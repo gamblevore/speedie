@@ -27,12 +27,12 @@ Honestly... the only reason to use Speedie right now, is if you find it interest
 
 
 # General Features #
-	* Object-oriented programming model
-	* Works natively with Jeebox... Probably the best way to learn how to use Jeebox.
-	* Simple but powerful syntax.
-	* Can make command-line apps or GUI apps.
-	* IPC lets you communicate and spread work across multiple processes.
-	* Has a native IDE (Perry), written specifically for Speedie. 
+* Object-oriented programming model
+* Works natively with Jeebox... Probably the best way to learn how to use Jeebox.
+* Simple but powerful syntax.
+* Can make command-line apps or GUI apps.
+* IPC lets you communicate and spread work across multiple processes.
+* Has a native IDE (Perry), written specifically for Speedie. 
 
 
 # Power Features #
@@ -44,13 +44,13 @@ Honestly... the only reason to use Speedie right now, is if you find it interest
 # Goals #
 I have a lot of long-term goals... Overall, I want to make programming a whole lot more fun. Here goes for a partial-list of goals!
 
-	* "stepping backwards-in-time, through code" to see WHERE a problem originated from, would reduce a lot of the pain in debugging. I know how to do this nicely.
-	* I want to embed Speedie within a game-engine, that can be used for anything, kind of like Roblox. But designed for fast real-time-action much more than Roblox.
-	* I actually want to design a game (someday) where you can do programming without writing code, in fact the shape of the levels and monsters or items within the levels would implicitly write code for you. So basically the whole experience would become very metaphorical and dream-like. You would write code through your adventures.
-	* I'd like to create a space for the original goals of Jeebox. This includes perfect translation of human language, and making the computer sensibly work with human commands. This needs a community, theres no way I can do this myself. Using Jeebox for AI is a goal, but this will have to be community driven. It's quite possible that "It won't be fun to do first" and "there are more fun directions to follow first" such as more visual-programming route.
-	* Perhaps being adopted by a specific community? For example, perhaps some company or group WANTS to have a programming language designed for it's needs specifically?
-	* I'm still interested in MMI (Mind Machine Interfacing) using quantum-entropy, so perhaps Speedie could be modified to be good at it. But I want to steer clear of any "real-life-resource gains" and stick to the "lets use it for play" (like using randomness for games) kind of thing, so it might have to come **after** making a good gaming system? Using MMI for resource-gains is kind of a cursed-genre.
-	* Perhaps visualisation of data-structures within a game-engine could be cool? As a way to explore your data and debug things.
+* "stepping backwards-in-time, through code" to see WHERE a problem originated from, would reduce a lot of the pain in debugging. I know how to do this nicely.
+* I want to embed Speedie within a game-engine, that can be used for anything, kind of like Roblox. But designed for fast real-time-action much more than Roblox.
+* I actually want to design a game (someday) where you can do programming without writing code, in fact the shape of the levels and monsters or items within the levels would implicitly write code for you. So basically the whole experience would become very metaphorical and dream-like. You would write code through your adventures.
+* I'd like to create a space for the original goals of Jeebox. This includes perfect translation of human language, and making the computer sensibly work with human commands. This needs a community, theres no way I can do this myself. Using Jeebox for AI is a goal, but this will have to be community driven. It's quite possible that "It won't be fun to do first" and "there are more fun directions to follow first" such as more visual-programming route.
+* Perhaps being adopted by a specific community? For example, perhaps some company or group WANTS to have a programming language designed for it's needs specifically?
+* I'm still interested in MMI (Mind Machine Interfacing) using quantum-entropy, so perhaps Speedie could be modified to be good at it. But I want to steer clear of any "real-life-resource gains" and stick to the "lets use it for play" (like using randomness for games) kind of thing, so it might have to come **after** making a good gaming system? Using MMI for resource-gains is kind of a cursed-genre.
+* Perhaps visualisation of data-structures within a game-engine could be cool? As a way to explore your data and debug things.
 
 On a personal level, outside of Speedie, I'd love to work on anything helping to restore nature or make technology less harmful. Such as helping retune wifi or EM-emissions of tech to NOT drain our health.
 
@@ -69,7 +69,6 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 1) Download and run Perry.app
 2) Perry will ask, if you want it to install everything. Just press "OK".
 3) It should be installed.
-
 
 
 
