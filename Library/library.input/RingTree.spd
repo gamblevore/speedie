@@ -1,0 +1,529 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class RingTree (Saveable)
+	|ind|			Position // should this be an ind?
+
+	size 40
+	linkage
+		wrapper
+		cpp_part		Tree
+	cpp_refs
+		disturbs nil
+		disowns  false
+
+	
+	saveas nil
+	contains		RingTree
+
+	
+	function Parent (||)				{ cpp_wrapper JB_Ring_Parent }
+	function Parent (assigns:||)
+		cpp_wrapper JB_Ring_ParentSet
+		cpp_refs {disturbs self} 
+	
+	constructor							{ cpp_wrapper JB_Ring_Constructor0 }
+	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor }
+	destructor							{ cpp_wrapper JB_Ring_Destructor }
+	
+
+	function Next (||)					{ cpp_wrapper JB_Ring_NextSib }
+	function Next (assigns:||)			{ cpp_wrapper JB_Ring_NextSibSet }
+
+	function Prev (||)					{ cpp_wrapper JB_Ring_PrevSib  }
+	function Prev (assigns:||)			{ cpp_wrapper JB_Ring_PrevSibSet }
+
+	function First (||)					{ cpp_wrapper JB_Ring_First }
+	function First (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_FirstSet }
+	function MakeFirst (||)				{ disabled "Seems buggy", cpp_wrapper JB_Ring_MakeFirst }
+	
+	function Last (||)					{ cpp_wrapper JB_Ring_Last }
+	function Last (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_LastSet }
+
+	function Second (||)
+		opt norefcounts
+		|| x = .first
+			return x.next
+
+
+	function Root (||)					{ cpp_wrapper JB_Ring_Root }
+	function IsRoot (|bool|)			{ cpp_wrapper JB_Ring_IsRoot }
+	function IsFirst (|bool|)			{ opt norefcounts, return .prev == nil }
+	function IsLast (|bool|)			{ opt norefcounts, return .next == nil}
+
+	function HasAny (|bool|)			{ cpp_wrapper JB_Ring_HasChildren }
+	function HasChildren (|bool|)		{ Disabled ".hasany" }
+	function HasChildCount (|int|Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount }
+		
+
+	function TakeAllFrom (|| src)
+		opt norefcounts
+		while src.hasany: .First = src.Last
+
+	function AtRoot (|bool|)
+		opt norefcounts
+		|| p = .parent
+		if !p or !p.parent
+			return true
+
+	
+	syntax Compare (|int| n, |bool|Aware, |int|)
+		return .slowcount - n
+	
+	syntax Equals (|int| n, |bool|Aware, |bool|)
+		return .haschildcount( n )
+	
+	operator More (|int| N, |bool|)
+		disabled ">" // has more children than N
+		return false
+		return !(self lessorequal n)
+	
+	
+	operator LessOrEqual (|int|N, |bool|)
+		// has N children or less.
+		opt norefcounts
+		|| c = .first
+		while c
+			require n > 0
+			n--
+			c++
+		return true
+	
+	
+	function Next (|| p, assigns:||)
+		cpp_part JB_Ring_SmartNextSet
+		if self
+			.next = Value
+		  else
+			p <~ Value
+	
+	
+	function FlatLast (||)
+		opt norefcounts
+		rz = self
+		while
+			rz = rz.last#loop
+	
+	function FlatNext  (|int| i, |bool| Down, ||)
+		opt norefcounts
+		if i < 0
+			debugat
+			return self
+		rz = self
+		for i
+			require rz
+			rz = rz.flatnextdepth(nil, down)
+	function FlatNext  (||)	
+		cpp_wrapper JB_Ring_FlatNext0
+	function FlatNextDepth  (|&int|Depth, |bool|Down=true, ||)
+		cpp_wrapper JB_Ring_FlatNextDepth
+	function FlatAfter (||)
+		cpp_wrapper JB_Ring_FlatAfter
+	function IsAncestor (|| root, |bool|)
+		disabled "Use inside or contains operator"
+
+
+	operator inside (|| s, |bool|)
+		return s contains self
+
+	operator contains (|| r, |bool|)
+		opt norefcounts
+		for s.up in r
+			if s == self
+				return true
+		
+	function Remove
+		.Parent = nil
+	
+	function DisposeAll (|bool| MeToo=false)
+		opt norefcounts
+		require self
+		while (|| f = .first)
+			f.disposeall(true)
+		if (Metoo)
+			.dispose
+	
+	function dist (|ringtree| r, |int|)
+		opt norefcounts
+		require self and r
+		
+		debug_require r.parent == .parent
+		if r != self
+			return .fwddist(R) oar .backdist(r)
+			
+
+	function fwddist (|ringtree| F, |int|)
+		opt norefcounts
+		|| c = 0
+		while F
+			if self == F
+				return c
+			F++
+			c++
+			
+
+	function backdist (|ringtree| B, |int|)
+		opt norefcounts
+		|| c = 0
+		while B
+			if self == B
+				return c
+			B--
+			c--
+		
+	operator gt (|ringtree| rt, |bool|)
+		return .fwddist(rt)
+
+	operator min (|| rt, ||)
+		if rt gt self
+			return self
+		return rt
+
+	operator plus (|int| n, ||)
+		disabled ".moveflat or .move?"
+	operator minus (|int| n, ||)
+		disabled ".moveflat or .move?"
+	
+
+	function Move (|bool| fw, ||)
+		if fw
+			return .next oar self
+		return .prev oar self
+		
+	
+	function Move (|int| n, ||)
+		cpp_part MoveN
+		return .move(n, nil, true)
+
+	function Step (|bool| dir, ||)
+		cpp_Part stepbool
+		if dir
+			return .next
+		return .prev
+	function Step (|int| i, ||)
+		disabled "use .move(int) or .step(bool)"
+		if i
+			return .step(i>0)
+		return self
+
+	function Move (|int| n, |&int| r, |bool| cap, ||)
+		cpp_part StepN
+		opt NoRefCounts
+		if !self or !n
+			return self
+		|| m = 0
+		|| c = self
+		|| lim = n.abs
+		while m < lim
+			c = c.step(n > 0)
+			if !c: Exit
+			m++
+
+		if r
+			*r = m
+		if c or !cap
+			return c
+		c = .parent
+		return (C.first, c.last)(n < 0)
+
+
+	function Pop (||)
+		// don't opt this :3
+		rz = .last
+		if rz 
+			rz.remove // really bad bug here if you do
+
+
+	function PopFirst (||)
+		rz = .first
+		if rz
+			rz.remove
+
+
+	function ReplaceWith (|| x)
+		.Prev = x
+		.Parent = nil
+
+
+	function MoveTo (|| dest)
+		require self != dest
+		if Dest gt self
+			dest.next = self
+		  else
+			dest.prev = self
+
+
+	function ShuffleNow
+		opt norefcounts
+		|| n = .slowcount
+		for n
+			.first = .last.move(-n.now)
+
+
+	function IsOnlyChild (|bool|)
+		opt norefcounts
+		if (!.Prev)
+			return !.Next
+
+	function HasOneChild (|bool|)
+		return .HasChildCount(1)
+
+
+	function RemoveChildren
+		disabled ".clear now"
+
+
+	function Clear // rename stuff to be more inline with arrays. :)
+		opt norefcounts
+		while
+			.first$.remove
+
+
+	function Count (|int|)
+		disabled "This function is slow. Use .HasChildCount or .SlowCount (a more honestly named version of .count... there is no fast way to do this.)"
+
+
+	function SlowCount (|int|)
+		opt norefcounts
+		for self
+			rz++
+
+
+	function ExtractChild (||)
+		rz = .First
+		rz.parent = nil
+
+
+	function IsChild (|int| N, |bool|)
+		opt norefcounts
+		for C in .Parent
+			N--
+			if (C == self)
+				return !N
+
+
+	function NextPrev (||)
+		opt norefcounts
+		|| n = .next
+			return n
+		return .prev
+
+
+	syntax access (||)
+		if self
+			return .Parent
+
+
+	syntax Access (|int| n, ||)
+		cpp_part Get
+		opt norefcounts
+		if self
+			if n >= 0
+				rz = .First
+				while rz and (--n >= 0)
+					rz++
+			  else
+				rz = .last
+				while rz and (++n < 0)
+					rz--
+
+	
+	function First_ (||)
+		if self
+			return .First
+
+	render
+		fs <~ "("
+		for f in self
+			f.__render__(Fs)
+			fs <~ ","
+			fs <~ " "
+		fs <~ ")"
+
+
+	syntax Append (|| Last)
+		.Last = Last
+
+
+	function RemoveAfter
+		opt norefcounts
+		while (|| x = .next)
+			x.remove
+
+	function RemoveBefore
+		opt norefcounts
+		while (|| x = .prev)
+			x.remove
+
+
+	function Keep (|int| n, |bool| First = true)
+		opt norefcounts
+		if n <= 0
+			.clear
+		  elseif first
+			self[n-1].removeafter?
+		  else
+			self[-n].removebefore?
+
+
+	function AppendAfter (|| item, || after)
+		if after
+			after.next = item
+		  else
+			.first = item
+	
+	
+	function Flatten (|[...]|)
+		opt norefcounts
+		for c.flat in self
+			rz <~ c
+	
+	function Array (|[...]|)
+		opt norefcounts
+		for msg in self
+			rz <~ msg
+
+
+	function AppendBefore (|| item, || Before)
+		if Before
+			before.prev = item
+		  else
+			.Last = item
+
+
+	helper SortAfter (|SorterComparer| fnc, |ringtree|)
+		opt norefcounts
+		// find the first obj that we are "more than"
+		|| p = .prev
+		while p
+			if (fnc)(self, p)
+				return p
+			p--
+
+
+	function Sort (|SorterComparer| fnc, |int|)
+		opt NoRefCounts
+		|| c = .second
+		while c
+			|| f = c
+			c = c.next
+			|| b = f.SortAfter(fnc)
+				b.next = f
+			  else
+				.first = f
+
+
+	function Loop (|bool| dir, ||)
+		if dir
+			return .nextloop
+		return .prevloop
+		
+
+	function NextLoop (||)
+		|| f = .next
+		return (f, .parent.first)(f)
+		
+
+	function PrevLoop (||)
+		|| f = .prev
+		return (f, .parent.last)(f)
+	
+	function Upward (|int| n, ||)
+		opt norefcounts
+		rz = self
+		while rz and n-- >= 1
+			rz = rz.parent
+	
+	operator downto (|| Low, |RingDownRange of ...|)
+		|RingDownRange| rz
+		rz.From = self
+		rz.To = (Low.prev, nil)(Low)
+		return rz
+
+	operator to (|| High, |RingRange of ...|)
+		|RingRange| rz
+		rz.From = self
+		rz.To = (high.next, nil)(high)
+		return rz
+
+	iterator
+		|| ch_ = .First_
+		while ( ch_ )
+			|| N = ch_.Next|...|
+			yield ch_ (ch_)
+			ch_ = N
+		(self)
+	
+	
+	iterator reverse
+		|| ch_ = .last
+		while ( ch_ )
+			|| N = ch_.prev|...|
+			yield ch_ (ch_)
+			ch_ = N
+		(self)
+			
+
+	iterator fast
+		|| ch_ = .First_
+		while ( ch_ )
+			yield ch_ (ch_)
+			ch_ = ch_.Next|...|
+		(self)
+
+	
+	iterator flat
+		|| _curr = self
+		|| after = .FlatAfter
+
+		while ( _curr ) and ( _curr != after )
+			|| N_ = _curr.FlatNext|...|
+			yield _curr (_curr)
+			_curr = N_
+		(self)
+
+
+	
+	iterator up
+		|| _curr = self
+		while _curr
+			yield _curr (_curr)
+			_curr = _curr.parent
+		(self)
+
+		
+	iterator forward
+		|| _curr = self
+		while _curr
+			yield _curr (_curr)
+			_curr = _curr.next
+		(self)
+
+
+struct RingDownRange
+	contains ringtree
+	|| From
+	|| To
+	
+	iterator
+		|| ch_ = .from
+		while ( ch_ and ch_ != .to )
+			yield ch_ (ch_)
+			ch_ = ch_.prev
+
+
+
+struct RingRange
+	contains ringtree
+	|| From
+	|| To
+	
+	iterator
+		|| ch_ = .from
+		while ( ch_ and ch_ != .to )
+			yield ch_ (ch_)
+			ch_ = ch_.next
+

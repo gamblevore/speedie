@@ -1,0 +1,24 @@
+
+
+class Concept {
+	|Category|			Cat
+	|string|			Name
+	|object|			Opposite
+	
+	constructor (|string| s, |category| cat)
+		.cat = cat
+		.name = s
+		
+	function message.concept (|bool| CanCreate, |concept|)
+		|| id = .id
+		|| item = Concept.list[id]
+		if !item and cancreate
+			item = concept.new(id, langload.currcat)
+			concept.list[id] = item
+		return item
+	
+	module
+		|dictionary of concept|	List = dictionary.new
+}
+
+

@@ -1,0 +1,43 @@
+
+
+|memory| Ughughugh
+class ProgressBar (GUIControl)
+	linkage
+		cpp_part Bar
+	|float| Progress
+	|bool|	Indefinite
+	|bool|	RandomStyle
+
+	constructor (|guicontrol| p, |guiaction| onclicked=nil)
+		super.constructor(p)
+		.onclicked = onclicked
+		.indefinite = true
+	
+	behaviour draw
+		sdlapp.touch
+		if .Indefinite
+			Ughughugh := byte[128]
+			if !Ughughugh[0] or sdlapp.FrameCount isa 9
+				Ughughugh.Temporal
+			where.Colorise(Ughughugh, 2)
+		  else
+			|| Dark  = (0.2, 0.2, 0.2, 1.0)
+			|| Light = (0.7, 0.7, 0.7, 1.0)
+			if !.RandomStyle
+				light = (0.4, 0.4, 0.4, 1.0)
+				
+			for (p in where) (v)
+				p <~ (dark, light)(.StripeDark(v))
+		where.drawrect(.lastrect, .gnormal, 1.0)
+	
+	
+	behaviour Mouseup
+		if .lastrect contains p
+			(.onclicked)(self, nil,  nil)?
+	
+	
+	function StripeDark (|ivec2| v, |bool|)
+		if .indefinite
+			if .RandomStyle
+				return RANDOM[] > 0.5
+			return ((v.sum - date.ticks/3) / 4) mod 2

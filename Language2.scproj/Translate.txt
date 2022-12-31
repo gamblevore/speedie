@@ -1,0 +1,56 @@
+
+
+Bugs:
+	* grouptable/wordtable can be a dict of wordgroup?
+	* considering it has one property.
+
+
+Get it working
+	* Some Sample Dictionaries and Jeebox examples
+	* Language-Rendering
+	
+	
+Improvements
+	* Ambiguous word resolution
+	* Grammar-Improvements during translation
+
+
+Second part
+	* VM ASM
+	* High quality translation dictionary importer
+	* Temporal machine-learning AI
+
+
+* need ambiguous words
+	light:
+		a light (bright) shade
+		a light (gentle) note
+		a light (thin) coat
+		a light (weight) dumbbell
+		(only resolvable by domain... color/speed/size/weight/force
+	
+	fat:
+		i am fat
+		i eat fat
+		(resolvable by adjective/noun resolution.)
+			i am fat --> "i am adjective"
+			i eat fat --> "i verb noun"
+
+
+selector Domains {
+	items (
+		Color
+		Time
+		Speed
+		Length
+		Size
+		Weight
+		Force
+		Beauty // pretty~fat vs pretty~cat
+		Science
+		Computer
+		Slang
+	)
+}
+
+

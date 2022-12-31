@@ -1,0 +1,61 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+module Pipe
+	constants
+		StdIn_  = 0
+		StdOut_ = 1
+		StdErr_ = 2
+
+	function StdError (assigns:|int|)
+		cpp_wrapper
+
+	function StdOut (assigns:|int|)
+		cpp_wrapper
+	
+	function IsTerminal (|int| FD, |bool|)
+		cpp_wrapper JB_IsTerminal
+	
+	function ErrorIsTerminal (|bool|)
+		.IsTerminal(Stderr_)
+		
+	//function PipeClosed (|int| FD, |bool|)
+		//cpp_wrapper JB_PipeIsClosed // implmented badly.
+	function KillPID (|int| pid, |int|)
+		cpp_wrapper JB_Kill
+	
+			
+
+
+datatype PID_Int (int)
+	syntax cast (|bool|)
+		return self > 0
+
+extend string
+	function StartProcess (|string|talk, |[string]| Args=nil, |PID_Int|)
+		cpp_Wrapper JB_Str_StartIPC
+
+	function PrintExecute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
+		if file.DebugExecute // shouldnt be default!
+			print self
+			print " "
+			printline args.Render
+		return .Execute(args, out, errs)
+		
+	function Execute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
+		cpp_wrapper JB_Str_Execute
+
+	function CreateArgs (|&cstring| Space, |[string]| Args, |int|)
+		cpp_wrapper JB_ArrayPrepare_
+
+	function ExecuteStr (|[string]| Args, |string|)
+		|| fs = faststring()
+		if .execute(args, fs)
+			return fs
+
+	function System (|int|)
+		cpp_wrapper	// bad? execute is better?
+

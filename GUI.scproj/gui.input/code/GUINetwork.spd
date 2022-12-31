@@ -1,0 +1,27 @@
+
+ 
+function network.guidownload (|string|url, |int|lim, |networkDownloader|)
+	rz = .download(url, lim)$
+	while !rz.Finished
+		require sdlapp.WaitFrame("Downloading from $url\n\n${rz.progress.pc}") 
+
+
+function sdlapp.WaitFrame (|string| Reason, |bool|)
+	// put up a dialog... with a string reason
+	// allow them to close the dialog!
+
+
+function process.Activate (|date| timeout, |bool| TestFailConnect, |int|)
+	cpp_Part GUIActivate
+	require self != nil
+	if self > timeout
+		error (self, "child timed out.")
+		.disconnect
+	if (TestFailConnect and .FailedConnect) 
+		ifn ("Could not connect to "+.name+". Re-try?").confirm
+			return -1
+	if .activate
+		return 1
+	return -1
+
+

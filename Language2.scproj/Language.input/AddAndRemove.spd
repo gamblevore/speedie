@@ -1,0 +1,320 @@
+
+
+// DESIGN:
+// * "ti.orig" : Tightened by ImproveKidTranslation to it's "word-group" (a~big~cat)
+//   Even leaves are tightened by siblings.
+
+// * "ti.mine" : only includes it's children's values and its own.
+// (I could change this)
+
+
+
+// * i will~run far~away --> spanish
+	// * replace "I" with "_"
+	// * remove "will"
+	// * far~away gets @badj
+	// * run --> some-stupid-word that takes into account "I" and "will"
+	
+
+extend message {
+
+function DebugTran
+	require self
+	|| ti = .tran
+	printline "................................................
+	orig:	${ti.origmsg.render} ${ti.orig.render}
+	new:	${.render} ${ti.mine.render}
+"
+	// So... now what?
+	
+
+function DebugTranAll 
+	Opt NoRefCounts
+	printline .langrender
+	for s.flat in self
+		s.debugtran
+
+
+function BiggerWord (|message|)
+	opt norefcounts
+	for (r.up in self)
+		if r.tran.isbiggerword
+			return r
+
+
+function LeafTranFunc (|syntax|)
+	opt norefcounts
+	for a.flat in self
+		if a.translateable
+			return a.func
+	return .func
+
+
+function tran (|TransInfo|)
+	opt norefcounts
+	|| w = .obj
+	if w isa transinfo
+		return w
+	if w
+		debugat()
+
+
+function WordTypes (|gram|)
+	with .obj|word|
+		return .types
+	return -1
+
+
+function ImproveTran (|message| Will, |bool|)
+	opt norefcounts
+
+	|| Run = self
+	// will~run  -->  will~runero
+	// 101  011       101  001
+			
+	|| WillTi    = will.tran
+	require (WillTi.myword$) is grammar
+	|| RunTI	 = .tran
+
+	if (RunTi.mine & WillTi.mine) == RunTi.mine
+		.debugtran
+		will.debugtran
+		debugat()
+		return true
+
+
+function CanBePartOfBigWord (|bool|)
+	if .translateable
+		return true
+	|| fn = .func
+	return (fn == @bra or @adj or @badj)
+
+
+function ImproveKidTranslation (|gram| overall, |bool|)
+	opt NoRefCounts
+	
+	|| modified = false
+	for Part in self
+		modified (|)= Part.tran.NeatenWord(Part, overall)
+		if part.hasany
+			modified (|)= part.ImproveKidTranslation(overall)
+		
+	if modified
+		.CleanupMine
+		return true
+
+	
+
+
+function CleanupMine (|gram|)
+	opt NoRefCounts
+	|| ti = .tran
+	if !.hasany
+		return ti.mine
+
+	|gram| mine = -1
+	for Part in self
+		mine = mine merge Part.CleanupMine
+	ti.mine = mine
+	return mine
+}
+
+
+
+
+
+function Language.WordSpecificers (|message| msg) {
+	// i put it on the table --> i laid it on the table
+	// (german doesn't have "put", only "laid/inserted/slided/slammed/etc")
+	// what about "placed"? Anyhow, most people replace "put" with a more specific word.
+	// lets use placed if possible?
+}
+
+
+function TransState.StraightTranslate (|message| Read,  |message| cpy,  |TransInfo|)
+	Opt NoRefCounts
+	
+	|| ti = .TranOneWord(read, cpy)
+
+	for r in Read
+		if r != @sheb
+			|| KidTr = .StraightTranslate(r, message(cpy, R))
+			ti <~ kidtr
+	
+	//.Stats(read, ti)
+	ti.CheckBiggerness(cpy)
+	return ti
+
+
+function TransState.StraightRead (|message| Read,  |TransInfo|)
+	Opt NoRefCounts
+	
+	|| ti = TransInfo.new(read, read.word)
+	read.obj = ti
+
+	for r in Read
+		ti <~ .StraightRead(r)
+	
+	ti.CheckBiggerness(read)
+	return ti
+
+
+function TransState.ImproveWords (|message| cpy, |bool|)
+	Opt NoRefCounts
+	
+	for r.flat in cpy
+		|| ti = r.tran
+		if ti.IsBiggerWord and r.hasany
+			r.ImproveKidTranslation(ti.orig)
+
+
+function TransState.TranOneWord (|message| read, |message| cpy, |TransInfo|) {
+	Opt NoRefCounts
+	|| wrd = read.word
+	|| w2 = .DestVersion(Wrd, read)
+	|| r = TransInfo.new(read, w2)
+	cpy.obj = r
+	if w2
+		cpy.name = w2.name
+	return r
+}
+
+
+function TransState.RemoveStructure (|message| cpy) {
+	Opt NoRefCounts
+	
+	for s in cpy
+		.removestructure(s)
+
+	require cpy == @Adj or @badj
+	require cpy.parent						// not removed already.
+
+	|| Removeable = cpy.first
+	|| Keep = Removeable.next #require
+	
+	if keep.ImproveTran(removeable)
+		cpy.replacewith(Keep)
+}
+
+
+function TransState.AddStructure (|message| root)
+	opt NoRefCounts
+	visible
+	
+	for r.flat in root
+		|| ti = r.tran
+		if (ti and ti.isbiggerword)
+			.AddWords(r, ti)
+
+
+function TransState.AddWords (|message| cpy, |TransInfo| g) {
+	opt norefcounts
+	require !(cpy.translateable and !g.myword)
+	if g.Mine == -1
+		if stderr.ok
+		return
+		
+	|| ToRemove = g.Mine &~ g.Orig						#require
+	|| OppOrThing = cpy.LeafTranFunc
+		
+	for R in gram.components
+		|| Want = R & g.orig // this is what we want.
+		|| Have = R & g.mine
+		if (want != have) and want.ispo2
+			cpy = .ApplySub(cpy, OppOrThing, g, want)
+}
+
+
+function TransState.CaptureLoss (|message| Stuff, |gram| ToAdd, |message|) {
+	return stuff
+	//    /\;v;/\
+	//		en~el~pozo --> in~the~well
+	// We lost "male". But wells aren't male... so whatever?
+	// we might wanna capture this loss...
+}
+
+
+function TransState.ApplySub (|message| Stuff, |syntax| OppOrThg, |TransInfo| Gs, |gram| ToAdd, |message|) {
+	opt NoRefCounts
+	|| w2 = .dest.FindGrammar(ToAdd)
+	if (!w2)
+		return .CaptureLoss(Stuff, ToAdd)
+
+	|| adj = @adj.msg
+	|| f = message.new(adj, OppOrThg, w2.Name)
+	f.Obj = TransInfo.new(nil, w2)
+	
+	stuff.next = adj
+	adj <~ stuff
+	return adj
+}
+
+
+
+class TransInfo {
+	// Just put this on .obj! Replace with .newword later!
+	
+	|gram|			Orig
+	|gram|			Mine
+	|message--|		OrigMsg
+	|word--|		MyWord
+	|bool|			IsBiggerWord
+	|bool|			CanBePart
+	|bool|			KidsArePart
+	
+	
+	syntax append (|TransInfo| x)
+		.Orig = .orig merge x.Orig
+		.Mine = .mine merge x.Mine
+		.KidsArePart = .KidsArePart and x.canbepart and x.kidsarepart
+	
+	
+	constructor (|message| OrigMsg, |word| MyWord)
+		.OrigMsg = OrigMsg
+		.mine = (MyWord.types, -1)(myword)
+		.Orig = (OrigMsg.WordTypes,-1)(origmsg)
+		.MyWord = MyWord
+		.CanBePart = (origmsg.CanBePartOfBigWord,true)(origmsg)
+		.KidsArePart = true
+
+
+	function TransInfo.CheckBiggerness (|message| cpy)
+		opt norefcounts
+		require !.canbepart
+			// were talking about the parent
+			// awkward... but we need the entire info.
+		for ch in cpy
+			|| c = ch.tran 
+			|| b = c.canbepart and c.kidsarepart
+			c.isbiggerword = b
+	
+	
+	render {
+		if (.origmsg)
+			.origmsg.render(FS)
+			fs <~ '\n'
+		fs <~ "mine: "
+		.mine.render(fs)
+		fs <~ '\n'
+		fs <~ "orig: "
+		.orig.render(fs)
+		fs <~ '\n'
+	}
+	
+	
+	function NeatenWord (|message| f, |gram| overall, |bool|) // the->el
+		|| MoreHonest = overall merge .orig					  // a more honest translation 
+		require (morehonest != .mine)
+		|| w1 = .myword			#require
+		|| w2 = w1.improve(MoreHonest)
+		require (w2 != w1)
+
+		f.name = w2.name
+		.mine = w2.types // do we re-tighten cos we modified this?
+		.myword = w2
+		return true
+}
+
+
+
+// @comrade is a~cursed~evil~shit.

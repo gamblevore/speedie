@@ -1,0 +1,37 @@
+
+
+main // speedie main {	 
+	compiler.SetupEnv
+	Compiler.Main
+	if interact.Perry != nil
+		printline "exiting speedie " + app.id.render
+
+
+function Compiler.Main
+	if !.TryVariousStartModes and FeedBack.ParseArgs
+		if !interact.Enter
+			.CompileTime
+	.PrintStats
+	.PrintCompileErrors
+
+
+api Speedie_Main (|&cstring| args, |int| Mode, |ErrorInt|)
+	cpp_name Speedie_Main 
+	return app.sp_run(args, mode)
+
+
+function compiler.SetupEnv
+	opt norefcounts
+	|| B = app..talk and app.IsMainThread
+// don't let breakpoints rekt us
+		app.IgnoreSig
+		app.CrashHandler = &process.TellParentIDied 		
+	  else
+		app.CrashHandler = &app.DefaultCrashHandler
+
+	app.PrefsStartup
+	errorcolors.DisableIfNoTerminal
+
+
+function app.IgnoreSig (|int| sig=-1)
+	cpp_wrapper JB_Pipe__Ignore

@@ -1,0 +1,31 @@
+
+
+class StringShared
+	linkage
+		wrapper
+		cpp_class JB_StringShared
+		cpp_part Str
+
+	cpp_refs
+		Disturbs		nil
+
+	default			""
+
+
+target future
+	// I suppose we could do a different parsing scheme...
+	// where we use shared "ID" objects... per message
+	// Could save RAM/CPU during parse? if done right.
+	// Apple = Apple.eat(Apple) the Apple is thg@"Apple"
+	// sooo it can be reused 3x.
+	// doesnt work well for large strings... but most of them yes.
+	// could set a "maximum string size" that we do it to?
+	// otherwise... they DON'T get uniqufied.
+
+	class ID (StringShared)
+		contains object
+		||			OurThing
+		|syntax|	Func
+		constructor
+			.ourthing = nil
+

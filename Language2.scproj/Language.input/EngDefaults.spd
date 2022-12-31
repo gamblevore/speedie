@@ -1,0 +1,236 @@
+
+extend Group {
+
+function DefaultSpecials 
+	if self isa Element.aux
+		.DefaultSpecial (|)= specialproperty.grammar
+
+
+function DefaultVerb (|string| N, |gram| T)
+	Opt NoRefCounts
+	// lift  -> lifting,  lifts,   lifted
+	// run   -> running,  runs,    ran
+	
+	|| Last = N.Last
+	|| Last2 = N.Last(1)
+	|| Remove = 0
+	|| extra = "s"
+	
+	
+	.AddDefault(N, gram.BasicTense, T, Element.verb)				// hurry
+
+	
+	if (last.isvowel and last != 'e') or N.EndsSZCHX
+		extra = "es"
+	  elseif (last == 'y') and last2.isconso
+		remove = 1
+		extra = "ies"
+	
+	|| N2 = .engname(N, remove, 0, extra)
+	.adddefault(N2, gram.spread, T, Element.verb)				// hurry --> hurries
+
+
+//
+	Remove = 0
+	extra = "ed"
+	if (last == 'y') and last2.isconso
+		extra = "ied"											// hurry --> hurried
+		remove = 1
+	  elseif (last == 'e')
+		extra = "d"
+	  elseif (last == 'p') and (last2 == 'e')
+		remove = 2
+		extra = "pt"											// sleep --> slept, weep --> wept
+	
+	N2 = .Groupname.EngAdd_ED
+	.AddDefault(N2, gram.past, T, Element.verb)
+
+
+//
+	remove = 0
+	|| Add = 0
+	extra = "ing"
+	if last == 'e'
+		remove = 1
+	  elseif (last.isconso and last != 'w') and last2.isvowel and n.last(2).isconso
+		//  run-->running,  sleep-->sleeping,  kill-->killing,  fool --> fooling 
+		add = last
+		
+	
+	N2 = .engname(N, remove, add, extra)
+	.AddDefault(N2, gram.continuous, T, Element.verb)			// hurry --> hurrying, bake-->baking
+	
+	
+
+function DefaultQuestion (|string| N, |gram| T)
+	Opt NoRefCounts
+	.AddDefault(N, -1, T, .eles)			// –which girl are you, –which cat ate all~my~cheese
+
+
+
+function DefaultAux (|string| N, |gram| T)
+	Opt NoRefCounts
+	debugat()
+	.AddDefault(N, -1, T, Element.aux)					// can/cant
+	
+
+function DefaultAdverb (|string| N, |gram| T)
+	// quick	->	quickly,		quicker,	quickest
+	// easy		->	easily,			easier,		easiest
+	// gentle   ->  gently,			gentler,	gentlest
+	// pathetic ->	pathetically,	(none),		(none),
+	
+	// adverbs: icaltefl.com/regular-adverbs-in-english-grammar
+	Opt NoRefCounts
+	
+	if (self isa Element.noun) or (self isa Element.adjective)
+		.DefaultAdjective(N, T)
+
+	|| Last = N.Last
+	|| Remove = 0
+	|| add = 0
+	|| AdverbOnly = ""
+	
+	if (last == 'y')
+		debugat
+		remove = 1
+		add = 'i'
+	  elseif N.endswith("ly")
+		remove = 2
+		add = 'i'
+	  elseif N.Endswith("ic")
+		AdverbOnly = "ally"
+	  elseif N.Endswith("ical") or N.Endswith("ful")
+		AdverbOnly = "ly"
+	
+	//  a slow book,   	i slowly climbed up,  i am slow
+	//  a magical book, i magically climbed up, i am magical 
+
+	if (adverbonly)
+//			expect !(self isa Element.adjective) (self, "This can't be an adjective")
+		adverbonly = N + adverbonly
+	  else
+		adverbonly = .engname(N, remove, add, "ly")
+	.adddefault(adverbonly,	0, T, Element.adverb)
+	
+
+function DefaultAdjective (|string| N, |gram| T)
+	Opt NoRefCounts
+
+	|| Last = N.Last
+	|| Last2 = N.Last(1)
+	|| Remove = 0
+	
+	|| NounOrAdj = Element.noun + Element.adjective
+	.AddDefault(N, gram.medium, T, NounOrAdj)						// an~easy~game // noun, adjective
+	
+	if last != 's' or 'x'										// Cant!
+		if last.isvowel
+			remove = 1
+			last = 0
+		  elseif last == 'y'
+			Remove = 1												// Easy, easier, easiest
+			last = 'i'
+		  elseif (last == 'h') and (last2 == 'c' or 's')
+			last = 'i'												// Bitch, bitchier, bitchiest // :3
+		  elseif !((last.IsConso and last!='w') and last2.isvowel and n.last(2).isconso)
+			last = 0
+		  elseif last.isconso and (last2.isconso or n.last(2).isconso)
+			last = 0 // fat/fatter, cold/colder, tired/tireder
+		
+		|| N2 = .EngName(N, Remove, last, "er")
+		.AddDefault(N2, gram.bigger, T, NounOrAdj)					// Easier
+
+		N2 = .EngName(n, Remove, last, "est")
+		.AddDefault(N2, gram.biggest, T, NounOrAdj)					// Easiest
+
+
+
+function EngName (|string| name, |int| Remove, |byte| last, |string| add, |string|)
+	|| fs = faststring.new
+	|| n = name.length-Remove
+	fs <~ name[0, n]
+	if last
+		fs <~ last
+	fs <~ add
+	return fs
+
+function DefaultNoun (|string| N, |gram| T) {
+	// dog   -> dogs
+	// nouns: theenglishspace.com/spelling/plurals-ending-s.html
+
+	Opt NoRefCounts
+	|| Last = N.Last
+	|| Last2 = N.Last(1)
+	|| Remove = 0
+	|| extra = "s"
+
+
+	if (last == 'y') and last2.Isconso // baby -->babies
+		extra = "ies"
+		remove = 1
+	  elseif (last == 'z')
+		debugat()
+		extra = "zes" 
+	  elseif N.EndsSZCHX
+		extra = "es" // box --> boxes
+	  elseif (last == 'o' and last2 == 't')
+		debugat()
+		extra = "es"
+	  elseif (last == 'f')
+		remove = 1
+		extra = "ves"
+	  elseif (last == 'e' and last2 == 'f')
+		debugat()
+		extra = "ves"
+		remove = 2 
+			
+	.AddDefault(N,	gram.single, T, Element.noun)		// dog,  bitch,   box,   quiz,    tomato
+	|| N2 = .engname(n, Remove, 0,	extra)
+	.AddDefault(N2,  gram.plural, T, Element.noun)		// dogs, bitches, boxes, quizzes, tomatoes
+	
+	if self isa Element.verb		// not successed!
+		.adddefault(n.EngAdd_ED, gram.past_simple, T, Element.verb) // a~(Dark haired boy)
+}
+
+}
+
+
+
+function EngWordExpander (LangWordExpander)
+	if self isa Element.question
+		.DefaultQuestion(name, Types)
+	  elseif self isa Element.adverb
+		.DefaultAdVerb(name, Types)
+	  elseif self isa Element.adjective
+		.DefaultAdjective(name, Types)
+	  elseif self isa Element.noun
+		.DefaultNoun(name, Types)
+	  elseif self isa Element.verb
+		.DefaultVerb(name, Types)
+	  elseif self isa Element.aux
+		.DefaultAux(name, types)
+	
+
+
+
+function string.EndsSZCHX (|bool|)
+	|| Last = .Last
+	if last == 's' or 'z' or 'x'
+		return true
+	  elseif last == 'h'
+		last = .last(1)
+		return last == 'c' or 's'
+
+
+function string.EngAdd_ED (|string|)
+	|| last = .last
+	|| last2 = .last(1)
+	if (last == 'y') and last2.isconso
+		return self[0, .length-1] + "ied"						// hurry --> hurried
+	  elseif (last == 'e')
+	    return self + "d"
+	  elseif (last == 'p') and (last2 == 'e')
+		return self[0, .length-2] + "pt"								// sleep --> slept, weep --> wept
+	return self + "ed"
+

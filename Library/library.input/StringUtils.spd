@@ -1,0 +1,114 @@
+
+
+function Print (|string| data)
+	cpp_wrapper JB_Str_Print
+
+
+function PrintLine (|string| data=nil)
+	strprintline(Data)							// to disambiguate vs macro
+
+
+macro PrintLine
+	StrPrintline(_.render) // not self-referential anymore.
+
+	
+function StrPrintLine (|string| data)
+	cpp_wrapper JB_Str_PrintLine
+
+
+
+function PrintLine (|object| o)
+	cpp_name JB_Obj_PrintLine
+	printline o.render
+
+
+function ZalgoLine (|string| data="  ooooof  ")
+	printline data //.zalgo // remove floats first
+
+
+macro ZalgoLine
+	Printline _.render	//.zalgo // remove floats first
+
+
+
+function Print (|object| o)
+	cpp_name JB_Obj_Print
+	print o.render
+
+
+function PrintError (|string| data)
+	cpp_wrapper JB_Str_PrintError
+
+
+function PrintTo (|string| data, |int| FileDes)
+	cpp_wrapper JB_Str_PrintTo
+
+
+function byte.IsConso (|bool|)
+	return !.isvowel
+
+
+function byte.IsVowel (|bool|)
+	|| b = .lowercase
+	return (b =='a' or 'i' or 'e' or 'o' or 'u') 
+
+
+function int.operatorpc (|int| x, |string|) 
+	return (self|float| / x|float|).pc
+
+
+function string.IsFileLike (|bool|)
+	|| c = self[0]
+	return (c == '/') or ((c == '.' or c == '~') and ((self[1] == '.') or (self[1] == '/')))
+	// so... we want to wrap to w... but prefer to wrap at a SPACE or comma
+	
+function string.operatorpc (|string| x, |string|) 
+	return .length pc x.length
+	
+
+function byte.IsTextLine (|bool|)
+	 return self == '\n' or '\r'
+
+function int.TabsWidth (|int|)
+	return 4-(self & 3)
+
+
+
+
+helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
+	|| i		= p
+	|| ParaMax	= 1K
+	MaxWidth	= MaxWidth min Paramax
+	|| Orig		= MaxWidth
+	paramax += p
+
+	while
+		|| c = .byte(i, -1)
+		if c < 0
+			return i
+		if c|byte|.IsTextLine
+			return i + 1
+		if i >= ParaMax or MaxWidth <= 0
+			return i
+		
+		if c == '\t'
+			i++
+			maxwidth -= (Orig-MaxWidth).TabsWidth
+		  elseif isinline
+			i++
+		  elseif jeebox.cswrapsplit[c]
+			i++
+			MaxWidth--
+		  else									 // so where does the word end?
+			|| WordEnd = .find(jeebox.cswrapsplit, i, ParaMax)
+				WordEnd += (self[WordEnd] > 32)
+			  else
+				WordEnd = .length min paramax
+			|| MW2 = MaxWidth - .CharCount(i, WordEnd)
+			if MW2 < 0
+				if i == p
+					i = p + MaxWidth
+				return i
+			MaxWidth = MW2
+			i = WordEnd
+			continue

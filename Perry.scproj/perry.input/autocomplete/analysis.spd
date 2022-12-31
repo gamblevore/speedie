@@ -1,0 +1,100 @@
+
+
+function perryide.ListAllFuncs (|bool| sel=false)
+	|| result = .FunctionMenu.submenu.listsource
+	result.clear
+	.ListAllFuncsMsg(.editme.ViewParse, result)
+	if sel
+		.FindSelectedMenuItem(result)
+	|| old = result.obj
+	result.obj = (.editme._Start, nil)(sel)
+		
+	result.Sort(FuncListSorter)
+	(.FunctionMenu is visible) = result.HasAny
+	.FunctionMenu.text = "(" + result.SlowCount.Render + ")"
+	.ImproveFuncList(Result)
+
+
+function message.FuncAtPos (|int| n, |message|)
+	opt norefcounts
+	for s in self
+		if s.position > n
+			return s.prev
+	return .last
+
+
+function PerryIDE.FindSelectedMenuItem (|message| result)
+	opt norefcounts
+	require result.hasany
+	|| fn = result.FuncAtPos(.editme.sel0 )
+	.FunctionMenu.submenu.select(result)
+	
+	
+function PerryIDE.ImproveFuncList (|message| result)
+	opt NoRefCounts
+	|message| p0
+	for s.fast in result
+		|| p = s[0][0]
+		if !p0 or !p.shallowequals(p0, true)
+			|| d = listviewrow()
+			d.name = "------<" + p.name + ">------"
+			(d is disabled)
+			s.prev = d
+		|| n = s[0].name
+		if p != @name
+			n = "." + n 
+		s.name = n
+		p0 = p
+				
+					
+function PerryFuncMenuSelected (GUIListEvent)
+	opt norefcounts
+	|| e = .ide.EditMe
+	e.ClearFound
+	if row
+		e.ViewPos(row.position, 1, true) is found //inviewexact
+	  else
+		|| obj = .ListSource.obj
+		if obj isa TextViewLine
+			e._Start = obj
+
+
+function FuncListSorter (SorterComparer)
+	opt norefcounts
+	|| aa = a|message|.first
+	|| bb = b|message|.first
+	|| af = aa.first
+	|| bf = bb.first
+	|| an = af.name
+	|| bn = bf.name
+	|| cmp = bn.SyntaxCompare(an, true)
+	cmp := (bf.func|int| - af.func|int|)
+	cmp := bb.name.SyntaxCompare(aa.name, true)
+	return cmp < 0
+
+
+function message.funcarg (|message|)
+	opt norefcounts
+	|| s = .last
+	if s == @arg
+		return s
+
+
+function perryide.ListAllFuncsMsg (|message| items, |message| result)
+	opt norefcounts
+	for line in items
+		if line == @tmp
+			|string_aware| n = line.name
+			if AutoComplete.owner[n]						// class/module/etc
+				.ListAllFuncsMsg(line.funcarg, result)
+			  elseif AutoComplete.isafunc(line)
+				|| fn = result.msg(@str)
+				fn <~ line.OwningFullName(@emb)
+				fn.position = line.position
+
+
+function MenuAllFuncs (GUIaction)
+	if self isa buttonview
+		.ide.ListAllFuncs(true)
+		.OpenMenu
+

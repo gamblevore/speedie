@@ -1,0 +1,16 @@
+
+
+struct ASMVarType
+	contains object
+	|int|					Contains // also a class
+	|int|					ClassNum
+	|int|					C_Array
+	|byte|					PointerCount
+	//|NilState|				Expected
+	//|NilState|				Found
+
+// OK, so we wanna export this and import it.
+// can we make this all numbers? no pointers.
+// I could make a type-tree system...
+// so each type is based on another type.
+// |DataTypeCode|  			TypeInfo // belongs on the class

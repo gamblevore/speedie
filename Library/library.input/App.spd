@@ -1,0 +1,292 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+//crash
+
+module App {
+|bool|						Unregistered 
+|[string]|					OldArgs
+|message|					_Conf
+|config|					Prefs
+|string|					codesign_native = "codesign_osx"
+
+function Sleep (|Date| Duration)
+	cpp_wrapper JB_Date__Sleep
+
+syntax access (|int| i, |stringzeroterminated|)
+	return .args[i]
+	
+function conf (|string| name, |string|)
+	return ._conf[name].value
+
+function conf (|string| name, assigns:|string|)
+	disabled "Set conf values in the original app.configure..."
+
+function Pref (|string| s, |string|)
+	return .prefs[s].value
+
+function Created (|date|)
+	return __now__|date|
+	
+function TimeID (|uint|)
+	return __time_id__
+	
+
+
+function Pref (|string| s, assigns:|string|)
+	.prefs[s] = Value
+
+function Crash (|string| reason="Crashing on purpose")
+	printline reason
+	*(-1|&byte|) = 0
+
+syntax access (|string| name, |string_argvalue|)
+	cpp_part ArgValue
+	opt norefcounts
+	for R in .rawargs
+		if R.HasArgName(name)
+			return R.argvalue
+	
+function args_ (|[string]|)
+	opt norefcounts
+	for R in .rawargs
+		if R.HasArgName("")
+			rz <~ r
+
+function args (|[string]|)
+	opt norefcounts
+	return .oldargs init .args_
+
+function PrintStackTrace
+	cpp_wrapper JB_PrintStackTrace
+
+function Path (|string|)
+	cpp_wrapper JB_App__Path
+
+function CalledName (|string|)
+	cpp_wrapper JB_App__CalledBy
+
+function TurnInto (|string| s, |[string]| R=nil, |errorint|)
+	cpp_Wrapper JB_App__TurnInto
+
+function Restart
+	.turninto(.path, .rawargs)
+
+function AppName (|string|)
+	return .apppath.name
+
+function ObjMemory (|int64|)
+	return JB_MemCount()
+
+function StringMemory (|int64|)
+	return Memory.used
+
+function pref_path (|string|)
+	rz = app.conf("prefs")$
+	if rz[0] == '~'
+		rz = rz.pathfix
+	if rz ~= "default"
+		rz = ""
+	
+	if rz[0] != '/'
+		rz = file.appPrefs(rz)
+	error (rz[0] == '/' or '~') ("App pref path should be 'default' or a full-path.")
+
+
+function PrefsStartup
+	|| pref_path = .pref_path #debug_require
+	.prefs = pref_path.file.conf
+	app.pref("first") := date()|int64|.render
+
+
+function SavePrefs
+	if .prefs
+		.prefs.save
+	
+
+function Expired (|date| period, |date|From=__now__, |date|)
+	|| expiry = period + from
+	if date() > expiry
+		return expiry
+	
+	
+function AppPath (|string|)
+	if platform.osx
+		return .path.backtoapp
+	return .path
+
+	
+function Env (|dictionary of string|)
+	cpp_wrapper JB_App__Env
+
+
+function Input (|string|)
+	cpp_Wrapper JB_App__Readline
+
+
+helper sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
+	cpp_Wrapper JB_SP_Run
+
+function RawArgs  (|array of stringzeroterminated|)
+	cpp_wrapper JB_App__Args
+
+
+function Exit (|int| Code=0)
+	disabled "Use app.quit instead (to avoid confusion with the 'exit' statement, which exits loops!)"
+
+
+function Quit (|int| Code=0)
+	cpp_Wrapper JB_App__Quit
+
+
+function Die (|string| Err = "", |int| code = -1)
+	if err
+		printerror err
+	.quit(code)
+
+function Name (|string|)
+	disabled ".Filename (terminal) or .appname (gui package osx)"
+
+function FileName (|string|)
+	return .Path.Name
+
+
+function StdIn (|File|)
+	return File.new(pipe.stdin_)
+
+	
+function StdOut (|File|)
+	return File.new(pipe.stdout_)
+
+
+function CWD (|string|)
+	cpp_wrapper JB_File__CWD
+
+
+function CWD (assigns:|string|, |int|)
+	return .chdir_(Value)
+
+function chdir_ (|string| path, |int|)
+	cpp_wrapper JB_File__chdir
+
+
+function LeakMarkMemory
+	cpp_wrapper JB_Mem_Mark
+
+function LeakUnMarkMemory
+	cpp_wrapper JB_Mem_Unmark
+
+function DefaultCrashHandler (fn_app_crash_handler)
+	cpp_wrapper JB__DefaultCrashHandler
+	
+function IsQuarantined (|bool|)	
+	return .path contains "/AppTranslocation/"
+
+
+function Say (|string| s, |errorint|)
+	return "/usr/bin/say".execute([s])
+	
+function AppleScript (|string| str, |ErrorInt|)
+	return "/usr/bin/osascript".execute(["-e",str], nil)
+
+
+function Sudo (|string| p, |ErrorInt|)
+	return .applescript("do shell script \"$p\" with administrator privileges")
+
+
+function configure (assigns:|string|)
+	._conf  = Value.parse
+	._conf := message()
+
+
+
+function icon (assigns:|string| path)
+	|| ico = path.Resolve
+		.seticon(ico.cstr)
+
+function seticon (|cstring| path)
+	cpp_wrapper JB_App__SetIcon
+
+function ShowURL (|string| path)
+	cpp_part ShowURLStr
+	.showurlc(path.cstr)
+
+function ShowURLC (|cstring| path)
+	cpp_wrapper JB_App__ShowURL
+
+function IdealPath (|file|)
+	return .apppath.idealApp.file
+
+function NeedsIdealPath (|file|)
+	|| f = .idealpath
+	if f.path != app.apppath
+		return f
+}
+
+
+function string.ArgName (|string|)
+	// "--Name=Value" --> "Name"
+	// "--Name" --> "Name"
+	if (self[0] == '-')
+		|| i = .find( '=' ) oar int.max
+		|| S = self[ 0, i ]
+		S = S.TrimFirst('-')
+		return S.lowercase
+
+
+function string.ArgValue (|string|)
+	// "--Name=Value" --> "Value"
+	// "--Name" --> ""
+	// "Value" --> "Value"
+	if (self[0] != '-')
+		return self
+
+	|| it = .find( '=' )
+		return self[it + 1...]
+	return "true"
+
+
+function object.ArgValue (|String_ArgValue|)
+	if (self isa string):  return .argValue
+	if (self isa message): return .argValue
+
+
+function object.HasArgName (|string| name, |bool|)
+	return .argname ~= name
+
+function object.ArgName (|string|)
+	if (self isa string):  return .argName
+	if (self isa message): return .argName
+
+
+
+// The idea is... we want to have an array of arguments... that can be messages or strings:
+	// * (name:)	  for switches:  --nocolor
+	// * (name:value) for switches:  --level=3
+	// * (value)	  for paths:	 "/usr/dir/filexx"
+
+
+function Message.ArgName (|string|)
+	require self == @item
+	return .first.nyme.lowercase
+
+
+function Message.ArgValue (|string|)
+	if (self == @item)
+		return .second.nyme oar "true"
+	return .name
+
+
+
+prototype ShellOption			(|string| Name, |string| Value, |faststring| purpose=nil, |bool|)
+prototype fn_app_crash_handler	(|int| signal = -1999)
+
+
+role String_ArgValue (string)
+	linkage
+		cpp_part Arg
+	syntax cast (|bool|)
+		return .yes
+

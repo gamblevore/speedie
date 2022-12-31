@@ -1,0 +1,16 @@
+
+
+cpp_part Lang
+
+main {
+	printline "«Language Test!»\n"
+	
+	if (gram.free <= 12)
+		printline "(" + gram.free.render + " free grams)\n" 
+	require language.LoadCat("category")
+	require language.LoadDict("english")
+	require language.LoadDict("spanish")
+	
+	language.ReportfullTest("translate")
+}
+

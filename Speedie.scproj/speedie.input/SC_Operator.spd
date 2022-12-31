@@ -1,0 +1,386 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+// give each comparator, an opposite "<" --> ">="
+// useful for stuff like (!(a<b)) --> (a >= b)
+// or maybe not
+
+
+
+class SCOperator {
+linkage
+	cpp_part		Opp
+
+|int|		Score
+
+|string|	Name
+|string|	CompOp
+|string|	CompParam
+|string|	FuncName
+|fn_OpASM|	ASM
+|bool|		IsCaseAware
+|bool|		IsCompare
+|bool|		IsEquals
+|bool|		IsSet
+|bool|		AsBit
+|bool|		IsCustom
+|bool|		DoesntNeedExtraBits
+|bool|		MakesSigned
+|bool|		IsBoolable
+
+
+constructor (|fn_opasm| ASM)
+	.asm = asm
+
+function CaseAwareStr (|String|)
+	return .IsCaseAware.render
+
+
+syntax equals (|string| s, |bool| aware, |bool|)
+	return .name.syntaxequals(s, aware)
+
+
+function SimpleName (|String|)
+	|| n = .name
+	if (.IsCaseAware)
+		Return n[1...]
+	Return n
+
+function IsCompSet (|bool|)
+	return .IsCompare or .isset
+
+function InitComp (|string| name_)
+	.Name = name_
+	.IsCaseAware = ( name_[0] == '~' )
+	.IsCompare = true
+	.FuncName = "OperatorCompare"
+	
+	// (a=b)  =   0
+	// (a<b)  =  -1
+	// (a>b)  =   1
+	// (a<=b) <=  0
+	// (a>=b) >=  0
+	
+	|| s = .SimpleName
+	if (s.length == 2)
+		.CompOp = s
+	  else
+		.CompOp = "=="
+	
+	if (s == "<")
+		.CompParam = "-1"
+		.CompOp = "<="
+	  elseif (s == ">")
+		.CompParam = "1"
+		.CompOp = ">="
+	  elseif (s == "<=") or (s == ">=")
+		.CompParam = "0"
+	  else
+		.IsEquals = true
+		.CompParam = "0"
+
+
+function InitBit (|string| name_, |String| FuncName_)
+	.Name = name_
+	.FuncName = FuncName_
+	.AsBit = true
+
+
+function InitNormal (|string| name_, |String| FuncName_)
+	.Name = name_
+	.FuncName = FuncName_
+
+
+
+
+module {
+	|SCOperator~Dictionary|			Dict = nil
+	|int|							CustomOperatorScore
+
+	function Lookup ( |Message| opch, |SCOperator| )
+		opt norefcounts
+		|| result = opch.obj|scoperator|
+			return result
+		
+		|| op = opch.name
+		Result = dict[ op ]
+
+		if (!Result)
+			result = AddNormal( op, op.UpperFirst, nil )
+			result.IsCustom = true
+			result.score = CustomOperatorScore
+
+		  elseif (op != result.name)
+			if (!result.iscustom)
+				opch.name = result.name
+		
+		result.isboolable = (op == "or" or "and" or "=" or "==" or "!=" or "<>")
+		result.DoesntNeedExtraBits = (op == "&" or ">>")// or "|")
+		return Result
+
+
+	function Init
+		dict = Dictionary.new
+
+// "=" -> "set", and "==" --> "equals"
+// fix this... can't fix the // * if first > 0 and !rz.lines		// compares first to a BOOL!
+// bug without it.
+		
+		.AddCompSub( "~=",				&asmops.Equals) // sigh
+		.AddCompSub("==",				&asmops.Equals)
+		.AddComp( "<",					&asmops.Less)
+		.AddComp( ">",					&asmops.More)
+		.AddComp( "<=",					&asmops.LessEq)
+		.AddComp( ">=",					&asmops.MoreEq)
+		.AddComp( "!=",					&asmops.NotEq)
+
+		.AddNormal( "mod",	"Mod",		&asmops.Mod)
+		.AddNormal( "+",	"Plus",		&asmops.Plus)
+		.AddNormal( "-",	"Minus",	&asmops.Minus).MakesSigned = true
+		.AddNormal( "*",	"Mul",		&asmops.Mul)
+		.AddNormal( "/",	"Divide",	&asmops.Div)
+
+		.AddBit( kBitAnd,	"BitAnd",	&asmops.BitAnd)
+		.AddBit( kBitOr,	"BitOr",	&asmops.BitOr)
+		.AddBit( kBitXor,	"Xor",		&asmops.bitxor)
+		dict["|"]         = dict[ "(|)" ]
+		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL)
+		.AddBit( ">>>",	"RotateRight",	&asmops.ROR)
+		.addbit( ">>",	"ShiftRight",	&asmops.SHR)
+		.addbit( "<<",	"ShiftLeft",	&asmops.SHL)
+		
+		.AddComp2( "=",					&asmops.Assign)
+		.AddBit( "is",		"is",		nil )           		// if obj is flag
+		.AddBit( "isnt",	"isnt",		nil )           		// if obj isnt flag
+
+		.BuildOrder
+
+
+	function AddComp (|string| s, |fn_opasm| ASM)
+		AddCompSub( s, asm )
+		AddCompSub( "~" + s, asm )
+	
+		
+	function AddComp2 (|string| s, |fn_opasm| ASM)
+		|| it = SCOperator.new(asm)
+		it.InitComp( s )
+		dict[ s ] = it
+		it.IsCompare = false // changing this line breaks it
+		it.IsSet = true // lol
+
+
+	function AddNormal (|string| s, |string| FuncName, |fn_opasm| ASM, |SCOperator|)
+		|| opp = SCOperator.new(asm)
+		opp.InitNormal( s, "Operator" + FuncName )
+		dict[ s ] = opp
+		dict[ FuncName.Lowercase ] = opp
+		return opp
+
+
+	function AddCompSub (|string| s, |fn_OpASM| fn)
+		|| opp = SCOperator.new(fn)
+		opp.InitComp( s )
+		dict[ s ] = opp
+
+
+	function AddBit (|string| s, |String| FuncName, |fn_opasm| ASM)
+		|| opp = SCOperator.new(asm)
+		opp.InitBit( s, "Operator" + FuncName )
+		dict[ s ] = opp
+		dict[ FuncName.Lowercase ] = opp
+
+
+	function AddBadComp (|string| s, |string|err)
+		dict[ s ] = SCOperator.new(nil)
+	
+	
+	function BuildOrder // reordering here
+		|| Strs = "
+mod
+^ pow
+/ divide
+* multiply
+- minus
++ plus
+<<
+>>
+>>>
+&&& &
+^^^ xor ^
+||| | (|)
+to from custom
+by
+<
+<=
+>
+>=
+==
+!=
+is isnt
+in
+and
+or
+="	
+
+		|| order = strs.split
+		|| fake = «opp ""» 
+		for i in order.length
+			for s2 in order[i].words
+				if s2
+					fake.name = s2
+					.lookup(fake).score = i
+
+		dict["="].score = 100
+		CustomOperatorScore = dict["custom"].score
+
+}
+
+}
+
+
+
+
+function Message.OpScore (|int|)
+	opt norefcounts
+	if .obj
+		return .obj|scoperator|.score
+	|| op = scoperator.dict.ValueLower(.name)
+		.obj = op
+		return op.score
+	return scoperator.customoperatorscore
+
+
+function Message.OarExpand (|bool|)
+	if self in @rel
+		.name = "or"
+		.parent.BunchFix
+	return true
+
+
+function Message.OppExpand (|bool|)
+	if self == @opp
+		if self ~= "oar"
+			return .oarexpand
+		if self ~= "jinit"
+			debugger
+			return .initexpand
+		if self ~= "init"
+			return .initexpand
+
+
+function Message.InitExpand (|bool|)
+	|| rel = .parent
+	.name = ":="
+	using self
+	rel.FixErl
+	return true
+
+
+function Message.RelFix (|bool| force, |bool|)
+	require .AndOrExpansionTest != -1
+	// 1 + 2 < 4
+	//   $
+	// 1 + $
+	//     2 < $
+	//         4 + 5
+	|| One =  .first
+	|| Plus = One.Next
+	if force or !plus.obj
+		|| PlusScore = plus.opscore // just do it now
+		|| SubRel = Plus.next
+		if  Plus == ":="
+			.FixErl
+		  elseif SubRel == @Rel
+			rz = subrel.relfix(true)
+			ifn self in @decl or @arg
+				|| Two = SubRel.First
+				|| LessThan = Two.Next
+				|| Last = lessthan.next
+				if LessThan.OpScore > PlusScore
+					self <~ lessthan
+					self <~ last
+					subrel.first = plus
+					subrel.first = one
+					subrel.relfix(true)
+					rz = true
+
+	//       $
+	//     $ < $
+	// 1 + 2   4 + 5
+
+
+
+function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCBase|name_space, |Message|RN, |SCDecl|)
+	// a + b   --> a.operator_plus(b)
+	// a oar b --> a.operator_oar(b,syntaxcast?)
+	exp.become(@Dot, comp.FuncName)
+	exp <~ «prm, RN »
+	exp[ 1 ].Remove
+	return TypeOfExpr( exp, name_space )
+
+
+module CustomOps
+	constants
+		NotCustom = 0
+		TypeCastFromBool = 16
+		TypeCastToBigger = 32
+		Needed = 64
+		LeftOnlyIsVector = 65
+		RightOnlyIsVector = 66
+
+
+
+function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| ErrPlace, |int|)
+	opt norefcounts
+	if (comp.isCustom or comp.IsCaseAware)
+		return CustomOps.Needed
+	
+	|| CompOrSet= (comp.IsCompare or comp.isset)
+	|| LNT		= LC.TypeInfo
+	|| RNT		= RC.TypeInfo
+	|| LN		= LNT.NumericCountBoolsToo
+	|| RN		= RNT.NumericCountBoolsToo
+	ifn LN and LN == RN	   		// not both same numbers
+		if ln and rn and (ln == 1 or rn == 1)
+			if (CompOrSet)
+				return CustomOps.Needed
+			
+			expect (LNT.SameBasicType(RNT)) (errplace, "Vector type mismatch.")
+			if LN > RN
+				return CustomOps.LeftOnlyIsVector
+			  else
+				return CustomOps.RightOnlyIsVector
+		return CustomOps.Needed				// num + obj
+	
+	
+	|| extra = 0
+	if LN and RN
+		|| GotABool = (DataTypeCode.bool == lnt or rnt)
+		if lnt != rnt
+			expect !(gotabool and comp.iscompare) (errplace, "Cant compare bools to non-bools")
+			if !CompOrSet and !comp.DoesntNeedExtraBits
+				extra = CustomOps.TypeCastToBigger
+		  elseif GotABool and !comp.isboolable
+			extra = CustomOps.TypeCastFromBool
+
+	if (!SCBase.ConstantsLoadingOverride and LC.Type.TreatAsBaseType)
+		return CustomOps.Needed (|) extra
+	
+	if ((LN > 1) and CompOrSet)					// can't compare vectors directly in C++
+		return CustomOps.Needed (|) extra
+	if !extra
+		|| t = lc.type
+		if t.super and t.hasOperator(comp.funcname)
+			return CustomOps.Needed
+
+	return extra
+
+
+function scclass.HasOperator (|string| op, |bool|)
+	opt norefcounts
+	|| obj = self[op]
+	if obj isa scfunction
+		return true

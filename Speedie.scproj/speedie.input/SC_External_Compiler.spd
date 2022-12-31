@@ -1,0 +1,489 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+module ExternalCompiler {
+linkage:cpp_part Ext
+|[File]| FoundObjects
+|[File]| Cleanup
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+function TmpBase (|string| V, |string|)
+	opt norefcounts
+	|| s = ("/tmp/Speedie/", "/tmp/Speedie64/")(options.is32bit)
+	return s + V
+
+
+function TmpOut (|string| V, |string|)
+	return .TmpBase("out" + V + ".txt")
+
+
+function TmpErr (|string| V, |string|)
+	return .TmpBase("err" + V + ".txt")
+
+
+function BackupPath (|string|)
+	return Compiler.Projects.child("Terminal/Backup")
+
+
+function ProductName (|string|)
+	return compiler.projectname + Compiler.VariantSuffix
+
+
+function ProductPath (|String|)
+	if options.output_path
+		return options.output_path
+	
+	if options.scripting
+		return compiler.originalinputpath.scriptlocation
+		
+	|| prod = .productname
+	if Options.SelfReplacement
+		return Compiler.Projects.child("Terminal/"+prod)
+	return Compiler.BuildFolder.path[ prod ]
+
+
+function CppLib (|File|)
+	return Compiler.Projects.filech("Library/CppLib")
+
+
+function ProjTmpPath (|string|)
+	return .tmpbase(.ProductName)
+
+function LogName (|string|)
+	return .ProjTmpPath.child("build.txt")
+
+function LibTmpPath (|string|)
+	return .tmpbase("Lib")
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+function CanCompile ( |string| name, |bool| )
+	return name.ext.isclike
+
+
+function string.isCLike (|bool|)
+	return (self ~= "cpp" or "m" or "mm") // mm gets wierd errors that cpp doesnt?
+
+
+function NoGoodObject ( |string| Cpp, |File| h, |File| o, |int| )
+	if (h.exists) and (h IsNewerThan o):	return 4 // most important
+	ifn o.exists:							return 1
+	if Cpp.file IsNewerThan o
+		return 2
+
+ 
+function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
+	|| aslib = options.makelib or options.projectislibrary
+	require ! (aslib and (cpp contains "/JB_Main.")) // .o and .cpp
+	require ! (!asm.needed and (cpp contains "/JB_VM."))  
+	require ! (!(targets..gui or linkage.interpreter) and cpp contains "/JB_OSX.")  // or really should be "JB_Native.o"
+
+	|| name		= cpp.name
+	|| Prefix	= name.trimextandpath
+	|| h		= cpp.Sibling(Prefix + ".h").file
+	|| o		= Objects[Prefix + ".o"]
+	.FoundObjects <~ o
+
+	return .NoGoodObject(Cpp, h, o)
+
+
+
+function FilterCppsIfAlreadyDone (|[string]| Cpps,  |File| Objects,  |&int| stdafx,  |[File]|)
+	|| wierd = cpp_export.CppProduct
+	for Cpp in Cpps
+		|| reason = .NeedNewObjForSrc(cpp, objects) 
+			rz <~ Cpp.File
+			if (reason == 4) and stdafx
+				*stdafx = 1
+
+
+function CollectCppsInto ( |File| Fol,  |File| Objects, |&int| stdafx, |[File]| )
+	|[string]| Cpps
+	for name in Fol
+		if .CanCompile(name)
+			Cpps <~ Fol.path.child( name )
+
+	return .FilterCppsIfAlreadyDone(Cpps, Objects, stdafx)
+
+
+
+function string.CleanO (|string| name, |int|)
+	// bloody jb_string.o causing problems... all the time
+	if !name
+		return .file.deleteall
+	|| f = .filech("Lib")
+	name = name.lowercase + ".o"
+	for ch in f
+		if ch.name.lowercase contains name
+			ch.file.delete
+			printline ch
+	
+ 
+function Clean (|string| name, |bool|)
+	"/tmp/Speedie".CleanO(name)
+	"/tmp/Speedie64".CleanO(name)
+	"/tmp/SpeedieApps".cleano("")
+	return stderr.ok
+
+
+function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Type, |[string]|)
+	rz.AppendWords( Product )
+
+	// Requirementsaslib or options.projectislibrary
+	|| cmode = "-std=gnu++17  -stdlib=libc++"
+	if Type == "m" or "o" or "mm"
+		if type == "mm"
+			cmode += " -x objective-c++ "
+		  else
+			cmode = ""
+		cmode += "-fobjc-arc  -fobjc-link-runtime"
+	
+	rz.AppendWords( ("-m32", "-m64")(options.Is32Bit) )
+	
+	rz.appendwords("-L/usr/local/lib/")
+	rz.appendwords("-I /usr/local/include")
+	if platform.osx // OSX likes playing hide and seek
+		rz.appendwords("-F/Library/Frameworks  -framework Cocoa  ")
+		if targets..gui or linkage.interpreter
+			rz.appendwords("-rpath @executable_path/../Frameworks")
+		rz.appendwords("-rpath ~/Library/Frameworks  -rpath /Library/Frameworks")
+		
+	rz.AppendWords( "-w  -Wno-return-type-c-linkage -lc++")
+	rz.AppendWords( "-finput-charset=UTF-8 -fextended-identifiers" )
+	rz.AppendWords( cmode )
+	rz.AppendWords( " -fno-strict-aliasing  -fvisibility=hidden  -fvisibility-inlines-hidden" )
+	rz.AppendWords( Linkage[Platform.name] )
+	
+	// Gaming64Bit
+	rz.AppendWords( " -march=core2  -ffast-math  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
+	
+	|| aslib = options.makelib or options.projectislibrary
+	if options.selfreplacement or aslib
+		rz.appendwords( "-g")
+	if aslib // unix suxx
+		rz.appendwords( "-dynamiclib -fPIC")
+	if (aslib  or  Options.Optimise < 0)
+		rz.AppendWords( " -O0  " )
+	  else
+		rz.AppendWords( " -mtune=native " )
+		if (Options.Optimise >= 1)
+			rz.AppendWords( " -Os " )
+			if (Options.Optimise >= 2)
+				rz.AppendWords( " -flto " )
+
+
+	// Headers
+	|| cppl = .CppLib
+	rz.AppendWords( "   -D TARGET_UNIX=1 -D __SPEEDIE__=1  -I $cppl  -I ${Compiler.BuildFolder} -I ${compiler.generatedcppsfolder}  " )
+
+	|| NoASM = !asm.needed
+	for f in CppList
+		if f isa Type
+			rz <~ f
+			cmode = ""
+	
+	if cmode				// Disabled
+		rz.clear
+	
+
+
+function ExecuteGCC (|[string]| Commands, |bool|)
+	return "/usr/bin/clang".Execute(Commands, nil) #expect ("C++ compiler failed to compile source code.")
+
+
+function CollectAndCompile (|File| Input, |String| Output, |bool|)
+	|| TmpFol = Output.MakeAndGoInto
+	|| Cpps = .CollectCppsInto( Input, TmpFol, nil )
+	return .ExtCompile( Cpps, " -c ", "cpp" )  and  .extCompile( Cpps, " -c ", "m" )  and  .extCompile( Cpps, " -c ", "mm" )
+
+
+function UseAndCompile (|[string]| Input, |String| Output, |bool|)
+	// not sure why this is different... I think it's for external C files?
+	// can't remove it until i can test them.
+	
+	|| TmpFol = Output.MakeAndGoInto
+	|| Cpps = .FilterCppsIfAlreadyDone( Input, TmpFol, nil )
+	return .extCompile( Cpps, " -c ", "cpp" )  and  .extCompile( Cpps, " -c ", "m" )  and  .extCompile( Cpps, " -c ", "mm" )
+
+
+function ClearThis
+	if StdErr.ok
+		for F in .Cleanup
+			F.DeleteAll
+
+	.Cleanup.Clear
+	.FoundObjects.Clear
+
+
+function IsCompilerAndNeedsInstall (|bool|)
+	require (Options.SelfReplacement == kSelfReplace)
+	require (StdErr.OK and !Compiler.IsTest)
+	require (.TestNewCompiler and .BackupCompiler)
+	return true
+
+
+function ExtComp 
+	require .ShouldExtComp
+	if options.products
+		if options.pack
+			Flatten.BuildPack
+		if options.native
+			.RunCppCompile
+			if .IsCompilerAndNeedsInstall
+				.InstallCompiler
+	.ClearThis
+	if stderr.ok
+		compiler.Package
+
+
+function RunCppCompile
+	require (StdErr.OK)
+
+	if !options.silent
+		"\nCompiling c++ to: \"${.ProductPath}\"\n"
+	
+	.CollectAndCompile(	.CppLib,						.LibTmpPath )$
+	.CollectAndCompile(	Compiler.GeneratedCppsFolder,	.ProjTmpPath )$
+	.UseAndCompile(		Cpp_Export.Cpp_input,			.ProjTmpPath        )$
+	.ExtCompile(		.FoundObjects,			"-o " + .ProductPath,	"o" )$
+		
+
+function MakeLib
+	|| n = .productpath.sibling("libspeedie.dylib")
+	if !options.silent
+		"Lib at: $n"
+	.ExtCompile(		.FoundObjects,			"-o " + n,	"o" )$
+	
+
+
+function LinkOK (|file| p, |file|) // or just not a link
+	require p.exists
+	|| lto = p.linkto
+	if !lto
+		return p
+
+	|| tof = lto.resolve(true).file
+	if tof.exists and !tof.linkto // not bad
+		return tof
+
+	tof.delete
+
+
+function ShouldExtComp (|bool|)
+	if options.Scripting
+		return true // if were here... its cos the scripting code wants it
+	require !options.final and Options.Compile  
+
+	if options.ForceRecompile
+		return true
+
+	|| p = .linkOK(.ProductPath.file)
+	if   !p   or   p.modified < scimport.recent
+		return true
+	printline p.path + " already up to date"
+
+
+
+function ExtCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
+	if !Files
+		return true // awesome
+	
+	|| CompileString = .CreateCompileString( Files, Dest, Type )
+	if !CompileString
+		return true
+
+	if Options.PrintCompileString
+		print	 "\nclang "
+		printline Join2(CompileString, " ")
+	
+	app.sleep(0.125s)
+	return .ExecuteGCC( CompileString )
+
+
+function saytest (|int| n)
+	print "\n()   Test"
+	print n.Render
+	printline "   ()"
+
+
+function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self
+	|| S = .ProductPath
+	|| Test1 = S.File
+	|| Test2 = "${S}2".File
+	|| Test3 = "${S}3".File
+
+	|| Cpp1 = Cpp_Export.CppProduct
+	|| Cpp2 = Cpp1.Path.ReplacePathComponent(-2, "BuildTest2").File
+	|| Cpp3 = Cpp1.Path.ReplacePathComponent(-2, "BuildTest3").File
+
+	.Cleanup <~ Test2
+	.Cleanup <~ Test3
+	.Cleanup <~ Cpp3.Parent
+	
+
+// OldSpeedie has compiled SpeedyTest, at Test1. It is different.
+	|| Args = ["--self",  "--variant=2",  "--nocolor"]
+
+	.saytest(1)
+	require Test1.TestSpeedie(Args, "2")
+
+
+// Test1 has been run. It created Test2. Test2 is different than Test1, because Test1 had a chance to optimise itself.
+	Args[1] = "--variant=3"
+	Args <~ "--final"
+
+	.saytest(2)
+	require Test2.TestSpeedie(Args, "3")
+
+
+// Test2 creates Test3 in .cpp form only, for speed. The outputs SHOULD match.
+	.saytest(3)
+	printline
+	
+	require cpp2.mustexist
+	require cpp3.mustexist
+	expect (Cpp2 matches Cpp3) "$Cpp2 doesn't match $Cpp3!"
+	
+	require Test2.TestBatch
+
+	return stderr.ok	// My Code is so Beautiful.
+
+
+	
+function ReplaceOld (|file| input, |File| Backs)
+	|file| oldest
+	|| score = 0
+	for f.files in Backs
+		|| name = f.name
+		if (name endswith "speedie") and (name[0].isletter)
+			|| s = f.modified.ago.days
+			if s > score
+				score = s
+				oldest = f
+	
+	if oldest != nil
+		input.copyto(oldest)
+
+
+function MakeDailyProductPath (|File| B, |string|)
+	|| D = Date.Now.DayOfWeek
+	|byte| x = 'A' + D
+	return B.Path.child( D.Render+"_Speedie" )
+
+
+function BackupCompiler (|bool|)
+// Committing the .box + .cpp files, via git can be done later, if needed.
+
+	|| Product = .ProductPath.file
+	|| B = .BackupPath.File
+	B.MakeEntirePath
+
+	|| backup1 = B["LatestBackup"] 
+	if backup1 matches Product
+		return true
+
+	.ReplaceOld( product, b )
+	Product.CopyFileTo( backup1 )
+
+	|| DailyProduct = .MakeDailyProductPath( B )
+	|| path = DailyProduct.trimextandpath
+	Product.CopyFileTo( DailyProduct )
+	Cpp_Export.CppProduct.CopyTo( path + ".cpp" )
+	Cpp_Export.HProduct.CopyTo( path + ".h" )
+
+	return stderr.ok
+
+
+function InstallCompiler
+	"Installing Speedie: $__time_id__"
+
+	.ProductPath.File.MoveTo( Compiler.Projects.child("Terminal/Speedie") )
+
+	|| CppTest = Cpp_Export.CppProduct
+	|| HTest = Cpp_Export.HProduct
+	|| Cpp0 = CppTest.Path.ReplacePathComponent(-2, "Build")
+	|| H0 = HTest.Path.ReplacePathComponent(-2, "Build")
+	Cpp0.Parent.MakeDir
+	ifn CppTest matches Cpp0.File
+		CppTest.CopyTo(Cpp0)
+	ifn HTest matches H0.File
+		HTest.CopyTo(H0.File)
+	
+	if options.Makelib
+		.MakeLib
+}
+
+
+function String.LastLine (|string|)
+	return .AfterByte('\n')
+
+
+function file.TestBatch (|bool|)
+	|| batch = compiler.BaseProjectPath["Batch"]
+	print "Tested: " 
+	|| n = 0
+	for c.files in batch
+		if c.visible
+			if n++
+				print ", "
+			print c.Name
+			.execute([c, "--nocompile"])
+	printline
+	return stderr.ok
+	// we want to test each file... how? we need to call the new speedie!
+	// so we need a folder to test...
+
+
+function File.TestSpeedie (|[string]| Args, |string| Variant, |bool|) {
+// test all is OK.
+//	return .testspeedie(args)
+	
+	require (.mustexist)
+	expect !(.path contains " ") ("Path: ${.path} contains a space! :(")
+
+// Create and call command
+	|| Cmd = .Path + " --self --nocolor --variant=" + Variant
+	|| cmd_args = ["--self",  "--nocolor",  "--variant=" + Variant]
+	if Variant == "3"
+		cmd_args <~ "--final"
+	if options.PrintCompileString
+		cmd_args <~ "--noisy"
+
+	|| result = faststring()
+	.path.execute(cmd_args, result)
+	printline Result // not sure if its good or bad?
+
+
+// Read output
+	print			externalCompiler.TmpOut(Variant).FileData
+	|| test_err =	externalCompiler.TmpErr(Variant).FileData
+	error !(test_err) (test_err)	
+
+	return StdErr.OK
+}
+
+
+function Array.AppendWords (|string| R)
+	|| fi = StringFields( R, ' ' )
+	for S in fi
+		if S
+			.AddCStr(s)
+
+
+function string.MakeAndGoInto (|File|)
+	rz = .File
+	rz.MakeEntirePath
+	app.cwd = self
+
+

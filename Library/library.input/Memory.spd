@@ -1,0 +1,241 @@
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+class DataTypeWrapper
+	linkage
+		cpp_part Wrap
+		cpp_class DTWrap
+	
+	|DataTypeCode|		DataType
+	|byte|				DeathAction
+	|int64|				PrivValue		//()
+	
+	destructor
+		if .deathaction == kfree
+			Memory.free(.privvalue|_voidptr|)
+
+	
+	constructor (|int64| v)
+		cpp_part ConstructorInt
+		.datatype = datatypecode.s64
+		.PrivValue = v
+
+	
+	constructor (|bool| b)  // could be an issue as most things convert to a bool...
+		cpp_part ConstructorBool
+		.datatype = datatypecode.bool
+		.PrivValue = b|int|
+
+	
+	constructor (|_voidptr| p)
+		.datatype = datatypecode.unusedtype
+		.PrivValue = p|int64|
+
+	
+	function Value (|int64|)
+		if (self) {return .privvalue}
+	
+	
+	function FloatValue (|f64|)
+		if (self) {return .privvalue.asfloat}
+
+
+	function Value (assigns:|int64|)
+		disabled "This property is immutable"
+
+
+	render
+		if .datatype.isfloat
+			fs <~ .FloatValue
+		  elseif .datatype == datatypecode.unusedtype
+			fs <~ "0x"
+			fs.appendhex(.privvalue)
+		  elseif .datatype == datatypecode.bool	
+			fs <~ ("true", "false")(.privvalue)
+		  else
+			fs <~ .PrivValue
+
+	module
+		function NewFloat (|f64| v, |DataTypeWrapper|)
+			rz = DataTypeWrapper(true) 
+			rz.datatype = datatypecode.f64
+			rz.PrivValue = v.AsInt
+	
+	constants
+		kNothing = 0
+		kFree = 1
+		kDelete = 2
+
+
+
+class Memory
+	linkage
+		cpp_part Mrap
+		cpp_class MWrap
+		pragma noearlyfree
+	
+	|int|				Capacity		//()
+	|&byte|				_Ptr			//()
+	|int|				Length
+	|uint16|			ItemSize		//()
+	|DataTypeCode|		DataType		//()
+	|byte|				DeathAction		//()
+	contains byte // should be byte?
+	
+	
+	constructor (|int| ItemCount, |uint| ItemSize, |bool| DummyParam)
+		cpp_part ConstructorDummy // these two are the same?
+		|| Request = ItemCount * ItemSize
+		.ItemSize = ItemSize
+		.length = 0
+		._ptr = byte(Request)
+		.Capacity = (itemcount, 0)(._ptr)
+		.deathAction = datatypewrapper.kFree
+	
+	
+	constructor (|int| ItemCount, |uint| ItemSize)
+		|| Request = ItemCount * ItemSize
+		.ItemSize = ItemSize
+		.length = 0
+		._ptr = byte(Request)
+		.Capacity = (itemcount, 0)(._ptr)
+		.deathaction = datatypewrapper.kFree
+	
+
+	constructor (|int| ItemCount, |uint| ItemSize, |&byte| ptr)
+		cpp_part ConstructorPtr
+		.ItemSize = ItemSize
+		.length = itemcount
+		.Capacity = itemcount
+		._ptr = ptr
+	
+	function Ptr (|&...|)
+		return ._ptr|&...|
+		
+	setter Length (|int|)
+		if Value > .Capacity
+			.Capacity = Value
+		  elseif Value == 0
+			.Capacity = 0
+		.length = Value
+	
+	operator plus (|int|n, |&...|)
+		return (._ptr + .itemsize*n)|&...|
+	
+	function Place (|&...|)
+		return .operatorplus(.length)
+	
+	function Copy (|string| Src, |int|)
+		|| cap = .ByteCapacity min src.Length
+			memory.Copy(.ptr, src.Addr, cap)
+			return cap
+		
+		
+	function AppendPlace (|&...|)
+		|| L = .length
+		if (L >= .Capacity)
+			// try grow
+			|| NewSize = (.itemsize*L*2)
+			|| P2 = Memory.realloc(._ptr, NewSize)
+			if (!P2) // fail
+				return (&Memory.MDummy)|&...|
+			|| OldSize = .Capacity*.itemsize
+			Memory.zero(p2 + OldSize, NewSize - OldSize) 
+			._ptr = p2
+	
+		.length = l + 1
+		return (._ptr + (.itemsize*L))|&...|
+	
+	
+	function Temporal
+		random.shared.temporal(self)
+	
+		
+	setter Capacity	(|int|)
+		|| Mem = Memory.realloc(._ptr, .itemsize|int|*Value)
+			._ptr = mem
+			.Capacity = Value 
+
+	function ByteCapacity (|int|)
+		return .itemsize|int|*.Capacity|int|
+	function BytesUsed (|int|)
+		return .itemsize|int|*.length|int|
+
+	function Free
+		if (.deathaction == datatypewrapper.kfree)
+			Memory.free(._ptr)
+		._ptr = nil
+		.Capacity = 0	
+
+	
+	
+	function Clear
+		disabled "Do you mean .Free or .Zero?"
+	
+	
+	function Zero
+		zero(._ptr, .length * .itemsize)
+	
+	
+	destructor
+		.free
+		
+
+	iterator safe
+		|| i = 0
+		while (i < .length)
+			yield self[i] (i)
+			i++
+
+
+	iterator
+		|| FFFirst = .ptr 
+		|| Curr = FFFirst  
+		|| After = curr + .length
+		while (Curr < after)
+			yield Curr[0] (curr - FFFirst)
+			Curr++
+
+		
+	Macro Last
+		(.ptr|&...|)[.length-1]
+		
+	macro SyntaxAccess
+		(.ptr|&...|)[_]
+	macro syntaxappend
+		(.appendplace|&...|)[0] = _
+
+	syntax cast (|&...|)
+		return .ptr
+
+	module
+		|uint64[2]| MDummy
+		function Object (|int| ItemCount, |int| ItemSize, |Memory|)
+			visible 
+			rz = .new(ItemCount, ItemSize, false)
+			require rz._ptr
+
+		function Random  (|int| n, |memory|)
+			rz = byte[n]
+			random.shared.temporal(rz)
+		
+		function FillInt (|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
+		function Unmap	 (|_voidptr| p, |int| n):						cpp_wrapper JB_munmap
+		function Used	 (|int64|):										cpp_wrapper JB_memused
+		function _Alloc  (|int| n, |&byte|):							cpp_wrapper JB_malloc
+		function Zalloc  (|int| n, |&byte|)
+			return byte(n)
+		function Realloc (|_voidptr| b, |int| n, |&byte|):				cpp_wrapper JB_realloc
+		function Free	 (|_voidptr| b):								cpp_wrapper JB_free
+		function Zero	 (|_voidptr| addr, |int| n):					cpp_wrapper memzero
+		function Copy	 (|_voidptr| dest, |_voidptr|src, |int| N):		cpp_wrapper memcpy
+		function Copy	 (|object| dest, |object|src, |int| N)
+			.copy(dest|_voidptr|, src|_voidptr|, n)
+		function CopyObject (|object|src, |object| dest, |int| N)
+			Memory.copy(self|&byte|+4, src|&byte|+4, n-4)
+		

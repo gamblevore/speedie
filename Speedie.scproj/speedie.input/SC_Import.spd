@@ -1,0 +1,220 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+class SCImport
+	linkage
+		cpp_part		Imp
+	
+	|bool|					IsSTDLib
+	|int|					Depth
+	|[SCFile]|				Files
+	|File|					InputFolder
+	|File|					Proj
+	|MemoryLayer|			DeclLayer
+	|SCModule|				Mod
+	
+
+	constructor ( |File| F )
+		.Proj = F
+		|| M = SCModule.Neu( nil, compiler.program, nil )|SCModule|
+		.DeclLayer = (scdecl).CreateLayer(self)
+		M.Project = self
+		M.IsImport = true
+		if (F != nil)
+			M.name = f.name
+			(SCImport.Recent max= f.modified) 
+		.Mod = M
+	
+	
+	render
+		fs <~ .mod.name
+	
+	
+	function Use
+		if self
+			.decllayer.use
+			scimport.curr = self
+		
+		
+	function ImportMsg (|Message| j)
+		|| Name = J[@str, -1]$.name
+		|| P	= Compiler.FindProject(Name)
+		expect  (P.Exists)   ( J, "Can’t find project at: '${P.Path}' for import: '$Name'" )
+
+		SCImport.Importpath( name, P, .Depth + 1 )
+	
+	
+	function PrepareAll
+		for f in .files
+			f.AST
+		// for the "targets" feature... we really want the base-projects targets set first
+		// only then import libs and stuff.
+
+
+	function ReloadImports
+		for f in .files
+			for j in f.AST
+				if J IsTmp "import"
+					.ImportMsg(j)
+
+
+	function LoadPrefix (|SCFile| scf, |int| depth)
+		.Mod.ExportName = "App" // make it simple
+		require scf != nil
+		|| root = scf.AST$
+		|| link = root.findflat( @tmp, "linkage" )
+			link.remove
+			.IsSTDLib = scimport.STDLibTime or link..type ~= "library"
+			|| name = link[@arg].findflat( @tmp, "cpp_part" )[@thg]
+				scf.ExportName = name.name
+				.Mod.ExportName = name.name
+		
+
+	function IncludeCHeaders (|file| f, |[string]| output)
+		for cName in f
+			|| c = f[cName]
+			if (!c.isDir) and (cName isa "h")
+				output <~ c.path
+	
+	
+	function ImportSpd (|File| c, |string| CurrPath, |SCFile|)
+		|| path = c.lowercase
+		if compiler.files[ path ]
+			debugat
+			error (path, "File included twice.")
+		rz = SCFile( c )
+		compiler.files[ path ] = rz
+		rz.Proj = self
+		.files <~ rz
+		scimport.allfiles <~ rz
+		rz.filenum = scimport.allfiles.length
+	
+	
+	function ImportDir (|File| f,  |string| Path,  |SCFile|)
+		for cName in f
+			(cName[0] != '.') #continue
+			|| c		= f[cName]
+			|| CurrPath = path.child( cname )
+			|| ext		= cName.ext
+
+			if cname contains "(disabled)"
+				0 //
+			  elseif (c.IsDir)
+				.ImportDir( c, CurrPath )
+			  elseif (cname.isspeediesrc)
+				|| B = .ImportSpd(c, currpath)
+				if cName ~= "index.spd"
+					rz = B
+			  else
+				// compiler.FilesImported[cname] = c
+				if ext == "vert" or "frag" or "shad" or "sdf"
+					Shaders := dictionary.new
+					shaders[ cName ] = c
+
+				  elseif (ext.isclike)
+					Cpp_Export.Cpp_Input <~ c.path
+	
+	
+	function string.IsOKForImport (|bool|)
+		|| X = self
+		if (self starts "Library/")
+			return self[6...].IsOKForImport
+			
+		while X[0] == '/'
+			X = X[1...]
+		
+		if (!X or Jeebox.CSWordStart[X[0]])
+			return true
+		error  (x, "Invalid path")
+
+
+	module
+		|[SCFile]|			AllFiles
+		|dictionary|		Shaders // name per shader, storing file or string
+		|date|				Recent
+		|scimport--|		Curr
+		|bool|				STDLibTime
+		
+		function IsInputName (|string|name, |bool|)
+			if name ~= "input"
+				return true
+			if name isa "input"
+				return true
+		
+		function NoProj
+			.curr = nil
+			(Scdecl).restore
+
+		function FindInputFolder (|file| f, |file|)
+			|| FirstName = ""
+			for name in f
+				if IsInputName(name)
+					ifn FirstName
+						FirstName = name
+					else
+						error false ( nil, "Multiple input folders found! '$Name' and '$FirstName'" )
+			
+			expect (Firstname) (f, "Can't find folder '$f/input/'.")
+			return f[FirstName]
+		
+		
+		function ImportPath (|string| path, |file| f, |int| ImportDepth)
+			require f.mustexist and path.IsOKForImport
+	
+			|| fpl = f.Path.lowercase
+			require (!Compiler.ImportedNames[fpl])
+			|| rz = SCImport.new(f)
+			Compiler.ImportedNames[fpl] = rz
+			
+			if (path contains "/") and (path[0] != '/')
+				// import "lib/item"
+			  elseif (options.SingleFileInput and !path)
+				// 
+			  else
+				f = FindInputFolder(f)
+				require f.MustExist
+			
+			rz.InputFolder = f
+			|scfile| index
+			if (options.SingleFileInput and !path)
+				index = rz.ImportSpd( options.SingleFileInput.file, Path )
+			  else
+				index = rz.ImportDir( f, Path )
+			
+			rz.LoadPrefix(index, ImportDepth)
+			rz.IncludeCHeaders( f["c_includes"],	 Cpp_Export.H_Input )
+			rz.IncludeCHeaders( f["c_postincludes"], Cpp_Export.H_PostInput )
+			
+			rz.Depth = ImportDepth
+			rz.PrepareAll
+			rz.ReloadImports
+
+			Compiler.ImportedList <~ rz
+
+
+
+		function ExportShaders
+			require shaders
+			
+			compiler.Timer( "Copying Shaders" )
+			
+			|| P = compiler.BuildFolder["Resources/Shaders"]
+			expect P != nil
+			P.MakeAndGoInto
+			printline "S: " + app.cwd
+			
+			for (f in shaders) (sh_name)
+				if (f isa File)
+					|| name = f.name
+					|| Dest = P[name]
+					|| fs = dest.writer
+					dest.filedata = "\n// (Copy of original)\n"+ f.readall
+				  elseif (f isa string)
+					|| Dest = P[sh_name]
+					debugger /// what?
+					Dest.Data = f
+

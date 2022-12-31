@@ -1,0 +1,22 @@
+
+conf
+	name	pack
+	creator	jeebox
+	prefs	"pack.prefs"
+	targets nothing
+
+
+target !fast
+	import "gui"
+	import "network"
+import "speedie.scproj/speedie.input/ASMExec"
+import "temporal"
+
+linkage
+	cpp_part pack
+
+
+compile_linking
+	flags
+		interpreter true
+

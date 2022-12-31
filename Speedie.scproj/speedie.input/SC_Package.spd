@@ -1,0 +1,75 @@
+
+
+// must create an error if not found... unless the name is "default"
+
+
+function compiler.Package 
+	require !Compiler.IsTest and !Options.ExternalCompile
+	require targets..gui
+	|| Pd = ExternalCompiler.productpath
+	|| Pj = .BaseProjectPath.path
+	if platform.osx
+		.AppleBuildApp(pj.file, pd.file)
+
+	
+function compiler.NewConf (CollectFunc)
+	expect (!.ConfMsg) (node, "Conf already exists!") 
+	|| conf = node[@arg]
+		conf.remove
+		.ConfMsg = conf
+		|| x = makedecl("", "__AppConfString", @str+conf.render)
+		node.become(x)
+		compiler.program.movetoinitfunc(node)
+		return compiler.program
+
+
+function compiler.IdealName (|string|)
+	|| s = .confmsg["name"]
+		return s.name
+	return externalcompiler.productname.trimextandpath
+
+
+function compiler.AppBuildOneLib (|file| inner, |message| lib)
+	|| dir = "/usr/local/lib/".file
+	|| libf = Dir[lib.name]
+	|| ldest = inner.parent.parent["Frameworks/" + libf.name]
+	ifn ldest.exists
+		libf.hardlinkto(ldest.path)
+
+
+function compiler.AppBuildLibs (|file| inner)
+	opt norefcounts
+	|| libs = linkage.conf("libs")
+		for lib in libs 
+			if lib.expect(@str)				// ok so... hard-link it?
+				.AppBuildOneLib(inner, lib)
+
+
+function compiler.AppleBuildApp (|file| project, |file| product)
+	|| dest = product.linkto
+		error (dest, "This should not be a link")
+		return
+	
+	Compiler.stage("Create MacOSX Package")
+	|| name			= .idealname
+	|| prefered_name=name + ".app"
+	|| prefered_app	= product.sibling(prefered_name)
+	|| xcode_place	= prefered_app.sibling("Release/"+prefered_name)
+	|| final_app	= (xcode_place, prefered_app)(xcode_place.fileexists)
+	|| inner		= final_app["Contents/MacOS/"+name]
+	if product.moveto( inner )
+		.AppBuildLibs(inner)
+		.CodeSign(final_app)
+		if prefered_app != final_app
+			prefered_app.linkto = final_app
+		options.output_path = prefered_app
+		prefered_app.touch
+
+
+
+|| codesign_native = "codesign_osx"
+function compiler.CodeSign (|file| gui_app)
+	|| sign = app.pref(codesign_native)
+		gui_app.codesign(sign)
+	  else
+		StdErr.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_app.path )

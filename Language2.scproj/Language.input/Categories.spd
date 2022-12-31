@@ -1,0 +1,51 @@
+
+
+class Category {
+	contains category
+	|message|					Source
+	|string|					Name
+	|category|					Parent
+	|Category--|				NextActive
+	
+	constructor (|string| n, |message| src, |category| p)
+		.source = src
+		.name = n
+		.parent = p
+	
+	iterator 
+		|| c = self
+		while c
+			|| n = c.nextactive
+			yield c
+			c = n
+
+	module
+		|dictionary of category|	List = dictionary.new
+		
+		function add (|message| c, |bool|)
+			return .processone(c, nil)
+		
+
+		function ProcessOne (|message| msg, |category| parent, |bool|)
+			// life
+			//     animal
+			
+			require msg.expect(@tmp)
+			|| n = msg.id #expect (msg, "Bad name")
+			|| cat = list[n]
+			if cat
+				|| p = cat.parent
+				expect (p == parent) (msg, "Redefined category $n, with conflicting parent! Previous parent is '${(p.name, `none`)(p)}'.")
+			  else
+				cat = category.new(n, msg, parent)
+				list[n] = cat
+
+			|| arg = msg.first
+			if arg
+				require arg.expect(@arg) and arg.expectlast
+				for ch in arg
+					require .processone(ch, cat)
+			
+			return true
+}
+

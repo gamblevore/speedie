@@ -1,0 +1,57 @@
+
+
+extend_module scfunction
+	function FastStringOpt (|message| s, |scbase| name_space)
+		opt norefcounts
+		|| fn = s.msgfunc
+		|| prms = s.second
+		require  prms  and  fn
+		require fn.ExportName == "JB_FS_AppendString"
+		|| item = prms.last
+		if item.msgfunc == "JB_FS_GetResult"
+			FastStringOpts.FS(s, item)
+		  else
+			FastStringOpts.String(s, item)
+
+
+module FastStringOpts {
+	|| FSRemoved = 0
+	|| StrRemoved = 0
+	|scfunction| _ByteFunc 
+
+
+function ByteFunc (|scfunction|)
+	return ._bytefunc init compiler.exportnames["JB_FS_AppendByte"]|scfunction|
+
+
+function FS (|Message| exp, |Message| getresult)
+	opt norefcounts
+	|| fs2 = getresult.last.first
+	|| t2 = TypeOfExpr(fs2, nil)
+	require t2 is compilercreated
+
+	|| Place = t2.default.parentpoint
+	|| arg = place.parent
+	require arg.expect(@arg)
+	
+	|| fs1 = getresult.prev
+	|| name2 = fs2.name
+	for ch.flat in arg
+		if ch isthing name2
+			ch.name = fs1.name
+			ch.obj = fs1.obj
+	
+	place.SafeRemove
+	exp.SafeRemove
+	.FSRemoved++
+
+
+function String (|Message| exp, |Message| str)
+	opt norefcounts
+	require (str == @str or @sstr or @back) and str.name == 1
+	str.obj = typebyte.typenormal
+	str.parent.obj = .bytefunc
+	str.func = @char
+	.StrRemoved++
+}
+

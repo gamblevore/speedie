@@ -1,0 +1,80 @@
+
+
+module SC_API
+	// CreateAPI! (parsing input)
+	function Message.APICppProject (|string|)
+		opt norefcounts
+		|| f = .scfile
+		|| it = f.exportname
+			return it.lowercase
+		|| a = f.proj
+			|| b = a.mod
+				|| c = b.exportname
+					return c.lowercase
+		return "app"
+
+
+	function NewAPI (|message| api, |string| part, |SCBase| parent, |string| proj)
+		proj += "_"
+		|| name = api[@thg]					#require
+		|| arg = api[@arg, -1]				#require
+		|| cpp = arg.findflat(@tmp, "cpp_name")
+		
+		using (arg)
+			if (!cpp)
+				cpp = «tmp "cpp_name"»
+				arg.first = cpp
+			if part
+				part += "_"
+			cpp <~ «thg Proj+part+name.name »
+		
+		|| Fn = scfunction.NewFunc(api, parent, api) // done with it?
+		if (Fn isa scfunction)
+			fn.isvisible = true
+			compiler.API_Funcs <~ fn
+
+
+	function NewExportAPI (CollectFunc)
+		expect (name_space==compiler.program) (errplace)
+		
+		sc_api.NewExportAPISub(node, name_space)
+		node.remove
+		return compiler.program
+
+
+	function NewExportAPISub (|message| node, |scobject| parent)
+		|| name = node[@thg]										#require
+		|| arg = name.next(@arg)									#require
+		
+		|| lib_tmp = arg.findflat(@tmp, "libraryname", true)		#require
+		|| lib_name = lib_tmp[@str]									#require
+		require (lib_name ~= compiler.projectname)
+		
+		for (C in arg)
+			if (C== "api" or "class_api")
+				C.obj = parent
+				compiler.api_list <~ C
+			  elseif (C== "exportplace" or "libraryname")
+				require C[@str]
+			  else
+				error C
+
+		compiler.api_place = node
+	
+	
+	function DelayedClassAPI (|message| node, |string| proj)
+		if (node == "api")
+			.NewAPI(node, "", Compiler.program, proj)
+			return
+		
+		|| name		= node[@thg]								#require
+		|| partname = name.next(@bra)[@thg]						#require
+		|| arg		= node[@Arg, -1]							#require
+		|| cls		= compiler[name]							#require
+
+		partname.parent.remove
+		for ch in arg
+			require ch.expect(@tmp, "api")
+			.NewAPI(ch, partname.name, cls, proj)
+
+

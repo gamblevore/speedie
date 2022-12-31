@@ -1,0 +1,100 @@
+  
+// archive
+//    "/path/"
+//		  data "abc"
+//		  modified "asdasd"
+//		  mode 123
+
+role FileArchive (message)
+	linkage
+		cpp_part Arc
+	
+	constructor (|string| base)
+		.func = @tmp
+		.name = "archive"
+		.msg(@arg).obj = base.PathDir
+
+
+	function Validate (|FileArchive|)
+		|| arc = (.first, self)(self == @arg)
+		require .expect(@tmp, "archive")
+		for p in arc.last(@arg)
+			require p.expect(@tmp)
+			|| arg = p[@arg]
+			|| OK = (p.name.istext and arg["data"] and !(p.name contains "/../" or "/./"))
+			expect OK (p, "Invalid file in archive") 
+		return self
+
+
+	function Install (|message| item, |file| base, |bool| overwrite, |int64|)
+		|| path = item.name
+		|| data = item..data.value
+		|| chld = base[path]
+		if overwrite and chld.isdir
+			chld.deleteall
+		if chld.Data(data)
+			|| it = item..mode
+				chld.mode = it.int
+			return data.length
+	
+	
+	iterator
+		|| l = .last.first
+		while l
+			yield l
+			l++
+
+	function InstallTo (|file| dest, |bool| overwrite=false, |int64|)
+		require self and dest.MakeEntirePath
+		for f in self
+			rz += .install(f, dest, overwrite)
+
+
+	function FileCount (|int|)
+		return .last.slowcount
+
+	
+	function SaveTo (|file| dest)
+		require self
+		.render_jbin.compressIntoSub(dest.writer, nil)
+	
+	
+	function StripFileContents (|FileArchive|)
+		// just keep meta...
+		opt norefcounts
+		rz = .copy
+		for file in rz
+			|| d = file..data
+			file..size = d.value.length
+			d.remove
+	
+	
+	function Size (|int|)
+		opt norefcounts
+		for file in self
+			rz += file..data.value.length
+		
+
+	syntax append (|string| path, |string| data)
+		.msg(@tmp, path)..data = data
+
+	syntax append (|file| f)
+		cpp_part AppendFile
+		opt norefcounts
+		|| p = f.path
+		|| where = p.trimstart(.base)
+		if where != p
+			|| item = .last.msg(@tmp, where)
+			item..data = f.readall
+			item..modified = f.modified.render
+			item..mode = f.mode.render
+
+	function base (|string|)
+		opt norefcounts
+		|| o = .last.obj
+		if o isa string
+			return o
+
+function string.GetArchive (|int|lim, |FileArchive|)
+	return .decompress(lim).parse|FileArchive|.validate
+

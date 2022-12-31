@@ -1,0 +1,397 @@
+
+
+class GUIControl (ringtree)
+	linkage: cpp_part ctrl
+	
+	contains GuiControl
+	constants
+		LockCenter = 3
+		LockBoth = 2
+		LockRight = 1
+		LockLeft = 0
+		LockTop = 1
+		LockBottom = 0
+	
+	|ivec4| 					LastRect
+	|string|					ID
+	|string|					Text
+	|string|					Tooltip
+	|object|					Tag
+	|Drawstyle|					GNormal
+	|GUIAction|					OnClicked
+	|GUIAction|					OnFocus
+	|ControlSize|				Sizer
+	|TakesFocusFlag|			TakesFocus
+	|byte|						TextAlteredForDraw
+	|byte|						ExpandOnMouseOver
+	|bool|						PostLoaded
+	|byte|						ClipMode
+	|CopyPasteFlags|			CopyPaste
+	|GuiControlFlags|			State
+
+
+	constructor (|guicontrol| parent)
+		.id = ("", "root")(parent)
+		if parent
+			parent <~ self
+		.gnormal = drawstyle()
+
+		is visible
+		is Enabled
+		is Drawsfocus
+		// log "GUI"
+
+	
+	render
+		fs <~ "("
+		fs <~ .class.name
+		fs <~ "  "
+		fs <~ .lastrect
+		fs <~ `): '`
+		fs <~ .id
+		fs <~ "'"
+		fs.indent++
+		for ch in self
+			fs.IndentLine
+			ch|object|.render(Fs)
+		fs.indent--
+		
+	
+	virtual Search		(|string| s, |bool|JustUpdate, |bool|)
+	virtual MouseWheel	(|ivec2| P,  |int|  Direction, |bool|)
+	virtual MouseMove	(|ivec2| P,  |SDL_WindowEventID| State, |bool|)
+	virtual MouseDown	(|ivec2| P,  |int| Clicks, |int|)
+		return 1
+	virtual RightClick	(|ivec2| P)
+	virtual KeyDown		(|keys| Key, |bool|)
+	virtual MouseUp		(|ivec2| P)
+	virtual Draw		(|image| Where)
+		Where.DrawRect(.lastrect, .gnormal)
+	virtual PostLoad
+		0
+	virtual Copy
+	virtual GotFocus
+		(.OnFocus)(self, 1)?
+	virtual LostFocus
+		(.OnFocus)(self, 0)?
+	virtual AppForegroundChanged (|bool| IsForeGround)
+		0
+	
+
+	behaviour Search
+	behaviour MouseMove
+	behaviour MouseWheel
+	behaviour KeyDown
+	behaviour RightClick
+	behaviour MouseUp
+	behaviour Copy
+
+	function Size (|ivec2|)
+		return .lastrect.size
+	setter Size (|controlrect|)
+		.sizer.setsize(value)
+
+	helper Reflow (|ivec4| mine, |ivec4| Hard) 
+		opt norefcounts
+		|| prev = mine.x2y2x1y1 // noice
+		for R in self
+			if r is visible or Spacer
+				prev = R.ReflowDoc(mine, prev, hard)
+
+
+	helper ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|)
+		opt norefcounts
+		rz = .sizer.Calculate(parent, prev, Hard, .clipmode)
+		.LastRect = rz
+		if !.hasany
+			return rz
+		|| mine = rz
+		if self isa window
+			mine = mine.soothe
+			hard = mine
+		.Reflow(mine, hard)
+
+
+	helper NextFocus (|bool| dir, |bool| force, |guicontrol|)
+		opt NoRefCounts
+		|| c = self
+		while
+			c = c.loop(dir)
+			if c.isviewable and c is enabled
+				if c.takesfocus.tab(force)
+					if (c isa ListView or textview)
+						return c
+				if c is opensmenu
+					return c
+			if c == self
+				return c
+		
+	
+	function TextWidth (|int|)
+		opt norefcounts
+		return .text.bounds.x * font.width
+
+	syntax cast (|ivec4|)
+		return .lastrect
+	syntax append (|guicontrol| g)
+		super <~ g
+
+
+	syntax isnt (|guicontrolflags|F, |bool|)
+		return !.syntaxis(F)
+	
+	
+	syntax isnt (|guicontrolflags| F, assigns:|bool|)
+		.syntaxis(f) = !value
+		
+		
+	syntax is (|guicontrolflags| F, |bool|)
+		return .state&F
+	
+	
+	syntax is (|guicontrolflags|F, assigns:|bool|)
+		require ((.state&f)!=0) != value
+		//if self ~= "inline_editor"
+		if value
+			.state |= f
+		  else
+			.state &= ~F
+		|| test = guicontrolflags.visible (|) guicontrolflags.decluttered 
+		if f & test
+			sdlapp.resized(self)
+
+	
+	setter Visible (|bool|)
+		(self is visible) = value
+
+	
+	function IsViewable (|bool|)
+		return (self is visible) and .lastrect.ispositive
+
+		
+	function MouseIsInside (|bool|)
+		return self contains .window.MouseIsOver
+	
+	
+	helper DrawOof (|image| where)
+		if .IsViewable
+			where.ControlClip = self
+			.__Draw__(Where)
+
+	
+	helper DrawChildren (|image| where)
+		opt norefcounts
+		for R in self							// front gets drawn last (ontop)
+			if R.isviewable
+				r.DrawOof(Where)
+				if r.hasany
+					r.drawchildren(where)
+
+	
+	helper DoPaste (|Object| Data, |copypasteflags| Type = CopyPasteFlags.pastetext, |bool|)
+		if self and (data isa string)
+			|| c = self
+			|| w = c.window
+			if !c.PasteEvent
+				c = w
+			  elseif !(c.CopyPaste & Type) and (w.copypaste & type)
+				c = w
+			
+			|| P = c.PasteEvent
+				if c.CopyPaste & copypasteflags.paste
+					|| items = [Data]
+					if (c.copypaste == copypasteflags.pastefile) // split by lines
+						items = data.split
+					|ListViewrow| After
+					if c isa ListView
+						after = c.lastselected
+						c.selectnone
+					for file in items
+						if (file) and (P)(c, after, file, c.CopyPaste)
+							rz = true
+					return true
+		beep
+	
+	
+	helper PasteEvent (|GUIPasteEvent|)
+		if self isa window
+			return .onpaste
+		if self isa ListView
+			return .onpaste
+		if self isa textview and self is editable
+			return (&TextView.textPaste)|GUIPasteEvent|
+
+
+	helper CopyEvent (|GUICopyEvent|)
+		if self isa window
+			return .onCopy
+		if self isa ListView
+			return .onCopy
+		if self isa textview
+			return (&TextView.textCopy)|GUICopyEvent|
+
+	
+	helper CopyList (|array|)
+		if self isa ListView
+			return .copylist
+		if self isa textview
+			return [.seltext]
+		return nil
+
+
+	function Width (|int|)
+		return .lastrect.width
+	setter Width (|controlline|)
+		.sizer.g(0) = value[0]
+		.sizer.g(2) = value[1]
+
+	function Height (|int|)
+		return .lastrect.Height
+	// dreams... of dance, fun, youth! healinggggg...
+	setter Height (|controlline|)
+		.sizer.g(1) = value[0]
+		.sizer.g(3) = value[1]
+
+	helper DoCopy (|object| item=nil, |bool|)
+		|| S = .getcopy
+		clipboard.text = s
+		return S
+	
+	
+	helper GetCopy (|object| item=nil, |string|)
+		return (.CopyEvent$)(self, item)
+	
+	syntax equals (|string| s, |bool| aware, |bool|)
+		if self
+			return .id.syntaxequals(s, true)
+
+	operator Contains (|ivec2| p, |bool|)
+		return .lastrect.contains(p)
+	
+	function Window (|Window|)
+		opt norefcounts
+		for p.up in self
+			if p isa Window
+				return p
+	
+	setter Size (|int| i, |ControlPoint|)
+		cpp_Part SizePart
+		.sizer.g(i) = value
+	
+	function Right (|int|)			// these are not synced but i dont know what to do.....
+		return .lastrect.x2			// set a controlpoint, but get a lastrect int?
+	setter Left (|ControlPoint|)
+		.size(0) = (value)~right
+	setter Bottom (|ControlPoint|)
+		.size(1) = (value)~up
+	setter Right (|ControlPoint|)
+		.size(2) = (value)~left
+	setter Top (|ControlPoint|)
+		.size(3) = (value)~down
+
+	function Left (|int|)
+		return .lastrect.x
+	setter After (|int|)
+		.sizer.g(0) = (value)~after
+
+	function Horz (|ivec2|)
+		return .lastrect.x1x2
+
+	function Vert (|ivec2|)
+		return .lastrect.xx2
+
+	function Top (|int|)
+		return .lastrect.y2
+	setter Under (|int|)
+		.sizer.g(3) = (value)~under
+		
+	function Bottom (|int|)
+		return .lastrect.y
+
+	function HasFocus (|bool|)
+		opt norefcounts
+		
+		|| w = .window$
+		|| f = w.focus$
+		if self == f 
+			return true
+		return self == .inline.For
+
+
+	helper DrawFocus (|image| where)
+		require self
+		.drawfocusrect(Where, .lastrect, .FaintingEdge)
+
+
+	helper DrawFocusRect (|image| where, |ivec4| R, |float| Strength) 
+		where.controlclip = (0, 0, 31K, 31K)
+		|| NormalBorder = (self isnt modified) or (self is NeverDrawModified)
+		|| g = (¥.Border, ¥.ModifiedBorder)(normalborder)
+		
+		where.EdgeAlpha(R, g, Strength)
+	
+	
+	helper FaintingEdge (|float|)
+		opt norefcounts
+		if self is drawsfocus
+			return 1
+		if .HasFocus
+			|| w = .window
+			|| f = w.alphafader				#require
+			|| delay = date() - f
+			|| remain = 1s - delay
+			if w.alphasubtle
+				remain += 0.5s
+			if remain > 0
+				sdlapp.touch(Self)
+				|| f2 = (remain)|float| / 1s|float|
+				if w.alphasubtle
+					f2 *= 0.2
+				return f2
+			w.alphafader = 0
+			w.alphasubtle = false
+	
+			
+	function SetFocus
+		opt norefcounts
+		.window$.setfocus(self)
+
+	
+	helper MouseIsDown (|bool|)
+		opt norefcounts
+		return .Window.CurrMouseDown == self
+	
+	setter Text (|string|)
+		.textset(value)
+	
+	helper TextSet (assigns:|string| text, |bool|)
+		require (text != .text)
+		.text = text
+		.TextAlteredForDraw |= 2
+		sdlapp.Touch(Self)
+		return true	
+	
+	
+	function Hide
+		isnt visible
+
+	
+	helper RefSanity
+		|| c	= .class		// Cls->Memory
+		|| m	= c.layer
+		|| rc	= m.refcount
+		for r in self
+			|| r2 = r
+			r2.refsanity
+		
+
+
+helper image.ControlClip (assigns:|GuiControl| G)
+	.controlclip = g.lastrect
+
+
+function image.Window (assigns:|window| W)
+	|| s = w.LastRect
+	.base = s.xy
+	.ControlClip = s.Soothe
+

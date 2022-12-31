@@ -1,0 +1,19 @@
+
+prototype GUIImageDrawEvent		(|Image| self, 		|bool|)
+prototype GUIAction				(|GUIControl| self, |int| State=0,	|ListViewrow| Row=nil, |ListViewrow| Prev=nil, |bool|)
+prototype GUIListDragEvent		(|ListView|   self,	|ListViewrow| Before, |ListViewrow| Into, |bool|)
+prototype GUIListEvent			(|ListView|   self,	|ListViewrow| Row, |bool|)
+prototype GUIListEditEvent		(|ListView|   self,	|ListViewcell| Cell, |string| Value, |bool|)
+prototype GUIMenuEvent			(|guicontrol| self,	|menuitem| menu, |ListViewcell| Clicked)
+prototype GUITextSelectionEvent	(|guicontrol| self, |bool| TextWasAltered)
+prototype GUITextErrorSelected  (|guicontrol| self, |textviewline| Error)
+prototype GUIKeyEvent			(|guicontrol| self, |keys| Key, |bool|)
+prototype GUIPasteEvent			(|guicontrol| self, |ListViewrow| After, |string| Data, |copypasteflags| purpose, |bool|)
+prototype GUITextShowEvent		(|TextView|   self, |ivec2| LeftCorner, |message| Msg, |string| reason)
+prototype GUICopyEvent			(|guicontrol| self, |object| item, |string|)
+prototype GUIMouseMoveEvent		(|window|     self, |guicontrol| Curr, |guicontrol| Old)
+prototype GUIBackgroundDrawer	(|object|     self, |image| where)
+
+prototype ListViewRowDraw		(|ListViewrow|self, |int| rowy, |int| texty, |image| where, |ListView| Parent, |int| col, |ivec2|)
+
+

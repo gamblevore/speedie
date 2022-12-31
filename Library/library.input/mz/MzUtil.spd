@@ -1,0 +1,101 @@
+
+extend string
+	function CompressTest (|bool| report=false, |bool|)
+		|compressionstats| s
+		|| c = .compress(s)
+		if report
+			printline s.Render
+		return self == c.decompress
+	
+	function Compress (|&compressionstats| st = nil, |string|) 
+		|| j = jbin()
+		.CompressIntoSub(j, st)
+		return j
+	
+	function CompressInto (|string| path, |&compressionstats| st=nil)
+		.compressintosub(path.file.writer, st)
+	
+	function IsCompressed (|bool|)
+		return .isjbin and self[2, "C\06µz"]
+		
+	function Decompress (|&compressionstats| st=nil, |int|lim=256MB, |StringThatWasReadSafely|)
+		if !.IsCompressed
+			return self
+		rz = string.error
+		|| fs = faststring()
+		if .DecompressSub(st, lim, .parse_jbin, fs)
+			rz = fs
+
+
+Module MZLab	
+	function OK (|bool|)
+		|| f = "~/Desktop/enc/Library.xml".file
+		return f.readall.compresstest(true)
+		
+	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
+		for j in 4 
+			if i & (1<<j)
+				fs <~ items[j]
+
+	function TestMz (|bool|) // mztest
+		|| Items = "abcd efgh ijkl mnop".words
+		|| fs = faststring()
+		
+		for i in 1024*64
+			if i  and  i isa 16K
+				printline i.render
+			for sh in 0 to 4
+				.TestSub(items, fs, i>>(sh*4))
+			require fs.getresult.CompressTest
+		"Compression Test: OK"
+		return true
+		
+
+struct CompressionStats
+	linkage:cpp_part MzSt
+	|date| Duration
+	|int|  In
+	|int|  LastOut
+	|int|  Out
+	|bool| Live
+	
+	function start
+		.Duration = -date()
+	function end
+		.Duration += date()
+	function len (|int| n)
+		.Duration := -date()
+		.LastOut = n
+
+	function liveupdate (|string| s, |int| outt)
+		.in += s.length
+		.out += outt - .LastOut
+		.LastOut = .out
+		|| d = .durr
+		if .live and d > 1
+			printline .render
+	function durr (|float|)
+		|| d = .duration
+		if d < 0
+			d += date()
+		return d.seconds
+	render
+		|| durr = .durr
+		|int64| spd = (.in max .out)/durr
+		|| pc = .out pc .in
+		fs <~ "${.in.strsize} to ${.out.strsize} ($pc) in at ${spd.strsize}/s (${durr}s)"
+	module
+		|compressionstats| All // noice
+		function New (|compressionstats|)
+			rz.live = true
+
+
+helper BTWSorter_64K (|string| text, |&int| ap, |&int| bp, |int|)
+	|| a		= *ap
+	|| b		= *bp
+	|| txt		= text.addr
+	for text.length
+		|int| ac = txt[64KB&a++]
+		|int| bc = txt[64KB&b++]
+		|| d = ac - bc
+			return d.SignBit

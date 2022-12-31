@@ -1,0 +1,222 @@
+
+
+// ADDC? optimise stages... OR special-case it specifically.
+
+struct ASMFuncState 
+	linkage: cpp_part flat
+	|SCFunction--|				fn       
+	|µFunc|						Out      
+	|&ASM2|						Start    
+	|int|						Written  
+	|uint|						MaxLength
+	|bool|						OK       
+	|byte|						LabelCount
+	|uint64|					UsedRegs // could use 256 bits really... would be better for opts
+	|uint64[32]|				TrueBits 
+	|uint64[32]|				FalseBits
+	|uint|						AnyTrue	 
+
+	function AddFuncParams (|scfunction| fn)
+		opt norefcounts
+		for a in fn.Args
+			.AllocReg(a.Source, a, 0.reg)
+
+	function Last (|&asm2|)
+		return .start + .Written-1
+	
+	
+	function AddASM (|message| dbg, |int| SM, |int| a, |int| b=0, |int| c=0, |int| d=0, |&asm2|)
+		pragma inline,  cpp_part AddASM,  opt norefcounts
+		rz   = .Requestop(sm)
+		rz.r[0] = a
+		rz.r[1] = b
+		rz.r[2] = c
+		rz.r[3] = d
+		|| filepos = dbg.extra &~ 19.bits
+		rz.debug = dbg.position (|) filepos
+		target debug
+			rz.print
+		
+		
+	function AddExtended (|message| err, |uint| Bits)
+		pragma inline
+		|| B = 1<<31
+		expect !(Bits&B) (err)
+		.RequestOp(asm.extended).rest = bits (|) B
+		
+	
+	function RequestOp (|uint| Code, |&asm2|)
+		cpp_part RequestOp2, pragma inline
+		rz = .requestop 
+		rz.op = code
+
+	function RequestOp (|&asm2|)
+		cpp_part RequestOp
+		if .written < .maxlength
+			return .start + .written++
+		if .ok
+			error "ASM is out of memory."
+			.ok = false
+		return asmfuncstate.Dummy
+	
+	
+	function NeedSomewhere (|Message| err, |&asmreg| dest, |DataTypeCode| T) // .needreg
+		require !dest.reg
+		|| B = (~.usedregs).lowestbit
+		error (B) (err, "No free registers.")
+		.usedregs |= B
+		dest.reg = B.log2
+		dest.aType = T
+
+	function OpenVars (|uint64|)
+		rz = .usedregs
+		if !(rz&1)
+
+	function CloseVars (|uint64| Old)
+		if !(old&1)
+		.usedregs = old
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function µ (|message| exp,  |AsmReg| reg = 0.reg, |AsmReg|)
+		opt norefcounts
+		cpp_part Reg
+		|| fn = exp.ASMFunc
+			return (fn)(self, exp, reg)
+		debugger
+
+	function µ2 (|message| exp, |AsmReg|)
+		cpp_part RegSaved
+		rz = .µ(exp)
+		.usedregs |= 1<<rz.reg
+
+	function AllocReg (|message| exp, |AsmReg|)
+		debugger
+
+
+	function WriteReg (|AsmReg| exp, |AsmReg| out,  |AsmReg|)
+		// write something to memory... :)
+		debugger
+
+
+	function ArgLine (|message| exp, |AsmReg|)
+		opt NoRefCounts
+		if exp != @rel
+			return .µ(exp)
+			
+		debugger
+		// A REL
+		|| L = exp.first
+		|| R = L.next(@opp, "=").next(nil)$
+		
+		|| Dest = .AllocReg(L)$
+		|| result = .µ( r, dest )$
+
+		if !Dest.aType.IsPointer
+			return result						// x = a+b
+		return .WriteReg(Dest, result)			// str.fld = a+b
+
+
+	function AllocReg   (|message| exp, |scdecl| decl, |asmreg| R,  |AsmReg|)
+		cpp_Part AllocRegDecl
+// what if "@thg:" calling this is a global?
+// Also, do we need R?
+		.NeedSomewhere(exp, &decl.dregister, decl.RegType)
+		return decl.dregister
+	
+	
+	function FuncPrms (|message| pr, |int| Remain, |uint| Bits, |Message|)
+		opt norefcounts
+		while pr
+			|| reg = .µ2(pr)
+			pr++
+			Remain -= 5
+			Bits |= reg.reg << Remain
+			loop Remain >= 5
+		.addextended(pr, Bits)
+		return pr
+
+
+	function DoFunc (|message| prms, |asmreg| dest, |asmreg|)
+		opt norefcounts
+		|| fn = prms.asfunc					#debug_require
+
+		.NeedSomeWhere(prms, &dest, fn.regtype)
+		.AddASM(prms.parent, asm.fnc, 0).rest = fn.tableid
+
+		|| OV     = .OpenVars
+		|| Bits   = Dest.reg<<25 (|) ov.log2<<20					// 6+5 bits, 20 left.
+		|| Remain = 20
+		|| p      = prms.first
+		while
+			p = .FuncPrms(p, Remain, Bits) #loop
+			Remain = 31
+			Bits = 0
+		.closevars(OV)
+
+		return dest
+
+
+	function DoRels (|message| L, |asmreg| dest, |asmreg|)
+		opt norefcounts
+
+		|| op = L.next
+		|| OV = .openvars
+		|| mL = .µ2(L)			// µ2 stops mR fucking mL
+		|| mR = .µ(op.next)
+		.closevars(OV)			// allow overwriting either!
+		require ml.reg (|) mr.reg
+		
+		.NeedSomewhere(op, dest, ml.atype)
+		|| scop = op.obj|scoperator|
+			|| fn = scop.ASM
+				return (fn)(self, dest, ml, mr, op)
+		error (op, "No ASM for this operator?")
+
+	module
+		|ASM2|						Dummy
+		|ASM2[]|					JSMSpace    
+		
+
+function message.ASMFunc (|fn_asm|)
+	|| ASM = .flags & 63
+	asm := .func|int|
+	return fn_asm_table[asm]
+
+
+function ASMFuncState.TotalInit
+	opt norefcounts
+	|| j = ASMFuncState.JSMSpace init (asm2[1MB])$		// big enough
+	.maxlength = j.Capacity
+	.start = j.ptr
+	.Written = 0
+
+
+function ASMFuncState.InitState (|µFunc| fn)
+	.TotalInit
+	fn.start = .written
+	fn.length = -.written
+	.LabelCount = 0
+	.fn  = fn.fn
+	.out = fn
+	.ok  = true
+	.usedregs = 1
+	.AddFuncParams(fn.fn)
+
+
+function ASMFuncState.FinishASM
+	opt norefcounts
+	.out.length += .written
+	ifn .last isa asm.ret
+		.AddASM(.fn.source, asm.RET, 0)
+
+
+function @fn_asm.default (fn_asm)
+
+
+function @fn_asm.inittable
+	require !fn_asm_table[0]
+	for i in 64
+		fn_asm_table[i] := &fn_asm.default
+			

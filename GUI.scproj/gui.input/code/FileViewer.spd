@@ -1,0 +1,545 @@
+
+
+class FileViewer (ListView)
+	linkage
+		cpp_part FV
+    |dictionary|					Excludes
+    |dictionary|					NoFind
+    |TextView|						QuickOpen
+    |ListView|						ListOpen
+    |textView|						Editme
+    |filerow| 						Extra
+    |[string]|						SizeCheckers
+    
+	constructor (|window| p, |GUIListEvent| sel, |GUIListEvent| ret, |textview| editme)
+		super.constructor(p, sel, ret)
+		.MultiSelection 	= true
+		.onrightclick 		= RightClickFileList
+		.editme				= editme
+		.quickopen			= textview(nil,		nil,		nil)
+		.Listopen			= ListView(nil,		nil, 		ClickedOpenList)
+		.ondrawrow			= InsideFileViewRowDraw
+		.tryeditcell		= FileRowRenamer
+		.listsource			= filerow("", "root")
+		
+		.quickopen.tag = self
+		.listopen.tag = self
+	
+	
+	destructor
+		.quickopen.disposeall
+		.listopen.disposeall
+
+
+	function Init
+		.IsTree	= true
+		.NoSeps	= true
+		.EnableDrag
+		with .quickopen
+			is enabled
+			is editable
+			isnt visible
+			.clipmode		= ControlPoint.SlideBackInWindow
+			.ID				= "quickopen"
+			.size 			= 400~wide by 15~high
+			.onkeydown		= QuickOpenKey
+			.OnTextChanged	= QuickOpenKey
+			.takesfocus		= takesfocusflag.On
+			.onfocus		= QuickOpenFocus
+			.SingleLine		= true
+			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)
+
+		with .listsource|filerow|
+			.AsDir = true
+			
+		with .Listopen
+			is enabled
+			is unsearchable
+			isnt editable
+			isnt visible
+			.onealwaysselected = true
+			.ID				= "listopen"
+			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)
+			.takesfocus 	= 0
+	
+	
+	behaviour MouseDown
+		rz = super.mousedown(p, clicks)
+		if clicks == 1 or 0
+			.TryReloadPath
+	
+	
+	behaviour AppForegroundChanged
+		.TryReloadPath
+	
+	behaviour keydown
+		if key is delete
+			|| r = .sel
+			if r isa filerow
+				r.AskDelete(self)
+				return true
+		rz = super.keydown(key)
+		.TryReloadPath
+
+
+	function filerow.DirSize (|[string]|sc, |ivec2|)
+		opt norefcounts
+		require .asdir
+		for f in self
+			if f isa filerow
+				for ext in sc
+					if f isa ext
+						rz += (f.lastsize|int|, 1)
+						exit
+				if f.asdir
+					rz += f.dirsize(Sc)
+		.lastsize = rz[0]
+		.lastfilecount = rz[1]
+	
+	
+	function CheckSize
+		opt norefcounts
+		|| f = .listsource
+		if f isa filerow
+			f.dirsize(.sizecheckers)
+	
+	
+	function ShowQuickOpen (|bool|)
+		opt norefcounts
+		|| w = .window
+		|| q = .quickopen
+		q.text := .editme.seltext.before("\n").trim
+		w <~ q
+		w <~ .listopen
+		if q is visible
+			.HideOpenList
+			return true
+		(q is visible)
+		q.setfocus
+		q.selectall
+		.quickOpenFile(q.text)
+		return true
+
+
+	function SavedFileData (|string| path, |string|)
+		opt norefcounts
+		|| f = self[path]
+			return f.savedfiledata
+
+			
+	function AddRoot (|file| fol, |bool| IsMainProj = false, |filerow|)
+		|| C = 3000
+		rz = .addrootsub(fol, IsMainProj, C)
+		self <~ rz
+
+
+	function AddRootSub (|file| fol, |bool| IsMainProj, |&int| C, |filerow|)
+		|| p = fol.path
+		if !fol.isdir
+			return FileRow(p, p.name)
+		|| F = FileRow(p, p.trimextandpath, .folfile)
+		f.inmainproj = ismainproj
+		(f is expanded) = ismainproj
+		f.FillFilesSub(fol, .excludes, .folfile, c)
+		return f
+
+
+	function Conf (|string|)
+		opt NoRefCounts
+		return .start|filerow|$.location.child(.folfile)
+	
+	
+	function FolFile (|string|)
+		return .listsource.name
+	
+	
+	function FolFile (assigns:|string|)
+		.listsource.name = value
+
+
+	function ErrorAt (|error| e)
+		with self[e.path]
+			.HasError = true
+
+			
+	function ClearErrors
+		opt norefcounts
+		for s in self
+			s.haserror = false
+
+
+	iterator
+		|| _curr = .listsource.first|filerow|
+		while _curr
+			|| N_ = _curr.FlatNext|filerow|
+			yield _curr
+			_curr = N_
+		(self)
+
+
+	function SaveAll (|bool|)
+		cpp_part SaveAllArr
+		rz = true
+		for f in .modified
+			if !f.Save
+				debugger // sigh
+				rz = false
+
+
+	function Modified (|[FileRow]|)
+		for f in self
+			if f.ismodified
+				rz <~ f
+		if rz.length == 0
+			rz = nil
+
+
+	function AskSaveAll (|bool|)
+		|| m = .modified 
+		if !m
+			return true
+		.focuson(m[0])
+
+		|| fs = faststring()
+		if m.length == 1
+			fs <~ "Save file '"
+			fs <~ m[0].readname
+			fs <~ "'"
+		  else
+			fs <~ "Save ${m.length} files in project "
+			fs <~ .start.name
+		fs <~ "?"
+		if m.length > 1
+			fs <~ "\n"
+			for m0 in m
+				fs <~ "\n"
+				fs <~ m0.readname
+		
+		|| answer = AskSaveOrCancel(fs)
+		if answer >= 1  // save
+			return .saveall
+		if answer == -1 // cancel
+			return false
+		if answer == 0	// don't
+			return true
+
+
+	syntax access (|int| i, |filerow|)
+		return .listsource[i]|filerow|
+
+
+	syntax access (|string| path, |filerow|)
+		cpp_part AccessPath
+		opt norefcounts
+		for f in self
+			if f.location ~= path
+				return f
+
+
+	helper string.name (|bool| YeahReally, |string|)
+		cpp_part NameMaybe
+		if yeahreally
+			return .name
+		return self
+
+
+	helper string.PathMatch (|string| path, |int|)
+		if path contains ".todo"
+		if path[0] == '/'
+			require (self ~= path)
+			return 10
+		if .StarMatch(path)
+			return 8
+		if (path[0] == '.' and path[1] != '/') and .endswith(path, true)
+			return 1
+
+		ifn path.length >= 2
+			return 0
+		|| slah = path contains '/'
+		if (self, .name)(slah) contains path
+			if self.endswith(path) and self[(self-path)-1] == '.'
+				return 1 // sigh
+			return 2
+
+	
+	function FindAPath (|string| path,  |filerow| within=nil, |filerow|)
+		return .FindPaths(path, within)[0]
+
+
+	function FindPaths (|string| path, |filerow| within=nil, |[filerow]|)
+		if path
+			|| NameOnly = path[0, "./"] 
+				path = path[2...]
+			return .FindPaths_(path, within, nameonly)
+
+
+	function FindPaths_ (|string| path,  |ListViewrow| within,  |bool| NameOnly,  |[filerow]|)
+		opt norefcounts
+		within := .listsource
+		for f.flat in within
+			if f isa filerow
+				|| it = f.match(path, NameOnly)
+					f.extra = it
+					rz <~ f
+		
+		rz.sort(FileRowScoreSorter)
+		|dictionary of filerow| D = dictionary.new
+		for f in rz
+			f.samenameasprev = false
+			|| old = D[f.name]
+				old.SameNameAsPrev = true
+				f.samenameasprev = true
+			d[f.name] = f
+		
+		for (f in rz) (i)
+			if f.SameNameAsPrev // is this buggering something?
+				|| name = f.name + "  --  " + f.location.neatenpath
+				f = filerow(f)
+				f.name = name
+				rz[i] = f
+		
+	function Listviewrow.FileSort
+		.sort(&fileviewer.FileRowNameSorter)
+	
+
+	helper message.ExtractRecent (|message| into)
+		for s in self
+			if s|error|.when
+				into <~ s
+		
+	
+	helper BatchFindSub (|string| str, |message| all)
+		opt norefcounts
+		for f in self
+			if f isa filerow
+				if !.nofind.valuelower(f.location.name)
+					f.FindAll(str, all)
+
+
+	function BatchFind (|string| str, |message|)
+		|| All = message()
+		if !str
+			return all
+		.BatchFindSub(str, all)
+		all.ExtractRecent(rz)			// Split into recent and not recent
+		rz.sort(ErrorSearchSorter)		// recent
+		all.sort(ErrorSearchSorter)		// not recent
+		for s in all
+			rz <~ s
+
+
+	function HideOpenList (|bool|)
+		.listopen.clear
+		.quickopen.hide
+		.listopen.hide
+		return true
+
+
+	function QuickOpenFile (|string| path, |int| FromReturnKey=0, |bool|)
+		|| line = ""
+		|| byte = ""
+		path = path.TrimStart("line ")
+		if path.isint
+			line = path
+			path = ""
+		  else
+			|| parts = path / ':'
+			path = parts[0].trim
+			line = parts[1].trim
+			byte = parts[2].trim
+		if path[0] == '~'
+			path = path.Resolve(true)$
+		return .QuickOpenFileSub(path, line, "", FromReturnKey)
+
+
+	function QuickOpenFileSub (|string| path, |string| line, |string| BytePos, |int| FromReturnKey = 0, |bool|)
+		|| r = .FindPaths(path)
+		if FromReturnKey
+			if (FromReturnKey >= 3) or (!path) or (path.file.exists)
+				if path
+					|| r0 = r[0] oar .addextra(path)
+						path = ""
+					.select(nil) // force event
+					.selectfast(r0)			
+				if line
+					.editme.ViewLineandsel(line.int)
+				if bytepos
+					.editme.ShowAndSel(bytepos.int)
+				.HideOpenList
+				if FromReturnKey >= 2
+					.editme.setfocus
+				if fromreturnkey >= 0
+					return r or !path
+			if FromReturnKey >= 2
+				return false
+		
+		|| l = .listopen
+		(l is visible) = r.length > 0
+		if path.length < 2
+			l.clear
+		  else
+			l.fill(r)
+		l.size = the~same by 0~before back (l.desiredheight max 100)
+		return (l is visible)
+
+
+	function AddExtra (|string| path, |filerow|)
+		|| x = .extra init filerow("", "(Extra)", ".") // sigh
+		ifn .listsource contains x
+			self <~ x
+		
+		|| C = 3000
+		|| r = .AddRootSub(path.file, false, C) 
+		x <~ r
+		.selectfast(r)
+		return r
+
+			
+	
+	module
+		function FileRowRenamer (guilisteditevent)
+			|| o = cell.original
+			if o isa filerow
+				if o.moveto(value)
+					return true
+			
+		function FileRowScoreSorter (SorterComparer)
+			opt norefcounts
+			|| aa = a|filerow|
+			|| bb = b|filerow|
+			if bb.extra == aa.extra
+				|| aprj = aa.InMainProj
+				|| bprj = bb.InMainProj
+				if aprj == bprj
+					return FileRowNameSorter(aa, bb)
+				return aprj
+				
+			return aa.extra < bb.extra
+
+
+		function ErrorSearchSorter (SorterComparer)
+			// spds first.
+			|| aa = a|error|
+			|| bb = b|error|
+			|| an = aa.path.name 
+			|| bn = bb.path.name 
+			|| ae = an.ext
+			|| be = bn.ext
+			|| it = isbetter(ae, be, "spd")
+				rz = it == 1
+			  else
+				it = isbetter(ae, be, "box")
+				if it
+					rz = it == 1
+				  else
+					rz = (be < ae, an > bn)(be != ae)
+
+
+		function FileRowNameSorter (SorterComparer)
+			opt norefcounts
+			|| aa = a|filerow|
+			|| bb = b|filerow|
+			if (bb.asdir) != (aa.asdir)
+				return (bb.asdir)
+			return (bb.name ~<= aa.name)
+
+
+		function QuickOpenKey (guikeyevent)
+			|| fv = .tag
+			if fv.mustbe(fileviewer)
+				if key <= 0
+					fv.quickOpenFile(.text)
+					return true
+				|| l = fv.listopen
+				if key.isaccept
+					|| s = .text
+					|| fr = s.first
+					if fr != '/' and '~'
+						|| r = l.sel
+							s = r.obj|filerow|.location
+					error fv.quickOpenFile(s, 2) (Beep)
+				if (key is escape) or key.isaccept
+					return fv.hideopenlist
+				if key is up or down
+					return l.keydown(key)
+
+
+		function QuickOpenFocus (guiaction)
+			if state == 0
+				|| fv = .tag
+				if fv.MustBe(FileViewer)
+					return fv.hideopenlist
+
+
+		function ClickedOpenList (GuiListevent)
+			|| fl = .tag
+			if row and fl isa fileviewer
+				|| f = row.obj
+				if f isa filerow
+					.select(f)
+				fl.hideopenlist
+			
+
+		function InsideFileViewRowDraw (ListViewRowDraw)
+			opt norefcounts
+			if self isa filerow
+				|| z	= parent.lastrect
+				|| d	= ._Document
+				|| sh	= font.width*2
+				|| v	= (6 + .depth(parent)*sh, texty)
+				|| mod	= d.ismodified?
+				|| ddd	= (Colors.black(0.5), Colors.clear)(mod)
+				font.small.drawicon(.Modifier, where, V, ddd)
+
+				if .HasError
+					v.x = z.x2-sh
+					font.small.drawicon('\17', where, V) // not sure???
+				return (sh, 0)
+
+
+		function isbetter (|string| a, |string| b, |string| ext, |int|)
+			if (b == ext) != (a == ext)
+				return (a==ext)+1
+
+
+helper string.StarMatch (|string| name, |bool|)
+	visible
+	require self and name
+	if self ~= name
+		return true
+	|| Star		=  .find('*')						#require
+	DebugAt
+	|| Len		= .length - (Star + 1)
+	|| P1		= self[0,star]
+	|| P2		= self[star + 1...]
+	rz			= name[0, p1, true] and name[name-p2, p2, true]
+
+
+helper string.PlatformVisible (|bool| AtRoot, |bool|)
+	require self[0] != '.'
+	if !atroot
+		return true
+	if platform.osx
+		return (.length > 3) and !.islower
+	return true
+
+
+function FileRow.Modifier (|byte|)
+	if .DoesntExist
+		return '?'
+	return icon(.location, "", self is expanded, !.asdir)
+
+
+extend_module filerow
+	helper icon (|string| self, |string| types, |bool| Expanded = false, |bool| NotDir = false, |byte|)
+		|| n = .name
+		|| ext = n.ext
+		if (.last == '/') and !notdir
+			if types and types.TypeContains(ext + "/")
+				return '\19'
+			if expanded
+				return '\1A'
+			return '\10'
+		  elseif (ext == "app" or "scproj" or "uwuz")
+			return '\19'
+		return '\11'

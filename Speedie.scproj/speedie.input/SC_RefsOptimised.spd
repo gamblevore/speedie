@@ -1,0 +1,133 @@
+
+
+
+class CppRefs
+	|uint16|			DisturbParams
+	|bool|				Owned
+	|[string]|			Disturbs		// cant be a class cos this is called BEFORE the classes are inited.
+										// awkward.
+	
+	constructor (|message| s=nil)
+		if s
+			.read(s)
+
+
+	function SetDefaultRefStatus
+		.Owned			= false
+		.Disturbs		= array.new
+		.disturbparams	= -1
+		.disturbs		<~ "object"
+
+
+	function AddOne (|message| C)
+		if (C ~= "nil")
+			// 
+		  elseif (C ~= "self")
+			.DisturbParams |= 1
+		  elseif (C == @num)
+			.DisturbParams |= (C.int << 1)
+		  else
+			.Disturbs <~ C.name
+	
+
+	function Read (|message| node)
+/*
+	cpp_refs {
+		Disowns			true
+		Disturbs		nil
+		ParamSafe		true
+	}
+*/
+		.SetDefaultRefStatus
+		|| arg = node[@arg] #require
+		arg.expectlast
+		
+		for c in arg
+			c.expect(@tmp)
+			expect (c=="disturbs" or c=="disowns") (c, "Should be 'disturbs' or 'disowns'")
+			|| ch = c.first
+			if (ch == @bra): ch.func = @prm
+			expect (ch == @thg or @prm or @num) (ch)
+			ch.expectlast
+
+		require stderr.ok
+
+		
+		|| Disown = arg.findflat(@tmp, "returnsdisowned")[0]
+			.Owned = !disown.TrueOrFalse
+
+		|| Stuff = arg.findflat(@tmp, "disturbs")[0]
+			.Disturbs.clear
+			.DisturbParams = 0
+			if (Stuff != @list)
+				.addone(stuff)
+			  else
+				for c in Stuff
+					.addone(C)
+
+
+
+dispatch CppRefTable (TranFunc)
+	disowns				{} //(SCFunction.NewCppWrapper)
+	disturbs			{} //(SCBase.LoadCppPart)
+	paramsafe			{} scfunction.tran_cpprefs
+
+
+extend_module scmodule
+	function ReadIntoCppRefs (CollectFunc)
+		name_space.GetAsModule$.DefaultRefs.Read(node)
+		return compiler.program
+
+
+extend_module SCFunction	
+	function Tran_CppRefs (TranFunc)
+		fn.refs = cpprefs.new(node)
+		node.remove
+
+
+dispatch FuncLinkageTable (TranFunc)
+	cpp_wrapper			{}
+	cpp_part			{SCBase.LoadCppPart(node, name_space, node)}
+	cpp_refs			scfunction.tran_cpprefs
+	visible				{} // (SCFunction.Tran_Visible)
+	ignore				{}
+	inline				{}
+
+
+dispatch ClassLinkageTable (TranFunc)
+	// these items with {} are processed elsewhere...
+	// it would have been better to process them all here. but I wrote this after
+	// So the older code still needs removing and using this instead.
+	cpp_wrapper			{}
+	cpp_part			{SCBase.LoadCppPart(node, name_space, node)}
+	cpp_refs			scfunction.tran_cpprefs
+	cpp_class			{}
+	visible				{} // (SCFunction.Tran_Visible)
+	ignore				{}
+	noearlyfree			{}
+	dontdestructlocally {}
+	wrapper				{} //if name_space.mustbe(scclass) : name_space.IsWrapper = true}
+	datatype
+		if name_space.mustbe(SCClass, node)
+			expect (name_space.isstruct) (node, "Expected this for a struct")
+			|| value = node[@thg]
+				value.expectlast
+				name_space.IsDataTypeLike = value.trueorfalse
+
+	numeric
+		if name_space.mustbe(SCClass, node)
+			expect (name_space.isdatatype) (node, "Expected this for a datatype")
+			if node[@thg] == "false"
+				name_space.typeinfo = datatypecode.unusedtype
+				name_space.IsNotNumeric = true
+
+
+function SCBase.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, |scbase|)
+	|| fn = .owningfunc
+	for ch in node
+		require ch.expect(@tmp)
+		|| linker = Table[ch.name] #expect (ch)
+		(linker)(fn, ch, self)
+
+	return compiler.program
+

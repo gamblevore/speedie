@@ -1,0 +1,147 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+
+
+
+Module Jeebox
+	linkage
+		cpp_part Constants
+	
+
+	|| EscapeStr = [
+		"\00"  : `\00` // just for escaping, not unescaping
+		"\0A"  : `\n`
+		"\0D"  : `\r`
+		"\09"  : `\t`
+		`"`    : `\"`
+		`'`    : `\'`
+		`\`    : `\\`
+		`&#`   : `\&#`
+	]
+	
+
+	|| XML_EscapeStr = [
+		"&"    : `&amp;` 
+		"'"    : `&apos;` 
+		"\""   : `&quot;` 
+		"<"    : `&lt;` 
+		">"    : `&gt;`
+	]
+
+	
+	|| JS_EscapeStr = [
+		"\08"  : `\b`
+		"\0C"  : `\f` 
+		"\0A"  : `\n` 
+		"\0D"  : `\r` 
+		"\09"  : `\t`
+		"\""   : `\"`
+		"\\"   : `\\`
+	]
+	
+	|dictionary of string| UnEscapeStr
+	|dictionary of string| JS_UnEscapeStr
+	|dictionary of string| XML_UnEscapeStr
+	|dictionary of string| EscapeChr
+	
+	|| CSWordMiddle		= "AZaz09__".UniCS
+	|| CSLettersOnly    = "AZaz".UniCS
+	|| CSWordStart		= "AZaz__".UniCS
+	|| CSNum			= jeebox.CSWordMiddle
+	|| CSLine			= "\n\r".charset(false)
+	|| CSAfterStatement	= " ,:\t\n\r\\".charset(false)
+	|| CSLineBlack		= "\n\r,".charset(false)
+	|| CSWrapSplit		= " \t\n\r\f-^+/\\*:;<>=,".charset(false)
+
+	.InitConstants
+
+	function string.UniCS (|charset|)
+		// all valid unicode-ranges
+		return (self + #(80BFC2F4)#).charset 	
+	
+	function AddEscape (|int| i, |faststring| fs)
+		opt norefcounts
+		|| f = string[i]
+		require  !.EscapeStr[f]  or  !.Escapechr[f]
+		fs <~ '\\'
+		fs.appendhex(i, 2)
+		|| t = fs.getresult
+		.EscapeStr[f] := t 
+		.Escapechr[f] := t
+
+	function InitConstants
+		array.new // needed by argv
+
+		.EscapeChr = dictionary.Copy(.EscapeStr)
+		.EscapeStr[`$`] = `\$`
+		.UnEscapeStr		= dictionary.Reverse(.EscapeStr)			// unify data
+		.JS_UnEscapeStr		= dictionary.Reverse(.JS_EscapeStr)			// unify data 
+		.XML_UnEscapeStr	= dictionary.Reverse(.XML_EscapeStr)		// unify data 
+		.EscapeChr[`"`]		= nil|string|
+		.EscapeChr[`$`] 	= nil|string|
+
+		.UnEscapeStr[`\0`]	= nil|string|					// handle normally
+		//.JS_UnEscapeStr[`\n`]	= ""						// c/js compat
+		.Unescapestr[`\`]	= ""
+		.EscapeStr["'"]		= nil|string|
+		
+		
+		|| tfs = faststring()
+		for i in 256
+			// this will avoid printing garbage to console.
+			if i <= 31 or (i == 127 or 0xc0 or 0xc1) or i >= 0xf5
+				.addescape(i, tfs)
+		
+		SetEscapeCode(.UnEscapeStr, true)
+		SetDecodeEntities(.UnEscapeStr, true)
+		SetDecodeEntities(.XML_UnEscapeStr, true)
+
+		.EscapeStr[`${`] = `$\{`
+	
+
+	function string.UnBackTick (|string|)
+		return .replaceall("``", "`")
+
+
+	Function string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
+		after = after min .length
+		while (off < after)
+			|| c = self[off++]
+			if (c == '\\')
+				off++
+			  elseif c == find
+				if find == '$'
+					if off >= after: exit
+					|| nxt = self[off]
+					ifn (nxt == '{' or '.') or jeebox.CSWordStart[nxt]
+						continue
+				return off - 1
+	
+
+	function ASCII (|string|)
+		cpp_wrapper JB_ASCII
+	
+	function Upper (|string|)
+		cpp_wrapper JB_Upper
+	
+	function Lower (|string|)
+		cpp_wrapper JB_Lower
+
+
+function Byte.IsALetter (|bool|)
+	return jeebox.CSLettersOnly[self]
+
+function String.Unescape (|string|)
+	return .ReplaceAll( Jeebox.UnEscapeStr )
+
+function String.Escape (|string|)
+	return .ReplaceAll( jeebox.EscapeStr )
+
+function String.EscapeChr (|string|)
+	return .ReplaceAll( jeebox.EscapeChr )
+

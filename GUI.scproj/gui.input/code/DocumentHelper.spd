@@ -1,0 +1,73 @@
+ 
+
+function dictionary.CachePath (|string| path, ||)
+	opt norefcounts
+	require self
+	|| i = self[path]|CachedPath|
+		return i.value
+
+
+class CachedPath
+	linkage
+		cpp_part CaP
+	contains object
+	|string|				Path
+	|object--|				Value
+	|dictionary--|			Cache
+
+	constructor (|string| p, |dictionary| c, |object| v)
+		c[p] = self
+		.path = p
+		.cache = c
+		.value = v
+
+
+	function Clear
+		require self
+		.cache[.path] = nil
+		.path = nil
+		.value = nil
+		.cache = nil
+
+
+
+class DocumentViewer (ringtree)
+	linkage: cpp_part docview
+	contains documentviewer
+	|GUIControl--|				Viewer
+	constructor (|GUIControl| V)
+		.viewer = V
+	function clear
+		opt norefcounts
+		for o in self
+			if o isa textview
+				o.document = nil
+		super.clear
+	function find (|GUIControl| V, |documentviewer|)
+		opt norefcounts
+		for (o in self) (s)
+			if o == v
+				return s
+	destructor
+		.clear
+	
+	iterator
+		|| ff = .first
+		while ff
+			yield (ff.viewer) (ff)
+			ff = ff.next
+
+
+function document.removeviewer (|guicontrol| g)
+	opt norefcounts
+	.viewers.find(g).remove?
+
+
+function document.addviewer (|guicontrol| g)
+	opt norefcounts
+	if !.viewers.find(g)
+		.viewers <~ documentviewer(g)
+	if g isa textview
+		|| c = .current
+			g.UseState(c,  self,  DocumentState.InitialSet)
+

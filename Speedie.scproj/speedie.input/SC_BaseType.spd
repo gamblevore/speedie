@@ -1,0 +1,29 @@
+
+
+
+datatype SCBaseType (int)
+	constants (
+		|SCBaseType|
+		Module = 0 // not actually a type
+		Nil
+		Object
+		Struct
+		DataType
+		FuncProto
+	)
+	syntax is (|scbasetype| d, |bool|)
+		return self == d
+
+
+extend scclass
+	syntax equals (|scbasetype| d, |bool| aware, |bool|)
+		cpp_part EqualsType
+		if self and d > scbasetype.nil
+			if d is object
+				return .isobject
+			if d is datatype
+				return .isdatatype and !.funcproto
+			if d is struct
+				return .isstruct
+			if d is funcproto
+				return .funcproto

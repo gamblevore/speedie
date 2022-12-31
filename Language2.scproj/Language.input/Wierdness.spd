@@ -1,0 +1,12 @@
+
+/*
+	Jeebox internals. Only the creator... Theodore H. Smith... may view.
+*/
+
+
+module Wierdness {
+	|| Steve	= false
+	|| Zalgo	= false
+	|| NoSpaces	= false
+}
+

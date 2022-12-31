@@ -1,0 +1,75 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+
+// bad design and only sciterator uses it!
+// better to NOT use it!
+class SCNodeRenamer {
+|string|	Name
+|[Message]| nodes
+linkage
+	cpp_part		NR
+	
+
+function Rename (|message| name)
+	opt norefcounts
+	expect !(name.hasany) (name, "We can't do that yet")
+	for n in .nodes
+		n.belike(name)
+
+
+function RenameStr (|string| s, |syntax|func=@thg)
+	.rename(func.msg(s))
+
+
+function Message.FullAfter (|Message|)
+	|| P = .Parent
+	|| N = P.Next
+	while (N)
+		P = N
+		N = P.Next
+	return P.FlatAfter
+
+
+function CollectDclThg (|Message| DclThg)
+	|| Dcl = DclThg.Ancestor( @Decl )
+	expect (dcl and dclthg == @thg) (dclthg)
+
+	/*
+		Because of wonky things like this:
+	
+		while {
+			|| abc = test()
+		} (abc)
+		
+		I can’t just end at "}"... 
+	*/
+	
+	.Collect( DclThg,  DclThg.name,  dcl.FullAfter )
+
+
+function Uniqueify (|SCBase| p)
+	.Renamestr( UniqueTmpVar(p, .Name) )
+
+
+function Collect (|Message| msg, |String| name, |Message| after)
+	.Name = name
+	
+	While msg != after
+		if (msg IsThing name)
+			.nodes <~ msg
+		msg = msg.FlatNext
+
+
+function CollectSelfs (|Message| root)
+	for Msg.flat in root
+		if Msg == @SDot
+			SCFunction.Tran_Sdt( Msg )
+// Not the cleanest design. it should rely on being transformed for this, previously.
+	.Collect( root, "self", root.flatAfter )
+}
+

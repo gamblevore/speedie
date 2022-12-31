@@ -1,0 +1,218 @@
+
+
+class ButtonView (GUIControl)
+	linkage
+		cpp_part Btn
+		
+	|GUIAction|					Pressing
+	|GUIAction|					Over
+	|guiaction|					OnRightClick
+	|date|						StepDuration
+	|date|						DelayTill
+	|menu|						SubMenu
+	|listviewrow|				Items
+	|listviewrow|				ClickedItem
+	|int|						ItemWidth
+	|byte|						ClickCount
+	|bool|						PressingDone
+	|bool|						PressMakesLighter
+	|bool|						MouseDownDoesClick
+	|ListViewState|				Align
+
+	constructor (|guicontrol| p,  |GUIAction| act,  |GUIAction| pressing=nil,  |GUIListEvent| ret=nil, |guiaction| OnRightClick=nil)
+		super.constructor(p)
+		.onclicked = act
+		.pressing = pressing
+		.OnRightClick = OnRightClick
+		.StepDuration = 0.75s
+		.align = ListViewState.aligncenter 
+		.submenu = .InitMenu(ret)
+
+	helper InitMenu (|GUIListEvent| ret,  |menu|)
+		if ret
+			rz = menu(self, nil, ret)
+			rz.AttachedToParent = true
+
+	function Click
+		(.onclicked|GUIAction|)(self, nil, nil)?
+	
+	function Click (|ivec2| p, |bool| left=true)
+		cpp_part ClickXY
+		opt norefcounts
+		require .lastrect contains p
+		|| c = .itemat(p.x)
+		|| prev = .selectrow(c)
+		if left
+			(.onclicked|GUIAction|)(self, C, prev)?
+		  else
+			(.onrightclick|GUIAction|)(self, C, prev)?
+
+
+	function SelectRow (|ListViewRow| R, |listviewrow|)
+		opt norefcounts
+		for i in .items
+			if i is Selected
+				rz = i
+			(i is Selected) = (i == r)
+
+
+	behaviour MouseMove
+		if state is enter or leave
+			sdlapp.touch
+		(.over)(self, state|int|, .itemat(p.x))?
+
+
+	function ItemAt (|int| P, |ListViewRow|)
+		opt norefcounts
+		|| W = .ItemWidth
+		|| R = .lastrect.horz
+		R.x2 = R.x + W
+		for i in .items
+			if R contains P
+				return i
+			R += W + 4
+
+
+	behaviour MouseUp
+		opt norefcounts
+		.DelayTill = nil
+		.ClickedItem = nil
+		if .PressingDone
+			.PressingDone = false
+		  else
+			.click(p)
+
+
+	behaviour RightClick
+		opt norefcounts
+		.Click(p, !.onrightclick)
+		
+	
+	behaviour MouseDown
+		opt norefcounts
+		|| D = .itemat(P.x)
+			if d isnt active and self is decluttered
+				d = nil
+		
+		if .clickeditem and clicks == -1
+			// drag
+			if D and D != .ClickedItem
+				.ClickedItem.moveto(D)
+			return 4			
+		
+		require D or !.items
+		if .ItemWidth and !D
+			return nil
+		.clickcount = clicks
+		if .MouseDownDoesClick
+			.pressingdone = true
+			.click(p)
+			return 1
+		
+		if !.Pressing
+			if D
+				.ClickedItem = d
+				return 4
+			return 1
+
+		|| n = date()
+		if !.DelayTill
+			.DelayTill = n + 0.7s
+		  elseif n >= .DelayTill
+			.DelayTill = n + .StepDuration
+			.PressingDone = true
+			if !(.Pressing)(self, 0, D)
+				.delaytill = 0
+				return 0
+		return 5
+
+
+	function ivec4.TextCorner (|drawstyle| g, |string| T, |ListViewState|C, |ivec2|)
+		|| MV = (.height - g.height(t))-3
+		if C & ListViewState.aligncenter
+			|| MH = .width - g.width(t)
+			|| vmid = .y+((mv-1)/2) + 2
+			return (.x+(mh/2), vmid)
+		ifn c & ListViewState.align
+			|| vmid = ((mv)/2) + 2
+			|| xy = .xy + (0, vmid)
+			ifn (C == ListViewState.alignright or ListViewState.aligncenter)
+				xy += (5, 0)
+			return xy 
+
+
+	function DrawItem (|image| where, |ivec4| R, |ivec4| grow, |listviewrow| i)
+		opt norefcounts
+		|| disabled = (i and i is disabled) or (self isnt enabled)
+			grow = nil
+		|| clicked = .MouseIsDown and R.x1x2 contains sdlapp.mousexy.x
+		r.x2 += 2
+		|| strength = 1.0
+		if i is Active
+			strength += SDLApp.cycle(1s)
+			SDLApp.Touch
+		  else
+			require self isnt decluttered
+		grow += r
+		where.ControlClip = grow
+		Where.DrawRect(Grow, .GNormal, strength)
+		if (i is Selected) or (!i and clicked)
+			|| darker = (!i and clicked)
+			if .pressmakeslighter
+				darker = !darker
+			|| w = (colors.black(0.2), colors.white(0.15))(darker)
+			where.fillrect(grow, W, W) 
+		if clicked and i
+			.drawfocusrect(where, grow, 1.0)
+		
+		if !i and .text.refcount == 0
+		|| t = (i.text, .text)(i)
+		if i is Broken
+			t += " \17"
+		if i is dead
+			t += " (!)"
+		|| Pn = R.TextCorner(.gnormal,  t,  .align) + (-1, 1)
+		|| White = (.align & listviewstate.DrawWhiteSpace)!=0
+		font.small.DrawText(t,  Where,  Pn, White)
+		if disabled
+			|| px = colors.grey(0.55)
+			where.fillrect(R, px, px)
+
+		
+	behaviour Draw
+		opt norefcounts
+		|| r = .lastrect
+		|| g = .MouseisInside|int| * .ExpandOnMouseOver
+		|| grow = (-g,-g, g, g)
+		where.controlclip += grow
+		|| W = .ItemWidth
+			|| m = .mousexy
+			R.x2 = R.x + W
+			for i in .items
+				|| inside = r contains m
+				.drawitem(where, R, grow*inside, i)
+				R = R right W + 6
+				require r.x < where.width
+		  else
+			.drawitem(where, r, grow, nil)
+
+
+	function XOfItem (|listviewrow| row, |ind|)
+		opt norefcounts
+		if !row: return -1
+		rz = 0
+		|| W = .ItemWidth
+		|| r = .items.first
+		while row != r
+			rz += w + 6
+			r++
+
+
+	function OpenMenu (|listviewrow| row=nil, |bool|)
+		|| it = .submenu			#require
+		expect it.listsource.hasany (beep)
+		if .MouseIsDown
+			.window.CurrMouseDown = it // right?
+		|| x = .XOfItem(row)
+		it.ShowCmm(self, 0, x)
+		return true

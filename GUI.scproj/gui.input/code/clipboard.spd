@@ -1,0 +1,53 @@
+
+
+module clipboard
+	cpp_Wrapper SDL_GetClipboardText (|cstring|) 
+	cpp_wrapper SDL_SetClipboardText (|cstring| s)
+	
+	|stringzeroterminated| _backup = ""
+	function Text (|string|)
+		|| s = .SDL_GetClipboardText.sdltext
+		if !s
+			return ._backup
+		|| s2 = s.FixLineEndings
+			s = s2
+		  else
+			Notifications <~ "Can't fix line-endings in clipboard text."
+		return s
+	function Text (assigns: |string| s)
+		if s // don't copy empty string!
+			._backup = s.cstr // macos hates copying binary data.
+			.SDL_SetClipboardText(._backup)
+		  else
+			beep
+
+function cstring.sdltext (|string|)
+	|| s = string.fromc(self).copy
+	memory.free(self|&byte|)
+	return s
+
+
+function string.FixLineEndings (|string| dest="\n", |StringThatWasReadSafely|)
+	|| type = .DetectLineEndings
+	if type <= 1
+		return self
+	if !type.IsPo2
+		return string.error // sigh
+	if type == 4
+		return .ReplaceAll("\r\n", dest)
+	return .ReplaceAll("\r", dest)
+	
+	
+function string.DetectLineEndings (|int|)
+	|| n = .Length
+	for i in n
+		|| c = self[i]
+		if c == 10
+			rz |= 1
+		  elseif c == 13
+			if self[i+1] == 10 // CRLF
+				rz |= 4
+				i++
+			  else
+				rz |= 2
+	

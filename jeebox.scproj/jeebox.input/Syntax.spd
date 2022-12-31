@@ -1,0 +1,153 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+prototype fpMsgRender (|Message| self, |FastString| fs)
+
+
+datatype Syntax (Byte)
+	linkage
+		cpp_Part Syx
+		numeric false // disallow implicit (syntax <--> int) conversion
+
+	function ID (|int|) 
+		return self|int|
+
+	function Translateable (|bool|) 
+		return self >= @thg and self <= @name
+
+	function ListViewable (|bool|) 
+		return self >= @thg and self <= @emb
+
+	function IsRel (|bool|) 
+		return self >= @rel and self <= @yoda
+
+	function IsAdj (|bool|) 
+		return self >= @adj and self <= @badj
+
+	function IsBra (|bool|) 
+		return self == @bra or @list
+
+	function Message.Translateable (|bool|) 
+		return .Func.Translateable
+
+	render 
+		if Self
+			.obj.render(fs)
+	
+	operator plus (|string| m, |message|)
+		return self.msg(m)
+	operator plus (|int| m, |message|)
+		opt norefcounts
+		cpp_Part PlusNum
+		return self.msg(m.render)
+	
+	syntax access (|string| m, |message|)
+		return .msg(m)
+	
+	function Name (|string|) 
+		Opt NoRefCounts
+		if (!self)
+			return "child"
+		return .obj.name
+	
+	
+	function LongName (|string|) 
+		Opt NoRefCounts
+		if (!self)
+			return "child"
+		return .obj.longname
+	
+	
+	function Obj (|syntaxobj|) 
+		return _FuncArray_[self|int|]
+	
+	
+	function Msg ( |string| name="", |Message| ) 
+		return Message( nil, self, parser.usingpos, name, name.length )
+	
+	// remove this? node.msg seems better?
+	function Msg ( |message| parent, |string| name, |Message| )
+		cpp_part ParentMsg
+		return Message( parent, self, parser.usingpos, name, name.length )
+	function message.Msg ( |syntax| fn, |string| name="", |Message| )
+		// || x = node.msg(@dot, "delete") // seems nicer
+		// || x = @dot.msg(node, "delete") 
+		return Message( self, fn, parser.usingpos, name, name.length )
+	
+	// replace with int64.msg? seems better.
+	function Msg ( |int64| name, |Message| ) 
+		cpp_part IntMsg
+		return .msg(name.render)
+		
+	function ExportAddr (assigns:|fpMsgRender|) 
+		Opt NoRefCounts
+		.obj.exportaddr = Value
+	
+	function ExportAddr (|fpMsgRender|) 
+		Opt NoRefCounts
+		return .obj.exportaddr
+	
+	function RenderAddr (assigns:|fpMsgRender|) 
+		Opt NoRefCounts
+		.obj.renderaddr = Value
+	
+	function RenderAddr (|fpMsgRender|) 
+		Opt NoRefCounts
+		return .obj.renderaddr
+	
+	
+	module 
+		|int|		CurrFuncID
+		|int|		MaxFuncID  
+		
+		syntax access (|string| name, |syntax|)
+			|| obj = _syxdict_[name] #expect "Unknown syntax " + name
+			return obj.id
+			
+		function StdNew (|fpMsgRender| msg, |string|name, |String| LongName, |Syntax|) 
+		// called by the compiler via "syx" syntax.
+		// would be better to just make these all consts?
+		// at least... the syxnum should be.		
+			|| ID = .CurrFuncID++
+			|| result = Syntaxobj.new(msg, name, ID)
+			MaxFuncID = ID
+			_syxdict_[name] = result
+			_Funcarray_[ID] = result
+			if (LongName)
+				_syxdict_[LongName] = result
+				result.LongName = LongName
+			  else
+				result.LongName = Name
+			return ID|syntax|
+
+
+
+class SyntaxObj 
+	linkage
+		cpp_part Fn
+	visible			true
+
+	|fpMsgRender|			RenderAddr
+	|fpMsgRender|			ExportAddr
+	|String|				Name
+	|String|				LongName
+	|Syntax|            	ID
+
+
+	constructor (|fpMsgRender| msg, |string| name, |int| ID) 
+		.RenderAddr = msg
+		.Name		= Name
+		.ID			= ID|syntax|
+		.ExportAddr = Message.Dummy
+	
+	
+	render 
+		ifn fs_in 
+			return .LongName.lowercase
+		fs_in <~ .LongName.LowerCase
+	
+
+

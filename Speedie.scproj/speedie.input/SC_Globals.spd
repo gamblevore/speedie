@@ -1,0 +1,1809 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+/*
+	* need to temp some vars... or else how to GET bits of it?
+		* || oof = abc().zyx
+		* cls1.loc.zw = (1,2) -->
+		  || tmp = cls1.loc
+		  cls1.loc = (tmp.x, tmp.y, 1, 2) 
+
+
+	function XY (|vec2|) {
+		// this shouldn't be allowed!!! (its on vec4)
+		return (.x, .y)
+	}
+*/
+
+
+
+constants {
+	kBitXor = "^"
+	kBitOr = "(|)"
+	kBitNot = "~"
+	kBitAnd = "&"
+}
+
+
+
+
+prototype ExprResolver (|Message| Exp, |SCBase| name_space, |Message| side, |SCObject|)
+
+dispatch ExprFuncs (ExprResolver)  {
+	@Rel  : (TypeOfRel)
+	@BRel : (TypeOfBRel)
+	@ARel : (TypeOfARel)
+	@Adj  : (TypeOfAdj)
+	@Func : (TypeOfFunc)
+	@Acc  : (TypeOfAccess)
+	@msg  : (TypeOfMsg)
+	@sthg : (TypeOfSthg)
+	@Dot  : (TypeOfDot)
+	@Name : (TypeOfSyx)
+	@url  : (TypeOfURL)
+	@list : (TypeOflist)
+	@Arr  : (TypeOfArr)
+	@Arg  : (TypeOfArgArr)
+	@Char : (TypeOfChar)
+	@sstr : (TypeOfString)
+	@Item : (TypeOfLast)
+	@Bra  : (TypeOfBra)
+	
+	@Str:
+		Return TypeString.TypeNormal
+	@Back:
+		Return TypeString.TypeNormal
+
+	@Num  : (TypeOfNum)
+	@unit : (Typeofunit)
+
+	@Thg  : (TypeOfThg)
+	@Ques : (TypeOfQues)
+
+	@SDot:
+		SCFunction.Tran_Sdt( exp )
+		Return TypeOfDot( exp, name_space, side )
+
+	@Type:
+		return TypeCastCheck(Exp, name_Space, side)
+
+	@Emb:
+		Return nil
+	@Sheb:
+		Return nil
+	63:
+		return nil // stop errors with the func being too large.
+
+/* BAD!
+	@Decl
+		debugger
+*/
+}
+
+
+function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
+	require (.type.isstruct or .c_Array) and (!.pointercount)
+	return  (side.RemoveTypeCasts != @arg)
+
+
+function TypeCastCheck (ExprResolver) // (|Message| Exp, |SCBase| name_space, |Message| side, |Object|)
+	|| exp0 = exp.first
+	|| N = exp0.next
+	|| Old = TypeOfExpr( exp0, name_space, side )		#require
+	|| New = ExtractDecl( N, name_space )				#require
+	// allow MOST typecasts, but NOT typecasts to/from struct instances...
+	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
+		error (exp, "Can’t cast to/from structs/carrays (pointers to structs are OK though)")
+	return New
+
+
+function scdecl.exists (|bool|)
+	return self and self != typevoid and typenil
+
+	
+function TypeOfURL (ExprResolver)
+//	|| OK so... we want the... URL as a file
+// could load file from http later but thats also some kind of a security flaw
+// what use is code that cant compile?
+	require exp.expect(@url, "file")
+	if scfunction.GetFileString(exp, exp.first.name)
+		return TypeOfExpr(exp, name_space)
+
+
+function TypeOfARel (ExprResolver)
+	if exp == "&"
+		return TypeOfAddress(exp.first, name_space, side )
+	if exp == "!"
+		exp.become(@bra)
+		return TypeOfExpr(exp.first, name_space)
+	if Exp == "..."
+		return TypeOfDotDotDot(exp, name_Space,nil)
+	return SCFunction.Tran_AfterRel(exp, name_space, side)
+
+
+function TypeOfFunc (ExprResolver)
+	opt norefcounts
+	|| f = exp.first
+	if f == @list
+		return TypeOfTernary(exp, name_space, side)
+	
+	|| fn = TypeOfFuncSub(exp, name_space, side)			#expect (exp, "Can’t use this as a function.")
+	if fn isa SCFunction
+		|| obj = fn.ReturnType
+		if !obj
+			exp.obj = typevoid
+		return obj // voids are so annoying.
+	return fn
+
+
+function Message.CanGetAddress (|scbase| name_space, |bool| DoErr = true, |bool|)
+	|| curr = .unbra
+	|| err = ""
+	if (curr == @acc)
+		|| f = curr.first
+		|| T = TypeOfExpr(f, name_space) #require
+		if (T.isnumeric > 1)
+			err = "Can't get address of vector element (c++ limitation)."
+	  else
+		|| T = TypeOfExpr(curr, name_space) #require // might transform it
+		ifn (curr == @thg or @dot)
+			err = "Can't get address of this."
+		  elseif (T is const)
+			err = "Can't get the address of a const."
+	if doerr and err
+		error (curr, err)
+	return !err
+
+
+function TypeOfBRel (ExprResolver)
+	|| name = exp.name
+	|| F = exp.first									#require
+	|| SubType = TypeOfExpr( F, name_space )			#require
+	if (Subtype.type.funcproto) and (name == "&")
+		return TypeOfAddress(F, name_space, side) // return subtype // just use this instead?
+													 
+
+	if name == "*"
+		|| Cpy = subtype.Copy // should keep borrowedness...
+		Cpy.PointerCount--
+		return cpy // how to render?
+		
+	  elseif name == "-" // minus
+		Return subtype
+		
+	  elseif name == "&"
+		require F.CanGetAddress(name_Space)
+		return Subtype.AsPointer
+		
+	  elseif name == "!"
+		|| cond = ExpandToBool( F, name_space )$
+		|| d = cond.obj
+		if (d isa scdecl)
+			if d.IsConstOf(Falsebool)
+				return truebool
+			if d.IsConstOf(Truebool)
+				return falsebool
+		
+		Return TypeBool.TypeNormal // it's a bool anyhow
+		
+	  elseif (name == kBitNot or "~")
+		expect (subtype.IsInteger) (exp, "Expected an integer.") 
+		Return subtype
+		
+	SCFunction.Tran_AfterRel( exp, name_space, side )
+	Return SubType
+
+
+function TypeOfLast (ExprResolver)
+	return TypeOfExpr( exp.Last, name_space, nil )
+
+
+function TypeOfBlock (ExprResolver)
+	|| p = exp.scarg( name_space )
+	p.isstatementexpr = true
+	|| fn = p.owningfunc
+	
+	CollectDecls( exp, p, p )
+	for ch in exp			// copied from tran_all
+		if ch == @Arg
+			SCFunction.Tran_All( fn, ch, ch.scArg( p ) )
+		  else
+			SCFunction.Tran_All( fn, ch, p )
+	
+	|| last = exp.last
+	require last.expect(@tmp, "rejoin")
+	|| val = last.first #expect (last, "Must return a value")
+	require val.expectlast
+	return typeofexpr(val, p, nil)
+
+
+function TypeOfThg (ExprResolver)
+	return TypeOfThgSub(Exp, name_space, side, false)
+
+
+function TypeOfThgSub (|Message| Exp, |SCBase| name_space, |Message| side, |bool| AllowAny, |SCObject|)
+	opt norefcounts
+	|| R = name_space.LookUpvar( exp.name, exp, side )
+	
+	if R isa SCModule
+		|| Cls = R.Cls						#expect (Exp, "Can’t refer to a module like that.")
+		if !AllowAny
+			if Cls.ismodel
+				return Cls.GetFlyingMemory(exp)
+
+			expect cls.isobject (exp, "Can’t refer to type “${exp.name}” like that (it's not a class).")
+			expect !cls.IsRole  (exp, "roles aren't real classes!")
+
+	if R isa scdecl
+		if side
+			(r is setto)
+		|| O = R.islookuponly
+		if O isa message
+			exp.safereplacewith(o.copy(exp))
+	return R
+	
+
+
+function TypeOfBra (ExprResolver)
+	|| c0 = exp.first
+	if (c0 == @arg)
+		rz = typeofBlock(c0, name_space, side)
+	  else
+		rz = typeofexpr(c0, name_space, side)
+
+
+function TypeOfString (ExprResolver)
+	return typestring.typenormal // really it should also be a cstring!
+function TypeOfChar (ExprResolver)
+	error (exp.length == 1) (exp, "Chars must be one byte long.")
+//	want  (exp.length == 1) (exp, "Chars must be one byte long.") // seems better?
+
+	return TypeByte.typenormal
+
+
+
+
+|| CSHex			= "AFaf09__".charset
+|| CSNum			= "09..".charset
+
+
+function message.unitmatch (|string| a, |string|b, |bool|)
+	opt norefcounts
+	|| unit = .name
+	if unit == a: return true
+	if unit == b
+		error (self, "Unit should be " + a)
+
+
+
+function TypeOfUnit (ExprResolver)	
+	if exp == "l"
+		using (exp)
+		exp.become(@type)
+		exp <~ (@thg, "l")
+		return typeint64.TypeNormal
+
+	|f64| Mul = 0.0
+	|| Type = TypeInt.typenormal
+	|| unit = exp.name
+	if unit == "KB" or "K"
+		Mul = 1<<10
+	  elseif unit == "MB" or "M"
+		Mul = 1<<20
+	  elseif unit == "GB" or "G"
+		Mul = 1<<30
+	  elseif unit == "TB" or "T"
+		Mul = 1|int64|<<40|int64| // goddamn c++ complaining
+	  elseif unit == "th"
+		Mul = 0
+	  else
+		type = typedate.typenormal
+		if unit == "s"
+			mul = 64KB
+		  elseif unit == "ms"
+			mul = 64
+		  elseif unit == "π"
+			mul = π
+			type = typef64.typenormal
+		  elseif unit == "τ"
+			mul = τ
+			type = typef64.typenormal
+		  elseif exp.unitmatch("days", "day")
+			mul = 86400.0 * 64KB
+		  elseif exp.unitmatch("weeks", "week")
+			mul = 604800.0 * 64KB
+		  elseif exp.unitmatch("years", "year")
+			mul = 31536000.0 * 64KB
+		  elseif exp.unitmatch("mins", "min")
+			mul = 60 * 64KB
+		  elseif exp.unitmatch("hours", "hour")
+			mul = 3600 * 64KB
+		  else
+			error (exp, "Unknown unit")
+	
+	|| it = exp.first
+		|| str = ""
+		|| val = it.float
+		if !mul
+			str = (1.0 / val).render
+		  else
+			val *= mul
+			if type.typeinfo.isint
+				str = val|int64|.render
+			  else
+				str = val.render
+		exp.become(@num, str)
+		it.remove
+	return type
+
+
+function String.IsHexConstant (|bool|)
+	return  (self[0]=='0')  and  (self[1] == 'x')
+
+
+function String.IsBinaryConstant (|bool|)
+	return  (self[0]=='0')  and  (self[1] == 'b')
+
+
+function TypeOfNum (ExprResolver)
+	if (exp.name contains ".")
+		exp.float
+		Return typefloat.TypeNormal
+
+	|| Val = exp.int
+	if exp.name.IsHexConstant or exp.name.IsBinaryConstant
+		exp.become Val
+
+	if ((Val << 32) >> 32) != Val
+		return typeint64.typenormal
+	return typeint.typenormal
+
+
+function Message.CollectionPlace (|Message|)
+	|| msg = self
+	while (msg)
+		|| p = msg.parent
+		if (msg == @arg)
+			// possibly good?
+			if !p: Return msg
+			if (p isTmp "class" or "module"): Return msg
+		msg = p
+
+
+function ParamsFail (|SCFunction| f, |SCParamArray| params)
+	|| fs = faststring.new
+	if !interact.shouldenter
+		debugat
+	for i in Params.Range
+		fs <~ ", "
+		start
+		|| P = params[i]
+		|| Type = TypeOfExpr(P, nil)
+		Type.RenderTypeName( fs )
+	
+	|| str = fs.getresult
+		str = "Wrong params passed: " + str
+	  else
+		str = "Missing params."
+
+	error ( params.exp, str )
+	error ( f.Source, "to " + f.RenderTitle )
+
+
+function ExtractAmount (|Message| Prms, |SCBase| name_space, |SCDecl| R, |bool|)
+	|| num = prms.first
+	if num == @unit
+		typeofunit(num, nil, nil)
+	require num.expect(@num) and num.expectlast
+	R.C_Array = Num.Name.ParseInt
+	R.Default = «arg »
+	return true
+
+
+function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
+	// a bit recursive!
+	|| f = c.func
+	
+	if (f == @Decl)
+		Return ExtractDecl( c.first, name_space )
+	
+	if (f == @Emb)
+		expect (!c.first) (c)
+		return nil
+	
+	if (f == @Bra)
+		c = c.first
+		f = c.func
+		
+	if (f == @sthg) and (c == "...")
+		return name_space.RequireContained( c )
+	
+	if (f == @Thg)		// usual case
+		return Compiler[ c.name, c ]$.typenormal
+	
+	if (c == @Acc)		// |Byte[10]| TenBytes
+		|| Prms = c[1]
+		if prms.hasany
+			|| R = ExtractDecl( c.first, name_space ) #require
+			R = R.copy
+			expect  ExtractAmount( Prms, name_space, R )   ( c, "Expected something like: |Type[10]|" )
+			return R
+			
+		f = @rel
+		c.func = f
+		|| fi = c.first
+		c.clear
+		c <~ «thg "memory"»
+		c <~ «opp "of"»
+		c <~ fi
+
+	
+	if (f == @func)
+		|| R = ExtractDecl( c.first, name_space ) #require
+		return R.RefineDecl(c.last)
+
+	
+	if (f == @Arel)
+		if (C == "--")
+			|| R = ExtractDecl( c.first, name_space ) #require
+			return R.MakeBorrowed
+
+
+	if (F == @arg) // a bit ugly... |{\n\tfaststring\n}|
+		|| d = extractdecl(c.first, name_Space)$
+		d.compilercreated = true
+		return d
+		
+
+	|| result = SCDecl.new
+	|| ErrCount = stderr.errorCount
+
+	if (C IsBrel "&")	// pointer
+		|| R = ExtractDecl( c.first, name_space )
+		if (R)
+			R.CopyTypeInfoTo(result)
+			result.PointerCount++
+	
+	  elseif (c isbrel "~") // not a brel anymore?
+		c.name = "&"
+		c.first.func = @thg
+		|| wrapp = «thg "datatypewrapper"»
+		result.loadContained(c, wrapp, name_space)	#require
+	
+	  elseif (f == @item)
+		|| R = ExtractDecl( c.first, name_space ) #require
+		expect R.isnumeric and (c.last == @num) (c, "Must be numeric")
+		result.TypeContained = R.Type // use CopyTypeInfoTo? what does this do even?
+		
+	  elseif (f == @Arr)
+		|| ch = c.first
+		ifn ch										// |[]|
+			Return TypeArray.TypeNormal
+		
+		expect (ch != @Item) (c)
+		result.Contains = ExtractDecl( ch, name_space )
+		result.TypeContained = TypeArray
+		
+	  elseif (f == @Adj)
+		Result.LoadContained(c.first, c.last, name_Space)		#require
+		
+	  elseif (f == @rel)
+		|| op = c.findflat(@opp, "of", true)					#require
+		|| contained = c[nil, 2]								#require
+		result.loadContained(contained, c.first, name_Space)	#require
+	
+	  elseif (ErrCount == StdErr.errorCount)
+		error ( c ) // no spam
+	
+	result.MakeContainedObject
+	
+	if (ErrCount == StdErr.errorCount)
+		Return result
+
+
+
+function SCDecl.MakeStatic (|SCDecl| R, |bool|)
+	R.CopyTypeInfoTo(self)
+	.isstatic = true
+	return true
+
+
+function SCDecl.LoadContained (|Message| Contained, |Message| c, |SCBase| Name_Space, |bool|)
+	|| R = ExtractDecl( c, name_space )$
+	if contained == @thg and "static"
+		return .MakeStatic(R)
+	
+	|| Cont = ExtractDecl( Contained, name_space )$
+	.type = R.Type
+
+	if typewrapper.typenormal.match(R, ktypecastfalse).isnormalmatch
+		expect (!Cont.isnormalobject)  ( c, "Datatype-wrappers can't contain objects." )
+		expect (!Cont.c_array)         ( c, "Datatype-wrappers can't contain this." )
+		.autocastto = cont
+		.contains = cont
+	  else
+		|| RCont = R.Type.Contained 
+		expect (R.IsNormalObject or R.Type.IsStruct or R.Contains)  ( c, "Not a container class." )
+		expect (RCont) ( c, "Not a container class." )
+		
+		// object can match anything. 
+		if RCont.type != typeobject
+			if RCont.isnormalobject
+				require (RCont.ExpectMatch(cont, 0, c, contained))
+		.Contains = Cont
+
+	return true
+
+
+
+function TypeOfExprModulesOK (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCObject|)
+	if (Exp.obj)
+		return exp.obj|scobject|
+	if (exp == @thg)
+		exp.Obj = name_space.LookUpVar( exp.name, exp, side )
+		return exp.Obj|scobject|
+	return TypeOfExprsub2(exp, name_space, side)
+
+
+function TypeOfExprModulesNotOK (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCDecl|)
+	|| dcl = TypeOfExprModulesOK(exp, name_space, side)
+	if dcl isa scdecl
+		return dcl
+	error (exp, "Can't use modules here.")
+
+
+function TypeOfExprMaybeNil (|Message| Exp, |scbase| name_space, |SCDecl|)
+	if Exp
+		return TypeOfExpr(Exp, name_space, nil)
+
+
+function TypeOfExprSub2 (|Message| Exp, |SCBase| name_space, |Message| side = nil, |scobject|)
+	if exp == @Decl
+		|| d = exp.last.obj
+		if d isa SCDecl: Return d
+
+	expect (name_space) (Exp, "Failed to get type of this.")
+
+	exp.obj = TypeOfExprSub( exp, name_space, side )	#require
+	return exp.obj|scobject|
+
+
+
+function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCDecl|)
+	|| obj = exp.obj|scobject| oar TypeOfExprSub2(Exp, name_Space, side)
+		if obj isa SCDecl
+			return obj
+		if obj isa SCModule
+			|| cls = obj.Cls				#expect ( exp, "Can’t use a module here." )
+			Return cls.ClassType.AsPointer
+
+
+
+function Message.SCFile (|SCFile|)
+	for S.up in self
+		|| r = S.memoryLayer.obj
+		if r isa SCFile
+			Return r
+		require S != @arg
+
+
+function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message| side, |SCObject|)
+	opt norefcounts
+	|| f = ExprFuncs[Exp.func|int|]								#expect ( exp )
+	rz = (f)(Exp, name_space, side)
+	if rz.ShouldUnWrap
+		return (rz|scdecl|).UnWrapDataType(exp, name_Space)
+
+
+
+function SCModule.IsMArray (|message| arr, |bool|)
+	// || X = MyStruct[N]
+	// allocates N of MyStruct
+	
+	|| cls = .Cls
+	if cls and (!arr or arr.hasonechild)
+		return cls.IsDataType or cls.IsStruct
+
+
+
+function message.expectmatch (|scbase| name_space, |scclass| With, |bool|)
+	return .ExpectClass(TypeOfExprNeeded( self, name_space ), With)
+
+function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
+	// Vector[N] --> memory.object(N, itemsize)
+
+	|| ty = exp.first
+	|| prms = ty.next
+	if prms == @opp
+		prms <~ prms.next
+		prms.name = ""
+
+	exp.become( @dot, "object" )
+	ty.name  = "memory"
+
+	prms.Func = @prm
+	prms <~ cls.calculatesize
+	
+	|| MemWrapper = TypeOfExpr(exp, compiler.program)	#require
+	MemWrapper = MemWrapper.copy // cos we gonna alter it.
+	memwrapper.isnewlycreated = true
+	memwrapper.contains = cls.typenormal
+	
+	return MemWrapper
+
+
+function TypeOfVecAccess (|message| index, |scdecl| ty0, |int| w, |scdecl|)
+	if index == @num // ok!
+		expect (index.int inrange w) (index, "Vector access is too large.")
+	if ty0.type.typeinfo.isfloat
+		return typefloat.NotConst
+	return typeint.NotConst
+
+
+function TypeOfPointerAccess (|scdecl| ty0, |scdecl|)
+	|| Cpy = Ty0.Copy // should keep borrowedness...
+	if (Cpy.C_Array)
+		Cpy.C_Array = nil
+	else
+		Cpy.PointerCount--
+	return Cpy
+
+
+function TypeOfAccess (ExprResolver)
+	|| ch = exp.first
+	|| Ty0 = TypeOfExprModulesOK( ch, name_space, nil )
+	|| arr = exp.last
+
+
+	if (Ty0 isa SCDecl) and (Arr.HasOneChild)
+		|| Index = Arr.first
+		|| Access = typeofexpr(index, name_space)$
+		|| W = ty0.isnumeric
+		if (W > 1)
+			require Index.ExpectClass( Access, typeint )
+			return TypeOfVecAccess(index, ty0, w)
+		if Ty0.C_Array
+			return TypeOfPointerAccess(ty0)
+		if (Ty0.PointerCount and Access isa typeint)
+			ifn (ch == @bra and ch.first == @bra) // should work now
+				return TypeOfPointerAccess(ty0)
+	if (ty0 isa scmodule)
+		if ty0.IsMArray(arr) and arr.first.expectmatch(name_Space, typeint)
+			return LowlevelArrayTransform(exp, ty0.Cls)
+
+	arr.Func = @prm
+	if (ch isarel "!")
+		ch.become(@bra)
+		exp.become(@dot, "SyntaxAccessExpect")
+	  else
+		exp.become(@dot, "SyntaxAccess")
+	exp.range = arr.range 
+	
+	Return TypeOfDot( exp, name_space, side )
+
+
+function TypeOfAddress (|Message| Exp, |SCBase| name_space, |message|side, |SCObject|)
+	exp = exp.unbra
+	if exp == @dot
+		rz = TypeOfDot( exp, name_space, side )
+	  elseif (exp == @thg)
+		rz = name_space.LookUpVar( exp.Name, exp, side )
+	  else
+		expect (false) (exp)
+	exp.obj = rz
+
+
+function MoveFutureStaticsIn (|Message| msg)
+// module {|int|a=0}, module {|int|b=0} --> module {|int|a=0, |int|b=0}, module {}
+
+	for ch.forward in msg$.next
+		if (ch istmp "module")
+			ch[@arg, -1].MoveAllIn( msg.Last )
+
+
+
+function message.TypeOfArrItem (|message|)
+	// x = [("",n)] // an array of "", for n items. 
+	if self == @list
+		return .first
+	if (self == @rel) and (self[1] isthing "for")
+		return .first
+	return self
+
+
+function TypeOfSthg (ExprResolver)
+	exp.func = @Sheb
+	... // boomer
+
+
+function TypeOfMsg (ExprResolver)
+	|| type = exp.first
+	require message.GetFunc(type)
+	|| name = type.first
+	if name
+		TypeOfExpr( name, name_space )
+	for ch.forward in type.next
+		TypeOfExpr( ch, name_space )
+
+	return compiler..message.typenormal
+
+
+function SpellOutMsg (|message| type, |message| Exp, |message| namemsg, |message|)
+	using (exp)
+	|| Result = «dot "msg"
+		type
+		«prm, NameMsg »
+	»
+	Type.become(@thg, "Syx" + Type.name)
+	
+	exp.func = @bra
+	exp.first = Result
+	return result
+
+
+function Tran_Msg (|SCFunction| fn,  |message| Exp,  |scbase| name_space)
+	|| Type		= exp.first
+	|| NameMsg	= Type.first
+	if exp LessOrEqual 1
+		|| Mini	= SpellOutMsg(type, exp, namemsg)
+		TypeOfExpr( Mini, name_space )
+		return
+
+	|| itm		= type.next
+	|| P		= exp.parent
+	|| Place	= exp.IntoVariable(name_space)
+	
+	require place.arg
+	name_space = place.arg.SCArg(name_space)
+	|| Result	= SpellOutMsg(type, exp, namemsg)
+
+	while (itm)
+		|| NextItm = itm.next
+		using (itm)
+		|| Line = «dot "SyntaxAppend"
+			«thg place.name »
+			«prm, itm »
+		»
+		place <~ Line
+		TypeOfExpr( Line, name_space )
+		scfunction.Tran_all(fn, line, name_space)
+		itm = nextitm
+	
+	TypeOfExpr( Result, name_space )
+
+
+function Tran_MsgList (|scfunction| fn, |message| Exp, |scbase| name_space)
+	error (Exp, `Use «thg "name"» syntax instead!`)
+	scfunction.disabledpoints++
+
+
+function SameTypeSub (|message| first,  |message| second,  |scbase| name_space,  |scdecl|)
+	|| T1 = TypeOfExpr( first, name_space )
+	|| T2 = TypeOfExpr( second, name_space )
+	require t1 and t2
+	
+	if t1.isnil
+		t2.match(t1, ktypecasttrue, first)
+		return t2
+	if t2.isnil
+		t1.match(t2, ktypecasttrue, second)
+		return t1
+	|| Obj1 = t1.isnormalobject
+	|| Obj2 = t2.isnormalobject 
+	if Obj1 and Obj2
+		0
+	  elseif !Obj1 and !Obj2
+		rz = t1.better_numeric(t2) // oof
+	  elseif Obj1
+		t2 = t2.newwrapper(t2)
+	  else
+		t1 = t1.newwrapper(t1)
+
+	if !rz
+		rz = t1.HighestMatch( t2, first )
+		if !rz
+			return t1
+
+// make C++ happy
+	if rz != t2
+		rz.CreateSimpleTypeCast(second)  // can delete these two lines
+	if rz != t1
+		rz.CreateSimpleTypeCast(first)	 // if we ever dump c
+	
+
+
+function TypeOfTernary (ExprResolver)
+// x = ("true", "false")(oof),		x = JB_Ternary(oof, "true", "false")
+	|| list		= exp.first
+	|| params	= list.next
+	expect  list.hasany and params.haschildcount(1)  (exp, "expected: (a,b)(cond)")
+	
+	
+	|| first	= list.first
+	|| second	= first.next
+		require second.expectlast
+	  else
+		second = exp.createnil
+		first.next = second
+
+	|| Test = params.first
+	|| result = SameTypeSub(first, second, name_space)	
+	if result and ExpandToBool( test, name_space )
+		params <~ list.first
+		list.become(@thg, "JB_Ternary")
+		params.obj = compiler.TernaryFunc
+		params <~ list.first
+		return result
+
+
+function ArrayInOrderCheck (|int| InOrder, |message| msg, |int|)
+	if (Inorder >= 0 and msg == @num)
+		if (msg.int == InOrder)
+			return InOrder + 1 
+	return -1
+
+
+function TypeOfArr (ExprResolver)
+	|| result = SCDecl.new
+	exp.obj = result
+	|| InOrder = 0
+	|int| IsDispatch = (exp ~= "dispatch")|int|
+		
+		
+	for (itm in exp)
+		|| NewArrCls = TypeArray
+		
+		if (itm == @Item)
+			|| IdxType = TypeOfExpr( itm.first, name_space )
+			if (IdxType isa TypeString)
+				NewArrCls = TypeDictionary
+			  elseif (IdxType isa TypeInt)
+				// remove this! arrays never are specified like [0:item, 1:item] // !!!
+				// items should always be dictionaries unless a dispatch.
+				if !IsDispatch
+					InOrder = ArrayInOrderCheck(InOrder, itm.first)
+					if (InOrder <= 0)
+						NewArrCls = TypeDictionary
+			  elseif !(IdxType isa TypeSyntax)
+				error ( exp, "Array index is wrong type." )
+				continue
+			
+			itm = itm.Last
+		
+		|| Contained = TypeOfExpr( itm.TypeOfArrItem, name_space ) #continue // find more errors
+		itm = itm.Resync(exp)
+		
+		if (Contained.type.isobject)
+			Contained = Contained.type.TypeNormal
+		  elseif isdispatch
+			IsDispatch++// 
+		
+		if (result.Contains)
+			result.contains = Contained.HighestArrayContainMatch( result.contains, itm ) 
+		  else
+			result.Contains = Contained
+		
+		if (result.Type)  			// don't use "isa"! not here.
+			expect (result.Type == NewArrCls) ( exp, "Array indexes mismatch." )
+		  else
+			result.type = NewArrCls
+	
+	
+	if isdispatch and result.type != typedictionary // dispatches use function pointers... 
+		result.type = result.contains.type
+		result.contains = nil
+		result.c_array = IsDispatch-1
+		exp.func = @arg
+		tran_argarray(exp, name_space)
+	  else
+		if result.Contains and !result.Contains.type.isobject
+			result.Contains = result.Contains.newwrapper(result.Contains)
+
+		
+	result.Type := typearray
+	return result
+
+
+
+function TypeOfSwizzle (|message| Exp, |scdecl| Type, |scbase| name_space, |message| side, |int| swiz, |scdecl|)
+	// So... we are getting like: v.z --> v[2]
+	// She gave me a sharebox of chicken :[ she was so amazing! She really was...
+	// AND TELL ME WHEN TO STOP!!!	// Interdimensional harmony... 
+	
+	|| Count = swiz >> 16
+	|| W = type.type.NumericCount
+	expect (Count == 1 or side == nil)    (exp, "Can't swizzle that many yet.")
+	expect (count <= 4)                   (exp, "Vectors max out at 4 items.")
+	
+	|| prms = exp.last
+	|| T = VecType(!type.IsInteger, count).notconst
+	if (count == 1)
+		swiz &= 7
+		expect (swiz < W) (prms, "Vector access is too large.")
+		exp.become(@acc)
+		prms.func = @arr
+		prms <~ swiz
+
+	  else
+		prms.remove
+
+		|| oof = exp.first
+		|| tmp = oof.name
+		if (oof == @thg)
+			oof.remove
+		  else
+			|| what = oof.intovariable(name_space)
+			oof = what.arg 
+			oof.parent.obj = T
+			name_space = oof.asarg
+			exp.become(@bra)
+			exp = oof.last.last
+			tmp = exp.name
+			exp.obj = T
+			
+		exp.become(@list)
+
+		for (i in count)
+			|| field = (swiz >> (i*3)) & 7
+			|message| item
+			if field == 4
+				item = «num "0" »
+			  else
+				expect (field < W) (exp, "Vector access is too large.")
+				|| thg = «thg tmp » 
+				item = «acc
+					thg
+					«arr
+						«num field »
+					»
+				»
+			typeofexpr(item, name_space)
+			exp <~ item 
+		
+	return T
+	
+	// So... v[1, 2] --> (v[1], v[2])
+
+
+
+function string.IsSwizzle (|int| Width, |int|)
+	|| N      = .length
+	|| Total  = 0
+	|| i      = 0
+	|| shift  = 0
+	|| c      = 0
+	|| dold   = 0
+	require (N <= 8)
+	
+	|| HasLetter = false
+	while (i < N)
+		|| d  = self[i++].lowercase
+		if (d != '_')
+			HasLetter = true
+			require (!c) or ((d >= 'w') == (dold >= 'w')) or (dold == '_')
+			
+		c = d
+		dold = d
+		if (c == 'r' or 'x')
+			c = 0
+		  elseif  c == 'g' or 'y'
+			c = 1
+		  elseif  c == 'b' or 'z'
+			c = 2
+		  elseif  c == 'a' or 'w'
+			c = 3
+		  elseif  c == '_'
+			c = 4
+
+		if i < n
+			|int| c2 = self[i].lowercase
+			if c2 == '1'
+				i++
+			  elseif c2 == '2'
+				i++
+				require (Width != 3)
+				c += (Width>>1)
+		require (c <= 4 and c >= 0)
+		total  |= (c << (shift++ * 3))
+
+	if HasLetter
+		return total (|) (shift<<16)
+
+
+function TypeOfSyx (ExprResolver)
+	exp.becomesyx
+	return typeofthg(exp, name_space, side)
+
+struct asdas
+	|int| aaabbb
+
+struct asdas2
+	|asdas| www
+	function hhh
+		visible
+		|| jjj = .www
+
+
+function TypeOfDot (ExprResolver)
+	require !exp.Last.obj // it's a func that returns nothing. we already got it, don't get again.
+
+	||			name = exp.name
+	|scobject|	Class_Space
+	||			ch = exp.first
+	if ch == @Thg
+		// module.func, module.var
+		Class_Space = name_space.LookUpVar( ch.name, ch, nil )
+		ch.obj = Class_Space
+	  else
+		Class_Space = TypeOfExprmodulesok( ch, name_space ) 
+	
+	expect (class_space) (ch, "This expression can’t be used here.")
+	|SCDecl| contains
+
+	ifn Class_Space isa SCModule
+		|| DeclSpace = Class_Space	// work around...
+		if (DeclSpace isa SCDecl)
+			|| W = declspace.type.NumericCount 
+			if ((W > 1) and !exp.last.hasany)
+				|| swz = name.isSwizzle(W)
+					return TypeOfSwizzle(exp, declspace, name_space, side, swz)   // 
+				
+			contains = DeclSpace.Contains
+			|| ContainsCls = DeclSpace.Type
+			if (!contains) and (ContainsCls)
+				contains = ContainsCls.Contained
+			Class_Space = ContainsCls
+
+		expect  (Class_Space isa SCClass)  ( exp, "Not a class." )
+	
+	|| o = Class_Space|SCbase|.LookUpDot( name, exp, name_Space, contains, side )		#require
+	|SCDecl| decl
+	
+	if (o isa SCFunction)
+		decl = o.ReturnType
+
+	  elseif (o isa SCDecl)
+		decl = o
+		
+	  elseif (o isa SCModule)
+		// make that work too...
+		if ch == @thg
+			exp.Func = @thg
+			exp.clear // replace...
+		return o
+	
+	if decl
+		if contains
+			if Class_Space isa scclass
+				decl = decl.ContainedReplace( Class_Space, Contains, true )
+		  elseif class_Space isa scmodule
+			|| cls = class_Space.cls
+			if cls and cls.IsRole
+				decl = decl.ClassActReplace(cls)		
+	
+	|| fn = exp.last.obj
+	if fn isa SCFunction
+		decl := typevoid
+		exp.obj = decl
+		DotFuncToNormalFunc( exp, fn )
+	
+	return decl
+
+
+/*
+try
+	asdasdasdas
+success
+
+fail
+*/
+
+
+function message.expfunc (|scfunction|)
+	opt norefcounts
+	|| it = .unbra.last
+		|| fn = it.obj 
+		if fn isa scfunction
+			return fn
+
+
+function TypeOfExprNeeded ( |message| exp, |scbase| name_space, |SCDecl| )
+	|| OldCount = stderr.errorcount
+	|| result = typeofexpr(Exp, name_space)
+	if result and result.type != typevoid_
+		return result
+	if (oldcount == stderr.errorcount)
+		error (exp, "This expression doesn't return anything.")
+		|| it = exp.expfunc
+			error (it.source, "(Using this function.)")
+			
+
+function message.NiceIsFlagSyntax (|message| list,  |message| RN,  |scbase| name_space, |message| side, |scdecl|) {
+	|| cls = typeofexpr(self, name_space)
+	require cls and cls.isnormal
+
+	|| ty = cls.type
+	|| fn = ty.TheIsFunc		#expect (list, "${ty.name} doesn‘t have 'syntax is' specified.")
+	|| arg1 = fn.args[1]		#expect (fn.source, "This func needs a parameter!")
+	|| LookupType = arg1.type			// OK so... we have the arg. it's a decl, with a type
+	require rn.expect(@thg)
+	
+		// (a is b) --> (a is b) = true
+		
+	using (rn)
+	
+	
+
+	// a is b = true  --> a.syntaxis(s.b) = true
+	// if a is b      --> if a.syntaxis(s.b)
+	// if a is s.b.c  --> if a.syntaxis(s.b.c)	// need special handling, not done yet.
+	// if a is b(d).c --> if a.syntaxis(s.b(d).c)
+	|| exp = .parent
+	exp.func = @dot
+	ifn side
+		|| bra = exp.parent
+		if bra != @bra
+			bra = exp
+		if (bra in @arg)
+			if bra == exp // a is b = c --> (a is b)=c
+				// bra is exp? so its not a bra?
+				// so... we wrap exp in a bra? just try?
+				// debugger
+				bra = exp.wrapwith(@bra.msg)
+
+			bra.func = @rel
+			bra <~ (@opp, "=")
+			bra <~ (@thg, "true")
+			side = bra.last
+			
+	if list == "isnt"
+		exp.name = "syntaxisnt"
+	  else
+		exp.name = "syntaxis"
+	list.become(@prm)
+	list.obj = nil // heh
+	rn.func = @dot
+
+	while rn.first		// not used yet. rn == @thg, not @func/@dot
+		list <~ rn.first
+	rn  <~ (@thg, LookupType.name) 
+	rn  <~ list
+	exp <~ «prm, rn »
+	
+	return typeofexpr(exp, name_Space, side)
+}
+
+
+
+
+function CanOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |bool| )
+	opt norefcounts
+	return (exp.Parent != @Arg) and (LC.Type.CanCompare(RC, Comp.IsEquals))
+
+
+function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |scbase|name_space, |scdecl| ) {
+	using (exp)
+	|| dot = «dot
+		exp.first
+		«prm
+			exp.last
+			«thg comp.CaseAwareStr »
+		»
+	»
+	exp.First = dot
+
+	if (comp.isEquals)
+		exp.Last.Remove
+		dot.name = "SyntaxEquals"
+		if (comp.CompOp == "!=")
+			exp.become( @BRel, "!" )
+			exp <~ dot
+		  else
+			exp.become(@bra) // don't break the AST...
+	  else
+		dot.name = "SyntaxCompare"
+		exp.Last.name = comp.compOp
+		exp <~ «Num comp.compparam »
+
+	TypeOfExpr( dot, name_space )
+	Return TypeBool.TypeNormal
+}
+
+
+function scdecl.CirSub (|int64| Value, |bool|)
+	|| T = .type.typeinfo
+	|| S = t.bytesize
+	if S == 8
+		return true
+	if t.isint
+		|| ign = t.issigned
+		if S == 4
+			if ign
+				return (value >= int.min) and (value <= int.max)
+			  else
+				return (value >= -1) and (value <= 0xFFFFffff)
+				
+		  elseif S == 2
+			if ign
+				return value >= int16.min and value <= int16.max
+			  else
+				return (value >= -1) and (value <= 0xFFFF)
+		  elseif S == 1
+			if ign
+				return (value >= char.min) and (value <= char.max)
+			  else
+				return (value >= -1) and (value <= 0xFF)
+	return true
+
+
+function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
+	opt norefcounts
+	if RN == @num	
+		if rn.isint 
+			return .cirsub(rn.int)
+	
+	elseif (rn == @thg) and (rt is const) and rt.isnormalnumber and rt.isinteger
+		|| def = rt.default
+			return .cirsub(def.int)
+
+	// if RN == @num... check the type of self big enough
+	// if RN == @thg and is a const... check the type of self big enough
+	// if num == -1 then... allow into unsigned... otherwise no negative consts.
+	return true
+
+
+function SCDecl.ConstCheck (|message|ln, |message| RN, |scdecl| rc, |bool|)
+	if ln
+		expect ((LN.IsAssignable) and (self isnt const)) (LN, "Not assignable.")
+		if !rn
+			return true
+	return !rn or (.ConstInRange(RN, rc))		#expect (RN, "Loses numeric info.") 
+
+
+function message.AndOrExpansionTest (|uint|)
+	opt norefcounts
+
+	|| ln = .first
+	if self == @bra
+		return ln.AndOrExpansionTest
+	require self == @rel
+
+	
+	|| op = ln.next
+	require op != "="
+
+	|| rn = op.next$
+	|| ls = ln.AndOrExpansionTest
+	|| rs = rn.AndOrExpansionTest
+	|| bs = ls (|) rs
+	|| orand = 1
+	if (op == "or"  or  op == "and")
+		return orand (|) bs
+	if (ls == 2 or ls == 0) and (rs == orand) // ls should be 0? not 2?
+		.BunchlessFix
+		return -1
+
+	// x InRange and y or z					// R == boolops
+	// x InRange and (y==0) or z==1			// go into
+	// x InRange w and y or (z+z)			
+	return 2 + bs
+
+
+		
+
+function TypeOfRel (ExprResolver) {
+	|| LN = exp.first
+	|| opch = ln.Next
+	|| Comp = SCOperator.Lookup( opch )
+	|| RN = opch.Next
+	if opch == "is" or "isnt"
+		return LN.NiceIsFlagSyntax(opch, RN, name_space, side)
+	
+	expect  (RN or Comp.isCustom)  ( exp, "Invalid expression." )
+
+
+	side = nil
+	|| P = exp.niceParent
+		|| ParentFunc = P.func
+		|| ShouldBeSet = (ParentFunc == @Arg or @Decl) 
+		if (comp != "=")
+			if (Shouldbeset)
+				error (opch, "Can't use this operator here.")
+		  elseif (ShouldBeSet)
+			side = rn
+		  else
+			error (opch, "Can't use '=' here. Did you mean '=='?")
+
+	
+	|SCDecl| RC
+	|SCDecl| LC
+	
+	if (side)
+		RC = TypeOfExprNeeded( RN, name_space ) #require 
+		LC = TypeOfExpr( LN, name_space, side )
+		if (exp == @rel) and (ln == exp.last)		// oop. it just changed.
+			return TypeOfRel(Exp, name_space, side) // lol.
+	  else 
+		LC = TypeOfExpr( LN, name_space )
+		if (RN)
+			RC = TypeOfExprNeeded( RN, name_space ) #require 
+
+
+	require (exp == @rel) // has exp changed?
+	expect  (LC)  (LN, "Can’t find the type of this.")
+	
+	if (!RN)
+		return CustomFuncOp( exp, comp, name_space, RN )
+	
+	if (side)
+		// check for dumb stuff like "func() = nil" or "abc|bool| = false"
+		require LC.ConstCheck(LN, RN, rc)
+	
+	if (comp == "or" or "and")
+		return Or_And_Expansion( LC, RC, exp, name_Space ) // expects both sides to be booleans, right?
+
+	opch.obj = comp
+
+
+	|| Custom = 0
+	if (RC != TypeNil)
+		|| IPM = IsPointerMath(LC, RC, comp, exp)
+			return IPM
+		Custom = UseCustomOperators(LC, RC, comp, exp) 
+		if Custom == CustomOps.needed
+			if (!comp.IsCompset) // bug here!!
+				return CustomFuncOp( exp, comp, name_space, RN )
+			  elseif comp.iscaseaware or CanOpCompare(exp, lc, rc, comp)
+				return DoOpCompare(exp, lc, rc, comp, name_space)
+		  elseif (comp.AsBit)
+			require RC.NoFloat(RN) and LC.NoFloat(LN)
+	
+	if (custom & CustomOps.TypeCastFromBool) and !side and rn
+		lc = typeint.typenormal
+		rc = lc
+	
+	if Custom <= CustomOps.needed
+		LC.ExpectMatchRel( RC, RN, side, exp )
+	  elseif Custom == CustomOps.LeftOnlyIsVector
+		return LC		// LC is bigger (vec3 vs float)
+	  else
+		return RC		// RC is bigger (float vs vec3)
+
+	if custom & CustomOps.TypeCastToBigger
+		lc = lc.better_numeric(rc)
+	
+	if (comp.IsCompare and !side)
+		Return TypeBool.TypeNormal
+
+	if (comp.MakesSigned and lc.isuintlike)
+		return lc.MakeSignedIfPossible // should explicitly type-cast?
+	
+	Return LC
+	
+	
+	// s =  "abc"   ->   s.eq("abc", false)
+	// s ~= "abc"   ->   s.eq("abc", true )
+}
+
+
+function VecType (|bool|isfloat, |int|count, |SCClass|) {
+	if (isfloat)
+		if (count==2): return typevec2	// we need non-const versions of these! normally created by extractdecl
+		if (count==3): return typevec3
+		if (count==4): return typevec4
+		if (count==1): return typefloat
+
+	if (count==2): return typeivec2
+	if (count==3): return typeivec3
+	if (count==4): return typeivec4
+	if (count==1): return typeint
+
+// I dont even know anymore
+}
+
+
+
+function scclass.NotConst (|scdecl|)
+// da egg didnt make it... :(
+// ORANGE GREEN FLAMES
+	require self
+	
+	|| d = .NotConstUwU
+	if (!d)
+		d = .typenormal
+		if (d is const)
+			D = D.copy	// erase IsConst, like collectdecls does...
+			D.IsConst = false
+			// future opts could speed this up! like all da magic eggs... transform into a new space!!!
+		.NotConstUwU = d			// a space of new eggs!!!
+	return D
+
+
+function datatypecode.FloatIntMerge (|int| old, |message| s, |int|)
+	if (.isfloat)
+		old |= 2
+	  elseif (.isint)
+		old |= 1
+	expect (old != 3) (s, "int or float vector?")
+	return old
+
+
+function string.IsZero (|bool|)
+	for c in self
+		require  (c == '.')  or  (c == '0')
+	return true
+
+
+function message.iszero (|bool|)
+	return  (self == @num)  and  (.name.iszero)
+
+
+function message.WrapFloatOrInt (|datatypecode| T, |int| N, |scdecl| D)
+	require T isnt float and int
+	|| V = VecType(T.isfloat, N)$
+	require !(d isa v)
+
+	using (self)
+	|| W = «type
+		«thg V.name »
+	»
+	.wrapwith(w)
+
+
+function TypeOfList (ExprResolver)
+	|| FoundType = 0
+	|| AllowType = 0
+	|| Count = 0
+	|| HasBig = false
+	|| Numeric = true
+	
+	for (s in exp)
+		|| typ = typeofexpr(s, name_space) #require
+		|| N = typ.isnumeric
+		if !n
+			numeric = false
+		if numeric
+			if (N > 1)
+				HasBig = true
+
+			if (typ.mustbe(SCDecl, s))
+				|| T = typ.type.typeinfo
+				if s.IsZero
+					AllowType = T.floatintmerge(AllowType, s)
+				  else
+					FoundType = T.floatintmerge(FoundType, s) 
+					S.WrapFloatOrInt(T,N, typ)
+
+			count += N
+			expect (count <= 4) (exp, "Too many items in vector (max 4)")
+
+	if !numeric
+		return typeofexpr(exp.first, name_space)
+
+	expect (count >= 2) (exp, "Too few items in vector (min 2)")
+
+
+	FoundType := Allowtype
+	|| IsFloat = (Foundtype == 2)
+	|| cns = VecType(IsFloat, count).NotConst
+	if !HasBig
+		exp.obj = cns
+		return cns
+
+	using (exp)
+	|| name = ("vecmix", "ivecmix")(isfloat)
+	|| list = «prm »
+	exp.MoveAllIn(list)
+	exp <~ «thg name »
+	exp <~ list
+	exp.func = @func
+	return typeofexpr(exp, name_space)
+
+
+function CopyDecl (|Message| CopyFrom, |string| name, |SCDecl|)
+	|| o = CopyFrom.obj
+	if o isa SCDecl
+		|| dcl = o.Copy(true) // only called from MakeDecl, but MakeDecl is used from all over... i'm not sure why. Or what for. I guess just clear it... even if the original was borrowed, the new one shouldn't be... makes sense. 
+		dcl.Name = name
+		dcl.Default = CopyFrom
+		Return dcl
+
+
+function ClassOfObjForC (|Message| curr, |SCClass|) {
+	if curr == @Func
+		|| fnc = curr.MsgFunc
+		if fnc: Return fnc.ReturnType.Type
+	
+	|| obj = curr.obj
+	if obj isa SCDecl:		return obj.Type
+	if obj isa SCClass:		return obj
+	if obj isa SCFunction:	return obj.ReturnType.Type
+	
+	if obj isa SCModule
+		if obj.Cls: Return TypeJBClass
+}
+
+
+function DeclOfObjForC (|Message| curr, |SCDecl|)
+	if curr == @Func
+		|| fnc = curr.MsgFunc
+		if fnc: Return fnc.ReturnType
+	
+	|| obj = curr.obj
+	if obj isa SCDecl:		return obj
+	if obj isa SCClass:		return obj.TypeNormal
+	if obj isa SCFunction:	return obj.ReturnType
+	
+	if obj isa SCModule
+		|| cls = obj.Cls
+			return cls.ClassType
+
+
+function TooManyErrors (|bool|)
+	return StdErr.errorCount >= 50
+
+
+	
+function message.PrepareAST
+	opt NoRefCounts
+	|| After = .FlatAfter
+	// why isnt this parseclean?
+	|| msg = self 
+	while ( msg ) and ( msg != After )
+		if (msg == @tmp) and (msg == "functiontable" or "dispatch")
+			SCFunction.Tran_FuncTable( msg )
+		msg = msg.FlatNext
+
+
+
+function Message.FixErl 
+	// just do a syntactic expand...
+	|| ch = .first
+	|| opp = ch.Next
+	|| last = opp.Next
+	|| name = opp.Name
+	
+	if (name == ":=") and (.niceparent != @arg)
+		.become(Macros.InitExpand, [.first, .last])
+	  else
+		using opp
+		
+		while self in @bra
+			.parent.ReplaceWith( self )
+		
+		|| IsBitOr = (name == ":=") 
+		.Func = @rel
+		opp.Name = "="
+
+		ch = ch.copy
+		if IsBitOr
+			|| new_if = «tmp "if"
+				«brel "!", ch.NeedBra »
+			»
+			.Prev = new_if
+			new_if <~ «arg, self »
+
+		  else								// a += 1 --> a = a + 1
+			if last == @rel
+				last = «bra, last » 
+			opp.Next = «rel
+				ch
+				«opp name »
+				last
+			»
+
+
+function AddToStaticSection (|Message| arg, |Message| ToAdd)
+	|| Static = arg.findflat(@tmp, "module")
+
+	if (static)
+		arg = static.Last
+		expect ( arg == @arg ) ( static, "Missing argument." )
+	  else
+		static = «tmp "module"»
+		arg <~ static 
+		arg = «arg »
+		static <~ arg
+
+	arg <~ ToAdd
+
+
+function TypeOfExprAsObj (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCDecl|)
+	|| result = TypeOfExpr( exp, name_space, side )	#require
+
+	if !result.type.IsObject
+		exp = exp.CastToObject #require
+		|| obj = exp.obj
+		if obj isa SCDecl
+			Return obj
+	return result
+
+
+
+function Message.ChildrenHaveDecls (|bool|)
+	for (c in self)
+		require (c.Obj isa SCDecl)
+	return true
+
+
+function Message.Resync (|Message| parent, |Message|)
+	|| curr = self
+	While curr and (curr.parent != parent)
+		curr = curr.parent
+	Return curr
+
+
+function TypeOfSyntaxCall (|Message| exp, |SCBase| name_space, |Message| side, |scdecl|)
+	exp.become( @dot, "SyntaxCall" )
+	return typeofexpr(exp, name_space, side)
+
+
+function TypeOfFuncSub (|Message| exp, |SCBase| name_space, |Message| side, |scobject|)
+	|| fn = exp.MsgFunc
+		return fn
+	|| ch = exp.first
+	|| params = ch.next
+
+	if ch == @Thg
+		return name_space.LookUpFunc( ch.name, exp, params )
+	
+	|| ThgDecl = TypeOfExpr( ch, name_space )		   #require
+	fn = ThgDecl.Type.FuncProto
+	if !fn
+		return TypeOfSyntaxCall(exp, name_space, side)
+	
+	|| PList = SCParamArray.new(exp)				// these 3 lines should be 2 lines...
+	require PList.PreReadTypes(name_space, params, side)
+	fn = fn.ArgsMatch( nil, name_space, PList )
+	if !fn
+		ParamsFail( ThgDecl.Type.FuncProto, plist )
+	  elseif !fn.ReturnType
+		exp.Obj = typevoid // save it being looked up over and over...
+	
+	return fn
+
+
+function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
+	if d.name // wat?
+		debugat()
+	|| NewNum = «num N.Render »
+	
+	newnum.obj = d
+	D.type = TypeInt
+	if  n < int.min  or  n > int.max
+		d.type = typeint64
+	d.name = varname
+	if varname // setvarname later?
+		D.Default = NewNum
+	Return NewNum
+
+
+function DetectComplexity (|Message| n, |int|)
+	for (nc.flat in n)
+		|| s = nc.Name
+		if (s)
+			if (nc IsTmp "return")
+				// 
+			  elseif !(nc.obj isa SCModule)
+				rz++
+			
+		  elseif (nc.IsSetRel)
+			rz-- // its not THAT complex! really just 2 items.
+			
+		  elseif (nc == @Func)
+			rz++ // funcs are 2 complexity..., plus the params...
+			|| Fnc = nc.MsgFunc#require
+			|| Ret = Fnc.ReturnType
+			if (Ret and Ret.IsNormalObject)
+				rz++
+				
+		  elseif (nc == @Type)
+			rz += DetectComplexity( nc[0] )
+			Continue_with nc.FlatAfter
+
+
+function DotFuncToNormalFunc (|Message|dot, |SCFunction|fn)
+	// a.b( c )
+	// b(a, c)
+	dot.become(@Func)
+
+	|| first = dot.First
+	|| L = dot.Last
+	L.obj = fn
+	L.Func = @prm
+	if first.obj isa SCModule
+		first.Remove
+	  else
+		L.First = first
+
+	using (dot)
+		dot.First = «thg fn.ExportName »
+
+
+function SCDecl.ProcessAs (|Message| msg, |SCDecl|)
+	|| P = msg.parent.unbra
+	if (P isBrel "&")					 // :)
+		return self
+	|| T = .type.processas.typenormal
+	T.CreateSimpleTypeCast(msg)
+	msg.last.obj = self					 // fix bug?
+	return T
+
+
+function Message.FindDestructor (|Message|)
+	opt norefcounts
+	for c in self
+		if c == @Func // i guess its a dot?
+			|| fn = c.last.Obj
+			if fn isa SCFunction: if fn isa kIsDestructor: Return c
+
+
+function TypeOfArgArr (ExprResolver)
+	|| result = SCDecl.new
+	for itm in exp
+		if itm == @tmp
+			itm.func = @thg
+		|| Contained = TypeOfExpr( itm, name_space )
+			error (Contained.type.isdatatype or contained.PointerCount) (itm, "Must be a datatype.")
+			if (result.type)
+				|| oof = contained.HighestArrayContainMatch( result.type.TypeNormal, itm )
+					result.type = oof.type
+			  else
+				result.type = contained.type
+			result.c_Array++
+	
+	exp.obj = result
+	Tran_ArgArray(exp, name_space)
+	return result
+
+
+
+function Tran_ArgArray (|Message| Exp, |SCBase| name_space)
+	visible
+	// needs cleaning up. we are getting this called a few times!
+	|| thg = exp.IsSetIntoVar
+	
+	// OK so the problem is... that we are setting the memorywrapper.dummy thing
+	// to {}. And... aparantly, we can't do that in C, and also we don't NEED to do that.
+	// So... no problem. so how do we avoid creating the {} rel setter. Where is it create?
+		
+	
+	if (!thg)
+		if exp in @sheb
+			return // shouldn't come here anyhow. set a breakpoint to fix this!
+		expect (false) (exp) 
+
+	|| rel = exp.NiceParent
+	rel.expect(@rel)
+	|| Place = rel.ParentPoint
+	|| d = thg.asdecl
+		d.default = nil
+
+	rel.func = @sheb			// comment
+	if place == rel
+		rel.next = thg
+		Place = thg
+	  else
+		rel.replacewith(Thg)
+		place.next = rel
+		exp.func = @str //@emb
+
+	using (exp)
+	|ArgArrayCounter| Counter
+	for itm in exp
+		|| rel2 = Counter.do(thg.name, itm, name_space)
+		place.Next = rel2
+		place = rel2
+
+	counter.check(exp)
+	|| Already = exp.obj
+	if counter.isitem and already.mustbe(scdecl)
+		|| c = counter.max+1
+		error (c < 16K) (exp, "Too many items in C-array.")
+		already.c_array = c
+		
+

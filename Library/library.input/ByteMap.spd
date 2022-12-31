@@ -1,0 +1,26 @@
+
+// not the same as charset, charset has multiple-classes
+// like 1,2,3,4, etc.
+class ByteMap
+	linkage
+		wrapper
+		cpp_class ByteMap
+		cpp_part BM
+
+	constructor (|string| from, |string| to)
+		cpp_wrapper JB_BM_Constructor
+	
+	function Invert (|int| Unfound = -1, |bytemap|)
+		cpp_wrapper JB_BM_Invert
+		
+	function Clear (|int| to=-1)
+		cpp_wrapper JB_BM_Clear
+
+	syntax Access  (|uint| C, |byte|)
+		cpp_wrapper JB_BM_Access
+	syntax Access  (|string| S, assigns:|byte|)
+		cpp_part SetStr
+		for c in s
+			self[c] = value
+	syntax Access (|uint| C, assigns:|byte|)
+		cpp_wrapper JB_BM_AccessSet

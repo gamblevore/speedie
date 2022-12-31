@@ -1,0 +1,9 @@
+#!/usr/local/bin/spd
+
+main
+	|| s = app[0] oar "0"
+	|| n = s.int
+	for i in 1 to n
+		printline i
+		app.sleep(0.5s)
+

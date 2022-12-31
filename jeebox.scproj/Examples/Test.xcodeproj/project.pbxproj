@@ -1,0 +1,623 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AC34D5332278A39B00C1320F /* users.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC34D5322278A39B00C1320F /* users.cpp */; };
+		AC34D5342278A69700C1320F /* libJeebox.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC4C0CCE2276F37500D28B0D /* libJeebox.dylib */; };
+		AC4C0CCD2276F34600D28B0D /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC4C0CCC2276F34600D28B0D /* test.cpp */; };
+		AC4C0CCF2276F37500D28B0D /* libJeebox.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC4C0CCE2276F37500D28B0D /* libJeebox.dylib */; };
+		AC760FFF227A0DD600707427 /* jb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC760FFE227A0DD600707427 /* jb.cpp */; };
+		AC761000227A0F4A00707427 /* libJeebox.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC4C0CCE2276F37500D28B0D /* libJeebox.dylib */; };
+		AC7CD502227F07F300C3F69A /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC4C0CCC2276F34600D28B0D /* test.cpp */; };
+		AC7CD51B227F086700C3F69A /* JB_Alloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD504227F086700C3F69A /* JB_Alloc.cpp */; };
+		AC7CD51C227F086700C3F69A /* JB_BasicIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD505227F086700C3F69A /* JB_BasicIO.cpp */; };
+		AC7CD51D227F086700C3F69A /* JB_ByteMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD506227F086700C3F69A /* JB_ByteMap.cpp */; };
+		AC7CD51E227F086700C3F69A /* JB_Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD507227F086700C3F69A /* JB_Date.cpp */; };
+		AC7CD51F227F086700C3F69A /* JB_Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD508227F086700C3F69A /* JB_Dictionary.cpp */; };
+		AC7CD520227F086700C3F69A /* JB_DirReaderUnix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD509227F086700C3F69A /* JB_DirReaderUnix.cpp */; };
+		AC7CD521227F086700C3F69A /* JB_DirReaderWin32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD50A227F086700C3F69A /* JB_DirReaderWin32.cpp */; };
+		AC7CD522227F086700C3F69A /* JB_Errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD50B227F086700C3F69A /* JB_Errors.cpp */; };
+		AC7CD523227F086700C3F69A /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD50C227F086700C3F69A /* JB_FastString.cpp */; };
+		AC7CD524227F086700C3F69A /* JB_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD50D227F086700C3F69A /* JB_File.cpp */; };
+		AC7CD525227F086700C3F69A /* JB_LibraryFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD50E227F086700C3F69A /* JB_LibraryFile.cpp */; };
+		AC7CD526227F086700C3F69A /* JB_Lib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD50F227F086700C3F69A /* JB_Lib.cpp */; };
+		AC7CD527227F086700C3F69A /* JB_List.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD510227F086700C3F69A /* JB_List.cpp */; };
+		AC7CD528227F086700C3F69A /* JB_Math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD511227F086700C3F69A /* JB_Math.cpp */; };
+		AC7CD529227F086700C3F69A /* JB_MSR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD512227F086700C3F69A /* JB_MSR.cpp */; };
+		AC7CD52A227F086700C3F69A /* JB_ObjArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD513227F086700C3F69A /* JB_ObjArray.cpp */; };
+		AC7CD52B227F086700C3F69A /* JB_Pipe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD514227F086700C3F69A /* JB_Pipe.cpp */; };
+		AC7CD52C227F086700C3F69A /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD515227F086700C3F69A /* JB_RingTree.cpp */; };
+		AC7CD52D227F086700C3F69A /* JB_Saveable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD516227F086700C3F69A /* JB_Saveable.cpp */; };
+		AC7CD52E227F086700C3F69A /* JB_String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD517227F086700C3F69A /* JB_String.cpp */; };
+		AC7CD52F227F086700C3F69A /* JB_Tokeniser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD518227F086700C3F69A /* JB_Tokeniser.cpp */; };
+		AC7CD530227F086700C3F69A /* JB_Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD519227F086700C3F69A /* JB_Utils.cpp */; };
+		AC7CD531227F086700C3F69A /* JB_Vectors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD51A227F086700C3F69A /* JB_Vectors.cpp */; };
+		AC7CD533227F09C400C3F69A /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7CD532227F09C400C3F69A /* JB.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AC34D5292278A38500C1320F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		AC4C0CC02276F33000D28B0D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		AC760FF5227A0DBA00707427 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		AC7CD4F9227F07E000C3F69A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		AC34D52B2278A38500C1320F /* UsersExample */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = UsersExample; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC34D5322278A39B00C1320F /* users.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = users.cpp; sourceTree = "<group>"; };
+		AC4C0CC22276F33100D28B0D /* Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC4C0CCC2276F34600D28B0D /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
+		AC4C0CCE2276F37500D28B0D /* libJeebox.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libJeebox.dylib; path = ../Build/libJeebox.dylib; sourceTree = "<group>"; };
+		AC760FF7227A0DBA00707427 /* jb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jb; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC760FFE227A0DD600707427 /* jb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jb.cpp; sourceTree = "<group>"; };
+		AC7CD4FB227F07E000C3F69A /* TestDirect */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TestDirect; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC7CD504227F086700C3F69A /* JB_Alloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Alloc.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Alloc.cpp; sourceTree = "<absolute>"; };
+		AC7CD505227F086700C3F69A /* JB_BasicIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_BasicIO.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_BasicIO.cpp; sourceTree = "<absolute>"; };
+		AC7CD506227F086700C3F69A /* JB_ByteMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ByteMap.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_ByteMap.cpp; sourceTree = "<absolute>"; };
+		AC7CD507227F086700C3F69A /* JB_Date.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Date.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Date.cpp; sourceTree = "<absolute>"; };
+		AC7CD508227F086700C3F69A /* JB_Dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Dictionary.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Dictionary.cpp; sourceTree = "<absolute>"; };
+		AC7CD509227F086700C3F69A /* JB_DirReaderUnix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DirReaderUnix.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_DirReaderUnix.cpp; sourceTree = "<absolute>"; };
+		AC7CD50A227F086700C3F69A /* JB_DirReaderWin32.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DirReaderWin32.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_DirReaderWin32.cpp; sourceTree = "<absolute>"; };
+		AC7CD50B227F086700C3F69A /* JB_Errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Errors.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Errors.cpp; sourceTree = "<absolute>"; };
+		AC7CD50C227F086700C3F69A /* JB_FastString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_FastString.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_FastString.cpp; sourceTree = "<absolute>"; };
+		AC7CD50D227F086700C3F69A /* JB_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_File.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_File.cpp; sourceTree = "<absolute>"; };
+		AC7CD50E227F086700C3F69A /* JB_LibraryFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_LibraryFile.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_LibraryFile.cpp; sourceTree = "<absolute>"; };
+		AC7CD50F227F086700C3F69A /* JB_Lib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Lib.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Lib.cpp; sourceTree = "<absolute>"; };
+		AC7CD510227F086700C3F69A /* JB_List.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_List.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_List.cpp; sourceTree = "<absolute>"; };
+		AC7CD511227F086700C3F69A /* JB_Math.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Math.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Math.cpp; sourceTree = "<absolute>"; };
+		AC7CD512227F086700C3F69A /* JB_MSR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_MSR.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_MSR.cpp; sourceTree = "<absolute>"; };
+		AC7CD513227F086700C3F69A /* JB_ObjArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ObjArray.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_ObjArray.cpp; sourceTree = "<absolute>"; };
+		AC7CD514227F086700C3F69A /* JB_Pipe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pipe.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Pipe.cpp; sourceTree = "<absolute>"; };
+		AC7CD515227F086700C3F69A /* JB_RingTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_RingTree.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_RingTree.cpp; sourceTree = "<absolute>"; };
+		AC7CD516227F086700C3F69A /* JB_Saveable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Saveable.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Saveable.cpp; sourceTree = "<absolute>"; };
+		AC7CD517227F086700C3F69A /* JB_String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_String.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_String.cpp; sourceTree = "<absolute>"; };
+		AC7CD518227F086700C3F69A /* JB_Tokeniser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Tokeniser.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Tokeniser.cpp; sourceTree = "<absolute>"; };
+		AC7CD519227F086700C3F69A /* JB_Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Utils.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Utils.cpp; sourceTree = "<absolute>"; };
+		AC7CD51A227F086700C3F69A /* JB_Vectors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Vectors.cpp; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Vectors.cpp; sourceTree = "<absolute>"; };
+		AC7CD532227F09C400C3F69A /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = ../Cpp/JB.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AC34D5282278A38500C1320F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC34D5342278A69700C1320F /* libJeebox.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AC4C0CBF2276F33000D28B0D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC4C0CCF2276F37500D28B0D /* libJeebox.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AC760FF4227A0DBA00707427 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC761000227A0F4A00707427 /* libJeebox.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AC7CD4F8227F07E000C3F69A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AC4C0CB92276F33000D28B0D = {
+			isa = PBXGroup;
+			children = (
+				AC7CD503227F085000C3F69A /* DirectCpp */,
+				AC4C0CCC2276F34600D28B0D /* test.cpp */,
+				AC34D5322278A39B00C1320F /* users.cpp */,
+				AC760FFE227A0DD600707427 /* jb.cpp */,
+				AC4C0CCE2276F37500D28B0D /* libJeebox.dylib */,
+				AC4C0CC32276F33100D28B0D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AC4C0CC32276F33100D28B0D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AC4C0CC22276F33100D28B0D /* Test */,
+				AC34D52B2278A38500C1320F /* UsersExample */,
+				AC760FF7227A0DBA00707427 /* jb */,
+				AC7CD4FB227F07E000C3F69A /* TestDirect */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AC7CD503227F085000C3F69A /* DirectCpp */ = {
+			isa = PBXGroup;
+			children = (
+				AC7CD504227F086700C3F69A /* JB_Alloc.cpp */,
+				AC7CD532227F09C400C3F69A /* JB.cpp */,
+				AC7CD505227F086700C3F69A /* JB_BasicIO.cpp */,
+				AC7CD506227F086700C3F69A /* JB_ByteMap.cpp */,
+				AC7CD507227F086700C3F69A /* JB_Date.cpp */,
+				AC7CD508227F086700C3F69A /* JB_Dictionary.cpp */,
+				AC7CD509227F086700C3F69A /* JB_DirReaderUnix.cpp */,
+				AC7CD50A227F086700C3F69A /* JB_DirReaderWin32.cpp */,
+				AC7CD50B227F086700C3F69A /* JB_Errors.cpp */,
+				AC7CD50C227F086700C3F69A /* JB_FastString.cpp */,
+				AC7CD50D227F086700C3F69A /* JB_File.cpp */,
+				AC7CD50E227F086700C3F69A /* JB_LibraryFile.cpp */,
+				AC7CD50F227F086700C3F69A /* JB_Lib.cpp */,
+				AC7CD510227F086700C3F69A /* JB_List.cpp */,
+				AC7CD511227F086700C3F69A /* JB_Math.cpp */,
+				AC7CD512227F086700C3F69A /* JB_MSR.cpp */,
+				AC7CD513227F086700C3F69A /* JB_ObjArray.cpp */,
+				AC7CD514227F086700C3F69A /* JB_Pipe.cpp */,
+				AC7CD515227F086700C3F69A /* JB_RingTree.cpp */,
+				AC7CD516227F086700C3F69A /* JB_Saveable.cpp */,
+				AC7CD517227F086700C3F69A /* JB_String.cpp */,
+				AC7CD518227F086700C3F69A /* JB_Tokeniser.cpp */,
+				AC7CD519227F086700C3F69A /* JB_Utils.cpp */,
+				AC7CD51A227F086700C3F69A /* JB_Vectors.cpp */,
+			);
+			name = DirectCpp;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AC34D52A2278A38500C1320F /* UsersExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AC34D5312278A38500C1320F /* Build configuration list for PBXNativeTarget "UsersExample" */;
+			buildPhases = (
+				AC34D5272278A38500C1320F /* Sources */,
+				AC34D5282278A38500C1320F /* Frameworks */,
+				AC34D5292278A38500C1320F /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UsersExample;
+			productName = UsersExample;
+			productReference = AC34D52B2278A38500C1320F /* UsersExample */;
+			productType = "com.apple.product-type.tool";
+		};
+		AC4C0CC12276F33000D28B0D /* Test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AC4C0CC92276F33100D28B0D /* Build configuration list for PBXNativeTarget "Test" */;
+			buildPhases = (
+				AC4C0CBE2276F33000D28B0D /* Sources */,
+				AC4C0CBF2276F33000D28B0D /* Frameworks */,
+				AC4C0CC02276F33000D28B0D /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Test;
+			productName = Test;
+			productReference = AC4C0CC22276F33100D28B0D /* Test */;
+			productType = "com.apple.product-type.tool";
+		};
+		AC760FF6227A0DBA00707427 /* jb */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AC760FFD227A0DBA00707427 /* Build configuration list for PBXNativeTarget "jb" */;
+			buildPhases = (
+				AC760FF3227A0DBA00707427 /* Sources */,
+				AC760FF4227A0DBA00707427 /* Frameworks */,
+				AC760FF5227A0DBA00707427 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = jb;
+			productName = jb;
+			productReference = AC760FF7227A0DBA00707427 /* jb */;
+			productType = "com.apple.product-type.tool";
+		};
+		AC7CD4FA227F07E000C3F69A /* TestDirect */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AC7CD501227F07E000C3F69A /* Build configuration list for PBXNativeTarget "TestDirect" */;
+			buildPhases = (
+				AC7CD4F7227F07E000C3F69A /* Sources */,
+				AC7CD4F8227F07E000C3F69A /* Frameworks */,
+				AC7CD4F9227F07E000C3F69A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TestDirect;
+			productName = TestDirect;
+			productReference = AC7CD4FB227F07E000C3F69A /* TestDirect */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AC4C0CBA2276F33000D28B0D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0810;
+				ORGANIZATIONNAME = Theodore;
+				TargetAttributes = {
+					AC34D52A2278A38500C1320F = {
+						CreatedOnToolsVersion = 8.1;
+						ProvisioningStyle = Automatic;
+					};
+					AC4C0CC12276F33000D28B0D = {
+						CreatedOnToolsVersion = 8.1;
+						ProvisioningStyle = Automatic;
+					};
+					AC760FF6227A0DBA00707427 = {
+						CreatedOnToolsVersion = 8.1;
+						ProvisioningStyle = Automatic;
+					};
+					AC7CD4FA227F07E000C3F69A = {
+						CreatedOnToolsVersion = 8.1;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = AC4C0CBD2276F33000D28B0D /* Build configuration list for PBXProject "Test" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = AC4C0CB92276F33000D28B0D;
+			productRefGroup = AC4C0CC32276F33100D28B0D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AC4C0CC12276F33000D28B0D /* Test */,
+				AC34D52A2278A38500C1320F /* UsersExample */,
+				AC760FF6227A0DBA00707427 /* jb */,
+				AC7CD4FA227F07E000C3F69A /* TestDirect */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AC34D5272278A38500C1320F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC34D5332278A39B00C1320F /* users.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AC4C0CBE2276F33000D28B0D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC4C0CCD2276F34600D28B0D /* test.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AC760FF3227A0DBA00707427 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC760FFF227A0DD600707427 /* jb.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AC7CD4F7227F07E000C3F69A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC7CD531227F086700C3F69A /* JB_Vectors.cpp in Sources */,
+				AC7CD522227F086700C3F69A /* JB_Errors.cpp in Sources */,
+				AC7CD520227F086700C3F69A /* JB_DirReaderUnix.cpp in Sources */,
+				AC7CD52A227F086700C3F69A /* JB_ObjArray.cpp in Sources */,
+				AC7CD51E227F086700C3F69A /* JB_Date.cpp in Sources */,
+				AC7CD51D227F086700C3F69A /* JB_ByteMap.cpp in Sources */,
+				AC7CD502227F07F300C3F69A /* test.cpp in Sources */,
+				AC7CD530227F086700C3F69A /* JB_Utils.cpp in Sources */,
+				AC7CD52D227F086700C3F69A /* JB_Saveable.cpp in Sources */,
+				AC7CD52C227F086700C3F69A /* JB_RingTree.cpp in Sources */,
+				AC7CD533227F09C400C3F69A /* JB.cpp in Sources */,
+				AC7CD52F227F086700C3F69A /* JB_Tokeniser.cpp in Sources */,
+				AC7CD526227F086700C3F69A /* JB_Lib.cpp in Sources */,
+				AC7CD51B227F086700C3F69A /* JB_Alloc.cpp in Sources */,
+				AC7CD51C227F086700C3F69A /* JB_BasicIO.cpp in Sources */,
+				AC7CD529227F086700C3F69A /* JB_MSR.cpp in Sources */,
+				AC7CD525227F086700C3F69A /* JB_LibraryFile.cpp in Sources */,
+				AC7CD521227F086700C3F69A /* JB_DirReaderWin32.cpp in Sources */,
+				AC7CD523227F086700C3F69A /* JB_FastString.cpp in Sources */,
+				AC7CD528227F086700C3F69A /* JB_Math.cpp in Sources */,
+				AC7CD527227F086700C3F69A /* JB_List.cpp in Sources */,
+				AC7CD52E227F086700C3F69A /* JB_String.cpp in Sources */,
+				AC7CD524227F086700C3F69A /* JB_File.cpp in Sources */,
+				AC7CD51F227F086700C3F69A /* JB_Dictionary.cpp in Sources */,
+				AC7CD52B227F086700C3F69A /* JB_Pipe.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AC34D52F2278A38500C1320F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AC34D5302278A38500C1320F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		AC4C0CC72276F33100D28B0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		AC4C0CC82276F33100D28B0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		AC4C0CCA2276F33100D28B0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AC4C0CCB2276F33100D28B0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		AC760FFB227A0DBA00707427 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AC760FFC227A0DBA00707427 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		AC7CD4FF227F07E000C3F69A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"TARGET_UNIX=1",
+					"AS_LIBRARY=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
+					/Users/theodore/Speedie/jeebox.scproj/Cpp/LibSrc,
+				);
+				OTHER_CFLAGS = (
+					"-march=core2",
+					"-ffast-math",
+					"-mfpmath=sse",
+					"-mmmx",
+					"-msse",
+					"-msse2",
+					"-msse4.1",
+					"-msse4.2",
+					"-Wno-return-type-c-linkage",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = /Users/theodore/Speedie/Cpp/ElfDataSrc;
+			};
+			name = Debug;
+		};
+		AC7CD500227F07E000C3F69A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
+					/Users/theodore/Speedie/jeebox.scproj/Cpp/LibSrc,
+				);
+				OTHER_CFLAGS = (
+					"-march=core2",
+					"-ffast-math",
+					"-mfpmath=sse",
+					"-mmmx",
+					"-msse",
+					"-msse2",
+					"-msse4.1",
+					"-msse4.2",
+					"-Wno-return-type-c-linkage",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = /Users/theodore/Speedie/Cpp/ElfDataSrc;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AC34D5312278A38500C1320F /* Build configuration list for PBXNativeTarget "UsersExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC34D52F2278A38500C1320F /* Debug */,
+				AC34D5302278A38500C1320F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AC4C0CBD2276F33000D28B0D /* Build configuration list for PBXProject "Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC4C0CC72276F33100D28B0D /* Debug */,
+				AC4C0CC82276F33100D28B0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AC4C0CC92276F33100D28B0D /* Build configuration list for PBXNativeTarget "Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC4C0CCA2276F33100D28B0D /* Debug */,
+				AC4C0CCB2276F33100D28B0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AC760FFD227A0DBA00707427 /* Build configuration list for PBXNativeTarget "jb" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC760FFB227A0DBA00707427 /* Debug */,
+				AC760FFC227A0DBA00707427 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AC7CD501227F07E000C3F69A /* Build configuration list for PBXNativeTarget "TestDirect" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC7CD4FF227F07E000C3F69A /* Debug */,
+				AC7CD500227F07E000C3F69A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AC4C0CBA2276F33000D28B0D /* Project object */;
+}

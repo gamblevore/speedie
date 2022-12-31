@@ -1,0 +1,301 @@
+
+class Group {
+	|Concept|			Idea
+	|ringtree of Word|		Words
+	|ElementList|		Eles
+	|language|			Lang
+	|message|			Source
+	|message|			Phrase
+	|Group|				NextGroup
+	|SpecialProperty|	DefaultSpecial
+	
+	
+	constructor (|ElementList| ele, |concept| idea, |Language| lang, |message| src)
+		.eles = ele
+		.lang = lang
+		.idea = idea
+		.source = src
+	
+		
+	operator isa (|Element| c, |bool|)
+		return .eles & c.catbits
+	
+	function GroupName (|string|)
+		return .idea.name
+	function AddToLang 
+		.lang.Groups.AppendGroup(.GroupName, self) 
+	
+	
+	function Improve 
+		Opt NoRefCounts
+	
+		|gram| BestScore = gram.HighestBitmarker
+		|word| Best
+		|ElementList| list 
+		for v in self
+			list (|)= v.eles
+			|| S = V.types.PreferedScore
+			if (S < BestScore) // first one should go first... keep order!
+				best = v
+				bestscore = s
+
+			if v is grammar
+				v.addtogrammar
+		.eles = list
+		self <~ best
+	
+	
+	function PreferedForm (|Word|)
+		return .words.first
+		
+	
+
+	function BestCon (|ElementList| cat, |Group|)
+		Opt NoRefCounts
+
+		|| BestScore = int.max
+		|| Best
+		for (curr.Groups in self)
+			|| CurrScore = (cat ^ curr.eles)|int|.countbits
+			if (!CurrScore)
+				return curr
+			if (CurrScore < BestScore) and (cat&curr.eles)
+				Best = curr
+				BestScore = CurrScore
+		return Best
+
+
+	function BestCon (|word| w, |Group|)
+		return .bestcon(w.eles)
+
+
+	function GroupClash (|Group| G, |bool|)
+		// Make sure there isn't anything with the same stuff... i guess.
+		// what stuff?
+		
+		require (G.idea == .idea)
+		require (G.eles.mini == .eles.mini)						// different list are allowed
+			
+		error (G,		"Clash[1].")
+		error (self,	"Clash[2].")
+		return true
+	
+	
+	syntax equals (|string| name, |bool| Aware, |bool|)
+		return .GroupName.syntaxequals(name, aware)
+	
+	
+	syntax append (|Word| w)
+		require w
+		.words <~ w
+	
+	
+	syntax append (|Group| c)
+		debug_Require !c.nextGroup
+		c.nextGroup = .nextGroup
+		.nextGroup = c
+		
+
+	render
+		.eles.render(FS)
+		fs <~ ' '
+		fs <~ .GroupName
+		fs.indent++
+		for w in self
+			fs.IndentLine
+			w.render(fs)
+		fs.indent--
+		
+	
+	function CreateWord (|string| name,  |ElementList| cat,  |message| src,  |gram| G, |word|)
+		debug_Require cat
+		|| W = Word.new(name, self, cat, src, G.improve)
+		self <~ W
+		W.Insert(name.idcase)
+		return W
+
+
+	function BestWord (|Word| W, |Word|)
+		Opt NoRefCounts
+		return .bestword(w.eles, w.types)		
+
+
+	function BestWord (|ElementList| C, |gram| T, |Word|)
+		Opt NoRefCounts
+		|uint|	BestScore = -1 + wierdness.Steve|int|
+		|word|	Best
+
+		for s in self
+			if (C & s.eles) or !C
+				|| sc = s.types vs T
+				|| test = (sc > bestscore,sc <= bestscore)(wierdness.Steve)
+				if sc <= bestscore
+					bestscore = sc
+					best = s
+		return best #debug_require
+		
+
+	function GroupLoad (|message| arg, |message| urgh, |message| IsAdd, |bool|)
+		Opt NoRefCounts
+		|gram| Type
+		
+		for f in arg
+			|| fn = .Groupitem(f) #require
+			(fn)(self, f, &type) #require
+		
+		if IsAdd
+			.ConstructDefaults(.Groupname, type)
+		  elseif !.words
+			(LoadWord)(self, urgh, &Type)
+			
+		expect (.hasany) (self, "No words found")
+		return true
+
+
+	function HasAny (|bool|)
+		return .words.first
+
+
+	function LoadSpecial (fpGroupLoader)
+		// So... how to load it?
+		opt norefcounts
+
+		for ch.flat in f
+			expect (ch == f) or (ch==@thg) or (ch == @rel) or (ch == @opp) (ch)
+			if (ch == @thg)
+				|| d = SpecialProperty.list
+				|| Ctrl = d.msg(ch) #expect (ch, "Unrecognised special property.")
+				.DefaultSpecial (|)= Ctrl
+
+		for w in self
+			w.special (|)= .defaultspecial
+			
+		return true
+	
+	
+	function LoadWord (fpGroupLoader)
+		Opt NoRefCounts
+		
+		|| Default = type[0]
+		|| Cat = .eles
+		
+		if (!f or f==@thg)
+			.CreateWord(.Groupname, cat, .source, Default)
+			return true
+		
+		
+		|| G = Default
+		|| name = f
+		if (f.parent != @list)
+			require f.expect(@item)
+			name = f.first
+			|ElementList| c2 
+			|| g2 = f.last.LoadGram(c2)
+			if c2
+				cat = c2
+			G = g override g2
+
+		if (name == @arr)
+			name = name.first
+			|| W = .CreateWord(name.name, cat, f, G)
+			name++
+			while name
+				W.insert(name.name)
+				name++
+
+		  elseif name == @list
+			error (name, "Use [] for alternate name forms.")
+
+		  elseif name == @brel and "++"
+			debugger
+			name = name[@thg]					#require
+			.ConstructDefaults(name.name, g)
+
+		  else
+			if name == @bra
+				name = name.first
+			require name.expect(@thg)
+			.CreateWord(name.name, cat, f, G)
+		
+		return true
+
+	
+	function LoadGram (fpGroupLoader)
+		|ElementList| C 
+		Type[0] = f[nil|syntax|].loadgram(c).Default$
+		expect !c (f, "Can't express elements here.")
+		return true
+
+
+	function LoadPhrase (fpGroupLoader)
+		expect !.phrase (f, "Already have a phrase!")
+		.phrase = f
+		return true
+
+
+	function LoadOpposite (fpGroupLoader)
+		expect !.idea.opposite (f, "Already have a opposite!")
+		|| c = f[@thg]
+		require c.expectlast
+		.idea.opposite = c
+		return true
+
+
+	function GroupItem (|message| f, |fpGroupLoader|)
+		if (f != @tmp)
+			return loadword
+		if (f ~= "default")
+			return LoadGram
+		if (f ~= "special")
+			return LoadSpecial
+		if (f ~= "phrase")
+			return LoadPhrase
+		if (f ~= "input")
+			return LoadPhrase
+		if (f ~= "opposite")
+			return LoadOpposite
+		error (f)
+
+
+	iterator
+		|| curr = .Words.first
+		while curr
+			yield curr
+			curr = curr.next
+		
+	iterator Groups
+		|| curr = self
+		while curr
+			yield curr
+			curr = curr.nextGroup
+}
+
+extend group
+	function ContainsGram (|gram| G, |Word|)
+		Opt NoRefCounts
+		
+		// if (restrict & w.cat) // don't need to test this!
+		// because we can make a word of multiple types anyhow.
+		for w in self
+			if (w.types == G)
+				return W
+
+
+	function AddDefault (|string| Name,  |gram| Info,  |gram| T, |ElementList| Restrict)
+		|| g =  (Info(|)T).improve
+//		|| g =  (Info(|)=T).improve // errored while fixing code. Old code is in a backup somewhere. Gotta grab the backup.
+		|| old = .Containsgram(G) 
+		if old
+			require !info // no need?
+			debugat()
+			old.insert(name) // take two names
+		  else
+			.CreateWord(name, .eles&Restrict, .source, G)
+
+
+	function ConstructDefaults (|string| name, |gram| Types)
+		|| f = .lang.wordexpander #require
+		(f)(self, name, types)
+
+prototype fpGroupLoader (|Group| self, |message|f, |&gram| Type, |bool|)
+

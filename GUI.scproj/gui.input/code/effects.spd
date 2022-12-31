@@ -1,0 +1,131 @@
+
+// a few graphics effects
+class ImageEffects
+	linkage: cpp_part fx
+	|image| 		Read
+	|image| 		Write
+	|image| 		Final
+	|vec4| 			Aura
+	|imageblurrer|	BlurData
+	
+	
+	constructor (|image| Read)
+		.read = read
+		.final = read
+
+	function MakeBoxes
+		// how to make the boxes?
+		// figure out later. first... just blur and sobel
+	
+	function Swap 
+		swap .read .write
+		.final = .read
+		
+	function start
+		opt norefcounts
+		|| P = .read.wh
+		if !.write
+			.Write = image(P, "write")
+		  elseif .write.wh != P
+			.Write.resizeto(P)
+	
+	function Blur 
+		opt norefcounts
+		.start
+		for v.down in 2
+			for (P in .write) (C)
+				|| total = vec4()
+				for (W in .blurdata) (O)
+					|| off = (O,O)
+					off[v] = 0
+					|| col = (.read)(C+off)+(.read)(C-off)
+					total += col*W
+				P <~ total
+			.swap
+		
+	
+	setter Aura (|float|)
+		.aura = (value, value+0.25).sincos
+
+	
+	function Sobel
+		.apply(sobelmain)
+
+	function Apply (|fnImageShader| fn)
+		.start
+		for (px in .write) (P)
+			|| v4 = (fn)(self, P.vec2+0.5, .Read)
+			px <~ v4
+		
+	function Jeebox
+		.MakeBoxes
+		.Blur
+		.Sobel
+
+
+
+struct ImageBlurrer
+	|float[16]|		Values
+	|int|			Count
+	
+	constructor (|float| Sigma)
+		.create(sigma)
+	
+	function Create (|float| Sigma)
+		.count = 0
+		|| Lim = 0.0 // Lim may only be 0.6 by the end!!
+		// each number is used twice.
+		|| W = &.values[0]
+		for i in 16
+			|| g = i|float|.Gaussian(Sigma)
+			if i == 0: g *= 0.5
+			W[i] = g
+			Lim += g
+		
+		// OK, so lets say lim == 0.6, now what do we do?
+		// Count the number of pixels needed
+		Lim *= 1.0 - 72th // 0.986, approx 99% brightness
+		|| Found = 0.0
+		for i in 16
+			loop Found < Lim
+			Found += W[i]
+			.Count++
+	
+		|| norm = 0.5/found
+		for i in 16
+			W[i] *= norm
+
+
+	iterator
+		|| c = .count
+		|| i = 0
+		while (i < c)
+			yield .values[i]  (i)
+			i++
+
+
+
+prototype fnImageShader (|ImageEffects| self, |vec2| P, |image| Read, |vec4|)
+
+function image.Sqrt (|vec2| xy, |vec4|)
+	return (self)(xy).sqrt
+
+
+helper image.SobelSub (|vec2| XY, |vec2| Move, |vec4|)
+    || s1 = .Sqrt(XY - Move * 1.5)
+    || s2 = .Sqrt(XY + Move * 1.5)
+    || s3 = .Sqrt(XY - Move)
+    || s4 = .Sqrt(XY + Move)
+
+    || sx = 4.0 * ((s4 + s3) - (s2 + s1))
+    || sy = 4.0 * ((s2 + s4) - (s1 + s3))
+
+    return sx*sx + sy*sy
+
+
+function SobelMain (fnImageShader)
+    || S1	= read.SobelSub(P, .Aura.xy) // aura circles
+    || S2	= read.SobelSub(P, .Aura.yz)
+    || Sobel= mix(S1, S2, 0.5)
+	return (Sobel.rgb, 1.0)
+

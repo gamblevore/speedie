@@ -1,0 +1,149 @@
+
+class function
+	|int|				Index
+	|int|				Length
+	|string|			Name
+	|Message|			Src
+	|&ASMblob|			SpeedieFunc
+	|_voidptr|			CFunc
+
+	constructor (|string| name)
+		cpp_Part Basic
+		.name  = name
+	
+	constructor (|_voidptr| cpp, |message| spd)
+		.name = spd.name
+		|| ASM = spd[0]
+		.speediefunc = nil
+		if asm == @sstr or @bin       // noice
+			|| s    = asm.name
+			|| blob = s.addr|&ASMBlob|
+			|| n    = (s.length/4) - 2
+			// we actually aren't allowed to write to string addresses!!
+			// right? I mean... internal ones anyhow?
+			.length = n
+			error (n > 0) ("Missing asm for: " + .name)
+			error (!blob.guard and !blob.callcount) ("Corrupted asm for: " + .name)
+			blob.guard = bear // bobobear
+			blob.callcount = 0
+			.speediefunc = blob
+	
+	
+	function Run (|int64|)
+		jb_vm.vm.ClearRegisters 
+		return jb_vm.Run(.speediefunc.ASM, .length)
+	
+	
+	function LinkCpp
+	
+		
+	function LinkSpd
+		// app-funcs are already linked
+		// lib-funcs no...
+		// I guess we can do it like func-num + SmallOffset?
+		// We might want a small offset, say 256 instructions inside.
+		// small offsets can't work with cpp lol.
+
+	
+	syntax call (|int|):	return .run
+	render:					fs <~ .name
+
+	constants
+		bear = 0xB0B0BA14
+
+	module
+		function LoadApp (|bool|)
+			opt norefcounts
+			for spd in package.funcs 
+				|| fn = function(nil, spd)
+				(apptable <~ fn) #loop
+				fn.LinkCpp
+				fn.LinkSpd
+
+			error (apptable.table >= 1) ("Missing 'init'")
+			error (apptable.table >= 2) ("Missing 'main'")
+			return stderr.ok
+			
+		
+		syntax access (|int| i, |function|)
+			if i > 0
+				return apptable[i]
+			return internaltable[1-i]
+
+	
+	
+	
+	
+	
+//////////          //////////            //////////
+// our super table thingy				  //////////
+//////////          //////////            //////////
+
+module InternalTable
+	|[function]|				Table
+	|dictionary of function|	Names
+	|string|					Failed
+
+	syntax append (|function| fn, |bool|)
+		ifn (.table < 16K)
+			error ("Too many functions")
+			return false
+		fn.index = .table.length
+		.table <~ fn
+		return true
+		
+	syntax access (|int| i, |function|)
+		return .table[i]
+
+	function Build (|bool|)
+		|&_voidptr| Internals 
+		||			spd = package.LibFuncLayout(&Internals).decompress.parse
+		rz = .Buildsub(spd.first, internals)
+	
+	function BuildSub (|message| spd, |&_voidptr| Internals, |bool|)
+		opt norefcounts
+		while spd
+			|| fn = (*Internals++, nil)(*Internals)
+				(InternalTable <~ function(fn, spd)) #loop
+			  else
+				error (spd, "Missing cpp function")
+			spd++
+					
+		return (!*Internals) #error "Extra InternalFunction" 
+		
+
+	function ReGather (|bool|)
+		Description "Checks that stdlib has all needed functions... and gets a reference to them."
+		
+		|| list = StringFields(package.linkage.name, '\n')
+		.LoadNameTableSub(list)
+		expect !.Failed ("Lib lacks needed function: " + .failed)
+		return stderr.ok 
+
+
+	function LoadNameTableSub (|StringFields| flist)
+		opt norefcounts
+		for l in flist
+			.Failed = l
+			if l
+				AppTable.linkorder <~ internaltable.names[l]$
+		.Failed = nil
+
+
+
+module AppTable
+	|[function]|	Table
+	|[function]|	LinkOrder 
+
+	syntax append (|function| fn, |bool|)
+		if (.table < 4M)
+			fn.index = .table.length
+			.table <~ fn
+			return true
+		error (package.funcs, "Too many functions")
+	
+	syntax access (|int| i, |function|)
+		return .table[i]
+
+//////////          //////////            //////////
+//////////          //////////            //////////

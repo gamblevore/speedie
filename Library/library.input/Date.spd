@@ -1,0 +1,103 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+datatype Date (int64)
+	syntax cast (|bool|)
+		return self|bool|
+
+	syntax cast (|float|)
+		cpp_Part CastFloat
+		return .seconds
+	
+	syntax cast (|f64|)
+		cpp_Part CastDouble
+		return .seconds
+	
+	
+	constants
+		kOneSecond = 0x10000
+		kTicks = 0x10000
+		kTickBits = 16
+		kClocksPerSecond = 1000000
+		kSecondsPerDay = 86400
+		kSecondsPerWeek = 604800
+		kSecondsPerMonthApprox = 2628000
+	
+	
+	syntax Compare (|float| Other, |bool|Aware, |int|)
+		|| oof = other * kOneSecond
+		if (self > oof)
+			return 1
+		if (self < oof)
+			return -1
+	
+	function WholeSeconds (|int64|) // needs 48 bits!
+		return self >> kTickBits
+	
+	function Seconds (|f64|)
+		return self|f64|/64KB
+
+	function ago (|date|)
+		if self
+			return now() - self
+	
+	render dmy
+		fs.appenddmy(self)
+	
+	render RenderDurr
+		fs.appenddurr(self)
+		
+	function Fired (|bool|)
+		if self != 0
+			return self < date()
+		
+	function Durr (|f64|)
+		return self|f64| / kTicks|f64|
+	
+	render
+		fs.appendintegerastext(self)
+
+	function Ticks (|int|)
+		disabled "is .ticks math right?"
+		return self mod kTicks
+	
+	function DayOfWeek (|int|)
+		return .Days mod 7
+	
+	function Days (|int64|)
+		return (.wholeSeconds / kSecondsPerDay)
+	function MonthsApprox (|int64|)
+		return (.wholeSeconds / kSecondsPerMonthApprox)
+
+	function WeekOfYear (|int|)
+		return .Weeks mod 52
+
+	function Weeks (|int64|)
+		return (.wholeSeconds / kSecondsPerWeek)
+
+	function int64.seconds (|date|)
+		return self << 16
+
+	module
+		function TimeID (|int|)
+			cpp_wrapper
+			
+		function Ticks (|int64|)
+			return (.now>>10) //64KB-->64
+
+		function Now (|Date|)
+			cpp_wrapper JB_Date__Now
+
+		function New (|Date|)
+			cpp_part New0
+			return now()
+
+		function TimeStamp  (|uint64|)
+			cpp_Wrapper RDTSC
+			
+		function hash  (|uint64|)
+			return .timestamp.hash
+

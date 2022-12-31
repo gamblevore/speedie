@@ -1,0 +1,24 @@
+#!/usr/local/bin/speedie
+ 
+main 
+	|| args		= app.args
+	|| inpath	= args[0]
+	|| OutPath	= args[1]
+	expect (args >= 1 and args <= 2)		("Usage: jbin InPath [OutPath]")
+	expect (inpath!=outpath)				("InPath = OutPath??")
+	|| b		= inpath.file.ReadSafely(0.25GB)	#require
+	
+	|| start	= date.Now
+	|| pz		= b.Parse							#require
+	printline "Parsed time: " + start.ago.RenderDurr
+	
+	if b.isjbin
+		OutPath := inpath.RemoveExt("jbin", "_unjbin").UniqueFile
+		pz.render(outpath.writer$)
+	  else
+		Outpath := inpath + ".jbin"
+		pz.render_jbin(outpath.writer$)
+	
+	printline outpath
+
+	

@@ -1,0 +1,32 @@
+
+
+							Todo
+
+* fix xcode paths
+
+* Set up git for installs... sigh. better than my buggy installer.
+	* changing a file to a folder or back again... fails to update in the IDE. TryReloadPath?
+* jeeboxlib should be tested by "spd --self"? I doubt it still works.
+
+* Speedie export asm funcs
+	* Pack linking... at least a basic idea?
+	* "conf:backup critical". perry/speedie/etc share backup approach
+
+* Put off till later
+	* Make logs hierarchical with timestamps
+	* batch-find in a specific directory... maybe just piggyback off the main file-list...
+	* graphics? like an editor?
+		* temporal editor? choosing colors? pixels? textures?
+
+* basic bugs / feature (needs users to sponsor)
+	* TextView error/find resync
+	* double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
+	* Find-replace!
+		* syntactic-mode also
+	* too long text in listview draw as much as we can
+	* First use of tab (in func) or () (to wrap) on opening perry doesn't work.
+	* install permissions validation? /usr/local/bin should be owned by ':admin' and have mode 775
+
+* contact
+	* https://github.com/paypal/Checkout-PHP-SDK
+	* multiplay. find others on youtube, and discord

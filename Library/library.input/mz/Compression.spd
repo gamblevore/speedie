@@ -1,0 +1,46 @@
+
+
+extend String 
+	function Chunk (|int| n, |[String]|)
+		|| i = 0
+		while i < .length
+			rz <~ self[i, i+n]
+			i += n
+		
+	helper CompressIntoSub (|jbin| j, |&compressionstats| st) 
+		st := CompressionStats.All
+		st.len(j.length)
+		j.jinit
+		j.enter(@tmp, "µz")
+		j.addint(.length)
+		j.enter(@arg)
+		for s in .chunk(1MB)
+			|| ugh = j.OpenStream
+			j.CompressChunk(s)
+			j.CloseStream(ugh)
+			st.LiveUpdate(s, j.length)
+		j.up(2)
+		j.CompressChunk(nil) // cleanup
+
+	helper DecompressSub (|&compressionstats| st, |int| lim, |message| j, |faststring| fs, |bool|)
+		opt norefcounts
+		st := compressionstats.all
+		|| L	= j.first
+		|| arg	= L.next
+		|| total_size = l.int
+		expect (L == @num and arg == @arg)  (self, "Invalid mz header")
+		expect (total_size <= lim)			(self, "Oversized mz")
+		st.len(j.length)
+		for C in L.next
+			require fs.DecompressChunk(c.name, total_size)
+			st.liveupdate(c.name, fs.length)
+		return true
+
+		
+helper faststring.CompressChunk (|string| str) 
+	cpp_wrapper JB_Str_CompressChunk
+
+
+helper faststring.DecompressChunk (|string| str, |int| total_length, |int|) 
+	cpp_wrapper JB_Str_DecompressChunk
+

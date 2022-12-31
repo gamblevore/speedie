@@ -1,0 +1,49 @@
+
+
+extern "C" {
+    JB_String* JB_Platform();
+    bool JB_IsLibrary();
+    Array* JB_App__Args();
+    JB_StringC*	JB_App__CalledBy();
+    JB_String* JB_App__Readline();
+    bool JB_App__ShouldDie();
+    int JB_App__LostChild();
+    int JB_App__ParentID();
+    int JB_App__ID();
+    Dictionary* JB_App__Env();
+    void JB_App__Quit (int Code);
+    JB_String* JB_App__Path();
+    int JB_Rec__PrintErrors();
+	JB_String* JB_App__LibFuncs(void*** Funcs);   
+	JB_String* JB_App__LibClasses(); 
+
+// startup
+    int JB_LibInit (const char** R);
+    void JB_LibShutdown();
+    bool JB_LibIsThreaded();
+
+// APP
+    void JB_App__Beep ();
+	void JB_App__SetIcon (const char* Path);
+	void JB_App__InitStuff ();
+	void JB_SDL_RemoveWindowBorder (void* window);
+	void JB_SDL_FullScreen (void* w, bool On);	
+	void JB_SDL_SetModified (void* w, bool b);
+	void JB_App__ShowURL (const char* Path);
+	JB_String* JB_App__DocumentOpened ();
+    
+// Sub process
+	int* JB_SP_ErrorNumber ();
+	int JB_SP_Run (const char** R, int Mode);
+	
+// VM 
+	int64 JB_ASM_Run(u32* Code, u32 CodeSize);
+	struct jb_vm;
+	s64* JB_ASM_Registers(jb_vm* V);
+	s64* JB_ASM_ClearRegisters(jb_vm* V, int n);
+	jb_vm* JB_ASM_VM();
+	typedef void (*SaverLoadClass)(JB_Class* cls, char* Data);
+	void JB_InitClassList(SaverLoadClass fn);
+
+} // ExternCEnd
+

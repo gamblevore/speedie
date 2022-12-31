@@ -1,0 +1,171 @@
+
+
+module SC_Init
+	function SCModule.BuildInitArg (|message|)
+		rz = «arg, «arg »»
+		if (.Source)
+			|| ig = «tmp "ignore",  rz »
+			ig.Obj = self // ignore in the renderer.
+			.Source <~ ig
+
+
+	function Message.SettingToNil (|bool|)
+		if (self == @Decl)
+			|| d = .Last
+			if (d == @Rel) and (d.Last ~= "nil")
+				Return true
+
+
+	function SCModule.MoveToInitFunc (|Message| c)	
+		opt norefcounts
+		if (c == @sheb or @url)
+			c.remove
+			return
+		
+		expect c.AllowedMoveToInit (c)
+		
+		if c == @Decl
+			require !c.SettingToNil
+
+	
+		.InitCodeArg := .BuildInitArg
+		if c == @decl
+			.InitVarsArg := .BuildInitArg
+			.initvarsarg.first <~ c
+		  else
+			.initcodearg <~ c
+
+
+function Message.AllowedMoveToInit (|bool|)
+	opt norefcounts
+	|| type = .func
+	if (type == @dot or @sdot or @func or @rel or @decl)
+		return true
+	if self istmp "once"
+		return true
+
+
+function SCModule.LoadInitFuncSub (|message| init, |string| name)
+	|| msg = "function $Name (|int|)".ParseClean
+	msg <~ init
+	|| fn = .NewModuleFunc( msg )
+	fn.alloccode |= kIsInitFunc
+	
+	|| L = init.Last
+	ifn L.hasany
+		L.Remove // never called anymore?
+
+
+function SCModule.LoadInitFunc
+	scbase.CurrVisibility = true
+	scbase.currmodule = self
+	|| arg = .initcodeArg
+		.LoadInitFuncSub(arg, "InitCode_")
+	
+	arg = .initVarsArg
+	if arg
+		.LoadInitFuncSub(arg, "Init_")
+		|| Msg = "function Dispose () { visible false }".ParseClean
+		.DisposeFunc = .NewModuleFunc(Msg)
+	scbase.currmodule = nil
+
+
+
+function scmodule.TryInit (|array of scmodule| req, |bool|)
+	opt norefcounts
+	for name in .initafter
+		name.expect(@thg)$
+		|| m = compiler.FindModulemsg(name)$
+		require m.inited
+
+	.inited = true
+	req <~ self
+	return true
+
+
+extend_module scmodule
+	function DoInitAfter (CollectFunc)
+		opt norefcounts
+		|| mod = name_Space.getasmodule(node)$
+		mod.InitAfter = node[@prm, @bra]
+		return compiler.program
+
+
+function SortInitOrderSub (|array of scmodule| mods, |array of scmodule| out, |bool|)
+	opt norefcounts
+	|scmodule| failed
+	|| GotAny = false
+	for m in mods
+		require stderr.ok
+		if !m.inited
+			if m.tryInit(out)
+				gotany = true
+			else
+				Failed = m
+
+	expect (gotany or !failed) (Failed.source, "Modules has recursive init order")
+	return failed
+	
+	
+function SortInitOrder (|array of scmodule| mods, |array of scmodule|)
+	while SortInitOrderSub(mods, rz)
+		0
+
+	
+function SCModule.AddDelayedInit (|message| src, |message|dest, |string| fn_name)
+	opt norefcounts
+	if src and .HasActualCode(src) and (self != Compiler.program)
+		dest <~ «sheb "// " + .Name »
+		dest <~ «dot fn_name
+			«Thg .Name »
+			«prm »
+		»
+
+
+function SCModule.DelayedInitFuncTransform
+	|| v = .initvarsarg
+	|| it = v[0]
+		for (msg in it)
+			if (msg == @Decl) and msg.GetDclName.InitRootDecl( msg, self )
+				msg.Remove
+		.AddDelayedInit(v, Compiler.program.initvarsarg, "Init_")
+
+	.AddDelayedInit(.initcodearg, Compiler.program.initcodearg, "InitCode_")
+
+
+function SCModule.HasActualCode (|message|arg, |bool|)
+	opt norefcounts
+	for curr.flat in arg
+		if (curr == @Decl)
+			continue_with curr.FlatAfter
+		  elseif (curr != @arg)
+			return true // found something!
+
+function Message.InitRootDecl (|Message| before, |SCBase| name_space, |bool|) {
+	// this code just seems wrong... it finds an SCDecl and puts it into "Decl" :)
+	// have an SCDecl... that should always already have a default! So why we are creating a default?
+
+	require .expect(@thg)
+	
+	|| P = .Parent
+	|| NewDefault = (P.last,nil)(P == @Rel)
+	
+	|| O = name_space.LookUpVarRootDecl( .name, self )
+	require (O isa SCDecl)
+	using (self)
+	
+	|| Decl = O|SCDecl|
+	ifn NewDefault
+		ifn Decl.IsNormal
+			return true
+		NewDefault = Decl.CreateDefault(self)
+		if (NewDefault and decl.contains)
+			NewDefault = decl.WriteTypeCast(NewDefault)
+			NewDefault.Obj = nil // just keep doing what it used to do
+	
+	if NewDefault != "nil"
+		before.Prev = NewRel( «thg .name », "=", NewDefault )
+	Return true
+}
+
+

@@ -1,0 +1,47 @@
+
+// seems good?
+main
+	expect app.args != 4  "Usage: rep Directory Func From To"
+	|| Directory = app[0].ExistingFile
+	require stderr.ok
+	
+	for f.flat in Directory
+		if f isfile "spd"
+			require f.SyntacticReplace
+
+
+function file.SyntacticReplace (|bool|)
+	|| str = .ReadSafely	#require
+	|| ch = str.Parse		#require
+	|| fs = faststring()
+	rep.ReplaceAll(ch, fs, str)
+	return .Data(fs)
+		
+
+
+
+module rep
+	|string|	From  = app[2]
+	|string|	To    = app[3]
+	|syntax|	Func  = syntax[app[1]]
+	|int|		Where = 0
+	|bool|		Aware = app..caseaware.yes
+	
+	function match (|message| msg, |bool|)
+		return msg == .func  and  msg == (.from, .aware)
+		
+
+	function DoReplace (|message| msg, |faststring| out, |string| str)
+		out <~ str[.where, msg.position]
+		out <~ rep.to
+		.where = msg.after
+	
+	
+	function ReplaceAll (|message| msg, |faststring| out, |string| str)
+		if .match(msg)
+			.DoReplace(msg, out, str)
+		for ch in msg
+			.replaceall(ch, out, str)
+		if !msg.parent
+			out <~ str[.where...]
+		

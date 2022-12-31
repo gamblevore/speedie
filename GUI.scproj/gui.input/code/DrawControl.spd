@@ -1,0 +1,101 @@
+
+
+class DrawToolBar (Guicontrol)
+	// selection/airbrush/stamps/eraser
+
+
+
+class DrawControl (GuiControl) // imageeditor
+	|[image]|				Layers
+	|image| 				Merged
+	|file| 					Backing
+	|int| 					BG
+	
+	function Load (|bool|)
+		require .Backing
+		|| d = .backing.Read(64MB)
+		if d.IsJbin
+			rz = .LoadNative(d)
+		  else
+			rz = .LoadImage(d)
+		.Merged = nil
+		.Merged = image(.size)
+	
+	function Size (|ivec2|)
+		opt norefcounts
+		return .Layers[0]$.size
+			
+	
+	
+	helper LoadNative (|string| f, |bool|)
+		|| root = f.parse_jbin
+		|| imgs = root..jdraw..layers
+		for l in imgs
+			if l.Expect(@tmp)
+				|| p = image.Load(l)
+					.layers <~ p
+		|| size = .Size
+		for p in .Layers
+			expect (p.Size == size) ("Layers have different sizes.")
+		return true
+	
+	
+	function Save
+/*jdraw 1
+	layers
+		oof (#data#)*/
+		|jbin| j = .backing.writer
+		j.jinit
+		j.enter @arg
+		j.enter(@tmp, "jdraw")
+		j.addint 1
+		j.enter @arg
+		j.enter(@tmp, "layers")
+		j.enter @arg
+		for l in .Layers
+			j.addimage(l, l.name)
+		j.up 5
+		j.Flush
+	
+	function image.RawData (|string|)
+		return string.FromPtr(.ptr|cstring|, .ByteCapacity)
+			
+	function jbin.AddImage	(|image| img, |string| name)
+		.enter(@tmp, name)
+		.addint(img.Width)
+		.addint(img.height)
+		.add(@bin, img.rawdata.compress)
+		.up
+	
+	
+	function DoMerge (|bool| bg=true)
+		if bg
+			.DoBG
+		for p in .layers
+			p.DrawTo(.Merged) // cell-system would be better than doing all this work
+							  // everytime a single pixel is altered! Of course... we'd need cells...
+							  // just get it working for now!
+		
+	function DoBG (|int| size=3)
+		if .bg == 0 // checkerboard
+			.Merged.Clear
+			return 
+			
+		|| g = colors.grey
+		|| w = colors.white
+		for (p in .Merged) (v)
+			|| col = (v<<size).sum isa 2
+			*p = (g,w)(col)
+	
+	
+	function ExportPNG (|file| dest)
+		.Domerge(false)
+		.Merged.SavePNG(dest)
+		
+		
+	helper LoadImage (|string| f, |bool|)
+		|| p = f.LoadImage
+			.Layers <~ p
+			return true
+	
+	

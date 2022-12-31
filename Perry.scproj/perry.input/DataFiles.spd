@@ -1,0 +1,18 @@
+
+
+module QQFiles	
+	
+	|| Todo = "
+		 			*** Todo file ***
+
+* Enter list of things to do
+* Do them
+* Enjoy
+"
+	
+	|| Roots = `
+roots 	// extra roots to search from. This doesn't affect compilation.
+	"@spd/Library/library.input/"
+	"@spd/Jeebox.scproj/jeebox.input/"
+
+`

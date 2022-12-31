@@ -1,0 +1,136 @@
+
+
+extend PerryIDE
+	function Recheck
+		require .ModifiedForCompile
+		.ModifiedForCompile = false
+		.ForceRecheck
+		
+	function ForceRecheck
+		if .IsSpeedieCode and !.UsingSpdLib
+			.GetFeedbackStr "check"
+
+	
+	syntax is (|ListViewState| s, |bool|)
+		return .projmsg.syntaxis(s)
+	syntax isnt (|ListViewState| s, |bool|)
+		return !.syntaxis(s)
+	syntax is (|ListViewState| s, assigns:|bool| b)
+		.projmsg.syntaxis(s) = b
+	syntax isnt (|ListViewState| s, assigns:|bool| b)
+		.syntaxis(s)=!b
+
+	function ClearErrors (|bool| Compiled)
+		isnt Broken
+		.CompileOKString = ("Compile OK", "Check OK")(Compiled)
+		.errorlist.Clear
+		.editme.ClearErrors
+		.filelist.ClearErrors
+	
+	function CompiledOK (|message| msg, |bool|)
+		isnt active
+		.ClearErrors(msg=="compile")
+		if .viewing == .viewerrors
+			.NoNeed(.CompileOKString, .viewfiles)
+		return true
+
+
+	function ShowCompileErrors (|message| msg, |bool|)
+		isnt active
+		|| j = msg.first
+		sdlapp.CompileStatus = nil
+		if (j == "ok")
+			.errorlist.clear
+			return .CompiledOK(msg)
+
+		is Broken
+		.NoNeed
+		.errorlist.listsource = j.jberrors
+
+
+	function Compile (|string| operation)
+		if !.Building
+			// require .filelist.saveall // CompileMsg does this
+			.ActualCompile(.CompileMsg(operation, true))
+		  elseif .editsep.div.Collapsed
+			.ShowStdOut  
+		  else
+			beep
+			
+	
+	function CompileMsg (|string| operation, |bool| SaveAll, |message|)
+		if SaveAll
+			require .filelist.SaveAll
+		|| cmd = @tmp + operation
+		cmd <~ .Project.path
+		return cmd
+
+
+	function DebugFB (|message| msg)
+		// || pp = .ProductPath
+		// we actually... hmmm... can't open the debugger yet. not until it's made!
+	
+		
+	function ErrorListFB (|message| msg, |bool|)
+		.filelist.ClearErrors
+		|| NoErrors		= .ShowCompileErrors(msg)
+		|| ErrsVis		= .isviewing(.errorlist) 
+		.errorlist.selectfirst
+		|| RealErrors	= msg ~!= "check"
+		if !RealErrors
+			0
+		  elseif NoErrors
+			if errsvis
+				.view(.viewfiles)
+			if msg ~= "debug"
+				.debugFB(msg)
+		  elseif !errsvis
+			.view(.viewerrors)
+		.LoadErrors(RealErrors, realerrors)
+		.showstats
+
+
+	function CrashedFB (|message| msg, |bool|)
+		.reportdead(msg.render)
+
+
+	function LogFB (|message| msg)
+		.BuildLogFile = msg.first.nyme
+	
+	function Readlog
+		require .stdout.height > 1
+		// OK so let's just append something
+		if .BuildLogFile and .Building
+			.justreadlog
+	
+	function JustReadLog
+		.stdout.text = .BuildLogFile.FileData(256KB)
+	
+	function CompileFB (|message| msg, |bool|)
+		.CancelCompile
+		|| first = msg.first #require
+		if first == @arg // an error-list
+			.ErrorListFB(msg)
+		  else
+			.CompiledOK(msg)
+			|| file = @url + "file"
+			file <~ first
+			.notify(.name + "\n\nCompiled OK!", file)
+				
+				
+	function Notify (|string| What, |message| response=nil)
+		|| c = what
+		if response
+			c = what + ("\n" + response.render) // hmmm... seems awkward
+		.LogComms(@emb + ("\1b " + c))
+		notifications <~ (what, response)
+	
+	function CancelCompile 
+		if .compilr!=nil
+			.compilr.JustKill
+		(.buildbutton is enabled)
+		(.progress isnt visible)
+		.JustReadlog
+		.buildlogfile = ""
+		isnt active
+

@@ -1,0 +1,39 @@
+
+
+class µFunc {
+	linkage
+		cpp_class ASMFunc
+		cpp_part ASMFunc 
+	|scfunction|			Fn
+	|int|					Start
+	|int|					Length
+	|bool|					OK
+	
+	constructor (|scfunction| fn)
+		.fn = fn
+		fn.asm = self
+	
+	function name (|string|)
+		return .fn.ExportName
+
+	function Finish (|µFunc1|)
+
+/// TEXTUAL STUFF		
+	render
+		fs <~ "asm ${.fn.name}\n"
+		for µ in self
+			ifn µ isa asm.Extended
+				fs <~ '\t'
+				µ.render(fs)
+				fs <~ '\n'
+
+	iterator
+		|| CurrInst = 0
+		|| Addr = ASMFuncState.JSMSpace.ptr + .start
+		while currinst < .length
+			yield Addr+currinst
+			currinst++
+
+	syntax append (|asm2| A)
+		disabled "Append the fields directly via asmfuncstate"
+}

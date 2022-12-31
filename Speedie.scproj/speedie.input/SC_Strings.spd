@@ -1,0 +1,471 @@
+
+
+|| file_read_test = file://syntax.asm
+
+
+module SCStrings
+	|Message| RenderInsides
+	|Message| RenderNewParams
+	|Message| RenderFinish
+
+
+
+extend_module SCFunction {
+
+
+SCStrings.RenderInsides = "
+	|| fs = FastString.New(fs_in)
+	finish
+	return fs.GetResult(fs_in)
+".ParseCleanWipe
+
+SCStrings.RenderNewParams = "
+	|FastString| fs_in = nil
+	|string|
+".ParseCleanWipe
+		
+SCStrings.RenderFinish = SCStrings.RenderInsides.findflat( @tmp, "finish" )
+
+
+function Tran_Render (|Message| msg, |SCClass| Cls, |bool|)
+	|| using2 = msg.SyntaxUsing
+	return tran_RenderSub(msg, cls)								// using bug
+
+
+function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
+	msg.name = "function"
+	|| IsPureRender = msg.first != @thg
+		msg.first = @thg.msg("Render")
+		if cls
+			msg.name = "behaviour"
+
+	|| arg = msg.NormaliseFunc
+	|| name = msg.first
+	|| params = name.next 
+
+	if msg.name == "behaviour"
+		params <~ (@thg, "render")
+		arg.first = @tmp.msg("visible")
+	  else
+		SCStrings.RenderNewParams.CopyAllInto(params)
+	
+	if msg.FindNested( @thg, "fs" )
+		using arg
+			SCStrings.RenderFinish.CopyAllBeforeInto( arg, nil )
+		using arg.flatlast
+			SCStrings.RenderFinish.CopyAllAfterInto( arg, nil )
+	if msg.name == "behaviour"
+		msg[1].remove
+		return true
+
+
+function NewRender (CollectFunc)
+	|| cls = name_space.isnormalobject 
+	if Tran_Render( node, cls )
+		return SCBehaviour.NewBehaviour( node, name_space, ErrPlace )
+	return SCFunction.NewFunc( node, name_space, ErrPlace )
+
+
+
+function ObjectifyString (|Message| msg)
+	require !MsgInsideDcl(msg)
+
+	|| P1 = msg.parent
+	|| p  = p1.parent
+	if p == @Func
+		require (p.first != "JB_Str3")
+	
+	msg.func = @sstr
+
+
+function GetFileString (|Message| msg, |string| name, |message|)
+	|| f = compiler.InputFile(nil, name, msg)
+		msg.become(@str, f.readall)
+		msg.clear
+		.ObjectifyString(msg)
+		return msg
+	error (msg, "File does not exist")
+
+
+function Tran_Strings (|Message| start, |SCFunction| fn)
+	require (start)
+	if (start == @Str)
+		String_Expand( start, fn )
+		Return
+	
+	// shouldn't tran_names be part of this?
+	for msg.flat in start		
+		|| f = msg.Func
+		if (f == @thg)
+			if (msg ~= "__SELF_TEST_JBIN__") or (msg ~= "__SELF_TEST_NATURAL__")
+				Create_JeeboxTest( msg )
+				String_Expand( msg, fn )
+			
+		  elseif (f == @Str)
+			String_Expand( msg, fn )
+			
+		  elseif (f == @Char) and (msg.length > 1)
+			Tran_Chr( msg, fn )
+
+
+
+function InBuiltFunc (|message|self, |string| name, |bool|)
+	opt norefcounts
+	|| p = .parent
+	|| c = p.first
+	|| OK = (P == @ques) and c == name
+	if !OK
+		|| p2 = p.parent
+		if p2==@func
+			c = p2.first
+			|| n = c.name
+			OK = n.hasmoat and n[2, name]
+			if OK
+				p2.become(@bra)
+	if (OK)
+		p.become(@bra)
+		c.remove
+		return true
+
+
+function String_Expand (|Message| msg, |SCFunction|fn) {
+	|| P = msg.parent 
+	if (P istmp "disabled" or "description")
+		msg.Func = @str					// in case of description ''
+		return
+			
+	if InbuiltFunc(msg, "digest")
+		msg.name = msg.name.digest
+		// return? why dont we return?
+	
+	if P == @arg
+		msg.wrapwith(«tmp "printline"»)
+		
+	if !msg.first
+		ObjectifyString( msg )
+		Return
+	
+	require fn
+	|| Point = msg.ParentPoint
+	using (msg)
+	|| FSName = UniqueTmpVar( fn, "fs" )
+	|| StrName = fsName + "_str"
+	|| Dot = «dot "new"
+		«Thg "FastString"»
+		«emb »
+	»
+	
+	|| decl = MakeDecl( "FastString", fsName, Dot )
+	point.Prev = decl
+	//vampirio := decl.parent
+	|| errpos = msg
+	for item in msg
+		|| syx = item.func
+		if syx == @Emb or @Str
+			if syx == @emb
+				errpos = item
+			ObjectifyString( item )
+	
+	error !(scbase.CurrModule) (errpos, "Strings with expressions, must be in proper functions. (Compiler limitation)")
+		// would need to totally redesign how I do strings... and init code. sigh. collectdecls seems to have happened already so... its too late at this point to add new vars? something like that.
+
+	for (item in msg)
+		point.Prev = «dot "SyntaxAppend", «Thg fsName », «prm, item » »
+
+	// fs <~ "dasdasd"
+	|| WeAreAppending = false
+	|| fnc = msg.parent
+	if fnc == @prm
+		fnc = fnc.parent
+		if fnc ~= @dot and "SyntaxAppend"
+			WeAreAppending = true
+	// wrong approach.
+	if false
+		msg.become(@thg, fsname) // keep the reference the same so it doesn't whoop up.
+	  else
+		msg.become(@dot, "getresult") // keep the reference the same so it doesn't whoop up.
+		msg <~ «thg fsname » 
+		msg <~ «emb »
+	(decl)
+}
+}
+
+
+function String.ParseCleanWipe (|Message|)
+	rz = .parseclean
+	if rz
+		rz.wipepositions
+
+
+function String.ParseClean (|Message|)
+	Compiler.stTotalSourceSize += .Length
+	|| P1		= Date.Now
+	rz			= .Parse									#require
+	Compiler.stParseTime += (Date.Now - P1)|int|
+	rz.clean(True)
+	rz.PrepareAST // sigh the "Extra" value is 1 toob ig if its the last item on a line!
+	
+	
+function message.UnicodeSafe
+	opt norefcounts
+	|| n = .name
+	require !n.isascii
+	.name = n.UnicodeSafeName
+
+
+
+function Message.Clean (|bool| erl = false)
+	|| pos		= parser.usingpos
+
+	|message| IgnoreArg 
+	if ((message).layer == (message).defaultlayer)
+		pos = -1
+	
+	for (curr.flat in self)
+		if pos >= 0: curr.position = pos
+		
+		|| f = curr.func
+		if (f != @Back and @Str and @sstr and @bin)
+			expect !(curr.name contains "\A0") (curr, "Node contains option-space")
+
+		if (f == @arg)
+			curr.name = ""
+			
+		  elseif (f == @Back or @sstr or @bin)
+			Curr.Func = @Str
+		
+		  elseif (f == @Rel)
+			Curr.RelFix(false)
+		
+		  elseif (erl and f == @erel)
+			curr.name = curr.name.Lowercase
+			curr.FixErl
+
+		  elseif (f == @arel)
+			if curr == "?"
+				curr.Tran_QMark
+				continue_with curr.flatnext
+			
+		  elseif (f == @decl)
+			|| l = curr.last
+			if l == @arg
+				|| types = curr.first
+				|| names = types.next
+				if (types and names and names.next == l)
+					l.WithDeclTransform(curr, names, l)
+		
+		  elseif (f == @opp or @cnj or @erel)
+			if curr == "<>"
+				deprecate (curr, "Use !=")
+				curr.name = "!="
+			  elseif curr == "~<>"
+				deprecate (curr, "Use ~!=")
+				curr.name = "~!="
+			  elseif curr == "<~" or (curr == "<" and curr in @arg)
+				curr.BecomeAppend("SyntaxAppend")
+			  elseif curr == "~>" // noice
+				curr.BecomeAppend("SyntaxSendTo")
+			  elseif curr.OppExpand
+				0 // 
+			  elseif jeebox.CSWordStart[curr.name[0]]
+				curr.name = curr.name.Lowercase
+		
+		  elseif (f == @tmp)
+			if curr.parent != IgnoreArg
+				|| s  = curr.name.Lowercase
+				curr.name = s
+				if s == "if" or "elseif" or "ifn"
+					curr.FixElseif
+				  elseif s == "target"
+					continue_with curr.tran_target
+				  elseif s == "is" or "isnt"
+					curr.Tran_Isnt("self")
+				  elseif s == "targets"
+					targets.set(curr.first)
+				  elseif s == "dispatch" or "functiontable"
+					IgnoreArg = curr.last
+				  elseif s == "with"
+					curr.tran_with
+				  elseif s == "direct_test_only"
+					if options.IsDirectTest
+						curr.name = "if"
+						using (curr)
+						curr.first = «thg "true"»
+					  else
+						curr.name = "ignore"
+
+
+function message.BecomeSyx
+	.func = @thg
+	.name = "syx" + .name
+
+
+function message.Tran_Isnt (|string| name)
+	// is dead --> (self is dead)
+	|| type = self[nil|syntax|]
+	require type.ExpectLast
+	
+	using (self)
+		.func = @rel
+		self <~ «thg name »
+		self <~ «opp .name »
+		self <~ type
+
+
+function message.FixElseif
+	|| curr = .next
+	|| f = .first // cond
+	|| needarg = f and (f.next != @arg)
+		
+	while (curr istmp "else" or "elseif")
+		|| n = curr.next
+		if needarg
+			using (self)
+				self <~ @arg
+				needarg = false
+		self <~ curr
+		curr = n
+	
+	
+function message.BecomeAppend (|string| s)
+	// typeofsend actually does a lot more than this
+	// so it can't be removed just yet
+	opt NoRefCounts
+	|| p = .parent
+	require p.expect(@rel)
+	p.become(@dot, s)
+	.func = @prm
+	|| n = .next
+	if n == @list // i guess itss... fs <~ (' ', 1)
+		.replacewith(n)
+		n.func = @prm
+	  else
+		.last = n
+
+
+function message.WithDirectName (|message| p, |string|)
+	expect (self!=@rel and self != @bra) (self)
+	return scfunction.tempmoveout(self).DeclName.name
+
+
+function message.Tran_With 
+	|| obj = self[nil|syntax|]$
+	|| arg = obj.next(@arg)$	
+	
+	.name = "if"
+	|| name = obj.WithDirectName(self)$	
+
+	
+	using (obj)
+	for ch.flat in arg
+		if ch == @tmp
+			if ch == "is" or "isnt"
+				ch.Tran_Isnt("it")
+				continue_With ch
+			if ch == "with"
+				continue_with ch.flatafter
+		  elseif ch == @sdot
+			ch.func = @dot
+			ch.first = «thg name »
+		  elseif ch == @thg
+			if ch == "it"
+				ch.name = name
+
+
+
+function message.WithDeclTransform (|message| decl, |message| rel, |message| arg)
+	require rel.expect(@rel)
+	|| name = rel[@thg]
+	using arg
+	|| IF = @tmp + "if"
+	decl.next = if
+	if <~ (@thg, name.name)
+	if <~ arg
+
+
+function message.BunchFixSub (|message| subject, |message| stuff)
+	while (stuff)
+		|| test = «rel
+			subject
+			.copy
+		»
+		if stuff != @rel
+			stuff.replaceinto(Test)
+			exit
+		|| R = stuff[2]							#expect (stuff, "Rel missing right side.")
+		stuff.first.ReplaceInto(test)
+		stuff = R
+		subject = subject.copy
+
+
+function Message.BunchFixOof (|Message|)
+	opt norefcounts
+	// if a == b or c
+	
+	|| P = .NiceParent
+	if (P == @rel)
+		return p
+	return scfunction.tempmoveout(self).last
+
+
+function Message.BunchFix
+	using (self)
+	
+	|| P		= .BunchFixOof
+	|| subject	= P.first
+	|| multi_opp= subject.next(nil)$
+	.RelFix(false)
+	P.ReplaceWith(self)
+	multi_opp.BunchFixSub(subject, self)
+
+	
+function Message.BunchlessFix
+	|| subject		= .first
+	|| multi_opp	= subject.next(nil)$ // or
+	|| c			= multi_opp.next$
+	// P			is the rel (a=b or c)
+	// self/stuff	is the bunch (b or c)
+	// subject		is left side of rel (a)
+	// multi_opp	is the opp (=)
+	.become(c)
+	using (self)
+	multi_opp.BunchFixSub(subject, self)
+
+
+function Message.TernaryFix (|message| exp) {
+	|| place = .IsSetIntoVar			#expect self	
+	using (self)
+	|| list = .first
+	expect list.haschildcount(2) (self, "Expected two children")
+
+	.next = «tmp "if"
+		exp
+		«arg, newrel(place, "=", list.first)»
+		«tmp "else"
+			«Arg, newrel( «Thg place.name », "=", list.last)»
+		»
+	»
+	
+	.remove
+	
+	 
+//	|| x = ("true", "false")(exp2)
+// -->
+//  if (exp2) {x = "true"} else {x="false"}
+}
+
+
+
+function Create_JeeboxTest (|Message| msg)
+	using (errorlist.new)
+		|| f = Compiler.InputFile( nil, "self_test.txt", nil )
+		expect (f!=nil) "self_test.txt can’t be found."
+		|| s = f.ReadAll
+		if msg ~= "__SELF_TEST_JBIN__"
+			using (msg)
+			s = s.digest
+
+		msg.become(@str, s)
+
+
+// |message| vampirio

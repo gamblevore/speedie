@@ -1,0 +1,74 @@
+//jb self-test file.
+"Tests all syntax in small amount of code."
+`Does not make sense in any other way.`
+
+how %can someone fall so~far #without %realising it
+
+http://hello.kitty
+
++"hahaha :3"
+	+"bbbb ()" eeeep!
+
+story X (
+	–which dog
+	x (a < b) c
+			-->
+	sonic@the~hedgedog or @jeebox
+	
+	>~slowly i ran home
+	
+	A ((B~C)~D E F~G) I #W A t (o:c)
+)
+
+
+
+za a {
+	art ≈ brt // abc /deff\ xyz
+	1 (crt ≈ drt) 2
+	|1| x * y * z = ?()?
+	|| a = c or d
+	(a,)
+	([] --> a + a, b, d:e)
+	[|0|d, a+b:c, [c, d]] /* /*
+		nested comments!
+		*/ I found it useful.*/
+
+	// }
+}
+
+d d // savetext
+	c c
+		a, bbbbb
+
+#(70 68 61 6e 74617379207374617220706c696e6b20706c6f6e6b20706c696e6b2069747320736f2062656175746966 75 6c)# 
+
+function name (|x: y + z| a, ||) {
+	// label : func()
+	"'\"stri\c3\b1g test\"'"
+	`\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\)`
+	"\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\)"
+	--x-- mod= 'ioi \'""\'oio'
+	
+	y.size(...?, ..., <(`s`t`r`)>).y(-z)
+
+	x = "{ab${x} ${y}${z}ab}" + `abc`
+	|(a,)|z += .exit(code: -3)
+
+	for (a in b) {
+		$a$ = &b + !c!
+	}
+
+	if ('a' & b === !b (|) c) ^ (a ~>= b)
+		if a: return 0xff + 10_miles
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<?why G A V~E?>
+<!--comments?????<><><>YUSAJKD;-->
+<xml abc="def" ghi="&apos;abc&apos;">
+	<K C="def"/>
+	<text>
+		iiii&amp;jjjj
+	</text>
+</xml>

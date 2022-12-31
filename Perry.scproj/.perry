@@ -1,0 +1,21 @@
+roots
+	"@spd/Library/library.input/"
+	"@spd/Jeebox.scproj/jeebox.input/"
+	"@spd/gui.scproj/gui.input/"
+	"@spd/image.scproj/image.input/"
+	"@spd/network.scproj/network.input/"
+
+
+/*
+Bloat fix plan:
+	* use macros! get rid of loads of stuff
+	* ({block-code}) refcounts like crazy! reduce
+	* remove dictionary, use fixeddict (needs leaf/stems)
+	* string append instead of faststring where possible
+	* some unnecessary visble funcs (JB_MzSt_Render)
+	* objectloader, and saveable stuff (JB_StructSaveTest_destructor is unused?)
+		* clean up and remove the special-rules around it? it was kinda ugly...
+	* whole program ref analysis for remove refcounts.
+	* remove dict.reverse in jbinit
+*/
+

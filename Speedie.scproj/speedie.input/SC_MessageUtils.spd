@@ -1,0 +1,421 @@
+
+
+
+///////////// ///////////// ///////////// FINDING ///////////// ///////////// ///////////// 
+
+function Message.FindAllDclNames (|[Message]|)
+	for dcl in .FindAllDcls
+		|| n = dcl.GetDclName
+			rz <~ n
+
+
+function Message.FindAllDcls (|[Message]|)
+	Return FindAllSyx( self, @Decl )
+
+
+function FindAllSyx (|Message| msg, |Syntax| syx, |[Message]|)
+	opt norefcounts
+	for c.flat in msg	
+		if c == syx
+			rz <~ c
+
+
+function Message.FindAndRemove (|String| name,  |bool| NothingOK,  |bool| IsClass,  |string|)
+	return .FindAndRemoveSub(name, NothingOK, isclass)$.name
+
+
+
+function Message.FindClassOption (|String| name,  |string| Kind=nil,  |int|)
+	|| place = .findflat( @Tmp, name )		#require
+
+	|| num = 1
+	if Kind != nil
+		|| ch = place.first
+		require ch and ch.expect(@thg)
+		require ch ~= Kind
+		|| num_msg = ch.next 
+			num_msg.expect(@num)
+			num = num_msg.int
+	
+	place.Remove
+	Return num
+
+
+
+///////////// ///////////// ///////////// SYNTAX ///////////// ///////////// ///////////// 
+
+
+function Message.MsgOwningFunc (|SCFunction|)
+	opt norefcounts
+	for ch.up in self
+		|| O = ch.obj
+		if O isa SCArg
+			if O.ParentFunc
+				Return O.ParentFunc
+		  elseif (O isa SCFunction) and (ch != @prm)
+			// could be a func associated with the lst on "obj.func".
+			Return o
+
+
+function WithinOrAnd (|Message| msg, |bool|)
+	// if ((a.f + b.f) or c.f) { }
+	// x = ((a.f + b.f) or c.f)
+	// check for rels... until we hit what? An arg? Seems sensible!
+	
+	|| p = msg
+	While p != @arg
+		if p == @rel
+			|| op = p[ 1 ]
+			if op == "and" or "or"
+				Return true
+		
+		p = p.Parent
+
+
+function SC_MakeComment (|Message| msg)
+	expect (msg == @tmp)
+	msg.func = @Sheb
+	msg.clear
+
+
+function Message.Negate (|Message|)
+	|| ch = .unbra
+	if ch IsBRel "!"
+		return .ReplaceWith(ch.first)
+
+	|| Not = «BRel "!"»
+	.ReplaceWith(Not)
+	Not <~ self
+	return Not
+
+
+function Message.IsAssignable (|bool|)
+	return self != @Func and @type // unless... its an assigns func?
+
+
+function message.isint (|bool|)
+	 return (self == @num) and !.name.find('.')
+
+
+function Message.ParentPoint (|Message|)
+	opt norefcounts
+	|| curr = self
+	while curr
+		|| OldMsg = curr
+		curr = curr.parent
+		if curr == @Arg
+			Return OldMsg
+
+
+function Message.IsVarUseableInLoop (|String| name, |bool|)
+	if name == "self"
+		return false
+	return .IsVarAltered(name)
+
+
+function Message.IsVarAltered (|String| name, |bool|)
+	opt norefcounts
+	for msg.flat in self
+		(msg == @Rel)						#continue
+		(msg in @arg)						#continue
+		(msg[0] IsThing name)				#continue
+		Return true
+
+
+function Message.MsgArg (|SCArg|)
+	opt norefcounts
+	for ch.up in self
+		|| O = ch.obj
+		if O isa SCArg
+			Return O
+
+
+function Message.MsgFunc (|SCFunction|)
+	opt norefcounts
+	if self == @Dot or @Func
+		|| sc = .second
+			return sc.asfunc
+
+
+function Message.DclExp (|Message|)
+	opt norefcounts
+	if self == @decl // oof
+		return self[1]
+	return self
+
+
+function Message.MsgDecl (|SCDecl|)
+	opt norefcounts
+	return .DclExp.AsDecl
+
+
+function Message.DeclName (|Message|)
+	|| dcl = .DclExp
+	if dcl == @Rel
+		Return dcl.first
+	if dcl == @Thg
+		Return dcl
+	expect !(dcl == @Emb)
+
+
+
+// same as above?
+function Message.GetDclName (|Message|)
+	rz = self[@Nil, 1]
+	if rz == @Rel
+		rz = rz[@thg]
+
+
+
+function Message.WantAsArg (|message| ErrPlace, |string| errmsg = "Expected {argument} here.", |message|)
+	if self == @arg
+		return self
+	expect !errplace (errplace, errmsg)
+
+
+function Message.WithinLoop (|Message| stop, |bool|)
+	opt norefcounts
+	|| curr = self
+	while (curr != stop) and curr
+		if (curr IsTmp "while" or "for")
+			return true // seems OK, its within a loop.
+		curr = curr.parent
+
+
+function Message.UnBra (|Message|)
+	opt norefcounts
+	rz = self
+	While rz == @bra and rz.first != @arg
+		rz = rz.first
+
+
+function Message.UnBraType (|Message|)
+	opt norefcounts
+	rz = self
+	While (rz == @type) or (rz == @bra and rz.first != @arg)
+		rz = rz.first
+
+
+function Message.CastedParent (|Message|)
+	opt norefcounts
+	rz = .unbra.Parent
+	if rz == @prm
+		rz = rz.parent
+
+
+
+
+///////////// ///////////// ///////////// MOVING ///////////// ///////////// ///////////// 
+
+
+
+function Message.ReplaceIntoFirst (|message| With, |message|)
+	.prev = with
+	with.first
+	return with
+
+
+function Message.ReplaceWith (|message|j, |Message|)
+	.Prev = j
+	.Remove
+	return j
+	
+
+function Message.ReplaceWithChild (||)
+	rz = .First
+	.Prev = rz
+	.Remove
+
+
+function Message.SafeRemove (|syntax| T=@sheb)
+	.become(T)
+	is inserted // stop issues with autocomplete :)
+	for (c in self)
+		c.remove
+
+
+function Message.SafeReplaceWith (|message| Incoming)
+	.saferemove(@bra)
+	self <~ incoming
+
+
+function Message.WrapWith (|Message| W, |Message|)
+	.Prev = W
+	W.first = self
+	return W
+
+
+function Message.AddBefore (|Message| before, |Message| NewItem)
+	if before
+		before.Prev = NewItem
+	  else
+		self <~ NewItem
+
+
+function Message.InsertBefore (|Message| j, |Message| ch)
+	if ch
+		ch.Prev = j
+	  else
+		.Last = j
+
+
+function Message.InsertAfter (|Message| j, |Message| ch)
+	if ch
+		ch.next = j
+	  else
+		.first = j
+
+
+function Message.Move (|Message| last, |Message| into)
+	|| curr = self
+	while (curr != last)
+		|| next_ = curr.Next
+		into.First = curr
+		curr = next_
+
+
+function Message.MoveAllIn (|Message|Dest)
+	While .hasany
+		Dest.Last = .First
+
+
+function Message.MoveAllAfter (|Message| after)
+	While .hasany
+		after.Next = .Last
+
+
+function Message.NeedMarker (|String| s, |bool| b, |Message|)
+	rz = .findflat( @tmp, s )
+	if !rz
+		rz = @tmp.msg(s)
+		if b
+			.Last = rz
+		  else
+			.First = rz
+
+
+function message.WipeCopy (|message| oof, |Message|)
+	cpp_part LayerWipeCopy
+	if !oof
+		return .WipeCopy
+	|| L = oof.memorylayer
+	rz = Message.NewWithLayer(L, self) // looks better
+	rz.position = -1
+	for v in self
+		rz <~ v.WipeCopy(oof)
+
+	
+function message.WipeCopy (|Message|)
+	rz = Message(self)
+	rz.position = -1
+	for v in self
+		rz <~ v.wipeCopy
+
+
+function Message.CopyAllAfterBefore (|Message| Before, |message| copylayer)
+	|| exp = .Next
+	While exp
+		before.Prev = exp.wipeCopy(copylayer)
+		exp++
+
+
+function Message.CopyAllBefore (|Message| Before, |message| copylayer)
+	|| curr = .Prev
+	while curr
+		|| cpy = curr.Copy(copylayer)
+		Before.Prev = cpy
+		Before = cpy
+		curr--
+
+
+function Message.CopyAllAfter (|Message| after, |message| copylayer)
+	|| curr = .next
+	While curr
+		|| cpy = curr.WipeCopy(copylayer)
+		after.Next = cpy
+		after = cpy
+		curr++
+
+
+// all these copyintos need to clear position
+function Message.CopyAllInto (|Message| j, |bool| wipe = false)
+	for c in self
+		j <~ c.Copy(j)			// Was .wipecopy. why did I do that?
+
+
+function Message.CopyAllBeforeInto (|Message| into, |Message| copylayer)
+	|| curr = .Prev
+	while curr
+		into.first = curr.Copy(copylayer)	// was .WipeCopy. why did I do that?
+		curr--
+
+
+function Message.CopyAllAfterInto (|Message| into, |Message| copylayer)
+	|| curr = .Next
+	While curr
+		into <~ curr.Copy(copylayer) // was .wipecopy. why did I do that?
+		curr++
+
+
+///////////// ///////////// ///////////// CREATING ///////////// ///////////// ///////////// 
+
+
+function Message.GetMarker (|String| s, |Message|)
+	opt norefcounts
+	for a in self: if a isTmp s: return a
+
+
+function NewRel (|string| L, |string| op, |String| R, |Message|)
+	cpp_part NewRelStr
+	return «Rel
+		«Thg L »
+		«Opp op »
+		«Thg R »
+	»
+
+
+function NewDecl (|string| type, |string| name="", |message|)
+	opt norefcounts
+	|| msg = («thg name », nil)(name)
+	return newdecl(type, msg)
+		
+function NewDecl (|string| type, |message| RelOrName, |message|)
+	opt norefcounts
+	rz = «decl »
+	if type
+		rz <~ (@thg, type)
+	  else
+		rz <~ @emb
+	
+	rz <~ relOrName
+
+
+function NewRel (|Message| L, |string| op, |Message| R, |Message|)
+	return «rel
+		L
+		«Opp op »
+		R
+	»
+
+
+function NewSetter (|string| L, |Message| R, |Message|)
+	return «rel
+		«thg L »
+		«Opp "="»
+		R
+	»
+
+
+function Message.NeedBra (|Message|)
+	if (self == @Bra)
+		 return self
+	
+	return .wrapwith(«bra »)
+
+
+function NewFnc (|string| name, |Message|)
+	return «func
+		«Thg name »
+		«prm »
+	»
+

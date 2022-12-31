@@ -1,0 +1,15 @@
+
+
+
+module network
+	function download (|string|url, |int|lim, |networkDownloader|)
+
+
+class NetworkDownloader
+	linkage
+		cpp_part Down
+	|faststring|	Result
+	|bool|			Finished
+	function Progress (|float|)
+	syntax cast (|string|)
+

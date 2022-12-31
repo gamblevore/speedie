@@ -1,0 +1,20 @@
+
+
+linkage
+	cpp_part GUI
+	type library
+
+import "Image"
+import "network" // for network.guidownload
+				 // its like A, B, AB. So... gui is independant
+				 // network is independant. But what if you have both?
+				 // we need to import a 3rd thing now? SIGGHHHH.
+				 // perhaps with some kinda target/ifdef system, 
+				 // but that becomes order-dependant. sucks!
+
+compile_linking
+	flags:	osx "-framework OpenGL  -framework AVFoundation  -lSDL2"
+	libs:	"libSDL2.dylib"
+
+// sudo install_name_tool -add_rpath	/usr/local/lib			/usr/local/lib/libSDL2.dylib
+// sudo install_name_tool -add_rpath	@executable_path		/usr/local/lib/libSDL2.dylib

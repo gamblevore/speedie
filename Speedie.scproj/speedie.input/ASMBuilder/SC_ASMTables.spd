@@ -1,0 +1,125 @@
+
+dispatch fn_asm_table (fn_asm)
+	@arg:
+		opt norefcounts
+		|| OV = .openvars
+		|| garb = 31.reg
+		for ch.fast in exp
+			.µ(ch, garb)
+		.closevars(OV)
+			
+
+	@decl: // yay
+		debugger
+
+
+	@num:
+		debugger
+	@rel:
+		opt norefcounts
+		|| OV = .openvars
+		rz = .DoRels(exp.first, reg)
+		.closevars(OV)
+
+
+	@thg:
+		opt norefcounts
+		// what if this is a constant?
+		|| d = exp.AsDecl #debug_require
+		if d is const // we want a number, really
+		|| r = d.dregister
+		if r.reg
+			return r
+		return .AllocReg(exp, d, reg)
+	
+	
+	@bra:
+		opt norefcounts
+		|| f = exp.first
+		if f != @arg
+			return .µ(f, reg)
+		return ASMtmp.StateExpr(self, f)
+
+
+	@list: // vectors
+		debugger
+
+
+	@func:
+		opt norefcounts
+		// 0, a, b, fn(), b*b, a*a
+		// 0, a, b, b*b, a*a, fn()
+		rz = .DoFunc(exp.last, reg)
+
+
+	@acc: // pointers?
+		debugger
+
+
+	@brel: // ++, --, -
+		debugger
+
+
+	@arel: // ++, --, 
+		debugger
+
+
+	@type: // 
+		// bit narrowing, float conversion, etc?
+		// could be others too? vectors?
+		debugger
+
+	(ASMtmp.iDebugger):	ASMtmp.Debugger // 63==max
+	(ASMtmp.iif):		ASMtmp.If
+	(ASMtmp.irejoin):	ASMtmp.Rejoin
+	(ASMtmp.ireturn):	ASMtmp.return
+	(ASMtmp.iwhile):	ASMtmp.While
+
+	@tmp:
+		if exp == "debugger":	return ASMtmp.Debugger(self, exp)
+		if exp == "if":			return ASMtmp.If(self, exp)
+		if exp == "rejoin":		return ASMtmp.Rejoin(self,exp)
+		if exp == "return":		return ASMtmp.Return(self, exp)
+		if exp == "while":		return ASMtmp.While(self, exp)
+		error (exp, "Unknown statement in ASM")
+		debugger
+
+
+module ASMtmp
+	function StateExpr	(fn_asm)
+	function Debugger	(fn_asm)
+		debugger
+
+	function If		(fn_asm)
+		debugger
+
+	function Rejoin	(fn_asm)
+		debugger
+
+	function Return	(fn_asm)
+		opt norefcounts
+		|| f = exp.first
+			rz = .µ(f)
+		.AddASM(exp, asm.RET, rz)
+
+	function While		(fn_asm)
+		debugger
+
+	constants
+		iDebugger	= 63
+		iIf			= 62
+		iRejoin		= 61
+		iReturn		= 60
+		iWhile		= 59
+		iSwap		= 58
+	
+	
+
+extend MsgUIFlags // ideal... better than above.
+	constants
+		Debugger	= 63
+		If			= 62
+		Rejoin		= 61
+		Return		= 60
+		While		= 59
+		Swap		= 58

@@ -1,0 +1,15 @@
+
+				
+	  
+
+main 	  	  	  	  	  	 	// main {
+	error.AutoPrint = 1
+	InternalTable.Build						#require
+	package.LoadPack						#require
+	internaltable.ReGather					#require
+	function.LoadApp						#require
+	class.Behave							#require
+	debugger.load
+	rz  = apptable[0].Run
+	rz := apptable[1].Run
+

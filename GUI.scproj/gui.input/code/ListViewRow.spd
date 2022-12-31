@@ -1,0 +1,249 @@
+
+
+			
+
+
+role ListViewRow (message)
+	linkage
+		cpp_part Row
+	contains ListViewRow
+	constructor
+		is editable
+
+	function State (|ListViewState|)
+		return .flags
+
+	function State (assigns:|ListViewState|)
+		.flags = value
+
+	syntax is (|ListViewState| s, |bool|)
+		if self
+			return .state & s
+
+	syntax isnt (|ListViewState| s, |bool|)
+		return !.syntaxis(s)
+
+	syntax is (|ListViewState| s, assigns:|bool| b)
+		if b
+			.state |= s
+		  else
+			.state &= ~s
+
+	syntax isnt (|ListViewState| s, assigns:|bool| b)
+		.syntaxis(s)=!b
+
+
+	function Vis (|int|i, |bool|)
+		if !self
+			return true
+		return !((.Indent)&(1<<i))
+		
+
+	function AllExpandState (|int|)
+		opt norefcounts
+		for r in self
+			if (r is expanded) and r.hasany
+				rz |= 2
+			  else
+				rz |= 1
+
+
+	function HierEnd (|listviewrow| root, |bool| searchall = false, ||)
+		opt norefcounts
+		rz = self
+		while searchall or (rz is expanded) or (rz == root)
+			rz = rz.last		#loop
+
+
+	function HierPrev (|listviewrow| root, |bool| searchall=false, || )
+		opt norefcounts
+		|| p = .Prev
+			return p.hierend(root, SearchAll)
+		p = .parent
+		return (nil, p)(p == root)
+
+
+	function HierNext  (|listviewrow| root, ||)
+		opt norefcounts
+		if (self is expanded) or (self == root)
+			return .flatnext
+		return .next oar .flatafter
+	
+	
+	function IsSelected	(|bool|)
+		return .state & ListViewState.selected
+		
+	
+	function InView (|listview| Of, |bool|)
+		opt norefcounts
+		|| f = of._Scroll$
+		for of.VisibleRows
+			if f == self
+				return true
+			f++
+			require f
+		
+	
+	function ListView.DrawCell (|ListViewrow| R, |int| x, |ListViewcell|)
+		// So... what are columns
+		// 0-100 --> 30, 60
+		// if x < a number, we are in that thing.
+		|| col = 0
+		for i in (1 to .DrawCols-1)
+			if .columns(i) >= x
+				exit
+			col++
+		return ListViewcell(R, col)
+	
+		
+	function RemoveQuietly (|listview| lv)
+		.remove(lv, false)
+	
+	
+	function Remove (|listview| lv, |bool| Update=true)
+		if (lv)
+			lv.removerow(self, Update)
+		else
+			super.remove
+
+
+	function ChangeSel (|bool| Newstate, |int|)
+		if NewState == (self is selected)
+			return 0
+		if NewState and (Self is disabled)
+			return 0
+		(self is selected) = newstate
+		return 1
+
+
+	function NextSelected (||)
+		opt norefcounts
+		|| f = .next
+		while f
+			if f is selected
+				return f
+			f = f.next
+
+
+	function DrawSep (|ivec4| rect, |image| Where)
+		opt norefcounts
+		|| y = (rect.y + rect.y2+1)/2
+		rect = (rect.x, y, rect.x2+1, y+1)
+		|ImagePixel| A
+		A <~ ((1.0, 1.0, 1.0, 0.25))
+		where.FillRect(Rect, A, A) 
+	
+	
+	function DrawDividerH (|ivec4| z2, |image| Where, |ListView| p, |int| i)
+		opt NoRefCounts
+		require (self isnt disabled) and (.prev isnt disabled)
+		|| Vis	= .vis(i)
+			Where.markh(z2.x1y2, z2.width)
+
+	function DrawDividerV (|ivec4| z2, |image| Where)
+		Where.markv(z2.x1y2, 		z2.height)
+		Where.markv(z2.x2y2+(1,0),	z2.height)
+
+	
+	function ListRowDraw (|ivec4| Rect, |image| Where, |ListView| p, |int| depth)
+		opt NoRefCounts
+		require self and (p isnt decluttered)
+		|| w	= p.window	
+		|| z2	= rect
+		
+		where.controlclip = rect.clip(p.lastrect)
+		for i in p.DrawCols
+			rect.horz	= p.col(i, z2, self)
+			rect.x	   += depth*font.width*2
+			.DrawRowColumn(rect, where,  p, depth, i) 
+
+		if self is active
+			where.horz	= z2.h
+			where.drawcircle( z2 + (4,0,-4,0), ¥.WhiteStyle, 1)
+		
+		if self is Greyed
+			|| gr = colors.grey(0.4)
+			where.fillrect(z2 + (0,0,0,-1), gr, gr)
+			
+		if (self is found)
+			z2 += (0, 1, 0, 0)
+			z2.y2 = z2.y + 1
+			where.fillrect(z2, ¥.textselection.edge, ¥.textselection.edge)
+
+
+	function DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column)
+		opt NoRefCounts
+		
+		|| g		= parent.gnormal // unecessary? drawsep doesnt even use gnormal!
+		|| na = .__text__(column)
+		if !na and (self is disabled)
+			.DrawSep(Rect, where)
+			return
+		
+		|| R		= Rect.TextCorner(g, na, .state)
+		|| sighy	= ((rect.y + rect.y2)/2) - 3
+		|| moved	= (parent.OnDrawRow)(self, Rect.y1, sighy, where, parent, column)?
+
+		R.x += moved.x
+		if .vis(column)
+			if parent.MultiLineDraw
+				r.y = rect.y2-10
+			|| TextCol	= parent.colorrow(depth, column, moved.y)
+			font.small.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
+
+
+
+datatype ListViewState (uint16)
+	flags
+		AlignLeft = 0
+		Align		= (AlignCenter, AlignRight)
+		Selected 
+		Modified
+		Disabled
+		Greyed
+		Active
+		Editable
+		Broken		
+		Dead		
+		Expanded
+		Found
+		Hierarchical
+		DrawWhiteSpace
+
+
+role ListViewCell (message)
+	linkage
+		cpp_part Cell
+	constructor (|ListViewRow| owner, |int|i)
+		.obj = owner
+		.position = i
+	function Column (|int|)
+		if self
+			return .position
+	function Original (|ListViewrow|)
+		if self
+			return .obj|ListViewrow|
+	syntax cast (|string|)
+		return self$.value
+	function Step (|int|i, |ListViewcell|)	
+		return .step(i, .position)
+	function Step (|int|i, |int|col, |ListViewcell|)
+		cpp_Part StepCol
+		|| c = .obj|ListViewrow|.move(i)
+			return ListViewcell(c, col)  
+	syntax equals (|ListViewcell|c, |bool| aware, |bool|)
+		return c.obj == .obj  and  c.position == .position
+	function Value (|string|)
+		require self
+		return .original.__text__(.column)
+	
+	
+	function tab (|bool| dir, |ListView| lv, |ListViewcell|)
+		|| n    = .column + (1, -1)(dir)
+		|| cols = lv.DrawCols
+		if n >= cols
+			return .step( 1, 0)
+		if n < 0
+			return .step(-1, cols-1)
+		return ListViewcell(.original, n)
+

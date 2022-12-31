@@ -1,0 +1,21 @@
+
+
+
+function package.Glob (|int| size)
+	opt norefcounts
+	|| ptr_size		= platform.PointerBytes
+	|| n_strs		= package.strings.slowcount
+	expect (n_strs <= 1000_000) ("Too many strings in pack: " + n_strs.render)
+	size		   += (n_strs+1)*ptr_size
+	.globals = Memory(size, 1)	#require
+	|| write = .globals.Ptr|&string|
+	for ch in .strings
+		*(write++) = ch.name
+		write = write + 1
+
+
+// globals
+	// strings
+	// (load-time computed constants)		// later
+	// vars (ints/object)
+	// (thread_local)						// later

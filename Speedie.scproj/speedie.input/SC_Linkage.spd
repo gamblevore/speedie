@@ -1,0 +1,42 @@
+
+
+
+module Linkage
+	|| Dict  = message()
+	|| Flags = message() // for the linker i guess...
+	
+	function Interpreter (|bool|)
+		return linkage..interpreter.yes
+	function conf (|string|name, |message|)
+		return .dict[name]
+	syntax access (|string| name, |string|)
+		return .flags[name].nyme
+
+	function LinkerSub (CollectFunc)
+		|| arg = node[@arg]
+			|| cf = arg..flags
+				cf.remove
+				.flags.takeallfrom(cf)
+
+			.dict.TakeAllFrom(arg)
+			return Compiler.program
+	
+	
+	function Collect (CollectFunc)
+		expect  (name_space == Compiler.Program)  (node, "This must be at root.")
+
+		return LinkerSub(node, name_space, ErrPlace)		#expect (ErrPlace, `Supposed to be like: linkage { osx = "linker flags", win = "linker flags2" }` )
+
+
+
+
+module InbuiltShellArgs
+	function Collect (CollectFunc)
+		expect  (name_space == Compiler.Program)  (node, "This must be at root.")
+
+		|| ShellArgs = node[@list].listall
+		feedback.ParseArgsSub(shellargs)
+		
+		return Compiler.program
+
+

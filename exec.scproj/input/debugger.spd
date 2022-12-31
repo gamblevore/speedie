@@ -1,0 +1,10 @@
+
+module debugger
+	|message| root
+	|message| meta
+	function Load (|bool|)
+		ifn debugger.root
+		return true
+		
+		// if we fail... but don't NEED a debugger... we just still return true
+

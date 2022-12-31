@@ -1,0 +1,33 @@
+/*	Jeebox internals. By Theodore H. Smith...*/
+
+
+class StringFields
+	linkage
+		cpp_part FI
+
+	|string|		Data
+	|Byte|			Sep
+
+	constructor (|string| Source,  |Byte| Sep = '\n')
+		.Data = Source
+		.Sep  = Sep		// not as fast as ElfDataFields ... that was so highly optimised it was crazy. 
+
+	
+	function NextSep (|int| Prev, |ind|)
+		return .Data.find( .sep, Prev )
+
+
+	function Field (|ind| Prev, |ind| Curr, |string|)
+		Curr := .Data.length
+		return .Data[Prev, Curr]
+
+///////////////////////////////////////////////////////////////////////////
+
+	iterator
+		|| Prev = 0
+		while (.Data != nil) {
+			|| Curr_ = .NextSep(Prev)
+			yield  .Field( Prev, Curr_ )
+			Prev = Curr_ + 1
+		} (Curr_)
+

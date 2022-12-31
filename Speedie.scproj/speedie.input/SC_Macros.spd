@@ -1,0 +1,88 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+module Macros {
+|| FS = "|| fs = faststring()".macro
+
+|| InitExpand = "({
+	|| _X = _0
+	if !_X
+		_X = _1
+		_0 = _X
+	rejoin _X
+})".macro
+
+|| Worked2 = "({
+	|| _ErrCount = stderr.errorcount 
+	(_0)
+	rejoin stderr.errorcount == _ErrCount 
+})".macro
+
+|| ASM_Datatype = "datatype _0 (ASM) 
+	module
+		function Encode (ASM_Encoder2,)
+			rz = .op << 25
+		
+ASM.Forms[_1] = &_0.Encode // for now
+".macro
+
+|macro|     Copier  = "rz._0 = .r[_1]".macro
+|macro|     Copier2 = "rz._0 = .rest".macro
+|macro|		Setter = "function asm._0 (assigns:|uint|, |asm|): return self (|) ((value << _1) >> _2)".macro
+}
+
+
+
+function message.CleanBecome (|macro| m)
+	if !m.Cleaned
+		m.cleaned = true
+		m.Pz.clean
+	.become(m)
+
+	
+function message.TargetTest (|bool|)
+	if self ~= "debug"
+		return options.TargetDebug
+	if self ~= "release"
+		return !options.TargetDebug
+	if self ~= "perry"
+		return options.perry
+	if self ~= "true"
+		return true
+	if self ~= "false"
+		return false
+	if self ~= "osx"
+		return Platform.osx
+	if self ~= "win"
+		return Platform.windows
+	if self ~= "lnx"
+		return Platform.linux
+	if self ~= "direct"
+		return options.IsDirectTest
+	return targets[.name]
+
+
+function message.tran_target (|message|)
+	.tran_targetsub
+	rz  = .next
+	rz := .flatafter
+	.remove
+
+
+function message.tran_targetsub
+	opt norefcounts
+	|| value = self[@nil]
+	|| use_second = (value == @brel and "!")
+		value = value.first
+	
+	|| arg = self[@arg, 1]
+	require arg and value.expect(@thg) 
+	
+	if value.TargetTest == use_second
+		arg = self[2][@arg]
+
+// can't handle target false
+	while arg.hasany
+		.next = arg.pop

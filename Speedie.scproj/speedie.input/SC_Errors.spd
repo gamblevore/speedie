@@ -1,0 +1,292 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+// * Setting the func as an integer, actually would help a lot!
+	// * We can compare funcs as integers, which lets us do bit-tests!
+	// * I suppose @thg would have to be considered... a number? Or else we get slow obj->num conversions when we test if message.type = @thg...
+
+
+// * There's another issue with errors...
+	// * Yep... Perhaps errors should have a... "level" associated with them???
+	// * So! No... "warn/assert" thing? Just expect/etc.
+	// * makes it simpler... less stuff.
+		// * Only 3 types...
+		// * return		 (require)
+		// * error		  (error)
+		// * return + error (expect)
+	// OK so! Thats nice. In fact, only error and expect could have "warn levels"...
+	// * while it is nice to say... ".OK" on StdErr... I think that's not actually OK.
+		// * Stderr.OK could be: return (.ErrorCount > 0)
+	// * Is it better to have just one global error-catcher?
+		// * And warn/etc be subclasses?
+		// * Or sub-lists?
+	// * OR have just StdWarn, StdErr, StdWhatever as globals...
+		// * somehow I like this more...
+		// * The thing is... subparsers/processors want to put their stuff into the global error thing?
+	// * whatever :)
+
+
+// * Printing to stderr makes it actually a lot harder to debug :( What with chaining of outputs and stuff... Or else why does the output not come through?
+	// * it's easier to have ONE output that may be success or error or whatever!
+	// * Harder to dump to a file too, when we have streams going all over... 
+
+
+// * "assert" should be the one that takes zero identifiers to WHERE the error occurred...
+	// * what's the point of an error and no clue to where it happened?
+	// * assert would use a string for the file-name and a line-number... :)
+	// * maybe a function name too...
+	// * otherwise identical... to error.
+// * the thing is... it seems most of them, we want variants that return, or don't return...
+// * except require, which of course only returns...
+// * error vs expect
+// * warn vs ?
+// * assert vs ?
+/*
+	|| X = bla() #expect // auto-location param?
+	|| X = bla() #assert
+	expect X // auto-location param?
+	require X
+	error X // so is X a location or a condition?
+	
+	|| X = bla() #assert and #require	 // seems simple enough.
+
+	|| X = bla() #assert
+	require X // clumsy
+*/
+
+
+module SC_Errors
+	linkage
+		cpp_part Errors
+	
+	function Color (|string| Col)
+		if Pipe.ErrorIsTerminal
+			PrintError( Col )
+	
+/*	
+0: reset colors/style
+1: bold
+4: underline
+30 - 37: black, red, green, yellow, blue, magenta, cyan, and white text
+40 - 47: black, red, green, yellow, blue, magenta, cyan, and white background
+*/	
+
+	|dictionary of message| IgnoredBranches = dictionary.new
+
+	function AlreadyIgnored (|Message| F, |bool|)
+		|| RipRoot = F$.MsgOwningFunc$.SourceArg
+		for Curr.up in F
+			if (Curr == @arg) and (.IgnoredBranches[Curr._DictName])
+				return true
+			require (Curr != RipRoot)
+
+	
+	syntax access (|Error| Err, |bool|)
+		if Err is dontstrip
+			return true
+		if (!Err.node or Err.iswarning)
+			return true // why not
+		
+		|| A = Err.node.Ancestor(@arg)
+		if Options.HideMultipleErrors
+			require !.AlreadyIgnored(A)
+		.IgnoredBranches[A._DictName] = A
+		return true
+
+
+
+function SCWarn (|Message| node, |string| s)
+	StdErr.newwarning( node, s )
+
+ 
+function Compiler.PrePrintErrors
+	for err in stderr.errors
+		err.improve
+	ifn options.KeepAllErrors
+		for err in stderr.errors
+			ifn SC_Errors[err]
+				err.remove
+
+
+function Compiler.PrintErrors (|errorseverity| MinSev)
+	|| s = .builderrors(minsev)
+	if options.perry or stderr.errorcount
+		if options.perry == 2
+			s = s.digest
+		printerror s
+	  else
+		print s
+
+
+function Compiler.BuildErrors (|errorseverity| MinSev, |string|)
+	|| Printable = stderr.problemcount+stderr.errorcount 
+	if (Printable and minsev < errorseverity.problem)
+		minsev = errorseverity.problem
+	
+	|| Count = 0
+	|| msg = faststring()
+	for (err in stderr)
+		if err.ErrorLevel >= MinSev
+			Count++
+			err.scrender(msg)
+
+	if !count
+		|| problems = 0
+		for (err in stderr)
+			if (err.ErrorLevel == errorseverity.problem)
+				if ++problems <= 10
+					err.scrender(msg)
+	  elseif !options.perry
+		msg.problemsfound(count)
+	
+	return msg
+
+
+function Message.FileLocation (|string|)
+	opt norefcounts
+	return .SCfile$.path
+
+
+function Error.Improve
+	opt norefcounts
+	|| node = FindBytePos( .node )		#require
+	
+	ifn .HasPosition
+		.position = node.position
+
+	if !.path
+		|| SC = node.SCfile$
+		ifn sc == .node.scfile
+			.node = node // wrong file!!
+		if sc.exists
+			.path = sc.path
+
+
+function FindBytePos (|Message|Node, |bool| EndInside=false, |Message|)
+	opt norefcounts
+	if !node or node.HasPosition
+		Return node
+
+	// OK so now let's go inside...
+	for m.flat in node
+		if m.HasPosition
+			Return m
+
+	require !EndInside
+	|| msg = FindBytePos( node.parent, true )
+		Return msg
+
+
+	// last try...
+	|| fn = node.MsgOwningFunc
+		return FindBytePos( fn.Source, true )
+
+
+
+extend Error
+	function SCGrabLine (|faststring| fs, |bool| Usecolor)
+		if Usecolor
+			fs <~ ErrorColors.Normal
+
+		|| d = .SCOriginalData	#require
+		require .HasPosition
+
+		|| Start  = d.find( jeebox.csline, .Position, 0	) + 1
+		|| Finish = d.find( jeebox.csline, .Position... )
+		if (Finish == -1)
+			Finish = D.Length + 1
+		
+		|| Line = d[Start, Finish]
+		Line = Line.ReplaceAll("\t", " ")
+		fs <~ Line
+		// mark where in the line the error occurs?
+
+		|| Spaces = (.Position - Start)
+		debug_require (Spaces < 100) // it happened once, due to bugs. Another bug could cause this to be off and ruin things.
+		fs <~ '\n'
+		if Usecolor
+			fs <~ ErrorColors.Underline
+		fs <~ (' ', Spaces)
+		fs <~ '^'
+
+
+	function SCOriginalData (|string|)
+		|| p = .SCoriginalpath
+		if p
+			return p.filedata
+		return .originaldata
+
+
+	function SCOriginalPath (|string|)
+		return .node.filelocation oar .path
+
+
+	function SCLineCount (|int|)
+		|| f = .SCOriginalData	#require
+		return .LinePos( f )
+	
+	function SCLineIdentifiers (|faststring|fs, |string| Data)
+		if (!.HasPosition)
+			|| fn = .node.MsgOwningFunc #require // fallback...
+			fs <~ fn.ExportName
+		  else
+			fs <~ (.SCLineCount	 #require)
+			fs <~ ":"
+
+			|| Start = Data.find( jeebox.csline, .Position, 0 )
+			fs <~ .Position - Start
+			fs <~ ":"
+
+
+	render render_unix
+// <path>:<line number>:<bytedownline>: error/warning: <message>
+///.../Speedie.scproj/BuildTest/JB.cpp:2679:10: error: conflicting types for 'JB__Comp_InputFile'
+
+		if options.color: fs <~ errorcolors.Bold
+
+		|| data = .SCOriginalData
+			|| p = .SCOriginalPath oar "(string)"
+			fs <~ p
+			fs <~ ':'
+			.SCLineIdentifiers(fs, data)
+			
+		  elseif (.node) // wyyyyyyyy
+			.node.render(fs)
+			|| fn = .node.msgowningfunc
+			if (fn)  // could be an error in a variable outside of a func! (module/global)
+				fs <~ " in:\n"
+				.node.msgowningfunc.render(fs)
+		
+		fs <~ ' '
+		if options.color
+			if (.iswarning)
+				fs <~ errorcolors.warn
+			else
+				fs <~ errorcolors.Error
+		
+		.errorlevel.render(Fs)
+		fs <~ ": "
+		if options.color: fs <~ errorcolors.Bold
+		fs <~ .name
+		fs <~ '\n'
+
+					// fs.whoops
+					//   ^
+		.SCGrabLine(fs, options.color)
+		fs <~ '\n'
+
+		if options.color: fs <~ errorcolors.Normal
+		
+
+		
+	render SCRender
+		// probably not needed, but whatever leave it for now.
+		.path := .SCOriginalPath oar "(string)"
+		if options.perry
+			.render(fs)
+		  else
+			.render_unix(fs)
+

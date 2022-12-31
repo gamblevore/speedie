@@ -1,0 +1,79 @@
+
+
+selector Instruction // class instruction
+	initafter (µform)
+	
+	// jus a thing???
+	// with the functions right?
+	// how they are loaded.
+
+	// So yeah.
+	
+	|byte|			OpLength
+	|byte|			aType
+	|byte|			PCount
+	|µForm|			Sizes
+	|string|		FormName
+
+	
+	constants
+		kTypeConst		= 2
+		kTypeFunc		= 1
+
+	instructionlist // magically extracts selector-items from "vm. box"
+
+	
+	render
+		fs <~ .name
+	
+	function selector_init (|string| formName, |int| num=1)
+		.oplength = num
+		.formname = formname
+
+	function ActualInit
+		.sizes = µform.NeedForm(.FormName)$
+		.PCount = .sizes.count
+		instruction.store(self)
+
+
+	syntax equals (|string| other, |bool| aware, |bool|)
+		return .name.syntaxequals(other, aware)
+	function IsFunc (|bool|)
+		return .atype == kTypeFunc
+
+	syntax access (|int| i, |µParam|)
+		return .sizes.params[i]
+
+	function IsSetConst (|bool|)
+		return .atype == kTypeConst
+
+	function Const 
+		.atype = kTypeConst
+		//.NoExpect // shouldnt have removed this?
+
+	function opcode (|uint|)
+		return .id
+
+	module
+		|dictionary of instruction|			TypeDict
+		|instruction[256]|					TypeList
+		|int|								TypeListSize
+
+		syntax access (|message| m, |instruction|)
+			opt norefcounts
+			return TypeDict[m.name]			#expect (m, "Isn't a valid instruction.")
+
+
+		function Store (|instruction| i)
+			if .typelistsize++ != i.id
+				debugat
+			.TypeDict := dictionary.new
+			.typelist[i.id] = i
+			.typedict[i.name] = i
+
+
+		function InitAll
+			opt norefcounts
+			for i in instruction.__first
+				i.ActualInit
+

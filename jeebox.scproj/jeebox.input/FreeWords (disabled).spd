@@ -1,0 +1,210 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+extend Parser
+	function GrabLine (|bool|)
+		return .Process( kWords_Line, Parser.kAllow )
+	
+
+	function CountIndents (|int|)
+		while
+			if .EatsByte( '\t') // % goes (up, to: the~next~4)
+				rz += (4 - rz mod 4)
+			  elseif .eatsbyte(' ')
+				rz += 1
+			  else
+				exit
+		rz >>= 2
+	
+	
+	function HandleBlocks (|Message| R, |int| Diff, |Message|)
+		while (diff > 0)
+			diff--			// the Start param here, doesn't seem right... 
+			R = parser.new(R, @blok, parser.nextstart)
+		while (diff < 0)
+			diff++
+			R = R.parent
+		return R
+
+
+	function EndToken (|string|s)
+		|| Start = .CleanSpaces
+		if .data[start, s]
+			.NextStart = Start + s.length
+		  else
+			.ErrorAdd( "Missing end $s" )	
+
+
+	function fCNL (ParseHandler)
+		|| Result = parser.new(nil, @fwrd, start)
+		|| Block = Result
+		|| LastCount = 0
+		
+		while {
+			|| Count = parser.CountIndents
+			Block = parser.HandleBlocks(Block, Count - LastCount)
+			LastCount = Count
+			|| line = parser.Words_Line
+			Block <~ line
+		} (line and parser.GrabLine)
+		
+		parser.EndToken( "/~" )
+		return result
+	
+
+	
+	function Words_Line (|Message|)
+		|| Result = parser.new(nil, @Line, .nextstart)
+		parser.Words_ReadItems(Result)
+
+		|| C = Result.First
+		if (C == "*")
+			Result.Name = "*"
+			C.Remove
+		return result
+
+
+	function MoreCNL (|bool|)
+		return !.CheckEnded(kWords_Line + kEndContainer)
+
+
+	function Words_ReadItems (|Message| line)
+		while (.MoreCNL) {
+			|| msg = .Process( kFreeWords )
+			line <~ msg
+		} (msg)
+
+
+// **__head__**
+	
+	function fStyle (ParseHandler)
+		|| name = parser[Start, parser.NextStart]
+		if (StyleArray)
+			require (StyleArray.last != name)
+		
+		|| result = parser.new(nil, @Styl, start, name)
+		result.name = name
+		StyleArray <~ name
+
+		parser.Words_ReadItems(result)
+		StyleArray.trim		
+		parser.EndToken(name)
+
+		return result
+
+
+	function fCNLBracket (ParseHandler)
+		rz = parser(nil, @Bra, start)
+		rz <~ parser.Words_Line
+		parser.ExpectEndChar(')')
+
+
+	function fEntity (ParseHandler)
+		rz = parser.newWord( nil, @Ent, start, start + 1 )
+		parser.ExpectEndChar(';') // how disallow spaces inside ents? :( nvm, later!
+		// also spacing issues around ents!
+		// "a&amp;b"  renders as  "a &amp; b"
+		// either I put spaces into the CNL... OR...
+		// I make some feature where you can render stuff with the original spacing
+		// this is an intended feature so its better...
+
+
+	function fCNLGroup (ParseHandler)
+		|| Result = parser(nil, @Groo, start)
+		Result <~ parser.Words_Line
+		parser.ExpectEndChar('}')
+		return result
+
+
+	function fCNLBlock (ParseHandler)
+		rz = parser(nil, @blok, start)
+		parser.Words_ReadItems(rz)
+
+	function InitFreeWords
+		|| CNPunkt    =    ", . ; ! ? ... * - / + ="
+		|| CNStyle    =    `** -- ## \\ " ' ::`
+		// don't use "||" as a style, it breaks parsing of "|| varname"
+		// and the fix for that "just use the shorter string"... BREAKS
+		// parsing of other things...
+
+
+/*
+		
+	binary =    ~~| asdasdas |~~
+	binary =     -| asdasdas |-
+	binary =    --| asdasdas |--
+	binary =   ---| asdasdas |---
+	binary =  ----| asdasdas |----
+	binary =    ##( asdasdas )##
+	binary =     #( asdasdas )#
+	binary =    ##( asdasdas )##
+	binary =     <( asdasdas )>
+	binary = -----| asdasdas |-----
+
+*/
+
+		parser.Tokenz( "~/",   			kThingSyx,                  fCNL				)
+		parser.Tokenz( "`",				kFreeWords,					fBackTick			)
+		parser.Tokenz( "(",				kFreeWords,					fCNLBracket			)
+		parser.Tokenz( "{",				kFreeWords,					fCNLGroup			)
+		parser.Tokenz( CNPunkt,         kFreeWords,					fThingSyx			)
+		parser.Tokenz( "\t",			kFreeWords,					fCNLBlock			)
+		parser.Tokenz( CNStyle,         kFreeWords,					fStyle				)
+		parser.Tokenz( "&",             kFreeWords,					fEntity				)
+
+
+
+extend Message
+	function RenderWithLines (|FastString| fs)
+		for (ch in self)
+			fs <~ '\n'
+			start
+			fs <~ ch
+
+
+	syx Fwrd (Freestyle_Words)
+// reset the indent?
+		|| X = fs.indent
+		fs.indent = 0
+
+		fs <~ "~/ "
+		.RenderWithLines( fs )
+		fs <~ " /~"
+		fs.indent = X
+
+	
+	syx Blok (Words_Block)
+		fs.indent++
+		.RenderWithLines( fs )
+		fs.indent--
+
+	
+	syx Line (Words_Line)
+		fs.AppendIndent
+		if (.Name)
+			fs <~ .Name
+			fs <~ ' '
+		.RenderWithSpaces( fs )
+
+
+	syx Groo (Words_Group)
+		fs <~ '{'
+		.RenderWithSpaces( fs )
+		fs <~ '}'
+
+
+	syx Styl (Words_Style)
+		fs <~ .name
+		.RenderWithSpaces( fs )
+		fs <~ .name
+
+
+	syx Ent (Words_Entity)
+		fs <~ '&'
+		fs <~ .name
+		fs <~ ';'
+

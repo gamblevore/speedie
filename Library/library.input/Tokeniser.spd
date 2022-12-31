@@ -1,0 +1,80 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+class TokenHandler
+	linkage
+		wrapper
+		cpp_class TokHan
+		cpp_part TH
+	
+	function Link (|int| BitTypes, |TokenHandler_fp| Func, |TokenHandler|)
+		cpp_wrapper JB_TH_Link
+
+
+
+extend Parser {
+	function NextByte (|int|)
+		cpp_wrapper
+
+	function Eats ( |string| s, |bool| )
+		cpp_wrapper JB_Tk__EatString
+	
+	function Avoid (|message|)
+		return endoflinemarker
+
+	function ErrorStart (|ind|)
+		cpp_wrapper
+
+	function ErrorStart (assigns:|ind|)
+		cpp_wrapper
+
+	function StartParse (|string| result) { cpp_wrapper  }
+	function StopParse { .startparse(nil) }
+
+	function NextStart (|int|)			{ cpp_wrapper	}
+	function NextStart (assigns:|int|)	{ cpp_wrapper  }
+
+	function Running (|bool|)			{ cpp_wrapper  }
+
+
+	function CppInited (|bool|)
+		cpp_wrapper 
+	function Token (|string| name, assigns:|TokenHandler|)
+		cpp_wrapper
+	function Token (|string| name, |TokenHandler|)
+		cpp_wrapper
+	function TokenNil (|string| name, assigns:|TokenHandler|)
+		cpp_wrapper
+	function Handler (|int|BitTypes, |TokenHandler_fp|Func=nil, |TokenHandler|)
+		cpp_wrapper
+	function Process (|int|BitTypes, |bool|Mode=false, |message| paren=nil, |message|)
+		cpp_wrapper
+	function CleanSpaces (|int|)
+		cpp_wrapper
+	function ClearIndent (|int|)
+		cpp_wrapper
+
+
+	function Expect (|int|BitTypes, |bool|)
+		cpp_wrapper
+
+	function Allow (|int|BitTypes, |bool|)
+		cpp_wrapper
+
+	function Consume (|int|BitTypes, |bool|Expect, |bool|)
+		cpp_wrapper
+
+	function CheckEnded (|int|BitTypes, |bool|)
+		cpp_wrapper
+	
+	// function Indentation (|int| Start, |int|) { cpp_wrapper }
+//	|| Tabs = .Indentation(start+1)
+	// ignore " "
+	// "check for "/" "\n" "\r"
+//	|| DarkSpaces = .SpacesBeforeDark(start+tabs)
+}
+

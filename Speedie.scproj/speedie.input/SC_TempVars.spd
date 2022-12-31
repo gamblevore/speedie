@@ -1,0 +1,214 @@
+
+
+function message.EmbToString
+	if (self == @emb) and !.name
+		.func = @str
+		scfunction.ObjectifyString(self)
+
+
+
+function Message.HasOwnBlock (|Message|)
+	|| arg = .parent
+	require (arg == @rel)
+	arg = arg.parent
+	require (Arg == @decl) 
+	arg = arg.parent
+	require (arg == @arg)
+	|| obj = arg.asarg
+	debug_require (obj isa scarg)
+
+	if (obj.TmpMovedOutFor == self)
+		return arg
+
+
+function Message.CreateOwnBlock (|bool| ForSelf=true, |Message|)
+	//  adds new ({}),  marks it as temp-exprblock for parent,  and puts in the right place
+
+	using (self)
+		
+	|| NewArg = «arg »
+	|| bra = «bra, NewArg »
+	bra.obj = .obj
+	.replacewith(bra)
+	
+	|| NewObj = NewArg.scarg(nil)
+	if (ForSelf)
+		NewObj.TmpMovedOutFor = self
+		newobj.IsStatementExpr = true // jeez sheesh. shouldn't have to set this?
+	return NewArg
+
+
+function message.TheTmpVarOf (|string| tmpname, |message|)
+	|| d = .AsDecl.Copy
+	d.Name = ""
+	rz = «Thg tmpname »
+	rz.obj = d
+
+
+
+function Message.TempIntoBlock (|message| ParentPlace, |Message|)
+// We wanna merge all the temp funcs into one...
+// Will make it harder if we use tempintoblock from multiple places...
+// cos then "How it is used" becomes important.
+
+	|| FuncMsg = .parent
+	if (funcmsg == @dot) and (funcmsg.first == self)
+		0 // || x = R.pop().Property
+	  else
+		debug_require (FuncMsg==@prm)
+		FuncMsg = FuncMsg.parent
+
+	|| fn = FuncMsg.MsgFunc
+	debug_require (FuncMsg==@func or @dot) and (!fn or fn.class == scfunction)
+	
+	ifn fn and fn.ReturnType
+		scfunction.TempMoveOut(self, parentplace)
+		return nil
+	
+	|| Using = .syntaxusing
+	|| arg = FuncMsg.HasOwnBlock
+	|message| TmpFuncThg
+	|message| TmpFuncDecl
+	if (Arg)
+		|| rel = FuncMsg.parent
+		TmpFuncDecl = rel.parent
+		TmpFuncThg = rel.first
+	  else
+		arg = FuncMsg.createownblock #require
+		|| TmpFuncVar = UniqueTmpVar(nil)							// "t2"
+		TmpFuncThg = .TheTmpVarOf(TmpFuncVar)
+		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg )		    // || t2 = func(t1, c.d)
+		arg <~ TmpFuncDecl
+		arg <~ «tmp "rejoin", TmpFuncThg »							// t2
+
+	|| TmpParamName = UniqueTmpVar(nil)								// "t1"
+	rz = funcmsg.TheTmpVarOf(TmpParamName)				// t1
+	.ReplaceWith( rz )										// func(a.b.b2, c.d) --> func(t1, c.d)
+// || t1 = a.b.b2
+	|| TmpParamDecl = MakeDecl( "", TmpParamName, self )
+	TmpFuncDecl.prev = TmpParamDecl
+
+
+
+function message.IntoVariable (|scbase| name_space, |nameandmsg|)
+	|| P = .NiceParent
+	|| Place = P.IsInDeclInBlock
+		|| NameMsg = P.first.usenonrefchangers
+		if (NameMsg == @thg)
+			rz.name = NameMsg.name
+			rz.arg = place.Ancestor(@arg)
+			rz.msg = place.next // result uses .arg as backup if !.msg
+			return rz
+	
+	|| Block = .CreateOwnBlock
+	|| name = uniquetmpvar(name_space, "_imP")
+	
+	P = NewRel( @thg.msg(name), "=", self )
+	|| arg = block.asarg
+	Block <~ «decl
+		@emb
+		P
+	»
+	
+	// _tmp0 is a name that should never be used...
+	// except here.
+	
+	collectdecls(block, name_Space, arg)
+	block.parent.obj = arg[name]	// Stop collectdecls being called twice! (name-conflict errors)
+									// it's called in typeofblock, unless we already have the type
+									// which we just set here.
+	|| last = «tmp "rejoin"
+		«thg name »
+	»
+	 
+	block <~ last
+	rz.msg = last
+	rz.arg = block
+	rz.name = name
+
+
+
+struct NameAndMsg
+	|message|   Msg
+	|string|	Name
+	|message|   Arg
+	
+	syntax append (|message| m)
+		if (.msg)
+			.msg.prev = m
+		  else
+			.arg <~ m
+
+
+function UniqueNum (|int|)
+	Return ++SCGlobals.UniqueNum
+
+
+function UniqueTmpVar (|SCBase| base, |string| name = "tmP", |string|)
+	|| fs = FastString()
+	fs <~ '_'
+	fs <~ name
+
+	if (base)
+		|| FN = base.OwningFunc
+			fs <~ 'f'
+			fs <~ FN.TmpCounter++|int|
+	  else
+		fs <~ SCGlobals.UniqueNum++
+
+	return fs
+
+
+
+extend_module scfunction
+	function TempMoveOut (|Message| msg, |string|name="", |Message|)
+		cpp_part TypedTempMoveOut
+		// a.b.c -> || tmp1 = a.b.c
+	
+		|| Using = msg.syntaxusing
+		name := UniqueTmpVar(msg.msgowningfunc)
+		|| repl = «thg name »
+		msg.ReplaceWith( repl )
+		
+		|| p = repl.ParentPoint
+		|| insert = msg
+		if (msg == @rel)
+			insert = «bra, (msg)»
+	
+		|| dcl = MakeDecl( "", name, insert )
+		p.Prev = dcl
+		if (repl in @arg)
+			repl.Remove
+		
+		|| OldDcl = msg.AsDecl
+			insert.obj = OldDcl
+			OldDcl = OldDcl.Copy // no difference, its a temp
+			OldDcl.Name = name
+			repl.obj = OldDcl
+			dcl.obj = OldDcl
+		
+		Return dcl
+
+
+
+	function TempMoveOut (|Message| msg, |Message| parent, |Message|)
+		expect (msg != @str)
+		
+		|| OldDecl = msg.AsDecl
+		ifn olddecl
+			parent.prev = msg
+			return msg // right?
+	
+		|| Using = msg.syntaxusing
+		|| Name = UniqueTmpVar(msg.msgowningfunc)
+		|| d = OldDecl.Copy // no difference? This ACTUALLY may or may NOT be borrowed, BUT surely the temp should have the SAME borrowedness? Or else why are we temping it?
+		d.Name = ""
+		
+		// a.b.c -> || tmp1 = a.b, tmp1.c
+		|| NameThing = «Thg name »
+		NameThing.obj = d
+		msg.ReplaceWith( NameThing )
+		
+		(parent, namething)(parent).prev = MakeDecl( "", name, msg )		
+		Return NameThing
+

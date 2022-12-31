@@ -1,0 +1,41 @@
+//jb
+pack 0123123 // lib_date
+	meta
+		conf 
+			date // auto-generated
+			name
+			version
+		pictures
+
+	app GlobalSize
+		strs
+			"abc"
+			"def"
+		
+		link "malloc/JB_Alloc/whatever"
+		fncs
+			+"init"
+				<(`ASM`)>
+			+"main"
+				<(`ASM`)>
+			+"string.whatever"
+				<(`ASM`)>
+			+"string.reverse"
+				<(`ASM`)>
+
+		clss
+			+"example_class"  super_class
+				size 123
+				behaviours
+					destructor
+					render
+
+	debug
+		fn // string.whatever
+			var_ranges		(0 reg1 10, 5 reg2 15)
+			byte_file_poses	(1,2,3,4,5)
+
+		fn // string.reverse
+			var_ranges		(0 reg1 10, 5 reg2 15)
+			byte_file_poses	(1,2,3,4,5)
+

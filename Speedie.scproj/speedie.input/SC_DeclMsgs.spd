@@ -1,0 +1,229 @@
+
+
+
+function DeclsDefault (|Message| def, |Message|)
+	opt norefcounts
+	require (def and (def == @rel))
+	|| f = def.first 
+	|| s = f.next(@opp, "=")$
+	|| l = s.next
+	if f == @thg and l == @thg
+		expect !(f.name ~= l.name) (def, "Really bad error here!")
+	Return l
+
+
+function MakeDecl (|string| Type, |string| Name, |Message| Value, |Message|)
+	rz = «decl »
+	if (Type)
+		|| arg = rz.msg(@arg)
+		(arg is style2)
+		arg <~ (@thg, type)
+	  else 
+		rz <~ @emb
+	
+	|| NameMsg = «thg name »
+	if value
+		|| Rel = «rel
+			NameMsg
+			@opp+"="
+			value
+		»
+		NameMsg.obj = CopyDecl( value, name )
+		Rel.obj = NameMsg.obj
+		NameMsg = Rel
+	
+	rz <~ NameMsg
+
+
+function MakeDeclOrRel (|Message| Into, |message| namemsg, |Message| value, |Message|)
+	require into
+	rz = «decl
+		«emb »
+	»
+	
+	if value
+		Value = NewRel( NameMsg, "=", value )
+	  else
+		Value = NameMsg
+	rz <~ value
+	into.First = rz
+
+
+
+function SCDecl.NoFloat (|Message| exp, |bool|)
+	|| T = .type.TypeInfo
+	expect (T != DataTypeCode.UnusedType)	(exp, "Can’t do bit ops on this")
+	expect (!T.isfloat)						(exp, "Can’t do bit ops on floats")
+	return true
+
+
+
+function DefaultStitch (|Message| Default, |Message| args)
+	|| name = args[ 1 ] // a name...
+	using (args)
+	|| rel = «rel »
+	name.ReplaceWith( rel )
+	rel <~ name
+	rel <~ «Opp "="»
+	rel <~ Default
+
+
+function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSpace, |int| PropertyMode=0, |[SCDecl]|)
+	if (!DeclList)
+		return []
+	expect  (DeclList == @prm or @Arg)  (DeclList)
+	
+	|| OriginalErrCount = stderr.errorcount
+	|SCFunction|	Func
+	|SCClass|		Cls
+	
+	if (Name_Space isa SCFunction) and (DeclList == @prm)
+		func = Name_Space
+		cls = func.Cls
+		if (cls)
+			rz <~ cls.SelfStrong
+		  else
+			|| L = func.lookup
+			if (L isa SCModule)
+				cls = L.Cls
+	  elseif (AddToSpace isa SCClass)
+		cls = AddToSpace
+	
+
+	for item in DeclList
+		if (func and func.isassigns == 2) and item.islast
+			if !cls
+				error (item, "Can’t use this here." )
+			  else
+				// fn x (|int|) --> fn x (|int| value)
+				func.isassigns = 3
+				if cls.isdatatype
+					item.next = item.copy // fn x (|int|) --> fn x (|int| value, |int|)
+				item <~ «thg "Value"»
+			
+		if item == @Item
+			expect  (Func)  (item, "Can’t use this here." )
+			if item.first == "assigns" // remove this after fixing galaxxies :(
+				item = item.Last
+				func.IsAssigns = 1
+				if !item.haschildcount(2)
+					item <~ «thg "Value"»
+
+		if item != @Decl
+			expect (!Func)  ( item, "Not a declaration." )
+			continue
+
+		|| Types = item.first
+		|| Names = types.Next				
+
+		expect (Func or Names)  (item, "No name found.")
+		if (PropertyMode & 2)
+			expect (names == @thg) (names, "Must be a proper name.")
+
+		|| Default = DeclsDefault( names )
+		if names ~= "_fsf0"
+		|| Rdcl = ExtractDecl( Types, name_Space )
+		if (!rdcl and !default and (Name_space isa SCArg))
+			rdcl = name_space.ParentFunc.ReturnType
+
+		
+		|SCDecl| DefaultDcl
+		if (!Func) and (Default)
+			DefaultDcl = TypeOfExprNeeded( Default, name_space ) #require
+			if (rdcl)   // make sure it matches.
+				default = rdcl.ExpectMatch( DefaultDcl, kTypeCastTrue, default )
+			
+		  elseif (AddToSpace isa SCClass)
+			0 // no defaults... its a property
+			
+		  elseif ( !Func ) and ( rdcl ) and ( !Default ) and (rdcl.CanUseDefault)
+			Default = Rdcl.CreateDefault(types, AddToSpace isa SCArg)
+			if (Default)
+				TypeOfExpr( default, Name_Space )
+				DefaultStitch( Default, item )
+		
+		require (stderr.errorcount == OriginalErrCount)
+		
+		|bool| OriginalRdcl = rdcl
+		if (!rdcl)
+			if (cls) and (cls.Contained)
+				rdcl = cls.Contained // (|| x = Y), (|object| x = Y)
+			  else
+				expect (!Func)  ( item, "Function declarations need a type. (Unless it's in a container class.)" )
+				rdcl = DefaultDcl #expect ( item, "Missing type, or default value." )
+		
+		expect !(func and rdcl is Borrowed) (item, "Variables can’t be borrowed in function parameters or return")
+		
+		if rdcl.NeedsContainedfix
+			rdcl = rdcl.ContainedNilfix
+		
+		if !names		// a return value, how to return the return value?
+			expect ((Func and !func.ReturnType) and (!item.Next)) ( item, "Parameter is missing a name." )
+			if (Func)
+				expect !rdcl.Default
+				func.ReturnType = rdcl
+				expect rdcl isnt Borrowed
+			Continue
+		
+		
+		|| NameItm = item.GetDclName #require
+		
+		|| dcl = Rdcl.copy
+		|| IsFunctionBody  =  (AddToSpace isa SCArg)
+		if (!OriginalRdcl and IsFunctionBody)
+			Dcl.IsBorrowed = false
+
+		dcl.IsConst = false // erase IsConst, happens if we parse "|| bla = true"
+		if (!Func) and (dcl.Strength == kStrSharedParams)
+			dcl.Strength = 0
+		
+		nameitm.obj = dcl
+		if (nameitm in @Rel)
+			nameitm.Parent.obj = dcl
+		
+		dcl.Default = Default
+		dcl.Name = nameitm.name
+		if names and !Default
+			if names.next == @list
+				error names
+				dcl.setter = compiler.PrivateProperty
+			  else
+				names.expectlast
+		
+		if (Func and !dcl.Strength and dcl.IsNormalObject)
+			dcl.Strength = kStrSharedParams
+		
+		if (PropertyMode&1)
+			(dcl is property)
+		rz <~ dcl
+		nameitm.obj = dcl
+		dcl.Source = item
+		if default and defaultdcl
+			dcl.ConstCheck(nil, default, DefaultDcl)
+		
+		if (AddToSpace)
+			AddToSpace.TryAdd( nameitm, dcl, dcl.Name )
+
+
+
+function Message.CollectFuncTableName (|string|)
+	//	@msg.ID-->"msg"
+	//	"abc"-->"abc"
+	//	why? why not?
+	if .name and self != @dot
+		Return .Name
+
+	Return .First.Name 
+	
+
+function scdecl.NeedsContainedfix (|bool|)
+	opt NoRefCounts
+	if !.AllocSource and !.contains
+		return .reallycontains
+
+
+function scdecl.ContainedNilfix (|scdecl|)
+	|| t = .type
+	rz = (.copy, self)(T.typenormal == self)
+	rz.contains = t.ContainedButNotUpgrade
+		

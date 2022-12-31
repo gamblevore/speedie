@@ -1,0 +1,660 @@
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class String
+	linkage
+		wrapper
+		cpp_class JB_String
+		cpp_part Str
+		visible true
+
+	cpp_refs
+		Disturbs		nil
+
+	default			""
+	|int|	Length_
+	|&byte|	Addr
+
+
+
+// accessing
+	function Length (|int|)					{ cpp_wrapper JB_Str_Length }
+	function Address (|&byte|)				{ cpp_wrapper JB_Str_Address }
+	function LengthUTF8 (|int|)				{ cpp_wrapper JB_Str_LengthUTF8 }
+
+// (need to reorder these func params to put find first)
+	helper InByte_ ( |int| Start, |int| After=int.max, |Byte| find, |int| )
+		cpp_wrapper JB_Str_InByte
+
+	function OutByte_ ( |int| Start, |int| After=int.max, |Byte| find, |int| )
+		cpp_wrapper JB_Str_OutByte
+
+	helper CharSet_ (|int|Start=0, |int|After=int.max, |CharSet| cs, |bool|IsIn, |ind|)
+		cpp_wrapper JB_Str_CharSet
+
+	helper InCharSet_ (|int|Start=0, |int|After=int.max, |CharSet| cs, |ind|) { return .CharSet_(Start, After, cs, true) }
+
+	helper OutCharSet_ (|int|Start=0, |int|After=int.max, |CharSet| cs, |ind|) { return .CharSet_(Start, After, cs, false) }
+
+	helper White_ (|int|Start=0, |int|After=int.max, |bool| IsIn, |ind|)
+		cpp_wrapper JB_Str_WhiteSpace
+	
+	function InWhite (|int|Start=0, |int|After=int.max, |ind|) { return .white_(Start, After, true) }
+
+	function OutWhite (|int|Start=0, |int|After=int.max, |ind|) { return .white_(Start, After, false) }
+	
+
+
+// searching
+	function Find ( |string| find, |int|Start=0, |int|After=int.max, |bool|CaseAware=false, |ind|)
+		cpp_wrapper JB_Str_InStr
+
+	function Find ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| )
+		cpp_part FindByte
+		return .inbyte_(start, after, find)
+
+	function Find (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|)
+		return .CharSet_(Start, After, cs, true)
+
+	function OutByte2 ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| ) { return .outbyte_(Start, after, find)  }
+
+	function OutCharSet (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|) { return .CharSet_(Start, After, cs, false) }
+	
+// comparing / analysing
+	function Last (|int| minus = 0, |Byte|)
+		return self[.length-(1+minus)]
+	
+	function First (|Byte|)
+		return self[0]
+	
+	operator minus (|int|n, |int|)
+		disabled 
+		return .length - n
+		
+	operator divide (|byte| sep, |[string]|)
+		return .split(sep)
+	
+	operator minus (|string|s, |int|)
+		return .length - s.length
+	
+	operator isna (|string| s, |bool|)
+		return !(self isa s)
+	
+	function Widen (|int| Width, |int| Mode=1, |byte| Char=' ', |string|)
+		if self >= Width
+			return  self
+		|| n = Width - .Length
+		|| fs = FastString(width)
+		if Mode <= 0
+			fs <~ (char, n >> !mode)
+		fs <~ self
+		if Mode >= 0
+			fs <~ (char, width-fs.length)
+		return fs
+	
+	function Wipe_ // used by GameSound...
+		disabled "not sure what this did?" 
+	
+	function IsLower (|bool|)
+		for s in self
+			require !s.isupper
+		return true
+
+	function IsUpper (|bool|)
+		for s in self
+			require !s.islower
+		return true
+
+	function group (|int| i, |int|)
+		|| b = self[i]
+		if b.IsUpper
+			return 1
+		if b.IsLower or b == '_'
+			return 2
+		if b.IsInt
+			return 3
+		if b.iswhite
+			return 4
+		if b >= 128
+			return 5
+
+
+	function Map (|bytemap|b, |int|clear=-1, |string|)
+		cpp_wrapper JB_Str_MapBytes
+
+
+	function Compare (|string| other, |bool| Insensitive, |int|) { cpp_wrapper JB_Str_Compare }
+
+	function IsInt (|bool|)
+		return .isint(0)
+	function IsInt (|int|i, |bool|)
+		cpp_part IsIntFrom
+		require self
+		while i < .length
+			require self[i++].IsInt
+		return true
+	
+	function Owner		(|object|)					{ cpp_wrapper }
+	function Unshare	(|string|)					{ cpp_wrapper }
+	function Copy		(|string|)					{ cpp_wrapper }
+
+// altering
+	function UpperCase	(|string|)					{ cpp_wrapper JB_Str_UpperCase }
+	function LowerCase	(|string|)					{ cpp_wrapper JB_Str_LowerCase }
+
+	render TitleCase
+		fs <~ self[0].uppercase
+		fs <~ self[1, int.max].lowercase
+
+	render Size
+		.length.strsize(fs)
+
+	render Remove (|charset| remove, |int| to=-1)
+		for c in self
+			if !remove[c]
+				fs <~ c
+			  elseif to >= 0
+				fs <~ to|byte|
+
+	render Wrap (|int| MaxWidth)
+		|| p = 0
+		while
+			|| i = p
+			p = .WrapSub(MaxWidth, false, p)
+			fs <~ self[i,p-1]
+			if self <= p
+				exit
+			fs <~ '\n'
+
+	
+	function ReplaceAll (|string| from, |string| to, |bool|Lexer=false, |Faststring|fs_in=nil, |string|) { cpp_wrapper JB_Str_ReplaceAll }
+
+	function Hex (|faststring| fs=nil,|string|)					{ cpp_wrapper JB_Str_Hex }
+
+	function UnHex (|faststring| fs=nil,|string|)				{ cpp_wrapper JB_Str_UnHex }
+
+
+	function ParseInt (|int| Start, |message| where, |int64|)
+		cpp_Wrapper JB_Str_TextIntegerSection
+	
+	function ParseHex (|int| Start=0, |message| where=nil, |int64|)
+		cpp_Wrapper JB_Str_HexIntegerSection
+	
+	function ParseInt (|Message| Where=nil, |int64|) 
+		cpp_Wrapper JB_Str_TextIntegerValid
+	
+	function int (|int64|)
+		return .parseint
+	
+	function float (|f64|)
+		return .parsefloat(nil)
+	
+	function ParseFloat (|Message| Where=nil, |f64|)
+		cpp_Wrapper JB_Str_TextDouble
+	
+	function ParseHexInt (|message|where=nil,|int|) 
+		cpp_Wrapper JB_Str_HexInteger
+
+	function UnicodeSync (|string|)
+		cpp_wrapper JB_Str_UnicodeSync
+
+	function CharCount (|int|Start=0, |int|After=int.max, |int|)
+		cpp_wrapper JB_Str_CharCount
+
+	function Preview (|int| N = 100, |string|)
+		if (.Length <= N)
+			return self
+		return self[0, N].UnicodeSync + "..."
+
+	function SimpleName (|string|)
+		return .lowercase.trimextandpath
+	
+	function UpperFirst (|String|)
+		if (self[0].IsUpper)
+			return self
+		Return self[0,1].Uppercase + self[1...]
+	
+
+	function Trim (|charset| cs = nil, |string|)
+		cpp_wrapper JB_Str_Trim
+	
+
+	function TrimStart (|string|s, |string|)
+		if self starts s
+			return self[s.length...]
+		return self
+
+
+	function Squeeze (|string|)
+		visible
+		|| fs		= faststring()
+		|| broken	= false
+
+		for c in self
+			if c.iswhite
+				broken = fs.length
+			  else
+				if broken
+					fs <~ ' '
+				fs <~ c
+				broken = false
+		
+		return fs
+
+
+	function Yes (|bool|)
+		if (self[0] == '0'):					return false
+		if self ~= "no" or "false" or "off":	return false
+		return self
+
+
+	function CharSet (|bool| Range = true, |CharSet|)
+		return CharSet.new(self, range)
+
+
+	function Words (|[String]|)
+		return .Split(' ')
+
+
+	function Split (|Byte|sep = '\n', |[String]|)
+		for field in StringFields( self, sep )
+			rz <~ field
+
+
+	function Split (|int| n, |StringLengthSplit|)
+		cpp_part SplitChunks
+		rz.name = self
+		rz.size = n
+
+
+	function FirstLine (|string|)
+		return .before("\n")
+		
+	function Before (|string|s, |string|)
+		|| it = .find(s)
+			return self[0, it]
+		return self
+	
+	function ByteSplit (|[string]|)
+		for n in .length
+			rz <~ string[self[n]]
+
+	function LineCount (|int|)
+		if !self
+			return 1
+		return .Count('\n')+1
+	
+	function LineAtByte (|int| b, |intrange|)
+		for (L.lines in self) (after)
+			if after >= b
+				return (after-l.length, after)
+	
+	function DiffAt (|string| A, |bool| aware, |ind|)
+		cpp_Part DiffAtCase
+		if aware
+			return .LowerCase.DiffAt(A.LowerCase)
+	
+	function DiffAt (|string| A, |ind|)
+		cpp_wrapper
+
+	function Count (|Byte|b, |int|)
+		for c in self
+			rz += (c==b)
+	
+	operator Contains (|string| s, |bool|)
+		cpp_part ContainsString
+		return .find(s, 0, int.max, true)
+	
+	operator Contains (|charset| s, |bool|)
+		cpp_part ContainsAny
+		return .find(s)
+	
+	operator Contains (|Byte| b, |bool|)
+		cpp_part ContainsByte
+		return .find(b)
+	
+	operator EndsWith (|string| s, |bool|)
+		return .endswith(s, true)
+	
+	operator mul (|bool| b, |string|)
+		cpp_part MulBool
+		return (self,"")(b)
+	
+	operator Mul (|int| n, |string|)
+		if n <= 1
+			return .operatormul(n==1)
+		|| fs = faststring()
+		for n
+			fs <~ self
+		return fs
+
+	function IsASCII (|bool|)
+		cpp_wrapper JB_Str_IsASCII
+
+	render Reverse
+		cpp_wrapper
+		
+	function IsBadUTF8 (|int|from, |ind|)
+		cpp_Wrapper JB_Str_BadUTF8
+
+	function IsBinary (|float|f=24th, |bool|)
+		return (.length*f) < .badness
+	
+	function IsText (|float|f=24th, |bool|)
+		return !.isbadutf8(0)
+	
+	helper Badness (|int|)
+		|| pos = 0
+		while
+			|| p = .IsBadUTF8(pos)
+			if p < pos	
+				exit
+			pos = p+1
+			rz++
+			
+	operator plus (|string| other, |string|)
+		cpp_wrapper JB_Str_OperatorPlus
+			
+	operator plus (|byte| B, |string|)
+		opt norefcounts
+		cpp_part PlusByte
+		return self + string[b]
+	
+	helper Append (|string| b, |string| c, |string| d="")
+		cpp_wrapper JB_Str_Append4
+	helper Append (|string| b, |string| c, |string| d, |string| e, |string| f="")
+		cpp_wrapper JB_Str_Append6
+		
+	function insert (|string| s, |int| i, |int| n = 0, |string|)
+		|| fs = faststring()
+		fs.size = .length + s.length
+		fs.appendsection(self, 0, i)
+		fs <~ s
+		fs.appendsection(self, i+n, int.max)
+		return fs
+
+		
+	operator in (|array of string| list, |ind|)
+		cpp_part OpInList
+		opt norefcounts
+		for (item in list) (i)
+			if item == self
+				return i
+
+	operator in (|string| s, |bool|)
+		cpp_part OpInStr
+		return s contains self
+			
+	operator in (|dictionary| d, |bool|)
+		cpp_part OpInDict
+		return d[self]
+	
+	operator in (|byte| d, |bool|)
+		cpp_part OpInByte
+		if self
+			for c in self
+				if c != d
+					return false
+			return true
+	
+	function cstr (|stringZeroTerminated|)
+		cpp_Wrapper JB_Str_MakeC
+
+	module
+		function New (|int| n, |string|)
+			cpp_Wrapper JB_Str_New
+//		function Own (|cstring| addr,  |int| n, |string|)
+//			cpp_wrapper JB_FreeableString
+		function Copy (|&byte| addr,  |int| n, |string|)
+			cpp_part NewCopy
+			rz = new(n)
+			if rz
+				memory.copy(rz.addr, addr, n)
+		
+		function Hex (|int64| i, |string|)
+			|| fs = faststring()
+			fs.AppendHex(i)
+			return fs
+		
+		function FromPtr (|cstring| Addr, |int| N, |_voidptr|free=nil, |_voidptr| obj=nil, |string|)
+			cpp_wrapper JB_StrFromPtr
+
+		function FromC (|cstring| Addr, |string|)
+			return stringzeroterminated(addr)
+
+		function FromC (|&Byte| Addr, |string|)
+			disabled "cast to a cstring first"
+			cpp_Part fromcstr2
+			
+			
+		function Error (|string|)
+			cpp_wrapper JB_Str__Error
+		
+		function Uniqify (|dictionary of string| D)
+			cpp_wrapper JB_Str__Uniqify
+
+		function Byte (|int| b, |string|)
+			cpp_wrapper JB_Str_ChrB
+		
+		syntax Access (|int|b, |string|)
+			return .byte(b)
+
+		function Char (|uint| c, |string|)
+			cpp_wrapper JB_Str_ChrUTF8
+
+
+	syntax cast ( |bool| )							{ cpp_wrapper JB_Str_Exists }
+//	syntax cast ( |&char| )							{ disabled,return .addr|&char| }
+	syntax cast ( |&byte| )
+		cpp_part CastByte
+		return .addr|&byte|
+	syntax cast (|StringZeroTerminated|)
+		cpp_part CastZero
+		return .cstr
+
+	function Byte (|int| index, |Byte| Default, |int|)
+		cpp_wrapper JB_Str_ByteValue2
+		
+	syntax Access (|int| index=0, |Byte|)
+		cpp_wrapper JB_Str_ByteValue
+		
+	syntax Access (|int| start, |int| after, |string|)
+		cpp_wrapper JB_Str_Range
+		
+	function Codepoint (|codepoint|)
+		cpp_wrapper JB_Str_UTF8Value
+		
+	syntax Access (|ivec2| r, |string|)
+		cpp_part RangeVec
+		return self[r.x, r.x2]
+
+	syntax Access (|int| index, |string| Compare, |bool| Aware=false, |bool|)
+		cpp_wrapper JB_Str_MidEquals
+
+	syntax Compare (|string| Other, |bool|Aware, |int|)
+		cpp_part CompareStr
+		return .Compare(other, Aware)
+
+	syntax Compare (|int| Other, |bool|Aware, |int|)
+		cpp_part CompareInt
+		return .length - other
+	
+	syntax Equals (|string| Other, |bool|Aware, |bool|)
+		cpp_wrapper JB_Str_Equals
+	syntax Equals (|int| Other, |bool|Aware, |bool|)
+		cpp_part EqualsInt
+		return .length == other
+	
+	function Move (|ind| Pos, |int| CodePoints, |ind|)
+		|| n	= .length
+		|| s0	= .address
+		|| s	= s0 + pos
+		if Codepoints >= 0
+			|| s2 = s0 + n
+			while (CodePoints-- > 0) and (s < s2)
+				codepoint.utf8read(&s)
+		  else
+			while (s > s0)
+				|| c = (--s)[0]
+				if (c < 0x80) or (c > 0xC0)
+					Codepoints++
+					if (CodePoints >= 0)
+						exit
+		return (s - s0)|ind|
+
+
+	operator match (|string| s, |int|)
+		if s ~= self
+			return 2
+		if s contains self
+			return 1
+
+	operator starts (|string| s, |bool|)
+		return self[0, s, true]
+		
+	function EndsWith (|string| s, |bool| aware=false, |bool|)
+		|| n = s.length
+		|| L =  .length
+		for (i in 1 to n)
+			|| a = self[l-i]
+			|| b = s[n-i]
+			if aware
+				a = a.lowercase
+				b = b.lowercase
+			require a == b
+		return true
+
+
+	function HasMoat (|bool|)
+		|| n = .length-2
+		require n>2
+		|| u = '_'
+		|| d = .addr
+		return u == d[0] and d[1] and d[n] and d[n+1]
+
+
+	function IsURL (|string|)
+		for i in .length
+			if self[i, "://"]
+				return self[0, i]
+			require !self[i].iswhite
+		
+
+// OK so this function makse no sense
+// baiscally we just want " " to match with  multiple spaces or tabs
+// that is all. but also "  " must match with at least two.
+	helper StretchyFindSub (|string| find, |int| from, |int|)
+		|| i = 0
+		|| n = .length
+		while i < find and i+from < n
+			|| c = self[from + i]
+			|| f = find[i++]
+			if f != ' '
+				require c eq f
+				continue
+			|| extra = 0
+			|| found = 0
+			while (find[i+extra] == ' ')
+				extra++
+			// so now we need to find that many extra spaces
+			while c == ' ' or '\t'
+				c = self[from + i + found]
+				found++
+			require found > extra
+			i+=extra
+			from+=found-(extra+1)
+		return i+from
+
+
+	// fails to find "   test"... shuld be at least 3 spaces
+	function StretchyFind (|string| find, |int| from=0, |int| to=int.max, |intrange|)
+		|| n = self - find
+		to = to min n
+		from = from min n
+		if from < to
+			while from <= to
+				|| l = .StretchyFindSub(find, from)
+					return (from, l)
+				from++
+		  else
+			from -= find.length
+			while from >= to
+				|| l = .StretchyFindSub(find, from)
+					return (from, l)
+				from--
+		return (-1, 0)
+					
+
+	function Hash (|uint64| last=0, |uint64|)
+		cpp_Wrapper JB_Str_CRC
+
+
+	iterator
+		|| Start = .Addr
+		|| End = Start + .Length
+		while (Start < End)
+			yield Start[0] (Start - .Addr)
+			Start++
+
+	
+	iterator Backwards
+		|| Start = .Addr
+		|| i = .Length-1
+		while (i >= 0)
+			yield Start[i] (i)
+			i--
+
+	iterator lines
+		|| Prev = 0
+		while (self != nil) {
+			|| Curr_ = .find( jeebox.CSLine, Prev )
+			yield  self[prev,curr_] (curr_)
+			Prev = Curr_ + 1
+		} (Curr_)
+
+	
+	iterator CodePoints
+		|| Start	= .Addr
+		|| End		= Start + .Length
+		while (Start < End)
+			|| c = codepoint.UTF8Read(&start)
+			yield (c) (start)
+
+	iterator CodePoints2
+		|| First	= .Addr
+		|| Curr		= First
+		|| End		= first + .Length
+		while (Curr < End)
+			|| pos = (Curr - first)|int|
+			|| c = codepoint.UTF8Read(&curr)
+			yield (c) (pos)
+
+
+function Join2 (|[string]| R, |string| sep = "", |String|)
+	|| n = (r.length-1) * sep.length
+	for s in r
+		n += s.length
+	|| fs = FastString(n)
+	for (s in r) (i)
+		if i > 0
+			fs <~ sep
+		fs <~ s
+	return fs
+
+
+struct StringLengthSplit
+	|int|		Size
+	|string|	Name
+	
+	iterator
+		|| spos = 0
+		while spos < .name.length
+			yield .name[spos, spos+.size]
+			spos += .size
+	
+	function list (|array of string|)
+		opt norefcounts
+		for s in self
+			rz <~ s

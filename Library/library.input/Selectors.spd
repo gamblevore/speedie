@@ -1,0 +1,58 @@
+
+
+// Selectors! Really nice. It works!!
+
+
+class Selector
+	linkage
+		cpp_part Sel
+	
+	contains selector
+	|int|			ID
+	|string|		Name
+	||				Next // its a list
+	
+	syntax cast (|int|)
+		cpp_part Cast
+		return .ID
+	syntax cast (|uint|)
+		cpp_part UCast
+		return .ID
+	syntax cast (|uint16|)
+		cpp_part U16Cast
+		return .ID
+	function Idee (|int|)
+		if (self)
+			return .id
+	
+	constructor (|selector| Next, |&selector| Place, |string| namee)
+		.name = namee
+		.next = next
+		*place = self
+	
+	Function GiveIDs
+		opt norefcounts
+		|| ID = 0
+		for (curr in self)
+			curr.id = id
+			id++
+	
+	
+	iterator
+		|| Curr = self
+		while (Curr)
+			yield curr
+			curr = curr.next
+
+
+/*
+// even better would be:
+	struct selector {
+		|int|	   ID
+		|string|	Name
+	}
+	module materials {
+		|selector[10]| Selectors // last is empty, no name.
+	}
+// this way... its simple! and fast as possible.
+*/

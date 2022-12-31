@@ -1,0 +1,75 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+ 
+//
+class SCArg (SCBase)
+	linkage
+		cpp_part		Arg
+
+	|SCFunction|	ParentFunc
+	|Message|		TmpMovedOutFor
+	|bool|			IsClassArg
+	|bool|			IsStatementExpr
+
+	function Cls (|SCClass|)
+		Return .ParentFunc$.Cls
+	
+	constructor (|Message| node)
+	// shouldn't be necessary!
+		super.Constructor(node)
+	 
+	 
+	function Count (|int|)
+		opt norefcounts
+		for (v in .access)
+			RZ += (v isa scdecl)
+
+		|| l = .lookup
+		if l isa scarg
+			RZ += l.count + 1		
+	
+	render
+		fs <~ "SCArg: (\n"
+		fs <~ .source
+		fs <~ ")\n"
+
+
+function Message.SCArgNested (|message|base, |SCBase| p, |SCArg|)
+	|| curr = self
+	|| cp = curr.Ancestor(@arg)
+	if cp == base
+		return .scarg(p)
+	|| p2 = cp.scargnested(Base, p)
+	return .scarg(p2)
+
+
+function Message.SCArg (|SCBase| p, |message| avoid=nil, |SCArg|)
+	debug_require (self == @arg)
+	
+	if avoid and (avoid != @arg and @tmp)
+		if p isa scarg
+			return p
+		debugger
+		return nil
+	
+	|| R = .AsArg
+	p := .msgarg
+	if (!R and p)
+		R = SCArg.new( self )
+		if (p isa SCArg)
+			R.ParentFunc = p.ParentFunc
+			r.IsClassArg = p.IsClassArg
+			R.LookUp = p
+
+		  elseif (p isa SCFunction)
+			R.ParentFunc = p
+			r.IsClassArg = p.cls
+			R.LookUp = p.lookup // skip the function entirely.
+
+		.obj = R
+
+	Return R
+
+

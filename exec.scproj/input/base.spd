@@ -1,0 +1,65 @@
+
+ 
+module package
+	linkage: cpp_part pack
+	|memory|		globals
+	|config|		funcs
+	|config|		linkage
+	|config|		ProjClasses
+	|config|		strings
+	
+	
+	function LibFuncLayout (|&&_voidptr| funcs, |string|)
+		cpp_wrapper JB_App__LibFuncs
+	
+	function LibClassLayout (|string|)
+		cpp_wrapper JB_App__LibClasses
+	
+	function LibClasses (|message|)
+		return .LibClassLayout().decompress.parse
+	
+	
+	/*
+	ringtree
+		sub1
+		sub2
+	*/
+	function LoadAppClasses (|message| list)
+		for s in list
+			|| cls = class.Table[s.name]
+				class.grab(s[@arg], cls)
+			  else
+				error (s, "Linked to missing class: " + s.name)
+
+
+	function LoadPack (|bool|)
+		.GetStructure
+		require StdErr.ok
+		class.Grab(.libClasses, nil)
+		.LoadAppClasses(.ProjClasses)
+		return stderr.ok
+	
+	
+	function GetStructure (|int|)
+		|| pk			= .InputPack
+		|| app_			= pk..app			#error "Missing 'app'"
+
+		debugger.root	= pk..debug
+		debugger.meta	= pk..meta
+		
+		.strings		= app_..strs oar Message()
+		.projclasses	= app_..clss oar message()
+		.funcs			= app_..fncs		#error "Missing 'fncs'"
+		.linkage		= app_..link		#error "Missing 'link'"
+
+		|| g = app_.int						#error "No globals requested."
+		(g <= 256MB)						#error "Over 256MB of globals requested."
+		.glob(g)
+		
+
+	function InputPack (|messageroot|)
+		|| x = app.args[0]
+		x := "~/Speedie/exec.scproj/demo.jx"
+		|| fl = x.ExistingFile("load executable")
+			return fl.parse[@tmp, "pack"]
+

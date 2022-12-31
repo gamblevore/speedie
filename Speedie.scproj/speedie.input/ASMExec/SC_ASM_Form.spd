@@ -1,0 +1,102 @@
+
+
+// vm.box
+
+
+class µForm 
+	|string|		Name
+	|µParam[8]|		Params
+	|int|			Count
+	|int|			Index
+	|bool|			Varies
+	
+	constructor (|string| data)
+		opt norefcounts
+		.name = data
+		for param in data
+			.loadparam( string[param], nil )
+		.Finish
+		.index = ++µform.count
+
+	constructor (|message| tmp)
+		opt norefcounts
+		.name = tmp.name
+		for line in tmp.last(@arg)
+			|| f = line[@nil]
+			.loadparam(f.nyme, f)
+		.Finish
+		.index = ++µform.count
+
+
+	syntax append (|µParam| P)
+		|| i = .count++
+		if (i < 8)
+			.params[i] = p // expect
+	
+
+	function Finish
+		|| total = 0
+		for (s in self) (i)
+			if s & asm.remainder
+				s |= (25 - total)
+			self[i] = s (|) (total << 11)
+			total += s.bitsize
+		
+
+	function LastField (|µParam|)
+		return self[.Count-1]
+	
+	syntax Access (|int| i, |µParam|)
+		cpp_part AccessInt
+		return .params[i]
+	
+	syntax Access (|int| i, assigns: |µParam|)
+		.params[i] = Value
+	
+	
+	iterator
+		|| i = 0
+		while (i < .count)
+			yield self[i] (i)
+			i++
+
+	function AddRemainder (|uint| U=0)
+		self <~ asm.num (|) asm.remainder (|) U
+	
+	function LoadParam (|string| pl, |message| place)
+		if (pl.isint)
+			self <~ pl.ASMint (|) asm.num
+			return
+		expect (pl == 1) (self)
+		|| p = pl[0]
+		if  p == 'r'
+			self <~ 5 
+		  elseif p == 'n'
+			self <~ 5 (|) asm.num
+		  elseif p == 'l'
+			.addremainder
+		  elseif p == 'L'
+			.addremainder( asm.NoExpect)
+		  elseif p == 's'
+			.addremainder( asm.signed)
+		  elseif p == 'S'
+			.addremainder( asm.signed + asm.NoExpect)
+		  elseif p == 'j'
+			.addremainder( asm.signed + asm.jump)
+		  elseif place
+			error (place)
+		  else
+		    error (self)
+	
+
+	module
+		|dictionary of µForm|				Forms = dictionary()
+		|int| Count
+		function Needform (|string| Form, |µform|)
+			opt norefcounts
+			return forms.valuelower(form) init µform(form)
+
+
+function string.ASMint (|uint|)
+	rz = .int
+	debug_require rz|int| inrange 32

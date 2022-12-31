@@ -1,0 +1,100 @@
+
+
+class StringStream
+// this should be based on fastbuff, and fastbuff should also... 
+// have 3 pointers
+	|string|	Data
+	|file|		File
+	|int|		Position
+	|int|		Length
+	|int|		ChunkSize
+	linkage:cpp_Part ss
+	
+	constructor (|string| d)
+		d := ""
+		.data = d
+		.length = d.length
+	constructor (|file| file, |int| ChunkSize=4MB)
+		cpp_part ConstructorStream
+		.file = file
+		file.close
+		.ChunkSize = chunksize
+		.length = file.size
+		.data = file.read(chunksize)		// for now
+	function Skip (|int| p = 1)
+		if p < 0 // end
+			.position = .length
+		  else
+			.position += p
+	syntax cast (|bool|)
+		require (self != nil)
+		return (.position inrange .length)
+	function Byte (|byte|)
+		.need(1)
+		return .data[.position++]
+		
+	function bint (|int|n=4, |int64|)
+		for n
+			rz <<= 8
+			rz |= .byte
+		
+	function bint0 (|int|n=3, |int64|)
+		// 0-3 works better for bit-math
+		return .bint(n+1)
+
+	function lint0 (|int|n=3, |int64|)
+		for i in n+1
+			rz |= .byte << i << 3
+	
+
+	function CString (|string|)
+		|| p = .position
+		|| zpos = .data.find(0|byte|, p, int.max)
+/*		if !zpos and .CanStreamMore
+			p = .RejoinChunkFromPos
+			zpos = .data.find(0|byte|, p, int.max)
+*/
+			.position = zpos+1
+			return .data[p, zpos]|string|
+		
+	function Need (|int| n)
+		
+
+	function CanStreamMore (|bool|)
+		
+	
+	function RejoinChunkFromPos (|int|)
+		// so... we need to work in "global offsets"
+		// the caller can't need to know where we are in the curr chunk
+		// just in the total file So... we need offsets!
+		rz = .length
+
+	function upto (|int| end,|int|)
+		return end - .position
+	function uint (|int| size, |int| mult=256, |uint|)
+		for size
+			rz *= mult
+			rz += .Byte		
+	function Trim (|int|n, |string|)
+		return .str(n).trim
+	function Remaining (|int|)
+		return .length-.position
+	function Str (|int|n, |int|skip=0, |string|)
+		.need(n)
+		|| p = .position
+		|| p2 = p + n
+		.position = p2
+		return .data[p+skip, p2]
+	function utf8 (|int|n, |int|skip=0, |string|)
+		.position += skip
+		return  .str(n-skip).utf16to8(2)
+	function test (|int| a = 0, |string| b, |StringStream|)
+		if !b or .str(b.length) == b
+			return self
+
+
+function file.reader (|string|T="", |StringStream|)
+	return stringstream(self).test(T)
+
+function string.reader (|string|T="", |StringStream|)
+	return stringstream(self).test(T)

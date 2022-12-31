@@ -1,0 +1,53 @@
+
+
+* update asm.design
+	* write a fully functioning one
+	* then make speedie generate it?
+* (Debugger)
+
+* debugger_info finish
+* cpp global changes invalidate entire interpreter.
+	* otherwise, we know the addr of each global vs the base
+
+
+* disable opt-norefs in proj... (just causes bugs, and refs are invis)
+
+* Each prototype has a "wrapper" that calls the vm
+	|| x = vmfunc.getwrapper,	|| y = (X)(a, b, c, vmfunc)
+* Destructors have their own special code
+* Merge LabelsTodo and state... bleurgh.
+* to debug speedie from perry, check for self-alter, then ext-compile ASM (same as speedie is debugged in xcode)
+
+
+* Flow control
+
+
+* need funcaddrlist, not names! Lib-change recompiles interpreter.
+	* cpp_nothing still needed
+	* interpreter needs self ASM to debug lib.
+	
+
+
+
+// opts
+
+https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+https://cacm.acm.org/magazines/2020/2/242347-optimizations-in-c-compilers/fulltext // exlpains some good opts?
+* lines can have a "cost" number... for the "number of instructions involved"... assuming its not a function call :)
+
+.........................................................................................................
+
+
+* Have FUN
+	* what details do fun include??
+		* Vibration? :3 sunbathing?
+
+
+* you are a genius at making it fast.
+	* You look really beautiful while doing it
+		* You dont realise how much you are!
+* i think the file design is good enough? so how to go ahead?
+	* Well its already superior to all other formats! They are shit an 100% overcompliated! I can't find any simplifications there!
+
+* The game engine's voxel-hitdetection should use SDF tactics vs the... point?
+

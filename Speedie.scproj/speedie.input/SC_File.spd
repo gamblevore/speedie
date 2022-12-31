@@ -1,0 +1,154 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class SCFile (file)
+	|string|		ExportName
+	|SCImport|		Proj
+	|string|		FData
+	|Message|		LiveAST
+	|Message|		OrigAST
+	|date|			OrigDate
+	|int|			filenum
+	|bool|			IsInternal
+
+
+	constructor (|File| f)
+		super.constructor((f.path, "")(f != nil))
+		.isinternal = f == nil
+		.liveast = .start_ast
+		Compiler.stTotalFileCount += .isinternal
+		(SCImport.Recent max= f.modified) 
+		
+	function start_ast (|message|)
+		if .isinternal
+			return message.newwithlayer((Message).createLayer(self), @arg, "")
+
+	function Use
+		require .LiveAst // if parse fails...
+		.LiveAST.memoryLayer.Use
+
+
+	function Decls (|SCBase| p)
+		.Use
+		.Proj.use // should be inside use?
+		CollectDecls( .LiveAST, p, p )
+
+
+	function scmodule.InitDecls // same as scfile.decls just different
+		|| a = .initvarsarg[0]
+		if a.hasany
+			.Project.use
+			CollectDecls( a, self, self )
+
+
+	function GetMsg (|int| pos, |bool| needname, |message|)
+		opt norefcounts
+		for f.flat in .orig
+			if !needname or f.name
+				if f.range contains pos
+					return f
+
+
+	function SavedData (|string|)
+		if .origdate < .modified
+			.fData = .ReadAll.decompress // why not.
+		return .fdata
+
+			
+	function Orig (|message|)
+		if !.origast or .origdate < .modified
+			.origdate = .modified
+			// .liveast = nil // wha? // we need this!
+			.origast = .astsub
+		return .origast
+
+
+	function AST (|Message|)
+		opt norefcounts
+		return .liveast init .ASTSub$
+
+
+	function DetectInsecureWords
+		opt norefcounts
+		require options.perry
+		|| words = compiler.InsecureWords$
+		|| where = (0,0)
+		|| found = words.Find(.fdata, where)
+			|| place = @thg+""
+			place.range = where // doesn't say where though?
+			stderr.newerror(place, "Insecure word found", .path)
+		
+	
+	function ASTSub (|Message|)
+		if .IsInternal
+			
+		(Message).createLayer(self).use
+		|| str = .Readsafely.decompress
+			.fData = str
+			.origdate = .modified
+			StdErr.source = .path
+			parser.DotInsertallow = true	// more consistant with IDE
+			
+			parser.baseextra = .filenum << 19
+			rz = .fData.ParseClean // OK so now what?
+			rz.PrepareAST
+			.DetectInsecureWords
+			parser.baseextra = 0
+			parser.DotInsertallow = false
+			StdErr.source = nil
+		(Message).restore
+		
+
+
+function message.DetectBadPosition
+	opt norefcounts
+	for msg.flat in self
+		if (msg != self) and !msg.position
+			printline msg.filelocation
+			debugat
+
+
+function @file.CompilerPrefs (|file|)
+	return .appprefs("klinkerhoppen.speedie").file
+	
+function app.CodeSign (|file|)
+	|| pref_file = file.CompilerPrefs
+	if pref_file.exists // read directly because other apps might want it.
+		|| me = app.apppath.file
+		|| pz = pref_file.parse
+		|| sign = pz[codesign_native] // code
+			me.codesign(sign.value)
+			return me
+	
+	StdErr.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign self." )
+
+
+function file.CodeSign (|string| sign, |errorint|)
+	target osx
+		StdErr.ErrorsAreProblems++
+		|[string]| args = []
+		args <~ "--deep"
+		args <~ "--force"
+		if options.PrintCompileString
+			args <~ "--verbose"
+		args <~ "-s"
+		args <~ sign.cstr
+		args <~ self.cstr
+
+		rz = "/usr/bin/codesign".PrintExecute(args) // creates unnecesssary errors
+
+		args = []
+		args <~ "--verify"
+		if options.PrintCompileString
+			args <~ "--verbose"
+		args <~ self
+		if rz
+			rz = "/usr/bin/codesign".PrintExecute(args)
+		if rz
+			args[0] = "-a"
+			rz = "/usr/sbin/spctl".PrintExecute(args)
+		StdErr.ErrorsAreProblems--
+			

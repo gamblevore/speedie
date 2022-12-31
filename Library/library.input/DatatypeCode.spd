@@ -1,0 +1,137 @@
+
+
+datatype DataTypeCode (uint16)
+	linkage
+		cpp_part TC
+	default UnusedType
+	constants Types
+		|DataTypeCode|
+	// 8 = "is a number" bit...
+		sign	= 64
+		u8	    =               0   + 8
+		char	= 0 + 0  + 64 + 0   + 8
+		Byte2   = 1 + 0  + 0  + 0   + 8
+		Byte3   = 2 + 0  + 0  + 0   + 8
+		Byte4   = 3 + 0  + 0  + 0   + 8
+		SByte   = 0 + 0  + 64 + 0   + 8
+		SByte2  = 1 + 0  + 64 + 0   + 8
+		SByte3  = 2 + 0  + 64 + 0   + 8
+		SByte4  = 3 + 0  + 64 + 0   + 8
+		uint16  = 0 + 16 + 0  + 0   + 8
+		int16   = 0 + 16 + 64 + 0   + 8
+		s16x2   = 1 + 16 + 64 + 0   + 8
+		s16x3   = 2 + 16 + 64 + 0   + 8
+		s16x4   = 3 + 16 + 64 + 0   + 8
+		int64   = 0 + 48 + 64 + 0   + 8
+		uint64  = 0 + 48 + 0  + 0   + 8
+		iVec2   = 1 + 32 + 64 + 0   + 8
+		iVec3   = 2 + 32 + 64 + 0   + 8
+		iVec4   = 3 + 32 + 64 + 0   + 8
+		HFloat  = 0 + 16 + 64 + 128 + 8
+		Float   = 0 + 32 + 64 + 128 + 8
+		Double  = 0 + 48 + 64 + 128 + 8
+		Vec2	= 1 + 32 + 64 + 128 + 8
+		Vec3	= 2 + 32 + 64 + 128 + 8
+		Vec4	= 3 + 32 + 64 + 128 + 8
+		// no need
+		// Mat2	  
+		// Mat4	// use higher bits
+		Int		= 0 + 32 + 64 + 0   + 8
+		UInt	= 0 + 32 + 0  + 0   + 8
+		bool	= 0
+		u32	 = uint
+		s64	 = int64
+		u64	 = uint64
+		f64	 = double
+		f16	 = hfloat
+		s8	 = char
+		byte = u8
+		int8 = char // remove s8+u8!!
+		uint8 = u8
+		u16	 = uint16
+		s16	 = int16
+		atomic_int64	= 0 + 48 + 64 + 0   + 8 + 4
+		atomic_uint64	= 0 + 48 + 0  + 0   + 8 + 4
+		atomic_int		= 0 + 32 + 64 + 0   + 8 + 4
+		atomic_uint		= 0 + 32 + 0  + 0   + 8 + 4
+		atomic_byte		=               0   + 8 + 4
+		
+		UnusedType = int64 &~ 8
+	
+	
+	syntax is (|datatypecode| M, |bool|)
+		return self == M
+
+	syntax isnt (|datatypecode| M, |bool|)
+		return self != M
+
+	function ExistsButBadlyNamedOrDesigned (|bool|)
+		// not sure what this is meant to do. Only used in one place anyhow.
+		// used to be called "Exists", but all of them exist even bytes?
+		// so why check ._shift?
+		return (._shift or !.isfloat)
+	
+	function IsFloat (|bool|)
+		return (self >> 7) & 1
+
+	function IsPointer (|bool|)
+		return !.isnumeric // for now
+
+	function IsInt (|bool|)
+		return !.IsFloat
+
+	function IsSigned (|bool|)
+		return (self >> 6) & 1
+
+	function IsNumeric (|bool|)
+		return (self & 8)
+
+	function IsAtomic (|bool|)
+		return (self & 4)
+
+	function NumericCount (|int|)
+		if (self & 8)
+			return .count
+	
+	function NumericCountBoolsToo (|int|)
+		if (Self & 8)
+			return .count
+		if !self
+			return 1
+	
+	function SetSigned (|bool| b, |DataTypeCode|)
+		if b
+			return (self) (|) (1 << 6)
+		  else
+			return (self) &~ (1 << 6)
+			
+
+	function ItemBitCount (|int|)
+		return 8 << ._shift
+	
+	module
+		function Create (|bool| Float, |int|bits, |bool|sign=true, |int|vec=1, |DataTypeCode|)
+			|| R = (128+64, 0)(float)
+			bits = bits&~15 // 0 means a byte...
+			if (bits == 64)
+				bits = 48
+			R |= bits
+			if sign
+				R |= 64
+			R |= vec - 1
+			return R
+			
+	
+	function _Shift (|int|)
+		return (self >> 4) & 3
+
+	function ByteSize (|int|)
+		return .Count << ._Shift
+
+	function Count (|int|)
+		return (self & 0x03) + 1
+	
+	function SameBasicType (|datatypecode| b, |bool|)
+		return (.isfloat == b.isfloat) // this will do for now. 
+
+

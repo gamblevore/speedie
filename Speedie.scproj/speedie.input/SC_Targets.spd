@@ -1,0 +1,15 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+module Targets
+	|| Items = dictionary()
+	function Set (|message| thg)
+		cpp_part SetMsg
+		.set(thg.name)
+	function Set (|string| name)
+		.items[name] = "true"
+	syntax Access (|string| name, |bool|)
+		return targets.items[name]

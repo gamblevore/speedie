@@ -1,0 +1,215 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+class SCModule (SCBase) {
+linkage
+	cpp_part		Mod
+
+|SCClass|					Cls
+|Message|					InitVarsArg
+|Message|					InitCodeArg
+|string|					CppPart
+|SCFunction|				DisposeFunc
+|CppRefs|					DefaultRefs
+|message|					InitAfter
+|string|					SubsFrom
+|bool|						Grabbed
+|bool|						IsImport
+|bool|						Inited
+|bool|						IsRequiredInterface
+
+
+constructor
+	.defaultrefs = cpprefs.new
+	if .isvisible
+
+
+render
+	if (.cls)
+		fs <~ "module of "
+		.cls.render(fs)
+	  else
+		super.render(fs)
+
+function SuperMod (|scmodule|)
+	opt norefcounts
+	|| c = .cls
+		return c.super.modul
+
+function IsProperModule (|bool|)
+// not "main" or any other auto-generated module that doesn't properly have a "module name {" thing going on...
+	require .Lookup
+	if (.Lookup == compiler.program) and (.source == nil)
+		return false
+	return true
+
+
+function GetPrefix (|SCDecl| D, |string|)
+	opt norefcounts
+	rz = d.project.Mod.ExportName + "_"
+	if .CppPart
+		rz += "_" + .CppPart + "_"
+	if D Is Const
+		rz = "k" + rz
+
+
+function SCDecl.PrefixedName (|SCModule| M, |string|)
+	|| s = .name
+	if (self is Const) and (s[0] == 'k')
+		s = s[1...]
+	return M.GetPrefix(self) + s.unicodesafename
+
+
+function RenameVars // decl.name, .declfix, .fixname, .declname
+	// Goes through our properties/constants and renames them!
+	for (decl in .ListVars)
+		if (!decl.IsLookupOnly)
+			decl.name = decl.PrefixedName(self)
+
+
+function ListProperties (|[SCDecl]|)
+	return .listvars(true)
+
+
+function ListVars (|bool| NoFuncs = false, |[SCDecl]|)
+// turn this into an iterator... :)
+	for o in .access
+		if o isa SCDecl
+			if NoFuncs and o.IsLookupOnly
+				Continue
+			rz <~ o
+
+
+function IsProject (|bool|)
+	return .Project.Mod == self
+
+
+function NewModuleFunc (|Message| src, |SCFunction|)
+	rz = SCFunction.NewFunc( src, self, src )|SCFunction|
+	.TryAddBase( src, rz )
+
+
+function BaseDecls
+	.Use
+	CollectDecls( .source, self, self, 1 ) // right?
+
+
+function AddModuleToFunc (|SCBase| space)
+// so we have an issue... we can’t even really add "self" in a module...
+// because we can’t return a module from an expression, yet.
+// sigh. Try?
+	if !space["self"]
+		space.TryAdd( space.FuncSrc, self, "self" )
+
+
+function FillDisposeFunc
+	|| Arg = .DisposeFunc$.SourceArg
+	for decl in .ListVars
+		if !decl.IsLookupOnly and (decl Isnt Const)
+			if (!decl.C_array)
+				arg <~ NewRel(decl.name, "=", "nil")
+
+
+function safename (|string|)
+	if .name
+		return .name
+	return .cls.name
+
+
+function LoadModule (|Message| node)
+	node.obj = self
+	|| namemsg = node.first
+	if !.cls
+		namemsg.expect(@thg)
+
+	|| arg = namemsg
+	if namemsg == @thg
+		.name = namemsg.name
+		|| sub = namemsg.next
+		arg = sub
+		if (sub == @bra) // module sdlapp (app)
+			.SubsFrom = sub[@thg]$.name
+			arg = sub.next
+
+
+	arg.expect(@arg)
+	arg.expectlast$
+	.Source = arg
+	
+	compiler.disammodules.TryAdd(nil, self, .safename)
+	
+	.Collect( .source, scbase.CurrVisibility )
+
+
+function scclass.SuperGrabbed (|bool|)
+	|| it = .super
+		return it.Modul.Grabbed
+	return true // basically its grabbed
+	
+
+function scclass.StructContainerShipGrabbed (|bool|)
+	for p in .properties
+		|| t = p.type
+		if (p.pointercount == 0) and (t.isstruct)
+			require t.modul.grabbed
+	return true
+
+
+function OKToSort (|bool|)
+	// for sorting things correctly so C-exports don't get order issues...
+	require !.Grabbed
+	|| c = .cls
+	if !c
+		 Return true
+	
+	if c.isstruct
+		require c.StructContainerShipGrabbed
+	
+	if c.SuperGrabbed
+		.Grabbed = true
+		Return true
+
+
+function Grab (|SCModule|)
+	expect .OKToSort
+	Return self
+
+
+module
+	function SCBase.GetAsModule (|message| errplace = nil, |scmodule|)
+		if (self isa scmodule)
+			return self
+		if (self isa scclass)
+			return .modul
+		error (errplace, "This should go into a module or class.")
+	
+		
+	function Neu (CollectFunc)
+		|| m = SCModule.new
+		m.Project = scimport.curr // hack?
+
+		if (name_space isa SCClass)
+			m.LookUp = nil	// So Array.Byte, File.Byte, XXX.Byte... won't be found.
+							// It's just for the looking up of functions ON the module... not in the module's code.
+			m.Cls = name_space
+			m.name = name_space.Name
+		  else
+			m.LookUp = name_space.ProjectFix
+		
+		if node
+			m.LoadModule( node )
+		Return m
+
+
+	function NewContainer (|string| s, |scmodule|)
+		// for storing arbitrary stuff in.
+		rz = SCModule.new
+		rz.name = s
+		Compiler.program.TryAdd( nil, rz, s )
+
+}
+

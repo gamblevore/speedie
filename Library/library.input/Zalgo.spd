@@ -1,0 +1,38 @@
+
+module zalgo
+	|random| R
+	|string| up = #(CC8DCC8ECC84CC85CCBFCC91CC86CC90CD92CD97CD91CC87CC88CC8ACD82CD83CD84CD8ACD8BCD8CCC83CC82CC8CCD90CC80CC81CC8BCC8FCC92CC93CC94CCBDCC89CDA3CDA4CDA5CDA6CDA7CDA8CDA9CDAACDABCDACCDADCDAECD9BCD86CC9A)#
+	|string| mid = #(CC95CC9BCD80CD81CD98CCA1CCA2CCA7CCA8CCB4CCB5CCB6CD8FCD9CCD9DCD9ECD9FCDA0CDA2CCB8CCB7CDA1D289)#
+	|string| down = #(CC96CC97CC98CC99CC9CCC9DCC9ECC9FCCA0CCA4CCA5CCA6CCA9CCAACCABCCACCCADCCAECCAFCCB0CCB1CCB2CCB3CCB9CCBACCBBCCBCCD85CD87CD88CD89CD8DCD8ECD93CD94CD95CD96CD99CD9ACCA3)#
+
+	function rand (|faststring| fs, |string| z)	
+		|| i = (zalgo.R[0, z.length/2]|int|)*2
+		fs <~ z[i]
+		fs <~ z[i+1]
+	
+
+	render (|string| txt, |float| Wierdness)
+		zalgo.r.init
+		for i in (-1 to txt.length) 
+			|| s = txt[i] oar ' '
+			fs <~ s
+			if s < 128
+				|| scale = (s<=32) + (txt[i+1]<=32) + (txt[i-1]<=32)
+				fs.zalgo(s, wierdness, scale)
+
+
+function string.zalgo (|float| Wierdness=8, |string|)
+	return zalgo.render(self, Wierdness, nil)
+
+
+function faststring.zalgo (|byte| s, |float| Wierdness, |float| whites)
+	|| mul  = 1.0/(whites+1.0)
+	|| up   = zalgo.R[3, 3+Wierdness]*mul
+	for (up)
+		zalgo.rand(self, zalgo.up)
+	|| mid  = zalgo.R[1.0,3.0]*mul
+	for (mid)
+		zalgo.rand(self, zalgo.mid)
+	|| down = zalgo.R[3,3+Wierdness]*mul
+	for (down)
+		zalgo.rand(self, zalgo.down)

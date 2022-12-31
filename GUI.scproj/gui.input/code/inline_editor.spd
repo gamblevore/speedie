@@ -1,0 +1,165 @@
+
+
+struct InlineEditor
+	linkage
+		cpp_part inl
+	|ListViewCell|		Cell
+	|Textview--|		Editor
+	|ListView--|		EditingFor
+	|Guicontrol--|		SearchingFor
+	|bool|				NeedsHide
+	
+	function DrawFocus (|image|where)
+		opt norefcounts
+		|| g = .editingfor|guicontrol| oar .searchingfor
+			g.drawfocus(where)
+	  
+	
+	function init (|Window| w)
+		.editor = textview(w)
+		with .editor
+			.id				= "inline_editor"
+			.visible		= false
+			.SingleLine		= true
+			(self.editor is editable)
+			.gnormal.bg		<~ (0, 0, 0, 255)
+	
+	
+	function NextSearch
+		with .searchingfor
+			ifn .__Search__(sdlapp.LastSearch, false)
+				beep
+			  else
+				sdlapp.touch(self.editor)
+
+	
+	function AcceptSearch (|string|s)
+		sdlapp.LastSearch = s
+		.NextSearch
+	
+	
+	function Accept (|string|s, |bool| hide)
+		if .searchingfor
+			.AcceptSearch(s)
+			if hide
+				.clear
+		  else
+			.finishandclear
+	
+	
+	function UpdateSearch (|string| s)
+		with .searchingfor
+			sdlapp.LastSearch = s
+			.__Search__(s, true)
+	
+	
+	function FinishAndClear (|bool|focus=true)
+		opt norefcounts
+		|| s = .editor.text
+		if s != .cell
+			|| l = .editingfor
+				l.TryRenameCellTo(.cell, s)
+		.Clear(focus)
+	
+	
+	function Hide
+		.NeedsHide = true
+		
+	
+	function Clear (|bool| Focus=true)
+		.NeedsHide = false
+		.cell = nil
+		|| s = .SearchingFor 
+		if s
+			sdlapp.LastSearch = .editor.text
+			if focus
+				s.setfocus
+		with .editor
+			.visible = false
+			.text = ""      // wants new
+		with .editingfor
+			.isediting = false
+			if focus
+				.setfocus
+		.EditingFor = nil
+		.searchingfor = nil
+	
+	
+	function Edit (|ListViewCell| r, |ListView| l)
+		opt norefcounts
+		sdlapp.touch(.editor)
+		l := .editingfor
+		debug_require l and r
+		with .editor
+			.FinishEditing(false)
+			.visible = true
+			.setfocus
+			.TextSet(r)
+			.sel = .text.length
+		l.Select(r.original)
+		l <~ .editor
+		l.isediting = true
+		l.showfast(r.original)
+		.cell = r
+		.EditingFor = l
+	
+	
+	function For (|Guicontrol|)
+		if .editingfor
+			return .editingfor
+		return .searchingfor
+
+
+function guicontrol.Inline (|&InlineEditor|)
+	opt norefcounts
+	|| w = .window
+		return &w.inlineeditor
+
+
+function GuiControl.CanSearch (|bool|)
+	require self isnt unsearchable
+	if self isa textview
+		require !.isinline
+		require !.singleline
+	return true
+
+
+function GuiControl.OpenSearch (|bool|)
+	opt norefcounts
+	debug_require !(self isa window)
+	require self isnt NoSearch
+	if .CanSearch
+		return .opensearchsub
+	
+	|| f = self
+	while {
+		if f.CanSearch
+			return f.opensearchsub
+		f = f.NextFocus(true, false)
+	} (f and f != self)
+
+
+function GuiControl.OpenSearchSub (|bool|)
+	|| e	= .inline
+	|| FOR	= e.for
+	require for != self
+	 
+	if for
+		e.FinishAndClear(False)
+	if self isa textview
+		if .isinline
+			return for$.opensearch
+		sdlapp.LastSearch := .seltext
+	
+	|| f = e.editor
+	e.searchingfor = self
+	self <~ f
+	debug_require !(self isa window)
+	f.size = 115~left  by  15~down to the~top
+	f.text = sdlapp.LastSearch
+	f.visible = true
+	f.setfocus
+	f.selectall
+	if sdlapp.lastsearch
+		e.UpdateSearch(sdlapp.lastsearch)
+	return true

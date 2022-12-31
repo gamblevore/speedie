@@ -1,0 +1,221 @@
+
+
+
+// bugs:
+
+
+extend ObjectLoader {
+	linkage
+		cpp_Part Loader
+
+	function Next (|message|)
+		opt NoRefCounts
+		|| C = .Curritem
+			.CurrItem = C.next
+			return C
+	
+	function String (|string|)
+		opt norefcounts
+		|| C = .Next #require
+		return C.name.unshare
+	
+	function TmpString (|string|)
+		opt norefcounts
+		|| C = .Next #require
+		return C.name
+	
+
+	function Int (|int64|)
+		opt norefcounts
+		|| C = .Next #require
+		return C.name.parseint(c)
+
+	function Bool (|bool|)
+		return .int|bool|
+
+	function Float (|float|)
+		return .f64
+	
+	function f64 (|float|)
+		opt norefcounts
+		return .Next$.float
+	
+	function ObjectSub (|message|c, |object|)
+		opt norefcounts
+		if (c == @thg)
+			return .dict[c.name]
+		  elseif (C == @str)
+			return c.name.unshare
+	
+	function Object (|object|)
+		opt norefCounts
+		return .objectSub(.Next)
+	
+	function HasItem (|bool|)
+		opt norefcounts
+		return .curritem
+
+
+	function ItemName (|string|)
+		opt norefcounts
+		|| c = .curritem
+		return c.first.nyme.unshare
+
+	function ItemIsInt (|bool|)
+		opt norefcounts
+		|| C = .curritem
+		return (c.last == @num)
+
+	function ItemObject (|object|)
+		opt norefcounts
+		|| c = .curritem #require
+		.CurrItem = c.next
+		return .objectsub(c.last)
+
+	function ItemInt (|int64|)
+		opt norefcounts
+		|| c = .curritem #require
+		.CurrItem = c.next
+		return c.last.int
+	
+
+	function LoadRaw (|&byte| f, |int| n)
+		opt norefcounts
+		|| Raw = .next.nyme.unhex // write zero if can’t find? makes sense...
+		memory.copy(f, raw.addr, n min raw.length)
+		
+	
+}
+
+
+struct ObjectLoader {
+	linkage
+		cpp_part LD
+	|dictionary--|				Dict
+	|Message--|					CurrItem
+	|object--|					CouldntLoad
+	|Saveable|					Result
+	|Message--|					DataError
+	|Message--|					NoClass
+	
+	function VerifyFormat (|message|root, |bool|)
+		opt norefcounts
+		ObjectLoader.Init
+		|| m1 = root[@name] #require
+		// @JBSave
+		return true
+	
+	
+	function Preload (|message| root, |Dictionary| dict)
+		opt norefcounts
+		for (Cls in root)
+			if (cls == @tmp)
+				.LoadClass(cls, dict)
+	
+
+	function LoadClass (|message| msg, |Dictionary| dict)
+		opt norefcounts
+		// OK so... we wanna load one!? How? first, let's get the thing...
+		|| Cls = .GetClassOf(msg) #require
+		
+		// OK, so now let's... go through each line.
+		|| items = msg.last
+		expect (items == @list) (items)
+		
+		for line in items
+			.LoadObject( line, dict, cls ) 
+
+
+	function LoadObject (|message| msg, |Dictionary| dict, |&ClassData| Cls)
+		opt norefcounts
+		require (msg == @item)
+		|| name = msg.first
+		|| Result = Cls.AllocZeroed|saveable|
+			dict[name.name] = result
+
+
+	function LoadForReal (|message| root, |dictionary of saveable| d)
+		opt norefcounts
+		.Dict = d
+		for (Cls in root)
+			if (cls == @tmp)
+				for (line in cls.last)
+					|| name = line.first
+					|| result = d[name.name]
+					if (result)
+						.CurrItem = line.last.first
+						result.__loadproperties__(self)
+			  elseif (cls == @name)
+				.result = d[cls.name]
+	
+
+	function Finish
+		.result = nil
+		error !.NoClass (.DataError, "Unknown class.")
+		error !.DataError (.DataError, "Bad data found.")
+		error !.Couldntload (.Couldntload, "This class has no loader for it.")
+	
+	
+	function GetClassOf (|message| msg, |&ClassData|)
+		opt norefcounts
+		|| Data = ObjectLoader.ClassList[msg.name]|&ClassData| 
+		if (!Data)
+			.Noclass = msg
+		return data
+	
+	
+	module
+		|dictionary of int64| ClassList = nil		// _voidptr is better
+		
+		function LoadOne (SaverLoadClass)
+			|| naem = string.fromc(cls.name).lowercase
+			objectloader.classlist[naem] = cls|int64|
+
+		function Init
+			require !.ClassList
+			.classlist = dictionary.new
+			objectsaver.CallMe(&LoadOne)
+}
+
+
+
+extend Array
+	behaviour LoadProperties
+		opt norefcounts
+		while Loader.HasItem
+			self <~ Loader.Object
+
+
+extend Dictionary
+	behaviour LoadProperties
+		opt norefcounts
+		while (loader.hasitem)
+			|| name = loader.ItemName
+			if (loader.ItemIsInt)
+				self[name] = loader.ItemInt
+			  else
+				self[name] = loader.ItemObject
+
+
+
+function Message.RestoreLoad (|Object|)
+	|ObjectLoader| L = nil
+	require L.VerifyFormat(self)
+
+	|dictionary of saveable| objs = dictionary.new
+	L.Preload(self, objs)
+	if StdErr.ok
+		L.LoadForReal(self, objs)
+	rz = L.result
+	L.Finish
+	objs.class // don't want it getting messed up.
+
+
+function string.RestoreLoad (|object|)
+	return .parse.restoreload
+
+
+helper File.RestoreLoad (|object|)
+	return .parse$.restoreload
+
+

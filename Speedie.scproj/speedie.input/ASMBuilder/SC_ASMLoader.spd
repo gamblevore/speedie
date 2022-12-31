@@ -1,0 +1,71 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+extend_module ASM
+	function AsmFile (|file|)
+		return Compiler.InputFile( nil, "syntax.asm", nil )
+
+
+	function InstructionList (|string| ch, |file|)
+		return ExternalCompiler.CppLib[ch]
+	
+	
+	function Enc1
+		|asm2| R
+		R.op = ASM.DSUB
+		R.r[0] = 3
+		R.r[1] = 2
+		R.r[2] = 1
+		R.Rest = 0
+		|| oof = R.Encode
+	
+	
+	function SelfTest (|message| tests)
+		opt norefcounts
+		require !app..talk
+		if true
+			.enc1
+		target debug // asm here
+			// So now what?
+			stderr.errorsareproblems++ // nice
+
+			|| list = tests.last(@arg)
+			|| testname = tests[@thg]
+			if list and testname
+				textassembler.assemble(list)
+				//.MiniLink
+				|| fn = Flatten[testname]
+					|| ff = fn.finish.run
+			
+			stderr.errorsareproblems--
+
+
+	function TestASM 
+		Flatten.initasm
+
+		if asm.noisyasm >= 3
+			.Listinstructions
+		|| T = .asmfile.parse[@tmp, "tests"]
+			.SelfTest(T)
+
+	
+	function CreateASMProperties
+		require options.SelfReplacement
+		instruction.SET1.const
+		instruction.SETK.const
+		instruction.SETN.const
+
+	
+		
+	function ListInstructions
+		|| fs = faststring()
+		fs <~ "Opcodes:\n"
+		for opcode in Instruction.typelistsize
+			|instruction--| inst = Instruction.typelist[opcode]
+			fs <~ "\t$opcode = ${inst.name}\n"
+		printline fs
+
+

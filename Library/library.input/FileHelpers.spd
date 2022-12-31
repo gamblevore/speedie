@@ -1,0 +1,297 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+extend String	
+	function ExistingFile (|string| operation="use",  |File|)
+		|| f = .file
+		if f.mustexist(operation)
+			return f
+	
+	function FileExists (|bool|)
+		|| f = .file
+		return f.exists
+
+	function MakeEntirePath (|bool|Last=true, |ErrorInt|)
+		visible
+		|| p = (Self, .parent)(last)
+		for S.Paths in p
+			|| err = S.MakeDir|int|
+				return err
+		
+	function PathDir (|string|)
+		if self and .last != '/'
+			return self + "/"
+		return self
+		
+	function syntaxappend (|string| s, |bool|)
+		return .filedata(s)
+
+	function Sibling (|string| name, |string|)
+		return .ReplacePathComponent(-1, Name)
+		
+	function file.sibling (|string| name, |file|)
+		return super.sibling(name).file
+	
+	function ReplacePathComponent (|int| num, |string| With, |string|)
+		|| R = .TrimTrailingSlashes.Split('/')
+		// ok so... 
+		if (num < 0)
+			num += R.length
+		
+		R[num] = With
+		return join2(R, "/")
+
+
+	function RemoveExt (|string| suff, |string| backup, |string|)
+		|| ext = .ext 
+		if ext == suff
+			return .TrimExtKeepPath
+		if backup
+			return self + backup
+		stderr.newerror("Expected suffix '$suff' on '$self' but found '$ext'")
+			
+
+	function TrimTrailingSlashes (|string|)
+		return self[0, .FindTrailingSlashes]
+	
+	function FindTrailingSlashes (|int|)
+		rz = .Length
+		while self[rz-1] == '/'
+			rz--
+		
+
+	function Resolve (|bool| AllowMissing=false, |string|) 
+		cpp_wrapper JB_Str_ResolvePath
+
+
+	function VolumeName (|string|)
+		opt norefcounts
+		|| s = .name // wait we wan the first path, not the last?
+			return s
+		return "Root"	// should really go through all the stuff in /Volumes/ or /vol/
+
+
+	function IsVolume (|bool|)
+		if self == "/"
+			return true
+		|| p = .parent.pathdir
+		if p == "/Volumes/" or "/vol/" or "/media/" or "/mnt/"
+			return true
+		// should really go through all the stuff in /Volumes/ or /vol/
+
+
+	function TrimExtKeepPath (|string|)
+		return .TrimExtAndPath(false)
+	function TrimExtAndPath (|bool| KeepPath=true, |string|)
+		Description "already does .name, no need for .name.trimext"
+		|| N	 = .FindTrailingSlashes
+		|| slash = .find('/', n-1, 0) + 1
+		|| dot	 = .find('.', n-1, slash)
+		dot := n
+		if !KeepPath
+			slash = 0
+		return self[slash, dot]
+		
+
+
+	function FileData (|int|lim=1024MB, |bool|AllowMissing=true, |string|)
+		return .file.readall(lim, AllowMissing)
+
+
+	function FileData (assigns:|string|, |bool|)
+		return .file.data(Value)
+		
+	function Child (|String| cname, |String|)
+		if !self
+			Return cname
+		|| C = (.last == '/')|int|
+		C += (cname[0] == '/')
+		if (C == 1)
+			return self+cname
+		if (C == 0)
+			Return self + "/" + cname
+		Return self + cname[1, int.max]
+
+
+	syntax access (|string| s, |string|)
+		return .child(s)
+
+
+	function Parent (|string|)
+		description "Gets the file path's parent'" 
+		if self != "/"
+			return .TrimTrailingSlashes.BeforeLastByte('/', 1)
+
+
+	function PathFix (|string|)
+		cpp_wrapper JB_File_PathFix_ // needs a better name
+		// basically just replaces "~/" with the username...
+
+
+	function MakeDir (|ErrorInt|)
+		cpp_wrapper JB_Str_MakeDir
+
+
+	function TrimLastSub (|Byte| b, |int|)
+		// replace with .outbyte(-1,0,b)?
+		|| N = .Length
+		while (self[N - 1] == b)
+			N--
+		return N
+
+	
+	function TrimFirst (|Byte| b, |string|)
+		|| s = .outbyte2(b)
+		return self[s...]
+
+	
+	function AfterByte (|Byte| b, |int| Last=-1, |string|)
+		|| Start = .find( b, Last, 0 )
+		return self[Start + 1, Last]
+
+
+	function BeforeLastByte (|Byte| b, |int| fudge=0, |string|)
+		|| Last = .TrimLastSub(b)
+		|| Start = .find( b, Last, 0 )
+		return self[ 0, Start + fudge ]
+
+
+	function BeforeByte (|Byte| b, |int| NotFound=-1, |string|)
+		|| i = .find( b )
+		if (i < 0)
+			i = NotFound
+		return self[ 0, i ]
+
+		
+	function Ext (|string| ext, |string|)
+		cpp_Part SetExt 
+		rz = .TrimExtKeepPath
+		if ext[0] != '.'
+			rz += "."
+		rz += ext
+	
+	function Ext (|string|)
+		|| i = .find( '.', int.max, 0 )
+		|| n = .outbyte2('/', int.max, 0)
+		n := .length
+		if i
+			return self[i + 1, n+1]
+
+
+	function BackToApp (|string|)
+		|| s = .trimtrailingslashes
+		|| Final = ".app/Contents/MacOS/" + .name
+		if s endswith final
+			rz = s[0, 4+(s-final)]
+		  else
+			rz = self
+
+	function Name (|string|)
+		|| Last  = .TrimLastSub('/')
+		return .AfterByte('/', Last)
+	
+	
+	function FolName (|string|)
+		|| Last  = .TrimLastSub('/')
+		|| before = .find('/', last, 0)+1
+		return self[before...]
+
+	
+	function CopyFileTo (|String| Dest, |bool| AttrOnly=false, |ErrorInt|)
+		return .file.copyto(dest.file, attronly)
+	
+
+// "/a/b/c" becomes "/a", "/a/b", "/a/b/c"
+// "a/b/c"  becomes "a",  "a/b",  "a/b/c"
+
+	iterator Paths
+		|| P = .pathfix.TrimTrailingSlashes
+		|| i = 1
+		|| N = P.Length
+
+		while (i <= N)
+			if (i < N) and (P[i] != '/')
+				continue
+
+			yield P[0, i]
+			i++
+
+
+
+
+/// ACTUAL FILE STUFF
+
+	operator isa (|string| s, |bool|)
+		return .ext ~= s
+	function File (|File|)
+		cpp_part AsFile
+		if self isa file
+			return self
+		return .filesub
+	helper FileSub (|File|)
+		cpp_Wrapper JB_Str_File
+	function FileCh (|string| ch, |File|)
+		cpp_Part ChildFile
+		return self.Child(ch).file
+	
+	function OpenFile
+		if self and platform.osx
+			|| p = .pathfix
+				"/usr/bin/open".execute([p])
+	
+	function Reveal (|bool|)
+		if self and platform.osx
+			|| p = .pathfix
+			require p.fileExists
+			|| R = ["-R", p]
+			if .last == '/'
+				r.remove(0)
+			"/usr/bin/open".execute(R)
+			return true
+
+	function TypeContains (|string| s, |bool|)
+		for field in StringFields( self, ',' )
+			if field ~= s
+				return true
+		
+
+extend file
+	helper xattrclear (|errorint|)
+		return .xattr("-rc")
+	helper xattr (|string| request, |errorint|)
+		if platform.osx
+			return "/usr/bin/xattr".execute([request, self])
+		
+	function xcopyto (|file|f, |errorint|) 
+		rz = .copyto(f)
+		if rz
+			rz = f.xattrclear
+
+
+	function UploadTo (|string| url, |errorint|)
+		return "/usr/bin/curl".execute([
+			"-T"
+			self
+			url
+		])
+	
+	function ZipTo (|string| zip, |errorint|) //zip -r foo.zip foo
+		|| p = .shellpath // sigh. // zip is so bad.
+		|| dir = p.parent
+		|| name = p[dir.length...]
+		rz = "cd $dir; zip  -r  $zip  $name".system
+	
+	function string.shellpath (|string|)
+		return .replaceall(" ", `\ `)
+		
+	function ZipTmp (|file|)
+		require self
+		|| zip = "/tmp/${.name}.zip"
+		if .zipto(zip)
+			return zip.file
+		
+	function ZipUpload (|string| url, |errorint|)
+		return .ZipTmp$.uploadto(url)
+		

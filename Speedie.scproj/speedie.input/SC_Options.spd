@@ -1,0 +1,469 @@
+
+
+constants
+	kSelfReplace 	= 1
+	kSelfDebug   	= 2
+
+
+module Options
+	flags: native,pack
+	
+	||		output_path				= ""
+	||		SingleFileInput			= ""
+	||		Variant					= ""
+	||		SingleCppOutput			= true
+	||		TargetDebug				= false
+	||		PrintLibraries			= false
+	||		HideMultipleErrors		= true
+	||		Products				= native
+	||		Cpp						= true
+	||		Compile					= true
+	||		KeepAllErrors			= false
+	||		Scripting				= false
+	||		MakeLib					= false // for now
+	||		CheckMaxVars			= false
+	||		ListAllLib				= false
+	||		ForceRecompile			= false
+	||		Silent					= false
+	||		Is32Bit					= false
+	||		IsDirectTest			= false
+	||		ProjectIsLibrary		= false
+	||		IgnoreCantSaveErrors	= false
+	||		ArgStats				= false
+	||		PrintCompileString		= false
+	||		PrintFiles				= false
+	||		Flow					= false
+	||		PrintStages				= false
+	||		Warnings				= false
+	||		UseFuncCallCount		= false
+	||		ExternalCompile			= false
+	||		Final					= false // won't call gcc.
+	||		Optimise				= 1
+	||		SelfReplacement			= 0
+	||		OperationCount			= 0
+	|byte|	Perry					= 0
+	|File|  OutputNormal
+	|File|  OutputErrors
+	
+	function Color (assigns:|bool|)
+		ErrorColors.enabled = Value
+
+	function Color (|bool|)
+		return ErrorColors.enabled
+	
+
+
+
+module Feedback 
+	linkage
+		cpp_part FB
+
+	function CheckSelfModifying (|string| S)
+		s = s.trimextandpath
+		require (S ~= "uwu" or "speedie") and !options.singlefileinput
+		require !(Options.SelfReplacement)
+		Options.SelfReplacement = kSelfReplace
+		Options.ExternalCompile = true
+		options.ForceRecompile = true
+
+
+	function ParseArgs (|bool|)
+		return ParseArgsSub(app.rawargs)
+
+
+	function ParseArgsSub (|[]| args, |bool|) 
+		if ("".length == 1)
+			"".debugprint // stop from being stripped
+			nil|message|.jdb2
+			nil|message|.dbglineinfo
+			nil|message|.LocateAll
+		
+		if !Args
+			.CompilerInfo
+			.Help
+			return false
+
+		for (S in args)
+			.Parseoption(S)
+		
+		if options.OperationCount <= 0
+			StdErr.newerror( "\nError: No operations requested.\n" )
+		  elseif options.OperationCount >= 2
+			StdErr.newerror( "\nToo many operations requested.\n" )
+
+		return StdErr.OK and Compiler.BaseProjectPath.Exists
+
+
+	function string.IsSpeedieSrc (|bool|)
+		return (self isa "spd")
+
+	function Output (|string| v, |file|)
+		if options.OutputNormal.path == v
+			return options.OutputNormal
+		if options.OutputErrors.path == v
+			return options.OutputErrors
+		return file.new(v)
+		
+	function Output (|string| value, |int| Mode)
+		Options.Color = false
+		|| f = Feedback.output(value)
+		|| d = f.opendes
+		if mode & 1
+			options.OutputNormal = f
+			pipe.stdOut = d
+		if mode & 2
+			options.OutputErrors = f
+			pipe.stderror = d
+
+	function TryUseProject (|String| path, |bool| IsScript=false, |string|)
+		ifn (path contains '/' or '.' or '~')
+			Path = compiler.FindProjNoSuffix(Path)
+		
+		|| path2 = path.Resolve(true)
+		if path2: path = path2
+		|| F = Path.File
+		expect !(f inside compiler.library or compiler.jeebox) (f, "Don't compile Library files") 
+			
+		compiler.OriginalInputPath = path // altered below at: F.path = F.path.parent
+		Compiler.BaseProjectPath = F
+		compiler.projectname = f.trimextandpath
+		compiler.reportedname = compiler.projectname
+		
+		|| exists	= f.exists
+		|| IsSpd	= f.name.IsSpeedieSrc or IsScript
+		if (exists and !F.isdir) or (!exists and IsSpd)
+			options.SingleFileInput = f.path
+			require f.mustexist
+			F = f.parent
+			Compiler.BaseProjectPath = f
+
+		CheckSelfModifying(Path)
+
+		if !options.SingleFileInput
+			F.mustexist("read project. (You may create it with: 'speedie --create /path/to/proj' if you want)")
+
+		if exists and isspd and stderr.ok
+			return path
+
+
+	function ParseOption (|object| Obj)
+		// something like that?
+		|| Name  = obj.ArgName
+		|| Value = obj.ArgValue
+
+		if Name
+			|| opt = AppOptions[name]
+			ifn opt
+				app.die("Unknown switch '$Name'\n")
+			  else
+				options.OperationCount += ((opt)(name, value, nil))
+		  elseif value.isjbin // ignore it
+			0 // probably a restart compile option
+		  elseif (options.OperationCount == 1) and !options.output_path
+			feedback.AppOptions_product("product", value) // change to output_path
+		  else
+			.TryUseProject(Value)
+			options.OperationCount++
+
+		
+	function Explain (|faststring| Purpose, |string| name="", |bool|) 
+		ifn purpose: return true
+		purpose <~ name
+
+
+	function AppExtCompile (ShellOption) 
+		explain(purpose, "Places the .cpp and header files locally")$
+		Options.ExternalCompile = true
+		Options.Color = false // makes sense... we want to do this using xcode
+
+
+	function AppVersionNumber (ShellOption) 
+		Explain(Purpose, "Print version number.")$
+		return CompilerInfo()
+
+
+	function AppTalk (ShellOption) 
+		Explain(Purpose, "")$
+		interact.ShouldEnter = 1
+		ErrorColors.enabled = false 
+		target release
+			|| v = ExternalCompiler.LogName
+			printline "Stdout to: " + v
+			app.printstacktrace
+			feedback.output(v, 3)
+			options.outputnormal.size = 0
+
+
+	dispatch AppOptions (ShellOption)
+		nocompile // remove this later
+			Explain(Purpose, "Will not compile any .cpp generated.")$
+			Options.Compile = false
+			options.products &=~ (options.pack+options.native)
+			
+		breakonerr 
+			Explain(Purpose, "")$
+			error.AutoPrint = value.optionint
+		
+		path
+			Explain(Purpose, "")$
+			printline app.Path
+		
+		keepallerrors
+			explain(purpose, "Show more errors that were hidden.")$
+			options.KeepAllErrors = value.optionbool
+
+		env
+			explain(purpose, "Print environment variables")$
+			for (s in app.env) (k)
+				printline k + ": " + s
+			return true
+			
+		externalcompile (AppExtCompile) // deprecated. remove
+		x (AppExtCompile)
+		
+		+"perry"
+			Explain(Purpose, "")$
+			options.perry = 1
+			options.perry += value.argvalue=="bin"
+			error.AutoPrint = 0
+			compiler.insecurewords = file.PrefsFolder["klinkerhoppen.banned"].readall.dict
+		
+		check
+			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$
+			Options.Compile = false
+			Options.Cpp = false
+			options.products = 0
+		
+
+		errortest 
+			explain(purpose, "Tests if error handling works OK.")$
+			PrintError "Errors print successefully\n"
+			return true // does something, counts towards operationCount
+		
+		argstats
+			Explain(Purpose, "")$
+			options.argstats = true
+			
+		noisy 
+			Explain(Purpose, "Prints more stuff.")$
+			Options.PrintCompileString = true
+			file.DebugExecute = true
+			options.PrintLibraries = true
+		
+		alive
+			Explain(purpose)$
+			printline "We seems alive :)" // used by perry
+			return true
+		
+		products
+			Explain(purpose, "Acceptable values: pack, cpp, native. Combine like pack/native.\n\n'Native' = compiled via GCC.\n'pack' = interpreted.")$
+			|| P = 0
+			for item in (value / '/')
+				if item ~= "native"
+					P |= options.native
+				if item ~= "cpp"
+					P |= options.cpp
+				if item ~= "pack"
+					P |= options.pack
+			options.products = P
+			
+
+		ignorecantsave 
+			Explain(Purpose)$
+			options.IgnoreCantSaveErrors = true
+		
+
+		quiet 
+			Explain(Purpose, "Prints less stuff")$
+			Options.PrintCompileString = false
+		
+		
+		stages
+			Explain(Purpose, "Prints the stages")$
+			options.printstages = value.optionbool
+		
+		
+		print 
+			Explain(Purpose)$
+			print Value
+			return true // does something, counts towards operationCount
+		
+		
+		directtest 
+			explain(Purpose, "Allows me to test certain compiler features more easily.")
+			options.isdirecttest = value.OptionBool
+			targets.set("direct")
+		
+		
+		single 
+			Explain(Purpose, "")$
+			options.SingleCppOutput = value.optionbool
+		
+		
+		+"self" 
+			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$
+			feedback.TryUseProject( Compiler.SpeedieProj )
+			return true // does something, counts towards operationCount
+			
+		+"__talk__" (AppTalk)
+			
+		+"talk" (AppTalk)
+		
+		+"targetdebug" // basically
+			Explain(Purpose, "")$
+			options.targetdebug = value.optionbool
+		
+		+"target"
+			Explain(Purpose, "")$
+			if value == "debug"
+				error "Use 'targetdebug' instead."
+			targets.set(value)
+			
+		m64
+			Explain(Purpose, "64-bit compile")$
+			options.is32bit = false
+
+		
+		funccount
+			Explain(Purpose, "Spams each func with a static int, to count the number of times it's called. Useful debugging feature.")$
+			options.UseFuncCallCount = value.optionbool
+
+
+		m32
+			Explain(Purpose, "32-bit compile")$
+			options.is32bit = true
+			app.PrintStackTrace
+
+		
+		warn
+			Explain(Purpose, "Show warnings.")$
+			Options.Warnings = value.optionbool
+
+		
+		maxvars
+			Explain(Purpose, "Reports maximum number of vars/funcs/args used in program.")$
+			Options.checkmaxvars = value.optionbool
+		
+		nocolor
+			Explain(Purpose, "Don't print text coloring symbols for terminals.")$
+			Options.Color = false
+		
+		output
+			Explain(Purpose, "Redirects stdout printed to file passed.")$
+			feedback.output(value, 1)
+		
+		errors
+			Explain(Purpose, "Sends all errors printed to file passed.")$
+			feedback.output(value, 2)
+
+		selfdebug
+			Explain(Purpose, "Self-test only.")$
+			Options.SelfReplacement = kSelfDebug
+			options.targetdebug = true
+			Options.Compile = false // remove this later
+			options.products &= (~options.pack+options.native) 
+			Options.ExternalCompile = true
+			feedback.TryUseProject( Compiler.SpeedieProj )
+			return true // does something, counts towards operationCount
+		
+		optimise
+			Explain(Purpose, "Optimisation level. (0 to 3... EG: '--Optimise=1')")$
+			Options.Optimise = Value.parseint
+
+		cpp
+			explain(purpose, "Compiles to cpp, using clang. Default true")$
+			options.cpp = value.optionbool
+		
+		product // delete this later
+			explain(purpose, "Specifies the build product path")$
+			options.output_path = value.pathfix
+			options.output_path.parent.file.mustexist
+		output_path
+			explain(purpose, "Specifies the build product path")$
+			options.output_path = value.pathfix
+			options.output_path.parent.file.mustexist
+		
+		force
+			explain(purpose, "Forces recompilation even if the output is newer than the input files.")$
+			options.ForceRecompile = true
+
+		variant
+			Explain(Purpose)$
+		// variant... lol
+			Options.Variant = (Value.parseInt|int|).Render
+
+			options.OutputNormal = file.new( externalcompiler.tmpout(Options.Variant) )
+			options.OutputErrors = file.new( externalcompiler.tmperr(Options.Variant) )
+			pipe.StdOut = options.outputNormal.OpenDes
+			pipe.StdError = options.outputErrors.Opendes 
+			Options.Color = false
+			(options.optimise max= 1) // -Os
+		
+		final
+			Explain(Purpose)$
+			Options.Final = true
+		
+		codesign
+			Explain(Purpose, "Gets/Sets the codesign certificate")$
+			if value == ""
+				printline app.pref(codesign_native)
+				return true
+			
+			if value == "none" or "nil" or "-"
+				value = ""
+			app.pref(codesign_native) = value
+			app.saveprefs
+			printline "Codesign set to " + value
+			return true
+		
+		dosign
+			Explain( Purpose, "Code signs an app." )
+			
+			return true
+
+		
+		+"clean"
+			Explain(Purpose, "Remove temp files.")$
+			if externalCompiler.Clean(value.argvalue)
+				"Cleaned"
+			return true // does something, counts towards operationCount
+		
+		version (AppVersionNumber)
+		
+		v		(AppVersionNumber)
+		
+		help
+			Explain(Purpose, "This.")$
+			Help()
+			return true
+
+
+	function string.optionbool (|bool|)
+		return (self ~= "" or "true" or "yes")
+	function string.optionint (|int|)
+		if .optionbool
+			return 1
+		return .int
+
+
+	function CompilerInfo (|bool|)
+		"spd $__time_id__"
+		return true
+
+
+	function Help 
+		|| fs		 = faststring.new
+		|| fs_tester = faststring.new
+		fs <~ "Usage: "
+		fs <~ app.filename
+		fs <~ " /path/to/project\n"
+		for (v in appoptions) (k) 
+			(appoptions[k])("", "", fs_tester)
+			if (fs_tester.length) 
+				fs_tester.length = 0
+				fs <~ "\n--"
+				fs <~ k
+				fs <~ (' ', 17-k.length)
+				(AppOptions[k])("", "", fs)
+		printline fs.getresult
+

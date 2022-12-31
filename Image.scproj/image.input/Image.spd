@@ -1,0 +1,434 @@
+
+
+
+class Image (memory)
+	linkage
+		cpp_part Img
+		opt min 3
+	|ivec2|			WH
+	|ivec2|			Base
+	|ivec4|			_ControlClip
+	|string|		Name
+	contains byte
+	
+	constructor (|ivec2| S, |&byte| P)
+		cpp_Part ConstructorPointer
+		super.constructor(s.area, 4, P)
+		.WHset(s)
+		
+	constructor (|ivec2| wh, |string| name="")
+		cpp_Part ConstructorSizeVec2
+		super.constructor(wh.area, 4) 
+		.name = name
+		.WHset(wh)
+
+	render	
+		fs <~ "image${.wh}:${.name}"
+	
+	function CopyImage (|Image|)
+		rz = image(.wh)
+		memory.Copy(rz.ptr, .ptr, .ByteCapacity)
+	
+	function ControlClip (assigns:|ivec4| R)
+		cpp_part ControlClipSet4
+		|| sigh = (0, 0, .wh)
+		// what if R is too big?
+		|| b = .base.xyxy
+		r += b
+		r = r.clip(sigh)
+		r -= b
+		._ControlClip = r
+	
+	
+	function ControlClip (|ivec4|)
+		return ._ControlClip 
+	
+	function Rect (|ivec4|)
+		return .wh.rect
+	function Size (|ivec2|)
+		return .rect.size
+	
+	
+	function Width (|int|)
+		return .wh.x
+	
+	
+	function Height (|int|)
+		return .wh.y
+	
+	function whset (|ivec2| wh)
+		.wh = wh
+		.base = (0,0)
+		._ControlClip = (0,0,wh)
+	
+	function whset
+		cpp_Part resetarea
+		.base = (0,0)
+		._ControlClip = (0,0,.wh)
+	
+	
+	function horz (assigns:|ivec2|r)
+		._controlclip.x = r.x
+		._controlclip.x2 = r.x2
+	
+		
+	function Clip (|ivec4| R, |ivec4|)
+		if (self)
+			r = r.clip(.ControlClip)
+		return R
+
+
+	operator contains (|ivec2| p, |bool|)
+		return p inrange .wh
+
+
+	operator contains (|&imagepixel| r, |bool|)
+		cpp_part ContainsPtr
+		require r >= .ptr|&imagepixel|
+		require r <  .ptr|&imagepixel| + .length
+		return true
+
+		
+	function ResizeTo (|ivec2| WH)
+		.Free
+		.WHset(wh)
+		.length = wh.area
+		.Capacity = .Length
+	
+	function Clear (|imagepixel| Color=colors.black)
+		.FillRect((0,0,.size), color)
+	
+	function Pixels (|&imagepixel|)
+		return .ptr|&imagepixel|
+	
+	function imagepixel.Colorise (|byte| D)
+		|| DB = (d>>2)&3				// too brown otherwise
+		|| DX = (d>>5)&3
+		.r = ((d>>0)&7)*36
+		.g = ((d>>3)&7)*36
+		.b = (DB xor DX)*85
+		.a = 255
+	
+	
+	function Colorise (|Memory| data, |int| px)
+		|| in = data.ptr$
+		|| after = in + data.BytesUsed$
+		|| curr = ._controlclip.x1y1
+		|| end = ._controlclip.x2y2
+		|| w = Colors.grey(0.5)
+		while (curr.y < end.y)
+			while (curr.x < end.x)
+				|| p = self[curr]
+				p.Colorise(*in)
+				if ++in >= after
+					in = data.ptr
+				|| p2 = self[curr+(0,1)]
+				curr.x += 2
+				p[1] = p[0]
+				if p2
+					p2[0] = w //p[0]
+					p2[1] = w
+			curr = (._controlclip.x, curr.y+2)			
+		
+		
+	syntax access (|int| x, |int| y, |&imagePixel|)
+		cpp_part AtXYInt
+		return self[(x,y)]
+	
+	// seems pointless really?
+	// if you want interp... you need the vec4 version
+	syntax access (|vec2| P, |&ImagePixel|)
+		disabled "use vec2 coords or use syntax call for ivec2 coord"
+		cpp_part AtVec2
+		return self[p.ivec2]
+	
+	syntax access (|ivec2| P, |&ImagePixel|)
+		cpp_part AtXY
+		// We want to add something to x, then check x vs
+		P += .base
+		|| S = .wh
+		rz = .pixels
+		ifn p inrange s
+			p = p.clip(s-(1,1)) // sigh... messy
+		p.y = s.y - (1 + p.y) // invert
+		rz += (p fma s.x)
+
+	syntax call (|ivec2| P, |vec4|)
+		cpp_part ColXY
+		return .SyntaxAccess(p).Color
+	syntax call (|vec2| P, |vec4|)
+		cpp_part ColVec2// should do interpolation
+		return .SyntaxAccess(p.ivec2).Color
+		
+	function SavePNG (|file| f) // writetofile
+		if f.openEmpty
+			f.RawWritePng(.wh.x, .wh.y, .ptr|&byte|)
+	
+		
+	function ClearMarks (|ivec4| R)
+		.mark(r, 0)
+	
+	
+	function Mark (|ivec4| R,  |byte| Mark=1)
+		for px in self[r]
+			px.a = mark
+
+
+	function MarkOutline (|ivec4| R,  |byte| Mark=1)
+		.markh(r.xy, r.width, mark)
+		.markh(r.xy2, r.width, mark)
+		.markv(r.xy, r.height, mark)
+		.markv(r.x2y, r.height, mark)
+
+	
+	function MarkH  (|ivec2| xy, |int| Width,  |byte| Mark=1)
+		|| sigh = self[xy]
+		require sigh!=.pixels
+		width++
+		for width
+			(sigh++).a = Mark
+	
+	
+	function MarkV (|ivec2| xy, |int| Height, |byte| Mark=1)
+		|| iw	= .width
+		if xy.y < 0
+			height -= xy.y
+			xy.y = 0
+		|| sigh	= self[xy]
+		require sigh != .pixels
+		height++
+		|| ylim = .height - xy.y 
+		for height
+			require --ylim > 0 
+			sigh.a = Mark
+			sigh -= iw
+	
+	
+	function FillMarks (|ivec4| R, |imagepixel| A, |imagepixel| B, |imagepixel| C, |imagepixel| D)
+		|| va = a.color
+		|| vb = b.color
+		|| vc = c.color
+		|| vd = d.color
+		for sighs in self[r]
+			|| i = sighs.a
+			if i == 0
+				sighs.overlay(va)
+			  elseif i == 1
+				sighs.overlay(vb)
+			  elseif i == 2
+				sighs.overlay(vc)
+			  elseif i == 3
+				sighs.overlay(vd)
+	
+	
+	function DrawLine (|ivec2| A, |ivec2| B, |int| Width)
+		A<<=16
+		B<<=16
+		|| D	= B - A
+		|| ab	= d.abs
+		|| N	= 0
+		if (!D)
+		  elseif (ab.x > ab.y)
+			N = ab.x
+			D = ( 64KB, (d.y*64KB)/d.x )  
+		  else
+			N = ab.y
+			D = ( (d.x*64K)/d.y, 64KB )  
+		N = (N + 64KB-1) >> 16
+
+		for (N)
+			self[A>>16][] = 255
+			A += D
+
+	
+	iterator
+		|| curr = ._controlclip.x1y1
+		|| xstart = ._controlclip.x
+		|| end = ._controlclip.x2y2
+		while (curr.y < end.y)
+			while (curr.x < end.x)
+				if self[curr]|int64| < 0xc2000
+					debugger
+					self[curr]
+				yield (self[curr]) (curr)
+				curr.x++
+			curr = (xstart, curr.y+1)
+
+	
+	module
+		function file.RawWritePng (|int| w, |int| h, |&byte| data, |int|)
+			cpp_wrapper JB_File_WritePng
+		
+		function Load (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |&byte|)
+			cpp_wrapper JB_LoadImage
+		
+		function Load (|Message| l, |image|)
+			cpp_part LoadMsg
+			|| w = l[@num, 0].int
+			|| h = l[@num, 1].int
+			|| d = l[2].nyme.decompress
+			require (w > 0) and (h > 0) and d
+			|| img = image((w,h), l.name)
+				img.Copy(d)
+				return img
+
+		function string.LoadImage (|image|)
+			|| x	= 0
+			|| y	= 0
+			|| comp	= 0
+			|| buff = image.load( .addr, .length, &x, &y, &comp, 4 )
+				return image((x, y), buff)
+
+		
+		function file.LoadImage (|image|)
+			|| f = .readall
+				return f.loadimage #expect (.path, "Failed to read image.")
+
+
+// move over to the other file.
+	
+	function LoadEmpty (|int| W, |int| H, |bool|)
+		if (.wh.x != W or .wh.y != h)
+			.Capacity = w*h
+			.WHset((w,h))
+		return .Pixels
+	
+	
+	function  DoStyle (|imagePixel| P, |DrawStyle| G, |float| Shadow, |vec4|)
+		if (!G)
+			Shadow := 1.0
+			return P*Shadow
+		
+		|| T = P * G.text
+		|| B = P * G.Bg			// Multiply by forecolor and backcolor...
+		|| C = P.brightness-Shadow
+		return mix(T, B, 1.0-C)	// interpolate by how dark the pixel is.
+
+	
+	function DrawTo (|image| Where, |int| DrawX=0, |int| DrawY=0)
+		|| d = (DrawX, DrawY)
+		for (P in self) (V)
+			Where[v + d] <~ P
+	
+	
+	syntax access (|ivec4| rect, |imagereader|)
+		cpp_part imagereader
+		rz.rect = .clip(rect)
+		rz.img = self
+	
+	
+	function DrawRect (|ivec4| R, |DrawStyle| G=nil, |float| strength=1, |bool|)
+		|| EdgeColor = g.EdgeColor(true)
+		|| InnerColor = g.EdgeColor(false)
+		if strength < 1
+			EdgeColor.a = strength*EdgeColor.a max 0
+			InnerColor.a = strength*InnerColor.a max 0
+		  elseif strength > 1
+			|| v = InnerColor.Color
+			|| c2 = (v*strength+strength*0.08).clamp
+			InnerColor = c2
+		return .fillrect(r, innercolor, edgecolor)
+	
+	
+	function EdgeAlpha (|ivec4| R, |DrawStyle| G, |float| alpha, |bool|)
+		|| EdgeColor = g.EdgeColor(true)
+		|| InnerColor = g.EdgeColor(false)
+		edgecolor.alpha = alpha
+		require edgecolor.a
+		innercolor.alpha = 0
+		return .fillrect(r, innercolor, edgecolor)
+
+
+	function FillRect (|ivec4| Rect, |ImagePixel| Color, |bool|)
+		cpp_Part FillRectSub
+		require Color.a
+		if color.a != 255
+			|| c = color.color
+			for (sigh in self[rect]) (v)
+				sigh.Overlay(C)
+		  elseif Rect == .rect
+			memory.fillint(.ptr|&int|, .length, color.uint)
+		  else
+			for (sigh in self[rect]) (v)
+				*sigh = color
+		return true
+
+
+	function FillRect (|ivec4| Rect, |ImagePixel| Color, |ImagePixel| Outline, |int|HideEdge=0, |bool|)
+		if color.equals(outline)
+			return  .fillrect(rect, color)
+		
+		.FillRect(Rect ± 1, color)
+		ifn HideEdge & 1 
+			.FillRect(rect.x2y1x2y2 + (-1,1,0,-1),	outline) // right
+		ifn HideEdge & 2
+			.FillRect(rect.x1y1x1y2 + (0,1,1,-1),	outline) // left
+		ifn HideEdge & 4 
+			.FillRect(rect.x1y2x2y2 + (0,-1,0,0),	outline) // top
+		ifn HideEdge & 8 
+			.FillRect(rect.x1y1x2y1 + (0,0,0,1),	outline) // bottom
+		return true
+	
+	
+	function Invert 
+		|| p = ._Ptr
+		|| End = p + (.bytecapacity-3) 
+		while p < End
+			p[0] = 255-p[0] 
+			p[1] = 255-p[1] 
+			p[2] = 255-p[2] 
+			p[3] = 255-p[3] 
+			p+=4
+			
+
+
+	function DrawCircle (|ivec4| R, |DrawStyle| G=nil, |float| fade=0.0,  |bool|)
+		|| Back		= .Clip(R)$
+		
+		R -= (0,0,1,1)
+		|| mid		= r.Center
+		|| maxdist	= (0.5 * r.width) + 0.5
+		|| scale	= (1.0, r.aspect)
+		|| area_over= r.area|float|
+		|| Dim		= area_over.RangeConvertClamped(2000, 0.15, 8000, 0.26)
+		
+		// OK so... jsut fade? 
+		|| C		= G.Bg.color
+		c.a = 1.0
+		|| c2		= c * fade
+
+		for Pix.rect in Back
+			|| V	= (mid - pix.vec2)*scale
+			if fade > 0
+				|| L = v.length
+				|| briht = 1.0-dim
+				if L > 0.0001
+					briht = ((maxdist*0.15) / L) - dim
+				if (briht > 0)
+					self[Pix].add(briht*c2)
+			  elseif v <= maxdist
+				c.a = 1.0
+				self[Pix].Overlay(c)
+		return true
+
+	
+	function Fill (|DrawStyle| G)
+		.DrawRect(._controlclip, G)
+
+
+	
+
+struct ImageReader
+	|ivec4|				Rect
+	|Image|				Img
+	iterator
+		while (.rect.y < .rect.y2)
+			|| v	= .rect.xy
+			|| v1	= .img[v]
+			if v1 // in case a    bad coord.
+				|| v2	= v1 + .rect.width
+				while v1 < v2
+					yield v1 (v)
+					v.x++
+					v1++
+			.rect.y++

@@ -1,0 +1,246 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+class Error (Message)
+	linkage
+		cpp_part	Err
+		cpp_class	JB_Error
+	
+
+	contains	Error
+	
+	|String|				Path
+	|String|				OriginalData
+	|message|				Node
+	|date|					When
+	|ErrorSeverity|			ErrorLevel
+	|ErrorFlags|			ErrorFlags
+
+	constructor (|message| node, |string| desc = "", |errorseverity| level=errorseverity.error, |string| path="" )
+		super.constructor
+		.position = -1
+		if node: .position = node.position
+		.node = node
+		.errorlevel = level
+		.name = desc // sigh
+		.path = (path, node.filepath)(path)
+		.OriginalData = node.OriginalParseData
+		.when = date()
+		.func = @sstr // whatever
+
+
+	constructor (|error| orig, |bool| ErrDummy)
+		cpp_Part Copy
+		super.constructor
+		.position = orig.position
+		.node = orig.node
+		.errorlevel = orig.errorlevel
+		.name = orig.name // sigh
+		.path = orig.path
+		.OriginalData = orig.OriginalData
+		.when = orig.when
+		.func = @sstr // whatever
+
+
+	function Copy (|error|)
+		return error(self, false)
+
+
+	syntax isnt (|ErrorFlags|F, |bool|)
+		return !.syntaxis(F)
+	syntax is (|ErrorFlags| F, |bool|)
+		return self and .ErrorFlags&F
+	syntax is (|ErrorFlags|F, assigns:|bool|)
+		if Value
+			.ErrorFlags |= f
+		  else
+			.ErrorFlags &= ~F
+
+	
+	function LinePos (|string| data, |int|)
+		if (.HasPosition)
+			return data[ 0, .Position ].LineCount
+
+
+	function HasPosition (|bool|)
+		return .Position >= 0 
+	
+	function Fired (|bool|)
+		return .when.fired
+	
+	function IsWarning (|bool|)
+		return (.ErrorLevel <= errorseverity.Warning)
+
+	function NeedsPrint (|bool|)
+		return (.errorlevel >= errorseverity.problem)
+
+	function IsError (|bool|)
+		return (.ErrorLevel >= errorseverity.error)
+
+	
+	function Fill (|string| path, |string| desc)
+		visible					// for lib
+		.Path = path
+		(self is PreferNoRenderPath) = desc contains path
+		.name = desc 
+	
+	
+	function GrabLine (|faststring| fs, |bool| Usecolor=false)
+		if Usecolor
+			fs <~ ErrorColors.Normal
+
+		|| d = .OriginalData
+		require d and .HasPosition
+
+		fs <~ "\n"
+		|| Start  = d.find( jeebox.csline, .Position, 0		) + 1
+		|| Finish = d.find( jeebox.csline, .Position...  )
+		if (Finish == -1)
+			Finish = D.Length + 1
+		
+		fs <~ d[Start, Finish].ReplaceAll("\t", " ")
+
+		|| Spaces = (.Position - Start)
+		if spaces > 200: spaces = 0 // stop bugs.
+		
+		fs <~ '\n'
+		if Usecolor: fs <~ ErrorColors.Underline
+		fs <~ (' ', Spaces)
+		fs <~ '^'
+
+
+	function LineIdentifiers (|faststring|fs, |string|path, |bool|)
+		require (.HasPosition)
+		|| d = .OriginalData #require
+
+		if !path: fs <~ "line "
+		fs <~ .LinePos( d )
+		fs <~ ':'
+
+		|| Start = d.find( jeebox.csline, .Position, 0 )
+		fs <~ .Position - Start
+		fs <~ ':'
+		return true
+	
+
+	syntax compare (|date| d, |bool| aware, |int|)
+		|| w = .when + d
+		return date() - w
+
+
+	render render
+		fs <~ "error"
+		fs.indent++
+		fs.field( "", .name )
+		if .position >= 0
+			fs.field( "pos", .position ) // this is buggered... the pos is totally wrong.
+		fs.field( "file", .path )
+		fs <~ "\n"
+		fs.indent-- 
+
+
+	render render_clang
+		|| M = fs.mark
+		|| p = .path
+		if ((self isnt PreferNoRenderPath) and P)
+			fs <~ .path
+			fs <~ ":"
+		
+		if (!.LineIdentifiers(fs, P) and .node)
+			.node.render(fs)
+		
+		if fs.grew(m)
+			fs <~ " "
+		.errorlevel.render(fs)
+		fs <~ ": "
+		fs <~ .name
+		.GrabLine(fs)
+
+
+	module
+		|| AutoPrint = 0 // errorflags.PrintAndRemove
+
+
+
+datatype ErrorFlags (Byte)
+	flags
+		|ErrorFlags|
+		DontStrip
+		PreferNoRenderPath
+		Parse
+	constants
+		Keep = 0
+		PrintAndKeep = 1
+		PrintAndRemove = 2
+		
+
+
+
+datatype ErrorSeverity (Byte)
+	render
+		if (self < MaxError)
+			names := "OK note warning warning error critical".words
+			|| name = names[self|int|]
+			if !fs_in
+				return name
+			fs_in <~ name
+
+	constants // Severity
+		|ErrorSeverity|
+		MaxError	= 6	    // dont use this!
+		Critical	= 5		// Unrecoverable "OutOfMemory / signals / etc"  need to quit.
+		Error		= 4		// parse errors, file not exists, etc.
+		Problem		= 3		// always print these, but still continue
+		Warning		= 2		// Its probably bad, and probably better corrected. 
+		Hint		= 1		// We can’t tell if its wrong, just letting you know if you want it fixed
+		OK			= 0
+	
+	module
+		|array of string| names
+
+
+
+
+
+module ErrorColors
+	|bool| Enabled
+	
+	constants
+		normal		= "\1b[0m"
+		bold		= "\1b[0;1m"
+		error		= "\1b[0;1;31m"
+		good		= "\1b[0;1;32m"
+		warn		= "\1b[0;1;33m"
+		underline	= "\1b[0;1;32m"
+	
+	
+	function string.PrintColor (|string| color)
+		if (errorcolors.enabled): print color
+		print self
+		if (errorcolors.enabled): print ErrorColors.normal
+	
+	
+	function string.PrintlineColor (|string| color)
+		if (errorcolors.enabled): print color
+		printline self
+		if (errorcolors.enabled): print ErrorColors.normal
+	
+
+	function DisableIfNoTerminal
+		.enabled = Pipe.IsTerminal(Pipe.StdOut_)
+
+
+function message.Reverse
+	opt norefcounts // reverse the entire list!!!
+	|| c = .last
+	.first = c
+	while
+		|| l = .last
+		require l != c
+		c.next = l
+		c = l
+

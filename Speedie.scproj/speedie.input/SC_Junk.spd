@@ -1,0 +1,113 @@
+
+// sc_junk.spd
+
+
+helper __junktest_1__
+	visible
+	|| r = [1, 2, 3]
+	|errorseverity| i = 2
+	|| v = r[i|int|]
+
+
+
+extend ivec4
+	helper __junktest_4__ (assigns:|int|, |ivec4|)
+		.x2 = Value + .x1
+		return self
+
+
+
+helper __junktest_3__ (|intrange| data, |bool|)
+	visible
+	|ivec4| x
+	x.__junktest_4__ = 1 // x = x.assignstest(1) 
+	direct_Test_Only
+		if data == data
+			return true
+
+
+
+helper __junktest_2__
+	visible
+	|| r1 = ringtree()
+	|| r2 = ringtree()
+	|| i2 = 0
+	|| i3 = &i2
+	*i3 = r1.dist(r2)
+	r1.parent? = r2
+
+
+
+module __junktest_5__
+	constants
+		a
+		b
+		c
+	|| x = {a, b, c}
+
+	function abc (|bool| g)
+		visible
+		if 1234 == 1 or 2
+		__modules__.__junktest_6__.abcvis
+		if g
+			once
+				"abc"
+		  else
+			once
+				"def"
+
+
+
+class __junktest_6__
+	module
+		function abcvis (|~int|)
+			visible
+			|| x = ("cpp_name").length?
+	setter abc (|int|)
+		if value == 1
+
+
+
+datatype __junktest_7__ (uint64)
+	linkage
+		cpp_part TM
+
+	constants
+		|__junktest_7__|
+		Halfmap = 0x5555555555555555
+
+	constants
+		BaseShrinkSpeed = 0.0005
+		MOUSEMOTION    = 0x400	/* Mouse moved */
+		MOUSEBUTTONDOWN			/* Mouse button pressed */
+	
+	
+// we want to list all the indexes from this item.
+	function ClearBit (|uint64| i, |uint64|)
+		pragma inline
+		visible
+		|| x = halfmap
+		|| x2 = BaseShrinkSpeed
+		return self &~ (1|uint64|<<i)
+
+
+helper int.__junktest_8__ (|int| Inaaaadex = 0, |bool| Create=false, |int|)
+	visible
+	|| doubleJunk2 = 0
+	for 0
+		doubleJunk2 = 1.__junktest_8__		#loop
+
+
+helper int.__junktest_9__ (|int| X, |int| Y, |int| Z=0, |int|)
+	|int16| oof
+	return .__junktest_8__(oof, false)
+
+
+function __junktest_10__
+	// dictionary of int... works?
+	// but i had a bug like this? sigh...
+	//	dict[str] = intgr // fails
+
+	|dictionary of int| d = dictionary.new
+	|| i = 1
+	d["abc"] = i

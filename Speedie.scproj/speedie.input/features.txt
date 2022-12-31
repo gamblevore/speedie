@@ -1,0 +1,191 @@
+      % % % % Do things just because its fun to do. % % % %
+
+ 
+		 				FEATURES TO DO
+
+
+* main (|file| a, |string| b = "", ...) its too good to NOT DO
+	* Also gen "usage" :)
+* Better expect syntax! explained in expect.txt
+* language is too complex! Find features to remove
+	* remove arrays/linkedlists. Use dicttree/ringtree for all.
+* Static vars?
+* struct/array unpacking too.
+	* var = {a,b,c}|nameandmsg| // a struct... or even a class? why not?
+* ability to create functions that own copies of vars from owning space.
+	* fn = % func (value, expr) // or fn = ∆ func val exp
+	* rz <~ all~files --> "appends each file into rz"
+
+* Ref-counting / problem-collection.
+	* Don't refcount unreached funcs!
+
+* vector splat?
+
+* auto-create float/int funcs for vecs? (on demand or explicit?)
+
+* Nil checking... would eliminate many bugs from my game... like that language "Nice".
+	* func abc (|obj| a),		if (a), or || x = a?.b	// a can be nil, cos it's tested
+	* func abc (|obj| a),		|| x = a.b				// a cant be nil, untested
+	* func abc (|obj?| a),		|| x = a.b				// silently --> || x = a?.b
+	* func abc (|message| m),	|| o = m.obj?.oof		// no choice, gotta test it.
+														// should we insert tests automatically?
+	It will make my VM much easier to debug! Literally 99% of my crash bugs are nil-objs.
+	Almost never anything else except "invalid pointer"... from a compiler error... thats fixed.
+
+* ID system... to replace message.func+name. So we can compare a message in one check! Basically replaces .name for ID as string subclass that contains a Syx. IDs are created by a callback, so speedie can do lowercasing or attach whatever info it wants :) Useful to say "msg isa Spd.Return" rather than "msg==@tmp and 'return'"
+
+* vec/array param split?
+	* obj.func(*P) --> obj.func(p.x, p.y, p.z)
+
+* macros allow multiple same input! and also allow statements-expr by default?
+
+* bit fields?
+	* or at least some sytnax to "get inside in a defined bit-ops way"... with names too.
+	class whatever
+		|u32| Abc bits {
+			a : 3
+			b : 20
+			c : 9
+		}
+
+* Remove FastAppender, use fixedarray instead.
+* Replace with string param adder if so few into faststring
+* Allow constants for array sizes!
+* "||" parsing... requries an "inside |" boolean. What if... instead we use the same func that parses stuff inside of strings? Like... distance based :)
+
+* Struct / datatype / object size should be available...
+
+*		expect (obj isa SCDecl) // ideally the test below should be unnecessary
+		if (obj isa SCDecl) { use obj as a decl... }
+
+
+* 	try
+		.sudo("echo 'hi'")
+	  succeed
+	  	return true
+	  fail
+		oof()
+	-->
+	|| errcount = stderr.errorcount
+	.sudo("echo 'hi'")
+	if stderr.errorcount == errcount
+		return true
+	else
+		oof()
+	
+	
+................................................................................
+
+DESIGN FLAWS JUST LEAVE FOR NOW
+
+*		|[int]| S,		.Starts = S
+        class X {|[int]| Ints}
+                                // Ordering issue...
+
+ .............................................................................. 
+
+							Awkwards
+
+* Make dict root resizable...
+* Why does the compiler make bigger files outside of xcode?
+* Restrict default params to being named? like python.
+* AddressOf is a bit inconsistant... just make it do whatever it does in C++
+* Allows multiple variables of same name!!!! (at different levels) SHOULD NOT!
+* Disable require/expect on statements with no effect...	
+*        if (a mod b) --> if (a.mod(b))
+         if (a in (b, c)) --> if (a.in(b,c))
+    without creating new scoperators!
+
+................................................................................
+
+Do when it's fun...
+
+* markdown
+* ';' scom!
+	* or perhaps a string to translate into jb?
+* Basically... file should be a string subclass.. of strshared
+ 
+................................................................................
+
+
+							Actually already good:
+
+* "a:b" I need to change language?
+
+* syntactic comments... actually good! I know the code is a mess... bug that probably means it should be redesigned. It does exactly what it should do! There isn't a simpler way to do it. Just maybe a clearer way.
+
+* lack of #exit... it was buggy and the syntax SUCKED
+    "(item) #exit" all over. urgh.
+
+* 
+    class bla {
+        module {
+            |int| i
+            function bla {i++}
+            // disallow i++, use .i++ ?
+        }
+        // sure, except... what about accessing "i" from within the class?
+        function bla2 {
+            i++
+            // now it is inconsistant! unless we have MORE syntax like mod.i++
+            // it's fine as it is.
+            // maybe not?
+        }
+    }
+    
+    
+
+* units!!!! @num containing @unit was DUMB!!!! @UNIT should be the top!!!
+
+
+* "return{bla}" should be allowed? (its to differentiate return() from return ())
+		
+
+* tmp vars... do them local per func...
+	(seems actually quite hard... because they aren't just created in one spot. It's called from at least 3 widely separated points in the code. So I can’t just keep a global counter because the global counter needs resetting... Also means I need to "Start tmp vars" and then "stop tmp vars" PER FUNCTION in 3 points in the code... before actually doing anything... so now I have...
+		fn.StartTmpVars
+		DoRefs(fn)
+		fn.StopTmpVars
+		
+		which i s ugly.
+		
+		it would be better to design it properly, so it always takes a namespace? But that means redesigning a lot of my code...
+		* Why not each func just has a "tempvar" counter?
+	)
+	
+	Right now... the tempifier is messing up a lot of var names... seems WORSE after trying to fix this!
+
+
+* Lack of struct.new    (add "owned/borrowed/shared/virtual" objects instead!)
+
+* Constructors/new are already good! Because constructors inline in C anyhow...
+
+*	msg[0] was finding a func in message[(default params)] instead of ringtree[(exact match)]
+	I think this actually is good behaviour... I should just create an error about "Shadowing"... rather than make my compiler awkward.
+	
+* a = b:c
+	BAD... Breaks my parser. In so many ways.
+
+* CNJ efficiency by putting it elsewhere...
+	BAD: Old design was better
+
+* a = b #require
+	ITS FINE! The only issue is this:
+	a = b + (c + D#require)
+
+	nested requires/expects are the issue.
+	
+* compiler needs to have some way for a datatype func to say "Actually, we need THE ADDRESS OF SELF"
+	* useful for saving...
+		function LoadProperties (blablabla) {
+			pragma AddressOfSelf // implied for structs
+		}
+		* Can mean I can get rid of value = loader.int or whatever it was...
+			.Value.LoadProperties(loader)
+			* what about our huge number of datatypes? fail?
+				* Yeah, basically...
+	* wait till need this anyhow for OTHER REASONS than saving.
+
+* @base... MAKES THINGS WORSE! what about -10? or -0x10?
+	where does the "-" go? now we need to do string append just to get the -10 with an "x" base!
+	And what about parsing? -10 or 0x10.parseint... works just fine. until we split it all off!

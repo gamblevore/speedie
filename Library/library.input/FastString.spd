@@ -1,0 +1,294 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+class FastString {
+	linkage
+		wrapper
+		cpp_part FS
+
+// Fast appends and tools for building data formats
+// can't append bools due to auto-casting issues... this should be fixed :)
+
+	|int|			Length
+	|int|			Reserved
+	|&Byte|			ResultPtr
+	|uint16|		Indent
+	|Byte|			IndentChar
+	|int|			WrittenLength
+	|bool|			Failed
+	
+/////
+
+	constructor							{ cpp_wrapper JB_FS_Constructor }
+	constructor (|int|size)				{ cpp_wrapper JB_FS_ConstructorSize }
+	destructor							{ cpp_wrapper JB_FS_Destructor }
+
+	setter Length (|int|)				{cpp_wrapper JB_FS_LengthSet}
+	
+	function AppendLower (|string| data)
+		cpp_wrapper JB_FS_AppendLower
+	function FreeSize (|int|):	cpp_wrapper JB_FS_FreeSize
+	function FreeSize (assigns:|int|, |&byte|) {cpp_wrapper JB_FS_NeedSpare}
+
+	function StreamLength (|int|)
+		cpp_wrapper JB_FS_StreamLength
+
+	function Size (|int|)				{ cpp_wrapper JB_FS_Size }
+	function Size (assigns:|int|)		{ cpp_wrapper JB_FS_SizeSet }
+	function AppendMultiReplace (|string|s, |dictionary of string| m, |ErrorList| Rec=stderr) { cpp_wrapper JB_FS_AppendMultiReplace }
+		
+	function AppendHex (|int64|Num, |int|RoundTo=2)
+		cpp_wrapper JB_FS_AppendHex
+	
+	function AppendHexData (|string| Data)
+		cpp_part AppendHexStr 
+		if data
+			.appendhexdata(Data.addr, data.length)
+	
+	function AppendHexData (|&byte| Data, |int| N)
+		cpp_wrapper JB_FS_AppendHexData
+
+
+	function AppendSection (|String| Data, |int| Start, |int| Length)
+		cpp_wrapper JB_FS_AppendSection
+
+	function AppendHex3 (|int|Num)
+		cpp_wrapper JB_FS_AppendHex3
+	
+	function AppendUTF8 (|int|Num)		{ cpp_wrapper JB_FS_AppendUTF8Char }
+	function IndentLine					{ cpp_wrapper JB_FS_AppendIndent }
+	function Flush	(|bool|)			{ cpp_wrapper JB_FS_Flush }
+	function Remove (|Byte| b)			{ cpp_wrapper JB_FS_RemoveByte }
+	function GetResult (|string|)
+		cpp_wrapper JB_FS_GetResult
+	function GetResult (|FastString| other, |string|)
+		cpp_wrapper JB_FS_SmartResult
+
+	function Copy (|string|)
+		disabled "hmmm?"
+
+	function lint (|uint64| n)
+		while n
+			self <~ (N&255)|byte|
+			n>>=8
+		
+
+	render
+		fs <~ self
+
+	syntax Append (|Byte| data, |int|count)
+		cpp_wrapper JB_FS_AppendMultiByte
+
+	syntax Append (|string| data, |int|count)
+		cpp_part AppendMultiStr
+		for count
+			self <~ data
+
+	function AppendEscape (|string| s)
+		.AppendMultiReplace( s, jeebox.EscapeStr )
+
+
+	module
+		function New (|FastString| other, |FastString|)
+			cpp_wrapper JB_FS__FastNew
+		
+		function New (|&byte| b, |int| n, |FastString|)
+			cpp_part NewDirect
+			rz = faststring()
+			rz.resultptr = b
+			rz.reserved = n
+
+		|FastString| StdOutFS // ideally, speedie should clear these at app-exit!
+							  // force flush and stuff like that.
+		function StdOut (|FastString|)
+			opt norefcounts
+			|| fs = .StdOutFS
+			if !fs
+				fs = faststring()
+				fs.file = app.stdout
+				.StdOutFS = fs
+			return fs
+
+
+	syntax Access (|int| off, |Byte|):				cpp_wrapper JB_FS_Byte
+	syntax Access (|int| off, assigns:|Byte|)		{ cpp_wrapper JB_FS_ByteSet }
+	syntax Append (|string| data)
+		cpp_wrapper JB_FS_AppendString
+	syntax Append (|FastString| fs)
+		cpp_part AppendFastString
+		.AppendMemory(fs.resultptr, fs.length)
+	syntax Append (|Byte| data)						{ cpp_wrapper JB_FS_AppendByte }
+
+	function AppendIntegerAsText (|int64| data, |int|RoundTo=1)
+		cpp_wrapper JB_FS_AppendIntegerAsText
+
+	function AppendInteger (|int64| data, |int|RoundTo=1)
+		disabled "appendintegerastext or appendint?"
+	
+	function AppendInt (|int| data)
+		cpp_Wrapper JB_FS_AppendInteger
+			
+	function uint64.lelength (|int|)
+		pragma inline
+		return (self|int|.log2 max 0) >> 3
+	
+	function BInt (|uint64| val) // highest first
+		|| n = val.lelength
+		while n >= 0
+			self <~ (val>>(n<<3))|byte|
+			n--
+
+	function AppendShort (|uint16| data)
+		cpp_wrapper JB_FS_AppendShort
+
+	syntax Append (|int64| data)
+		cpp_part AppendInt64
+		.AppendIntegerAsText(data, 1)
+
+	
+	syntax Append (|int| data)
+		cpp_part AppendInt32
+		self <~ data|int64|
+
+	
+	syntax cast (|string|)
+		return .getresult
+
+
+	function Hash (|uint64|)
+		return self|string|.hash // bad
+	
+	syntax Append (|cstring| Str)
+		cpp_wrapper JB_FS_AppendCString
+
+	
+	function field (|string| name, |string| data)
+		cpp_part AppendInfo
+		if data
+			.fieldstart(name)
+			self <~ '"'
+			.appendescape(data)
+			self <~ '"'
+	
+	function PadTo (|int|n, |byte| b=' ')
+		self <~ (b, n-.length)
+	
+	function fieldstart (|string| name)
+		.IndentLine
+		if name
+			self <~ name
+			self <~ ' '
+
+
+	function fieldenter (|string| name)
+		.fieldstart(name)
+		.indent++
+
+	function field (|string| name, |int64| data)
+		cpp_part AppendInfoNum
+		if data
+			.fieldstart(name)
+			self <~ data
+			
+	
+	function fieldf (|string| name, |f64| data)
+		cpp_part AppendInfoFloat
+		if data
+			if data == 8.0
+			.fieldstart(name)
+			self <~ data
+
+
+	function AppendMemory (|&byte| Str, |uint| N)
+		cpp_wrapper JB_FS_AppendMem_
+	
+
+	function AppendDurr (|Date| D)
+		cpp_wrapper JB_FS_AppendDurr
+
+	function AppendDMY (|Date| D)
+		cpp_wrapper JB_FS_AppendDMY
+
+
+	syntax Append (|f64| D)
+		cpp_wrapper JB_FS_AppendDoubleAsText0
+
+	
+	function AppendDouble (|f64| D, |&byte|fmt=nil)
+		cpp_wrapper JB_FS_AppendDoubleAsText
+	
+	
+	syntax Append (|Float| F)
+		cpp_name JB_FS_AppendFloatAsText
+		self <~ F|f64|
+
+	
+	function Mark (|int|)
+		cpp_wrapper
+	
+	function Grew (|int|m, |bool|)
+		cpp_wrapper
+
+	macro syntaxappend
+		_.render(self)
+}
+
+
+
+
+
+extend FastString
+	function File (|File|)
+		cpp_wrapper JB_FS_File
+	
+	function File (assigns:|File|)
+		cpp_wrapper JB_FS_FileSet
+
+	// use syntax-append instead? "fs <~ (doubles, n)"
+	function AppendFloats (|float[1]| Data, |int| N)
+		self <~ '['
+		for (i in N)
+			self <~ ", "
+			start
+			self <~ Data[i]
+		self <~ ']'
+
+	function AppendDoubles (|f64[1]| Data, |int| N)
+		self <~ '['
+		for (i in N)
+			self <~ ", "
+			start
+			self <~ Data[i]
+		self <~ ']'
+
+	function AppendInts (|int[1]| Data, |int| N)
+		self <~ '['
+		for (i in N)
+			self <~ ", "
+			start
+			self <~ Data[i]
+		self <~ ']'
+
+	function AppendInt64s (|int64[1]| Data, |int| N)
+		self <~ '['
+		for (i in N)
+			self <~ ", "
+			start
+			self <~ Data[i]
+		self <~ ']'
+
+
+function String.UTF16To8 (|faststring|fs=nil, |int|BigEndian=1, |string|)
+	cpp_wrapper JB_Str_UTF16To8
+
+
+function String.UTF8 (|string|)
+	if !.isbadutf8(0)
+		return self
+	return .UTF16To8
+
+

@@ -1,0 +1,394 @@
+
+//
+class FileRow (ListViewRow)
+	linkage
+		cpp_part FR
+	|string|						Location
+	|Document|						_Document
+	|date|							ReloadedAt
+	|string|						DirFile
+	|int|							LastSize
+	|int|							LastScroll
+	|int|							LastFileCount
+	|bool|							HasError
+	|bool|							InMainProj
+	|bool|							AsDir
+	|bool|							DoesntExist
+	|bool|							SameNameAsPrev
+	contains FileRow
+	
+	 
+	constructor (|FileRow| R)
+		cpp_Part ConstructorCopy
+		.func = r.func
+		.location = R.location
+		.dirfile	= r.DirFile
+		.asdir		= r.asdir
+		.name		= r.name
+		.lastsize	= r.lastsize
+		.lastfilecount = r.lastfilecount
+		.DoesntExist = r.DoesntExist
+		.InMainProj = r.InMainProj
+		is hierarchical
+	
+	constructor (|string| path, |string| name, |string| DirFile="")
+		.func		= @file
+		.Location	= (path.PathDir, path)(DirFile)
+		.dirfile	= DirFile
+		if dirfile == "."
+		.asdir		= dirfile
+		.name		= name
+		.lastsize	= (path.File.Size, 0)(!.asdir)
+		.lastfilecount = (!.asdir)|int|
+		is hierarchical
+	
+	behaviour copyid
+		return .location
+	
+	render
+		fs <~ "file: "
+		fs <~ .location
+		fs <~ .dirfile
+	
+	
+	behaviour text
+		if i == 0
+			return .name
+
+	operator isa (|string|s, |bool|)
+		return .location isa s
+
+	function AskDelete (|fileviewer| fv)
+		|| ex = fv.extra
+		if ex contains self
+			.remove(fv)
+			return
+		|| l = .Location$
+		require keys.shift or "Delete file: ${l.name}?\n\nAt ${l.parent}".confirm
+		if l.file.MoveToTrash
+			.remove(fv)
+		fv.checksize
+
+
+	function MoveToSub (|string|v, |file|)
+		|| l = .location.file
+		rz = l.sibling(v)
+		if !l.moveto(rz)
+			rz = nil
+	
+	
+	function MoveTo (|string| v, |bool|) // rename
+		|| f = .movetosub(v) #expect beep
+		.location = f.path
+		.name = f.name
+		.parent.filesort
+		with ._document
+			.location = self.readfrom
+			return true
+
+	
+	function SavedFileData (|string|)
+		opt norefcounts
+		|| d = ._document
+		if d and !d.ismodified and d.current
+			return d.text
+		return .readfrom.filedata
+	
+	
+	function ReadFrom (|string|)
+		return .Location + .dirfile
+
+
+	function TryReload (|fileviewer|fv)
+		require .asdir
+		|| f = .location.file
+		|| d = f.modified
+		if d > .reloadedat
+			.reloadedat = d
+			.ReloadFiles(f, fv)
+		fv.checksize
+	
+
+	function FileViewer.TryReloadPath
+		opt norefcounts
+		for s.up in .sel
+			if s isa filerow
+				s.TryReload(self)
+
+
+	function AddFile (|file| f, |fileviewer| o)
+		|| Count = 2000
+		.addfilesub(f,  o.excludes,  o.folfile,  Count)
+
+
+	function AddFileSub (|file| f, |dictionary| excl, |string| folfile, |&int| Count, |bool|)
+		|| C = (*Count)--
+		require C > 0
+		|| r = filerow(f.path, f.name)
+		self <~ r
+		if f.isdir
+			r.location = r.location.pathdir
+			r.dirfile = folfile
+			if folfile == "."
+
+		if f.isdirlike and !f.islink
+			r.asdir = true
+			r.FillFilessub(f, excl, folfile, Count)
+		return true
+
+
+	function RemoveFile (|filerow| r, |fileviewer| fv)
+		for c.flat in r
+			|| d = c._document
+				if d.ismodified
+					r.DoesntExist = true
+					fv.select(r)
+					return
+		r.remove
+
+
+	function ReloadFiles (|file| dir, |fileviewer|o)
+		|| excl = o.excludes
+		|dictionary of filerow| found = dictionary()
+		for s in self
+			found[s.name] = s
+
+		for c in dir
+			ifn (c[0] == '.') or (excl[c.ext])
+				|| f = found[c] 
+					found[c] = nil
+					f.DoesntExist = false
+				  else
+					.addfile(dir[c], o)
+		
+		for (lost in found)
+			.removefile(lost, o)
+		.filesort
+
+
+	function FillFilesSub (|file| fol, |dictionary| excl, |string| folfile, |&int| Count)
+		.ReloadedAt = fol.modified
+		for f.files in fol // merge these two
+			|| name = f.path.name
+			|| ext = name.ext
+			if (name[0] != '.')  and  (!excl[ext])
+				if !.AddFileSub(f, excl, folfile, count)
+					exit
+		.filesort
+
+
+	function ReadName (|string|)
+		|| n = .location.name
+		if .dirfile
+			return n.pathdir + .dirfile
+		return n
+
+
+	function Save (|bool|)
+		opt norefcounts
+		|| d = ._Document
+			require D.save
+			.lastsize = D.length
+		return true
+
+
+	function IsModified (|bool|)
+		return ._document$.ismodified
+
+
+	function Document (|document|)
+		return ._document init .makedoc
+
+
+	function MakeDoc (|document|)
+		return document(.readfrom)
+
+
+	function visibletext (|bool|ignore=false,|string|)
+		if ._document and ._document.current
+			return ._document.text
+		|| f = .readfrom.file
+		debug_require !f.isdir
+		return f.filedata(ignore).utf8
+
+
+	function FindAllParent (|message| found, |error|)
+		rz = error(nil, .location, errorseverity.ok)
+		(rz|listviewrow| is expanded)
+		rz.name = ("\11 ", "\19 ")(!.asdir) + .location.name
+		rz.path = .location
+		rz.position = -1
+		rz.when = ._document.viewdate?
+		found <~ rz
+
+
+	function FindAll (|string| pattern,  |message| found)
+		require pattern
+		|error| parent
+		|| t		= .visibletext(True)$
+		require !t.IsBinary
+		
+		|| lim		= 100
+		|| i		= 0
+		while (i < t.length) and (lim-- >= 0)
+			|| R	= t.StretchyFind(pattern, i)
+			|| p = r.x
+			if p < 0
+				exit
+			|| err	= error(nil, errorseverity.ok)
+			parent := .findallparent(found)
+			parent <~ err
+			err.position = p
+			err.path = .location
+			
+			i = r.x2
+			|| after  = t.find(jeebox.csline, i, i+30)  oar  (i+30)
+			|| before = t.find(jeebox.csline, p, p-30 max 0)  oar  (p-10)
+			|| s = t[before, after]
+			if !pattern[0].iswhite
+				s = s.trim.remove(jeebox.csline)
+			err.name = s
+
+
+	syntax append (|filerow| r)
+		super.syntaxappend(r)
+		r.inmainproj = .InMainProj
+
+	syntax access (|string| name, |filerow|)
+		opt norefcounts
+		for r in self
+			if r.location.name ~= name
+				return r
+
+
+	helper Match (|string| path, |bool| NameOnly, |int|)
+		rz = .location.name(nameonly).pathmatch(path)
+		if .dirfile
+			|| r = .readfrom
+			if rz and path.last != '/' and .readfrom.file.size == 0
+				rz = 0 // folder matched uselessly
+			  else
+				rz = rz max r.name(nameonly).pathmatch(path)
+
+
+helper ListView.ListFilesUp (|string| path, |string| types, |bool| Save, |int| max = 2K)
+	path = path.trimtrailingslashes
+	.listfiles(path, types, save, max)
+	require path
+	|| r = filerow(path.parent, "..", ".nothing")
+	.listsource.first = r
+	|| f = path.file
+	|| r2 = .listsource|filerow|[path.name]
+	if f.exists and !f.isdir and r2
+		(r2 is selected)
+		.show(r2)
+	  else
+		(r is selected)
+			
+
+
+function ListView.ListFiles (|string| path, |string|types, |bool| save, |int| max = 256)
+	.listsource.listfilespath(path, types, save, max)
+
+
+function ListViewRow.ListFilesPath (|string| path, |string| types, |bool| save, |int| max = 256)
+	.clear
+	path = path.Resolve
+	require path
+	|| allsight = (path.name == ".")
+	|| AtRoot   = (path == "/")
+	|| pf		= path.file 
+	if !pf.exists or !pf.isdir
+		pf = pf.parent
+	for f.files in pf // merge these two
+		|| p = f.path
+		|| n = p.name
+		if AllSight or n.platformvisible(ATroot)
+			if --max <= 0
+				exit
+			|| isdir = f.isdirlike
+			|| ext = n.ext
+			if isdir
+				p = p.PathDir
+			|| icon = filerow.icon(p, types).render
+			n = icon + " " + n
+			|| r = filerow(p, n, (".nothing", "")(isdir))
+			self <~ r
+			|| IsOK = isdir
+			if !save and !isdir and !types and f.isdir
+				isok = false // can't open package if we want files
+			  elseif save and isdir and types.typecontains(ext + "/")
+				isok = false
+			  elseif !save and !isok
+				isok = !types
+				if !isok
+					if isdir
+						ext = ext.pathdir
+					isok = types.typecontains(ext)
+			(r is Greyed) = !ISOK 
+			
+	.filesort
+
+
+
+
+function RightClickFileList (GUIListEvent)
+	opt NoRefCounts
+	if self isa fileviewer
+		|| m = .newcmm
+		|| s = .sel|filerow|
+		if s and (.extra contains s) and s!=.extra
+			m <~ ("Remove From Project",	FileListRemove)
+		m <~ ("Rename File",		FileRenameFile)
+		m <~ ("Create File",		FileListCreateFile)
+		m <~ ("Copy File Path",		FileListCopyPath)
+		m <~ ("Show In Finder",		FileListCMMShow)
+		m.addsep
+		m <~ ("Move To Trash",		FileListTrash)
+	return true
+
+
+function FileListCMMShow (GuiMenuEvent)
+	|| row = clicked.original
+	if row isa FileRow
+		row.location.Reveal
+
+
+function FileRenameFile (GuiMenuEvent)
+	|| row = clicked.original|filerow|
+	self|Fileviewer|.rename(row)
+	
+
+function FileListCreateFile (GuiMenuEvent)
+	|| row = clicked.Original|filerow|
+	if !row.asdir
+		row = row.parent
+	|| l = row.location
+	|| f = l.file.UniqueChild("untitled")
+	if f and f.create
+		|| created = filerow(f.path, f.name) 
+		row <~ created
+		row.filesort
+		self|Fileviewer|.rename(created)
+		self|Fileviewer|.checksize
+
+
+function FileListCopyPath (GuiMenuEvent)
+	|GuiMenuEvent| test
+	|| row = clicked.original
+	if row isa FileRow
+		clipboard.text = row.location
+
+
+function FileListTrash (GuiMenuEvent)
+	|| row = clicked.original
+	if  row isa FileRow  and  self isa fileviewer
+		row.AskDelete(self)
+
+
+function FileListRemove (GuiMenuEvent)
+	|| row = clicked.original
+	if row isa FileRow
+		row.remove
+
+

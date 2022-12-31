@@ -1,0 +1,47 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+extend message
+	function tviewch (|message|)
+		opt norefcounts
+		if self != @tmp
+			return self
+		
+		|| ch = .first
+			|| ch2 = ch.next
+			if ch2.ListViewable
+				return ch2
+			if ch.ListViewable
+				return ch
+		return self
+	
+	
+	function ListViewable (|bool|)
+		return self and .func.ListViewable
+
+
+	virtual text		(|int| i=0, |string|)
+		opt norefcounts
+		if i == 0
+			return .tviewch.name
+
+
+	virtual textset 	(|int| i=0, |string| v, |bool|)
+		opt norefcounts
+		if i == 0
+			.tviewch.name = v
+			return true
+
+
+	virtual copyid		(|string|)
+		return nil
+
+
+	function SearchColumns (|string| find, |int| n, |int|)
+		for i in n
+			rz = rz max (find match .__text__(i))
+			if rz == 2
+				exit

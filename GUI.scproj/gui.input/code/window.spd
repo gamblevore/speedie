@@ -1,0 +1,405 @@
+
+
+class Window (GUIControl)
+	linkage
+		cpp_part Win
+	|bool|							FocusWasSet
+	|bool|							ClickOutsideCloses
+	|bool|							AlphaSubtle
+	|bool|							NoDrawBackground
+	|GUIControl|					Focus   // For multi-windows?
+	|Menu|							OpenedMenu
+	|Guicontrol|					MenuOpener
+	|GUIControl|					CurrMouseDown
+	|GuiControl--|					SelBeforeMouseDown
+	|guicontrol--|					ToolTipControl // probably better to remove this
+	|guicontrol--|					DroppingInto
+	|guicontrol--|					MouseIsOver
+	|InlineEditor|					InlineEditor
+	|GUIPasteEvent|					OnPaste
+	|GUICopyEvent|					OnCopy
+	|GUIMouseMoveEvent|				OnMouseMove
+	|object|						ReturnValue
+	|date|							AlphaFader
+	|date|							CreatedDate
+	
+	function Front (|Window|)
+		return window.all.last
+	
+	
+	constructor
+		super.constructor(nil)
+		.createddate = date.now
+		.size = the~area
+		.inlineeditor.init(self)
+		.show
+
+	
+	destructor
+		.disposeall
+
+
+	virtual FrameUpdate
+		0
+
+	virtual CancelClose (|int| Reason, |bool|)
+		return reason == 0
+	
+	
+	behaviour AppForegroundChanged
+		opt norefcounts
+		for c in self
+			c.__AppForegroundChanged__(isforeground)
+	
+	
+	setter Size (|ivec2|)
+		cpp_Part Size2
+		.lastrect = value.rect
+		.size = .lastrect.layout
+ 
+
+	helper Reflow
+		opt norefcounts
+		|| p = .parent oar window.all
+		if self ~= "confirm"
+		.reflow(self, p)
+	
+
+	setter OpenedMenu (|menu|)
+		.setmenu(value)
+
+
+	function SetMenu (|menu| m)
+		.openedmenu = m
+		sdlapp.UpdateTextFocus(self)
+
+
+	function IsDialog (|bool|)
+		return window.opendialogs contains self
+
+
+	syntax call (|ConfirmCanceller| Cancel=nil, |object|)
+		require self isnt visible // recursive... sigh
+		.opendialog
+		.returnvalue = nil
+		while sdlapp.SingleFrame
+			rz = .returnvalue
+			if rz or (Cancel)()
+				exit
+		.returnvalue = nil
+		if rz == self
+			rz = nil
+		.closedialog
+
+
+	setter focus (|guicontrol|)
+		.setfocus(value)
+	
+	
+	function SetFocus (|guicontrol| Focus)
+		|| old = .focus
+		require (old != focus)
+		if focus
+			require focus.Takesfocus.able
+			expect (focus is visible) (beep)
+
+		.focus = focus
+		.FocusWasSet = true // for stop mousedown bug
+		sdlapp.touch(Self)
+		old.__LostFocus__?
+		.alphafader = 0
+		if focus
+			focus.__GotFocus__
+			if .parent and focus isnt drawsfocus
+				.alphafader = date()
+		sdlapp.UpdateTextFocus(self)
+
+
+	syntax is (|guicontrolflags| F, assigns:|bool|)
+		require self
+		if (f == guicontrolflags.Modified) and ((self is modified) != value)
+			sdlapp.JB_SDL_SetModified(sdlapp.nativewindow, value)
+		super.syntaxis(f) = value
+
+
+	behaviour keydown
+		opt norefcounts
+		if (key iscmd keys.U) and keys.option
+			|| t = .focus 
+			if t isa textview
+				return t.TryColorise
+
+		|| F = .focus
+		|| it = .openedmenu
+			if it isnt typethrough
+				if key isnt tab
+					return it.__keydown__(key)
+				F = .MenuOpener
+				it.CloseMenu
+				
+			  elseif key isnt tab
+				return it.__keydown__(key) or (f and f.__keydown__(key))
+		  elseif f and f.__keydown__(key)
+			return true
+		
+		if key is tab
+			f := .first
+			f = f.NextFocus(!keys.shift, keys.option)
+			if f isnt opensmenu
+				f.setfocus
+			  else
+				(f.onclicked)(f)?
+			return true
+		if (key is escape) and .IsDialog
+			.returnvalue := self
+			return true
+	
+		
+	function Show  
+		opt norefcounts
+		is visible
+		window.shown <~ self
+		
+	function IsFront (|bool|)
+		return .islast
+		
+	function IsFullScreen (|bool|)
+		return .lastrect == All.lastrect
+	
+	
+	behaviour Draw
+		opt norefcounts
+		where.window = self
+		
+		if .gnormal
+			where.fill(.gnormal)
+		
+		.DrawChildren(where)			
+		.focus.drawfocus(where)
+		
+		|| it = .openedmenu
+			it.DrawOof(Where)
+		
+		where.ControlClip = self
+		.inline.DrawFocus(where)
+		where.whset
+		
+
+	function guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
+		require dest != nil  and  dest != self
+		require dest is editable and enabled
+		|| copies = .Copypaste.cancopy
+		if copies.CanPasteInto(dest.CopyPaste)
+			return dest
+	
+	
+	function ClearDrops
+		sdlapp.candrag = 0
+		sdlapp.drawdrag = nil
+		.DroppingInto = nil
+		.currmousedown = nil
+
+
+	function DoDragAcrossControls (|ivec2| P, |guicontrol| r, |bool|)
+		sdlapp.drawdrag := r.CopyList
+		if sdlapp.drawdrag
+			|| dest = r.CanPasteInto(self[p, true])
+			.DroppingInto = dest
+			if dest
+				dest.setfocus
+				dest.__mousedown__(p, -1)
+				return true
+
+
+	function DoMouseDrag (|ivec2| P, |bool| Beyond)
+		opt norefcounts
+		|| r = .CurrMouseDown$
+		require (r is visible) or (r == .openedmenu)
+		
+		if keys.cancel
+			.cleardrops
+			return
+		
+		if r contains p
+			.DroppingInto = nil
+		  elseif .DoDragAcrossControls(p,r)
+			return
+		
+		if !Beyond
+			require (r.lastrect ± -20) contains p
+		sdlapp.candrag = R.__mousedown__(p, -1)
+
+	
+	syntax access (|ivec2| P, |bool|fordrag=false, |guicontrol|)
+		opt NoRefCounts
+		cpp_part ControlAtXY
+		|| r = p.point
+		rz = .controlat(r,  0)
+		if ForDrag
+			rz := .controlat(r, 10)
+	
+	syntax access (|ivec4| P, |guicontrol|)
+		opt norefcounts
+		return .controlat(p,  0)
+
+
+	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| clicks=false, |Guicontrol|)
+		opt norefcounts
+		for R.reverse in self
+			if r is visible and r is enabled
+				|| rr = r.lastrect ± -pad 
+				if rr overlaps p
+					if r > 0
+						|| it = r.controlat(p, pad, clicks)
+							return it
+					if !clicks or r isnt clickthrough
+						return r
+						
+	
+	function OpenDialog
+		window.OpenDialogs	<~ self
+		window.all			<~ self
+		is visible
+		sdlapp.StartResize // sigh
+
+
+	function Close
+		cpp_part CloseDisabler
+		disabled "pass a reason why we are closing this (kquit/kactivity)"
+				
+	
+	
+	function Close (|int| reason, |bool|)
+		if !sdlapp.wantsquit and (reason < sdlapp.ktryquit)
+			if window.DocumentWindows.length <= 1
+				if !"Quit this application?".confirm
+					.__CancelClose__(0)
+					return false
+				sdlapp.wantsquit = true
+
+		|| cancelled = .__CancelClose__(reason)
+		if !cancelled or (reason & sdlapp.kExiting) or sdlapp.WantsQuit
+			.DisposeAll(true)
+			return true
+
+	
+	function CloseDialog
+		opt norefcounts
+		isnt visible
+		.ReturnValue := self
+		if OpenDialogs.Last == self
+			OpenDialogs.pop
+		.remove
+	
+	
+	function DoMouseDown (|ivec2| P, |int| Clicks, |guicontrol|)
+		.SelBeforeMouseDown = .focus
+		|| M = .openedmenu 
+			|| O = .MenuOpener
+			if (m contains p) and (m is enabled)
+				SdlApp.CanDrag = M.__mousedown__(p, clicks)
+				return m
+			
+			m.CloseMenu
+			|| R = self[p]
+			require r  and  r is opensmenu and  r != O
+		
+		.FocusWasSet = false
+		|| aww = .ControlAt(p.point, 0, true)
+		if aww != nil and window.all
+			|| clicks2 = aww.__MouseDown__(p, clicks)
+				SdlApp.CanDrag = clicks2
+				if !.FocusWasSet
+					.setfocus(aww)
+				return aww
+
+
+	behaviour MouseWheel
+		opt norefcounts
+		|| it = .openedmenu
+			return it.__mousewheel__(P, direction)
+			
+		|| R = self[sdlapp.mousexy]
+			R.__mousewheel__(P, direction)
+		return true
+	
+	
+	iterator
+		|| ctrl = .first|guicontrol|
+		while ctrl
+			|| nxt = ctrl.flatnext
+			yield ctrl
+			ctrl = nxt
+
+	module
+		|object|					LeakedTestObj
+		|GUIControl|				ActiveControl
+		|guicontrol of Window|		All = guicontrol(nil)
+		|[Window]|					Shown
+		|[window]|					OpenDialogs
+
+		function Front (|Window|)
+			return  .all.last
+
+		function DocumentWindows (|[window]|)
+			opt norefcounts
+			for w in .all
+				if (w is visible) and !.opendialogs.find(w)
+					rz <~ w
+
+
+struct SDL_Window
+	linkage:wrapper
+	destructor
+		cpp_wrapper SDL_DestroyWindow
+	cpp_wrapper SDL_GetWindowWMInfo (|&SDL_SysWMinfo| info, |bool|)
+
+
+struct SDL_SysWMinfo
+	|int|		A
+	|int|		B
+	|objcid|	window
+	|byte[56]|	Buffer
+
+
+struct SDL_Renderer
+	linkage:wrapper
+	destructor
+		cpp_wrapper SDL_DestroyRenderer
+
+
+struct SDL_Texture
+	linkage: wrapper
+	function Dispose
+		cpp_wrapper SDL_DestroyTexture
+
+	function UnlockThatCopiesEvenThoughItShouldnt
+		cpp_wrapper SDL_UnlockTexture
+	
+	function LockThatZerosEvenThoughItShouldnt (|&ivec4| b, |&_voidptr| p, |&int| n)
+		cpp_wrapper SDL_LockTexture
+		
+	destructor
+		.dispose
+
+
+function window.MouseXY (|ivec2|)
+	return sdlapp.mousexy - .lastrect.xy
+
+
+function guicontrol.MouseXY (|ivec2|)
+	opt norefcounts
+	return sdlapp.mousexy - .window.lastrect.xy
+
+
+
+
+/*
+// your the best... you know that! ooop-
+folder1/
+	file
+		data
+	folder2/
+	file2
+*/
+

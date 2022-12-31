@@ -1,0 +1,183 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class SCIterator (SCObject)
+	linkage
+		cpp_part			Iter
+
+	|[SCNodeRenamer]|	Names
+	|SCNodeRenamer|		selfs
+	|SCNodeRenamer|		ValueRenamer
+	|message|			Index
+	|message|			LoopCond
+	|message|			LoopEndCond
+	|message|			Value
+	|message|			WhileLoop
+	|message|			Yield
+	|scclass|			parent
+	
+	constructor (|scclass| parent)
+		.parent = parent
+		
+	function InitIter (|Message| msg, |bool|)
+		require msg
+		if msg contains @erel
+		SCFunction.Tran_Strings( msg, nil )
+		
+		|| thg = msg.first
+		if thg == @thg
+			.Name = thg.name
+		
+		.source = msg[@Arg, -1]									#expect msg
+		
+		.WhileLoop = .source.findflat( @tmp, "while" )			#expect (msg, "missing while")
+		|| WhileArg = .WhileLoop.find(@Arg)						#expect (.WhileLoop, "missing argument for 'while'")
+
+		.LoopEndCond = WhileArg.Next
+		if (.LoopEndCond)
+			 .LoopEndCond = .LoopEndCond.first
+		
+		.LoopCond = .WhileLoop[0]
+		if (.LoopCond == WhileArg)
+			.LoopCond = «thg "true"»
+		  else
+			.LoopCond = .loopcond.NeedBra
+		
+		.yield = WhileArg.FindNested( @Tmp, "yield" )			#expect (WhileArg, "Missing yield statement.")
+		
+		.Index = .yield[1]
+		.Value = .yield[0]
+		
+		if (.Index)
+			(.Index == @Bra)									#expect .Index
+			.Index = .Index[0]
+		
+		.selfs = SCNodeRenamer.new
+		.selfs.CollectSelfs( .source )
+		.Names = .Uniqueify( .source )
+		
+		Return true
+
+
+	function message.Deepest (|syntax| Tmp, |string| name, |message|)
+		opt norefcounts
+		for ch in self
+			|| best = ch.deepest(tmp, name)
+				return best
+		if self == @tmp and name
+			return self
+
+
+	function MakeWhile (|message| arg, |message| postcond, |message|)
+		|| result = .whileloop.copy(arg)				 // hmmm... this position thing doesn't work.
+		|| Loop = result.Deepest(@tmp, "while") #require // for (x,y) loops...
+		|| larg = Loop.find(@arg)				#require
+		|| it = larg.next // postcond
+			it.remove
+		larg.replacewith(arg)
+		loop <~ postcond
+		return result
+	
+	
+	function RenameSelf (|Message| Name)
+		.selfs.Rename( Name )
+
+
+	function Check (|SCClass| cls)
+		using .source
+		|| dot = ("." + .name, "")(.name)
+		|| msg = "iterator iter_test () {for yield_test$dot in self {(yield_test)}}".parseclean
+		|| fnc = SCFunction.NewFunc( msg, cls, .source )|SCFunction|
+		fnc.FuncDecls
+		fnc.Transform
+
+
+	function RenameValue (|String| s)
+		if !.ValueRenamer
+			.ValueRenamer = SCNodeRenamer.new
+			.ValueRenamer.Collect(  .source,  .value.name,  .source.FlatAfter )
+		.ValueRenamer.Renamestr( s )
+
+
+	function Renuqify (|SCBase| p)
+		for n in .names
+			n.Uniqueify( p )
+
+
+	function Uniqueify (|Message| msg, |[SCNodeRenamer]|)
+		for CurrName in msg.FindAllDclNames
+			|| ren = SCNodeRenamer.new
+			ren.CollectDclThg( CurrName )
+			rz <~ ren
+
+
+	module
+		|sciterator| c_array
+		|sciterator| pointer
+		
+		function SimpleIter (|string| src, |sciterator|)
+			|| it = SCIterator.new(nil)
+			if it.InitIter( src.parse[0] )
+				rz = it
+
+		
+		c_array = SimpleIter(
+"iterator	// eyyy mammi, i aint doin this
+	|| first = &self[0]
+	|| i = 0
+	while (i <  –count self)
+		yield first[i] (i)
+		i++")
+
+
+		pointer = SimpleIter(
+"iterator
+	|| curr = self
+	while self[0]
+		yield self[0] (self)
+		self++")
+		
+		function NeuIter (CollectFunc)
+			if name_space.mustbe(SCClass, node)
+				|| it = SCIterator.new(name_space)
+				require it.InitIter( node )
+				
+				|| s = it.name oar "DefaultIterator"
+				name_space.tryadd(node, it, s)
+				
+				Return Compiler.program // OK
+
+
+
+function SCClass.GetIteratorAny (|String| name, |message| node, |SCIterator|)
+	opt norefcounts
+	name := "DefaultIterator"
+	for c.upwards in self
+		|| R = c[name] 
+		if R isa SCIterator
+			return R
+
+	error (node, "No iterator $Name for class: ${.Name}" )
+
+
+
+function SCClass.CheckIterator
+	opt norefcounts
+	for i in .access
+		if i isa sciterator
+			i.check(self)
+
+
+function scdecl.GetIteratorAny (|String| name, |message| node, |SCIterator|)
+	if .c_Array
+		return sciterator.c_array
+	|| cls = .type								#expect ( node, "No class found." )
+	if .PointerCount and !cls.isstruct
+		return sciterator.pointer
+	
+	return cls.GetIteratorAny(name, node)
+
+

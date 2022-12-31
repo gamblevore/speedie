@@ -1,0 +1,972 @@
+
+
+module SDLApp
+	linkage
+		cpp_part App
+	|SDL_Event|					Event
+	|[string]|					PendingAlerts
+	|array|						DrawDrag = nil
+	|KeyMod|					KeyMod
+	|GUIPasteEvent|				AppDocumentOpen
+	|ivec2| 					NewSize
+	|ivec2| 					CurrMouseXY
+	|ivec2| 					AppResizingXY
+	|ivec2|						TryResizeLater
+	|f64|						FrameLength
+	|date|						OpenedFirst
+	|date|						LastFrameDate
+	|date|						SelSolidUntil
+	|date|						FastToolTipDate
+	|uint|						LastMouseDownRepeat
+	|bool|						StartedProperly
+	|bool|						AlertsAreSurprising
+	|bool|						IsBackground
+	|byte|						CanDrag
+	|bool|						FlashSelector
+	|bool|						LoadedSizePref
+	|bool|						WantsQuit
+	|bool|						IsQuitting
+	|bool|						AControlWasResized
+	|bool|						LastWasWindowClose
+	|bool|						TextInputEnabled
+	|bool|						TextInputEnabledAtStart
+	|bool|						LastFlashSelector
+	|byte|						TouchCount=10 // draw the first few frames always
+											  // helps with startup events! at least on osx
+	|byte|						SingleFrameNest
+	|byte|						TouchFingersDown
+	|int|						TicksDuration
+	|uint|						FrameCount
+	|uint|						LastFrameSelMove
+	|uint|						DrawCount
+	|float|						Scale
+	|image|						DrawSpace
+	|image|						ReadSpace
+	|imageeffects| 				Effects
+	|&SDL_Window|				ScreenWindow
+	|&SDL_Renderer|				Renderer
+	|&SDL_Texture|				Raw
+	|error|						ToolTip = error(nil,  "",  errorseverity.ok)
+	|error|						CompileStatus // remove
+	|string|					LastSearch
+
+
+
+	
+	constants
+		kNothing = 1
+		kActivity = 2
+		kTryQuit = 4
+		kExiting = 8
+		
+	
+	
+	cpp_wrapper SDL_Init				(|uint| c)
+	cpp_wrapper SDL_Quit				()
+
+	cpp_wrapper SDL_CreateWindow		(|cstring| title, |int| x, |int| y, |int| w, |int| h, |uint| flags, |&SDL_Window|) 
+	cpp_wrapper SDL_SetWindowTitle		(|&SDL_Window| win, |cstring| title) 
+	cpp_wrapper SDL_GetWindowTitle		(|&SDL_Window| win, |cstring|) 
+	cpp_wrapper SDL_CaptureMouse		(|bool| state, |int|) 
+	
+	cpp_Wrapper SDL_CreateRenderer		(|&SDL_Window| window, |int| index, |Uint| flags, |&SDL_renderer|)
+
+	cpp_Wrapper SDL_GetRendererOutputSize (|&SDL_Renderer| renderer, |&int| w, |&int| H, |int|)
+	cpp_Wrapper SDL_CreateTexture		(|&SDL_Renderer| renderer, |Uint| format, |int| access, |int| w, |int| h, |&SDL_Texture|)
+	cpp_Wrapper SDL_GL_GetDrawableSize	(|&SDL_Window| window, |&int| w, |&int| h)
+	cpp_wrapper SDL_RenderCopy			(|&SDL_Renderer| renderer,  |&SDL_Texture| texture,  |&SDL_Rect| srcrect, |&SDL_Rect| dstrect)
+	cpp_Wrapper SDL_RenderPresent		(|&SDL_Renderer| renderer)
+	cpp_Wrapper SDL_GetMouseState		(|&int| x, |&int|y, |mousebutton|) 
+	cpp_wrapper SDL_EventState			(|int| event, |int| enable, |byte|)
+	cpp_wrapper SDL_SetWindowPosition	(|&SDL_Window| w,  |int| x, |int| y)
+	cpp_wrapper SDL_ShowCursor			(|int| show=-1, |int|)
+	cpp_wrapper SDL_GetDisplayBounds	(|int| displayIndex, |&SDL_Rect| rect, |int|)
+	cpp_wrapper SDL_SetWindowMaximumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
+	cpp_wrapper SDL_SetWindowMinimumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
+	cpp_Wrapper SDL_MaximizeWindow		(|&SDL_Window| window)
+	cpp_wrapper SDL_SetWindowFullscreen	(|&SDL_Window| window, |int| Mode=0x1001, |int|)
+	cpp_Wrapper SDL_RestoreWindow		(|&SDL_Window| window)
+	cpp_wrapper SDL_GetWindowPosition	(|&SDL_Window| w,  |&int| x, |&int| y)
+	cpp_wrapper SDL_GetWindowSize		(|&SDL_Window| w,  |&int| x, |&int| y)
+	cpp_wrapper SDL_SetWindowSize		(|&SDL_Window| window, |int| w, |int| h, |int|)
+	cpp_WRapper SDL_GetModState			(|keymod|)
+	cpp_wrapper SDL_StartTextInput		()
+	cpp_wrapper SDL_StopTextInput		()
+	cpp_wrapper SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |&SDL_Window| window)
+	cpp_Wrapper  JB_SDL_RemoveWindowBorder (|_voidptr| window)
+	cpp_Wrapper  JB_SDL_SetModified (|_voidptr| window, |bool| b)
+	cpp_wrapper  JB_SDL_FullScreen (|_voidptr| w, |bool| On=true)
+	function DocumentOpened  (|String|)
+		cpp_Wrapper JB_App__DocumentOpened
+		
+	function InitDelegates
+		cpp_Wrapper JB_App__InitStuff
+
+	function Screen (|ivec4|)
+		cpp_Part GetScreen
+		return (.ScreenOrig.vec4 / .scale).ivec4 	
+
+	function NativeWindow (|_voidptr|)
+		|SDL_SysWMinfo| data
+		.screenwindow.SDL_GetWindowWMInfo(data)
+		return data.window|_Voidptr|
+
+	function Alert (|string| msg, |string| title="")
+		visible
+		SDL_ShowSimpleMessageBox(0, title.cstr, msg.cstr, nil)
+
+
+	function SelChanged
+		.LastFrameSelMove = .FrameCount+32
+
+	
+	function ScreenOrig (|ivec4|)
+		|| P = .ScreenPosOrig
+		return (p, p + .SizeOrig) 	
+	
+	
+	function SizeOrig (|ivec2|)
+		|| aaa = (&rz)|&int|
+		.SDL_GetWindowSize(.ScreenWindow,  aaa,  aaa+1)
+
+	function SizeOrig (assigns:|ivec2|)
+		|| p = .ScreenPosOrig
+		|| r = (p, p + value)
+		.screenorig(r)
+
+	function Title (|string|)
+		return SDL_GetWindowTitle(.screenwindow).render
+
+	function Title (assigns:|string|)
+		SDL_SetWindowTitle(.screenwindow, value.cstr)
+
+	function ScreenPosOrig (|ivec2|)
+		|| aaa = (&rz)|&int|
+		.SDL_GetWindowPosition(.screenwindow,  aaa, aaa+1)
+
+		
+	function ShowCursor (|bool| v = true)
+		SDL_ShowCursor(v|int|)
+
+	function CursorVisible (|bool|)
+		return SDL_ShowCursor()
+		
+	function Size (assigns:|ivec2| S)
+		|| pos	= .ScreenPosOrig
+		|| s2	= (s.vec2*.scale).ivec2
+		.ScreenOrig((0, 0, s2))
+
+
+	function Screen (|ivec4| result, |bool|)
+		cpp_Part SetScreen
+		result = (result.vec4 * .scale).ivec4
+		return .ScreenOrig(result)
+	
+	
+	function Screen (assigns:|ivec4| result, |bool|)
+		cpp_Part SetScreen2
+		return .ScreenOrig((result.vec4*.scale).ivec4)
+
+
+	function ScreenOrig (assigns:|ivec4| result, |bool|)
+		require .ScreenWindow
+		if (result.x <= 0) and (result.y <= 0)
+			.JB_SDL_FullScreen(.nativewindow)
+			//.SDL_SetWindowFullscreen(.screenwindow)
+			return true
+		|| Old = .SizeOrig
+		|| wh = result.size-1 align 3
+		.SDL_SetWindowSize(.screenwindow, wh.x, wh.y)
+		if .SizeOrig != wh
+			.TryResizeLater = wh
+		if result.xy
+			.SDL_SetWindowPosition(.ScreenWindow, result.x, result.y)
+
+		|| Niew = .SizeOrig
+		if old != Niew
+			.NewSize = niew
+		return true
+		
+	
+	function Touch (|guicontrol| modified=nil)
+		.TouchCount = .TouchCount|int| max 2
+
+	
+	function Resized (|guicontrol| modified=nil)
+		.AControlWasResized = true
+		.Touch(modified)
+
+
+	function DropEnable
+		SDL_EventState(SDLEventType.DROPFILE, 1)
+	
+	
+	function IsTyping (|bool|)
+		return .event.type is textinput or keydown
+
+
+	function MainLoop (|int|)
+		target !gui
+			disabled `Put "targets gui" in the app's conf section to use this!`
+		.StartedProperly = true
+		while .SingleFrame
+			.PostLoads
+		.SavePrefs
+		.Quit
+
+	
+	function PostLoads
+		opt norefcounts
+		if !.LoadedSizePref
+			.LoadedSizePref = true
+			|| it = app.prefs..screen
+				sdlapp.ScreenOrig = it.ivec4
+
+		|| s = .TryResizeLater
+			.SizeOrig = s
+			.TryResizeLater = nil // clear... in case of inf loop
+
+		for w in window.all
+			if !w.PostLoaded
+				w.PostLoaded = true
+				w.__PostLoad__
+
+	function Screen2 (|guicontrol|)
+		return window.all
+
+	function MouseXY (|ivec2|)
+		|| x = 0
+		|| y = 0
+		SDL_GetMouseState(&x, &y)
+		return (x,y).sdlxy
+		
+		
+	function MouseButtons (|Mousebutton|)
+		return SDL_GetMouseState(nil, nil)
+
+	
+	constants
+		SDL_PIXELFORMAT_ARGB8888 = 372645892
+		SDL_PIXELFORMAT_RGBA8888 = 373694468
+		SDL_PIXELFORMAT_ABGR8888 = 376840196
+		ChosenPixelFormat = SDL_PIXELFORMAT_ABGR8888
+		SDL_INIT_TIMER =			0x00000001
+		SDL_INIT_AUDIO =			0x00000010
+		SDL_INIT_VIDEO =			0x00000020  /** implies SDL_INIT_EVENTS */
+		SDL_INIT_JOYSTICK =			0x00000200  /** implies SDL_INIT_EVENTS */
+		SDL_INIT_HAPTIC =			0x00001000
+		SDL_INIT_GAMECONTROLLER =	0x00002000  /** implies SDL_INIT_JOYSTICK */
+		SDL_INIT_EVENTS =			0x00004000
+		SDL_INIT_SENSOR =			0x00008000
+		SDL_WINDOWPOS_CENTERED =	0x2FFF0000
+		SDL_TEXTUREACCESS_STREAMING = 1
+		SDL_WINDOW_RESIZABLE =		0x20
+		SDL_WINDOW_ALLOW_HIGHDPI =	0x00002000
+
+	function initwindow (|ivec2| s, |string|name)
+		SDL_Init(SDL_INIT_AUDIO (|) SDL_INIT_VIDEO (|) SDL_INIT_EVENTS (|) SDL_INIT_HAPTIC)
+
+		.screenwindow = SDL_CreateWindow(name.cstr,
+			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.x, s.y, SDL_WINDOW_RESIZABLE (|) SDL_WINDOW_ALLOW_HIGHDPI)
+
+		.SDL_SetWindowMaximumSize(.screenwindow, 4096, 4096)
+		.SDL_SetWindowMinimumSize(.screenwindow,  400,  200)
+		if s.x < 400 or s.y < 200
+			".initwindow(size) too small!"
+		.vsync = true
+		.renderer = SDL_CreateRenderer(.screenwindow, -1, 0)
+
+
+	function vsync (assigns:|bool|)
+		|| v = ("1", "0")(value)
+		.SetHint("SDL_RENDER_VSYNC".cstr, v.cstr)
+	
+	
+	function RemoveBorder
+		JB_SDL_RemoveWindowBorder(.NativeWindow)
+
+
+	function SavePrefs
+		if app.prefs
+			app.prefs..screen = sdlapp.screenorig.list
+			app.saveprefs
+
+
+	function InitScaling (|vec2| s, |float| scale)
+		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, S.x, S.y)
+		
+		|int| w = s.x
+		|int| h = s.y
+		SDL_GetRendererOutputSize(.renderer, w, h)
+		
+		|| theirscale = w|float| / s.x
+		|int| o = ((theirscale*scale) + 0.4999)
+		|| ot = o|float|
+		|| mul = (ot / theirscale) max 1
+		if (mul < scale) and (scale.fract >= 0.5)
+			mul++
+			
+		.scale = mul
+		SDL_SetWindowSize(.screenwindow, s.x*mul, s.y*mul)
+		
+
+	function GUICheck
+		if app..version
+			printline app.conf("version")
+			app.quit(0)
+		if app..created
+			printline __now__|date|.render
+			app.quit(0)
+	
+	
+	function SDLInit (|controlrect| cr) // startup
+		require !.framelength
+		.guicheck
+		if !font.small
+			return app.die("smallfont not loaded.\n")
+		|| s = cr.size
+		.FrameLength	= 1.0/60.0
+		.DrawSpace		= image(s, 0|&byte|)
+		.drawspace.name = "read"
+		.FastToolTipDate = 1
+		.initwindow(s, app.conf("selfname") oar app.conf("name"))
+		.InitScaling(s.vec2, 1.5)
+		__modules__.window.all.lastrect = s.rect
+		.CheckQuarantine
+		.OpenedFirst = date()
+		app.regStartup
+		appmenu.InitAppMenu
+		.InitDelegates
+		
+		
+	
+	function SetHint (|cstring| name, |cstring| value)
+		cpp_wrapper SDL_SetHint
+	
+	
+	function SelectorFlash
+		.LastFlashSelector = .FlashSelector
+		.FlashSelector = (((.FrameCount-.LastFrameSelMove)>>5) mod 2) and !.IsBackground
+
+
+	function ClearAlerts
+		|| it = .PendingAlerts
+			.PendingAlerts = []
+			for s in it
+				app.alert(s)
+
+
+	function DialogIsOpen (|bool|)
+		return window.opendialogs
+
+
+	function OpenDialog (|window|)
+		return __modules__.window.opendialogs.last
+
+
+	function StatusInfo (|string|)
+		// remove?
+		if .ToolTip.Fired
+			return .Tooltip.name
+
+	helper FastUpdate (|bool|)
+		return !.IsBackground or .DroppingInto
+	
+	function FrameAndEvents (|int|)		
+		.ClearAlerts
+		|| Occured = knothing
+		while
+			while .Event.Poll
+				occured |= .CheckEvent(.event)
+			if .WantsQuit
+				Occured |= .TryQuit(kExiting)
+			if .newsize
+				Occured |= kActivity
+
+			|| t_now = date()
+			|| Durr  = (t_now - .LastFramedate).durr
+			.TicksDuration = (t_now - .LastFramedate) >> 10
+			|int| t_now_small = t_now >> 10
+			
+			if .TouchCount				
+				|| f = (0.0164s, 0.5s)(.FastUpdate)
+				if durr >= f
+					.TouchCount--
+					Occured |= kActivity
+			if Durr >= FrameLength
+				.FrameCount++
+				.SelectorFlash
+				.LastFramedate = t_now
+				return occured
+			if occured & kActivity
+				return occured
+			if !sdl_event.poll
+				|| f = (0.005s, 0.25s)(.FastUpdate)
+				app.sleep( f )
+	
+	
+	function DroppingInto (|guicontrol|)
+		opt norefcounts
+		return __modules__.window.front.droppinginto?
+
+
+	function Window.EveryFrame
+		opt norefcounts
+		|| f = .focus$
+		if f isnt visible
+			.focus = nil
+		if !sdlapp.isbackground and (f isa textview)
+			if f is editable and (sdlapp.FlashSelector != sdlapp.LastFlashSelector)
+				sdlapp.touch(f)
+
+	
+	function UpdateTextFocus (|window|w)
+		opt norefcounts
+		|| NeedsInput = false
+		|| f = w.focus
+		if (f isa textview)
+			|| menu = w.openedmenu
+			if !menu or menu is typethrough 
+				needsinput = f is editable
+			
+		require sdlapp.TextInputEnabled != needsinput
+		sdlapp.TextInputEnabled = needsinput
+		if NeedsInput
+			sdlapp.sdl_starttextinput
+		  else
+			sdlapp.sdl_stoptextinput
+		
+			
+	function PreframeText (|window| W)
+		.TextInputEnabledAtStart = .TextInputEnabled		
+		if ListView.delayedItTill.fired
+			ListView.delayedItTill = 0
+			|| lv = w.focus
+			if lv isa ListView
+				lv.TryDelayedEdit
+
+
+	function HandleOpenFile (|bool|)
+		|| doc = .DocumentOpened
+			|| d = .AppDocumentOpen
+				|| f = doc.file
+				if f.exists
+					(d)(nil, nil, f.path, CopyPasteFlags.PasteFile)
+			return true
+
+
+	function PreFrame (|int|)
+		if !stderr.ok
+			notifications <~ stderr.pop
+			stderr.clear
+			beep
+
+		.HandleOpenFile
+		
+		|| w	= __modules__.window.front$
+		.UpdateTextFocus(W)
+		.PreFrameText(w)
+		
+		// seems to be sending far too much mousedowns...
+		// just clicking once sends like 20 mousedowns
+		if .candrag > 4
+			.touch
+			w.DoMouseDrag(.MouseXY, true)
+			return kactivity
+			
+		|| ed = &w.inlineeditor
+		if ed.needshide
+			ed.clear
+	
+	function MouseDownRepeatOK (|bool|)
+		require (.CanDrag >= 3) and (.MouseButtons is left)
+		|| gap = .framecount|int64| - .LastMouseDownRepeat|int64|
+		if gap > 24
+			.LastMouseDownRepeat = .framecount
+			return true
+		
+	
+	function DoDrawDrag (|window|w, |image| where)
+		|| s = .drawdrag
+		require s
+		|| d = w.DroppingInto
+		require d and d != w.currmousedown
+		|| P	= .mousexy
+		|| sigh	= P.grow((6,6))
+		where.drawcircle(sigh, ¥.DragAndDrop, 0.0)
+		sigh	= P.grow((10,10))
+		where.drawcircle(sigh, ¥.DragAndDrop, 7.0)
+		
+		|| old = where.controlclip
+		where.controlclip = sigh
+		|| t	= s.length.render 
+		|| x	= t.length*font.width
+		|| h	= font.height
+		|| P2	= (x,h)/2
+		font.small.drawtext(t, where, P-P2, true)
+		where.controlclip = old
+	
+
+	function DrawWinFrom (|window|)
+		opt norefcounts
+		rz = window.front
+		while rz
+			if rz.isviewable and rz.isfullscreen
+				return rz
+			rz = rz.prev|window|#loop
+		
+
+	function StartResize
+		opt norefcounts
+		require .acontrolwasresized
+		.acontrolwasresized = false
+		|| BigRect = .DrawSpace.rect
+		|| Rect = (0, 0, 0, 0)
+		for w in __modules__.window.all
+			rect = w.reflowdoc(bigrect, rect, bigrect)
+		for w in notifications.Alerts
+			w.reflowdoc(bigrect, nil, bigrect)
+	
+	
+	function DrawFrame
+		opt norefcounts
+		
+		require .StartFrame(.Raw)
+		|| w1 = .DrawWinFrom
+		if !w1.NoDrawBackground
+			¥.DrawBackground(.DrawSpace)
+		
+		while w1
+			if w1.isviewable
+				w1.__draw__(.DrawSpace)
+			w1 = w1.next|window|
+			
+			
+		notifications.Draw
+
+		|| ws = __modules__.window.all
+		.DoDrawDrag(ws.first, .DrawSpace)
+		.EndFrame(.Raw)
+
+		
+	function UpdateWindowFrames
+		opt norefcounts
+		.StartResize
+		for w  in  __modules__.window.all
+			if w isa window
+				w.EveryFrame
+		if !.DialogIsOpen
+			for w  in  __modules__.window.all
+				if w isa window
+					w.__FrameUpdate__			
+		.StartResize
+		
+		
+	function mod (|int| period, |float|)
+		return (.FrameCount mod period)|float| / period|float|
+
+	function cycle (|date| amount, |float|)
+		// FrameLength is 1/60
+		return (.mod((amount*60).WholeSeconds).sin + 1) * 0.5
+
+	function ShowWindows
+		opt norefcounts
+		for w in window.shown
+			if w is visible
+				sdlapp.Resized(w)
+				window.all <~ w
+		window.shown.Clear
+	
+	
+	function SingleFrame (|bool|)
+		require .SingleFrameNest <= 2
+		.SingleFrameNest++
+		.ShowWindows
+			
+		|| occured  = .PreFrame (|) .FrameAndEvents
+		require !(Occured & kExiting)
+		.AppResize
+		.UpdateWindowFrames
+		if occured&kactivity
+			.DrawFrame
+		
+		.SingleFrameNest--
+		return true
+
+
+	function CheckQuarantine
+		if platform.osx and app.isquarantined
+			sdlapp.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
+
+
+	function AppResize (|ivec2|)
+		require .newsize
+
+		.raw.dispose
+		|| v = (.NewSize.vec2/.Scale).ivec2
+		.newsize = nil										// phew
+		.DrawSpace.ResizeTo(v)
+		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, v.x, v.y)
+
+		|| ws = __modules__.window.all
+		ws|window|.FullScreen = v
+		.StartResize
+
+
+	function StartFrame (|&SDL_Texture| T, |bool|)
+		opt norefcounts
+		if !.effects
+			.Effects = ImageEffects(.drawspace)
+			.effects.blurdata.create(10.0)
+		debug_require (t and .effects.final)
+		|| stride = 0
+		t.lockThatZerosEventhoughItShouldnt(nil, (&.effects.final._ptr)|&_voidptr|, &stride)  // zeros data :( This makes insertion flicking require entire screen redraw!
+		return true
+
+
+	function PicturePtr (|&_voidptr|)
+		opt norefcounts
+		if false and .effects// and keys.Control and keys.Cmd
+			.Effects.Blur
+		
+		return (&.effects.final._ptr)|&_voidptr|
+	
+	
+	function EndFrame (|&SDL_Texture| T)
+		|| stride = 0
+		|| Img = .PicturePtr
+		.Drawcount++
+		target release  // makes it slower but also resizes work better whatever
+						// fix this later so we don't need it.
+			t.UnlockThatCopiesEvenThoughItShouldnt // wait why do we unlock and also lock?
+			t.LockThatZerosEventhoughItShouldnt(nil, img, &Stride)
+		|SDL_Rect| dstrect
+		SDL_GL_GetDrawableSize( .screenwindow,  &dstrect.w,  &dstrect.h )
+		SDL_RenderCopy(.renderer, T, nil, &dstrect)
+		SDL_RenderPresent(.renderer)
+		t.UnlockThatCopiesEvenThoughItShouldnt // seems like we are double doing this?
+
+
+	function Delay (|int| ms)
+		cpp_Wrapper SDL_Delay
+
+
+	function Quit
+		for w in __modules__.window.all
+			w.close(kExiting)
+		.sdl_quit
+
+	
+	function FileDroppedIntoApp (|window| w, |string| path, |CopyPasteFlags| p)
+		|| c = w[.MouseXY] oar w
+		c.DoPaste(path, p)
+		w.DroppingInto = nil
+
+
+	function AllowKeyDown (|&SDL_KeySym| Ev, |bool|)
+		opt norefcounts
+		if !.TextInputEnabledAtStart
+			return true
+		|| k = ev.sym
+		if k.isaccept or k is delete or tab or escape
+			return true
+		return (k.isscan or ev.Command)
+
+
+	function AllowTyping (|bool|)
+		opt norefcounts
+		return .TextInputEnabledAtStart and !keys.cmd
+	
+	
+	function Window.MenuAt (|ivec2| xy, |bool|Test, |guicontrol|)
+		opt norefcounts
+		|| F = .openedmenu$
+		if (!test) or (f.lastrect.horz contains xy.x)
+			return f
+	
+	
+	function Window.ControlOrMenuAt (|ivec2| xy, |bool|Test=true, |guicontrol|)
+		opt norefcounts
+		return .menuat(xy, test) oar self[xy]
+
+
+	function StandardKeys (|keys| key, |bool|)
+		|| w	= __modules__.window.front
+		|| g	= w.focus
+			if keys.cmd
+				if (key is g)
+					if !g.__Search__(sdlapp.lastsearch, false)
+						beep
+					return true
+				if (key is f) and !(keys.shift or keys.option)
+					return g.OpenSearch
+			  elseif (key is find or AC_SEARCH)
+				return g.OpenSearch
+
+		|| gw	= g oar w
+		if keys.cmd
+			if (key is f) and keys.option
+				.JB_SDL_FullScreen(.nativewindow, false)
+				return true
+			if (key is l) and keys.shift
+				JB_Mem_ClassLeakCounter()
+			if (key is c)
+				return gw.DoCopy
+			if (key is v)
+				return gw.DoPaste(clipboard.text)
+		  elseif (key is paste)
+			return gw.DoPaste(clipboard.text)
+		  elseif (key is copy)
+			return gw.DoCopy
+
+
+	function TryQuit (|int|reason=kTryQuit, |int|)
+		opt norefcounts
+		if .dialogisopen
+			for w in window.opendialogs
+				w.cancelreturn
+			return 0
+
+		.IsQuitting = true
+		rz = kExiting
+		for w in window.all
+			if !w.close(reason)
+				rz = 0
+				exit
+		.IsQuitting = false
+		if !rz
+			.WantsQuit = false // sigh.
+
+
+	function TryClose (|int|)
+		if !.DialogIsOpen
+			|| w = window.front
+			if w and w.close(kactivity)
+				rz = kactivity
+
+
+	function AppIsBackground (|bool| v, |int|)
+		require .IsBackground != v // what? why is tihs happenin 
+		.IsBackground = v
+		if !.DialogIsOpen
+			for w in __modules__.window.all
+				w.__AppForegroundChanged__(!v)
+		.touch
+		return kactivity
+		
+
+	function CheckEvent (|&SDL_Event| ev, |int|)
+		visible
+		|| lwwc = .LastWasWindowClose
+		.LastWasWindowClose = false
+		|| t = ev.type
+		 
+		if (t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND)
+			beep.OK = 1
+			.keymod = 0
+			.AppIsBackground(t is APP_DIDENTERBACKGROUND)
+			return kActivity
+		
+		.keymod = .SDL_GetModState
+		if  t is APP_TERMINATING
+			return .tryquit
+		
+		if (t is QUIT) and !lwwc
+			return .tryquit
+		
+		if  t is WINDOWEVENT
+			|| wev = ev.window
+			|| wt = wev.event
+			if (wt is CLOSE)
+				.LastWasWindowClose = true
+				return .tryclose
+			if (wt is RESIZED)
+				.NewSize = (wev.data1, wev.data2)
+				return kActivity
+			  elseif (wt is FOCUS_GAINED)
+				return .appisbackground(false)
+			  elseif (wt is FOCUS_LOST)
+				return .appisbackground(true)
+			return knothing
+
+
+		|| w = .opendialog oar __modules__.window.front
+		if (!w)
+			return kNothing
+
+		if T is dropbegin
+			w.DroppingInto = w[.MouseXY] oar w
+			return kActivity
+		if t is DROPFILE or Droptext
+			|| flags = (copypasteflags.pastefile, copypasteflags.pastetext)(t is dropfile)
+			.FileDroppedIntoApp(w, ev.drop.filestr, flags)
+			return kActivity
+		if (t is dropcomplete)
+			w.DroppingInto = nil
+			return kActivity
+		
+		|| xy = ev.button.xy
+		if  t is MOUSEDOWN
+			beep.OK = 1
+			if notifications.Clickedat(xy)
+				return kactivity
+				
+			|| InsideWin = w.lastrect.soothe contains xy
+			if !InsideWin and (w == .opendialog)
+				if w.ClickOutsideCloses
+					w.closedialog
+					return kactivity
+				beep
+				return kNothing
+			.candrag = nil
+			if .inResizeCorner(xy)
+				return kActivity
+			|| B = ev.button
+			if b.button == 1
+				if !w.CurrMouseDown
+					mousebutton.DownAt = date()
+				w.CurrMouseDown = w.DoMouseDown(xy, b.clicks)
+			  elseif b.button == 3
+				|| F = w.ControlOrMenuAt(xy)
+				w.CurrMouseDown = f
+				if F
+					f.__rightclick__(xy)
+			return kActivity
+
+
+		  elseif  t is MOUSEMOVE
+			|| mxy = .mousexy
+			if .AppResizingXY
+				return .DoAppResize(mxy)
+			if .CurrMouseXY != mxy
+				.CurrMouseXY = mxy
+				.ShowCursor
+				if (.CanDrag >= 2) and (.MouseButtons is left)
+					w.DoMouseDrag(xy, .CanDrag > 3)
+					return kActivity
+				
+				|guicontrol--| OldMM = w.MouseIsOver
+				|guicontrol--| r     = w.ControlOrMenuAt(Xy, false)
+				w.MouseIsOver = r 
+				
+				.SetToolTips(r)
+				if oldmm and oldmm != r
+					oldmm.__MouseMove__(xy, SDL_WindowEventID.leave)
+				|| state = SDL_WindowEventID.moved
+				if oldmm != r
+					state = SDL_WindowEventID.enter
+					
+				if r and R.__MouseMove__(xy, state)
+					return kactivity
+				if w.CurrMousedown
+					.touch
+					return kActivity
+
+
+		  elseif  t is MOUSEUP
+			SDL_CaptureMouse(false)
+			.AppResizingXY = nil
+			.LastMouseDownRepeat = nil			
+			|| dd	= .drawdrag 
+			|| B	= ev.button
+			|| dow	= w.CurrMouseDown
+			|| F	= w.openedmenu
+			|| di	= w.DroppingInto
+			if di and dd
+				for c in dd
+					di.dopaste(c, copypasteflags.pastefile)
+			
+			w.ClearDrops
+			if !(di and dd) and (b.button == 3) and (dow != F) and f and (f contains xy)
+				f.__rightclick__(xy)
+			  elseif dow and (B.button!=3) and !Scroller.JustClicked
+				dow.__MouseUp__(xy)
+			Scroller.JustClicked = false
+			return kActivity
+
+
+		  elseif  t is MOUSEWHEEL
+			|| weel = ev.wheel
+			w.__mousewheel__(weel.xy, weel.direction)
+			return kActivity
+
+
+		  elseif  t is TEXTINPUT
+			|| e = ev.Editing
+			if !.AllowTyping or .CanDrag >= 2
+				return kNothing
+			|| tv = w.focus
+			if tv isa textview
+				tv.TypedRaw(e.str)
+			return kActivity
+
+
+		  elseif  t is KEYDOWN
+			|| kev = ev.keysym
+			|| key = kev.sym
+			if key.IsCancelled or .CanDrag >= 2
+				return kNothing
+			beep.OK = 1
+			if !w.openedmenu and !.AllowKeyDown(kev)
+				return kNothing
+			keys.AddKey(key)
+			
+			ifn (key is escape) and keys.escape.heldkey
+				if .StandardKeys(key) or w.__keydown__(key)
+					return kActivity
+			
+			if (.singleframenest < 2) and keys.escape.HeldKey(0.75s)
+				keys.escape.eat
+				return  AppMenu.show
+			
+		  elseif  t is KEYUP
+			keys.Removekey(ev.key.key)
+			return kActivity
+		return kNothing
+		
+
+	function FindResizeCorner (|ivec2| p, |ivec2|)
+		opt norefcounts
+		|| R = window.all.lastrect.x2
+		return (r-p.x, p.y)
+
+
+	function DoAppResize (|ivec2| M, |int|)
+		|| P = .FindResizeCorner(M)
+		|| D = .AppResizingXY - p
+		|| L = window.all.lastrect.size
+		sdlapp.screen = (0, 0, l + D)
+		return kActivity
+	
+	
+	function InResizeCorner (|ivec2| P, |bool|)
+		p = .FindResizeCorner(p)
+		|| m = 30
+		if p.x < m  and  p.y < m
+			.AppResizingXY = p
+			SDL_CaptureMouse(True)
+			return true
+
+
+	function SetToolTips (|guicontrol| r)
+		opt norefcounts
+		|| w = r.window$
+		if w.ToolTipControl != r
+			w.ToolTipControl = r
+			|| desc = r.description?
+			|| info = ("", desc)(r isa textview  and  r is editable)
+			with .tooltip
+				|| WasOff = !.name
+				|| delay = (0.0s, 1.5s)(!sdlapp.FastToolTipDate.fired)
+				|| now = date()
+				if .name and .when.fired
+					sdlapp.FastToolTipDate = now + 1s
+				.when = now + delay
+				.name = info
+
+
+
+function guicontrol.description (|string|)
+	return .tooltip // :)
+
+

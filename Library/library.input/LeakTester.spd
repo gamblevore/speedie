@@ -1,0 +1,84 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class LeakTester
+	linkage
+		cpp_part		Lk
+
+	|int|		MemUsedStart
+	|string|	Name
+
+	constructor (|string| name)
+		.MemUsedStart = app.objmemory
+		.Name = name
+		app.LeakMarkMemory
+	
+	helper FinalTest
+		.Test2
+		.MemUsedStart = nil
+		app.LeakUnMarkMemory
+	
+	helper Test1
+		visible
+		|| fs = faststring()
+		fs <~ "a${1}b${2}"
+		printline fs
+	helper Test2
+		require .MemUsedStart
+		|int| NewAmount = app.objmemory
+		|| Diff = NewAmount - .MemUsedStart
+		if Diff > 0
+			debugger
+			"Leaked $Diff bytes in ${.Name}. New Count $NewAmount."
+
+	
+	helper SyntaxUsingComplete
+		.finaltest
+
+	
+	helper SyntaxUsing (|LeakTester|)
+		return self
+
+	
+	module
+		helper SyntaxUsing (|LeakTester|)
+			return leaktester.new("")
+		
+		helper TestClasses
+			
+
+
+helper object.CollectLeaks_ (|[]|)
+	JB_FindLeakedObject(self, rz)
+
+
+helper object.PrintLeaks_
+	description "Finds the object that refers to this leaked object."
+	visible
+	cpp_name jbl
+	for bad in .CollectLeaks_
+		bad.debugprint
+		debugger
+	
+
+
+struct SpeedTester
+	|Date|				Start
+	|string|			Name
+		
+	helper SyntaxUsingComplete
+		|| µs = date() - .start
+		SpeedTester.log( .Name + ": " + µs.renderdurr + "s" )
+			
+	module
+		function Log (|string| s)
+			printline s
+
+
+function string.SyntaxUsing (|SpeedTester|)
+	SpeedTester.log( "Starting: " + self )
+	rz.name = self
+	rz.start = date()

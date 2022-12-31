@@ -1,0 +1,105 @@
+
+
+class Class
+	linkage
+		cpp_class ClsInfo
+	|string|				Name
+	|int|					Size
+	|datatypecode|			DataType
+	|BaseType|				BaseType
+	|Message|				Src
+	|class|					Super
+	|&classdata|			RealClass
+	
+	
+	constructor (|message| Cls)
+		.name = cls.name
+		|| Type = cls[0]
+			if type == @char // datatype
+				.basetype = BaseType.DataType
+				.DataType = type.name.parsehex
+			  elseif type == @num // struct
+				.basetype = BaseType.struct
+				.size = type.int		#error "Size == 0?"
+			  elseif type == @arr
+				.basetype = Basetype.Object
+				// lib->collect the size via the system?
+				// app->actually we need a size.
+			  elseif type == @list
+				.basetype = basetype.funcproto
+			  else
+				error type
+		  else
+			error (cls, "Missing Type")
+			
+		.src = cls
+		class.table[cls.name.LowerCase] = self
+
+
+	
+	function CreateLowLevelClass (|int| behaviours, |int| size, |&ClassData|)
+		.realclass = rz
+
+
+	function ClassData.Behaviour (assigns:|int| i, |function| fn)
+		
+
+	function LoadBehaviours
+		|| b = .src..behaviours
+		// destructor/render should be assumed...
+		|| cls = .CreateLowLevelClass(b.slowcount, .size)
+		|| i = 0
+		for fn in b
+			cls.Behaviour(i++) = function[fn.int]
+		
+			
+	module
+		function Behave (|bool|)
+			opt norefcounts
+			for c in .list
+				c.Loadbehaviours
+			return true
+
+		function Grab (|message| all, |class| parent)
+			opt norefcounts
+			require all == @arg
+			for msg in all
+				|| c = class.new(msg)
+				c.super = parent
+				class.list <~ c
+				.grab(msg.last, c)
+			// load with jbin? we'll need a list of them!
+	
+		|[class]|				List
+		|dictionary of class|	Table = dictionary.new
+
+
+
+// create array of behaviours... associate with funcs
+// so... what if the behaviours are partly c and partly spd?
+// annoying?? Well... firstly, how do behaviours work?
+// its a func, that calls another func... and they should be spd.
+// i suppose the behaviour can be a c-func that returns another func?
+// also, the c-code might want to call speedie code? sigh...
+// i think we decided that "mostly" when we call c-code, it stays in
+// c-code. To call back into the VM is hard.
+// but for behaviours we have no choice! the c-code has to call speedie.
+// so... our "behaviour" has to be a func that calls the VM!
+// what about from speedie?
+// behaviours are rarely used anyhow?
+// mostly for render... i guess, but even that is mostly direct
+
+
+datatype BaseType (int)
+	constants (
+		|BaseType|
+		Module = 0 // not actually a type
+		Nil
+		Object
+		Struct
+		DataType
+		FuncProto
+	)
+	syntax is (|BaseType| d, |bool|)
+		return self == d
+

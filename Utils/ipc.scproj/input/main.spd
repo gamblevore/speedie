@@ -1,0 +1,4 @@
+#!/usr/local/bin/spd
+
+main 
+	processtest.run

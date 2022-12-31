@@ -1,0 +1,19 @@
+// Jeebox internals. By Theodore H. Smith...
+
+linkage
+	cpp_part SC
+
+
+compile_linking
+	flags
+		osx "-F/Library/Frameworks  -L/usr/local/lib/   -framework Cocoa"
+
+
+ignore // better append syntax?
+	WriteTo <~ { tmp "ello"
+		thg "you"
+		opp "are"
+		thg "awesome"
+	}
+
+// simpler... cleaner.

@@ -1,0 +1,250 @@
+
+//  https:github.com/grimfang4/SDL_FontCache
+//  TTF_Font* Sans = TTF_OpenFont("Sans.ttf", 24) this opens a font style and sets a size
+//
+//  SDL_Color White = {255, 255, 255}   this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
+//
+//  SDL_Surface* surfaceMessage = TTF_RenderText_Solid(Sans, "put your text here", White)  as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+//
+//  SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage) now you can convert it into a texture
+//
+//  SDL_Rect Message_rect create a rect
+//  Message_rect.x = 0  controls the rect's x coordinate 
+//  Message_rect.y = 0  controls the rect's y coordinte
+//  Message_rect.w = 100  controls the width of the rect
+//  Message_rect.h = 100  controls the height of the rect
+//
+//  Mind you that (0,0) is on the top left of the window/screen, think a rect as the text's box, that way it would be very simple to understand
+//
+//  Now since it's a texture, you have to put RenderCopy in your game loop area, the area where the whole code executes
+//
+//  SDL_RenderCopy(renderer, Message, NULL, &Message_rect) you put the renderer's name first, the Message, the crop size(you can ignore this if you don't want to dabble with cropping), and the rect which is the size and coordinate of your texture
+//
+//  Don't forget to free your surface and texture
+//  SDL_FreeSurface(surfaceMessage)
+//  SDL_DestroyTexture(Message)
+
+
+
+
+module font
+	|image| small_
+	function Small (|Image|)
+		opt norefcounts
+		return .small_ init ( file://SmallFont.png ).fontload
+	constants
+		Width = 6 
+		Height = 9 
+
+
+function image.DrawText (|string| Str, |image| Where, |ivec2| xy=(0,0), |ImagePixel| Col = ImagePixel.clear, |bool| DrawInvis=false)
+	opt min 3
+	require (str and Where.Pixels and .Pixels)
+	for c.codepoints in str
+		if DrawInvis
+			c = -c
+		xy.x = .DrawChar(c, Where, xy, Col)$
+
+
+function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |ImagePixel| Col, |int| H)
+	opt min 3
+	|| lines = (H / 12) max 1
+	if lines <= 1
+		.DrawText(str, where, xy, col)
+		return
+		
+	|| i	= 0
+	|| mw	= where.ControlClip.width/font.width
+	while (i < str.length) and lines >= 1
+		|| p = i
+		i = str.WrapSub(mw, false, p)
+		|| ttt = str[p, i]
+		.DrawText(ttt, where, xy, col)
+		xy.y -= 12
+		lines--
+
+
+helper string.FontLoad (|image|)
+	rz = .loadimage$
+	for v in rz
+		if !v.hascolor or !v.a
+			v <~ 0
+
+	for c in rz.width/6
+		if c > 32
+			rz.FontCleanupChar((c*6, 0))
+
+	
+function image.FontCleanupChar (|ivec2| s)
+	for v in (6, 8)
+		|| p = v+s
+		|| c = self[p].color
+		self[p] <~ c.FontPixelCleanup
+
+
+function vec4.FontPixelCleanup (|vec4|)
+	|| full		= 0.95 // fair?
+	|| total	= (.x+.y+.z)/3.0
+	require total >= 0.1
+	
+	rz = vec4(1)
+	if total < full						// "anything above this is 100% white"
+		rz.a = total/full				// anything else... is white, but less opaque
+
+
+function CodePoint.DrawCharfix (|codepoint|)
+	if self == 171 // sigh
+		return 128
+	  elseif self == 187 // we need a proper unicode drawing code
+		return 129
+	return ' '
+
+
+function image.DrawIcon (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| Col=colors.white)
+	.drawchar(c, where, xy, col, 0) 
+
+
+function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| Col, |int| DrawMode=1, |int|)
+	opt min 3
+	rz = (font.Width + XY.x) max 1
+	if c.iswhite
+		return rz
+	if c|int| < 0: c = -c // draw white-space
+	|uint64| MissingChar = 0
+	if c == 0xAB
+		c = 128
+	  elseif c == 0xBB
+		c = 129
+	  elseif c >= 130 and c <= 133
+		0 // idk
+	  elseif c >= 0x80
+		MissingChar = c.hash
+		c = 0x80
+	
+	// (mode 1)== normal
+		// letter-pixels: totally recolor using col
+		// emoji-letter: draw it as-is. no recolor.
+	// mode 0 == colored icons
+
+	if !col.a
+		col = colors.white
+	
+	|| col4		= col.color 
+	|| Read		= (font.Width, font.Height-1)
+	|| Clip		= where.clip((XY, xy+Read))
+	if !clip.ispositive
+		return rz
+	
+	|| X2  		= C|int| * font.Width
+	|| v0		= (X2, 0) - xy
+	if (c < 32) and (col4 == vec4(1) or drawmode == 1)			// draws faster
+		drawmode = -1
+	  elseif drawmode == 1
+		drawmode = col.a + 1
+
+	|| y = 0
+	while clip.y < clip.y2
+		|| sz = self[v0 + clip.xy]
+		|| dz = where[clip.xy]
+		for ww in clip.width
+			if (MissingChar)
+				sz = &imagepixel.clear
+				if (ww-1 inrange 4) and y-1 inrange 6
+					sz = imagepixel.char(missingchar)
+					MissingChar>>=1
+					
+			
+			if sz.uint
+				if drawmode > 0
+					|| A = (sz.a + 1) * drawmode				// now... this depends on if... 
+					if A >= 64K									
+						dz <~ col.uint							// opaque pixel
+					  else
+						|| f = A|float|/64K|float|
+						dz <~ mix(dz.color, col4, f)			// transparent pixel
+				  elseif drawmode < 0
+					dz <~ sz.uint								// emoji direct
+				  else
+					dz <~ mix(sz.color, col4, col4.a)			// emoji darkened
+			sz++
+			dz++
+		clip.y++
+		y++
+
+
+extend FastString
+	function Now (|uint64| M, |uint64|)
+		if M
+			return .ram_test(0) mod M
+		
+	function message.now (||)
+		|| a = .slowcount #require
+		|int| b = date.now mod a
+		return self[b]
+
+	function ram_test (|uint64|cmp, |uint64|)
+		cpp_part ram_test
+		|| x = date()			// date.timestamp seems to fail in... release builds??? 
+		|| t = .ram_test_sub	// the whole thing was taking 0 cycles!!! makes no sense but hard to debug
+		if cmp
+			expect (.hash == cmp) ("Illegal RAM alteration.")
+		|| d2 = date() - x
+		rz = (d2 << 16) + (date.timestamp & 0xffff) //sigh
+
+
+	function ram_test_sub (|int|)
+		|| n = .length/2
+		for i in n
+			|| A = self[i  ]
+			|| B = self[i+n]
+			self[i+n] = A
+			self[i  ] = B
+			rz += a+b<<8
+
+
+	function Picture (|int| c, |image| f)
+		cpp_part ram_test_encode
+		if c > 127 // unicode...
+			c = 32
+		elseif c == 32
+			c = 0
+		
+		|| X0 = C * font.Width
+		for x in font.Width
+			|| B = 0
+			for y in 8
+				|| rz = f[x0 + x,  y]
+				if (rz != nil) and rz.hascolor
+					b |= (1<<y)
+			self <~ b|byte|
+
+
+extend string
+	function MakeFlasher (|int| n, |&uint64|out, |FastString|)
+		cpp_part make_ram_test
+		|| fs = faststring(.length * 2 * n)
+		for n
+			fs <~ (0, .length)
+			fs <~ self
+		*out = fs.hash
+		return fs
+			
+
+	render Picture (|image| font=font.small)
+		cpp_part ram_test_encode
+		for c in self
+			fs.Picture(c, font)
+
+
+	render depicture
+		cpp_part ram_test_decode
+		for row in (7 downto 0)
+			for c in self
+				|| bit = c & (1 << row)
+				fs <~ ('*', ' ')(bit)
+			fs <~ '\n'
+
+		
+function string.EndsWithLine (|bool|)
+	return .last.IsTextLine
+

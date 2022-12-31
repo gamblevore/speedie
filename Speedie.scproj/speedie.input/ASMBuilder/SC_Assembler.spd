@@ -1,0 +1,137 @@
+
+
+module TextAssembler
+	|dictionary of int|			LabelsToDo
+
+	
+	function FindRequests (|bool|)
+		return false
+		|| Missing = 0
+		for r in textassembler.RequestTable
+			Missing += (!r.find)
+		return (!Missing)				#expect ("$Missing functions can't be found!")
+		
+
+	function TextFunc (|message| msg, |bool|) // assemble a function from text
+		|| fn = SCFunction.new
+		fn.source = msg
+		|| mu = µFunc(fn)
+		Flatten.StdState.Initstate(mu)
+		|| arg = Flatten.StdState.TextFuncSub(msg)
+			compiler.exportnames[fn.exportname] = fn
+		Flatten.StdState.FinishASM
+		.LabelsToDo.dispose
+
+
+	function TextData (|message| msg) // assemble a function from text
+		// how?
+
+
+	function assemble (|message| msg)
+		opt norefcounts
+		for ch in msg
+			if ch istmp "asm"
+				.textfunc(ch)
+			  elseif ch istmp "data"
+				.textdata(ch)
+
+
+module Flatten
+	|ASMFuncState|				StdState
+	|[scfunction]|				PackFuncs
+
+	function InitAsm
+		fn_asm.inittable
+		return 
+		TextAssembler.Requests		:= dictionary()
+		TextAssembler.RequestTable	:= array.new
+
+
+	syntax access (|message| m, |µFunc|)
+		cpp_part AccessStr
+		opt norefcounts
+		|| f = compiler.ExportNames[m.name]
+		if f isa SCFunction
+			return f.ASM					#expect (m, "This function has no ASM")
+		
+		|| err = ("This isn't a function", "Can't find this function")(f)
+		error (m, err)
+
+	
+	function CollectFuncs (|string| exp, |[scfunction]|)
+		opt norefcounts
+		for l in exp / ','
+			|| fn = compiler.ExportNames[l]
+			if fn isa SCFunction
+				if fn.CanLibLoad // nope
+				fn.addtotable(rz)
+		
+		
+	function StampAll (|[scfunction]| Funcs)
+		opt norefcounts
+		for fn in funcs
+			if fn is reached
+				.Stamp(fn)
+	
+		
+		
+	function BuildPack 
+		fn_asm.inittable
+
+		target debug {
+		|| list = .CollectFuncs("asm_test,asm_test_sub")		#require
+		#!debugger
+		.stampall(list)
+		packtools.linkall(list)
+		|| args = {8725l, 275l}
+		|| mu   = list[0].asm
+			|| Result = mu.finish.run(args, –count args)
+			if result != 9000
+			
+			.StampAll(compiler.funclist)
+		}
+
+
+	function asm_test_add (|int| a, |int| b, |int|)
+		cpp_name asm_test_sub
+		return (a + b) - (a / b)
+
+
+	function asm_test_func (|int| a, |int| b, |int|)
+		cpp_name asm_test
+		return asm_test_add(b*b, a*a)
+
+
+	function scfunction.Flatten
+		|| fp = fn_asm_table[@arg]
+		target direct
+			(fp)(flatten.StdState, .SourceArg)
+
+
+	function Stamp (|SCFunction| fn)
+		opt norefcounts
+		|| mu = µFunc(fn)
+		.StdState.Initstate(mu)
+		fn.Flatten
+		.StdState.FinishASM
+
+		
+
+
+
+extend_module ASM
+	function Needed (|bool|)
+		|| fn = compiler.exportnames["JB_ASM_Run"]
+			return fn is Reached
+
+
+//|| ASMPack = –digest <(`
+//pack
+//	app 1K
+//		strs
+//			"hellø"
+//		fncs
+//			init #(00000000000000007B00080409A01A0516FF1F040046080700000838FAFF231800000001)#
+//			main #(00)#
+//`)>
+

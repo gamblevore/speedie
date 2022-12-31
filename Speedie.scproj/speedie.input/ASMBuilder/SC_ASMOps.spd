@@ -1,0 +1,100 @@
+
+
+prototype fn_OpASM (|&ASMFuncState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| dbg, |asmreg|)
+
+// do add+mul during opt_phase
+// theres a lot more we can do there too.
+
+module asmOps
+	function Plus	(fn_opasm)
+		// what about the type? i think we just figure iout.
+		debugger
+		.AddASM(dbg, asm.ADD, dest, L, R, 0)
+		return dest
+		
+	function Equals (fn_opasm)
+		debugger
+		.AddASM(dbg, asm.CMPE, L, R, 1, 0)
+		return dest
+	function NotEq	(fn_opasm)
+		debugger
+		.AddASM(dbg, asm.CMPN, L, R, 1, 0)
+		return dest
+	function Less	(fn_opasm)
+		debugger
+		.AddASM(dbg, asm.CMPI, L, R, 0, 1)
+		return dest
+	function LessEq (fn_opasm)
+		debugger
+		.AddASM(dbg, asm.CMPI, L, R, 0, 1)
+		return dest
+	function More	(fn_opasm)
+		debugger
+		.AddASM(dbg, asm.CMPI, L, R, 0, 1)
+		return dest
+	function MoreEq (fn_opasm)
+		debugger
+		.AddASM(dbg, asm.CMPI, L, R, 0, 1)
+		return dest
+	function Mod	(fn_opasm)
+		debugger
+		.AddASM(dbg, asm.div, dest, 31, L, R)
+		return dest
+	function Div	(fn_opasm)
+		debugger 
+		.AddASM(dbg, asm.div, 31, dest, L, R)
+		return dest
+	function Minus	(fn_opasm)
+		debugger
+		.AddASM(dbg, asm.SUB, dest, L, R, 0)
+		return dest
+	function Mul	(fn_opasm)
+		.AddASM(dbg, asm.MUL, dest, L, R, 0)
+		return dest
+	function BitAnd (fn_opasm)
+		.AddASM(dbg, asm.BAND, dest, L, R, 0)
+		return dest
+	function BitXor (fn_opasm)
+		.AddASM(dbg, asm.Bxor, dest, L, R, 0)
+		return dest
+	function BitOr	(fn_opasm)
+		.AddASM(dbg, asm.bor, dest, L, R, 0)
+		return dest
+	function ROL	(fn_opasm)
+		.AddASM(dbg, asm.brol, dest, L, R, 0)
+		return dest
+	function ROR	(fn_opasm)
+		.AddASM(dbg, asm.bror, dest, L, R, 0)
+		return dest
+	function SHR	(fn_opasm)
+		.AddASM(dbg, asm.SHRU, dest, L, R, 0)
+		return dest
+	function SHL	(fn_opasm)
+		.AddASM(dbg, asm.SHLS, dest, L, R, 0)
+		return dest
+	function Assign	(fn_opasm)
+		.AddASM(dbg, asm.bor, L, R)
+		return dest
+
+//module asmOps // dummy
+/*
+	function Plus	(fn_opasm)
+	function Equals (fn_opasm)
+	function NotEq	(fn_opasm)
+	function Less	(fn_opasm)
+	function LessEq (fn_opasm)
+	function More	(fn_opasm)
+	function MoreEq (fn_opasm)
+	function Mod	(fn_opasm)
+	function Div	(fn_opasm)
+	function Minus	(fn_opasm)
+	function Mul	(fn_opasm)
+	function BitAnd (fn_opasm)
+	function BitXor (fn_opasm)
+	function BitOr	(fn_opasm)
+	function ROL	(fn_opasm)
+	function ROR	(fn_opasm)
+	function SHR	(fn_opasm)
+	function SHL	(fn_opasm)
+	function Assign	(fn_opasm)
+*/

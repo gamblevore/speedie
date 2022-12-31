@@ -1,0 +1,115 @@
+
+
+ 
+insertion the
+	top		2|ControlPoint|
+	bottom	0|ControlPoint|
+	middle	ControlPoint.Centered
+	left	0|ControlPoint|
+	right	2|ControlPoint|
+	height	(0,2)|ControlLine|
+	width	(0,2)|ControlLine|
+	rest	(6,2)|ControlLine| // after, end
+	area	(0,0,2,2)|ControlRect|
+	same	(ControlPoint.Before to ControlPoint.After)
+
+
+
+insertion general
+	timeit	({|| starttime = date.now, (_0), rejoin (starttime.ago)})
+	right	the~left + _0
+	left	the~right-(_0)
+	up		the~bottom+_0
+	down	the~top - (_0)
+	wide	_0.middlelayout
+	high	_0.middlelayout
+	after	ControlPoint.After.layout(_0)
+	before	ControlPoint.Before.layout(-(_0)) // brackets needed for cpp...
+	inside	_0.insidelayout
+	above	ControlPoint.After.layout(_0)
+	under	ControlPoint.Before.layout(-(_0)) // not for speedie! sheesh.
+	long	ControlPoint.length.layout(_0)    // i'd have to fix the cpp_Export to handle --x == x
+	pc		Controlpoint.percent.layout(_0*64K)
+	
+
+
+
+datatype ControlRect (ivec4)
+	linkage:cpp_part CL4
+
+	function size (|ivec2|)
+		return (.x2>>4, .y2>>4)
+
+function int.middleLayout (|controlline|)
+	return the~middle-(self>>1) to (self)~long
+
+function int.insidelayout (|controlline|)
+	return the~left+self to the~right-self
+function ivec2.layout (|controlrect|)
+	return .x~wide by .y~high
+
+
+datatype ControlLine (ivec2)
+	linkage:cpp_part CL2
+	
+	operator by (|ControlLine| B, |ControlRect|)
+		cpp_part By
+		return (.x,b.x,   .y,b.y)|ControlRect|
+	operator by (|Controlpoint| B, |ControlRect|)
+		cpp_part ByPoint
+		return self by b.expand
+	operator by (|intrange| B,    |ControlRect|)
+		cpp_part ByRange
+		return self by (b<<4)|controlline|
+
+
+
+datatype ControlPoint (int)
+	linkage: cpp_part CL1
+	syntax is (|ControlPoint| m, |bool|)
+		return (self&15)==m
+	operator plus (|int| n, |ControlPoint|)
+		return (self&15) (|) ( (.length+n) << 4)
+	operator minus (|int| n, |ControlPoint|)
+		return .operatorplus(-n)
+	operator to (|ControlPoint| High, |ControlLine|)
+		return (self, high)|ControlLine|
+	operator for (|int| n, |controlline|)
+		return (self, (n)~long)|ControlLine|
+	operator back (|int| n, |controlline|)
+		return ((n)~long, self)|ControlLine|
+	operator by (|ControlPoint| B, |controlRect|)
+		cpp_part ByPoint
+		return .expand by b.expand
+	operator by (|ControlLine| B, |controlRect|)
+		cpp_part ByLine
+		return .expand by b
+	function length (|int|)
+		return self>>4
+		
+	function expand (|ControlLine|)
+		if self is low
+			return the~bottom to self
+		if self is high
+			return self to the~top
+	function Layout (|int| value, |ControlPoint|)
+		return self (|) value<<4
+
+	constants
+		|ControlPoint|
+		Low		= 0
+		High 	= 2
+		Before	= 4 
+		After   = 6
+		Centered = 7
+		Percent = 8
+		Length	= 10
+		SlideBackInParent = 1
+		SlideBackInWindow = 2
+
+
+function ivec4.layout (|ControlRect|)
+	return (self<<4)|ControlRect|
+
+function int.operatorby (|int| h, |controlrect|)
+	return (self)~wide by (h)~high

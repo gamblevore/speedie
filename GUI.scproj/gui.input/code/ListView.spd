@@ -1,0 +1,1448 @@
+
+class ListView (GUIControl) {
+	linkage
+		cpp_part LV
+	|int|							RowHeight
+	|int|							ScrollShift
+	|uint|							ScrollDrawTimer_
+	|byte|							ColumnCount
+	|byte|							ScrollRealigner
+	|bool|							IsEditing
+	|bool|							SelJustChanged
+	|bool|							RightClickSelects
+	|bool|							MultiSelection
+	|bool|							MultiLineDraw
+	|bool|							CanSeeAllLines
+	|bool|							OneAlwaysSelected
+	|bool| 							_BlockedDuringUse
+	|bool|							AlwaysSendChangeEvent
+	|bool|							NoSeps
+	|bool|							IsTree
+	|bool| 							AttachedToParent
+	|bool|							UseColorScheme
+	|bool|							Skips
+	|byte|							CommandSelectRow
+
+	|ListViewRow|					DraggingRowTo
+	|ListViewrow|					_Scroll
+	|ListViewCell|					EditDelayed
+	|ListViewCell|					MouseDownCell
+	|ListViewrow|					DraggingRowFrom
+	|ListViewrow|					ListSource
+	|string|						ColumnInfo
+	|menu|							CMM
+	|DrawStyle|						gRowSel 
+	
+	|GUIListEditEvent|				TryEditCell
+	|GUIListEvent|					WasEdited
+	|GUIListEvent|					OnSelected
+	|GUIKeyEvent|					OnKeyDown
+	|GUIListEvent|					OnReturn
+	|GUIListEvent|					CalculateColumnWidths
+	|GUIListEvent|					OnRightClick // god we need a lot of these... lol.
+	|GUIPasteEvent|					OnPaste
+	|GUICopyEvent|					OnCopy
+	|GUIListDragEvent|				OnDragRow
+	|ListViewRowDraw|				OnDrawRow
+
+
+	constructor (|guicontrol| p,  |GUIListEvent| sel,  |GUIListEvent| ret)
+		super.constructor(p)
+		.RowHeight		= 13
+		.ColumnCount	= 1
+		.takesfocus 	= takesfocusflag.On
+		.onreturn		= ret
+		.onselected 	= sel
+		.oncopy			= (&listview.defaultcopy)|GUICopyEvent|
+		is editable
+		isnt drawsfocus
+		.listsource		= ListViewrow()
+		.gRowSel		= .gnormal.copy
+		.RightClickSelects = true
+		.init
+	
+	
+	function init
+		.gRowSel.Bg			<~ ((0.5, 0.5, 0.5, 0.65))
+		.gnormal.solid		=  ((0,   0,   0,   0.65))
+		.gnormal.seps		<~ ((0.5, 0.5, 0.5, 0.65))
+	
+	
+	function guicontrol.BestXForMenu (|int|x, |int| width, |controlline|)
+		opt norefcounts
+		(width max= 64)
+		if x >= 0
+			return (x)~right for width
+		if .mousexy.x > .horz.mid
+			return the~right back width
+		return the~left for width
+
+	
+	function TryRenameCellTo (|listviewcell| cell, |string| value, |bool|)
+		opt NoRefCounts
+		if self and .TryRenameCellSub(cell, value)
+			|| o = cell.original
+			.touch
+			.show(o)
+			(.WasEdited)(self, o)? // remove this event
+			(.onselected)(self, o)?
+			return true
+
+
+	function TryRenameCellSub (|listviewcell|cell, |string| value, |bool|)
+		opt norefcounts
+		if !.TryEditCell
+			cell.original.__textset__(cell.column, value)
+			return true
+		return (.TryEditCell)(self, cell, value)
+
+
+	function ViewableRowCount (|int|)
+		opt norefcounts
+		for r.all in self
+			rz++
+
+
+	function DistTo (|ListViewRow| a, |ivec2|)
+		opt norefcounts
+		for r.all in self
+			if r == a
+				rz.y = rz.x
+			rz.x++
+
+	
+	function ColorRow (|int| Depth, |int| Column, |int| y, |imagepixel|)
+		if y
+			return (0.5, 0.5, 0.5, 1.0).px
+		if .UseColorScheme
+			return ¥.SyxCol[1]
+		return imagepixel.clear
+
+
+	function DistBetween (|ListViewRow| c, |ListViewRow| b, |int|)
+		opt norefcounts
+		|| a = c
+		while a
+			if a == b
+				return rz
+			a = .Hiernext(a)
+			rz++
+		a = c
+		rz = 0
+		while a
+			if a == b
+				return rz
+			a = .Hierprev(a)
+			rz--
+
+
+	function OpenMenu (|ListViewRow| r, |int| y, |ListViewrow| sels)
+		opt norefcounts
+		|| m = .cmm	
+			m.EditingRow = r
+			m.ShowCmm(self, (y-1) - .bottom)
+
+
+	function DesiredHeight (|int|)
+		return 2 + ((.ListSource.SlowCount max 2) * .RowHeight) 
+
+
+	function Col (|int| col,  |ivec4| z2, |ListViewrow| sc, |intrange|)
+		|| x1	= .columns(col)
+		|| col1 = col+1
+		//if sc.__text__(col) and !sc.__text__(col1)
+			//col1++
+		|| x2	= .columns(col1) - 1
+		rz		= (x1, x2) + z2.x
+		rz.x2	= rz.x2 min z2.x2
+
+
+	function ScrollDrawTimer (|uint|)
+		return .ScrollDrawTimer_ 
+	setter ScrollDrawTimer (|uint|)
+		if .ScrollDrawTimer_ != value
+			.ScrollDrawTimer_ = value
+			sdlapp.touch(self)
+		
+	function Columns (|int| i, |int|)
+		require i > 0
+
+		|| w = .width
+		if .DrawCols == 3
+			if i == 1
+				return (w/2)
+			if i == 2
+				return (w/2)+(w/4)
+		return w
+	
+	
+	
+	function DrawCols (|int|)
+		if .width < 150
+			return 1
+		return .ColumnCount
+
+	
+	function TextWidth (|int|)
+		opt norefcounts
+		for row.viewable in self
+			rz = rz max row.__text__.bounds.x
+		rz *= font.width
+	
+
+	function NewCmm (|menu|)
+		if .cmm
+			.cmm.listsource.clear
+			return .cmm
+		|| m = menu(self, nil, nil)
+		m.clipmode = ControlPoint.SlideBackInWindow
+		.cmm = m
+		m.id = "cmm"
+		return m
+	
+	
+	behaviour RightClick
+		.EditDelayed = nil
+		delayEditTill = nil
+		.MouseDownCell = .DrawClickCell(P)
+		|| y = p.y
+		|| r = .MouseDownCell.original
+			require (r isnt disabled)
+			y = .DrawYRow(r)
+		
+		if (.rightclickselects or .onrightclick)
+			ifn r and r is selected
+				.Select(r)
+			|| c = .onrightclick 
+			if c and (c)(self, r)
+				.openmenu(r, y - .bottom, r)
+	
+
+	function MenuForSelRow
+		|| sels = .sel$
+		.showfast(sels)
+		|| y = .DrawYRow(sels)
+		if .onrightclick and (.onrightclick)(self, sels)
+			.openmenu(sels, y - .bottom, sels)
+		
+	
+	function DoReturn (|bool|)
+		require .onreturn
+		(.onreturn)(self, .sel)
+		return true
+		
+	
+	function Clear
+		.listsource.clear
+		._Scroll		= nil
+		.DraggingRowTo	= nil
+		.DraggingRowFrom= nil
+	
+
+	function InlineCell (|bool| always = false, |&InlineEditor|)
+		opt norefcounts
+		|| t = &.window.inlineeditor
+		if always or (self == T.editingfor)
+			return t
+
+			
+	function ClearEdits
+		opt norefcounts
+		.InlineCell.finishandclear(false)?
+	
+	
+	function Replaced (|ListViewrow| gone, |ListViewrow| orig, |ListViewrow|)
+		opt norefcounts
+		if orig == gone
+			return .sib(orig)
+		return orig
+	
+	
+	function sib (|ListViewrow|r, |ListViewrow|)
+		return .Hiernext(r) oar .Hierprev(r)
+	
+	
+	function CheckRemoved (|ListViewrow|r)
+		._Scroll		= .replaced(r, ._Scroll)
+		.DraggingRowTo	= .replaced(r, .DraggingRowTo)
+		.DraggingRowFrom= .replaced(r, .DraggingRowFrom)
+	
+	
+	function RemoveRow (|ListViewrow| r, |bool| update=true)
+		.CheckRemoved(r)
+		
+		|ListViewrow| willsel
+		if r is selected
+			willsel = r.prev oar r.next
+		r|ringtree|.remove
+		
+		if willsel
+			willsel.ChangeSel(true)
+			.SelChangeEvent( willsel )
+
+		sdlapp.touch(self)
+		if Update
+			.touch				// setmodified
+	
+	
+	behaviour Search
+		require s
+		.OpenSearch // whatever
+		if JustUpdate
+			return .SearchItems(s)
+		|| f = .nextsearch(.lastselected)$
+		
+		.Show(f)
+		.scrolljump
+		if !.DraggingRowFrom
+			.Select(f)
+		return true
+		
+		
+	function Rename (|bool|)
+		cpp_part RenameCurr
+		return .startRenameCell(ListViewcell(.LastSelected, 0))
+	
+	
+	function Rename (|ListViewRow| r, |bool|)
+		cpp_part RenameRow
+		return .startRenameCell(ListViewcell(r, 0))
+	
+	
+	function RenameCol (|ListViewRow| r, |int|col, |bool|)
+		return .StartRenameCell( ListViewcell(r, col) )
+	
+		
+	function StartRenameCell (|ListViewcell| rc, |bool|)  //  .editcell
+		opt norefcounts
+		|| r = rc.original					#require
+		.SelectAdd(r)
+		.Show(r)
+		if (r is editable) and (self is editable)
+			|| inl = .inlinecell(true) 
+			inl.edit(rc, self)
+			if .istree
+				inl.Editor.selectall
+			return true
+	
+	
+	behaviour KeyDown
+		// so what if the key is delete????
+		if self is typethrough
+			if key is delete
+				return false
+		if .KeyDownTest(key) or (.OnKeydown)(self, key)?
+			.EditDelayed = nil
+			return true
+			
+			
+	function KeyDownTest (|keys| key, |bool|)
+		if (key is INSERT or Enter)
+			.rename
+			return true
+
+		if key.IsAccept
+			return .doreturn
+		
+		if key.iscancel
+			if .DraggingRowFrom
+				.DraggingRowFrom = nil
+				.DraggingRowTo = nil
+				return true
+			if .ClearSearch
+				return true
+			if keys.shift
+				return .rename
+			
+		if .OnRightClick and (key.IsCmm)
+			.menuforselrow
+			return true
+			
+		if (key iscmd keys.A)
+			return .SelectAll
+		if (key is PAGEUP)
+			.ScrollByRows(-.VisibleRows+1)
+			return true
+		if (key is PAGEDOWN)
+			.ScrollByRows(.VisibleRows-1)
+			return true
+		if (key is HOME)
+			.slidescroll = .start
+			return true
+		if (key is END)
+			.slidescroll = .end
+			return true
+			
+		if key is up or down
+			if keys.Cmd
+				.SelectMove( (-int.max, int.max)(Key is up) )
+			  elseif !.sel
+				.SelectMove( (-int.max, int.max)(Key is down) )
+			  else
+				|| page = .VisibleRows/2
+				|| i = (page, 1)(keys.option)
+				if key is up
+					i = -i
+				.SelectMove(i)
+			return true
+		
+		if .IsTree and (key is left or right)
+			return .openorclose(key)
+
+	
+	function DefaultCopy (GUICopyEvent)
+		|| fs = faststring()
+		for s.selected in self
+			|| it = s.__copyid__
+			it := s.text
+			it := s.name
+			if fs.length
+				fs <~ '\n'
+			fs <~ it
+		return fs
+
+
+	function CopyList (|array of string|)
+		opt norefcounts
+		.EditDelayed = nil
+		.clearinternaldrops
+		for s.selected in self
+			|| it = s.__copyid__
+				rz <~ it
+
+
+	function SelList (|array of ListViewrow|)
+		opt norefcounts
+		for s.selected in self
+			rz <~ s
+	
+	
+	function IsEmpty (|bool|)
+		return !.listsource.hasany
+	
+	
+	function JumpTo (|string| s, ||)
+		opt norefcounts
+		|| it = .partialfind(S)
+			.select(it)
+		
+		
+	function PartialFind (|string| s, |listviewrow|)
+		opt norefcounts
+		for r.toplist in self
+			if listview.pf(r.name)[0,s]
+				return r
+
+
+	function VisibleRows (|int|)
+		|| h = .height + .scrollshift + .RowHeight - 1
+		|| r = .RowHeight
+		return h / r
+	
+
+	function FullyVisibleRows (|int|)
+		return .height / .RowHeight
+
+
+	function VisibleRowsGap (|int|)
+		|| m = .FullyVisibleRows
+		if m == 5
+			return 4
+		if m > 5
+			return m - 2
+		return m
+		
+	
+	function CheckDrawUpdate
+		if .ScrollDrawTimer and !.inscrollarea(.mousexy)
+			sdlapp.Touch(self)
+
+
+	function EnableDrag
+		.ondragrow = (nil, &BasicRowDrag)(.istree)
+	
+
+	behaviour MouseMove
+		if .CanSeeAllLines
+			.ScrollDrawTimer = 0
+			return .HasFocus
+		
+		return .MouseMovedScroll(p, .ScrollDrawTimer_)
+		
+		
+	behaviour LostFocus
+		.InlineCell.clear(false)?
+		.clearinternaldrops
+	
+	
+	function SlideScroll (assigns:|listviewrow|r)
+		.ScrollSet(r) // we wanted this to slide smoothly... sigh. do it later.
+					  // in terms of the nodes and mousewheel.
+
+
+	function ScrollSet (|ListViewrow| s)
+		s := .start
+		.scrollshift = 0
+		.ScrollRealigner = 0
+		debug_require s != .listsource
+		._scroll = s
+		.ExpandParents(s)
+		.checkdrawupdate
+		if .isediting and !.VisFullyContains(s)
+			.ClearEdits
+
+
+	function VisContains (|ListViewRow| s, |bool|)
+		opt norefcounts
+		require s
+		for r.visible in self
+			if r == s
+				return true
+
+
+	function VisFullyContains (|ListViewRow| s, |bool|)
+		opt norefcounts
+		for r.fullyvisible in self
+			if r == s
+				return true
+
+	
+	function scrollProtect
+		opt norefcounts
+		|| s	= ._scroll
+		ifn .listsource contains s
+			s = .start
+			._scroll = s
+		require s
+		|| last = .end
+		for .VisibleRowsGap
+			if last == s
+				s = nil
+			last = .hierstep(last, false) #loop
+		if !s
+			.scrollset(last)
+	
+	
+	function ExtractSelected (|ListViewrow| c, |ListViewrow|)
+		rz = ListViewrow()
+		while c
+			|| p = c.nextselected
+			rz <~ c
+			c = p
+	
+	
+	function FoundSep (|ListViewrow| m, |ListViewrow| before, |int|dir, |bool|)
+		opt norefcounts
+		|| answer = false
+		while
+			m = .hierstep(m, dir>0)
+			if m == before
+				return answer
+			require m
+			if m is disabled
+				answer = true
+			
+
+	function CanBasicRowDragOne (|ListViewrow| s, |ListViewrow| before, |bool|)
+		opt norefcounts
+		if before
+			require before isnt disabled
+			require !.FoundSep(s, before, -1)
+		return .FoundSep(s, before, 1)
+		
+
+	function HasSeps (|bool|)
+		opt norefcounts
+		|| l = .start
+		while l
+			if l is disabled
+				return true
+			l++
+
+
+	function CanBasicRowDrag (|ListViewrow| s, |ListViewrow|before, |bool|)
+		opt norefcounts
+		if !.hasSeps
+			return true
+			
+		while s
+			require .CanBasicRowDragOne(s, before) 
+			s = s.nextselected
+		return true
+
+
+	function BasicRowDrag (GuiListDragEvent)
+		|| s = .sel
+		if !s or (.Hiernext(s) == before) and !s.nextselected
+			return true // no need
+		if (before is selected)
+			if before != s 
+				beep
+			return true
+		if !.CanBasicRowDrag(s, before)
+			beep
+			return true
+		
+		for p in .ExtractSelected(s)
+			if into	
+				into <~ p
+			  elseif before
+				before.prev = p
+		
+		.scrolldrawtimer = scroller.timer
+		.touch
+		return true
+	
+	
+	function Touch
+		opt norefcounts
+		// .list.Touch // waha?
+		super.touch
+
+
+	function guicontrol.touch
+		opt norefcounts
+		sdlapp.touch(self) // why wasnt this here before?
+		(.window is modified)
+	
+	function ClearInternalDrops
+		.DraggingRowTo = nil
+		.CommandSelectRow = nil
+		.SelJustChanged = false
+		.MouseDownCell = nil
+		
+
+	behaviour MouseUp
+		scroller.endDrag(.scrolldrawtimer_)
+
+		|| f = .DraggingRowFrom
+		|| t = .DraggingRowTo
+		|| sl = .SelJustChanged
+		.DraggingRowFrom = nil
+		.ClearInternalDrops
+
+		if f and t
+			debug_require .OnDragRow
+			if t == .listsource
+				(.OnDragRow)(self, nil, t) 
+			  else
+				(.OnDragRow)(self, t, nil) 
+			
+		  elseif !sl
+			|| LC = .DrawClickCell(P)
+			|| L = LC.original
+			require (L isnt disabled)
+			if (L is selected) and (.SelCount > 1)
+				.Select(l)
+			  elseif !keys.Cmd and (.window.SelBeforeMouseDown == self)
+				.DelayedRename(Lc)
+			
+
+	function SelCount (|int|)
+		opt norefcounts
+		for f.selected in self 
+			RZ++
+
+
+	function DelayedRename (|ListViewCell| i)
+		.EditDelayed = i
+		delayedittill = (date() + 0.5s, nil)(i)
+
+
+	function TryDelayedEdit
+		|| i = .EditDelayed$
+		.EditDelayed = nil
+		|| p = .mouseXY
+		if self contains p
+			|| R = .DrawClickcell(p)
+			if r and (R == i)
+				.startRenameCell(r)
+	
+	
+	function CanDrawDrag (|ListViewrow| wantsbefore, |bool|)
+		if .draggingrowto or (.sel != .lastselected)
+			return true
+		require .draggingrowfrom != WantsBefore
+		require .Hiernext(.draggingrowfrom) != wantsbefore
+		return true
+
+
+	function FixScroll (|bool|)
+		if !._scroll
+			.scrollset(.start)
+			return ._scroll
+		return true
+
+
+	behaviour MouseDown
+		.EditDelayed = nil
+		if clicks >= 0
+			.SelJustChanged = clicks > 1
+		if (!keys.Cmd) and (.CommandSelectRow)
+			return 1 // done.
+		
+		|| AdjustScroll = (clicks == -1) and (.draggingrowFrom)
+		if (clicks == -1) and (.window.droppinginto == self) // I guess the filter is already done...
+			|| i = .drawclick(p)
+			if (i isnt disabled)
+				.Select(i)
+			AdjustScroll = true
+
+		if AdjustScroll
+			if !.fixscroll
+				return 4
+			|| p2 = (0, .rowheight / 2)
+			|| i  = .DrawClick(P - P2)
+			|ListViewrow--| WantsTo
+			
+			if i
+				WantsTo = i
+			  else
+				WantsTo = .listsource
+				|| top = .top
+				if (p.y+p2.y > .top)
+					WantsTo = .bmove(._scroll, -1)
+					.ScrollByRows(-1)
+					
+				  elseif (p.y-p2.y < .bottom)
+					.ScrollByRows(1)
+			
+			if .draggingrowFrom and (WantsTo and .CanDrawDrag(Wantsto))
+				.draggingrowto = wantsto
+			return 5
+		
+		if .ClickedScroll(P, clicks)
+			return 2
+		
+		|| FirstSel = .sel
+		if (Clicks > 1) and (firstsel) and !(keys.Cmd)
+			if (.OnReturn)
+				(.OnReturn)(self, firstsel)
+			return 1
+		
+		|| LC = .DrawClickCell(P)
+		.MouseDownCell = LC
+		|| l = lc.original 
+		if !l
+			if !keys.Cmd
+				.selectnone
+			return 1
+		if L is disabled
+			return 1
+			
+		if keys.Cmd
+			.CommandSelectRow := 1 + (L is selected)
+			|| State = .CommandSelectRow
+			.selectadd(l, State == 1, true)
+			return 2
+		
+		if (L isnt selected) or .AlwaysSendChangeEvent
+			if keys.shift
+				.selectShift(firstsel, L)
+			  else
+				.Select(L)
+
+		if (!.istree and .OnDragRow and l is editable)
+			.DraggingRowFrom = L
+			.DraggingRowTo = nil
+			return 2
+		return 1
+	
+	
+	function LastSelected (|ListViewrow|)
+		opt NoRefCounts
+		|| l = .end
+		while l
+			if l is selected
+				return l
+			l = .hierPrev(l)
+		return .OneAlways
+			
+		
+	function End (|ListViewrow|)
+		opt norefcounts
+		|| li = .listsource 
+		return (li.hierend(li), li.last)(.IsTree)
+	function End (|int|i, |ListViewrow|)
+		cpp_part EndDir
+		return (.end, .start)(i > 0)
+	function Start (|ListViewrow|)
+		return .listsource.first 
+	function SearchStep (|ListViewrow| l, |bool| fwd, |ListViewrow|)
+		opt norefcounts
+		|| root = .listsource
+		if !fwd
+			return l.hierprev(root) oar .end
+		if l != root // compare to .list? instead?
+			(l is expanded) // might as well
+		return l.hiernext(.listsource) oar .start
+	function hierNext (|ListViewrow| l, |ListViewRow|)
+		if l
+			return (l.hiernext(.listsource), l.next)(.istree)
+	function hierPrev (|ListViewrow| l, |ListViewrow|)
+		if l
+			return (l.hierprev(.listsource), l.prev)(.istree)
+	function HierStep (|ListViewrow| l, |bool|fwd, |ListViewrow|)
+		if fwd
+			return .Hiernext(l)
+		return .hierprev(l)
+	function BMove (|ListViewrow| l, |int| i, |ListViewrow|)
+		opt norefcounts
+		require l
+		for i.abs
+			l = .hierstep(l, i > 0) #loop
+		return l
+	function Loop (|ListViewrow| l, |bool| fwd, |ListViewrow|)
+		opt norefcounts
+		rz = .hierstep(l, fwd)
+		rz := (.start, .end)(fwd)
+
+
+	function NextSearch (|ListViewRow| curr, |ListViewRow|)
+		opt norefcounts
+		|| dir = !keys.shift				// can do this backwards... if we want.
+		
+		curr := .start
+		|| Start = curr
+		
+		while curr {
+			curr = .searchstep(curr, dir)
+			if curr == start
+				return (start, nil)(curr is found)
+		} (curr isnt found)
+		return curr
+	
+	
+	function ClearSearch (|bool|)
+		opt norefcounts
+		for s.all in self
+			if s is found
+				(s is Found) = false
+				rz = true
+	
+
+	function SearchItems (|string| s, |bool|)
+		|| c = .columncount
+		opt norefcounts
+		for m.all in self
+			|| n = m.searchcolumns(s, c)
+			(m is found) = (n > 0)
+			rz = true
+
+
+	function OpenOrClose (|keys| K, |bool|)
+		opt norefcounts
+		|| sel		= .LastSelected$
+		|| Expand	= (k is right)
+		|| Force	= keys.option 
+		if (!Expand and (!sel.hasany or sel isnt expanded))
+			sel = sel.parent
+			.Select(sel)
+			Force = true
+		if sel != .listsource
+			if (!Expand and sel contains ._Scroll)
+				.showfast(sel)
+		if !force and !expand and (sel.AllExpandState & 2)
+			for r in sel
+				(r is expanded)=false
+			return true
+		if Force or (Expand == (sel is expanded))
+			for r.flat in sel
+				(r is expanded) = Expand
+		(sel is expanded) = Expand
+		return true
+
+
+	function Sel (|ListViewRow|)
+		opt NoRefCounts
+		|| l = .start 		
+		while l
+			if l is selected
+				return l
+			l = .HierNext(l)
+		return .onealways
+
+
+	function OneAlways (|ListViewRow|)
+		opt norefcounts
+		if .onealwaysselected
+			|| it = .start
+				(it is selected)
+				self.SelChangeEvent( it )
+				return it
+
+
+	function SelectAll (|bool|)
+		opt norefcounts
+		.selectshift(.start, .end)
+		return true
+
+
+	function SelectFirst (|bool|)
+		opt norefcounts
+		.select(.start)
+		return true
+
+
+	function SelectShift (|ListViewrow| l, |ListViewrow| m)
+		opt norefcounts
+		expect (l and m) (Beep)
+		expect (.multiselection) (Beep)
+		expect (l.parent == m.parent) (beep)
+		
+		|| modified = 0
+		|| all		= (l == .start) and (m == .end) 
+		|| i		= .distbetween(l,m)
+		|| n		= i.abs + 1
+		for n
+			if (l isnt disabled)
+				modified += l.ChangeSel(true)
+			 l = .hierstep(l, i > 0)
+
+		if modified
+			.SelChangeEvent( (m, nil)(i), all )
+
+
+	function SelectMove (|int| i, |bool| Multi=keys.shift)
+		opt norefcounts
+		debug_require i
+		|| l = (.lastselected, .sel)(i > 0)
+		if !l
+			if i < 0
+				return .Select(.start)
+			return .Select(.end)
+		
+		|| m = .bmove(l, i)
+		ifn .multiselection and multi
+			while m  and  m is disabled
+				m = .hierstep(m, i > 0)
+			return .Select(m)
+		
+		if multi
+			.SelectShift(l, m)
+		  else
+			.SelectAdd(m)
+
+
+	function SelectAdd (|ListViewrow| m, |bool| State=true, |bool| Multi=keys.shift)
+		opt norefcounts
+		if .OneAlwaysSelected
+			return .Select(m)
+		
+		if .multiselection and multi
+			if m.ChangeSel(state)
+				.SelChangeEvent(m)
+		  else
+			.Select(m)
+
+
+	function SelectNone
+		opt NoRefCounts
+		|| one = .OneAlwaysSelected
+		|| s = (.sel oar .start, nil)(one)
+		return .Select(s)
+	
+	
+	function SelectNoShow (|ListViewRow| s)
+		.select(s, -1)
+	
+	function SelectFast (|ListViewRow| s)
+		.select(s, 1)
+		
+	function Select (|ListViewRow| s, |int|Mode=0)
+		// 0  == normal
+		// 1  == fast
+		// -1 == noshow 
+		opt norefcounts
+		require s != .listsource
+		require !s or .owns(s)
+		
+		.ExpandParents(s)
+		|| Modified = 0
+		for r.all in self
+			modified += r.ChangeSel(r == s)
+		
+		if modified or .AlwaysSendChangeEvent
+			.SelChangeEvent(s, mode < 0)
+		if Mode >= 0
+			.show(s)
+			if Mode == 1
+				.scrolljump
+
+	
+	function FocusOn (|ListViewrow| r)
+		require .listsource contains r
+		.scrollset(r)
+		(r is expanded)
+		.select(r)
+
+	
+	function SelChangeEvent (|ListViewRow| s, |bool| NoShow=false)
+		opt norefcounts
+		.ClearEdits
+		.SelJustChanged = true
+		if s and !NoShow
+			.Show(s)
+
+		if !._BlockedDuringUse
+			(.onselected)(self, s)?
+
+
+	function ScrollByRows (|int| Rows)
+		.scrollset( .bmove(._scroll, rows) )
+		.ScrollDrawTimer = scroller.timer // where should this go?
+		// in scrollset or the caller of this func?
+
+	
+	function ScrollMoveTo (|int| v)
+		.scrollset(.bmove(.start, v))
+		.ScrollJump
+	
+
+	function ScrollJump						// sigh...
+		// not needed anyomre
+		//.Scrollset( ._desiredscroll )
+	
+	
+	function ShowFast (|ListViewrow| i)
+		.show(i)
+		.scrolljump
+
+	
+	function owns (|ListViewrow| i, |bool|)
+		return .listsource contains i
+	
+	
+	function ExpandParents (|ListViewrow| i)
+		opt norefcounts
+		require i
+		while i != .listsource
+			i = i.parent		#require
+			(i is expanded)
+
+	
+	function Show (|ListViewrow| i)
+		require i
+		debug_Require .owns(i)
+		
+		.ExpandParents(i)
+		require !.VisFullyContains(i)
+		|| n = .visiblerows*0.34
+		.scrollset(.bmove(i, -n))
+	
+		
+	function Contains (|int| Y,  |ivec2| Search,  |bool|)
+		|| Srch = (.left,  y - .RowHeight,  .right,  y)
+		return Srch.contains(Search)
+	
+
+	function Fill (|[ListViewrow]| r)
+		opt norefcounts
+		.clear
+		for p in r
+			|| m = message(@str, p.name) 
+			self <~ m
+			m.obj = p
+			
+	
+	function Use (|ListViewrow| PL, |bool| SendClickEvent=false)
+		opt norefcounts
+		debug_require pl
+		require pl != .listsource
+		._BlockedDuringUse = !SendClickEvent
+		.listsource = pl
+
+		.Scrollset( pl.first )
+		if .OneAlwaysSelected
+			.SelectFirst
+		  else
+			.selectnone
+		.ScrollDrawTimer = scroller.timer
+		._BlockedDuringUse = false
+
+	
+	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
+		return .ClickedScrollbar(P, Clicks, .slh, .ScrollDrawTimer_)
+
+
+	helper DrawClick (|ivec2| Search, |ListViewRow|)
+		return .DrawClickCell((0,search.y)).original
+	
+	
+	
+	helper DrawClickMenu (|int| y, |ListViewRow|)
+		opt norefcounts
+		if y <= .bottom
+			return .bmove(.LastVisible, 1)
+		if y > .top
+			return .bmove(._scroll, -1)
+		return .DrawClickCell((0,y)).original
+	
+	
+	helper DrawClickCell (|ivec2| Search, |ListViewCell|)
+		opt NoRefCounts
+		|| r = .lastrect
+		|| x = search.x - r.x
+		
+		for sc.visible in self
+			r.y = r.y2 - .rowheight
+			if r.vert contains search.y
+				return .DrawCell( sc, x )
+			r.y2 = r.y
+
+
+	helper DrawYRow (|ListViewrow| search, |int|)
+		opt NoRefCounts
+		|| r = .lastrect
+
+		for row.visible in self
+			r.y = r.y2 - .rowheight
+			if row == search
+				return r.y2
+			r.y2 = r.y
+			
+
+	
+	function DefaultColumnWidths (GUIListEvent)
+		return nil
+		/*
+		|| cw = .ColumnWidths$
+		|| Weights = cw.length$
+		|| sect = .width / Weights
+		|| x = sect*2
+		cw[0] = 0
+		cw[1] = x
+		
+		for i in (2 to weights)
+			x+=sect
+			cw[i] = x
+		cw[weights-1] = .width
+		*/
+	
+	
+	function LastVisible (|ListViewrow|)
+		for r.visible in self
+			rz = r
+
+
+	helper RowBorderDraw (|ListViewrow| curr, |ListViewrow| find, |int| add, |image| where, |drawstyle| g)
+		|| r = .RowBounds(curr, find, add)
+			where.drawrect(r, g)
+	
+	
+	helper ListViewRow.CalculateSkip (|ListViewRow| prev, |int| n, |int|)
+		opt norefcounts
+		require prev
+		for i in 1 to n
+			|| t =     .__text__(i)
+			|| p = prev.__text__(i)
+			if (t == p) // and t and p 
+				rz |= 1<<i
+	
+	
+	helper CalculateSkips
+		opt norefcounts
+		|| n = .ColumnCount
+		|ListViewRow| prev
+		for sk.visible in self
+			|| ind = (0, sk.CalculateSkip(prev, n))(.IsTree)
+			sk.indent = ind
+			prev = sk
+	
+	
+	helper RowBounds (|ListViewrow| curr, |ListViewrow| find, |int| add, |ivec4|)
+		require find
+		
+		|| s	= .lastrect
+		|| low	= s.y1
+		|| top	= s.y2
+		top += .scrollshift
+		top -= .rowheight
+		while curr != find
+			ifn (curr) and (top >= low)
+				return nil
+			curr = .hiernext(curr)
+			top -= .rowheight
+		return (s.x, top, s.x2, top + add)
+	
+
+	helper SetCellBounds
+		opt norefcounts
+		|| inl = .InlineCell
+			|| cell = inl.cell
+				|| cb = .CellBounds(._scroll, cell)
+				if cb and cb.y2 <= .height+1 and cb.y1 >= -1
+					inl.editor.size = cb.layout
+				  else
+					inl.FinishAndClear
+	
+	
+	helper CellBounds (|ListViewRow| curr,  |ListViewCell| cell,  |ivec4|)
+		|| sc = cell.original
+		rz = .RowBounds(._scroll, sc, .rowheight) 
+		if rz
+			rz.horz = .col(cell.column, rz, sc)
+			rz.x += sc.depth(self) * font.width*2
+			rz = rz down .bottom
+			rz = rz left .left
+
+
+	helper DrawBordersSub (|image| Where,  |ivec4| Rect)
+		require (self isnt decluttered)
+		|| z2 = rect
+		z2.y2 += .scrollshift
+		z2.y  = z2.y2 - .rowheight
+		
+		if !.noseps and .gnormal.seps.a
+			for r.visible in self
+				|| n = .drawcols
+				for i in n
+					z2.horz = .Col(i, rect, r)
+					r.DrawDividerH(z2, where, self, i)
+					if i < n-1
+						r.DrawDividerV(z2, where)
+				z2 = z2 down .rowheight
+
+		z2 = rect
+		z2.y2 += .scrollshift
+		z2.y = z2.y2 - .rowheight
+		for r.visible in self
+			if r is Selected
+				Where.mark(z2, (2, 3)(.hasfocus))
+			z2 = z2 down .rowheight
+
+
+	function DrawMarks (|image| Where,  |ivec4| Rect)
+		where.clearmarks(rect)
+		.DrawBordersSub(where, rect)
+		|| bg		= .gnormal.bg
+		|| focus	= .gRowSel.bg
+		|| focuscol	= focus.color
+		|| bgcol	= bg.color
+		focuscol	= mix(bgcol, focuscol, focuscol.a)
+		
+		|| unfoc	= vec4(focuscol.lum)
+		unfoc.a		= focuscol.a
+		unfoc		= mix(focuscol, unfoc, 0.667)
+		unfoc.a += 0.2
+		where.fillmarks(rect ± 1, bgcol, .gnormal.seps, focuscol, unfoc)
+
+			
+	behaviour MouseWheel
+		if !.CanSeeAllLines
+			|| i = -p.y
+			.scrollPixels(i*6)
+		return true
+
+
+	helper RealignScrollshift (|int| shl, |int|)
+		if shl >= (.rowheight/2)
+			return shl + 1
+		return shl-1
+
+
+	helper ScrollSlide (|int|)
+		|| y	= .top
+		|| shl	= .scrollshift
+		if !shl or .ScrollPixelsSub(0)
+			return y
+		
+		|| real = .ScrollRealigner
+			real--
+			if real < 32
+				shl = .realignscrollshift(shl).clamp(0, .rowheight)
+				.scrollshift = shl
+				if !shl
+					real = 0
+			.ScrollRealigner = real
+			sdlapp.touch(Self)
+		return y + shl
+
+
+	function ScrollPixels (|int| rem)
+		if rem
+			.ScrollPixelsSub(rem)
+			.scrolldrawtimer = scroller.timer
+			.ScrollRealigner = (48, 0)(.scrollshift)
+			sdlapp.touch(self)
+
+
+	function ScrollEnd (|listviewrow|)
+		opt norefcounts
+		rz = .end
+		for .VisibleRowsGap
+			rz = .hierstep(rz, false) #loop
+	
+	
+	helper ScrollPixelsSub (|int| rem, |bool|)
+		rem += .scrollShift
+		|| cmp = (.start, .scrollend)(rem < 0) 
+		if cmp == ._scroll
+			rem = 0
+		
+		while (rem < 0)
+			.ScrollByRows -1
+			rem += .rowheight
+		while (rem >= .rowheight)
+			.ScrollByRows(1)
+			rem -= .rowheight
+		.scrollshift = rem
+		return !rem
+
+		
+	behaviour Draw
+		opt NoRefCounts
+		|| c = (.CalculateColumnWidths) oar (DefaultColumnWidths)
+		(c)(self, nil)
+		.scrollProtect
+		
+		|| rect			= .lastrect
+		|| L			= .listsource
+		
+		.CalculateSkips
+		.DrawMarks(where, rect)
+		
+		rect.y2			= .ScrollSlide
+		|| End			= .end
+		
+		for r.visible in self
+			rect.y = rect.y2 - .rowheight
+			|| D = (r.depth(self), 0)(.istree)
+			r.ListRowDraw(rect, Where, self, D)
+			rect.y2 = rect.y
+			.CanSeeAllLines = (r == end and .start == ._scroll)
+
+		where.controlclip = .lastrect
+		where.horz = .lastrect.h // redundant?
+		|| cmm = .cmm
+			.RowBorderDraw(._scroll, cmm.EditingRow, .RowHeight, where, ¥.border)
+
+		
+		|| re = .rowBounds(._scroll, .draggingrowto, 1)
+			re = re up .rowheight
+			ifn .draggingrowto.prev
+				re = re down 2
+			where.drawrect(re, ¥.border)
+		
+		.SetCellBounds
+		
+		if .CanSeeAllLines
+			.scrolldrawtimer = 0
+		  else
+			if self isa menu
+				.ScrollDrawTimer = 1							// oooop
+			scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer_)
+		
+		where.fillrect(.lastrect, imagepixel.clear, .gnormal.edge, .edgehide)
+
+	
+	helper EdgeHide	(|int|)
+		opt norefcounts
+		require .AttachedToParent
+		|| p = .parent
+		rz |= (.top > p.top) * 8
+		rz |= (.bottom < p.bottom) * 4
+		if rz == 12
+			rz = 0
+		
+	
+	helper LastNamed (|string| s, |ListViewrow|)
+		opt norefcounts
+		rz = .listsource.last
+		while rz
+			if rz.name ~= s
+				return rz
+	
+	
+	syntax Append (|string| name, |GUIMenuEvent| ev, |object| o=nil)
+		cpp_part AppendMenuItem
+		|| m = menuitem(name, ev)
+		m.obj = o
+		self <~ m
+	
+	Syntax append (|ListViewRow| R)
+		|| needsel = .OneAlwaysSelected and !.ListSource.HasAny
+		.listsource <~ r
+		if needsel
+			.select(r)
+	
+	
+	helper AddSep
+		self <~ menuitem("", nil)
+
+
+	iterator Selected
+		|| f = .sel
+		while f
+			yield f
+			f = f.nextselected
+
+
+	iterator Viewable
+		|| F = .start
+		while f
+			yield f
+			f = .Hiernext(f)
+
+	iterator Visible
+		.fixscroll
+		|| F = ._scroll
+		|| n = .VisibleRows
+		while f and n >= 1
+			yield f
+			f = .Hiernext(f)
+			n--
+
+
+	iterator FullyVisible
+		.fixscroll
+		|| F = ._scroll
+		|| n = .FullyVisibleRows
+		while f and n >= 1
+			yield f
+			f = .Hiernext(f)
+			n--
+
+
+	iterator All
+		|| F = .start
+		while f
+			yield f
+			f = .Hiernext(f)
+
+	iterator TopList
+		|| F = .start
+		while f
+			yield f
+			f = f.next
+
+
+	module
+		|drawstyle| 		gscroll
+		|date|				DelayEditTill
+		.init
+
+		function init
+			.gscroll = drawstyle()
+			.gscroll.bg <~ ((0.5, 0.0, 0.7, 0.4)) 
+			.gscroll.edge <~ ((0.75, 0.25, 0.9, 0.5))
+	
+	
+		function pf (|string|s, |string|)
+			for (c in s) (i)
+				if c.isalphanum
+					return s[i...].lowercase
+			
+}
+
+
+
+function ListViewrow.depth (|listview| me, |int|)
+	opt norefcounts
+	|| c = self
+	rz = -1
+	|| root = me.listsource
+	while c and (root != c)
+		rz++
+		c = c.parent
+

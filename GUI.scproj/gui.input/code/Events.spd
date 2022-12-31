@@ -1,0 +1,380 @@
+
+
+struct SDL_Event
+	linkage
+		wrapper union
+		cpp_part Event
+	
+	|SDLEventType|	 			type
+	|uint|						timestamp
+
+
+	module 
+		function Poll (|bool|)
+			return (nil|&SDL_Event|).poll
+			
+	function Poll (|bool|)
+		cpp_wrapper SDL_PollEvent
+
+	function Window (|&SDL_WindowEvent|)
+		return self|&SDL_WindowEvent|
+
+	function Button (|&SDL_MouseButtonEvent|)
+		return self|&SDL_MouseButtonEvent|
+	
+	function Finger (|&SDL_TouchFingerEvent|)
+		return self|&SDL_TouchFingerEvent|
+	
+	function Wheel (|&SDL_MouseWheelEvent|)
+		return self|&SDL_MouseWheelEvent|
+	
+	function Key (|&SDL_KeyboardEvent|)
+		return self|&SDL_KeyboardEvent|
+		
+	function keysym (|&sdl_keysym|)
+		return &.key.keysym
+		
+	function Drop (|&SDL_DropEvent|)
+		return self|&SDL_DropEvent|
+		
+	function Editing (|&SDL_TextEditingEvent|)
+		return self|&SDL_TextEditingEvent| 
+
+
+
+struct SDL_WindowEvent
+	linkage: wrapper
+	|SDLEventType|				type
+	|uint|						timestamp
+	|SDL_WindowEventID|			event
+	|int|						data1
+	|int|						data2
+
+
+
+struct SDL_TextEditingEvent	
+	linkage:wrapper
+	|uint|			type								// SDL_TEXTEDITING
+	|uint|			timestamp							// In milliseconds, populated using SDL_GetTicks()
+	|uint|			windowID							// The window with keyboard focus, if any
+	|char[32]|		text								// The editing text
+	|uint|			start								// The start cursor of selected editing text
+    |uint|			length								// The length of selected editing text
+    
+    function Str (|string|)
+		|| b = (&.text[0])|cstring|
+		return string.fromc(b).copy
+	
+	render
+		|| b = (&.text[0])|cstring|
+		fs <~ string.fromc(b)
+
+
+
+
+struct SDL_MouseWheelEvent
+	linkage: wrapper
+	|SDLEventType|				type
+	|uint|						timestamp
+	|uint|						windowID
+	|uint|						which
+	|int|						x
+	|int|						y
+	|int|						direction
+	function xy (|ivec2|)
+		return (.x,.y)
+
+
+
+struct SDL_TouchFingerEvent
+	linkage
+		wrapper
+		cpp_part Fngr
+	|SDLEventType|				type
+	|uint|						timestamp
+	|uint|						touchId
+	|uint|						fingerId
+	|float|						x
+	|float|						y
+	|float|						dx
+	|float|						dy
+	|float|						pressure
+	|uint|						windowID
+
+	function NumFingers (|int|)
+		return SDL_GetNumTouchFingers(.touchid)
+
+	module 
+		cpp_wrapper SDL_GetNumTouchFingers (|int| touchid, |int|)
+
+
+datatype MouseButton (uint)
+	linkage
+		cpp_part MB
+	syntax is (|MouseButton| x, |bool|)
+		return self == x
+
+	flags
+		Left		
+		Middle
+		Right
+		X1
+		X2
+
+
+	module
+		|date|						DownAt
+		function Durr (|date|)
+			return date() - .DownAt
+	
+
+
+function ivec2.sdlxy (|ivec2|)
+	opt norefcounts
+	|int| x = .x / SDLApp.Scale
+	|int| y = .y / SDLApp.Scale
+
+	|| w = __modules__.window.front $
+	|| scr = sdlapp.DrawSpace.wh.y
+	|| v = (x, scr - y)
+	v -= w.lastrect.xy
+	return v
+
+
+struct SDL_MouseButtonEvent
+	linkage
+		wrapper
+		cpp_part MBE
+	|SDLEventType|	type
+	|uint|			timestamp
+	|uint|			windowID
+	|uint|			which			// which mouse
+	|byte|			button			// mouse button
+	|byte|			state			// pressed/released
+	|byte|			clicks			// single/double
+	|byte|			pudding
+	|int|			x				// mouse-x, window-relative
+	|int|			y				// mouse-y, window-relative
+	
+	function xy (|ivec2|)
+		return (.x,.y).sdlxy
+
+
+struct SDL_DropEvent
+	linkage
+		wrapper
+		cpp_part Drop
+    |Uint|		type
+    |Uint|		timestamp			/**< In milliseconds, populated using SDL_GetTicks() */
+    |cstring|	file				/**< Should be freed with SDL_free(), NULL on begin/complete */
+    |Uint|		windowID			/**< The window that was dropped on, if any */
+    
+    function FileStr (|string|)
+		return .file.sdltext
+
+
+
+datatype SDLEventType (uint)
+	linkage
+		wrapper
+		cpp_part ET
+	syntax is (|SDLEventType| x, |bool|)
+		return self == x
+		
+	constants
+		|SDLEventType|
+		/* Application events */
+		QUIT           = 0x100 /* User-requested quit */
+
+		/* These application events have special meaning on iOS see README-ios.md for details */
+		APP_TERMINATING        /* The application is being terminated by the OS
+										 Called on iOS in applicationWillTerminate()
+										 Called on Android in onDestroy()
+									*/
+		APP_LOWMEMORY          /* The application is low on memory free memory if possible.
+										 Called on iOS in applicationDidReceiveMemoryWarning()
+										 Called on Android in onLowMemory()
+									*/
+		APP_WILLENTERBACKGROUND /* The application is about to enter the background
+										 Called on iOS in applicationWillResignActive()
+										 Called on Android in onPause()
+									*/
+		APP_DIDENTERBACKGROUND /* The application did enter the background and may not get CPU for some time
+										 Called on iOS in applicationDidEnterBackground()
+										 Called on Android in onPause()
+									*/
+		APP_WILLENTERFOREGROUND /* The application is about to enter the foreground
+										 Called on iOS in applicationWillEnterForeground()
+										 Called on Android in onResume()
+									*/
+		APP_DIDENTERFOREGROUND	/* The application is now interactive
+										 Called on iOS in applicationDidBecomeActive()
+										 Called on Android in onResume()
+									*/
+
+		/* Display events */ 
+		DISPLAYEVENT   = 0x150  /* Display state change */
+
+		/* Window events */ 
+		WINDOWEVENT    = 0x200	/* Window state change */
+		SYSWMEVENT				/* System specific event */
+
+		/* Keyboard events */
+		KEYDOWN        = 0x300	/* Key pressed */
+		KEYUP          = 0x301	/* Key released */
+		TEXTEDITING    = 0x302	/* Keyboard text editing (composition) */
+		TEXTINPUT      = 0x303	/* Keyboard text input */
+		KEYMAPCHANGED  = 0x304	/* Keymap changed due to a system event such as an
+										 input language or keyboard layout change.
+									*/
+
+		/* Mouse events */
+		MOUSEMOVE    = 0x400	/* Mouse moved */
+		MOUSEDOWN				/* Mouse button pressed */
+		MOUSEUP					/* Mouse button released */
+		MOUSEWHEEL		 		/* Mouse wheel motion */
+
+		/* Joystick events */
+		JOYAXISMOTION  = 0x600	/* Joystick axis motion */
+		JOYBALLMOTION			/* Joystick trackball motion */
+		JOYHATMOTION			/* Joystick hat position change */
+		JOYBUTTONDOWN			/* Joystick button pressed */
+		JOYBUTTONUP				/* Joystick button released */
+		JOYDEVICEADDED			/* A new joystick has been inserted into the system */
+		JOYDEVICEREMOVED		/* An opened joystick has been removed */
+
+		/* Game controller events */
+		CONTROLLERAXISMOTION  = 0x650 /* Game controller axis motion */
+		CONTROLLERBUTTONDOWN          /* Game controller button pressed */
+		CONTROLLERBUTTONUP            /* Game controller button released */
+		CONTROLLERDEVICEADDED         /* A new Game controller has been inserted into the system */
+		CONTROLLERDEVICEREMOVED       /* An opened Game controller has been removed */
+		CONTROLLERDEVICEREMAPPED      /* The controller mapping was updated */
+
+		/* Touch events */
+		FINGERDOWN      = 0x700
+		FINGERUP
+		FINGERMOTION
+
+		/* Gesture events */
+		DOLLARGESTURE   = 0x800
+		DOLLARRECORD
+		MULTIGESTURE
+
+		/* Clipboard events */
+		CLIPBOARDUPDATE = 0x900 /* The clipboard changed */
+
+		/* Drag and drop events */
+		DROPFILE        = 0x1000 /* The system requests a file open */
+		DROPTEXT        = 0x1001  /* text/plain drag-and-drop event */
+		DROPBEGIN       = 0x1002 /* A new set of drops is beginning (NULL filename) */
+		DROPCOMPLETE    = 0x1003 /* Current set of drops is now complete (NULL filename) */
+
+		/* Audio hotplug events */
+		AUDIODEVICEADDED = 0x1100 /* A new audio device is available */
+		AUDIODEVICEREMOVED        /* An audio device has been removed. */
+
+		/* Sensor events */
+		SENSORUPDATE = 0x1200     /* A sensor was updated */
+
+		/* Render events */
+		RENDER_TARGETS_RESET = 0x2000 /* The render targets have been reset and their contents need to be updated */
+		RENDER_DEVICE_RESET /* The device has been reset and all textures need to be recreated */
+
+
+
+
+
+datatype SDL_WindowEventID (byte)
+	linkage
+		cpp_class GUI_WindowEventID
+		cpp_part EID
+	constants 
+		|SDL_WindowEventID|
+		NONE           /* Never used */
+		SHOWN          /* Window has been shown */
+		HIDDEN         /* Window has been hidden */
+		EXPOSED        /* Window has been exposed and should be redrawn */
+		MOVED          /* Window has been moved to data1, data2 */
+		RESIZED        /* Window has been resized to data1xdata2 */
+		SIZE_CHANGED   /* The window size has changed, either as
+						 a result of an API call or through the
+						 system or user changing the window size. */
+		MINIMIZED      /* Window has been minimized */
+		MAXIMIZED      /* Window has been maximized */
+		RESTORED       /* Window has been restored to normal size
+						 and position */
+		ENTER          /* Window has gained mouse focus */
+		LEAVE          /* Window has lost mouse focus */
+		FOCUS_GAINED   /* Window has gained keyboard focus */
+		FOCUS_LOST     /* Window has lost keyboard focus */
+		CLOSE          /* The window manager requests that the window be closed */
+		TAKE_FOCUS     /* Window is being offered a focus (should SetWindowInputFocus() on itself or a subwindow, or ignore) */
+		HIT_TEST        /* Window had a hit test that wasn't SDL_HITTEST_NORMAL. */
+	syntax is (|SDL_WindowEventID| state, |bool|)	
+		return self == state
+
+
+
+datatype CopyPasteFlags (Byte)
+	linkage
+		cpp_part CPF
+	Flags
+		Copy  = (CopyFile,  CopyText,  CopyImage,  CopyNode)
+		Paste = (PasteFile, PasteText, PasteImage, PasteNode)
+		PasteTextLike = (PasteText(|)PasteFile)
+	function CanCopy (|CopyPasteFlags|)
+		return self&Copy
+	function CanPaste (|CopyPasteFlags|)
+		return self&Paste
+	function CanPasteInto (|CopyPasteFlags| dest, |bool|)
+		return (dest >> 4) & (self&copy)
+
+
+
+datatype TakesFocusFlag (byte)
+	linkage
+		cpp_part TFF
+	flags
+		CanFocus
+		CanTabInto
+		None = 0
+		On = CanTabInto (|) CanFocus 
+
+	function Able (|bool|)
+		return self&canfocus
+		
+	function Tab (|bool|force=false, |bool|)
+		if self&CanTabInto
+			return true
+		if force and self
+			return true
+
+
+datatype GuiControlFlags (uint16)
+	linkage
+		cpp_part GCF
+	flags
+		|guicontrolflags| 
+		Visible
+		Decluttered // similar
+		Enabled
+		Editable
+		UnSearchable
+		NoSearch
+		TypeThrough
+		ClickThrough
+		Spacer
+		AlwaysScrollable
+		Modified
+		NeverDrawModified
+		OpensMenu
+		DrawsFocus // showborder, showsborder, hasborder, drawborder
+
+
+struct SDL_Rect
+	linkage: wrapper
+	|int| x
+	|int| y
+	|int| w
+	|int| h

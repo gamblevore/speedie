@@ -1,0 +1,55 @@
+
+
+function compiler.PrintCompileTime (|date| durr) 	
+	if StdErr.OK and !options.silent
+		print "\nClasses:           "
+		compiler.ReachedClassCount.render.printlinecolor(errorcolors.good)
+		print "Funcs:             "
+		"${compiler.reachedfuncs} / ${compiler.funclist.length}".printlinecolor(errorcolors.good)
+
+		print "Total elapsed:	   "
+		durr.renderdurr.printlinecolor(errorcolors.good)
+
+		Print "Input source code: "
+		"${Compiler.stTotalSourceSize/1024} KB\n".printcolor(errorcolors.good)
+
+
+function compiler.PrintStats
+	require options.argstats
+	|| fs = faststring()
+	fs <~ "FuncStats: "
+	for i in 12
+		|| c = scfunction.FuncStats[i]
+			if i
+				fs <~ ", "
+			fs <~ "$i:$c"
+	printline fs
+
+
+function compiler.PrintCompileErrors
+	require stderr.problems
+	.preprinterrors
+
+	if (scfunction.DisabledPoints)
+		"Disabled functions called ${scfunction.DisabledPoints}x!".printlinecolor(errorcolors.error)
+	
+	|| MinSev = (errorseverity.warning, errorseverity.problem)(Options.Warnings) 
+	.PrintErrors(MinSev)
+	stderr.clear
+
+
+
+extend_module file
+	function testjb
+		|| t = Jeebox.test // bug if put into compiler.run!. Wierd!
+		if !options.perry and !options.scripting
+			zalgoline t
+
+
+function compiler.CompileTime 
+	File.TestJB
+	SC_Saver.test						// put before init or after compile-all?
+	.PrintCompileTime(.CompileAll~timeit)
+	if stderr.ok
+		externalcompiler.ExtComp
+		

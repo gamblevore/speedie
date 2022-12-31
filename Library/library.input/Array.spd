@@ -1,0 +1,208 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class Array (saveable)
+	linkage
+		wrapper
+
+	default		Array.new
+	contains	object
+
+	|int|		Marker
+
+////////////////////////////////////////////////////////////////////////////
+// we are using the faststring system... (make it standard if possible)
+// length = "items in use"
+// size   = "buffer size"
+// count  = Like counting birds. it takes effort. (but array doesnt have it)
+////////////////////////////////////////////////////////////////////////////
+
+
+	constructor ( |int| size ) // dont use this... WILL BE REMOVED
+		visible
+		cpp_wrapper JB_Array_Constructor
+	
+	constructor
+		visible
+		cpp_wrapper JB_Array_Constructor0
+	
+	destructor
+		cpp_wrapper JB_Array_Destructor
+
+	function Shuffle
+		cpp_wrapper JB_Array_Shuffle
+
+	function Last (||)
+		return self[.length - 1]
+	
+	function First (||)
+		return self[0]
+
+	function Next (||)
+		if .marker < .length
+			return self[.marker++]
+	function Set (|| obj)
+		self[.marker++] = obj
+
+	function Prev (||)
+		if .marker > 0
+			return self[--.marker]
+	function active (|bool|)
+		return .marker < .length
+	function reset
+		.marker = 0
+	
+	function Trim
+		.length = .length - 1
+	
+	function Pop (||)
+		|| n = .length$
+		n--
+		rz = self[n]
+		.length = n
+
+	function SetAt (|| c, |int| i)
+		|| n = .length
+		if n == i
+			self <~ c
+		  elseif i < n
+			self[i] = c
+		
+	function Clear
+		.length = 0
+	
+	function Wipe (|int|)
+		// returns .size
+		cpp_wrapper JB_Array_Wipe
+	
+	/*function Wipe (|int| n, |... ~ array|)
+		disabled
+		if .Wipe > n
+			.clear
+		return self
+	*/
+
+	function Size (|int|)
+		disabled "use length"
+	
+	function Length (|int|)
+		cpp_wrapper JB_Array_Size
+	
+	function Reverse
+		cpp_wrapper JB_Array_Reverse
+	
+	function Insert (|int| Pos, || Value)
+		cpp_wrapper JB_Array_Insert
+	
+	function Remove (|int| Pos)
+		cpp_wrapper JB_Array_Remove
+
+	function Sort (|SorterComparer| Srt, |bool| down=false)
+		cpp_wrapper JB_Array_Sort
+	
+	function Count (|int|)
+		disabled "Use .length instead"
+		
+	function Length (assigns:|int|)
+		cpp_wrapper JB_Array_SizeSet
+
+	function Size (assigns:|int|)
+		cpp_part wtfwtfwf
+		disabled "Use .length instead."
+	
+	function Copy (|[...]|)
+		cpp_wrapper JB_Array_Copy
+	
+	function Swap (|int| i, |int| j)
+		cpp_wrapper JB_Array_Swap
+	
+	syntax Access (|int| pos, assigns:||)
+		cpp_wrapper JB_Array_ValueSet
+		
+	
+	syntax Access (|int| pos, ||)
+		cpp_wrapper JB_Array_Value
+	
+	syntax Access (||)
+		cpp_part Rand
+		return self[.length.now]
+	
+	syntax Access (|bool| pos, ||)
+		return self[!pos]
+	
+	function Reserve (|int| Needed)
+		if .length < Needed
+			.length = Needed
+		
+	syntax Access (|syntax| pos, assigns:||)
+		.reserve(1 + pos|int|)
+		self[pos|int|] = Value
+	
+	syntax cast (|bool|)
+		return (self|bool|) and (.length >= 1)
+	
+	syntax Append (|| item)
+		.syntaxappend(item,1)
+	
+	syntax Append (|| item, |int| Count)
+		cpp_wrapper JB_Array_AppendCount
+	
+	render
+		cpp_wrapper
+	
+	function Find (|| f, |ind|)
+		opt norefcounts
+		for (o in self) (i)
+			if o == f
+				return i
+
+
+	syntax Compare (|int| n, |bool|Aware, |int|)
+		return .length - n
+	
+	syntax Equals (|int| n, |bool|Aware, |bool|)
+		return .length == n
+	
+	function addcstr (|string| s)
+		opt norefcounts
+		self <~ s.cstr
+	
+	operator contains (|object| o, |bool|)
+		return .find(o) >= 0
+	
+	iterator
+		|| i = 0 // remove self-check... later.
+		while ( i < .length )
+			yield self[i] (i)
+			i++
+
+	iterator Backwards
+		|| i = .length // remove self-check... later.
+		while ( i-- >= 1 )
+			yield self[i] (i)
+
+
+
+prototype SorterComparer (|object| a, |object| b, |bool|)
+	
+function StringSorter (SorterComparer)
+	return a|string|  <  b|string|
+	
+
+helper SorterComparer.TestSort
+	|random| rnd
+	rnd.seed = 123
+	.TestArr(("aaa,bbb,ccc,ddd,fff,eee" / ','))
+	.TestArr(rnd.texts(10000, 10))
+
+	
+helper SorterComparer.TestArr (|[string]| r)
+	r.sort(self)
+	for i in 0 to r.length-2
+		if r[i] > r[i+1]
+			"${r[i]} > ${r[i+1]}"
+			debugger
+	printline r

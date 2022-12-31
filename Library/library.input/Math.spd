@@ -1,0 +1,335 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+module Math
+	constants
+		// just use π for pi, or 2π for PI*2
+		E   = 2.7182818284590452353602874713526
+	
+	function sin (|float| f, |float|)
+		return .sinpi(f*2)
+
+	function float.__sincospi (|&float| a, |&float| b)
+		cpp_wrapper (__sincospif)
+		
+	function float.sin (|float|)
+		return math.sin(self) //sigh
+		
+	function float.sincos (|vec2|)
+		|float| a
+		|float| b
+		.__sincospi(a, b)
+		return (a, b)
+		
+	function cospi (|float| f, |float|)
+		cpp_wrapper (__cospif)
+
+	function cos (|float| f, |float|)
+		return .cospi(f*2)
+
+	function saw (|float| f, |float|)		 // just a saw-func
+		//   0-->0,  0.25-->1,  0.5-->0,  0.75--> -1,  1-->0
+		f = f.fract
+		f = f * 4.0
+		f = f - f.minus0(1.0)
+		return f
+	
+	function tanpi (|float| f, |float|)
+		cpp_wrapper (__tanpif)
+	
+	function sinpi (|float| f, |float|)
+		cpp_wrapper (__sinpif)
+
+
+	function float.atan2 (|float| f2, |float|)
+		cpp_wrapper (atan2f)
+
+	function float.atan3 (|float| f2, |float|)
+		|| Result = -.atan2(f2)				   // our result is +-pi, but we want 0-1...
+		Result /= 2π
+		if (Result < 0)
+			Result += 1.0
+		return Result	
+
+	function int.abs (|int|)
+		cpp_wrapper (abs)
+	
+	function float.abs (|float|)
+		cpp_wrapper (fabsf)
+	
+	function float.sqrt (|float|)
+		cpp_wrapper (sqrtf)
+	
+	function int.sqrt (|int|)
+		return self|f64|.sqrt
+	
+	function float.rsqrt (|float|)
+		return 1.0 / .sqrt
+	
+	function f64.sqrt (|f64|)
+		cpp_wrapper (sqrt)
+	
+	function float.fract (|float|)
+		return self - .floor
+	
+	function float.Ceil (|float|)
+		|| F = .floor
+		if self != F
+			F++
+		return F
+	
+	function float.Gaussian (|float| v, |float|)
+		|| exp = self*self / v
+		|| factor = math.e pow -exp
+		return factor / (π * v).sqrt
+
+	
+	function float.clamp (|float|L, |float|H, |float|)
+		cpp_wrapper (fclampf)
+	
+	function float.clamp (|float|H=1.0, |float|)
+		return .clamp(0,h)
+		
+	function float.cluster (|float|)
+		cpp_Wrapper JB_fCluster
+
+	function int64.hash (|uint64|)
+		return self|uint64|.hash 
+
+	function int.hash (|uint|)
+		return self|uint|.hash 
+
+	function uint64.hash (|uint64|)
+		cpp_wrapper 
+	
+	function int.ToOne (|int|)
+		if self > 0
+			return 1
+		return self|uint| >> 31
+	
+	function int.LowestBit (|int|)
+		return self & -self 
+
+	function int.RemoveOneBit (|int|)
+		return self & (self-1)
+
+	function int.Sign (|int|)
+		if self > 0
+			return 1
+		return -(self|uint|>>31)
+
+	function int.clamp (|int| low, |int| high, |int|)
+		cpp_part ClampRange
+		|| result = low max self
+		return high min result
+
+	function int.clamp (|int| high, |int|)
+		return high min (self max 0)
+
+	function Int.FlipSign (|int| Sign, |int|)
+		// Sign is 0 or 1
+		return (self ^ -Sign) + Sign
+
+	function int.SetSign (|bool| IsNeg, |int|)
+		// bool.dir is beter
+		if (IsNeg)
+			return -self
+		return self
+	
+	function int.SignBit (|int|)
+		return self|uint| >> 31
+		
+	function int.Reduce1 (|int|)
+		disabled "seems buggy, doesnt work for 0"
+		return self + (.signbit << 1) - 1
+	
+	function int.reduce (|int| d=1, |int|)
+		if (self > d)
+			return self - d
+		elseif (self < -d)
+			return self + d
+		
+	function int.reduce2 (|int| d, |&int| Zeros, |int|)
+		pragma inline
+		if ( self > d )
+			return self - d
+		  elseif (self < -d)
+			return self + d
+		Zeros[0] = Zeros[0] + 1
+	
+	function uint64.LowestBit (|uint64|)
+		return self & -self 
+
+	function uint64.RemoveOneBit (|uint64|)
+		return self & (self-1)
+
+
+
+function Mix (|float| X, |float| Y, |float| Mix, |float|)
+	cpp_Part FloatMix
+	return X + (Mix * (Y - X))
+
+function UnMix (|float| X, |float| Y, |float| R, |float|)
+	return (R - x)/(Y - X)
+
+function Mix (|vec4| A, |vec4| B, |float| F, |vec4|)
+	cpp_Part Vec4Mix
+	return (A*(1.0-F)) + (B*F)
+
+function Mix (|vec3| A, |vec3| B, |float| F, |vec3|)
+	cpp_Part Vec3Mix
+	return (((A,0.0)*(1.0-F)) + ((B,0.0) * F)).xyz
+
+function Mix (|ivec2| A, |float| F, |float|)
+	cpp_Part ivec2Mix
+	return (A.x1*(1.0-F)) + (a.x2*F)
+
+
+
+function int.copysign (|int| From, |int|)
+	if (self.signbit == from.signbit)
+		return self 
+	return -self
+
+
+extend int
+	operator pow (|int| a, |int|)
+		if (a==2)
+			return self*self
+		debugger
+	operator minus0 (|int|a, |int|)
+		|| r = self - a
+		if r >= 0
+			return r
+
+
+extend float
+	function setsign (|bool|b, |float|)
+		if (b)
+			return -self
+		return self
+
+	function copysign (|float| frum, |float|)
+		cpp_Wrapper (copysignf)
+	
+	function minus0 (|float| B, |float|)
+		cpp_Wrapper (fdimf)
+
+	function Reduce (|float| f, |float|)
+		return .abs.minus0(f).copysign(self)
+	
+	function Increase (|float| f, |float|)
+		return self + f.copysign(self)
+	
+	function isnan (|bool|)
+		cpp_wrapper (__isnanf)
+	
+	function isnormal (|bool|)
+		// not inf and not nan, but what about 0? i guess 0 is normal?
+		cpp_wrapper (__isnormalf)
+	
+	function RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |float| )
+		|| fr = hfrom - lfrom
+		|| tr = hto - lto
+		// if its lfrom, return lto
+		// if its hfrom, return hto
+		|| inbetweenfromness = (self - lfrom) / fr
+		return mix(lto, hto, inbetweenfromness) 
+	
+	
+	function RangeConvertClamped (|float| lfrom, |float| lto, |float| hfrom, |float| hto, |float| )
+		self = .RangeConvert(lfrom, hfrom, lto, hto)
+		return .clamp(lto, hto)
+		
+		
+	function sanity (|bool|)
+		debug_Require !(.isnan or .isinf)
+		return true
+	
+	function MakeSane (|float|)
+		debug_require !(.isnan or .isinf)
+		return self
+	
+	function IsInf (|bool|)
+		cpp_wrapper (__isinff)
+	
+	function f64.IsNan (|bool|)
+		cpp_wrapper (__isnand)
+	
+	function f64.isInf (|bool|)
+		cpp_wrapper (__isinfd)
+	
+	function powow (|int| n, |float|)
+		visible
+		rz = self
+		for n
+			rz *= rz
+
+	function pow2 (|float|)
+		return self*self
+
+	function pow3 (|float|)
+		return self*self*self
+
+	function pow4 (|float|)
+		rz = self*self
+		rz *= rz
+
+	function pow6 (|float|)
+		rz = self*self
+		rz = rz*rz*rz
+
+	function pow8 (|float|)
+		rz = self * self
+		rz *= rz
+		rz *= rz
+
+	function pow16 (|float|)
+		rz = self * self
+		rz *= rz
+		rz *= rz
+		rz *= rz
+	
+	syntax access (|float| from, |float| to, |float|)
+		// isnt this the mix function?
+		|| C = .clamp(0,1)
+		|| range = to-from
+		return (range*C) + from 
+	
+	function map (|float| from, |float| to, |float|)
+		if (self > to)
+			return 1
+		return .minus0(from) / to
+
+
+
+function int.Towards (|int| Dest, |int| N, |int|)
+	if (self >= dest)
+		self -= N
+		if (self <= dest)
+			return dest 
+	  else
+		self += N
+		if (self >= dest)
+			return dest
+	return self
+
+
+function float.multiply (|bool|b, |float| mul, |float|)
+	disabled "use .mul instead"
+
+	
+function float.mul (|float| by, |bool| Cond, |float|)
+	if (cond)
+		return self * by
+	return self
+
+
+function float.plus (|bool|b, |float| add=1.0, |float|)
+	if (b)
+		return self + add
+	return self
+

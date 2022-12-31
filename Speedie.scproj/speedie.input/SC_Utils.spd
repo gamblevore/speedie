@@ -1,0 +1,195 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+//  //  //  //  //   //  // .Obj Conversion //  //  //  //  //  //  //  //  //
+
+function Message.AsDecl (|SCDecl|)
+	// .MsgDecl uses this
+	opt norefcounts
+	|| obj = .obj$
+	if (obj isa scdecl)
+		return obj
+	printline .parent.ObjectID
+	debugger
+
+
+function Message.AsCls (|SCClass|)
+	opt norefcounts
+	|| obj = .obj$
+	if (obj isa SCClass)
+		return obj
+	debugger
+
+
+function Message.AsFunc (|SCFunction|)
+	opt norefcounts
+	|| obj = .obj
+	if (obj isa SCFunction)
+		return obj
+
+
+function Message.AsBase (|SCBase|)
+	|| obj = .obj$
+	if (obj isa SCBase)
+		return obj
+	debugger
+
+
+function Message.AsArg (|SCArg|)
+	opt norefcounts
+	|| obj = .obj$
+	if (obj isa SCArg)
+		return obj
+
+
+function Message.AsModule (|SCModule|)
+	opt norefcounts
+	|| obj = .obj$
+	if (obj isa SCModule)
+		return obj
+	debugger
+
+
+function Message.IsLast (|bool|)
+	return self and !.Next
+
+
+function Message.ListAll (|[Message]|)
+	opt norefcounts
+	for A in self
+		rz <~ A
+
+
+
+
+//  //  //  //  //  //  // syntax type detection //  //  //  //  //  //  //  // 
+
+extend Message {
+	operator IsThing (|String| name, |bool|)
+	// case aware....
+	// if I had my... "nil.fnc always returns nil"... then I could
+	// remove the self-check! :D So beautiful code.
+		Return (self) and (self == @Thg) and (.name ~= name)
+
+
+	operator IsThing (|bool|)
+		disabled "ooop"
+		Return (self) and (self == @Thg)
+
+
+	operator IsOpp (|string|name, |bool|)
+		Return (self) and (self == @Opp) and (.name ~= name)
+
+
+	operator IsArg (|string|name, |bool|)
+		Return (self) and (self == @arg) and (.name == name)
+
+
+	operator IsTmp (|String| name, |bool|)
+	// case blind...
+		Return (self) and (self == @Tmp) and (.name == name)
+
+
+	operator IsARel (|String| name, |bool|)
+	// case blind...
+		Return (self) and (self == @Arel) and (.name == name)
+
+
+	operator IsBRel (|String| name, |bool|)
+	// case blind...
+		Return (self) and (self == @Brel) and (.name == name)
+
+	operator IsRel (|String| name, |bool|)
+	// case blind...
+		Return (self) and (self == @Rel) and (self[1].name == name)
+
+
+	operator IsCNJ (|String| name, |bool|)
+		Return (self) and (self == @Cnj) and (.name == name)
+
+
+	operator IsDot (|string| name, |bool|)
+		Return (self) and (self == @dot) and (.name ~= name)
+
+	
+	syntax access (|message|)
+		if (self)
+			return .Parent
+
+	
+	function TrueOrFalse (|bool|)
+		if self ~= "true"
+			return true
+		if self ~= "false"
+			return false
+		error (self, "This value should be 'true' or 'false'.")
+}
+
+
+
+
+extend Message		// scanning
+	iterator ScanArg
+// Just go through all the arg-level children! Will return temporal
+// statements. but also go into the arguments within a temporal statement.
+		debugger (self == @Arg)
+		
+		|| Curr_  = .First
+		|| After_ = .FlatAfter
+		
+		while (Curr_ and Curr_ != After_)
+			if (Curr_.Parent != @Arg)
+				continue
+			yield Curr_
+			Curr_ = Curr_.FlatNext
+
+
+function scbase.ListFunctions (|[SCFunction]|)
+	require .access
+	for o in .access
+		ListFunctionsSub(o, rz)
+
+
+function ListFunctionsSub (|object|o, |[SCFunction]| rz)
+	opt norefcounts
+	if o isa scdecl
+		 o = o.setter|scdecl|
+	if o isa SCFunction
+		for f in o
+			rz <~ f
+		
+
+
+function ListModules (|Dictionary| access, |[SCModule]|)
+	opt norefcounts
+	for o in access
+		if o isa SCModule
+			rz <~ o
+
+
+function message.IsReffer (|bool|)
+	opt norefcounts
+	if self == @func
+		|| fn = .last.asfunc
+		return fn and fn isa kisreffer
+
+
+
+module SCGlobals
+	linkage
+		cpp_part		SC
+	|int| UniqueNum
+
+
+function message.OperatorInFunc (|string| s, |bool|)
+	return .msgowningfunc ~= s
+
+
+function Message.Op (|message|)
+	if self == @rel
+		return self[1]
+

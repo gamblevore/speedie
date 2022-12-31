@@ -1,0 +1,256 @@
+
+
+module EnglishRender {
+	|LangMsgRender[64]| Funcs
+		
+	function EngFuncs (LangZuncFinder)
+		|| f = Funcs[.func|int|]
+		if !f
+			englishrender.init
+			f = Funcs[.func|int|]
+		return f
+
+	
+	syntax access (|syntax| f, assigns:|LangMsgRender|)
+		Funcs[f|int|] = value
+
+
+	function Message.FindLanguage (|language|)
+		opt norefcounts
+		for c.flat in self
+			|| ti = c.tran
+			if ti and ti.myword
+				return ti.myword.lang
+
+	
+	function Message.LangRender (|string|)
+		|| l = .findLanguage #expect (self, "No language associated.")
+		|| R = l.renderer #debug_require 
+		(R)(self, nil)
+		|| fs = LangFastString.new(R)
+		.LangExport(fs)
+		return fs
+
+	
+	function Init {
+		require !Funcs[@thg|int|]
+		|| b = BasicMover
+		self[@thg]		= B
+		self[@opp]		= B
+		self[@bra]		= ListeyMover
+		self[@adj]		= AdjMover
+		self[@badj]		= AdjMover
+		self[@ques]		= B // unused.
+		self[@cnj]		= B
+		self[@emb]		= Ignore
+
+		|| w = WordsMover
+		self[@cnj]		= W
+		self[@rel]		= w
+		self[@trel]		= TRelMover
+		self[@Tril]		= TrilMover
+		self[@arel]		= W
+		self[@brel]		= W
+		self[@oat]		= W
+		self[@Item]		= W
+		self[@pinn]		= W // fix later
+		self[@ques]		= w
+		self[@binn]		= AskMover // fix later 
+		self[@ask]		= AskMover // fix later 
+		self[@scom]		= CommentMover
+		self[@Arg]		= SentanceMover
+		self[@sthg]		= Line
+		self[@list]		= ListeyMover
+		self[@arr]		= QuotationMover	// don't want this... it should be a list! [frog, dog, hog, bog]
+											// need new syntax for quotes...
+		self[@Tmp]		= CommaeyMover
+		self[@name]		= NameyMover
+	}
+	
+	function Ignore (LangMsgRender) {
+	
+	}
+
+	function SentanceMover (LangMsgRender) {
+		opt NoRefCounts
+		for Sentance in self
+			fs.CapNext = true
+			Sentance.LangExport(fs)
+			fs.addsep('.')
+	}
+	
+	
+	function Message.LangExport2 (|langfaststring| fs, |bool| Always=false)
+		require self
+		.LangExport(fs)
+		if Always or .CouldUseASep
+			fs.AddSep(' ')
+
+
+	function TrelMover (LangMsgRender) {
+		opt NoRefCounts
+		|| i = 0
+		for s in self
+			if i++==1: fs.addsep(',')
+			s.LangExport2(fs)
+	}
+
+	function TrilMover (LangMsgRender) {
+		opt NoRefCounts
+		|| i = 0
+		for s in self
+			if i++==2: fs.addsep(',')
+			s.LangExport2(fs)
+	}
+
+	function WordsMover (LangMsgRender) {
+		opt NoRefCounts
+		.Namesep(fs, " ")
+		for s in self
+			s.LangExport2(fs)
+	}
+
+	function AskMover (LangMsgRender) {
+		opt NoRefCounts
+
+		// i can				can i 
+		// i can~run			can i run
+		// i can~run home		can i run home
+		|| f = .first			#require
+		|| opp = f.next			#require
+		|| l = opp.next
+		|| OF = opp.first
+
+		.Namesep(fs, " ")
+
+		(of, opp)(of).LangExport2(fs)
+		fs.AddSep(' ')
+		f.LangExport2(fs)
+		if (of)
+			OF.Next.LangExport2(fs, true)
+		
+		L.LangExport2(fs)
+	}
+
+
+	function TrilMover (LangMsgRender) {
+		opt NoRefCounts
+		|| f = .first
+		f.LangExport(fs)
+		
+		|| s = f.next			#require
+		s.LangExport(fs)
+		fs.AddSep(' ')
+		
+		|| l = s.next			#require
+		l.LangExport(fs)
+		fs.addsep(',')
+	}
+
+
+	function AdjMover (LangMsgRender) {
+		opt NoRefCounts
+		|| f = .first
+		|| l = f.next
+		if (self == @badj) or ((l isa Element.anaphorism) and (f isa Element.adjective))
+			l.LangExport(fs)
+			fs.AddSep(' ')
+			f.LangExport(fs)
+		  else
+			f.LangExport(fs)
+			fs.AddSep(' ')
+			l.LangExport(fs)
+	}
+
+
+	function BasicMover (LangMsgRender) {
+		opt NoRefCounts
+		if .name
+			fs <~ .name
+			if .first
+				fs <~ ' '
+		
+		.first$.LangExport( fs )
+	}
+
+
+	function CommentMover (LangMsgRender) {
+		opt NoRefCounts
+		|| f = .first
+		|| l = f.next
+		WordsMover( l, fs )
+		fs <~ ' '
+		fs <~ '('
+		WordsMover(f, fs)
+		fs <~ ')'
+	}
+
+
+	function BackwardsWordsMover (LangMsgRender) {
+		opt NoRefCounts
+		.Namesep(fs, " ")
+		for s.reverse in self
+			s.LangExport(fs)
+			if s.CouldUseASep
+				fs.AddSep(' ')
+	}
+
+
+	function message.NameSep (|langfaststring| fs, |string| s) {
+		opt NoRefCounts
+		if .name and .func != @arg and @list
+			fs <~ .name
+			if (.First)
+				fs.AddSep(' ')
+	}
+
+
+	function CommaeyMover (LangMsgRender) {
+		opt NoRefCounts
+		.Namesep(fs, " ")
+		for s in self
+			s.LangExport(fs)
+			if s.coulduseasep
+				fs.AddSep(',')
+	}
+
+
+	
+	function ListeyMover (LangMsgRender) {
+		opt NoRefCounts
+		|| P = .parent
+		if (P == nil or @arg) {
+			SentanceMover(self, fs)
+		} else {
+			WordsMover(self, fs)
+		}
+	}	
+	
+	
+	function Line (LangMsgRender) {
+		opt NoRefCounts
+		
+		fs <~ ("\n\n", true)
+	}
+	
+	
+	function QuotationMover (LangMsgRender) {
+		opt NoRefCounts
+		fs <~ "“"
+		SentanceMover(self, fs)
+		fs <~ "”"
+	}
+	
+	
+	function NameyMover (LangMsgRender) {
+		opt NoRefCounts
+		if (.First) {
+			.First.LangExport(fs)
+			fs.AddSep(' ')
+		}
+
+		fs.CapNext = false // Xcode
+		fs <~ .name
+	}
+}
+

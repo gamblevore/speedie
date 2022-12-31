@@ -1,0 +1,230 @@
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+|| C_Letters		= "AZaz__09".charset
+module SCGame3D
+	|| Types = [
+		"point"				: "P"
+		"triangle"			: "T"
+		"triangle_strip"	: "t"
+		"line"				: "L"
+		"line_strip"		: "l"
+
+// special ones
+		"cube"				: "C_"
+		"billboard"			: "B_"
+		"shadowselection"	: "H_"
+		"sdf"				: "S_"
+	]
+
+	function NeuModel (CollectFunc)
+		|| Inst = Node.TranModel			#expect (node, "Not a good model.")
+		|| M = SCClass.newStruct(node, name_space, ErrPlace)
+		if M isa SCModule
+			M.Cls.IsModel = Inst
+		return M
+
+
+	function Love (CollectFunc)
+		if random.shared[] > (1.0/12.0)
+			printline node.render[5...]
+		return compiler.program
+
+
+
+extend SCClass
+	function NewDeclInClassModule (|string| S, |SCClass| T)
+		|| Dcl = SCDecl.new
+		dcl.TypeContained = T 
+		dcl.Name = S
+		.Modul.TryAdd( .IsModel, Dcl, S )
+	
+	
+	function DeclModel
+		expect (.properties)  (.source, "Need properties for a Game3D Type.")
+			
+		|| Inst = .properties.last
+		|| Dcl = .modul[ "_AllocDraw" ]
+		
+		if (Dcl isa SCDecl)
+			dcl.MakeGameFlying(self)
+		  else
+			debugger
+
+
+	function GetFlyingMemClassFor (|SCClass|)
+		return Compiler.FindClass("GameFlyingMem", .IsModel)
+
+	
+	function ModelDecls
+		|| M = .GetFlyingMemClassFor #require
+		.NewDeclInClassModule("_AllocDraw", M)
+	
+	function HasGameType (|bool|)
+		return (.TypeInfo != DataTypeCode.UnusedType)
+
+
+function FastString.CArrayAdd (|string| s)
+	for (B in s)
+		.CArrayAddB(B)
+	.CArrayAddB(0)
+
+
+function FastString.CArrayAddB (|Byte| B)
+	if !B
+		self <~ '0'
+	  else
+		self <~ '\''
+		if C_Letters[B]
+			self <~ B
+		  else
+			self <~ "\\x"
+			.AppendHex( B )
+		self <~ '\''
+	self <~ ", "
+
+
+function FastString.CArrayAddB0 (|Byte| B)
+	.carrayaddb(b)
+	.carrayaddb(0)
+
+
+extend Message {
+	function ModelType (|Message|)
+		rz = self
+		if Rz == @Rel
+			Rz = Rz.first
+		expect (Rz==@thg) (self)
+
+
+	function ModelMode (|int|)		// type circle+alpha+nodepth
+		require (self == @Rel)
+		for (C.flat in .last)
+			if (C isthing "alpha")
+				rz |= 1
+			  elseif (C isthing "nodepth")
+				rz |= 2
+			  else
+				expect (C == @rel or "+") (C)
+		
+
+	function TranModel (|Message|)
+		|| Arg = self[@arg, -1]							#require
+		|| Shader = Arg.ParseShaderSub				    #require // should be empty by now.
+		.Name = "struct"
+		return Shader
+
+
+	function FindShader (|string| TypeName, |Message|)
+		|| U = .findflat(@tmp, "type")				#require
+		|| C = U[0].ModelType						#require
+		|| N = C.name.lowercase
+		if (N.last == 's')
+			N = N[0, N.length - 1]
+		
+		|| F = SCGame3D.Types[N]
+		expect (F)   (U, "Bad model type.")
+
+		// We want to get stuff... alpha and depth
+
+		SCGame3D.NeedShader(TypeName + ".frag") #require
+		if (F.Length >= 2) // Cube, sdf, etc... use a standard vertex shader
+			F = F[0, 1]
+		  else
+			SCGame3D.NeedShader(TypeName + ".vert") #require
+		
+		// "type points" --> "type P"
+		// and then the temporal_statement is removed.
+		
+		C.name = F
+		C = U[0] // cos "Type billboard", and "Type billboard+alpha" aren't the same. We don't just want to remove "billboard"!
+		U.Remove
+		return C
+
+
+	function ParseShaderSub (|Message|)
+		|| Name = .parent[0].name #expect (.parent, "Expected a name")
+		rz = .FindShader(Name) #require
+		
+		|| StaticAdditions = "function New (|&$name|) {
+		return Game_FlyingAlloc(_AllocDraw)|&$name|}".Parse
+
+		/*	// FindModes
+		model Circle {
+			type circle + alpha + noBlend
+		}*/	  
+	
+		AddToStaticSection( self, StaticAdditions )
+}
+
+
+function SCGame3D.NeedShader (|string| Name, |bool|)
+	if (Name ~= "ModelTest.vert" or "ModelTest.frag")
+		return true // or else self-tests fail!
+	|| F = SCImport.Shaders[Name]
+	expect (F isa string) ("Can’t find shader $name\n")
+	return true
+
+
+extend SCDecl 
+	function GameType (|DataTypeCode|)
+		expect !(.PointerCount) (.source, "Can’t be a pointer")
+
+		|| T = .type
+		expect (T and T.HasGameType) ( .source, "SC_GameTypes.box doesn't contain type '${.Type.Name}'." )
+		return T.TypeInfo
+
+
+	function MakeGameFlying (|scclass| oof)
+		require oof
+		|| fs = faststring()
+		fs <~ "const char $(N)_Init[] = {"
+
+		fs.CArrayAdd( oof.name )
+		fs.CArrayAddB( oof.ismodel.ModelType.name[0] )
+		fs.CArrayAddB0( 8 ) // SuggestedCount. for the moment!
+		fs.CArrayAddB0( oof.ismodel.ModelMode ) // Alpha + Depth
+
+		for (p in oof.Properties)
+			fs.CArrayAddB( p.GameType|Byte| )
+			fs.CArrayAdd( "_" + p.name )
+		
+		fs <~ "0 };\n"
+		fs <~ "GameFlyingMem $(N) = {.InitData=(u8*)$(N)_Init, .InitDataLength=sizeof($(N)_Init)}"
+		(self is gameflyingmem)
+		.stringdata = fs
+
+
+function SCClass.GetFlyingMemory (|Message| exp, |SCDecl|)
+// pretty awkward, but basically, we get a thing, and that thing refers to a struct instance
+// but we want the address of a struct, so we need to actually... convert all the code
+// into being the address. "_AllocDraw" is just where our decl that knows our flyingmem struct's name/location
+	|| Decl = .modul[ "_AllocDraw" ]
+	if (Decl isa scdecl)
+		expect (exp == @thg)
+		|| Thg = «Thg exp.name »
+		thg.obj = decl 
+		exp <~ thg
+		exp.Become( @BRel, "&" )
+		return Decl.makepointer
+
+
+
+model ModelTest
+	|int| x
+	|int| y
+	type points
+	
+
+function Game_FlyingAlloc (|&GameFlyingMem| Mem, |&byte|):
+
+struct GameFlyingMem
+	linkage
+		wrapper
+		cpp_part Mem
+
+

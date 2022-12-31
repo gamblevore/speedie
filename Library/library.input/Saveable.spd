@@ -1,0 +1,324 @@
+
+
+// all objects should be saveable unless the class sas its not.
+// makes more sense. we messed up the language otherwise!
+
+struct ObjectSaver
+	linkage
+		cpp_Part Saver
+
+	|FastString|				Dest
+	|object--|					CantSaveThis
+	|object--|					Root
+		
+	destructor
+		error !.CantSaveThis (.CantSaveThis, "This class has no saving function for it.")
+	
+	module
+		|SaverClassInfo|		SaveableList
+
+		
+		function New (|ObjectSaver|)
+			ObjectSaver.init
+			|ObjectSaver| Result = nil
+			return Result
+		
+		function LoadOne (SaverLoadClass)
+			|| N = SaverClassInfo.new( cls, data )
+			cls.saveinfo = N|&byte|
+			N.NextInfo = objectsaver.Saveablelist
+			objectsaver.Saveablelist = N
+		
+		function CallMe (|SaverLoadClass| fn)
+			visible
+			cpp_wrapper JB_InitClassList
+		
+		function Init
+			require !.saveablelist
+			.CallMe(&LoadOne)
+
+
+
+
+class Saveable
+// probably should be LOADABLE too... :)
+	linkage
+		visible
+		wrapper
+		cpp_part Sav
+
+	
+	virtual   SaveWrite (|&ObjectSaver| Saver)
+		Saver.CantSaveThis = self
+		saver.dest <~ "nil,"
+	virtual   LoadProperties (|&ObjectLoader| Loader,)
+		Loader.CouldntLoad = self
+
+	virtual   SaveCollect (|&ObjectSaver| Saver)
+	Behaviour SaveCollect { /* not all objects need to collect anything... */ }
+
+	constructor
+		cpp_wrapper
+	
+	
+	function IsSaveMarked (|bool|)
+		|| p = self|&int|
+		return (p[0] & 0x10000000)
+
+	function SaveMark (|bool|)
+		// pretty brave!!! to try this! Very dangerous
+		|| p = self|&int|
+		|| rc = p[0] 
+		require !(rc & 0x10000000)
+		p[0] = Rc (|) 0x10000000
+		return true
+	
+	function SaveUnMark
+		|| p = self|&int|
+		p[0] &= ~ 0x10000000
+	
+	function SaveTo (|File| f)
+		cpp_part SaveToFile
+		|| it = f.writer
+			.saveto(it)
+	
+	function ObjectSaver.Finish (|saveable| first)
+		opt norefcounts
+		|| fs = .dest
+		fs <~ '\n'
+		fs <~ '@'
+		fs.AppendObjectID(first)
+		fs <~ '\n'
+		fs <~ kSaverEnd
+
+	// textview uses "Saveto" as a property.
+	function SaveTo (|FastString| fs_in = nil, |string|)
+		cpp_part SaveTo
+		|| fs = FastString(fs_in) #require
+		|| Saver = objectsaver.new
+		saver.dest = fs
+		saver.root = self
+		fs <~ kSaverStart1
+		
+		.SaveTryCollect(saver)
+
+		// Go through all the classes...
+		|saverclassinfo--| sci = ObjectSaver.saveablelist 
+		while (sci!=nil)
+			sci.output(saver)
+			sci = sci.nextinfo
+		
+		sci = ObjectSaver.saveablelist 
+		while (sci!=nil)
+			sci.clear // maybe slower BUT I JUST WANT THIS TO WORK!!!
+			sci = sci.nextinfo
+		
+		Saver.Finish(self)
+		|| result = fs.GetResult(fs_in)
+		saver.dest = nil
+		saver.CantSaveThis = nil
+		return result
+
+
+/////// /////// /////// /////// /////// HELPERS /////// /////// /////// /////// /////// /////// 
+
+
+extend ObjectSaver
+	function AppendBool (|bool| b)
+		.dest <~ b|int|
+		.dest <~ ','
+
+	function AppendString (|string| s)
+		// seems fine, to be honest.
+		.dest <~ '`'
+		s.replaceall("`","``", .dest)
+		.dest <~ '`'
+		.dest <~ ','
+	
+	function AppendInt (|int64| i)
+		.dest <~ i
+		.dest <~ ','
+	function AppendRaw (|&byte| f, |int| n)
+		.dest.AppendHexData(f, n)
+		.dest <~ ','
+	function AppendObject (|object| o)
+		.dest.AppendObjectOrNil(o)
+		.dest <~ ','
+
+
+function FastString.AppendObjectID (|saveable| o)
+	.Appendhex3( o.ObjectID )
+
+
+function FastString.AppendObjectOrNil (|object| o)
+	if (o isa saveable)
+// For linked lists... if we try to save one object but it has a .next
+// but we don't want to save the .next...
+		if (o.IsSaveMarked)
+			.AppendObjectID(o)
+		  else
+			#!"Valid behaviour! For example we save a level, but we don't save the player along with the level. Like terraria."
+//			debugger(1)
+			self <~ "nil"
+	  elseif (o isa string)
+		o.render(self)
+	  else
+		self <~ "nil"
+
+
+extend Array
+	Behaviour SaveCollect
+		// put all in, for now.   // opt later. :)
+		for (v in self)
+			v.SaveTryCollect(saver)
+		opt NoRefCounts
+
+	Behaviour SaveWrite
+		|| D = saver.dest
+		for (v in self)
+			D <~ ", "
+			start
+			D.AppendObjectOrNil(v)
+		opt NoRefCounts
+
+
+extend Dictionary
+	behaviour SaveCollect
+		opt NoRefCounts
+		for (v in self)
+			v.SaveTryCollect(saver)
+	
+	behaviour SaveWrite
+		opt NoRefCounts
+		|| D = saver.dest
+		|| L = .navigate
+		
+		while (l)
+			D <~ l.name // what if it's an int?
+			D <~ ": "
+			D.AppendObjectOrNil(l.value)
+			D <~ ','
+
+
+
+constants
+	kSaverStart1 = "@JBSave\n"
+	kSaverEnd = ""
+
+
+
+/// Try not to generate savers for things that contain "saveas nil"
+/// or ARE "saveas nil"
+
+
+function Object.SaveTryCollect (|&ObjectSaver| Saver)
+	opt norefcounts
+	if (self isa Saveable)
+		require .SaveMark
+		.SaverInfo <~ self
+		.__SaveCollect__(saver)
+	  elseif (self)
+		ifn self isa string
+			saver.CantSaveThis = self
+
+
+
+
+
+prototype SaverLoadClass (|&ClassData| cls, |&char| Data)
+
+class SaverClassInfo (array)
+	default nil
+	linkage
+		cpp_part sci
+
+	contains			Saveable
+	saveas				nil
+	
+	|&ClassData|		Cls
+	|SaverClassInfo|	NextInfo
+	|&char|				Data
+	
+
+	function adfub (|faststring| fs)
+		// adfub????
+		// nothing uses this?
+		opt norefcounts
+		for (Obj in self)
+			fs.AppendObjectID(obj)
+
+
+	constructor ( |&ClassData| Cls, |&char| Data )
+		.cls  = cls
+		.data = data
+
+	
+	function HasData (|bool|)
+		return (.data != nil) and (.data[0])
+
+	
+	function Saveable.SaverInfo (|SaverClassInfo|)
+		opt norefcounts
+		return .class.saveinfo|Saverclassinfo|
+
+
+	function Clear
+		opt norefcounts
+		require self
+		for Obj in self
+			obj.SaveUnMark // make debugging easier...
+		super.clear
+
+	
+	function Output (|&ObjectSaver| Saver)
+		opt norefcounts
+		require self
+		
+		|| D = saver.dest
+		D <~ '\n'
+		D <~ string.fromc(.cls.name).lowercase // lol.
+		D <~ ' '
+		
+		if (.HasData)
+			D <~ '('
+			D <~ .data|cstring|
+			D <~ ')'
+			D <~ ' '
+		D <~ "(\n"
+		
+		for (Obj in self)
+			D <~ '\t'
+			D.AppendObjectID(obj)
+			D <~ ':'
+			D <~ '('
+			Obj.__SaveWrite__(Saver)
+			D.remove(',')
+			D <~ ')'
+			D <~ '\n'
+		D <~ ')'
+		D <~ '\n'
+
+
+
+
+/////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 
+
+
+struct StructSaveTest {
+	saveas struct
+	|saveable|	Sav
+	|int64|		Intt
+	|string|	Str
+	
+	function RunTest {
+		.test("")
+	}
+	function test (|string| s) {
+		cpp_part TestStr
+	}
+	function test (|object| s) {
+		cpp_part TestObj
+
+	}
+}
+

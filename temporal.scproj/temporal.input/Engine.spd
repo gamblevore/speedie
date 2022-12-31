@@ -1,0 +1,12 @@
+
+
+class SteveMachine
+	|string|	Name
+	|int| 		ID
+	|int| 		Reps
+	|fpSteve|	Steve
+	
+	syntax call (|memory| data, |bool|)
+		(.steve)(data, .reps)
+		
+prototype fpSteve (|memory| Data, |int| Reps)

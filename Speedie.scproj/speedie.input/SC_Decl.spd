@@ -1,0 +1,1014 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+/*
+	Decls need to be re-written... New plan:
+		* Unique type system. Pointers, classes, etc... should be one unique object per-type.
+			* Some kind of lookup-table should tell us how to remodify one type's child as another.
+				* String based? Or something better?
+				* If we have "a dict that contains strings" and later want "a dict that contains strings"... it should be quick to find that one already exists...
+		* Variables as a different concept than types.
+			* Variables should NEVER be reused. So... there.
+			* Contains, pointercount, c_Array are what need this.
+				* c_array and pointers should be "container classes".
+				* So the entire thing is about containment.
+				* Just need a set of root classes then?
+
+	// Use a dictionary of strings? If types are 2 bytes each. So a type-chain is a string.
+		
+	* Anyhow... once we have all vars separate, and all classes have SCTypes... we won't have issues with overwritings a classes's var by accident...
+		* Anytime we ned a new var, we start off creating one, and just let it be filled in...
+*/
+
+
+
+
+
+constants
+	// order of badness?
+	kNeedsAddressOfButAlsoNeedsSuperMatch   = 64
+	kNeedsAddressOf     = 32
+	kNeedsTypeCast		= 16
+	kNeeds				= kNeedsTypeCast (|) kNeedsAddressOf (|) kNeedsAddressOfButAlsoNeedsSuperMatch 
+
+	kUseDefaultParams   = 10
+	// don't use 8... no idea why but kTypeCastBothWays is 8 and conflicts with these...
+	// despite that its used as a "amount of typecasting needed", and these are "the type-casting result".
+	kLossyCastedMatch	= 7
+	kCastedMatch		= 6
+	kVoidPtrMatch		= 5
+	kSuperClassMatch	= 4
+	kAddressOfMatch     = 3		 // i REALLY don't care...
+	kNumericMatch		= 2
+	kSimpleMatch		= 1
+	kNoMatch			= 0		 // for #require
+
+	kStrSharedParams	= 10
+	kStrOwned			= 20
+	kStrShared			= 0
+	
+	kSaveProperty		= 1 // for when we want to save the property, but not go into the object to add it to save-list
+	kSavePropertyAndGoIn= 2 // for most of them?  
+	kDontSaveProperty	= 0 // sets the variable to zero on load.
+
+
+	kTypeCastMost = 1
+	kTypeCastNumbers = 2
+	kTypeCastIgnoreContained = 4
+	kTypeCastBothWays = 8
+	kTypeCastTrue = kTypeCastMost (|) kTypeCastNumbers   // to replace whatever we used to do when we passed "true"
+	kNoBoolTypeCast = 16
+	kTypeCastAssigns = 32
+	kTypeCastFalse = 0
+
+
+
+datatype SCDeclInfo (uint)
+	flags
+		|SCDeclInfo|
+		Borrowed
+		Const
+		Static
+		UpgradeableContained
+		NewlyCreated
+		TypeImprove
+		UsedByCode
+		API
+		Hidden // unused... remove
+		CompilerCreated
+		Disabled
+		GameFlyingMem
+		Property
+		Atomic
+		SetTo // a var sets it... like: rz = obj
+		
+		
+	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
+		if b
+			return self (|) d
+		return self &~ d
+		
+	
+
+class SCDecl (SCObject) {
+	linkage
+		cpp_part			Decl
+
+	// bool in parent
+	|Byte|				PointerCount
+	|Byte|				AllocSource
+	|Byte|				Strength
+	
+	|SCFunction--|		Setter		// todo: replace the .stringdata/hider thing with this.
+	|Object|			IsLookupOnly
+	|string|			StringData
+	|SCDecl|			AutoCastTo	// 4 special objects. Aren't they exclusive? Write some code to see if they are.
+	
+	|SCDecl|			Contains
+	|Message|			Default
+	|SCClass|			Type
+	|int|				C_Array
+	|SCDeclInfo|		Info
+	|AsmReg|			DRegister
+	//|NilState|		Expected
+	//|NilState|		Found
+	
+	function Project (|scimport|)
+		// scfunction and scclass should use this too!
+		// iterator too... even. Then everything knows where it comes from
+		opt norefcounts
+		|| m = .MemoryLayer
+		|| obj = m.obj
+		if obj isa scimport
+			return obj
+		
+	syntax append (|SCDeclInfo| d)
+		.info |= d
+
+	function IsBorrowed (assigns:|bool|)
+		.info = .info.set(SCDeclInfo.Borrowed, Value)
+	function IsConst (assigns:|bool|)
+		.info = .info.set(SCDeclInfo.Const, Value)
+	function IsStatic (assigns:|bool|)
+		.info = .info.set(SCDeclInfo.Static, Value)
+	function IsNewlyCreated (assigns:|bool|)
+		.info = .info.set(SCDeclInfo.NewlyCreated, Value)
+	function IsTypeImprove (assigns:|bool|)
+		.info = .info.set(SCDeclInfo.TypeImprove, Value)
+	function CompilerCreated (assigns:|bool|)
+		.info = .info.set(SCDeclInfo.CompilerCreated, Value)
+	function IsAPI (assigns:|bool|)
+		.info = .info.set(SCDeclInfo.api, Value)
+
+
+	syntax is (|SCDeclInfo| d, |bool|)
+		if self
+			return .info & d
+	syntax isnt (|SCDeclInfo| d, |bool|)
+		return !.syntaxis(d)
+	syntax is (|SCDeclInfo| d, assigns:|bool|)
+		.info = .info.set(d, Value)
+
+
+	function isnil (|bool|)
+		return self == typenil
+
+
+	function RegType (|datatypecode|)
+		require self
+		|| T = .type.typeinfo 
+		if T.isint
+			return datatypecode.int64
+		if t.bytesize == 4
+			return datatypecode.float
+		return datatypecode.double
+
+	
+	function Copy (|bool| ForNewVariable = false, |SCDecl|)
+		|| dcl = SCDecl.new
+		
+		.CopyTypeInfoTo( dcl )
+		dcl.IsConst  = self Is Const
+		(dcl is api) = self is api
+		dcl.isstatic = self is static
+		(dcl Is Borrowed) = !ForNewVariable and (self Is Borrowed)
+		dcl.Name     = .Name
+		dcl.Default  = .Default
+		dcl.Strength = .Strength
+		Return dcl
+
+	
+	function better_numeric (|scdecl| o, |scdecl|)
+		opt norefcounts
+										// int+float-->float
+										// int+double-->double
+		|| S =  .type.typeinfo
+		|| T = o.type.typeinfo 
+		if (s &~ datatypecode.sign) == (t &~ datatypecode.sign)
+			return self
+		|| cls = s.better_numeric_sub(t)
+		if cls.typeinfo == s
+			return self // in case of: || x = (date(), 0)(test)
+		if cls.typeinfo == t
+			return o
+		return cls.typenormal
+
+
+	function SCDecl.isfloat (|bool|)
+		return .type.typeinfo.isfloat
+
+
+	function datatypecode.better_numeric_sub (|datatypecode| t, |SCClass|)
+		|| bits	= .ItemBitCount max t.ItemBitCount
+		// what about a float + an int? f64 right?
+		if .isfloat or t.isfloat
+			// in here?
+			if bits > 32
+				return typef64
+			if bits > 16
+				return typefloat
+			return typehfloat
+		
+		|| Signed = .issigned or t.issigned
+		if bits > 32
+			return (typeint64, typeuint64)(signed)
+		if bits > 16
+			return (typeint, typeuint)(signed)
+		if bits > 8
+			return (typeint16, typeuint16)(signed)
+		return typebyte
+
+
+	function PointeryMatch (|scdecl| O, |bool|)
+		require (o.PointerCount == .PointerCount)
+		require (o.C_array|bool| == .C_array|bool|)
+		return true
+
+
+	function PointeryMatchSub (|SCDecl| O, |int| TypeCast, |int|)
+		opt norefcounts
+		|| OType = O.Type
+		|| t = .type
+		|| tica = t.IsRole
+		if tica == otype.IsRole
+			//
+		  elseif tica
+			while t.IsRole
+				t = t.super
+		  else
+			while otype.IsRole
+				otype = otype.super
+		
+		for (CurrSuper.Upwards in OType)
+			if (t == CurrSuper)
+// .AllocSource just means it's some kinda awlloc function... at least that's what I want it to mean.
+				if (o.AllocSource or .ContainsMatch(o, TypeCast))
+					if (CurrSuper != otype)
+						return kSuperClassMatch
+					Return kSimpleMatch
+
+	
+	function CopyTypeInfoTo (|SCDecl| Dcl)
+		dcl.Type		= .Type
+		dcl.PointerCount= .PointerCount
+		dcl.Contains	= .Contains
+		(dcl Is UpgradeableContained) = self Is UpgradeableContained
+		dcl.AutoCastTo	= .AutoCastTo
+		dcl.C_array		= .C_array
+		dcl.compilercreated = self is compilercreated
+
+
+	function TypeContained (assigns:|scclass|)
+		.type = Value
+		.contains := Value.contained
+			
+		
+	function MakePointer (|SCDecl|)
+		if .PointerCount
+			return self
+		return .GetAddress
+
+
+	function GetAddress (|SCDecl|)
+		rz = SCDecl.new
+		.CopyTypeInfoTo(rz)
+		rz.name = .name // sigh... right?
+		rz.PointerCount++
+
+
+	function GetAddress0 (|SCDecl|)
+		opt norefcounts
+		rz = .getaddress
+		rz.c_array = 0
+
+	render
+		.WriteDeclFull.Render(fs)
+		
+	function SyntaxExpect
+		disabled  
+		print self
+
+	
+	function AutoCompleteName (|string|)
+		|| n = .realname
+		|| fs = faststring()
+		fs <~ n
+		fs <~ (' ', (32-n.length) max 1)
+		fs <~ '|'
+		fs <~ .WriteType
+		fs <~ '|'
+		return fs
+		
+
+	function WriteDeclFull (|String| DeclName = "", |bool| minimal = false, |Message|)
+		DeclName := .Name
+		expect DeclName or !.default
+		
+		if DeclName
+			return .WriteDeclSub(DeclName, minimal)
+		return «decl, .WriteType(minimal) »
+	
+
+	function RenderTypeAndName (|bool|minimal,|string|)
+		return .WriteDeclTypeAndName("", minimal).render
+	
+	
+	function WriteDeclTypeAndName (|String| Name, |bool| minimal, |Message|)
+		name := .Name
+		return « decl,  .WriteType(minimal),  «Thg name » »
+	
+	
+	function WriteDeclSub (|String| Name, |bool|minimal, |Message|)
+		|| dcl = «decl, .WriteType(minimal) »
+		|| def = .Default oar .Type.defawlt
+		if !def or .pointercount
+			def = «thg "nil"»
+		  else
+			def = def.copy
+
+		if (.Contains)
+			def = «type ":)"
+				def
+				«adj // seems OK :P
+					«Thg .Contains.Type.Name »
+					«Thg .Type.Name »
+				»
+			»
+		
+		dcl <~ «rel
+			«Thg name »
+			«opp "="»
+			def
+		»
+	
+		Return dcl
+	
+
+	function IsNormalStruct (|bool|)
+		return .Type.IsStruct and !.PointerCount and !.C_Array
+
+
+	function IsSwappable (|bool|)
+		require !.C_Array
+		if .pointercount
+			return true
+		return !.Type.IsStruct
+
+
+	function IsInteger (|bool|)
+		return .IsDataType and .type.TypeInfo.isint
+
+
+	function IsDataType (|bool|)
+		return .Type.Isdatatype and !.PointerCount and !.C_Array
+
+	function IsProto (|bool|)
+		return .Type.FuncProto
+
+
+	function IsNormalObject (|bool|)
+		return (!.PointerCount) and (!.IsNil) and (.Type.IsObject) and (!.C_Array)
+
+
+	function IsReffedObject (|bool|)
+		return .isnormalobject and (self isnt borrowed) 
+
+
+	function IsNormalNumber (|bool|)
+		return (!.C_Array) and (!.PointerCount) and (.Type.NumericCount == 1) 
+	
+	
+	function IsNormalBool (|bool|)
+		return (!.C_Array) and (!.PointerCount) and (.Type == typebool) 
+
+
+	function IsNumeric (|int|)
+		opt norefcounts
+		if (!.C_Array) and (!.PointerCount)
+			return .Type.NumericCount
+
+
+	function TypeInfo (|DataTypeCode|)
+		opt norefcounts
+		if (!.C_Array) and (!.PointerCount)
+			return .Type.typeinfo
+
+
+	function MiniMatch (|SCDecl| O, |int| TypeCast = 0, |bool|)
+		Return .Match( o, TypeCast, nil )
+
+	
+	function SCObject.ShouldUnWrap (|bool|)
+		if (self isa SCDecl)
+			return (.AutoCastTo) and (self isnt NewlyCreated)
+
+	
+	function CanWrap (|bool|)
+		if (.pointercount)
+			return true
+
+		if (.type.funcproto)
+			return true
+
+		require !.IsNormalStruct
+		require !.C_Array
+		require .type.TypeInfo!=DataTypeCode.UnusedType
+		return true
+
+
+	function MakeContainedObject
+		if (.contains)
+			.contains = .contains.MakeAsObject(self, .source)
+
+
+	function NewWrapperSub (|scdecl| CastTo, |scdecl|)
+		rz.AutoCastTo = CastTo
+		rz.contains = castto
+		rz.Type = typewrapper
+
+	
+	function NewWrapper (|scdecl| CastTo, |scdecl|)
+		ifn castto and castto.isnormal
+			return .NewWrapperSub(castto)
+
+		|| it = .type.DataTypeWrapper
+			return it
+		rz = .newwrappersub(castto)
+		.type.datatypewrapper = rz 
+	
+	
+	function MakeAsObject (|SCDecl| Container, |Message| ErrPlace, |scdecl|)
+		|| NormalContained = container.type.contained#require
+		if (.IsNormalObject)
+			expect (NormalContained.isnormalobject) (errplace, "This doesn't contain objects.")
+			return self
+
+		  elseif !NormalContained.isnormalobject
+			return self // yeah not very precise, but good enough for now!
+		
+		
+		expect .CanWrap (ErrPlace, "Can't store this type as an object (in this version of speedie).")
+		return .NewWrapper(self)
+	
+	
+	function SCClass.GoUpTo (|int|d, |SCClass|)
+		|| s = self
+		while (s and s.depth > d)
+			s = s.super
+		return s
+	
+
+	function HighestArrayContainMatch (|SCDecl| Other, |Message| exp, |SCDecl|)
+		rz = .highestmatch(other, exp)
+		rz := self
+		
+	function HighestMatch (|SCDecl| Other, |Message| exp, |SCDecl|)
+		opt norefcounts
+		require Other
+		|| M = .type
+		|| o = other.type
+
+		require !(o == m)
+
+		if (o.depth > m.depth)
+			o = o.GoUpTo(m.depth)
+		  elseif (o.depth < m.depth)
+			m = m.GoUpTo(o.depth)
+
+		while (o != m) and (o.super)
+			o = o.super
+			m = m.super
+		return o.typenormal
+
+
+	function Message.ExpectClass (|SCDecl| slf, |SCClass| Cls, |bool|)
+		return slf.expectmatch(cls.typenormal, 0, self, self) 
+	
+
+	function ExpectMatch (|SCDecl| O, |int| TypeCast, |Message| exp, |Message| ErrNode = nil, |Message|)
+		|| Matched = .Match(O, TypeCast, exp)
+		if (Matched == kCastedMatch or kLossyCastedMatch)
+			return exp.CastedParent
+
+		  elseif (Matched == kNoMatch)
+			ErrNode := exp
+			error ( ErrNode, "Type mismatch, expected '${.RenderTypeName}' but found '${o.RenderTypeName}'." )
+			.Match(O, TypeCast, exp)
+
+		return exp
+
+
+	function SCClass.MatchType (|SCDecl|Other, |message| exp, |bool|)
+		return .typenormal.ExpectMatch(other, ktypecastfalse, exp, exp)
+
+
+	operator isobj (|SCClass| type, |bool|)
+		return self and (.type == type) and (.isnormalobject)
+
+
+	function isptr (|scclass|type, |bool|)
+		return self and (.type == type) and .pointercount == 1
+
+		
+	operator isa_not_stupid (|SCClass| O, |bool|)
+		if o and self
+			return O.TypeNormal.matchC(self)
+		// same as operator isa but not backwards :(
+
+	
+	operator isa (|SCDecl| O, |bool|)
+		cpp_part IsaDecl
+		// should disable/deprecate this
+		return .matchC(O)
+
+
+	operator isa (|string| s, |bool|)
+		cpp_Part IsaStr
+		if self
+			return .isnormal and .type.name ~= s
+	
+
+	operator isa (|SCClass| O, |bool|)
+		if o and self
+			return self isa O.TypeNormal
+	
+	
+	function isuintlike (|bool|)
+		|| t = .type.typeinfo
+		require .isnormal and .isdatatype and t.isint
+		return !t.IsSigned
+
+	
+	function MakeSignedIfPossible (|SCDecl|)
+		if .type.signed
+			return .type.Signed
+		return self
+		
+	
+	function MatchC (|SCDecl| O, |bool|)
+		Return .Match( o, kTypeCastTrue, nil )
+
+
+	function ClassActReplace (|scclass| cls, |scdecl|)
+		if .matchc(cls.typenormal)
+			return cls.typenormal
+		return self
+
+		
+	function ContainedReplace (|scclass| DotCls, |SCDecl| contains, |bool| NeedsName,  |SCDecl|)
+		opt NoRefCounts
+		// handles   " ...  --> string "     (.iscontained)
+		//    or     "[...] -->[string]"     (.contains.iscontained)
+
+		if (self Is UpgradeableContained) and Contains
+			if  !needsname and .SameForReplace(contains)
+				return contains
+			|| C = contains.copy				#require
+			(C is borrowed) = self is borrowed
+			C.PointerCount = .PointerCount
+			C.C_array = .C_array
+			if NeedsName
+				c.name = .name
+				(C is UpgradeableContained) = (C.type != .type)
+			Return C // unless??
+
+		|| goddamn = .contains
+			if (goddamn Is UpgradeableContained) and (goddamn != contains)
+				|| result = .Copy
+				result.Contains = contains
+				Return result
+		
+		Return self
+	
+
+	function SameForReplace (|SCDecl| c, |bool|)
+		require (c is borrowed) == (self is borrowed) 
+		require c.PointerCount == .PointerCount 
+		require c.C_array      == .C_array
+		return true 
+
+
+	function IsNormal (|bool|)
+		debugger .Type
+		return (!.PointerCount) and (!.IsNil) and !.C_Array
+
+
+	function AlreadyContains (|scdecl| c, |bool|)
+		opt norefcounts
+		|| ty = .type.contained
+			return c.MiniMatch(ty)
+		
+		
+	function WriteType (|bool|minimal=false, |Message|)
+		opt norefcounts
+		ifn .Contains
+			return .WriteSimpleType
+		if minimal and .AlreadyContains(.contains)
+			return .WriteSimpleType
+		return «adj
+			«thg .Contains.Type.Name »
+			.WriteSimpleType
+		»
+		
+
+
+	function WriteSimpleType (|Message|)
+		require self
+
+		|| name = (.type.Name, "(nil!)")(.type)
+		rz = «Thg name »
+		for (.pointercount|int|)
+			rz = «Brel "&", rz »
+		if (.c_Array)
+			rz = «acc 
+				rz
+				«arr
+					«num .c_array »
+				»
+			»
+	
+	
+	function CreateSimpleTypeCast (|Message| exp, |Message|)
+		|| Curr = exp
+		While (curr == @bra)
+			Curr.obj = self
+			curr = curr.first
+
+		rz = @type.msg(":)")
+		// (s) --> (s|bool|)
+
+		exp.ReplaceWith( rz )
+		rz <~ exp
+		rz <~ .WriteType
+		rz.obj = self
+
+	function RenderType (|string|)
+		return .WriteType.render
+
+	function CantBeNilInCpp (|bool|)
+		require !.pointercount
+		return (.C_array) or (.type.IsStruct) or (.isnumeric > 1) 
+
+
+	function CreateStructNil (|message| errs, |Message|)
+		using (errs)
+		|| Arg = «arg »
+		Arg.obj = self
+		if (.C_Array)
+			return Arg
+		
+		rz = «type ":)"
+			Arg
+			.WriteType
+		»
+		rz.obj = self
+	
+
+	function message.createnil (|message|)
+		using (self)
+		rz = «Thg "nil"»
+		rz.Obj = TypeNil
+
+
+	function CreateDefault (|message| errs, |bool|isfunc=true, |Message|)
+		if (.CantBeNilInCpp) // in case we are storing objects... need to have non-corrupt data.
+			if isfunc
+				return .CreateStructNil(errs)
+			return nil
+
+		if (.PointerCount)
+			if isfunc
+				return errs.createnil
+			return nil
+
+		return .Type.defawlt.copy(errs)
+
+
+	function CanUseDefault (|bool|)
+		if .IsNil
+			debugger
+			return false
+
+		debugger .type
+		if (.Type.IsStruct and !.PointerCount)
+			return (.IsNormalStruct)
+		return true
+
+
+	function IsReffable (|bool| SetOnly, |bool|)
+		require (!.PointerCount)
+		require (.Type)
+		require (.Type.IsObject)
+		require (!.Strength)
+		require (!(SetOnly and (self Is Borrowed)))
+
+		Return true
+
+
+	function HasStruct (|bool|)
+		opt norefcounts
+		require (!.PointerCount)
+		|| T = .type
+		debug_require (T)
+		return T.isstruct
+	
+	
+	function HasStructDestructor (|SCFunction|)
+		if .HasStruct
+			return .type.destructorfunc
+
+
+	function reallycontains (|scdecl|)
+		opt norefcounts
+		|| c = .contains oar .type.contained
+		if c and c.type != self.type
+			return c
+
+		
+	function AsPointer (|SCDecl|)
+		rz = .Copy // A pointer to a borrowed thing? Possible! No difference. Just keep.
+		rz.PointerCount++
+
+	
+	function ContainsMatch (|SCDecl| o, |int| TypeCast, |bool|)
+		opt norefcounts
+		if (TypeCast & kTypeCastIgnoreContained)
+			return true // for now
+
+		|| oc = o.reallycontains
+		|| sc =  .reallycontains
+		if (oc == sc) or !(sc and oc)
+			Return true
+		
+		// OK so what cases do we have?
+		// array of nil				vs array of object 
+		// fixeddict of nil			vs fixeddict of string
+		// we can allow "of nil" to match any... i guess?
+		// the thing is... how to reject matches?
+		// like array of nil being passed into param of array of message?
+		
+		
+		if !o.contains
+			return true
+		Return sc.Match( oc, 0 ).IsNormalMatch
+
+
+	function MakeBorrowed (|SCDecl|)
+		if self Is Borrowed
+			Return self
+		
+		rz = .Copy				// only used in extractdecl. Avoids modifying original.
+		(rz Is Borrowed)
+
+
+	function RefineDecl (|message| list, |SCDecl|)
+		rz = .Copy
+		for p in list
+			if (p isthing "tag")
+				(rz is borrowed) = options.projectislibrary
+			  elseif (p isthing "api")
+				rz.isapi = true
+			  else
+				error p
+
+
+	function Message.WrapExpr (|scdecl| src, |int|)
+		if !self
+			Return kNeedsTypeCast
+
+		|| W = «dot "new"
+			«thg "datatypewrapper"»
+			«emb »
+		»
+		if src.isfloat
+			w.name = "newfloat" // sigh
+		.ReplaceWith(W)
+		W.last <~ self
+		TypeOfExpr(W, compiler.program)
+		|| D = .AsDecl
+			w.obj = D.NewWrapper(D)
+		  else
+			debugger
+		
+		return kCastedmatch
+	
+	
+	function UnWrapDataType (|message| exp, |scbase| name_space, |scdecl|)
+		rz = .AutoCastTo
+		|| ExpReplacement = exp.func.msg(exp.name)
+		ExpReplacement.obj = exp.obj
+		for s in exp
+			ExpReplacement <~ s 
+		
+		exp.func = @type
+		exp <~ «dot "Value"
+			ExpReplacement
+			«prm »
+		»
+		exp <~ «thg rz.type.name »
+	
+	
+	function Message.CastToBool (|SCBase|name_space=nil, |int|)
+		return .castToType("bool", TypeBool, name_space, kLossycastedmatch)
+
+	function Message.CastToInt (|SCBase|name_space=nil, |int|)
+		return .CastToType("int", TypeInt, name_space)
+
+	function Message.CastToVoidPtr (|SCBase|name_space=nil, |int|)
+		return .CastToType("_voidptr", compiler.._voidptr, name_space)
+
+	function Message.CastTo (|string|type, |SCBase|name_space=nil, |int|)
+		return .CastToType(type, compiler[type], name_space)
+
+	function Message.CastToClass (|scclass|type, |SCBase|name_space=nil, |int|)
+		return .CastToType(type.name, type, name_space)
+
+
+	function Message.CastToType (|string| TypeName, |SCClass| type, |SCBase| name_space, |int| loss = kCastedMatch, |int|)
+		if (!self)
+			// its not "loss" here? or else we get kcastedmatch on things that
+			// aren't casted.
+			Return kNeedsTypeCast (|) loss
+
+
+		if (name_Space)
+			TypeOfExpr(self, name_space)
+		  elseif (.obj)
+			|| FoundType = TypeOfExprMaybeNil(self, name_Space)
+			if FoundType and FoundType.type.isstruct
+				expect FoundType.PointerCount (self, "Can't typecast a struct!")
+
+
+		|| cst = «type ":)" »
+		.ReplaceWith( cst )
+		cst <~ self
+		cst <~ «thg typeName »
+		
+		cst.obj = Type.TypeNormal	 // hmmm.... why not do it anyhow?
+		Return loss	
+
+	
+	function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
+		if !self
+			Return kNeedsAddressOf
+		
+		|| Addr = «brel "&"»
+		.ReplaceWith( Addr )
+
+		|| inside = self
+		if WasCArray
+			inside = «acc 
+				self
+				«arr 
+					«num "0"»
+				»
+			»
+		
+		Addr <~ inside
+		Addr.obj = Type
+		Return kAddressOfMatch
+	
+	
+	function Message.GetAddressOf2
+		|| sigh = .func + .name
+		sigh.takeallfrom(self)
+		.name = "&"
+		.func = @brel
+		self <~ sigh
+
+
+	function ExpectMatchRel (|SCDecl| O,  |Message| exp,  |Message| side,  |Message| ErrNode = nil)
+		// Just like ExpectMatch, except also does strength transformations...
+		// and always does type-casting. and returns nothing.
+		
+		|| Cast = kTypeCastTrue
+		if !side
+			Cast |= kTypeCastBothWays
+		
+		.ExpectMatch( O, Cast, exp, ErrNode )
+		require (exp and (.Strength > o.Strength) and exp.IsSetIntoPlace)
+		if !.isnumeric						   // sigh. seems to fuck up the var if I modify self.
+			expect (.Type.SelfStrong != self)  (exp, "You can’t modify 'self'.")
+		
+		exp.MsgOwningFunc.RefSmooth( self )
+
+
+	function WriteNilRel (|Message|)
+		return NewRel( .Name, "=", "nil" )
+
+	
+	function WriteNilDecl (|Message|)
+		opt norefcounts
+		|| dcl = «decl
+			.WriteType
+			.WriteNilRel
+		»
+		dcl.obj = self
+		dcl.Last.obj = self
+		dcl.Last.First.Obj = self
+		Return dcl
+
+
+	function WriteTypeCast (|Message| msg, |Message|)
+		|| TheType = «type ":)"
+			msg
+			.WriteType
+		»
+
+		TheType.Obj = self // Does InitRootDecl actually want this?
+		return TheType
+
+
+	render RenderTypeName 
+		if !self
+			fs <~ "(nil!)"
+		  else 
+			if (.IsNil) 
+				fs <~ "nil"
+			  else 
+				fs <~ ( '&', .PointerCount )
+				fs <~ .Type.Name
+			
+			if (.c_array) 
+				fs <~ '['
+				fs <~ .c_Array|int|
+				fs <~ ']'
+			
+			if .contains and !.contains.minimatch(.type.contained, 0) 
+				fs <~ " of "
+				fs <~ .contains.type.name
+
+}
+
+
+function IsPointerMath (|SCDecl|L, |SCDecl|R, |SCOperator| opp, |Message|exp, |SCDecl|)
+	require (opp.name == "+" or "-")
+	if (L.PointerCount) and (R.IsNumeric == 1)
+		return L
+	if (R.PointerCount) and (L.IsNumeric == 1)
+		return R
+	if (R.PointerCount) and (L.PointerCount) and (opp.name == "-")
+		L.ExpectMatch(R, 0, exp)
+		return TypeInt.TypeNormal
+
+
+function Message.RenderType (|string|)
+	debug_require self
+	|| D = .obj
+	if (D isa SCDecl)
+		return D.WriteSimpleType.Render
+	return .Render
+
+
+function scdecl.TypeIsReached (|bool|)
+	return (.type is Reached)
+
+
+function scdecl.ByteSize (|int|)
+	opt norefcounts
+	if .PointerCount
+		return platform.PointerBytes
+	|| n = .type.CalculateSize
+	if .C_Array
+		n *= .C_Array
+	return N
+
+
+
+class GUIControl (ringtree)
+	contains GUIControl 
+	|int| xyz
+	constructor (|guicontrol|p)
+		super.constructor(p)
+	
+
+class TreeView (GUIControl)
+	|int| abc
+
+
+role StretchControl (GUIControl)
+	function xxxtest (|guicontrol| p)
+		visible
+		Target true
+			|| g = stretchcontrol(p)
+		// we need a new-func added to stretch-control
+		// same func in two places
+
+
+role TreeViewRow (message)
+	contains TreeViewRow
+	function ViewRoot (|TreeViewRoot|)
+		
+	function FindOwner (|TreeView|)
+		return .ViewRoot$.rowowner
+
+
+role TreeViewRoot (TreeViewrow)
+	contains TreeViewRow
+	function RowOwner (|TreeView|)
+		|| o = .obj
+		if o isa TreeView
+			return o
+

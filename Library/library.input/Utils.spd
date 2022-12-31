@@ -1,0 +1,33 @@
+
+// allow the short sort of one-liners that other languages have...
+// good for demos and language-tests
+
+function dictionary.sort (|SorterComparer| fn, |int| count, |[...]|)
+	|| tmp = .values // a more efficient sorter could extract only needed
+	tmp.sort(fn)
+	for i in count
+		rz <~ tmp[i]
+
+function message.AllNames (|[string]|)
+	opt norefcounts
+	for s in self
+		rz <~ s.name
+
+extend_module file
+	function Dictionary (|file|)
+		disabled "Use .words"
+		
+	function Words (|file|)
+		return "/usr/share/dict/words".file
+		
+function string.Dict (|byte|sep='\n', |dictionary|)
+	|| fi = StringFields.new( self, sep )
+	rz = Dictionary()
+	for l in fi
+		if l
+			rz[l] = "x"
+
+function string.Sort (|byte| sep = '\n', |string|)
+	|| x = .split(sep)
+	x.Sort(StringSorter)
+	return Join2(x, string[sep])

@@ -1,0 +1,566 @@
+
+ 
+function FileSepClicker (guiaction)
+	opt norefcounts
+	.ide.ViewAsSwap
+
+
+function IdeAddProj (|string| path, |PerryIDE| ide = nil, |PerryIDE|)
+	|| old = perry.FindProj(path)
+		ClickedTabs(nil, old)
+		return old.obj|PerryIDE|
+	ide := PerryIDE.EmptyBase
+	ide := PerryIDE(false)
+	ide.LoadProject(path.file)
+	ide.Show(false)
+	perry.Readjust
+	return ide
+
+
+function perryide.EmptyMainFile (|string| name, |string|)
+	return "
+
+// Basic empty file
+main
+	\"Hello $name!\"
+
+"
+
+
+function perryide.CreateBasicFiles (|file| proj)
+	|| main = proj["input/main.spd"]
+	proj[".perry"].filedata = qqfiles.Roots
+	main.data = .EmptyMainFile(proj.trimextandpath)
+	proj["input/.todo"].FileData = qqfiles.Todo
+
+
+function string.TrimProj (|string|)
+	if .isproj
+		return .TrimExtAndPath
+	return self
+
+
+function PerryIDE.CreateProj (|string| path)
+	|| proj = path.file
+	expect (!proj.exists) (proj, "Can't create over existing project.")
+	.CreateBasicFiles(proj)
+	IdeAddProj(path)
+
+
+function ClickedOpenProj (GUIaction)
+	|| start		= "~/".Resolve.Child("Speedie")
+	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project")	#require
+	|| better_path	= path.GetSpeedieProj("scproj")
+		IdeAddProj(better_path)
+	  else
+		IdeAddProj(path)
+	perry.HideStartIfNeeded
+		
+
+function ClickedCreateProj (GUIAction)
+	|| i = .ide
+	|| it = app.AskSave("scproj/",  "",  .id,  "Create")
+		i.CreateProj(it)
+	perry.HideStartIfNeeded
+
+
+function ClickedOpenFile (GUIaction)
+	|| file = app.askopen("",  "",  "Open File")
+		ideaddproj(file)
+	perry.HideStartIfNeeded
+
+
+function ClickedCreateFile (GUIaction)
+	|| path = app.AskSave("",  "",  .id,  "New")
+		if path.file.Create
+			ideaddproj(path)
+	perry.HideStartIfNeeded
+
+
+function perry.HideStartifneeded
+	require .projects.hasany
+	startupwindow.hide
+		
+	
+function ClickedTabs (GUIAction)
+	if row
+		row.obj|PerryIDE|.show
+		
+
+function RightClickedTabs (GUIAction)
+	if row and self isa ButtonView
+		.FillMenuPath(row.obj|PerryIDE|.Project.path, row)
+
+
+function ClickedBird (GUIAction)
+	sdlapp.size = (414,256)
+	birdwindow().show
+
+
+function ClickedToolbar (GUIAction)
+	opt norefcounts
+	|| w = .ide
+	if self isa buttonview
+		if w and (.clickcount == 2)
+			w.ViewAsSwap
+
+
+function file.InputFol (|file|)
+	for c.files in self
+		if c.name ~= "input" or c isa "input"
+			return c
+
+
+function file.FindProjectMain (|file|)
+	|| inp = .inputfol
+	|| best = inp["main.spd"]
+	if best.exists
+		return best
+	best = inp["index.spd"]
+	if best.exists
+		return best
+	for c.files in inp
+		if c isa "spd"
+			return c
+
+
+function PerryIDE.FindNotTodo (|bool|)
+	.nottodo := .findfirstpath("./main.spd")
+	.nottodo := .findfirstpath("./index.spd")
+	|| F = .MainProjFol
+	.nottodo := f.first
+	return .nottodo
+
+
+function PerryIDE.ClickedTodo
+	|| todo	= .mainprojFol #require
+	|| fl	= .filelist
+	require .findnottodo
+	|| Jumpback = (todo is selected) and .nottodo and (fl.listsource contains .nottodo) 
+		todo = .nottodo
+		fl.show(todo)
+		fl.scrolljump
+	  else
+		.nottodo = fl.sel|filerow|
+	fl.SelectNoShow(todo)
+
+
+function HeldReleaseButton (GUIaction)
+	if self isa buttonview
+		if !.OpenMenu
+			.ide.notify("No build-tasks exist.")
+
+
+function ClickedRelease (GUIaction)
+	debugat
+	return false
+	|| name = .tag
+	if name isa string
+		.ide.compile("compile", name)
+	  else
+		beep
+
+
+function ClickedDebug (GUIAction)
+	|| i = .ide
+	i.compile("debug")
+
+
+function fnBuildIsDead (fnConfirmCanceller)
+	if self isa perryide
+		.SpeedieMsgReceive(.compilr)
+		if !.compilr.alive
+			.CancelCompile // will return false in ClickedCancel if we return true here.
+			return true
+
+
+function Perryide.Building (|bool|) // .isbuilding, .iscompiling, .compiling 
+	return .progress is visible
+
+
+function ClickedCancel (GUIAction)
+	|| i = .ide
+	require i.building
+	|| can = ConfirmCanceller(i, fnBuildIsDead)
+	if "Cancel Build of ${i.project.trimproj}?".confirm(can)
+		i.CancelCompile
+	  else
+		rz = true
+		
+
+function ClickedCompile (GUIaction)
+	.ide.compile("compile")
+
+		
+function PerryFileRenamed (guilistevent)
+	.ide.recheck
+
+
+function ReturnProjectPath (GUIListEvent)
+	if row isa filerow
+		row.location.reveal
+	return true
+
+
+function ReturnAllFuncs (GUIListEvent)
+	|| e = .ide.EditMe
+	e.ShowAndSel(row.position)
+	e.SetFocus
+	return true
+
+	
+function buttonview.FillMenuPath (|string| L, |listviewrow| row=nil)
+	opt norefcounts
+	|| p = .submenu
+	|| orig = l
+	p.listsource.clear
+	while l
+		|| S = filerow.icon(l, "").render + " " + l.volumename
+		p <~ filerow(l, s, (".nothing", "")(l != orig))
+		if l.IsVolume
+			exit
+		l = l.parent
+	.OpenMenu(row)
+
+	
+function OpenProjectPath (GUIaction)
+	|| f = .ide.filelist.sel
+	if (f isa filerow) and (self isa buttonview)
+		.FillMenuPath(f.location)
+
+
+function ClickedStatus (GUIaction)
+	.ide.editme.ShowParseError
+
+
+function ClickedStats (GUIaction)
+	.ide.clickedstats
+
+
+function PerryIDE.EnablePrevnext
+	opt norefcounts
+	|| m = .PrevMarker
+	(.gonext is enabled) = m and m.next
+	(.goprev is enabled) = m and m.prev
+
+
+function perryide.AddToJumpHistory
+	require .EnableHistoryChanges
+	|| where = message()
+	|| old = .previous.find(where)
+		where = old
+	  else
+		.Mark(where)
+
+	|| p = .PrevMarker			// .shunt all after prevmarker... before it.
+		if p.parent != .previous
+		while (|| x = p.next)
+			p.prev = x
+			
+	.previous <~ where
+	.prevmarker = where
+	if .prevmarker.parent != .previous
+	.previous.keep(40, false)
+	.EnablePrevNext
+
+
+function RightClickNext (GUIaction)
+	if self isa ButtonView
+		require .SubMenu // where.owning_func
+		.SubMenu.ListSource = .ide.SortedPrevious
+		.OpenMenu
+
+
+function ChosePrevItem (GUIListEvent)
+	.ide.GoToMarker(row)
+	return true
+
+
+function PerryIDE.GoToMarker (|message| m)
+	if m
+		.mark(.prevmarker)
+		.prevmarker = m
+		if m.parent != .previous
+		.EnableHistoryChanges = false
+		|| l = m.first
+		.filelist.QuickOpenFileSub(m.name, l.name, "", 2)
+		.editme.scrollpos = l.first.int
+		.EnableHistoryChanges = true
+	.EnablePrevNext
+
+	
+function perryide.SortedPrevious (|message|)
+	|dictionary of message| s = dictionary()
+	for ch in .previous
+		|| n = ch[2].name
+		|| old = s[n]
+			old.remove
+		s[n] = ch
+	return .previous
+	
+
+function PerryIDE.Mark (|message| m)
+	m.clear
+	m.become(@tmp, .currpath)
+	|| line = (@num + .editme.currline) 
+	line <~ .editme.scrollpos
+	m <~ line
+	|| name = .CurrPath.name.widen(16)
+	|| fnname = ""
+	|| msg = .Editme.ClickedMsg
+		|| fn = msg.owning_func
+			fnname = fn.OwningFullName(@emb).render
+			name += " (" + fnname + ")"
+	
+	m <~ name
+	m <~ .currpath + "/" + fnname
+
+
+function ClickedPrevNext (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	|| m = i.PrevMarker
+		m = m.step(self == i.gonext)
+		i.GoToMarker(m)
+		return true
+	
+
+function PerryIDE.ShowErrors (|bool| FromKeys, |bool|)
+	opt norefcounts
+	.SaveEditing
+	.recheck
+	|| t = .istextonly
+	.viewasproject
+	if t and .isviewing(.errorlist)
+		return true
+	if !.isviewing(.errorlist)
+		ClickedAView(.ViewErrors)
+	  elseif .errorlist.hasany
+		.ShowNextError
+	  else
+		ClickedAView(.Viewfiles)
+	
+	return true
+
+
+function ClickedAView (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	if (i.errorlist is visible) and .tag == i.errorlist
+		i.ShowNextError(0)
+	i.view(self|buttonview|)
+
+
+function ClickedNoNeed (GUIaction)
+	opt norefcounts
+	if .tag
+		.ide.view(.tag|buttonview|)	
+
+
+function PerryIDE.SelTextParse (|bool|)
+	opt norefcounts
+	|| e = .editme
+	if !e.selrange.width
+		e.DoSelectLine
+	|| s = e.seltext
+	if s == .OldJBCloser
+		.OldJBCloser = ""
+		.editsep.Collapse
+		.stdout.text = "" 
+		return true
+	.OldJBCloser = s
+	|error| where
+	|| msg = s.parsewitherror(where)
+	.stdout.text = (msg.renderast(0), where.render)(!where) 
+	.editsep.show
+	return true
+
+
+function PerryIDE.clickedfile (|bool|)
+	|| t = .editme.seltext.trim
+	if t[0] == '/'
+		|| it = t.inwhite
+			t = t[0, it]
+		if t.reveal
+			return true
+
+
+function PerryIDE.BatchPhind (|string| text, |bool|)
+	|| found = .filelist.BatchFind(text)
+	.foundlist.use(found)
+	.foundlist.setfocus
+	return found.hasany
+
+
+function PressedSelInfo (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	|| q = i.filelist.quickopen
+	q.text = "line "+i.editme.CurrLine.Render
+	i.filelist.showquickopen
+
+
+function PressedSearchKeys (GUIKeyEvent)
+	opt norefcounts
+	|| w = .ide
+	if key.isaccept
+		w.ViewAsProject
+		w.BatchPhind(.text)
+		if w.foundlist.isempty and .text
+			w.noneed("The search text “${.text}” wasn't found", nil)
+			perry.FindElseWhere(w, .text)
+		  else
+			w.noneed
+		return true
+	require key.iscancel
+	if .text
+		.text = ""
+	  else
+		w.view(W.viewfiles)
+	return true
+
+
+function EditMeSelChange (GUITextSelectionEvent)
+	opt norefcounts
+	|| i = .ide
+	i.popuphide
+	i.ShowRightStats
+	require !TextWasAltered and i.feedback.isopen
+	|| e = self|textview|
+	|| s = e.selrange
+	if s.width
+		e.PerryTryAutoComplete(s.x2, "autocomplete_sel", PerryAutoCompleteReason.sel)
+
+
+function EditMeSelError (GUITextErrorSelected)
+	opt norefcounts
+	|| i = .ide
+	|| el = i.errorlist
+	i.DuringMsgFB = true
+	el.select(error.error)
+	i.DuringMsgFB = false
+
+
+function PressedEditKeys (GUIKeyEvent)
+	opt norefcounts
+	require self|textview|.ExpectsParse >= 2
+	if key is Decl
+		return self|textview|.PerryDeclKey
+	
+	require key == -9 or -10 or 27
+	key = key.abs
+	return self|textview|.PerryInsertSyntax(key)
+
+
+function PerryIDE.MoveError (|error| row,  |string| p,  |int| i,  |error|)
+	opt norefcounts
+	while row
+		|| nrow = row.step(i>0) 
+		if !nrow or nrow.path != p
+			return row
+		row = nrow
+
+
+function PerryIDE.ClickedError (|error| row)
+	sdlapp.CompileStatus = row
+	require !.DuringMsgFB
+	|| f = row.path.file
+	if row.path != .editme.path
+		if f.IsNicelyViewable
+			.filelist.QuickOpenFile(f, 1)
+	.editme.ShowAndSel(row.position)
+	.editme.MyError = row
+
+
+function file.IsNicelyViewable (|bool|)
+	require .exists
+	require .size < 512KB
+	return !.readall.isbinary
+
+
+function PerryIDE.ClickedFind (|error| row)
+	|| p = row.path
+	.filelist.quickOpenFile(p, 1)
+	if row.position
+		.editme.ShowAndSel(row.position, .masssearchfield.text.length)
+	  else
+		row = row.first
+	|| curr = .MoveError(row, p, -1)
+	|| last = .MoveError(row, p,  1)
+	.editme.ClearFound
+
+	while curr
+		.editme.FoundAt(curr.position, row == curr)
+		if curr == last
+			exit
+		curr++
+
+	
+function ClickedError (GUIListEvent)
+	if row isa error
+		|| ide	= .ide
+		if self == ide.errorlist
+			ide.ClickedError(row)
+		  else
+			ide.clickedfind(row)
+	return true
+
+
+function ClickedLog (GUIListEvent)
+	|| i = .ide
+	if i.stdout is visible
+		i.stdout.text = row.name
+	return true
+
+
+function LogAreaKeys (GuiKeyEvent)
+	if key is lgui
+		return false
+	if key iscmd keys.k
+		|| s = .ide.sendrecv
+		if s and "Clear log?\n\nContains ${s.slowcount} items.".confirm
+			s.clear
+		return true
+
+function ReturnErrorList (GuiListEvent)
+	.select(row)
+	.ide.editme.setfocus
+	return true
+
+
+function FoundListKeys (GuiKeyEvent)
+	if key.isdelete
+		if self isa listview
+			.removerow(.sel)
+		return true
+
+
+function SelectedFile (GuiListevent)
+	if row isa FileRow
+		return .ide.EditTextFile(row)
+
+
+function RightClickErrorList (GUIListEvent)
+	opt NoRefCounts
+	if self isa FileViewer
+		|| m = .newcmm
+		m <~ ("Copy File Path",			FileListCopyPath)
+		m <~ ("Show In Finder",			FileListCMMShow)
+		m <~ ("Show In Project",		ProjectCMMShow)
+	return true
+
+
+function ProjectCMMShow (GuiMenuEvent)
+	|| row = clicked.original
+	if row isa error
+		|| i = .ide
+		i.clickederror(row)
+		i.view(i.viewfiles)
+
+
+function perry.FindElseWhere (|perryide| ignore, |string| find)
+	for w in perry.OpenProj
+		if (w != ignore) and w.BatchPhind(find)
+			if "$find not found here, but was found in '${w.name}'.\n\nTake a look?".confirm
+				w.show
+			return

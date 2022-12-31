@@ -1,0 +1,526 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+class File (String)
+	linkage
+		cpp_class JB_File
+		wrapper
+	default			nil
+	|int|		Descriptor
+
+	constants
+		IgnoreErrors = true
+		O_CREAT	 = 0x200			/* create if nonexistant */
+		O_TRUNC	 = 0x400			/* truncate to zero length */
+		O_EXCL   = 0x800			/* error if already exists */
+		O_APPEND = 0x008			/* set append mode */
+		O_RDONLY = 0x000			/* open for reading only */
+		O_WRONLY = 0x001			/* open for writing only */
+		O_RDWR   = 0x002			/* open for reading and writing */
+
+////////////////////////////////////////////////////////////////////////////
+
+	constructor ( |string| path = "" )
+		cpp_wrapper JB_File_Constructor
+	
+	destructor
+		cpp_wrapper JB_File_Destructor
+
+	function Mode (|FileMode|)
+		cpp_Wrapper JB_File_Mode
+	
+	function path (|string|)
+		cpp_Wrapper JB_File_Path
+
+	function Mode (assigns:|FileMode|)
+		cpp_Wrapper JB_File_ModeSet
+
+	function LinkTo (|string|)
+		cpp_wrapper JB_File_LinkToGet
+
+	function StringZeroTerminated.LinkFrom (assigns:|file|, |errorint|)
+		cpp_wrapper JB_Str_LinkFrom
+
+	function LinkTo (assigns:|string|, |errorint|)
+		// linkfrom cos the unix c-api has idiotic params 
+		return Value.cstr.LinkFrom(self)
+
+	function HardLinkTo (assigns:|stringzeroterminated|, |bool|)
+		cpp_wrapper JB_File_HardLinkTo 
+
+	function Opened (|bool|)
+		return .descriptor >= 0
+
+	function Name (assigns:|string|Name, |errorint|)
+		return .MoveTo( super.Parent[Name] )
+	
+	syntax cast (|bool|)
+		return self!=nil
+	syntax equals (|string|s, |bool| aware, |bool|)
+		if self != nil
+			return super.syntaxequals(s, aware)
+			
+	function Length (|int|)
+		disabled "Do you mean the file's size or the file's path length?" 
+	
+	function Size (|uint64|)
+		cpp_wrapper JB_File_Size
+
+	function Size (assigns:|int|N)
+		cpp_wrapper JB_File_SizeSet
+
+	function Created (|Date|)
+		cpp_wrapper JB_File_Created
+
+	function Create (|bool|)
+		cpp_wrapper JB_File_Create
+
+	function Close
+		cpp_wrapper JB_File_Close
+	
+	function Write (|string| Data, |ind|)
+		cpp_wrapper JB_File_Write
+	
+	Syntax Append (|string| data)
+		// .offset = -1 // sigh seems to caus issues
+		.write(Data)
+	
+	function visible (|bool|)
+		return .name[0] != '.'
+		
+	function hidden (|bool|)
+		return !.visible
+
+	function SmartData (assigns:|String| nieu, |bool|)
+		if (.size != nieu.length) or (.readall(true) != nieu)
+			return .data(Nieu)
+	
+	operator plus (|string|s, |file|)
+		return (super+S).file
+	
+	
+	function Data (assigns:|String|Data, |bool|)
+		cpp_wrapper JB_File_DataSet
+	
+	
+	function ReadSafely (|int| lim = 128MB, |bool| AllowMissing = true, |StringThatWasReadSafely|)
+		opt norefcounts
+		return .readall(lim, allowmissing)
+	
+	
+	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |messageroot|)
+		// file.parse keeps track of the source+path
+		// if you don't want that for memory's sake, use file.data.parse
+		|| f = .Resolve(allowmissing).file
+			|| S = f.readsafely(lim, allowmissing)
+				|memorylayer--| L = (Message).CreateLayer(f) // these 3 lines should be one
+				L.use      // 2
+				L.obj2 = S // 3 // data set here, path set in createlayer 
+				rz = S.parse
+				(message).restore
+
+	
+	function Modified (|Date|)
+		cpp_wrapper JB_File_Modified
+
+
+	function Peek (|int| n, |string|)
+		|| i = .offset
+		rz = .read(n)
+		.offset = i
+	
+	syntax access (|int| a, |int| b, |string|)
+		cpp_part AccessPeek
+		|| Wasopen = .descriptor
+		if .open
+			.offset = a
+			rz = .read(b-a)
+		if wasopen < 0
+			.close
+
+	function IsCompressed (|bool|)
+		return self[0,10].iscompressed
+
+
+	function RelFile (|file|)
+		|| cd = app.cwd.pathdir
+		return .trimstart(cd).File
+
+	render 
+		cpp_wrapper
+
+
+	function Child (|string| name, |bool| errs=false, |File|)
+		if name
+			|| f = File( .PathDir + Name.trimstart("/") )
+			if (!errs or f.exists)
+				return f
+			error (Self, "Can't find file/folder: '$name' in '${super}'." )
+		error (Self, "No name specified for sub-file of directory: " + self)
+	
+	
+	function Parent (|File|)
+		return File.new( super.Parent )
+	
+	function touch (|errorint|)
+		return "/usr/bin/touch".execute([self])
+		
+	
+	function Compare (|File| A, |bool|)
+		cpp_part FileCompare
+		require (.Size == A.Size)
+		.Open(O_RDONLY)
+		A.Open(O_RDONLY)
+		
+		while {
+			|| S_ = .Read(64K)
+			|| SA = A.Read(64K)
+			require (S_ == SA)
+		} (S_)
+		
+		.Close
+		A.Close
+
+		return true
+
+	
+	function Compare (|String|S, |bool|)
+		return (.Size == S.Length) and (.ReadAll(true) == S)
+
+	
+	function ReadAll (|int| lim = 128MB, |bool| AllowMissing = true, |string|)
+		cpp_wrapper JB_File_ReadAll
+	
+	
+	function MustExist (|string| operation = "", |bool|)
+		if .exists
+			return true
+		|| eerr = "Can’t find '"
+		if (self != nil)
+			eerr += self
+		eerr += "'"
+		if self and super[0] != '/'
+			eerr += " at "
+			eerr += app.cwd
+		if operation
+			eerr += ", trying to "
+			eerr += operation
+		error (self, eerr)
+
+	
+	function Exists (|bool|)
+		cpp_wrapper JB_File_Exists
+
+	
+	syntax access (|string| name, |bool| Errs=false, |File|)
+		return .Child(name, errs)
+
+
+	function ListStart (|bool|)
+		cpp_wrapper
+
+	function ListActive (|bool|)
+		cpp_wrapper
+
+	function ListEnd
+		cpp_wrapper
+		
+
+	function MoveNext (|bool|)
+		cpp_wrapper JB_File_MoveNext
+
+	function CurrChild (|String|)
+		cpp_wrapper
+	
+	function Open (|int| Flags = File.O_RDWR (|) File.O_CREAT, |bool|AllowMissing=false, |int|)
+		cpp_wrapper
+
+		
+	function OpenForRead (|bool| AllowMissing = false, |int|)
+		return .open(0, AllowMissing)
+	
+	function OpenDes (|int|)
+		.openempty
+		return .descriptor
+	
+	
+	function OpenBlank (|int|)
+		cpp_wrapper JB_File_Open____
+		disabled "Use OpenEmpty instead"
+
+	function OpenEmpty (|ind|)
+		cpp_wrapper JB_File_OpenBlank
+	
+	function EOF (|bool|)
+		cpp_wrapper JB_File_EOF
+	
+	function IsDir (|bool|)
+		cpp_wrapper JB_File_IsDir
+
+	function IsLink (|bool|)
+		cpp_wrapper JB_File_IsLink
+
+	function IsTerminal (|bool|)
+		return pipe.IsTerminal(.descriptor)
+		
+	function Offset (|int64|)
+		cpp_wrapper JB_File_Offset
+	
+	function Offset (assigns:|int64|)
+		cpp_wrapper JB_File_OffsetSet
+	
+	function Delete (|ErrorInt|)
+		cpp_wrapper JB_File_Delete
+		
+	function MoveToTrash (|ErrorInt|)
+		|| tttt = (file)
+		|| ch = file.trash(.name)
+			.moveto(ch)
+	
+	function string.UniqueFile (|file|)
+		|| f = .file
+		if !f.exists
+			return f
+		return f.Parent.UniqueChild(.name)
+			
+		
+	function UniqueChild (|string| name, |file|)
+		|| test = name
+		for 1000
+			|| ch = .child(test)
+			if !ch.exists
+				return ch
+			test = name + (random.shared.int&0xFFFFFF).render
+			
+	
+	
+	function DeleteAll (|ErrorInt|)
+		if super == "/" or ""
+			return -1
+		if .IsDir
+			for C.Files in self
+				|| tmp = C.DeleteAll
+				if rz == 0
+					rz = tmp
+		|| tmp2 = .Delete
+		if rz == 0
+			rz = tmp2
+
+
+	operator isfile (|string| ext, |bool|)
+		return !.isdir and self isa ext
+
+	operator isdir (|string| ext, |bool|)
+		return .isdir and self isa ext
+
+	operator Matches (|string| s, |bool|)
+		cpp_part StrMatch
+		return .Compare(s)
+	
+	operator Matches (|File| f, |bool|)
+		return .Compare(f)
+	
+	
+	operator IsNewerThan (|File| F, |bool|)
+		cpp_Part NewerThanFile
+		return self isnewerthan f.modified
+	operator IsNewerThan (|date| F, |bool|)
+		return (.Modified > F)
+	
+	
+	operator IsOlderThan (|File| F, |bool|)
+		return (.Modified < F.Modified)
+	
+	
+	function writer (|FastString|) // streamout
+		if self != nil
+			.close
+			require .OpenEmpty
+			rz = FastString()
+			rz.file = self
+	
+	function string.writer (|faststring|)
+		return .file.writer
+	
+	function StreamIn (|Byte| sep = '\n', |StringFields|)
+		return StringFields.new( .ReadAll, sep )
+	
+	
+	function CopyFile (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
+		cpp_wrapper JB_File_Copy
+	
+	
+	function CopyTo (|string| Dest, |bool| AttrOnly=false, |ErrorInt|)
+		if !.isdir
+			return .copyfile(dest.file, AttrOnly)
+
+		for f in self
+			rz = self[f].copyto(dest[f]) 
+			if !rz
+				exit
+		
+	
+	function List (|bool|invis = false, |[string]|)
+		for name in self
+			if (invis) or (name[0] != '.')
+				rz <~ name
+		rz.sort(stringsorter)
+	
+	
+	function Launch (|faststring| output=nil, |errorint|)
+		if !.isdir
+			return .execute([], output)
+		return "/usr/bin/open".execute([self], output)
+	
+	
+	function MoveTo (|string| Path, |ErrorInt|)
+		cpp_wrapper JB_File_MoveTo
+		
+	
+	operator inside (|file|f, |bool|)
+		|| fp = f.pathdir
+		return super[0, fp.length] == fp
+			
+	function Read (|int| Length, |bool|AllowMissing=true, |string|)
+		cpp_wrapper JB_File_Read
+
+
+	function skip (|int| n=1)
+		.offset += n
+
+	iterator
+		.ListStart
+		while ( .MoveNext )
+			yield .CurrChild
+
+	iterator Files
+		.ListStart
+		while ( .MoveNext )
+			yield self[.CurrChild]
+		.listend
+	iterator flat
+		|[file]| dir_chain
+		|| Curr		 = self
+		.liststart
+		while .MoveNextChain(dir_chain, Curr)
+			yield curr
+		.listend
+	
+	function MoveNextChain (|[file]| dir_chain, |&File| Curr, |bool|)
+		if !.listactive
+			dir_chain <~ self
+			*curr = self
+			return true
+		while dir_chain
+			|| last = dir_chain.Last
+			if last.movenext // OK... we went in. now we can find a child
+				|| ch = last.currchild.file
+				*curr = ch
+				if ch.isdir
+					dir_chain <~ ch
+				return true
+			dir_chain.pop
+		
+	function SyntaxExpect (|string| Error )
+		visible
+		opt norefcounts
+		cpp_part Fail
+		|| p = ""
+		if self != nil
+			p = .path
+		StdErr.NewError( nil, Error, p )
+
+	module
+		|| DebugExecute = false
+
+		function string.NeatenPath (|string|)
+			if self starts file.HomePath
+				return "~" + self[file.HomePath.length ...]
+
+		function string.IdealApp (|string|)
+			if platform.osx
+				return ("/Applications/" + .name)
+
+		function file.IdealApp (|file|)
+			return .path.idealapp.file
+
+
+		function New (|int| FD, |file|)
+			cpp_Part NewFD
+			require (FD >= 0)
+			rz = file(nil|string|)
+			rz.descriptor = fd
+		
+
+		function TrashPath (|string|)
+			if platform.osx
+				return "~/.Trash/"
+			if platform.windows
+				return `C:\$Recycle.Bin`
+			if platform.linux
+				return "~/.local/share/Trash"
+
+		function AppPrefs (|string|name = "", |string|)
+			if !name
+				name = app.FileName.lowercase
+				name := app.conf("name")
+				name += ".pref"
+			return .preferencespath.child(name)		
+
+		function Preferences (|file|)
+			return .PreferencesPath.resolve.file 
+		
+		function HomePath (|string|)
+			cpp_wrapper JB_File__Home
+
+		function PreferencesPath (|string|)
+			if platform.osx
+				return "~/Library/Preferences"
+			if platform.windows
+				return "~\AppData\Roaming" // whatever
+			if platform.linux
+				return "~/.config"
+			
+		function Trash (|string|name="", |file|)
+			rz = .TrashPath.Resolve.file
+			if name
+				rz = rz.uniquechild(name)
+
+		function ReadCPath (|cstring| path, |bool| AllowMissingFile, |int| MaxSize = 100000000, |string|)
+			cpp_wrapper JB_cPath_ReadAll
+
+
+		function DocumentsFolder (|file|)
+			return "~/Documents/".file			// .file calls pathfix already
+
+		function PrefsFolder (|file|)
+			if platform.osx
+				return "~/Library/Preferences".file
+
+		function Logs (|file|)
+			return "/tmp/logs/".file
+
+	function AppDate (|date|)
+		if self
+			ifn self isa "app"
+				return .anydate
+			|| n = "/Contents/MacOS/" + .trimextandpath
+			return self[n].anydate
+
+
+	function anydate (|date|)
+		return .created oar .modified
+
+
+role StringThatWasReadSafely (string)
+	linkage
+		cpp_part Safe
+	//JB_Safe_NopeWith0193
+	//JB_Safe_NopeWith0With0
+	//JB_Safe_NopeWith0WithMem // why are these beign created?
+	syntax cast (|bool|)
+		opt norefcounts
+		|| o = self|object|
+		return o != string.error and nil

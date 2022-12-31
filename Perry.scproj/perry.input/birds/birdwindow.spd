@@ -1,0 +1,94 @@
+
+
+
+class BirdWindow (Window)
+	|int|				Round
+	|PipeOwner|			Pipes
+	|bird|				Player
+	|RetroFloat|		Speed
+	|textview|			Score
+	|date|				StartDate
+	|int|				BestScore
+	|int|				PrevBestScore
+
+
+	constructor
+		.NoDrawBackground = true	
+		.pipes = guicontrol(self)
+		.pipes.size = 414~wide by 256~high
+		.pipes.id = "pipeowner"
+		.size = the~area
+		.score = textview(self)
+		.score.size =  8~left back 40  by  8~down back 12
+		.score.gnormal.solid = nil
+		.score.id = "score"
+		.player = bird(self)
+		.player.gnormal.solid = (0.8, 0.8, 0.1, 1.0)
+		.RestartGame
+	
+	
+	function RestartGame
+		.PrevBestScore = .bestscore
+		pipeowner.Passed = 0
+		.UpdateScore
+		.score.singleline = true
+		.speed.speed = 0.75
+		.speed.remain = 0
+		.pipes.clear
+		.pipes.position = 0
+		.reflow
+		.pipes.refill(0)
+		.pipes.first.left = 200
+		.player.init
+		.reflow
+	
+	
+	behaviour keydown
+		if key is space
+			keys.space.eat
+			.player.jump
+		  elseif key is escape
+			.RestartGame // ooop
+	
+	
+	behaviour FrameUpdate
+		if !.player.died
+			.movepipes
+		.player.gamestep(.pipes)
+		if .player.died
+			.RestartGame
+	
+	
+	function UpdateScore
+		|| score = pipeowner.Passed
+		.bestscore = .bestscore max score
+		|| s = ""
+		if score == .bestscore
+			s = score.render
+			s += "!" * (score - .PrevBestScore)
+		  else
+			s = "$score/$.bestscore"
+		.score.text = s
+
+	
+	function MovePipes
+		|| p = .pipes.first
+		.speed.speed += 600th
+		.speed.speed min= 2.5
+		|| x = p.left - .speed.next
+		if p.width + x > 0
+			p.left = x
+		  else
+			pipeowner.Passed++
+			.updatescore
+			p.next.remove
+			p.remove
+			|| p2 = .pipes.first
+			p2.left = p2.left
+			.pipes.refill(.speed.speed)
+	
+	
+	
+	constants
+		G = 0.145
+		jumpspeed = 2.25

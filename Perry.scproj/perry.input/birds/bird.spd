@@ -1,0 +1,64 @@
+
+
+class Bird (guicontrol)
+	|float|			YSpeed
+	|uint|			LastJump
+	|date|			Died
+
+	
+	function init
+		.yspeed = 0
+		.lastjump = 0
+		.died = 0
+		.size =  40~up for 10  by  100~right for 10
+		is clickthrough
+
+
+	function Jump
+		require !.died
+		require .lastjump+2 < sdlapp.FrameCount
+		.yspeed = (.yspeed.clamp(birdwindow.jumpspeed)*0.33) + birdwindow.jumpspeed
+		.lastjump = sdlapp.FrameCount
+	
+	
+	function GameStep (|pipeowner| pp, |bool|)
+		opt norefcounts
+		
+		|| b = .bottom
+		if true
+			|| y = .yspeed
+			if (y > 0) and keys.space
+				y *= 1.44
+			b += y
+			.yspeed = (.yspeed - birdwindow.G) max -10
+
+		if b <= 0 and .yspeed <= 0 // bounces
+			.yspeed *= -0.5
+			b = -b
+		  elseif .top >= pp.top and .yspeed > 0
+			.yspeed = -.yspeed
+			b = pp.top - (.height+1)
+
+		.size = 40~right for 10 by (b)~up for 10
+		
+		if !.died
+			|| p = pp.controlat(self, -2, true)
+			if p isa gamepipe
+				.died = date.now
+		return .died.ago < 3s
+	 
+
+		
+struct RetroFloat
+	|float|		Speed
+	|float|		Remain
+	
+	function Next (|int|)
+		|| spd = .speed // 1.1... every 10th frame returns 2
+		|| rem = spd.fract + .remain
+		if rem >= 1.0
+			rem--
+			spd++
+		.remain = rem
+		return spd
+

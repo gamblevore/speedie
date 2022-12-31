@@ -1,0 +1,187 @@
+
+
+function parser.XMLAttribs (|message| XML,  |int| start,  |int|)
+	|| AllAtts = parser.new(xml, @arg, Start)
+	|| s = parser.data
+	while
+		|| i = .nextstart
+		|byte| c
+		while i < s.length
+			c = s[i]
+			loop c.iswhite
+			i++
+		if (c == '>') or (c=='/' and s[i+1]=='>')
+			return i
+		ifn jeebox.CSWordStart[c]
+			exit
+		|| Attr = fthingword(i)
+		Attr.func = @XAtt
+		AllAtts <~ Attr
+		require .ExpectEndChar(parser.nextstart, "=")
+		i = .cleanspaces
+		c = s[i]
+		ifn (c == '\'' or c == '"')
+			.erroradd("Attribute value didn't close.", i)
+			return nil
+		
+		|| After	= s.find(c, i+1)
+		|| Txt		= parser.new(Attr, @xtxt, start)
+		txt.name	= s[i+1,after].replaceall(jeebox.xml_unescapestr)
+		.nextstart	= after+1
+	
+	.erroradd("Element malformed.", .nextstart)
+
+
+function Parser.CloseXML (|message| XML, |int|i, |string| s, |message|)
+	|| CloseEnd = s.find('>', i+2)
+	// s.s
+	ifn (CloseEnd)
+		return .erroradd( "Close-tag malformed", i)
+	|| CloseName = s[i+2, CloseEnd]
+	if (CloseName != XML.name)
+		return .erroradd( "Open/close tags mismatch! </$CloseName> vs <${XML.Name}>", i)
+	.nextstart = ++closeend
+	xml.extra = (xml.position - closeend) (|) parser.baseextra
+	return XML
+
+
+function Parser.XMLWhatever (|int| s, |int| skip, |string| ender, |syntax| fn, |message|)
+	|| i = s + skip
+	|| EndPos = .data.find(ender, i)
+	if (!endpos)
+		return .erroradd("Tag didn't close", i)
+	
+	.nextstart = endpos + ender.length
+	if (fn)
+		rz = .new(nil, fn, i, .data[i, endpos])
+		rz.position = s
+		rz.after = .nextstart
+
+
+function Parser.AddXMLText (|message| XML, |string| s, |int| start, |int| i)
+	|| a = s.outwhite(start)
+	require (a < i)
+	|| str = s[start, i]
+	|| str2 = str.trim
+	|| str3 = str2.replaceall(jeebox.xml_unescapestr)
+	.new(xml, @xtxt, start, str3)
+
+
+function Parser.FillXML (|message| XML, |ind| i, |message|)
+	|| s = .data
+	if (s[i-1] == '/')							// <abc d="e"/>
+		.nextstart = i+1
+		return xml
+	.nextstart = i
+
+	while
+		|| Prev = .nextstart
+		i = s.find('<', prev)
+		ifn i
+			return .erroradd("Element didn't close", xml.position)
+		.addXMLText(xml, s, prev, i) 
+		.nextstart = i
+		|| next = s[i+1] 
+		if next == '/'			
+			return .CloseXML(XML, i, s)			// </abc>
+
+		if (next != '!')
+			xml <~ fXML(i)$
+		  elseif  s[i, "<!--"]
+			xml <~ .XMLWhatever(i,4, "-->", @xcom)$
+		  elseif  s[i, "<![CDATA["]
+			xml <~ .XMLWhatever(i,9, "]]>", @xcdt)$
+		  else
+			return .erroradd("", i)
+
+
+function parser.fXML (ParseHandler)
+	|| XML		= .newword( nil, @xml, start, start+1 )
+	|| endpos	= start + 1 + xml.length
+	EndPos		= .XMLAttribs(XML, endpos)				#require
+	rz = .FillXML(XML, EndPos + 1)
+	if rz
+		rz.after = .nextstart
+
+
+function parser.fXML_PI (ParseHandler)
+	rz = .new( nil, @xpi, start )
+	.ParseLoopFlags( rz, "?>", .ktemporal )
+
+
+function parser.fXML_Comment (ParseHandler)
+	return parser.XMLWhatever(Start, 4, "-->", @xcom)
+
+
+function parser.fXML_DocType (ParseHandler)
+	for (i in .nextstart to .data.length-1)
+		|| c = .data[i]		// need to search for '[' just in case...
+		if c == '['
+			i = .data.find(']', i)
+			ifn i
+				return .erroradd("Bad Doctype", start)
+		  elseif c == '>'
+			.nextstart = i + 1
+			return .new(nil, @xcom, start, .data[start+9, i])
+
+
+extend message
+	syx XAtt (XML_Attribute)
+		opt norefcounts
+		fs <~ " ${.name}=\"${.first}\""
+
+	syx XML (XML_Element)
+		opt norefcounts
+		fs <~ "<"
+		fs <~ .name
+		
+		|| atts = .first
+		for A in atts
+			fs <~ a
+
+		|| Children = (atts.next, nil)(atts)
+		if !Children
+			fs  <~  "/>"
+			return
+
+		fs <~ ">"
+		|| SingleText = (children==@xtxt) and (!children.next) 
+		if SingleText
+			fs <~ children
+		  else
+			fs.indent++
+			for ch.forward in children
+				fs.IndentLine
+				fs <~ ch
+			fs.indent--
+			fs.IndentLine
+
+		fs <~ "</${.name}>"
+
+
+	syx XPI (XML_ProcessingInstruction)
+		fs <~ "<?"
+		if .haschildcount(1)
+			fs <~ .first
+		  else
+			.FSListArg( fs )
+			fs <~ '\n'
+		fs <~ "?>"
+
+		
+	syx XCom (XML_Comment)
+		fs <~ "<!--"
+		fs <~ .name
+		fs <~ "-->"
+
+
+	syx XCDT (XML_CDATA)
+		fs <~ "<![CDATA["
+		fs <~ .name
+		fs <~ "]]>"
+
+
+	syx XTxt (XML_Text)
+		fs.appendmultireplace(.name, jeebox.XML_EscapeStr)
+
+

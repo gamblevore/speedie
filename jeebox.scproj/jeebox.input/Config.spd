@@ -1,0 +1,88 @@
+
+
+// use a message... as a dictionary!!
+// wierd but efficient
+
+function ivec4.list (|message|)
+	rz = @list.msg
+	for i in 4
+		rz <~ self[i]
+
+
+role config (message)
+	linkage
+		pragma noearlyfree
+	iterator
+		|| C = .conffirst
+		while (C)
+			yield C
+			C++
+
+	function conffirst (||)
+		|| l = .confarg
+			return l|message|.first
+			
+	syntax cast (|string|)
+		return .nyme
+	
+	function Save (|bool|)
+		|| f = .obj
+		if f isa file
+			|| p = .render
+			|error| err
+			if p.ParseWithError(Err)
+				return f.smartdata(p) 
+
+
+ // why would a conf-file be so big?
+function file.conf (|int|lim=1MB,  |config|)
+	opt norefcounts
+	if .exists
+		rz = .parse(lim)|config|
+	rz := message()
+	rz.obj = self
+
+
+extend message
+	function ConfArg (|config|)
+		opt norefcounts
+		if self == @arg or nil
+			return self
+		|| w = (.last, .next)(self == @tmp)
+		if w == @arg
+			return w
+
+	function SyntaxAccess (|string| key, |bool| Err=false, |config|)
+		cpp_part GetConf
+		opt norefcounts
+		for item in .confarg
+			if item ~= key
+				|| f = item.first
+					return f
+				return item // whatever
+		if err
+			error (self, key + " not found.")
+		
+	function Value (|string|)
+		if self == @tmp and self in @arg
+			return .first.nyme
+		if self != @arg
+			return .nyme
+
+// move these to utils?
+	function IsTypeOfDecl (|bool|)
+		return .istype(1)
+			
+	function IsType (|int| Allowed=3, |bool|)
+		opt norefcounts
+		|| p = .parent
+		|| msg = self
+		while p and p != @arg
+			if (allowed&1) and (p == @decl)
+				return msg.isfirst
+			if (allowed&2) and (p == @type)
+				return msg.islast
+			msg = p
+			p = p.parent
+	
+	

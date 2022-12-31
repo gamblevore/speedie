@@ -1,0 +1,124 @@
+
+
+prototype LangLoaderFunc (|language| L, |message| msg, |object|)
+
+
+FunctionTable Langfuncs (LangLoaderFunc) {
+	language // language espaniol (spanish)
+		expect (!L) (msg, "Only 1 language allowed per-file.")
+		
+		|| native_name = msg[@thg]
+		|| arg = native_name
+		|| id_name = native_name.next
+		if (id_name == @bra)
+			arg = id_name
+			id_name.expectlast
+			id_name = id_name[nil, 0]
+		  else
+			id_name = native_name
+			id_name.expectlast
+
+		if id_name.expect(@thg)
+			return language[id_name, native_name]
+			
+	
+	category
+		LangLoad.ActivateCategory(msg)
+
+		
+	noun
+		l.BuildAGroup(msg,		Element.noun)
+	nouns
+		l.BuildGroupList(msg,	Element.noun)
+		
+	adjective
+		l.BuildAGroup(msg,		Element.adjective)
+	adjectives
+		l.BuildGroupList(msg,	Element.adjective)
+		
+	question
+		l.BuildAGroup(msg,		Element.question)
+	questions
+		l.BuildGroupList(msg,	Element.question)
+		
+	placer
+		l.BuildAGroup(msg,		Element.placer)
+	placers
+		l.BuildGroupList(msg,	Element.placer)
+		
+	quantifier
+		l.BuildAGroup(msg,		Element.quantifier)
+	quantifiers
+		l.BuildGroupList(msg,	Element.quantifier)
+	
+	 // can/will/did
+	aux
+		l.BuildAGroup(msg,		Element.aux)
+	auxs
+		l.BuildGroupList(msg,	Element.aux)
+		
+		
+	adverb
+		l.BuildAGroup(msg,		Element.adverb)
+	adverbs
+		l.BuildGroupList(msg,	Element.adverb)
+		
+	concept
+		|| cat = msg.ElementList
+		if cat
+			l.BuildAGroup(msg, nil, cat)
+	concepts
+		|| cat = msg.ElementList
+			l.BuildGroupList(msg, nil, cat)
+
+	verb
+		l.BuildAGroup(msg,		Element.verb)
+	verbs
+		l.BuildGroupList(msg,	Element.verb)
+		
+	conj
+		l.BuildAGroup(msg,		Element.conj)
+	conjs
+		l.BuildGroupList(msg,	Element.conj)
+		
+	statement
+		l.BuildAGroup(msg,		Element.statement)
+	statements
+		l.BuildGroupList(msg,	Element.statement)
+		
+	anaphorism
+		l.BuildAGroup(msg,		Element.anaphorism)
+	anaphorisms
+		l.BuildGroupList(msg,	Element.anaphorism)
+		
+	name
+		l.BuildAGroup(msg,		Element.name)
+	names
+		l.BuildGroupList(msg,	Element.name)
+}
+
+
+	
+
+function message.ElementList (|ElementList|) {
+	opt norefcounts
+	debug_require self == @tmp
+	//  concept are (a/b/c)
+	//	debugat()
+	|| f = self[nil|syntax|]		#require
+	|| n = f.next(@bra)				#require
+	|| arg = n.next
+	expect (arg == nil or @arg)
+
+	|| Result
+	for item.flat in n.first
+		if (item == @rel)
+			//
+		  elseif (item != @thg)
+			expect (item == @opp and "/") (item)
+		  else
+			result (|)= Element.select(item)$
+	
+	n.remove
+	return result		    
+}

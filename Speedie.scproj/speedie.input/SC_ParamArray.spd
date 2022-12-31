@@ -1,0 +1,133 @@
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+class SCParamArray
+	linkage
+		cpp_part		PA
+	contains message
+
+	|Message[11]--|		Items
+	|Message--|			Exp
+	|int16|				Size
+	|int16|				ErrCount
+	|bool|				IsAssigns
+	|bool|				HasProperParams
+	|bool|				IsDot
+	|bool|				IsAddress
+	|bool|				IsForClass
+	|bool|				IsSelf
+	|bool|				IsSuper
+	|bool|				Found
+	
+
+	syntax append (|| m)
+		expect (.size < 11) (m, "Too many parameters")
+		|| i = .size++
+		.items[i] = m
+	
+	syntax access (|int| i, ||)
+		if (i < .size)
+			return .items[i]
+	
+	function IsModule (|bool|)
+		return !.isForClass
+		
+	function MadeError (|bool|)
+		return StdErr.ErrorCount > .errcount
+	
+	function IgnoreSelf (|int|)
+		if (.IsDot and .Isforclass)
+			return kTypeCastIgnoreContained
+
+	function RenderType (|string|)
+		if (.isforclass)
+			return "class"
+		return "module"
+	function RenderName (|string|)
+		if (.isforclass)
+			return Self[0].RenderType
+		return .exp.first.render
+
+
+	constructor (|Message| exp, |message|side=nil)
+		.Exp = exp
+		.side = side
+		.IsDot = (exp == @dot)
+		.IsAddress = (exp != nil) and (exp.niceparent Isbrel "&")
+		.ErrCount = stderr.errorcount
+
+
+	function PreReadTypes (|SCBase| Name_Space, |Message| P, |message|side, |bool|)
+		.exp := p
+		for  Item.fast in P  // in case '...' adds a param
+			require  .AddTestedParam(item, name_space)
+		.side = side
+		return true
+
+
+	function scbase.IsClassFunc (|bool|)
+		opt norefcounts
+		return !.IsModuleFunc
+
+
+	function scbase.IsModuleFunc (|bool|)
+		opt norefcounts
+		if (self isa scarg)
+			return !.IsClassArg
+		return (self isa SCModule)
+
+
+	function DetectDotSuper (|SCBase| curr, |SCBase|)
+		opt norefcounts
+		.IsForClass = Curr.IsClassFunc
+		if .IsDot
+			|| Exp0 = .exp.first
+			.isself = (exp0 ~= "self")
+			if .IsForClass
+				self <~ exp0
+				if (exp0 IsThing "super")
+					.IsSuper = true
+					exp0.name = "self"
+					// setting isself would change property setters.
+					return Curr.Lookup
+		return Curr
+
+
+	syntax cast (|bool|)
+		return .HasProperParams
+
+
+	function AddParam (|message| item)
+		self <~ item
+		.HasProperParams = true
+
+
+	function AddTestedParam (|message| item, |scbase| name_space, |bool|)
+		// x(|message| a, a) fails!
+		// Because we CAN get the tpe of a decl! We shouldn't.... though? surely? hmmm....
+		// i mean they aren't things. Only params and stuff...
+		|| P = TypeOfExpr( item, name_space )
+		expect  (P)  ( item, "Can’t find type." )
+		.AddParam(Item)
+		return true
+
+
+	function Range (|IntRange|)
+		|| y = .size
+		|| x = (.isdot and .isForClass)|int|
+		return (x,y)|intrange|
+
+
+	function MacroSize (|int|)
+		if .isassigns
+			return .size-1
+		return .size
+
+
+	function Side (assigns:|Message|)
+		if (Value)
+			self <~ Value
+			.IsAssigns = true

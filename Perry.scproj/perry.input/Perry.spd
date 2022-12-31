@@ -1,0 +1,348 @@
+
+
+|| Speedie = "/usr/local/bin/speedie"
+|| CppCompiler = "/usr/bin/clang"
+
+
+module Perry
+    |listviewrow|					Projects
+    |dictionary| 					InsecureWords
+    |string|						_SpeedieDir
+    |bool|							Checked	
+	
+	constants
+		arc_newer	= 2
+		arc_older	= 1
+	
+	function SpeedieDir (|string|)
+		._SpeedieDir := .MakeSpeedieDir
+		return ._SpeedieDir := "~/Speedie".PathFix
+	
+	
+	function AnyActive (|bool|)
+		opt norefcounts
+		for p in .Projects
+			if p is active
+				return true
+
+
+	function PreWindows
+		|| bad = app.prefs..badwords			#require
+		|| w = .InsecureWords init Dictionary()
+		for m in bad
+			w[m.name] = "x"
+		
+		
+	function LoadWindows (|PerryIDE| r)
+		|| l = .projects.list
+			.LoadWindowsSub(r, l)
+		  elseif !.CreateDefaultProject
+			startupwindow.show
+
+
+	function CreateDefaultProject (|bool|)
+		|| s = .SpeedieDir.child("FirstProj.scproj")
+		if !s.file.Exists
+			.ide.CreateProj(s)
+			return true
+	
+	
+	function Save
+		visible
+		app.prefs..colors = ¥.savecolors.parse
+
+
+	function message.PerryType (|int| type, |int|)
+		|| proj = .name.file
+		if proj.Exists
+			type |= (1+proj.isdir)
+		  else
+			.remove
+		return type
+	
+		
+	function LoadWindowsSub (|PerryIDE| r, |[message]| files)
+		|| Type = 0
+		for proj_item in files
+			type = proj_item.PerryType(type)
+				
+		for proj_item in files
+			|| proj = proj_item.name.file
+			if (type == 1) or proj.isdir
+				|| r2 = r oar PerryIDE(false)
+				r2.Loadproject(proj)
+				startupwindow.hide
+				r = nil
+			  else
+				proj_item.remove
+
+
+	function BuildAppMenu
+		appmenu.addsep
+		|| extra = platform.isdebug or (registration.CarriedInfo ~= "god")
+			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
+			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
+			appmenu <~ ("Show Preferences", ClickedShowPrefs)
+		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
+		appmenu <~ ("Install",  		ClickedInstallMenu)
+
+
+	function Startup
+		.Projects = (app.prefs)("lastproj")
+		.PreWindows
+		
+		|| r = PerryIDE(false)
+		r.LoadState
+		r.ViewAsText
+		.LoadWindows(r)
+		.BuildAppMenu
+		
+		|| old = app.Pref("currproj")
+		|| oof = (.FindProj(old),  .Projects.First)(old)
+			oof.obj|PerryIDE|.show(false)
+
+
+	function OpenProj (|[PerryIDE]|)
+		opt norefcounts
+		for r in .Projects
+			|| i = r.obj
+			if i isa PerryIDE
+				rz <~ i
+
+	function IDE (|PerryIDE|)
+		return .OpenProj[0]	
+
+	function Readjust
+		for i in .OpenProj
+			i.ViewAsbetter
+
+
+	function FindProj (|string| path, |message|)
+		return .Projects.find(path)
+
+
+	function ProjContaining (|string| path, |PerryIDE|)
+		opt norefcounts
+		for s in .projects
+			|| i = s.obj|PerryIDE|
+			if i.FindPath(path)
+				return i
+
+
+	helper string.ProjCleanName (|string|)
+		rz = .name
+		while rz endswith "()"
+			rz = rz[0, rz.length-2]
+	
+	
+	function AddProj (|string| path, |PerryIDE| i)
+		opt norefcounts
+		|| old	= .FindProj(path)
+		if !old
+			old = .projects.msg(@tmp, path)
+			old.msg(@str, path.TrimProj)
+			old["edit"] = ""
+
+		|| name = old.first.name.ProjCleanName
+		old.first.name = name
+		i.ProjMsg = old
+		i.id = "IDE: " + name
+		old.obj = i
+		i.tabs.SelectRow(old)
+			
+
+extend PerryIDE {
+function IsSpeedieCode (|bool|)
+	opt norefcounts
+	|| r = .filelist.listsource.First
+	if r isa filerow
+		return r.location.pathiscode
+
+
+function LoadState
+	|| it = app.prefs..colors
+		colorscheme.load(it)
+	  else
+		colorscheme.load(defaultcolors.parse)
+	
+
+function View (|ButtonView| btn)
+	opt norefcounts
+	require !.istextonly
+	|| g		= btn.tag|guicontrol|
+	|| changed	= g isnt visible
+	
+	|| old = .viewing
+	if btn != old
+		.PrevView = old
+	
+
+	// colors
+	for b in .viewbuttons
+		|| c = (0.0, 0.0, 0.0, 0.0)
+		if b == btn
+			c = (0.7, 1.0, 0.2, 0.1)
+		b.gnormal.solid = c
+	
+	// visable
+	for g2 in .views
+		(g2 is visible) = g == g2
+	|| vis = (.SearchArea is visible)
+	(.MassSearchField is visible) = vis
+	(.FoundList is visible) = vis
+
+	
+	// consistancy
+	if (btn == .viewsearch)
+		.MassSearchField.setfocus
+		.masssearchfield.text = SDLApp.LastSearch
+		changed = false
+	  elseif (btn == .viewerrors)
+		.SwitchedToErrors
+	if changed
+		g.setfocus
+	  elseif btn == .viewfiles
+		if !.InConstructor
+			.filelist.ShowQuickOpen
+	.CheckViewWorthIt(old)
+
+
+function ShowStdOut (|bool| AlwaysShow=false)
+	if AlwaysShow or .EditSep.Collapsed
+		.EditSep.Show // needds reflow first?
+		.stdout.scrolltoend
+	  else
+		.EditSep.Collapse
+
+
+function SwitchedToErrors
+	|| e = .errorlist
+	if e.listsource.hasany and !e.sel
+		e.selectfirst
+	  else
+		.editme.ShowParseError
+
+
+function NoNeed (|string| s = "", |buttonview| old = nil)
+	|| n = .noneeder
+	n.text = s
+	|bool| Vis = s
+	(n is visible) = vis 
+	if !vis
+		n.tag = old
+
+
+function CheckViewWorthIt (|buttonview| old)
+	|| s = ""
+	if (.errorlist is visible) and .errorlist.isempty
+		s = .CompileOKString
+	  elseif (.debugger is visible) and !.attachedProgram
+		s = "No program active"
+	.noneed(s, old)
+
+
+function Viewing (|buttonview|) // currview
+	opt norefcounts
+	for i in .viewbuttons
+		if i.tag|guicontrol| is visible
+			return i
+
+
+function IsViewing (|guicontrol| g, |bool|)
+	return (g is visible)
+	
+
+function ViewAsNatural
+	if .project
+		if .project.isdir
+			.viewasproject
+		  else
+			.viewastext
+
+
+function ViewAsBetter
+	if .project
+		if .project.isdir
+			.viewasproject
+		  else
+			.viewascurr
+
+
+function ViewAsCurr
+	.ViewAsVis(!.istextonly)
+
+
+function ViewAsText
+	.ViewAsVis(false)
+
+
+function ViewAsProject
+	.ViewAsVis(True)
+
+
+function ViewAsSwap
+	if .istextonly
+		.ViewAsProject
+	  else
+		.ViewAsText
+
+
+function ext (|string|)
+	opt norefcounts
+	return .editme$.document$.location$.ext
+
+
+function ViewAsVis (|bool| vis)
+	opt norefcounts
+	sdlapp.touch
+	.istextonly = !vis
+	|| AnyViews = false
+	for v in .ViewButtons
+		|| t = v.tag
+		if t isa guicontrol
+			(t is visible) = (v.gnormal.bg.hasany)
+			AnyViews := t is visible 
+	
+	if vis and !AnyViews
+		.viewfiles.click(nil)
+
+	|| top = !(.noclutter&1) and vis
+	.filesep.Collapsed = !vis
+	(.gonext is visible)	= vis
+	(.goPrev is visible)	= vis
+	(.rborder is visible)	= vis
+	(.ViewButtons is visible) = vis
+	(.filesep.div is visible) = vis
+	(.StartScreen is visible) = (.noclutter & 1)==0
+	(.filelist is decluttered)  = (.noclutter & 2)!=0
+	(.noneeder is visible)  = .noneeder.text and vis
+	
+	|| StillRuns = top and (vis or (.ext == "spd"))
+	|| srchvis   = vis and (.searcharea is visible) 
+	(.searcharea is visible)		= srchvis
+	(.MassSearchField is visible)	= srchvis
+	(.FoundList is visible)			= srchvis
+
+	(.runbutton is visible)			= StillRuns
+	(.buildbutton is visible)		= StillRuns
+	(.progress is visible)			= Stillruns and (.buildbutton isnt enabled)
+	(.tabs is decluttered)			= !top
+
+	if .focus and (.focus isnt visible)
+		.editme.setfocus
+
+	if vis
+		.CurrFileName.size = 8 ~ after for 140 by 1~inside
+		.FileListersInside(.rborder)
+	  else
+		.CurrFileName.size = 140~wide by 3~inside
+		.FileListersInside(.toolbar)
+
+
+function FileListersInside (|guicontrol| dest)
+	dest <~ .currfilename
+	dest <~ .functionmenu
+}
+
+
+		

@@ -1,0 +1,135 @@
+
+
+module LangLoad {
+	|element--|					ActiveElement
+	|Category--|				ActiveCatList
+	|Category--|				CurrCat
+	|array of Category--|		ActiveTags
+	|language--|				Lang		
+	|category|					Unused = category.new("(unused)", nil, nil)
+	  
+	
+
+	function LangFunc (|language| L, |message| ch, |object|)
+		|| fn = LangFuncs.msg(ch) #expect (ch)
+		return (fn)(L, ch)
+
+
+	function StartLoad (|message| root, |message|)
+		Opt NoRefCounts
+		.ActiveCatList = unused
+		if unused.nextactive : debugger
+		
+		|| ch = root[0] #require
+//		if false
+//			|| ch = ch // fail! what does this even refer to?
+		|| l = .LangFunc(nil, ch)
+		if l.mustbe(language, ch)
+			.Lang = l
+			return ch.next
+		
+
+	function Dict (|message| root, |bool|)
+		Opt NoRefCounts
+
+		language.Init
+		|| ch = .startload(root)	#require
+		.LoadFuncs
+
+		while ch and stderr.errorcount < 5
+			.LangFunc(.lang, ch)
+			ch++
+
+		.FinishAll
+		.VerifyLang
+		return stderr.ok
+
+
+	function VerifyLang
+		opt norefcounts
+		|| L = language.master
+		|| M = L
+		if (m==.lang)
+			m = nil
+		  else
+			l = nil
+
+		for c in .lang.Groups
+			require stderr.canaddmore
+			if c.mustbe(Group)
+				c.verify(m)
+
+		for f in .lang.words
+			require stderr.canaddmore
+			if f.mustbe(Word)
+				f.VerifyWord
+		
+		if (l)
+			l.BasicEnglishTest
+		
+	
+	function LoadFuncs
+		opt norefcounts
+		|| l = .lang
+		|| defaultRender = &EnglishRender.engfuncs 
+		l.renderer = defaultRender
+		if l.name ~= "english"
+			l.renderer = &EnglishRender.engfuncs
+			l.wordexpander = &EngWordExpander
+	
+
+	function ClearEles
+		opt norefcounts
+		for e in element.__first
+			e.deactivated = false
+
+
+	function ClearCats
+		opt norefcounts
+		for c in activeCatlist
+			c.nextactive = nil
+		activeCatlist = Unused
+		currcat = nil
+
+
+	function FinishAll 
+		ClearEles()
+		ClearCats()
+
+
+	function ActivateCategory (|message| msg)
+		opt norefcounts
+		|| c = msg[@thg]$
+		if c == "none"
+			.currcat = nil
+			.activeelement = nil
+			return
+			
+		|| cat = category.list.msg(c) #expect (msg, "Unrecognised category")
+		expect (!cat.NextActive) (msg, "Already used this category! Can't respecify within the same file!")
+		cat.nextactive = activeCatlist
+		activeCatlist = cat
+		
+		.ActiveElement = nil
+		.cleareles
+		currcat = cat
+
+
+	function CheckOrder (|element| cls, |message| errplace, |bool|)
+		if !currcat
+			return true
+
+		expect .Lang            (errplace, "No language specified yet!")
+		if cls
+			expect !cls.Deactivated (errplace, "Wrong order. Place all '${cls.name}' together.")
+		expect (activecatlist)  (errplace, "Specify a category first!")
+
+		if cls != .ActiveElement
+			if .ActiveElement
+				.ActiveElement.Deactivated = true
+			.ActiveElement = cls
+
+			
+		return true
+}
+

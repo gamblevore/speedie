@@ -1,0 +1,132 @@
+
+
+
+module SCSelector
+	function BuildClassCode (|string| name, |string| type, |message|)
+
+		return ("
+class $name (selector)
+	contains $name
+	constructor (|selector| Next, |&selector| Place, |string| name1)
+		super.constructor(next, place, name1)
+
+	module $name
+		function __LoadSel (|&$type| Place, |string| Name)
+			visible
+			$name.__First = $type.new($name.__First, place|&selector|, name)
+
+		|$type| __First
+		...
+		$name.__first.GiveIDs
+
+		").parse.first
+		
+	
+	function DeclareOneSel (|string| sel_name, |string| type, |message| place)
+		place.prev = NewDecl( type, sel_name )
+
+	
+	function LoadOneSel (|string| sel_name, |string| module_name, |message| LoaderPlace, |message| Prms)
+		|| Line = «sdot "__LoadSel"
+			«prm
+				«brel "&"
+					«dot sel_name
+						«thg module_name »
+						«emb »
+					»
+				»
+				«str sel_name »
+			»
+		»
+		loaderplace.next = line
+		
+		if prms
+			if prms != @prm
+				if prms == @list
+				prms = «prm, prms »
+			// should be SelectorInit
+			|| Line2 = «dot "selector_init"
+				«dot sel_name
+					«thg module_name »
+					«emb »
+				»
+				Prms
+			»
+			line.parent <~ line2
+	
+	
+	function Neu (CollectFunc)
+		.build(node, name_space, errplace)
+		node.name = "ignored"
+		return compiler.program
+
+
+	function FindItems (|message| arg, |message|)
+		opt norefcounts
+		|| mu = arg.findflat(@tmp, "instructionlist")
+			expect !mu.hasany (mu, "Should be empty.")
+			// we have a list... well... lets replace it!
+			vm_Builder.BuildInstructions(mu)
+			return mu
+		return arg.findflat(@tmp, "items", true)
+		
+		
+
+
+	function Build (CollectFunc)
+		|| arg = node[@arg, -1]								#require
+		|| name = node[@thg]								#require
+		|| items = .FindItems(arg)							#require
+		|| ActualNames = items[@list]						#require
+
+		Using (node)
+		|| IsClass = HasClassStuff(arg)
+
+		|| type = (name.name, "selector")(IsClass)
+		|| ClassCode = BuildClassCode(name.name, type)
+		|| dot3 = ClassCode.findnested(@sthg, "...", true)
+		
+		items.remove
+		
+		// Create that thing we need...		.loadone(&materials.pellets, "Pellets")
+		// One for each, put them in.		
+		
+		for (line in ActualNames)
+			|message| init
+			if line == @item			// EROR: (1, SomeForm)
+				line = line.first
+				init = line.next
+				if init == @list
+					init.func = @prm
+			ifn line.expect(@thg): exit
+			
+			using (line)
+			DeclareOneSel(line.name, type, dot3)
+			LoadOneSel(line.name, name.name, dot3, init)
+		
+		for ch.reverse in arg
+			classcode[-1].first = ch
+
+		ifn IsClass
+			classcode = dot3.parent.parent
+
+		dot3.remove
+		name_space.collectsub(ClassCode)
+	
+	
+	function HasClassStuff (|message| self, |bool|)
+		for s in self
+			ifn (s istmp "module") or (s istmp "items")
+				expect !(s istmp "constructor") (s, "Selectors can't have constructors")
+				rz = true
+
+
+selector MaterialsLol
+	|string| oof 
+	items (
+		Pellets
+		Wood
+		Iron
+		WierdBlock
+	)
+

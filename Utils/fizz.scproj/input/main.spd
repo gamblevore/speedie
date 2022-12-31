@@ -1,0 +1,8 @@
+#!/usr/local/bin/spd
+		
+		
+main 
+	for n in 1 to 105
+		|| buzz = "Fizz"*(n isa 3) + "Buzz"*(n isa 5)
+		printline  buzz oar n.render
+

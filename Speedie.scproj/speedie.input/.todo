@@ -1,0 +1,81 @@
+	
+
+						bugs
+
+* || x = .SomeCArray // should just get the address... :)
+* Errors in subprojects kinda suck with error-reporting
+* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
+* return func(str.parse.first) // str.parse disappers too fast. refcounter not strong enough
+* vector constants
+* || s = "".Address.IsLower // won't compile...
+* import "speedie.scproj/speedie.input/SC_Main.spd" // does nothing
+* function RefCountBug (|object| p, |int|)
+	if p isa string: p = "abc"
+* perryide_Behaviour 
+	* Make not available from speedie, c-export only.
+	* Perhaps a unicode start letter. or don't add to lookup table
+* do we need lowercase in lookupsub??? all dots/funcs got lowered in parseclean?
+* &uint... allows &int
+* (node, err) = .text.parse --> |error| err, || node = .text.parse(err) // noice
+* passing .hfloatvar to  func(float) causes reporting error
+*  msg <~ {
+	dot "hi"
+	thg "ok"
+	prm
+		thg "yep" }    -->    ok.hi(yep)
+* oar --> \ 
+	* a = b or c  -->  a = b\c
+* |string| s = __now__.render fails
+* render float.fn {code} // won't compile
+* disallow append file into |[message]|! (Array of msg)
+* v.operatormul(1.33) instead of v*1.33 :(
+* disallowed nesting should error on the children not the parent (like a bra "containing" an arg)
+* Statement exprs should be {} first... or else it causes obscure bugs all over!
+	* before doing any fixes
+* rejoin blocks shouldn't safedecr then incr!! pointless!
+	* "a oar b" should almost never be refcounted (unless returns a real object thats empty)
+* oar is kinda buggy for a lot of things.
+	x = a oar x // sets x to x! should disallow? if a: x=a thats what we want.
+* MacroSystem using ast-spawner // could simplify a lot of things, especially the sugars
+	* "Try" syntax via ast-spawner? just make it... NOT inbuilt?
+*	status(.CurrMousePixelColor.render) // tmp struct.
+* new destructor! bitfield 64 for objs! no super! works for most!
+	// could be done better with ast-spawner?
+* RelSetOr
+	* if .parent == A or B -->
+		    if .parent == A or .parent == B
+		--> if ({|| p = .parent, rejoin p==A or p==B})
+
+
+class-changes
+	* delete fastappender
+	* replace dictionary with fixeddict
+* Get galaxxies compiling
+	* Condtionally use glm in galaxxies.
+	* (|xyz| a)	// Should be @decl					// Replace fTypeCast2 with fdecl...
+* GameFloodFill being generated despite not being used.
+	GameFloodFill_Behaviour GameFloodFill_FuncTable_ = InitTableGameFloodFill_();
+	JBClassPlace4(GameFloodFill, JB_AsClass(FastAppender), GameFloodFill_FuncTable_);
+	void Game_Flood_Destructor(GameFloodFill* self) {
+		Game_Flood_PopAllOff(self); // bug here
+	}
+I guess it's because it's a saveable? makes sense, sorta. We can just make it not saveable...
+* obj*bool = JB_ObjOrNot(obj,bool)
+	* need special "returns self" type?
+
+*	|FastString| StdOutFS // create .disposeall_ func. just search for ".initvarsarg"
+* Can't save GameMaterial... but we can save cell? neither are subclass of saveable.
+
+* Loop bug with moveset iterator as nested loop? NearestEmptyCell... fails if we remove "|| OurLoop = Dirs" cos dirs gets altered when it shouldn't.
+
+* CollectDecls needs to be split up and... able to only process one at a time.
+	for m in msgs 
+		.CollectOneDecl(m)
+
+* Saving... should work as ONE stream. Maybe 1 or 2 phases. (Collects objects + write objects, but don't separate into classes.). Allows tighter compression, simpler-saving-code, etc. Makes it easier to work into an archiving system even!!! Faster saving too, just copy entire object. Needs a "SaveProperty true/false" temporal... Just use save-marking to stop saving objects twice. Need one array to clear the save-marks. dicts can use a special value to mark "end"
+    * Actually... speed isn't the issue. SIMPLICITY is. more than fast enough.
+        * Allow a tree, like JSON? Repeated objs become a ref second time around.
+            * Debuggable...
+* Make all objects saveable? Why would some not be? Simpler than marking them as saveable.
+	* If a class has specific stuff that can't be saved... we can silently mark it as non-saveable... unless already marked as saveable... or we try to save it, then we create an error.
+* burst-mode allocation, for parsing basically, seeing as we spend 80% of our time during parse in allocators!

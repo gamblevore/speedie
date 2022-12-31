@@ -1,0 +1,51 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+function Message.ReplaceInbuilt (|scbase| name_space, |scdecl| sulf, |message| sulf_exp)
+	|| m = .ReplaceInbuiltSub(name_space, sulf, sulf_exp)
+		.SafeReplaceWith(m)
+
+
+function Message.ReplaceInbuiltSub (|scbase| name_space, |scdecl| self_decl, |message| self_exp, |message|)
+	|| f = .first
+	if (f isthing "count")
+		expect (self_decl.c_array) (self_exp, "This is not a c-array")
+		return «num self_decl.c_array »
+
+	  elseif (f isthing "sizeof")
+		return .InbuiltSizeOf(name_space, self_decl, self_exp)
+
+	  elseif (!f and self==".")
+		return self_exp.copy
+
+	  else
+		error (self_exp)
+
+
+function Message.InbuiltSizeOf (|scbase| name_space, |scdecl| sulf, |message| sulf_exp, |message|)
+	|| Nn  = –sizeof name_Space
+	return NewDeclNum(scdecl.new, sulf.bytesize, "")
+
+
+function TypeOfQues (ExprResolver)
+	opt norefcounts
+	|| type = TypeOfExprModulesOK(exp.last, name_space)			#require
+	exp.ReplaceInbuilt(name_space, type.AsDecl, exp)
+	if exp != @ques
+		return TypeOfExpr(exp, name_space)
+
+
+function Object.AsDecl (|scdecl|)
+	if self isa SCDecl
+		return self
+	if self isa SCClass
+		return .typenormal
+	if self isa SCModule
+		if .cls
+			return .cls.typenormal
+	if self isa scfunction
+		return .returntype

@@ -1,0 +1,163 @@
+
+
+extend asmfuncstate
+	function LoadTitle (|message| m, |message|)
+		// asm oof (9)
+		opt NoRefCounts
+		|| name = m[@thg]$
+		.fn.exportname = name.name
+		.fn.name = name.name
+		|| bra = name.next(@bra)$
+		|| n = bra[@num].int
+		expect (n>=0 and n<=10) (m, "Too many arguments")
+		for n
+			.fn.args <~ TypeInt64.TypeNormal // :) just ints!
+
+		rz = bra.next(@arg)
+		rz.expectlast
+
+		
+	function TrySmallConst (|uint| reg,  |int64| Value, |message| where, |bool|)
+		|| set1_test = (value|int|<<12)>>12 // u1 takes 12 bits for stuff
+		if set1_test == value
+			.AddASM(where, asm.set1, reg).rest = set1_test
+			return true
+
+		|| R = (~Value|uint64|).LongestBitStretch	// longest false-stretch
+		if r.x >= 50		// OK so we have the longest stretch in r.x
+			value = value rotl 63-r.y
+			.AddASM(where, asm.setk, reg, r.y).rest = value|int|
+			return true
+
+
+	function SetConst (|Message| List,  |message| Orig,  |bool|)
+		opt norefcounts								// set1: r1, 123
+		|| RegMsg = list[@thg]
+		|| Reg    = RegMsg.reg
+		|| Value  = regmsg.Next(nil)$.ASMConst
+
+		if !.TrySmallConst(reg, value, orig)
+			debugat // how would I write it backwards?
+					// I'd need to know where it is.
+					// I guess I COULD make setn write in place.
+					// at the start is nicer.
+			.AddASM(orig, asm.setn, reg)
+		return true
+	
+	
+	function TextInstruction (|message| m)
+		if !.TextOp(m)
+			debugger // retry
+			.TextOp(m)
+		// we also need to go into the if/while things
+
+
+	function TextOp (|message| m, |bool|)
+		opt norefcounts
+		
+		if m == @rel
+	//    r1 = jb_str_length(r2)~5    // save 5 regs
+			|| Dest = m[@thg]$
+			|| funcMsg = dest.GetASMFunc$
+
+		require m.expect(@tmp)
+		|| op = instruction[m]						#require
+		|| list = m.first
+		expect (list == nil or @list or @bra) (m)
+
+		if op.IsSetConst
+			return .SetConst(list, m)
+		
+		|| A = .RequestOp(op)
+		|| write = 0
+		for p in list
+			if p != @name
+				a.AddRegParam(p, write)
+			  else
+				a.rest = .GetLabelJump(p)
+			expect (++write <= op.pcount) (list, "Too many params")
+
+		return (op.pcount == write) #expect (list, "Too few params")
+
+	
+	function GetLabelJump (|message| P, |uint|)
+		opt NoRefCounts
+		return textassembler.LabelsToDo.valuelower(p.name) #expect (P, "Label not found")
+	
+	
+	function LoadLabelJumps (|bool|)
+		opt norefcounts
+		require textassembler.LabelsToDo
+		for A in .out
+			if a.label == 255
+				|| Found = .findlabel(a)
+				if !found
+					debugger, .findlabel(a), return false
+				A.rest = Found-A
+		return true
+	
+	function ASM2.SyntaxExpect (|string| Error)
+		|| file = scimport.allfiles[.debug>>19].path
+		|| err = Error(nil, error, ErrorSeverity.Error, file)
+			err.position = .debug&19.bits
+			stderr <~ err
+
+	function FindLabel (|&asm2| dbg, |&ASM2|)
+		opt norefcounts
+		|| num = dbg.rest
+		for A in .out
+			if a.label == num
+				return a
+		error (dbg, "No label found")
+	
+	
+	function AddLabel (|message| ch)
+		opt norefcounts
+		|| T = textassembler.LabelsToDo init dictionary()
+		.last.label = ++.labelcount			#expect (ch, "Too many labels")
+		expect (!T.valuelower(ch.name))		        (ch, "Label already used" )
+		#!debugger
+		T.valuelower(ch.name) = datatypewrapper(.out.length)
+
+
+	function TextFuncSub (|message| m, |bool|)
+		opt NoRefCounts
+		for ch in .LoadTitle(m)
+			if ch == @name
+				.addlabel(ch)
+			  else
+				.TextInstruction(ch)
+		
+		require .LoadLabelJumps
+		if asm.noisyasm >= 2
+			printline self
+
+
+function message.ASMConst (|uint64|) 
+	opt norefcounts
+	if (self == @unit)
+		.expect(nil, "d")$
+		return .first.float.AsInt
+	.expect(@num)$
+	if (.name contains '.')
+		return .float32.asint
+	return .int
+
+
+
+function uint64.LongestBitStretch (|ivec2|)
+	|uint64| last
+    while self
+		last = self
+        self &= self rotl 1
+		rz.x++
+	rz.y = last.log2
+	
+
+// how to tell where the range is? we only know how long it is?
+
+// 0101010000000000101010101-->
+// 1010101111111111010101010
+// 0000001111111110000000000
+// OK now what? where is the range? we really want the last value!
+// whhere does the range start/end?

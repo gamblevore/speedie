@@ -1,0 +1,19 @@
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class ShellStream
+	linkage
+		wrapper
+		cpp_part Sh
+		cpp_class ShellStreamer
+	destructor:							cpp_wrapper JB_Sh_Destructor
+
+	function Step (|bool|):				cpp_wrapper JB_Sh_Step
+
+	module
+		function New (|String| self, |[]| R, |FastString| FSOut, |FastString| FSErrIn, |ShellStream|)
+			cpp_wrapper JB_Sh__New

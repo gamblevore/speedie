@@ -1,0 +1,121 @@
+
+// jbin: streamable, binary jeebox
+
+|| _JbinHeader = "\10\03" // ugh 
+/// can't put a constant in a role? 
+
+		
+extend message
+	render render_jbin (|string| sheb = "")
+		opt norefcounts
+		require self
+		|| js = fs|jbin|
+		js.sheb(sheb)
+		js.jinit
+		|| ch	 = self
+		|| after = .FlatAfter
+		while ch != after
+			|| Depth	= 0
+			|| curr		= ch
+			ch			= ch.FlatNextDepth(depth)
+			js.Add(curr.func, curr.name, depth > 0)
+			js.up(-depth)
+
+
+role JBin (Faststring)
+	linkage: cpp_part bin
+	constructor 	(|syntax| type, |string| data="")
+		cpp_part Constructor
+		.jinit
+		.enter(type, data)
+	constructor: cpp_part Constructor0
+	function enter		(|syntax| type=@arg, |string| data="")
+		.add(type, data, true)
+	function addstr		(|string| data)
+		.add(@str, data)
+	function addint		(|int64| data)
+		.add(@num, data.render)
+	function add		(|syntax| type, |string| data="", |bool|into = false)
+		|| L = data.length
+		.addmemory(type, into, (data.addr, nil)(L), L)
+
+	function sheb		(|string| data)
+		if data
+			self <~ '#'
+			self <~ '!'
+			self <~ data
+			self <~ '\n' // noice
+
+	function jinit
+		.length = 0 // whateverrrrr...
+		self <~ _JbinHeader
+
+	function up (|int| amount = 1)
+		while amount > 0
+			|| less  = amount min 63
+			self    <~ (less(|)192)|byte|
+			amount  -= less
+
+	function AddCstring	(|cstring| data, |syntax| type=@str)
+		.addmemory(type, false, data|&byte|, data.length)
+	
+	function AddMemory	(|syntax| type, |bool| GoIn, |&byte| data, |uint64| L)
+		|uint| info = 128 >> goin
+		|| L2 = (L|int|, 60+L.lelength)(L < 60)
+		self <~ (info (|) L2)|byte|
+		if L >= 60
+			.lint(L)
+		self <~ type|byte|
+		if data // so .openstream can stream unknown data-length  
+			.AppendMemory(data, L|int|)
+
+	function OpenStream	(|int|)
+		.AddMemory(@bin, false, nil, 1GB)
+		return .length
+
+	function CloseStream (|int| c)
+		|| nwe = .length
+		.length = c - 6
+		self <~ 191|byte|
+		.AppendInt(nwe - c)
+		self <~ (@bin)|byte|
+		.length = nwe
+
+
+function stringstream.parse_ (|MessageRoot|)	
+	require .test(_JbinHeader)
+	|message| Curr
+	
+	while (self)
+		|uint| info = .Byte
+		|| L	= info & 63
+		|| Dir	= info >> 6						// 3 = up,  2 = same,  1 = down :)
+		if Dir == 3
+			curr = curr.upward(L)					#loop
+		  else
+			if L >= 60
+				L = .lint0(L-60)
+			|| type = .byte
+			|| msg  = curr.msg(type|syntax|,  .str(L))
+			if msg.func > @bin					// need @max
+				error (msg, "Corrupted jbin")
+				msg.func = @tmp
+			rz := msg
+			if !curr or Dir == 1
+				curr = msg
+
+
+function string.parse_jbin (|message|)
+	return .reader.parse_jbin
+
+function string.IsJbin (|bool|)
+	return self starts _JbinHeader
+
+function string.digest (|string|)
+	if !.isjbin
+		|| p = .parse
+			return p.render_jbin
+	return self
+
+function stringstream.Parse_Jbin (|MessageRoot|)
+	return .parse_  #expect  (self, "Not jbin")

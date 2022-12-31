@@ -1,0 +1,50 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+// ideally should merge with byte...
+// be a subclass of byte despite being a different datatype
+// seeing as it can do everything that byte can do!
+// at least for function calling, maybe not everything else.
+// maybe not "subclass" but more... "super-type" :)
+// also a lot of int/uint funcs should be shared.....
+datatype Codepoint (uint)
+	linkage
+		cpp_part CP
+	function UTF8Size (|uint|)	
+		cpp_wrapper JB_Str_UTF8Size
+	function IsLower (|bool|)
+		return .in('a', 'z')
+	function IsInt (|bool|)
+		return .in('0', '9')
+	function IsLetter (|bool|)
+		return .isupper or .islower or .ishigher
+	function IsHigher (|bool|)
+		return .in(128, 1114111)
+	function IsAlphaNum (|bool|)
+		return .isletter or .IsInt
+	function IsWhite (|bool|)
+		return self == ' ' or '\n' or '\r' or '\t' 
+	function In (|int| a, |int| b, |bool|)
+		return  (self - a)|codepoint| <= (b-a)|codepoint|
+	function IsUpper (|bool|)
+		return .in('A', 'Z')
+	function str (|string|)
+		return string.char(self)
+	syntax cast (|string|)
+		return string.char(self)
+	render
+		if fs_in
+			fs_in.AppendUTF8(self)
+		  else
+			return self
+	module
+		function UTF8Read ( |&&byte| source, |Codepoint|)
+			cpp_wrapper JB_u8p_Read
+		
+		function UTF8ByteCount (|&Byte| S, |int| Len, |int| CharCount, |int|)
+			cpp_wrapper JB_u8p_ByteCount	
+		
+				
+

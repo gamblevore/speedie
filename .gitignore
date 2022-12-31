@@ -1,0 +1,13 @@
+**/Build/
+**/BuildTest/
+**/BuildTest2/
+/Speedie.scproj/Terminal/
+cpp.hidden
+.DS_Store
+xcuserdata/
+**/src.nogit/
+/Library/*.jbin
+**/*.input/garbage.jb
+/Terminal/Backup/
+/Terminal/Debug/
+*.scproj/Cpp/

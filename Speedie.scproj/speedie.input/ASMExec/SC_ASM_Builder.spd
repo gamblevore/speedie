@@ -1,0 +1,74 @@
+
+
+// building from asm-text = assembling
+// building from source   = flattening
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+function asm2.AddRegParam (|message| src, |uint| write)
+	opt norefcounts
+	|| Num = src.regornum
+	if write < 4
+		.r[write] = num // what if it's the last one...
+		error (.r[write] == num) (src, "Number out of bounds.")
+	  elseif write == 4
+		.rest = num
+	  else
+		debugger
+
+
+
+datatype µParam (uint16) {
+	linkage: cpp_class ASMParam
+	function form2 (|byte|)
+		return .bitsize (|) (.issigned << 7)
+	function Max (|int|)
+		|| oof = .issigned|int|
+		return (1 << ((.bitsize|int|)-oof))|int|
+		
+	function IsLast (|bool|)
+		return self & 256
+	function NoExpect (|bool|)
+		return (self & 512)
+	function Position (|uint|)
+		return self >> 11
+	function Min (|int|)
+		if (.issigned)
+			return -.max
+	function BitSize (|uint|)
+		return self & 31
+	function IsNumber (|bool|)
+		return self & 64
+	function IsReg (|bool|)
+		return !.isnumber
+	function IsJump (|bool|)
+		return self & asm.jump
+	function IsSigned (|bool|)
+		return self & 128
+
+	function InRange (|int64| num, |message| src, |bool|)
+		|int64| H = .Max
+		|int64| L = .Min
+		if (num > h)
+		expect (num <  H)   (src, "Number too high.")
+		expect (num >= L)   (src, "Number too low.")
+		return true
+
+}
+
+
+
+function message.Reg (|uint|)
+	return .regornum(true)
+
+function message.RegOrNum (|bool| NeedReg = false, |uint|)
+	if !NeedReg and (.name[0].lowercase != 'r')
+		return .int
+	|| reg = .int(1)
+	if (reg <= 31)
+		return reg|uint|
+	error (self, "Expected register between r0 and r31")

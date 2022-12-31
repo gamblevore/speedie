@@ -1,0 +1,53 @@
+
+
+// Put all the message-specific stuff in here, in case I want to remove
+// jeebox from the library? To compile without jeebox. Maybe?
+
+
+extend ErrorList
+	function NewWarning (|Message| node=nil, |String| Desc=nil)
+		self <~ Error(node, desc, errorseverity.Warning)
+	
+	function NewProblem (|Message| node=nil, |String| Desc=nil)
+		self <~ Error(node, desc, errorseverity.problem)
+	
+	function NewError (|Message| node=nil, |string| Desc=nil, |string| path=nil)
+		cpp_part NewErrorWithNode
+		|| sev = (ErrorSeverity.Problem, ErrorSeverity.Error)(.ErrorsAreProblems > 0)
+		self <~ Error(node, desc, sev, path)
+
+
+function Message.ErrorLocation (|string| desc = "", |string|)
+	return Error(self, desc).render
+
+
+function Message.FilePath (|string|)
+	Opt NoRefCounts
+	|| L = .OriginalParseLayer$
+	|| O = L.obj
+	if O isa String
+		return O
+	if !__IS_LIBRARY__ and (O isa File)
+		return O.path
+
+
+function Message.OriginalParseLayer (|memorylayer|)
+	Opt NoRefCounts
+	require self
+	|| L = .memorylayer
+	if (L and L != (Message).defaultlayer)
+		return L
+
+
+function Message.OriginalParseData (|string|)
+	Opt NoRefCounts
+	|| L = .OriginalParseLayer
+	if (L and L.obj2 isa string)
+		return L.obj2|string|
+
+
+extend_module Error
+	function CantParseNum (|Message| Where, |string| num, |int| Pos)
+		visible // for lib
+		|| msg = "Can’t parse number '${num[0,10]}' (found '${num[pos]}')."
+		stderr <~ error(where, msg) // we are done.

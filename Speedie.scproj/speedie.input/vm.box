@@ -1,0 +1,295 @@
+
+
+
+// vm.box
+forms
+	U0:
+	U1: r1 r
+	U2: r1 r,  r2 r
+	U3: r1 r,  r2 r,  r3 r
+	U4: r1 r,  r2 r,  r3 r,  r4 r
+
+	Func ...	// func: fnc:
+		Mode		2
+		JUMP		j
+	/*
+	FuncOld ...
+		ENTR		6		// dest
+		SaveRegs	5		// simd
+	*/
+	
+	Cmp		// cmp:
+		r1		r
+		r2		r
+		Cmp		4
+	CmpEq	// cmpeq:
+		r1		r
+		r2		r
+		bytes	2
+		Jmp		j
+
+	Const	// const:
+		r1		r
+		rot		6
+	Bra		// bra:
+		r1		r
+		c1		2
+		jmp		j
+	Mem		// mem:
+		r1		r
+		r2		r
+		incr	2
+	Setn ...
+		len		2
+		Dest	5
+		Cond	2	// 0 == always, 1 = only if dest == 0, 2 = only if dest != 0
+	CNTR	// 
+		r1		r
+		r2		r
+		incr	3
+		size	2 // 1, 2, 4, 8
+		// *(u1+L3-8) += i2
+		// u1+=incr-3
+		// this can add a reg to an obj property
+		// incr useful for writing to an array?
+	CNTC
+		r1		r
+		cnst	8
+		size	2 // 1, 2, 4, 8
+		// *(u1+CNTC_Lu-8) += CNTC_cnsti
+	BFLD
+		r1		r
+		r2		r
+		up		6
+		down	6
+		sign	3
+
+	SWAP
+		A		6
+		B		6
+		C		6
+		D		6
+
+
+// this file:
+// 1) builds the c++ vm
+// 2) builds the instruction-info speedie uses exec can just include this file too.
+// 3) builds the µforms
+
+ 
+#!						 (((((STOP)))))
+EROR (U1)
+	debugger
+	return -1
+
+
+HALT (U1) // merge these two? don't need 16M codes just to stop
+	return u1
+
+
+#!						 (((((FUNC)))))
+STCK (U1)
+	r[-1] += u1 + U1_Lu
+
+SWAP (Swap)
+	std_swap(r[swap_A], r[swap_B])
+	std_swap(r[swap_C], r[swap_D])
+
+FNC  (Func)
+	__
+	Code = BumpStack(r, Code, Op)
+	___
+
+FNCX (Func)
+	__
+	vm.CurrStack = r // to make this recursive
+	ForeignFuncSimple(r, Code, Op)
+	___
+
+RET (rn)
+	__ 
+	Code = Return(r, Code, Op)
+	___
+
+LEAF ("j")
+	__
+	JumpLeaf(Code + U0_Li)
+	___
+	
+RETL ("l")
+	__
+	Code = LeafCode
+	___
+	
+
+#!						 (((((Utils)))))
+RARE (U2)
+	if_rare (Rare(r, Op)) return n3
+CONV (U3)
+	Conv(r+n1, n2)
+
+
+#!						 (((((Consts)))))
+SET1 ("rS")
+	i1 = U1_Li
+SETK (Const)
+	i1 = JB_u64_RotL(Const_Lu, Const_rotu)
+SETN (setn)			// OK
+	loadconst(r, Op, Code)
+
+
+#!						 (((((Math)))))
+ADDC ("rrnl")
+	i1  =  i2 + JB_u64_RotL(L3, n3)
+ADD  (U3)
+	i1  =  i2 + (i3 << L3) // only need 6 bits for shift! can we save 3 conditional add?
+SUB  (U3)
+	i1  =  i2 - (i3 << L3)
+MUL  (U4)
+	i1 = (i2 * i3) + i4
+DIV  (U4)
+	divmath(r, Op)
+
+
+#!						 (((((Bitops)))))
+SHRS  (U3)
+	i1 = i2 >> (u3 + L3)
+SHRU  (U3)
+	u1 = u2 >> (u3 + L3)
+SHLS  (U3)
+	i1 = i2 >> (u3 + L3)
+BAND  (U3)
+	u1 = u2 &  (u3(|)L3)
+BOR   (U3)
+	u1  |= i3(|)L3
+BXOR  (U3)
+	u1 = u2 ^ u3
+BNOT  (U2)
+	u1 = ~u2
+BFLG  (BFLD)
+	if (BFLD_signu) // perhaps sign can allow for 1-4 contig regs to be masked?
+		i1 = ((i2 << BFLD_upu) >> BFLD_downu)
+	else
+		u1 = ((u2 << BFLD_upu) >> BFLD_downu)
+BFLS  (BFLD)		 // same?
+	i1 |= ((i2 << BFLD_downu) >> BFLD_upu)
+
+	
+//BSTT  (U4)
+//	i1 = 0//bitstats(u2, u3, u4)
+BROL  (U3)
+	i1 = JB_u64_RotL(u2, u3 + L3)
+BROR  (U3)
+	i1 = JB_u64_RotR(u2, u3 + L3)
+
+#!						 (((((Branches)))))
+CMPI  (Cmp)					// Yes. int/uint/u64/i64 versions
+	__
+	Code = CompI(r, Op, Code)
+	___
+CMPF  (Cmp)
+	__
+	Code = CompF(r, Op, Code)
+	___
+CMPE  (CmpEq)				// NO (add 8/16/32/64 versions? and a neq version?)
+	Code = CompEq(r, Op, Code)
+	___
+CMPN  (CmpEq)				// NO (But easy to fix)
+	__
+	Code = CompNeq(r, Op, Code)
+	___
+BRA   (Bra)					// NO (But easy to fix)
+	__
+	if (!i1)
+		Code += Bra_jmpi
+	___
+	i1 += Bra_c1u-1
+	
+BRAN  (Const)				// NO (But easy to fix)
+	__
+	if (i1)
+		Code += Bra_jmpi
+	___
+	i1 += Bra_c1u-1
+
+LUPU  ("rrj")				// assume uint64
+	__
+	if (i1++ < i2)
+		Code -= U2_Lu
+	___
+LUPD  ("rrj")			 	// same
+	__
+	if (i1-- > i2)
+		Code -= U2_Lu
+	___
+
+
+#!						 (((((Refs)))))
+
+RSDE  ("rrrj")
+	__
+	Code += U3_Li
+	___
+	decr(o3)
+	decr(o2)
+	safedecr(o1)
+	#!jump too? for branches...
+RSET  (U4)
+	setref(n1, o1, o2)
+	setref(n3, o3, o4)
+
+RALO  (U2)
+	o1 = alloc(o2)
+	#!should call constructor too.
+
+	
+#!						(((((Memory)))))
+RD1U  (mem)				// OKALL
+	u1 = mem(uint8)
+RD1S  (mem)
+	u1 = mem(char)
+RD2U  (mem)
+	u1 = mem(u16)
+RD2S  (mem)
+	u1 = mem(s16)
+RD4U  (mem)
+	u1 = mem(u32)
+RD4S  (mem)
+	u1 = mem(int)
+RD8U  (mem)
+	u1 = mem(u64)
+ST1U  (mem)
+	mem(uint8) = u1
+ST2U  (mem)
+	mem(u16) = u1
+ST4U  (mem)
+	#! xcode only complains about this one? ?
+	mem(u32) = (u32)u1
+ST8U  (mem)
+	mem(u64) = u1
+CNTC  (CNTC)				// aWESOME  JOBBBBBBBBBBB BROOOOOO LOLLLLLLL ::DDDDDD
+	CountConst(r, Op)
+MEMM  ("rrnl")
+	#! copy/fill/endian/xor
+	MemStuff((u32*)u1, (u32*)u2, n3, L3)
+
+
+#!						(((((Float)))))
+FADD  (U3)
+	f1 = f2 + f3
+FSUB  (U3)
+	f1 = f2 - f3
+FMUL  (U4)
+	f1 = (f2 * f3)+f4
+FDIV  (U3)
+	f1 = f2 / f3
+DADD  (U3)
+	d1 = d2 + d3
+DSUB  (U3)
+	d1 = d2 - d3
+DMUL  (U4)
+	d1 = (d2 * d3) + d4
+DDIV  (U3)
+	d1 = d2 / d3
+PRNT (U1)
+	printf("%lli\n", i1)

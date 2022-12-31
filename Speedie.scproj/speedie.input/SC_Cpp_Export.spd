@@ -1,0 +1,1498 @@
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+// cexport cppexport exportcpp
+class Cpp_Export {
+linkage
+	cpp_part		Cpp
+
+module
+	|SCClass|						CurrClass
+
+	
+	function compiler.Reachedfuncs (|int|)
+		opt norefcounts
+		for f in compiler.funclist
+			rz += f is reached
+
+
+
+|FastStringCpp|						T
+|[FastStringCpp]|					Outputs_cpp
+|[FastStringCpp]|					Outputs_h
+|FastStringCpp|						Inlines
+|FastStringCpp|						TypesProj
+|FastStringCpp|						HeaderProj
+|FastStringCpp|						AllTypes
+|FastStringCpp|						ModuleProperties
+
+
+
+constructor
+	Init()
+
+
+
+function PreRun
+	Cpp_Export.StringBlob	= FastStringCpp.new
+	Cpp_Export.StringLengths= FastStringCpp.new
+	Cpp_Export.StringDict = dictionary()
+
+	.AllTypes   = .StreamChild( "AllTypes.h"  )
+	.TypesProj  = .StreamChild( "Proj.h" )
+	
+	.HeaderProj = .StreamChild( "JB.h" )
+	.Inlines	= .StreamChild( "Inlines.h" )
+	.ModuleProperties = .StreamChild( "ModuleProperties.cpp" )
+	
+	.AllTypes <~ "
+#ifndef ObjCID
+	#define ObjCID void*
+#endif
+"
+
+	.Headerproj <~ '\n'
+	.T = FastStringCpp.new
+	
+	.ModuleProperties <~ `// Globals put into a separate file to make things faster.
+#include "JB_Umbrella.hpp"
+#include "JB.h"
+#pragma GCC visibility push(hidden)
+
+`
+
+
+function OptStart (|FastStringCpp| fs, |int| m, |bool| force = 0)
+	opt min 3
+	if m and (force or !currclass.minopt)
+		|| s = "s"
+		if m <= 3
+			s = m.render
+		fs <~ "#pragma GCC optimize (\"O$s\")\n"
+
+
+
+function OptEnd (|FastStringCpp| fs, |int| m, |bool| force=0)
+	if m and (force or !currclass.minopt)
+		fs <~ "\n#pragma GCC reset_options\n\n"
+	
+
+function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
+	if !f.IsExternalLib
+		require !f.IsWrapper and !f.isMacro
+	require !(f isa kIsNewStruct)
+	
+	WriteFunctionHeader( F, .T )
+	if (f.IsInline)
+		fs = .Inlines // one inline can inlcude another so we still need the header first.
+	
+	|| FuncHeader = .T.getresult
+	H <~ FuncHeader
+	H <~ ";\n\n"
+	require !f.isexternallib
+	
+	if f.isapi
+		fs <~ "__lib__ "
+	
+	.OptStart(fs, f.minopt)
+	fs <~ FuncHeader
+	.T.Length = 0
+	
+	fs.currfunc = f
+	fs.srcend = f.sourcearg
+	fs.extraafter = fs.srcend.flatafter
+	fs <~ ' ' // space between arg.
+	f.Source[@Arg, -1]$.Export( fs )
+
+	.OptEnd(fs, f.minopt)
+	fs <~ "\n\n"
+
+
+function SCClass.NeedsExport (|bool|)
+	return super.needsexport or .isbehaviourTable
+
+
+function Codify (|SCModule| scb, |string| fName)
+	// class and modules come through here.
+	|| cls = scb.Cls
+	if !fName
+		if (cls)
+			fName = cls.ExportName
+		  else
+			fName = scb.ExportName
+
+	if (scb == Compiler.program) // doesn't really matter...
+		fName = "main"
+	
+	|| ModuleFuncs = scb.ListFunctions
+	require (cls or ModuleFuncs or scb.access)
+		
+	cpp_Export.currclass = cls
+	|| File = .StreamChild( fname + ".cpp" )
+	.HeaderProj <~ ("\n\n// $fname\n")
+	.ExportModuleProperties( scb, .ModuleProperties )
+
+
+	if (Cls and cls.NeedsExport)
+		.ExportClass( cls, .ModuleProperties )
+		.optstart(file, cls.minopt, true)
+		.CodifyFuncs( file, cls.ListFunctions )
+		.optend(file, cls.minopt, true)
+	
+	.CodifyFuncs( file, ModuleFuncs )
+	cpp_Export.currclass = nil
+
+
+function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
+	for (f in list)
+		if f.NeedsExport
+			scfunction.CurrFunc = f
+			.func( file, f, .HeaderProj )
+			scfunction.CurrFunc = nil
+
+
+function StreamChild (|String| s, |FastStringCpp|)			// zero amy dokh doomed...
+	rz = FastStringCpp(s.trimextandpath) #expect
+	if s isa "h"
+		.Outputs_h <~ rz
+		rz <~ "//// HEADER "
+		rz <~ s
+	  else
+		.Outputs_cpp <~ rz
+	rz <~ '\n'
+
+
+function WriteAPIFuncHeader (|SCFunction| F, |FastStringCpp| fs)
+	Cpp_export.WriteAPI = true
+	WriteFunctionHeader( F, fs )
+	Cpp_export.WriteAPI = false
+
+
+function SCClass.APIStructName (|string|)
+	if (.isobject or .super)
+		return .source.APICppProject + .name.lowercase
+	return .Cstructname
+
+
+function WriteAPIHeader (|file| destfile)
+	// CreateApi (Cpp export)
+	require destfile!=nil
+	
+	|| fs = FastStringCpp.new
+	fs <~ cpp_export.CppLicence
+	fs <~ `
+
+		// API
+
+
+extern "C" {
+
+		// Types
+
+typedef const char* _cstring;
+typedef void* _voidptr;
+#ifndef u8
+	typedef unsigned char  u8; 
+#endif
+#ifndef byte
+	typedef u8  byte; 
+#endif
+#ifndef int64
+	typedef long long  int64; 
+#endif
+#ifndef uint64
+	typedef unsigned long long  uint64; 
+#endif
+
+struct jbobject {int RefCount;};
+`
+
+	for (m in compiler.api_list)
+		if (m == "class_api")
+			|| f = m.first
+			|| cls = compiler[f]#require
+			if (cls.isobject)
+				fs <~ "struct ${cls.APIStructName} : jbobject {};\n"
+			  elseif (cls.isdatatype)
+				fs <~ "typedef ${cls.super.CStructName} ${cls.APIStructName};\n"
+			  else
+				error (m, "Can't export this.")
+
+
+	|SCClass| PrevCls
+	for (f in compiler.api_funcs)
+		if (f.Cls != PrevCls)
+			Prevcls = f.cls
+			fs <~ "\n\n\t\t// "
+			if (prevcls)
+				fs <~ prevcls.name
+			  else
+				fs <~ "Global"
+			fs <~ " functions\n\n"
+		
+		if !f.iswrapper
+			.WriteAPIFuncHeader( f, fs )
+		fs <~ ';'
+		if (f.description)
+			fs <~ " /* ${f.description} */"
+		fs <~ '\n'
+	
+	
+	if (Compiler.SyxArray)
+		fs <~ "\n\n\t\t// Jeebox Syntax\n\n"
+		for (s in Compiler.SyxArray)
+			|| slower = s.lowercase
+			|| id = _syxdict_[slower].id|int|
+			fs <~ "#define JB_Syx$s $id;\n"
+			fs <~ "#define \$$slower $id\n"
+	
+	fs <~ `
+
+#ifdef __nodebug
+	#undef __nodebug
+#endif
+#if defined(__linux__)
+	#define __nodebug inline __attribute__((__always_inline__)) // __nodebug__ doesn't exist on linux?
+#else
+	#define __nodebug inline __attribute__((__always_inline__, __nodebug__))
+#endif
+__nodebug void jb_incr(jbobject* s) {
+	if (s) {s->RefCount++;}
+}
+
+__nodebug void jb_decr(jbobject* s) {
+	if (s) { if (--s->RefCount <= 0) {jb_delete_(s);} }
+}
+
+} // end-extern
+`
+	
+	SmartWrite(FS, destfile)
+
+
+
+function Run 
+	for c in Compiler.ClassList
+		if !c.IsFunc
+			WriteType( c, .AllTypes, true )
+	
+	for c in Compiler.ClassList
+		if c.IsFunc
+			WriteType( c, .AllTypes, false )
+	
+	for c in Compiler.ModuleList
+		.Codify( c, "" )
+	
+	for c in Compiler.ModuleList
+		.ExportModuleProperties( c, nil )
+	
+
+	if options.ProjectIsLibrary
+		|| WriteTo = Cpp_Export.APIHeader
+			|| File = .StreamChild( "API.cpp" )
+			file <~ "\n//// API START! ////\n\n"
+			file <~ "#pragma GCC visibility push(default)\n"
+			.CodifyFuncs( file, compiler.api_funcs )
+			file <~ "#pragma GCC visibility pop\n"
+			file <~ "//// API END! ////\n"
+			.WriteAPIHeader(WriteTo)
+
+
+
+function SCClass.ExportDestructor (|string|)
+	|| it = .FirstDestructor
+		return it.ExportName
+	return "0"
+
+
+function SCClass.CSuperStructName (|string|)
+	|| sup = .realSuper
+	if (!sup)
+		return "0"
+	return "JB_AsClass(${sup.CStructName})"
+
+
+function AppendPropField (|SCdecl|prop, |FastStringCpp| fs)
+	fs <~ "\n\t"
+	WriteDecl( prop, fs )
+	fs <~ ';'
+
+
+function AppendCppField (|string|prop, |FastStringCpp| fs)
+	fs <~ "\n\t"
+	fs <~ prop
+	fs <~ ';'
+
+
+function ExportProperties (|SCClass| cls, |FastStringCpp|fs, |string| Ignore=nil)
+	for prop in cls.Properties
+		if prop.name != Ignore
+			.AppendPropField(prop, fs)
+
+
+function ExportOneProperty (|SCClass| cls, |FastStringCpp|fs, |string| Only, |bool|)
+	for prop in cls.Properties
+		if prop.name == Only
+			.AppendPropField(prop, fs)
+			return true
+
+
+function scclass.WriteStructOrUnion (|faststringcpp| fs)
+	opt norefcounts
+	fs <~ "\n"
+	if .iswrapper == 2
+		fs <~ "union"
+	  else
+		fs <~ "struct"
+	fs <~ " "
+
+
+function ExportStruct (|SCClass| cls, |bool| IsBehaviour=false)
+	|| fs = .TypesProj
+	cls.WriteStructOrUnion(fs)
+	if Cls.IsModel
+		fs <~ "__attribute__((__packed__)) "
+	
+	fs <~ cls.cstructname
+	if cls.super
+		fs <~ ": "
+		fs <~ cls.super.cstructname
+	
+	fs <~ " {"
+
+	if (IsBehaviour)
+		if (!cls.super)
+			.AppendCppField("void* __destructor__", fs)
+			.ExportOneProperty(cls, fs, "render")
+		.ExportProperties(cls, fs, "render")
+	  else
+		.ExportProperties(cls, fs)
+	
+	fs <~ "\n};\n"
+
+
+function ExportBehaviourHeader (|SCClass| cls)
+	require !cls.IsRole
+	|| b = cls.Behaviour							#require
+	.ExportStruct( B.FuncTayble.cls, true )
+
+
+function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass| Type)
+	self <~ "\tResult."
+	if name
+		self <~ name
+	  else
+		self <~ "__destructor__"
+
+	self <~ " = "
+	ifn fn
+		self <~ "nil"
+	  else
+		self <~ '('
+		if Type
+			self <~ (Type.Cstructname#expect)
+		  else
+			self <~ "void*"
+		self <~ ')'
+		self <~ fn.exportname
+	self <~ ";\n"
+
+
+function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
+	|| b		= cls.behaviour									#require
+	|| TableCls = b.FuncTayble.cls
+	|| N		= TableCls.CstructName
+	|| CN		= cls.CStructName
+
+	fs <~ N
+	fs <~ " InitTable"
+	fs <~ CN
+	fs <~ "_() { // Behaviour \n\t"
+	fs <~ N
+	fs <~ " Result;\n"
+	
+	fs.AppendBehaviour(nil, cls.destructorfunc, nil)
+	
+	while (b)
+		for (M in b.interfaces)
+			|| s = m.name.InterfaceToBehaviour
+			|| fn = cls.BestBehaviourFor(s)					#expect (cls.source, "Cant find behaviour '$s' on class ${cls.name}")
+			|| BaseClass = cls.InterfaceForBehaviour(fn)	#require
+			if (M.IsRequiredInterface and !cls.Behaviour[s])
+				|| msg = "Missing behaviour on class: ${cls.name}" 
+				error (cls.source, msg)
+				error (baseclass.funcproto.source, msg)
+			fs.AppendBehaviour(s, fn, Baseclass)
+		b = b.upwards
+	
+	fs <~ "\treturn Result;\n}\n\n"
+	fs <~ "$N ${CN}_FuncTable_ = InitTable${CN}_();\n"
+	return true
+
+
+function ExportClass (|SCClass| cls, |FastStringCpp| CppFile)
+	require !cls.IsDataType
+	require !cls.IsFunc
+	require !cls.isbehaviourTable
+	require !cls.IsRole
+	if cls.iswrapper
+		.ExportBehaviourHeader(cls)
+	require !cls.IsWrapper
+	
+	if cls.IsStruct
+		.ExportStruct( cls )
+		return
+	
+
+	|| HFile = .TypesProj
+	.ExportBehaviourHeader(cls)
+	
+	HFile <~ "\nJBClass ( "
+	HFile <~ cls.CStructName
+	HFile <~ " , "
+	if (cls.super)
+		HFile <~ cls.super.CStructName
+	  else
+		HFile <~ "JB_Object"
+	HFile <~ " , "
+	
+	for (prop in cls.Properties)
+		HFile <~ "\n\t"
+		WriteDecl( prop, HFile )
+		HFile <~ ';'
+	
+	HFile <~ "\n);\n"
+	
+
+	|| HasTable = .ExportBehaviourInstance(cls, cppfile)
+	CppFile <~ "JBClassPlace4(${cls.CStructName}, ${cls.CSuperStructName}, "
+	if (!HasTable)
+		cls = TypeObject
+	cppfile <~ cls.CStructName
+	cppfile <~ "_FuncTable_);\n\n"
+
+
+function scfunction.CanLibLoad (|bool|)
+	require .exportname
+	require !.disabled and .iscppinbuilt != 2
+	return .isstdlib
+	
+
+function scfunction.WrapName (|string|)
+	if .canlibload
+		if .iscppinbuilt
+			rz = .ExportNameBuilder + "Wrap"
+		  else
+			rz = .exportname
+
+
+function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
+	|| n = f.WrapName
+	WriteFuncSub( f, n, fs )
+	fs <~ " {\n\t"
+	if f.returnType
+		fs <~ "return "
+	
+	fs <~ f.ExportName
+	
+	WriteFuncArgs( f, fs, true )
+	fs <~ ";\n}\n\n"
+	// OK... so we cant call it directly.
+
+
+function DoInterpreter
+	require options.ListAllLib
+	|| fs = .ModuleProperties
+	.listAllFuncs(fs)
+	.ListAllClasses(fs)
+
+
+
+function SCClass.LibExport (|jbin| j)
+	j.enter(@tmp, .name)
+	if .isobject
+		|| b = .behaviour
+		j.enter(@arr)
+		for fn in b.WrapperFuncs
+			j.add(@tmp, fn.exportname)
+		j.up
+	  elseif .funcproto
+		j.add(@list)
+	  elseif .isstruct
+		j.addint(.size)
+	  else
+		j.add(@char, string.hex(.typeinfo|int|))
+	if .children
+		j.enter
+		for c in .children
+			c.libexport(j)
+		j.up
+	j.up
+
+
+ignore
+	string 123 basestring
+		destructor
+		render
+
+
+function ListAllClasses (|FastStringCpp| fs)
+	|| j = jbin(@arg)
+	for c in Compiler.ClassList
+		if c.IsSTDLib and !c.super
+			c.LibExport(j)
+	
+	|| s = j.getresult.compress
+	fs <~ `__lib__ const char* JB_LibClassInfo = `
+	fs.AppendCpp(s)
+	fs <~ ";
+extern \"C\" JB_String* JB_App__LibClasses() {
+	return JB_StrCN(JB_LibClassInfo, ${s.length});
+}
+"
+	// just need a func to actually read it.
+
+
+
+function ListAllFuncs (|FastStringCpp| fs)
+	fs <~ "// entire_function_list\n\n"
+	for f in ExecTable.Funcs
+		if f.isstdlib and f.iscppinbuilt == 1
+			.MakeWrapperFor(fs, f)
+	
+	|| bs = jbin(@arg)
+	fs <~ "\n__lib__ void* JB_AllFuncsList[] = {\n"
+	for f in ExecTable.Funcs
+		if f.isstdlib
+			fs <~ "\t(void*)"
+			|| name = f.WrapName
+				bs.add(@tmp, name)
+				fs <~ name
+				fs <~ ",\n"
+			
+	fs <~ "0};\n"
+
+	|| s = bs.getresult.compress
+	fs <~ `__lib__ const char* JB_LibFuncInfo = `
+	fs.AppendCpp(s)
+	fs <~ ";\n"
+	
+	fs <~ "
+extern \"C\" JB_String* JB_App__LibFuncs(void*** Funcs) {
+	* Funcs = JB_AllFuncsList;
+	return JB_StrCN(JB_LibFuncInfo, ${s.length});
+}
+"
+	
+
+function ExportModuleProperties (|SCModule| modl, |FastStringCpp| IntoModule)
+	|| fs = IntoModule oar .TypesProj
+
+	for prop in modl.ListProperties
+		if prop is Const
+			if IntoModule: Continue
+
+			WriteConst( prop, fs )
+		  elseif prop.TypeIsReached
+			if !IntoModule
+				fs <~ "extern "
+			  elseif prop is api
+				fs <~ "__lib__ " 
+
+			if IntoModule and prop is GameFlyingMem
+				prop.stringdata.replaceall("$(N)", prop.name, fs)
+			  else
+				WriteDecl( prop, fs, nil )
+			fs <~ ';'
+		
+		fs <~ '\n'
+
+
+
+function ExportSyx
+	require Compiler.SyxArray
+	|| fs = .StreamChild( "SyntaxConstants.h" )
+	
+	for (i in Compiler.SyxArray.length)
+		.ExportOneSyx( i, fs )
+
+
+function ExportOneSyx (|int| i, |FastStringCpp| fs)
+	|| syx = Compiler.SyxArray[ i ]
+	fs <~ "#define kSyx$syx $i\n"
+
+
+function FinalMergeOutputIntoACpp
+	|| fs = faststringcpp.new
+	fs <~ "\n// Auto-generated file, by speedie.\n"
+	fs <~ Cpp_Export.CppLicence
+
+	fs.includeh "JB_Umbrella.hpp"
+	fs.includeh "JB.h"
+
+	for h in Cpp_Export.H_PostInput
+		fs.includeh(h)
+
+
+	fs <~ `
+#pragma GCC visibility push(hidden)
+extern "C" {
+
+`
+	fs <~ "extern "
+	Cpp_Export.GenLub(fs)
+
+	
+	fs <~ "extern ${TypeObject.Behaviour.FuncTayble.cls.cstructname} JB_Object_FuncTable_;\n"
+	if Cpp_Export.DoSavers
+		Cpp_Export.CreateClassListHeader(fs, ";\n")
+
+	cpp_export.GenStrings(.ModuleProperties)
+	Cpp_Export.SmartWrite(.ModuleProperties, Cpp_Export.product("JB_Globals.cpp"))
+	.ModuleProperties.length = 0
+
+	for f in .Outputs_cpp
+		fs <~ Cpp_Export.splitcpp(f, f.cpp_name)
+	
+	if Cpp_Export.DoSavers
+		Cpp_Export.CreateClassListFunc(fs)
+	
+	fs <~ "}\n\n//"
+	
+	for i in Cpp_Includes
+		fs <~ ' '
+		fs <~ i
+	
+	Cpp_Export.SmartWrite(FS, Cpp_Export.CppProduct)
+
+
+function WriteHeader
+	|| fs = FastStringCpp.new
+	fs <~ "\n\n // Auto-generated file, by speedie.\n"
+	fs <~ Cpp_Export.CppLicence
+	
+	fs <~ "\n#define __SPEEDIE__ 1\n"
+	for h in Cpp_Export.H_Input
+		fs.includeh(h)
+	
+	fs <~ `
+
+#ifndef __JB_H__
+#define __JB_H__
+
+extern "C" {
+
+`
+	
+	for (f in .Outputs_h)
+		fs <~ f
+		fs <~ '\n'
+	
+	fs <~ "\n}\n#endif // __JB_H__\n"
+	Cpp_Export.SmartWrite(fs, Cpp_Export.HProduct)
+
+
+
+module
+	|FastStringCpp|				StringBlob
+	|FastStringCpp|				StringLengths
+	|dictionary of int|			StringDict
+	|int|						StringCount
+
+	|bool|						WriteAPI 
+	|bool|						WroteAny
+								
+	|[string]|					H_Input
+	|[string]|					H_PostInput
+	|[string]|					Cpp_Input
+	|[string]|					Cpp_Includes
+
+
+	function GenLub (|faststring| fs)
+		fs <~ "JB_String* JB_LUB["
+		fs <~ .StringCount + 1 // 1 safety
+		fs <~ "];\n\n"
+
+	function GenStrings (|faststring| fs)
+		.GenLub(fs)
+		
+		fs <~ "int JB_LUBLengths[] = {"
+		fs <~ .stringlengths
+		fs <~ "0};\n\n"
+		
+		fs <~ "const char* JB_LUBSrc = "
+		fs.appendcpp(.StringBlob)
+		fs <~ `;
+
+extern "C" void JB_Str__FindGlobals(JB_String*** lub, int** lengths, const char** src) {
+	*lub = JB_LUB;
+	*lengths = JB_LUBLengths;
+	*src = JB_LUBSrc;
+}
+`
+		.stringlengths = nil
+		.stringblob = nil
+		.stringdict = nil
+
+
+	Syntax Access (|string| name, |int|)
+		require name // "" is 0
+		rz = Cpp_Export.StringDict[name]
+		if rz
+			return rz
+			
+		rz = ++Cpp_Export.StringCount
+		Cpp_Export.StringDict[name] = rz
+		.StringBlob <~ name
+		.StringBlob <~ 0|byte|
+		.stringlengths <~ name.length
+		.stringlengths <~ ", "
+		
+
+
+	function CppProduct (|File|)
+		return Compiler.GeneratedCppsFolder[ "JB.cpp" ]
+
+
+	function HProduct (|File|)
+		return Compiler.GeneratedCppsFolder[ "JB.h" ]
+
+
+	function Product (|string| name, |File|)
+		return Compiler.GeneratedCppsFolder[ name ]
+
+
+	function APIHeader (|File|)
+		|| arg = compiler.api_place[@arg, -1]
+		|| ForLib = arg.findflat(@tmp, "libraryname")[@str]#require
+		|| FolName = arg.findflat(@tmp, "exportplace")[@str]#require
+		|| Fol = Compiler.BaseProjectPath[ FolName.name ]
+		require fol.mustexist("Create API-Header for API: ${arg.filelocation}")
+		return Fol[compiler.ProjectName + "_api.h"]
+	
+	
+	function WriteFuncSub (|SCFunction| F, |string| E, |FastStringCpp| T)
+		.WriteDecl( f.ReturnType, T )
+		T <~ ' '
+		T <~ E
+		.WriteFuncArgs( F, T )
+		
+		
+	function WriteFunctionHeader (|SCFunction| F, |FastStringCpp| T)
+		// int example(int a, int b)
+		if f.IsInline
+			t <~ "inline "
+		
+		.WriteFuncSub(F, f.exportname, t)
+
+
+	function WriteDecl (|SCDecl| D, |FastStringCpp| T, |Message| equality = nil) 
+		if (!d)
+			t <~ "void"
+			Return
+		
+		.WriteDeclNoName( d, T )
+		
+		if (d.Name)
+			T <~ ' '
+			d.Name.safe(t)
+			if (d.C_Array)
+				T <~ '['
+				T <~ d.C_Array|int|
+				T <~ ']'
+		
+		if (equality)
+			T <~ " = "
+			equality.Export( T )
+
+
+	function SmartWrite (|string| S, |File| F)
+		.cpp_includes <~ s.hash|int64|.render
+		require F!=nil
+		require !(F matches S)
+		.wroteAny = true
+		F.Data = S
+	
+	
+	function DoSavers (|bool|)
+		return compiler.Reached("SaverClassInfo") and compiler.Reached("saverloadclass")
+
+
+	|| CppLicenceStr = ""
+	function CppLicence (|string|)
+		if !.CppLicenceStr
+			|| f = compiler.inputfile(nil, "licence.txt", nil)
+			.Cpplicencestr = f.readall(16KB, true)
+			.CppLicenceStr := " "
+		return .CppLicenceStr
+
+	
+	function ExportAllSource
+		require StdErr.ok
+		
+		|| exp = Cpp_Export()
+		exp.PreRun
+		exp.run
+		exp.ExportSyx
+		exp.WriteHeader
+		exp.DoInterpreter
+		exp.FinalMergeOutputIntoACpp
+	
+
+	function CreateClassListHeader (|FastString| fs, |string| s)
+		fs <~ "void JB_InitClassList(SaverLoadClass fn)"		
+		fs <~ s
+	
+	
+	function FastString.includeh (|string| name)
+		self <~ `#include "`
+		self <~ name 
+		self <~ '"'
+		self <~ '\n'
+
+
+	function CreateClassListFunc (|Faststring| dest)
+		|| fs = faststringcpp.new
+		.CreateClassListHeader(fs, " {\n")
+
+		for ( c in compiler.ClassList )
+			if (c.IsSaveableObject and (c is Reached))
+				fs <~ "\tfn(&"
+				fs <~ c.CStructName
+				fs <~ "Data, (char*)" 
+				c.RenderSaveable(fs)
+				fs <~ ");\n"
+		
+		fs <~ "}\n"
+		dest <~ .splitCpp(fs, "saver_funcs")
+
+
+	function SplitCpp (|faststringcpp| fs, |string| name, |string|)
+		if options.SingleCppOutput
+			return fs
+
+// if the file is too big, we can split here. Just search for "}\n\n" //{
+		require fs.length > 1
+		name += ".i"
+		.SmartWrite(fs, .product(name))
+
+// reuse fs
+		fs.includeh(name)
+		return fs
+		
+
+	function WriteType (|SCClass| c, |FastStringCpp| fs, |bool| always)
+		require !c.IsBuiltin
+		ifn always
+			require c.NeedsExport
+		
+		|| f = c.FuncProto
+			fs <~ "\ntypedef "
+			.WriteDecl( f.ReturnType, fs )
+			fs <~ " (*"
+			fs <~ c.CStructName
+			fs <~ ')'
+
+			.WriteFuncArgs( f, fs )
+		  else
+			if c.IsDatatype
+				|| name = c.super.CStructName #require // can be nil!
+				fs <~ "\ntypedef "
+				fs <~ name
+				fs <~ ' '
+			  else
+				c.WriteStructOrUnion(fs)
+			fs <~ c.CStructName
+		
+		fs <~ ";\n"
+
+
+	function WriteClass (|SCClass| C, |FastStringCpp| T)
+		if (.writeapi)
+			T <~ C.APIStructName
+		  else
+			T <~ C.CStructName
+		if (C.IsObject)
+			T <~ '*'
+
+
+	function Init
+		WroteAny = false
+		Cpp_Includes = []
+		@Acc.ExportAddr  = C_RenderAcc
+		@Item.ExportAddr = C_RenderItem
+
+		@list.exportaddr = C_RenderList
+		@prm.exportaddr  = C_RenderList
+		@Arg.ExportAddr  = C_RenderArg
+		@Dot.ExportAddr  = C_RenderDot
+		@Decl.ExportAddr = C_RenderDcl
+		@Func.ExportAddr = C_RenderFnc
+		@Thg.ExportAddr  = C_RenderThg
+
+		
+		@Type.ExportAddr = C_RenderTyp
+		@Tmp.ExportAddr  = C_RenderTmp
+		@opp.ExportAddr  = C_RenderOpp
+		@brel.ExportAddr = C_RenderBrl
+		
+		@Rel.ExportAddr  = C_RenderRel
+		
+		@Num.ExportAddr  = C_RenderNum
+		@unit.ExportAddr = C_RenderUnt
+		@Bra.ExportAddr  = C_RenderBra
+		@ARel.ExportAddr = C_RenderArl
+
+		@Char.ExportAddr = C_RenderChr
+		@Str.ExportAddr  = C_RenderStr
+		@SStr.ExportAddr = C_RenderSStr
+		@Back.ExportAddr = C_RenderBak
+		
+		@Sheb.ExportAddr = C_RenderShe
+	
+	
+	function C_RenderAcc (fpMsgRenderCpp) // name, params
+		.first.Export(fs)
+		fs <~ '['
+		self[1].first.Export(fs)
+		fs <~ ']'
+	
+	
+	function C_RenderItem (fpMsgRenderCpp)
+		// func(a:b, c:d)
+		self[1].Export( fs )
+
+	
+	function C_RenderList (fpMsgRenderCpp)
+		opt norefcounts
+		|| d = .obj
+		if (d isa scdecl)
+			fs <~ d.type.name // vec4
+			.MiniArgCpp(fs)
+
+	
+	function Message.MiniArgCpp (|faststring| fs)
+		opt norefcounts
+		fs <~ '{'
+		for (ch in self)
+			fs <~ ", "
+			start
+			ch.Export(fs)
+		fs <~ '}'
+
+	
+	function C_RenderArg (fpMsgRenderCpp)
+		opt norefcounts
+		|| d = .obj
+
+		fs <~ "{"
+		fs.indent++
+		
+		for (ch in self)
+			fs.IndentLine
+			ch.Export( fs )
+			ifn (ch isTmp "if" or "elseif" or "else")
+				fs <~ ';'
+		
+		fs.indent--
+		fs.IndentLine
+
+// closers... suck for linepos. so we just don't put a line there.
+		fs <~ '}'
+
+		if .next
+			fs.IndentLine
+	
+	
+	function C_RenderDot (fpMsgRenderCpp)
+		|| Backup = .Last.obj
+		require !(Backup isa SCFunction) // function call
+
+		|| ch = .first
+		|| obj = .obj
+
+		if (obj.mustbe(SCDecl))
+			if !obj.name
+				// could be a type-override... either way we need that name!
+				expect ((Backup isa SCDecl) and Backup|scdecl|.name) (self, "Missing property name")
+				Obj = Backup|scdecl|
+
+			if (ch.obj isa SCModule)
+				obj.Name.safe(fs)
+
+			  else
+				|| CloseStr = cpp_export.CDotType( self, obj, fs )
+		
+				ch.Export( fs )
+				|| ch_decl = DeclOfObjForC( ch )
+				if (ch_decl) and NeedsDotForC( ch_decl )
+					fs <~ '.'
+				  else
+					fs <~ "->"
+
+				obj.name.safe(fs)
+				fs <~ CloseStr
+	
+
+	function C_RenderFnc (fpMsgRenderCpp)
+		opt norefcounts
+		|| F = .first
+		|| ch1 = f.next
+		|| fn = ch1.obj|scfunction|
+		|| PostBracket = false
+		
+		if (fn isa SCFunction) and !fn.prototype   // easy
+			if Fn.ReturnType and (.Parent != @arg)
+				PostBracket = C_OneParamType(fs, self, .AsDecl)
+
+			fs <~ fn.ExportName
+		  else
+			F.Export( fs )
+		
+		C_ParamsRender( ch1, fs )
+		if PostBracket
+			fs <~ ')'
+		
+		// what if it's not a known function, but
+		// from a function pointer?
+		
+		// NormalFunc()
+		// |fp| y,  y()
+		// x[1]()
+
+
+	function C_RenderDcl (fpMsgRenderCpp)
+		|| name = .GetDclName
+		|| d = name.AsDecl				#expect
+		WriteDecl( d, fs, DeclsDefault(.last) )
+	
+
+	function C_RenderTmp (fpMsgRenderCpp)
+		opt norefcounts			
+		|| name = .name
+		if (name == "exit")
+			fs <~ "break"
+			
+		  elseif (name == "elseif")
+			fs <~ "else if"
+
+		  elseif (name == "ignore")
+			return
+
+		  elseif (name == "rejoin")
+			0 //
+		  elseif (name == "swap")
+			fs <~ "JB_Swap"
+			debugat
+			C_ParamsRender(self, fs)
+			return
+		  else
+			fs <~ name
+		
+		for mv in self
+			fs <~ ' '
+			mv.Export( fs )
+
+
+	function C_RenderOpp (fpMsgRenderCpp)
+		|| s = .name
+		if s == kBitOr
+			fs <~ "|"
+		  elseif s == kBitAnd
+			fs <~ "&"
+		  elseif s == kBitXor
+			fs <~ "^"
+		  elseif s == kBitNot
+			fs <~ "~"
+		  elseif s == "mod"
+			fs <~ "%"
+		  else
+			fs <~ s
+
+
+	function C_RenderBrl (fpMsgRenderCpp)
+		fs <~ '('
+		|| s = .name
+		if (s == kBitNot)
+			s = "~"
+		
+		fs <~ s
+		RenderInBracketsIfRel( .first, fs )		
+		fs <~ ')'
+
+
+	function WriteConst (|SCDecl| D, |FastStringCpp| T)
+		T <~ "#define "
+		D.Name.safe(T)
+		t <~ " ("
+		D.Default.Export( T )
+		t <~ ')'
+
+
+	function C_RenderUnt (fpMsgRenderCpp)
+		expect (self == "x")
+		|| num = .first
+		|| s = num.name.ReplaceAll( "_", "" )
+
+		fs <~ "0x"
+		if (s.length mod 2) and s[0].isletter
+			fs <~ '0'
+		fs <~ s
+
+
+	function C_RenderBak (fpMsgRenderCpp)
+		fs <~ .name // assume pre-rendered in C!
+
+
+	function C_RenderThg (fpMsgRenderCpp)
+		|| o = .obj
+		if o isa SCDecl
+			WriteThgMaybeTypeToo( self, o, fs )
+			Return
+			
+		if o isa SCModule
+			|| cls = o.Cls
+				|| InAlloc = scfunction.CurrFunc isa kIsAlloc
+				if !InAlloc
+					fs <~ "JB_AsClass("
+				fs <~ cls.CStructName
+				if !InAlloc
+					fs <~ ')'
+				return
+		.safe(fs)
+
+
+	function C_RenderRel (fpMsgRenderCpp)
+		|| first	= .first
+		|| ch		= first
+		RenderInBracketsIfRel( ch, fs )
+
+		fs <~ ' '
+		ch++
+		ch.Export( fs )
+		fs <~ ' '
+		
+		ch++
+		RenderInBracketsIfRel( ch, fs )
+
+
+	function RenderInBracketsIfRel (fpMsgRenderCpp)
+		if self == @Rel
+			fs <~ '('
+		
+		.Export( fs )
+		
+		if self == @Rel
+			fs <~ ')'
+
+
+	function WriteFuncArgs (|SCFunction| F, |FastStringCpp| T, |bool| names_only=false)
+		// int example(int a, int b)
+		T <~ '('
+		|| N = false
+		for a in f.args
+			if n
+				T <~ ", "
+			n = true
+			if names_only
+				t <~ a.name
+			  else
+				.WriteDecl( A, T )
+		
+		T <~ ')'
+
+
+	function C_OneParamType (|FastStringCpp| fs, |Message| Curr, |SCDecl| D, |bool|)
+		// because C doesn't do type-inferencing
+		|| ActualType = ClassOfObjForC( Curr )$
+		if ActualType != D.type
+			fs <~ '('							//  wrapper calls ')' after
+			fs <~ '('
+			WriteDeclNoName( d, fs )
+			fs <~ ')'
+			return true
+	
+	
+	constants
+		kNeedsOuterBrackets = 0
+		kNeedsInnerBrackets = 1
+		kNeedsNoBrackets	= 2
+	
+	
+	function DontNeedMoreBrackets (|Message| msg, |int|)
+		if msg.first == @rel
+			return kNeedsOuterBrackets
+			
+		|| P = Msg.Parent
+		|| Result = kNeedsOuterBrackets
+		
+		while  P == @bra
+			P = P.parent
+			Result = kNeedsInnerBrackets
+		
+		if  P IsBrel "!"
+			return kNeedsNoBrackets
+		
+		if  P isTmp "if" or "while"
+			return kNeedsNoBrackets
+
+		return Result
+
+
+	function C_RenderTyp (fpMsgRenderCpp)
+		|| Saveness = DontNeedMoreBrackets(self)
+		|| fc		= .first
+		if (Saveness == kNeedsNoBrackets)
+			fc.Export(fs)
+			return
+		
+		if (Saveness == kNeedsOuterBrackets)
+			fs <~ '('
+		WriteDeclBrackets( self, fs )
+
+		if (fc == @Rel)
+			fs <~ '('
+		if (fc == @arg)
+			fc.MiniArgCpp( fs )
+		  else
+			fc.Export( fs )
+		if (fc == @Rel)
+			fs <~ ')'
+		if (Saveness == kNeedsOuterBrackets)
+			fs <~ ')'
+
+
+	function MsgOKToImprove (|Message| msg, |bool|)
+		opt norefcounts
+		|| p = msg.parent
+		if (p == @prm)
+			return (p.AsFunc != Compiler.RefSetRef)
+		if p == @rel and msg == p.first
+			return false
+		Return true
+
+
+	function NeedsDotForC (|SCDecl| d, |bool|)
+		require !d.PointerCount
+		if d.type.isstruct
+			Return true
+
+
+	function CDotType (|Message| msg, |SCDecl| Type, |FastStringCpp| fs, |String|)
+		require type Is UpgradeableContained
+		fs <~ '('
+		.WriteDeclNoName( Type, fs )
+		fs <~ ")("
+		return ")"
+
+
+	function WriteDeclNoName (|SCDecl| D, |FastStringCpp| T)
+		WriteClass( d.Type, T )
+		T <~ ( '*', D.PointerCount )
+
+
+	function C_RenderNum (fpMsgRenderCpp)
+		fs <~ .name
+		|| d = .asdecl$
+		if d.type.typeinfo == datatypecode.float
+			fs <~ 'f'
+
+
+	function C_RenderBra (fpMsgRenderCpp)
+		fs <~ '('
+		.first.Export( fs )
+		fs <~ ')'
+
+
+	function C_RenderArl (fpMsgRenderCpp)
+		// ("arl" @x "++" )							x++
+		
+		.first.Export( fs )
+		if (.name != "&")
+			fs <~ .name
+
+
+	function C_RenderChr (fpMsgRenderCpp)
+		// ("chr" "x")										'x'
+		fs <~ '\''
+		
+		|| b = .name[0]
+		if b < 32 and b != 9 and 10
+			fs <~ "\\x"
+			fs.appendhex(b)
+		  else
+			fs <~ .name.EscapeChr // C_Unescape?
+		fs <~ '\''
+	
+
+	function C_ParamsRender (fpMsgRenderCpp)
+		// assume we are an LST
+		fs <~ '('
+		C_FSListComma( self, fs )
+		fs <~ ')'
+	
+
+	function C_FSListComma (fpMsgRenderCpp)
+		for (item in self)
+			fs <~ ", "
+			start
+			item.Export( fs )
+
+
+	function C_RenderSStr (fpMsgRenderCpp)
+		// so... convert it to an obj
+		fs <~ "JB_LUB["
+		fs <~ Cpp_Export[.name]
+		fs <~ "]"
+
+
+	function C_RenderStr (fpMsgRenderCpp)
+		fs.appendcpp(.name)
+	
+	function Faststring.AppendCpp (|string| s)
+		self <~ '"'
+		for (c in s) (i)
+			if c == '?'
+				self <~ `\?`
+			  elseif c == '\\'
+				self <~ `\\`
+			  elseif c == 9
+				self <~ `\t`
+			  elseif c == 10
+				self <~ `\n`
+			  elseif c == 13
+				self <~ `\r`
+			  elseif (c >= 32) and (c != '"') and (c <= 127)
+				self <~ c
+			  else
+				self <~ `\x`
+				.appendhex(c, 2)
+				if s[i+1].IsHex
+					self <~ `""`
+		self <~ '"'
+
+
+	function WriteDeclBrackets (fpMsgRenderCpp)
+		fs <~ '('
+		
+		if (.obj isa SCDecl) // it should be?
+			WriteDeclNoName( .AsDecl, fs )
+		  else
+			self[1].Export( fs )
+		
+		fs <~ ')'
+
+
+	function C_RenderShe (fpMsgRenderCpp)
+		fs <~ "//"
+		fs <~ .name
+
+
+	function WriteThgMaybeTypeToo (|Message| msg, |SCDecl| d, |FastStringCpp| fs)
+		if !d.Name
+			msg.safe(fs)
+
+		  elseif (d is TypeImprove) and (MsgOKToImprove(msg))
+			fs <~ '('
+			WriteDeclBrackets( msg, fs )
+			d.name.safe(fs)
+			fs <~ ')'
+
+		  else
+			d.name.safe(fs)
+		// plink plink plonk
+		// plantasy star is so beautiful.
+		// and i was... too.
+}
+
+function message.safe (|faststring| fs)
+	.name.safe(fs)
+function string.safe (|faststring| fs)
+	if .isascii
+		fs <~ self
+		return
+		
+	for s in self
+		if s.isupper or s.islower or s.IsInt or s == '_'
+			fs <~ s
+		  else
+			fs <~ 'x'
+			fs.appendhex(s)
+
+
+prototype fpMsgRenderCpp (|Message|self, |FastStringCpp| fs)
+class FastStringCpp (FastString)
+	|message|		ExtraAfter
+	|scfile|		OrigFile
+	|string|		OrigSrc
+	|string|		Cpp_Name
+	|message|		SrcEnd
+	|scfunction|	CurrFunc
+	|uint|			LastLine
+	|uint|			LastPos
+
+
+	constructor (|string| name = "")
+		.cpp_name = name
+		.lastline = 1
+
+	
+	function ringtree.dbglineinfo
+		cpp_name dbglineinfo
+		if (self isa message)
+			|| f = .scfile
+			|| fs = faststring.new
+			fs <~ "pos: "
+			fs <~ .position
+
+			if (f!=nil) and .hasposition
+				|| lines = f.fdata[0, .position].count('\n')
+				fs <~ " line: "
+				fs <~ lines + 1
+				fs <~ ' '
+
+			printline fs
+	
+	
+	function ExpectedNext (|int|)
+		return .lastline + 1
+		
+	
+	function LineNumber (|message| msg, |int|)
+		|| p = msg.position
+		if p < 0
+			require .lastline != 1
+			return .lastline
+
+		|| l = .lastpos|int|
+		.lastpos = p
+		|| Missing = .OrigSrc[l min p, p max l]
+		|| Lines = Missing.count('\n')
+
+		if (p < l)
+			lines = -lines
+		.lastline += lines
+
+		return .lastline
+
+
+	function WriteFile (|message| msg, |string|)
+		opt norefcounts
+		require msg.hasposition
+			
+		|| f = msg.scfile
+			require .origfile != f
+
+			.Origfile = f
+			.LastLine = 1
+			.LastPos = 0
+			.origSrc = f.fdata
+			return f.path 
+
+
+function funcsorter_fn (sortercomparer)
+	return (a|scfunction|).exportname < (b|scfunction|).exportname

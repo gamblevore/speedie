@@ -1,0 +1,46 @@
+#!/usr/local/bin/spd
+
+class Anagrams
+	|dictionary of string|		out
+	|string|					orig
+		
+	helper Split (|string| v, |string| remain)
+		for i in 1 to remain.Length
+			|| sub = remain[0, i]
+			if Anagrams[sub]
+				|| v2 = (sub, v + " " + sub)(!v)
+				|| remain2 = remain[i...]
+					.split(v2, remain2)
+				  else
+					.out[v] = v2.sort(' ')
+		
+	
+	helper Find (|string| progress, |string| inside, |int| depth)
+		for i in progress.Length+1
+			|| Variant = progress.insert(inside, i)
+			if depth < .orig
+				.find(Variant, string[.orig[depth]], depth+1)
+			  else
+				.split("", variant)
+	
+	module
+		|dictionary| D
+		syntax access (|string| s, |bool|)
+			if s.length > 1: return .d[s]
+			return s == "i" or "a"
+			
+		function Find (|string| s, |dictionary of string|)
+			if !.d
+				|| data = ""
+				using "read":  data = file.words.ReadAll
+				using "lower": data = data.LowerCase
+				using "dict":    .d = data.dict
+			rz = Dictionary()
+			using "anagram"
+				Anagrams(rz, s).find("", "", 0)
+
+main
+	using "total"
+		|| d = Anagrams.find(app[0])
+		for v in d
+			printline v

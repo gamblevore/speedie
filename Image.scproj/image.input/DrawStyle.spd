@@ -1,0 +1,61 @@
+
+
+class DrawStyle
+	linkage
+		cpp_part sty
+	default DrawStyle.new 
+	|imagePixel|		Text
+	|imagePixel|		BG
+	|imagePixel|		Edge
+	|imagePixel|		Seps
+
+		
+	constructor
+		.text <~ 1.0
+		.clear
+
+
+	constructor (|float| bg, |float| edge)
+		cpp_part Grey // who wants grey???
+		.text <~ 1.0
+		.Edge <~ edge
+		.Bg   <~ bg
+		.seps = .edge
+	
+	
+	constructor (|DrawStyle| c)
+		cpp_part ConstructorCopy
+		.text = c.text
+		.bg = c.bg
+		.edge = c.edge
+		.seps = c.seps
+	
+	
+	function NoBorder
+		.edge = .bg
+	
+	function clear
+		.solid = (0.0,0.0,0.0,0.0)
+	
+	function Copy (|DrawStyle|)
+		return DrawStyle(self)
+	
+	function solid (assigns:|vec4|c)
+		.bg <~ c
+		.edge = .bg
+		.seps = .bg
+		
+
+	function EdgeColor (|bool| B, |imagepixel|)
+		if self
+			return (.edge, .Bg)(B)
+		|| l1 = (0.5, 0.5, 0.5, 1.0)
+		|| l2 = (0.0, 0.0, 0.0, 1.0)
+		return (l1, l2)(b)
+		
+	function Width (|string| s, |int|)
+		return s.length * font.width
+		
+	function Height (|string| s, |int|)
+		return font.height
+

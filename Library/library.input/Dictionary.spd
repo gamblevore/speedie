@@ -1,0 +1,174 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+//// Advice: Avoid using dictname within anything fast unless wrapped with norefcounts
+
+class Dictionary (saveable)
+	linkage
+		wrapper
+		cpp_part Dict
+
+	contains object
+	constructor
+		cpp_wrapper
+	destructor
+		cpp_wrapper
+	
+	syntax Access (|string| Key, assigns:||)
+		cpp_wrapper JB_Dict_ValueSet
+	syntax Access (|string| Key, ||)
+		cpp_part ValueStr
+		return self[key,nil]
+	syntax Access (|string_aware| Key, ||)
+		cpp_part ValueAware
+		return .ValueLower(key|string|)
+	syntax Access (|string| Key, |...| Default, ||)
+		cpp_wrapper JB_Dict_Value
+		
+	syntax Access (|uint64| Key, assigns:||)
+		opt norefcounts
+		cpp_part SetInt
+		self[key|int64|._DictName] = Value
+	syntax Access (|uint64| Key, ||)
+		opt norefcounts
+		cpp_part ValueInt
+		return self[key|int64|._DictName]
+	
+	function Longest (|string| key, |&int| LengthFound, ||)
+		cpp_wrapper JB_Dict_Longest
+	function find (|string| match, |&ivec2| Found, ||)
+		cpp_wrapper JB_Dict_FindStr
+	
+	syntax append (|message| m)
+		self[m.name] = m
+	
+	function ValueLower (|string| s, ||) // remove and just use string_aware? why have two ways
+		return self[s.lowercase]
+	function ValueLower (|string| s, assigns:||) // remove and just use string_aware? why have two ways
+		self[s.lowercase] = value
+
+
+	function Dispose									{ cpp_wrapper }
+
+
+	// "..." means "Whatever it is that we contain"
+	// so.. we return a dictionary reader containing whatever we contain.
+	function Navigate (|DictionaryReader of ...|) { cpp_wrapper JB_Dict_Navigate }
+
+	function Values (|[...]|)
+		for V in self
+			rz <~ V
+	
+	function list (|[...]|)
+		return .values
+
+	function Keys (|array of string|)
+		for (V in self) (key)
+			rz <~ key
+		
+	render
+		cpp_wrapper
+	
+	
+	iterator
+		|| nav = .Navigate
+		while (nav.MoveNext)
+			yield nav.Value (nav.Name)
+			
+	module
+		function Reverse (|dictionary of string|Dict, |dictionary of string|)
+			cpp_name JB_Dict__Reverse
+			rz = dictionary.new
+			for (value in Dict) (key)
+				rz[value] = key
+
+		function Copy (|dictionary of string| Dict, |dictionary of string|)
+			cpp_name JB_Dict__Copy
+			rz = dictionary()
+			for (value in Dict) (key)
+				rz[key] = value
+
+
+
+
+class DictionaryReader
+	linkage
+		wrapper
+	contains		object	
+
+	function Name (|string|)
+		cpp_wrapper JB_Nav_Name
+
+	function Value (||)
+		cpp_wrapper JB_Nav_Value
+
+	function Value (assigns:||)
+		cpp_wrapper JB_Nav_ValueSet
+	
+	function MoveNext (|bool|)
+		cpp_wrapper JB_Nav_MoveNext
+	
+	constructor (|dictionary| dict)
+		cpp_wrapper JB_Nav_Constructor
+
+	destructor
+		cpp_wrapper JB_Nav_Destructor
+
+	syntax cast (|bool|)
+		return .MoveNext
+
+
+function String.ReplaceAll (|dictionary of string| Dict, |ErrorList| Rec=StdErr, |string|)
+	cpp_wrapper JB_Str_MultiReplaceAll
+
+function SetDecodeEntities (|dictionary of string|Dict, |bool| Value)
+	cpp_wrapper JB_MSR_DecodeEntitySet
+
+function SetEscapeCode (|dictionary of string|Dict, |bool| Value)
+	cpp_wrapper JB_MSR_EscapeCodeSet
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
+extend dictionary
+	function Obj (|object| prm, ||)
+		opt norefcounts
+		return self[prm._Dictname]
+		
+	function Obj (|object| prm, assigns:||)
+		opt norefcounts
+		self[prm._Dictname] = Value
+
+	function Set (|string| key, |int64| Value)
+		cpp_part SetValue
+		self[key] = value
+
+	function Set (|string| key, |string| Value)
+		self[key] = value
+
+	function msg (|message| m, ||)
+		return self[m.id_]
+
+	function msg (|message| m, assigns:||)
+		self[m.id_] = Value
+	
+	function Expect (|message| m, ||)
+		return self[m.name]		#expect (m, "Unrecognised name: " + m.name)
+
+
+
+helper message.id_ (|string|):      return .name.idcase
+helper object._DictName (|string|): cpp_wrapper JB_Obj_DictName
+helper  int64._DictName (|string|): cpp_wrapper JB_int64_DictName
+helper string.idcase (|string|):    return .lowercase
+// can't remove diacritics cos... spanish needs them for disambig!
+// literally two words with different diacritics
+
+role string_aware (object)
+

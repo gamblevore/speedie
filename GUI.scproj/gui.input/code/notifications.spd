@@ -1,0 +1,109 @@
+
+module Notifications
+	linkage: cpp_part Note 
+	|ringtree of window|	Alerts = ringtree()
+	|window|				_ErrorWindow
+	|textview|				Txt
+	
+	constants
+		hi = 60
+		wd = 160
+		|int64|
+		disappear = 7.5
+	
+	function DrawSlide (|window| w, |bool|)
+		opt norefcounts
+		|| br = window.all.lastrect
+		|| r = br
+		
+		|| ago = w.createddate.ago.seconds
+		|int| b = ago*100.0
+		b = b min hi 
+		r = (r.x2-wd, b-hi, r.x2, b)
+		ago -= disappear
+		if (ago > 0)
+			if w.tag and (w contains sdlapp.mousexy)
+				w.createddate = disappear.seconds.ago
+			  else
+				r = r right ago*140.0
+				require r.x <= br.x2
+				b = 0
+		  
+		w.LastRect = r
+		if b < hi
+			sdlapp.touch
+		return true
+		
+
+	function Clicked (|window| w)
+		opt norefcounts
+		(w.CreatedDate min= disappear.seconds.ago)
+		|| t = w.tag
+		if t isa error
+			|| n = t.node
+			if n == @str
+				app.alert(n.name)
+			  elseif n == @url and "file"
+				n.first.name.Reveal
+		w.tag = nil
+	
+	
+	function ClickedAt (|ivec2| XY, |bool|)
+		opt norefcounts
+		for w in .Alerts
+			if w contains xy
+				.Clicked(w)
+				return true
+	
+	syntax append (|string| desc, |message| details=@emb.msg)
+		cpp_part Str
+		self <~ error(details, desc)
+
+	syntax append (|error| err)
+		cpp_part Msg
+		|| w = .errorwindow
+		w.CreatedDate = date.now
+		.Alerts <~ w
+		w.tag = err
+		.txt.text = err.name
+
+	function Draw
+		opt norefcounts
+		for w in .Alerts
+			if .DrawSlide(w)
+				w.__Draw__(sdlapp.DrawSpace)
+			  else
+				w.remove
+
+	
+	function ErrorWindow (|window|)
+		opt norefcounts
+		if ._ErrorWindow
+			return ._ErrorWindow
+		|| w = Window()
+		(w isnt visible)
+		._errorwindow = w
+		w.id = "error"
+		w.size = (wd)~left by 0~up back (hi) 
+		._ErrorWindow = w
+		.txt = TextView(w)
+		.txt.id = "error"
+		.txt.size = the~area
+		|| col = Colors.white(0.8)
+		w.GNormal.Edge <~ col
+		col = colors.black(0.8)
+		w.GNormal.BG <~ col
+		return w
+	
+
+function error.Useable (|date| ago=8s, |error|)
+	require self and .name
+	if !.when
+		.when = date.now
+		return self
+	if !ago
+		return self
+	if .when.fired and self < ago
+		return self
+
+		

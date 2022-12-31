@@ -1,0 +1,228 @@
+
+/*
+	So, how to set different error-levels, into the same thing?
+	I think we need a bit-set... of what errors we have.
+	
+	So... we can only add errors, or clear the entire thing. or just replace it.
+	But not "just remove warnings/errors" by themselves.
+*/
+
+
+|ErrorList| StdErr
+
+class ErrorList
+	linkage
+		cpp_part Rec
+		cpp_class JB_ErrorReceiver
+		visible true
+
+	contains ErrorList
+
+	|Error|					Errors
+	|File|					Log
+	|int|					MaxErrors
+	|int|					ErrorCount
+	|int|					ProblemCount
+	|int|					WarnCount
+	|int|					ErrorsAreProblems
+	|string|				Source
+
+	constructor
+		.errors = error(nil)
+		.errors.func = @arg
+		.MaxErrors = 512
+		JB_API.NilHappened = nil
+
+
+	function Clear
+		.errors.clear
+		.errorcount = 0
+		.warncount = 0
+		.problemcount = 0
+	
+	
+	function OK (|bool|)
+		Return self and !.errorcount
+	
+	function Problems (|bool|)
+		Return self and .errorcount or .problemcount
+	
+	
+	function NewItem (|Error|Err)	
+		visible true
+		if self
+			self <~ err
+		
+	
+	syntax append (|Error| Err)
+		|| CanPrint = !.errorcount and error.autoprint
+		.incr(err)
+		require .CanAddMore(err.ErrorLevel)
+		
+		err.path := .source
+		if .log
+			.log <~ err.render
+		if CanPrint and err.needsprint
+			printline err.render
+		if error.autoprint and err.errorlevel >= Errorseverity.error
+			debugat
+		if error.autoprint != errorflags.PrintAndRemove
+			.errors <~ err
+
+
+	syntax append (|string| Err)
+		cpp_part AppendStr
+		self <~ error(nil, err)
+
+	function LogFile (assigns:|string|)
+		.log = value.file
+		if .log
+			.log.openempty
+
+
+	function incr (|error| err, |bool| add=true)
+		|| n = (1, -1)(add)
+		
+		if err.errorlevel == errorseverity.problem
+			.problemcount += n
+		  elseif err.isError
+			.errorcount += n
+		  elseif err.iswarning
+			.warncount += n
+
+
+	function Pop (|error|)
+		|| err = .errors.pop
+			.incr(err, false)
+			return err
+		
+		
+	function Count (|int|)
+		disabled "Do you mean .ErrorCount or .WarnCount, or .TotalCount?"
+
+
+	function List (|error|)
+		disabled "Do you mean .Errors?"
+
+	
+	render
+		.rendererrors(fs, 0, false)
+
+
+	function RenderErrors (|faststring| fs, |errorseverity| Level, |bool|shell, |int|)
+		opt norefcounts
+		require self
+		for err in self
+			if err.errorlevel >= level
+				RZ++
+				if shell
+					err.render_clang(Fs)
+				  else
+					err.render(fs)
+				fs <~ "\n"
+
+
+	render RenderErrors
+		cpp_part RenderErrors0
+		.rendererrors(fs, errorseverity.problem, false)
+		
+	
+	function PrintErrors (|int|)
+		return .PrintErrors(errorseverity.problem, false, false)
+
+
+	function ShellPrintErrors (|int|)
+		visible // for jb_main.cpp
+		return .PrintErrors(errorseverity.problem, false, true)
+	
+	
+	function PrintErrors (|errorseverity| Level, |bool| PrintCount, |bool| shell, |int|)
+		cpp_part PrintErrorsMain
+		|| rec = self oar stderr
+
+		|| fs    = faststring()
+		|| Count = rec.rendererrors(fs, level, shell)$
+		printerror fs.getresult
+		fs.problemsfound(count)
+		PrintError fs.getresult
+		if Count
+			return -1
+
+
+	function faststring.ProblemsFound (|int| count)
+		self <~ Count
+		self <~ " issue"
+		if Count > 1
+			self <~ 's'
+		self <~ " found.\n" // found."
+	
+	
+	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
+		require !ErrorList.OutOfMemory
+		if level >= ErrorSeverity.error // a warning
+			return (.ErrorCount < .MaxErrors)
+		  else
+			return (.WarnCount < .MaxErrors)
+	
+	Syntax UsingComplete
+		stderr.printerrors
+		stderr = self
+
+		
+	Syntax Using (|ErrorList|)
+		|| old = stderr
+		stderr = self
+		return old
+
+
+	function FirstError (|error|)
+		visible
+		opt norefcounts
+		for err in .errors
+			if Err.iserror
+				return err
+
+
+	module
+		function OutOfMemory (|bool|)
+			cpp_Wrapper JB_OutOfMemoryOccurred
+	
+	iterator
+		|| curr_err = .errors.first
+		while (curr_err)
+			|| N = curr_err.next
+			yield curr_err
+			curr_err = N
+
+
+
+extend Object
+	syntax expect
+		app.PrintStackTrace
+		stderr.NewError(nil, "Internal Error")
+
+
+extend string
+	syntax expect
+		visible
+		stderr.NewError(nil, self)
+
+
+extend stringstream
+	syntax expect ( |string| Error )
+		opt norefcounts
+		debugat
+		|| msg = "Error decoding data: "
+		|| p = ""
+		if (.file != nil)
+			msg = "Error decoding file: "
+			p = .file.path
+		stderr.newError(nil, msg, p)
+
+
+function bool.operatorplus (|string| s, |bool|)
+	// idk... kinda usel
+	if self
+		return true
+	debugger
+	error s

@@ -1,0 +1,486 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AC3540E823BE9CD30066602F /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC3540E723BE9CD20066602F /* JB_Globals.cpp */; };
+		AC9E17AE233A8F33003B433F /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC9E17AD233A8F33003B433F /* JB.cpp */; };
+		ACBC0274272B04D20065BCE0 /* JB_Vectors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0259272B04D20065BCE0 /* JB_Vectors.cpp */; };
+		ACBC0275272B04D20065BCE0 /* JB_Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC025A272B04D20065BCE0 /* JB_Main.cpp */; };
+		ACBC0276272B04D20065BCE0 /* JB_ByteMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC025B272B04D20065BCE0 /* JB_ByteMap.cpp */; };
+		ACBC0277272B04D20065BCE0 /* JB_Pipe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC025C272B04D20065BCE0 /* JB_Pipe.cpp */; };
+		ACBC0278272B04D20065BCE0 /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC025D272B04D20065BCE0 /* JB_RingTree.cpp */; };
+		ACBC0279272B04D20065BCE0 /* JB_MSR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC025E272B04D20065BCE0 /* JB_MSR.cpp */; };
+		ACBC027A272B04D20065BCE0 /* JB_String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC025F272B04D20065BCE0 /* JB_String.cpp */; };
+		ACBC027B272B04D20065BCE0 /* JB_DirReaderWin32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0260272B04D20065BCE0 /* JB_DirReaderWin32.cpp */; };
+		ACBC027C272B04D20065BCE0 /* JB_Compress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0261272B04D20065BCE0 /* JB_Compress.cpp */; };
+		ACBC027D272B04D20065BCE0 /* JB_Math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0262272B04D20065BCE0 /* JB_Math.cpp */; };
+		ACBC027E272B04D20065BCE0 /* JB_DirReaderUnix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0264272B04D20065BCE0 /* JB_DirReaderUnix.cpp */; };
+		ACBC027F272B04D20065BCE0 /* JB_Tokeniser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0265272B04D20065BCE0 /* JB_Tokeniser.cpp */; };
+		ACBC0280272B04D20065BCE0 /* JB_Errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0266272B04D20065BCE0 /* JB_Errors.cpp */; };
+		ACBC0282272B04D20065BCE0 /* JB_Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0268272B04D20065BCE0 /* JB_Dictionary.cpp */; };
+		ACBC0283272B04D20065BCE0 /* JB_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0269272B04D20065BCE0 /* JB_File.cpp */; };
+		ACBC0284272B04D20065BCE0 /* JB_BasicIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC026A272B04D20065BCE0 /* JB_BasicIO.cpp */; };
+		ACBC0285272B04D20065BCE0 /* JB_PNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC026B272B04D20065BCE0 /* JB_PNG.cpp */; };
+		ACBC0286272B04D20065BCE0 /* JB_List.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC026C272B04D20065BCE0 /* JB_List.cpp */; };
+		ACBC0287272B04D20065BCE0 /* JB_ObjArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC026D272B04D20065BCE0 /* JB_ObjArray.cpp */; };
+		ACBC0288272B04D20065BCE0 /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC026E272B04D20065BCE0 /* JB_FastString.cpp */; };
+		ACBC0289272B04D20065BCE0 /* JB_LibraryFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC026F272B04D20065BCE0 /* JB_LibraryFile.cpp */; };
+		ACBC028A272B04D20065BCE0 /* JB_Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0270272B04D20065BCE0 /* JB_Utils.cpp */; };
+		ACBC028B272B04D20065BCE0 /* JB_Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0271272B04D20065BCE0 /* JB_Date.cpp */; };
+		ACBC028C272B04D20065BCE0 /* JB_Saveable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0272272B04D20065BCE0 /* JB_Saveable.cpp */; };
+		ACBC028D272B04D20065BCE0 /* JB_Alloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBC0273272B04D20065BCE0 /* JB_Alloc.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AC9E17A9233A8BE0003B433F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AC9E1719233A859B003B433F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AC9E17A5233A8B70003B433F;
+			remoteInfo = debug;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AC9E171F233A859B003B433F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		AC07F4E1241FC756007A58F4 /* _todo.spd */ = {isa = PBXFileReference; lastKnownFileType = text; name = _todo.spd; path = Language.input/_todo.spd; sourceTree = "<group>"; };
+		AC0AE95F24658128002C4400 /* translate.test */ = {isa = PBXFileReference; lastKnownFileType = text; name = translate.test; path = Build/dict/translate.test; sourceTree = "<group>"; };
+		AC0F6154233BA87000382DA7 /* Jeebox.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Jeebox.input; path = ../jeebox.scproj/Jeebox.input; sourceTree = "<group>"; };
+		AC3540E723BE9CD20066602F /* JB_Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = Cpp/JB_Globals.cpp; sourceTree = SOURCE_ROOT; };
+		AC9E1721233A859B003B433F /* Language */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Language; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC9E1775233A8824003B433F /* JB_Alloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JB_Alloc.h; path = /Users/theodore/Speedie/Speedie.scproj/../jeebox.scproj/Cpp/LibSrc/JB_Alloc.h; sourceTree = "<absolute>"; };
+		AC9E17AD233A8F33003B433F /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = Cpp/JB.cpp; sourceTree = SOURCE_ROOT; };
+		AC9E17AF233A8FA7003B433F /* Language.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Language.input; sourceTree = "<group>"; };
+		ACBAD32D2472993600D4565E /* english.box */ = {isa = PBXFileReference; lastKnownFileType = text; name = english.box; path = Build/dict/english.box; sourceTree = "<group>"; };
+		ACBC0258272B04980065BCE0 /* JB_Umbrella.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JB_Umbrella.hpp; path = ../../Library/CppLib/JB_Umbrella.hpp; sourceTree = "<group>"; };
+		ACBC0259272B04D20065BCE0 /* JB_Vectors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Vectors.cpp; path = ../../Library/CppLib/JB_Vectors.cpp; sourceTree = "<group>"; };
+		ACBC025A272B04D20065BCE0 /* JB_Main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Main.cpp; path = ../../Library/CppLib/JB_Main.cpp; sourceTree = "<group>"; };
+		ACBC025B272B04D20065BCE0 /* JB_ByteMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ByteMap.cpp; path = ../../Library/CppLib/JB_ByteMap.cpp; sourceTree = "<group>"; };
+		ACBC025C272B04D20065BCE0 /* JB_Pipe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pipe.cpp; path = ../../Library/CppLib/JB_Pipe.cpp; sourceTree = "<group>"; };
+		ACBC025D272B04D20065BCE0 /* JB_RingTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_RingTree.cpp; path = ../../Library/CppLib/JB_RingTree.cpp; sourceTree = "<group>"; };
+		ACBC025E272B04D20065BCE0 /* JB_MSR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_MSR.cpp; path = ../../Library/CppLib/JB_MSR.cpp; sourceTree = "<group>"; };
+		ACBC025F272B04D20065BCE0 /* JB_String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_String.cpp; path = ../../Library/CppLib/JB_String.cpp; sourceTree = "<group>"; };
+		ACBC0260272B04D20065BCE0 /* JB_DirReaderWin32.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DirReaderWin32.cpp; path = ../../Library/CppLib/JB_DirReaderWin32.cpp; sourceTree = "<group>"; };
+		ACBC0261272B04D20065BCE0 /* JB_Compress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Compress.cpp; path = ../../Library/CppLib/JB_Compress.cpp; sourceTree = "<group>"; };
+		ACBC0262272B04D20065BCE0 /* JB_Math.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Math.cpp; path = ../../Library/CppLib/JB_Math.cpp; sourceTree = "<group>"; };
+		ACBC0263272B04D20065BCE0 /* JB_Umbrella.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JB_Umbrella.hpp; path = ../../Library/CppLib/JB_Umbrella.hpp; sourceTree = "<group>"; };
+		ACBC0264272B04D20065BCE0 /* JB_DirReaderUnix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DirReaderUnix.cpp; path = ../../Library/CppLib/JB_DirReaderUnix.cpp; sourceTree = "<group>"; };
+		ACBC0265272B04D20065BCE0 /* JB_Tokeniser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Tokeniser.cpp; path = ../../Library/CppLib/JB_Tokeniser.cpp; sourceTree = "<group>"; };
+		ACBC0266272B04D20065BCE0 /* JB_Errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Errors.cpp; path = ../../Library/CppLib/JB_Errors.cpp; sourceTree = "<group>"; };
+		ACBC0268272B04D20065BCE0 /* JB_Dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Dictionary.cpp; path = ../../Library/CppLib/JB_Dictionary.cpp; sourceTree = "<group>"; };
+		ACBC0269272B04D20065BCE0 /* JB_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_File.cpp; path = ../../Library/CppLib/JB_File.cpp; sourceTree = "<group>"; };
+		ACBC026A272B04D20065BCE0 /* JB_BasicIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_BasicIO.cpp; path = ../../Library/CppLib/JB_BasicIO.cpp; sourceTree = "<group>"; };
+		ACBC026B272B04D20065BCE0 /* JB_PNG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_PNG.cpp; path = ../../Library/CppLib/JB_PNG.cpp; sourceTree = "<group>"; };
+		ACBC026C272B04D20065BCE0 /* JB_List.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_List.cpp; path = ../../Library/CppLib/JB_List.cpp; sourceTree = "<group>"; };
+		ACBC026D272B04D20065BCE0 /* JB_ObjArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ObjArray.cpp; path = ../../Library/CppLib/JB_ObjArray.cpp; sourceTree = "<group>"; };
+		ACBC026E272B04D20065BCE0 /* JB_FastString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_FastString.cpp; path = ../../Library/CppLib/JB_FastString.cpp; sourceTree = "<group>"; };
+		ACBC026F272B04D20065BCE0 /* JB_LibraryFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_LibraryFile.cpp; path = ../../Library/CppLib/JB_LibraryFile.cpp; sourceTree = "<group>"; };
+		ACBC0270272B04D20065BCE0 /* JB_Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Utils.cpp; path = ../../Library/CppLib/JB_Utils.cpp; sourceTree = "<group>"; };
+		ACBC0271272B04D20065BCE0 /* JB_Date.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Date.cpp; path = ../../Library/CppLib/JB_Date.cpp; sourceTree = "<group>"; };
+		ACBC0272272B04D20065BCE0 /* JB_Saveable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Saveable.cpp; path = ../../Library/CppLib/JB_Saveable.cpp; sourceTree = "<group>"; };
+		ACBC0273272B04D20065BCE0 /* JB_Alloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Alloc.cpp; path = ../../Library/CppLib/JB_Alloc.cpp; sourceTree = "<group>"; };
+		ACC2E86324841797003AE23D /* category.box */ = {isa = PBXFileReference; lastKnownFileType = text; name = category.box; path = Build/dict/category.box; sourceTree = "<group>"; };
+		ACD2D51D24291333009BB15E /* JB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB.h; path = Cpp/JB.h; sourceTree = SOURCE_ROOT; };
+		ACFB05892472BBCA0075250B /* spanish.box */ = {isa = PBXFileReference; lastKnownFileType = text; name = spanish.box; path = Build/dict/spanish.box; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AC9E171E233A859B003B433F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AC9E1718233A859B003B433F = {
+			isa = PBXGroup;
+			children = (
+				AC07F4E1241FC756007A58F4 /* _todo.spd */,
+				AC0AE95F24658128002C4400 /* translate.test */,
+				ACBAD32D2472993600D4565E /* english.box */,
+				ACC2E86324841797003AE23D /* category.box */,
+				ACFB05892472BBCA0075250B /* spanish.box */,
+				AC9E17AF233A8FA7003B433F /* Language.input */,
+				AC0F6154233BA87000382DA7 /* Jeebox.input */,
+				AC9E1723233A859B003B433F /* Cpp */,
+				AC9E1722233A859B003B433F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AC9E1722233A859B003B433F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AC9E1721233A859B003B433F /* Language */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AC9E1723233A859B003B433F /* Cpp */ = {
+			isa = PBXGroup;
+			children = (
+				AC9E17AD233A8F33003B433F /* JB.cpp */,
+				ACD2D51D24291333009BB15E /* JB.h */,
+				ACBC0265272B04D20065BCE0 /* JB_Tokeniser.cpp */,
+				ACBC0258272B04980065BCE0 /* JB_Umbrella.hpp */,
+				AC3540E723BE9CD20066602F /* JB_Globals.cpp */,
+				AC9E1775233A8824003B433F /* JB_Alloc.h */,
+				ACBC0273272B04D20065BCE0 /* JB_Alloc.cpp */,
+				ACBC026A272B04D20065BCE0 /* JB_BasicIO.cpp */,
+				ACBC025B272B04D20065BCE0 /* JB_ByteMap.cpp */,
+				ACBC0261272B04D20065BCE0 /* JB_Compress.cpp */,
+				ACBC0271272B04D20065BCE0 /* JB_Date.cpp */,
+				ACBC0268272B04D20065BCE0 /* JB_Dictionary.cpp */,
+				ACBC0264272B04D20065BCE0 /* JB_DirReaderUnix.cpp */,
+				ACBC0260272B04D20065BCE0 /* JB_DirReaderWin32.cpp */,
+				ACBC0266272B04D20065BCE0 /* JB_Errors.cpp */,
+				ACBC026E272B04D20065BCE0 /* JB_FastString.cpp */,
+				ACBC0269272B04D20065BCE0 /* JB_File.cpp */,
+				ACBC026F272B04D20065BCE0 /* JB_LibraryFile.cpp */,
+				ACBC026C272B04D20065BCE0 /* JB_List.cpp */,
+				ACBC025A272B04D20065BCE0 /* JB_Main.cpp */,
+				ACBC0262272B04D20065BCE0 /* JB_Math.cpp */,
+				ACBC025E272B04D20065BCE0 /* JB_MSR.cpp */,
+				ACBC026D272B04D20065BCE0 /* JB_ObjArray.cpp */,
+				ACBC025C272B04D20065BCE0 /* JB_Pipe.cpp */,
+				ACBC026B272B04D20065BCE0 /* JB_PNG.cpp */,
+				ACBC025D272B04D20065BCE0 /* JB_RingTree.cpp */,
+				ACBC0272272B04D20065BCE0 /* JB_Saveable.cpp */,
+				ACBC025F272B04D20065BCE0 /* JB_String.cpp */,
+				ACBC0263272B04D20065BCE0 /* JB_Umbrella.hpp */,
+				ACBC0270272B04D20065BCE0 /* JB_Utils.cpp */,
+				ACBC0259272B04D20065BCE0 /* JB_Vectors.cpp */,
+			);
+			name = Cpp;
+			path = Language;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		AC9E17A5233A8B70003B433F /* debug */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "--nocolor --externalcompile --nocompile --Optimise=3 /Users/theodore/Speedie/Language2.scproj ";
+			buildConfigurationList = AC9E17A6233A8B70003B433F /* Build configuration list for PBXLegacyTarget "debug" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/local/bin/speedie;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = debug;
+			passBuildSettingsInEnvironment = 1;
+			productName = debug;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXNativeTarget section */
+		AC9E1720233A859B003B433F /* Language */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AC9E1728233A859B003B433F /* Build configuration list for PBXNativeTarget "Language" */;
+			buildPhases = (
+				AC9E171D233A859B003B433F /* Sources */,
+				AC9E171E233A859B003B433F /* Frameworks */,
+				AC9E171F233A859B003B433F /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AC9E17AA233A8BE0003B433F /* PBXTargetDependency */,
+			);
+			name = Language;
+			productName = Language;
+			productReference = AC9E1721233A859B003B433F /* Language */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AC9E1719233A859B003B433F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = Theodore;
+				TargetAttributes = {
+					AC9E1720233A859B003B433F = {
+						CreatedOnToolsVersion = 8.2.1;
+						ProvisioningStyle = Automatic;
+					};
+					AC9E17A5233A8B70003B433F = {
+						CreatedOnToolsVersion = 8.2.1;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = AC9E171C233A859B003B433F /* Build configuration list for PBXProject "Language2" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				en,
+			);
+			mainGroup = AC9E1718233A859B003B433F;
+			productRefGroup = AC9E1722233A859B003B433F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AC9E1720233A859B003B433F /* Language */,
+				AC9E17A5233A8B70003B433F /* debug */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AC9E171D233A859B003B433F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ACBC027B272B04D20065BCE0 /* JB_DirReaderWin32.cpp in Sources */,
+				ACBC027C272B04D20065BCE0 /* JB_Compress.cpp in Sources */,
+				ACBC0279272B04D20065BCE0 /* JB_MSR.cpp in Sources */,
+				ACBC0285272B04D20065BCE0 /* JB_PNG.cpp in Sources */,
+				ACBC0283272B04D20065BCE0 /* JB_File.cpp in Sources */,
+				ACBC028B272B04D20065BCE0 /* JB_Date.cpp in Sources */,
+				ACBC0287272B04D20065BCE0 /* JB_ObjArray.cpp in Sources */,
+				ACBC0280272B04D20065BCE0 /* JB_Errors.cpp in Sources */,
+				ACBC0282272B04D20065BCE0 /* JB_Dictionary.cpp in Sources */,
+				ACBC0275272B04D20065BCE0 /* JB_Main.cpp in Sources */,
+				ACBC027A272B04D20065BCE0 /* JB_String.cpp in Sources */,
+				ACBC0288272B04D20065BCE0 /* JB_FastString.cpp in Sources */,
+				ACBC027E272B04D20065BCE0 /* JB_DirReaderUnix.cpp in Sources */,
+				ACBC027D272B04D20065BCE0 /* JB_Math.cpp in Sources */,
+				ACBC0286272B04D20065BCE0 /* JB_List.cpp in Sources */,
+				ACBC0274272B04D20065BCE0 /* JB_Vectors.cpp in Sources */,
+				ACBC028C272B04D20065BCE0 /* JB_Saveable.cpp in Sources */,
+				AC3540E823BE9CD30066602F /* JB_Globals.cpp in Sources */,
+				AC9E17AE233A8F33003B433F /* JB.cpp in Sources */,
+				ACBC027F272B04D20065BCE0 /* JB_Tokeniser.cpp in Sources */,
+				ACBC0289272B04D20065BCE0 /* JB_LibraryFile.cpp in Sources */,
+				ACBC0276272B04D20065BCE0 /* JB_ByteMap.cpp in Sources */,
+				ACBC0278272B04D20065BCE0 /* JB_RingTree.cpp in Sources */,
+				ACBC028A272B04D20065BCE0 /* JB_Utils.cpp in Sources */,
+				ACBC0284272B04D20065BCE0 /* JB_BasicIO.cpp in Sources */,
+				ACBC0277272B04D20065BCE0 /* JB_Pipe.cpp in Sources */,
+				ACBC028D272B04D20065BCE0 /* JB_Alloc.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AC9E17AA233A8BE0003B433F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AC9E17A5233A8B70003B433F /* debug */;
+			targetProxy = AC9E17A9233A8BE0003B433F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		AC9E1726233A859B003B433F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "TARGET_UNIX=1";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_VALUE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/include,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"-march=core2",
+					"-ffast-math",
+					"-mfpmath=sse",
+					"-mmmx",
+					"-msse",
+					"-msse2",
+					"-msse4.1",
+					"-msse4.2",
+					"-Wno-return-type-c-linkage",
+				);
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = /Users/theodore/Speedie/jeebox.scproj/Cpp/LibSrc;
+			};
+			name = Debug;
+		};
+		AC9E1727233A859B003B433F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "TARGET_UNIX=1";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_VALUE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/include,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = (
+					"-march=core2",
+					"-ffast-math",
+					"-mfpmath=sse",
+					"-mmmx",
+					"-msse",
+					"-msse2",
+					"-msse4.1",
+					"-msse4.2",
+					"-Wno-return-type-c-linkage",
+				);
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = /Users/theodore/Speedie/jeebox.scproj/Cpp/LibSrc;
+			};
+			name = Release;
+		};
+		AC9E1729233A859B003B433F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEAD_CODE_STRIPPING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"JB_Debug_ON=1",
+					"TARGET_UNIX=1",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AC9E172A233A859B003B433F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEAD_CODE_STRIPPING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		AC9E17A7233A8B70003B433F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		AC9E17A8233A8B70003B433F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AC9E171C233A859B003B433F /* Build configuration list for PBXProject "Language2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC9E1726233A859B003B433F /* Debug */,
+				AC9E1727233A859B003B433F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AC9E1728233A859B003B433F /* Build configuration list for PBXNativeTarget "Language" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC9E1729233A859B003B433F /* Debug */,
+				AC9E172A233A859B003B433F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AC9E17A6233A8B70003B433F /* Build configuration list for PBXLegacyTarget "debug" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC9E17A7233A8B70003B433F /* Debug */,
+				AC9E17A8233A8B70003B433F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AC9E1719233A859B003B433F /* Project object */;
+}

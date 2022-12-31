@@ -1,0 +1,126 @@
+
+
+selector Element 
+	contains Element
+	|uint|			SyxBits
+	|bool|			Deactivated
+	|elementlist|	Expand
+	
+	items (
+		noun
+		anaphorism
+		placer
+		quantifier
+		adjective
+		verb
+		adverb
+		aux
+		conj
+		statement
+		name
+		question
+	)
+
+	render
+		fs <~ .name
+	
+	operator plus (|Element| a, |ElementList|)
+		return .CatBits (|) a.CatBits
+	
+	operator plus (|ElementList| a, |ElementList|)
+		return .CatBits (|) a
+	
+	syntax cast (|ElementList|)
+		return .CatBits
+	
+	function CatBits (|ElementList|)
+		return 1 << .ID
+	
+	function ExpandsTo (|elementlist| x)
+		.expand = .catbits (|) x
+	
+		
+	module
+		|dictionary of Element| CatNames
+		function Select (|message| name, |ElementList|)
+			|| n = name.id
+			|| c = catnames[n] #expect (name, "Can't find this element.")
+			return c.catbits
+		
+		function Init
+			CatNames = dictionary.new
+			|gram| G = gram.gender
+			|gram| A = gram.audience
+			|gram| P = gram.plurality
+			|gram| T = gram.tense
+			|gram| O = gram.Doer
+			Unattached(noun,			@thg,		"noun")
+		    AttachedOrNot(anaphorism,	@thg,		"anaphorism")
+		    Attached(placer,			@thg,		"placer")
+		    Attached(quantifier,		@thg,		"quantifier")
+		    AttachedOrNot(adjective,	@thg,		"adjective")
+			Unattached(question,		@thg,		"question")
+		    Unattached(verb,			@opp,		"verb")
+		    Attached(adverb,			@opp,		"adverb")
+		    AttachedOrNot(aux,			@opp,		"aux")
+			Unattached(conj,			@cnj,		"conj")
+			Unattached(statement,		@tmp,		"statement")
+			Unattached(name,			@name,		"name")
+
+			adjective.ExpandsTo(noun)
+			question.Expandsto(verb+noun+conj)
+			adverb.Expandsto(adjective+noun)
+			conj.Expandsto(adjective+statement)
+			
+			|| D = gram.list
+			D..self = D..self_
+			D..self_ = nil
+		
+		
+		function AttachedOrNot (|Element| cat, |syntax|f, |string| N)
+			AndIOup(cat, f, n, -1)
+		
+		function Attached (|Element| cat, |syntax|f, |string| N)
+			AndIOup(cat, f, n, 1)
+		
+		function Unattached (|Element| cat, |syntax|f, |string| N)
+			AndIOup(cat, f, n, 0)
+				
+		function AndIOup (|Element| cat,  |syntax| f,  |string| N,  |int| Attachments=0)
+			cat.expand = cat
+			CatNames[N] = cat
+			if Attachments <= 0					// no attachment
+				cat.SyxBits |= 1<<f.CatID(false)
+			if Attachments						// yes attachment
+				cat.SyxBits |= 1<<f.CatID(true)
+												// -1 means both yes and no Attachments
+		
+
+		function Gram.Improve (|gram|)
+			|| Mask = gram.HighestBitmarker-1			
+			|| g = self & Mask
+			for (R in gram.components)
+				ifn g & R
+					g |= R
+			return g
+
+
+		function Gram.Unimprove (|gram|)
+			|| g = self
+			for (R in gram.components)
+				if (g & R)==R
+					g = g&~R
+			return g
+						
+		
+		syntax access (|syntax| f1, |syntax| f2, |int|)
+			return self[f1, f2|bool|]
+
+
+		syntax access (|syntax| f1, |bool| b, |int|)
+			// debugger
+			|| i = f1|int|
+			|| x = i + (b|int|*64)
+			return x
+
+

@@ -1,0 +1,213 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+function scbase.CollectConstants (|Message| src=nil, |SCImport|imp)
+	require imp
+	imp.use
+	src := .Source
+	constantsloadingoverride = true
+	for (ch in src)
+		if (ch IsTmp "constants") or (ch IsTmp "flags")
+			.CollectConstantsSub( ch, imp )
+	constantsloadingoverride = false
+
+
+function scbase.CollectConstantsSub (|Message| ch, |SCImport| imp)
+	|| FuncName = ch[nil|syntax|]									#require
+	|| arg = ch[-1]
+	|| vs = funcname
+
+	if funcname == @thg
+		vs = funcname.next
+	  else
+		funcname = nil
+
+	expect (arg == vs) (vs)
+	expect (arg == @arg or arg == @list) (arg)
+	
+	|uint64| NextNum = 0 + (ch == "flags")
+	|uint64| StartNum = NextNum
+	|uint64| LastFlag = 0
+	
+	|[SCDecl]|	FixLater
+	|[message]|	NameList
+	|SCDecl|	CurrType
+
+	for (line in arg)
+		if (line == @rel) and (line.first == @List) or (line.last == @list)
+			.ConstantExpand( line )
+		  elseif (line == @tmp)
+			expect !line.hasany (line)
+			line.Func = @thg
+
+
+	for (Line in arg)
+		if (line == @decl)
+			CurrType = ExtractDecl( line.first, self )		#expect line
+			line.remove
+			continue
+		
+		|| NewItem = SCDecl.new
+		NewItem <~ scdeclinfo.Const
+
+		if (line == "...")
+			NextNum = StartNum
+			Continue
+			
+		  elseif (line == @Thg) // default numeric constant
+			using (line)
+			|| NewNum = NewDeclNum( NewItem, NextNum, line.name )
+			newitem.source = line
+			if (ch == "flags")
+				LastFlag++
+				NextNum <<= 1
+			  else
+				NextNum++
+
+			if currtype
+				currtype.constcheck(nil, newnum, currtype)  
+				currtype.copytypeinfoto(newitem)
+			
+		  else
+			require  line.expect(@rel)  and  line[@opp, 1].expect(@opp, "=")
+			|| ValueNode = Line[2]							#expect Line
+			|| thg = line[ @Thg ]							#require
+			|| OMGType = TypeOfExpr( ValueNode, self )		#require // can’t seem to remove this.
+			|| NewType = CurrType oar OMGType
+			expect (NewType) (line)
+
+			if (ValueNode == @Str)
+				SCFunction.ObjectifyString(ValueNode)
+				ValueNode.obj = TypeString.typenormal
+			  elseif (valuenode.isint) or (valuenode == @unit)
+				NewType.constcheck(nil, ValueNode, OMGType)  
+				nextnum = valuenode.int + 1
+			
+			FixLater <~ NewItem
+			
+			NewType.CopyTypeInfoTo( NewItem )
+			NewItem.name = thg.name
+			NewItem.Default = ValueNode
+			newitem.source = thg
+		
+		NameList <~ NewItem.source // crappy work around for now...
+		.TryAdd( line, NewItem, NewItem.Name )
+	
+	
+	if (ch == "flags")
+		|| NewItem = SCDecl.new
+		NewItem <~ scdeclinfo.const
+		|| s = (FuncName.Name, "Flag")(FuncName)
+		NewDeclNum( NewItem, lastflag|int|.bits, "Largest" + s )
+		.TryAdd( ch, NewItem, NewItem.Name )
+	
+	for (D in FixLater)
+		.Tran_Const( D, self )
+
+	if (FuncName)
+		.CreateNameDict( FuncName, NameList )
+
+
+
+function scbase.Tran_Const (|SCDecl| D, |SCBase| base)
+	|| root = D.default
+	|| Using = root.SyntaxUsing
+
+	for curr.flat in root
+		if curr == @thg
+			require TypeOfExpr(curr, base)
+			|| actual = base[curr.name]
+			if actual isa SCDecl
+				|| BetterVersion = actual.Default.Copy(curr)
+				curr.ReplaceWith( BetterVersion )				
+			  else
+				expect ((curr.obj == TypeString.typenormal) or (curr ~= "true") or (curr ~= "false")) (curr, "This type isn't allowed for a constant.")
+			
+		  elseif curr == @unit
+			require typeofexpr(curr, base)
+			
+		  elseif (curr == @str) or ((curr==@num) and curr.parent!=@unit)
+			require typeofexpr(curr, base)
+
+
+
+function ConstantExpand (|Message| ch)
+	|| L = ch.first
+	|| op = L.Next
+	|| R = op.Next
+	
+	expect ((op == "=") and (L ==@thg))  ( op, "Expected 'd=(a,b,c...)' ." )
+	
+	|| Rel = «rel
+		L
+		«opp "="»
+		R.ConstantExpandSub
+	»
+
+	ch.Next = rel
+	R.MoveAllAfter(ch)
+	ch.remove
+
+
+
+|| naawgr = {0:12312398, 0:12312398, 0:12312398}
+
+
+function message.ConstIntValueSub (|scbase| name_space, |&int64| v, |bool|)
+	opt norefcounts
+	|| s = self
+	while s == @bra
+		s = s.first
+	if s == @num
+		*v = s.int
+		return true
+	if @thg and s.name[0,"syx"]
+		|| find = _syxdict_.valuelower(s.name[3...])
+			* v = find.id|int64|
+			s.become(@num, (*v).render)
+			return true
+
+
+function message.ConstIntValue (|scbase| name_space, |&int64| v, |bool|)
+	opt norefcounts
+	if .ConstIntValueSub(name_space, v)
+		return true
+
+	|| t = typeofexpr(self, name_space)
+		|| d = t.default
+			// error (d is const) (itm, "We need a constant for the index") // not neeeded
+			return d.constintvaluesub(name_space, v)
+
+
+struct ArgArrayCounter
+	|int|  i
+	|int|  max
+	|bool| IsItem
+	|bool| IsNotItem
+	
+	function check (|message| exp)
+		if (.isitem and .isnotitem)
+			error (exp, "Mixed indexes found. (Some have ':' and some don't)")
+
+	function Do (|string| name, |message| item, |scbase| name_space, |message|)
+		opt norefcounts
+		|| acc = «acc, «thg name » »
+		|| arr = acc.msg(@arr)
+		|| value = item
+		if value == @item
+			.IsItem = true
+			|| key = item.first
+			|int64| v
+			if key.ConstIntValue(name_space, v) #error (item, "Can't load constant.")
+				(.max max= v)
+			arr <~ key
+			value = item.first
+		  else
+			.IsNotItem = true
+			arr <~ (.i)++
+			.max = .i
+		return NewRel( acc, "=", value )			// [1:x, 4:y]
+

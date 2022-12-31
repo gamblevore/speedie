@@ -1,0 +1,1280 @@
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+		
+datatype int
+	default 0
+
+	module
+		function max (|int|)
+			return 0x7FFFffff_
+		function min (|int|)
+			return 0x80000000_
+
+	operator avg (|int| n, |int|)
+		return (self+n)/2
+
+	operator in (|ivec2| i, |bool|)
+		return self >= i.x and self <= i.y
+		
+	operator bits (|int| n, |int|)
+		return self & n.bits
+
+	operator dtf (|uint| belf, |bool|)
+		return self and ((self&belf) == belf)
+
+	operator ftd (|uint| belf, |bool|)
+		return self and ((self&belf) == self)
+
+	function bits (|int|)
+		return (1<<self)-1
+		
+	syntax compare (|string|s, |bool| aware, |int|)
+		return self - s.length
+	syntax access (|int| bit, |bool|)
+		return self&(1<<bit)
+	syntax access (|int| bit, assigns:|bool|, |int|)
+		|| mask = 1<<bit
+		return (self &~ mask) (|) (value << bit) 
+	function clz (|int|)
+		cpp_inbuilt __builtin_clz
+	
+
+	operator nobits (|int| n, |int|)
+		return self &~ ((1<<n)-1)
+
+	operator isa (|uint| n, |bool|)
+		return !(self mod n)
+
+	function Wrap (|int| N, |int|)
+		if self < 0 // returns -1 if N ==0
+			return N-1
+		if self >= N
+			return 0
+		return self
+
+
+	syntax cast (|bool|)
+		return self|bool|
+		// don't put a cast to string here.
+		// bytes are for string conversion! not integers.
+
+	render
+		cpp_part RenderFS
+		fs <~ self
+	
+	function Render (|&byte| Addr, |int| N, |int|)
+		cpp_wrapper JB_int_Render
+		
+	render StrSize
+		cpp_part RenderSize
+		return self|int64|.strsize(fs_in)
+
+	render (|int| zeros)
+		cpp_part RenderZeros
+		fs.appendintegerastext(self, zeros)
+
+	
+	operator min (|int| other, |int|)
+		if self < other: return self
+		return other
+
+
+	operator absmin (|int| other, |int|)
+		if .abs < other.abs: return self
+		return other
+
+
+	operator max (|int| other, |int|)
+		if self > other: return self
+		return other
+
+
+	operator xor (|int| X, |int|)
+		return self ^ X
+
+	
+	function CountBits (|int|)
+		cpp_wrapper JB_Int_CountBits
+
+
+	function Log2 (|int|) // highestbit, highbit
+		cpp_wrapper JB_Int_Log2
+
+	function ctz (|int|)
+		cpp_wrapper JB_Int_CTZ
+		
+	function tri (|int|)
+		return (self*(self+1))/2
+
+	operator ± (|int|i, |int|)
+		cpp_part Shrink
+		if self > 0
+			return (self-i) max 0
+		if self < 0
+			return (self+i) min 0
+	
+	
+	operator InRange (|int| d, |bool|)
+		pragma inline
+		return (self|uint| < d|uint|) // negative self will... fail this test. So basically tests (self >= 0 and self < d)
+
+
+	function IsKnown (|bool|)
+		pragma inline
+		return (self & (self - 1)) == 0
+
+	function IsPo2 (|bool|)
+		pragma inline
+		return (self & (self - 1)) == 0
+
+	operator minus (|string| s, |int|)
+		return s.move(self, -1)
+
+	operator plus (|string| s, |int|)
+		return s.move(self, 1)
+	
+	function IsPow2 (|bool|)
+		disabled ".IsPo2"
+	
+	operator Align (|int| To, |int|)
+		|| Missing = (self mod To)
+			return self + (To - Missing)
+		return self
+
+	
+	iterator
+		|| i = 0
+		while (i < self)
+			yield i (i)
+			i++
+
+	iterator down
+		|| i = seLf - 1
+		while (i >= 0)
+			yield i (i)
+			i--
+	
+	iterator bit		// Get 1 bit of the original per loop
+		|| curr = self|int|
+		while curr
+			|| Highest = 1 << curr.log2
+			yield highest
+			curr = curr &~ Highest
+	
+	
+	operator to (|int| other, |IntRange|)
+		// for 5 to 10 // this should be inclusive
+		return (self, other+1)
+
+	
+	operator downto (|int| other, |IntDownRange|)
+		rz.From = self
+		rz.To = other
+
+
+datatype SizeInt (int)
+	syntax cast (|string|)
+		return .strsize
+
+
+datatype Ind (int)
+	default -1
+	syntax cast (|bool|)
+		return self >= 0
+	function exists (|bool|)
+		return self >= 0
+
+
+datatype ErrorInt (int)
+	default 0
+	syntax cast (|bool|)
+		return self == 0
+
+
+
+struct IntDownRange   /// :3
+	|int| From
+	|int| To
+	
+	iterator
+		while (.From >= .To)
+			yield .From (.from)
+			.From--
+
+
+struct FloatRange   /// :3
+	|Float| From
+	|Float| To
+	
+	iterator
+		while (.From < .To)
+			yield .From (.from)
+			.From = .From + 1.0
+
+
+datatype uint
+	default 0
+
+	constants
+		|uint|
+		max = 0xffffFFFF_
+		min = 0
+	
+	function clearhigh (|int| p8, |uint|)
+		self <<= p8
+		self >>= p8
+		return self
+		
+	operator isa (|uint| n, |bool|)
+		return !(self mod n)
+
+	function crc (|byte| b, |uint|)
+		cpp_inbuilt __builtin_ia32_crc32qi
+		
+	operator rotl (|int| Amount, |uint64|)
+		cpp_wrapper JB_u32_RotL
+	
+	operator rotr (|int| Amount, |uint64|)
+		cpp_wrapper JB_u32_RotR
+
+	operator bits (|uint| n, |uint|)
+		return self & ((1<<n)-1)
+
+	operator nobits (|uint| n, |uint|)
+		return self &~ ((1<<n)-1)
+
+	function IsPo2 (|bool|)
+		pragma inline // as above
+		return (self & (SelF - 1)) == 0
+	
+	function IsPow2 (|bool|)
+		disabled ".IsPo2"
+	
+	function isknown (|bool|)
+		return .ispo2
+
+	function hash (|uint|)
+		cpp_wrapper 
+	function unhash (|uint|)
+		cpp_wrapper 
+	
+	function SwapEndian (|uint|)
+		cpp_Wrapper (__builtin_bswap32)
+	
+	operator tdt (|uint| belf, |bool|)
+		|| xelf = self xor belf
+		return (self&xelf) and (belf&xelf) 
+
+	operator dtf (|uint| belf, |bool|)
+		return self and ((self&belf) == belf)
+
+
+	operator max (|uint| other, |uint|)
+		if (self > other) { return self }
+		return other
+	
+
+	syntax cast (|bool|)
+		return self|bool|
+
+	operator rol (|uint| bits, |uint|)
+		bits &= 31
+		return ((self << bits) (|) (self >> (32 - bits)))
+
+	operator ror (|uint| bits, |uint|)
+		bits &= 31
+		return ((self >> bits) (|) (self << (32 - bits)))
+		
+		
+	iterator
+		|uint| i = 0
+		while i < self
+			yield i
+			i++
+
+
+
+datatype U24_8 (uint)
+	function big (|uint|)
+		return self >> 8
+	function big (assigns:|uint| v, |U24_8|)
+		return (self & 255) (|) (v << 8)
+	function small (|uint|)
+		return self & 255
+	function small (assigns:|uint| v, |U24_8|)
+		return (self & ~255) (|) (v & 255)
+
+
+
+datatype _voidptr:
+	// actualtype &byte
+
+
+datatype ObjCID:
+
+
+datatype _void
+	linkage
+		noauto // this doesnt exist...
+	size 0
+	syntax cast (|bool|)
+		disabled "Can't cast void to a bool."
+
+
+
+
+datatype uint16
+	linkage
+		cpp_class u16
+
+	default 0
+
+	constants
+		|uint16|
+		max = 0xffff_
+		min = 0
+
+	syntax cast (|bool|)
+		return self|bool|
+
+
+datatype int16
+	default 0
+	
+	linkage 
+		cpp_class s16
+
+	constants
+		|int16|
+		max = 32767
+		min = -32K
+
+	syntax cast (|bool|)
+		return self|bool|
+
+
+
+struct uint24
+	|byte[3]| Data
+	syntax cast	(|uint|)
+		return .data[2] (|) .data[1]<<8 (|) .data[0]<<16
+
+function int.SyntaxCast (|uint24|)
+	cpp_part U24
+	rz.data[0] = self>>16
+	rz.data[1] = self>> 8
+	rz.data[2] = self
+
+
+
+datatype float
+	linkage 
+		cpp_part f
+	default 0
+		
+		
+	module
+		function max (|float|)
+			cpp_wrapper
+		function nan (|float|)
+			cpp_wrapper
+	
+	render
+		fs <~ self
+
+	render pc
+		if !self
+			fs <~ "0"
+		  else
+			self = (self * 1000).floor/10
+			if !self
+				fs <~ "<0.1"
+			  else
+				fs <~ self
+		fs <~ "%"
+
+
+	syntax cast (|bool|)
+		return self|bool|
+	
+	function Floor (|float|)
+		cpp_wrapper (floorf)
+	
+	function AsInt (|int|)
+		cpp_wrapper JB_f_AsInt
+	
+	function Round (|float|)
+		cpp_wrapper (roundf)
+	
+	operator avg (|float| f, |float|)
+		return (f + self) * 0.5
+	
+	operator IsNear (|float|other, |bool|)
+		return (self - other).abs < 0.0001 // seems close enough?
+	
+	function mix (|float| y, |float| a, |float|)
+		return self * (1.0 - a) + (y * a)
+
+	function smoothstep (|float|)
+		|| x = .clamp-0.5
+		return x * x * (3 - 2 * x)
+
+	operator max (|float| other, |float|)
+		cpp_wrapper (fmaxf)
+
+	operator min (|float| other, |float|)
+		cpp_wrapper (fminf)
+
+	operator pow (|float| other, |float|)
+		cpp_wrapper (powf)
+
+	operator modf (|float| F, |float|)
+		cpp_wrapper (fmodf)
+
+	operator to (|float| other, |FloatRange|)
+		rz.From = self
+		rz.To = other
+
+	iterator
+		|| i = 0.0
+		while (i < self)
+			yield i (i)
+			i++
+
+
+
+datatype f64
+	linkage
+		cpp_class double
+		cpp_part dbl
+	
+
+	default 0
+	syntax cast (|bool|)
+		return self|bool|
+	
+	operator modf (|f64| F, |f64|)
+		cpp_wrapper (fmod)
+	
+	function AsInt (|int64|)
+		|| Addr = &self
+		|| Addr2 = Addr|&int64|
+		return Addr2[0]
+
+	function Floor (|f64|)
+		cpp_wrapper (floor)
+	function Fract (|f64|)
+		return self - .floor
+	
+	operator pow (|f64| other, |f64|)
+		cpp_wrapper (pow)
+
+	function abs (|f64|)
+		cpp_wrapper (fabs)
+
+	operator max (|f64| other, |f64|)
+		cpp_wrapper (fmax)
+
+	operator min (|f64| other, |f64|)
+		cpp_wrapper (fmin)
+
+	render (|string|fmt=nil)
+		|| addr = fmt.address?|&byte|
+		fs.appenddouble(self, addr)
+
+
+
+datatype hfloat
+	processas float
+	default 0
+	
+	linkage
+		cpp_class __fp16
+		cpp_part f16
+
+
+
+datatype int64
+	default 0
+
+	constants
+		max = 0x7FFFffffFFFFffff_
+		min = max+1
+
+	syntax cast (|bool|)
+		return self|bool|
+
+	render
+		fs <~ self
+
+	function AlignTo (|int64| To, |int64|)
+		return self + (-self|uint64| mod to) // ???
+
+	operator InRange (|int64| d, |bool|)
+		pragma inline
+		return (self|uint64| < d|uint64|)
+
+	operator isa (|uint| n, |bool|)
+		return !(self mod n)
+
+	operator max (|int64| d, |int64|)
+		if d > self
+			return d
+		return self
+	operator min (|int64| d, |int64|)
+		if d < self
+			return d
+		return self
+		
+	function abs (|int64|)
+		return (-self,self)(self < 0)
+
+	operator rotl (|int| Amount, |int64|)
+		return (self|uint64|) rotl amount
+
+	operator rotr (|int| Amount, |int64|)
+		return (self|uint64|) rotr amount
+
+	function Log2 (|int64|) // highestbit, highbit
+		return (self|uint64|).log2
+	
+	function Lowest (|int|)
+		return .lowestbit.log2
+		
+	function Highest (|int|)
+		return (self|uint64|).log2
+
+	function LowestBit (|uint64|)
+		return self & -self
+
+	operator bits (|int64| n, |int|)
+		|int64| one = 1
+		return self & ((one<<n)-one)
+
+	operator nobits (|int64| n, |int|)
+		|int64| one = 1
+		return self & ((one<<n)-one)
+
+	function AsFloat (|f64|)
+		|| Addr = &self
+		|| Addr2 = Addr|&f64|
+		return Addr2[0]
+
+	render strsize
+		if self < 2KB
+			fs <~ self
+		  elseif self <= 875KB
+			fs <~ self/1KB
+			fs <~ "KB"
+		  else
+			|| MB = self / 1MB
+			fs <~ MB
+			|| Extra = (((self+102K) - (MB * 1MB))*10)/(1MB) 
+				fs <~ '.'
+				fs <~ extra
+			fs <~ "MB"
+	
+	
+	function IsPo2 (|bool|)
+		pragma inline // as above
+		return (self & (sElf - 1)) == 0
+	
+	function IsPow2 (|bool|)
+		disabled ".IsPo2"
+
+	iterator
+		|int64| i = 0
+		while (i < self)
+			yield i (i)
+			i++
+
+
+
+function _logictest (|uint64| a, |uint64| b, |uint|)
+	|| pa = a&~b
+	|| pb = b&~a // purely...
+	|| ab = a&b
+	return (pa.exists << 2) (|) (ab.exists << 1) (|) (pb.exists << 0)
+
+
+
+datatype uint64
+	default 0
+
+	constants
+		|uint64|
+		max = -1
+	
+	operator rotl (|int| Amount, |uint64|)
+		cpp_wrapper JB_u64_RotL
+	
+	operator rotr (|int| Amount, |uint64|)
+		cpp_wrapper JB_u64_RotR
+
+	operator isa (|uint| n, |bool|)
+		return !(self mod n)
+	
+	function exists (|uint|)
+		return (self|bool|)|uint|
+	
+	function High (|uint|)
+		return self >> 32
+	
+	function Low (|uint|)
+		return self
+	
+	syntax cast (|bool|)
+		return self|bool|
+		
+	operator max (|uint64| s, |uint64|)
+		if self > s: return self
+		return s
+	
+		
+	operator min (|uint64| s, |uint64|)
+		if self < s: return self
+		return s
+	
+	function Log2 (|uint64|) // highestbit, highbit
+		cpp_wrapper JB_u64_Log2
+
+	function CountBits (|int|)
+		cpp_Wrapper (__builtin_popcountll)
+
+	operator rol (|uint| bits, |uint64|)
+		bits &= 63
+		return ((self << bits) (|) (self >> (64 - bits)))
+
+	operator ror (|uint| bits, |uint64|)
+		bits &= 63
+		return ((self >> bits) (|) (self << (64 - bits)))
+
+	operator dtf (|uint64| belf, |bool|)
+		|| xelf = self xor belf
+		return (self&belf) and (!(xelf&belf))
+		
+	operator inside (|uint64| b, |bool|)
+		return _logictest(self, b) == 0b011
+
+	operator contains (|uint64| b, |bool|)
+		return _logictest(self, b) == 0b110
+
+	
+	operator tdt (|uint64| belf, |bool|)
+		|| xelf = self xor belf
+		return (self&xelf) and (belf&xelf) 
+
+	function IsPo2 (|bool|)
+		pragma inline // as above
+		return (self & (SElf - 1)) == 0
+	
+	function IsPow2 (|bool|)
+		disabled ".IsPo2"
+
+	operator crc (|uint64| Other, |uint64|)
+		cpp_wrapper _mm_crc32_u64
+	
+	function isknown (|bool|)
+		return .ispo2
+	
+	iterator bits				// Get 1 bit of the original per loop
+		|| curr = self|uint64|
+		while curr
+			|uint64| Highest = 1 << curr.log2
+			yield highest
+			curr = curr &~ Highest
+
+
+
+
+
+datatype bool
+	size 1
+	default false
+	
+	operator bitor (|bool| b, |bool|)
+		return self or b
+	
+	operator sign (|int| i, |int|)
+		return (i, -i)(self)
+	function bool (|int| i, |int|)
+		disabled "use operator sign"
+	function sign
+		disabled "use .dir"
+
+	function set (|int| old, |int| flag, |int|)
+		cpp_part setflag
+		if self
+			return old (|) flag
+		return old &~ flag
+		
+		
+	function dir (|int|)
+		return (self|int|<<1)-1
+	
+	function Render (|string|)
+		cpp_part Render0
+		return ("true", "false")(self)
+
+	function Render (|faststring| fs_in, |string|)
+		opt norefcounts
+		|| s = .render
+		if !fs_in
+			return s
+		fs_in <~ s
+	
+	
+	iterator
+		|| num = 1
+		while (num >= 0)
+			yield (num == 1)
+			num--
+
+
+datatype vec4 
+	syntax cast (|bool|)
+		cpp_part Bool
+		return self != vec4()	
+	
+	syntax Equals (|vec4| v, |bool|Aware, |bool|)
+		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
+	
+	function clamp (|vec4|)
+		return vec4(.x.clamp, .y.clamp, .z.clamp, .w.clamp)
+	
+	function sqrt (|vec4|)
+		cpp_wrapper __builtin_ia32_sqrtps
+	function ivec4 (|ivec4|)
+		return (.x|int|, .y|int|, .z|int|, .w|int|)	
+
+
+	function sum (|float|)
+		return .x + .y + .z + .w
+
+	render
+		fs <~ "${.x}, ${.y}, ${.z}, ${.w}"
+	
+	module
+		function new (|vec4|)
+			cpp_part New0
+			return (0.0,0.0,0.0,0.0)
+		function new (|float| f, |vec4|)
+			cpp_part New1
+			return (f,f,f,f)
+		function new (|float| a, |float| b, |float| c, |float| d, |vec4|)
+			cpp_part New4
+			return (a,b,c,d)
+
+
+datatype ivec4
+	function clip (|ivec4| R, |ivec4|)
+		r.x  = r.x  max .x
+		r.y  = r.y  max .y
+		r.x2 = r.x2 min .x2
+		r.y2 = r.y2 min .y2
+		return R
+		
+	function BoundClip (|ivec4| bn, |ivec4|)
+		return .bound(bn).clip(bn)
+	function Bound (|ivec4| bn, |ivec4|)
+		rz = self
+		if rz.x < bn.x
+			rz.x = bn.x
+			rz.x2 = bn.x + .width
+		  elseif .x2 > bn.x2
+			rz.x2 = bn.x2
+			rz.x = bn.x2 - .width
+		if rz.y < bn.y
+			rz.y = bn.y
+			rz.y2 = bn.y + .height
+		  elseif .y2 > bn.y2
+			rz.y2 = bn.y2
+			rz.y = bn.y2 - .height
+		
+		
+	function vec4 (|vec4|)
+		return (.x|float|, .y|float|, .z|float|, .w|float|)
+
+	operator right (|int|x, |ivec4|)
+		return self + (x,0,x,0)
+	
+	operator up (|int|x, |ivec4|)
+		return self + (0,x,0,x)
+
+	operator left (|int|x, |ivec4|)
+		return self - (x,0,x,0)
+		
+	operator down (|int|x, |ivec4|)
+		return self - (0,x,0,x)
+		
+	function MoveTo (|ivec2| XY, |ivec4|)
+		return (XY, XY + .size)
+
+	syntax Equals (|ivec4| v, |bool|Aware, |bool|)
+		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w)
+	
+	operator ± (|int|i, |ivec4|)
+		cpp_part Shrink
+		return (.x+i, .y+i, .z-i, .w-i)
+	
+	function Width (|int|)
+		return .x2 - .x1			// not quite true but SubliminalApp uses it this way :(
+	
+	function Width (assigns:|int|, |ivec4|)
+		.x2 = .x1 + Value
+	function Height (assigns:|int|, |ivec4|)
+		.y2 = .y1 + Value
+	
+	function Width (|bool|d, |int|)
+		disabled "use .length"
+	
+	function Length (|bool|d, |int|)
+		return self[2+d|int|] - self[0+d|int|]
+	
+	function h (|ivec2|)
+		return .x1x2
+	function v (|ivec2|)
+		return .y1y2
+		
+	function Height (|int|)
+		return .y2 - .y1
+		
+	function Area (|int|)
+		return .width * .height
+	
+	function Aspect (|float|)
+		return .width|float| / .height|float|
+	
+	function Horz (|intrange|)
+		return .x1 to .x2
+	
+	function Vert (|bool|d=false, |intrange|)
+		return .dim(1-d|int|)
+	
+	function Dim (|int|d, |intrange|)
+		return self[d] to self[d+2]
+		
+	function horz (assigns:|ivec2|r, |ivec4|)
+		.x1 = r.x1
+		.x2 = r.x2
+		return self
+	
+	function contains (|int| x, |int| y, |bool|)
+		cpp_part ContainsInt
+		require x >= .x and x < .x2
+		require y >= .y and y < .y2
+		return true
+	
+	function contains (|ivec2| v, |bool|)
+		cpp_part ContainsVec2
+		return .contains(v.x, v.y)
+	
+	operator contains (|ivec4| v, |bool|)
+		disabled "why?"
+		return .contains(v.x1y1) and .contains(v.x2y2)
+	
+	operator overlaps (|ivec4| v, |bool|)
+		require v.x2 > .x1
+		require v.x1 < .x2 
+		require v.y2 > .y1
+		require v.y1 < .y2
+		return true 
+	
+	operator contains (|ivec2| v, |bool|)
+		return .contains(v)
+	
+	function ispositive (|bool|)
+		return (.x2 > .x) and (.y2 > .y)
+	
+	function isnegative (|bool|)
+		return (.x2 < .x) or (.y2 < .y)
+		
+	syntax cast (|bool|)
+		cpp_part Bool
+		return self!=ivec4.zero	
+
+	function Soothe (|ivec4|)
+		return (0, 0, .x2 - .x1, .y2 - .y1)	
+	
+	function size (|ivec2|)
+		return (.x2 - .x1, .y2 - .y1)	
+
+	render
+		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
+	
+	module
+		function zero (|ivec4|)
+			return (0, 0, 0, 0)
+		function new (|ivec4|)
+			cpp_part New0
+			return (0, 0, 0, 0)
+		function new (|int| x, |ivec4|)
+			cpp_part New1
+			return (x,x,x,x)
+	
+	iterator Rect
+		|| curr = (.x1,.y1)
+		while (curr.y < .y2) // just changed this ooofff
+			while (curr.x < .x2)
+				yield curr
+				curr.x++
+			curr = (.x1, curr.y+1)
+
+
+
+datatype vec3
+	syntax cast (|bool|)
+		cpp_part Bool
+		return (self != vec3.zero)
+
+	syntax Equals (|vec3| v, |bool|Aware, |bool|)
+		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
+	
+	function lum (|float|)
+		return ((self*self) • (0.299, 0.587, 0.114)).sqrt
+	
+	function vec4.lum (|float|)
+		return .xyz.lum
+
+	operator min (|vec3| s, |vec3|)
+		(s.x min= .x)
+		(s.y min= .y)
+		(s.z min= .z)
+		return s
+	
+	function ivec3 (|ivec3|)
+		return (.x|int|, .y|int|, .z|int|)
+
+	function Length (|float|)
+		return (.x*.x + .y*.y + .z*.z)
+		
+	operator mul (|float| x, |vec3|)
+		cpp_part MulF
+		return (x,x,x)*self
+
+	operator mul (|vec3| v, |vec3|)
+		cpp_part Mul3
+		return (.x*v.x, .y*v.y, .z*v.z)
+	
+	function abs (|vec3|)
+		return (.x.abs, .y.abs, .z.abs)
+	
+	operator • (|vec3| other, |float|)
+		cpp_part Dot
+		return (self * other).sum
+
+
+	function reflect (|vec3| plane, |vec3|)
+	    return self - 2.0 * (self • plane) * plane
+
+	function sum (|float|)
+		return .x + .y + .z
+
+
+	function Normal (|vec3|) 									// use invsqrt instead?
+		return self / .length
+
+	render
+		fs <~ "${.x}, ${.y}, ${.z}"
+	
+	module
+		function zero (|vec3|)
+			return (0.0,  0.0, 0.0)
+		function New (|float| x, |float| y, |float| z, |vec3|)
+			return (x,y,z)
+		function New (|float| x, |vec3|)
+			cpp_part New1
+			return (x,x,x)
+		function Up   (|vec3|)
+			return (0.0,  1.0, 0.0)
+		function Down (|vec3|)
+			return (0.0, -1.0, 0.0)
+
+
+
+datatype ivec3
+	syntax cast (|bool|)
+		cpp_part Bool
+		return .x or .y or .z
+
+	function vec3 (|vec3|)
+		return (.x|float|, .y|float|, .z|float|)	
+
+	render
+		fs <~ "(${.x}, ${.y}, ${.z})"
+
+	syntax Equals (|ivec3| v, |bool| Aware, |bool|)
+		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
+	
+	module
+		function zero (|ivec3|)
+			return (0, 0, 0)
+
+
+
+
+
+extend ivec2
+	syntax cast (|intrange|)
+		return self|intrange|
+
+
+// mousetest
+datatype IntRange (ivec2)
+	linkage
+		cpp_part Rg
+	function Width (|int|)
+		return .x2 - .x
+	operator Inside (|ivec4| R, |bool|)
+		return R.Contains(.X, .Y)
+
+	function overlaps (|intrange| r, |bool|)
+		return r.x1 < .x2 and r.x2 > .x1
+	function By (|intrange| r, |ivec4|)
+		return (.x, r.x, .y, r.y)
+ 
+	operator ± (|int|i, |intrange|)
+		cpp_part Shrink
+		return (.x+i, .x2-i)
+	
+	
+	operator dtd  (|intrange| R, |bool|)
+		if (r.x2 <= .x) or (r.x >= .x2)
+			return false
+		return true
+		
+	function Resolve (|intrange|)
+		return (.lower, .higher)
+	function Higher (|int|)
+		return .x1 max .x2
+	function Lower (|int|)
+		return .x1 min .x2
+	function Mid (|int|)
+		return (.x1 + .x2)/2
+	function Mix (|float|f,|float|)
+		return mix(.x1,.x2,f)
+	function LimitTo (|int| i, |ivec2|)
+		if (.X  < 0):		.X  = 0
+		if (.X2 < 0):		.X2 = 0
+		if (.X  > i):		.X  = i
+		if (.X2 > i):		.X2 = i
+		return self
+
+	operator Contains (|int| i, |bool|)
+		cpp_part Contains1
+		return (i >= .X) and (i < .X2)
+	operator Contains (|ivec2| i, |bool|)
+		cpp_part Contains2
+		return self contains i.x and i.x2
+
+	syntax Equals (|int| i, |bool|)
+		return .X==i and .X2==i
+
+	iterator
+		while (.x < .x2)
+			yield .x (.x)
+			.x++
+
+
+
+datatype ivec2
+	function lengthsq (|float|)
+		return (.x * .x)|float| + (.y * .y)|float| 
+
+	function width (|int|)
+		return .x2 - .x
+
+	syntax Compare (|float| Other, |bool|Aware, |int|)
+		|| LSq = .lengthsq
+		|| Osq = other*other
+		if (Lsq > osq)
+			return 1
+		if (Lsq < osq)
+			return -1
+
+	function Grow (|ivec2|g, |ivec4|)
+		return (self-g, self+g)
+	function clip (|int| p, |int|)
+		if p < .x
+			return .x
+		return p min .x2
+	function clip (|ivec2| p, |ivec2|)
+		cpp_part Clip2
+		p.x = .x.clamp(p.x)
+		p.y = .y.clamp(p.y)
+		return p
+			
+	function mid (|int|)
+		return (.x1+.x2)/2
+		
+	operator contains (|int| x, |bool|)
+		return (x >= .x1) and (x <= .x2)
+
+	operator mul (|float| x, |ivec2|)
+		return (.vec2*x).ivec2
+
+	operator align (|int| a, |ivec2|)
+		return (.x align a, .y align a)
+
+	operator max (|ivec2| o, |ivec2|)
+		cpp_part Max2
+		return (o.x max .x, o.y max .y)
+
+	operator max (|int| o, |ivec2|)
+		cpp_part Max1
+		return (o max .x, o max .y)
+
+	operator min (|ivec2| o, |ivec2|)
+		return (o.x min .x, o.y min .y)
+		
+	operator fma (|int|a, |int|)
+		return .x + .y*a
+
+	operator inrange (|ivec2| p, |bool|)
+		return .x inrange p.x  and  .y inrange p.y
+
+	function sum (|int|)
+		return .x + .y
+
+	function area (|int|)
+		return .x * .y
+
+	function Inside (|ivec4| R, |bool|)
+		return R.Contains(.x, .y)
+	
+	function vec2 (|vec2|)
+		return (.x|float|, .y|float|)
+	
+	function Rect (|ivec4|)
+		return (0, 0, .x, .y)
+
+	function point (|ivec4|) 
+		return .xyxy + (0,0,1,1)
+	
+	syntax cast (|bool|)
+		cpp_part Bool
+		return .x or .y
+	
+	syntax Equals (|ivec2| v, |bool|Aware, |bool|)
+		cpp_part Equals2
+		return (.x == v.x) and (.y == v.y) 
+
+	syntax Equals (|int| v, |bool|Aware, |bool|)
+		return (.x == v) and (.y == v) 
+
+	render
+		fs <~ "(${.x}, ${.y})"
+	
+
+	iterator
+		|| curr = (0,0)
+		while (curr.y < .y)
+			while (curr.x < .x)
+				yield curr
+				curr.x++
+			curr = (0,curr.y+1)
+
+
+
+datatype vec2
+	render
+		fs <~ "${.x}, ${.y}"
+
+	function ivec2 (|ivec2|)
+		return (.x|int|, .y|int|)
+
+	syntax cast (|bool|)
+		cpp_part Bool
+		return .x or .y
+
+	syntax Equals (|vec2| v, |bool|Aware, |bool|)
+		return (.x == v.x) and (.y == v.y) 
+	
+	operator • (|vec2| other, |float|)
+		cpp_part Dot
+		return (self * other).sum
+
+	function sum (|float|)
+		return .x + .y
+
+	function LengthSq (|float|)
+		return (.x * .x)  +  (.y * .y)
+
+	function Length (|float|)
+		return .LengthSq.sqrt
+
+	function sincos (|vec4|)
+		return (.x.sincos, .y.sincos)
+
+	syntax Compare (|float| Other, |bool|Aware, |int|)
+		|| L = .LengthSq
+		other = other * other
+		if (L > other)
+			return 1
+		if (L < other)
+			return -1
+	module
+		function New (|float| v, |vec2|)
+			return (v,v)
+
+
+function vecmix (|vec2|a, |vec2|b, |vec4|)
+	cpp_part mix22
+	return (a.x, a.y, b.x, b.y)
+function vecmix (|float|a, |vec2|b, |float|c, |vec4|)
+	cpp_part mix121
+	return (a, b.x, b.y, c)
+function vecmix (|vec3|a, |float|b, |vec4|)
+	cpp_part mix31
+	return (a.x, a.y, a.z, b)
+function vecmix (|float|a, |vec3|b, |vec4|)
+	cpp_part mix13
+	return (a, b.x, b.y, b.z)
+function vecmix (|vec2|a, |float|b, |vec3|)
+	cpp_part mix21
+	return (a.x, a.y, b)
+function vecmix (|float|a, |vec2|b, |vec3|)
+	cpp_part mix12
+	return (a, b.x, b.y)
+function ivecmix (|ivec2|a, |ivec2|b, |ivec4|)
+	cpp_part imix22
+	return (a.x, a.y, b.x, b.y)
+function ivecmix (|int|a, |int|b, |ivec2|c, |ivec4|)
+	cpp_part imix112
+	return (a, b, c.x, c.y)
+function ivecmix (|int|a, |ivec2|b, |int|c, |ivec4|)
+	cpp_part imix121
+	return (a, b.x, b.y, c)
+function ivecmix (|ivec3|a, |int|b, |ivec4|)
+	cpp_part imix31
+	return (a.x, a.y, a.z, b)
+function ivecmix (|int|a, |ivec3|b, |ivec4|)
+	cpp_part imix13
+	return (a, b.x, b.y, b.z)
+function ivecmix (|ivec2|a, |int|b, |ivec3|)
+	cpp_part imix21
+	return (a.x, a.y, b)
+function ivecmix (|int|a, |ivec2|b, |ivec3|)
+	cpp_part imix12
+	return (a, b.x, b.y)
+
+
+function ivec2.abs (|ivec2|)
+	return (.x.abs, .y.abs)
+
+function ivec4.clamp (|int| L, |int| H, |ivec4|)
+	return .max(L).min(H)
+
+function ivec4.max (|int| L, |ivec4|)
+	return (.x max L, .y max L, .z max L, .w max L )
+
+function ivec4.min (|int| L, |ivec4|)
+	return (.x min L, .y min L, .z min L, .w min L )
+
+function ivec4.Center (|vec2|)
+	return ((.x+.x2)|float|/2.0, (.y+.y2)|float|/2.0)
+

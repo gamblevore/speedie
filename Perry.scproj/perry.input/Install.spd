@@ -1,0 +1,374 @@
+	
+
+extend_module perry
+	function ftp_path (|string|)  ////////
+		rz = app.pref("ftp_dest")
+		if !rz or keys.Option or app.Pref("ftp_failed")
+			|| q = "Upload Perry to what URL?\n\nEG: ftp://user:pass@ftp.domain.com/dirs/perry.zip"
+			rz = q.Ask(rz)$
+			app.pref("ftp_dest") = rz
+
+///// abc
+	function monthly_name (|date| n, |string|)
+		|| fs = faststring()
+		fs <~ "~/Backups/perry_monthly/".PathFix
+		fs.AppendIntegerAsText(n.MonthsApprox, 4)
+		fs <~ "m.zip"
+		return fs
+
+
+	function latest_name (|string|)
+		target debug
+			return "~/Backups/perry_latest.debug.zip".PathFix
+		  else
+			return "~/Backups/perry_latest.zip".PathFix
+
+
+	function daily_name (|date| n, |string|)
+		|| fs = faststring() 
+		fs <~ "~/Backups/perry/".PathFix
+		fs.AppendIntegerAsText(n.Days, 4)
+		fs <~ ".zip"
+		return fs
+	
+	
+	function remove_old (|file| fol, |int| allowed, |bool| keep_first=false, |file|)
+		fol.MakeEntirePath
+		|| items = fol.list
+		while items.length > allowed
+			|| s = fol[items.pop]
+			if keep_first
+				keep_first = false
+				rz = s
+			  else
+				s.delete
+
+
+	function backup (|file| zip, |file|)
+// Daily file per week, weekly file per month.
+		|| now  = date() - 107020500000000
+		|| latest = .latest_name
+		|| daily = .daily_name(now)
+		|| monthly = .monthly_name(now)
+		|| daily_fol = "~/Backups/perry".file
+		|| monthly_fol = "~/Backups/perry_monthly".file
+		|| latest_local = perry.speediedir["Terminal"][latest.name]
+
+		zip.copyto(latest_local)
+		zip.moveto(daily)
+		
+		|| it = remove_old(daily_fol, 7, true)
+			it.moveto(monthly)
+		remove_old(monthly_fol, 8)
+		
+		return latest_local.File
+				
+		
+	function install_path (|string|)
+		|| p = app.path.parent
+		expect (p contains ".app/") (beep, "Can't install/uninstall while using the app directly.")
+		return p.sibling("Resources/speedie_install.txt") // evade code-signing
+
+
+	function DownloadData (|string| url, |int| lim, |string|)
+		|| p = .install_path			#require
+		return p.filedata(lim)			#expect (beep, "Can't find installation-data at:\n" + p)
+
+
+	
+	function InstallState (|FileArchive| Arc, |file| base, |faststring| diff, |int|)
+		|| newer = FastString()
+		|| older = FastString()
+		
+		for i in arc
+			|| curr_file = base[i.name]
+			if curr_File.isdir or curr_file.readall(true) != i..data.Value
+				|| diskmod = curr_file.modified
+				|| arcmod = i..modified.int|date|
+				if diskmod <= arcmod
+					rz |= arc_newer
+					newer.FileDiff(i.name, "And newer ones too")
+				  else
+					rz |= arc_older
+					older.FileDiff(i.name, "Archive contains older files")
+				
+		diff <~ older
+		if newer.length and older.length
+			diff <~ "\n"
+		diff <~ newer
+
+
+	function HandleState (|int| state, |file| f, |string| explain,  |file|)
+		require state
+		if (state & arc_older)
+			|| side = f.sibling("SpeedieTest")
+			|| q = faststring()
+			q <~ "You don't mind losing your alterations to Speedie?\n\nInstall separately: $side\nOr overwrite:       $f\n\n$explain"
+			|| it = q.getresult.ask_named("Separate/Overwrite/Cancel")
+			require it != -1		// cancel
+			if it == 1
+				return side
+		return f
+
+
+	function FindSpeedyRoot (|string| In, |string|)
+		|| paths = in.parent
+		|| srch = "/Speedie/"
+		|| found = paths.find(srch)
+		expect (found > 0) ("speedie needs to be contained in a folder named 'Speedie' (case sensitive).")
+		return paths[0, found+srch.length]
+
+
+	function MakeSpeedieDir (|string|)
+// over complex? it just returns (speedie.file)?
+// i mean testing is important... but what if it fails? does it do anything special to help with that?
+		|| where = speedie.file
+		require where.exists
+		|| dest_path = where.linkto
+			|| result = dest_path.executestr(["--alive"]).trim
+			if result contains "seems alive :)"
+				return .FindSpeedyRoot(dest_path)
+
+
+	function TestShell (|string|)
+		if !.makespeediedir
+			return " * Link $speedie\n\n"
+		
+		
+	function TestInstall (|string|)
+		|| where = .SpeedieDir.file
+		|| fail = " * Install Speedie (compiler and libs).\n\n"
+		if !where.exists
+			return fail
+		|| items = "GUI.scproj Image.scproj jeebox.scproj Library Network.scproj Speedie.scproj Terminal" / ' '
+		
+		for i in items
+			|| w = where[i]
+			if !w.exists
+				return fail + w.path + " is missing.\n\n"
+			
+	
+	function InBuildFolder (|bool|)
+		|| paths = app.path.split('/')
+		for s.backwards in paths
+			if s.isproj
+				return true
+			// find "build" then find... ".scproj"
+		
+	
+	function TestOlder (|&bool| not_exist, |&bool| age_bad, |bool|test, |string|)
+		require platform.release or test
+		if !test
+			require !.InBuildFolder
+		|| p = app.NeedsIdealPath$
+		
+		if !p.exists
+			*not_Exist = true
+			return " * Move Perry to /Applications"
+		  elseif p.appDate < app.Created
+			*age_Bad = true
+			return " * Replace old Perry (in /Applications)"
+				
+
+	function TestNewer (|string|)
+		|| old = app.NeedsIdealPath$
+		if old.appdate > app.Created
+			return old.path
+
+
+	function MoveToAppFolder (|string|) // disabled?
+		|| me = app.apppath.file
+		|| t = file.trash(me.name)
+		|| dest = app.NeedsIdealPath$
+		
+		for 10
+			if dest.exists and !dest.moveto(t)
+				rz = "\n\nCan't remove " + dest.path
+			  elseif me.moveto(dest)
+				return "" // success
+			  else
+				t.moveto(dest) /*undo*/ 
+				rz = "\n\nFailed to move $me to destination"
+		
+	function TestCompiler (|string|)
+		if !CppCompiler.file.exists
+			return "No c++ compiler exists at '$CppCompiler' ! Please make one available from that path."
+
+	function CheckInstallStatus (|bool| testanyhow)
+		.checked = true
+		|| CompilerMsg = .TestCompiler
+		|| HasNewerApp = .testnewer
+		|| ShellBad = .testshell
+		|| InstallBad = .testinstall
+		|| ExistsBad = false
+		|| AgeBad = false
+		|| probs = false
+		if ShellBad or InstallBad or AgeBad or (Existsbad and testanyhow)
+			if HasNewerApp				// what should we do?
+				beep ("A newer version of Perry exists... at $HasNewerApp. Please use it to install Speedie.")
+				return
+			|| Msg = "Some installation needs to be done to use Perry:\n\n$ShellBad$InstallBad"
+			if msg.confirm
+				.install(installbad!="", shellbad!="")
+			probs = true
+		if CompilerMsg
+			beep CompilerMsg
+		  elseif testanyhow and !probs
+			beep "No errors detected with install."
+
+
+	function GenerateArchive
+		if !.GenerateArchiveSub
+			beep
+
+
+	helper GenerateArchiveSub (|bool|)
+		|| outpath = .install_path
+		|| p = .SpeedieDir
+		|| f = p.existingFile("generate archive")
+		require f and outpath
+		
+		|| arc = FileArchive.new(p)		
+		.GenerateallDir(arc, f)
+		|| Terminal = F.Child("Terminal")
+		|| SpdExec = Terminal.Child("Speedie")
+		arc <~ SpdExec
+
+		|| out = outpath.file
+		arc.saveto(out)
+
+		|| result = app.apppath.file
+		require Speedie.execute(["--dosign="+result])
+		|| zipped = result.ZipTmp					#require
+		|| latest = .backup(zipped)
+
+		|| out_size = out.size|SizeInt|
+		|| in_size = arc.size|SizeInt|			
+		beep "Done!\n\n$out created at $out_size\n\nExpands to $in_size"
+		latest.Reveal
+		return true
+		
+		
+	function CanGenerate (|file| f, |bool|)
+		require !f.linkto
+		|| n = f.name
+		require !n[0, ".git"]
+		if f.isdir
+			require n ~!= "Build" and "Cpp" and "Terminal" and "cpp.hidden" and "BuildTest" and "BuildTest2" //
+		if n ~!= ".DS_Store"
+			|| ext = n.ext
+			return ext ~!= "xcodeproj" and ".mz"
+
+
+	function GenerateAllDir (|FileArchive| f, |file| dir)
+		for c.files in dir
+			if .cangenerate(c) and !.GenerateDir(f, c, false)
+				printline "Skipping personal project: " + c
+
+
+	function GenerateDir (|FileArchive| f, |file| dir, |bool| uploadable, |bool|)
+		if !uploadable
+			|| perry = dir[".perry"]
+			require perry.exists
+			|| up = dir[".upload"] 
+			if !up.exists
+				|| oof = perry.parse
+				require (oof == "uploadable") or oof.find("uploadable")
+				up.data = "true\n"
+		
+		for c.files in dir
+			if .CanGenerate(c)
+				if c.isdir
+					.GenerateDir(f, c, true)
+				  else
+					f <~ c		
+		return true
+
+
+	function SetupLinks (|file|f, |string|)
+		|| term = f["Terminal/Speedie"]
+		require term.mustexist
+		|| at = speedie.file
+		|| dest = at.linkto
+		if Dest == term.path
+			//
+		  elseif at.linkto(term)
+			rz = "\n\nInstalled speedie at: " + at.path
+		  else
+			rz = "\n\nFailed to install speedie at: " + at.path
+
+
+	function install_files (|file| f, |string|)
+		|| URL		= app.conf("install_url")
+		|| str		= .DownloadData(URL, 10MB)	#require
+		|| arc		= str.GetArchive(64MB)		#expect (beep, "Can't use installation-file.")
+		|| diff		= faststring()
+		|| State	= .InstallState(Arc, f, diff)
+		|| f2		= .HandleState(state, f, diff)
+		if !f2 and state // cancelled
+			beep "No files changed."
+			return ""
+		
+		rz = "Already installed and up to date."
+		if f2
+			|| size = arc.InstallTo(f2, true)
+			rz = "${arc.FileCount} files (${size.strsize}) written to:\n\n$f2"
+			if !stderr.ok
+				rz += "\n\nSome errors occurred:\n"
+				rz += stderr.render
+
+
+	function Install (|bool| DoInstall, |bool| DoLinks, |bool|)
+		stderr.clear
+		|| msg = ""
+		|| f   = "~/Speedie/".file
+		if doinstall
+			msg += .install_files(f)
+		if dolinks
+			msg += .SetupLinks(f)
+		if msg
+			beep msg
+		return true
+		
+			
+	function UnInstall
+		|| fs = FastString()
+		|| spd = speedie.file
+		|| per = app.Idealpath
+		|| fol = .SpeedieDir
+		if spd.exists and spd.delete
+			fs <~ "Deleted Link at: $spd"
+		if per.fileexists and per.movetotrash
+			fs <~ "\nDeleted Perry at: $per"
+		fs <~ "\n\nTo fully uninstall, remove folder at:\n$Fol"
+		beep fs
+
+
+function ClickedInstallMenu (guimenuevent)
+	perry.install(true, true)
+
+function ClickedMakeArchiveMenu (guimenuevent)
+	perry.GenerateArchive
+
+function ClickedUninstallMenu (GUIMenuEvent)
+	perry.uninstall
+
+function ClickedShowPrefs (GUIMenuEvent)
+	app.pref_path.Reveal
+
+function ClickedTestInstallMenu (guimenuevent)
+	perry.CheckInstallStatus(true)
+
+function string.IsProj (|bool|)
+	return self isa "scproj" or "uwuz"
+
+function string.PathIsCode (|bool|)
+	return .isproj or (self isa "spd" or "uwu")
+
+function faststring.FileDiff (|string| name, |string| Title)
+	if !.length
+		self <~ title
+		self <~ ":\n"
+	self <~ "\t"
+	self <~ name
+	self <~ "\n"

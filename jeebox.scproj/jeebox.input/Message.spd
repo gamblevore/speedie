@@ -1,0 +1,1174 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+|Dictionary of SyntaxObj|	_SyxDict_ = Dictionary.New // must be at root. compiler init order.
+|SyntaxObj[64]|             _FuncArray_
+
+
+
+class Message (RingTree)
+	linkage
+		cpp_part Msg
+		visible true
+
+////////////////////////////////
+	contains Message
+	|string|				Name
+	|Object(tag)|			Obj					// Allow users to attach interesting information.
+	|Syntax|				Func
+	|Byte|					Indent
+	|MsgUIFlags|			Flags
+	|int|					Extra
+////////////////////////////////
+
+		
+	constructor
+		cpp_part ConstructorBasic
+		.Position	= parser.UsingPos
+		.func		= @arg
+		.flags		= parser.InsertedFlags
+		
+			
+	constructor (|Message| other)
+		cpp_part ConstructorCopy
+		super.constructor
+		
+		.Position	= other.Position oar parser.UsingPos
+		.func		= other.func
+		.flags		= other.flags (|) parser.InsertedFlags
+		.Name		= other.Name
+		.Obj		= other.Obj
+		.indent		= other.indent
+		.extra		= other.extra
+
+		
+	constructor (|Syntax| Func, |string| Name)
+		cpp_part ConstructorNormal
+		.Position	= parser.UsingPos
+		.func		= func
+		.flags		= parser.InsertedFlags
+		.extra		= (name.length, parser.usingextra)(.Position<0)
+		.name		= name
+
+	
+	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| Extra)
+		cpp_part ConstructorRange
+		super.constructor(Parent)
+		
+		.Position	= BytePos
+		.flags		= parser.InsertedFlags
+		.func		= func
+		.extra		= extra (|) parser.baseextra // pack some bits in 
+		.name		= name
+
+
+	function syxid (|int|)
+		return .Func|int|
+///////////////////////////////////////////////////////////////////////////////
+
+	function CopyWipe (|memorylayer| L=nil, |Message|)
+		parser.UsingPos = -1 // whatever
+		return .copy_(nil, L)
+
+
+	helper Copy_ (|message| pos_msg=nil, |memorylayer| L, |Message|)
+		opt norefcounts
+		rz = message.NewWithLayer(L, self)				// looks better
+		if pos_msg
+			rz.position = pos_msg.position
+		for v in self
+			rz <~ v.Copy_(pos_msg, L)
+	
+
+	function Copy (|message| L = nil, |Message|)
+		opt norefcounts
+		cpp_Part NiceCopy
+		if self
+			if !L
+				return .Copy_(.memorylayer)
+			return .Copy_(L, L.memorylayer)
+
+
+	operator matches (|message| m, |bool|)
+		return .func == m.func  and  .name ~= m.name
+
+
+	operator Starts (|string| s, |bool|)
+		return .name[0, s, true]
+
+
+	function Copy (|message| D, |message| R, |Message|)
+		cpp_part CopyRename			// unused??? // made to replace SCNodeRenamer. much simpler.
+		rz = message(self)
+		for v in self
+			if v matches d
+				rz <~ r.copy
+			  else
+				rz <~ v.Copy(d, r)
+
+
+	function ClearPosition
+		.Position = parser.usingpos
+
+
+////////////////////////////////////////////////////////////////////////////////
+	syx Nil (WildCard)
+		Opt NoRefCounts
+		debugger
+	
+	
+	syx Arg (Argument)
+		Opt NoRefCounts
+		|| Braces = (self is style2)  or  !.hasany  or  (self in @arg)
+			fs <~ '{'
+		.FSListArg( fs )
+		if Braces
+			fs.IndentLine
+			fs <~ '}'
+	
+	
+	syx Bra (Bracket)
+		fs <~ '('
+		fs <~ .First
+		fs <~ ')'
+
+	
+	syx Thg (Thing)
+		fs <~ .Name
+
+
+	syx Opp (Operator)
+		fs <~ .Name
+
+	
+	syx Cnj (conj)
+//                                  I eat cheese #when I feel hungry
+		fs <~ '#'
+		fs <~ .Name
+		
+
+	function string.IsTmpName (|bool|)
+		return (jeebox.cswordmiddle contains self) and (!self[0].IsInt)
+	
+	
+	syx Tmp (Statement)
+		Opt NoRefCounts
+//							return x
+		if .name.IsTmpName
+			fs <~ .name
+		  else
+			fs <~ `+"`
+			fs.appendescape(.name)
+			fs <~ `"`
+
+		require .hasany
+
+		|| ch = .First
+		|| HasArg = false
+		while (ch)
+			if HasArg // hanging args
+				fs.IndentLine
+			fs <~ ' '
+			fs <~ ch
+			if ch == @arg
+				hasarg = true
+			ch++
+
+	
+	syx Name
+		|| ch = .First
+		if (ch)
+			fs <~ .Name      // sonic
+			fs <~ " @ "			
+			fs <~ ch         // the~hedgehog
+		else
+			fs <~ '@'
+			fs <~ .Name
+
+
+	syx Ques (Question)
+		|| f = .first$
+		fs <~ "–"
+		fs <~ f
+
+		|| n = f.next$
+		fs <~ ' '
+		fs <~ n
+
+
+	syx Back (Backtick)				//  `abc`
+		if .name.find('`')
+			.str__(fs)
+		  else
+			fs <~ '`'
+			fs <~ .Name
+			fs <~ '`'
+	
+	
+	syx Char (Character)
+//									'x'
+		fs <~ '\''
+		fs <~ .Name.EscapeChr
+		fs <~ '\''
+
+
+	syx SStr (Super_String)			// <(`abc`)>
+		fs <~ "<(`"
+		fs <~ .Name
+		fs <~ "`)>"
+
+	syx Oat (Operator_As_Thing)
+		fs <~ '%'
+		.renderwithspaces(fs)
+
+	
+	syx Sheb (Shebang)
+		fs <~ "#!"
+		fs <~ .Name
+		fs <~ '\n'
+	
+	
+	syx Str (String)
+		fs <~ '"'
+		fs.appendescape(.name)
+
+		for (ch in self)
+			if (ch == @Emb)
+				fs.appendescape(ch.Name)
+			  else
+				fs <~ '$'
+				fs <~ '{'
+				fs <~ ch
+				fs <~ '}'
+		fs <~ '"'
+
+
+	syx SThg (Syntactic_Thing)
+		fs <~ .Name
+	
+
+	syx SCnj (Syntactic_conj)
+//                                  a - b --> b + -a
+		fs <~ .Name
+
+	
+	syx Num (Number)
+		Opt NoRefCounts
+		fs <~ .Name // 123
+
+	
+	syx Emb (Embedded_Value)
+		fs <~ .Name
+		require .hasany
+		.RenderWithSpaces(fs)
+	
+	syx Unit
+		|| num = .first.name
+		fs <~ num // 20cm
+		if (num.ishexlike) and (num.last != '_')       // 0xFF
+			fs <~ '_'
+		fs <~ .name  // 20cm, 0xFF_cm
+	
+
+	syx Type (Typecast)
+//                                     obj|type|
+		|| obj = .First					#require
+		|| type = obj.next
+		fs <~ obj
+		fs <~ '|'
+		if type: fs <~ type
+		fs <~ '|'
+	
+
+	syx ARel (After_Relationship)
+		fs <~ .First
+		fs <~ .Name
+
+
+	syx Dot (Dot)
+//										x.fn(a)
+		|| ch = .First					#require
+		fs <~ ch
+		fs <~ '.'
+		fs <~ .Name
+		fs <~ ch.Next
+		
+
+	syx SDot (Self_Dot)
+		// .fn
+		// .fn(a)
+
+		fs <~ '.'
+		fs <~ .name
+		fs <~ .First
+
+
+	syx Func (Function)					// fn(a)
+		|| ch = .First                  #require
+		fs <~ ch
+		fs <~ ch.Next
+	
+	
+	syx BRel (Before_Relationship)
+		fs <~ .name
+		fs <~ .First
+	
+	
+	syx Adj (Adjective)
+		opt norefcounts
+		|| f = .first
+		|| l = f.next
+		fs <~ f
+		fs <~ " ~ "
+		fs <~ l
+
+
+	syx Badj (Backwards_Adjective)
+		opt norefcounts
+		|| f = .first
+		|| l = f.next
+		fs <~ l
+		fs <~ " ≈ "
+		fs <~ f
+
+
+	syx Acc (Access)				// b[2]
+		|| f = .first
+		fs <~ f
+		F.next.RenderPrm(fs, '[', ']')
+	
+	
+	syx Arr (Array)					// [b, c]
+		fs <~ '['
+		.FSListSep( fs, ", " )
+		fs <~ ']'
+	
+
+	syx Item
+//                                   a: b
+		|| ch = .First	#require
+		fs <~ ch
+		fs <~ ": "
+		fs <~ ch.Next
+
+	
+	syx List
+		Opt NoRefCounts
+		fs <~ '('
+		|| count = 0
+		|| sep = ", "
+		if (self is style2)
+			sep = "\n"
+			fs <~ sep
+		for ch in self
+			if ++count > 1
+				fs <~ sep
+			fs <~ ch
+		if (count == 1  or  self is style2)
+			fs <~ sep
+		fs <~ ')'
+
+	
+	syx Prm (Parameter_List)
+		Opt NoRefCounts // much simpler!
+		fs <~ '('
+		for ch in self
+			fs <~ ", "
+			start
+			fs <~ ch
+		fs <~ ')'
+
+
+	syx File (File_List)
+		Opt NoRefCounts // much simpler!
+		fs <~ .name
+		.indent++
+		for ch in self
+			fs.IndentLine
+			fs <~ ch
+		.indent--
+
+
+	syx Quot (Quotation)
+		Opt NoRefCounts
+		fs <~ "“"
+		for ch in self
+			fs <~ ch
+			if (ch.next)
+				fs <~ ", "
+		
+		fs <~ " ”"
+	
+
+	syx Decl (Declaration)					//		|x| a = b
+		|| ch = .First				#require
+		fs <~ '|'
+		fs <~ ch
+		fs <~ '|'
+		ch++
+		while ch
+			fs <~ ' '
+			fs <~ ch
+			ch++
+	
+	
+////////////////////////////////////////////////////////////////////////////////		
+	
+	function RenderWithSpaces (|FastString| fs, |Message|ch=nil)
+		Opt NoRefCounts
+		ch := .First
+
+		while (ch)
+			fs <~ ch
+			ch = ch.next #require
+			fs <~ ' '
+	
+	syx Rel (Relationship)
+		.RenderWithSpaces(fs)
+		
+	
+	syx ERel (Equals_Relationship)
+		|| ch = .First					#require
+		fs <~ ch
+		fs <~ ' '
+		
+		++ch							#require
+		fs <~ ch
+		fs <~ "= "
+
+		++ch
+		fs <~ ch$
+
+	
+	syx TRel (Temporal_Relationship)
+		.RenderWithSpaces(fs)
+	
+
+	syx Tril (Temporal_Relationship2)
+		opt norefcounts
+		|| f = .first			#require
+		fs <~ '#'
+		fs <~ f
+
+		|| s = f.next			#require
+		fs <~ ' '
+		fs <~ s
+		
+		|| l = s.next			#require
+		fs <~ ' '
+		fs <~ l
+
+
+	syx pinn (Post_InnerAdj)
+		// I slowly~ran home --> i ran home <≈ slowly
+		opt norefcounts
+
+		|| f	= .first
+		|| opp	= f.next
+		|| l	= opp.next
+		
+		fs <~ f
+		fs <~ ' '
+		fs <~ opp.last
+		fs <~ ' '
+		fs <~ l
+		fs <~ " <≈ "
+		fs <~ opp.first
+
+	
+	function BinnRender (|faststring| fs, |string| sepa, |string| sepb)
+		opt norefcounts
+
+		// i can				>~ can i 
+		// i can~run			>~ can i run
+		// i can~run home		>~ can i run home
+		// i run home			>~ run i home // NOpE!
+		|| f = .first$
+		|| opp = f.next$
+		|| l = opp.next
+		|| OF = opp.first
+
+		fs <~ SepA
+		fs <~ (of, opp)(of)
+		fs <~ ' '
+		fs <~ f
+
+		if (!of)
+			debugger !l
+			return
+		
+		|| ON = OF.Next
+		if (ON)
+			fs <~ ' '
+			fs <~ ON
+		
+		if (L)
+			fs <~ ' '
+			fs <~ l
+
+
+	syx binn (InnerAdj)
+		// I slowly~ran home --> >~ slowly i ran home 
+		.BinnRender(fs, ">~ ", "")
+
+
+	syx Ask
+		.BinnRender(fs, "∆", "")
+
+
+	syx Yoda (Yoda_Relationship)
+		// thing, thing, op, always three!
+		// you have~become powerful ==  ¬ powerful you have~become
+		opt norefcounts
+		|| f = .first
+		|| s = f.next
+		|| l = s.next
+		fs <~ "¬ "
+		fs <~ l
+		fs <~ ' '
+		fs <~ f
+		fs <~ ' '
+		fs <~ s
+
+	
+	syx SCom (Syntactic_Comment)
+		|| ch = .first
+
+		fs <~ ch.next
+		fs <~ " /# "
+		if ch.HasOneChild
+			fs <~ ch.First
+		  else
+			ch.FSListArg( fs )
+			fs <~ '\n'
+		fs <~ " #/"
+
+	
+	syx Msg (Message_List)
+		fs <~ "«"
+		.FSListSep(fs, ", ")
+		fs <~ " »"
+
+		
+	syx Todo (To_Do_List)
+		fs <~ .name
+		.FSListSep(fs, " ")
+
+	
+	syx url (URL)
+		fs <~ .Name
+		fs <~ "://"
+		fs <~ .First.name
+	
+	function RenderPrm (|FastString| fs, |Byte| b1, |Byte| b2)
+		fs <~ b1
+		.FSListSep( fs, ", " )
+		fs <~ b2
+
+
+	function Dummy (fpMsgRender)
+		// Dummy function used by .ExportAddr. Stops crashes if someone calls export but hasn't set his own function yet.
+
+	
+	function ConvertJSONToJB
+		Opt NoRefCounts
+		for (m in self)
+			if (m == @item)
+				|| Tmp = m.first // a string
+				m.prev = Tmp
+				Tmp.Func = @tmp
+				|| value = m.first
+				Tmp <~ value
+				m.remove
+				value.ConvertJSONToJB
+			  else
+				m.ConvertJSONToJB
+
+
+	render
+		fs <~ self
+
+	
+	function jdb_  (|faststring|fs_in=nil, |int| flags=1, |string|)
+		return .jdb2_(flags, fs_in)
+
+
+	render jdb2_  (|int| Flags = 1)			//  function ast,  message.ast
+		if flags&1
+			fs <~ "«"
+		fs <~ .Func.name
+		fs <~ ' '
+		if (.name)
+			fs <~ '"'
+			if flags & 2
+				fs.appendescape(.name[0,32])
+			else
+				fs.appendescape(.name)
+			fs <~ '"'
+		if .hasany
+			fs.indent++
+			for ch in self
+				fs.IndentLine
+				ch.jdb2_(flags, fs)
+			fs.indent--
+			if flags&1
+				fs.IndentLine
+		if flags&1
+			fs <~ "»"
+	
+	
+	render RenderAST (|int| flags=1)
+		if (self == @arg) and (.isroot)
+			for ch in self
+				ch.jdb2_(flags, fs)
+				fs <~ '\n'
+		  else
+			.jdb2_(flags, fs)
+	
+	
+	function UnEmbed
+		|| s1 = .First
+		require (s1 == @Emb) and (!s1.Next)
+		s1.Remove
+		.Name = s1.Name
+
+
+	function FSListSep (|FastString| fs, |String| sep)
+		opt norefcounts
+		for (ch in self)
+			fs <~ sep
+			start
+			fs <~ ch
+	
+
+	function FSListArg (|FastString| fs)
+		opt NoRefCounts
+		|| hasp = .parent!=nil
+		fs.indent += hasp
+		
+		|| doind = hasp
+		if .name
+			doind = true
+			fs.IndentLine
+			fs <~ "^\""
+			fs.appendescape(.name)
+			fs <~ '"'
+		for ch in self
+			if doind
+				fs.IndentLine
+			fs <~ ch
+			doind = true
+
+		fs.indent -= hasp
+		if hasp
+			fs <~ '\n'
+
+
+	function FuncName (|string|)
+		return .Func.LongName.lowercase
+		
+	function Length (|int|)
+		return .name.length
+	
+	function ShallowEquals (|message| B, |bool| Aware=false, |bool|)
+		return (.func == b.func) and .name.syntaxequals(b.name, aware)
+	
+	function DeepEquals (|message| B, |bool| Aware=false, |bool|)
+		opt norefcounts
+		|| A = self
+		|| A2 = .FlatAfter
+		|| B2 = b.FlatAfter
+		while
+			|| ADone = A==A2
+			|| BDone = B==B2
+			if ADone And BDone
+				return true
+
+			if (ADone!=BDone) or (!a.ShallowEquals(b, aware))
+				return false
+				
+			A = A.flatnext
+			b = b.flatnext
+		
+	function Find (|message| match, |message|)
+		cpp_part FindMatch
+		opt norefcounts
+		for old in self
+			if old.DeepEquals(match)
+				return old
+			
+	function ShortDesc (|string|)
+		if !.name
+			return .funcname
+		return "${.funcname} ‘${.name}’"
+
+
+	function Nyme (|string|)
+		// this function won't be necessary in the future!
+		if self
+			return .Name 
+	
+
+	function ParentOf (|Syntax| f, |Message|)
+		Opt NoRefCounts
+		|| p = .parent
+		if (f==nil) or (p==f)
+			return p
+		.accesserr(f, nil, p)
+
+
+	function Parent (|Syntax| f, |Message|)
+		return .parentof(f)
+
+
+	function Ancestor (|Syntax| f, |Message|)
+		Opt NoRefCounts
+		if self
+			for ch.Up in .parent
+				if ch == f
+					return ch
+
+
+	function Find (|Syntax| s, |Message|)
+		cpp_part FindSyx
+		Opt NoRefCounts
+		for ch in self
+			if ch == s
+				return ch
+
+	
+	function Find (|Syntax| s, |string| name, |Message|)
+		cpp_part FindSyxName
+		return .findflat(s, name, false)
+
+
+	function FindFlat (|Syntax| s, |string| name, |bool| Err = false, |Message|)
+		opt norefcounts
+		for ch in self
+			if (ch == s  and  ch ~= name): return ch
+
+		if Err
+			.AccessErr(s, name, nil)
+
+
+	function Find (|string| name, |Message|)
+		cpp_part FindName
+		Opt NoRefCounts
+		for ch in self
+			if ch ~= name
+				return ch
+	
+
+	function FindNested (|Syntax| fn, |string| name = nil, |bool| Err=false, |Message|)
+		Opt NoRefCounts
+		
+		for curr.flat in self
+			if curr == fn or fn == nil
+				if name == nil  or  curr ~= name: Return curr
+		if err
+			.accesserr(fn, name, nil)
+	
+	
+	function FastString.MsgErrorName (|string| name)
+		if (name)
+			self <~ " '"
+			self <~ name
+			self <~ "' "
+
+
+	function AccessErr (|syntax|s, |string| name, |message| found)
+		cpp_part CantFind
+		debugat
+		if !self
+			jb_api.NilHandler
+			return
+		
+		|| fs = faststring.new
+		// remove this later
+		fs <~ "((("
+		fs <~ .StringOwner
+		fs <~ "))) "
+		/// remove
+		if found
+			fs <~ "Expected @"
+			fs.MsgErrorName(name)
+			fs <~ s.Name
+			fs <~ " but found @"
+			fs <~ found.Func.Name
+		  else
+			if s
+				fs <~ "Missing "
+				fs <~ '@'
+				fs <~ s.Name
+			  else
+				fs <~ "Missing syntax"
+			fs.MsgErrorName(name)
+			found = self
+
+		StdErr.NewError( found, fs.getresult )
+	
+
+	function AccessErr (|int| i)
+		cpp_part CantFindAt
+		|| errnum = (" at item " + i.render, "")(i)
+		StdErr.NewError( self, "Incomplete syntax" + errnum )
+
+
+	function ExpectLast (|string| err="", |bool|)
+		require self
+		|| N = .next
+		ifn N
+			return true
+		N.syntaxexpect(err)
+	
+	
+	function Expect (|syntax| type, |string| name=nil, |bool|)
+		require self
+		if (!type or (.Func == type))
+			if (name == nil) or (.name ~= name)
+				return true
+		
+		|| fs = faststring.new
+		fs <~ "Expected "
+		if (type)
+			fs <~ Type.longname
+		fs.MsgErrorName(name)
+		fs <~ ", but found "//@"
+		fs <~ .Func.longname
+		fs.msgerrorname(.name)
+		error (self, fs)
+	
+
+	syntax call (|string| key, |Message|)
+		Opt NoRefCounts
+		if self
+			for item in self
+				if item ~= key
+					return item.needsarg
+			return .msg(@tmp, key).needsarg
+		return message() // sigh
+
+	syntax append (|string| key)
+		self <~ @str.msg(key)
+		
+	function NeedsArg (|message|)
+		Opt NoRefCounts
+		|| r = .last 
+		if r == @arg
+			return r
+		return .msg(@arg)
+
+
+	syntax access (|Syntax| Need, |syntax| OK, |Message|)
+		cpp_Part NeedSyxOK
+		Opt NoRefCounts
+		if self
+			|| found = .first
+				if found == OK or found == need or (OK == @nil)
+					return found
+			  elseif OK!=@nil
+				.accesserr(need, nil, found)
+	
+	
+	syntax access (|Syntax| s, |Message|)
+		cpp_Part NeedSyx
+		Opt NoRefCounts
+		if self
+			|| found = .first
+				if s == nil or found == s
+					return found
+				// what about this branch, when does it fire?
+				// so s is NOT nil... OK thats easy to understand
+				// but that means that found is NOT s... which means...
+				// its not what we asked for?
+				// why isnt this failing?
+			.accesserr(s, nil, found)
+
+
+	Syntax Access (|syntax| s, |int| n, |message|)
+		cpp_Part NeedSyxInt
+		Opt NoRefCounts
+		|| Ch = self[n]
+		if (ch) and ((ch.func==s) or !s)
+			return ch
+		.accesserr(s, nil, ch)
+	
+	syntax access (|Syntax| s, |string| name, |Message|)
+		cpp_Part NeedSyxName
+		Opt NoRefCounts
+		|| f = self[s]
+		if f.expect(@nil, name)
+			return f
+	
+		
+	syntax access (|string| key, assigns:|string|)
+		cpp_part SetStr
+		self[key] = @str.msg(Value)
+
+
+	syntax access (|string| key, assigns:|int64|)
+		cpp_part SetInt
+		self[key] = @num.msg(Value.render)
+
+	
+	syntax access (|string| key, assigns:|message|)
+		cpp_part SetMsg
+		opt norefcounts
+		debug_require self
+		.AccessAdd(key) <~ Value		
+	
+	function AccessAdd (|string| key, |message|)
+		opt norefcounts
+		|| l = self
+		if self == @tmp
+			l = .last
+			if l != @arg
+				l = .msg(@arg)
+		for tmp in l
+			if (tmp ~= key)
+				tmp.last.remove?
+				return tmp  
+		return l.msg(@tmp, key)
+
+	
+	function Become (|syntax| fn, |string| name="")
+		cpp_part BecomeStr
+		.func = fn
+		.name = name
+
+	function Become (|int64| num)
+		cpp_part BecomeNum
+		.clear
+		.func = @num
+		.name = num.render
+
+	
+	function BeLike (|Message| belikeme)
+		debug_require !(belikeme.hasany)
+		// if we upgrade this, we can use lists in for-loops? 
+		.func = belikeme.func
+		.name = belikeme.name
+
+	
+	function Next (|syntax| Need, |string| Name, |Message|)
+		Opt NoRefCounts
+		cpp_part NextOf
+		|| ch = .next(need, nil|syntax|) #require
+		if ch ~= name
+			return ch
+		.accesserr(need, nil, ch)
+
+	function Last (|syntax| Need, |Message|)
+		Opt NoRefCounts
+		|| ch = .last
+		if  (ch==Need)
+			return ch
+		.accesserr(Need, nil, ch)
+
+	
+	function Next (|syntax| Need, |syntax|OK=nil, |Message|)
+		Opt NoRefCounts
+		cpp_part NextOf2
+		|message| ch
+		if (self)
+			ch = .next
+			if !need or (ch==Need)
+				return ch
+			if (OK and ch==OK)
+				ch.func = ok
+				return ch
+		.accesserr(Need, nil, ch)
+
+	
+	syntax Compare (|string| Other, |bool|Aware, |int|)
+		return .name.Compare(other, Aware)
+
+
+	syntax equals (|string| name, |bool|Aware, |bool|)
+		return self and .name.SyntaxEquals( name, aware )
+
+
+	syntax equals (|Syntax| X, |bool|Aware, |bool|)
+		cpp_part EqualsSyx
+		return self and (.Func == X)
+	
+	function List (|[Message]|)
+		opt norefcounts
+		for s in self
+			rz <~ s
+
+	function HasPosition (|bool|)
+		return .Position >= 0
+
+
+	function ReplaceInto (|message| w, |message|)
+		.prev = w
+		w <~ self
+		return w
+
+
+	function Export (|FastString| fs)
+		|| fn = (.Func.ExportAddr)
+		(fn)( self, fs )
+
+
+	function SyntaxExpect ( |string| Error = nil )
+		if !Error
+			if !self
+				nil.syntaxexpect
+				return
+			Error = "Unexpected $.FuncName “${.name}”"
+		StdErr.NewError( self, Error )
+
+	function SyntaxDeprecate ( |string| Error = "Deprecated." )
+		StdErr.Newproblem( self, Error )
+		
+	function SyntaxWarn ( |string| Error = nil )
+		Error := "Unexpected $.FuncName “${.name}”"
+		StdErr.NewWarning( self, Error )
+	
+	function SyntaxAppend (|syntax| Fn, |string| name="")
+		cpp_part AppendSyx
+		fn.msg(self, name)
+	
+	function SyntaxAppend (|int64| Num)
+		cpp_part AppendNum
+		@num.msg(self, num.render)
+
+	
+	function Int (|int|i = 0, |int64|)
+		opt norefcounts
+		if self
+			if self != @unit
+				return .name.parseint(i, self)
+			|| f = .first
+			if self == "x"
+				return F.name.ParseHex(i, F)
+			|| mul = f.name.ParseFloat
+			if self == "K"
+				mul *= 1K
+			elseif self == "M"
+				mul *= 1M
+			elseif self == "G"
+				mul *= 1G
+			else
+				error (self, "Invalid unit")
+				return 0
+			return mul
+			
+
+	function Float (|f64|)
+		return .name.parsefloat(self)
+
+	function Hex (|int64|)
+		return .name.parseint(self)
+
+	function float32 (|float|)
+		|| d = .float
+		expect (d.abs <= float.max) ("Float64 got clipped in a float32")
+		return d
+
+	function range (|intrange|)
+		return (.position, .position+.extra)
+	function range (assigns:|intrange|r)
+		.position = r.x
+		.extra = r.width (|) parser.baseextra
+
+	function FlatRange (|intrange|)
+		opt norefcounts
+		rz = (int.max, 0)
+		for ch.flat in self
+			|| ss = ch.range
+			if ss.x >= 0
+				rz.x = rz.x min ss.x
+				rz.x2 = rz.x2 max ss.x2
+		
+	function ivec4 (|ivec4|)
+		opt norefcounts
+		|| c = .first
+		for i in 4
+			rz[i] = C$.int|int|
+			c++
+
+
+	function Yes (|bool|)
+		if self
+			return .name.yes
+			
+
+	function After (|int|)
+		return .position + .extra
+
+	function After (assigns:|int|)
+		.extra = (Value - .position) (|) parser.baseextra
+
+	
+	operator Contains (|string| s, |bool|)
+		opt norefcounts
+		cpp_part ContainsStr
+		return .FindNested(nil, s, false)
+
+	operator Contains (|syntax| s, |bool|)
+		opt norefcounts
+		cpp_part ContainsSyx
+		return .FindNested(s, nil, false)
+
+	operator Contains (|ind| p, |bool|)
+		cpp_part ContainsInd
+		opt norefcounts // we want to put textview's insertion after a name and still find it
+					    // like: abc      // abc is found still.   
+					    //			^
+		return .position <= p and .after >= p 
+		
+	operator In (|syntax| f, |bool|)
+		opt norefcounts
+		require self
+		|| p = .parent
+			return p.func == f
+
+	function EndsBefore (|intrange| r, |bool|)
+		return .after <= r.x
+	function StartsAfter (|intrange| r, |bool|)
+		return .position >= r.x2
+	function StartsBefore (|intrange| r, |bool|)
+		return .position < r.x
+	function IsContainer (|bool|)
+		|| f = .func
+		return f == @arg or @list or @prm or @arr or @bra
+
+
+	function WipePositions
+		opt norefcounts
+		for v.flat in self
+			v.position = -1
+
+	module
+/*		function SuperNew (|memorylayer| m, |message|)
+	// new design... for simpler constructors
+			visible
+			if m == nil
+				return message()
+			return message.newwithlayer(m)
+*/
+		function Dictionary.Syntax (|string| Key, ||)
+			return self[key.SyntaxLower] 
+		
+
+		function String.SyntaxLower (|string|)
+			cpp_wrapper JB_Str_FastLower
+
+
+		function GetFunc (|Message| msg, |Syntaxobj|)
+			return _syxdict_.Syntax( msg.name )   #expect (msg, "Can’t find syntax: ${msg.name}")
+
+
+
+////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\
+
+
+function FastString.SyntaxAppend (|Message| msg)
+	if (msg)
+		(msg.Func.RenderAddr)( msg, self )

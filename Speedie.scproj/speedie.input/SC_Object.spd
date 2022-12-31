@@ -1,0 +1,38 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class SCObject
+	|SCBase~dictionary|		LinkFrom
+	|string|				Name
+	|Message|				Source
+	|uint16|				TableId
+	|byte|					NoAutoComplete
+	
+	render
+		|| S = string.fromc(.class.name) 
+		fs <~ S[2...]
+		fs <~ ": "
+		fs <~ .name
+	
+	function SyntaxExpect ( |string| Error )
+		cpp_part Fail
+		StdErr.NewError( .source, Error )
+
+	syntax equals (|string| s, |bool| aware, |bool|)
+		return .name ~= s
+
+	function File (|SCFile|)
+		|| it = .Source
+			return it.SCFile
+		if self isa SCModule
+			return .cls.file?
+	
+	function AnySource (|message|)
+		if .source
+			return .source
+		if self isa scmodule
+			if .cls
+				return .cls.source 

@@ -1,0 +1,10 @@
+
+/*
+	Jeebox internals.
+*/
+
+
+linkage
+	cpp_part JB
+	type library
+

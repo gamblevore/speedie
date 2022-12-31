@@ -1,0 +1,6 @@
+
+linkage
+	cpp_part GUI
+	type library
+
+

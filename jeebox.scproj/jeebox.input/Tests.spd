@@ -1,0 +1,190 @@
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+extend_module Message
+	helper TreeCompare (|message| orig, |Message| reparse, |bool|)
+		ifn orig and reparse
+			return CompareError(orig, reparse)
+
+		if (orig.func != reparse.func) or ( orig.name != reparse.name )
+			return CompareError(orig, reparse)
+
+		|| r1 = reparse.First
+		|| s1 = orig.First
+		while (r1 or s1)
+			require message.TreeCompare( s1, r1 )
+			r1++
+			s1++
+		return true
+
+
+function Message.LocateAll
+	visible
+	for ch.flat in self
+		printline ch.locate
+
+
+function Message.Locate (|string|)
+	if (!self)
+		return "(nil)"
+	
+	|| s = .Render
+	|| fname = .func.name
+	|| fs = faststring.new
+
+	.name.render(fs)
+	fs <~ "@"
+	fs <~ fname
+	fs <~ ": '"
+	fs <~ s
+	fs <~ "'"
+	if (.position >= 0)
+		fs <~ " at byte: "
+		fs <~ .position
+		|| r = .root.obj
+		if (r isa string)
+			if r.length
+				fs <~ " in "
+				fs <~ r
+	fs <~ '\n'
+	return fs
+
+
+helper message.PoorAnt (|message|)
+	if (self)
+		return .parent
+
+
+helper CompareError (|Message|expected, |Message| found, |bool|)
+// I want to see it printed, for my use. Must think about my needs first!
+	
+	"Expected ${expected.locate} but found ${found.locate}"
+	"parent of expected is ${expected.PoorAnt.locate}"
+
+	if (found)
+		"parent of found is ${found.PoorAnt.locate}"
+	  else
+		found = expected
+
+	found.SyntaxExpect
+
+
+helper EntityTest (|string|)
+// Should spell (ĴëêƁoⓧ)
+
+	|| raw			= "\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\) "
+	|| replicate	= `\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\) `
+
+	|dictionary of string| repl = dictionary.new
+	repl["\\n"] = "\n"
+	SetDecodeEntities(repl, true)
+	SetEscapeCode(repl, true)
+
+	|| s3 = replicate.unescape               // inbuilt
+	replicate = replicate.ReplaceAll(repl)   // cobbled together
+
+	debugger (raw == replicate and s3)
+
+	return replicate.lowercase + " loaded successfully\n"
+
+
+helper Message.Test (|string| new_render, |string| name)
+	ifn .TestSub(new_render, name)
+		print "Test $name: Failed\n\n$new_render"
+		stderr.clear
+
+
+helper Message.test_style
+	opt norefcounts
+	|| b = false
+	for s.flat in self
+		if s == @arg or @list
+			b = !b
+			(s is style2) = b
+
+
+helper Message.TestSub (|string| new_render, |string| name, |bool|)
+	|| LKT = leaktester(name)
+	{
+		|| reparse = new_render.Parse				#require
+		
+		reparse.test_style
+		self.test_style
+		require message.TreeCompare( self, reparse )
+		|| self_render = .render					#require
+		|| reparse_render = reparse.render			#require
+		require StdErr.ok and (self_render == reparse_render)
+	}
+	(lkt.finaltest)
+
+	return true
+
+
+
+helper TestCasting (|bool|)
+	|dictionary of int| d2 = dictionary.new
+	d2..abc += 1
+	
+	|| d = dictionary.new
+	|| str = "\0\0\0\0\0\0"
+	expect !str[0] and !str[1] and !str[2] and !str[3] and (str.length == 6)
+	d[str] = str
+
+	require !'\0'
+	|| x = Message
+	|| y = Message(@bra, "")
+	y.Name = "abc "
+	|Object| yy
+	yy = y
+	|| arr = [""] // whatever...
+	if yy isa Message
+		debugger (yy.name == "abc ")
+
+	return (y isa x)
+
+
+helper string.EscapeTest (|bool|)
+	|| esc = .escape
+	|| back = esc.unescape 
+	return (back == self)
+
+
+helper Jeebox.Test (|string|)
+	cpp_Part TestJB
+	|| fs = FastString.new
+	for (c in 256)
+		fs <~ c|Byte|
+	
+	|| str = fs.getresult
+	require str.escapetest
+
+	|| natural_input = __SELF_TEST_NATURAL__
+	|| jbin_input    = __SELF_TEST_JBIN__
+	// Parse, render, re-parse, compare tree, compare re-render
+	
+	debugger (TestCasting())
+	"normal".uppercase
+	|| LKT = leaktester.new("entities")
+	EntityTest()
+	LKT.FinalTest
+	require stderr.ok
+
+	|| root = natural_input.parse #require
+	root.jbinTest
+	if (jbin_input)
+		message.TreeCompare( root, root.copy ) // make sure compare works
+		message.TreeCompare( root, jbin_input.parse )
+		root.Test( root.Render,      	"normal" )
+		root.Test( root.render_jbin,	"jbin" )
+	
+	require StdErr.ok
+	return EntityTest()
+
+
+helper message.jbinTest (|bool|)
+	|| msg = .render_jbin.parse_jbin
+	return message.TreeCompare( self, msg )
+

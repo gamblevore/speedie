@@ -1,0 +1,115 @@
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+datatype int8 (char) {
+
+} //sigh
+
+
+datatype char
+	default 0
+	
+	constants
+		|char|
+		max = 127
+		min = -128
+	syntax cast (|bool|)
+		return self|bool|
+
+	operator to (|char| other, |IntRange|)
+		return (self, other)|intrange|
+
+
+
+datatype byte
+	default 0
+
+	constants
+		|Byte|
+		max = 255
+		min = 0
+		
+	function Equals (|string| B, |bool|)
+		cpp_part EqualsByte
+		return b.length == 1 and b.first == self
+
+	syntax cast (|bool|)
+		return self|bool|
+	
+	render
+		if (!fs_in)
+			return string[self]
+		fs_in <~ self|Byte|
+		return nil
+
+	function UTF8Size (|int|)
+		cpp_wrapper JB_u8_Size
+	
+	function LowerCase (|Byte|)
+		if .isupper
+			return self + 32
+		return self
+
+	function UpperCase (|Byte|)
+		if .islower
+			return self - 32
+		return self
+
+	function IsHex (|bool|)
+		return .IsInt  or  .in('a', 'f')  or  .in('A', 'F')
+
+	function IsInt (|bool|)
+		return .in('0', '9')
+		
+	operator eq (|byte| b, |bool|)
+		self = .lowercase
+		b = b.lowercase
+		return self == b
+		
+	function IsLetter (|bool|)
+		return self|codepoint|.isletter
+	function IsAlphaNum (|bool|)
+		return self|codepoint|.isalphanum
+	function IsWhite (|bool|)
+		return self|codepoint|.iswhite 
+	function IsUpper (|bool|)
+		return self|codepoint|.isupper
+	function IsLower (|bool|)
+		return self|codepoint|.islower
+	
+	operator in (|charset| cs, |bool|)
+		return cs[self]
+	operator out (|charset| cs, |bool|)
+		return !(cs[self])
+	function In (|uint| a, |uint| b, |bool|)
+		return  self >= a  and  self <= b
+	
+	module
+		function new (|int| n, |&byte|)
+			cpp_wrapper JB_zalloc
+
+
+datatype cstring
+	linkage: cpp_class _cstring
+	function Length (|int|)
+		cpp_wrapper strlen
+	function Copy (|string|)
+		return string.copy(self|&byte|, .length)
+	render
+		if fs_in
+			fs_in <~ self
+		  else
+			return .copy
+	module
+		function new (|[string]| r, |cstring[]|)
+			|| n = r.length
+			rz = memory(n, platform.PointerBytes)
+			for i in n
+				|| s = r[i].cstr
+				r[i] = s
+				rz <~ s.addr|cstring|
+

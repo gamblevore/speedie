@@ -1,0 +1,352 @@
+ 
+
+class Document (RingTree)
+	linkage
+		cpp_part Doc
+	contains DocumentState
+	|int|					UndoChecker
+	|int|					ScrollPos
+	|byte|					MaxUndos
+	|bool|					WasCompressed
+	|bool|					WasJbin
+	|bool|					LoadedFromFile
+	|DocumentState|			Current
+	|DocumentState|			Original
+	|message|				DocParsed
+	|error|					DocError	
+	|string|				Location
+	|date|					FileDate
+	|date|					ViewDate
+	|intrange|				Sel
+	|DocumentViewer|		Viewers
+	|CachedPath|			Ref // remove too? dict into viewers?
+	
+	
+	constructor (|string| path, |bool| Dummy)
+		.ref		= CachedPath(path, document.docs, self)
+		.maxundos	= 20
+		.Viewers	= DocumentViewer(nil)
+		.Location	= path
+
+	
+	destructor
+		.Viewers.clear
+		.ref.clear
+	
+	render
+		fs <~ .location
+		fs <~ "\n"
+		super.render(fs)
+
+
+	function Clear 
+		.original = nil
+		.current = nil
+		.loadedfromfile = false
+		super.clear
+		
+	
+	function Name (|string|)
+		return .Location.name
+	
+	function Text (|string|)
+		opt norefcounts
+		return .Current.text?
+
+	function ExpectCurr (||)
+		opt NoRefCounts
+		|| o = .original
+		|| c = .current
+		if c and c.parent|document| != self
+			debugger //!!??
+			c = nil
+		if o and o.parent|document| != self
+			debugger //????
+			o = nil
+		if (!c)
+			c = .first
+			.current = c
+		return c
+
+
+	function UpdateState (|string| nt)
+		|| c = .current
+			if c != .original
+				c.text = nt
+				return
+		
+		.addstate(nt)
+	 
+
+	function AddState (|string| nt, |DocumentState|)
+		|| c = .current
+			if c.text == nt
+				return c
+			c.RemoveAfter
+		
+		|| latest	= documentstate()
+		latest.text = nt
+		self <~ latest
+		
+		.current = latest
+		.original := latest
+		.Trim
+		return latest
+
+
+	function ClearTo (|string| s)
+		.clear
+		.AddState(s)
+
+
+	function IsModified (|bool|)
+		opt norefcounts
+		|| c = .current
+		|| o = .original
+		require o and c
+		return (c != o) and (c.text!=o.text)
+
+
+	function DocClose (|bool|)
+		if !.ismodified
+			return true
+		|| Answer = AskSaveOrCancel("Save file " + .Location.name + "?") 
+		if answer >= 1		// save
+			return .save
+		return answer == 0	// don't
+
+
+	function SaveText (|documentstate| l, |string|)
+		|| t = l.text
+		if .Wasjbin
+			t = t.digest
+		if .WasCompressed
+			t = t.compress
+		return t
+
+
+	function ShouldSave (|bool|)
+		if !.docerror
+			return true
+		// also we want to select the error? in the IDE.
+		// put that here.
+		.ShowErrorInViewers
+		return ("Save invalid jeebox for document?\n" + .location).confirm
+	
+	
+	function Save (|bool|)
+		|| f = .Location.file?
+		|| l = .current	#require	
+		|| t = .savetext(l)
+		if !t and !f.visible
+			rz = f.delete
+		  elseif .ShouldSave
+			rz = f.data(t)
+		if rz
+			.filedate = f.modified
+			.original = l
+			.UpdateModState
+
+
+	function CheckModified (|bool|)
+		|| f = .Location.file
+		require .filedate
+		
+		if .filedate == f.modified
+			return false
+		
+		if !.ismodified
+			return .load(true)
+
+		|| Options	= ["Save", "Reload"]
+		|| Answer	= ConfirmIt("The file ${f.name} has been externally modified. Reload or resave?", "", Options) 
+		if answer >=  1			// save
+			.save
+		if answer ==  0			// reload
+			.load(true)
+		return true
+
+
+	function Length (|int|)
+		return .current.text.length
+
+
+	function ShowErrorInViewers
+		opt norefcounts
+		|| e = .docerror$
+		for it in .viewers
+			if it isa textview
+				it.ErrorAt(e)
+
+
+	function UpdateViewers (|int| Reason)
+		opt norefcounts
+		|| a = .current$
+		for it in .viewers
+			if it isa textview
+				it.UseState(a,  self,  Reason)
+
+
+	function UpdateModState 
+		opt norefcounts
+		for it in .viewers
+			if it isa textview
+				it.UpdateModState(self)
+
+
+	function LoadSub (|bool| ChangedExternal, |bool|)
+		|| f		= .Location.file
+		|| Data		= f.readsafely(16MB, true)		#require
+		
+		.viewdate	= date()
+		.wascompressed = data.IsCompressed
+		if .wascompressed
+			data = data.decompress
+		.WasJBin = data.Isjbin
+		if .wasjbin
+			data = data.parse.render
+			
+		.filedate	= f.modified
+		if !ChangedExternal
+			.clear
+		.AddState(data)
+		.Original = .Current
+		.LoadedFromFile = true
+		return true
+
+
+	function Load (|bool| ChangedExternal = false, |bool|)
+		if !.LoadedFromFile or ChangedExternal
+			require .loadsub(ChangedExternal)
+		.UpdateViewers(DocumentState.Initialset)
+		return true
+
+
+	function Trim
+		opt norefcounts
+		|| L = .last$
+		|| F = .first
+		require L != F
+		|| n = .maxundos|int| - 2
+		for (n)
+			l--
+			require L != F
+		while
+			|| nxt = f.next
+			if nxt == l
+				exit
+			nxt.remove
+		if !.current.parent	 // how?? its the last!
+			debugger			
+			self <~ .current
+		if !.original.parent // original sometimes isnt first
+			debugat // just wanna see :)
+			.first = .original
+			f.remove
+
+
+	module
+		|dictionary of cachedpath| Docs = dictionary()
+		function New (|string| path, |document|)
+			cpp_part NewShared
+			if path
+				rz = .docs.CachePath(path)|document|
+			rz := document(path, true)
+
+
+
+extend TextView
+	function KeepUndosOnLoseFocus (|bool|)
+		return (self is editable) and !.isinline
+
+	
+	function UpdateAllViews (|string| nt, |int| Reason)
+		opt norefcounts
+		|| u = .document
+			u.UpdateViewers(Reason)
+		  else
+			.insertsub2(nt)
+	
+	function TryCaptureUndo (|int| x, |string| nt)
+		opt NoRefCounts
+		|| u = .undoer
+		if !u or self isnt editable
+			return .UpdateAllViews(nt, DocumentState.Typing)
+		
+		if x == u.UndoChecker
+			u.UpdateState(nt)
+		  else
+			u.AddState(nt)
+		.UpdateAllViews(nt, DocumentState.Typing)				// updates self
+
+
+	function UndoChecker (assigns:|int| x)
+		opt norefcounts
+		with .undoer
+			.UndoChecker = x
+
+
+	function DoUndo (|bool| undo, |bool|)
+		.undo(undo)
+		return true
+
+
+	function Undo (|bool| undo)
+		opt norefcounts
+		|| u = .undoer$
+		|| m = u.ExpectCurr$
+		m = m.step(!undo)		#expect beep
+		u.current = m
+		
+		if .text != m.text
+			.usestate(m, u, DocumentState.UndoOrRedo)
+
+
+	function UpdateModState (|document| D)
+		|| ismod = d.ismodified
+		if (self is modified) != ismod 
+			(self is modified) = ismod
+			if ismod
+				.touch
+
+
+	function UseState (|DocumentState| L,  |document| D,  |int| Reason)
+		require .parent
+		.UndoChecker = -1
+		if reason == DocumentState.UndoOrRedo
+			.ViewPos(l.typingplace.x)//inviewback
+		.Clear(l.text, reason<0)
+		.TypingPlaceTry( l.typingplace, true, nil)
+
+		.GuessExpectsParse
+		|| pos = d.ScrollPos
+		if reason != DocumentState.UndoOrRedo and pos >= 2
+			.PrepareLinesOfText
+			if reason != DocumentState.typing 
+				.Goto(pos)
+		
+		.UpdateModState(d)
+		(.OnTextChanged)(self, Reason)?
+	
+
+
+
+class DocumentState (RingTree)
+	linkage
+		cpp_part dcs
+	contains DocumentState
+	|string|			Text
+	|IntRange|			TypingPlace 
+
+	constants
+		InitialSet = 0
+		Typing = -1
+		UndoOrRedo = -2
+
+	setter Text (|string|)
+		.text = value
+		
+	render
+		fs <~ '"'
+		fs.appendescape(.text.preview(150))
+		fs <~ '"'

@@ -1,0 +1,148 @@
+
+
+
+class Menu (ListView)
+	|ListViewrow|						EditingRow // 
+	|Menuitem|							ChosenMenu 
+	|bool|								DelayedOpen
+	|bool|								NoCloseOnClick
+	
+	
+	constructor (|guicontrol| p, |GUIKeyEvent| keys, |GUIListEvent| ret)
+		super.constructor(p, nil, ret)
+		isnt visible
+		.MultiSelection = false
+		.onkeydown = keys
+		.clipmode = ControlPoint.SlideBackInWindow
+		.StyleAsMenu
+
+
+	function ListView.StyleAsMenu
+		.gnormal = ¥.Menus 
+		.gRowSel = ¥.MenuRowSel 
+	
+	
+	behaviour RightClick
+		if .onrightclick
+			super.rightclick(p)
+		  else
+			.mousedown(p, 2)
+
+
+	behaviour draw
+		super.draw(Where)
+
+
+	behaviour MouseDown
+		if .ClickedScroll(P, clicks)
+			return 2
+		|| L = .DrawClick(P)
+		if L is disabled
+			return 1
+		if (L is selected)
+			.usemenu(l|menuitem|)
+			return 1
+		
+		.Select(L)
+		return 1
+	
+	
+	function UseMenu (|menuitem| L)
+		|| e = .EditingRow
+		if !.NoCloseOnClick
+			.closemenu
+		require l
+		.ChosenMenu = l
+		if .DelayedOpen
+			return
+		if (L isa menuitem) and (L.MenuEvent)
+			(L.MenuEvent)(.parent,  l,  ListViewcell(e, 0))
+			return
+		(.onreturn)(self, l)?
+			
+	
+	behaviour MouseMove
+		if state is leave or enter
+			return false// right? should have a different event for this
+		|| moved = super.mousemove(p, 0|SDL_WindowEventID|)
+		|| l = .DrawClickMenu(P.y)
+		if !l
+			return true
+		.SelJustChanged = false
+		if (l isnt disabled)
+			.Select(l)
+			
+		return moved or .SelJustChanged 
+	
+	
+	function ContainsFocus (|bool|)
+		opt norefcounts
+		for c.up in .window.focus
+			if c == self
+				return true
+		
+	
+	function ShowCmm (|guicontrol| Owner, |int| Y, |int| X = -1)
+		opt norefcounts
+		|| mw = owner.width min 140
+		|| W = owner.BestXForMenu(x, .TextWidth+14 max mw)
+		|| H = (Y)~up back .DesiredHeight
+		.size = w by h
+		.showmenu(owner)
+	
+	function ShowMenu (|guicontrol| Owner)
+		|| win = .window					#require
+		win.inline.clear
+		win.setmenu(self)
+		win.menuopener = owner
+		is visible
+		._Scroll = nil
+		.SelectFirst
+	
+	function IsCmm (|bool|)
+		|| p = .parent
+		if p isa listview
+			return p.cmm == self // idk really
+		
+	function IsOpenedMenu (|bool|)
+		opt norefcounts
+		|| w = .window
+		return w.openedmenu == self
+	
+	function CloseMenu
+		opt norefcounts
+		.selectNone
+		isnt visible
+		.EditingRow = nil
+		if .isopenedmenu
+			.window.setmenu(nil)
+			.window.menuopener = nil
+
+	
+	function DoReturn (|bool|)
+		.UseMenu  .sel|menuitem|
+		return true
+
+	
+	behaviour KeyDown
+		if key.isaccept or (keys.cmd and key.IsCmm)
+			return .doreturn
+		if key.iscancel or (key.iscmm and .iscmm)
+			.closemenu
+			return true
+		return super.keydown(key)
+
+
+class MenuItem (ListViewrow)
+	|GUIMenuEvent|		MenuEvent
+	
+	constructor (|string| name, |GUIMenuEvent| ev)
+		.name = name
+		.MenuEvent = ev
+		(self is disabled) = (name == "")
+		
+	render
+		fs <~ .name
+		fs <~ " "
+		super.render(Fs)
+

@@ -1,0 +1,15 @@
+
+roots
+	"@spd/Library/Library.input/"
+	"@spd/Jeebox.scproj/Jeebox.input/"
+	"@spd/image.scproj/image.input/"
+
+excludes 
+	"hidden"
+	"xcodeproj"
+
+checks
+	"@spd/temporal.scproj"
+	"@spd/SelfTool.scproj"
+	"@spd/PerryBug.scproj"
+	"@spd/Language2.scproj"

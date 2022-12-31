@@ -1,0 +1,227 @@
+
+
+class FixedDict
+	contains object
+	linkage: cpp_part dict
+	|uint|					ItemTypes
+	|_voidptr|				Value
+	|FixedDict--|			Parent
+	|_voidptr[16]|			Items
+	|Byte|					ValueType
+	|Byte|					Letter
+	|uint16|				Depth
+	
+	constants
+		TypeValue	= 0
+		TypeObj     = 1
+		TypeStem	= 2
+		TypeDict    = 3
+	
+	constructor (|_voidptr| Value = nil, |Byte| type = 0)
+		cpp_part ConstructorValue
+		.value = value
+		.valuetype = type
+		if (type == typeobj)
+			jb_incr(value|object|)
+	
+	constructor (|FixedDict| Parent, |int| Part, || old, |byte| type)
+		cpp_part ConstructorReplace
+		.value = old|_voidptr|
+		.valuetype = type
+		parent.typeof(part) = typedict
+		parent.items[part] = self|_voidptr|
+		jb_incr(self)
+
+
+	destructor
+		.clear
+	
+	function Clear
+		opt norefcounts
+		|| T = .itemtypes
+		|| i = 0
+		while T
+			if T & 3
+				jb_decr( self[i] )
+			i++
+			T >>= 2
+		if .valuetype == typeobj
+			jb_decr( .value|object| )
+		.valuetype = 0
+		.itemtypes = 0
+	
+	
+	function TypeOf (|int| i, |int|)
+		return 3 & .itemtypes >> (i<<1)
+	function TypeOf (|int| i2, assigns:|uint|)
+		i2 <<= 1
+		.itemtypes	= (.itemtypes &~ (3 << i2))  (|)  (Value << i2)
+	syntax access (|int|i, |fixeddict|)
+		return .items[i]|fixeddict|
+
+
+	function SetPart (|int| B, || Val, |int| type)
+		opt NoRefCounts
+		if type
+			jb_incr(val)
+
+		|| BT = .typeof(b)
+		|| place = &.items[b]
+		|| obj = (*place)|fixeddict|		// verbose but faster
+		if BT >= typestem
+			if obj.valuetype
+				jb_decr( obj.value|...| )
+			obj.valuetype = type
+			obj.value = val|_voidptr|
+		else
+			.typeof(b) = type
+			*place = val|_voidptr|
+			if bt
+				jb_decr( obj )				// cos we call this last, compiler can opt it.
+	
+
+	function DownPart (|int| part, |FixedDict|)
+		opt NoRefCounts
+		|| rt = .typeof(part)
+		|| r  = self[Part]
+		if rt == TypeDict
+			return r
+		return fixeddict(self, part, r, rt)
+	
+
+	function ValueObj (|int| t, ||)
+		if T == typeobj: return self|...|
+		if T and .valuetype
+			return .value|...|
+
+
+	syntax access (|string| s, assigns:|| o)
+		cpp_part SetObj
+		|| n = s.length
+			addType(self, s.addr, n-1, o, typeobj)
+
+
+	syntax access (|string| s, ||)
+		cpp_part GetObj
+		|| n = s.length
+			return getobj(self, s.addr, n - 1)
+
+	
+	module
+		function AddType (|fixedDict| curr, |&byte| Addr, |int| n, || val, |int| Type)
+			opt norefcounts
+			for i in int.max
+				|| b = addr[i]
+				curr = curr.DownPart(b&15)
+				if i >= n
+					return curr.SetPart(B>>4, Val, Type)
+				curr = curr.DownPart(B>>4)
+
+
+		function GetObj (|fixeddict| curr, |&byte| Addr, |int| n, ||)
+			opt norefcounts
+			for i in int.max
+				|| B	= addr[i]
+				curr	= curr[B&15]				#require
+				|| T	= curr.typeof(B>>4)
+				curr	= curr[B>>4]
+				if i >= n: return curr.valueobj(t)
+				require T == typedict
+
+
+		function TimeTest (|array of string| items)
+			|fixeddict of string|  fd = fixeddict()
+			|dictionary of string| ed = dictionary()
+			|| n = 4
+			
+			printline
+			for (n): fd = fixeddict(), using ("fixed set") {
+				for a in items: fd[a] = a
+			}
+
+			printline
+			for (n): using ("fixed set reuse") {
+				for a in items: fd[a] = a
+			}
+
+			printline
+			for (n): ed = dictionary(), using ("set") {
+				for a in items: ed[a] = a
+			}
+			
+			printline
+			for (n): using ("set reuse") {
+				for a in items: ed[a] = a
+			}
+			
+			printline
+			for (n): using ("fixed get") {
+				for a in items
+					expect (fd[a] == a)
+			}
+
+			printline
+			for (n): using ("get") {
+				for a in items
+					expect (ed[a] == a)
+			}
+		
+		
+		function Test
+			|array of string| items		= []
+			|| fs						= faststring.new
+			|| N						= 0
+
+			for i in 100
+				fs <~ ('A' + i)|Byte|
+				fs <~ ('Z' + i)|Byte|
+				fs <~ (i&15)|Byte| // just for the mix
+			
+			|| s = fs.getresult
+			|| prefill = fixeddict()
+
+			for i in 100
+				for j in (i + 1) to 100 // fill ooftester
+					|| t = s[i, j]
+					items <~ t
+					prefill[t] = t
+			prefill.clear
+
+			using (leaktester("oof2"))
+				|| f = fixeddict()
+				for t in items
+					f[t] = t
+			
+			(prefill)
+			|fixeddict of string| dict	= FixedDict.new
+			for t in items
+				dict[t] = t
+			for t in items
+				expect (dict[t] == t) (dict[t])
+			dict.clear
+
+			TimeTest(items)
+
+
+
+// main
+//		fixeddict.test
+//
+
+// a fixed-place dictionary!
+// just an experiment! It works!
+// its just done for fun.
+
+/*
+	Could replace:
+		* Array			(arrays suck in every language. we only wanna go forward/backward!)
+		* Dictionary	(kinda bloated, and slower!! and takes more memory!)
+		* FastAppender	(looked ugly)
+		* Hashes		(Assuming we got good removal)
+*/
+
+// wouldnt this be better, if instead of setting/getting a value
+// it returns the PLACE of the value? This way... we can subclass
+// for specific types? And it can set objs/ints as it chooses?
+// or else we get a mess with types
+// although... we still have to deal with nodes?

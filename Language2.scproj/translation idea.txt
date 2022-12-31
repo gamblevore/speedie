@@ -1,0 +1,71 @@
+/*
+So... here is a good idea of how to do translation.
+
+Firstly, we want to read words like code. Basically like in a programming language, you "lookup" words based on a lookup-table, which may have multiple scopes. We want to do the same for translation.
+
+
+language espaniol (spanish) { 
+	quantifier el (the)			{ as male, (la:  female) } 
+	noun chien (dog) 
+	verb cuenta (aware)			{ as present, (contará:future, contó:past) }
+	verb realise (realise)		{ as future, (realising:present, realised:past)}
+	verb darse (became)
+	param del (of)
+}
+
+
+language english (english) {
+	quantifier every
+	noun plan
+	verb for
+	quantifier the
+	adjective evil
+	noun queen
+	param to
+	verb destroy
+	noun snow
+	adjective white
+	adverb will
+	verb fail
+}
+
+So... this works pretty well for most words that are unambiguous. But what about ambiguous words like "bug"? (Computer bug, insect, microbe). We need special handling for that. That or force people to write bug_computer bug_insect or something like that, but that's lame.
+
+Possible solutions?
+	*** Modes ***
+	mode (computers), mode (casual), mode (casual, civic)
+		changes the order of what dictionaries are looked up from. This obviously changes the meaning.
+
+	*** Ambiguous words in the dictionary ***
+		ambiguous bug {
+			option computer_bug
+			option insect_bug
+			option microbe_bug
+		}
+	
+	The parser could recognise "bug" and helpfully suggest replacements, or even change it themself. Or at least translate "I saw a~bug" to something like "I saw a~(computer_bug/insect_bug/microbe_bug)" (lol) which is more honest at least.
+
+	*** some kind of convention *** 
+		bug:  The most-common non-colloquial non-technical definition of bug. (bug = insect)
+		_bug: A technical version of bug. (bug = error in code)
+		bug1: Colloquial words. (bug = microbe)
+	
+	To be honest, I think the "convention" approach is the simplest. AND, we can use the ambiguous version too, alongside it.
+	
+	(a~_bug in my~code) deleted (her~song about a~killer~bug)
+
+Or perhaps all 3?
+
+...
+
+I think as long as every word is unambiguously looked up, near-perfect translation is possible. Assuming they aren't doing anything poetic or wierd.
+
+...
+
+Other possibilities are some kind of "Frequency" or even "domain-based" lookups. For example "code" has a "computer" domain, and "bug" has a few domains: casual/computer/microbiology. So the obvious interpretation is we are talking about computers then. But is it?
+
+I think... frequency/domain-based stuff should be used to helpfully suggest disambiguations.
+
+
+*/
+

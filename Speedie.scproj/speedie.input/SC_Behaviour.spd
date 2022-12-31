@@ -1,0 +1,374 @@
+ 
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+function abc
+	|| i = "x"
+	//
+
+class SCBehaviour (SCBase)
+	|SCModule|							FuncTayble
+	|SCModule~dictionary|				Interfaces
+	|[SCFunction]|						WrapperFuncs	
+	
+	
+	constructor (|SCClass| parent)
+		.project = parent.project
+		.Lookup = parent
+		.Interfaces = dictionary.new
+
+
+	function Cls (|SCClass|)
+		return .lookup|scclass|
+	
+	
+	function Add (|scbase| fn)
+		require (fn)
+		|| Old = self[fn.name]|scbase|
+
+		error  (!Old) (fn.source,	kNameConf) 
+		expect (!Old) (old.source,	kNameConf)
+
+		.TryAdd(fn.source, fn, fn.name) // Link... later.
+	
+	
+	function Upwards (|SCBehaviour|)
+		return .cls.super$.behaviour
+	
+	
+	function SCClass.AddBehaviourOrInterface (|SCBase| M, |Message| ErrPlace)
+		|| b = .behaviour
+		if (!b)
+			b = SCBehaviour.new(Self)
+			.behaviour = b
+		
+		if (M isa SCModule)
+			b.interfaces[M.name.lowercase] = M
+		  else
+			b.add(m)
+	
+	
+	function SCModule.OperatorOneOrOther  (|SCModule| B, |SCModule|)
+		if (self and b)
+			error ( .source, kNameConf)
+			error (b.source, kNameConf)
+		return B
+
+
+	function SCClass.InterfaceForBehaviour (|SCFunction| Fn, |SCClass|)
+		|| name = fn.name.lowercase
+		if (name.UnderScoreAtAnyEnd)
+			name = name.InterfaceToBehaviour
+		
+		if (name.last == '0')
+			name = name[0, name.length-1]
+		if (!name.UnderScoreAtAnyEnd)
+			name = "__" + name + "__"
+		return .InterfaceFor(name, fn.source)
+	
+	
+	function SCClass.InterfaceFor (|string| name, |message| errplace, |SCClass|)
+		|SCModule| Result
+		for (C.upwards in self)
+			|| B = C.behaviour								  #expect errplace
+			|| I = B.interfaces[name]
+				Result = Result OneOrOther I
+
+		expect result (ErrPlace, "No interface found for this behaviour")
+		return Result.cls
+	
+	
+	function SCClass.CreateBehaviour
+		require .isobject
+		.Behaviour := SCBehaviour.new(self)
+		.Behaviour.CreateFuncTable( .sourcearg )
+	
+	
+	function SCClass.BestBehaviourFor (|string|name, |SCFunction|)
+		// Erm... we need to go through our behaviours, not our functions.
+		// or else... its bad.
+		
+		|| b = .behaviour
+		while (b)
+			|| fn = b[name]
+			if (fn isa SCFunction)
+				return fn
+			  elseif (fn)
+				debugger
+			b = b.upwards
+
+	
+	function SCClass.FillInterFaceIn  (|SCFunction| fn, |bool| Late=false)
+		|| Interface = .InterfaceForBehaviour(fn)					#require
+		|| prm = fn.source.find(@prm)								#expect (fn.source, "No parameters found")
+		
+		fn.DeclsProtoType(prm.first, interface, late)
+
+
+	function SCClass.FillInterFaceWrapper  (|SCFunction| fn)
+		|| Interface = .InterfaceForBehaviour(fn)					#require
+		|| prm = fn.source.find(@prm)								#expect (fn.source, "No parameters found")
+		
+		fn.DeclsProtoTypeRemove(interface, prm.first, true)
+
+		require stderr.ok
+		|| prms = fn.source.findnested(@sthg, "...")				#expect
+		// so... now we have prms? fill them in?
+	
+		|| WriteTo = prms.parent
+		WriteTo.func = @prm
+		prms.Remove
+
+		|| Using = fn.source.syntaxusing
+		|| CopyFrom = fn.source[1]
+		WriteTo.msg(@thg, "self")
+		/*
+			WriteTo <~ (@rel, "oop"):
+				(@thg,"you")
+				(@opp,"are")
+				(@thg,"awesome")
+		*/
+
+		for C in CopyFrom
+			if C == @decl
+				|| it = c.declname
+					WriteTo.msg(@thg, it.name)
+
+	
+	function SCClass.AddInterfacesTo (|[SCModule]| List)
+		|| B = .behaviour									   #require
+		for (mod in B.interfaces)	// add all?
+			List <~ mod
+	
+	
+	function SCClass.IsBehaviourTable (|bool|)
+		require self
+		return .isbehaviour == scbehaviour.kBehaviourTable
+	
+	
+	function SCFunction.IsBehaviour (|bool|)
+		return .protodecl$.Type.IsInterface
+	
+	
+	function SCClass.IsInterface (|bool|)
+		require self
+		return .isbehaviour & scbehaviour.kBehaviourProto
+
+
+	function String.InterfaceToBehaviour (|string|)
+		return self[2, .length-2].lowercase
+
+		
+	function SCClass.ProcessBehaviours
+		|| B = .behaviour										#require
+		|| Table = b.FuncTayble									#expect
+		|| TableCls = Table.cls									#expect
+		
+		for (fn in B)
+			.FillInterFaceIn(fn)
+		
+		for (W in b.Wrapperfuncs)
+			.FillInterfaceWrapper(w)
+
+		for (interface in B.interfaces)
+			interface.AddInterfaceToTable(TableCls)
+	
+	
+	function SCClass.ProcessInterfaces
+		require .IsInterface
+		|| fn = .funcproto					#require
+		|| L = fn.lookup
+		if (L isa scmodule)
+			|| cls = L.cls
+				expect fn.lookup
+				fn.AddSelfToFunc(cls)
+		error (fn.source) ("Error in ProcessInterface.")
+	
+	
+	function SCModule.AddInterfaceToTable (|SCClass| TableCls)
+		|| d = SCDecl.new
+		d.TypeContained = .cls
+		d.Name = .name.InterfaceToBehaviour
+		tablecls.properties <~ d
+		tablecls.tryadd(.source, d, d.name)
+	
+	
+	function SCClass.BehaviourName (|string|)
+		return .name + "_Behaviour"
+	
+
+	function CreateFuncTable (|Message| ErrPlace)
+		expect !.FuncTayble
+
+		|| name = .cls.behaviourname
+		|| Using = errplace.syntaxusing 
+		|| msg = «tmp "struct"
+			«Thg name »
+			«Arg »
+		»
+		
+		if !.project
+		.project.use
+		|| F = SCClass.newStruct(msg, compiler.program, ErrPlace)|SCModule| #require
+		F.cls.IsBehaviour = kBehaviourTable
+		f.cls.IsRole = .cls.IsRole				// sigh
+		compiler.program.TryAddBase( ErrPlace, F )
+		Compiler.ModuleList <~ F						// Sigh... should not have to do this!
+		.FuncTayble = F
+		scimport.noproj
+	
+	
+	function String.UnderScoreAtAnyEnd (|bool|)
+		return (Self[0] == '_') or (self[-1] == '_')
+	
+
+	function SCBase.ShouldBeClass (|message|errplace, |SCClass|)
+		return .IsNormalObject #expect (errplace, "Can only use this in a class.")
+	
+
+	function SCModule.InterfaceFunc (|SCFunction|)
+		return .Cls.FuncProto
+
+	
+	function SCFunction.AddSelfToFunc (|SCClass|cls)
+		|| prms = .source.find(@prm)
+		|| name = .source.first			#expect (.source, "No name found")
+		
+		|| Using = name.syntaxusing
+		ifn prms
+			prms = «prm »
+			name.next = prms
+		
+		prms.first = MakeDecl(cls.name, "self", nil)
+	
+	
+	module {
+		function Tran_Behaviour (|message| node, |scclass| cls, |bool|)
+			require cls and node
+			expect !cls.IsRole (node, "roles can't specify behaviours (they aren't real classes!)")
+			|| name = node[@thg]
+			|| lst = name.next
+			expect (lst != @bra and @prm and @list)  (lst, "Behaviours can’t specify parameters")
+			using node 
+				|| it = name.next
+					it.expect(@arg)
+				  else
+					node <~ «arg »
+
+				name.next = «prm
+					«thg "__" + name.name + "__"»
+				»
+			return true
+		
+		
+		function NewBehaviour (CollectFunc)
+			|| cls = name_space.ShouldBeClass(errplace)
+			if Tran_Behaviour(node, cls)
+				|| fn = SCFunction.NewFunc(node, cls, node)
+					fn.isvisible = true
+					cls.AddBehaviourOrInterface( fn, ErrPlace )
+					Return fn
+
+
+		function MakeCallerSub (|string| FnStr, |SCClass| Cls, |Message| ErrPlace, |SCFunction|)
+			|| Using = Errplace.syntaxusing 
+			|| FNSrc = FNStr.ParseClean												#require
+			|| FN = SCFunction.NewFunc( fnsrc.first, Cls, ErrPlace )|SCFunction|	#require
+			fn.alloccode |= kIsVirtualCaller
+			cls.behaviour.WrapperFuncs <~ Fn
+			return FN
+
+
+		function MakeInterfaceCaller (|SCModule| Mod, |SCClass| Cls, |Message| ErrPlace, |SCFunction|)
+			// so it's a func, on the base, with the same name... as... the module
+			|| InterName = mod.name
+			|| Type = cls.behaviourname
+			|| FuncName = Intername.InterfaceToBehaviour
+			|| FNStr = "
+function $InterName (,$InterName)
+	pragma inline
+	|| Table = .ClassBehaviours|&$Type|
+	return (Table.$FuncName)(...)
+"
+			return .MakeCallerSub(fnstr, cls, errplace)
+		
+		
+
+		function NewInterface (CollectFunc)
+			using (errplace)
+			|| cls = name_space.ShouldBeClass(errplace)
+				|| arg = node.find(@arg)
+					|| Beh = «tmp "behaviour"
+						node.first.copy, arg »
+					node.next = beh
+					name_Space.CollectOne( beh, true ) // cos we collect from a list... sigh
+
+				|| Mod = .NewInterfaceSub(node, cls, errplace)
+					return .MakeInterfaceCaller(Mod, cls, errplace)
+		
+		
+		function NewInterfaceSub (|Message| node, |SCClass| cls, |Message| ErrPlace, |scmodule|) {
+			|| Thg = node.first
+			|| required = (thg isarel "++")
+				thg = thg.replacewith(thg.first)
+
+			expect (thg==@thg) (node, "Interface has no name.")
+			|| s = Thg.name
+			expect (!s.UnderScoreAtAnyEnd) (thg, "Interfaces can’t start or end with underscore.")
+			expect (s~!="destructor")      (thg, "Bad name.")
+			Thg.name = "__" + s + "__"
+			
+			// node.normalisefunc
+			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s) #require
+			Mod.IsRequiredInterface = required
+			cls.AddBehaviourOrInterface( Mod, ErrPlace )
+			mod.cls.IsBehaviour = kBehaviourProto
+			if required
+				mod.cls.IsBehaviour = kBehaviourProtoRequired
+			Return Mod
+		}
+	}
+
+	
+	constants
+		kBehaviourTable = 1
+		kBehaviourProto = 2
+		kBehaviourProtoRequired = 6
+	
+	
+	iterator
+		|| FnList = .access.navigate
+		while FnList.movenext
+			yield FnList.value|scfunction|
+	linkage
+		cpp_part Beh
+
+
+function SCBase.IsNormalObject (|SCClass|)
+	if (self isa SCClass)
+		if .isobject
+			return self
+	  elseif (self isa scdecl)
+		if (.type.isobject)
+			debugat(1) // wait... what about this case?
+
+
+extend SCClass
+	syntax Compare (|string| Other, |bool|Aware, |int|)
+		if !self
+			return 1
+		return .name.Compare(other, Aware)
+	syntax Equals (|string| Other, |bool|Aware, |bool|)
+		cpp_part EqualsStr
+		if self
+			return .name.syntaxequals(other, Aware)
+
+
+function SCClass.RenameInterfaces
+	for (f in .behaviour$.interfaces)
+		|| it = f.cls
+			it.name = it.CppClass + it.name
+
+
+|| kNameConf = "Name conflict"

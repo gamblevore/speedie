@@ -1,0 +1,1815 @@
+
+
+	
+class TextView (GUIControl)
+	linkage
+		cpp_part Text
+	|bool|						SingleLine
+	|bool|						PreferPrevLine
+	|bool|						PreferStayAtEnd
+	|bool|						CanSeeAllLines
+	|bool|						GroupSaveAll
+	|bool|						CopyPlaceActive
+	|bool|						CanAutoComplete
+	|byte|						ClicksDown
+	|byte|						CodeInsertionState
+	|byte|						SetsDebugLines
+	|byte|						LineNumWidth
+	|byte|						LineHeight
+	|byte|						ExpectsParse
+	|ListViewState|				Align
+	|int16|						LastDrawWidth
+	|uint|						ScrollDrawTimer
+	|int|						ClickedPos
+	|int|						AutoCompleteBack
+	|string|					AutoCompleteString
+	|Error|						MyError
+	|TextViewLine|				_Start
+	|TextViewLine|				Lines
+	|IntRange|					_TypingPlace
+	|IntRange|					UncorrectedSel
+	|GUIKeyEvent|				OnKeyDown
+	|GUIKeyEvent|				OnTextChanged
+	|GUITextSelectionEvent|		OnSelChanged
+	|GUITextErrorSelected|		OnSelError
+	|GUITextShowEvent|			OnShowExtraInfo
+	|dictionary|				ColoriseAsRoot
+	|Document|					_Viewing
+
+	function Document (|document|)
+		opt norefcounts
+		return ._Viewing
+	
+	function Document (assigns:|document|)
+		opt norefcounts
+		require value != ._viewing
+		if ._viewing
+			._viewing.removeviewer(self)
+		._viewing = value
+		if value
+			value.addviewer(self)
+	
+
+	function Undoer (|Document|)
+		opt norefcounts
+		if ._viewing or self isnt editable
+			return ._viewing
+		._viewing = document("")
+		._viewing.addviewer(self)
+		return ._Viewing // why??????
+
+	destructor
+		.document = nil		
+	
+
+	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
+		super.Constructor(p)
+		.Lines = TextViewLine(nil)
+		.TakesFocus = TakesFocusFlag.On
+		.OnClicked	= Clicked
+		.OnKeyDown	= keys
+		.LineHeight = font.Height + 4 // whatever
+		.SetsDebugLines = 10
+		.ExpectsParse = 1
+		.CopyPaste = CopyPasteFlags.CopyText (|) CopyPasteFlags.PasteText
+		.init
+	
+	
+	behaviour MouseDown
+		.clickedpos = p.x // for selectin text
+		if (clicks == 1) and keys.cmd
+			.SendClick(p, keys.PlatCmd)
+			return 1
+		if .ClickedScroll(P, clicks)
+			return 2
+		if self is editable or AlwaysScrollable
+			if clicks >= 1
+				.ClicksDown = clicks
+			.EditClick(p, clicks, false)
+		if (.onclicked) and clicks >= 0				// -1 = drag
+			(.onclicked)(self, clicks)
+		if self is editable or AlwaysScrollable
+			return 4
+		return 1
+
+		
+	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
+		return .ClickedScrollbar(P, Clicks, .slh, .ScrollDrawTimer)
+			
+		
+	behaviour lostfocus
+		.isinline.clear(False)?
+		
+		ifn .KeepUndosOnLoseFocus
+			.document = nil
+		super.lostfocus
+
+
+	behaviour gotfocus
+		if .isinline or .singleline
+			.sel = .text.length
+		.clearfound
+		super.gotfocus
+
+
+	behaviour mousewheel
+		if (self is editable or AlwaysScrollable) and !.singleline
+			.start = .start.move(-p.y)
+			return true
+
+
+	helper LineAtY (|int| py, |textviewline|)
+		opt norefcounts
+		|| y = py max .bottom
+		|| Dist = .top - Y
+		|| L = Dist / .lineheight|int|
+		if dist < 0
+			l = -1
+		return .Start.move(L)
+
+	
+	helper ExpandToAntiWords (|intrange| t, |intrange|)
+		opt norefcounts
+		|| M = .clickedmsg(t.x1)
+		|| M2 = .clickedmsg(t.x2)
+		if false and m != nil and m == m2
+			if m in @decl
+				m = m.parent
+				if t.x1 >= m.position and t.x2 <= m.after
+					t.x1 = m.position
+					t.x2 = m.after
+					return t
+			
+		|| IsForward = t.x1 < t.x2 
+		|| fwd = 0+( IsForward)
+		|| bck = 0+(!IsForward)
+		t.x1 += fwd
+		t[bck] = .FindEnd(t[bck], -1)
+		t[fwd] = .FindEnd(t[fwd],  1)
+		return t
+
+	
+	helper TextViewLine.ooof (|bool| t, |int|)
+		if t
+			return .position
+		return .after
+		
+		
+	helper ExpandToVis (|intrange| t, |intrange|)
+		opt norefcounts
+		|| m = t
+		|| d1 = .FindDrawInfo(m.x1)
+		|| d2 = .FindDrawInfo(m.x2)
+		t.x1 = d1.ooof(m.x1 <= m.x2)
+		t.x2 = d2.ooof(m.x2 <  m.x1)
+		return t
+		
+
+	helper XAdjust (|ivec2| p, |int|)
+		if p.y < .top
+			return p.x - (.left+.LineNumWidth*font.width+5)			
+		
+		
+	helper ByteAtXY (|ivec2| p, |&textviewline| d_, |ivec2|)
+		opt norefcounts
+		|| d = .LineAtY(p.y)
+		if d_
+			*d_ = d
+		if d
+			return .LastLineFix(d, .xadjust(p))
+		if p.y < .top
+			return (.text.length, 0)
+
+
+	
+	helper LastLineFix (|textviewline| d, |int| x, |ivec2|)
+		if self is editable
+			x += 2
+		|| t = d.ByteOfX(x)
+		|| PreferFirst = (d.after == t) and (d isnt last)
+		if PreferFirst and d.endswithline
+			t -= .text
+			preferfirst = false
+		return (t, PreferFirst|int|)
+		
+	
+	helper ExpandSel (|ivec2| t, |int| C, |ivec2|)
+		if (C == 2)
+			return .ExpandToAntiWords(t)
+		if (C == 3)
+			return .ExpandToVis(t)
+		if (C >= 4)
+			return .lineexpand(t)
+		return t
+
+
+	function EditClick (|ivec2| p, |int| clicks, |bool| CmdKey)
+		|textviewline| d
+		|| bs = .byteatxy(p, d)
+		|| b = bs.x
+		if !cmdkey and !clicks and .selrange contains b
+			return
+		
+		ifn .lastrect.vert contains p.y
+			.ViewPos(b) // inviewback
+		
+		|| t = .uncorrectedsel
+		if keys.shift or (clicks == -1)
+			t.x2 = b
+		  else
+			t = (b, b)
+
+		if !CmdKey
+			.sel2(.ExpandSel(t, .clicksdown), d)
+		  else
+			.sel2(t, d)
+		.PreferPrevLine = bs.x2
+		.uncorrectedsel = t
+
+
+	function SendClick (|ivec2| p, |bool| FromCmdKey)
+		.EditClick(p, 0, fromcmdkey)
+		ifn .__keydown__(keys.section)
+			|| Code = (-2, -1)(fromcmdkey)
+			(.onclicked)(self, Code)?
+	
+	
+	behaviour RightClick
+		.sendclick(p, false)
+					
+
+
+	function SelRange (|intrange|)
+		return ._typingplace.resolve
+	function Sel0 (|int|)
+		return .selrange.x
+	function Sel1 (|int|)
+		return .selrange.y
+
+	function Sel (|intrange|)
+		return ._typingplace
+
+
+	function Sel (assigns:|intrange|)
+		.TypingPlaceTry(value, false, nil)
+
+	helper Sel2 (|intrange| value, |textviewline| d)
+		.TypingPlaceTry(value, false, d)
+
+	function Sel (assigns: |int| r)
+		cpp_part TypingPlaceInt
+		.sel = (r, r)
+		
+	helper TypingPlaceDirect (|intrange| result, |bool|)
+		require result != ._TypingPlace
+		._TypingPlace = result
+		.PreferPrevLine = false
+		.CanAutoComplete = false
+		.autocompletestring = ""
+		.UncorrectedSel = result
+		return true
+
+	helper TypingPlaceTry (|intrange| result, |bool|insert, |textviewline| d)
+		opt norefcounts
+		require .TypingPlaceDirect(result)
+		.ChangeSel(insert, d)
+		|| u = .undoer
+			|| c = u.current
+				c.typingplace = result
+
+
+	helper ChangeSel (|bool| insert, |textviewline| d)
+		if .hasfocus
+			sdlapp.selchanged
+		if !.IsCleared
+			(.OnSelChanged)(self, insert)?
+		if d and d.error
+			(.OnSelError)(self, d)?
+
+		
+	helper FindEnd (|ind| x,  |int| i,  |int|)
+		opt norefcounts
+		|| f = csAntiWords
+		|| avoid = false
+		|| s = .text
+		if i > 0
+			|| x2 = x + s
+			if f[s[x]]	// so... if we have "|   " and we wanna move forward. then what?
+				if !avoid
+					return x2
+				x = s.outcharset(f, x2) 
+			  else
+				x = s.find(f, x2...)
+		  elseif x > 0
+			|| x2 = x - s
+			if f[s[x2]]
+				if !avoid
+					return x2
+				x = s.outcharset(F, x2, 0)
+			  else
+				x = s.find(f, x2, 0)
+			if x
+				x = x + s
+		if x
+			return x
+		if i > 0
+			return s.length
+	
+	
+	helper WordMove (|ind| pos, |int| dir, |ind|)
+		opt norefcounts
+		|| s = .text
+		|| x = .WordMoveSub(pos, dir)
+		ifn (x!=pos) and keys.platcmd(false)
+			return .clamp(x)
+		//
+		|| shift = (dir==1)-1
+		|| G = s.group(pos+shift)
+		while x != pos // move pos
+			|| ng = s.group(pos+shift)
+			if ng!=G
+				if (dir == -1) and (G == 2) and (ng==1)
+					pos--
+				return pos
+			pos+=dir
+			if pos <= 0 or pos >= s.length
+				exit
+		return pos
+				
+			
+	helper WordMoveSub (|ind| pos, |int| dir, |ind|)
+		opt norefcounts
+		|| s = .text
+		|| orig = pos
+		if dir < 0
+			if pos > 0
+				pos = s.OutCharSet(textview.csantiWords, pos-1, 0)
+				if pos
+					pos = s.find(textview.csantiWords, pos, 0)
+					if pos
+						pos = pos max .FindLine(orig-1, pos)
+						return pos + 1
+		  else
+			pos = s.OutCharSet(textview.csantiWords, pos...)
+			if pos
+				pos = s.find(textview.csantiWords, pos...)
+				|| t2 = .FindLine(pos, orig+1)
+					pos = pos min t2
+			pos := s.length
+			return pos
+	
+	
+	helper MoveSel (|int| i, |bool|)
+		opt norefcounts
+		debug_require i
+		sdlapp.showcursor(false)
+
+		|| t = .sel
+		|| x = t.x2
+		|| LineEnd = false
+		|| fwd = false
+		ifn keys.shift
+			|| r = t.resolve
+			x = (r.x2, r.x)(i > 0)
+		if keys.platCmd									// line-end
+			|| t2 = (t.x - (i < 0), t.x2)
+			x = .FindDrawLineEdge(t2, i)
+			LineEnd = true
+			fwd = (i > 0)
+		  elseif keys.option or keys.platcmd(false)						// word by word
+			x = .WordMove(x, i)
+		  elseif (!t.width) or keys.shift
+			x = .text.move(x, i)
+		  else
+			fwd = i > 0
+
+		x = .clamp(x)
+			
+		if keys.shift
+			t.x2 = x
+			if LineEnd and (x > t.x)
+				x--
+		  else
+			t = (x, x)
+		|| d = .ViewPos(x) // inviewback
+			.preferprevline = fwd and (!d.emptyline or !d.EndsWithLine) 
+		.sel2(t,d)
+		return true
+	
+	
+	helper textviewline.InSane (|textviewline|s, |bool|)
+		if (.position < 0)
+			return true
+		if s and (s.position != .after)
+			return true
+
+
+	helper sanity
+		opt norefcounts
+		target false
+			for p in .lines
+				|| s = p.next
+				if p.insane(s)
+					debugat
+					return
+				p = s
+
+
+	function ShowTypingPlace (|ivec2| r)
+		|| n = .MaxVisibleLines/2
+		if r.width
+			.ViewPos(r.x, n)		//inviewback
+		.ViewPos(r.x2, n)			//inviewback
+
+
+	function CurrLine (|int|)
+		return .text[0, .sel0].linecount
+	
+	
+	helper DrawInfoAtLine (|int| L, |textviewline|)
+		opt norefcounts
+		.PrepareLinesOfText
+		for r in .lines
+			if r.tline >= l
+				return r
+		return .lines.last
+	
+	function ViewLineAndSel (|int| L)
+		|| i	= 0
+		|| d	= .DrawInfoAtLine(L)
+		.ShowAndSel(d.position)
+
+	
+	function Show (|int| x)
+		.ViewPos(x, (.MaxVisibleLines/3)) //idk
+	
+	
+	function ShowAndSel (|int| x, |int| length=0)
+		opt NoRefCounts
+		|| d = .ViewPos(x, (.MaxVisibleLines/3), 2) //idk
+		.sel2((x, x + length), d)
+
+
+	function ViewPos (|int| x,  |int|before=0, |int| back=0, |bool| Exact=false, |TextViewLine|)
+		opt NoRefCounts
+		|| i	= 0
+		|| d	= .FindDrawInfo(x, i)
+		if !exact and (i inrange (1+.MaxVisibleLines - back))
+			return d
+		|| bef = before.abs
+		.start = d.move(-bef)
+		sdlapp.touch(self)
+		return d
+
+
+	// whats the difference even???? view/goto??? ooofff
+	// seem almost the same!
+	function Goto (|int| x)
+		|| vis = .MaxVisibleLines
+		|| d   = .FindDrawInfo(x)
+			|| d2 = d.move(vis).move(-vis) // not too far
+			if d2 != d
+				d2 = d2.move(2) // looks lil nicer
+			if ._Start != d2
+				.start = d2
+				.ScrollDrawTimer = scroller.timer 
+		
+		
+	function Jump (|int| x, |int| Before=0, |bool|)
+		// views X, and sets new typing place.
+		opt norefcounts		
+		|| t = .sel
+		x = .clamp(x)
+		|| d = .ViewPos(x, before, 2) //idk
+			
+		if keys.shift
+			t.x2 = x
+		  else
+			t = (x, x)
+		.sel2(t,d)
+		return true	
+
+
+	function Clamp (|int| x, |int|)
+		return x.clamp(.text.length)
+		
+
+	helper MoveListLine (|int| i, |bool|)
+		opt norefcounts
+		|| inl = .isinline$
+		|| c = inl.cell$ // wat
+		|| c2 = c.step(i)
+			inl.Edit(c2, nil)
+			if i < 0
+				.sel = 0
+		return true
+
+
+	helper MoveSelLine (|int| i, |bool| Page, |bool|)
+		opt norefcounts
+		debug_require i
+		sdlapp.showcursor(false)
+		
+		|| x  = (.text.length, 0)(i > 0)
+		|| t  = .sel
+		|| bs = .FindDrawSelMove(t, i, page)
+		if .singleline and (t == bs.x)
+			return .MoveListLine(i)
+
+		if Keys.Cmd
+			.PreferPrevLine = i < 0
+			.jump(x)
+			.PreferPrevLine = i < 0
+			return true
+
+		.jump(bs.x)
+		.PreferPrevLine = bs.x2
+		return true
+	
+	
+	behaviour Search
+		|| inl = .IsInline
+		if inl and inl.SearchingFor
+			.AcceptEditing(false)
+			return true
+		if JustUpdate
+			return true
+		|| r = .SelRange
+		|| range = (R.x2, .text.length)
+		if keys.shift
+			range = (R.x, 0)
+		range = .text.stretchyfind(s, range.x, range.x2)
+			
+		if range.x < 0
+			range = (0, int.max)
+			if keys.shift
+				range = range.yx
+			range = .text.stretchyfind(s, range.x, range.x2)
+			require range.x >= 0
+		
+		.sel2(range, nil)
+		.ViewPos(range.x, .MaxVisibleLines/2, 2) //inviewback
+		return true
+			
+	
+	behaviour KeyDown
+		opt norefcounts
+		if self is editable
+			if (.OnKeyDown)(self, key)?
+				return true
+		if .KeyDownTest(key) // to be called by other funcs
+			return true
+		if (self isnt editable) and (key.isaccept or key.IsCmm) and (.onclicked)
+			(.onclicked)(self)
+			return true			
+		if (key is RGUI or LGUI) and sdlapp.CursorVisible
+			.ShowExtraInfo(.mousexy)
+		
+
+	helper KeyDownTest (|keys| key, |bool|)
+		if self is editable
+			if .IsInline
+				if key.IsCancel:		return .CancelEditing
+				if key.IsAccept:		return .AcceptEditing(true)
+				if key iscmd keys.g:	return .AcceptEditing(false)
+				if key is tab:			return .FinishEditing
+			if key.isaccept:			return .NewLine
+			if key is left:				return .MoveSel(-1)
+			if key is right:			return .MoveSel(1)
+			if key is LEFTBRACKET:		return .tabIndent(-1, "\t")
+			if key is RIGHTBRACKET:		return .TabIndent(1, "\t")
+			if (key is tab) and !keys.option
+				return .trytab
+			if key iscmd keys.SLASH:	return .CommentSlash(false)
+			if key iscmd keys.Num8:		return .CommentSlash(true)
+			if key is up:				return .MoveSelLine(-1, keys.option)
+			if key is pageup:			return .MoveSelLine(-1, true)
+			if key is down:				return .MoveSelLine( 1, keys.option)
+			if key is pagedown:			return .MoveSelLine( 1, true)
+			if key is home:				return .jump(0)
+			if key is end:				return .jump(.text.length)
+			if key is delete:			return .DeleteKey(keys.shift)
+			if key is ForwardDELETE:	return .DeleteKey(!keys.shift)
+			if (key iscmd keys.x) or (key is cut)				// select all
+				return .DoCut
+			if (key iscmd keys.z) or (key is undo or again) 	// select all
+				return .DoUndo(!keys.shift)
+
+		if (key iscmd keys.c) or (key is copy)					// copy
+			return .DoCopy
+		if (key iscmd keys.a) or (key is select)				// select all
+			return .DoSelectAll
+	
+	
+	helper DoSelectAll (|bool|)
+		.sel = (0, .text.length)
+		return true
+	
+	
+	helper DoCut (|bool|)
+		.docopy
+		.Insert("")
+		return true
+
+
+	helper IndentCount (|int| x, |int|)
+		|| l	= .lineexpand((x,x))
+		|| r	= l.x
+		|| allspace = true
+		while
+			|| c = self[r++]
+			if c == ' '
+				rz++
+			  elseif c == '\t'
+				rz = rz &~ 3
+				rz += 4
+				allspace = false
+			  else
+				exit
+		if allspace
+			rz = -rz
+
+
+	helper ImproveIndent (|int| Curr, |int| extra, |string|)
+		|| c = curr
+		if c < 0
+			c = -c
+		c = c &~ 3
+		c += extra
+		if (curr < 0) and (c > 0) 
+			return " " * c
+		return "\t" * (c/4)
+
+
+	helper NewLineSub (|int|extra, |bool|)
+		|| sr	= .selrange
+		|| ind  = 0
+		if !.singleline and !keys.shift
+			|| b4 = self[sr.x - 1]
+			if !b4.istextline
+				ind = .IndentCount(sr.x2)
+		.UndoChecker = -1
+		.Typed("\n" + .improveindent(ind, extra))
+		.UndoChecker = -1 // needed
+		return true
+	
+	
+	helper SwapChars (|bool|)
+		|| i  = .selrange
+		|| i0 = i.x1
+		|| i2 = i
+		if i.width
+			return true
+		|| t = .text
+		i2 = (t.move(i0, -2), t.move(i0,  -1))
+		
+		|| s1 = self[ i2 ]
+		|| s2 = self[ i2.x2,  i0 ]
+		.insertsub(s2+s1, (i2.x, i0)) 
+			
+		return true
+	
+	
+	helper NewLine (|bool|)
+		if .SingleLine
+			return true //eat it
+		|| extra = 0
+		if ((.onkeydown)(self, -10)?) and !keys.shift
+			.sel = .ExtendToLineEnd(.sel1-1) // move sel to end of line
+			extra = 4
+		.NewLineSub(Extra)
+		return true
+	
+	
+	syntax access (|int| i, |string| s, |bool|)
+		cpp_Part Match
+		return .text[i, s]
+	
+		
+	helper DeComment (|bool|)
+		require !.singleline
+		|| r = .selrange
+		|| s = ""
+		if self[r.x, "/*"]  and  self[r.x2-2, "*/"]
+			s = self[r + (2,-2)]
+		  elseif self[r.x-2, "/*"]  and  self[r.x2, "*/"]
+			s = self[r]
+			r = r + (-2, 2)
+		  else
+			return false
+		.insertsub(s, r, true)
+		return true
+	
+	
+	helper CommentSlash (|bool| star, |bool|)
+		require !.singleline
+		ifn keys.shift or star
+			.tabindent(1, "//", true)
+		  elseif !.decomment
+			.Insert("/*" + .seltext + "*/", true)
+		return true
+	
+	 
+	helper InsertAutoComplete (|bool|)
+		|| c2 = .AutoCompleteString
+		require .CanAutoComplete and c2
+		|| trim = c2.InsertTrim
+		|| autostart = c2[0, trim.x]
+		|| ins = .sel0
+		|| old = self[ins-.autocompleteback, ins]
+		if old != c2
+			c2 = c2.insertFix(trim)
+			|| r = .selrange - (.autocompleteback, 0)
+			if (c2 endswith "()") and self[r.x2] == '('
+				c2 = c2[0, c2.length-2]
+			.undochecker = -1
+			.insertsub(c2, r, false)
+			.sel += (trim - c2.length)
+			rz = true
+
+
+	helper backspaces (|int| i, |int|)
+		|byte| c
+		while
+			c = self[--i]
+			loop c == ' '
+		if c.istextline or c == '\t' 
+			return i+1
+				
+		
+	helper TypeTab (|bool|)
+		if !.sel.width and .isjeeboxmode
+			|| i = .sel.x
+			|| bs = .backspaces(i)
+				.sel = (bs, i)
+		return .typed("\t")
+
+
+	helper TryTab (|bool|)
+		|| sh = keys.shift
+		ifn .seltext contains jeebox.CSLine
+			if .InsertAutoComplete
+				return true
+			if (.onkeydown)(self, -9)?
+				return true
+			if !sh or .isinline
+				return .TypeTab
+		return .TabIndent(-sh.dir, "\t")
+
+		
+	syntax access (|int| p, |byte|)
+		cpp_Part Byte
+		return .text[p]
+	syntax access (|ivec2| p, |string|)
+		cpp_Part RangeVec
+		return .text[p]
+	syntax access (|int| a, |int|b, |string|)
+		cpp_Part Range
+		return .text[a, b]
+
+
+	helper LineExpand (|IntRange| s, |bool| canback=false, |intrange|)
+		// this thing seems borked.
+		opt norefcounts
+		s = s.resolve
+		if canback
+			|| back = s.x2-1 
+			if self[back].istextline
+				s.x2 = back
+		
+		if self[s.x].istextline and self[s.x-1].istextline and !s.width
+			return s
+		|| A = .findline(s.x, 0 )
+		|ind| b = s.x2
+		b += self[b-1].istextline
+			
+		B = .findline(b) oar .text.length
+		return (A+1, b) // don't include the line.
+
+			
+	function ShowParseError
+		.errorat(.myerror)
+	
+	
+	function ErrorJump (|error| err)
+		.jump(err.position, .MaxVisibleLines/2)
+		
+	function ErrorAt (|error| err)
+		if err
+			.errorjump(err)
+			.lineerroradd( err )
+
+
+	function ClearErrors
+		opt norefcounts
+		for d in .lines
+			d.error = nil
+
+
+	function ClearFound (|bool|)
+		opt norefcounts
+		for d in .lines
+			if d is found
+				(d isnt found)
+				(d isnt currfound)
+				rz = true
+
+
+	function LineErrorAdd (|error| e)
+		opt norefcounts
+		|| r = .FindDrawInfo(.clamp(e.position))
+			r.TrySetError(e)
+			.myerror := e
+			sdlapp.touch(Self)
+
+
+	function FoundAt (|int| x, |bool| IsCurr)
+		opt norefcounts
+		|| r = .FindDrawInfo(x)
+			(r is found)
+			(r is CurrFound) = iscurr
+			sdlapp.touch(Self)
+
+
+	helper message.LastAfter (|int|ignoreafter, |ind|)
+		opt norefcounts
+		for a.flat in self
+			|| af = a.after
+			if af < ignoreafter
+				rz = rz max af
+	
+	
+	helper textviewline.abound (|int|)
+		opt norefcounts
+		|| a = .after
+		|| la = .message.lastafter(a)
+			return a min la
+		return a
+	
+	
+	function ClickedMsg (|message|)
+		cpp_Part ClickedMsg0
+		return .clickedmsg(.sel0)
+	
+	
+	function ClickedMsg (|int| pos, |bool| named=false, |message|)
+		opt NoRefCounts
+		|| d   = .findDrawInfo(pos)
+		require d and !d.error
+		|| msg = d.message						#require
+		|| abound = d.abound
+		if pos > abound
+			pos = .text.outwhite(pos, 0)
+		
+		|| found = msg.FindTightest(pos, named)
+		if named and !found
+			found = msg.FindTightest(pos, false) 
+		if found in @rel
+			|| p = found.parent
+			if found == p.second
+				return p
+		return found
+
+	
+	helper message.FindTightest (|int| pos, |bool| named=false, |message|) // findpos, findat
+		opt norefcounts
+		|| size = int.max
+		for ch.flat in self
+			if (ch contains pos) and (!named or ch.name or ch == @dot or @sdot)
+				|| r = ch.extra
+					if (r < size) or (rz!=nil and pos == rz.position and ch.after) // smallest
+						rz = ch
+						size = r
+
+	
+	helper TabIndent (|int| dir, |string| mark, |bool| Mirror = false, |bool|)
+		|| sel	= .selrange
+		|| r	= sel.width and self[sel.x2 - 1].istextline
+		|| r2	= (0, r|int|)
+		|| t	= .lineexpand(sel - r2)
+		if t.width > 0
+			t.x2 -= self[t.x2].istextline
+
+		if mirror and .text[t.x, mark]
+			dir = -dir
+		t.x2++ // whatever... just for now
+		
+		|| old = self[t]
+		|| Tabbed = .TabIndentAll(dir, mark, old)
+		if old == tabbed
+			beep
+			return true
+			
+		if ._typingplace != t
+			._typingplace = t
+		.InsertSub(Tabbed, t, true)
+		return true
+	
+	
+	helper string.TabIndent (|int| n, |string| mark, |string|)
+		if n > 0
+			return mark + self
+		if self[0, mark]
+			return self[mark.length...]
+			
+		if mark == "\t"
+			|| c = 0
+			for i in 4
+				if self[i] != ' '
+					exit
+				c = i + 1
+			return self[c...]
+		return self
+	
+	
+	helper TabIndentAll (|int| dir, |string| mark, |string| txt,  |string|)
+		|| fs = faststring()
+		for (l.lines in txt) (p)
+			fs <~ l.TabIndent(dir, mark)
+			if p
+				fs <~ txt[p]
+		return fs
+	
+	
+	helper TextSet (|string| s)
+		isnt modified
+		.Clear(s)
+		.undoer.ClearTo(s)?
+	
+
+	function CancelEditing (|bool|)
+		opt norefcounts
+		.IsInline.Clear
+		return true
+	
+		
+	helper IsInline (|&InlineEditor|)
+		opt norefcounts
+		|| t = .Inline
+		if t and self == T.editor
+			return t
+	
+	
+	helper FinishEditing (|bool| Focus=true, |bool|)
+		|| it = .isinline
+			|| c = it.cell
+			|| lv = it.editingfor
+			it.FinishAndClear(focus)
+			if focus and c and lv // try next tab
+				c = c.tab(!keys.shift, lv)
+				lv.startRenameCell(c)
+					
+		return true
+	
+	
+	helper AcceptEditing (|bool|hide, |bool|)
+		opt norefcounts
+		.IsInline.Accept(.text, hide)
+		return true
+	
+	
+	function SelectAll
+		.sel = (0, .text.length)
+			
+
+	helper init
+		.gnormal.edge  <~ ((0.5, 0.5, 0.5, 1.0))
+		.gnormal.Bg    <~ ((0, 0, 0, 0.5))
+		.clear("")
+	
+	
+	helper SelMsgValid (|bool|)
+		opt norefcounts
+		if .expectsparse
+			|| s = .sel
+			|| d = .finddrawinfo(s.x)
+			// bugged
+			while d and d.range.overlaps(s)
+				require !d.error
+				require d.message or .parsedmessage
+				d++
+		return true
+
+
+	helper CounterPartSel (|string| s, |bool| Force=false, |bool|)
+		require (!.singleline and s.length == 1)
+		|| sel  = .sel
+		|| t    = .seltext
+		|| sel2 = sel.x2
+
+		if (!sel.width and s == "=")			//   a |=| b   -->   a |= b
+			if  self[sel2] == '|'  and  self[sel2-1] == '|'
+				.sel = (sel2, sel2+1)
+			return false
+
+		require t or (.expectsparse >= 2)
+		|| c     = counterparts.find(s)
+		|| After = self[sel2]
+		if !c
+			c = CounterParts2.find(s)
+			if c and after.equals(s)
+				.sel = sel2+1
+				return true				// sigh could simplify this. cant be bothered
+			return false
+			
+		if (t.length == 1) and counterparts.find(t)  // stop awkward things like:	 " --> (")
+			require (s == "'" or "\"") and (s != t)
+			
+		|| Other = CounterParts2[c]
+		if other.equals(s) and other==after
+			.sel = sel2+1
+			return true
+		
+		if .SelMsgValid
+			.undochecker = -1
+			|| x = .insert(s + t + other)
+			.sel = (x+1, x+t.length+1)
+			return true
+
+
+	function SelText (|string|)
+		return self[.selrange]
+
+	function SelLine (|string|)
+		return self[.SelectCurrLine]
+
+	
+	helper TypedRaw (|string| s, |bool|)
+		// shouldn't it be shift-space? option-space is a real char.
+		if (keys.option and s == " ") or s == " "
+			return .Swapchars
+		
+		if s == "\\"
+			s = "|"
+		  elseif s == "|"
+			s = "\\"
+		if s.length == 1
+			if (.onkeydown)(self, s.codepoint)?
+				return true
+		return .typed(s, true)
+	
+
+	helper Typed (|string| s, |bool| ForceCounter=false, |int|)
+		debug_require self is editable
+		SdlApp.ShowCursor(false)
+		
+		if .CounterPartSel(s, ForceCounter)
+			return 2
+		.insert(S)
+		return 1
+
+
+	helper TextViewLine.Resync (|int| EndEdit, |int| StartEdit, |int| shift, |string| sn, |int| cw, |textviewline|)
+		|| p = .position
+		|| a = .after
+		 
+		if (EndEdit < p)
+			if (.position + shift == p)
+				debugat
+				.position += shift
+				return .next					// delete?
+			debugat
+			.removeafter
+			.remove
+			return nil
+			
+		.FindWhereLineBreaks(sn, cw, false, p)
+
+		if (EndEdit <= a) and (.after == a)
+			debugat
+			return nil // all done!
+			
+		return .next
+		// the line is altered and different
+			// maybe deleted
+			// maybe inserted
+		// the prev lines were altered, but we still match up. just need to update vline
+
+
+	helper ReclaimDrawInfo (|string| so, |intrange| p)
+		return
+		require !.singleline
+		|| sn		= .text
+		|| Start	= p.x
+		|| End		= p.x2
+		|| d		= .FindDrawinfo( Start )	#require// Anything before Start is safe.
+
+		debug_require (Start >= d.position)
+		|| Shift	= sn - so				 		// Anything after... End, is shifted by shift.
+		|| cw		= .LastDrawWidth
+		
+		while d
+			d = d.Resync(Start, End, shift, sn, cw)
+			.sanity
+
+		d = .startline
+		for .MaxVisibleLines
+			d = d.forward(self, true) #loop
+			.sanity
+		
+		.TextAlteredForDraw = 0
+	
+	
+	function Insert (|string| s, |bool|selnew=false, |int|)
+		return .insertsub(s, .selrange, selnew)
+
+
+	helper InsertSub2 (|string| NewText)
+		super.textset(newtext)
+		(self is modified) = true
+		.touch
+
+
+	helper InsertSub (|string| s, |intrange| p, |bool| selnew=false, |int|)
+		p = p.resolve
+		|| Same = (p.width == s.length) and self[p.x, s] 
+		|| i	= (p.x + s.length, p.x2)(!Same)
+		.ViewPos(i, .MaxVisibleLines/3) // just wants it in view... if not, then scrollback
+
+		if !Same
+			.CanAutoComplete = false
+			.AutoCompleteString = ""
+			|| t = .text
+			|| nt = t.insert(s, p.x, p.width)
+			|| x = (p.x, p.x2)(s)
+			|| tab = (s in '\t')
+				.undochecker = -1
+			//.PrevWasTabsOK = (!.myerror) and tab 
+			// too confusing. they get beeps and don't know why.
+			// maybe better to just actually HILITE the tabs after space!
+			.TryCaptureUndo(x, nt)
+			|| it = .isinline
+				it.UpdateSearch(nt)
+			i = p.x + s.length
+		
+		if SelNew
+			.TypingPlaceTry((p.x, i), true, nil)
+		  else
+			.TypingPlaceTry((i, i),   true, nil)
+		.ShowTypingplace((p.x, i))
+		.UndoChecker = i
+		(.OnTextChanged)(self, 0)?
+		return p.x
+
+
+	helper AlphaFade
+		opt norefcounts
+		require .hasfocus
+		.window.alphafader = date()
+		.window.alphasubtle = true
+
+	
+	helper WasEverAltered (|bool|)
+		opt norefcounts
+		with .document
+			return .current != .original
+		return self is modified
+
+
+	helper Save (|bool|)
+		opt norefcounts
+		if .undoer.save?
+			.AlphaFade
+			return true
+	
+	
+	function File (|file|)
+		opt norefcounts
+		return .path$.file
+	
+	
+	function File (assigns:|file|)
+		.undoer.Location = value.path
+	
+	
+	function Path (|string|)
+		|| u = .document$
+		return u.Location
+
+
+	function DeleteKey (|bool| fwd, |bool|)
+		|| d = (1, -1)(fwd)
+		ifn .deletekeysub(d)
+			beep
+		sdlapp.showcursor(false)
+		return true
+	
+		
+	function SelectCurrLine (|intrange|)
+		rz = .lineexpand(.selrange, true)
+		if rz.x > 0
+			rz.x--
+		  else
+			rz.x2++ // i guess?
+	
+	
+	helper DeleteLineStart (|ind|)
+		opt norefcounts
+		|| x2 = .sel1				// text or not? 
+		|| D = .FindDrawInfo(x2)
+		|| Msg = D.message
+		if (msg == @arg and "")
+			if d contains msg.after // OK... so what do we have?
+				ifn d contains msg.position
+					rz = msg.position
+					while self[rz-1] == ' ' or '\t'
+						rz--
+
+
+	function ExtendToLineEnd (|ind| i, |ind|)
+		return .LineExpand((i,i)).x2
+
+	
+	function Length (|int|)
+		return .text.length
+
+
+	helper InsertLoss (|string|s, |ivec2| abc, |int|)
+		|| n = .length
+		.insertsub(s, abc, false)
+		return n - .length
+		
+	
+	function FindLine (|int|start=0, |int|end=int.max, |ind|)
+		return .text.find(jeebox.CSLine, start, End )
+
+
+	function DoSelectLine  // select line
+		.sel = .ProperSelectLine
+
+
+	helper ProperSelectLine (|intrange|)
+		// i guess the other is broken. Replace it? :)
+		|| r = .selrange
+		|ind| A = .findline(r.x, 0)+1
+		|ind| B = r.x2
+		if (b > a) and self[b-1].istextline
+			b-- 
+		|| b2 = .findline(b)
+			return (a,b2+1)
+		return (a,.length+1) 
+	
+	
+	helper DeleteLine (|bool|)
+		// OK so this makes no sense
+		|| i = .ProperSelectLine
+		i -= (i.x>0)|int|.setsign(keys.shift)
+		|| H = .DeleteLineStart
+			|| i2 = (H, .ExtendToLineEnd(H))
+			i -= .insertloss("", i2)
+		.insertsub("", i, false)
+		return true
+		
+		
+	helper DeleteKeySel (|int| d, |intrange|)
+		|| r = .selrange
+		if r.width
+			return r
+
+		|| x = r.x
+		if keys.option or keys.platcmd(false)
+			r.x2 = .wordmove(x, (1,-1)(keys.shift))
+			return r
+	
+		if self[x-1] == '(' and self[x] == ')'
+			|| c = .ClickedMsg(x)
+				if c == @prm or @bra or @list
+					return (x-1,x+1)
+		
+		r.x2 = .text.move(x, d)
+		return r.resolve
+
+
+	helper DeleteKeySub (|int| d, |bool|)
+		if  keys.platCmd  and  !.singleline
+			return .DeleteLine
+			
+		|| r = .DeleteKeySel(d)
+		if r.width
+			.InsertSub("", r)
+			return true
+
+
+	function SelectorRect (|int| pos, |ivec4|)
+		|| i = .XYOfChar(pos)- (1,0)	
+		|| i2 = (1, .lineheight+1)
+		rz = (i, i+i2)
+		ifn .singleline
+			rz.y++
+
+
+	helper DrawSelRange (|image| Where, |intRange| R, |drawstyle| g)
+		opt norefcounts
+		|| i	= 0
+		|| d	= .Start
+		|| End	= d.move(.maxvisiblelines + 1)
+		if end is last
+			end = nil
+		while d and d != End
+			d.DrawSel(where, r, self, i++, g)
+			if d.after > r.x2
+				exit
+			d++
+
+
+	function TextLeft (|int|)
+		return .left + 2 + .LineNumWidth*font.width
+
+
+	helper DrawSel (|image| where)
+		opt norefcounts
+		|| r = .SelRange
+		if R.width
+			|| g = (¥.TextSelection, ¥.TextSelectionUnfocus)(.hasfocus)
+			.DrawSelRange(Where, r, g)
+		  elseif sdlapp.FlashSelector
+			if .hasfocus and !.hasinline and .window.islast
+				|| Cp = (1.0, 1.0, 1.0, 0.666).px
+				Where.fillrect(.SelectorRect(r.x), Cp, Cp)
+
+	
+	helper HasInline (|bool|)
+		opt norefcounts
+		return .inline$.for == self
+
+
+	helper FoundInfo (|ivec2|m, |int| Pos, |bool|sec, |bool|)
+		if M contains Pos
+			if (m.x2 == Pos) and !.PreferPrevLine
+				return false
+			return true
+
+	
+	helper FindDrawInfo (|int| Char, |&int| VLine=nil, |TextViewLine|)
+		return .FindDrawInfoSub(char, vline, !.PreferPrevLine)
+		 
+		
+	helper FindDrawInfoSub (|int| Char, |&int| VLine,  |bool| sec, |TextViewLine|)
+		.PrepareLinesOfText
+		return .FindDrawInfoSub2(char, vline, sec)
+
+		
+	helper FindDrawInfoSub2 (|int| Char, |&int| VLine,  |bool| sec, |TextViewLine|)
+		opt norefcounts
+		char = .clamp(char)
+		|| c = -int.max
+		|| s = .Start
+		|| d = .lines.first
+		
+		while
+			|| n = d.next
+			if d == s
+				c = 0
+			if !n or .FoundInfo(d.DrawRange, char, sec)
+				if vline
+					*vline = c
+				return d
+			d = n
+			c++
+	
+	
+	function XYOfChar (|ind| pos, |ivec2|)
+		opt norefcounts
+		|| VLine = 0
+		|| d = .FindDrawInfo(pos, VLine)
+		require  d  and  vline >= 0  and  vline <= .maxvisiblelines
+		
+		|| y = .top - (VLine+1) * .lineheight|int|
+		|| x = d.XOfChar(pos) + font.width + .textleft // sigh
+		return (x-2, y-2)
+	
+
+	helper FindDrawLineEdge (|intrange| t, |int| i, |bool| CanAvoid=true, |int|)
+		|| x2 = t.x2
+		if (i > 0) and (keys.shift) and (self[x2].IsTextLine)
+			x2++
+		
+		|| d = .FindDrawInfo(x2)									#debug_require
+		|| r = d.drawrange
+		x2 = r.x2
+		if (i > 0) and (keys.shift) and (d is avoidlastchar) and !d.endswithline
+			//
+		  elseif (d is AvoidLastChar) and canavoid
+			x2 = x2 - .text
+		return (r.x, x2)(i < 0) 
+ 
+
+	helper FindDrawSelMove (|intrange| t, |int| i, |bool|page, |ivec2|)
+		opt norefcounts		
+		debug_require i.abs == 1
+		|| pos = t.x2
+		ifn keys.shift
+			t = t.resolve
+			pos = (t.x, t.x2)(i < 0)
+			if (t.width) and (pos > 0) and (i > 0) and (self[pos-1].IsTextLine)
+				pos--
+		if page
+			i *= (.maxvisiblelines-1)
+		|| d = .FindDrawInfo(pos)
+		|| x = 0
+		if !t.width or keys.shift
+			x = d.xOfChar(Pos)
+		  else
+			x = d.xofchar(t.lower)
+		|| movedCount = 0
+		d = d.move(i, movedCount, true) 
+		if MovedCount
+			return .lastlinefix(d, x)
+		if i > 0
+			return (d.after, 0)
+			
+	
+	behaviour Draw
+		opt norefcounts
+		Where.DrawRect(.lastrect, .gnormal)
+		(where.ControlClip ±= 1)
+		
+		.PrepareLinesOfText
+		.DrawPreparedText(where)
+		if self is editable or alwaysscrollable
+			.DrawSel(where)
+			ifn .CanSeeAllLines
+				where.ControlClip = self // :) /// restore!
+				scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer)
+	
+			
+	helper DrawPreparedText (|image| where)
+		opt norefcounts
+		|| d		= .Start						#debug_require
+		|| Base 	= 0
+		|| N		= .MaxVisibleLines
+		|| inl		= (.isinline != nil)
+		|| y		= ((.lineheight|int| - font.height) + .top) - inl
+		|| lc		= .LineNumColor
+		ifn self is editable
+			y += 2
+		ifn .isinline
+			y -= 2
+		y--
+		|| yen		= .bottom
+		|| UseCol	= .UseColorAnyway
+		while (y > yen) and (d)
+			y -= .LineHeight
+			.DrawOneLine(where, D, y, usecol, lc)
+			d++
+
+		.CanSeeAllLines = (.Start.position == 0) and (d==nil) // oop
+
+
+	function MaxWidthInChars (|int|)
+		|| C = (.width - 9) / font.Width
+		return c max 16
+
+
+	function MaxVisibleLines (|int|)	
+		return (.height / .lineheight|int|)
+	
+	
+	behaviour MouseMove
+		.ShowExtraInfo(p)
+		return .MouseMovedScroll(p, .ScrollDrawTimer)
+	
+	
+	helper ShowNoExtra
+		(.OnShowExtraInfo)(self, (0,0), nil, "")?
+	
+
+	helper ShowExtraInfo (|ivec2| P)
+		opt NoRefCounts
+		require .isjeeboxmode and .OnShowExtraInfo
+		if !keys.cmd
+			return .ShowNoExtra
+		// +(0,2) cos its too easy to slip down to lower line
+		|textviewline| d
+		|| B = .ByteAtXY(P+(0,2), d).x
+		.ShowExtraInfoAtPos(B, "")
+	
+	helper ShowExtraInfoAtPos (|int| B, |string| reason)
+		opt NoRefCounts
+		require .OnShowExtraInfo
+		|| xy = (0,0)
+		|| M = .ClickedMsg(B)
+			xy = .XYOfChar(M.position)
+		(.OnShowExtraInfo)(self, XY, M, reason)
+
+
+	function Start (|TextViewLine|)
+		return ._Start
+	
+	
+	function Start (assigns:|TextViewLine| d)
+		cpp_part StartAtLine
+		.StartWithoutScrollDraw = d
+		.ScrollDrawTimer = scroller.timer
+
+
+	function Start (assigns:|int| v)
+		cpp_part StartAtInt
+		.start = .lines.first.move(V)
+		
+
+	helper StartWithoutScrollDraw (assigns:|TextViewLine| d)
+		opt norefcounts
+		|| last = .lines.last.move(3 - .maxvisiblelines)
+		if d gt last
+			d = last
+		._Start = d
+		.ShowNoExtra
+			
+	
+	function Clear (|string| newtext, |bool| KeepStart=false)
+		if super.textset(newtext) or !newtext
+			if !keepstart
+				|| sel = (.text.length, 0)(.singleline) 
+				.TypingPlaceDirect((sel,sel))
+			.ScrollDrawTimer = 0
+			.TextAlteredForDraw |= 2 // this might not clear text?
+			if !Keepstart
+				.lines.clear
+				._Start = .addvline
+				._start.position = -1
+				.ShowNoExtra
+				// we aren't clearing anything if we undo?
+				// so when does it happen?
+				// just on draw?
+
+	
+	helper AddVline (|textviewline|)
+		opt norefcounts
+		|| d = textviewline(0)
+		.lines <~ d
+		return d
+
+
+	helper NeedsPrepare (|int|)
+		|| t	= .TextAlteredForDraw
+		.TextAlteredForDraw = 0
+		|| CW	= .MaxWidthInChars
+		|| ldw	= .LastDrawWidth
+		.LastDrawWidth = CW
+		if (!.lines.first) or (t & 2)
+			return 2
+		if (CW != ldw)
+			return 1
+
+
+	function string.Bounds (|ivec2|)
+		require self
+		|| w = 0
+		rz.y = 1
+		for c in self
+			if c.istextline
+				rz.y++
+				(rz.x max= w) 
+				w = 0
+			  elseif c != '\t'
+				w++
+			  else
+				w += w.tabswidth
+		(rz.x max= w)
+
+
+	function TextSize (|string|s, |ivec2|)
+		|| mul = (font.width, .lineheight)
+		|| bd  = s.bounds
+		|| add = (6, 0)
+		return bd * mul + add 
+
+
+	helper CanParse (|int| Expect, |bool|)
+		//require ._viewing // makes no sense // find a better way... we need to color stuff!
+		require (expect >= 2)
+		require !.singleline
+// Just segment for longer files. No one needs 10000KB file word-wrapped.
+		return .text.length < 256K	// my largest jb file is 60k! 
+
+
+	helper ParsedMessage (|message|)
+		if ._viewing
+			return ._viewing.DocParsed
+		
+
+	helper ParsedMessage (assigns:|message|)
+		opt norefcounts
+		with ._viewing
+			if self.expectsparse > 2
+				.docparsed = value
+				.docerror = self.myerror
+			  else
+				.docparsed = nil
+				.docerror = nil
+				
+
+	helper ViewParse (|message|)
+		cpp_Part ViewParse0
+		return .ViewParse(false, .FindExpectsParse)
+
+
+	helper ViewParse (|bool| Changed, |int| expect, |message|)
+		//opt norefcounts
+		if !.canparse(expect)
+			.myerror = nil // crappy bugfix
+			return nil
+		
+		|| p = .ParsedMessage
+		if p and !changed
+			return p
+		|| sel = .sel
+		if !sel.width and sel.x > 0
+			parser.dotinsertallow = true
+		p = .text.ParseWithError(.myerror)
+		if p
+			p.obj = .path
+		.ParsedMessage = p
+		
+		if expect <= 1
+			.myerror = nil
+		  elseif .myerror
+			.lineerroradd(.myerror)
+		  elseif .coloriseasroot
+			.ColoriseRoot(p)
+		return p
+	
+	
+	helper ColoriseRoot (|message| p)
+		opt norefcounts
+		for m in p	// do this directly in the actual coloriser!!
+					// uncool to do this here
+			if (m == @tmp) and .coloriseasroot.ValueLower(m.name)
+				m.flags |= textview.NotRoot
+	
+	
+	helper TryColorise (|bool|)
+		opt norefcounts
+		if .ParsedMessage and app.needreg("(To alter your syntax text-color.)")
+			return ¥.randomise(self)
+		return true
+
+
+	helper IsCleared (|bool|)
+		opt norefcounts
+		|| d = .lines.first
+		return !d or d.position < 0
+
+
+	helper StartPos (|int|)
+		opt norefcounts
+		rz = ._start.position
+		if rz < 0
+			rz = 0
+			._start.position = 0
+
+	helper EndGap (|bool|)
+		opt norefcounts
+		require .PreferStayAtEnd
+		|| curr = .lines.last
+		|| lim = .MaxVisibleLines
+		|| rz = 0
+		while curr != ._start
+			require curr and rz < lim
+			curr--
+			rz++
+		return true
+		
+	helper FindStayAtEnd (|textviewline|) // findend
+		opt norefcounts
+		return .lines.last.move(1 - .MaxVisibleLines, nil, true)
+
+	helper PrepareLinesOfText
+		opt norefcounts
+		|| Changed  = .NeedsPrepare #require
+		|| expect	= .FindExpectsParse
+		|| msg   	= .ViewParse(changed >= 2, expect)
+		|| ParsedOK = msg!=nil
+		|| Pos	 	= .StartPos
+		|| isinl 	= .singleline
+		|| d	 	= .lines.first
+		|| p	 	= 0
+		|| v	 	= 0
+		|| t	 	= 1
+		|| StayAtEnd = .Endgap
+		.LineNumWidth = (.text.TextLineCount.LineNumWidth,  0)(Expect >= 3)
+		
+		|int| CharW	= .LastDrawWidth - .LineNumWidth
+		if .singleline
+			charw = 4KB
+		
+		while v < 256K // too much!
+			d.vline = v++
+			p = d.FindWhereLineBreaks(.text, CharW, isinl, p)
+			t = d.SetErrorsAndStuff(self, t)
+			if expect >= 2
+				msg = d.colorise(msg, ParsedOK)
+			if p < 0
+				exit
+			d++
+			d := .addvline
+		
+		d.RemoveAfter
+		.PreferPrevLine = false
+		if StayAtEnd
+			d = .FindStayAtEnd
+		if !StayAtEnd or !d
+			d = .FindDrawInfoSub2(pos, nil, false)
+		.StartWithoutScrollDraw = d
+	
+	
+	function ScrollToEnd
+		opt norefcounts
+		.window.reflow
+		.preparelinesoftext // sigh
+		.StartWithoutScrollDraw = .FindStayAtEnd
+		
+	helper TextCopy (GUICopyEvent)
+		return self[.selrange]
+
+	
+	function ScrollPos (|int|)
+		return ._Start.position?
+
+	
+	function ScrollPos (assigns:|int|)
+		opt norefcounts
+		for c in .lines
+			if c.after > value
+				._Start = c
+				return
+		.scrolltoend
+
+
+	helper UnloadDoc (|document| old)
+		old.ScrollPos = .scrollpos
+		old.sel = .selrange
+		if old <= 1
+			old.clear
+		.document = nil
+
+
+	function LoadDocument (|document| D, |bool|)
+		debug_require d
+		|| old = .document
+			require .GroupSaveAll or old.DocClose
+			.UnloadDoc(old)
+		
+		if d.load
+			.document = d
+			.MyError = nil
+			.sel = d.sel
+			return true
+		
+		.clear("")			// NOW... 
+
+
+	helper TextPaste (GUIPasteEvent)
+		if (self is editable) and (purpose & copypasteflags.PasteTextLike)
+			if data > 1
+				.undochecker = -1
+			.insert(data)
+			return true
+
+
+	helper FindExpectsParse (|int|)
+		if .expectsparse
+			if .ExpectsParse >= 3
+				return .ExpectsParse
+			if .text.HasWord("<?jb?>") or .text.hasword("//jb")
+				return 3
+			return .expectsparse
+
+	helper isjeeboxmode (|bool|)
+		return .FindExpectsParse >= 2
+
+
+	flags
+		NotRoot = 0x800
+
+	module
+		|| csAntiWords		= makeanti()
+		|| CounterParts		= <(`{[(`'"|`)>
+		|| CounterParts2	= <(`}])`'"|`)>
+		
+		function makeanti (|charset|)
+			return jeebox.CSWordMiddle.Invert
+
+
+helper string.InsertTrim (|ivec2|)
+	|| i = .find('<')
+		|| i2 = .find('>', i)
+		return (i, i2-1)
+	i = .length
+	return (i, i)
+
+
+helper string.InsertFix (|ivec2|r, |string|)
+	|| fs = faststring()
+	fs <~ self[0,       r.x]
+	fs <~ self[r.x+1,   r.x2+1]
+	fs <~ self[r.x2+2,  int.max]
+	return fs
+
+
+
+//	To fix textview style errors... dump viewline info?
+//		"range, text, parsed-msgs + their ranges"
+//	Rise and become alive..... // RISE MY CHILD!
+

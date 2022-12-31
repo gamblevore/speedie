@@ -1,0 +1,56 @@
+
+
+function compiler.usingScript (|file|f, |file|)
+	require !f.isdir
+	require f.readall starts "#!/"
+	rz = feedback.TryUseProject(f.path, true).scriptlocation.file
+	if rz
+		error.AutoPrint = 0 
+		options.scripting = true
+		options.silent = true
+		options.PrintCompileString = false
+		options.OperationCount++
+		app.rawargs.remove(0)
+
+
+function compiler.ScriptRecompile (|file|f, |file|script_build, |bool|)
+	if !script_build.exists
+		return true
+	if (script_build.modified < f.modified)
+		return true
+
+
+function compiler.TryVariousStartModes (|bool|)
+	require !interact.shouldenter	
+	|| p = app.rawargs[0]
+	require p and !p.argname and !app..perry
+			
+	|| f   = p.file
+	|| it  = compiler.usingScript(f)$
+	|| cwd = app.cwd
+	if compiler.ScriptRecompile(f, it)
+		compiler.CompileTime
+	if it.exists and stderr.ok
+		app.cwd = cwd
+		app.turninto(it.path, app.rawargs)
+	return true
+
+
+function string.ContainerName (|string|ext, |string|)
+	|| After = .find(ext.PathDir)
+		return self[0, after].name
+
+
+function string.SpdScriptName (|string|)
+	// if we are in fizz.scproj... use fizz.
+	rz  = .ContainerName(".scproj")
+	rz := .ContainerName(".uwu")
+	rz := .name.trimextandpath
+
+	
+function string.ScriptLocation (|string| container = "/tmp/SpeedieApps/", |string|)
+	|| full = .Resolve oar self
+	container = container[full.hash|int64|.abs.render]
+	container.makeentirepath
+	return container[full.SpdScriptName]
+

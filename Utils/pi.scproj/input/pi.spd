@@ -1,0 +1,6 @@
+#!/usr/local/bin/spd
+
+main
+	"Please enter a number:"	
+	|| input = app.input.int
+	"$input * π = ${input*π}" 

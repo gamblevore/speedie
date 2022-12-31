@@ -1,0 +1,6 @@
+
+roots
+	"@spd/Library/library.input/"
+	"@spd/Jeebox.scproj/jeebox.input/"
+	// extra roots to search from can be stored here.
+	// These 'extra roots' are not compiled.

@@ -1,0 +1,72 @@
+
+
+struct ASM2 // µfunc uses this
+	|byte|		Op
+	|byte|		Label // 255 labels per function
+	|byte[2]|	Nothing
+	|byte[4]|	r
+	|int|		Rest
+	|uint|		Debug
+	
+	operator isa (|int| m, |bool|)
+		return m == .op
+	
+	// OK so this should encode nicely! and fast too!
+	// now we just need to make sure the asm always has a form!
+	// we'll do that later!
+		
+	function fs (|faststring| fs)
+		opt norefcounts
+		|| op = instruction.typelist[.op]
+		fs <~ op.name
+		fs <~ ':'
+		fs <~ (' ', 5-op.name.length)
+		|| gotany = ""
+		|| remain = 25
+		|| f = op.sizes
+		for i in 5
+			|| bs = f[i].bitsize
+			if remain > 0 and bs
+				fs <~ gotany
+				gotany = ", "
+				if f[i].isreg
+					fs <~ 'r'
+				if i >= 4
+					fs <~ .rest
+				  else
+					fs <~ .r[i]
+				remain += bs
+
+	function Print
+		if asm.NoisyASM >= 3
+			printline .render
+	
+	render
+		.fs(fs)
+
+ 
+class µFunc1 (memory)
+	linkage
+		cpp_class ASMFunc2
+		cpp_part ASMFunc2
+	contains ASM
+	
+	function Run (|&int64| Args = nil, |int| ArgCount=nil, |int64|)
+		cpp_part RunArgs
+		if args
+			|| vm	= jb_vm.vm
+			|| r	= vm.ClearRegisters(argcount)
+			for i in argcount
+				r[i] = args[i] 
+		
+		return jb_vm.Run(.ptr, .length)
+
+
+
+// we are gonna use asm2 to store the ASM... opt it after.
+
+function abctest
+	visible
+	|asm2| Test
+	test.rest = 1
+

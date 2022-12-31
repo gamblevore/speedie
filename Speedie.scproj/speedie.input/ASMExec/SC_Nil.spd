@@ -1,0 +1,12 @@
+
+
+ignore
+	datatype NilState (byte)
+		constants
+			|nilstate|
+			CanBeNil = 1
+			CanExist = 2
+			Unknown  = 3
+			IsNil    = 1
+			NotNil   = 2
+			

@@ -1,0 +1,6 @@
+uploadable
+
+roots 
+	"@spd/Library/library.input/"
+	"@spd/Jeebox.scproj/jeebox.input/"
+	"@spd/gui.scproj/gui.input/"

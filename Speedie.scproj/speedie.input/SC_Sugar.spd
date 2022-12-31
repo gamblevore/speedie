@@ -1,0 +1,78 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+function TypeOfDotDotDot (ExprResolver)
+	using (exp)
+		exp.become(@bra)
+		|| P = exp.parent
+		|| c = exp
+		while p != @prm and @arr
+			expect (p and p!=@arg) (exp, "Should be in a list.")
+			c = p
+			p = p.parent
+		
+		c.next = «dot "max", «thg "int"», «emb »»
+	return TypeOfExpr(exp.first, name_space)
+
+
+function message.Tran_QMark 
+	using (self)
+	|| thedot		= .first$
+	|| IsNormal		= (thedot == @dot or @sdot or @func) 
+	expect (isnormal or thedot == @bra) (thedot, "Should look like a.b?  or  .b?  or  (a)(b)?  or  a.b ?= c  or  (a) ?= b")
+	if thedot == @sdot
+		scfunction.Tran_Sdt(thedot)
+	|| inside = (thedot.first, thedot)(isnormal)
+	if thedot == @func
+		require inside.expect(@bra)
+		inside = inside.first
+	
+	|| arg			= self
+	|| p			= .parent
+	|| UseTernary	= false
+	if P == @arg
+		.become(@arg)
+	  elseif p == @rel and !.prev and p.parent!=@decl						// a.b? = c --> (a.b = c)?
+		.become(@arg)
+		.replacewith(thedot)
+		p.wrapwith(self)
+	  else
+		UseTernary = true
+		.become(@bra)
+		arg = @arg.msg(self, "")
+
+	|| vn	= inside.name
+	if inside != @thg	// or if it is a global? like module.property
+						// how can i tell? lol. sigh... i guess just test it
+		vn	= UniqueTmpVar(nil, "_INSID")
+		inside.replaceWith(@thg.msg(vn))
+		arg <~ makedecl( "",  vn,  inside)
+
+	ifn UseTernary
+/*		a().b?
+		{|| y = a(), if y: y.b }
+*/
+		|| iff		= @tmp.msg(arg, "if")
+		|| test		= @thg.msg(iff, vn)
+		|| arg2		= @arg.msg(iff, "")
+		arg2 <~ (p, thedot)(p == @rel)
+
+
+	else
+/*		x = a().b?
+		x = ({      || y = a(),    (y.b, "")(y)    })
+*/
+		|| into		= @tmp.msg(arg,	"rejoin")
+		|| func		= @func.msg(into, "")
+		|| tern1	= @list.msg(func, "")
+		tern1 <~ thedot
+		if arg != self
+			tern1 <~ (@thg, "nil") 
+		|| tern2	= @prm.msg(func, "")
+		tern2 <~ (@thg, vn)
+
+

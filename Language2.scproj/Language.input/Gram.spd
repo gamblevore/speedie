@@ -1,0 +1,226 @@
+
+
+datatype Gram (uint64) {
+	flags List {
+		|gram|
+		// n = unknown_gender, m = male, l = genderless
+		audience	= (us,			you,		other,)
+		doer		= (actor,		viewer,		self_,)		// we replace self_ with self
+		gender		= (genderless,  male,		female,  unknown_gender,)
+		plurality	= (uncountable, single,		plural,)
+		formality	= (formal,		informal,)
+		oldness		= (modern,		ancient,)				// old-style speak. Like: "thou, whomst, one". 
+		specifics   = (temporary,	permanent,  near,		far) // "this" and "that"
+		size		= (biggest,		bigger,		medium,		smaller,	smallest,)
+		tense		= (
+			present_simple					// i run, he runs 
+			present_continuous				// i am~running	
+			present_perfect					// i have~ran	
+			present_perfect_continuous		// i have~been~running	
+
+			past_simple						// i ran
+			past_continuous					// i was~running	
+			past_perfect					// i had~run	
+			past_perfect_continuous			// i had~been~running
+			
+			future_simple					// i will~run	
+			future_continuous				// i will~be~running	
+			future_perfect					// i will~have~ran	
+			future_perfect_continuous		// i will~have~been~running	
+
+			timeless						// i like %to~run, i can~run
+			conditional						// i could~run
+			past_idea						// i would~have~run
+			present_idea					// i would~run	
+			command_yes						// run!
+			command_no						// dont~run!
+		)
+		
+
+		HighestBitMarker
+
+		// names that make more sense to me.
+		past	= future_perfect+present_perfect+past_simple	// i ran, i have~ran, i will~have~ran
+		present	= present_continuous							// i am~running
+		future	= future_simple									// i will~run
+		spread	= present_simple								// i run
+		continuous	= past_continuous + present_continuous + future_continuous
+		past_complete = past_perfect
+
+		
+		preterite   = past_complete
+		imperfect   = past_continuous
+
+//	imperfect:
+//		We used to eat lunch together every day.			// 1. Habitual or Repeated Actions
+		// same as past, except implies no longer happens
+//		Every Saturday the ladies would go shopping.		// 1. Habitual or Repeated Actions
+//		I was going to class when the telephone rang.		// 2. Actions that Were in Progress in the Past
+//		My dad was cooking when I came in the house.		// 2. Actions that Were in Progress in the Past
+//		Sometimes her hands and feet ached.					// 2. Actions that Were in Progress in the Past
+
+
+
+		i			= us	+	single
+		we			= us	+	plural
+		thou		= you	+	single
+		youse		= you	+	plural
+		em			= other	+	single
+		them		= other +	plural
+		she			= other	+	single + female 
+		he			= other	+	single + male
+		command		= command_yes + command_no
+		idea		= past_idea + present_idea
+		basictense  = past_perfect + present_simple + future_simple + timeless + conditional + past_idea + present_idea + command_yes + command_no
+		would		= conditional
+		f = female
+		m = male
+		p = plural
+		s = single
+	}
+
+/*
+	// whats the difference?
+		he ran			#while %eating chips
+		he was~running	#while %eating chips
+*/
+
+	function PreferedScore (|gram|) {
+		return self // already sorted
+	}
+
+	function Default (|gram|)
+		ifn self&formality
+			self (|)= informal
+		ifn self&oldness
+			self (|)= modern
+		return self
+		
+
+	render RenderAll {
+		|| D = gram.list
+		fs <~ '('
+		for code in D (key)
+			if (self & code) and code.ispo2
+				fs <~ key
+				fs <~ ", "
+		fs <~ ')'
+	}
+	
+	render {
+		|| Started = false
+		|| g = .unimprove
+		|| D = list()
+		if G & modern == modern
+			G &=~ modern
+		if G & informal == informal
+			G &=~ informal
+
+		for code in D (key)
+			|| C = code
+			if (G & C) and (C.ispo2)
+				G &=~ C
+				fs <~ ' '
+				if !Started
+					Started = true
+					fs <~ '('
+				fs <~ key
+
+		if started
+			fs <~ ')'
+	}
+
+
+	function Solo (|gram|)
+		|| result
+		for r in gram.components
+			if (self&r).ispo2
+				result (|)= self&r
+		debug_require result.ispo2
+		return result
+	
+	
+	function ScorePart (|gram| orig, |uint|) {
+		|| opp = _logictest(orig, self)				#require
+		|| score = (self xor orig).countbits
+		debugat
+		if opp & 0b001
+			score += 128
+		// However, left side is worse than right? just run the test..
+		// how much worse? dunno lol.
+		if opp & 0b100
+			score += 256
+
+		return score
+	}
+	
+	
+	operator merge (|Gram| SideWith, |gram|) {
+		|| M = SideWith // side with this, if we can't find anything. else just merge
+		for T in gram.components
+			|| M2 = M & T & self
+			if (M2)
+				M &= ~T
+				M (|)= M2
+		return M
+	}
+		
+	operator override (|Gram| stronger, |gram|) {
+		|| result
+		for T in gram.components
+			|| T2 = T & stronger
+			|| S2 = T & self
+
+			if (T2 != T) and T2
+				result (|)= T2
+			  elseif ((S2!=T) and s2)
+				result (|)= s2
+			  else
+				result (|)= t
+
+		return result
+	}
+	
+	
+	operator vs (|Gram| orig, |uint|) {
+		|| Result
+		for r in gram.components
+			|| sr = self&r
+			|| OR = Orig&R
+			Result += sr.ScorePart(OR)
+		return result
+	}
+	
+	
+	module {
+		function HighestBit (|int|)
+			return Gram.HighestBitmarker|int|.log2-1
+		function Free (|int|)
+			return 64 - gram.HighestBit
+		function Select (|message| oof, |gram|)
+			|| name = oof.id
+			return gram.list[name]
+
+		|| Components = {tense, formality, plurality, gender, doer, audience, oldness, Specifics, size} 
+	}
+}
+
+
+
+// (u,p,n)/(u,s,n)/(y,s,n)/(t,p,n)
+// we/i/you/they have been
+
+// (t,s,m)/(t,s,f)/(t,s,l)
+//   he/she/it   has been
+
+// we/you/they were
+// i/she/he/it was
+
+// i want some way to specify variants
+// we/she/i/you/they...
+// rther than compose them...
+// because... we lose accuracy.
+// what accuracies have been lost?
+// what if I keep the existing system, but add along side...
+// a "specifics" system? _we/_us/_they_m/_they_f/_you/_he/_she/_it/_i/
+

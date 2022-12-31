@@ -1,0 +1,46 @@
+
+/*
+	Jeebox internals.
+*/
+
+
+module Platform
+	function Name (|string|)
+		cpp_wrapper JB_Platform
+
+	function osx (|bool|)
+		return .name=="osx"
+
+	function linux (|bool|)
+		return .name=="lin"
+
+	function windows (|bool|)
+		return .name=="win"
+
+	function IsDebug (|bool|)
+		cpp_Wrapper JB_IsDebug
+	
+	function Release (|bool|)
+		return !.Isdebug
+
+	function PointerBits (|int|)
+		cpp_wrapper JB_PointerSize
+
+	function PointerBytes (|int|)
+		return .PointerBits >> 03
+
+	function Is64Bit (|bool|)
+		return .PointerBits == 64
+		
+	function Log (|string| s)
+		if !.logger
+			.OpenLog
+		.logger <~ s
+		.Logger <~ "\n"
+	
+	helper OpenLog (|string| path = "")
+		path   := file.logs[app.AppName + ".log"]
+		.logger = path.file
+		.Logger.OpenEmpty
+	|file| Logger
+		

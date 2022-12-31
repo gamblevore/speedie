@@ -1,0 +1,118 @@
+
+/*
+	Jeebox internals
+*/
+
+
+struct Random
+	linkage
+		cpp_part Rnd
+	|uint64| Store
+	|uint64| State
+	
+	saveas struct
+
+	function int (|int64|)
+		|| s = ++.state
+		rz = (.store + s).hash
+		.store = rz		
+		
+	setter Seed (|uint64|) 
+		.store = value
+		.state = 1
+		
+	function Reseed
+		.seed = date()
+	
+	function Text (|int| n, |byte|a, |byte|b, |string|)
+		rz = string(n)$
+		|| addr = rz.addr
+		for i in n
+			addr[i] = self[a,b]
+	
+	
+	function Texts (|int| array_len, |int| item_len, |[string]|)
+		for array_len
+			rz <~ .text(item_len, 'a', 'z')
+	
+	
+	function Data (|int| n, |string|)
+		|| m = n|int64|.alignto(8)
+		|| s = string(m)
+			|| addr = s.addr|&int64|
+			for i in m>>3
+				addr[i] = .int
+			return s[0,n]
+	
+	function Int (|f64| n, |int64|) 
+		return .Double * n
+
+	function Double (|f64|)
+		rz = .int|uint64|
+		rz /= 18446744073709551616.0 
+
+	function Float (|float|) 
+		return .double
+	
+	function Float (|float| From, |float| To, |float|) 
+		cpp_part FloatRange
+		return (.double * (To - From)) + From
+	
+	function Float (|float| To, |float|) 
+		cpp_part FloatScale
+		return (.double * To)
+
+	syntax access (|float| From, |float| To, |float|) 
+		cpp_part AccessRange
+		return .float(from, to)
+	
+	syntax access (|float| To, |float|) 
+		cpp_part AccessScale
+		return .float(to)
+
+	syntax access (|float| From, |float| To, |float| step, |float|)
+		cpp_part AccessStep
+		if !step
+			return self[from, to]
+		rz = self[from, to+step]
+		rz -= rz modf step
+		
+	syntax access (|f64|)
+		return .double
+		
+	syntax access (|float| From, |float| To, |float|step, |float| Pow, |float|) 
+		cpp_part AccessPow
+		rz = self[from, to, step]
+		rz = rz.rangeconvert(from, to, 1, 0)
+		rz = rz pow pow
+		rz = rz.rangeconvert(1, 0, from, to)
+
+	function Temporal (|Memory| mem)
+		|| p = mem.ptr|&uint64|
+		|| after = (mem.ptr + mem.ByteCapacity - 7)|&uint64|
+		while p < after
+			*p++ = .int
+		mem.Length = mem.Capacity
+	
+	function Init
+		if !.store
+			.reseed
+	
+		
+	module  // module random
+		|Random| Shared
+		.shared.reseed
+
+		macro syntaxaccess
+			random.shared[...]
+
+
+function int.rand (|int|)
+	return random.shared.int(self)
+
+function uint64.now (|uint64|)
+	return date.hash mod self
+
+function int.now (|uint64|)
+	return self|uint64|.now
+

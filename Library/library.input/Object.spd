@@ -1,0 +1,199 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class Object
+	linkage
+		wrapper
+		cpp_class JB_Object
+	
+	virtual Render (|FastString|fs_in=nil, |string|)
+		cpp_wrapper JB_ObjRender
+
+	helper GenericRender (|FastString| fs_in=nil)
+		cpp_wrapper JB_Obj_GenericRender
+
+	function Class (|&ClassData|)
+		cpp_wrapper JB_ObjClass
+
+	helper ClassBehaviours (|&byte|)
+		cpp_wrapper JB_ObjClassBehaviours
+
+	helper MemoryLayer (|MemoryLayer|)
+		cpp_wrapper JB_ObjLayer
+	
+	helper RefCount (|int|)
+		cpp_Wrapper JB_ObjRefCount
+	
+	helper ObjectID (|int|)			// stable across Runs!
+		cpp_wrapper JB_ObjID		// uses pos within the superblock :)
+	
+	function Dispose				// Safely clears out all the properties...
+		cpp_wrapper JB_ObjDestroy
+
+	
+	syntax cast (|bool|)
+		return self|bool|
+
+	operator isa (|&ClassData|x, |bool|)
+		cpp_part Isa
+		if (self)
+			|| P = .Class
+			if x == p
+				return true
+			require x.hassubclasses
+			p = p.parent
+			while (P|bool|)
+				if (P == x)
+					return true
+				P = P.Parent
+	
+	
+	helper MustBe (|&ClassData|x, |Message|ErrNode=nil, |bool|)
+		if self isa x
+			return true
+		error (errnode, "Expected class ${x.name|cstring|}")
+
+
+	operator fast_isa (|&ClassData|x, |bool|)
+		cpp_part FastIsa
+		return (self) and (.Class == x)
+
+
+	api DebugPrint  // more for use in XCode, than anything else.
+		cpp_name jdb
+		visible true
+		if self
+			print string.FromC(.class.name)
+			print ": "
+		printline .render
+
+		
+	helper SyntaxExpect ( |string| Error )
+		visible
+		cpp_part Fail
+		
+		if self isa message
+			StdErr.NewError( self, Error )
+		  else
+			StdErr.NewError( Error )
+
+
+	helper string.SyntaxWarn
+		cpp_part Warn
+		StdErr.Newwarning( self )
+	
+
+	module
+		function DebugAllMemory (assigns:|bool|)
+			cpp_wrapper JB_TotalMemorySet
+
+
+struct ClassData
+	linkage
+		wrapper
+		cpp_class JB_Class
+	
+	|&ClassData|			Parent
+	|&ClassData|			NextClass
+	|cstring|				Name
+	|fpDestructor|			Destructor
+	|&byte|					SaveInfo
+	|bool|					HasSubclasses
+	|int|					Size
+	
+	function Init (|&MemoryWorld| World, |int| Size)
+		// don't call this... unless you create one yourself.
+		cpp_wrapper JB_Class_Init
+	
+	function AllocZeroed (|Object|)
+		cpp_Wrapper JB_Class_AllocZeroed
+
+	function CreateLayer (|Object| obj, |MemoryLayer|)
+		cpp_Wrapper JB_Mem_CreateLayer
+
+	function Layer (|MemoryLayer|)
+		cpp_Wrapper JB_Class_Layer
+	
+	function Count (|int|)
+		disabled "huh?"
+
+	function CurrLayer (|MemoryLayer|)
+		return .layer
+
+	function DefaultLayer (|MemoryLayer|)
+		cpp_Wrapper JB_Class_DefaultLayer
+
+	function Restore
+		.DefaultLayer.Use
+
+	
+	iterator
+		|| curr = self
+		while (curr)
+			yield curr
+			curr = curr.nextclass
+
+
+function DebugAt (|int| i=1)
+	cpp_nothing JB_DoAt
+
+
+cpp_nothing JB_SetRef				(|Object| A,			|Object| B)
+cpp_nothing JB_Incr					(|Object| Obj)
+cpp_nothing JB_FreeIfDead			(|Object| Obj,			|int|)
+cpp_nothing JB_SafeDecr 			(|Object| Obj,			|Object|)
+cpp_nothing JB_Decr					(|Object| Obj)
+cpp_nothing JB_Ternary				(|Object| Obj,			|int|) // weird, only 1 param?
+cpp_nothing JB_Swap					(|&Object| A,			|&Object| B) // weird, only 1 param?
+cpp_wrapper JB_Delete				(|object| Obj)
+cpp_wrapper JB_FindLeakedObject 	(|object| Obj,			|array| dest)
+cpp_wrapper JB_Mem_ClassLeakCounter ()
+cpp_wrapper JB_Str3					(|Object| Data,			|int| N, |string|)
+cpp_nothing JB_New					(|&ClassData|  Class,	|Object|)
+cpp_nothing JB_LayerNew				(|MemoryLayer| L,		|&ClassData| Class, |Object|)
+
+
+
+/// debugging
+cpp_wrapper	JB_MemCount			(|int|)
+prototype	fpDestructor		(|object| self)
+
+
+
+struct MemoryWorld
+	linkage
+		wrapper
+		cpp_class JB_MemoryWorld
+
+	|&Byte|		 	Name
+	|Byte|			SuperSize
+	|Byte|			BlockSize
+	|Byte|			ShadowSize
+	|Byte|			Alignment
+
+
+
+class MemoryLayer
+	linkage
+		wrapper
+		cpp_class JB_MemoryLayer
+		cpp_part  Mem
+
+	|Object|		Obj
+	|Object|		Obj2
+	
+	constructor (|&ClassData| Cls)
+		cpp_wrapper JB_Mem_Constructor
+
+	function LayerClass (|&ClassData|)
+		disabled "unused?"
+
+	function Use
+		cpp_wrapper JB_Mem_Use
+
+
+
+

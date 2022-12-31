@@ -1,0 +1,303 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |string| name="", |Message|)
+	Opt NoRefCounts
+	cpp_part NewParentName
+	rz = Message.new(parent, func, Start, name, .nextstart - start)
+	// if rz.extra < 0
+
+
+function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |int| End, |Message|)
+	Opt NoRefCounts
+	cpp_part NewParent
+	|| name = parser[start, end]
+	rz = Message.new(Parent, func, Start, name, end - start)
+	// if rz.extra < 0
+
+
+function parser.NewWord ( |Message| P, |Syntax| F, |int| Start, |int| SearchFrom, |Message|)
+	Opt NoRefCounts
+	|| after = parser.WordAfter( SearchFrom )
+	|| name = parser[searchfrom, after]
+	rz = message.New( P, F, start, name, after - start )
+	// if rz.extra < 0
+
+
+function parser.NewEmpty ( |Message| P, |Syntax| F, |int| Start, |int| After, |Message|)
+	Opt NoRefCounts
+	rz = message.new(P, F, start, "", after - start)
+	// if rz.extra < 0
+
+
+function parser.NewSkip ( |Message| P, |Syntax| F, |int| Start, |int| NameStart, |int| NameEnd, |Message|)
+	Opt NoRefCounts
+	|| name = parser[namestart, nameend]
+	rz = message.New( P, F, start, name, parser.nextstart - start )
+	// if rz.extra < 0
+
+
+
+//////////////////////////////////////////////////
+
+function String.ParseJSON (|Messageroot|)
+	|| tmp = Jeebox.UnEscapeStr
+	jeebox.UnEscapeStr = Jeebox.JS_UnEscapeStr
+	rz = .parse
+	jeebox.UnEscapeStr = tmp
+	rz.ConvertJSONToJB?
+
+
+function String.ParseWithError (|&Error| rec, |MessageRoot|)
+	visible
+	opt norefcounts // lol finally
+	* rec = nil
+	|| L = (message).layer
+	rz = .parse
+	if !rz
+		*rec = stderr.pop
+
+
+function String.HiddenJBin (|ind|)
+	|ind| nl = 0
+	if  self[0] == '#'  and  self[1] == '!' // shebang
+		nl = .find('\n') + 1
+		if nl == 0
+			return -1
+	if .isjbin
+		return nl
+	return -1
+
+
+function String.Parse (|syntax| owner = @arg, |MessageRoot|)
+	// language2.scproj uses owner
+	|| j = .HiddenJBin
+		return self[j, int.max].parse_jbin
+	if !Parser.CppInited
+	    Parser.Init
+
+	parser.StartParse( self )
+	parser.StopBars = 0
+	|| Count	= StdErr.errorCount
+	|| Flags	= parser.kTemporal
+	|| into		= message.new(nil, owner, 0, "", 0)
+	|| lines	= parser.ParseLoopFlags( into, "", Flags )
+	if !Lines and into.hasChildCount(1)
+		into = into.first // nice
+
+	parser.CleanSpaces
+	if parser.Running
+	    parser.Expect( 0 )
+	
+	parser.StopParse // clear error message
+	if Count == StdErr.ErrorCount
+		return into|MessageRoot|
+
+
+
+extend Parser
+	function fError (ParseHandler)
+	    return nil // seems OK... doesn't need to do more
+	function fError2 (ParseHandler)
+		return .erroradd("Unexpected syntax", start)
+	
+
+	function ErrorAlwaysAdd (|String| s, |ind|Start, |Message|)
+	    .ErrorStart = start
+		
+		// create msg for memory-layer
+		|| err				= Error.new(message())
+		err.Position		= Start
+		(err is dontstrip)
+		(err is parse)
+		err.name			= s
+	    err.originaldata	= .data
+		
+		stderr <~ err
+	
+	
+	function ErrorAdd (|String| s, |ind|Start = parser.NextStart, |Message|)
+		require .OK //  multiple errors... per parse gets STUPID.
+		return .ErrorAlwaysAdd(s, start)
+	
+
+	function OK (|bool|)
+		Return !.ErrorStart
+
+
+	function ErrorEvent (|int|Start, |int| ExpectedBits, |int| RealBits)
+	    visible true // called directly by the tokeniser... sorry :PPPP
+
+		|| Err = FastString.new
+	    ifn RealBits & kIllegalChar
+			ifn ExpectedBits and Realbits and FindError(expectedbits)
+	            err <~ "Unexpected "
+			  else
+	            for (5) { // 5, in case there is a bug causing infinite loop.
+	                ExpectedBits = MessageErrorSub( err, ExpectedBits, Realbits )
+	            } (ExpectedBits)
+	            err <~ " but found "
+
+		if (RealBits == kEndOfLine)
+			err <~ "end-of-line"
+
+		  elseif !RealBits
+			err <~ "end-of-data"
+
+		  else
+			if parser.NextStart <= start
+				parser.NextStart = start + 1
+
+			if (RealBits & kIllegalChar)
+				err <~ "Found illegal-character "
+	            || illegal = parser[start]
+	            if (illegal.CanPrintAsNormalChar) 
+	                err <~ '\''
+	                err <~ parser[start]
+	                err <~ '\''
+				  else
+	                err <~ "0x"
+	                err.AppendHex( illegal )
+	                err <~ ' '
+			  else
+	            err <~ '\''
+	            |ind| N = parser.NextStart min (start + 100)
+	            err <~ parser[ start, N ].escape
+	            err <~ '\''
+
+		Parser.ErrorAdd( err, start )
+
+
+	function FindError (|int| num, |int|)
+		if num == kThing: return kThing
+		for (ErrorNames) (Key)
+	        || i = key.parseint|int|
+			if (num & i) == i
+				return i
+
+
+	function MessageErrorSub (|FastString| fs, |int| num, |int| ButFound, |int|)
+		if (!ErrorNames)
+			ErrorNames = dictionary.new
+	        ErrorNames[kTemporal]           = "temporal"
+	        ErrorNames[kTemporalSyx]        = "declaration"
+	        ErrorNames[kTemporalWord]       = "statement"
+	        ErrorNames[kEndOfLine]          = "end-of-line"
+	        ErrorNames[kColon]              = "':'"
+	        ErrorNames[kOppSyx]             = "operator"
+	        ErrorNames[kOppWord]            = "operator"
+	        ErrorNames[kOpp]                = "operator"
+	        ErrorNames[kOppTemporal]        = "temporal-operator"
+	        ErrorNames[kThing]              = "a name"
+	        ErrorNames[kThingWord]          = "a name"
+	        ErrorNames[kThingSyx]           = "something"
+	        ErrorNames[kIllegalChar]        = "illegal-character"
+	    
+		if fs.length
+			fs <~ " / "
+		  else
+			fs <~ "Expected "
+
+		
+		|| BestValue = FindError(num)
+		if (BestValue)
+			fs <~ ErrorNames[ BestValue ]
+			return num &~ BestValue
+		
+		fs <~ "something else"
+
+
+
+struct MessagePosition
+	linkage
+		cpp_part MsgPos
+		noauto
+	
+	|int|               OldPosition
+	|int|               OldExtra
+	|MemoryLayer--|     OldLayer
+	
+	destructor
+	    parser.UsingPos = .OldPosition 
+	    parser.UsingExtra = .Oldextra 
+	    .OldLayer.use 
+	
+	function SyntaxUsingComplete 
+
+
+function Message.SyntaxUsing (|MessagePosition|)
+	Opt NoRefCounts
+	|messageposition| Result = nil
+	Result.OldPosition = parser.UsingPos
+	Result.OldLayer = (message).Layer
+	if (self)
+	    parser.UsingPos = .position
+	    parser.UsingExtra = .extra
+	    .memorylayer.use
+	  else
+	    debugger
+	
+	return Result
+
+
+api ringtree.jdb2
+	cpp_name jdb2
+	visible
+	if (Self)
+		printline self|message|.jdb_
+	  else
+	    "(nil)"
+
+api ringtree.jdb3
+	cpp_name jdb3
+	visible
+	if (Self)
+		printline self|message|.jdb_(3)
+	  else
+	    "(nil)"
+
+
+function byte.CanPrintAsNormalChar (|bool|)
+	return (self < 127 and self >= 32)
+
+
+function Message.SyntaxUsingComplete { }
+
+
+
+
+// remove tokenhandler_fp, its just parsehandler!
+prototype ParseHandler    (|int| Start, |message| Parent=nil, |Message|)
+prototype TokenHandler_fp (|int| Start, |message| parent=nil, |Object|)
+
+
+
+struct ParserLineAndIndent
+	|int|			Lines 
+	|int|			Indent
+	|int|			Commas
+	|int|			Pos
+	|bool|			IsDebug
+
+
+
+ 
+role MessageRoot (Message)
+	contains Message
+	linkage
+		noauto
+		pragma noearlyfree
+
+
+
+
+function message.StringOwner (|string|)
+	for fuck.flat in .root
+		|| owner = fuck.name.owner
+		if owner isa string
+			if owner.length > rz
+				rz = owner
+
