@@ -52,7 +52,7 @@ extend_module perry
 		|| monthly = .monthly_name(now)
 		|| daily_fol = "~/Backups/perry".file
 		|| monthly_fol = "~/Backups/perry_monthly".file
-		|| latest_local = perry.speediedir["Terminal"][latest.name]
+		|| latest_local = perry.speediedir["Terminal/Backup"][latest.name]
 
 		zip.copyto(latest_local)
 		zip.moveto(daily)
