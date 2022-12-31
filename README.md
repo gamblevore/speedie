@@ -21,7 +21,7 @@ I could say "well I have a GUI-system that is platform-independant"... except th
 
 I could say "Speedie is a language that accomplishes a lot from a very small code-base" which might be useful to embedded programmers... but then Speedie isn't ported to Linux yet.
 
-My language has a lot of good qualities but for each one, you can always find a reason why something else is better. Unfortunately that is because I am one person who has created a very large piece of work. Only extra devlopers contributing to Speedie can fix this.
+My language has a lot of good qualities but for each one, you can always find a reason why something else is better. Unfortunately that is because I am one person who has created a very large piece of work. Only extra developers contributing to Speedie can fix this.
 
 Honestly... the only reason to use Speedie right now, is if you find it interesting or fun.
 
@@ -36,9 +36,9 @@ Honestly... the only reason to use Speedie right now, is if you find it interest
 
 
 # Power Features #
-	* Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE-pointers/ifstreams/fread and do everything using low-level Unix APIs.)
-	* Doesn't infantilise you like Javascript or java does. Allows you to mess around with pointers or structs if you need... although its usually buggier approach. 
-	* Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
+* Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE-pointers/ifstreams/fread and do everything using low-level Unix APIs.)
+* Doesn't infantilise you like Javascript or java does. Allows you to mess around with pointers or structs if you need... although its usually buggier approach. 
+* Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
 	
 
 # Goals #
