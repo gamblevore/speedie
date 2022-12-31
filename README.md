@@ -33,11 +33,12 @@ Honestly... the only reason to use Speedie right now, is if you find it interest
 * Can make command-line apps or GUI apps.
 * IPC lets you communicate and spread work across multiple processes.
 * Has a native IDE (Perry), written specifically for Speedie. 
+* Competitive at multiple purposes. Good at fast and heavy-duty data-processing... or just making little tools with few lines of code... or writing large well-structured programs that deal with a lot of complexity.
 
 
 # Power Features #
 * Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE-pointers/ifstreams/fread and do everything using low-level Unix APIs.)
-* Doesn't infantilise you like Javascript or java does. Allows you to mess around with pointers or structs if you need... although its usually buggier approach. 
+* Doesn't infantilise you like Javascript or java does. Allows you to mess around with pointers or structs if you need... although its usually a buggier approach. 
 * Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
 	
 
