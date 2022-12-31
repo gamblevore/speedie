@@ -73,9 +73,9 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 
 # Install Via Perry (MacOSX only) #
 
-1) Download and run Perry.app
+1) Download and run Perry.app ( download at https://github.com/gamblevore/speedie/releases/ )
 2) Perry will ask, if you want it to install everything. Just press "OK".
-3) It should be installed.
+3) It should be installed. However you don't get the github tracking or xcode projects.
 
 
 
