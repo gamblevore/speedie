@@ -28,6 +28,8 @@ My language has a lot of good qualities but for each one, you can always find a 
 
 Honestly... the only reason to use Speedie right now, is if you find it interesting or fun.
 
+Becoming a contributor could be a great way to add programming concepts to a new language. Assuming they fit with the overall existing feature set and have efficient implementations.
+
 
 # General Features #
 * Object-oriented programming model
@@ -37,6 +39,7 @@ Honestly... the only reason to use Speedie right now, is if you find it interest
 * IPC lets you communicate and spread work across multiple processes.
 * Has a native IDE (Perry), written specifically for Speedie. 
 * Competitive at multiple purposes. Good at fast and heavy-duty data-processing... or just making little tools with few lines of code... or writing large well-structured programs that deal with a lot of complexity.
+* You might appreciate my IDE's design?
 
 
 # Power Features #
@@ -62,7 +65,7 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 
 # Install Via Github (MacOSX only) #
 
-1) Download the files via github, and install Speedie at ~/Speedie/
+1) Download the files via github, placing the repo at ~/Speedie/
 2) Run this command `ln -s  ~/Speedie/Terminal/Speedie /usr/local/bin/speedie`.
 	This will allow speedie to be run from the command-line. Also run `ln -s  ~/Speedie/Terminal/Speedie /usr/local/bin/spd` to make it quicker.
 3) If /usr/local/bin/ isnt in your command-line PATH, then you can find instructions on how to do that elsewhere. 
