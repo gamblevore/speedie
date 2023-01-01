@@ -2,10 +2,13 @@
 
 							Todo
 
-* fix xcode paths
 
-* Set up git for installs... sigh. better than my buggy installer.
-	* changing a file to a folder or back again... fails to update in the IDE. TryReloadPath?
+* fix xcode paths
+* update jeebox.org to reflect the new release!
+* build-system should INITIALLY not rely on the speedie executable... just a script built by speedie. :) with all the correct files needed.
+* func calledfrom (rightclick) should jump to exact line...
+
+* changing a file to a folder or back again... fails to update in the IDE. TryReloadPath?
 * jeeboxlib should be tested by "spd --self"? I doubt it still works.
 
 * Speedie export asm funcs
