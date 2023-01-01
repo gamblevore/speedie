@@ -109,7 +109,6 @@
 		ACCA8C0A2871910E002CD3B0 /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACCA8C082871910E002CD3B0 /* JB_Globals.cpp */; };
 		ACCA8C0B2871910E002CD3B0 /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACCA8C092871910E002CD3B0 /* JB.cpp */; };
 		ACEB6E431B1B0E70007B488A /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACBEF7D01A33185F00BB1311 /* JB.cpp */; };
-		ACF11EA028B2A01A00096B05 /* demo.jx in Sources */ = {isa = PBXBuildFile; fileRef = ACF11E9F28B2A01A00096B05 /* demo.jx */; };
 		ACF67B45286A1C5B0038C746 /* JB_Tokeniser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC68A51D27036DEB008A2901 /* JB_Tokeniser.cpp */; };
 		ACF67B46286A1C5B0038C746 /* JB_OSX.m in Sources */ = {isa = PBXBuildFile; fileRef = AC68A51527036DEB008A2901 /* JB_OSX.m */; };
 		ACF67B47286A1C5B0038C746 /* JB_Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC68A52227036DEB008A2901 /* JB_Main.cpp */; };
@@ -218,14 +217,6 @@
 		AC33990D286BCA780003F66D /* SC_Table.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = SC_Table.spd; sourceTree = "<group>"; };
 		AC3540E423BE9C840066602F /* JB_Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = Build/JB_Globals.cpp; sourceTree = SOURCE_ROOT; };
 		AC37AEA1252A156700584F97 /* SC_Nil.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = SC_Nil.spd; sourceTree = "<group>"; };
-		AC3CC88B28B0DEA800D389C6 /* main.spd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; name = main.spd; path = ../exec.scproj/input/main.spd; sourceTree = "<group>"; };
-		AC3CC88C28B0DEA800D389C6 /* func_asm.spd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; name = func_asm.spd; path = ../exec.scproj/input/func_asm.spd; sourceTree = "<group>"; };
-		AC3CC88D28B0DEA800D389C6 /* class.spd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; name = class.spd; path = ../exec.scproj/input/class.spd; sourceTree = "<group>"; };
-		AC3CC88E28B0DEA800D389C6 /* functions.spd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; name = functions.spd; path = ../exec.scproj/input/functions.spd; sourceTree = "<group>"; };
-		AC3CC88F28B0DEA800D389C6 /* debugger.spd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; name = debugger.spd; path = ../exec.scproj/input/debugger.spd; sourceTree = "<group>"; };
-		AC3CC89128B0DEA800D389C6 /* globals.spd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = globals.spd; path = /Users/theodore/Speedie/exec.scproj/input/globals.spd; sourceTree = "<absolute>"; };
-		AC3CC89228B0DEA800D389C6 /* index.spd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; name = index.spd; path = ../exec.scproj/input/index.spd; sourceTree = "<group>"; };
-		AC3CC89428B0DEA800D389C6 /* base.spd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = base.spd; path = /Users/theodore/Speedie/exec.scproj/input/base.spd; sourceTree = "<absolute>"; };
 		AC4C62D728DC9E94001A1BD2 /* vm.box */ = {isa = PBXFileReference; lastKnownFileType = text; path = vm.box; sourceTree = "<group>"; };
 		AC4D28BF2757C66300DE4978 /* FileMode.spd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = FileMode.spd; sourceTree = "<group>"; };
 		AC4D28C02757C66300DE4978 /* simplebase.spd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = simplebase.spd; sourceTree = "<group>"; };
@@ -235,7 +226,6 @@
 		AC4D28C52757C8A100DE4978 /* Image.spd */ = {isa = PBXFileReference; lastKnownFileType = text; name = Image.spd; path = ../../Image.scproj/image.input/Image.spd; sourceTree = "<group>"; };
 		AC57EB5C24AA73A9006AC391 /* SC_InbuiltFuncs.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = SC_InbuiltFuncs.spd; sourceTree = "<group>"; };
 		AC59EF25249CD6DF00414ED6 /* SC_FastString.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = SC_FastString.spd; sourceTree = "<group>"; };
-		AC5A69DE2334E1B800F38015 /* bugz.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = bugz.txt; path = "../../OldProgramming/plans/2_speedy curr/bugz.txt"; sourceTree = "<group>"; };
 		AC6101072798220A00278BEF /* JB_Run.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Run.cpp; path = ../Library/CppLib/JB_Run.cpp; sourceTree = "<group>"; };
 		AC6262AC253F2B4000819A4C /* SC_Junk.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = SC_Junk.spd; sourceTree = "<group>"; };
 		AC635051284E48EE007D7326 /* JB_Child.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Child.cpp; path = /Users/theodore/Speedie/Library/CppLib/JB_Child.cpp; sourceTree = "<absolute>"; };
@@ -449,9 +439,6 @@
 		ACE3C73528193513001F6394 /* SC_The.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = SC_The.spd; sourceTree = "<group>"; };
 		ACE3C73628193E71001F6394 /* External.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = External.spd; sourceTree = "<group>"; };
 		ACEB6E521B1B0E70007B488A /* uwuTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = uwuTest; sourceTree = BUILT_PRODUCTS_DIR; };
-		ACF11E9D28B2A01A00096B05 /* design.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = design.txt; path = /Users/theodore/Speedie/exec.scproj/design.txt; sourceTree = "<absolute>"; };
-		ACF11E9E28B2A01A00096B05 /* asm.design */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = asm.design; path = /Users/theodore/Speedie/exec.scproj/asm.design; sourceTree = "<absolute>"; };
-		ACF11E9F28B2A01A00096B05 /* demo.jx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = demo.jx; path = /Users/theodore/Speedie/exec.scproj/demo.jx; sourceTree = "<absolute>"; };
 		ACF4A8A127FCB1AB006429BD /* Atomics.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = Atomics.spd; sourceTree = "<group>"; };
 		ACF4A8A227FCB513006429BD /* JB_Atomic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Atomic.h; path = ../Library/CppLib/JB_Atomic.h; sourceTree = "<group>"; };
 		ACF67B6A286A1C5B0038C746 /* exec */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exec; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -560,25 +547,6 @@
 			);
 			name = library.input;
 			path = ../Library/library.input;
-			sourceTree = "<group>";
-		};
-		AC3CC88928B0DE8600D389C6 /* Exec */ = {
-			isa = PBXGroup;
-			children = (
-				ACF11E9E28B2A01A00096B05 /* asm.design */,
-				ACF11E9F28B2A01A00096B05 /* demo.jx */,
-				ACF11E9D28B2A01A00096B05 /* design.txt */,
-				AC3CC89428B0DEA800D389C6 /* base.spd */,
-				AC3CC88D28B0DEA800D389C6 /* class.spd */,
-				AC3CC88F28B0DEA800D389C6 /* debugger.spd */,
-				AC3CC88C28B0DEA800D389C6 /* func_asm.spd */,
-				AC3CC88E28B0DEA800D389C6 /* functions.spd */,
-				AC3CC89128B0DEA800D389C6 /* globals.spd */,
-				AC3CC89228B0DEA800D389C6 /* index.spd */,
-				AC3CC88B28B0DEA800D389C6 /* main.spd */,
-			);
-			name = Exec;
-			path = ../Cpp/Exec;
 			sourceTree = "<group>";
 		};
 		AC84A0F717A811CA0070C259 /* Main Src */ = {
@@ -766,8 +734,6 @@
 		ACB5F6D2175CBA7700797A3C = {
 			isa = PBXGroup;
 			children = (
-				AC5A69DE2334E1B800F38015 /* bugz.txt */,
-				AC3CC88928B0DE8600D389C6 /* Exec */,
 				ACE90B1F1B5707D0008B5AEF /* .spd */,
 				ACE90B201B5707F0008B5AEF /* .cpp */,
 				ACB5F6DC175CBA7700797A3C /* Products */,
@@ -1028,7 +994,6 @@
 				AC68A57627036DEC008A2901 /* JB_FastString.cpp in Sources */,
 				AC68A55227036DEC008A2901 /* JB_Math.cpp in Sources */,
 				AC68A55C27036DEC008A2901 /* JB_Vectors.cpp in Sources */,
-				ACF11EA028B2A01A00096B05 /* demo.jx in Sources */,
 				AC68A53A27036DEC008A2901 /* JB_PNG.cpp in Sources */,
 				AC68A56227036DEC008A2901 /* JB_File.cpp in Sources */,
 				AC68A55027036DEC008A2901 /* JB_ByteMap.cpp in Sources */,
