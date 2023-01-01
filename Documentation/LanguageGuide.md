@@ -107,17 +107,17 @@ Looking through Speedie code, you may see a lot of strangely defined functions. 
 ## Possibly Surprising things
 
     class Logger
-        |file| log
+        |file| file
         function Log (|string| s)
-            if !.log
+            if !.file
                 || L = file.logs.child(app.AppName+".log")
                 .OpenLog(L)
-            .log <~ s
-            .Log <~ "\n"
+            .file <~ s
+            .file <~ "\n"
         
         helper OpenLog (|string| path)
-            .log = path.file
-            .Log.OpenEmpty        
+            .file = path.file
+            .file.OpenEmpty        
 
 
 One thing you will notice immediately, is that we are accessing our properties with `.` even within a class's own functions. This is different to most languages. `self.property` is equal to `.property` in speedie. The dot `.` is necessary, you can't access self's properties or functions without it. This reduces the chances of bugs.
@@ -169,12 +169,5 @@ Here's a few more tricks you'll might want to know. Actually these two lines do 
 The `()` version is actually a lot nicer to read, most of the time.
 
 I think that's enough for now. I'll write a proper documentation later.
- 
- 
- 
- 
- 
- 
- 
- 
- 
+
+
