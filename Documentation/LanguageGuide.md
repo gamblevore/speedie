@@ -10,15 +10,15 @@ Let's make a simple example in C:
 
 ````
 int CountStringLines(String* s) {
-	auto Addr = s->Addr; // implicitly declared type
-	int Length = s->Length;
-	int Result = 0;
-	for (int i = 0; i < Length; i++) {
-		if (Addr[i] == '\n') {
-			Result++;
-		}
-	}
-	return Result;
+    auto Addr = s->Addr; // implicitly declared type
+    int Length = s->Length;
+    int Result = 0;
+    for (int i = 0; i < Length; i++) {
+        if (Addr[i] == '\n') {
+            Result++;
+        }
+    }
+    return Result;
 }
 ````
 
@@ -26,7 +26,7 @@ Well... in Speedie things will look different, but the concept is the same.
 
 Firstly, we define functions with the name "function". Secondly, we use `||` to declare variables or parameters in Speedie.
 
-	function CountStringLines (|string| s, |int|)
+    function CountStringLines (|string| s, |int|)
 
 This just means we take a string and return an int.
 
@@ -36,13 +36,13 @@ Speedie has implicit types (the `||` declarations.) You are expected to use impl
 
 ````
 function CountStringLines (|string| s, |int|)
-	|| Addr = s.Addr
-	|| Length = s.Length
-	|| Result = 0
-	for i in Length
-		if Addr[i] == '\n'
-			Result++
-	return Result
+    || Addr = s.Addr
+    || Length = s.Length
+    || Result = 0
+    for i in Length
+        if Addr[i] == '\n'
+            Result++
+    return Result
 
 ````
 
@@ -54,11 +54,11 @@ Firstly, we can directly loop over a string. This will produce identical code to
 
 ````
 function CountStringLines (|string| s, |int|)
-	|| Result = 0
-	for c in s
-		if c == '\n'
-			Result++
-	return Result
+    || Result = 0
+    for c in s
+        if c == '\n'
+            Result++
+    return Result
 ````
 
 We can even make it smaller! Speedie has a special "rz" variable that means "this is the result of the function". "rz" is returned when the function ends, and it takes the type from the function's declaration.
@@ -66,29 +66,29 @@ We can even make it smaller! Speedie has a special "rz" variable that means "thi
 
 ````
 function CountStringLines (|string| s, |int|)
-	for c in s
-		if c == '\n'
-			rz++
+    for c in s
+        if c == '\n'
+            rz++
 ````
 Wow this function is looking great already! It does exactly the same as the original C version but contains only 3 lines of code. We can make it even better if we want. Let's make this function accessable ON string rather than a global function.
 
 ````
 function string.CountLines (|int|)
-	for c in self
-		if c == '\n'
-			rz++
+    for c in self
+        if c == '\n'
+            rz++
 ````
 
 Now that is more like it. A proper Speedie function. Let's try to use this in a program:
 
 ````
 function string.CountLines (|int|)
-	for c in self
-		if c == '\n'
-			rz++
+    for c in self
+        if c == '\n'
+            rz++
 
 main
-	printline app.args[0].countlines
+    printline app.args[0].countlines
 ````
 
 Speedie should be able to compile this, and make a working program! Not bad huh! Your first Speedie program.
@@ -106,18 +106,18 @@ Looking through Speedie code, you may see a lot of strangely defined functions. 
 
 ## Possibly Surprising things
 
-	class Logger
-		|file| log
-		function Log (|string| s)
-			if !.log
-				|| L = file.logs.child(app.AppName+".log")
-				.OpenLog(L)
-			.log <~ s
-			.Log <~ "\n"
-		
-		helper OpenLog (|string| path)
-			.log = path.file
-			.Log.OpenEmpty		
+    class Logger
+        |file| log
+        function Log (|string| s)
+            if !.log
+                || L = file.logs.child(app.AppName+".log")
+                .OpenLog(L)
+            .log <~ s
+            .Log <~ "\n"
+        
+        helper OpenLog (|string| path)
+            .log = path.file
+            .Log.OpenEmpty        
 
 
 One thing you will notice immediately, is that we are accessing our properties with `.` even within a class's own functions. This is different to most languages. `self.property` is equal to `.property` in speedie. The dot `.` is necessary, you can't access self's properties or functions without it. This reduces the chances of bugs.
@@ -128,43 +128,43 @@ In speedie, functions are just functions. They behave the same way. So why is on
 
 You might see a lot of functions like this, used internally by Speedie:
 
-	function Path (|string|)
-		cpp_wrapper JB_App__Path
+    function Path (|string|)
+        cpp_wrapper JB_App__Path
 
 This means it's implementation is created in C. So it does what it says. This is a wrapper around a C++ function.
  
 Speedie has a lot of syntactic sugar. For example:
 
-	|| ab = "a" + "b"
+    || ab = "a" + "b"
 
 This actually calls a string-append function, defined on the string class.
 
-	operator plus (|string| other, |string|)
-		cpp_wrapper JB_Str_OperatorPlus
+    operator plus (|string| other, |string|)
+        cpp_wrapper JB_Str_OperatorPlus
 
 You can write your own operator-functions on your own classes too, although its usually a bad idea for most classes. One exception is the `append` operator `<~`. It kind of looks like a wobbly-arrow flying through the air. Its useful for many many things. Mostly for classes that contain things, like an array or dictionary.
 
-	class PeopleLister
-		|[string]| People
-		syntax Append (|string| person)
-			.people <~ person
-	
-	main
-		|| list = PeopleLister.new
-		list <~ "fred"
-		list <~ "amy"
-	
+    class PeopleLister
+        |[string]| People
+        syntax Append (|string| person)
+            .people <~ person
+    
+    main
+        || list = PeopleLister.new
+        list <~ "fred"
+        list <~ "amy"
+    
 You'll see the `<~` operator used in most Speedie code, as appending one thing into another thing is one of the most common things you will do. It is used in the FastString class, and even the File class. Its used in arrays, messages, IPC, everything really.
 
-	list.append("fred") // Most other languages do this
-	list <~ "fred"      // which is easier to read?
+    list.append("fred") // Most other languages do this
+    list <~ "fred"      // which is easier to read?
  
 Having to write `.append(var)` gets noisy really fast after many lines of the same thing.
  
 Here's a few more tricks you'll might want to know. Actually these two lines do the same thing:
  
-	|| list1 = PeopleLister.new
-	|| list2 = PeopleLister() // I borrowed this syntax from python.
+    || list1 = PeopleLister.new
+    || list2 = PeopleLister() // I borrowed this syntax from python.
  
 The `()` version is actually a lot nicer to read, most of the time.
 
