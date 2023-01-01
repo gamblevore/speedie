@@ -46,9 +46,9 @@ function CountStringLines (|string| s, |int|)
 
 ````
 
-So this function will basically do exactly the same as the C function! In Speedie, it is considered usually-bad to access a string's .Addr property directly, but the above is just an example of "something that does the same as C code", not "good speedie code". We'll make a good example next!
+So this function will basically do exactly the same as the C function! In Speedie, it is considered usually-bad to access a string's `.Addr` property directly, but the above is just an example of "something that does the same as C code", not "good speedie code". We'll make a good example next!
 
-We can make this code shorter. Speedie has a lot of "Speedieisms", basically short-hands to make code shorter. I guess I just couldn't help myself while writing the compiler.
+We can make this code shorter. Speedie has a lot of "Speedieisms", basically ways to make code shorter. I guess I just couldn't help myself while writing the compiler.
 
 Firstly, we can directly loop over a string. This will produce identical code to the previous version! It's just simpler to write and understand.
 
