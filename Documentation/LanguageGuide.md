@@ -28,7 +28,7 @@ Firstly, we define functions with the name "function". Secondly, we use `||` to 
 
     function CountStringLines (|string| s, |int|)
 
-This just means we take a string and return an int. (The last declaration in a function, if it has no name, becomes the return type.)
+This just means we take a string and return an int.
 
 Let's just fill out the whole function. In the example code below, you will see that speedie doesn't use `;` to end lines. Also Speedie uses `.` to access object properties.
 
