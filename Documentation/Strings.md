@@ -49,7 +49,9 @@ Well thats a lot of ways of storing a string... but what if you had a FILE that 
 
 Speedie will find that file, as long as it exists within your project. No need for full paths or even paths relative to the project base.
 
+There are also "super-strings" which are strings that can contain other super-strings, if you really need something a bit stronger.
 
+    || sup_bro = <(`This is a super-string! And it contains another <(`super-string`)>! Wow. `)>
 
 More docs coming later! Theres a lot more to say about strings, parsing them... the charset class, the FastString class! Dictionaries, helper-functions, sorting and much more!
 
