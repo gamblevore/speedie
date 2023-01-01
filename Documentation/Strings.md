@@ -31,9 +31,13 @@ Thats nice, but what if you wanted to print a number? Or perhaps a count of some
 
 Seems great, but what if you wanted a string that happens to contain something that LOOKS like an escape code or contains double-quote?
 
-	printline `I am "Fred" and sometimes I look like this 🕺🏻`
+	printline `I am "Fred" and sometimes I look like this:
+    \o/
+     |
+    / \ 
+    `
 
-Seems good but what if you had some real binary data that just contains ALL the bytes from 0-255, and you wanted to put it in your app. Perhaps it is actually a random SHA-256 hash used to verify a file.
+Seems good but what if you had some real binary data that just contains ALL the bytes from 0-255, and you wanted to put it in your app. Perhaps it is actually a SHA-256 hash used to verify a file.
 	
 	|| myhash = #(5121dc529808dc02bf8df8f44595babf701477d62d6260f0aa65cd7b3117e8dd)#
 
