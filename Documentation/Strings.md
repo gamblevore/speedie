@@ -21,7 +21,7 @@ Want to put some "impossible" or awkward letters into your string? You can escap
 	//     IndentedLine
 	// A wierd looking Ɓoⓧ
 
-Speedie (because it is based on Jeebox) inherits all of Jeebox's abilities with expressing strings... but adds somemore too. In this case, Speedie has "inherited" all the escape codes, including byte escape codes (`\81`), character-entities (`&#9447;`), and normal escape codes (`\n`).
+Speedie (because it is based on Jeebox) inherits all of Jeebox's abilities with expressing strings... but adds some more too. In this case, Speedie has "inherited" all the escape codes, including byte escape codes (`\81`), character-entities (`&#9447;`), and normal escape codes (`\n`).
 
 
 Thats nice, but what if you wanted to print a number? Or perhaps a count of some items:
@@ -31,7 +31,7 @@ Thats nice, but what if you wanted to print a number? Or perhaps a count of some
 
 Seems great, but what if you wanted a string that happens to contain something that LOOKS like an escape code or contains double-quote?
 
-	printline `I am "Fred" and sometimes I look like this \o/ `
+	printline `I am "Fred" and sometimes I look like this 🕺🏻`
 
 Seems good but what if you had some real binary data that just contains ALL the bytes from 0-255, and you wanted to put it in your app. Perhaps it is actually a random SHA-256 hash used to verify a file.
 	
