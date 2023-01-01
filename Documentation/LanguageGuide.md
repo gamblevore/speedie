@@ -24,7 +24,7 @@ int CountStringLines(String* s) {
 
 Well... in Speedie things will look different, but the concept is the same.
 
-Firstly, we define functions with the name "function". Secondly, we use `||` to declare variables or types in Speedie.
+Firstly, we define functions with the name "function". Secondly, we use `||` to declare variables or parameters in Speedie.
 
 	function CountStringLines (|string| s, |int|)
 
