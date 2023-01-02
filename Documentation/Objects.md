@@ -51,3 +51,49 @@ Object types can be tested using `isa`.
 
 Once you test the type of an object, you don't need to type-cast it anymore within that branch. This means that actually, typecasting is something to avoid. Just test a type, don't blind-cast.
 
+If you need to type-cast (Rare but it can happen), its done like this:
+
+    function CastExample
+        || s = "im a string"
+        |object| o = s    // loses track of what 's' is
+        || s2 = o|string| // type-casted!
+        if s2.length > 1  // uses string.length
+            printlin s2
+        
+## Container Classes
+
+Classes can contain have contained types. For example, you can declare something as an array of string, rather than just an array of any-old-kinda-object.
+
+    |[string]| MyStringArray
+    |[]| MyArray
+    || MyArray2 = []
+    
+    MyArray <~ "apple"
+    MyArray2 <~ "apple"
+    MyStringArray <~ "apple"
+    for s in MyStringArray
+        printline s.uppercase
+    for s in myarray
+        printline s.uppercase // FAILS
+    for s in MyArray2
+        printline s.uppercase // FAILS
+
+The two failing lines, fail, because they don't know that they contain strings. They've lost that information. That's why for container classes, its sometimes (or often?) better to define their type fully.
+
+However, for function parameters or class-properties, actually you'll always be defining their type-fully anyhow.
+    
+What about writing a container class yourself? Well, you can do this, or you can adapt an existing container clsas. The main thing, is how to write a function that returns _"the contained type"_.
+
+    class ContainerClass
+        contains object
+        |array of ...| InternalData
+        syntax Access (|int| position, ||)
+            return .InternalData[position]
+
+Kinda strange syntax right? We are returning `||` from a function and we have an "`array of ...`"
+
+The "`array of ...`" means "this array contains whatever type it is that we contain". The same with  `||` in the function return. Two ways to say the same thing. But we need `...` in the array declaration, or else we would have to say "`array of`" which just doesn't read right at all!
+
+This can be used for both getting and setting.
+
+
