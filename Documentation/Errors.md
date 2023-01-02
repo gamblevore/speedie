@@ -144,12 +144,12 @@ Basically by returning `nil`, `false`, or some value that evaluates to `false`.
 
 For example: `string.parse` will return `nil` if an error occurred, and return a valid object otherwise. This is the convention that Speedie sticks to.
 
-If copying a file fails, it will return an `ErrorInt` of -1, which evaluates to false. So you can do:
+If copying a file fails, it will return an `ErrorInt` of -1, which evaluates to `false`. So you can do:
     
     require File1.CopyTo(File2)
     "$File1 copied successfully"
 
-_Conclusion: The official way of detecting **if** an error just occurred in a function-call, is checking if the function returned something that evaluates to false._
+_Conclusion: The official way of detecting **if** an error just occurred in a function-call, is checking if the function returned something that evaluates to false. (Assuming the function does create errors, not all do.)_
 
 
 ### What to do with the List of Errors?
