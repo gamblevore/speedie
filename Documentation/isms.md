@@ -6,6 +6,8 @@ I just call them 'isms'. The more 'isms' you know, the better your code will loo
 
 As long as you write generally good code in the first place, your code in Speedie will be also good. These "isms" just make code shorter, which is useful in large projects. With the **exception of error-handling**, that actually **is quite important** to know how to write properly.
 
+Error-handling is described in it's own file.
+
 ---
 ### 'Syntax' Functions
 These are special functions. They work like any other function, but are called via syntactic sugars. For example:
@@ -143,6 +145,15 @@ Speedie uses custom operators a lot. For string appends obviously, but for all s
 We have ternary expressions too. Useful sometimes.
 
     || x = (.LeftHand, .RightHand)(BeLeft)
+
+Strings can be divided and multiplied. Dividing just calls `.split`.
+    
+    printline "hello,goodbye,away" / ','
+    // prints: ["hello", "goodbye", "away"]
+    Printline "abc"*4
+    // prints: "abcabcabcabc"
+    
+
     
 ---
 ### FastString Tricks
@@ -243,98 +254,3 @@ Obviously, these are in power of 2, so 1KB = 1024. Reporting sizes can be done n
 ### Parsing
 Remembering to use Jeebox instead of making a custom file format, is a good way to reduce code-size, even for very simple file formats like a file separated by lines and commas.
 
----
-### Good Error Handling
-Error handling is quite important. Its a skill to get right. The tools available are `stderr` which stores reported errors, and the `#require`/`#expect`/`#error` statements. Lets show some speedie code and then convert it to simpler code, to see how much worse the simpler way is.
-    
-    main
-        || F = app.args[0].ExistingFile    #require
-        || jobs = f.parse                  #require
-        || list = jobs[@tmp, "jobs"][@arg] #require
-        for job in list
-            .ProcessJob(job)
-        require stderr.ok
-        for job in list
-            .FinaliseJob(job)
-        
-
-Seems simple? Lets look at a version written **without** the Speedie error handling system.
-
-        
-    
-    main
-        || F = app.args[0].file
-        if !F.exists
-            "Error: File $f doesn't exist."
-            return -1
-        
-        || jobs = f.parse
-        if !jobs
-            "Error: Can't parse file $f"
-            return -1
-        || list = jobs[0]
-        if list != @tmp or list != "jobs"
-            "Expected first item of file $f to be statement 'jobs'"
-            return -1
-        list = list[0]
-        if list != @arg
-            "Expected first item of statement 'jobs' in file $f to be an argument."
-            return -1
-        
-        || StillOK = true
-        for job in list
-            if !.ProcessJob(job)
-                StillOK = false
-        require StillOK
-        for job in list
-            .FinaliseJob(job)
-    
-
-As you can tell, this is a mess. Doing it the non-speedie way is a mess, and makes error-reporting **worse**. For example, filepaths are now buried in an error-message, rather than separate and easy to parse.
-
-Why is is so much worse?
-
-+ We need to print often, to replace the inbuilt-error-reporting in many functions like `.ExistingFile`... and the fact that Speedie prints `stderr` on exit.
-+ We have to `return -1` often, to replace the inbuilt `return -1` you get when your program exits but `stderr.ok==false`.
-+ We must replace the same functionality (`printing`/`return -1`) for testing for message types or names. This makes code unreadable.
-+ We need "`StillOK`" booleans in many places, because previously any function could have been adding errors.
-
-Take a look again at the first example. Its just SOOO much better. Everything does what it is meant to do. Its simple, readable, works better.
-
-    main
-        || F = app.args[0].ExistingFile    #require
-        || jobs = f.parse                  #require
-        || list = jobs[@tmp, "jobs"][@arg] #require
-        for job in list
-            .ProcessJob(job)
-        require stderr.ok
-        for job in list
-            .FinaliseJob(job)
-
-Speedie's error-reporting system has a lot more features, such as:
-
-+ Reporting warnings, which get printed but like normal but leave `stderr.ok` true.
-+ Logging of errors to a logfile
-+ Treating errors as warnings during certain code-sections
-+ Can temporarily replace `stderr` with another `ErrorList` during certain code-sections, in case you want to contain your errors from harming the rest of the program.
-
-Overall it is a great thing. Use it if you need to deal with errors or generate errors. Sometimes you don't want errors to occur, like when reading from a file that doesn't exist, but actually I've already thought about that. `file.ReadAll` defaults to ignoring non-existing files.
-
-    || x = "/path/to/optional_file"
-    || data = x.file.readall
-    printline data
-
-This only ignores "file doesn't exist", not "the file is actually a folder", or recursive-symlinks, or some other file-system error.
-
----
-### How do we know an Error Occurred Just now?
-OK, so `stderr` will tell us if an error has occurred sometime in the past, not "just now". How to know if it happened just now? Mostly... by returning `nil`, or `false`, or some value that evaluates to `false`.
-
-For example parsing a string, will return `nil` if an error occurred during parse.
-
-If copying a file fails, it will return an `ErrorInt` of -1, which evaluates to false. So you can do:
-    
-    require File1.CopyTo(File2)
-    "$File1 copied successfully"
-
-_Conclusion: The general way of detecting **if** an error just occurred in a function-call, is checking if the called-function returned something that evaluates to false._
