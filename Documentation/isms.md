@@ -1,4 +1,4 @@
-## Speedie-isms
+## Speedie-Isms
 
 Speedie has a lot of speedie-isms.
 
@@ -10,7 +10,7 @@ You only really need to know 'isms' for **reading** code, not writing.
 
 As long as you write generally good code in the first place, your code in Speedie will be also good. These "isms" just make code shorter, which is useful in large projects.
 
-#### 'syntax' functions
+#### 'Syntax' Functions
 These are special functions. They work like any other function, but are called via syntactic sugars. For example:
 
     class Something
@@ -30,12 +30,12 @@ These are special functions. They work like any other function, but are called v
 + `syntax expect` - Used for error-handling.
 + `syntax is/isnt` - See below.
 
-#### Making a script executable
+### Making A Script Executable
 You can add `#!/usr/local/bin/spd` to the start of speedie files, to make them executable in unix-shells. Obviously this only works for single-file scripts.
 
 You'll also have to have linked `/usr/local/bin/spd` to your speedie executable, but this exact-path is the standard I've settled on.  (The first run will take a few seconds to compile. Its cached after that.)
 
-#### 'Is' and 'isnt'
+#### 'is' and 'isnt'
 Sometimes its nice to have constants work for you, rather than you work for them. `Syntax "is"` does that:
 
     function ClickedOnRow (|listviewrow| row, |bool|)
@@ -103,7 +103,7 @@ Flags and constants can also have a custom datatype set to them.
             Bouncy    //  HappyType, and not   //
             Relieved  //  just a plain int.    //
 
-#### Property Hiding (+ a bonus ism)
+#### Property Hiding (+ A Bonus 'ism')
 
 Speedie has setter functions. If a setter function has the same name as a property, then this property becomes "hidden", and only the class itself can see the property.
 
@@ -119,10 +119,10 @@ Speedie has setter functions. If a setter function has the same name as a proper
         || P = person(12, "fred") // auto-constructor
         P.age = -2 // reports "error: Age -2 out of range on fred"
 
-As a bonus, I've also demonstrated auto-constructors, which are created for anything with 6 or less properties and (no explicit constructors). I just made two points with one example :)
+As a bonus, I've also demonstrated auto-constructors, which are created for anything with 6 or less properties and (no explicit constructors).
 
 
-#### operators
+#### Custom Operators
 Speedie uses custom operators a lot. For string appends obviously, but for all sorts of classes.
 
 For example, you can compare an array to an int. `Strings` too. And `RingTree`!
@@ -153,7 +153,7 @@ We have ternary expressions too. Useful sometimes.
     || x = (.LeftHand, .RightHand)(BeLeft)
     
         
-#### FastString tricks
+#### FastString Tricks
 You can append an string with embedded values, into a FastString. This actually is an optimised operation, and runs at full-speed.
 
      || fs = faststring()
@@ -167,7 +167,7 @@ this expands to:
      fs <~ " and my age is "
      fs <~ age
     
-Obviously the first version looks better. So don't worry about appending strings with embedded expressions!
+Obviously the first version looks better. So don't worry about appending strings with embedded expressions! Its pre-optimised.
     
 #### Extending classes and modules
 Sometimes you want to add a function to a class or module, without altering the file it is defined in.
@@ -219,7 +219,7 @@ Well, you might **want** that to compile, but speedie won't do it, because its a
       else
         printline "You passed nothing"
 
-#### Datatype subclassing
+#### Datatype Subclassing
 Sometimes you want to define a new "datatype". For example Speedie has the "`ErrorInt`" type which evaluates to `true`, if it is **not zero**. This is very useful for unix functions, because they tend to return 0 for success.
 
 Obviously, datatype subclasses can't add properties or have virtual functions. This example datatype will count as "true" for if-tests or anytime a bool is needed, only if it is an odd-number.
@@ -246,7 +246,7 @@ Obviously, these are in power of 2, so 1KB = 1024. Reporting sizes can be done n
 Remembering to use Jeebox instead of making a custom file format, is a good way to reduce code-size, even for very simple file formats like a file separated by lines and commas.
 
 
-#### good use of errors
+#### Good Error Handling
 Error handling is quite important. Its a skill to get right. The tools available are `stderr` which stores reported errors, and the `#require`/`#expect`/`#error` statements. Lets show some speedie code and then convert it to simpler code, to see how much worse the simpler way is.
     
     main
