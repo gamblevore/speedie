@@ -154,9 +154,9 @@ _Conclusion: The official way of detecting **if** an error just occurred in a fu
 
 ### What to do with the List of Errors?
 
-OK, so stderr collects a list of errors. What do we do with it now we have it? Depends on what you are trying to do.
+OK, so `stderr` collects a list of errors. What do we do with it now we have it? Depends on what you are trying to do.
 
-For many short shell-tools, you don't do anything. On quit, your app will report the errors found so far. We don't errors them immediately, because your app may want to filter the errors. Speedie itself filters errors during compiliation.
+For many short shell-tools, you don't do anything. On quit, your app will report the errors found so far. We don't print them immediately, because your app may want to filter the errors, especially if one user-mistake caused 10 errors, you might as well filter it down to 1 error per user-mistake.
 
 For GUI-apps, you probably want to log the errors. Like this:
 
