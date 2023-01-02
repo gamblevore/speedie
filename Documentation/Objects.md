@@ -118,11 +118,18 @@ What about writing a container class yourself? Well, you can do this, or you can
         |array of ...| InternalData
         syntax Access (|int| position, ||)
             return .InternalData[position]
+        syntax append (|| value)
+            .internaldata <~ value
+            
+    main
+        |containerclass of file| CC = containerclass.new
+        CC <~ file.desktop.child("me.png")
+        || path = CC[0].path
+        printline path //   "/Users/NAME/Desktop/me.png"
+        
 
 Kinda strange syntax right? We are returning `||` from a function and we have an "`array of ...`"
 
 The "`array of ...`" means "this array contains whatever type it is that we contain". The same with  `||` in the function return. Two ways to say the same thing. But we need `...` in the array declaration, or else we would have to say "`array of`" which just doesn't read right at all!
-
-This can be used for both getting and setting.
 
 
