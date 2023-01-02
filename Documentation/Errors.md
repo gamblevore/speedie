@@ -53,9 +53,8 @@ Lets make a list of the statements:
 + `require` - This will just return, if the expression is false. No error.
 + `error` - This will create an error if the expression is false. But the code will continue to flow.
 
+
 ---
-
-
 ### Good Error Handling
 Error handling is a skill to get right. Lets show some speedie code and then convert it to simpler code, to see how much worse the simple way is.
     
@@ -151,7 +150,7 @@ If copying a file fails, it will return an `ErrorInt` of -1, which evaluates to
 
 _Conclusion: The official way of detecting **if** an error just occurred in a function-call, is checking if the function returned something that evaluates to false. (Assuming the function does create errors, not all do.)_
 
-
+---
 ### What to do with the List of Errors?
 
 OK, so `stderr` collects a list of errors. What do we do with it now we have it? Depends on what you are trying to do.
