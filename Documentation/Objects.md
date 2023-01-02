@@ -30,7 +30,7 @@ Subclassing is done like this:
         function Draw (|image| dest)
             ...
 
-`Contains` is needed when you subclass a container class. Otherwise it's not needed.
+`Contains` is needed when you subclass a container class (like `RingTree`, `array`, `dictionary`, etc). Otherwise it's not needed.
 
     class A
         |string| Name
