@@ -218,7 +218,7 @@ Well, you might **want** that to compile, but speedie won't do it, because its a
 
 ---
 ### Datatype Subclassing
-Sometimes you want to define a new "datatype". For example Speedie has the "`ErrorInt`" type which evaluates to `true`, if it is **not zero**. This is very useful for unix functions, because they tend to return 0 for success.
+Sometimes you want to define a new "datatype". For example Speedie has the "`ErrorInt`" type which evaluates to `true`, if it **is zero**. This is very useful for unix functions, because they tend to return 0 for success.
 
 Obviously, datatype subclasses can't add properties or have virtual functions. This example datatype will count as "true" for if-tests or anytime a bool is needed, only if it is an odd-number.
 
