@@ -160,7 +160,8 @@ this expands to:
      fs <~ age
     
 Obviously the first version looks better. So don't worry about appending strings with embedded expressions! Its pre-optimised.
-    
+
+---
 ### Extending classes and modules
 Sometimes you want to add a function to a class or module, without altering the file it is defined in.
     
