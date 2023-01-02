@@ -21,6 +21,34 @@ Technically, a class contains these things:
 
 The class's parent might just be "`object`" or it could subclass from something else, like "`RingTree`" or one of your own classes.
 
+## Subclassing
+
+Subclassing is done like this:
+
+    class MapArea (RingTree)
+        contains MapArea
+        function Draw (|image| dest)
+            ...
+
+`Contains` is needed when you subclass a container class. Otherwise it's not needed.
+
+    class A
+        |string| Name
+
+    class B (A)
+        // no need for contains
+        |int|    Number
+    
+    main
+        || bb = B.new
+        bb.number = 1
+        bb.name = "fred"
+        if bb isa a
+            "bb isa A"
+        if bb isa b
+            "bb isa B"
+
+
 ## Reference Cycles?
 You might find yourself wondering: _"Well how do I make a tree, or a double-linked-list in Speedie, without suffering from ref-count-cycles?"_
 
