@@ -41,17 +41,17 @@ Sometimes its nice to have constants work for you, rather than you work for them
 Where are the names ("modified/disabled") defined? How are they found? They are found via the "`syntax is`"  function on `listviewrow`.
 
     syntax is (|ListViewState| s, |bool|)
-		if self
-			return .state & s
+        if self
+            return .state & s
 
 Speedie checks the first param, and assumes we want a constant within `ListViewState`. And the `ListViewState` datatype, has some flags defined:
     
     datatype ListViewState (uint16)
-    	flags
-    		Selected 
-    		Modified
-    		Disabled
-    		...
+        flags
+            Selected 
+            Modified
+            Disabled
+            ...
     
 
 So these two lines are equivalent:
@@ -232,11 +232,11 @@ Speedie has some handy constants!
     || x1 = 1KB
     || x2 = 2MB
     || x3 = 1.5MB
-	"$x1 $x2 $x3"
+    "$x1 $x2 $x3"
 
 Obviously, these are in power of 2, so 1KB = 1024. Reporting sizes can be done nicely too!
 
-	"${x.strsize} ${x2.strsize} ${x3.strsize}" // prints: "1024 2MB 1.5MB"
+    "${x.strsize} ${x2.strsize} ${x3.strsize}" // prints: "1024 2MB 1.5MB"
 
 ---
 ### Parsing
