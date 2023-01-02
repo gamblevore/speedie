@@ -1,6 +1,6 @@
 ## Objects in Speedie
 
-Speedie is a refcounted language. That is, objects in Speedie know how many references to them exist. This makes Speedie much better than Java or other garbage-collected languages. Because we free things as soon as we are done with them. 
+Speedie is a refcounted language. That is, objects in Speedie know how many references to them exist. This makes Speedie better than garbage-collected languages. Because we delete objects as soon as we are done with them. 
 
 This leads to smoother performance, in games or other high-performance things. Its faster overall too.
 
@@ -40,7 +40,7 @@ You can create an object via a class's module.
 
 	|| msg = message.new
 	
-All classes have modules, and that module will contain the `myclass.new` function, but perhaps more. The `file` module has many helper functions, like `file.preferences` or `file.log` or `file.desktop`, etc.
+All classes have modules, and that module will contain the `new()` function, but perhaps more. The `file` module has many helper functions, like `file.preferences` or `file.log` or `file.desktop`, etc.
 
 Object types can be tested using `isa`.
 
@@ -50,14 +50,14 @@ Object types can be tested using `isa`.
           elseif abc isa message
             printline abc.render
 
-Once you test the type of an object, you don't need to type-cast it anymore within that branch. This means that actually, typecasting is something to avoid. Just test a type, don't blind-cast.
+Once you test the type of an object, you don't need to typecast it anymore within that branch. This means that actually, typecasting is something to avoid. Just test a type, don't blind-cast.
 
-If you need to type-cast (Rare but it can happen), its done like this:
+If you need to typecast (Rare but it can happen), its done like this:
 
     function CastExample
         || s = "im a string"
         |object| o = s    // loses track of what 's' is
-        || s2 = o|string| // type-casted!
+        || s2 = o|string| // typecasted!
         if s2.length > 1  // uses string.length
             printline s2
 
@@ -76,7 +76,6 @@ Subclassing is done like this:
         |string| Name
 
     class B (A)
-        // no need for contains
         |int|    Number
     
     main
@@ -89,7 +88,7 @@ Subclassing is done like this:
             "bb isa B"
 
 
-## Container Classes
+## Container Classes (array, dictionary, etc)
 
 Classes can contain have contained types. For example, you can declare something as an array of string, rather than just an array of any-old-kinda-object.
 
@@ -109,9 +108,9 @@ Classes can contain have contained types. For example, you can declare something
 
 The two failing lines, fail, because they don't know that they contain strings. They've lost that information. That's why for container classes, its sometimes (or often?) better to define their type fully.
 
-However, for function parameters or class-properties, actually you'll always be defining their type-fully anyhow.
+However, for function parameters or class-properties, actually you'll always be defining their type fully anyhow.
     
-What about writing a container class yourself? Well, you can do this, or you can adapt an existing container clsas. The main thing, is how to write a function that returns _"the contained type"_.
+What about writing a container class yourself? Well, you can do this, or you can adapt an existing container class. The main thing, is how to write a function that returns _"the contained type"_.
 
     class ContainerClass
         contains object
@@ -130,6 +129,5 @@ What about writing a container class yourself? Well, you can do this, or you can
 
 Kinda strange syntax right? We are returning `||` from a function and we have an "`array of ...`"
 
-The "`array of ...`" means "this array contains whatever type it is that we contain". The same with  `||` in the function return. Two ways to say the same thing. But we need `...` in the array declaration, or else we would have to say "`array of`" which just doesn't read right at all!
-
+The "`array of ...`" means "this array contains whatever type it is that we contain". The same with  `||` in the function return. Two ways to say the same thing.
 
