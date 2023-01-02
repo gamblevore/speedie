@@ -26,6 +26,13 @@ Which isn't great because then `Message` becomes too complex in it's behaviour a
 
 For example, `ListViewRow` is actually just a `message`
 
+
+## Making A Script Executable
+You can add `#!/usr/local/bin/spd` to the start of speedie files, to make them executable in unix-shells. Obviously this only works for single-file scripts.
+
+You'll also have to have linked `/usr/local/bin/spd` to your speedie executable, but this exact-path is the standard I've settled on.  (The first run will take a few seconds to compile. Its cached after that.)
+
+
 ## File.ReadAll on non-existing files?
 
 Let's say you call `.readall` on a file that doesn't exist on the file-system. Well... speedie is helpful here, because `.Readall` returns not a string, but a `StringThatWasReadSafely`.
