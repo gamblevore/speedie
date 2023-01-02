@@ -26,6 +26,71 @@ Which isn't great because then `Message` becomes too complex in it's behaviour a
 
 For example, `ListViewRow` is actually just a `message`
 
+## Function Prototypes (callbacks)
+
+Functions can be dynamic! Like this! Its a great way to make dynamic code, without needing virtual functions.
+
+For example, you can make a dictionary containing functions. Or an array of functions. Or even anything.
+
+Jeebox for example, the `Syntax` object contains a function callback, which is used for rendering. And Jeebox uses a dictionary of functions for parsing.
+
+Let's see how function prototypes work:
+    
+    prototype SayerFunction (|string| input)
+    
+    function MeSayer (SayerFunction)
+        "Me says: $input"
+
+    function SheSayer (SayerFunction)
+        "Rebecca says: $input (very quietly)"
+        
+    main
+        || fn = (mesayer, shesayer)(random[] < 0.5)
+        (fn)(app.args[0])
+
+Function prototypes have to be wrapped with brackets like this: `(fn)` to be able to call them, or else they would just look like normal functions which isn't great.
+
+Function prototypes can exist in modules, classes or globally. When they are on a class, the prototype gets an implicit `"self"` variable.
+
+
+## Function Dispatch Tables
+
+Do you want an even **more** powerful version of function-prototypes! Use the function-table! This is the king of function systems. Well maybe not but I think its pretty great. Anyhow, so it looks like this:
+
+
+    class RPGHero // for a tile-based board game
+        |string| Name
+        |bool|   OnGround
+        |bool|   IsDucking
+        |int|    YSpeed
+        |int|    GroundSpeed
+        
+        constructor (|string| name)
+            .name = name
+        
+        
+    dispatch DoAction (|rpghero|self, |string| Reason)
+        jump
+            "$.Name jumped because $Reason"
+            if .OnGround
+                .YSpeed = (.YSpeed max 0) + 2 
+            
+        run 
+            "$.Name ran because $Reason"
+            .GroundSpeed = .GroundSpeed min 5
+        
+        duck
+            "$.Name ducked because $Reason"
+            .IsDucking = true
+    main 
+        || G = RPGHero("fred")
+        (Doaction["jump"])(G, "hes scared")
+        
+Sorry I can't think of a better example right now, but you get the point. I hope. `Dispatch`es have to be contained within modules right now, they can't go directly into classes.
+            
+
+
+
 
 ## Making A Script Executable
 You can add `#!/usr/local/bin/spd` to the start of speedie files, to make them executable in unix-shells. Obviously this only works for single-file scripts.
