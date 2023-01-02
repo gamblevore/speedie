@@ -2,13 +2,9 @@
 
 Speedie has a lot of speedie-isms.
 
-I just call them 'isms'. The more 'isms' you know, the better your code will look. But you don't **need** to know them.
+I just call them 'isms'. The more 'isms' you know, the better your code will look. But you don't **need** to know them. You only really need to know 'isms' for **reading** code, not writing. 
 
-You only really need to know 'isms' for **reading** code, not writing. 
-
-(With the exception of error-handling, thats actually quite important to know how to write properly.)
-
-As long as you write generally good code in the first place, your code in Speedie will be also good. These "isms" just make code shorter, which is useful in large projects.
+As long as you write generally good code in the first place, your code in Speedie will be also good. These "isms" just make code shorter, which is useful in large projects. With the **exception of error-handling**, that actually **is quite important** to know how to write properly.
 
 ---
 ### 'Syntax' Functions
@@ -23,19 +19,13 @@ These are special functions. They work like any other function, but are called v
         printline x[2] // "l"
     
 
-+ `syntax cast` - Decides how an object gets turned into a bool. Useful for `"if"` tests. Also used so you can return a `faststring` object from a function that expects a `string`... because the `faststring` has a cast to a `string`.
 + `syntax append` - Useful if your class can have things appended into it.
 + `syntax equals` - Used for comparing if two objects are equal.
 + `syntax compare` - Used for comparing if one object is more or less than the other.
 + `syntax access` - Used for accessing an object as if it were an array. Can take params of any kind, strings or messages even. Can even take multiple parameters.
 + `syntax expect` - Used for error-handling.
++ `syntax cast` - Decides how an object gets turned into a bool. Useful for `"if"` tests. Also used so you can return a `faststring` object from a function that expects a `string`... because the `faststring` has a cast to a `string`.
 + `syntax is/isnt` - See below.
-
----
-### Making A Script Executable
-You can add `#!/usr/local/bin/spd` to the start of speedie files, to make them executable in unix-shells. Obviously this only works for single-file scripts.
-
-You'll also have to have linked `/usr/local/bin/spd` to your speedie executable, but this exact-path is the standard I've settled on.  (The first run will take a few seconds to compile. Its cached after that.)
 
 ---
 ### 'is' and 'isnt'
