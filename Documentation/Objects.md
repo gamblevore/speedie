@@ -40,7 +40,7 @@ You can create an object via a class's module.
 
 	|| msg = message.new
 	
-All classes have modules, at least for the `myclass.new` function. For example the `file` class has many helper functions, like `file.preferences` or `file.log` or `file.desktop`, etc.
+All classes have modules, and that module will contain the `myclass.new` function, but perhaps more. The `file` module has many helper functions, like `file.preferences` or `file.log` or `file.desktop`, etc.
 
 Object types can be tested using `isa`.
 
@@ -59,7 +59,7 @@ If you need to type-cast (Rare but it can happen), its done like this:
         |object| o = s    // loses track of what 's' is
         || s2 = o|string| // type-casted!
         if s2.length > 1  // uses string.length
-            printlin s2
+            printline s2
 
 ## Subclassing
 
