@@ -137,13 +137,16 @@ For example, you can compare an array to an int. `Strings` too. And `RingTree`!
     if L == 4
         "The list $L has four items!"
         
-`Isa` works on ints too, it checks if something is a multiple of somerthing else.
+`Isa` works on ints too, it checks if something is a multiple of somerthing else. We can also set bits on ints even.
 
+    || x = 0
     for i in 10
         if i isa 2 // if 
             "$i is even"
+            x[i] = true
           else
             "$i is odd"
+    "x is $x"
 
 We have ternary expressions too. Useful sometimes.
 
@@ -217,19 +220,14 @@ Well, you might **want** that to compile, but speedie won't do it, because its a
         printline "You passed nothing"
 
 #### Datatype subclassing
-Sometimes, you want to define a new "datatype". For example, in Speedie I have the "`ErrorInt`" type, which is just an `int`... except that `ErrorInt` evaluates to `true`, if it is **not zero**. This is very useful for unix functions, because they tend to return 0 for success.
+Sometimes you want to define a new "datatype". For example Speedie has the "`ErrorInt`" type which evaluates to `true`, if it is **not zero**. This is very useful for unix functions, because they tend to return 0 for success.
 
-Obviously, datatypes can't add properties or have virtual functions, they aren't "real classes", but in other ways, they are like subclasses. A lot of syntactic sugars work on datatypes, even `syntax access`.
+Obviously, datatype subclasses can't add properties or have virtual functions. This example datatype will count as "true" for if-tests or anytime a bool is needed, only if it is an odd-number.
 
-For example, to set a bit in an int, you can do this:
+    datatype OddIsTrue (int)
+        syntax Cast (|bool|)
+            return self & 1
 
-    || x = 0
-    for i in 32
-        x[i] = i & 1
-
-This will set every-other bit to true. So half the bits are true. This is done via the `syntax access` function defined on ints. But you can define `syntax access` differently for your datatypes.
-        
-        
                  
 #### File/Memory Sizes
 Speedie has some handy constants!
