@@ -1,47 +1,51 @@
 ## Error Handling In Speedie
 
-The way Speedie handles errors, is something I'm quite proud of. That is, it handles errors in "the right way".
+Error handling is quite important. Its a skill to get right. The tools available are `stderr` which stores reported errors, and the `#require`/`#expect`/`#error` statements.  All errors flow through a central object we call `StdErr`.
 
-Most languages make a mess of errors. We don't. We do things the right way. All errors flow through a central object we call `StdErr`.
-
-C++ has exceptions, and many other languages followed. (Java, python, rust, etc). Unfortunate! But at least they have other advantages.
-
-Anyhow, so what we do, is collect a list of errors. Errors can be generated from any function. They don't affect code-flow, except unless you **want** it to. Let's make a simple example:
+Errors can be generated from any function. They don't affect code-flow, except unless you **want** it to. Let's make a simple example:
 
 
-    || BannedWords = "poop/smelly".split
+    || BannedWords = "poop,smelly" / ','
+    
     function string.NameIsOK (|bool|)
         for b in bannedwords
             if self contains b
                 return false
         return true
 
+
     function CheckUserListNames (|string| userspath)
+        // '#require' will exit this function, if userlist is set to nil.
         || userlist = userspath.file.parse            #require
         "User list parsed OK"
+        
         for user in userlist
+            // 'error' will create an error if .nameisok returns false. 
+            // the error will contain the "user" object
+            // this reports the file and position of the error
+            // along with the error messge below.
             error user.name.NameIsOK (user, "User has a bad name.")
+            // even if an error is created control-flow continues
+            
         if stderr.ok
+            // this branch occurs if all the names were good.
             "All users have good names"
           else
+            // otherwise we end up here.
             "${stderr.errorCount} users have bad names"
         
 
+Hopefully the comments explain this function well.
 
-Well... a lot of things are going on in this code, so lets break it down. First, the `#require` statement. This statement will return from the function if the value (`userlist` in this case) does not evaluate to true.
+The statements `require` / `expect` / `error` are used for control-flow and error-handling. They remove the messy control-flow, so you can see your code clearly.
 
-In other words, if `.file.parse` returns `nil`, then `CheckUserListNames` will end at the `#require` line.
+Each can be used after an expression, or before:
 
-Speedie has a lot of statements including `require` / `expect` / `error`, used for control-flow and error-handling. It just gets all the messy control-flow out of your way, so you can see your code. Very-useful for error-handling.
-
-These statements can be used after some code, or before.
-
-    function RequireTest
-        || A = "a,a,a".parse            #require
+        || A = "a,a,a".parse    #require // #require after A
         || B = "b,b,b".parse
-        require B
+        require B                        // require before B
 
-both `A` and `B` are tested in the exact same way. The control-flow is the same. But the first looks better to me. Its more "out of the way". Like an after thought thats not relevant to the usual understanding of how the function works.
+both `A` and `B` are tested in the same way. But the first looks better to me, in this case. Its more "out of the way".
 
 Lets make a list of the statements:
 
@@ -49,31 +53,116 @@ Lets make a list of the statements:
 + `require` - This will just return, if the expression is false. No error.
 + `error` - This will create an error if the expression is false. But the code will continue to flow.
 
-There are others but they will just confuse you right now. So reading the `CheckUserListNames` function... what do we see us doing?
+---
 
-+ We parse a file
-+ If the file can't be parsed, then we return.
-+ Otherwise we print "User list parsed OK"
-+ Then we go through the list of users
-+ We check each user-name to see if it contains any bad words.
-+ If a user DOES have a bad word, then `user.name.NameIsOK` returns false, which will be caught by the `error` statement, which will generate an error and send that error to `stderr`.
-+ Control-flow continues on regardless of any errors detected, so all users will be tested.
-+ If no users have a bad name we print  "All users have good names"
-+ Otherwise we print "*N* users have bad names" where N is the number of bad user-names found.
 
-The main idea is that we can create errors from multiple places, but only a few points NEED to catch errors or do anything with them.
+### Good Error Handling
+Error handling is a skill to get right. Lets show some speedie code and then convert it to simpler code, to see how much worse the simple way is.
+    
+    main
+        || F = app.args[0].ExistingFile    #require
+        || jobs = f.parse                  #require
+        || list = jobs[@tmp, "jobs"][@arg] #require
+        for job in list
+            .ProcessJob(job)
+        require stderr.ok
+        for job in list
+            .FinaliseJob(job)
+        
 
-If nothing catches the errors, they will be printed when the app ends. Which is the desired behaviour for some shell-scripts.
+Seems clear? Lets look at a version written **without** the Speedie error handling system.
 
-Catching the errors is just done by printing or logging them or doing something with them, and then clearing stderr.
+    main
+        || F = app.args[0].file
+        if !F.exists
+            "Error: File $f doesn't exist."
+            return -1
+        
+        || jobs = f.parse
+        if !jobs
+            "Error: Can't parse file $f"
+            return -1
+        || list = jobs[0]
+        if list != @tmp or list != "jobs"
+            "Expected first item of file $f to be statement 'jobs'"
+            return -1
+        list = list[0]
+        if list != @arg
+            "Expected first item of statement 'jobs' in file $f to be an argument."
+            return -1
+        
+        || StillOK = true
+        for job in list
+            if !.ProcessJob(job)
+                StillOK = false
+        require StillOK
+        for job in list
+            .FinaliseJob(job)
+    
 
-Otherwise, functions can just return nil or a valid-object to see if they succeeded or not, if you don't want to be checking `stderr.ok` all the time.
+As you can tell, this is a mess. A disaster actually. Doing it the non-speedie way is awful, and makes error-reporting **worse**. For example, filepaths are now buried in an error-message, rather than separate and easy to parse.
 
-For GUI-apps, the errors can be sent to the notification-manager like this:
+Why is is so much worse?
 
-    for err in stderr
-        notifications <~ err
-    stderr.clear
++ We need to print often, to replace the inbuilt-error-reporting in many functions like `.ExistingFile`... and the fact that Speedie prints `stderr` on exit.
++ We have to `return -1` often, to replace the inbuilt `return -1` you get when your program exits but `stderr.ok==false`.
++ We must replace the same functionality (`printing`/`return -1`) for testing for message types or names. This makes code unreadable.
++ We need "`StillOK`" booleans in many places, because previously any function could have been adding errors.
 
+Take a look again at the first example. Its just SOOO much better. Everything does what it is meant to do. Its simple, readable, works better.
+
+    main
+        || F = app.args[0].ExistingFile    #require
+        || jobs = f.parse                  #require
+        || list = jobs[@tmp, "jobs"][@arg] #require
+        for job in list
+            .ProcessJob(job)
+        require stderr.ok
+        for job in list
+            .FinaliseJob(job)
+
+Speedie's error-reporting system has a lot more features, such as:
+
++ Reporting warnings, which get printed but like normal but leave `stderr.ok` true.
++ Logging of errors to a logfile
++ Treating errors as warnings during certain code-sections
++ Can temporarily replace `stderr` with another `ErrorList` during certain code-sections, in case you want to contain your errors from harming the rest of the program.
+
+Overall it is a great thing. Use it if you need to deal with errors or generate errors. Sometimes you don't want errors to occur, like when reading from a file that doesn't exist, but actually I've already thought about that. `file.ReadAll` defaults to ignoring non-existing files.
+
+    || x = "/path/to/optional_file"
+    || data = x.file.readall
+    printline data
+
+This only ignores "file doesn't exist", not "the file is actually a folder", or recursive-symlinks, or some other file-system error.
+
+---
+### How Do We Know An Error Occurred Just Now?
+OK, so `stderr` will tell us if an error has occurred sometime in the past, not "just now". How to know if it happened just now? Mostly... by returning `nil`, or `false`, or some value that evaluates to `false`.
+
+For example: `string.parse` will return `nil` if an error occurred, and return a valid object otherwise. This is the convention that Speedie sticks to.
+
+If copying a file fails, it will return an `ErrorInt` of -1, which evaluates to false. So you can do:
+    
+    require File1.CopyTo(File2)
+    "$File1 copied successfully"
+
+_Conclusion: The official way of detecting **if** an error just occurred in a function-call, is checking if the function returned something that evaluates to false._
+
+
+### What to do with the List of Errors?
+
+OK, so stderr collects a list of errors. What do we do with it now we have it? Depends on what you are trying to do.
+
+For many short shell-tools, you don't do anything. On quit, your app will report the errors found so far. We don't errors them immediately, because your app may want to filter the errors. Speedie itself filters errors during compiliation.
+
+For GUI-apps, you probably want to log the errors. Like this:
+
+    main 
+        stderr.LogFile = file.Logs["MyApp.log"] // set this once, at app-startup
+
+Errors are actually automatically sent to the notification area, in GUI-apps, once per-frame.
+
+For long-lived shelltools, you need to decide the behaviour for yourself. Print them? Log them? Send them to another process? Choice is yours.
 
 
