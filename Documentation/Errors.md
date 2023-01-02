@@ -123,7 +123,7 @@ Take a look again at the first example. Its just SOOO much better. Everything do
 
 Speedie's error-reporting system has a lot more features, such as:
 
-+ Reporting warnings, which get printed but like normal but leave `stderr.ok` true.
++ Reporting warnings, which get printed like normal but leave `stderr.ok` true.
 + Logging of errors to a logfile
 + Treating errors as warnings during certain code-sections
 + Can temporarily replace `stderr` with another `ErrorList` during certain code-sections, in case you want to contain your errors from harming the rest of the program.
@@ -138,7 +138,9 @@ This only ignores "file doesn't exist", not "the file is actually a folder", or 
 
 ---
 ### How Do We Know An Error Occurred Just Now?
-OK, so `stderr` will tell us if an error has occurred sometime in the past, not "just now". How to know if it happened just now? Mostly... by returning `nil`, or `false`, or some value that evaluates to `false`.
+`stderr` tells us if an error has occurred sometime in the past, but how to know if it happened just now? 
+
+Basically by returning `nil`, `false`, or some value that evaluates to `false`.
 
 For example: `string.parse` will return `nil` if an error occurred, and return a valid object otherwise. This is the convention that Speedie sticks to.
 
