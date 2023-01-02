@@ -51,21 +51,3 @@ Object types can be tested using `isa`.
 
 Once you test the type of an object, you don't need to type-cast it anymore within that branch. This means that actually, typecasting is something to avoid. Just test a type, don't blind-cast.
 
-
-## Memory-Layers
-
-Heres an advanced feature for objects! `MemoryLayer`s! `MemoryLayer`s are a concept I came up with myself. I use them for Jeebox, for it's parser. Basically, when you are parsing a file, you want all the `message`s to belong to the same `"MemoryLayer"`.
-
-This means, that all the messages **know** what file they belong to, without actually each message object storing the file itself. The `"MemoryLayer"` stores the file reference!
-
-Its just a simple way of saving memory and making things go faster, for something quite complex and large like parsing a Jeebox file. Very useful, at least internally.
-
-`MemoryLayer`s aren't well documented but you can look at `Object.spd` file to see the functions on the `MemoryLayer` class. Layers can be created, used, or the default `MemoryLayer` can be used.
-
-
-
-
-
-
-
-
