@@ -10,7 +10,7 @@ You only really need to know 'isms' for **reading** code, not writing.
 
 As long as you write generally good code in the first place, your code in Speedie will be also good. These "isms" just make code shorter, which is useful in large projects.
 
-#### 'Syntax' Functions
+### 'Syntax' Functions
 These are special functions. They work like any other function, but are called via syntactic sugars. For example:
 
     class Something
@@ -35,7 +35,7 @@ You can add `#!/usr/local/bin/spd` to the start of speedie files, to make them e
 
 You'll also have to have linked `/usr/local/bin/spd` to your speedie executable, but this exact-path is the standard I've settled on.  (The first run will take a few seconds to compile. Its cached after that.)
 
-#### 'is' and 'isnt'
+### 'is' and 'isnt'
 Sometimes its nice to have constants work for you, rather than you work for them. `Syntax "is"` does that:
 
     function ClickedOnRow (|listviewrow| row, |bool|)
@@ -75,7 +75,7 @@ Obviously, the first looks better, but they both do the same thing, and the seco
         (other is selected)
 
 
-#### Flag Constants
+### Flag Constants
 Speedie has bit-flag support. `Flags` can be used in modules, classes or globally, and works much like the `constants` statement.
     
     class MyListViewRow
@@ -103,7 +103,7 @@ Flags and constants can also have a custom datatype set to them.
             Bouncy    //  HappyType, and not   //
             Relieved  //  just a plain int.    //
 
-#### Property Hiding (+ A Bonus 'ism')
+### Property Hiding (+ A Bonus 'ism')
 
 Speedie has setter functions. If a setter function has the same name as a property, then this property becomes "hidden", and only the class itself can see the property.
 
@@ -122,10 +122,8 @@ Speedie has setter functions. If a setter function has the same name as a proper
 As a bonus, I've also demonstrated auto-constructors, which are created for anything with 6 or less properties and (no explicit constructors).
 
 
-#### Custom Operators
-Speedie uses custom operators a lot. For string appends obviously, but for all sorts of classes.
-
-For example, you can compare an array to an int. `Strings` too. And `RingTree`!
+### Custom Operators
+Speedie uses custom operators a lot. For string appends obviously, but for all sorts of classes. For example, you can compare an array to an int. `Strings` too. And `RingTree`!
 
     || x = ["a", "b", "c"]
     if x == 3
@@ -153,7 +151,7 @@ We have ternary expressions too. Useful sometimes.
     || x = (.LeftHand, .RightHand)(BeLeft)
     
         
-#### FastString Tricks
+### FastString Tricks
 You can append an string with embedded values, into a FastString. This actually is an optimised operation, and runs at full-speed.
 
      || fs = faststring()
@@ -169,7 +167,7 @@ this expands to:
     
 Obviously the first version looks better. So don't worry about appending strings with embedded expressions! Its pre-optimised.
     
-#### Extending classes and modules
+### Extending classes and modules
 Sometimes you want to add a function to a class or module, without altering the file it is defined in.
     
     function string.AddNumber (|int| num, |string|)
@@ -185,7 +183,7 @@ To extend many functions at once do this:
         function B
         function C
 
-#### rz ####
+### rz ###
 `rz` is a special variable that is automatically created for functions that return things. Simply using `rz` at all, will create the variable, otherwise it won't be created.
 
 ````
@@ -193,7 +191,7 @@ function string.CountLines (|int|)
     for c in self
         rz += (c == '\n')
 ````
-#### Bools
+### Bools
 Bools have special treatment. You can add or even multiply them with numbers. The above `rz` example demonstrates adding a bool.
 
 However, bools are treated with extra caution when passed to function parameters. This is because almost everything can be converted to a bool, and it is very error-prone to pass let's say an int to a function that takes a bool.
@@ -211,7 +209,7 @@ Well, you might **want** that to compile, but speedie won't do it, because its a
         if Name // if name != "" then we call .dostuff
             .DoStuff(name)
     
-#### Implicit "if"
+### Implicit "if"
 "`if`" can be implicit, in speedie.
 
     || x = app.args[0]
@@ -219,7 +217,7 @@ Well, you might **want** that to compile, but speedie won't do it, because its a
       else
         printline "You passed nothing"
 
-#### Datatype Subclassing
+### Datatype Subclassing
 Sometimes you want to define a new "datatype". For example Speedie has the "`ErrorInt`" type which evaluates to `true`, if it is **not zero**. This is very useful for unix functions, because they tend to return 0 for success.
 
 Obviously, datatype subclasses can't add properties or have virtual functions. This example datatype will count as "true" for if-tests or anytime a bool is needed, only if it is an odd-number.
@@ -229,7 +227,7 @@ Obviously, datatype subclasses can't add properties or have virtual functions. T
             return self & 1
 
                  
-#### File/Memory Sizes
+### File/Memory Sizes
 Speedie has some handy constants!
     
     || x1 = 1KB
@@ -242,11 +240,11 @@ Obviously, these are in power of 2, so 1KB = 1024. Reporting sizes can be done n
 	"${x.strsize} ${x2.strsize} ${x3.strsize}" // prints: "1024 2MB 1.5MB"
 
     
-#### Parsing
+### Parsing
 Remembering to use Jeebox instead of making a custom file format, is a good way to reduce code-size, even for very simple file formats like a file separated by lines and commas.
 
 
-#### Good Error Handling
+### Good Error Handling
 Error handling is quite important. Its a skill to get right. The tools available are `stderr` which stores reported errors, and the `#require`/`#expect`/`#error` statements. Lets show some speedie code and then convert it to simpler code, to see how much worse the simpler way is.
     
     main
@@ -328,7 +326,7 @@ Overall it is a great thing. Use it if you need to deal with errors or generate 
 
 This only ignores "file doesn't exist", not "the file is actually a folder", or recursive-symlinks, or some other file-system error.
 
-#### How do we know an Error Occurred Just now?
+### How do we know an Error Occurred Just now?
 OK, so `stderr` will tell us if an error has occurred sometime in the past, not "just now". How to know if it happened just now? Mostly... by returning `nil`, or `false`, or some value that evaluates to `false`.
 
 For example parsing a string, will return `nil` if an error occurred during parse.
