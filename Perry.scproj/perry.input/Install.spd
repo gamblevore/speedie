@@ -53,15 +53,14 @@ extend_module perry
 		|| daily_fol = "~/Backups/perry".file
 		|| monthly_fol = "~/Backups/perry_monthly".file
 		|| latest_local = perry.speediedir["Terminal/Backup"][latest.name]
-
-		zip.copyto(latest_local)
+		
+		rz = latest_local.file
+		zip.copyto(rz)
 		zip.moveto(daily)
 		
 		|| it = remove_old(daily_fol, 7, true)
 			it.moveto(monthly)
 		remove_old(monthly_fol, 8)
-		
-		return latest_local.File
 				
 		
 	function install_path (|string|)
@@ -124,7 +123,7 @@ extend_module perry
 // i mean testing is important... but what if it fails? does it do anything special to help with that?
 		|| where = speedie.file
 		require where.exists
-		|| dest_path = where.linkto
+		|| dest_path = where.linksto
 			|| result = dest_path.executestr(["--alive"]).trim
 			if result contains "seems alive :)"
 				return .FindSpeedyRoot(dest_path)
@@ -200,10 +199,8 @@ extend_module perry
 		|| HasNewerApp = .testnewer
 		|| ShellBad = .testshell
 		|| InstallBad = .testinstall
-		|| ExistsBad = false
-		|| AgeBad = false
 		|| probs = false
-		if ShellBad or InstallBad or AgeBad or (Existsbad and testanyhow)
+		if ShellBad or InstallBad or testanyhow
 			if HasNewerApp				// what should we do?
 				beep ("A newer version of Perry exists... at $HasNewerApp. Please use it to install Speedie.")
 				return
@@ -250,7 +247,7 @@ extend_module perry
 		
 		
 	function CanGenerate (|file| f, |bool|)
-		require !f.linkto
+		require !f.linksto
 		|| n = f.name
 		require !n[0, ".git"]
 		if f.isdir
@@ -289,7 +286,7 @@ extend_module perry
 		|| term = f["Terminal/Speedie"]
 		require term.mustexist
 		|| at = speedie.file
-		|| dest = at.linkto
+		|| dest = at.linksto
 		if Dest == term.path
 			//
 		  elseif at.linkto(term)

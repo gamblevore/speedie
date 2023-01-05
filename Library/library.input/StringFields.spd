@@ -10,7 +10,7 @@ class StringFields
 
 	constructor (|string| Source,  |Byte| Sep = '\n')
 		.Data = Source
-		.Sep  = Sep		// not as fast as ElfDataFields ... that was so highly optimised it was crazy. 
+		.Sep  = Sep
 
 	
 	function NextSep (|int| Prev, |ind|)

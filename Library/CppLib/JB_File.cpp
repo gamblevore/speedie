@@ -138,7 +138,7 @@ int64 ErrorHandleStr_(int64 MaybeErr, JB_String* self, JB_String* other, const c
         return MaybeErr;
     }
     JB_ErrorHandleFile(self, other, errno, nil, Operation);
-    return 0;
+    return MaybeErr;
 }
 
 
@@ -174,25 +174,22 @@ int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
 }
 
 
-bool Stat_( JB_File* f, struct _stat* st, bool normal=true ) {
-    if (!f) return false;
+bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
+    if (!self) return false;
     int err = 0;
-    if ( HasFD( f ) ) {
-        err = fstat( f->Descriptor, st );
-    } else {
-        NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileThing( f );
-        if (normal)
-			err = stat( tmp, st );
-		  else
-			err = lstat( tmp, st );
-		if (err  and  errno != ENOENT  and access(tmp, 0)) { // access returns err
-			errno = ENOENT; // well duh.
-		}
-    }
+    uint8 Tmp[1024];
+	auto tmp = (const char*)JB_FastFileString(self, Tmp);
+	if (normal)
+		err = stat( tmp, st );
+	  else
+		err = lstat( tmp, st );
+	if (err  and  errno != ENOENT  and access(tmp, 0)) { // access returns err
+		errno = ENOENT; // well duh.
+	}
 
     if (!err) return true;
 	if (errno != ENOENT)
-		ErrorHandleStr_(err, f, nil, "get info on");
+		ErrorHandleStr_(err, self, nil, "get info on");
 	return false;
 }
 
@@ -437,13 +434,14 @@ int JB_Str_MakeDir(JB_String* self) {
 }
 
 
-int JB_File_Delete (JB_File* self) {
-    NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileThing( self );
+int JB_File_Delete (JB_String* self) {
+	uint8 Tmp[1024];
+    NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileString( self, Tmp );
     int err = remove( tmp );
     if (err == -1 and errno == ENOENT) {
         return 0;
     }
-    return (int)ErrorHandle_(err, self, nil, "delete");  // handle error
+    return (int)ErrorHandleStr_(err, self, nil, "delete");  // handle error
 }
 
     
@@ -581,21 +579,28 @@ int JB_File_ModeSet( JB_File* self, int Mode ) {
 }
 
 
-int JB_Str_LinkFrom( JB_StringC* self, JB_File* Link ) {
+int JB_Str_SymLink( JB_StringC* Existing, JB_String* ToCreate ) {
 	int Err = 0;
-	if (JB_File_Exists(Link)) {
-		Err = JB_File_Delete(Link);
+	if (JB_File_Exists(ToCreate)) {
+		Err = JB_File_Delete(ToCreate);
 		if (Err) {
 			errno = EEXIST; // clearer error message.
 		}
 	}
 	if (!Err) {
-		auto C	= ((const char*)JB_FastFileThing(Link));
-		Err	= symlink((const char*)(self->Addr), C);
-		if (Err and MakeParentPath_(self))
-			Err = symlink((const char*)(self->Addr), C);
+		uint8 Tmp[1024];
+		auto Created = (const char*)JB_FastFileString(ToCreate, Tmp);
+		Err	= symlink((const char*)(Existing->Addr), Created);
+		
+		if (Err and errno == ENOENT) {
+			if (MakeParentPath_(ToCreate)) {
+				Err = symlink((const char*)(Existing->Addr), Created);
+			} else {
+				Err = 0; // creates clearer error messages. 
+			}
+		}
 	}
-	return (int)ErrorHandleStr_(Err, Link, self, "linking");
+	return (int)ErrorHandleStr_(Err, ToCreate, Existing, "linking");
 }
 
 
@@ -688,15 +693,17 @@ bool JB_File_Create( JB_File* self ) {
 }
 
 
-bool JB_File_Exists( JB_File* self ) {
-	struct _stat info = {};
-	// OK so... this is better than access()
-	// because we can test for LINKS existing.
-	// kinda need it?
-	return Stat_(self, &info, false);
+bool JB_File_Exists( JB_String* self ) {
+    uint8 Tmp[1024];
+	auto tmp = (const char*)JB_FastFileString(self, Tmp);
+	int err = access(tmp, 0);
+	if (!err)
+		return true;
+	if (errno != ENOENT) {
+		ErrorHandleStr_(err, self, nil, "test-existance");
+	}
+	return false;
 }
-
-
 
 
 int JB_File_MoveTo(JB_File* self, JB_String* New) {

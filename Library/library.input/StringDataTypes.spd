@@ -5,9 +5,7 @@
 */
 
 
-datatype int8 (char) {
-
-} //sigh
+datatype int8 (char) 
 
 
 datatype char

@@ -7,4 +7,3 @@ function string.CountLines (|int|)
 
 main
 	printline app.args[0].countlines
-//	printline "`${app.args[0]}`"

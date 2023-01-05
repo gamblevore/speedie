@@ -4,7 +4,7 @@
 */
 
 
-// quite useful for a lot of things...
+// quite useful for calling unix functions...
 class StringZeroTerminated (string)
 	linkage
 		wrapper

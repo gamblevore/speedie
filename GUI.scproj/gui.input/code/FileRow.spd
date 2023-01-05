@@ -159,7 +159,7 @@ class FileRow (ListViewRow)
 					found[c] = nil
 					f.DoesntExist = false
 				  else
-					.addfile(dir[c], o)
+					.addfile(dir.child(c), o)
 		
 		for (lost in found)
 			.removefile(lost, o)

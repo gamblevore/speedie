@@ -37,15 +37,15 @@ class File (String)
 	function Mode (assigns:|FileMode|)
 		cpp_Wrapper JB_File_ModeSet
 
-	function LinkTo (|string|)
+	function LinksTo (|string|)
 		cpp_wrapper JB_File_LinkToGet
 
-	function StringZeroTerminated.LinkFrom (assigns:|file|, |errorint|)
-		cpp_wrapper JB_Str_LinkFrom
+	function StringZeroTerminated.SymLink (assigns:|file|, |errorint|)
+		cpp_wrapper JB_Str_SymLink
 
 	function LinkTo (assigns:|string|, |errorint|)
-		// linkfrom cos the unix c-api has idiotic params 
-		return Value.cstr.LinkFrom(self)
+		// This API confuses me... not sure if it's me or unix right now. 
+		return Value.cstr.SymLink(self)
 
 	function HardLinkTo (assigns:|stringzeroterminated|, |bool|)
 		cpp_wrapper JB_File_HardLinkTo 
@@ -348,16 +348,18 @@ class File (String)
 		return StringFields.new( .ReadAll, sep )
 	
 	
-	function CopyFile (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
+	function Copy (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
+		disabled "Use .Copyto"
+	function CopyTo (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
 		cpp_wrapper JB_File_Copy
 	
 	
-	function CopyTo (|string| Dest, |bool| AttrOnly=false, |ErrorInt|)
+	function CopyAll (|string| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		if !.isdir
-			return .copyfile(dest.file, AttrOnly)
+			return .copyto(dest.file, AttrOnly)
 
 		for f in self
-			rz = self[f].copyto(dest[f]) 
+			rz = .child(f).copyall(dest[f]) 
 			if !rz
 				exit
 		
@@ -398,7 +400,7 @@ class File (String)
 	iterator Files
 		.ListStart
 		while ( .MoveNext )
-			yield self[.CurrChild]
+			yield self.child(.CurrChild)
 		.listend
 	iterator flat
 		|[file]| dir_chain
@@ -507,7 +509,7 @@ class File (String)
 			ifn self isa "app"
 				return .anydate
 			|| n = "/Contents/MacOS/" + .trimextandpath
-			return self[n].anydate
+			return .child(n).anydate
 
 
 	function anydate (|date|)

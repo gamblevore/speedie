@@ -1,10 +1,13 @@
 
 
-main // speedie main {	 
+main // speedie main {	
+	error.AutoPrint = 1
+
 	compiler.SetupEnv
 	Compiler.Main
 	if interact.Perry != nil
 		printline "exiting speedie " + app.id.render
+	debugger
 
 
 function Compiler.Main

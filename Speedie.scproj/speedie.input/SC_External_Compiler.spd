@@ -269,12 +269,12 @@ function MakeLib
 
 function LinkOK (|file| p, |file|) // or just not a link
 	require p.exists
-	|| lto = p.linkto
+	|| lto = p.linksto
 	if !lto
 		return p
 
 	|| tof = lto.resolve(true).file
-	if tof.exists and !tof.linkto // not bad
+	if tof.exists and !tof.linksto // not bad
 		return tof
 
 	tof.delete
@@ -373,7 +373,7 @@ function ReplaceOld (|file| input, |File| Backs)
 				oldest = f
 	
 	if oldest != nil
-		input.copyto(oldest)
+		input.copyall(oldest)
 
 
 function MakeDailyProductPath (|File| B, |string|)
@@ -399,8 +399,8 @@ function BackupCompiler (|bool|)
 	|| DailyProduct = .MakeDailyProductPath( B )
 	|| path = DailyProduct.trimextandpath
 	Product.CopyFileTo( DailyProduct )
-	Cpp_Export.CppProduct.CopyTo( path + ".cpp" )
-	Cpp_Export.HProduct.CopyTo( path + ".h" )
+	Cpp_Export.CppProduct.Copyall( path + ".cpp" )
+	Cpp_Export.HProduct.Copyall( path + ".h" )
 
 	return stderr.ok
 
@@ -412,13 +412,13 @@ function InstallCompiler
 
 	|| CppTest = Cpp_Export.CppProduct
 	|| HTest = Cpp_Export.HProduct
-	|| Cpp0 = CppTest.Path.ReplacePathComponent(-2, "Build")
-	|| H0 = HTest.Path.ReplacePathComponent(-2, "Build")
+	|| Cpp0 = CppTest.Path.ReplacePathComponent(-2, "Build").file
+	|| H0 = HTest.Path.ReplacePathComponent(-2, "Build").file
 	Cpp0.Parent.MakeDir
-	ifn CppTest matches Cpp0.File
-		CppTest.CopyTo(Cpp0)
-	ifn HTest matches H0.File
-		HTest.CopyTo(H0.File)
+	ifn CppTest matches Cpp0
+		CppTest.Copyto(Cpp0)
+	ifn HTest matches H0
+		HTest.Copyto(H0)
 	
 	if options.Makelib
 		.MakeLib

@@ -345,7 +345,8 @@ class PerryIDE (Window)
 			dir = -dir
 		if err and dir
 			err = err.loop(dir>0)
-		err := (L.start, l.end)(dir>0)
+		if !err
+			err = (L.start, l.end)(dir>0)
 		if err
 			L.select(err)
 		  else
@@ -379,7 +380,7 @@ class PerryIDE (Window)
 				return .FindInSubFolder
 			if .masssearchfield.hasfocus
 				if .PrevView
-					.PrevView.Click?
+					.PrevView.Click
 				return .editme.OpenSearch
 			return .ShowFind
 		if key iscmd keys.k
@@ -438,10 +439,6 @@ class PerryIDE (Window)
 		//	return true // the gui-system needs fixing to make this work
 		return super.keydown(key)
 
-	
-	behaviour Draw
-		super.draw(where)
-		
 	
 	function Root (|filerow|)
 		return .filelist.start|filerow|
@@ -504,7 +501,7 @@ class PerryIDE (Window)
 			|| f = PerryOpenFix(data)
 			require f.file.exists
 			i = IdeAddProj(f, nil) // need to find it, not use the front!
-			i.opendoc(after, data, purpose)
+			i.OpenDoc(after, data, purpose)
 
 
 	function TryHideJB

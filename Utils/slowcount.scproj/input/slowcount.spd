@@ -6,4 +6,3 @@ main
 	for i in 1 to n
 		printline i
 		app.sleep(0.5s)
-

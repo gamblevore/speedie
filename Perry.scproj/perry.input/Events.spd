@@ -28,10 +28,10 @@ main
 
 
 function perryide.CreateBasicFiles (|file| proj)
-	|| main = proj["input/main.spd"]
-	proj[".perry"].filedata = qqfiles.Roots
+	|| main = proj.child("input/main.spd")
+	proj.child(".perry").filedata = qqfiles.Roots
 	main.data = .EmptyMainFile(proj.trimextandpath)
-	proj["input/.todo"].FileData = qqfiles.Todo
+	proj.child("input/.todo").FileData = qqfiles.Todo
 
 
 function string.TrimProj (|string|)
@@ -113,10 +113,10 @@ function file.InputFol (|file|)
 
 function file.FindProjectMain (|file|)
 	|| inp = .inputfol
-	|| best = inp["main.spd"]
+	|| best = inp.child("main.spd")
 	if best.exists
 		return best
-	best = inp["index.spd"]
+	best = inp.child("index.spd")
 	if best.exists
 		return best
 	for c.files in inp

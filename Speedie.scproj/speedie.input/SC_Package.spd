@@ -46,7 +46,7 @@ function compiler.AppBuildLibs (|file| inner)
 
 
 function compiler.AppleBuildApp (|file| project, |file| product)
-	|| dest = product.linkto
+	|| dest = product.linksto
 		error (dest, "This should not be a link")
 		return
 	

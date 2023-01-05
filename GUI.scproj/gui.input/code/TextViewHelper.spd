@@ -9,6 +9,7 @@ datatype TextLineFlags (uint16)
 		Last
 		AvoidLastChar
 
+
 class TextViewLine (ringtree)
 	linkage
 		cpp_part Line

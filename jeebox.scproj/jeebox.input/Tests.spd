@@ -9,7 +9,7 @@ extend_module Message
 		ifn orig and reparse
 			return CompareError(orig, reparse)
 
-		if (orig.func != reparse.func) or ( orig.name != reparse.name )
+		if (orig.func != reparse.func) or (orig.name != reparse.name)
 			return CompareError(orig, reparse)
 
 		|| r1 = reparse.First
@@ -20,11 +20,6 @@ extend_module Message
 			s1++
 		return true
 
-
-function Message.LocateAll
-	visible
-	for ch.flat in self
-		printline ch.locate
 
 
 function Message.Locate (|string|)

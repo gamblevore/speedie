@@ -37,8 +37,10 @@ static void MyWrite_(int F, const char* s, int N) {
 void JB_Str_PrintError(JB_String* s) {
     if (JB_Str_Length(s)) {
 		JB_Str_PrintTo(s, StdErrFD_);
-		if (!JB_ErrorNumber)
+		if (!JB_ErrorNumber) {
+			JB_DoAt(0);
 			JB_ErrorNumber = -1; // terminals complain if printerror without return -1;
+		}
     }
 }
 

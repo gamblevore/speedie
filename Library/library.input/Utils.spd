@@ -13,18 +13,16 @@ function message.AllNames (|[string]|)
 	for s in self
 		rz <~ s.name
 
-extend_module file
-	function Dictionary (|file|)
-		disabled "Use .words"
-		
-	function Words (|file|)
-		return "/usr/share/dict/words".file
+function @file.Dictionary (|file|)
+	disabled "Use .words"
+	
+function @file.Words (|file|)
+	return "/usr/share/dict/words".file
 		
 function string.Dict (|byte|sep='\n', |dictionary|)
-	|| fi = StringFields.new( self, sep )
 	rz = Dictionary()
-	for l in fi
-		if l
+	if self
+		for l in StringFields( self, sep )
 			rz[l] = "x"
 
 function string.Sort (|byte| sep = '\n', |string|)

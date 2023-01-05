@@ -123,7 +123,9 @@ uint8* JB_Str_AddressEnd( JB_String* self ) {
 
 
 uint8* JB_Str_Address( JB_String* self ) {
-	return (uint8*)self->Addr;
+	if (self) 
+		return (uint8*)self->Addr;
+	return 0;
 }
 
       

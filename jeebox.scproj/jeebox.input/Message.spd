@@ -150,14 +150,14 @@ class Message (RingTree)
 		fs <~ .Name
 		
 
-	function string.IsTmpName (|bool|)
+	function string.IsStatementName (|bool|)
 		return (jeebox.cswordmiddle contains self) and (!self[0].IsInt)
 	
 	
 	syx Tmp (Statement)
 		Opt NoRefCounts
 //							return x
-		if .name.IsTmpName
+		if .name.IsStatementName
 			fs <~ .name
 		  else
 			fs <~ `+"`

@@ -181,7 +181,7 @@ datatype SizeInt (int)
 		return .strsize
 
 
-datatype Ind (int)
+datatype Ind (int) // an INDex. And an INT.
 	default -1
 	syntax cast (|bool|)
 		return self >= 0
@@ -189,7 +189,7 @@ datatype Ind (int)
 		return self >= 0
 
 
-datatype ErrorInt (int)
+datatype ErrorInt (int) // useful for unix-functions which has 0 == success
 	default 0
 	syntax cast (|bool|)
 		return self == 0
@@ -483,8 +483,7 @@ datatype f64
 		cpp_wrapper (fmin)
 
 	render (|string|fmt=nil)
-		|| addr = fmt.address?|&byte|
-		fs.appenddouble(self, addr)
+		fs.appenddouble(self, fmt.address)
 
 
 
@@ -564,19 +563,26 @@ datatype int64
 		|| Addr2 = Addr|&f64|
 		return Addr2[0]
 
+	helper RenderSizePart (|faststring| fs, |int| Size, |string| Suff)
+		|int64| MB = self / Size
+		fs <~ MB
+		|| Extra = (((self+(Size*0.05)|int64|) - (MB * Size))*10)/(Size) 
+			fs <~ '.'
+			fs <~ extra
+		fs <~ Suff
+		
 	render strsize
-		if self < 2KB
+		if self <= 512
 			fs <~ self
-		  elseif self <= 875KB
-			fs <~ self/1KB
-			fs <~ "KB"
+		  elseif self <= 900KB
+			.RenderSizePart(fs, 1KB, "KB")
+		  elseif self < 900MB
+			.RenderSizePart(fs, 1MB, "MB")
+		  elseif self < 900GB
+			.RenderSizePart(fs, 1GB, "GB")
 		  else
-			|| MB = self / 1MB
-			fs <~ MB
-			|| Extra = (((self+102K) - (MB * 1MB))*10)/(1MB) 
-				fs <~ '.'
-				fs <~ extra
-			fs <~ "MB"
+			.RenderSizePart(fs, 1024GB, "TB")
+			
 	
 	
 	function IsPo2 (|bool|)

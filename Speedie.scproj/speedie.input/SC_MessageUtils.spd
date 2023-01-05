@@ -419,3 +419,7 @@ function NewFnc (|string| name, |Message|)
 		«prm »
 	»
 
+function Message.LocateAll
+	for ch.flat in self
+		printline ch.locate
+

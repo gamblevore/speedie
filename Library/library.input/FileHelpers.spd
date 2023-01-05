@@ -6,7 +6,7 @@
 extend String	
 	function ExistingFile (|string| operation="use",  |File|)
 		|| f = .file
-		if f.mustexist(operation)
+		if f.MustExist(operation)
 			return f
 	
 	function FileExists (|bool|)
@@ -84,6 +84,8 @@ extend String
 
 	function TrimExtKeepPath (|string|)
 		return .TrimExtAndPath(false)
+
+
 	function TrimExtAndPath (|bool| KeepPath=true, |string|)
 		Description "already does .name, no need for .name.trimext"
 		|| N	 = .FindTrailingSlashes
@@ -94,7 +96,6 @@ extend String
 			slash = 0
 		return self[slash, dot]
 		
-
 
 	function FileData (|int|lim=1024MB, |bool|AllowMissing=true, |string|)
 		return .file.readall(lim, AllowMissing)
@@ -143,7 +144,7 @@ extend String
 
 	
 	function TrimFirst (|Byte| b, |string|)
-		|| s = .outbyte2(b)
+		|| s = .outbyte(b)
 		return self[s...]
 
 	
@@ -174,7 +175,7 @@ extend String
 	
 	function Ext (|string|)
 		|| i = .find( '.', int.max, 0 )
-		|| n = .outbyte2('/', int.max, 0)
+		|| n = .outbyte('/', int.max, 0)
 		n := .length
 		if i
 			return self[i + 1, n+1]
@@ -264,8 +265,8 @@ extend file
 		if platform.osx
 			return "/usr/bin/xattr".execute([request, self])
 		
-	function xcopyto (|file|f, |errorint|) 
-		rz = .copyto(f)
+	function xcopyall (|file|f, |errorint|) 
+		rz = .copyall(f)
 		if rz
 			rz = f.xattrclear
 

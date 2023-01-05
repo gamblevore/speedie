@@ -128,7 +128,7 @@ function app.CodeSign (|file|)
 
 function file.CodeSign (|string| sign, |errorint|)
 	target osx
-		StdErr.ErrorsAreProblems++
+		StdErr.ErrorsAreWarnings++
 		|[string]| args = []
 		args <~ "--deep"
 		args <~ "--force"
@@ -150,5 +150,5 @@ function file.CodeSign (|string| sign, |errorint|)
 		if rz
 			args[0] = "-a"
 			rz = "/usr/sbin/spctl".PrintExecute(args)
-		StdErr.ErrorsAreProblems--
+		StdErr.ErrorsAreWarnings--
 			

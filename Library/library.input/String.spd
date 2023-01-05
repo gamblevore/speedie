@@ -34,10 +34,6 @@ class String
 	helper CharSet_ (|int|Start=0, |int|After=int.max, |CharSet| cs, |bool|IsIn, |ind|)
 		cpp_wrapper JB_Str_CharSet
 
-	helper InCharSet_ (|int|Start=0, |int|After=int.max, |CharSet| cs, |ind|) { return .CharSet_(Start, After, cs, true) }
-
-	helper OutCharSet_ (|int|Start=0, |int|After=int.max, |CharSet| cs, |ind|) { return .CharSet_(Start, After, cs, false) }
-
 	helper White_ (|int|Start=0, |int|After=int.max, |bool| IsIn, |ind|)
 		cpp_wrapper JB_Str_WhiteSpace
 	
@@ -58,7 +54,7 @@ class String
 	function Find (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|)
 		return .CharSet_(Start, After, cs, true)
 
-	function OutByte2 ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| ) { return .outbyte_(Start, after, find)  }
+	function OutByte ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| ) { return .outbyte_(Start, after, find)  }
 
 	function OutCharSet (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|) { return .CharSet_(Start, After, cs, false) }
 	
@@ -339,11 +335,11 @@ class String
 	function IsBadUTF8 (|int|from, |ind|)
 		cpp_Wrapper JB_Str_BadUTF8
 
-	function IsBinary (|float|f=24th, |bool|)
-		return (.length*f) < .badness
+	function IsBinary (|float|f=24.0, |bool|)
+		return .badness*f >= .length
 	
-	function IsText (|float|f=24th, |bool|)
-		return !.isbadutf8(0)
+	function IsText (|float|f=24.0, |bool|)
+		return !.IsBinary(f)
 	
 	helper Badness (|int|)
 		|| pos = 0
@@ -369,7 +365,7 @@ class String
 		
 	function insert (|string| s, |int| i, |int| n = 0, |string|)
 		|| fs = faststring()
-		fs.size = .length + s.length
+		fs.size = .length + s.length - n
 		fs.appendsection(self, 0, i)
 		fs <~ s
 		fs.appendsection(self, i+n, int.max)
@@ -542,8 +538,7 @@ class String
 			require !self[i].iswhite
 		
 
-// OK so this function makse no sense
-// baiscally we just want " " to match with  multiple spaces or tabs
+// basically we just want " " to match with  multiple spaces or tabs
 // that is all. but also "  " must match with at least two.
 	helper StretchyFindSub (|string| find, |int| from, |int|)
 		|| i = 0
@@ -568,7 +563,6 @@ class String
 		return i+from
 
 
-	// fails to find "   test"... shuld be at least 3 spaces
 	function StretchyFind (|string| find, |int| from=0, |int| to=int.max, |intrange|)
 		|| n = self - find
 		to = to min n
@@ -592,7 +586,7 @@ class String
 
 
 	iterator
-		|| Start = .Addr
+		|| Start = .Address
 		|| End = Start + .Length
 		while (Start < End)
 			yield Start[0] (Start - .Addr)
@@ -600,7 +594,7 @@ class String
 
 	
 	iterator Backwards
-		|| Start = .Addr
+		|| Start = .Address
 		|| i = .Length-1
 		while (i >= 0)
 			yield Start[i] (i)
@@ -616,14 +610,14 @@ class String
 
 	
 	iterator CodePoints
-		|| Start	= .Addr
+		|| Start	= .Address
 		|| End		= Start + .Length
 		while (Start < End)
 			|| c = codepoint.UTF8Read(&start)
 			yield (c) (start)
 
 	iterator CodePoints2
-		|| First	= .Addr
+		|| First	= .Address
 		|| Curr		= First
 		|| End		= first + .Length
 		while (Curr < End)

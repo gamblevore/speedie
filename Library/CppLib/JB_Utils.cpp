@@ -142,7 +142,8 @@ uint8* JB_FastCString( JB_String* Path, uint8* Tmp ) {
     }
 
 	uint8* Result = Path->Addr;
-    if (JB_ObjClass(Path)==JB_AsClass(JB_StringC))
+	auto Cls = JB_ObjClass(Path); 
+    if (Cls==JB_AsClass(JB_StringC) or Cls==JB_AsClass(JB_File))
         return Result;
 
     if (N > 1023)

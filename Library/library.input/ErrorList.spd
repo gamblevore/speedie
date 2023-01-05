@@ -24,7 +24,7 @@ class ErrorList
 	|int|					ErrorCount
 	|int|					ProblemCount
 	|int|					WarnCount
-	|int|					ErrorsAreProblems
+	|int|					ErrorsAreWarnings
 	|string|				Source
 
 	constructor
@@ -55,6 +55,8 @@ class ErrorList
 		
 	
 	syntax append (|Error| Err)
+		if err.errorlevel >= Errorseverity.error
+			debugat
 		|| CanPrint = !.errorcount and error.autoprint
 		.incr(err)
 		require .CanAddMore(err.ErrorLevel)
@@ -84,6 +86,7 @@ class ErrorList
 		|| n = (1, -1)(add)
 		
 		if err.errorlevel == errorseverity.problem
+			debugger
 			.problemcount += n
 		  elseif err.isError
 			.errorcount += n

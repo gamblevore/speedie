@@ -30,7 +30,7 @@ extend_module ASM
 			.enc1
 		target debug // asm here
 			// So now what?
-			stderr.errorsareproblems++ // nice
+			stderr.ErrorsAreWarnings++ // nice
 
 			|| list = tests.last(@arg)
 			|| testname = tests[@thg]
@@ -40,7 +40,7 @@ extend_module ASM
 				|| fn = Flatten[testname]
 					|| ff = fn.finish.run
 			
-			stderr.errorsareproblems--
+			stderr.ErrorsAreWarnings--
 
 
 	function TestASM 

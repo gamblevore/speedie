@@ -334,6 +334,9 @@ function TypeOfUnit (ExprResolver)
 			val *= mul
 			if type.typeinfo.isint
 				str = val|int64|.render
+				|f64| big = 1|int64| << 31|int64|
+				if val >= big  or val < -big
+					type = TypeInt64.TypeNormal
 			  else
 				str = val.render
 		exp.become(@num, str)

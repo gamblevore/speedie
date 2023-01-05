@@ -1,15 +1,14 @@
 
-
 							Todo
 
 
-* fix xcode paths
-* update jeebox.org to reflect the new release!
-* build-system should INITIALLY not rely on the speedie executable... just a script built by speedie. :) with all the correct files needed.
 * func calledfrom (rightclick) should jump to exact line...
-
 * changing a file to a folder or back again... fails to update in the IDE. TryReloadPath?
 * jeeboxlib should be tested by "spd --self"? I doubt it still works.
+
+
+* invite tobias/simon to speedie collab
+* build-system should INITIALLY not rely on the speedie executable... just a script built by speedie. :) with all the correct files needed.
 
 * Speedie export asm funcs
 	* Pack linking... at least a basic idea?

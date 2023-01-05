@@ -423,11 +423,13 @@ class RingTree (Saveable)
 		
 
 	function NextLoop (||)
+		opt norefcounts
 		|| f = .next
 		return (f, .parent.first)(f)
 		
 
 	function PrevLoop (||)
+		opt norefcounts
 		|| f = .prev
 		return (f, .parent.last)(f)
 	

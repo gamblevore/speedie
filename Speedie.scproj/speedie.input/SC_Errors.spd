@@ -113,9 +113,9 @@ function Compiler.PrePrintErrors
 
 function Compiler.PrintErrors (|errorseverity| MinSev)
 	|| s = .builderrors(minsev)
-	if options.perry or stderr.errorcount
-		if options.perry == 2
-			s = s.digest
+	if options.perry == 2
+		s = s.digest
+	if stderr.errorcount
 		printerror s
 	  else
 		print s

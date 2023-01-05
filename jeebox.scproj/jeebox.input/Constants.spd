@@ -133,9 +133,6 @@ Module Jeebox
 		cpp_wrapper JB_Lower
 
 
-function Byte.IsALetter (|bool|)
-	return jeebox.CSLettersOnly[self]
-
 function String.Unescape (|string|)
 	return .ReplaceAll( Jeebox.UnEscapeStr )
 
