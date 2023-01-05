@@ -18,9 +18,9 @@ Technically, Jeebox is classed as an `AST` (abstract syntax tree), that is why i
     for f in recent_list..files
         printline f.first.name // prints the paths
     
-**Unlike** XML which has many different kinds of nodes, each `Message` returned by string.parse is interchangeable, and has only two things defining it, the type and the name.
+**Unlike** XML which has many different kinds of nodes, each `Message` returned by `string.parse` is interchangeable, and has only two things defining it, the type and the name.
 
-`Message` has a type accessed via `.func`, and a name (`.name`).
+`Message` has a type accessed via `.func`, and a name accessed via `.name`.
 
 For example, parsing this:
 
