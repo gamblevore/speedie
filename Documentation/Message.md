@@ -8,13 +8,13 @@ Message is used to represent the nodes within a parsed Jeebox string. Jeebox is 
 Technically, Jeebox is classed as an `AST` (abstract syntax tree), that is why it can store source-code. It just happens to also be useful for storing data-files.
 
 
-    || recent_list_data = `
+    || source_string = `
     files
         file "/path/to/file1" (Picture)
         file "/path/to/file2" (Sound)
         file "/path/to/file3" (Text)
     `
-    || recent_list = recent_list.parse
+    || recent_list = source_string.parse
     for f in recent_list..files
         printline f.first.name // prints the paths
     
