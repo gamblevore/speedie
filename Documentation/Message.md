@@ -3,7 +3,7 @@
 
 The `Message` class is the result of parsing a string, like "`|| msg = "(a,b,c)".parse`"
 
-Message is used to represent the nodes within a parsed Jeebox string. Jeebox is a highly flexible data-format, that is extensible (like XML).
+Message is used to represent the nodes within a parsed string. Jeebox is a highly flexible data-format, that is extensible (like XML).
 
 Technically, Jeebox is classed as an `AST` (abstract syntax tree), that is why it can store source-code. It just happens to also be useful for storing data-files.
 
