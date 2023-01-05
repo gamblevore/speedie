@@ -29,10 +29,10 @@ For example, parsing this:
 Well, that leads to this "AST":
 
     tmp "return"
-    	rel 
-    		thg "a"
-    		opp ">"
-    		thg "c"
+        rel 
+            thg "a"
+            opp ">"
+            thg "c"
 
 So the message "`return`" has a type of `@tmp`. "`>`" has a type of `@opp`.
 
