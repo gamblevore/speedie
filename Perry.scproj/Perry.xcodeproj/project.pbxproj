@@ -167,7 +167,6 @@
 /* Begin PBXFileReference section */
 		AC0F6154233BA87000382DA7 /* Jeebox.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Jeebox.input; path = ../jeebox.scproj/Jeebox.input; sourceTree = "<group>"; };
 		AC150E6629671B800071AE42 /* JB_Network.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Network.cpp; path = Cpp/JB_Network.cpp; sourceTree = "<group>"; };
-		AC150E6929671BA30071AE42 /* JB_Network.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JB_Network.h; path = ../GUI.scproj/gui.input/c_includes/JB_Network.h; sourceTree = "<group>"; };
 		AC259FAC2660E1AC0026C303 /* Multiplay.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Multiplay.entitlements; sourceTree = "<group>"; };
 		AC259FAD2660E1AC0026C303 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AC259FB22660E1AC0026C303 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -371,7 +370,6 @@
 			children = (
 				AC3A6A8D296082E700CE1E91 /* README.md */,
 				AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */,
-				AC150E6929671BA30071AE42 /* JB_Network.h */,
 				AC28D04B2638AAE700635A66 /* perry.input */,
 				AC528A5F2961F8D3005EFB9D /* Compiled Src Perry */,
 				AC610133279877CC00278BEF /* Compiled Src Speedie */,
