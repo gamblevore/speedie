@@ -26,7 +26,7 @@ For example, parsing this:
 
     return a > c
 
-Well, that leads to this "AST":
+Well, that leads to this tree:
 
     tmp "return"
         rel 
@@ -34,16 +34,16 @@ Well, that leads to this "AST":
             opp ">"
             thg "c"
 
-So the message "`return`" has a type of `@tmp`. "`>`" has a type of `@opp`.
+So the message "`return`" has a type of `@tmp`. "`>`" has a type of `@opp`. (We use `@` in Speedie, to represent `Message` types. So `@thg` would be a "thing" type, and `@arg` would be an "argument" type.)
 
-So... `Message` can be used to store all sorts of data really. Here are some things I've (practically) used it for so far:
+`Message` is very generally useful. Think of Jeebox like Unicode, where you have one standard (Unicode) that represents many languages. Jeebox is the same. Here are some things I've (practically) used Jeebox for, so far:
 
 * Source code (Speedie uses it)
 * Configuration files (Speedie uses it)
 * Preference files (all my apps use it)
 * IPC (the `Process` class)
 * Internet communications
-* Various technical data
+* Data-banks
 
 ## Upcoming Section...
 
