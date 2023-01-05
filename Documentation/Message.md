@@ -36,7 +36,9 @@ Well, that leads to this tree:
 
 So the message "`return`" has a type of `@tmp`. "`>`" has a type of `@opp`. (We use `@` in Speedie, to represent `Message` types. So `@thg` would be a "thing" type, and `@arg` would be an "argument" type.)
 
-`Message` is very generally useful. Think of Unicode, where you have one standard that represents many languages. Jeebox is the same. Here are some things I've (practically) used Jeebox for, so far:
+`Message` is very generally useful. Think of Unicode, where you have one standard that represents many languages. Jeebox is the same. If you appreciate Unicode over the mess we had before with hundreds of different encodings, each only good at one language and usually a few encodings per language... you might appreciate Jeebox too.
+
+Here are some things I've (practically) used Jeebox for, so far:
 
 * Source code (Speedie uses it)
 * Configuration files (Speedie uses it)
