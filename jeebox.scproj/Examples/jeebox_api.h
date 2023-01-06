@@ -1,8 +1,6 @@
 
 /* jeebox-licence:
     By Theodore H. Smith, 2019, theo@jeebox.org
-
-	I guess this software is private right now... fuck this licence as if anyone ever cared about what I said.
 	
     This software is provided 'as-is', without any warranty.
     In no event will the author be held liable for any damages
@@ -10,7 +8,7 @@
 
     Permission is granted to anyone to use this software for any purpose,
     including commercially, and to alter it and redistribute it
-    freely, subject to the following restrictions:
+    freely, subgect to the following restrictions:
 
     1. The origin of this software must not bee misrepresented; you must not
         claim that you wrote the original software.
@@ -76,7 +74,6 @@ jbmessage* jb_msg_root(jbmessage* self);
 void jb_msg_remove(jbmessage* self); /* Removes the node from the tree. */
 jbstring* jb_msg_render(jbmessage* self);
 jbstring* jb_msg_ast(jbmessage* self);
-jbmessage* jb_msg_parseast(jbmessage* self);
 jbmessage* jb_msg_copy(jbmessage* self, jbmessage* layer);
 jbmessage* jb_msg_create(jbmessage* self, jbsyntax Type, jbstring* Name);
 void jb_msg_error(jbmessage* self, jbstring* ErrorMsg); /* Lets you add your own error messages to the tree. */
@@ -120,6 +117,8 @@ jbstring* jb_readfile(_cstring path, bool AllowMissingFile);
 
 		// Jeebox Syntax
 
+#define JB_SyxNil 0;
+#define $nil 0
 #define JB_SyxArg 1;
 #define $arg 1
 #define JB_SyxBra 2;
@@ -136,94 +135,98 @@ jbstring* jb_readfile(_cstring path, bool AllowMissingFile);
 #define $name 7
 #define JB_SyxQues 8;
 #define $ques 8
-#define JB_SyxUnit 9;
-#define $unit 9
-#define JB_SyxNum 10;
-#define $num 10
-#define JB_SyxAdj 11;
-#define $adj 11
-#define JB_SyxBadj 12;
-#define $badj 12
-#define JB_SyxAcc 13;
-#define $acc 13
-#define JB_SyxArr 14;
-#define $arr 14
-#define JB_SyxBack 15;
-#define $back 15
-#define JB_SyxSStr 16;
-#define $sstr 16
-#define JB_SyxChar 17;
-#define $char 17
-#define JB_SyxDecl 18;
-#define $decl 18
-#define JB_SyxDot 19;
-#define $dot 19
-#define JB_SyxEmb 20;
-#define $emb 20
-#define JB_SyxFunc 21;
-#define $func 21
-#define JB_SyxItem 22;
-#define $item 22
-#define JB_SyxList 23;
-#define $list 23
-#define JB_SyxQuot 24;
-#define $quot 24
-#define JB_SyxOat 25;
-#define $oat 25
-#define JB_SyxARel 26;
-#define $arel 26
-#define JB_SyxBRel 27;
-#define $brel 27
-#define JB_SyxERel 28;
-#define $erel 28
-#define JB_SyxRel 29;
-#define $rel 29
-#define JB_SyxTRel 30;
-#define $trel 30
-#define JB_SyxTril 31;
-#define $tril 31
-#define JB_Syxpinn 32;
-#define $pinn 32
-#define JB_Syxbinn 33;
-#define $binn 33
-#define JB_SyxAsk 34;
-#define $ask 34
-#define JB_SyxYoda 35;
-#define $yoda 35
-#define JB_SyxSDot 36;
-#define $sdot 36
-#define JB_SyxSCom 37;
-#define $scom 37
-#define JB_SyxSheb 38;
-#define $sheb 38
-#define JB_SyxStr 39;
-#define $str 39
-#define JB_SyxSThg 40;
-#define $sthg 40
-#define JB_SyxSCnj 41;
-#define $scnj 41
-#define JB_SyxType 42;
-#define $type 42
-#define JB_SyxMsg 43;
-#define $msg 43
-#define JB_SyxBnch 44;
-#define $bnch 44
-#define JB_SyxTodo 45;
-#define $todo 45
-#define JB_SyxXAtt 46;
-#define $xatt 46
-#define JB_SyxXML 47;
-#define $xml 47
-#define JB_SyxXPI 48;
-#define $xpi 48
-#define JB_SyxXCom 49;
-#define $xcom 49
-#define JB_SyxXCDT 50;
-#define $xcdt 50
-#define JB_SyxXTxt 51;
-#define $xtxt 51
-#define JB_SyxBin 52;
-#define $bin 52
+#define JB_SyxBack 9;
+#define $back 9
+#define JB_SyxChar 10;
+#define $char 10
+#define JB_SyxSStr 11;
+#define $sstr 11
+#define JB_SyxOat 12;
+#define $oat 12
+#define JB_SyxSheb 13;
+#define $sheb 13
+#define JB_SyxStr 14;
+#define $str 14
+#define JB_SyxSThg 15;
+#define $sthg 15
+#define JB_SyxSCnj 16;
+#define $scnj 16
+#define JB_SyxNum 17;
+#define $num 17
+#define JB_SyxEmb 18;
+#define $emb 18
+#define JB_SyxUnit 19;
+#define $unit 19
+#define JB_SyxType 20;
+#define $type 20
+#define JB_SyxARel 21;
+#define $arel 21
+#define JB_SyxDot 22;
+#define $dot 22
+#define JB_SyxSDot 23;
+#define $sdot 23
+#define JB_SyxFunc 24;
+#define $func 24
+#define JB_SyxBRel 25;
+#define $brel 25
+#define JB_SyxAdj 26;
+#define $adj 26
+#define JB_SyxBadj 27;
+#define $badj 27
+#define JB_SyxAcc 28;
+#define $acc 28
+#define JB_SyxArr 29;
+#define $arr 29
+#define JB_SyxItem 30;
+#define $item 30
+#define JB_SyxList 31;
+#define $list 31
+#define JB_SyxPrm 32;
+#define $prm 32
+#define JB_SyxFile 33;
+#define $file 33
+#define JB_SyxQuot 34;
+#define $quot 34
+#define JB_SyxDecl 35;
+#define $decl 35
+#define JB_SyxRel 36;
+#define $rel 36
+#define JB_SyxERel 37;
+#define $erel 37
+#define JB_SyxTRel 38;
+#define $trel 38
+#define JB_SyxTril 39;
+#define $tril 39
+#define JB_Syxpinn 40;
+#define $pinn 40
+#define JB_Syxbinn 41;
+#define $binn 41
+#define JB_SyxAsk 42;
+#define $ask 42
+#define JB_SyxYoda 43;
+#define $yoda 43
+#define JB_SyxSCom 44;
+#define $scom 44
+#define JB_SyxMsg 45;
+#define $msg 45
+#define JB_SyxTodo 46;
+#define $todo 46
+#define JB_Syxurl 47;
+#define $url 47
+#define JB_SyxXAtt 48;
+#define $xatt 48
+#define JB_SyxXML 49;
+#define $xml 49
+#define JB_SyxXPI 50;
+#define $xpi 50
+#define JB_SyxXCom 51;
+#define $xcom 51
+#define JB_SyxXCDT 52;
+#define $xcdt 52
+#define JB_SyxXTxt 53;
+#define $xtxt 53
+#define JB_SyxBin 54;
+#define $bin 54
 
 
 #ifdef __nodebug

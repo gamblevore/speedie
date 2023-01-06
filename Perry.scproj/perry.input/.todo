@@ -2,9 +2,11 @@
 							Todo
 
 
-* func calledfrom (rightclick) should jump to exact line...
 * changing a file to a folder or back again... fails to update in the IDE. TryReloadPath?
-* jeeboxlib should be tested by "spd --self"? I doubt it still works.
+* jbbuild.sh should be auto-run by spd --self.
+	* banned thing should mention the property/msg that reached us
+	* .render is reaching process/file? lol. Via behaviours?
+	* remove date from error... or at least change it for libs.
 
 
 * invite tobias/simon to speedie collab

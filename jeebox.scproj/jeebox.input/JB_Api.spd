@@ -145,7 +145,7 @@ class_api Message (msg)
 	
 	api ast (|string|)
 		.nil$
-		return .ast
+		return .renderast
 		description "Renders the structure of the tree in a human-readable format. Useful to understand the parse-tree. This gives you an idea of how to move across the tree using jb_msg_child/prev/parent/etc!"
 			
 	api copy (|message|layer, |message|)
@@ -237,8 +237,9 @@ The optional path is not used for anything except generating better error messag
 
 
 api syntax (|string| name, |syntax|)
-	return syntax[name]$.id
-	description `Looks up the syntax of that name from the syntax-table. The name must be lower-case and in short-form, like "arg" not "Arg" or "argument". (The list of short-form names is in api.h, you will see $arg, $acc... its those minus the $.)`
+	opt norefcounts
+	return Syntax.Func(name)
+	description `Looks up the syntax of that name from the syntax-table. The name must be in short-form, like "arg", not "argument". (The list of short-form names is in api.h, you will see $arg, $acc... its those minus the $.)`
 
 
 api str (|cstring| Str, |int| Length, |_voidptr| Release, |_voidptr| Tag, |string|)

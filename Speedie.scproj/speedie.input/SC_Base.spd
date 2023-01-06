@@ -17,6 +17,7 @@ linkage
 |Dictionary of scobject|			Access
 |String|							ExportName
 |SCBase--|							Lookup
+|SCBase--|							CurrReacher
 |SCImport--|						Project
 
 

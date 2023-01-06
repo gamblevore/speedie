@@ -846,18 +846,19 @@ function CollectLinks (|object| obj)
 		.DoLinkTo( obj )
 
 
-function FindReached
+function FindReached (|scbase| from)
 	// so... just go through stuff...
 	require !(self is Reached)
+	.currreacher = from
 	.Reach
 		
 	for o in .LinkTo
 		if (o is Reached)
 			//
 		  elseif (o isa SCFunction)
-			o.FindReached
+			o.FindReached(self)
 		  elseif (o isa SCClass)
-			o.Reach
+			o.Reach(self)
 
 
 function Reach
@@ -866,7 +867,7 @@ function Reach
 
 	Compiler.stReachedFunc++
 	is reached
-	.cls$.Reach
+	.cls$.Reach(self)
 
 
 

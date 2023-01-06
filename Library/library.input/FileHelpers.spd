@@ -65,6 +65,8 @@ extend String
 	function Resolve (|bool| AllowMissing=false, |string|) 
 		cpp_wrapper JB_Str_ResolvePath
 
+	Operator PathMatch (|string| path, |bool|)
+		return .lowercase == .lowercase
 
 	function VolumeName (|string|)
 		opt norefcounts

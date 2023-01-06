@@ -55,8 +55,6 @@ class ErrorList
 		
 	
 	syntax append (|Error| Err)
-		if err.errorlevel >= Errorseverity.error
-			debugat
 		|| CanPrint = !.errorcount and error.autoprint
 		.incr(err)
 		require .CanAddMore(err.ErrorLevel)

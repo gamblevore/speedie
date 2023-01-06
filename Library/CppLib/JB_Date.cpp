@@ -76,4 +76,9 @@ Date JB_Date__Now( ) {
 
 }
 
+#else
+extern "C" void JB_Date__Stub() {
+	return;
+}
+
 #endif

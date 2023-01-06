@@ -7,7 +7,6 @@ main // speedie main {
 	Compiler.Main
 	if interact.Perry != nil
 		printline "exiting speedie " + app.id.render
-	debugger
 
 
 function Compiler.Main

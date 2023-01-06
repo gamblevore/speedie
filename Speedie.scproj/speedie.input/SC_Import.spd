@@ -62,13 +62,24 @@ class SCImport
 					.ImportMsg(j)
 
 
+	function ShouldBan (|scfile| scf, |bool|)
+		if !SCImport.STDLibTime
+			return true
+		require compiler.BaseProjectPath pathmatch compiler.jeebox
+		require compiler.BaseProjectPath.DirectoryContains(scf.path)
+		return true
+		// we also need something else to be the same.
+		// scf needs to be inside the thing...
+	
+	
 	function LoadPrefix (|SCFile| scf, |int| depth)
 		.Mod.ExportName = "App" // make it simple
-		require scf != nil
-		|| root = scf.AST$
+		|| root = scf$.AST$
 		|| link = root.findflat( @tmp, "linkage" )
 			link.remove
-			.IsSTDLib = scimport.STDLibTime or link..type ~= "library"
+			.IsSTDLib = SCImport.STDLibTime or link..type ~= "library"
+			if .ShouldBan(scf)
+				.LoadBanned(link..bannedclasses)
 			|| name = link[@arg].findflat( @tmp, "cpp_part" )[@thg]
 				scf.ExportName = name.name
 				.Mod.ExportName = name.name
@@ -79,6 +90,16 @@ class SCImport
 			|| c = f[cName]
 			if (!c.isDir) and (cName isa "h")
 				output <~ c.path
+	
+	
+	function LoadBanned (|Message| list)
+		opt norefcounts
+		require list and list.expect(@list)
+		debugger
+		options.BannedClasses := Dictionary()
+		for item in list
+			item.expect(@thg)
+			options.BannedClasses.valuelower(item.name) = "x"
 	
 	
 	function ImportSpd (|File| c, |string| CurrPath, |SCFile|)
@@ -109,14 +130,12 @@ class SCImport
 				|| B = .ImportSpd(c, currpath)
 				if cName ~= "index.spd"
 					rz = B
-			  else
-				// compiler.FilesImported[cname] = c
-				if ext == "vert" or "frag" or "shad" or "sdf"
-					Shaders := dictionary.new
-					shaders[ cName ] = c
+			  elseif ext == "vert" or "frag" or "shad" or "sdf"
+				Shaders := dictionary.new
+				shaders[ cName ] = c
 
-				  elseif (ext.isclike)
-					Cpp_Export.Cpp_Input <~ c.path
+			  elseif (ext.isclike)
+				Cpp_Export.Cpp_Input <~ c.path
 	
 	
 	function string.IsOKForImport (|bool|)
@@ -155,7 +174,7 @@ class SCImport
 				if IsInputName(name)
 					ifn FirstName
 						FirstName = name
-					else
+					  else
 						error false ( nil, "Multiple input folders found! '$Name' and '$FirstName'" )
 			
 			expect (Firstname) (f, "Can't find folder '$f/input/'.")
@@ -202,8 +221,7 @@ class SCImport
 			
 			compiler.Timer( "Copying Shaders" )
 			
-			|| P = compiler.BuildFolder["Resources/Shaders"]
-			expect P != nil
+			|| P = compiler.BuildFolder["Resources/Shaders"]		#expect
 			P.MakeAndGoInto
 			printline "S: " + app.cwd
 			

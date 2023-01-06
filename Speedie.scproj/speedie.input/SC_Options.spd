@@ -8,6 +8,7 @@ constants
 module Options
 	flags: native,pack
 	
+	||		BannedClasses			= nil|dictionary of scclass|
 	||		output_path				= ""
 	||		SingleFileInput			= ""
 	||		Variant					= ""

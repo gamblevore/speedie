@@ -3,26 +3,36 @@
 # cmake -BBuild .; cd Build; sudo make install
 
 cmake_minimum_required(VERSION 3.13)
-project(Jeebox VERSION 1.2.5 DESCRIPTION "Extensible language that can describe anything. The ultimate life-form of parsers.")
+project(Jeebox VERSION 1.2.5 DESCRIPTION "Extensible and good looking data-format with lots of cool util functions")
 
 if (UNIX AND NOT APPLE)
 	set(LINUX TRUE)
 elseif(APPLE)
 	SET( CMAKE_CXX_COMPILER "c++" ) #more pointless issues to solve
 endif()
+
 set(Root ${CMAKE_SOURCE_DIR})
+set(RootParent /)
+cmake_path(GET Root PARENT_PATH RootParent)
+#get_filename_component(PARENT_DIR ${RootParent} DIRECTORY)
 set(JbCpp ${Root}/Cpp)
+set(JbLib ${RootParent}/Library/CppLib)
 set(Exmp ${Root}/Examples/)
 
-file(GLOB MainSrc ${JbCpp}/LibSrc/*.cpp)
+message(Root="${Root}")
+message(RootParent="${RootParent}")
+message(JbCpp="${JbCpp}")
+message(JbLib="${JbLib}")
+message(Exmp="${Exmp}")
+
+file(GLOB MainSrc ${JbLib}/*.cpp)
 set(MainSrc ${MainSrc} ${JbCpp}/JB.cpp ${JbCpp}/JB_Globals.cpp)
-set(AllocSrc ${JbCpp}/LibSrc/JB_Alloc.cpp)
 
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS YES CACHE BOOL "Export all symbols")
 
 add_compile_definitions(TARGET_UNIX=1 AS_LIBRARY=1)
-add_compile_options(${ARCH} ${DEBUG} -Wno-return-type-c-linkage -Wno-unused-value -Wno-unknown-escape-sequence -Wno-invalid-source-encoding -std=gnu++14 -stdlib=libc++ -fno-strict-aliasing -fvisibility=hidden -march=core2 -mfpmath=sse -mmmx -msse -msse2 -msse4.1 -msse4.2 -mtune=native -Os)
+add_compile_options(${ARCH} ${DEBUG} -Wno-return-type-c-linkage -Wno-unused-value -Wno-unknown-escape-sequence -Wno-invalid-source-encoding -Wno-nonnull -Wno-nullability-completeness -std=gnu++14 -stdlib=libc++ -fno-strict-aliasing -fvisibility=hidden -march=core2 -mfpmath=sse -mmmx -msse -msse2 -msse4.1 -msse4.2 -mtune=native -Os -I ${JbLib})
 add_link_options(${ARCH} -flto)
 
  
@@ -31,7 +41,9 @@ function (BuildLibrary Name Type Arch)
 	set_target_properties(${Name}  			PROPERTIES VERSION ${PROJECT_VERSION})
 	target_compile_options(${Name} PUBLIC ${Arch})
 	set_target_properties(${Name} 			PROPERTIES PUBLIC_HEADER "${Exmp}jeebox_api.h;${Exmp}Jeebox.h")
+
 	target_include_directories(${Name} 		PRIVATE ${JbCpp}/LibSrc)
+	target_include_directories(${Name} 		PRIVATE ${JbLib}/)
 	install(
 		TARGETS ${Name}
 		LIBRARY DESTINATION lib
@@ -64,7 +76,7 @@ target_link_libraries(jb Jeebox)
 install( TARGETS jb RUNTIME DESTINATION bin )
 
 
-add_executable(alloc_speed ${Root}/Examples/alloc_speed.cpp ${AllocSrc})
-target_compile_definitions(alloc_speed PUBLIC ALLOCATOR_ONLY=1) 	#seems to break everything?
-target_include_directories(alloc_speed 	PRIVATE ${JbCpp}/LibSrc)
+# add_executable(alloc_speed ${Root}/Examples/alloc_speed.cpp ${AllocSrc})
+# target_compile_definitions(alloc_speed PUBLIC ALLOCATOR_ONLY=1) 	#seems to break everything?
+# target_include_directories(alloc_speed 	PRIVATE ${JbCpp}/LibSrc)
 

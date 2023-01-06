@@ -294,8 +294,8 @@ function Jeebox (|file|)
 
 function ImportLibs
 	SCImport.STDLibTime = true
-	SCImport.Importpath( "Library",		.Library,			1 )
-	SCImport.Importpath( "Jeebox",		.Jeebox,			1 )
+	SCImport.Importpath( "Library",		.Library,		1 )
+	SCImport.Importpath( "Jeebox",		.Jeebox,		1 )
 
 
 function ImportProj
@@ -810,7 +810,7 @@ function ReachAllForInterpreter
 	for f in .FuncList
 		(f is Reached) = !f.disabled
 	for c in .classlist
-		c.reach
+		c.reach(nil)
 
 
 function DeadCodeStrip
@@ -820,7 +820,7 @@ function DeadCodeStrip
 
 	for f in .FuncList
 		if f.IsVisible
-			f.FindReached
+			f.FindReached(nil)
 
 
 function CheckIsGoodLibrary
@@ -867,7 +867,7 @@ function AddMain
 	Options.ProjectisLibrary = !m
 	if !m
 		"Compiling as library."
-		m = .program.CollectString( "main: " ).last				// mainproj.collect
+		m = .program.CollectString( "main:," ).last				// mainproj.collect
 	
 	if m and .ConfMsg
 		m.first = "app.configure = __AppConfString".parse

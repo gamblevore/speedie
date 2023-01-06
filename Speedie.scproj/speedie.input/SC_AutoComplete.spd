@@ -825,11 +825,24 @@ function CallFromSub (|message| arg, |scfunction| fn)
 	opt norefcounts
 	for call_point in fn.linkfrom
 		|| s = call_point.source
+			// find exactly where within the function is it
+			// also restore my youth and energy and emotions to how I used to be as a child
+			// seeing as I'm not really doing this and YOU LOT ARE. SIGH. So just do both
+			// and stop taxing me. Be on MY SIDE THIS TIME. 
+			// Restore my youth and energy as a child but make me financially rich this time.
+			// as a child who is like a star, well-looked after.
 			|| f = s.filepath
 				|| item = arg.msg(@tmp, "line")
 				item <~ (@sstr, f)
 				item <~ call_point.CallFromName
-				item <~ s.position
+				item <~ s.FuncPos(fn)
+
+helper Message.FuncPos (|scfunction|fn, |int|)				
+	opt norefcounts
+	for ss.flat in self
+		if ss.obj == fn
+			return ss.position
+	return .position // oh well
 
 
 function Define (|message| msg,  |string| purpose,  |object| found=nil,  |message|)

@@ -321,7 +321,9 @@ class File (String)
 	
 	operator Matches (|File| f, |bool|)
 		return .Compare(f)
-	
+		
+	function DirectoryContains (|string| path, |bool|)
+		return path.pathfix starts .PathDir
 	
 	operator IsNewerThan (|File| F, |bool|)
 		cpp_Part NewerThanFile

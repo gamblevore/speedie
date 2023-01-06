@@ -618,28 +618,48 @@ function AddSelfToFunc (|SCBase| space)
 	space.TryAdd( space.FuncSrc, .selfstrong, "self" )
 
 
-function Reach
+function scdecl.TypeReach (|scbase| from)
+	opt norefcounts
+	require self
+	|| t = .type
+		t.reach(from)
+
+
+function BannedAll
+	|| curr = .currreacher
+	for 1000
+		if !curr
+			exit
+		error (curr, "via: " + curr.name)
+		curr = curr.currreacher
+
+	
+function BannedCheck
+	require Options.BannedClasses.valuelower(.name)
+	error (self, "Banned class was reached")
+	.BannedAll
+
+
+function Reach (|scbase| from)
 	require !(self is Reached)
+	.CurrReacher = from
 	Compiler.stReachedClass++
 	is reached
+	
+	if Options.BannedClasses
+		.BannedCheck
 	if .super
-		.super.Reach
+		.super.Reach(self)
 	if .behaviour
-		.behaviour.FuncTayble.cls.reach
+		.behaviour.FuncTayble.cls.reach(self)
 
 	if .DestructorFunc
-		.DestructorFunc.findReached
+		.DestructorFunc.findReached(self)
 	
 	for d in .Properties
-		|| t = d.type
-		if t: t.Reach
-		
-		d = d.contains
-		if d and d.Type
-			d.Type.Reach
+		d.TypeReach(self)
+		d.contains.TypeReach(self)
 
-// the setter isnt being reached. why?
-// it is being reached in the code?? so... surely it should count?
 
 function IsA (|SCClass| S, |bool|)
 	opt norefcounts
@@ -901,7 +921,6 @@ module
 
 
 	function ProcessExtendOld (|Message| c, |bool| PreferClass)
-		
 		|| name = c[@thg]							#require
 		|| arg  = c[@arg, -1]						#require
 		|| M = Compiler.FindModulemsg(name)			#require
@@ -1003,9 +1022,6 @@ module
 		node.remove
 		return compiler.program
 }
-
-
-
 
 
 extend SCClass
