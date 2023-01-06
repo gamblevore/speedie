@@ -37,7 +37,7 @@ Well, that leads to this tree:
 
 So the message "`return`" has a type of `@tmp`. "`>`" has a type of `@opp`. (We use `@` in Speedie, to represent `Message` types. So `@thg` would be a "thing" type, and `@arg` would be an "argument" type.)
 
-`Message` is very generally useful. Think of Unicode, where you have one standard that represents many languages. Jeebox is the same. If you appreciate Unicode over the mess we had before with hundreds of different encodings, each only good at one language and usually a few encodings per language... you might appreciate Jeebox too.
+Jeebox (and it's `Message` class), is useful for so many use-cases, that it surprises people (even me). Sometimes it even confuses people, but it shouldn't, because we use ascii or Unicode for just anything. Why not a file-format too?
 
 Here are some things I've (practically) used Jeebox for, so far:
 
