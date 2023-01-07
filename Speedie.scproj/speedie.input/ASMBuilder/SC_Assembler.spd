@@ -70,7 +70,7 @@ module Flatten
 	function StampAll (|[scfunction]| Funcs)
 		opt norefcounts
 		for fn in funcs
-			if fn is reached
+			if fn.CurrReacher
 				.Stamp(fn)
 	
 		
@@ -122,7 +122,7 @@ module Flatten
 extend_module ASM
 	function Needed (|bool|)
 		|| fn = compiler.exportnames["JB_ASM_Run"]
-			return fn is Reached
+			return fn.CurrReacher
 
 
 //|| ASMPack = –digest <(`

@@ -45,7 +45,7 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 
 	if msg.name == "behaviour"
 		params <~ (@thg, "render")
-		arg.first = @tmp.msg("visible")
+//		arg.first = @tmp.msg("visible") // why? all behaviours would need visible then?
 	  else
 		SCStrings.RenderNewParams.CopyAllInto(params)
 	

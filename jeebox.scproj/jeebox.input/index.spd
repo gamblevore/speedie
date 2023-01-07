@@ -1,1 +1,1 @@
-/*	Jeebox internals. By Theodore H. Smith...*/ linkage	cpp_part JB	type library	bannedclasses (file, date, process)ignore
+/*	Jeebox internals. By Theodore H. Smith...*/ linkage	cpp_part JB	type library	bannedclasses (file, date, process, shellstream, archive)ignore

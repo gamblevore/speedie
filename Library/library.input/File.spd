@@ -3,6 +3,9 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
+// how to say that we are in JBLib?
+// via a conf, right? where is conf read from?
+
 class File (String)
 	linkage
 		cpp_class JB_File
@@ -427,14 +430,10 @@ class File (String)
 				return true
 			dir_chain.pop
 		
-	function SyntaxExpect (|string| Error )
-		visible
+	function SyntaxExpect (|string| Error)
 		opt norefcounts
 		cpp_part Fail
-		|| p = ""
-		if self != nil
-			p = .path
-		StdErr.NewError( nil, Error, p )
+		StdErr.NewError( nil, Error, (.path, "")(self) )
 
 	module
 		|| DebugExecute = false

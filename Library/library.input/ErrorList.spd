@@ -1,12 +1,4 @@
 
-/*
-	So, how to set different error-levels, into the same thing?
-	I think we need a bit-set... of what errors we have.
-	
-	So... we can only add errors, or clear the entire thing. or just replace it.
-	But not "just remove warnings/errors" by themselves.
-*/
-
 
 |ErrorList| StdErr
 

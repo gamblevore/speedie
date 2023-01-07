@@ -618,47 +618,62 @@ function AddSelfToFunc (|SCBase| space)
 	space.TryAdd( space.FuncSrc, .selfstrong, "self" )
 
 
-function scdecl.TypeReach (|scbase| from)
+function scdecl.TypeReach (|scbase| from, |message| src)
 	opt norefcounts
 	require self
 	|| t = .type
-		t.reach(from)
+		t.reach(from, src)
 
 
-function BannedAll
-	|| curr = .currreacher
-	for 1000
-		if !curr
-			exit
-		error (curr, "via: " + curr.name)
-		curr = curr.currreacher
+function SCBase.ReachedName (|string|)
+	opt norefcounts
+	|| c = .CurrReacher
+	rz = "    via: " + .name
+	if c.class == scbase
+		rz += " (visible func)"
 
-	
-function BannedCheck
+function BannedCheck (|message| src)
+	opt norefcounts
 	require Options.BannedClasses.valuelower(.name)
 	error (self, "Banned class was reached")
-	.BannedAll
+	|| curr = .currreacher
+	for 100
+		if !curr or curr.class == SCBase
+			exit
+		if src
+			error (src, curr.ReachedName)
+			src = nil
+		  else
+			error (curr, curr.ReachedName)
+		curr = curr.CurrReacher
 
 
-function Reach (|scbase| from)
-	require !(self is Reached)
+function Reach (|scbase| from, |message| src=nil)
+	opt norefcounts
+	require !.currreacher
+	if !from
 	.CurrReacher = from
 	Compiler.stReachedClass++
-	is reached
 	
 	if Options.BannedClasses
-		.BannedCheck
+		.BannedCheck(src)
 	if .super
 		.super.Reach(self)
 	if .behaviour
 		.behaviour.FuncTayble.cls.reach(self)
-
+	
 	if .DestructorFunc
 		.DestructorFunc.findReached(self)
 	
 	for d in .Properties
-		d.TypeReach(self)
-		d.contains.TypeReach(self)
+		d.TypeReach(self, d.source)
+		d.contains.TypeReach(self, d.source)
+
+function ReachBehaviours
+	for f in .Access
+		if f isa SCFunction
+			if f.IsBehaviour
+				f.FindReached(self)
 
 
 function IsA (|SCClass| S, |bool|)

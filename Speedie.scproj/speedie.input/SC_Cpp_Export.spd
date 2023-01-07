@@ -17,7 +17,7 @@ module
 	function compiler.Reachedfuncs (|int|)
 		opt norefcounts
 		for f in compiler.funclist
-			rz += f is reached
+			rz += f.CurrReacher!=nil
 
 
 
@@ -860,7 +860,7 @@ extern "C" void JB_Str__FindGlobals(JB_String*** lub, int** lengths, const char*
 		.CreateClassListHeader(fs, " {\n")
 
 		for ( c in compiler.ClassList )
-			if (c.IsSaveableObject and (c is Reached))
+			if (c.IsSaveableObject and c.CurrReacher)
 				fs <~ "\tfn(&"
 				fs <~ c.CStructName
 				fs <~ "Data, (char*)" 

@@ -39,6 +39,10 @@
 |SCDecl|	TrueBool
 |SCDecl|	FalseBool
 
+extend_module compiler
+	|SCBase|	VisibleFuncs
+	|SCBase|	Interpreter
+
 
 
 function Compiler.FindSpeedieRoot (|string|)
@@ -187,7 +191,7 @@ function testdate
 function compiler.ReachedClassCount (|int|)
 	opt norefcounts
 	for C in compiler.classlist
-		RZ += ((C is reached) and c.isobject)
+		RZ += ((C.currreacher) and c.isobject)
 
 
 function AddSubProjects (|[SCModule]| Modules)
@@ -201,7 +205,7 @@ function FastString.AppendWidth (|string| s, |int| Width)
 
 function Reached (|string| s, |bool|)
 	|| obj = self[s]
-		return (obj is Reached)
+		return (obj.currreacher)
 
 
 function InitTypes
@@ -695,7 +699,7 @@ function CheckMaxVars
 	|int[10]| ArgVersions
 
 	for f in .FuncList
-		if (f is Reached)
+		if (f.CurrReacher)
 			|| N = f.args.length
 			V = v max f.maxvars
 			ArgVersions[n min 9]++
@@ -804,23 +808,30 @@ function SortModulesSub (|SCBaseType| TypeWanted, |[SCModule]| NewList)
 			i = 0
 
 
-function ReachAllForInterpreter
-	opt norefcounts
-	.funclist.sort(funcsorter_fn)
-	for f in .FuncList
-		(f is Reached) = !f.disabled
-	for c in .classlist
-		c.reach(nil)
-
 
 function DeadCodeStrip
 	opt norefcounts
+	|| v = Compiler.VisibleFuncs init scbase("Visible",	false)
+	|| i = Compiler.Interpreter init scbase("Interpreter", false)
+
 	if options.ListAllLib
-		return .ReachAllForInterpreter
+		.funclist.sort(funcsorter_fn)
 
 	for f in .FuncList
 		if f.IsVisible
-			f.FindReached(nil)
+			f.FindReached(v)
+		  elseif options.ListAllLib and !f.disabled
+			f.FindReached(i)
+
+	if options.ListAllLib
+		for c in .classlist
+			c.reach(i)
+	
+	for c in .classlist
+		if c.CurrReacher
+// shorten-discovery-chains, behaviour chains tend to be long.
+			c.ReachBehaviours
+			
 
 
 function CheckIsGoodLibrary
@@ -980,6 +991,3 @@ function FindProject (|string|Path, |File|)
 function ProjName (|String|)
 	return Compiler.Program.ExportName // OK
 
-////////////////////////////////////////////////////////////////////////////// 
-
-|| abcthingy = ""

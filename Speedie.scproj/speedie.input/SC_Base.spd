@@ -162,13 +162,10 @@ constructor
 	.IsVisible = CurrVisibility	// don't do anything?
 
 
-constructor (|string| s)
+constructor (|string| Name, |bool| Dummy)
 	cpp_part ConstructorStr
-	.Access = dictionary()
-	.Project = scimport.curr
-	|| found = scobject()
-	for w in s.split('/')
-		.access[w] = found
+	.name = name
+	
 
 
 constructor (|Message| node)
@@ -670,11 +667,11 @@ function SetExportName (|String| s, |bool| Explicit)
 
 
 function SCFunction.NeedsExport (|bool|)
-	Return  (self is Reached) or .isapi
+	Return  (.currreacher) or .isapi
 
 
 function NeedsExport (|bool|)
-	Return  (self is Reached)
+	Return  (.currreacher)
 
 
 function message.InsideFunc (|SCFunction|) //owningfunc, infunc
@@ -964,6 +961,5 @@ dispatch ClsCollectTable (CollectFunc)
 datatype SCBaseInfo (int)
 	constants
 		ExplicitExport
-		Reached
 		Visible
 

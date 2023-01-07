@@ -80,7 +80,7 @@ class Process
 			fs <~ "ipc is open: ${.origsize}\n"
 		  else
 			fs <~ "ipc not open.\n"
-
+ 
 	render
 		.reportconnection("", fs)
 

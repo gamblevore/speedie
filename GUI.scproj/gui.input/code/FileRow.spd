@@ -33,6 +33,9 @@ class FileRow (ListViewRow)
 	
 	constructor (|string| path, |string| name, |string| DirFile="")
 		.func		= @file
+		if path == nil
+			debugger 
+			path = "" // crash bug?
 		.Location	= (path.PathDir, path)(DirFile)
 		.dirfile	= DirFile
 		if dirfile == "."

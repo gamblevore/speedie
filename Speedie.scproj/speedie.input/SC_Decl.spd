@@ -963,7 +963,7 @@ function Message.RenderType (|string|)
 
 
 function scdecl.TypeIsReached (|bool|)
-	return (.type is Reached)
+	return (.type.CurrReacher)
 
 
 function scdecl.ByteSize (|int|)

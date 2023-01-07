@@ -266,7 +266,11 @@ class SCBehaviour (SCBase)
 			|| cls = name_space.ShouldBeClass(errplace)
 			if Tran_Behaviour(node, cls)
 				|| fn = SCFunction.NewFunc(node, cls, node)
-					fn.isvisible = true
+					//fn.isvisible = true
+					// fn.visible causes problems
+					// then all classes basically become visible
+					// because all classes have render funcs! at least render!
+					// we need a better way.
 					cls.AddBehaviourOrInterface( fn, ErrPlace )
 					Return fn
 
