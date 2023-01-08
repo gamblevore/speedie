@@ -787,11 +787,6 @@ class Message (RingTree)
 			return
 		
 		|| fs = faststring.new
-		// remove this later
-		fs <~ "((("
-		fs <~ .StringOwner
-		fs <~ "))) "
-		/// remove
 		if found
 			fs <~ "Expected @"
 			fs.MsgErrorName(name)
