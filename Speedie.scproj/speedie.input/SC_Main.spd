@@ -24,6 +24,9 @@ api Speedie_Main (|&cstring| args, |int| Mode, |ErrorInt|)
 
 function compiler.SetupEnv
 	opt norefcounts
+	if !app.pref_path
+		"Conf missing prefpath"
+		debugger
 	|| B = app..talk and app.IsMainThread
 // don't let breakpoints rekt us
 		app.IgnoreSig
