@@ -51,6 +51,7 @@ linkage
 |bool|						SavingCanSkip
 |bool|						TreatAsBaseType
 |bool|						IsNotNumeric
+|bool| 						Banned
 
 
 constructor (|Message| node, |SCBase| parent)
@@ -76,6 +77,7 @@ constructor (|Message| node, |SCBase| parent)
 	.SelfStrong = T
 	.saveas = nil
 	.TypeInfo = DataTypeCode.UnusedType
+	.Banned = .TestBanned
 
 
 function IsSTDLib (|bool|)
@@ -632,11 +634,18 @@ function SCBase.ReachedName (|string|)
 	if c.class == scbase
 		rz += " (visible func)"
 
+
+function Compiler.Banned (|string| name, |bool|)
+	return Options.BannedClasses.valuelower(name)
+		
+function TestBanned (|bool|)
+	return compiler.banned(.name)
+	
 function BannedCheck (|message| src)
 	opt norefcounts
-	require Options.BannedClasses.valuelower(.name)
-	error (self, "Banned class was reached")
-	|| curr = .currreacher
+	require .TestBanned
+	error (self, "Banned class reached: " + .name)
+	|| curr = .CurrReacher
 	for 100
 		if !curr or curr.class == SCBase
 			exit
@@ -668,6 +677,7 @@ function Reach (|scbase| from, |message| src=nil)
 	for d in .Properties
 		d.TypeReach(self, d.source)
 		d.contains.TypeReach(self, d.source)
+
 
 function ReachBehaviours
 	for f in .Access
@@ -791,7 +801,7 @@ module
 	
 	function NeuClass (CollectFunc)
 		|| it = .NeuClassSub(node, name_space, ErrPlace, nil)
-			it.classcollect
+			it.ClassCollect
 			return it.modul
 
 	

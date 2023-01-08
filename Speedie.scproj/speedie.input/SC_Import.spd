@@ -95,11 +95,11 @@ class SCImport
 	function LoadBanned (|Message| list)
 		opt norefcounts
 		require list and list.expect(@list)
-		debugger
-		options.BannedClasses := Dictionary()
+
+		|| x = options.BannedClasses := Dictionary()
 		for item in list
 			item.expect(@thg)
-			options.BannedClasses.valuelower(item.name) = "x"
+			x.valuelower(item.name) = "x"
 	
 	
 	function ImportSpd (|File| c, |string| CurrPath, |SCFile|)

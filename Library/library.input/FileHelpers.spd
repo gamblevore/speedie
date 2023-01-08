@@ -14,18 +14,20 @@ extend String
 		return f.exists
 
 	function MakeEntirePath (|bool|Last=true, |ErrorInt|)
-		visible
-		|| p = (Self, .parent)(last)
+		visible class~file
+		|| p = Self
+		if last: p = .parent
 		for S.Paths in p
 			|| err = S.MakeDir|int|
-				return err
+				rz = err
+				exit
 		
 	function PathDir (|string|)
 		if self and .last != '/'
 			return self + "/"
 		return self
 		
-	function syntaxappend (|string| s, |bool|)
+	function SyntaxAppend (|string| s, |bool|)
 		return .filedata(s)
 
 	function Sibling (|string| name, |string|)

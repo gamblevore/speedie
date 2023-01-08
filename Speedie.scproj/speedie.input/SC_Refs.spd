@@ -39,7 +39,7 @@ function Message.LastUsedFix (|Message|)
 		|| Ch = self[1].first
 		expect (Ch == @thg)
 		if (SCRefs.RefBasis(ch, true) == SCRefs.kBasisObj)
-			// wereturning an object. need to scan for the first incr of that object...
+			// we returning an object. need to scan for the first incr of that object...
 			|| it = .FindRef(Compiler.RefIncr, Ch.name)
 				return it.Next
 	

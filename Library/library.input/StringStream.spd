@@ -4,7 +4,7 @@ class StringStream
 // this should be based on fastbuff, and fastbuff should also... 
 // have 3 pointers
 	|string|	Data
-	|file|		File
+	|string|	FilePath
 	|int|		Position
 	|int|		Length
 	|int|		ChunkSize
@@ -16,7 +16,7 @@ class StringStream
 		.length = d.length
 	constructor (|file| file, |int| ChunkSize=4MB)
 		cpp_part ConstructorStream
-		.file = file
+		.filepath = file
 		file.close
 		.ChunkSize = chunksize
 		.length = file.size

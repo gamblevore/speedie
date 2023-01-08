@@ -107,7 +107,7 @@ linkage
 |SCModule|				DisamModules
 
 
-|message|				HasMainFunc
+|bool|					HasMainFunc
 |int|					stClasses
 |int|					stFuncs
 |int|					stReachedFunc
@@ -131,6 +131,14 @@ function BuildFolder (|file|)
 	ifn ._BuildFolder.Exists
 		._BuildFolder.MakeDir
 	return ._buildfolder
+
+
+function GetMainFunc (|message| where, |ScFunction|)
+	opt norefcounts
+	|| mod = Compiler.FindModule("app", where)
+		|| fn = mod["main"]
+		if fn isa SCFunction
+			return fn
 
 
 function PrepareInterpreter
@@ -263,7 +271,9 @@ function InitBasicStuff (|bool|)
 	.AddGlobalConst( "__now__", typedate ).islookuponly = «num date.now »
 	.AddGlobalConst( "π", typef64 ).islookuponly = «num "3.1415926535897932" »
 	.AddGlobalConst( "τ", typef64 ).islookuponly = «num "6.2831853071795864" »
-	
+	return StdErr.OK
+
+function InitBasicFuncs (|bool|)
 	.RefSetRef		= .LoadRefFunc( "JB_SetRef" )
 	.RefIncr		= .LoadRefFunc( "JB_Incr" )
 	.RefDecr		= .LoadRefFunc( "JB_Decr" )
@@ -271,9 +281,6 @@ function InitBasicStuff (|bool|)
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
 	.PrivateProperty = .CreateFuncFromSource("function Private () {disabled `This property is private.`}")
-
-
-	.AddMain
 	return StdErr.OK
 
 
@@ -331,25 +338,17 @@ function ImportAll
 		compiler.program.ImportFile( L )
 		require StdErr.OK
 
+	require .Stage( "Initialising Compiler" )
+	require .InitBasicStuff
+	.AddMain
 	parser.insertedflags = MsgUIFlags.Inserted // noice
 	scimport.noproj
 	
 	for c in .classlist
 		C.TryAddToProject
 		
-	
-	require .Stage( "Initialising ASM" )
-	asm.CreateASMProperties
+		asm.CreateASMProperties
 	asm.TestASM
-
-
-	require .Stage( "Initialising Compiler" )
-	require .InitBasicStuff
-	
-	.ModuleList = ListModules( .program.access )
-	.AddSubProjects(.ModuleList)
-	.ModuleList <~ .program
-	
 	
 	require .Stage( "Processing Delayed Imports" )
 	for l in .extend_list
@@ -357,6 +356,12 @@ function ImportAll
 
 	for l in .extend_module_list
 		SCClass.ProcessExtend( l, false )
+
+	require .initbasicfuncs
+	
+	.ModuleList = ListModules( .program.access )
+	.AddSubProjects(.ModuleList)
+	.ModuleList <~ .program
 	
 	
 	require .Stage( "Creating Class Hierarchy" )
@@ -632,20 +637,26 @@ function FindClass (|String| name, |Message| where, |SCClass|)
 	return Mod.cls			#expect (where, "Expected a class but found module.")
 
 
+function FindClassOK (|String| name, |SCClass|)
+	|| Obj = compiler.program.access.valuelower( name )
+	if obj isa scmodule
+		return obj.cls
+
+
 function FindModuleMsg (|Message| where, |SCModule|)
 	return .FindModule(where.name, where)
 
-																// AutoCompleteName
 
 function FindModule (|String| name, |Message| where, |string| ErrMsg="Not a module.", |SCModule|)
 	|| Obj = compiler.program.access.valuelower( name )
+
 	if Obj isa SCModule
 		return Obj
 	
 	if where and !obj
-		error (where, "Can’t find: '$name'") // OK
+		error (where, "Can’t find: " + name) // OK
 	  elseif errmsg
-		error ( where, ErrMsg )
+		error (where, ErrMsg)
 
 
 function CreateRoot
@@ -809,30 +820,34 @@ function SortModulesSub (|SCBaseType| TypeWanted, |[SCModule]| NewList)
 
 
 
+function scfunction.StripTest
+	if .IsVisible
+		.FindReached(Compiler.VisibleFuncs)
+	  elseif options.ListAllLib and !.disabled
+		.FindReached(Compiler.Interpreter)
+
+
 function DeadCodeStrip
 	opt norefcounts
-	|| v = Compiler.VisibleFuncs init scbase("Visible",	false)
-	|| i = Compiler.Interpreter init scbase("Interpreter", false)
+	Compiler.VisibleFuncs = scbase("Visible",	false)
+	Compiler.Interpreter = scbase("Interpreter", false)
 
 	if options.ListAllLib
 		.funclist.sort(funcsorter_fn)
-
+	
+	.getmainfunc(nil).StripTest?
+	
 	for f in .FuncList
-		if f.IsVisible
-			f.FindReached(v)
-		  elseif options.ListAllLib and !f.disabled
-			f.FindReached(i)
+		f.striptest
 
 	if options.ListAllLib
 		for c in .classlist
-			c.reach(i)
+			c.reach(Compiler.Interpreter)
 	
 	for c in .classlist
-		if c.CurrReacher
-// shorten-discovery-chains, behaviour chains tend to be long.
-			c.ReachBehaviours
+		if c.CurrReacher // shorten-discovery-chains, 
+			c.ReachBehaviours // behaviour chains tend to be long.
 			
-
 
 function CheckIsGoodLibrary
 	if options.ProjectIsLibrary
@@ -874,15 +889,18 @@ function AddGlobalConst (|string| name, |SCClass| c, |SCDecl|)
 
 
 function AddMain
-	|| m	= .hasmainfunc
-	Options.ProjectisLibrary = !m
-	if !m
+	|message| m
+
+	|| f = .getmainfunc(nil)
+		m = f.sourcearg
+	  else
 		"Compiling as library."
-		m = .program.CollectString( "main:," ).last				// mainproj.collect
+		m = .program.CollectString( "main:\n" ).last				// mainproj.collect
+	Options.ProjectisLibrary = !f
 	
 	if m and .ConfMsg
 		m.first = "app.configure = __AppConfString".parse
-		
+	
 	|| b = (Truebool, falsebool)(options.projectislibrary) 
 	.program.TryAdd( nil, b, "__IS_LIBRARY__" )
 

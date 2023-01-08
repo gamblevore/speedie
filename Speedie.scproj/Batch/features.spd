@@ -2,4 +2,4 @@ main
 	|| x = stderr
 	x.errorsarewarnings++
 	x.errorsarewarnings--
-	x.log = file.logs["features.spd.log"]
+	x.logfile = "features.spd.log"

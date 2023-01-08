@@ -43,6 +43,7 @@ function message.CleanBecome (|macro| m)
 
 	
 function message.TargetTest (|bool|)
+	.expect(@thg)
 	if self ~= "debug"
 		return options.TargetDebug
 	if self ~= "release"
@@ -68,19 +69,18 @@ function message.tran_target (|message|)
 	.tran_targetsub
 	rz  = .next
 	rz := .flatafter
-	.remove
+	.Remove
 
 
-function message.tran_targetsub
+function message.Tran_TargetSub
 	opt norefcounts
 	|| value = self[@nil]
-	|| use_second = (value == @brel and "!")
+	|| IsFalse = (value == @brel and "!")
 		value = value.first
 	
-	|| arg = self[@arg, 1]
-	require arg and value.expect(@thg) 
+	|| arg = self[@arg, 1]#require
 	
-	if value.TargetTest == use_second
+	if value.TargetTest == IsFalse
 		arg = self[2][@arg]
 
 // can't handle target false

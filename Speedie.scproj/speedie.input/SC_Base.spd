@@ -643,6 +643,7 @@ function TestExportName (|String| s, |bool| Explicit, |string|) {
 	  elseif o isnt ExplicitExport
 		if o.RehomeExport: return s
 	
+	debugat
 	|| Err = "Export-name conflict: " + s
 	error ( o.Source, Err )
 	error (  .Source, Err )
@@ -781,9 +782,22 @@ function ConstantExpand (|Message| ch)
 	ch.remove
 
 
+function FindVis (|Message| c, |bool|)
+	if !c
+		return true
+	if c == @thg
+		return c.TrueOrFalse
+	if c == @adj
+		|| first = c[@thg]
+		first.expect(@thg, "class")
+		|| name  = c[@thg, 1].nyme
+		|| cls   = compiler.FindClassOK(name)
+		return cls and !cls.banned
+	error c
+
+
 function LoadVisibility (|Message| p)
-	|| c = p$[0] 	// visible false,   visibile true,   visible
-	CurrVisibility = (!c)  or  c.trueorfalse
+	CurrVisibility = .FindVis(p.first) //   visible false,   visibile true,   visible
 	.IsVisible = CurrVisibility
 	SC_MakeComment( p )
 

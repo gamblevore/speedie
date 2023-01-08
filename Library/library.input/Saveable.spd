@@ -41,7 +41,7 @@ struct ObjectSaver
 
 
 class Saveable
-// probably should be LOADABLE too... :)
+// probably should be called LOADABLE too... :)
 	linkage
 		visible
 		wrapper
@@ -51,6 +51,7 @@ class Saveable
 	virtual   SaveWrite (|&ObjectSaver| Saver)
 		Saver.CantSaveThis = self
 		saver.dest <~ "nil,"
+	
 	virtual   LoadProperties (|&ObjectLoader| Loader,)
 		Loader.CouldntLoad = self
 
