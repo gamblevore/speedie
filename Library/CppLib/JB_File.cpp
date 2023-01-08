@@ -360,6 +360,12 @@ JB_String* JB_App__Path() {
     return Result;
 }
 
+int JB_App_SetEnv(JB_StringC* name, JB_StringC* value) {
+	if (name and value)
+		return setenv((const char*)(name->Addr), (const char*)(value->Addr), 1);
+	return -999;
+}
+
 
 static JB_String* FileAlloc( JB_File* self, IntPtr Length ) {
     JB_String* Str = JB_Str_New( Length );

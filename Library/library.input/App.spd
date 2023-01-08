@@ -32,8 +32,6 @@ function Created (|date|)
 	
 function TimeID (|uint|)
 	return __time_id__
-	
-
 
 function Pref (|string| s, assigns:|string|)
 	.prefs[s] = Value
@@ -68,6 +66,9 @@ function Path (|string|)
 function CalledName (|string|)
 	cpp_wrapper JB_App__CalledBy
 
+function Env (|StringZeroTerminated| s, assigns:|StringZeroTerminated| value, |int|)
+	cpp_wrapper JB_App_SetEnv
+		
 function TurnInto (|string| s, |[string]| R=nil, |errorint|)
 	cpp_Wrapper JB_App__TurnInto
 
@@ -167,7 +168,7 @@ function CWD (|string|)
 function CWD (assigns:|string|, |int|)
 	return .chdir_(Value)
 
-function chdir_ (|string| path, |int|)
+helper chdir_ (|string| path, |int|)
 	cpp_wrapper JB_File__chdir
 
 

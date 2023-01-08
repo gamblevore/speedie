@@ -13,6 +13,7 @@ extern "C" {
     Dictionary* JB_App__Env();
     void JB_App__Quit (int Code);
     JB_String* JB_App__Path();
+    int JB_App_SetEnv(JB_StringC* name, JB_StringC* value);
     int JB_Rec__PrintErrors();
 	JB_String* JB_App__LibFuncs(void*** Funcs);   
 	JB_String* JB_App__LibClasses(); 

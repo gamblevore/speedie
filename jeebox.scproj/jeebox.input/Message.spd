@@ -784,7 +784,6 @@ class Message (RingTree)
 
 	function AccessErr (|syntax|s, |string| name, |message| found)
 		cpp_part CantFind
-		debugat
 		if !self
 			jb_api.NilHandler
 			return
