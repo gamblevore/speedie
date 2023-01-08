@@ -103,8 +103,8 @@ datatype Syntax (Byte)
 		|int|		CurrFuncID
 		|int|		MaxFuncID  
 		
-		function Func (|string| name, |syntax|)
-			|| obj = _syxdict_.valuelower(name) #expect "Unknown syntax " + name
+		function Func (|string| name, |message| where=nil, |syntax|)
+			|| obj = _syxdict_.valuelower(name) #expect (where, "Unknown syntax " + name)
 			return obj.id
 			
 		function StdNew (|fpMsgRender| msg, |string|name, |String| LongName, |Syntax|) 

@@ -629,6 +629,21 @@ class Message (RingTree)
 			.jdb2_(flags, fs)
 	
 	
+	function ParseAST (|message|)
+		if self == @arg
+			|| f = .first
+			f.ExpectLast
+			return f.ParseAST
+		|| fn = Syntax.Func(.name, self)		#require
+		|| name = .first
+		|| isStr = name==@str
+		rz = Message(fn, (name.name, "")(isstr))
+		|| arg = (name.next, name)(isstr)
+		if arg == @arg
+			for ch in arg
+				rz <~ ch.ParseAST
+	
+	
 	function UnEmbed
 		|| s1 = .First
 		require (s1 == @Emb) and (!s1.Next)
@@ -710,18 +725,6 @@ class Message (RingTree)
 		// this function won't be necessary in the future!
 		if self
 			return .Name 
-	
-
-	function ParentOf (|Syntax| f, |Message|)
-		Opt NoRefCounts
-		|| p = .parent
-		if (f==nil) or (p==f)
-			return p
-		.accesserr(f, nil, p)
-
-
-	function Parent (|Syntax| f, |Message|)
-		return .parentof(f)
 
 
 	function Ancestor (|Syntax| f, |Message|)

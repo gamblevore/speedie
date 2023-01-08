@@ -74,6 +74,7 @@ jbmessage* jb_msg_root(jbmessage* self);
 void jb_msg_remove(jbmessage* self); /* Removes the node from the tree. */
 jbstring* jb_msg_render(jbmessage* self);
 jbstring* jb_msg_ast(jbmessage* self);
+jbmessage* jb_msg_parseast(jbmessage* self);
 jbmessage* jb_msg_copy(jbmessage* self, jbmessage* layer);
 jbmessage* jb_msg_create(jbmessage* self, jbsyntax Type, jbstring* Name);
 void jb_msg_error(jbmessage* self, jbstring* ErrorMsg); /* Lets you add your own error messages to the tree. */

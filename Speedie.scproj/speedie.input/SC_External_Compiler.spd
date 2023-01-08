@@ -133,7 +133,7 @@ function string.CleanO (|string| name, |int|)
 function Clean (|string| name, |bool|)
 	"/tmp/Speedie".CleanO(name)
 	"/tmp/Speedie64".CleanO(name)
-	"/tmp/SpeedieApps".cleano("")
+	"/tmp/SpeedieApps".CleanO("")
 	return stderr.ok
 
 

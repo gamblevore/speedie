@@ -1,6 +1,6 @@
 
 
-function compiler.usingScript (|file|f, |file|)
+function compiler.usingScript (|file| f, |file|)
 	require !f.isdir
 	require f.readall starts "#!/"
 	rz = feedback.TryUseProject(f.path, true).scriptlocation.file
@@ -13,7 +13,7 @@ function compiler.usingScript (|file|f, |file|)
 		app.rawargs.remove(0)
 
 
-function compiler.ScriptRecompile (|file|f, |file|script_build, |bool|)
+function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
 	if !script_build.exists
 		return true
 	if (script_build.modified < f.modified)

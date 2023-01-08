@@ -191,7 +191,6 @@ int main(int argc, const char* argv[]) {
     }
     
     PrintErrors();
-
     jb_shutdown();
     return -((bool)Options.ParseErr);
 }
