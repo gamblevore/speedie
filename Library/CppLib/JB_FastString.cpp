@@ -484,14 +484,6 @@ void JB_FS_LengthSet(FastString* fs, int NewLength) {
 
 #ifndef AS_LIBRARY
 // used by compression.
-void JB_FS_BackFlush (FastString* fs, int CurrLength) {
-	if (fs->File) {
-		memmove(fs->ResultPtr, fs->ResultPtr+fs->Length, CurrLength);
-		fs->Length = CurrLength;
-		JB_FS_Flush(fs);
-	}
-	fs->Length += CurrLength;
-}
 
 	
 bool JB_FS_Flush(FastString* fs) {

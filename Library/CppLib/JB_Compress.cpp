@@ -291,6 +291,15 @@ u8* Copy_(u8* Addr, FastBuff& fb, int Offset, int Length) {
 	}
 	return Addr;
 }
+
+void BackFlush_ (FastString* fs, int CurrLength) {
+	if (fs->File) {
+		memmove(fs->ResultPtr, fs->ResultPtr+fs->Length, CurrLength);
+		fs->Length = CurrLength;
+		JB_FS_Flush(fs);
+	}
+	fs->Length += CurrLength;
+}
   
 extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int TotalLength) {
 	FastBuff& fb = FB;
@@ -311,7 +320,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int To
 	require (Addr != ErrP);
 	DReq(Addr == AddrEnd,						"Chunk read overflow",		0);
 	DReq(fb.Expected == fb.Length(),			"Chunk write-length error",	0);
-	JB_FS_BackFlush(fs, fb.Expected);
+	BackFlush_(fs, fb.Expected);
 	return fb.Expected; 
 }
 

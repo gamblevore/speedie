@@ -98,7 +98,6 @@ void JB_FS_AppendMultiReplace(FastString* self, JB_String* Data, Dictionary* MSR
 void JB_FS_AppendByteMap(FastString* self, JB_String* Data, ByteMap* MSR);
 void JB_FS_AppendLower(FastString* fs, JB_String* Data);
 bool JB_FS_Flush(FastString* self);
-void JB_FS_BackFlush (FastString* fs, int CurrLength);
 JB_File* JB_FS_File(FastString* fs);
 
 
