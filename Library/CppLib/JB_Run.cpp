@@ -72,7 +72,6 @@ JBClassPlaceSaver( Dictionary,   JB_Dict_Destructor,    JB_AsClass(Saveable),   
 JBClassPlaceSaver( Array,        JB_Array_Destructor,   JB_AsClass(Saveable),       JB_Array_Render, JB_Array_LoadProperties, JB_Array_SaveCollect, JB_Array_SaveWrite );
 JBClassPlaceSaver( Saveable,     0,                     0,                          0,               JB_Sav_LoadProperties,                       JB_Sav_SaveCollect, JB_Sav_SaveWrite );
 
-JBClassPlace( ShellStreamer,    JB_Sh_Destructor,      JB_AsClass(JB_Object),      0 );
 JBClassPlace( FastString,       JB_FS_Destructor,      JB_AsClass(JB_Object),      JB_FS_Render );
 JBClassPlace( ByteMap,          0,                     JB_AsClass(JB_Object),      0 );
 JBClassPlace( CharSet,          0,                     JB_AsClass(JB_Object),      JB_CS_Render );

@@ -22,6 +22,8 @@
 
 extern "C" {
 const int RD = 0; const int WR = 1;
+JBClassPlace( ShellStreamer,    JB_Sh_Destructor,      JB_AsClass(JB_Object),      0 );
+
 
 void JB_Rec_NewErrorWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
 
