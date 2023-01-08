@@ -134,6 +134,7 @@ JB_String* JB_Platform() {
 }
 
 
+#ifndef AS_LIBRARY
 
 uint8* JB_FastCString( JB_String* Path, uint8* Tmp ) {
     u32 N = JB_Str_Length( Path );
@@ -225,7 +226,13 @@ JB_StringC* JB_Str_MakeC ( JB_String* self ) {
     }
 	return Rz;
 }
+#else
 
+void JB_Utils_Stub() {
+	;
+}
+
+#endif
 
 } // 
 
