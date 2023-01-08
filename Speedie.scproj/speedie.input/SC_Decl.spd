@@ -922,7 +922,7 @@ class SCDecl (SCObject) {
 
 
 	render RenderTypeName 
-		if !self
+		if !self or !.type
 			fs <~ "(nil!)"
 		  else 
 			if (.IsNil) 

@@ -71,12 +71,14 @@ function MatchBase
 
 function scdecl.Match (|SCDecl| O, |int| TypeCast, |Message| exp = nil, |int|)
 // Make TypeCast = true able to deal with... pointers to structs!
-	if (!o)
+	if (o == nil)
 		require .default
 		Return kUseDefaultParams
 
 	if (o == self)
 		Return kSimpleMatch
+	require o.type and .type
+		
 
 	if (o.IsNil and (TypeCast & kTypeCastTrue))		// nil cast
 		if .CantBeNilInCpp							// |mystruct| x = nil
