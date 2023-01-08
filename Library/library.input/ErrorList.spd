@@ -2,6 +2,11 @@
 
 |ErrorList| StdErr
 
+// hmmm... what should I do?
+// how to remove log
+
+prototype fnErrorLogger (|errorlist| self, |string| Data)
+
 class ErrorList
 	linkage
 		cpp_part Rec
@@ -11,13 +16,14 @@ class ErrorList
 	contains ErrorList
 
 	|Error|					Errors
-	|File|					Log
+	|fnErrorLogger| 		LogFunc
 	|int|					MaxErrors
 	|int|					ErrorCount
 	|int|					ProblemCount
 	|int|					WarnCount
 	|int|					ErrorsAreWarnings
 	|string|				Source
+	|object| 				LogObj
 
 	constructor
 		.errors = error(nil)
@@ -52,8 +58,7 @@ class ErrorList
 		require .CanAddMore(err.ErrorLevel)
 		
 		err.path := .source
-		if .log
-			.log <~ err.render
+		(.LogFunc)(self, err.render)?
 		if CanPrint and err.needsprint
 			printline err.render
 		if error.autoprint and err.errorlevel >= Errorseverity.error
@@ -66,10 +71,22 @@ class ErrorList
 		cpp_part AppendStr
 		self <~ error(nil, err)
 
-	function LogFile (assigns:|string|)
-		.log = value.file
-		if .log
-			.log.openempty
+	setter LogFile (|string|)
+		opt norefcounts
+		visible class~file
+		ifn Value contains "/"
+			value = file.Logs[value]
+		|| f = value.file
+		f.OpenEmpty
+		.LogObj = f
+		.LogFunc = LogFileWriter
+	
+	function LogFileWriter (fnErrorLogger)
+		opt norefcounts
+		visible class~file
+		|| f = .LogObj
+		if f isa file
+			f <~ data
 
 
 	function incr (|error| err, |bool| add=true)
@@ -205,12 +222,10 @@ extend stringstream
 	syntax expect ( |string| Error )
 		opt norefcounts
 		debugat
-		|| msg = "Error decoding data: "
-		|| p = ""
-		if (.file != nil)
-			msg = "Error decoding file: "
-			p = .file.path
-		stderr.newError(nil, msg, p)
+		if (.filepath)
+			stderr.newError(nil, "Error decoding file: ", .filepath)
+		  else
+			stderr.newError(nil, "Error decoding data: ", "")
 
 
 function bool.operatorplus (|string| s, |bool|)
