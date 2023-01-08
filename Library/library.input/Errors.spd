@@ -43,26 +43,24 @@ class Error (Message)
 		.when = orig.when
 		.func = @sstr // whatever
 
-
 	function Copy (|error|)
 		return error(self, false)
 
-
 	syntax isnt (|ErrorFlags|F, |bool|)
 		return !.syntaxis(F)
+
 	syntax is (|ErrorFlags| F, |bool|)
 		return self and .ErrorFlags&F
+		
 	syntax is (|ErrorFlags|F, assigns:|bool|)
 		if Value
 			.ErrorFlags |= f
 		  else
 			.ErrorFlags &= ~F
-
 	
 	function LinePos (|string| data, |int|)
 		if (.HasPosition)
 			return data[ 0, .Position ].LineCount
-
 
 	function HasPosition (|bool|)
 		return .Position >= 0 
@@ -123,12 +121,10 @@ class Error (Message)
 		fs <~ .Position - Start
 		fs <~ ':'
 		return true
-	
 
 	syntax compare (|date| d, |bool| aware, |int|)
 		|| w = .when + d
 		return date() - w
-
 
 	render render
 		fs <~ "error"
@@ -139,7 +135,6 @@ class Error (Message)
 		fs.field( "file", .path )
 		fs <~ "\n"
 		fs.indent-- 
-
 
 	render render_clang
 		|| M = fs.mark
@@ -174,7 +169,6 @@ datatype ErrorFlags (Byte)
 		Keep = 0
 		PrintAndKeep = 1
 		PrintAndRemove = 2
-		
 
 
 
@@ -202,8 +196,6 @@ datatype ErrorSeverity (Byte)
 
 
 
-
-
 module ErrorColors
 	|bool| Enabled
 	
@@ -217,9 +209,11 @@ module ErrorColors
 	
 	
 	function string.PrintColor (|string| color)
-		if (errorcolors.enabled): print color
+		if (errorcolors.enabled)
+			print color
 		print self
-		if (errorcolors.enabled): print ErrorColors.normal
+		if (errorcolors.enabled)
+			print ErrorColors.normal
 	
 	
 	function string.PrintlineColor (|string| color)
@@ -230,15 +224,4 @@ module ErrorColors
 
 	function DisableIfNoTerminal
 		.enabled = Pipe.IsTerminal(Pipe.StdOut_)
-
-
-function message.Reverse
-	opt norefcounts // reverse the entire list!!!
-	|| c = .last
-	.first = c
-	while
-		|| l = .last
-		require l != c
-		c.next = l
-		c = l
 
