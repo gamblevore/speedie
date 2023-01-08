@@ -3,12 +3,6 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-// How to make me cute, pretty, adorable, loveabel and most of all...
-// hair-free on my legs and face like a boy, so toooo:
-// bring me back back to my ideal girl...
-// and while doing that to me, the others will work on the date thing
-// and also make me rich for being the great focal point.
-
 class Error (Message)
 	linkage
 		cpp_part	Err
