@@ -2,6 +2,11 @@
 // Copyright, Theodore H. Smith 2019.
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
+#ifdef AS_LIBRARY
+
+void JB_Child_Stub() {}
+
+#else
 
 #include "JB_Umbrella.hpp"
 #include <unistd.h>
@@ -67,3 +72,5 @@ int JB_App__BelongsToParent () {
 
 
 }
+#endif
+
