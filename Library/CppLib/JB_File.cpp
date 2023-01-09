@@ -121,6 +121,10 @@ extern "C" {
 #define kDefaultMode (S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)
 
 extern "C" {
+
+JBClassPlace( JB_File,          JB_File_Destructor,    JB_AsClass(JB_Object),      JB_File_Render );
+
+
 int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation);
 
 
@@ -192,6 +196,47 @@ bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
 		ErrorHandleStr_(err, self, nil, "get info on");
 	return false;
 }
+
+
+uint8* JB_FastCString( JB_String* Path, uint8* Tmp ) {
+    u32 N = JB_Str_Length( Path );
+    if ( ! N ) {
+        return (uint8*)"";
+    }
+
+	uint8* Result = Path->Addr;
+	auto Cls = JB_ObjClass(Path); 
+    if (Cls==JB_AsClass(JB_StringC) or Cls==JB_AsClass(JB_File))
+        return Result;
+
+    if (N > 1023)
+        N = 1023;
+	
+    if (!Tmp) {
+        debugger;
+        return 0;
+    }
+    
+    Tmp[ N ] = 0;
+    return (uint8*)CopyBytes( Result, Tmp, N );
+}
+
+
+uint8* JB_FastFileString( JB_String* Path, uint8* Tmp ) { // utf-16 on windows :(? Or do we just use posix funcs?
+#ifdef TARGET_UNIX
+    return JB_FastCString(Path, Tmp);
+#else
+	unsigned short* Result16 = (unsigned short*)Result;
+    N = local_c8to16( Result, N, &BufferData );
+    if ( ! N ) {
+        return 0; // error
+    }
+    Result16 = (unsigned short*)BufferData.Addr;
+    Result16[ N / 2 ] = 0;
+    return (uint8*)Result16;
+#endif
+}
+
 
 int JB_File_OpenStart( JB_File* f, bool AllowMissing ) {
 	int FD = f->Descriptor;
@@ -429,9 +474,32 @@ int JB_File_OpenBlank( JB_File* self ) {
 }
 
 
+bool filenameis (const char* tmp, const char* match) {
+	char buff[1000];
+	int nw = 0;
+	int nr = 0;
+	while (1) {
+		char s = tmp[nr++];
+		if (s>='A' and s <= 'Z')
+			s+=32;
+		buff[nw++] = s;
+		if (!s) break;
+		if (s=='/' or s == '.')
+			nw = 0;
+	};
+	if (strcmp(buff, match) == 0) {
+		return true;
+	} 
+	
+	return false;
+}
+
+
 int JB_Str_MakeDir(JB_String* self) {
     uint8 Buffer[1024];
     NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileString( self, Buffer );
+    if (filenameis(tmp, "h") or filenameis(tmp, "cpp")  or filenameis(tmp, "txt") )
+		debugger; // what?
     int err = mkdir(tmp, kDefaultMode);
     if (err == -1 and errno == EEXIST) {
         return 0; // ignore. really. I don't need this.
@@ -448,11 +516,6 @@ int JB_File_Delete (JB_String* self) {
         return 0;
     }
     return (int)ErrorHandleStr_(err, self, nil, "delete");  // handle error
-}
-
-    
-JB_String* JB_File_RemoveDotDot(JB_String* P) {
-	return P;
 }
 
 
@@ -500,8 +563,8 @@ JB_String* JB_File_PathFix_(JB_String* P) {
 
 
 void JB_File_Constructor( JB_File* self, JB_String* Path ) {
-
-	if (!Path) {Path = JB_Str__Empty();}
+	if (!Path)
+		Path = JB_Str__Empty();
 	Path = JB_File_PathFix_(Path);
 	self->Addr = Path->Addr;
 	self->Length = Path->Length;
@@ -618,7 +681,6 @@ bool JB_File_HardLinkTo( JB_File* self, JB_StringC* Link ) {
 	ErrorHandleStr_(Err, self, Link, "hardlink");
 	return !Err;
 }
-
 
 
 JB_String* JB_File_LinkToGet( JB_File* self ) {

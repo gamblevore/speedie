@@ -1411,6 +1411,7 @@ extern "C" void JB_Str__FindGlobals(JB_String*** lub, int** lengths, const char*
 
 function message.safe (|faststring| fs)
 	.name.safe(fs)
+
 function string.safe (|faststring| fs)
 	if .isascii
 		fs <~ self
@@ -1478,20 +1479,6 @@ class FastStringCpp (FastString)
 		.lastline += lines
 
 		return .lastline
-
-
-	function WriteFile (|message| msg, |string|)
-		opt norefcounts
-		require msg.hasposition
-			
-		|| f = msg.scfile
-			require .origfile != f
-
-			.Origfile = f
-			.LastLine = 1
-			.LastPos = 0
-			.origSrc = f.fdata
-			return f.path 
 
 
 function funcsorter_fn (sortercomparer)

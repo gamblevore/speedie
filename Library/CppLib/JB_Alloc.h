@@ -157,7 +157,7 @@ struct JB_Class {
     JB_Class*           NextClass;
     u16                 Size; // Move to JB_MemoryLayer for refcountless allocs. Or put a "UsesRefCounts" bool in MemLayer
     bool                HasSubclasses;  // for optimised isa testing
-    uint8               ClassDepth; // for optimised isa testing
+    uint8               ClassDepth;		// for optimised isa testing
     int					LeakCounter;
     JB_MemoryLayer      Memory;
     const char*         Name;

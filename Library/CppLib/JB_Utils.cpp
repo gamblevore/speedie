@@ -136,45 +136,6 @@ JB_String* JB_Platform() {
 
 #ifndef AS_LIBRARY
 
-uint8* JB_FastCString( JB_String* Path, uint8* Tmp ) {
-    u32 N = JB_Str_Length( Path );
-    if ( ! N ) {
-        return (uint8*)"";
-    }
-
-	uint8* Result = Path->Addr;
-	auto Cls = JB_ObjClass(Path); 
-    if (Cls==JB_AsClass(JB_StringC) or Cls==JB_AsClass(JB_File))
-        return Result;
-
-    if (N > 1023)
-        N = 1023;
-	
-    if (!Tmp) {
-        debugger;
-        return 0;
-    }
-    
-    Tmp[ N ] = 0;
-    return (uint8*)CopyBytes( Result, Tmp, N );
-}
-
-
-uint8* JB_FastFileString( JB_String* Path, uint8* Tmp ) { // utf-16 on windows :(? Or do we just use posix funcs?
-#ifdef TARGET_UNIX
-    return JB_FastCString(Path, Tmp);
-#else
-	unsigned short* Result16 = (unsigned short*)Result;
-    N = local_c8to16( Result, N, &BufferData );
-    if ( ! N ) {
-        return 0; // error
-    }
-    Result16 = (unsigned short*)BufferData.Addr;
-    Result16[ N / 2 ] = 0;
-    return (uint8*)Result16;
-#endif
-}
-
 
 
 bool HasCStringSpace_(JB_Class* Cls, int N) {

@@ -298,9 +298,11 @@ function Constpiler (|string| name, |scclass|)
 function Library (|file|)
 	return .projects.filech("Library")
 
-
 function Jeebox (|file|)
 	return .Projects.filech("Jeebox.scproj")
+
+function Speedie (|file|)
+	return .Projects.filech("Speedie.scproj")
 
 
 function ImportLibs

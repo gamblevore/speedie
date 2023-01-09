@@ -62,12 +62,11 @@ class SCImport
 					.ImportMsg(j)
 
 
-	function ShouldBan (|scfile| scf, |bool|)
+	function CanBan (|scfile| scf, |bool|)
 		if !SCImport.STDLibTime
 			return true
-		require compiler.BaseProjectPath pathmatch compiler.jeebox
-		require compiler.BaseProjectPath.DirectoryContains(scf.path)
-		return true
+		require options.projectisjeebox
+		return compiler.BaseProjectPath.DirectoryContains(scf.path)
 		// we also need something else to be the same.
 		// scf needs to be inside the thing...
 	
@@ -78,7 +77,7 @@ class SCImport
 		|| link = root.findflat( @tmp, "linkage" )
 			link.remove
 			.IsSTDLib = SCImport.STDLibTime or link..type ~= "library"
-			if .ShouldBan(scf)
+			if .canBan(scf)
 				.LoadBanned(link..bannedclasses)
 			|| name = link[@arg].findflat( @tmp, "cpp_part" )[@thg]
 				scf.ExportName = name.name

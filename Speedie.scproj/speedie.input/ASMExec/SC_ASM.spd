@@ -28,8 +28,8 @@ datatype ASM (JSM)
 	function RestI (|int|)
 		return (self << 7)|int| >> 7
 	module
-		|byte|				NoisyASM = 2
-		|asm_encoder2[32]|	Forms
+		|byte|				 NoisyASM = 1
+		|asm_encoder2[32]|	 Forms
 		|asm_encoder2[128]|  Encoders
 		|asm_decoder2[128]|  Decoders
 

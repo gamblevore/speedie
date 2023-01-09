@@ -49,11 +49,6 @@ void JB_Sav_SaveWrite(Saveable* self, void* Saver);
 void JB_Sav_LoadProperties(Saveable* self, void* Other);
 void JB_Dict__Init();
 
-
-#ifndef AS_LIBRARY
-JBClassPlace( JB_File,          JB_File_Destructor,    JB_AsClass(JB_Object),      JB_File_Render );
-#endif
-
 JBClassPlace( JB_String,        JB_BA_Destructor,      JB_AsClass(JB_Object),      JB_Str_Render );
 JBClassPlace( JB_StringC,       0,                     JB_AsClass(JB_String),      JB_Str_Render );
 JBClassPlace( JB_StringShared,  JB_Str_Destructor,     JB_AsClass(JB_String),      JB_Str_Render );

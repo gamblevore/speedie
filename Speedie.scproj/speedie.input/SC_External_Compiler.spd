@@ -5,7 +5,7 @@
 
 
 
-module ExternalCompiler {
+module ExternalCompiler { // cppcomp, external_compiler, extcomp
 linkage:cpp_part Ext
 |[File]| FoundObjects
 |[File]| Cleanup
@@ -67,9 +67,15 @@ function LibTmpPath (|string|)
 
 
 
+function AllowedThisFile (|string| name, |bool|)
+	if !options.projectisjeebox
+		return true
+	if name ~= "JB_File.cpp" or "JB_OSX.m" or "JB_Pipe.cpp" or "JB_PNG.cpp" or "JB_VM.cpp" or "JB_DirReaderWin32.cpp" or "JB_DirReaderUnix.cpp" or "JB_Child.cpp"
+		return false
+	return true
 
 function CanCompile ( |string| name, |bool| )
-	return name.ext.isclike
+	return name.ext.isclike and .AllowedThisFile(name)
 
 
 function string.isCLike (|bool|)
@@ -140,7 +146,6 @@ function Clean (|string| name, |bool|)
 function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Type, |[string]|)
 	rz.AppendWords( Product )
 
-	// Requirementsaslib or options.projectislibrary
 	|| cmode = "-std=gnu++17  -stdlib=libc++"
 	if Type == "m" or "o" or "mm"
 		if type == "mm"
@@ -188,12 +193,13 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 	rz.AppendWords( "   -D TARGET_UNIX=1 -D __SPEEDIE__=1  -I $cppl  -I ${Compiler.BuildFolder} -I ${compiler.generatedcppsfolder}  " )
 
 	|| NoASM = !asm.needed
+	|| GotAny = false
 	for f in CppList
 		if f isa Type
 			rz <~ f
-			cmode = ""
+			Gotany = true
 	
-	if cmode				// Disabled
+	if !GotAny				// Disabled
 		rz.clear
 	
 
@@ -432,14 +438,18 @@ function String.LastLine (|string|)
 function file.TestBatch (|bool|)
 	|| batch = compiler.BaseProjectPath["Batch"]
 	print "Tested: " 
-	|| n = 0
+	|| sep = ""
 	for c.files in batch
-		if c.visible
-			if n++
-				print ", "
+		if c.visible and c isa "spd"
+			print sep
+			sep = ", "
 			print c.Name
 			.execute([c, "--nocompile"])
 	printline
+	for c.files in batch
+		if c isa "cpp" or "h"
+			printline "This file should really not be here: " + c
+			debugger
 	return stderr.ok
 	// we want to test each file... how? we need to call the new speedie!
 	// so we need a folder to test...
