@@ -120,7 +120,7 @@ function Env (|dictionary of string|)
 	cpp_wrapper JB_App__Env
 
 function ChildEnv (|StringZeroTerminated| s, assigns:|StringZeroTerminated| value, |int|)
-	cpp_wrapper JB_App__SetEnv // missing a '_'!
+	cpp_wrapper JB_App__SetEnv
 
 
 function Input (|string|)
