@@ -356,7 +356,7 @@ extern "C" void Stub_JBPipe () {
     
 }
 
-void JB_PrintStackTrace() {
+extern "C" void JB_PrintStackTrace() {
 }
 
 #endif
