@@ -405,7 +405,7 @@ JB_String* JB_App__Path() {
     return Result;
 }
 
-int JB_App_SetEnv(JB_StringC* name, JB_StringC* value) {
+int JB_App__SetEnv(JB_StringC* name, JB_StringC* value) {
 	if (name and value)
 		return setenv((const char*)(name->Addr), (const char*)(value->Addr), 1);
 	return -999;
@@ -822,6 +822,10 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 #ifdef TARGET_UNIX
 	JB_String* JB_File__CWD( ) {
 		char* path = getcwd( 0, 0 );
+		if (!path) {
+			JB_ErrorHandleFile(nil, nil, errno, strerror(errno),  "getcwd");
+			return JB_Str__Error(); // sigh. it's possible, and can crash your app.
+		}
 		IntPtr N = strlen( path );
 		while (path[N-1] == '/')		// linux is different than Mac :(
 			N = N - 1;
