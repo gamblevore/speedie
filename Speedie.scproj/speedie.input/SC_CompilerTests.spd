@@ -1,0 +1,28 @@
+
+function Compiler.FileSanityTests
+	// Basic sanity checks. Make sure file functions work.
+	// Most read/write functions already tested via normal code
+	// but nested paths / deleting / linking, need these tests.
+	|| A = "/tmp/.SpdPathHidden".file
+	|| B = "/tmp/.SpdLinkHidden".file
+	|| C = A.path.child("a/b/c/d/e.txt")
+	|| D = B.path.child("a/b/c/d/e.txt")
+	for i in 3
+		if StdErr.ok
+			.FileTestsSub(A,b,c,d)
+	A.DeleteAll
+	B.DeleteAll
+
+
+helper Compiler.FileTestsSub (|file| Dest, |file| Src, |string| A, |string| B)
+	Dest.DeleteAll
+	Src.DeleteAll
+	expect (!Dest.Exists and !Src.Exists) ("Unable to delete files")
+	
+	// So we have a few paths... and they don't exist, lets create them.
+	Src.linkto(Dest)
+	A <~ Jeebox.name
+
+	|| ReadBack = B.file.ReadAll
+	error (ReadBack == Jeebox.name) ("Testing link+write failed. Read: " + Readback)
+		

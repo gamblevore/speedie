@@ -134,9 +134,9 @@ class File (String)
 		rz = .read(n)
 		.offset = i
 	
-	syntax access (|int| a, |int| b, |string|)
+	function section (|int| a, |int| b, |string|)
 		cpp_part AccessPeek
-		|| Wasopen = .descriptor
+		|| WasOpen = .descriptor
 		if .open
 			.offset = a
 			rz = .read(b-a)
@@ -144,7 +144,7 @@ class File (String)
 			.close
 
 	function IsCompressed (|bool|)
-		return self[0,10].iscompressed
+		return .section(0,10).iscompressed
 
 
 	function RelFile (|file|)

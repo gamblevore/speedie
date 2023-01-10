@@ -122,24 +122,11 @@ function CollectCppsInto ( |File| Fol,  |File| Objects, |&int| stdafx, |[File]| 
 
 	return .FilterCppsIfAlreadyDone(Cpps, Objects, stdafx)
 
-
-
-function string.CleanO (|string| name, |int|)
-	// bloody jb_string.o causing problems... all the time
-	if !name
-		return .file.deleteall
-	|| f = .filech("Lib")
-	name = name.lowercase + ".o"
-	for ch in f
-		if ch.name.lowercase contains name
-			ch.file.delete
-			printline ch
 	
  
-function Clean (|string| name, |bool|)
-	"/tmp/Speedie".CleanO(name)
-	"/tmp/Speedie64".CleanO(name)
-	"/tmp/SpeedieApps".CleanO("")
+function Clean (|bool|)
+	"/tmp/Speedie64".file.deleteall
+	"/tmp/SpeedieApps".file.deleteall
 	return stderr.ok
 
 

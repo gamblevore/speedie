@@ -47,8 +47,9 @@ extend_module file
 
 
 function compiler.CompileTime 
+	.FileSanityTests
 	File.TestJB
-	SC_Saver.test						// put before init or after compile-all?
+	SC_Saver.test
 	.PrintCompileTime(.CompileAll~timeit)
 	if stderr.ok
 		externalcompiler.ExtComp
