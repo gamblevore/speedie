@@ -65,9 +65,6 @@ function Path (|string|)
 
 function CalledName (|string|)
 	cpp_wrapper JB_App__CalledBy
-
-function Env (|StringZeroTerminated| s, assigns:|StringZeroTerminated| value, |int|)
-	cpp_wrapper JB_App_SetEnv
 		
 function TurnInto (|string| s, |[string]| R=nil, |errorint|)
 	cpp_Wrapper JB_App__TurnInto
@@ -121,6 +118,9 @@ function AppPath (|string|)
 	
 function Env (|dictionary of string|)
 	cpp_wrapper JB_App__Env
+
+function ChildEnv (|StringZeroTerminated| s, assigns:|StringZeroTerminated| value, |int|)
+	cpp_wrapper JB_App__SetEnv // missing a '_'!
 
 
 function Input (|string|)

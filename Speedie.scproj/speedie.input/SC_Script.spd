@@ -2,7 +2,7 @@
 
 function compiler.usingScript (|file| f, |file|)
 	require !f.isdir
-	require f.readall starts "#!/"
+	require f.Read(16) starts "#!/"
 	rz = feedback.TryUseProject(f.path, true).scriptlocation.file
 	if rz
 		error.AutoPrint = 0 
@@ -32,6 +32,8 @@ function compiler.TryVariousStartModes (|bool|)
 		compiler.CompileTime
 	if it.exists and stderr.ok
 		app.cwd = cwd
+		debugger
+		app.ChildEnv("OrigScriptPath") = f
 		app.turninto(it.path, app.rawargs)
 	return true
 

@@ -441,7 +441,7 @@ module Feedback
 		
 		+"clean"
 			Explain(Purpose, "Remove temp files.")$
-			if externalCompiler.Clean(value.argvalue)
+			if externalCompiler.Clean
 				"Cleaned"
 			return true // does something, counts towards operationCount
 		
