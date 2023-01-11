@@ -307,9 +307,8 @@ class File (String)
 				|| tmp = C.DeleteAll
 				if rz == 0
 					rz = tmp
-		|| tmp2 = .Delete
 		if rz == 0
-			rz = tmp2
+			rz = .Delete
 
 
 	operator isfile (|string| ext, |bool|)
