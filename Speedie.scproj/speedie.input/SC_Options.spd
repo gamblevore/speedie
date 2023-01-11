@@ -29,7 +29,7 @@ module Options
 	||		Is32Bit					= false
 	||		IsDirectTest			= false
 	||		ProjectIsLibrary		= false
-	||		ProjectIsJeebox			= false
+	||		ProjectIsMiniLib		= false
 	||		IgnoreCantSaveErrors	= false
 	||		ArgStats				= false
 	||		PrintCompileString		= false
@@ -72,7 +72,7 @@ module Feedback
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
 		  elseif t2 == 2
-			Options.ProjectIsJeebox = true
+			Options.ProjectIsMiniLib = true
 
 
 	function CheckSelfModifying2 (|int|)
@@ -177,7 +177,7 @@ module Feedback
 		  elseif value.isjbin // ignore it
 			0 // probably a restart compile option
 		  elseif (options.OperationCount == 1) and !options.output_path
-			feedback.AppOptions_product("product", value) // change to output_path
+			feedback.AppOptions_output_path("output_path", value) // change to output_path
 		  else
 			.TryUseProject(Value)
 			options.OperationCount++
@@ -391,14 +391,11 @@ module Feedback
 			explain(purpose, "Compiles to cpp, using clang. Default true")$
 			options.cpp = value.optionbool
 		
-		product // delete this later
-			explain(purpose, "Specifies the build product path")$
-			options.output_path = value.pathfix
-			options.output_path.parent.file.mustexist
 		output_path
 			explain(purpose, "Specifies the build product path")$
 			options.output_path = value.pathfix
 			options.output_path.parent.file.mustexist
+			options.ForceRecompile = true // it's what we expect
 		
 		force
 			explain(purpose, "Forces recompilation even if the output is newer than the input files.")$

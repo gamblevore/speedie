@@ -33,13 +33,15 @@ module Platform
 		return .PointerBits == 64
 		
 	function Log (|string| s)
+		printline s
 		if !.logger
 			.OpenLog
 		.logger <~ s
 		.Logger <~ "\n"
 	
-	helper OpenLog (|string| path = "")
-		path   := file.logs[app.AppName + ".log"]
+	helper OpenLog (|string| name = "")
+		name:=app.AppName
+		|| path = file.logs[name + ".log"]
 		.logger = path.file
 		.Logger.OpenEmpty
 	|file| Logger

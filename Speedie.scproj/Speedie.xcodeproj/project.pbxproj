@@ -70,7 +70,7 @@
 		AC528FED2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528FEA2961FEFC005EFB9D /* JB_RingTree.cpp */; };
 		AC528FEE2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528FEA2961FEFC005EFB9D /* JB_RingTree.cpp */; };
 		ACC5D721296B64A100052D75 /* jb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACC5D720296B64A100052D75 /* jb.cpp */; };
-		ACC5D725296B652400052D75 /* libJeebox.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ACC5D724296B652400052D75 /* libJeebox.dylib */; };
+		ACE9CDEC296EF5C600E84EE9 /* libjeebox.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ACE9CDEB296EF5C600E84EE9 /* libjeebox.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -188,7 +188,7 @@
 		ACC5D717296B642E00052D75 /* jbLibTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jbLibTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACC5D71F296B64A100052D75 /* jeebox_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jeebox_api.h; path = ../../jeebox.scproj/Examples/jeebox_api.h; sourceTree = "<group>"; };
 		ACC5D720296B64A100052D75 /* jb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jb.cpp; path = ../../jeebox.scproj/Examples/jb.cpp; sourceTree = "<group>"; };
-		ACC5D724296B652400052D75 /* libJeebox.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libJeebox.dylib; path = ../../jeebox.scproj/Build/libJeebox.dylib; sourceTree = "<group>"; };
+		ACE9CDEB296EF5C600E84EE9 /* libjeebox.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjeebox.dylib; path = ../../../../../usr/local/lib/libjeebox.dylib; sourceTree = "<group>"; };
 		ACEB6E521B1B0E70007B488A /* uwuTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = uwuTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACF67B6A286A1C5B0038C746 /* exec */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exec; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -212,7 +212,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ACC5D725296B652400052D75 /* libJeebox.dylib in Frameworks */,
+				ACE9CDEC296EF5C600E84EE9 /* libjeebox.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,7 +302,7 @@
 			isa = PBXGroup;
 			children = (
 				ACC5D720296B64A100052D75 /* jb.cpp */,
-				ACC5D724296B652400052D75 /* libJeebox.dylib */,
+				ACE9CDEB296EF5C600E84EE9 /* libjeebox.dylib */,
 				ACC5D71F296B64A100052D75 /* jeebox_api.h */,
 			);
 			path = jbLibTest;

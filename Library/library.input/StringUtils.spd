@@ -4,7 +4,7 @@ function Print (|string| data)
 	cpp_wrapper JB_Str_Print
 
 
-function PrintLine (|string| data=nil)
+function PrintLine (|string| data="")
 	strprintline(Data)							// to disambiguate vs macro
 
 
@@ -14,7 +14,6 @@ macro PrintLine
 	
 function StrPrintLine (|string| data)
 	cpp_wrapper JB_Str_PrintLine
-
 
 
 function PrintLine (|object| o)
@@ -30,7 +29,6 @@ macro ZalgoLine
 	Printline _.render	//.zalgo // remove floats first
 
 
-
 function Print (|object| o)
 	cpp_name JB_Obj_Print
 	print o.render
@@ -38,10 +36,6 @@ function Print (|object| o)
 
 function PrintError (|string| data)
 	cpp_wrapper JB_Str_PrintError
-
-
-function PrintTo (|string| data, |int| FileDes)
-	cpp_wrapper JB_Str_PrintTo
 
 
 function byte.IsConso (|bool|)

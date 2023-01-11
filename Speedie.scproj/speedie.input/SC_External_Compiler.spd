@@ -53,14 +53,20 @@ function CppLib (|File|)
 	return Compiler.Projects.filech("Library/CppLib")
 
 
+function LibSuff (|string|)
+	if options.ProjectIsMiniLib
+		return "Mini"
+	return ""
+
 function ProjTmpPath (|string|)
 	return .tmpbase(.ProductName)
+
+function LibTmpPath (|string|)
+	return .tmpbase("Lib") + .LibSuff
 
 function LogName (|string|)
 	return .ProjTmpPath.child("build.txt")
 
-function LibTmpPath (|string|)
-	return .tmpbase("Lib")
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,9 +74,9 @@ function LibTmpPath (|string|)
 
 
 function AllowedThisFile (|string| name, |bool|)
-	if !options.projectisjeebox
+	if !options.ProjectIsMiniLib
 		return true
-	if name ~= "JB_File.cpp" or "JB_OSX.m" or "JB_Pipe.cpp" or "JB_PNG.cpp" or "JB_VM.cpp" or "JB_DirReaderWin32.cpp" or "JB_DirReaderUnix.cpp" or "JB_Child.cpp"
+	if name ~= "JB_File.cpp" or "JB_OSX.m" or "JB_PNG.cpp" or "JB_VM.cpp" or "JB_DirReaderWin32.cpp" or "JB_DirReaderUnix.cpp" or "JB_Child.cpp"
 		return false
 	return true
 
@@ -93,7 +99,7 @@ function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
 	|| aslib = options.makelib or options.projectislibrary
 	require ! (aslib and (cpp contains "/JB_Main.")) // .o and .cpp
 	require ! (!asm.needed and (cpp contains "/JB_VM."))  
-	require ! (!(targets..gui or linkage.interpreter) and cpp contains "/JB_OSX.")  // or really should be "JB_Native.o"
+	require ! (!(targets..gui or linkage.interpreter) and cpp contains "/JB_OSX.")  // should be "JB_Native.o"
 
 	|| name		= cpp.name
 	|| Prefix	= name.trimextandpath
@@ -160,23 +166,29 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 	// Gaming64Bit
 	rz.AppendWords( " -march=core2  -ffast-math  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
 	
+	// stripping
+	rz.appendwords( "-fdata-sections -ffunction-sections")
+	
+	|| opt = options.optimise
 	|| aslib = options.makelib or options.projectislibrary
+		rz.appendwords( "-dynamiclib -fPIC")
+		opt = 3
 	if options.selfreplacement or aslib
 		rz.appendwords( "-g")
-	if aslib // unix suxx
-		rz.appendwords( "-dynamiclib -fPIC")
-	if (aslib  or  Options.Optimise < 0)
+	if (opt < 0)
 		rz.AppendWords( " -O0  " )
 	  else
 		rz.AppendWords( " -mtune=native " )
-		if (Options.Optimise >= 1)
+		if (opt >= 1)
 			rz.AppendWords( " -Os " )
-			if (Options.Optimise >= 2)
+			if (opt >= 2)
 				rz.AppendWords( " -flto " )
 
 
 	// Headers
 	|| cppl = .CppLib
+	if options.ProjectIsMiniLib
+		rz.appendwords( "-D AS_LIBRARY=1" )
 	rz.AppendWords( "   -D TARGET_UNIX=1 -D __SPEEDIE__=1  -I $cppl  -I ${Compiler.BuildFolder} -I ${compiler.generatedcppsfolder}  " )
 
 	|| NoASM = !asm.needed
@@ -324,7 +336,6 @@ function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self
 	.Cleanup <~ Test3
 	.Cleanup <~ Cpp3.Parent
 	
-
 // OldSpeedie has compiled SpeedyTest, at Test1. It is different.
 	|| Args = ["--self",  "--variant=2",  "--nocolor"]
 
@@ -346,7 +357,7 @@ function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self
 	
 	require cpp2.mustexist
 	require cpp3.mustexist
-	expect (Cpp2 matches Cpp3) "$Cpp2 doesn't match $Cpp3!"
+	expect (Cpp2.matchFile(Cpp3)) "$Cpp2 doesn't match $Cpp3!"
 	
 	require Test2.TestBatch
 
@@ -383,7 +394,7 @@ function BackupCompiler (|bool|)
 	B.MakeEntirePath
 
 	|| backup1 = B["LatestBackup"] 
-	if backup1 matches Product
+	if backup1.matchFile( Product)
 		return true
 
 	.ReplaceOld( product, b )
@@ -408,9 +419,9 @@ function InstallCompiler
 	|| Cpp0 = CppTest.Path.ReplacePathComponent(-2, "Build").file
 	|| H0 = HTest.Path.ReplacePathComponent(-2, "Build").file
 	Cpp0.Parent.MakeDir
-	ifn CppTest matches Cpp0
+	ifn CppTest.matchFile( Cpp0)
 		CppTest.Copyto(Cpp0)
-	ifn HTest matches H0
+	ifn HTest.matchFile( H0)
 		HTest.Copyto(H0)
 	
 	if options.Makelib

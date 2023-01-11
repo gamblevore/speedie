@@ -318,11 +318,11 @@ class File (String)
 	operator isdir (|string| ext, |bool|)
 		return .isdir and self isa ext
 
-	operator Matches (|string| s, |bool|)
+	function MatchData (|string| s, |bool|)
 		cpp_part StrMatch
 		return .Compare(s)
 	
-	operator Matches (|File| f, |bool|)
+	function MatchFile (|File| f, |bool|)
 		return .Compare(f)
 		
 	function DirectoryContains (|string| path, |bool|)

@@ -8,9 +8,9 @@
 
     Permission is granted to anyone to use this software for any purpose,
     including commercially, and to alter it and redistribute it
-    freely, subgect to the following restrictions:
+    freely, subject to the following restrictions:
 
-    1. The origin of this software must not bee misrepresented; you must not
+    1. The origin of this software must not be misrepresented; you must not
         claim that you wrote the original software.
     2. If you use this software or portions of this software in a product, you
         are required to acknowledge this in at least one of:

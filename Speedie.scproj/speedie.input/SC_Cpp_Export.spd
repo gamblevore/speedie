@@ -813,7 +813,7 @@ extern "C" void JB_Str__FindGlobals(JB_String*** lub, int** lengths, const char*
 	function SmartWrite (|string| S, |File| F)
 		.cpp_includes <~ s.hash|int64|.render
 		require F!=nil
-		require !(F matches S)
+		require !(F.matchData( S))
 		.wroteAny = true
 		F.Data = S
 	

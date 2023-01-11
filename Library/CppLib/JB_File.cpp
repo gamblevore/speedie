@@ -534,9 +534,15 @@ JB_String* JB_File__Home() {
 	return Home;
 }
 
+JB_String* JB_Str_Preview(JB_String* P, int N);
 JB_String* JB_File_PathFix_(JB_String* P) {
 // creates c-strings.
-	if (!JB_Str_Length(P)) return P;
+	int N = JB_Str_Length(P);
+	if (!N) return P;
+	if (N >= PATH_MAX) {
+		JB_ErrorHandleFile(JB_Str_Preview(P, 150), nil, ENAMETOOLONG, nil, "read-path");
+		return JB_Str__Error(); // hmmm
+	}
 	// P = JB_File_RemoveDotDot(P); // doesnt do anything
 	byte* s = P->Addr;
 	if (s[0] == '/')

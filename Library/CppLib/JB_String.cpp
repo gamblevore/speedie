@@ -1556,7 +1556,7 @@ JB_String* JB_Str_Range(JB_String* self, int StartOff, int AfterOff) {
         return u;
 
     } else if ( Length == 1 ) {
-		return JB_Str_ChrB( self->Addr[StartOff] );
+		return JB_Str__Byte( self->Addr[StartOff] );
 	}
 
 	return JB_Str__Empty();
@@ -1697,7 +1697,7 @@ JB_String* JB_Str_BOM(JB_String* self, int Encoding, bool IsBigEndian) {
 
 JB_String* JB_Str_ChrUTF8(u32 C) {
 	if (C <= 127) {
-		return JB_Str_ChrB( C );
+		return JB_Str__Byte( C );
 	}
     
 	u32 N = JB_Str_UTF8Size( C );
@@ -1767,8 +1767,8 @@ uint64 JB_Str_CRC (JB_String* S, uint64 crc) {
 Array* JB_Array__New0();
 Array* JB_Str_ArgV(const char** ArgV) {
     Array* Result = JB_Array__New0();
-    while (true) {
-        const char* c = *ArgV++;
+    while (ArgV) {
+        const char* c = *++ArgV;
         if (!c) {break;}
         JB_Array_Append(Result, JB_StrC(c));
     }
@@ -1818,19 +1818,19 @@ JB_String* JB_Str_FromInt( int L, int R ) {
 }
 
 
-JB_String* JB_Str_ChrB(int i) {
+JB_String* JB_Str__Byte(int i) {
     struct ChrBData {
         JB_String* Objects[256];
     };
-	static ChrBData* block = (ChrBData*)JB_zalloc(sizeof(ChrBData) );
+	static ChrBData block = {};
     
 	i = i & 0xFF; // make sure it's actually a byte!!
-	JB_String* Result = block->Objects[i];
+	JB_String* Result = block.Objects[i];
 	if (Result)
 		return Result;
 
     Result = JB_Str_New(1);
-	block->Objects[i] = (JB_String*)JB_Incr(Result);
+	block.Objects[i] = (JB_String*)JB_Incr(Result);
     Result->Addr[0] = i;
 	return Result;
 }

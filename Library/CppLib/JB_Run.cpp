@@ -137,8 +137,9 @@ int JB_LibInit (_cstring* R) {
         return EADDRINUSE;
     if (!(EmptyString_ = emptystr()))
         return ENOMEM;
-	App_CalledBy = *R;
-	App_Args = JB_Incr(JB_Str_ArgV(R + 1));				// allow caller to remove their c-string thingy. 
+	if (R)
+		App_CalledBy = *R;
+	App_Args = JB_Incr(JB_Str_ArgV(R));	// allow caller to remove their c-string data.
 
     ErrorString_ = emptystr();
     WhiteSpace_ = JB_CS__New( JB_StrC("\x9\xA\xD\x20"), false );

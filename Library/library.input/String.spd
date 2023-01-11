@@ -200,6 +200,7 @@ class String
 		cpp_wrapper JB_Str_CharCount
 
 	function Preview (|int| N = 100, |string|)
+		visible class~file // file uses this
 		if (.Length <= N)
 			return self
 		return self[0, N].UnicodeSync + "..."
@@ -432,7 +433,7 @@ class String
 			cpp_wrapper JB_Str__Uniqify
 
 		function Byte (|int| b, |string|)
-			cpp_wrapper JB_Str_ChrB
+			cpp_wrapper JB_Str__Byte
 		
 		syntax Access (|int|b, |string|)
 			return .byte(b)

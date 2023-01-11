@@ -88,7 +88,7 @@ JB_String* JB_MSR_ReplaceAll( Dictionary* Dict, JB_String* Data, FastString* fs_
         return 0;
     }
 
-	JB_String* EntityMarker = JB_Str_ChrB( '&' );
+	JB_String* EntityMarker = JB_Str__Byte( '&' );
 	
     uint8* SearchStart = Data->Addr;
 	uint8* SearchEnd = SearchStart + Data->Length;
@@ -199,7 +199,7 @@ CharList* ReorderArrays_( CharList* First ) {
 void EntitySet_(Dictionary* self, JB_String* Key, bool Value) {
     JB_String* ent = 0;
     if (Value) {
-        ent = JB_Str_ChrB( '&' );
+        ent = JB_Str__Byte( '&' );
     }
     JB_Dict_ValueSet(self, Key, ent);
 }
@@ -212,7 +212,7 @@ void JB_MSR_DecodeEntitySet(Dictionary* self, bool Value) {
 }
 
 void JB_MSR_EscapeCodeSet(Dictionary* self, bool Value) {
-    EntitySet_( self, JB_Str_ChrB( '\\' ), Value );
+    EntitySet_( self, JB_Str__Byte( '\\' ), Value );
 }
 
 
