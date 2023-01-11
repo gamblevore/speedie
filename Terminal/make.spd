@@ -1,0 +1,81 @@
+#!/usr/local/bin/spd
+
+// CONFIG
+|| Speedie = "~/Speedie".resolve // change this later
+|| LibName = "libjeebox.dylib"
+// END CONF
+
+|| ExecFlags = ""
+function comp (|string| name, |string|)
+	return "
+echo \"Compiling ${name}.cpp\"
+clang -o Build/$name  $ExecFlags  ${name}.cpp
+"
+
+main {
+
+expect !app.args (app.args, "Don't pass arguments to this script, except with '--' .")
+|| CFlags = "-std=gnu++17 -stdlib=libc++ -m64 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -lc++ -Os -flto -mtune=native"
+|| LibFlags = "$CFlags -dynamiclib  -F/Library/Frameworks  -D TARGET_UNIX=1 -D AS_LIBRARY=1 -D __SPEEDIE__=1"
+ExecFlags = "$CFlags -g -ljeebox"
+|| BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
+|| CppLib = "$Speedie/Library/CppLib".file
+|| tocompile = FastString()
+|| Count = 2 //jb.cpp and jb_globals.cpp
+for ch in CppLib
+	if ch isa "cpp"
+		tocompile <~ ch
+		tocompile <~ ' '
+		Count++
+
+////////////////////////////
+<(`    (((generating cpp files)))    `)>
+////////////////////////////
+
+expect !(Speedie contains ' ') ("The path: '$speedie' contains spaces and can't be compiled.")
+app.cwd = Speedie.child("jeebox.scproj").resolve
+"/usr/local/bin/spd".silentexecute([".", "-x", "--quiet", "--nocompile"])
+require StdErr.ok
+|| scriptout = "make.sh".file
+
+
+////////////////////////////
+<(`    (((generating script)))    `)>
+////////////////////////////
+
+
+scriptout.data = "#!/bin/bash
+set -e
+
+cd $CppLib
+
+echo \"Compiling $LibName\"
+clang -o /usr/local/lib/$LibName  $LibFlags  $tocompile   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+
+echo \"Cleaning old files\"
+cd $Speedie/jeebox.scproj/Examples
+mkdir -p Build
+rm -rf Build/*
+
+echo \"Installing headers\"
+cp *.h /usr/local/include/
+
+${comp(`jb`)}
+${comp(`xml`)}
+${comp(`test`)}
+${comp(`users`)}
+
+echo \"\"
+echo \"Build Complete. Also built some example .cpp files in $BuildFol\"
+"
+
+
+require StdErr.ok
+"Script generated at: ${scriptout.resolve}
+Running Script: $scriptout ($Count .cpp files)\n\n"
+scriptout.Execute
+
+require StdErr.ok
+BuildFol.child("jb").reveal
+
+}
