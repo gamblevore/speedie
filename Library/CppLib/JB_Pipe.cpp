@@ -103,7 +103,7 @@ int JB_ThreadStart (fn_pth_wrap wrap, JB_Object* oof, bool join) {
 }
 
 
-static bool pipe_dup2(int to, int from) {
+static bool pipe_dup2(int to, int from) { // so this kinda does what dup2 should do.
 	if (to <= 0)
 		return true;
 	while (true) {
@@ -209,11 +209,8 @@ int JB_Str_StartIPC(JB_String* self, JB_String* talk, Array* Args) {
 
 static int JB_FEPDWEE_Call(ShellStreamer& Sh, const char** argv, bool NewStdOut) {
 // Fork,Exec,Pipe,Dup2,Waitid,Errno,Eintr // unix simplicity :)
-	//puts("1");
 	if (NewStdOut or Sh.FSOut)
 		pipe(Sh.CaptureOut);
-	  else
-		debugger;
 	pipe(Sh.StdErrPipe);
 	if (Sh.Mode == 1) {	// 1 means... no block. So we wanna restore it.
 		if (Sh.CaptureOut[RD])
@@ -321,7 +318,11 @@ void JB_Sh_Destructor(ShellStreamer* self) {
 	JB_Decr(Sh.FSOut);
 }
 
-static void Smooth(ShellStreamer& Sh) { // or else certain apps will lock up.
+static void Smooth(ShellStreamer& Sh) {
+// or else certain apps will lock up.
+// funnily enough, sleeping makes these apps run FASTER.
+// probably by triggereing the printf statements instead 
+// of collecting them into one giant blob.
 	Date L = Sh.Last;
 	Date C = JB_Date__Now();
 	if (L) {
