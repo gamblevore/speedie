@@ -10,6 +10,7 @@ module App {
 |[string]|					OldArgs
 |message|					_Conf
 |config|					Prefs
+|string| 					_Path
 |string|					codesign_native = "codesign_osx"
 
 function Sleep (|Date| Duration)
@@ -60,8 +61,13 @@ function args (|[string]|)
 function PrintStackTrace
 	cpp_wrapper JB_PrintStackTrace
 
-function Path (|string|)
+helper ExePath (|string|)
 	cpp_wrapper JB_App__Path
+
+function Path (|string|)
+	._Path := .env["OrigScriptPath"]
+	._Path := .exepath
+	return ._path
 
 function CalledName (|string|)
 	cpp_wrapper JB_App__CalledBy

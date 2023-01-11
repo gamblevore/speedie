@@ -38,20 +38,23 @@ extend string
 	function StartProcess (|string|talk, |[string]| Args=nil, |PID_Int|)
 		cpp_Wrapper JB_Str_StartIPC
 
-	function PrintExecute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
+	function DebugExecute (|[string]| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
 		if file.DebugExecute // shouldnt be default!
 			print self
 			print " "
 			printline args.Render
-		return .Execute(args, out, errs)
+		return .Execute(args, out, errs, false)
 		
-	function Execute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
+	function Execute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |bool| KeepStdOut=true, |ErrorInt|)
 		cpp_wrapper JB_Str_Execute
+
+	function SilentExecute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
+		return .execute(args, out, errs, false)
 
 	function CreateArgs (|&cstring| Space, |[string]| Args, |int|)
 		cpp_wrapper JB_ArrayPrepare_
 
-	function ExecuteStr (|[string]| Args, |string|)
+	function ExecuteStr (|[string]| Args=nil, |string|)
 		|| fs = faststring()
 		if .execute(args, fs)
 			return fs

@@ -138,7 +138,7 @@ function file.CodeSign (|string| sign, |errorint|)
 		args <~ sign.cstr
 		args <~ self.cstr
 
-		rz = "/usr/bin/codesign".PrintExecute(args) // creates unnecesssary errors
+		rz = "/usr/bin/codesign".DebugExecute(args) // creates unnecesssary errors
 
 		args = []
 		args <~ "--verify"
@@ -146,9 +146,9 @@ function file.CodeSign (|string| sign, |errorint|)
 			args <~ "--verbose"
 		args <~ self
 		if rz
-			rz = "/usr/bin/codesign".PrintExecute(args)
+			rz = "/usr/bin/codesign".DebugExecute(args)
 		if rz
 			args[0] = "-a"
-			rz = "/usr/sbin/spctl".PrintExecute(args)
+			rz = "/usr/sbin/spctl".DebugExecute(args)
 		StdErr.ErrorsAreWarnings--
 			

@@ -168,7 +168,7 @@ class File (String)
 		return File.new( super.Parent )
 	
 	function touch (|errorint|)
-		return "/usr/bin/touch".execute([self])
+		return "/usr/bin/touch".SilentExecute([self])
 		
 	
 	function Compare (|File| A, |bool|)
@@ -378,8 +378,8 @@ class File (String)
 	
 	function Launch (|faststring| output=nil, |errorint|)
 		if !.isdir
-			return .execute([], output)
-		return "/usr/bin/open".execute([self], output)
+			return .SilentExecute([], output)
+		return "/usr/bin/open".SilentExecute([self], output)
 	
 	
 	function MoveTo (|string| Path, |ErrorInt|)

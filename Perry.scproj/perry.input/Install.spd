@@ -64,7 +64,7 @@ extend_module perry
 				
 		
 	function install_path (|string|)
-		|| p = app.path.parent
+		|| p = app.exepath.parent
 		expect (p contains ".app/") (beep, "Can't install/uninstall while using the app directly.")
 		return p.sibling("Resources/speedie_install.txt") // evade code-signing
 
@@ -148,7 +148,7 @@ extend_module perry
 			
 	
 	function InBuildFolder (|bool|)
-		|| paths = app.path.split('/')
+		|| paths = app.exepath.split('/')
 		for s.backwards in paths
 			if s.isproj
 				return true

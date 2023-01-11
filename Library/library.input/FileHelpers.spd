@@ -245,9 +245,9 @@ extend String
 		return self.Child(ch).file
 	
 	function OpenFile
-		if self and platform.osx
+		target osx
 			|| p = .pathfix
-				"/usr/bin/open".execute([p])
+				"/usr/bin/open".SilentExecute([p])
 	
 	function Reveal (|bool|)
 		if self and platform.osx
@@ -256,7 +256,7 @@ extend String
 			|| R = ["-R", p]
 			if .last == '/'
 				r.remove(0)
-			"/usr/bin/open".execute(R)
+			"/usr/bin/open".SilentExecute(R)
 			return true
 
 	function TypeContains (|string| s, |bool|)
@@ -269,8 +269,8 @@ extend file
 	helper xattrclear (|errorint|)
 		return .xattr("-rc")
 	helper xattr (|string| request, |errorint|)
-		if platform.osx
-			return "/usr/bin/xattr".execute([request, self])
+		target osx
+			return "/usr/bin/xattr".SilentExecute([request, self])
 		
 	function xcopyall (|file|f, |errorint|) 
 		rz = .copyall(f)
@@ -279,7 +279,7 @@ extend file
 
 
 	function UploadTo (|string| url, |errorint|)
-		return "/usr/bin/curl".execute([
+		return "/usr/bin/curl".silentexecute([
 			"-T"
 			self
 			url

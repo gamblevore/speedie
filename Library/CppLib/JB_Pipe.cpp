@@ -70,8 +70,8 @@ JB_String* JB_App__Readline() {
     return 0;
 }
 
-static bool safe_close (int fd) {
-	if (fd == -1) return true;
+static bool pipe_close (int fd) {
+	if (fd <= 0) return true;
 	while (close(fd) == -1)
 		if (errno != EINTR)
 			return false;
@@ -103,7 +103,9 @@ int JB_ThreadStart (fn_pth_wrap wrap, JB_Object* oof, bool join) {
 }
 
 
-static bool safe_dup2(int to, int from) {
+static bool pipe_dup2(int to, int from) {
+	if (to <= 0)
+		return true;
 	while (true) {
 		int res = dup2(to, from);
 		if (res != -1)
@@ -205,12 +207,17 @@ int JB_Str_StartIPC(JB_String* self, JB_String* talk, Array* Args) {
 
 
 
-static int JB_FEPDWEE_Call(ShellStreamer& Sh, const char** argv) {
+static int JB_FEPDWEE_Call(ShellStreamer& Sh, const char** argv, bool NewStdOut) {
 // Fork,Exec,Pipe,Dup2,Waitid,Errno,Eintr // unix simplicity :)
-	pipe(Sh.CaptureOut);
+	//puts("1");
+	if (NewStdOut or Sh.FSOut)
+		pipe(Sh.CaptureOut);
+	  else
+		debugger;
 	pipe(Sh.StdErrPipe);
 	if (Sh.Mode == 1) {	// 1 means... no block. So we wanna restore it.
-		fcntl(Sh.CaptureOut[RD], F_SETFL, O_NONBLOCK);
+		if (Sh.CaptureOut[RD])
+			fcntl(Sh.CaptureOut[RD], F_SETFL, O_NONBLOCK);
 		fcntl(Sh.StdErrPipe[RD], F_SETFL, O_NONBLOCK);
 	}
 	Sh.PID = fork();
@@ -218,12 +225,18 @@ static int JB_FEPDWEE_Call(ShellStreamer& Sh, const char** argv) {
 		return EPERM;
 	}
 	if (Sh.PID) {
-		safe_close(Sh.CaptureOut[WR]);  safe_close(Sh.StdErrPipe[WR]);
+		pipe_close(Sh.CaptureOut[WR]);
+		pipe_close(Sh.StdErrPipe[WR]);
 		return 0;
 	}
-	safe_dup2( Sh.CaptureOut[WR], STDOUT_FILENO );  safe_close(Sh.CaptureOut[WR]);
-	safe_dup2( Sh.StdErrPipe[WR], STDERR_FILENO );  safe_close(Sh.StdErrPipe[WR]);
-	safe_close(Sh.CaptureOut[RD]); safe_close(Sh.StdErrPipe[RD]);
+	
+	pipe_dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
+	pipe_close(Sh.CaptureOut[WR]);
+	pipe_close(Sh.CaptureOut[RD]);
+	
+	pipe_dup2( Sh.StdErrPipe[WR], STDERR_FILENO );
+	pipe_close(Sh.StdErrPipe[WR]);
+	pipe_close(Sh.StdErrPipe[RD]);
 	execvp(argv[0], (char* const*)argv);  _exit(errno); // in case execvp fails
 }
 
@@ -245,24 +258,26 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 }
 
 
-bool JB_FEPDWEE_Start(ShellStreamer* sh, Array* R, FastString* FSOut, FastString* FSErrIn, JB_String* self) {
+bool JB_FEPDWEE_Start(ShellStreamer* sh, Array* R, FastString* FSOut, FastString* FSErrIn, JB_String* self, bool KeepStdOut) {
 	ShellStreamer& Sh = *sh;
+	Sh.FSOut = FSOut;
+	Sh.FSErr = JB_FS__FastNew(FSErrIn);
+
 	const char* argv[MaxArgs + 1];
 	Sh.Err = JB_ArrayPrepare_(self, argv, R);
 	if (!Sh.Err)
-		Sh.Err = JB_FEPDWEE_Call(Sh, argv); // once this is called... we don't need argv anymore.
+		Sh.Err = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
 	if ( Sh.Err) {
 		JB_ErrorHandleFile(self, nil, Sh.Err, nil, "call command-line tool");
 		return false;
 	}
-	Sh.FSOut = FSOut;   Sh.FSErr = JB_FS__FastNew(FSErrIn);
 	return true;
 }
 
 void JB_FEPDWEE_Finish(ShellStreamer& Sh) {
 	Sh.Err = JB_SafeWait(Sh.PID); // this is jsut to get the... exit code.
-	safe_close(Sh.CaptureOut[RD]);
-	safe_close(Sh.StdErrPipe[RD]);
+	pipe_close(Sh.CaptureOut[RD]);
+	pipe_close(Sh.StdErrPipe[RD]);
 	Sh.Mode = -1;
 }
 
@@ -271,12 +286,13 @@ int JB_FEPDWEE_Finish2(ShellStreamer& Sh, FastString* FSErrIn ) {
 	if (Sh.FSErr->Length and !FSErrIn) {
 		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh.FSErr), nil);
 	}
+	JB_SetRef(Sh.FSErr, nil);
 	return Sh.Err;
 }
 
-int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn) {
+int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
 	ShellStreamer Sh = {};
-	if (!JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self))
+	if (!JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, KeepStdOut))
 		return Sh.Err;
 	JB_FEPDWEE_Middle(Sh);
 	return JB_FEPDWEE_Finish2(Sh, FSErrIn);
@@ -289,7 +305,7 @@ void JB_Sh_Constructor(ShellStreamer* self) {
 ShellStreamer* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn) {
 	auto Sh = JB_New(ShellStreamer);
 	JB_Sh_Constructor(Sh);
-	if (!JB_FEPDWEE_Start(Sh, R, FSOut, FSErrIn, self)) {
+	if (!JB_FEPDWEE_Start(Sh, R, FSOut, FSErrIn, self, FSOut==nil)) {
 		JB_FreeIfDead(Sh);
 		return 0;
 	}

@@ -24,7 +24,7 @@ void JB_Sh_Destructor(ShellStreamer* self);
 void JB_Sh_Constructor(ShellStreamer* self);
 ShellStreamer* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn);
 bool JB_Sh_Step(ShellStreamer* self);
-int JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs);
+int JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, bool KeepStdOut);
 int JB_App__TurnInto(JB_String* self, Array* R);
 typedef void (*fn_app_deathaction)();
 void JB_App__AtExit (fn_app_deathaction b);

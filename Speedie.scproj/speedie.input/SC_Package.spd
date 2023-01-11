@@ -68,8 +68,8 @@ function compiler.AppleBuildApp (|file| project, |file| product)
 
 
 || codesign_native = "codesign_osx"
-function compiler.CodeSign (|file| gui_app)
+function compiler.CodeSign (|file| gui_exe)
 	|| sign = app.pref(codesign_native)
-		gui_app.codesign(sign)
+		gui_exe.codesign(sign)
 	  else
-		StdErr.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_app.path )
+		StdErr.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_exe.path )
