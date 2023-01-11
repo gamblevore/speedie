@@ -69,8 +69,6 @@
 		AC528FEC2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528FEA2961FEFC005EFB9D /* JB_RingTree.cpp */; };
 		AC528FED2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528FEA2961FEFC005EFB9D /* JB_RingTree.cpp */; };
 		AC528FEE2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528FEA2961FEFC005EFB9D /* JB_RingTree.cpp */; };
-		ACC5D721296B64A100052D75 /* jb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACC5D720296B64A100052D75 /* jb.cpp */; };
-		ACE9CDEC296EF5C600E84EE9 /* libjeebox.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ACE9CDEB296EF5C600E84EE9 /* libjeebox.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -108,15 +106,6 @@
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 		ACC4BA6128BF423E00D26BCE /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-		ACC5D715296B642E00052D75 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -185,10 +174,6 @@
 		AC528FF2296200BF005EFB9D /* exec.scproj */ = {isa = PBXFileReference; lastKnownFileType = folder; name = exec.scproj; path = ../exec.scproj; sourceTree = "<group>"; };
 		ACBEE4E61A2E1D5200B61694 /* uwu */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = uwu; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACC4BA6528BF423E00D26BCE /* exec */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exec; sourceTree = BUILT_PRODUCTS_DIR; };
-		ACC5D717296B642E00052D75 /* jbLibTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jbLibTest; sourceTree = BUILT_PRODUCTS_DIR; };
-		ACC5D71F296B64A100052D75 /* jeebox_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jeebox_api.h; path = ../../jeebox.scproj/Examples/jeebox_api.h; sourceTree = "<group>"; };
-		ACC5D720296B64A100052D75 /* jb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jb.cpp; path = ../../jeebox.scproj/Examples/jb.cpp; sourceTree = "<group>"; };
-		ACE9CDEB296EF5C600E84EE9 /* libjeebox.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjeebox.dylib; path = ../../../../../usr/local/lib/libjeebox.dylib; sourceTree = "<group>"; };
 		ACEB6E521B1B0E70007B488A /* uwuTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = uwuTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACF67B6A286A1C5B0038C746 /* exec */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exec; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -205,14 +190,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		ACC5D714296B642E00052D75 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				ACE9CDEC296EF5C600E84EE9 /* libjeebox.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,7 +256,6 @@
 				AC528FF2296200BF005EFB9D /* exec.scproj */,
 				AC528FF029620091005EFB9D /* library.input */,
 				AC528F1B2961FD51005EFB9D /* Speedie.scproj */,
-				ACC5D718296B642E00052D75 /* jbLibTest */,
 				AC528F1A2961FD3E005EFB9D /* Build */,
 				AC528F192961FD1A005EFB9D /* CppLib */,
 				ACB5F6DC175CBA7700797A3C /* Products */,
@@ -293,19 +269,8 @@
 				ACEB6E521B1B0E70007B488A /* uwuTest */,
 				ACF67B6A286A1C5B0038C746 /* exec */,
 				ACC4BA6528BF423E00D26BCE /* exec */,
-				ACC5D717296B642E00052D75 /* jbLibTest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		ACC5D718296B642E00052D75 /* jbLibTest */ = {
-			isa = PBXGroup;
-			children = (
-				ACC5D720296B64A100052D75 /* jb.cpp */,
-				ACE9CDEB296EF5C600E84EE9 /* libjeebox.dylib */,
-				ACC5D71F296B64A100052D75 /* jeebox_api.h */,
-			);
-			path = jbLibTest;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -392,23 +357,6 @@
 			productReference = ACC4BA6528BF423E00D26BCE /* exec */;
 			productType = "com.apple.product-type.tool";
 		};
-		ACC5D716296B642E00052D75 /* jbLibTest */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = ACC5D71B296B642E00052D75 /* Build configuration list for PBXNativeTarget "jbLibTest" */;
-			buildPhases = (
-				ACC5D713296B642E00052D75 /* Sources */,
-				ACC5D714296B642E00052D75 /* Frameworks */,
-				ACC5D715296B642E00052D75 /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = jbLibTest;
-			productName = jbLibTest;
-			productReference = ACC5D717296B642E00052D75 /* jbLibTest */;
-			productType = "com.apple.product-type.tool";
-		};
 		ACEB6E341B1B0E70007B488A /* DirectTest */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = ACEB6E4F1B1B0E70007B488A /* Build configuration list for PBXNativeTarget "DirectTest" */;
@@ -453,11 +401,6 @@
 				DefaultBuildSystemTypeForWorkspace = Original;
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "";
-				TargetAttributes = {
-					ACC5D716296B642E00052D75 = {
-						CreatedOnToolsVersion = 14.2;
-					};
-				};
 			};
 			buildConfigurationList = ACB5F6D6175CBA7700797A3C /* Build configuration list for PBXProject "Speedie" */;
 			compatibilityVersion = "Xcode 11.4";
@@ -479,7 +422,6 @@
 				ACC4BA6828BF452E00D26BCE /* Exec Release */,
 				ACF67B41286A1C5B0038C746 /* exec */,
 				ACC4BA3A28BF423E00D26BCE /* exec release */,
-				ACC5D716296B642E00052D75 /* jbLibTest */,
 			);
 		};
 /* End PBXProject section */
@@ -527,14 +469,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC528FEE2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		ACC5D713296B642E00052D75 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				ACC5D721296B64A100052D75 /* jb.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -847,103 +781,6 @@
 			};
 			name = Release;
 		};
-		ACC5D71C296B642E00052D75 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.6;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
-		ACC5D71D296B642E00052D75 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.6;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Release;
-		};
 		ACEB6DF21B1AFEAE007B488A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1173,15 +1010,6 @@
 			buildConfigurations = (
 				ACC4BA6A28BF452E00D26BCE /* Debug */,
 				ACC4BA6B28BF452E00D26BCE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		ACC5D71B296B642E00052D75 /* Build configuration list for PBXNativeTarget "jbLibTest" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				ACC5D71C296B642E00052D75 /* Debug */,
-				ACC5D71D296B642E00052D75 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
