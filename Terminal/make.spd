@@ -19,27 +19,33 @@
 // END CONF
 
 || ExecFlags = ""
+
 function comp (|string| name, |string|)
-	return "
+	rz = "
 echo \"Compiling ${name}.cpp\"
 clang -o Build/$name  $ExecFlags  ${name}.cpp
 "
 
 main {
-"Death to make-tools!"
-expect !app.args (app.args, "Don't pass arguments to this script, except with '--' .")
-|| CFlags = "-std=gnu++17 -stdlib=libc++ -m64 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -lc++ -Os -flto -mtune=native"
-|| LibFlags = "$CFlags -dynamiclib  -F/Library/Frameworks  -D TARGET_UNIX=1 -D AS_LIBRARY=1 -D __SPEEDIE__=1"
+
+expect !app.args (app.args, "This script takes no arguments.")
+
+|| CFlags = "-std=gnu++17 -stdlib=libc++ -m64 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -lc++ -Os -ffast-math -flto -mtune=native -D TARGET_UNIX=1 -D __SPEEDIE__=1"
+|| LibFlags = "$CFlags -dynamiclib  -F/Library/Frameworks  -D AS_LIBRARY=1 "
 ExecFlags = "$CFlags -g -ljeebox"
 || BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
 || CppLib = "$Speedie/Library/CppLib".file
 || tocompile = FastString()
+|| SpdSrc = "$Speedie/Speedie.scproj/BuildTest"
+|| SpdTerm = "$Speedie/Terminal/Speedie"
+|| LibPath = "/usr/local/lib/$LibName"
 || Count = 2 //jb.cpp and jb_globals.cpp
 for ch in CppLib
 	if ch isa "cpp"
 		tocompile <~ ch
 		tocompile <~ ' '
 		Count++
+|| list = tocompile.render
 
 ////////////////////////////
 <(`    (((generating cpp files)))    `)>
@@ -47,9 +53,12 @@ for ch in CppLib
 
 expect !(Speedie contains ' ') ("The path: '$speedie' contains spaces and can't be compiled.")
 app.cwd = Speedie.child("jeebox.scproj").resolve
-"/usr/local/bin/spd".silentexecute([".", "-x", "--quiet", "--nocompile"])
-require StdErr.ok
-|| scriptout = "make.sh".file
+
+"Death to make-tools!"
+
+"/usr/local/bin/spd".silentexecute([".", "--x", "--nocompile"])$
+"/usr/local/bin/spd".silentexecute(["--self", "--x", "--nocompile"])$
+|| scriptout = "$Speedie/Terminal/make.sh".file
 
 
 ////////////////////////////
@@ -58,12 +67,17 @@ require StdErr.ok
 
 
 scriptout.data = "#!/bin/bash
+echo \"Started Speedie Build Script\"
 set -e
-
 cd $CppLib
 
-echo \"Compiling $LibName\"
-clang -o /usr/local/lib/$LibName  $LibFlags  $tocompile   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+echo \"Compiling $LibPath\"
+clang -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+
+
+echo \"Compiling Speedie to $SpdTerm\"
+clang -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp
+
 
 echo \"Cleaning old files\"
 cd $Speedie/jeebox.scproj/Examples
@@ -85,10 +99,7 @@ echo \"Build Complete. Also built some example .cpp files in $BuildFol\"
 
 require StdErr.ok
 "Script generated at: $scriptout
-Running Script: $scriptout ($Count .cpp files)\n\n"
+Running Script: $scriptout ($Count+ .cpp files)\n\n"
 scriptout.Execute
-
-require StdErr.ok
-BuildFol.child("jb").reveal
 
 }
