@@ -6,17 +6,15 @@
 
 
 // ANTI-MAKE THEORY:
-// This demonstrates the 'anti-make theory'.
-// Basically: "Don't use the unix 'make' or cmake,
-// just create a command-lines from your favourite programming language!
-// And don't use bash features like control-flow or vars!
+	// NO: unix 'make' or cmake
+	// NO: bash programming (control-flow / vars)
+	// DO: Create the command-lines from your fav language!
 // "Death to make-tools!"
 
 
-// CONFIG
+module Conf // crashes constantly if this is made into a module?
 || Speedie = "~/Speedie".resolve // change this later
 || LibName = "libjeebox.dylib"
-// END CONF
 
 || ExecFlags = ""
 
@@ -31,14 +29,15 @@ main {
 expect !app.args (app.args, "This script takes no arguments.")
 
 || CFlags = "-std=gnu++17 -stdlib=libc++ -m64 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -lc++ -Os -ffast-math -flto -mtune=native -D TARGET_UNIX=1 -D __SPEEDIE__=1"
-|| LibFlags = "$CFlags -dynamiclib  -F/Library/Frameworks  -D AS_LIBRARY=1 "
+|| LibFlags = "$CFlags -dynamiclib  -D AS_LIBRARY=1 "
 ExecFlags = "$CFlags -g -ljeebox"
 || BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
 || CppLib = "$Speedie/Library/CppLib".file
-|| tocompile = FastString()
 || SpdSrc = "$Speedie/Speedie.scproj/BuildTest"
 || SpdTerm = "$Speedie/Terminal/Speedie"
 || LibPath = "/usr/local/lib/$LibName"
+
+|| tocompile = FastString()
 || Count = 2 //jb.cpp and jb_globals.cpp
 for ch in CppLib
 	if ch isa "cpp"
@@ -53,8 +52,6 @@ for ch in CppLib
 
 expect !(Speedie contains ' ') ("The path: '$speedie' contains spaces and can't be compiled.")
 app.cwd = Speedie.child("jeebox.scproj").resolve
-
-"Death to make-tools!"
 
 "/usr/local/bin/spd".silentexecute([".", "--x", "--nocompile"])$
 "/usr/local/bin/spd".silentexecute(["--self", "--x", "--nocompile"])$
