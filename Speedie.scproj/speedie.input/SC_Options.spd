@@ -238,11 +238,6 @@ module Feedback
 		externalcompile (AppExtCompile) // deprecated. remove
 		x (AppExtCompile)
 		
-		+"genbuildscripts"
-			|| exp = "Generates build-scripts for speedie and jeebox that don't require speedie itself."
-			explain(Purpose, Exp)$
-			// todo
-			
 		+"perry"
 			Explain(Purpose, "")$
 			options.perry = 1
