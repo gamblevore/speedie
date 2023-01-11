@@ -34,9 +34,7 @@ module Perry
 		
 		
 	function LoadWindows (|PerryIDE| r)
-		|| l = .projects.list
-			.LoadWindowsSub(r, l)
-		  elseif !.CreateDefaultProject
+		if !.LoadWindowsSub(r) and !.CreateDefaultProject
 			startupwindow.show
 
 
@@ -51,30 +49,23 @@ module Perry
 		visible
 		app.prefs..colors = ¥.savecolors.parse
 
-
-	function message.PerryType (|int| type, |int|)
-		|| proj = .name.file
-		if proj.Exists
-			type |= (1+proj.isdir)
-		  else
-			.remove
-		return type
-	
 		
-	function LoadWindowsSub (|PerryIDE| r, |[message]| files)
-		|| Type = 0
-		for proj_item in files
-			type = proj_item.PerryType(type)
-				
-		for proj_item in files
-			|| proj = proj_item.name.file
-			if (type == 1) or proj.isdir
-				|| r2 = r oar PerryIDE(false)
-				r2.Loadproject(proj)
-				startupwindow.hide
-				r = nil
+	function LoadWindowsSub (|PerryIDE| r, |bool|)
+		|| Found = false
+		for proj_item in .projects
+			if proj_item.name.fileExists
+				found = true
 			  else
-				proj_item.remove
+				proj_item.Remove
+		
+		require Found
+		for proj_item in .projects
+			|| proj = proj_item.name.file
+			|| r2 = r oar PerryIDE(false)
+			r2.Loadproject(proj)
+			startupwindow.hide
+			r = nil
+		return true
 
 
 	function BuildAppMenu
