@@ -151,10 +151,9 @@ function IsSpeedieCode (|bool|)
 
 
 function LoadState
+	colorscheme.load(defaultcolors.parse)
 	|| it = app.prefs..colors
 		colorscheme.load(it)
-	  else
-		colorscheme.load(defaultcolors.parse)
 	
 
 function View (|ButtonView| btn)
