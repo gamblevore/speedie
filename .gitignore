@@ -10,5 +10,6 @@ xcuserdata/
 **/*.input/garbage.jb
 /Terminal/Backup/
 /Terminal/Debug/
+/Terminal/Build*
 *.scproj/Cpp/
 **/.todo
