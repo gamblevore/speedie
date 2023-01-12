@@ -47,7 +47,10 @@ extend_module file
 
 
 function compiler.CompileTime 
-	.FileSanityTests
+	if options.SelfReplacement
+		.FileSanityTests // sometimes this fails due to lack of permissions in xcode...
+						 // rather not fail needlessly. xcode gives lower perms to
+						 // it's builder scripts, strangely.
 	File.TestJB
 	SC_Saver.test
 	.PrintCompileTime(.CompileAll~timeit)
