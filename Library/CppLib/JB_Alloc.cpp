@@ -221,15 +221,24 @@ u64 JB_MemCount() {
 	#define SanityOfInUse(a,b)
 	#define SanityOfFree(a)
 	#define Sanity(x)
+	#define ObjInBlock(a,b)
 #else
+	FreeObject* ObjInBlock(FreeObject* Obj, AllocationBlock* B) {
+		char* S = BlockStart_(B);
+		char* ObjEnd = ((char*)Obj) + B->ObjSize;
+		if ((char*)Obj < S  or  ObjEnd > (char*)B) {
+			if (Obj==B->FirstFree) {
+				failed("corrupt block first free");
+			} else {
+				failed("corrupt freeobj next chain");
+			}
+		}
+		return Obj->Next;
+	}
 	void AllocBlock_Debug(AllocationBlock* B) {
 		FreeObject* Obj = B->FirstFree;
-		char* S = BlockStart_(B);
 		while (Obj) {
-			char* ObjEnd = ((char*)Obj) + B->ObjSize; 
-			if ((char*)Obj < S  or  ObjEnd > (char*)B)
-				failed("corrupt10");
-			Obj = Obj->Next;
+			Obj = ObjInBlock(Obj, B);
 		};
 	}
 
@@ -240,7 +249,8 @@ u64 JB_MemCount() {
 		return (GetDestructor_(B) == (fpDestructor)JB_MemCount);
 	}
 
-	static void TestMemory_(AllocationBlock* B) {
+
+	void TestMemory_(AllocationBlock* B) {
 		if (!B) {
 			return;
 		}
@@ -289,6 +299,14 @@ u64 JB_MemCount() {
 		}
 	}
 
+	void FSDebug() {
+		extern JB_Class FastStringData;
+		extern JB_Object* TheSharedFastString;
+		if (TheSharedFastString)
+			if (TheSharedFastString->RefCount > 100)
+				debugger;
+		TestMemory_(FastStringData.DefaultBlock);
+	}
 
 	static bool IsBadFree_(AllocationBlock* Curr) {
 		if (Curr->Prev) {
@@ -1053,7 +1071,8 @@ void JB_DeleteSub_( FreeObject* Obj, AllocationBlock* Block ) {
     // used by my other projects for custom memory managers!
     Obj->Next = Block->FirstFree;
     Block->FirstFree = Obj;
-    
+	ObjInBlock(Obj, Block);
+
     if_usual (--(Block->ObjCount) >= 1) {
         return;
     }
@@ -1172,6 +1191,7 @@ void JB_Mem_ClassLeakCounter () {
 static inline JB_Object* Trap_(FreeObject* Obj, AllocationBlock* B) {
 //	if (JB_ObjID((JB_Object*)Obj)==19456)
 //		debugger;
+	ObjInBlock(Obj, B);
 	Obj->FakeRefCount = 0;
     return (JB_Object*)Obj;
 }
@@ -1186,7 +1206,7 @@ __hot JB_Object* JB_Alloc2( AllocationBlock* CurrBlock ) {
     } else if ((IntPtr)Obj == 1) {
 		return 0;// do some kinda burst-mode allocation for parsing jeebox
 	} else {
-		return Trap_(NewBlock( CurrBlock ), 0);
+		return Trap_(NewBlock( CurrBlock ), CurrBlock->Owner->CurrBlock);
 	}
 }
 
@@ -1199,7 +1219,7 @@ __hot JB_Object* JB_Alloc( JB_MemoryLayer* Mem ) {
         CurrBlock->FirstFree = Obj->Next;
         return Trap_(Obj, CurrBlock);
     }
-    return Trap_(NewBlock( CurrBlock ), 0);
+    return Trap_(NewBlock( CurrBlock ), Mem->CurrBlock);
 }
 
 
