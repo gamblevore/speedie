@@ -8,16 +8,16 @@ Message is used to represent the nodes within a parsed string. Jeebox is a highl
 Technically, Jeebox is classed as an `AST` (abstract syntax tree), that is why it can store source-code. It just happens to also be useful for storing data-files.
 
     || source_string = `
-    files
-        file "/path/to/file1" (Picture)
-        file "/path/to/file2" (Sound)
-        file "/path/to/file3" (Text)
+    file_list
+        item "/path/to/file1" (Picture)
+        item "/path/to/file2" (Sound)
+        item "/path/to/file3" (Text)
     `
     || recent_list = source_string.parse
-    for f in recent_list..files
-		|| name = f[@str,0].name.name
-		|| type = f[@bra,1][@thg].name
-        "$name is a $type"					// "file1 is a Picture,  file2 is a Sound,  file3 is a Text"
+    for item in recent_list["file_list"]
+        || name = item[@str,0].name.name
+        || type = item[@bra,1][@thg].name
+        "$name is a $type"                    // "file1 is a Picture,  file2 is a Sound,  file3 is a Text"
     
 **Unlike** XML which has many different kinds of nodes, each `Message` returned by `string.parse` is interchangeable, and has only two things defining it, the type and the name.
 
