@@ -3,8 +3,8 @@ function Compiler.FileSanityTests
 	// Basic sanity checks. Make sure file functions work.
 	// Most read/write functions already tested via normal code
 	// but nested paths / deleting / linking, need these tests.
-	|| A = "/tmp/.SpdPathHidden".file
-	|| B = "/tmp/.SpdLinkHidden".file
+	|| A = "/tmp/SpdPathHidden".file
+	|| B = "/tmp/SpdLinkHidden".file
 	|| C = A.path.child("a/b/c/d/e.txt")
 	|| D = B.path.child("a/b/c/d/e.txt")
 	for i in 3
