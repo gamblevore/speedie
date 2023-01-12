@@ -37,7 +37,7 @@ Well, that leads to this tree:
 
 So the message "`return`" has a type of `@tmp`. "`>`" has a type of `@opp`. (We use `@` in Speedie, to represent `Message` types. So `@thg` would be a "thing" type, and `@arg` would be an "argument" type.)
 
-Jeebox (and it's `Message` class), is useful for so many use-cases, that it surprises people (even me). Sometimes it even confuses people, but it shouldn't, because we use ascii or Unicode for just anything. Why not a file-format too?
+Jeebox (and it's `Message` class), is useful for almost anytime you need a new or custom data-format of any kind.
 
 Here are some things I've (practically) used Jeebox for, so far:
 
@@ -46,7 +46,7 @@ Here are some things I've (practically) used Jeebox for, so far:
 * Preference files (all my apps use it)
 * IPC (the `Process` class)
 * Internet communications
-* Data-banks
+* Data-banks (song libraries)
 
 ## Upcoming Section...
 
