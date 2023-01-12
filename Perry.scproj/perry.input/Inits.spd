@@ -420,7 +420,7 @@ extend PerryIDE
 		.LoadConfSub(proj, avoid)
 		.IsLoading = false
 		startupwindow.hide
-		.viewasbetter
+		.viewasproject
 		.forcerecheck
 		app.saveprefs // for pref-file editing
 		return true
