@@ -6,7 +6,6 @@
 
 module Perry
     |listviewrow|					Projects
-    |dictionary| 					InsecureWords
     |string|						_SpeedieDir
     |bool|							Checked	
 	
@@ -24,13 +23,6 @@ module Perry
 		for p in .Projects
 			if p is active
 				return true
-
-
-	function PreWindows
-		|| bad = app.prefs..badwords			#require
-		|| w = .InsecureWords init Dictionary()
-		for m in bad
-			w[m.name] = "x"
 		
 		
 	function LoadWindows (|PerryIDE| r)
@@ -80,7 +72,6 @@ module Perry
 
 	function Startup
 		.Projects = (app.prefs)("lastproj")
-		.PreWindows
 		
 		|| r = PerryIDE(false)
 		r.LoadState
