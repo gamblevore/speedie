@@ -283,7 +283,6 @@ int JB_FEPDWEE_Finish2(ShellStreamer& Sh, FastString* FSErrIn ) {
 	if (Sh.FSErr->Length and !FSErrIn) {
 		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh.FSErr), nil);
 	}
-	JB_SetRef(Sh.FSErr, nil);
 	return Sh.Err;
 }
 
