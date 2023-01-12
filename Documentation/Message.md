@@ -21,9 +21,9 @@ Technically, Jeebox is classed as an `AST` (abstract syntax tree), that is why i
     
 **Unlike** XML which has many different kinds of nodes, each `Message` returned by `string.parse` is interchangeable, and has only two things defining it, the type and the name.
 
-`Message` has a type accessed via `.func`, and a name accessed via `.name`.
+The name is accessed via `.name`, and is just a string. The type is accessed `.func`, and is a datatype called `Syntax`. On the CPU, `Syntax` is just an `int`. Datatypes have their own functions that you can call, so you must think of `Syntax` as it's own type that just happens to have efficient CPU representation.
 
-For example, parsing this:
+OK, lets try parsing this:
 
     return a > c
 
