@@ -152,6 +152,7 @@ function IsSpeedieCode (|bool|)
 
 function LoadState
 	colorscheme.load(defaultcolors.parse)
+	return // buggy somewhere?
 	|| it = app.prefs..colors
 		colorscheme.load(it)
 	
