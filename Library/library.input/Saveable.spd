@@ -16,6 +16,8 @@ struct ObjectSaver
 	
 	module
 		|SaverClassInfo|		SaveableList
+		constants
+			RefMark = 0x40000000
 
 		
 		function New (|ObjectSaver|)
@@ -64,19 +66,19 @@ class Saveable
 	
 	function IsSaveMarked (|bool|)
 		|| p = self|&int|
-		return (p[0] & 0x10000000)
+		return (p[0] & ObjectSaver.RefMark)
 
 	function SaveMark (|bool|)
 		// pretty brave!!! to try this! Very dangerous
 		|| p = self|&int|
 		|| rc = p[0] 
-		require !(rc & 0x10000000)
-		p[0] = Rc (|) 0x10000000
+		require !(rc & ObjectSaver.RefMark)
+		p[0] = Rc (|) ObjectSaver.RefMark
 		return true
 	
 	function SaveUnMark
 		|| p = self|&int|
-		p[0] &= ~ 0x10000000
+		p[0] &= ~ ObjectSaver.RefMark
 	
 	function SaveTo (|File| f)
 		cpp_part SaveToFile
