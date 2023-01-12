@@ -206,7 +206,6 @@ module Feedback
 		target release
 			|| v = ExternalCompiler.LogName
 			printline "Stdout to: " + v
-			app.printstacktrace
 			feedback.output(v, 3)
 			options.outputnormal.size = 0
 
@@ -349,7 +348,6 @@ module Feedback
 		m32
 			Explain(Purpose, "32-bit compile")$
 			options.is32bit = true
-			app.PrintStackTrace
 
 		
 		warn
