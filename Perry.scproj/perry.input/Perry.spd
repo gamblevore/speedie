@@ -241,14 +241,6 @@ function Viewing (|buttonview|) // currview
 
 function IsViewing (|guicontrol| g, |bool|)
 	return (g is visible)
-	
-
-function ViewAsNatural
-	if .project
-		if .project.isdir
-			.viewasproject
-		  else
-			.viewastext
 
 
 function ViewAsBetter
