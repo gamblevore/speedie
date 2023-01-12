@@ -431,7 +431,9 @@ JB_String* JB_FS_GetResult(FastString* self) {
     if (!Result)
 		Result = JB_Str__Empty();
 
-	return JB_Str_Shrink(Result, Length);
+	Result = JB_Str_Shrink(Result, Length);
+//	FSDebug();
+	return Result;
 }
 
 
@@ -541,15 +543,19 @@ FastString* JB_FS__InternalNew() {
     return fs;
 }
 
+FastString* TheSharedFastString;
 FastString* JB_FS__FastNew(FastString* other) {
     if (other) {
         return other;
     }
     
-	static FastString* fs;
-    
+	FastString* fs = TheSharedFastString; 
+	if (fs and fs->RefCount > 100) debugger;
+
+
 	if ( !fs or (JB_RefCount(fs) > 1)) {
         JB_SetRef(fs, JB_New(FastString));
+		TheSharedFastString=fs;
         JB_FS_Constructor( fs );
     } else {
         fs->Length = 0;
