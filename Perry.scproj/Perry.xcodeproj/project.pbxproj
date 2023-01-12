@@ -126,6 +126,13 @@
 			remoteGlobalIDString = AC61010D2798768C00278BEF;
 			remoteInfo = Speedie;
 		};
+		AC7E16DC29703FE100CE3387 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AC9E1719233A859B003B433F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AC61010D2798768C00278BEF;
+			remoteInfo = Speedie;
+		};
 		AC9220A62857A16E002F3F97 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AC9E1719233A859B003B433F /* Project object */;
@@ -506,6 +513,7 @@
 			);
 			dependencies = (
 				AC30E54426666827009DFD82 /* PBXTargetDependency */,
+				AC7E16DD29703FE100CE3387 /* PBXTargetDependency */,
 			);
 			name = PerryApp;
 			productName = Multiplay;
@@ -703,6 +711,11 @@
 			isa = PBXTargetDependency;
 			target = AC61010D2798768C00278BEF /* Speedie */;
 			targetProxy = AC5C19D6282F9AB500E1F377 /* PBXContainerItemProxy */;
+		};
+		AC7E16DD29703FE100CE3387 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AC61010D2798768C00278BEF /* Speedie */;
+			targetProxy = AC7E16DC29703FE100CE3387 /* PBXContainerItemProxy */;
 		};
 		AC9220A72857A16E002F3F97 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
