@@ -586,6 +586,7 @@ class Process
 			
 
 		function Child (|string| app_path, |string| name, |[string]| params=nil, |int|size=16KB, |Process|)
+			require app_path.file.mustexist
 			|| p = process(name, size, params)
 			if p.RunChild(app_path)
 				return p
