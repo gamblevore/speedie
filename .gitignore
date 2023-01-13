@@ -8,6 +8,7 @@ xcuserdata/
 **/src.nogit/
 /Library/*.jbin
 **/*.input/garbage.jb
+/FirstProj*
 /Terminal/Backup/
 /Terminal/Debug/
 /Terminal/Build*
