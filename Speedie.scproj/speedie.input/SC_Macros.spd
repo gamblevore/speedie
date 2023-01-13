@@ -42,7 +42,7 @@ function message.CleanBecome (|macro| m)
 	.become(m)
 
 	
-function message.TargetTest (|bool|)
+function message.TargetTest (|bool|) // target true, target false, 
 	.expect(@thg)
 	if self ~= "debug"
 		return options.TargetDebug
@@ -50,6 +50,8 @@ function message.TargetTest (|bool|)
 		return !options.TargetDebug
 	if self ~= "perry"
 		return options.perry
+	if self ~= "minilib"
+		return options.ProjectIsMiniLib
 	if self ~= "true"
 		return true
 	if self ~= "false"
