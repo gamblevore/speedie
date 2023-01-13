@@ -767,7 +767,7 @@ class SCDecl (SCObject) {
 		rz = .Copy
 		for p in list
 			if (p isthing "tag")
-				(rz is borrowed) = options.projectislibrary
+				(rz is borrowed) = options.ProjectIsLibrary
 			  elseif (p isthing "api")
 				rz.isapi = true
 			  else
