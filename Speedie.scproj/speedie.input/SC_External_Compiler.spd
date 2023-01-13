@@ -35,6 +35,14 @@ function BackupPath (|string|)
 function ProductName (|string|)
 	return compiler.projectname + Compiler.VariantSuffix
 
+function ProductSuffix (|String|)
+	require Options.ProjectIsLibrary
+	Target OSX
+		return ".dylib"
+	target Win
+		return ".lib"
+	return ".so"
+	
 
 function ProductPath (|String|)
 	if options.output_path
@@ -43,7 +51,7 @@ function ProductPath (|String|)
 	if options.scripting
 		return compiler.originalinputpath.scriptlocation
 		
-	|| prod = .productname
+	|| prod = .productname + .ProductSuffix
 	if Options.SelfReplacement
 		return Compiler.Projects.child("Terminal/"+prod)
 	return Compiler.BuildFolder.path[ prod ]
