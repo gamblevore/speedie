@@ -47,10 +47,16 @@ for ch in CppLib
 
 expect !(Speedie contains ' ') ("The path: '$speedie' contains spaces and can't be compiled.")
 app.cwd = Speedie.child("jeebox.scproj").resolve
+|| ScriptOut = "$Speedie/Terminal/make.sh".file
+|| PrepareCpp = "$Speedie/Terminal/PrepareSpeedie.sh".file
 
-"/usr/local/bin/spd".silentexecute([".", "--x", "--nocompile"])$
-"/usr/local/bin/spd".silentexecute(["--self", "--x", "--nocompile"])$
-|| scriptout = "$Speedie/Terminal/make.sh".file
+
+PrepareCpp.data = `#!/bin/bash
+echo "Prebuild .cpp files"
+sudo -u $(logname) /usr/local/bin/speedie . --x --nocompile
+sudo -u $(logname) /usr/local/bin/speedie --self --x --nocompile
+`
+PrepareCpp.SilentExecute
 
 
 ////////////////////////////
@@ -58,7 +64,7 @@ app.cwd = Speedie.child("jeebox.scproj").resolve
 ////////////////////////////
 
 scriptout.data = "#!/bin/bash
-echo \"Started Speedie Build Script\"
+echo \"Started Building Speedie\"
 set -e
 cd $CppLib
 
