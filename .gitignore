@@ -12,6 +12,6 @@ xcuserdata/
 /Terminal/Backup/
 /Terminal/Debug/
 /Terminal/Build*
-/Terminal/make.sh
+/Terminal/*.sh
 *.scproj/Cpp/
 **/.todo
