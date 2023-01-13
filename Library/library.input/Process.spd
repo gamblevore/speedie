@@ -505,6 +505,12 @@ class Process
 			.self "reopen"
 			return .RunChild(.path)
 
+	function Where (|string|)
+		if !self
+			return "(??)"
+		if .path
+			return .path
+		return "(fp)"
 
 	function Run (fn_pth_wrap)
 		return (.subprocess)(nil, 7) // 4 means thread, 1 + 2 = IDK.
@@ -614,18 +620,17 @@ class Process
 				f.close
 				
 		function TellParentIDied (fn_app_crash_handler)
+			opt norefcounts
 			target debug
 				if !app.ismainthread
 					debugger
-			"child: crashed"
+			app.DefaultCrashHandler(signal)
 			app.CrashHandler = nil // just in case
-			opt norefcounts
 			|| o = self.owner_
 			require o!=nil
 			if signal != -1999
 				o.ours.state = o.ours.state|int| max ipcstate.Crashed
 			o.sendcrashed
-			app.DefaultCrashHandler
 
 
 function file.IPC (|&int| n, |_voidptr|)

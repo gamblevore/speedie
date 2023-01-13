@@ -30,6 +30,9 @@ extend String
 	function SyntaxAppend (|string| s, |bool|)
 		return .filedata(s)
 
+	function SyntaxAppend (|cstring| s, |byte|sep='\n', |bool|)
+		cpp_wrapper JB_File_WriteCString
+
 	function Sibling (|string| name, |string|)
 		return .ReplacePathComponent(-1, Name)
 		

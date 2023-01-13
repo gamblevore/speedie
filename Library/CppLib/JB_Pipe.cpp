@@ -50,15 +50,18 @@ const char** JB_BackTrace(void** space, int* size) {
 }
 
 
+void JB_Rec__CrashLog(const char* c);
+
 void JB_PrintStackTrace() {
-    void*   array[32];
-    int size = 32;
+    int   size = 32;
+    void* array[size];
     auto  strings = JB_BackTrace(array, &size);
 
-    for_(size)
-        puts( strings[i] );
+    for_(size) {
+        JB_Rec__CrashLog(strings[i]);
+	}
     
-    puts("");
+	JB_Rec__CrashLog("");    
     free( strings );
 }
 

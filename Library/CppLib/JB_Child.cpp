@@ -25,14 +25,18 @@ int JB_App__ID() {
 	return getpid();
 }
 
-void SafePrint (const char* c) {
+static void SafePrint (const char* c) {
 	write(STDOUT_FILENO, c, strlen(c) );
 }
 
+
 void JB__DefaultCrashHandler(int Sig) {
-	debugger;
     if (Sig != SIGTERM and Sig != SIGQUIT) {
 		JB_PrintStackTrace();
+		
+		char ErrorBuff[64];
+		snprintf(ErrorBuff, 64, "Crash: %s", strsignal(Sig));
+		JB_Rec__CrashLog(ErrorBuff);
 		exit(-1);
 	} else if (getppid() > 1) {
 		SafePrint("Child process got signal...\n" );

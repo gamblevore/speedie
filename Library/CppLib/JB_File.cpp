@@ -334,6 +334,27 @@ int JB_FS_InterPipe(FastString* self, int Desired, int fd, int Mode) {
 }
 
 
+int CrashLogFile = 0;
+JB_StringC* JB_App__CrashLogName();
+void JB_Rec__CrashLog(const char* c) {
+	if (!c) return;
+	puts(c);
+
+// this filename tho... lol. fucking lack of strings...
+	JB_StringC* Name = JB_App__CrashLogName();
+	if (!CrashLogFile and Name) {
+		mkdir("/tmp/logs", kDefaultMode);
+		auto s = (const char*)(Name->Addr);
+		int flags = O_RDWR | O_CREAT | O_TRUNC;
+		CrashLogFile = open(s, flags, kDefaultMode);
+	}
+	if (!CrashLogFile) return;
+
+    InterWrite( CrashLogFile, (u8*)c, (int)strlen(c) );
+    InterWrite( CrashLogFile, (u8*)"\n", 1 );
+}
+
+
 bool JB_FS_AppendPipe(FastString* self, int fd, int Mode) {
 	// Error:
 	//	0  means finished. we wanna close. Same with errors. So (>= 0) --> close
@@ -461,6 +482,20 @@ int JB_File_Write( JB_File* self, JB_String* Data ) {
 	}
     return -1;
 }
+
+int JB_File_WriteCString( JB_File* self, const char* Data, int Sep ) {
+    if (!Data)
+		return 0;
+	if (JB_File_Open( self, O_RDWR | O_CREAT, false ) >= 0 ) {
+		int N = JB_File_WriteRaw_(self, (u8*)Data, (int)strlen(Data));
+		byte Sep2 = (byte)Sep;
+		if (N > 0 and Sep >= 0 and JB_File_WriteRaw_(self, (u8*)"\n", 1) > 0)
+			N++;
+		return N;
+	}
+    return -1;
+}
+
     
 
 void JB_File_Flush(JB_File* self) {

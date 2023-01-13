@@ -7,11 +7,13 @@
 
 module App {
 |bool|						Unregistered 
+|string|					_CLN = app.crashlogname
 |[string]|					OldArgs
 |message|					_Conf
 |config|					Prefs
 |string| 					_Path
 |string|					codesign_native = "codesign_osx"
+
 
 function Sleep (|Date| Duration)
 	cpp_wrapper JB_Date__Sleep
@@ -37,9 +39,15 @@ function TimeID (|uint|)
 function Pref (|string| s, assigns:|string|)
 	.prefs[s] = Value
 
-function Crash (|string| reason="Crashing on purpose")
-	printline reason
+function Crash (|string| reason="")
+	opt norefcounts
+	if reason
+		printline reason
+	.CrashLog "AboutToCrash".cstr
 	*(-1|&byte|) = 0
+
+function CrashLog (|cstring| value)
+	cpp_wrapper JB_Rec__CrashLog
 
 syntax access (|string| name, |string_argvalue|)
 	cpp_part ArgValue
@@ -68,6 +76,14 @@ function Path (|string|)
 	._Path := .env["OrigScriptPath"]
 	._Path := .exepath
 	return ._path
+	
+
+function CrashLogName (|stringzeroterminated|)
+	opt norefcounts
+	if ._cln
+		return ._cln
+	// actually, speedie itself should generate this. Like as a c-array.
+	return "/tmp/logs/${.filename}.crash.txt"
 
 function CalledName (|string|)
 	cpp_wrapper JB_App__CalledBy

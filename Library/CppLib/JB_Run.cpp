@@ -137,8 +137,12 @@ int JB_LibInit (_cstring* R) {
         return EADDRINUSE;
     if (!(EmptyString_ = emptystr()))
         return ENOMEM;
-	if (R)
+	if (R) {
 		App_CalledBy = *R;
+		#ifndef AS_LIBRARY
+			JB_App__CrashInstall(JB__DefaultCrashHandler);
+		#endif
+	}
 	App_Args = JB_Incr(JB_Str_ArgV(R));	// allow caller to remove their c-string data.
 
     ErrorString_ = emptystr();

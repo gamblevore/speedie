@@ -41,6 +41,7 @@ typedef void (*JB_CrashHandler)(int);
 void JB_App__CrashInstall(JB_CrashHandler P);
 int JB_App__BelongsToParent();
 void JB__DefaultCrashHandler(int Signal);
+void JB_Rec__CrashLog(const char* c);
 struct Process;
 typedef int	(*fn_pth_wrap)(Process* obj);
 int JB_ThreadStart (fn_pth_wrap wrap, JB_Object* IPC, bool join);
