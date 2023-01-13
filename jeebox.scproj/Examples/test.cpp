@@ -2,7 +2,7 @@
 //  Created by Theodore on 23/04/2019.
 //  Copyright © 2019 Theodore. All rights reserved.
 
-#include "Jeebox.h"
+#include "jeebox.h"
 #include <stdio.h>
 
 using namespace Jeebox;

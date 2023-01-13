@@ -1,5 +1,5 @@
 
-#include "Jeebox.h"
+#include "jeebox.h"
 #include <iostream>
 using namespace Jeebox;
 
