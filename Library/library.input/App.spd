@@ -7,7 +7,8 @@
 
 module App {
 |bool|						Unregistered 
-|string|					_CLN = app.crashlogname
+target !minilib
+	|string|					_CLN = app.crashlogname
 |[string]|					OldArgs
 |message|					_Conf
 |config|					Prefs
@@ -73,29 +74,40 @@ helper ExePath (|string|)
 	cpp_wrapper JB_App__Path
 
 function Path (|string|)
+	cpp_part OrigPath
+	visible class~file
 	._Path := .env["OrigScriptPath"]
 	._Path := .exepath
 	return ._path
 	
 
+target !minilib {
 function CrashLogName (|stringzeroterminated|)
 	opt norefcounts
 	if ._cln
 		return ._cln
 	// actually, speedie itself should generate this. Like as a c-array.
 	return "/tmp/logs/${.filename}.crash.txt"
+}
+
+function Restart
+	.turninto(.path, .rawargs)
+
+
+function AppName (|string|)
+	return .apppath.name
+
+
+function AppPath (|string|)
+	if platform.osx
+		return .path.backtoapp
+	return .path
 
 function CalledName (|string|)
 	cpp_wrapper JB_App__CalledBy
 		
 function TurnInto (|string| s, |[string]| R=nil, |errorint|)
 	cpp_Wrapper JB_App__TurnInto
-
-function Restart
-	.turninto(.path, .rawargs)
-
-function AppName (|string|)
-	return .apppath.name
 
 function ObjMemory (|int64|)
 	return JB_MemCount()
@@ -131,11 +143,6 @@ function Expired (|date| period, |date|From=__now__, |date|)
 	if date() > expiry
 		return expiry
 	
-	
-function AppPath (|string|)
-	if platform.osx
-		return .path.backtoapp
-	return .path
 
 	
 function Env (|dictionary of string|)
