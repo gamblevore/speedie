@@ -16,7 +16,7 @@
 
 function comp (|string| name, |string|)
 	rz = "echo \"Compiling ${name}.cpp\"
-clang -o Build/$name  $ExecFlags  ${name}.cpp"
+g++ -o Build/$name  $ExecFlags  ${name}.cpp"
 
 main {
 
@@ -56,6 +56,9 @@ echo "Prebuild .cpp files"
 sudo -u $(logname) /usr/local/bin/speedie . --x --nocompile
 sudo -u $(logname) /usr/local/bin/speedie --self --x --nocompile
 `
+// sudo -u $(logname) will "drop root permissions". This allows us to
+// NOT run speedie as root, causing speedie to create folders owned
+// by root. Meaning now we can't use those folders unless we sudo everything.
 PrepareCpp.SilentExecute
 
 
@@ -69,20 +72,20 @@ set -e
 cd $CppLib
 
 echo \"Compiling $LibPath\"
-clang -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 
 
 echo \"Compiling Speedie to $SpdTerm\"
-clang -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp
+g++ -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp
 
 
 echo \"Cleaning old files\"
 cd $Speedie/jeebox.scproj/Examples
-mkdir -p Build
+sudo -u \$(logname) mkdir -p Build
 rm -rf Build/*
 
 echo \"Installing headers\"
-cp *.h /usr/local/include/
+sudo -u \$(logname) cp *.h /usr/local/include/
 
 ${comp(`jb`)}
 ${comp(`xml`)}
