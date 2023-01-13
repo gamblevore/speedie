@@ -1,9 +1,7 @@
 #!/usr/local/bin/spd
 
 // README:
-// Run this using sudo. like:
-// sudo make.spd
-
+// Run this using sudo. like: sudo make.spd
 
 // ANTI-MAKE THEORY:
 	// NO: unix 'make' or cmake
@@ -12,30 +10,26 @@
 // "Death to make-tools!"
 
 
-module Conf // crashes constantly if this is made into a module?
 || Speedie = "~/Speedie".resolve // change this later
-|| LibName = "libjeebox.dylib"
-
+|| LibName = "libjeebox.dylib" 
 || ExecFlags = ""
 
 function comp (|string| name, |string|)
-	rz = "
-echo \"Compiling ${name}.cpp\"
-clang -o Build/$name  $ExecFlags  ${name}.cpp
-"
+	rz = "echo \"Compiling ${name}.cpp\"
+clang -o Build/$name  $ExecFlags  ${name}.cpp"
 
 main {
 
 expect !app.args (app.args, "This script takes no arguments.")
 
-|| CFlags = "-std=gnu++17 -stdlib=libc++ -m64 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -lc++ -Os -ffast-math -flto -mtune=native -D TARGET_UNIX=1 -D __SPEEDIE__=1"
+|| CFlags   = "-std=gnu++17 -stdlib=libc++ -m64 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -lc++ -Os -ffast-math -flto -mtune=native -D TARGET_UNIX=1 -D __SPEEDIE__=1"
 || LibFlags = "$CFlags -dynamiclib  -D AS_LIBRARY=1 "
-ExecFlags = "$CFlags -g -ljeebox"
+ExecFlags   = "$CFlags -g -ljeebox"
 || BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
-|| CppLib = "$Speedie/Library/CppLib".file
-|| SpdSrc = "$Speedie/Speedie.scproj/BuildTest"
-|| SpdTerm = "$Speedie/Terminal/Speedie"
-|| LibPath = "/usr/local/lib/$LibName"
+|| CppLib   = "$Speedie/Library/CppLib".file
+|| SpdSrc   = "$Speedie/Speedie.scproj/BuildTest"
+|| SpdTerm  = "$Speedie/Terminal/Speedie"
+|| LibPath  = "/usr/local/lib/$LibName"
 
 || tocompile = FastString()
 || Count = 2 //jb.cpp and jb_globals.cpp
@@ -45,6 +39,7 @@ for ch in CppLib
 		tocompile <~ ' '
 		Count++
 || list = tocompile.render
+
 
 ////////////////////////////
 <(`    (((generating cpp files)))    `)>
@@ -61,7 +56,6 @@ app.cwd = Speedie.child("jeebox.scproj").resolve
 ////////////////////////////
 <(`    (((generating script)))    `)>
 ////////////////////////////
-
 
 scriptout.data = "#!/bin/bash
 echo \"Started Speedie Build Script\"
