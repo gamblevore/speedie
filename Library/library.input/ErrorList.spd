@@ -76,9 +76,7 @@ class ErrorList
 		visible class~file
 		ifn Value contains "/"
 			value = file.Logs[value]
-		|| f = value.file
-		f.OpenEmpty
-		.LogObj = f
+		.LogObj = value.file
 		.LogFunc = LogFileWriter
 	
 	function LogFileWriter (fnErrorLogger)
@@ -86,8 +84,10 @@ class ErrorList
 		visible class~file
 		|| f = .LogObj
 		if f isa file
+			if !f.Opened
+				f.OpenEmpty
 			f <~ data
-
+			
 
 	function incr (|error| err, |bool| add=true)
 		|| n = (1, -1)(add)
@@ -196,7 +196,8 @@ class ErrorList
 	module
 		function OutOfMemory (|bool|)
 			cpp_Wrapper JB_OutOfMemoryOccurred
-	
+			
+		
 	iterator
 		|| curr_err = .errors.first
 		while (curr_err)
