@@ -1,6 +1,6 @@
 
 
-main // speedie main {	
+main // speedie main { 
 	error.AutoPrint = 1
 	compiler.SetupEnv
 	Compiler.Main
@@ -23,15 +23,11 @@ api Speedie_Main (|&cstring| args, |int| Mode, |ErrorInt|)
 
 function compiler.SetupEnv
 	opt norefcounts
-	if !app.pref_path
-		"Conf missing prefpath"
-		debugger
+	error (app.pref_path) "Conf missing prefpath"
 	|| B = app..talk and app.IsMainThread
 // don't let breakpoints rekt us
 		app.IgnoreSig
 		app.CrashHandler = &process.TellParentIDied 		
-	  else
-		app.CrashHandler = &app.DefaultCrashHandler
 
 	app.PrefsStartup
 	errorcolors.DisableIfNoTerminal

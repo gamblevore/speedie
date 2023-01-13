@@ -44,8 +44,8 @@ module Options
 	||		SelfReplacement			= 0
 	||		OperationCount			= 0
 	|byte|	Perry					= 0
-	|File|  OutputNormal
-	|File|  OutputErrors
+	//|File|  OutputNormal//sigh
+	//|File|  OutputErrors
 	
 	function Color (assigns:|bool|)
 		ErrorColors.enabled = Value
@@ -114,14 +114,19 @@ module Feedback
 	function string.IsSpeedieSrc (|bool|)
 		return (self isa "spd")
 
+/*
 	function Output (|string| v, |file|)
+		disabled
+		return nil
 		if options.OutputNormal.path == v
 			return options.OutputNormal
 		if options.OutputErrors.path == v
 			return options.OutputErrors
 		return file.new(v)
-		
+	
 	function Output (|string| value, |int| Mode)
+		disabled
+		return nil
 		Options.Color = false
 		|| f = Feedback.output(value)
 		|| d = f.opendes
@@ -131,6 +136,7 @@ module Feedback
 		if mode & 2
 			options.OutputErrors = f
 			pipe.stderror = d
+*/
 
 	function TryUseProject (|String| path, |bool| IsScript=false, |string|)
 		ifn (path contains '/' or '.' or '~')
@@ -202,12 +208,17 @@ module Feedback
 	function AppTalk (ShellOption) 
 		Explain(Purpose, "")$
 		interact.ShouldEnter = 1
-		ErrorColors.enabled = false 
-		target release
-			|| v = ExternalCompiler.LogName
-			printline "Stdout to: " + v
-			feedback.output(v, 3)
-			options.outputnormal.size = 0
+		ErrorColors.enabled = false
+		/* 
+		// this fucking thing isnt working... its not making sense either
+		// maybe just... don't use it? just print?
+		// we have the ability to alter stdout
+		// why not do that for crashlogs? that is stdout goes to the crashlog?
+		|| v = ExternalCompiler.LogName
+		printline "Stdout to: " + v
+		feedback.output(v, 3)
+		options.outputnormal.size = 0
+		*/
 
 
 	dispatch AppOptions (ShellOption)
@@ -320,7 +331,10 @@ module Feedback
 			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$
 			feedback.TryUseProject( Compiler.SpeedieProj )
 			return true // does something, counts towards operationCount
-			
+		
+		+"crash"
+			explain(purpose, "Crashes speedie to test it's crash handlers.")$
+			app.crash
 		+"__talk__" (AppTalk)
 			
 		+"talk" (AppTalk)
@@ -363,6 +377,7 @@ module Feedback
 			Explain(Purpose, "Don't print text coloring symbols for terminals.")$
 			Options.Color = false
 		
+/*
 		output
 			Explain(Purpose, "Redirects stdout printed to file passed.")$
 			feedback.output(value, 1)
@@ -370,7 +385,7 @@ module Feedback
 		errors
 			Explain(Purpose, "Sends all errors printed to file passed.")$
 			feedback.output(value, 2)
-
+*/
 		selfdebug
 			Explain(Purpose, "Self-test only.")$
 			Options.SelfReplacement = kSelfDebug
@@ -404,10 +419,12 @@ module Feedback
 		// variant... lol
 			Options.Variant = (Value.parseInt|int|).Render
 
+/*
 			options.OutputNormal = file.new( externalcompiler.tmpout(Options.Variant) )
 			options.OutputErrors = file.new( externalcompiler.tmperr(Options.Variant) )
 			pipe.StdOut = options.outputNormal.OpenDes
-			pipe.StdError = options.outputErrors.Opendes 
+			pipe.StdError = options.outputErrors.Opendes
+*/ 
 			Options.Color = false
 			(options.optimise max= 1) // -Os
 		
