@@ -15,7 +15,7 @@ extend PerryIDE
 		.Toolbar			= buttonview(self,		ClickedToolBar,			nil)
 		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			nil)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile,			nil)
-		.Tabs				= ButtonView(.Toolbar,	ClickedTabs,    nil,  ReturnProjectPath,  RightClickedTabs) 
+		.Tabs				= ButtonView(.Toolbar,	ClickedTabs,    RightClickedTabs,  ReturnProjectPath,  RightClickedTabs) 
 		.StartScreen		= buttonview(.Toolbar,	&startupwindow.open)
 		.BirdButton			= buttonview(.Toolbar,	ClickedBird)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
