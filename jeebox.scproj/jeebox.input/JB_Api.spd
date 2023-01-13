@@ -349,9 +349,10 @@ module JB_API
 		|| ErrCode = jb_api.JB_LibInit
 			return ErrCode
 		
-		|| msg = Jeebox.Test
-		if flags & 1
-			printline msg
+		target !NoSelfTest // compile like: "speedie jeebox.scproj --target=NoSelfTest"
+			|| msg = Jeebox.Test
+			if flags & 1
+				printline msg
 		
 		if !stderr.ok
 			print stderr.errors.first.name
