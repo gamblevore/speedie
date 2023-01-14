@@ -10,9 +10,11 @@
 // "Death to make-tools!"
 
 
-|| Speedie = "~/Speedie".resolve // change this later
-|| LibName = "libjeebox.dylib" 
+|| Speedie = "/usr/local/speedie"
 || ExecFlags = ""
+target osx:  || LibName = "libjeebox.dylib" 
+target win:  || LibName = "libjeebox.lib" 
+target lnx:  || LibName = "libjeebox.so" 
 
 function comp (|string| name, |string|)
 	rz = "echo \"Compiling ${name}.cpp\"
