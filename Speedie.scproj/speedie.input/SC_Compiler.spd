@@ -48,8 +48,8 @@ extend_module compiler
 function Compiler.FindSpeedieRoot (|string|)
 	|| paths = app.exepath.resolve.parent
 	|| srch = "/Speedie/"
-	|| found = paths.find(srch)
-	expect (found > 0) (paths, "Put dis in a folder named 'Speedie' (case sensitive). Old: "  + paths)
+	|| found = paths.find(srch,0,int.max,true)
+	expect (found > 0) (paths, "Put in a folder named 'Speedie' (case sensitive). Old: " + paths)
 	return paths[0, found + srch.length]
 	
 
