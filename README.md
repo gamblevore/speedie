@@ -59,23 +59,21 @@ I have a lot of long-term goals... Overall, I want to make programming a whole l
 * I'm still interested in MMI (Mind Machine Interfacing) using quantum-entropy, so perhaps Speedie could be modified to be good at it. But I want to steer clear of "financial predictions" and stick to the "lets use it for play" (like using randomness for games) kind of thing, so it might have to come **after** making a good gaming system? Using MMI for financial-predictions is kind of a cursed-genre.
 * Perhaps visualisation of data-structures within a game-engine could be cool? As a way to explore your data and debug things.
 
-On a personal level, outside of Speedie, I'd love to work on anything helping to restore nature or make technology less harmful. Such as helping retune wifi or EM-emissions of tech to NOT drain our health.
+On a personal level, outside of Speedie, I'd love to work on anything helping to restore nature or make technology less harmful. Such as helping retune wifi or EM-emissions of tech to **not** drain our health.
 
 
 
 # Install Via Github (MacOSX only) #
 
-1) Download the files via github, placing the repo at ~/Speedie/
-2) Run this command `ln -s  ~/Speedie/Terminal/Speedie /usr/local/bin/speedie`.
-	This will allow speedie to be run from the command-line. Also run `ln -s  ~/Speedie/Terminal/Speedie /usr/local/bin/spd` to make it quicker.
-3) If /usr/local/bin/ isnt in your command-line PATH, then you can find instructions on how to do that elsewhere. 
+1. Download/Clone repo, and place repo at `/usr/local/speedie`
+2. Run the script at `/usr/local/speedie/Terminal/make.sh`.
 
 
 # Install Via Perry (MacOSX only) #
 
-1) Download and run Perry.app ( download at https://github.com/gamblevore/speedie/releases/ )
-2) Perry will ask, if you want it to install everything. Just press "OK".
-3) It should be installed. However you don't get the github tracking or xcode projects.
+1. Download and run Perry.app ( download at https://github.com/gamblevore/speedie/releases/ )
+2. Perry will ask, if you want it to install everything. Just press "OK".
+3. It should be installed. However you don't get the github tracking, also the version is older.
 
 
 
