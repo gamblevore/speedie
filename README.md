@@ -2,17 +2,17 @@
 # Speedie - Fun is the main goal #
 ## Technical Qualities: Object Oriented, Simple, Fast, Nice-Looking, Non-Infantilising ##
 
-by Theodore H. Smith - Released on NYE, 31/12/2022.
-Contact theo@elfdata.com
+* by Theodore H. Smith - Released on NYE, 31/12/2022.
+* Contact: `theo@elfdata.com`
 
-Speedie is the compiler that I have created Jeebox in and is also built ontop of Jeebox. So thats a great thing. This proves that Jeebox can be used to write programming languages.
+Speedie is the compiler that I have created Jeebox in and is also built ontop of Jeebox. This proves that Jeebox can be used to write programming languages.
 
 Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't NEED C++, but being able to is a great property to have, so that property will remain.
 
 Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D I did delete most of the rude comments before release, but still... dont expect "corporate professionalism".
 
 
-# Why use Speedie? #
+# Why Use Speedie? #
 
 Use Speedie if you feel called to: Because you find it fun to work on, or work in.
 
