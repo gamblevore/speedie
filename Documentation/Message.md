@@ -1,19 +1,18 @@
 ## Messages
 (aka **Jeebox**)
 
-The `Message` class is the result of parsing a string, like "`|| msg = "(a,b,c)".parse`"
+In Speedie, when you parse a string using `string.parse`, you get back a tree. A `Message` is a node within a parsed tree. Jeebox uses trees much in the same way XML or JSON does, but more advanced and simpler.
 
-Message is used to represent the nodes within a parsed string. Jeebox is a highly flexible data-format, that is extensible (like XML).
+Its more advanced because the syntax can represent both code or data. Here is some data, in Jeebox.
 
-Technically, Jeebox is classed as an `AST` (abstract syntax tree), that is why it can store source-code. It just happens to also be useful for storing data-files.
-
-    || source_string = `
     file_list
         item "/path/to/file1" (Picture)
         item "/path/to/file2" (Sound)
         item "/path/to/file3" (Text)
-    `
-    || recent_list = source_string.parse
+        
+Imagine we wanted to parse it. Lets put it in "example.box" and parse that file.
+
+    || recent_list = "example.box".file.parse
     for item in recent_list["file_list"]
         || name = item[@str,0].name.name
         || type = item[@bra,1][@thg].name
@@ -48,7 +47,68 @@ Here are some things I've (practically) used Jeebox for, so far:
 * Internet communications
 * Data-banks (song libraries)
 
-## Upcoming Section...
+## Walkthrough of creating a Book Searcher
 
-I am going to write a walk-through, on how to parse an iTunes song library and convert it to Jeebox! This way we have our own song-library we can easy edit or use from within Speedie. In fact my program "`MultiPlay`" uses this technique.
+OK, in this walk-through, we are gonna create small example program, in Speedie. We'll make some example files and mark our progress through the tutorial.
 
+Let's start with an XML data-bank, the first thing we want to do is convert it to Jeebox. You should find the file `books.xml` in the examples folder.
+
+    <?xml version="1.0"?>
+    <catalog>
+       <book id="bk101">
+          <author>Gambardella, Matthew</author>
+          <title>XML Developer's Guide</title>
+          <genre>Computer</genre>
+          <price>44.95</price>
+          <publish_date>2000-10-01</publish_date>
+          <description>An in-depth look at creating applications 
+          with XML.</description>
+       </book>
+    ...
+
+First, lets test that we can even read a file at all. Lets take the file via command-line arguments.
+
+    #!/usr/local/bin/spd
+    
+    main 
+    	|| path = app.args[0]			#expect ("Pass a file-path")
+    	|| B = path.ExistingFile		#require
+    	|| jb = B.parse
+    	jb.xmltojeebox
+    	printline jb
+
+Ooops, well we converted it already. See that line `XMLToJeebox`? I guess in my enthusiasm I already converted it. Anyhow so thats great. Now lets save this file to jeebox, might as well.
+
+    path.Ext("Box").FileData = jb.render
+
+Now, the jeebox file is saved to disk. We could do searching in the file, but first a few safety checks. Lets only do the `XML->Jeebox` conversion if we pass an XML file, and lets tell them we did it!
+
+Also, lets make sure we return if `b.parse` fails. And lets put in a safety check in case someone passes a non-XML file as an XML-file.
+
+		expect jb.find(@xml)   (b, "This is not an XML file")
+
+Altogether that makes this:
+
+	|| path = app.args[0]			#expect ("Pass a file-path")
+	|| B = path.ExistingFile		#require
+	|| jb = B.Parse					#require
+	if b isa "xml"
+		expect jb.find(@xml)   (b, "This is not an XML file")
+		jb.XMLToJeebox
+		path.Ext("box").FileData = jb.render
+
+(Starting now, I won't put the "`#!/usr/local/bin/spd, main`" parts anymore. Just assume it is  at the start of the code.) 
+
+Now, lets do the searching! Let's specify some search queries via command-line arguments. 
+    
+    ... // new code
+    	for arg in app.args
+    		|| SearchName = arg.ArgName #expect "Unexpected input: $arg"
+    		|| Found = BookSearch(jb, SearchName, arg.ArgValue)
+    			printline Found
+    		  else
+    			printline "Can't find: $arg"
+		
+    function BookSearch (|message| BookFile, |string| Name, |string| ToFind, |message|)
+
+Looks great! Very readable and also we got very far in our progress! Lets do a little more to finish this off:
