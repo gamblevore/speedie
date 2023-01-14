@@ -358,8 +358,7 @@ function TypeOfNum (ExprResolver)
 		Return typefloat.TypeNormal
 
 	|| Val = exp.int
-	if exp.name.IsHexConstant or exp.name.IsBinaryConstant
-		exp.become Val
+	exp.become Val
 
 	if ((Val << 32) >> 32) != Val
 		return typeint64.typenormal
