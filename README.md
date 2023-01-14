@@ -66,7 +66,7 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 # Installation #
 
 1. Download/Clone repo, and place at `/usr/local/speedie`
-2. Run the script at `/usr/local/speedie/Terminal/make.sh`
+2. Execute this shell command `sudo /usr/local/speedie/Terminal/make.sh`
 
 
 
