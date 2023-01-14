@@ -185,3 +185,37 @@ extend message
 		fs.appendmultireplace(.name, jeebox.XML_EscapeStr)
 
 
+
+function message.XMLToJeebox
+	if self == @arg 
+		for ch in self
+			ch.XMLToJeebox
+	  elseif self == @xpi
+		.remove
+		return
+	  elseif self == @xml
+		.func = @tmp
+		|| prms = .first
+		prms.func = @list // shoulda been this already.
+		prms.remove
+		|message| arg
+		while 
+			|| ch = .first #loop
+			arg := @arg.msg
+			arg <~ ch
+			ch.XMLToJeebox
+		if prms.HasAny
+			self <~ prms
+			for ch in prms
+				ch.XMLToJeebox
+		if arg.HasChildCount(1) and arg.first == @str
+			self <~ arg.first
+		  else
+			self <~ arg
+	  elseif self == @xtxt
+		.func = @str
+	  elseif self == @xatt
+		.func = @item
+		.first.func = @str
+		.first = @emb + .name
+		.name = ""
