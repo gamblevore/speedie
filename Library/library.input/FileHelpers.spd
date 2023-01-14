@@ -4,7 +4,7 @@
 */
 
 extend String	
-	function ExistingFile (|string| operation="use",  |File|)
+	function ExistingFile (|string| operation="access",  |File|)
 		|| f = .file
 		if f.MustExist(operation)
 			return f
