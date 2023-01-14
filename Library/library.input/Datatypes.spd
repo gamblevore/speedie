@@ -753,7 +753,7 @@ datatype vec4
 		return vec4(.x.clamp, .y.clamp, .z.clamp, .w.clamp)
 	
 	function sqrt (|vec4|)
-		cpp_wrapper __builtin_ia32_sqrtps
+		cpp_inbuilt __builtin_ia32_sqrtps
 	function ivec4 (|ivec4|)
 		return (.x|int|, .y|int|, .z|int|, .w|int|)	
 
