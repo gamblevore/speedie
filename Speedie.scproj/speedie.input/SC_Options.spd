@@ -271,7 +271,7 @@ module Feedback
 			Explain(Purpose, "")$
 			options.argstats = true
 			
-		noisy 
+		+"noisy "
 			Explain(Purpose, "Prints more stuff.")$
 			Options.PrintCompileString = true
 			file.DebugExecute = true
@@ -283,11 +283,11 @@ module Feedback
 			return true
 		
 		products
-			Explain(purpose, "Acceptable values: pack, cpp, native. Combine like pack/native.\n\n'Native' = compiled via GCC.\n'pack' = interpreted.")$
+			Explain(purpose, `Acceptable values: pack, cpp, native. Combine like pack/native. 'native' = compiled via GCC. 'pack' = interpreted.`)$
 			|| P = 0
 			for item in (value / '/')
 				if item ~= "native"
-					P |= options.native
+					P |= options.native // these two seem the same?
 				if item ~= "cpp"
 					P |= options.cpp
 				if item ~= "pack"
@@ -486,6 +486,7 @@ module Feedback
 		fs <~ "Usage: "
 		fs <~ app.filename
 		fs <~ " /path/to/project\n"
+		fs <~ "Installation: ${compiler.SpeedieProj.parent}\n"
 		for (v in appoptions) (k) 
 			(appoptions[k])("", "", fs_tester)
 			if (fs_tester.length) 
