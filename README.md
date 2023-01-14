@@ -63,17 +63,10 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 
 
 
-# Install Via Github (MacOSX only) #
+# Installation #
 
-1. Download/Clone repo, and place repo at `/usr/local/speedie`
-2. Run the script at `/usr/local/speedie/Terminal/make.sh`.
-
-
-# Install Via Perry (MacOSX only) #
-
-1. Download and run Perry.app ( download at https://github.com/gamblevore/speedie/releases/ )
-2. Perry will ask, if you want it to install everything. Just press "OK".
-3. It should be installed. However you don't get the github tracking, also the version is older.
+1. Download/Clone repo, and place at `/usr/local/speedie`
+2. Run the script at `/usr/local/speedie/Terminal/make.sh`
 
 
 
