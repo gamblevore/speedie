@@ -14,7 +14,9 @@ module Perry
 		arc_older	= 1
 	
 	function SpeedieDir (|string|)
+		opt norefcounts
 		._SpeedieDir := .MakeSpeedieDir
+		._SpeedieDir := "/usr/local/speedie".resolve
 		return ._SpeedieDir := "~/Speedie".PathFix
 	
 	

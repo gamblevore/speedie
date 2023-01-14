@@ -112,9 +112,9 @@ extend_module perry
 
 	function FindSpeedyRoot (|string| In, |string|)
 		|| paths = in.parent
-		|| srch = "/Speedie/"
-		|| found = paths.find(srch)
-		expect (found > 0) ("speedie needs to be contained in a folder named 'Speedie' (case sensitive).")
+		|| srch = "/speedie/"
+		|| found = paths.find(srch, 0, int.max, true)
+		expect (found > 0) ("speedie needs to be contained in a folder named 'Speedie'.")
 		return paths[0, found+srch.length]
 
 

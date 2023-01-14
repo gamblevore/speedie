@@ -420,7 +420,7 @@
 /* Begin PBXLegacyTarget section */
 		AC9220A22857A127002F3F97 /* DebugBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --externalcompile --nocompile --targetdebug  ~/Speedie/Perry.scproj ";
+			buildArgumentsString = "--nocolor --externalcompile --nocompile --targetdebug  /usr/local/speedie/Perry.scproj ";
 			buildConfigurationList = AC9220A32857A127002F3F97 /* Build configuration list for PBXLegacyTarget "DebugBuilder" */;
 			buildPhases = (
 			);
@@ -434,7 +434,7 @@
 		};
 		AC9E17A5233A8B70003B433F /* ReleaseBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --externalcompile --nocompile --Optimise=3 ~/Speedie/Perry.scproj ";
+			buildArgumentsString = "--nocolor --externalcompile --nocompile --Optimise=3 /usr/local/speedie/Perry.scproj ";
 			buildConfigurationList = AC9E17A6233A8B70003B433F /* Build configuration list for PBXLegacyTarget "ReleaseBuilder" */;
 			buildPhases = (
 			);
