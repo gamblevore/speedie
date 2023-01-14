@@ -367,6 +367,8 @@ class Message (RingTree)
 			if ++count > 1
 				fs <~ sep
 			fs <~ ch
+			if ch == @item
+				count++
 		if (count == 1  or  self is style2)
 			fs <~ sep
 		fs <~ ')'
