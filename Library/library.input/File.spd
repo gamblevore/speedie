@@ -213,7 +213,7 @@ class File (String)
 		error (self, eerr)
 
 	
-	function Exists (|bool|)
+	function Exists (|bool|TestLinkExists=false, |bool|)
 		cpp_wrapper JB_File_Exists
 
 	

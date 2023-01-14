@@ -187,11 +187,11 @@ bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
 		err = stat( tmp, st );
 	  else
 		err = lstat( tmp, st );
-	if (err  and  errno != ENOENT  and access(tmp, 0)) { // access returns err
-		errno = ENOENT; // well duh.
-	}
-
     if (!err) return true;
+	if (errno != ENOENT  and access(tmp, 0)) {
+		errno = ENOENT; // sometimes we get ENOENT when it really IS a ENOENT
+	}					// So we need to refill this.
+
 	if (errno != ENOENT)
 		ErrorHandleStr_(err, self, nil, "get info on");
 	return false;
@@ -691,7 +691,7 @@ int JB_File_ModeSet( JB_File* self, int Mode ) {
 
 int JB_Str_SymLink( JB_StringC* Existing, JB_String* ToCreate ) {
 	int Err = 0;
-	if (JB_File_Exists(ToCreate)) {
+	if (JB_File_Exists(ToCreate, true)) {
 		Err = JB_File_Delete(ToCreate);
 		if (Err) {
 			errno = EEXIST; // clearer error message.
@@ -793,7 +793,7 @@ Date JB_File_Created( JB_File* self ) {
 
 
 bool JB_File_Create( JB_File* self ) {
-	if (JB_File_Exists(self))
+	if (JB_File_Exists(self, false))
 		return true;
 	if (JB_File_OpenBlank(self) < 0)
 		return false;
@@ -802,7 +802,11 @@ bool JB_File_Create( JB_File* self ) {
 }
 
 
-bool JB_File_Exists( JB_String* self ) {
+bool JB_File_Exists( JB_String* self, bool LinkExists ) {
+	if (LinkExists) {
+		struct _stat st;
+		return Stat_(self, &st, false);
+	}
     uint8 Tmp[1024];
 	auto tmp = (const char*)JB_FastFileString(self, Tmp);
 	int err = access(tmp, 0);

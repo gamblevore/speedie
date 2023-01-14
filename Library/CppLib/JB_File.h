@@ -57,7 +57,7 @@ JB_File* JB_Str_File( JB_String* Path );
 JB_File* JB_File__StdOut( );
 int JB_File_MoveTo(JB_File* self, JB_String* New);
 
-bool JB_File_Exists( JB_String* self );
+bool JB_File_Exists( JB_String* self, bool LinkExists );
 Date JB_File_Modified( JB_File* self );
 Date JB_File_Created( JB_File* self );
 bool JB_File_Create( JB_File* self );
