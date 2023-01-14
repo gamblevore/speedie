@@ -13,6 +13,8 @@ function Compiler.Main
 		if !interact.Enter
 			.CompileTime
 	.PrintStats
+	if !stderr.ok
+		printline "Installation: " + .projects
 	.PrintCompileErrors
 
 
