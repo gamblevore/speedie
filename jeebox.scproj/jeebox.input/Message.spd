@@ -853,6 +853,9 @@ class Message (RingTree)
 	syntax append (|string| key)
 		self <~ @str.msg(key)
 		
+
+	function Arg (|message|)
+		return .last(@arg)
 	function NeedsArg (|message|)
 		Opt NoRefCounts
 		|| r = .last 
@@ -879,11 +882,6 @@ class Message (RingTree)
 			|| found = .first
 				if s == nil or found == s
 					return found
-				// what about this branch, when does it fire?
-				// so s is NOT nil... OK thats easy to understand
-				// but that means that found is NOT s... which means...
-				// its not what we asked for?
-				// why isnt this failing?
 			.accesserr(s, nil, found)
 
 
