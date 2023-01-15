@@ -263,3 +263,21 @@ Now, the same search query (`--author=Corets`) will return 3 books!
 Wonderful! And with this: `booksearch.spd books.xml --author=COrets --description=London`
 
 We further filter it down to only one book. Perfect.
+
+## Advanced: Compression and jbin ##
+
+If you want to go even more advanced, you could do things like compress the jeebox file or store it as `jbin`, or even a compressed `jbin`!
+
+Lets try that now...
+
+    boxfile <~ jb.render_jbin // write file to disk as jbin
+
+`Jbin` is just jeebox, but in a binary form. jbin is approximiately the same size as jeebox, except when it comes to storing binary data, when it is far smaller. Jbin can store everything jeebox can. Best of all... jeebox transparently parses it. Also, the code for jbin is very small. Its a very tight-definition of a language, `Jbin` is probably the smallest tree-node system I've seen.
+
+**What about compression?**
+
+    boxfile <~ jb.render.compress // write file compressed
+
+this will compress the data then write it to disk. Again, Jeebox is smart enough to be able to parse compressed files, (assuming it was compressed by speedie's `.Compress` function, not .zip or anything.)
+
+Jeebox, Speedie and Perry can  all handle jbin and compressed files...
