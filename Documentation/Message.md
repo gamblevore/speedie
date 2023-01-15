@@ -71,11 +71,11 @@ First, lets test that we can even read a file at all. Lets take the file via com
     #!/usr/local/bin/spd
     
     main 
-    	|| path = app.args[0]			#expect ("Pass a file-path")
-    	|| B = path.ExistingFile		#require
-    	|| jb = B.parse
-    	jb.xmltojeebox
-    	printline jb
+        || path = app.args[0]            #expect ("Pass a file-path")
+        || B = path.ExistingFile        #require
+        || jb = B.parse
+        jb.xmltojeebox
+        printline jb
 
 Ooops, well we converted it already. See that line `XMLToJeebox`? I guess in my enthusiasm I already converted it. Anyhow so thats great. Now lets save this file to jeebox, might as well.
 
@@ -84,13 +84,13 @@ Ooops, well we converted it already. See that line `XMLToJeebox`? I guess in my 
 Now, the jeebox file is saved to disk. Lets take a look at it:
 
     catalog 
-    	book (id: "bk101") 
-    		author "Gambardella, Matthew"
-    		title "XML Developer's Guide"
-    		genre "Computer"
-    		price "44.95"
-    		publish_date "2000-10-01"
-    		description "An in-depth look at creating applications \n      with XML."
+        book (id: "bk101") 
+            author "Gambardella, Matthew"
+            title "XML Developer's Guide"
+            genre "Computer"
+            price "44.95"
+            publish_date "2000-10-01"
+            description "An in-depth look at creating applications \n      with XML."
     ...
 
 Much better! Actually the file is 25% smaller already, although XML->Jeebox can usually save a lot more than that.
@@ -99,26 +99,26 @@ We could do searching in the file, but first a few safety checks. Lets only do t
 
 Altogether that makes this:
 
-	|| path = app.args[0]			#expect ("Pass a file-path")
-	|| B = path.ExistingFile		#require
-	|| jb = B.Parse					#require
-	if b isa "xml"
-		jb.XMLToJeebox
-		|| boxfile = path.Ext("box")
-		if boxfile <~ jb.render // write file to disk
-			"Converted XML to Jeebox: $boxfile"
+    || path = app.args[0]            #expect ("Pass a file-path")
+    || B = path.ExistingFile        #require
+    || jb = B.Parse                    #require
+    if b isa "xml"
+        jb.XMLToJeebox
+        || boxfile = path.Ext("box")
+        if boxfile <~ jb.render // write file to disk
+            "Converted XML to Jeebox: $boxfile"
 
 (Starting now, I won't put the "`#!/usr/local/bin/spd, main`" parts anymore. Just assume it is  at the start of the code.) 
 
 Now, lets do the searching! Let's specify some search queries via command-line arguments. We'll use `app.switches` to find arguments like "`--author=tim`", then use `.ArgName` and `.ArgValue` to get the name/value from the switch.
     
     ... // new code
-	for arg in app.Switches
-		|| Found = BookSearch(jb, arg.ArgName, arg.ArgValue)
-			"$Found"
-		  else
-			"Can't find: ${arg.ArgName} '${arg.ArgValue}'"
-		
+    for arg in app.Switches
+        || Found = BookSearch(jb, arg.ArgName, arg.ArgValue)
+            "$Found"
+          else
+            "Can't find: ${arg.ArgName} '${arg.ArgValue}'"
+        
     function BookSearch (|message| BookFile, |string| Name, |string| ToFind, |message|)
 
 Looks great! Very readable and also we got very far in our progress!
@@ -129,20 +129,20 @@ So far all we did was just parsing, or read or write files or switches, handle e
 
 First, we need to find `"catalog"`, which isn't the root actually, because the root is an `@arg` (a list of statements).
 
-	|| catalog = BookFile[@tmp, "catalog"] #require
+    || catalog = BookFile[@tmp, "catalog"] #require
 
 This will get a `@tmp` named "catalog", and will create an error if the name is wrong. `@tmp`, `@str`, etc are just node types. 
 
 Now we need to list through all the books, they are contained in another node, an `@arg`. `@arg` is a list of statements (like `"catalog"` in our file), or other things, but its the only thing that can contain statements. So its our list and we need it to read the books.
 
-	|| booklist = catalog[@arg]            #require
+    || booklist = catalog[@arg]            #require
 
 those `require` statements mean that "if this variable is set to nil, we return from our function and also return nil". Its a very convenient syntax that reduces noise.
 
 Now let's go over the list:
 
-	for book in booklist
-		printline book.first
+    for book in booklist
+        printline book.first
 
 We just put `printline` here to verify that we are getting the books. We should see this output:
 
@@ -156,21 +156,21 @@ OK great! We are now listing over our books! Now to search each book for the sea
 
 So lets delete the printline statement and add this:
 
-    	for row in book[@arg,-1]
-    	
+        for row in book[@arg,-1]
+        
 That will give us access to the rows like this:
 
-	author "Gambardella, Matthew"
-	title "XML Developer's Guide"
-	genre "Computer"
-	price "44.95"
-	...
+    author "Gambardella, Matthew"
+    title "XML Developer's Guide"
+    genre "Computer"
+    price "44.95"
+    ...
 
 `book[@arg,-1]` means "get the last child of `book`, and make sure it is an `@arg`" Lets check we can actually read them:
 
-	for book in booklist
-		for row in book[@arg,-1]
-			printline row.first.name
+    for book in booklist
+        for row in book[@arg,-1]
+            printline row.first.name
 
     /* we will see these lines:
     Gambardella, Matthew
@@ -186,11 +186,11 @@ OK, so lets do the actual comparison! We will add this
 Here is our total search function. Great it works!
 
     function BookSearch (|message| BookFile, |string| Name, |string| ToFind, |message|)
-    	|| catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
-    	for book in catalog[@arg]
-    		for row in book[@arg,-1]
-    			if (row ~= name) and (row.first.name contains tofind)
-    				return book
+        || catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
+        for book in catalog[@arg]
+            for row in book[@arg,-1]
+                if (row ~= name) and (row.first.name contains tofind)
+                    return book
 
 
 Now, calling this commandline:
@@ -200,52 +200,52 @@ Now, calling this commandline:
 Will return this book:
 
     book (id: "bk103") 
-    	author "Corets, Eva"
-    	title "Maeve Ascendant"
-    	genre "Fantasy"
-    	price "5.95"
-    	publish_date "2000-11-17"
-    	description "After the collapse of a nanotechnologysociety in England, the young survivors lay the foundation for a new society."
+        author "Corets, Eva"
+        title "Maeve Ascendant"
+        genre "Fantasy"
+        price "5.95"
+        publish_date "2000-11-17"
+        description "After the collapse of a nanotechnologysociety in England, the young survivors lay the foundation for a new society."
 
 ###Success!
 We could probably improve our code. If we search for multiple-queries, it doesn't reduce the books found but increases it. This isn't a jeebox problem anymore but just a basic logic problem. But lets fix that anyhow for completeness.
 
 Here is the final total code, with the logic bug fixed:
 
-		
+        
     #!/usr/local/bin/spd
     
     main 
-    	|| path = app.args[0]			#expect ("Pass a file-path")
-    	|| B = path.ExistingFile		#require
-    	|| jb = B.Parse					#require
-    	if b isa "xml"
-    		jb.XMLToJeebox
-    		|| boxfile = path.Ext("box")
-    		if boxfile <~ jb.render // write file to disk
-    			"Converted XML to Jeebox: $boxfile"
+        || path = app.args[0]            #expect ("Pass a file-path")
+        || B = path.ExistingFile        #require
+        || jb = B.Parse                    #require
+        if b isa "xml"
+            jb.XMLToJeebox
+            || boxfile = path.Ext("box")
+            if boxfile <~ jb.render // write file to disk
+                "Converted XML to Jeebox: $boxfile"
     
-    	|| Queries = app.Switches
-    	|| Found = BookSearch(jb, Queries)
-    		"$Found"
-    	  else
-    		"Can't find any books by: $Queries"
-    		
-    		
+        || Queries = app.Switches
+        || Found = BookSearch(jb, Queries)
+            "$Found"
+          else
+            "Can't find any books by: $Queries"
+            
+            
     function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
-    	|| catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
-    	for book in catalog[@arg]
-    		if book.TestBook(Queries)
-    			rz <~ book
+        || catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
+        for book in catalog[@arg]
+            if book.TestBook(Queries)
+                rz <~ book
     
     function message.TestBook (|[string]| queries, |bool|)
-    	for row in self[@arg,-1]
-    		for Q in queries
-    			if row ~= q.ArgName
-    				require row.first.name contains q.ArgValue
-    				rz = true
-    			
-    	
+        for row in self[@arg,-1]
+            for Q in queries
+                if row ~= q.ArgName
+                    require row.first.name contains q.ArgValue
+                    rz = true
+                
+        
 
 
 This program is doing a lot more than it might seem.
@@ -256,7 +256,7 @@ This program is doing a lot more than it might seem.
 * Optionally reads Jeebox or XML files as input, as decided by the file's extension (`B isa "xml"`)
 * Tests for valid input arguments as well as that the input file exists.
 * Reports all errors to stdout (this is done by the framework, there isn't a specific line of code that does this.)
-	
+    
 Now, the same search query (`--author=Corets`) will return 3 books!
 
     [(id: "bk103"), (id: "bk104"), (id: "bk105")]
