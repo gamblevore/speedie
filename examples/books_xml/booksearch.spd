@@ -1,0 +1,32 @@
+#!/usr/local/bin/spd
+
+main 
+	|| path = app.args[0]			#expect ("Pass a file-path")
+	|| B = path.ExistingFile		#require
+	|| jb = B.Parse					#require
+	if b isa "xml"
+		jb.XMLToJeebox
+		|| boxfile = path.Ext("box")
+		if boxfile <~ jb.render // write file to disk
+			"Converted XML to Jeebox: $boxfile"
+
+	|| Queries = app.Switches
+	|| Found = BookSearch(jb, Queries)
+		"$Found"
+	  else
+		"Can't find any books by: $Queries"
+		
+		
+function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
+	|| catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
+	for book in catalog[@arg]
+		for row in book[@arg,-1]
+			if row.PassesAllQueries(Queries)
+				rz <~ book
+
+function message.PassesAllQueries (|[string]| queries, |bool|)
+	for Q in queries
+		require (self ~= q.ArgName) and (.first.name contains q.ArgValue)
+	return true
+			
+	
