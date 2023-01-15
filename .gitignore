@@ -8,7 +8,12 @@ xcuserdata/
 **/src.nogit/
 /Library/*.jbin
 **/*.input/garbage.jb
+
+#Examples
 /FirstProj*
+/examples/**/books.box
+
+#Terminal
 /Terminal/Backup/
 /Terminal/Debug/
 /Terminal/Speedie
