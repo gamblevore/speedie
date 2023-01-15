@@ -27,7 +27,7 @@ function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
 function message.TestBook (|[string]| queries, |bool|)
 	for row in self[@arg,-1]
 		for Q in queries
-			if row ~= q.ArgName
+			if row ~= q.ArgName // ~= is like == but case-insensitive
 				require row.first.name contains q.ArgValue
 				rz = true
 			
