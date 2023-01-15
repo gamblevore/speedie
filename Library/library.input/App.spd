@@ -9,7 +9,7 @@ module App {
 |bool|						Unregistered 
 target !minilib
 	|string|					_CLN = app.crashlogname
-|[string]|					OldArgs
+|[string]|					OldArgs = nil
 |message|					_Conf
 |config|					Prefs
 |string| 					_Path
@@ -56,6 +56,12 @@ syntax access (|string| name, |string_argvalue|)
 	for R in .rawargs
 		if R.HasArgName(name)
 			return R.argvalue
+
+function Switches (|[string]|)
+	opt norefcounts
+	for R in .RawArgs
+		if R.ArgName
+			rz <~ R
 	
 function args_ (|[string]|)
 	opt norefcounts
@@ -65,7 +71,9 @@ function args_ (|[string]|)
 
 function args (|[string]|)
 	opt norefcounts
-	return .oldargs init .args_
+	if .OldArgs == nil // == nil important here
+		.oldargs = .args_
+	return .oldargs
 
 function PrintStackTrace
 	cpp_wrapper JB_PrintStackTrace
