@@ -72,7 +72,7 @@ First, lets test that we can even read a file at all. Lets take the file via com
     
     main 
         || path = app.args[0]            #expect ("Pass a file-path")
-        || B = path.ExistingFile        #require
+        || B = path.ExistingFile         #require
         || jb = B.parse
         jb.xmltojeebox
         printline jb
@@ -100,8 +100,8 @@ We could do searching in the file, but first a few safety checks. Lets only do t
 Altogether that makes this:
 
     || path = app.args[0]            #expect ("Pass a file-path")
-    || B = path.ExistingFile        #require
-    || jb = B.Parse                    #require
+    || B = path.ExistingFile         #require
+    || jb = B.Parse                  #require
     if b isa "xml"
         jb.XMLToJeebox
         || boxfile = path.Ext("box")
@@ -217,8 +217,8 @@ Here is the final total code, with the logic bug fixed:
     
     main 
         || path = app.args[0]            #expect ("Pass a file-path")
-        || B = path.ExistingFile        #require
-        || jb = B.Parse                    #require
+        || B = path.ExistingFile         #require
+        || jb = B.Parse                  #require
         if b isa "xml"
             jb.XMLToJeebox
             || boxfile = path.Ext("box")
