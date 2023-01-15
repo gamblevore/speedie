@@ -123,7 +123,7 @@ Now, lets do the searching! Let's specify some search queries via command-line a
 
 Looks great! Very readable and also we got very far in our progress!
 
-###Reading the Parsed Tree
+### Reading the Parsed Tree ###
 
 So far all we did was just parsing, or read or write files or switches, handle errors, etc. But not actually using Jeebox. So lets do that.
 
@@ -207,7 +207,7 @@ Will return this book:
         publish_date "2000-11-17"
         description "After the collapse of a nanotechnologysociety in England, the young survivors lay the foundation for a new society."
 
-###Success!
+### Success! ### 
 We could probably improve our code. If we search for multiple-queries, it doesn't reduce the books found but increases it. This isn't a jeebox problem anymore but just a basic logic problem. But lets fix that anyhow for completeness.
 
 Here is the final total code, with the logic bug fixed:
