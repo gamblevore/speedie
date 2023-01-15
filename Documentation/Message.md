@@ -49,7 +49,7 @@ Here are some things I've (practically) used Jeebox for, so far:
 
 ## Walkthrough of creating a Book Searcher
 
-OK, in this walk-through, we are gonna create small example program, in Speedie. We'll make some example files and mark our progress through the tutorial.
+OK, in this walk-through, we are gonna create a small program. You should use the example files, at `/usr/local/speedie/examples/books_xml` that will be in the github repo.
 
 Let's start with an XML data-bank, the first thing we want to do is convert it to Jeebox. You should find the file `books.xml` in the examples folder.
 
@@ -81,11 +81,21 @@ Ooops, well we converted it already. See that line `XMLToJeebox`? I guess in my 
 
     path.Ext("Box").FileData = jb.render
 
-Now, the jeebox file is saved to disk. We could do searching in the file, but first a few safety checks. Lets only do the `XML->Jeebox` conversion if we pass an XML file, and lets tell them we did it!
+Now, the jeebox file is saved to disk. Lets take a look at it:
 
-Also, lets make sure we return if `b.parse` fails. And lets put in a safety check in case someone passes a non-XML file as an XML-file.
+    catalog 
+    	book (id: "bk101") 
+    		author "Gambardella, Matthew"
+    		title "XML Developer's Guide"
+    		genre "Computer"
+    		price "44.95"
+    		publish_date "2000-10-01"
+    		description "An in-depth look at creating applications \n      with XML."
+    ...
 
-		expect jb.find(@xml)   (b, "This is not an XML file")
+Much better! Actually the file is 25% smaller already, although XML->Jeebox can usually save a lot more than that.
+
+We could do searching in the file, but first a few safety checks. Lets only do the `XML->Jeebox` conversion if we pass an XML file, and lets tell them we did it! Also, lets make sure we return if parsing fails.
 
 Altogether that makes this:
 
@@ -93,22 +103,164 @@ Altogether that makes this:
 	|| B = path.ExistingFile		#require
 	|| jb = B.Parse					#require
 	if b isa "xml"
-		expect jb.find(@xml)   (b, "This is not an XML file")
 		jb.XMLToJeebox
-		path.Ext("box").FileData = jb.render
+		|| boxfile = path.Ext("box")
+		if boxfile <~ jb.render // write file to disk
+			"Converted XML to Jeebox: $boxfile"
 
 (Starting now, I won't put the "`#!/usr/local/bin/spd, main`" parts anymore. Just assume it is  at the start of the code.) 
 
-Now, lets do the searching! Let's specify some search queries via command-line arguments. 
+Now, lets do the searching! Let's specify some search queries via command-line arguments. We'll use `app.switches` to find arguments like "`--author=tim`", then use `.ArgName` and `.ArgValue` to get the name/value from the switch.
     
     ... // new code
-    	for arg in app.args
-    		|| SearchName = arg.ArgName #expect "Unexpected input: $arg"
-    		|| Found = BookSearch(jb, SearchName, arg.ArgValue)
-    			printline Found
-    		  else
-    			printline "Can't find: $arg"
+	for arg in app.Switches
+		|| Found = BookSearch(jb, arg.ArgName, arg.ArgValue)
+			"$Found"
+		  else
+			"Can't find: ${arg.ArgName} '${arg.ArgValue}'"
 		
     function BookSearch (|message| BookFile, |string| Name, |string| ToFind, |message|)
 
-Looks great! Very readable and also we got very far in our progress! Lets do a little more to finish this off:
+Looks great! Very readable and also we got very far in our progress!
+
+###Reading the Parsed Tree
+
+So far all we did was just parsing, or read or write files or switches, handle errors, etc. But not actually using Jeebox. So lets do that.
+
+First, we need to find `"catalog"`, which isn't the root actually, because the root is an `@arg` (a list of statements).
+
+	|| catalog = BookFile[@tmp, "catalog"] #require
+
+This will get a `@tmp` named "catalog", and will create an error if the name is wrong. `@tmp`, `@str`, etc are just node types. 
+
+Now we need to list through all the books, they are contained in another node, an `@arg`. `@arg` is a list of statements (like `"catalog"` in our file), or other things, but its the only thing that can contain statements. So its our list and we need it to read the books.
+
+	|| booklist = catalog[@arg]            #require
+
+those `require` statements mean that "if this variable is set to nil, we return from our function and also return nil". Its a very convenient syntax that reduces noise.
+
+Now let's go over the list:
+
+	for book in booklist
+		printline book.first
+
+We just put `printline` here to verify that we are getting the books. We should see this output:
+
+    (id: "bk101")
+    (id: "bk102")
+    (id: "bk103")
+    (id: "bk104")
+    ...
+
+OK great! We are now listing over our books! Now to search each book for the search query.
+
+So lets delete the printline statement and add this:
+
+    	for row in book[@arg,-1]
+    	
+That will give us access to the rows like this:
+
+	author "Gambardella, Matthew"
+	title "XML Developer's Guide"
+	genre "Computer"
+	price "44.95"
+	...
+
+`book[@arg,-1]` means "get the last child of `book`, and make sure it is an `@arg`" Lets check we can actually read them:
+
+	for book in booklist
+		for row in book[@arg,-1]
+			printline row.first.name
+
+    /* we will see these lines:
+    Gambardella, Matthew
+    XML Developer's Guide
+    Computer
+    44.95
+    2000-10-01*/
+
+OK, so lets do the actual comparison! We will add this
+
+    if (row ~= name) and (row.first.name contains tofind)
+
+Here is our total search function. Great it works!
+
+    function BookSearch (|message| BookFile, |string| Name, |string| ToFind, |message|)
+    	|| catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
+    	for book in catalog[@arg]
+    		for row in book[@arg,-1]
+    			if (row ~= name) and (row.first.name contains tofind)
+    				return book
+
+
+Now, calling this commandline:
+
+    booksearch.spd books.box --author=Corets
+
+Will return this book:
+
+    book (id: "bk103") 
+    	author "Corets, Eva"
+    	title "Maeve Ascendant"
+    	genre "Fantasy"
+    	price "5.95"
+    	publish_date "2000-11-17"
+    	description "After the collapse of a nanotechnologysociety in England, the young survivors lay the foundation for a new society."
+
+###Success!
+We could probably improve our code. If we search for multiple-queries, it doesn't reduce the books found but increases it. This isn't a jeebox problem anymore but just a basic logic problem. But lets fix that anyhow for completeness.
+
+Here is the final total code, with the logic bug fixed:
+
+		
+    #!/usr/local/bin/spd
+    
+    main 
+    	|| path = app.args[0]			#expect ("Pass a file-path")
+    	|| B = path.ExistingFile		#require
+    	|| jb = B.Parse					#require
+    	if b isa "xml"
+    		jb.XMLToJeebox
+    		|| boxfile = path.Ext("box")
+    		if boxfile <~ jb.render // write file to disk
+    			"Converted XML to Jeebox: $boxfile"
+    
+    	|| Queries = app.Switches
+    	|| Found = BookSearch(jb, Queries)
+    		"$Found"
+    	  else
+    		"Can't find any books by: $Queries"
+    		
+    		
+    function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
+    	|| catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
+    	for book in catalog[@arg]
+    		if book.TestBook(Queries)
+    			rz <~ book
+    
+    function message.TestBook (|[string]| queries, |bool|)
+    	for row in self[@arg,-1]
+    		for Q in queries
+    			if row ~= q.ArgName
+    				require row.first.name contains q.ArgValue
+    				rz = true
+    			
+    	
+
+
+This program is doing a lot more than it might seem.
+
+* A little file validation (via `BookFile[@tmp, "catalog"]` type functions)
+* Converts XML to Jeebox
+* Saves the Jeebox to disk
+* Optionally reads Jeebox or XML files as input, as decided by the file's extension (`B isa "xml"`)
+* Tests for valid input arguments as well as that the input file exists.
+* Reports all errors to stdout (this is done by the framework, there isn't a specific line of code that does this.)
+	
+Now, the same search query (`--author=Corets`) will return 3 books!
+
+    [(id: "bk103"), (id: "bk104"), (id: "bk105")]
+
+Wonderful! And with this: `booksearch.spd books.xml --author=COrets --description=London`
+
+We further filter it down to only one book. Perfect.

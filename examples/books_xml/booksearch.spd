@@ -20,13 +20,14 @@ main
 function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
 	|| catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
 	for book in catalog[@arg]
-		for row in book[@arg,-1]
-			if row.PassesAllQueries(Queries)
-				rz <~ book
+		if book.TestBook(Queries)
+			rz <~ book
 
-function message.PassesAllQueries (|[string]| queries, |bool|)
-	for Q in queries
-		require (self ~= q.ArgName) and (.first.name contains q.ArgValue)
-	return true
+function message.TestBook (|[string]| queries, |bool|)
+	for row in self[@arg,-1]
+		for Q in queries
+			if row ~= q.ArgName
+				require row.first.name contains q.ArgValue
+				rz = true
 			
 	
