@@ -18,10 +18,11 @@ main
 		
 		
 function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
-	|| catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
+	|| catalog = BookFile[@tmp, "catalog"] #require
 	for book in catalog[@arg]
 		if book.TestBook(Queries)
 			rz <~ book
+
 
 function message.TestBook (|[string]| queries, |bool|)
 	for row in self[@arg,-1]
