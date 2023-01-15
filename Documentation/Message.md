@@ -137,8 +137,6 @@ Now we need to list through all the books, they are contained in another node, a
 
     || booklist = catalog[@arg]            #require
 
-those `require` statements mean that "if this variable is set to nil, we return from our function and also return nil". Its a very convenient syntax that reduces noise.
-
 Now let's go over the list:
 
     for book in booklist
@@ -233,10 +231,11 @@ Here is the final total code, with the logic bug fixed:
             
             
     function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
-        || catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
+        || catalog = BookFile[@tmp, "catalog"] #require
         for book in catalog[@arg]
             if book.TestBook(Queries)
                 rz <~ book
+                
     
     function message.TestBook (|[string]| queries, |bool|)
         for row in self[@arg,-1]
