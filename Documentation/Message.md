@@ -270,7 +270,9 @@ If you want to go even more advanced, you could do things like compress the jeeb
 
     boxfile <~ jb.render_jbin // write file to disk as jbin
 
-`Jbin` is just jeebox, but in a binary form. `jbin` is approximiately the same size as jeebox, except when it comes to storing binary data, when it is far smaller. `Jbin` can store everything jeebox can. Best of all... jeebox transparently parses it. Also, the code for `jbin` is very small. Its a very tight-definition of a language, `Jbin` is probably the smallest tree-node system I've seen.
+`Jbin` is just jeebox, but in a binary form. `jbin` is approximiately the same size as jeebox, except when it comes to storing binary data, when it is far smaller. `Jbin` can store everything jeebox can. Best of all... jeebox transparently parses it. Also, the code for `jbin` is very small.
+
+`jbin` is a very tightly defined format, and parses between 2x to 20x faster than Jeebox.
 
 **What about compression?**
 
