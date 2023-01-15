@@ -240,7 +240,7 @@ Here is the final total code, with the logic bug fixed:
     function message.TestBook (|[string]| queries, |bool|)
         for row in self[@arg,-1]
             for Q in queries
-        			if row ~= q.ArgName // ~= is like == but case-insensitive
+                if row ~= q.ArgName // ~= is like == but case-insensitive
                     require row.first.name contains q.ArgValue
                     rz = true
                 
