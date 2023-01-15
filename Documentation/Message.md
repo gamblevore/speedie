@@ -133,7 +133,7 @@ First, we need to find `"catalog"`, which isn't the root actually, because the r
 
 This will get a `@tmp` named "catalog", and will create an error if the name is wrong. `@tmp`, `@str`, etc are just node types. 
 
-Now we need to list through all the books, they are contained in another node, an `@arg`. `@arg` is a list of statements (like `"catalog"` in our file), or other things, but its the only thing that can contain statements. So its our list and we need it to read the books.
+Now we need to list through all the books, they are contained in another node, an `@arg`. `@arg` is a list of statements (`"catalog"` or `"book"` is a statement in this example), or other things, but its the only thing that can contain statements. So and we need it to read the books.
 
     || booklist = catalog[@arg]            #require
 
