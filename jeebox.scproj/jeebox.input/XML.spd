@@ -186,13 +186,16 @@ extend message
 
 
 
-function message.XMLToJeebox
-	if self == @arg 
-		for ch in self
-			ch.XMLToJeebox
-	  elseif self == @xpi
+function message.XMLToJeebox (|bool|)
+	for ch in self
+		rz := ch == @xml
+		ch.XMLToJeeboxSub
+	error rz (self, "No XML found.")
+
+
+helper message.XMLToJeeboxSub
+	if self == @xpi
 		.remove
-		return
 	  elseif self == @xml
 		.func = @tmp
 		|| prms = .first
@@ -203,11 +206,11 @@ function message.XMLToJeebox
 			|| ch = .first #loop
 			arg := @arg.msg
 			arg <~ ch
-			ch.XMLToJeebox
+			ch.XMLToJeeboxSub
 		if prms.HasAny
 			self <~ prms
 			for ch in prms
-				ch.XMLToJeebox
+				ch.XMLToJeeboxSub
 		if arg.HasChildCount(1) and arg.first == @str
 			self <~ arg.first
 		  else
