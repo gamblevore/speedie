@@ -8,7 +8,6 @@ function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |string| name
 	Opt NoRefCounts
 	cpp_part NewParentName
 	rz = Message.new(parent, func, Start, name, .nextstart - start)
-	// if rz.extra < 0
 
 
 function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |int| End, |Message|)
@@ -16,7 +15,6 @@ function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |int| End, |M
 	cpp_part NewParent
 	|| name = parser[start, end]
 	rz = Message.new(Parent, func, Start, name, end - start)
-	// if rz.extra < 0
 
 
 function parser.NewWord ( |Message| P, |Syntax| F, |int| Start, |int| SearchFrom, |Message|)
@@ -24,20 +22,17 @@ function parser.NewWord ( |Message| P, |Syntax| F, |int| Start, |int| SearchFrom
 	|| after = parser.WordAfter( SearchFrom )
 	|| name = parser[searchfrom, after]
 	rz = message.New( P, F, start, name, after - start )
-	// if rz.extra < 0
 
 
 function parser.NewEmpty ( |Message| P, |Syntax| F, |int| Start, |int| After, |Message|)
 	Opt NoRefCounts
 	rz = message.new(P, F, start, "", after - start)
-	// if rz.extra < 0
 
 
 function parser.NewSkip ( |Message| P, |Syntax| F, |int| Start, |int| NameStart, |int| NameEnd, |Message|)
 	Opt NoRefCounts
 	|| name = parser[namestart, nameend]
 	rz = message.New( P, F, start, name, parser.nextstart - start )
-	// if rz.extra < 0
 
 
 
@@ -200,10 +195,8 @@ extend Parser
 			fs <~ " / "
 		  else
 			fs <~ "Expected "
-
 		
 		|| BestValue = FindError(num)
-		if (BestValue)
 			fs <~ ErrorNames[ BestValue ]
 			return num &~ BestValue
 		
@@ -251,6 +244,7 @@ api ringtree.jdb2
 	  else
 	    "(nil)"
 
+
 api ringtree.jdb3
 	cpp_name jdb3
 	visible
@@ -283,14 +277,12 @@ struct ParserLineAndIndent
 	|bool|			IsDebug
 
 
-
  
 role MessageRoot (Message)
 	contains Message
 	linkage
 		noauto
 		pragma noearlyfree
-
 
 
 

@@ -34,6 +34,7 @@ dispatch TemporalStatements (TranFunc)
 	printerror				(Tran_Print)
 	log						(Tran_Log)
 	beep					(Tran_Beep)
+	quit					(Tran_Quit)
 	
 	continue				SCFunction.Tran_Exit
 	exit					SCFunction.Tran_Exit
@@ -274,13 +275,13 @@ function MsgInsideDcl (|Message| msg, |bool|)
 			Return true
 		require (p != @Tmp and @Rel) and (++Count < 3)
 
-
+	
 function Tran_Beep (TranFunc)
-	using (node)
-		node <~ «prm, node.first »
-		node.first = «thg "app"»
-		node.func = @dot
-	TypeOfExpr( node, name_space )
+	node.MiniTran(name_space, "app")
+
+
+function Tran_Quit (TranFunc)
+	node.MiniTran(name_space, "app")
 
 
 function Tran_Print (TranFunc)
@@ -859,3 +860,9 @@ function message.NotNilRZ (|scdecl| type,  |scbase|space)
 		nel.obj = nil // clear
 		typeofexpr(nel, space)
 		
+function message.MiniTran (|scbase| name_space, |string| On="app")
+	using (self)
+		self <~ «prm, .first »
+		.first = «thg on »
+		.func = @dot
+	TypeOfExpr( self, name_space )

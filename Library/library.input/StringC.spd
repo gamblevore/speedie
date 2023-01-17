@@ -14,9 +14,11 @@ class StringZeroTerminated (string)
 	cpp_refs
 		Disturbs		nil
 	default			""
-	syntax cast (|cstring|)
+	function cstring (|cstring|)
 		if self != nil
 			return .addr|cstring|
+	syntax cast (|cstring|)
+		return .cstring
 
 	module
 		function new (|cstring| s, |StringZeroTerminated|)

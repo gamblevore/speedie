@@ -85,7 +85,7 @@ JB_String* JB_Str3(const char* c, int N) {
 }
 
 
-JB_String* JB_StrFromPtr(const char* c, int N, void* Free, void* Obj) {
+JB_String* JB_StrFromPtr(void* c, int N, void* Free, void* Obj) {
 	if (N > 0) {
 		JB_StringExternal* S = JB_New( JB_StringExternal );
 		S->Addr = (uint8*)c;
@@ -102,8 +102,8 @@ JB_StringC* JB_StrC( const char* c ) {
 	return (JB_StringC*)(JB_Str3(c, n));
 }
 
-JB_StringC* JB_StrCN( const char* c, int n ) {
-	return (JB_StringC*)JB_Str3(c, n);
+JB_StringC* JB_StrCN( void* c, int n ) {
+	return (JB_StringC*)JB_Str3((const char*)c, n);
 }
 
 

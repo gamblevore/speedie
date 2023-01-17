@@ -655,6 +655,10 @@ function TypeOfPointerAccess (|scdecl| ty0, |scdecl|)
 	return Cpy
 
 
+function Message.ExpectInt (|scdecl| type, |bool|)
+	expect type.Type.TypeInfo.IsInt (self, "Expected integer")
+	return true
+	
 function TypeOfAccess (ExprResolver)
 	|| ch = exp.first
 	|| Ty0 = TypeOfExprModulesOK( ch, name_space, nil )
@@ -666,12 +670,14 @@ function TypeOfAccess (ExprResolver)
 		|| Access = typeofexpr(index, name_space)$
 		|| W = ty0.isnumeric
 		if (W > 1)
-			require Index.ExpectClass( Access, typeint )
+			require Index.ExpectInt(Access)
 			return TypeOfVecAccess(index, ty0, w)
 		if Ty0.C_Array
+			require Index.ExpectInt(Access)
 			return TypeOfPointerAccess(ty0)
 		if (Ty0.PointerCount and Access isa typeint)
 			ifn (ch == @bra and ch.first == @bra) // should work now
+				require Index.ExpectInt(Access)
 				return TypeOfPointerAccess(ty0)
 	if (ty0 isa scmodule)
 		if ty0.IsMArray(arr) and arr.first.expectmatch(name_Space, typeint)

@@ -846,8 +846,8 @@ class Message (RingTree)
 		if self
 			for item in self
 				if item ~= key
-					return item.needsarg
-			return .msg(@tmp, key).needsarg
+					return item.GiveArg
+			return .msg(@tmp, key).GiveArg
 		return message() // sigh
 
 	syntax append (|string| key)
@@ -856,7 +856,7 @@ class Message (RingTree)
 
 	function Arg (|message|)
 		return .last(@arg)
-	function NeedsArg (|message|)
+	function GiveArg (|message|)
 		Opt NoRefCounts
 		|| r = .last 
 		if r == @arg

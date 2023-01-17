@@ -36,7 +36,6 @@ extern Object_Behaviour JB_Object_FuncTable_;
 int JB_App__Init_() {
 	{
 		JB__App_Unregistered = false;
-		JB_SetRef(JB__App_OldArgs, JB_Array__New0());
 		JB_SetRef(JB__App__Path, JB_LUB[0]);
 		JB_SetRef(JB__App_codesign_native, JB_LUB[1]);
 	}
@@ -5336,6 +5335,9 @@ void JB_Msg_List__(Message* self, FastString* fs) {
 				JB_FS_AppendString(fs, sep);
 			}
 			JB_FS_SyntaxAppend(fs, ch);
+			if (JB_Msg_EqualsSyx(ch, JB_SyxItem, false)) {
+				count++;
+			}
 			ch = _Nf1;
 		};
 		(self);
@@ -6742,7 +6744,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023011414);
+	return (2023011521);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {

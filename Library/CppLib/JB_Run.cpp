@@ -120,7 +120,7 @@ void JB_Str__LoadGlobals2() {
 	*Write++ = EmptyString_;
 	require0 (Lengths and Read);
 	while (int n = *Lengths++) {
-		auto S = JB_StrCN(Read, n);
+		auto S = JB_StrCN((void*)Read, n);
 		Read+=n+1;
 		#ifndef DEBUG
 		S->RefCount = 1; // whatever

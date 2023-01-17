@@ -1638,11 +1638,11 @@ function SCFunction.PreProcessExpects
 
 
 
-function message.GiveArg (|message|)
+/*function message.GiveArg (|message|)
 	rz = .last
 	if rz != @arg
 		rz = @arg.msg(self, "")
-
+*/
 
 function message.NormaliseFunc (|message|)
 	opt norefcounts

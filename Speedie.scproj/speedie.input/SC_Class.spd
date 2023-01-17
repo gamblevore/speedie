@@ -814,7 +814,7 @@ module
 			Return Compiler.program // OK
 		
 		scbase.CurrVisibility = false
-		node.needsarg
+		node.givearg
 		
 		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface )
 			it.IsDataType = true
@@ -878,7 +878,7 @@ module
 		for (c in datatypecode.types) (key)
 			if (c == s)
 				|| M = compiler.program.access[ key ]
-				if (M isa scmodule)
+				if M isa scmodule
 					return m.cls
 		
 

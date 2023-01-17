@@ -415,7 +415,7 @@ class String
 			fs.AppendHex(i)
 			return fs
 		
-		function FromPtr (|cstring| Addr, |int| N, |_voidptr|free=nil, |_voidptr| obj=nil, |string|)
+		function FromPtr (|_voidptr| Addr, |int| N, |_voidptr|free=nil, |_voidptr| obj=nil, |string|)
 			cpp_wrapper JB_StrFromPtr
 
 		function FromC (|cstring| Addr, |string|)

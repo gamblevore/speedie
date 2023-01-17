@@ -1212,6 +1212,9 @@ datatype vec2
 
 	function Length (|float|)
 		return .LengthSq.sqrt
+		
+	function abs (|vec2|)
+		return (.x.abs, .y.abs)
 
 	function sincos (|vec4|)
 		return (.x.sincos, .y.sincos)
@@ -1224,7 +1227,7 @@ datatype vec2
 		if (L < other)
 			return -1
 	module
-		function New (|float| v, |vec2|)
+		function New (|float| v=0, |vec2|)
 			return (v,v)
 
 
