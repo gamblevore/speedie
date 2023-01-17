@@ -425,6 +425,7 @@ function EditMeSelChange (GUITextSelectionEvent)
 	|| i = .ide
 	i.popuphide
 	i.ShowRightStats
+	i.EditMeTabRetryThing = 0
 	require !TextWasAltered and i.feedback.isopen
 	|| e = self|textview|
 	|| s = e.selrange
@@ -449,7 +450,10 @@ function PressedEditKeys (GUIKeyEvent)
 	
 	require key == -9 or -10 or 27
 	key = key.abs
-	return self|textview|.PerryInsertSyntax(key)
+	|| tabkind = self|textview|.PerryInsertSyntax(key)
+		if tabkind == 1
+			.ide.EditMeTabRetryThing = 0
+		return true
 
 
 function PerryIDE.MoveError (|error| row,  |string| p,  |int| i,  |error|)
@@ -564,3 +568,9 @@ function perry.FindElseWhere (|perryide| ignore, |string| find)
 			if "$find not found here, but was found in '${w.name}'.\n\nTake a look?".confirm
 				w.show
 			return
+
+
+function HideSomeStuffOnResize (guiaction)
+	if self isa guicontrol
+		.ide.PopupHide
+	

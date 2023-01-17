@@ -60,6 +60,7 @@ class PerryIDE (Window)
 	|date|						LastAutoCompleteDate
 	|date|						PopupDateOn
 //	|date|						PopupDateOff
+	|int|						EditMeTabRetryThing
 	|bool|						DuringMsgFB  // canloadfile, canupdate, .disable 
 	|bool|						IsTextOnly
 	|bool|						UsingSpdLib
@@ -165,6 +166,7 @@ class PerryIDE (Window)
 
 	behaviour AppForeGroundChanged
 		.editme.document.checkmodified?
+		HideSomeStuffOnResize(self)
 		.focus := .editme
 		super.AppForegroundChanged(IsForeGround)
 	
@@ -327,6 +329,8 @@ class PerryIDE (Window)
 		|| fc = sdlapp.FrameCount|int|
 		if (perryide.statsmode == 2) and (fc isa 64)
 			.UpdateMem = true
+		if fc+1 isa 64
+			require !.ProjClosed
 		if .UpdateMem
 			.ShowLeftStats
 		if fc isa 32
@@ -334,6 +338,18 @@ class PerryIDE (Window)
 		.HideStuff
 
 
+	function ProjClosed (|bool|)
+		opt norefcounts
+		|| f = .project
+		require f and !f.exists
+		
+		if "This project can't be found on the file-system anymore.\n\nWould you like to close it?".confirm
+			.close(sdlapp.kactivity)
+			return true
+			
+		// So what if it doesn't exist? Tell the user, right?
+			
+		
 	function ShowNextError (|int| dir=1, |bool|)
 		opt norefcounts
 		|| L = .ErrorList

@@ -280,16 +280,16 @@ function textview.PerryDeclKey (|bool|)
 		return true
 
 
-function textview.PerryInsertSyntax (|keys| Key, |bool|)
+function textview.PerryInsertSyntax (|keys| Key, |int|)
 	opt norefcounts
 	|| ide = .ide
 	if key is escape  and  ide.PopupDateOn.ago > 0.5
 		ide.PopupHide
-		return true
+		return 1
 	require  .ExpectsParse >= 2
 	|| s = .SelRange
 	if  !s.width  and  key is escape
-		return .PerryTryAutoComplete(s.x, "autocomplete", PerryAutoCompleteReason.escape)
+		return .PerryTryAutoComplete(s.x, "autocomplete", PerryAutoCompleteReason.escape)|int|
 
 
 	require  !.MyError  and  key isnt escape
@@ -300,34 +300,39 @@ function textview.PerryInsertSyntax (|keys| Key, |bool|)
 	|| inrange = false
 	|| state = .CodeInsertion(d, i2, inrange, where)
 	if state == -2
-		return false
+		return 0
 	if state == -1
 		beep
-		return true
+		return 1
 	
 	if key == '\n'
 		require state != 10 
 		if (state >= 3)  and  !s.width 
-			return s.x <= i2
+			return (s.x <= i2)|int|
 		if (state == 2)
 			if s.width
 				.sel = s.x2x2
-			return true // why not
-		return false // i think?
+			return 1 // why not
+		return 0 // i think?
 	
 	|| after= where.after?
 	|| A	= (after, after)
 	if state != 10  and  (!s.width or state == 5)
 		if state == 1
-			return PerryInsert1(self, where, a)
+			return PerryInsert1(self, where, a)|int|
 		if state == 2
-			return PerryInsert2(self, where, A)
+			return PerryInsert2(self, where, A)|int|
 		if inrange
 			if state == 4
-				return PerryInsert34(self, where, A)
+				return PerryInsert34(self, where, A)|int|
 			if state == 5
-				return PerryInsert5(self, where, A)
+				return PerryInsert5(self, where, A)|int|
 
+	|| prevchar = self[i2-1]
+	require (prevchar == '.') or jeebox.CSWordMiddle[prevchar]
+	
+	if ide.EditMeTabRetryThing
+		return 0
 	if  !s.width  and  (key is tab)  and  self[s.x].istextline
 		// printline .ide.autocomplete.listsource
 		// checking the listsource is unreliable because it is out of date
@@ -336,8 +341,10 @@ function textview.PerryInsertSyntax (|keys| Key, |bool|)
 		|| C = .ide.autocomplete.listsource.slowcount
 		if C > 0 
 			if c == 1 and .FakeAutoComplete == -1
-				return false // what?
-			return .PerryTryAutoComplete(s.x, "autocomplete", PerryAutoCompleteReason.tab)
+				return 0 // what?
+			if .PerryTryAutoComplete(s.x, "autocomplete", PerryAutoCompleteReason.tab)
+				ide.EditmeTabRetryThing = 1
+				return 2
 
 
 function perryide.IsEditingSource (|bool|)

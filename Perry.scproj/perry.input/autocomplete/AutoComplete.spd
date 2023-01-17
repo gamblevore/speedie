@@ -260,6 +260,7 @@ function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
 function EditMeModified (guikeyevent)
 	opt norefcounts 
 	|| i = .ide
+	i.EditMeTabRetryThing = 0
 	i.ShowStats
 	if key <= 0 and self isa textview
 		|| x = .sel1
