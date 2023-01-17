@@ -114,7 +114,7 @@ class TextView (GUIControl)
 
 	behaviour mousewheel
 		if (self is editable or AlwaysScrollable) and !.singleline
-			.start = .start.move(-p.y)
+			.StartLine = .StartLine.move(-p.y)
 			return true
 
 
@@ -125,7 +125,7 @@ class TextView (GUIControl)
 		|| L = Dist / .lineheight|int|
 		if dist < 0
 			l = -1
-		return .Start.move(L)
+		return .StartLine.move(L)
 
 	
 	helper ExpandToAntiWords (|intrange| t, |intrange|)
@@ -457,7 +457,7 @@ class TextView (GUIControl)
 		if !exact and (i inrange (1+.MaxVisibleLines - back))
 			return d
 		|| bef = before.abs
-		.start = d.move(-bef)
+		.StartLine = d.move(-bef)
 		sdlapp.touch(self)
 		return d
 
@@ -471,7 +471,7 @@ class TextView (GUIControl)
 			if d2 != d
 				d2 = d2.move(2) // looks lil nicer
 			if ._Start != d2
-				.start = d2
+				.StartLine = d2
 				.ScrollDrawTimer = scroller.timer 
 		
 		
@@ -1012,7 +1012,7 @@ class TextView (GUIControl)
 				return true				// sigh could simplify this. cant be bothered
 			return false
 			
-		if (t.length == 1) and counterparts.find(t)  // stop awkward things like:	 " --> (")
+		if (t.length == 1) and counterparts.find(t)  // stop awkward things like: " --> (")
 			require (s == "'" or "\"") and (s != t)
 			
 		|| Other = CounterParts2[c]
@@ -1021,6 +1021,13 @@ class TextView (GUIControl)
 			return true
 		
 		if .SelMsgValid
+// blocking things like x = x.parse() is bad, cus we WANT that ()
+// or else we get garbage jb all the time. better to keep it in a valid-state
+// but what if it gets into an invalid state?
+// we could undo... then try redo without the double-insertion???
+// can't see anything better than that.	still.. lets just block "{" for now.
+			if !sel.width
+				require s != "{" 
 			.undochecker = -1
 			|| x = .insert(s + t + other)
 			.sel = (x+1, x+t.length+1)
@@ -1301,7 +1308,7 @@ class TextView (GUIControl)
 	helper DrawSelRange (|image| Where, |intRange| R, |drawstyle| g)
 		opt norefcounts
 		|| i	= 0
-		|| d	= .Start
+		|| d	= .StartLine
 		|| End	= d.move(.maxvisiblelines + 1)
 		if end is last
 			end = nil
@@ -1353,7 +1360,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		char = .clamp(char)
 		|| c = -int.max
-		|| s = .Start
+		|| s = .StartLine
 		|| d = .lines.first
 		
 		while
@@ -1435,7 +1442,7 @@ class TextView (GUIControl)
 			
 	helper DrawPreparedText (|image| where)
 		opt norefcounts
-		|| d		= .Start						#debug_require
+		|| d		= .StartLine						#debug_require
 		|| Base 	= 0
 		|| N		= .MaxVisibleLines
 		|| inl		= (.isinline != nil)
@@ -1453,7 +1460,7 @@ class TextView (GUIControl)
 			.DrawOneLine(where, D, y, usecol, lc)
 			d++
 
-		.CanSeeAllLines = (.Start.position == 0) and (d==nil) // oop
+		.CanSeeAllLines = (.StartLine.position == 0) and (d==nil) // oop
 
 
 	function MaxWidthInChars (|int|)
@@ -1493,19 +1500,19 @@ class TextView (GUIControl)
 		(.OnShowExtraInfo)(self, XY, M, reason)
 
 
-	function Start (|TextViewLine|)
+	helper StartLine (|TextViewLine|)
 		return ._Start
 	
 	
-	function Start (assigns:|TextViewLine| d)
+	helper StartLine (assigns:|TextViewLine| d)
 		cpp_part StartAtLine
 		.StartWithoutScrollDraw = d
 		.ScrollDrawTimer = scroller.timer
 
 
-	function Start (assigns:|int| v)
+	function StartLine (assigns:|int| v)
 		cpp_part StartAtInt
-		.start = .lines.first.move(V)
+		.StartLine = .lines.first.move(V)
 		
 
 	helper StartWithoutScrollDraw (assigns:|TextViewLine| d)

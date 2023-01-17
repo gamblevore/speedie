@@ -53,7 +53,7 @@ function ListView.SLH (|vec3|)
 function textview.SLH (|vec3|)
 	// whats the total number of lines? sigh... seems like we always need the entire thing?
 	|| n = .lines.last.vline - (.maxvisiblelines - 2)
-	|| v =  .Start.vline 
+	|| v =  .StartLine.vline 
 	return (v,  n max 1,  .lineheight).vec3
 
 
@@ -87,7 +87,7 @@ function ScrollBarMove (|vec3| slh, |int| shift)
 		if self isa ListView
 			.ScrollMoveTo(t)
 		  elseif self isa textview
-			.Start = t
+			.StartLine = t
 
 
 function ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |&uint| Timer,  |bool|)

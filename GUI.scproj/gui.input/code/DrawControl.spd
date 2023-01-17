@@ -58,7 +58,7 @@ class DrawControl (GuiControl) // imageeditor
 		j.Flush
 	
 	function image.RawData (|string|)
-		return string.FromPtr(.ptr|cstring|, .ByteCapacity)
+		return string.FromPtr(.ptr, .ByteCapacity)
 			
 	function jbin.AddImage	(|image| img, |string| name)
 		.enter(@tmp, name)

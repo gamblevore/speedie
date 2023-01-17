@@ -66,6 +66,7 @@ class StretchDivider (GuiControl)
 	linkage:cpp_part Div
 	|guiAction|					OnHide 
 	|guiAction|					OnShow
+	|guiAction|					OnStretch
 	|int|						Min
 	|int|						Max
 	|controlpoint|				Start
@@ -110,6 +111,7 @@ class StretchDivider (GuiControl)
 		  else
 			H = the~height
 		.size = W by H
+		(.OnStretch)(self)?
 
 
 	function Collapsed (|bool|)

@@ -365,7 +365,8 @@ class GUIControl (ringtree)
 		.textset(value)
 	
 	helper TextSet (assigns:|string| text, |bool|)
-		require (text != .text)
+		cpp_part TextSetter
+		require (self and text != .text)
 		.text = text
 		.TextAlteredForDraw |= 2
 		sdlapp.Touch(Self)
