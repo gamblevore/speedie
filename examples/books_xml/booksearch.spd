@@ -12,6 +12,7 @@ main
 
 	|| Queries = app.Switches
 	|| Found = BookSearch(jb, Queries)
+		""
 		for bk in found
 			"$bk"
 	  else
@@ -19,14 +20,13 @@ main
 		
 		
 function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
-	|| catalog = BookFile[@tmp, "catalog"] #require
-	for book in catalog[@arg]
+	for book in BookFile[@tmp, "catalog"][@arg]
 		if book.TestBook(Queries)
 			rz <~ book
 
 
 function message.TestBook (|[string]| queries, |bool|)
-	.Expect(@tmp, "book")$			// validate :)
+	require .Expect(@tmp, "book")			// validate :)
 	for row in self[@arg,-1]
 		for Q in queries
 			if row ~= q.ArgName		// ~= is like == but case-insensitive
