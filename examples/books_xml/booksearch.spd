@@ -1,5 +1,11 @@
 #!/usr/local/bin/spd
 
+// docs at:
+https://github.com/gamblevore/speedie/blob/main/Documentation/Message.md
+// or locally:
+file://usr/local/speedie/Documentation/Messages.md
+
+
 main 
 	|| path = app.args[0]				#expect ("Pass a file-path")
 	|| B = path.ExistingFile			#require
