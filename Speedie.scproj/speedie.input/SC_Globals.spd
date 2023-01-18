@@ -4,30 +4,11 @@
 */
 
 
-
-/*
-	* need to temp some vars... or else how to GET bits of it?
-		* || oof = abc().zyx
-		* cls1.loc.zw = (1,2) -->
-		  || tmp = cls1.loc
-		  cls1.loc = (tmp.x, tmp.y, 1, 2) 
-
-
-	function XY (|vec2|) {
-		// this shouldn't be allowed!!! (its on vec4)
-		return (.x, .y)
-	}
-*/
-
-
-
-constants {
+constants
 	kBitXor = "^"
 	kBitOr = "(|)"
 	kBitNot = "~"
 	kBitAnd = "&"
-}
-
 
 
 
@@ -164,9 +145,8 @@ function TypeOfBRel (ExprResolver)
 	|| F = exp.first									#require
 	|| SubType = TypeOfExpr( F, name_space )			#require
 	if (Subtype.type.funcproto) and (name == "&")
-		return TypeOfAddress(F, name_space, side) // return subtype // just use this instead?
-													 
-
+		return TypeOfAddress(F, name_space, side)
+	
 	if name == "*"
 		|| Cpy = subtype.Copy // should keep borrowedness...
 		Cpy.PointerCount--
@@ -204,7 +184,7 @@ function TypeOfLast (ExprResolver)
 
 function TypeOfBlock (ExprResolver)
 	|| p = exp.scarg( name_space )
-	p.isstatementexpr = true
+	p.IsStatementExpr = true
 	|| fn = p.owningfunc
 	
 	CollectDecls( exp, p, p )
@@ -216,9 +196,9 @@ function TypeOfBlock (ExprResolver)
 	
 	|| last = exp.last
 	require last.expect(@tmp, "rejoin")
-	|| val = last.first #expect (last, "Must return a value")
+	|| val = last.first	#expect (last, "Must return a value")
 	require val.expectlast
-	return typeofexpr(val, p, nil)
+	return TypeOfExpr(val, p, nil)
 
 
 function TypeOfThg (ExprResolver)
@@ -253,11 +233,13 @@ function TypeOfBra (ExprResolver)
 	if (c0 == @arg)
 		rz = typeofBlock(c0, name_space, side)
 	  else
-		rz = typeofexpr(c0, name_space, side)
+		rz = TypeOfExpr(c0, name_space, side)
 
 
 function TypeOfString (ExprResolver)
 	return typestring.typenormal // really it should also be a cstring!
+
+
 function TypeOfChar (ExprResolver)
 	error (exp.length == 1) (exp, "Chars must be one byte long.")
 //	want  (exp.length == 1) (exp, "Chars must be one byte long.") // seems better?
