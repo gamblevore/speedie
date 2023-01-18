@@ -79,7 +79,7 @@ First, lets test that we can even read a file at all. Lets take the file via com
 
 Ooops, well we converted it already. See that line `XMLToJeebox`? I guess in my enthusiasm I already converted it. Anyhow so thats great. Now lets save this file to jeebox, might as well.
 
-    path.Ext("Box") <~ jb.render
+    path.Ext("box") <~ jb.render
 
 Now, the jeebox file is saved to disk. The `<~` operator just means "write this string to the file at this path". Lets take a look at it:
 
