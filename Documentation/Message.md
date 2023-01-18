@@ -13,7 +13,7 @@ Its more advanced because the syntax can represent both code or data. Here is so
 Imagine we wanted to parse it. Lets put it in "example.box" and parse that file.
 
     || recent_list = "example.box".file.parse
-    for item in recent_list["file_list"]
+    for item in recent_list["file_list"][@arg]
         || name = item[@str,0].name.name
         || type = item[@bra,1][@thg].name
         "$name is a $type"                    // "file1 is a Picture,  file2 is a Sound,  file3 is a Text"
