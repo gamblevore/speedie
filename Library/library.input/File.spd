@@ -449,11 +449,8 @@ class File (String)
 			return .path.idealapp.file
 
 
-		function New (|int| FD, |file|)
-			cpp_Part NewFD
-			require (FD >= 0)
-			rz = file(nil|string|)
-			rz.descriptor = fd
+		function NewPipe (|int| Pipe, |file|)
+			cpp_wrapper JB_File_NewPipe
 		
 
 		function TrashPath (|string|)

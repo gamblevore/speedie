@@ -681,6 +681,9 @@ class TextView (GUIControl)
 		return true
 	
 	
+	syntax append (|string| s)
+		.textset(.text + s)
+
 	syntax access (|int| i, |string| s, |bool|)
 		cpp_Part Match
 		return .text[i, s]

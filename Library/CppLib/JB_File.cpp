@@ -447,7 +447,8 @@ JB_String* JB_File_Read( JB_File* self, IntPtr Length, bool AllowMissing ) {
 		JB_String* Str = FileAlloc( self, Length );
 		if (Str) {
 			int Error = 0;
-			Length = InterRead( FD, Str->Addr, (int)Length, self, Error, 0 );
+			int Mode = (self->MyFlags & 2) != 0;
+			Length = InterRead( FD, Str->Addr, (int)Length, self, Error, Mode );
 			return JB_Str_Shrink( Str, (int)Length );
 		}
 	}
@@ -655,10 +656,10 @@ void JB_File_Destructor( JB_File* self ) {
 
 
 void JB_File_StopSHM (JB_File* self) {
-	if (self->MyFlags) { // 1 == server!
+	if (self->MyFlags & 1) { // 1 == server!
 		printf("unlinking %s\n", self->Addr);
 		shm_unlink((const char*)(self->Addr));
-		self->MyFlags = 0;
+		self->MyFlags &= ~1;
 	}
 }
 
@@ -914,6 +915,17 @@ bool JB_File_DataSet( JB_File* self, JB_String* Data ) {
 	return false;
 }
 
+JB_File* JB_File__NewPipe(int Pipe) {
+	if (Pipe < 0) {
+		return nil;
+	}
+	JB_File* F = JB_New( JB_File );
+	JB_File_Constructor( F, 0 );
+	F->Descriptor = Pipe;
+	F->MyFlags |= 2;
+	return F;
+}
+
 
 JB_File* JB_Str_File( JB_String* Path ) {
 	// || f = .resolve.file
@@ -971,11 +983,13 @@ bool JB_File_IsLink (JB_File* self) {
 
 
 #define SavedParentIPC 321
+
+
 void* JB_File_IPC (JB_File* self, int* np) {
 	if (self->Descriptor >= 0) {
 		JB_ErrorHandleFile(self, nil, EISCONN, nil, "shm_open");
 		return 0;
-	}
+	}	
 	
 	MakeParentPath_(self);
 	int Mode = O_RDWR;
@@ -1002,7 +1016,7 @@ void* JB_File_IPC (JB_File* self, int* np) {
 	}
 	if (FD >= 1) {
 		self->Descriptor = FD;
-		self->MyFlags = Srv;
+		self->MyFlags = (int)Srv;
 		if (Srv) {
 			*np = JB_Int_RoundUp(*np, getpagesize());
 			Try = "fcntl";
@@ -1039,6 +1053,8 @@ void* JB_File_IPC (JB_File* self, int* np) {
 void JB_munmap (void* mem, int64 n) {
 	ErrorHandle_(munmap(mem, n), nil, nil, "mem-unmap");
 }
+
+
 
 }
 

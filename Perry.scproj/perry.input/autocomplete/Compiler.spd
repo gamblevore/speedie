@@ -95,16 +95,16 @@ extend PerryIDE
 
 
 	function LogFB (|message| msg)
-		.BuildLogFile = msg.first.nyme
+		// ignore.
 	
 	function Readlog
-		require .stdout.height > 1
-		// OK so let's just append something
-		if .BuildLogFile and .Building
+		if .Building and .stdout.height > 1
 			.justreadlog
 	
 	function JustReadLog
-		.stdout.text = .BuildLogFile.FileData(256KB)
+		opt norefcounts
+		|| f = .compilr$.childstdout
+			.stdout <~ f.read(256KB)
 	
 	function CompileFB (|message| msg, |bool|)
 		.CancelCompile
@@ -126,11 +126,9 @@ extend PerryIDE
 		notifications <~ (what, response)
 	
 	function CancelCompile 
-		if .compilr!=nil
-			.compilr.JustKill
+		.compilr.JustKill?
 		(.buildbutton is enabled)
 		(.progress isnt visible)
 		.JustReadlog
-		.buildlogfile = ""
 		isnt active
 

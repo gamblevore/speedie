@@ -54,6 +54,7 @@ JB_String* JB_File_ReadFD( int* FD, int Length, JB_String* Path );
 bool JB_File_DataSet( JB_File* self, JB_String* Data );
 int JB_Str_FileSize(JB_String* self);
 JB_File* JB_Str_File( JB_String* Path );
+JB_File* JB_File__NewPipe(int Pipe);
 JB_File* JB_File__StdOut( );
 int JB_File_MoveTo(JB_File* self, JB_String* New);
 

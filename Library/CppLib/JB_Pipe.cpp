@@ -180,32 +180,46 @@ int JB_Kill(int PID) {
 	return KillErr;
 }
 
-
-int JB_Str_StartIPC(JB_String* self, JB_String* talk, Array* Args) {
+const char* _StartIPC (JB_String* self, const char** argv, int& child_stdout, int& PID) {
+    int child_write[2]={};
+	int Err = access(argv[0], X_OK | F_OK);
+	if (Err) return "access";
+	Err = pipe(child_write);
+	if (Err) return "pipe";
+	child_stdout = child_write[0];
 	signal(SIGCHLD, JB_SigChild);
-	const char* argv[MaxArgs] = {};
-	const char* cmd = "prepare ipc";
-	int Err = JB_ArrayPrepare_(self, argv, Args);
-	if (!Err) {
-		cmd = "access";
-		Err = access(argv[0], X_OK | F_OK);
-		if (!Err) {
-			cmd = "fork";
-			int PID = fork();
-			if (PID > 0) {
-				return PID;
-			}
-			Err = PID;
-		}
-	} 
-	if (Err < 0) {
-		JB_ErrorHandleFile(self, nil, errno, nil, cmd);
-		return Err;
+	PID = fork();
+	if (!PID) {		// child process
+		pipe_dup2(child_write[1], 1); // We can now capture stdout cleanly!
+		pipe_close(child_write[0]);
+		execvp(argv[0], 	(char* const*)argv);
+		printf("execv(\"%s\") failed\n",  argv[0]);
+		exit(-1);
 	}
-	
-	execvp(argv[0], 	(char* const*)argv);
-	printf("execv(\"%s\") failed\n",  argv[0]);
-	exit(-1);
+
+	pipe_close(child_write[1]);
+	if (PID > 0) return (const char*)0;
+	return "fork";
+}
+
+const char* ArrayPrepare_(JB_String* self, const char** argv, Array* R) {
+	if (JB_ArrayPrepare_(self, argv, R)) {
+		return "prepare ipc";
+	}
+	return 0;
+}
+
+JB_File* JB_Str_StartIPC (JB_String* self, Array* Args, int* PID) {
+// "talk" is unused... kind of a flaw. I assumed when I made this that we would specify
+// a "talk" file... but I just settled on an exact file-path that both processes would
+// know about implicitly through the filenames of both processes. I guess we can delete
+// "talk". We'll see... Do this later.
+	const char* argv[MaxArgs] = {};
+	const char* Err = ArrayPrepare_(self, argv, Args);
+	int Pipe = 0;
+	if (!Err) Err = _StartIPC(self, argv, Pipe, *PID);
+	if (Err)  JB_ErrorHandleFile(self, nil, errno, nil, Err);
+	return JB_File__NewPipe(Pipe);
 }
 
 

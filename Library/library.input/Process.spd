@@ -31,6 +31,7 @@ class Process
 	|fn_subprocess|				SubProcess
 	|[string]|					Params
 	|file|						LogFile
+	|file|						ChildStdOut
 	|ringtree of message|		SendQueue
 	|ind|						ProcPos
 	|IPCMessage|				Dummy
@@ -120,13 +121,14 @@ class Process
 	helper SetupAlloc (|int| n, |int|)
 		if .orig
 			return .origsize
-		.origsize = 0
-		.orig = (&.dummy)|&byte|
-		|| v = .talker.ipc(n)|&byte|				#expect (self, "can't open ipc")
-		expect !(v|uint64| & 31)							(self, "Unaligned memory.")
 		.origsize = n
-		.orig = v
-		return n
+		.orig = .talker.ipc(.origsize)|&byte|
+		if !.orig or (.orig|uint64| & 31)
+			debugger
+			error (self, "can't open ipc")
+			.orig = (&.dummy)|&byte|
+			.origsize = 0
+		return .origsize
 
 
 	helper SetupAdjust (|int| n)
@@ -383,6 +385,7 @@ class Process
 			.cid = 0
 			.self("killed child", true)
 		.Disconnect
+		.childstdout = nil
 
 
 	function Close
@@ -481,9 +484,9 @@ class Process
 
 	function RunChild (|string| path, |bool|)
 		require (self isnt invalid) 
-		|| P = path.cstr.Startprocess(.Talker, .params)
+		.ChildStdout = path.cstr.Startprocess(.params, .cid)
+		if .ChildStdout
 			.path = path
-			.cid = P
 			.AddToList
 			return true
 		is closed

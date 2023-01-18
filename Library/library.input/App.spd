@@ -191,11 +191,11 @@ function FileName (|string|)
 
 
 function StdIn (|File|)
-	return File.new(pipe.stdin_)
+	return File.newpipe(pipe.stdin_)
 
 	
 function StdOut (|File|)
-	return File.new(pipe.stdout_)
+	return File.newpipe(pipe.stdout_)
 
 
 function CWD (|string|)

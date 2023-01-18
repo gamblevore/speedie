@@ -10,7 +10,6 @@ class PerryIDE (Window)
 	|Guicontrol|				Debugger
 	|Guicontrol|				Tester
 	|string|					CompileOKString
-	|string|					BuildLogFile
 	|Guicontrol|				SearchArea
 	|Guicontrol of buttonview|	ViewButtons
 	|buttonview|				PrevView
@@ -324,13 +323,12 @@ class PerryIDE (Window)
 		.UpdateStatusErrors
 		.Readlog
 		.PopupDisplayFadeIn
-		require !.openedmenu
-		require self.islast
 		|| fc = sdlapp.FrameCount|int|
-		if (perryide.statsmode == 2) and (fc isa 64)
-			.UpdateMem = true
+		require !.openedmenu and .islast
 		if fc+1 isa 64
 			require !.ProjClosed
+		if (perryide.statsmode == 2) and (fc isa 64)
+			.UpdateMem = true
 		if .UpdateMem
 			.ShowLeftStats
 		if fc isa 32

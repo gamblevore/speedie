@@ -1614,11 +1614,10 @@ JB_String* JB_Str_Append6(JB_String* A, JB_String* B, JB_String* C, JB_String* D
 
 JB_String* JB_Str_OperatorPlus(JB_String* self, JB_String* other) {
     int NS = JB_Str_Length(self);
+    int NO = JB_Str_Length(other);
     if (!NS) {
         return other;
     }
-    
-    int NO = JB_Str_Length(other);
     if (!NO) {
         return self;
     }
