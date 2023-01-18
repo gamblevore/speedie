@@ -194,7 +194,7 @@ class SCImport
 				// 
 			  else
 				f = FindInputFolder(f)
-				require f.MustExist
+				require f and f.MustExist
 			
 			rz.InputFolder = f
 			|scfile| index

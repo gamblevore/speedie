@@ -112,7 +112,9 @@ function Compiler.PrePrintErrors
 
 
 function Compiler.PrintErrors (|errorseverity| MinSev)
+	stderr.BlockErrors = true
 	|| s = .builderrors(minsev)
+	stderr.BlockErrors = false
 	if options.perry == 2
 		s = s.digest
 	if stderr.errorcount
@@ -214,9 +216,10 @@ extend Error
 
 
 	function SCOriginalData (|string|)
-		|| p = .SCoriginalpath
-		if p
-			return p.filedata
+		|| p = .SCOriginalpath
+			|| f = p.file
+			if f and f.exists and !f.isdir
+				return f.readall
 		return .originaldata
 
 

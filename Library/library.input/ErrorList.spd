@@ -22,6 +22,7 @@ class ErrorList
 	|int|					ProblemCount
 	|int|					WarnCount
 	|int|					ErrorsAreWarnings
+	|bool|					BlockErrors
 	|string|				Source
 	|object| 				LogObj
 
@@ -168,7 +169,7 @@ class ErrorList
 	
 	
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
-		require !ErrorList.OutOfMemory
+		require !.BlockErrors and !ErrorList.OutOfMemory
 		if level >= ErrorSeverity.error // a warning
 			return (.ErrorCount < .MaxErrors)
 		  else
