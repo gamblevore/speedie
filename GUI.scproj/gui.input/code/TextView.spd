@@ -682,7 +682,8 @@ class TextView (GUIControl)
 	
 	
 	syntax append (|string| s)
-		.textset(.text + s)
+		if s
+			.textset(.text + s)
 
 	syntax access (|int| i, |string| s, |bool|)
 		cpp_Part Match
