@@ -187,6 +187,7 @@ const char* _StartIPC (JB_String* self, const char** argv, int& child_stdout, in
 	Err = pipe(child_write);
 	if (Err) return "pipe";
 	child_stdout = child_write[0];
+	fcntl(child_stdout, F_SETFL, O_NONBLOCK);
 	signal(SIGCHLD, JB_SigChild);
 	PID = fork();
 	if (!PID) {		// child process
