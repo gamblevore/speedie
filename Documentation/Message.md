@@ -195,7 +195,7 @@ Here is our total search function. Great it works!
 
 Now, calling this commandline:
 
-    booksearch.spd books.box --author=Corets
+    ./booksearch.spd books.box --author=Corets
 
 Will return this book:
 
