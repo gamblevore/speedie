@@ -1,9 +1,11 @@
 ## Messages
 (aka **Jeebox**)
 
-In Speedie, when you parse a string using `string.parse`, you get back a tree. A `Message` is a node within a parsed tree. Jeebox uses trees much in the same way XML or JSON does, but more advanced and simpler.
+In Speedie, when you parse a string using `string.parse`, you get back a tree. A `Message` is a node within a parsed tree. The format we are parsing, is called “Jeebox” ([http://jeebox.org]()).
 
-Its more advanced because the syntax can represent both code or data. Here is some data, in Jeebox.
+In fact, you can parse file-objects as well. This is better because error messages created will point back to the parsed file.
+
+The format “Jeebox” can represent both code and data (and more, be creative!). Here is some data.
 
     file_list
         item "/path/to/file1" (Picture)
@@ -18,7 +20,7 @@ Imagine we wanted to parse it. Lets put it in "example.box" and parse that file.
         || type = item[@bra,1][@thg].name
         "$name is a $type"                    // "file1 is a Picture,  file2 is a Sound,  file3 is a Text"
     
-**Unlike** XML which has many different kinds of nodes, each `Message` returned by `string.parse` is interchangeable, and has only two things defining it, the type and the name.
+**Unlike** XML which has many different kinds of nodes, each `Message` returned is interchangeable, and has only two things defining it, the type and the name.
 
 The name is accessed via `.name`, and is just a string. The type is accessed `.func`, and is a datatype called `Syntax`. On the CPU, `Syntax` is just an `int`. Datatypes have their own functions that you can call, so you must think of `Syntax` as it's own type that just happens to have efficient CPU representation.
 
@@ -131,7 +133,7 @@ First, we need to find `"catalog"`, which isn't the root actually, because the r
 
     || catalog = BookFile[@tmp, "catalog"] #require
 
-This will get a `@tmp` named "catalog", and will create an error if the name is wrong. `@tmp`, `@str`, etc are just node types. 
+`BookFile[@tmp, "catalog"]` will get a `@tmp` named "catalog", and will create an error if the name is wrong. `@tmp`, `@str`, etc are just node types. Also, `#require` will return if "catalog" is set to `nil`. Its the same as: `if catalog==nil: return nil`
 
 Now we need to list through all the books, they are contained in another node, an `@arg`. `@arg` is a list of statements (`"catalog"` or `"book"` is a statement in this example), or other things, but its the only thing that can contain statements. We need it to read the books.
 
