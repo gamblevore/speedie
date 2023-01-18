@@ -28,7 +28,7 @@ extend String
 		return self
 		
 	function SyntaxAppend (|string| s, |bool|)
-		return .filedata(s)
+		return .write(s)
 
 	function SyntaxAppend (|cstring| s, |byte|sep='\n', |bool|)
 		cpp_wrapper JB_File_WriteCString
@@ -107,11 +107,11 @@ extend String
 		return self[slash, dot]
 		
 
-	function FileData (|int|lim=1024MB, |bool|AllowMissing=true, |string|)
+	function ReadFile (|int|lim=1024MB, |bool|AllowMissing=true, |string|)
 		return .file.readall(lim, AllowMissing)
 
 
-	function FileData (assigns:|string|, |bool|)
+	function Write (assigns:|string|, |bool|)
 		return .file.data(Value)
 		
 	function Child (|String| cname, |String|)

@@ -29,9 +29,9 @@ main
 
 function perryide.CreateBasicFiles (|file| proj)
 	|| main = proj.child("input/main.spd")
-	proj.child(".perry").filedata = qqfiles.Roots
+	proj.child(".perry").write = qqfiles.Roots
 	main.data = .EmptyMainFile(proj.trimextandpath)
-	proj.child("input/.todo").FileData = qqfiles.Todo
+	proj.child("input/.todo").write = qqfiles.Todo
 
 
 function string.TrimProj (|string|)

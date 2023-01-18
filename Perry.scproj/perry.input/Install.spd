@@ -71,7 +71,7 @@ extend_module perry
 
 	function DownloadData (|string| url, |int| lim, |string|)
 		|| p = .install_path			#require
-		return p.filedata(lim)			#expect (beep, "Can't find installation-data at:\n" + p)
+		return p.readfile(lim)			#expect (beep, "Can't find installation-data at:\n" + p)
 
 
 	

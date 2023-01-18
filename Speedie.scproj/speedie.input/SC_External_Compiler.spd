@@ -482,8 +482,8 @@ function File.TestSpeedie (|[string]| Args, |string| Variant, |bool|) {
 
 
 // Read output
-	print			externalCompiler.TmpOut(Variant).FileData
-	|| test_err =	externalCompiler.TmpErr(Variant).FileData
+	print			externalCompiler.TmpOut(Variant).ReadFile
+	|| test_err =	externalCompiler.TmpErr(Variant).ReadFile
 	error !(test_err) (test_err)	
 
 	return StdErr.OK

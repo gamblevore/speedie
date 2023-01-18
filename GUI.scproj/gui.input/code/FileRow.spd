@@ -95,7 +95,7 @@ class FileRow (ListViewRow)
 		|| d = ._document
 		if d and !d.ismodified and d.current
 			return d.text
-		return .readfrom.filedata
+		return .readfrom.ReadFile
 	
 	
 	function ReadFrom (|string|)
@@ -212,7 +212,7 @@ class FileRow (ListViewRow)
 			return ._document.text
 		|| f = .readfrom.file
 		debug_require !f.isdir
-		return f.filedata(ignore).utf8
+		return f.readfile(ignore).utf8
 
 
 	function FindAllParent (|message| found, |error|)

@@ -229,7 +229,7 @@ class SCImport
 					|| name = f.name
 					|| Dest = P[name]
 					|| fs = dest.writer
-					dest.filedata = "\n// (Copy of original)\n"+ f.readall
+					dest.write = "\n// (Copy of original)\n"+ f.readall
 				  elseif (f isa string)
 					|| Dest = P[sh_name]
 					debugger /// what?
