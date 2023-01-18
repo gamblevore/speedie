@@ -1,18 +1,19 @@
 #!/usr/local/bin/spd
 
 main 
-	|| path = app.args[0]			#expect ("Pass a file-path")
-	|| B = path.ExistingFile		#require
-	|| jb = B.Parse					#require
+	|| path = app.args[0]				#expect ("Pass a file-path")
+	|| B = path.ExistingFile			#require
+	|| jb = B.Parse						#require
 	if b isa "xml"
 		jb.XMLToJeebox
-		|| boxfile = path.Ext("box")
-		if boxfile <~ jb.render // write file to disk
+		|| BoxFile = path.Ext("box")
+		if BoxFile <~ jb.render		// write file to disk
 			"Converted XML to Jeebox: $boxfile"
 
 	|| Queries = app.Switches
 	|| Found = BookSearch(jb, Queries)
-		"$Found"
+		for bk in found
+			"$bk"
 	  else
 		"Can't find any books by: $Queries"
 		
@@ -25,9 +26,10 @@ function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
 
 
 function message.TestBook (|[string]| queries, |bool|)
+	.Expect(@tmp, "book")$			// validate :)
 	for row in self[@arg,-1]
 		for Q in queries
-			if row ~= q.ArgName // ~= is like == but case-insensitive
+			if row ~= q.ArgName		// ~= is like == but case-insensitive
 				require row.first.name contains q.ArgValue
 				rz = true
 			
