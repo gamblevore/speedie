@@ -1,10 +1,7 @@
 #!/usr/local/bin/spd
 
-// docs at:
-https://github.com/gamblevore/speedie/blob/main/Documentation/Message.md
-// or locally:
-file://usr/local/speedie/Documentation/Messages.md
-
+https://github.com/gamblevore/speedie/blob/main/Documentation/Message.md // docs here
+file:///usr/local/speedie/Documentation/Messages.md						 // locally
 
 main 
 	|| path = app.args[0]				#expect ("Pass a file-path")
@@ -13,30 +10,27 @@ main
 	if b isa "xml"
 		jb.XMLToJeebox
 		|| BoxFile = path.Ext("box")
-		if BoxFile <~ jb.render		// write file to disk
+		if BoxFile <~ jb.render		// write to disk
 			"Converted XML to Jeebox: $boxfile"
 
-	|| Queries = app.Switches
-	|| Found = BookSearch(jb, Queries)
+	|| Found = BookSearch(jb, app.Switches)
 		""
 		for bk in found
 			"$bk"
 	  else
-		"Can't find any books by: $Queries"
+		"Can't find any books by: ${app.Switches}"
 		
 		
-function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
+function BookSearch (|message| BookFile, |[string]| Queries, |[message]|)
 	for book in BookFile[@tmp, "catalog"][@arg]
 		if book.TestBook(Queries)
 			rz <~ book
 
 
 function message.TestBook (|[string]| queries, |bool|)
-	require .Expect(@tmp, "book")			// validate :)
+	require .Expect(@tmp, "book")
 	for row in self[@arg,-1]
 		for Q in queries
 			if row ~= q.ArgName		// ~= is like == but case-insensitive
 				require row.first.name contains q.ArgValue
 				rz = true
-			
-	

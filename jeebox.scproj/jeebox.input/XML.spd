@@ -26,7 +26,7 @@ function parser.XMLAttribs (|message| XML,  |int| start,  |int|)
 		
 		|| After	= s.find(c, i+1)
 		|| Txt		= parser.new(Attr, @xtxt, start)
-		txt.name	= s[i+1,after].replaceall(jeebox.xml_unescapestr)
+		txt.name	= s[i+1,after].ReplaceAll(jeebox.xml_unescapestr)
 		.nextstart	= after+1
 	
 	.erroradd("Element malformed.", .nextstart)
@@ -34,7 +34,6 @@ function parser.XMLAttribs (|message| XML,  |int| start,  |int|)
 
 function Parser.CloseXML (|message| XML, |int|i, |string| s, |message|)
 	|| CloseEnd = s.find('>', i+2)
-	// s.s
 	ifn (CloseEnd)
 		return .erroradd( "Close-tag malformed", i)
 	|| CloseName = s[i+2, CloseEnd]
@@ -130,7 +129,7 @@ extend message
 		opt norefcounts
 		fs <~ " ${.name}=\"${.first}\""
 
-	syx XML (XML_Element)
+	syx XML  (XML_Element)
 		opt norefcounts
 		fs <~ "<"
 		fs <~ .name
@@ -159,7 +158,7 @@ extend message
 		fs <~ "</${.name}>"
 
 
-	syx XPI (XML_ProcessingInstruction)
+	syx XPI  (XML_ProcessingInstruction)
 		fs <~ "<?"
 		if .haschildcount(1)
 			fs <~ .first
@@ -215,7 +214,7 @@ helper message.XMLToJeeboxSub
 			self <~ arg.first
 		  else
 			self <~ arg
-	  elseif self == @xtxt
+	  elseif self == @xtxt or @xcdt
 		.func = @str
 	  elseif self == @xatt
 		.func = @item
