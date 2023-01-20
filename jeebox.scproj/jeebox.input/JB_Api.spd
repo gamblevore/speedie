@@ -137,11 +137,17 @@ class_api Message (msg)
 		description "Removes the node from the tree."
 
 		
-	api render (|string|)
+	api render (|int| mode, |string|)
 		.nil$
-		return .render
+		if mode & 1
+			rz = .render_jbin
+		  else
+			rz = .render
+		if mode & 2
+			rz = rz.compress
 		description "Renders the tree as a string!"
 
+	
 	
 	api ast (|string|)
 		.nil$
@@ -208,7 +214,15 @@ class_api String (string)
 	api length (|int|)
 		return .length
 		description "String length, in bytes. A nil-string is acceptable and gives 0 length."
+	
+	api compress (|string|)
+		return .compress
+		description "Compresses the string using the inbuilt 'mz' format."
 		
+	api decompress (|string|)
+		return .decompress
+		description "Deompresses the string using the inbuilt 'mz' format."
+	
 	api copy (|string|)
 		return .copy
 		description `Copies the string into a new string, which you can modify the contents as you like, before passing it to anything else. (Strings are meant to be "immutable" (their content doesn't change), but it's OK to modify it right after copying.`
@@ -251,14 +265,14 @@ api str (|cstring| Str, |int| Length, |_voidptr| Release, |_voidptr| Tag, |strin
 	if !str or length < 0
 		return "" // why not?
 	Length := str.length
-	return string.FromPtr(str, Length, Release, Tag)
+	return string.FromPtr(str|_voidptr|, Length, Release, Tag)
 
 	description "Creates a JBString from a c-string. Expects the c-string to remain unchanged until the JBString is freed. Length is optional. Can optionally pass a call-back to release your c-string, during freeing the JBString."
 
 
 api cstr (|cstring| Str, |string|)
 	if (str)
-		return string.FromPtr(str, str.length)
+		return string.FromPtr(str|_voidptr|, str.length)
 
 	description "Creates a JBString from a c-string. Expects the c-string to remain unchanged until the JBString is freed."
 
