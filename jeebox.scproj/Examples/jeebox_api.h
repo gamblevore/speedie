@@ -72,7 +72,7 @@ jbmessage* jb_msg_flatnext(jbmessage* self);
 jbmessage* jb_msg_flatafter(jbmessage* self);
 jbmessage* jb_msg_root(jbmessage* self);
 void jb_msg_remove(jbmessage* self); /* Removes the node from the tree. */
-jbstring* jb_msg_render(jbmessage* self);
+jbstring* jb_msg_render(jbmessage* self, int mode); /* Renders the tree as a string! */
 jbstring* jb_msg_ast(jbmessage* self);
 jbmessage* jb_msg_parseast(jbmessage* self);
 jbmessage* jb_msg_copy(jbmessage* self, jbmessage* layer);
@@ -92,6 +92,8 @@ jbstring* jb_syx_longname(jbsyntax self);
 
 _cstring jb_string_address(jbstring* self);
 int jb_string_length(jbstring* self);
+jbstring* jb_string_compress(jbstring* self);
+jbstring* jb_string_decompress(jbstring* self);
 jbstring* jb_string_copy(jbstring* self);
 jbmessage* jb_string_parse(jbstring* self, jbstring* path);
 jbstring* jb_string_escape(jbstring* self);

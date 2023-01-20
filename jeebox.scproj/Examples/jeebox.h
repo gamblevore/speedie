@@ -77,6 +77,8 @@ public:
     __nodebug int         length () const     {return jb_string_length(_self);}
     __nodebug String      copy () const       {return jb_string_copy(_self);}
     __nodebug String      escape () const     {return jb_string_escape(_self);}
+    __nodebug String      compress () const     {return jb_string_compress(_self);}
+    __nodebug String      decompress () const     {return jb_string_decompress(_self);}
 __nodebug void        fwrite (FILE* f) const  {std::fwrite(address(), length(), 1, f);}
     
 
@@ -146,7 +148,7 @@ __nodebug Message match(const Syntax& Type, const String& Name=(const char*)0) c
     __nodebug Message flatafter() const{return jb_msg_flatafter(_self);}
     __nodebug Message copy(const Message& l) const     {return jb_msg_copy(_self, l);}
     __nodebug Message copy() const     {return jb_msg_copy(_self, 0);}
-    __nodebug String  render() const   {return jb_msg_render(_self);}
+    __nodebug String  render(int Mode = 0) const   {return jb_msg_render(_self, Mode);}
     __nodebug Message root() const     {return jb_msg_root(_self);}
 __nodebug String  ast()const {return jb_msg_ast(_self);}
 __nodebug Message parseast()const{return jb_msg_parseast(_self);}
