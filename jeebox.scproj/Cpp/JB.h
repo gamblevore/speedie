@@ -354,6 +354,7 @@ JBClass ( JB_ErrorReceiver , JB_Object ,
 	int ProblemCount;
 	int WarnCount;
 	int ErrorsAreWarnings;
+	bool BlockErrors;
 	JB_String* Source;
 	JB_Object* LogObj;
 );
@@ -479,13 +480,13 @@ extern JB_String* JB__App_codesign_native;
 extern Array* JB__App_OldArgs;
 
 extern bool JB__App_Unregistered;
-#define kJB__ErrorColors_bold (JB_LUB[334])
+#define kJB__ErrorColors_bold (JB_LUB[348])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[335])
-#define kJB__ErrorColors_good (JB_LUB[336])
-#define kJB__ErrorColors_normal (JB_LUB[337])
-#define kJB__ErrorColors_underline (JB_LUB[336])
-#define kJB__ErrorColors_warn (JB_LUB[338])
+#define kJB__ErrorColors_error (JB_LUB[349])
+#define kJB__ErrorColors_good (JB_LUB[350])
+#define kJB__ErrorColors_normal (JB_LUB[351])
+#define kJB__ErrorColors_underline (JB_LUB[350])
+#define kJB__ErrorColors_warn (JB_LUB[352])
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -563,7 +564,7 @@ extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
 extern Dictionary* JB__SyxDict_;
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[339])
+#define kJB_SaverStart1 (JB_LUB[353])
 extern JB_ErrorReceiver* JB_StdErr;
 extern Syntax JB_SyxAcc;
 extern Syntax JB_SyxAdj;
@@ -1172,6 +1173,8 @@ int JB_ErrorSeverity__InitCode_();
 
 
 // float
+JB_String* JB_f_pc(float self, FastString* fs_in);
+
 float JB_f_powow(float self, int n);
 
 
@@ -1190,7 +1193,11 @@ int JB_int_OperatorMax(int self, int other);
 
 int JB_int_OperatorMin(int self, int other);
 
+JB_String* JB_int_operatorpc(int self, int x);
+
 IntRange JB_int_OperatorTo(int self, int other);
+
+JB_String* JB_int_RenderSize(int self, FastString* fs_in);
 
 int JB_int__max();
 
@@ -1201,6 +1208,12 @@ int JB_int__max();
 
 // int64
 double JB_int64_AsFloat(int64 self);
+
+JB_String* JB_int64_Render(int64 self, FastString* fs_in);
+
+void JB_int64_RenderSizePart(int64 self, FastString* fs, int Size, JB_String* Suff);
+
+JB_String* JB_int64_strsize(int64 self, FastString* fs_in);
 
 
 
@@ -1304,6 +1317,8 @@ bool JB_TC_IsFloat(DataTypeCode self);
 
 
 // Date
+double JB_Date_Seconds(Date self);
+
 Date JB_Date__New0();
 
 
@@ -1396,6 +1411,14 @@ void JB_ClassData_Restore(JB_Class* self);
 
 
 // JB_CompressionStats
+float JB_MzSt_durr(CompressionStats* self);
+
+void JB_MzSt_len(CompressionStats* self, int n);
+
+void JB_MzSt_liveupdate(CompressionStats* self, JB_String* s, int outt);
+
+JB_String* JB_MzSt_Render(CompressionStats* self, FastString* fs_in);
+
 int JB_MzSt__Init_();
 
 int JB_MzSt__InitCode_();
@@ -1731,6 +1754,8 @@ void JB_FS_AppendInt64(FastString* self, int64 data);
 
 void JB_FS_AppendInt32(FastString* self, int data);
 
+void JB_FS_AppendFloatAsText(FastString* self, float F);
+
 void JB_FS_SyntaxAppend(FastString* self, Message* msg);
 
 inline JB_String* JB_FS_SyntaxCast(FastString* self);
@@ -1825,7 +1850,17 @@ Array* JB_Str_ByteSplit(JB_String* self);
 
 CharSet* JB_Str_CharSetWithBool(JB_String* self, bool Range);
 
+Array* JB_Str_Chunk(JB_String* self, int n);
+
+JB_String* JB_Str_Compress(JB_String* self, CompressionStats* st);
+
+void JB_Str_CompressIntoSub(JB_String* self, FastString* j, CompressionStats* st);
+
 int JB_Str_Count(JB_String* self, byte b);
+
+JB_String* JB_Str_Decompress(JB_String* self, CompressionStats* st, int lim);
+
+bool JB_Str_DecompressSub(JB_String* self, CompressionStats* st, int lim, Message* j, FastString* fs);
 
 bool JB_Str_EndsWith(JB_String* self, JB_String* s, bool aware);
 
@@ -1842,6 +1877,8 @@ Ind JB_Str_Find(JB_String* self, CharSet* cs, int Start, int After);
 Ind JB_Str_HiddenJBin(JB_String* self);
 
 Ind JB_Str_InWhite(JB_String* self, int Start, int After);
+
+bool JB_Str_IsCompressed(JB_String* self);
 
 int JB_Str_IsHexLike(JB_String* self, int N);
 
@@ -2011,13 +2048,25 @@ int JB_File__InitCode_();
 // JB_JBin
 void JB_bin_add(FastString* self, Syntax type, JB_String* data, bool into);
 
+void JB_bin_addint(FastString* self, int64 data);
+
 void JB_bin_AddMemory(FastString* self, Syntax type, bool GoIn, byte* data, uint64 L);
 
+void JB_bin_CloseStream(FastString* self, int c);
+
+void JB_bin_Constructor0(FastString* self);
+
+void JB_bin_enter(FastString* self, Syntax type, JB_String* data);
+
 void JB_bin_jinit(FastString* self);
+
+int JB_bin_OpenStream(FastString* self);
 
 void JB_bin_sheb(FastString* self, JB_String* data);
 
 void JB_bin_up(FastString* self, int amount);
+
+FastString* JB_bin__New0();
 
 
 
@@ -2399,7 +2448,7 @@ Message* jb_msg_root(Message* self);
 
 void jb_msg_remove(Message* self);
 
-JB_String* jb_msg_render(Message* self);
+JB_String* jb_msg_render(Message* self, int mode);
 
 JB_String* jb_msg_ast(Message* self);
 
@@ -2422,6 +2471,10 @@ JB_String* jb_syx_longname(Syntax self);
 _cstring jb_string_address(JB_String* self);
 
 int jb_string_length(JB_String* self);
+
+JB_String* jb_string_compress(JB_String* self);
+
+JB_String* jb_string_decompress(JB_String* self);
 
 JB_String* jb_string_copy(JB_String* self);
 
