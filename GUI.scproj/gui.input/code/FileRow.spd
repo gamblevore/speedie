@@ -102,6 +102,9 @@ class FileRow (ListViewRow)
 		return .Location + .dirfile
 
 
+	helper IsAlsoDir (|file| f, |bool|)
+		return f.isdir == .asdir
+		
 	function TryReload (|fileviewer|fv)
 		require .asdir
 		|| f = .location.file
@@ -156,15 +159,17 @@ class FileRow (ListViewRow)
 		for s in self
 			found[s.name] = s
 
-		for c in dir
-			ifn (c[0] == '.') or (excl[c.ext])
-				|| f = found[c] 
-					found[c] = nil
+		for name in dir
+			|| ch = dir[name]
+			ifn (name[0] == '.') or (excl[name.ext])
+				|| f = found[name]
+				if f and f.IsAlsoDir(ch)
+					found[name] = nil
 					f.DoesntExist = false
 				  else
-					.addfile(dir.child(c), o)
+					.addfile(ch, o)
 		
-		for (lost in found)
+		for lost in found
 			.removefile(lost, o)
 		.filesort
 
