@@ -1529,20 +1529,19 @@ class TextView (GUIControl)
 			
 	
 	function Clear (|string| newtext, |bool| KeepStart=false)
-		if super.textset(newtext) or !newtext
-			if !keepstart
-				|| sel = (.text.length, 0)(.singleline) 
-				.TypingPlaceDirect((sel,sel))
-			.ScrollDrawTimer = 0
-			.TextAlteredForDraw |= 2 // this might not clear text?
-			if !Keepstart
-				.lines.clear
-				._Start = .addvline
-				._start.position = -1
-				.ShowNoExtra
-				// we aren't clearing anything if we undo?
-				// so when does it happen?
-				// just on draw?
+		require super.textset(newtext) or !newtext
+		if !keepstart
+			|| sel = (.text.length, 0)(.singleline) 
+			.TypingPlaceDirect((sel,sel))
+		
+		.ScrollDrawTimer = 0
+		.TextAlteredForDraw |= 2 // this might not clear text?
+
+		require !Keepstart
+		.lines.clear
+		._Start = .addvline
+		._start.position = -1
+		.ShowNoExtra
 
 	
 	helper AddVline (|textviewline|)
@@ -1743,7 +1742,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		for c in .lines
 			if c.after > value
-				._Start = c
+				.StartWithoutScrollDraw(c)
 				return
 		.scrolltoend
 

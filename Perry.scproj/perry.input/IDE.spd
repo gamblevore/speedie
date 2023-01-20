@@ -164,7 +164,7 @@ class PerryIDE (Window)
 
 	behaviour AppForeGroundChanged
 		.editme.document.checkmodified?
-		HideSomeStuffOnResize(self)
+		.PopupHide
 		.focus := .editme
 		//super.AppForegroundChanged(IsForeGround)
 	

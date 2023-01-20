@@ -204,6 +204,7 @@ function PerryIDE.PopupDisplayFadeInSub (|bool|)
 function PerryIDE.PopupHide
 	.PopupDateOn = 0
 	.PopupDisplay.text = ""
+	.lastextrainfo = nil
 	.PopupDisplay.visible = false
 	sdlapp.touch
 
@@ -290,7 +291,7 @@ function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |string| reason)
 	opt norefcounts
 	|| pop = .popupdisplay
 	if !M
-		(pop isnt visible)
+		.popuphide
 		.lastextrainfo = nil
 		return
 	require (M != .lastextrainfo) or (pop isnt visible)
