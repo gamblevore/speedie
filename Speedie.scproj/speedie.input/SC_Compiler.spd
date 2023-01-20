@@ -582,7 +582,6 @@ function InitCompiler
 	.TimerOutput <~ "\n"
 
 	.ImportedNames = Dictionary.new      // stop projects imported twice.
-	//.FilesImported = dictionary.new
 	.CurrStage = 1
 
 	.stReachedClass = 0
@@ -987,24 +986,34 @@ function AddSCProj (|string| Path, |string|)
 
 function FindProjNoSuffix (|string| Path, |string|)
 	|| spd = path + ".spd"
-	if (spd.fileexists)
+	if spd.FileExists
 		return spd
 	return path + ".scproj"
 
 
-function FindProject (|string|Path, |File|)
+function FindProject (|string| Path, |bool| error, |File|)
+	|| p = .BaseProjectPath.parent
+	|| B = .FindProjectSub(p, path)
+		return B
+	|| A = .FindProjectSub(.projects, path)
+		return A
+
+	
+helper FindProjectSub (|string| base, |string| Path, |File|)
 	if (Path[0] == '/')
-		return Path.File
+		return Path.ExistingFile
 	
 	|| First = Path
 	|| SlashPos = Path.find('/')
 		First = Path[0, SlashPos]
 	first = .AddSCProj(first)
 	
-	if (SlashPos)
+	if SlashPos
 		First = First + Path[SlashPos...]
 
-	return .Projects.filech(First)
+	rz = base.FileCh(First)
+	if !rz.Exists
+		rz = nil
 }
 
 

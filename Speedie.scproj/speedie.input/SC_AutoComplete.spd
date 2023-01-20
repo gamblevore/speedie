@@ -630,7 +630,7 @@ function TmpAutoComplete (|message| f, |string| name, |string| type, |message|)
 function JumpImport (|message| cmd, |message|)
 	|| arg = cmd[@arg]
 	|| f = arg[0]
-		|| proj = Compiler.FindProject(f.name)
+		|| proj = Compiler.FindProject(f.name, false)
 		if proj.exists
 			rz = @tmp + "define"
 			rz <~ (@sstr, proj.path)

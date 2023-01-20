@@ -42,8 +42,7 @@ class SCImport
 		
 	function ImportMsg (|Message| j)
 		|| Name = J[@str, -1]$.name
-		|| P	= Compiler.FindProject(Name)
-		expect  (P.Exists)   ( J, "Can’t find project at: '${P.Path}' for import: '$Name'" )
+		|| P	= Compiler.FindProject(Name, true) #expect ( J, "Can’t find import: '$name'" )
 
 		SCImport.Importpath( name, P, .Depth + 1 )
 	
