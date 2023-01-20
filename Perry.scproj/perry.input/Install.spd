@@ -267,11 +267,6 @@ extend_module perry
 		if !uploadable
 			|| perry = dir[".perry"]
 			require perry.exists
-			|| up = dir[".upload"] 
-			if !up.exists
-				|| oof = perry.parse
-				require (oof == "uploadable") or oof.find("uploadable")
-				up.data = "true\n"
 		
 		for c.files in dir
 			if .CanGenerate(c)
