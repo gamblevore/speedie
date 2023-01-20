@@ -37,9 +37,12 @@ Becoming a contributor could be a great way to add programming concepts to a new
 * Simple but powerful syntax.
 * Can make command-line apps or GUI apps.
 * IPC lets you communicate and spread work across multiple processes.
-* Has a native IDE (Perry), written specifically for Speedie. 
-* Competitive at multiple purposes. Good at fast and heavy-duty data-processing... or just making little tools with few lines of code... or writing large well-structured programs that deal with a lot of complexity.
-* You might appreciate my IDE's design?
+* Has a native IDE (Perry), written specifically for Speedie.You might appreciate the IDE's simplicity.
+* Use one language, thats great at multiple areas:
+    * Fast and heavy-duty data-processing
+    * making tools with few lines of code
+    * Writing large well-structured programs
+    * Cross-platform code, even with GUI.
 
 
 # Power Features #
