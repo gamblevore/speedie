@@ -95,7 +95,10 @@ ${comp(`test`)}
 ${comp(`users`)}
 
 echo \"\"
-echo \"Build Complete. Also built some example .cpp files in $BuildFol\"
+echo \"Build Complete.\"
+
+echo \"Speedie Compiling Perry\"
+$SpdTerm $Speedie/Perry.scproj
 "
 
 

@@ -29,4 +29,7 @@ echo "Compiling users.cpp"
 g++ -o Build/users  -std=gnu++17 -stdlib=libc++ -m64 -L/usr/local/lib/ -I /usr/local/include -I /usr/local/speedie/Library/CppLib -w -Wno-return-type-c-linkage -lc++ -Os -ffast-math -flto -mtune=native -D TARGET_UNIX=1 -D __SPEEDIE__=1 -g -ljeebox  users.cpp
 
 echo ""
-echo "Build Complete. Also built some example .cpp files in /usr/local/speedie/jeebox.scproj/Examples/Build"
+echo "Build Complete."
+
+echo "Speedie Compiling Perry"
+/usr/local/speedie/Terminal/Speedie /usr/local/speedie/Perry.scproj
