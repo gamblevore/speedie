@@ -83,7 +83,6 @@ class PerryIDE (Window)
 		]
 		rz = path.path_expand(d) #expect ("Unrecognised @ in: " + path)
 		rz = rz.resolve
-		if !rz
 
 
 	function GetBuildFile (|file|) 
@@ -167,7 +166,7 @@ class PerryIDE (Window)
 		.editme.document.checkmodified?
 		HideSomeStuffOnResize(self)
 		.focus := .editme
-		super.AppForegroundChanged(IsForeGround)
+		//super.AppForegroundChanged(IsForeGround)
 	
 	
 	behaviour PostLoad
