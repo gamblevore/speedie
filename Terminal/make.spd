@@ -98,7 +98,7 @@ echo \"\"
 echo \"Build Complete.\"
 
 echo \"Speedie Compiling Perry\"
-$SpdTerm $Speedie/Perry.scproj
+sudo -u \$(logname) $SpdTerm $Speedie/Perry.scproj
 "
 
 
