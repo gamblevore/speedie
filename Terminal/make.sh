@@ -32,4 +32,4 @@ echo ""
 echo "Build Complete."
 
 echo "Speedie Compiling Perry"
-/usr/local/speedie/Terminal/Speedie /usr/local/speedie/Perry.scproj
+sudo -u $(logname) /usr/local/speedie/Terminal/Speedie /usr/local/speedie/Perry.scproj
