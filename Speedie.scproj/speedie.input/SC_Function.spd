@@ -1180,11 +1180,11 @@ function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |
 	»
 	
 	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface )
-	|| clss = modul.Cls
-	clss.IsBuiltin = false // datatype sets it to true.
-	clss.FuncProto = f
-	f.ProtoType = clss
-	Compiler.ProtoTypes <~ f
+		|| clss = modul.Cls
+		clss.IsBuiltin = false // datatype sets it to true.
+		clss.FuncProto = f
+		f.ProtoType = clss
+		Compiler.ProtoTypes <~ f
 	
 	Return Modul
 
