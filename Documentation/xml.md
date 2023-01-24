@@ -74,7 +74,7 @@ OK, lets try this above example in jeebox. I can't resist talking about jeebox a
         
 Much cleaner!
 
-Jeebox is really a very pure and true format that has almost no downsides... apart from low-users.
+Jeebox is really a very pure and true format that has almost no downsides... apart from low-users. (But you can change that by using Jeebox and promoting it.)
 
 Lets go through all the problems with XML or JSON.
 
