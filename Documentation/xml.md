@@ -88,7 +88,7 @@ I mean it looks good. No close-tags, and using white-space for indentation makes
 #### Simplicity
 Jeebox doesn't have name-spaces, doctypes, dtds or processing-instructions, or file-entities. Neither SOAP, XSLT or XPath.
 
-Jeebox doesn't have and doesn't need something like a DTD. Code is code. The best way to validate a document is with the app that created it. Jeebox works with the philosophy, that what people really want, is code, good simple code. Because all systems seem to emmigrate in that direction anyhow. Schema is a full programming-language, computer-games end up adding script-languages, data-bases end up adding "triggers", and websites added javascript.
+Jeebox doesn't have and doesn't need something like a DTD. Code is code. The best way to validate a document is with the app that created it. Jeebox works with the philosophy, that what people really want, is code, good simple code. Because all systems seem to emmigrate in that direction anyhow. Schema is a full programming-language, computer-games end up adding scripts, databases end up adding "triggers", and websites added javascript. If we really needed a validation for a Jeebox-based format, it would have to be a program.
 
 Jeebox's API has a simple system where the code that validates the code is the same code that reads it.
 
