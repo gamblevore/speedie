@@ -158,8 +158,8 @@ Lets do it the "real" JSON way.
     {
       "userlist": [
           {"user": 12355},
-          {"uwser": 12345},
-          {"uswer": 12365}
+          {"user": 12345},
+          {"user": 12365}
       ]
     }
 
