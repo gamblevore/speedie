@@ -303,9 +303,11 @@ class FileViewer (ListView)
 	
 
 	helper message.ExtractRecent (|message| into)
+		opt norefcounts
 		for s in self
-			if s|error|.when
-				into <~ s
+			if s isa error
+				if s.when
+					into <~ s
 		
 	
 	helper BatchFindSub (|string| str, |message| all)
