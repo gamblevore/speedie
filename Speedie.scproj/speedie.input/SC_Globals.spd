@@ -838,11 +838,15 @@ function ArrayInOrderCheck (|int| InOrder, |message| msg, |int|)
 
 
 function TypeOfArr (ExprResolver)
+	|int| IsDispatch = (exp ~= "dispatch")|int|
+		//if (name_space isa scmodule)
+			//expect !name_Space.cls (exp, "This can't go here.")
+// seems to work for scfunction's "dispatch TemporalStatements"?
+// i wonder why it fails elsewhere.
+		
+	|| InOrder = 0
 	|| result = SCDecl.new
 	exp.obj = result
-	|| InOrder = 0
-	|int| IsDispatch = (exp ~= "dispatch")|int|
-		
 		
 	for (itm in exp)
 		|| NewArrCls = TypeArray
