@@ -282,11 +282,6 @@ typedef bool (*__Message_textset__)(Message* self, int i, JB_String* v);
 //// HEADER Proj.h
 
 struct CompressionStats {
-	Date Duration;
-	int In;
-	int LastOut;
-	int Out;
-	bool Live;
 };
 
 struct ObjectLoader {
@@ -480,13 +475,13 @@ extern JB_String* JB__App_codesign_native;
 extern Array* JB__App_OldArgs;
 
 extern bool JB__App_Unregistered;
-#define kJB__ErrorColors_bold (JB_LUB[348])
+#define kJB__ErrorColors_bold (JB_LUB[338])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[349])
-#define kJB__ErrorColors_good (JB_LUB[350])
-#define kJB__ErrorColors_normal (JB_LUB[351])
-#define kJB__ErrorColors_underline (JB_LUB[350])
-#define kJB__ErrorColors_warn (JB_LUB[352])
+#define kJB__ErrorColors_error (JB_LUB[339])
+#define kJB__ErrorColors_good (JB_LUB[340])
+#define kJB__ErrorColors_normal (JB_LUB[341])
+#define kJB__ErrorColors_underline (JB_LUB[340])
+#define kJB__ErrorColors_warn (JB_LUB[342])
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -564,7 +559,7 @@ extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
 extern Dictionary* JB__SyxDict_;
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[353])
+#define kJB_SaverStart1 (JB_LUB[343])
 extern JB_ErrorReceiver* JB_StdErr;
 extern Syntax JB_SyxAcc;
 extern Syntax JB_SyxAdj;
@@ -733,7 +728,6 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__MsgUIFlags_LargestFlag (0)
 #define kJB__MsgUIFlags_Reserved (4096)
 #define kJB__MsgUIFlags_Style2 (16384)
-extern CompressionStats JB__MzSt_All;
 extern Dictionary* JB__LD_ClassList;
 #define kJB__Saver_RefMark (1073741824)
 extern SaverClassInfo* JB__Saver_SaveableList;
@@ -1173,8 +1167,6 @@ int JB_ErrorSeverity__InitCode_();
 
 
 // float
-JB_String* JB_f_pc(float self, FastString* fs_in);
-
 float JB_f_powow(float self, int n);
 
 
@@ -1193,11 +1185,7 @@ int JB_int_OperatorMax(int self, int other);
 
 int JB_int_OperatorMin(int self, int other);
 
-JB_String* JB_int_operatorpc(int self, int x);
-
 IntRange JB_int_OperatorTo(int self, int other);
-
-JB_String* JB_int_RenderSize(int self, FastString* fs_in);
 
 int JB_int__max();
 
@@ -1210,10 +1198,6 @@ int JB_int__max();
 double JB_int64_AsFloat(int64 self);
 
 JB_String* JB_int64_Render(int64 self, FastString* fs_in);
-
-void JB_int64_RenderSizePart(int64 self, FastString* fs, int Size, JB_String* Suff);
-
-JB_String* JB_int64_strsize(int64 self, FastString* fs_in);
 
 
 
@@ -1317,8 +1301,6 @@ bool JB_TC_IsFloat(DataTypeCode self);
 
 
 // Date
-double JB_Date_Seconds(Date self);
-
 Date JB_Date__New0();
 
 
@@ -1411,17 +1393,11 @@ void JB_ClassData_Restore(JB_Class* self);
 
 
 // JB_CompressionStats
-float JB_MzSt_durr(CompressionStats* self);
-
 void JB_MzSt_len(CompressionStats* self, int n);
 
 void JB_MzSt_liveupdate(CompressionStats* self, JB_String* s, int outt);
 
-JB_String* JB_MzSt_Render(CompressionStats* self, FastString* fs_in);
-
-int JB_MzSt__Init_();
-
-int JB_MzSt__InitCode_();
+CompressionStats* JB_MzSt__all();
 
 
 
@@ -1753,8 +1729,6 @@ void JB_FS_AppendFastString(FastString* self, FastString* fs);
 void JB_FS_AppendInt64(FastString* self, int64 data);
 
 void JB_FS_AppendInt32(FastString* self, int data);
-
-void JB_FS_AppendFloatAsText(FastString* self, float F);
 
 void JB_FS_SyntaxAppend(FastString* self, Message* msg);
 
