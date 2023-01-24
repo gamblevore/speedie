@@ -150,13 +150,13 @@ self-documenting form:
 You are free to choose which makes the most sense for your program.
 
 #### Trees not dictionaries
-Unlike JSON, Jeebox uses a tree-model. That means, you can easily express an array of named items with the same name. JSON doesn't allow this, not in an easy way.
+Unlike JSON, Jeebox uses a tree-model. That means, you can easily express an array of named items with the same name. JSON doesn't allow named-trees, because JSON doesn't allow multiple same-key names.
 
     {
       "userlist: {
           "user": 12355,
-          "user": 12345, // invalid!
-          "user": 12365 // actually json doesn't allow comments either. But jeebox does
+          "user": 12355, // invalid! dupliate key!
+          "user": 12355 // actually json doesn't allow comments either. But jeebox does
       }
     }
 
