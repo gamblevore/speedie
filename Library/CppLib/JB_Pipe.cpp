@@ -149,14 +149,22 @@ int JB_Pipe__Ignore (int Signal) {
 const char* ArrayCStrOne_(JB_String* S, int& ugh) {
 	if (!JB_Str_Length(S)) {return "";}
 	if (JB_Str_IsC(S)) return (const char*)JB_Str_Address(S);
-	debugger;
 	JB_ErrorHandleFile(S, nil, EINVAL, "Speedie string not zero-terminated", "Executing shell-command");
 	ugh = EINVAL;
 	return 0;
 }
 
+void JB_Str__Terminate(Array* strs) {
+	int n = JB_Array_Size(strs);
+	for_(n) {
+		JB_String* A = (JB_String*)JB_Array_Value(strs, i);
+		JB_Array_ValueSet(strs, i, JB_Str_MakeC(A));
+	};
+}
+
 
 int JB_ArrayPrepare_(JB_String* self, const char** argv, Array* R) {
+	JB_Str__Terminate(R);
 	errno	= 0;
 	int Err = 0;
 	auto last = argv + MaxArgs-1;
