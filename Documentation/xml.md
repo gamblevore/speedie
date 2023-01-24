@@ -5,19 +5,19 @@ OK, for preface, I don't think XML actually sucks. But I'd rather not use it if 
 
 That said, a lot of people have had complaints about XML, so lets list them, and also talk about JSON too. Which is quite similar but fundamentally different.
 
-    *“Most xml i’ve seen makes me think i’m dyslexic. it also looks constipated, and two health problems in one standard is just too much.”* – Charles Forsyth on 9fans
-    
-    *“Some part of me desperately wants to believe that XML-RPC is some kind of elaborate joke, like a cross between Discordianism and IP Over Avian Carriers.”* – Ex-Cyber on #plan9
-    
-    *“Any damn fool could produce a better data format than XML”* – James Clark 2007-04-06*
-    
-    *“XML is simply lisp done wrong.”* – Alan Cox
-    
-    *“XML is like violence. Sure, it seems like a quick and easy solution at first, but then it spirals out of control into utter chaos.”* – Sarkos in reddit
-    
-    *“XML is a classic political compromise: it balances the needs of man and machine by being equally unreadable to both.”* – Matthew Might
-    
-    *XSLT is a failure wrapped in pain. There’s no job for which XSLT is the right tool. If you think you found a job for which XSLT is a good tool, chances are the job itself is fucked up.* – masklinn
+*“Most xml i’ve seen makes me think i’m dyslexic. it also looks constipated, and two health problems in one standard is just too much.”* – Charles Forsyth on 9fans
+
+*“Some part of me desperately wants to believe that XML-RPC is some kind of elaborate joke, like a cross between Discordianism and IP Over Avian Carriers.”* – Ex-Cyber on #plan9
+
+*“Any damn fool could produce a better data format than XML”* – James Clark 2007-04-06*
+
+*“XML is simply lisp done wrong.”* – Alan Cox
+
+*“XML is like violence. Sure, it seems like a quick and easy solution at first, but then it spirals out of control into utter chaos.”* – Sarkos in reddit
+
+*“XML is a classic political compromise: it balances the needs of man and machine by being equally unreadable to both.”* – Matthew Might
+
+*XSLT is a failure wrapped in pain. There’s no job for which XSLT is the right tool. If you think you found a job for which XSLT is a good tool, chances are the job itself is fucked up.* – masklinn
 
 OK well thats very funny... so lets look at a common list of reasons... why people aren't fans of XML.
 
