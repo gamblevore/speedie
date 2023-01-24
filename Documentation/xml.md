@@ -119,7 +119,7 @@ Additionally, Jeebox has two forms. A textual-form and a binary-form named 'jbin
 
 In C++ it is done like this:
 
-    auto data = document.render(1) // I'll add a proper named constant later. 1 means "render as jbin".
+    auto data = document.render_jbin();
 
 
 #### Lack of Legacy
