@@ -51,6 +51,20 @@ Module MZLab
 		return true
 		
 
+target minilib {
+struct CompressionStats
+	linkage:cpp_part MzSt
+	function start
+	function end
+	function len (|int| n)
+	function liveupdate (|string| s, |int| outt)
+	function durr (|float|)
+	function render (|string|)
+	module
+		function all (|&compressionstats|)
+		function New (|compressionstats|)
+
+} else {
 struct CompressionStats
 	linkage:cpp_part MzSt
 	|date| Duration
@@ -88,7 +102,7 @@ struct CompressionStats
 		|compressionstats| All // noice
 		function New (|compressionstats|)
 			rz.live = true
-
+}
 
 helper BTWSorter_64K (|string| text, |&int| ap, |&int| bp, |int|)
 	|| a		= *ap
