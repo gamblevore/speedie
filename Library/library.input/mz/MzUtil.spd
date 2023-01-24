@@ -13,7 +13,7 @@ extend string
 		return j
 	
 	function CompressInto (|string| path, |&compressionstats| st=nil)
-		.compressintosub(path.file.writer, st)
+		.CompressIntoSub(path.file.writer, st)
 	
 	function IsCompressed (|bool|)
 		return .isjbin and self[2, "C\06µz"]
