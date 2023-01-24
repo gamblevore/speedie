@@ -94,7 +94,7 @@ Jeebox's API has a simple system where the code that validates the code is the s
 
 
 #### Regularity
-Jeebox has a 100% simple model. It's tree is made out of nodes (the `message` class), each node is interchangeable with any other, no difference between text or container nodes. Each node has only two things that define it, a type and a name. By changing the type and the name, you change how the document.
+Jeebox has a 100% simple model. It's tree is made out of nodes (the `message` class), each node is interchangeable with any other, no difference between text or container nodes. Each node has only two things that define it, a type and a name. By changing the type and the name, you change how the document looks.
 
 #### Powerful strings
 Text like: `if "a" < "b"`, is very simple to express in jeebox.
@@ -104,7 +104,7 @@ Text like: `if "a" < "b"`, is very simple to express in jeebox.
 there... done. We just use backticks in this case, although we have about 6 different string-types in Jeebox. Very flexible.
 
 #### Encoding Binary Strings is easy
-Depending on how you want to encode them, there are a few ways. We can do the C-string-like approach for text that is mostly UTF-8 but contains a little-binary.
+Depending on how you want to encode them, there are a few ways. We can escape bytes like in C, for text is mostly UTF-8 but contains a little-binary.
 
     data "hello here is a \1b[0;1mbold styling" // using command-line terminal styling.
 
