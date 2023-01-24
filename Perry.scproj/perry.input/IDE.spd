@@ -389,8 +389,6 @@ class PerryIDE (Window)
 
 	behaviour keydown
 		if key iscmd keys.f
-			if !.editme.hasfocus  and  .filelist is visible
-				return .FindInSubFolder
 			if .masssearchfield.hasfocus
 				if .PrevView
 					.PrevView.Click
