@@ -99,9 +99,9 @@ Jeebox has a 100% simple model. It's tree is made out of nodes (the `message` cl
 #### Powerful strings
 Text like: `if "a" < "b"`, is very simple to express in jeebox.
 
-    code_sample `if "a" < "b"`
+    `if "a" < "b"`
 
-there... done. We just use backticks in this case, although we have about 6 different string-types in Jeebox. Very flexible.
+there... done. We just use backticks in this case, although we have 5 different string-types in Jeebox. Very flexible.
 
 
 #### Only one Encoding
@@ -111,11 +111,11 @@ Jeebox is stored as UTF-8. That's it.
 #### Encoding Binary Strings is easy
 Depending on how you want to encode them, there are a few ways. For mostly UTF-8 text containing a little binary, we can escape bytes.
 
-    data "hello here is a \1b[0;1mbold styling" // \1b[0;1m is the "bold" signal to command-line terminals
+    "hello here is a \1b[0;1mbold styling" // \1b[0;1m is the "bold" signal to command-line terminals
 
 Or if what you have is really "binary-like", you can use the binary string.
 
-    data #(6da7494de9243de7)#
+    #(6da7494de9243de7)#
     
 Additionally, we have "sister format" to Jeebox called "jbin". Jbin does everything jeebox does, except it is stored as binary. The C++ code to parse jbin takes about 35 lines of code, its a very small and fast format. Yes, you can now store jpegs or other pictures/music directly in a Jeebox file with no encoding-overhead, or hexing needed. This is done in speedie via like this:
 
@@ -182,7 +182,9 @@ Perfect!
 Do you need a dictionary anyhow? Where keys can contain any byte? Easy:
 
     dict
-        +"key-_)1(*&^" "Value"
+        +"/key/is/actually/a/file-path.txt" "Value"
+
+This is useful for file-paths
 
 #### Not Fiddly
 JSON is notoriously fiddly. Extra or missing "," mess everything up. Jeebox doesn't care. You don't need any ",", but they are treated as lines, so you can add them if you want.
