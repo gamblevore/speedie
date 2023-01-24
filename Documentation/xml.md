@@ -53,11 +53,9 @@ Well.. you can't. I mean... often you can, and you should be able to. The proble
         <string>Boulder Road</string>
     </dict>
 
-Which is just awful. Unreadable, and bloated. JSON is better at this, because keys have string names.
+Which is just awful. Unreadable, and bloated. JSON is better at this, because keys have string names. What about JSON then? Is that the ultimate format?
 
-What about JSON then? Is that the ultimate format?
-
-Well... better in some ways and worse in others. It is quite unwieldy and hard to read! Very easy to miss a closing [] or {} thing. JSON is better at making dictionaries, but not perfect either.
+Well... JSON is better in some ways and worse in others. JSON is quite unwieldy and hard to read! Very easy to miss a "," or closing [] or {} thing. JSON is better at making dictionaries, but not perfect either.
 
 Here is an example of how trying to use JSON for "xml-like tasks" becomes unreadable:
 
@@ -163,6 +161,11 @@ It's just ugly and fiddly. Now lets see it in Jeebox
           user 12365
 
 Perfect!
+
+Do you need a dictionary anyhow? Where keys can contain any byte? Easy:
+
+    dict
+        +"key-_)1(*&^" "Value"
 
 #### Not Fiddly
 JSON is notoriously fiddly. Extra or missing "," mess everything up. Jeebox doesn't care. You don't need any ",", but they are treated as lines, so you can add them if you want.
