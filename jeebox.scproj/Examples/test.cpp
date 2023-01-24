@@ -38,14 +38,17 @@ void ExampleOfBadJeebox (String S) {
 
 void ExampleOfModifyingJeebox (String S) { 
     Message M = S.parse();
+    Syntax Arg = M.type();
+    if (Arg != $arg) {
+		msg("Error in parse");
+    }
     M.render().printline();
     // two different ways to add to a tree.
     // 1) through parsing, 2) syntactically 
 
                 // Add "%close the~book", through parsing.
     Message M2 = String("%close the~book").parse();
-    M.append(M2.first()); // parsing returns the lines wrapped in an $arg
-                          // so the first (only) line (%close the~book) is the first (only) child.
+    M.append(M2);
 
 
     msg("you know what? We parsed something, but...", 0, 0);
@@ -56,7 +59,8 @@ void ExampleOfModifyingJeebox (String S) {
     auto Adj = Added.create($adj);
     Adj.create($thg, "the");
     Adj.create($thg, "store");
-    Adj.last().name("door");
+    auto Last = Adj.last();
+    Last.name("door");
     
     
                 // Modify the name and syntax of a message
@@ -108,8 +112,8 @@ int main(int argc, const char * argv[]) {
     ExampleOfBadJeebox("|| (a,+a");
     
     msg("let's look at jeebox parsing something like English", 0, 2);
-    ExampleOfModifyingJeebox("because @Fred snapped his~fingers");
-    ExampleOfModifyingJeebox2("hello @SpongeBob");
+    ExampleOfModifyingJeebox("\nbecause @Fred snapped his~fingers\n");
+    ExampleOfModifyingJeebox2("hello @SpongeBob\n");
     
     return jb_shutdown();
 }
