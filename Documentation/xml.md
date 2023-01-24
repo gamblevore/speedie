@@ -104,7 +104,7 @@ Text like: `if "a" < "b"`, is very simple to express in jeebox.
 there... done. We just use backticks in this case, although we have about 6 different string-types in Jeebox. Very flexible.
 
 #### Encoding Binary Strings is easy
-Depending on how you want to encode them, there are a few ways. We can escape bytes like in C, for text is mostly UTF-8 but contains a little-binary.
+Depending on how you want to encode them, there are a few ways. For mostly UTF-8 text containing a little binary, we can escape bytes.
 
     data "hello here is a \1b[0;1mbold styling" // \1b[0;1m is the "bold" signal to command-line terminals
 
