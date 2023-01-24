@@ -103,6 +103,11 @@ Text like: `if "a" < "b"`, is very simple to express in jeebox.
 
 there... done. We just use backticks in this case, although we have about 6 different string-types in Jeebox. Very flexible.
 
+
+####Only one Encoding
+
+Jeebox is stored as UTF-8. That's it.
+
 #### Encoding Binary Strings is easy
 Depending on how you want to encode them, there are a few ways. For mostly UTF-8 text containing a little binary, we can escape bytes.
 
