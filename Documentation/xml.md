@@ -155,8 +155,8 @@ Unlike JSON, Jeebox uses a tree-model. That means, you can easily express an arr
     {
       "userlist: {
           "user": 12355,
-          "user": 12355, // invalid! dupliate key!
-          "user": 12355 // actually json doesn't allow comments either. But jeebox does
+          "user": 12345, // invalid! duplicate key "user"!
+          "user": 12365 // actually json doesn't allow comments either. But jeebox does
       }
     }
 
