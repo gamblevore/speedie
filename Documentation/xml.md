@@ -209,9 +209,9 @@ Do you hate white-space for tree-nesting? Well, lets say you do, jeebox actually
             c
     
     a {
-        b {
-            c
-        }
+    b {
+    c
+    }
     }
 
 Same thing... I am keeping the `{}` support there simply to make it easier to convert many old formats to Jeebox. But white-space haters might appreciate me keeping it too.
