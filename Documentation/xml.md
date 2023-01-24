@@ -104,7 +104,7 @@ Text like: `if "a" < "b"`, is very simple to express in jeebox.
 there... done. We just use backticks in this case, although we have about 6 different string-types in Jeebox. Very flexible.
 
 
-####Only one Encoding
+#### Only one Encoding
 
 Jeebox is stored as UTF-8. That's it.
 
