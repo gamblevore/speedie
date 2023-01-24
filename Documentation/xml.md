@@ -111,6 +111,16 @@ Depending on how you want to encode them, there are a few ways. We can do the C-
 Or if what you have is really "binary-like", you can use the binary string.
 
     data #(6da7494de9243de7)#
+    
+Additionally, Jeebox has two forms. A textual-form and a binary-form named 'jbin'. Yes, you can now store jpegs or other pictures/music directly in a Jeebox file with no encoding-overhead, or hexing needed. This is done in speedie via like this:
+
+    || myfile = "~/Desktop/doc.jbin"
+    myfile <~ document.render_jbin
+
+In C++ it is done like this:
+
+    auto data = document.render(1) // I'll add a proper named constant later. 1 means "render as jbin".
+
 
 #### Lack of Legacy
 Jeebox is modern language. It has no baggage!
