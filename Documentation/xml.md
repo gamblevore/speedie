@@ -125,6 +125,8 @@ Additionally, we have "sister format" to Jeebox called "jbin". Jbin does everyth
 In C++ it is done like this:
 
     auto data = document.render_jbin();
+    
+JeeboxLib will actually "just parse" a jbin file or a jeebox file, as-is. No need to convert it. You are free to store your files in either way.
 
 
 #### Lack of Legacy
