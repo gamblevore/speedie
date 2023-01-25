@@ -3,7 +3,8 @@
 ## Technical Qualities: Object Oriented, Simple, Fast, Nice-Looking, Non-Infantilising ##
 
 * by Theodore H. Smith - Released on NYE, 31/12/2022.
-* Contact: `theo@elfdata.com`
+* Contact: `theo@jeebox.org`
+* Forum: [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 
 Speedie is the compiler that I have created Jeebox in and is also built ontop of Jeebox. This proves that Jeebox can be used to write programming languages.
 
