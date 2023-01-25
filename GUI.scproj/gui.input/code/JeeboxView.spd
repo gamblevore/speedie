@@ -1,0 +1,60 @@
+
+
+class MessageView (ListView)
+	linkage
+		cpp_part JBV
+    
+	constructor (|guicontrol| p, |GUIListEvent| sel, |GUIListEvent| ret)
+		super.constructor(p, sel, ret)
+		.MultiSelection 	= true
+		.onrightclick		= RightClickJeeboxView
+		.ondrawrow			= InsideJeeboxViewRowDraw
+		.tryeditcell		= JeeboxViewRenamer
+		.IsTree	= true
+		.NoSeps	= true
+		.EnableDrag	
+
+	behaviour MouseDown
+	
+	
+	behaviour keydown
+		if key is delete
+			|| r = .sel
+			return true
+		rz = super.keydown(key)
+
+	
+	
+	module
+		function JeeboxViewRenamer (guilisteditevent)
+			|| o = cell.original
+			if o isa filerow
+				if o.moveto(value)
+					return true
+
+
+		function RightClickJeeboxView (GuiListevent)
+			|| fl = .tag
+			if row and fl isa fileviewer
+				|| f = row.obj
+				if f isa filerow
+					.select(f)
+				fl.hideopenlist
+			
+
+		function InsideJeeboxViewRowDraw (ListViewRowDraw)
+			opt norefcounts
+			if self isa filerow
+				|| z	= parent.lastrect
+				|| d	= ._Document
+				|| sh	= font.width*2
+				|| v	= (6 + .depth(parent)*sh, texty)
+				|| mod	= d.ismodified?
+				|| ddd	= (Colors.black(0.5), Colors.clear)(mod)
+				font.small.drawicon(.Modifier, where, V, ddd)
+
+				if .HasError
+					v.x = z.x2-sh
+					font.small.drawicon('\17', where, V) // not sure???
+				return (sh, 0)
+
