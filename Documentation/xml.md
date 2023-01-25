@@ -33,7 +33,7 @@ OK well thats very funny... so lets look at a common list of reasons... why peop
 * CData is ugly: `<escape/> me >_<` -> `<![CDATA[<escape/>]]> me <![CDATA[>_<]]>`
 * XML is historically a markup language. Even if it can be used for general data-storage, it carries the baggage of being a markup language.
     * White-space rules suck: They are so bad that no one follows them. Merge multiple-whitespace? Does indentation count as part of the text? What about leading/trailing white-space? "Depends". Most parsers give multiple options, so you can choose which way that your particular program needs.
-    * XML is rarely self-documenting (IE, you can understand the document) for complex formats. But also quite often a simple list of data is better, where the meaning of the items is inferred by it's position in the list.
+    * XML is rarely self-documenting (IE, you can understand the document) for complex formats. But also quite often a simple list of data is better, where the meaning of the items is inferred by it's position in the list. Imposing verbose self-documentation on something that can't benefit from it, is just wasteful.
 
 ## Dictionaries
 
