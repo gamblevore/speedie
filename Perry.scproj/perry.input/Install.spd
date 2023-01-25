@@ -259,22 +259,18 @@ extend_module perry
 
 	function GenerateAllDir (|FileArchive| f, |file| dir)
 		for c.files in dir
-			if .cangenerate(c) and !.GenerateDir(f, c, false)
-				printline "Skipping personal project: " + c
+			if .CanGenerate(c) and dir.child(".perry").exists
+				.GenerateDir(f, c)
 
 
-	function GenerateDir (|FileArchive| f, |file| dir, |bool| root, |bool|)
-		if !root
-			|| perry = dir[".perry"]
-			require perry.exists
-		
+	function GenerateDir (|FileArchive| f, |file| dir)
 		for c.files in dir
-			if .CanGenerate(c)
-				if c.isdir
-					.GenerateDir(f, c, true)
-				  else
-					f <~ c		
-		return true
+			if !.CanGenerate(c)	
+				//
+			  elseif c.isdir
+				.GenerateDir(f, c)
+			  else
+				f <~ c
 
 
 	function SetupLinks (|file|f, |string|)
