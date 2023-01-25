@@ -263,8 +263,8 @@ extend_module perry
 				printline "Skipping personal project: " + c
 
 
-	function GenerateDir (|FileArchive| f, |file| dir, |bool| uploadable, |bool|)
-		if !uploadable
+	function GenerateDir (|FileArchive| f, |file| dir, |bool| root, |bool|)
+		if !root
 			|| perry = dir[".perry"]
 			require perry.exists
 		
