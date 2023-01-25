@@ -16,7 +16,7 @@ xcuserdata/
 #Terminal
 /Terminal/Backup/
 /Terminal/Debug/
-/Terminal/Speedie
+/Terminal/Speedie*
 /Terminal/Build*
 /Terminal/*.sh
 *.scproj/Cpp/
