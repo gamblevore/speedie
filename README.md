@@ -2,9 +2,9 @@
 # Speedie - Fun is the main goal #
 ## Technical Qualities: Object Oriented, Simple, Fast, Nice-Looking, Non-Infantilising ##
 
-* by Theodore H. Smith - Released on NYE, 31/12/2022.
-* Contact: `theo@jeebox.org`
-* Forum: [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
+* `Creator:` Theodore H. Smith - Released on NYE, 31/12/2022.
+* `Contact:` [theo@jeebox.org](mailto:theo@jeebox.org)
+* `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 
 Speedie is the compiler that I have created Jeebox in and is also built ontop of Jeebox. This proves that Jeebox can be used to write programming languages.
 
@@ -38,7 +38,7 @@ Becoming a contributor could be a great way to add programming concepts to a new
 * Simple but powerful syntax.
 * Can make command-line apps or GUI apps.
 * IPC lets you communicate and spread work across multiple processes.
-* Has a native IDE “Perry”. You might appreciate the IDE's simplicity.
+* Has a native IDE “Perry”. Created to combine power + simplicity.
 * Use one language, thats great at multiple areas:
     * Fast and heavy-duty data-processing
     * Making tools with few lines of code
@@ -47,7 +47,7 @@ Becoming a contributor could be a great way to add programming concepts to a new
 
 
 # Power Features #
-* Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE-pointers/ifstreams/fread and do everything using low-level Unix APIs.)
+* Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE*/ifstreams/fread and do everything using low-level Unix APIs.)
 * Doesn't infantilise you like Javascript or java does. Allows you to mess around with pointers or structs if you need... although its usually a buggier approach. 
 * Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
 	
