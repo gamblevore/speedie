@@ -182,9 +182,20 @@ Perfect!
 Do you need a dictionary anyhow? Where keys can contain any byte? Easy:
 
     dict
-        +"/key/is/actually/a/file-path.txt" "Value"
+        name    "Fred Flintstone"
+        address "Boulder Road"
+        +"/file/path/as-key.txt"   "File-Data"
 
-This is useful for file-paths
+This is useful for file-paths. Compared to this, its perfect:
+
+    <dict>
+        <key>name</key>
+        <string>Fred Flintstone</string>
+        <key>address</key>
+        <string>Boulder Road</string>
+        <key>/file/path/as-key.txt</key>
+        <string>File-Data</string>
+    </dict>
 
 #### Not Fiddly
 JSON is notoriously fiddly. Extra or missing "," mess everything up. Jeebox doesn't care. You don't need any ",", but they are treated as lines, so you can add them if you want.
