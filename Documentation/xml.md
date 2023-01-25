@@ -23,14 +23,14 @@ OK well thats very funny... so lets look at a common list of reasons... why peop
 
 * XML is verbose: For "big data" this matters because they are often CPU/storage bound.
 * Hard for humans to scan: So many tags and nesting makes it hard to "see past" that much data. What you need becomes buried.
-* Too many encodings: XML should have simply stuck with UTF-8. In fact XML doesn't even have to be Unicode!
+* Too many encodings: XML should have simply stuck with UTF-8. There are 5 Unicode encodings that XML can be, plus non-unicode encodings it can be in!
 * Over complex: 
     * Namespaces, doctypes, dtds, cdata, attributes, processing-instructions, file-entities (that exist separately on disk or on the internet!), all needed just to get started.
     * SOAP, XSLT, XPath... Too many XML technologies.
 * XML is not very regular in terms of the object model. XML elements are different than XML attributes and XML text. Same with DTD/doctypes and processing-instructions. They aren't interchangeable, meaning to represent an XML document requires many different classes.
-* Awkward strings, text like: `if "a" < "b"`, is quite awkward to express in XML.
+* Awkward strings. Text like: `if "a" < "b"`, is quite awkward to express in XML.
 * Encoding binary strings is hugely wasteful: You need to use entities. Simply hexing something doesn't count, because the XML parser itself won't unhex it.
-* CData is ugly: `<![CDATA[<escape/>]]>ing so beautifully <![CDATA[>_<]]>`
+* CData is ugly: `<escape/> me >_<` -> `<![CDATA[<escape/>]]> me <![CDATA[>_<]]>`
 * XML is historically a markup language. Even if it can be used for general data-storage, it carries the baggage of being a markup language.
     * White-space rules suck: They are so bad that no one follows them. Merge multiple-whitespace? Does indentation count as part of the text? What about leading/trailing white-space? "Depends". Most parsers give multiple options, so you can choose which way that your particular program needs.
     * XML is rarely self-documenting (IE, you can understand the document) for complex formats. But also quite often a simple list of data is better, where the meaning of the items is inferred by it's position in the list.
