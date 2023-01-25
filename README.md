@@ -84,7 +84,7 @@ If you've enjoyed porting software before, you should find porting Speedie, easy
 
 Currently sponsored by:
 
-* [@breck7](http://pub.pd) He is working on many projects including pub.pd, Scroll, Ohayo, and Music Of A People.
+* [@breck7](http://pd.pub) He is working on many projects including pd.pub, Scroll, Ohayo, and Music Of A People.
 * [@randonautica](https://randonautica.com/) Explore the world in a new way, and increase mystery.
 
 
