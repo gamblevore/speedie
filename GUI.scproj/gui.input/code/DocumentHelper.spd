@@ -3,7 +3,7 @@
 function dictionary.CachePath (|string| path, ||)
 	opt norefcounts
 	require self
-	|| i = self[path]|CachedPath|
+	|| i = .valuelower(path)|CachedPath|
 		return i.value
 
 
@@ -16,7 +16,7 @@ class CachedPath
 	|dictionary--|			Cache
 
 	constructor (|string| p, |dictionary| c, |object| v)
-		c[p] = self
+		c.valuelower(p) = self
 		.path = p
 		.cache = c
 		.value = v
@@ -24,25 +24,27 @@ class CachedPath
 
 	function Clear
 		require self
-		.cache[.path] = nil
+		.cache.valuelower(.path) = nil
 		.path = nil
 		.value = nil
 		.cache = nil
-
 
 
 class DocumentViewer (ringtree)
 	linkage: cpp_part docview
 	contains documentviewer
 	|GUIControl--|				Viewer
+
 	constructor (|GUIControl| V)
 		.viewer = V
+
 	function clear
 		opt norefcounts
 		for o in self
 			if o isa textview
 				o.document = nil
 		super.clear
+		
 	function find (|GUIControl| V, |documentviewer|)
 		opt norefcounts
 		for (o in self) (s)
