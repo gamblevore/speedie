@@ -83,7 +83,7 @@ Ooops, well we converted it already. See that line `XMLToJeebox`? I guess in my 
 
     path.Ext("box") <~ jb.render
 
-Now, the our document is saved to the file "`books.box`" (assuming you passed in `books.xml`). The `<~` operator just means "write this string to the file at this path". Lets take a look at it:
+Now, our document is saved to the file "`books.box`" (assuming you passed in `books.xml`). The `<~` operator just means "write this string to the file at this path". Lets take a look at it:
 
     catalog 
         book (id: "bk101") 
