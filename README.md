@@ -79,3 +79,12 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 It would be nice to have people help port Speedie to other platforms. Speedie is basically built ontop of Unix, C++ and SDL2. There is only one small .m file it uses that uses Apple headers. HOWEVER, things are rarely so simple. Even a plain C++ command-line app usually needs reworking to compile across multiple platforms due to header differences. 
 
 If you've enjoyed porting software before, you should find porting Speedie, easy. Let me know if you want to port Speedie to Windows or Linux! In this case we'd be very eager for you to upload your work!
+
+# Sponsors #
+
+Currently sponsored by:
+
+* [@breck7](http://pub.pd) He is working on many projects including pub.pd, Scroll, Ohayo, and Music Of A People.
+* [@randonautica](https://randonautica.com/) Explore the world in a new way, and increase mystery.
+
+
