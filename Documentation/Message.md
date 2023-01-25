@@ -125,15 +125,13 @@ Looks great! Very readable and also we got very far in our progress!
 
 ### Reading the Parsed Tree ###
 
-So far all we did was just parsing, or read or write files or switches, handle errors, etc. But not actually using Jeebox. So lets do that.
-
-First, we need to find `"catalog"`, which isn't the root actually, because the root is an `@arg` (a list of statements).
+So far all we did was just parsing, or read or write files or switches, handle errors, etc. But not actually using Jeebox. So lets do that. First, we need to find `"catalog"`.
 
     || catalog = BookFile[@tmp, "catalog"] #require
 
-`BookFile[@tmp, "catalog"]` will get a `@tmp` named "catalog", and will create an error if the name is wrong. `@tmp`, `@str`, etc are just node types. Also, `#require` will return if "catalog" is set to `nil`. Its the same as: `if catalog==nil: return nil`
+This gives us a `@tmp` named "catalog", or creates an error if that `@tmp` can't be found. `@tmp`, `@str`, etc are just node types. `#require` here does the same as: `if catalog==nil: return nil`
 
-Now we need to list through all the books, they are contained in another node, an `@arg`. `@arg` is a list of statements (like `"book"` in this example).
+Now we need to list through the books, they are contained in catalog's `@arg`.
 
     for book in catalog[@arg]
         printline book.first
