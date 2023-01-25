@@ -83,7 +83,7 @@ Ooops, well we converted it already. See that line `XMLToJeebox`? I guess in my 
 
     path.Ext("box") <~ jb.render
 
-Now, the jeebox file is saved to disk. The `<~` operator just means "write this string to the file at this path". Lets take a look at it:
+Now, the our document is saved to the file "`books.box`" (assuming you passed in `books.xml`). The `<~` operator just means "write this string to the file at this path". Lets take a look at it:
 
     catalog 
         book (id: "bk101") 
@@ -95,7 +95,7 @@ Now, the jeebox file is saved to disk. The `<~` operator just means "write this 
             description "An in-depth look at creating applications \n      with XML."
     ...
 
-Much better! Actually the file is 25% smaller already, although XML->Jeebox can usually save a lot more than that.
+Much better! Actually the file is 25% smaller already, although XML->Jeebox can usually save a lot more than that. From now on, we can pass in `books.box` instead of `books.xml` to our app.
 
 We could do searching in the file, but first a few safety checks. Lets only do the `XML->Jeebox` conversion if we pass an XML file, and lets tell them we did it! Also, lets make sure we return if parsing fails.
 
