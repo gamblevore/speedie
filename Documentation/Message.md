@@ -110,8 +110,6 @@ Altogether that makes this:
         if boxfile <~ jb.render // write file to disk
             "Converted XML to Jeebox: $boxfile"
 
-(Starting now, I won't put the "`#!/usr/local/bin/spd, main`" parts anymore. Just assume it is  at the start of the code.) 
-
 Now, lets do the searching! Let's specify some search queries via command-line arguments. We'll use `app.switches` to find arguments like "`--author=tim`", then use `.ArgName` and `.ArgValue` to get the name/value from the switch.
     
     ... // new code
@@ -258,11 +256,7 @@ This program is doing a lot more than it might seem.
 * Tests for valid input arguments as well as that the input file exists.
 * Reports all errors to stdout (this is done by the framework, there isn't a specific line of code that does this.)
     
-Now, the same search query (`--author=Corets`) will return 3 books!
-
-    [(id: "bk103"), (id: "bk104"), (id: "bk105")]
-
-Wonderful! And with this: `booksearch.spd books.xml --author=Corets --description=London`
+Now, the same search query (`--author=Corets`) will return 3 books! Wonderful! And with this: `booksearch.spd books.xml --author=Corets --description=London`
 
 We further filter it down to only one book. Perfect.
 
