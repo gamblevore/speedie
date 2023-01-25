@@ -133,7 +133,7 @@ First, we need to find `"catalog"`, which isn't the root actually, because the r
 
 `BookFile[@tmp, "catalog"]` will get a `@tmp` named "catalog", and will create an error if the name is wrong. `@tmp`, `@str`, etc are just node types. Also, `#require` will return if "catalog" is set to `nil`. Its the same as: `if catalog==nil: return nil`
 
-Now we need to list through all the books, they are contained in another node, an `@arg`. `@arg` is a list of statements (`"catalog"` or `"book"` is a statement in this example).
+Now we need to list through all the books, they are contained in another node, an `@arg`. `@arg` is a list of statements (like `"book"` in this example).
 
     for book in catalog[@arg]
         printline book.first
