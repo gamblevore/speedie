@@ -133,13 +133,9 @@ First, we need to find `"catalog"`, which isn't the root actually, because the r
 
 `BookFile[@tmp, "catalog"]` will get a `@tmp` named "catalog", and will create an error if the name is wrong. `@tmp`, `@str`, etc are just node types. Also, `#require` will return if "catalog" is set to `nil`. Its the same as: `if catalog==nil: return nil`
 
-Now we need to list through all the books, they are contained in another node, an `@arg`. `@arg` is a list of statements (`"catalog"` or `"book"` is a statement in this example), or other things, but its the only thing that can contain statements. We need it to read the books.
+Now we need to list through all the books, they are contained in another node, an `@arg`. `@arg` is a list of statements (`"catalog"` or `"book"` is a statement in this example).
 
-    || booklist = catalog[@arg]            #require
-
-Now let's go over the list:
-
-    for book in booklist
+    for book in catalog[@arg]
         printline book.first
 
 We just put `printline` here to verify that we are getting the books. We should see this output:
@@ -166,7 +162,7 @@ That will give us access to the rows like this:
 
 `book[@arg,-1]` means "get the last child of `book`, and make sure it is an `@arg`" Lets check we can actually read them:
 
-    for book in booklist
+    for book in catalog[@arg]
         for row in book[@arg,-1]
             printline row.first.name
 
@@ -256,7 +252,7 @@ This program is doing a lot more than it might seem.
 * Tests for valid input arguments as well as that the input file exists.
 * Reports all errors to stdout (this is done by the framework, there isn't a specific line of code that does this.)
     
-Now, the same search query (`--author=Corets`) will return 3 books! Wonderful! And with this: `booksearch.spd books.xml --author=Corets --description=London`
+Now, the same search query (`--author=Corets`) will return 3 books! Wonderful! And with this: `booksearch.spd books.box --author=Corets --description=London`
 
 We further filter it down to only one book. Perfect.
 
