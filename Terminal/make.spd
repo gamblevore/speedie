@@ -96,8 +96,6 @@ echo \"Cleaning old files\"
 rm -rf Build/*
 
 echo \"Installing headers\"
-${mkdir(`/usr/local/include/`)}
-${mkdir(`/usr/local/bin/`)}
 sudo -u \$(logname) cp *.h /usr/local/include/
 
 ${comp(`jb`)}
