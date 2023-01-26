@@ -1,7 +1,7 @@
 #include "JB_FastString.h"
 #include <string>
 #include <iostream>
-#include <immintrin.h>
+//#include <immintrin.h>
 using namespace std;
 
 #define u8 unsigned char
