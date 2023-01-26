@@ -16,13 +16,13 @@ extern "C" {
     void JB_Date__Sleep(Date Time);
     Date JB_Date__Now( );
 #if defined(__x86_64__) || defined(__amd64)
-inline u64 rdtsc() {
+inline u64 RDTSC() {
 	u64 a; u64 d;
 	__asm__ volatile ("rdtsc" : "=a" (a), "=d" (d));
 	return (d<<32) | a;
 }
 #elif defined(__i386__)
-inline u64 rdtsc() {
+inline u64 RDTSC() {
 	u64 x;
 	__asm__ volatile ("rdtsc" : "=A" (x));
 	return x;
