@@ -29,14 +29,6 @@ echo "Cleaning old files"
 rm -rf Build/*
 
 echo "Installing headers"
-echo "Creating dir /usr/local/include/"
-mkdir -p "/usr/local/include/"
-chown $(logname):staff /usr/local/include/
-
-echo "Creating dir /usr/local/bin/"
-mkdir -p "/usr/local/bin/"
-chown $(logname):staff /usr/local/bin/
-
 sudo -u $(logname) cp *.h /usr/local/include/
 
 echo "Compiling jb.cpp"
@@ -49,8 +41,8 @@ echo "Compiling users.cpp"
 g++ -o Build/users  -std=gnu++17 -stdlib=libc++ -m64 -L/usr/local/lib/ -I /usr/local/include -I /usr/local/speedie/Library/CppLib -w -Wno-return-type-c-linkage -lc++ -Os -ffast-math -flto -mtune=native -D TARGET_UNIX=1 -D __SPEEDIE__=1 -g -ljeebox  users.cpp
 
 echo "Creating Links"
-ln -s /usr/local/speedie/Terminal/Speedie /usr/local/bin/spd
-ln -s /usr/local/speedie/Terminal/Speedie /usr/local/bin/speedie
+ln -sf /usr/local/speedie/Terminal/Speedie /usr/local/bin/spd
+ln -sf /usr/local/speedie/Terminal/Speedie /usr/local/bin/speedie
 echo ""
 echo "Build Complete."
 

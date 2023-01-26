@@ -104,8 +104,8 @@ ${comp(`test`)}
 ${comp(`users`)}
 
 echo \"Creating Links\"
-ln -s $SpdTerm /usr/local/bin/spd
-ln -s $SpdTerm /usr/local/bin/speedie
+ln -sf $SpdTerm /usr/local/bin/spd
+ln -sf $SpdTerm /usr/local/bin/speedie
 echo \"\"
 echo \"Build Complete.\"
 
