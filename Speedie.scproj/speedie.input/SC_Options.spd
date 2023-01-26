@@ -271,7 +271,7 @@ module Feedback
 			Explain(Purpose, "")$
 			options.argstats = true
 			
-		+"noisy "
+		+"noisy"
 			Explain(Purpose, "Prints more stuff.")$
 			Options.PrintCompileString = true
 			file.DebugExecute = true
@@ -377,15 +377,6 @@ module Feedback
 			Explain(Purpose, "Don't print text coloring symbols for terminals.")$
 			Options.Color = false
 		
-/*
-		output
-			Explain(Purpose, "Redirects stdout printed to file passed.")$
-			feedback.output(value, 1)
-		
-		errors
-			Explain(Purpose, "Sends all errors printed to file passed.")$
-			feedback.output(value, 2)
-*/
 		selfdebug
 			Explain(Purpose, "Self-test only.")$
 			Options.SelfReplacement = kSelfDebug
@@ -416,15 +407,7 @@ module Feedback
 
 		variant
 			Explain(Purpose)$
-		// variant... lol
 			Options.Variant = (Value.parseInt|int|).Render
-
-/*
-			options.OutputNormal = file.new( externalcompiler.tmpout(Options.Variant) )
-			options.OutputErrors = file.new( externalcompiler.tmperr(Options.Variant) )
-			pipe.StdOut = options.outputNormal.OpenDes
-			pipe.StdError = options.outputErrors.Opendes
-*/ 
 			Options.Color = false
 			(options.optimise max= 1) // -Os
 		
