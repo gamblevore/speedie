@@ -17,7 +17,7 @@ extern "C" {
     Date JB_Date__Now( );
 #if defined(__x86_64__) || defined(__amd64)
 inline u64 rdtsc() {
-	u64 a; u64; d;
+	u64 a; u64 d;
 	__asm__ volatile ("rdtsc" : "=a" (a), "=d" (d));
 	return (d<<32) | a;
 }
