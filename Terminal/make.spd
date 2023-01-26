@@ -20,6 +20,12 @@ function comp (|string| name, |string|)
 	rz = "echo \"Compiling ${name}.cpp\"
 g++ -o Build/$name  $ExecFlags  ${name}.cpp"
 
+function mkdir (|string| dir, |string|)
+	rz = "echo \"Creating dir $dir\"
+sudo -u \$(logname) mkdir -p \"$dir\"
+chown \$(logname):staff $dir
+"
+
 main {
 
 expect !app.args (app.args, "This script takes no arguments.")
@@ -82,11 +88,11 @@ g++ -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.
 
 echo \"Cleaning old files\"
 cd $Speedie/jeebox.scproj/Examples
-sudo -u \$(logname) mkdir -p Build
+${mkdir(`Build`)}
 rm -rf Build/*
 
 echo \"Installing headers\"
-sudo -u \$(logname) mkdir -p /usr/local/include/
+${mkdir(`/usr/local/include/`)}
 sudo -u \$(logname) cp *.h /usr/local/include/
 
 ${comp(`jb`)}
