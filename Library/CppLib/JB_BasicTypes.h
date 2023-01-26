@@ -81,21 +81,10 @@ typedef int64					Date;
 #endif
 
 
-#if _WIN32 || _WIN64
-    #if _WIN64
-        #define ENVIRONMENT64
-    #else
-        #define ENVIRONMENT32
-    #endif
-#endif
-
-// Check GCC
-#if __GNUC__
-    #if __x86_64__ || __ppc64__
-        #define ENVIRONMENT64
-    #else
-        #define ENVIRONMENT32
-    #endif
+#if _WIN64 || __x86_64__ || __ppc64__ || _M_ARM64 || __powerpc64__ || __ppc64__ || _ARCH_PPC64 || __ia64 || _M_IA64 || __aarch64__
+    #define ENVIRONMENT64
+#else
+    #define ENVIRONMENT32
 #endif
 
 #ifdef ENVIRONMENT64
@@ -114,6 +103,7 @@ typedef int64					Date;
 	#define kPlatformEndian 0
 #endif
 
+// probably should move all this into the string header... utf-8 isnt needed elsewhere
 #if kPlatformEndian == 0
     #define kWrongUTF16			/*Becomes*/		(16+1)
 	#define kUTF16BBOM			/*Becomes*/		0xFFFE
