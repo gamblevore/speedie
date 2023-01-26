@@ -6,7 +6,7 @@
 #ifndef AS_LIBRARY
 #ifndef __JB_Vectors__
 #define __JB_Vectors__
-#include  <nmmintrin.h>
+//#include  <nmmintrin.h>
 
 extern "C" {
 
