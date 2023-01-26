@@ -45,7 +45,7 @@ extend string
 			printline args.Render
 		return .Execute(args, out, errs, false)
 		
-	function Execute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |bool| KeepStdOut=true, |ErrorInt|)
+	function Execute (|[string]| Args = [], |faststring| Out = nil, |faststring| Errs = nil, |bool| KeepStdOut=true, |ErrorInt|)
 		cpp_wrapper JB_Str_Execute
 
 	function SilentExecute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
