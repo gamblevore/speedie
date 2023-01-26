@@ -7,9 +7,6 @@
 */
 
 #include "JB_Umbrella.hpp"
-#ifndef AS_LIBRARY
-    #include "smmintrin.h"
-#endif
 
 #include <vector>
 
