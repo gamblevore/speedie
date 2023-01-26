@@ -29,7 +29,8 @@ inline u64 rdtsc() {
 }
 #else
 	inline u64 RDTSC() {
-		return __builtin_ia32_rdtsc();
+		return static_cast<int64>(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+
 	}
 #endif
 
