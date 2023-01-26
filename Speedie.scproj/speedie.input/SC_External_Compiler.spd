@@ -348,31 +348,24 @@ function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self
 	.Cleanup <~ Cpp3.Parent
 	
 // OldSpeedie has compiled SpeedyTest, at Test1. It is different.
-	|| Args = ["--self",  "--variant=2",  "--nocolor"]
-
 	.saytest(1)
-	require Test1.TestSpeedie(Args, "2")
+	require Test1.TestSpeedie("2")
 
 
 // Test1 has been run. It created Test2. Test2 is different than Test1, because Test1 had a chance to optimise itself.
-	Args[1] = "--variant=3"
-	Args <~ "--final"
 
 	.saytest(2)
-	require Test2.TestSpeedie(Args, "3")
+	require Test2.TestSpeedie("3")
 
 
 // Test2 creates Test3 in .cpp form only, for speed. The outputs SHOULD match.
 	.saytest(3)
 	printline
 	
-	require cpp2.mustexist
-	require cpp3.mustexist
+	require cpp2.mustexist and cpp3.mustexist
 	expect (Cpp2.matchFile(Cpp3)) "$Cpp2 doesn't match $Cpp3!"
-	
-	require Test2.TestBatch
 
-	return stderr.ok	// My Code is so Beautiful.
+	return Test2.TestBatch and stderr.OK
 
 
 	
@@ -398,8 +391,6 @@ function MakeDailyProductPath (|File| B, |string|)
 
 
 function BackupCompiler (|bool|)
-// Committing the .box + .cpp files, via git can be done later, if needed.
-
 	|| Product = .ProductPath.file
 	|| B = .BackupPath.File
 	B.MakeEntirePath
@@ -412,7 +403,7 @@ function BackupCompiler (|bool|)
 	Product.CopyFileTo( backup1 )
 
 	|| DailyProduct = .MakeDailyProductPath( B )
-	|| path = DailyProduct.trimextandpath
+	|| path = DailyProduct.TrimExtAndPath
 	Product.CopyFileTo( DailyProduct )
 	Cpp_Export.CppProduct.Copyall( path + ".cpp" )
 	Cpp_Export.HProduct.Copyall( path + ".h" )
@@ -464,16 +455,13 @@ function file.TestBatch (|bool|)
 	// so we need a folder to test...
 
 
-function File.TestSpeedie (|[string]| Args, |string| Variant, |bool|) {
-// test all is OK.
-//	return .testspeedie(args)
-	
+function File.TestSpeedie (|string| Variant, |bool|) {
 	require (.mustexist)
 	expect !(.path contains " ") ("Path: ${.path} contains a space! :(")
 
 // Create and call command
-	|| Cmd = .Path + " --self --nocolor --variant=" + Variant
-	|| cmd_args = ["--self",  "--nocolor",  "--variant=" + Variant]
+	variant = "--variant="+variant
+	|| cmd_args = ["--self",  "--nocolor",  Variant]
 	if Variant == "3"
 		cmd_args <~ "--final"
 	if options.PrintCompileString
@@ -481,23 +469,25 @@ function File.TestSpeedie (|[string]| Args, |string| Variant, |bool|) {
 
 	|| result = faststring()
 	.path.execute(cmd_args, result)
-	printline Result // not sure if its good or bad?
-
+	printline Result
 
 // Read output
 	print			externalCompiler.TmpOut(Variant).ReadFile
 	|| test_err =	externalCompiler.TmpErr(Variant).ReadFile
-	error !(test_err) (test_err)	
+		error test_err // is this even used anymore?
 
 	return StdErr.OK
 }
 
+	
+function array.AddCStr (|string| s)
+	opt norefcounts
+	if s
+		self <~ s.cstr
 
 function Array.AppendWords (|string| R)
-	|| fi = StringFields( R, ' ' )
-	for S in fi
-		if S
-			.AddCStr(s)
+	for S in R / ' '
+		.AddCStr(s)
 
 
 function string.MakeAndGoInto (|File|)
