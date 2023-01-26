@@ -166,10 +166,6 @@ class Array (saveable)
 	syntax Equals (|int| n, |bool|Aware, |bool|)
 		return .length == n
 	
-	function addcstr (|string| s)
-		opt norefcounts
-		self <~ s.cstr
-	
 	operator contains (|object| o, |bool|)
 		return .find(o) >= 0
 	
