@@ -15,12 +15,23 @@ extern "C" {
     int64 JB_Date__TimeID ();
     void JB_Date__Sleep(Date Time);
     Date JB_Date__Now( );
+#if defined(__x86_64__) || defined(__amd64)
+inline u64 rdtsc() {
+	u64 a; u64; d;
+	__asm__ volatile ("rdtsc" : "=a" (a), "=d" (d));
+	return (d<<32) | a;
+}
+#elif defined(__i386__)
+inline u64 rdtsc() {
+	u64 x;
+	__asm__ volatile ("rdtsc" : "=A" (x));
+	return x;
+}
+#else
 	inline u64 RDTSC() {
-		unsigned long long tsc;
-		asm("rdtsc" : "=A"(tsc));
-		return tsc;
+		return __builtin_ia32_rdtsc();
 	}
-
+#endif
 
 }
 
