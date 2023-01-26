@@ -2,6 +2,7 @@
 
 extern "C" {
     JB_String* JB_Platform();
+    int JB_Platform__CPU();
     bool JB_IsLibrary();
     Array* JB_App__Args();
     JB_StringC*	JB_App__CalledBy();

@@ -115,6 +115,18 @@ bool JB_IsLibrary() {
 }
 
 
+int JB_Platform__CPU() {
+	#if _M_X86 || __i386__
+		return 4; // intel
+	#elif __arm__
+		return 2; // arm
+	#elif __ppc__
+		return 8; // ppc
+	#else
+		return 0; // unknown
+	#endif
+}
+
 JB_String* JB_Platform() {
     static JB_String* Plat = 0;
     if (Plat) {

@@ -82,12 +82,12 @@ typedef int64					Date;
 
 
 #if _WIN64 || __x86_64__ || __ppc64__ || _M_ARM64 || __powerpc64__ || __ppc64__ || _ARCH_PPC64 || __ia64 || _M_IA64 || __aarch64__
-    #define ENVIRONMENT64
+    #define ENV64BIT
 #else
-    #define ENVIRONMENT32
+    #define ENV32BIT
 #endif
 
-#ifdef ENVIRONMENT64
+#ifdef ENV64BIT
     typedef long long int IntPtr;
     typedef unsigned long long int UintPtr;
 #else

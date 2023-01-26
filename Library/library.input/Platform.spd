@@ -8,6 +8,18 @@ module Platform
 	function Name (|string|)
 		cpp_wrapper JB_Platform
 
+	helper cpu (|int|)
+		cpp_wrapper JB_Platform__CPU
+	
+	function CPU_Intel (|bool|)
+		return .cpu & 4
+
+	function CPU_ARM (|bool|)
+		return .cpu & 2
+
+	function CPU_Spd (|bool|)
+		return .cpu & 1
+
 	function osx (|bool|)
 		return .name=="osx"
 
