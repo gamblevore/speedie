@@ -29,7 +29,7 @@ expect !app.args (app.args, "This script takes no arguments.")
 ExecFlags   = "$CFlags -g -ljeebox"
 || BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
 || CppLib   = "$Speedie/Library/CppLib".file
-|| SpdSrc   = "$Speedie/Speedie.scproj/BuildTest"
+|| SpdSrc   = "$Speedie/Speedie.scproj/Build"
 || SpdTerm  = "$Speedie/Terminal/Speedie"
 || LibPath  = "/usr/local/lib/$LibName"
 
@@ -76,7 +76,6 @@ cd $CppLib
 echo \"Compiling $LibPath\"
 g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 
-sudo -u \$(logname) mkdir -p $SpdSrc
 echo \"Compiling Speedie to $SpdTerm\"
 g++ -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp
 
