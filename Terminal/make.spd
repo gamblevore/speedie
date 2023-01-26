@@ -86,13 +86,18 @@ echo \"Compiling Speedie to $SpdTerm\"
 g++ -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp
 
 
-echo \"Cleaning old files\"
 cd $Speedie/jeebox.scproj/Examples
+echo \"Creating directories\"
 ${mkdir(`Build`)}
+${mkdir(`/usr/local/include/`)}
+${mkdir(`/usr/local/bin/`)}
+
+echo \"Cleaning old files\"
 rm -rf Build/*
 
 echo \"Installing headers\"
 ${mkdir(`/usr/local/include/`)}
+${mkdir(`/usr/local/bin/`)}
 sudo -u \$(logname) cp *.h /usr/local/include/
 
 ${comp(`jb`)}
@@ -100,6 +105,9 @@ ${comp(`xml`)}
 ${comp(`test`)}
 ${comp(`users`)}
 
+echo \"Creating Links\"
+ln -s $SpdTerm /usr/local/bin/spd
+ln -s $SpdTerm /usr/local/bin/speedie
 echo \"\"
 echo \"Build Complete.\"
 
