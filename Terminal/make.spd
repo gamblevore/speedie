@@ -22,7 +22,7 @@ g++ -o Build/$name  $ExecFlags  ${name}.cpp"
 
 function mkdir (|string| dir, |string|)
 	rz = "echo \"Creating dir $dir\"
-sudo -u \$(logname) mkdir -p \"$dir\"
+mkdir -p \"$dir\"
 chown \$(logname):staff $dir
 "
 

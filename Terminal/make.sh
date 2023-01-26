@@ -13,14 +13,14 @@ g++ -o /usr/local/speedie/Terminal/Speedie  -std=gnu++17 -stdlib=libc++ -m64 -L/
 echo "Cleaning old files"
 cd /usr/local/speedie/jeebox.scproj/Examples
 echo "Creating dir Build"
-sudo -u $(logname) mkdir -p "Build"
+mkdir -p "Build"
 chown $(logname):staff Build
 
 rm -rf Build/*
 
 echo "Installing headers"
 echo "Creating dir /usr/local/include/"
-sudo -u $(logname) mkdir -p "/usr/local/include/"
+mkdir -p "/usr/local/include/"
 chown $(logname):staff /usr/local/include/
 
 sudo -u $(logname) cp *.h /usr/local/include/
