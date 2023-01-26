@@ -16,6 +16,7 @@ sudo -u $(logname) mkdir -p Build
 rm -rf Build/*
 
 echo "Installing headers"
+sudo -u $(logname) mkdir -p /usr/local/include/
 sudo -u $(logname) cp *.h /usr/local/include/
 
 echo "Compiling jb.cpp"
