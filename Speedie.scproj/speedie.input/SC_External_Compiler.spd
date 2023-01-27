@@ -174,9 +174,6 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 	// Gaming64Bit
 	if Platform.CPU_Intel
 		rz.AppendWords( " -march=core2  -ffast-math  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
-
-	if opt >= 4
-		rz.AppendWords("-march=native") // causes issues
 	
 	// stripping
 	rz.appendwords( "-fdata-sections -ffunction-sections")
