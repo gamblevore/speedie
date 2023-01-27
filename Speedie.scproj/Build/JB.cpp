@@ -3936,7 +3936,6 @@ bool SC_FB__AppOptions_self(JB_String* Name, JB_String* Value, FastString* purpo
 	JB_String* _tmPf0 = JB_Incr(SC_Comp__SpeedieProj());
 	JB_FreeIfDead(SC_FB__TryUseProject(_tmPf0, false));
 	JB_Decr(_tmPf0);
-	SC__Options_PrintCompileString = true;
 	return true;
 }
 
