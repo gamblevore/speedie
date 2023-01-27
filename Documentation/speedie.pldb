@@ -1,0 +1,153 @@
+title Speedie
+appeared 2022
+type pl
+creators Theodore H Smith
+website http://github.com/gamblevore/speedie
+webRepl http://github.com/gamblevore/speedie
+documentation https://github.com/gamblevore/speedie/blob/main/Documentation
+emailList https://t.me/speedie_dev
+country United Kingdom
+domainName speedie.dev
+ registered 2023
+related i-expressions json yaml toml xml haml ini grammar jtree treenotation
+influencedBy javascript python c lua cpp visualbasic hypercard html css xml json
+
+supersetOf jeebox
+
+visualParadigm false
+
+features
+ hasPartialApplication true
+  
+  main
+	"hello world ${app.args[0]}"
+  
+ hasSingleDispatch true
+ hasMagicGettersAndSetters true
+ hasMacros true
+ hasEnums true
+ canWriteToDisk true
+  "helloworld.txt" <~ "Hello, world!\n"
+ hasDuckTyping false
+ hasRegularExpressionsSyntaxSugar false
+ isCaseSensitive true
+  || Same = "x" == "X" // same = false
+ hasCaseInsensitiveIdentifiers true
+  if "abc".LeNgTh == 3
+      "cool length"
+ hasTernaryOperators true
+  while
+     printline (1,0)(random[])
+ hasBitWiseOperators true
+  x << y
+ canDoShebang true
+  #!/usr/local/bin/spd
+ hasSymbolTables true
+ hasDynamicProperties false
+ hasBooleans true
+ hasConditionals true
+ hasComments true
+  // comment
+ hasMultiLineComments true
+  /*
+   multiline
+  */
+
+ hasImports true
+  import Proj
+ hasAssignment true
+  name = "John"
+ hasInfixNotation true
+  seven = 3 + 4
+ hasMultilineStrings true
+  "hello
+   you
+   beauty"
+ hasPointers true
+ hasIntegers true
+  pldb = 80766866
+ hasUnitsOfMeasure true
+  || time = 1day - 10s
+  || size = 10.2MB
+ hasLists true
+  myList = [1, 2, 3, 4, 5]
+ hasFunctions true
+ hasOctals false
+ hasHexadecimals true
+  || num = 0xBEEF
+ hasFloats true
+  || num = 0.0
+ hasBinaryNumbers true
+  || num = 0b010101
+ hasConstructors true
+    class Foobar
+		|float| x
+		|float| y
+		constructor	(|float| r=1, |float| alpha=0)
+			.x = r * alpha.cos
+			.y = r * alpha.sin
+  
+	|| a = foobar()
+	|| b = foobar(3)
+	|| c = foobar(5, M_PI/4)
+ hasIterators true
+	|| items = [5,6,7,8]
+	for i in items
+		printline i
+ hasFunctionOverloading true
+  function volume (|int| a, |int|)
+	return a*a*a
+  function volume (|float| r, |float| h, |int|)
+  // volume of a cylinder
+	return math.pi*r*r*h
+ hasNamespaces false
+ hasMultipleInheritance false
+ hasOperatorOverloading true
+  str = "a" + "b"
+  array <~ str
+ hasSemanticIndentation true
+  class Person
+     |string| name
+ hasInheritance true
+  class Person (Animal)
+ hasStrings true
+  "hello world"
+ hasDisposeBlocks true
+  using SomeObject
+   // someobject.SyntaxUsingComplete will be called
+ hasPrintDebugging true
+  "error 1 here"
+ hasZeroBasedNumbering true
+ hasTemplates false
+ hasVirtualFunctions true
+ hasThreads false
+ hasClasses true
+ hasExceptions false
+ hasAccessModifiers true
+
+lineCommentToken //
+multiLineCommentTokens /* */
+printToken print
+assignmentToken =
+booleanTokens true false
+keywords #require #expect #error and asm break class continue else elseif false for if is in import module or return require expect error virtual behaviour function syntax syx self true with yield while xor
+
+githubLanguage Speedie
+ fileExtensions spd scproj
+ type programming
+ tm_scope source.spd
+
+helloWorldCollection C++
+ main
+     "Hello World!"
+  
+quineRelay spd
+  
+description General-purpose modern and clean object-oriented programming language created by Theodore H Smith built ontop of C.
+fileExtensions spd scproj
+
+pypl spd
+
+twitter https://twitter.com/gamblevore
+gdbSupport false
+fileType text
