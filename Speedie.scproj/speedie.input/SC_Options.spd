@@ -330,7 +330,7 @@ module Feedback
 		+"self" 
 			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$
 			feedback.TryUseProject( Compiler.SpeedieProj )
-			options.printcompilestring = true // for now
+//			options.printcompilestring = true // for now
 			return true // does something, counts towards operationCount
 		
 		+"crash"

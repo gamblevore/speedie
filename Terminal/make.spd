@@ -67,7 +67,7 @@ sudo -u $(logname) /usr/local/bin/speedie --self --x --nocompile
 // sudo -u $(logname) will "drop root permissions". This allows us to
 // NOT run speedie as root, causing speedie to create folders owned
 // by root. Meaning now we can't use those folders unless we sudo everything.
-PrepareCpp.SilentExecute
+PrepareCpp.Execute
 
 
 ////////////////////////////
