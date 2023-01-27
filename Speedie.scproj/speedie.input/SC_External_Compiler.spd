@@ -460,7 +460,7 @@ function File.TestSpeedie (|string| Variant, |bool|) {
 	expect !(.path contains " ") ("Path: ${.path} contains a space! :(")
 
 // Create and call command
-	variant = "--variant="+variant
+	variant = "--variant=" + variant
 	|| cmd_args = ["--self",  "--nocolor",  Variant]
 	if Variant == "3"
 		cmd_args <~ "--final"

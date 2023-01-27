@@ -50,6 +50,9 @@ class µFunc1 (memory)
 		cpp_class ASMFunc2
 		cpp_part ASMFunc2
 	contains ASM
+
+	function Visible
+		visible // needed to compile strangely...
 	
 	function Run (|&int64| Args = nil, |int| ArgCount=nil, |int64|)
 		cpp_part RunArgs

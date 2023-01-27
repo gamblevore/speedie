@@ -3,14 +3,13 @@
 function compiler.usingScript (|file| f, |file|)
 	require !f.isdir
 	require f.Read(16) starts "#!/"
-	rz = feedback.TryUseProject(f.path, true).scriptlocation.file
-	if rz
-		error.AutoPrint = 0 
-		options.scripting = true
-		options.silent = true
-		options.PrintCompileString = false
-		options.OperationCount++
-		app.rawargs.remove(0)
+	rz = feedback.TryUseProject(f.path, true).scriptlocation.file #require
+	error.AutoPrint = 0 
+	options.scripting = true
+	options.silent = true
+	options.PrintCompileString = false
+	options.OperationCount++
+	app.rawargs.remove(0)
 
 
 function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
