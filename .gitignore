@@ -1,6 +1,4 @@
-**/Build/
-**/BuildTest/
-**/BuildTest2/
+**/Build*/
 /Speedie.scproj/Terminal/
 cpp.hidden
 .DS_Store
