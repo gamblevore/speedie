@@ -754,6 +754,11 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = (
+					"-ffast-math",
+					"-Wno-return-type-c-linkage",
+					"-Wno-nullability-completeness",
+				);
 			};
 			name = Debug;
 		};
@@ -780,6 +785,11 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = (
+					"-ffast-math",
+					"-Wno-return-type-c-linkage",
+					"-Wno-nullability-completeness",
+				);
 			};
 			name = Release;
 		};
@@ -805,6 +815,11 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = (
+					"-ffast-math",
+					"-Wno-return-type-c-linkage",
+					"-Wno-nullability-completeness",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -831,6 +846,11 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = (
+					"-ffast-math",
+					"-Wno-return-type-c-linkage",
+					"-Wno-nullability-completeness",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -1048,6 +1068,11 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OBJROOT = "/tmp/$(SYMROOT)";
+				OTHER_CFLAGS = (
+					"-ffast-math",
+					"-Wno-return-type-c-linkage",
+					"-Wno-nullability-completeness",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 			};
 			name = Debug;
@@ -1082,6 +1107,11 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_FAST_MATH = YES;
 				OBJROOT = /tmp/build;
+				OTHER_CFLAGS = (
+					"-ffast-math",
+					"-Wno-return-type-c-linkage",
+					"-Wno-nullability-completeness",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 			};
 			name = Release;
