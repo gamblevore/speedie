@@ -218,21 +218,32 @@ extend_module perry
 	function GenerateArchive
 		expect (.GenerateArchiveSub) (beep)
 			
-
-
+	
+	helper ConfirmGen (|[file]| list, |bool|)
+		|| fs = FastString()
+		fs <~ "Include all these files?\n\n"
+		list.sort(FileSizeSorter)
+		for f in list
+			fs <~ f
+			fs <~ " "
+			fs <~ f.file.Size|int|.strsize
+			fs <~ "\n"
+		return fs.render.confirm
+			
 	helper GenerateArchiveSub (|bool|)
 		|| outpath = .install_path
 		|| p = .SpeedieDir
 		|| f = p.existingFile("generate archive")
 		require f and outpath
 		
-		|| arc = FileArchive.new(p)		
-		.GenerateallDir(arc, f)
-		|| Terminal = F.Child("Terminal")
-		|| SpdExec = Terminal.Child("Speedie")
-		arc <~ SpdExec
-
+		|array of file| list 
+		list <~ F.Child("Terminal/Speedie")
+		.GenerateallDir(list, f)
+		require .ConfirmGen(list)
+		|| arc = FileArchive.new(p)
 		|| out = outpath.file
+		for ch in list
+			arc <~ ch
 		arc.saveto(out)
 
 		|| result = app.apppath.file
@@ -240,31 +251,37 @@ extend_module perry
 		|| zipped = result.ZipTmp					#require
 		|| latest = .backup(zipped)
 
-		|| out_size = out.size|SizeInt|
-		|| in_size = arc.size|SizeInt|			
+		|| out_size = out.size|int|.StrSize
+		|| in_size = arc.size|int|.StrSize
 		beep "Done!\n\n$out created at $out_size\n\nExpands to $in_size"
 		latest.Reveal
 		return true
 		
 		
 	function CanGenerate (|file| f, |bool|)
+		return .CanGeneratesub(f, f.name)
+	
+	helper CanGenerateSub (|file| f, |string| n, |bool|)
 		require !f.linksto
-		|| n = f.name
+		require !(f.path contains "/Terminal/Debug" or "/Terminal/Backup")
 		require !n[0, ".git"]
+		require !(n contains "DerivedData") // fucking xcode!
+		require !(n contains "(Disabled)")
+		require n ~!= ".DS_Store"
 		if f.isdir
-			require n ~!= "Build" and "Cpp" and "Terminal" and "cpp.hidden" and "BuildTest" and "BuildTest2" //
-		if n ~!= ".DS_Store"
-			|| ext = n.ext
-			return ext ~!= "xcodeproj" and ".mz"
+			require !n[0, "Build"]
+			require n ~!= "Cpp" and "Terminal" and "cpp.hidden" //
+		return !(n isa "xcodeproj" or ".mz")
 
 
-	function GenerateAllDir (|FileArchive| f, |file| dir)
+	function GenerateAllDir (|[file]| f, |file| dir)
 		for c.files in dir
-			if .CanGenerate(c) and dir.child(".perry").exists
+			|| n = c.name
+			if .CanGenerate(c)
 				.GenerateDir(f, c)
 
 
-	function GenerateDir (|FileArchive| f, |file| dir)
+	function GenerateDir (|[file]| f, |file| dir)
 		for c.files in dir
 			if !.CanGenerate(c)	
 				//
@@ -361,3 +378,10 @@ function faststring.FileDiff (|string| name, |string| Title)
 	self <~ "\t"
 	self <~ name
 	self <~ "\n"
+
+
+
+function FileSizeSorter (SorterComparer)
+	|| aa = a|file|.size
+	|| bb = b|file|.size
+	return aa > bb
