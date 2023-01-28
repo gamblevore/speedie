@@ -194,14 +194,14 @@ extend_module perry
 		if !CppCompiler.file.exists
 			return "No c++ compiler exists at '$CppCompiler' ! Please make one available from that path."
 
-	function CheckInstallStatus (|bool| testanyhow)
+	function CheckInstallStatus
 		.checked = true
 		|| CompilerMsg = .TestCompiler
 		|| HasNewerApp = .testnewer
 		|| ShellBad = .testshell
 		|| InstallBad = .testinstall
 		|| probs = false
-		if ShellBad or InstallBad or testanyhow
+		if ShellBad or InstallBad
 			if HasNewerApp				// what should we do?
 				beep ("A newer version of Perry exists... at $HasNewerApp. Please use it to install Speedie.")
 				return
@@ -211,7 +211,7 @@ extend_module perry
 			probs = true
 		if CompilerMsg
 			beep CompilerMsg
-		  elseif testanyhow and !probs
+		  elseif !probs
 			beep "No errors detected with install."
 
 
@@ -363,7 +363,7 @@ function ClickedShowPrefs (GUIMenuEvent)
 	app.pref_path.Reveal
 
 function ClickedTestInstallMenu (guimenuevent)
-	perry.CheckInstallStatus(true)
+	perry.CheckInstallStatus
 
 function string.IsProj (|bool|)
 	return self isa "scproj" or "uwuz"
