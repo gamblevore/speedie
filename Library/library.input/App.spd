@@ -202,10 +202,10 @@ function CWD (|string|)
 	cpp_wrapper JB_File__CWD
 
 
-function CWD (assigns:|string|, |int|)
+function CWD (assigns:|string|, |ErrorInt|)
 	return .chdir_(Value)
 
-helper chdir_ (|string| path, |int|)
+helper chdir_ (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
 
 
