@@ -66,6 +66,7 @@ extend_module perry
 	function install_path (|string|)
 		|| p = app.exepath.parent
 		expect (p contains ".app/") (beep, "Can't install/uninstall while using the app directly.")
+		// we need to store this in the .app folder...
 		return p.sibling("Resources/speedie_install.txt") // evade code-signing
 
 
