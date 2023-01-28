@@ -39,7 +39,7 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 			
 	
 	if save
-		|| t = "UntitledFile" 
+		|| t = "Untitled.txt" 
 		|| ext = types.name
 			t = "untitled." + ext
 		w.name.text = t
