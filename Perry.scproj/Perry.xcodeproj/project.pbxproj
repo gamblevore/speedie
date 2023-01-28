@@ -1050,6 +1050,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Build/Release/Perry.app/Contents/Frameworks",
 				);
+				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1090,6 +1091,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Build/Release/Perry.app/Contents/Frameworks",
 				);
+				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_FAST_MATH = YES;
 				OBJROOT = /tmp/build;
