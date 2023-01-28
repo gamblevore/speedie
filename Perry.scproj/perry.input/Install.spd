@@ -194,14 +194,14 @@ extend_module perry
 		if !CppCompiler.file.exists
 			return "No c++ compiler exists at '$CppCompiler' ! Please make one available from that path."
 
-	function CheckInstallStatus (|bool| testanyhow)
+	function CheckInstallStatus (|bool| MsgIfNothing=true)
 		.checked = true
 		|| CompilerMsg = .TestCompiler
 		|| HasNewerApp = .testnewer
 		|| ShellBad = .testshell
 		|| InstallBad = .testinstall
 		|| probs = false
-		if ShellBad or InstallBad or testanyhow
+		if ShellBad or InstallBad
 			if HasNewerApp				// what should we do?
 				beep ("A newer version of Perry exists... at $HasNewerApp. Please use it to install Speedie.")
 				return
@@ -211,7 +211,7 @@ extend_module perry
 			probs = true
 		if CompilerMsg
 			beep CompilerMsg
-		  elseif testanyhow and !probs
+		  elseif !probs and MsgIfNothing
 			beep "No errors detected with install."
 
 
@@ -222,7 +222,7 @@ extend_module perry
 	helper ConfirmGen (|[file]| list, |bool|)
 		|| fs = FastString()
 		fs <~ "Include all these files?\n\n"
-		list.sort(FileSizeSorter)
+		list.sort(&File.SizeSorter)
 		for f in list
 			fs <~ f
 			fs <~ " "
@@ -327,7 +327,7 @@ extend_module perry
 	function Install (|bool| DoInstall, |bool| DoLinks, |bool|)
 		stderr.clear
 		|| msg = ""
-		|| f   = "~/Speedie/".file
+		|| f   = "/usr/local/speedie/".file
 		if doinstall
 			msg += .install_files(f)
 		if dolinks
@@ -363,7 +363,7 @@ function ClickedShowPrefs (GUIMenuEvent)
 	app.pref_path.Reveal
 
 function ClickedTestInstallMenu (guimenuevent)
-	perry.CheckInstallStatus(true)
+	perry.CheckInstallStatus
 
 function string.IsProj (|bool|)
 	return self isa "scproj" or "uwuz"
@@ -379,9 +379,3 @@ function faststring.FileDiff (|string| name, |string| Title)
 	self <~ name
 	self <~ "\n"
 
-
-
-function FileSizeSorter (SorterComparer)
-	|| aa = a|file|.size
-	|| bb = b|file|.size
-	return aa > bb

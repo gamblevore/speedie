@@ -437,6 +437,11 @@ class File (String)
 	module
 		|| DebugExecute = false
 
+		function SizeSorter (SorterComparer)
+			|| aa = a|file|.size
+			|| bb = b|file|.size
+			return aa > bb
+			
 		function string.NeatenPath (|string|)
 			if self starts file.HomePath
 				return "~" + self[file.HomePath.length ...]
