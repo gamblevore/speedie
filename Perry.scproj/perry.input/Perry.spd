@@ -64,7 +64,7 @@ module Perry
 
 	function BuildAppMenu
 		appmenu.addsep
-		|| extra = platform.isdebug or (registration.CarriedInfo ~= "god")
+		|| extra = platform.isdebug or (registration.CarriedInfo ~= "perry")
 			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
 			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
 			appmenu <~ ("Show Preferences", ClickedShowPrefs)

@@ -215,8 +215,8 @@ extend_module perry
 
 
 	function GenerateArchive
-		if !.GenerateArchiveSub
-			beep
+		expect (.GenerateArchiveSub) (beep)
+			
 
 
 	helper GenerateArchiveSub (|bool|)
