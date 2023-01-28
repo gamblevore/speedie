@@ -86,8 +86,8 @@ function PerryIDE.CompilerInit (|process| C, |bool| actual_compile, |process|)  
 			f.name = name + "()"
 		rz = (SubProcess).RunAsProcess(name, p, 128KB)
 	  else
-		target false//debug
-			|| Proc = "~/Speedie/Terminal/Debug/uwu".resolve
+		target false //debug
+			|| Proc = "/usr/local/speedie/Terminal/Debug/uwu".resolve
 		  else
 			|| proc = Speedie.resolve
 		if proc
