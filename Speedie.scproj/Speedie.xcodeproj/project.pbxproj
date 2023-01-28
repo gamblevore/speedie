@@ -69,6 +69,10 @@
 		AC528FEC2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528FEA2961FEFC005EFB9D /* JB_RingTree.cpp */; };
 		AC528FED2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528FEA2961FEFC005EFB9D /* JB_RingTree.cpp */; };
 		AC528FEE2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528FEA2961FEFC005EFB9D /* JB_RingTree.cpp */; };
+		AC641C262984083300986ED2 /* JB_FlowControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC641C252984083300986ED2 /* JB_FlowControl.cpp */; };
+		ACDC5A0729840884005A2454 /* JB_FlowControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC641C252984083300986ED2 /* JB_FlowControl.cpp */; };
+		ACDC5A0829840885005A2454 /* JB_FlowControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC641C252984083300986ED2 /* JB_FlowControl.cpp */; };
+		ACDC5A0929840886005A2454 /* JB_FlowControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC641C252984083300986ED2 /* JB_FlowControl.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -172,6 +176,7 @@
 		AC528FF029620091005EFB9D /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		AC528FF1296200A5005EFB9D /* jeebox.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = jeebox.input; path = ../jeebox.scproj/jeebox.input; sourceTree = "<group>"; };
 		AC528FF2296200BF005EFB9D /* exec.scproj */ = {isa = PBXFileReference; lastKnownFileType = folder; name = exec.scproj; path = ../exec.scproj; sourceTree = "<group>"; };
+		AC641C252984083300986ED2 /* JB_FlowControl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_FlowControl.cpp; path = ../Library/CppLib/JB_FlowControl.cpp; sourceTree = "<group>"; };
 		ACBEE4E61A2E1D5200B61694 /* uwu */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = uwu; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACC4BA6528BF423E00D26BCE /* exec */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exec; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACEB6E521B1B0E70007B488A /* uwuTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = uwuTest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -250,6 +255,7 @@
 		ACB5F6D2175CBA7700797A3C = {
 			isa = PBXGroup;
 			children = (
+				AC641C252984083300986ED2 /* JB_FlowControl.cpp */,
 				AC528FE92961FE2F005EFB9D /* JB_Umbrella.hpp */,
 				AC528FEF29620070005EFB9D /* speedie.input */,
 				AC528FF1296200A5005EFB9D /* jeebox.input */,
@@ -458,6 +464,7 @@
 				AC528FBB2961FDB4005EFB9D /* JB_Alloc.cpp in Sources */,
 				AC528FC32961FDB4005EFB9D /* JB_Pipe.cpp in Sources */,
 				AC528FD32961FDB5005EFB9D /* JB_FastString.cpp in Sources */,
+				AC641C262984083300986ED2 /* JB_FlowControl.cpp in Sources */,
 				AC528FE32961FDB5005EFB9D /* JB_Run.cpp in Sources */,
 				AC528FC72961FDB5005EFB9D /* JB_ObjArray.cpp in Sources */,
 				AC528FE12961FDB5005EFB9D /* JB_Utils.cpp in Sources */,
@@ -469,6 +476,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC528FEE2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */,
+				ACDC5A0929840886005A2454 /* JB_FlowControl.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -505,6 +513,7 @@
 				AC528FD42961FDB5005EFB9D /* JB_FastString.cpp in Sources */,
 				AC528FE42961FDB5005EFB9D /* JB_Run.cpp in Sources */,
 				AC528FC82961FDB5005EFB9D /* JB_ObjArray.cpp in Sources */,
+				ACDC5A0729840884005A2454 /* JB_FlowControl.cpp in Sources */,
 				AC528FE22961FDB5005EFB9D /* JB_Utils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -514,6 +523,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC528FED2961FEFC005EFB9D /* JB_RingTree.cpp in Sources */,
+				ACDC5A0829840885005A2454 /* JB_FlowControl.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
