@@ -241,7 +241,7 @@ class String
 		return fs
 
 
-	function Yes (|bool|)
+	function Yes (|bool|) // ispositive, isaffirmative
 		if (self[0] == '0'):					return false
 		if self ~= "no" or "false" or "off":	return false
 		return self
