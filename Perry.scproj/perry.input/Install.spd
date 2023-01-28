@@ -194,7 +194,7 @@ extend_module perry
 		if !CppCompiler.file.exists
 			return "No c++ compiler exists at '$CppCompiler' ! Please make one available from that path."
 
-	function CheckInstallStatus
+	function CheckInstallStatus (|bool| MsgIfNothing=true)
 		.checked = true
 		|| CompilerMsg = .TestCompiler
 		|| HasNewerApp = .testnewer
@@ -211,7 +211,7 @@ extend_module perry
 			probs = true
 		if CompilerMsg
 			beep CompilerMsg
-		  elseif !probs
+		  elseif !probs and MsgIfNothing
 			beep "No errors detected with install."
 
 

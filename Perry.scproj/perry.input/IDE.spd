@@ -171,7 +171,7 @@ class PerryIDE (Window)
 	
 	behaviour PostLoad
 		if !perry.checked
-			perry.CheckInstallStatus
+			perry.CheckInstallStatus(false)
 
 	function StatsMode (|int|)
 		rz = perryide.StatsMode|int|
