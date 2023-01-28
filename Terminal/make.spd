@@ -1,7 +1,7 @@
 #!/usr/local/bin/spd
 
 // README:
-// Run this using sudo. like: sudo make.spd
+// Run this using sudo. like: sudo /usr/local/speedie/Terminal/make.spd
 
 // ANTI-MAKE THEORY:
 	// NO: unix 'make' or cmake
