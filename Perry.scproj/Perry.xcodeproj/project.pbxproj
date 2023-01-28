@@ -935,14 +935,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
-					"-march=core2",
 					"-ffast-math",
-					"-mfpmath=sse",
-					"-mmmx",
-					"-msse",
-					"-msse2",
-					"-msse4.1",
-					"-msse4.2",
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
 				);
@@ -1006,14 +999,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
-					"-march=core2",
 					"-ffast-math",
-					"-mfpmath=sse",
-					"-mmmx",
-					"-msse",
-					"-msse2",
-					"-msse4.1",
-					"-msse4.2",
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
 				);
