@@ -402,8 +402,8 @@ class String
 	module
 		function New (|int| n, |string|)
 			cpp_Wrapper JB_Str_New
-//		function Own (|cstring| addr,  |int| n, |string|)
-//			cpp_wrapper JB_FreeableString
+		function Own (|cstring| addr,  |int| n, |string|)
+			cpp_wrapper JB_FreeableString
 		function Copy (|&byte| addr,  |int| n, |string|)
 			cpp_part NewCopy
 			rz = new(n)
