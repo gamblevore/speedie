@@ -1,0 +1,14 @@
+<widget>
+	<debug>on</debug>
+	<window title="Sample Konfabulator Widget">
+		I just put some text here
+		<name>main_window</name>
+		<width>500</width>
+		<height>500</height>
+	</window>
+	<image src="Images/Sun.png" name="sun1">
+		<hOffset>250<unit>mm</unit></hOffset>
+		<vOffset>250</vOffset>
+		<alignment>center</alignment>
+	</image>
+</widget>

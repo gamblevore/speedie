@@ -1,0 +1,14 @@
+{"widget":{"":[
+  {"debug":{"":["on"]}},
+  {"window":{"title":"Sample Konfabulator Widget", "": [
+    "I just put some text here",
+    {"name":{"":["main window"]}},
+    {"width":{"":["500"]}},
+    {"height":{"":["500"]}}
+  ]},
+  {"image":{"src":"Images/Sun.png", "name":"sun1", "":[
+    {"hOffset":{"":["250",{"unit":{"":["mm"]}}]}},
+    {"vOffset":{"":["250"]}},
+    {"alignment":{"":["center"]}}
+  }
+]}

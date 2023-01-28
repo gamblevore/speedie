@@ -1,0 +1,11 @@
+widget
+	debug on
+	window (title: "Sample Konfabulator Widget")
+		"I just put some text here"
+		name main_window
+		width 500
+		height 500
+	image (name: sun1, src:"Images/Sun.png")
+		hOffset 250mm
+		vOffset 250
+		alignment center
