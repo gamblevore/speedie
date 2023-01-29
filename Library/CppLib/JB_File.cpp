@@ -223,7 +223,7 @@ uint8* JB_FastCString( JB_String* Path, uint8* Tmp ) {
 
 
 uint8* JB_FastFileString( JB_String* Path, uint8* Tmp ) { // utf-16 on windows :(? Or do we just use posix funcs?
-#ifdef TARGET_UNIX
+#ifndef TARGET_WINDOWS
     return JB_FastCString(Path, Tmp);
 #else
 	unsigned short* Result16 = (unsigned short*)Result;
@@ -865,7 +865,7 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 
 
 
-#ifdef TARGET_UNIX
+#ifndef TARGET_WINDOWS
 	JB_String* JB_File__CWD( ) {
 		char* path = getcwd( 0, 0 );
 		if (!path) {
