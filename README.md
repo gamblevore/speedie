@@ -25,7 +25,7 @@ Speedie has been written as a passion project with a large amount of hacker-ment
 
 Use Speedie if you feel called to: Because you find it fun to work on, or work in.
 
-Describing why anyone would Speedie is a bit difficult. I can say "the programs it makes, run fast" but most people would rather write C++ if they want speed.
+Describing why anyone would use Speedie is a bit difficult. I can say "the programs it makes, run fast" but most people would rather write C++ if they want speed.
 
 I could say "you usually only need a little code to do a lot" but most dynamic languages have this property. And besides, lacking a debugger right now really hampers development. (I'm working to fix this.)
 
