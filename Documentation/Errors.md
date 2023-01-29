@@ -36,9 +36,9 @@ The statements `require` / `expect` / `check` / `error` are used for control-flo
 
 Each can be used after an expression, or before:
 
-        || A = "a,a,a".parse    #require // #require after A
+        || A = "a,a,a".parse            #require
         || B = "b,b,b".parse
-        require B                        // require before B
+        require B
 
 both `A` and `B` are tested in the same way. But the first looks better to me, in this case. Its more "out of the way".
 
