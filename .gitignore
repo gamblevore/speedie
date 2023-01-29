@@ -3,7 +3,7 @@
 cpp.hidden
 .DS_Store
 xcuserdata/
-**/src.nogit/
+*nogit
 /Library/*.jbin
 **/*.input/garbage.jb
 
