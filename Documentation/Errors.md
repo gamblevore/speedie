@@ -20,24 +20,19 @@ Errors can be generated from any function. They don't affect code-flow, except u
         "User list parsed OK"
         
         for user in userlist
-            // 'error' will create an error if .nameisok returns false. 
-            // the error will contain the "user" object
-            // this reports the file and position of the error
-            // along with the error messge below.
-            error user.name.NameIsOK (user, "User has a bad name.")
-            // even if an error is created control-flow continues
+            // check all users for bad-names. Pass the message to nicely
+            // describe where the errors were found in the source.
+            check user.name.NameIsOK (user, "User has a bad name.")
             
         if stderr.ok
-            // this branch occurs if all the names were good.
             "All users have good names"
           else
-            // otherwise we end up here.
             "${stderr.errorCount} users have bad names"
         
 
 Hopefully the comments explain this function well.
 
-The statements `require` / `expect` / `error` are used for control-flow and error-handling. They remove the messy control-flow, so you can see your code clearly.
+The statements `require` / `expect` / `check` / `error` are used for control-flow and error-handling. They remove the messy control-flow, so you can see your code clearly.
 
 Each can be used after an expression, or before:
 
@@ -51,8 +46,8 @@ Lets make a list of the statements:
 
 + `expect` - This will create an error, and return from the function if the expression is false.
 + `require` - This will just return, if the expression is false. No error.
-+ `error` - This will create an error if the expression is false. But the code will continue to flow.
-
++ `check` - This will create an error if the expression is false. But the code will continue to flow.
++ `error` - This will create an error.
 
 ---
 ### Good Error Handling

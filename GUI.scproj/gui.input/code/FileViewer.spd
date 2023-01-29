@@ -459,7 +459,7 @@ class FileViewer (ListView)
 					if fr != '/' and '~'
 						|| r = l.sel
 							s = r.obj|filerow|.location
-					error fv.quickOpenFile(s, 2) (Beep)
+					check fv.quickOpenFile(s, 2) (Beep)
 				if (key is escape) or key.isaccept
 					return fv.hideopenlist
 				if key is up or down
