@@ -107,22 +107,22 @@ Looking through Speedie code, you may see a lot of strangely defined functions. 
 ## Possibly Surprising things
 
     class Logger
-        |file| file
+        |file| File
         function Log (|string| s)
             if !.file
                 || L = file.logs.child(app.AppName+".log")
                 .OpenLog(L)
-            .file <~ s
+            .File <~ s
             .file <~ "\n"
         
         helper OpenLog (|string| path)
-            .file = path.file
+            .FILE = path.file
             .file.OpenEmpty        
 
 
 One thing you will notice immediately, is that we are accessing our properties with `.` even within a class's own functions. This is different to most languages. `self.property` is equal to `.property` in speedie. The dot `.` is necessary, you can't access self's properties or functions without it. This reduces the chances of bugs.
 
-Another thing you might spot is that actually, Speedie is case-insensitive. It doesn't care if you write `.LOG` or or `.log` or `.loG`. This makes writing code easier.
+Another thing you might spot is that actually, Speedie is case-insensitive. It doesn't care if you write `.FILE` or or `.file` or `.fILe`. This makes writing code easier.
 
 In speedie, functions are just functions. They behave the same way. So why is one function declared as `function` and the other `helper`? `helper` functions are hidden by the IDE "Perry"! So its a way for developers to unclutter their code from the perspective of users, thats all!
 
