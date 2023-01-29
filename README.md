@@ -86,7 +86,7 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 
 Currently Speedie is compiling for MacOSX Intel and Apple Silicon (ARM).
 
-It would be nice to have people help port Speedie to other platforms. Speedie is basically built ontop of Unix, C++ and SDL2. Speedie itself uses no Mac code, but Perry (the IDE) uses one small .m (MacOSX) code file. So porting the compiler Speedie itself should be easier than compiling the IDE Perry.
+It would be nice to have people help port Speedie to other platforms. Speedie is basically built ontop of Unix, C++. Speedie itself uses no Mac code, but Perry (the IDE) uses one small .m (MacOSX) code file, and SDL2. So porting the compiler Speedie itself should be easier than compiling the IDE Perry.
 
 HOWEVER, things are rarely so simple. Even a plain C++ command-line app usually needs reworking to compile across multiple platforms due to header differences. 
 
