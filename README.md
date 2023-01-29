@@ -2,7 +2,7 @@
 # Speedie - Fun is the main goal #
 ## Technical Qualities: Object Oriented, Simple, Fast, Nice-Looking, Non-Infantilising ##
 
-* `Creator:` Theodore H. Smith - Released on NYE, 31/12/2022.
+* `Creator:` [@gamblevore](http://github.com/gamblevore/) - Released on NYE, 31/12/2022.
 * `Contact:` [theo@jeebox.org](mailto:theo@jeebox.org)
 * `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 
