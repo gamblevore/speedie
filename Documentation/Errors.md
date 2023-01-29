@@ -1,6 +1,6 @@
 ## Error Handling In Speedie
 
-Error handling is quite important. Its a skill to get right. The tools available are `stderr` which stores reported errors, and the `#require`/`#expect`/`#error` statements.  All errors flow through a central object we call `StdErr`.
+Error handling is quite important. Its a skill to get right. The tools available are `stderr` which stores reported errors, and the `#require`/`#expect`/`#error`/`#check` statements.  All errors flow through a central object we call `StdErr`.
 
 Errors can be generated from any function. They don't affect code-flow, except unless you **want** it to. Let's make a simple example:
 
