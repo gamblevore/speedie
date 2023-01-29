@@ -47,7 +47,7 @@ Lets make a list of the statements:
 + `expect` - This will create an error, and return from the function if the expression is false.
 + `require` - This will just return, if the expression is false. No error.
 + `check` - This will create an error if the expression is false. But the code will continue to flow.
-+ `error` - This will create an error.
++ `error` - This will create an error. Same as `check false`
 
 ---
 ### Good Error Handling
