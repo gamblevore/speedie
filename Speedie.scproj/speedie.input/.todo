@@ -4,7 +4,6 @@
 
 * || x = .SomeCArray // should just get the address... :)
 * Errors in subprojects kinda suck with error-reporting
-* || x = 4GB should automatically be an int64.
 * months.scproj demo needs better compiler support, including .render not being needed.
 * collectdecls uppercase one letter at least... within funcs, unless 1 byte long
 * return func(str.parse.first) // str.parse disappers too fast. refcounter not strong enough
