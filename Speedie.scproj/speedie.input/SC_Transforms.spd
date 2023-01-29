@@ -160,8 +160,6 @@ function Tran_Array (|Message| S, |SCBase| name_space) {
 	using (S)
 	// type.type contains the class to create
 	|| DotNew = «dot "new", «thg type.type.Name », «emb »»
-	if type.type == TypeArray
-		DotNew.Last <~ 0
 
 
 	if P in @Decl
