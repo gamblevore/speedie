@@ -1978,7 +1978,7 @@ void JB_App__Crash(JB_String* reason);
 
 JB_StringC* JB_App__CrashLogName();
 
-int JB_App__CWDSet(JB_String* Value);
+ErrorInt JB_App__CWDSet(JB_String* Value);
 
 void JB_App__Die(JB_String* Err, int code);
 

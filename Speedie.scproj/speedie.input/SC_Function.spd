@@ -907,7 +907,7 @@ function FixCnjSub (|Message| exp) {
 	|| ch = exp.first
 	|| name = ch.Next.Name
 	// "error" sucks as a name... so does continue_with_Error...
-	|| CreatesError = (name == "expect" or "continue_with_error" or "error" or "want")
+	|| CreatesError = (name == "expect" or "continue_with_error" or "error" or "check")
 
 	|| DoesReturn =  (name != "continue_with_error" and "error" and "loop")
 	expect (CreatesError or (name == "debug_require" or "require" or "continue" or "loop")) (exp, "Must be one of '#require, #expect, #continue, #debug_require, #continue_with_error, #error, #loop' .")
@@ -1601,7 +1601,7 @@ function message.NeedsPreprocess (|bool|)
 	if self == @TRel or self IsARel "$"
 		return true
 	if self == @tmp
-		return .name == "using" or "expect" or "require" or "debug_require" or "warn" or "error" or "want" or "loop"
+		return .name == "using" or "expect" or "require" or "debug_require" or "warn" or "error" or "check" or "loop"
 
 	require (self == @rel)
 	|| L = .first

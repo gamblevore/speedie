@@ -83,6 +83,6 @@ extend message
 		.become(abc)
 
 		for r in prms
-			error (r is inserted)  (r, "Unused parameter to macro")
+			check (r is inserted)  (r, "Unused parameter to macro")
 
 

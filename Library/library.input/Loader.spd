@@ -151,9 +151,9 @@ struct ObjectLoader {
 
 	function Finish
 		.result = nil
-		error !.NoClass (.DataError, "Unknown class.")
-		error !.DataError (.DataError, "Bad data found.")
-		error !.Couldntload (.Couldntload, "This class has no loader for it.")
+		check !.NoClass (.DataError, "Unknown class.")
+		check !.DataError (.DataError, "Bad data found.")
+		check !.Couldntload (.Couldntload, "This class has no loader for it.")
 	
 	
 	function GetClassOf (|message| msg, |&ClassData|)

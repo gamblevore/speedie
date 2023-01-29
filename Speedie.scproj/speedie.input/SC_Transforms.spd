@@ -50,7 +50,7 @@ dispatch TemporalStatements (TranFunc)
 
 
 
-function Tran_Expect (TranFunc) {
+function Tran_Expect (TranFunc)
 // expect a=b -->
 // if !(a=b) {
 // error stuff
@@ -61,25 +61,28 @@ function Tran_Expect (TranFunc) {
 	Using (node)
 	|| Ch1 = ch.next
 	|| N = node.name
-
-	|| NewStyle = (N == "error" or "warn" or "want")
-	if (NewStyle and !ch1) { // work around for now.... for: error where
+	
+	if n == "error"
+		n = "check"
+		if ch1
+			deprecate (node, "This is 'check' now.")
+// its always "newstyle" now? remove this check?
+	|| NewStyle = (N == "check" or "warn")
+	if (NewStyle and !ch1) // work around for now.... for: error where
 		ch1 = ch
 		ch = «thg "false"»
 		ch1.prev = ch
-	}
 
 	if (name_Space)
 		typeofexpr(ch, name_space) // use this pre-transform or during transform... :)
 
-	ch = ch.negate.needbra
+	ch = ch.Negate.NeedBra
 	
 	|| arg = «arg »
 	node <~ arg
 
 	if (N == "expect") or (NewStyle)
 		arg <~ ch1.ExpectParamsTransform( node.Position, ch, N )
-
 	
 	if (N == "debug_require")
 		arg <~ «tmp "debugger"»
@@ -93,14 +96,12 @@ function Tran_Expect (TranFunc) {
 			arg <~ ret
 
 	node.name = "if"
-}
+
 
 
 function Tran_Temporal (|SCFunction| FN, |Message| s, |SCBase| name_space)
 	|| TmpInt = TemporalStatements[s.name]		#expect (s, "Unrecognised statement")
 	(TmpInt)( FN, s, name_space )
-
-
 
 
 
@@ -793,13 +794,13 @@ function Tran_FuncTable (|Message| msg, |bool|)
 			// tmp {a.b++}
 			
 			if table_name == @prm
-				error (listok) (i, `Should be like ("a", "b") : code`)
+				check (listok) (i, `Should be like ("a", "b") : code`)
 				table_name = table_name.first
 				sigh.remove
 			  else
 				table_name = i
 			item_name = i
-			error (item_Value) (I, "Item needs to be like: 'name {code}'." )
+			check (item_Value) (I, "Item needs to be like: 'name {code}'." )
 		  else
 			i.expect(@item)
 			if (item_Value == item_name)

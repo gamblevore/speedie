@@ -241,7 +241,7 @@ function TypeOfString (ExprResolver)
 
 
 function TypeOfChar (ExprResolver)
-	error (exp.length == 1) (exp, "Chars must be one byte long.")
+	check (exp.length == 1) (exp, "Chars must be one byte long.")
 //	want  (exp.length == 1) (exp, "Chars must be one byte long.") // seems better?
 
 	return TypeByte.typenormal
@@ -1742,7 +1742,7 @@ function TypeOfArgArr (ExprResolver)
 		if itm == @tmp
 			itm.func = @thg
 		|| Contained = TypeOfExpr( itm, name_space )
-			error (Contained.type.isdatatype or contained.PointerCount) (itm, "Must be a datatype.")
+			check (Contained.type.isdatatype or contained.PointerCount) (itm, "Must be a datatype.")
 			if (result.type)
 				|| oof = contained.HighestArrayContainMatch( result.type.TypeNormal, itm )
 					result.type = oof.type
@@ -1797,7 +1797,7 @@ function Tran_ArgArray (|Message| Exp, |SCBase| name_space)
 	|| Already = exp.obj
 	if counter.isitem and already.mustbe(scdecl)
 		|| c = counter.max+1
-		error (c < 16K) (exp, "Too many items in C-array.")
+		check (c < 16K) (exp, "Too many items in C-array.")
 		already.c_array = c
 		
 

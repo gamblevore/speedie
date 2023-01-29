@@ -63,7 +63,7 @@ struct ASMFuncState
 	function NeedSomewhere (|Message| err, |&asmreg| dest, |DataTypeCode| T) // .needreg
 		require !dest.reg
 		|| B = (~.usedregs).lowestbit
-		error (B) (err, "No free registers.")
+		check (B) (err, "No free registers.")
 		.usedregs |= B
 		dest.reg = B.log2
 		dest.aType = T

@@ -184,13 +184,12 @@ extend message
 		fs.appendmultireplace(.name, jeebox.XML_EscapeStr)
 
 
-
 function message.XMLToJeebox (|bool|)
 	for ch in self
 		rz := ch == @xml
 		ch.XMLToJeeboxSub
-	error rz (self, "No XML found.")
-
+	check rz (self, "No XML found.")
+ 
 
 helper message.XMLToJeeboxSub
 	if self == @xpi

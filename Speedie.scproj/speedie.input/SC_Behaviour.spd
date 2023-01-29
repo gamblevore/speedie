@@ -27,7 +27,7 @@ class SCBehaviour (SCBase)
 		require (fn)
 		|| Old = self[fn.name]|scbase|
 
-		error  (!Old) (fn.source,	kNameConf) 
+		check  (!Old) (fn.source,	kNameConf) 
 		expect (!Old) (old.source,	kNameConf)
 
 		.TryAdd(fn.source, fn, fn.name) // Link... later.
@@ -183,7 +183,7 @@ class SCBehaviour (SCBase)
 			|| cls = L.cls
 				expect fn.lookup
 				fn.AddSelfToFunc(cls)
-		error (fn.source) ("Error in ProcessInterface.")
+		check (fn.source) ("Error in ProcessInterface.")
 	
 	
 	function SCModule.AddInterfaceToTable (|SCClass| TableCls)

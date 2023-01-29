@@ -173,7 +173,7 @@ class SCImport
 					ifn FirstName
 						FirstName = name
 					  else
-						error false ( nil, "Multiple input folders found! '$Name' and '$FirstName'" )
+						error ( nil, "Multiple input folders found! '$Name' and '$FirstName'" )
 			
 			expect (Firstname) (f, "Can't find folder '$f/input/'.")
 			return f[FirstName]

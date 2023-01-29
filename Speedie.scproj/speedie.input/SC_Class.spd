@@ -134,7 +134,7 @@ function AutoConstructor
 			|| name = prop.name
 			if name ~= "super"
 				name = "sooper"
-			error (name != "__rz__") (prop.source, "Invalid name.")
+			check (name != "__rz__") (prop.source, "Invalid name.")
 			prms <~ prop.WriteDeclTypeAndName(name, false)
 			arg  <~ «rel
 				«sdot name »
@@ -325,7 +325,7 @@ function CreateConstructors
 	if .IsObject
 		|| Con = .FindAllocFunc( "Constructor" )
 		if .IsRole
-			error (!con or .super.ConstructorFunc) (con.source, "Role's super lacks a constructor.")
+			check (!con or .super.ConstructorFunc) (con.source, "Role's super lacks a constructor.")
 			con := .super.ConstructorFunc
 			.destructorfunc = .super.DestructorFunc
 			require con
@@ -450,7 +450,7 @@ function OverrideSyntax
 
 	for f in cast
 		f.IsInline = true
-		error  (f.args == 1)		(f.Source, "No params allowed." )
+		check  (f.args == 1)		(f.Source, "No params allowed." )
 		expect (f.ReturnType)       (f.Source, "Need a return type.")
 		f.nextfunc.DontWantSameReturnType(f)
 		.Casts <~ f
@@ -909,7 +909,7 @@ module
 		|| dot = node.first
 		|| name = dot[@thg, @name]
 			|| emb = name.next
-			error (emb != @prm) (emb, "Need space between bracket and name.")
+			check (emb != @prm) (emb, "Need space between bracket and name.")
 			emb.remove
 		return compiler.program
 

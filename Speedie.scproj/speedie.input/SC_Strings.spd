@@ -166,7 +166,7 @@ function String_Expand (|Message| msg, |SCFunction|fn) {
 				errpos = item
 			ObjectifyString( item )
 	
-	error !(scbase.CurrModule) (errpos, "Strings with expressions, must be in proper functions. (Compiler limitation)")
+	check !(scbase.CurrModule) (errpos, "Strings with expressions, must be in proper functions. (Compiler limitation)")
 		// would need to totally redesign how I do strings... and init code. sigh. collectdecls seems to have happened already so... its too late at this point to add new vars? something like that.
 
 	for (item in msg)

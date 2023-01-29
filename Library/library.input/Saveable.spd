@@ -12,7 +12,7 @@ struct ObjectSaver
 	|object--|					Root
 		
 	destructor
-		error !.CantSaveThis (.CantSaveThis, "This class has no saving function for it.")
+		check !.CantSaveThis (.CantSaveThis, "This class has no saving function for it.")
 	
 	module
 		|SaverClassInfo|		SaveableList

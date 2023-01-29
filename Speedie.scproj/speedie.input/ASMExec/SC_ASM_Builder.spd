@@ -14,7 +14,7 @@ function asm2.AddRegParam (|message| src, |uint| write)
 	|| Num = src.regornum
 	if write < 4
 		.r[write] = num // what if it's the last one...
-		error (.r[write] == num) (src, "Number out of bounds.")
+		check (.r[write] == num) (src, "Number out of bounds.")
 	  elseif write == 4
 		.rest = num
 	  else

@@ -621,7 +621,7 @@ function UniquifyExport (|String| s, |string|)
 
 
 function RehomeExport (|bool|)
-	error (!.IsSTDLib) (self, "Can't rehome a std lib function. Use cpp_part to give a unique name.")
+	check (!.IsSTDLib) (self, "Can't rehome a std lib function. Use cpp_part to give a unique name.")
 	|| newhome = .UniquifyExport(.exportname)			#require
 	compiler.exportnames[.exportname] = nil
 	compiler.exportnames[newhome] = self

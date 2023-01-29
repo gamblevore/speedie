@@ -132,7 +132,7 @@ function pref_path (|string|)
 	
 	if rz[0] != '/'
 		rz = file.appPrefs(rz)
-	error (rz[0] == '/' or '~') ("App pref path should be 'default' or a full-path.")
+	check (rz[0] == '/' or '~') ("App pref path should be 'default' or a full-path.")
 
 
 function PrefsStartup

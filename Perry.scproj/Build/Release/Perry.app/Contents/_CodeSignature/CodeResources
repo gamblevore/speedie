@@ -23,17 +23,13 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			C8PAJ3fvZneMVyrhVgn4xtAEByk=
+			q9imo7+38K7UcK/R0a3KPlH1aiI=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"c7b42e625411c4b43a151423a0027690d230a04c" or cdhash H"0bc3c02777ef66778c572ae15609f8c6d0040729" or cdhash H"e6cf8ecdc6868413d71e8e3f741ca76f5515de9b" or cdhash H"9a0b28a860af4d6912e87b3f1d2880f6988d2969"</string>
+			<string>identifier libSDL2 and anchor apple generic and certificate leaf[subject.CN] = "Apple Development: delete@elfdata.com (JZC3RBZ4MH)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
 		</dict>
 		<key>Resources/AppIcon.icns</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			OGh7bA07wEDQmp1ECKkSmo/31Z4=
-			</data>
 			<key>hash2</key>
 			<data>
 			JgPBFKV4kVIHYj10kiNKKBnPs/RXLEiWAAc7e7LUGGg=
@@ -41,10 +37,6 @@
 		</dict>
 		<key>Resources/Assets.car</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			B4N85mKcqIqZqK7G7i+DMo7aeJw=
-			</data>
 			<key>hash2</key>
 			<data>
 			v2iS4qR5TDOhVX4U654/zW75gktm6+YFw+nLDSuYm+I=
@@ -52,10 +44,6 @@
 		</dict>
 		<key>Resources/speedie_install.txt</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			V8UdV4pzGTG1C+spYo1EMCQHphw=
-			</data>
 			<key>hash2</key>
 			<data>
 			gRvsicCi2kHf2WjY65qA/Eg+nG0HEgsD2mXrAtWvT2M=
