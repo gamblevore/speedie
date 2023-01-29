@@ -12,6 +12,14 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 
 Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D I did delete most of the rude comments before release, but still... dont expect "corporate professionalism".
 
+# Read More #
+* [Language Guide](Documentation/LanguageGuide.md)
+* [XML Comparison](Documentation/xml.md)
+* [Message (Jeebox)](Documentation/Message.md)
+* [Strings](Documentation/Strings.md)
+* [Error Handling](Documentation/Errors.md)
+
+
 
 # Why Use Speedie? #
 
