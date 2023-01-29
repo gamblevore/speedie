@@ -90,7 +90,7 @@ Subclassing is done like this:
 
 ## Container Classes (array, dictionary, etc)
 
-Classes can contain have contained types. For example, you can declare something as an array of string, rather than just an array of any-old-kinda-object.
+Classes can have contained types. For example, you can declare something as an array of string, rather than just an array of any-old-kinda-object.
 
     |[string]| MyStringArray
     |[]| MyArray
