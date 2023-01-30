@@ -1085,10 +1085,11 @@ class Message (RingTree)
 		
 	function ivec4 (|ivec4|)
 		opt norefcounts
-		|| c = .first
-		for i in 4
-			rz[i] = C$.int|int|
-			c++
+		if self
+			|| c = .first
+			for i in 4
+				rz[i] = (C #loop).int|int|
+				c++
 
 
 	function Yes (|bool|)

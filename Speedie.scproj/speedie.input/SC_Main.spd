@@ -31,7 +31,7 @@ function compiler.SetupEnv
 		app.IgnoreSig
 		app.CrashHandler = &process.TellParentIDied 		
 
-	app.PrefsStartup
+	app.PrefsInit
 	errorcolors.DisableIfNoTerminal
 
 

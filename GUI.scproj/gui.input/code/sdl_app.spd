@@ -23,7 +23,6 @@ module SDLApp
 	|bool|						IsBackground
 	|byte|						CanDrag
 	|bool|						FlashSelector
-	|bool|						LoadedSizePref
 	|bool|						WantsQuit
 	|bool|						IsQuitting
 	|bool|						AControlWasResized
@@ -154,24 +153,13 @@ module SDLApp
 	function Size (assigns:|ivec2| S)
 		|| pos	= .ScreenPosOrig
 		|| s2	= (s.vec2*.scale).ivec2
-		.ScreenOrig((0, 0, s2))
-
-
-	function Screen (|ivec4| result, |bool|)
-		cpp_Part SetScreen
-		result = (result.vec4 * .scale).ivec4
-		return .ScreenOrig(result)
-	
-	
-	function Screen (assigns:|ivec4| result, |bool|)
-		cpp_Part SetScreen2
-		return .ScreenOrig((result.vec4*.scale).ivec4)
+		.ScreenOrig((pos, s2))
 
 
 	function ScreenOrig (assigns:|ivec4| result, |bool|)
 		require .ScreenWindow
 		if (result.x <= 0) and (result.y <= 0)
-			.JB_SDL_FullScreen(.nativewindow)
+			.JB_SDL_FullScreen(.nativewindow) //SDL2 had a bug in it... probably still exists
 			//.SDL_SetWindowFullscreen(.screenwindow)
 			return true
 		|| Old = .SizeOrig
@@ -217,22 +205,15 @@ module SDLApp
 	
 	function PostLoads
 		opt norefcounts
-		if !.LoadedSizePref
-			.LoadedSizePref = true
-			|| it = app.prefs..screen
-				sdlapp.ScreenOrig = it.ivec4
-
 		|| s = .TryResizeLater
-			.SizeOrig = s
 			.TryResizeLater = nil // clear... in case of inf loop
+			.SizeOrig = s
 
 		for w in window.all
 			if !w.PostLoaded
 				w.PostLoaded = true
 				w.__PostLoad__
 
-	function Screen2 (|guicontrol|)
-		return window.all
 
 	function MouseXY (|ivec2|)
 		|| x = 0
@@ -319,25 +300,31 @@ module SDLApp
 			app.quit(0)
 	
 	
-	function SDLInit (|controlrect| cr) // startup
+	function SDLInit (|ivec2| s) // startup
 		require !.framelength
+		app.PrefsInit
+		|| PrevSize = app.prefs..screen.ivec4
+			s = PrevSize.size
 		.guicheck
 		if !font.small
 			return app.die("smallfont not loaded.\n")
-		|| s = cr.size
 		.FrameLength	= 1.0/60.0
+		.FastToolTipDate = 1
+
 		.DrawSpace		= image(s, 0|&byte|)
 		.drawspace.name = "read"
-		.FastToolTipDate = 1
 		.initwindow(s, app.conf("selfname") oar app.conf("name"))
 		.InitScaling(s.vec2, 1.5)
 		__modules__.window.all.lastrect = s.rect
+		if prevsize
+			sdlapp.ScreenOrig = prevsize
+		
+		
 		.CheckQuarantine
 		.OpenedFirst = date()
 		app.regStartup
 		appmenu.InitAppMenu
 		.InitDelegates
-		
 		
 	
 	function SetHint (|cstring| name, |cstring| value)
@@ -935,7 +922,8 @@ module SDLApp
 		|| P = .FindResizeCorner(M)
 		|| D = .AppResizingXY - p
 		|| L = window.all.lastrect.size
-		sdlapp.screen = (0, 0, l + D)
+		|| R = ((0, 0, l + D).vec4*.scale).ivec4
+		.ScreenOrig=R
 		return kActivity
 	
 	

@@ -144,7 +144,7 @@ module Registration
 		|| r = app._conf..registration
 		registration.RegConf = r
 		app.unregistered = r
-		app.PrefsStartup
+		app.PrefsInit
 		registration.TestFailed
 	
 	function Name (|string|)
