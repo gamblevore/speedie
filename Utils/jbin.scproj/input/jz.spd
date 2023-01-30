@@ -21,7 +21,22 @@ datatype Type (int)
 main  
 	expect (app.args >= 1 and app.args <= 2)				("Usage: ${app.filename} InPath [OutPath]")
 	data = inpath.file.ReadSafely(0.25GB)					#require
-	.Detect
+	
+	if data.IsCompressed
+		data = data.Decompress
+		detected = Type.Compressed
+	parse = data.parse
+	
+	if !parse
+		detected |= type.plain
+	  elseif data.IsJbin
+		data = parse.Render
+		detected |= type.jbin
+	  elseif parse.Find(@xml)
+		detected |= type.xml
+	  else
+		detected |= type.box
+		
 	if !.DoStuff and stderr.ok
 		|| str = .ReportStr()
 		error "$str to $str: Nothing to do."
@@ -46,22 +61,6 @@ function App.ReportStr (|string|)
 	if Detected & type.jbin: rz += "jbin"
 	if Detected & type.box:  rz += "jeebox"
 	if Detected & type.xml:  rz += "xml"
-		
-
-function App.Detect
-	if data.IsCompressed
-		data = data.Decompress
-		detected = Type.Compressed
-	parse = data.parse
-	if !parse
-		detected |= type.plain
-	  elseif data.IsJbin
-		data = parse.Render
-		detected |= type.jbin
-	  elseif parse.Find(@xml)
-		detected |= type.xml
-	  else
-		detected |= type.box
 
 	
 function App.ToBoxOrBin (|Type| Dest, |bool|)
