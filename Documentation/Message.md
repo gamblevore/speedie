@@ -63,8 +63,7 @@ Let's start with an XML data-bank, the first thing we want to do is convert it t
           <genre>Computer</genre>
           <price>44.95</price>
           <publish_date>2000-10-01</publish_date>
-          <description>An in-depth look at creating applications 
-          with XML.</description>
+          <description>An in-depth look at creating applications with XML.</description>
        </book>
     ...
 
@@ -81,7 +80,7 @@ First, lets test that we can even read a file at all. Lets take the file via com
 
 Ooops, well we converted it already. See that line `XMLToJeebox`? I guess in my enthusiasm I already converted it. Anyhow so thats great. Now lets save this file to jeebox, might as well.
 
-    path.Ext("box") <~ jb.render
+    path.SetExt("box") <~ jb.render
 
 Now, our document is saved to the file "`books.box`" (assuming you passed in `books.xml`). The `<~` operator just means "write this string to the file at this path". Lets take a look at it:
 
@@ -92,7 +91,7 @@ Now, our document is saved to the file "`books.box`" (assuming you passed in `bo
             genre "Computer"
             price "44.95"
             publish_date "2000-10-01"
-            description "An in-depth look at creating applications \n      with XML."
+            description "An in-depth look at creating applications with XML."
     ...
 
 Much better! Actually the file is 25% smaller already, although XML->Jeebox can usually save a lot more than that. From now on, we can pass in `books.box` instead of `books.xml` to our app.
@@ -106,7 +105,7 @@ Altogether that makes this:
     || jb = B.Parse                  #require
     if b isa "xml"
         jb.XMLToJeebox
-        || boxfile = path.Ext("box")
+        || boxfile = path.SetExt("box")
         if boxfile <~ jb.render // write file to disk
             "Converted XML to Jeebox: $boxfile"
 
@@ -213,7 +212,7 @@ Here is the final total code, with the logic bug fixed:
         || jb = B.Parse                  #require
         if b isa "xml"
             jb.XMLToJeebox
-            || boxfile = path.Ext("box")
+            || boxfile = path.SetExt("box")
             if boxfile <~ jb.render // write file to disk
                 "Converted XML to Jeebox: $boxfile"
     
