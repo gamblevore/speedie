@@ -56,7 +56,7 @@ function message.TargetTest (|bool|) // target true, target false,
 		return true
 	if self ~= "false"
 		return false
-	if self ~= "osx"
+	if self ~= "osx" or "mac"
 		return Platform.osx
 	if self ~= "win"
 		return Platform.windows

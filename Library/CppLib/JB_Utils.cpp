@@ -116,15 +116,7 @@ bool JB_IsLibrary() {
 
 
 int JB_Platform__CPU() {
-	#if _M_X86 || __i386__
-		return 4; // intel
-	#elif __arm__
-		return 2; // arm
-	#elif __ppc__
-		return 8; // ppc
-	#else
-		return 0; // unknown
-	#endif
+	return __CPU_TYPE__;
 }
 
 JB_String* JB_Platform() {
@@ -134,7 +126,7 @@ JB_String* JB_Platform() {
     }
     
     #if defined(__APPLE__) && defined(__MACH__)
-        Plat = JB_StrC("osx");
+        Plat = JB_StrC("mac");
     #elif __unix__
         Plat = JB_StrC("lin");
     #elif __WIN32__

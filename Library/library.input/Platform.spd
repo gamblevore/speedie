@@ -21,7 +21,7 @@ module Platform
 		return .cpu & 1
 
 	function osx (|bool|)
-		return .name=="osx"
+		return .name=="osx" or "mac"
 
 	function linux (|bool|)
 		return .name=="lin"

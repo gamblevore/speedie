@@ -87,6 +87,22 @@ typedef int64					Date;
     #define ENV32BIT
 #endif
 
+
+#define __CPU_PPC__ 8
+#define __CPU_INT__ 4 // intel
+#define __CPU_ARM__ 2
+#define __CPU_SPD__ 1
+
+#if _M_X86 || __i386__ || __x86_64__
+	#define __CPU_TYPE__ __CPU_INT__
+#elif __arm__ || __aarch64__ || _M_ARM64
+	#define __CPU_TYPE__ __CPU_ARM__
+#elif __ppc__ || __powerpc64__ || __ppc64__ || _ARCH_PPC64
+	#define __CPU_TYPE__ __CPU_PPC__
+#else
+	#define __CPU_TYPE__ 0
+#endif
+
 #ifdef ENV64BIT
     typedef long long int IntPtr;
     typedef unsigned long long int UintPtr;
@@ -102,42 +118,6 @@ typedef int64					Date;
 #ifndef kPlatformEndian
 	#define kPlatformEndian 0
 #endif
-
-// probably should move all this into the string header... utf-8 isnt needed elsewhere
-#if kPlatformEndian == 0
-    #define kWrongUTF16			/*Becomes*/		(16+1)
-	#define kUTF16BBOM			/*Becomes*/		0xFFFE
-	#define kUTF16LBOM			/*Becomes*/		0xFEFF
-	#define kUTF32LBOM			/*Becomes*/		0x0000FEFF
-	#define kUTF32BBOM			/*Becomes*/		0xFFFE0000
-#elif kPlatformEndian == 1
-    #define kWrongUTF16			/*Becomes*/		(16)
-	#define kUTF16BBOM			/*Becomes*/		0xFEFF
-	#define kUTF16LBOM			/*Becomes*/		0xFFFE
-	#define kUTF32LBOM			/*Becomes*/		0xFFFE0000
-	#define kUTF32BBOM			/*Becomes*/		0x0000FEFF
-#endif
-
-
-#define kUTF8BOM			/*Becomes*/		0xEFBBBF
-#define kUTF8BOM1			/*Becomes*/		0xEF
-#define kUTF8BOM2			/*Becomes*/		0xBB
-#define kUTF8BOM3			/*Becomes*/		0xBF
-#define kLast3ByteMask		/*Becomes*/		0xFFFFFF00
-#define kUTF8FirstMin						-62 /*A magic number! don't change it!*/
-
-enum {
-	kEncAscii = 0,
-	kEncBytes = 0,
-	kEncUTF8 = 8,
-	kEncUTF16 = 16,
-    kEncUTF32 = 32,
-    kEncBE = 1,
-    kEncUTF = kEncUTF8|kEncUTF16|kEncUTF32,
-    kEncUTF8_BE = kEncUTF8|kEncBE,
-    kEncUTF_BE = kEncUTF| kEncBE,
-};
-
 
 
 #define kMaxint								2147483647

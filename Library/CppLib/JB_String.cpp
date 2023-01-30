@@ -15,11 +15,50 @@
 
 extern "C" {
 
+
 #ifdef ENV64BIT
     #define kStrLengthMax (2147483644) // 2GB string max
 #else
     #define kStrLengthMax (1024*1024*1024) // 1GB string max
 #endif
+
+// probably should move all this into the string header... utf-8 isnt needed elsewhere
+#if kPlatformEndian == 0
+    #define kWrongUTF16			/*Becomes*/		(16+1)
+	#define kUTF16BBOM			/*Becomes*/		0xFFFE
+	#define kUTF16LBOM			/*Becomes*/		0xFEFF
+	#define kUTF32LBOM			/*Becomes*/		0x0000FEFF
+	#define kUTF32BBOM			/*Becomes*/		0xFFFE0000
+#elif kPlatformEndian == 1
+    #define kWrongUTF16			/*Becomes*/		(16)
+	#define kUTF16BBOM			/*Becomes*/		0xFEFF
+	#define kUTF16LBOM			/*Becomes*/		0xFFFE
+	#define kUTF32LBOM			/*Becomes*/		0xFFFE0000
+	#define kUTF32BBOM			/*Becomes*/		0x0000FEFF
+#endif
+
+
+#define kUTF8BOM			/*Becomes*/		0xEFBBBF
+#define kUTF8BOM1			/*Becomes*/		0xEF
+#define kUTF8BOM2			/*Becomes*/		0xBB
+#define kUTF8BOM3			/*Becomes*/		0xBF
+#define kLast3ByteMask		/*Becomes*/		0xFFFFFF00
+#define kUTF8FirstMin						-62 /*A magic number! don't change it!*/
+
+enum {
+	kEncAscii = 0,
+	kEncBytes = 0,
+	kEncUTF8 = 8,
+	kEncUTF16 = 16,
+    kEncUTF32 = 32,
+    kEncBE = 1,
+    kEncUTF = kEncUTF8|kEncUTF16|kEncUTF32,
+    kEncUTF8_BE = kEncUTF8|kEncBE,
+    kEncUTF_BE = kEncUTF| kEncBE,
+};
+
+
+
 bool JB_Byte_IsWhite(byte b);
 
 
