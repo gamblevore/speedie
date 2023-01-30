@@ -447,7 +447,7 @@ class File (String)
 				return "~" + self[file.HomePath.length ...]
 
 		function string.IdealApp (|string|)
-			if platform.osx
+			if platform.OSX
 				return ("/Applications/" + .name)
 
 		function file.IdealApp (|file|)
@@ -459,7 +459,7 @@ class File (String)
 		
 
 		function TrashPath (|string|)
-			if platform.osx
+			if platform.OSX
 				return "~/.Trash/"
 			if platform.windows
 				return `C:\$Recycle.Bin`

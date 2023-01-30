@@ -14,13 +14,22 @@ module Platform
 	function CPU_Intel (|bool|)
 		return .cpu & 4
 
+	function CPU_PPC (|bool|)
+		return .cpu & 8
+
 	function CPU_ARM (|bool|)
 		return .cpu & 2
 
 	function CPU_Spd (|bool|)
 		return .cpu & 1
 
-	function osx (|bool|)
+	function CPU_Name (|string|)
+		if .CPU_Intel: return "intel"
+		if .CPU_ARM:   return "arm"
+		if .CPU_PPC:   return "ppc"
+		if .CPU_Spd:   return "spd"
+
+	function OSX (|bool|)
 		return .name=="osx" or "mac"
 
 	function linux (|bool|)

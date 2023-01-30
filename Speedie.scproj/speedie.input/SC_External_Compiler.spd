@@ -172,8 +172,13 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 	rz.AppendWords( Linkage[Platform.name] )
 	
 	// Gaming64Bit
-	if Platform.CPU_Intel
-		rz.AppendWords( " -march=core2  -ffast-math  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
+	rz.AppendWords("-ffast-math")
+	if options.arch ~= "intel"
+		rz.AppendWords( " -march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
+	  elseif (options.arch ~= "arm") and platform.OSX
+		rz.AppendWords( "-mcpu=apple-a14 -target arm64-apple-macos11" )
+	  else
+		rz.AppendWords("-march=native")
 	
 	// stripping
 	rz.appendwords( "-fdata-sections -ffunction-sections")
@@ -187,7 +192,8 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 	if (opt < 0)
 		rz.AppendWords( " -O0  " )
 	  else
-		rz.AppendWords( " -mtune=native " )
+		if options.arch ~= "intel"
+			rz.AppendWords( "-mtune=native" )
 		if (opt >= 1)
 			rz.AppendWords( " -Os " )
 			if (opt >= 2)
@@ -259,13 +265,13 @@ function ExtComp
 	.ClearThis
 	if stderr.ok
 		compiler.Package
-
+//-arch arm64
 
 function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
-		"\nCompiling c++ to: \"${.ProductPath}\"\n"
+		"\nCompiling ${options.arch} c++ to: \"${.ProductPath}\"\n"
 	
 	.CollectAndCompile(	.CppLib,						.LibTmpPath )$
 	.CollectAndCompile(	Compiler.GeneratedCppsFolder,	.ProjTmpPath )$
@@ -331,7 +337,7 @@ function saytest (|int| n)
 	printline "   ()"
 
 
-function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self
+function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, testcompiler
 	|| S = .ProductPath
 	|| Test1 = S.File
 	|| Test2 = "${S}2".File
@@ -464,6 +470,8 @@ function File.TestSpeedie (|string| Variant, |bool|) {
 		cmd_args <~ "--final"
 	if options.PrintCompileString
 		cmd_args <~ "--noisy"
+	if Options.arch
+		cmd_args <~ "--arch="+options.arch
 
 	|| result = faststring()
 	.path.execute(cmd_args, result)
