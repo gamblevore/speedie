@@ -6,7 +6,7 @@ main
 	expect (inpath!=outpath)				("InPath = OutPath??")
 	|| b		= inpath.file.ReadSafely(1GB)	#require
 	if b.isjbin
-		OutPath := inpath.RemoveExt("jbin", "_unjbin").UniqueFile
+		OutPath := inpath.Removeext("jbin").UniqueFile
 	  else
 		Outpath := inpath + ".jbin"
 	|| writer = outpath.writer				#require
