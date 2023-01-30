@@ -749,7 +749,7 @@ class Message (RingTree)
 		cpp_part FindSyxName
 		return .findflat(s, name, false)
 
-
+// merge these two! find and find flat... seem to do the same except the err-param
 	function FindFlat (|Syntax| s, |string| name, |bool| Err = false, |Message|)
 		opt norefcounts
 		for ch in self

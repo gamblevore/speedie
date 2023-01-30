@@ -108,8 +108,8 @@ class File (String)
 		cpp_wrapper JB_File_DataSet
 	
 	
-	function ReadSafely (|int| lim = 128MB, |bool| AllowMissing = true, |StringThatWasReadSafely|)
-		opt norefcounts
+	function ReadSafely (|int| lim = 128MB, |bool| AllowMissing = false, |StringThatWasReadSafely|)
+		// normally allowmissing is good, but here it is bad.
 		return .readall(lim, allowmissing)
 	
 	

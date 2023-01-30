@@ -49,13 +49,10 @@ extend String
 		return join2(R, "/")
 
 
-	function RemoveExt (|string| suff, |string| backup, |string|)
-		|| ext = .ext 
-		if ext == suff
+	function RemoveExt (|string| suff, |string|)
+		if self isa suff
 			return .TrimExtKeepPath
-		if backup
-			return self + backup
-		stderr.newerror("Expected suffix '$suff' on '$self' but found '$ext'")
+		return self
 			
 
 	function TrimTrailingSlashes (|string|)
@@ -176,12 +173,16 @@ extend String
 		return self[ 0, i ]
 
 		
-	function Ext (|string| ext, |string|)
-		cpp_Part SetExt 
-		rz = .TrimExtKeepPath
+	function AddExt (|string| ext, |string|)
 		if ext[0] != '.'
-			rz += "."
-		rz += ext
+			ext = "." + ext
+		return self + ext
+		
+	function Ext (|string| ext, |string|)
+		disabled "Do you mean .addext or .setext?"
+
+	function SetExt (|string| ext, |string|)
+		return .TrimExtKeepPath.AddExt(ext)
 	
 	function Ext (|string|)
 		|| i = .find( '.', int.max, 0 )

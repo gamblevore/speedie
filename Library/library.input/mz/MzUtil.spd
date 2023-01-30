@@ -18,6 +18,12 @@ extend string
 	function IsCompressed (|bool|)
 		return .isjbin and self[2, "C\06µz"]
 		
+	function DecompressStream (|faststring| fs, |bool|)
+		if !.IsCompressed
+			fs <~ self
+		  else
+			return .DecompressSub(nil, 256MB, .parse_jbin, fs)
+		
 	function Decompress (|&compressionstats| st=nil, |int|lim=256MB, |StringThatWasReadSafely|)
 		if !.IsCompressed
 			return self
