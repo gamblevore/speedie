@@ -94,12 +94,19 @@ typedef int64					Date;
 #define __CPU_SPD__ 1
 
 #if _M_X86 || __i386__ || __x86_64__
+	#pragma message("CPU: Intel")
 	#define __CPU_TYPE__ __CPU_INT__
 #elif __arm__ || __aarch64__ || _M_ARM64
+	#pragma message("CPU: ARM")
 	#define __CPU_TYPE__ __CPU_ARM__
 #elif __ppc__ || __powerpc64__ || __ppc64__ || _ARCH_PPC64
+	#pragma message("CPU: PPC")
 	#define __CPU_TYPE__ __CPU_PPC__
+#elif __spd64__ || __spd32__
+	#pragma message("CPU: Speedie")
+	#define __CPU_TYPE__ __CPU_SPD__
 #else
+	#pragma message("CPU: None?")
 	#define __CPU_TYPE__ 0
 #endif
 
