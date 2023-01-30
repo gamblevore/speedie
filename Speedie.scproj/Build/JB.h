@@ -1239,13 +1239,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1761])
+#define kJB__ErrorColors_bold (JB_LUB[1762])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1762])
-#define kJB__ErrorColors_good (JB_LUB[1763])
-#define kJB__ErrorColors_normal (JB_LUB[1764])
-#define kJB__ErrorColors_underline (JB_LUB[1763])
-#define kJB__ErrorColors_warn (JB_LUB[1765])
+#define kJB__ErrorColors_error (JB_LUB[1763])
+#define kJB__ErrorColors_good (JB_LUB[1764])
+#define kJB__ErrorColors_normal (JB_LUB[1765])
+#define kJB__ErrorColors_underline (JB_LUB[1764])
+#define kJB__ErrorColors_warn (JB_LUB[1766])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern Array* SC__Ext_Cleanup;
@@ -1436,8 +1436,8 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
 #define kSC_BitAnd (JB_LUB[408])
 #define kSC_BitNot (JB_LUB[506])
-#define kSC_BitOr (JB_LUB[611])
-#define kSC_BitXor (JB_LUB[1766])
+#define kSC_BitOr (JB_LUB[612])
+#define kSC_BitXor (JB_LUB[1767])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1467,7 +1467,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1767])
+#define kJB_SaverStart1 (JB_LUB[1768])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -4882,6 +4882,8 @@ JB_ErrorReceiver* JB_Rec__New();
 // JB_FastString
 void JB_FS_AppendCpp(FastString* self, JB_String* s);
 
+void JB_FS_AppendCppAll(FastString* self, JB_String* s);
+
 void JB_FS_AppendEscape(FastString* self, JB_String* s);
 
 void JB_FS_AppendHexStr(FastString* self, JB_String* Data);
@@ -5707,8 +5709,6 @@ inline bool JB_Array_SyntaxCast(Array* self);
 bool JB_Array_SyntaxEquals(Array* self, int n, bool Aware);
 
 Array* JB_Array__Alloc();
-
-Array* JB_Array__New(int size);
 
 Array* JB_Array__New0();
 

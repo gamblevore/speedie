@@ -8,6 +8,7 @@
 #include <string.h>
 #include "JB_BasicTypes.h"
 #include "JB_MemUtils.h"
+#include <csignal>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,13 +43,12 @@ extern "C" {
 
 
 #ifdef DEBUG
-	#if defined(ARM)
-		#define BK_PT "bkpt"
-	#else
-		#define BK_PT "int3"
-	#endif
 	extern bool CanASMBKPT;
-    #define debugger if (CanASMBKPT) __asm__(BK_PT) // int3 works in xcode but not in releasebuilds!
+	#if __CPU_TYPE__ == __CPU_INT__
+		#define debugger if (CanASMBKPT) __asm__("int3")
+	#else
+		#define debugger if (CanASMBKPT) std::raise(SIGINT)
+	#endif
     #define dbgexpect(test)  if  (!(test)) {debugger; return;} // int3 works in xcode but not in releasebuilds!
     #define dbgexpect2(test) if  (!(test)) {debugger; return 0;}
     #define JB_DoAt(count) int ldb; {static int jDB = 0; if (++jDB == count) {debugger;}; ldb = jDB; }

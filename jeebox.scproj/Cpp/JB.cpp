@@ -2538,7 +2538,7 @@ bool JB_TestCasting() {
 	JB_SetRef(y->Name, JB_LUB[269]);
 	JB_Object* yy = nil;
 	JB_SetRef(yy, y);
-	Array* arr = JB_Incr((JB_Array__New(0)));
+	Array* arr = JB_Incr((JB_Array__New0()));
 	JB_Array_SyntaxAppend(arr, JB_LUB[0]);
 	JB_Decr(arr);
 	if (JB_Object_Isa(yy, JB_AsClass(Message))) {
@@ -4489,14 +4489,6 @@ void JB_Array_SyntaxAppend(Array* self, JB_Object* item) {
 
 Array* JB_Array__Alloc() {
 	return ((Array*)JB_New(Array));
-}
-
-Array* JB_Array__New(int size) {
-	Array* __rz__ = ((Array*)JB_Array__Alloc());
-	if (__rz__) {
-		JB_Array_Constructor(__rz__, size);
-	}
-	return __rz__;
 }
 
 Array* JB_Array__New0() {
@@ -6911,7 +6903,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023012814);
+	return (2023013010);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
@@ -6923,4 +6915,4 @@ __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 6565725007342036 8266847538098989 -455154587352300
+// 6565725007342036 -261596577180868 -583773081452306

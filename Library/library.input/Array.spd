@@ -19,11 +19,6 @@ class Array (saveable)
 // size   = "buffer size"
 // count  = Like counting birds. it takes effort. (but array doesnt have it)
 ////////////////////////////////////////////////////////////////////////////
-
-
-	constructor ( |int| size ) // dont use this... WILL BE REMOVED
-		visible
-		cpp_wrapper JB_Array_Constructor
 	
 	constructor
 		visible

@@ -725,7 +725,7 @@ module
 		fs <~ "0};\n\n"
 		
 		fs <~ "const char* JB_LUBSrc = "
-		fs.appendcpp(.StringBlob)
+		fs.appendcppall(.StringBlob)
 		fs <~ `;
 
 extern "C" void JB_Str__FindGlobals(JB_String*** lub, int** lengths, const char** src) {
@@ -1353,6 +1353,13 @@ extern "C" void JB_Str__FindGlobals(JB_String*** lub, int** lengths, const char*
 	function C_RenderStr (fpMsgRenderCpp)
 		fs.appendcpp(.name)
 	
+	function Faststring.AppendCppAll (|string| s)
+		self <~ '"'
+		for (c in s) (i)
+			self <~ `\x`
+			.appendhex(c, 2)
+		self <~ '"'
+		
 	function Faststring.AppendCpp (|string| s)
 		self <~ '"'
 		for (c in s) (i)

@@ -1981,8 +1981,6 @@ inline bool JB_Array_SyntaxCast(Array* self);
 
 Array* JB_Array__Alloc();
 
-Array* JB_Array__New(int size);
-
 Array* JB_Array__New0();
 
 
