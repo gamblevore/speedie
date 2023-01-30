@@ -1239,13 +1239,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1762])
+#define kJB__ErrorColors_bold (JB_LUB[1774])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1763])
-#define kJB__ErrorColors_good (JB_LUB[1764])
-#define kJB__ErrorColors_normal (JB_LUB[1765])
-#define kJB__ErrorColors_underline (JB_LUB[1764])
-#define kJB__ErrorColors_warn (JB_LUB[1766])
+#define kJB__ErrorColors_error (JB_LUB[1775])
+#define kJB__ErrorColors_good (JB_LUB[1776])
+#define kJB__ErrorColors_normal (JB_LUB[1777])
+#define kJB__ErrorColors_underline (JB_LUB[1776])
+#define kJB__ErrorColors_warn (JB_LUB[1778])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern Array* SC__Ext_Cleanup;
@@ -1293,6 +1293,7 @@ extern Macro* SC__Macros_InitExpand;
 extern Macro* SC__Macros_Setter;
 extern Macro* SC__Macros_Worked2;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
+extern JB_String* SC__Options_Arch;
 extern bool SC__Options_ArgStats;
 extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_CheckMaxVars;
@@ -1434,10 +1435,10 @@ extern JB_String* JB_file_read_test;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[408])
-#define kSC_BitNot (JB_LUB[506])
-#define kSC_BitOr (JB_LUB[612])
-#define kSC_BitXor (JB_LUB[1767])
+#define kSC_BitAnd (JB_LUB[418])
+#define kSC_BitNot (JB_LUB[516])
+#define kSC_BitOr (JB_LUB[624])
+#define kSC_BitXor (JB_LUB[1779])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1467,7 +1468,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1768])
+#define kJB_SaverStart1 (JB_LUB[1780])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2002,7 +2003,7 @@ void JB_App__PrefSet(JB_String* s, JB_String* Value);
 
 JB_String* JB_App__pref_path();
 
-void JB_App__PrefsStartup();
+void JB_App__PrefsInit();
 
 void JB_App__Restart();
 
@@ -2378,6 +2379,8 @@ bool SC_FB__AppExtCompile(JB_String* Name, JB_String* Value, FastString* purpose
 
 bool SC_FB__AppOptions_alive(JB_String* Name, JB_String* Value, FastString* purpose);
 
+bool SC_FB__AppOptions_arch(JB_String* Name, JB_String* Value, FastString* purpose);
+
 bool SC_FB__AppOptions_argstats(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppOptions_breakonerr(JB_String* Name, JB_String* Value, FastString* purpose);
@@ -2463,6 +2466,8 @@ void SC_FB__CheckSelfModifying(JB_String* S);
 int SC_FB__CheckSelfModifying2();
 
 bool SC_FB__CompilerInfo();
+
+void SC_FB__DefaultOptions();
 
 bool SC_FB__Explain(FastString* Purpose, JB_String* name);
 
@@ -2914,7 +2919,15 @@ Message* JB_Tk__XMLWhatever(int s, int skip, JB_String* ender, Syntax fn);
 
 
 // Platform
+bool JB_Platform__CPU_ARM();
+
 bool JB_Platform__CPU_Intel();
+
+JB_String* JB_Platform__CPU_Name();
+
+bool JB_Platform__CPU_PPC();
+
+bool JB_Platform__CPU_Spd();
 
 int JB_Platform__Init_();
 
@@ -2926,7 +2939,7 @@ void JB_Platform__Log(JB_String* s);
 
 void JB_Platform__OpenLog(JB_String* name);
 
-bool JB_Platform__osx();
+bool JB_Platform__OSX();
 
 int JB_Platform__PointerBytes();
 

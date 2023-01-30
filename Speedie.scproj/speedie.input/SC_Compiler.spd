@@ -253,7 +253,7 @@ function InitTypes
 	typestring.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
 
 
-function InitBasicStuff (|bool|)
+function InitBasicStuff (|bool|) // compiler.init
 	(Message).Restore
 		
 	expect (StdErr.OK)  ("Error in source syntax. Can’t continue.")
