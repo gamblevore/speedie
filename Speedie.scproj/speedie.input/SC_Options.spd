@@ -101,7 +101,6 @@ module Feedback
 
 		for (S in args)
 			.Parseoption(S)
-		.DefaultOptions
 		
 		if options.OperationCount <= 0
 			StdErr.newerror( "\nError: No operations requested.\n" )
@@ -167,10 +166,6 @@ module Feedback
 
 		if exists and isspd and stderr.ok
 			return path
-
-
-	function DefaultOptions
-		options.arch:=Platform.CPU_Name
 		
 	function ParseOption (|object| Obj)
 		// something like that?
