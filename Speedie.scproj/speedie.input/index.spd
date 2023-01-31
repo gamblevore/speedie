@@ -4,10 +4,6 @@ linkage
 	cpp_part SC
 
 
-compile_linking
-	flags
-		osx "-F/Library/Frameworks  -L/usr/local/lib/   -framework Cocoa"
-
 
 ignore // better append syntax?
 	WriteTo <~ { tmp "ello"
