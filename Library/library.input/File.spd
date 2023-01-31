@@ -400,13 +400,15 @@ class File (String)
 		.ListStart
 		while ( .MoveNext )
 			yield .CurrChild
+		.listend
 
 	iterator Files
 		.ListStart
 		while ( .MoveNext )
 			yield self.child(.CurrChild)
 		.listend
-	iterator flat
+		
+	iterator flat // i don't like this...
 		|[file]| dir_chain
 		|| Curr		 = self
 		.liststart
