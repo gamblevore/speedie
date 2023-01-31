@@ -33,23 +33,21 @@ extend String
 		ifn p contains '*'
 			return .child(p).fileglobsub2(parts, result, i)
 		for ch in .file
-			if ch.GlobName(p)
+			if p globs ch
 				.child(ch).fileglobsub2(parts, result, i)
 		
-		
+	
 	operator globs (|string| within, |bool|)
-		return within.GlobName(self) // this order is better
-		
-	helper GlobName (|string| p, |bool|)
 		|| si = 0
 		|| pi = 0
-		while si < self
-			|| sc = self[si++]
-			|| pc = p[pi++]
+		while si < within
+			|| sc = within[si++]
+			|| pc = self[pi++]
 			if pc != '*'
 				require sc == pc
 			  else
-				pc = p[pi]
+				// also need to handle stretches like abcdddddd matching "*d"... not just give up on the first "d"
+				pc = self[pi]
 				if sc != pc
 					pi--
 				// abcd

@@ -17,10 +17,25 @@ conf
 
 
 main  // main {
+	target debug {
+	|| x_ = "abcd/abcdefg/eeeefffff/aaaaabbbbcccdddd" / '/'
+	|| y_ = "a*d/*//abc*/*abc*/*abcd*/*a*b*c*d*/ef*/*ef*/*dd*" / '/'
+	
+	"avail = $x_"
+	
+	for y in y_
+		"testing \"$y\" "
+		for x in x_
+			debugger
+			if y globs x
+				"	$x"
+	}
+	
 	target debug
 		"*** target debug ***"
 	  else
 		"*** target release ***"
+	
 	stderr.LogFile = "PerryErrors.txt"
 	app.InitColors
 
