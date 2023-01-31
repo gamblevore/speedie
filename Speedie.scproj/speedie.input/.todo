@@ -1,7 +1,5 @@
 
 
-a.b 3
-
 						bugs
 
 * || x = .SomeCArray // should just get the address... :)
