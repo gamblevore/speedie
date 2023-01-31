@@ -1145,9 +1145,6 @@ class TextView (GUIControl)
 			|| x = (p.x, p.x2)(s)
 			|| tab = (s in '\t')
 				.undochecker = -1
-			//.PrevWasTabsOK = (!.myerror) and tab 
-			// too confusing. they get beeps and don't know why.
-			// maybe better to just actually HILITE the tabs after space!
 			.TryCaptureUndo(x, nt)
 			|| it = .isinline
 				it.UpdateSearch(nt)
