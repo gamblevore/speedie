@@ -1,5 +1,0 @@
-
-roots
-	"@spd/Library/library.input/"
-	"@spd/Jeebox.scproj/jeebox.input/"
-	// optional source-locations to search from can be stored here. These are not compiled.
