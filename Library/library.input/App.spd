@@ -19,7 +19,7 @@ target !minilib
 function Sleep (|Date| Duration)
 	cpp_wrapper JB_Date__Sleep
 
-syntax access (|int| i, |stringzeroterminated|)
+syntax access (|int| i, |string|)
 	return .args[i]
 	
 function conf (|string| name, |string|)
@@ -168,7 +168,7 @@ function Input (|string|)
 helper sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
 	cpp_Wrapper JB_SP_Run
 
-helper RawArgs  (|array of stringzeroterminated|)
+helper RawArgs  (|array of string|)
 	cpp_wrapper JB_App__Args
 
 helper Exit (|int| Code=0)

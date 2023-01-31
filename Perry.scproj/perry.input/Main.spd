@@ -17,7 +17,7 @@ conf
 
 
 main  // main {
-	target debug {
+	target false {
 	|| x_ = "abcd/abcdefg/eeeefffff/aaaaabbbbcccdddd" / '/'
 	|| y_ = "a*d/*//abc*/*abc*/*abcd*/*a*b*c*d*/ef*/*ef*/*dd*" / '/'
 	
