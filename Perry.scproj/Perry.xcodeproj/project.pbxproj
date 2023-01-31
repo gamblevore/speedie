@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -528,7 +528,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 1130;
 				LastUpgradeCheck = 0820;
-				ORGANIZATIONNAME = Theodore;
+				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					AC571FF926382ACC0060F126 = {
 						CreatedOnToolsVersion = 11.5;
@@ -549,7 +549,7 @@
 				};
 			};
 			buildConfigurationList = AC9E171C233A859B003B433F /* Build configuration list for PBXProject "Perry" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -996,6 +996,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 					/Users/theodore/Speedie/Terminal,
 				);
+				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
@@ -1045,12 +1046,14 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = OSX/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Build/Release/Perry.app/Contents/Frameworks",
 				);
-				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1086,12 +1089,14 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = OSX/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Build/Release/Perry.app/Contents/Frameworks",
 				);
-				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_FAST_MATH = YES;
 				OBJROOT = /tmp/build;
