@@ -91,7 +91,6 @@ class PerryIDE (Window)
 		if found isa filerow
 			return found.location.file
 
-
 	
 	function PerryError (|error|) 
 		opt norefcounts

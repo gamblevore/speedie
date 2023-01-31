@@ -41,7 +41,7 @@ extend PerryIDE
 		.ViewErrors			= buttonview(.ViewButtons,		ClickedAView)
 		.viewlog			= ButtonView(.ViewButtons,		clickedaview)
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .logarea]
-		.filesep			= StretchControl.horz(self, 125~right, 110, 110)
+		.filesep			= StretchControl.horz(self, 175~right, 110, 110)
 		.editsep			= StretchControl.vert(self, 0,         0,   100)
 		.PopupDisplay		= textview(self,		nil,					nil)
 		.AttachedProgram	= ""
