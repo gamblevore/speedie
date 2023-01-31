@@ -1,5 +1,4 @@
 
-function name
 
 function textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|)
 	|| l = func_name.position
@@ -208,8 +207,18 @@ function textview.InPrmsAndBetweenDecls (|message| msg, |int| x, |int|)
 	
 function PerryInsert6 (|textview| self, |intrange| a, |bool|)
 	.undochecker = -1
-	.InsertSub( " || name," , a)
-	.sel = (a.x2+4, a.x2+8)
+	|| toInsert = "|| name"
+
+	|| sel = a.x+1
+	if self[a.x-1] == ','
+		toInsert = " " + toInsert
+		sel++
+
+	if self[a.x2] != ')'
+		toInsert += ", "
+		
+	.InsertSub(toinsert , a)
+	.sel = sel
 	return true								// f* --> fn *
 
 function PerryInsert5 (|textview| self, |message| where, |intrange| A, |bool|)
