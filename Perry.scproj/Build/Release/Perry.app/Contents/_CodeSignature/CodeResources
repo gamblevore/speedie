@@ -23,7 +23,7 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			q9imo7+38K7UcK/R0a3KPlH1aiI=
+			4Ddypfa6Rd2FqW+M2OoJsjb+lhk=
 			</data>
 			<key>requirement</key>
 			<string>identifier libSDL2 and anchor apple generic and certificate leaf[subject.CN] = "Apple Development: delete@elfdata.com (JZC3RBZ4MH)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
