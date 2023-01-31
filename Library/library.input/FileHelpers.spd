@@ -8,6 +8,68 @@ extend String
 		|| f = .file
 		if f.MustExist(operation)
 			return f
+			
+	function FileGlob (|[file]|)
+		expect !(self contains "**") ("Can't glob '**' in: " + self)
+		for L.lines in self
+			|| fixed = L.PathFix.TrimTrailingSlashes
+			"".FileGlobSub(fixed / '/', rz)
+
+/*
+	OK, so how would this work?
+	
+	/aaa/bb*b/ccc
+	
+	split by *?
+
+	/aaa/bb,  b/ccc
+	
+	then find the last "/" and jump back to there?	
+*/
+
+
+	helper FileGlobSub (|[string]| parts, |[file]| result, |int| i=0)
+		|| p = parts[i++]
+		ifn p contains '*'
+			return .child(p).fileglobsub2(parts, result, i)
+		for ch in .file
+			if ch.GlobName(p)
+				.child(ch).fileglobsub2(parts, result, i)
+		
+		
+	operator globs (|string| within, |bool|)
+		return within.GlobName(self) // this order is better
+		
+	helper GlobName (|string| p, |bool|)
+		|| si = 0
+		|| pi = 0
+		while si < self
+			|| sc = self[si++]
+			|| pc = p[pi++]
+			if pc != '*'
+				require sc == pc
+			  else
+				pc = p[pi]
+				if sc != pc
+					pi--
+				// abcd
+				// a*d
+				
+		return true
+			
+	helper FileGlobSub2 (|[string]| parts, |[file]| result, |int| i=0)
+		if parts > i
+			.FileGlobSub(parts, result, i)
+		  else
+			|| f = .file
+			if f.Exists
+				result <~ f
+		//   /abc/def/ghi
+		//   /*/def/ghi
+		//   /abc/def/*
+		//   /abc/d*f/ghi
+		//   /*/d*f/*
+			
 	
 	function FileExists (|bool|)
 		|| f = .file
