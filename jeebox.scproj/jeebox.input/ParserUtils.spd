@@ -262,7 +262,6 @@ function Message.SyntaxUsingComplete { }
 
 
 
-
 // remove tokenhandler_fp, its just parsehandler!
 prototype ParseHandler    (|int| Start, |message| Parent=nil, |Message|)
 prototype TokenHandler_fp (|int| Start, |message| parent=nil, |Object|)
@@ -283,13 +282,4 @@ role MessageRoot (Message)
 	linkage
 		noauto
 		pragma noearlyfree
-
-
-
-function message.StringOwner (|string|)
-	for fuck.flat in .root
-		|| owner = fuck.name.owner
-		if owner isa string
-			if owner.length > rz
-				rz = owner
 
