@@ -126,7 +126,7 @@ JB_String* JB_Platform() {
     }
     
     #if defined(__APPLE__) && defined(__MACH__)
-        Plat = JB_StrC("mac");
+        Plat = JB_StrC("osx");
     #elif __unix__
         Plat = JB_StrC("lin");
     #elif __WIN32__
