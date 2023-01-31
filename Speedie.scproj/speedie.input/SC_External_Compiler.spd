@@ -271,7 +271,7 @@ function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
-		"\nCompiling ${options.arch} c++ to: \"${.ProductPath}\"\n"
+		"\nCompiling c++ to: \"${.ProductPath}\"\n"
 	
 	.CollectAndCompile(	.CppLib,						.LibTmpPath )$
 	.CollectAndCompile(	Compiler.GeneratedCppsFolder,	.ProjTmpPath )$
