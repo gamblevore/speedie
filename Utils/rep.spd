@@ -23,7 +23,7 @@ function file.SyntacticReplace (|bool|)
 module rep
 	|string|	From  = app[2]
 	|string|	To    = app[3]
-	|syntax|	Func  = syntax[app[1]]
+	|syntax|	Func  = syntax.Func(app[1])
 	|int|		Where = 0
 	|bool|		Aware = app..caseaware.yes
 	

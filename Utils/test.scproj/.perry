@@ -1,6 +1,0 @@
-
-roots
-	"@spd/Library/library.input/"
-	"@spd/Jeebox.scproj/jeebox.input/"
-	// extra roots to search from. This doesn't affect compilation.
-	// @spd is a prefix meaning "the speedie folder"
