@@ -1435,8 +1435,8 @@ extern JB_String* JB_file_read_test;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[418])
-#define kSC_BitNot (JB_LUB[516])
+#define kSC_BitAnd (JB_LUB[417])
+#define kSC_BitNot (JB_LUB[515])
 #define kSC_BitOr (JB_LUB[624])
 #define kSC_BitXor (JB_LUB[1779])
 #define kSC_CastedMatch (6)

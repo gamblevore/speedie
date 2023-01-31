@@ -175,8 +175,9 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 	rz.AppendWords("-ffast-math")
 	if options.arch ~= "intel"
 		rz.AppendWords( " -march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
-	  elseif (options.arch ~= "arm") and platform.OSX
-		rz.AppendWords( "-mcpu=apple-a14 -target arm64-apple-macos11" )
+	
+	if platform.OSX
+		rz.appendwords( "-arch x86_64 -arch arm64 -mmacosx-version-min=11.0" )
 	  else
 		rz.AppendWords("-march=native")
 	
@@ -191,13 +192,12 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 		rz.appendwords( "-g")
 	if (opt < 0)
 		rz.AppendWords( " -O0  " )
-	  else
+	  elseif (opt >= 1)
+		rz.AppendWords( " -Os " )
 		if options.arch ~= "intel"
 			rz.AppendWords( "-mtune=native" )
-		if (opt >= 1)
-			rz.AppendWords( " -Os " )
-			if (opt >= 2)
-				rz.AppendWords( " -flto " )
+		if (opt >= 2)
+			rz.AppendWords( " -flto " )
 
 
 	// Headers
