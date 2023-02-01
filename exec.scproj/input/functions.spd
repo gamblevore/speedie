@@ -22,8 +22,8 @@ class function
 			// we actually aren't allowed to write to string addresses!!
 			// right? I mean... internal ones anyhow?
 			.length = n
-			error (n > 0) ("Missing asm for: " + .name)
-			error (!blob.guard and !blob.callcount) ("Corrupted asm for: " + .name)
+			check (n > 0) ("Missing asm for: " + .name)
+			check (!blob.guard and !blob.callcount) ("Corrupted asm for: " + .name)
 			blob.guard = bear // bobobear
 			blob.callcount = 0
 			.speediefunc = blob
@@ -60,8 +60,8 @@ class function
 				fn.LinkCpp
 				fn.LinkSpd
 
-			error (apptable.table >= 1) ("Missing 'init'")
-			error (apptable.table >= 2) ("Missing 'main'")
+			check (apptable.table >= 1) ("Missing 'init'")
+			check (apptable.table >= 2) ("Missing 'main'")
 			return stderr.ok
 			
 		
