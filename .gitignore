@@ -10,7 +10,7 @@ xcuserdata/
 #Examples
 /FirstProj*
 /examples/**/books.box
-
+**/speedie2.xcodeproj
 #Terminal
 /Terminal/Backup/
 /Terminal/Debug/
