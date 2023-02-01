@@ -4388,10 +4388,10 @@ void JB_ss_SyntaxExpect(StringStream* self, JB_String* Error) {
 
 StringStream* JB_ss_test(StringStream* self, int a, JB_String* b) {
 	if ((!JB_Str_Exists(b)) or (({
-		JB_String* _tmP124 = JB_Incr(JB_ss_Str(self, JB_Str_Length(b), 0));
-		bool _tmP123 = JB_Str_Equals(_tmP124, b, false);
-		JB_Decr(_tmP124);
-		 _tmP123;
+		JB_String* _tmP128 = JB_Incr(JB_ss_Str(self, JB_Str_Length(b), 0));
+		bool _tmP127 = JB_Str_Equals(_tmP128, b, false);
+		JB_Decr(_tmP128);
+		 _tmP127;
 	}))) {
 		return self;
 	}
@@ -6903,7 +6903,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023013010);
+	return (2023013118);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {

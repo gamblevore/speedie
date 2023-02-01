@@ -48,12 +48,13 @@ function String.ParseJSON (|Messageroot|)
 
 function String.ParseWithError (|&Error| rec, |MessageRoot|)
 	visible
-	opt norefcounts // lol finally
-	* rec = nil
-	|| L = (message).layer
+	opt norefcounts
+	|| old = stderr
+	stderr = jeebox.ParseProtector init errorlist()
+	stderr.clear
 	rz = .parse
-	if !rz
-		*rec = stderr.pop
+	*rec = stderr.pop
+	stderr = old
 
 
 function String.HiddenJBin (|ind|)

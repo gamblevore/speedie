@@ -43,7 +43,7 @@ class ErrorList
 	function OK (|bool|)
 		Return self and !.errorcount
 	
-	function Problems (|bool|)
+	function Problems (|bool|) // totallyok
 		Return self and .errorcount or .problemcount
 	
 	
@@ -56,13 +56,13 @@ class ErrorList
 	syntax append (|Error| Err)
 		|| CanPrint = !.errorcount and error.autoprint
 		.incr(err)
-		require .CanAddMore(err.ErrorLevel)
+		require .CanAddMore(err.severity)
 		
 		err.path := .source
 		(.LogFunc)(self, err.render)?
 		if CanPrint and err.needsprint
 			printline err.render
-		if error.autoprint and err.errorlevel >= Errorseverity.error
+		if error.autoprint and err.severity >= Errorseverity.error
 			debugat
 		if error.autoprint != errorflags.PrintAndRemove
 			.errors <~ err
@@ -93,7 +93,7 @@ class ErrorList
 	function incr (|error| err, |bool| add=true)
 		|| n = (1, -1)(add)
 		
-		if err.errorlevel == errorseverity.problem
+		if err.severity == errorseverity.problem
 			debugger
 			.problemcount += n
 		  elseif err.isError
@@ -124,7 +124,7 @@ class ErrorList
 		opt norefcounts
 		require self
 		for err in self
-			if err.errorlevel >= level
+			if err.severity >= level
 				RZ++
 				if shell
 					err.render_clang(Fs)

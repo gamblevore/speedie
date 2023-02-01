@@ -1,7 +1,7 @@
 
 
 extend PerryIDE
-	function Recheck
+	function Recheck 
 		require .ModifiedForCompile
 		.ModifiedForCompile = false
 		.ForceRecheck
@@ -27,25 +27,26 @@ extend PerryIDE
 		.editme.ClearErrors
 		.filelist.ClearErrors
 	
+	
 	function CompiledOK (|message| msg, |bool|)
 		isnt active
 		.ClearErrors(msg=="compile")
-		if .viewing == .viewerrors
+		if .viewing == .ViewErrors
 			.NoNeed(.CompileOKString, .viewfiles)
 		return true
 
 
 	function ShowCompileErrors (|message| msg, |bool|)
 		isnt active
-		|| j = msg.first
+		|| MaybeOK = msg.first
 		sdlapp.CompileStatus = nil
-		if (j == "ok")
+		if (MaybeOK == "ok")
 			.errorlist.clear
 			return .CompiledOK(msg)
 
 		is Broken
 		.NoNeed
-		.errorlist.listsource = j.jberrors
+		.errorlist.listsource = MaybeOK.jberrors
 
 
 	function Compile (|string| operation)
@@ -113,6 +114,7 @@ extend PerryIDE
 			.ErrorListFB(msg)
 		  else
 			.CompiledOK(msg)
+		if self isnt broken
 			|| file = @url + "file"
 			file <~ first
 			.notify(.name + "\n\nCompiled OK!", file)

@@ -16,6 +16,7 @@ extend Message
 		if arg == @arg
 			rz.position		= arg..pos.int|int|
 			rz.path			= arg..file.value
+			rz.severity		= arg..severity.int|errorseverity|
 			rz.name	= arg[@str].nyme
 		  else
 			rz.name = .name

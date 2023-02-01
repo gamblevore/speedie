@@ -131,14 +131,14 @@ function Compiler.BuildErrors (|errorseverity| MinSev, |string|)
 	|| Count = 0
 	|| msg = faststring()
 	for (err in stderr)
-		if err.ErrorLevel >= MinSev
+		if err.severity >= MinSev
 			Count++
 			err.scrender(msg)
 
 	if !count
 		|| problems = 0
 		for (err in stderr)
-			if (err.ErrorLevel == errorseverity.problem)
+			if (err.severity == errorseverity.problem)
 				if ++problems <= 10
 					err.scrender(msg)
 	  elseif !options.perry
@@ -256,10 +256,9 @@ extend Error
 			fs <~ ':'
 			.SCLineIdentifiers(fs, data)
 			
-		  elseif (.node) // wyyyyyyyy
+		  elseif (.node)
 			.node.render(fs)
-			|| fn = .node.msgowningfunc
-			if (fn)  // could be an error in a variable outside of a func! (module/global)
+			|| fn = .node.msgowningfunc // could be an error in a variable outside of a func! (module/global)
 				fs <~ " in:\n"
 				.node.msgowningfunc.render(fs)
 		
@@ -267,10 +266,13 @@ extend Error
 		if options.color
 			if (.iswarning)
 				fs <~ errorcolors.warn
-			else
+			  else
 				fs <~ errorcolors.Error
 		
-		.errorlevel.render(Fs)
+		if .severity is problem
+			fs <~ "warning" // "problem" isnt a valid unix thingy
+		  else
+			.severity.render(Fs)
 		fs <~ ": "
 		if options.color: fs <~ errorcolors.Bold
 		fs <~ .name

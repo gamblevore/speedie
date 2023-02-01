@@ -15,7 +15,7 @@ class Error (Message)
 	|String|				OriginalData
 	|message|				Node
 	|date|					When
-	|ErrorSeverity|			ErrorLevel
+	|ErrorSeverity|			Severity
 	|ErrorFlags|			ErrorFlags
 
 	constructor (|message| node, |string| desc = "", |errorseverity| level=errorseverity.error, |string| path="" )
@@ -23,7 +23,7 @@ class Error (Message)
 		.position = -1
 		if node: .position = node.position
 		.node = node
-		.errorlevel = level
+		.severity = level
 		.name = desc // sigh
 		.path = (path, node.filepath)(path)
 		.OriginalData = node.OriginalParseData
@@ -36,7 +36,7 @@ class Error (Message)
 		super.constructor
 		.position = orig.position
 		.node = orig.node
-		.errorlevel = orig.errorlevel
+		.severity = orig.severity
 		.name = orig.name // sigh
 		.path = orig.path
 		.OriginalData = orig.OriginalData
@@ -69,13 +69,13 @@ class Error (Message)
 		return .when.fired
 	
 	function IsWarning (|bool|)
-		return (.ErrorLevel <= errorseverity.Warning)
+		return (.severity <= errorseverity.Warning)
 
 	function NeedsPrint (|bool|)
-		return (.errorlevel >= errorseverity.problem)
+		return (.severity >= errorseverity.problem)
 
 	function IsError (|bool|)
-		return (.ErrorLevel >= errorseverity.error)
+		return (.severity >= errorseverity.error)
 
 	
 	function Fill (|string| path, |string| desc)
@@ -131,8 +131,9 @@ class Error (Message)
 		fs.indent++
 		fs.field( "", .name )
 		if .position >= 0
-			fs.field( "pos", .position ) // this is buggered... the pos is totally wrong.
+			fs.field( "pos", .position )
 		fs.field( "file", .path )
+		fs.field( "severity", .severity )
 		fs <~ "\n"
 		fs.indent-- 
 
@@ -148,7 +149,7 @@ class Error (Message)
 		
 		if fs.grew(m)
 			fs <~ " "
-		.errorlevel.render(fs)
+		.severity.render(fs)
 		fs <~ ": "
 		fs <~ .name
 		.GrabLine(fs)
@@ -175,11 +176,14 @@ datatype ErrorFlags (Byte)
 datatype ErrorSeverity (Byte)
 	render
 		if (self < MaxError)
-			names := "OK note warning warning error critical".words
+			names := "OK note warning problem error critical".words
 			|| name = names[self|int|]
 			if !fs_in
 				return name
 			fs_in <~ name
+	
+	syntax is (|errorseverity| e, |bool|)
+		return self == e
 
 	constants // Severity
 		|ErrorSeverity|

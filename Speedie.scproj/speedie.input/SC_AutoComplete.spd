@@ -151,7 +151,7 @@ function ReportBuild (|message| cmd, |message|)
 		.Perry <~ .Log
 		externalcompiler.ExtComp
 	cmd.clear
-	if !stderr.ok
+	if stderr.Problems
 		cmd <~ compiler.ErrorsToPerry
 	  elseif cmd == "compile"
 		cmd <~ externalcompiler.productpath
@@ -160,18 +160,9 @@ function ReportBuild (|message| cmd, |message|)
 	return cmd
 
 
-function Wait (|message|)
-	"special waiting..."
-	for Cmd in .Perry
-		if cmd == "go"
-			exit
-	"wait over"
-
-
 function ReportBuildOrRestart (|message| cmd, |message| arg, |message|)
 	if !.CompileUpToDate
-		.restart(arg)		// arg, or else we complain about bad cmds		
-// check wants to keep it alive... compile wants to die
+		.restart(arg)		// arg, or else we complain about bad cmds
 	.CompileUpToDate = false
 	return .ReportBuild(cmd)
 
@@ -193,7 +184,7 @@ function compiler.FindModuleOrClass (|message| mod, |bool| retry, |scbase|)
 	opt norefcounts
 	if mod == @name and "main"
 		return compiler.program
-	|| Module = .FindModule(mod.name, nil, "nomod") #require
+	|| Module = .FindModule(mod.name, nil, "nomod")		#require
 	if (mod == @thg)
 		rz = module.cls
 		require rz or retry
