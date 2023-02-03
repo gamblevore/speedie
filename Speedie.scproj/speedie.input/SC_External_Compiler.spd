@@ -175,7 +175,7 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 	// Gaming64Bit
 	rz.AppendWords("-ffast-math")
 
-// not sure how you specifcy that these only apply to x86???
+// not sure how you specify that these only apply to x86???
 // clang seems too stupid to understand, anyhow... and refuses to compile :(
 // (only when compiling for both arm64 and x86... )
 // how to do a fat-compile with all the fastest version on both cpus?
@@ -183,7 +183,7 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 // we need some way to specify core2 at least... + all the extensions
 	
 	if platform.OSX
-		if options.arch ~= "intel"
+		if (options.arch ~= "intel") // and these files aren't lib files?
 			if options.optimise >= 4 // sigh
 				rz.AppendWords( " -march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
 			// fallback?
@@ -274,7 +274,7 @@ function ExtComp
 	.ClearThis
 	if stderr.ok
 		compiler.Package
-//-arch arm64
+
 
 function RunCppCompile
 	require (StdErr.OK)
@@ -341,9 +341,7 @@ function ExtCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 
 
 function saytest (|int| n)
-	print "\n()   Test"
-	print n.Render
-	printline "   ()"
+	"\n()   Test$n   ()"
 
 
 function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, testcompiler
