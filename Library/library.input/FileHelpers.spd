@@ -31,7 +31,8 @@ extend String
 	helper FileGlobSub (|[string]| parts, |[file]| result, |int| i=0)
 		|| p = parts[i++]
 		ifn p contains '*'
-			return .child(p).fileglobsub2(parts, result, i)
+			.child(p).fileglobsub2(parts, result, i)
+			return 
 		for ch in .file
 			if p globs ch
 				.child(ch).fileglobsub2(parts, result, i)
