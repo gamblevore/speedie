@@ -36,25 +36,30 @@ extend String
 			if p globs ch
 				.child(ch).fileglobsub2(parts, result, i)
 		
-	
-	operator globs (|string| within, |bool|)
-		|| si = 0
-		|| pi = 0
-		while si < within
-			|| sc = within[si++]
-			|| pc = self[pi++]
-			if pc != '*'
-				require sc == pc
-			  else
-				// also need to handle stretches like abcdddddd matching "*d"... not just give up on the first "d"
-				pc = self[pi]
-				if sc != pc
-					pi--
-				// abcd
-				// a*d
-				
-		return true
 			
+	operator globs (|string| txt, |bool|)
+		|&byte| text_backup
+		|&byte| wild_backup
+		|| text = txt.address
+		|| textEnd = text + txt.length
+		|| wild = .address
+		|| wildEnd = wild + .length
+		while text < textEnd
+			|| w = *wild
+			if w == '*'
+				text_backup = text
+				wild_backup = ++wild
+			  elseif (w == '?' or *text)
+				text++
+				wild++
+			  else
+				wild = wild_backup #require
+				text = ++text_backup 
+		while (wild < wildEnd and *wild == '*')
+			wild++  // ignore trailing stars
+		return wild == wildEnd
+	
+	
 	helper FileGlobSub2 (|[string]| parts, |[file]| result, |int| i=0)
 		if parts > i
 			.FileGlobSub(parts, result, i)
