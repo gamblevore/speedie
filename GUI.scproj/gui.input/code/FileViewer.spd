@@ -248,7 +248,7 @@ class FileViewer (ListView)
 		if path[0] == '/'
 			require (self ~= path)
 			return 10
-		if .StarMatch(path) // use globs instead?
+		if self globs path
 			return 8
 		if (path[0] == '.' and path[1] != '/') and .endswith(path, true)
 			return 1
@@ -502,19 +502,6 @@ class FileViewer (ListView)
 		function isbetter (|string| a, |string| b, |string| ext, |int|)
 			if (b == ext) != (a == ext)
 				return (a==ext)+1
-
-
-helper string.StarMatch (|string| name, |bool|)
-	visible
-	require self and name
-	if self ~= name
-		return true
-	|| Star		=  .find('*')						#require
-	DebugAt
-	|| Len		= .length - (Star + 1)
-	|| P1		= self[0,star]
-	|| P2		= self[star + 1...]
-	rz			= name[0, p1, true] and name[name-p2, p2, true]
 
 
 helper string.PlatformVisible (|bool| AtRoot, |bool|)
