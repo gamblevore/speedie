@@ -20,7 +20,19 @@ datatype Type (int)
 
 main  
 	expect (app.args >= 1 and app.args <= 2)				("Usage: ${app.filename} InPath [OutPath]")
-	data = inpath.file.ReadSafely(0.25GB)					#require
+	|| all = inpath.FileGlob
+	if OutPath
+		expect (all == 1) ("only 1 file should be matched but found: " + join2(all,"\n"))
+	for f in all
+		|| Read = f.ReadSafely(0.25GB)
+			.Process(read)
+		OutPath = ""
+
+
+function app.process (|string| read)
+	data = read
+	Detected = 0
+	parse = nil
 	
 	if data.IsCompressed
 		data = data.Decompress
