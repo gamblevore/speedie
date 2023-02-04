@@ -523,9 +523,6 @@ class File (String)
 role StringThatWasReadSafely (string)
 	linkage
 		cpp_part Safe
-	//JB_Safe_NopeWith0193
-	//JB_Safe_NopeWith0With0
-	//JB_Safe_NopeWith0WithMem // why are these beign created?
 	syntax cast (|bool|)
 		opt norefcounts
 		|| o = self|object|
