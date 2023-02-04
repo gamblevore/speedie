@@ -11,101 +11,97 @@ datatype Type (int)
 /// jz A.whatever		// decompress (Assuming it is compressed)
 /// jz -bin  A.box		// a.box.jbin
 
-|| OutPath = app[1]
-|| InPath = app[0]
-|| Comp = app["comp"]
-|| Data = ""
-|type| Detected
-|message| parse 
-
 main  
 	expect (app.args >= 1 and app.args <= 2)				("Usage: ${app.filename} InPath [OutPath]")
-	|| all = inpath.FileGlob
-	if OutPath
-		expect (all == 1) ("only 1 file should be matched but found: " + join2(all,"\n"))
+	|| C = conv()
+	|| all = app[0].FileGlob
+	|| Out = app[1]
+		expect (all == 1) ("Only 1 file should be matched but found: " + join2(all, "\n"))
 	for f in all
-		|| Read = f.ReadSafely(0.25GB)
-			.Process(read)
-		OutPath = ""
+		|| data = f.ReadAll(0.25GB, false)
+			conv(data, f, nil, nil, nil).Process
 
 
-function app.process (|string| read)
-	data = read
-	Detected = 0
-	parse = nil
-	
-	if data.IsCompressed
-		data = data.Decompress
-		detected = Type.Compressed
-	parse = data.parse
-	
-	if !parse
-		detected |= type.plain
-	  elseif data.IsJbin
-		data = parse.Render
-		detected |= type.jbin
-	  elseif parse.Find(@xml)
-		detected |= type.xml
-	  else
-		detected |= type.box
+class Conv
+	|string|  Data
+	|string|  In
+	|string|  Out
+	|message| Parse
+	|type| 	  Detected
+
+	function process
+		if .data.IsCompressed
+			.data = .data.Decompress
+			.detected = Type.Compressed
+		|| parse = .data.parse
 		
-	if !.DoStuff and stderr.ok
-		|| str = .ReportStr()
-		error "$str to $str: Nothing to do."
-
-
-function app.DoStuff (|bool|)
-	if app["report"]
-		print "$inpath is ${.ReportStr}\n\n"
-		StdErr.clear
-		return true
-	if app["box"]
-		return .ToBoxOrBin(Type.box)
-	if app["bin"]
-		return .ToBoxOrBin(Type.jbin)
-	if (detected is Compressed) == !comp
-		.write
-		return true
-
-
-function App.ReportStr (|string|)
-	if Detected & type.Compressed: rz = "compressed "
-	if Detected & type.jbin: rz += "jbin"
-	if Detected & type.box:  rz += "jeebox"
-	if Detected & type.xml:  rz += "xml"
-
-	
-function App.ToBoxOrBin (|Type| Dest, |bool|)
-	expect !(Detected is plain) ("File isn't jeebox.")
-	|| ext = ""
-	if Detected & Dest
-		require Detected is Compressed
-	  else
-		if Detected is xml
-			parse.XMLToJeebox
-		if dest is box
-			data = parse.Render
-			ext = "box"
+		if !parse
+			.detected |= type.plain
+		  elseif .data.IsJbin
+			.data = parse.Render
+			.detected |= type.jbin
+		  elseif parse.Find(@xml)
+			.detected |= type.xml
 		  else
-			data = parse.render_jbin
-			ext = "jbin"
-
-	.write(ext)
-	return true
-		
-
-function app.write (|string| ext="")
-	if !OutPath
-		outpath = inpath.RemoveExt("mz")
-		if ext
-			outpath = outpath.setext(ext)
-		if Comp
-			outpath = outpath.addext("mz")
+			.detected |= type.box
+			
+		if !.DoStuff and stderr.ok
+			|| str = .ReportStr
+			error "$str to $str: Nothing to do."
 	
-	if Comp
-		data = data.Compress
-	OutPath <~ data
-
-	if StdErr.ok
-		StrPrintLine(outpath)
-
+	
+	function DoStuff (|bool|)
+		if app["report"]
+			print "$.in is ${.ReportStr}\n\n"
+			StdErr.clear
+			return true
+		if app["box"]
+			return .ToBoxOrBin(Type.box)
+		if app["bin"]
+			return .ToBoxOrBin(Type.jbin)
+		if (.detected is Compressed) == !app["comp"].yes
+			return .write
+	
+	
+	function ReportStr (|string|)
+		if .Detected & type.Compressed: rz = "compressed "
+		if .Detected & type.jbin: rz += "jbin"
+		if .Detected & type.box:  rz += "jeebox"
+		if .Detected & type.xml:  rz += "xml"
+	
+		
+	function ToBoxOrBin (|Type| Dest, |bool|)
+		expect !(.Detected is plain) ("File isn't jeebox.")
+		|| ext = ""
+		if .Detected & Dest
+			require .Detected is Compressed
+		  else
+			if .Detected is xml
+				.parse.XMLToJeebox
+			if dest is box
+				.data = .parse.Render
+				ext = "box"
+			  else
+				.data = .parse.render_jbin
+				ext = "jbin"
+	
+		return .write(ext)
+			
+	
+	function write (|string| ext="", |bool|)
+		if !.Out
+			.Out = .in.RemoveExt("mz")
+			if ext
+				.out = .out.setext(ext)
+			if app["comp"].yes
+				.out = .out.addext("mz")
+		
+		if app["comp"].yes
+			.data = .data.Compress
+		.Out <~ .data
+	
+		if StdErr.ok
+			printline .out
+		return true
+	
+	
