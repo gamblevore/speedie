@@ -3,7 +3,10 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-extend String	
+extend String
+	function IsOK (|bool|)
+		return self != string.error
+	
 	function ExistingFile (|string| operation="access",  |File|)
 		|| f = .file
 		if f.MustExist(operation)
@@ -31,7 +34,8 @@ extend String
 	helper FileGlobSub (|[string]| parts, |[file]| result, |int| i=0)
 		|| p = parts[i++]
 		ifn p contains '*'
-			.child(p).fileglobsub2(parts, result, i)
+			|| abc = (.child(p), "/")(self or p) 
+			abc.fileglobsub2(parts, result, i)
 			return 
 		for ch in .file
 			if p globs ch
@@ -46,11 +50,11 @@ extend String
 		|| wild = .address
 		|| wildEnd = wild + .length
 		while text < textEnd
-			|| w = *wild
+			|| w = (*wild).lowercase
 			if w == '*'
 				text_backup = text
 				wild_backup = ++wild
-			  elseif (w == '?' or *text)
+			  elseif (w == '?' or (*text).lowercase)
 				text++
 				wild++
 			  else
