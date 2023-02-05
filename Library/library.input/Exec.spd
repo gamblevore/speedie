@@ -7,20 +7,23 @@
 module Pipe
 	constants
 		StdIn_  = 0
-		StdOut_ = 1
-		StdErr_ = 2
+		StdOut_ = 1 // i guess it should be a getter func
+		StdErr_ = 2 // considering we have setter funcs
 
 	function StdError (assigns:|int|)
 		cpp_wrapper
 
 	function StdOut (assigns:|int|)
 		cpp_wrapper
+
+	function StdOutIsTerminal (|bool|)
+		return .IsTerminal(.StdOut_)
 	
 	function IsTerminal (|int| FD, |bool|)
 		cpp_wrapper JB_IsTerminal
 	
 	function ErrorIsTerminal (|bool|)
-		.IsTerminal(Stderr_)
+		.IsTerminal(.StdErr_)
 		
 	//function PipeClosed (|int| FD, |bool|)
 		//cpp_wrapper JB_PipeIsClosed // implmented badly.

@@ -225,7 +225,6 @@ module ErrorColors
 		printline self
 		if (errorcolors.enabled): print ErrorColors.normal
 	
-
 	function DisableIfNoTerminal
-		.enabled = Pipe.IsTerminal(Pipe.StdOut_)
+		.enabled = pipe.StdOutIsTerminal
 
