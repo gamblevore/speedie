@@ -29,7 +29,7 @@ function app.Action (|type|)
 	
 
 main  
-	|| args = app.args		#expect ("Usage: ${app.filename} InPath [...]")
+	|| args = app.args		#expect ("Usage: ${app.filename} File1 [File2, ...],  or: ${app.filename} FileIn -p > FileOut")
 	|| Action = .Action
 	expect ((action isnt stdout) or (args == 1)) ("Can't write multiple files to stdout. How would we know where a file ends?")
 	for r in args
@@ -72,7 +72,7 @@ class Conv
 				StdErr.clear
 				return true
 
-			require Detected&type.actions != dest&type.actions
+			require Detected&type.actions != Do
 	
 			if dest is box
 				.data = parse.Render
