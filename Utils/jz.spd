@@ -1,107 +1,97 @@
 #!/usr/local/bin/speedie
 
 datatype Type (int)
-	flags: Compressed, Plain, XML, Box, Jbin
+	flags
+		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut
+	
 	syntax is (|Type| test, |bool|)
 		return self & test
+	
+	render
+		if self is Compressed: fs <~ "compressed "
+		if self is jbin: fs <~ "jbin"
+		if self is box:  fs <~ "jeebox"
+		if self is xml:  fs <~ "xml"
+		if self is plain: fs <~ "plain"
 
-/// jz -box  A.xml		// xml to box
-/// jz -comp A.xml		// compress A.xml a.xml.mz ?
-/// jz -comp A.xml.mz	// do nothing
-/// jz A.whatever		// decompress (Assuming it is compressed)
-/// jz -bin  A.box		// a.box.jbin
+
+function app.Action (|type|)
+	rz |= app["report"].yes * type.report
+	rz |= app["box"].yes    * type.box
+	rz |= app["bin"].yes    * type.jbin
+	rz |= app["p"].yes      * type.stdout
+	rz |= app["cmp"].yes   * type.compressed
+	rz := type.plain
+	expect (rz & type.actions).CountBits <= 1 ("Too many actions chosen.")
+	
 
 main  
-	expect (app.args >= 1 and app.args <= 2)				("Usage: ${app.filename} InPath [OutPath]")
-	|| C = conv()
-	|| all = app[0].FileGlob
-	|| Out = app[1]
-		expect (all == 1) ("Only 1 file should be matched but found: " + join2(all, "\n"))
-	for f in all
-		|| data = f.ReadAll(0.25GB, false)
-			conv(data, f, nil, nil, nil).Process
+	|| args = app.args		#expect ("Usage: ${app.filename} InPath [...]")
+	|| Action = .Action
+	for r in args
+		|| data = r.ReadFile(0.25GB, false)
+			conv(data, r).Process(Action)
+	
+	if stderr.ok
+		check (conv.done) "Nothing to do. All files already ${action.render}."
 
 
 class Conv
-	|string|  Data
-	|string|  In
-	|string|  Out
-	|message| Parse
-	|type| 	  Detected
+	|string|  	Data
+	|string|  	In
+	module: |int| Done
 
-	function process
-		if .data.IsCompressed
-			.data = .data.Decompress
-			.detected = Type.Compressed
-		|| parse = .data.parse
+	function Process (|Type| Dest, |bool|)
+		|type| Detected = .data.IsCompressed * type.compressed
+		ifn Dest&type.Actions // (de)compress only
+			require (detected is Compressed) != (dest is compressed)
+		if Detected
+			.data = .data.Decompress 
 		
-		if !parse
-			.detected |= type.plain
-		  elseif .data.IsJbin
-			.data = parse.Render
-			.detected |= type.jbin
-		  elseif parse.Find(@xml)
-			.detected |= type.xml
-		  else
-			.detected |= type.box
-			
-		if !.DoStuff and stderr.ok
-			|| str = .ReportStr
-			error "$str to $str: Nothing to do."
-	
-	
-	function DoStuff (|bool|)
-		if app["report"]
-			print "$.in is ${.ReportStr}\n\n"
-			StdErr.clear
-			return true
-		if app["box"]
-			return .ToBoxOrBin(Type.box)
-		if app["bin"]
-			return .ToBoxOrBin(Type.jbin)
-		if (.detected is Compressed) == !app["comp"].yes
-			return .write
-	
-	
-	function ReportStr (|string|)
-		if .Detected & type.Compressed: rz = "compressed "
-		if .Detected & type.jbin: rz += "jbin"
-		if .Detected & type.box:  rz += "jeebox"
-		if .Detected & type.xml:  rz += "xml"
-	
-		
-	function ToBoxOrBin (|Type| Dest, |bool|)
-		expect !(.Detected is plain) ("File isn't jeebox.")
+		++done
 		|| ext = ""
-		if .Detected & Dest
-			require .Detected is Compressed
-		  else
-			if .Detected is xml
-				.parse.XMLToJeebox
+		|| Do = Dest&type.Actions
+			|| parse = .data.parse
+			expect (parse or dest is report) ("File isn't parseable.")
+			if !parse
+				detected |= type.plain
+			  elseif .data.IsJbin
+				detected |= type.jbin
+			  elseif parse.Find(@xml)
+				detected |= type.xml
+				parse.XMLToJeebox
+			  else
+				detected |= type.box
+
+			require Detected&type.actions != dest&type.actions
+			if Dest is report
+				"$.in is: ${detected.render}"
+				StdErr.clear
+				return true
+	
 			if dest is box
-				.data = .parse.Render
+				.data = parse.Render
 				ext = "box"
 			  else
-				.data = .parse.render_jbin
+				.data = parse.render_jbin
 				ext = "jbin"
 	
-		return .write(ext)
-			
-	
-	function write (|string| ext="", |bool|)
-		if !.Out
-			.Out = .in.RemoveExt("mz")
+		if dest is stdout
+			print .data
+		  else
+			|| Out = .in.RemoveExt("mz")
 			if ext
-				.out = .out.setext(ext)
-			if app["comp"].yes
-				.out = .out.addext("mz")
+				out = out.SetExt(ext)
+			if dest is compressed
+				out = out.AddExt("mz")
+				.data = .data.Compress
+			if Out <~ .data
+				printline out
 		
-		if app["comp"].yes
-			.data = .data.Compress
-		.Out <~ .data
-	
-		if StdErr.ok
-			printline .out
 		return true
-	
-	
+
+/// jz -box  A.xml					// xml to box
+/// jz -comp A.xml -out=B.xml.mz	// compress A.xml a.xml.mz ?
+/// jz -comp A.xml.mz				// do nothing
+/// jz A.whatever					// decompress (Assuming it is compressed)
+/// jz -bin  A.box					// a.box.jbin
