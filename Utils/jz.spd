@@ -11,10 +11,12 @@ datatype Type (int)
 	
 	render
 		if self is Compressed: fs <~ "compressed "
-		if self is jbin: fs <~ "jbin"
-		if self is box:  fs <~ "jeebox"
-		if self is xml:  fs <~ "xml"
-		if self is plain: fs <~ "plain"
+		if self is jbin
+			fs <~ "jbin"
+		  elseif self is box:  fs <~ "jeebox"
+		  elseif self is xml:  fs <~ "xml"
+		  else
+			fs <~ "plain"
 
 
 function app.Action (|type|)
@@ -23,7 +25,6 @@ function app.Action (|type|)
 	rz |= app["bin"].yes    * type.jbin
 	rz |= app["p"].yes      * type.stdout
 	rz |= app["cmp"].yes    * type.compressed
-	rz := type.plain
 	expect (rz & type.actions).CountBits <= 1 ("Too many actions chosen.")
 	
 
@@ -86,7 +87,7 @@ class Conv
 			print .data
 		  else
 			|| Out = .in.RemoveExt("mz")
-			if ext:  out = out.SetExt(ext)
+			if ext:  out = out.SetExt(ext) // killing good exts like "spd" <-- "". sigh
 			if dest is compressed: out = out.AddExt("mz")
 			if Out <~ .data
 				printline out
