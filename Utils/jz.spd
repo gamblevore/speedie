@@ -6,6 +6,8 @@ datatype Type (int)
 	
 	syntax is (|Type| test, |bool|)
 		return self & test
+	syntax isnt (|Type| test, |bool|)
+		return !(self & test)
 	
 	render
 		if self is Compressed: fs <~ "compressed "
@@ -20,7 +22,7 @@ function app.Action (|type|)
 	rz |= app["box"].yes    * type.box
 	rz |= app["bin"].yes    * type.jbin
 	rz |= app["p"].yes      * type.stdout
-	rz |= app["cmp"].yes   * type.compressed
+	rz |= app["cmp"].yes    * type.compressed
 	rz := type.plain
 	expect (rz & type.actions).CountBits <= 1 ("Too many actions chosen.")
 	
@@ -28,6 +30,7 @@ function app.Action (|type|)
 main  
 	|| args = app.args		#expect ("Usage: ${app.filename} InPath [...]")
 	|| Action = .Action
+	expect ((action isnt stdout) or (args == 1)) ("Can't write multiple files to stdout. How would we know where a file ends?")
 	for r in args
 		|| data = r.ReadFile(0.25GB, false)
 			conv(data, r).Process(Action)
@@ -37,14 +40,14 @@ main
 
 
 class Conv
-	|string|  	Data
-	|string|  	In
+	|string|	Data
+	|string|	In
 	module: |int| Done
 
 	function Process (|Type| Dest, |bool|)
 		|type| Detected = .data.IsCompressed * type.compressed
 		ifn Dest&type.Actions // (de)compress only
-			require (detected is Compressed) != (dest is compressed)
+			require (detected is Compressed) == (dest isnt compressed)
 		if Detected
 			.data = .data.Decompress 
 		
@@ -59,15 +62,16 @@ class Conv
 				detected |= type.jbin
 			  elseif parse.Find(@xml)
 				detected |= type.xml
-				parse.XMLToJeebox
+				require parse.XMLToJeebox
 			  else
 				detected |= type.box
 
-			require Detected&type.actions != dest&type.actions
 			if Dest is report
 				"$.in is: ${detected.render}"
 				StdErr.clear
 				return true
+
+			require Detected&type.actions != dest&type.actions
 	
 			if dest is box
 				.data = parse.Render
@@ -76,15 +80,14 @@ class Conv
 				.data = parse.render_jbin
 				ext = "jbin"
 	
+		if dest is compressed
+			.data = .data.Compress
 		if dest is stdout
 			print .data
 		  else
 			|| Out = .in.RemoveExt("mz")
-			if ext
-				out = out.SetExt(ext)
-			if dest is compressed
-				out = out.AddExt("mz")
-				.data = .data.Compress
+			if ext:  out = out.SetExt(ext)
+			if dest is compressed: out = out.AddExt("mz")
 			if Out <~ .data
 				printline out
 		
