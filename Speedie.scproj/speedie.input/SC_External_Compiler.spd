@@ -7,8 +7,9 @@
 
 module ExternalCompiler { // cppcomp, external_compiler, extcomp
 linkage:cpp_part Ext
-|[File]| FoundObjects
-|[File]| Cleanup
+|[File]|		FoundObjects
+|[File]|		Cleanup
+|int| 			CompilingLibFiles
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,6 +145,10 @@ function Clean (|bool|)
 	return stderr.ok
 
 
+function MacBothArch (|[string]| r)
+	r.appendwords( "-arch x86_64 -arch arm64 -mmacosx-version-min=11.0" )
+
+
 function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Type, |[string]|)
 	rz.AppendWords( Product )
 
@@ -183,12 +188,14 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 // we need some way to specify core2 at least... + all the extensions
 	
 	if platform.OSX
-		if (options.arch ~= "intel") // and these files aren't lib files?
-			if options.optimise >= 4 // sigh
+		if .CompilingLibFiles
+			.MacBothArch(rz)
+		  elseif (options.arch ~= "intel") // and these files aren't lib files?
+			if options.optimise >= 3 // sigh
 				rz.AppendWords( " -march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
 			// fallback?
 		  else
-			rz.appendwords( "-arch x86_64 -arch arm64 -mmacosx-version-min=11.0" )
+			.MacBothArch(rz)
 	
 	// stripping
 	rz.appendwords( "-fdata-sections -ffunction-sections")
@@ -282,7 +289,10 @@ function RunCppCompile
 	if !options.silent
 		"\nCompiling c++ to: \"${.ProductPath}\"\n"
 	
+	.CompilingLibFiles++
 	.CollectAndCompile(	.CppLib,						.LibTmpPath )$
+	.CompilingLibFiles--
+	
 	.CollectAndCompile(	Compiler.GeneratedCppsFolder,	.ProjTmpPath )$
 	.UseAndCompile(		Cpp_Export.Cpp_input,			.ProjTmpPath        )$
 	.ExtCompile(		.FoundObjects,			"-o " + .ProductPath,	"o" )$
@@ -292,7 +302,10 @@ function MakeLib
 	|| n = .productpath.sibling("libspeedie.dylib")
 	if !options.silent
 		"Lib at: $n"
-	.ExtCompile(		.FoundObjects,			"-o " + n,	"o" )$
+	
+	.CompilingLibFiles++
+	.ExtCompile(		.FoundObjects,			"-o " + n,	"o" )
+	.CompilingLibFiles--
 	
 
 
