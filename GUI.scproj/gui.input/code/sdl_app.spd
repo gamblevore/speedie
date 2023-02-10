@@ -250,7 +250,7 @@ module SDLApp
 		.screenwindow = SDL_CreateWindow(name.cstr,
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.x, s.y, SDL_WINDOW_RESIZABLE (|) SDL_WINDOW_ALLOW_HIGHDPI)
 
-		.SDL_SetWindowMaximumSize(.screenwindow, 4096, 4096)
+		.SDL_SetWindowMaximumSize(.screenwindow, 2K, 2K)
 		.SDL_SetWindowMinimumSize(.screenwindow,  400,  200)
 		if s.x < 400 or s.y < 200
 			".initwindow(size) too small!"
@@ -288,7 +288,6 @@ module SDLApp
 			mul++
 			
 		.scale = mul
-		if s.x > 1500
 		SDL_SetWindowSize(.screenwindow, s.x*mul, s.y*mul)
 		
 

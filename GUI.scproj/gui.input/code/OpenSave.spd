@@ -27,16 +27,12 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 		.accept.text		= accept
 		.path.text			= base
 		(.name is visible)	= save
-		(.question is visible) = question!=""
-		if question
-			.question.text = question
+		.question.vistext = question
 	|| bigger = question and save
 	|| wsize = (350 by 216,  350 by 200)(bigger)
 	w.size = wsize
 	|| bot = (39~up, 23~up)(bigger)
 	w.files.size = 1~inside by bot to 16~down
-	
-			
 	
 	if save
 		|| t = "Untitled.txt" 

@@ -57,7 +57,7 @@ function string.Ask (|string| response="",  |string| Title="",  |string|)
 		return ConfirmWindow_.asker.response.text
 
 
-function buttonview.VisText (assigns:|string|s)
+function guicontrol.VisText (assigns:|string|s)
 	.text = s
 	(self is visible) = s != ""
 

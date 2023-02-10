@@ -27,24 +27,19 @@ main
 "
 
 
-function perryide.CreateBasicFiles (|file| proj)
-	|| main = proj.child("input/main.spd")
-	proj.child(".perry").write = qqfiles.Roots
-	main.data = .EmptyMainFile(proj.trimextandpath)
-	proj.child("input/.todo").write = qqfiles.Todo
-
-
 function string.TrimProj (|string|)
 	if .isproj
 		return .TrimExtAndPath
 	return self
 
 
-function PerryIDE.CreateProj (|string| path)
-	|| proj = path.file
+function PerryIDE.CreateProj (|file| proj)
 	expect (!proj.exists) (proj, "Can't create over existing project.")
-	.CreateBasicFiles(proj)
-	IdeAddProj(path)
+	|| main = proj.child("input/main.spd")
+	proj.child(".perry").write = qqfiles.Roots
+	main.data = .EmptyMainFile(proj.trimextandpath)
+	proj.child("input/.todo").write = qqfiles.Todo
+	IdeAddProj(proj)
 
 
 function ClickedOpenProj (GUIaction)
@@ -59,19 +54,20 @@ function ClickedOpenProj (GUIaction)
 
 function ClickedCreateProj (GUIAction)
 	|| i = .ide
-	|| it = app.AskSave("scproj/",  "",  .id,  "Create")
-		i.CreateProj(it)
+	|| it = app.AskSave("scproj/",  "",  "New Project",  "Create")
+		i.CreateProj(it.file)
 	perry.HideStartIfNeeded
 
 
 function ClickedOpenFile (GUIaction)
-	|| file = app.askopen("",  "",  "Open File")
-		ideaddproj(file)
+	debugger
+	|| file = app.AskOpen("",  "",  "Open File")
+		IdeAddProj(file)
 	perry.HideStartIfNeeded
 
 
 function ClickedCreateFile (GUIaction)
-	|| path = app.AskSave("",  "",  .id,  "New")
+	|| path = app.AskSave("",  "",  "New File",  "New")
 		if path.file.Create
 			ideaddproj(path)
 	perry.HideStartIfNeeded
