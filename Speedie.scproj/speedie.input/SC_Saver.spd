@@ -25,13 +25,11 @@ module SC_Saver {
 		
 		|| First = .SourceArg.first
 		warn First (.source, "This func needs some code.")
-		for (line in .SourceArg) {
-			if (cls.super != TypeSaveable) {
+		for (line in .SourceArg)
+			if (cls.super != TypeSaveable)
 				line.CheckSuperDotSave(name, first == line)	// need a call to the saver first...
-			}
 			require stderr.ok
 			// To do: Add order checker to compare code in saver/loader...
-		}
 	
 	
 	function SCFunction.FillInSaver (|String| name) {
