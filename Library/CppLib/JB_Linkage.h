@@ -32,7 +32,7 @@ extern "C" {
 	void JB_SDL_FullScreen (void* w, bool On);	
 	void JB_SDL_SetModified (void* w, bool b);
 	void JB_App__ShowURL (const char* Path);
-	JB_String* JB_App__DocumentOpened ();
+	JB_String* JB_App__DocumentOpened (bool Clear);
     
 // Sub process
 	int* JB_SP_ErrorNumber ();

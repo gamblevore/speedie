@@ -13,10 +13,12 @@ void JB_FreeIfDead_(void* c);
 static id							sigh;
 static NSString*					FileOpened;
 
-void* JB_App__DocumentOpened (void) {
+void* JB_App__DocumentOpened (bool Clear) {
 	NSString* F = FileOpened;
-	if (!F) return nil;
-	FileOpened = nil;
+	if (!F)
+		return nil;
+	if (Clear)
+		FileOpened = nil;
 	return JB_Str_CopyFromCString([F UTF8String]);
 }
 

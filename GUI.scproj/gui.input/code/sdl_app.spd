@@ -95,7 +95,7 @@ module SDLApp
 	cpp_Wrapper  JB_SDL_RemoveWindowBorder (|_voidptr| window)
 	cpp_Wrapper  JB_SDL_SetModified (|_voidptr| window, |bool| b)
 	cpp_wrapper  JB_SDL_FullScreen (|_voidptr| w, |bool| On=true)
-	function DocumentOpened  (|String|)
+	function DocumentOpened  (|bool|Clear=true, |String|)
 		cpp_Wrapper JB_App__DocumentOpened
 		
 	function InitDelegates
@@ -288,6 +288,7 @@ module SDLApp
 			mul++
 			
 		.scale = mul
+		if s.x > 1500
 		SDL_SetWindowSize(.screenwindow, s.x*mul, s.y*mul)
 		
 
@@ -304,21 +305,22 @@ module SDLApp
 		require !.framelength
 		app.PrefsInit
 		|| PrevSize = app.prefs..screen.ivec4
+			// make sure this is unscaled! .InitScaling seems to be scaling it
 			s = PrevSize.size
-		.guicheck
+		s = s min (2K, 2K)
+		
+		.GUICheck
 		if !font.small
 			return app.die("smallfont not loaded.\n")
-		.FrameLength	= 1.0/60.0
+		|| DocOpened = .DocumentOpened(false)
+		.FrameLength	 = 1.0/60.0
 		.FastToolTipDate = 1
 
 		.DrawSpace		= image(s, 0|&byte|)
-		.drawspace.name = "read"
+		.DrawSpace.name = "read"
 		.initwindow(s, app.conf("selfname") oar app.conf("name"))
 		.InitScaling(s.vec2, 1.5)
 		__modules__.window.all.lastrect = s.rect
-		if prevsize
-			sdlapp.ScreenOrig = prevsize
-		
 		
 		.CheckQuarantine
 		.OpenedFirst = date()
@@ -433,13 +435,13 @@ module SDLApp
 				lv.TryDelayedEdit
 
 
-	function HandleOpenFile (|bool|)
+	function HandleOpenFile
 		|| doc = .DocumentOpened
-			|| d = .AppDocumentOpen
-				|| f = doc.file
-				if f.exists
-					(d)(nil, nil, f.path, CopyPasteFlags.PasteFile)
-			return true
+		|| d = .AppDocumentOpen
+		require d and doc
+		|| f = doc.file
+		if f.exists
+			(d)(nil, nil, f.path, CopyPasteFlags.PasteFile)
 
 
 	function PreFrame (|int|)
@@ -454,8 +456,6 @@ module SDLApp
 		.UpdateTextFocus(W)
 		.PreFrameText(w)
 		
-		// seems to be sending far too much mousedowns...
-		// just clicking once sends like 20 mousedowns
 		if .candrag > 4
 			.touch
 			w.DoMouseDrag(.MouseXY, true)
@@ -917,13 +917,12 @@ module SDLApp
 		|| R = window.all.lastrect.x2
 		return (r-p.x, p.y)
 
-
 	function DoAppResize (|ivec2| M, |int|)
 		|| P = .FindResizeCorner(M)
 		|| D = .AppResizingXY - p
 		|| L = window.all.lastrect.size
 		|| R = ((0, 0, l + D).vec4*.scale).ivec4
-		.ScreenOrig=R
+		.ScreenOrig = R
 		return kActivity
 	
 	

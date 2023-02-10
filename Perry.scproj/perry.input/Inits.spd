@@ -3,6 +3,7 @@
 extend PerryIDE 
     constructor (|bool| ignore)
 		super.constructor 
+		
 		sdlapp.AppDocumentOpen = PerryOpenDoc
 		.EnableHistoryChanges = true
 		.InConstructor		= true
