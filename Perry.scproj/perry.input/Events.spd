@@ -74,8 +74,8 @@ function ClickedCreateFile (GUIaction)
 
 
 function perry.HideStartifneeded
-	require .projects.hasany
-	startupwindow.hide
+	if .projects.hasany
+		startupwindow.hide
 		
 	
 function ClickedTabs (GUIAction)

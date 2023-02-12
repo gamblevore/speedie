@@ -12,7 +12,6 @@ conf
 		salt	"Perry"
 		type	Donate
 		buyurl	"http://jeebox.org/donate/perry"
-		test	"\tjjjjj\ta"
 
 
 
@@ -25,9 +24,9 @@ main  // main {
 	stderr.LogFile = "PerryErrors.txt"
 	app.InitColors
 
-	sdlapp.SDLInit((414,256))
+	sdlapp.SDLInit((414, 256))
 	perry.Startup
-	return sdlapp.MainLoop
+	sdlapp.RunAndQuit
 
 
 
@@ -40,11 +39,10 @@ function app.InitColors
 	¥.Menus.bg				= (0.106, 0.154, 0.031, 1.0)
 
 
-struct Spark {
-    linkage:cpp_part Sprk
-	|int|   	ID
-    |int|		Morality
-} // } isn't coloring properly
+
+function ColorMe {
+	""
+}  // not coloring properly
 
 
 

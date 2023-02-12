@@ -193,14 +193,17 @@ module SDLApp
 		return .event.type is textinput or keydown
 
 
-	function MainLoop (|int|)
+	function RunAndQuit
+		.run
+		.quit
+	
+	
+	function Run
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
 		.StartedProperly = true
 		while .SingleFrame
 			.PostLoads
-		.SavePrefs
-		.Quit
 
 	
 	function PostLoads
@@ -269,11 +272,15 @@ module SDLApp
 
 	function SavePrefs
 		if app.prefs
-			app.prefs..screen = sdlapp.screenorig.list
+			app.prefs["screen"] = sdlapp.screenorig.list
 			app.saveprefs
 
 
 	function InitScaling (|vec2| s, |float| scale)
+		// s is the actual size. although i dunno what size
+		// i guess its the number of pixels we wanna use. our texture size
+		// so... how big shoudl teh windwo be?
+		// well... the window shouldn't be bigger than the actual screen size
 		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, S.x, S.y)
 		
 		|int| w = s.x
@@ -303,7 +310,9 @@ module SDLApp
 	function SDLInit (|ivec2| s) // startup
 		require !.framelength
 		app.PrefsInit
-		|| PrevSize = app.prefs..screen.ivec4
+		|| PrevSize = app.prefs["screen"].ivec4
+			// this would be the WHAT size? the pixel-size that is considered to be a pixel on the old macs
+			// not the high-dpi mini-pixels
 			// make sure this is unscaled! .InitScaling seems to be scaling it
 			s = PrevSize.size
 		s = s min (2K, 2K)
@@ -638,8 +647,10 @@ module SDLApp
 
 
 	function Quit
+		.saveprefs // in case we crash during quit
 		for w in __modules__.window.all
 			w.close(kExiting)
+		.saveprefs
 		.sdl_quit
 
 	
