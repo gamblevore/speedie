@@ -343,12 +343,10 @@ function ExportOneProperty (|SCClass| cls, |FastStringCpp|fs, |string| Only, |bo
 
 function scclass.WriteStructOrUnion (|faststringcpp| fs)
 	opt norefcounts
-	fs <~ "\n"
 	if .iswrapper == 2
-		fs <~ "union"
+		fs <~ "\nunion "
 	  else
-		fs <~ "struct"
-	fs <~ " "
+		fs <~ "\nstruct "
 
 
 function ExportStruct (|SCClass| cls, |bool| IsBehaviour=false)
@@ -889,22 +887,18 @@ extern "C" void JB_Str__FindGlobals(JB_String*** lub, int** lengths, const char*
 		require !c.IsBuiltin
 		ifn always
 			require c.NeedsExport
-		
+		//iswrapper
 		|| f = c.FuncProto
 			fs <~ "\ntypedef "
 			.WriteDecl( f.ReturnType, fs )
-			fs <~ " (*"
-			fs <~ c.CStructName
-			fs <~ ')'
-
+			fs <~ " (*${c.CStructName})"
 			.WriteFuncArgs( f, fs )
 		  else
 			if c.IsDatatype
 				|| name = c.super.CStructName #require // can be nil!
-				fs <~ "\ntypedef "
-				fs <~ name
-				fs <~ ' '
+				fs <~ "\ntypedef $name "
 			  else
+				require !c.iswrapper
 				c.WriteStructOrUnion(fs)
 			fs <~ c.CStructName
 		
