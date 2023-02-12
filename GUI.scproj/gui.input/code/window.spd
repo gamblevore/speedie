@@ -86,22 +86,21 @@ class Window (GUIControl)
 			rz = .returnvalue
 			if rz or (Cancel)()
 				exit
-		.returnvalue = nil
+		.ReturnValue = nil
 		if rz == self
 			rz = nil
-		.closedialog
+		.CloseDialog
 
 
 	setter focus (|guicontrol|)
-		.setfocus(value)
+		.SetFocus(value)
 	
 	
 	function SetFocus (|guicontrol| Focus)
 		|| old = .focus
 		require (old != focus)
 		if focus
-			require focus.Takesfocus.able
-			expect (focus is visible) (beep)
+			require focus.Takesfocus.able and (focus is visible)
 
 		.focus = focus
 		.FocusWasSet = true // for stop mousedown bug
@@ -159,10 +158,12 @@ class Window (GUIControl)
 		opt norefcounts
 		is visible
 		window.shown <~ self
-		
+
+	
 	function IsFront (|bool|)
 		return .islast
-		
+
+
 	function IsFullScreen (|bool|)
 		return .lastrect == All.lastrect
 	
@@ -266,9 +267,8 @@ class Window (GUIControl)
 	function Close
 		cpp_part CloseDisabler
 		disabled "pass a reason why we are closing this (kquit/kactivity)"
-				
-	
-	
+
+
 	function Close (|int| reason, |bool|)
 		if !sdlapp.wantsquit and (reason < sdlapp.ktryquit)
 			if window.DocumentWindows.length <= 1
@@ -362,8 +362,17 @@ struct SDL_SysWMinfo
 	|byte[56]|	Buffer
 
 
+struct SDL_DisplayMode
+	linkage: wrapper
+	|uint| format
+	|int| w 
+	|int| h
+	|int| refresh_rate
+	|_voidptr| driverdata
+
+
 struct SDL_Renderer
-	linkage:wrapper
+	linkage: wrapper
 	destructor
 		cpp_wrapper SDL_DestroyRenderer
 

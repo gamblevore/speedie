@@ -1,4 +1,5 @@
 
+prototype GUIApplicationInit    (|Object| Anything, |errorint|)
 prototype GUIImageDrawEvent		(|Image| self, 		|bool|)
 prototype GUIAction				(|GUIControl| self, |int| State=0,	|ListViewrow| Row=nil, |ListViewrow| Prev=nil, |bool|)
 prototype GUIListDragEvent		(|ListView|   self,	|ListViewrow| Before, |ListViewrow| Into, |bool|)

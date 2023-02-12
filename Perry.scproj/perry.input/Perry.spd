@@ -72,7 +72,7 @@ module Perry
 		appmenu <~ ("Install",  		ClickedInstallMenu)
 
 
-	function Startup
+	function Startup (GUIApplicationInit)
 		.Projects = (app.prefs)("lastproj")
 		
 		|| r = PerryIDE(false)

@@ -92,9 +92,12 @@ module SDLApp
 	cpp_wrapper SDL_StartTextInput		()
 	cpp_wrapper SDL_StopTextInput		()
 	cpp_wrapper SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |&SDL_Window| window)
-	cpp_Wrapper  JB_SDL_RemoveWindowBorder (|_voidptr| window)
-	cpp_Wrapper  JB_SDL_SetModified (|_voidptr| window, |bool| b)
-	cpp_wrapper  JB_SDL_FullScreen (|_voidptr| w, |bool| On=true)
+	cpp_Wrapper JB_SDL_RemoveWindowBorder (|_voidptr| window)
+	cpp_Wrapper JB_SDL_SetModified (|_voidptr| window, |bool| b)
+	cpp_wrapper JB_SDL_FullScreen (|_voidptr| w, |bool| On=true)
+	cpp_Wrapper SDL_GetCurrentDisplayMode (|int| displayIndex, |&SDL_DisplayMode| mode, |errorint|)
+
+		
 	function DocumentOpened  (|bool|Clear=true, |String|)
 		cpp_Wrapper JB_App__DocumentOpened
 		
@@ -193,17 +196,15 @@ module SDLApp
 		return .event.type is textinput or keydown
 
 
-	function RunAndQuit
-		.run
-		.quit
-	
-	
-	function Run
+	function RunAndQuit (|GUIApplicationInit| fn, |object| Anything=nil,  |ivec2| size=(414, 256))
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
+		.SDLInit(size)
+		(fn)(anything)
 		.StartedProperly = true
 		while .SingleFrame
 			.PostLoads
+		.quit
 
 	
 	function PostLoads
@@ -276,18 +277,18 @@ module SDLApp
 			app.saveprefs
 
 
-	function InitScaling (|vec2| s, |float| scale)
-		// s is the actual size. although i dunno what size
-		// i guess its the number of pixels we wanna use. our texture size
-		// so... how big shoudl teh windwo be?
-		// well... the window shouldn't be bigger than the actual screen size
-		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, S.x, S.y)
+	function CurrScreenSize (|ivec2|)
+		|sdl_displaymode| mode = nil
+		if SDL_GetCurrentDisplayMode(0, mode)
+			return (mode.w, mode.h)
+
+
+	function InitScaling (|vec2| Big, |float| scale)
+		|| Screen = .CurrScreenSize
+		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, Big.x, Big.y)
 		
-		|int| w = s.x
-		|int| h = s.y
-		SDL_GetRendererOutputSize(.renderer, w, h)
 		
-		|| theirscale = w|float| / s.x
+		|| theirscale = screen.x|float| / Big.x
 		|int| o = ((theirscale*scale) + 0.4999)
 		|| ot = o|float|
 		|| mul = (ot / theirscale) max 1
@@ -295,7 +296,7 @@ module SDLApp
 			mul++
 			
 		.scale = mul
-		SDL_SetWindowSize(.screenwindow, s.x*mul, s.y*mul)
+		SDL_SetWindowSize(.screenwindow, Big.x, Big.y)
 		
 
 	function GUICheck
@@ -311,9 +312,6 @@ module SDLApp
 		require !.framelength
 		app.PrefsInit
 		|| PrevSize = app.prefs["screen"].ivec4
-			// this would be the WHAT size? the pixel-size that is considered to be a pixel on the old macs
-			// not the high-dpi mini-pixels
-			// make sure this is unscaled! .InitScaling seems to be scaling it
 			s = PrevSize.size
 		s = s min (2K, 2K)
 		
