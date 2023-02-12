@@ -1,7 +1,7 @@
 
 
 	
-// openfile, filedialog, folderdialog, askfile, openfolder
+// openfile,  filedialog,  folderdialog,  askfile,  openfolder
 
 function app.AskOpen (|string| types, |string| base="", |string|question="", |string|accept="Open", |string|)
 	require sdlapp.StartedProperly
@@ -18,9 +18,6 @@ function app.AskSave (|string| SingleType, |string| base="", |string|question=""
 
 function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bool| Save,  |string| question, |string|)
 	|| w = OpenSaveDialog.asker init OpenSaveDialog()
-	|| last = OpenSaveDialog.LastDir[types].value
-		base = last.parent
-	base := "~/".resolve
 	
 	with w
 		.types				= types
@@ -40,6 +37,9 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 			t = "untitled." + ext
 		w.name.text = t
 			
+	|| last = OpenSaveDialog.LastDir[types].value
+		base = last.parent
+	base := "~/".resolve
 	|| f = w.files
 	f.ListFilesUp(base, types, save)
 	f.SelectFirst
@@ -73,7 +73,6 @@ class OpenSaveDialog (Window)
     |string|			Types
     |string|			Keyboard
     |date|				KeyDownExpired
-
 
     constructor
 		super.constructor
@@ -151,8 +150,14 @@ class OpenSaveDialog (Window)
 			if .focus == .path or nil
 				.files.setfocus
 				return true
-			if .focus == .Files
-				.Accept.Click
+			if (.focus == .Files)
+				if .name isnt visible
+					.Accept.Click
+				  elseif keys.cmd or keys.shift or keys.cmd
+					return false// 
+				  else
+					.name.setfocus
+					.name.selectall
 				return true
 		
 		if !keys.cmd and !key.isscan and key|codepoint|.isalphanum
@@ -204,15 +209,14 @@ function file.IsDirLike (|bool|)
 	require .IsDir
 	|| n	= .Name
 	|| ext	= n.Ext
-	require ext != "app" and "framework" and "bundle" and "xcodeproj" and "build" and "dSYM" // os x
-	require n != "XCBuildData"
-	return true
+	return (n != "XCBuildData") and (ext != "app" and "framework" and "bundle" and "xcodeproj" and "build" and "dSYM") // os x
 
 
 function OpenSaveKey (guikeyevent)
+	opt NoRefCounts
+	require key <= 0
 	|| w = .window|OpenSaveDialog|
-	if key <= 0
-		return w.RelistFiles(.text, false)
+	return w.RelistFiles(.text, false)
 
 
 function OpenSaveDialog.RelistFiles (|string| path, |bool| AlwaysUse=true, |bool|)
