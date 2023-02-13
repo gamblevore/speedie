@@ -121,26 +121,30 @@ module SDLApp
 	function SelChanged
 		.LastFrameSelMove = .FrameCount+32
 
-	
+
 	function ScreenOrig (|ivec4|)
 		|| P = .ScreenPosOrig
 		return (p, p + .SizeOrig) 	
-	
-	
+
+
 	function SizeOrig (|ivec2|)
 		|| aaa = (&rz)|&int|
 		.SDL_GetWindowSize(.ScreenWindow,  aaa,  aaa+1)
+
 
 	function SizeOrig (assigns:|ivec2|)
 		|| p = .ScreenPosOrig
 		|| r = (p, p + value)
 		.screenorig(r)
 
+
 	function Title (|string|)
 		return SDL_GetWindowTitle(.screenwindow).render
 
+
 	function Title (assigns:|string|)
 		SDL_SetWindowTitle(.screenwindow, value.cstr)
+
 
 	function ScreenPosOrig (|ivec2|)
 		|| aaa = (&rz)|&int|
@@ -162,7 +166,7 @@ module SDLApp
 	function ScreenOrig (assigns:|ivec4| result, |bool|)
 		require .ScreenWindow
 		if (result.x <= 0) and (result.y <= 0)
-			.JB_SDL_FullScreen(.nativewindow) //SDL2 had a bug in it... probably still exists
+			.JB_SDL_FullScreen(.nativewindow) // SDL2 had a bug in it... probably still exists
 			//.SDL_SetWindowFullscreen(.screenwindow)
 			return true
 		|| Old = .SizeOrig
@@ -192,22 +196,21 @@ module SDLApp
 		SDL_EventState(SDLEventType.DROPFILE, 1)
 	
 	
-	function IsTyping (|bool|)
+	helper IsTyping (|bool|)
 		return .event.type is textinput or keydown
 
 
 	function RunAndQuit (|GUIApplicationInit| fn, |object| Anything=nil,  |ivec2| size=(414, 256))
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
-		.SDLInit(size)
-		(fn)(anything)
-		.StartedProperly = true
-		while .SingleFrame
-			.PostLoads
+		
+		.Init(size)
+		(fn)(anything)?
+		while .SingleFrame: .PostLoads
 		.quit
 
 	
-	function PostLoads
+	helper PostLoads
 		opt norefcounts
 		|| s = .TryResizeLater
 			.TryResizeLater = nil // clear... in case of inf loop
@@ -248,7 +251,7 @@ module SDLApp
 		SDL_WINDOW_RESIZABLE =		0x20
 		SDL_WINDOW_ALLOW_HIGHDPI =	0x00002000
 
-	function initwindow (|ivec2| s, |string|name)
+	helper InitWindow (|ivec2| s, |string|name)
 		SDL_Init(SDL_INIT_AUDIO (|) SDL_INIT_VIDEO (|) SDL_INIT_EVENTS (|) SDL_INIT_HAPTIC)
 
 		.screenwindow = SDL_CreateWindow(name.cstr,
@@ -256,18 +259,22 @@ module SDLApp
 
 		.SDL_SetWindowMaximumSize(.screenwindow, 2K, 2K)
 		.SDL_SetWindowMinimumSize(.screenwindow,  400,  200)
-		if s.x < 400 or s.y < 200
-			".initwindow(size) too small!"
 		.vsync = true
 		.renderer = SDL_CreateRenderer(.screenwindow, -1, 0)
+		
+		SDL_SetWindowSize(.screenwindow, s.x, s.y) // unnecessary?
+
+		|| scr = .CurrScreenSize
+		if (s.x >= scr.x) and (s.y >= scr.y)
+			.JB_SDL_FullScreen(.nativewindow)
 
 
-	function vsync (assigns:|bool|)
+	helper vsync (assigns:|bool|)
 		|| v = ("1", "0")(value)
 		.SetHint("SDL_RENDER_VSYNC".cstr, v.cstr)
 	
 	
-	function RemoveBorder
+	helper RemoveBorder
 		JB_SDL_RemoveWindowBorder(.NativeWindow)
 
 
@@ -282,21 +289,21 @@ module SDLApp
 		if SDL_GetCurrentDisplayMode(0, mode)
 			return (mode.w, mode.h)
 
-
-	function InitScaling (|vec2| Big, |float| scale)
-		|| Screen = .CurrScreenSize
-		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, Big.x, Big.y)
+	helper IsHighDPI (|bool|)
+		|int[2]| SmallPx
+		|int[2]| BigPx
+		SDL_GetWindowSize(.ScreenWindow,  &BigPx[0],  &BigPx[1] )
+		SDL_GL_GetDrawableSize( .screenwindow,  &SmallPx[0],  &SmallPx[1] )
+		require SmallPx[0] and BigPx[0]
+		return SmallPx[0] > BigPx[0]
 		
 		
-		|| theirscale = screen.x|float| / Big.x
-		|int| o = ((theirscale*scale) + 0.4999)
-		|| ot = o|float|
-		|| mul = (ot / theirscale) max 1
-		if (mul < scale) and (scale.fract >= 0.5)
-			mul++
-			
-		.scale = mul
-		SDL_SetWindowSize(.screenwindow, Big.x, Big.y)
+	function Scaling (assigns:|float| scale)
+		|| bigPx = (.SizeOrig.vec2/scale).ivec2
+		.DrawSpace		= image(bigPx, 0|&byte|, "read")
+		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)
+		.scale = Scale
+		window.all.lastrect = bigPx.rect
 		
 
 	function GUICheck
@@ -307,39 +314,46 @@ module SDLApp
 			printline __now__|date|.render
 			app.quit(0)
 	
+	function NiceAppName (|string|)
+		with app.conf("selfname")
+			return it
+		with app.conf("name")
+			return it
+		return app.appname
 	
-	function SDLInit (|ivec2| s) // startup
+	helper Init (|ivec2| s) // startup
 		require !.framelength
 		app.PrefsInit
 		|| PrevSize = app.prefs["screen"].ivec4
 			s = PrevSize.size
-		s = s min (2K, 2K)
+		s = s min (2K, 2K) max (400, 200)
 		
 		.GUICheck
 		if !font.small
-			return app.die("smallfont not loaded.\n")
+			app.die("smallfont not loaded.\n")
 		|| DocOpened = .DocumentOpened(false)
-		.FrameLength	 = 1.0/60.0
+		.FrameLength = 1.0/60.0
 		.FastToolTipDate = 1
 
-		.DrawSpace		= image(s, 0|&byte|)
-		.DrawSpace.name = "read"
-		.initwindow(s, app.conf("selfname") oar app.conf("name"))
-		.InitScaling(s.vec2, 1.5)
-		__modules__.window.all.lastrect = s.rect
-		
+		.InitWindow(s, .niceappname)
+		if .ishighdpi
+			.scaling = 1.5
+		  else
+			.scaling = 2
+				
 		.CheckQuarantine
 		.OpenedFirst = date()
 		app.regStartup
 		appmenu.InitAppMenu
 		.InitDelegates
+		.StartedProperly = true
 		
 	
-	function SetHint (|cstring| name, |cstring| value)
+	helper SetHint (|cstring| name, |cstring| value)
 		cpp_wrapper SDL_SetHint
 	
 	
-	function SelectorFlash
+	helper SelectorFlash
 		.LastFlashSelector = .FlashSelector
 		.FlashSelector = (((.FrameCount-.LastFrameSelMove)>>5) mod 2) and !.IsBackground
 
@@ -356,7 +370,7 @@ module SDLApp
 
 
 	function OpenDialog (|window|)
-		return __modules__.window.opendialogs.last
+		return window.opendialogs.last
 
 
 	function StatusInfo (|string|)
@@ -367,7 +381,7 @@ module SDLApp
 	helper FastUpdate (|bool|)
 		return !.IsBackground or .DroppingInto
 	
-	function FrameAndEvents (|int|)		
+	helper FrameAndEvents (|int|)		
 		.ClearAlerts
 		|| Occured = knothing
 		while

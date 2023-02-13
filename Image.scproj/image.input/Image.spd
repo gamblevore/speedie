@@ -11,9 +11,10 @@ class Image (memory)
 	|string|		Name
 	contains byte
 	
-	constructor (|ivec2| S, |&byte| P)
+	constructor (|ivec2| S, |&byte| P, |string| name="")
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
+		.name = name
 		.WHset(s)
 		
 	constructor (|ivec2| wh, |string| name="")
