@@ -24,7 +24,7 @@ class Document (RingTree)
 	
 	constructor (|string| path, |bool| Dummy)
 		.ref		= CachedPath(path, document.docs, self)
-		.maxundos	= 20
+		.maxundos	= 60
 		.Viewers	= DocumentViewer(nil)
 		.Location	= path
 
