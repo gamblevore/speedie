@@ -86,5 +86,5 @@ Actually jbin is nothing like `m4a`, except being binary. Thats how much I chang
 * Faster (because it is simpler)
 * Smaller. 2 bytes overhead per node, vs 12 to 24 bytes.
 * Entire tree is visible. QuickTime's format relies on you knowing each "type" (4 byte string codes) and whether or not it has children. Which is impossible for vendor-defined codes.
-* Can be streamed... because we don't need to know the entire **combined** length of a node and all it's children, ahead of time.
+* Can be streamed when generating it... because we don't need to know the entire **combined** length of a node and all it's children, ahead of time. You can't "streamedly generate" something if you require "pre-knowledge" of things that haven't been created yet, can you!
 * More generic. QuickTime's format can either have children, or a name, but not both. Jeebox can have both.
