@@ -263,6 +263,8 @@ If you want to go even more advanced, you could do things like compress the jeeb
 
 `jbin` parses between 2x to 20x faster than Jeebox.
 
+[Learn more about jbin](jbin.md)
+
 **What about compression?**
 
     boxfile <~ jb.render.compress // write file compressed
