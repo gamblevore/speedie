@@ -7,7 +7,7 @@ So it is an incredible format... considering that it does so much. That said... 
 
 ### Example Use
 
-OK, so lets make a litle example:
+OK, so lets make a little example:
     
     // Str is a jeebox string
     || Str = "@mary had a~little~lamb whose fleece was white as snow"
@@ -23,7 +23,7 @@ OK great. Worked. We parsed and rendered some Jeebox. Now let's add some jbin. A
     || bin = msg.render_jbin
     printline bin
     
-Well, you will get some unprintable characters. it might look soemthing like this, depending on how your terminal handles unprintable characters:
+Well, you will get some unprintable characters. it might look something like this, depending on how your terminal handles unprintable characters:
 
     @$?mary?had@$@?a@?little?lambwhose@$?fleece?was@$?white?as?snow
 
@@ -64,7 +64,7 @@ Just remember, jbin is always parseable by jeebox. So you have nothing to lose a
 
 * Speed of parse and render
 * **Way** smaller when storing binary files
-* Won't ever change. Jeebox does get tweeks from time to time, but Jbin doesn't need any.
+* Won't ever change. Jeebox does get tweaks from time to time, but Jbin doesn't need any.
 * Really easy to write parsers for in other languages, like javascript.
 
 #### Jbin disadvantages
