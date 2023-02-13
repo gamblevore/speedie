@@ -4,9 +4,8 @@
 
 So it is an incredible format... considering that it does so much. That said... I hate over-short example documents... so lets just spell out `Jbin` with overly detailed explanation.
 
-`Jbin` is an important thing so more text helps it feel more important.
 
-#### Example Use
+### Example Use
 
 OK, so lets make a litle example:
     
