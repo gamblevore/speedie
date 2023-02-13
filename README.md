@@ -13,6 +13,8 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 
 Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D I did delete most of the rude comments before release, but still... dont expect "corporate professionalism".
 
+If you'd like to financially support the ongoing development of Speedie, consider [sponsoring its author through GitHub](https://github.com/sponsors/gamblevore).
+
 # Read More #
 * [Language Guide](Documentation/LanguageGuide.md)
 * [XML Comparison](Documentation/xml.md)
