@@ -18,7 +18,8 @@ visualParadigm false
 
 features
 	example
-		"hello world ${app.args[0]}"
+		main
+			"hello world ${app.args[0]}"
 	 
 	hasSingleDispatch true
 	hasMultipleDispatch false
