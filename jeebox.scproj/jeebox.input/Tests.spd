@@ -5,7 +5,7 @@
 
 
 extend_module Message
-	helper TreeCompare (|message| orig, |Message| reparse, |bool|)
+	function TreeCompare (|message| orig, |Message| reparse, |bool| PrintIfSame=false, |bool|)
 		ifn orig and reparse
 			return CompareError(orig, reparse)
 
@@ -18,6 +18,8 @@ extend_module Message
 			require message.TreeCompare( s1, r1 )
 			r1++
 			s1++
+		if PrintIfSame
+			"Trees ${orig.MiniName} are identical."
 		return true
 
 
