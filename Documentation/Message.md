@@ -261,9 +261,7 @@ If you want to go even more advanced, you could do things like compress the jeeb
 
 `Jbin` is just jeebox, but in a binary form. `jbin` is approximately the same size as jeebox, except when it comes to storing binary data, when it is far smaller. `Jbin` can store everything jeebox can. Best of all... jeebox transparently parses it. Also, the code for `jbin` is very small, you could parse it in about 30 lines of C++.
 
-`jbin` parses between 2x to 20x faster than Jeebox.
-
-[Learn more about jbin](jbin.md)
+`jbin` parses between 2x to 20x faster than Jeebox. [Learn more about jbin](jbin.md)
 
 **What about compression?**
 
