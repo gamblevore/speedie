@@ -2,7 +2,7 @@
 
 datatype Type (int)
 	flags
-		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut
+		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace
 	
 	syntax is (|Type| test, |bool|)
 		return self & test
@@ -19,20 +19,29 @@ datatype Type (int)
 			fs <~ "plain"
 
 
-function app.Action (|type|)
-	rz |= app["report"].yes * type.report
-	rz |= app["box"].yes    * type.box
-	rz |= app["bin"].yes    * type.jbin
-	rz |= app["p"].yes      * type.stdout
-	rz |= app["cmp"].yes    * type.compressed
-	expect (rz & type.actions).CountBits <= 1 ("Too many actions chosen.")
-	
+function App.GetActions (|Type|)
+	for s in app.Switches
+		|| name = s.ArgName
+		expect (s.ArgValue=="true") ("Unexpected value: ${s.argvalue}")
+		if name ~= "r"
+			rz |= type.report
+		  elseif name ~= "j": rz |= type.box
+		  elseif name ~= "b": rz |= type.jbin
+		  elseif name ~= "c": rz |= type.compressed
+		  elseif name ~= "s": rz |= type.selfreplace
+		  elseif name ~= "p"
+			rz |= type.stdout
+			check (app.args == 1) ("Can't write multiple files to stdout.")
+		  else
+			error "Unknown switch $s"
+
+	rz |= type.plain
+	check ((rz & type.actions).CountBits <= 1) ("Too many actions.")
+
 
 main  
-	|| args = app.args		#expect ("Usage: ${app.filename} File1 [File2, ...],  or: ${app.filename} FileIn -p > FileOut")
-	|| Action = .Action
-	expect ((action isnt stdout) or (args == 1)) ("Can't write multiple files to stdout. How would we know where a file ends?")
-	for r in args
+	|| action = .getactions$
+	for r in (app.args  #expect ("Usage: ${app.filename} File1 [File2, ...],  or: ${app.filename} FileIn -p > FileOut"))
 		|| data = r.ReadFile(0.25GB, false)
 			conv(data, r).Process(Action)
 	
@@ -86,16 +95,18 @@ class Conv
 		if dest is stdout
 			print .data
 		  else
-			|| Out = .in.RemoveExt("mz")
-			if ext:  out = out.SetExt(ext) // killing good exts like "spd" <-- "". sigh
-			if dest is compressed: out = out.AddExt("mz")
+			|| Out = .in
+			if dest isnt selfreplace
+				out = .in.RemoveExt("mz")
+				if ext:  out = out.SetExt(ext) // killing good exts like "spd" <-- "". sigh
+				if dest is compressed: out = out.AddExt("mz")
 			if Out <~ .data
 				printline out
 		
 		return true
 
-/// jz -box  A.xml					// xml to box
-/// jz -comp A.xml -out=B.xml.mz	// compress A.xml a.xml.mz ?
-/// jz -comp A.xml.mz				// do nothing
-/// jz A.whatever					// decompress (Assuming it is compressed)
-/// jz -bin  A.box					// a.box.jbin
+/// jz -j A.xml						// xml to box
+/// jz -c A.xml -out=B.xml.mz		// compress A.xml a.xml.mz ?
+/// jz -c A.xml.mz					// do nothing
+/// jz    A.whatever				// decompress (Assuming it is compressed)
+/// jz -b A.box						// a.box.jbin
