@@ -17,9 +17,7 @@ supersetOf jeebox
 visualParadigm false
 
 features
-	hasPartialApplication true
-	 
-	 main
+	example
 		"hello world ${app.args[0]}"
 	 
 	hasSingleDispatch true
