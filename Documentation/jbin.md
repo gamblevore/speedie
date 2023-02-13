@@ -1,10 +1,10 @@
 ## "JBin" - The Jeebox Binary Format
 
-`Jbin` is just jeebox as a binary format. There isn't really much to say about it. This is simply because the code for it is so small. It takes about 35 lines of C++ to parse jbin.
+`Jbin` is just jeebox as a binary format. There isn't really much to say about `Jbin`. This is simply because the code for `Jbin` is so small. It takes about 35 lines of C++ to parse jbin.
 
 So it is an incredible format... considering that it does so much.
 
-####Example Use####
+#### Example Use
 
 OK, so lets make a litle example:
     
@@ -55,14 +55,14 @@ There really isn't much more to it than that! All you need to do is call `messag
 
 There's not much you can say about the 15 lines of (speedie) parsing code it takes to parse jbin, really. (35 lines in C++). Jbin is so simple. And thats what so great about it.
 
-####Jbin advantages to Jeebox####
+#### Jbin advantages to Jeebox
 
 * Speed of parse and render
 * **Way** smaller when storing binary files
 * Won't ever change. Jeebox does get tweeks from time to time, but Jbin doesn't need any.
 * Really easy to write parsers for in other languages, like javascript.
 
-####Jbin disadvantages####
+#### Jbin disadvantages
 * Not human readable
 
     
