@@ -58,7 +58,7 @@ There's not much you can say about the 15 lines of (speedie) parsing code it tak
 
 ### Transparent binary handling
 
-Just remember, jbin is always parseable by jeebox. So you have nothing to use and no extra steps to do, just to parse some jbin. You literally call the same `string.parse` and jeebox will recognise the `jbin` header and parse it. 
+Just remember, jbin is always parseable by jeebox. So you have nothing to lose and no extra steps to do, just to parse some jbin. You literally call the same `string.parse` and jeebox will recognise the `jbin` header and parse it. 
 
 #### Jbin advantages to Jeebox
 
@@ -69,7 +69,7 @@ Just remember, jbin is always parseable by jeebox. So you have nothing to use an
 
 #### Jbin disadvantages
 * Not human readable
-
+* Does not store formatting, or comments
     
 #### History
 
