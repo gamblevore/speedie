@@ -1,7 +1,7 @@
 
  
 conf
-	version	0_7
+	version	0_75
 	name	Perry
 	creator	jeebox
 	helpurl	"http://jeebox.org/help"
