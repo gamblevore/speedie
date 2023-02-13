@@ -1011,20 +1011,22 @@ class Message (RingTree)
 		|| fn = (.Func.ExportAddr)
 		(fn)( self, fs )
 
+	function MiniName (|string|)
+		return "$.FuncName “${.name[0,64].UnicodeSync}”"
 
 	function SyntaxExpect ( |string| Error = nil )
 		if !Error
 			if !self
 				nil.syntaxexpect
 				return
-			Error = "Unexpected $.FuncName “${.name}”"
+			Error = "Unexpected " + .MiniName
 		StdErr.NewError( self, Error )
 
 	function SyntaxDeprecate ( |string| Error = "Deprecated." )
 		StdErr.Newproblem( self, Error )
 		
 	function SyntaxWarn ( |string| Error = nil )
-		Error := "Unexpected $.FuncName “${.name}”"
+		Error := "Unexpected " + .mininame
 		StdErr.NewWarning( self, Error )
 	
 	function SyntaxAppend (|syntax| Fn, |string| name="")
