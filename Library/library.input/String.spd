@@ -167,7 +167,7 @@ class String
 	
 	function ReplaceAll (|string| from, |string| to, |bool|Lexer=false, |Faststring|fs_in=nil, |string|) { cpp_wrapper JB_Str_ReplaceAll }
 
-	function Hex (|faststring| fs=nil,|string|)					{ cpp_wrapper JB_Str_Hex }
+	function Hex (|int|Spaces=0,|faststring| fs=nil,|string|)					{ cpp_wrapper JB_Str_Hex }
 
 	function UnHex (|faststring| fs=nil,|string|)				{ cpp_wrapper JB_Str_UnHex }
 
