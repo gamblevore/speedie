@@ -56,6 +56,10 @@ There really isn't much more to it than that! All you need to do is call `messag
 
 There's not much you can say about the 15 lines of (speedie) parsing code it takes to parse jbin, really. (35 lines in C++). Jbin is so simple. And thats what so great about it.
 
+### Transparent binary handling
+
+Just remember, jbin is always parseable by jeebox. So you have nothing to use and no extra steps to do, just to parse some jbin. You literally call the same `string.parse` and jeebox will recognise the `jbin` header and parse it. 
+
 #### Jbin advantages to Jeebox
 
 * Speed of parse and render
@@ -67,7 +71,7 @@ There's not much you can say about the 15 lines of (speedie) parsing code it tak
 * Not human readable
 
     
-####History####
+#### History
 
 Lets give a little history about `jbin`. OK, so... basically, I was writing an `.m4a` parser in Speedie. This is to let me import files into a music player.
 
@@ -77,7 +81,7 @@ Jbin is still better. I was writing the `m4a` parser and realised "wait... I can
 
 Actually jbin is nothing like `m4a`, except being binary. Thats how much I changed.
 
-####Jbin Compared to Apple's atom (quicktime) format####
+#### Jbin Compared to Apple's atom (quicktime) format
 
 * Faster (because it is simpler)
 * Smaller. 2 bytes overhead per node, vs 12 to 24 bytes.
