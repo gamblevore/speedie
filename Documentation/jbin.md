@@ -62,8 +62,8 @@ Just remember, jbin is always parseable by jeebox. So you have nothing to lose a
 
 #### Jbin advantages to Jeebox
 
-* Speed of parse and render
-* **Way** smaller when storing binary files
+* Faster parse and render
+* **Amazingly** smaller when storing binary files
 * Won't ever change. Jeebox does get tweaks from time to time, but Jbin doesn't need any.
 * Really easy to write parsers for in other languages, like javascript.
 
