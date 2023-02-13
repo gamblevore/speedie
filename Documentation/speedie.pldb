@@ -244,8 +244,9 @@ features
 	hasLists true
 		myList = [1, 2, 3, 4, 5]
 	hasFunctions true
-		function Example (|string| data)
-			file <~ data
+		function Example (|string| data, |string|)
+			|| x = data.lowercase + "!!"
+			return x
 	hasOctals false
 	hasHexadecimals true
 		|| num = 0xBEEF
