@@ -68,14 +68,15 @@ function String.HiddenJBin (|ind|)
 	return -1
 
 
-function String.Parse (|syntax| owner = @arg, |MessageRoot|)
+function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |MessageRoot|)
 	// language2.scproj uses owner
-	|| j = .HiddenJBin
-		return self[j, int.max].parse_jbin
+	|| data = (.decompress, self)(Allowdecomp and .iscompressed)
+	|| j = data.HiddenJBin
+		return data[j, int.max].parse_jbin
 	if !Parser.CppInited
 	    Parser.Init
 
-	parser.StartParse( self )
+	parser.StartParse( data )
 	parser.StopBars = 0
 	|| Count	= StdErr.errorCount
 	|| Flags	= parser.kTemporal
@@ -89,8 +90,9 @@ function String.Parse (|syntax| owner = @arg, |MessageRoot|)
 	    parser.Expect( 0 )
 	
 	parser.StopParse // clear error message
-	if Count == StdErr.ErrorCount
-		return into|MessageRoot|
+	if Count != StdErr.ErrorCount
+		into = nil
+	return into|MessageRoot|
 
 
 

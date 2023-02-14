@@ -118,10 +118,13 @@ class File (String)
 		// if you don't want that for memory's sake, use file.data.parse
 		|| f = .Resolve(allowmissing).file
 			|| S = f.readsafely(lim, allowmissing)
+			if s.IsCompressed
+				s = s.Decompress(nil, lim)
+			if s
 				|memorylayer--| L = (Message).CreateLayer(f) // these 3 lines should be one
 				L.use      // 2
 				L.obj2 = S // 3 // data set here, path set in createlayer 
-				rz = S.parse
+				rz = S.parse(@arg, false) // already decompressed.
 				(message).restore
 
 	
