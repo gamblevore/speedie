@@ -16,6 +16,7 @@ module SDLApp
 	|date|						OpenedFirst
 	|date|						LastFrameDate
 	|date|						SelSolidUntil
+	|date|						FixScreenBug
 	|date|						FastToolTipDate
 	|uint|						LastMouseDownRepeat
 	|bool|						StartedProperly
@@ -206,7 +207,8 @@ module SDLApp
 		
 		.Init(size)
 		(fn)(anything)?
-		while .SingleFrame: .PostLoads
+		while .SingleFrame
+			.PostLoads
 		.quit
 
 	
@@ -262,7 +264,7 @@ module SDLApp
 		.vsync = true
 		.renderer = SDL_CreateRenderer(.screenwindow, -1, 0)
 
-		|| scr = .CurrScreenSize
+		|| scr = .CurrDisplaySize
 		if (s.x >= scr.x) and (s.y >= scr.y)
 			.JB_SDL_FullScreen(.nativewindow)
 
@@ -282,10 +284,14 @@ module SDLApp
 			app.saveprefs
 
 
-	function CurrScreenSize (|ivec2|)
+	function CurrDisplaySize (|ivec2|)
+		// we call the monitor a "display"
+		// and our SDL window we call it a "screen"
+		// cos we have sub-windows. They can't both be windows
 		|sdl_displaymode| mode = nil
 		if SDL_GetCurrentDisplayMode(0, mode)
 			return (mode.w, mode.h)
+
 
 	helper IsHighDPI (|bool|)
 		|int[2]| SmallPx
@@ -295,10 +301,23 @@ module SDLApp
 		require SmallPx[0] and BigPx[0]
 		return SmallPx[0] > BigPx[0]
 		
+	function IsFullScreen (|bool|)
+		|| scr = .CurrDisplaySize
+		return scr.x >= .ScreenOrig.x
 		
+		
+	helper BumpSize
+		description "Fixes a MacOSX bug. Not my fault!" 
+		.FixScreenBug = 0
+		|| was = .IsFullScreen
+		.JB_SDL_FullScreen(.nativewindow, false)
+		if was
+			.JB_SDL_FullScreen(.nativewindow, true)
+	
+	
 	function Scaling (assigns:|float| scale)
 		|| bigPx = (.SizeOrig.vec2/scale).ivec2
-		.DrawSpace		= image(bigPx, 0|&byte|, "read")
+		.DrawSpace = image(bigPx, 0|&byte|, "read")
 		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)
 		.scale = Scale
 		window.all.lastrect = bigPx.rect
@@ -321,7 +340,8 @@ module SDLApp
 	
 	helper Init (|ivec2| s) // startup
 		require !.framelength
-		app.PrefsInit
+		.openedfirst = date.now
+		app.PrefsInit(.openedfirst)
 		|| PrevSize = app.prefs["screen"].ivec4
 			s = PrevSize.size
 		s = s min (2K, 2K) max (400, 200)
@@ -329,18 +349,13 @@ module SDLApp
 		.GUICheck
 		if !font.small
 			app.die("smallfont not loaded.\n")
-		|| DocOpened = .DocumentOpened(false)
 		.FrameLength = 1.0/60.0
 		.FastToolTipDate = 1
 
 		.InitWindow(s, .niceappname)
-		if .ishighdpi
-			.scaling = 1.5
-		  else
-			.scaling = 2
+		.scaling = 2 - (0.5*.ishighdpi)
 				
 		.CheckQuarantine
-		.OpenedFirst = date()
 		app.regStartup
 		appmenu.InitAppMenu
 		.InitDelegates
@@ -454,15 +469,20 @@ module SDLApp
 
 
 	function HandleOpenFile
-		|| doc = .DocumentOpened
+		|| doc = .DocumentOpened			#require
 		|| d = .AppDocumentOpen
-		require d and doc
-		|| f = doc.file
-		if f.exists
-			(d)(nil, nil, f.path, CopyPasteFlags.PasteFile)
+			|| f = doc.file
+			if f.exists
+				(d)(nil, nil, f.path, CopyPasteFlags.PasteFile)
+		if .openedfirst.ago < 3s
+			.FixScreenBug = date.now + 1s
 
 
 	function PreFrame (|int|)
+		if .FixScreenBug.Fired
+			.BumpSize
+			
+			
 		if !stderr.ok
 			notifications <~ stderr.pop
 			stderr.clear
@@ -474,14 +494,14 @@ module SDLApp
 		.UpdateTextFocus(W)
 		.PreFrameText(w)
 		
+		|| ed = &w.inlineeditor
+		if ed.needshide
+			ed.clear
+
 		if .candrag > 4
 			.touch
 			w.DoMouseDrag(.MouseXY, true)
 			return kactivity
-			
-		|| ed = &w.inlineeditor
-		if ed.needshide
-			ed.clear
 	
 	function MouseDownRepeatOK (|bool|)
 		require (.CanDrag >= 3) and (.MouseButtons is left)
@@ -613,8 +633,7 @@ module SDLApp
 		.DrawSpace.ResizeTo(v)
 		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, v.x, v.y)
 
-		|| ws = __modules__.window.all
-		ws|window|.FullScreen = v
+		window.all.FullScreen = v
 		.StartResize
 
 

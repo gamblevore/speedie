@@ -32,7 +32,7 @@ struct ControlSize
 		.g(i)   = (value.x << 4) (|) mode
 		.g(i+1) = (value.y << 4) (|) mode
 
-	setter window.FullScreen (|ivec2|) // for full-screen windows
+	setter guicontrol.FullScreen (|ivec2|) // for full-screen windows
 		.lastrect = (0,0,value)
 		.sizer.sett(0, (0,0), ControlPoint.low)
 		.sizer.sett(2, value, ControlPoint.length)

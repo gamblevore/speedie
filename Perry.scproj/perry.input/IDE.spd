@@ -608,7 +608,7 @@ class PerryIDE (Window)
 		|| l = d.Location.Resolve
 		|| p = app.pref_path.resolve
 		require l ~= p
-		app.PrefsInit
+		app.PrefsInit(0)
 		.notify("Reloading prefs...")
 		.LoadState
 		
