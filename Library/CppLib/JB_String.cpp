@@ -591,17 +591,32 @@ int JB_Str_Scan_BadUTF8AtEnd(JB_String* u) {
 static const uint8 EscapeTable_[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz._";
 
 void JB_FS_AppendHexSub ( FastString* fs, int64 tVal,  int RoundTo, const uint8* CharMap);
-void JB_FS_AppendHexData( FastString* fs, uint8* Addr, int Len ) {
+void JB_FS_AppendHexData( FastString* fs, uint8* Addr, int Len, int Spaces ) {
 	require0(Len >= 1);
-	uint8* wp = JB_FS_WriteAlloc_(fs, Len * 2);
+	Spaces &= ~1;
+	int Added = 0;
+	int Alloc = Len*2;
+	if (Spaces>0) {
+		Alloc += (Alloc-1)/Spaces;
+	}
+
+	uint8* wp = JB_FS_WriteAlloc_(fs, Alloc);
+	uint8* orig = wp;
     if (!wp) { return; }
 
     auto CharMap = &EscapeTable_[0];
 	while (Len-- >= 1) {
+		if (Spaces>0 and Added >= Spaces) {
+			*wp++ = ' ';
+			Added = 0;
+		}
         uint8 C = *Addr++;
         *wp++ = CharMap[C>>4];
         *wp++ = CharMap[C&15];
+		Added += 2;
 	}
+	if (wp != orig+Alloc)
+		debugger;
 }
 
 
@@ -1282,35 +1297,8 @@ JB_String* JB_FS_SmartResult( FastString* fs, FastString* Orig ) {
 
 
 JB_String* JB_Str_Hex(JB_String* s, int Spaces, FastString* fs_in) {
-	FastString* fs = JB_FS__FastNew( fs_in );    
-	uint8* SelfPos = JB_Str_Address(s);
-	uint8* SelfEnd = SelfPos + JB_Str_Length(s);
-	Spaces &= ~1;
-	int Added = 0;
-	for ( ; SelfPos < SelfEnd; SelfPos++ ) {
-		uint8 ThisChar = *SelfPos;
-		uint8 NextChar = (uint8) (ThisChar & 0x0F);
-		ThisChar = (uint8)(ThisChar >> 4);
-		if (ThisChar < 10) {
-			ThisChar = (uint8)(ThisChar + '0');
-		} else {
-			ThisChar = (uint8)(ThisChar + 55);		//'A' - 10
-		}
-		if (NextChar < 10) {
-			NextChar = (uint8)(NextChar + '0');
-		} else {
-			NextChar = (uint8)(NextChar + 55);		//'A' - 10
-		}
-		if (Spaces and Added >= Spaces) {
-			JB_FS_AppendByte(fs, ' ');
-			Added = 0;
-		}
-			
-		JB_FS_AppendByte(fs, ThisChar);
-		JB_FS_AppendByte(fs, NextChar);
-		Added += 2;
-	}
-
+	FastString* fs = JB_FS__FastNew( fs_in );
+	JB_FS_AppendHexData( fs, JB_Str_Address(s), JB_Str_Length(s), Spaces );
 	return JB_FS_SmartResult( fs, fs_in );
 }
 

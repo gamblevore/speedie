@@ -49,7 +49,7 @@ class FastString {
 		if data
 			.appendhexdata(Data.addr, data.length)
 	
-	function AppendHexData (|&byte| Data, |int| N)
+	function AppendHexData (|&byte| Data, |int| N, |int| Spaces=0)
 		cpp_wrapper JB_FS_AppendHexData
 
 

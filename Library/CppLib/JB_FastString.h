@@ -72,7 +72,7 @@ int JB_FS_Mark(FastString* self);
 bool JB_FS_Grew(FastString* self, int m);
 int JB_FS_Byte(FastString* self, int offset);
 void JB_FS_AppendHex(FastString* self, int64 tVal, int PadTo);
-void JB_FS_AppendHexData(FastString* fs, uint8* Addr, int N);
+void JB_FS_AppendHexData(FastString* fs, uint8* Addr, int N, int Spaces);
 void JB_FS_AppendHex3(FastString* fs, int tVal);
 void JB_FS_AppendIntegerAsText(FastString* self, s64 LeftOver, int RoundTo);
 void JB_FS_AppendIndent( FastString* self );
