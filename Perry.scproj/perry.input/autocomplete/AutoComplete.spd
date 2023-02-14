@@ -414,6 +414,7 @@ function message.owning_func (|message|)
 		
 function message.owning_modclass (|bool| EndAtArg=true, |message|)
 	opt norefcounts
+	require self
 	rz = .owningSyntax(AutoComplete.owner, EndAtArg)
 	if .parent == nil
 		rz := @tmp+"root"
@@ -461,10 +462,8 @@ function message.OwningFullName (|syntax| prm, |message|)
 		if self ~= "constructor" or "destructor"
 			name = .name
 	  elseif mod_class ~= "module" and mod_class[0] == @arg // what if it's a class module?
-		|| sub = mod_class.parent
-			sub = sub.owning_modclass(false)
-			if sub
-				mod_class = sub
+		|| sub = mod_class.parent.owning_modclass(false)
+			mod_class = sub
 	
 	rz = @dot.msg(name)
 	|| modname = mod_class[0].nyme
