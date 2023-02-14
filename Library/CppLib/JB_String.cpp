@@ -1281,37 +1281,39 @@ JB_String* JB_FS_SmartResult( FastString* fs, FastString* Orig ) {
 }
 
 
-JB_String* JB_Str_Hex(JB_String* s, FastString* fs_in) {
-	int SelfLen = JB_Str_Length(s);
-	FastString* fs = JB_FS__FastNew( fs_in );
-    JB_FS_SizeSet(fs, SelfLen*2);
-    
-    if (fs->Reserved) {
-		fs->Length = SelfLen*2;
-		uint8* SelfPos = s->Addr;
-		uint8* SelfEnd = SelfPos + SelfLen;
-		uint8* OutPos = fs->ResultPtr;
-		for ( ; SelfPos < SelfEnd; SelfPos++ ) {
-			uint8 ThisChar = *SelfPos;
-			uint8 NextChar = (uint8) (ThisChar & 0x0F);
-			ThisChar = (uint8)(ThisChar >> 4);
-			if (ThisChar < 10) {
-				ThisChar = (uint8)(ThisChar + '0');
-			} else {
-				ThisChar = (uint8)(ThisChar + 55); //'A' - 10
-			}
-			if (NextChar < 10) {
-				NextChar = (uint8)(NextChar + '0');
-			} else {
-				NextChar = (uint8)(NextChar + 55); //'A' - 10
-			}
-			*OutPos++ = ThisChar;
-			*OutPos++ = NextChar;
+JB_String* JB_Str_Hex(JB_String* s, int Spaces, FastString* fs_in) {
+	FastString* fs = JB_FS__FastNew( fs_in );    
+	uint8* SelfPos = JB_Str_Address(s);
+	uint8* SelfEnd = SelfPos + JB_Str_Length(s);
+	Spaces &= ~1;
+	int Added = 0;
+	for ( ; SelfPos < SelfEnd; SelfPos++ ) {
+		uint8 ThisChar = *SelfPos;
+		uint8 NextChar = (uint8) (ThisChar & 0x0F);
+		ThisChar = (uint8)(ThisChar >> 4);
+		if (ThisChar < 10) {
+			ThisChar = (uint8)(ThisChar + '0');
+		} else {
+			ThisChar = (uint8)(ThisChar + 55);		//'A' - 10
 		}
+		if (NextChar < 10) {
+			NextChar = (uint8)(NextChar + '0');
+		} else {
+			NextChar = (uint8)(NextChar + 55);		//'A' - 10
+		}
+		if (Spaces and Added >= Spaces) {
+			JB_FS_AppendByte(fs, ' ');
+			Added = 0;
+		}
+			
+		JB_FS_AppendByte(fs, ThisChar);
+		JB_FS_AppendByte(fs, NextChar);
+		Added += 2;
 	}
 
 	return JB_FS_SmartResult( fs, fs_in );
 }
+
 
 static int BM_Affects_(ByteMap* BM, JB_String* s) {
 	if (s and BM) {

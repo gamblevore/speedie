@@ -103,7 +103,7 @@ JB_String* JB_Str_MultiReplaceAll(JB_String* self, 	Dictionary* Dict, JB_ErrorRe
 //JB_String* JB_Str_MultiReplaceAll(JB_String* self,  Dictionary* Dict, JB_ErrorReceiver* Rec);
 JB_String* JB_Str_ReplaceBytesSub_(JB_String* self, int lFrom, int lTo, FastString* fs);
 JB_String* JB_Str_UnHex(JB_String* self, FastString* fs = nil);
-JB_String* JB_Str_Hex(JB_String* self, FastString* fs = nil);
+JB_String* JB_Str_Hex(JB_String* self, int Spaces, FastString* fs = nil);
 JB_String* JB_Str_MapBytes(JB_String* self, ByteMap* CS, int Clear);
 JB_String* JB_Str_LowerCase(JB_String* self);
 JB_String* JB_Str_FastLower(JB_String* self);
