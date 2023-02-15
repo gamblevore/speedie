@@ -209,3 +209,5 @@ This does the same thing but I prefer the first, don't you think? Also, the "usi
 This would actually make sure `stderr` is reset to its original value no matter how we exit the `using` block.
 
 If you hate exceptions, or think exceptions suck, or think that manually dealing with errors all over the place like Go does... is awkward and just irritating... then Speedie is probably the language for you! It just does everything in a very clean way.
+
+The main thing is to see statements like `#expect` or `#require` like comments. You don't need to understand them in order to understand the code flow. They are almost "out of the way", like comments. So your eyes more naturally look to the code at the left. Thats the whole idea of it. And even if you were looking at them, the overall amount of code is still **much lower**.
