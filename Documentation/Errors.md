@@ -123,7 +123,7 @@ Accessing messages is so common that manually creating errors all the time would
  
 Speedie's error-reporting system has a lot more features, such as:
 
-+ Warnings: These get printed like normal but leave `stderr.ok` true.
++ Warnings: These get printed like errors, but leave `stderr.ok` true.
 + Logging of errors to a logfile
 + Treating errors as warnings during certain code-sections
 + Can temporarily replace `stderr` with another `ErrorList` during certain code-sections, in case you want to contain your errors from harming the rest of the program.
