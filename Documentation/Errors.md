@@ -286,6 +286,8 @@ Python overall is a minimal language, much like speedie in that way. But Speedie
         msg = "Sorry, the file "+ filename + "does not exist."
         print(msg) # Sorry, the file John.txt does not exist.
 
+The python code has a problem... it fails to handle recursive symlink errors or file-busy errors? The filesystem has about 50 errors, and expecting the programmer to know the names of all of them is impossible. All you want is "what was the error name, and did it fail".
+
 In Speedie:
 
     || filename = "John.txt"
@@ -298,7 +300,5 @@ Speedie's version is simpler. In fact, here we can rely on Speedie already print
 1 issue found.
 `
 
-Well, what about recursive symlink errors or file-busy errors? The filesystem has about 50 errors, and expecting the programmer to know the names of all of them is impossible. All you want is "what was the error name, and did it fail".
-
-Speedie give you that. The python code (copied from a popular website on the 1st page of google-search) doesn't. If it fails for any other reason than "file not found"... this code fails to give the correct error message. So speedie is better, again.
+Speedie will handle every file-system error, not just file-not-found. The python code (copied from a popular website on the 1st page of google-search) doesn't. If it fails for any other reason than "file not found"... this code fails to give the correct error message. So speedie is better, again.
 
