@@ -212,9 +212,12 @@ If you hate exceptions, or think exceptions suck, or think that manually dealing
 
 The main thing is to see statements like `#expect` or `#require` like comments. You don't need to understand them in order to understand the code flow. They are almost "out of the way", like comments. So your eyes more naturally look to the code at the left. Thats the whole idea of it. And even if you were looking at them, the overall amount of code is still **much lower**.
 
-### Comparison To Other Languages
+# Comparisons
+Lets compare speedie error handling, to other languages.
 
-Lets look at "`Go`", a supposedly modern language with huge funding (not jealous at all 😂 😭). And then look at how much better it is in `Speedie`:
+### Comparison To Go
+
+First lets look at "`Go`", a supposedly modern language with huge funding (not jealous at all 😂 😭). And then look at how much better it is in `Speedie`:
 
 
     package greetings
@@ -263,10 +266,39 @@ OK, their syntax is quite understandable, in this case. `Go` has awkward syntax 
             
 
 
-Yeah... that. LITERALLY 1/4 of the code. Are you starting to feel it now Mr Krabs? Are ya? Are ya? Mr Krabs?
+Yeah... that. LITERALLY 1/3 of the code. Are you starting to feel it now Mr Krabs? Are ya? Are ya? Mr Krabs?
 
-You might be wondering, why I didn't "`log.fatal`", well... because `log.fatal` only calls "`log.print(msg);os.Exit(1)`", so its just printing.
+You might be wondering, why I didn't replace "`log.fatal`", well... because `log.fatal` only calls "`log.print(msg);os.Exit(1)`", so its just printing.
 
 Turns out that Speedie apps do the same thing, on exit. Once the speedie app exits, if `stderr` contains errors, the errors are logged to the console, with an error number of -1. So it is literally the same thing... just happens without me even needing to say it.
 
 Speedie really is remarkably expressive and well-designed.
+
+### Python Comparison
+
+Python overall is a minimal language, much like speedie in that way. But Speedie's error handling is unmatched.
+
+    filename = 'John.txt'
+    try:
+        with open(filename) as f_obj:
+            contents = f_obj.read()
+    except FileNotFoundError:
+        msg = "Sorry, the file "+ filename + "does not exist."
+        print(msg) # Sorry, the file John.txt does not exist.
+
+In Speedie:
+
+    || filename = "John.txt"
+    || f_obj = filename.file
+    || contents = f_obj.readall(false) // 'false' here disables treating missing files as empty files
+
+Speedie's version is simpler. In fact, here we can rely on Speedie already printing good error messages. If you run this code, you should see this:
+
+`error: File doesn't exist when open '/Users/theodore/John.txt'.
+1 issue found.
+`
+
+Well, what about recursive symlink errors or file-busy errors? The filesystem has about 50 errors, and expecting the programmer to know the names of all of them is impossible. All you want is "what was the error name, and did it fail".
+
+Speedie give you that. The python code (copied from a popular website on the 1st page of google-search) doesn't. If it fails for any other reason than "file not found"... this code fails to give the correct error message. So speedie is better, again.
+
