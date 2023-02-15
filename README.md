@@ -7,13 +7,11 @@
 * `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 * `Released`: New Years Eve 2022  (31/12/2022)
 
-Speedie is the compiler that I have created Jeebox in and is also built ontop of Jeebox. This proves that Jeebox can be used to write programming languages.
-
-Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't NEED C++, but being able to is a great property to have, so that property will remain.
-
 Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D I did delete most of the rude comments before release, but still... dont expect "corporate professionalism".
 
 If you'd like to financially support the ongoing development of Speedie, consider [sponsoring its author through GitHub](https://github.com/sponsors/gamblevore).
+
+Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't NEED C++, but being able to is a great property to have, so that property will remain.
 
 # Read More #
 * [Language Guide](Documentation/LanguageGuide.md)
