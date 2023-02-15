@@ -294,7 +294,7 @@ In Speedie:
 
 Speedie's version is simpler. In fact, here we can rely on Speedie already printing good error messages. If you run this code, you should see this:
 
-`error: File doesn't exist when open '/Users/theodore/John.txt'.
+`error: File doesn't exist when open '/Users/USERNAME/John.txt'.
 1 issue found.
 `
 
