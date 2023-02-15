@@ -196,4 +196,14 @@ You could do it manually but thats messy.
         beep "An error occured during conversion:\n\n" + stderr.render
     stderr = old
 
-This does the same thing but I prefer the first, don't you think?
+This does the same thing but I prefer the first, don't you think? Also, the "using" syntax can handle early returns:
+
+    using errorlist.new
+        if !.startconversion
+            return
+        .doconversion
+        .finishconversion
+        if !stderr.ok
+            beep "An error occured during conversion:\n\n" + stderr.render
+
+This would actually make sure `stderr` is reset to its original value no matter how we exit the `using` block.
