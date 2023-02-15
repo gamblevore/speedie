@@ -179,7 +179,13 @@ Another thing you can do is "fail gracefully". For example, lets say you are doi
         if !stderr.ok
             beep "An error occured during conversion:\n\n" + stderr.render
 
-This command "`beep`" would open up an alert-window and beep with the message passed. The "`using errorlist.new`" thing, would "contain" any errors from contaminating the rest of the program, which in this example we don't want. It does this by creating a new `stderr`... saving the old one, then replacing the old `stderr` after our job is done. You could do it manually but thats kind of ugly.
+This command "`beep`" would open up an alert-window and beep with the message passed. The "`using errorlist.new`" thing, would "contain" any errors from contaminating the rest of the program, which in this example we don't want. It does this by:
+
+* creating a new clean `stderr`, which has no errors inside, so you can be sure stderr.ok is true
+* saving the old stderr
+* putting the old `stderr` back, after our job is done
+
+You could do it manually but thats messy.
 
     || old = stderr
     stderr = errorlist.new
@@ -190,4 +196,4 @@ This command "`beep`" would open up an alert-window and beep with the message pa
         beep "An error occured during conversion:\n\n" + stderr.render
     stderr = old
 
-This does the same thing but it looks messier.
+This does the same thing but I prefer the first, don't you think?
