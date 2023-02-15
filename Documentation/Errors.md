@@ -169,7 +169,7 @@ For long-lived shelltools, you need to decide the behaviour for yourself. Print 
 
 ### Containing Errors
 
-Another thing you can do is "fail gracefully". For example, lets say you are doing a long complex operation. Like converting some database tables, and an error occurs deep within the code. Like a GUI-app doing a database-conversion.
+Another thing you can do is "fail gracefully". For example, lets say you are doing a long complex operation. Like converting some database tables, and an error occurs deep within the code. Lets say this is a GUI-app.
 
     
     using errorlist.new
