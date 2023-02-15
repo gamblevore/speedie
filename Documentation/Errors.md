@@ -134,7 +134,7 @@ Overall it is a great thing. Use it if you need to deal with errors or generate 
     || data = x.file.readall
     printline data
 
-This only ignores "file doesn't exist", not "the file is actually a folder", or recursive-symlinks, or some other file-system error.
+`file.ReadAll` only ignores "file doesn't exist", not "the file is actually a folder", or recursive-symlinks, or some other file-system error.
 
 ---
 ### How Do We Know An Error Occurred Just Now?
