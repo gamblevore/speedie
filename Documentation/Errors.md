@@ -167,4 +167,16 @@ Errors are actually automatically sent to the notification area, in GUI-apps, on
 
 For long-lived shelltools, you need to decide the behaviour for yourself. Print them? Log them? Send them to another process? Choice is yours.
 
+Another thing you can do is "fail gracefully". For example, lets say you are doing a long complex operation. Like converting some database tables, and an error occurs deep within the code. You can do "`require stderr.ok`" at some point in your code to exit that operation...
 
+Let's say you had a GUI-app doing a database-conversion.
+
+    
+    using errorlist.new
+        .startconversion
+        .doconversion
+        .finishconversion
+        if !stderr.ok
+            beep "An error occured during conversion:\n\n" + stderr.render
+
+This command "`beep`" would open up an alert-window and beep with the message passed. The "`using errorlist.new`" thing, would "contain" any errors from contaminating the rest of the program, which in this example we don't want. It does this by creating a new `stderr`... saving the old one, then replacing the old `stderr` after our job is done.
