@@ -119,7 +119,7 @@ Take a look again at the first example. Its just SOOO much better. Everything do
         for job in list
             .FinaliseJob(job)
 
-Accessing messages is so common that manually creating errors all the time would be totally undoable. In fact this is why my error system exists. But its really useful especially for files or anything really.
+Accessing messages is so common that manually creating errors all the time would be totally undoable. In fact this is why my error system exists. But still useful elsewhere, especially for files or anything really.
  
 Speedie's error-reporting system has a lot more features, such as:
 
