@@ -5,7 +5,7 @@ Error handling is quite important. Its a skill to get right. The tools available
 Errors can be generated from any function. They don't affect code-flow, except unless you **want** it to. Let's make a simple example:
 
 
-    || BannedWords = "poop,smelly" / ','
+    || BannedWords = ["poop", "smelly"]
     
     function string.NameIsOK (|bool|)
         for b in bannedwords
