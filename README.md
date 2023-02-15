@@ -7,6 +7,21 @@
 * `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 * `Released`: New Years Eve 2022  (31/12/2022)
 
+# General Features #
+* Object-oriented programming model
+* Works natively with Jeebox... Probably the best way to learn how to use Jeebox.
+* Simple but powerful syntax.
+* A lot of syntactic sugar, while still being tasteful.
+* Can make cross-platform command-line apps or GUI apps.
+* IPC lets you communicate and spread work across multiple processes.
+* Has a native IDE “Perry”. Created to combine power + simplicity.
+* Use one language, thats great at multiple areas:
+    * Fast at heavy-duty data-processing
+    * Making tools with few lines of code
+    * Writing large well-structured programs
+    * Cross-platform code, even with GUI
+
+
 Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D I did delete most of the rude comments before release, but still... dont expect "corporate professionalism".
 
 If you'd like to financially support the ongoing development of Speedie, consider [sponsoring its author through GitHub](https://github.com/sponsors/gamblevore).
@@ -40,19 +55,6 @@ Honestly... the only reason to use Speedie right now, is if you find it interest
 
 Becoming a contributor could be a great way to add programming concepts to a new language. Assuming they fit with the overall existing feature set and have efficient implementations.
 
-
-# General Features #
-* Object-oriented programming model
-* Works natively with Jeebox... Probably the best way to learn how to use Jeebox.
-* Simple but powerful syntax.
-* Can make command-line apps or GUI apps.
-* IPC lets you communicate and spread work across multiple processes.
-* Has a native IDE “Perry”. Created to combine power + simplicity.
-* Use one language, thats great at multiple areas:
-    * Fast and heavy-duty data-processing
-    * Making tools with few lines of code
-    * Writing large well-structured programs
-    * Cross-platform code, even with GUI
 
 
 # Power Features #
