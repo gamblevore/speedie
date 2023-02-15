@@ -2,7 +2,7 @@
 
 Error handling is quite important. Its a skill to get right in any language.
 
-But in Speedie, we use a few tools: We use an object called `stderr` to store reported errors... and we use the `#require`/`#expect`/`#error`/`#check` statements.  All errors flow through `StdErr`.
+This is how we do it in Speedie: We use an object called `stderr` to store reported errors... and we use the `#require`/`#expect`/`#error`/`#check` statements.  All errors flow through `StdErr`.
 
 Errors can be generated from any function. Generated errors don't affect control-flow, unless you specifically state that it will.
 
