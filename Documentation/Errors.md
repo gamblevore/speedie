@@ -179,4 +179,15 @@ Let's say you had a GUI-app doing a database-conversion.
         if !stderr.ok
             beep "An error occured during conversion:\n\n" + stderr.render
 
-This command "`beep`" would open up an alert-window and beep with the message passed. The "`using errorlist.new`" thing, would "contain" any errors from contaminating the rest of the program, which in this example we don't want. It does this by creating a new `stderr`... saving the old one, then replacing the old `stderr` after our job is done.
+This command "`beep`" would open up an alert-window and beep with the message passed. The "`using errorlist.new`" thing, would "contain" any errors from contaminating the rest of the program, which in this example we don't want. It does this by creating a new `stderr`... saving the old one, then replacing the old `stderr` after our job is done. You could do it manually but thats kind of ugly.
+
+    || old = stderr
+    stderr = errorlist.new
+    .startconversion
+    .doconversion
+    .finishconversion
+    if !stderr.ok
+        beep "An error occured during conversion:\n\n" + stderr.render
+    stderr = old
+
+This does the same thing but it looks messier.
