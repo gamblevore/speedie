@@ -211,3 +211,62 @@ This would actually make sure `stderr` is reset to its original value no matter 
 If you hate exceptions, or think exceptions suck, or think that manually dealing with errors all over the place like Go does... is awkward and just irritating... then Speedie is probably the language for you! It just does everything in a very clean way.
 
 The main thing is to see statements like `#expect` or `#require` like comments. You don't need to understand them in order to understand the code flow. They are almost "out of the way", like comments. So your eyes more naturally look to the code at the left. Thats the whole idea of it. And even if you were looking at them, the overall amount of code is still **much lower**.
+
+### Comparison To Other Languages
+
+Lets look at "`Go`", a supposedly modern language with huge funding (not jealous at all 😂 😭). And then look at how much better it is in `Speedie`:
+
+
+    package greetings
+    import (
+        "errors"
+        "fmt"
+    )
+    
+    func Hello(name string) (string, error) {
+        if name == "" {
+            return "", errors.New("empty name")
+        }
+        message := fmt.Sprintf("Hi, %v. Welcome!", name)
+        return message, nil
+    }
+
+
+    package main
+    import (
+        "fmt"
+        "log"
+        "example.com/greetings"
+    )
+    
+    func main() {
+        message, err := greetings.Hello("")
+        if err != nil {
+            log.Fatal(err)
+        }
+        fmt.Println(message)
+    }
+    
+
+
+OK, their syntax is quite understandable, in this case. `Go` has awkward syntax usually, but for this simple case it's OK! Now lets look at this in speedie:
+
+
+    module greetings
+        function Hello (|string| name, |string|)
+            expect (name) "empty name"
+            return "Hi, $name. Welcome!"
+
+    main
+        || message = greetings.hello("")
+            printline message
+            
+
+
+Yeah... that. LITERALLY 1/4 of the code. Are you starting to feel it now Mr Krabs? Are ya? Are ya? Mr Krabs?
+
+You might be wondering, why I didn't "`log.fatal`", well... because `log.fatal` only calls "`log.print(msg);os.Exit(1)`", so its just printing.
+
+Turns out that Speedie apps do the same thing, on exit. Once the speedie app exits, if `stderr` contains errors, the errors are logged to the console, with an error number of -1. So it is literally the same thing... just happens without me even needing to say it.
+
+Speedie really is remarkably expressive and well-designed.
