@@ -207,3 +207,5 @@ This does the same thing but I prefer the first, don't you think? Also, the "usi
             beep "An error occured during conversion:\n\n" + stderr.render
 
 This would actually make sure `stderr` is reset to its original value no matter how we exit the `using` block.
+
+If you hate exceptions, or think exceptions suck, or think that manually dealing with errors all over the place like Go does... is awkward and just irritating... then Speedie is probably the language for you! It just does everything in a ery clean way.
