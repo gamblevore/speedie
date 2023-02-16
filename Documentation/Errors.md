@@ -287,9 +287,7 @@ In Speedie:
 
 Speedie's version is simpler. In fact, here we can rely on Speedie already printing good error messages. If you run this code, you should see this:
 
-`error: File doesn't exist when open '/Users/USERNAME/John.txt'.
-1 issue found.
-`
+`error: File doesn't exist when opening '/Users/USERNAME/John.txt'.`
 
 Speedie will handle every file-system error, not just file-not-found. The python code (copied from a popular website on the 1st page of google-search) doesn't. If it fails for any other reason than "file not found"... the python code fails to give the correct error message. So speedie is better, again.
 
