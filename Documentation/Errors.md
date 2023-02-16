@@ -220,6 +220,8 @@ Lets compare speedie error handling, to other languages.
 First lets look at "`Go`", a supposedly modern language with huge funding (not jealous at all 😂 😭). And then look at how much better it is in `Speedie`:
 
 
+File one:
+
     package greetings
     import (
         "errors"
@@ -234,6 +236,7 @@ First lets look at "`Go`", a supposedly modern language with huge funding (not j
         return message, nil
     }
 
+File two:
 
     package main
     import (
@@ -304,7 +307,7 @@ Speedie will handle every file-system error, not just file-not-found. The python
 
 ### Error Handling in C
 
-Funnily enough... C is much better in error handling than most modern languages. It's error handling makes sense. Awkward and easy to get wrong, and miss errors... but if you know what you are doing, it makes sense.
+C's error handling... what to say about it. It makes sense from a performance perspective. But from a coder's perspective its no fun. Awkward, easy to miss errors... messy.
 
     const char* Fol = "/tmp/a/b/c/";
     int err = mkdir(Fol, 0755);
@@ -318,7 +321,7 @@ Funnily enough... C is much better in error handling than most modern languages.
     }
     UseFolder(Fol);
 
-Well...it makes sense but its als labourious, error-prone and time-wastery. What if you don't know about `EEXIST` or fail to log `strerror(errno)` and `Fol`. Thats 2 strings to log and 2 check. Also the control flow is messy.
+This code seems labourious, error-prone and time-wastery. What if you don't know about `EEXIST` or fail to log `strerror(errno)` and `Fol`. Thats 2 strings to log, and 2 checks to remember. Also the control flow is messy.
 
 In Speedie:
 
