@@ -293,7 +293,7 @@ Speedie's version is simpler. In fact, here we can rely on Speedie already print
 
 Also, Speedie's error handling is harder to get wrong! Most of the examples I've seen for reading files, catch `FileNotFoundException`... which fails to catch most of the 50 file-system errors. I had to ignore most prevalent examples to find a good python example.
 
-Also, there are two failiure points in the python code. `open()` and `read()` just because `open()` succeeded doesn't mean you can `read()` from it! Especially if you opened a directory. So error-handling with files in python, is still more difficult than it seems.
+Also, there are two failiure points in the python code. `open()` and `read()`. Just because `open()` succeeded doesn't mean you can `read()` from it! Especially if you opened a directory. So error-handling with files in python, is still more difficult than it seems.
 
 Things just are more convenient in speedie.
 
