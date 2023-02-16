@@ -102,9 +102,10 @@ As you can tell, this is a mess. A disaster actually. Doing it the non-speedie w
 
 Why is it so much worse?
 
-+ We need to print often, to replicate how Speedie prints `stderr` on exit. Also many functions (like `string.ExistingFile`) create errors if something goes wrong... so we need to replicate that too.
++ We need to print often, to replicate how Speedie prints `stderr` on exit.
++ Many functions (like `string.ExistingFile`) create errors if something goes wrong... so we need to replicate that too.
 + We have to `return -1` often, to replace the inbuilt `return -1` you get when your program exits but `stderr.ok==false`.
-* The same above two problems apply for accessing children of `message`, which happens **all over the place**.
+* The same above two problems apply for accessing child nodes of `message`, which happens **all over the place**.
 + We need "`StillOK`" booleans in many places, because previously any function could have been adding errors.
 
 Take a look again at the first example. Its just SOOO much better. Everything does what it is meant to do. Its simple, readable, works better.
