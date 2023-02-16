@@ -24,8 +24,8 @@ Let's make a simple example:
         "User list parsed OK"
         
         for user in userlist
-            // check all users for bad-names. Pass the message to nicely
-            // describe where the errors were found in the source.
+            // check all users for bad-names. Passes the object 'user' which knows
+            // what position in what file it came from, and stores that in the error.
             check user.name.NameIsOK (user, "User has a bad name.")
             
         if stderr.ok
