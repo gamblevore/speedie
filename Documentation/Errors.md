@@ -334,4 +334,4 @@ Again! Super simple! Once the program exits, you get the list of errors printed.
 
 Compared to other error-handling systems, Speedie's always comes out on top. It is simpler, easier to use, more reliable, and cuts down total lines of code to 1/3 quite often.
 
-`ErrorLists` just are the way.
+`ErrorLists` just are the way forward.
