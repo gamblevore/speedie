@@ -60,7 +60,7 @@ class Window (GUIControl)
 
 	helper Reflow
 		opt norefcounts
-		|| p = .parent oar window.all
+		|| p = .parent ?? window.all
 		if self ~= "confirm"
 		.reflow(self, p)
 	

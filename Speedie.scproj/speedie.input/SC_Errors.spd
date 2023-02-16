@@ -224,7 +224,7 @@ extend Error
 
 
 	function SCOriginalPath (|string|)
-		return .node.filelocation oar .path
+		return .node.filelocation ?? .path
 
 
 	function SCLineCount (|int|)
@@ -251,7 +251,7 @@ extend Error
 		if options.color: fs <~ errorcolors.Bold
 
 		|| data = .SCOriginalData
-			|| p = .SCOriginalPath oar "(string)"
+			|| p = .SCOriginalPath ?? "(string)"
 			fs <~ p
 			fs <~ ':'
 			.SCLineIdentifiers(fs, data)
@@ -289,7 +289,7 @@ extend Error
 		
 	render SCRender
 		// probably not needed, but whatever leave it for now.
-		.path := .SCOriginalPath oar "(string)"
+		.path := .SCOriginalPath ?? "(string)"
 		if options.perry
 			.render(fs)
 		  else

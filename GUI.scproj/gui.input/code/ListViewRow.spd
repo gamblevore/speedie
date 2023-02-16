@@ -67,7 +67,7 @@ role ListViewRow (message)
 		opt norefcounts
 		if (self is expanded) or (self == root)
 			return .flatnext
-		return .next oar .flatafter
+		return .next ?? .flatafter
 	
 	
 	function IsSelected	(|bool|)

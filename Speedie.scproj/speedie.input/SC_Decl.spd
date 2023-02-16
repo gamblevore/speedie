@@ -322,7 +322,7 @@ class SCDecl (SCObject) {
 	
 	function WriteDeclSub (|String| Name, |bool|minimal, |Message|)
 		|| dcl = «decl, .WriteType(minimal) »
-		|| def = .Default oar .Type.defawlt
+		|| def = .Default ?? .Type.defawlt
 		if !def or .pointercount
 			def = «thg "nil"»
 		  else
@@ -722,7 +722,7 @@ class SCDecl (SCObject) {
 
 	function reallycontains (|scdecl|)
 		opt norefcounts
-		|| c = .contains oar .type.contained
+		|| c = .contains ?? .type.contained
 		if c and c.type != self.type
 			return c
 

@@ -508,7 +508,7 @@ function ArgsMatchSub (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCPa
 		Incoming.Exp.Last.Func = @prm
 		Result.Argsmatchtwo( TypeCast, base, true, name_space, Incoming )
 
-	return result oar missing
+	return result ?? missing
 
 
 function FLookup (assigns:|SCBase|)
@@ -727,7 +727,7 @@ function FillInConstructorAndDestructor (|Message| root, |bool| IsConstructor, |
 			  else
 				|| TheSetter = IsSelfOfSetter( curr )
 				|| t = TypeOfExpr(p, nil)
-					|| tester = TheSetter oar p
+					|| tester = TheSetter ?? p
 					if (t.IsNormalObject)
 						(!(IsConstructor and !TheSetter) #error (tester, "Can’t read object properties during a constructor."))
 						(!(!IsConstructor and TheSetter) #error (tester, "Can’t set object properties during a destructor."))

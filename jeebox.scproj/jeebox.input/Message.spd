@@ -36,7 +36,7 @@ class Message (RingTree)
 		cpp_part ConstructorCopy
 		super.constructor
 		
-		.Position	= other.Position oar parser.UsingPos
+		.Position	= other.Position ?? parser.UsingPos
 		.func		= other.func
 		.flags		= other.flags (|) parser.InsertedFlags
 		.Name		= other.Name

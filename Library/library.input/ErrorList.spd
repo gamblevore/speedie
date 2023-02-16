@@ -149,7 +149,7 @@ class ErrorList
 	
 	function PrintErrors (|errorseverity| Level, |bool| PrintCount, |bool| shell, |int|)
 		cpp_part PrintErrorsMain
-		|| rec = self oar stderr
+		|| rec = self ?? stderr
 
 		|| fs    = faststring()
 		|| Count = rec.rendererrors(fs, level, shell)$

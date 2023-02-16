@@ -235,7 +235,7 @@ function SCFunction.UseCppName (|string| CppName, |bool|)
 function LinkagePlace (|message|)
 	|| Place = .SourceArg
 	|| Link = Place.findflat(@tmp, "linkage")
-	return Link[@arg] oar Place
+	return Link[@arg] ?? Place
 
 
 function message.cpp_wrapper (|string|)
@@ -266,7 +266,7 @@ function scfunction.ExportNameBuilder (|string|CppPart="", |string| )
 			SubSection = L.CppPart
 			AfterSub = "__"
 
-	|| P = .project oar .lookup.project
+	|| P = .project ?? .lookup.project
 	|| wanted = p.mod.exportname
 	if wanted != subsection
 		rz = (wanted + "_")
@@ -570,7 +570,7 @@ function RequireContained (|Message| exp, |SCDecl|)
 	|SCClass| cls
 	
 	if (self isa SCFunction)
-		cls = .Cls oar (.lookup|SCModule|).Cls
+		cls = .Cls ?? (.lookup|SCModule|).Cls
 		
 	  elseif (self isa SCClass)
 		cls = self

@@ -49,7 +49,7 @@ function string.SpdScriptName (|string|)
 
 	
 function string.ScriptLocation (|string| container = "/tmp/SpeedieApps/", |string|)
-	|| full = .Resolve oar self
+	|| full = .Resolve ?? self
 	container = container[full.hash|int64|.abs.render]
 	container.makeentirepath
 	return container[full.SpdScriptName]

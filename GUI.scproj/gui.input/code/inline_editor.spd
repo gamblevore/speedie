@@ -11,7 +11,7 @@ struct InlineEditor
 	
 	function DrawFocus (|image|where)
 		opt norefcounts
-		|| g = .editingfor|guicontrol| oar .searchingfor
+		|| g = .editingfor|guicontrol| ?? .searchingfor
 			g.drawfocus(where)
 	  
 	

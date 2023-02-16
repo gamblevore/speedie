@@ -158,7 +158,7 @@ class PerryIDE (Window)
 		opt norefcounts
 		|| it = .FileList
 			|| r = it[0]
-			return it.findapath("./input/", r)  oar  it.findapath("./*.input/", r) 
+			return it.findapath("./input/", r)  ??  it.findapath("./*.input/", r) 
 
 
 	behaviour AppForeGroundChanged

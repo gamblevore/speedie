@@ -55,7 +55,7 @@ module Perry
 		require Found
 		for proj_item in .projects
 			|| proj = proj_item.name.file
-			|| r2 = r oar PerryIDE(false)
+			|| r2 = R ?? PerryIDE(false)
 			r2.Loadproject(proj)
 			startupwindow.hide
 			r = nil

@@ -14,7 +14,7 @@ module zalgo
 	render (|string| txt, |float| Wierdness)
 		zalgo.r.init
 		for i in (-1 to txt.length) 
-			|| s = txt[i] oar ' '
+			|| s = txt[i] ?? ' '
 			fs <~ s
 			if s < 128
 				|| scale = (s<=32) + (txt[i+1]<=32) + (txt[i-1]<=32)

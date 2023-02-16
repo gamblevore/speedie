@@ -28,7 +28,7 @@ extend Parser
 
 
 		|| numb     =   "0123456789".bytesplit
-		|| op_comp  =   "= == === < > <= <== >= >== <> ~<> != !== <=> ~>= ~<= ~> ~< <~ ~= ~!= ~<=> :="
+		|| op_comp  =   "= == === < > <= <== >= >== <> ~<> != !== <=> ~>= ~<= ~> ~< <~ ~= ~!= ~<=> := ??"
 		|| op_math  =   "* / \\ + - ^ & >> << >>> <<< (|)"
 		
 		|| PFix		=	"++ -- $ ! ? ..."
@@ -654,7 +654,7 @@ extend Parser
 		(rz is style2)
 		rz.extra = 1 (|) parser.baseextra // oof
 		while {
-			|| Item = .Process( kTemporal, rz ) oar .ProcessThing
+			|| Item = .Process( kTemporal, rz ) ?? .ProcessThing
 			rz <~ item
 		} (item and .allow(kcomma))
 
@@ -667,7 +667,7 @@ extend Parser
 		|| result = parser( nil, @Str, start )
 
 		while StrPos
-			|| NewStrPos = parser.data.jbfind('$', StrPos, After) oar After
+			|| NewStrPos = parser.data.jbfind('$', StrPos, After) ?? After
 			if NewStrPos > StrPos
 				|| Str = parser.new(result, @Emb, StrPos, NewStrPos )
 				str.name = str.name.unescape
@@ -926,7 +926,7 @@ extend Parser
 		|| Result = parser(nil, @Item, ch.position)
 		Result <~ ch
 
-		|| ch2 = .Process( TemporalFlags, Result ) oar .ProcessThing(ops)
+		|| ch2 = .Process( TemporalFlags, Result ) ?? .ProcessThing(ops)
 		ch2 := parser.new(Result, @emb, ns) // so we can do item.last
 		result <~ ch2
 		result.after = ch2.after 
@@ -1192,7 +1192,7 @@ extend Parser
 		Opt NoRefCounts
 		|| n = .data.length
 		if (Start < n)
-			|| After = .data.OutCharSet( Jeebox.CSWordMiddle, Start ) oar n
+			|| After = .data.OutCharSet( Jeebox.CSWordMiddle, Start ) ?? n
 			if (After > Start)
 				.NextStart = After
 				return After

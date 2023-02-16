@@ -588,7 +588,7 @@ extern \"C\" JB_String* JB_App__LibFuncs(void*** Funcs) {
 	
 
 function ExportModuleProperties (|SCModule| modl, |FastStringCpp| IntoModule)
-	|| fs = IntoModule oar .TypesProj
+	|| fs = IntoModule ?? .TypesProj
 
 	for prop in modl.ListProperties
 		if prop is Const

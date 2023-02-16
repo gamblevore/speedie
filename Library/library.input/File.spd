@@ -520,7 +520,8 @@ class File (String)
 
 
 	function anydate (|date|)
-		return .created oar .modified
+		return .created ?? .modified
+
 
 
 role StringThatWasReadSafely (string)

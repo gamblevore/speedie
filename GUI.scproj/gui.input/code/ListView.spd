@@ -259,7 +259,7 @@ class ListView (GUIControl) {
 	
 	
 	function sib (|ListViewrow|r, |ListViewrow|)
-		return .Hiernext(r) oar .Hierprev(r)
+		return .Hiernext(r) ?? .Hierprev(r)
 	
 	
 	function CheckRemoved (|ListViewrow|r)
@@ -273,7 +273,7 @@ class ListView (GUIControl) {
 		
 		|ListViewrow| willsel
 		if r is selected
-			willsel = r.prev oar r.next
+			willsel = r.prev ?? r.next
 		r|ringtree|.remove
 		
 		if willsel
@@ -772,10 +772,10 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| root = .listsource
 		if !fwd
-			return l.hierprev(root) oar .end
+			return l.hierprev(root) ?? .end
 		if l != root // compare to .list? instead?
 			(l is expanded) // might as well
-		return l.hiernext(.listsource) oar .start
+		return l.hiernext(.listsource) ?? .start
 	function hierNext (|ListViewrow| l, |ListViewRow|)
 		if l
 			return (l.hiernext(.listsource), l.next)(.istree)
@@ -939,7 +939,7 @@ class ListView (GUIControl) {
 	function SelectNone
 		opt NoRefCounts
 		|| one = .OneAlwaysSelected
-		|| s = (.sel oar .start, nil)(one)
+		|| s = (.sel ?? .start, nil)(one)
 		return .Select(s)
 	
 	
@@ -1292,7 +1292,7 @@ class ListView (GUIControl) {
 		
 	behaviour Draw
 		opt NoRefCounts
-		|| c = (.CalculateColumnWidths) oar (DefaultColumnWidths)
+		|| c = (.CalculateColumnWidths) ?? (DefaultColumnWidths)
 		(c)(self, nil)
 		.scrollProtect
 		

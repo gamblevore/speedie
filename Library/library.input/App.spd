@@ -268,8 +268,8 @@ function NeedsIdealPath (|file|)
 function string.ArgName (|string|)
 	// "--Name=Value" --> "Name"
 	// "--Name" --> "Name"
-	if (self[0] == '-')
-		|| i = .find( '=' ) oar int.max
+	if (self[0] == '-') 
+		|| i = .find( '=' ) ?? int.max
 		|| S = self[ 0, i ]
 		S = S.TrimFirst('-')
 		return S.lowercase
@@ -314,7 +314,7 @@ function Message.ArgName (|string|)
 
 function Message.ArgValue (|string|)
 	if (self == @item)
-		return .second.nyme oar "true"
+		return .second.nyme ?? "true"
 	return .name
 
 

@@ -142,7 +142,7 @@ function PerryIDE.DefineFB (|message| msg, |bool|)
 
 
 function PerryIDE.DisplayFB (|message| display, |bool|)
-	|| f = display.first oar display
+	|| f = display.first ?? display
 	f.parent = nil // for @args
 	if (f == @arg) and !f.hasany and (display starts "displayall")
 		.PopupHide
@@ -298,7 +298,7 @@ function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |string| reason)
 	|| s = .feedback
 		.LastExtraInfo = M
 		.PopupDisplayCorner = p
-		.MaybeSendMessage(reason oar "display", M)
+		.MaybeSendMessage(reason ?? "display", M)
 
 
 function OnShowExtraInfo (GUITextShowEvent)

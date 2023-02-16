@@ -787,7 +787,7 @@ class TextView (GUIControl)
 		|ind| b = s.x2
 		b += self[b-1].istextline
 			
-		B = .findline(b) oar .text.length
+		B = .findline(b) ?? .text.length
 		return (A+1, b) // don't include the line.
 
 			

@@ -76,7 +76,7 @@ function scbase.CollectConstantsSub (|Message| ch, |SCImport| imp)
 			|| ValueNode = Line[2]							#expect Line
 			|| thg = line[ @Thg ]							#require
 			|| OMGType = TypeOfExpr( ValueNode, self )		#require // can’t seem to remove this.
-			|| NewType = CurrType oar OMGType
+			|| NewType = CurrType ?? OMGType
 			expect (NewType) (line)
 
 			if (ValueNode == @Str)

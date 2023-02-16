@@ -251,8 +251,8 @@ class FileRow (ListViewRow)
 			err.path = .location
 			
 			i = r.x2
-			|| after  = t.find(jeebox.csline, i, i+30)  oar  (i+30)
-			|| before = t.find(jeebox.csline, p, p-30 max 0)  oar  (p-10)
+			|| after  = t.find(jeebox.csline, i, i+30)   ??  (i+30)
+			|| before = t.find(jeebox.csline, p, p-30 max 0)   ??  (p-10)
 			|| s = t[before, after]
 			if !pattern[0].iswhite
 				s = s.trim.remove(jeebox.csline)

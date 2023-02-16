@@ -47,8 +47,8 @@ module package
 		debugger.root	= pk..debug
 		debugger.meta	= pk..meta
 		
-		.strings		= app_..strs oar Message()
-		.projclasses	= app_..clss oar message()
+		.strings		= app_..strs ?? Message()
+		.projclasses	= app_..clss ?? message()
 		.funcs			= app_..fncs		#error "Missing 'fncs'"
 		.linkage		= app_..link		#error "Missing 'link'"
 

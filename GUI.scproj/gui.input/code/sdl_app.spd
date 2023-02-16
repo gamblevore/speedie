@@ -684,7 +684,7 @@ module SDLApp
 
 	
 	function FileDroppedIntoApp (|window| w, |string| path, |CopyPasteFlags| p)
-		|| c = w[.MouseXY] oar w
+		|| c = w[.MouseXY] ?? w
 		c.DoPaste(path, p)
 		w.DroppingInto = nil
 
@@ -713,7 +713,7 @@ module SDLApp
 	
 	function Window.ControlOrMenuAt (|ivec2| xy, |bool|Test=true, |guicontrol|)
 		opt norefcounts
-		return .menuat(xy, test) oar self[xy]
+		return .menuat(xy, test) ?? self[xy]
 
 
 	function StandardKeys (|keys| key, |bool|)
@@ -729,7 +729,7 @@ module SDLApp
 			  elseif (key is find or AC_SEARCH)
 				return g.OpenSearch
 
-		|| gw	= g oar w
+		|| gw	= g ?? w
 		if keys.cmd
 			if (key is f) and keys.option
 				.JB_SDL_FullScreen(.nativewindow, false)
@@ -816,12 +816,12 @@ module SDLApp
 			return knothing
 
 
-		|| w = .opendialog oar __modules__.window.front
+		|| w = .opendialog ?? __modules__.window.front
 		if (!w)
 			return kNothing
 
 		if T is dropbegin
-			w.DroppingInto = w[.MouseXY] oar w
+			w.DroppingInto = w[.MouseXY] ?? w
 			return kActivity
 		if t is DROPFILE or Droptext
 			|| flags = (copypasteflags.pastefile, copypasteflags.pastetext)(t is dropfile)

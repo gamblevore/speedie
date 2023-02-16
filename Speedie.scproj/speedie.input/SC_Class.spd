@@ -186,7 +186,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		Count = .super.CalculateSizeRaw				#debug_require
 
 	for p in .properties
-		|| Mul = P.c_Array oar 1
+		|| Mul = P.c_Array ?? 1
 		|| curr = 0
 		if (P.isnormalobject) or (p.pointercount)
 			Curr = platform.PointerBytes

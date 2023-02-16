@@ -359,7 +359,7 @@ class FileViewer (ListView)
 		if FromReturnKey
 			if (FromReturnKey >= 3) or (!path) or (path.file.exists)
 				if path
-					|| r0 = r[0] oar .addextra(path)
+					|| r0 = r[0] ?? .addextra(path)
 						path = ""
 					.select(nil) // force event
 					.selectfast(r0)			

@@ -162,7 +162,7 @@ function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 	lst <~ msg.Copy
 	lst.obj = func
 	rz.position = -1 // why not. its not real.
-	rz.obj = func.returntype oar typevoid
+	rz.obj = func.returntype ?? typevoid
 
 
 // RefMsg/reffunc are almost the same... sigh.

@@ -152,7 +152,7 @@ class RingTree (Saveable)
 		
 		debug_require r.parent == .parent
 		if r != self
-			return .fwddist(R) oar .backdist(r)
+			return .fwddist(R) ?? .backdist(r)
 			
 
 	function fwddist (|ringtree| F, |int|)
@@ -190,8 +190,8 @@ class RingTree (Saveable)
 
 	function Move (|bool| fw, ||)
 		if fw
-			return .next oar self
-		return .prev oar self
+			return .next ?? self
+		return .prev ?? self
 		
 	
 	function Move (|int| n, ||)

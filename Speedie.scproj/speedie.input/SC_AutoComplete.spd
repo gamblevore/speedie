@@ -967,7 +967,7 @@ function LocateDefinitionSub (|message| msg, |scobject| already_defined, |bool| 
 	
 	if DisplayOnly
 		|| t = ty.type
-		return t.typenormal.source oar t.sourceclass
+		return t.typenormal.source ?? t.sourceclass
 		
 }
 

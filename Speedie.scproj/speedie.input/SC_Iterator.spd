@@ -145,7 +145,7 @@ class SCIterator (SCObject)
 				|| it = SCIterator.new(name_space)
 				require it.InitIter( node )
 				
-				|| s = it.name oar "DefaultIterator"
+				|| s = it.name ?? "DefaultIterator"
 				name_space.tryadd(node, it, s)
 				
 				Return Compiler.program // OK

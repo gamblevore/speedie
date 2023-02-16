@@ -22,6 +22,7 @@ dispatch TemporalStatements (TranFunc)
 	ifn						(Tran_Ifn)
 	else					(Tran_Else)
 	debugger				(Tran_Debugger)
+	crash					{app.crash("crashtest")}
 	deprecate				(Tran_Deprecate)
 	
 	debugat					(Tran_DoAt)
@@ -382,8 +383,7 @@ function Tran_Result (|SCFunction| f, |message|)
 	|| Type = f.ReturnType
 	|| Src  = f.SourceArg
 	require type and src and !(Src.Last IsTmp "return")
-
-	|| errs = src.last oar src
+	|| errs = src.last ?? src
 	using (errs)
 	parser.usingpos = -1
 	
