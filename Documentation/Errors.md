@@ -219,10 +219,7 @@ Lets compare speedie error handling, to other languages.
 
 First lets look at "`Go`", a supposedly modern language with huge funding (not jealous at all 😂 😭). And then look at how much better it is in `Speedie`:
 
-
-File one:
-
-    package greetings
+    package main
     import (
         "errors"
         "fmt"
@@ -235,18 +232,9 @@ File one:
         message := fmt.Sprintf("Hi, %v. Welcome!", name)
         return message, nil
     }
-
-File two:
-
-    package main
-    import (
-        "fmt"
-        "log"
-        "example.com/greetings"
-    )
     
     func main() {
-        message, err := greetings.Hello("")
+        message, err := Hello("")
         if err != nil {
             log.Fatal(err)
         }
@@ -258,18 +246,17 @@ File two:
 OK, their syntax is quite understandable, in this case. `Go` has awkward syntax usually, but for this simple case it's OK! Now lets look at this in speedie:
 
 
-    module greetings
-        function Hello (|string| name, |string|)
-            expect (name) "empty name"
-            return "Hi, $name. Welcome!"
+    function Hello (|string| name, |string|)
+        expect (name) "empty name"
+        return "Hi, $name. Welcome!"
 
     main
-        || message = greetings.hello("")
+        || message = hello("")
             printline message
             
 
 
-Yeah... that. LITERALLY 1/3 of the code. Are you starting to feel it now Mr Krabs? Are ya? Are ya? Mr Krabs?
+Yeah... that. LITERALLY 1/2 of the code. Are you starting to feel it now Mr Krabs? Are ya? Are ya? Mr Krabs?
 
 You might be wondering, why I didn't replace "`log.fatal`", well... because `log.fatal` only calls "`log.print(msg);os.Exit(1)`", so its just printing.
 
