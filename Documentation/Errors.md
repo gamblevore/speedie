@@ -48,8 +48,8 @@ both `A` and `B` are tested in the same way. But the first looks better to me, i
 
 Lets make a list of the statements:
 
-+ `expect` - This will create an error, and exit the function if the expression is false. The function will return nil.
-+ `require` - This will exit the function, if the expression is false. No error.  The function will return nil.
++ `expect` - If the expression is false, this will create an error, then the function will return nil.
++ `require` - If the expression is false, the function will return nil. No error.
 + `check` - This will create an error if the expression is false. But the code will continue to flow.
 + `error` - This will create an error. Same as `check false`
 
