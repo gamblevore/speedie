@@ -100,7 +100,7 @@ Seems clear? Lets look at a version written **without** the Speedie error handli
 
 As you can tell, this is a mess. A disaster actually. Doing it the non-speedie way is awful, and makes error-reporting **worse**. For example, filepaths are now buried in an error-message, rather than separate and easy to parse.
 
-Why is is so much worse?
+Why is it so much worse?
 
 + We need to print often, to replicate how Speedie prints `stderr` on exit. Also many functions (like `string.ExistingFile`) create errors if something goes wrong... so we need to replicate that too.
 + We have to `return -1` often, to replace the inbuilt `return -1` you get when your program exits but `stderr.ok==false`.
