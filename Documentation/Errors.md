@@ -269,27 +269,33 @@ Speedie really is remarkably expressive and well-designed.
 
 Python overall is a minimal language, much like speedie in that way. But Speedie's error handling is unmatched.
 
-    filename = 'John.txt'
+    filename = '/'
     try:
         with open(filename) as f_obj:
             contents = f_obj.read()
     except OSError as e:
-        print(f"Unable to open {path}: {e}", file=sys.stderr)
+        print(f"Unable to open or read {filename}: {e}", file=sys.stderr)
         return
+        
     print(contents.lower)
 
 In Speedie:
 
-    || filename = "John.txt"
+    || filename = "/"
     || f_obj = filename.file
-    || contents = f_obj.readall(false) // 'false' here disables treating missing files as empty files
-        print contents.lower
+    || contents = f_obj.readall #require
+
+    print contents.lowercase
 
 Speedie's version is simpler. In fact, here we can rely on Speedie already printing good error messages. If you run this code, you should see this:
 
-`error: File doesn't exist when opening '/Users/USERNAME/John.txt'.`
+`error: Is a directory when reading '/'.`
 
-Also, Speedie's error handling is harder to get wrong! Most of the examples I've seen for reading files, catch FileNotFoundException... which fails to catch most of the 50 file-system errors. I had to ignore most prevalent examples to find a good python example.
+Also, Speedie's error handling is harder to get wrong! Most of the examples I've seen for reading files, catch `FileNotFoundException`... which fails to catch most of the 50 file-system errors. I had to ignore most prevalent examples to find a good python example.
+
+Also, there are two failiure points in the python code. `open()` and `read()` just because `open()` succeeded doesn't mean you can `read()` from it! Especially if you opened a directory. So error-handling with files in python, is still more difficult than it seems.
+
+Things just are more convenient in speedie.
 
 ### Error Handling in C
 
