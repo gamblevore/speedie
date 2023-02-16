@@ -273,9 +273,10 @@ Python overall is a minimal language, much like speedie in that way. But Speedie
     try:
         with open(filename) as f_obj:
             contents = f_obj.read()
-    except FileNotFoundError:
-        msg = "Sorry, the file "+ filename + "does not exist."
-        print(msg) # Sorry, the file John.txt does not exist.
+    except OSError as e:
+        print(f"Unable to open {path}: {e}", file=sys.stderr)
+        return
+    print(contents.lower)
 
 The python code has a problem... it fails to handle recursive symlink errors or file-busy errors? The filesystem has about 50 errors, and expecting the programmer to know the names of all of them is impossible. All you want is "what was the error name, and did it fail".
 
@@ -284,6 +285,7 @@ In Speedie:
     || filename = "John.txt"
     || f_obj = filename.file
     || contents = f_obj.readall(false) // 'false' here disables treating missing files as empty files
+        print contents.lower
 
 Speedie's version is simpler. In fact, here we can rely on Speedie already printing good error messages. If you run this code, you should see this:
 
