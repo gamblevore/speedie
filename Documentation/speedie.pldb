@@ -7,7 +7,7 @@ webRepl http://github.com/gamblevore/speedie
 documentation https://github.com/gamblevore/speedie/blob/main/Documentation
 emailList https://t.me/speedie_dev
 country United Kingdom
-domainName speedie.dev
+domainName gamblevore.org
 	registered 2023
 related i-expressions json yaml toml xml haml ini grammar jtree treenotation
 influencedBy javascript python c lua cpp visualbasic hypercard html css xml json
@@ -18,340 +18,350 @@ visualParadigm false
 
 features
 	example
-		main
-			"hello world ${app.args[0]}"
+	    main
+	        "hello world ${app.args[0]}"
 	 
 	hasSingleDispatch true
-	hasMultipleDispatch false
 	hasMaps true
-		|| x = ["a":"Apple", "b":"Bird", "c":"Cat"]
-		printline x["b"] // Bird
+	    || x = ["a":"Apple", "b":"Bird", "c":"Cat"]
+	    printline x["b"] // Bird
 	hasPipes true
-	hasManualMemoryManagement false
+	hasManualMemoryManagement true
+	    || mem = byte[1MB]
+	    mem[10] = 1
+	    // do whatever you want with this yourself in here... I just don't recommend
+	    // using it to store any objects.
 	hasPolymorphism true
-		|object| x = somefunction()
-		|| y = x.render // returns a string by calling the virtual func "render"
+	    |object| x = somefunction()
+	    || y = x.render // returns a string by calling the virtual func "render"
 	hasAssertStatements true
-		class Person
-			|int| age
-			setter age
-				// "expect" will actually add an Error to a list of errors
-				expect (value >= 0) ("bad age $value set!")
-				.age = value
-		
-		main
-			|| p = person()
-			p.age = -10
-			if !stderr.ok
-				"Oof we got some errors"
+	    class Person
+	        |int| age
+	        setter age
+	            // "expect" will actually add an Error to a list of errors
+	            expect (value >= 0) ("bad age $value set!")
+	            .age = value
+	    
+	    main
+	        || p = person()
+	        p.age = -10
+	        if !stderr.ok
+	            "Oof we got some errors"
 	hasDocComments true
-		function Find (|string| pattern, |int| pos=0, |int|)
-			description "Returns the position of pattern in self, starting from 'pos'. If not found, we return -1."
+	    function Find (|string| pattern, |int| pos=0, |int|)
+	        description "Returns the position of pattern in self, starting from 'pos'. If not found, we return -1."
 	hasUnicodeIdentifiers true
-		class é©©
-			constructor
-				printline .class.name // "é©©"
+	    main
+	        || Jüñé = 6
+	        printline Jüñé
 	hasDefaultParameters true
-		function Find (|string| pattern, |int| pos=0, |int|)
+	    function Find (|string| pattern, |int| pos=0, |int|)
 	
 	hasMagicGettersAndSetters true
 	hasMacros true
 	hasTypeInference true
-		|| x = "Hello"
-		|| y = FunctionThatReturnsAString() // is now a string
-		x = 1 // fails to compile
-		y = 2 // fails to compile
+	    || x = "Hello"
+	    || y = FunctionThatReturnsAString() // is now a string
+	    x = 1 // fails to compile
+	    y = 2 // fails to compile
 	hasStaticTyping true
-		|| x = "Hello"
-		x = 1 // fails to compile... because x is a string
+	    || x = "Hello"
+	    x = 1 // fails to compile... because x is a string
 	hasIncrementAndDecrementOperators true
-		|| x = 1
-		x++
-		x--
+	    || x = 1
+	    x++
+	    x--
 	hasSingleDispatch true
-		|| x = "str"
-		|| i = x.find("t")
+	    || x = "str"
+	    || i = x.find("t")
 	hasModules true
-		module App
-			function Path (|string|)
-				// return the app's path here
+	    module Greeting
+	        function Hello
+	            printline "Hello!"
 	hasExplicitTypeCasting true
-		|| x = message()
-		|| y = x|object| // lose type info
-		|| z = y|message| // regain it
+	    || x = message()
+	    || y = x|object| // lose type info
+	    || z = y|message| // regain it
 	hasStructs true
-		struct Fuel
-			|int| A
-			|byte| B
+	    struct Fuel
+	        |int| A
+	        |byte| B
 	hasEnums true
-		flags
-			A
-			B
-			C
-			D
-		// A=1, B=2, C=4, D=8
-		constants
-			X
-			Y
-			Z
-			W
-		// X=0, Y=1, Z=3, W=4
+	    flags
+	        A
+	        B
+	        C
+	        D
+	    // A=1, B=2, C=4, D=8
+	    constants
+	        X
+	        Y
+	        Z
+	        W
+	    // X=0, Y=1, Z=3, W=4
 	canWriteToDisk true
-		"helloworld.txt" <~ "Hello, world!\n"
+	    "helloworld.txt" <~ "Hello, world!\n"
 	hasDuckTyping false
 	hasRegularExpressionsSyntaxSugar false
 	isCaseSensitive true
-		|| Same = "x" == "X" // same = false
+	    || Same = "x" == "X" // same = false
 	hasCaseInsensitiveIdentifiers true
-		if "abc".LeNgTh == 3
-			 "cool length"
+	    if "abc".LeNgTh == 3
+	         "cool length"
 	hasTernaryOperators true
-		while
-			printline (1,0)(random[]>0.5)
+	    while
+	        printline (1,0)(random[]>0.5)
 	hasMessagePassing true
-		|| chld = app.fork("ipc_identifier_123", app.rawargs)
-		chld <~ "send message"
-		printline chld.get // receive message
+	    || chld = app.fork("ipc_identifier_123", app.rawargs)
+	    chld <~ "send message"
+	    printline chld.get // receive message
 	hasBitWiseOperators true
-		x << y
+	    x << y
 	canDoShebang true
-		#!/usr/local/bin/spd
+	    #!/usr/local/bin/spd
 	hasSymbolTables true
 	hasDynamicProperties false
 	hasBooleans true
 	hasConditionals true
 	hasContinue true
-		for i in 10
-			if i < 5: continue
-			printline i // 6,7,8,9
+	    for i in 10
+	        if i < 5: continue
+	        printline i // 6,7,8,9
 	hasBreak
-		for i in 10
-			if i > 3: exit
-			printline i // 1,2,3
+	    for i in 10
+	        if i > 3: exit
+	        printline i // 1,2,3
 	hasConstants
-		constants
-			Opened = 1
-			Closed = 2
+	    constants
+	        Opened = 1
+	        Closed = 2
 	hasGarbageCollection true
-		|| msg = message()
-		DoSomethingWith(msg)
-		// msg now gets disposed
+	    || msg = message()
+	    DoSomethingWith(msg)
+	    // msg now gets disposed
 	 
 	hasComments true
-		// comment
+	    // comment
 	hasMultiLineComments true
-		/*
-		multiline
-		comments
-		*/
+	    /*
+	    multiline
+	    comments
+	    */
 
 	hasImports true
-		import Proj
+	    import Proj
 	hasAssignment true
-		name = "John"
+	    name = "John"
 	hasWhileLoops
-		while true
-			 "hello"
+	    while true
+	         "hello"
 	hasForLoops
-		while i in 10
-			 "hello: $i"
+	    for i in 10
+	         "hello: $i"
 	hasBoundedChecksArrays true
-		|| arr = [1,2,3]
-		|| v = arr[4] // returns nil
+	    || arr = [1,2,3]
+	    || v = arr[4] // returns nil
 	hasEscapeCharacters true
-		|| str = "\01\02\03"
+	    || str = "\01\02\03"
 	hasCharacters true
-		|| char = 'b'
-		if b > 32
-			"good"
+	    || char = 'b'
+	    if b > 32
+	        "good"
 	hasStringConcatOperator true
-		|| ab = "a" + "b"
+	    || ab = "a" + "b"
 	hasMemberVariables
-		class abc
-			|int| def
+	    class abc
+	        |int| def
 	hasTryCatch false
-		|| data = "somefile".file.readall
-		if !data
-			stderr.printerrors // prints any file-system error that occurred during .readall
+	    // not needed. Speedie has an ErrorList system
+	    || data = "somefile".readfile
+	    if !data
+	        stderr.printerrors // prints any file-system error that occurred during .readall
 	hasStatementTerminatorCharacter true
-		if x: x++, x*=2, return
-		
+	    if x: x++, x*=2, return
+	    
 	hasSelfOrThisWord true
-		self.Remove
-		.remove
+	    self.Remove
+	    .remove
 	hasRequiredMainFunction true
-		main
-			"hello world"
+	    main
+	        "hello world"
 	hasDynamicSizedArrays true
-		|| arr = []
-		arr <~ "abc"
+	    || arr = []
+	    arr <~ "abc"
 	canReadCommandLineArgs true
-		printline app[0]
+	    printline app[0]
 	hasFnArguments true
-		function ABC (|string| name)
+	    function ABC (|string| name)
 	hasGlobalScope true
-		|| x = 123
-		function abc
-			x = 10
+	    || x = 123
+	    function abc
+	        x = 10
 	hasVoidFunctions true
-		|| x = 123
-		function abc
-			x = 10
+	    || x = 123
+	    function abc
+	        x = 10
 	hasMethodOverloading true
 	hasTimestamps true
-		printline __time_id__
+	    printline __time_id__
 	hasTypeParameters true
-		function ABC (|string| name)
+	    function ABC (|string| name)
 	hasStaticMethods true
-		class abc
-			module
-				function Print
-					"abc"
-		main
-			abc.print
+	    class abc
+	        module
+	            function Print
+	                "abc"
+	    main
+	        abc.print
 	hasVirtualFunctions true
-		class abc
-			virtual DoSomething (|string| name)
-			behaviour DoSomething
-				printline "hello: $name"
+	    class abc
+	        virtual DoSomething (|string| name)
+	        behaviour DoSomething
+	            printline "hello: $name"
 	hasSourceMaps true
-		linkage
-			bannedclasses (file, process, shellstream, archive)
-			// using these classes... even indirectly, will create an error
-			// the error message will show the entire call-chain that reached these classes
+	    linkage
+	        bannedclasses (file, process, shellstream, archive)
+	        // using these classes... even indirectly, will create an error
+	        // the error message will show the entire call-chain that reached these classes
 	supportsBreakpoints true
-		debugger
+	    debugger
 	hasInfixNotation true
-		seven = 3 + 4
+	    seven = 3 + 4
 	hasMultilineStrings true
-		"hello
+	    "hello
 		you
 		beauty"
 	writtenIn
-		speedie c++
+	    speedie c++
 	hasHomoiconicity
-		The~entire~Language is (%written in:@Jeebox)
+	    The~entire~Language is (%written in:@Jeebox)
 	hasPointers true
-		|| i = 0
-		|| p = &i
-		*p = 1
-		if (i == 1)
-			"success"
+	    || i = 0
+	    || p = &i
+	    *p = 1
+	    if (i == 1)
+	        "success"
 	hasIntegers true
-		pldb = 80766866
+	    pldb = 80766866
 	hasUnitsOfMeasure true
-		|| time = 1day - 10s
-		|| size = 10.2MB
+	    || time = 1day - 10s
+	    || size = 10.2MB
 	hasLists true
-		myList = [1, 2, 3, 4, 5]
+	    myList = [1, 2, 3, 4, 5]
 	hasFunctions true
-		function Example (|string| data, |string|)
-			|| x = data.lowercase + "!!"
-			return x
+	    function Example (|string| data, |string|)
+	        || x = data.lowercase + "!!"
+	        return x
 	hasOctals false
+		|| x = 0755 // this number won't surprisingly ruin your day
+		// it is literally seven hundred and fifty five
 	hasHexadecimals true
-		|| num = 0xBEEF
+	    || num = 0xBEEF
 	hasFloats true
-		|| num = 0.0
+	    || num = 0.0
 	hasBinaryNumbers true
-		|| num = 0b010101
+	    || num = 0b010101
 	hasConstructors true
-		class Foobar
-			|float| x
-			|float| y
-			constructor	(|float| r=1, |float| alpha=0)
-			.x = r * alpha.cos
-			.y = r * alpha.sin
+	    class Foobar
+	        |float| x
+	        |float| y
+	        constructor	(|float| r=1, |float| alpha=0)
+	        .x = r * alpha.cos
+	        .y = r * alpha.sin
 	 
-		|| a = foobar()
-		|| b = foobar(3)
-		|| c = foobar(5, M_PI/4)
+	    || a = foobar()
+	    || b = foobar(3)
+	    || c = foobar(5, M_PI/4)
 	hasIterators true
-		|| items = [5,6,7,8]
-		for i in items
-			printline i
+	    || items = [5,6,7,8]
+	    for i in items
+	        printline i
 	hasForEachLoops true
-		|| items = [5,6,7,8]
-		for i in items
-			printline i
+	    || items = [5,6,7,8]
+	    for i in items
+	        printline i
 	hasSingleTypeArrays true
-		|array of string| s
-		s <~ "abc" // ok
-		s <~ 1 // fail
+	    |array of string| s
+	    s <~ "abc" // ok
+	    s <~ 1 // fail
 	hasReservedWords false
-		|| return = 123
-		|| if = 456
-		if if == 456
-			return return
+	    || return = 123
+	    || if = 456
+	    if if == 456
+	        return return
 	hasFunctionOverloading true
-		function volume (|float| a, |float|)
-			return a*a*a
-		function volume (|float| r, |float| h, |float|)
-			// volume of a cylinder
-			return math.pi*r*r*h
+	    function volume (|float| a, |float|)
+	        return a*a*a
+	    function volume (|float| r, |float| h, |float|)
+	        // volume of a cylinder
+	        return math.pi*r*r*h
 	hasNamespaces false
-	hasMultipleInheritance false
 	hasOperatorOverloading true
-		str = "a" + "b"
-		array <~ str
+	    str = "a" + "b"
+	    array <~ str
 	hasUserDefinedOperators true
-		class myclass
-			|int| Num
-			operator add (|int| x, |myclass|)
-				return myclass(.num + x)
-			render
-				fs <~ .num
-		
-		main
-			|| x = myclass(1)
-			|| y = myclass(2)
-			|| z = y + x
-			printline z
+	    class myclass
+	        |int| Num
+	        operator add (|int| x, |myclass|)
+	            return myclass(.num + x)
+	        render
+	            fs <~ .num
+	    
+	    main
+	        || x = myclass(1)
+	        || y = myclass(2)
+	        || z = y + x
+	        printline z
 	hasUnaryOperators true
-		|| x = !0
+	    || x = !0
 	hasNull true
-		|| msg = message()
-		while
-			if msg != nil
-				"msg exists"
-			  else
-				"empty"
-				return
-			msg = nil
+	    || msg = message()
+	    while
+	        if msg != nil
+	            "msg exists"
+	          else
+	            "empty"
+	            return
+	        msg = nil
 	hasSemanticIndentation true
-		class Person
-			|string| name
+	    class Person
+	        |string| name
 	hasInheritance true
-		class Person (Animal)
+	    class Person (Animal)
 	hasAccessModifiers true
-		class Person
-			|int| age
-			setter age
-				expect (value >= 0) ("bad age $value set!")
-				.age = value
-		main
-			|| p = person()
-			p.age = -1     // calls a function rather than the property
-			|| n = p.age   // reads the property directly!
+	    class Person
+	        |int| age
+	        setter age
+	            expect (value >= 0) ("bad age $value set!")
+	            .age = value
+	    main
+	        || p = person()
+	        p.age = -1     // calls a function rather than the property
+	        || n = p.age   // reads the property directly!
 	hasStrings true
-		"hello world"
+	    "hello world"
 	hasDisposeBlocks true
-		using SomeObject
-			for 10
-				Someobject.dosomework
-				if (random[]>0.5)
-					return // someobject.SyntaxUsingComplete called here
-		// someobject.SyntaxUsingComplete called here too
+	    using SomeObject
+	        for 10
+	            Someobject.dosomework
+	            if (random[]>0.5)
+	                return // someobject.SyntaxUsingComplete called here
+	    // someobject.SyntaxUsingComplete called here too
 	hasPrintDebugging true
-		"error 1 here"
+	    "error 1 here"
 	hasZeroBasedNumbering true
-		printline ["a", "b", "c"][0] // prints "a"
+	    printline ["a", "b", "c"][0] // prints "a"
 	hasTemplates false
 	hasVirtualFunctions true
 	hasThreads false
+	    // Actually you can use threads, just as long as it doesn't allocate memory using the same system. You get only the same guarantees it will work as with C code. Which is almost nothing.
+	    // Message passing is the way... in the future I'll add "light-threads" which will use message-passing.
 	hasClasses true
+	    class Person
+	        |string| Name
 	hasExceptions false
-	hasAccessModifiers true
+	    // not needed. Speedie has an ErrorList system which is far superior.
+	    http://docs.gamblevore.org/Errors.md
 
 lineCommentToken //
 multiLineCommentTokens /* */
@@ -376,5 +386,4 @@ fileExtensions spd scproj
 pypl spd
 
 twitter https://twitter.com/gamblevore
-gdbSupport false
 fileType text
