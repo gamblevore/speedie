@@ -29,21 +29,21 @@ JB_String* JB_cPath_ReadAll (const char* path, bool AllowMissingFile, int MaxFil
         if (AllowMissingFile and errno == ENOENT) {
             return JB_Str__Empty();
         }
-        return jb_lib_file_err(path, "open");
+        return jb_lib_file_err(path, "opening");
     }
 
     JB_String* Result = 0;
     int N = GetFileSize(path);
     if (N < 0) {
-        jb_lib_file_err(path, "open");
+        jb_lib_file_err(path, "opening");
     } else {
         Result = JB_Str_New(N+1);
         if (!Result) {
-            jb_lib_file_err(path, "allocate memory for");
+            jb_lib_file_err(path, "allocating memory for");
         } else {
             int Size = (int)fread(JB_Str_Address(Result), 1, N, fp);
             if (ferror(fp)) {
-                jb_lib_file_err(path, "read");
+                jb_lib_file_err(path, "reading");
                 JB_Delete((FreeObject*)Result); Result = 0;
             } else {
 				Result->Length = Size;

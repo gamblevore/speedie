@@ -173,7 +173,7 @@ int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
     
     if ((errno == ENOENT) and AllowMissing)
         return -2;// ignore it...
-	JB_ErrorHandleFile(Path, nil, errno, nil, "open");
+	JB_ErrorHandleFile(Path, nil, errno, nil, "opening");
     return -1;
 }
 
@@ -193,7 +193,7 @@ bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
 	}					// So we need to refill this.
 
 	if (errno != ENOENT)
-		ErrorHandleStr_(err, self, nil, "get info on");
+		ErrorHandleStr_(err, self, nil, "getting info on");
 	return false;
 }
 
@@ -316,9 +316,9 @@ int InterRead (int fd, unsigned char* buffer, int N, JB_String* ErrorPath, int& 
     } while (true);
 
     if (!ErrorPath and isatty(fd))
-        JB_ErrorHandleFileC(ttyname(fd), Error, "read");
+        JB_ErrorHandleFileC(ttyname(fd), Error, "reading");
       else
-        ErrorHandleStr_( -1, ErrorPath, nil, "read" );
+        ErrorHandleStr_( -1, ErrorPath, nil, "reading" );
     
     return Total;
 }
@@ -384,7 +384,7 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 					JB_File_Close(self);
 				return Result;
 			}
-			JB_ErrorHandleFile(self, nil, 0, nil, "file unsafely big");
+			JB_ErrorHandleFile(self, nil, EFBIG, nil, "reading");
 		}
 	}
 	return JB_Str__Error();
@@ -404,7 +404,7 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 		if (Resolved)
 			Result = JB_StrC( Resolved );
 		  else if (!(errno == ENOENT and AllowMissing))
-			JB_ErrorHandleFile(self, nil, errno, nil, "resolve path for");
+			JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
 	}
 	if (UserPath != self)
 		JB_FreeIfDead(UserPath);
@@ -436,7 +436,7 @@ int JB_App__SetEnv(JB_StringC* name, JB_StringC* value) {
 static JB_String* FileAlloc( JB_File* self, IntPtr Length ) {
     JB_String* Str = JB_Str_New( Length );
     if (!Str)
-		JB_ErrorHandleFile(self, nil, ENOMEM, nil, "read");
+		JB_ErrorHandleFile(self, nil, ENOMEM, nil, "reading");
     return Str;
 }
 
@@ -488,7 +488,7 @@ int JB_File_WriteCString( JB_File* self, const char* Data, int Sep ) {
     if (!Data)
 		return 0;
 	if (JB_File_Open( self, O_RDWR | O_CREAT, false ) >= 0 ) {
-		int N = JB_File_WriteRaw_(self, (u8*)Data, (int)strlen(Data));
+		int N = (int)JB_File_WriteRaw_(self, (u8*)Data, (int)strlen(Data));
 		byte Sep2 = (byte)Sep;
 		if (N > 0 and Sep >= 0 and JB_File_WriteRaw_(self, (u8*)"\n", 1) > 0)
 			N++;
@@ -501,7 +501,7 @@ int JB_File_WriteCString( JB_File* self, const char* Data, int Sep ) {
 
 void JB_File_Flush(JB_File* self) {
     if ( HasFD(self) )
-        ErrorHandle_( fsync( self->Descriptor ), self, nil, "flush" );
+        ErrorHandle_( fsync( self->Descriptor ), self, nil, "flushing" );
 }
 
 
@@ -540,7 +540,7 @@ int JB_Str_MakeDir(JB_String* self) {
     if (err == -1 and errno == EEXIST) {
         return 0; // ignore. really. I don't need this.
     }
-    return (int)ErrorHandleStr_(err, self, nil, "makedir");
+    return (int)ErrorHandleStr_(err, self, nil, "creating a folder");
 }
 
 
@@ -551,7 +551,7 @@ int JB_File_Delete (JB_String* self) {
     if (err == -1 and errno == ENOENT) {
         return 0;
     }
-    return (int)ErrorHandleStr_(err, self, nil, "delete");  // handle error
+    return (int)ErrorHandleStr_(err, self, nil, "deleting");  // handle error
 }
 
 
@@ -576,7 +576,7 @@ JB_String* JB_File_PathFix_(JB_String* P) {
 	int N = JB_Str_Length(P);
 	if (!N) return P;
 	if (N >= PATH_MAX) {
-		JB_ErrorHandleFile(JB_Str_Preview(P, 150), nil, ENAMETOOLONG, nil, "read-path");
+		JB_ErrorHandleFile(JB_Str_Preview(P, 150), nil, ENAMETOOLONG, nil, "fixing-path");
 		return JB_Str__Error(); // hmmm
 	}
 	// P = JB_File_RemoveDotDot(P); // doesnt do anything
@@ -668,7 +668,7 @@ void JB_File_CloseSub ( JB_File* self ) {
 	self->Descriptor  = -1;
 	self->OpenMode = 0;
     if (R >= 0)
-		ErrorHandleStr_(close( R ), self, nil, "close");
+		ErrorHandleStr_(close( R ), self, nil, "closing");
 }
 
 void JB_File_Close ( JB_File* self ) {
@@ -720,7 +720,7 @@ bool JB_File_HardLinkTo( JB_File* self, JB_StringC* Link ) {
     int Err	= link(C, (const char*)(Link->Addr));
     if (Err and MakeParentPath_(Link))
 		Err = link(C, (const char*)(Link->Addr));
-	ErrorHandleStr_(Err, self, Link, "hardlink");
+	ErrorHandleStr_(Err, self, Link, "hardlinking");
 	return !Err;
 }
 
@@ -814,7 +814,7 @@ bool JB_File_Exists( JB_String* self, bool LinkExists ) {
 	if (!err)
 		return true;
 	if (errno != ENOENT) {
-		ErrorHandleStr_(err, self, nil, "test-existance");
+		ErrorHandleStr_(err, self, nil, "testing the existance of");
 	}
 	return false;
 }
@@ -827,7 +827,7 @@ int JB_File_MoveTo(JB_File* self, JB_String* New) {
     int Err			= rename((const char*)SelfPath, (const char*)NewPath);
     if (Err and MakeParentPath_(New))
 		Err = rename((const char*)SelfPath, (const char*)NewPath);
-    ErrorHandleStr_(Err, self, New, "move");
+    ErrorHandleStr_(Err, self, New, "moving");
 //    if (!Err) // causes so many bugs
 //        JB_SetRef(self, New);
     return Err;
@@ -942,7 +942,7 @@ JB_File* JB_Str_File( JB_String* Path ) {
 long JB_File__chdir( JB_String* Path ) {
     uint8 Buffer1[1024];
 	long err = trchdir( (NativeFileChar2*)JB_FastFileString( Path, Buffer1 ) );
-	return ErrorHandleStr_(err, Path, nil, "chdir"); 
+	return ErrorHandleStr_(err, Path, nil, "calling chdir"); 
 }
     
 bool JB_File_MoveNext(JB_File* self) {
