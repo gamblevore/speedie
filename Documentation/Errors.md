@@ -300,5 +300,38 @@ Speedie's version is simpler. In fact, here we can rely on Speedie already print
 1 issue found.
 `
 
-Speedie will handle every file-system error, not just file-not-found. The python code (copied from a popular website on the 1st page of google-search) doesn't. If it fails for any other reason than "file not found"... this code fails to give the correct error message. So speedie is better, again.
+Speedie will handle every file-system error, not just file-not-found. The python code (copied from a popular website on the 1st page of google-search) doesn't. If it fails for any other reason than "file not found"... the python code fails to give the correct error message. So speedie is better, again.
 
+### Error Handling in C
+
+Funnily enough... C is much better in error handling than most modern languages. It's error handling makes sense. Awkward and easy to get wrong, and miss errors... but if you know what you are doing, it makes sense.
+
+    const char* Fol = "/tmp/a/b/c/";
+    int err = mkdir(Fol, 0755);
+    if (err) {
+        if (err == -1 and errno == EEXIST) {
+            ; // it's OK, just ignore
+        } else {
+            printf("An error %s occurred while trying to make a directory at %s\n", strerror(errno), Fol);
+            return -1;
+        }
+    }
+    UseFolder(Fol);
+
+Well...it makes sense but its als labourious, error-prone and time-wastery. What if you don't know about `EEXIST` or fail to log `strerror(errno)` and `Fol`. Thats 2 strings to log and 2 check. Also the control flow is messy.
+
+In Speedie:
+
+    || Fol = "/tmp/a/b/c/".file
+    require fol.makedir
+    usefolder(fol)
+
+Again! Super simple! Once the program exits, you get the list of errors printed. With nicely informative error message:
+
+    error: File doesn't exist when makedir '/tmp/a/b/c/'.
+
+#Conclusion:
+
+Compared to other error-handling systems, Speedie's always comes out on top. It is simpler, easier to use, more reliable, and cuts down total lines of code to 1/3 quite often.
+
+`ErrorLists` just are the way.
