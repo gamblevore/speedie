@@ -211,3 +211,117 @@ This would actually make sure `stderr` is reset to its original value no matter 
 If you hate exceptions, or think exceptions suck, or think that manually dealing with errors all over the place like Go does... is awkward and just irritating... then Speedie is probably the language for you! It just does everything in a very clean way.
 
 The main thing is to see statements like `#expect` or `#require` like comments. You don't need to understand them in order to understand the code flow. They are almost "out of the way", like comments. So your eyes more naturally look to the code at the left. Thats the whole idea of it. And even if you were looking at them, the overall amount of code is still **much lower**.
+
+# Comparisons
+Lets compare speedie error handling, to other languages.
+
+### Comparison To Go
+
+First lets look at "`Go`", a supposedly modern language with huge funding (not jealous at all 😂 😭). And then look at how much better it is in `Speedie`:
+
+    package main
+    import (
+        "errors"
+        "fmt"
+    )
+    
+    func Hello(name string) (string, error) {
+        if name == "" {
+            return "", errors.New("empty name")
+        }
+        message := fmt.Sprintf("Hi, %v. Welcome!", name)
+        return message, nil
+    }
+    
+    func main() {
+        message, err := Hello("")
+        if err != nil {
+            log.Fatal(err)
+        }
+        fmt.Println(message)
+    }
+    
+
+
+OK, their syntax is quite understandable, in this case. `Go` has awkward syntax usually, but for this simple case it's OK! Now lets look at this in speedie:
+
+
+    function Hello (|string| name, |string|)
+        expect (name) "empty name"
+        return "Hi, $name. Welcome!"
+
+    main
+        || message = hello("")
+            printline message
+            
+
+
+Yeah... that. LITERALLY 1/2 of the code. Are you starting to feel it now Mr Krabs? Are ya? Are ya? Mr Krabs?
+
+You might be wondering, why I didn't replace "`log.fatal`", well... because `log.fatal` only calls "`log.print(msg);os.Exit(1)`", so its just printing.
+
+Turns out that Speedie apps do the same thing, on exit. Once the speedie app exits, if `stderr` contains errors, the errors are logged to the console, with an error number of -1. So it is literally the same thing... just happens without me even needing to say it.
+
+Speedie really is remarkably expressive and well-designed.
+
+### Python Comparison
+
+Python overall is a minimal language, much like speedie in that way. But Speedie's error handling is unmatched.
+
+    filename = 'John.txt'
+    try:
+        with open(filename) as f_obj:
+            contents = f_obj.read()
+    except FileNotFoundError:
+        msg = "Sorry, the file "+ filename + "does not exist."
+        print(msg) # Sorry, the file John.txt does not exist.
+
+The python code has a problem... it fails to handle recursive symlink errors or file-busy errors? The filesystem has about 50 errors, and expecting the programmer to know the names of all of them is impossible. All you want is "what was the error name, and did it fail".
+
+In Speedie:
+
+    || filename = "John.txt"
+    || f_obj = filename.file
+    || contents = f_obj.readall(false) // 'false' here disables treating missing files as empty files
+
+Speedie's version is simpler. In fact, here we can rely on Speedie already printing good error messages. If you run this code, you should see this:
+
+`error: File doesn't exist when open '/Users/USERNAME/John.txt'.
+1 issue found.
+`
+
+Speedie will handle every file-system error, not just file-not-found. The python code (copied from a popular website on the 1st page of google-search) doesn't. If it fails for any other reason than "file not found"... the python code fails to give the correct error message. So speedie is better, again.
+
+### Error Handling in C
+
+C's error handling... what to say about it. It makes sense from a performance perspective. But from a coder's perspective its no fun. Awkward, easy to miss errors... messy.
+
+    const char* Fol = "/tmp/a/b/c/";
+    int err = mkdir(Fol, 0755);
+    if (err) {
+        if (err == -1 and errno == EEXIST) {
+            ; // it's OK, just ignore
+        } else {
+            printf("An error %s occurred while trying to make a directory at %s\n", strerror(errno), Fol);
+            return -1;
+        }
+    }
+    UseFolder(Fol);
+
+This code seems labourious, error-prone and time-wastery. What if you don't know about `EEXIST` or fail to log `strerror(errno)` and `Fol`. Thats 2 strings to log, and 2 checks to remember. Also the control flow is messy.
+
+In Speedie:
+
+    || Fol = "/tmp/a/b/c/".file
+    require fol.makedir
+    usefolder(fol)
+
+Again! Super simple! Once the program exits, you get the list of errors printed. With nicely informative error message:
+
+    error: File doesn't exist when makedir '/tmp/a/b/c/'.
+
+# Conclusion:
+
+Compared to other error-handling systems, Speedie's always comes out on top. It is simpler, easier to use, more reliable, and cuts down total lines of code to 1/3 quite often.
+
+`ErrorLists` just are the way forward.
