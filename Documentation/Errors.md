@@ -278,8 +278,6 @@ Python overall is a minimal language, much like speedie in that way. But Speedie
         return
     print(contents.lower)
 
-The python code has a problem... it fails to handle recursive symlink errors or file-busy errors? The filesystem has about 50 errors, and expecting the programmer to know the names of all of them is impossible. All you want is "what was the error name, and did it fail".
-
 In Speedie:
 
     || filename = "John.txt"
@@ -291,7 +289,7 @@ Speedie's version is simpler. In fact, here we can rely on Speedie already print
 
 `error: File doesn't exist when opening '/Users/USERNAME/John.txt'.`
 
-Speedie will handle every file-system error, not just file-not-found. The python code (copied from a popular website on the 1st page of google-search) doesn't. If it fails for any other reason than "file not found"... the python code fails to give the correct error message. So speedie is better, again.
+Also, Speedie's error handling is harder to get wrong! Most of the examples I've seen for reading files, catch FileNotFoundException... which fails to catch most of the 50 file-system errors. I had to ignore most prevalent examples to find a good python example.
 
 ### Error Handling in C
 
