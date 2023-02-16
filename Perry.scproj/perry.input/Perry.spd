@@ -73,6 +73,9 @@ module Perry
 
 
 	function Startup (GUIApplicationInit)
+		stderr.LogFile = "PerryErrors.txt"
+		app.InitColors
+	
 		.Projects = (app.prefs)("lastproj")
 		
 		|| r = PerryIDE(false)
