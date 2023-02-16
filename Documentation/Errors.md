@@ -282,8 +282,7 @@ Python overall is a minimal language, much like speedie in that way. But Speedie
 In Speedie:
 
     || filename = "/"
-    || f_obj = filename.file
-    || contents = f_obj.readall #require
+    || contents = filename.readfile #require
 
     print contents.lowercase
 
