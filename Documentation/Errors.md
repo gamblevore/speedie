@@ -106,7 +106,7 @@ Why is it so much worse?
 + Many functions (like `string.ExistingFile`) create errors if something goes wrong... so we need to replicate that too.
 + We have to `return -1` often, to replace the inbuilt `return -1` you get when your program exits but `stderr.ok==false`.
 * The same above two problems apply for accessing child nodes of `message`, which happens **all over the place**.
-+ We need "`StillOK`" booleans in many places, because previously any function could have been adding errors.
++ We need "`StillOK`" booleans in many places, to replicate how `stderr` previously was catching errors generated in subfunctions.
 
 Take a look again at the first example. Its just SOOO much better. Everything does what it is meant to do. Its simple, readable, works better.
 
