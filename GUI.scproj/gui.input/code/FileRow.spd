@@ -216,7 +216,6 @@ class FileRow (ListViewRow)
 		if ._document and ._document.current
 			return ._document.text
 		|| f = .readfrom.file
-		printline f.path
 		debug_require !f.isdir
 		return f.readfile(ignore).utf8
 
