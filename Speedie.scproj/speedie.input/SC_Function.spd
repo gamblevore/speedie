@@ -1791,8 +1791,7 @@ function NeuMain (CollectFunc)
 	|| s = "function app.Main (|int|) {cpp_name JB_Main, visible true}"
 	|| fn_src = s.ParseClean
 	|| src_arg = fn_src.Last
-	|| inc_arg = node.Last
-	expect  ((inc_arg) and (inc_arg == @arg))  (node, "Expected an argument" )
+	|| inc_arg = node[@arg, -1]$
 
 	src_arg.Remove
 	fn_src <~ inc_arg
