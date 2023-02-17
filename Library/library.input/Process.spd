@@ -624,16 +624,8 @@ class Process
 				
 		function TellParentIDied (fn_app_crash_handler)
 			opt norefcounts
-			"C"
-			target debug
-				if !app.ismainthread
-					"D"
-					debugger
-				else
-					"E"
-			  else
-				"F"
-			app.DefaultCrashHandler(signal)
+			signal := 1
+			app.DefaultCrashHandler(-signal.abs)
 			app.CrashHandler = nil // just in case
 			|| o = self.owner_ #require
 			if signal != -1999

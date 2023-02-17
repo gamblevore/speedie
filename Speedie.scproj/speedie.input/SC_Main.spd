@@ -26,10 +26,9 @@ api Speedie_Main (|&cstring| args, |int| Mode, |ErrorInt|)
 function compiler.SetupEnv
 	opt norefcounts
 	check (app.pref_path) "Conf missing prefpath"
-	|| B = app..talk and app.IsMainThread
-// don't let breakpoints rekt us
+	if app..talk and app.IsMainThread
 		app.IgnoreSig
-		app.CrashHandler = &process.TellParentIDied 		
+		app.CrashHandler = &process.TellParentIDied
 
 	app.PrefsInit
 	errorcolors.DisableIfNoTerminal

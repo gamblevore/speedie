@@ -31,13 +31,16 @@ static void SafePrint (const char* c) {
 
 
 void JB__DefaultCrashHandler(int Sig) {
+	bool Crash = Sig > 0;
+	if (Sig < 0) Sig = -Sig;
     if (Sig != SIGTERM and Sig != SIGQUIT) {
 		JB_PrintStackTrace();
 		
 		char ErrorBuff[64];
 		snprintf(ErrorBuff, 64, "Crash: %s", strsignal(Sig));
 		JB_Rec__CrashLog(ErrorBuff);
-		exit(-1);
+		if (Crash)
+			exit(-1);
 	} else if (getppid() > 1) {
 		SafePrint("Child process got signal...\n" );
 	} else { 
