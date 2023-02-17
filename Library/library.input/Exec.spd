@@ -38,8 +38,8 @@ datatype PID_Int (int)
 		return self > 0
 
 extend string
-	function StartProcess (|[string]| Args=nil, |&int|PID, |File|)
-		cpp_Wrapper JB_Str_StartIPC
+	function StartProcess (|[string]| Args=nil, |&int|PID, |&file|StdOut=nil, |bool|)
+		cpp_Wrapper JB_Str_StartProcess
 
 	function DebugExecute (|[string]| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
 		if file.DebugExecute // shouldnt be default!

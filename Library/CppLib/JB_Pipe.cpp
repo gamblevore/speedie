@@ -188,49 +188,54 @@ int JB_Kill(int PID) {
 	return KillErr;
 }
 
-const char* _StartIPC (JB_String* self, const char** argv, int& child_stdout, int& PID) {
-    int child_write[2]={};
-	int Err = access(argv[0], X_OK | F_OK);
-	if (Err) return "access";
-	Err = pipe(child_write);
-	if (Err) return "pipe";
-	child_stdout = child_write[0];
-	fcntl(child_stdout, F_SETFL, O_NONBLOCK);
-	signal(SIGCHLD, JB_SigChild);
-	PID = fork();
-	if (!PID) {		// child process
-		pipe_dup2(child_write[1], 1); // We can now capture stdout cleanly!
-		pipe_close(child_write[0]);
-		execvp(argv[0], 	(char* const*)argv);
-		printf("execv(\"%s\") failed\n",  argv[0]);
-		exit(-1);
-	}
 
-	pipe_close(child_write[1]);
-	if (PID > 0) return (const char*)0;
-	return "fork";
-}
-
-const char* ArrayPrepare_(JB_String* self, const char** argv, Array* R) {
-	if (JB_ArrayPrepare_(self, argv, R)) {
+const char* _StartProcess (JB_String* self, const char** argv, Array* Args, int* childpipe, int& PID) {
+	if (JB_ArrayPrepare_(self, argv, Args)) {
 		return "prepare ipc";
 	}
-	return 0;
+	int Err = access(argv[0], X_OK | F_OK);
+	if (Err) return "access";
+
+	if (childpipe) {
+		if (pipe(childpipe)) return "pipe";
+		fcntl(childpipe[0], F_SETFL, O_NONBLOCK);
+	}
+
+	signal(SIGCHLD, JB_SigChild);
+	PID = fork();
+	
+	if (PID == -1)
+		return "fork";
+	if (PID) {		// parent
+		if (childpipe)
+			pipe_close(childpipe[1]);
+		return 0;
+	}
+	
+	// çhild
+	if (childpipe) {
+		pipe_dup2(childpipe[1], 1); // We can now capture stdout cleanly!
+		pipe_close(childpipe[0]);
+	}
+	execvp(argv[0], 	(char* const*)argv);
+	printf("execv(\"%s\") failed\n",  argv[0]);
+	exit(-1);
 }
 
-JB_File* JB_Str_StartIPC (JB_String* self, Array* Args, int* PID) {
-// "talk" is unused... kind of a flaw. I assumed when I made this that we would specify
-// a "talk" file... but I just settled on an exact file-path that both processes would
-// know about implicitly through the filenames of both processes. I guess we can delete
-// "talk". We'll see... Do this later.
+
+
+bool JB_Str_StartProcess (JB_String* self, Array* Args, int* PID, JB_File** StdOut) {
 	const char* argv[MaxArgs] = {};
-	const char* Err = ArrayPrepare_(self, argv, Args);
-	int Pipe = 0;
-	if (!Err) Err = _StartIPC(self, argv, Pipe, *PID);
-	if (Err)  JB_ErrorHandleFile(self, nil, errno, nil, Err);
-	return JB_File__NewPipe(Pipe);
+    int Pipes[2] = {};
+	auto Err = _StartProcess(self, argv, Args, StdOut?Pipes:0, *PID);
+	if (Err) {
+		return JB_ErrorHandleFile(self, nil, errno, nil, Err) and false;
+	}
+	if (StdOut) {
+		JB_SetRef(*StdOut, JB_File__NewPipe(Pipes[0]));
+	}
+	return true;
 }
-
 
 
 static int JB_FEPDWEE_Call(ShellStreamer& Sh, const char** argv, bool NewStdOut) {

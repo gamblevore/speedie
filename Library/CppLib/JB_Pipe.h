@@ -31,7 +31,7 @@ void JB_App__AtExit (fn_app_deathaction b);
 int JB_ArrayPrepare_(JB_String* self, const char** argv, Array* R);
 int JB_Str_System(JB_String* self);
 int JB_Kill(int PID);
-JB_File* JB_Str_StartIPC (JB_String* self, Array* Args, int* PID);
+bool JB_Str_StartProcess (JB_String* self, Array* Args, int* PID, JB_File** StdOut);
 void JB_AtExit(void* func);
 bool JB_PipeIsClosed(int fd);
 bool JB_IsTerminal(int FD);

@@ -41,9 +41,10 @@ class Process
 	|int|						DiedCount
 	|int|						CID
 	|bool|						IsServer
+	|bool|						TrapStdOut
 	|byte|						CanPrint
 
-	constructor	(|string| name,  |int| n, |[string]| params=nil,  |fn_subprocess| sub=nil)
+	constructor	(|string| name,  |int| n, |[string]| params=nil,  |fn_subprocess| sub=nil, |bool|TrapStdOut=false)
 		cpp_part Constructor
 		
 		.deathlimit = 12
@@ -483,9 +484,8 @@ class Process
 
 
 	function RunChild (|string| path, |bool|)
-		require (self isnt invalid) 
-		.ChildStdout = path.cstr.Startprocess(.params, .cid)
-		if .ChildStdout
+		require (self isnt invalid)
+		if path.cstr.Startprocess(.params, .cid, (&.ChildStdout, nil)(.trapstdout))
 			.path = path
 			.AddToList
 			return true
@@ -594,11 +594,11 @@ class Process
 			return self.owner_
 			
 
-		function Child (|string| app_path, |string| name, |[string]| params=nil, |int|size=16KB, |Process|)
+		function Child (|string| app_path, |string| name, |[string]| params=nil, |bool| TrapStdOut=false, |int|size=16KB, |Process|)
 			require app_path.file.mustexist
-			|| p = process(name, size, params)
-			if p.RunChild(app_path)
-				return p
+			rz = process(name, size, params, trapstdout)
+			if !rz.RunChild(app_path)
+				rz = nil
 		
 
 		function string.ipcPath (|string|)
@@ -613,8 +613,8 @@ class Process
 		
 		function InstallCloseProcesses
 			require !.ClosePipesInstalled
-			.ClosePipesInstalled=1
-			app <~ closeprocesses
+			.ClosePipesInstalled = 1
+			app <~ CloseProcesses
 			
 		function CloseProcesses (fn_app_deathaction)
 			"closing all process connections"
@@ -624,16 +624,21 @@ class Process
 				
 		function TellParentIDied (fn_app_crash_handler)
 			opt norefcounts
+			"C"
 			target debug
 				if !app.ismainthread
+					"D"
 					debugger
+				else
+					"E"
+			  else
+				"F"
 			app.DefaultCrashHandler(signal)
 			app.CrashHandler = nil // just in case
-			|| o = self.owner_
-			require o!=nil
+			|| o = self.owner_ #require
 			if signal != -1999
 				o.ours.state = o.ours.state|int| max ipcstate.Crashed
-			o.sendcrashed
+			o.SendCrashed
 
 
 function file.IPC (|&int| n, |_voidptr|)
