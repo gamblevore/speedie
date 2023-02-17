@@ -14,6 +14,9 @@ module Macros {
 	rejoin _X
 })".macro
 
+|| MainArg2 = "|| _0 = (_1.MainArg(_2), _3)(__ArgCount > _1)".macro
+|| MainArg1 = "|| _0 = _1.MainArg(_2)".macro
+
 || Worked2 = "({
 	|| _ErrCount = stderr.errorcount 
 	(_0)

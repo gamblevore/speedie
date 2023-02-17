@@ -1788,11 +1788,17 @@ function NeuMain (CollectFunc)
 	expect  (name_space == compiler.program)  (node, "Can’t have main inside here.")
 
 	node.name = "function"
-	|| s = "function app.Main (|int|) {cpp_name JB_Main, visible true}"
+	|| s = "function app.Main (|int|,) {cpp_name JB_Main, visible true}"
 	|| fn_src = s.ParseClean
 	|| src_arg = fn_src.Last
 	|| inc_arg = node[@arg, -1]$
-
+	|| prms = node[0]
+	if prms == @list or @bra
+		prms.func = @list
+		prms.MainArgs(src_Arg)
+	  else
+		expect (prms == inc_arg) (prms)
+		
 	src_arg.Remove
 	fn_src <~ inc_arg
 	inc_arg.TakeAllFrom( src_arg )

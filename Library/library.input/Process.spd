@@ -573,9 +573,9 @@ class Process
 		function BackTrace (|&_voidptr| space, |&int| size, |&cstring|) 
 			cpp_wrapper JB_BackTrace
 		
-		function StackTrace (|string| reason, |string|)
+		function app.StackTrace (|string| reason="", |string|)
 			|| fs = faststring()
-			.StackTraceJbin(fs, reason, 3)
+			process.StackTraceJbin(fs, reason, 3)
 			return fs.getresult.parse.render
 
 		function StackTraceJbin (|jbin| j, |string| reason, |int|skip=4)

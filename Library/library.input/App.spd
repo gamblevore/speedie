@@ -13,6 +13,7 @@ target !minilib
 |message|					_Conf
 |config|					Prefs
 |string| 					_Path
+|string| 					Usage = "unknown"
 |string|					codesign_native = "codesign_osx"
 
 
@@ -328,4 +329,27 @@ role String_ArgValue (string)
 		cpp_part Arg
 	syntax cast (|bool|)
 		return .yes
+
+
+helper @int.MainArg (|int| Pos, |int|)
+	return string.MainArgSub(Pos, "integer")$.int
+helper @string.MainArg (|int| Pos, |string|)
+	return string.MainArgSub(Pos, "string")
+helper @file.MainArg (|int| Pos, |string|)
+	return string.MainArgSub(Pos, "file")$.file
+helper @message.MainArg (|int| Pos, |message|)
+	return string.MainArgSub(Pos, "message")$.parse
+helper @float.MainArg (|int| Pos, |f64|)
+	return string.MainArgSub(Pos, "float")$.float
+
+
+
+helper @string.MainArgSub (|int| Pos, |string| type, |stringthatwasreadsafely|)
+	if app.args > pos
+		return app.args[pos]
+	if StdErr.ok
+		error "Usage: ${app.filename} ${app.usage}"
+	return string.Error
+
+
 

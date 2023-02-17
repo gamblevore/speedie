@@ -76,3 +76,57 @@ function message.Tran_QMark
 		tern2 <~ (@thg, vn)
 
 
+
+function message.MainOneArg (|message| arg, |int64| i, |faststring| usage)
+	opt norefcounts
+	|| type = self[@thg]				#require
+	|| name = type.next					#require
+	|message| value
+	|| mac = macros.MainArg1
+	if name == @rel
+		name = name[@thg]				#require
+		|| opp = name.next(@opp, "=")	#require
+		value = opp.next(@Nil)			#require
+		mac = macros.MainArg2
+	  else
+		require name.Expect(@thg)
+	arg.MainOneArgSub(mac, name, type, i.msg, value)
+	
+	usage <~ "${name.name}"
+	ifn type ~= "string"
+		usage <~ "(${type.name}) "
+
+
+function message.MainOneArgSub (|macro| mac, |message| name, |message| type, |message| i, |message| value)
+	|| args = [name, type, i]
+	if value
+		args <~ value
+	self <~ (mac)(args)
+	
+	
+/*
+main (|file| f, |string| s, |int| n = 0)
+	-->
+main {
+    |file|   f = file.MainArg(0)
+    |string| s = string.MainArg(1)
+    |int|    n = (int.MainArg(2), 0)(__ArgCount > 2)
+}
+
+how do I decide that I want the file to be a file that exists?
+	(|file.existing| f)
+*/
+	
+	
+function message.MainArgs (|message| arg)
+	opt norefcounts
+	arg <~ (–digest "|| __ArgCount = app.args.length").parse
+	|| i = 0
+	|| usage = faststring()
+	for ch in self
+		if ch.expect(@decl)
+			ch.MainOneArg(arg, i++, usage)
+	arg.first = ("app.usage = <(`$usage`)>").parse
+
+
+

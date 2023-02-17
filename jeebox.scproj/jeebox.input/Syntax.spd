@@ -151,3 +151,12 @@ class SyntaxObj
 	
 
 
+function string.msg (|message|)
+	return @str + self
+	
+function int64.msg (|message|)
+	return @num + .Render
+
+function bool.msg (|message|)
+	return @thg + .Render
+
