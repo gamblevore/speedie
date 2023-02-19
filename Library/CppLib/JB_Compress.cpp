@@ -18,7 +18,8 @@ inline int u64Cmp(const u64* a, const u64* b, unsigned int n) {
 	return 0;
 }
 
-int CompSorter (const u8* x, const int* ap, const int* bp) {
+int CompSorter (const void* _x, const void* _ap, void* _bp) {
+	auto x = (const u8*)_x; auto ap = (const int*)_ap; auto bp = (const int*)_bp;
 	int a		= *ap;
 	int b		= *bp;
 	auto va		= x - a;
