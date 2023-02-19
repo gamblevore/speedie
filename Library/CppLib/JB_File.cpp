@@ -779,9 +779,8 @@ u64 JB_File_Size( JB_File* self ) {
 
 Date JB_File_Modified( JB_File* self ) {
     struct _stat st = {};
-    if (Stat_(self, &st)) {
-        return JB_Date__SpecToDate(st.st_mtimespec);
-    }
+    if (Stat_(self, &st))
+		return JB_Date__Create(st.st_mtimespec.tv_sec, st.st_mtimespec.tv_nsec);
     return 0;
 }
 
@@ -789,7 +788,7 @@ Date JB_File_Modified( JB_File* self ) {
 Date JB_File_Created( JB_File* self ) {
     struct _stat st = {};
     if (Stat_(self, &st))
-        return JB_Date__SpecToDate(st.st_ctimespec);
+		return JB_Date__Create(st.st_ctimespec.tv_sec, st.st_ctimespec.tv_nsec);
     return 0;
 }
 

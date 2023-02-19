@@ -17,16 +17,13 @@ Date JB_Date__Create( u64 S, u64 NS ) {
     return S + NS;
 }
 
-Date JB_Date__SpecToDate( timespec ts ) {
-	return JB_Date__Create(ts.tv_sec, ts.tv_nsec);
-}
 // 0xFFFF -> 0.9999
 // 0x8000 -> 0.5...
 
 Date JB_Date__Now( ) {
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
-	return JB_Date__SpecToDate(ts);
+	return JB_Date__Create(ts.tv_sec, ts.tv_nsec);
 }
 
 
