@@ -6,9 +6,6 @@
 
 || Speedie = "/usr/local/speedie"
 || ExecFlags = ""
-target osx:  || LibName = "libjeebox.dylib" 
-target win:  || LibName = "libjeebox.lib" 
-target lnx:  || LibName = "libjeebox.so" 
 
 function comp (|string| name, |string|)
 	rz = "echo \"Compiling ${name}.cpp\"
@@ -30,10 +27,14 @@ expect !.args (.args, "This script takes no arguments.")
 
 || CFlags   = "-std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1"
 || shared = "shared"
+|| ext = "so"
 if plat~="osx"
 	shared = "dynamiclib"
+	ext = "dylib"
 	CFlags += " -arch=arm64  -arch=x86_64  -lc++"
+	
 	// we really wanna generate two makefiles... one for osx one for everything else
+|| LibName = "libjeebox.$ext" 
 || LibFlags = "$CFlags -$shared  -D AS_LIBRARY=1 "
 ExecFlags   = "$CFlags -g -ljeebox"
 || BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
