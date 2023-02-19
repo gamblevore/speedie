@@ -159,7 +159,8 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 			cmode += " -x objective-c++ "
 		  else
 			cmode = ""
-		cmode += "-fobjc-arc  -fobjc-link-runtime"
+		if Platform.osx
+			cmode += "-fobjc-arc  -fobjc-link-runtime"
 	
 	if options.Compile32Bit.IsKnown
 		rz.AppendWords( ("-m32", "-m64")(options.Compile32Bit.default) )

@@ -2870,7 +2870,9 @@ Array* SC_Ext__CreateCompileString(Array* CppList, JB_String* Product, JB_String
 		 else {
 			JB_SetRef(cmode, JB_LUB[0]);
 		}
-		JB_SetRef(cmode, JB_Str_OperatorPlus(cmode, JB_LUB[198]));
+		if (JB_Platform__OSX()) {
+			JB_SetRef(cmode, JB_Str_OperatorPlus(cmode, JB_LUB[198]));
+		}
 	}
 	if (JB_MaybeBool_IsKnown(SC__Options_Compile32Bit)) {
 		JB_String* _tmPf3 = JB_Incr(((JB_String*)JB_Ternary(JB_MaybeBool_Default(SC__Options_Compile32Bit), JB_LUB[199], JB_LUB[200])));
