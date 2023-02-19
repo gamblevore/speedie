@@ -174,7 +174,7 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 			rz.appendwords("-rpath @executable_path/../Frameworks")
 		rz.appendwords("-rpath ~/Library/Frameworks  -rpath /usr/local/speedie/Library  -rpath /Library/Frameworks")
 		
-	rz.AppendWords( "-w  -Wno-return-type-c-linkage -lc++")
+	rz.AppendWords( "-w  -Wno-return-type-c-linkage")
 	rz.AppendWords( "-finput-charset=UTF-8 -fextended-identifiers" )
 	rz.AppendWords( cmode )
 	rz.AppendWords( " -fno-strict-aliasing  -fvisibility=hidden  -fvisibility-inlines-hidden" )
