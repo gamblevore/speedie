@@ -41,6 +41,8 @@ typedef byte ErrorFlags;
 
 typedef byte ErrorSeverity;
 
+typedef byte MaybeBool;
+
 typedef int PID_Int;
 
 typedef int SizeInt;
@@ -1177,6 +1179,9 @@ JB_String* JB_int64_Render(int64 self, FastString* fs_in);
 
 
 // ivec4
+
+
+// MaybeBool
 
 
 // ObjCID

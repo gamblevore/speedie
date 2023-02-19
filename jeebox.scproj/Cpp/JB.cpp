@@ -2709,6 +2709,7 @@ JB_String* JB_int64_Render(int64 self, FastString* fs_in) {
 
 
 
+
 bool JB_Syx_ListViewable(Syntax self) {
 	return (self >= JB_SyxThg) and (self <= JB_SyxEmb);
 }
@@ -6949,4 +6950,4 @@ __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 6565725007342036 -797116942392864 -893550536634198
+// 6565725007342036 -616871519083821 -893550536634198
