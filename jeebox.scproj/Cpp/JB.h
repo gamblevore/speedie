@@ -73,8 +73,6 @@ typedef u16 MsgUIFlags;
 
 typedef uint U24_8;
 
-struct JB_Class;
-
 struct CompressionStats;
 
 struct FloatRange;
@@ -82,8 +80,6 @@ struct FloatRange;
 struct IntDownRange;
 
 struct IPCMessage;
-
-struct JB_MemoryWorld;
 
 struct MessagePosition;
 
@@ -181,19 +177,9 @@ struct Message_Behaviour;
 
 struct Message_Behaviour;
 
-struct JB_Object;
-
-struct ByteMap;
-
-struct CharSet;
-
 struct DTWrap;
 
-struct DictionaryReader;
-
 struct JB_ErrorReceiver;
-
-struct FastString;
 
 struct FixedDict;
 
@@ -203,47 +189,25 @@ struct Macro;
 
 struct MWrap;
 
-struct JB_MemoryLayer;
-
 struct Process;
 
-struct Saveable;
-
 struct Selector;
-
-struct ShellStreamer;
-
-struct JB_String;
 
 struct JB_Object;
 
 struct StringFields;
 
-struct JB_StringShared;
-
 struct StringStream;
 
 struct SyntaxObj;
 
-struct TokHan;
-
-struct Array;
-
-struct Dictionary;
-
-struct JB_File;
-
 struct FastString;
-
-struct RingTree;
 
 struct SaverClassInfo;
 
 struct JB_String;
 
 struct JB_String;
-
-struct JB_StringC;
 
 struct Message;
 
@@ -466,7 +430,7 @@ JBClass ( JB_Error , Message ,
 	JB_String* OriginalData;
 	Message* Node;
 	Date When;
-	ErrorSeverity ErrorLevel;
+	ErrorSeverity Severity;
 	ErrorFlags ErrorFlags;
 );
 extern Message* JB__App__Conf;
@@ -475,13 +439,14 @@ extern JB_String* JB__App_codesign_native;
 extern Array* JB__App_OldArgs;
 
 extern bool JB__App_Unregistered;
-#define kJB__ErrorColors_bold (JB_LUB[338])
+extern JB_String* JB__App_Usage;
+#define kJB__ErrorColors_bold (JB_LUB[342])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[339])
-#define kJB__ErrorColors_good (JB_LUB[340])
-#define kJB__ErrorColors_normal (JB_LUB[341])
-#define kJB__ErrorColors_underline (JB_LUB[340])
-#define kJB__ErrorColors_warn (JB_LUB[342])
+#define kJB__ErrorColors_error (JB_LUB[343])
+#define kJB__ErrorColors_good (JB_LUB[344])
+#define kJB__ErrorColors_normal (JB_LUB[345])
+#define kJB__ErrorColors_underline (JB_LUB[344])
+#define kJB__ErrorColors_warn (JB_LUB[346])
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -496,6 +461,7 @@ extern Dictionary* JB__Constants_EscapeStr;
 extern Dictionary* JB__Constants_JS_EscapeStr;
 extern Dictionary* JB__Constants_JS_UnEscapeStr;
 extern JB_String* JB__Constants_Name;
+extern JB_ErrorReceiver* JB__Constants_ParseProtector;
 extern Dictionary* JB__Constants_UnEscapeStr;
 extern Dictionary* JB__Constants_XML_EscapeStr;
 extern Dictionary* JB__Constants_XML_UnEscapeStr;
@@ -559,7 +525,7 @@ extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
 extern Dictionary* JB__SyxDict_;
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[343])
+#define kJB_SaverStart1 (JB_LUB[347])
 extern JB_ErrorReceiver* JB_StdErr;
 extern Syntax JB_SyxAcc;
 extern Syntax JB_SyxAdj;
@@ -1876,7 +1842,7 @@ Ind JB_Str_OutCharSet(JB_String* self, CharSet* cs, int Start, int After);
 
 Ind JB_Str_OutWhite(JB_String* self, int Start, int After);
 
-Message* JB_Str_Parse(JB_String* self, Syntax owner);
+Message* JB_Str_Parse(JB_String* self, Syntax owner, bool AllowDecomp);
 
 Message* JB_Str_parse_jbin(JB_String* self);
 
@@ -2190,6 +2156,8 @@ bool JB_Msg_ListViewable(Message* self);
 
 JB_String* JB_Msg_Locate(Message* self);
 
+JB_String* JB_Msg_MiniName(Message* self);
+
 Message* JB_Msg_Msg(Message* self, Syntax fn, JB_String* name);
 
 void JB_Msg_Msg__(Message* self, FastString* fs);
@@ -2324,7 +2292,7 @@ Message* JB_Msg__NewRange(Message* Parent, Syntax Func, int BytePos, JB_String* 
 
 Message* JB_Msg__NewWithLayerCopy(JB_MemoryLayer* _L, Message* other);
 
-bool JB_Msg__TreeCompare(Message* orig, Message* reparse);
+bool JB_Msg__TreeCompare(Message* orig, Message* reparse, bool PrintIfSame);
 
 
 

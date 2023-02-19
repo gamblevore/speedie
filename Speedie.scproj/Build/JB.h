@@ -692,6 +692,7 @@ JBClass ( Process , JB_Object ,
 	int DiedCount;
 	int CID;
 	bool IsServer;
+	bool TrapStdOut;
 	byte CanPrint;
 );
 
@@ -1131,6 +1132,7 @@ extern JB_String* JB__App_codesign_native;
 extern Array* JB__App_OldArgs;
 extern Message* JB__App_Prefs;
 extern bool JB__App_Unregistered;
+extern JB_String* JB__App_Usage;
 #define kSC__ASMtmp_iDebugger (63)
 #define kSC__ASMtmp_iIf (62)
 #define kSC__ASMtmp_iRejoin (61)
@@ -1199,13 +1201,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1781])
+#define kJB__ErrorColors_bold (JB_LUB[1782])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1782])
-#define kJB__ErrorColors_good (JB_LUB[1783])
-#define kJB__ErrorColors_normal (JB_LUB[1784])
-#define kJB__ErrorColors_underline (JB_LUB[1783])
-#define kJB__ErrorColors_warn (JB_LUB[1785])
+#define kJB__ErrorColors_error (JB_LUB[1783])
+#define kJB__ErrorColors_good (JB_LUB[1784])
+#define kJB__ErrorColors_normal (JB_LUB[1785])
+#define kJB__ErrorColors_underline (JB_LUB[1784])
+#define kJB__ErrorColors_warn (JB_LUB[1786])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern Array* SC__Ext_Cleanup;
@@ -1252,6 +1254,8 @@ extern Macro* SC__Macros_Copier;
 extern Macro* SC__Macros_Copier2;
 extern Macro* SC__Macros_FS;
 extern Macro* SC__Macros_InitExpand;
+extern Macro* SC__Macros_MainArg1;
+extern Macro* SC__Macros_MainArg2;
 extern Macro* SC__Macros_Setter;
 extern Macro* SC__Macros_Worked2;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
@@ -1397,10 +1401,10 @@ extern JB_String* JB_file_read_test;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[416])
-#define kSC_BitNot (JB_LUB[514])
-#define kSC_BitOr (JB_LUB[623])
-#define kSC_BitXor (JB_LUB[1786])
+#define kSC_BitAnd (JB_LUB[417])
+#define kSC_BitNot (JB_LUB[517])
+#define kSC_BitOr (JB_LUB[626])
+#define kSC_BitXor (JB_LUB[1787])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1430,7 +1434,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1787])
+#define kJB_SaverStart1 (JB_LUB[1788])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -4995,7 +4999,7 @@ bool JB_Proc_ChildAlive(Process* self);
 
 bool JB_Proc_Closed(Process* self);
 
-void JB_Proc_Constructor(Process* self, JB_String* name, int n, Array* params, fn_subprocess sub);
+void JB_Proc_Constructor(Process* self, JB_String* name, int n, Array* params, fn_subprocess sub, bool TrapStdOut);
 
 void JB_Proc_Destructor(Process* self);
 
@@ -5075,7 +5079,7 @@ int JB_Proc__Init_();
 
 int JB_Proc__InitCode_();
 
-Process* JB_Proc__New(JB_String* name, int n, Array* params, fn_subprocess sub);
+Process* JB_Proc__New(JB_String* name, int n, Array* params, fn_subprocess sub, bool TrapStdOut);
 
 Process* JB_Proc__Parent();
 
