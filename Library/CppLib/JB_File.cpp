@@ -11,7 +11,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <poll.h>
-#if __PLATFORM_CURR__ == __PLATFORM_LINUX__
+#if __linux__
 	#include <sys/mman.h>
 	#include <sys/sendfile.h>
 #else
@@ -779,17 +779,23 @@ u64 JB_File_Size( JB_File* self ) {
 
 Date JB_File_Modified( JB_File* self ) {
     struct _stat st = {};
-    if (Stat_(self, &st))
+    require (Stat_(self, &st))
+	#if __linux__
+		return JB_Date__Create(st.st_mtime, st.st_mtime_nsec);
+	#else
 		return JB_Date__Create(st.st_mtimespec.tv_sec, st.st_mtimespec.tv_nsec);
-    return 0;
+	#endif
 }
 
 
 Date JB_File_Created( JB_File* self ) {
     struct _stat st = {};
-    if (Stat_(self, &st))
+    require (Stat_(self, &st))
+	#if __linux__
+		return JB_Date__Create(st.st_ctime, st.st_ctime_nsec);
+	#else
 		return JB_Date__Create(st.st_ctimespec.tv_sec, st.st_ctimespec.tv_nsec);
-    return 0;
+	#endif
 }
 
 
