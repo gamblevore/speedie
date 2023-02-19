@@ -5,29 +5,26 @@
 #define kExtend 0x70
 #pragma GCC optimize O3
 
-inline int u64Cmp(const u64* a, const u64* b, unsigned int n) {
+bool CompSorter (int _a, int _b, const u8* x) {
+	auto va		= x - _a;
+	auto vb		= x - _b;
+	// shouldn't n be 128? considering we don't sort the last?
+	// might optimise better...
+	int n		= min(min(_a, _b), 128);
+
+	u64* a = (u64*)va;
+	u64* b = (u64*)vb;
 	const u64* aEnd = a + n/8;
 	while (a < aEnd) {
 		u64 A = u64Sortable(*a++);
 		u64 B = u64Sortable(*b++);
-		if (B > A)
-			return -1;
+		if (A < B)
+			return true;
 		  else if (B < A)
-			return 1;
+			return false;
 	};
-	return 0;
-}
-
-int CompSorter (int a, int b, const u8* x) {
-	auto va		= x - a;
-	auto vb		= x - b;
-	// shouldn't n be 128? considering we don't sort the last?
-	// might optimise better...
-	int n		= min(min(a, b), 128);
-	int Result	= u64Cmp((u64*)va,  (u64*)vb, n);
-	if (Result)
-		return Result;
-	return a > b; // or should it be >= or < or <= ??
+	bool Result = a>=b;
+	return Result; // true == A < B.
 }
 #pragma GCC reset_options
 
@@ -123,11 +120,26 @@ struct CompState : FastBuff {
 		for_ (n)
 			R0[i] = n - i;
 	
-		CmpQuickSort(R0, 0, n-mUnitSize, Read + n);
+		CmpQuickSort(R0, 0, n-(mUnitSize+1), Read + n);
 
 		for_(n)					// code is simple, but concept is confusing.
 			SP[n - R0[i]] = i;	// each byte, gets told it's position in R0 (endgaps)
-								// just look up SP[byte] and you get the position in SortArray for that byte. 
+								// just look up SP[byte] and you get the position in SortArray for that byte.
+
+		bool print_sorted_array = false; // debug it
+		if (print_sorted_array) for_(n) {
+			auto pos = (Read+n)-R0[i];
+			for (int j = 0; j < 32; j++) {
+				char c = pos[j]; 
+				if (!c)
+					break;
+				if (c <= 32)
+					c = 32;
+				printf("%c", c);
+			}
+			puts("");
+		}
+		
 		return n + Read;
 	}
 	
