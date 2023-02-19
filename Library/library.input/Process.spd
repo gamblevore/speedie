@@ -485,7 +485,8 @@ class Process
 
 	function RunChild (|string| path, |bool|)
 		require (self isnt invalid)
-		if path.cstr.Startprocess(.params, .cid, (&.ChildStdout, nil)(.trapstdout))
+		.cid = path.cstr.Startprocess(.params, , (&.ChildStdout, nil)(.trapstdout))
+		if .cid
 			.path = path
 			.AddToList
 			return true

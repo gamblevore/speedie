@@ -224,17 +224,18 @@ const char* _StartProcess (JB_String* self, const char** argv, Array* Args, int*
 
 
 
-bool JB_Str_StartProcess (JB_String* self, Array* Args, int* PID, JB_File** StdOut) {
+int JB_Str_StartProcess (JB_String* self, Array* Args, JB_File** StdOut) {
 	const char* argv[MaxArgs] = {};
     int Pipes[2] = {};
-	auto Err = _StartProcess(self, argv, Args, StdOut?Pipes:0, *PID);
+    int PID = 0;
+	auto Err = _StartProcess(self, argv, Args, StdOut?Pipes:0, PID);
 	if (Err) {
-		return JB_ErrorHandleFile(self, nil, errno, nil, Err) and false;
+		JB_ErrorHandleFile(self, nil, errno, nil, Err); return -1;
 	}
 	if (StdOut) {
 		JB_SetRef(*StdOut, JB_File__NewPipe(Pipes[0]));
 	}
-	return true;
+	return PID;
 }
 
 
