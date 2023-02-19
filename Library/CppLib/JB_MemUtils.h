@@ -1,12 +1,14 @@
 
 
+#ifndef __JB_MEM_UTILS__
+#define __JB_MEM_UTILS__
 
 #include <string.h>
-#if defined(__linux__)
+#if __PLATFORM_CURR__ == __PLATFORM_OSX__
+    #include <malloc/malloc.h>
+#else
     #include <stdlib.h>
     #include <malloc.h>
-#else
-    #include <malloc/malloc.h>
 #endif
 
 extern "C" {
@@ -76,4 +78,6 @@ inline int JB_Int_RoundUp(int N, int To) {
 
 }
 
+
+#endif
 

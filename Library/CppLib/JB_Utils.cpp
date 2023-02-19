@@ -6,7 +6,7 @@
 
 #include "JB_Umbrella.hpp"
 #include "JB_Log.h"
-#include <malloc/malloc.h>
+#include "JB_MemUtils.h"
 
 extern "C" {
 
