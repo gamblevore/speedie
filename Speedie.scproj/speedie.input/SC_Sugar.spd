@@ -110,11 +110,10 @@ function message.MainOneArgSub (|macro| mac, |message| name, |message| type, |me
 /*
 main (|file| f, |string| s, |int| n = 0)
 	-->
-main {
+main
     |file|   f = file.MainArg(0)
     |string| s = string.MainArg(1)
     |int|    n = (int.MainArg(2), 0)(__ArgCount > 2)
-}
 */
 	
 	
