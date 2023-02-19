@@ -239,7 +239,6 @@
 		AC7D3E0E29A2844100148ADB /* JB_BasicTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_BasicTypes.h; path = ../Library/CppLib/JB_BasicTypes.h; sourceTree = "<group>"; };
 		AC7D3E0F29A2844100148ADB /* JB_Umbrella.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = JB_Umbrella.hpp; path = ../Library/CppLib/JB_Umbrella.hpp; sourceTree = "<group>"; };
 		AC7D3E1029A2844100148ADB /* JB_Saveable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Saveable.h; path = ../Library/CppLib/JB_Saveable.h; sourceTree = "<group>"; };
-		AC7D3E1129A2844100148ADB /* stb_image_write.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = stb_image_write.h; path = ../Library/CppLib/stb_image_write.h; sourceTree = "<group>"; };
 		AC7D3E1229A2844100148ADB /* JB_SafeIncludes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_SafeIncludes.h; path = ../Library/CppLib/JB_SafeIncludes.h; sourceTree = "<group>"; };
 		AC7D3E1329A2844100148ADB /* JB_Log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Log.h; path = ../Library/CppLib/JB_Log.h; sourceTree = "<group>"; };
 		AC7D3E1429A2844100148ADB /* JB_VM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_VM.h; path = ../Library/CppLib/JB_VM.h; sourceTree = "<group>"; };
@@ -251,7 +250,6 @@
 		AC7D3E1A29A2844200148ADB /* JB_CompileUnix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_CompileUnix.h; path = ../Library/CppLib/JB_CompileUnix.h; sourceTree = "<group>"; };
 		AC7D3E1B29A2844200148ADB /* JB_CompileWin32.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_CompileWin32.h; path = ../Library/CppLib/JB_CompileWin32.h; sourceTree = "<group>"; };
 		AC7D3E1C29A2844200148ADB /* JB_DirReaderWin32.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_DirReaderWin32.h; path = ../Library/CppLib/JB_DirReaderWin32.h; sourceTree = "<group>"; };
-		AC7D3E1D29A2844200148ADB /* stb_image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = stb_image.h; path = ../Library/CppLib/stb_image.h; sourceTree = "<group>"; };
 		AC7D3E1E29A2844200148ADB /* JB_ObjArray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_ObjArray.h; path = ../Library/CppLib/JB_ObjArray.h; sourceTree = "<group>"; };
 		AC7D3E1F29A2844200148ADB /* JB_FileLister.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_FileLister.h; path = ../Library/CppLib/JB_FileLister.h; sourceTree = "<group>"; };
 		AC7D3E2029A2844200148ADB /* JB_List.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_List.h; path = ../Library/CppLib/JB_List.h; sourceTree = "<group>"; };
@@ -296,6 +294,8 @@
 		AC7D3E4729A2844E00148ADB /* StringProperties.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringProperties.i; path = ../Library/CppLib/StringProperties.i; sourceTree = "<group>"; };
 		AC7D3E4829A2844E00148ADB /* StringSearchers.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringSearchers.i; path = ../Library/CppLib/StringSearchers.i; sourceTree = "<group>"; };
 		AC7D3E4929A2844E00148ADB /* StringSplitters.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringSplitters.i; path = ../Library/CppLib/StringSplitters.i; sourceTree = "<group>"; };
+		AC7D3E4B29A284DB00148ADB /* speedie.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = speedie.input; sourceTree = "<group>"; };
+		AC7D3E4C29A284EA00148ADB /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -333,6 +333,8 @@
 		AC6ADADE29872AA8009CFFBB = {
 			isa = PBXGroup;
 			children = (
+				AC7D3E4C29A284EA00148ADB /* library.input */,
+				AC7D3E4B29A284DB00148ADB /* speedie.input */,
 				AC7D3E0C29A283FF00148ADB /* Headers */,
 				AC7D3E0529A281FD00148ADB /* Exec */,
 				AC7D3C7829A27BF300148ADB /* cpp */,
@@ -458,8 +460,6 @@
 				AC7D3E3429A2844200148ADB /* JB_Vectors.h */,
 				AC7D3E2729A2844200148ADB /* JB_VectorTypes.h */,
 				AC7D3E1429A2844100148ADB /* JB_VM.h */,
-				AC7D3E1129A2844100148ADB /* stb_image_write.h */,
-				AC7D3E1D29A2844200148ADB /* stb_image.h */,
 				AC7D3E2929A2844200148ADB /* StringConvert.h */,
 				AC7D3E2129A2844200148ADB /* StringFunctions.h */,
 				AC7D3E3229A2844200148ADB /* StringFunctionsLib.h */,
