@@ -4,6 +4,9 @@
 */
 
 
+    // wouldn't it be better as app properties? or jsut arg properties?
+    // args.f, args.s, args.n? like a module? to be accessable anywhere?
+    // also needs arrays to be useful... and existingfiles.
 
 function TypeOfDotDotDot (ExprResolver)
 	using (exp)
@@ -112,9 +115,6 @@ main {
     |string| s = string.MainArg(1)
     |int|    n = (int.MainArg(2), 0)(__ArgCount > 2)
 }
-
-how do I decide that I want the file to be a file that exists?
-	(|file.existing| f)
 */
 	
 	
