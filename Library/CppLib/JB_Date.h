@@ -6,15 +6,14 @@
 #include "JB_Umbrella.h"
 
 extern "C" {
-    
-    // do I really want such a class? why not just use a 64-bit value?
-    // I could do... hmmm.... 32+16=48 bits for seconds? and 16 for fractional seconds?
-    // That gives us 9 million year time range. Quite enough...
+    // 9 million year time range at 64K/s. Quite enough...
     struct timespec;
     Date JB_Date__SpecToDate( timespec ts );
     int64 JB_Date__TimeID ();
     void JB_Date__Sleep(Date Time);
     Date JB_Date__Now( );
+}
+
 #if defined(__x86_64__) || defined(__amd64)
 inline u64 RDTSC() {
 	u64 a; u64 d;
@@ -28,13 +27,12 @@ inline u64 RDTSC() {
 	return x;
 }
 #else
-	inline u64 RDTSC() {
-		return static_cast<int64>(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
-
-	}
-#endif
+#include <chrono>
+inline u64 RDTSC() {
+	return static_cast<int64>(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 
 }
+#endif
 
 #endif
 
