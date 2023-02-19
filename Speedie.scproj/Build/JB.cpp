@@ -2872,9 +2872,11 @@ Array* SC_Ext__CreateCompileString(Array* CppList, JB_String* Product, JB_String
 		}
 		JB_SetRef(cmode, JB_Str_OperatorPlus(cmode, JB_LUB[198]));
 	}
-	JB_String* _tmPf3 = JB_Incr(((JB_String*)JB_Ternary(SC__Options_Is32Bit, JB_LUB[199], JB_LUB[200])));
-	JB_Array_AppendWords(rz, _tmPf3);
-	JB_Decr(_tmPf3);
+	if (JB_MaybeBool_IsKnown(SC__Options_Compile32Bit)) {
+		JB_String* _tmPf3 = JB_Incr(((JB_String*)JB_Ternary(JB_MaybeBool_Default(SC__Options_Compile32Bit), JB_LUB[199], JB_LUB[200])));
+		JB_Array_AppendWords(rz, _tmPf3);
+		JB_Decr(_tmPf3);
+	}
 	JB_Array_AppendWords(rz, JB_LUB[201]);
 	JB_Array_AppendWords(rz, JB_LUB[202]);
 	JB_Array_AppendWords(rz, JB_LUB[203]);
@@ -3530,7 +3532,7 @@ bool SC_Ext__TestNewCompiler() {
 }
 
 JB_String* SC_Ext__TmpBase(JB_String* V) {
-	JB_String* s = ((JB_String*)JB_Ternary(SC__Options_Is32Bit, JB_LUB[255], JB_LUB[256]));
+	JB_String* s = ((JB_String*)JB_Ternary(JB_MaybeBool_Default(SC__Options_Compile32Bit), JB_LUB[255], JB_LUB[256]));
 	return JB_Str_OperatorPlus(s, V);
 }
 
@@ -3846,7 +3848,7 @@ bool SC_FB__AppOptions_m32(JB_String* Name, JB_String* Value, FastString* purpos
 	if ((!SC_FB__Explain(purpose, JB_LUB[285]))) {
 		return nil;
 	}
-	SC__Options_Is32Bit = true;
+	SC__Options_Compile32Bit = 1;
 	return false;
 }
 
@@ -3854,7 +3856,7 @@ bool SC_FB__AppOptions_m64(JB_String* Name, JB_String* Value, FastString* purpos
 	if ((!SC_FB__Explain(purpose, JB_LUB[286]))) {
 		return nil;
 	}
-	SC__Options_Is32Bit = false;
+	SC__Options_Compile32Bit = 0;
 	return false;
 }
 
@@ -5851,7 +5853,7 @@ int SC_Options__Init_() {
 		SC__Options_ListAllLib = false;
 		SC__Options_ForceRecompile = false;
 		SC__Options_Silent = false;
-		SC__Options_Is32Bit = false;
+		SC__Options_Compile32Bit = JB_MaybeBool__New(false);
 		SC__Options_IsDirectTest = false;
 		SC__Options_ProjectIsLibrary = false;
 		SC__Options_ProjectIsMiniLib = false;
@@ -14580,6 +14582,19 @@ JB_String* JB_int64_strsize(int64 self, FastString* fs_in) {
 ivec4 JB_ivec4___junktest_4__Set(ivec4 self, int Value) {
 	self[2] = (Value + self[0]);
 	return self;
+}
+
+
+bool JB_MaybeBool_Default(MaybeBool self) {
+	return ((bool)(self & 1));
+}
+
+bool JB_MaybeBool_IsKnown(MaybeBool self) {
+	return self < 2;
+}
+
+MaybeBool JB_MaybeBool__New(bool Default) {
+	return 8 + Default;
 }
 
 
@@ -43180,4 +43195,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 5278274991957915 -288055726119545
+// 2604521955553419 -651017133734337

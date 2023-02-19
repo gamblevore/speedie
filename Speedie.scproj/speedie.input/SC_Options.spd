@@ -27,7 +27,7 @@ module Options
 	||		ListAllLib				= false
 	||		ForceRecompile			= false
 	||		Silent					= false
-	||		Is32Bit					= false
+	||		Compile32Bit			= maybebool(false)
 	||		IsDirectTest			= false
 	||		ProjectIsLibrary		= false
 	||		ProjectIsMiniLib		= false
@@ -358,7 +358,7 @@ module Feedback
 			
 		m64
 			Explain(Purpose, "64-bit compile")$
-			options.is32bit = false
+			options.Compile32Bit = 0
 
 		
 		funccount
@@ -368,7 +368,7 @@ module Feedback
 
 		m32
 			Explain(Purpose, "32-bit compile")$
-			options.is32bit = true
+			options.Compile32Bit = 1
 
 		
 		warn

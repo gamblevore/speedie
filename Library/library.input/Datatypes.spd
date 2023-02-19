@@ -696,6 +696,17 @@ datatype uint64
 
 
 
+datatype MaybeBool (byte) // could just put these on int? do we need a whole new type?
+	default 8
+	function Default (|bool|)
+		return self&1
+	function IsKnown (|bool|)
+		return self<2
+	module
+		function New (|bool| Default, |Maybebool|)
+			return 8+default
+	
+	
 
 
 datatype bool
@@ -718,7 +729,6 @@ datatype bool
 			return old (|) flag
 		return old &~ flag
 		
-		
 	function dir (|int|)
 		return (self|int|<<1)-1
 	
@@ -733,12 +743,12 @@ datatype bool
 			return s
 		fs_in <~ s
 	
-	
 	iterator
 		|| num = 1
 		while (num >= 0)
 			yield (num == 1)
 			num--
+
 
 
 datatype vec4 

@@ -41,6 +41,8 @@ typedef byte ErrorFlags;
 
 typedef byte ErrorSeverity;
 
+typedef byte MaybeBool;
+
 typedef int PID_Int;
 
 typedef int SCBaseInfo;
@@ -1265,6 +1267,7 @@ extern bool SC__Options_ArgStats;
 extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_CheckMaxVars;
 extern bool SC__Options_Compile;
+extern MaybeBool SC__Options_Compile32Bit;
 extern bool SC__Options_Cpp;
 extern bool SC__Options_ExternalCompile;
 extern bool SC__Options_Final;
@@ -1272,7 +1275,6 @@ extern bool SC__Options_Flow;
 extern bool SC__Options_ForceRecompile;
 extern bool SC__Options_HideMultipleErrors;
 extern bool SC__Options_IgnoreCantSaveErrors;
-extern bool SC__Options_Is32Bit;
 extern bool SC__Options_IsDirectTest;
 extern bool SC__Options_KeepAllErrors;
 #define kSC__Options_LargestFlag (3)
@@ -3603,6 +3605,15 @@ JB_String* JB_int64_strsize(int64 self, FastString* fs_in);
 
 // ivec4
 ivec4 JB_ivec4___junktest_4__Set(ivec4 self, int Value);
+
+
+
+// MaybeBool
+bool JB_MaybeBool_Default(MaybeBool self);
+
+bool JB_MaybeBool_IsKnown(MaybeBool self);
+
+MaybeBool JB_MaybeBool__New(bool Default);
 
 
 

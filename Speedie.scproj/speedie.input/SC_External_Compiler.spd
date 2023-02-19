@@ -18,7 +18,7 @@ linkage:cpp_part Ext
 
 function TmpBase (|string| V, |string|)
 	opt norefcounts
-	|| s = ("/tmp/Speedie/", "/tmp/Speedie64/")(options.is32bit)
+	|| s = ("/tmp/Speedie/", "/tmp/Speedie64/")(options.Compile32Bit.Default)
 	return s + V
 
 
@@ -161,7 +161,8 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 			cmode = ""
 		cmode += "-fobjc-arc  -fobjc-link-runtime"
 	
-	rz.AppendWords( ("-m32", "-m64")(options.Is32Bit) )
+	if options.Compile32Bit.IsKnown
+		rz.AppendWords( ("-m32", "-m64")(options.Compile32Bit.default) )
 	
 	rz.appendwords("-L/usr/local/speedie/Library")
 	rz.appendwords("-L/usr/local/lib/")
