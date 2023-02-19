@@ -13,6 +13,8 @@
 #include <signal.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include <string>
 #include <iostream>
