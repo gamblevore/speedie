@@ -299,7 +299,7 @@ function Library (|file|)
 	return .projects.filech("Library")
 
 function Jeebox (|file|)
-	return .Projects.filech("Jeebox.scproj")
+	return .Projects.filech("jeebox.scproj")
 
 function Speedie (|file|)
 	return .Projects.filech("Speedie.scproj")
@@ -308,7 +308,7 @@ function Speedie (|file|)
 function ImportLibs
 	SCImport.STDLibTime = true
 	SCImport.Importpath( "Library",		.Library,		1 )
-	SCImport.Importpath( "Jeebox",		.Jeebox,		1 )
+	SCImport.Importpath( "jeebox",		.Jeebox,		1 )
 
 
 function ImportProj
