@@ -202,8 +202,9 @@ void JB_Array_Shuffle( Array* self ) {
 #endif
 
 
+
 static int SortABit(obj* array, int j, int high, SorterComparer fp) {
-    obj pivot = array[high];
+    auto pivot = array[high];
     while ((fp)(array[j++], pivot)) // no need swap
 		if (j >= high)
 			return j;
@@ -218,13 +219,12 @@ static int SortABit(obj* array, int j, int high, SorterComparer fp) {
 }
 
 
-static void QuickSort(obj array[], int start, int end, SorterComparer fp) {
+static void QuickSort(obj* array, int start, int end, SorterComparer fp) {
     require0 (start < end);
     int p = SortABit(	 array, start, end,   fp);
     QuickSort(			 array, start, p - 1, fp);
     QuickSort(			 array, p + 1, end,   fp);
 }
-
 
 void JB_Array_Sort ( Array* self, SorterComparer fp, bool down ) {
 	int N = JB_Array_Size(self);
