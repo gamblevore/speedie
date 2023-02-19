@@ -11,11 +11,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <poll.h>
-#include <sys/posix_shm.h>
-#if defined(__APPLE__) || defined(__FreeBSD__)
-	#include <copyfile.h>
-#else
+#if __PLATFORM_CURR__ == __PLATFORM_LINUX__
+	#include <sys/mman.h>
 	#include <sys/sendfile.h>
+#else
+	#include <copyfile.h>
+	#include <sys/posix_shm.h>
 #endif
 
 
