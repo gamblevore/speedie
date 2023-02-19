@@ -97,7 +97,6 @@ typedef int64					Date;
 #define __PLATFORM_LINUX__ 4
 #define __PLATFORM_OSX__ 2
 #define __PLATFORM_SPD__ 1
-#define __PLATFORM_CURR__ 
 
 #if defined(__APPLE__) && defined(__MACH__)
 	#pragma message("Plat: OSX")
