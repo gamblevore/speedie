@@ -153,7 +153,7 @@ function MacBothArch (|[string]| r)
 function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Type, |[string]|)
 	rz.AppendWords( Product )
 
-	|| cmode = "-std=gnu++17  -stdlib=libc++"
+	|| cmode = "-std=gnu++17 "
 	if Type == "m" or "o" or "mm"
 		if type == "mm"
 			cmode += " -x objective-c++ "
