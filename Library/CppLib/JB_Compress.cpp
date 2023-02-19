@@ -18,10 +18,7 @@ inline int u64Cmp(const u64* a, const u64* b, unsigned int n) {
 	return 0;
 }
 
-int CompSorter (const void* _x, const void* _ap, void* _bp) {
-	auto x = (const u8*)_x; auto ap = (const int*)_ap; auto bp = (const int*)_bp;
-	int a		= *ap;
-	int b		= *bp;
+int CompSorter (int a, int b, const u8* x) {
 	auto va		= x - a;
 	auto vb		= x - b;
 	// shouldn't n be 128? considering we don't sort the last?
@@ -30,19 +27,36 @@ int CompSorter (const void* _x, const void* _ap, void* _bp) {
 	int Result	= u64Cmp((u64*)va,  (u64*)vb, n);
 	if (Result)
 		return Result;
-	return a - b;
+	return a > b; // or should it be >= or < or <= ??
 }
 #pragma GCC reset_options
 
 
 
-void JB_SuffixArray(int* R0, int n, void* Thingy) {
-#if __PLATFORM_CURR__ == __PLATFORM_LINUX__
-	qsort_r(R0,  n - mUnitSize,  sizeof(int),  (__compar)CompSorter,  Thingy); // lol
-#else // whyyyyy
-	qsort_r(R0,  n - mUnitSize,  sizeof(int),  Thingy,  (__compar)CompSorter);
-#endif	
+typedef bool (*IntSorterComparer)(int a, int b, const u8* State);
+
+int CmpSortABit(int* array, int j, int high, const u8* State) {
+    auto pivot = array[high];
+    while (CompSorter(array[j++], pivot, State)) // no need swap
+		if (j >= high)
+			return j;
+	int i = j-2;
+    while (j < high) {
+        if (CompSorter(array[j], pivot, State))
+            std::swap(array[++i], array[j]);
+		j++;
+	}
+	std::swap(array[++i], array[high]);
+	return i;
 }
+
+void CmpQuickSort(int* array, int start, int end, const u8* State) {
+    require0 (start < end);
+    int p = CmpSortABit(	 array, start, end,   State);
+    CmpQuickSort(			 array, start, p - 1, State);
+    CmpQuickSort(			 array, p + 1, end,   State);
+}
+
 
 
 struct CompState : FastBuff {
@@ -109,7 +123,7 @@ struct CompState : FastBuff {
 		for_ (n)
 			R0[i] = n - i;
 	
-		qsort_r(R0,  n - mUnitSize,  sizeof(int),  Read + n,  (__compar)CompSorter);
+		CmpQuickSort(R0, 0, n-mUnitSize, Read + n);
 
 		for_(n)					// code is simple, but concept is confusing.
 			SP[n - R0[i]] = i;	// each byte, gets told it's position in R0 (endgaps)
