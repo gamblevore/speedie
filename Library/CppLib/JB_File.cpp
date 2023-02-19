@@ -414,18 +414,31 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 }
 
 
-int _NSGetExecutablePath(char* buf, u32* length); // oh apple...
-JB_String* JB_App__Path() {
-    static JB_String* Result;
-    if (!Result) {
-        u32 N = 0;
-        _NSGetExecutablePath(0, &N);
-        Result = JB_Str_New(N-1);
-        _NSGetExecutablePath((char*)(Result->Addr), &N);
-        JB_Incr(Result);
-    }
-    return Result;
-}
+#if __linux__
+	JB_String* JB_App__Path() {
+		static JB_String* Result;
+		if (!Result) {
+			char Path[ PATH_MAX ];
+			int count = (int)readlink( "/proc/self/exe", Path, PATH_MAX );
+			Result = JB_Str_CopyFromPtr((u8*)(&Path[0]), count);
+			JB_Incr(Result);
+		}
+		return Result;
+	}
+#else
+	int _NSGetExecutablePath(char* buf, u32* length); // oh apple...
+	JB_String* JB_App__Path() {
+		static JB_String* Result;
+		if (!Result) {
+			u32 N = 0;
+			_NSGetExecutablePath(0, &N);
+			Result = JB_Str_New(N-1);
+			_NSGetExecutablePath((char*)(Result->Addr), &N);
+			JB_Incr(Result);
+		}
+		return Result;
+	}
+#endif
 
 int JB_App__SetEnv(JB_StringC* name, JB_StringC* value) {
 	if (name and value)
