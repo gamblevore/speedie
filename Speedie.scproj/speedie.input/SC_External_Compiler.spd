@@ -10,6 +10,7 @@ linkage:cpp_part Ext
 |[File]|		FoundObjects
 |[File]|		Cleanup
 |int| 			CompilingLibFiles
+|string| 		CppCompilerPath = "/usr/bin/g++"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -235,7 +236,7 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 
 
 function ExecuteGCC (|[string]| Commands, |bool|)
-	return "/usr/bin/g++".SilentExecute(Commands, nil) #expect ("C++ compiler failed to compile source code.")
+	return CppCompilerPath.SilentExecute(Commands, nil) #expect ("C++ compiler failed to compile source code.")
 
 
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
@@ -346,7 +347,7 @@ function ExtCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 		return true
 
 	if Options.PrintCompileString
-		print	 "\nclang "
+		print	 "\n ${cppcompilerpath.name} "
 		printline Join2(CompileString, " ")
 	
 	app.sleep(0.125s)

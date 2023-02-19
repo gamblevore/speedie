@@ -2975,9 +2975,9 @@ Array* SC_Ext__CreateCompileString(Array* CppList, JB_String* Product, JB_String
 }
 
 bool SC_Ext__ExecuteGCC(Array* Commands) {
-	ErrorInt _tmPf0 = JB_Str_SilentExecute(JB_LUB[225], Commands, nil, nil);
+	ErrorInt _tmPf0 = JB_Str_SilentExecute(SC__Ext_CppCompilerPath, Commands, nil, nil);
 	if ((!JB_ErrorInt_SyntaxCast(_tmPf0))) {
-		JB_Str_SyntaxExpect(JB_LUB[226]);
+		JB_Str_SyntaxExpect(JB_LUB[225]);
 		return nil;
 	}
 	return JB_ErrorInt_SyntaxCast(_tmPf0);
@@ -3014,15 +3014,24 @@ bool SC_Ext__ExtCompile(Array* Files, JB_String* Dest, JB_String* Type) {
 		return true;
 	}
 	if (SC__Options_PrintCompileString) {
-		JB_Str_Print(JB_LUB[227]);
-		JB_String* _tmPf0 = JB_Incr(JB_Join2(CompileString, JB_LUB[170]));
-		JB_PrintLine(_tmPf0);
-		JB_Decr(_tmPf0);
+		FastString* _fsf0 = JB_Incr(JB_FS__New());
+		JB_FS_AppendString(_fsf0, JB_LUB[226]);
+		JB_String* _tmPf1 = JB_Incr(JB_Str_Name(SC__Ext_CppCompilerPath));
+		JB_FS_AppendString(_fsf0, _tmPf1);
+		JB_Decr(_tmPf1);
+		JB_FS_AppendByte(_fsf0, ' ');
+		JB_String* _tmPf2 = JB_Incr(JB_FS_GetResult(_fsf0));
+		JB_Decr(_fsf0);
+		JB_Str_Print(_tmPf2);
+		JB_Decr(_tmPf2);
+		JB_String* _tmPf3 = JB_Incr(JB_Join2(CompileString, JB_LUB[170]));
+		JB_PrintLine(_tmPf3);
+		JB_Decr(_tmPf3);
 	}
 	JB_Date__Sleep(8192);
-	bool _tmPf1 = SC_Ext__ExecuteGCC(CompileString);
+	bool _tmPf4 = SC_Ext__ExecuteGCC(CompileString);
 	JB_Decr(CompileString);
-	return _tmPf1;
+	return _tmPf4;
 }
 
 Array* SC_Ext__FilterCppsIfAlreadyDone(Array* Cpps, JB_File* Objects, int* stdafx) {
@@ -3056,6 +3065,7 @@ int SC_Ext__Init_() {
 		JB_SetRef(SC__Ext_FoundObjects, JB_Array__New0());
 		JB_SetRef(SC__Ext_Cleanup, JB_Array__New0());
 		SC__Ext_CompilingLibFiles = 0;
+		JB_SetRef(SC__Ext_CppCompilerPath, JB_LUB[227]);
 	}
 	;
 	return 0;
@@ -3068,7 +3078,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[228]);
-	JB_FS_AppendInt32(_fsf0, (2023021921));
+	JB_FS_AppendInt32(_fsf0, (2023021922));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -4114,7 +4124,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[306]);
-	JB_FS_AppendInt32(_fsf0, (2023021921));
+	JB_FS_AppendInt32(_fsf0, (2023021922));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -43170,4 +43180,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 6157105007346658 -710118201729181
+// 5278274991957915 2542795071663986

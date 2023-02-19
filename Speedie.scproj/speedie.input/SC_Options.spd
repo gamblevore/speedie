@@ -399,7 +399,7 @@ module Feedback
 			Options.Optimise = Value.parseint
 
 		cpp
-			explain(purpose, "Compiles to cpp, using clang. Default true")$
+			explain(purpose, "Compiles to cpp. Default true")$
 			options.cpp = value.optionbool
 		
 		output_path
