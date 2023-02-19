@@ -34,9 +34,9 @@ extend string
 
 
 Module MZLab	
-	function OK (|bool|)
-		|| f = "~/Desktop/enc/Library.xml".file
-		return f.readall.compresstest(true)
+	function OK (|bool|) 
+		|| f = "~/Music/multiplay/library.box".file.readall.decompress
+		return f.compresstest(true)
 		
 	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
 		for j in 4 
@@ -54,7 +54,7 @@ Module MZLab
 				.TestSub(items, fs, i>>(sh*4))
 			require fs.getresult.CompressTest
 		"Compression Test: OK"
-		return true
+		return .ok
 		
 
 target minilib {
