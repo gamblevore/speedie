@@ -80,7 +80,7 @@ JB_StringC*         ErrorString_;
 JBObject_Behaviour  JB_Object_FuncTable_ = {0,0};
 JB_Class*           ClassList;
 int					JB_ErrorNumber;
-extern _cstring*	environ;
+extern char**		environ;
 static Array*		App_Args;
 _cstring			App_CalledBy;
 
