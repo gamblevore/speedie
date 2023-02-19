@@ -88,7 +88,7 @@ _cstring			App_CalledBy;
 Dictionary* JB_App__Env() {
     static Dictionary* App_Env;
     if (!App_Env) {
-        App_Env = JB_EnvC(environ);
+        App_Env = JB_EnvC((const char**)environ);
         JB_Incr(App_Env);
     }
     return App_Env;
