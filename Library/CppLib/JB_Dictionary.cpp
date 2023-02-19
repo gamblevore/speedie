@@ -614,7 +614,7 @@ JB_Object* JB_Dict_FindStr( Dictionary* Dict, JB_String* self, ivec2* Found ) {
 		ObjLength L = JB_Dict_LongestKey_( Dict, Str );
 		if (L.Obj) {
 			int n = (int)(Str.Addr - self->Addr);
-			*Found = {n, n+L.Length};
+			*Found = ivec2{n, n+L.Length};
 			return L.Obj;
 		}
 		Str.Next();
