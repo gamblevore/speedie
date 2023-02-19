@@ -783,7 +783,7 @@ Date JB_File_Modified( JB_File* self ) {
 	#if __linux__
 		return JB_Date__Create(st.st_mtime, st.st_mtime_nsec);
 	#else
-		return JB_Date__Create(st.st_mtimespec.tv_sec, st.st_mtimespec.tv_nsec);
+		return JB_Date__Create(st.st_mtimespec.tv_sec, 0);//st.st_mtimespec.tv_nsec);
 	#endif
 }
 
@@ -794,7 +794,7 @@ Date JB_File_Created( JB_File* self ) {
 	#if __linux__
 		return JB_Date__Create(st.st_ctime, st.st_ctime_nsec);
 	#else
-		return JB_Date__Create(st.st_ctimespec.tv_sec, st.st_ctimespec.tv_nsec);
+		return JB_Date__Create(st.st_ctimespec.tv_sec, 0);//st.st_ctimespec.tv_nsec);
 	#endif
 }
 
