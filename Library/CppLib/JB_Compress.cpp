@@ -37,7 +37,11 @@ int CompSorter (const void* _x, const void* _ap, void* _bp) {
 
 
 void JB_SuffixArray(int* R0, int n, void* Thingy) {
+#if __PLATFORM_CURR__ == __PLATFORM_LINUX__
+	qsort_r(R0,  n - mUnitSize,  sizeof(int),  (__compar)CompSorter,  Thingy); // lol
+#else // whyyyyy
 	qsort_r(R0,  n - mUnitSize,  sizeof(int),  Thingy,  (__compar)CompSorter);
+#endif	
 }
 
 

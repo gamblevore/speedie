@@ -93,6 +93,21 @@ typedef int64					Date;
 #define __CPU_ARM__ 2
 #define __CPU_SPD__ 1
 
+#define __PLATFORM_WIN__ 8
+#define __PLATFORM_LINUX__ 4
+#define __PLATFORM_OSX__ 2
+#define __PLATFORM_SPD__ 1
+#define __PLATFORM_CURR__ 
+
+#if defined(__APPLE__) && defined(__MACH__)
+	#define __PLATFORM_CURR__ __PLATFORM_OSX__
+#elif __unix__
+	#define __PLATFORM_CURR__ __PLATFORM_LINUX__
+#elif __WIN32__ || _WIN64
+	#define __PLATFORM_CURR__ __PLATFORM_WIN__
+#endif
+
+
 #if _M_X86 || __i386__ || __x86_64__
 //	#pragma message("CPU: Intel")
 	#define __CPU_TYPE__ __CPU_INT__
