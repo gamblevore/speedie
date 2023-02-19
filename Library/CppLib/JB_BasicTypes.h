@@ -102,7 +102,7 @@ typedef int64					Date;
 	#pragma message("Plat: OSX")
 	#define __PLATFORM_CURR__ __PLATFORM_OSX__
 #elif __unix__
-	#pragma message("Plat: Linux")
+	//#pragma message("Plat: Linux")
 	#define __PLATFORM_CURR__ __PLATFORM_LINUX__
 #elif __WIN32__ || _WIN64
 	#pragma message("Plat: Windows")
