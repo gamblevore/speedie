@@ -34,7 +34,7 @@ struct MatchFound {
     operator bool() { return Length; }
     int Cost() { return Fixed+Varying; }
 };
-typedef int (* _Nonnull __compar) (void*, const void*, const void*);
+typedef int (* __compar) (void*, const void*, const void*);
 
 
 struct FastBuff {
