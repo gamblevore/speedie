@@ -877,7 +877,7 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	}
 	
 	if (result)
-		JB_ErrorHandleFile(self, To, errno, nil,  "copy");
+		JB_ErrorHandleFile(self, To, errno, nil,  "copying");
 	return result;
 }
 
@@ -888,7 +888,7 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	JB_String* JB_File__CWD( ) {
 		char* path = getcwd( 0, 0 );
 		if (!path) {
-			JB_ErrorHandleFile(nil, nil, errno, strerror(errno),  "getcwd");
+			JB_ErrorHandleFile(nil, nil, errno, strerror(errno),  "calling-getcwd");
 			return JB_Str__Error(); // sigh. it's possible, and can crash your app.
 		}
 		IntPtr N = strlen( path );
@@ -1070,7 +1070,7 @@ void* JB_File_IPC (JB_File* self, int* np) {
 
 
 void JB_munmap (void* mem, int64 n) {
-	ErrorHandle_(munmap(mem, n), nil, nil, "mem-unmap");
+	ErrorHandle_(munmap(mem, n), nil, nil, "un-memmap");
 }
 
 
