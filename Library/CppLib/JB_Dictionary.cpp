@@ -619,7 +619,7 @@ JB_Object* JB_Dict_FindStr( Dictionary* Dict, JB_String* self, ivec2* Found ) {
 		}
 		Str.Next();
 	}
-	*Found = {};
+	*Found = ivec2{};
 	return 0;
 }
 
