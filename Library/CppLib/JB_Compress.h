@@ -35,12 +35,6 @@ struct MatchFound {
     int Cost() { return Fixed+Varying; }
 };
 
-#if __PLATFORM_CURR__ == __PLATFORM_LINUX__
-typedef int (* __compar) (const void*, const void*, void*);
-#else
-typedef int (* __compar) (void*, const void*, const void*);
-#endif
-
 
 struct FastBuff {
 	u8*	Write;
