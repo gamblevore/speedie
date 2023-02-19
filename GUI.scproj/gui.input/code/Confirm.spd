@@ -58,7 +58,7 @@ function string.Ask (|string| response="",  |string| Title="",  |string|)
 
 
 function guicontrol.VisText (assigns:|string|s)
-	.textset(s) // not sure why .text=s doesnt work
+	.textset(s)
 	(self is visible) = s != ""
 
 
