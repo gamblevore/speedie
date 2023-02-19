@@ -20,7 +20,7 @@ struct vec3 {
 	vec3(vec4 a) {S[0]=a[0];S[1]=a[1];S[2]=a[2];}
 
 	float& operator [] (int n) { return S[n]; }
-    explicit operator vec4() const { return {S[0], S[1], S[2], 0.0}; }
+    explicit operator vec4() const { return vec4{S[0], S[1], S[2], 0.0f}; }
     
 	vec3 operator * (float n) { return vec4(*this)*n; }
 	vec3 operator * (vec3 n)  { return vec4(*this)*vec4(n); }
@@ -46,7 +46,7 @@ struct ivec3 {
 	ivec3(ivec4 a) {S[0]=a[0]; S[1]=a[1]; S[2]=a[2];}
 
 	int& operator [] (int n) { return S[n]; }
-    explicit operator ivec4() const { return {S[0], S[1], S[2], 0}; }
+    explicit operator ivec4() const { return ivec4{S[0], S[1], S[2], 0}; }
 
 	ivec3 operator >> (int n)   { return {S[0]>>n,    S[1]>>n,    S[2]>>n};    }
 	ivec3 operator >> (ivec3 n) { return {S[0]>>n[0], S[1]>>n[1], S[2]>>n[2]}; }
