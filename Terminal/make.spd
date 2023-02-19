@@ -21,18 +21,18 @@ chown \$(logname):staff $dir
 "
 
 main 
-	.gen("osx")
-	.gen("linux")
+	.gen("osx", platform.OSX)
+	.gen("linux", platform.linux)
 
 
-function app.gen (|string| plat) {
+function app.gen (|string| plat, |bool| IsCurrentPlatform) {
 expect !.args (.args, "This script takes no arguments.")
 
-|| CFlags   = "-std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -lc++ -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1"
+|| CFlags   = "-std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1"
 || shared = "shared"
 if plat~="osx"
 	shared = "dynamiclib"
-	CFlags += " -arch=arm64  -arch=x86_64 "
+	CFlags += " -arch=arm64  -arch=x86_64  -lc++"
 	// we really wanna generate two makefiles... one for osx one for everything else
 || LibFlags = "$CFlags -$shared  -D AS_LIBRARY=1 "
 ExecFlags   = "$CFlags -g -ljeebox"
@@ -70,13 +70,15 @@ sudo -u $(logname) /usr/local/bin/speedie --self --x --nocompile
 // sudo -u $(logname) will "drop root permissions". This allows us to
 // NOT run speedie as root, causing speedie to create folders owned
 // by root. Meaning now we can't use those folders unless we sudo everything.
-PrepareCpp.Execute
+if IsCurrentPlatform
+	PrepareCpp.Execute
 
 
 ////////////////////////////
 <(`    (((generating script)))    `)>
 ////////////////////////////
 
+require StdErr.ok
 scriptout.data = "#!/bin/bash
 echo \"Started Building Speedie\"
 set -e
@@ -118,9 +120,10 @@ sudo -u \$(logname) $SpdTerm $Speedie/Perry.scproj
 
 
 require StdErr.ok
-"Script generated at: $scriptout
-Running Script: $scriptout ($Count+ .cpp files)\n\n"
-scriptout.Execute
+"Script generated at: $scriptout"
+if IsCurrentPlatform
+	"Running Script: $scriptout ($Count+ .cpp files)\n\n"
+	scriptout.Execute
 
 }
 
