@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AC7D3DDB29A2816700148ADB"
-               BuildableName = "Exec"
-               BlueprintName = "Exec"
+               BlueprintIdentifier = "AC6ADAE629872AA8009CFFBB"
+               BuildableName = "Speedie"
+               BlueprintName = "Update"
                ReferencedContainer = "container:Speedie.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,12 +45,26 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AC7D3DDB29A2816700148ADB"
-            BuildableName = "Exec"
-            BlueprintName = "Exec"
+            BlueprintIdentifier = "AC6ADAE629872AA8009CFFBB"
+            BuildableName = "Speedie"
+            BlueprintName = "Update"
             ReferencedContainer = "container:Speedie.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "--self"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/usr/local/speedie/Perry.scproj"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--perry"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -62,9 +76,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AC7D3DDB29A2816700148ADB"
-            BuildableName = "Exec"
-            BlueprintName = "Exec"
+            BlueprintIdentifier = "AC6ADAE629872AA8009CFFBB"
+            BuildableName = "Speedie"
+            BlueprintName = "Update"
             ReferencedContainer = "container:Speedie.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

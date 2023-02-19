@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1150"
+   LastUpgradeVersion = "1420"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ACC4BA3A28BF423E00D26BCE"
-               BuildableName = "exec"
-               BlueprintName = "exec release"
+               BlueprintIdentifier = "AC7D3DAA29A280F200148ADB"
+               BuildableName = "exec debug"
+               BlueprintName = "exec debug"
                ReferencedContainer = "container:Speedie.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -40,16 +40,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ACC4BA3A28BF423E00D26BCE"
-            BuildableName = "exec"
-            BlueprintName = "exec release"
-            ReferencedContainer = "container:Speedie.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -57,16 +47,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ACC4BA3A28BF423E00D26BCE"
-            BuildableName = "exec"
-            BlueprintName = "exec release"
+            BlueprintIdentifier = "AC7D3DAA29A280F200148ADB"
+            BuildableName = "exec debug"
+            BlueprintName = "exec debug"
             ReferencedContainer = "container:Speedie.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

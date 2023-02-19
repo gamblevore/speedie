@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AC7D3DDB29A2816700148ADB"
-               BuildableName = "Exec"
-               BlueprintName = "Exec"
+               BlueprintIdentifier = "AC7D3D8129A280A700148ADB"
+               BuildableName = "uwu"
+               BlueprintName = "Direct Test"
                ReferencedContainer = "container:Speedie.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,9 +45,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AC7D3DDB29A2816700148ADB"
-            BuildableName = "Exec"
-            BlueprintName = "Exec"
+            BlueprintIdentifier = "AC7D3D8129A280A700148ADB"
+            BuildableName = "uwu"
+            BlueprintName = "Direct Test"
             ReferencedContainer = "container:Speedie.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,9 +62,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AC7D3DDB29A2816700148ADB"
-            BuildableName = "Exec"
-            BlueprintName = "Exec"
+            BlueprintIdentifier = "AC7D3D8129A280A700148ADB"
+            BuildableName = "uwu"
+            BlueprintName = "Direct Test"
             ReferencedContainer = "container:Speedie.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

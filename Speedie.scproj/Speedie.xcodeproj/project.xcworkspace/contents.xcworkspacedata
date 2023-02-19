@@ -2,13 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:">
+      location = "self:/usr/local/speedie/Speedie.scproj/Speedie.xcodeproj">
    </FileRef>
 </Workspace>
-
-<!--
-Workspace
-    version 1.0
-    FileRef "self:"
-
--->
