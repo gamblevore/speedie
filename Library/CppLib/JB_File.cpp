@@ -282,6 +282,8 @@ int InterWrite(int fd, uint8* buffer, int N) {
 
 
 // this function does what the C++ read function SHOULD do.
+// returns errno, and errno > 0
+// so when we set Error to -1 or -2, its clear that it is not a number from errno. basically, not an error.
 int InterRead (int fd, unsigned char* buffer, int N, JB_String* ErrorPath, int& Error, int Mode) {
     int Total = 0;
 	Error = 0;
@@ -498,20 +500,6 @@ int JB_File_Write( JB_File* self, JB_String* Data ) {
     return -1;
 }
 
-int JB_File_WriteCString( JB_File* self, const char* Data, int Sep ) {
-    if (!Data)
-		return 0;
-	if (JB_File_Open( self, O_RDWR | O_CREAT, false ) >= 0 ) {
-		int N = (int)JB_File_WriteRaw_(self, (u8*)Data, (int)strlen(Data));
-		byte Sep2 = (byte)Sep;
-		if (N > 0 and Sep >= 0 and JB_File_WriteRaw_(self, (u8*)"\n", 1) > 0)
-			N++;
-		return N;
-	}
-    return -1;
-}
-
-    
 
 void JB_File_Flush(JB_File* self) {
     if ( HasFD(self) )
@@ -700,7 +688,8 @@ int JB_File_Mode( JB_File* self ) {
 int JB_File_ModeSet( JB_File* self, int Mode ) {
     require (self);
 	auto C = (const char*)JB_FastFileThing(self);
-	return chmod(C, Mode);
+	int Err = chmod(C, Mode);
+	return (int)ErrorHandleStr_(Err, self, nil, "setting permissions");
 }
 
 
@@ -857,33 +846,36 @@ int JB_File_MoveTo(JB_File* self, JB_String* New) {
 int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	if (!self or !To)
 		return -1;
+	bool WasOpen = self->Descriptor > 2;
 	int output	= JB_File_OpenBlank(To);
 	if (output < 0)
 		return -1;
 
-	int result	= JB_File_OpenStart( self, false );
-	if (result > 0) {
-	#if defined(__APPLE__) || defined(__FreeBSD__)
-		int mode = AttrOnly ? COPYFILE_METADATA : COPYFILE_ALL;
-		result = fcopyfile(result, output, 0, mode);							// FreeBSD / OSX 
-	#else
-		puts("A");
-		int Err = JB_File_Delete(To);
-		puts("B");
-		if (Err) return Err;
-		puts("C");
-		off_t bytesCopied = 0;
-		struct stat fileinfo = {};
-		if (!AttrOnly) {
-			puts("D");
-			fstat(result, &fileinfo);
+	int input	= JB_File_OpenStart( self, false );
+#if 0//__PLATFORM_CURR__ == __PLATFORM_OSX__
+	int mode = AttrOnly ? COPYFILE_METADATA : COPYFILE_ALL;
+	int result = fcopyfile(input, output, 0, mode);							// FreeBSD / OSX 
+#else
+	int result = 0;
+	if (input > 0) {
+		while (true) {
+			u8 Block[64*1024];
+			int Err = 0;
+			result = InterRead(input, Block, 64*1024, self, Err, 0);
+			if (result <= 0) break;
+			if (JB_File_WriteRaw_(To, Block, result) <= 0)
+				break;
 		}
-		puts("E");
-		result = sendfile(output, result, &bytesCopied, fileinfo.st_size);	// Linux
-		puts("F");
-	#endif
+		JB_File_Close(To);
+		struct stat st;
+		if (Stat_(self, &st)) {
+			JB_File_ModeSet(To, st.st_mode);
+		}
 	}
+#endif
 	
+	if (!WasOpen)
+		JB_File_Close(self);
 	if (result)
 		JB_ErrorHandleFile(self, To, errno, nil,  "copying");
 	return result;

@@ -69,7 +69,6 @@ JB_String* JB_File__CWD( );
 long JB_File_Remaining( JB_File* self );
 int JB_File_Write( JB_File* self, JB_String* Data );
 s64 JB_File_WriteRaw_( JB_File* self, uint8* Data, int N );
-int JB_File_WriteCString( JB_File* self, const char* Data, int Sep );
 int JB_File_WriteCompressed_( JB_File* self, JB_String* str );
 
 int JB_File_OpenBlank( JB_File* self );
