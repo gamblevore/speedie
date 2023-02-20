@@ -41,11 +41,11 @@ function compiler.SetupEnv
 
 
 function compiler.PreTests
-	|| s = "Conf missing prefpath"
-	.pt(s, 0, 'C')
-	.pt(s, 1, 'o')
-	.pt(s, -2, 't')
-	.pt(s, -1, 'h')
+	|| s = "ZYXW"
+	.pt(s, 0,  'Z')
+	.pt(s, 1,  'Y')
+	.pt(s, -2, 'X')
+	.pt(s, -1, 'W')
 
 
 function compiler.pt (|string| s, |int| i, |byte| c)
