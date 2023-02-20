@@ -106,10 +106,10 @@ function PerryIDE.ActualCompile (|message| msg)
 	
 	c <~ .datewrap(msg)
 	(.buildbutton isnt enabled)
-	(.progress is visible) 
 	is active
 	if .Project.name ~= "Speedie.scproj"
-		.ShowStdOut(true)  
+		.ShowStdOut(true) 
+	.ViewAsCurr
 
 
 
