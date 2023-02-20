@@ -29,9 +29,8 @@ int JB_PointerSize() {
 
 
 int OutOfMemoryHappenedAlready;
-static bool TooLargeHappenedAlready;
 static int  TotalAllocObjs;  // malloc stats get confused with OUR stats...
-static int  TotalAllocBytes; // malloc-sonez could do this, or WE COULD OURSELVES
+static int  TotalAllocBytes; // malloc-zones could do this, or WE COULD OURSELVES
 							// just easier.
 
 
