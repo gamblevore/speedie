@@ -47,7 +47,7 @@ I could say "you usually only need a little code to do a lot" but most dynamic l
 
 I could say "well I have a GUI-system that is platform-independant"... except that the porting to other platforms isn't even done yet. Not much needed but SOMEONE needs to do it.
 
-I could say "Speedie is a language that accomplishes a lot from a very small code-base" which might be useful to embedded programmers... but then Speedie isn't ported to Linux yet.
+I could say "Speedie is a language that accomplishes a lot from a very small code-base" which might be useful to embedded programmers... but then Speedie is only partially supported on Linux.
 
 My language has a lot of good qualities but for each one, you can always find a reason why something else is better. Unfortunately that is because I am one person who has created a very large piece of work. Only extra developers contributing to Speedie can fix this.
 
@@ -87,13 +87,11 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 
 # Porting #
 
-Currently Speedie is compiling for MacOSX Intel and Apple Silicon (ARM).
+Currently Speedie fully works on MacOSX Intel and Apple Silicon (ARM). Linux Support is Partial. The compiler works, but the GUI does not work. There are probably small bugs on Linux that don't appear on OSX.
 
-It would be nice to have people help port Speedie to other platforms. Speedie only assumes Unix and C++. Speedie itself uses no Mac code, so it should be easy to compile. However even plain C++ unix shelltools usually need some porting effort.
+It would be nice to have people help port Speedie to other platforms. I need one small .m (OSX) file that uses SDL2 ported to Linux or Windows, about 100 lines of code.
 
-Perry (the IDE) uses one small .m (MacOSX) code file, and SDL2. So porting Perry will be a little harder. The .m file just does things like beeping (easy to port) and live-updating of the App's icon (just comment that out lol, we don't need it on other platforms). It really does almost nothing.
-
-If you've enjoyed porting software before, you should find porting Speedie, easy. Let me know if you want to port Speedie to Windows or Linux! In this case we'd be very eager for you to upload your work!
+Let me know if you want to port Speedie to Windows or Linux! In this case we'd be very eager for you to upload your work!
 
 # Sponsors #
 
