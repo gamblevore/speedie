@@ -78,10 +78,11 @@ module Flatten
 	function BuildPack 
 		fn_asm.inittable
 
-		target debug {
+		|| str = ("A", "B")(platform.IsDebug)
+		require str == "A"
 		|| list = .CollectFuncs("asm_test,asm_test_sub")		#require
 		#!debugger
-		.stampall(list)
+		.StampAll(list)
 		packtools.linkall(list)
 		|| args = {8725l, 275l}
 		|| mu   = list[0].asm
@@ -89,7 +90,6 @@ module Flatten
 			if result != 9000
 			
 			.StampAll(compiler.funclist)
-		}
 
 
 	function asm_test_add (|int| a, |int| b, |int|)
