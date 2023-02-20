@@ -867,13 +867,20 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 		int mode = AttrOnly ? COPYFILE_METADATA : COPYFILE_ALL;
 		result = fcopyfile(result, output, 0, mode);							// FreeBSD / OSX 
 	#else
+		puts("A");
 		int Err = JB_File_Delete(To);
+		puts("B");
 		if (Err) return Err;
+		puts("C");
 		off_t bytesCopied = 0;
 		struct stat fileinfo = {};
-		if (!AttrOnly)
+		if (!AttrOnly) {
+			puts("D");
 			fstat(result, &fileinfo);
+		}
+		puts("E");
 		result = sendfile(output, result, &bytesCopied, fileinfo.st_size);	// Linux
+		puts("F");
 	#endif
 	}
 	
