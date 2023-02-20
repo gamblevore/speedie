@@ -867,6 +867,8 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 		int mode = AttrOnly ? COPYFILE_METADATA : COPYFILE_ALL;
 		result = fcopyfile(result, output, 0, mode);							// FreeBSD / OSX 
 	#else
+		int Err = JB_File_Delete(To);
+		if (Err) return Err;
 		off_t bytesCopied = 0;
 		struct stat fileinfo = {};
 		if (!AttrOnly)
