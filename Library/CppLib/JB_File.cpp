@@ -870,7 +870,7 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 		off_t bytesCopied = 0;
 		struct stat fileinfo = {};
 		if (!AttrOnly)
-			fstat(input, &fileinfo);
+			fstat(result, &fileinfo);
 		result = sendfile(output, result, &bytesCopied, fileinfo.st_size);	// Linux
 	#endif
 	}
