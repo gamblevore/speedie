@@ -855,25 +855,23 @@ int JB_File_MoveTo(JB_File* self, JB_String* New) {
 
 // copy file properly!! keeps attrs!! :)
 int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
-	if (!self or !To) {
+	if (!self or !To)
 		return -1;
-	}
 	int output	= JB_File_OpenBlank(To);
-	if (output < 0) {
+	if (output < 0)
 		return -1;
-	}
-	int result	= -1;
+
 	int input	= JB_File_OpenStart( self, false );
 	if (input > 0) {
 	#if defined(__APPLE__) || defined(__FreeBSD__)
 		int mode = AttrOnly ? COPYFILE_METADATA : COPYFILE_ALL;
-		result = fcopyfile(input, output, 0, mode);							// FreeBSD / OSX 
+		int result = fcopyfile(input, output, 0, mode);							// FreeBSD / OSX 
 	#else
 		off_t bytesCopied = 0;
 		struct stat fileinfo = {};
 		if (!AttrOnly)
 			fstat(input, &fileinfo);
-		result = sendfile(output, input, &bytesCopied, fileinfo.st_size);	// Linux
+		int result = sendfile(output, input, &bytesCopied, fileinfo.st_size);	// Linux
 	#endif
 	}
 	
