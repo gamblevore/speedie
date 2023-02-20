@@ -2,7 +2,6 @@
 
 
 main // speedie main { 
-	"~/Downloads/a.b".file.copyto("~/Downloads/b.b".file)
 	compiler.Main
 
 
