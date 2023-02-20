@@ -861,17 +861,17 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	if (output < 0)
 		return -1;
 
-	int input	= JB_File_OpenStart( self, false );
-	if (input > 0) {
+	int result	= JB_File_OpenStart( self, false );
+	if (result > 0) {
 	#if defined(__APPLE__) || defined(__FreeBSD__)
 		int mode = AttrOnly ? COPYFILE_METADATA : COPYFILE_ALL;
-		int result = fcopyfile(input, output, 0, mode);							// FreeBSD / OSX 
+		result = fcopyfile(result, output, 0, mode);							// FreeBSD / OSX 
 	#else
 		off_t bytesCopied = 0;
 		struct stat fileinfo = {};
 		if (!AttrOnly)
 			fstat(input, &fileinfo);
-		int result = sendfile(output, input, &bytesCopied, fileinfo.st_size);	// Linux
+		result = sendfile(output, result, &bytesCopied, fileinfo.st_size);	// Linux
 	#endif
 	}
 	
