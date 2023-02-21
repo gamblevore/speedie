@@ -25,8 +25,6 @@ module Pipe
 	function ErrorIsTerminal (|bool|)
 		.IsTerminal(.StdErr_)
 		
-	//function PipeClosed (|int| FD, |bool|)
-		//cpp_wrapper JB_PipeIsClosed // implmented badly.
 	function KillPID (|int| pid, |int|)
 		cpp_wrapper JB_Kill
 	
