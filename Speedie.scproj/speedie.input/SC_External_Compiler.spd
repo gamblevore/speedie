@@ -438,20 +438,21 @@ function BackupCompiler (|bool|)
 	return stderr.ok
 
 
+function InstallOne (|file| test)
+	test.parent.MakeDir
+	|| f0 = test.Path.ReplacePathComponent(-2, "Build").file
+	ifn Test.matchFile( f0)
+		Test.Copyto(f0)
+
+
 function InstallCompiler
 	"Installing Speedie: $__time_id__"
 
 	.ProductPath.File.MoveTo( Compiler.Projects.child("Terminal/Speedie") )
 
-	|| CppTest = Cpp_Export.CppProduct
-	|| HTest = Cpp_Export.HProduct
-	|| Cpp0 = CppTest.Path.ReplacePathComponent(-2, "Build").file
-	|| H0 = HTest.Path.ReplacePathComponent(-2, "Build").file
-	Cpp0.Parent.MakeDir
-	ifn CppTest.matchFile( Cpp0)
-		CppTest.Copyto(Cpp0)
-	ifn HTest.matchFile( H0)
-		HTest.Copyto(H0)
+	.InstallOne Cpp_Export.CppProduct
+	.InstallOne Cpp_Export.HProduct
+	.InstallOne Cpp_Export.HProduct.Sibling("JB_Globals.cpp")
 	
 	if options.Makelib
 		.MakeLib
