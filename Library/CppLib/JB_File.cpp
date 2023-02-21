@@ -851,29 +851,27 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	if (output < 0)
 		return -1;
 
-	int input	= JB_File_OpenStart( self, false );
-#if 0//__PLATFORM_CURR__ == __PLATFORM_OSX__
-	int mode = AttrOnly ? COPYFILE_METADATA : COPYFILE_ALL;
-	int result = fcopyfile(input, output, 0, mode);							// FreeBSD / OSX 
-#else
+	struct stat st;
+	if (Stat_(self, &st)) {
+		JB_File_ModeSet(To, st.st_mode);
+	}
+
 	int result = 0;
-	if (input > 0) {
-		while (true) {
-			u8 Block[64*1024];
-			int Err = 0;
-			result = InterRead(input, Block, 64*1024, self, Err, 0);
-			if (result <= 0) break;
-			if (JB_File_WriteRaw_(To, Block, result) <= 0)
-				break;
-		}
-		JB_File_Close(To);
-		struct stat st;
-		if (Stat_(self, &st)) {
-			JB_File_ModeSet(To, st.st_mode);
+	if (!AttrOnly) {
+		int input	= JB_File_OpenStart( self, false );
+		if (input > 0) {
+			while (true) {
+				u8 Block[64*1024];
+				int Err = 0;
+				result = InterRead(input, Block, 64*1024, self, Err, 0);
+				if (result <= 0) break;
+				if (JB_File_WriteRaw_(To, Block, result) <= 0)
+					break;
+			}
 		}
 	}
-#endif
-	
+
+	JB_File_Close(To);
 	if (!WasOpen)
 		JB_File_Close(self);
 	if (result)
