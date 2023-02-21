@@ -449,11 +449,9 @@ function InstallCompiler
 	|| H0 = HTest.Path.ReplacePathComponent(-2, "Build").file
 	Cpp0.Parent.MakeDir
 	ifn CppTest.matchFile( Cpp0)
-		if !CppTest.Copyto(Cpp0)
-			"failed to copy .cpp back"
+		CppTest.Copyto(Cpp0)
 	ifn HTest.matchFile( H0)
-		if !HTest.Copyto(H0)
-			"failed to copy .h back"
+		HTest.Copyto(H0)
 	
 	if options.Makelib
 		.MakeLib
