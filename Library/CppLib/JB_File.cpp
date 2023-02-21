@@ -843,37 +843,44 @@ int JB_File_MoveTo(JB_File* self, JB_String* New) {
 
 
 // copy file properly!! keeps attrs!! :)
+int CopyStats_(JB_File* self, JB_File* To) {
+	struct stat st;
+	if (Stat_(self, &st)) {
+		return JB_File_ModeSet(To, st.st_mode);
+	}
+	return 0;
+}
+
 int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	if (!self or !To)
 		return -1;
+	if (AttrOnly)
+		return CopyStats_(self, To);
 	bool WasOpen = self->Descriptor > 2;
 	int output	= JB_File_OpenBlank(To);
 	if (output < 0)
 		return -1;
 
-	struct stat st;
-	if (Stat_(self, &st)) {
-		JB_File_ModeSet(To, st.st_mode);
-	}
-
 	int result = 0;
-	if (!AttrOnly) {
-		int input	= JB_File_OpenStart( self, false );
-		if (input > 0) {
-			while (true) {
-				u8 Block[64*1024];
-				int Err = 0;
-				result = InterRead(input, Block, 64*1024, self, Err, 0);
-				if (result <= 0) break;
-				if (JB_File_WriteRaw_(To, Block, result) <= 0)
-					break;
-			}
+	int input	= JB_File_OpenStart( self, false );
+	if (input > 0) {
+		int ChunkSize = 4*1024;
+		u8 TotalBlock[ChunkSize*2];
+		u8* Block = (u8*)(((IntPtr)(TotalBlock + ChunkSize))&~(ChunkSize-1)); 
+		// align to ChunkSize, for speed
+		while (true) {
+			int Err = 0;
+			result = InterRead(input, Block, ChunkSize, self, Err, 0);
+			if (result <= 0) break;
+			if (JB_File_WriteRaw_(To, Block, result) <= 0)
+				break;
 		}
 	}
 
 	JB_File_Close(To);
 	if (!WasOpen)
 		JB_File_Close(self);
+	CopyStats_(self, To);
 	if (result)
 		JB_ErrorHandleFile(self, To, errno, nil,  "copying");
 	return result;
