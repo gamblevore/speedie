@@ -622,7 +622,6 @@ construct_BWT(const sauchar_t *T, saidx_t *SA,
 
 saint_t
 divsufsort(const sauchar_t *T, saidx_t *SA, saidx_t n) {
-  saidx_t *bucket_A, *bucket_B;
   saidx_t m;
   saint_t err = 0;
 
@@ -632,8 +631,8 @@ divsufsort(const sauchar_t *T, saidx_t *SA, saidx_t n) {
   else if(n == 1) { SA[0] = 0; return 0; }
   else if(n == 2) { m = (T[0] < T[1]); SA[m ^ 1] = 0, SA[m] = 1; return 0; }
 
-  bucket_A = (saidx_t *)malloc(BUCKET_A_SIZE * sizeof(saidx_t));
-  bucket_B = (saidx_t *)malloc(BUCKET_B_SIZE * sizeof(saidx_t));
+  static auto bucket_A = (saidx_t *)malloc(BUCKET_A_SIZE * sizeof(saidx_t));
+  static auto bucket_B = (saidx_t *)malloc(BUCKET_B_SIZE * sizeof(saidx_t));
 
   /* Suffixsort. */
   if((bucket_A != NULL) && (bucket_B != NULL)) {
@@ -642,9 +641,6 @@ divsufsort(const sauchar_t *T, saidx_t *SA, saidx_t n) {
   } else {
     err = -2;
   }
-
-  free(bucket_B);
-  free(bucket_A);
 
   return err;
 }

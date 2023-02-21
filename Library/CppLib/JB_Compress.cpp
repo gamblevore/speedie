@@ -1,70 +1,22 @@
 
 #include "JB_Compress.h"
+#include "divsufsort.h"
 
 
 #define kExtend 0x70
-#pragma GCC optimize O3
 
-bool CompSorter (int _a, int _b, const u8* x) {
-	auto va		= x - _a;
-	auto vb		= x - _b;
-	// shouldn't n be 128? considering we don't sort the last?
-	// might optimise better...
-	int n		= min(min(_a, _b), 128);
-
-	u64* a = (u64*)va;
-	u64* b = (u64*)vb;
-	const u64* aEnd = a + n/8;
-	while (a < aEnd) {
-		u64 A = u64Sortable(*a++);
-		u64 B = u64Sortable(*b++);
-		if (A < B)
-			return true;
-		  else if (B < A)
-			return false;
-	};
-	bool Result = a>=b;
-	return Result; // true == A < B.
-}
-#pragma GCC reset_options
-
-
-
-typedef bool (*IntSorterComparer)(int a, int b, const u8* State);
-
-int CmpSortABit(int* array, int j, int high, const u8* State) {
-    auto pivot = array[high];
-    while (CompSorter(array[j++], pivot, State)) // no need swap
-		if (j >= high)
-			return j;
-	int i = j-2;
-    while (j < high) {
-        if (CompSorter(array[j], pivot, State))
-            std::swap(array[++i], array[j]);
-		j++;
-	}
-	std::swap(array[++i], array[high]);
-	return i;
-}
-
-void CmpQuickSort(int* array, int start, int end, const u8* State) {
-    require0 (start < end);
-    int p = CmpSortABit(	 array, start, end,   State);
-    CmpQuickSort(			 array, start, p - 1, State);
-    CmpQuickSort(			 array, p + 1, end,   State);
-}
 
 
 
 struct CompState : FastBuff {
 	int					LastOut;
-	int*				EndGaps;
+	int*				Suffixes;
 	int*				SortPositionAtByte;	
 	int					B;
 	
 	
 	bool TestOneCost (u8* Find,  u8* E,  int G,  MatchFound& Best, int Esc) {
-		int N		= EndGaps[G];
+		int N		= Suffixes[G];
 		u8* Text	= E - N;
 		N			= (Text < Find) ? (int)(E-Find) : 2; // we just want to know if any good ones remain.
 		int i		= 0;
@@ -115,18 +67,15 @@ struct CompState : FastBuff {
 
 	u8* Detect () {
 		int n		= Expected;
-		int* R0		= EndGaps; 
+		int* R0		= Suffixes; 
 		int* SP		= SortPositionAtByte;
-		for_ (n)
-			R0[i] = n - i;
-	
-		CmpQuickSort(R0, 0, n-(mUnitSize+1), Read + n);
+		divsufsort(Read, R0, n);
+		for_(n)	{				// code is simple, but concept is confusing.
+			SP[R0[i]] = i;
+			R0[i] = n - R0[i];
+		}
 
-		for_(n)					// code is simple, but concept is confusing.
-			SP[n - R0[i]] = i;	// each byte, gets told it's position in R0 (endgaps)
-								// just look up SP[byte] and you get the position in SortArray for that byte.
-
-		bool print_sorted_array = false; // debug it
+		bool print_sorted_array = 0; // debug it
 		if (print_sorted_array) for_(n) {
 			auto pos = (Read+n)-R0[i];
 			for (int j = 0; j < 32; j++) {
@@ -170,7 +119,7 @@ struct CompState : FastBuff {
 	}
 
 	inline void WriteStr (const void* B, int N) {
-		(u8*)CopyBytes(B, Write, N)
+		(CopyBytes(B, Write, N));
 		Write+=N;
 	}
 
@@ -233,7 +182,7 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 
 	if (CB > C.B) {
 		C.B = CB;
-		C.EndGaps				= (int*)realloc(C.EndGaps,				2*ChunkLength*sizeof(int)); // dict
+		C.Suffixes				= (int*)realloc(C.Suffixes,	2*ChunkLength*sizeof(int)); // dict
 		C.SortPositionAtByte	= (int*)realloc(C.SortPositionAtByte,	ChunkLength*sizeof(int));
 	}
 
