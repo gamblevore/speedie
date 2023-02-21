@@ -12,19 +12,19 @@
 * Works natively with Jeebox... Probably the best way to learn how to use Jeebox.
 * Simple but powerful syntax.
 * A lot of syntactic sugar, while still being tasteful.
-* Can make cross-platform command-line apps or GUI apps.
-* IPC lets you communicate and spread work across multiple processes.
+* Cross-platform. Create shell tools and GUI apps
+* Easy communication across multiple processes (IPC).
 * Has a native IDE “Perry”. Created to combine power + simplicity.
 * Use one language, thats great at multiple areas:
     * Fast at heavy-duty data-processing
     * Making tools with few lines of code
     * Writing large well-structured programs
     * Cross-platform code, even with GUI
-
+* Not controlled by big-tech.
 
 Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D I did delete most of the rude comments before release, but still... dont expect "corporate professionalism".
 
-If you'd like to financially support the ongoing development of Speedie, consider [sponsoring its author through GitHub](https://github.com/sponsors/gamblevore).
+If you'd like to financially support the ongoing development of Speedie, consider [sponsoring through GitHub](https://github.com/sponsors/gamblevore).
 
 Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't NEED C++, but being able to is a great property to have, so that property will remain.
 
