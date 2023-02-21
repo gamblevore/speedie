@@ -12,7 +12,7 @@
 #endif
 
 extern "C" {
-#define CopyBytes(s0, d, Length) memcpy((void*)(d), (void*)(s0), (unsigned int)(Length));
+#define CopyBytes(s0, d, Length) memcpy((void*)(d), (void*)(s0), (unsigned int)(Length))
 
 struct JB_Object;
 
