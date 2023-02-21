@@ -81,7 +81,8 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 # Installation #
 
 1. Download/Clone repo, and place at `/usr/local/speedie`
-2. Execute this shell command `sudo /usr/local/speedie/Terminal/make.sh`
+2. `cd /usr/local/speedie`
+3. Execute `sudo Terminal/makelinux.sh` ... OR `sudo Terminal/makeosx.sh`
 
 
 
