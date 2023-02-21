@@ -6,7 +6,6 @@ main // speedie main {
 
 
 function Compiler.Main
-	.PreTests
 	.SetupEnv
 	if .EnterCompile
 		.CompileTime
@@ -38,20 +37,6 @@ function compiler.SetupEnv
 
 	app.PrefsInit
 	errorcolors.DisableIfNoTerminal
-
-
-function compiler.PreTests
-	|| s = "ZYXW"
-	.pt(s, 0,  'Z')
-	.pt(s, 1,  'Y')
-	.pt(s, -2, 'X')
-	.pt(s, -1, 'W')
-
-
-function compiler.pt (|string| s, |int| i, |byte| c)
-	require StdErr.ok
-	if s[i] != C
-		"Strings seem corrupted"
 
 
 function app.IgnoreSig (|int| sig=-1)
