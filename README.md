@@ -30,6 +30,7 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 
 # Read More #
 * [Language Guide](Documentation/LanguageGuide.md)
+* [Speedie-isms](Documentation/isms.md)
 * [XML Comparison](Documentation/xml.md)
 * [Message (Jeebox)](Documentation/Message.md)
 * [Strings](Documentation/Strings.md)
