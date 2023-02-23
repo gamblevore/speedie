@@ -52,21 +52,6 @@ const char** JB_BackTrace(void** space, int* size) {
 }
 
 
-void JB_Rec__CrashLog(const char* c);
-
-void JB_PrintStackTrace() {
-    int   size = 32;
-    void* array[size];
-    auto  strings = JB_BackTrace(array, &size);
-
-    for_(size) {
-        JB_Rec__CrashLog(strings[i]);
-	}
-    
-	JB_Rec__CrashLog("");    
-    free( strings );
-}
-
 
 JB_String* JB_App__Readline() {
     std::string L;
