@@ -292,7 +292,7 @@ class Process
 		return self <~ (@sstr.msg(str), TimeOut)
 			
 	
-	function SendSub (|message| msg)
+	helper SendSub (|message| msg)
 		|| p = .SendQueue.pop
 			.ours.queued -= (msg==nil)
 			.SendQueue.first = msg
@@ -552,6 +552,10 @@ class Process
 		|| j = .writer
 		process.StackTraceJbin(j, "crashed", 4)
 		.WriteSub
+		if .WaitFor(5s, true) // wait for the thing to be sent!
+			"CrashSent"
+		  else
+			"CrashUnReceived"
 
 
 	iterator

@@ -299,14 +299,14 @@ class PerryIDE (Window)
 		if (c!=nil)
 			if !c.Alive
 				if c is dead
-					.CrashedFB(c)
+					.CrashedFB(c, "Process found dead.")
 				c.Disconnect
 			  elseif (c.closed)
 				.CancelCompile
 		c = .feedback
 		if c != nil and C is dead
 			(C is invalid)
-			.CrashedFB(c)
+			.CrashedFB(c, "Process found dead.")
 
 
 	behaviour FrameUpdate
