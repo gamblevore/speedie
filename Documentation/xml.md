@@ -239,5 +239,7 @@ When you need to do more complex things... jeebox is still there for you. If you
 
 Or five different parsers. One for XML, another for JSON, another for C++, another for python, another for SQL, etc etc. Each of which can weigh from 200K to 1MB.
 
+Also, if you really have a low-lines-of-code project that you "just want to work fast" and don't care about user-niceities... you can just use jbin, which parses in less lines of code than any other format I've seen :)
+
 Jeebox makes everything simpler.
 
