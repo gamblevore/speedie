@@ -5,8 +5,6 @@
 
 #include "JB_Umbrella.hpp"
 #include <stdio.h>
-
-#ifndef AS_LIBRARY
 #include <unistd.h>
 #include <syslog.h>
 #include <execinfo.h>
@@ -16,11 +14,18 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+
+extern "C" const char** JB_BackTrace(void** space, int* size) {
+    *size = backtrace( space, *size );
+    return (const char**)backtrace_symbols( space, *size );
+}
+
+
+#ifndef AS_LIBRARY
 #include <string>
 #include <iostream>
-
-
 #define KillZombs 1
+
 
 extern "C" {
 const int RD = 0; const int WR = 1;
@@ -44,13 +49,6 @@ int JB_App__LostChild () {
     }
     return -1;
 }
-
-
-const char** JB_BackTrace(void** space, int* size) {
-    *size = backtrace( space, *size );
-    return (const char**)backtrace_symbols( space, *size );
-}
-
 
 
 JB_String* JB_App__Readline() {
