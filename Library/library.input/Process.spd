@@ -627,13 +627,14 @@ class Process
 				f.release
 				f.close
 				
-		target !minilib: helper TellParentIDied
-			opt norefcounts
-			visible
-			cpp_name JB__ProcessReportCrash
-			|| o = self.owner_
-				o.ours.state = o.ours.state|int| max ipcstate.Crashed
-				o.SendCrashed
+		target !minilib
+			helper TellParentIDied
+				opt norefcounts
+				visible
+				cpp_name JB__ProcessReportCrash
+				|| o = self.owner_
+					o.ours.state = o.ours.state|int| max ipcstate.Crashed
+					o.SendCrashed
 		
 
 function file.IPC (|&int| n, |_voidptr|)
