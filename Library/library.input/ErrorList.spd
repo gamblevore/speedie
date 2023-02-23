@@ -54,11 +54,13 @@ class ErrorList
 		
 	
 	syntax append (|Error| Err)
-		|| CanPrint = !.errorcount and error.autoprint
+		|| CanPrint = !.ErrorCount and error.autoprint
 		.incr(err)
 		require .CanAddMore(err.severity)
 		
 		err.path := .source
+		if Error.KeepTraceStack
+			err.StackTrace := app.StackTrace
 		(.LogFunc)(self, err.render)?
 		if CanPrint and err.needsprint
 			printline err.render

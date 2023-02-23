@@ -13,6 +13,7 @@ class Error (Message)
 	
 	|String|				Path
 	|String|				OriginalData
+	|[String]|				StackTrace
 	|message|				Node
 	|date|					When
 	|ErrorSeverity|			Severity
@@ -134,6 +135,8 @@ class Error (Message)
 			fs.field( "pos", .position )
 		fs.field( "file", .path )
 		fs.field( "severity", .severity )
+		if .StackTrace
+			fs.field( "stack_string", .StackTrace.render )
 		fs <~ "\n"
 		fs.indent-- 
 
@@ -156,7 +159,8 @@ class Error (Message)
 
 
 	module
-		|| AutoPrint = 0 // errorflags.PrintAndRemove
+		|byte| AutoPrint = 0 // errorflags.PrintAndRemove
+		|bool| KeepTraceStack = false
 
 
 

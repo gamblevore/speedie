@@ -405,11 +405,11 @@ class String
 		function Own (|cstring| addr,  |int| n, |string|)
 			cpp_wrapper JB_FreeableString
 		function Copy (|&byte| addr,  |int| n, |string|)
-			cpp_part NewCopy
-			rz = new(n)
-			if rz
-				memory.copy(rz.addr, addr, n)
+			cpp_wrapper JB_Str_CopyFromPtr
 		
+		function Copy (|cstring| str, |string|)
+			cpp_wrapper JB_Str_CopyFromCString
+
 		function Hex (|int64| i, |string|)
 			|| fs = faststring()
 			fs.AppendHex(i)
@@ -417,7 +417,7 @@ class String
 		
 		function FromPtr (|_voidptr| Addr, |int| N, |_voidptr|free=nil, |_voidptr| obj=nil, |string|)
 			cpp_wrapper JB_StrFromPtr
-
+		
 		function FromC (|cstring| Addr, |string|)
 			return stringzeroterminated(addr)
 
