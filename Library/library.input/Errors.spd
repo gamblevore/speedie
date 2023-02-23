@@ -136,7 +136,11 @@ class Error (Message)
 		fs.field( "file", .path )
 		fs.field( "severity", .severity )
 		if .StackTrace
-			fs.field( "stack_string", .StackTrace.render )
+			fs.field( "stack", "" )
+			fs.indent++
+			for fn.lines in .stacktrace
+				fs.field( "fn", fn )
+			fs.indent--
 		fs <~ "\n"
 		fs.indent-- 
 
