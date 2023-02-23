@@ -57,8 +57,8 @@ int64 JB_App__ObjMemory() {
 	return JB_MemCount();
 }
 
-Array* JB_App__StackTrace() {
-	Array* rz = JB_Incr(((Array*)JB_Array__New0()));
+JB_String* JB_App__StackTrace(FastString* fs_in) {
+	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
 	_voidptr arr[128] = {
 	};
 	int size = 128;
@@ -66,15 +66,17 @@ Array* JB_App__StackTrace() {
 	{
 		int i = 0;
 		while (i < size) {
-			JB_String* _tmPf1 = JB_Incr(JB_Str_CopyFromCString(strs[i]));
-			JB_Array_SyntaxAppend(rz, _tmPf1);
-			JB_Decr(_tmPf1);
+			JB_FS_AppendCString(fs, strs[i]);
+			JB_FS_AppendByte(fs, '\n');
 			i++;
 		};
 	}
 	;
-	JB_SafeDecr(rz);
-	return rz;
+	JB_free(strs);
+	JB_String* _tmPf1 = JB_Incr(JB_FS_SmartResult(fs, fs_in));
+	JB_Decr(fs);
+	JB_SafeDecr(_tmPf1);
+	return _tmPf1;
 }
 
 
@@ -3489,8 +3491,8 @@ void JB_Rec_SyntaxAppend(JB_ErrorReceiver* self, JB_Error* Err) {
 		JB_SetRef(Err->Path, self->Source);
 	}
 	if (JB__Err_KeepTraceStack) {
-		if ((!(JB_Array_SyntaxCast(Err->StackTrace)))) {
-			JB_SetRef(Err->StackTrace, JB_App__StackTrace());
+		if ((!(JB_Str_Exists(Err->StackTrace)))) {
+			JB_SetRef(Err->StackTrace, JB_App__StackTrace(nil));
 		}
 	}
 	{
@@ -6415,7 +6417,7 @@ bool JB_Msg__TreeCompare(Message* orig, Message* reparse, bool PrintIfSame) {
 
 void JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path) {
 	JB_Msg_ConstructorBasic(self);
-	Array* _tmPf0 = JB_Array__New0();
+	JB_String* _tmPf0 = JB_LUB[0];
 	self->StackTrace = JB_Incr(_tmPf0);
 	self->ErrorFlags = 0;
 	self->Position = -1;
@@ -6538,8 +6540,8 @@ JB_String* JB_Err_render(JB_Error* self, FastString* fs_in) {
 	}
 	JB_FS_AppendInfo(fs, JB_LUB[225], self->Path);
 	JB_FS_AppendInfoNum(fs, JB_LUB[338], self->Severity);
-	if (JB_Array_SyntaxCast(self->StackTrace)) {
-		JB_String* _tmPf0 = JB_Incr(JB_Array_Render(self->StackTrace, nil));
+	if (JB_Str_Exists(self->StackTrace)) {
+		JB_String* _tmPf0 = JB_Incr(JB_ObjRender(self->StackTrace, nil));
 		JB_FS_AppendInfo(fs, JB_LUB[339], _tmPf0);
 		JB_Decr(_tmPf0);
 	}
@@ -6971,7 +6973,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023022313);
+	return (2023022314);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
@@ -6983,4 +6985,4 @@ __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 6565725007342036 6323533780859436 2187904101035424
+// 6565725007342036 -715030692868465 2187904101035424

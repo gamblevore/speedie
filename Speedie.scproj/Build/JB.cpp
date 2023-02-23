@@ -262,8 +262,8 @@ void JB_App__SavePrefs() {
 	}
 }
 
-Array* JB_App__StackTrace() {
-	Array* rz = JB_Incr(((Array*)JB_Array__New0()));
+JB_String* JB_App__StackTrace(FastString* fs_in) {
+	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
 	_voidptr arr[128] = {
 	};
 	int size = 128;
@@ -271,15 +271,17 @@ Array* JB_App__StackTrace() {
 	{
 		int i = 0;
 		while (i < size) {
-			JB_String* _tmPf1 = JB_Incr(JB_Str_CopyFromCString(strs[i]));
-			JB_Array_SyntaxAppend(rz, _tmPf1);
-			JB_Decr(_tmPf1);
+			JB_FS_AppendCString(fs, strs[i]);
+			JB_FS_AppendByte(fs, '\n');
 			i++;
 		};
 	}
 	;
-	JB_SafeDecr(rz);
-	return rz;
+	JB_free(strs);
+	JB_String* _tmPf1 = JB_Incr(JB_FS_SmartResult(fs, fs_in));
+	JB_Decr(fs);
+	JB_SafeDecr(_tmPf1);
+	return _tmPf1;
 }
 
 JB_String* JB_App__ArgValue(JB_String* name) {
@@ -3108,7 +3110,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[228]);
-	JB_FS_AppendInt32(_fsf0, (2023022313));
+	JB_FS_AppendInt32(_fsf0, (2023022314));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -4158,7 +4160,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[308]);
-	JB_FS_AppendInt32(_fsf0, (2023022313));
+	JB_FS_AppendInt32(_fsf0, (2023022314));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -19012,8 +19014,8 @@ void JB_Rec_SyntaxAppend(JB_ErrorReceiver* self, JB_Error* Err) {
 		JB_SetRef(Err->Path, self->Source);
 	}
 	if (JB__Err_KeepTraceStack) {
-		if ((!(JB_Array_SyntaxCast(Err->StackTrace)))) {
-			JB_SetRef(Err->StackTrace, JB_App__StackTrace());
+		if ((!(JB_Str_Exists(Err->StackTrace)))) {
+			JB_SetRef(Err->StackTrace, JB_App__StackTrace(nil));
 		}
 	}
 	{
@@ -20089,7 +20091,9 @@ void JB_Proc__StackTraceJbin(FastString* j, JB_String* reason, int skip) {
 			JB_bin_AddCstring(j, strs[i], JB_SyxEmb);
 			_LoopSrcf0[0] = (_LoopSrcf0[0] + 1);
 		};
-	};
+	}
+	;
+	JB_free(strs);
 }
 
 void JB__ProcessReportCrash() {
@@ -42985,7 +42989,7 @@ bool JB_config_Save(Message* self) {
 
 void JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path) {
 	JB_Msg_ConstructorBasic(self);
-	Array* _tmPf0 = JB_Array__New0();
+	JB_String* _tmPf0 = JB_LUB[0];
 	self->StackTrace = JB_Incr(_tmPf0);
 	self->ErrorFlags = 0;
 	self->Position = -1;
@@ -43130,8 +43134,8 @@ JB_String* JB_Err_render(JB_Error* self, FastString* fs_in) {
 	}
 	JB_FS_AppendInfo(fs, JB_LUB[759], self->Path);
 	JB_FS_AppendInfoNum(fs, JB_LUB[1782], self->Severity);
-	if (JB_Array_SyntaxCast(self->StackTrace)) {
-		JB_String* _tmPf0 = JB_Incr(JB_Array_Render(self->StackTrace, nil));
+	if (JB_Str_Exists(self->StackTrace)) {
+		JB_String* _tmPf0 = JB_Incr(JB_ObjRender(self->StackTrace, nil));
 		JB_FS_AppendInfo(fs, JB_LUB[1783], _tmPf0);
 		JB_Decr(_tmPf0);
 	}
@@ -43420,4 +43424,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 1673658055047373 -152709604608974
+// 1385854204513581 -152709604608974

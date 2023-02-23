@@ -430,7 +430,7 @@ struct Error_Behaviour: Message_Behaviour {
 JBClass ( JB_Error , Message , 
 	JB_String* Path;
 	JB_String* OriginalData;
-	Array* StackTrace;
+	JB_String* StackTrace;
 	Message* Node;
 	Date When;
 	ErrorSeverity Severity;
@@ -747,7 +747,7 @@ int JB_Main();
 
 int64 JB_App__ObjMemory();
 
-Array* JB_App__StackTrace();
+JB_String* JB_App__StackTrace(FastString* fs_in);
 
 
 
