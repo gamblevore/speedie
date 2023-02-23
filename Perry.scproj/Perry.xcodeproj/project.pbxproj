@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		AC150E6729671B800071AE42 /* JB_Network.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC150E6629671B800071AE42 /* JB_Network.cpp */; };
 		AC150E6829671B800071AE42 /* JB_Network.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC150E6629671B800071AE42 /* JB_Network.cpp */; };
+		AC15C8EE29A7852100468248 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */; };
+		AC15C8EF29A7852100468248 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */; };
+		AC15C8F029A7852100468248 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */; };
 		AC259FB32660E1AC0026C303 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC259FAD2660E1AC0026C303 /* Assets.xcassets */; };
 		AC52897A2961F3FB005EFB9D /* JB_Umbrella.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */; };
 		AC528A5C2961F536005EFB9D /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528A5A2961F536005EFB9D /* JB_Globals.cpp */; };
@@ -174,6 +177,7 @@
 /* Begin PBXFileReference section */
 		AC0F6154233BA87000382DA7 /* Jeebox.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Jeebox.input; path = ../jeebox.scproj/Jeebox.input; sourceTree = "<group>"; };
 		AC150E6629671B800071AE42 /* JB_Network.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Network.cpp; path = Cpp/JB_Network.cpp; sourceTree = "<group>"; };
+		AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DivSufSort.cpp; path = ../Library/CppLib/JB_DivSufSort.cpp; sourceTree = "<group>"; };
 		AC259FAC2660E1AC0026C303 /* Multiplay.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Multiplay.entitlements; sourceTree = "<group>"; };
 		AC259FAD2660E1AC0026C303 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AC259FB22660E1AC0026C303 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -340,6 +344,7 @@
 				AC528A5A2961F536005EFB9D /* JB_Globals.cpp */,
 				AC528A5B2961F536005EFB9D /* JB.cpp */,
 				AC528E962961F99F005EFB9D /* JB_Alloc.cpp */,
+				AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */,
 				AC528E822961F99D005EFB9D /* JB_BasicIO.cpp */,
 				AC528E892961F99E005EFB9D /* JB_ByteMap.cpp */,
 				AC528E902961F99E005EFB9D /* JB_Child.cpp */,
@@ -606,6 +611,7 @@
 				AC528EFB2961F9B4005EFB9D /* JB_Child.cpp in Sources */,
 				AC528EDB2961F9B4005EFB9D /* JB_Alloc.cpp in Sources */,
 				AC528F052961F9B4005EFB9D /* JB_PNG.cpp in Sources */,
+				AC15C8EE29A7852100468248 /* JB_DivSufSort.cpp in Sources */,
 				AC528EEB2961F9B4005EFB9D /* JB_LibraryFile.cpp in Sources */,
 				AC150E6729671B800071AE42 /* JB_Network.cpp in Sources */,
 				AC528F0F2961F9B4005EFB9D /* JB_Compress.cpp in Sources */,
@@ -632,6 +638,7 @@
 				AC528EB32961F99F005EFB9D /* JB_Alloc.cpp in Sources */,
 				AC528EB82961F9A0005EFB9D /* JB_MSR.cpp in Sources */,
 				AC528EB12961F99F005EFB9D /* JB_VM.cpp in Sources */,
+				AC15C8F029A7852100468248 /* JB_DivSufSort.cpp in Sources */,
 				AC528EA52961F99F005EFB9D /* JB_Vectors.cpp in Sources */,
 				AC528EA42961F99F005EFB9D /* JB_String.cpp in Sources */,
 				AC528EA72961F99F005EFB9D /* JB_Date.cpp in Sources */,
@@ -683,6 +690,7 @@
 				AC528EFC2961F9B4005EFB9D /* JB_Child.cpp in Sources */,
 				AC528EDC2961F9B4005EFB9D /* JB_Alloc.cpp in Sources */,
 				AC528F062961F9B4005EFB9D /* JB_PNG.cpp in Sources */,
+				AC15C8EF29A7852100468248 /* JB_DivSufSort.cpp in Sources */,
 				AC528EEC2961F9B4005EFB9D /* JB_LibraryFile.cpp in Sources */,
 				AC150E6829671B800071AE42 /* JB_Network.cpp in Sources */,
 				AC528F102961F9B4005EFB9D /* JB_Compress.cpp in Sources */,
