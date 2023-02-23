@@ -372,7 +372,7 @@ function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, t
 
 	.Cleanup <~ Test2
 	.Cleanup <~ Test3
-	.Cleanup <~ Cpp3.Parent
+//	.Cleanup <~ Cpp3.Parent
 	
 // OldSpeedie has compiled SpeedyTest, at Test1. It is different.
 	.saytest(1)
