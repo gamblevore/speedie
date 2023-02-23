@@ -135,17 +135,13 @@ int JB_SafeWait (int pid) {
 }
 
 bool CanASMBKPT = true;
-int JB_Pipe__Ignore (int Signal) {
-	if (Signal == -1) {
-		Signal = SIGINT;
-		CanASMBKPT = false;
-	}
-	int rz = sigignore(Signal);	//(SIGINT)
+int JB_Pipe__IgnoreBreakPoints() {
+	CanASMBKPT = false;
+	int rz = sigignore(SIGINT);
 	if (rz)
 		rz = errno;
 	debugger;
 	return rz;
-		// OK... 
 }
 
 const char* ArrayCStrOne_(JB_String* S, int& ugh) {

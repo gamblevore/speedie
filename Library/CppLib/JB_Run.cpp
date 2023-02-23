@@ -129,6 +129,7 @@ void JB_Str__LoadGlobals2() {
 	};
 }
 
+
 int JB_LibInit (_cstring* R) {
 	JB_ErrorNumber = 0;
 
@@ -140,7 +141,8 @@ int JB_LibInit (_cstring* R) {
 	if (R) {
 		App_CalledBy = *R;
 		#ifndef AS_LIBRARY
-			JB_App__CrashInstall(JB__DefaultCrashHandler);
+			void JB_App__CrashInstall();
+			JB_App__CrashInstall();
 		#endif
 	}
 	App_Args = JB_Incr(JB_Str_ArgV(R));	// allow caller to remove their c-string data.

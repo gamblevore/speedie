@@ -1,6 +1,5 @@
 
 
-
 main // speedie main { 
 	compiler.Main
 
@@ -32,15 +31,14 @@ function compiler.SetupEnv
 	
 	check (app.pref_path) "Conf missing prefpath"
 	if app..talk and app.IsMainThread
-		app.IgnoreSig
-		app.CrashHandler = &process.TellParentIDied
+		app.IgnoreBreakPoints
 
 	app.PrefsInit
 	errorcolors.DisableIfNoTerminal
 
 
-function app.IgnoreSig (|int| sig=-1)
-	cpp_wrapper JB_Pipe__Ignore
+function app.IgnoreBreakPoints
+	cpp_wrapper JB_Pipe__IgnoreBreakPoints
 
 
 api Speedie_Main (|&cstring| args, |int| Mode, |ErrorInt|)

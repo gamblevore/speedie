@@ -623,16 +623,15 @@ class Process
 				f.release
 				f.close
 				
-		function TellParentIDied (fn_app_crash_handler)
+		target !minilib {
+		helper TellParentIDied
 			opt norefcounts
-			signal := 1
-			app.DefaultCrashHandler(-signal.abs)
-			app.CrashHandler = nil // just in case
-			|| o = self.owner_ #require
-			if signal != -1999
+			visible
+			cpp_name JB__ProcessReportCrash
+			|| o = self.owner_
 				o.ours.state = o.ours.state|int| max ipcstate.Crashed
-			o.SendCrashed
-
+				o.SendCrashed
+		}
 
 function file.IPC (|&int| n, |_voidptr|)
 	cpp_Wrapper JB_File_IPC
@@ -662,8 +661,6 @@ extend_module app
 		cpp_wrapper JB_LibIsThreaded
 	helper BelongsToParent (|int|)
 		cpp_wrapper JB_App__BelongsToParent		
-	helper CrashHandler (assigns:|fn_app_crash_handler|)
-		cpp_wrapper JB_App__CrashInstall
 	helper SyntaxAppend (|fn_app_deathaction| handler)
 		cpp_Wrapper JB_App__AtExit
 	

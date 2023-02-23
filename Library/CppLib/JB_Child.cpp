@@ -30,32 +30,31 @@ static void SafePrint (const char* c) {
 }
 
 
-void JB__DefaultCrashHandler(int Sig) {
-	bool Crash = Sig > 0;
-	if (Sig < 0) Sig = -Sig;
+void JB__PrintStackTraceAndLog(int Sig) {
+	char ErrorBuff[64];
+	snprintf(ErrorBuff, 64, "Crash: %s", strsignal(Sig));
+	JB_Rec__CrashLog(ErrorBuff);
+	JB_PrintStackTrace();
+}
+
+void JB__ProcessReportCrash();
+void JB__CrashHandler(int Sig) {
     if (Sig != SIGTERM and Sig != SIGQUIT) {
-		JB_PrintStackTrace();
-		
-		char ErrorBuff[64];
-		snprintf(ErrorBuff, 64, "Crash: %s", strsignal(Sig));
-		JB_Rec__CrashLog(ErrorBuff);
-		if (Crash)
-			exit(-1);
+		JB__PrintStackTraceAndLog(Sig);
+		JB__ProcessReportCrash();
 	} else if (getppid() > 1) {
 		SafePrint("Child process got signal...\n" );
 	} else { 
 		SafePrint("Process got signal...\n" );
 	}
+	exit(-1);
 }
 
-void JB_App__CrashInstall(JB_CrashHandler P) {
-	JB_CrashHandler C = (JB_CrashHandler)P;
-	if (!C)
-		C = SIG_DFL;
-	int list[] = {SIGSEGV, SIGBUS, SIGILL, SIGFPE, SIGSYS};
+void JB_App__CrashInstall() {
+	int list[] = {SIGSEGV, SIGBUS, SIGILL, SIGFPE, SIGSYS, SIGTERM, SIGQUIT};
 	int n = sizeof(list)/sizeof(int);
 	for_ (n) {
-		if (signal(list[i], C) == SIG_IGN)
+		if (signal(list[i], JB__CrashHandler) == SIG_IGN)
 			signal(list[i], SIG_IGN); // restore the old ignore signal... make speedie more unix-friendly.
 	}
 }

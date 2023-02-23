@@ -217,9 +217,9 @@ function LeakMarkMemory
 
 function LeakUnMarkMemory
 	cpp_wrapper JB_Mem_Unmark
-
-function DefaultCrashHandler (fn_app_crash_handler)
-	cpp_wrapper JB__DefaultCrashHandler
+	
+function PrintStackTraceAndLog (|int| Signal)
+	cpp_wrapper JB__PrintStackTraceAndLog
 	
 function IsQuarantined (|bool|)	
 	return .path contains "/AppTranslocation/"
@@ -321,7 +321,6 @@ function Message.ArgValue (|string|)
 
 
 prototype ShellOption			(|string| Name, |string| Value, |faststring| purpose=nil, |bool|)
-prototype fn_app_crash_handler	(|int| signal = -1999)
 
 
 role String_ArgValue (string)
