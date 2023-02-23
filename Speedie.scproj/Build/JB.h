@@ -1116,6 +1116,7 @@ struct Error_Behaviour: Message_Behaviour {
 JBClass ( JB_Error , Message , 
 	JB_String* Path;
 	JB_String* OriginalData;
+	Array* StackTrace;
 	Message* Node;
 	Date When;
 	ErrorSeverity Severity;
@@ -1201,13 +1202,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1789])
+#define kJB__ErrorColors_bold (JB_LUB[1790])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1790])
-#define kJB__ErrorColors_good (JB_LUB[1791])
-#define kJB__ErrorColors_normal (JB_LUB[1792])
-#define kJB__ErrorColors_underline (JB_LUB[1791])
-#define kJB__ErrorColors_warn (JB_LUB[1793])
+#define kJB__ErrorColors_error (JB_LUB[1791])
+#define kJB__ErrorColors_good (JB_LUB[1792])
+#define kJB__ErrorColors_normal (JB_LUB[1793])
+#define kJB__ErrorColors_underline (JB_LUB[1792])
+#define kJB__ErrorColors_warn (JB_LUB[1794])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern Array* SC__Ext_Cleanup;
@@ -1405,7 +1406,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[423])
 #define kSC_BitNot (JB_LUB[523])
 #define kSC_BitOr (JB_LUB[632])
-#define kSC_BitXor (JB_LUB[1794])
+#define kSC_BitXor (JB_LUB[1795])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1435,7 +1436,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1795])
+#define kJB_SaverStart1 (JB_LUB[1796])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1912,7 +1913,8 @@ extern int SC__Func_OnceCount;
 extern Dictionary* SC__Func_TemporalStatements;
 extern SCIterator* SC__Iter_c_array;
 extern SCIterator* SC__Iter_pointer;
-extern int JB__Err_AutoPrint;
+extern byte JB__Err_AutoPrint;
+extern bool JB__Err_KeepTraceStack;
 
 //// HEADER JB.h
 
@@ -1975,6 +1977,8 @@ void JB_App__PrefsInit(Date when);
 void JB_App__Restart();
 
 void JB_App__SavePrefs();
+
+Array* JB_App__StackTrace();
 
 JB_String* JB_App__ArgValue(JB_String* name);
 
@@ -5588,8 +5592,6 @@ Array* JB_Str_Words(JB_String* self);
 bool JB_Str_WriteSet(JB_String* self, JB_String* Value);
 
 bool JB_Str_Yes(JB_String* self);
-
-JB_String* JB_Str__NewCopy(byte* addr, int n);
 
 JB_String* JB_Str__FromC(_cstring Addr);
 

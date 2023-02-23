@@ -430,6 +430,7 @@ struct Error_Behaviour: Message_Behaviour {
 JBClass ( JB_Error , Message , 
 	JB_String* Path;
 	JB_String* OriginalData;
+	Array* StackTrace;
 	Message* Node;
 	Date When;
 	ErrorSeverity Severity;
@@ -442,13 +443,13 @@ extern Array* JB__App_OldArgs;
 
 extern bool JB__App_Unregistered;
 extern JB_String* JB__App_Usage;
-#define kJB__ErrorColors_bold (JB_LUB[342])
+#define kJB__ErrorColors_bold (JB_LUB[343])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[343])
-#define kJB__ErrorColors_good (JB_LUB[344])
-#define kJB__ErrorColors_normal (JB_LUB[345])
-#define kJB__ErrorColors_underline (JB_LUB[344])
-#define kJB__ErrorColors_warn (JB_LUB[346])
+#define kJB__ErrorColors_error (JB_LUB[344])
+#define kJB__ErrorColors_good (JB_LUB[345])
+#define kJB__ErrorColors_normal (JB_LUB[346])
+#define kJB__ErrorColors_underline (JB_LUB[345])
+#define kJB__ErrorColors_warn (JB_LUB[347])
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -527,7 +528,7 @@ extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
 extern Dictionary* JB__SyxDict_;
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[347])
+#define kJB_SaverStart1 (JB_LUB[348])
 extern JB_ErrorReceiver* JB_StdErr;
 extern Syntax JB_SyxAcc;
 extern Syntax JB_SyxAdj;
@@ -724,7 +725,8 @@ extern bool JB__File_DebugExecute;
 #define kJB__File_O_RDWR (2)
 #define kJB__File_O_TRUNC (1024)
 #define kJB__File_O_WRONLY (1)
-extern int JB__Err_AutoPrint;
+extern byte JB__Err_AutoPrint;
+extern bool JB__Err_KeepTraceStack;
 
 //// HEADER JB.h
 
@@ -744,6 +746,8 @@ int JB_App__InitCode_();
 int JB_Main();
 
 int64 JB_App__ObjMemory();
+
+Array* JB_App__StackTrace();
 
 
 
