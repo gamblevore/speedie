@@ -254,7 +254,7 @@ function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
 	  elseif msg starts "log"
 		.LogFB(msg)
 	  elseif msg starts "crashed"
-		.CrashedFB(msg)
+		.CrashedFB(c, msg.render)
 	.DuringMsgFB = false
 
 

@@ -91,10 +91,6 @@ extend PerryIDE
 		.showstats
 
 
-	function CrashedFB (|message| msg, |bool|)
-		.reportdead(true, msg.render)
-
-
 	function LogFB (|message| msg)
 		// ignore.
 	

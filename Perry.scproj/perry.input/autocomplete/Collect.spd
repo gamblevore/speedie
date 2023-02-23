@@ -24,7 +24,7 @@ function PerryIDE.GetFeedbackStr (|string| op)
 	.SendFeedbackmsg(.compilemsg(op, false))
 	
 
-function PerryIDE.datewrap (|message| msg, |message|)
+function PerryIDE.DateWrap (|message| msg, |message|)
 	rz = @arg + "Perry"
 	|| d = date.now
 	rz <~ d
@@ -53,14 +53,8 @@ function PerryIDE.SubProcess (|bool| actual_compile, |fn_Subprocess|)
 		Speedie_Checker = nil
 
 
-function PerryIDE.ReportDead (|bool| IsFeedback, |string| msg="")
-	|| type = ("feedback ", "compiler ")(isfeedback)
-	if isfeedback
-		type += .feedback.where
-	  else
-		type += .compilr.where
-
-	|| s = type + " crashed\n\n"
+function PerryIDE.CrashedFB (|process| c, |string| msg="")
+	|| s = ("crashed feedback ", "crashed compiler ")(c == .feedback)
 	(self is dead)
 	.notify(s, @emb + msg)
 	.CancelCompile
@@ -113,7 +107,6 @@ function PerryIDE.ActualCompile (|message| msg)
 
 
 
-
 target debug
 	cpp_libwrapper Speedie_Main (fn_subprocess)
 	|fn_subprocess| Speedie_Checker = Speedie_Main
@@ -121,3 +114,4 @@ target debug
   else
 	|fn_subprocess| Speedie_Checker = nil
 	|fn_subprocess| Speedie_Compiler = nil
+
