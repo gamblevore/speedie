@@ -1201,13 +1201,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1785])
+#define kJB__ErrorColors_bold (JB_LUB[1789])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1786])
-#define kJB__ErrorColors_good (JB_LUB[1787])
-#define kJB__ErrorColors_normal (JB_LUB[1788])
-#define kJB__ErrorColors_underline (JB_LUB[1787])
-#define kJB__ErrorColors_warn (JB_LUB[1789])
+#define kJB__ErrorColors_error (JB_LUB[1790])
+#define kJB__ErrorColors_good (JB_LUB[1791])
+#define kJB__ErrorColors_normal (JB_LUB[1792])
+#define kJB__ErrorColors_underline (JB_LUB[1791])
+#define kJB__ErrorColors_warn (JB_LUB[1793])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern Array* SC__Ext_Cleanup;
@@ -1402,10 +1402,10 @@ extern JB_String* JB_file_read_test;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[421])
-#define kSC_BitNot (JB_LUB[521])
-#define kSC_BitOr (JB_LUB[630])
-#define kSC_BitXor (JB_LUB[1790])
+#define kSC_BitAnd (JB_LUB[423])
+#define kSC_BitNot (JB_LUB[523])
+#define kSC_BitOr (JB_LUB[632])
+#define kSC_BitXor (JB_LUB[1794])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1435,7 +1435,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1791])
+#define kJB_SaverStart1 (JB_LUB[1795])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2383,6 +2383,8 @@ bool SC_FB__AppOptions_final(JB_String* Name, JB_String* Value, FastString* purp
 bool SC_FB__AppOptions_force(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppOptions_funccount(JB_String* Name, JB_String* Value, FastString* purpose);
+
+bool SC_FB__AppOptions_gcc(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppOptions_help(JB_String* Name, JB_String* Value, FastString* purpose);
 
