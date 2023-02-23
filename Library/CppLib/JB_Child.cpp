@@ -40,7 +40,7 @@ void JB__PrintStackTraceAndLog(int Sig) {
 void JB_Rec__CrashLog(const char* c);
 void JB__ProcessReportCrash();
 
-void JB_PrintStackTrace() {
+	void JB_PrintStackTrace() {
     int   size = 32;
     void* array[size];
     auto  strings = JB_BackTrace(array, &size);
@@ -57,7 +57,6 @@ void JB__CrashHandler(int Sig) {
     if (Sig != SIGTERM and Sig != SIGQUIT) {
 		JB__PrintStackTraceAndLog(Sig);
 		JB__ProcessReportCrash();
-		JB_Rec__CrashLog("dd");
 	} else if (getppid() > 1) {
 		SafePrint("Child process got signal...\n" );
 	} else { 
