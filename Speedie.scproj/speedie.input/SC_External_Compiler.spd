@@ -502,8 +502,8 @@ function File.TestSpeedie (|string| Variant, |bool|) {
 	printline Result
 
 // Read output
-	print			externalCompiler.TmpOut(Variant).ReadFile
-	|| test_err =	externalCompiler.TmpErr(Variant).ReadFile
+	print externalCompiler.TmpOut(Variant).ReadFile
+	|| test_err = externalCompiler.TmpErr(Variant).ReadFile
 		error test_err // is this even used anymore?
 
 	return StdErr.OK
