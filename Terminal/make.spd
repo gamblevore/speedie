@@ -32,6 +32,8 @@ if plat~="osx"
 	shared = "dynamiclib"
 	ext = "dylib"
 	CFlags += " -arch=arm64  -arch=x86_64  -lc++"
+if plat~="linux"
+	CFlags += " -rdynamic "
 	
 	// we really wanna generate two makefiles... one for osx one for everything else
 || LibName = "libjeebox.$ext" 
