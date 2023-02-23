@@ -13,7 +13,7 @@ class Error (Message)
 	
 	|String|				Path
 	|String|				OriginalData
-	|[String]|				StackTrace
+	|String|				StackTrace
 	|message|				Node
 	|date|					When
 	|ErrorSeverity|			Severity

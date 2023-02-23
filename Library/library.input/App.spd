@@ -99,6 +99,15 @@ function CrashLogName (|stringzeroterminated|)
 	return "/tmp/logs/${.filename}.crash.txt"
 }
 
+render StackTrace
+	|_voidptr[128]| arr
+	|| size = 128
+	|| strs = process.BackTrace(&arr[0], &size)
+	for i in size
+		fs <~ strs[i]
+		fs <~ '\n'
+	memory.free(strs)
+
 function Restart
 	.turninto(.path, .rawargs)
 

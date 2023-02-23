@@ -578,13 +578,6 @@ class Process
 		function BackTrace (|&_voidptr| space, |&int| size, |&cstring|) 
 			cpp_wrapper JB_BackTrace
 		
-		function app.StackTrace (|[string]|)
-			|_voidptr[128]| arr
-			|| size = 128
-			|| strs = process.BackTrace(&arr[0], &size)
-			for i in size
-				rz <~ string.copy(strs[i])
-
 		
 		function StackTraceJbin (|jbin| j, |string| reason, |int|skip=4)
 			|_voidptr[32]| arr
@@ -594,6 +587,8 @@ class Process
 			j.enter(@arg, reason)
 			for i in skip to size-1
 				j.addcstring(strs[i], @emb)
+			memory.free(strs)
+
 
 		function Parent (|Process|)
 			opt norefcounts
