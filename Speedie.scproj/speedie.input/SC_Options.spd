@@ -254,10 +254,14 @@ module Feedback
 				if v~=value
 					options.arch = v
 				
+		+"gcc"
+			explain(Purpose, "Replace gcc with something else")$
+			externalcompiler.CppCompilerPath=value
+				
 		+"perry"
 			Explain(Purpose, "")$
 			options.perry = 1
-			options.perry += value.argvalue=="bin"
+			options.perry += value~="bin" // argvalue not needed? jsut value, right?
 			error.AutoPrint = 0
 			compiler.insecurewords = file.PrefsFolder["klinkerhoppen.banned"].readall.dict
 		
