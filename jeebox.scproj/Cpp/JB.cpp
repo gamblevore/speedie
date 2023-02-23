@@ -2866,7 +2866,6 @@ int JB_Rg_Width(IntRange self) {
 
 
 
-
 void JB_ClassData_Restore(JB_Class* self) {
 	JB_MemoryLayer* _tmPf0 = JB_Incr(JB_Class_DefaultLayer(self));
 	JB_Mem_Use(_tmPf0);
@@ -6938,7 +6937,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023022109);
+	return (2023022310);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
@@ -6950,4 +6949,4 @@ __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 6565725007342036 -616871519083821 -893550536634198
+// 6565725007342036 -448621171082399 -893550536634198

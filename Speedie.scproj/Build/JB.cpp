@@ -2359,8 +2359,7 @@ void SC_Comp__SetupEnv() {
 		JB_Str_SyntaxExpect(JB_LUB[165]);
 	}
 	if (JB_Arg_SyntaxCast(JB_App__ArgValue(JB_LUB[166])) and JB_App__IsMainThread()) {
-		JB_Pipe__Ignore(-1);
-		(JB_App__CrashInstall((&JB_Proc__TellParentIDied)));
+		JB_Pipe__IgnoreBreakPoints();
 	}
 	JB_App__PrefsInit(JB_Date__Now());
 	JB_ErrorColors__DisableIfNoTerminal();
@@ -3088,7 +3087,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[228]);
-	JB_FS_AppendInt32(_fsf0, (2023022111));
+	JB_FS_AppendInt32(_fsf0, (2023022310));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -4135,7 +4134,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[307]);
-	JB_FS_AppendInt32(_fsf0, (2023022111));
+	JB_FS_AppendInt32(_fsf0, (2023022310));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -15544,7 +15543,6 @@ ASM JB_ASM_U4__Encode(ASM2* self) {
 
 
 
-
 AsmReg SC_fn_asm__default(ASMFuncState* self, Message* exp, AsmReg Reg) {
 	return ((AsmReg){});
 }
@@ -20056,20 +20054,13 @@ void JB_Proc__StackTraceJbin(FastString* j, JB_String* reason, int skip) {
 	};
 }
 
-void JB_Proc__TellParentIDied(int signal) {
-	if ((!(signal))) {
-		signal = 1;
-	}
-	JB__DefaultCrashHandler((-abs(signal)));
-	(JB_App__CrashInstall(nil));
+void JB__ProcessReportCrash() {
+	//visible;
 	Process* o = JB__Proc_Owner_;
-	if ((!o)) {
-		return;
-	}
-	if (signal != -1999) {
+	if (o) {
 		o->Ours->State = JB_int_OperatorMax(((int)o->Ours->State), kJB__IPCState_crashed);
+		JB_Proc_SendCrashed(o);
 	}
-	JB_Proc_SendCrashed(o);
 }
 
 
@@ -43392,4 +43383,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 3527543564104084 -414070698808397
+// -600203201285989 -414070698808397

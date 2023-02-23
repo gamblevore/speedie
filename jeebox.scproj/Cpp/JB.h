@@ -1301,9 +1301,6 @@ int JB_Rg_Width(IntRange self);
 // U24_8
 
 
-// fn_app_crash_handler
-
-
 // fn_app_DeathAction
 
 

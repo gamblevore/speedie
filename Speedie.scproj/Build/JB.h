@@ -413,8 +413,6 @@ typedef SCBase* (*CollectFunc)(Message* node, SCBase* name_space, Message* ErrPl
 
 typedef SCObject* (*ExprResolver)(Message* Exp, SCBase* name_space, Message* side);
 
-typedef void (*fn_app_crash_handler)(int signal);
-
 typedef AsmReg (*fn_asm)(ASMFuncState* self, Message* exp, AsmReg Reg);
 
 typedef AsmReg (*fn_OpASM)(ASMFuncState* self, AsmReg dest, AsmReg L, AsmReg R, Message* dbg);
@@ -4038,9 +4036,6 @@ ASM JB_ASM_U4__Encode(ASM2* self);
 // ExprResolver
 
 
-// fn_app_crash_handler
-
-
 // fn_app_DeathAction
 
 
@@ -5123,7 +5118,7 @@ Process* JB_Proc__Parent();
 
 void JB_Proc__StackTraceJbin(FastString* j, JB_String* reason, int skip);
 
-void JB_Proc__TellParentIDied(int signal);
+void JB__ProcessReportCrash();
 
 
 
