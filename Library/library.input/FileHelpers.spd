@@ -337,19 +337,7 @@ extend String
 		
 
 extend file
-	helper xattrclear (|errorint|)
-		return .xattr("-rc")
-	helper xattr (|string| request, |errorint|)
-		target osx
-			return "/usr/bin/xattr".SilentExecute([request, self])
-		
-	function xcopyall (|file|f, |errorint|) 
-		rz = .copyall(f)
-		if rz
-			rz = f.xattrclear
-
-
-	function UploadTo (|string| url, |errorint|)
+	function UploadTo (|string| url, |errorint|) // move to the network module
 		return "/usr/bin/curl".silentexecute([
 			"-T"
 			self
