@@ -312,6 +312,7 @@ function TypeOfUnit (ExprResolver)
 		|| val = it.float
 		if !mul
 			str = (1.0 / val).render
+			Type = Typefloat.typenormal
 		  else
 			val *= mul
 			if type.typeinfo.isint
