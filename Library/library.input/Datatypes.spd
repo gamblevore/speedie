@@ -376,7 +376,9 @@ datatype float
 		cpp_part f
 	default 0
 		
-		
+//	syntax cast (|date|) // doesn't seem to solve anything
+//		cpp_part AsDate
+//		return self * date.kTicks
 	module
 		function max (|float|)
 			cpp_wrapper
@@ -399,6 +401,7 @@ datatype float
 
 
 	syntax cast (|bool|)
+		cpp_part AsBool
 		return self|bool|
 	
 	function Floor (|float|)

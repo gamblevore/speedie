@@ -9,6 +9,7 @@ module Terminal
 	|array of array|	Screen
 	|faststring| 		fs
 	||					baseline = 0
+	|date| 				LastDisplay
 
 	constants
 		w = 80
@@ -17,7 +18,8 @@ module Terminal
 		TermReset = "\1b[1;1H"
 
 		
-	syntax append (|string| text, |int| x = 0, |int| y = -1, |int| Colors=0)
+	syntax append (|string| text, |int| x = 0, |int| y = -1, |int| Colors = 0)
+		.Init
 		if y == -1
 			y = .baseline++
 		|| within = 0
@@ -26,32 +28,40 @@ module Terminal
 				y++
 				within = 0
 			|| xx = x+within
-			if xx inrange w  and  y inrange h
-				.Screen[y][x] = string[c]
+			if  xx inrange w  and  y inrange h
+				.Screen[y][xx] = string[c]
 			within++
 	
 
-	function Clear
-		if !.Screen
-			for h
-				.Screen <~ [("", w)]
-			(TermClear).puts
-		.baseline = 0
+	helper Init
+		require !.Screen
+		(TermClear).puts
+		for h
+			|| s = []
+			s.SyntaxAppend(" ", w)
+			.Screen <~ s
+
 
 	function Flat (|string|)
 		visible
 		opt norefcounts
 		.fs := FastString()
 		for line in .Screen
-			for ch in line
+			for (ch in line) (i)
 				if ch isa string
 					.fs <~ ch
+				line[i] = " "
+			.fs <~ '\n'
+		return .fs.GetResult
+
 
 	function Display
-		if !.screen
-			.clear
-		|| s = 60th
-		app.Sleep(s)
+		.init
+		|| now = date.now
+		if .LastDisplay
+			app.Sleep((LastDisplay + 1s/60) - now)
+		.LastDisplay = now
+		.baseline = 0
 		TermReset.puts
 		.flat.puts
 		

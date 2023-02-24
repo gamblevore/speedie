@@ -13,6 +13,11 @@ class Person
 
 
 main
+	for s in 5s
+		for i in 10
+			Terminal <~ ("haha", i*2 + s*i*3)
+		Terminal.Display
+		
 	|| B1 = 60GB
 	|| B2 = 7.9MB
 	"${B1.strsize} = $B1, ${B2.strsize} = $B2"

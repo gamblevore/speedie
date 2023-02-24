@@ -80,6 +80,13 @@ datatype Date (int64)
 
 	function int64.seconds (|date|)
 		return self << 16
+	
+	iterator
+		|| StartDate = date.now()
+		|| EndDate = StartDate + self
+		|date| CurrTime
+		while date.now(CurrTime) < EndDate
+			yield (CurrTime - StartDate).seconds
 
 	module
 		function TimeID (|int|)
@@ -90,6 +97,11 @@ datatype Date (int64)
 
 		function Now (|Date|)
 			cpp_wrapper JB_Date__Now
+
+		helper Now (|&Date| out, |Date|)
+			cpp_part KindaNow
+			*out = .now()
+			return *out
 
 		function New (|Date|)
 			cpp_part New0
