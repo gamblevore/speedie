@@ -274,8 +274,6 @@ function IsCompilerAndNeedsInstall (|bool|)
 
 function ExtComp 
 	require .ShouldExtComp
-	error.KeepTraceStack = true // why not? seems like a good thing.
-								// mostly we don't expect user errors by this point?
 	if options.products
 		if options.pack
 			Flatten.BuildPack
