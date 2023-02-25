@@ -17,12 +17,13 @@ module Terminal
 		h = 35 // too many lines will break the clearscreen/reset function!
 		TermClear = "\1b[2J"
 		TermReset = "\1b[1;1H"
-//		reset = 0, black = 30, red = 31, green = 32, yellow = 33, blue = 34, magenta = 35, cyan = 36, and white = 37
-//		bg:reset = 0, black = 40, red = 41, green = 42, yellow = 43, blue = 44, magenta = 45, cyan = 46, and white=47
-//      \1b[1;31m // red
 		Black = 30
-		|TerminalColor| 
+		|TerminalColor|  //      \1b[1;31m // red
 		Red,Green,Yellow,Blue,Magenta,Cyan,White
+	
+	function Size (|ivec2|)
+		return (w,h)
+
 	syntax append (|string| text, |ivec2| xy, |TerminalColor| Colors = 0)
 		cpp_part Append2
 		self <~ (text, xy.x, xy.y, colors)

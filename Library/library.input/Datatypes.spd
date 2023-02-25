@@ -891,8 +891,12 @@ datatype ivec4
 	
 	function contains (|int| x, |int| y, |bool|)
 		cpp_part ContainsInt
-		require x >= .x and x < .x2
-		require y >= .y and y < .y2
+		return .contains((x,y))
+		
+	function contains (|ivec2| P, |int| i=0, |bool|)
+		cpp_part ContainsIvec2
+		require p.x >= .x+i and p.x < .x2-i
+		require p.y >= .y+i and p.y < .y2-i
 		return true
 	
 	function contains (|ivec2| v, |bool|)
@@ -1121,6 +1125,10 @@ datatype ivec2
 			return 1
 		if (Lsq < osq)
 			return -1
+	function Rnd (|ivec2|)
+		|int| cw = random[0, .x, 1]
+		|int| ch = random[0, .y, 1]
+		return (cw, ch)
 
 	function Grow (|ivec2|g, |ivec4|)
 		return (self-g, self+g)
@@ -1139,6 +1147,11 @@ datatype ivec2
 		
 	operator contains (|int| x, |bool|)
 		return (x >= .x1) and (x <= .x2)
+
+	function Contains (|ivec2| i, |int| within=0, |bool|)
+		if i.x >= within  and  i.x < .x-within
+			if  i.y >= within  and  i.y < .y-within
+				return true
 
 	operator mul (|float| x, |ivec2|)
 		return (.vec2*x).ivec2
@@ -1195,7 +1208,7 @@ datatype ivec2
 	render
 		fs <~ "(${.x}, ${.y})"
 	
-
+	
 	iterator
 		|| curr = (0,0)
 		while (curr.y < .y)

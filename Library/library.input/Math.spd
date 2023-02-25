@@ -293,8 +293,11 @@ extend float
 		rz *= rz
 		rz *= rz
 	
+	syntax access (|bool|)
+		return random[] < self
+		
 	syntax access (|float| from, |float| to, |float|)
-		// isnt this the mix function?
+		cpp_part Mix // this is the mix function
 		|| C = .clamp(0,1)
 		|| range = to-from
 		return (range*C) + from 

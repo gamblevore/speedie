@@ -1,0 +1,249 @@
+#!/usr/local/bin/spd
+
+
+class RogueCreature (RogueObject)
+    |int|		Age
+    |int|		Strength
+
+    render
+		fs <~ "${.name}'s age is ${.age}. He has ${.strength} STR and ${.health} HP. "
+
+
+module roguetype
+	|message| Floor
+	|message| Rock
+	|message| Wall
+	|message| Corridor
+	|message| Door
+	|message| Gate
+
+
+class RogueRoom
+	|ivec4|   Size
+	|message| Purpose 
+
+
+class RogueCell	(RingTree)
+	|ivec2|		pos
+	|message|	Type
+	|rogueroom| Room
+	contains RogueObject
+	
+	constructor (|ivec2| pos, |message| Type=roguetype.rock)
+		.pos = pos
+		.type = Type
+	
+	syntax is (|message| m, |bool|)
+		return .type == m
+	function TermColor (|int|)
+		// the types should have their colors
+		if .Type == RogueType.Wall or roguetype.door or roguetype.gate
+			return Terminal.white
+		if .type == roguetype.corridor
+			return Terminal.red
+	function Draw
+		if .Position>0
+			Terminal <~ (.position|byte|.render, .pos, .termcolor)
+		else
+			Terminal <~ (.type.name, .pos, .termcolor)
+		
+
+
+class RogueObject (RingTree)
+    |int|		Health
+    |string|	Name
+
+
+module Map {
+|[RogueCell]|	Data
+|ivec2|			Size
+|message| 		Creatures
+|Message| 		RoomTypes
+|[rogueroom]| 	Rooms
+
+syntax access (|ivec2| s, |RogueCell|)
+	if s inrange .size
+		return .data[s.y * .size.x  +  s.x]
+
+function Init (|ivec2| size)
+	map.size = size
+	for i in size
+		.data <~ RogueCell(i)
+
+function IsRoomOK (|ivec4| i, |bool|)
+	for p.rect in i
+		require self[p].Type != roguetype.Floor
+	return true
+
+function OKSize (|ivec4|)
+	for attempt in 1000
+		|| RoomSize = .rndsize
+		if .IsRoomOK(RoomSize)
+			return RoomSize
+
+function RndSize (|ivec4|)
+	|| c1 = .size.rnd
+	|int| w = random[5, 25, 1]+2
+	|int| h = random[4, 15, 1]+2
+	|| c2 = c1 + (w,h)
+	if c2.x >= .size.x // reflect room size back inwards if too far
+		c2.x = c1.x
+		c1.x -= w
+	if c2.y >= .size.y
+		c2.y = c1.y
+		c1.y -= h
+	return (c1, c2)
+	
+
+function ivec4.EdgeLength (|int|)
+	return .area - (self ± 2).area
+	
+function ivec4.Edge (|int| where, |ivec4|)
+	// no corners!
+	|| W = .Width-2
+	|| H = .Height-2
+	while where >= 0 and w > 0 and h > 0
+		if (where < W)		// bottom
+			return (.x + where+1, .Y, 0, -1)
+		where -= w
+
+		if (where < H)		// right
+			return (.X2-1, .y+where+1, 1, 0)
+		where -= h
+
+		if (where < W)		// top
+			return (.x + where+1, .Y2-1, 0, -1)
+		where -= w
+
+		if (where < H)		// left
+			return (.X, .y + where+1, 1, 0)
+		where -= h
+		
+	
+function Connect (|ivec2| p, |ivec2| d)
+	|| first = self[p] #require
+	|| Length = 1
+	|roguecell| last
+	while Length < 80
+		p += d
+		|| c = self[p] #require
+		|| ctype = c.type
+		ifn cType == roguetype.rock or roguetype.wall or roguetype.Corridor
+			exit
+		last = c
+		Length++
+		c.Type = roguetype.Corridor
+	
+	if Length >= 2
+		first.Type = roguetype.door
+		last.position = 0
+	
+	if length > 2
+		last.Type = roguetype.door
+	  elseif length == 2
+		last.Type = roguetype.Floor
+		first.position = 0
+
+
+function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| Coridoors=false,  |bool|)
+	|| s = r.size
+	|| hitwall = 1
+	for length in 80
+		p += d
+		|| c = self[p]$
+		|| r2 = c.room
+		|| ct = c.type
+		if ct == roguetype.wall
+			require hitwall++ <= 1
+		if r2 and (r2 != r) and (ct == roguetype.Floor)
+			return true
+		require (ct == roguetype.rock or roguetype.wall) or (coridoors and ct == roguetype.corridor)
+	
+function ConnectRoom (|rogueroom| r)
+	|int| needed = random[1, 5 * r.size.area/(25*15), 1]
+	|| ToTest = r.size.EdgeLength
+	for 1000
+		|| Cell = r.size.Edge(Random[0, ToTest])
+		if .CanConnect(r, cell.xy, cell.x2y2)
+			.Connect(cell.xy, cell.x2y2)
+			needed--
+			require needed > 0
+
+
+function GenRoom
+	|| RoomSize = .oksize #require
+	|| room = RogueRoom(roomsize, nil)
+	.rooms <~ room
+	for P.rect in RoomSize
+		|| cell = self[p]
+		cell.Room = room
+		|| type = RogueType.Floor
+		if !RoomSize.contains(P, 1)
+			if cell.type == RogueType.wall
+				type = RogueType.floor
+			  else
+				Type = RogueType.wall
+		cell.Type = type
+	
+	
+function GenMap
+	for i in 10
+		.GenRoom
+	for r in .Rooms
+		.ConnectRoom(r)
+	
+	
+function Load
+	// i could use a selector? i guess?
+	|| Cells = (file://Cells.txt ).parse
+	RogueType.Floor = (Cells..floor)[0]
+	RogueType.wall = (Cells..wall)[0]
+	RogueType.rock = (Cells..rock)[0]
+	RogueType.corridor = (Cells..corridor)[0]
+	RogueType.door = (Cells..door)[0]
+	RogueType.Gate = (Cells..gate)[0]
+	.Creatures = (file://Creatures.txt ).parse
+	.roomtypes = (file://Rooms.txt ).parse
+	
+
+
+function Run
+	.load
+	.init(terminal.size) // (256,128)
+	.GenMap
+	.splash
+	while .Running
+		.DrawMap
+		Terminal.Display
+	
+function Running (|bool|)
+	return true
+
+function DrawMap
+	for i in .size
+		self[i].draw	
+	
+function Splash
+	|| scale = Terminal.w|float| / Terminal.h|float|
+	|| h = 24
+
+	for secs in 1s
+		Terminal.DrawRect((0, 0, terminal.w, h))
+		for i in 5.0
+			|| Title = "Mini Rogue".Rotate(i + secs*3)
+			|| f = i*1.234 + secs*(0.33+i*0.05)
+			Terminal <~ (Title, 1+((1.5*f/scale).bounce*(Terminal.w-(title.length+2))), 1+f.bounce*(h-2), terminal.Red+i)
+
+		|| title2 = "<Mini-Rogue>"
+		|| x = (terminal.w - title2.length) / 2
+		Terminal <~ (title2, x, 0, Terminal.Red)
+		Terminal <~ (file://HeartLogo.txt , 32, 10, terminal.red)
+		Terminal.Display
+}
+	
+main
+	map.load
+	map.run
+
+
+

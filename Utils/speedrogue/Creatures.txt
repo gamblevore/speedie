@@ -1,0 +1,13 @@
+Rat
+	health 10
+	strength 1
+	
+Jelly
+	health 15
+	strength 2
+
+Warrior
+	health 20
+	strength 5
+
+	

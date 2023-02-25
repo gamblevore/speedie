@@ -1,0 +1,12 @@
+floor
+	+"."
+wall
+	+"+"
+rock
+	+" "
+corridor
+	+"`"
+door
+	+"@"
+gate
+	+"?"

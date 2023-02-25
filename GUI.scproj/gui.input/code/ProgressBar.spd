@@ -39,5 +39,5 @@ class ProgressBar (GUIControl)
 	function StripeDark (|ivec2| v, |bool|)
 		if .indefinite
 			if .RandomStyle
-				return RANDOM[] > 0.5
+				return 0.5[]
 			return ((v.sum - date.ticks/3) / 4) mod 2

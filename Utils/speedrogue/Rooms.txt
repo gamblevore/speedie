@@ -1,0 +1,24 @@
+WaterRoom 0.1
+	
+Pantry 0.1
+
+LivingRoom 0.3
+
+WeaponsRoom 0.1
+
+Colloseum 0.2
+	connected
+
+Garden 0.5
+	connected
+
+Shrine 0.3
+	connected
+
+EnergyHealer 0.1
+
+Summoning 0.1
+
+Trap 0.1
+
+	
