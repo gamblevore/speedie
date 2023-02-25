@@ -4,37 +4,62 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-
+datatype TerminalColor (int)
+	
 module Terminal
 	|array of array|	Screen
 	|faststring| 		fs
-	||					baseline = 0
 	|date| 				LastDisplay
+	|byte[]| 			ColorInfo
 
 	constants
 		w = 80
 		h = 35 // too many lines will break the clearscreen/reset function!
 		TermClear = "\1b[2J"
 		TermReset = "\1b[1;1H"
-
-		
-	syntax append (|string| text, |int| x = 0, |int| y = -1, |int| Colors = 0)
+//		reset = 0, black = 30, red = 31, green = 32, yellow = 33, blue = 34, magenta = 35, cyan = 36, and white = 37
+//		bg:reset = 0, black = 40, red = 41, green = 42, yellow = 43, blue = 44, magenta = 45, cyan = 46, and white=47
+//      \1b[1;31m // red
+		Black = 30
+		|TerminalColor| 
+		Red,Green,Yellow,Blue,Magenta,Cyan,White
+	syntax append (|string| text, |ivec2| xy, |TerminalColor| Colors = 0)
+		cpp_part Append2
+		self <~ (text, xy.x, xy.y, colors)
+	
+	syntax append (|string| text, |int| x = 0, |int| y = 0, |TerminalColor| Colors = 0)
 		.Init
-		if y == -1
-			y = .baseline++
 		|| within = 0
 		for c in text
 			if c.istextline
 				y++
 				within = 0
-			|| xx = x+within
-			if  xx inrange w  and  y inrange h
-				.Screen[y][xx] = string[c]
-			within++
+			  else
+				|| xx = x+within
+				if  xx inrange w  and  y inrange h and c != ' '
+					.Screen[y][xx] = string[c]
+					.ColorInfo[(.w*y)+xx] = colors // update later... allow setting bg, or styles.
+				within++
 	
+	
+	function DrawRect (|ivec4| Rect, |string| inside="", |terminalcolor| colors=0)
+		|| r2 = rect + (1,1,-2,-2)
+		for s.rect in rect
+			|| c = inside
+			|| X = r2.x1x2 contains s.x
+			|| Y = r2.y1y2 contains s.y
+			if !x and !y
+				c = "+"
+			  elseif !x and y
+				c = "|"
+			  elseif !y and x
+				c = "-"
+			self <~ (c, s)
+
 
 	helper Init
 		require !.Screen
+		.ColorInfo = byte[.w*.h]
 		(TermClear).puts
 		for h
 			|| s = []
@@ -46,8 +71,14 @@ module Terminal
 		visible
 		opt norefcounts
 		.fs := FastString()
+		|| cols = .ColorInfo.ptr
+		|| PrevCol = 0
 		for line in .Screen
 			for (ch in line) (i)
+				|| ccol = *cols++
+				if PrevCol != ccol
+					PrevCol = ccol
+					.fs <~ "\1b[1;${ccol|int|}m"
 				if ch isa string
 					.fs <~ ch
 				line[i] = " "
@@ -61,10 +92,16 @@ module Terminal
 		if .LastDisplay
 			app.Sleep((LastDisplay + 1s/60) - now)
 		.LastDisplay = now
-		.baseline = 0
 		TermReset.puts
 		.flat.puts
 		
 
 helper string.puts
 	.cstr.cstring.puts
+
+
+
+
+
+
+

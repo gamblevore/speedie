@@ -38,7 +38,7 @@ datatype Date (int64)
 		return self >> kTickBits
 	
 	function Seconds (|f64|)
-		return self|f64|/64KB
+		return self|f64|/kOneSecond
 
 	function ago (|date|)
 		if self
@@ -86,7 +86,7 @@ datatype Date (int64)
 		|| EndDate = StartDate + self
 		|date| CurrTime
 		while date.now(CurrTime) < EndDate
-			yield (CurrTime - StartDate).seconds
+			yield (CurrTime - StartDate).seconds|float|
 
 	module
 		function TimeID (|int|)

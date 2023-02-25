@@ -332,6 +332,13 @@ class String
 
 	render Reverse
 		cpp_wrapper
+	
+	function Rotate (|int| n, |string|)
+		if !n
+			return self
+		n = n mod (.length+1)
+	    return self[n, int.max] + self[0, n]
+		
 		
 	function IsBadUTF8 (|int|from, |ind|)
 		cpp_Wrapper JB_Str_BadUTF8

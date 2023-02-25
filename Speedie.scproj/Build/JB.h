@@ -1202,13 +1202,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1791])
+#define kJB__ErrorColors_bold (JB_LUB[1808])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1792])
-#define kJB__ErrorColors_good (JB_LUB[1793])
-#define kJB__ErrorColors_normal (JB_LUB[1794])
-#define kJB__ErrorColors_underline (JB_LUB[1793])
-#define kJB__ErrorColors_warn (JB_LUB[1795])
+#define kJB__ErrorColors_error (JB_LUB[1809])
+#define kJB__ErrorColors_good (JB_LUB[1810])
+#define kJB__ErrorColors_normal (JB_LUB[1811])
+#define kJB__ErrorColors_underline (JB_LUB[1810])
+#define kJB__ErrorColors_warn (JB_LUB[1812])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern Array* SC__Ext_Cleanup;
@@ -1369,6 +1369,14 @@ extern Message* SC__SCStrings_RenderFinish;
 extern Message* SC__SCStrings_RenderInsides;
 extern Message* SC__SCStrings_RenderNewParams;
 extern Dictionary* SC__Targets_Items;
+extern int JB__Terminal_baseline;
+extern FastString* JB__Terminal_fs;
+#define kJB__Terminal_h (35)
+extern Date JB__Terminal_LastDisplay;
+extern Array* JB__Terminal_Screen;
+#define kJB__Terminal_TermClear (JB_LUB[1813])
+#define kJB__Terminal_TermReset (JB_LUB[1814])
+#define kJB__Terminal_w (80)
 extern Dictionary* SC__TextAssembler_LabelsToDo;
 extern Array* SC__VM_Builder_Builder;
 extern Message* SC__VM_Builder_dt_prm;
@@ -1403,10 +1411,10 @@ extern JB_String* JB_file_read_test;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[423])
-#define kSC_BitNot (JB_LUB[523])
-#define kSC_BitOr (JB_LUB[632])
-#define kSC_BitXor (JB_LUB[1796])
+#define kSC_BitAnd (JB_LUB[426])
+#define kSC_BitNot (JB_LUB[526])
+#define kSC_BitOr (JB_LUB[637])
+#define kSC_BitXor (JB_LUB[1815])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1436,7 +1444,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1797])
+#define kJB_SaverStart1 (JB_LUB[1816])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2481,6 +2489,8 @@ void SC_Flatten__Stamp(SCFunction* fn);
 
 void SC_Flatten__StampAll(Array* Funcs);
 
+ASMFunc* SC_Flatten__AccessStr(Message* m);
+
 
 
 // InbuiltShellArgs
@@ -3093,10 +3103,25 @@ bool SC_Targets__SyntaxAccess(JB_String* name);
 
 
 
+// Terminal
+JB_String* JB_Terminal__Flat();
+
+int JB_Terminal__Init_();
+
+int JB_Terminal__InitCode_();
+
+
+
 // TextAssembler
+void SC_TextAssembler__assemble(Message* msg);
+
 int SC_TextAssembler__Init_();
 
 int SC_TextAssembler__InitCode_();
+
+void SC_TextAssembler__TextData(Message* msg);
+
+bool SC_TextAssembler__TextFunc(Message* msg);
 
 
 
@@ -3541,6 +3566,8 @@ int JB_ErrorSeverity__InitCode_();
 
 
 // f64
+int64 JB_dbl_AsInt(double self);
+
 JB_String* JB_dbl_Render(double self, JB_String* fmt, FastString* fs_in);
 
 
@@ -3605,6 +3632,8 @@ double JB_int64_AsFloat(int64 self);
 inline bool JB_int64_OperatorInRange(int64 self, int64 d);
 
 int64 JB_int64_OperatorMax(int64 self, int64 d);
+
+int64 JB_int64_OperatorRotl(int64 self, int Amount);
 
 JB_String* JB_int64_Render(int64 self, FastString* fs_in);
 
@@ -3697,6 +3726,8 @@ Syntax JB_Syx__StdNew(fpMsgRender msg, JB_String* name, JB_String* LongName);
 
 // uint64
 inline int JB_uint64_lelength(uint64 self);
+
+ivec2 JB_uint64_LongestBitStretch(uint64 self);
 
 uint64 JB_uint64_LowestBit(uint64 self);
 
@@ -4128,13 +4159,19 @@ void SC_asdas2_hhh(asdas2* self);
 
 
 // JB_ASM2
+void SC_ASM2_AddRegParam(ASM2* self, Message* src, uint write);
+
 ASM SC_ASM2_Encode(ASM2* self);
 
 void SC_ASM2_fs(ASM2* self, FastString* fs);
 
 bool SC_ASM2_OperatorIsa(ASM2* self, int m);
 
+void SC_ASM2_Print(ASM2* self);
+
 JB_String* SC_ASM2_Render(ASM2* self, FastString* fs_in);
+
+void SC_ASM2_SyntaxExpect(ASM2* self, JB_String* Error);
 
 
 
@@ -4144,6 +4181,8 @@ inline ASM2* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int
 inline void SC_flat_AddExtended(ASMFuncState* self, Message* err, uint Bits);
 
 void SC_flat_AddFuncParams(ASMFuncState* self, SCFunction* fn);
+
+void SC_flat_AddLabel(ASMFuncState* self, Message* ch);
 
 AsmReg SC_flat_AllocRegDecl(ASMFuncState* self, Message* exp, SCDecl* decl, AsmReg R);
 
@@ -4155,13 +4194,21 @@ AsmReg SC_flat_DoFunc(ASMFuncState* self, Message* prms, AsmReg dest);
 
 AsmReg SC_flat_DoRels(ASMFuncState* self, Message* L, AsmReg dest);
 
+ASM2* SC_flat_FindLabel(ASMFuncState* self, ASM2* dbg);
+
 void SC_flat_FinishASM(ASMFuncState* self);
 
 Message* SC_flat_FuncPrms(ASMFuncState* self, Message* pr, int Remain, uint Bits);
 
+uint SC_flat_GetLabelJump(ASMFuncState* self, Message* P);
+
 void SC_flat_InitState(ASMFuncState* self, ASMFunc* fn);
 
 ASM2* SC_flat_Last(ASMFuncState* self);
+
+bool SC_flat_LoadLabelJumps(ASMFuncState* self);
+
+Message* SC_flat_LoadTitle(ASMFuncState* self, Message* m);
 
 void SC_flat_NeedSomewhere(ASMFuncState* self, Message* err, AsmReg* dest, DataTypeCode T);
 
@@ -4171,7 +4218,17 @@ inline ASM2* SC_flat_RequestOp2(ASMFuncState* self, uint Code);
 
 ASM2* SC_flat_RequestOp(ASMFuncState* self);
 
+bool SC_flat_SetConst(ASMFuncState* self, Message* List, Message* Orig);
+
+bool SC_flat_TextFuncSub(ASMFuncState* self, Message* m);
+
+void SC_flat_TextInstruction(ASMFuncState* self, Message* m);
+
+bool SC_flat_TextOp(ASMFuncState* self, Message* m);
+
 void SC_flat_TotalInit(ASMFuncState* self);
+
+bool SC_flat_TrySmallConst(ASMFuncState* self, uint reg, int64 Value, Message* where);
 
 AsmReg SC_flat_Reg(ASMFuncState* self, Message* exp, AsmReg reg);
 
@@ -5353,6 +5410,8 @@ void JB_Sel_destructor(Selector* self);
 
 void JB_Sel_GiveIDs(Selector* self);
 
+inline uint JB_Sel_UCast(Selector* self);
+
 
 
 // JB_ShellStream
@@ -5882,6 +5941,8 @@ void SC_Instruction_Constructor(Instruction* self, Selector* Next, Selector** Pl
 
 void SC_Instruction_destructor(Instruction* self);
 
+bool SC_Instruction_IsSetConst(Instruction* self);
+
 JB_String* SC_Instruction_Render(Instruction* self, FastString* fs_in);
 
 void SC_Instruction_selector_init(Instruction* self, JB_String* formName, int num);
@@ -5899,6 +5960,8 @@ int SC_Instruction__InitCode_();
 Instruction* SC_Instruction__New(Selector* Next, Selector** Place, JB_String* name1);
 
 void SC_Instruction__Store(Instruction* i);
+
+Instruction* SC_Instruction__SyntaxAccess(Message* m);
 
 
 
@@ -7215,6 +7278,8 @@ SCFunction* JB_Msg_AsFunc(Message* self);
 
 void JB_Msg_Ask__(Message* self, FastString* fs);
 
+uint64 JB_Msg_ASMConst(Message* self);
+
 fn_asm JB_Msg_ASMFunc(Message* self);
 
 SCModule* JB_Msg_AsModule(Message* self);
@@ -7423,6 +7488,8 @@ void JB_Msg_FixMultiArr(Message* self);
 
 double JB_Msg_Float(Message* self);
 
+float JB_Msg_float32(Message* self);
+
 void JB_Msg_FSListArg(Message* self, FastString* fs);
 
 void JB_Msg_FSListSep(Message* self, FastString* fs, JB_String* sep);
@@ -7440,6 +7507,8 @@ void JB_Msg_FuncWrap(Message* self, Message* fnc);
 int JB_Msg_GetAddressOf(Message* self, SCDecl* Type, bool WasCArray);
 
 void JB_Msg_GetAddressOf2(Message* self);
+
+Message* JB_Msg_GetASMFunc(Message* self);
 
 Message* JB_Msg_GetDclName(Message* self);
 
@@ -7676,6 +7745,10 @@ void JB_Msg_rangeSet(Message* self, IntRange r);
 int JB_Msg_RC_HasTemporary(Message* self);
 
 bool JB_Msg_RefDisappears(Message* self);
+
+uint JB_Msg_Reg(Message* self);
+
+uint JB_Msg_RegOrNum(Message* self, bool NeedReg);
 
 void JB_Msg_Rel__(Message* self, FastString* fs);
 
@@ -8044,6 +8117,7 @@ inline ASM2* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int
 	rz->r[3] = d;
 	int filepos = dbg->Extra & (~JB_int_bits(19));
 	rz->Debug = (dbg->Position | filepos);
+	SC_ASM2_Print(rz);
 	return rz;
 }
 
@@ -8097,6 +8171,10 @@ inline void JB_Sav___SaveWrite__(Saveable* self, ObjectSaver* Saver) {
 
 inline bool SC_PA_SyntaxCast(SCParamArray* self) {
 	return self->HasProperParams;
+}
+
+inline uint JB_Sel_UCast(Selector* self) {
+	return self->ID;
 }
 
 inline JB_StringC* JB_Str_CastZero(JB_String* self) {

@@ -416,7 +416,14 @@ datatype float
 	operator avg (|float| f, |float|)
 		return (f + self) * 0.5
 	
+	function bounce (|float|)
+		|| f = .fract
+		if self|int| isa 2
+			return f
+		return 1.0-f
+	
 	operator IsNear (|float|other, |bool|)
+		disabled "what usse this even?"
 		return (self - other).abs < 0.0001 // seems close enough?
 	
 	function mix (|float| y, |float| a, |float|)

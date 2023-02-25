@@ -1,0 +1,34 @@
+#!/usr/local/bin/spd
+
+//
+class Person
+    |int|		Age
+    |int|		Strength
+    |int|		Health
+    |string|	Name
+    setter age (|int|)
+        expect (value > 0 and value < 300) "Age $value out of range on ${.name}"
+        .age = value
+
+    render
+		fs<~"${.name}'s age is ${.age}. He has ${.strength} STR and ${.health} HP. "
+
+
+function app.Splash
+	|| scale = Terminal.w|float| / Terminal.h|float|
+	for secs in 100s
+		|| h = 24
+		Terminal.DrawRect((0,0,terminal.w, h), " ")
+		for i in 5.0
+			|| Title = "Mini Rogue".Rotate(i + secs*3)
+			|| f = i*1.234 + secs*(0.33+i*0.05)
+			Terminal <~ (Title, 1+((1.5*f/scale).bounce*(Terminal.w-(title.length+2))), 1+f.bounce*(h-2), terminal.Red+i)
+		|| title2 = "<Mini-Rogue>"
+		Terminal <~ (title2, (terminal.w-title2.length)/2, 0, Terminal.Red)
+		Terminal <~ ( file://HeartLogo.txt , 32, 10, terminal.red)
+		
+		Terminal.Display
+
+main
+	.splash
+	
