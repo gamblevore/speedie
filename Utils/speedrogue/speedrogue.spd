@@ -1,12 +1,15 @@
 #!/usr/local/bin/spd
 
+// todo
+	// fix room connection...no need connect to the same room
+	// also delete rooms that can't connect
+	// also some rooms should conncet but aren't
+	// do it later! For now... just add some monsters! or else we'll take forever!
+
 
 class RogueCreature (RogueObject)
-    |int|		Age
-    |int|		Strength
-
     render
-		fs <~ "${.name}'s age is ${.age}. He has ${.strength} STR and ${.health} HP. "
+		fs <~ "${.name} has ${.strength} STR and ${.health} HP. "
 
 
 module roguetype
@@ -42,15 +45,13 @@ class RogueCell	(RingTree)
 		if .type == roguetype.corridor
 			return Terminal.red
 	function Draw
-		if .Position>0
-			Terminal <~ (.position|byte|.render, .pos, .termcolor)
-		else
-			Terminal <~ (.type.name, .pos, .termcolor)
+		Terminal <~ (.type.name, .pos, .termcolor)
 		
 
 
 class RogueObject (RingTree)
     |int|		Health
+    |int|		Strength // A RubberBlock == high HP + low strength, BOMB has low HP + high strength
     |string|	Name
 
 
@@ -168,7 +169,14 @@ function ConnectRoom (|rogueroom| r)
 			.Connect(cell.xy, cell.x2y2)
 			needed--
 			require needed > 0
+//		else // seems that some good positiosn ARE being tested, but are failing. Can't see why?
+// everything seems OK?'
+//			self[cell.xy].Type = roguetype.gate
 
+
+function ivec2.isCornerOf (|ivec4| R, |bool|)
+	r-=(0,0,1,1)
+	return self == R.x1y1 or R.x1y2 or R.x2y1 or R.x2y2 // fix later
 
 function GenRoom
 	|| RoomSize = .oksize #require
@@ -179,10 +187,12 @@ function GenRoom
 		cell.Room = room
 		|| type = RogueType.Floor
 		if !RoomSize.contains(P, 1)
-			if cell.type == RogueType.wall
-				type = RogueType.floor
-			  else
+			if cell.type != RogueType.wall
 				Type = RogueType.wall
+			  elseif p.IsCornerOf(Roomsize)
+				0
+			  else
+					type = RogueType.floor
 		cell.Type = type
 	
 	
