@@ -27,13 +27,15 @@ expect !.args (.args, "This script takes no arguments.")
 
 || CFlags   = "-std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1"
 || shared = "shared"
+|| LinkLibFlags = ""
 || ext = "so"
 if plat~="osx"
 	shared = "dynamiclib"
 	ext = "dylib"
 	CFlags += " -arch=arm64  -arch=x86_64  -lc++"
 if plat~="linux"
-	CFlags += " -rdynamic -lrt -pthread"
+	CFlags += " -rdynamic"
+	LinkLibFlags += "-lrt -pthread"
 	
 	// we really wanna generate two makefiles... one for osx one for everything else
 || LibName = "libjeebox.$ext" 
@@ -88,10 +90,10 @@ set -e
 cd $CppLib
 
 echo \"Compiling $LibPath\"
-g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp $
 
 echo \"Compiling Speedie to $SpdTerm\"
-g++ -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp
+g++ -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
 
 
 cd $Speedie/jeebox.scproj/Examples
