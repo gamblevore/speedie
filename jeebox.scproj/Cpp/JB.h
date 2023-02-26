@@ -49,6 +49,8 @@ typedef int SizeInt;
 
 typedef byte Syntax;
 
+typedef int TerminalColor;
+
 typedef uint Codepoint;
 
 typedef ivec2 ControlLine;
@@ -443,13 +445,13 @@ extern Array* JB__App_OldArgs;
 
 extern bool JB__App_Unregistered;
 extern JB_String* JB__App_Usage;
-#define kJB__ErrorColors_bold (JB_LUB[344])
+#define kJB__ErrorColors_bold (JB_LUB[345])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[345])
-#define kJB__ErrorColors_good (JB_LUB[346])
-#define kJB__ErrorColors_normal (JB_LUB[347])
-#define kJB__ErrorColors_underline (JB_LUB[346])
-#define kJB__ErrorColors_warn (JB_LUB[348])
+#define kJB__ErrorColors_error (JB_LUB[346])
+#define kJB__ErrorColors_good (JB_LUB[347])
+#define kJB__ErrorColors_normal (JB_LUB[348])
+#define kJB__ErrorColors_underline (JB_LUB[347])
+#define kJB__ErrorColors_warn (JB_LUB[349])
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -520,6 +522,22 @@ extern int JB__Tk_UsingPos;
 #define kJB__Pipe_StdIn_ (0)
 #define kJB__Pipe_StdOut_ (1)
 
+#define kJB__Terminal_Black (30)
+#define kJB__Terminal_blue (34)
+extern MWrap* JB__Terminal_ColorInfo;
+#define kJB__Terminal_cyan (36)
+extern FastString* JB__Terminal_fs;
+#define kJB__Terminal_green (32)
+#define kJB__Terminal_h (35)
+extern Date JB__Terminal_LastDisplay;
+#define kJB__Terminal_magenta (35)
+#define kJB__Terminal_red (31)
+extern Array* JB__Terminal_Screen;
+#define kJB__Terminal_TermClear (JB_LUB[350])
+#define kJB__Terminal_TermReset (JB_LUB[351])
+#define kJB__Terminal_w (80)
+#define kJB__Terminal_white (37)
+#define kJB__Terminal_yellow (33)
 extern JB_String* JB__zalgo_down;
 extern JB_String* JB__zalgo_mid;
 extern Random JB__zalgo_R;
@@ -528,7 +546,7 @@ extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
 extern Dictionary* JB__SyxDict_;
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[349])
+#define kJB_SaverStart1 (JB_LUB[352])
 extern JB_ErrorReceiver* JB_StdErr;
 extern Syntax JB_SyxAcc;
 extern Syntax JB_SyxAdj;
@@ -1056,6 +1074,15 @@ int JB_Platform__InitCode_();
 // ProT
 
 
+// Terminal
+JB_String* JB_Terminal__Flat();
+
+int JB_Terminal__Init_();
+
+int JB_Terminal__InitCode_();
+
+
+
 // zalgo
 int JB_zalgo__Init_();
 
@@ -1224,6 +1251,9 @@ int JB_Syx__InitCode_();
 
 Syntax JB_Syx__StdNew(fpMsgRender msg, JB_String* name, JB_String* LongName);
 
+
+
+// TerminalColor
 
 
 // uint
@@ -1745,6 +1775,8 @@ void JB_Mrap_ConstructorDummy(MWrap* self, int ItemCount, uint ItemSize, bool Du
 void JB_Mrap_Destructor(MWrap* self);
 
 void JB_Mrap_Free(MWrap* self);
+
+byte* JB_Mrap_Ptr(MWrap* self);
 
 MWrap* JB_Mrap__Alloc();
 

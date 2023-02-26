@@ -9,6 +9,7 @@
 
 
 #include "JB_Umbrella.hpp"
+#include <time.h>
 
 extern "C" {
 
@@ -82,8 +83,6 @@ uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { //JB_FS_FreeSizeSet
 
 void JB_FS_AppendDMY (FastString* fs, Date self) {
     time_t t = self >> 16; // lol
-    time_t t2 = 0;
-	time(&t2);
     tm TimeSpec;
     if (localtime_r( &t, &TimeSpec )) {
 		char* write = (char*)JB_FS_WriteAlloc_(fs,26);

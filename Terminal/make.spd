@@ -37,7 +37,7 @@ if plat~="linux"
 	
 	// we really wanna generate two makefiles... one for osx one for everything else
 || LibName = "libjeebox.$ext" 
-|| LibFlags = "$CFlags -$shared  -D AS_LIBRARY=1 "
+|| LibFlags = "$CFlags -$shared -fPIC  -D AS_LIBRARY=1 "
 ExecFlags   = "$CFlags -g -ljeebox"
 || BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
 || CppLib   = "$Speedie/Library/CppLib".file

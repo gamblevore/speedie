@@ -53,6 +53,8 @@ typedef int SizeInt;
 
 typedef byte Syntax;
 
+typedef int TerminalColor;
+
 typedef u16 ASMParam;
 
 typedef uint64 __junktest_7__;
@@ -1202,13 +1204,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1808])
+#define kJB__ErrorColors_bold (JB_LUB[1809])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1809])
-#define kJB__ErrorColors_good (JB_LUB[1810])
-#define kJB__ErrorColors_normal (JB_LUB[1811])
-#define kJB__ErrorColors_underline (JB_LUB[1810])
-#define kJB__ErrorColors_warn (JB_LUB[1812])
+#define kJB__ErrorColors_error (JB_LUB[1810])
+#define kJB__ErrorColors_good (JB_LUB[1811])
+#define kJB__ErrorColors_normal (JB_LUB[1812])
+#define kJB__ErrorColors_underline (JB_LUB[1811])
+#define kJB__ErrorColors_warn (JB_LUB[1813])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern Array* SC__Ext_Cleanup;
@@ -1369,14 +1371,22 @@ extern Message* SC__SCStrings_RenderFinish;
 extern Message* SC__SCStrings_RenderInsides;
 extern Message* SC__SCStrings_RenderNewParams;
 extern Dictionary* SC__Targets_Items;
-extern int JB__Terminal_baseline;
+#define kJB__Terminal_Black (30)
+#define kJB__Terminal_blue (34)
+extern MWrap* JB__Terminal_ColorInfo;
+#define kJB__Terminal_cyan (36)
 extern FastString* JB__Terminal_fs;
+#define kJB__Terminal_green (32)
 #define kJB__Terminal_h (35)
 extern Date JB__Terminal_LastDisplay;
+#define kJB__Terminal_magenta (35)
+#define kJB__Terminal_red (31)
 extern Array* JB__Terminal_Screen;
-#define kJB__Terminal_TermClear (JB_LUB[1813])
-#define kJB__Terminal_TermReset (JB_LUB[1814])
+#define kJB__Terminal_TermClear (JB_LUB[1814])
+#define kJB__Terminal_TermReset (JB_LUB[1815])
 #define kJB__Terminal_w (80)
+#define kJB__Terminal_white (37)
+#define kJB__Terminal_yellow (33)
 extern Dictionary* SC__TextAssembler_LabelsToDo;
 extern Array* SC__VM_Builder_Builder;
 extern Message* SC__VM_Builder_dt_prm;
@@ -1413,8 +1423,8 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
 #define kSC_BitAnd (JB_LUB[426])
 #define kSC_BitNot (JB_LUB[526])
-#define kSC_BitOr (JB_LUB[637])
-#define kSC_BitXor (JB_LUB[1815])
+#define kSC_BitOr (JB_LUB[638])
+#define kSC_BitXor (JB_LUB[1816])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1444,7 +1454,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1816])
+#define kJB_SaverStart1 (JB_LUB[1817])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -3716,6 +3726,9 @@ int JB_Syx__InitCode_();
 
 Syntax JB_Syx__StdNew(fpMsgRender msg, JB_String* name, JB_String* LongName);
 
+
+
+// TerminalColor
 
 
 // uint
