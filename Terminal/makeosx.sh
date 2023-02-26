@@ -14,22 +14,23 @@ cd /usr/local/speedie/jeebox.scproj/Examples
 echo "Creating directories"
 echo "Creating dir Build"
 mkdir -p "Build"
-chown $(logname):staff Build
+chmod 777 Build
 
 echo "Creating dir /usr/local/include/"
 mkdir -p "/usr/local/include/"
-chown $(logname):staff /usr/local/include/
+chmod 777 /usr/local/include/
 
 echo "Creating dir /usr/local/bin/"
 mkdir -p "/usr/local/bin/"
-chown $(logname):staff /usr/local/bin/
+chmod 777 /usr/local/bin/
 
 
 echo "Cleaning old files"
 rm -rf Build/*
 
 echo "Installing headers"
-sudo -u $(logname) cp *.h /usr/local/include/
+cp *.h /usr/local/include/
+chmod 775 /usr/local/include/jeebox*
 
 echo "Compiling jb.cpp"
 g++ -o Build/jb  -std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I /usr/local/speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1 -arch=arm64  -arch=x86_64  -lc++ -g -ljeebox  jb.cpp
@@ -47,4 +48,4 @@ echo ""
 echo "Build Complete."
 
 echo "Speedie Compiling Perry"
-sudo -u $(logname) /usr/local/speedie/Terminal/Speedie /usr/local/speedie/Perry.scproj
+/usr/local/speedie/Terminal/Speedie /usr/local/speedie/Perry.scproj
