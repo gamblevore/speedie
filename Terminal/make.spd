@@ -33,7 +33,7 @@ if plat~="osx"
 	shared = "dynamiclib"
 	ext = "dylib"
 	CFlags += " -arch=arm64  -arch=x86_64  -lc++"
-if plat~="linux"
+if plat ~= "linux"
 	CFlags += " -rdynamic"
 	LinkLibFlags += "-lrt -pthread"
 	
@@ -90,7 +90,7 @@ set -e
 cd $CppLib
 
 echo \"Compiling $LibPath\"
-g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp $
+g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 
 echo \"Compiling Speedie to $SpdTerm\"
 g++ -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags

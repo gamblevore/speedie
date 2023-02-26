@@ -7052,7 +7052,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023022610);
+	return (2023022611);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {

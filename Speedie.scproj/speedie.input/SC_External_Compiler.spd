@@ -199,6 +199,8 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 			// fallback?
 		  else
 			.MacBothArch(rz)
+	  else
+		rz.appendwords( "-pthread" )
 	
 	// stripping
 	rz.appendwords( "-fdata-sections -ffunction-sections")
@@ -231,6 +233,9 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 		if f isa Type
 			rz <~ f
 			Gotany = true
+	
+	if platform.linux
+		rz.appendwords( " -lrt" )
 	
 	if !GotAny				// Disabled
 		rz.clear
