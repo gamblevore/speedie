@@ -12,17 +12,6 @@ module Info
 	|config| 		RoomTypes
 	|config| 		CellTypes
 
-module roguetype	// i could use a selector? i guess?
-	|dictionary of message| all
-	syntax access (|string| name, |message|)
-		return .all[name]
-	function door		(|message|): return .all["door"]
-	function wall		(|message|): return .all["wall"]
-	function floor		(|message|): return .all["floor"]
-	function rock		(|message|): return .all["rock"]
-	function corriwall	(|message|): return .all["corriwall"]
-	function corridor	(|message|): return .all["corridor"]
-
 
 role RogueObject (message)
 class RogueCreature (RogueObject)
@@ -30,12 +19,14 @@ class RogueCreature (RogueObject)
 		fs <~ "${.name} has ${..strength} STR and ${..health} HP. "
 
 
-class RogueRoom
+class RogueRoom // this class is only to be used during generation! Doesn't exist during run/reload
 	|ivec4|		Size
 	|message| 	Purpose
 	|int| 		MonsterCount
 	constructor (|ivec4| size, |message| purpose)
 		.size = size, .purpose = purpose
+	function IsSpawn (|bool|)
+		return .purpose.IsFirst
 
 
 datatype RogueCellState (byte)
@@ -52,10 +43,14 @@ role RogueCell	(message)
 		super.Constructor(parent, @tmp, x, type.name)
 		.msg(@arg)
 	
+	function Room (|RogueRoom|)
+		|| o = .obj
+		if o mustbe rogueroom
+			return o // actually don't do this
 	function TermColor (|int|)
 		return .first.Indent
 	function Type (|message|)
-		return roguetype.all[.name]	// The compiler can opt this? An ideal compiler would
+		return map.types[.name]	// The compiler can opt this? An ideal compiler would
 	setter Type (|message|)
 		.Name = Value.name	
 	function Pos (|ivec2|) 
@@ -72,12 +67,15 @@ role RogueCell	(message)
 		.drawone(.type)
 
 module Map {
+|dictionary of message| types
 |[RogueCell]|	Data
 |ivec2|			Size
 |int64| 		Seed
 |message|		MapState
 |message| 		Level
 |message|		Player
+|message| door, |message| floor, |message| corriwall
+|message| rock, |message| corridor, |message| wall
 
 		
 
@@ -86,7 +84,6 @@ syntax access (|ivec2| s, |RogueCell|)
 		return .data[s.y * .size.x  +  s.x]
 
 function Init (|ivec2| size)
-	|| rock = roguetype.rock
 	.size = size
 	.MapState = Message()
 	|| maplist = .MapState.msg(@tmp, "maps").msg(@arg)
@@ -112,7 +109,7 @@ function LoadLevel (|int| i)
 
 function IsRoomOK (|ivec4| i, |bool|)
 	for p.rect in i
-		require self[p].Type != roguetype.Floor
+		require self[p].Type != Floor
 	return true
 
 function OKSize (|ivec4|)
@@ -164,8 +161,6 @@ function Connect (|ivec2| p, |ivec2| d)
 	|| Length = 1
 	|roguecell| last
 	|| d2 = d.yx
-	|| door = roguetype.door, || floor = roguetype.floor, || cw = roguetype.corriwall
-	|| rock = roguetype.rock, || corridor = roguetype.corridor, || wall = roguetype.wall
 	while Length < 30
 		p += d
 		|| c = self[p] #require
@@ -174,13 +169,13 @@ function Connect (|ivec2| p, |ivec2| d)
 			exit
 		last = c
 		Length++
-		c.Type = roguetype.Corridor
+		c.Type = Corridor
 		with self[p+d2]
 			if .type == Rock
-				.type = cw
+				.type = corriwall
 		with self[p-d2]
 			if .type == Rock
-				.type = cw
+				.type = corriwall
 	
 	if Length >= 2
 		first.Type = door
@@ -193,7 +188,6 @@ function Connect (|ivec2| p, |ivec2| d)
 function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| Coridoors=false,  |bool|)
 	|| s = r.size
 	|| hitwall = 1
-	|| wall = roguetype.wall,   || rock = roguetype.rock,   || corr = roguetype.corridor
 	
 	for length in 30
 		p += d
@@ -202,9 +196,9 @@ function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| Coridoors=false
 		|| ct = c.type
 		if ct == wall
 			require hitwall++ <= 1
-		if r2 and (r2 != r) and (ct == roguetype.Floor)
+		if r2 and (r2 != r) and (ct == Floor)
 			return true
-		require (ct == rock or wall) or (coridoors and ct == corr)
+		require (ct == rock or wall) or (coridoors and ct == corridor)
 
 
 function ConnectRoom (|rogueroom| r)
@@ -229,7 +223,7 @@ function ivec2.isCornerOf (|ivec4| R, |bool|)
 
 function RoomPurpose (|[rogueroom]| rooms, |message|)
 	if !rooms
-		return info.RoomTypes..stairwell
+		return info.RoomTypes.first
 	
 	|| Types = .AllowedRoom #require
 	|| Count = 0.0
@@ -251,15 +245,31 @@ function GenRoom (|[rogueroom]| rooms)
 	for P.rect in RoomSize
 		|| cell = self[p]
 		cell.obj = room
-		|| type = RogueType.Floor
+		|| type = Floor
 		if !RoomSize.contains(P, 1)
-			if cell.type != RogueType.wall
-				Type = RogueType.wall
+			if cell.type != wall
+				Type = wall
 			  elseif p.IsCornerOf(Roomsize)
 				0
 			  else
-					type = RogueType.floor
+				type = floor
 		cell.Type = type
+
+	require room.isspawn
+	for 100
+		for P.rect in RoomSize
+			|| cell = self[p]
+			if (cell.type == floor) and 100th[]
+				cell.arg <~ .Player
+				return 
+				
+		
+function GenPlayer
+	|| P = info.GameBank..classes
+	require p and p.hasany
+	.player = p[].Copy
+
+		
 	
 	
 function GenMap
@@ -270,18 +280,13 @@ function GenMap
 		.ConnectRoom(r)
 
 
-function GenPlayer
-	|| P = info.GameBank..classes
-	require p and p.hasany
-	.player = p[].Copy
-
 	
 function GenMonster
 	|| lim = random[18,30,1]
 	|| Mon = .AllowedMonsters				#expect ("no monsters?")
 	for 1000
 		for c in .data // all cells
-			if c.type..walkable and 100th[]
+			if !c.room.isspawn and c.type..walkable and 100th[]
 				c.arg <~ Mon[].copy
 				require --lim> 0
 
@@ -332,7 +337,14 @@ function info.Load (|int64| Seed, |bool|)
 	.GameBank = "Creatures.txt".file.parse|config|
 	.roomtypes = "Rooms.txt".file.parse|config|
 	.CellTypes = "Cells.txt".file.parse|config|
-	roguetype.all = .CellTypes.Dict
+
+	|| c = map.types init .CellTypes.Dict
+	map.door = c["door"]
+	map.wall = c["wall"]
+	map.floor = c["floor"]
+	map.rock = c["rock"]
+	map.corriwall = c["corriwall"]
+	map.corridor = c["corridor"]
 
 	.LoadColors(.celltypes)
 	.LoadColors(.gamebank..classes, terminal.white)
@@ -343,8 +355,8 @@ function info.Load (|int64| Seed, |bool|)
 
 function Run (|bool| Splash)
 	.init(terminal.size)
-	.GenMap
 	.GenPlayer
+	.GenMap
 	.GenMonster
 	if StdErr.ok
 		"monsters+map+player loaded"

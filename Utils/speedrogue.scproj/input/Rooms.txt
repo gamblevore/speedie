@@ -1,4 +1,4 @@
-StairWell 0 (1-100)  
+StairWell 0 (1-100) // stairwell must come first. its the spawnroom
 
 WaterRoom 0.1 (1-100) 
 	
