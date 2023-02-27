@@ -81,7 +81,35 @@ function perry.HideStartifneeded
 function ClickedTabs (GUIAction)
 	if row
 		row.obj|PerryIDE|.show
-		
+
+
+function PressingTabs (guiaction)
+	opt norefcounts
+	if self isa ButtonView
+		|| p = .submenu
+		|| ide = row.obj
+		if ide isa PerryIDE
+			p.listsource.clear
+			|| name = ide.Project.name
+			p <~ ( "Copy " + name, MenuCopyProject, ide)
+			p <~ ("Show Project", MenuShowProject, ide)
+			.OpenMenu(row) // "Yes" "no"
+
+
+function MenuCopyProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.obj
+	if ide isa perryide
+		clipboard.text = ide.Project
+		Notifications <~ "Copied: " + ide.Project
+
+
+function MenuShowProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.obj
+	if ide isa perryide
+		ide.Project$.Reveal
+	
 
 function RightClickedTabs (GUIAction)
 	if row and self isa ButtonView
@@ -92,7 +120,7 @@ function ClickedBird (GUIAction)
 	sdlapp.size = (414,256)
 	birdwindow().show
 
-
+	
 function ClickedToolbar (GUIAction)
 	opt norefcounts
 	|| w = .ide

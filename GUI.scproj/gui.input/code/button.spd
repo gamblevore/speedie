@@ -199,7 +199,7 @@ class ButtonView (GUIControl)
 
 	function XOfItem (|listviewrow| row, |ind|)
 		opt norefcounts
-		if !row: return -1
+		require  row
 		rz = 0
 		|| W = .ItemWidth
 		|| r = .items.first

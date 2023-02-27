@@ -716,8 +716,7 @@ class ListView (GUIControl) {
 		
 		|| FirstSel = .sel
 		if (Clicks > 1) and (firstsel) and !(keys.Cmd)
-			if (.OnReturn)
-				(.OnReturn)(self, firstsel)
+			(.OnReturn)(self, firstsel)?
 			return 1
 		
 		|| LC = .DrawClickCell(P)
