@@ -13,6 +13,17 @@ function message.AllNames (|[string]|)
 	for s in self
 		rz <~ s.name
 
+function ivec4.list (|message|)
+	rz = @list.msg
+	for i in 4
+		rz <~ self[i]
+
+function message.Dict (|dictionary of message|)
+	opt norefcounts
+	rz = Dictionary()
+	for s in self
+		rz[s.name] = s
+
 function @file.Dictionary (|file|)
 	disabled "Use .words"
 	

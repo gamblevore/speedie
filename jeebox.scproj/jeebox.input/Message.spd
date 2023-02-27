@@ -54,7 +54,7 @@ class Message (RingTree)
 		.name		= name
 
 	
-	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| Extra)
+	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| Extra=0)
 		cpp_part ConstructorRange
 		super.constructor(Parent)
 		

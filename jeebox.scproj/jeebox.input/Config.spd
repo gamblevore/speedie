@@ -3,11 +3,6 @@
 // use a message... as a dictionary!!
 // wierd but efficient
 
-function ivec4.list (|message|)
-	rz = @list.msg
-	for i in 4
-		rz <~ self[i]
-
 
 role config (message)
 	linkage
