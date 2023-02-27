@@ -1,5 +1,6 @@
 //jb
 floor "."
+	walkable
 	appearance "The floor seems dirty... uncleaned. But in places trampled till it gives a polished look."
 wall "+" // &#9639;
 	color white
@@ -8,13 +9,16 @@ rock " "
 	appearance "The surface appears to be rough broken granite... or some kind of dark strong stone."
 door "@"
 	color white
+	walkable
 	appearance "The wooden door is heavy and would take quite a pounding. It still smells of unfinished wood."
 gate "="
 	color white
+	walkable
 	appearance "An iron gate blocks your way. It's mere prescence seems harsh."
 corriwall "-"
 	color white
 	appearance "You see smoothly polished stone, with battle scars scratched in." // fix this
 corridor ","
 	color red
+	walkable
 	appearance "The coridoor feels light and breezy. The air hangs with the faint smell of water."

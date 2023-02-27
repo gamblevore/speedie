@@ -4,15 +4,16 @@
 	// fix room connection...no need connect to the same room
 	// also delete rooms that can't connect
 	// also some rooms should connect but aren't
+	// fill genplayer and genmonster
 
 module roguetype	// i could use a selector? i guess?
 	|dictionary of message| all
 	syntax access (|string| name, |message|)
 		return .all[name]
-	function door	(|message|): return .all["door"]
-	function wall	(|message|): return .all["wall"]
-	function floor	(|message|): return .all["floor"]
-	function rock	(|message|): return .all["rock"]
+	function door		(|message|): return .all["door"]
+	function wall		(|message|): return .all["wall"]
+	function floor		(|message|): return .all["floor"]
+	function rock		(|message|): return .all["rock"]
 	function corriwall	(|message|): return .all["corriwall"]
 	function corridor	(|message|): return .all["corridor"]
 
@@ -39,15 +40,15 @@ role RogueCell	(message)
 	
 	constructor (|message| parent, |int| x,  |message| Type)
 		super.Constructor(parent, @tmp, x, type.name)
-		.msg(@arg)						// The compiler can opt it haha.
+		.msg(@arg)
 	
 	function TermColor (|int|)
 		return .first.Indent
 	function Type (|message|)
-		return roguetype.all[.name]
+		return roguetype.all[.name]	// The compiler can opt this? An ideal compiler would
 	setter Type (|message|)
 		.Name = Value.name	
-	function pos (|ivec2|)
+	function Pos (|ivec2|)
 		return (.position, .parent.position)
 	function Draw 
 		opt norefcounts
@@ -55,18 +56,19 @@ role RogueCell	(message)
 		Terminal <~ (t.name, .pos, t.indent)
 
 
+module Info
+	|message| 		Creatures
+	|Message| 		RoomTypes
+	|Message| 		CellTypes
 
 module Map {
 |[RogueCell]|	Data
 |ivec2|			Size
 |int64| 		Seed
-|message| 		Creatures
-|Message| 		RoomTypes
-|Message| 		CellTypes
-|[rogueroom]| 	Rooms
 |message|		MapState
+|message| 		Level
+|message|		Player
 
-function Player (|RogueCreature|)
 		
 
 syntax access (|ivec2| s, |RogueCell|)
@@ -74,15 +76,29 @@ syntax access (|ivec2| s, |RogueCell|)
 		return .data[s.y * .size.x  +  s.x]
 
 function Init (|ivec2| size)
+	|| rock = roguetype.rock
 	.size = size
 	.MapState = Message()
-	|| map = .MapState.msg(@tmp, "map").msg(@arg)
-	|| rock = roguetype.rock
-	for y in size.y
-		|| row = map.msg(@arg, "row")
-		row.Position = y
-		for x in size.x
-			.data <~ RogueCell(row, x, rock)
+	|| maplist = .MapState.msg(@tmp, "maps").msg(@arg)
+	for i in 6
+		|| map = maplist.msg(@tmp, "map")
+		map <~ i+1
+		for y in size.y
+			|| row = map.GiveArg.msg(@tmp, "row").msg(@arg)
+			row.Position = y
+			for x in size.x
+				RogueCell(row, x, rock)
+	.LoadLevel(1)
+
+
+function LoadLevel (|int| i)
+	.Level = (.mapstate..maps)[i-1]
+	.data.clear
+	for row in .level.arg
+		for cell in row.arg
+			.data <~ cell
+	// thats the level. Now what?
+	
 
 function IsRoomOK (|ivec4| i, |bool|)
 	for p.rect in i
@@ -107,11 +123,10 @@ function RndSize (|ivec4|)
 		c2.y = c1.y
 		c1.y -= h
 	return (c1, c2)
-	
 
 function ivec4.EdgeLength (|int|)
 	return .area - (self ± 2).area
-	
+
 function ivec4.Edge (|int| where, |ivec4|)
 	// no corners!
 	|| W = .Width-2
@@ -159,7 +174,6 @@ function Connect (|ivec2| p, |ivec2| d)
 	
 	if Length >= 2
 		first.Type = door
-	
 	if length > 2
 		last.Type = door
 	  elseif length == 2
@@ -184,7 +198,8 @@ function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| Coridoors=false
 
 
 function ConnectRoom (|rogueroom| r)
-	|int| needed = random[1, 5 * r.size.area/(25*15), 1]
+	|| n = 5 * r.size.area/(25*15)
+	|| needed = random[1, n, 1]|int|
 	|| ToTest = r.size.EdgeLength
 	for 1000
 		|| Cell = r.size.Edge(Random[0, ToTest])
@@ -201,10 +216,10 @@ function ivec2.isCornerOf (|ivec4| R, |bool|)
 	r-=(0,0,1,1)
 	return self == R.x1y1 or R.x1y2 or R.x2y1 or R.x2y2 // fix later
 
-function GenRoom
+function GenRoom (|[rogueroom]| rooms)
 	|| RoomSize = .oksize #require
 	|| room = RogueRoom(roomsize)
-	.rooms <~ room
+	rooms <~ room
 	for P.rect in RoomSize
 		|| cell = self[p]
 		cell.obj = room
@@ -220,19 +235,40 @@ function GenRoom
 	
 	
 function GenMap
+	|[rogueroom]| 	Rooms
 	for i in 10
-		.GenRoom
-	for r in .Rooms
+		.GenRoom(rooms)
+	for r in Rooms
 		.ConnectRoom(r)
 
 
 function GenPlayer
-	
+	|| P = info.Creatures..classes$.rand$
+	.player = p.Copy
+
 	
 function GenMonster
+	|| CanGen = 18th
+	|| lim = 32
+	for c in .data // all cells
+		|| t = c.type
+		if t..walkable and CanGen[]
+			c.GenMonster
+			require --lim > 0
+
+function Roguecell.AllowedMonsters (|[roguecreature]|)
+	|| L = map.level
+	|| level_num = L[0].int
+	
+	
+function Roguecell.GenMonster
+	// OK so... So we wanna gen a monster
+	// We wanna gen a monster. but I don't know how? howwww??????
+	// so... how? lets get a random monster?
+	|| Allowed = .AllowedMonsters()
 
 
-function Load (|int64| Seed, |bool|)
+function info.Load (|int64| Seed, |bool|)
 	seed := date.now & 0xffff
 	Random.shared.seed = seed
 	map.seed = seed
@@ -244,14 +280,13 @@ function Load (|int64| Seed, |bool|)
 
 	for s in .CellTypes
 		|| col = s..color
-		printline col
+		|| f = s.first
 		if col ~= "white"
-			s.first.Indent = Terminal.white
+			f.Indent = Terminal.white
 		if col ~= "red"
-			s.first.Indent = Terminal.red
+			f.Indent = Terminal.red
 	
 	return StdErr.ok
-	
 
 
 function Run (|bool| Splash)
@@ -284,24 +319,24 @@ function Splash
 	|| scale = Terminal.w|float| / Terminal.h|float|
 	|| h = 24
 
-	for secs in 1s
+	for secs in 10s
 		Terminal.DrawRect((0, 0, terminal.w, h))
 		for i in 5.0
-			|| Title = "Mini Rogue".Rotate(i + secs*3)
+			|| Title = " Mini Rogue ".Rotate(i + secs*3)
 			|| f = i*1.234 + secs*(0.33+i*0.05)
-			Terminal <~ (Title, 1+((1.5*f/scale).bounce*(Terminal.w-(title.length+2))), 1+f.bounce*(h-2), terminal.Red+i)
+			|| x = 1+((1.5*f/scale).bounce*(Terminal.w-(title.length+2)))
+			|| y = 1+f.bounce*(h-2)
+			Terminal <~ (Title, x, y, terminal.Red+i)
 
-		|| title2 = " <Mini-Rogue> "
-		|| x = (terminal.w - title2.length) / 2
-		Terminal <~ (title2, x, 0, Terminal.Red)
+		|| title2 = "<Mini-Rogue>"
+		|| x2 = (terminal.w - title2.length) / 2
+		Terminal <~ (title2, x2, 0, Terminal.Red)
 		Terminal <~ (file://HeartLogo.txt , 32, 10, terminal.red)
 		Terminal.Display
 }
 	
 main
 	|| a = app[0]
-	if map.load(a.int)
+	if info.load(a.int)
 		map.run(!a)
-
-
 

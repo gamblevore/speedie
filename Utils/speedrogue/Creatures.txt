@@ -61,42 +61,44 @@ armor
 	
 
 monsters	
-	Rat
+	Rat 1-3
 		"Eek eek!"
 		health 10
 		strength 1
-		levels 1-3
 		freq 0.1
 		
-	Jelly
+	Jelly 1-3
 		"glob glob!"
 		health 15
 		strength 2
-		levels 2-4
+		freq 0.2
+		armour (0.05.leather, 1.0.none)
+		
+	Jelly 4
+		"glob glob!"
+		health 15
+		strength 2
 		freq 0.2
 		armour (0.05.plate, 1.0.none)
 
-	Orc
+	Orc 4-5
 		"A tough mean brute dedicated on destruction."
 		health 30
 		strength 2
-		levels 4-5
 		freq 0.1
 		armour (leather, padded)
 
-	Goblin
+	Goblin 4-5
 		"You no take candle!"
 		health 20
 		strength 2
-		levels 4-5
 		freq 0.2
 		armour (leather)
 
-	Peridot_Warrior
+	Peridot_Warrior 4-5
 		"Warrior dressed in peridot studded armour"
 		health 40
 		strength 5
-		levels 4-5
 		freq 0.05
 		armour (plate, leather)
 

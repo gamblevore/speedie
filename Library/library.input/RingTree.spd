@@ -329,6 +329,9 @@ class RingTree (Saveable)
 				rz = .last
 				while rz and (++n < 0)
 					rz--
+	
+	function Rand (||)
+		return self[.slowcount.rand]
 
 	
 	function First_ (||)
