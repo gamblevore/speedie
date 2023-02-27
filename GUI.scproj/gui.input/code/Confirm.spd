@@ -70,7 +70,7 @@ function ConfirmWindow_.Resize (|string| s)
 	.size = actual.layout
 
 
-function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| Response=string[0], |ConfirmCanceller| Cancel = nil, |int|)
+function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| Response=string.byte(0), |ConfirmCanceller| Cancel = nil, |int|)
 	|| w = ConfirmWindow_.asker init ConfirmWindow_()
 	if !q or w is visible		// recursive... sigh
 		if answers[2]
@@ -139,7 +139,7 @@ class ConfirmWindow_ (Window)
 	function SetResponse (|string| response)
 		opt norefcounts
 		|| R = .response
-		|| vis = response != string[0]
+		|| vis = response != string.byte(0)
 		r.visible = vis
 		if vis
 			r.text = response

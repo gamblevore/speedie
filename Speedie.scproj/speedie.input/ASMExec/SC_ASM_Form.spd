@@ -14,7 +14,7 @@ class µForm
 		opt norefcounts
 		.name = data
 		for param in data
-			.loadparam( string[param], nil )
+			.loadparam( string.byte(param), nil )
 		.Finish
 		.index = ++µform.count
 

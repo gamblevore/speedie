@@ -122,8 +122,13 @@ class Message (RingTree)
 	
 	syx Arg (Argument)
 		Opt NoRefCounts
-		|| Braces = (self is style2)  or  !.hasany  or  (self in @arg)
+		|| Braces = (self is style2)  or  !.hasany  or .name or  (self in @arg)
 			fs <~ '{'
+		if .name 
+			fs <~ '^'
+			fs <~ '"'
+			fs.appendescape(.name)
+			fs <~ '"'
 		.FSListArg( fs )
 		if Braces
 			fs.IndentLine
