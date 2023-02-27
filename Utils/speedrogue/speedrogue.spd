@@ -34,7 +34,7 @@ datatype RogueCellState (byte)
 		Glimpsed
 
 
-Role RogueCell	(message)
+role RogueCell	(message)
 	contains RogueObject
 	
 	constructor (|message| parent, |int| x,  |message| Type)
@@ -43,10 +43,6 @@ Role RogueCell	(message)
 	
 	function TermColor (|int|)
 		return .first.Indent
-//		if Type == RogueType.Wall or roguetype.door or Type == roguetype.gate or Type == roguetype.Corriwall
-//			return Terminal.white
-//		if .type == roguetype.corridor
-//			return Terminal.red
 	function Type (|message|)
 		return roguetype.all[.name]
 	setter Type (|message|)
@@ -54,7 +50,9 @@ Role RogueCell	(message)
 	function pos (|ivec2|)
 		return (.position, .parent.position)
 	function Draw 
-		Terminal <~ (.type.first.name, .pos, .termcolor)
+		opt norefcounts
+		|| t = .type.first
+		Terminal <~ (t.name, .pos, t.indent)
 
 
 
@@ -79,7 +77,6 @@ function Init (|ivec2| size)
 	.size = size
 	.MapState = Message()
 	|| map = .MapState.msg(@tmp, "map").msg(@arg)
-	printline .MapState
 	|| rock = roguetype.rock
 	for y in size.y
 		|| row = map.msg(@arg, "row")
@@ -233,11 +230,8 @@ function GenPlayer
 	
 	
 function GenMonster
-	
-	
-function Cell (|string| name, |message|)
-	return .cell(name)//Cells..floor
-	
+
+
 function Load (|int64| Seed, |bool|)
 	seed := date.now & 0xffff
 	Random.shared.seed = seed
@@ -247,6 +241,15 @@ function Load (|int64| Seed, |bool|)
 	.roomtypes = "Rooms.txt".file.parse
 	.CellTypes = "Cells.txt".file.parse
 	roguetype.all = .CellTypes.Dict
+
+	for s in .CellTypes
+		|| col = s..color
+		printline col
+		if col ~= "white"
+			s.first.Indent = Terminal.white
+		if col ~= "red"
+			s.first.Indent = Terminal.red
+	
 	return StdErr.ok
 	
 

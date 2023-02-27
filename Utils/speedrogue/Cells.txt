@@ -1,14 +1,20 @@
+//jb
 floor "."
 	appearance "The floor seems dirty... uncleaned. But in places trampled till it gives a polished look."
 wall "+" // &#9639;
+	color white
 	appearance "The wall is plastered with a rough patch of mud and straw. Wooden slats jut out from underneath in places."
 rock " "
 	appearance "The surface appears to be rough broken granite... or some kind of dark strong stone."
-corridor ","
-	appearance "The coridoor feels light and breezy. The air hangs with the faint smell of water."
-corriwall "-"
-	appearance "You see smoothly polished stone, with battle scars scratched in." // fix this
 door "@"
+	color white
 	appearance "The wooden door is heavy and would take quite a pounding. It still smells of unfinished wood."
 gate "="
+	color white
 	appearance "An iron gate blocks your way. It's mere prescence seems harsh."
+corriwall "-"
+	color white
+	appearance "You see smoothly polished stone, with battle scars scratched in." // fix this
+corridor ","
+	color red
+	appearance "The coridoor feels light and breezy. The air hangs with the faint smell of water."
