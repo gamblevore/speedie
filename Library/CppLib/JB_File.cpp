@@ -11,6 +11,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <poll.h>
+#include <termios.h>    // struct termios, tcgetattr(), tcsetattr()
+
 #if __linux__
 	#include <sys/mman.h>
 	#include <sys/sendfile.h>
@@ -326,6 +328,25 @@ int InterRead (int fd, unsigned char* buffer, int N, JB_String* ErrorPath, int& 
     return Total;
 }
 
+int JB_App__GetChar() {
+	struct termios old_tio, new_tio;
+
+	tcgetattr(STDIN_FILENO,&old_tio);	/* get the terminal settings for stdin */
+
+	/* we want to keep the old setting to restore them a the end */
+	new_tio=old_tio;
+
+	/* disable canonical mode (buffered i/o) and local echo */
+	new_tio.c_lflag &=(~ICANON & ~ECHO);
+	tcsetattr(STDIN_FILENO,TCSANOW,&new_tio);
+
+	int c = getchar();
+
+	/* restore the former settings */
+	tcsetattr(STDIN_FILENO,TCSANOW,&old_tio);
+	
+	return c;
+}
 
 int JB_FS_InterPipe(FastString* self, int Desired, int fd, int Mode) {
 	uint8* Buffer = JB_FS_WriteAlloc_(self, Desired);

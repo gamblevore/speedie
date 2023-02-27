@@ -95,6 +95,9 @@ module Terminal
 		.LastDisplay = now
 		TermReset.puts
 		.flat.puts
+	
+	syntax access (|int|)
+		cpp_wrapper JB_App__GetChar
 		
 
 helper string.puts
