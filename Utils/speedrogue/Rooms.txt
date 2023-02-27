@@ -1,24 +1,27 @@
-WaterRoom 0.1
+StairWell 0 (1-100)  
+
+WaterRoom 0.1 (1-100) 
 	
-Pantry 0.1
+Pantry 0.1 (1-100)
 
-LivingRoom 0.3
+LivingRoom 0.3 (1-100)  
 
-WeaponsRoom 0.1
 
-Colloseum 0.2
+WeaponsRoom 0.1 (1-100) 
+
+Colloseum 0.2 (1-100) 
 	connected
 
-Garden 0.5
+Garden 0.5 (1-100)
 	connected
 
-Shrine 0.3
+Shrine  0.3 (1-100)
 	connected
 
-EnergyHealer 0.1
+EnergyHealer  0.1 (1-100)
 
-Summoning 0.1
+Summoning  0.1 (1-100)
 
-Trap 0.1
+Trap 0.1 (1-100) 
 
 	

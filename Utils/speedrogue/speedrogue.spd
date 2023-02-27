@@ -6,6 +6,12 @@
 	// also some rooms should connect but aren't
 	// fill genplayer and genmonster
 
+
+module Info
+	|config| 		GameBank
+	|config| 		RoomTypes
+	|config| 		CellTypes
+
 module roguetype	// i could use a selector? i guess?
 	|dictionary of message| all
 	syntax access (|string| name, |message|)
@@ -25,7 +31,11 @@ class RogueCreature (RogueObject)
 
 
 class RogueRoom
-	|ivec4|   Size
+	|ivec4|		Size
+	|message| 	Purpose
+	|int| 		MonsterCount
+	constructor (|ivec4| size, |message| purpose)
+		.size = size, .purpose = purpose
 
 
 datatype RogueCellState (byte)
@@ -48,18 +58,18 @@ role RogueCell	(message)
 		return roguetype.all[.name]	// The compiler can opt this? An ideal compiler would
 	setter Type (|message|)
 		.Name = Value.name	
-	function Pos (|ivec2|)
+	function Pos (|ivec2|) 
 		return (.position, .parent.position)
+	function DrawOne (|message| t, |bool|)
+		|| f = t.first #expect (t, "no name msg?")
+		|| name = f.name #expect (f, "no name str?")
+		Terminal <~ (f.name, .pos, f.indent)
+		return f != @str
 	function Draw 
 		opt norefcounts
-		|| t = .type.first
-		Terminal <~ (t.name, .pos, t.indent)
-
-
-module Info
-	|message| 		Creatures
-	|Message| 		RoomTypes
-	|Message| 		CellTypes
+		for obj in .arg
+			require .drawone(obj)
+		.drawone(.type)
 
 module Map {
 |[RogueCell]|	Data
@@ -216,9 +226,27 @@ function ivec2.isCornerOf (|ivec4| R, |bool|)
 	r-=(0,0,1,1)
 	return self == R.x1y1 or R.x1y2 or R.x2y1 or R.x2y2 // fix later
 
+
+function RoomPurpose (|[rogueroom]| rooms, |message|)
+	if !rooms
+		return info.RoomTypes..stairwell
+	
+	|| Types = .AllowedRoom #require
+	|| Count = 0.0
+	for r in types
+		Count += r.first.Float
+	
+	|| rnd = random[0,count]
+	for r in types
+		count -= r.first.Float
+		if count <= 0
+			return r
+	return types.Last
+	
+	
 function GenRoom (|[rogueroom]| rooms)
 	|| RoomSize = .oksize #require
-	|| room = RogueRoom(roomsize)
+	|| room = RogueRoom(roomsize, .roompurpose(rooms))
 	rooms <~ room
 	for P.rect in RoomSize
 		|| cell = self[p]
@@ -243,29 +271,57 @@ function GenMap
 
 
 function GenPlayer
-	|| P = info.Creatures..classes$.rand$
-	.player = p.Copy
+	|| P = info.GameBank..classes
+	require p and p.hasany
+	.player = p[].Copy
 
 	
 function GenMonster
-	|| CanGen = 18th
-	|| lim = 32
-	for c in .data // all cells
-		|| t = c.type
-		if t..walkable and CanGen[]
-			c.GenMonster
-			require --lim > 0
+	|| lim = random[18,30,1]
+	|| Mon = .AllowedMonsters				#expect ("no monsters?")
+	for 1000
+		for c in .data // all cells
+			if c.type..walkable and 100th[]
+				c.arg <~ Mon[].copy
+				require --lim> 0
 
-function Roguecell.AllowedMonsters (|[roguecreature]|)
-	|| L = map.level
-	|| level_num = L[0].int
-	
-	
-function Roguecell.GenMonster
-	// OK so... So we wanna gen a monster
-	// We wanna gen a monster. but I don't know how? howwww??????
-	// so... how? lets get a random monster?
-	|| Allowed = .AllowedMonsters()
+
+function AllowedMonsters (|int| Level_Num = 0, |[roguecreature]|)
+	return (info.GameBank..monsters).LevelFilter(level_num, true)
+		
+function AllowedRoom (|int| Level_Num = 0, |[roguecreature]|)
+	return (info.RoomTypes).LevelFilter(level_num, false)
+
+
+function message.LevelFilter (|int| L, |bool| IsMonster,  |[roguecreature]|)
+	L := map.level[0].int
+	opt norefcounts
+	for Mon in self
+		if ismonster
+			|| str = mon[@str] // expect a name!
+			expect (str and str.name) (Mon, "Monster has no name!")
+		|| allowed = mon[@bra,1][@rel]
+		allowed[@opp, 1].Expect(nil, "-")
+		|| f = allowed[@num].int
+		|| t = allowed[@num, -1].int
+		if L >= f and L <= t
+			rz <~ mon
+
+
+function info.LoadColors (|Message| msg, |TerminalColor| Default=0)
+	for s in msg
+		|| col = s..color
+		|| f = s.first
+		|| c = default
+		if col ~= "white"
+			c = Terminal.white
+		if col ~= "red"
+			c = Terminal.red
+		if col ~= "blue"
+			c = Terminal.blue
+		if col ~= "yellow"
+			c = Terminal.yellow
+		f.Indent = c
 
 
 function info.Load (|int64| Seed, |bool|)
@@ -273,18 +329,14 @@ function info.Load (|int64| Seed, |bool|)
 	Random.shared.seed = seed
 	map.seed = seed
 	app.CWD = app.Path.parent
-	.Creatures = "Creatures.txt".file.parse
-	.roomtypes = "Rooms.txt".file.parse
-	.CellTypes = "Cells.txt".file.parse
+	.GameBank = "Creatures.txt".file.parse|config|
+	.roomtypes = "Rooms.txt".file.parse|config|
+	.CellTypes = "Cells.txt".file.parse|config|
 	roguetype.all = .CellTypes.Dict
 
-	for s in .CellTypes
-		|| col = s..color
-		|| f = s.first
-		if col ~= "white"
-			f.Indent = Terminal.white
-		if col ~= "red"
-			f.Indent = Terminal.red
+	.LoadColors(.celltypes)
+	.LoadColors(.gamebank..classes, terminal.white)
+	.LoadColors(.gamebank..monsters, terminal.yellow)
 	
 	return StdErr.ok
 
@@ -294,6 +346,8 @@ function Run (|bool| Splash)
 	.GenMap
 	.GenPlayer
 	.GenMonster
+	if StdErr.ok
+		"monsters+map+player loaded"
 	if Splash
 		.splash
 	while .Running
