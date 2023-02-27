@@ -44,6 +44,7 @@ role RogueCell	(message)
 		.msg(@arg)
 	
 	function Room (|RogueRoom|)
+		opt norefcounts
 		|| o = .obj
 		if o mustbe rogueroom
 			return o // actually don't do this
@@ -51,10 +52,16 @@ role RogueCell	(message)
 		return .first.Indent
 	function Type (|message|)
 		return map.types[.name]	// The compiler can opt this? An ideal compiler would
+	function InSpawn (|bool|)
+		opt norefcounts
+		return .room.IsSpawn?
 	setter Type (|message|)
 		.Name = Value.name	
 	function Pos (|ivec2|) 
 		return (.position, .parent.position)
+	function Walkable (|bool|)
+		opt norefcounts
+		return .type..walkable!=nil
 	function DrawOne (|message| t, |bool|)
 		|| f = t.first #expect (t, "no name msg?")
 		|| name = f.name #expect (f, "no name str?")
@@ -244,16 +251,16 @@ function GenRoom (|[rogueroom]| rooms)
 	rooms <~ room
 	for P.rect in RoomSize
 		|| cell = self[p]
-		cell.obj = room
 		|| type = Floor
 		if !RoomSize.contains(P, 1)
 			if cell.type != wall
 				Type = wall
 			  elseif p.IsCornerOf(Roomsize)
 				0
-			  else
+			  elseif !cell.InSpawn
 				type = floor
 		cell.Type = type
+		cell.obj = room
 
 	require room.isspawn
 	for 100
@@ -286,7 +293,7 @@ function GenMonster
 	|| Mon = .AllowedMonsters				#expect ("no monsters?")
 	for 1000
 		for c in .data // all cells
-			if !c.room.isspawn and c.type..walkable and 100th[]
+			if !c.inspawn and c.walkable and 100th[]
 				c.arg <~ Mon[].copy
 				require --lim> 0
 
