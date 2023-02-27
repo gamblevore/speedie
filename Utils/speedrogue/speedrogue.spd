@@ -172,17 +172,20 @@ function Connect (|ivec2| p, |ivec2| d)
 function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| Coridoors=false,  |bool|)
 	|| s = r.size
 	|| hitwall = 1
+	|| wall = roguetype.wall,   || rock = roguetype.rock,   || corr = roguetype.corridor
+	
 	for length in 30
 		p += d
 		|| c = self[p]$
 		|| r2 = c.obj
 		|| ct = c.type
-		if ct == roguetype.wall
+		if ct == wall
 			require hitwall++ <= 1
 		if r2 and (r2 != r) and (ct == roguetype.Floor)
 			return true
-		require (ct == roguetype.rock or roguetype.wall) or (coridoors and ct == roguetype.corridor)
-	
+		require (ct == rock or wall) or (coridoors and ct == corr)
+
+
 function ConnectRoom (|rogueroom| r)
 	|int| needed = random[1, 5 * r.size.area/(25*15), 1]
 	|| ToTest = r.size.EdgeLength
