@@ -313,8 +313,7 @@ class RingTree (Saveable)
 
 
 	syntax access (||)
-		if self
-			return .Parent
+		return .rand
 
 
 	syntax Access (|int| n, ||)
