@@ -1,13 +1,102 @@
-Rat
-	health 10
-	strength 1
-	
-Jelly
-	health 15
-	strength 2
+//jb
+classes
+	Warrior
+		health 20
+		strength 5
+	Monk
+		health 20
+		strength 5
+	Knight (warrior)
+		health 50
+		strength 10
+	Paladin (warrior)
+		health 40
+		strength 10
+		speed 2
 
-Warrior
-	health 20
-	strength 5
+weapons
+	knife
+		damage 5
+		skill 1
+	stave
+		damage 5
+		skill 3
+	steel_whip
+		damage 2
+		range 3
+		skill 1
+	sword
+		damage 7
+		range 2
+		skill 4
+	claws
+		damage 10
+		skill 5
 
+
+armor
+	padded
+		"(aka "gambisson"). This tough armour absorbs most except the strongest of blows"
+		strength 6
+		weight 2
+		hp 10
 	
+	leather
+		"Typical leather armour"
+		strength 3
+		weight 1
+		hp 10
+	
+	fine_cloth
+		"magical threads"
+		strength 1
+		hp 3
+		weight 0
+	
+	plate
+		"Weighty. But tank-like. You don't want to be facing this."
+		strength 12
+		hp 50
+		weight 10
+	
+
+monsters	
+	Rat
+		"Eek eek!"
+		health 10
+		strength 1
+		levels 1-3
+		freq 0.1
+		
+	Jelly
+		"glob glob!"
+		health 15
+		strength 2
+		levels 2-4
+		freq 0.2
+		armour (0.05.plate, 1.0.none)
+
+	Orc
+		"A tough mean brute dedicated on destruction."
+		health 30
+		strength 2
+		levels 4-5
+		freq 0.1
+		armour (leather, padded)
+
+	Goblin
+		"You no take candle!"
+		health 20
+		strength 2
+		levels 4-5
+		freq 0.2
+		armour (leather)
+
+	Peridot_Warrior
+		"Warrior dressed in peridot studded armour"
+		health 40
+		strength 5
+		levels 4-5
+		freq 0.05
+		armour (plate, leather)
+

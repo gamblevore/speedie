@@ -117,7 +117,7 @@ extend Parser
 // whats wrong with removing this?
 		|| IllegalHandler = .Handler( -1, fError ) // catch all?
 		for i in 256
-			.TokenNil( string[i] ) = IllegalHandler
+			.TokenNil( string.byte(i) ) = IllegalHandler
 
 
 

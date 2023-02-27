@@ -3,20 +3,22 @@
 // todo
 	// fix room connection...no need connect to the same room
 	// also delete rooms that can't connect
-	// also some rooms should conncet but aren't
-	// do it later! For now... just add some monsters! or else we'll take forever!
+	// also some rooms should connect but aren't
 
 
 class RogueCreature (RogueObject)
     render
-		fs <~ "${.name} has ${.strength} STR and ${.health} HP. "
+		fs <~ "${.name} has ${..strength} STR and ${..health} HP. "
 
+
+role RogueObject (message)
 
 module roguetype
-	|message| Floor
+	|message| Floor 
 	|message| Rock
 	|message| Wall
 	|message| Corridor
+	|message| Corriwall
 	|message| Door
 	|message| Gate
 
@@ -26,10 +28,17 @@ class RogueRoom
 	|message| Purpose 
 
 
+datatype RogueCellState (byte)
+	flags
+		Visited
+		Seen
+		Glimpsed
+		
 class RogueCell	(RingTree)
-	|ivec2|		pos
-	|message|	Type
-	|rogueroom| Room
+	|ivec2|				Pos
+	|message|			Type
+	|rogueroom|			Room
+	|RogueCellState|	State
 	contains RogueObject
 	
 	constructor (|ivec2| pos, |message| Type=roguetype.rock)
@@ -40,27 +49,26 @@ class RogueCell	(RingTree)
 		return .type == m
 	function TermColor (|int|)
 		// the types should have their colors
-		if .Type == RogueType.Wall or roguetype.door or roguetype.gate
+		if .Type == RogueType.Wall or roguetype.door or roguetype.gate or roguetype.Corriwall
 			return Terminal.white
 		if .type == roguetype.corridor
 			return Terminal.red
-	function Draw
+	function Draw 
 		Terminal <~ (.type.name, .pos, .termcolor)
 		
-
-
-class RogueObject (RingTree)
-    |int|		Health
-    |int|		Strength // A RubberBlock == high HP + low strength, BOMB has low HP + high strength
-    |string|	Name
 
 
 module Map {
 |[RogueCell]|	Data
 |ivec2|			Size
+|int64| 		Seed
 |message| 		Creatures
 |Message| 		RoomTypes
 |[rogueroom]| 	Rooms
+|message|		MapState
+
+function Player (|RogueCreature|)
+		
 
 syntax access (|ivec2| s, |RogueCell|)
 	if s inrange .size
@@ -125,7 +133,8 @@ function Connect (|ivec2| p, |ivec2| d)
 	|| first = self[p] #require
 	|| Length = 1
 	|roguecell| last
-	while Length < 80
+	|| d2 = d.yx
+	while Length < 30
 		p += d
 		|| c = self[p] #require
 		|| ctype = c.type
@@ -134,6 +143,12 @@ function Connect (|ivec2| p, |ivec2| d)
 		last = c
 		Length++
 		c.Type = roguetype.Corridor
+		with self[p+d2]
+			if .type == roguetype.Rock
+				.type = roguetype.corriWall
+		with self[p-d2]
+			if .type == roguetype.Rock
+				.type = roguetype.corriWall
 	
 	if Length >= 2
 		first.Type = roguetype.door
@@ -149,7 +164,7 @@ function Connect (|ivec2| p, |ivec2| d)
 function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| Coridoors=false,  |bool|)
 	|| s = r.size
 	|| hitwall = 1
-	for length in 80
+	for length in 30
 		p += d
 		|| c = self[p]$
 		|| r2 = c.room
@@ -201,37 +216,54 @@ function GenMap
 		.GenRoom
 	for r in .Rooms
 		.ConnectRoom(r)
+
+function GenPlayer
 	
+function GenMonster
 	
-function Load
+
+	
+function Load (|int64| Seed)
+	seed := date.now & 0xffff
+	Random.shared.seed = seed
+	map.seed = seed
+	app.CWD = app.Path.parent
 	// i could use a selector? i guess?
-	|| Cells = (file://Cells.txt ).parse
-	RogueType.Floor = (Cells..floor)[0]
-	RogueType.wall = (Cells..wall)[0]
-	RogueType.rock = (Cells..rock)[0]
-	RogueType.corridor = (Cells..corridor)[0]
-	RogueType.door = (Cells..door)[0]
-	RogueType.Gate = (Cells..gate)[0]
-	.Creatures = (file://Creatures.txt ).parse
-	.roomtypes = (file://Rooms.txt ).parse
+	|| Cells = "Cells.txt".file.parse
+	RogueType.Floor = (Cells..floor)
+	RogueType.wall = (Cells..wall)
+	RogueType.rock = (Cells..rock)
+	RogueType.corridor = (Cells..corridor)
+	RogueType.corriwall = (Cells..corriwall)
+	RogueType.door = (Cells..door)
+	RogueType.Gate = (Cells..gate)
+	.Creatures = "Creatures.txt".file.parse
+	.roomtypes = "Rooms.txt".file.parse
 	
 
 
-function Run
-	.load
+function Run (|bool| Splash)
 	.init(terminal.size) // (256,128)
 	.GenMap
-	.splash
+	.GenPlayer
+	.GenMonster
+	if Splash
+		.splash
 	while .Running
+		.DetectVisibility
 		.DrawMap
 		Terminal.Display
 	
 function Running (|bool|)
 	return true
 
+function DetectVisibility
+	
+	
 function DrawMap
 	for i in .size
-		self[i].draw	
+		self[i].draw
+	terminal <~ ("Map: " + .Seed.Render, 30, 0)
 	
 function Splash
 	|| scale = Terminal.w|float| / Terminal.h|float|
@@ -252,8 +284,9 @@ function Splash
 }
 	
 main
-	map.load
-	map.run
+	|| a = app[0]
+	map.load(a.int)
+	map.run(!a)
 
 
 

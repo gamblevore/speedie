@@ -1037,6 +1037,9 @@ class Message (RingTree)
 		cpp_part AppendNum
 		@num.msg(self, num.render)
 
+	setter int (|int64|)
+		.Func = @num
+		.name = Value.Render // later we can do this a different way. Like directly
 	
 	function Int (|int|i = 0, |int64|)
 		opt norefcounts

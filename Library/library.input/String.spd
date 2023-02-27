@@ -276,7 +276,7 @@ class String
 	
 	function ByteSplit (|[string]|)
 		for n in .length
-			rz <~ string[self[n]]
+			rz <~ string.byte(self[n])
 
 	function LineCount (|int|)
 		if !self
@@ -364,7 +364,7 @@ class String
 	operator plus (|byte| B, |string|)
 		opt norefcounts
 		cpp_part PlusByte
-		return self + string[b]
+		return self + string.byte(b)
 	
 	helper Append (|string| b, |string| c, |string| d="")
 		cpp_wrapper JB_Str_Append4
@@ -443,9 +443,10 @@ class String
 			cpp_wrapper JB_Str__Byte
 		
 		syntax Access (|int|b, |string|)
+			disabled ".char or .byte?"
 			return .byte(b)
 
-		function Char (|uint| c, |string|)
+		function Char (|codepoint| c, |string|)
 			cpp_wrapper JB_Str_ChrUTF8
 
 

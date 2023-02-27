@@ -5,7 +5,7 @@ function FileSepClicker (guiaction)
 	.ide.ViewAsSwap
 
 
-function IdeAddProj (|string| path, |PerryIDE| ide = nil, |PerryIDE|)
+function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE|)
 	|| old = perry.FindProj(path)
 		ClickedTabs(nil, old)
 		return old.obj|PerryIDE|

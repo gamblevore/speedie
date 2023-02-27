@@ -40,7 +40,7 @@ datatype byte
 	
 	render
 		if (!fs_in)
-			return string[self]
+			return string.byte(self)
 		fs_in <~ self|Byte|
 		return nil
 

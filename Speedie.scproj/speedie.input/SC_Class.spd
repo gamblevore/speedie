@@ -151,7 +151,7 @@ function LoadProperties
 		.properties = []
 		return
 	|| it = .properties.first
-		expect (!self.IsRole) (it.source, "Class acts can't have properties!")
+		expect (!self.IsRole) (it.source, "Roles can't have properties!")
 	for (p in .properties)
 		expect (!p.default) (p.source, "Class properties can’t have default values.")
 
@@ -795,8 +795,8 @@ module
 		|| mod = neuclass(node, name_Space, errplace)|scmodule| $
 		|| cls = mod.cls$
 		cls.IsRole = true
-		expect !(cls.properties) (cls.properties[0].source, "Can't have properties in class acts.")
-		return mod
+		if !(cls.properties)
+			return mod
 		
 	
 	function NeuClass (CollectFunc)

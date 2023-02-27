@@ -31,14 +31,14 @@ module Terminal
 	syntax append (|string| text, |int| x = 0, |int| y = 0, |TerminalColor| Colors = 0)
 		.Init
 		|| within = 0
-		for c in text
-			if c.istextline
+		for c.codepoints in text
+			if c == 10 or 13
 				y++
 				within = 0
-			  else
+			  else 
 				|| xx = x+within
-				if  xx inrange w  and  y inrange h and c != ' '
-					.Screen[y][xx] = string[c]
+				if  xx inrange w  and  y inrange h  and  c != ' '
+					.Screen[y][xx] = string.char(c)
 					.ColorInfo[(.w*y)+xx] = colors // update later... allow setting bg, or styles.
 				within++
 	

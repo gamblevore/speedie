@@ -65,9 +65,9 @@ Module Jeebox
 		// all valid unicode-ranges
 		return (self + #(80BFC2F4)#).charset 	
 	
-	function AddEscape (|int| i, |faststring| fs)
+	function AddEscape (|byte| i, |faststring| fs)
 		opt norefcounts
-		|| f = string[i]
+		|| f = string.byte(i)
 		require  !.EscapeStr[f]  or  !.Escapechr[f]
 		fs <~ '\\'
 		fs.appendhex(i, 2)
