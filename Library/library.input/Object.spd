@@ -51,6 +51,9 @@ class Object
 				P = P.Parent
 	
 	
+	operator MustBe (|&ClassData|x, |bool|)
+		return self.mustbe(x)
+	
 	helper MustBe (|&ClassData|x, |Message|ErrNode=nil, |bool|)
 		if self isa x
 			return true

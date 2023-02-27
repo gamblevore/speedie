@@ -709,7 +709,7 @@ function CollectIsaTests (|Message| s, |[Message]| out, |bool|)
 		Return true
 
 	|| fexp = f.ExportName
-	if fexp ~!=  "JB_Object_Isa" and "JB_Object_MustBe" and "JB_Object_FastIsa"
+	if fexp ~!=  "JB_Object_Isa" and "JB_Object_MustBe" and "JB_Object_OperatorMustBe" and "JB_Object_FastIsa"
 		Return true
 	// Awesome...
 	
