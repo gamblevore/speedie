@@ -10,5 +10,5 @@ corriwall "-"
 	appearance "You see smoothly polished stone, with battle scars scratched in." // fix this
 door "@"
 	appearance "The wooden door is heavy and would take quite a pounding. It still smells of unfinished wood."
-gate "π"
+gate "="
 	appearance "An iron gate blocks your way. It's mere prescence seems harsh."

@@ -6,26 +6,25 @@
 	// also some rooms should connect but aren't
 
 module roguetype	// i could use a selector? i guess?
-	|message| Floor 
-	|message| Rock
-	|message| Wall
-	|message| Corridor
-	|message| Corriwall
-	|message| Door
-	|message| Gate
+	|dictionary of message| all
+	syntax access (|string| name, |message|)
+		return .all[name]
+	function door	(|message|): return .all["door"]
+	function wall	(|message|): return .all["wall"]
+	function floor	(|message|): return .all["floor"]
+	function rock	(|message|): return .all["rock"]
+	function corriwall	(|message|): return .all["corriwall"]
+	function corridor	(|message|): return .all["corridor"]
 
 
+role RogueObject (message)
 class RogueCreature (RogueObject)
     render
 		fs <~ "${.name} has ${..strength} STR and ${..health} HP. "
 
 
-role RogueObject (message)
-
-
 class RogueRoom
 	|ivec4|   Size
-	|message| Purpose 
 
 
 datatype RogueCellState (byte)
@@ -34,25 +33,13 @@ datatype RogueCellState (byte)
 		Seen
 		Glimpsed
 
-ignore {
-cell "+"
-	
-	|ivec2|				Pos // calculated from .pos and .parent.pos
-	|message|			Type // .first.name
-	|rogueroom|			Room // .obj
-	|RogueCellState|	State // .extra?
-}
 
 Role RogueCell	(message)
 	contains RogueObject
 	
 	constructor (|message| parent, |int| x,  |message| Type)
-		super.Constructor(parent)
-		.func = @tmp
-		.name = "cell"
-		.position = x
-		.msg(@str, type.name)	// just look up the rock type each fucking time :)
-		.msg(@arg)				// be done with it! The compiler can opt it haha.
+		super.Constructor(parent, @tmp, x, type.name)
+		.msg(@arg)						// The compiler can opt it haha.
 	
 	function TermColor (|int|)
 		return .first.Indent
@@ -61,14 +48,13 @@ Role RogueCell	(message)
 //		if .type == roguetype.corridor
 //			return Terminal.red
 	function Type (|message|)
-		
+		return roguetype.all[.name]
 	setter Type (|message|)
-		
-	
+		.Name = Value.name	
 	function pos (|ivec2|)
 		return (.position, .parent.position)
 	function Draw 
-		Terminal <~ (.first.name, .pos, .termcolor)
+		Terminal <~ (.type.first.name, .pos, .termcolor)
 
 
 
@@ -78,6 +64,7 @@ module Map {
 |int64| 		Seed
 |message| 		Creatures
 |Message| 		RoomTypes
+|Message| 		CellTypes
 |[rogueroom]| 	Rooms
 |message|		MapState
 
@@ -90,10 +77,13 @@ syntax access (|ivec2| s, |RogueCell|)
 
 function Init (|ivec2| size)
 	.size = size
-	|| map = .MapState..map
+	.MapState = Message()
+	|| map = .MapState.msg(@tmp, "map").msg(@arg)
+	printline .MapState
 	|| rock = roguetype.rock
 	for y in size.y
 		|| row = map.msg(@arg, "row")
+		row.Position = y
 		for x in size.x
 			.data <~ RogueCell(row, x, rock)
 
@@ -152,31 +142,31 @@ function Connect (|ivec2| p, |ivec2| d)
 	|| Length = 1
 	|roguecell| last
 	|| d2 = d.yx
+	|| door = roguetype.door, || floor = roguetype.floor, || cw = roguetype.corriwall
+	|| rock = roguetype.rock, || corridor = roguetype.corridor, || wall = roguetype.wall
 	while Length < 30
 		p += d
 		|| c = self[p] #require
 		|| ctype = c.type
-		ifn cType == roguetype.rock or roguetype.wall or roguetype.Corridor
+		ifn cType == rock or wall or Corridor
 			exit
 		last = c
 		Length++
 		c.Type = roguetype.Corridor
 		with self[p+d2]
-			if .type == roguetype.Rock
-				.type = roguetype.corriwall
+			if .type == Rock
+				.type = cw
 		with self[p-d2]
-			if .type == roguetype.Rock
-				.type = roguetype.corriwall
+			if .type == Rock
+				.type = cw
 	
 	if Length >= 2
-		first.Type = roguetype.door
-		last.position = 0
+		first.Type = door
 	
 	if length > 2
-		last.Type = roguetype.door
+		last.Type = door
 	  elseif length == 2
-		last.Type = roguetype.Floor
-		first.position = 0
+		last.Type = Floor
 
 
 function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| Coridoors=false,  |bool|)
@@ -213,7 +203,7 @@ function ivec2.isCornerOf (|ivec4| R, |bool|)
 
 function GenRoom
 	|| RoomSize = .oksize #require
-	|| room = RogueRoom(roomsize, nil)
+	|| room = RogueRoom(roomsize)
 	.rooms <~ room
 	for P.rect in RoomSize
 		|| cell = self[p]
@@ -242,28 +232,24 @@ function GenPlayer
 function GenMonster
 	
 	
+function Cell (|string| name, |message|)
+	return .cell(name)//Cells..floor
+	
 function Load (|int64| Seed, |bool|)
 	seed := date.now & 0xffff
 	Random.shared.seed = seed
 	map.seed = seed
 	app.CWD = app.Path.parent
-	.MapState = Message()
 	.Creatures = "Creatures.txt".file.parse
 	.roomtypes = "Rooms.txt".file.parse
-	|| Cells = "Cells.txt".file.parse
-	RogueType.Floor = Cells..floor
-	RogueType.wall = Cells..wall
-	RogueType.rock = Cells..rock
-	RogueType.corridor = Cells..corridor
-	RogueType.corriwall = Cells..corriwall
-	RogueType.door = Cells..door
-	RogueType.Gate = Cells..gate
+	.CellTypes = "Cells.txt".file.parse
+	roguetype.all = .CellTypes.Dict
 	return StdErr.ok
 	
 
 
 function Run (|bool| Splash)
-	.init(terminal.size) // (256,128)
+	.init(terminal.size)
 	.GenMap
 	.GenPlayer
 	.GenMonster
@@ -273,9 +259,11 @@ function Run (|bool| Splash)
 		.DetectVisibility
 		.DrawMap
 		Terminal.Display
-	
+
+
 function Running (|bool|)
 	return true
+
 
 function DetectVisibility
 	
@@ -297,7 +285,7 @@ function Splash
 			|| f = i*1.234 + secs*(0.33+i*0.05)
 			Terminal <~ (Title, 1+((1.5*f/scale).bounce*(Terminal.w-(title.length+2))), 1+f.bounce*(h-2), terminal.Red+i)
 
-		|| title2 = "<Mini-Rogue>"
+		|| title2 = " <Mini-Rogue> "
 		|| x = (terminal.w - title2.length) / 2
 		Terminal <~ (title2, x, 0, Terminal.Red)
 		Terminal <~ (file://HeartLogo.txt , 32, 10, terminal.red)
