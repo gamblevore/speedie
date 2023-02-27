@@ -1,10 +1,8 @@
 #!/usr/local/bin/spd
 
 // todo
-	// fix room connection...no need connect to the same room
-	// also delete rooms that can't connect
-	// also some rooms should connect but aren't
-	// fill genplayer and genmonster
+	// abandoned rooms... need connection! (or removeal?)
+	// make getchar return a string!!! ooop
 
 
 module Info
@@ -23,10 +21,19 @@ class RogueRoom // this class is only to be used during generation! Doesn't exis
 	|ivec4|		Size
 	|message| 	Purpose
 	|int| 		MonsterCount
-	constructor (|ivec4| size, |message| purpose)
-		.size = size, .purpose = purpose
+	|int| 		ID
+	|int| 		ConnectedTo
+	|uint| 		What
+	constructor (|ivec4| size, |message| purpose, |int| n)
+		.size = size, .purpose = purpose, .ID = 1<<n
+		.ConnectedTo = .ID
 	function IsSpawn (|bool|)
 		return .purpose.IsFirst
+	function Connect (|RogueRoom| Other)
+		.ConnectedTo |= other.ID
+		other.ConnectedTo |= .ID
+	function IsConnected (|rogueroom| r, |bool|)
+		return r and (r.ConnectedTo&.ID)
 
 
 datatype RogueCellState (byte)
@@ -47,9 +54,9 @@ role RogueCell	(message)
 		opt norefcounts
 		|| o = .obj
 		if o mustbe rogueroom
-			return o // actually don't do this
-	function TermColor (|int|)
-		return .first.Indent
+			return o
+	function Color (|message| f, |int|)
+		return (f.indent, terminal.yellow)(!.flags)
 	function Type (|message|)
 		return map.types[.name]	// The compiler can opt this? An ideal compiler would
 	function InSpawn (|bool|)
@@ -59,19 +66,25 @@ role RogueCell	(message)
 		.Name = Value.name	
 	function Pos (|ivec2|) 
 		return (.position, .parent.position)
+		
 	function Walkable (|bool|)
 		opt norefcounts
 		return .type..walkable!=nil
+		
 	function DrawOne (|message| t, |bool|)
-		|| f = t.first #expect (t, "no name msg?")
-		|| name = f.name #expect (f, "no name str?")
-		Terminal <~ (f.name, .pos, f.indent)
+		|| f    = t.first   #expect (t, "no name msg?")
+		|| name = f.name    #expect (f, "no name str?")			
+		Terminal <~ (f.name, .pos, .color(F))
 		return f != @str
+		
 	function Draw 
 		opt norefcounts
 		for obj in .arg
 			require .drawone(obj)
-		.drawone(.type)
+		if .Indent
+			Terminal <~ ((.indent-1)|int|.render, .pos, .color(self))
+		  else 
+			.drawone(.type)
 
 module Map {
 |dictionary of message| types
@@ -81,7 +94,7 @@ module Map {
 |message|		MapState
 |message| 		Level
 |message|		Player
-|message| door, |message| floor, |message| corriwall
+|message| door, |message| floor,    |message| corriwall
 |message| rock, |message| corridor, |message| wall
 
 		
@@ -155,11 +168,11 @@ function ivec4.Edge (|int| where, |ivec4|)
 		where -= h
 
 		if (where < W)		// top
-			return (.x + where+1, .Y2-1, 0, -1)
+			return (.x + where+1, .Y2-1, 0, 1)
 		where -= w
 
 		if (where < H)		// left
-			return (.X, .y + where+1, 1, 0)
+			return (.X, .y + where+1, -1, 0)
 		where -= h
 		
 	
@@ -184,6 +197,8 @@ function Connect (|ivec2| p, |ivec2| d)
 			if .type == Rock
 				.type = corriwall
 	
+	if last
+		last.Room.Connect(first.room)
 	if Length >= 2
 		first.Type = door
 	if length > 2
@@ -192,20 +207,25 @@ function Connect (|ivec2| p, |ivec2| d)
 		last.Type = Floor
 
 
-function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| Coridoors=false,  |bool|)
+function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| AllowCoridoors=false,  |bool|)
 	|| s = r.size
 	|| hitwall = 1
-	
+//	self[p].flags = 1
+//	self[p].indent = 1
 	for length in 30
 		p += d
 		|| c = self[p]$
-		|| r2 = c.obj
+//		c.flags = 1
+//		c.indent = length+2
+		|| r2 = c.room
 		|| ct = c.type
+		if r.IsConnected(r2)
+			require 0.1[]
 		if ct == wall
 			require hitwall++ <= 1
-		if r2 and (r2 != r) and (ct == Floor)
+		if (ct == Floor)
 			return true
-		require (ct == rock or wall) or (coridoors and ct == corridor)
+		require (ct == rock or wall) or (AllowCoridoors and ct == corridor)
 
 
 function ConnectRoom (|rogueroom| r)
@@ -247,29 +267,31 @@ function RoomPurpose (|[rogueroom]| rooms, |message|)
 	
 function GenRoom (|[rogueroom]| rooms)
 	|| RoomSize = .oksize #require
-	|| room = RogueRoom(roomsize, .roompurpose(rooms))
+	|| room = RogueRoom(roomsize, .roompurpose(rooms), rooms.length)
 	rooms <~ room
 	for P.rect in RoomSize
 		|| cell = self[p]
-		|| type = Floor
-		if !RoomSize.contains(P, 1)
-			if cell.type != wall
-				Type = wall
-			  elseif p.IsCornerOf(Roomsize)
-				0
-			  elseif !cell.InSpawn
-				type = floor
-		cell.Type = type
+		if RoomSize.contains(P, 1)
+			cell.type = floor
+		  elseif cell.type != wall
+			cell.Type = wall
+		  elseif p.IsCornerOf(Roomsize)
+			0
+		  elseif !cell.InSpawn and !room.IsSpawn
+			cell.Type = floor
 		cell.obj = room
 
-	require room.isspawn
+	if room.isspawn
+		.PositionPlayer(room)
+		
+
+function PositionPlayer (|rogueroom| Room)
 	for 100
-		for P.rect in RoomSize
+		for P.rect in room.Size
 			|| cell = self[p]
 			if (cell.type == floor) and 100th[]
 				cell.arg <~ .Player
 				return 
-				
 		
 function GenPlayer
 	|| P = info.GameBank..classes
@@ -360,19 +382,23 @@ function info.Load (|int64| Seed, |bool|)
 	return StdErr.ok
 
 
+function Input 
+	|| c = Terminal[] 
+	Terminal <~ (c.render, 0, 0)
+
+
 function Run (|bool| Splash)
 	.init(terminal.size)
 	.GenPlayer
 	.GenMap
 	.GenMonster
-	if StdErr.ok
-		"monsters+map+player loaded"
-	if Splash
+	if Splash 
 		.splash
-	while .Running
+	while
 		.DetectVisibility
 		.DrawMap
 		Terminal.Display
+		.Input
 
 
 function Running (|bool|)
