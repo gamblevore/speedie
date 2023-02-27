@@ -5,7 +5,7 @@
 	// also delete rooms that can't connect
 	// also some rooms should connect but aren't
 
-module roguetype
+module roguetype	// i could use a selector? i guess?
 	|message| Floor 
 	|message| Rock
 	|message| Wall
@@ -242,13 +242,14 @@ function GenPlayer
 function GenMonster
 	
 	
-function Load (|int64| Seed)
+function Load (|int64| Seed, |bool|)
 	seed := date.now & 0xffff
 	Random.shared.seed = seed
 	map.seed = seed
 	app.CWD = app.Path.parent
-	// i could use a selector? i guess?
 	.MapState = Message()
+	.Creatures = "Creatures.txt".file.parse
+	.roomtypes = "Rooms.txt".file.parse
 	|| Cells = "Cells.txt".file.parse
 	RogueType.Floor = Cells..floor
 	RogueType.wall = Cells..wall
@@ -257,8 +258,7 @@ function Load (|int64| Seed)
 	RogueType.corriwall = Cells..corriwall
 	RogueType.door = Cells..door
 	RogueType.Gate = Cells..gate
-	.Creatures = "Creatures.txt".file.parse
-	.roomtypes = "Rooms.txt".file.parse
+	return StdErr.ok
 	
 
 
@@ -306,8 +306,8 @@ function Splash
 	
 main
 	|| a = app[0]
-	map.load(a.int)
-	map.run(!a)
+	if map.load(a.int)
+		map.run(!a)
 
 
 
