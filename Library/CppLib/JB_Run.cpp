@@ -185,6 +185,7 @@ int		JB_SP_Run (_cstring* C, int Mode)	{
 
 
 void JB_App__Quit (int Code) {
+	JB_Rec_ShellPrintErrors(nil);
 	if (!Code)
 		Code = JB_ErrorNumber;
     exit(Code);
