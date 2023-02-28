@@ -81,6 +81,7 @@ function ObjectifyString (|Message| msg)
 function GetFileString (|Message| msg, |string| name, |message|)
 	|| f = compiler.InputFile(nil, name, msg)
 		msg.become(@str, f.readall)
+		(SCImport.Recent max= f.modified) 
 		msg.clear
 		.ObjectifyString(msg)
 		return msg
