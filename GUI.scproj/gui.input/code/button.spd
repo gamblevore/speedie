@@ -171,6 +171,8 @@ class ButtonView (GUIControl)
 			t += " \17"
 		if i is dead
 			t += " (!)"
+		if i is Modified
+			t += "*"
 		|| Pn = R.TextCorner(.gnormal,  t,  .align) + (-1, 1)
 		|| White = (.align & listviewstate.DrawWhiteSpace)!=0
 		font.small.DrawText(t,  Where,  Pn, White)
