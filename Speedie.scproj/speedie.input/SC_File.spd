@@ -61,7 +61,6 @@ class SCFile (file)
 	function Orig (|message|)
 		if !.origast or .origdate < .modified
 			.origdate = .modified
-			// .liveast = nil // wha? // we need this!
 			.origast = .astsub
 		return .origast
 
