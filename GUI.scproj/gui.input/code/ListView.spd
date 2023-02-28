@@ -241,7 +241,7 @@ class ListView (GUIControl) {
 
 	function InlineCell (|bool| always = false, |&InlineEditor|)
 		opt norefcounts
-		|| t = &.window.inlineeditor
+		|| t = &.window$.inlineeditor
 		if always or (self == T.editingfor)
 			return t
 
