@@ -2,8 +2,11 @@
 
 // todo
 	// abandoned rooms... need connection! (or removeal?)
-	// make getchar return a string!!! ooop
-
+	// monsters try to attack us
+	// cell-discovery
+	// potions
+	// item pick up
+	// monster item drop
 
 module Info
 	|config| 		GameBank
@@ -11,10 +14,53 @@ module Info
 	|config| 		CellTypes
 
 
-role RogueObject (message)
-class RogueCreature (RogueObject)
-    render
+role RogueObject (Message)
+    render Str
 		fs <~ "${.name} has ${..strength} STR and ${..health} HP. "
+
+	function Cell (|RogueCell|)
+		return .parent.parent
+		
+	function TryAttack (|RogueCell| cell, |bool|)
+		|| mon = cell.monster #require
+		|| dmg = .ATK * random[0.7, 1.5]  -  mon.DEF * random[0.2, 1.0]
+		|| LIF = mon.hp - (dmg max 0)
+		mon.HP = LIF
+		.DescribeAttack(mon, dmg)
+		if LIF <= 0
+			mon.Kill
+		return true
+		
+	function DescribeAttack (|rogueobject| mon, |int| dmg)
+		|| w = .weapon
+		map.FrameText <~ "You ${w.verb} the ${mon.name} with your ${w.name} for $dmg DMG${mon.DiedMsg}."
+	
+	function DiedMsg (|string|)
+		if .hp <= 0
+			return ", killing it"
+		
+	function Kill
+		.name += " Corpse"
+		.clear
+		self <~ (@char, "x")
+		
+	function Verb (|string| Default="punch", |string|)
+		return (self[0].name, default)(self)
+	function HP (|int|)
+		return self..health.int
+	setter HP (|int|)
+		self..health = @num+value
+		
+	function Strength (|int|)
+		return self..strength.int
+	function Weapon (|rogueobject|)
+		return self..weapon|rogueobject|
+	function Armour (|rogueobject|)
+		return self..armour|rogueobject|
+	function DEF (|int|)
+		return .armour.strength
+	function ATK (|int|)
+		return .weapon.strength + .strength
 
 
 class RogueRoom // this class is only to be used during generation! Doesn't exist during run/reload
@@ -53,8 +99,10 @@ role RogueCell	(message)
 	function Room (|RogueRoom|)
 		opt norefcounts
 		|| o = .obj
-		if o mustbe rogueroom
+		if o and o mustbe rogueroom
 			return o
+	function Describe (|string|)
+		return .type..appearance.value
 	function Color (|message| f, |int|)
 		return (f.indent, terminal.yellow)(!.flags)
 	function Type (|message|)
@@ -66,34 +114,43 @@ role RogueCell	(message)
 		.Name = Value.name	
 	function Pos (|ivec2|) 
 		return (.position, .parent.position)
-		
+	syntax Append (|rogueobject| value)
+		.arg <~ value
 	function Walkable (|bool|)
 		opt norefcounts
-		return .type..walkable!=nil
+		return self and .type..walkable!=nil
+	function Monster (|rogueobject|)
+		for c in .arg
+			if c.first == @str
+				return c
 		
-	function DrawOne (|message| t, |bool|)
+	function DrawOne (|rogueobject| t, |bool|)
+		if t == map.Player
+			require map.DrawPlayer
 		|| f    = t.first   #expect (t, "no name msg?")
-		|| name = f.name    #expect (f, "no name str?")			
 		Terminal <~ (f.name, .pos, .color(F))
 		return f != @str
 		
 	function Draw 
 		opt norefcounts
-		for obj in .arg
-			require .drawone(obj)
 		if .Indent
 			Terminal <~ ((.indent-1)|int|.render, .pos, .color(self))
 		  else 
 			.drawone(.type)
+		for obj in .arg
+			require .DrawOne(obj)
+
 
 module Map {
 |dictionary of message| types
 |[RogueCell]|	Data
 |ivec2|			Size
+|date| 			FlickerAfter = 1
 |int64| 		Seed
+|FastString|	FrameText = faststring()
 |message|		MapState
 |message| 		Level
-|message|		Player
+|rogueobject|	Player
 |message| door, |message| floor,    |message| corriwall
 |message| rock, |message| corridor, |message| wall
 
@@ -108,15 +165,16 @@ function Init (|ivec2| size)
 	.MapState = Message()
 	|| maplist = .MapState.msg(@tmp, "maps").msg(@arg)
 	for i in 6
-		|| map = maplist.msg(@tmp, "map")
-		map <~ i+1
+		|| rowlist = maplist.msg(@tmp, "map").msg(@arg)
+		rowlist.prev = @num + (i+1)
 		for y in size.y
-			|| row = map.GiveArg.msg(@tmp, "row").msg(@arg)
+			|| row = rowlist.msg(@tmp, "row").msg(@arg)
 			row.Position = y
 			for x in size.x
 				RogueCell(row, x, rock)
-	.LoadLevel(1)
 
+function DrawPlayer (|bool|)
+	return !.FlickerAfter.fired or ((date.now / 0.8s)|int| isa 2)
 
 function LoadLevel (|int| i)
 	.Level = (.mapstate..maps)[i-1]
@@ -124,7 +182,9 @@ function LoadLevel (|int| i)
 	for row in .level.arg
 		for cell in row.arg
 			.data <~ cell
-	// thats the level. Now what?
+	.player = info.GameBank..classes[].copy
+	|| Wep = info.GameBank..weapons.filter(.player.strength)[]
+		.Player..weapon = wep.copy
 	
 
 function IsRoomOK (|ivec4| i, |bool|)
@@ -210,8 +270,6 @@ function Connect (|ivec2| p, |ivec2| d)
 function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| AllowCoridoors=false,  |bool|)
 	|| s = r.size
 	|| hitwall = 1
-//	self[p].flags = 1
-//	self[p].indent = 1
 	for length in 30
 		p += d
 		|| c = self[p]$
@@ -244,7 +302,7 @@ function ConnectRoom (|rogueroom| r)
 
 
 function ivec2.isCornerOf (|ivec4| R, |bool|)
-	r-=(0,0,1,1)
+	r -= (0,0,1,1)
 	return self == R.x1y1 or R.x1y2 or R.x2y1 or R.x2y2 // fix later
 
 
@@ -290,16 +348,9 @@ function PositionPlayer (|rogueroom| Room)
 		for P.rect in room.Size
 			|| cell = self[p]
 			if (cell.type == floor) and 100th[]
-				cell.arg <~ .Player
+				cell <~ .Player
 				return 
-		
-function GenPlayer
-	|| P = info.GameBank..classes
-	require p and p.hasany
-	.player = p[].Copy
 
-		
-	
 	
 function GenMap
 	|[rogueroom]| 	Rooms
@@ -308,7 +359,6 @@ function GenMap
 	for r in Rooms
 		.ConnectRoom(r)
 
-
 	
 function GenMonster
 	|| lim = random[18,30,1]
@@ -316,31 +366,35 @@ function GenMonster
 	for 1000
 		for c in .data // all cells
 			if !c.inspawn and c.walkable and 100th[]
-				c.arg <~ Mon[].copy
+				c <~ Mon[].copy
 				require --lim> 0
 
 
-function AllowedMonsters (|int| Level_Num = 0, |[roguecreature]|)
-	return (info.GameBank..monsters).LevelFilter(level_num, true)
+function AllowedMonsters (|int| Level_Num = 0, |[rogueobject]|)
+	return (info.GameBank..monsters).Filter(level_num, true)
 		
-function AllowedRoom (|int| Level_Num = 0, |[roguecreature]|)
-	return (info.RoomTypes).LevelFilter(level_num, false)
+function AllowedRoom (|int| Level_Num = 0, |[message]|)
+	return (info.RoomTypes).Filter(level_num)
 
 
-function message.LevelFilter (|int| L, |bool| IsMonster,  |[roguecreature]|)
+function message.Filter (|int| L, |bool| IsMonster=false,  |[rogueobject]|)
 	L := map.level[0].int
 	opt norefcounts
 	for Mon in self
-		if ismonster
+		if IsMonster
 			|| str = mon[@str] // expect a name!
 			expect (str and str.name) (Mon, "Monster has no name!")
-		|| allowed = mon[@bra,1][@rel]
-		allowed[@opp, 1].Expect(nil, "-")
-		|| f = allowed[@num].int
-		|| t = allowed[@num, -1].int
-		if L >= f and L <= t
-			rz <~ mon
-
+		|| bra = mon[@bra,1]
+			|| allowed = bra[0]
+			if allowed == @rel
+				allowed[@opp, 1].Expect(nil, "-")
+				|| f = allowed[@num].int
+				|| t = allowed[@num, -1].int
+				if L >= f and L <= t
+					rz <~ mon
+			  elseif allowed.int <= L
+				rz <~ mon
+				
 
 function info.LoadColors (|Message| msg, |TerminalColor| Default=0)
 	for s in msg
@@ -382,27 +436,58 @@ function info.Load (|int64| Seed, |bool|)
 	return StdErr.ok
 
 
-function Input 
+function Search (|roguecell| where, |bool|)
+	frametext <~ "You see: "
+	for obj in where.arg
+		if obj != .player
+			frametext <~ "${obj.name}. "
+	frametext <~ where.Describe
+	return true
+
+		
+function Move (|int| x, |int| y)
+	|| p0 = .Player.cell.Pos
+	|| cell = self[p0 + (x,y)]      #require
+	if !cell.Walkable
+		.search(cell)
+		return 
+
+	.FlickerAfter = date.now + 2s
+	if !.player.TryAttack(cell)
+		cell <~ .player
+	.FrameStep
+
+	
+function Input (|bool|)
 	|| c = Terminal[] 
-	Terminal <~ (c.render, 0, 0)
+	if c == ' '
+		return .Search(.player.cell)
+	|| up    = (c == '1' or '2' or '3' or 'q' or 'w' or 'e')|int|
+	|| down  = (c == '7' or '8' or '9' or 'z' or 'x' or 'c' or 's')|int|
+	|| left  = (c == '1' or '4' or '7' or 'q' or 'a' or 'z')|int|
+	|| right = (c == '3' or '6' or '9' or 'e' or 'd' or 'c')|int|
+	if right!=left or down!=up
+		.move(right-left, down-up)
+		return true
 
 
 function Run (|bool| Splash)
 	.init(terminal.size)
-	.GenPlayer
+	.LoadLevel(1)
 	.GenMap
 	.GenMonster
 	if Splash 
 		.splash
+	|| modified = true
 	while
 		.DetectVisibility
-		.DrawMap
-		Terminal.Display
-		.Input
+		if modified
+			.DrawMap
+			Terminal.Display
+		Modified = .Input
 
 
-function Running (|bool|)
-	return true
+function FrameStep
 
 
 function DetectVisibility
@@ -412,6 +497,9 @@ function DrawMap
 	for i in .size
 		self[i].draw
 	terminal <~ ("Map: " + .Seed.Render, 30, 0)
+	|| str = .FrameText.GetResult
+		|| s = Terminal.Size
+		Terminal.FrameText(str, (s-(30, 10), s))
 
 
 function Splash
@@ -423,9 +511,9 @@ function Splash
 		for i in 5.0
 			|| Title = " Mini Rogue ".Rotate(i + secs*3)
 			|| f = i*1.234 + secs*(0.33+i*0.05)
-			|| x = 1+((1.5*f/scale).bounce*(Terminal.w-(title.length+2)))
-			|| y = 1+f.bounce*(h-2)
-			Terminal <~ (Title, x, y, terminal.Red+i)
+			|| x = (1.5*f/scale).bounce * (Terminal.w-(title.length+2))
+			|| y = f.bounce*(h-2)
+			Terminal <~ (Title, x+1, y+1, terminal.Red+i)
 
 		|| title2 = "<Mini-Rogue>"
 		|| x2 = (terminal.w - title2.length) / 2

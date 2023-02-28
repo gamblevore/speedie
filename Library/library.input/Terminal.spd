@@ -23,6 +23,11 @@ module Terminal
 	
 	function Size (|ivec2|)
 		return (w,h)
+	
+	syntax Expect (|string| msg="")
+		"\07"
+		if msg
+			printline msg
 
 	syntax append (|string| text, |ivec2| xy, |TerminalColor| Colors = 0)
 		cpp_part Append2
@@ -38,11 +43,22 @@ module Terminal
 			  else 
 				|| xx = x+within
 				if  xx inrange w  and  y inrange h  and  c != ' '
+					if c == 127
+						c = ' ' // lol
 					.Screen[y][xx] = string.char(c)
 					.ColorInfo[(.w*y)+xx] = colors // update later... allow setting bg, or styles.
 				within++
 	
-	
+	function FrameText (|string| s, |ivec4| Frame, |terminalcolor| FrameCol=terminal.white, |terminalcolor| TextCol=0)
+		s = s.wrap(frame.width-2)
+		|| p = frame.xy+1
+		for i.rect in frame ± 1
+			.Screen[i.y][i.x] = " "
+		for l.lines in s
+			self <~ (l, p, textcol)
+			p.y++
+		.DrawRect(frame, FrameCol)
+		
 	function DrawRect (|ivec4| Rect, |string| inside="", |terminalcolor| colors=0)
 		|| r2 = rect + (1,1,-2,-2)
 		for s.rect in rect
@@ -96,7 +112,7 @@ module Terminal
 		TermReset.puts
 		.flat.puts
 	
-	syntax access (|int|)
+	syntax access (|ind|)
 		cpp_wrapper JB_App__GetChar
 		
 

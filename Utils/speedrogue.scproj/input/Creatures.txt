@@ -9,60 +9,41 @@ classes
 		health 15
 		strength 4
 		speed 2
-	Knight  "!" (warrior)
-		health 50
-		color blue
-		strength 10
-	Paladin  "!" (warrior)
-		color red
-		health 40
-		strength 10
-		speed 2
 
 weapons
-	knife
-		damage 5
-		skill 1
-	stave
-		damage 5
-		skill 3
-	steel_whip
-		damage 2
+	knife "slash" (5)
+		strength 5
+		
+	stave "swing" (5)
+		strength 5
+		
+	steel_whip "swipe at" (3)
+		strength 2
 		range 3
-		skill 1
-	sword
-		damage 7
+		
+	sword "slice" (5)
+		strength 7
 		range 2
-		skill 4
-	claws
-		damage 10
-		skill 5
+	claws "slice" (4)
+		strength 9
 
 
 armor
 	padded
-		"(aka "gambisson"). This tough armour absorbs most except the strongest of blows"
+		`(aka "gambisson"). This tough armour absorbs most except the strongest of blows`
 		strength 6
-		weight 2
-		hp 10
 	
 	leather
 		"Typical leather armour"
 		strength 3
-		weight 1
-		hp 10
 	
 	fine_cloth
 		"magical threads"
 		strength 1
-		hp 3
-		weight 0
 	
 	plate
 		"Weighty. But tank-like. You don't want to be facing this."
 		strength 12
-		hp 50
-		weight 10
 	
 
 monsters	
@@ -70,28 +51,24 @@ monsters
 		"Eek eek!"
 		health 8
 		strength 1
-		freq 0.1
 		gear (0.5.knife)
 		
 	Jelly "j" (1-3)
 		"glob glob!"
 		health 15
 		strength 2
-		freq 0.2
 		gear (0.05.leather)
 		
 	Jelly "J" (4-4)
 		"glob glob!"
 		health 15
 		strength 2
-		freq 0.2
 		items (0.05.plate)
 		
 	Orc "O" (4-5)
 		"A tough mean brute dedicated on destruction."
 		health 30
 		strength 2
-		freq 0.1
 		gear (leather, padded)
 		gear (sword)
 		items (health_potion)
@@ -100,7 +77,6 @@ monsters
 		"You no take candle!"
 		health 20
 		strength 2
-		freq 0.2
 		gear (leather)
 		gear (knife)
 
@@ -108,7 +84,6 @@ monsters
 		"Warrior dressed in peridot studded armour"
 		health 40
 		strength 5
-		freq 0.05
 		gear (plate, leather)
 		gear (steel_whip)
 
