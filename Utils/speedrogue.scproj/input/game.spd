@@ -1,12 +1,12 @@
 #!/usr/local/bin/spd
 
 // todo
-	// abandoned rooms... need connection! (or removeal?)
 	// monsters try to attack us
 	// cell-discovery
 	// potions
 	// item pick up
 	// monster item drop
+	// abandoned rooms... need connection! (or removal?)
 
 module Info
 	|config| 		GameBank
@@ -33,23 +33,23 @@ role RogueObject (Message)
 		
 	function DescribeAttack (|rogueobject| mon, |int| dmg)
 		|| w = .weapon
-		map.FrameText <~ "You ${w.verb} the ${mon.name} with your ${w.name} for $dmg DMG${mon.DiedMsg}."
+		map.FrameText <~ "You ${w.verb(mon)} the ${mon.name} with your ${w.name} for $dmg DMG."
 	
-	function DiedMsg (|string|)
-		if .hp <= 0
-			return ", killing it"
-		
 	function Kill
 		.name += " Corpse"
 		.clear
 		self <~ (@char, "x")
 		
-	function Verb (|string| Default="punch", |string|)
-		return (self[0].name, default)(self)
+	function Verb (|rogueobject| mon, |string|)
+		if mon.hp <= 0
+			return "kill"
+		return (self[0].name, "hit")(self)
 	function HP (|int|)
 		return self..health.int
 	setter HP (|int|)
 		self..health = @num+value
+	function Max (|int|)
+		return self..max.int
 		
 	function Strength (|int|)
 		return self..strength.int
@@ -133,10 +133,7 @@ role RogueCell	(message)
 		
 	function Draw 
 		opt norefcounts
-		if .Indent
-			Terminal <~ ((.indent-1)|int|.render, .pos, .color(self))
-		  else 
-			.drawone(.type)
+		.drawone(.type)
 		for obj in .arg
 			require .DrawOne(obj)
 
@@ -183,6 +180,7 @@ function LoadLevel (|int| i)
 		for cell in row.arg
 			.data <~ cell
 	.player = info.GameBank..classes[].copy
+	.Player..max = .Player..health.copy
 	|| Wep = info.GameBank..weapons.filter(.player.strength)[]
 		.Player..weapon = wep.copy
 	
@@ -296,7 +294,7 @@ function ConnectRoom (|rogueroom| r)
 			.Connect(cell.xy, cell.x2y2)
 			needed--
 			require needed > 0
-//		else // seems that some good positiosn ARE being tested, but are failing. Can't see why?
+//		else // seems that some good positions ARE being tested, but are failing. Can't see why?
 // everything seems OK?'
 //			self[cell.xy].Type = roguetype.gate
 
@@ -496,7 +494,7 @@ function DetectVisibility
 function DrawMap
 	for i in .size
 		self[i].draw
-	terminal <~ ("Map: " + .Seed.Render, 30, 0)
+	terminal <~ ( "${.player.name}: ${.player.HP}/${.player.Max}",  30,  0 )
 	|| str = .FrameText.GetResult
 		|| s = Terminal.Size
 		Terminal.FrameText(str, (s-(30, 10), s))
