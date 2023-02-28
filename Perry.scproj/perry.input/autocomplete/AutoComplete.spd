@@ -1,5 +1,4 @@
 
-
 helper message.list_desired (|int| common, |string|)
 	rz = .first.name[0, Common]
 	if self == rz
@@ -271,6 +270,9 @@ function EditMeModified (guikeyevent)
 			|| b = self[x]
 			if !b or b.istextline or i.autocomplete.isopenedmenu
 				.PerryTryAutoComplete(x, "autocomplete_edit", PerryAutoCompleteReason.modified)
+		
+		|listviewrow| msg = i.ProjMsg
+		(msg is modified) = (self is modified)
 
 
 function PerryIDE.ShowStats
@@ -315,6 +317,9 @@ function JumpToDefinition (GUIAction)
 		if msg in @url
 			msg = msg.parent
 		if msg == @url
+			if false and msg == "file"
+				// we should ask the compiler to actually show this.
+				//ide.filelist.QuickOpenFile(msg.first.nyme, 1) // doesn't work... we'd have to find the file.
 			app.showurl(msg.render)
 		  elseif msg == @sheb
 			msg.name.reveal
