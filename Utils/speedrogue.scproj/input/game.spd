@@ -1,13 +1,5 @@
 #!/usr/local/bin/spd
 
-// todo
-	// monsters try to attack us
-	// cell-discovery
-	// potions
-	// item pick up
-	// monster item drop
-	// abandoned rooms... need connection! (or removal?)
-
 module Info
 	|config| 		GameBank
 	|config| 		RoomTypes
