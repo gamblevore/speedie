@@ -1751,6 +1751,7 @@ function TypeOfArgArr (ExprResolver)
 				result.type = contained.type
 			result.c_Array++
 	
+	expect result.type (exp, "Can't get the type of this.")
 	exp.obj = result
 	Tran_ArgArray(exp, name_space)
 	return result
