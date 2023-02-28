@@ -328,22 +328,29 @@ int InterRead (int fd, unsigned char* buffer, int N, JB_String* ErrorPath, int& 
     return Total;
 }
 
+
+// getting a string makes more sense, cos what about Unicode? And glyphs?
+// HOWEVER, whabout someone copy/pasting an entire thing in? then what?
+// ideally... we should just get the whole thing
+// perhaps into a FastString? THEN we should... split it into glyphs.
+// on the other side... that is. not within here. Could just use u8Count_
+// to find a codepoint... maybe just ungetc. Do it later.
 int JB_App__GetChar() {
-	struct termios old_tio, new_tio;
+	struct termios tio;
 
-	tcgetattr(STDIN_FILENO,&old_tio);	/* get the terminal settings for stdin */
+	tcgetattr(STDIN_FILENO, &tio);	/* get the terminal settings for stdin */
 
-	/* we want to keep the old setting to restore them a the end */
-	new_tio=old_tio;
-
-	/* disable canonical mode (buffered i/o) and local echo */
-	new_tio.c_lflag &=(~ICANON & ~ECHO);
-	tcsetattr(STDIN_FILENO,TCSANOW,&new_tio);
-
+//	/* disable canonical mode (buffered io) and local echo */
+	tcflag_t PrevFlag = tio.c_lflag; 
+	tio.c_lflag &=~ (ICANON|ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &tio);
+	int PrevState = fcntl(STDIN_FILENO, F_GETFL); 
+	
+	fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
 	int c = getchar();
-
-	/* restore the former settings */
-	tcsetattr(STDIN_FILENO,TCSANOW,&old_tio);
+	fcntl(STDIN_FILENO, F_SETFL, PrevState);	/* restore the former settings */
+	tio.c_lflag = PrevFlag;
+	tcsetattr(STDIN_FILENO, TCSANOW, &tio);
 	
 	return c;
 }
