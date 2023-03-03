@@ -27,13 +27,13 @@ function compiler.PrintStats
 
 
 function compiler.PrintCompileErrors
-	require stderr.problems
+	require StdErr.problems
 	.preprinterrors
 
-	if (scfunction.DisabledPoints)
+	if (SCFunction.DisabledPoints)
 		"Disabled functions called ${scfunction.DisabledPoints}x!".printlinecolor(errorcolors.error)
 	
-	|| MinSev = (errorseverity.warning, errorseverity.problem)(Options.Warnings) 
+	|| MinSev = (ErrorSeverity.warning, ErrorSeverity.problem)(Options.Warnings) 
 	.PrintErrors(MinSev)
 	stderr.clear
 
@@ -51,7 +51,7 @@ function compiler.CompileTime
 		.FileSanityTests // sometimes this fails due to lack of permissions in xcode...
 						 // xcode gives lower perms to it's builder scripts, strangely.
 	File.TestJB
-	SC_Saver.test
+	SC_Saver.Test
 	.PrintCompileTime(.CompileAll~timeit)
 	if stderr.ok
 		externalcompiler.ExtComp

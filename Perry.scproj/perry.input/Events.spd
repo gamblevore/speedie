@@ -60,7 +60,6 @@ function ClickedCreateProj (GUIAction)
 
 
 function ClickedOpenFile (GUIaction)
-	debugger
 	|| file = app.AskOpen("",  "",  "Open File")
 		IdeAddProj(file)
 	perry.HideStartIfNeeded
