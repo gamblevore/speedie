@@ -223,9 +223,13 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 
 	// Headers
 	|| cppl = .CppLib
+	|| cbf = Compiler.BuildFolder
+	|| cgcf = compiler.generatedcppsfolder
+	expect (cppl and cbf and cgcf) ("Memory corruption error! Strings seem corrupted?") // sigh
+		
 	if options.ProjectIsMiniLib
 		rz.appendwords( "-D AS_LIBRARY=1" )
-	rz.AppendWords( "   -D TARGET_UNIX=1 -D __SPEEDIE__=1  -I $cppl  -I ${Compiler.BuildFolder} -I ${compiler.generatedcppsfolder}  " )
+	rz.AppendWords( "   -D TARGET_UNIX=1 -D __SPEEDIE__=1  -I $cppl  -I $cbf -I $cgcf  " )
 
 	|| NoASM = !asm.needed
 	|| GotAny = false
