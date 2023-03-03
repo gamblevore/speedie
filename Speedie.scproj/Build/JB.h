@@ -684,7 +684,8 @@ JBClass ( Process , JB_Object ,
 	fn_subprocess SubProcess;
 	Array* Params;
 	JB_File* LogFile;
-	JB_File* ChildStdOut;
+	JB_File* StdOutFile;
+	FastString* StdOut;
 	RingTree* SendQueue;
 	Ind ProcPos;
 	IPCMessage Dummy;
@@ -1204,13 +1205,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1794])
+#define kJB__ErrorColors_bold (JB_LUB[1796])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1795])
-#define kJB__ErrorColors_good (JB_LUB[1796])
-#define kJB__ErrorColors_normal (JB_LUB[1797])
-#define kJB__ErrorColors_underline (JB_LUB[1796])
-#define kJB__ErrorColors_warn (JB_LUB[1798])
+#define kJB__ErrorColors_error (JB_LUB[1797])
+#define kJB__ErrorColors_good (JB_LUB[1798])
+#define kJB__ErrorColors_normal (JB_LUB[1799])
+#define kJB__ErrorColors_underline (JB_LUB[1798])
+#define kJB__ErrorColors_warn (JB_LUB[1800])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern Array* SC__Ext_Cleanup;
@@ -1382,8 +1383,8 @@ extern Date JB__Terminal_LastDisplay;
 #define kJB__Terminal_magenta (35)
 #define kJB__Terminal_red (31)
 extern Array* JB__Terminal_Screen;
-#define kJB__Terminal_TermClear (JB_LUB[1799])
-#define kJB__Terminal_TermReset (JB_LUB[1800])
+#define kJB__Terminal_TermClear (JB_LUB[1801])
+#define kJB__Terminal_TermReset (JB_LUB[1802])
 #define kJB__Terminal_w (80)
 #define kJB__Terminal_white (37)
 #define kJB__Terminal_yellow (33)
@@ -1421,10 +1422,10 @@ extern JB_String* JB_file_read_test;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[425])
-#define kSC_BitNot (JB_LUB[525])
-#define kSC_BitOr (JB_LUB[635])
-#define kSC_BitXor (JB_LUB[1801])
+#define kSC_BitAnd (JB_LUB[426])
+#define kSC_BitNot (JB_LUB[526])
+#define kSC_BitOr (JB_LUB[636])
+#define kSC_BitXor (JB_LUB[1803])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1454,7 +1455,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1802])
+#define kJB_SaverStart1 (JB_LUB[1804])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2613,7 +2614,7 @@ bool JB_API__NilHandler();
 
 
 // Constants
-void JB_Constants__AddEscape(int i, FastString* fs);
+void JB_Constants__AddEscape(byte i, FastString* fs);
 
 int JB_Constants__Init_();
 
@@ -4942,6 +4943,8 @@ void JB_FS_AppendCppAll(FastString* self, JB_String* s);
 
 void JB_FS_AppendEscape(FastString* self, JB_String* s);
 
+bool JB_FS_AppendFile(FastString* self, JB_File* f);
+
 void JB_FS_AppendHexStr(FastString* self, JB_String* Data);
 
 void JB_FS_AppendObjectID(FastString* self, Saveable* o);
@@ -5082,13 +5085,15 @@ bool JB_Proc_Found(Process* self, bool send);
 
 Message* JB_Proc_Get(Process* self, Date TimeOut);
 
+Message* JB_Proc_GetSub(Process* self, Date TimeOut);
+
 bool JB_Proc_IsOpen(Process* self);
 
 void JB_Proc_log(Process* self, JB_String* s);
 
 void JB_Proc_LogMsg(Process* self, JB_String* msg);
 
-void JB_Proc_logus(Process* self);
+void JB_Proc_LogUs(Process* self);
 
 void JB_Proc_OpenSharedMemory(Process* self, int n);
 
@@ -5118,7 +5123,7 @@ int JB_Proc_SetupAlloc(Process* self, int n);
 
 void JB_Proc_SetupServerState(Process* self);
 
-PID_Int JB_Proc_sideid(Process* self);
+PID_Int JB_Proc_SideID(Process* self);
 
 bool JB_Proc_Send(Process* self, Message* msg, Date TimeOut);
 
@@ -5133,6 +5138,8 @@ JB_String* JB_Proc_TheirName(Process* self);
 void JB_Proc_Unlink(Process* self);
 
 void JB_Proc_Unmap(Process* self);
+
+void JB_Proc_UpdateStdOut(Process* self);
 
 void JB_Proc_UseDummy(Process* self);
 
@@ -5626,8 +5633,6 @@ bool JB_Str_Yes(JB_String* self);
 JB_String* JB_Str__FromC(_cstring Addr);
 
 JB_String* JB_Str__Hex(int64 i);
-
-JB_String* JB_Str__SyntaxAccess(int b);
 
 
 
