@@ -71,6 +71,7 @@ class OpenSaveDialog (Window)
     |Buttonview|		Accept
     |Buttonview|		Reveal
     |string|			Types
+    |string|			LastGoodPath
     |string|			Keyboard
     |date|				KeyDownExpired
 
@@ -103,19 +104,20 @@ class OpenSaveDialog (Window)
 			.singleline = true
 			.id			= id
 			.takesfocus	= takesfocusflag.canfocus
-			.onkeydown := OpenSaveKey
-			.OnTextChanged= OpenSaveKey
 			.gnormal.solid= ((0.0, 0.0, 0.0, 0.1))
 	
 	
 	function DragPathEvent (GUIPasteEvent)
 		.path.text = data
-		OpenSaveKey(.path, nil)
+		relistkey(.path, nil)
 		return true
 
 	
 	function init
 		.path.id = "opensave"
+		.path.onkeydown = relistkey
+		.path.OnTextChanged= relistkey
+		
 		.InitField(.path, "path")
 		.InitField(.name, "name")
 		.InitField(.question, "question")
@@ -201,7 +203,21 @@ class OpenSaveDialog (Window)
 				if r isa filerow
 					if r.location.name ~= name
 						return r
+		
 
+		function RelistKey (guikeyevent)
+			opt NoRefCounts
+			require key <= 0
+			|| w = .window|OpenSaveDialog|
+			|| p = w.path
+			|| t = p.text
+			if (t[0] != '/')
+				beep
+				p.text = w.LastGoodPath init "/"
+				return true
+			
+			w.RelistFiles(t, false)
+			return true
 
 
 
@@ -212,24 +228,16 @@ function file.IsDirLike (|bool|)
 	return (n != "XCBuildData") and (ext != "app" and "framework" and "bundle" and "xcodeproj" and "build" and "dSYM") // os x
 
 
-function OpenSaveKey (guikeyevent)
-	opt NoRefCounts
-	require key <= 0
-	|| w = .window|OpenSaveDialog|
-	return w.RelistFiles(.text, false)
-
-
-function OpenSaveDialog.RelistFiles (|string| path, |bool| AlwaysUse=true, |bool|)
+function OpenSaveDialog.RelistFiles (|string| path, |bool| AlwaysUse=true)
 	|| pf = path.file
 	if !pf.exists and !AlwaysUse
-		return true
+		return
 
 	if path[0] == '~'
 		path = path.Resolve
-	
-	.files.ListFilesUp(path, .types, (.name is visible))
-	
-	return true
+	if path
+		.LastGoodPath = path
+		.files.ListFilesUp(path, .types, (.name is visible))
 
 
 function OnAskSaveAnswer (GUIAction)
@@ -250,8 +258,7 @@ function OpenSaveDialog.GoIntoFolder (|bool|)
 	|| Acceptable = f and (f isnt greyed)
 	expect Acceptable (Beep)
 	if f.asdir
-		|| ext = f.location.ext
-		if (f.name == "..") or !.types or !.types.typecontains(ext+"/")
+		if (f.name == "..") or !.types or !.types.typecontains(f.location.ext+"/")
 			.path.text = f.location
 			.RelistFiles(f.location)
 			return true
@@ -285,5 +292,5 @@ function OnAskSaveEntered (GuiListEvent)
 	return .parent|OpenSaveDialog|.GoIntoFolder
 
 
-function window.cancelreturn
+function window.CancelReturn
 	.ReturnValue = self
