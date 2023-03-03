@@ -251,7 +251,7 @@ function PerryInsert1 (|textview| self, |message| where, |intrange| a, |bool|)
 function TextView.IsClearBackLine (|int| x, |bool|)
 	while x >= 0
 		|| c = self[x--]
-		if c.istextline
+		if c.IsTextLine
 			exit
 		require c == ' ' or '\t'
 	return true
@@ -284,6 +284,9 @@ function textview.PerryDeclKey (|bool|)
 	if clearback and !inclass
 		return .insert("|| ")
 	  elseif endofline or inclass
+		if d.BackHasIgnoringSpaces("||", s.x)
+			.insert(" ") // whatever
+			return true
 		.insert("||")
 		.sel = .sel0-1 // :)
 		return true
