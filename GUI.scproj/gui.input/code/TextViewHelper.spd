@@ -29,6 +29,7 @@ class TextViewLine (ringtree)
 
 
 	render
+		
 		if !.parent
 			for c in self
 				c.render(fs)
@@ -39,7 +40,13 @@ class TextViewLine (ringtree)
 			fs.appendescape(.text)
 			fs <~ '"'
 
-
+	helper BackHasIgnoringSpaces (|string| name, |int| pos, |bool|)
+		pos = pos-.Position
+		while --pos >= 0
+			|| t = .text[pos]
+			ifn t == ' ' or '\t'
+				return .Text[pos-(name.length-1), name]
+		
 	function DrawRange (|ivec2|)
 		|| p = .position
 		|| L = .text.length
