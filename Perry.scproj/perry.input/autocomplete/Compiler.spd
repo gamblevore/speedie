@@ -97,11 +97,12 @@ extend PerryIDE
 	function Readlog
 		if .Building and .stdout.height > 1
 			.justreadlog
-	
+
 	function JustReadLog
 		opt norefcounts
-		|| f = .compilr$.childstdout
-			.stdout <~ f.read(1K)
+		|| c = .Compilr$
+		c.UpdateStdOut
+		.stdout <~ c.stdout
 	
 	function CompileFB (|message| msg, |bool|)
 		.CancelCompile

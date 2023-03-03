@@ -31,7 +31,8 @@ class Process
 	|fn_subprocess|				SubProcess
 	|[string]|					Params
 	|file|						LogFile
-	|file|						ChildStdOut
+	|file|						StdOutFile
+	|FastString|				StdOut
 	|ringtree of message|		SendQueue
 	|ind|						ProcPos
 	|IPCMessage|				Dummy
@@ -44,7 +45,7 @@ class Process
 	|bool|						TrapStdOut
 	|byte|						CanPrint
 
-	constructor	(|string| name,  |int| n, |[string]| params=nil,  |fn_subprocess| sub=nil, |bool|TrapStdOut=false)
+	constructor	(|string| name,  |int| n,  |[string]| params=nil,  |fn_subprocess| sub=nil,  |bool|TrapStdOut=false)
 		cpp_part Constructor
 		
 		.deathlimit = 12
@@ -53,6 +54,7 @@ class Process
 		.sendqueue	= ringtree()
 		.writer		= FastString()
 		.subprocess = sub
+		.TrapStdOut = TrapStdOut
 		name := app..talk
 		if name
 			if name[0] != '/'
@@ -86,11 +88,11 @@ class Process
 	render
 		.reportconnection("", fs)
 
-	function PrintState (|string| s="")
+	function PrintState (|string| s = "")
 		printline .reportstate(s)
 
 
-	render ReportState (|string|s="")
+	render ReportState (|string| s = "")
 		.ReportConnection(s, fs)
 		|| S1 = .ours.sendid
 		|| R2 = .theirs.readid
@@ -131,7 +133,7 @@ class Process
 			.origsize = 0
 		return .origsize
 
-
+		
 	helper SetupAdjust (|int| n)
 		.writer.reserved = n - (–sizeof IPCMessage)
 		
@@ -153,7 +155,7 @@ class Process
 		// "successful enough", but they have to decide what that means as we can't know
 		// there is no point connecting to a file server, navigating through directories
 		// and dying everytiem we download any file.
-		
+	
 	helper TheirName (|string|)
 		return .OurName(false)
 	
@@ -352,17 +354,23 @@ class Process
 		sp.SendID++
 		.LastSend = date.now
 		.writer.length = 0
+		.UpdateStdOut
 
 
 	function Get (|Date| TimeOut = 2years, |message|)
+		opt norefcounts
 		require (self != nil)
+		rz = .getsub(timeout)
+		.UpdateStdOut
+		
+	helper GetSub (|Date| TimeOut, |message|)
 		if timeout > 0: .self( "get")
 		require .WaitFor(timeout, false)
 		|| sp = .theirs
 		|| len = sp.datalength
 			expect (len <= .writer.reserved) (self, "Invalid message length")
 			|| str = string.copy(.theirs.data, len)
-			.ours.readid = sp.SendID
+			.ours.ReadID = sp.SendID
 			return str.parse_jbin
 		.ours.readid = sp.SendID
 		.self "received nil"
@@ -377,6 +385,14 @@ class Process
 		if !.isserver
 			app.die
 
+
+	function Close
+		if .IsServer
+			.JustKill(true)
+		  else
+			.disconnect
+		.dispose
+
 	
 	function JustKill (|bool| OK=false)
 		if .cid
@@ -386,16 +402,13 @@ class Process
 			.cid = 0
 			.self("killed child", true)
 		.Disconnect
-		.childstdout = nil
 
-
-	function Close
-		if .IsServer
-			.JustKill(true)
-		  else
-			.disconnect
-		.dispose
 		
+	helper UpdateStdOut
+		opt norefcounts
+		if .stdoutfile and .stdout
+			.stdout.appendfile(.stdoutfile)
+
 
 	helper Self (|string| msg, |bool| strong=false)
 		if .CanPrint or strong
@@ -411,11 +424,11 @@ class Process
 			.logmsg(msg)
 
 
-	helper sideid (|pid_int|)
+	helper SideID (|pid_int|)
 		return .isserver sign app.id
 
 		
-	helper logus
+	helper LogUs
 		.log .ourname
 		.log .sideid.render
 		.log ": "
@@ -453,6 +466,7 @@ class Process
 
 
 	function Disconnect
+		.UpdateStdOut
 		.sendqueue.clear
 		if self isnt closed
 			.self "disconnect"
@@ -485,7 +499,7 @@ class Process
 
 	function RunChild (|string| path, |bool|)
 		require (self isnt invalid)
-		.cid = path.cstr.Startprocess(.params, , (&.ChildStdout, nil)(.trapstdout))
+		.cid = path.cstr.Startprocess(.params, nil)//(&.stdoutfile, nil)(.trapstdout))
 		if .cid
 			.path = path
 			.AddToList

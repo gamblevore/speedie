@@ -83,10 +83,11 @@ function PerryIDE.CompilerInit (|process| C, |bool| actual_compile, |process|)  
 		target false // debug
 			|| Proc = "/usr/local/speedie/Terminal/Debug/uwu"
 		  else
-			|| proc = Speedie
+			|| Proc = Speedie
 		proc = proc.resolve
 		if proc
 			rz = process.child(Proc, name, p, actual_compile, 128KB)
+				
 
 
 function PerryIDE.ActualCompile (|message| msg)

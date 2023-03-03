@@ -53,7 +53,9 @@ class File (String)
 	function HardLinkTo (assigns:|stringzeroterminated|, |bool|)
 		cpp_wrapper JB_File_HardLinkTo 
 
-	function Opened (|bool|)
+	function IsOpen (|bool|)
+		disabled "use .opened"
+	function Opened (|bool|) // isopen
 		return .descriptor >= 0
 
 	function Name (assigns:|string|Name, |errorint|)

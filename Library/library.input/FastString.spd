@@ -153,7 +153,13 @@ class FastString {
 	syntax Append (|int| data)
 		cpp_part AppendInt32
 		self <~ data|int64|
-
+		
+	function AppendFile (|File| f, |bool|)
+		if f.opened
+			return .appendpipe(f.descriptor, 0)
+		
+	helper AppendPipe (|int|fd, |int| mode, |bool|)
+		cpp_wrapper JB_FS_AppendPipe // (FastString* self, int fd, int Mode)
 	
 	syntax cast (|string|)
 		return .getresult
