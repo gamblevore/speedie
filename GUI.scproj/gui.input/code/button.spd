@@ -167,11 +167,13 @@ class ButtonView (GUIControl)
 		
 		if !i and .text.refcount == 0
 		|| t = (i.text, .text)(i)
+		if !i and .SubMenu
+			i = .SubMenu.ListSource // alow these text to be added.
 		if i is Broken
 			t += " \17"
 		if i is dead
 			t += " (!)"
-		if i is Modified
+		if (i is Modified)
 			t += "*"
 		|| Pn = R.TextCorner(.gnormal,  t,  .align) + (-1, 1)
 		|| White = (.align & listviewstate.DrawWhiteSpace)!=0
