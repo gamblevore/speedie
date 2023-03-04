@@ -847,16 +847,20 @@ module SDLApp
 			.candrag = nil
 			if .inResizeCorner(xy)
 				return kActivity
+
 			|| B = ev.button
-			if b.button == 1
-				if !w.CurrMouseDown
-					mousebutton.DownAt = date()
-				w.CurrMouseDown = w.DoMouseDown(xy, b.clicks)
-			  elseif b.button == 3
+			|| BN = b.button
+			|| Ctrl = keys.control
+			if (bn == 3) or (Ctrl and bn == 1) 
 				|| F = w.ControlOrMenuAt(xy)
 				w.CurrMouseDown = f
 				if F
 					f.__rightclick__(xy)
+			  elseif bn == 1
+				if !w.CurrMouseDown
+					mousebutton.DownAt = date()
+				w.CurrMouseDown = w.DoMouseDown(xy, b.clicks)
+			  
 			return kActivity
 
 
