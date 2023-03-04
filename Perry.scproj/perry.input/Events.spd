@@ -534,8 +534,9 @@ function ClickedError (GUIListEvent)
 
 
 function ClickedLog (GUIListEvent)
+	opt norefcounts
 	|| i = .ide
-	if i.stdout is visible
+	if row and i.stdout is visible
 		i.stdout.text = row.name
 	return true
 
