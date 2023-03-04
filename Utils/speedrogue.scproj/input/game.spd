@@ -36,13 +36,17 @@ role RogueObject (Message)
 		if mon.hp <= 0
 			return "kill"
 		return (self[0].name, "hit")(self)
+	function Gain (|int| Amount)
+		require amount > 0
+		.hp = (.hp + amount) min .max
 	function HP (|int|)
 		return self..health.int
 	setter HP (|int|)
 		self..health = @num+value
 	function Max (|int|)
 		return self..max.int
-		
+	Syntax Append (|int| Amount)
+		.gain(amount)
 	function Strength (|int|)
 		return self..strength.int
 	function Weapon (|rogueobject|)
@@ -53,6 +57,22 @@ role RogueObject (Message)
 		return .armour.strength
 	function ATK (|int|)
 		return .weapon.strength + .strength
+	function FrameStep
+		require .first == @str // a monster
+		// now what?
+		|| IsPlayer = self == map.Player
+		|| c = .cell
+		|| pos = c.Pos
+		for V.rect in (-10, -10, 10, 10)
+			|| cell = map[v+pos]
+			if !cell or v > 10
+				0
+			  elseif IsPlayer
+				cell.flags |= RogueCellState.seen // its visible... show it
+			  elseif cell.HasPlayer
+				|| found = c.CanSee(cell, v)
+					found <~ self
+					return 
 
 
 class RogueRoom // this class is only to be used during generation! Doesn't exist during run/reload
@@ -76,9 +96,9 @@ class RogueRoom // this class is only to be used during generation! Doesn't exis
 
 datatype RogueCellState (byte)
 	flags
+		Debug
 		Visited
 		Seen
-		Glimpsed
 
 
 role RogueCell	(message)
@@ -102,6 +122,12 @@ role RogueCell	(message)
 	function InSpawn (|bool|)
 		opt norefcounts
 		return .room.IsSpawn?
+	function HasPlayer (|bool|)
+		opt norefcounts
+		for obj in self
+			if obj == map.Player
+				return true
+	function CanSee (|RogueCell| Cell, |ivec2| Dir,  |roguecell|)
 	setter Type (|message|)
 		.Name = Value.name	
 	function Pos (|ivec2|) 
@@ -112,37 +138,48 @@ role RogueCell	(message)
 		opt norefcounts
 		return self and .type..walkable!=nil
 	function Monster (|rogueobject|)
-		for c in .arg
+		for c in self
 			if c.first == @str
 				return c
 		
 	function DrawOne (|rogueobject| t, |bool|)
 		if t == map.Player
 			require map.DrawPlayer
-		|| f    = t.first   #expect (t, "no name msg?")
+		|| f = t.first   #expect (t, "no name msg?")
 		Terminal <~ (f.name, .pos, .color(F))
 		return f != @str
 		
 	function Draw 
 		opt norefcounts
 		.drawone(.type)
-		for obj in .arg
+		for obj in self
 			require .DrawOne(obj)
 
+	iterator
+		|rogueobject| src = .arg[0]
+		while src
+			yield src
+			src++
 
-module Map {
+
+|| Map = Rogue()
+Class Rogue {
 |dictionary of message| types
 |[RogueCell]|	Data
 |ivec2|			Size
-|date| 			FlickerAfter = 1
+|date|			FlickerAfter
 |int64| 		Seed
-|FastString|	FrameText = faststring()
+|FastString|	FrameText
 |message|		MapState
 |message| 		Level
 |rogueobject|	Player
+|retrofloat| 	Healing
 |message| door, |message| floor,    |message| corriwall
 |message| rock, |message| corridor, |message| wall
 
+constructor
+	.flickerafter = 1
+	.frametext = FastString()
 		
 
 syntax access (|ivec2| s, |RogueCell|)
@@ -160,7 +197,7 @@ function Init (|ivec2| size)
 			|| row = rowlist.msg(@tmp, "row").msg(@arg)
 			row.Position = y
 			for x in size.x
-				RogueCell(row, x, rock)
+				RogueCell(row, x, .rock)
 
 function DrawPlayer (|bool|)
 	return !.FlickerAfter.fired or ((date.now / 0.8s)|int| isa 2)
@@ -179,7 +216,7 @@ function LoadLevel (|int| i)
 
 function IsRoomOK (|ivec4| i, |bool|)
 	for p.rect in i
-		require self[p].Type != Floor
+		require self[p].Type != .Floor
 	return true
 
 function OKSize (|ivec4|)
@@ -235,26 +272,26 @@ function Connect (|ivec2| p, |ivec2| d)
 		p += d
 		|| c = self[p] #require
 		|| ctype = c.type
-		ifn cType == rock or wall or Corridor
+		ifn cType == .rock or .wall or .Corridor
 			exit
 		last = c
 		Length++
-		c.Type = Corridor
+		c.Type = .Corridor
 		with self[p+d2]
-			if .type == Rock
-				.type = corriwall
+			if .type == map.Rock
+				.type = map.corriwall
 		with self[p-d2]
-			if .type == Rock
-				.type = corriwall
+			if .type == map.Rock
+				.type = map.corriwall
 	
 	if last
 		last.Room.Connect(first.room)
 	if Length >= 2
-		first.Type = door
+		first.Type = .door
 	if length > 2
-		last.Type = door
+		last.Type = .door
 	  elseif length == 2
-		last.Type = Floor
+		last.Type = .Floor
 
 
 function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| AllowCoridoors=false,  |bool|)
@@ -269,11 +306,11 @@ function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| AllowCoridoors=
 		|| ct = c.type
 		if r.IsConnected(r2)
 			require 0.1[]
-		if ct == wall
+		if ct == .wall
 			require hitwall++ <= 1
-		if (ct == Floor)
+		if (ct == .Floor)
 			return true
-		require (ct == rock or wall) or (AllowCoridoors and ct == corridor)
+		require (ct == .rock or .wall) or (AllowCoridoors and ct == .corridor)
 
 
 function ConnectRoom (|rogueroom| r)
@@ -320,13 +357,13 @@ function GenRoom (|[rogueroom]| rooms)
 	for P.rect in RoomSize
 		|| cell = self[p]
 		if RoomSize.contains(P, 1)
-			cell.type = floor
-		  elseif cell.type != wall
-			cell.Type = wall
+			cell.type = .floor
+		  elseif cell.type != .wall
+			cell.Type = .wall
 		  elseif p.IsCornerOf(Roomsize)
 			0
 		  elseif !cell.InSpawn and !room.IsSpawn
-			cell.Type = floor
+			cell.Type = .floor
 		cell.obj = room
 
 	if room.isspawn
@@ -337,7 +374,7 @@ function PositionPlayer (|rogueroom| Room)
 	for 100
 		for P.rect in room.Size
 			|| cell = self[p]
-			if (cell.type == floor) and 100th[]
+			if (cell.type == .floor) and 100th[]
 				cell <~ .Player
 				return 
 
@@ -427,11 +464,11 @@ function info.Load (|int64| Seed, |bool|)
 
 
 function Search (|roguecell| where, |bool|)
-	frametext <~ "You see: "
-	for obj in where.arg
+	.frametext <~ "You see: "
+	for obj in where
 		if obj != .player
-			frametext <~ "${obj.name}. "
-	frametext <~ where.Describe
+			.frametext <~ "${obj.name}. "
+	.frametext <~ where.Describe
 	return true
 
 		
@@ -445,6 +482,7 @@ function Move (|int| x, |int| y)
 	.FlickerAfter = date.now + 2s
 	if !.player.TryAttack(cell)
 		cell <~ .player
+		cell.flags |= RogueCellState.visited
 	.FrameStep
 
 	
@@ -470,17 +508,23 @@ function Run (|bool| Splash)
 		.splash
 	|| modified = true
 	while
-		.DetectVisibility
 		if modified
+			.FrameStep
 			.DrawMap
 			Terminal.Display
 		Modified = .Input
 
 
 function FrameStep
+	.Heal
+	for c in .data
+		for obj in c
+			obj.FrameStep
 
 
-function DetectVisibility
+function Heal
+	.Healing <~ 12th
+	.Player <~ .Healing[]
 	
 	
 function DrawMap
