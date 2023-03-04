@@ -39,9 +39,19 @@ function App.GetActions (|Type|)
 	check ((rz & type.actions).CountBits <= 1) ("Too many actions.")
 
 
+function app.usage (|string|)
+	return "Usage: ${.filename} File1 [File2, ...],  or: ${.filename} FileIn -p > FileOut
+	options:
+		-j		Convert to jeebox
+		-b		Convert to jbin
+		-c		Compress
+		-s		Replace file in-place
+		-p		Print to stdout
+		-r		Just report types. Otherwise do nothing."
+
 main  
 	|| action = .getactions$
-	for r in (app.args  #expect ("Usage: ${app.filename} File1 [File2, ...],  or: ${app.filename} FileIn -p > FileOut"))
+	for r in (app.args  #expect (.Usage))
 		|| data = r.ReadFile(0.25GB, false)
 			conv(data, r).Process(Action)
 	
