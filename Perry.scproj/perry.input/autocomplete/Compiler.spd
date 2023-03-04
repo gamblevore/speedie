@@ -15,8 +15,14 @@ extend PerryIDE
 		return .projmsg.syntaxis(s)
 	syntax isnt (|ListViewState| s, |bool|)
 		return !.syntaxis(s)
-	syntax is (|ListViewState| s, assigns:|bool| b)
-		.projmsg.syntaxis(s) = b
+	syntax is (|ListViewState| s, assigns:|bool| mod)
+		.projmsg.syntaxis(s) = mod
+		
+		if (s == listviewstate.modified)
+			|| sub = .CurrFileName.SubMenu$
+			|| src = sub.ListSource$
+			(src is modified) = Mod
+
 	syntax isnt (|ListViewState| s, assigns:|bool| b)
 		.syntaxis(s)=!b
 
@@ -100,9 +106,7 @@ extend PerryIDE
 
 	function JustReadLog
 		opt norefcounts
-		|| c = .Compilr$
-		c.UpdateStdOut
-		.stdout <~ c.stdout
+		.stdout <~ .Compilr.ReadStdOut
 	
 	function CompileFB (|message| msg, |bool|)
 		.CancelCompile

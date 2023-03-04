@@ -31,8 +31,8 @@ class Process
 	|fn_subprocess|				SubProcess
 	|[string]|					Params
 	|file|						LogFile
-	|file|						StdOutFile
-	|FastString|				StdOut
+	|file|						_StdOutFile
+	|FastString|				_StdOut
 	|ringtree of message|		SendQueue
 	|ind|						ProcPos
 	|IPCMessage|				Dummy
@@ -404,10 +404,17 @@ class Process
 		.Disconnect
 
 		
+	function ReadStdOut (|string|)
+		if self
+			.UpdateStdOut
+			return ._stdout
+		
+		
 	helper UpdateStdOut
 		opt norefcounts
-		if .stdoutfile and .stdout
-			.stdout.appendfile(.stdoutfile)
+		if ._stdoutfile
+			|| fs = ._stdout init faststring()
+			fs.appendfile(._stdoutfile)
 
 
 	helper Self (|string| msg, |bool| strong=false)
@@ -499,8 +506,8 @@ class Process
 
 	function RunChild (|string| path, |bool|)
 		require (self isnt invalid)
-		.cid = path.cstr.Startprocess(.params, nil)//(&.stdoutfile, nil)(.trapstdout))
-		if .cid
+		.cid = path.cstr.Startprocess(.params, (&._stdoutfile, nil)(.trapstdout))
+		if .cid > 0
 			.path = path
 			.AddToList
 			return true

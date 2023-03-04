@@ -188,7 +188,6 @@
 		AC52889E2961ED2B005EFB9D /* CppLib */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CppLib; path = ../Library/CppLib; sourceTree = SOURCE_ROOT; };
 		AC5288A12961EDC3005EFB9D /* Cpp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Cpp; sourceTree = "<group>"; };
 		AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = JB_Umbrella.hpp; path = ../Library/CppLib/JB_Umbrella.hpp; sourceTree = "<group>"; };
-		AC528A592961F4FB005EFB9D /* Build */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Build; path = ../Speedie.scproj/Build; sourceTree = "<group>"; };
 		AC528A5A2961F536005EFB9D /* JB_Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = ../Speedie.scproj/Build/JB_Globals.cpp; sourceTree = "<group>"; };
 		AC528A5B2961F536005EFB9D /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = ../Speedie.scproj/Build/JB.cpp; sourceTree = "<group>"; };
 		AC528E7C2961F946005EFB9D /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = Cpp/JB.cpp; sourceTree = "<group>"; };
@@ -390,7 +389,6 @@
 				AC78080D256C065000ED647E /* library.input */,
 				AC0F6154233BA87000382DA7 /* Jeebox.input */,
 				AC52889E2961ED2B005EFB9D /* CppLib */,
-				AC528A592961F4FB005EFB9D /* Build */,
 				AC5288A12961EDC3005EFB9D /* Cpp */,
 				AC259FAA2660E1AC0026C303 /* OSX */,
 				AC528F132961F9F0005EFB9D /* AVFoundation.framework */,
