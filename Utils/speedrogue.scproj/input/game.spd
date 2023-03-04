@@ -15,8 +15,8 @@ role RogueObject (Message)
 		
 	function TryAttack (|RogueCell| cell, |bool|)
 		|| mon = cell.monster #require
-		|| dmg = .ATK * random[0.7, 1.5]  -  mon.DEF * random[0.2, 1.0]
-		|| LIF = mon.hp - (dmg max 0)
+		|int| dmg = .ATK * random[0.7, 1.5]  -  mon.DEF * random[0.2, 1.0]
+		|int| LIF = mon.hp - (dmg max 0)
 		mon.HP = LIF
 		.DescribeAttack(mon, dmg)
 		if LIF <= 0
