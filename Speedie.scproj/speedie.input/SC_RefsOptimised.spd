@@ -70,7 +70,7 @@ class CppRefs
 dispatch CppRefTable (TranFunc)
 	disowns				{} //(SCFunction.NewCppWrapper)
 	disturbs			{} //(SCBase.LoadCppPart)
-	paramsafe			{} scfunction.tran_cpprefs
+	paramsafe			scfunction.tran_cpprefs
 
 
 extend_module scmodule
@@ -87,7 +87,9 @@ extend_module SCFunction
 
 dispatch FuncLinkageTable (TranFunc)
 	cpp_wrapper			{}
-	cpp_part			{SCBase.LoadCppPart(node, name_space, node)}
+	cpp_part			{
+		SCBase.LoadCppPart(node, name_space, node)
+	}
 	cpp_refs			scfunction.tran_cpprefs
 	visible				{} // (SCFunction.Tran_Visible)
 	ignore				{}
