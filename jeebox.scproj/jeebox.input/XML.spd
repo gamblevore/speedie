@@ -197,8 +197,8 @@ helper message.XMLToJeeboxSub
 	  elseif self == @xml
 		.func = @tmp
 		|| prms = .first
-		prms.func = @list // shoulda been this already.
-		prms.remove
+			prms.func = @list // shoulda been this already.
+			prms.remove
 		|message| arg
 		while 
 			|| ch = .first #loop
@@ -209,10 +209,12 @@ helper message.XMLToJeeboxSub
 			self <~ prms
 			for ch in prms
 				ch.XMLToJeeboxSub
-		if arg.HasChildCount(1) and arg.first == @str
-			self <~ arg.first
-		  else
-			self <~ arg
+		if arg
+			|| HasChild = arg.HasChildCount(1)
+			if HasChild and arg.first == @str
+				self <~ arg.first
+			  else
+				self <~ arg
 	  elseif self == @xtxt or @xcdt
 		.func = @str
 	  elseif self == @xatt
