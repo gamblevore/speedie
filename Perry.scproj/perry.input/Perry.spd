@@ -64,7 +64,7 @@ module Perry
 
 	function BuildAppMenu
 		appmenu.addsep
-		|| extra = platform.isdebug or app.prefs..dev.Nyme.Yes
+		|| extra = platform.isdebug or app.prefs..dev.Yes
 			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
 			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
 			appmenu <~ ("Show Preferences", ClickedShowPrefs)
@@ -230,7 +230,7 @@ function CheckViewWorthIt (|buttonview| old)
 
 function Viewing (|buttonview|) // currview
 	opt norefcounts
-	for i in .viewbuttons
+	for i in .ViewButtons
 		if i.tag|guicontrol| is visible
 			return i
 
@@ -240,11 +240,11 @@ function IsViewing (|guicontrol| g, |bool|)
 
 
 function ViewAsBetter
-	if .project
-		if .project.isdir
-			.viewasproject
-		  else
-			.viewascurr
+	require .project
+	if .project.isdir
+		.viewasproject
+	  else
+		.viewascurr
 
 
 function ViewAsCurr
