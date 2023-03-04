@@ -196,6 +196,23 @@ datatype ErrorInt (int) // useful for unix-functions which has 0 == success
 
 
 
+struct RetroFloat
+// for doing pixel-based animations that move smoothly for retro-games
+	|float|		Amount
+	|float|		Remain
+	
+	syntax Append (|float| n)
+		.Amount += n
+	syntax Access (|int|)
+		|| A = .Amount // 1.1... every 10th frame returns 2
+		|| rem = A.fract + .remain
+		if rem >= 1.0
+			rem--
+			A++
+		.remain = rem
+		return A
+
+
 struct IntDownRange   /// :3
 	|int| From
 	|int| To
