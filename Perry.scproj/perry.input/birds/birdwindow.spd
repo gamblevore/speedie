@@ -32,7 +32,7 @@ class BirdWindow (Window)
 		pipeowner.Passed = 0
 		.UpdateScore
 		.score.singleline = true
-		.speed.speed = 0.75
+		.speed.Amount = 0.75
 		.speed.remain = 0
 		.pipes.clear
 		.pipes.position = 0
@@ -73,9 +73,9 @@ class BirdWindow (Window)
 	
 	function MovePipes
 		|| p = .pipes.first
-		.speed.speed += 600th
-		.speed.speed min= 2.5
-		|| x = p.left - .speed.next
+		.speed.Amount += 600th
+		.speed.Amount min= 2.5
+		|| x = p.left - .speed[]
 		if p.width + x > 0
 			p.left = x
 		  else
@@ -85,7 +85,7 @@ class BirdWindow (Window)
 			p.remove
 			|| p2 = .pipes.first
 			p2.left = p2.left
-			.pipes.refill(.speed.speed)
+			.pipes.refill(.speed.Amount)
 	
 	
 	
