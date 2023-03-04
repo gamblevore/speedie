@@ -13,7 +13,6 @@ target !minilib
 |message|					_Conf
 |config|					Prefs
 |string| 					_Path
-|string| 					Usage = "unknown"
 |string|					codesign_native = "codesign_osx"
 
 
@@ -338,7 +337,8 @@ role String_ArgValue (string)
 	syntax cast (|bool|)
 		return .yes
 
-
+/*
+// clever idea. Just not worth it
 helper @int.MainArg (|int| Pos, |int|)
 	return string.MainArgSub(Pos, "integer")$.int
 helper @string.MainArg (|int| Pos, |string|)
@@ -358,6 +358,6 @@ helper @string.MainArgSub (|int| Pos, |string| type, |stringthatwasreadsafely|)
 	if StdErr.ok
 		error "Usage: ${app.filename} ${app.usage}"
 	return string.Error
-
+*/
 
 
