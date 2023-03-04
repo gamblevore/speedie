@@ -47,18 +47,3 @@ class Bird (guicontrol)
 				.died = date.now
 		return .died.ago < 3s
 	 
-
-		
-struct RetroFloat
-	|float|		Speed
-	|float|		Remain
-	
-	function Next (|int|)
-		|| spd = .speed // 1.1... every 10th frame returns 2
-		|| rem = spd.fract + .remain
-		if rem >= 1.0
-			rem--
-			spd++
-		.remain = rem
-		return spd
-
