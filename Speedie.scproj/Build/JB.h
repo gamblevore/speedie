@@ -1206,13 +1206,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1798])
+#define kJB__ErrorColors_bold (JB_LUB[1795])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1799])
-#define kJB__ErrorColors_good (JB_LUB[1800])
-#define kJB__ErrorColors_normal (JB_LUB[1801])
-#define kJB__ErrorColors_underline (JB_LUB[1800])
-#define kJB__ErrorColors_warn (JB_LUB[1802])
+#define kJB__ErrorColors_error (JB_LUB[1796])
+#define kJB__ErrorColors_good (JB_LUB[1797])
+#define kJB__ErrorColors_normal (JB_LUB[1798])
+#define kJB__ErrorColors_underline (JB_LUB[1797])
+#define kJB__ErrorColors_warn (JB_LUB[1799])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern Array* SC__Ext_Cleanup;
@@ -1384,8 +1384,8 @@ extern Date JB__Terminal_LastDisplay;
 #define kJB__Terminal_magenta (35)
 #define kJB__Terminal_red (31)
 extern Array* JB__Terminal_Screen;
-#define kJB__Terminal_TermClear (JB_LUB[1803])
-#define kJB__Terminal_TermReset (JB_LUB[1804])
+#define kJB__Terminal_TermClear (JB_LUB[1800])
+#define kJB__Terminal_TermReset (JB_LUB[1801])
 #define kJB__Terminal_w (80)
 #define kJB__Terminal_white (37)
 #define kJB__Terminal_yellow (33)
@@ -1426,7 +1426,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[425])
 #define kSC_BitNot (JB_LUB[525])
 #define kSC_BitOr (JB_LUB[635])
-#define kSC_BitXor (JB_LUB[1805])
+#define kSC_BitXor (JB_LUB[1802])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1456,7 +1456,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1806])
+#define kJB_SaverStart1 (JB_LUB[1803])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1803,7 +1803,6 @@ extern uint64 SC__Cpp_LubHash;
 extern FastStringCpp* SC__Cpp_StringBlob;
 extern int SC__Cpp_StringCount;
 extern Dictionary* SC__Cpp_StringDict;
-extern FastStringCpp* SC__Cpp_StringLengths;
 extern FastStringCpp* SC__Cpp_StringLengths2;
 extern bool SC__Cpp_WriteAPI;
 extern bool SC__Cpp_WroteAny;
