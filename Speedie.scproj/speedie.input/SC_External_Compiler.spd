@@ -301,7 +301,7 @@ function RunCppCompile
 	if !options.silent
 		|| fs = faststring()
 		fs <~ "\nCompiling c++ to: \"${.ProductPath}\""
-		if app.ErrorNumber // the blob-loader might have set this. No point sending this spammy-info unless we need it.
+		if *app.ErrorNumber // the blob-loader might have set this. No point sending this spammy-info unless we need it.
 			fs<~ " (blob = ${Cpp_Export.LubHash|int64|})"
 		printline fs
 	
