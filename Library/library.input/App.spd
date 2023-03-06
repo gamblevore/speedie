@@ -186,7 +186,10 @@ helper Exit (|int| Code=0)
 
 
 function Quit (|int| Code=0)
-	cpp_Wrapper JB_App__Quit
+	cpp_wrapper JB_App__Quit
+
+function ErrorNumber (|&int|)
+	cpp_wrapper JB_App__ErrorNumber
 
 
 function Die (|string| Err = "", |int| code = -1)

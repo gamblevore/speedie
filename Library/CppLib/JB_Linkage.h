@@ -13,6 +13,7 @@ extern "C" {
     int JB_App__ID();
     Dictionary* JB_App__Env();
     void JB_App__Quit (int Code);
+    int* JB_App__ErrorNumber ();
     JB_String* JB_App__Path();
     int JB_App__SetEnv(JB_StringC* name, JB_StringC* value);
     int JB_Rec__PrintErrors();

@@ -218,6 +218,10 @@ int		JB_SP_Run (_cstring* C, int Mode)	{
 
 
 
+int* JB_App__ErrorNumber () {
+	return &JB_ErrorNumber;
+}
+
 void JB_App__Quit (int Code) {
 	JB_Rec_ShellPrintErrors(nil);
 	if (!Code)
