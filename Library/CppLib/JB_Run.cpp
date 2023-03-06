@@ -103,27 +103,61 @@ static JB_StringC* emptystr() {
 
 
 CharSet* JB_CS__New(JB_String* charset, bool Ranges);
-void JB_Str__FindGlobals(JB_String*** lub, int** lengths, const char** src);
+JB_String** JB_Str__FindGlobals(u8** src, uint64* Hash);
 
 
-void JB_Str__LoadGlobals2() {
-	extern JB_StringC*	EmptyString_;
-	const char*			Read = 0;
-	int*				Lengths = 0;
-	JB_String**			Write = 0;
-	JB_Str__FindGlobals(&Write, &Lengths, &Read);
-	require0 (Write);
-	*Write++ = EmptyString_;
-	require0 (Lengths and Read);
-	while (int n = *Lengths++) {
-		auto S = JB_StrCN((void*)Read, n);
-		Read+=n+1;
-		#ifndef DEBUG
-		S->RefCount = 1; // whatever
-		#endif
-		JB_SetRef(*Write++, S);
-	};
+static uint DecodeLength(u8*& p) {
+	int lim = 256-8;
+	uint rz = *p++;
+	if (rz >= lim) {
+		int n = rz - lim;
+		int i = 0;
+		rz = 0;
+		while (i <= n) {
+			rz |= *p++ << (i << 3);
+			i++;
+		};
+	}
+	return rz;
 }
+
+void JB_Load_StrError(int num) {
+	char  s[] = "jb.loadglob ";
+	s[11] = num+'0';
+	AddError(EILSEQ, s);
+	debugger;
+}
+
+void JB_Str__LoadGlobals() {
+	u8*					Start = 0;
+	uint64				StoredHash = 0;
+	JB_String**			Write = JB_Str__FindGlobals(&Start, &StoredHash);
+	u8*					Lengths = Start;
+	*Write++ = EmptyString_;
+
+	auto LengthBytes = DecodeLength(Lengths);
+	auto ReadBytes = DecodeLength(Lengths);
+	auto N = DecodeLength(Lengths);
+	auto Read = (const char*)Lengths + LengthBytes;
+	auto ReadEnd = Read + ReadBytes;
+	
+	JB_String S = {0, (int)((u8*)ReadEnd-(u8*)Start), (u8*)Start};
+	uint64 DetectedHash = JB_Str_CRC(&S, 0);
+	if (DetectedHash != StoredHash) {
+		printf("Expected blob hash %llu but found %llu\n", StoredHash, DetectedHash);
+		JB_Load_StrError(0);
+	}
+
+	while (N --> 0) {
+		auto L = DecodeLength(Lengths);
+		auto S = JB_StrCN((void*)Read, L);
+		Read += L + 1;
+		JB_SetRef(*Write++, S);
+		if (Read > ReadEnd) {return JB_Load_StrError(1);}
+	};
+	if (Read != ReadEnd) {JB_Load_StrError(2);}
+}
+
 
 
 int JB_LibInit (_cstring* R) {
@@ -147,7 +181,7 @@ int JB_LibInit (_cstring* R) {
     WhiteSpace_ = JB_CS__New( JB_StrC("\x9\xA\xD\x20"), false );
     JB_FS__FastNew( 0 );		// stop leak tests catching this.
     JB_Dict__Init();
-    JB_Str__LoadGlobals2();
+    JB_Str__LoadGlobals();
 
     return JB_Init_();
 }

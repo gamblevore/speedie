@@ -11,7 +11,19 @@ linkage
 	cpp_part		Cpp
 
 module
-	|SCClass|						CurrClass
+	|SCClass| 	CurrClass
+	|string| 	FindGlobalsCpp = `		
+
+extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
+	*src = JB_LUBSrc2;
+	*Hash = JB_LUBHash;
+	return JB_LUB;
+}
+extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
+	*src = JB_LUBSrc2;
+	return JB_LUB;
+}
+`
 
 	
 	function compiler.Reachedfuncs (|int|)
@@ -32,15 +44,18 @@ module
 
 
 
+
+
 constructor
 	Init()
 
 
 
 function PreRun
-	Cpp_Export.StringBlob	= FastStringCpp.new
-	Cpp_Export.StringLengths= FastStringCpp.new
-	Cpp_Export.StringDict = dictionary()
+	Cpp_Export.StringBlob		= FastStringCpp.new
+	Cpp_Export.StringLengths	= FastStringCpp.new
+	Cpp_Export.StringLengths2	= FastStringCpp.new
+	Cpp_Export.StringDict		= dictionary()
 
 	.AllTypes   = .StreamChild( "AllTypes.h"  )
 	.TypesProj  = .StreamChild( "Proj.h" )
@@ -694,10 +709,10 @@ extern "C" {
 	Cpp_Export.SmartWrite(fs, Cpp_Export.HProduct)
 
 
-
 module
 	|FastStringCpp|				StringBlob
 	|FastStringCpp|				StringLengths
+	|FastStringCpp|				StringLengths2
 	|dictionary of int|			StringDict
 	|int|						StringCount
 
@@ -712,29 +727,45 @@ module
 
 	function GenLub (|faststring| fs)
 		fs <~ "JB_String* JB_LUB["
-		fs <~ .StringCount + 1 // 1 safety
+		fs <~ .StringCount + 1 // + 1 for the emptystring
 		fs <~ "];\n\n"
 
+
 	function GenStrings (|faststring| fs)
+		|| blob = .StringBlob.GetResult
+		|| lengths = .StringLengths2.GetResult
 		.GenLub(fs)
 		
-		fs <~ "int JB_LUBLengths[] = {"
+		fs <~ "static int JB_LUBLengths[] = {"
 		fs <~ .stringlengths
 		fs <~ "0};\n\n"
 		
-		fs <~ "const char* JB_LUBSrc = "
-		fs.appendcppall(.StringBlob)
-		fs <~ `;
-
-extern "C" void JB_Str__FindGlobals(JB_String*** lub, int** lengths, const char** src) {
-	*lub = JB_LUB;
-	*lengths = JB_LUBLengths;
-	*src = JB_LUBSrc;
-}
-`
-		.stringlengths = nil
-		.stringblob = nil
-		.stringdict = nil
+		// we wanna just encode the hash, right?
+		
+		fs <~ "static const char* JB_LUBSrc = "
+		fs.AppendCppAll(blob)
+		fs <~ ";\n"
+		
+		fs <~ "static const int JB_LUBCount = ${.stringcount};\n"
+		|| blob2 = FastString()
+		blob2.EncodeLength(lengths.length)
+		blob2.EncodeLength(blob.length)
+		blob2.EncodeLength(.stringcount)
+		blob2 <~ lengths
+		blob2 <~ blob
+		blob = blob2.GetResult
+		|| hash = blob.hash|int64|
+		"lub_hash: $hash"
+		fs <~ "static const uint64 JB_LUBHash = $hash;\n"
+		fs <~ "static const char* JB_LUBSrc2 = "
+		fs.AppendCppAll(blob)
+		fs <~ ";\n"
+		fs <~ .FindGlobalsCpp
+		
+		.StringLengths = nil
+		.StringLengths2 = nil
+		.StringBlob = nil
+		.StringDict = nil
 
 
 	Syntax Access (|string| name, |int|)
@@ -742,14 +773,17 @@ extern "C" void JB_Str__FindGlobals(JB_String*** lub, int** lengths, const char*
 		rz = Cpp_Export.StringDict[name]
 		if rz
 			return rz
-			
 		rz = ++Cpp_Export.StringCount
 		Cpp_Export.StringDict[name] = rz
+
+// add string
 		.StringBlob <~ name
 		.StringBlob <~ 0|byte|
+
+		StringLengths2.encodelength(name.length)
+		
 		.stringlengths <~ name.length
 		.stringlengths <~ ", "
-		
 
 
 	function CppProduct (|File|)

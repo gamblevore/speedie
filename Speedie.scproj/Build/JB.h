@@ -159,6 +159,8 @@ struct ParserLineAndIndent;
 
 struct Random;
 
+struct RetroFloat;
+
 struct RingDownRange;
 
 struct RingRange;
@@ -684,8 +686,8 @@ JBClass ( Process , JB_Object ,
 	fn_subprocess SubProcess;
 	Array* Params;
 	JB_File* LogFile;
-	JB_File* StdOutFile;
-	FastString* StdOut;
+	JB_File* _StdOutFile;
+	FastString* _StdOut;
 	RingTree* SendQueue;
 	Ind ProcPos;
 	IPCMessage Dummy;
@@ -1136,7 +1138,6 @@ extern JB_String* JB__App_codesign_native;
 extern Array* JB__App_OldArgs;
 extern Message* JB__App_Prefs;
 extern bool JB__App_Unregistered;
-extern JB_String* JB__App_Usage;
 #define kSC__ASMtmp_iDebugger (63)
 #define kSC__ASMtmp_iIf (62)
 #define kSC__ASMtmp_iRejoin (61)
@@ -1205,13 +1206,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1796])
+#define kJB__ErrorColors_bold (JB_LUB[1800])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1797])
-#define kJB__ErrorColors_good (JB_LUB[1798])
-#define kJB__ErrorColors_normal (JB_LUB[1799])
-#define kJB__ErrorColors_underline (JB_LUB[1798])
-#define kJB__ErrorColors_warn (JB_LUB[1800])
+#define kJB__ErrorColors_error (JB_LUB[1801])
+#define kJB__ErrorColors_good (JB_LUB[1802])
+#define kJB__ErrorColors_normal (JB_LUB[1803])
+#define kJB__ErrorColors_underline (JB_LUB[1802])
+#define kJB__ErrorColors_warn (JB_LUB[1804])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern Array* SC__Ext_Cleanup;
@@ -1383,8 +1384,8 @@ extern Date JB__Terminal_LastDisplay;
 #define kJB__Terminal_magenta (35)
 #define kJB__Terminal_red (31)
 extern Array* JB__Terminal_Screen;
-#define kJB__Terminal_TermClear (JB_LUB[1801])
-#define kJB__Terminal_TermReset (JB_LUB[1802])
+#define kJB__Terminal_TermClear (JB_LUB[1805])
+#define kJB__Terminal_TermReset (JB_LUB[1806])
 #define kJB__Terminal_w (80)
 #define kJB__Terminal_white (37)
 #define kJB__Terminal_yellow (33)
@@ -1422,10 +1423,10 @@ extern JB_String* JB_file_read_test;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[426])
-#define kSC_BitNot (JB_LUB[526])
-#define kSC_BitOr (JB_LUB[636])
-#define kSC_BitXor (JB_LUB[1803])
+#define kSC_BitAnd (JB_LUB[425])
+#define kSC_BitNot (JB_LUB[525])
+#define kSC_BitOr (JB_LUB[635])
+#define kSC_BitXor (JB_LUB[1807])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1455,7 +1456,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1804])
+#define kJB_SaverStart1 (JB_LUB[1808])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1586,8 +1587,8 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__ErrorSeverity_Warning (2)
 #define kJB__int16_max (32767)
 #define kJB__int16_min (-32768)
-#define kJB__int64_max (9223372036854775)
-#define kJB__int64_min (9223372036854775 + 1)
+#define kJB__int64_max (9223372036854775807)
+#define kJB__int64_min (9223372036854775807 + 1)
 #define kSC__SCBaseInfo_explicitexport (0)
 #define kSC__SCBaseInfo_visible (1)
 #define kSC__SCBaseType_DataType (4)
@@ -1604,7 +1605,7 @@ extern int JB__Syx_MaxFuncID;
 #define kJB__uint16_min (0)
 #define kJB__uint64_max (-1)
 #define kSC__TM_BaseShrinkSpeed (0.0005f)
-#define kSC__TM_Halfmap (6148914691236517)
+#define kSC__TM_Halfmap (6148914691236517205)
 #define kSC__TM_mousebuttondown (1025)
 #define kSC__TM_MOUSEMOTION (1024)
 #define kJB__CL1_After (6)
@@ -1792,6 +1793,7 @@ extern Array* SC__Cpp_Cpp_Includes;
 extern Array* SC__Cpp_Cpp_Input;
 extern JB_String* SC__Cpp_CppLicenceStr;
 extern SCClass* SC__Cpp_CurrClass;
+extern JB_String* SC__Cpp_FindGlobalsCpp;
 extern Array* SC__Cpp_H_Input;
 extern Array* SC__Cpp_H_PostInput;
 #define kSC__Cpp_NeedsInnerBrackets (1)
@@ -1801,6 +1803,7 @@ extern FastStringCpp* SC__Cpp_StringBlob;
 extern int SC__Cpp_StringCount;
 extern Dictionary* SC__Cpp_StringDict;
 extern FastStringCpp* SC__Cpp_StringLengths;
+extern FastStringCpp* SC__Cpp_StringLengths2;
 extern bool SC__Cpp_WriteAPI;
 extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_Delete (2)
@@ -4373,6 +4376,9 @@ int JB_Rnd__InitCode_();
 
 
 
+// JB_RetroFloat
+
+
 // JB_RingDownRange
 
 
@@ -4959,6 +4965,8 @@ void JB_FS_CArrayAddB(FastString* self, byte B);
 
 void JB_FS_CArrayAddB0(FastString* self, byte B);
 
+void JB_FS_EncodeLength(FastString* self, uint64 N);
+
 void JB_FS_AppendInfo(FastString* self, JB_String* name, JB_String* data);
 
 void JB_FS_AppendInfoNum(FastString* self, JB_String* name, int64 data);
@@ -4967,7 +4975,7 @@ void JB_FS_fieldstart(FastString* self, JB_String* name);
 
 void JB_FS_includeh(FastString* self, JB_String* name);
 
-void JB_FS_lint(FastString* self, uint64 n);
+void JB_FS_lInt(FastString* self, uint64 n);
 
 void JB_FS_MsgErrorName(FastString* self, JB_String* name);
 
@@ -7445,6 +7453,8 @@ Message* JB_Msg_FindNested(Message* self, Syntax fn, JB_String* name, bool Err);
 Message* JB_Msg_FindOwningLoop(Message* self, Message* top);
 
 Message* JB_Msg_FindPos(Message* self, int fr, int len);
+
+Message* JB_Msg_FindPosSub(Message* self, int fr, int len, bool Exact);
 
 Message* JB_Msg_FindRef(Message* self, SCFunction* fn, JB_String* name);
 
