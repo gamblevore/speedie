@@ -311,7 +311,7 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
 		JB_FS_AppendMultiByte( self, '0', RoundTo ); return;
 	}
 
-	uint8* wp = JB_FS_WriteAlloc_( self, 16 );
+	uint8* wp = JB_FS_WriteAlloc_( self, 18 );
 	if ( !wp )
         return;
 
@@ -323,7 +323,7 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
         if (LeftOver <= 0) { return; } // PPC oddity
         SignLen = 1;
     }
-
+	
     double tmpCount = log10( (double)LeftOver ); // all math lib funcs are DAMN fast.
     dbgexpect( tmpCount >= 0 and tmpCount <= 19 );
     int CountDigits = (int)tmpCount + 1;
@@ -338,7 +338,7 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
         *--wp = '0';
     }
     
-    JB_FS_AdjustLength_( self, 16, CountDigits + PadFirst + SignLen );
+    JB_FS_AdjustLength_( self, 18, CountDigits + PadFirst + SignLen );
 }
 
 
