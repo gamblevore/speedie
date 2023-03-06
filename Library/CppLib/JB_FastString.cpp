@@ -311,7 +311,7 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
 		JB_FS_AppendMultiByte( self, '0', RoundTo ); return;
 	}
 
-	const int Alloced = 19; 
+	const int Alloced = 21; 
 	uint8* wp = JB_FS_WriteAlloc_( self, Alloced );
 	if ( !wp )
         return;
