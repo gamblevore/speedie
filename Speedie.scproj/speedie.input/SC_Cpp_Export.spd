@@ -54,7 +54,6 @@ constructor
 
 function PreRun
 	Cpp_Export.StringBlob		= FastStringCpp.new
-	Cpp_Export.StringLengths	= FastStringCpp.new
 	Cpp_Export.StringLengths2	= FastStringCpp.new
 	Cpp_Export.StringDict		= dictionary()
 
@@ -712,7 +711,6 @@ extern "C" {
 
 module
 	|FastStringCpp|				StringBlob
-	|FastStringCpp|				StringLengths
 	|FastStringCpp|				StringLengths2
 	|dictionary of int|			StringDict
 	|int|						StringCount
@@ -736,14 +734,10 @@ module
 		|| blob = .StringBlob.GetResult
 		|| lengths = .StringLengths2.GetResult
 		.GenLub(fs)
-		
-		fs <~ "static int JB_LUBLengths[] = {"
-		fs <~ .stringlengths
-		fs <~ "0};\n\n"
-		
+				
 		// we wanna just encode the hash, right?
 		
-		fs <~ "static const int JB_LUBCount = ${.stringcount};\n"
+		//fs <~ "static const int JB_LUBCount = ${.stringcount};\n"
 		|| blob2 = FastString()
 		blob2.EncodeLength(lengths.length)
 		blob2.EncodeLength(blob.length)
@@ -758,7 +752,6 @@ module
 		fs <~ ";\n"
 		fs <~ .FindGlobalsCpp
 		
-		.StringLengths = nil
 		.StringLengths2 = nil
 		.StringBlob = nil
 		.StringDict = nil
@@ -777,9 +770,6 @@ module
 		.StringBlob <~ 0|byte|
 
 		StringLengths2.encodelength(name.length)
-		
-		.stringlengths <~ name.length
-		.stringlengths <~ ", "
 
 
 	function CppProduct (|File|)
