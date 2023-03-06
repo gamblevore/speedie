@@ -12,6 +12,7 @@ linkage
 
 module
 	|SCClass| 	CurrClass
+	|uint64| 	LubHash
 	|string| 	FindGlobalsCpp = `		
 
 extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
@@ -742,10 +743,6 @@ module
 		
 		// we wanna just encode the hash, right?
 		
-		fs <~ "static const char* JB_LUBSrc = "
-		fs.AppendCppAll(blob)
-		fs <~ ";\n"
-		
 		fs <~ "static const int JB_LUBCount = ${.stringcount};\n"
 		|| blob2 = FastString()
 		blob2.EncodeLength(lengths.length)
@@ -754,9 +751,8 @@ module
 		blob2 <~ lengths
 		blob2 <~ blob
 		blob = blob2.GetResult
-		|| hash = blob.hash|int64|
-		"lub_hash: $hash"
-		fs <~ "static const uint64 JB_LUBHash = $hash;\n"
+		.LubHash = blob.hash
+		fs <~ "static const uint64 JB_LUBHash = ${.LubHash|int64|};\n"
 		fs <~ "static const char* JB_LUBSrc2 = "
 		fs.AppendCppAll(blob)
 		fs <~ ";\n"

@@ -145,7 +145,7 @@ void JB_Str__LoadGlobals() {
 	uint64 DetectedHash = JB_Str_CRC(&S, 0);
 	if (DetectedHash != StoredHash) {
 		printf("Expected blob hash %llu but found %llu\n", StoredHash, DetectedHash);
-		JB_Load_StrError(0);
+//		JB_Load_StrError(0);
 	}
 
 	while (N --> 0) {

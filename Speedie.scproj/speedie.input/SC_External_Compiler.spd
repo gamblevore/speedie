@@ -299,7 +299,7 @@ function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
-		"\nCompiling c++ to: \"${.ProductPath}\"\n"
+		"\nCompiling c++ to: \"${.ProductPath}\"\n" //(blob=${Cpp_Export.LubHash|int64|})
 	
 	.CompilingLibFiles++
 	.CollectAndCompile(	.CppLib,						.LibTmpPath )$
