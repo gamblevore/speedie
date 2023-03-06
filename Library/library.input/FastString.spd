@@ -71,12 +71,29 @@ class FastString {
 	function Copy (|string|)
 		disabled "hmmm?"
 
-	function lint (|uint64| n)
+	function uint64.lelength (|int|)
+		pragma inline
+		return (self|int|.log2 max 0) >> 3
+	
+	function BInt (|uint64| val) // highest first
+		|| n = val.lelength
+		while n >= 0
+			self <~ (val>>(n<<3))|byte|
+			n--
+
+	function lInt (|uint64| n)
 		while n
 			self <~ (N&255)|byte|
 			n>>=8
-		
 
+	function EncodeLength (|uint64| N)
+		|| lim = 256-8
+		|| L2 = N|byte|
+		if N >= lim
+			l2 = lim + n.lelength
+		self <~ L2|byte|
+		if N >= lim
+			.lint(N)		
 	render
 		fs <~ self
 
@@ -132,16 +149,6 @@ class FastString {
 	function AppendInt (|int| data)
 		cpp_Wrapper JB_FS_AppendInteger
 			
-	function uint64.lelength (|int|)
-		pragma inline
-		return (self|int|.log2 max 0) >> 3
-	
-	function BInt (|uint64| val) // highest first
-		|| n = val.lelength
-		while n >= 0
-			self <~ (val>>(n<<3))|byte|
-			n--
-
 	function AppendShort (|uint16| data)
 		cpp_wrapper JB_FS_AppendShort
 
@@ -242,9 +249,6 @@ class FastString {
 	macro syntaxappend
 		_.render(self)
 }
-
-
-
 
 
 extend FastString
