@@ -110,18 +110,12 @@ function message.DetectBadPosition
 			debugat
 
 
-function @file.CompilerPrefs (|file|)
-	return .appprefs("klinkerhoppen.speedie").file
-	
 function app.CodeSign (|file|)
-	|| pref_file = file.CompilerPrefs
-	if pref_file.exists // read directly because other apps might want it.
+	|| sign = app.prefs[codesign_native] // code
 		|| me = app.apppath.file
-		|| pz = pref_file.parse
-		|| sign = pz[codesign_native] // code
-			me.codesign(sign.value)
-			return me
-	
+		me.codesign(sign.value)
+		return me
+
 	StdErr.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign self." )
 
 
