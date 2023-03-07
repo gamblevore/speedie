@@ -30,10 +30,10 @@ function compiler.SetupEnv
 	error.AutoPrint = 1
 	
 	check (app.pref_path) "Conf missing prefpath"
+	app.PrefsInit
 	if app..talk and app.IsMainThread
 		app.IgnoreBreakPoints
 
-	app.PrefsInit
 	errorcolors.DisableIfNoTerminal
 
 
