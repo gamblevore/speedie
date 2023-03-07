@@ -3,7 +3,6 @@
 module TextAssembler
 	|dictionary of int|			LabelsToDo
 
-	
 	function FindRequests (|bool|)
 		return false
 		|| Missing = 0
@@ -11,15 +10,15 @@ module TextAssembler
 			Missing += (!r.find)
 		return (!Missing)				#expect ("$Missing functions can't be found!")
 		
-
+	
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
 		|| fn = SCFunction.new
 		fn.source = msg
 		|| mu = µFunc(fn)
-		Flatten.StdState.Initstate(mu)
-		|| arg = Flatten.StdState.TextFuncSub(msg)
+		TreeAssembler.StdState.Initstate(mu)
+		|| arg = TreeAssembler.StdState.TextFuncSub(msg)
 			compiler.exportnames[fn.exportname] = fn
-		Flatten.StdState.FinishASM
+		TreeAssembler.StdState.FinishASM
 		.LabelsToDo.dispose
 
 
@@ -36,15 +35,18 @@ module TextAssembler
 				.textdata(ch)
 
 
-module Flatten
+
+module TreeAssembler
 	|ASMFuncState|				StdState
 	|[scfunction]|				PackFuncs
-
-	function InitAsm
+		
+	function InitAll
+		instruction.Init
+		asm.init		
 		fn_asm.inittable
 		return 
 		TextAssembler.Requests		:= dictionary()
-		TextAssembler.RequestTable	:= array.new
+		TextAssembler.RequestTable	:= array()
 
 
 	syntax access (|message| m, |µFunc|)
@@ -83,7 +85,7 @@ module Flatten
 		|| list = .CollectFuncs("asm_test,asm_test_sub")		#require
 		#!debugger
 		.StampAll(list)
-		packtools.linkall(list)
+		scfunction.linkall(list)
 		|| args = {8725l, 275l}
 		|| mu   = list[0].asm
 			|| Result = mu.finish.run(args, –count args)
@@ -104,8 +106,7 @@ module Flatten
 
 	function scfunction.Flatten
 		|| fp = fn_asm_table[@arg]
-		target direct
-			(fp)(flatten.StdState, .SourceArg)
+		(fp)(TreeAssembler.StdState, .SourceArg)
 
 
 	function Stamp (|SCFunction| fn)

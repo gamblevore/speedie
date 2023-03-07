@@ -285,7 +285,7 @@ function ExtComp
 	require .ShouldExtComp
 	if options.products
 		if options.pack
-			Flatten.BuildPack
+			TreeAssembler.BuildPack
 		if options.native
 			.RunCppCompile
 			if .IsCompilerAndNeedsInstall

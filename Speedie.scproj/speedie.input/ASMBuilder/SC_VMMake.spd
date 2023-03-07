@@ -148,12 +148,15 @@ function GenerateOne (|message| form_msg, |int| f)
 		.GenAcc(nil, bit_pos, 5)
 	.form_h <~ '\n'
 
-
-function Run // vmmake
-	require !.NameList, .NameList = message()
 	
+function InstructionList (|string| ch, |file|)
+	return ExternalCompiler.CppLib[ch]
+	
+
+function BuildFiles (|bool|)
+	.NameList = message()
 	.vm_file = Compiler.InputFile( nil, "vm.box", nil )	#require
-	|| x = .vm_file.parse							#require
+	|| x = .vm_file.parse								#require
 	|| forms = x.find("forms")
 	forms.remove
 	.namelist = x
@@ -168,10 +171,18 @@ function Run // vmmake
 	.VMSpd(x)
 	.VMCpp(code, jump)
 
-	ASM.InstructionList("InstructionGetters.h").smartdata = form_h
-	ASM.InstructionList("Instructions.i").smartdata = code
-	ASM.InstructionList("InstructionList.h").smartdata = jump
+	.InstructionList("InstructionGetters.h").smartdata = form_h
+	.InstructionList("Instructions.i").smartdata = code
+	.InstructionList("InstructionList.h").smartdata = jump
 	.form_h = nil
+	return true
+
+	
+function Run // vmmake
+	require !.NameList
+	require .BuildFiles	
+	treeassembler.InitAll
+	asm.TestASM
 
 
 function BuildInstructions (|message| mu)

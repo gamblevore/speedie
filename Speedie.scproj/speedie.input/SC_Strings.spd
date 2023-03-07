@@ -1,7 +1,5 @@
 
 
-|| file_read_test = file://syntax.asm
-
 
 module SCStrings
 	|Message| RenderInsides

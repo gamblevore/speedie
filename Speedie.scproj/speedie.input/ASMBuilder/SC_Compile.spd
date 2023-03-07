@@ -215,7 +215,7 @@ function ASMFuncState.FinishASM
 function @fn_asm.default (fn_asm)
 
 
-function @fn_asm.inittable
+function @fn_asm.InitTable
 	require !fn_asm_table[0]
 	for i in 64
 		fn_asm_table[i] := &fn_asm.default
