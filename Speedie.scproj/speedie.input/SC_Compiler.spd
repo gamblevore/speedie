@@ -324,8 +324,6 @@ function ImportAll
 	.ImportLibs
 	.ImportProj
 	VM_Builder.run
-	if vm_builder.vm_file
-		instruction.InitAll
 		
 	|| List = [.InternalFile]
 	for Imp in .ImportedList
@@ -348,9 +346,6 @@ function ImportAll
 	
 	for c in .classlist
 		C.TryAddToProject
-		
-		asm.CreateASMProperties
-	asm.TestASM
 	
 	require .Stage( "Processing Delayed Imports" )
 	for l in .extend_list
@@ -859,11 +854,14 @@ function InputFile (|File| Default, |String| s, |message| where, |File|)
 	opt norefcounts
 	expect !(s contains "../") (where, "Insecure path")
 	// find the "highest" file...
+	if SCImport.Curr
+		|| found = SCImport.Curr.Resources.ValueLower(s)
+			return found
+			
 	|| best = int.max
 	for (imp in .ImportedList)
 		if (imp.depth < best)
-			|| f = imp.InputFolder[s]
-			if f.exists
+			|| f = imp.Resources.ValueLower(s)
 				rz = f
 				best = imp.Depth
 	

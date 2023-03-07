@@ -16,18 +16,20 @@ class SCImport
 	|File|					Proj
 	|MemoryLayer|			DeclLayer
 	|SCModule|				Mod
+	|dictionary of file| 	Resources
 	
 
 	constructor ( |File| F )
 		.Proj = F
-		|| M = SCModule.Neu( nil, compiler.program, nil )|SCModule|
+		.Resources = Dictionary()
 		.DeclLayer = (scdecl).CreateLayer(self)
+		|| M = SCModule.Neu( nil, compiler.program, nil )|SCModule|
+		.Mod = M
 		M.Project = self
 		M.IsImport = true
 		if (F != nil)
 			M.name = f.name
 			(SCImport.Recent max= f.modified) 
-		.Mod = M
 	
 	
 	render
@@ -134,6 +136,9 @@ class SCImport
 
 			  elseif (ext.isclike)
 				Cpp_Export.Cpp_Input <~ c.path
+			  else
+				.Resources.valuelower(cname) = c
+				
 	
 	
 	function string.IsOKForImport (|bool|)
