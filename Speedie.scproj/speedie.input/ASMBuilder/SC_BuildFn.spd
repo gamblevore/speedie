@@ -1,1 +1,64 @@
-	function message.GetASMFunc (|message|)	opt norefcounts	if .reg >= 0		|| op = .next(@thg, "=")$		|| Adj = op.next(@adj)$		return adj[@func]	module PackTools	function LinkAll (|[scfunction]| Funcs)		opt norefcounts		for fn in funcs			if fn.CurrReacher				.Link(fn)	function Link (|SCFunction| fn)		opt norefcounts		// so... this will be the ACTUAL link.		// as in the one that the run-time loader will do!		|| mu = fn.asm$function asm2.Encode (|ASM|)	return (ASM.encoders[.op])(self)		
+
+extend_module ASM
+	function SelfTest (|message| tests)
+		opt norefcounts
+		.enc1
+
+		|| list = tests.last(@arg)
+		|| testname = tests[@thg]
+		require list and testname
+
+		textassembler.assemble(list)
+		|| fn = TreeAssembler[testname]
+			|| ff = fn.finish.run
+
+
+	function TestASM 
+		|| dev = app.prefs["dev"].int
+		if dev >= 2
+			asm.noisyasm = 3
+		if asm.noisyasm >= 3
+			.Listinstructions
+		if dev > 0
+			|| asmfile = file://syntax.asm 
+			|| T = asmfile.parse[@tmp, "tests"]
+				stderr.ErrorsAreWarnings++ // nice
+				.SelfTest(T)
+				stderr.ErrorsAreWarnings--
+	
+
+function message.GetASMFunc (|message|)
+	opt norefcounts
+	if .reg >= 0
+		|| op = .next(@thg, "=")$
+		|| Adj = op.next(@adj)$
+		return adj[@func]
+
+
+extend_module SCFunction
+	function LinkAll (|[scfunction]| Funcs)
+		opt norefcounts
+		for fn in funcs
+			if fn.CurrReacher
+				.Link(fn)
+
+
+	function Link (|SCFunction| fn)
+		opt norefcounts
+		// so... this will be the ACTUAL link.
+		// as in the one that the run-time loader will do!
+		|| mu = fn.asm$
+
+
+function asm2.Encode (|ASM|)
+	return (ASM.encoders[.op])(self)		
+
+	
+function @asm.Enc1
+	|asm2| R
+	R.op = ASM.DSUB
+	R.r[0] = 3
+	R.r[1] = 2
+	R.r[2] = 1
+	R.Rest = 0
+	|| oof = R.Encode
