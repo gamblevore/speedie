@@ -131,12 +131,6 @@ datatype int
 		pragma inline
 		return (self & (self - 1)) == 0
 
-	operator minus (|string| s, |int|)
-		return s.move(self, -1)
-
-	operator plus (|string| s, |int|)
-		return s.move(self, 1)
-	
 	function IsPow2 (|bool|)
 		disabled ".IsPo2"
 	

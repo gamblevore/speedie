@@ -188,7 +188,7 @@ class TextView (GUIControl)
 		|| t = d.ByteOfX(x)
 		|| PreferFirst = (d.after == t) and (d isnt last)
 		if PreferFirst and d.endswithline
-			t -= .text
+			t = .text.move(t, -1)
 			preferfirst = false
 		return (t, PreferFirst|int|)
 		
@@ -293,7 +293,7 @@ class TextView (GUIControl)
 		|| avoid = false
 		|| s = .text
 		if i > 0
-			|| x2 = x + s
+			|| x2 = s.move(x, 1)
 			if f[s[x]]	// so... if we have "|   " and we wanna move forward. then what?
 				if !avoid
 					return x2
@@ -301,7 +301,7 @@ class TextView (GUIControl)
 			  else
 				x = s.find(f, x2...)
 		  elseif x > 0
-			|| x2 = x - s
+			|| x2 = s.move(x, -1)
 			if f[s[x2]]
 				if !avoid
 					return x2
@@ -309,7 +309,7 @@ class TextView (GUIControl)
 			  else
 				x = s.find(f, x2, 0)
 			if x
-				x = x + s
+				x = s.move(x, 1)
 		if x
 			return x
 		if i > 0
@@ -1398,7 +1398,7 @@ class TextView (GUIControl)
 		if (i > 0) and (keys.shift) and (d is avoidlastchar) and !d.endswithline
 			//
 		  elseif (d is AvoidLastChar) and canavoid
-			x2 = x2 - .text
+			x2 = .text.move(x2, -1) //x2 - .text
 		return (r.x, x2)(i < 0) 
  
 
@@ -1819,4 +1819,11 @@ helper string.InsertFix (|ivec2|r, |string|)
 //	To fix textview style errors... dump viewline info?
 //		"range, text, parsed-msgs + their ranges"
 //	Rise and become alive..... // RISE MY CHILD!
-
+//
+//extend int
+//	operator minus (|string| s, |int|) // seeems risky...
+//		return s.move(self, -1)
+//
+//	operator plus (|string| s, |int|)
+//		return s.move(self, 1)
+//	
