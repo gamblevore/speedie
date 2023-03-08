@@ -201,6 +201,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AC4C95D629B7D78400B87345 /* jeebox.scproj */ = {isa = PBXFileReference; lastKnownFileType = folder; name = jeebox.scproj; path = ../jeebox.scproj; sourceTree = "<group>"; };
 		AC6ADAE729872AA8009CFFBB /* Speedie */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Speedie; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC7D3C7929A27C1D00148ADB /* JB_RingTree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_RingTree.cpp; path = ../Library/CppLib/JB_RingTree.cpp; sourceTree = "<group>"; };
 		AC7D3C7A29A27C1D00148ADB /* JB_Umbrella.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = JB_Umbrella.hpp; path = ../Library/CppLib/JB_Umbrella.hpp; sourceTree = "<group>"; };
@@ -338,6 +339,7 @@
 		AC6ADADE29872AA8009CFFBB = {
 			isa = PBXGroup;
 			children = (
+				AC4C95D629B7D78400B87345 /* jeebox.scproj */,
 				AC7D3E4C29A284EA00148ADB /* library.input */,
 				AC7D3E4B29A284DB00148ADB /* speedie.input */,
 				AC7D3E0C29A283FF00148ADB /* Headers */,
