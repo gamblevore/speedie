@@ -67,7 +67,6 @@ module Terminal
 
 
 	function Flat (|string|)
-		visible
 		opt norefcounts
 		.fs := FastString()
 		|| PrevCol = 0

@@ -14,21 +14,10 @@ class TerminalCell:
 		self.text = text
 		self.color = color
 
+
 def addlist (a, b):
 	return [x + y for x, y in zip(a, b)]
 
-def bounce (self):
-	f = self % 1.0
-	if not (int(self) & 1):
-		return f
-	return 1.0 - f
-
-def rotate (self, n):
-	n = int(n)
-	if not n:
-		return self
-	n = n % (len(self)+1)
-	return self[n:1000000] + self[0:n]
 
 class Terminal:
 	h = 35 # too many lines will break the clearscreen/reset function!
@@ -37,6 +26,7 @@ class Terminal:
 	TermReset = '\x1b[1;1H'
 	Black = 30; Red = 31; Green=32; Yellow=33; Blue=34; Magenta=35; Cyan=36; White=37
 	Screen = None
+	RunAlready = False
 
 	def DrawText (self, text, x = 0, y = 0, Colors = 0):
 		if not Terminal.Screen:
@@ -92,7 +82,9 @@ class Terminal:
 
 
 	def Display(self):
-		#print(Terminal.TermReset)
+		if not Terminal.RunAlready:
+			print(Terminal.TermReset)
+			Terminal.RunAlready = True
 		print(self.Flat())
 		time.sleep(1.0/60.0)
 
@@ -109,14 +101,30 @@ HeartText = '''
  888888888888888
  "Y88888888888P"
    "Y8888888P"
-	 "Y888P"
-	   "V"
+     "Y888P"
+       "V"
 '''
 
 
 scale = Terminal.w / Terminal.h
 h = 24
 start = time.time()
+
+
+def bounce (self):
+	f = self % 1.0
+	if not (int(self) & 1):
+		return f
+	return 1.0 - f
+
+
+def rotate (self, n):
+	n = int(n)
+	if not n:
+		return self
+	n = n % (len(self)+1)
+	return self[n:1000000] + self[0:n]
+
 
 while True:
 	T.DrawRect((0, 0, Terminal.w, h))
