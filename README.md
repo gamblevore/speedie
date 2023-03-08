@@ -89,7 +89,7 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 
 # Porting #
 
-Currently Speedie fully works on MacOSX Intel and Apple Silicon (ARM). Linux Support is Partial. The compiler works, but the GUI does not work. 1000x more testing has been done on OSX than Linux, so some Linux bugs MAY be unnoticed.
+Currently Speedie fully works on MacOSX Intel and Apple Silicon (ARM). Linux Support is Partial. The compiler works, but the GUI does not work.
 
 It would be nice to have people help port Speedie to other platforms. I need one small .m (OSX) file that uses SDL2 ported to Linux or Windows, about 100 lines of code.
 
