@@ -46,8 +46,8 @@ class Message (RingTree)
 	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
 		cpp_part ConstructorNormal
 		.name		= name
-		.Position	= parser.UsingPos
 		.func		= func
+		.Position	= parser.UsingPos
 		.flags		= parser.InsertedFlags
 		.RangeLength= parser.UsingLength
 		.tag		= parser.UsingTag // why not... 
@@ -60,8 +60,8 @@ class Message (RingTree)
 		.name		= name
 		.Position	= BytePos
 		.func		= func
-		.flags		= parser.InsertedFlags // speedie's message.AppMainFix likes this, for parse.insertion
 		.RangeLength= RangeLength
+		.flags		= parser.InsertedFlags // speedie's .AppMainFix likes this, for msg is inserted
 		.tag		= parser.UsingTag // why not...
 
 
@@ -70,7 +70,7 @@ class Message (RingTree)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-	helper Copy (|message| pos_msg=nil, |Message|)
+	function Copy (|message| pos_msg=nil, |Message|)
 		opt norefcounts
 		|| L = (pos_msg.memorylayer, .memorylayer)(pos_msg)
 				
@@ -80,7 +80,6 @@ class Message (RingTree)
 			rz.rangelength = pos_msg.rangelength
 		for v in self
 			rz <~ v.Copy(pos_msg)
-	
 
 
 	operator matches (|message| m, |bool|)
