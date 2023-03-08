@@ -129,8 +129,6 @@ struct asdas;
 
 struct asdas2;
 
-struct ASM2;
-
 struct ASMFuncState;
 
 struct AsmReg;
@@ -144,6 +142,8 @@ struct FloatRange;
 struct IntDownRange;
 
 struct IPCMessage;
+
+struct IR;
 
 struct MessagePosition;
 
@@ -409,7 +409,7 @@ struct Message;
 
 struct Message;
 
-typedef ASM (*ASM_Encoder2)(ASM2* self);
+typedef ASM (*ASM_Encoder2)(IR* self);
 
 typedef bool (*autosort_fn)(autoitem* a, autoitem* b);
 
@@ -474,19 +474,10 @@ struct asdas2 {
 	asdas www;
 };
 
-struct ASM2 {
-	byte Op;
-	byte Label;
-	byte Nothing[2];
-	byte r[4];
-	int Rest;
-	uint Debug;
-};
-
 struct ASMFuncState {
 	SCFunction* fn;
 	ASMFunc* Out;
-	ASM2* Start;
+	IR* Start;
 	int Written;
 	uint MaxLength;
 	bool OK;
@@ -517,6 +508,15 @@ struct IPCMessage {
 	IPCState State;
 	byte Queued;
 	byte Special;
+};
+
+struct IR {
+	byte Op;
+	byte Label;
+	byte Nothing[2];
+	byte r[4];
+	int Rest;
+	uint Debug;
 };
 
 struct MessagePosition {
@@ -1218,10 +1218,6 @@ extern bool JB__ErrorColors_Enabled;
 #define kJB__ErrorColors_warn (JB_LUB[1816])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
-extern Array* SC__Ext_Cleanup;
-extern int SC__Ext_CompilingLibFiles;
-extern JB_String* SC__Ext_CppCompilerPath;
-extern Array* SC__Ext_FoundObjects;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1352,7 +1348,7 @@ extern MsgUIFlags JB__Tk_InsertedFlags;
 extern int JB__Tk_StopBars;
 extern u16 JB__Tk_UsingLength;
 extern int JB__Tk_UsingPos;
-extern int JB__Tk_UsingTag;
+extern u16 JB__Tk_UsingTag;
 #define kJB__Pipe_StdErr_ (2)
 #define kJB__Pipe_StdIn_ (0)
 #define kJB__Pipe_StdOut_ (1)
@@ -1391,6 +1387,10 @@ extern Array* JB__Terminal_Screen;
 #define kJB__Terminal_white (37)
 #define kJB__Terminal_yellow (33)
 extern Dictionary* SC__TextAssembler_LabelsToDo;
+extern Array* SC__Ext_Cleanup;
+extern int SC__Ext_CompilingLibFiles;
+extern JB_String* SC__Ext_CppCompilerPath;
+extern Array* SC__Ext_FoundObjects;
 extern Array* SC__TreeAssembler_PackFuncs;
 extern ASMFuncState SC__TreeAssembler_StdState;
 extern Array* SC__VM_Builder_Builder;
@@ -1425,9 +1425,9 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[422])
-#define kSC_BitNot (JB_LUB[522])
-#define kSC_BitOr (JB_LUB[645])
+#define kSC_BitAnd (JB_LUB[336])
+#define kSC_BitNot (JB_LUB[435])
+#define kSC_BitOr (JB_LUB[644])
 #define kSC_BitXor (JB_LUB[1819])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
@@ -1784,7 +1784,7 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_STCK (2)
 #define kSC__ASM_SUB (13)
 #define kSC__ASM_SWAP (3)
-extern ASM2 SC__flat_Dummy;
+extern IR SC__flat_Dummy;
 extern MWrap* SC__flat_JSMSpace;
 extern CompressionStats JB__MzSt_All;
 
@@ -2280,91 +2280,6 @@ void SC_ExecTable__Run();
 
 
 
-// Ext
-bool SC_Ext__AllowedThisFile(JB_String* name);
-
-bool SC_Ext__BackupCompiler();
-
-JB_String* SC_Ext__BackupPath();
-
-bool SC_Ext__CanCompile(JB_String* name);
-
-bool SC_Ext__Clean();
-
-void SC_Ext__ClearThis();
-
-bool SC_Ext__CollectAndCompile(JB_File* Input, JB_String* Output);
-
-Array* SC_Ext__CollectCppsInto(JB_File* Fol, JB_File* Objects, int* stdafx);
-
-JB_File* SC_Ext__CppLib();
-
-Array* SC_Ext__CreateCompileString(Array* CppList, JB_String* Product, JB_String* Type);
-
-bool SC_Ext__ExecuteGCC(Array* Commands);
-
-void SC_Ext__ExtComp();
-
-bool SC_Ext__ExtCompile(Array* Files, JB_String* Dest, JB_String* Type);
-
-Array* SC_Ext__FilterCppsIfAlreadyDone(Array* Cpps, JB_File* Objects, int* stdafx);
-
-int SC_Ext__Init_();
-
-int SC_Ext__InitCode_();
-
-void SC_Ext__InstallCompiler();
-
-void SC_Ext__InstallOne(JB_File* test);
-
-bool SC_Ext__IsCompilerAndNeedsInstall();
-
-JB_String* SC_Ext__LibSuff();
-
-JB_String* SC_Ext__LibTmpPath();
-
-JB_File* SC_Ext__LinkOK(JB_File* p);
-
-JB_String* SC_Ext__LogName();
-
-void SC_Ext__MacBothArch(Array* r);
-
-JB_String* SC_Ext__MakeDailyProductPath(JB_File* B);
-
-void SC_Ext__MakeLib();
-
-int SC_Ext__NeedNewObjForSrc(JB_String* cpp, JB_File* objects);
-
-int SC_Ext__NoGoodObject(JB_String* Cpp, JB_File* h, JB_File* o);
-
-JB_String* SC_Ext__ProductName();
-
-JB_String* SC_Ext__ProductPath();
-
-JB_String* SC_Ext__ProductSuffix();
-
-JB_String* SC_Ext__ProjTmpPath();
-
-void SC_Ext__ReplaceOld(JB_File* input, JB_File* Backs);
-
-void SC_Ext__RunCppCompile();
-
-void SC_Ext__saytest(int n);
-
-bool SC_Ext__ShouldExtComp();
-
-bool SC_Ext__TestNewCompiler();
-
-JB_String* SC_Ext__TmpBase(JB_String* V);
-
-JB_String* SC_Ext__TmpErr(JB_String* V);
-
-JB_String* SC_Ext__TmpOut(JB_String* V);
-
-bool SC_Ext__UseAndCompile(Array* Input, JB_String* Output);
-
-
-
 // FastStringOpts
 SCFunction* SC_FastStringOpts__ByteFunc();
 
@@ -2379,8 +2294,6 @@ void SC_FastStringOpts__String(Message* exp, Message* str);
 
 
 // FB
-bool SC_FB__AppExtCompile(JB_String* Name, JB_String* Value, FastString* purpose);
-
 bool SC_FB__AppOptions_alive(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppOptions_arch(JB_String* Name, JB_String* Value, FastString* purpose);
@@ -2464,6 +2377,8 @@ bool SC_FB__AppOptions_variant(JB_String* Name, JB_String* Value, FastString* pu
 bool SC_FB__AppOptions_warn(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppTalk(JB_String* Name, JB_String* Value, FastString* purpose);
+
+bool SC_FB__AppTransCompile(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppVersionNumber(JB_String* Name, JB_String* Value, FastString* purpose);
 
@@ -3113,6 +3028,91 @@ int SC_TextAssembler__InitCode_();
 void SC_TextAssembler__TextData(Message* msg);
 
 bool SC_TextAssembler__TextFunc(Message* msg);
+
+
+
+// Ext
+bool SC_Ext__AllowedThisFile(JB_String* name);
+
+bool SC_Ext__BackupCompiler();
+
+JB_String* SC_Ext__BackupPath();
+
+bool SC_Ext__CanCompile(JB_String* name);
+
+bool SC_Ext__Clean();
+
+void SC_Ext__ClearThis();
+
+bool SC_Ext__CollectAndCompile(JB_File* Input, JB_String* Output);
+
+Array* SC_Ext__CollectCppsInto(JB_File* Fol, JB_File* Objects, int* stdafx);
+
+JB_File* SC_Ext__CppLib();
+
+Array* SC_Ext__CreateCompileString(Array* CppList, JB_String* Product, JB_String* Type);
+
+bool SC_Ext__ExecuteGCC(Array* Commands);
+
+Array* SC_Ext__FilterCppsIfAlreadyDone(Array* Cpps, JB_File* Objects, int* stdafx);
+
+int SC_Ext__Init_();
+
+int SC_Ext__InitCode_();
+
+void SC_Ext__InstallCompiler();
+
+void SC_Ext__InstallOne(JB_File* test);
+
+bool SC_Ext__IsCompilerAndNeedsInstall();
+
+JB_String* SC_Ext__LibSuff();
+
+JB_String* SC_Ext__LibTmpPath();
+
+JB_File* SC_Ext__LinkOK(JB_File* p);
+
+JB_String* SC_Ext__LogName();
+
+void SC_Ext__MacBothArch(Array* r);
+
+JB_String* SC_Ext__MakeDailyProductPath(JB_File* B);
+
+void SC_Ext__MakeLib();
+
+int SC_Ext__NeedNewObjForSrc(JB_String* cpp, JB_File* objects);
+
+int SC_Ext__NoGoodObject(JB_String* Cpp, JB_File* h, JB_File* o);
+
+JB_String* SC_Ext__ProductName();
+
+JB_String* SC_Ext__ProductPath();
+
+JB_String* SC_Ext__ProductSuffix();
+
+JB_String* SC_Ext__ProjTmpPath();
+
+void SC_Ext__ReplaceOld(JB_File* input, JB_File* Backs);
+
+void SC_Ext__RunCppCompile();
+
+void SC_Ext__saytest(int n);
+
+bool SC_Ext__ShouldTransComp();
+
+bool SC_Ext__TestNewCompiler();
+
+JB_String* SC_Ext__TmpBase(JB_String* V);
+
+JB_String* SC_Ext__TmpErr(JB_String* V);
+
+JB_String* SC_Ext__TmpOut(JB_String* V);
+
+void SC_Ext__TransComp();
+
+bool SC_Ext__TransCompile(Array* Files, JB_String* Dest, JB_String* Type);
+
+bool SC_Ext__UseAndCompile(Array* Input, JB_String* Output);
 
 
 
@@ -3990,82 +3990,82 @@ void SC_ASM__TestASM();
 
 
 // ASM_BFLD
-ASM JB_ASM_BFLD__Encode(ASM2* self);
+ASM JB_ASM_BFLD__Encode(IR* self);
 
 
 
 // ASM_Bra
-ASM JB_ASM_Bra__Encode(ASM2* self);
+ASM JB_ASM_Bra__Encode(IR* self);
 
 
 
 // ASM_Cmp
-ASM JB_ASM_Cmp__Encode(ASM2* self);
+ASM JB_ASM_Cmp__Encode(IR* self);
 
 
 
 // ASM_CmpEq
-ASM JB_ASM_CmpEq__Encode(ASM2* self);
+ASM JB_ASM_CmpEq__Encode(IR* self);
 
 
 
 // ASM_CNTC
-ASM JB_ASM_CNTC__Encode(ASM2* self);
+ASM JB_ASM_CNTC__Encode(IR* self);
 
 
 
 // ASM_CNTR
-ASM JB_ASM_CNTR__Encode(ASM2* self);
+ASM JB_ASM_CNTR__Encode(IR* self);
 
 
 
 // ASM_Const
-ASM JB_ASM_Const__Encode(ASM2* self);
+ASM JB_ASM_Const__Encode(IR* self);
 
 
 
 // ASM_Func
-ASM JB_ASM_Func__Encode(ASM2* self);
+ASM JB_ASM_Func__Encode(IR* self);
 
 
 
 // ASM_Mem
-ASM JB_ASM_Mem__Encode(ASM2* self);
+ASM JB_ASM_Mem__Encode(IR* self);
 
 
 
 // ASM_Setn
-ASM JB_ASM_Setn__Encode(ASM2* self);
+ASM JB_ASM_Setn__Encode(IR* self);
 
 
 
 // ASM_SWAP
-ASM JB_ASM_SWAP__Encode(ASM2* self);
+ASM JB_ASM_SWAP__Encode(IR* self);
 
 
 
 // ASM_U0
-ASM JB_ASM_U0__Encode(ASM2* self);
+ASM JB_ASM_U0__Encode(IR* self);
 
 
 
 // ASM_U1
-ASM JB_ASM_U1__Encode(ASM2* self);
+ASM JB_ASM_U1__Encode(IR* self);
 
 
 
 // ASM_U2
-ASM JB_ASM_U2__Encode(ASM2* self);
+ASM JB_ASM_U2__Encode(IR* self);
 
 
 
 // ASM_U3
-ASM JB_ASM_U3__Encode(ASM2* self);
+ASM JB_ASM_U3__Encode(IR* self);
 
 
 
 // ASM_U4
-ASM JB_ASM_U4__Encode(ASM2* self);
+ASM JB_ASM_U4__Encode(IR* self);
 
 
 
@@ -4169,27 +4169,8 @@ void SC_asdas2_hhh(asdas2* self);
 
 
 
-// JB_ASM2
-void SC_ASM2_AddRegParam(ASM2* self, Message* src, uint write);
-
-void SC_ASM2_debugSet(ASM2* self, Message* Value);
-
-ASM SC_ASM2_Encode(ASM2* self);
-
-void SC_ASM2_fs(ASM2* self, FastString* fs);
-
-bool SC_ASM2_OperatorIsa(ASM2* self, int m);
-
-void SC_ASM2_Print(ASM2* self);
-
-JB_String* SC_ASM2_Render(ASM2* self, FastString* fs_in);
-
-void SC_ASM2_SyntaxExpect(ASM2* self, JB_String* Error);
-
-
-
 // JB_ASMFuncState
-inline ASM2* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b, int c, int d);
+inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b, int c, int d);
 
 inline void SC_flat_AddExtended(ASMFuncState* self, Message* err, uint Bits);
 
@@ -4207,7 +4188,7 @@ AsmReg SC_flat_DoFunc(ASMFuncState* self, Message* prms, AsmReg dest);
 
 AsmReg SC_flat_DoRels(ASMFuncState* self, Message* L, AsmReg dest);
 
-ASM2* SC_flat_FindLabel(ASMFuncState* self, ASM2* dbg);
+IR* SC_flat_FindLabel(ASMFuncState* self, IR* dbg);
 
 void SC_flat_FinishASM(ASMFuncState* self);
 
@@ -4215,9 +4196,9 @@ Message* SC_flat_FuncPrms(ASMFuncState* self, Message* pr, int Remain, uint Bits
 
 uint SC_flat_GetLabelJump(ASMFuncState* self, Message* P);
 
-void SC_flat_InitState(ASMFuncState* self, ASMFunc* fn);
+void SC_flat_InitState(ASMFuncState* self, SCFunction* fn);
 
-ASM2* SC_flat_Last(ASMFuncState* self);
+IR* SC_flat_Last(ASMFuncState* self);
 
 bool SC_flat_LoadLabelJumps(ASMFuncState* self);
 
@@ -4227,9 +4208,9 @@ void SC_flat_NeedSomewhere(ASMFuncState* self, Message* err, AsmReg* dest, DataT
 
 uint64 SC_flat_OpenVars(ASMFuncState* self);
 
-inline ASM2* SC_flat_RequestOp2(ASMFuncState* self, uint Code);
+inline IR* SC_flat_RequestOp2(ASMFuncState* self, uint Code);
 
-ASM2* SC_flat_RequestOp(ASMFuncState* self);
+IR* SC_flat_RequestOp(ASMFuncState* self);
 
 bool SC_flat_SetConst(ASMFuncState* self, Message* List, Message* Orig);
 
@@ -4296,6 +4277,27 @@ bool JB_IPCMessage_Closed(IPCMessage* self);
 byte* JB_IPCMessage_Data(IPCMessage* self);
 
 bool JB_IPCMessage_IsOpen(IPCMessage* self);
+
+
+
+// JB_IR
+void SC_IR_AddRegParam(IR* self, Message* src, uint write);
+
+void SC_IR_debugSet(IR* self, Message* Value);
+
+ASM SC_IR_Encode(IR* self);
+
+SCFile* SC_IR_File(IR* self);
+
+Ind SC_IR_FilePos(IR* self);
+
+void SC_IR_fs(IR* self, FastString* fs);
+
+bool SC_IR_OperatorIsa(IR* self, int m);
+
+JB_String* SC_IR_Render(IR* self, FastString* fs_in);
+
+void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
 
 
 
@@ -8128,15 +8130,14 @@ inline bool JB_IPCState_SyntaxCast(IPCState self) {
 	return (self >= kJB__IPCState_Waiting) and (self < kJB__IPCState_closed);
 }
 
-inline ASM2* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b, int c, int d) {
-	ASM2* rz = nil;
+inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b, int c, int d) {
+	IR* rz = nil;
 	rz = SC_flat_RequestOp2(self, SM);
 	rz->r[0] = a;
 	rz->r[1] = b;
 	rz->r[2] = c;
 	rz->r[3] = d;
-	(SC_ASM2_debugSet(rz, dbg));
-	SC_ASM2_Print(rz);
+	(SC_IR_debugSet(rz, dbg));
 	return rz;
 }
 
@@ -8149,8 +8150,8 @@ inline void SC_flat_AddExtended(ASMFuncState* self, Message* err, uint Bits) {
 	SC_flat_RequestOp2(self, kSC__ASM_Extended)->Rest = (Bits | B);
 }
 
-inline ASM2* SC_flat_RequestOp2(ASMFuncState* self, uint Code) {
-	ASM2* rz = nil;
+inline IR* SC_flat_RequestOp2(ASMFuncState* self, uint Code) {
+	IR* rz = nil;
 	rz = SC_flat_RequestOp(self);
 	rz->Op = Code;
 	return rz;

@@ -593,7 +593,7 @@ function InitCompiler
 	  else
 		._BuildFolder = .BaseProjectPath[ "Build" + Compiler.VariantSuffix ]
 
-	.TempFolder = externalCompiler.ProjTmpPath.file  ///Tmp/Speedie/Proj
+	.TempFolder = TransCompiler.ProjTmpPath.file  ///Tmp/Speedie/Proj
 	.TempFolder.MakeEntirePath
 	.GeneratedCppsFolder.makeEntirePath
 	

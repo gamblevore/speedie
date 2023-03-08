@@ -34,6 +34,6 @@ class µFunc {
 			yield Addr+currinst
 			currinst++
 
-	syntax append (|asm2| A)
+	syntax append (|IR| A)
 		disabled "Append the fields directly via asmfuncstate"
 }

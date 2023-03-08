@@ -303,7 +303,7 @@ module SC_Saver {
 			R <~ s
 		R <~ "hello"
 		
-		|| F = externalcompiler.tmpbase("SavingTest.txt").file
+		|| F = TransCompiler.tmpbase("SavingTest.txt").file
 		R.saveto(F)
 		
 		|| R2 = F.parse.RestoreLoad

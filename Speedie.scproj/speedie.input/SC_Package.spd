@@ -6,7 +6,7 @@
 function compiler.Package 
 	require !Compiler.IsTest and !Options.ExternalCompile
 	require targets..gui
-	|| Pd = ExternalCompiler.productpath
+	|| Pd = TransCompiler.productpath
 	|| Pj = .BaseProjectPath.path
 	if platform.osx
 		.AppleBuildApp(pj.file, pd.file)
@@ -26,7 +26,7 @@ function compiler.NewConf (CollectFunc)
 function compiler.IdealName (|string|)
 	|| s = .confmsg["name"]
 		return s.name
-	return externalcompiler.productname.trimextandpath
+	return TransCompiler.productname.trimextandpath
 
 
 function compiler.AppBuildOneLib (|file| inner, |message| lib)

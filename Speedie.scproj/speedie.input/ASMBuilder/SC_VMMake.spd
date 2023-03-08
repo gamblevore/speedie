@@ -150,7 +150,7 @@ function GenerateOne (|message| form_msg, |int| f)
 
 	
 function InstructionList (|string| ch, |file|)
-	return ExternalCompiler.CppLib[ch]
+	return TransCompiler.CppLib[ch]
 	
 
 function BuildFiles (|bool|)

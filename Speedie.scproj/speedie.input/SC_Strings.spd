@@ -170,7 +170,6 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	for (item in msg)
 		point.Prev = «dot "SyntaxAppend", «Thg fsName », «prm, item » »
 
-	// fs <~ "dasdasd"
 	|| WeAreAppending = false
 	|| fnc = msg.parent
 	if fnc == @prm
@@ -201,7 +200,7 @@ function String.ParseClean (|Message|)
 	rz			= .Parse									#require
 	Compiler.stParseTime += (Date.Now - P1)|int|
 	rz.clean(True)
-	rz.PrepareAST // sigh the "Extra" value is 1 toob ig if its the last item on a line!
+	rz.PrepareAST
 	
 	
 function message.UnicodeSafe

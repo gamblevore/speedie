@@ -54,5 +54,5 @@ function compiler.CompileTime
 	SC_Saver.Test
 	.PrintCompileTime(.CompileAll~timeit)
 	if stderr.ok
-		externalcompiler.ExtComp
+		TransCompiler.TransComp
 		

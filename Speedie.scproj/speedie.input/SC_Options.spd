@@ -70,7 +70,7 @@ module Feedback
 			Options.SelfReplacement = kSelfReplace
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
-			externalcompiler.CompilingLibFiles++
+			TransCompiler.CompilingLibFiles++
 		  elseif t2 == 2
 			Options.ProjectIsMiniLib = true
 
@@ -193,7 +193,7 @@ module Feedback
 		purpose <~ name
 
 
-	function AppExtCompile (ShellOption) 
+	function AppTransCompile (ShellOption) 
 		explain(purpose, "Places the .cpp and header files locally")$
 		Options.ExternalCompile = true
 		Options.Color = false // makes sense... we want to do this using xcode
@@ -213,7 +213,7 @@ module Feedback
 		// maybe just... don't use it? just print?
 		// we have the ability to alter stdout
 		// why not do that for crashlogs? that is stdout goes to the crashlog?
-		|| v = ExternalCompiler.LogName
+		|| v = TransCompiler.LogName
 		printline "Stdout to: " + v
 		feedback.output(v, 3)
 		options.outputnormal.size = 0
@@ -244,8 +244,8 @@ module Feedback
 				printline k + ": " + s
 			return true
 			
-		externalcompile (AppExtCompile) // deprecated. remove
-		x (AppExtCompile)
+		externalcompile (AppTransCompile) // deprecated. remove
+		x (AppTransCompile)
 		
 		+"arch"
 			|| str = "intel/arm/ppc/spd"
@@ -256,7 +256,7 @@ module Feedback
 				
 		+"gcc"
 			explain(Purpose, "Replace gcc with something else")$
-			externalcompiler.CppCompilerPath=value
+			TransCompiler.CppCompilerPath=value
 				
 		+"perry"
 			Explain(Purpose, "")$
@@ -447,7 +447,7 @@ module Feedback
 		
 		+"clean"
 			Explain(Purpose, "Remove temp files.")$
-			if externalCompiler.Clean
+			if TransCompiler.Clean
 				"Cleaned"
 			return true // does something, counts towards operationCount
 		

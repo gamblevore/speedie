@@ -9,7 +9,7 @@
 */
 
 
-function asm2.AddRegParam (|message| src, |uint| write)
+function IR.AddRegParam (|message| src, |uint| write)
 	opt norefcounts
 	|| Num = src.regornum
 	if write < 4

@@ -1,4 +1,5 @@
 
+// FNC and FNCX are in the wrong place.
 
 extend asmfuncstate
 	function LoadTitle (|message| m, |message|)
@@ -96,16 +97,14 @@ extend asmfuncstate
 				A.rest = Found-A
 		return true
 	
-	function ASM2.SyntaxExpect (|string| Error)
-		|| FileIndex = .debug >> MsgDebugPosShift
-		|| BytePos   = .debug &  MsgDebugPosShift.bits
-		
-		|| file = scimport.allfiles[FileIndex].path
+	function IR.SyntaxExpect (|string| Error)
+		|| BytePos = .filepos
+		|| file = .file.path
 		|| err = Error(nil, error, ErrorSeverity.Error, file)
 			err.position = BytePos
 			stderr <~ err
 
-	function FindLabel (|&asm2| dbg, |&ASM2|)
+	function FindLabel (|&IR| dbg, |&IR|)
 		opt norefcounts
 		|| num = dbg.rest
 		for A in .out
@@ -131,9 +130,7 @@ extend asmfuncstate
 			  else
 				.TextInstruction(ch)
 		
-		require .LoadLabelJumps
-		if asm.noisyasm >= 2
-			printline self
+		return .LoadLabelJumps
 
 
 function message.ASMConst (|uint64|) 

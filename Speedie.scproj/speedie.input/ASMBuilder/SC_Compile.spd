@@ -6,7 +6,7 @@ struct ASMFuncState
 	linkage: cpp_part flat
 	|SCFunction--|				fn       
 	|µFunc|						Out      
-	|&ASM2|						Start    
+	|&IR|						Start    
 	|int|						Written  
 	|uint|						MaxLength
 	|bool|						OK       
@@ -21,11 +21,11 @@ struct ASMFuncState
 		for a in fn.Args
 			.AllocReg(a.Source, a, 0.reg)
 
-	function Last (|&asm2|)
+	function Last (|&IR|)
 		return .start + .Written-1
 	
 	
-	function AddASM (|message| dbg, |int| SM, |int| a, |int| b=0, |int| c=0, |int| d=0, |&asm2|)
+	function AddASM (|message| dbg, |int| SM, |int| a, |int| b=0, |int| c=0, |int| d=0, |&IR|)
 		pragma inline,  cpp_part AddASM,  opt norefcounts
 		rz   = .RequestOp(sm)
 		rz.r[0] = a
@@ -44,12 +44,12 @@ struct ASMFuncState
 		.RequestOp(asm.extended).rest = bits (|) B
 		
 	
-	function RequestOp (|uint| Code, |&asm2|)
+	function RequestOp (|uint| Code, |&IR|)
 		cpp_part RequestOp2, pragma inline
 		rz = .requestop 
 		rz.op = code
 
-	function RequestOp (|&asm2|)
+	function RequestOp (|&IR|)
 		cpp_part RequestOp
 		if .written < .maxlength
 			return .start + .written++
@@ -174,8 +174,8 @@ struct ASMFuncState
 		error (op, "No ASM for this operator?")
 
 	module
-		|ASM2|						Dummy
-		|ASM2[]|					JSMSpace    
+		|IR|						Dummy
+		|IR[]|					JSMSpace    
 		
 
 function message.ASMFunc (|fn_asm|)
@@ -186,22 +186,22 @@ function message.ASMFunc (|fn_asm|)
 
 function ASMFuncState.TotalInit
 	opt norefcounts
-	|| j = ASMFuncState.JSMSpace init (asm2[1MB])$		// big enough
+	|| j = ASMFuncState.JSMSpace init (IR[1MB])$		// big enough
 	.maxlength = j.Capacity
 	.start = j.ptr
 	.Written = 0
 
 
-function ASMFuncState.InitState (|µFunc| fn)
+function ASMFuncState.InitState (|scfunction| fn)
 	.TotalInit
-	fn.start = .written
-	fn.length = -.written
+	.out = µfunc(fn)
+	.out.start = .written
+	.out.length = -.written
 	.LabelCount = 0
-	.fn  = fn.fn
-	.out = fn
+	.fn  = fn
 	.ok  = true
 	.usedregs = 1
-	.AddFuncParams(fn.fn)
+	.AddFuncParams(fn)
 
 
 function ASMFuncState.FinishASM

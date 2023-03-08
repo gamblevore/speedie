@@ -14,6 +14,7 @@ extend_module ASM
 
 
 	function TestASM 
+		require app["asm"]
 		|| dev = app.prefs["dev"].int
 		if dev >= 2
 			asm.noisyasm = 3
@@ -21,10 +22,10 @@ extend_module ASM
 			.Listinstructions
 
 		require dev > 0
-		|| T = __digest__( file://syntax.asm ).parse[@tmp, "tests"] #require
 
 		stderr.ErrorsAreWarnings++ // nice
-		.SelfTestASM(T)
+		|| T = __digest__( file://syntax.asm ).parse[@tmp, "tests"]
+			.SelfTestASM(T)
 		stderr.ErrorsAreWarnings--
 	
 
@@ -50,12 +51,12 @@ extend_module SCFunction
 		|| mu = fn.asm$
 
 
-function asm2.Encode (|ASM|)
+function IR.Encode (|ASM|)
 	return (ASM.encoders[.op])(self)		
 
 	
 function @asm.Enc1
-	|asm2| R
+	|IR| R
 	R.op = ASM.DSUB
 	R.r[0] = 3
 	R.r[1] = 2

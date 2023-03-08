@@ -5,7 +5,7 @@
 
 
 
-module ExternalCompiler { // cppcomp, external_compiler, extcomp
+module TransCompiler { // cppcomp, external_compiler, TransComp
 linkage:cpp_part Ext
 |[File]|		FoundObjects
 |[File]|		Cleanup
@@ -253,7 +253,7 @@ function ExecuteGCC (|[string]| Commands, |bool|)
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
 	|| TmpFol = Output.MakeAndGoInto
 	|| Cpps = .CollectCppsInto( Input, TmpFol, nil )
-	return .ExtCompile( Cpps, " -c ", "cpp" )  and  .extCompile( Cpps, " -c ", "m" )  and  .extCompile( Cpps, " -c ", "mm" )
+	return .TransCompile( Cpps, " -c ", "cpp" )  and  .TransCompile( Cpps, " -c ", "m" )  and  .TransCompile( Cpps, " -c ", "mm" )
 
 
 function UseAndCompile (|[string]| Input, |String| Output, |bool|)
@@ -262,7 +262,7 @@ function UseAndCompile (|[string]| Input, |String| Output, |bool|)
 	
 	|| TmpFol = Output.MakeAndGoInto
 	|| Cpps = .FilterCppsIfAlreadyDone( Input, TmpFol, nil )
-	return .extCompile( Cpps, " -c ", "cpp" )  and  .extCompile( Cpps, " -c ", "m" )  and  .extCompile( Cpps, " -c ", "mm" )
+	return .TransCompile( Cpps, " -c ", "cpp" )  and  .TransCompile( Cpps, " -c ", "m" )  and  .TransCompile( Cpps, " -c ", "mm" )
 
 
 function ClearThis
@@ -281,8 +281,8 @@ function IsCompilerAndNeedsInstall (|bool|)
 	return true
 
 
-function ExtComp 
-	require .ShouldExtComp
+function TransComp 
+	require .ShouldTransComp
 	if options.products
 		if options.pack
 			TreeAssembler.BuildPack
@@ -311,7 +311,7 @@ function RunCppCompile
 	
 	.CollectAndCompile(	Compiler.GeneratedCppsFolder,	.ProjTmpPath )$
 	.UseAndCompile(		Cpp_Export.Cpp_input,			.ProjTmpPath        )$
-	.ExtCompile(		.FoundObjects,			"-o " + .ProductPath,	"o" )$
+	.TransCompile(		.FoundObjects,			"-o " + .ProductPath,	"o" )$
 		
 
 function MakeLib
@@ -320,7 +320,7 @@ function MakeLib
 		"Lib at: $n"
 	
 	.CompilingLibFiles++
-	.ExtCompile(		.FoundObjects,			"-o " + n,	"o" )
+	.TransCompile(		.FoundObjects,			"-o " + n,	"o" )
 	.CompilingLibFiles--
 	
 
@@ -338,7 +338,7 @@ function LinkOK (|file| p, |file|) // or just not a link
 	tof.delete
 
 
-function ShouldExtComp (|bool|)
+function ShouldTransComp (|bool|)
 	if options.Scripting
 		return true // if were here... its cos the scripting code wants it
 	require !options.final and Options.Compile  
@@ -353,7 +353,7 @@ function ShouldExtComp (|bool|)
 
 
 
-function ExtCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
+function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 	if !Files
 		return true // awesome
 	
@@ -514,8 +514,8 @@ function File.TestSpeedie (|string| Variant, |bool|) {
 	printline Result
 
 // Read output
-	print externalCompiler.TmpOut(Variant).ReadFile
-	|| test_err = externalCompiler.TmpErr(Variant).ReadFile
+	print TransCompiler.TmpOut(Variant).ReadFile
+	|| test_err = TransCompiler.TmpErr(Variant).ReadFile
 		error test_err // is this even used anymore?
 
 	return StdErr.OK

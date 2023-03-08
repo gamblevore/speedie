@@ -69,7 +69,7 @@ function ReInit ()
 
 function Log (|message|)
 	rz = @tmp + "log"
-	rz <~ ExternalCompiler.LogName	
+	rz <~ TransCompiler.LogName	
 
 
 function Enter (|bool|)
@@ -149,12 +149,12 @@ function Compiler.ErrorsToPerry (|message|)
 function ReportBuild (|message| cmd, |message|)
 	if stderr.ok and cmd == "compile"
 		.Perry <~ .Log
-		externalcompiler.ExtComp
+		TransCompiler.TransComp
 	cmd.clear
 	if stderr.Problems
 		cmd <~ compiler.ErrorsToPerry
 	  elseif cmd == "compile"
-		cmd <~ externalcompiler.productpath
+		cmd <~ TransCompiler.productpath
 	  else
 		cmd <~ (@thg, "ok")
 	return cmd
