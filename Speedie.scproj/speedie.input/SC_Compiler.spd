@@ -271,7 +271,9 @@ function InitBasicStuff (|bool|) // compiler.init
 	.AddGlobalConst( "__now__", typedate ).islookuponly = «num date.now »
 	.AddGlobalConst( "π", typef64 ).islookuponly = «num "3.1415926535897932" »
 	.AddGlobalConst( "τ", typef64 ).islookuponly = «num "6.2831853071795864" »
+
 	return StdErr.OK
+
 
 function InitBasicFuncs (|bool|)
 	.RefSetRef		= .LoadRefFunc( "JB_SetRef" )
@@ -324,16 +326,11 @@ function ImportAll
 	.ImportLibs
 	.ImportProj
 	VM_Builder.run
-		
-	|| List = [.InternalFile]
-	for Imp in .ImportedList
-		for F in Imp.Files
-			list <~ F
 
 	require .Stage( "Import" )
 	.Timer( "Import" )
 	
-	for L in List
+	for L in SCImport.AllFiles
 		L.Proj.use
 		compiler.program.ImportFile( L )
 		require StdErr.OK
@@ -425,7 +422,7 @@ function ImportAll
 	scimport.noproj
 
 
-	for f in list
+	for f in SCImport.AllFiles
 		f.Use
 		Compiler.program.CollectConstants( f.LiveAST, f.proj )
 
@@ -467,9 +464,6 @@ function ImportAll
 	scfunction.currfunc = nil
 
 	require StdErr.OK
-
-	//SCFunction.CreateAutoCasts
-	require StdErr.OK
 	
 
 	.DoSavers(2)
@@ -495,7 +489,7 @@ function ImportAll
 	require .Stage( "Collecting File Variables" )
 	for m in .ModuleList
 		m.InitDecls
-	for F in list
+	for F in SCImport.AllFiles
 		F.Decls Compiler.Program
 
 	scimport.noproj
@@ -599,6 +593,7 @@ function InitCompiler
 	
 	.CreateRoot
 	.CreateDisambiguation
+	SCImport.AllFiles <~ .InternalFile
 
 
 
