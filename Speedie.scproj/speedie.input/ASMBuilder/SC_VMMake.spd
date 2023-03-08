@@ -13,16 +13,16 @@
 
 
 module VM_Builder {
-	|message|   	NameList
-	|message|   	ModuleArg
-	|file|			vm_file
-	|[message]| 	Builder 
-	|faststring|	form_h
-	|message|		dt_prm
-	|string|		parent
-	|byte|			NormalPos = 0
-	|byte|			HighPos = 112
-	|[message]|		Msgs
+|message|   	NameList
+|message|   	ModuleArg
+|file|			vm_file
+|[message]| 	Builder 
+|faststring|	form_h
+|message|		dt_prm
+|string|		parent
+|byte|			NormalPos = 0
+|byte|			HighPos = 112
+|[message]|		Msgs
 
 
 function DefineGetSub (|string| fname,  |int| up,  |int| down, |byte| c, |byte| c2)
