@@ -1,59 +1,51 @@
 
-
-/*
-	Jeebox internals. By Theodore H. Smith...
-*/
-
 datatype TerminalColor (int)
 	
+class TerminalCell
+	|int| 		Color
+	|string| 	Text
+
+
 module Terminal
 	|array of array|	Screen
 	|faststring| 		fs
 	|date| 				LastDisplay
-	|byte[]| 			ColorInfo
-
+	
 	constants
 		w = 80
 		h = 35 // too many lines will break the clearscreen/reset function!
-		TermClear = "\1b[2J"
-		TermReset = "\1b[1;1H"
-		Black = 30
-		|TerminalColor|  //      \1b[1;31m // red
-		Red,Green,Yellow,Blue,Magenta,Cyan,White
+		|TerminalColor|
+		Black = 30, Red,Green,Yellow,Blue,Magenta,Cyan,White
 	
-	function Size (|ivec2|)
-		return (w,h)
-	
-	syntax Expect (|string| msg="")
-		"\07"
-		if msg
-			printline msg
-
-	syntax append (|string| text, |ivec2| xy, |TerminalColor| Colors = 0)
-		cpp_part Append2
-		self <~ (text, xy.x, xy.y, colors)
-	
-	syntax append (|string| text, |int| x = 0, |int| y = 0, |TerminalColor| Colors = 0)
-		.Init
-		|| within = 0
+	helper init
+		require !.Screen
+		for h
+			|| s = []
+			.Screen <~ s
+			for w
+				s <~ TerminalCell(0, " ")
+		
+	syntax append (|string| text, |ivec2| V, |TerminalColor| Colors = 0)
+		.init
+		|| x0 = v.x
 		for c.codepoints in text
 			if c == 10 or 13
-				y++
-				within = 0
-			  else 
-				|| xx = x+within
-				if  xx inrange w  and  y inrange h  and  c != ' '
-					if c == 127
-						c = ' ' // lol
-					.Screen[y][xx] = string.char(c)
-					.ColorInfo[(.w*y)+xx] = colors // update later... allow setting bg, or styles.
-				within++
+				v.y++
+				v.x = x0
+			  elseif c == ' '
+				0
+			  elseif v inrange .size  and  c != ' '
+				if c == 127
+					c = ' ' // lol
+				.Screen[v.y][v.x] = TerminalCell(colors, c)
+				v.x++
 	
 	function FrameText (|string| s, |ivec4| Frame, |terminalcolor| FrameCol=terminal.white, |terminalcolor| TextCol=0)
+		.init
 		s = s.wrap(frame.width-2)
 		|| p = frame.xy+1
 		for i.rect in frame ± 1
-			.Screen[i.y][i.x] = " "
+			.Screen[i.y][i.x] = terminalcell(0," ")
 		for l.lines in s
 			self <~ (l, p, textcol)
 			p.y++
@@ -74,54 +66,42 @@ module Terminal
 			self <~ (c, s)
 
 
-	helper Init
-		require !.Screen
-		.ColorInfo = byte[.w*.h]
-		(TermClear).puts
-		for h
-			|| s = []
-			s.SyntaxAppend(" ", w)
-			.Screen <~ s
-
-
 	function Flat (|string|)
 		visible
 		opt norefcounts
 		.fs := FastString()
-		|| cols = .ColorInfo.ptr
 		|| PrevCol = 0
 		for line in .Screen
-			for (ch in line) (i)
-				|| ccol = *cols++
-				if PrevCol != ccol
-					PrevCol = ccol
-					.fs <~ "\1b[1;${ccol|int|}m"
-				if ch isa string
-					.fs <~ ch
-				line[i] = " "
+			for cell in line|array of terminalcell|
+				|| CCol = cell.color
+				if PrevCol != CCol
+					PrevCol = CCol
+					.fs <~ "\1b[1;${CCol}m"
+				.fs <~ cell.Text
+				cell.text = " "
 			.fs <~ '\n'
 		return .fs.GetResult
 
 
 	function Display
-		.init
 		|| now = date.now
 		if .LastDisplay
 			app.Sleep((LastDisplay + 1s/60) - now)
+		  else
+			"\1b[2J"			// clear
 		.LastDisplay = now
-		TermReset.puts
-		.flat.puts
+		"\1b[1;1H"				// reset
+		print .flat
 	
+	function Size (|ivec2|)
+		return (w,h)
+	
+	syntax Expect (|string| msg="")
+		"\07"
+		if msg
+			printline msg
+
 	syntax access (|ind|)
 		cpp_wrapper JB_App__GetChar
-		
-
-helper string.puts
-	.cstr.cstring.puts
-
-
-
-
-
 
 
