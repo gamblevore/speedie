@@ -11,7 +11,7 @@ class SCFile (file)
 	|Message|		LiveAST
 	|Message|		OrigAST
 	|date|			OrigDate
-	|int|			filenum
+	|uint16|		filenum
 	|bool|			IsInternal
 
 
@@ -76,7 +76,7 @@ class SCFile (file)
 		|| words = compiler.InsecureWords$
 		|| where = (0,0)
 		|| found = words.Find(.fdata, where)
-			|| place = @thg+""
+			|| place = @thg + ""
 			place.range = where // doesn't say where though?
 			stderr.newerror(place, "Insecure word found", .path)
 		
@@ -91,8 +91,8 @@ class SCFile (file)
 			StdErr.source = .path
 			parser.DotInsertallow = true	// more consistant with IDE
 			
-			parser.usingtag = .filenum
-			rz = .fData.ParseClean // OK so now what?
+			parser.UsingTag = .filenum
+			rz = .fData.ParseClean			// OK so now what?
 			rz.PrepareAST
 			.DetectInsecureWords
 			
