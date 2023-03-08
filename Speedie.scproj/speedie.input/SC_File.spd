@@ -85,7 +85,7 @@ class SCFile (file)
 		if .IsInternal
 			
 		(Message).createLayer(self).use
-		|| str = .Readsafely.decompress
+		|| str = .ReadSafely.decompress
 			.fData = str
 			.origdate = .modified
 			StdErr.source = .path
