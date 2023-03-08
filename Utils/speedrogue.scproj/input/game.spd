@@ -5,6 +5,16 @@ module Info
 	|config| 		RoomTypes
 	|config| 		CellTypes
 
+	|| HeartTxt = `
+  ,d88b. ,d88b.
+ d888888v888888b
+ 888888888888888
+ "Y88888888888P"
+   "Y8888888P"
+     "Y888P"
+       "V"
+`
+
 
 role RogueObject (Message)
     render Str
@@ -25,7 +35,8 @@ role RogueObject (Message)
 		
 	function DescribeAttack (|rogueobject| mon, |int| dmg)
 		|| w = .weapon
-		map.FrameText <~ "You ${w.verb(mon)} the ${mon.name} with your ${w.name} for $dmg DMG."
+		|| fs = map.FrameText
+		fs <~ "You ${w.verb(mon)} the ${mon.name} with your ${w.name} for $dmg DMG."
 	
 	function Kill
 		.name += " Corpse"
@@ -63,9 +74,10 @@ role RogueObject (Message)
 		|| IsPlayer = self == map.Player
 		|| c = .cell
 		|| pos = c.Pos
-		for V.rect in (-10, -10, 10, 10)
+		|| r = 7
+		for V.rect in (-r, -r, r, r)
 			|| cell = map[v+pos]
-			if !cell or v > 10
+			if !cell or v > r
 				0
 			  elseif IsPlayer
 				cell.flags |= RogueCellState.seen // its visible... show it
@@ -464,11 +476,12 @@ function info.Load (|int64| Seed, |bool|)
 
 
 function Search (|roguecell| where, |bool|)
-	.frametext <~ "You see: "
+	|| fs = .FrameText
+	fs <~ "You see: "
 	for obj in where
 		if obj != .player
-			.frametext <~ "${obj.name}. "
-	.frametext <~ where.Describe
+			fs <~ "${obj.name}. "
+	fs <~ where.Describe
 	return true
 
 		
@@ -530,7 +543,7 @@ function Heal
 function DrawMap
 	for i in .size
 		self[i].draw
-	terminal <~ ( "${.player.name}: ${.player.HP}/${.player.Max}",  30,  0 )
+	terminal <~ ( "${.player.name}: ${.player.HP}/${.player.Max}",  (30,  0) )
 	|| str = .FrameText.GetResult
 		|| s = Terminal.Size
 		Terminal.FrameText(str, (s-(30, 10), s))
@@ -545,15 +558,18 @@ function Splash
 		for i in 5.0
 			|| Title = " Mini Rogue ".Rotate(i + secs*3)
 			|| f = i*1.234 + secs*(0.33+i*0.05)
-			|| x = (1.5*f/scale).bounce * (Terminal.w-(title.length+2))
-			|| y = f.bounce*(h-2)
-			Terminal <~ (Title, x+1, y+1, terminal.Red+i)
+			|int| x = (1.5*f/scale).bounce * (Terminal.w-(title.length+2))
+			|int| y = f.bounce*(h-2)
+			Terminal <~ (Title, (x+1, y+1), terminal.Red+i)
 
 		|| title2 = "<Mini-Rogue>"
 		|| x2 = (terminal.w - title2.length) / 2
-		Terminal <~ (title2, x2, 0, Terminal.Red)
-		Terminal <~ (file://HeartLogo.txt , 32, 10, terminal.red)
+		Terminal <~ (title2, (x2, 0), Terminal.Red)
+		Terminal <~ (info.HeartTxt, (32, 10), terminal.red)
 		Terminal.Display
+		if Terminal[]
+			exit
+
 }
 	
 main
