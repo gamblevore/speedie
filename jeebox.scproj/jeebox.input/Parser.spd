@@ -24,7 +24,7 @@ extend Parser
 		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine) 
 		.token(":") = .handler(kColon, fEndOfLine).link(kColonArg, fArgColon)
 
-		.EndOfLineMarker = message(nil, "line ")
+		.EndOfLineMarker = message(nil, "\n")
 
 
 		|| numb     =   "0123456789".bytesplit
@@ -1217,7 +1217,7 @@ module parser
 	|string|				Data
 	|message|				EndOfLineMarker
 	|int|                   StopBars
-	|int|					UsingTag = 0
+	|uint16|				UsingTag = 0
 	|int|					UsingPos = -1
 	|uint16|				UsingLength = 0
 	|MsgUIFlags|			InsertedFlags
