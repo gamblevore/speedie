@@ -14,8 +14,7 @@ module TextAssembler
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
 		|| fn = SCFunction.new
 		fn.source = msg
-		|| mu = µFunc(fn)
-		TreeAssembler.StdState.Initstate(mu)
+		TreeAssembler.StdState.Initstate(fn)
 		|| arg = TreeAssembler.StdState.TextFuncSub(msg)
 			compiler.exportnames[fn.exportname] = fn
 		TreeAssembler.StdState.FinishASM
@@ -111,8 +110,7 @@ module TreeAssembler
 
 	function Stamp (|SCFunction| fn)
 		opt norefcounts
-		|| mu = µFunc(fn)
-		.StdState.Initstate(mu)
+		.StdState.Initstate(fn)
 		fn.Flatten
 		.StdState.FinishASM
 
