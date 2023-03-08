@@ -1016,14 +1016,14 @@ function message.MsgIsProperModule (|bool|)
 
 	
 function message.FindPos (|int| fr, |int| len, |message|)
-	return .FindPossub(fr, len, true) ?? .FindPossub(fr, len, false)
+	return  .FindPossub(fr, len, true)  ??  .FindPossub(fr, len, false)
 
-function message.FindPosSub (|int| fr, |int| len, |bool| Exact,   |message|)
+function message.FindPosSub (|int| fr, |int| len, |bool| Exact, |message|)
 	opt norefcounts
 	|| Strength = 1
 	for ch.flat in self
 		if ch.position == fr
-			|| CurrStrength = (ch.extra == len) + !Exact
+			|| CurrStrength = (ch.RangeLength == len) + !Exact
 			if (CurrStrength >= Strength)
 				if ch isnt Inserted
 					return ch.unbra

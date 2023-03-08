@@ -40,7 +40,7 @@ function Parser.CloseXML (|message| XML, |int|i, |string| s, |message|)
 	if (CloseName != XML.name)
 		return .erroradd( "Open/close tags mismatch! </$CloseName> vs <${XML.Name}>", i)
 	.nextstart = ++closeend
-	xml.extra = (xml.position - closeend) (|) parser.baseextra
+	xml.RangeLength = xml.position - closeend
 	return XML
 
 

@@ -279,7 +279,7 @@ class FileViewer (ListView)
 		for f.flat in within
 			if f isa filerow
 				|| it = f.match(path, NameOnly)
-					f.extra = it
+					f.rangelength = it
 					rz <~ f
 		
 		rz.sort(FileRowScoreSorter)
@@ -409,14 +409,14 @@ class FileViewer (ListView)
 			opt norefcounts
 			|| aa = a|filerow|
 			|| bb = b|filerow|
-			if bb.extra == aa.extra
+			if bb.rangelength == aa.rangelength
 				|| aprj = aa.InMainProj
 				|| bprj = bb.InMainProj
 				if aprj == bprj
 					return FileRowNameSorter(aa, bb)
 				return aprj
 				
-			return aa.extra < bb.extra
+			return aa.rangelength < bb.rangelength
 
 
 		function ErrorSearchSorter (SorterComparer)

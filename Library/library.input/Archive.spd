@@ -10,8 +10,7 @@ role FileArchive (message)
 		cpp_part Arc
 	
 	constructor (|string| base)
-		.func = @tmp
-		.name = "archive"
+		super.Constructor(@tmp, "archive")
 		.msg(@arg).obj = base.PathDir
 
 

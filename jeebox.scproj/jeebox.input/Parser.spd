@@ -307,10 +307,9 @@ extend Parser
 		require  .needname(parent)
 		.NextStart = .data.inwhite(start)
 		parent.Func = @url
-		parent.extra += 3
+		parent.RangeLength += 3
 		parent <~ parser.new( nil, @str, start+3, .NextStart )
 		return parent
-		// https://www.wholefoodsmarket.co.uk
 		
 		
 	function fTmpPlus (ParseHandler)
@@ -652,7 +651,7 @@ extend Parser
 	function fArgColon (ParseHandler)
 		rz = parser.new( nil, @arg, start )
 		(rz is style2)
-		rz.extra = 1 (|) parser.baseextra // oof
+		rz.RangeLength = 1
 		while {
 			|| Item = .Process( kTemporal, rz ) ?? .ProcessThing
 			rz <~ item
@@ -699,7 +698,7 @@ extend Parser
 				return parser.ErrorAdd("Embedded expression didn't close.", NewStrPos)
 		
 		parser.NextStart = ++After
-		result.extra = (after - start) (|) parser.baseextra
+		result.RangeLength = after - start
 		result.UnEmbed
 		return result
 	}
@@ -876,7 +875,7 @@ extend Parser
 		
 		if .Eats("=")
 			Rel.Func = @ERel
-			opp.extra++
+			opp.RangeLength++
 		
 		|| Mode = Parser.kAllow
 		if !opp.name[0].isletter
@@ -940,7 +939,7 @@ extend Parser
 		ifn f == @tmp or @item or @decl
 			return parser.erroradd("Indented blocks must be within @tmp or @item or @decl", tmp.position)
 		
-		|| it = parser.makeinvisarg( tmp, i )
+		|| it = parser.MakeInvisArg( tmp, i )
 			it.indent = i
 			it.range = (pos, pos)
 			it <~ self
@@ -1218,10 +1217,10 @@ module parser
 	|string|				Data
 	|message|				EndOfLineMarker
 	|int|                   StopBars
-	|int|					BaseExtra = 0
+	|int|					UsingTag = 0
 	|int|					UsingPos = -1
-	|int|					UsingExtra = -1
-	|int|					InsertedFlags
+	|uint16|				UsingLength = 0
+	|MsgUIFlags|			InsertedFlags
 	|bool|					DotInsertAllow
 	|dictionary of string|  ErrorNames = nil
 	stderr = ErrorList.new

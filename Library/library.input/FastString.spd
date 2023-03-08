@@ -211,7 +211,6 @@ class FastString {
 	function fieldf (|string| name, |f64| data)
 		cpp_part AppendInfoFloat
 		if data
-			if data == 8.0
 			.fieldstart(name)
 			self <~ data
 

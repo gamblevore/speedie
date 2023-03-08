@@ -880,7 +880,7 @@ class TextView (GUIControl)
 		|| size = int.max
 		for ch.flat in self
 			if (ch contains pos) and (!named or ch.name or ch == @dot or @sdot)
-				|| r = ch.extra
+				|| r = ch.rangelength
 					if (r < size) or (rz!=nil and pos == rz.position and ch.after) // smallest
 						rz = ch
 						size = r

@@ -385,12 +385,11 @@ function Tran_Result (|SCFunction| f, |message|)
 	require type and src and !(Src.Last IsTmp "return")
 	|| errs = src.last ?? src
 	using (errs)
-	parser.usingpos = -1
+	parser.UsingPos = -1
 	
 	|| ret = type.WriteDeclFull("rz")
 	src.first = ret
 	return ret
-	
 
 
 function CanKeepAsSource (|Message| list, |Message| arg, |scdecl| d, |bool|)
@@ -590,14 +589,12 @@ function Tran_ForSub (TranFunc)					// :3
 	EndLoopMarker.Remove
 
 
-
 function Tran_Sdt (|Message| exp)
 	using (exp)
 	|| f = «thg "self"»
-	f.extra = 1 // simpler for autocomplete
+	f.RangeLength = 1 // simpler for autocomplete
 	exp.First = f
 	exp.Func = @dot
-
 
 
 function Tran_ForStart (|Message| arg, |Message| index, |SCBase| p)

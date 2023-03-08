@@ -71,7 +71,7 @@ function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 	return  (side.RemoveTypeCasts != @arg)
 
 
-function TypeCastCheck (ExprResolver) // (|Message| Exp, |SCBase| name_space, |Message| side, |Object|)
+function TypeCastCheck (ExprResolver)
 	|| exp0 = exp.first
 	|| N = exp0.next
 	|| Old = TypeOfExpr( exp0, name_space, side )		#require

@@ -66,13 +66,6 @@ function NewRender (CollectFunc)
 
 
 function ObjectifyString (|Message| msg)
-	require !MsgInsideDcl(msg)
-
-	|| P1 = msg.parent
-	|| p  = p1.parent
-	if p == @Func
-		require (p.first != "JB_Str3")
-	
 	msg.func = @sstr
 
 
@@ -108,31 +101,38 @@ function Tran_Strings (|Message| start, |SCFunction| fn)
 
 
 
-function InBuiltFunc (|message|self, |string| name, |bool|)
+function InBuiltFunc (|message| self, |string| name, |bool|)
 	opt norefcounts
+	//debugat 2524
 	|| p = .parent
 	|| c = p.first
 	|| OK = (P == @ques) and c == name
 	if !OK
 		|| p2 = p.parent
-		if p2==@func
+		if p2 == @func
 			c = p2.first
 			|| n = c.name
 			OK = n.hasmoat and n[2, name]
 			if OK
 				p2.become(@bra)
 	if (OK)
+		|| f = .first
+			error (f)
 		p.become(@bra)
 		c.remove
 		return true
 
 
-function String_Expand (|Message| msg, |SCFunction|fn) {
+function String_Expand (|Message| msg, |SCFunction| fn) {
 	|| P = msg.parent 
 	if (P istmp "disabled" or "description")
 		msg.Func = @str					// in case of description ''
 		return
-			
+	
+	|| URL = msg in @url
+		scfunction.GetFileString(p, msg.name) 
+		msg = p
+	
 	if InbuiltFunc(msg, "digest")
 		msg.name = msg.name.digest
 		// return? why dont we return?
@@ -156,7 +156,6 @@ function String_Expand (|Message| msg, |SCFunction|fn) {
 	
 	|| decl = MakeDecl( "FastString", fsName, Dot )
 	point.Prev = decl
-	//vampirio := decl.parent
 	|| errpos = msg
 	for item in msg
 		|| syx = item.func
@@ -215,13 +214,18 @@ function message.UnicodeSafe
 
 function Message.Clean (|bool| erl = false)
 	|| pos		= parser.usingpos
+	|| Len		= parser.UsingLength
+	|| Tag		= parser.UsingTag
 
 	|message| IgnoreArg 
 	if ((message).layer == (message).defaultlayer)
 		pos = -1
 	
 	for (curr.flat in self)
-		if pos >= 0: curr.position = pos
+		if pos >= 0
+			curr.position = pos
+			curr.RangeLength = len
+			curr.Tag = tag
 		
 		|| f = curr.func
 		if (f != @Back and @Str and @sstr and @bin)
@@ -465,6 +469,4 @@ function Create_JeeboxTest (|Message| msg)
 			s = s.digest
 
 		msg.become(@str, s)
-
-
-// |message| vampirio
+		

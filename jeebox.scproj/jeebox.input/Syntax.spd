@@ -72,9 +72,8 @@ datatype Syntax (Byte)
 	function Msg ( |message| parent, |string| name, |Message| )
 		cpp_part ParentMsg
 		return Message( parent, self, parser.usingpos, name, name.length )
+	
 	function message.Msg ( |syntax| fn, |string| name="", |Message| )
-		// || x = node.msg(@dot, "delete") // seems nicer
-		// || x = @dot.msg(node, "delete") 
 		return Message( self, fn, parser.usingpos, name, name.length )
 	
 	// replace with int64.msg? seems better.

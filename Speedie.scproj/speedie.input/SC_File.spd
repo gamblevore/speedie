@@ -91,11 +91,12 @@ class SCFile (file)
 			StdErr.source = .path
 			parser.DotInsertallow = true	// more consistant with IDE
 			
-			parser.baseextra = .filenum << 19
+			parser.usingtag = .filenum
 			rz = .fData.ParseClean // OK so now what?
 			rz.PrepareAST
 			.DetectInsecureWords
-			parser.baseextra = 0
+			
+			parser.usingtag = 0
 			parser.DotInsertallow = false
 			StdErr.source = nil
 		(Message).restore

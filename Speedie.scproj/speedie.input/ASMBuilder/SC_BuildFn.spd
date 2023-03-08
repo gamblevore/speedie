@@ -1,6 +1,6 @@
 
 extend_module ASM
-	function SelfTest (|message| tests)
+	function SelfTestASM (|message| tests)
 		opt norefcounts
 		.enc1
 
@@ -19,12 +19,13 @@ extend_module ASM
 			asm.noisyasm = 3
 		if asm.noisyasm >= 3
 			.Listinstructions
-		if dev > 0
-			|| asmfile = file://syntax.asm 
-			|| T = asmfile.parse[@tmp, "tests"]
-				stderr.ErrorsAreWarnings++ // nice
-				.SelfTest(T)
-				stderr.ErrorsAreWarnings--
+
+		require dev > 0
+		|| T = __digest__( file://syntax.asm ).parse[@tmp, "tests"] #require
+
+		stderr.ErrorsAreWarnings++ // nice
+		.SelfTestASM(T)
+		stderr.ErrorsAreWarnings--
 	
 
 function message.GetASMFunc (|message|)
@@ -41,7 +42,6 @@ extend_module SCFunction
 		for fn in funcs
 			if fn.CurrReacher
 				.Link(fn)
-
 
 	function Link (|SCFunction| fn)
 		opt norefcounts

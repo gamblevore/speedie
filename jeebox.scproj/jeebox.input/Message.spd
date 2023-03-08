@@ -18,78 +18,69 @@ class Message (RingTree)
 	contains Message
 	|string|				Name
 	|Object(tag)|			Obj					// Allow users to attach interesting information.
+												// better to remove "tag" and just use "target minilib"
+												// then we can do |object| or |uint64|
 	|Syntax|				Func
 	|Byte|					Indent
 	|MsgUIFlags|			Flags
-	|int|					Extra
-////////////////////////////////
-
-		
-	constructor
-		cpp_part ConstructorBasic
-		.Position	= parser.UsingPos
-		.func		= @arg
-		.flags		= parser.InsertedFlags
-		
+	|uint16|				RangeLength
+	|uint16|				Tag
+////////////////////////////////		
 			
 	constructor (|Message| other)
 		cpp_part ConstructorCopy
 		super.constructor
 		
-		.Position	= other.Position ?? parser.UsingPos
-		.func		= other.func
-		.flags		= other.flags (|) parser.InsertedFlags
+		.Position	= other.Position
 		.Name		= other.Name
-		.Obj		= other.Obj
+		.func		= other.func
+		.Obj		= other.obj
 		.indent		= other.indent
-		.extra		= other.extra
+		.flags		= other.flags	// (|) parser.InsertedFlags // What do I use insertedflags for even?
+									// just to avoid false-matches?
+									// turns out... a false-match won't matter here cos its a COPY.
+		.RangeLength= other.RangeLength
+		.Tag		= other.Tag
 
-		
-	constructor (|Syntax| Func, |string| Name)
+			
+	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
 		cpp_part ConstructorNormal
+		.name		= name
 		.Position	= parser.UsingPos
 		.func		= func
 		.flags		= parser.InsertedFlags
-		.extra		= (name.length, parser.usingextra)(.Position<0)
-		.name		= name
+		.RangeLength= parser.UsingLength
+		.tag		= parser.UsingTag // why not... 
 
 	
-	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| Extra=0)
+	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength=0)
 		cpp_part ConstructorRange
 		super.constructor(Parent)
 		
-		.Position	= BytePos
-		.flags		= parser.InsertedFlags
-		.func		= func
-		.extra		= extra (|) parser.baseextra // pack some bits in 
 		.name		= name
+		.Position	= BytePos
+		.func		= func
+		.flags		= parser.InsertedFlags // speedie's message.AppMainFix likes this, for parse.insertion
+		.RangeLength= RangeLength
+		.tag		= parser.UsingTag // why not...
 
 
 	function syxid (|int|)
 		return .Func|int|
 ///////////////////////////////////////////////////////////////////////////////
 
-	function CopyWipe (|memorylayer| L=nil, |Message|)
-		parser.UsingPos = -1 // whatever
-		return .copy_(nil, L)
 
-
-	helper Copy_ (|message| pos_msg=nil, |memorylayer| L, |Message|)
+	helper Copy (|message| pos_msg=nil, |Message|)
 		opt norefcounts
+		|| L = (pos_msg.memorylayer, .memorylayer)(pos_msg)
+				
 		rz = message.NewWithLayer(L, self)				// looks better
 		if pos_msg
 			rz.position = pos_msg.position
+			rz.rangelength = pos_msg.rangelength
 		for v in self
-			rz <~ v.Copy_(pos_msg, L)
+			rz <~ v.Copy(pos_msg)
 	
-
-	function Copy (|message| L = nil, |Message|)
-		opt norefcounts
-		cpp_Part NiceCopy
-		if self
-			if !L
-				return .Copy_(.memorylayer)
-			return .Copy_(L, L.memorylayer)
 
 
 	operator matches (|message| m, |bool|)
@@ -98,16 +89,6 @@ class Message (RingTree)
 
 	operator Starts (|string| s, |bool|)
 		return .name[0, s, true]
-
-
-	function Copy (|message| D, |message| R, |Message|)
-		cpp_part CopyRename			// unused??? // made to replace SCNodeRenamer. much simpler.
-		rz = message(self)
-		for v in self
-			if v matches d
-				rz <~ r.copy
-			  else
-				rz <~ v.Copy(d, r)
 
 
 	function ClearPosition
@@ -1079,10 +1060,10 @@ class Message (RingTree)
 		return d
 
 	function range (|intrange|)
-		return (.position, .position+.extra)
+		return (.position, .position+.RangeLength)
 	function range (assigns:|intrange|r)
 		.position = r.x
-		.extra = r.width (|) parser.baseextra
+		.RangeLength = r.width
 
 	function FlatRange (|intrange|)
 		opt norefcounts
@@ -1108,10 +1089,10 @@ class Message (RingTree)
 			
 
 	function After (|int|)
-		return .position + .extra
+		return .position + .RangeLength
 
 	function After (assigns:|int|)
-		.extra = (Value - .position) (|) parser.baseextra
+		.RangeLength = Value - .position
 
 	
 	operator Contains (|string| s, |bool|)

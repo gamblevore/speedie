@@ -97,9 +97,12 @@ extend asmfuncstate
 		return true
 	
 	function ASM2.SyntaxExpect (|string| Error)
-		|| file = scimport.allfiles[.debug>>19].path
+		|| FileIndex = .debug >> MsgDebugPosShift
+		|| BytePos   = .debug &  MsgDebugPosShift.bits
+		
+		|| file = scimport.allfiles[FileIndex].path
 		|| err = Error(nil, error, ErrorSeverity.Error, file)
-			err.position = .debug&19.bits
+			err.position = BytePos
 			stderr <~ err
 
 	function FindLabel (|&asm2| dbg, |&ASM2|)

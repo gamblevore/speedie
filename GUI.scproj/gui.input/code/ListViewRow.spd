@@ -8,6 +8,7 @@ role ListViewRow (message)
 		cpp_part Row
 	contains ListViewRow
 	constructor
+		super.Constructor(@arg, "")
 		is editable
 
 	function State (|ListViewState|)
@@ -215,6 +216,7 @@ role ListViewCell (message)
 	linkage
 		cpp_part Cell
 	constructor (|ListViewRow| owner, |int|i)
+		super.Constructor(@arg, "")
 		.obj = owner
 		.position = i
 	function Column (|int|)

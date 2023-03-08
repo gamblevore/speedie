@@ -389,7 +389,7 @@ function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  
 	  elseif ppp
 		rz <~ (@str, .editme.path) 
 		rz <~ where.position
-		rz <~ where.extra
+		rz <~ where.rangelength
 		|| str = rz.msg(@str, name)
 		str <~ (@thg, reason)
 		rz <~ .FuncText(spd_func)

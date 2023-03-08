@@ -27,17 +27,16 @@ struct ASMFuncState
 	
 	function AddASM (|message| dbg, |int| SM, |int| a, |int| b=0, |int| c=0, |int| d=0, |&asm2|)
 		pragma inline,  cpp_part AddASM,  opt norefcounts
-		rz   = .Requestop(sm)
+		rz   = .RequestOp(sm)
 		rz.r[0] = a
 		rz.r[1] = b
 		rz.r[2] = c
 		rz.r[3] = d
-		|| filepos = dbg.extra &~ 19.bits
-		rz.debug = dbg.position (|) filepos
+		rz.debug = dbg
 		target debug
 			rz.print
-		
-		
+
+
 	function AddExtended (|message| err, |uint| Bits)
 		pragma inline
 		|| B = 1<<31
@@ -220,3 +219,6 @@ function @fn_asm.InitTable
 	for i in 64
 		fn_asm_table[i] := &fn_asm.default
 			
+
+constants
+	MsgDebugPosShift = 19

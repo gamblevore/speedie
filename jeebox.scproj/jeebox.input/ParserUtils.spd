@@ -213,12 +213,14 @@ struct MessagePosition
 		noauto
 	
 	|int|               OldPosition
-	|int|               OldExtra
+	|uint|              OldLength
+	|uint|              OldTag
 	|MemoryLayer--|     OldLayer
 	
 	destructor
 	    parser.UsingPos = .OldPosition 
-	    parser.UsingExtra = .Oldextra 
+	    parser.UsingLength = .OldLength 
+	    parser.UsingTag = .OldTag 
 	    .OldLayer.use 
 	
 	function SyntaxUsingComplete 
@@ -226,17 +228,15 @@ struct MessagePosition
 
 function Message.SyntaxUsing (|MessagePosition|)
 	Opt NoRefCounts
-	|messageposition| Result = nil
-	Result.OldPosition = parser.UsingPos
-	Result.OldLayer = (message).Layer
+	rz.OldPosition = parser.UsingPos
+	rz.OldTag = parser.UsingTag
+	rz.OldLength = parser.UsingLength
+	rz.OldLayer = (message).Layer
 	if (self)
 	    parser.UsingPos = .position
-	    parser.UsingExtra = .extra
+	    parser.UsingLength = .RangeLength
+		parser.UsingTag = .Tag
 	    .memorylayer.use
-	  else
-	    debugger
-	
-	return Result
 
 
 api ringtree.jdb2
