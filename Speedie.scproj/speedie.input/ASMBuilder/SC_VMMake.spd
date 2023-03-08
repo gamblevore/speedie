@@ -224,6 +224,8 @@ function VMSpd   (|message| list)
 	.msgs <~ (@thg+"EROR",  128)
 	for ch in list
 		.VMTmp(ch)
+	printline .modulearg
+	debugger
 	
 	
 function VMCpp   (|faststring| vm, |faststring| jump)
@@ -280,3 +282,8 @@ function VMLine (|message| line, |faststring| vm)
 	vm <~ "\n"
 }
 
+	
+	
+	
+	
+	

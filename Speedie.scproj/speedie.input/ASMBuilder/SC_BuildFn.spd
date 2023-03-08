@@ -1,9 +1,7 @@
 
 extend_module ASM
-	function SelfTestASM (|message| tests)
+	helper TestASMSub (|message| tests)
 		opt norefcounts
-		.enc1
-
 		|| list = tests.last(@arg)
 		|| testname = tests[@thg]
 		require list and testname
@@ -14,6 +12,7 @@ extend_module ASM
 
 
 	function TestASM 
+		.enc1
 		require app["asm"]
 		|| dev = app.prefs["dev"].int
 		if dev >= 2
@@ -25,7 +24,7 @@ extend_module ASM
 
 		stderr.ErrorsAreWarnings++ // nice
 		|| T = __digest__( file://syntax.asm ).parse[@tmp, "tests"]
-			.SelfTestASM(T)
+			.TestASMSub(T)
 		stderr.ErrorsAreWarnings--
 	
 

@@ -15,6 +15,7 @@ extend_module ASM
 		|| fs = faststring()
 		fs <~ "Opcodes:\n"
 		|| n = 0
+		debugger
 		for opcode in Instruction.typelistsize
 			|instruction--| inst = Instruction.typelist[opcode]
 			fs.AppendIntegerAsText(opcode, 2)

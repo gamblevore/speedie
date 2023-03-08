@@ -1,9 +1,9 @@
 
 
 
-// we are gonna use IR to store the ASM... opt it after.
+// we use IR first, then opt the IR, then turn it to ASM last.
 
-struct IR // µfunc uses this
+struct IR // µfunc uses this. // "class IR"
 	|byte|			Op
 	|byte|			Label // 255 labels per function
 	|byte[2]|		Nothing
@@ -14,15 +14,15 @@ struct IR // µfunc uses this
 	operator isa (|int| m, |bool|)
 		return m == .op
 		
-	setter debug (|message|)
+	setter Debug (|message|)
 		|| FilePos  = value.position & MsgDebugPosShift.bits
 		|| FileInfo = value.tag << MsgDebugPosShift
 		.debug = FileInfo (|) FilePos
 	
 	function File (|scfile|)
-		return scimport.allfiles[.debug>>MsgDebugPosShift]
+		return scimport.allfiles[.debug >> MsgDebugPosShift]
 	
-	function FilePos (|ind|)
+	function BytePos (|ind|)
 		return .debug & MsgDebugPosShift.bits
 	
 	function fs (|FastString| fs)
@@ -33,7 +33,7 @@ struct IR // µfunc uses this
 		fs <~ ':'
 		fs <~ (' ', 5-op.name.length)
 		|| GotAny = ""
-		|| remain = 25
+		|| Remain = 25
 		|| f = op.sizes
 		for i in 5
 			|| bs = f[i].bitsize
@@ -69,8 +69,7 @@ class µFunc1 (memory)
 	function Run (|&int64| Args = nil, |int| ArgCount=nil, |int64|)
 		cpp_part RunArgs
 		if args
-			|| vm	= jb_vm.vm
-			|| r	= vm.ClearRegisters(argcount)
+			|| r = jb_vm.vm.ClearRegisters(argcount)
 			for i in argcount
 				r[i] = args[i] 
 		

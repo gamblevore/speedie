@@ -71,7 +71,7 @@ selector Instruction // class instruction
 
 	module
 		|dictionary of instruction|			TypeDict
-		|instruction[256]|					TypeList
+		|instruction[128]|					TypeList
 		|int|								TypeListSize
 
 		syntax access (|message| m, |instruction|)
@@ -80,6 +80,8 @@ selector Instruction // class instruction
 
 
 		function Store (|instruction| i)
+		
+			debugger
 			if .typelistsize++ != i.id
 				debugat
 			.TypeDict := dictionary.new

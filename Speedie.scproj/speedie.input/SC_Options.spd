@@ -349,6 +349,8 @@ module Feedback
 		+"__talk__" (AppTalk)
 			
 		+"talk" (AppTalk)
+		+"asm" // nothing... for now.
+			0
 		
 		+"targetdebug" // basically
 			Explain(Purpose, "")$
