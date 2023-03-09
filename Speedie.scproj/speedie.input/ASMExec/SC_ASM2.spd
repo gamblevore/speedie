@@ -27,8 +27,7 @@ struct IR // µfunc uses this. // "class IR"
 	
 	function fs (|FastString| fs)
 		opt norefcounts
-		debugger
-		|| op = instruction.typelist[.op]
+		|| op = instruction.typelist[.op]$
 		fs <~ op.name
 		fs <~ ':'
 		fs <~ (' ', 5-op.name.length)
@@ -73,6 +72,7 @@ class µFunc1 (memory)
 	
 	function Run (|&int64| Args = nil, |int| ArgCount=nil, |int64|)
 		cpp_part RunArgs
+		require self
 		if args
 			|| r = jb_vm.vm.ClearRegisters(argcount)
 			for i in argcount

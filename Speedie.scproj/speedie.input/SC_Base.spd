@@ -929,7 +929,6 @@ dispatch RootCollectTable (CollectFunc)
 	constants			(DontRemove)
 	flags				(DontRemove)
 	debuginsert			(scfunction.DebugInsert)
-	__instructionlist__ (vm_Builder.BuildInstructions)
 	
 
 

@@ -205,11 +205,15 @@ struct xC2xB5Func_Behaviour;
 
 struct SCOperator_Behaviour;
 
+struct Instruction_Behaviour;
+
 struct xC2xB5Form_Behaviour;
 
 struct SCNodeRenamer_Behaviour;
 
 struct LeakTester_Behaviour;
+
+struct TerminalCell_Behaviour;
 
 struct StringFields_Behaviour;
 
@@ -283,8 +287,6 @@ struct FastStringCpp_Behaviour;
 
 struct xC2xB5Func1_Behaviour;
 
-struct Instruction_Behaviour;
-
 struct File_Behaviour;
 
 struct String_Behaviour;
@@ -321,6 +323,8 @@ struct JB_ErrorReceiver;
 
 struct FixedDict;
 
+struct Instruction;
+
 struct LeakTester;
 
 struct Macro;
@@ -349,13 +353,13 @@ struct StringStream;
 
 struct SyntaxObj;
 
+struct TerminalCell;
+
 struct xC2xB5Form;
 
 struct ASMFunc;
 
 struct FastStringCpp;
-
-struct Instruction;
 
 struct FastString;
 
@@ -640,6 +644,18 @@ JBClass ( JB_ErrorReceiver , JB_Object ,
 struct FastString_Behaviour: Object_Behaviour {
 };
 
+struct Instruction_Behaviour: Object_Behaviour {
+};
+
+JBClass ( Instruction , JB_Object , 
+	byte aType;
+	byte PCount;
+	byte OpCode;
+	xC2xB5Form* Sizes;
+	JB_String* FormName;
+	JB_String* Name;
+);
+
 struct LeakTester_Behaviour: Object_Behaviour {
 };
 
@@ -869,17 +885,6 @@ JBClass ( FastStringCpp , FastString ,
 struct File_Behaviour: String_Behaviour {
 };
 
-struct Instruction_Behaviour: Selector_Behaviour {
-};
-
-JBClass ( Instruction , Selector , 
-	byte OpLength;
-	byte aType;
-	byte PCount;
-	xC2xB5Form* Sizes;
-	JB_String* FormName;
-);
-
 struct MaterialsLol_Behaviour: Selector_Behaviour {
 };
 
@@ -1007,7 +1012,7 @@ JBClass ( SCFile , JB_File ,
 	Message* LiveAST;
 	Message* OrigAST;
 	Date OrigDate;
-	int filenum;
+	u16 filenum;
 	bool IsInternal;
 );
 
@@ -1209,13 +1214,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1812])
+#define kJB__ErrorColors_bold (JB_LUB[1729])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1813])
-#define kJB__ErrorColors_good (JB_LUB[1814])
-#define kJB__ErrorColors_normal (JB_LUB[1815])
-#define kJB__ErrorColors_underline (JB_LUB[1814])
-#define kJB__ErrorColors_warn (JB_LUB[1816])
+#define kJB__ErrorColors_error (JB_LUB[1730])
+#define kJB__ErrorColors_good (JB_LUB[1731])
+#define kJB__ErrorColors_normal (JB_LUB[1732])
+#define kJB__ErrorColors_underline (JB_LUB[1731])
+#define kJB__ErrorColors_warn (JB_LUB[1733])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1279,6 +1284,7 @@ extern bool SC__Options_IsDirectTest;
 extern bool SC__Options_KeepAllErrors;
 #define kSC__Options_LargestFlag (3)
 extern bool SC__Options_ListAllLib;
+extern bool SC__Options_MakeASM;
 extern bool SC__Options_MakeLib;
 #define kSC__Options_native (1)
 extern int SC__Options_OperationCount;
@@ -1372,7 +1378,6 @@ extern Message* SC__SCStrings_RenderNewParams;
 extern Dictionary* SC__Targets_Items;
 #define kJB__Terminal_Black (30)
 #define kJB__Terminal_blue (34)
-extern MWrap* JB__Terminal_ColorInfo;
 #define kJB__Terminal_cyan (36)
 extern FastString* JB__Terminal_fs;
 #define kJB__Terminal_green (32)
@@ -1381,8 +1386,6 @@ extern Date JB__Terminal_LastDisplay;
 #define kJB__Terminal_magenta (35)
 #define kJB__Terminal_red (31)
 extern Array* JB__Terminal_Screen;
-#define kJB__Terminal_TermClear (JB_LUB[1817])
-#define kJB__Terminal_TermReset (JB_LUB[1818])
 #define kJB__Terminal_w (80)
 #define kJB__Terminal_white (37)
 #define kJB__Terminal_yellow (33)
@@ -1393,13 +1396,11 @@ extern JB_String* SC__Ext_CppCompilerPath;
 extern Array* SC__Ext_FoundObjects;
 extern Array* SC__TreeAssembler_PackFuncs;
 extern ASMFuncState SC__TreeAssembler_StdState;
-extern Array* SC__VM_Builder_Builder;
 extern Message* SC__VM_Builder_dt_prm;
 extern FastString* SC__VM_Builder_form_h;
 extern byte SC__VM_Builder_HighPos;
 extern Message* SC__VM_Builder_ModuleArg;
-extern Array* SC__VM_Builder_Msgs;
-extern Message* SC__VM_Builder_NameList;
+extern Array* SC__VM_Builder_NameList;
 extern byte SC__VM_Builder_NormalPos;
 extern JB_String* SC__VM_Builder_parent;
 extern JB_File* SC__VM_Builder_vm_file;
@@ -1425,10 +1426,10 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[336])
-#define kSC_BitNot (JB_LUB[435])
-#define kSC_BitOr (JB_LUB[644])
-#define kSC_BitXor (JB_LUB[1819])
+#define kSC_BitAnd (JB_LUB[337])
+#define kSC_BitNot (JB_LUB[436])
+#define kSC_BitOr (JB_LUB[642])
+#define kSC_BitXor (JB_LUB[1734])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1458,7 +1459,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1820])
+#define kJB_SaverStart1 (JB_LUB[1735])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1787,6 +1788,8 @@ extern byte SC__ASM_NoisyASM;
 extern IR SC__flat_Dummy;
 extern MWrap* SC__flat_JSMSpace;
 extern CompressionStats JB__MzSt_All;
+#define kSC__IR_MsgDebugPosShift (19)
+extern Array* SC__IR_Resources;
 
 extern Dictionary* JB__LD_ClassList;
 #define kJB__Saver_RefMark (1073741824)
@@ -1817,6 +1820,10 @@ extern FastString* JB__FS_StdOutFS;
 #define kJB__dict_TypeObj (1)
 #define kJB__dict_TypeStem (2)
 #define kJB__dict_TypeValue (0)
+#define kSC__Instruction_TypeConst (2)
+#define kSC__Instruction_TypeFunc (1)
+extern Dictionary* SC__Instruction_TypeDict;
+extern Instruction* SC__Instruction_TypeList[128];
 extern uint64 JB__Mrap_MDummy[2];
 extern Process* JB__Proc_Children[16];
 extern byte JB__Proc_ClosePipesInstalled;
@@ -1842,75 +1849,6 @@ extern bool JB__File_DebugExecute;
 #define kJB__File_O_RDWR (2)
 #define kJB__File_O_TRUNC (1024)
 #define kJB__File_O_WRONLY (1)
-extern Instruction* SC__Instruction___First;
-extern Instruction* SC__Instruction_ADD;
-extern Instruction* SC__Instruction_ADDC;
-extern Instruction* SC__Instruction_BAND;
-extern Instruction* SC__Instruction_BFLG;
-extern Instruction* SC__Instruction_BFLS;
-extern Instruction* SC__Instruction_BNOT;
-extern Instruction* SC__Instruction_BOR;
-extern Instruction* SC__Instruction_BRA;
-extern Instruction* SC__Instruction_BRAN;
-extern Instruction* SC__Instruction_BROL;
-extern Instruction* SC__Instruction_BROR;
-extern Instruction* SC__Instruction_BXOR;
-extern Instruction* SC__Instruction_CMPE;
-extern Instruction* SC__Instruction_CMPF;
-extern Instruction* SC__Instruction_CMPI;
-extern Instruction* SC__Instruction_CMPN;
-extern Instruction* SC__Instruction_CNTC;
-extern Instruction* SC__Instruction_CONV;
-extern Instruction* SC__Instruction_DADD;
-extern Instruction* SC__Instruction_DDIV;
-extern Instruction* SC__Instruction_DIV;
-extern Instruction* SC__Instruction_DMUL;
-extern Instruction* SC__Instruction_DSUB;
-extern Instruction* SC__Instruction_EROR;
-extern Instruction* SC__Instruction_FADD;
-extern Instruction* SC__Instruction_FDIV;
-extern Instruction* SC__Instruction_FMUL;
-extern Instruction* SC__Instruction_FNC;
-extern Instruction* SC__Instruction_FNCX;
-extern Instruction* SC__Instruction_FSUB;
-extern Instruction* SC__Instruction_HALT;
-#define kSC__Instruction_TypeConst (2)
-#define kSC__Instruction_TypeFunc (1)
-extern Instruction* SC__Instruction_LEAF;
-extern Instruction* SC__Instruction_LUPD;
-extern Instruction* SC__Instruction_LUPU;
-extern Instruction* SC__Instruction_MEMM;
-extern Instruction* SC__Instruction_MUL;
-extern Instruction* SC__Instruction_PRNT;
-extern Instruction* SC__Instruction_RALO;
-extern Instruction* SC__Instruction_RARE;
-extern Instruction* SC__Instruction_RD1S;
-extern Instruction* SC__Instruction_RD1U;
-extern Instruction* SC__Instruction_RD2S;
-extern Instruction* SC__Instruction_RD2U;
-extern Instruction* SC__Instruction_RD4S;
-extern Instruction* SC__Instruction_RD4U;
-extern Instruction* SC__Instruction_RD8U;
-extern Instruction* SC__Instruction_RET;
-extern Instruction* SC__Instruction_RETL;
-extern Instruction* SC__Instruction_RSDE;
-extern Instruction* SC__Instruction_RSET;
-extern Instruction* SC__Instruction_SET1;
-extern Instruction* SC__Instruction_SETK;
-extern Instruction* SC__Instruction_SETN;
-extern Instruction* SC__Instruction_SHLS;
-extern Instruction* SC__Instruction_SHRS;
-extern Instruction* SC__Instruction_SHRU;
-extern Instruction* SC__Instruction_ST1U;
-extern Instruction* SC__Instruction_ST2U;
-extern Instruction* SC__Instruction_ST4U;
-extern Instruction* SC__Instruction_ST8U;
-extern Instruction* SC__Instruction_STCK;
-extern Instruction* SC__Instruction_SUB;
-extern Instruction* SC__Instruction_SWAP;
-extern Dictionary* SC__Instruction_TypeDict;
-extern Instruction* SC__Instruction_TypeList[256];
-extern int SC__Instruction_TypeListSize;
 extern MaterialsLol* SC__MaterialsLol___First;
 extern MaterialsLol* SC__MaterialsLol_Iron;
 extern MaterialsLol* SC__MaterialsLol_Pellets;
@@ -2299,6 +2237,8 @@ bool SC_FB__AppOptions_alive(JB_String* Name, JB_String* Value, FastString* purp
 bool SC_FB__AppOptions_arch(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppOptions_argstats(JB_String* Name, JB_String* Value, FastString* purpose);
+
+bool SC_FB__AppOptions_asm(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppOptions_breakonerr(JB_String* Name, JB_String* Value, FastString* purpose);
 
@@ -3010,8 +2950,6 @@ bool SC_Targets__SyntaxAccess(JB_String* name);
 
 
 // Terminal
-JB_String* JB_Terminal__Flat();
-
 int JB_Terminal__Init_();
 
 int JB_Terminal__InitCode_();
@@ -3140,9 +3078,11 @@ xC2xB5Form* SC_VM_Builder__AddForm(Message* form);
 
 bool SC_VM_Builder__BuildFiles();
 
-void SC_VM_Builder__BuildInstructions(Message* mu);
+void SC_VM_Builder__BuildInstructions(SCFunction* fn, Message* node, SCBase* name_space);
 
 void SC_VM_Builder__Clean(Message* msg);
+
+JB_File* SC_VM_Builder__CppLibFile(JB_String* ch);
 
 Message* SC_VM_Builder__DataTypeCreate(Message* form, int fnum);
 
@@ -3164,23 +3104,21 @@ int SC_VM_Builder__Init_();
 
 int SC_VM_Builder__InitCode_();
 
-JB_File* SC_VM_Builder__InstructionList(JB_String* ch);
-
 void SC_VM_Builder__MakeJump(Message* msg, FastString* jump);
+
+void SC_VM_Builder__MakeTheVM();
 
 void SC_VM_Builder__MakeVM(Message* tmp, FastString* vm);
 
-void SC_VM_Builder__Run();
-
 void SC_VM_Builder__VMCpp(FastString* vm, FastString* jump);
 
-void SC_VM_Builder__VMDecl(Message* tmp);
+void SC_VM_Builder__VMDecl(Message* tmp, Array* msgs);
 
 void SC_VM_Builder__VMLine(Message* line, FastString* vm);
 
-void SC_VM_Builder__VMSpd(Message* list);
+Array* SC_VM_Builder__VMSpd(Message* list);
 
-void SC_VM_Builder__VMTmp(Message* tmp);
+void SC_VM_Builder__VMTmp(Message* tmp, Array* msgs);
 
 
 
@@ -3225,8 +3163,6 @@ void SC_ClassLinkageTable_visible(SCFunction* fn, Message* node, SCBase* name_sp
 void SC_ClassLinkageTable_wrapper(SCFunction* fn, Message* node, SCBase* name_space);
 
 SCClass* SC_ClassOfObjForC(Message* curr);
-
-SCBase* SC_ClsCollectTable_linkage(Message* node, SCBase* name_space, Message* ErrPlace);
 
 SCBase* SC_ClsCollectTable_pragma(Message* node, SCBase* name_space, Message* ErrPlace);
 
@@ -3369,8 +3305,6 @@ void JB_Obj_PrintLine(JB_Object* o);
 JB_String* SC_ProjName();
 
 void SC_RelSetOrExpansion(Message* exp);
-
-SCBase* SC_RootCollectTable_const(Message* node, SCBase* name_space, Message* ErrPlace);
 
 SCBase* SC_RootCollectTable_crash(Message* node, SCBase* name_space, Message* ErrPlace);
 
@@ -3983,9 +3917,9 @@ void SC_ASM__ListInstructions();
 
 bool SC_ASM__Needed();
 
-void SC_ASM__SelfTestASM(Message* tests);
-
 void SC_ASM__TestASM();
+
+void SC_ASM__TestASMSub(Message* tests);
 
 
 
@@ -4283,13 +4217,15 @@ bool JB_IPCMessage_IsOpen(IPCMessage* self);
 // JB_IR
 void SC_IR_AddRegParam(IR* self, Message* src, uint write);
 
-void SC_IR_debugSet(IR* self, Message* Value);
+Ind SC_IR_BytePos(IR* self);
+
+void SC_IR_DebugSet(IR* self, Message* Value);
 
 ASM SC_IR_Encode(IR* self);
 
-SCFile* SC_IR_File(IR* self);
+JB_String* SC_IR_File(IR* self);
 
-Ind SC_IR_FilePos(IR* self);
+int SC_IR_FilePos(IR* self);
 
 void SC_IR_fs(IR* self, FastString* fs);
 
@@ -4298,6 +4234,10 @@ bool SC_IR_OperatorIsa(IR* self, int m);
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
+
+int SC_IR__Init_();
+
+int SC_IR__InitCode_();
 
 
 
@@ -4489,6 +4429,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_SCOperator_Behaviour
 
 
+// JB_Instruction_Behaviour
+
+
 // JB_µForm_Behaviour
 
 
@@ -4496,6 +4439,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_LeakTester_Behaviour
+
+
+// JB_TerminalCell_Behaviour
 
 
 // JB_StringFields_Behaviour
@@ -4604,9 +4550,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_µFunc1_Behaviour
-
-
-// JB_Instruction_Behaviour
 
 
 // JB_File_Behaviour
@@ -4897,7 +4840,11 @@ void SC_CppRefs_SetDefaultRefStatus(CppRefs* self);
 
 CppRefs* SC_CppRefs__Alloc();
 
+SCBase* SC_CppRefs__Linkage(Message* node, SCBase* name_space, Message* ErrPlace);
+
 CppRefs* SC_CppRefs__New(Message* s);
+
+SCBase* SC_CppRefs__ReadIntoCppRefs(Message* node, SCBase* name_space, Message* ErrPlace);
 
 
 
@@ -5046,6 +4993,23 @@ FastString* JB_FS__NewSize(int size);
 
 
 // JB_FixedDict
+
+
+// JB_Instruction
+void SC_Instruction_destructor(Instruction* self);
+
+bool SC_Instruction_IsSetConst(Instruction* self);
+
+JB_String* SC_Instruction_Render(Instruction* self, FastString* fs_in);
+
+void SC_Instruction__Init();
+
+int SC_Instruction__Init_();
+
+int SC_Instruction__InitCode_();
+
+Instruction* SC_Instruction__SyntaxAccess(Message* m);
+
 
 
 // JB_LeakTester
@@ -5430,13 +5394,11 @@ SCParamArray* SC_PA__New(Message* exp, Message* side);
 
 
 // JB_Selector
-void JB_Sel_Constructor(Selector* self, Selector* Next, Selector** Place, JB_String* namee);
+void JB_Sel_Constructor(Selector* self, Selector* Next, Selector** Place, JB_String* name);
 
 void JB_Sel_destructor(Selector* self);
 
 void JB_Sel_GiveIDs(Selector* self);
-
-inline uint JB_Sel_UCast(Selector* self);
 
 
 
@@ -5747,13 +5709,14 @@ SyntaxObj* JB_Fn__New(fpMsgRender msg, JB_String* name, int ID);
 
 
 
+// JB_TerminalCell
+
+
 // JB_TokenHandler
 
 
 // JB_µForm
 void SC_xC2xB5Form_AddRemainder(xC2xB5Form* self, uint U);
-
-void SC_xC2xB5Form_ConstructorWithStr(xC2xB5Form* self, JB_String* data);
 
 void SC_xC2xB5Form_ConstructorWithMsg(xC2xB5Form* self, Message* tmp);
 
@@ -5774,10 +5737,6 @@ xC2xB5Form* SC_xC2xB5Form__Alloc();
 int SC_xC2xB5Form__Init_();
 
 int SC_xC2xB5Form__InitCode_();
-
-xC2xB5Form* SC_xC2xB5Form__Needform(JB_String* Form);
-
-xC2xB5Form* SC_xC2xB5Form__NewWithStr(JB_String* data);
 
 xC2xB5Form* SC_xC2xB5Form__NewWithMsg(Message* tmp);
 
@@ -5953,39 +5912,6 @@ JB_String* JB_File__PreferencesPath();
 JB_File* JB_File__PrefsFolder();
 
 void JB_File__testjb();
-
-
-
-// JB_Instruction
-void SC_Instruction_ActualInit(Instruction* self);
-
-void SC_Instruction_Const(Instruction* self);
-
-void SC_Instruction_Constructor(Instruction* self, Selector* Next, Selector** Place, JB_String* name1);
-
-void SC_Instruction_destructor(Instruction* self);
-
-bool SC_Instruction_IsSetConst(Instruction* self);
-
-JB_String* SC_Instruction_Render(Instruction* self, FastString* fs_in);
-
-void SC_Instruction_selector_init(Instruction* self, JB_String* formName, int num);
-
-void SC_Instruction____LoadSel(Instruction** Place, JB_String* Name);
-
-Instruction* SC_Instruction__Alloc();
-
-void SC_Instruction__Init();
-
-int SC_Instruction__Init_();
-
-int SC_Instruction__InitCode_();
-
-Instruction* SC_Instruction__New(Selector* Next, Selector** Place, JB_String* name1);
-
-void SC_Instruction__Store(Instruction* i);
-
-Instruction* SC_Instruction__SyntaxAccess(Message* m);
 
 
 
@@ -7220,8 +7146,6 @@ SCModule* SC_Mod__New();
 
 SCModule* SC_Mod__NewContainer(JB_String* s);
 
-SCBase* SC_Mod__ReadIntoCppRefs(Message* node, SCBase* name_space, Message* ErrPlace);
-
 
 
 // JB_String_ArgValue
@@ -8137,7 +8061,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[1] = b;
 	rz->r[2] = c;
 	rz->r[3] = d;
-	(SC_IR_debugSet(rz, dbg));
+	(SC_IR_DebugSet(rz, dbg));
 	return rz;
 }
 
@@ -8191,10 +8115,6 @@ inline void JB_Sav___SaveWrite__(Saveable* self, ObjectSaver* Saver) {
 
 inline bool SC_PA_SyntaxCast(SCParamArray* self) {
 	return self->HasProperParams;
-}
-
-inline uint JB_Sel_UCast(Selector* self) {
-	return self->ID;
 }
 
 inline JB_StringC* JB_Str_CastZero(JB_String* self) {

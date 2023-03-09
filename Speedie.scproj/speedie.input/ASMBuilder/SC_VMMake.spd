@@ -1,10 +1,9 @@
 
 
 module VM_Builder {
-|message|   	NameList
+|[message]| 	NameList
 |message|   	ModuleArg
 |file|			vm_file
-|[message]| 	Builder 
 |faststring|	form_h
 |message|		dt_prm
 |string|		parent
@@ -18,6 +17,7 @@ function DefineGetSub (|string| fname,  |int| up,  |int| down, |byte| c, |byte| 
 #define   ${fname}${c}_(x)   (((${c2}int)((x)<<$down))>>$Up)
 "
 
+
 function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |[message]|)
 	if last
 		.DefineGetSub(fname, up, down, 'i', ' ')
@@ -25,7 +25,6 @@ function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |[messa
 	rz <~ @thg + fname
 	rz <~ @num + up
 	rz <~ @num + down
-	.Builder = rz
 
 
 // we need to create an array of forms...
@@ -88,7 +87,7 @@ function string.ASMNormalise (|string|)
 		c = c.lowercase
 		if c == 'r' or 'n'	
 			n++
-		  elseif c=='l' or 's' or 'j'
+		  elseif c == 'l' or 's' or 'j'
 			0
 		  else
 			return self
@@ -141,12 +140,10 @@ function CppLibFile (|string| ch, |file|)
 	
 
 function BuildFiles (|bool|)
-	.NameList = message()
 	.vm_file = Compiler.InputFile( nil, "vm.box", nil )	#require
 	|| x = .vm_file.parse								#require
 	|| forms = x.find("forms")
 	forms.remove
-	.namelist = x
 
 	|| code = faststring()
 	|| jump = faststring()
@@ -155,12 +152,12 @@ function BuildFiles (|bool|)
 	.Clean(x)
 	.DataTypeModule
 	.GenerateForms(forms)
-	|| msgs = .VMSpd(x)
-	.VMCpp(msgs, code, jump)
+	.NameList = .VMSpd(x)
+	.VMCpp(code, jump)
 
-	.CppLibFile("InstructionGetters.h").smartdata = form_h
-	.CppLibFile("Instructions.i").smartdata = code
-	.CppLibFile("InstructionList.h").smartdata = jump
+	.CppLibFile("InstructionGetters.h").SmartData = form_h
+	.CppLibFile("Instructions.i").SmartData = code
+	.CppLibFile("InstructionList.h").SmartData = jump
 	.form_h = nil
 	return true
 
@@ -171,29 +168,25 @@ function MakeTheVM
 	asm.TestASM
 
 
-function BuildInstructions (CollectFunc)
+function BuildInstructions (TranFunc) // __instructionlist__
 	opt norefcounts
 	expect !node.hasany (node.first)
-	"found $node"
-	"using ${.namelist}"
 
-	return compiler.program
-	|| dest = node.msg(@list)
-	(dest is style2) // for debug
+	|| arg = node.parent
+	for (tmp in .namelist) (pos)
+		|| form = tmp[0][0].nyme
+			|| fnc = arg.msg(@sdot, "add") 
+			|| list = fnc.msg(@list)
+			list.msg(@str, form.lowercase)
+			list.msg(@str, tmp.name)
+			list.msg(@num, pos.render)
 
-	for tmp in .namelist
-		if tmp == @tmp
-			|| item = dest.msg(@item)
-			item.msg(@thg, tmp.name)
-			|| prm = tmp[@bra,@list]
-				|| first = prm.first
-				first.func = @str
-				item <~ prm
-			  else
-				error (tmp, "No params")
+	node.remove
+	if options.makeasm
+		"made $arg"
 
 
-function MakeJump   (|message| msg, |faststring| jump)
+function MakeJump   (|message| msg, |FastString| jump)
 	jump <~ "&&${msg.name},\n"
 
  
@@ -219,9 +212,9 @@ function VMSpd   (|message| list, |[message]|)
 		printline .modulearg
 
 	
-function VMCpp   (|[message]| msgs, |faststring| vm, |faststring| jump)
+function VMCpp (|faststring| vm, |faststring| jump)
 	opt norefcounts
-	for tmp in msgs
+	for tmp in .NameList
 		.MakeVM(tmp, vm)
 		.MakeJump(tmp, jump)
 
@@ -257,6 +250,7 @@ function VMDecl (|message| tmp, |[message]| msgs)
 	.ModuleArg <~ NewDecl(name)
 	.ModuleArg <~ NewRel(@thg+tmp.name, "=", @num + id) 
 // TypeList
+
 
 function VMTmp (|message| tmp, |[message]| msgs)		
 	if (tmp == @tmp) and (tmp != "forms" and "ignore")

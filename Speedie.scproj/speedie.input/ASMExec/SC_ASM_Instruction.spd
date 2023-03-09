@@ -24,7 +24,6 @@
 class Instruction // class instruction
 	initafter (µform)
 	
-	|byte|			OpLength
 	|byte|			aType
 	|byte|			PCount
 	|byte|			OpCode
@@ -37,22 +36,17 @@ class Instruction // class instruction
 		kTypeConst		= 2
 		kTypeFunc		= 1
 
-	// instructionlist // extracts selector-items from "vm.box"
-
 	render
 		fs <~ .name
 	
-	constructor (|string| formName, |int| len=1)
-		.oplength = len
+	constructor (|string| FormName, |string| name, |int| pos)
 		.formname = formname
-		instruction.TypeDict := dictionary.new
-		instruction.typelist[.opcode] = self
-		instruction.typedict[.name] = self
-
-	function ActualInit
-		.sizes = µform.NeedForm(.FormName)$
-		.PCount = .sizes.count
-
+		.opcode = pos
+		.name = name
+		.sizes = µform.NeedForm(.FormName)
+		if .sizes
+			.PCount = .sizes.count
+	
 	syntax equals (|string| other, |bool| aware, |bool|)
 		return .name.syntaxequals(other, aware)
 	
@@ -70,12 +64,18 @@ class Instruction // class instruction
 		//.NoExpect // shouldnt have removed this?
 
 	module
-		|dictionary of instruction|			TypeDict
+		|dictionary of instruction|			TypeDict = dictionary()
 		|instruction[128]|					TypeList
 
 		syntax access (|message| m, |instruction|)
 			opt norefcounts
-			return TypeDict[m.name]			#expect (m, "Isn't a valid instruction.")
+			return TypeDict.valuelower(m.name)			#expect (m, "Isn't a valid instruction.")
+		
+		function add (|string| FormName, |string| name, |int| pos)
+			|| ins = instruction(formname, name, pos)
+			.typelist[pos] = ins
+			.typedict[name] = ins
 	
 		function Init
+			__instructionlist__
 

@@ -18,7 +18,7 @@ extend_module ASM
 		|| n = 0
 		for opcode in 128
 			|instruction--| inst = Instruction.typelist[opcode]
-			if !opcode or inst.opcode
+			if inst and (!opcode or inst.opcode)
 				fs.AppendIntegerAsText(opcode, 2)
 				fs <~ " = ${inst.name}"
 				fs <~ (' ', 4-inst.name.length)

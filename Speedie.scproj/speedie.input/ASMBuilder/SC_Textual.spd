@@ -45,7 +45,7 @@ extend AsmFuncState
 	
 	function TextInstruction (|message| m)
 		if !.TextOp(m)
-			debugger // retry
+			debugat // retry
 			.TextOp(m)
 		// we also need to go into the if/while things
 

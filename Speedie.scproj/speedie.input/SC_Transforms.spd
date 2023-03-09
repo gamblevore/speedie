@@ -47,6 +47,7 @@ dispatch TemporalStatements (TranFunc)
 	alert					{ error (node, "I think you mean 'beep'?") }
 	break					{ error (node, "'break' not allowed. Either 'exit' or 'debugger'?") }
 	do						{ error (node, "'do' loops not allowed. Use 'for' or 'while'.") }
+	__instructionlist__		(vm_Builder.BuildInstructions)
 
 
 
