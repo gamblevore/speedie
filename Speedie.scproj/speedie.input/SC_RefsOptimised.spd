@@ -64,6 +64,13 @@ class CppRefs
 			  else
 				for c in Stuff
 					.addone(C)
+	
+	module
+		function Linkage (collectfunc)
+			return name_space.ProcessLinkage(node[@arg], ClassLinkageTable)		
+		function ReadIntoCppRefs (CollectFunc)
+			name_space.GetAsModule$.DefaultRefs.Read(node)
+			return compiler.program
 
 
 
@@ -72,11 +79,6 @@ dispatch CppRefTable (TranFunc)
 	disturbs			{} //(SCBase.LoadCppPart)
 	paramsafe			scfunction.tran_cpprefs
 
-
-extend_module scmodule
-	function ReadIntoCppRefs (CollectFunc)
-		name_space.GetAsModule$.DefaultRefs.Read(node)
-		return compiler.program
 
 
 extend_module SCFunction	
