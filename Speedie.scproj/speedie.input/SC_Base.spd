@@ -66,16 +66,15 @@ function FuncSrc (|Message|)
 
 
 function CollectSub (|Message| c, |SCBase|)
-// if we return true... we cant remove it
-// if we return false, remove it.
 	|| T = ClsCollectTable
-	if self == compiler.program
+	if self == compiler.program  or  self isa scmodule
 		T = RootCollectTable
 	
 	if c != @tmp
 		if self isa scclass
 			c.expect(@decl)
 		return nil
+	
 	|| FnInt = T[c.name]									#expect c	
 	|| base = (Fnint)( c, self, c )							#require
 	if (base != Compiler.program) // OK
@@ -916,6 +915,8 @@ dispatch RootCollectTable (CollectFunc)
 	import				(DontRemove)
 	compile_linking		Linkage.Collect
 	shell_args			InbuiltShellArgs.collect
+	syntax				SCClass.LoadSyntax
+	linkage				CppRefs.Linkage
 	struct				SCClass.newstruct
 	datatype			SCClass.DataType
 	extend				SCClass.StoreExtend
@@ -926,8 +927,10 @@ dispatch RootCollectTable (CollectFunc)
 	ignore				(DontRemove)
 	cpp_part			(scbase.LoadCppPart)
 	constants			(DontRemove)
+	flags				(DontRemove)
 	debuginsert			(scfunction.DebugInsert)
-	const				{ error (node, "I think you mean 'constants'") }
+	__instructionlist__ (vm_Builder.BuildInstructions)
+	
 
 
 
@@ -953,8 +956,8 @@ dispatch ClsCollectTable (CollectFunc)
 	syntax				SCClass.LoadSyntax
 	operator			SCClass.LoadSyntax
 	processas			SCClass.ProcessAs
-	cpp_refs			SCModule.ReadIntoCppRefs
-	linkage				{return name_space.ProcessLinkage(node[@arg], ClassLinkageTable)}
+	cpp_refs			cpprefs.ReadIntoCppRefs
+	linkage				CppRefs.Linkage
 	pragma				{ error (node,  "Unrecognised pragma." ) }
 
 	initafter			(SCModule.DoInitAfter)
