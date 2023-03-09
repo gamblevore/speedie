@@ -5,16 +5,6 @@ module Info
 	|config| 		RoomTypes
 	|config| 		CellTypes
 
-	|| HeartTxt = `
-  ,d88b. ,d88b.
- d888888v888888b
- 888888888888888
- "Y88888888888P"
-   "Y8888888P"
-     "Y888P"
-       "V"
-`
-
 
 role RogueObject (Message)
     render Str
@@ -68,8 +58,10 @@ role RogueObject (Message)
 		return .armour.strength
 	function ATK (|int|)
 		return .weapon.strength + .strength
+	function IsMonster (|bool|)
+		return .first == @str
 	function FrameStep
-		require .first == @str // a monster
+		require .ismonster
 		// now what?
 		|| IsPlayer = self == map.Player
 		|| c = .cell
@@ -80,7 +72,8 @@ role RogueObject (Message)
 			if !cell or v > r
 				0
 			  elseif IsPlayer
-				cell.flags |= RogueCellState.seen // its visible... show it
+				cell.flags |= RogueCellState.Discovered
+				cell.flags |= RogueCellState.visible
 			  elseif cell.HasPlayer
 				|| found = c.CanSee(cell, v)
 					found <~ self
@@ -110,7 +103,8 @@ datatype RogueCellState (byte)
 	flags
 		Debug
 		Visited
-		Seen
+		Visible
+		Discovered
 
 
 role RogueCell	(message)
@@ -128,7 +122,7 @@ role RogueCell	(message)
 	function Describe (|string|)
 		return .type..appearance.value
 	function Color (|message| f, |int|)
-		return (f.indent, terminal.yellow)(!.flags)
+		return (f.indent, terminal.yellow)(!.tag)
 	function Type (|message|)
 		return map.types[.name]	// The compiler can opt this? An ideal compiler would
 	function InSpawn (|bool|)
@@ -151,21 +145,27 @@ role RogueCell	(message)
 		return self and .type..walkable!=nil
 	function Monster (|rogueobject|)
 		for c in self
-			if c.first == @str
+			if c.IsMonster
 				return c
 		
-	function DrawOne (|rogueobject| t, |bool|)
-		if t == map.Player
-			require map.DrawPlayer
-		|| f = t.first   #expect (t, "no name msg?")
-		Terminal <~ (f.name, .pos, .color(F))
-		return f != @str
+	function DrawOne (|rogueobject| t, |bool| vis, |bool|)
+		require (t != map.Player) or map.CanDrawPlayer
+		|| mon = t.IsMonster
+		if !mon or vis
+			|| f = t.first
+				Terminal <~ (f.name, .pos, .color(F))
+			if mon
+				return false
+		return true
 		
 	function Draw 
 		opt norefcounts
-		.drawone(.type)
+		|| Seen = .flags & roguecellstate.discovered
+		|| Vis = .flags & roguecellstate.visible
+		require seen or vis
+		.drawone(.type, true)
 		for obj in self
-			require .DrawOne(obj)
+			require .DrawOne(obj, vis!=0)
 
 	iterator
 		|rogueobject| src = .arg[0]
@@ -211,7 +211,7 @@ function Init (|ivec2| size)
 			for x in size.x
 				RogueCell(row, x, .rock)
 
-function DrawPlayer (|bool|)
+function CanDrawPlayer (|bool|)
 	return !.FlickerAfter.fired or ((date.now / 0.8s)|int| isa 2)
 
 function LoadLevel (|int| i)
@@ -503,10 +503,10 @@ function Input (|bool|)
 	|| c = Terminal[] 
 	if c == ' '
 		return .Search(.player.cell)
-	|| up    = (c == '1' or '2' or '3' or 'q' or 'w' or 'e')|int|
-	|| down  = (c == '7' or '8' or '9' or 'z' or 'x' or 'c' or 's')|int|
-	|| left  = (c == '1' or '4' or '7' or 'q' or 'a' or 'z')|int|
-	|| right = (c == '3' or '6' or '9' or 'e' or 'd' or 'c')|int|
+	|| up    = "123qwe"  contains c
+	|| down  = "789zxcs" contains c
+	|| left  = "147qaz"  contains c
+	|| right = "369edc"  contains c
 	if right!=left or down!=up
 		.move(right-left, down-up)
 		return true
@@ -530,6 +530,8 @@ function Run (|bool| Splash)
 
 function FrameStep
 	.Heal
+	for c in .data
+		(c.flags &= ~ roguecellstate.visible)
 	for c in .data
 		for obj in c
 			obj.FrameStep
@@ -556,16 +558,16 @@ function Splash
 	for secs in 10s
 		Terminal.DrawRect((0, 0, terminal.w, h))
 		for i in 5.0
-			|| Title = " Mini Rogue ".Rotate(i + secs*3)
+			|| Title = " <3 Hugs ".Rotate(i + secs*3)
 			|| f = i*1.234 + secs*(0.33+i*0.05)
 			|int| x = (1.5*f/scale).bounce * (Terminal.w-(title.length+2))
 			|int| y = f.bounce*(h-2)
 			Terminal <~ (Title, (x+1, y+1), terminal.Red+i)
 
-		|| title2 = "<Mini-Rogue>"
+		|| title2 = " <3 Siarraaa "
 		|| x2 = (terminal.w - title2.length) / 2
 		Terminal <~ (title2, (x2, 0), Terminal.Red)
-		Terminal <~ (info.HeartTxt, (32, 10), terminal.red)
+		Terminal <~ ( file://HeartLogo.txt , (32, 10), terminal.red)
 		Terminal.Display
 		if Terminal[]
 			exit
