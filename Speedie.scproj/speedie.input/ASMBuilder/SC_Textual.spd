@@ -1,7 +1,7 @@
 
 // FNC and FNCX are in the wrong place.
 
-extend asmfuncstate
+extend AsmFuncState
 	function LoadTitle (|message| m, |message|)
 		// asm oof (9)
 		opt NoRefCounts
@@ -38,10 +38,7 @@ extend asmfuncstate
 		|| Value  = regmsg.Next(nil)$.ASMConst
 
 		if !.TrySmallConst(reg, value, orig)
-			debugat // how would I write it backwards?
-					// I'd need to know where it is.
-					// I guess I COULD make setn write in place.
-					// at the start is nicer.
+			debugat
 			.AddASM(orig, asm.setn, reg)
 		return true
 	
@@ -69,7 +66,7 @@ extend asmfuncstate
 		if op.IsSetConst
 			return .SetConst(list, m)
 		
-		|| A = .RequestOp(op)
+		|| A = .RequestOp(op.opcode)
 		|| write = 0
 		for p in list
 			if p != @name
@@ -97,11 +94,16 @@ extend asmfuncstate
 				A.rest = Found-A
 		return true
 	
+	
+	function IR.File (|string|)
+		return IR.Resources[.filepos]
+	
+	
 	function IR.SyntaxExpect (|string| Error)
-		|| file = .file.path
-		|| err = Error(nil, error, ErrorSeverity.Error, file)
+		|| err = Error(nil, error, ErrorSeverity.Error, .file)
 			err.position = .BytePos
 			stderr <~ err
+
 
 	function FindLabel (|&IR| dbg, |&IR|)
 		opt norefcounts
@@ -128,7 +130,6 @@ extend asmfuncstate
 				.addlabel(ch)
 			  else
 				.TextInstruction(ch)
-		
 		return .LoadLabelJumps
 
 
@@ -141,7 +142,6 @@ function message.ASMConst (|uint64|)
 	if (.name contains '.')
 		return .float32.asint
 	return .int
-
 
 
 function uint64.LongestBitStretch (|ivec2|)
