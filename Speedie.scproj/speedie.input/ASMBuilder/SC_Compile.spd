@@ -26,7 +26,7 @@ struct ASMFuncState
 	
 	
 	function AddASM (|message| dbg, |int| SM, |int| a, |int| b=0, |int| c=0, |int| d=0, |&IR|)
-		pragma inline,  cpp_part AddASM,  opt norefcounts
+		pragma inline,  opt norefcounts
 		rz   = .RequestOp(sm)
 		rz.r[0] = a
 		rz.r[1] = b
@@ -46,34 +46,34 @@ struct ASMFuncState
 	
 	function RequestOp (|uint| Code, |&IR|)
 		cpp_part RequestOp2, pragma inline
-		rz = .requestop 
+		rz = .RequestOp
 		rz.op = code
 
 	function RequestOp (|&IR|)
 		cpp_part RequestOp
-		if .written < .maxlength
-			return .start + .written++
-		if .ok
+		if .Written < .MaxLength
+			return .Start + .Written++
+		if .OK
 			error "ASM is out of memory."
-			.ok = false
-		return asmfuncstate.Dummy
+			.OK = false
+		return ASMFuncState.Dummy
 	
 	
 	function NeedSomewhere (|Message| err, |&asmreg| dest, |DataTypeCode| T) // .needreg
 		require !dest.reg
-		|| B = (~.usedregs).lowestbit
+		|| B = (~.UsedRegs).LowestBit
 		check (B) (err, "No free registers.")
-		.usedregs |= B
+		.UsedRegs |= B
 		dest.reg = B.log2
 		dest.aType = T
 
 	function OpenVars (|uint64|)
-		rz = .usedregs
+		rz = .UsedRegs
 		if !(rz&1)
 
 	function CloseVars (|uint64| Old)
 		if !(old&1)
-		.usedregs = old
+		.UsedRegs = old
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,8 +141,8 @@ struct ASMFuncState
 		opt norefcounts
 		|| fn = prms.asfunc					#debug_require
 
-		.NeedSomeWhere(prms, &dest, fn.regtype)
-		.AddASM(prms.parent, asm.fnc, 0).rest = fn.tableid
+		.NeedSomeWhere(prms, &dest, fn.RegType)
+		.AddASM(prms.parent, asm.fnc, 0).rest = fn.TableId
 
 		|| OV     = .OpenVars
 		|| Bits   = Dest.reg<<25 (|) ov.log2<<20					// 6+5 bits, 20 left.
@@ -161,10 +161,10 @@ struct ASMFuncState
 		opt norefcounts
 
 		|| op = L.next
-		|| OV = .openvars
+		|| OV = .OpenVars
 		|| mL = .µ2(L)			// µ2 stops mR fucking mL
 		|| mR = .µ(op.next)
-		.closevars(OV)			// allow overwriting either!
+		.CloseVars(OV)			// allow overwriting either!
 		require ml.reg (|) mr.reg
 		
 		.NeedSomewhere(op, dest, ml.atype)
@@ -174,8 +174,8 @@ struct ASMFuncState
 		error (op, "No ASM for this operator?")
 
 	module
-		|IR|						Dummy
-		|IR[]|					JSMSpace    
+		|IR|					Dummy
+		|IR[]|					JSMSpace
 		
 
 function message.ASMFunc (|fn_asm|)

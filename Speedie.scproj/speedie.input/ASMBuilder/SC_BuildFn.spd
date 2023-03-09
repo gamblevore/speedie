@@ -13,7 +13,7 @@ extend_module ASM
 
 	function TestASM 
 		.enc1
-		require app["asm"]
+		require options.makeasm
 		|| dev = app.prefs["dev"].int
 		if dev >= 2
 			asm.noisyasm = 3
