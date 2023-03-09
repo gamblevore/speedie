@@ -33,23 +33,12 @@ module Terminal
 				v.y++
 				v.x = x0
 			  elseif c == ' '
-				0
+				v.x++
 			  elseif v inrange .size  and  c != ' '
 				if c == 127
 					c = ' ' // lol
 				.Screen[v.y][v.x] = TerminalCell(colors, c)
 				v.x++
-	
-	function FrameText (|string| s, |ivec4| Frame, |terminalcolor| FrameCol=terminal.white, |terminalcolor| TextCol=0)
-		.init
-		s = s.wrap(frame.width-2)
-		|| p = frame.xy+1
-		for i.rect in frame ± 1
-			.Screen[i.y][i.x] = terminalcell(0," ")
-		for l.lines in s
-			self <~ (l, p, textcol)
-			p.y++
-		.DrawRect(frame, FrameCol)
 		
 	function DrawRect (|ivec4| Rect, |string| inside="", |terminalcolor| colors=0)
 		|| r2 = rect + (1,1,-2,-2)
@@ -92,6 +81,19 @@ module Terminal
 		"\1b[1;1H"				// reset
 		print .flat
 	
+	
+	function FrameText (|string| s, |ivec4| Frame, |terminalcolor| FrameCol=terminal.white, |terminalcolor| TextCol=0)
+		.init
+		s = s.wrap(frame.width-2)
+		|| p = frame.xy+1
+		for i.rect in frame ± 1
+			.Screen[i.y][i.x] = terminalcell(0," ")
+		for l.lines in s
+			self <~ (l, p, textcol)
+			p.y++
+		.DrawRect(frame, FrameCol)
+	
+
 	function Size (|ivec2|)
 		return (w,h)
 	
