@@ -25,8 +25,8 @@ class Selector
 		if (self)
 			return .id
 	
-	constructor (|selector| Next, |&selector| Place, |string| namee)
-		.name = namee
+	constructor (|selector| Next, |&selector| Place, |string| name)
+		.name = name
 		.next = next
 		*place = self
 	
