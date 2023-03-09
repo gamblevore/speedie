@@ -325,7 +325,8 @@ function ImportAll
 	
 	.ImportLibs
 	.ImportProj
-	VM_Builder.run
+	if options.SelfReplacement //and options.MakeASM
+		VM_Builder.MakeTheVM
 
 	require .Stage( "Import" )
 	.Timer( "Import" )
@@ -594,6 +595,7 @@ function InitCompiler
 	.CreateRoot
 	.CreateDisambiguation
 	SCImport.AllFiles <~ .InternalFile
+	ir.Resources = SCImport.AllFiles // why not? its just the same thing really. scfile is a subclass of file
 
 
 
@@ -859,9 +861,14 @@ function InputFile (|File| Default, |String| s, |message| where, |File|)
 			|| f = imp.Resources.ValueLower(s)
 				rz = f
 				best = imp.Depth
-	
-	if (rz==nil) and (Default!=nil)
+	if rz
+		return rz
+
+	rz := Compiler.BaseProjectPath[s]
+	if (Default!=nil)
 		rz := default[s]
+	ifn rz.exists
+		rz = nil
 
 
 function OrderClassList
