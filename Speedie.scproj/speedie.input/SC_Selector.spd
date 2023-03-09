@@ -62,16 +62,8 @@ class $name (selector)
 
 
 	function FindItems (|message| arg, |message|)
-		opt norefcounts
-		|| mu = arg.findflat(@tmp, "instructionlist")
-			expect !mu.hasany (mu, "Should be empty.")
-			// we have a list... well... lets replace it!
-			vm_Builder.BuildInstructions(mu)
-			return mu
 		return arg.findflat(@tmp, "items", true)
 		
-		
-
 
 	function Build (CollectFunc)
 		|| arg = node[@arg, -1]								#require

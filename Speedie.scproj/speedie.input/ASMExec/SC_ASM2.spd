@@ -18,12 +18,12 @@ struct IR // µfunc uses this. // "class IR"
 		|| FilePos  = value.position & MsgDebugPosShift.bits
 		|| FileInfo = value.tag << MsgDebugPosShift
 		.debug = FileInfo (|) FilePos
-	
-	function File (|scfile|)
-		return scimport.allfiles[.debug >> MsgDebugPosShift]
-	
+		
 	function BytePos (|ind|)
 		return .debug & MsgDebugPosShift.bits
+	
+	function FilePos (|int|)
+		return .debug >> IR.MsgDebugPosShift
 	
 	function fs (|FastString| fs)
 		opt norefcounts
@@ -54,6 +54,11 @@ struct IR // µfunc uses this. // "class IR"
 	
 	render
 		.fs(fs)
+	
+	module
+		|[string]| Resources
+	constants
+		MsgDebugPosShift = 19
 
  
  

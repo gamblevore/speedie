@@ -28,10 +28,10 @@ datatype ASM (JSM)
 	function RestI (|int|)
 		return (self << 7)|int| >> 7
 	module
-		|byte|				 NoisyASM = 1
-		|asm_encoder2[32]|	 Forms
-		|asm_encoder2[128]|  Encoders
-		|asm_decoder2[128]|  Decoders
+		|byte|					NoisyASM = 1
+		|asm_encoder2[32]|		Forms
+		|asm_encoder2[128]| 	Encoders
+		|asm_decoder2[128]| 	Decoders
 
 
 prototype ASM_Decoder2  (|&IR| self, |asm| A)

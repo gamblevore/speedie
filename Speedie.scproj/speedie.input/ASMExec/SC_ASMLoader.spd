@@ -7,26 +7,27 @@
 extend_module ASM
 
 	function Init
-		instruction.SET1.const
-		instruction.SETK.const
-		instruction.SETN.const	
+		target asm
+			instruction.SET1.const
+			instruction.SETK.const
+			instruction.SETN.const	
 		
 	function ListInstructions
 		|| fs = faststring()
 		fs <~ "Opcodes:\n"
 		|| n = 0
-		debugger
-		for opcode in Instruction.typelistsize
+		for opcode in 128
 			|instruction--| inst = Instruction.typelist[opcode]
-			fs.AppendIntegerAsText(opcode, 2)
-			fs <~ " = ${inst.name}"
-			fs <~ (' ', 4-inst.name.length)
-			n++
-			if n >= 7
-				fs <~ "\n"
-				n = 0
-			  else
-				fs <~ ",  "
+			if !opcode or inst.opcode
+				fs.AppendIntegerAsText(opcode, 2)
+				fs <~ " = ${inst.name}"
+				fs <~ (' ', 4-inst.name.length)
+				n++
+				if n >= 7
+					fs <~ "\n"
+					n = 0
+				  else
+					fs <~ ",  "
 			
 		printline fs
 

@@ -14,6 +14,7 @@ module Options
 	||		Variant					= ""
 	|| 		Arch					= "" // targetarchitecture
 	||		SingleCppOutput			= true
+	||		MakeASM					= false
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
 	||		HideMultipleErrors		= true
@@ -350,7 +351,7 @@ module Feedback
 			
 		+"talk" (AppTalk)
 		+"asm" // nothing... for now.
-			0
+			options.MakeASM = value.optionbool
 		
 		+"targetdebug" // basically
 			Explain(Purpose, "")$

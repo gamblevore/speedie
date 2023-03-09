@@ -21,38 +21,41 @@
 // so... we won't need most of it?
 
 
-selector Instruction // class instruction
+class Instruction // class instruction
 	initafter (µform)
 	
 	|byte|			OpLength
 	|byte|			aType
 	|byte|			PCount
+	|byte|			OpCode
 	|µForm|			Sizes
 	|string|		FormName
+	|string|		Name
 
 	
 	constants
 		kTypeConst		= 2
 		kTypeFunc		= 1
 
-	instructionlist // magically extracts selector-items from "vm. box"
+	// instructionlist // extracts selector-items from "vm.box"
 
-	
 	render
 		fs <~ .name
 	
-	function selector_init (|string| formName, |int| num=1)
-		.oplength = num
+	constructor (|string| formName, |int| len=1)
+		.oplength = len
 		.formname = formname
+		instruction.TypeDict := dictionary.new
+		instruction.typelist[.opcode] = self
+		instruction.typedict[.name] = self
 
 	function ActualInit
 		.sizes = µform.NeedForm(.FormName)$
 		.PCount = .sizes.count
-		instruction.store(self)
-
 
 	syntax equals (|string| other, |bool| aware, |bool|)
 		return .name.syntaxequals(other, aware)
+	
 	function IsFunc (|bool|)
 		return .atype == kTypeFunc
 
@@ -66,31 +69,13 @@ selector Instruction // class instruction
 		.atype = kTypeConst
 		//.NoExpect // shouldnt have removed this?
 
-	function opcode (|uint|)
-		return .id
-
 	module
 		|dictionary of instruction|			TypeDict
 		|instruction[128]|					TypeList
-		|int|								TypeListSize
 
 		syntax access (|message| m, |instruction|)
 			opt norefcounts
 			return TypeDict[m.name]			#expect (m, "Isn't a valid instruction.")
-
-
-		function Store (|instruction| i)
-		
-			debugger
-			if .typelistsize++ != i.id
-				debugat
-			.TypeDict := dictionary.new
-			.typelist[i.id] = i
-			.typedict[i.name] = i
-
-
+	
 		function Init
-			opt norefcounts
-			for i in instruction.__first
-				i.ActualInit
 

@@ -1,16 +1,4 @@
 
-/// this generates instructions
-// the instructions are needed by my asm-code...
-// I want to change the encoder to encoder2
-// somehow it doesn't work... i guess the current version needs the current definition
-// so I could disable it temporarily... except that it disables instruction generation
-// so I can't.
-
-// I'm kind of locked?
-
-// unless I disable the entire thing?
-
-
 
 module VM_Builder {
 |message|   	NameList
@@ -22,7 +10,6 @@ module VM_Builder {
 |string|		parent
 |byte|			NormalPos = 0
 |byte|			HighPos = 112
-|[message]|		Msgs
 
 
 function DefineGetSub (|string| fname,  |int| up,  |int| down, |byte| c, |byte| c2)
@@ -149,7 +136,7 @@ function GenerateOne (|message| form_msg, |int| f)
 	.form_h <~ '\n'
 
 	
-function InstructionList (|string| ch, |file|)
+function CppLibFile (|string| ch, |file|)
 	return TransCompiler.CppLib[ch]
 	
 
@@ -168,27 +155,30 @@ function BuildFiles (|bool|)
 	.Clean(x)
 	.DataTypeModule
 	.GenerateForms(forms)
-	.VMSpd(x)
-	.VMCpp(code, jump)
+	|| msgs = .VMSpd(x)
+	.VMCpp(msgs, code, jump)
 
-	.InstructionList("InstructionGetters.h").smartdata = form_h
-	.InstructionList("Instructions.i").smartdata = code
-	.InstructionList("InstructionList.h").smartdata = jump
+	.CppLibFile("InstructionGetters.h").smartdata = form_h
+	.CppLibFile("Instructions.i").smartdata = code
+	.CppLibFile("InstructionList.h").smartdata = jump
 	.form_h = nil
 	return true
 
 	
-function Run // vmmake
-	require !.NameList
+function MakeTheVM
 	require .BuildFiles	
 	treeassembler.InitAll
 	asm.TestASM
 
 
-function BuildInstructions (|message| mu)
+function BuildInstructions (CollectFunc)
 	opt norefcounts
-	mu.name = "items"
-	|| dest = mu.msg(@list)
+	expect !node.hasany (node.first)
+	"found $node"
+	"using ${.namelist}"
+
+	return compiler.program
+	|| dest = node.msg(@list)
 	(dest is style2) // for debug
 
 	for tmp in .namelist
@@ -219,18 +209,19 @@ function Clean   (|message| msg)
 				ch.name = "|"
 
 
-function VMSpd   (|message| list)
+function VMSpd   (|message| list, |[message]|)
 	opt norefcounts
-	.msgs <~ (@thg+"EROR",  128)
+	rz <~ (@thg+"EROR",  128)
 	for ch in list
-		.VMTmp(ch)
-	printline .modulearg
-	debugger
+		.VMTmp(ch, rz)
 	
+	if options.makeasm
+		printline .modulearg
+
 	
-function VMCpp   (|faststring| vm, |faststring| jump)
+function VMCpp   (|[message]| msgs, |faststring| vm, |faststring| jump)
 	opt norefcounts
-	for tmp in .msgs
+	for tmp in msgs
 		.MakeVM(tmp, vm)
 		.MakeJump(tmp, jump)
 
@@ -253,7 +244,7 @@ function MakeVM (|message| tmp, |faststring| vm)
 		.VMLine(line, vm)
 
 
-function VMDecl (|message| tmp)
+function VMDecl (|message| tmp, |[message]| msgs)
 	opt norefcounts
 	|| arg = tmp.last
 	|| prms = tmp.first
@@ -261,15 +252,15 @@ function VMDecl (|message| tmp)
 	|| form = µform.forms.valuelower(name)			#require
 	|| id = (.highpos++, .normalpos++)(form.varies)
 	asm.Encoders[id] = asm.Forms[form.Index]
-	.msgs[id] = tmp
+	msgs[id] = tmp
 	name = "ASM_" + name
 	.ModuleArg <~ NewDecl(name)
 	.ModuleArg <~ NewRel(@thg+tmp.name, "=", @num + id) 
+// TypeList
 
-
-function VMTmp (|message| tmp)		
-	if tmp == @tmp and (tmp != "forms" and "ignore")
-		.VMDecl(tmp)
+function VMTmp (|message| tmp, |[message]| msgs)		
+	if (tmp == @tmp) and (tmp != "forms" and "ignore")
+		.VMDecl(tmp, msgs)
 
 
 function VMLine (|message| line, |faststring| vm)
