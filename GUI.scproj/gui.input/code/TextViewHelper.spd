@@ -533,3 +533,10 @@ function textview.GuessExpectsParse
 helper string.HasWord (|string| s, |ind| i = 0, |bool|)
 	return self[i, s]  and  self[s.length].iswhite
 
+extend message
+	function EndsBefore (|intrange| r, |bool|)
+		return .after <= r.x
+	function StartsAfter (|intrange| r, |bool|)
+		return .position >= r.x2
+	function StartsBefore (|intrange| r, |bool|)
+		return .position < r.x
