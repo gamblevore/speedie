@@ -16,12 +16,16 @@ function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| na
 function PerryIDE.GetFeedback (|string| cmd,  |message| where,  |string| name,  |string| reason, |bool|)
 	|| n = .projmsg.first.nyme
 	|| msg = .BuildCmd(cmd, where, name, reason)
-		.SendFeedbackmsg(msg)
+		if (.PopupDisplay is visible) or .PopupDateOn
+			|| cmdstr = msg.render_jbin
+			require .lastCmdStr != cmdstr
+			.lastCmdStr = cmdstr
+		.SendFeedbackMsg(msg)
 		return true
 
 
 function PerryIDE.GetFeedbackStr (|string| op)
-	.SendFeedbackmsg(.compilemsg(op, false))
+	.SendFeedbackMsg(.compilemsg(op, false))
 	
 
 function PerryIDE.DateWrap (|message| msg, |message|)
