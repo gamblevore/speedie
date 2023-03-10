@@ -141,11 +141,12 @@ void JB_Str__LoadGlobals() {
 	auto Read = (const char*)Lengths + LengthBytes;
 	auto ReadEnd = Read + ReadBytes;
 	
-	JB_String S = {0, (int)((u8*)ReadEnd-(u8*)Start), (u8*)Start};
+	JB_String S = {};
+	S.Length = (int)((u8*)ReadEnd-(u8*)Start);
+	S.Addr = (u8*)Start;
 	uint64 DetectedHash = JB_Str_CRC(&S, 0);
 	if (DetectedHash != StoredHash) {
-		printf("Expected blob hash %llu but found %llu\n", StoredHash, DetectedHash);
-//		JB_Load_StrError(0);
+		JB_Load_StrError(0);
 	}
 
 	while (N --> 0) {
