@@ -162,9 +162,6 @@ void JB_Array_ValueSet( Array* self, int Pos, JB_Object* Value ) {
 		u32 n = (u32)self->Vec.size();
 		if ((u32)Pos < n) {
 			JB_SetRef( self->Vec[Pos], Value );
-		} else if (n == Pos) {
-			JB_Incr(Value);
-			self->Vec.push_back(Value);
 		}
 	} else {
 		JB_ReportMemoryError("Tried to set a nil value into an array", 0, nil);
