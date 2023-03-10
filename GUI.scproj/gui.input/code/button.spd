@@ -5,7 +5,7 @@ class ButtonView (GUIControl)
 		cpp_part Btn
 		
 	|GUIAction|					Pressing
-	|GUIAction|					Over
+	|GUIAction|					OnOver
 	|guiaction|					OnRightClick
 	|date|						StepDuration
 	|date|						DelayTill
@@ -59,7 +59,7 @@ class ButtonView (GUIControl)
 	behaviour MouseMove
 		if state is enter or leave
 			sdlapp.touch
-		(.over)(self, state|int|, .itemat(p.x))?
+		(.onover)(self, state|int|, .itemat(p.x))?
 
 
 	function ItemAt (|int| P, |ListViewRow|)
@@ -73,10 +73,13 @@ class ButtonView (GUIControl)
 			R += W + 4
 
 
-	behaviour MouseUp
-		opt norefcounts
+	helper ClearMouse
 		.DelayTill = nil
 		.ClickedItem = nil
+		
+	behaviour MouseUp
+		opt norefcounts
+		.clearmouse
 		if .PressingDone
 			.PressingDone = false
 		  else
@@ -87,6 +90,9 @@ class ButtonView (GUIControl)
 		opt norefcounts
 		.Click(p, !.onrightclick)
 		
+	helper DoPressing (|listviewrow| D, |bool|)
+		.ClearMouse
+		return (.Pressing)(self, 0, D)
 	
 	behaviour MouseDown
 		opt norefcounts
@@ -98,7 +104,13 @@ class ButtonView (GUIControl)
 			// drag
 			if D and D != .ClickedItem
 				.ClickedItem.moveto(D)
-			return 4			
+				.PressingDone = true
+			if !.pressing or .PressingDone
+				return 4
+		
+		if keys.option and .pressing
+			.DoPressing(D)
+			return 5
 		
 		require D or !.items
 		if .ItemWidth and !D
@@ -108,20 +120,20 @@ class ButtonView (GUIControl)
 			.pressingdone = true
 			.click(p)
 			return 1
+
+		if D
+			.ClickedItem := d
 		
 		if !.Pressing
-			if D
-				.ClickedItem = d
-				return 4
-			return 1
-
+			return (4, 1)(D)
+		
 		|| n = date()
 		if !.DelayTill
 			.DelayTill = n + 0.7s
-		  elseif n >= .DelayTill
+		  elseif (D == .clickeditem) and (n >= .DelayTill)
 			.DelayTill = n + .StepDuration
 			.PressingDone = true
-			if !(.Pressing)(self, 0, D)
+			ifn .DoPressing(D)
 				.delaytill = 0
 				return 0
 		return 5

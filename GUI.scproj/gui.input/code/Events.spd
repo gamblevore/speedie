@@ -112,7 +112,7 @@ datatype MouseButton (uint)
 	linkage
 		cpp_part MB
 	syntax is (|MouseButton| x, |bool|)
-		return self == x
+		return self & x
 
 	flags
 		Left		
