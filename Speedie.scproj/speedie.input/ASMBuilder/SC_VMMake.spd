@@ -189,8 +189,6 @@ function BuildInstructions (TranFunc) // __instructionlist__
 			after = fnc
 
 	node.saferemove
-	if options.makeasm
-		"made ${node.parent}"
 
 
 function MakeJump   (|message| msg, |FastString| jump)
@@ -214,9 +212,6 @@ function VMSpd   (|message| list, |[message]|)
 	rz <~ (@thg+"EROR",  128)
 	for ch in list
 		.VMTmp(ch, rz)
-	
-	if options.makeasm
-		printline .modulearg
 
 	
 function VMCpp (|faststring| vm, |faststring| jump)
