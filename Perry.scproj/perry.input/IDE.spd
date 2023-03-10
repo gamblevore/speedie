@@ -48,6 +48,7 @@ class PerryIDE (Window)
 	|message|					PrevMarker
     |message|					Previous
     |string|					OldJBCloser
+    |string| 					lastCmdStr
     |ivec2|						PopupDisplayCorner
     |string|					AttachedProgram
     |Buttonview|				BuildButton
