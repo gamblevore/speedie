@@ -80,18 +80,14 @@ function GetFileString (|Message| msg, |string| name, |message|)
 
 
 function Tran_Strings (|Message| start, |SCFunction| fn)
-	require (start)
-	if (start == @Str)
-		String_Expand( start, fn )
-		Return
-	
-	// shouldn't tran_names be part of this?
+	// we should remove this function? Just generate it on demand
+	// 
 	for msg.flat in start		
 		|| f = msg.Func
 		if (f == @thg)
 			if (msg ~= "__SELF_TEST_JBIN__") or (msg ~= "__SELF_TEST_NATURAL__")
-				Create_JeeboxTest( msg )
-				String_Expand( msg, fn )
+				Create_JeeboxTest( msg ) // could do this some other way I guess.
+				String_Expand( msg, fn ) // perhaps the inbuiltfunc thing.
 			
 		  elseif (f == @Str)
 			String_Expand( msg, fn )
@@ -103,22 +99,12 @@ function Tran_Strings (|Message| start, |SCFunction| fn)
 
 function InBuiltFunc (|message| self, |string| name, |bool|)
 	opt norefcounts
-	//debugat 2524
-	|| p = .parent
-	|| c = p.first
-	|| OK = (P == @ques) and c == name
-	if !OK
-		|| p2 = p.parent
-		if p2 == @func
-			c = p2.first
-			|| n = c.name
-			OK = n.hasmoat and n[2, name]
-			if OK
-				p2.become(@bra)
-	if (OK)
+	require self in @ques
+	|| c = .prev
+	if c == name
 		|| f = .first
 			error (f)
-		p.become(@bra)
+		.parent.become(@bra)
 		c.remove
 		return true
 
@@ -135,9 +121,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	
 	if InbuiltFunc(msg, "digest")
 		msg.name = msg.name.digest
-		// return? why dont we return?
-	
-	if P == @arg
+	  elseif P == @arg
 		msg.wrapwith(«tmp "printline"»)
 		
 	if !msg.first

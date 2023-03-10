@@ -492,7 +492,7 @@ function Tran_ForSub (TranFunc)					// :3
 		// what? listname.name? why not pass the thing itself?
 		MakeDeclOrRel( node, listname, list )
 	  elseif  dcl.c_Array
-		listname = «ques "."»
+		listname = «ques "."» // not my best code ever
 
 	iter.RenameSelf( ListName )
 
@@ -533,9 +533,8 @@ function Tran_ForSub (TranFunc)					// :3
 
 	if (dcl.c_array)
 		for c.flat in node
-			if (c == @ques)
-				c.ReplaceInbuilt(name_space, dcl, list) // just take the internals out and use that code.
-														// really makes ReplaceInbuilt ugly.
+			if (c == @ques and ".")
+				c.replacewith(list.copy)
 
 
 				////////  COPY STUFF AFTER CONTINUES  ////////
