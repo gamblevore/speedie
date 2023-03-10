@@ -414,23 +414,16 @@ extend PerryIDE
 			btn.gnormal.solid = (f, f, f, opa)
 	
 	
-	function LoadProject (|file| proj, |bool| avoid = false, |bool|)
-		if !avoid
-			require proj.mustexist("load project")
-			.project = proj
+	function LoadProject (|file| proj, |bool|)
+		require proj.mustexist("load project")
+		.project = proj
 		.IsLoading = true
-		.LoadConfSub(proj, avoid)
+		.LoadConfSub(proj)
 		.IsLoading = false
 		startupwindow.hide
 		.viewasproject
 		.forcerecheck
 		app.saveprefs // for pref-file editing
-		return true
-
-
-	function HasAllRoots (|message|conf, |bool|)
-		for ro in .roots(conf)
-			require .filelist[ro]
 		return true
 	
 	
@@ -441,7 +434,7 @@ extend PerryIDE
 				rz <~ .ExpandStr(ro.name)
 	
 	
-	function StartFiles (|message| conf)
+	function StartFiles (|message| conf, |bool| IsDir)
 		|| f = .FileList
 		f.clear
 		f.Excludes = dictionary()
@@ -451,6 +444,8 @@ extend PerryIDE
 		f.addroot(.project, true) isnt editable
 		f.FocusOn( f.start|filerow| )
 		
+		if !IsDir
+			conf = QQFiles.Roots.parse
 		for p in .roots(conf)
 			f.addroot(p.file)
 		f.checksize
@@ -476,29 +471,22 @@ extend PerryIDE
 			.EditRow(.filelist.start)
 
 
-	function LoadConfSub (|file| proj, |bool| avoid)
+	function LoadConfSub (|file| proj)
 		|| ProjIsDir = proj.isdir
 		|| projconf	 = proj.child(".perry")
 		
 		|message| conf
-		if ProjIsDir
-			if !projconf.exists
-				projconf.create
+		if ProjIsDir and projconf.exists
 			conf = projconf.parse
-			if avoid and .HasAllRoots(conf)
-				return
-		  elseif avoid
-			return
 		
 		perry.AddProj(proj.path, self)
 		|| r = .root
 			.id = r.location
-		.nottodo = nil // awkward. should remove this property
+		.nottodo = nil			// awkward. should remove this property
 		.Previous.clear
-		.prevmarker = nil
+		.PrevMarker = nil
 		
-		.StartFiles(conf)
-		.isloading = false // its done and we need .startproj
-		if !avoid
-			.StartProj
+		.StartFiles(conf, projisdir)
+		.isloading = false		// its done and we need .startproj
+		.StartProj
 	
