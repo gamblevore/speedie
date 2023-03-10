@@ -35,6 +35,7 @@ class PerryIDE (Window)
     |TextView|					StatsInfo
     |TextView|					SelInfo
     |TextView|					NoNeeder
+    |textview| 					DebugArgsText
     |buttonview|				Toolbar
     |Buttonview|				Tabs
     |Buttonview|				ViewErrors
@@ -64,6 +65,7 @@ class PerryIDE (Window)
 	|bool|						DuringMsgFB  // canloadfile, canupdate, .disable 
 	|bool|						IsTextOnly
 	|bool|						UsingSpdLib
+	|bool| 						DebugIsWaitingForCompile
 	|bool|						IsLoading
 	|bool|						InConstructor
 	|byte|						NoClutter
@@ -233,6 +235,7 @@ class PerryIDE (Window)
 
 
 	function Show (|bool| bump=true)
+		debug_require self // what?
 		|| p = .Project
 			app.pref("currproj") = p.path
 		if bump
@@ -261,7 +264,9 @@ class PerryIDE (Window)
 		|| other = .UpdateSearchSwap #require 
 		|| t = .focus.text
 		sdlapp.LastSearch = t
-		other.text = t
+		if other.text != t
+			other.text = t
+			other.Sel = 0
 
 
 	function HideStuff 

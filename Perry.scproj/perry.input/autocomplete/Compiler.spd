@@ -112,13 +112,15 @@ extend PerryIDE
 		.CancelCompile
 		|| first = msg.first #require
 		if first == @arg // an error-list
-			.ErrorListFB(msg)
-		  else
-			.CompiledOK(msg)
-		if self isnt broken
-			|| file = @url + "file"
-			file <~ first
-			.notify(.name + "\n\nCompiled OK!", file)
+			return .ErrorListFB(msg)
+		.CompiledOK(msg)
+		
+		require self isnt broken
+		|| file = @url + "file"
+		file <~ first
+		.notify(.name + "\n\nCompiled OK!", file)
+		if .DebugIsWaitingForCompile
+			.StartDebugging(file.name.file)
 				
 				
 	function Notify (|string| What, |message| response=nil)

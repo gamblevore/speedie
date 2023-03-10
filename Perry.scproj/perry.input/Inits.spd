@@ -14,9 +14,10 @@ extend PerryIDE
 		.ViewButtons		= guicontrol(self) 
 		.RBorder			= guicontrol(self)
 		.Toolbar			= buttonview(self,		ClickedToolBar,			nil)
-		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			nil)
+		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile,			nil)
 		.Tabs				= ButtonView(.Toolbar,	ClickedTabs,    PressingTabs,  ReturnProjectPath,  RightClickedTabs) 
+		.DebugArgsText		= TextView(self)
 		.StartScreen		= buttonview(.Toolbar,	&startupwindow.open)
 		.BirdButton			= buttonview(.Toolbar,	ClickedBird)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
@@ -65,6 +66,11 @@ extend PerryIDE
 			isnt drawsfocus
 			.align			= ListViewState.aligncenter
 			.gnormal.solid  = (0.0, 0.0, 0.0, 0.6) 
+		
+		
+		with .DebugArgsText
+			isnt visible
+			.size = 120 by 40~down
 
 
 		with .ViewButtons 

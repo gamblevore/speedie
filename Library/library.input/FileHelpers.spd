@@ -315,10 +315,10 @@ extend String
 		cpp_Part ChildFile
 		return self.Child(ch).file
 	
-	function OpenFile
+	function OpenFile (|errorint|)
 		target osx
 			|| p = .pathfix
-				"/usr/bin/open".SilentExecute([p])
+				return "/usr/bin/open".SilentExecute([p])
 	
 	function Reveal (|bool|)
 		if self and platform.osx

@@ -73,7 +73,7 @@ function PerryIDE.AutoCompleteFB (|message| list, |AutoCompleteMode| Mode, |stri
 			ch.remove
 		
 	|| e = .editme
-	|| n = list.name.length
+	|| n = list.length
 	if longest
 		|| CanShow = ((shortest != n) or (reason ~= "Escape"))
 			if  common == n  and  longest > common  and  mode isnt default

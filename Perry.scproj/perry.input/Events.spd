@@ -186,7 +186,44 @@ function ClickedRelease (GUIaction)
 
 function ClickedDebug (GUIAction)
 	|| i = .ide
+	i.DebugIsWaitingForCompile = true
 	i.compile("debug")
+
+
+function perryide.ArgTextFileList (|[string]|)
+	for s in .DebugArgsText.text.parse
+		if s.isstring
+			rz <~ s.name
+		  else
+			error s
+	
+	// use a textfile and do something with it
+	
+function perryide.StartDebugging (|file| f)
+	require f.MustExist
+	if f.IsDir
+		f.Execute
+	  else
+		f.launch(.ArgTextFileList)
+	// So... if this is a GUI app or somsething we can just run it
+	// its a termainl... we need to run this in the external terminal
+
+function message.IsString (|bool|)
+	require self
+	|| f = .func
+	return f == @str or @char or @sstr or @bin or @back
+
+function file.launch (|[string]| args=nil, |errorint|)
+	|| d = [self] + [args]
+	return "/usr/bin/open".SilentExecute(d)
+
+function array.operatorplus (|array of ...| other, |array of ...|)
+	rz = .Copy
+	for s in other
+		rz <~ s 
+
+function PressingDebug (GUIAction)
+	beep "Not implemented yet. Its meant to open up a textview to enter your args in"
 
 
 function fnBuildIsDead (fnConfirmCanceller)

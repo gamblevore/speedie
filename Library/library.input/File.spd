@@ -380,12 +380,6 @@ class File (String)
 		rz.sort(stringsorter)
 	
 	
-	function Launch (|faststring| output=nil, |errorint|)
-		if !.isdir
-			return .SilentExecute([], output)
-		return "/usr/bin/open".SilentExecute([self], output)
-	
-	
 	function MoveTo (|string| Path, |ErrorInt|)
 		cpp_wrapper JB_File_MoveTo
 		
