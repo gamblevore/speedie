@@ -157,8 +157,8 @@ helper Jeebox.Test (|string|)
 	|| str = fs.getresult
 	require str.escapetest
 
-	|| natural_input = __SELF_TEST_NATURAL__
-	|| jbin_input    = __SELF_TEST_JBIN__
+	|| natural_input = –SELF_TEST_NATURAL
+	|| jbin_input    = –SELF_TEST_JBIN
 	// Parse, render, re-parse, compare tree, compare re-render
 	
 	debugger (TestCasting())

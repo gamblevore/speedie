@@ -30,15 +30,12 @@ dispatch ExprFuncs (ExprResolver)  {
 	@Arr  : (TypeOfArr)
 	@Arg  : (TypeOfArgArr)
 	@Char : (TypeOfChar)
-	@sstr : (TypeOfString)
+	@sstr : (TypeOfSString)
 	@Item : (TypeOfLast)
 	@Bra  : (TypeOfBra)
 	
-	@Str:
-		Return TypeString.TypeNormal
-	@Back:
-		Return TypeString.TypeNormal
-
+	@Str  : (TypeOfStr)
+	@Back : (TypeOfStr)
 	@Num  : (TypeOfNum)
 	@unit : (Typeofunit)
 
@@ -236,16 +233,27 @@ function TypeOfBra (ExprResolver)
 		rz = TypeOfExpr(c0, name_space, side)
 
 
-function TypeOfString (ExprResolver)
+function TypeOfStr (ExprResolver)
+	opt norefcounts
+	// this is better than calling tran_strings, right?
+	scfunction.String_Expand(exp, exp.msgowningfunc)
+	Return TypeString.TypeNormal
+
+
+function TypeOfSString (ExprResolver)
 	return typestring.typenormal // really it should also be a cstring!
 
 
 function TypeOfChar (ExprResolver)
-	check (exp.length == 1) (exp, "Chars must be one byte long.")
-//	want  (exp.length == 1) (exp, "Chars must be one byte long.") // seems better?
-
-	return TypeByte.typenormal
-
+	if exp.length == 1
+		return TypeByte.typenormal
+	|ind| cp = exp.name.codepoint
+	expect (cp) (exp, "Invalid codepoint")
+	
+	|| x = 'ø'
+	exp.Func = @num
+	exp.name = cp.render
+	return compiler["codepoint"].typenormal
 
 
 

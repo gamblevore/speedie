@@ -80,20 +80,13 @@ function GetFileString (|Message| msg, |string| name, |message|)
 
 
 function Tran_Strings (|Message| start, |SCFunction| fn)
-	// we should remove this function? Just generate it on demand
-	// 
+	// once collectdecls is re-written to happen per decl
+	// instead of per arg, we can remove this!
+	opt norefcounts
 	for msg.flat in start		
 		|| f = msg.Func
-		if (f == @thg)
-			if (msg ~= "__SELF_TEST_JBIN__") or (msg ~= "__SELF_TEST_NATURAL__")
-				Create_JeeboxTest( msg ) // could do this some other way I guess.
-				String_Expand( msg, fn ) // perhaps the inbuiltfunc thing.
-			
-		  elseif (f == @Str)
+		if (f == @Str)
 			String_Expand( msg, fn )
-			
-		  elseif (f == @Char) and (msg.length > 1)
-			Tran_Chr( msg, fn )
 
 
 
@@ -122,7 +115,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	if InbuiltFunc(msg, "digest")
 		msg.name = msg.name.digest
 	  elseif P == @arg
-		msg.wrapwith(«tmp "printline"»)
+		msg.wrapwith(@tmp + "printline")
 		
 	if !msg.first
 		ObjectifyString( msg )

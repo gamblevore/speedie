@@ -1323,16 +1323,6 @@ function Tran_Exit (TranFunc)
 	expect Found (node, "Must be within a loop.")
 
 
-function Tran_Chr (|Message| msg, |SCFunction| fn)
-	// 'ab' --> "ab".charset
-	|| cp = msg.name.codepoint
-	expect (cp >= 128) (msg, "Invalid codepoint")
-	
-	msg.Func = @num
-	msg.name = cp|int|.render
-	msg.obj = compiler["codepoint"].typenormal
-
-
 function Tran_Debugger (TranFunc) {
 	|| ch = node.first
 	if !ch

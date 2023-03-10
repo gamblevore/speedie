@@ -20,10 +20,8 @@ function Message.ReplaceInbuiltSub (|scbase| name_space, |scdecl| self_decl, |me
 		return .InbuiltSizeOf(name_space, self_decl, self_exp)
 
 	  elseif (f isthing "SELF_TEST_JBIN" or "SELF_TEST_NATURAL")
-		//|| x = –SELF_TEST_JBIN
-		//debugger
-		Create_JeeboxTest( self )							// could do this some other way I guess.
-		scfunction.String_Expand( self, .msgowningfunc )	// perhaps the inbuiltfunc thing.		return true
+		Create_JeeboxTest( f )
+		.become(@bra)
 
 	  else
 		error (self_exp)

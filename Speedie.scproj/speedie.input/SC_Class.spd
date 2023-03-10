@@ -785,8 +785,6 @@ module
 		
 		
 		cls.defawlt = arg.findflat(@tmp, "default")[0]
-		if cls.defawlt
-			SCFunction.Tran_Strings( cls.defawlt, nil )
 		
 		Return cls
 	

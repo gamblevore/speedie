@@ -1365,6 +1365,7 @@ module
 
 
 	function C_RenderStr (fpMsgRenderCpp)
+		/// hmmmm? this shouldn't happen? Where do we need cstrings even?
 		fs.appendcpp(.name)
 	
 	function Faststring.AppendCppAll (|string| s)
