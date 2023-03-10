@@ -169,7 +169,7 @@ class Message (RingTree)
 			fs <~ .Name      // sonic
 			fs <~ " @ "			
 			fs <~ ch         // the~hedgehog
-		else
+		  else
 			fs <~ '@'
 			fs <~ .Name
 
@@ -233,17 +233,13 @@ class Message (RingTree)
 	syx SThg (Syntactic_Thing)
 		fs <~ .Name
 	
-
 	syx SCnj (Syntactic_conj)
-//                                  a - b --> b + -a
-		fs <~ .Name
-
+		fs <~ .Name						// a - b --> b + -a
 	
 	syx Num (Number)
 		Opt NoRefCounts
 		fs <~ .Name // 123
 
-	
 	syx Emb (Embedded_Value)
 		fs <~ .Name
 		require .hasany
