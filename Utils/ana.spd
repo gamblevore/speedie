@@ -19,7 +19,7 @@ class Anagrams
 		for i in progress.Length+1
 			|| Variant = progress.insert(inside, i)
 			if depth < .orig
-				.find(Variant, string[.orig[depth]], depth+1)
+				.find(Variant, string.byte(.orig[depth]), depth+1)
 			  else
 				.split("", variant)
 	
