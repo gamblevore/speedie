@@ -5,12 +5,6 @@
 
 
 extend_module ASM
-
-	function Init
-		target asm
-			instruction.SET1.const
-			instruction.SETK.const
-			instruction.SETN.const	
 		
 	function ListInstructions
 		|| fs = faststring()

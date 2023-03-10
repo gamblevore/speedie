@@ -27,7 +27,7 @@ struct ASMFuncState
 	
 	function AddASM (|message| dbg, |int| SM, |int| a, |int| b=0, |int| c=0, |int| d=0, |&IR|)
 		pragma inline,  opt norefcounts
-		rz   = .RequestOp(sm)
+		rz = .RequestOp(sm)
 		rz.r[0] = a
 		rz.r[1] = b
 		rz.r[2] = c
@@ -122,7 +122,7 @@ struct ASMFuncState
 // what if "@thg:" calling this is a global?
 // Also, do we need R?
 		.NeedSomewhere(exp, &decl.dregister, decl.RegType)
-		return decl.dregister
+		return decl.DRegister
 	
 	
 	function FuncPrms (|message| pr, |int| Remain, |uint| Bits, |Message|)
@@ -219,6 +219,3 @@ function @fn_asm.InitTable
 	for i in 64
 		fn_asm_table[i] := &fn_asm.default
 			
-
-constants
-	MsgDebugPosShift = 19

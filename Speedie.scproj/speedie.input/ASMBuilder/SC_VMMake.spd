@@ -1,5 +1,10 @@
 
 
+// i think the order of whats happening is wrong?
+// it can't find the instructions or something?
+// just step through the instruction lister thing and find out what is wrong
+// 
+
 module VM_Builder {
 |[message]| 	NameList
 |message|   	ModuleArg
@@ -172,18 +177,20 @@ function BuildInstructions (TranFunc) // __instructionlist__
 	opt norefcounts
 	expect !node.hasany (node.first)
 
-	|| arg = node.parent
+	|| after = node
 	for (tmp in .namelist) (pos)
 		|| form = tmp[0][0].nyme
-			|| fnc = arg.msg(@sdot, "add") 
+			|| fnc = @sdot + "add" 
 			|| list = fnc.msg(@list)
 			list.msg(@str, form.lowercase)
 			list.msg(@str, tmp.name)
 			list.msg(@num, pos.render)
+			after.next = fnc
+			after = fnc
 
-	node.remove
+	node.saferemove
 	if options.makeasm
-		"made $arg"
+		"made ${node.parent}"
 
 
 function MakeJump   (|message| msg, |FastString| jump)

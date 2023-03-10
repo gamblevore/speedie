@@ -23,7 +23,7 @@ extend_module ASM
 		require dev > 0
 
 		stderr.ErrorsAreWarnings++ // nice
-		|| T = __digest__( file://syntax.asm ).parse[@tmp, "tests"]
+		|| T = ( –digest file://syntax.asm ).parse[@tmp, "tests"]
 			.TestASMSub(T)
 		stderr.ErrorsAreWarnings--
 	
