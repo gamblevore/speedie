@@ -1214,13 +1214,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1729])
+#define kJB__ErrorColors_bold (JB_LUB[1807])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1730])
-#define kJB__ErrorColors_good (JB_LUB[1731])
-#define kJB__ErrorColors_normal (JB_LUB[1732])
-#define kJB__ErrorColors_underline (JB_LUB[1731])
-#define kJB__ErrorColors_warn (JB_LUB[1733])
+#define kJB__ErrorColors_error (JB_LUB[1808])
+#define kJB__ErrorColors_good (JB_LUB[1809])
+#define kJB__ErrorColors_normal (JB_LUB[1810])
+#define kJB__ErrorColors_underline (JB_LUB[1809])
+#define kJB__ErrorColors_warn (JB_LUB[1811])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1427,9 +1427,9 @@ extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
 #define kSC_BitAnd (JB_LUB[337])
-#define kSC_BitNot (JB_LUB[436])
-#define kSC_BitOr (JB_LUB[642])
-#define kSC_BitXor (JB_LUB[1734])
+#define kSC_BitNot (JB_LUB[435])
+#define kSC_BitOr (JB_LUB[641])
+#define kSC_BitXor (JB_LUB[1812])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1459,7 +1459,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1735])
+#define kJB_SaverStart1 (JB_LUB[1813])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1476,7 +1476,6 @@ extern JB_String* JB_kNameConf;
 #define kSC_TypeCastTrue (1 | 2)
 #define kSC_UseDefaultParams (10)
 #define kSC_VoidPtrMatch (5)
-#define kSC_MsgDebugPosShift (19)
 extern int JB_naawgr[1];
 extern Dictionary* JB_RootCollectTable;
 extern JB_ErrorReceiver* JB_StdErr;
@@ -3198,15 +3197,11 @@ Message* SC_ExpandToBool(Message* inside, SCBase* name_space);
 
 SCObject* SC_ExprFuncs_63(Message* Exp, SCBase* name_space, Message* side);
 
-SCObject* SC_ExprFuncs_Back(Message* Exp, SCBase* name_space, Message* side);
-
 SCObject* SC_ExprFuncs_Emb(Message* Exp, SCBase* name_space, Message* side);
 
 SCObject* SC_ExprFuncs_SDot(Message* Exp, SCBase* name_space, Message* side);
 
 SCObject* SC_ExprFuncs_Sheb(Message* Exp, SCBase* name_space, Message* side);
-
-SCObject* SC_ExprFuncs_Str(Message* Exp, SCBase* name_space, Message* side);
 
 SCObject* SC_ExprFuncs_Type(Message* Exp, SCBase* name_space, Message* side);
 
@@ -3410,9 +3405,11 @@ SCObject* SC_TypeOfQues(Message* Exp, SCBase* name_space, Message* side);
 
 SCObject* SC_TypeOfRel(Message* Exp, SCBase* name_space, Message* side);
 
+SCObject* SC_TypeOfSString(Message* Exp, SCBase* name_space, Message* side);
+
 SCObject* SC_TypeOfSthg(Message* Exp, SCBase* name_space, Message* side);
 
-SCObject* SC_TypeOfString(Message* Exp, SCBase* name_space, Message* side);
+SCObject* SC_TypeOfStr(Message* Exp, SCBase* name_space, Message* side);
 
 SCDecl* SC_TypeOfSwizzle(Message* Exp, SCDecl* Type, SCBase* name_space, Message* side, int swiz);
 
@@ -3906,8 +3903,6 @@ ASM SC_ASM_U3_LSet(ASM self, uint Value);
 ASM SC_ASM_U4_LSet(ASM self, uint Value);
 
 void SC_ASM__Enc1();
-
-void SC_ASM__Init();
 
 int SC_ASM__Init_();
 
@@ -4996,19 +4991,31 @@ FastString* JB_FS__NewSize(int size);
 
 
 // JB_Instruction
+void SC_Instruction_Const(Instruction* self);
+
+void SC_Instruction_Constructor(Instruction* self, JB_String* FormName, JB_String* name, int pos);
+
 void SC_Instruction_destructor(Instruction* self);
 
 bool SC_Instruction_IsSetConst(Instruction* self);
 
 JB_String* SC_Instruction_Render(Instruction* self, FastString* fs_in);
 
-void SC_Instruction__Init();
+void SC_Instruction__add(JB_String* FormName, JB_String* name, int pos);
+
+Instruction* SC_Instruction__Alloc();
 
 int SC_Instruction__Init_();
 
 int SC_Instruction__InitCode_();
 
-Instruction* SC_Instruction__SyntaxAccess(Message* m);
+void SC_Instruction__InstructionInit();
+
+Instruction* SC_Instruction__New(JB_String* FormName, JB_String* name, int pos);
+
+Instruction* SC_Instruction__SyntaxAccessWithMsg(Message* m);
+
+Instruction* SC_Instruction__SyntaxAccessWithInt(int pos);
 
 
 
@@ -5478,8 +5485,6 @@ int JB_Str_FindTrailingSlashes(JB_String* self);
 
 byte JB_Str_First(JB_String* self);
 
-bool JB_Str_HasMoat(JB_String* self);
-
 Ind JB_Str_HiddenJBin(JB_String* self);
 
 int64 JB_Str_int(JB_String* self);
@@ -5718,6 +5723,8 @@ SyntaxObj* JB_Fn__New(fpMsgRender msg, JB_String* name, int ID);
 // JB_µForm
 void SC_xC2xB5Form_AddRemainder(xC2xB5Form* self, uint U);
 
+void SC_xC2xB5Form_ConstructorWithStr(xC2xB5Form* self, JB_String* data);
+
 void SC_xC2xB5Form_ConstructorWithMsg(xC2xB5Form* self, Message* tmp);
 
 void SC_xC2xB5Form_destructor(xC2xB5Form* self);
@@ -5737,6 +5744,10 @@ xC2xB5Form* SC_xC2xB5Form__Alloc();
 int SC_xC2xB5Form__Init_();
 
 int SC_xC2xB5Form__InitCode_();
+
+xC2xB5Form* SC_xC2xB5Form__Needform(JB_String* Form);
+
+xC2xB5Form* SC_xC2xB5Form__NewWithStr(JB_String* data);
 
 xC2xB5Form* SC_xC2xB5Form__NewWithMsg(Message* tmp);
 
@@ -6966,8 +6977,6 @@ void SC_Func__Tran_Array(Message* S, SCBase* name_space);
 
 void SC_Func__Tran_Beep(SCFunction* fn, Message* node, SCBase* name_space);
 
-void SC_Func__Tran_Chr(Message* msg, SCFunction* fn);
-
 void SC_Func__Tran_CppRefs(SCFunction* fn, Message* node, SCBase* name_space);
 
 void SC_Func__Tran_Debugger(SCFunction* fn, Message* node, SCBase* name_space);
@@ -7638,8 +7647,6 @@ bool JB_Msg_OarExpand(Message* self);
 
 void JB_Msg_Oat__(Message* self, FastString* fs);
 
-bool JB_Msg_ContainsSyx(Message* self, Syntax s);
-
 bool JB_Msg_OperatorIn(Message* self, Syntax f);
 
 bool JB_Msg_OperatorIsARel(Message* self, JB_String* name);
@@ -7717,8 +7724,6 @@ JB_String* JB_Msg_RenderType(Message* self);
 JB_String* JB_Msg_RenderTypeAndName(Message* self);
 
 void JB_Msg_RenderWithSpaces(Message* self, FastString* fs, Message* ch);
-
-void JB_Msg_ReplaceInbuilt(Message* self, SCBase* name_space, SCDecl* sulf, Message* sulf_exp);
 
 Message* JB_Msg_ReplaceInbuiltSub(Message* self, SCBase* name_space, SCDecl* self_decl, Message* self_exp);
 
