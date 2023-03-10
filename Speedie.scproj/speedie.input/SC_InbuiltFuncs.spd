@@ -19,33 +19,39 @@ function Message.ReplaceInbuiltSub (|scbase| name_space, |scdecl| self_decl, |me
 	  elseif (f isthing "sizeof")
 		return .InbuiltSizeOf(name_space, self_decl, self_exp)
 
-	  elseif (!f and self==".")
-		return self_exp.copy
+	  elseif (f isthing "SELF_TEST_JBIN" or "SELF_TEST_NATURAL")
+		//|| x = –SELF_TEST_JBIN
+		//debugger
+		Create_JeeboxTest( self )							// could do this some other way I guess.
+		scfunction.String_Expand( self, .msgowningfunc )	// perhaps the inbuiltfunc thing.		return true
 
 	  else
 		error (self_exp)
 
 
 function Message.InbuiltSizeOf (|scbase| name_space, |scdecl| sulf, |message| sulf_exp, |message|)
-	|| Nn  = –sizeof name_Space
 	return NewDeclNum(scdecl.new, sulf.bytesize, "")
 
 
 function TypeOfQues (ExprResolver)
 	opt norefcounts
-	|| type = TypeOfExprModulesOK(exp.last, name_space)			#require
+	|| prm = exp[0 + (exp.name == "")]
+	|| type
+	if prm 
+		type = TypeOfExprModulesOK(prm, name_space)
 	exp.ReplaceInbuilt(name_space, type.AsDecl, exp)
 	if exp != @ques
 		return TypeOfExpr(exp, name_space)
 
 
 function Object.AsDecl (|scdecl|)
-	if self isa SCDecl
-		return self
-	if self isa SCClass
-		return .typenormal
-	if self isa SCModule
-		if .cls
-			return .cls.typenormal
-	if self isa scfunction
-		return .returntype
+	if self
+		if self isa SCDecl
+			return self
+		if self isa SCClass
+			return .typenormal
+		if self isa SCModule
+			if .cls
+				return .cls.typenormal
+		if self isa scfunction
+			return .returntype
