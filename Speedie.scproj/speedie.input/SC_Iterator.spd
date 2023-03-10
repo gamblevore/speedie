@@ -24,8 +24,6 @@ class SCIterator (SCObject)
 		
 	function InitIter (|Message| msg, |bool|)
 		require msg
-		if msg contains @erel
-		SCFunction.Tran_Strings( msg, nil )
 		
 		|| thg = msg.first
 		if thg == @thg
