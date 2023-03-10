@@ -93,12 +93,10 @@ function Tran_Strings (|Message| start, |SCFunction| fn)
 function InBuiltFunc (|message| self, |string| name, |bool|)
 	opt norefcounts
 	require self in @ques
-	|| c = .prev
-	if c == name
+	if self == name
 		|| f = .first
 			error (f)
-		.parent.become(@bra)
-		c.remove
+		.become(@bra)
 		return true
 
 

@@ -5,23 +5,19 @@
 
 
 
-function Message.ReplaceInbuilt (|scbase| name_space, |scdecl| sulf, |message| sulf_exp)
-	|| m = .ReplaceInbuiltSub(name_space, sulf, sulf_exp)
-		.SafeReplaceWith(m)
-
-
 function Message.ReplaceInbuiltSub (|scbase| name_space, |scdecl| self_decl, |message| self_exp, |message|)
-	|| f = .first
-	if (f isthing "count")
+	if self_exp != self // remove param
+	if (self == "count")
 		expect (self_decl.c_array) (self_exp, "This is not a c-array")
 		return «num self_decl.c_array »
-
-	  elseif (f isthing "sizeof")
+	  elseif (self == "digest")
+		|| f = self[@sstr]
+			f.name = f.name.digest
+	  elseif (self == "sizeof")
 		return .InbuiltSizeOf(name_space, self_decl, self_exp)
 
-	  elseif (f isthing "SELF_TEST_JBIN" or "SELF_TEST_NATURAL")
-		Create_JeeboxTest( f )
-		.become(@bra)
+	  elseif (self == "SELF_TEST_JBIN" or "SELF_TEST_NATURAL")
+		Create_JeeboxTest( self )
 
 	  else
 		error (self_exp)
@@ -33,11 +29,11 @@ function Message.InbuiltSizeOf (|scbase| name_space, |scdecl| sulf, |message| su
 
 function TypeOfQues (ExprResolver)
 	opt norefcounts
-	|| prm = exp[0 + (exp.name == "")]
 	|| type
-	if prm 
+	|| prm = exp[0 + (exp.name == "")]
 		type = TypeOfExprModulesOK(prm, name_space)
-	exp.ReplaceInbuilt(name_space, type.AsDecl, exp)
+	|| m = exp.ReplaceInbuiltSub(name_space, type.AsDecl, exp)
+		exp.SafeReplaceWith(m)
 	if exp != @ques
 		return TypeOfExpr(exp, name_space)
 

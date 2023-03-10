@@ -794,8 +794,7 @@ extend Parser
 	
 
 	function fQuestion (ParseHandler)
-		rz = parser( nil, @Ques, Start )
-		parser.NewWord( rz, @thg, Start, parser.nextStart ) 
+		rz = parser.NewWord( nil, @ques, Start, parser.NextStart ) 
 		rz <~ .processthing		// –how ∆can I die
 	
 	
