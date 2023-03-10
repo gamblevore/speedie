@@ -397,7 +397,7 @@ function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  
 	if !rz.hasany and (where == @tmp)
 		rz.SimpleComplete(pp, where)
 
-	if !rz.hasany or ((jump==1) and cmd[0,"autocomplete"])
+	if !rz.hasany or ((jump==1) and cmd[0, "autocomplete"])
 		rz = nil
 
 
