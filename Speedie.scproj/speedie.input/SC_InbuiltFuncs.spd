@@ -13,6 +13,7 @@ function Message.ReplaceInbuiltSub (|scbase| name_space, |scdecl| self_decl, |me
 	  elseif (self == "digest")
 		|| f = self[@sstr]
 			f.name = f.name.digest
+		.become(@bra)
 	  elseif (self == "sizeof")
 		return .InbuiltSizeOf(name_space, self_decl, self_exp)
 
