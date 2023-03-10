@@ -175,13 +175,12 @@ class Message (RingTree)
 
 
 	syx Ques (Question)
-		|| f = .first$
 		fs <~ "–"
-		fs <~ f
+		fs <~ .name
 
-		|| n = f.next$
-		fs <~ ' '
-		fs <~ n
+		|| n = .first
+			fs <~ ' '
+			fs <~ n
 
 
 	syx Back (Backtick)				//  `abc`
