@@ -28,7 +28,7 @@ module rep
 	|bool|		Aware = app..caseaware.yes
 	
 	function match (|message| msg, |bool|)
-		return msg == .func  and  msg == (.from, .aware)
+		return (msg == .func)  and  msg.syntaxequals(.from, .aware)
 		
 
 	function DoReplace (|message| msg, |faststring| out, |string| str)
