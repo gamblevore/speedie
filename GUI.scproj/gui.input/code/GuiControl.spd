@@ -40,7 +40,6 @@ class GUIControl (ringtree)
 		is visible
 		is Enabled
 		is Drawsfocus
-		// log "GUI"
 
 	
 	render
