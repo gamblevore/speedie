@@ -423,6 +423,8 @@ bool JB_FS_Grew(FastString* self, int Old) {
 
 
 JB_String* JB_FS_GetResult(FastString* self) {
+	if (!self)
+		return JB_Str__Empty();
 	int Length = self->Length;
 	JB_String* Result = self->Result;
 	FS_SanityCheck_(self);
