@@ -519,13 +519,7 @@ class PerryIDE (Window)
 	function TryHideJB
 		.popuphide
 		if .editme.FindExpectsParse < 2
-			.HideJB
-		  else	
-			.stdout.text = ""
-
-
-	function HideJB
-		.editsep.Collapse
+			.editsep.Collapse
 
 
 	function LoadErrors (|bool| jump, |bool| actual_compile) 

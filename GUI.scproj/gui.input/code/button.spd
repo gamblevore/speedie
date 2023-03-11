@@ -31,7 +31,8 @@ class ButtonView (GUIControl)
 	helper InitMenu (|GUIListEvent| ret,  |menu|)
 		if ret
 			rz = menu(self, nil, ret)
-			rz.AttachedToParent = true
+			if rz
+				rz.AttachedToParent = true
 
 	function Click
 		(.onclicked|GUIAction|)(self, nil, nil)?

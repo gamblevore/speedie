@@ -831,7 +831,8 @@ module SDLApp
 			w.DroppingInto = nil
 			return kActivity
 		
-		|| xy = ev.button.xy
+		|| b = ev.button
+		|| xy = b.xy
 		if  t is MOUSEDOWN
 			beep.OK = 1
 			if notifications.Clickedat(xy)
@@ -840,7 +841,7 @@ module SDLApp
 			|| InsideWin = w.lastrect.soothe contains xy
 			if !InsideWin and (w == .opendialog)
 				if w.ClickOutsideCloses
-					w.closedialog
+					w.CloseDialog
 					return kactivity
 				beep
 				return kNothing
@@ -848,18 +849,10 @@ module SDLApp
 			if .inResizeCorner(xy)
 				return kActivity
 
-			|| B = ev.button
-			|| BN = b.button
-			|| Ctrl = keys.control
-			if (bn == 3) or (Ctrl and bn == 1) 
-				|| F = w.ControlOrMenuAt(xy)
-				w.CurrMouseDown = f
-				if F
-					f.__rightclick__(xy)
-			  elseif bn == 1
-				if !w.CurrMouseDown
-					mousebutton.DownAt = date()
-				w.CurrMouseDown = w.DoMouseDown(xy, b.clicks)
+			|| dw = w.Click(b.button, b.clicks, xy)	
+			|| foc = w.Focus
+			if foc and foc.ClickOutsideCloses and (foc!=w.CurrMouseDown)
+				w.Focus = nil
 			  
 			return kActivity
 
@@ -898,7 +891,6 @@ module SDLApp
 			.AppResizingXY = nil
 			.LastMouseDownRepeat = nil			
 			|| dd	= .drawdrag 
-			|| B	= ev.button
 			|| dow	= w.CurrMouseDown
 			|| F	= w.openedmenu
 			|| di	= w.DroppingInto
@@ -954,6 +946,19 @@ module SDLApp
 			return kActivity
 		return kNothing
 		
+	
+	helper Window.Click (|int| bn,  |int| clicks,  |ivec2| xy, |guicontrol|)
+		|| Ctrl = keys.control
+		if (bn == 3) or (Ctrl and bn == 1) 
+			rz = .ControlOrMenuAt(xy)
+			if rz
+				rz.__rightclick__(xy)
+		  else
+			if !rz
+				mousebutton.DownAt = date()
+			rz = .DoMouseDown(xy, clicks)
+		.currmousedown = rz		
+
 
 	function FindResizeCorner (|ivec2| p, |ivec2|)
 		opt norefcounts

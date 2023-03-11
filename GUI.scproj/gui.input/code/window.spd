@@ -4,7 +4,6 @@ class Window (GUIControl)
 	linkage
 		cpp_part Win
 	|bool|							FocusWasSet
-	|bool|							ClickOutsideCloses
 	|bool|							AlphaSubtle
 	|bool|							NoDrawBackground
 	|GUIControl|					Focus   // For multi-windows?
@@ -247,7 +246,7 @@ class Window (GUIControl)
 	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| clicks=false, |Guicontrol|)
 		opt norefcounts
 		for R.reverse in self
-			if r is visible and r is enabled
+			if r is visible and enabled
 				|| rr = r.lastrect ± -pad 
 				if rr overlaps p
 					if r > 0

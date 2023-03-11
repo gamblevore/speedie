@@ -42,6 +42,11 @@ function PerryIDE.CreateProj (|file| proj)
 	IdeAddProj(proj)
 
 
+function DebugArgsGotFocus (guiaction)
+	if self isa TextView
+		(self is visible) = state==1
+
+
 function ClickedOpenProj (GUIaction)
 	|| start		= "~/".Resolve.Child("Speedie")
 	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project")	#require
@@ -201,29 +206,19 @@ function perryide.ArgTextFileList (|[string]|)
 	
 function perryide.StartDebugging (|file| f)
 	require f.MustExist
+	|| args = .ArgTextFileList
 	if f.IsDir
-		f.Execute
+		f.Execute(args)
 	  else
-		f.launch(.ArgTextFileList)
+		f.launch(args)
 	// So... if this is a GUI app or somsething we can just run it
 	// its a termainl... we need to run this in the external terminal
 
-function message.IsString (|bool|)
-	require self
-	|| f = .func
-	return f == @str or @char or @sstr or @bin or @back
-
-function file.launch (|[string]| args=nil, |errorint|)
-	|| d = [self] + [args]
-	return "/usr/bin/open".SilentExecute(d)
-
-function array.operatorplus (|array of ...| other, |array of ...|)
-	rz = .Copy
-	for s in other
-		rz <~ s 
 
 function PressingDebug (GUIAction)
-	beep "Not implemented yet. Its meant to open up a textview to enter your args in"
+	|| d = .ide.DebugArgsText
+	(d is visible)
+	d.setfocus
 
 
 function fnBuildIsDead (fnConfirmCanceller)
@@ -502,6 +497,12 @@ function EditMeSelError (GUITextErrorSelected)
 	i.DuringMsgFB = false
 
 
+function PressedDebugArgsKeys (GUIKeyEvent)
+	if key is ESCAPE
+		.window.SetFocus(nil)
+		return true
+	
+	
 function PressedEditKeys (GUIKeyEvent)
 	opt norefcounts
 	require self|textview|.ExpectsParse >= 2

@@ -17,8 +17,7 @@ extend PerryIDE
 		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile,			nil)
 		.Tabs				= ButtonView(.Toolbar,	ClickedTabs,    PressingTabs,  ReturnProjectPath,  RightClickedTabs) 
-		.DebugArgsText		= TextView(self)
-		.StartScreen		= buttonview(.Toolbar,	&startupwindow.open)
+		.StartScreen		= buttonview(.Toolbar,	&StartupWindow.open)
 		.BirdButton			= buttonview(.Toolbar,	ClickedBird)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= buttonview(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
@@ -45,7 +44,8 @@ extend PerryIDE
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .logarea]
 		.filesep			= StretchControl.horz(self, 175~right, 110, 110)
 		.editsep			= StretchControl.vert(self, 0,         0,   100)
-		.PopupDisplay		= textview(self,		nil,					nil)
+		.PopupDisplay		= textview(self)
+		.DebugArgsText		= TextView(self,		nil,					PressedDebugArgsKeys)
 		.AttachedProgram	= ""
 		
 		.init
@@ -70,7 +70,11 @@ extend PerryIDE
 		
 		with .DebugArgsText
 			isnt visible
-			.size = 120 by 40~down
+			is editable
+			.size = the~left+4 for 200 by 18~down back 90
+			.ClickOutsideCloses = true
+			.OnFocus = DebugArgsGotFocus
+			.GNormal.solid = (0,0,0,0.9)
 
 
 		with .ViewButtons 
@@ -293,7 +297,6 @@ extend PerryIDE
 		.buildbutton.size = 5~after for 22  by  3~inside
 		.progress.size =    0~before for 60  by  3~inside
 		
-		(.RunButton isnt enabled)
 		.RunButton.ExpandOnMouseOver = 1
 		.buildbutton.ExpandOnMouseOver = 1
 		.progress.ExpandOnMouseOver = 1

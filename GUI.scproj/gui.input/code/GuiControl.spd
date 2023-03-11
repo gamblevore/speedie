@@ -26,6 +26,7 @@ class GUIControl (ringtree)
 	|byte|						ExpandOnMouseOver
 	|bool|						PostLoaded
 	|byte|						ClipMode
+	|bool|						ClickOutsideCloses
 	|CopyPasteFlags|			CopyPaste
 	|GuiControlFlags|			State
 

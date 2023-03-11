@@ -133,6 +133,7 @@ extend PerryIDE
 	function CancelCompile 
 		.compilr.JustKill?
 		(.buildbutton is enabled)
+		(.runbutton is enabled)
 		(.progress isnt visible)
 		.JustReadlog
 		isnt active

@@ -105,6 +105,7 @@ function PerryIDE.ActualCompile (|message| msg)
 	
 	c <~ .datewrap(msg)
 	(.buildbutton isnt enabled)
+	(.runbutton isnt enabled)
 	is active
 	if .Project.name ~= "Speedie.scproj"
 		.ShowStdOut(true) 

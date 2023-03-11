@@ -40,7 +40,7 @@ void JB__PrintStackTraceAndLog(int Sig) {
 void JB_Rec__CrashLog(const char* c);
 void JB__ProcessReportCrash();
 
-	void JB_PrintStackTrace() {
+void JB_PrintStackTrace() {
     int   size = 32;
     void* array[size];
     auto  strings = JB_BackTrace(array, &size);
