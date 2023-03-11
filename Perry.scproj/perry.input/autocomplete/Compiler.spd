@@ -120,7 +120,9 @@ extend PerryIDE
 		file <~ first
 		.notify(.name + "\n\nCompiled OK!", file)
 		if .DebugIsWaitingForCompile
-			.StartDebugging(file.name.file)
+			.DebugIsWaitingForCompile = false
+			beep "hehe"
+			.StartDebugging(file.last.nyme.file)
 				
 				
 	function Notify (|string| What, |message| response=nil)
