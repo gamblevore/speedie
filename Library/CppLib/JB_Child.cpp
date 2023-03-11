@@ -62,7 +62,8 @@ void JB__CrashHandler(int Sig) {
 	} else { 
 		SafePrint("Process got signal...\n" );
 	}
-	exit(-1);
+	signal(Sig, SIG_IGN);
+	std::raise(Sig);
 }
 
 void JB_App__CrashInstall() {
