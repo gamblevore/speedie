@@ -146,14 +146,17 @@ function Compiler.ErrorsToPerry (|message|)
 	compiler.PrePrintErrors
 	return .BuildErrors(errorseverity.problem).parse
 
+function message.compiles (|bool|)
+	return self ~= "compile" or "debug"
+
 function ReportBuild (|message| cmd, |message|)
-	if stderr.ok and cmd == "compile"
+	if stderr.ok and cmd.compiles
 		.Perry <~ .Log
 		TransCompiler.TransComp
 	cmd.clear
 	if stderr.Problems
 		cmd <~ compiler.ErrorsToPerry
-	  elseif cmd == "compile"
+	  elseif cmd.compiles
 		cmd <~ TransCompiler.productpath
 	  else
 		cmd <~ (@thg, "ok")
@@ -170,9 +173,9 @@ function ReportBuildOrRestart (|message| cmd, |message| arg, |message|)
 function DoCmd (|Message| cmd, |message| arg, |message|)
 	require cmd == @tmp
 	if cmd == "crash":					app.crash
-	if cmd == "compile" or "check":		return .ReportBuildOrRestart(cmd, arg)
-	if cmd == "debug":					return .Debug(cmd)
 	if cmd == 1:						return .Jump(cmd)
+	if cmd.compiles or cmd == "check"
+		return .ReportBuildOrRestart(cmd, arg)
 	|| req = cmd[@str].nyme.lowercase
 	|| my_file = compiler.files[req]
 		rz = .MainAct(cmd, my_file)

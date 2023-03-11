@@ -291,7 +291,7 @@ extend PerryIDE
 
 		.AddIDEButton(.RunButton,	"\02", "Debug Project", "debug")
 		.AddIDEButton(.buildbutton, "\1C", "Build Project", "compile")
-		.buildbutton.next = .progress // better
+		.runbutton.next = .progress // better
 		.AddIDEButton(.progress,	"", "", "progress")
 		.runbutton.size =   5~after for 22  by  3~inside
 		.buildbutton.size = 5~after for 22  by  3~inside

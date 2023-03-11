@@ -119,7 +119,7 @@ main
 	
 function message.MainArgs (|message| arg)
 	opt norefcounts
-	arg <~ (–digest "|| __ArgCount = app.args.length").parse
+	arg <~ "|| __ArgCount = app.args.length".parse
 	|| i = 0
 	|| usage = faststring()
 	for ch in self

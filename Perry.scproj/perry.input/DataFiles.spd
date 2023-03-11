@@ -9,7 +9,7 @@ module QQFiles
 * Enjoy
 "
 	
-	|| Roots = –digest `
+	|| Roots = `
 roots 	// extra roots to search from. This doesn't affect compilation.
 	"@spd/Library/library.input/"
 	"@spd/Jeebox.scproj/jeebox.input/"

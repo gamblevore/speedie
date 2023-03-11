@@ -126,7 +126,7 @@ extend_module ASM
 			return fn.CurrReacher
 
 
-//|| ASMPack = –digest <(`
+//|| ASMPack = "digest" <(`
 //pack
 //	app 1K
 //		strs

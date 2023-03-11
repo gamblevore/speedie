@@ -168,6 +168,8 @@ class Process
 
 
 	helper SetupServerState
+		if ._StdOut
+			._StdOut.Length = 0
 		if .IsServer
 			memory.zero(.orig, .origsize)
 			is Connecting

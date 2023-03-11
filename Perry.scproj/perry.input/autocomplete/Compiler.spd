@@ -133,6 +133,7 @@ extend PerryIDE
 		notifications <~ (what, response)
 	
 	function CancelCompile 
+		.DebugIsWaitingForCompile = false
 		.compilr.JustKill?
 		(.buildbutton is enabled)
 		(.runbutton is enabled)

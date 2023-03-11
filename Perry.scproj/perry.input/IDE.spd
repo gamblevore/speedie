@@ -60,7 +60,6 @@ class PerryIDE (Window)
 	|Faststring|				Stats
 	|date|						LastAutoCompleteDate
 	|date|						PopupDateOn
-//	|date|						PopupDateOff
 	|int|						EditMeTabRetryThing
 	|bool|						DuringMsgFB  // canloadfile, canupdate, .disable 
 	|bool|						IsTextOnly
