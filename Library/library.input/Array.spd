@@ -163,6 +163,11 @@ class Array (saveable)
 	
 	operator contains (|object| o, |bool|)
 		return .find(o) >= 0
+
+	function operatorplus (|array of ...| other, |array of ...|)
+		rz = .Copy
+		for s in other
+			rz <~ s 
 	
 	iterator
 		|| i = 0 // remove self-check... later.
