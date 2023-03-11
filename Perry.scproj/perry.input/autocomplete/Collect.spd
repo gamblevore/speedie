@@ -48,7 +48,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg)
 
 
 function PerryIDE.SubProcess (|bool| actual_compile, |fn_Subprocess|)
-	require platform.isdebug and !actual_compile
+	require platform.isdebug and actual_compile
 	if actual_compile
 		rz = Speedie_Compiler
 		Speedie_Compiler = nil
@@ -103,7 +103,9 @@ function PerryIDE.ActualCompile (|message| msg)
 	.compilr = c
 	.stdout.text = ""
 	
-	c <~ .datewrap(msg)
+	|| dw = .datewrap(msg)
+	.LogComms(dw, "\1C ")
+	c <~ dw
 	(.buildbutton isnt enabled)
 	(.runbutton isnt enabled)
 	is active
