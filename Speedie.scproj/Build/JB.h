@@ -1214,13 +1214,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1807])
+#define kJB__ErrorColors_bold (JB_LUB[1805])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1808])
-#define kJB__ErrorColors_good (JB_LUB[1809])
-#define kJB__ErrorColors_normal (JB_LUB[1810])
-#define kJB__ErrorColors_underline (JB_LUB[1809])
-#define kJB__ErrorColors_warn (JB_LUB[1811])
+#define kJB__ErrorColors_error (JB_LUB[1806])
+#define kJB__ErrorColors_good (JB_LUB[1807])
+#define kJB__ErrorColors_normal (JB_LUB[1808])
+#define kJB__ErrorColors_underline (JB_LUB[1807])
+#define kJB__ErrorColors_warn (JB_LUB[1809])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1426,10 +1426,10 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[337])
-#define kSC_BitNot (JB_LUB[435])
-#define kSC_BitOr (JB_LUB[641])
-#define kSC_BitXor (JB_LUB[1812])
+#define kSC_BitAnd (JB_LUB[335])
+#define kSC_BitNot (JB_LUB[433])
+#define kSC_BitOr (JB_LUB[638])
+#define kSC_BitXor (JB_LUB[1810])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1459,7 +1459,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1813])
+#define kJB_SaverStart1 (JB_LUB[1811])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2380,8 +2380,6 @@ bool SC_AC__CanUseName(SCBase* l);
 Message* SC_AC__CmdResponse(Message* cmd, Message* arg);
 
 void SC_AC__CmdWrap(Message* arg);
-
-Message* SC_AC__Debug(Message* cmd);
 
 Message* SC_AC__Define(Message* msg, JB_String* purpose, JB_Object* found);
 
@@ -4226,6 +4224,8 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
+void SC_IR_Print(IR* self);
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5900,7 +5900,7 @@ bool JB_File_TestBatch(JB_File* self);
 
 bool JB_File_TestSpeedie(JB_File* self, JB_String* Variant);
 
-ErrorInt JB_File_touch(JB_File* self);
+ErrorInt JB_File_Touch(JB_File* self);
 
 bool JB_File_visible(JB_File* self);
 
@@ -7317,6 +7317,8 @@ JB_String* JB_Msg_CollectFuncTableName(Message* self);
 
 Message* JB_Msg_CollectionPlace(Message* self);
 
+bool JB_Msg_compiles(Message* self);
+
 Message* JB_Msg_ConfArg(Message* self);
 
 Message* JB_Msg_ConstantExpandSub(Message* self);
@@ -8067,6 +8069,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
