@@ -172,10 +172,12 @@ function ReportBuildOrRestart (|message| cmd, |message| arg, |message|)
 
 function DoCmd (|Message| cmd, |message| arg, |message|)
 	require cmd == @tmp
-	if cmd == "crash":					app.crash
-	if cmd == 1:						return .Jump(cmd)
+	if cmd == "crash"
+		app.crash
 	if cmd.compiles or cmd == "check"
 		return .ReportBuildOrRestart(cmd, arg)
+	if cmd == 1
+		return .Jump(cmd)
 	|| req = cmd[@str].nyme.lowercase
 	|| my_file = compiler.files[req]
 		rz = .MainAct(cmd, my_file)
