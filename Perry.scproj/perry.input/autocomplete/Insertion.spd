@@ -298,7 +298,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 	if key is escape  and  ide.PopupDateOn.ago > 0.5
 		ide.PopupHide
 		return 1
-	require  .ExpectsParse >= 2
+	require  .ExpectsParse >= probablyjeebox
 	|| s = .SelRange
 	if  !s.width  and  key is escape
 		return .PerryTryAutoComplete(s.x, "autocomplete", PerryAutoCompleteReason.escape)|int|

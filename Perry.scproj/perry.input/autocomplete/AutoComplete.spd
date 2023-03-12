@@ -146,7 +146,7 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 	if (f == @arg) and !f.hasany and (display starts "displayall")
 		.PopupHide
 	  else
-		.PopupDisplay.expectsparse = 2
+		.PopupDisplay.expectsparse = textview.probablyjeebox
 		.DisplayInPopup(f.render, display.name contains "forced")
 
 
@@ -249,7 +249,7 @@ function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
 		.DefineFB(msg)
 	  elseif msg starts "check"
 		.ErrorListFB(msg)
-	  elseif msg starts "compile"
+	  elseif msg starts "compile" or "debug"
 		.CompileFB(msg)
 	  elseif msg starts "log"
 		.LogFB(msg)

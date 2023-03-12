@@ -74,6 +74,7 @@ extend PerryIDE
 			.size = the~left+4 for 200 by 18~down back 90
 			.ClickOutsideCloses = true
 			.OnFocus = DebugArgsGotFocus
+			.ExpectsParse = TextView.definitelyjeebox
 			.GNormal.solid = (0,0,0,0.9)
 
 
@@ -202,7 +203,7 @@ extend PerryIDE
 			.size 			= the~area
 			.takesfocus		= 0
 			.clipmode = ControlPoint.SlideBackInWindow
-			.expectsparse	= 2
+			.expectsparse	= TextView.probablyjeebox
 			.gnormal.bg		<~ ((0.1, 0.3, 0.1, 1.0))
 			.gnormal.edge	<~ ((0.1, 0.3, 0.1, 0.5))
 
@@ -232,7 +233,7 @@ extend PerryIDE
 			.size 			= the~area
 			.takesfocus		= takesfocusflag.On
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.85)
-			.expectsparse	= 2
+			.expectsparse	= TextView.probablyjeebox
 			.PreferStayAtEnd= true
 
 
@@ -291,7 +292,7 @@ extend PerryIDE
 
 		.AddIDEButton(.RunButton,	"\02", "Debug Project", "debug")
 		.AddIDEButton(.buildbutton, "\1C", "Build Project", "compile")
-		.runbutton.next = .progress // better
+		.buildbutton.next = .progress // better
 		.AddIDEButton(.progress,	"", "", "progress")
 		.runbutton.size =   5~after for 22  by  3~inside
 		.buildbutton.size = 5~after for 22  by  3~inside

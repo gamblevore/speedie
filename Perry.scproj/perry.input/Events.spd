@@ -43,8 +43,19 @@ function PerryIDE.CreateProj (|file| proj)
 
 
 function DebugArgsGotFocus (guiaction)
-	if self isa TextView
-		(self is visible) = state==1
+	|| txt = self|textview|
+	|| i = .ide
+	|| f = i.DebugArgsFile #require
+	|| s = state == 1
+		.text = f.ReadAll ?? `/*Type command-line arguments here. Strings, numbers and bools are allowed. Comments are ignored, including this comment. EG:
+	"Arg1"
+	"Arg2"
+	123
+	true
+*/`
+	  else
+		f.SmartData = .text
+	(self is visible) = s
 
 
 function ClickedOpenProj (GUIaction)
@@ -191,28 +202,30 @@ function ClickedRelease (GUIaction)
 
 function ClickedDebug (GUIAction)
 	|| i = .ide
+	require i.ArgTextFileList != nil
+	
 	i.DebugIsWaitingForCompile = true
 	i.compile("debug")
 
 
 function perryide.ArgTextFileList (|[string]|)
 	for s in .DebugArgsText.text.parse
-		if s.isstring
-			rz <~ s.name
-		  else
-			error s
-	
-	// use a textfile and do something with it
-	
+		expect (s.isstring or s == @num) (s)
+		|| f = s[0]
+		expect !f (f)
+		rz <~ s.name
+
+
 function perryide.StartDebugging (|file| f)
 	require f.MustExist
 	|| args = .ArgTextFileList
+	require args != nil
 	if f.IsDir
 		f.Execute(args)
 	  else
 		f.launch(args)
 	// So... if this is a GUI app or somsething we can just run it
-	// its a termainl... we need to run this in the external terminal
+	// its a terminal... we need to run this in the external terminal
 
 
 function PressingDebug (GUIAction)

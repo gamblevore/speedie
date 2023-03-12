@@ -10,3 +10,11 @@ function string.path_expand (|dictionary of string| dict, |string|)
 	|| found = dict[name]
 		return found.TrimTrailingSlashes + self[i...]
 
+
+function perryide.DebugArgsFile (|file|)
+	|| p = .Project
+	if p.IsDir
+		p = p.Child(".args")
+		return p
+	
+

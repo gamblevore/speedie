@@ -70,7 +70,7 @@ class TextView (GUIControl)
 		.OnKeyDown	= keys
 		.LineHeight = font.Height + 4 // whatever
 		.SetsDebugLines = 10
-		.ExpectsParse = 1
+		.ExpectsParse = TextView.allowjeebox
 		.CopyPaste = CopyPasteFlags.CopyText (|) CopyPasteFlags.PasteText
 		.init
 	
@@ -1006,7 +1006,7 @@ class TextView (GUIControl)
 				.sel = (sel2, sel2+1)
 			return false
 
-		require t or (.expectsparse >= 2)
+		require t or (.expectsparse >= probablyjeebox)
 		|| c     = counterparts.find(s)
 		|| After = self[sel2]
 		if !c
@@ -1599,7 +1599,7 @@ class TextView (GUIControl)
 	helper ParsedMessage (assigns:|message|)
 		opt norefcounts
 		with ._viewing
-			if self.expectsparse > 2
+			if self.expectsparse > probablyjeebox
 				.docparsed = value
 				.docerror = self.myerror
 			  else
@@ -1777,18 +1777,23 @@ class TextView (GUIControl)
 
 	helper FindExpectsParse (|int|)
 		if .expectsparse
-			if .ExpectsParse >= 3
+			if .ExpectsParse >= definitelyjeebox
 				return .ExpectsParse
 			if .text.HasWord("<?jb?>") or .text.hasword("//jb")
-				return 3
+				return definitelyjeebox
 			return .expectsparse
 
 	helper isjeeboxmode (|bool|)
-		return .FindExpectsParse >= 2
+		return .FindExpectsParse >= probablyjeebox
 
 
 	flags
 		NotRoot = 0x800
+	constants
+		NotJeebox = 0
+		AllowJeebox
+		ProbablyJeebox
+		DefinitelyJeebox
 
 	module
 		|| csAntiWords		= makeanti()

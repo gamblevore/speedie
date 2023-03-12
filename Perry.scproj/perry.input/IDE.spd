@@ -104,7 +104,7 @@ class PerryIDE (Window)
 			return e
 		|| it = sdlapp.CompileStatus.Useable
 			return it
-		if e and .editme.expectsparse >= 2
+		if e and .editme.expectsparse >= textview.probablyjeebox
 			return e
 		it = sdlapp.tooltip.useable
 		if it
