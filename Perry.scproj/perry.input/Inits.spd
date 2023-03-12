@@ -482,7 +482,7 @@ extend PerryIDE
 
 	function LoadConfSub (|file| proj)
 		|| ProjIsDir = proj.isdir
-		|| projconf	 = proj.child(".perry")
+		|| ProjConf	 = proj.child(".perry")
 		
 		|message| conf
 		if ProjIsDir and projconf.exists
@@ -495,7 +495,7 @@ extend PerryIDE
 		.Previous.clear
 		.PrevMarker = nil
 		
-		.StartFiles(conf, projisdir)
+		.StartFiles(conf, ProjIsDir)
 		.isloading = false		// its done and we need .startproj
 		.StartProj
 	
