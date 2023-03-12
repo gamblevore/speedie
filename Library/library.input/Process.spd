@@ -695,8 +695,8 @@ extend_module app
 	helper LostChild (|pid_int|)
 		cpp_wrapper JB_App__LostChild
 
-	function Fork (|string| talk_name, |[string]| r, |process|)
-		return process.Child(.path, talk_name, r)
+	function Fork (|[string]| r, |process|)
+		return process.Child(.path, .path.name + .path.hash|int64|.render, r)
 		
 	helper ParentID (|pid_int|)
 		cpp_wrapper JB_App__ParentID
