@@ -422,7 +422,6 @@ extend PerryIDE
 		if btn isa buttonview
 			btn.gnormal.solid = (f, f, f, opa)
 	
-	
 	function LoadProject (|file| proj, |bool|)
 		require proj.mustexist("load project")
 		.project = proj
@@ -431,7 +430,7 @@ extend PerryIDE
 		.IsLoading = false
 		startupwindow.hide
 		.viewasproject
-		.forcerecheck
+		.ForceRecheck
 		app.saveprefs // for pref-file editing
 		return true
 	
