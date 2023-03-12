@@ -43,19 +43,26 @@ function PerryIDE.CreateProj (|file| proj)
 
 
 function DebugArgsGotFocus (guiaction)
-	|| txt = self|textview|
+	|| lv = self|listview| // .debugargslist
 	|| i = .ide
 	|| f = i.DebugArgsFile #require
-	|| s = state == 1
-		.text = f.ReadAll ?? `/*Type command-line arguments here. Strings, numbers and bools are allowed. Comments are ignored, including this comment. EG:
-	"Arg1"
-	"Arg2"
-	123
-	true
-*/`
+	|| v = state == 1
+		|| list = f.ReadAll.parse|listviewrow|
+		lv.listsource = list
+		for s in list
+			(s is editable)
+		
+		|| L = list.msg(@str, "(Add Row...)")|listviewrow|
+		(L is AlignCenter)
+		lv.SelectFirst
 	  else
-		f.SmartData = .text
-	(self is visible) = s
+		|| list = lv.listsource
+		|| l = list.last
+		if (l is aligncenter)
+			l.remove
+		f.SmartData = list.render
+		list <~ l
+	(self is visible) = v
 
 
 function ClickedOpenProj (GUIaction)
@@ -201,25 +208,14 @@ function ClickedRelease (GUIaction)
 
 
 function ClickedDebug (GUIAction)
-	|| i = .ide
-	require i.ArgTextFileList != nil
-	
+	|| i = .ide	
 	i.DebugIsWaitingForCompile = true
 	i.compile("debug")
 
 
-function perryide.ArgTextFileList (|[string]|)
-	for s in .DebugArgsText.text.parse
-		expect (s.isstring or s == @num) (s)
-		|| f = s[0]
-		expect !f (f)
-		rz <~ s.name
-
-
 function perryide.StartDebugging (|file| f)
 	require f.MustExist
-	|| args = .ArgTextFileList
-	require args != nil
+	|| args = .DebugArgsList.listsource.AllNames
 	if f.IsDir
 		f.Execute(args)
 	  else
@@ -229,7 +225,7 @@ function perryide.StartDebugging (|file| f)
 
 
 function PressingDebug (GUIAction)
-	|| d = .ide.DebugArgsText
+	|| d = .ide.DebugArgsList
 	(d is visible)
 	d.setfocus
 
@@ -262,7 +258,6 @@ function ClickedCompile (GUIaction)
 		
 function PerryFileRenamed (guilistevent)
 	.ide.recheck
-
 
 function ReturnProjectPath (GUIListEvent)
 	if row isa filerow
@@ -607,6 +602,25 @@ function ReturnErrorList (GuiListEvent)
 	return true
 
 
+function ReturnDebugArgs (GUIListEvent)
+	if row isnt editable
+		|| r = .AddRow
+		row.prev = r
+		(r is editable)
+		.Rename(r)
+		return true
+	  else
+		.Rename(row)
+
+
+function DebugArgsKeyDown (GUIKeyEvent)
+	opt norefcounts
+	if FoundListKeys(self, key)
+		return true
+	if key is RETURN and self isa listview
+		return ReturnDebugArgs(self, .listsource.last)
+	
+	
 function FoundListKeys (GuiKeyEvent)
 	if key.isdelete
 		if self isa listview

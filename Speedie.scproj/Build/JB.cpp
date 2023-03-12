@@ -2151,8 +2151,15 @@ void SC_Comp__PrePrintErrors() {
 }
 
 void SC_Comp__PrintCompileErrors() {
-	if ((!JB_Rec_Problems(JB_StdErr))) {
-		return;
+	if (SC__Options_Warnings) {
+		if ((!JB_Rec_Anything(JB_StdErr))) {
+			return;
+		}
+	}
+	 else {
+		if ((!JB_Rec_Problems(JB_StdErr))) {
+			return;
+		}
 	}
 	SC_Comp__PrePrintErrors();
 	if (SC__Func_DisabledPoints) {
@@ -3291,7 +3298,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[224]);
-	JB_FS_AppendInt32(_fsf0, (2023031122));
+	JB_FS_AppendInt32(_fsf0, (2023031217));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8825,7 +8832,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[591]);
-	JB_FS_AppendInt32(_fsf0, (2023031122));
+	JB_FS_AppendInt32(_fsf0, (2023031217));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -16316,14 +16323,6 @@ bool SC_IR_OperatorIsa(IR* self, int m) {
 	return m == self->Op;
 }
 
-void SC_IR_Print(IR* self) {
-	if (SC__ASM_NoisyASM >= 3) {
-		JB_String* _tmPf0 = JB_Incr(SC_IR_Render(self, nil));
-		JB_PrintLine(_tmPf0);
-		JB_Decr(_tmPf0);
-	}
-}
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in) {
 	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
 	SC_IR_fs(self, fs);
@@ -19197,6 +19196,10 @@ DTWrap* JB_Wrap__New(_voidptr p) {
 
 
 
+bool JB_Rec_Anything(JB_ErrorReceiver* self) {
+	return (((bool)self) and ((bool)self->ErrorCount)) or (((bool)self->ProblemCount) or ((bool)self->WarnCount));
+}
+
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level) {
 	if ((!((!self->BlockErrors) and (!JB_OutOfMemoryOccurred())))) {
 		return nil;
@@ -20424,14 +20427,6 @@ void JB_Proc_SendSub(Process* self, Message* msg) {
 	}
 	JB_FreeIfDead(JB_Msg_render_jbin(msg, JB_LUB[0], self->Writer));
 	JB_Decr(msg);
-	JB_String* _tmPf0 = JB_Incr(JB_Str_CopyFromPtr(JB_IPCMessage_Data(self->Ours), self->Writer->Length));
-	Message* reparse = JB_Incr(JB_Str_parse_jbin(_tmPf0));
-	JB_Decr(_tmPf0);
-	if ((!reparse)) {
-		debugger;
-	}
-	(reparse);
-	JB_Decr(reparse);
 	JB_Proc_WriteSub(self);
 }
 
@@ -43796,4 +43791,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -4318617059875783666 5541102868359256433
+// 1084400698701348776 5541102868359256433

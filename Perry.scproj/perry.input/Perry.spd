@@ -296,7 +296,7 @@ function ViewAsVis (|bool| vis)
 	(.filelist is decluttered)  = (.noclutter & 2)!=0
 	(.noneeder is visible)  = .noneeder.text and vis
 	if !top
-		(.DebugArgsText isnt visible)
+		(.DebugArgsList isnt visible)
 	
 	|| StillRuns = top and (vis or (.ext == "spd"))
 	|| srchvis   = vis and (.searcharea is visible) 

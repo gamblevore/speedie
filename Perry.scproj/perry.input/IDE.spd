@@ -35,7 +35,7 @@ class PerryIDE (Window)
     |TextView|					StatsInfo
     |TextView|					SelInfo
     |TextView|					NoNeeder
-    |textview| 					DebugArgsText
+    |listview| 					DebugArgsList
     |buttonview|				Toolbar
     |Buttonview|				Tabs
     |Buttonview|				ViewErrors
