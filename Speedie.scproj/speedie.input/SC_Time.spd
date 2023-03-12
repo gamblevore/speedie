@@ -28,7 +28,7 @@ function compiler.PrintStats
 
 function compiler.PrintCompileErrors
 	require StdErr.problems
-	.preprinterrors
+	.PrePrintErrors
 
 	if (SCFunction.DisabledPoints)
 		"Disabled functions called ${scfunction.DisabledPoints}x!".printlinecolor(errorcolors.error)
@@ -36,7 +36,6 @@ function compiler.PrintCompileErrors
 	|| MinSev = (ErrorSeverity.warning, ErrorSeverity.problem)(Options.Warnings) 
 	.PrintErrors(MinSev)
 	stderr.clear
-
 
 
 extend_module file
