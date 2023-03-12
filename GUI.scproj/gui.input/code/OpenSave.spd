@@ -115,7 +115,7 @@ class OpenSaveDialog (Window)
 	
 	function init
 		.path.id = "opensave"
-		.path.onkeydown = relistkey
+		.path.OnKeyDown = relistkey
 		.path.OnTextChanged= relistkey
 		
 		.InitField(.path, "path")

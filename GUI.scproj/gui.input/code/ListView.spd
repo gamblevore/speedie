@@ -210,7 +210,7 @@ class ListView (GUIControl) {
 			require (r isnt disabled)
 			y = .DrawYRow(r)
 		
-		if (.rightclickselects or .onrightclick)
+		if (.RightClickSelects or .OnRightClick)
 			ifn r and r is selected
 				.Select(r)
 			|| c = .onrightclick 
@@ -298,13 +298,15 @@ class ListView (GUIControl) {
 			.Select(f)
 		return true
 		
+	function AddRow (|string| name = "", |listviewrow|)
+		return .ListSource.msg(@str, name)
 		
 	function Rename (|bool|)
 		cpp_part RenameCurr
 		return .startRenameCell(ListViewcell(.LastSelected, 0))
 	
 	
-	function Rename (|ListViewRow| r, |bool|)
+	function Rename (|ListViewRow| r, |bool|) // .editrow 
 		cpp_part RenameRow
 		return .startRenameCell(ListViewcell(r, 0))
 	

@@ -42,7 +42,7 @@ class FileViewer (ListView)
 			.clipmode		= ControlPoint.SlideBackInWindow
 			.ID				= "quickopen"
 			.size 			= 400~wide by 15~high
-			.onkeydown		= QuickOpenKey
+			.OnKeyDown		= QuickOpenKey
 			.OnTextChanged	= QuickOpenKey
 			.takesfocus		= takesfocusflag.On
 			.onfocus		= QuickOpenFocus
@@ -292,7 +292,7 @@ class FileViewer (ListView)
 			d[f.name] = f
 		
 		for (f in rz) (i)
-			if f.SameNameAsPrev // is this buggering something?
+			if f.SameNameAsPrev
 				|| name = f.name + "  --  " + f.location.neatenpath
 				f = filerow(f)
 				f.name = name
@@ -354,7 +354,7 @@ class FileViewer (ListView)
 		return .QuickOpenFileSub(path, line, "", FromReturnKey)
 
 
-	function QuickOpenFileSub (|string| path, |string| line, |string| BytePos, |int| FromReturnKey = 0, |bool|)
+	helper QuickOpenFileSub (|string| path, |string| line, |string| BytePos, |int| FromReturnKey = 0, |bool|)
 		|| r = .FindPaths(path)
 		if FromReturnKey
 			if (FromReturnKey >= 3) or (!path) or (path.file.exists)

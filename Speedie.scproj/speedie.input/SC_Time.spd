@@ -27,7 +27,10 @@ function compiler.PrintStats
 
 
 function compiler.PrintCompileErrors
-	require StdErr.problems
+	if Options.Warnings
+		require stderr.anything
+	  else
+		require StdErr.problems
 	.PrePrintErrors
 
 	if (SCFunction.DisabledPoints)

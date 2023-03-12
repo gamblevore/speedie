@@ -54,6 +54,14 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--self"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--check"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--warn"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
@@ -70,7 +78,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Utils/speedrogue.scproj"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Speedie.scproj/Batch/chart.spd"

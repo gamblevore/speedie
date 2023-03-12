@@ -977,8 +977,8 @@ class TextView (GUIControl)
 			
 
 	helper init
-		.gnormal.edge  <~ ((0.5, 0.5, 0.5, 1.0))
-		.gnormal.Bg    <~ ((0, 0, 0, 0.5))
+		.gnormal.edge  = (0.5, 0.5, 0.5, 1.0)
+		.gnormal.Bg    = (0, 0, 0, 0.5)
 		.clear("")
 	
 	

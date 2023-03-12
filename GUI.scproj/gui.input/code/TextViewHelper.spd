@@ -518,9 +518,10 @@ function TextView.DrawOneStartLine (|string| txt, |int|)
 	return x
 
 
-function textview.GuessExpectsParse 
-	require .expectsparse
-	|| mode = 1
+function textview.GuessExpectsParse
+	|| mode = .expectsparse
+	require mode == 1 or 2 
+	mode = 1
 	|| d = .document
 		|| ext = d.Location.ext
 		if ext ~= "spd" or "box" or "jbin" or "xml" or "jb" // i wanna debug my xml code

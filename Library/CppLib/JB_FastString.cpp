@@ -433,9 +433,7 @@ JB_String* JB_FS_GetResult(FastString* self) {
     if (!Result)
 		Result = JB_Str__Empty();
 
-	Result = JB_Str_Shrink(Result, Length);
-//	FSDebug();
-	return Result;
+	return JB_Str_Shrink(Result, Length);
 }
 
 

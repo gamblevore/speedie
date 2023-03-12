@@ -46,6 +46,9 @@ class ErrorList
 	function Problems (|bool|) // totallyok
 		Return self and .errorcount or .problemcount
 	
+	function Anything (|bool|) // totallyok
+		Return self and .errorcount or .problemcount or .warncount
+	
 	
 	function NewItem (|Error|Err)	
 		visible true
