@@ -398,8 +398,10 @@ module SDLApp
 		.ClearAlerts
 		|| Occured = knothing
 		while
+			object.TotalSanity
 			while .Event.Poll
 				occured |= .CheckEvent(.event)
+				object.TotalSanity
 			if .WantsQuit
 				Occured |= .TryQuit(kExiting)
 			if .newsize
@@ -694,7 +696,7 @@ module SDLApp
 		if !.TextInputEnabledAtStart
 			return true
 		|| k = ev.sym
-		if k.isaccept or k is delete or tab or escape
+		if k.isaccept or k.isdelete or k is tab or escape
 			return true
 		return (k.isscan or ev.Command)
 
