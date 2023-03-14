@@ -92,7 +92,10 @@ class Object
 	module
 		function DebugAllMemory (assigns:|bool|)
 			cpp_wrapper JB_TotalMemorySet
-
+		function TotalSanity (|bool| Force=true, |bool|)
+			target debug
+				cpp_wrapper JB_TotalMemorySanity
+			// something like that?
 
 struct ClassData
 	linkage
