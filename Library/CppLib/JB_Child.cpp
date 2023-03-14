@@ -53,7 +53,13 @@ void JB_PrintStackTrace() {
     free( strings );
 }
 
+
+int SigList[] = {SIGSEGV, SIGBUS, SIGILL, SIGFPE, SIGSYS, SIGTERM, SIGQUIT};
+
 void JB__CrashHandler(int Sig) {
+	for_ (sizeof(SigList)/sizeof(int)) {
+		signal(Sig, SIG_DFL);
+	}
     if (Sig != SIGTERM and Sig != SIGQUIT) {
 		JB__PrintStackTraceAndLog(Sig);
 		JB__ProcessReportCrash();
@@ -62,16 +68,12 @@ void JB__CrashHandler(int Sig) {
 	} else { 
 		SafePrint("Process got signal...\n" );
 	}
-	signal(Sig, SIG_IGN);
-	std::raise(Sig);
 }
 
 void JB_App__CrashInstall() {
-	int list[] = {SIGSEGV, SIGBUS, SIGILL, SIGFPE, SIGSYS, SIGTERM, SIGQUIT};
-	int n = sizeof(list)/sizeof(int);
-	for_ (n) {
-		if (signal(list[i], JB__CrashHandler) == SIG_IGN)
-			signal(list[i], SIG_IGN); // restore the old ignore signal... make speedie more unix-friendly.
+	for_ (sizeof(SigList)/sizeof(int)) {
+		if (signal(SigList[i], JB__CrashHandler) == SIG_IGN)
+			signal(SigList[i], SIG_IGN); // restore the old ignore signal... make speedie more unix-friendly.
 	}
 }
 
