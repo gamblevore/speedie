@@ -45,7 +45,7 @@ extend PerryIDE
 		.filesep			= StretchControl.horz(self, 175~right, 110, 110)
 		.editsep			= StretchControl.vert(self, 0,         0,   100)
 		.PopupDisplay		= textview(self)
-		.DebugArgsList		= listview(self,		nil,				ReturnDebugArgs	) //PressedDebugArgsKeys
+		.DebugArgsList		= listview(self,		nil,				ReturnDebugArgs	)
 		.AttachedProgram	= ""
 		
 		.init
@@ -71,12 +71,14 @@ extend PerryIDE
 		with .DebugArgsList
 			isnt visible
 			is editable
-			.size = the~left+4 for 200 by 18~down back 90
+			.size =  the~left+4 for 200  by  18~down back 90
+			.id = "debugargs"
 			.ClickOutsideCloses = true
 			.OnFocus = DebugArgsGotFocus
 			.gnormal.solid  = (0.0, 0.0, 0.0, 0.7)
 			.gnormal.edge = (1.0, 1.0, 1.0, 0.7)
 			.OnKeyDown = DebugArgsKeyDown
+			.EnableDrag
 
 
 		with .ViewButtons 
