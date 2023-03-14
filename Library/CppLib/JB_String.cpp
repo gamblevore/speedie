@@ -1788,8 +1788,6 @@ uint64 JB_Str_CRC (JB_String* S, uint64 crc) {
 }
 
 
-///////////    #include "StringGlobals.i"
-
 Array* JB_Array__New0();
 Array* JB_Str_ArgV(const char** ArgV) {
     Array* Result = JB_Array__New0();
