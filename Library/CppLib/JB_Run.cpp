@@ -184,7 +184,9 @@ int JB_LibInit (_cstring* R) {
     JB_Dict__Init();
     JB_Str__LoadGlobals();
 
-    return JB_Init_();
+    int Err = JB_Init_();
+	JB_TotalMemorySanity(true);
+	return Err;
 }
 
 
