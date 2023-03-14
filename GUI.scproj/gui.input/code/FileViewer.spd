@@ -73,7 +73,7 @@ class FileViewer (ListView)
 		.TryReloadPath
 	
 	behaviour keydown
-		if key is delete
+		if key.isdelete
 			|| r = .sel
 			if r isa filerow
 				r.AskDelete(self)
