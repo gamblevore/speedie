@@ -92,7 +92,8 @@ class ListView (GUIControl) {
 	function TryRenameCellSub (|listviewcell|cell, |string| value, |bool|)
 		opt norefcounts
 		if !.TryEditCell
-			cell.original.__textset__(cell.column, value)
+			|| orig = cell.original#require 
+			orig.__textset__(cell.column, value)
 			return true
 		return (.TryEditCell)(self, cell, value)
 
@@ -320,9 +321,8 @@ class ListView (GUIControl) {
 		|| r = rc.original					#require
 		.SelectAdd(r)
 		.Show(r)
-		if (r is editable) and (self is editable)
-			|| inl = .inlinecell(true) 
-			inl.edit(rc, self)
+		|| inl = .inlinecell(true) 
+		if inl.edit(rc, self)
 			if .istree
 				inl.Editor.selectall
 			return true
@@ -381,8 +381,8 @@ class ListView (GUIControl) {
 			  elseif !.sel
 				.SelectMove( (-int.max, int.max)(Key is down) )
 			  else
-				|| page = .VisibleRows/2
-				|| i = (page, 1)(keys.option)
+				|| i = 1
+				if keys.option: i = .VisibleRows/2
 				if key is up
 					i = -i
 				.SelectMove(i)
@@ -473,9 +473,10 @@ class ListView (GUIControl) {
 		
 		
 	behaviour LostFocus
-		.InlineCell.clear(false)?
-		.clearinternaldrops
-		super.lostfocus(notreallylost)
+		if !notreallylost
+			.InlineCell.clear(false)?
+			.clearinternaldrops
+			super.lostfocus(notreallylost)
 	
 	
 	function SlideScroll (assigns:|listviewrow|r)
@@ -908,7 +909,7 @@ class ListView (GUIControl) {
 	function SelectMove (|int| i, |bool| Multi=keys.shift)
 		opt norefcounts
 		debug_require i
-		|| l = (.lastselected, .sel)(i > 0)
+		|| l = (.LastSelected, .sel)(i > 0)
 		if !l
 			if i < 0
 				return .Select(.start)
@@ -956,7 +957,7 @@ class ListView (GUIControl) {
 		// 1  == fast
 		// -1 == noshow 
 		opt norefcounts
-		require s != .listsource
+		require s != .ListSource
 		require !s or .owns(s)
 		
 		.ExpandParents(s)
@@ -1348,6 +1349,17 @@ class ListView (GUIControl) {
 			rz = 0
 		
 	
+	helper textview.MoveListLine (|int| i, |bool|)
+		opt norefcounts
+		|| inl = .isinline$
+		|| c = inl.cell$ // wat
+		|| c2 = c.step(i)
+			inl.Edit(c2, nil)
+			if i < 0
+				.sel = 0
+		return true
+
+
 	helper LastNamed (|string| s, |ListViewrow|)
 		opt norefcounts
 		rz = .listsource.last

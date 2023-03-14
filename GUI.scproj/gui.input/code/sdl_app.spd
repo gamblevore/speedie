@@ -438,7 +438,10 @@ module SDLApp
 		opt norefcounts
 		|| f = .focus$
 		if f isnt visible
-			.focus = nil
+			if f == .inline.editor
+				.setfocus(.inline.editingfor)
+			else
+				.setfocus(nil)
 		if !sdlapp.isbackground and (f isa textview)
 			if f is editable and (sdlapp.FlashSelector != sdlapp.LastFlashSelector)
 				sdlapp.touch(f)
@@ -893,13 +896,13 @@ module SDLApp
 			.AppResizingXY = nil
 			.LastMouseDownRepeat = nil			
 			|| dd	= .drawdrag 
-			|| dow	= w.CurrMouseDown
-			|| F	= w.openedmenu
 			|| di	= w.DroppingInto
 			if di and dd
 				for c in dd
 					di.dopaste(c, copypasteflags.pastefile)
 			
+			|| dow	= w.CurrMouseDown
+			|| F	= w.openedmenu
 			w.ClearDrops
 			if !(di and dd) and (b.button == 3) and (dow != F) and f and (f contains xy)
 				f.__rightclick__(xy)

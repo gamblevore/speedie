@@ -295,7 +295,7 @@ function ViewAsVis (|bool| vis)
 	(.StartScreen is visible) = (.noclutter & 1)==0
 	(.filelist is decluttered)  = (.noclutter & 2)!=0
 	(.noneeder is visible)  = .noneeder.text and vis
-	if !top
+	if !top and !Platform.IsDebug
 		(.DebugArgsList isnt visible)
 	
 	|| StillRuns = top and (vis or (.ext == "spd"))

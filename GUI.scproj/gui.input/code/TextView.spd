@@ -494,17 +494,6 @@ class TextView (GUIControl)
 		return x.clamp(.text.length)
 		
 
-	helper MoveListLine (|int| i, |bool|)
-		opt norefcounts
-		|| inl = .isinline$
-		|| c = inl.cell$ // wat
-		|| c2 = c.step(i)
-			inl.Edit(c2, nil)
-			if i < 0
-				.sel = 0
-		return true
-
-
 	helper MoveSelLine (|int| i, |bool| Page, |bool|)
 		opt norefcounts
 		debug_require i

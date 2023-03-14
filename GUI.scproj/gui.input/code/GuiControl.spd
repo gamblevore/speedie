@@ -43,18 +43,21 @@ class GUIControl (ringtree)
 
 	
 	render
-		fs <~ "("
-		fs <~ .class.name
-		fs <~ "  "
-		fs <~ .lastrect
-		fs <~ `): '`
-		fs <~ .id
-		fs <~ "'"
-		fs.indent++
-		for ch in self
-			fs.IndentLine
-			ch|object|.render(Fs)
-		fs.indent--
+		if !self
+			fs <~ "(nil)"
+		  else
+			fs <~ "("
+			fs <~ .class.name
+			fs <~ "  "
+			fs <~ .lastrect
+			fs <~ `): '`
+			fs <~ .id
+			fs <~ "'"
+			fs.indent++
+			for ch in self
+				fs.IndentLine
+				ch|object|.render(Fs)
+			fs.indent--
 		
 	
 	virtual Search		(|string| s, |bool|JustUpdate, |bool|)

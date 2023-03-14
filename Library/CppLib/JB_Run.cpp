@@ -209,7 +209,6 @@ int		JB_SP_Run (_cstring* C, int Mode)	{
 		
 		if ((Mode & 1) and App_Args and !JB_ErrorNumber)
 			AddError(JB_Main(),			"occurred");
-//		int ch = getch();
 		if ((Mode & 2) and App_Args) {
 			AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
 			JB_LibShutdown();

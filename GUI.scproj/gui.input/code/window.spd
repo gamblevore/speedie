@@ -97,14 +97,15 @@ class Window (GUIControl)
 	
 	helper SetFocus (|guicontrol| Focus)
 		|| old = .focus
+		"focussing ${focus}"
 		require (old != focus)
 		|| NotChanged = false
 		|| t = .inline
 		if focus
 			require focus.Takesfocus.able and (focus is visible)
-			if focus == t.editor
+			if focus == t.editor  and  old contains focus
 				NotChanged = true
-			  elseif focus == t.editingfor and old == t.editor
+			  elseif focus == t.editingfor  and  old == t.editor
 				notchanged = true
 
 		.focus = focus
@@ -137,15 +138,15 @@ class Window (GUIControl)
 				return t.TryColorise
 
 		|| F = .focus
-		|| it = .openedmenu
-			if it isnt typethrough
+		|| menu = .openedmenu
+			if menu isnt typethrough
 				if key isnt tab
-					return it.__keydown__(key)
+					return menu.__keydown__(key)
 				F = .MenuOpener
-				it.CloseMenu
+				menu.CloseMenu
 				
 			  elseif key isnt tab
-				return it.__keydown__(key) or (f and f.__keydown__(key))
+				return menu.__keydown__(key) or (f and f.__keydown__(key))
 		  elseif f and f.__keydown__(key)
 			return true
 		

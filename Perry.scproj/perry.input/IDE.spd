@@ -166,7 +166,8 @@ class PerryIDE (Window)
 	behaviour AppForeGroundChanged
 		.editme.document.checkmodified?
 		.PopupHide
-		.focus := .editme
+		if !.focus
+			.setfocus(.editme)
 		//super.AppForegroundChanged(IsForeGround)
 	
 	
@@ -315,7 +316,8 @@ class PerryIDE (Window)
 
 
 	behaviour FrameUpdate
-		.focus := .editme
+		if !.focus
+			.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
 		if perryide.birds
 			perryide.birds = false
 			.birdbutton.click
@@ -327,13 +329,14 @@ class PerryIDE (Window)
 		.Readlog
 		.PopupDisplayFadeIn
 		|| fc = sdlapp.FrameCount|int|
-		require !.openedmenu and .islast
+		require .islast
 		if fc+1 isa 64
 			require !.ProjClosed
-		if (perryide.statsmode == 2) and (fc isa 64)
-			.UpdateMem = true
-		if .UpdateMem
-			.ShowLeftStats
+		if !.openedmenu
+			if (perryide.statsmode == 2) and (fc isa 64)
+				.UpdateMem = true
+			if .UpdateMem
+				.ShowLeftStats
 		if fc isa 32
 			.EditMe.document.checkmodified?
 		.HideStuff

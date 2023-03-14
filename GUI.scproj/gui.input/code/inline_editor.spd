@@ -26,7 +26,7 @@ struct InlineEditor
 	
 	function NextSearch
 		|| L = .EditingFor
-		if L isa listview
+		if L
 			ifn L.__Search__(sdlapp.LastSearch, false)
 				beep
 			  else
@@ -39,7 +39,7 @@ struct InlineEditor
 	
 	
 	function Accept (|string| s, |bool| hide)
-		if .editingfor isa listview
+		if .editingfor
 			.AcceptSearch(s)
 			if hide
 				.clear
@@ -71,7 +71,7 @@ struct InlineEditor
 	function Clear (|bool| Focus=true)
 		.NeedsHide = false
 		.cell = nil
-		|| s = .editingfor 
+		|| s = .EditingFor 
 		if s isa listview
 			sdlapp.LastSearch = .editor.text
 			if focus
@@ -80,13 +80,13 @@ struct InlineEditor
 			.visible = false
 			.text = ""      // wants new
 		if s isa listview
-			s.isediting = false
+			s.IsEditing = false
 			if focus
 				s.setfocus
 		.EditingFor = nil
 	
 	
-	function Edit (|ListViewCell| r, |ListView| l)
+	function Edit (|ListViewCell| r, |ListView| l, |bool|)
 		opt norefcounts
 		sdlapp.touch(.editor)
 		if !l
@@ -95,6 +95,8 @@ struct InlineEditor
 				l = l2
 			
 		debug_require l and r
+		|| row = r.Original
+		require row is editable and row isnt disabled and l is editable
 		with .editor
 			.FinishEditing(false)
 			.visible = true
@@ -104,9 +106,10 @@ struct InlineEditor
 		l.Select(r.original)
 		l <~ .editor
 		l.isediting = true
-		l.showfast(r.original)
+		l.ShowFast(r.original)
 		.cell = r
 		.EditingFor = l
+		return true
 	
 
 function guicontrol.Inline (|&InlineEditor|)
