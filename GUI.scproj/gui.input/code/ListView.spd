@@ -331,7 +331,7 @@ class ListView (GUIControl) {
 	behaviour KeyDown
 		// so what if the key is delete????
 		if self is typethrough
-			if key is delete
+			if key.isdelete
 				return false
 		if .KeyDownTest(key) or (.OnKeydown)(self, key)?
 			.EditDelayed = nil
@@ -475,6 +475,7 @@ class ListView (GUIControl) {
 	behaviour LostFocus
 		.InlineCell.clear(false)?
 		.clearinternaldrops
+		super.lostfocus(notreallylost)
 	
 	
 	function SlideScroll (assigns:|listviewrow|r)

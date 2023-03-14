@@ -4,14 +4,13 @@ struct InlineEditor
 	linkage
 		cpp_part inl
 	|ListViewCell|		Cell
-	|Textview--|		Editor
-	|ListView--|		EditingFor
-	|Guicontrol--|		SearchingFor
+	|Textview|			Editor
+	|Guicontrol|		EditingFor
 	|bool|				NeedsHide
 	
 	function DrawFocus (|image|where)
 		opt norefcounts
-		|| g = .editingfor|guicontrol| ?? .searchingfor
+		|| g = .editingfor
 			g.drawfocus(where)
 	  
 	
@@ -26,8 +25,9 @@ struct InlineEditor
 	
 	
 	function NextSearch
-		with .searchingfor
-			ifn .__Search__(sdlapp.LastSearch, false)
+		|| L = .EditingFor
+		if L isa listview
+			ifn L.__Search__(sdlapp.LastSearch, false)
 				beep
 			  else
 				sdlapp.touch(self.editor)
@@ -38,8 +38,8 @@ struct InlineEditor
 		.NextSearch
 	
 	
-	function Accept (|string|s, |bool| hide)
-		if .searchingfor
+	function Accept (|string| s, |bool| hide)
+		if .editingfor isa listview
 			.AcceptSearch(s)
 			if hide
 				.clear
@@ -48,9 +48,10 @@ struct InlineEditor
 	
 	
 	function UpdateSearch (|string| s)
-		with .searchingfor
+		|| l = .editingfor
+		if l isa listview
 			sdlapp.LastSearch = s
-			.__Search__(s, true)
+			l.__Search__(s, true)
 	
 	
 	function FinishAndClear (|bool|focus=true)
@@ -58,6 +59,7 @@ struct InlineEditor
 		|| s = .editor.text
 		if s != .cell
 			|| l = .editingfor
+			if l isa listview
 				l.TryRenameCellTo(.cell, s)
 		.Clear(focus)
 	
@@ -69,26 +71,29 @@ struct InlineEditor
 	function Clear (|bool| Focus=true)
 		.NeedsHide = false
 		.cell = nil
-		|| s = .SearchingFor 
-		if s
+		|| s = .editingfor 
+		if s isa listview
 			sdlapp.LastSearch = .editor.text
 			if focus
 				s.setfocus
 		with .editor
 			.visible = false
 			.text = ""      // wants new
-		with .editingfor
-			.isediting = false
+		if s isa listview
+			s.isediting = false
 			if focus
-				.setfocus
+				s.setfocus
 		.EditingFor = nil
-		.searchingfor = nil
 	
 	
 	function Edit (|ListViewCell| r, |ListView| l)
 		opt norefcounts
 		sdlapp.touch(.editor)
-		l := .editingfor
+		if !l
+			|| l2 = .editingfor
+			if l2 isa listview
+				l = l2
+			
 		debug_require l and r
 		with .editor
 			.FinishEditing(false)
@@ -103,12 +108,6 @@ struct InlineEditor
 		.cell = r
 		.EditingFor = l
 	
-	
-	function For (|Guicontrol|)
-		if .editingfor
-			return .editingfor
-		return .searchingfor
-
 
 function guicontrol.Inline (|&InlineEditor|)
 	opt norefcounts
@@ -141,7 +140,7 @@ function GuiControl.OpenSearch (|bool|)
 
 function GuiControl.OpenSearchSub (|bool|)
 	|| e	= .inline
-	|| FOR	= e.for
+	|| FOR	= e.editingfor
 	require for != self
 	 
 	if for
@@ -152,7 +151,7 @@ function GuiControl.OpenSearchSub (|bool|)
 		sdlapp.LastSearch := .seltext
 	
 	|| f = e.editor
-	e.searchingfor = self
+	e.editingfor = self
 	self <~ f
 	debug_require !(self isa window)
 	f.size = 115~left  by  15~down to the~top

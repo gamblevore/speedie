@@ -95,19 +95,28 @@ class Window (GUIControl)
 		.SetFocus(value)
 	
 	
-	function SetFocus (|guicontrol| Focus)
+	helper SetFocus (|guicontrol| Focus)
 		|| old = .focus
 		require (old != focus)
+		|| NotChanged = false
+		|| t = .inline
 		if focus
 			require focus.Takesfocus.able and (focus is visible)
+			if focus == t.editor
+				NotChanged = true
+			  elseif focus == t.editingfor and old == t.editor
+				notchanged = true
 
 		.focus = focus
 		.FocusWasSet = true // for stop mousedown bug
 		sdlapp.touch(Self)
-		old.__LostFocus__?
+
+		if old
+			old.__LostFocus__(NotChanged)
+
 		.alphafader = 0
 		if focus
-			focus.__GotFocus__
+			focus.__GotFocus__(NotChanged)
 			if .parent and focus isnt drawsfocus
 				.alphafader = date()
 		sdlapp.UpdateTextFocus(self)

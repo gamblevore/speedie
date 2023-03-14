@@ -70,10 +70,12 @@ class GUIControl (ringtree)
 	virtual PostLoad
 		0
 	virtual Copy
-	virtual GotFocus
-		(.OnFocus)(self, 1)?
-	virtual LostFocus
-		(.OnFocus)(self, 0)?
+	virtual GotFocus (|bool| NotReallyGained)
+		if !NotReallyGained
+			(.OnFocus)(self, 1)?
+	virtual LostFocus (|bool| NotReallyLost)
+		if !NotReallyLost
+			(.OnFocus)(self, 0)?
 	virtual AppForegroundChanged (|bool| IsForeGround)
 		0
 	
@@ -315,7 +317,7 @@ class GUIControl (ringtree)
 		|| f = w.focus$
 		if self == f 
 			return true
-		return self == .inline.For
+		return self == .inline.editingfor
 
 
 	helper DrawFocus (|image| where)

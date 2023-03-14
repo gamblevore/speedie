@@ -97,22 +97,22 @@ class TextView (GUIControl)
 		return .ClickedScrollbar(P, Clicks, .slh, .ScrollDrawTimer)
 			
 		
-	behaviour lostfocus
+	behaviour LostFocus
 		.isinline.clear(False)?
 		
 		ifn .KeepUndosOnLoseFocus
 			.document = nil
-		super.lostfocus
+		super.lostfocus(notreallylost)
 
 
-	behaviour gotfocus
+	behaviour GotFocus
 		if .isinline or .singleline
 			.sel = .text.length
 		.clearfound
-		super.gotfocus
+		super.gotfocus(notreallygained)
 
 
-	behaviour mousewheel
+	behaviour MouseWheel
 		if (self is editable or AlwaysScrollable) and !.singleline
 			.StartLine = .StartLine.move(-p.y)
 			return true
@@ -404,7 +404,7 @@ class TextView (GUIControl)
 			return true
 
 
-	helper sanity
+	helper Sanity
 		opt norefcounts
 		target false
 			for p in .lines
@@ -529,7 +529,7 @@ class TextView (GUIControl)
 	
 	behaviour Search
 		|| inl = .IsInline
-		if inl and inl.SearchingFor
+		if inl and inl.editingfor
 			.AcceptEditing(false)
 			return true
 		if JustUpdate
@@ -548,7 +548,7 @@ class TextView (GUIControl)
 			require range.x >= 0
 		
 		.sel2(range, nil)
-		.ViewPos(range.x, .MaxVisibleLines/2, 2) //inviewback
+		.ViewPos(range.x, .MaxVisibleLines/2, 2) // inviewback
 		return true
 			
 	
@@ -959,7 +959,7 @@ class TextView (GUIControl)
 			|| c = it.cell
 			|| lv = it.editingfor
 			it.FinishAndClear(focus)
-			if focus and c and lv // try next tab
+			if focus and c and lv isa listview // try next tab
 				c = c.tab(!keys.shift, lv)
 				lv.startRenameCell(c)
 					
@@ -1338,7 +1338,7 @@ class TextView (GUIControl)
 	
 	helper HasInline (|bool|)
 		opt norefcounts
-		return .inline$.for == self
+		return .inline$.editingfor == self
 
 
 	helper FoundInfo (|ivec2|m, |int| Pos, |bool|sec, |bool|)
@@ -1770,30 +1770,43 @@ class TextView (GUIControl)
 	helper TextPaste (GUIPasteEvent)
 		if (self is editable) and (purpose & copypasteflags.PasteTextLike)
 			if data > 1
-				.undochecker = -1
+				.UndoChecker = -1
 			.insert(data)
 			return true
 
 
 	helper FindExpectsParse (|int|)
-		if .expectsparse
-			if .ExpectsParse >= definitelyjeebox
+		if .ExpectsParse
+			if .ExpectsParse >= AlwaysJeebox
 				return .ExpectsParse
 			if .text.HasWord("<?jb?>") or .text.hasword("//jb")
-				return definitelyjeebox
-			return .expectsparse
+				return currentlyjeebox
+			return .ExpectsParse
 
-	helper isjeeboxmode (|bool|)
+	helper IsJeeboxMode (|bool|)
 		return .FindExpectsParse >= probablyjeebox
 
-
+	function GuessExpectsParse
+		|| mode = .expectsparse
+		require mode == AllowJeebox or ProbablyJeebox or CurrentlyJeebox
+		mode = AllowJeebox
+		|| d = .document
+			|| ext = d.Location.ext
+			if ext ~= "spd" or "box" or "jbin" or "xml" or "jb" // i wanna debug my xml code
+				mode = CurrentlyJeebox
+			  elseif ext ~!= "todo" and "txt"
+				mode = ProbablyJeebox // this seems wrong
+		.expectsparse = mode
+	
+	
 	flags
 		NotRoot = 0x800
 	constants
 		NotJeebox = 0
 		AllowJeebox
 		ProbablyJeebox
-		DefinitelyJeebox
+		CurrentlyJeebox
+		AlwaysJeebox
 
 	module
 		|| csAntiWords		= makeanti()
