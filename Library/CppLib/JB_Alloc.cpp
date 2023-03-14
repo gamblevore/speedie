@@ -25,7 +25,7 @@
 extern "C" {
 
 int RefTrap = 0;
-bool DoTotalMemoryTest;
+bool DoTotalMemoryTest=true;
 
 inline void failed(const char* c) {
 	printf("jbmem error: %s\n", c);
@@ -59,20 +59,6 @@ struct SuperBlock {
     void*                   BlockEnd;
 };
 
-
-struct AllocationBlock {
-    JB_MemoryLayer*         Owner;      // these two...
-    FreeObject*             FirstFree;  // have to be first...
-    AllocationBlock*        Next;
-    AllocationBlock*        Prev;
-    JBObject_Behaviour*     FuncTable; // speed things up a bit.
-    u16                     ObjCount;
-    u16                     HiddenObjCount;
-
-    u16                     ObjSize;
-    u16                     Unused_;
-    SuperBlock*             Super;		// seems like this takes 56 bytes on x64
-};
 
 
 struct JBAllocTable {       // for pretending to be realloc. (we aren't)
@@ -109,9 +95,7 @@ static bool IsDummy( const AllocationBlock* Block ) {
     return OwnersDummy == Block;
 }
 static fpDestructor GetDestructor_(AllocationBlock* B) {
-	if (B->FuncTable) // fix this...
-		return (fpDestructor)(B->FuncTable->__destructor__);
-	return 0;
+	return (fpDestructor)(B->FuncTable->__destructor__);
 }
 
 
@@ -140,6 +124,7 @@ JB_Class JBClassInit(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
         MemoryManager.Alignment      = 4;
         MemoryManager.SpareTrigger   = 0.75f;
     }
+
     Cls.Name = Name;
     Cls.Parent = Parent;
     Cls.FuncTable = b;
@@ -209,12 +194,14 @@ char* BlockStart_(AllocationBlock* B) {
 }
 
 
+void BlockIsFreeMark (JB_Object* self) {};
 
 u64 JB_MemCount() {
     JB_MemoryWorld* World = JB_MemStandardWorld();
     return (u64)( JB_MemoryStats(World, false, 0).Blocks ) << World->BlockSize;
 }
 
+JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 
 #if !JBTestSanityOK
 	#define TestMemory_(x)
@@ -243,10 +230,9 @@ u64 JB_MemCount() {
 	}
 
 
-	JBObject_Behaviour SuperSanityTable = {(void*)JB_MemCount, 0};
 
 	static bool FreeBlock_(AllocationBlock* B) {
-		return (GetDestructor_(B) == (fpDestructor)JB_MemCount);
+		return (GetDestructor_(B) == BlockIsFreeMark);
 	}
 
 
@@ -299,15 +285,6 @@ u64 JB_MemCount() {
 		}
 	}
 
-	void FSDebug() {
-		extern JB_Class FastStringData;
-		extern JB_Object* TheSharedFastString;
-		if (TheSharedFastString)
-			if (TheSharedFastString->RefCount > 100)
-				debugger;
-		TestMemory_(FastStringData.DefaultBlock);
-	}
-
 	static bool IsBadFree_(AllocationBlock* Curr) {
 		if (Curr->Prev) {
 			failed("corrupt2");
@@ -319,7 +296,7 @@ u64 JB_MemCount() {
 			return true;
 		}
 		fpDestructor D = GetDestructor_(Curr);
-		if (D != (fpDestructor)JB_MemCount) {
+		if (D != BlockIsFreeMark) {
 			failed("corrupt4");
 			return true;
 		}
@@ -333,7 +310,7 @@ u64 JB_MemCount() {
 		AllocationBlock* Curr = First;
 		do {
 			fpDestructor D = GetDestructor_(Curr);
-			if (D == (fpDestructor)JB_MemCount) {
+			if (D == BlockIsFreeMark) {
 				failed("corrupt5");
 				return -1;
 			}
@@ -371,7 +348,7 @@ u64 JB_MemCount() {
 		AllocationBlock* Curr = StartBlock_(Sup);
 		AllocationBlock* Finish = EndBlock_(Sup);
 		while (Curr < Finish) {
-			if (GetDestructor_(Curr) != (fpDestructor)JB_MemCount) {
+			if (GetDestructor_(Curr) != BlockIsFreeMark) {
 				IsBadInUse_(Curr);
 			} else {
 				TestMemory_(Curr);
@@ -385,7 +362,7 @@ u64 JB_MemCount() {
 		AllocationBlock* F = Sup->FirstBlock;
 		AllocationBlock* Curr = F;
 		while (Curr) {
-			if (GetDestructor_(Curr) != (fpDestructor)JB_MemCount) {
+			if (GetDestructor_(Curr) != BlockIsFreeMark) {
 				failed("corrupt9");
 			}
 			IsBadFree_(Curr);
@@ -606,12 +583,12 @@ Sanity(NewBlock);
 
 
 void JB_TotalMemorySet(bool b)  {
-	DoTotalMemoryTest=b;
+	DoTotalMemoryTest = b;
 }
 
-void JB_TotalMemorySanity() {
-	if (!DoTotalMemoryTest)
-		return;
+bool JB_TotalMemorySanity(bool Force) {
+	if (!Force and !DoTotalMemoryTest)
+		return true;
 	auto cls = AllClasses;
 	while (cls) {
 		TestMemory_(cls->DefaultBlock);
@@ -620,7 +597,7 @@ void JB_TotalMemorySanity() {
 	SuperBlock* Sup0 = MemoryManager.CurrSuper;
 	SuperBlock* Curr = Sup0;
 	if (!Curr) {
-		return;
+		return true;
 	}
 
 	do {
@@ -628,6 +605,7 @@ void JB_TotalMemorySanity() {
 		SanityOfFree(Curr);
 		Curr = Curr->Next;
 	} while (Curr and Curr != Sup0);
+	return true;
 }
 
 
@@ -664,7 +642,7 @@ Sanity(First->Next);
 // write the AllocationBlocks... at the end.
 static inline void SetupSuper_(SuperBlock* Super, JB_MemoryWorld* W) {
     AllocationBlock* Curr = StartBlock_( Super );
-    AllocationBlock* End =  EndBlock_( Super ); // end is too far, somehow. it's 4100K but we only allocated 4096K?
+    AllocationBlock* End =  EndBlock_( Super );
     int Size = 1 << W->BlockSize;
 
     Super->FirstBlock = Curr;
@@ -672,9 +650,7 @@ static inline void SetupSuper_(SuperBlock* Super, JB_MemoryWorld* W) {
     while (Curr < End) {
         AllocationBlock* Next = JBShift(Curr, Size);
         Curr->Super = Super;
-        #if CheckSanity
         Curr->FuncTable = &SuperSanityTable;
-        #endif
         Curr->Owner = 0; // for clearing
         Curr->Next = Next;
         Curr = Next;
@@ -791,7 +767,6 @@ void JB_OutOfMainMemory(int N) {
 
 
 bool JB_OutOfMemoryOccurred () {
-    // read by ErrorReceiver!
     return OutOfMemoryHappenedAlready;
 }
 
@@ -1050,9 +1025,7 @@ static void BlockFree_( AllocationBlock* FreeBlock ) {
         // return block to superblock
 
         FreeBlock->Prev = 0;
-        #if CheckSanity
         FreeBlock->FuncTable = &SuperSanityTable;
-        #endif
         FreeBlock->Next = Super->FirstBlock;
         Super->FirstBlock = FreeBlock;
         Sanity(FreeBlock->Next);
@@ -1189,7 +1162,7 @@ void JB_Mem_ClassLeakCounter () {
 
 
 static inline JB_Object* Trap_(FreeObject* Obj, AllocationBlock* B) {
-//	if (JB_ObjID((JB_Object*)Obj)==19456)
+//	if (JB_ObjID((JB_Object*)Obj)==123456)
 //		debugger;
 	ObjInBlock(Obj, B);
 	Obj->FakeRefCount = 0;
@@ -1198,28 +1171,25 @@ static inline JB_Object* Trap_(FreeObject* Obj, AllocationBlock* B) {
 
 
 __hot JB_Object* JB_Alloc2( AllocationBlock* CurrBlock ) {
-    FreeObject* Obj = CurrBlock->FirstFree;
+	Sanity(CurrBlock);
+    auto Obj = CurrBlock->FirstFree;
     if_usual ((IntPtr)Obj > 1) {
         CurrBlock->ObjCount++;
         CurrBlock->FirstFree = Obj->Next;
-        return Trap_(Obj, CurrBlock);
-    } else if ((IntPtr)Obj == 1) {
+        Obj->FakeRefCount = 0;
+		Sanity(CurrBlock);
+        return (JB_Object*)Obj;
+    }
+    if ((IntPtr)Obj == 1) {
 		return 0;// do some kinda burst-mode allocation for parsing jeebox
-	} else {
-		return Trap_(NewBlock( CurrBlock ), CurrBlock->Owner->CurrBlock);
 	}
+	
+	return Trap_(NewBlock( CurrBlock ), CurrBlock->Owner->CurrBlock);
 }
 
 
 __hot JB_Object* JB_Alloc( JB_MemoryLayer* Mem ) {
-    AllocationBlock* CurrBlock = Mem->CurrBlock;
-    FreeObject* Obj = CurrBlock->FirstFree;
-    if_usual (Obj) {
-        CurrBlock->ObjCount++;
-        CurrBlock->FirstFree = Obj->Next;
-        return Trap_(Obj, CurrBlock);
-    }
-    return Trap_(NewBlock( CurrBlock ), Mem->CurrBlock);
+    return JB_Alloc2( Mem->CurrBlock );
 }
 
 

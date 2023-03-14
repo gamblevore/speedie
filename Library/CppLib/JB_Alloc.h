@@ -127,6 +127,21 @@ struct JB_Object {
 };
 
 
+struct AllocationBlock {
+    JB_MemoryLayer*         Owner;      // these two...
+    FreeObject*             FirstFree;  // have to be first...
+    AllocationBlock*        Next;
+    AllocationBlock*        Prev;
+    JBObject_Behaviour*     FuncTable; // speed things up a bit.
+    u16                     ObjCount;
+    u16                     HiddenObjCount;
+
+    u16                     ObjSize;
+    u16                     Unused_;
+    SuperBlock*             Super;		// seems like this takes 56 bytes on x64
+};
+
+
 struct JB_MemoryLayer : JB_Object  { // is actually a JBObject... but a clang bug won't let me use "JBClass(JB_MemoryLayer..."
     u16                 HiddenRefCount;
     bool                IsActive;
@@ -138,7 +153,7 @@ struct JB_MemoryLayer : JB_Object  { // is actually a JBObject... but a clang bu
     
     JB_Object*          Obj;
     JB_Object*          Obj2;
-    DummyBlock          Dummy;
+    AllocationBlock     Dummy;
 }; 
 JBStructData (JB_MemoryLayer);
 
@@ -283,14 +298,13 @@ u32 JB_ObjCount();
     #define JBTestSanityOK 0
 #endif
 
-void JB_TotalMemorySanity();
+bool JB_TotalMemorySanity(bool Force);
 extern JB_Class ProcessData;
 
 
 inline JB_Object* JB_Incr_(JB_Object* self) {
     if (self) {
 		JBObjRefTest(self);
-		//JB_TotalMemorySanity();
         self->RefCount++;
     }
     return self;
@@ -299,7 +313,6 @@ inline JB_Object* JB_Incr_(JB_Object* self) {
 inline void JB_Decr(JB_Object* self) {
     if ( self ) {
 		JBObjRefTest(self);
-		//JB_TotalMemorySanity();
         int N = --self->RefCount; 
         if (!N)
             JB_Delete( (FreeObject*)self );
@@ -309,7 +322,6 @@ inline void JB_Decr(JB_Object* self) {
 inline JB_Object* JB_SafeDecr_(JB_Object* self) {
     if (self) {
 		JBObjRefTest(self);
-		//JB_TotalMemorySanity();
         self->RefCount--;
     }
     return self;
@@ -318,7 +330,6 @@ inline JB_Object* JB_SafeDecr_(JB_Object* self) {
 inline JB_Object* JB_FreeIfDead(JB_Object* self) {
     if (self) {
 		JBObjRefTest(self);
-		//JB_TotalMemorySanity();
         if (!self->RefCount) {
             JB_Delete( (FreeObject*)self );
         }
