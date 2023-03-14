@@ -18,8 +18,7 @@ class MessageView (ListView)
 	
 	
 	behaviour keydown
-		if key is delete
-			|| r = .sel
+		if key.isdelete
 			return true
 		rz = super.keydown(key)
 
