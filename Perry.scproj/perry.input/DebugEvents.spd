@@ -1,0 +1,80 @@
+
+
+function ReturnDebugArgs (GUIListEvent)
+	if row isnt editable
+		|| r = .AddRow
+		row.prev = r
+		(r is editable)
+		.Rename(r)
+		return true
+	  else
+		.Rename(row)
+
+
+function DebugArgsKeyDown (GUIKeyEvent)
+	opt norefcounts
+	if FoundListKeys(self, key)
+		return true
+	if key.IsAccept and self isa listview
+		return ReturnDebugArgs(self, .listsource.last)
+	if key.IsCancel
+		.window.setfocus(nil)
+		return true
+	
+	
+function FoundListKeys (GuiKeyEvent)
+	if key.IsDelete
+		if self isa ListView
+			|| s = .sel
+			if s is editable
+				.RemoveRow(s)
+		return true
+
+
+function DebugArgsGotFocus (guiaction)
+	|| v = state == 1
+	require (self is visible) != v
+	|| lv = self|listview|			// .DebugArgsList
+	|| i = .ide
+	|| f = i.DebugArgsFile #require
+	if v
+		|| list = f.ReadAll.parse|listviewrow|
+		lv.listsource = list
+		for s in list
+			(s is editable)
+		
+		|| L = list.msg(@str, "(Add Row...)")|listviewrow|
+		(L is AlignCenter)
+		lv.SelectFirst
+	  else
+		|| list = lv.listsource
+		|| l = list.last
+		if (l is aligncenter)
+			l.remove
+		f.SmartData = list.render
+		list <~ l
+	(self is visible) = v
+
+
+
+function ClickedDebug (GUIAction)
+	|| i = .ide	
+	i.DebugIsWaitingForCompile = true
+	i.compile("debug")
+
+
+function perryide.StartDebugging (|file| f)
+	require f.MustExist
+	|| args = .DebugArgsList.listsource.AllNames
+	if f.IsDir
+		f.Execute(args)
+	  else
+		f.launch(args)
+	// So... if this is a GUI app or somsething we can just run it
+	// its a terminal... we need to run this in the external terminal
+
+
+function PressingDebug (GUIAction)
+	|| d = .ide.DebugArgsList
+	DebugArgsGotFocus(d, 1)
+	d.SetFocus

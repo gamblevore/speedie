@@ -42,29 +42,6 @@ function PerryIDE.CreateProj (|file| proj)
 	IdeAddProj(proj)
 
 
-function DebugArgsGotFocus (guiaction)
-	|| lv = self|listview| // .debugargslist
-	|| i = .ide
-	|| f = i.DebugArgsFile #require
-	|| v = state == 1
-		|| list = f.ReadAll.parse|listviewrow|
-		lv.listsource = list
-		for s in list
-			(s is editable)
-		
-		|| L = list.msg(@str, "(Add Row...)")|listviewrow|
-		(L is AlignCenter)
-		lv.SelectFirst
-	  else
-		|| list = lv.listsource
-		|| l = list.last
-		if (l is aligncenter)
-			l.remove
-		f.SmartData = list.render
-		list <~ l
-	(self is visible) = v
-
-
 function ClickedOpenProj (GUIaction)
 	|| start		= "~/".Resolve.Child("Speedie")
 	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project")	#require
@@ -111,7 +88,7 @@ function PressingTabs (guiaction)
 		|| p = .submenu
 		|| ide = row.obj
 		if ide isa PerryIDE
-			p.listsource.clear
+			p.ListSource.clear
 			|| name = ide.Project.name
 			p <~ ( "Copy " + name, MenuCopyProject, ide)
 			p <~ ("Show Project", MenuShowProject, ide)
@@ -198,36 +175,12 @@ function HeldReleaseButton (GUIaction)
 
 
 function ClickedRelease (GUIaction)
-	debugat
 	return false
 	|| name = .tag
 	if name isa string
 		.ide.compile("compile", name)
 	  else
 		beep
-
-
-function ClickedDebug (GUIAction)
-	|| i = .ide	
-	i.DebugIsWaitingForCompile = true
-	i.compile("debug")
-
-
-function perryide.StartDebugging (|file| f)
-	require f.MustExist
-	|| args = .DebugArgsList.listsource.AllNames
-	if f.IsDir
-		f.Execute(args)
-	  else
-		f.launch(args)
-	// So... if this is a GUI app or somsething we can just run it
-	// its a terminal... we need to run this in the external terminal
-
-
-function PressingDebug (GUIAction)
-	|| d = .ide.DebugArgsList
-	(d is visible)
-	d.setfocus
 
 
 function fnBuildIsDead (fnConfirmCanceller)
@@ -272,7 +225,7 @@ function ReturnAllFuncs (GUIListEvent)
 	return true
 
 	
-function buttonview.FillMenuPath (|string| L, |listviewrow| row=nil)
+function ButtonView.FillMenuPath (|string| L, |listviewrow| row=nil)
 	opt norefcounts
 	|| p = .submenu
 	|| orig = l
@@ -504,11 +457,6 @@ function EditMeSelError (GUITextErrorSelected)
 	el.select(error.error)
 	i.DuringMsgFB = false
 
-
-function PressedDebugArgsKeys (GUIKeyEvent)
-	if key is ESCAPE
-		.window.SetFocus(nil)
-		return true
 	
 	
 function PressedEditKeys (GUIKeyEvent)
@@ -600,32 +548,6 @@ function ReturnErrorList (GuiListEvent)
 	.select(row)
 	.ide.editme.setfocus
 	return true
-
-
-function ReturnDebugArgs (GUIListEvent)
-	if row isnt editable
-		|| r = .AddRow
-		row.prev = r
-		(r is editable)
-		.Rename(r)
-		return true
-	  else
-		.Rename(row)
-
-
-function DebugArgsKeyDown (GUIKeyEvent)
-	opt norefcounts
-	if FoundListKeys(self, key)
-		return true
-	if key is RETURN and self isa listview
-		return ReturnDebugArgs(self, .listsource.last)
-	
-	
-function FoundListKeys (GuiKeyEvent)
-	if key.isdelete
-		if self isa listview
-			.removerow(.sel)
-		return true
 
 
 function SelectedFile (GuiListevent)
