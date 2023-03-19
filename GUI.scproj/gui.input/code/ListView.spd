@@ -242,7 +242,8 @@ class ListView (GUIControl) {
 
 	function InlineCell (|bool| always = false, |&InlineEditor|)
 		opt norefcounts
-		|| t = &.window$.inlineeditor
+		|| w = .window$
+		|| t = w.inline
 		if always or (self == T.editingfor)
 			return t
 
@@ -473,10 +474,9 @@ class ListView (GUIControl) {
 		
 		
 	behaviour LostFocus
-		if !notreallylost
-			.InlineCell.clear(false)?
-			.clearinternaldrops
-			super.lostfocus(notreallylost)
+		.InlineCell.clear(false)?
+		.clearinternaldrops
+		super.lostfocus
 	
 	
 	function SlideScroll (assigns:|listviewrow|r)

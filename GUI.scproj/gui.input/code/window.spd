@@ -7,14 +7,14 @@ class Window (GUIControl)
 	|bool|							AlphaSubtle
 	|bool|							NoDrawBackground
 	|GUIControl|					Focus   // For multi-windows?
-	|Menu|							OpenedMenu
-	|Guicontrol|					MenuOpener
+	|Guicontrol|					InnerFocus
+//	|Guicontrol|					MenuOpener
 	|GUIControl|					CurrMouseDown
 	|GuiControl--|					SelBeforeMouseDown
 	|guicontrol--|					ToolTipControl // probably better to remove this
 	|guicontrol--|					DroppingInto
 	|guicontrol--|					MouseIsOver
-	|InlineEditor|					InlineEditor
+	|InlineEditor|					InlineEditorPlace
 	|GUIPasteEvent|					OnPaste
 	|GUICopyEvent|					OnCopy
 	|GUIMouseMoveEvent|				OnMouseMove
@@ -30,7 +30,7 @@ class Window (GUIControl)
 		super.constructor(nil)
 		.createddate = date.now
 		.size = the~area
-		.inlineeditor.init(self)
+		.inlineeditorplace.init(self)
 		.show
 
 	
@@ -60,12 +60,20 @@ class Window (GUIControl)
 	helper Reflow
 		opt norefcounts
 		|| p = .parent ?? window.all
-		if self ~= "confirm"
 		.reflow(self, p)
 	
+	helper RealFocus (|guicontrol|)
+		opt norefcounts
+		return .innerfocus ?? .focus
 
 	setter OpenedMenu (|menu|)
 		.setmenu(value)
+
+	function OpenedMenu (|menu|)
+		opt norefcounts
+		|| f = .InnerFocus
+		if f isa menu
+			return f 
 
 
 	function SetMenu (|menu| m)
@@ -94,33 +102,45 @@ class Window (GUIControl)
 	setter focus (|guicontrol|)
 		.SetFocus(value)
 	
-	
-	helper SetFocus (|guicontrol| Focus)
-		|| old = .focus
-		"focussing ${focus}"
-		require (old != focus)
-		|| NotChanged = false
-		|| t = .inline
-		if focus
-			require focus.Takesfocus.able and (focus is visible)
-			if focus == t.editor  and  old contains focus
-				NotChanged = true
-			  elseif focus == t.editingfor  and  old == t.editor
-				notchanged = true
 
-		.focus = focus
+	helper SetInnerFocus (|guicontrol| Focus)
+		|| old = .InnerFocus
+		if old != Focus
+			.InnerFocus = focus
+			.finishfocus(focus)
+			focus.__GotFocus__?
+			old.__LostFocus__?
+
+
+	helper FinishFocus (|guicontrol| focus)
+		if focus and .parent and focus isnt drawsfocus
+			.alphafader = date()
+		  else
+			.alphafader = 0
+		
 		.FocusWasSet = true // for stop mousedown bug
+		sdlapp.UpdateTextFocus(self)
 		sdlapp.touch(Self)
 
-		if old
-			old.__LostFocus__(NotChanged)
 
-		.alphafader = 0
+	helper SetFocus (|guicontrol| Focus)
+		if focus == .inlineeditor
+			.setInnerFocus(focus)
+			return
+		
+		
+		.setinnerfocus(nil)
+		require (.focus != focus)
 		if focus
-			focus.__GotFocus__(NotChanged)
-			if .parent and focus isnt drawsfocus
-				.alphafader = date()
-		sdlapp.UpdateTextFocus(self)
+			require focus.Takesfocus.able and (focus is visible)
+		
+		|| old = .focus
+		.focus = focus
+
+		focus.__GotFocus__?
+		old.__LostFocus__?
+		
+		.FinishFocus(focus)
 
 
 	syntax is (|guicontrolflags| F, assigns:|bool|)
@@ -137,12 +157,11 @@ class Window (GUIControl)
 			if t isa textview
 				return t.TryColorise
 
-		|| F = .focus
+		|| F = .realfocus
 		|| menu = .openedmenu
 			if menu isnt typethrough
 				if key isnt tab
 					return menu.__keydown__(key)
-				F = .MenuOpener
 				menu.CloseMenu
 				
 			  elseif key isnt tab
@@ -191,7 +210,7 @@ class Window (GUIControl)
 			it.DrawOof(Where)
 		
 		where.ControlClip = self
-		.inline.DrawFocus(where)
+		.inline.DrawInline(where)
 		where.whset
 		
 
@@ -304,25 +323,32 @@ class Window (GUIControl)
 	function DoMouseDown (|ivec2| P, |int| Clicks, |guicontrol|)
 		.SelBeforeMouseDown = .focus
 		|| M = .openedmenu 
-			|| O = .MenuOpener
+			|| O = .focus
 			if (m contains p) and (m is enabled)
 				SdlApp.CanDrag = M.__mousedown__(p, clicks)
 				return m
 			
 			m.CloseMenu
 			|| R = self[p]
-			require r  and  r is opensmenu and  r != O
+			require  r  and  r is opensmenu  and  r != O
 		
 		.FocusWasSet = false
-		|| aww = .ControlAt(p.point, 0, true)
-		if aww != nil and window.all
-			|| clicks2 = aww.__MouseDown__(p, clicks)
+		|| Found = .ControlAt(p.point, 0, true)
+		if Found and window.all
+			|| clicks2 = Found.__MouseDown__(p, clicks)
 				SdlApp.CanDrag = clicks2
 				if !.FocusWasSet
-					.setfocus(aww)
-				return aww
+					.setfocus(Found)
+				return Found
 
-
+	function Guicontrol.ClearFocus
+		opt norefcounts
+		if .hasfocus
+			.window.clearfocus
+	
+	function ClearFocus
+		.setfocus(nil)
+	
 	behaviour MouseWheel
 		opt norefcounts
 		|| it = .openedmenu

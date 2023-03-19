@@ -8,9 +8,10 @@ struct InlineEditor
 	|Guicontrol|		EditingFor
 	|bool|				NeedsHide
 	
-	function DrawFocus (|image|where)
+	function DrawInline (|image|where)
 		opt norefcounts
-		|| g = .editingfor
+		|| g = .editor
+		if g is visible
 			g.drawfocus(where)
 	  
 	
@@ -39,11 +40,11 @@ struct InlineEditor
 	
 	
 	function Accept (|string| s, |bool| hide)
-		if .editingfor
+		if .editingfor isa textview
 			.AcceptSearch(s)
 			if hide
 				.clear
-		  else
+		  elseif .editingfor isa listview
 			.finishandclear
 	
 	
@@ -112,10 +113,13 @@ struct InlineEditor
 		return true
 	
 
-function guicontrol.Inline (|&InlineEditor|)
+function window.Inline (|&InlineEditor|) // avoid getting the struct itself
 	opt norefcounts
-	|| w = .window
-		return &w.inlineeditor
+	return &.inlineeditorplace
+
+function window.InlineEditor (|guicontrol|)
+	opt norefcounts
+	return .inlineeditorplace.editor
 
 
 function GuiControl.CanSearch (|bool|)
@@ -142,7 +146,7 @@ function GuiControl.OpenSearch (|bool|)
 
 
 function GuiControl.OpenSearchSub (|bool|)
-	|| e	= .inline
+	|| e	= .window.inline
 	|| FOR	= e.editingfor
 	require for != self
 	 

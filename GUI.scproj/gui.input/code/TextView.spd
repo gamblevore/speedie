@@ -102,14 +102,14 @@ class TextView (GUIControl)
 		
 		ifn .KeepUndosOnLoseFocus
 			.document = nil
-		super.lostfocus(notreallylost)
+		super.lostfocus
 
 
 	behaviour GotFocus
 		if .isinline or .singleline
 			.sel = .text.length
 		.clearfound
-		super.gotfocus(notreallygained)
+		super.gotfocus
 
 
 	behaviour MouseWheel
@@ -938,9 +938,10 @@ class TextView (GUIControl)
 		
 	helper IsInline (|&InlineEditor|)
 		opt norefcounts
-		|| t = .Inline
-		if t and self == T.editor
-			return t
+		|| w = .window
+			|| t = w.Inline
+			if self == T.editor
+				return t
 	
 	
 	helper FinishEditing (|bool| Focus=true, |bool|)
@@ -1327,7 +1328,8 @@ class TextView (GUIControl)
 	
 	helper HasInline (|bool|)
 		opt norefcounts
-		return .inline$.editingfor == self
+		|| w = .window
+			return w.inline.editingfor == self
 
 
 	helper FoundInfo (|ivec2|m, |int| Pos, |bool|sec, |bool|)

@@ -94,7 +94,7 @@ class Menu (ListView)
 		|| win = .window					#require
 		win.inline.clear
 		win.setmenu(self)
-		win.menuopener = owner
+		win.InnerFocus = owner
 		is visible
 		._Scroll = nil
 		.SelectFirst
@@ -116,7 +116,7 @@ class Menu (ListView)
 		.EditingRow = nil
 		if .isopenedmenu
 			.window.setmenu(nil)
-			.window.menuopener = nil
+			.window.InnerFocus = nil
 
 	
 	function DoReturn (|bool|)

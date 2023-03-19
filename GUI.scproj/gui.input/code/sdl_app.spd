@@ -436,32 +436,31 @@ module SDLApp
 
 	function Window.EveryFrame
 		opt norefcounts
-		|| f = .focus$
-		if f isnt visible
-			if f == .inline.editor
-				.setfocus(.inline.editingfor)
-			else
-				.setfocus(nil)
+		|| f = .realfocus$
 		if !sdlapp.isbackground and (f isa textview)
 			if f is editable and (sdlapp.FlashSelector != sdlapp.LastFlashSelector)
 				sdlapp.touch(f)
+		if f isnt visible
+			if f == .innerfocus
+				.setinnerfocus(nil)
+			  else
+				.clearfocus
 
 	
-	function UpdateTextFocus (|window|w)
+	function UpdateTextFocus (|window| w)
 		opt norefcounts
-		|| NeedsInput = false
-		|| f = w.focus
-		if (f isa textview)
-			|| menu = w.openedmenu
-			if !menu or menu is typethrough 
-				needsinput = f is editable
-			
-		require sdlapp.TextInputEnabled != needsinput
-		sdlapp.TextInputEnabled = needsinput
-		if NeedsInput
-			sdlapp.sdl_starttextinput
+		|| f = w.innerfocus
+		if (f isa menu) and (f is typethrough)
+			f = nil
+		f := w.focus			
+		require f
+		|| allow = f is editable
+		require .TextInputEnabled != allow
+		.TextInputEnabled = allow
+		if allow
+			.sdl_starttextinput
 		  else
-			sdlapp.sdl_stoptextinput
+			.sdl_stoptextinput
 		
 			
 	function PreframeText (|window| W)
@@ -487,7 +486,6 @@ module SDLApp
 		if .FixScreenBug.Fired
 			.BumpSize
 			
-			
 		if !stderr.ok
 			notifications <~ stderr.pop
 			stderr.clear
@@ -499,7 +497,7 @@ module SDLApp
 		.UpdateTextFocus(W)
 		.PreFrameText(w)
 		
-		|| ed = &w.inlineeditor
+		|| ed = w.inline
 		if ed.needshide
 			ed.clear
 
@@ -507,6 +505,7 @@ module SDLApp
 			.touch
 			w.DoMouseDrag(.MouseXY, true)
 			return kactivity
+	
 	
 	function MouseDownRepeatOK (|bool|)
 		require (.CanDrag >= 3) and (.MouseButtons is left)
@@ -857,7 +856,7 @@ module SDLApp
 			|| dw = w.Click(b.button, b.clicks, xy)	
 			|| foc = w.Focus
 			if foc and foc.ClickOutsideCloses and (foc!=w.CurrMouseDown)
-				w.Focus = nil
+				w.clearfocus
 			  
 			return kActivity
 
@@ -920,9 +919,10 @@ module SDLApp
 
 		  elseif  t is TEXTINPUT
 			|| e = ev.Editing
-			if !.AllowTyping or .CanDrag >= 2
+			|| allow = .AllowTyping
+			if !allow or .CanDrag >= 2
 				return kNothing
-			|| tv = w.focus
+			|| tv = w.RealFocus
 			if tv isa textview
 				tv.TypedRaw(e.str)
 			return kActivity

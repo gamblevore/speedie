@@ -18,7 +18,7 @@ function DebugArgsKeyDown (GUIKeyEvent)
 	if key.IsAccept and self isa listview
 		return ReturnDebugArgs(self, .listsource.last)
 	if key.IsCancel
-		.window.setfocus(nil)
+		.window.clearfocus
 		return true
 	
 	
@@ -43,7 +43,7 @@ function DebugArgsGotFocus (guiaction)
 		for s in list
 			(s is editable)
 		
-		|| L = list.msg(@str, "(Add Row...)")|listviewrow|
+		|| L = list.msg(@str, "(Add Command Line Arg...)")|listviewrow|
 		(L is AlignCenter)
 		lv.SelectFirst
 	  else

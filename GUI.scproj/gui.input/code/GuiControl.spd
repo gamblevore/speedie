@@ -73,12 +73,10 @@ class GUIControl (ringtree)
 	virtual PostLoad
 		0
 	virtual Copy
-	virtual GotFocus (|bool| NotReallyGained)
-		if !NotReallyGained
-			(.OnFocus)(self, 1)?
-	virtual LostFocus (|bool| NotReallyLost)
-		if !NotReallyLost
-			(.OnFocus)(self, 0)?
+	virtual GotFocus
+		(.OnFocus)(self, 1)?
+	virtual LostFocus
+		(.OnFocus)(self, 0)?
 	virtual AppForegroundChanged (|bool| IsForeGround)
 		0
 	
@@ -156,7 +154,7 @@ class GUIControl (ringtree)
 	
 	syntax is (|guicontrolflags|F, assigns:|bool|)
 		require ((.state&f)!=0) != value
-		//if self ~= "inline_editor"
+		
 		if value
 			.state |= f
 		  else
@@ -268,7 +266,7 @@ class GUIControl (ringtree)
 	
 	syntax equals (|string| s, |bool| aware, |bool|)
 		if self
-			return .id.syntaxequals(s, true)
+			return .id.syntaxequals(s, aware)
 
 	operator Contains (|ivec2| p, |bool|)
 		return .lastrect.contains(p)
@@ -315,12 +313,8 @@ class GUIControl (ringtree)
 
 	function HasFocus (|bool|)
 		opt norefcounts
-		
-		|| w = .window$
-		|| f = w.focus$
-		if self == f 
-			return true
-		return self == .inline.editingfor
+		|| w = .window
+			return self == w.realfocus 
 
 
 	helper DrawFocus (|image| where)
