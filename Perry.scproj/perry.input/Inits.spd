@@ -76,7 +76,7 @@ extend PerryIDE
 			.ClickOutsideCloses = true
 			.OnFocus = DebugArgsGotFocus
 			.gnormal.solid  = (0.0, 0.0, 0.0, 0.7)
-			.gnormal.edge = (1.0, 1.0, 1.0, 0.7)
+			.gnormal.edge = (0.0, 0.0, 0.0, 0.125)
 			.OnKeyDown = DebugArgsKeyDown
 			.EnableDrag
 
@@ -463,10 +463,11 @@ extend PerryIDE
 		f.checksize
 
 
-	function DesiredStart (|filerow| projfol, |filerow|)
+	function DesiredStart (|filerow| projfol, |&int| pos,  |filerow|)
 		opt norefcounts
-		with .projmsg..edit.nyme
-			return self.filelist[it]
+		|| edit = .ProjMsg["edit"]
+			*pos = .ProjMsg["pos"].int
+			return self.filelist[edit.nyme]
 		|| tod = .nottodo
 			return tod
 		return projfol
@@ -478,7 +479,10 @@ extend PerryIDE
 			projfol.dirfile = ".todo"
 			.findnottodo
 			(projfol is expanded)
-			.EditRow(.DesiredStart(projfol))
+			|| pos = 0
+			|| file = .DesiredStart(projfol, pos)
+			.EditRow(file)
+			.EditMe.Sel = pos
 		  else
 			.EditRow(.filelist.start)
 

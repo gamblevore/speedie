@@ -129,6 +129,7 @@ module Perry
 			old = .projects.msg(@tmp, path)
 			old.msg(@str, path.TrimProj)
 			old["edit"] = ""
+			old["pos"] = ""
 
 		|| name = old.first.name.ProjCleanName
 		old.first.name = name

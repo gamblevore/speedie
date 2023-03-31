@@ -1,6 +1,6 @@
 
 
-class PerryIDE (Window)
+class PerryIDE (Window) 
 	linkage: cpp_part IDE
 	|Process|					Feedback
 	|Process|					compilr
@@ -581,9 +581,10 @@ class PerryIDE (Window)
 		|| Loaded =  E.LoadDocument(doc)
 		.ListAllFuncs
 		require Loaded
-		if !.isloading
-			|| it = .projmsg
-				it..edit = r.location
+		|| it = .projmsg
+			if !.isloading
+				it["edit"] = r.location
+			it["pos"] = doc.Position
 		.filelist.select(r)
 		e.ClearErrors
 		.LoadErrors(true, false)
