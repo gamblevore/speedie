@@ -1,12 +1,6 @@
 
 
-extend String 
-	function Chunk (|int| n, |[String]|)
-		|| i = 0
-		while i < .length
-			rz <~ self[i, i+n]
-			i += n
-		
+extend String 		
 	helper CompressIntoSub (|jbin| j, |&compressionstats| st) 
 		st := CompressionStats.All
 		st.len(j.length)
