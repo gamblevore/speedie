@@ -1,0 +1,54 @@
+
+
+struct FlowPart
+	|FastBuff|			Buff
+	|stringstream|		Read
+	|faststring| 		Write
+	|CompressionStats|	Stats
+	
+	function init (|string| path, |string| ext, |bool|)
+		.write = path.AddExt(ext + ".tmp").file.Writer #require
+		.read = path.AddExt(ext).file.StreamIn
+		return .buff.Alloc(1MB)
+
+	function Flush
+		if .buff.curr >= .buff.end
+			.buff.CompressInto(.write, .stats)
+			.buff.Curr = .buff.start
+	
+	function Test (|uint| Expected, |int| Bytes)
+		opt norefcounts
+		|| r = .read
+			|| Found = r.uint(bytes)
+			if Found != Expected
+				"Flow Control differs here: ${app.StackTrace}"
+				debugger 
+
+
+
+
+class FlowControl
+	|FlowPart| 			Bits
+	|FlowPart| 			Loops
+	|bool| 				OK
+	|uint16| 			LoopCount
+	
+	constructor (|string| Path)
+		.ok = .loops.init(path, ".w") and .bits.init(path, ".b")
+
+	function While (|bool| value, |bool|)
+		if value
+			.LoopCount++
+			return true
+	
+		|| c = .LoopCount
+		.LoopCount = 0
+		.Loops.buff <~ c
+		.loops.Test(c, 2)
+		.loops.flush
+
+	function Cond (|bool| value)
+		.bits.buff <~ value|byte|
+		.bits.Test(value|uint|, 1)
+		.bits.Flush
+
