@@ -93,8 +93,7 @@ class Menu (ListView)
 	function ShowMenu (|guicontrol| Owner)
 		|| win = .window					#require
 		win.inline.clear
-		win.setmenu(self)
-		win.InnerFocus = owner
+		win.openedmenu = self
 		is visible
 		._Scroll = nil
 		.SelectFirst
@@ -115,7 +114,7 @@ class Menu (ListView)
 		isnt visible
 		.EditingRow = nil
 		if .isopenedmenu
-			.window.setmenu(nil)
+			.window.openedmenu = (nil)
 			.window.InnerFocus = nil
 
 	
