@@ -695,12 +695,15 @@ module SDLApp
 
 	function AllowKeyDown (|&SDL_KeySym| Ev, |bool|)
 		opt norefcounts
-		if !.TextInputEnabledAtStart
+		if !.TextInputEnabledAtStart or ev.command
 			return true
 		|| k = ev.sym
-		if k.isaccept or k.isdelete or k is tab or escape
+		if k is tab or escape
 			return true
-		return (k.isscan or ev.Command)
+		if k.iscmm
+			return true
+		if k.isscan or k.isaccept or k.isdelete
+			return true
 
 
 	function AllowTyping (|bool|)
