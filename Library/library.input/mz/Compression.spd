@@ -9,11 +9,14 @@ extend String
 		j.addint(.length)
 		j.enter(@arg)
 		for s in .chunk(1MB)
-			|| ugh = j.OpenStream
+			j.Flush
+			start
+			|| Place = j.OpenStream
 			j.CompressChunk(s)
-			j.CloseStream(ugh)
+			j.CloseStream(Place)
 			st.LiveUpdate(s, j.length)
 		j.up(2)
+		j.Flush
 		j.CompressChunk(nil) // cleanup
 
 	helper DecompressSub (|&compressionstats| st, |int| lim, |message| j, |faststring| fs, |bool|)
