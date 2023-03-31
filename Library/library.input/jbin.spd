@@ -4,7 +4,7 @@
 || _JbinHeader = "\10\03" // ugh 
 /// can't put a constant in a role? 
 
-		
+
 extend message
 	render render_jbin (|string| sheb = "")
 		opt norefcounts
@@ -109,13 +109,13 @@ function stringstream.parse_ (|MessageRoot|)
 
 
 function string.parse_jbin (|message|)
-	return .reader.parse_jbin
+	return .StreamIn.parse_jbin
 
 function string.IsJbin (|bool|)
 	return self starts _JbinHeader
 
 function string.digest (|string|)
-	if !.isjbin
+	if !.IsJbin
 		|| p = .parse
 			return p.render_jbin
 	return self
