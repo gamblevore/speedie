@@ -1,26 +1,23 @@
 
 
 class StringStream
-// this should be based on fastbuff, and fastbuff should also... 
-// have 3 pointers
-	|string|	Data
-	|string|	FilePath
-	|int|		Position
+	|FastBuff|	Data
+	|file|		File
 	|int|		Length
 	|int|		ChunkSize
 	linkage:cpp_Part ss
 	
 	constructor (|string| d)
 		d := ""
-		.data = d
+		.data.readfrom = d
 		.length = d.length
 	constructor (|file| file, |int| ChunkSize=4MB)
 		cpp_part ConstructorStream
-		.filepath = file
 		file.close
+		.file = file
 		.ChunkSize = chunksize
 		.length = file.size
-		.data = file.read(chunksize)		// for now
+		.data.readfrom = file.read(chunksize)		// for now
 	function Skip (|int| p = 1)
 		if p < 0 // end
 			.position = .length
@@ -31,8 +28,11 @@ class StringStream
 		return (.position inrange .length)
 	function Byte (|byte|)
 		.need(1)
-		return .data[.position++]
-		
+		return .data.byte
+	function Position (|int|)
+		return .data.position
+	setter Position (|int|)
+		.data.position = value
 	function bint (|int|n=4, |int64|)
 		for n
 			rz <<= 8
@@ -69,22 +69,22 @@ class StringStream
 		// just in the total file So... we need offsets!
 		rz = .length
 
-	function upto (|int| end,|int|)
+	function upto (|int| end, |int|)
 		return end - .position
 	function uint (|int| size, |int| mult=256, |uint|)
 		for size
 			rz *= mult
 			rz += .Byte		
-	function Trim (|int|n, |string|)
+	function Trim (|int| n, |string|)
 		return .str(n).trim
 	function Remaining (|int|)
-		return .length-.position
-	function Str (|int|n, |int|skip=0, |string|)
+		return .length - .position
+	function Str (|int| n, |int|skip=0, |string|)
 		.need(n)
 		|| p = .position
 		|| p2 = p + n
 		.position = p2
-		return .data[p+skip, p2]
+		return .data.syntaxaccess(p+skip, p2)
 	function utf8 (|int|n, |int|skip=0, |string|)
 		.position += skip
 		return  .str(n-skip).utf16to8(2)
