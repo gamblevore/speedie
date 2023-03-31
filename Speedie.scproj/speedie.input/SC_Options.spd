@@ -488,7 +488,7 @@ module Feedback
 		fs <~ "Usage: "
 		fs <~ app.filename
 		fs <~ " /path/to/project\n"
-		fs <~ "Installation: ${compiler.SpeedieProj.parent}  Platform: ${platform.cpu_name}"
+		fs <~ "Installation: ${compiler.SpeedieProj.parent}  Arch: ${platform.cpu_name}  Platform: ${platform.Name}"
 		for (v in appoptions) (k) 
 			(appoptions[k])("", "", fs_tester)
 			if (fs_tester.length) 
