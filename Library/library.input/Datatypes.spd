@@ -720,9 +720,15 @@ datatype uint64
 datatype MaybeBool (byte) // could just put these on int? do we need a whole new type?
 	default 8
 	function Default (|bool|)
-		return self&1
+		return (self&1)|bool|
 	function IsKnown (|bool|)
 		return self<2
+	function IsTrue (|bool|)
+		return self == 1
+	function IsFalse (|bool|)
+		return self == 0
+	syntax cast (|bool|)
+		disabled "Do you mean .istrue? Maybebools can have an unknown state."
 	module
 		function New (|bool| Default, |Maybebool|)
 			return 8+default
