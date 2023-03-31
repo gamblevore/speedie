@@ -18,6 +18,7 @@ module Options
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
 	||		HideMultipleErrors		= true
+	||		FlowControlEnabled		= true
 	||		Products				= native
 	||		Cpp						= true
 	||		Compile					= true
@@ -281,6 +282,10 @@ module Feedback
 		argstats
 			Explain(Purpose, "")$
 			options.argstats = true
+		
+		+"flow"
+			explain(Purpose, "Adds flow control testing! Slow but very thorough.")$
+			options.FlowControlEnabled = value.optionbool
 			
 		+"noisy"
 			Explain(Purpose, "Prints more stuff.")$
@@ -290,7 +295,7 @@ module Feedback
 		
 		alive
 			Explain(purpose)$
-			printline "We seems alive :)" // used by perry
+			"We seems alive :)" // used by perry
 			return true
 		
 		products
