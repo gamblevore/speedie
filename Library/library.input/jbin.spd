@@ -24,11 +24,13 @@ extend message
 
 role JBin (Faststring)
 	linkage: cpp_part bin
-	constructor 	(|syntax| type, |string| data="")
+	constructor         (|syntax| type=@arg, |string| data="")
 		cpp_part Constructor
 		.jinit
 		.enter(type, data)
-	constructor: cpp_part Constructor0
+	constructor (|int| n)
+		cpp_part Constructor0
+		if n // what?
 	function enter		(|syntax| type=@arg, |string| data="")
 		.add(type, data, true)
 	function addstr		(|string| data)
@@ -37,7 +39,8 @@ role JBin (Faststring)
 		.add(@num, data.render)
 	function add		(|syntax| type, |string| data="", |bool|into = false)
 		|| L = data.length
-		.addmemory(type, into, (data.addr, nil)(L), L)
+		|| addr = (data.addr, nil)(L)
+		.addmemory(type, into, addr, L)
 
 	function sheb		(|string| data)
 		if data
