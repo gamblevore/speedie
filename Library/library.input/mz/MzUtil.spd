@@ -1,30 +1,22 @@
 
 extend string
-	function CompressTest (|bool| report=false, |bool|)
-		|compressionstats| s
-		|| c = .compress(s)
-		if report
-			printline s.Render
-		return self == c.decompress
-	
 	function Compress (|&compressionstats| st = nil, |string|) 
-		|| j = jbin()
+		|| j = jbin(0)
 		.CompressIntoSub(j, st)
 		return j
 	
-	function CompressInto (|string| path, |&compressionstats| st=nil)
-		.CompressIntoSub(path.file.writer, st)
+	function CompressInto (|file| file, |&compressionstats| st=nil)
+		.CompressIntoSub(file.file.writer, st)
 	
 	function IsCompressed (|bool|)
 		return .isjbin and self[2, "C\06µz"]
 		
 	function DecompressStream (|faststring| fs, |bool|)
-		if !.IsCompressed
-			fs <~ self
-		  else
+		if .IsCompressed
 			return .DecompressSub(nil, 256MB, .parse_jbin, fs)
+		fs <~ self
 		
-	function Decompress (|&compressionstats| st=nil, |int|lim=256MB, |StringThatWasReadSafely|)
+	function Decompress (|&compressionstats| st=nil,  |int|lim=256MB,  |StringThatWasReadSafely|)
 		if !.IsCompressed
 			return self
 		rz = string.error
@@ -33,11 +25,24 @@ extend string
 			rz = fs
 
 
+function FastString.CompressInto (|faststring| fs, |&compressionstats| st=nil)
+	|| str = string.fromptr(.resultptr, .length)
+	str.CompressIntoSub(fs, st)
+
+	
+
 Module MZLab	
 	function OK (|bool|) 
 		|| f = "~/Music/multiplay/library.box".file.readall.decompress
 		return f.compresstest(true)
 		
+	helper string.CompressTest (|bool| report=false, |bool|)
+		|compressionstats| s
+		|| c = .compress(s)
+		if report
+			printline s.Render
+		return self == c.decompress
+	
 	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
 		for j in 4 
 			if i & (1<<j)
@@ -111,6 +116,7 @@ struct CompressionStats
 }
 
 helper BTWSorter_64K (|string| text, |&int| ap, |&int| bp, |int|)
+// unused
 	|| a		= *ap
 	|| b		= *bp
 	|| txt		= text.addr
