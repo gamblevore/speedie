@@ -68,9 +68,6 @@ class FastString {
 	function GetResult (|FastString| other, |string|)
 		cpp_wrapper JB_FS_SmartResult
 
-	function Copy (|string|)
-		disabled "hmmm?"
-
 	function uint64.lelength (|int|)
 		pragma inline
 		return (self|int|.log2 max 0) >> 3
@@ -289,15 +286,5 @@ extend FastString
 			start
 			self <~ Data[i]
 		self <~ ']'
-
-
-function String.UTF16To8 (|faststring|fs=nil, |int|BigEndian=1, |string|)
-	cpp_wrapper JB_Str_UTF16To8
-
-
-function String.UTF8 (|string|)
-	if !.isbadutf8(0)
-		return self
-	return .UTF16To8
 
 
