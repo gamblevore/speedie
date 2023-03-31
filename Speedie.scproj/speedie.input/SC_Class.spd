@@ -492,7 +492,7 @@ function AllocStr (|string|)
 	|| s0 = .name
 	|| s = (s0, .super.name)(!.IsRole)
 	return "
-	function Alloc (|$s0|)
+	helper Alloc (|$s0|)
 		return JB_New(__classes__.$s)|$s0|
 	"
 
@@ -501,7 +501,7 @@ function AllocStrLayer (|string|)
 	|| s0 = .name
 	|| s = (s0, .super.name)(!.IsRole)
 	return "
-	function LayerAlloc (|MemoryLayer| _L, |$s0|)
+	helper LayerAlloc (|MemoryLayer| _L, |$s0|)
 		visible false
 		return JB_LayerNew(_L, __classes__.$s)|$s0|
 	"
