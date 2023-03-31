@@ -16,6 +16,8 @@ datatype Codepoint (uint)
 		cpp_wrapper JB_Str_UTF8Size
 	function IsLower (|bool|)
 		return .in('a', 'z')
+	function IsUpper (|bool|)
+		return .in('A', 'Z')
 	function IsInt (|bool|)
 		return .in('0', '9')
 	function IsLetter (|bool|)
@@ -28,8 +30,6 @@ datatype Codepoint (uint)
 		return self == ' ' or '\n' or '\r' or '\t' 
 	function In (|int| a, |int| b, |bool|)
 		return  (self - a)|codepoint| <= (b-a)|codepoint|
-	function IsUpper (|bool|)
-		return .in('A', 'Z')
 	function str (|string|)
 		return string.char(self)
 	syntax cast (|string|)
