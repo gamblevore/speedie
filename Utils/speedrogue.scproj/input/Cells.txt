@@ -2,7 +2,7 @@
 floor "."
 	walkable
 	appearance "The floor seems dirty... uncleaned. But in places trampled till it gives a polished look."
-wall "+" // &#9639;
+wall "+"
 	color white
 	appearance "The wall is plastered with a rough patch of mud and straw. Wooden slats jut out from underneath in places."
 rock " "
