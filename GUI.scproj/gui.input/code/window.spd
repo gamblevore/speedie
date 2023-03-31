@@ -6,9 +6,9 @@ class Window (GUIControl)
 	|bool|							FocusWasSet
 	|bool|							AlphaSubtle
 	|bool|							NoDrawBackground
+	|bool|							BlockRecurseKeyDown
 	|GUIControl|					Focus   // For multi-windows?
 	|Guicontrol|					InnerFocus
-//	|Guicontrol|					MenuOpener
 	|GUIControl|					CurrMouseDown
 	|GuiControl--|					SelBeforeMouseDown
 	|guicontrol--|					ToolTipControl // probably better to remove this
@@ -67,7 +67,7 @@ class Window (GUIControl)
 		return .innerfocus ?? .focus
 
 	setter OpenedMenu (|menu|)
-		.setmenu(value)
+		.setinnerfocus(value)
 
 	function OpenedMenu (|menu|)
 		opt norefcounts
@@ -75,11 +75,8 @@ class Window (GUIControl)
 		if f isa menu
 			return f 
 
-
 	function SetMenu (|menu| m)
-		.openedmenu = m
-		sdlapp.UpdateTextFocus(self)
-
+		disabled "use openedmenu"
 
 	function IsDialog (|bool|)
 		return window.opendialogs contains self
@@ -106,6 +103,7 @@ class Window (GUIControl)
 	helper SetInnerFocus (|guicontrol| Focus)
 		|| old = .InnerFocus
 		if old != Focus
+			if focus == .focus /// ???
 			.InnerFocus = focus
 			.finishfocus(focus)
 			focus.__GotFocus__?
@@ -150,7 +148,13 @@ class Window (GUIControl)
 		super.syntaxis(f) = value
 
 
-	behaviour keydown
+	behaviour KeyDown
+		debug_require !.BlockRecurseKeyDown
+		.BlockRecurseKeyDown = true
+		rz = .KeyDownWin(key)
+		.BlockRecurseKeyDown = false
+
+	helper KeyDownWin (|keys| key, |bool|)
 		opt norefcounts
 		if (key iscmd keys.U) and keys.option
 			|| t = .focus 
