@@ -229,8 +229,8 @@ extend stringstream
 	syntax expect ( |string| Error )
 		opt norefcounts
 		debugat
-		if (.filepath)
-			stderr.newError(nil, "Error decoding file: ", .filepath)
+		if (.file)
+			stderr.newError(nil, "Error decoding file: ", .file)
 		  else
 			stderr.newError(nil, "Error decoding data: ", "")
 
