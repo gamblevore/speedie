@@ -21,12 +21,12 @@ function PrintLine (|object| o)
 	printline o.render
 
 
-function ZalgoLine (|string| data="  ooooof  ")
-	printline data //.zalgo // remove floats first
+function ZalgoLine (|string| data="I'm all kinds of Steve! >:3 ")
+	printline data
 
 
 macro ZalgoLine
-	Printline _.render	//.zalgo // remove floats first
+	Printline _.render
 
 
 function Print (|object| o)
@@ -39,7 +39,7 @@ function PrintError (|string| data)
 
 
 function byte.IsConso (|bool|)
-	return !.isvowel
+	return .isletter and !.isvowel
 
 
 function byte.IsVowel (|bool|)
@@ -51,15 +51,15 @@ function int.operatorpc (|int| x, |string|)
 	return (self|float| / x|float|).pc
 
 
+function string.operatorpc (|string| x, |string|) 
+	return .length pc x.length
+	
+
 function string.IsFileLike (|bool|)
 	|| c = self[0]
 	return (c == '/') or ((c == '.' or c == '~') and ((self[1] == '.') or (self[1] == '/')))
 	// so... we want to wrap to w... but prefer to wrap at a SPACE or comma
 	
-function string.operatorpc (|string| x, |string|) 
-	return .length pc x.length
-	
-
 function byte.IsTextLine (|bool|)
 	 return self == '\n' or '\r'
 
@@ -67,6 +67,20 @@ function int.TabsWidth (|int|)
 	return 4-(self & 3)
 
 
+function string.Chunk (|int| n, |[String]|)
+	|| i = 0
+	while i < .length
+		rz <~ self[i, i+n]
+		i += n
+
+function String.UTF16To8 (|faststring|fs=nil, |int|BigEndian=1, |string|)
+	cpp_wrapper JB_Str_UTF16To8
+
+
+function String.UTF8 (|string|)
+	if !.isbadutf8(0)
+		return self
+	return .UTF16To8
 
 
 helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
