@@ -1,0 +1,69 @@
+
+
+struct FastBuff
+	|&byte| Curr
+	|&byte| Start
+	|&byte| End
+	|string| ReadFrom
+	
+	syntax Append (|byte| v)
+		cpp_part AppendByte
+		*.curr++ = v
+	syntax Append (|uint16| v)
+		cpp_part AppendU16
+		|| c = .curr|&uint16|,  *c++ = v,  .curr = c|&byte|
+	syntax access (|int| pos, |byte|)
+		cpp_part AccessByte
+		return .start[pos]
+	syntax access (|int| pos, |int| after,  |string|)
+		cpp_part AccessStr
+		if .readfrom != nil
+			return .readfrom[pos, after] // better
+		|| A = .clip(pos)
+		|| B = .clip(after, 0)
+		return string.Copy(A, B-A)
+	function Clip (|int| v, |int| reduce=1, |&byte|)
+		if v <= 0
+			return .start
+		v = v min (.size-reduce)
+		return .start + v
+	function Position (|int|)
+		return .curr - .start
+	setter Position (|int|)
+		.curr = .start + value
+	function Byte (|byte|)
+		return *.curr++
+		
+	function Find (|byte| b, |int| from, |int| After, |ind|)
+		|| Pos = .clip(from)
+		|| End = .clip(after, 0)
+		while Pos < End
+			if *Pos == b
+				return pos - .Start
+			Pos++
+		
+	function IsFull (|bool|)
+		return .curr >= .end
+	setter ReadFrom (|string|)
+		.ReadFrom = Value
+		.start = Value.Address
+		.end = .start + Value.length
+		.curr = .start
+	function Alloc (|int| n, |bool|)
+		.start = Memory.Zalloc(n)
+		.curr = .start
+		.end = (.start+n, nil)(.start)
+		.readfrom = nil
+		return .start
+	function Length (|int|)
+		if self
+			return .curr - .start
+	function Size (|int|)
+		if self
+			return .end - .start
+	function jbin.add		(|syntax| type, |&FastBuff| data, |bool|into = false)
+		cpp_part AddBuff
+		|| L = data.length
+		|| addr = (data.start, nil)(L)
+		.addmemory(type, into, addr, L)
+
