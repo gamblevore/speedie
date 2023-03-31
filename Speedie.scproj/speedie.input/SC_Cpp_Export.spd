@@ -554,7 +554,7 @@ ignore
 
 
 function ListAllClasses (|FastStringCpp| fs)
-	|| j = jbin(@arg)
+	|| j = jbin()
 	for c in Compiler.ClassList
 		if c.IsSTDLib and !c.super
 			c.LibExport(j)
@@ -577,7 +577,7 @@ function ListAllFuncs (|FastStringCpp| fs)
 		if f.isstdlib and f.iscppinbuilt == 1
 			.MakeWrapperFor(fs, f)
 	
-	|| bs = jbin(@arg)
+	|| bs = jbin()
 	fs <~ "\n__lib__ void* JB_AllFuncsList[] = {\n"
 	for f in ExecTable.Funcs
 		if f.isstdlib
