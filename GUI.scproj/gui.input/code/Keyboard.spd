@@ -160,7 +160,7 @@ dataType Keys (int) {
 	operator iscmd (|keys|s, |bool|)
 		return keys.cmd and self == s
 
-	function IsCMM  (|bool|shift=false,|bool|)
+	function IsCMM  (|bool|shift=false, |bool|)
 		if shift == (keys.shift or keys.option)
 			return self is section or MacBackQuote or backquote or APPLICATION or slash
 
