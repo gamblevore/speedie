@@ -6,6 +6,13 @@ struct FastBuff
 	|&byte| End
 	|string| ReadFrom
 	
+	function TmpStr (|string|)
+		return string.FromPtr(.start, .length)
+	function String (|string|)
+		return string.copy(.start, .length)
+	
+	syntax Compare (|int| n, |bool| aware,  |int|)
+		return .Length - n
 	syntax Append (|byte| v)
 		cpp_part AppendByte
 		*.curr++ = v
@@ -33,6 +40,8 @@ struct FastBuff
 		.curr = .start + value
 	function Byte (|byte|)
 		return *.curr++
+	function UInt16 (|uint16|)
+		|| c = .curr|&uint16|,  rz = *c++,  .curr = c|&byte|
 		
 	function Find (|byte| b, |int| from, |int| After, |ind|)
 		|| Pos = .clip(from)
