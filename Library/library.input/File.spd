@@ -357,9 +357,6 @@ class File (String)
 	function string.writer (|faststring|)
 		return .file.writer
 	
-	function StreamIn (|Byte| sep = '\n', |StringFields|)
-		return StringFields.new( .ReadAll, sep )
-	
 	
 	function Copy (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
 		disabled "Use .Copyto"
