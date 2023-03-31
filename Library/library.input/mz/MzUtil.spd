@@ -29,6 +29,9 @@ function FastString.CompressInto (|faststring| fs, |&compressionstats| st=nil)
 	|| str = string.fromptr(.resultptr, .length)
 	str.CompressIntoSub(fs, st)
 
+function FastBuff.CompressInto (|faststring| fs, |&compressionstats| st=nil)
+	.tmpstr.CompressIntoSub(fs, st)
+
 	
 
 Module MZLab	
