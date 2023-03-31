@@ -1,4 +1,5 @@
-{"abc"
-"def"
-"123"
+{"/path/to/file"
+"hello.txt"
+"--self"
+"--noisy"
 }
