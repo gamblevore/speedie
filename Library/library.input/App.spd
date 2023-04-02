@@ -7,8 +7,6 @@
 
 module App {
 |bool|						Unregistered 
-target !minilib
-	|string|				_CLN = app.crashlogname
 |[string]|					OldArgs = nil
 |message|					_Conf
 |config|					Prefs
@@ -93,15 +91,6 @@ function Path (|string|)
 	._Path := .exepath
 	return ._path
 	
-
-target !minilib {
-function CrashLogName (|stringzeroterminated|)
-	opt norefcounts
-	if ._cln
-		return ._cln
-	// actually, speedie itself should generate this. Like as a c-array.
-	return "/tmp/logs/${.filename}.crash.txt"
-}
 
 render StackTrace
 	|_voidptr[128]| arr

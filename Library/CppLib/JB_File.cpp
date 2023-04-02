@@ -366,18 +366,16 @@ int JB_FS_InterPipe(FastString* self, int Desired, int fd, int Mode) {
 
 
 int CrashLogFile = 0;
-JB_StringC* JB_App__CrashLogName();
+extern const char* JB_CrashLogFileName;
 void JB_Rec__CrashLog(const char* c) {
 	if (!c) return;
 	puts(c);
 
 // this filename tho... lol. fucking lack of strings...
-	JB_StringC* Name = JB_App__CrashLogName();
-	if (!CrashLogFile and Name) {
+	if (!CrashLogFile) {
 		mkdir("/tmp/logs", kDefaultMode);
-		auto s = (const char*)(Name->Addr);
 		int flags = O_RDWR | O_CREAT | O_TRUNC;
-		CrashLogFile = open(s, flags, kDefaultMode);
+		CrashLogFile = open(JB_CrashLogFileName, flags, kDefaultMode);
 	}
 	if (!CrashLogFile) return;
 
