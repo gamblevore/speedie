@@ -211,7 +211,7 @@ class OpenSaveDialog (Window)
 			|| w = .window|OpenSaveDialog|
 			|| p = w.path
 			|| t = p.text
-			if (t[0] != '/')
+			if (t[0] != '/' and '~')
 				beep
 				p.text = w.LastGoodPath init "/"
 				return true
