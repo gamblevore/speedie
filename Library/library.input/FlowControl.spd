@@ -1,4 +1,13 @@
 
+/*
+how to do this?
+we really want this to STREAM in. So... how? We want stringstream to stream
+
+I think combining the files into one, IS possssible... but we SHOULDN'T do it first.
+Its too many complex tricky things to solve all at once. First get the thing working...
+then see if we can optimise it.
+*/
+
 
 struct FlowPart
 	|FastBuff|			Buff
@@ -6,15 +15,18 @@ struct FlowPart
 	|faststring| 		Write
 	|CompressionStats|	Stats
 	
-	function init (|string| path, |string| ext, |bool|)
-		.write = path.AddExt(ext + ".tmp").file.Writer #require
-		.read = path.AddExt(ext).file.StreamIn
+	function init (|string| path, |string| type, |bool|)
+		.write = path.AddExt(".flow."+type).out #require
+		.read = path.AddExt(".expected."+type).in
+		|| sign = type * 2
+		if .read
+			require .read.test(sign)
+		.write <~ sign
 		return .buff.Alloc(1MB)
 
 	function Flush
-		if .buff.curr >= .buff.end
-			.buff.CompressInto(.write, .stats)
-			.buff.Curr = .buff.start
+		.buff.CompressInto(.write, .stats)
+		.buff.Curr = .buff.start
 	
 	function Test (|uint| Expected, |int| Bytes)
 		opt norefcounts
@@ -34,7 +46,7 @@ class FlowControl
 	|uint16| 			LoopCount
 	
 	constructor (|string| Path)
-		.ok = .loops.init(path, ".w") and .bits.init(path, ".b")
+		.ok = .loops.init(path, "w") and .bits.init(path, "b")
 
 	function While (|bool| value, |bool|)
 		if value
@@ -43,12 +55,12 @@ class FlowControl
 	
 		|| c = .LoopCount
 		.LoopCount = 0
-		.Loops.buff <~ c
+		ifn .Loops.buff <~ c
+			.loops.flush
 		.loops.Test(c, 2)
-		.loops.flush
 
-	function Cond (|bool| value)
-		.bits.buff <~ value|byte|
+	function Cond (|bool| value)	
+		ifn .bits.buff <~ value|byte|
+			.bits.Flush
 		.bits.Test(value|uint|, 1)
-		.bits.Flush
 
