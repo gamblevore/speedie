@@ -79,6 +79,8 @@ function PreRun
 #pragma GCC visibility push(hidden)
 
 `
+	|| str = "const char* JB_CrashLogFileName = \"/tmp/logs/${compiler.projectname}.crash.txt\";\n\n"
+	.moduleproperties <~ str
 
 
 function OptStart (|FastStringCpp| fs, |int| m, |bool| force = 0)
@@ -665,7 +667,8 @@ extern "C" {
 		Cpp_Export.CreateClassListHeader(fs, ";\n")
 
 	cpp_export.GenStrings(.ModuleProperties)
-	Cpp_Export.SmartWrite(.ModuleProperties, Cpp_Export.product("JB_Globals.cpp"))
+	|| glob_file = Cpp_Export.product("JB_Globals.cpp")
+	Cpp_Export.SmartWrite(.ModuleProperties, glob_file)
 	.ModuleProperties.length = 0
 
 	for f in .Outputs_cpp
