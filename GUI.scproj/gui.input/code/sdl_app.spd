@@ -324,10 +324,10 @@ module SDLApp
 		
 
 	function GUICheck
-		if app..version
+		if app.yes("version")
 			printline app.conf("version")
 			app.quit(0)
-		if app..created
+		if app.yes("created")
 			printline __now__|date|.render
 			app.quit(0)
 	

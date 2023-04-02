@@ -23,7 +23,10 @@ syntax access (|int| i, |string|)
 	if .args > i
 		return .args[i]
 	error "Missing shell argument: " + i.Render
-	
+
+function Yes (|string| name, |bool|)
+	return app[name].yes
+
 function conf (|string| name, |string|)
 	return ._conf[name].value
 
@@ -340,7 +343,7 @@ role String_ArgValue (string)
 	linkage
 		cpp_part Arg
 	syntax cast (|bool|)
-		return .yes
+		disabled "On arg-value; Do you mean string.yes or do you mean string.syntaxcast"
 
 /*
 // clever idea. Just not worth it

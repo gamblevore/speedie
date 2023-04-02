@@ -690,7 +690,7 @@ extend_module app
 		cpp_Wrapper JB_App__AtExit
 	
 	helper HasIPC (|bool|)
-		return app..talk
+		return app..talk.length
 			
 	helper LostChild (|pid_int|)
 		cpp_wrapper JB_App__LostChild

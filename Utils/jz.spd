@@ -51,7 +51,7 @@ function app.usage (|string|)
 		
 
 main  
-	if app["test"]
+	if app.yes("test")
 		return 1-MZLab.TestMz(app[0])
 		// so we wanna run the mzlab thing
 		
