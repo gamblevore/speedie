@@ -839,6 +839,7 @@ JBClass ( StringStream , JB_Object ,
 	JB_File* File;
 	int Length;
 	int ChunkSize;
+	int Mode;
 );
 
 struct SyntaxObj_Behaviour: Object_Behaviour {
@@ -1227,13 +1228,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1810])
+#define kJB__ErrorColors_bold (JB_LUB[1814])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1811])
-#define kJB__ErrorColors_good (JB_LUB[1812])
-#define kJB__ErrorColors_normal (JB_LUB[1813])
-#define kJB__ErrorColors_underline (JB_LUB[1812])
-#define kJB__ErrorColors_warn (JB_LUB[1814])
+#define kJB__ErrorColors_error (JB_LUB[1815])
+#define kJB__ErrorColors_good (JB_LUB[1816])
+#define kJB__ErrorColors_normal (JB_LUB[1817])
+#define kJB__ErrorColors_underline (JB_LUB[1816])
+#define kJB__ErrorColors_warn (JB_LUB[1818])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1443,7 +1444,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[335])
 #define kSC_BitNot (JB_LUB[433])
 #define kSC_BitOr (JB_LUB[638])
-#define kSC_BitXor (JB_LUB[1815])
+#define kSC_BitXor (JB_LUB[1819])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1473,7 +1474,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1816])
+#define kJB_SaverStart1 (JB_LUB[1820])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1851,6 +1852,8 @@ extern Dictionary* SC__Imp_Shaders;
 extern bool SC__Imp_STDLibTime;
 extern int SC__Opp_CustomOperatorScore;
 extern Dictionary* SC__Opp_Dict;
+#define kJB__ss_JbinMode (1)
+#define kJB__ss_LargestFlag (0)
 extern int SC__xC2xB5Form_Count;
 extern Dictionary* SC__xC2xB5Form_Forms;
 extern bool JB__File_DebugExecute;
@@ -5483,6 +5486,8 @@ JB_String* JB_Str_Compress(JB_String* self, CompressionStats* st);
 
 void JB_Str_CompressIntoSub(JB_String* self, FastString* j, CompressionStats* st);
 
+bool JB_Str_CompressTest(JB_String* self, bool report);
+
 JB_String* JB_Str_ContainerName(JB_String* self, JB_String* ext);
 
 ErrorInt JB_Str_CopyFileTo(JB_String* self, JB_String* Dest, bool AttrOnly);
@@ -5493,7 +5498,7 @@ ErrorInt JB_Str_DebugExecute(JB_String* self, Array* Args, FastString* Out, Fast
 
 JB_String* JB_Str_Decompress(JB_String* self, CompressionStats* st, int lim);
 
-bool JB_Str_DecompressSub(JB_String* self, CompressionStats* st, int lim, Message* j, FastString* fs);
+bool JB_Str_DecompressSub(JB_String* self, CompressionStats* st, int lim, JB_String* input, FastString* fs);
 
 Dictionary* JB_Str_Dict(JB_String* self, byte sep);
 
@@ -5586,6 +5591,10 @@ bool JB_Str_OperatorEndsWith(JB_String* self, JB_String* s);
 bool JB_Str_OperatorIsa(JB_String* self, JB_String* s);
 
 int JB_Str_OperatorMinus(JB_String* self, JB_String* s);
+
+JB_String* JB_Str_MulBool(JB_String* self, bool b);
+
+JB_String* JB_Str_OperatorMul(JB_String* self, int n);
 
 bool JB_Str_OperatorPathMatch(JB_String* self, JB_String* path);
 
@@ -7511,7 +7520,7 @@ void JB_Msg_GetAddressOf2(Message* self);
 
 Message* JB_Msg_GetASMFunc(Message* self);
 
-Message* JB_Msg_GetDclName(Message* self);
+Message* JB_Msg_GetDclName(Message* self, bool Need);
 
 Message* JB_Msg_GetMarker(Message* self, JB_String* s);
 
@@ -7759,7 +7768,7 @@ Message* JB_Msg_RemoveTypeCasts(Message* self);
 
 JB_String* JB_Msg_Render(Message* self, FastString* fs_in);
 
-JB_String* JB_Msg_render_jbin(Message* self, JB_String* sheb, FastString* fs_in);
+JB_String* JB_Msg_render_jbin(Message* self, JB_String* execute, FastString* fs_in);
 
 void JB_Msg_RenderPrm(Message* self, FastString* fs, byte b1, byte b2);
 
