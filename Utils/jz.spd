@@ -22,7 +22,6 @@ datatype Type (int)
 function App.GetActions (|Type|)
 	for s in app.Switches
 		|| name = s.ArgName
-		expect (s.ArgValue=="true") ("Unexpected value: ${s.argvalue}")
 		if name ~= "r"
 			rz |= type.report
 		  elseif name ~= "j": rz |= type.box
@@ -47,9 +46,15 @@ function app.usage (|string|)
 		-c		Compress
 		-s		Replace file in-place
 		-p		Print to stdout
+		-test	Tests if compression works using input file
 		-r		Just report types. Otherwise do nothing."
+		
 
 main  
+	if app["test"]
+		return 1-MZLab.TestMz(app[0])
+		// so we wanna run the mzlab thing
+		
 	|| action = .getactions$
 	for r in (app.args  #expect (.Usage))
 		|| data = r.ReadFile(0.25GB, false)
