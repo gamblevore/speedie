@@ -149,7 +149,7 @@ class File (String)
 			.close
 
 	function IsCompressed (|bool|)
-		return .section(0,10).iscompressed
+		return .section(0,16).iscompressed
 
 
 	function RelFile (|file|)

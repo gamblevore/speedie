@@ -9,7 +9,7 @@ extend string
 		.CompressIntoSub(file.out, st)
 	
 	function IsCompressed (|bool|)
-		return .isjbin and self[2, "C\06µz"]
+		return .isjbin and self[2, "C\06µz"] or self[2, "@\01C\06µz"]
 		
 	function DecompressInto (|faststring| fs, |bool|)
 		if .IsCompressed
@@ -45,14 +45,17 @@ Module MZLab
 		|| c = .compress(s)
 		if report
 			printline s.Render
-		return (self == c.decompress) #expect "Decompression failed when compressing: " + self
+		|| decomp = c.Decompress
+		rz = self == decomp
+		if !rz
+			error "Decompression failed when compressing: " + self
 	
 	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
 		for j in 4 
 			if i & (1<<j)
 				fs <~ items[j]
 
-	function ManyTests (|bool|) // mztest
+	helper ManyTests (|bool|) // mztest
 		|| Items = "abcd efgh ijkl mnop".words
 		|| fs = faststring()
 		

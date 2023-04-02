@@ -15,7 +15,7 @@ extend String
 	helper CompressIntoSub (|jbin| j, |&compressionstats| st) 
 		st := CompressionStats.All
 		st.len(j.length)
-		if !j.Length
+		if !j.length
 			j.jinit
 			j.enter(@arg)
 		j.enter(@tmp, "µz")
@@ -33,11 +33,15 @@ extend String
 		opt norefcounts
 		st := compressionstats.all
 		|| mz = .parse_jbin				#require
-		|| size_node = mz.first
-		|| arg = mz.second
-		|| total_size = size_node.int
-		expect (size_node == @num and arg == @arg)  (self, "Invalid mz header")
-		expect (total_size <= lim)					(self, "Oversized mz")
+		if mz == @arg
+			mz = mz[@tmp]
+		  elseif !mz.expect(@tmp)
+			mz = nil
+		|| size = mz[@num, 0]
+		|| arg = mz[@arg, 1]
+		|| total_size = size.int
+		expect (size and arg)                (self, "Invalid mz header")
+		expect (total_size <= lim)           (self, "Oversized mz")
 		st.len(mz.length)
 		for C in arg
 			require fs.DecompressChunk(c.name, total_size)
