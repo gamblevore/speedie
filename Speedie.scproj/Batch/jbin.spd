@@ -9,7 +9,7 @@ main
 		OutPath := inpath.Removeext("jbin").UniqueFile
 	  else
 		Outpath := inpath + ".jbin"
-	|| writer = outpath.writer				#require
+	|| writer = outpath.out				#require
 	
 	if b.isjbin
 		b = b.Parsetime.render(writer)
