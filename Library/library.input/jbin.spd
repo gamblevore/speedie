@@ -109,7 +109,7 @@ function stringstream.parse_ (|MessageRoot|)
 
 
 function string.parse_jbin (|message|)
-	return .StreamIn.parse_jbin
+	return .stream.parse_jbin
 
 function string.IsJbin (|bool|)
 	return self starts _JbinHeader

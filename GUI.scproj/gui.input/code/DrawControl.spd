@@ -44,7 +44,7 @@ class DrawControl (GuiControl) // imageeditor
 /*jdraw 1
 	layers
 		oof (#data#)*/
-		|jbin| j = .backing.writer
+		|jbin| j = .backing.out
 		j.jinit
 		j.enter @arg
 		j.enter(@tmp, "jdraw")

@@ -95,14 +95,7 @@ class StringStream
 			return true
 		return Header == .str(Header.length)
 
-
-function file.StreamIn (|string|T="", |StringStream|)
-	if .exists
-		rz = stringstream(self)
-		if !rz.test(t)
-			rz = nil
-
-function string.StreamIn (|string|T="", |StringStream|)
+function string.Stream (|string|T="", |StringStream|)
 	rz = stringstream(self)
 	if !rz.test(t)
 		rz = nil

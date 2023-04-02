@@ -82,7 +82,7 @@ class Saveable
 	
 	function SaveTo (|File| f)
 		cpp_part SaveToFile
-		|| it = f.writer
+		|| it = f.out
 			.saveto(it)
 	
 	function ObjectSaver.Finish (|saveable| first)

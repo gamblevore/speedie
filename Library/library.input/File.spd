@@ -347,16 +347,22 @@ class File (String)
 		return (.Modified < F.Modified)
 	
 	
-	function writer (|FastString|) // streamout
-		if self != nil
-			.close
-			require .OpenEmpty
+	function Writer (|FastString|) // streamout
+		disabled "Use .out"
+	
+	function string.out (|faststring|)
+		|| f = .file
+			f.close
+			require f.OpenEmpty
 			rz = FastString()
-			rz.file = self
+			rz.file = f
 	
-	function string.writer (|faststring|)
-		return .file.writer
-	
+	function string.In (|string|T="", |StringStream|)
+		|| f = .file
+		if f.exists
+			rz = stringstream(f)
+			if !rz.test(t)
+				rz = nil
 	
 	function Copy (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
 		disabled "Use .Copyto"
