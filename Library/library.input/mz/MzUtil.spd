@@ -35,9 +35,10 @@ function FastBuff.CompressInto (|faststring| fs, |&compressionstats| st=nil)
 	
 
 Module MZLab	
-	function OK (|bool|) 
-		|| f = "~/Music/multiplay/library.box".file.readall.decompress
-		return f.compresstest(true)
+	function TestMz (|string| path, |bool|)
+		if path
+			|| f = path.file.readall.decompress
+			return f.compresstest(true) and .ManyTests
 		
 	helper string.CompressTest (|bool| report=false, |bool|)
 		|compressionstats| s
@@ -51,7 +52,7 @@ Module MZLab
 			if i & (1<<j)
 				fs <~ items[j]
 
-	function TestMz (|bool|) // mztest
+	function ManyTests (|bool|) // mztest
 		|| Items = "abcd efgh ijkl mnop".words
 		|| fs = faststring()
 		
@@ -62,7 +63,7 @@ Module MZLab
 				.TestSub(items, fs, i>>(sh*4))
 			require fs.getresult.CompressTest
 		"Compression Test: OK"
-		return .ok
+		return true
 		
 
 target minilib {
