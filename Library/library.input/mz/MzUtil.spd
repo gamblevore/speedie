@@ -11,9 +11,9 @@ extend string
 	function IsCompressed (|bool|)
 		return .isjbin and self[2, "C\06µz"]
 		
-	function DecompressStream (|faststring| fs, |bool|)
+	function DecompressInto (|faststring| fs, |bool|)
 		if .IsCompressed
-			return .DecompressSub(nil, 256MB, .parse_jbin, fs)
+			return .DecompressSub(nil, 256MB, self, fs)
 		fs <~ self
 		
 	function Decompress (|&compressionstats| st=nil,  |int|lim=256MB,  |StringThatWasReadSafely|)
@@ -21,8 +21,7 @@ extend string
 			return self
 		rz = string.error
 		|| fs = faststring()
-		|| mz = .parse_jbin
-		if mz and .DecompressSub(st, lim, mz, fs)
+		if .DecompressSub(st, lim, self, fs)
 			rz = fs
 
 
@@ -46,7 +45,7 @@ Module MZLab
 		|| c = .compress(s)
 		if report
 			printline s.Render
-		return self == c.decompress
+		return (self == c.decompress) #expect "Decompression failed when compressing: " + self
 	
 	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
 		for j in 4 

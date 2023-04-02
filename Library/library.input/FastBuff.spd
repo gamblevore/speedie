@@ -42,6 +42,8 @@ struct FastBuff
 		return .start + v
 	function Position (|int|)
 		return .curr - .start
+	function FreeSize (|int|)
+		return .end - .start
 	setter Position (|int|)
 		.curr = .start + value
 	function Byte (|byte|)
