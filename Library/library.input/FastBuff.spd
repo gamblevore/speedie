@@ -9,16 +9,22 @@ struct FastBuff
 	function TmpStr (|string|)
 		return string.FromPtr(.start, .length)
 	function String (|string|)
+		if .ReadFrom!=nil
+			return .ReadFrom
 		return string.copy(.start, .length)
 	
 	syntax Compare (|int| n, |bool| aware,  |int|)
 		return .Length - n
-	syntax Append (|byte| v)
+	syntax Append (|byte| v, |bool|)
 		cpp_part AppendByte
+		pragma inline
 		*.curr++ = v
-	syntax Append (|uint16| v)
+		return .curr < .end
+	syntax Append (|uint16| v, |bool|)
 		cpp_part AppendU16
+		pragma inline
 		|| c = .curr|&uint16|,  *c++ = v,  .curr = c|&byte|
+		return c|&byte| < .end
 	syntax access (|int| pos, |byte|)
 		cpp_part AccessByte
 		return .start[pos]
