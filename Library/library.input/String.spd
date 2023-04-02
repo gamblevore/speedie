@@ -323,8 +323,8 @@ class String
 		if n <= 1
 			return .operatormul(n==1)
 		|| fs = faststring()
-		for n
-			fs <~ self
+		fs.Size = n*.length
+		fs <~ (self, n)
 		return fs
 
 	function IsASCII (|bool|)

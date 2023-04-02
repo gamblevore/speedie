@@ -99,6 +99,9 @@ class FastString {
 
 	syntax Append (|string| data, |int|count)
 		cpp_part AppendMultiStr
+		|| needed = data.Length*count
+		if .FreeSize < needed
+			.FreeSize = needed
 		for count
 			self <~ data
 
