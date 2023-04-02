@@ -82,13 +82,6 @@ datatype __junktest_7__ (uint64)
 		MOUSEBUTTONDOWN			/* Mouse button pressed */
 	
 	
-// we want to list all the indexes from this item.
-	function ClearBit (|uint64| i, |uint64|)
-		pragma inline
-		visible
-		|| x = halfmap
-		|| x2 = BaseShrinkSpeed
-		return self &~ (1|uint64|<<i)
 
 
 helper int.__junktest_8__ (|int| Inaaaadex = 0, |bool| Create=false, |int|)
