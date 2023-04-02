@@ -16,11 +16,9 @@ struct FlowPart
 	|CompressionStats|	Stats
 	
 	function init (|string| path, |string| type, |bool|)
-		.write = path.AddExt(".flow."+type).out #require
-		.read = path.AddExt(".expected."+type).in
 		|| sign = type * 2
-		if .read
-			require .read.test(sign)
+		.write = path.AddExt(".flow."+type).out #require
+		.read = path.AddExt(".expected."+type).in(sign)
 		.write <~ sign
 		return .buff.Alloc(1MB)
 
@@ -55,12 +53,12 @@ class FlowControl
 	
 		|| c = .LoopCount
 		.LoopCount = 0
-		ifn .Loops.buff <~ c
+		if .Loops.buff <~ c
 			.loops.flush
 		.loops.Test(c, 2)
 
 	function Cond (|bool| value)	
-		ifn .bits.buff <~ value|byte|
+		if .bits.buff <~ value|byte|
 			.bits.Flush
 		.bits.Test(value|uint|, 1)
 

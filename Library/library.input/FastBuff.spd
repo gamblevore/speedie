@@ -19,12 +19,12 @@ struct FastBuff
 		cpp_part AppendByte
 		pragma inline
 		*.curr++ = v
-		return .curr < .end
+		return .curr >= .end
 	syntax Append (|uint16| v, |bool|)
 		cpp_part AppendU16
 		pragma inline
 		|| c = .curr|&uint16|,  *c++ = v,  .curr = c|&byte|
-		return c|&byte| < .end
+		return c|&byte| >= .end
 	syntax access (|int| pos, |byte|)
 		cpp_part AccessByte
 		return .start[pos]

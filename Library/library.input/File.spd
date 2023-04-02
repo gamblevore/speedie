@@ -353,9 +353,9 @@ class File (String)
 	function string.out (|faststring|)
 		|| f = .file
 			f.close
-			require f.OpenEmpty
-			rz = FastString()
-			rz.file = f
+			if f.OpenEmpty
+				rz = FastString()
+				rz.file = f
 	
 	function string.In (|string|T="", |StringStream|)
 		|| f = .file
