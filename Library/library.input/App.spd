@@ -8,7 +8,7 @@
 module App {
 |bool|						Unregistered 
 target !minilib
-	|string|					_CLN = app.crashlogname
+	|string|				_CLN = app.crashlogname
 |[string]|					OldArgs = nil
 |message|					_Conf
 |config|					Prefs
@@ -20,7 +20,9 @@ function Sleep (|Date| Duration)
 	cpp_wrapper JB_Date__Sleep
 
 syntax access (|int| i, |string|)
-	return .args[i]
+	if .args > i
+		return .args[i]
+	error "Missing shell argument: " + i.Render
 	
 function conf (|string| name, |string|)
 	return ._conf[name].value
