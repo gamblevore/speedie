@@ -834,6 +834,7 @@ module
 	function SmartWrite (|string| S, |File| F)
 		.cpp_includes <~ s.hash|int64|.render
 		require F!=nil
+		f.Offset = 0 // oof. can write \0\0\0\0 at start of file otherwise
 		require !(F.matchData( S))
 		.wroteAny = true
 		F.Data = S
