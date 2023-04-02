@@ -5003,6 +5003,8 @@ void JB_FS_ProblemsFound(FastString* self, int count);
 
 JB_String* JB_FS_Render(FastString* self, FastString* fs_in);
 
+void JB_FS_AppendMultiStr(FastString* self, JB_String* data, int count);
+
 void JB_FS_AppendFastString(FastString* self, FastString* fs);
 
 void JB_FS_AppendInt64(FastString* self, int64 data);

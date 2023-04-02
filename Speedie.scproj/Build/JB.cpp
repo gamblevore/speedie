@@ -19750,6 +19750,20 @@ JB_String* JB_FS_Render(FastString* self, FastString* fs_in) {
 	return _tmPf0;
 }
 
+void JB_FS_AppendMultiStr(FastString* self, JB_String* data, int count) {
+	int needed = JB_Str_Length(data) * count;
+	if (JB_FS_FreeSize(self) < needed) {
+		(JB_FS_NeedSpare(self, needed));
+	}
+	{
+		int _Valuef1 = 0;
+		while (_Valuef1 < count) {
+			JB_FS_AppendString(self, data);
+			_Valuef1++;
+		};
+	};
+}
+
 void JB_FS_AppendFastString(FastString* self, FastString* fs) {
 	JB_FS_AppendMem_(self, fs->ResultPtr, fs->Length);
 }
@@ -22926,18 +22940,12 @@ JB_String* JB_Str_OperatorMul(JB_String* self, int n) {
 		return JB_Str_MulBool(self, n == 1);
 	}
 	FastString* fs = JB_Incr(JB_FS__New());
-	{
-		int _Valuef1 = 0;
-		while (_Valuef1 < n) {
-			JB_FS_AppendString(fs, self);
-			_Valuef1++;
-		};
-	}
-	;
-	JB_String* _tmPf2 = JB_Incr(JB_FS_SyntaxCast(fs));
+	(JB_FS_SizeSet(fs, n * JB_Str_Length(self)));
+	JB_FS_AppendMultiStr(fs, self, n);
+	JB_String* _tmPf0 = JB_Incr(JB_FS_SyntaxCast(fs));
 	JB_Decr(fs);
-	JB_SafeDecr(_tmPf2);
-	return _tmPf2;
+	JB_SafeDecr(_tmPf0);
+	return _tmPf0;
 }
 
 bool JB_Str_OperatorPathMatch(JB_String* self, JB_String* path) {
@@ -24723,7 +24731,7 @@ void JB_File__testjb() {
 		JB_ZalgoLine(t);
 	}
 	JB_Decr(t);
-	JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 100));
+	JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12));
 	JB_Str_CompressTest((_tmPf0), false);
 	JB_Decr(_tmPf0);
 }
@@ -43943,4 +43951,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -1437050820068174477 -1883104102257829330
+// 3053680464366291098 -1883104102257829330
