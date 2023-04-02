@@ -256,7 +256,6 @@
 		AC61010E2798768C00278BEF /* libSpeedie.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSpeedie.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC78080D256C065000ED647E /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		ACB2D27929BCCAB70070E60F /* PerryDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		ACB2D27A29BCCAB70070E60F /* PerryApp copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PerryApp copy-Info.plist"; path = "/usr/local/speedie/Perry.scproj/PerryApp copy-Info.plist"; sourceTree = "<absolute>"; };
 		ACB86AF9260BB58900555758 /* Perry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perry.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -396,7 +395,6 @@
 				AC528F132961F9F0005EFB9D /* AVFoundation.framework */,
 				AC528F142961FA8C005EFB9D /* libSDL2.dylib */,
 				AC9E1722233A859B003B433F /* Products */,
-				ACB2D27A29BCCAB70070E60F /* PerryApp copy-Info.plist */,
 				ACB2D27D29BCF4AD0070E60F /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -1003,7 +1001,7 @@
 				FRAMEWORK_SEARCH_PATHS = $BUILT_PRODUCTS_DIR;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				INFOPLIST_FILE = "PerryApp copy-Info.plist";
+				INFOPLIST_FILE = OSX/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1047,7 +1045,7 @@
 				FRAMEWORK_SEARCH_PATHS = $BUILT_PRODUCTS_DIR;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				INFOPLIST_FILE = "PerryApp copy-Info.plist";
+				INFOPLIST_FILE = OSX/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
