@@ -436,7 +436,7 @@ function message.owningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
 	|| s = self
 	|| WillEnd = false
 	while s
-		if (s == @tmp) and find.valuelower(s.name)
+		if (s == @tmp) and find.ValueLower(s.name)
 			return s
 		require !willend
 		|| p = s.parent
