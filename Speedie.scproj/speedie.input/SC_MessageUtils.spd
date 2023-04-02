@@ -160,10 +160,12 @@ function Message.DeclName (|Message|)
 
 
 // same as above?
-function Message.GetDclName (|Message|)
+function Message.GetDclName (|bool| Need=false, |Message|)
 	rz = self[@Nil, 1]
 	if rz == @Rel
 		rz = rz[@thg]
+	if !rz and need
+		error (self, "No decl name found")
 
 
 
