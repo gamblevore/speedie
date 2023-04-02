@@ -956,7 +956,7 @@ bool JB_File_DataSet( JB_File* self, JB_String* Data ) {
 		return false;
 	}
 	JB_File_SizeSet(self, 0);
-	JB_File_OffsetSet(self, 0); // setting the size does not set the offset!
+	JB_File_OffsetSet(self, 0); // necessary as ftruncate doesnt do this.
 	int N = JB_File_Write(self, Data);
 	if (!WasOpen)
 		JB_File_Close(self);
