@@ -31,7 +31,8 @@ function compiler.SetupEnv
 	
 	check (app.pref_path) "Conf missing prefpath"
 	app.PrefsInit
-	if app..talk and app.IsMainThread
+	|| talk = app..talk
+	if talk.length and app.IsMainThread
 		app.IgnoreBreakPoints
 
 	errorcolors.DisableIfNoTerminal
