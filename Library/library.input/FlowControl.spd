@@ -1,11 +1,7 @@
 
 /*
-how to do this?
-we really want this to STREAM in. So... how? We want stringstream to stream
-
-I think combining the files into one, IS possssible... but we SHOULDN'T do it first.
-Its too many complex tricky things to solve all at once. First get the thing working...
-then see if we can optimise it.
+So what do we have? we basically write a chunk of data into a file, and it gets compressed! Pretty simple!
+So we want the stringstream to be able to give us back chunks of data.
 */
 
 
@@ -25,6 +21,7 @@ struct FlowPart
 	function Flush
 		.buff.CompressInto(.write, .stats)
 		.buff.Curr = .buff.start
+		.write.Flush
 	
 	function Test (|uint| Expected, |int| Bytes)
 		opt norefcounts
