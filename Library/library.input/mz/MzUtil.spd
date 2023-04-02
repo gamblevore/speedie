@@ -21,7 +21,8 @@ extend string
 			return self
 		rz = string.error
 		|| fs = faststring()
-		if .DecompressSub(st, lim, .parse_jbin, fs)
+		|| mz = .parse_jbin
+		if mz and .DecompressSub(st, lim, mz, fs)
 			rz = fs
 
 

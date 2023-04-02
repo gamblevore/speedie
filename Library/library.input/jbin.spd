@@ -6,11 +6,12 @@
 
 
 extend message
-	render render_jbin (|string| sheb = "")
+	render render_jbin (|string| execute = "")
 		opt norefcounts
 		require self
 		|| js = fs|jbin|
-		js.sheb(sheb)
+		if execute
+			js.sheb(execute)
 		js.jinit
 		|| ch	 = self
 		|| after = .FlatAfter
@@ -43,14 +44,12 @@ role JBin (Faststring)
 		.addmemory(type, into, addr, L)
 
 	function sheb		(|string| data)
-		if data
-			self <~ '#'
-			self <~ '!'
-			self <~ data
-			self <~ '\n' // noice
+		self <~ '#'
+		self <~ '!'
+		self <~ data
+		self <~ '\n' // noice
 
 	function jinit
-		.length = 0 // whateverrrrr...
 		self <~ _JbinHeader
 
 	function up (|int| amount = 1)
@@ -85,7 +84,7 @@ role JBin (Faststring)
 		.length = nwe
 
 
-function stringstream.parse_ (|MessageRoot|)	
+helper stringstream.parse_ (|MessageRoot|)	
 	require .test(_JbinHeader)
 	|message| Curr
 	
