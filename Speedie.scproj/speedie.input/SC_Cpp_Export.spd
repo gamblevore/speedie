@@ -13,7 +13,7 @@ linkage
 module
 	|SCClass| 	CurrClass
 	|uint64| 	LubHash
-	|string| 	FindGlobalsCpp = `		
+	|string| 	FindGlobalsCpp = (–compress `		
 
 extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	*src = JB_LUBSrc2;
@@ -24,8 +24,7 @@ extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
 	*src = JB_LUBSrc2;
 	return JB_LUB;
 }
-`
-
+`).decompress // just test that my compressor works...!!
 	
 	function compiler.Reachedfuncs (|int|)
 		opt norefcounts
