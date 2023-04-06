@@ -342,8 +342,6 @@ int StrDiffAt2( MiniStr S, MiniStr F ) {
 
 Dictionary* UnLeafify_(FindResult& F, DictionaryLeaf* Leaf) {
 // Mismatch in a leaf. Replace everything with branches up to the first mismatch.
-	//JB_DoAt(6903);
-	static int aaa = 0;
     MiniStr OldKey = LeafKey(Leaf);
     int DiffAt = StrDiffAt2( OldKey, F.Data );
     
