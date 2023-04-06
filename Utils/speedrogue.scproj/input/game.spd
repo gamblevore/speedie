@@ -564,7 +564,7 @@ function Splash
 			|int| y = f.bounce*(h-2)
 			Terminal <~ (Title, (x+1, y+1), terminal.Red+i)
 
-		|| title2 = " <3 Siarraaa "
+		|| title2 = "Welcome to SpeedRogue"
 		|| x2 = (terminal.w - title2.length) / 2
 		Terminal <~ (title2, (x2, 0), Terminal.Red)
 		Terminal <~ ( file://HeartLogo.txt , (32, 10), terminal.red)
@@ -572,8 +572,8 @@ function Splash
 		if Terminal[]
 			exit
 
-}
-	
+} 
+
 main
 	|| a = app[0]
 	if info.load(a.int)
