@@ -84,31 +84,42 @@ role JBin (Faststring)
 		.length = nwe
 
 
-helper stringstream.parse_ (|MessageRoot|)	
-	require .test(_JbinHeader)
-	|message| Curr
-	
+helper stringstream.Parse_Jbin (|MessageRoot|)	
+	expect .test(_JbinHeader)  (self, "Not jbin")
+	|message|	Curr
+	||			Type = 0
 	while (self)
-		|uint| info = .Byte
-		|| L	= info & 63
-		|| Dir	= info >> 6						// 3 = up,  2 = same,  1 = down :)
-		if Dir == 3
-			curr = curr.upward(L)					#loop
+		|| name = .NextJbin(type)
+		if type < 0 // go up
+			curr = curr.upward(-type)					#loop
 		  else
-			if L >= 60
-				L = .lint0(L-60)
-			|| type = .byte
-			|| msg  = curr.msg(type|syntax|,  .str(L))
-			if msg.func > @bin					// need @max
-				error (msg, "Corrupted jbin")
-				msg.func = @tmp
+			|| msg = curr.msg((type>>1)|syntax|, name)
 			rz := msg
-			if !curr or Dir == 1
+			if !curr or Type & 1
 				curr = msg
 
 
+helper stringstream.NextJbin (|&int| type, |string|)	
+	|uint| info = .Byte
+	|| L	= info & 63
+	|| Dir	= info >> 6						// 3 = up,  2 = same,  1 = down :)
+	if Dir == 3
+		*type = -L
+		return nil
+	if L >= 60
+		L = .lint0(L-60)
+	|| t = .byte
+	if t > @bin|int|						// need @max
+		if !.ErrorReported
+			error (self, "Corrupted jbin")
+			.ErrorReported = true
+		t = @tmp
+	*type = (t<<1)+(2-Dir)
+	return .str(L)
+
+
 function string.parse_jbin (|message|)
-	return .stream.parse_jbin
+	return .Stream.Parse_Jbin
 
 function string.IsJbin (|bool|)
 	return self starts _JbinHeader
@@ -118,5 +129,4 @@ function string.digest (|string|)
 		return self
 	return .parse$.render_jbin
 
-function stringstream.Parse_Jbin (|MessageRoot|)
-	return .parse_  #expect  (self, "Not jbin")
+

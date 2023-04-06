@@ -7,6 +7,7 @@ class StringStream
 	|int|		ChunkSize
 	|int| 		StartFrom
 	|bool| 		IsEnded
+	|bool| 		ErrorReported
 	linkage:cpp_Part ss
 	
 	Flags
@@ -93,7 +94,8 @@ class StringStream
 		return .length - .position
 	
 	function Str (|int| n, |int|skip=0, |string|)
-		require n > 0 and skip < n
+		ifn n > 0 and skip < n
+			return ""
 		if (.data has n) or (.IsEnded)
 			|| pos = .data.position		// no need use the .startfrom
 			.data.position = n + pos
