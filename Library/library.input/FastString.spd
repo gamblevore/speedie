@@ -155,6 +155,9 @@ class FastString {
 	syntax Append (|int64| data)
 		cpp_part AppendInt64
 		.AppendIntegerAsText(data, 1)
+	syntax Append (|uint| data)
+		cpp_part AppendUint
+		self <~ data|int64|
 
 	
 	syntax Append (|int| data)
