@@ -467,7 +467,7 @@ module SDLApp
 		.TextInputEnabledAtStart = .TextInputEnabled		
 		if ListView.delayedItTill.fired
 			ListView.delayedItTill = 0
-			|| lv = w.focus
+			|| lv = w.realfocus
 			if lv isa ListView
 				lv.TryDelayedEdit
 
@@ -725,7 +725,7 @@ module SDLApp
 
 	function StandardKeys (|keys| key, |bool|)
 		|| w	= __modules__.window.front
-		|| g	= w.focus
+		|| g	= w.realfocus
 			if keys.cmd
 				if (key is g)
 					if !g.__Search__(sdlapp.lastsearch, false)
