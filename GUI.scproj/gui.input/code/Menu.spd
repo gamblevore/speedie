@@ -73,13 +73,6 @@ class Menu (ListView)
 			.Select(l)
 			
 		return moved or .SelJustChanged 
-	
-	
-	function ContainsFocus (|bool|)
-		opt norefcounts
-		for c.up in .window.focus
-			if c == self
-				return true
 		
 	
 	function ShowCmm (|guicontrol| Owner, |int| Y, |int| X = -1)
