@@ -202,7 +202,7 @@ class File (String)
 		return (.Size == S.Length) and (.ReadAll(true) == S)
 
 	
-	function ReadAll (|int| lim = 128MB, |bool| AllowMissing = true, |string|)
+	function ReadAll (|int| lim = 128MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
 		cpp_wrapper JB_File_ReadAll
 	
 	
@@ -357,10 +357,10 @@ class File (String)
 				rz = FastString()
 				rz.file = f
 	
-	function string.In (|string|T="", |StringStream|)
+	function string.In (|string|T="", |int| ChunkSize=4MB, |StringStream|)
 		|| f = .file
 		if f.exists
-			rz = stringstream(f)
+			rz = stringstream(f, chunkSize)
 			if !rz.test(t)
 				rz = nil
 	

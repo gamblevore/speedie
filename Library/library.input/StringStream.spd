@@ -1,38 +1,34 @@
 
 
-/*
-FOR THIS FILE:
-****** literally only need to finish the .need function! No knowledge of jbin!!! ****** 
-*/
-
-
-
-
 class StringStream
 	|FastBuff|	Data
 	|file|		File
 	|int|		Length
 	|int|		ChunkSize
-	|int| 		Mode
+	|int| 		StartFrom
+	|bool| 		IsEnded
 	linkage:cpp_Part ss
 	
 	Flags
 		JbinMode = 1
 	
-	function Need (|int| n)
-	
 	constructor (|string| d)
 		d := ""
 		.data.readfrom = d
 		.length = d.length
-	constructor (|file| file, |int| ChunkSize=4MB, |int| Mode=0)
+	constructor (|file| file, |int| ChunkSize=4MB)
 		cpp_part ConstructorStream
 		file.close
 		.file = file
 		.ChunkSize = chunksize
 		.length = file.size
-		.Mode = Mode
-		.data.readfrom = file.read(chunksize)		// for now
+		.ReadChunk
+	
+	helper ReadChunk (|bool|)
+		.data.readfrom = .file.read(.chunksize)		// for now
+		if .data.readfrom.length < .chunksize
+			.isended = true // not technically true for pipes... but this will do for now!
+		return .data.readfrom
 	
 	function Skip (|int| p = 1)
 		if p < 0 // end
@@ -41,14 +37,28 @@ class StringStream
 			.position += p
 	syntax cast (|bool|)
 		require (self != nil)
-		return (.position inrange .length)
+		if .data has 1
+			return true
+		return .NextChunk
+	
+	helper NextChunk (|bool|)
+		opt norefcounts
+		if .file
+			.startfrom += .data.size
+			if .ReadChunk
+				return true
+			.file = nil // why not
+		
+		
 	function Byte (|byte|)
-		.need(1)
+		ifn .data has 1
+			require .NextChunk
 		return .data.byte
+	
 	function Position (|int|)
-		return .data.position
+		return .data.position + .StartFrom
 	setter Position (|int|)
-		.data.position = value
+		.data.position = value - .StartFrom
 	function bint (|int|n=4, |int64|)
 		for n
 			rz <<= 8
@@ -63,30 +73,44 @@ class StringStream
 			rz |= .byte << i << 3
 
 	function CString (|string|)
+		// this function doesn't work with streaming...
+		// its not ideal. but none of my code needs this streamed!
+		// they just read the entire file in. So I don't need it!
 		|| p = .position
 		|| zpos = .data.find(0|byte|, p, int.max)
 			.position = zpos+1
-			return .data[p, zpos]|string|
+			return .data[p, zpos] // don't call .section, seeing as its not streaming anyhow
 	
 	function upto (|int| end, |int|)
 		return end - .position
 	function uint (|int| size, |int| mult=256, |uint64|)
 		for size
 			rz *= mult
-			rz += .Byte		
+			rz += .Byte
 	function Trim (|int| n, |string|)
 		return .str(n).trim
 	function Remaining (|int|)
 		return .length - .position
+	
 	function Str (|int| n, |int|skip=0, |string|)
-		.need(n)
-		|| p = .position
-		|| p2 = p + n
-		.position = p2
-		return .data.syntaxaccess(p+skip, p2)
+		require n > 0 and skip < n
+		if (.data has n) or (.IsEnded)
+			|| pos = .data.position		// no need use the .startfrom
+			.data.position = n + pos
+			return .data.syntaxaccess(pos + skip, .data.position)
+
+		|| Remaining = n - skip
+		|| r = string(Remaining) #require
+		while
+			|| Copied = .data.CopyTo(r.address, .data.Remaining min Remaining)
+			Remaining -= Copied
+			loop Remaining > 0
+			if !.NextChunk
+				return r[0, r.length - remaining].copy
+		return r
+	
 	function utf8 (|int|n, |int|skip=0, |string|)
-		.position += skip
-		return  .str(n-skip).utf16to8(2)
+		return  .str(n,skip).utf16to8(2)
 	function test (|string| Header, |bool|)
 		if !Header
 			return true
@@ -100,55 +124,3 @@ function string.Stream (|string|T="", |StringStream|)
 	if !rz.test(t)
 		rz = nil
 
-
-
-/*
-thoughts:
-
-
-not sure? What do we even mean really?
-we want to be able to read in chunks.
-and to be able to read in chunks... from a compressed file
-so the chunk-reader seems the first thing we need!
-restitching... I don't like it, really. its a nasty thing
-better to just have the whole file, or well-defined chunks.
-
-We'd also need to improve... oh fuck. well a lot of things.
-
-Let me see... we could just re-use the natural chunk behaviour. So we'd have to adapt
-our chunker. Basically open it up. I can't see any other way... really.
-
-We'd have to embed the compressed file within more jbins... thats the only other way.
-
-Perhaps not a terrible idea?
-
-lets list the approaches and their problems:
-
-	jbin wrapper
-		* basically an entire string copy... in memory. unnecessary?
-	write one chunk at a time.
-		* We need the final length of all the chunks-combined, to actually compress like this. Which we don't have at the start as we don't know.
-			* If we don't know the final length, we can't write it, right? seems so?
-				* Could we avoid putting in the final length?
-				* We'd need to change how the decompress system works...
-		* We need the compressed chunklength, to read back one chunk at a time...
-
-	Write one entire compressed string at a time
-		* better... but not perfect.
-		* I like that it uses a different input system. This means it HAS to be chunked.
-			* it is technically a different format. Just very simple to work with.
-			* It will also fail to decompress properly... which is interesting. Perhaps we want that.
-		* we'd need the compressed size in order to chunk the read!, which we don't know until we did the compression!
-		* Can we just try to align to the depth? We'll probably need to fudge the input/output already anyhow?
-		
-	Use a different format
-		* Bad.
-		
-	* Decompressing large files might be a nice thing... and parsing with jbin. if we can do this transparently, this is OK? it would also work with or without jbins... being compressed.
-		* I think jbin reorienting might be a good thing?
-		* Jbin seems self reorienting as it is byte-aligned. All we need is the "need" func done.
-		* As long as we don't need to know the final length, it is OK?
-			* Could also be useful for compressing files in general... right?
-			* The problem is... we do also WANT some kind of chunking behaviour!! So we don't WANT a proper normal compressed file! 
-	
-*/

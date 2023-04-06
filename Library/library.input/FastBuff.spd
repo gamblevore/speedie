@@ -34,16 +34,27 @@ struct FastBuff
 			return .readfrom[pos, after] // better
 		|| A = .clip(pos)
 		|| B = .clip(after, 0)
-		return string.Copy(A, B-A)
+		if B >= A
+			return string.Copy(A, B-A)
 	function Clip (|int| v, |int| reduce=1, |&byte|)
 		if v <= 0
 			return .start
 		v = v min (.size-reduce)
 		return .start + v
+	function CopyTo (|&byte| Dest, |int| Length, |uint|)
+		|| A = .curr
+		require (A < .end and length > 0)
+		|| B = A + Length
+		if b > .end
+			b = .end
+		rz = B - A
+		.curr = b
+		Memory.Copy(Dest, A, rz)
+		
 	function Position (|int|)
 		return .curr - .start
-	function FreeSize (|int|)
-		return .end - .start
+	function Remaining (|int|)
+		return .end - .curr
 	setter Position (|int|)
 		.curr = .start + value
 	function Byte (|byte|)
@@ -59,8 +70,9 @@ struct FastBuff
 				return pos - .Start
 			Pos++
 		
-	function IsFull (|bool|)
-		return .curr >= .end
+	operator has (|int| n, |bool|)
+		return .end - .curr >= n
+	
 	setter ReadFrom (|string|)
 		.ReadFrom = Value
 		.start = Value.Address

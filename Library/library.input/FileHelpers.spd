@@ -171,7 +171,7 @@ extend String
 		return self[slash, dot]
 		
 
-	function ReadFile (|int|lim=1024MB, |bool|AllowMissing=true, |string|)
+	function ReadFile (|int|lim=1024MB, |bool|AllowMissing=true, |stringthatwasreadsafely|)
 		return .file.readall(lim, AllowMissing)
 
 

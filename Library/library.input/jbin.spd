@@ -114,10 +114,9 @@ function string.IsJbin (|bool|)
 	return self starts _JbinHeader
 
 function string.digest (|string|)
-	if !.IsJbin
-		|| p = .parse
-			return p.render_jbin
-	return self
+	if .IsJbin
+		return self
+	return .parse$.render_jbin
 
 function stringstream.Parse_Jbin (|MessageRoot|)
 	return .parse_  #expect  (self, "Not jbin")
