@@ -5,18 +5,18 @@
 
 
 constants
-	kIsConstructor	= 1
-	kIsDestructor	= 2
-	kIsNew			= 4
-	kIsProperty		= 8
-	kIsComparison	= 16
-	kIsReffer		= 32
-	kIsLayer		= 64
-	kIsAlloc		= 128
-	kIsNewStruct	= 256
+	kIsConstructor		= 1
+	kIsDestructor		= 2
+	kIsNew				= 4
+	kIsProperty			= 8
+	kIsComparison		= 16
+	kIsReffer			= 32
+	kIsLayer			= 64
+	kIsAlloc			= 128
+	kIsNewStruct		= 256
 	kDestructorNotFromLocalRefs = 512
-	kIsInitFunc		= 1024
-	kIsMemory		= 2048 // kIsProperty
+	kIsInitFunc			= 1024
+	kIsMemory			= 2048 // kIsProperty
 	kIsVirtualCaller	= 4096
 	kIsEmptyConstructor = 1<<13
 
@@ -1734,7 +1734,7 @@ function scfunction.init_sub (|message| node,  |scbase| name_space)
 	.minopt			= arg.FindClassOption("opt",	"min")
 
 	if  Arg.FindClassOption("pragma", "DontDestructLocally")
-		.alloccode |= kDestructorNotFromLocalRefs
+		.AllocCode |= kDestructorNotFromLocalRefs
 	
 
 function NewFuncSub (CollectFunc)
