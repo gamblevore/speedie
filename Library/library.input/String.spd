@@ -288,11 +288,6 @@ class String
 			if after >= b
 				return (after-l.length, after)
 	
-	function DiffAt (|string| A, |bool| aware, |ind|)
-		cpp_Part DiffAtCase
-		if aware
-			return .LowerCase.DiffAt(A.LowerCase)
-	
 	function DiffAt (|string| A, |ind|)
 		cpp_wrapper
 

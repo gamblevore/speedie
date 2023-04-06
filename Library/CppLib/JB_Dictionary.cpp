@@ -337,7 +337,7 @@ int StrDiffAt2( MiniStr S, MiniStr F ) {
         return N;
     }
     
-    return kMaxint;
+    return -1;
 }
 
 Dictionary* UnLeafify_(FindResult& F, DictionaryLeaf* Leaf) {
@@ -352,7 +352,7 @@ Dictionary* UnLeafify_(FindResult& F, DictionaryLeaf* Leaf) {
 
     dbgexpect2( F.Parent == P );
     dbgexpect2( IsValue_(F.Parent) );
-    dbgexpect2( DiffAt != kMaxint );
+    dbgexpect2( DiffAt != -1 );
     if (DiffAt >= 0) {
         DiffAt++;        // OK so one is smaller...
     }
