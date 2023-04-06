@@ -839,7 +839,8 @@ JBClass ( StringStream , JB_Object ,
 	JB_File* File;
 	int Length;
 	int ChunkSize;
-	int Mode;
+	int StartFrom;
+	bool IsEnded;
 );
 
 struct SyntaxObj_Behaviour: Object_Behaviour {
@@ -1228,13 +1229,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1814])
+#define kJB__ErrorColors_bold (JB_LUB[1818])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1815])
-#define kJB__ErrorColors_good (JB_LUB[1816])
-#define kJB__ErrorColors_normal (JB_LUB[1817])
-#define kJB__ErrorColors_underline (JB_LUB[1816])
-#define kJB__ErrorColors_warn (JB_LUB[1818])
+#define kJB__ErrorColors_error (JB_LUB[1819])
+#define kJB__ErrorColors_good (JB_LUB[1820])
+#define kJB__ErrorColors_normal (JB_LUB[1821])
+#define kJB__ErrorColors_underline (JB_LUB[1820])
+#define kJB__ErrorColors_warn (JB_LUB[1822])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1441,10 +1442,10 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[335])
-#define kSC_BitNot (JB_LUB[433])
-#define kSC_BitOr (JB_LUB[638])
-#define kSC_BitXor (JB_LUB[1819])
+#define kSC_BitAnd (JB_LUB[339])
+#define kSC_BitNot (JB_LUB[437])
+#define kSC_BitOr (JB_LUB[642])
+#define kSC_BitXor (JB_LUB[1823])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1474,7 +1475,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1820])
+#define kJB_SaverStart1 (JB_LUB[1824])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2045,6 +2046,8 @@ JB_File* SC_Comp__BuildFolder();
 void SC_Comp__CheckIsGoodLibrary();
 
 void SC_Comp__CheckMaxVars();
+
+void SC_Comp__ClearEnvs();
 
 void SC_Comp__CodeSign(JB_File* gui_exe);
 
@@ -4209,13 +4212,19 @@ byte JB_FastBuff_Byte(FastBuff* self);
 
 byte* JB_FastBuff_Clip(FastBuff* self, int v, int reduce);
 
+uint JB_FastBuff_CopyTo(FastBuff* self, byte* Dest, int Length);
+
 void JB_FastBuff_destructor(FastBuff* self);
+
+bool JB_FastBuff_OperatorHas(FastBuff* self, int n);
 
 int JB_FastBuff_Position(FastBuff* self);
 
 void JB_FastBuff_PositionSet(FastBuff* self, int Value);
 
 void JB_FastBuff_ReadFromSet(FastBuff* self, JB_String* Value);
+
+int JB_FastBuff_Remaining(FastBuff* self);
 
 int JB_FastBuff_Size(FastBuff* self);
 
@@ -5734,15 +5743,13 @@ void JB_ss_destructor(StringStream* self);
 
 int64 JB_ss_lint0(StringStream* self, int n);
 
-void JB_ss_Need(StringStream* self, int n);
+bool JB_ss_NextChunk(StringStream* self);
 
 Message* JB_ss_parse_(StringStream* self);
 
 Message* JB_ss_Parse_Jbin(StringStream* self);
 
-int JB_ss_Position(StringStream* self);
-
-void JB_ss_PositionSet(StringStream* self, int Value);
+bool JB_ss_ReadChunk(StringStream* self);
 
 JB_String* JB_ss_Str(StringStream* self, int n, int skip);
 
@@ -8178,7 +8185,10 @@ inline bool JB_ss_SyntaxCast(StringStream* self) {
 	if ((!(self != nil))) {
 		return nil;
 	}
-	return (JB_int_OperatorInRange(JB_ss_Position(self), self->Length));
+	if (JB_FastBuff_OperatorHas((&self->Data), 1)) {
+		return true;
+	}
+	return JB_ss_NextChunk(self);
 }
 
 inline bool JB_Array_SyntaxCast(Array* self) {
