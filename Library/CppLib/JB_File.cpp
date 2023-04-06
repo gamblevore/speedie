@@ -468,9 +468,16 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 	}
 #endif
 
+//int JB_App__ClearEnv() {
+//	clearenv; // sigh. not on osx!
+//}
+
 int JB_App__SetEnv(JB_StringC* name, JB_StringC* value) {
-	if (name and value)
-		return setenv((const char*)(name->Addr), (const char*)(value->Addr), 1);
+	if (name) {
+		if (value)
+			return setenv((const char*)(name->Addr), (const char*)(value->Addr), 1);
+		return unsetenv((const char*)(name->Addr));
+	}
 	return -999;
 }
 
