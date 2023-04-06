@@ -52,11 +52,13 @@ function CallFromSorter (SorterComparer)
 	return bb.name < aa.name
 
 
+function string.LowerDiffAt (|string| A, |ind|)
+	return .LowerCase.DiffAt(A.LowerCase)
 
 	
 function PerryIDE.AutoCompleteFB (|message| list, |AutoCompleteMode| Mode, |string| reason, |bool|)
 	opt NoRefCounts
-	require .editme.CanAutoComplete
+	require .EditMe.CanAutoComplete
 	|| w		= 5
 	|| Common	= int.max
 	|| shortest = Common
@@ -68,7 +70,7 @@ function PerryIDE.AutoCompleteFB (|message| list, |AutoCompleteMode| Mode, |stri
 			(longest max= chn.length)
 			(shortest min= chn.length)
 			|| p = ch.prev
-				common = common min chn.diffat(p.name, true)
+				common = common min chn.LowerDiffAt(p.name)
 		  else
 			ch.remove
 		
