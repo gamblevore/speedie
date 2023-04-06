@@ -161,7 +161,10 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 			cmode = ""
 		if Platform.osx
 			cmode += "-fobjc-arc  -fobjc-link-runtime"
+
 	
+	rz.AppendWords( cmode )
+
 	if options.Compile32Bit.IsKnown
 		rz.AppendWords( ("-m32", "-m64")(options.Compile32Bit.default) )
 	
@@ -176,7 +179,6 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 		
 	rz.AppendWords( "-w  -Wno-return-type-c-linkage")
 	rz.AppendWords( "-finput-charset=UTF-8 -fextended-identifiers" )
-	rz.AppendWords( cmode )
 	rz.AppendWords( " -fno-strict-aliasing  -fvisibility=hidden  -fvisibility-inlines-hidden" )
 	rz.AppendWords( Linkage[Platform.name] )
 	
@@ -190,17 +192,16 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 // just be slow for now i guess?
 // we need some way to specify core2 at least... + all the extensions
 	
-	if platform.OSX
-		if .CompilingLibFiles
-			.MacBothArch(rz)
-		  elseif (options.arch ~= "intel") // and these files aren't lib files?
-			if options.optimise >= 3 // sigh
-				rz.AppendWords( " -march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
-			// fallback?
-		  else
-			.MacBothArch(rz)
-	  else
+	ifn platform.OSX
 		rz.appendwords( "-pthread" )
+	  elseif .CompilingLibFiles
+		.MacBothArch(rz)
+	  elseif (options.arch ~= "intel") // and these files aren't lib files?
+		if options.optimise >= 3 // sigh
+			rz.AppendWords( " -march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
+		// fallback?
+	  else
+		.MacBothArch(rz)
 	
 	// stripping
 	rz.appendwords( "-fdata-sections -ffunction-sections")
@@ -362,7 +363,7 @@ function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 		return true
 
 	if Options.PrintCompileString
-		print	 "\n ${cppcompilerpath.name} "
+		print	 "\n ${cppcompilerpath} "
 		printline Join2(CompileString, " ")
 	
 	app.sleep(0.125s)
@@ -516,6 +517,7 @@ function File.TestSpeedie (|string| Variant, |bool|) {
 // Read output
 	print TransCompiler.TmpOut(Variant).ReadFile
 	|| test_err = TransCompiler.TmpErr(Variant).ReadFile
+	if test_Err.length
 		error test_err // is this even used anymore?
 
 	return StdErr.OK

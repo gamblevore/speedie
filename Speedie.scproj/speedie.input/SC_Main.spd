@@ -24,11 +24,18 @@ function Compiler.PrintResults
 		printline "exiting speedie " + app.id.render
 
 
+function compiler.ClearEnvs
+	// osx freaks out sometimes otherwise
+	for (v in app.env) (k)
+		if k ~!= "HOME" and "LOGNAME" and "PATH" and "PWD"
+			app.childenv(k) = nil
+
+
 function compiler.SetupEnv
 	opt norefcounts
 
 	error.AutoPrint = 1
-	
+	.Clearenvs
 	check (app.pref_path) "Conf missing prefpath"
 	app.PrefsInit
 	|| talk = app..talk
