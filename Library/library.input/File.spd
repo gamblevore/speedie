@@ -92,7 +92,7 @@ class File (String)
 		// .offset = -1 // sigh seems to caus issues
 		.write(Data)
 	
-	function visible (|bool|)
+	function string.visible (|bool|)
 		return .name[0] != '.'
 		
 	function hidden (|bool|)
