@@ -128,6 +128,7 @@ class PerryIDE (Window)
 	behaviour CancelClose 
 		|| proj = .projmsg #require
 		|| n = proj.parent.slowcount?
+		proj["pos"] = .editme.sel0
 
 		Perry.save
 		
@@ -389,68 +390,71 @@ class PerryIDE (Window)
 		"Trying to crash"
 		.SendFeedbackmsg(@tmp+"crash")
 
-
-	behaviour keydown
-		if key iscmd keys.f
+	
+	helper CmdKey (|keys| key, |bool|)
+		if key is f
 			if .masssearchfield.hasfocus
 				if .PrevView
 					.PrevView.Click
 				return .editme.OpenSearch
 			return .ShowFind
-		if key iscmd keys.k
+		if key is k
 			if !super.keydown(key)
 				.stdout.text = ""
 			return true
-		if (key is tab) and .openedmenu == .autocomplete
-			return .autocomplete.doreturn
-		if key iscmd keys.j
+		if key is j
 			return .SelTextParse
-		if key iscmd keys.e
+		if key is e
 			return .ShowErrors(true)
-		if key iscmd keys.comma
+		if key is comma
 			return ClickedPrevNext(.goprev)
-		if key iscmd keys.period
+		if key is period
 			return ClickedPrevNext(.gonext)
-		if key iscmd keys.squote
+		if key is squote
 			return .ShowNextError
-		if key iscmd keys.r
+		if key is r
 			if keys.shift and keys.option
 				.sendCrash
 			  else
 				ClickedDebug(.runButton)
 			return true
-		if key iscmd keys.o
+		if key is o
 			if keys.shift
 				clickedopenfile(self)
 			  else
 				clickedopenproj(self)
 			return true
-		if key iscmd keys.n
+		if key is n
 			if keys.shift
 				clickedCreatefile(self)
 			  else
 				clickedCreateproj(self)
 			return true
-		if key iscmd keys.b
+		if key is b
 			if keys.option
 				ClickedBird(.birdbutton)
 			  else
 				Clickedcompile(.buildbutton)
 			return true
-		if key iscmd keys.t // todo
+		if key is t // todo
 			.view(.viewfiles)
 			return true
-		if key iscmd keys.s
+		if key is s
 			if .editme is visible
 				.SaveEditing
 				return true
-		if key iscmd keys.num0
+		if key is num0
 			.ViewAsSwap
 			return true
-		if key iscmd keys.d or keys.l				// l=line jump
+		if key is d or l				// l=line jump
 			return .filelist.showquickopen
-		//if !key.IsModifier and .editme.keydown(key)
-		//	return true // the gui-system needs fixing to make this work
+
+
+	behaviour keydown
+		if keys.cmd and .cmdkey(key)
+			return true
+		if (key is tab) and .openedmenu == .autocomplete
+			return .autocomplete.doreturn
 		return super.keydown(key)
 
 	
