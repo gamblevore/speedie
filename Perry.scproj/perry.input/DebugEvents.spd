@@ -26,7 +26,6 @@ function FoundListKeys (GuiKeyEvent)
 	if key.IsDelete
 		if self isa ListView
 			|| s = .sel
-			if s is editable
 				.RemoveRow(s)
 		return true
 
