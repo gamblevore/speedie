@@ -29,6 +29,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	.autocomplete.listsource = list
 	.SetAutoPoint(.editme.sel0)
 	.showauto(false)
+	(.AutoComplete isnt typethrough)
 
 
 function message.DefineToLine (|string| count)
@@ -106,6 +107,7 @@ function PerryIDE.ClearAutoComplete
 function PerryIDE.ShowAuto (|bool| beep)
 	if .autocomplete.listsource.hasany
 		.autocomplete.Showcmm(self, .AutoPoint.y-.bottom, .AutoPoint.x)
+		(.autocomplete is typethrough)
 	  else
 		if beep
 			beep
