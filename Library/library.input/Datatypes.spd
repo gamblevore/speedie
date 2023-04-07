@@ -120,7 +120,8 @@ datatype int
 	
 	operator InRange (|int| d, |bool|)
 		pragma inline
-		return (self|uint| < d|uint|) // negative self will... fail this test. So basically tests (self >= 0 and self < d)
+		if d > 0 // can fail otherwise
+			return (self|uint| < d|uint|)
 
 
 	function IsKnown (|bool|)
