@@ -266,15 +266,12 @@ class FileViewer (ListView)
 		return .FindPaths(path, within)[0]
 
 
-	function FindPaths (|string| path, |filerow| within=nil, |[filerow]|)
-		if path
-			|| NameOnly = path[0, "./"] 
-				path = path[2...]
-			return .FindPaths_(path, within, nameonly)
-
-
-	function FindPaths_ (|string| path,  |ListViewrow| within,  |bool| NameOnly,  |[filerow]|)
+	function FindPaths (|string| path,  |listviewrow| within=nil,  |[filerow]|)
 		opt norefcounts
+		require path
+		|| NameOnly = path[0, "./"] 
+			path = path[2...]
+
 		within := .listsource
 		for f.flat in within
 			if f isa filerow
@@ -354,8 +351,18 @@ class FileViewer (ListView)
 		return .QuickOpenFileSub(path, line, "", FromReturnKey)
 
 
+	helper QuickFindPaths (|string| path, |[filerow]|)
+		ifn (path[0, "/"] or path[0,"~/"])
+			return .findpaths(path)
+		|| f = path.file
+		for ch in f
+			if ch.visible
+				rz <~ filerow(f[ch], ch)
+			
+		
+
 	helper QuickOpenFileSub (|string| path, |string| line, |string| BytePos, |int| FromReturnKey = 0, |bool|)
-		|| r = .FindPaths(path)
+		|| r = .QuickFindPaths(path)
 		if FromReturnKey
 			if (FromReturnKey >= 3) or (!path) or (path.file.exists)
 				if path
