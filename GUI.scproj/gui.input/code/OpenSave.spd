@@ -140,6 +140,15 @@ class OpenSaveDialog (Window)
 		
 		.gnormal = ¥.systemstyle
 
+
+	behaviour TypedString
+		if .KeyDownExpired.Fired
+			.Keyboard = ""
+		.KeyDownExpired = date() + 0.5s
+		.Keyboard += input
+		.Files.JumpTo(.keyboard)
+		return true
+
 		
 	behaviour keydown
 		opt NoRefCounts
@@ -161,21 +170,8 @@ class OpenSaveDialog (Window)
 					.name.setfocus
 					.name.selectall
 				return true
-		
-		if !keys.cmd and !key.isscan and key|codepoint|.isalphanum
-			.JumpToKey(key|codepoint|)
-			return true
 		return super.keydown(key)
  
-
-	function JumpToKey (|codepoint| cp)
-		if .KeyDownExpired.Fired
-			.Keyboard = ""
-		.KeyDownExpired = date() + 0.5s
-		.Keyboard += cp.Render
-		.Files.JumpTo(.keyboard)
-		
-		
 	function AddButton (|ButtonView| BTN,  |string| Oof,  |bool| first)
 		btn.ExpandOnMouseOver = 2
 		btn.size = (44~long to 4~before) by (4~up for 16)

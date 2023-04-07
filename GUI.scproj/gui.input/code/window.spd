@@ -148,6 +148,14 @@ class Window (GUIControl)
 		super.syntaxis(f) = value
 
 
+	behaviour TypedString
+		opt norefcounts
+		|| tv = .realFocus
+			if (tv isa menu) and (tv != .focus) and (tv is typethrough)
+				tv = .focus|menu|$
+			return tv.__TypedString__(input)
+
+
 	behaviour KeyDown
 		debug_require !.BlockRecurseKeyDown
 		.BlockRecurseKeyDown = true

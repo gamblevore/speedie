@@ -449,12 +449,10 @@ module SDLApp
 	
 	function UpdateTextFocus (|window| w)
 		opt norefcounts
-		|| f = w.innerfocus
-		if (f isa menu) and (f is typethrough)
-			f = nil
-		f := w.focus			
-		require f
-		|| allow = f is editable
+		|| f = w.realfocus #require
+		|| allow = (f is editable) or (f isa menu) 
+//		if (!allow) and f == w.innerfocus and f is typethrough
+//			allow = w.focus is editable
 		require .TextInputEnabled != allow
 		.TextInputEnabled = allow
 		if allow
@@ -919,17 +917,12 @@ module SDLApp
 			w.__mousewheel__(weel.xy, weel.direction)
 			return kActivity
 
-
 		  elseif  t is TEXTINPUT
-			|| e = ev.Editing
-			|| allow = .AllowTyping
-			if !allow or .CanDrag >= 2
-				return kNothing
-			|| tv = w.RealFocus
-			if tv isa textview
-				tv.TypedRaw(e.str)
-			return kActivity
-
+			if .AllowTyping and .CanDrag < 2
+				|| e = ev.Editing.str
+				if w.__typedstring__(e)
+					return kActivity
+			return kNothing
 
 		  elseif  t is KEYDOWN
 			|| kev = ev.keysym
@@ -942,7 +935,9 @@ module SDLApp
 			keys.AddKey(key)
 			
 			ifn (key is escape) and keys.escape.heldkey
-				if .StandardKeys(key) or w.__keydown__(key)
+				if .StandardKeys(key)
+					return kActivity
+				if w.__keydown__(key)
 					return kActivity
 			
 			if (.singleframenest < 2) and keys.escape.HeldKey(0.75s)

@@ -88,6 +88,8 @@ class GUIControl (ringtree)
 	behaviour RightClick
 	behaviour MouseUp
 	behaviour Copy
+	virtual TypedString (|string| Input, |bool|)
+		0
 
 	function Size (|ivec2|)
 		return .lastrect.size

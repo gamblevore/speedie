@@ -83,6 +83,7 @@ class Menu (ListView)
 		.size = w by h
 		.showmenu(owner)
 	
+	
 	function ShowMenu (|guicontrol| Owner)
 		|| win = .window					#require
 		win.inline.clear
@@ -122,7 +123,33 @@ class Menu (ListView)
 		if key.iscancel or (key.iscmm and .iscmm)
 			.closemenu
 			return true
-		return super.keydown(key)
+		if super.keydown(key)
+			return true
+		if self is typethrough
+			|| w = .outerfocus
+				return w.__keydown__(key)
+
+
+	function guicontrol.OuterFocus (|guicontrol|)
+		opt norefcounts
+		|| w = .window
+			|| i = w.innerfocus
+			if i == self
+				return w.focus
+					
+
+	helper FindTypedRow (|string| input, |listviewrow|)
+		for s.all in self
+			if s.__text__[0,input,true]
+				return s
+
+
+	behaviour TypedString
+		opt norefcounts
+		|| r = .findtypedrow(input)
+			.select(r)
+		return true
+			
 
 
 class MenuItem (ListViewrow)

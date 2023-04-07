@@ -448,6 +448,7 @@ class TextView (GUIControl)
 		opt NoRefCounts
 		|| d = .ViewPos(x, (.MaxVisibleLines/3), 2) //idk
 		.sel2((x, x + length), d)
+		
 
 
 	function ViewPos (|int| x,  |int|before=0, |int| back=0, |bool| Exact=false, |TextViewLine|)
@@ -1035,19 +1036,19 @@ class TextView (GUIControl)
 		return self[.SelectCurrLine]
 
 	
-	helper TypedRaw (|string| s, |bool|)
+	behaviour TypedString
 		// shouldn't it be shift-space? option-space is a real char.
-		if (keys.option and s == " ") or s == " "
+		if (keys.option and input == " ") or input == " "
 			return .Swapchars
 		
-		if s == "\\"
-			s = "|"
-		  elseif s == "|"
-			s = "\\"
-		if s.length == 1
-			if (.onkeydown)(self, s.codepoint)?
+		if input == "\\"
+			input = "|"
+		  elseif input == "|"
+			input = "\\"
+		if input.length == 1
+			if (.onkeydown)(self, input.codepoint)?
 				return true
-		return .typed(s, true)
+		return .typed(input, true)
 	
 
 	helper Typed (|string| s, |bool| ForceCounter=false, |int|)
@@ -1126,7 +1127,8 @@ class TextView (GUIControl)
 		|| Same = (p.width == s.length) and self[p.x, s] 
 		|| i	= (p.x + s.length, p.x2)(!Same)
 		.ViewPos(i, .MaxVisibleLines/3) // just wants it in view... if not, then scrollback
-
+		
+		
 		if !Same
 			.CanAutoComplete = false
 			.AutoCompleteString = ""
@@ -1135,6 +1137,9 @@ class TextView (GUIControl)
 			|| x = (p.x, p.x2)(s)
 			|| tab = (s in '\t')
 				.undochecker = -1
+				
+			// we should update the selection first! makes things more reliable!
+			
 			.TryCaptureUndo(x, nt)
 			|| it = .isinline
 				it.UpdateSearch(nt)
