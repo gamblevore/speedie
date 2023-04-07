@@ -482,7 +482,7 @@ extend PerryIDE
 			|| pos = 0
 			|| file = .DesiredStart(projfol, pos)
 			.EditRow(file)
-			.EditMe.Sel = pos
+			.EditMe.showandsel(pos)
 		  else
 			.EditRow(.filelist.start)
 
