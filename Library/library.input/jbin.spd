@@ -88,6 +88,7 @@ helper stringstream.Parse_Jbin (|MessageRoot|)
 	expect .test(_JbinHeader)  (self, "Not jbin")
 	|message|	Curr
 	||			Type = 0
+	(message).BoostMode = true
 	while (self)
 		|| name = .NextJbin(type)
 		if type < 0 // go up
@@ -97,6 +98,7 @@ helper stringstream.Parse_Jbin (|MessageRoot|)
 			rz := msg
 			if !curr or Type & 1
 				curr = msg
+	(message).BoostMode = false
 
 
 helper stringstream.NextJbin (|&int| type, |string|)	
@@ -116,6 +118,25 @@ helper stringstream.NextJbin (|&int| type, |string|)
 		t = @tmp
 	*type = (t<<1) + (2-Dir)
 	return .str(L)
+
+
+// well... we could fold nextjbin into this
+// then we basically just get a new message at a time
+// we can do somerthing like .NextMsgClearing... so we just keep the parent chain.
+// so... that would be in... .upward?
+// well no, there are two places we go up. kinda. we can go down or left... is the problem
+// if we go down... we gotta update curr, if not we keep curr. but its the same new node returned.
+helper stringstream.NextMsg (|&message| curr, |Message|)	
+	require (self)
+	|| type = 0
+	|| name = .NextJbin(type)
+	if type >= 0
+		|| msg = (*curr).msg((type>>1)|syntax|, name)
+		if !*curr or Type & 1
+			*curr = msg
+		return msg
+	*curr = (*curr).upward(-type) // go up
+	return .NextMsg(curr)
 
 
 function string.parse_jbin (|message|)
