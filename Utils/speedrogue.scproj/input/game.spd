@@ -531,7 +531,7 @@ function Run (|bool| Splash)
 function FrameStep
 	.Heal
 	for c in .data
-		(c.flags &= ~ roguecellstate.visible)
+		(c.flags &= ~roguecellstate.visible)
 	for c in .data
 		for obj in c
 			obj.FrameStep

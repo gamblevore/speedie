@@ -6,7 +6,6 @@ Pantry 0.1 (1-100)
 
 LivingRoom 0.3 (1-100)  
 
-
 WeaponsRoom 0.1 (1-100) 
 
 Colloseum 0.2 (1-100) 
