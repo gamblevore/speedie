@@ -38,7 +38,7 @@ class FileRow (ListViewRow)
 			path = "" // crash bug?
 		.Location	= (path.PathDir, path)(DirFile)
 		.dirfile	= DirFile
-		if dirfile == "."
+		if path and dirfile == "."
 		.asdir		= dirfile
 		.name		= name
 		.lastsize	= (path.File.Size, 0)(!.asdir)

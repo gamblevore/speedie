@@ -352,13 +352,16 @@ class FileViewer (ListView)
 
 
 	helper QuickFindPaths (|string| path, |[filerow]|)
-		ifn (path[0, "/"] or path[0,"~/"])
-			return .findpaths(path)
 		|| f = path.file
+		if !(path[0, "/"] or path[0,"~/"]) or (f.exists and !f.isdir)
+			return .findpaths(path)
+		|| invis = path endswith "/."
 		for ch in f
-			if ch.visible
-				rz <~ filerow(f[ch], ch)
-			
+			if invis or ch.visible
+				|| s = f[ch]
+				if s.IsDir
+					ch+="/"
+				rz <~ filerow(s, ch)
 		
 
 	helper QuickOpenFileSub (|string| path, |string| line, |string| BytePos, |int| FromReturnKey = 0, |bool|)
@@ -454,23 +457,35 @@ class FileViewer (ListView)
 
 
 		function QuickOpenKey (guikeyevent)
-			|| fv = .tag
-			if fv.mustbe(fileviewer)
-				if key <= 0
-					fv.quickOpenFile(.text)
-					return true
-				|| l = fv.listopen
-				if key.isaccept
-					|| s = .text
-					|| fr = s.first
-					if fr != '/' and '~'
-						|| r = l.sel
-							s = r.obj|filerow|.location
-					check fv.quickOpenFile(s, 2) (Beep)
-				if (key is escape) or key.isaccept
-					return fv.hideopenlist
-				if key is up or down
-					return l.keydown(key)
+			|| fv = .tag|fileviewer|
+			require fv.mustbe(fileviewer)
+			if key <= 0
+				fv.quickOpenFile(.text)
+				return true
+
+			|| l = fv.listopen
+			if key.isaccept
+				ClickedOpenList(l, l.sel)
+				rz =  true
+/* // stupid code... just delete this
+				|| fl = .tag
+				if row and fl isa fileviewer
+					|| f = row.obj
+					if f isa filerow
+						fl.select(f)
+					fl.hideopenlist
+				|| s = .text
+				|| fr = s.first
+				if fr != '/' and '~'
+					|| r = l.sel
+						s = r.obj|filerow|.location
+				check fv.quickOpenFile(s, 2) (Beep)
+			
+*/
+			  elseif (key is escape) or key.isaccept
+				rz = fv.hideopenlist
+			  elseif key is up or down
+				rz = l.keydown(key)
 
 
 		function QuickOpenFocus (guiaction)
@@ -481,12 +496,27 @@ class FileViewer (ListView)
 
 
 		function ClickedOpenList (GuiListevent)
-			|| fl = .tag
-			if row and fl isa fileviewer
-				|| f = row.obj
-				if f isa filerow
-					.select(f)
-				fl.hideopenlist
+			|| V = .tag|fileviewer|
+			require row and V isa fileviewer
+			|| r = row.obj|filerow|
+			require r isa filerow
+
+			|| faa = r.location.file
+			if V.owns(r)
+				V.select(r)
+			  elseif faa.isdir
+				v.QuickOpen.textset(faa.path) // sigh. just setting .text did not work!
+				V.quickOpenFile(faa.path)
+				
+				return true
+			  else
+				r = v.findapath(faa)
+				if r
+					v.select(r)
+				  else
+					v.addextra(faa)
+			V.hideopenlist
+			return true
 			
 
 		function InsideFileViewRowDraw (ListViewRowDraw)

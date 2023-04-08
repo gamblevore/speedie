@@ -69,22 +69,24 @@ class Document (RingTree)
 		return c
 
 
-	function UpdateState (|string| nt)
+	function UpdateState (|string| nt, |ivec2| ns)
 		|| c = .current
 			if c != .original
 				c.text = nt
+				c.typingplace = ns
 				return
 		
-		.addstate(nt)
+		.addstate(nt, ns)
 	 
 
-	function AddState (|string| nt, |DocumentState|)
+	function AddState (|string| nt, |ivec2| ns, |DocumentState|)
 		|| c = .current
 			if c.text == nt
 				return c
 			c.RemoveAfter
 		
 		|| latest	= documentstate()
+		latest.typingplace = ns
 		latest.text = nt
 		self <~ latest
 		
@@ -96,7 +98,7 @@ class Document (RingTree)
 
 	function ClearTo (|string| s)
 		.clear
-		.AddState(s)
+		.AddState(s, nil)
 
 
 	function IsModified (|bool|)
@@ -209,7 +211,7 @@ class Document (RingTree)
 		.filedate	= f.modified
 		if !ChangedExternal
 			.clear
-		.AddState(data)
+		.AddState(data, nil)
 		.Original = .Current
 		.LoadedFromFile = true
 		return true
@@ -260,24 +262,25 @@ extend TextView
 		return (self is editable) and !.isinline
 
 	
-	function UpdateAllViews (|string| nt, |int| Reason)
+	function UpdateAllViews (|string| nt, |ivec2| NS, |int| Reason)
 		opt norefcounts
 		|| u = .document
 			u.UpdateViewers(Reason)
 		  else
-			.insertsub2(nt)
+			super.textset(nt)
+			(self is modified) = true
+			.touch
+			.TypingPlaceTry(ns, true, nil)
 	
-	function TryCaptureUndo (|int| x, |string| nt)
+	helper TryCaptureUndo (|int| x, |string| nt, |ivec2| ns)
 		opt NoRefCounts
 		|| u = .undoer
-		if !u or self isnt editable
-			return .UpdateAllViews(nt, DocumentState.Typing)
-		
-		if x == u.UndoChecker
-			u.UpdateState(nt)
-		  else
-			u.AddState(nt)
-		.UpdateAllViews(nt, DocumentState.Typing)				// updates self
+			if self is editable
+				if x == u.UndoChecker
+					u.UpdateState(nt, ns)
+				  else
+					u.AddState(nt, ns)
+		.UpdateAllViews(nt, ns, DocumentState.Typing)				// updates self
 
 
 	function UndoChecker (assigns:|int| x)
@@ -314,7 +317,7 @@ extend TextView
 		require .parent
 		.UndoChecker = -1
 		if reason == DocumentState.UndoOrRedo
-			.ViewPos(l.typingplace.x)//inviewback
+			.ViewPos(l.typingplace.x)
 		.Clear(l.text, reason<0)
 		.TypingPlaceTry( l.typingplace, true, nil)
 

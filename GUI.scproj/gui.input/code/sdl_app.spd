@@ -161,17 +161,19 @@ module SDLApp
 	function Size (assigns:|ivec2| S)
 		|| pos	= .ScreenPosOrig
 		|| s2	= (s.vec2*.scale).ivec2
-		.ScreenOrig((pos, s2))
+		.ScreenOrig((pos, s2)) // shouldn't i be adding pos to s2? 
 
 
 	function ScreenOrig (assigns:|ivec4| result, |bool|)
 		require .ScreenWindow
 		if (result.x <= 0) and (result.y <= 0)
 			.JB_SDL_FullScreen(.nativewindow) // SDL2 had a bug in it... probably still exists
-			//.SDL_SetWindowFullscreen(.screenwindow)
 			return true
 		|| Old = .SizeOrig
-		|| wh = result.size-1 align 3
+		|| align = .scale * (1+.IsHighDPI)
+		|| wh = result.size-1
+		if align > 1
+			 wh = wh align align
 		.SDL_SetWindowSize(.screenwindow, wh.x, wh.y)
 		if .SizeOrig != wh
 			.TryResizeLater = wh
@@ -605,14 +607,15 @@ module SDLApp
 		window.shown.Clear
 	
 	
-	function SingleFrame (|bool|)
+	helper SingleFrame (|bool|)
 		require .SingleFrameNest <= 2
 		.SingleFrameNest++
 		.ShowWindows
 			
 		|| occured  = .PreFrame (|) .FrameAndEvents
 		require !(Occured & kExiting)
-		.AppResize
+		if .NewSize
+			.AppResize
 		.UpdateWindowFrames
 		if occured&kactivity
 			.DrawFrame
@@ -625,10 +628,15 @@ module SDLApp
 		if platform.osx and app.isquarantined
 			sdlapp.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
 
-
-	function AppResize (|ivec2|)
-		require .newsize
-
+	helper Rescale (|float| NewScale, |bool|)
+		if (NewScale >= 1 and NewScale <= 8)
+			.scale = NewScale
+			.NewSize = .SizeOrig
+		  else
+			beep
+		return true
+		
+	helper AppResize (|ivec2|)
 		.raw.dispose
 		|| v = (.NewSize.vec2/.Scale).ivec2
 		.newsize = nil										// phew
@@ -736,6 +744,10 @@ module SDLApp
 
 		|| gw	= g ?? w
 		if keys.cmd
+			if (key is PLUS or EQUALS)
+				return .Rescale(.scale+0.5)
+			  elseif (key is minus)
+				return .Rescale(.scale-0.5)
 			if (key is f) and keys.option
 				.JB_SDL_FullScreen(.nativewindow, false)
 				return true

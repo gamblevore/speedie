@@ -211,7 +211,7 @@ class TextView (GUIControl)
 			return
 		
 		ifn .lastrect.vert contains p.y
-			.ViewPos(b) // inviewback
+			.ViewPos(b)
 		
 		|| t = .uncorrectedsel
 		if keys.shift or (clicks == -1)
@@ -261,24 +261,25 @@ class TextView (GUIControl)
 		.sel = (r, r)
 		
 	helper TypingPlaceDirect (|intrange| result, |bool|)
+		opt norefcounts
 		require result != ._TypingPlace
 		._TypingPlace = result
 		.PreferPrevLine = false
 		.CanAutoComplete = false
 		.autocompletestring = ""
 		.UncorrectedSel = result
+		|| u = .undoer
+			|| c = u.current
+				c.typingplace = result
 		return true
 
 	helper TypingPlaceTry (|intrange| result, |bool|insert, |textviewline| d)
 		opt norefcounts
-		require .TypingPlaceDirect(result)
-		.ChangeSel(insert, d)
-		|| u = .undoer
-			|| c = u.current
-				c.typingplace = result
+		if .TypingPlaceDirect(result)
+			.TypingPlaceSucceed(insert, d)
 
 
-	helper ChangeSel (|bool| insert, |textviewline| d)
+	helper TypingPlaceSucceed (|bool| insert, |textviewline| d)
 		if .hasfocus
 			sdlapp.selchanged
 		if !.IsCleared
@@ -391,7 +392,7 @@ class TextView (GUIControl)
 				x--
 		  else
 			t = (x, x)
-		|| d = .ViewPos(x) // inviewback
+		|| d = .ViewPos(x)
 			.preferprevline = fwd and (!d.emptyline or !d.EndsWithLine) 
 		.sel2(t,d)
 		return true
@@ -418,8 +419,8 @@ class TextView (GUIControl)
 	function ShowTypingPlace (|ivec2| r)
 		|| n = .MaxVisibleLines/2
 		if r.width
-			.ViewPos(r.x, n)		//inviewback
-		.ViewPos(r.x2, n)			//inviewback
+			.ViewPos(r.x, n)
+		.ViewPos(r.x2, n)
 
 
 	function CurrLine (|int|)
@@ -446,9 +447,8 @@ class TextView (GUIControl)
 	
 	function ShowAndSel (|int| x, |int| length=0)
 		opt NoRefCounts
-		|| d = .ViewPos(x, (.MaxVisibleLines/3), 2) //idk
+		|| d = .ViewPos(x, (.MaxVisibleLines/3), 2)
 		.sel2((x, x + length), d)
-		
 
 
 	function ViewPos (|int| x,  |int|before=0, |int| back=0, |bool| Exact=false, |TextViewLine|)
@@ -538,7 +538,7 @@ class TextView (GUIControl)
 			require range.x >= 0
 		
 		.sel2(range, nil)
-		.ViewPos(range.x, .MaxVisibleLines/2, 2) // inviewback
+		.ViewPos(range.x, .MaxVisibleLines/2, 2)
 		return true
 			
 	
@@ -1116,20 +1116,21 @@ class TextView (GUIControl)
 		return .insertsub(s, .selrange, selnew)
 
 
-	helper InsertSub2 (|string| NewText)
-		super.textset(newtext)
-		(self is modified) = true
-		.touch
-
-
 	helper InsertSub (|string| s, |intrange| p, |bool| selnew=false, |int|)
 		p = p.resolve
 		|| Same = (p.width == s.length) and self[p.x, s] 
 		|| i	= (p.x + s.length, p.x2)(!Same)
 		.ViewPos(i, .MaxVisibleLines/3) // just wants it in view... if not, then scrollback
 		
-		
-		if !Same
+		if !same
+			i = p.x + s.length
+		|| UpdatedSel = (i,i)
+		if (SelNew)
+			UpdatedSel.x = p.x
+				
+		if Same
+			.TypingPlaceTry(UpdatedSel, true, nil)
+		  else
 			.CanAutoComplete = false
 			.AutoCompleteString = ""
 			|| t = .text
@@ -1137,18 +1138,11 @@ class TextView (GUIControl)
 			|| x = (p.x, p.x2)(s)
 			|| tab = (s in '\t')
 				.undochecker = -1
-				
-			// we should update the selection first! makes things more reliable!
 			
-			.TryCaptureUndo(x, nt)
+			.TryCaptureUndo(x, nt, updatedsel)
 			|| it = .isinline
 				it.UpdateSearch(nt)
-			i = p.x + s.length
 		
-		if SelNew
-			.TypingPlaceTry((p.x, i), true, nil)
-		  else
-			.TypingPlaceTry((i, i),   true, nil)
 		.ShowTypingplace((p.x, i))
 		.UndoChecker = i
 		(.OnTextChanged)(self, 0)?
