@@ -909,7 +909,7 @@ function FixCnjSub (|Message| exp) {
 	// "error" sucks as a name... so does continue_with_Error...
 	|| CreatesError = (name == "expect" or "continue_with_error" or "error" or "check")
 
-	|| DoesReturn =  (name != "continue_with_error" and "error" and "loop")
+	|| DoesReturn =  (name != "continue_with_error" and "error" and "loop" and "check")
 	expect (CreatesError or (name == "debug_require" or "require" or "continue" or "loop")) (exp, "Must be one of '#require, #expect, #continue, #debug_require, #continue_with_error, #error, #loop' .")
 	
 	// lets fix it, if its in a rel, (it shouldn't be)
