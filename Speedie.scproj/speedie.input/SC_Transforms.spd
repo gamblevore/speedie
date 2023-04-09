@@ -58,7 +58,6 @@ function Tran_Expect (TranFunc)
 // error stuff
 // return nil
 // }
-	
 	|| ch = node[nil|syntax|] #require
 	Using (node)
 	|| Ch1 = ch.next
