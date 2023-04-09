@@ -1,10 +1,11 @@
 
 
 struct FastBuff
-	|&byte| Curr
-	|&byte| Start
-	|&byte| End
-	|string| ReadFrom
+	|&byte|		Curr
+	|&byte|		Start
+	|&byte|		End
+	|string|	ReadFrom
+	|bool| 		ErrorReported
 	
 	function TmpStr (|string|)
 		return string.FromPtr(.start, .length)
@@ -51,14 +52,27 @@ struct FastBuff
 		.curr = b
 		Memory.Copy(Dest, A, rz)
 		
-	function Position (|int|)
-		return .curr - .start
-	function Remaining (|int|)
+	function Remaining (|int64|)
 		return .end - .curr
-	setter Position (|int|)
-		.curr = .start + value
+
+	function Position (|int64|)
+		return .curr - .start
+		
+	setter Position (|int64|)
+		|| c = .start + value
+		if c < .start or c > .end
+			error (self, "Stream read too far")
+			c = .end
+		.curr = c
+		
 	function Byte (|byte|)
 		return *.curr++
+	
+	syntax Expect (|string| s)
+		if !.ErrorReported
+			.ErrorReported = true
+			error s
+		
 	function UInt16 (|uint16|)
 		|| c = .curr|&uint16|,  rz = *c++,  .curr = c|&byte|
 		

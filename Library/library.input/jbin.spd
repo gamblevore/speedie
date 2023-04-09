@@ -112,9 +112,7 @@ helper stringstream.NextJbin (|&int| type, |string|)
 		L = .lint0(L - 60)
 	|| t = .byte
 	if t > @bin|int|						// need @max
-		if !.ErrorReported
-			.ErrorReported = true
-			error (self, "Corrupted jbin")
+		error (.data, "Corrupted jbin" )
 		t = @tmp
 	*type = (t<<1) + (2-Dir)
 	return .str(L)

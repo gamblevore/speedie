@@ -7,7 +7,6 @@ class StringStream
 	|int|		ChunkSize
 	|int| 		StartFrom
 	|bool| 		IsEnded
-	|bool| 		ErrorReported
 	linkage:cpp_Part ss
 	
 	Flags
@@ -56,9 +55,9 @@ class StringStream
 			require .NextChunk
 		return .data.byte
 	
-	function Position (|int|)
+	function Position (|int64|)
 		return .data.position + .StartFrom
-	setter Position (|int|)
+	setter Position (|int64|)
 		.data.position = value - .StartFrom
 	function bint (|int|n=4, |int64|)
 		for n
