@@ -518,6 +518,7 @@ struct FastBuff {
 	byte* Start;
 	byte* End;
 	JB_String* ReadFrom;
+	bool ErrorReported;
 };
 
 struct IPCMessage {
@@ -1229,13 +1230,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1818])
+#define kJB__ErrorColors_bold (JB_LUB[1819])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1819])
-#define kJB__ErrorColors_good (JB_LUB[1820])
-#define kJB__ErrorColors_normal (JB_LUB[1821])
-#define kJB__ErrorColors_underline (JB_LUB[1820])
-#define kJB__ErrorColors_warn (JB_LUB[1822])
+#define kJB__ErrorColors_error (JB_LUB[1820])
+#define kJB__ErrorColors_good (JB_LUB[1821])
+#define kJB__ErrorColors_normal (JB_LUB[1822])
+#define kJB__ErrorColors_underline (JB_LUB[1821])
+#define kJB__ErrorColors_warn (JB_LUB[1823])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1445,7 +1446,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[339])
 #define kSC_BitNot (JB_LUB[437])
 #define kSC_BitOr (JB_LUB[642])
-#define kSC_BitXor (JB_LUB[1823])
+#define kSC_BitXor (JB_LUB[1824])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1475,7 +1476,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1824])
+#define kJB_SaverStart1 (JB_LUB[1825])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -3594,6 +3595,8 @@ inline bool JB_int64_OperatorInRange(int64 self, int64 d);
 
 int64 JB_int64_OperatorMax(int64 self, int64 d);
 
+int64 JB_int64_OperatorMin(int64 self, int64 d);
+
 int64 JB_int64_OperatorRotl(int64 self, int Amount);
 
 JB_String* JB_int64_Render(int64 self, FastString* fs_in);
@@ -4188,6 +4191,8 @@ inline int SC_Reg_ToInt(AsmReg* self);
 
 
 // JB_ClassData
+void JB_ClassData_BoostModeSet(JB_Class* self, bool Value);
+
 void JB_ClassData_Restore(JB_Class* self);
 
 
@@ -4218,17 +4223,19 @@ void JB_FastBuff_destructor(FastBuff* self);
 
 bool JB_FastBuff_OperatorHas(FastBuff* self, int n);
 
-int JB_FastBuff_Position(FastBuff* self);
+int64 JB_FastBuff_Position(FastBuff* self);
 
-void JB_FastBuff_PositionSet(FastBuff* self, int Value);
+void JB_FastBuff_PositionSet(FastBuff* self, int64 Value);
 
 void JB_FastBuff_ReadFromSet(FastBuff* self, JB_String* Value);
 
-int JB_FastBuff_Remaining(FastBuff* self);
+int64 JB_FastBuff_Remaining(FastBuff* self);
 
 int JB_FastBuff_Size(FastBuff* self);
 
 JB_String* JB_FastBuff_AccessStr(FastBuff* self, int pos, int after);
+
+void JB_FastBuff_SyntaxExpect(FastBuff* self, JB_String* s);
 
 
 
@@ -4269,6 +4276,8 @@ int SC_IR_FilePos(IR* self);
 void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
+
+void SC_IR_Print(IR* self);
 
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
@@ -5701,6 +5710,8 @@ CharSet* JB_Str_UniCS(JB_String* self);
 
 JB_String* JB_Str_UpperFirst(JB_String* self);
 
+bool JB_Str_visible(JB_String* self);
+
 Array* JB_Str_Words(JB_String* self);
 
 bool JB_Str_WriteSet(JB_String* self, JB_String* Value);
@@ -5745,7 +5756,7 @@ int64 JB_ss_lint0(StringStream* self, int n);
 
 bool JB_ss_NextChunk(StringStream* self);
 
-Message* JB_ss_parse_(StringStream* self);
+JB_String* JB_ss_NextJbin(StringStream* self, int* type);
 
 Message* JB_ss_Parse_Jbin(StringStream* self);
 
@@ -5965,8 +5976,6 @@ bool JB_File_TestBatch(JB_File* self);
 bool JB_File_TestSpeedie(JB_File* self, JB_String* Variant);
 
 ErrorInt JB_File_Touch(JB_File* self);
-
-bool JB_File_visible(JB_File* self);
 
 JB_File* JB_File__Alloc();
 
@@ -8091,7 +8100,10 @@ JB_Error* JB_Err__New(Message* node, JB_String* desc, ErrorSeverity level, JB_St
 
 //// HEADER Inlines.h
 inline bool JB_int_OperatorInRange(int self, int d) {
-	return (((uint)self) < ((uint)d));
+	if (d > 0) {
+		return (((uint)self) < ((uint)d));
+	}
+	return false;
 }
 
 inline bool JB_int64_OperatorInRange(int64 self, int64 d) {
@@ -8122,6 +8134,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
