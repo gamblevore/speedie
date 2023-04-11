@@ -262,12 +262,16 @@ function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
 	.DuringMsgFB = false
 
 
-function EditMeModified (guikeyevent)
+function EditMeKeyDown (guitextevent)
 	opt norefcounts 
+	.ide.EditMeTabRetryThing = 0
+	.ide.ShowStats
+
+
+function EditMeModified (guitextevent)
 	|| i = .ide
-	i.EditMeTabRetryThing = 0
-	i.ShowStats
-	if key <= 0 and self isa textview
+	editmekeydown(self, 0, false)
+	if reason!=documentstate.saving
 		|| x = .sel1
 		if !sdlapp.IsTyping
 			i.InteractUpdate
@@ -275,14 +279,14 @@ function EditMeModified (guikeyevent)
 			|| b = self[x]
 			if !b or b.istextline or i.autocomplete.isopenedmenu
 				.PerryTryAutoComplete(x, "autocomplete_edit", PerryAutoCompleteReason.modified)
-		
-		(i is modified) = (self is modified)
-		|| msg = i.ProjMsg|listviewrow|
-		|| Mod = (self is modified)
-		(msg is modified) = Mod
-		|| sub = i.CurrFileName.SubMenu
-			|| src = sub.ListSource
-				(src is modified) = Mod
+	
+	(i is modified) = (self is modified)
+	|| msg = i.ProjMsg|listviewrow|
+	|| Mod = (self is modified)
+	(msg is modified) = Mod
+	|| sub = i.CurrFileName.SubMenu
+		|| src = sub.ListSource
+			(src is modified) = Mod
 
 
 function PerryIDE.ShowStats

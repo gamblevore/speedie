@@ -436,7 +436,7 @@ function PressedSearchKeys (GUIKeyEvent)
 	return true
 
 
-function EditMeSelChange (GUITextSelectionEvent)
+function EditMeSelChange (GUITextEvent)
 	opt norefcounts
 	|| i = .ide
 	i.popuphide
