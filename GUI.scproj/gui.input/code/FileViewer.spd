@@ -27,6 +27,8 @@ class FileViewer (ListView)
 	
 	
 	destructor
+//		.quickopen.tag = nil
+//		.listopen.tag = nil // causes crashes to set here
 		.quickopen.disposeall
 		.listopen.disposeall
 
@@ -43,7 +45,7 @@ class FileViewer (ListView)
 			.ID				= "quickopen"
 			.size 			= 400~wide by 15~high
 			.OnKeyDown		= QuickOpenKey
-			.OnTextChanged	= QuickOpenKey
+			.OnTextChanged	= QuickOpenModified
 			.takesfocus		= takesfocusflag.On
 			.onfocus		= QuickOpenFocus
 			.SingleLine		= true
@@ -456,13 +458,16 @@ class FileViewer (ListView)
 			return (bb.name ~<= aa.name)
 
 
+
+
+		function QuickOpenModified (guitextevent)
+			|| fv = .tag|fileviewer|
+			require fv.mustbe(fileviewer)
+			fv.quickOpenFile(.text)
+
 		function QuickOpenKey (guikeyevent)
 			|| fv = .tag|fileviewer|
 			require fv.mustbe(fileviewer)
-			if key <= 0
-				fv.quickOpenFile(.text)
-				return true
-
 			|| l = fv.listopen
 			if key.isaccept
 				ClickedOpenList(l, l.sel)

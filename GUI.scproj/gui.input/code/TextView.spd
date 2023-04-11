@@ -29,8 +29,8 @@ class TextView (GUIControl)
 	|IntRange|					_TypingPlace
 	|IntRange|					UncorrectedSel
 	|GUIKeyEvent|				OnKeyDown
-	|GUIKeyEvent|				OnTextChanged
-	|GUITextSelectionEvent|		OnSelChanged
+	|GUITextEvent|				OnTextChanged
+	|GUITextEvent|				OnSelChanged
 	|GUITextErrorSelected|		OnSelError
 	|GUITextShowEvent|			OnShowExtraInfo
 	|dictionary|				ColoriseAsRoot
@@ -283,7 +283,7 @@ class TextView (GUIControl)
 		if .hasfocus
 			sdlapp.selchanged
 		if !.IsCleared
-			(.OnSelChanged)(self, insert)?
+			(.OnSelChanged)(self, 0, insert)?
 		if d and d.error
 			(.OnSelError)(self, d)?
 
@@ -1039,7 +1039,7 @@ class TextView (GUIControl)
 	behaviour TypedString
 		// shouldn't it be shift-space? option-space is a real char.
 		if (keys.option and input == " ") or input == " "
-			return .Swapchars
+			return .SwapChars
 		
 		if input == "\\"
 			input = "|"
@@ -1145,7 +1145,6 @@ class TextView (GUIControl)
 		
 		.ShowTypingplace((p.x, i))
 		.UndoChecker = i
-		(.OnTextChanged)(self, 0)?
 		return p.x
 
 

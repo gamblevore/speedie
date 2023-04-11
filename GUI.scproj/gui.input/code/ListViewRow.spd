@@ -1,7 +1,5 @@
 
 
-			
-
 
 role ListViewRow (message)
 	linkage
@@ -31,7 +29,7 @@ role ListViewRow (message)
 			.state &= ~s
 
 	syntax isnt (|ListViewState| s, assigns:|bool| b)
-		.syntaxis(s)=!b
+		.syntaxis(s) = !b
 
 
 	function Vis (|int|i, |bool|)

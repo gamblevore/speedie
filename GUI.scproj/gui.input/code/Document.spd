@@ -118,7 +118,7 @@ class Document (RingTree)
 		return answer == 0	// don't
 
 
-	function SaveText (|documentstate| l, |string|)
+	helper SaveText (|documentstate| l, |string|)
 		|| t = l.text
 		if .Wasjbin
 			t = t.digest
@@ -147,7 +147,7 @@ class Document (RingTree)
 		if rz
 			.filedate = f.modified
 			.original = l
-			.UpdateModState
+			.UpdateSavedState
 
 
 	function CheckModified (|bool|)
@@ -189,11 +189,12 @@ class Document (RingTree)
 				it.UseState(a,  self,  Reason)
 
 
-	function UpdateModState 
+	function UpdateSavedState 
 		opt norefcounts
 		for it in .viewers
 			if it isa textview
-				it.UpdateModState(self)
+				(it is modified) = false
+				(it.ontextchanged)(it, documentstate.Saving, false)?
 
 
 	function LoadSub (|bool| ChangedExternal, |bool|)
@@ -271,7 +272,8 @@ extend TextView
 			(self is modified) = true
 			.touch
 			.TypingPlaceTry(ns, true, nil)
-	
+			(.OnTextChanged)(self, reason, true)?
+
 	helper TryCaptureUndo (|int| x, |string| nt, |ivec2| ns)
 		opt NoRefCounts
 		|| u = .undoer
@@ -305,12 +307,13 @@ extend TextView
 			.usestate(m, u, DocumentState.UndoOrRedo)
 
 
-	function UpdateModState (|document| D)
+	function UpdateModState (|document| D, |int| reason)
 		|| ismod = d.ismodified
 		if (self is modified) != ismod 
 			(self is modified) = ismod
 			if ismod
 				.touch
+		(.OnTextChanged)(self, Reason, ismod)?
 
 
 	function UseState (|DocumentState| L,  |document| D,  |int| Reason)
@@ -328,8 +331,7 @@ extend TextView
 			if reason != DocumentState.typing 
 				.Goto(pos)
 		
-		.UpdateModState(d)
-		(.OnTextChanged)(self, Reason)?
+		.UpdateModState(d, reason)
 	
 
 
@@ -345,6 +347,7 @@ class DocumentState (RingTree)
 		InitialSet = 0
 		Typing = -1
 		UndoOrRedo = -2
+		Saving = -3
 
 	setter Text (|string|)
 		.text = value

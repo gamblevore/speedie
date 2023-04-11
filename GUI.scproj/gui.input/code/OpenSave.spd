@@ -103,19 +103,18 @@ class OpenSaveDialog (Window)
 			isnt DrawsFocus
 			.singleline = true
 			.id			= id
-			.takesfocus	= takesfocusflag.canfocus
+			.takesfocus	= takesfocusflag.On
 			.gnormal.solid= ((0.0, 0.0, 0.0, 0.1))
 	
 	
 	function DragPathEvent (GUIPasteEvent)
 		.path.text = data
-		relistkey(.path, nil)
+		relistkey(.path, nil, true)
 		return true
 
 	
 	function init
 		.path.id = "opensave"
-		.path.OnKeyDown = relistkey
 		.path.OnTextChanged= relistkey
 		
 		.InitField(.path, "path")
@@ -142,6 +141,9 @@ class OpenSaveDialog (Window)
 
 
 	behaviour TypedString
+		if .path.hasfocus
+			.Keyboard = ""
+			return .path.__typedstring__(input)
 		if .KeyDownExpired.Fired
 			.Keyboard = ""
 		.KeyDownExpired = date() + 0.5s
@@ -201,19 +203,16 @@ class OpenSaveDialog (Window)
 						return r
 		
 
-		function RelistKey (guikeyevent)
+		function RelistKey (guitextevent)
 			opt NoRefCounts
-			require key <= 0
 			|| w = .window|OpenSaveDialog|
 			|| p = w.path
 			|| t = p.text
 			if (t[0] != '/' and '~')
 				beep
 				p.text = w.LastGoodPath init "/"
-				return true
-			
-			w.RelistFiles(t, false)
-			return true
+			  else
+				w.RelistFiles(t, false)
 
 
 

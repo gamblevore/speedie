@@ -6,7 +6,7 @@ prototype GUIListDragEvent		(|ListView|   self,	|ListViewrow| Before, |ListViewr
 prototype GUIListEvent			(|ListView|   self,	|ListViewrow| Row, |bool|)
 prototype GUIListEditEvent		(|ListView|   self,	|ListViewcell| Cell, |string| Value, |bool|)
 prototype GUIMenuEvent			(|guicontrol| self,	|menuitem| menu, |ListViewcell| Clicked)
-prototype GUITextSelectionEvent	(|guicontrol| self, |bool| TextWasAltered)
+prototype GUITextEvent			(|textview| self, |int| Reason, |bool| TextWasAltered)
 prototype GUITextErrorSelected  (|guicontrol| self, |textviewline| Error)
 prototype GUIKeyEvent			(|guicontrol| self, |keys| Key, |bool|)
 prototype GUIPasteEvent			(|guicontrol| self, |ListViewrow| After, |string| Data, |copypasteflags| purpose, |bool|)
