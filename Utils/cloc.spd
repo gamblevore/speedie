@@ -9,7 +9,7 @@ module Counts
 	|int64| Files
 	|int64| Dirs
 	|| exts = dictionary.new
-	|| loud = !(app..quiet or app..q)
+	|| loud = !(app.yes("quiet") or app.yes("q"))
 	
 	function init (|string| ss)
 		ss = ss.trim 
