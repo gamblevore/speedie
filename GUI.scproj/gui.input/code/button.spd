@@ -44,8 +44,9 @@ class ButtonView (GUIControl)
 		cpp_part ClickXY
 		opt norefcounts
 
-		|| w = .window
-		require w and w.openedmenu != .submenu // we shouldn't get a mouseup if we opened a menu?
+		|| sub = .submenu
+			|| w = .window
+			require w and w.openedmenu != sub // we shouldn't get a mouseup if we opened a menu?
 
 		|| Always = (p == (int.min, int.min)) 
 		require always or .lastrect contains p
