@@ -57,7 +57,6 @@ extend PerryIDE
 
 	function Compile (|string| operation)
 		if !.Building
-			// require .filelist.saveall // CompileMsg does this
 			.ActualCompile(.CompileMsg(operation, true))
 		  elseif .editsep.div.Collapsed
 			.ShowStdOut  
