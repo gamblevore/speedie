@@ -5,37 +5,38 @@ class PerryIDE (Window)
 	|Process|					Feedback
 	|Process|					compilr
 	|FileViewer|				FileList
-	|ListView|					ErrorList
-	|listview|					LogArea
 	|Guicontrol|				Debugger
 	|Guicontrol|				Tester
-	|string|					CompileOKString
 	|Guicontrol|				SearchArea
-	|Guicontrol of buttonview|	ViewButtons
-	|buttonview|				PrevView
 	|Guicontrol|				rborder
+	|string|					CompileOKString
 	|FileRow|					NotTodo
 	|listviewrow|				SendRecv
 	|message--|					ProjMsg
 	|[guicontrol]|				Views
 	|File|						Project
-    |ButtonView|				CurrFileName
-    |ButtonView|				FunctionMenu
     |ivec2|						AutoPoint
 	|menu|						AutoComplete	// ... todo
-	|ListView|					Variables		// ... todo
-	|ListView|					FoundList
     |TextView|					MassSearchField
-    |message|					LastExtraInfo
-    |StretchControl|			EditSep
-    |StretchControl|			FileSep
 	|TextView|					StdOut
     |TextView|					EditMe
     |TextView|					Status
     |TextView|					StatsInfo
     |TextView|					SelInfo
     |TextView|					NoNeeder
+    |TextView|					PopupDisplay
+    |message|					LastExtraInfo
+    |StretchControl|			EditSep
+    |StretchControl|			FileSep
+	|ListView|					ErrorList
+	|listview|					LogArea
+	|ListView|					Variables		// ... todo
+	|ListView|					FoundList
     |listview| 					DebugArgsList
+	|Guicontrol of buttonview|	ViewButtons
+	|buttonview|				PrevView
+    |ButtonView|				CurrFileName
+    |ButtonView|				FunctionMenu
     |buttonview|				Toolbar
     |Buttonview|				Tabs
     |Buttonview|				ViewErrors
@@ -46,17 +47,16 @@ class PerryIDE (Window)
     |Buttonview|				GoNext
     |Buttonview|				GoPrev
     |Buttonview|				StartScreen
+    |Buttonview|				BuildButton
+    |Buttonview|				BirdButton
+    |Buttonview|				RunButton
 	|message|					PrevMarker
     |message|					Previous
     |string|					OldJBCloser
     |string| 					lastCmdStr
     |ivec2|						PopupDisplayCorner
     |string|					AttachedProgram
-    |Buttonview|				BuildButton
-    |Buttonview|				BirdButton
-    |Buttonview|				RunButton
     |ProgressBar|				Progress
-    |TextView|					PopupDisplay
 	|Faststring|				Stats
 	|date|						LastAutoCompleteDate
 	|date|						PopupDateOn
@@ -244,11 +244,12 @@ class PerryIDE (Window)
 				.ClickedTodo
 			  else
 				.recheck
-		.tabs.SelectRow(.projmsg)
-		.editme.SetFocus // make it simple
+		if !.isfront
+			.tabs.SelectRow(.projmsg)
+			.editme.SetFocus // make it simple
+			super.show
 		.id = .name
 		sdlapp.Title = .id
-		super.show
 
 
 	helper UpdateSearchSwap (|textview|)
@@ -316,12 +317,13 @@ class PerryIDE (Window)
 			.CrashedFB(c, "Process found dead.")
 
 
-	behaviour FrameUpdate
-		if !.focus
-			.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
-		if perryide.birds
-			perryide.birds = false
-			.birdbutton.click
+	behaviour FrameUpdate // perframe, eachframe, onframe
+		if !ShouldNotDisturbGUI
+			if !.focus
+				.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
+			if perryide.birds
+				perryide.birds = false
+				.birdbutton.click
 		.TestCompilerAlive
 		.SpeedieMsgReceive(.feedback)
 		.SpeedieMsgReceive(.compilr)
@@ -340,7 +342,8 @@ class PerryIDE (Window)
 				.ShowLeftStats
 		if fc isa 32
 			.EditMe.document.checkmodified?
-		.HideStuff
+		if !ShouldNotDisturbGUI
+			.HideStuff
 
 
 	function ProjClosed (|bool|)

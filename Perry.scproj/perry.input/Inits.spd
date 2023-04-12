@@ -319,7 +319,6 @@ extend PerryIDE
 
 		.AddIDEButton(.StartScreen,	"\1a", "Startup screen", "startup")
 		.StartScreen.size = 7~left back 22  by  3~down back 14
-			
 
 		.AddViewButton(.Viewfiles,		"\10",	.filelist)
 		.AddViewButton(.viewsearch,		"\16",	.searcharea)
@@ -329,11 +328,9 @@ extend PerryIDE
 		.viewfiles.left = 5
 		.view(.Viewfiles)
 		
-
 		.addlbutton(.goprev,		"<",	"prev", "Go to previous file.")
 		.addlbutton(.gonext,		">",	"next", "Go to next file.")
 		
-
 		with .CurrFileName
 			.MouseDownDoesClick	= true
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)

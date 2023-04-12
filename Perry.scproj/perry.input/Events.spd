@@ -225,7 +225,7 @@ function ReturnAllFuncs (GUIListEvent)
 	return true
 
 	
-function ButtonView.FillMenuPath (|string| L, |listviewrow| row=nil)
+function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
 	opt norefcounts
 	|| p = .submenu
 	|| orig = l
@@ -236,7 +236,7 @@ function ButtonView.FillMenuPath (|string| L, |listviewrow| row=nil)
 		if l.IsVolume
 			exit
 		l = l.parent
-	.OpenMenu(row)
+	.OpenMenu(tab)
 
 	
 function OpenProjectPath (GUIaction)

@@ -587,7 +587,7 @@ module SDLApp
 		if !.DialogIsOpen
 			for w  in  __modules__.window.all
 				if w isa window
-					w.__FrameUpdate__			
+					w.__FrameUpdate__(w.openedmenu!=nil)
 		.StartResize
 		
 		
@@ -660,7 +660,7 @@ module SDLApp
 
 	function PicturePtr (|&_voidptr|)
 		opt norefcounts
-		if false and .effects// and keys.Control and keys.Cmd
+		if .effects and keys.Control and keys.shift
 			.Effects.Blur
 		
 		return (&.effects.final._ptr)|&_voidptr|

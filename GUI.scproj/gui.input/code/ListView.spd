@@ -1317,8 +1317,8 @@ class ListView (GUIControl) {
 		|| cmm = .cmm
 			.RowBorderDraw(._scroll, cmm.EditingRow, .RowHeight, where, ¥.border)
 
-		
-		|| re = .rowBounds(._scroll, .draggingrowto, 1)
+
+		|| re = .rowbounds(._scroll, .draggingrowto, 1)
 			re = re up .rowheight
 			ifn .draggingrowto.prev
 				re = re down 2

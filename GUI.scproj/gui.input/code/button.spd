@@ -34,15 +34,25 @@ class ButtonView (GUIControl)
 			if rz
 				rz.AttachedToParent = true
 
+	
 	function Click
-		(.onclicked|GUIAction|)(self, nil, nil)?
+		opt norefcounts
+		.click((int.min, int.min))
+	
 	
 	function Click (|ivec2| p, |bool| left=true)
 		cpp_part ClickXY
 		opt norefcounts
-		require .lastrect contains p
-		|| c = .itemat(p.x)
-		|| prev = .selectrow(c)
+
+		|| w = .window
+		require w and w.openedmenu != .submenu // we shouldn't get a mouseup if we opened a menu?
+
+		|| Always = (p == (int.min, int.min)) 
+		require always or .lastrect contains p
+
+		|| c = (nil, .itemat(p.x))(always)
+		|| prev = (nil, .selectrow(c))(always)
+
 		if left
 			(.onclicked|GUIAction|)(self, C, prev)?
 		  else

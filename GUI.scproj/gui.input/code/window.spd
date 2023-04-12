@@ -38,7 +38,7 @@ class Window (GUIControl)
 		.disposeall
 
 
-	virtual FrameUpdate
+	virtual FrameUpdate (|bool| ShouldNotDisturbGUI)
 		0
 
 	virtual CancelClose (|int| Reason, |bool|)
@@ -102,12 +102,13 @@ class Window (GUIControl)
 
 	helper SetInnerFocus (|guicontrol| Focus)
 		|| old = .InnerFocus
-		if old != Focus
-			if focus == .focus /// ???
-			.InnerFocus = focus
-			.finishfocus(focus)
-			focus.__GotFocus__?
-			old.__LostFocus__?
+		require old != Focus
+		if old isa menu
+			(old isnt visible) // makes sense?
+		.InnerFocus = focus
+		.finishfocus(focus)
+		focus.__GotFocus__?
+		old.__LostFocus__?
 
 
 	helper FinishFocus (|guicontrol| focus)
@@ -219,11 +220,12 @@ class Window (GUIControl)
 		if .gnormal
 			where.fill(.gnormal)
 		
-		.DrawChildren(where)			
+		|| menu = .openedmenu
+		.DrawChildren(where, menu)			
 		.focus.drawfocus(where)
 		
-		|| it = .openedmenu
-			it.DrawOof(Where)
+		if menu
+			menu.DrawOof(Where)
 		
 		where.ControlClip = self
 		.inline.DrawInline(where)

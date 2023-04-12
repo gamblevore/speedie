@@ -151,7 +151,8 @@ class GUIControl (ringtree)
 		
 		
 	syntax is (|guicontrolflags| F, |bool|)
-		return .state&F
+		if self
+			return .state&F
 	
 	
 	syntax is (|guicontrolflags|F, assigns:|bool|)
@@ -184,13 +185,13 @@ class GUIControl (ringtree)
 			.__Draw__(Where)
 
 	
-	helper DrawChildren (|image| where)
+	helper DrawChildren (|image| where, |guicontrol| avoid)
 		opt norefcounts
 		for R in self							// front gets drawn last (ontop)
-			if R.isviewable
+			if (r!=avoid) and R.isviewable
 				r.DrawOof(Where)
 				if r.hasany
-					r.drawchildren(where)
+					r.drawchildren(where, avoid)
 
 	
 	helper DoPaste (|Object| Data, |copypasteflags| Type = CopyPasteFlags.pastetext, |bool|)

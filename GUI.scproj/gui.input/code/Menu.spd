@@ -88,7 +88,7 @@ class Menu (ListView)
 		|| win = .window					#require
 		win.inline.clear
 		win.openedmenu = self
-		is visible
+		is visible // shouln't really be visible? seems no?
 		._Scroll = nil
 		.SelectFirst
 	
@@ -108,8 +108,7 @@ class Menu (ListView)
 		isnt visible
 		.EditingRow = nil
 		if .isopenedmenu
-			.window.openedmenu = (nil)
-			.window.InnerFocus = nil
+			.window.openedmenu = nil
 
 	
 	function DoReturn (|bool|)
