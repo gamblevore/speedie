@@ -2,16 +2,18 @@
 
 class PerryIDE (Window) 
 	linkage: cpp_part IDE
+
 	|Process|					Feedback
 	|Process|					compilr
+	|string|					CompileOKString
+	|ShellStream|				RunAndDebug
+	
 	|FileViewer|				FileList
 	|Guicontrol|				Debugger
 	|Guicontrol|				Tester
 	|Guicontrol|				SearchArea
 	|Guicontrol|				rborder
-	|string|					CompileOKString
 	|FileRow|					NotTodo
-	|listviewrow|				SendRecv
 	|message--|					ProjMsg
 	|[guicontrol]|				Views
 	|File|						Project
@@ -28,6 +30,7 @@ class PerryIDE (Window)
     |message|					LastExtraInfo
     |StretchControl|			EditSep
     |StretchControl|			FileSep
+	|listviewrow|				SendRecv
 	|ListView|					ErrorList
 	|listview|					LogArea
 	|ListView|					Variables		// ... todo
