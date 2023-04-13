@@ -65,12 +65,10 @@ function ClickedDebug (GUIAction)
 function perryide.StartDebugging (|file| f)
 	require f.MustExist
 	|| args = .DebugArgsList.listsource.AllNames
-	if f.IsDir
+	if !f.IsDir 
 		f.Execute(args)
-	  else
+	  else // gui apps are dirs, right?
 		f.launch(args)
-	// So... if this is a GUI app or somsething we can just run it
-	// its a terminal... we need to run this in the external terminal
 
 
 function PressingDebug (GUIAction)
