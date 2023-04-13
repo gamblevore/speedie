@@ -154,7 +154,7 @@ JB_Class* Str_IsCSub ( JB_String* self ) { // 0 means true
 	int N = JB_Str_Length(self);
 	if (!N) return 0;
     auto C = JB_ObjClass(self); 
-    if (C == JB_AsClass(JB_StringC) or C == JB_AsClass(JB_String)) return 0;
+    if (C == JB_AsClass(JB_StringC) or C == JB_AsClass(JB_String) or C == JB_AsClass(JB_File)) return 0;
 	if (HasCStringSpace_(C, N) and !self->Addr[N])
 		return 0;
     if (C == JB_AsClass(JB_StringExternal)) {
@@ -169,7 +169,7 @@ JB_Class* Str_IsCSub ( JB_String* self ) { // 0 means true
 bool JB_Str_IsC ( JB_String* self ) {
 	auto C = Str_IsCSub(self);
 	if (!C) return true;
-	if (C == JB_AsClass(JB_StringShared) or C == JB_AsClass(JB_File)) {
+	if (C == JB_AsClass(JB_StringShared)) {
 		auto P = (JB_String*)(((JB_StringShared*) self)->Parent);
 		if (P->Length+P->Addr == self->Length+self->Addr)
 			return Str_IsCSub(P)==0;

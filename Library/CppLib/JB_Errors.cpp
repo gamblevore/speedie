@@ -86,10 +86,9 @@ static JB_String* Path_(JB_String* self) {
 int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errnum, const char* BackupErr, const char* op) {
 	if (!errnum)
 		return 0;
-    JB_Error* Err = JB_Err__New(0, nil, 4, nil);
     JB_String* Desc = Desc_(self, other, errnum, BackupErr, op);
     JB_String* Path = Path_(self);
-    JB_Err_Fill(Err, Path, Desc );
+    JB_Error* Err = JB_Err__New(0, Desc, 4, Path);
     JB_Rec_NewItem(JB_StdErr, Err);
 
     return errnum;

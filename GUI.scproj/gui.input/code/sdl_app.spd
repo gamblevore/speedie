@@ -46,7 +46,7 @@ module SDLApp
 	|&SDL_Window|				ScreenWindow
 	|&SDL_Renderer|				Renderer
 	|&SDL_Texture|				Raw
-	|error|						ToolTip = error(nil,  "",  errorseverity.ok)
+	|error|						ToolTip = error()
 	|error|						CompileStatus // remove
 	|string|					LastSearch
 

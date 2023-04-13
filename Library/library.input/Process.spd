@@ -507,6 +507,7 @@ class Process
 
 
 	function RunChild (|string| path, |bool|)
+		debug_require path
 		require (self isnt invalid)
 		.cid = path.cstr.Startprocess(.params, (&._stdoutfile, nil)(.trapstdout))
 		if .cid > 0
@@ -528,6 +529,7 @@ class Process
 		if .cid
 			.justkill(false)
 		if .CanActivate
+			expect (.path) (self, "Can't activate this without a path.")
 			.OpenSharedMemory(.origsize)
 			.self "reopen"
 			return .RunChild(.path)

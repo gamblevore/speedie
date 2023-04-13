@@ -5,7 +5,7 @@ extend Message
 	function JBErrors (|error|)
 		opt norefcounts
 		require self
-		rz = error(nil)
+		rz = error()
 		for s in self
 			rz <~ s.AsError
 	

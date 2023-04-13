@@ -108,6 +108,7 @@ extend PerryIDE
 		.stdout <~ .Compilr.ReadStdOut
 	
 	function CompileFB (|message| msg, |bool|)
+		|| db = .DebugIsWaitingForCompile
 		.CancelCompile
 		|| first = msg.first #require
 		if first == @arg // an error-list
@@ -118,10 +119,8 @@ extend PerryIDE
 		|| file = @url + "file"
 		file <~ first
 		.notify(.name + "\n\nCompiled OK!", file)
-		if .DebugIsWaitingForCompile
-			.DebugIsWaitingForCompile = false
-			beep "hehe"
-			.StartDebugging(file.last.nyme.file)
+		if db
+			.StartDebugging(first.name.file)
 				
 				
 	function Notify (|string| What, |message| response=nil)

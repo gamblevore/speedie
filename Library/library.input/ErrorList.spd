@@ -27,8 +27,7 @@ class ErrorList
 	|object| 				LogObj
 
 	constructor
-		.errors = error(nil)
-		.errors.func = @arg
+		.errors = error()
 		.MaxErrors = 512
 		JB_API.NilHappened = nil
 

@@ -131,6 +131,7 @@ const char* ArrayCStrOne_(JB_String* S, int& ugh) {
 	if (!JB_Str_Length(S)) {return "";}
 	if (JB_Str_IsC(S)) return (const char*)JB_Str_Address(S);
 	JB_ErrorHandleFile(S, nil, EINVAL, "Speedie string not zero-terminated", "Executing shell-command");
+	JB_Str_IsC(S); // for testing
 	ugh = EINVAL;
 	return 0;
 }
@@ -171,6 +172,9 @@ int JB_Kill(int PID) {
 
 
 const char* _StartProcess (JB_String* self, const char** argv, Array* Args, int* childpipe, int& PID) {
+	if (!JB_Str_Length(self)) {
+		return "received empty-path";
+	}
 	if (JB_ArrayPrepare_(self, argv, Args)) {
 		return "prepare ipc";
 	}

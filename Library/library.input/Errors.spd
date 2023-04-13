@@ -30,6 +30,13 @@ class Error (Message)
 		.OriginalData = node.OriginalParseData
 		.when = date()
 		.func = @sstr // whatever
+	constructor ()
+		cpp_part Nothing
+		super.constructor
+		.position = -1
+		.severity = ErrorSeverity.ok
+		.when = date()
+		.func = @arg
 
 
 	constructor (|error| orig, |bool| ErrDummy)
