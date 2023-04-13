@@ -6,14 +6,19 @@
 
 
 class ShellStream
+	|int|			PID
+	|int|			Err
+	|FastString|	FSOut
+	|FastString|	FSErr
+    |Date|			Last
 	linkage
 		wrapper
 		cpp_part Sh
-		cpp_class ShellStreamer
+		cpp_class ShellStream
 	destructor:							cpp_wrapper JB_Sh_Destructor
 
 	function Step (|bool|):				cpp_wrapper JB_Sh_Step
 
 	module
-		function New (|String| self, |[]| R, |FastString| FSOut, |FastString| FSErrIn, |ShellStream|)
+		function New (|String| app, |[array of string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |ShellStream|)
 			cpp_wrapper JB_Sh__New

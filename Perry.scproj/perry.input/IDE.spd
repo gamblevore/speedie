@@ -6,7 +6,7 @@ class PerryIDE (Window)
 	|Process|					Feedback
 	|Process|					compilr
 	|string|					CompileOKString
-	|ShellStream|				RunAndDebug
+	|ShellStream|				RunCompiledApp
 	
 	|FileViewer|				FileList
 	|Guicontrol|				Debugger

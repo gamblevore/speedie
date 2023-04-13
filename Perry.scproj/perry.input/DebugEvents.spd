@@ -65,10 +65,10 @@ function ClickedDebug (GUIAction)
 function perryide.StartDebugging (|file| f)
 	require f.MustExist
 	|| args = .DebugArgsList.listsource.AllNames
-	if !f.IsDir 
-		f.Execute(args)
-	  else // gui apps are dirs, right?
-		f.launch(args)
+	if f.isdir
+		args = [f] + args
+		f = "/usr/bin/open".file
+	.RunCompiledApp = shellstream(f, args, faststring())
 
 
 function PressingDebug (GUIAction)

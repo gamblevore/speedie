@@ -175,10 +175,6 @@ class File (String)
 	function Touch (|errorint|)
 		return "/usr/bin/touch".SilentExecute([self])
 
-	function Launch (|[string]| args=nil, |errorint|)
-		|| d = [self] + args
-		return "/usr/bin/open".SilentExecute(d)
-		
 	
 	function Compare (|File| A, |bool|)
 		cpp_part FileCompare

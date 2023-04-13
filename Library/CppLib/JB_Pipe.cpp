@@ -29,7 +29,7 @@ extern "C" const char** JB_BackTrace(void** space, int* size) {
 
 extern "C" {
 const int RD = 0; const int WR = 1;
-JBClassPlace( ShellStreamer,    JB_Sh_Destructor,      JB_AsClass(JB_Object),      0 );
+JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(JB_Object),      0 );
 
 
 void JB_Rec_NewErrorWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
@@ -224,9 +224,9 @@ int JB_Str_StartProcess (JB_String* self, Array* Args, JB_File** StdOut) {
 }
 
 
-static int JB_FEPDWEE_Call(ShellStreamer& Sh, const char** argv, bool NewStdOut) {
+static int JB_FEPDWEE_Call(ShellStream& Sh, const char** argv, bool NewStdOut) {
 // Fork,Exec,Pipe,Dup2,Waitid,Errno,Eintr // unix simplicity :)
-	if (NewStdOut or Sh.FSOut)
+	if (NewStdOut or Sh.Output)
 		pipe(Sh.CaptureOut);
 	pipe(Sh.StdErrPipe);
 	if (Sh.Mode == 1) {	// 1 means... no block. So we wanna restore it.
@@ -255,11 +255,11 @@ static int JB_FEPDWEE_Call(ShellStreamer& Sh, const char** argv, bool NewStdOut)
 }
 
 
-static bool JB_FEPDWEE_Middle(ShellStreamer& Sh) {
-	bool ContinueOut = JB_FS_AppendPipe(Sh.FSOut, Sh.CaptureOut[RD], Sh.Mode);
+static bool JB_FEPDWEE_Middle(ShellStream& Sh) {
+	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], Sh.Mode);
 	// this will only return, once the app has finished... unless we are Streaming.
 	// either way, if both return false, we can finish.
-	bool ContinueErr = JB_FS_AppendPipe(Sh.FSErr, Sh.StdErrPipe[RD], Sh.Mode);
+	bool ContinueErr = JB_FS_AppendPipe(Sh.StdErr, Sh.StdErrPipe[RD], Sh.Mode);
 	return (ContinueOut or ContinueErr);
 }
 
@@ -272,74 +272,76 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 }
 
 
-bool JB_FEPDWEE_Start(ShellStreamer* sh, Array* R, FastString* FSOut, FastString* FSErrIn, JB_String* self, bool KeepStdOut) {
-	ShellStreamer& Sh = *sh;
-	Sh.FSOut = FSOut;
-	Sh.FSErr = JB_FS__FastNew(FSErrIn);
+bool JB_FEPDWEE_Start(ShellStream* sh, Array* R, FastString* FSOut, FastString* FSErrIn, JB_String* self, bool KeepStdOut) {
+	ShellStream& Sh = *sh;
+	Sh.Output = FSOut;
+	Sh.StdErr = JB_FS__FastNew(FSErrIn);
 
 	const char* argv[MaxArgs + 1];
-	Sh.Err = JB_ArrayPrepare_(self, argv, R);
-	if (!Sh.Err)
-		Sh.Err = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
-	if ( Sh.Err) {
-		JB_ErrorHandleFile(self, nil, Sh.Err, nil, "call command-line tool");
+	Sh.Error = JB_ArrayPrepare_(self, argv, R);
+	if (!Sh.Error)
+		Sh.Error = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
+	if ( Sh.Error) {
+		JB_ErrorHandleFile(self, nil, Sh.Error, nil, "call command-line tool");
 		return false;
 	}
 	return true;
 }
 
-void JB_FEPDWEE_Finish(ShellStreamer& Sh) {
-	Sh.Err = JB_SafeWait(Sh.PID); // this is jsut to get the... exit code.
+void JB_FEPDWEE_Finish(ShellStream& Sh) {
+	Sh.Error = JB_SafeWait(Sh.PID); // this is jsut to get the... exit code.
 	pipe_close(Sh.CaptureOut[RD]);
 	pipe_close(Sh.StdErrPipe[RD]);
 	Sh.Mode = -1;
 }
 
-int JB_FEPDWEE_Finish2(ShellStreamer& Sh, FastString* FSErrIn ) {
+int JB_FEPDWEE_Finish2(ShellStream& Sh, FastString* FSErrIn ) {
 	JB_FEPDWEE_Finish(Sh);
-	if (Sh.FSErr->Length and !FSErrIn) {
-		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh.FSErr), nil);
+	if (Sh.StdErr->Length and !FSErrIn) {
+		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh.StdErr), nil);
 	}
-	return Sh.Err;
+	return Sh.Error;
 }
 
 int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
-	ShellStreamer Sh = {};
+// what if I just do this in terms of JB_Sh__New?
+// like a busy-loop that calls .step until its finished
+	ShellStream Sh = {};
 	if (!JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, KeepStdOut))
-		return Sh.Err;
+		return Sh.Error;
 	JB_FEPDWEE_Middle(Sh);
 	return JB_FEPDWEE_Finish2(Sh, FSErrIn);
 }
 
-void JB_Sh_Constructor(ShellStreamer* self) {
+void JB_Sh_Constructor(ShellStream* self) {
 	*self = {}; self->Mode = 1;
 }
 
-ShellStreamer* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn) {
-	auto Sh = JB_New(ShellStreamer);
+ShellStream* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn) {
+	auto Sh = JB_New(ShellStream);
 	JB_Sh_Constructor(Sh);
 	if (!JB_FEPDWEE_Start(Sh, R, FSOut, FSErrIn, self, FSOut==nil)) {
 		JB_FreeIfDead(Sh);
 		return 0;
 	}
-	JB_Incr(Sh->FSErr);
-	JB_Incr(Sh->FSOut);
+	JB_Incr(Sh->StdErr);
+	JB_Incr(Sh->Output);
 	return Sh;
 }
 
-void JB_Sh_Destructor(ShellStreamer* self) {
-	ShellStreamer& Sh = *self;
+void JB_Sh_Destructor(ShellStream* self) {
+	ShellStream& Sh = *self;
 	JB_FEPDWEE_Finish(Sh);
-	JB_Decr(Sh.FSErr);
-	JB_Decr(Sh.FSOut);
+	JB_Decr(Sh.StdErr);
+	JB_Decr(Sh.Output);
 }
 
-static void Smooth(ShellStreamer& Sh) {
+static void Smooth(ShellStream& Sh) {
 // or else certain apps will lock up.
 // funnily enough, sleeping makes these apps run FASTER.
-// probably by triggereing the printf statements instead 
+// probably by triggering the printf statements instead 
 // of collecting them into one giant blob.
-	Date L = Sh.Last;
+	Date L = Sh.LastRead;
 	Date C = JB_Date__Now();
 	if (L) {
 		Date D = C - L;
@@ -347,17 +349,17 @@ static void Smooth(ShellStreamer& Sh) {
 			JB_Date__Sleep(4096);
 		}
 	}
-	Sh.Last = C;
+	Sh.LastRead = C;
 }
 
-bool JB_Sh_Step(ShellStreamer* self) {
-	ShellStreamer& Sh = *self;
-	if (Sh.Mode < 0) // finished
-		return false;
-	Smooth(Sh);
-	if (JB_FEPDWEE_Middle(Sh))
-		return true;
-	JB_FEPDWEE_Finish(Sh);
+bool JB_Sh_Step(ShellStream* self) {
+	ShellStream& Sh = *self;
+	if (Sh.Mode >= 0) {
+		Smooth(Sh);
+		if (JB_FEPDWEE_Middle(Sh))
+			return true;
+		JB_FEPDWEE_Finish(Sh);
+	}
 	return false;
 }
 
