@@ -105,6 +105,7 @@ struct JB_File;
 void JB_FS_FileSet(FastString* fs, JB_File* F);
 void JB_FS_Destructor(FastString* self);
 JB_String* JB_FS_GetResult(FastString* self);
+JB_String* JB_FS_Copy(FastString* fs);
 uint8* JB_FS_GrowBy(FastString* fs, int Needs);
 
 

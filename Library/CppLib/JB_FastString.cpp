@@ -32,11 +32,11 @@ static void ClearFSSub_(FastString* fs) {
     JB_FS_Constructor(fs);
 }
 
+
 static void ClearFS_(FastString* fs) {
     JB_SetRef( fs->Result, 0 );
     ClearFSSub_(fs);
 }
-
 
 
 
@@ -93,6 +93,10 @@ void JB_FS_AppendDMY (FastString* fs, Date self) {
     }
 }
 
+JB_String* JB_FS_Copy(FastString* fs) {
+    FS_SanityCheck_(fs);
+    return JB_Str_CopyFromPtr(fs->ResultPtr, fs->Length);
+}
 
 bool JB_FS_ResizeTo_(FastString* fs, int NewLength) {
     FS_SanityCheck_(fs);
@@ -101,12 +105,31 @@ bool JB_FS_ResizeTo_(FastString* fs, int NewLength) {
     }
 
 	auto S = fs->Result;
+//	if (S) {
+//		int OldLength = S->Length;
+//		if (NewLength < OldLength and S->RefCount > 1) {
+//			JB_BA_Realloc_(S, fs->Length);
+			// OK... this is an interesting issue. We have a wierd sharing behaviour. We need to just...
+			// let go of it? or something? but at least shrink it down to the OldLength
+
+			// lets say we have a big buffer
+			// and a small portion of it shared
+			// then we append something huge, so we need a HUGER buffer
+			// we cant keep the old buffer... so we gotta make a new one
+			// But we can't realloc the old one, right? It could MOVE in memory. Easily it can.
+			// especially if it becomes very short. So... if it becomes short and moved...
+			// then everything that uses it... becomes fucked. So we need to NOT realloc it.
+			// so that means we need to keep the huge buffer.
+			// seems better to just copy the buffer?
+//		}
+//	}
 	if (!S) {
 		if (fs->ResultPtr) {fs->Failed = true; return 0;}; // direct memory write.
 		S = JB_Incr(JB_New( JB_String ));
 		S->Addr = 0;
 		fs->Result = S;
 	}
+	// So what if the size is lower than the current? AND if the current is... shared?
 
 	require (JB_BA_Realloc_(S, NewLength));
     
