@@ -14,7 +14,7 @@ function string.path_expand (|dictionary of string| dict, |string|)
 function perryide.DebugArgsFile (|file|)
 	|| p = .Project
 	if p.IsDir
-		p = p.Child(".args")
-		return p
+		return p.Child(".args")
+	return p.SetExt("args").file
 	
 

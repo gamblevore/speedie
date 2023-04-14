@@ -1,5 +1,11 @@
-{"/path/to/file"
-"hello.txt"
-"--self"
-"--noisy"
-}
+args
+	"/path/to/file"
+	"hello.txt"
+	"--self"
+	"--noisy"
+
+pwd '.'
+
+env
+	setting="value"
+	

@@ -32,8 +32,9 @@ extend PerryIDE
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
 		.Status				= TextView(self,		ClickedStatus,			nil)
 		.StatsInfo			= TextView(self,		ClickedStats,			nil)
-		.SelInfo			= TextView(self,		PressedSelInfo,			nil		)
+		.SelInfo			= TextView(self,		PressedSelInfo,			nil)
 		.StdOut				= TextView(self,		nil,					nil)
+		.CompileTabs		= ButtonView(self,		ClickedCompileTabs) 
 		.NoNeeder			= TextView(self,		ClickedNoNeed,			nil)
 		.AutoComplete		= menu(self, 			nil,					AutoCompleteInsertText)
 		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
@@ -45,7 +46,7 @@ extend PerryIDE
 		.filesep			= StretchControl.horz(self, 175~right, 110, 110)
 		.editsep			= StretchControl.vert(self, 0,         0,   100)
 		.PopupDisplay		= textview(self)
-		.DebugArgsList		= listview(self,		nil,				ReturnDebugArgs	)
+		.DebugArgsList		= textview(self	)
 		.AttachedProgram	= ""
 		
 		.init
@@ -71,14 +72,13 @@ extend PerryIDE
 		with .DebugArgsList
 			isnt visible
 			is editable
-			.size =  the~left+4 for 200  by  18~down back 90
+			.size =  the~left+4 for 360  by  18~down back 150
 			.id = "debugargs"
 			.ClickOutsideCloses = true
 			.OnFocus = DebugArgsGotFocus
 			.gnormal.solid  = (0.0, 0.0, 0.0, 0.7)
 			.gnormal.edge = (0.0, 0.0, 0.0, 0.125)
 			.OnKeyDown = DebugArgsKeyDown
-			.EnableDrag
 
 
 		with .ViewButtons 
@@ -309,12 +309,20 @@ extend PerryIDE
 		.tabs.ExpandOnMouseOver = 2
 
 		with .tabs
-			.id = "tabs"
+			.id = "ProjTabs"
 			.size = 10~after to the~right  by  3~inside
 			.itemwidth = 75
 			.items = perry.projects
 			|| pf = perry.projects.first 
 				 (pf is selected)
+			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
+
+		with .compiletabs
+			.id = "CompileTabs"
+			.size = 4~after to the~right  by  the~top-2 for 18
+			.itemwidth = 75
+			.items = "Speedie, Jeebox, Product".parse|listviewrow|
+			.items.first is selected
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
 
 		.AddIDEButton(.StartScreen,	"\1a", "Startup screen", "startup")

@@ -82,6 +82,9 @@ function ClickedTabs (GUIAction)
 		row.obj|PerryIDE|.show
 
 
+function ClickedCompileTabs (Guiaction)
+	
+
 function PressingTabs (guiaction)
 	opt norefcounts
 	if self isa ButtonView

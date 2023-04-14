@@ -1,0 +1,24 @@
+
+class GrowControl (GuiControl)
+	linkage:cpp_part Grow
+	|controlsize|				Maximum
+	|controlsize|				Minimum
+
+	constructor (|guicontrol| p)
+		super.constructor(p)
+		isnt drawsfocus
+		.takesfocus = 0
+		.gnormal.solid = (0.65, 0.75, 0.0, 1.0)
+
+	behaviour MouseDown
+		return 4
+
+
+	behaviour MouseMove
+		opt norefcounts
+
+
+	behaviour Draw
+		opt norefcounts
+		where.DrawRect(.lastrect, .GNormal)
+		

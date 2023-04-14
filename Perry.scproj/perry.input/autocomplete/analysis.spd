@@ -3,7 +3,7 @@
 function perryide.ListAllFuncs (|bool| sel=false)
 	|| result = .FunctionMenu.submenu.listsource
 	result.clear
-	.ListAllFuncsMsg(.editme.ViewParse, result)
+	.ListAllFuncsMsg(.editme.Parse, result)
 	if sel
 		.FindSelectedMenuItem(result)
 	|| old = result.obj

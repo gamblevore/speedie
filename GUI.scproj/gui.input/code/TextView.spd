@@ -1596,12 +1596,11 @@ class TextView (GUIControl)
 				.docerror = nil
 				
 
-	helper ViewParse (|message|)
+	helper Parse (|message|)
 		cpp_Part ViewParse0
-		return .ViewParse(false, .FindExpectsParse)
-
-
-	helper ViewParse (|bool| Changed, |int| expect, |message|)
+		return .Parse(false, .FindExpectsParse)
+	
+	helper Parse (|bool| Changed, |int| expect, |message|)
 		//opt norefcounts
 		if !.canparse(expect)
 			.myerror = nil // crappy bugfix
@@ -1675,7 +1674,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| Changed  = .NeedsPrepare #require
 		|| expect	= .FindExpectsParse
-		|| msg   	= .ViewParse(changed >= 2, expect)
+		|| msg   	= .Parse(changed >= 2, expect)
 		|| ParsedOK = msg!=nil
 		|| Pos	 	= .StartPos
 		|| isinl 	= .singleline

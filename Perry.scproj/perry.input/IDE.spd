@@ -35,13 +35,14 @@ class PerryIDE (Window)
 	|listview|					LogArea
 	|ListView|					Variables		// ... todo
 	|ListView|					FoundList
-    |listview| 					DebugArgsList
+    |textview| 					DebugArgsList
 	|Guicontrol of buttonview|	ViewButtons
 	|buttonview|				PrevView
     |ButtonView|				CurrFileName
     |ButtonView|				FunctionMenu
     |buttonview|				Toolbar
     |Buttonview|				Tabs
+    |buttonview| 				CompileTabs
     |Buttonview|				ViewErrors
     |Buttonview|				ViewFiles
     |Buttonview|				ViewSearch

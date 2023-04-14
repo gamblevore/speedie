@@ -13,10 +13,6 @@ function ReturnDebugArgs (GUIListEvent)
 
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
-	if FoundListKeys(self, key)
-		return true
-	if key.IsAccept and self isa listview
-		return ReturnDebugArgs(self, .listsource.last)
 	if key.IsCancel
 		.window.clearfocus
 		return true
@@ -30,28 +26,23 @@ function FoundListKeys (GuiKeyEvent)
 		return true
 
 
+	
 function DebugArgsGotFocus (guiaction)
 	|| v = state == 1
 	require (self is visible) != v
-	|| lv = self|listview|			// .DebugArgsList
 	|| i = .ide
 	|| f = i.DebugArgsFile #require
-	if v
-		|| list = f.ReadAll.parse|listviewrow|
-		lv.listsource = list
-		for s in list
-			(s is editable)
-		
-		|| L = list.msg(@str, "(Add Command Line Arg...)")|listviewrow|
-		(L is AlignCenter)
-		lv.SelectFirst
+	if v and self isa TextView
+		.text = f.ReadAll
+		|| data = .parse
+			if !data..args
+				self <~ "\nargs {Arg1, Arg2}\n"
+			if !data..pwd
+				self <~ "\npwd '.'\n"
+			if !data..env
+				self <~ "\nenv {setting=\"value\"}\n"
 	  else
-		|| list = lv.listsource
-		|| l = list.last
-		if (l is aligncenter)
-			l.remove
-		f.SmartData = list.render
-		list <~ l
+		f.SmartData = .text
 	(self is visible) = v
 
 
@@ -71,7 +62,8 @@ function PressingDebug (GUIAction)
 function perryide.StartDebugging (|file| f)
 	require f.MustExist
 
-	|| args = .DebugArgsList.listsource.AllNames
+	|| file = .DebugArgsList.text.Parse$
+	|| args = file["args"].AllNames
 	if f.isdir
 		args = [f] + args
 		f = "/usr/bin/open".file
@@ -80,7 +72,7 @@ function perryide.StartDebugging (|file| f)
 
 
 function perryide.UpdateDebuggedApp
-	|| r = .runcompiledapp #require
+	|| r = .RunCompiledApp #require
 	// so what if we have a shellstream? then what?
 	|| fs = r.output
 	if !r.userflags and fs.length
