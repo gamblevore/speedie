@@ -53,7 +53,10 @@ function file.CountAll (|bool| force=false)
 
 
 main  
-	|| a = app.args 		#expect "Usage: cloc path [--files=cpp/c/h]  [--quiet=true/false]"
+	|| a = app.args
+	if !a
+		"Usage: cloc path [--files=cpp/c/h]  [--quiet=true/false]"
+		return 0
 	
 	counts.Init(app..files)
 	for path in a
