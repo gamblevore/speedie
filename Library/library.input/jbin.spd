@@ -106,6 +106,7 @@ helper stringstream.NextMsgInfo (|uint64|)
 				.userobj = msg|object|
 			return msg
 		parent = parent.upward(L) // go up
+		.userobj = parent
 	.UserObj = nil
 
 
