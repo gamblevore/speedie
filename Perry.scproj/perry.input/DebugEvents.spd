@@ -62,16 +62,33 @@ function ClickedDebug (GUIAction)
 	i.compile("debug")
 
 
-function perryide.StartDebugging (|file| f)
-	require f.MustExist
-	|| args = .DebugArgsList.listsource.AllNames
-	if f.isdir
-		args = [f] + args
-		f = "/usr/bin/open".file
-	.RunCompiledApp = shellstream(f, args, faststring())
-
-
 function PressingDebug (GUIAction)
 	|| d = .ide.DebugArgsList
 	DebugArgsGotFocus(d, 1)
 	d.SetFocus
+
+
+function perryide.StartDebugging (|file| f)
+	require f.MustExist
+
+	|| args = .DebugArgsList.listsource.AllNames
+	if f.isdir
+		args = [f] + args
+		f = "/usr/bin/open".file
+	|| fs = faststring()
+	.RunCompiledApp = shellstream(f, args, fs, fs)
+
+
+function perryide.UpdateDebuggedApp
+	|| r = .runcompiledapp #require
+	// so what if we have a shellstream? then what?
+	|| fs = r.output
+	if !r.userflags and fs.length
+		.ShowStdOut
+		r.userflags |= 1
+	
+	if !r.step
+		.runcompiledapp = nil
+		
+	.stdout <~ fs.GetResult // later we will make this NOT do string appends to create .text
+	// what else can we do? send some msgs via ipc? lol. i cant do anything else?
