@@ -1,2 +1,74 @@
-@Fmodule†Counts@@#…int64…LinesÁ@#…int64…NamesÁ@#…int64…NodesÁ@#…int64†ParsedÁ@#…int64…FilesÁ@#…int64„DirsÁ@#€@$„exts=CnewŠdictionary€Ã@#€@$„loud=A!@@$Cyesƒapp@ …quietÂ‚orCyesƒapp@ qÇHfunction„init@@#†string‚ssÂ@@$‚ss=Dtrim‚ss€Â@$‚ss‚:=‡spd/boxÁCfor@$s‚in@@$‚ss/
-/Ã@@$@„exts@sÂ=sÅHfunction…Count@@#‡messageƒMsgÂ@GrequireƒmsgÁB++Fparsed†Counts€Â@#€@$…names=0Â@#€@$…nodes=0ÂCfor@$Dflats€Á‚inƒmsgÁ@@%…names+@$Dnames€Á‚!=€ÂB++…nodesÃ@%ENames€Á+…namesÁ@%ENodes€Á+…NodesÅHfunctionCloc†string€Á@@#ƒintÂ@Cfor@$Eliness€Á‚in„selfÁ@@%‚rz+@$HOutWhites€Á‚>=0ÆHfunctionDcloc„file€Á@BifDloud†counts€Á@IprintlineDpath€ÄB++Efiles†Counts€Â@#€@$s=A$JReadSafely€Ä@%ELines†Counts€Á+Clocs€ÂECount†counts@ Eparses€ÅHfunctionHCountAll„file€Á@@#„bool@$…force=…falseÃ@BifEisdir€Á@B++Ddirs†counts€ÂCfor@$Efilesc€Á‚in„selfÁ@HCountAllc€ÅDelse@Bif@$…force‚or@Dexts†counts€Á@Cext€Ä@Dcloc€ÇDmain@@#€@&@$a=Dargsƒapp€Â†expect¸Usage: cloc path [--files=cpp/c/h]  [--quiet=true/false]ÂDInit†counts@ @ƒapp@…filesÄCfor@$„path‚inaÁ@@#€@$ƒdir=LExistingFile„path€Â@HCountAllƒdir@ „trueÆFreport†counts€ÃHfunctionFreport†Counts€Á@@#€@$f=Efiles€Ã@#€@$l=Elines€Ã@#€@$p=Fparsed€Ã@#€@$d=Enodes€Ã@lŠ lines in f† filesÁ@#€@$n=Enames€Â@@nŠ names in dŽ nodes across p jeebox filesÃEclear†stderr€
+#!/usr/local/bin/spd
+
+module Counts 
+	|int64| Lines
+	|int64| Names
+	|int64| Nodes
+	|int64| Parsed
+	|int64| Files
+	|int64| Dirs
+	|| exts = dictionary.new
+	|| loud = !(app.yes("quiet") or app.yes("q"))
+	
+	function init (|string| ss)
+		ss = ss.trim 
+		ss := "spd/box"
+		for s in (ss / '/') 
+			exts[s] = s
+
+	function Count (|message| Msg)
+		require msg
+		Counts.parsed++
+		|| names =0 
+		|| nodes = 0
+		for s.flat in msg
+			names += s.name!=""
+			nodes++
+		.Names += names
+		.Nodes += Nodes
+
+
+function string.loc (|int|)
+	for s.lines in self
+		rz += s.OutWhite >= 0
+
+
+function file.cloc
+	if counts.loud
+		printline .path
+	Counts.files++
+	|| s = .ReadSafely$
+	Counts.Lines += s.loc
+	counts.Count(s.parse)
+
+
+function file.CountAll (|bool| force=false)
+	if .isdir
+		counts.dirs++
+		for c.files in self
+			c.CountAll
+	  else
+		if force or counts.exts[.ext]
+			.cloc	
+
+
+main  
+	|| a = app.args 		#expect "Usage: cloc path [--files=cpp/c/h]  [--quiet=true/false]"
+	
+	counts.Init(app..files)
+	for path in a
+		|| dir = path.ExistingFile
+			dir.CountAll(true)
+	counts.report
+
+
+function Counts.report
+	|| f = .files
+	|| l = .lines
+	|| p = .parsed
+	|| d = .nodes
+	"$l lines in $f files"
+	|| n = .names
+		"$n names in $d nodes across $p jeebox files"
+	stderr.clear
+

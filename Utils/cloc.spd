@@ -1,6 +1,5 @@
 #!/usr/local/bin/spd
 
-
 module Counts 
 	|int64| Lines
 	|int64| Names
@@ -14,7 +13,7 @@ module Counts
 	function init (|string| ss)
 		ss = ss.trim 
 		ss := "spd/box"
-		for s in (ss / '/')
+		for s in (ss / '/') 
 			exts[s] = s
 
 	function Count (|message| Msg)
