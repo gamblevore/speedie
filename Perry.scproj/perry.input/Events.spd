@@ -388,6 +388,19 @@ function PerryIDE.SelTextParse (|bool|)
 	|error| where
 	|| msg = s.parsewitherror(where)
 	.stdout.text = (msg.renderast(0), where.render)(!where) 
+	
+	// could put some tabs into that area? QT creator does the same???
+	// one for jeebox... one for stdout from shellstreamer...
+	// then we can opt the shellstreamer to NOT copy the streaminfo if its not onscreen?
+	// or atleast we can opt it somehow... like doing getresult and appending it
+	// and having the textview able to stitch together stuff... via the textviewlines 
+	// of course... the .text won't be legit anymore. Which would be bad.
+	// we would like to append stuff without needing the whole file in RAM as one string!!
+	// as long as that is possible... it should be ok?
+	// Perhaps  .text  can come from a function that wraps a virtual func???
+	// then it can stitch it together, if called for.
+	// but the internal drawing/scrolling funcs wouldn't need it, right? Right??? RIGHT?
+	
 	.editsep.show
 	return true
 
