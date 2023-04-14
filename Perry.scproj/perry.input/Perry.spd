@@ -197,7 +197,7 @@ function View (|ButtonView| btn)
 
 function ShowStdOut (|bool| AlwaysShow=false)
 	if AlwaysShow or .EditSep.Collapsed
-		.EditSep.Show // needds reflow first?
+		.EditSep.Show // needs reflow first?
 		.stdout.scrolltoend
 	  else
 		.EditSep.Collapse
