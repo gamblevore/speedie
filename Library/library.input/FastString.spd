@@ -67,7 +67,8 @@ class FastString {
 		cpp_wrapper JB_FS_GetResult
 	function GetResult (|FastString| other, |string|)
 		cpp_wrapper JB_FS_SmartResult
-
+	function Copy (|string|)
+		cpp_wrapper JB_FS_Copy
 	function uint64.lelength (|int|)
 		pragma inline
 		return (self|int|.log2 max 0) >> 3
