@@ -529,7 +529,8 @@ class Process
 		if .cid
 			.justkill(false)
 		if .CanActivate
-			expect (.path) (self, "Can't activate this without a path.")
+			if !.path
+			expect (.path) (self, "Can't re-activate process ${.name} without a path.")
 			.OpenSharedMemory(.origsize)
 			.self "reopen"
 			return .RunChild(.path)
