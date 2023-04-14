@@ -1,0 +1,6 @@
+args
+	"/usr/local/speedie/Utils"
+	"--quiet"
+pwd '.'
+
+env {setting="value"}
