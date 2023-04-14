@@ -8,14 +8,16 @@
 extern "C" {
 
 JBClass( ShellStream, JB_Object,
+	int Mode;
 	int PID;
 	int Error;
-	int Mode;
 	FastString* Output;
 	FastString* StdErr;
-    int CaptureOut[2];
-    int StdErrPipe[2];
+    int CaptureOut[2]; // remove these? they are just temps?
+    int StdErrPipe[2]; // check if they are!
     Date LastRead;
+    int64 UserFlags;
+    JB_Object* UserObj; // just like jeebox!
 );
 
 

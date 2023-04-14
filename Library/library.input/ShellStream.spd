@@ -7,10 +7,12 @@
 
 class ShellStream
 	|int|			PID
-	|int|			Err
-	|FastString|	FSOut
-	|FastString|	FSErr
-    |Date|			Last
+	|int|			Error
+	|FastString|	Output
+	|FastString|	StdErr
+    |Date|			LastRead
+    |int64|			UserFlags
+    |object|		UserObj
 	linkage
 		wrapper
 		cpp_part Sh

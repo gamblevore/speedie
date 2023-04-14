@@ -318,15 +318,15 @@ void JB_Sh_Constructor(ShellStream* self) {
 }
 
 ShellStream* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn) {
-	auto Sh = JB_New(ShellStream);
-	JB_Sh_Constructor(Sh);
-	if (!JB_FEPDWEE_Start(Sh, R, FSOut, FSErrIn, self, FSOut==nil)) {
-		JB_FreeIfDead(Sh);
-		return 0;
+	ShellStream Sh = {}; Sh.Mode = 1;
+	require(JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, FSOut==nil));
+	auto rz = JB_New(ShellStream);
+	if (rz) {
+		JB_Incr(Sh.StdErr);
+		JB_Incr(Sh.Output);
+		*rz = Sh;
 	}
-	JB_Incr(Sh->StdErr);
-	JB_Incr(Sh->Output);
-	return Sh;
+	return rz;
 }
 
 void JB_Sh_Destructor(ShellStream* self) {
