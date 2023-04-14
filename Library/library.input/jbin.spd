@@ -84,58 +84,41 @@ role JBin (Faststring)
 		.length = nwe
 
 
+function stringstream.NextMsg (|Message|)
+	return .NextMsgInfo|message|
+
+helper stringstream.NextMsgInfo (|uint64|)
+	opt norefcounts
+	|| parent = .UserObj|message|
+	while (self)
+		|uint| info = .Byte
+		|| L	= info & 63
+		|| Dir	= info >> 6							// 3 = up,  2 = same,  1 = down :)
+		if Dir != 3
+			if L >= 60
+				L = .lint0(L - 60)|uint|
+			|| t = .byte
+			if t > @bin|int|						// need @max
+				error (.data, "Corrupted jbin" )
+				t = @arg
+			|| msg = parent.msg(t|syntax|, .str(L))|uint64|
+			if !parent or dir == 1
+				.userobj = msg|object|
+			return msg
+		parent = parent.upward(L) // go up
+	.UserObj = nil
+
+
 helper stringstream.Parse_Jbin (|MessageRoot|)	
 	expect .test(_JbinHeader)  (self, "Not jbin")
-	|message|	Curr
-	||			Type = 0
+	
 	(message).BoostMode = true
-	while (self)
-		|| name = .NextJbin(type)
-		if type < 0 // go up
-			curr = curr.upward(-type)					#loop
-		  else
-			|| msg = curr.msg((type>>1)|syntax|, name)
-			rz := msg
-			if !curr or Type & 1
-				curr = msg
+	|| root = .NextMsginfo				// just avoid refcounting
+	while (.NextMsginfo)
 	(message).BoostMode = false
 
-
-helper stringstream.NextJbin (|&int| type, |string|)	
-	|uint| info = .Byte
-	|| L	= info & 63
-	|| Dir	= info >> 6						// 3 = up,  2 = same,  1 = down :)
-	if Dir == 3
-		*type = -L
-		return nil
-	if L >= 60
-		L = .lint0(L - 60)
-	|| t = .byte
-	if t > @bin|int|						// need @max
-		error (.data, "Corrupted jbin" )
-		t = @tmp
-	*type = (t<<1) + (2-Dir)
-	return .str(L)
-
-
-// well... we could fold nextjbin into this
-// then we basically just get a new message at a time
-// we can do somerthing like .NextMsgClearing... so we just keep the parent chain.
-// so... that would be in... .upward?
-// well no, there are two places we go up. kinda. we can go down or left... is the problem
-// if we go down... we gotta update curr, if not we keep curr. but its the same new node returned.
-helper stringstream.NextMsg (|&message| curr, |Message|)	
-	require (self)
-	|| type = 0
-	|| name = .NextJbin(type)
-	if type >= 0
-		|| msg = (*curr).msg((type>>1)|syntax|, name)
-		if !*curr or Type & 1
-			*curr = msg
-		return msg
-	*curr = (*curr).upward(-type) // go up
-	return .NextMsg(curr)
-
+	return root|messageroot|
+	
 
 function string.parse_jbin (|message|)
 	return .Stream.Parse_Jbin

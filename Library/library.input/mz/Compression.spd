@@ -11,7 +11,7 @@
 */
 
 
-extend String 		
+extend String
 	helper CompressIntoSub (|jbin| j, |&compressionstats| st) 
 		st := CompressionStats.All
 		st.len(j.length)

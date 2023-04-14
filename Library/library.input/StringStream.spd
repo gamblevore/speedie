@@ -7,6 +7,8 @@ class StringStream
 	|int|		ChunkSize
 	|int| 		StartFrom
 	|bool| 		IsEnded
+	|object--|	UserObj // for jbin
+
 	linkage:cpp_Part ss
 	
 	Flags
