@@ -1,5 +1,6 @@
 #!/usr/local/bin/speedie
 
+// todo: reporting jbin files as plain for some reason?
 datatype Type (int)
 	flags
 		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace
