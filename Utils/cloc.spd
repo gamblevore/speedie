@@ -19,7 +19,7 @@ module Counts
 	function Count (|message| Msg)
 		require msg
 		Counts.parsed++
-		|| names =0 
+		|| names = 	0 
 		|| nodes = 0
 		for s.flat in msg
 			names += s.name!=""
