@@ -522,12 +522,12 @@ JB_MemoryLayer* JB_ObjLayer( JB_Object* Obj ) {
 }
 
 
-int JB_ObjID( JB_Object* Obj ) {
+uint JB_ObjID( JB_Object* Obj ) {
     AllocationBlock* Block = ObjBlock_(Obj);
     require(((IntPtr)Block->Super) >= 4000);
-    int SuperID = Block->Super->ID;
+    uint SuperID = Block->Super->ID;
     IntPtr Offset = ((IntPtr)Obj) - ((IntPtr)(Block->Super));
-    return (SuperID << 20) + (int)(Offset >> 3);// min objectsize = 8. So we can lose 3 bits
+    return (SuperID << 20) + (uint)(Offset >> 3);// min objectsize = 8. So we can lose 3 bits
 												// SuperID is also different. Need to increase it so it won't collPerryIDE.
 }
 
