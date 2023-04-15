@@ -27,7 +27,7 @@ class Object
 	helper RefCount (|int|)
 		cpp_Wrapper JB_ObjRefCount
 	
-	helper ObjectID (|int|)			// stable across Runs!
+	helper ObjectID (|uint|)			// stable across Runs!
 		cpp_wrapper JB_ObjID		// uses pos within the superblock :)
 	
 	function Dispose				// Safely clears out all the properties...
