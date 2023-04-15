@@ -102,7 +102,7 @@ struct InlineEditor
 			.FinishEditing(false)
 			.visible = true
 			.setfocus
-			.TextSet(r)
+			.text = r
 			.sel = .text.length
 		l.Select(r.original)
 		l <~ .editor

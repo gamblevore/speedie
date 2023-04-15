@@ -9,7 +9,7 @@ class ButtonView (GUIControl)
 	|guiaction|					OnRightClick
 	|date|						StepDuration
 	|date|						DelayTill
-	|menu|						SubMenu
+	|guicontrol|				SubControl
 	|listviewrow|				Items
 	|listviewrow|				ClickedItem
 	|int|						ItemWidth
@@ -26,7 +26,7 @@ class ButtonView (GUIControl)
 		.OnRightClick = OnRightClick
 		.StepDuration = 0.75s
 		.align = ListViewState.aligncenter 
-		.submenu = .InitMenu(ret)
+		.subcontrol = .InitMenu(ret)
 
 	helper InitMenu (|GUIListEvent| ret,  |menu|)
 		if ret
@@ -34,7 +34,11 @@ class ButtonView (GUIControl)
 			if rz
 				rz.AttachedToParent = true
 
-	
+	function SubMenu (|menu|)
+		|| s = .SubControl
+		if s isa menu
+			return  s
+
 	function Click
 		opt norefcounts
 		.click((int.min, int.min))
@@ -44,9 +48,9 @@ class ButtonView (GUIControl)
 		cpp_part ClickXY
 		opt norefcounts
 
-		|| sub = .submenu
+		|| sub = .SubControl
 			|| w = .window
-			require w and w.openedmenu != sub // we shouldn't get a mouseup if we opened a menu?
+			require w and w.innerfocus != sub // we shouldn't get a mouseup if we opened a menu?
 
 		|| Always = (p == (int.min, int.min)) 
 		require always or .lastrect contains p
@@ -169,7 +173,8 @@ class ButtonView (GUIControl)
 		opt norefcounts
 		|| disabled = (i and i is disabled) or (self isnt enabled)
 			grow = nil
-		|| clicked = .MouseIsDown and R.x1x2 contains sdlapp.mousexy.x
+		|| MouseXInside = R.x1x2 contains sdlapp.mousexy.x
+		|| clicked = .MouseIsDown and mouseXinside
 		r.x2 += 2
 		|| strength = 1.0
 		if i is Active
@@ -189,10 +194,10 @@ class ButtonView (GUIControl)
 		if clicked and i
 			.drawfocusrect(where, grow, 1.0)
 		
-		if !i and .text.refcount == 0
 		|| t = (i.text, .text)(i)
-		if !i and .SubMenu
-			i = .SubMenu.ListSource // alow these text to be added.
+		if !i
+			|| s = .SubMenu
+				i = s.ListSource // allow these text to be added.
 		if i is Broken
 			t += " \17"
 		if i is dead
@@ -201,7 +206,10 @@ class ButtonView (GUIControl)
 			t += "*"
 		|| Pn = R.TextCorner(.gnormal,  t,  .align) + (-1, 1)
 		|| White = (.align & listviewstate.DrawWhiteSpace)!=0
-		font.small.DrawText(t,  Where,  Pn, White)
+		pn.x = font.small.DrawText(t,  Where,  Pn, White)
+		if .pressing and (r contains sdlapp.mousexy) and r.Width > 16
+			(pn.x min= r.x2-(font.Width+2))
+			font.small.DrawText("\03", where, pn, white)
 		if disabled
 			|| px = colors.grey(0.55)
 			where.fillrect(R, px, px)

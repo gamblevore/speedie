@@ -220,9 +220,9 @@ class Window (GUIControl)
 		if .gnormal
 			where.fill(.gnormal)
 		
-		|| menu = .openedmenu
+		|| menu = .innerfocus
 		.DrawChildren(where, menu)			
-		.focus.drawfocus(where)
+		.realfocus.drawfocus(where)
 		
 		if menu
 			menu.DrawOof(Where)

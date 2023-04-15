@@ -510,7 +510,7 @@ class FileViewer (ListView)
 			if V.owns(r)
 				V.select(r)
 			  elseif faa.isdir
-				v.QuickOpen.textset(faa.path) // sigh. just setting .text did not work!
+				v.QuickOpen.text = faa.path // sigh. just setting .text did not work!
 				V.quickOpenFile(faa.path)
 				
 				return true

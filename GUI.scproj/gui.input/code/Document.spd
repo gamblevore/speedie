@@ -23,7 +23,7 @@ class Document (RingTree)
 	
 	
 	constructor (|string| path, |bool| Dummy)
-		.ref		= CachedPath(path, document.docs, self)
+		.ref		= CachedPath(path, document.Cache, self)
 		.maxundos	= 60
 		.Viewers	= DocumentViewer(nil)
 		.Location	= path
@@ -249,11 +249,11 @@ class Document (RingTree)
 
 
 	module
-		|dictionary of cachedpath| Docs = dictionary()
+		|dictionary of cachedpath| Cache = dictionary()
 		function New (|string| path, |document|)
 			cpp_part NewShared
 			if path
-				rz = .docs.CachePath(path)|document|
+				rz = .Cache.CachePath(path)|document|
 			rz := document(path, true)
 
 

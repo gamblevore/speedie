@@ -292,6 +292,8 @@ extend PerryIDE
 			.addlow  self.stdout
 			.addhigh self.rborder
 			.addhigh self.editme
+		
+		.runbutton.SubControl = self.DebugArgsList
 
 		.AddIDEButton(.RunButton,	"\02", "Debug Project", "debug")
 		.AddIDEButton(.buildbutton, "\1C", "Build Project", "compile")

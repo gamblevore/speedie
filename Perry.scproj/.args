@@ -3,9 +3,6 @@ args
 	"hello.txt"
 	"--self"
 	"--noisy"
-
 pwd '.'
-
 env
 	setting="value"
-	

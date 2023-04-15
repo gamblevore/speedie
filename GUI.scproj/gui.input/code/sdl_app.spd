@@ -866,10 +866,11 @@ module SDLApp
 			if .inResizeCorner(xy)
 				return kActivity
 
-			|| dw = w.Click(b.button, b.clicks, xy)	
 			|| foc = w.Focus
 			if foc and foc.ClickOutsideCloses and (foc!=w.CurrMouseDown)
 				w.clearfocus
+			  else
+				w.Click(b.button, b.clicks, xy)	
 			  
 			return kActivity
 

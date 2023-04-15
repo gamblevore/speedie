@@ -28,22 +28,23 @@ function FoundListKeys (GuiKeyEvent)
 
 	
 function DebugArgsGotFocus (guiaction)
+	|| f = .ide.DebugArgsFile #require
 	|| v = state == 1
 	require (self is visible) != v
-	|| i = .ide
-	|| f = i.DebugArgsFile #require
+	(self is visible) = v
 	if v and self isa TextView
 		.text = f.ReadAll
 		|| data = .parse
 			if !data..args
-				self <~ "\nargs {Arg1, Arg2}\n"
+				self <~ "\nargs\n\tArg1\n\tArg2\n"
 			if !data..pwd
 				self <~ "\npwd '.'\n"
 			if !data..env
-				self <~ "\nenv {setting=\"value\"}\n"
+				self <~ "\nenv\n\tsetting=\"value\"\n"
+		.window.setinnerfocus(self)
 	  else
 		f.SmartData = .text
-	(self is visible) = v
+		
 
 
 
@@ -56,7 +57,6 @@ function ClickedDebug (GUIAction)
 function PressingDebug (GUIAction)
 	|| d = .ide.DebugArgsList
 	DebugArgsGotFocus(d, 1)
-	d.SetFocus
 
 
 function perryide.StartDebugging (|file| f)

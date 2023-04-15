@@ -88,7 +88,7 @@ function ClickedCompileTabs (Guiaction)
 function PressingTabs (guiaction)
 	opt norefcounts
 	if self isa ButtonView
-		|| p = .submenu
+		|| p = .submenu|listview|
 		|| ide = row.obj
 		if ide isa PerryIDE
 			p.ListSource.clear
@@ -285,9 +285,9 @@ function perryide.AddToJumpHistory
 
 function RightClickNext (GUIaction)
 	if self isa ButtonView
-		require .SubMenu // where.owning_func
-		.SubMenu.ListSource = .ide.SortedPrevious
-		.OpenMenu
+		|| s = .submenu
+			s.ListSource = .ide.SortedPrevious
+			.OpenMenu
 
 
 function ChosePrevItem (GUIListEvent)

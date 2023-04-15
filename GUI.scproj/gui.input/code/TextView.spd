@@ -673,7 +673,8 @@ class TextView (GUIControl)
 	
 	syntax append (|string| s)
 		if s
-			.textset(.text + s)
+			.text += s	// ideally we can optimise this. to not create a whole new string
+						// useful for large log files.
 
 	syntax access (|int| i, |string| s, |bool|)
 		cpp_Part Match
@@ -926,9 +927,7 @@ class TextView (GUIControl)
 	
 	
 	helper TextSet (|string| s)
-		isnt modified
-		.Clear(s)
-		.undoer.ClearTo(s)?
+		disabled "use .text instead"
 	
 
 	function CancelEditing (|bool|)
@@ -1307,7 +1306,12 @@ class TextView (GUIControl)
 				exit
 			d++
 
-
+	setter Text (|string|)
+		cpp_part TextSetReal
+		isnt modified
+		.Clear(value)
+		.undoer.ClearTo(value)?
+		
 	function TextLeft (|int|)
 		return .left + 2 + .LineNumWidth*font.width
 
@@ -1596,11 +1600,11 @@ class TextView (GUIControl)
 				.docerror = nil
 				
 
-	helper Parse (|message|)
-		cpp_Part ViewParse0
+	function Parse (|message|)
 		return .Parse(false, .FindExpectsParse)
 	
 	helper Parse (|bool| Changed, |int| expect, |message|)
+		cpp_Part ViewParseSub
 		//opt norefcounts
 		if !.canparse(expect)
 			.myerror = nil // crappy bugfix
