@@ -1,5 +1,4 @@
 
-// we can do this the "simple" way for now. DO it the "proper" way later!
 // seems like a good system?
 
 class SimpleGraph (dictionary)
@@ -25,11 +24,6 @@ class SimpleGraph (dictionary)
 
 	destructor
 		.Clear
-	
-	iterator
-		|| nav = .Navigate
-		while (nav.MoveNext)
-			yield nav.Value
 	
 	
 
