@@ -2,6 +2,7 @@
 
 						bugs
 
+* function finding fails with dictionary subclasses? dictsub["abc"]
 * || x = .SomeCArray // should just get the address... :)
 * Errors in subprojects kinda suck with error-reporting
 * months.scproj demo needs better compiler support, including .render not being needed.
