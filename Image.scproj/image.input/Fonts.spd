@@ -37,13 +37,16 @@ module font
 		Height = 9 
 
 
-function image.DrawText (|string| Str, |image| Where, |ivec2| xy=(0,0), |ImagePixel| Col = ImagePixel.clear, |bool| DrawInvis=false)
+function image.DrawText (|string| Str, |image| Where, |ivec2| xy=(0,0), |ImagePixel| Col = ImagePixel.clear, |bool| DrawInvis=false, |int|)
 	opt min 3
 	require (str and Where.Pixels and .Pixels)
 	for c.codepoints in str
 		if DrawInvis
 			c = -c
-		xy.x = .DrawChar(c, Where, xy, Col)$
+		|| next = .DrawChar(c, Where, xy, Col)#loop
+		xy.x = next
+	return xy.x
+		
 
 
 function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |ImagePixel| Col, |int| H)
