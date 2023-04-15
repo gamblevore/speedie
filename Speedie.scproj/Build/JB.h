@@ -315,6 +315,8 @@ struct Message_Behaviour;
 
 struct SCFile_Behaviour;
 
+struct SimpleGraph_Behaviour;
+
 struct __junktest_6__;
 
 struct autoitem;
@@ -392,6 +394,8 @@ struct SCFunction;
 struct SCIterator;
 
 struct SCModule;
+
+struct SimpleGraph;
 
 struct JB_String;
 
@@ -842,6 +846,7 @@ JBClass ( StringStream , JB_Object ,
 	int ChunkSize;
 	int StartFrom;
 	bool IsEnded;
+	JB_Object* UserObj;
 );
 
 struct SyntaxObj_Behaviour: Object_Behaviour {
@@ -1098,6 +1103,14 @@ JBClass ( SCModule , SCBase ,
 	bool IsRequiredInterface;
 );
 
+struct SimpleGraph_Behaviour: Dictionary_Behaviour {
+};
+
+JBClass ( SimpleGraph , Dictionary , 
+	JB_Object* Owner;
+	JB_String* Name;
+);
+
 struct StringZeroTerminated_Behaviour: String_Behaviour {
 };
 
@@ -1230,13 +1243,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1819])
+#define kJB__ErrorColors_bold (JB_LUB[1820])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1820])
-#define kJB__ErrorColors_good (JB_LUB[1821])
-#define kJB__ErrorColors_normal (JB_LUB[1822])
-#define kJB__ErrorColors_underline (JB_LUB[1821])
-#define kJB__ErrorColors_warn (JB_LUB[1823])
+#define kJB__ErrorColors_error (JB_LUB[1821])
+#define kJB__ErrorColors_good (JB_LUB[1822])
+#define kJB__ErrorColors_normal (JB_LUB[1823])
+#define kJB__ErrorColors_underline (JB_LUB[1822])
+#define kJB__ErrorColors_warn (JB_LUB[1824])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1446,7 +1459,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[339])
 #define kSC_BitNot (JB_LUB[437])
 #define kSC_BitOr (JB_LUB[642])
-#define kSC_BitXor (JB_LUB[1824])
+#define kSC_BitXor (JB_LUB[1825])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1476,7 +1489,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1825])
+#define kJB_SaverStart1 (JB_LUB[1826])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -3539,6 +3552,8 @@ JB_String* JB_f_pc(float self, FastString* fs_in);
 
 float JB_f_powow(float self, int n);
 
+bool JB_f_SyntaxAccess(float self);
+
 
 
 // hfloat
@@ -4634,6 +4649,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_SCFile_Behaviour
+
+
+// JB_SimpleGraph_Behaviour
 
 
 // JB_Object
@@ -5756,7 +5774,7 @@ int64 JB_ss_lint0(StringStream* self, int n);
 
 bool JB_ss_NextChunk(StringStream* self);
 
-JB_String* JB_ss_NextJbin(StringStream* self, int* type);
+uint64 JB_ss_NextMsgInfo(StringStream* self);
 
 Message* JB_ss_Parse_Jbin(StringStream* self);
 
@@ -7228,6 +7246,23 @@ SCModule* SC_Mod__NewContainer(JB_String* s);
 
 
 
+// JB_SimpleGraph
+void JB_SimpleGraph_Clear(SimpleGraph* self);
+
+void JB_SimpleGraph_Constructor(SimpleGraph* self, JB_String* name);
+
+void JB_SimpleGraph_Destructor(SimpleGraph* self);
+
+void JB_SimpleGraph_SyntaxAppendSet(SimpleGraph* self, SimpleGraph* other, bool value);
+
+SimpleGraph* JB_SimpleGraph__Alloc();
+
+SimpleGraph* JB_SimpleGraph__New(JB_String* name);
+
+void JB_SimpleGraph__Test();
+
+
+
 // JB_String_ArgValue
 
 
@@ -8037,6 +8072,8 @@ bool JB_config_Save(Message* self);
 // JB_Error
 void JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path);
 
+void JB_Err_ConstructorNothing(JB_Error* self);
+
 void JB_Err_destructor(JB_Error* self);
 
 void JB_Err_Fill(JB_Error* self, JB_String* path, JB_String* desc);
@@ -8090,6 +8127,8 @@ int JB_Err__Init_();
 int JB_Err__InitCode_();
 
 JB_Error* JB_Err__New(Message* node, JB_String* desc, ErrorSeverity level, JB_String* path);
+
+JB_Error* JB_Err__NewNothing();
 
 
 
