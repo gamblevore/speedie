@@ -100,12 +100,12 @@ extend PerryIDE
 		// ignore.
 	
 	function Readlog
-		if .Building and .stdout.height > 1
+		if .Building
 			.justreadlog
 
 	function JustReadLog
 		opt norefcounts
-		.stdout <~ .Compilr.ReadStdOut
+		.speedietext <~ .Compilr.ReadStdOut
 	
 	function CompileFB (|message| msg, |bool|)
 		|| db = .DebugIsWaitingForCompile

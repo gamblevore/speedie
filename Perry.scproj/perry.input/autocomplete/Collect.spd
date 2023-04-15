@@ -101,7 +101,7 @@ function PerryIDE.ActualCompile (|message| msg)
 		isnt active
 		return
 	.compilr = c
-	.stdout.text = ""
+	.speedietext.text = ""
 	
 	|| dw = .datewrap(msg)
 	.LogComms(dw, "\1C ")

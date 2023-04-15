@@ -56,7 +56,8 @@ class ButtonView (GUIControl)
 		require always or .lastrect contains p
 
 		|| c = (nil, .itemat(p.x))(always)
-		|| prev = (nil, .selectrow(c))(always)
+		.selected = c
+		|| prev = (nil, c)(always)
 
 		if left
 			(.onclicked|GUIAction|)(self, C, prev)?
@@ -64,12 +65,16 @@ class ButtonView (GUIControl)
 			(.onrightclick|GUIAction|)(self, C, prev)?
 
 
-	function SelectRow (|ListViewRow| R, |listviewrow|)
+	setter Selected (|ListViewRow|)
+		opt norefcounts
+		for i in .items
+			(i is Selected) = (i == value)
+
+	function Selected (|listviewrow|)
 		opt norefcounts
 		for i in .items
 			if i is Selected
-				rz = i
-			(i is Selected) = (i == r)
+				return i
 
 
 	behaviour MouseMove
@@ -206,8 +211,8 @@ class ButtonView (GUIControl)
 			t += "*"
 		|| Pn = R.TextCorner(.gnormal,  t,  .align) + (-1, 1)
 		|| White = (.align & listviewstate.DrawWhiteSpace)!=0
-		pn.x = font.small.DrawText(t,  Where,  Pn, White)
-		if .pressing and (r contains sdlapp.mousexy) and r.Width > 16
+		pn.x = font.small.DrawText(t,  Where,  Pn, White) + 2
+		if .pressing and (r contains sdlapp.mousexy) and r.Width > 19
 			(pn.x min= r.x2-(font.Width+2))
 			font.small.DrawText("\03", where, pn, white)
 		if disabled

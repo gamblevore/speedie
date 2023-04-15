@@ -83,6 +83,14 @@ function ClickedTabs (GUIAction)
 
 
 function ClickedCompileTabs (Guiaction)
+	opt norefcounts
+	// so... we clicked it
+	if self isa ButtonView
+		for i in .Items
+			|| obj = i.obj
+			if obj isa GUIControl
+				(obj is visible) = (i == row)
+				
 	
 
 function PressingTabs (guiaction)
@@ -189,13 +197,13 @@ function ClickedRelease (GUIaction)
 function fnBuildIsDead (fnConfirmCanceller)
 	if self isa perryide
 		.SpeedieMsgReceive(.compilr)
-		if !.compilr.alive
+		if !.Building
 			.CancelCompile // will return false in ClickedCancel if we return true here.
 			return true
 
 
 function Perryide.Building (|bool|) // .isbuilding, .iscompiling, .compiling 
-	return .progress is visible
+	return .compilr.alive
 
 
 function ClickedCancel (GUIAction)
@@ -385,12 +393,12 @@ function PerryIDE.SelTextParse (|bool|)
 	if s == .OldJBCloser
 		.OldJBCloser = ""
 		.editsep.Collapse
-		.stdout.text = "" 
+		.jeeboxtext.text = "" 
 		return true
 	.OldJBCloser = s
 	|error| where
 	|| msg = s.parsewitherror(where)
-	.stdout.text = (msg.renderast(0), where.render)(!where) 
+	.jeeboxtext.text = (msg.renderast(0), where.render)(!where) 
 	
 	// could put some tabs into that area? QT creator does the same???
 	// one for jeebox... one for stdout from shellstreamer...
@@ -502,9 +510,8 @@ function PerryIDE.ClickedError (|error| row)
 	sdlapp.CompileStatus = row
 	require !.DuringMsgFB
 	|| f = row.path.file
-	if row.path != .editme.path
-		if f.IsNicelyViewable
-			.filelist.QuickOpenFile(f, 1)
+	if (row.path != .editme.path) and f.IsNicelyViewable
+		.filelist.QuickOpenFile(f, 1)
 	.editme.ShowAndSel(row.position)
 	.editme.MyError = row
 
@@ -539,26 +546,19 @@ function ClickedError (GUIListEvent)
 		if self == ide.errorlist
 			ide.ClickedError(row)
 		  else
-			ide.clickedfind(row)
-	return true
-
-
-function ClickedLog (GUIListEvent)
-	opt norefcounts
-	|| i = .ide
-	if row and i.stdout is visible
-		i.stdout.text = row.name
+			ide.ClickedFind(row)
 	return true
 
 
 function LogAreaKeys (GuiKeyEvent)
-	if key is lgui
+	if key is LGUI
 		return false
 	if key iscmd keys.k
 		|| s = .ide.sendrecv
 		if s and "Clear log?\n\nContains ${s.slowcount} items.".confirm
 			s.clear
 		return true
+
 
 function ReturnErrorList (GuiListEvent)
 	.select(row)

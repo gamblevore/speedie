@@ -136,7 +136,7 @@ module Perry
 		i.ProjMsg = old
 		i.id = "IDE: " + name
 		old.obj = i
-		i.tabs.SelectRow(old)
+		i.tabs.selected=(old)
 			
 
 extend PerryIDE {
@@ -198,9 +198,16 @@ function View (|ButtonView| btn)
 function ShowStdOut (|bool| AlwaysShow=false)
 	if AlwaysShow or .EditSep.Collapsed
 		.EditSep.Show // needs reflow first?
-		.stdout.scrolltoend
+		.outtext.ScrollToEnd?
 	  else
 		.EditSep.Collapse
+
+
+function OutText (|textview|)
+	|| row = .tabs2.Selected
+		|| obj = row.obj
+		if obj isa textview
+			return obj
 
 
 function SwitchedToErrors

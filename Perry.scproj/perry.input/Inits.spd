@@ -13,6 +13,7 @@ extend PerryIDE
 		.SearchArea			= guicontrol(self) 
 		.ViewButtons		= guicontrol(self) 
 		.RBorder			= guicontrol(self)
+		.StdOutBorder		= guicontrol(self)
 		.Toolbar			= buttonview(self,		ClickedToolBar,			nil)
 		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile,			nil)
@@ -27,14 +28,16 @@ extend PerryIDE
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList) 
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
-		.LogArea			= ListView(self,		ClickedLog,				nil)
+		.LogArea			= ListView(self,		nil,				nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
 		.Status				= TextView(self,		ClickedStatus,			nil)
 		.StatsInfo			= TextView(self,		ClickedStats,			nil)
 		.SelInfo			= TextView(self,		PressedSelInfo,			nil)
-		.StdOut				= TextView(self,		nil,					nil)
-		.CompileTabs		= ButtonView(self,		ClickedCompileTabs) 
+		.JeeboxText			= TextView(self,		nil,					nil)
+		.SpeedieText		= TextView(self,		nil,					nil)
+		.ProductPage		= TextView(self,		nil,					nil)
+		.tabs2				= ButtonView(.stdoutborder,		ClickedCompileTabs) 
 		.NoNeeder			= TextView(self,		ClickedNoNeed,			nil)
 		.AutoComplete		= menu(self, 			nil,					AutoCompleteInsertText)
 		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
@@ -91,7 +94,6 @@ extend PerryIDE
 			.ID				= "RBorder"
 			.size 			= the~width  by  15~down
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.7)
-
 
 		with .FileList
 			.tooltip		= "Displays files in project"
@@ -227,18 +229,6 @@ extend PerryIDE
 			.onselerror		= EditMeSelError
 			.ColoriseAsRoot = autocomplete.functions
 
-		with .stdout
-			is enabled
-			is alwaysscrollable
-			isnt editable
-			isnt drawsfocus
-			.ID				= "stdout"
-			.size 			= the~area
-			.takesfocus		= takesfocusflag.On
-			.gnormal.solid	= (0.0, 0.0, 0.0, 0.85)
-			.expectsparse	= TextView.probablyjeebox
-			.PreferStayAtEnd= true
-
 
 		with .status 
 			.ID				= "Status"
@@ -266,7 +256,6 @@ extend PerryIDE
 			.size 			= the~right back 115  by  0 to 11
 			.gnormal.clear
 
-
 		with .FileSep
 			is enabled
 			.ID	= "filesep"
@@ -280,6 +269,7 @@ extend PerryIDE
 			.addlow  self.SearchArea
 			.addlow  self.FileList
 			.addlow  self.Noneeder
+		
 		with .filesep.div
 			.onhide = FileSepClicker
 			.onshow = FileSepClicker
@@ -289,10 +279,15 @@ extend PerryIDE
 			is enabled
 			.size = the~area
 			.ID	= "edit+stdout"
-			.addlow  self.stdout
+			.AddLow  self.StdOutBorder
 			.addhigh self.rborder
 			.addhigh self.editme
-		
+
+
+		.JeeboxText.SetupOut("jeebox")
+		.SpeedieText.SetupOut("speedie")
+		.ProductPage.SetupOut("product")
+				
 		.runbutton.SubControl = self.DebugArgsList
 
 		.AddIDEButton(.RunButton,	"\02", "Debug Project", "debug")
@@ -310,6 +305,12 @@ extend PerryIDE
 		.FunctionMenu.ExpandOnMouseOver = 1
 		.tabs.ExpandOnMouseOver = 2
 
+		
+		with .StdOutBorder
+			.ID				= "OutBorder"
+			.size 			= the~width  by  18~down
+			.gnormal.solid	= (0.0, 0.0, 0.0, 0.75)
+
 		with .tabs
 			.id = "ProjTabs"
 			.size = 10~after to the~right  by  3~inside
@@ -317,15 +318,23 @@ extend PerryIDE
 			.items = perry.projects
 			|| pf = perry.projects.first 
 				 (pf is selected)
-			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
+			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
 
-		with .compiletabs
+		with .tabs2
 			.id = "CompileTabs"
-			.size = 4~after to the~right  by  the~top-2 for 18
+			.size = the~area
 			.itemwidth = 75
-			.items = "Speedie, Jeebox, Product".parse|listviewrow|
-			.items.first is selected
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
+			|| items = "Speedie, Jeebox, Product".parse|listviewrow|
+			.items = items
+			items = items.first
+			(items is selected)
+			items.Obj = self.SpeedieText
+			items++
+			items.obj = self.JeeboxText
+			items++
+			items.obj = self.ProductPage
+			
 
 		.AddIDEButton(.StartScreen,	"\1a", "Startup screen", "startup")
 		.StartScreen.size = 7~left back 22  by  3~down back 14
@@ -353,20 +362,37 @@ extend PerryIDE
 			.id = "AllFuncs"
 			.tooltip   = "List Functions In File"
 			.size = 4~after for 40 by the~same
+		
 		with .FunctionMenu.submenu
 			.onselected = PerryFuncMenuSelected
 
 		with .currfilename.submenu
 			isnt drawsfocus
 			.ID				= "PathMenu"
+		
 		with .FunctionMenu.submenu
 			isnt drawsfocus
 			.ID				= "allFuncsMenu"
 		
-		.viewascurr
+		.ViewAsCurr
 		.SetupLogArea
 		
 
+	function textview.SetupOut (|string| name)
+		opt norefcounts
+		is enabled
+		is alwaysscrollable
+		isnt editable
+		isnt drawsfocus
+		.ID				= name
+		.size 			= the~width by the~bottom to 0~under
+		.takesfocus		= takesfocusflag.On
+		.gnormal.solid	= (0.0, 0.0, 0.0, 0.85)
+		.expectsparse	= TextView.probablyjeebox
+		.PreferStayAtEnd= true
+		.ide.EditSep.addlow(self)
+		
+		
 	function SetupLogArea
 		|| g = .LogArea
 		g.istree = true

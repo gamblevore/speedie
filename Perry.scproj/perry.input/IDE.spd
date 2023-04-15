@@ -13,14 +13,16 @@ class PerryIDE (Window)
 	|Guicontrol|				Tester
 	|Guicontrol|				SearchArea
 	|Guicontrol|				rborder
+	|guicontrol| 				StdOutBorder
 	|FileRow|					NotTodo
 	|message--|					ProjMsg
 	|[guicontrol]|				Views
 	|File|						Project
     |ivec2|						AutoPoint
-	|menu|						AutoComplete	// ... todo
+    |TextView| 					ProductPage
+	|TextView|					SpeedieText
+	|TextView|					JeeboxText
     |TextView|					MassSearchField
-	|TextView|					StdOut
     |TextView|					EditMe
     |TextView|					Status
     |TextView|					StatsInfo
@@ -31,9 +33,10 @@ class PerryIDE (Window)
     |StretchControl|			EditSep
     |StretchControl|			FileSep
 	|listviewrow|				SendRecv
+	|menu|						AutoComplete	// ... todo
+	|ListView|					Variables		// ... todo
 	|ListView|					ErrorList
 	|listview|					LogArea
-	|ListView|					Variables		// ... todo
 	|ListView|					FoundList
     |textview| 					DebugArgsList
 	|Guicontrol of buttonview|	ViewButtons
@@ -42,7 +45,7 @@ class PerryIDE (Window)
     |ButtonView|				FunctionMenu
     |buttonview|				Toolbar
     |Buttonview|				Tabs
-    |buttonview| 				CompileTabs
+    |buttonview| 				Tabs2 // compiletabs, compilertabs, ctabs
     |Buttonview|				ViewErrors
     |Buttonview|				ViewFiles
     |Buttonview|				ViewSearch
@@ -125,7 +128,7 @@ class PerryIDE (Window)
 		|| r = .projmsg
 			|| n = r.next
 			n := r.prev
-			.tabs.selectrow(n)
+			.tabs.selected=(n)
 			r.remove
 
 
@@ -249,7 +252,7 @@ class PerryIDE (Window)
 			  else
 				.recheck
 		if !.isfront
-			.tabs.SelectRow(.projmsg)
+			.tabs.selected = .projmsg
 			.editme.SetFocus // make it simple
 			super.show
 		.id = .name
@@ -407,8 +410,9 @@ class PerryIDE (Window)
 				return .editme.OpenSearch
 			return .ShowFind
 		if key is k
-			if !super.keydown(key)
-				.stdout.text = ""
+			|| t = .outtext
+			if t and !super.keydown(key)
+				t.text = ""
 			return true
 		if key is j
 			return .SelTextParse

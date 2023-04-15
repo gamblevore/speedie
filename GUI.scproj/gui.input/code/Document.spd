@@ -1,5 +1,12 @@
  
 
+// use the simplegraph instead...
+// this way... documents can have multiple viewers...
+// and viewers can have multiple documents... 
+// for example, a project has a something open.
+// i wonder how do we describe the strength of the link, though?
+
+
 class Document (RingTree)
 	linkage
 		cpp_part Doc

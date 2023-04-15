@@ -82,5 +82,5 @@ function perryide.UpdateDebuggedApp
 	if !r.step
 		.runcompiledapp = nil
 		
-	.stdout <~ fs.GetResult // later we will make this NOT do string appends to create .text
+	.productpage <~ fs.GetResult // later we will make this NOT do string appends to create .text
 	// what else can we do? send some msgs via ipc? lol. i cant do anything else?
