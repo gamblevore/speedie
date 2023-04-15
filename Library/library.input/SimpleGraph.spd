@@ -1,0 +1,53 @@
+
+// we can do this the "simple" way for now. DO it the "proper" way later!
+// seems like a good system?
+
+class SimpleGraph (dictionary)
+	saveas nil
+	|object| Owner
+	|string| Name
+	contains SimpleGraph
+	
+	constructor (|string| name="")
+		super.Constructor
+		.name = name
+	
+	syntax append (|SimpleGraph| other, assigns:|bool|value=true)
+		|uint64| Data = .ObjectID|uint64|.hash  xor  other.ObjectID|uint64|.hash
+		|| str = string.Copy((&Data)|&byte|, 8)
+		debug_require !(other|dictionary|[str] or self|dictionary|[str])
+		other[str] = (self, nil)(value)
+		self[str] = (other, nil)(value)
+	
+	function Clear
+		for obj in self
+			(obj <~ self) = false
+
+	destructor
+		.Clear
+	
+	iterator
+		|| nav = .Navigate
+		while (nav.MoveNext)
+			yield nav.Value
+	
+	
+
+function @SimpleGraph.Test
+	|| n = 10
+	|[SimpleGraph]| items
+	for i in n
+		items <~ SimpleGraph( string.byte('A'+i) )
+	
+	for i in n
+		|| ii = items[i]
+		for j in (i + 1 to n-1)
+			if (0.1)[]
+				ii <~ items[j]
+	
+	for t in items
+		"${t.name} is connected to:"
+		for found in t
+			"\t${found.name}"
+	
+		
