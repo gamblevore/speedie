@@ -51,14 +51,14 @@ class Process
 		.deathlimit = 12
 		.procpos = -1
 		.isserver = n != 0
-		.sendqueue	= ringtree()
-		.writer		= FastString()
 		.subprocess = sub
 		.TrapStdOut = TrapStdOut
+		.sendqueue	= ringtree()
+		.writer		= FastString()
+
 		name := app..talk
-		if name
-			if name[0] != '/'
-				name = name.ipcPath
+		if name and name[0] != '/'
+			name = name.ipcPath
 		.name = name.ipcname
 		.talker		= name.file
 		if .isserver
@@ -68,6 +68,7 @@ class Process
 		  else
 			app.BelongsToParent // should die if the parent dies!
 		.params		= params
+
 		if name
 			.OpenSharedMemory(n)
 		  else
