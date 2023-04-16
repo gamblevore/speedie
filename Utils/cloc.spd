@@ -37,9 +37,9 @@ function file.cloc
 	if counts.loud
 		printline .path
 	Counts.files++
-	|| s = .ReadSafely$
-	Counts.Lines += s.loc
-	counts.Count(s.parse)
+	|| s = .ReadSafely
+		Counts.Lines += s.loc
+		counts.Count(s.parse)
 
 
 function file.CountAll (|bool| force=false)
