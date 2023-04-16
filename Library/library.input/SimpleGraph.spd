@@ -12,9 +12,14 @@ class SimpleGraph (dictionary)
 		.name = name
 	
 	syntax append (|SimpleGraph| other, assigns:|bool|value=true)
-		|uint64| Data = .ObjectID|uint64|.hash  xor  other.ObjectID|uint64|.hash
+		|uint64| A = .ObjectID
+		|uint64| B = other.ObjectID
+		if (A > B)
+			A >>= 32
+		  else
+			B >>= 32
+		|| Data = A (|) B
 		|| str = string.Copy((&Data)|&byte|, 8)
-		debug_require !(other|dictionary|[str] or self|dictionary|[str])
 		other[str] = (self, nil)(value)
 		self[str] = (other, nil)(value)
 	
