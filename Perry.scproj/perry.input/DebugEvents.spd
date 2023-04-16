@@ -52,6 +52,7 @@ function ClickedDebug (GUIAction)
 	|| i = .ide	
 	i.DebugIsWaitingForCompile = true
 	i.compile("debug")
+	i.ShowText(i.ProductPage, "")
 
 
 function PressingDebug (GUIAction)

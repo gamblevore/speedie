@@ -206,7 +206,7 @@ function fnBuildIsDead (fnConfirmCanceller)
 
 
 function Perryide.Building (|bool|) // .isbuilding, .iscompiling, .compiling 
-	return false//.buildbutton isnt enabled
+	return .buildbutton isnt enabled
 
 
 function ClickedCancel (GUIAction)
