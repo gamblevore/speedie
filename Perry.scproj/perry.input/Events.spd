@@ -83,14 +83,17 @@ function ClickedTabs (GUIAction)
 
 
 function ClickedCompileTabs (Guiaction)
+	.ide.StdOutSelect(row)
+
+
+function PerryIDE.StdOutSelect (|object| Desired)	
 	opt norefcounts
-	// so... we clicked it
-	if self isa ButtonView
-		for i in .Items
-			|| obj = i.obj
-			if obj isa GUIControl
-				(obj is visible) = (i == row)
-				
+	for i in .tabs2.Items
+		|| obj = i.obj
+		if obj isa GUIControl
+			|| vis = (Desired == i or obj)
+			(i is selected) = vis
+			(obj is visible) = vis
 	
 
 function PressingTabs (guiaction)
@@ -203,7 +206,7 @@ function fnBuildIsDead (fnConfirmCanceller)
 
 
 function Perryide.Building (|bool|) // .isbuilding, .iscompiling, .compiling 
-	return .compilr.alive
+	return false//.buildbutton isnt enabled
 
 
 function ClickedCancel (GUIAction)
@@ -384,6 +387,12 @@ function ClickedNoNeed (GUIaction)
 		.ide.view(.tag|buttonview|)	
 
 
+function PerryIDE.ShowText (|textview| field, |string| Text)
+	field.text = text
+	.editsep.show
+	.StdOutSelect(field)
+	
+	
 function PerryIDE.SelTextParse (|bool|)
 	opt norefcounts
 	|| e = .editme
@@ -398,7 +407,7 @@ function PerryIDE.SelTextParse (|bool|)
 	.OldJBCloser = s
 	|error| where
 	|| msg = s.parsewitherror(where)
-	.jeeboxtext.text = (msg.renderast(0), where.render)(!where) 
+	.ShowText(.JeeboxText, (msg.renderast(0), where.render)(!where) )
 	
 	// could put some tabs into that area? QT creator does the same???
 	// one for jeebox... one for stdout from shellstreamer...
@@ -412,7 +421,6 @@ function PerryIDE.SelTextParse (|bool|)
 	// then it can stitch it together, if called for.
 	// but the internal drawing/scrolling funcs wouldn't need it, right? Right??? RIGHT?
 	
-	.editsep.show
 	return true
 
 
@@ -436,7 +444,7 @@ function PressedSelInfo (GUIaction)
 	opt norefcounts
 	|| i = .ide
 	|| q = i.filelist.quickopen
-	q.text = "line "+i.editme.CurrLine.Render
+	q.text = "line " + i.editme.CurrLine.Render
 	i.filelist.showquickopen
 
 
@@ -526,7 +534,7 @@ function PerryIDE.ClickedFind (|error| row)
 	|| p = row.path
 	.filelist.quickOpenFile(p, 1)
 	if row.position
-		.editme.ShowAndSel(row.position, .masssearchfield.text.length)
+		.editme.ShowAndSel(row.position, .MassSearchField.text.length)
 	  else
 		row = row.first
 	|| curr = .MoveError(row, p, -1)
