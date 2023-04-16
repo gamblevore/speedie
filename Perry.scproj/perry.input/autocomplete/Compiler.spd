@@ -130,6 +130,7 @@ extend PerryIDE
 		.LogComms(@emb + ("\1b " + c))
 		notifications <~ (what, response)
 	
+	
 	function CancelCompile 
 		.DebugIsWaitingForCompile = false
 		.compilr.JustKill?
