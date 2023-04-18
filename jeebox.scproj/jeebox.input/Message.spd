@@ -818,7 +818,7 @@ class Message (RingTree)
 		fs.MsgErrorName(name)
 		fs <~ ", but found "//@"
 		fs <~ .Func.longname
-		fs.msgerrorname(.name)
+		fs.MsgErrorName(.name)
 		error (self, fs)
 	
 

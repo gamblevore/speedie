@@ -18,7 +18,7 @@ class FastString {
 	|&Byte|			ResultPtr
 	|uint16|		Indent
 	|Byte|			IndentChar
-	|int|			WrittenLength
+//	|int|			WrittenLength // invisible
 	|bool|			Failed
 	
 /////
