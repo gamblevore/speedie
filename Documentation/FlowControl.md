@@ -28,6 +28,11 @@ Stepping backwards in time requires a few other systems added to Speedie, but Fl
 
 Basically, if we are gonna "re-run" our test-code to a slightly earlier point... we'll need to know that the test-code was doing the same thing, or else its no point re-running it! So its vital for stepping backwards.
 
+## Stability Tests
+
+You might want to be sure that your code is doing the same no matter how many times it is called, or from what parent calling functions. FlowControl can compare older runs!
+
+
 ## Updating, Swapping or Upgrading Libraries
 
 So lets say you have some code... lets say it's a network browser or something. You just wanna list the servers on the network.
@@ -45,6 +50,18 @@ Using FlowControl, you can log the behaviour of your app that uses the lib, so t
 I am going to use FlowControl for the Speedie VM. This is to ensure that my C++ generated code, and the VM... behave the same way. This will make a good match, ensuring that your code behaves the same, regardless of VM or C++.
 
 **Very** Important! It will totally squash any bugs allowing them to instantly be found :) It will be awesome!
+
+### Internally
+
+Internally, my FlowControl system will be a few things.
+
+* Logging `if` conditions. Also `and/or` conditions (some of them) as a boolean. This allows 8 conditions per byte.
+* Logging `while` loops. We log these as pure-numbers.
+* Logging function callbacks!
+
+We also compress the data we capture, and decompress older logs, for comparison. We just jump into the debugger at the first difference found.
+
+To do this, required me to upgrade my compression and decompression system, so that it is fully streamable. Now this is done, I can get back onto FlowControl!
 
 
 
