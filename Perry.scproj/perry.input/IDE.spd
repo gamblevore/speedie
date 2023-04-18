@@ -234,12 +234,13 @@ class PerryIDE (Window)
 		.SelInfo.text = fs	
 
 	
-	function Name (|string|)
+	function ProjName (|string|)
+		disabled "Use .name"
+		
+	function Name (|string|) //.ProjName
 		opt norefcounts
 		|| m = .projmsg
 			return m.name.name
-		debugger
-		return "(Perry)"
 
 
 	function Show (|bool| bump=true)

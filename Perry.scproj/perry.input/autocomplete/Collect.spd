@@ -14,7 +14,6 @@ function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| na
 
 
 function PerryIDE.GetFeedback (|string| cmd,  |message| where,  |string| name,  |string| reason, |bool|)
-	|| n = .projmsg.first.nyme
 	|| msg = .BuildCmd(cmd, where, name, reason)
 		if (.PopupDisplay is visible) or .PopupDateOn
 			|| cmdstr = msg.render_jbin
@@ -74,7 +73,7 @@ function PerryIDE.CompilerInit (|process| C, |bool| actual_compile, |process|)  
 
 	|| p = [.project, "--perry=bin", "--quiet"]
 	|| f = .projmsg.first 
-	|| name = f.name
+	|| name = .name
 	if !actual_compile
 		p <~ "--check"
 	

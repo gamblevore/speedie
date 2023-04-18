@@ -56,7 +56,7 @@ extend PerryIDE
 		.InConstructor = false
 	
 	
-	function Init
+	function Init // perryide.init
 		.size = the~area
 		.noclutter  = 2
 		.CopyPaste	= CopyPasteFlags.PasteFile
@@ -325,7 +325,7 @@ extend PerryIDE
 			.size = the~area
 			.itemwidth = 75
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
-			|| items = "Speedie, Jeebox, Product".parse|listviewrow|
+			|| items = "Speedie, Jeebox, ''".parse|listviewrow|
 			.items = items
 			items = items.first
 			(items is selected)
@@ -376,6 +376,7 @@ extend PerryIDE
 		
 		.ViewAsCurr
 		.SetupLogArea
+		.StdOutSelect(.SpeedieText)
 		
 
 	function textview.SetupOut (|string| name)

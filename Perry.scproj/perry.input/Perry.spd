@@ -136,7 +136,8 @@ module Perry
 		i.ProjMsg = old
 		i.id = "IDE: " + name
 		old.obj = i
-		i.tabs.selected=(old)
+		i.tabs.selected = old
+		i.tabs2.items.last.name = name + "[]"
 			
 
 extend PerryIDE {
