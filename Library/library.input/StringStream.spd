@@ -9,7 +9,7 @@ class StringStream
 	|bool| 		_IsEnded
 	|object--|	UserObj // for jbin
 
-	linkage:cpp_Part ss
+	linkage:cpp_Part SS
 	
 	Flags
 		JbinMode = 1
