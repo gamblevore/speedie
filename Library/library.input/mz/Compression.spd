@@ -11,42 +11,44 @@
 */
 
 
-extend String
-	helper CompressIntoSub (|jbin| j, |&compressionstats| st) 
-		st := CompressionStats.All
-		st.len(j.length)
-		if !j.length
-			j.jinit
-			j.enter(@arg)
-		j.enter(@tmp, "µz")
-		j.addint(.length)
-		j.enter(@arg)
-		for s in .chunk(1MB)
-			|| Place = j.OpenStream
-			j.CompressChunk(s)
-			j.CloseStream(Place)
-			st.LiveUpdate(s, j.length)
-		j.up(2)
-		j.CompressChunk(nil) // cleanup
+function string.CompressInto (|jbin| j, |&compressionstats| st=nil) 
+	st := CompressionStats.All
+	st.len(j.length)
+	j.jinit
+	j.enter(@arg)
+	j.enter(@tmp, "µz")
+	j.addint(.length)
+	j.enter(@arg)
+	for s in .chunk(1MB)
+		|| Place = j.OpenStream
+		j.CompressChunk(s)
+		j.CloseStream(Place)
+		st.LiveUpdate(s, j.length)
+	j.up(3)
+	j.CompressChunk(nil) // cleanup
 
-	helper DecompressSub (|&compressionstats| st, |int| lim, |string| input, |faststring| fs, |bool|)
-		opt norefcounts
-		st := compressionstats.all
-		|| mz = .parse_jbin				#require
-		if mz == @arg
-			mz = mz[@tmp]
-		  elseif !mz.expect(@tmp)
-			mz = nil
-		|| size = mz[@num, 0]
-		|| arg = mz[@arg, 1]
-		|| total_size = size.int
-		expect (size and arg)                (self, "Invalid mz header")
-		expect (total_size <= lim)           (self, "Oversized mz")
-		st.len(mz.length)
-		for C in arg
-			require fs.DecompressChunk(c.name, total_size)
-			st.liveupdate(c.name, fs.length)
+
+helper stringstream.DecompressInto (|&compressionstats| st, |int| lim, |faststring| fs, |bool|)
+	opt norefcounts
+	if !.IsCompressed
+		fs <~ .readall
 		return true
+	st := compressionstats.all
+	|| mz = .parse_jbin				#require
+	if mz == @arg
+		mz = mz[@tmp]
+	  elseif !mz.expect(@tmp)
+		mz = nil
+	|| size = mz[@num, 0]
+	|| arg = mz[@arg, 1]
+	|| total_size = size.int
+	expect (size and arg)                (self, "Invalid mz header")
+	expect (total_size <= lim)           (self, "Oversized mz")
+	st.len(mz.length)
+	for C in arg
+		require fs.DecompressChunk(c.name, total_size)
+		st.liveupdate(c.name, fs.length)
+	return true
 
 		
 helper faststring.CompressChunk (|string| str) 

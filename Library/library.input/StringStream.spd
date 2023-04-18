@@ -6,7 +6,7 @@ class StringStream
 	|int|		Length
 	|int|		ChunkSize
 	|int| 		StartFrom
-	|bool| 		IsEnded
+	|bool| 		_IsEnded
 	|object--|	UserObj // for jbin
 
 	linkage:cpp_Part ss
@@ -25,11 +25,14 @@ class StringStream
 		.ChunkSize = chunksize
 		.length = file.size
 		.ReadChunk
+
+	function ReadAll (|string|)
+		return .str(.length - .startfrom)
 	
 	helper ReadChunk (|bool|)
 		.data.readfrom = .file.read(.chunksize)		// for now
 		if .data.readfrom.length < .chunksize
-			.isended = true // not technically true for pipes... but this will do for now!
+			._isended = true // not technically true for pipes... but this will do for now!
 		return .data.readfrom
 	
 	function Skip (|int| p = 1)
@@ -94,10 +97,24 @@ class StringStream
 	function Remaining (|int|)
 		return .length - .position
 	
+	function StrNoAdvance (|int| n, |int|skip=0, |string|)
+		|| p = .Position
+		rz = .str(n)
+		.Position = p
+	
+	function IsEnded (|bool|)
+		if ._isended
+			return true
+		if .data.Remaining <= 0
+			if !.file
+				return true
+			if .length <= .startfrom
+				return true
+				
 	function Str (|int| n, |int|skip=0, |string|)
 		ifn n > 0 and skip < n
 			return ""
-		if (.data has n) or (.IsEnded)
+		if (.data has n) or (._IsEnded)
 			|| pos = .data.position		// no need use the .startfrom
 			.data.position = n + pos
 			return .data.syntaxaccess(pos + skip, .data.position)
@@ -109,7 +126,8 @@ class StringStream
 			Remaining -= Copied
 			loop Remaining > 0
 			if !.NextChunk
-				return r[0, r.length - remaining].copy
+				 r = r[0, r.length - remaining].copy
+				 exit
 		return r
 	
 	function utf8 (|int|n, |int|skip=0, |string|)

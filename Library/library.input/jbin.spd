@@ -107,6 +107,7 @@ helper stringstream.NextMsgInfo (|uint64|)
 			return msg
 		parent = parent.upward(L) // go up
 		.userobj = parent
+		require parent
 	.UserObj = nil
 
 
