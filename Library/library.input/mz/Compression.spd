@@ -29,26 +29,39 @@ function string.CompressInto (|jbin| j, |&compressionstats| st=nil)
 
 
 helper stringstream.DecompressInto (|&compressionstats| st, |int| lim, |faststring| fs, |bool|)
-	opt norefcounts
 	if !.IsCompressed
 		fs <~ .readall
 		return true
 	st := compressionstats.all
-	|| mz = .parse_jbin				#require
+	require .ExpectJbin
+	
+	|| mz = .NextMsg				#require
 	if mz == @arg
-		mz = mz[@tmp]
+		mz = .NextMsg(@tmp)
 	  elseif !mz.expect(@tmp)
 		mz = nil
-	|| size = mz[@num, 0]
-	|| arg = mz[@arg, 1]
+	|| size = .NextMsg(mz, @num)
+	|| arg = .NextMsg(mz, @arg)
 	|| total_size = size.int
-	expect (size and arg)                (self, "Invalid mz header")
-	expect (total_size <= lim)           (self, "Oversized mz")
-	st.len(mz.length)
-	for C in arg
-		require fs.DecompressChunk(c.name, total_size)
-		st.liveupdate(c.name, fs.length)
-	return true
+	|| ErrorCount = StdErr.ErrorCount
+	mz.name = nil
+	size.name = nil
+	ifn size and arg and total_size <= lim
+		if (total_size > lim)
+			error ("mz would decompress too large")
+		  else
+			error (self, "Invalid mz header")
+	  else
+		st.len(fs.StreamLength)
+		|| Continue = true
+		while Continue
+			|| c = .NextMsg(arg, @bin)
+			Continue = c and fs.DecompressChunk(c.name, total_size)
+			if Continue
+				st.LiveUpdate(c.name, fs.StreamLength)
+			c.remove
+			
+	return stderr.ErrorCount == ErrorCount
 
 		
 helper faststring.CompressChunk (|string| str) 

@@ -87,6 +87,15 @@ role JBin (Faststring)
 function stringstream.NextMsg (|Message|)
 	return .NextMsgInfo|message|
 
+
+function stringstream.NextMsg (|message| parent=nil, |syntax| fn, |string| name=nil,  |Message|)
+	cpp_part NextMsgExpect
+	rz = .NextMsg #require
+	if (rz.expect(fn, name)) and (parent) and (rz.parent != parent)
+		error rz
+		rz = nil
+
+
 helper stringstream.NextMsgInfo (|uint64|)
 	opt norefcounts
 	|| parent = .UserObj|message|
@@ -111,8 +120,14 @@ helper stringstream.NextMsgInfo (|uint64|)
 	.UserObj = nil
 
 
+helper stringstream.ExpectJbin (|bool|)
+	if .test(_JbinHeader)
+		return true
+	error (self, "Not jbin")
+
+
 helper stringstream.Parse_Jbin (|MessageRoot|)	
-	expect .test(_JbinHeader)  (self, "Not jbin")
+	require .expectjbin
 	
 	(message).BoostMode = true
 	|| root = .NextMsginfo				// just avoid refcounting

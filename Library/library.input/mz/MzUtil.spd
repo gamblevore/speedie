@@ -92,7 +92,7 @@ Module MZLab
 		for orig in inputs
 			expect orig == back.decompress
 		expect (back.IsEnded) and !back.Decompress.length
-
+		"TestCompression passed."
 
 
 target minilib {
