@@ -125,7 +125,7 @@ struct CompressionStats
 		.Duration := -date()
 		.LastOut = n
 
-	function liveupdate (|string| s, |int| outt)
+	function LiveUpdate (|string| s, |int| outt)
 		.in += s.length
 		.out += outt - .LastOut
 		.LastOut = .out
