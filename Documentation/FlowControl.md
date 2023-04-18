@@ -10,7 +10,7 @@ FlowControl allows many advanced features to become possible.
 
 Mainly, this is by comparing two logs of FlowControl, to see where they differ! Very powerful.
 
-##Debugging Programs On Other Computers
+## Debugging Programs On Other Computers
 
 So lets say you run your program on another computer, that you have no debugger available for. And the program is failing, but you can't tell why, because all you have is the compiled source and an error message. But like most errors, the cause of the error is far away from the point that it is generated.
 
