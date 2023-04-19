@@ -131,10 +131,6 @@ struct ClassData
 
 	function Restore
 		.DefaultLayer.Use
-	
-	setter BoostMode (|bool|)
-// does nothing for now. Will go super-fast!!
-//		cpp_wrapper JB_Class_BoostSet
 
 	
 	iterator

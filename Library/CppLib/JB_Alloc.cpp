@@ -1173,16 +1173,13 @@ static inline JB_Object* Trap_(FreeObject* Obj, AllocationBlock* B) {
 __hot JB_Object* JB_Alloc2( AllocationBlock* CurrBlock ) {
 	Sanity(CurrBlock);
     auto Obj = CurrBlock->FirstFree;
-    if_usual ((IntPtr)Obj > 1) {
+    if_usual (Obj) {
         CurrBlock->ObjCount++;
         CurrBlock->FirstFree = Obj->Next;
         Obj->FakeRefCount = 0;
 		Sanity(CurrBlock);
         return (JB_Object*)Obj;
     }
-    if ((IntPtr)Obj == 1) {
-		return 0;// do some kinda burst-mode allocation for parsing jeebox
-	}
 	
 	return Trap_(NewBlock( CurrBlock ), CurrBlock->Owner->CurrBlock);
 }
