@@ -286,10 +286,15 @@ class RingTree (Saveable)
 		disabled "This function is slow. Use .HasChildCount or .SlowCount (a more honestly named version of .count... there is no fast way to do this.)"
 
 
-	function SlowCount (|int|)
+	function SlowCount (|bool|Flat=false, |int|)
 		opt norefcounts
-		for self
+		|| c = self
+		while c
 			rz++
+			if flat
+				c = c.flatnext
+			  else
+				c = c.next
 
 
 	function ExtractChild (||)
