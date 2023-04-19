@@ -16,8 +16,7 @@ datatype Type (int)
 			fs <~ "jbin"
 		  elseif self is box:  fs <~ "jeebox"
 		  elseif self is xml:  fs <~ "xml"
-		  else
-			fs <~ "plain"
+		  else:                fs <~ "plain"
 
 
 function App.GetActions (|Type|)
