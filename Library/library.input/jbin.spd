@@ -6,19 +6,19 @@
 
 
 extend message
-	render render_jbin (|string| execute = "")
+	render render_jbin (|string| shell_path = "")
 		opt norefcounts
 		require self
 		|| js = fs|jbin|
-		if execute
-			js.sheb(execute)
+		if shell_path
+			js.sheb(shell_path)
 		js.jinit
 		|| ch	 = self
 		|| after = .FlatAfter
 		while ch != after
 			|| Depth	= 0
 			|| curr		= ch
-			ch			= ch.FlatNextDepth(depth)
+			ch			= curr.FlatNextDepth(depth)
 			js.Add(curr.func, curr.name, depth > 0)
 			js.up(-depth)
 
@@ -84,6 +84,31 @@ role JBin (Faststring)
 		.length = nwe
 
 
+function @jbin.ParseSpeedTest
+    || bin = –digest "@mary had a~little~lamb whose fleece was white as snow"
+    || p = "/tmp/jbin_demo.jbin"
+    
+	|| out = p.out 
+	|| c = bin.parse.slowcount(true)
+	|| n = 0
+	while n < 256K
+		n += c
+		out <~ bin
+	out = nil
+	"$n nodes created"
+	
+	|| result = Message()
+	|| start = date.now
+	for 4
+		|| In = p.in
+		while !in.isended
+			result <~ in.Parse_Jbin
+	|| time = date.now - start
+	n *= 4
+	|| t = time.seconds
+	"parsed $n nodes in $t seconds, at ${(1000000000.0 * t)/n} ns/node"
+	 
+
 function stringstream.NextMsg (|Message|)
 	return .NextMsgInfo|message|
 
@@ -126,13 +151,11 @@ helper stringstream.ExpectJbin (|bool|)
 	error (self, "Not jbin")
 
 
-helper stringstream.Parse_Jbin (|MessageRoot|)	
+helper stringstream.Parse_Jbin (|bool| Burst = false, |MessageRoot|)	
 	require .expectjbin
 	
-	(message).BoostMode = true
 	|| root = .NextMsginfo				// just avoid refcounting
 	while (.NextMsginfo)
-	(message).BoostMode = false
 
 	return root|messageroot|
 	

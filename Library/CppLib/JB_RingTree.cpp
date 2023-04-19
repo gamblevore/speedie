@@ -348,7 +348,7 @@ DepthNode FlatNext( RingTree* self, bool AllowDown ) {
 		up = self->Parent;
 	}
 
-	return {0, 0};
+	return {0, Depth};
 }
 
 // very cool
@@ -360,7 +360,7 @@ RingTree* JB_Ring_FlatNext0( RingTree* self ) {
 RingTree* JB_Ring_FlatNextDepth( RingTree* self, int* Depth, bool Down ) {
 	auto D = FlatNext( self, Down );
 	if (Depth)
-		*Depth+=D.Depth;
+		*Depth += D.Depth;
 	return D.Node;
 }
 
