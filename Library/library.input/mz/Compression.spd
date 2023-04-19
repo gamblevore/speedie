@@ -48,7 +48,7 @@ helper stringstream.DecompressInto (|&compressionstats| st, |int| lim, |faststri
 	size.name = nil
 	ifn size and arg and total_size <= lim
 		if (total_size > lim)
-			error ("mz would decompress too large")
+			error (self, "mz would decompress too large")
 		  else
 			error (self, "Invalid mz header")
 	  else
