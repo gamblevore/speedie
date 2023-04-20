@@ -352,10 +352,9 @@ class Window (GUIControl)
 		
 		.FocusWasSet = false
 		|| Found = .ControlAt(p.point, 0, true)
-		if Found and window.all
 			|| clicks2 = Found.__MouseDown__(p, clicks)
 				SdlApp.CanDrag = clicks2
-				if !.FocusWasSet
+				if !.FocusWasSet and (found != .innerfocus)
 					.setfocus(Found)
 				return Found
 
