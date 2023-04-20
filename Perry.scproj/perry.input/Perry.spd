@@ -122,6 +122,16 @@ module Perry
 			rz = rz[0, rz.length-2]
 	
 	
+	function perryide.SetTabName (|message| old)
+		opt norefcounts
+		.tabs.selected = old
+
+		|| f = old.first
+		f.name = f.name.ProjCleanName
+		.id = "IDE: " + f.name
+		.tabs2.items.last.name = f.name + "[]"
+		
+		
 	function AddProj (|string| path, |PerryIDE| i)
 		opt norefcounts
 		|| old	= .FindProj(path)
@@ -130,14 +140,10 @@ module Perry
 			old.msg(@str, path.TrimProj)
 			old["edit"] = ""
 			old["pos"] = ""
-
-		|| name = old.first.name.ProjCleanName
-		old.first.name = name
+		
 		i.ProjMsg = old
-		i.id = "IDE: " + name
 		old.obj = i
-		i.tabs.selected = old
-		i.tabs2.items.last.name = name + "[]"
+		i.SetTabName(old)
 			
 
 extend PerryIDE {
