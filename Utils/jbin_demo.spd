@@ -1,21 +1,9 @@
 #!/usr/local/bin/spd
 
 main
-    // Str is a jeebox string
-    || Str = "@mary had a~little~lamb whose fleece was white as snow"
-    // lets parse it
-    || Msg = str.parse #require
-    // now render
-    printline msg.Render 
-    || bin = msg.render_jbin
-
-    printline bin    // oh dear this looks bad
-    printline bin.hex // this looks better
-    
-    || Msg2 = bin.parse // we just parsed binary data!
-    printline msg2.render
-     
-	message.treecompare(msg2, msg, true)
-	msg.last.last.last.first.name = "cold"
-	message.treecompare(msg2, msg, true)
-
+	|| args = app.args 
+	expect (args <= 1) "Too many args"
+	|| size = 10000000
+	if args == 1
+		size = args[0].int
+	jbin.ParseSpeedTest(Size)
