@@ -80,7 +80,7 @@ function PerryIDE.CompilerInit (|process| C, |bool| actual_compile, |process|)  
 	|| SubProcess = .SubProcess(actual_compile)
 		if !.UsingSpdLib
 			.UsingSpdLib = true
-			f.name = name + "()"
+			f.name = name.TrimExtKeepPath + "()"
 		rz = (SubProcess).RunAsProcess(name, p, 128KB)
 	  else
 		target false // debug
