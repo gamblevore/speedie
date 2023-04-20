@@ -240,7 +240,6 @@ function ReturnAllFuncs (GUIListEvent)
 
 	
 function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
-	opt norefcounts
 	|| p = .submenu
 	|| orig = l
 	p.listsource.clear
