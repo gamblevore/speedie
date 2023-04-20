@@ -84,29 +84,65 @@ role JBin (Faststring)
 		.length = nwe
 
 
-function @jbin.ParseSpeedTest
+function @string.int32 (|int| n, |string|)
+	return string.Copy((&n)|&byte|, 4)
+
+
+function @jbin.JoinParseTest (|string|)
     || bin = –digest "@mary had a~little~lamb whose fleece was white as snow"
-    || p = "/tmp/jbin_demo.jbin"
-    
-	|| out = p.out 
-	|| c = bin.parse.slowcount(true)
-	|| n = 0
-	while n < 256K
-		n += c
+	|| out = faststring()
+	for 5
 		out <~ bin
-	out = nil
-	"$n nodes created"
-	
+	|| In = out.getresult.stream
+
 	|| result = Message()
+	while !in.isended
+		result <~ in.Parse_Jbin
+	return result.render
+
+
+function @jbin.ParseSpeedTest (|int| Count=10000000) 
+	.JoinParseTest
+    
+    || p = "/tmp/jbin_demo.jbin"
+	|jbin| out = p.out 
+	out.jinit
+	out.enter
+	
+    "Creating $Count nodes at '$p'"
+	for n in Count
+		if n isa 2
+			out.add(@str, string.int32(n))
+		  else
+			out.add(@str, "") // half the nodes usually have no name
+	out = nil
+
+	|int| sz = p.file.size
+	|| strsize = sz.strsize
+	"Size: $strsize"
+	
+	|| In = p.in
 	|| start = date.now
-	for 4
-		|| In = p.in
-		while !in.isended
-			result <~ in.Parse_Jbin
-	|| time = date.now - start
-	n *= 4
-	|| t = time.seconds
-	"parsed $n nodes in $t seconds, at ${(1000000000.0 * t)/n} ns/node"
+	debugger
+	|| result = in.Parse_Jbin	#require
+	|| t = (date.now - start).seconds
+	...
+	|| curr = result.first		#require
+	for n in Count
+		if n isa 2
+			|| name = string.int32(n)
+			if curr != name
+		  else
+			expect curr == ""
+		curr = curr.next
+	...
+	
+	|| node_rate = (1000000000.0 * t)/Count|f64|
+	|| size_rate = (sz|f64|/1MB|f64|)/t
+	"parsed_in: ${t}s
+duration: ${node_rate}ns / node
+parse_rate: ${size_rate}MB / s
+"
 	 
 
 function stringstream.NextMsg (|Message|)
@@ -155,7 +191,7 @@ helper stringstream.Parse_Jbin (|bool| Burst = false, |MessageRoot|)
 	require .expectjbin
 	
 	|| root = .NextMsginfo				// just avoid refcounting
-	while (.NextMsginfo)
+	while .NextMsginfo
 
 	return root|messageroot|
 	

@@ -121,9 +121,11 @@ class StringStream
 
 		|| Remaining = n - skip
 		|| r = string(Remaining) #require
+		|| Dest = r.address
 		while
-			|| Copied = .data.CopyTo(r.address, .data.Remaining min Remaining)
+			|| Copied = .data.CopyTo(dest, .data.Remaining min Remaining)
 			Remaining -= Copied
+			dest += copied
 			loop Remaining > 0
 			if !.NextChunk
 				 r = r[0, r.length - remaining].copy
