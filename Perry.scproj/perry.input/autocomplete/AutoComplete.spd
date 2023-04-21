@@ -168,6 +168,7 @@ function PerryIDE.DisplayStr (|message| f, |bool|)
 function PerryIDE.DisplayInPopup (|string| s, |bool| instant)
 	|| sizer_str = s.wrap(80)
 	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 0)
+	(size.x max= 40)
 	|| c = .PopupDisplayCorner				// set the top above it
 	.PopupDisplay.size =   c.x~right for size.x   by   c.y~up back size.y
 	.PopupDisplay.text = s 
