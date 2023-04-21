@@ -22,7 +22,7 @@ class ShellStream
 	function Step (|bool|):				cpp_wrapper JB_Sh_Step
 
 	function Kill
-		if .pid > 0
+		if self and .pid > 0
 			pipe.KillPID(.pid)
 			.pid = 0
 
