@@ -122,21 +122,10 @@ function @jbin.ParseSpeedTest (|int| Count=10000000)
 	"Size: $strsize"
 	
 	|| In = p.in
+
 	|| start = date.now
-	debugger
 	|| result = in.Parse_Jbin	#require
 	|| t = (date.now - start).seconds
-	...
-	|| curr = result.first		#require
-	for n in Count
-		if n isa 2
-			|| name = string.int32(n)
-			if curr != name
-		  else
-			expect curr == ""
-		curr = curr.next
-	...
-	
 	|| node_rate = (1000000000.0 * t)/Count|f64|
 	|| size_rate = (sz|f64|/1MB|f64|)/t
 	"parsed_in: ${t}s
