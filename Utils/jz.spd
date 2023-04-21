@@ -16,7 +16,8 @@ datatype Type (int)
 			fs <~ "jbin"
 		  elseif self is box:  fs <~ "jeebox"
 		  elseif self is xml:  fs <~ "xml"
-		  else:                fs <~ "plain"
+		  else // speedie can't put this on a single line. C++ compile-error!
+			fs <~ "plain"
 
 
 function App.GetActions (|Type|)
@@ -57,7 +58,7 @@ main
 		
 	|| action = .getactions$
 	for r in (app.args  #expect (.Usage))
-		|| data = r.ReadFile(0.25GB, false)
+		|| data = r.ReadFile(1GB, false)
 			conv(data, r).Process(Action)
 	
 	if stderr.ok
