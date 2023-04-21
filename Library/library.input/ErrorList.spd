@@ -226,16 +226,6 @@ extend string
 		stderr.NewError(nil, self)
 
 
-extend stringstream
-	syntax expect ( |string| Error )
-		opt norefcounts
-		debugat
-		if (.file)
-			stderr.newError(nil, "Error decoding file: ", .file)
-		  else
-			stderr.newError(nil, "Error decoding data: ", "")
-
-
 function bool.operatorplus (|string| s, |bool|)
 	// idk... kinda usel
 	if self

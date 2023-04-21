@@ -141,6 +141,17 @@ class StringStream
 	function UInt16 (|uint16|)
 		disabled "use .uint(2)"
 
+	syntax expect ( |string| Error )
+		opt norefcounts
+		if !error
+			if (.file)	
+				error = "Error decoding file: "
+			  else
+				error = "Error decoding data."
+				
+		stderr.newError(nil, error, .file)
+
+
 	
 function string.Stream (|string|T="", |StringStream|)
 	rz = stringstream(self)
