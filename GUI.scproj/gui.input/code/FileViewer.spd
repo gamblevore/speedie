@@ -135,7 +135,7 @@ class FileViewer (ListView)
 		self <~ rz
 
 
-	function AddRootSub (|file| fol, |bool| IsMainProj, |&int| C, |filerow|)
+	helper AddRootSub (|file| fol, |bool| IsMainProj, |&int| C, |filerow|)
 		|| p = fol.path
 		if !fol.isdir
 			return FileRow(p, p.name)
@@ -296,6 +296,11 @@ class FileViewer (ListView)
 				f = filerow(f)
 				f.name = name
 				rz[i] = f
+		// sigh
+		|| ff = path.file
+		if !rz and ff.exists and !ff.isdir
+			rz <~ filerow(ff, ff)
+		
 		
 	function Listviewrow.FileSort
 		.sort(&fileviewer.FileRowNameSorter)
@@ -340,7 +345,7 @@ class FileViewer (ListView)
 		|| line = ""
 		|| byte = ""
 		path = path.TrimStart("line ")
-		if path.isint
+		if path.trim.isint
 			line = path
 			path = ""
 		  else
@@ -354,9 +359,9 @@ class FileViewer (ListView)
 
 
 	helper QuickFindPaths (|string| path, |[filerow]|)
-		|| f = path.file
-		if !(path[0, "/"] or path[0,"~/"]) or (f.exists and !f.isdir)
+		ifn path[0, "/"] or path[0, "~/"]
 			return .findpaths(path)
+		|| f = path.file
 		|| invis = path endswith "/."
 		for ch in f
 			if invis or ch.visible
@@ -367,7 +372,18 @@ class FileViewer (ListView)
 		
 
 	helper QuickOpenFileSub (|string| path, |string| line, |string| BytePos, |int| FromReturnKey = 0, |bool|)
-		|| r = .QuickFindPaths(path)
+		if path
+			|| r = .QuickFindPaths(path)
+			require .quickopenfilesub2(path, r, fromreturnkey)
+		else
+			require fromreturnkey
+		if line
+			.editme.ViewLineandsel(line.int)
+		if bytepos
+			.editme.ShowAndSel(bytepos.int)
+		return true
+		
+	helper QuickOpenFileSub2 (|string| path, |[filerow]| r, |int| FromReturnKey, |bool|)
 		if FromReturnKey
 			if (FromReturnKey >= 3) or (!path) or (path.file.exists)
 				if path
@@ -375,10 +391,6 @@ class FileViewer (ListView)
 						path = ""
 					.select(nil) // force event
 					.selectfast(r0)			
-				if line
-					.editme.ViewLineandsel(line.int)
-				if bytepos
-					.editme.ShowAndSel(bytepos.int)
 				.HideOpenList
 				if FromReturnKey >= 2
 					.editme.setfocus
@@ -502,7 +514,11 @@ class FileViewer (ListView)
 
 		function ClickedOpenList (GuiListevent)
 			|| V = .tag|fileviewer|
-			require row and V isa fileviewer
+			require V isa fileviewer
+			if !row
+				V.quickOpenFile(v.quickopen.text, 2)
+				return true
+			
 			|| r = row.obj|filerow|
 			require r isa filerow
 
@@ -510,8 +526,9 @@ class FileViewer (ListView)
 			if V.owns(r)
 				V.select(r)
 			  elseif faa.isdir
-				v.QuickOpen.text = faa.path // sigh. just setting .text did not work!
-				V.quickOpenFile(faa.path)
+				|| p = faa.path
+				v.QuickOpen.text = p // sigh. just setting .text did not work!
+				V.quickOpenFile(p)
 				
 				return true
 			  else
