@@ -14,7 +14,7 @@ module App {
 |string|					codesign_native = "codesign_osx"
 
 
-function Sleep (|Date| Duration)
+function Sleep (|Date| Duration=1s)
 	cpp_wrapper JB_Date__Sleep
 
 syntax access (|int| i, |string|)
