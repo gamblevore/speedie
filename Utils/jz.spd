@@ -1,6 +1,5 @@
 #!/usr/local/bin/speedie
 
-// todo: reporting jbin files as plain for some reason?
 datatype Type (int)
 	flags
 		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace
@@ -60,58 +59,63 @@ function app.usage (|string|)
 		jz -b A.box						// box to jbin
 		jz -b A.xml						// xml to jbin
 "
-		
 
 main  
-
 	if app.yes("test")
 		return 1-MZLab.TestMz(app[0]) 
 		// so we wanna run the mzlab thing
 		
 	|| action = .getactions$
 	for r in (app.args  #expect (.Usage))
-		|| Start = date.now
+		|| StartTime = date()
 		|| data = r.ReadFile(int.max, false)
-			.Time(start.ago, "Read", data.length)
-			conv(data, r).Process(Action)
+			conv(data, r, starttime).Process(Action)
 	
 	if stderr.ok
-		check (conv.done) "Nothing to do. All files already ${action.render}."
+		check (conv.done) "Nothing to do. All files already in destination format."
 
-
-function App.Time (|date| ago, |string| Name, |int| Size)
-	|float| scale = 1MB
-	|| unit = "MB"
-	if size < 10MB
-		scale = 1KB
-		unit = "KB"
-	|| s = ago.seconds
-	"$Name: ${s}s  (${Size/(scale*s)}$unit/s)"
 
 
 class Conv
 	|string|	Data
 	|string|	In
+	|date| 		Start
 	module: |int| Done
+	
+	constructor (|string| Data, |string| in, |date| before)
+		.data = data
+		.in = in
+		.Start = before
+		.Time("Read")
+	
+	function Time (|string| Name)
+		|| ago = .Start.ago
+		|float| scale = 1MB
+		|| unit = "MB"
+		|| size = .data.Length
+		if size < 10MB
+			scale = 1KB
+			unit = "KB"
+		|| s = ago.seconds
+		"$Name: ${s}s  (${Size/(scale*s)}$unit/s)"
 
 	function Process (|Type| Dest, |bool|)
 		|type| Detected = .data.IsCompressed * type.compressed
 		ifn Dest&type.Actions // (de)compress only
 			require (detected is Compressed) == (dest isnt compressed)
 		if Detected and .data.IsCompressed
-			|| start = date.now
+			.start = date()
 			.data = .data.Decompress(int.max)
-			app.time(start.ago, "Decompress", .data.length)
+			.time("Decompress")
 
 		++done
 		|| ext = ""
 		|| Do = Dest&type.Actions
-			|| start = date.now
+			.start = date.now
 			|| parse = .data.parse
-			|| Duration = start.ago
 			expect (parse or dest is report) ("File isn't parseable.")
 			if parse
-				app.time(duration, "Parse", .data.length)
+				.time("Parse")
 			if !parse
 				detected |= type.plain
 			  elseif .data.IsJbin
