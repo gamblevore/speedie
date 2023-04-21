@@ -13,6 +13,7 @@ class ButtonView (GUIControl)
 	|listviewrow|				Items
 	|listviewrow|				ClickedItem
 	|int|						ItemWidth
+	|int| 						ItemGap
 	|byte|						ClickCount
 	|bool|						PressingDone
 	|bool|						PressMakesLighter
@@ -23,6 +24,7 @@ class ButtonView (GUIControl)
 		super.constructor(p)
 		.onclicked = act
 		.pressing = pressing
+		.itemgap = 6
 		.OnRightClick = OnRightClick
 		.StepDuration = 0.75s
 		.align = ListViewState.aligncenter 
@@ -78,9 +80,20 @@ class ButtonView (GUIControl)
 
 
 	behaviour MouseMove
-		if state is enter or leave
+		if (state is enter or leave) or .Items
 			sdlapp.touch
 		(.onover)(self, state|int|, .itemat(p.x))?
+
+
+	function XOfItem (|listviewrow| row, |ind|)
+		opt norefcounts
+		require  row
+		rz = 0
+		|| W = .ItemWidth
+		|| r = .items.first
+		while row != r
+			rz += w + .itemgap
+			r++
 
 
 	function ItemAt (|int| P, |ListViewRow|)
@@ -91,7 +104,7 @@ class ButtonView (GUIControl)
 		for i in .items
 			if R contains P
 				return i
-			R += W + 4
+			R += W + .itemgap
 
 
 	helper ClearMouse
@@ -232,21 +245,10 @@ class ButtonView (GUIControl)
 			for i in .items
 				|| inside = r contains m
 				.drawitem(where, R, grow*inside, i)
-				R = R right W + 6
+				R = R right W + .itemgap
 				require r.x < where.width
 		  else
 			.drawitem(where, r, grow, nil)
-
-
-	function XOfItem (|listviewrow| row, |ind|)
-		opt norefcounts
-		require  row
-		rz = 0
-		|| W = .ItemWidth
-		|| r = .items.first
-		while row != r
-			rz += w + 6
-			r++
 
 
 	function OpenMenu (|listviewrow| row=nil, |bool|)
