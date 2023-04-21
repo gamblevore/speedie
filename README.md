@@ -48,7 +48,7 @@ I could say "you usually only need a little code to do a lot" but most dynamic l
 
 I could say "well I have a GUI-system that is platform-independant"... except that the porting to other platforms isn't even done yet. Not much needed but SOMEONE needs to do it.
 
-I could say "Speedie is a language that accomplishes a lot from a very small code-base" which might be useful to embedded programmers... but then Speedie is only partially supported on Linux.
+I could say "Speedie is a language that accomplishes a lot from a very small code-base" which might be useful to embedded programmers... but again, without a debugger, its hard to write code.
 
 My language has a lot of good qualities but for each one, you can always find a reason why something else is better. Unfortunately that is because I am one person who has created a very large piece of work. Only extra developers contributing to Speedie can fix this.
 
