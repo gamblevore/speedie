@@ -162,17 +162,24 @@ function file.FindProjectMain (|file|)
 
 
 function PerryIDE.FindNotTodo (|bool|)
+	if .IsSingleFileProject
+		|| c = .CurrFileRow
+		|| root = .FileList[0]
+		if c != root
+			.NotTodo = c
 	.nottodo := .findfirstpath("./main.spd")
 	.nottodo := .findfirstpath("./index.spd")
 	|| F = .MainProjFol
-	.nottodo := f.first
+		.nottodo := f.first
 	return .nottodo
 
 
 function PerryIDE.ClickedTodo
-	|| todo	= .mainprojFol #require
+	|| todo	= .mainprojFol
 	|| fl	= .filelist
-	require .findnottodo
+	if !todo
+		todo = fl[0]
+	require todo and .findnottodo
 	|| Jumpback = (todo is selected) and .nottodo and (fl.listsource contains .nottodo) 
 		todo = .nottodo
 		fl.show(todo)
