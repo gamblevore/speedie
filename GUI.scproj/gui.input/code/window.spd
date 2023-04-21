@@ -83,8 +83,8 @@ class Window (GUIControl)
 
 
 	syntax call (|ConfirmCanceller| Cancel=nil, |object|)
-		require self isnt visible // recursive... sigh
-		.opendialog
+		require !(Cancel)() and self isnt visible // recursive... sigh
+		.OpenDialog
 		.returnvalue = nil
 		while sdlapp.SingleFrame
 			rz = .returnvalue

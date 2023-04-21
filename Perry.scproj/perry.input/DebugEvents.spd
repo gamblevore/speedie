@@ -46,17 +46,28 @@ function DebugArgsGotFocus (guiaction)
 		f.SmartData = .text
 		
 
+function fnStillRunning (fnConfirmCanceller)
+	if self isa perryide
+		.UpdateDebuggedApp(false)
+		if !.RunCompiledApp
+			return true
 
+	
+function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
+	|| can = ConfirmCanceller(self, fn)
+	if q.confirm(can)
+		return true
+	
 
 function ClickedDebug (GUIAction)
 	|| i = .ide	
-	if .text == "\02" // the user cares about what he can see...
+	if .text == "\02" // play // the user cares about what he can see...
 		i.DebugIsWaitingForCompile = true
 		i.compile("debug")
 		i.ShowText(i.ProductPage, "")
-	  else
-		|| r = i.RunCompiledApp
-			r.kill
+	  elseif .text == "\07" // stop
+		if i.RunCompiledApp and i.confirm("Kill running product " + i.Name + "?", fnStillRunning)
+			i.RunCompiledApp.kill
 			i.UpdateDebuggedApp(true)
 
 
@@ -81,7 +92,7 @@ function perryide.StartDebugging (|file| f)
 		
 
 
-function perryide.UpdateDebuggedApp (|bool| Kill=false)
+function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
 	// so what if we have a shellstream? then what?
 	|| fs = r.output
@@ -96,4 +107,5 @@ function perryide.UpdateDebuggedApp (|bool| Kill=false)
 	.productpage <~ fs.GetResult // later we will make this NOT do string appends to create .text
 	if kill
 		.productpage <~ "(--Process Killed--)"
+	return !kill
 		

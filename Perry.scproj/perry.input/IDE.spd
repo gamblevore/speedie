@@ -332,7 +332,7 @@ class PerryIDE (Window)
 			if perryide.birds
 				perryide.birds = false
 				.birdbutton.click
-		.UpdateDebuggedApp
+		.UpdateDebuggedApp(false)
 		.TestCompilerAlive
 		.SpeedieMsgReceive(.feedback)
 		.SpeedieMsgReceive(.compilr)
