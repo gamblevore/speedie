@@ -391,13 +391,18 @@ class Process
 
 	function Close
 		if .IsServer
-			.JustKill(true)
+			.KillButOK
 		  else
 			.disconnect
 		.dispose
 
 	
-	function JustKill (|bool| OK=false)
+	function KillButOK
+		.KillSub(true)
+	function KillCosFailed
+		.KillSub(false)
+
+	helper KillSub (|bool| OK)
 		if .cid
 			if !OK
 				.diedcount++
@@ -528,7 +533,7 @@ class Process
 			return true
 		debug_require .IsServer
 		if .cid
-			.justkill(false)
+			.killsub(false)
 		if .CanActivate
 			if !.path
 			expect (.path) (self, "Can't re-activate process ${.name} without a path.")

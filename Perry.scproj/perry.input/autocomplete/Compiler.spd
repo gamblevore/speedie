@@ -133,7 +133,7 @@ extend PerryIDE
 	
 	function CancelCompile 
 		.DebugIsWaitingForCompile = false
-		.compilr.JustKill?
+		.compilr.KillButOK?
 		(.buildbutton is enabled)
 		(.runbutton is enabled)
 		(.progress isnt visible)
