@@ -51,13 +51,14 @@ function app.usage (|string|)
 		-s		Replace file in-place
 		-p		Print to stdout
 		-test	Tests if compression works using input file
-		-r		Just report types. Otherwise do nothing.
+		-r		Just report types, otherwise do nothing.
 
 	examples:
 		jz -j A.xml						// xml to box
 		jz -c A.xml						// compress A.xml into A.xml.mz
 		jz    A.mz						// decompress
-		jz -b A.box						// a.box.jbin
+		jz -b A.box						// box to jbin
+		jz -b A.xml						// xml to jbin
 "
 		
 
@@ -101,7 +102,7 @@ class Conv
 			|| start = date.now
 			.data = .data.Decompress(int.max)
 			app.time(start.ago, "Decompress", .data.length)
-		
+
 		++done
 		|| ext = ""
 		|| Do = Dest&type.Actions
