@@ -94,13 +94,25 @@ function Parser.FillXML (|message| XML, |ind| i, |message|)
 			return .erroradd("", i)
 
 
+function Parser.XMLWordEnd (|int| From, |ind|)
+	|| b = .data[from] 
+	if !Jeebox.CSWordStart[b]
+		.erroradd( "Wrong first byte of XML", from)
+	  else
+		rz = .data.OutCharSet(jeebox.XMLwordmiddle, from+1)
+		if rz == -1
+			.Erroradd( "XML name does not end" )
+		.NextStart = rz
+
+
 function parser.fXML (ParseHandler)
-	|| XML		= .newword( nil, @xml, start, start+1 )
-	|| endpos	= start + 1 + xml.length
-	EndPos		= .XMLAttribs(XML, endpos)				#require
-	rz = .FillXML(XML, EndPos + 1)
-	if rz
-		rz.after = .nextstart
+	|| EndPos   = .XMLWordEnd(start+1)
+		|| XML		= .newskip( nil, @xml, start, start+1, EndPos )
+		EndPos		= .XMLAttribs(XML, endpos)
+		if endpos > 0
+			rz = .FillXML(XML, EndPos + 1)
+			if rz
+				rz.after = .nextstart
 
 
 function parser.fXML_PI (ParseHandler)

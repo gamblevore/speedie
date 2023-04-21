@@ -53,6 +53,7 @@ Module Jeebox
 	|| CSWordMiddle		= "AZaz09__".UniCS
 	|| CSLettersOnly    = "AZaz".UniCS
 	|| CSWordStart		= "AZaz__".UniCS
+	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
 	|| CSNum			= jeebox.CSWordMiddle
 	|| CSLine			= "\n\r".charset(false)
 	|| CSAfterStatement	= " ,:\t\n\r\\".charset(false)
