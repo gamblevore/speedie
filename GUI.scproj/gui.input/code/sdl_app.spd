@@ -453,8 +453,6 @@ module SDLApp
 		opt norefcounts
 		|| f = w.realfocus #require
 		|| allow = (f is editable) or (f isa menu) 
-//		if (!allow) and f == w.innerfocus and f is typethrough
-//			allow = w.focus is editable
 		require .TextInputEnabled != allow
 		.TextInputEnabled = allow
 		if allow
@@ -866,8 +864,8 @@ module SDLApp
 			if .inResizeCorner(xy)
 				return kActivity
 
-			|| foc = w.Focus
-			if foc and foc.ClickOutsideCloses and (foc!=w.CurrMouseDown)
+			|| foc = w.realFocus
+			if foc and foc.ClickOutsideCloses and !(foc contains xy)
 				w.clearfocus
 			  else
 				w.Click(b.button, b.clicks, xy)	
