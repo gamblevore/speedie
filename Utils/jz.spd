@@ -51,10 +51,18 @@ function app.usage (|string|)
 		-s		Replace file in-place
 		-p		Print to stdout
 		-test	Tests if compression works using input file
-		-r		Just report types. Otherwise do nothing."
+		-r		Just report types. Otherwise do nothing.
+
+	examples:
+		jz -j A.xml						// xml to box
+		jz -c A.xml						// compress A.xml into A.xml.mz
+		jz    A.mz						// decompress
+		jz -b A.box						// a.box.jbin
+"
 		
 
 main  
+
 	if app.yes("test")
 		return 1-MZLab.TestMz(app[0]) 
 		// so we wanna run the mzlab thing
@@ -62,7 +70,7 @@ main
 	|| action = .getactions$
 	for r in (app.args  #expect (.Usage))
 		|| Start = date.now
-		|| data = r.ReadFile(1GB, false)
+		|| data = r.ReadFile(int.max, false)
 			.Time(start.ago, "Read", data.length)
 			conv(data, r).Process(Action)
 	
@@ -89,11 +97,10 @@ class Conv
 		|type| Detected = .data.IsCompressed * type.compressed
 		ifn Dest&type.Actions // (de)compress only
 			require (detected is Compressed) == (dest isnt compressed)
-		if Detected
-			if .data.IsCompressed
-				|| start = date.now
-				.data = .data.Decompress(int.max)
-				app.time(start.ago, "Decompress", .data.length)
+		if Detected and .data.IsCompressed
+			|| start = date.now
+			.data = .data.Decompress(int.max)
+			app.time(start.ago, "Decompress", .data.length)
 		
 		++done
 		|| ext = ""
@@ -137,15 +144,11 @@ class Conv
 			|| Out = .in
 			if dest isnt selfreplace
 				out = .in.RemoveExt("mz")
-				if ext:  out = out.SetExt(ext) // killing good exts like "spd" <-- "". sigh
-				if dest is compressed: out = out.AddExt("mz")
+				if ext
+					out = out.SetExt(ext) // killing good exts like "spd" <-- "". sigh
+				if dest is compressed
+					out = out.AddExt("mz")
 			if Out <~ .data
 				printline out
 		
 		return true
-
-/// jz -j A.xml						// xml to box
-/// jz -c A.xml -out=B.xml.mz		// compress A.xml a.xml.mz ?
-/// jz -c A.xml.mz					// do nothing
-/// jz    A.whatever				// decompress (Assuming it is compressed)
-/// jz -b A.box						// a.box.jbin
