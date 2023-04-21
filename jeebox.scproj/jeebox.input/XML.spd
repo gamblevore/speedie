@@ -222,9 +222,9 @@ helper message.XMLToJeeboxSub
 			for ch in prms
 				ch.XMLToJeeboxSub
 		if arg
-			|| HasChild = arg.HasChildCount(1)
-			if HasChild and arg.first == @str
-				self <~ arg.first
+			|| first = arg.first
+			if (first == @str) and first.IsLast
+				self <~ first
 			  else
 				self <~ arg
 	  elseif self == @xtxt or @xcdt
