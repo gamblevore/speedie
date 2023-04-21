@@ -1554,7 +1554,6 @@ class TextView (GUIControl)
 
 
 	function string.Bounds (|ivec2|)
-		require self
 		|| w = 0
 		rz.y = 1
 		for c in self
