@@ -11,11 +11,14 @@ datatype Type (int)
 		return !(self & test)
 	
 	render
-		if self is Compressed: fs <~ "compressed "
+		if self is Compressed
+			fs <~ "compressed "
 		if self is jbin
 			fs <~ "jbin"
-		  elseif self is box:  fs <~ "jeebox"
-		  elseif self is xml:  fs <~ "xml"
+		  elseif self is box
+			fs <~ "jeebox"
+		  elseif self is xml
+			fs <~ "xml"
 		  else // speedie can't put this on a single line. C++ compile-error!
 			fs <~ "plain"
 
@@ -58,11 +61,23 @@ main
 		
 	|| action = .getactions$
 	for r in (app.args  #expect (.Usage))
+		|| Start = date.now
 		|| data = r.ReadFile(1GB, false)
+			.Time(start.ago, "Read", data.length)
 			conv(data, r).Process(Action)
 	
 	if stderr.ok
 		check (conv.done) "Nothing to do. All files already ${action.render}."
+
+
+function App.Time (|date| ago, |string| Name, |int| Size)
+	|float| scale = 1MB
+	|| unit = "MB"
+	if size < 10MB
+		scale = 1KB
+		unit = "KB"
+	|| s = ago.seconds
+	"$Name: ${s}s  (${Size/(scale*s)}$unit/s)"
 
 
 class Conv
@@ -80,15 +95,20 @@ class Conv
 		++done
 		|| ext = ""
 		|| Do = Dest&type.Actions
+			|| start = date.now
 			|| parse = .data.parse
+			|| Duration = start.ago
 			expect (parse or dest is report) ("File isn't parseable.")
+			if parse
+				app.time(duration, "Parse", .data.length)
 			if !parse
 				detected |= type.plain
 			  elseif .data.IsJbin
 				detected |= type.jbin
 			  elseif parse.Find(@xml)
 				detected |= type.xml
-				require parse.XMLToJeebox
+				if !(dest is report)
+					require parse.XMLToJeebox
 			  else
 				detected |= type.box
 
