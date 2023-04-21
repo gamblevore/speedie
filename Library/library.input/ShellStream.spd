@@ -21,6 +21,11 @@ class ShellStream
 
 	function Step (|bool|):				cpp_wrapper JB_Sh_Step
 
+	function Kill
+		if .pid > 0
+			pipe.KillPID(.pid)
+			.pid = 0
+
 	module
 		function New (|String| app, |[array of string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |ShellStream|)
 			cpp_wrapper JB_Sh__New

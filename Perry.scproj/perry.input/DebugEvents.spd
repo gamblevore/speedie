@@ -50,9 +50,14 @@ function DebugArgsGotFocus (guiaction)
 
 function ClickedDebug (GUIAction)
 	|| i = .ide	
-	i.DebugIsWaitingForCompile = true
-	i.compile("debug")
-	i.ShowText(i.ProductPage, "")
+	if .text == "\02" // the user cares about what he can see...
+		i.DebugIsWaitingForCompile = true
+		i.compile("debug")
+		i.ShowText(i.ProductPage, "")
+	  else
+		|| r = i.RunCompiledApp
+			r.kill
+			i.UpdateDebuggedApp(true)
 
 
 function PressingDebug (GUIAction)
@@ -68,20 +73,27 @@ function perryide.StartDebugging (|file| f)
 	if f.isdir
 		args = [f] + args
 		f = "/usr/bin/open".file
+
 	|| fs = faststring()
-	.RunCompiledApp = shellstream(f, args, fs, fs)
+	.RunCompiledApp = ShellStream(f, args, fs, fs)
+	if .RunCompiledApp and .RunCompiledApp.PID
+		.RunButton.text = "\07"
+		
 
 
-function perryide.UpdateDebuggedApp
-	|| r = .RunCompiledApp #require
+function perryide.UpdateDebuggedApp (|bool| Kill=false)
+	|| r = .RunCompiledApp						#require
 	// so what if we have a shellstream? then what?
 	|| fs = r.output
 	if !r.userflags and fs.length
 		.ShowStdOut
 		r.userflags |= 1
 	
-	if !r.step
+	if !r.step or kill
 		.runcompiledapp = nil
+		.RunButton.text = "\02"
 		
 	.productpage <~ fs.GetResult // later we will make this NOT do string appends to create .text
-	// what else can we do? send some msgs via ipc? lol. i cant do anything else?
+	if kill
+		.productpage <~ "(--Process Killed--)"
+		
