@@ -254,9 +254,13 @@ function IsViewing (|guicontrol| g, |bool|)
 	return (g is visible)
 
 
+function IsSingleFileProject (|bool|)// IsProj
+	if .project
+		return !.project.isdir
+	
 function ViewAsBetter
 	require .project
-	if .project.isdir
+	if .IsSingleFileProject
 		.viewasproject
 	  else
 		.viewascurr
