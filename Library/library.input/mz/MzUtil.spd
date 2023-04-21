@@ -43,7 +43,7 @@ function FastBuff.CompressInto (|faststring| fs, |&compressionstats| st=nil)
 Module MZLab	
 	function TestMz (|string| path, |bool|)
 		if path
-			|| f = path.file.readall.decompress
+			|| f = path.ReadFile.decompress(1GB)
 			return f.CompressTest(true) and .ManyTests
 		
 	helper string.CompressTest (|bool| report=false, |bool|)
@@ -51,7 +51,7 @@ Module MZLab
 		|| c = .compress(s)
 		if report
 			printline s.Render
-		|| decomp = c.Decompress
+		|| decomp = c.Decompress(int.max)
 		rz = self == decomp
 		if !rz
 			error "Decompression failed when compressing: " + self
