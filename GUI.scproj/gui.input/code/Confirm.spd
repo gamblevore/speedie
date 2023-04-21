@@ -87,12 +87,15 @@ function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| 
 			b.vistext = answers[i]
 			|| bw = b.textwidth+8 max 40
 			b.size    = 3~after for bW  by 3~up  for 17
-		// .yes.size = 3~after for 60  by 3~up  for 30
 		.SetResponse(response)
 		
 		|object| p
 		while
 			p = (W)(Cancel)
+			// shouldn't this exit either way?
+			// why would we want to loop here?
+			// the func we call has a loop already!
+			// all we care about is whether or not to beep, right?
 			if (.response isnt visible) or (p != .yes) or (.response.text)
 				exit
 			beep
