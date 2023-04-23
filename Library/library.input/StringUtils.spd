@@ -122,15 +122,3 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			continue
 
 
-role StringTempCWD (string)
-	// useful to temporarily change the cwd... with only 1 line of code. via "path".tempcwd
-	Syntax UsingComplete
-		if self
-			app.cwd = self
-	Syntax Using (|StringTempCWD|)
-		return self
-	
-function string.TempCWD (|StringTempCWD|)
-	require self
-	rz = app.cwd
-	app.CWD = self
