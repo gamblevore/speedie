@@ -71,8 +71,8 @@ main
 		|| data = r.ReadFile(int.max, false)
 			conv(data, r, starttime).Process(Action)
 	
-	if stderr.ok
-		check (conv.done) "Nothing to do. All files already in destination format."
+	if stderr.ok and !conv.done
+		"Nothing to do. All files already in destination format."
 
 
 
@@ -91,13 +91,9 @@ class Conv
 	function Time (|string| Name)
 		|| ago = .Start.ago
 		|float| scale = 1MB
-		|| unit = "MB"
-		|| size = .data.Length
-		if size < 10MB
-			scale = 1KB
-			unit = "KB"
+		|float| size = .data.Length
 		|| s = ago.seconds
-		"$Name: ${s}s  (${Size/(scale*s)}$unit/s)"
+		"$Name: ${s}s  (${Size/(scale*s)}MB/s)"
 
 	function Process (|Type| Dest, |bool|)
 		|type| Detected = .data.IsCompressed * type.compressed
