@@ -251,6 +251,9 @@ class FastString {
 
 	macro syntaxappend
 		_.render(self)
+
+	syntax Compare (|int| n, |bool|Aware, |int|)
+		return .streamlength - n
 }
 
 
