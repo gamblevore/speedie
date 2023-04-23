@@ -12,10 +12,11 @@ function message.AllNames (|[string]|)
 	opt norefcounts
 	for s in self
 		|| i = s.GoodName
+		if i != string.error
 			rz <~ i
 
 
-function message.GoodName (|stringthatwasreadsafely|) // we want something that looks like it could have a name
+function message.GoodName (|string|) // we want something that looks like it could have a name
 	opt norefcounts
 	if !self
 		return ""
