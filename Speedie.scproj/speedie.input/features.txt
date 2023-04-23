@@ -57,21 +57,6 @@
 
 *		expect (obj isa SCDecl) // ideally the test below should be unnecessary
 		if (obj isa SCDecl) { use obj as a decl... }
-
-
-* 	try
-		.sudo("echo 'hi'")
-	  succeed
-	  	return true
-	  fail
-		oof()
-	-->
-	|| errcount = stderr.errorcount
-	.sudo("echo 'hi'")
-	if stderr.errorcount == errcount
-		return true
-	else
-		oof()
 	
 	
 ................................................................................
