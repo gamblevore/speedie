@@ -555,6 +555,11 @@ module SDLApp
 			w.reflowdoc(bigrect, nil, bigrect)
 	
 	
+	helper DrawSub (|window| w)
+		if w.isviewable
+			w.__draw__(.DrawSpace)
+	
+	
 	function DrawFrame
 		opt norefcounts
 		
@@ -563,11 +568,16 @@ module SDLApp
 		if !w1.NoDrawBackground
 			¥.DrawBackground(.DrawSpace)
 		
+		// for some reason... the opendialogs might not be in front of the viewable windows??
+		// that is very strange. Lets say it hapened by accident. We want them to be on front, right?
+		// just check if any are drawn?
+		|| d = window.opendialogs
 		while w1
-			if w1.isviewable
-				w1.__draw__(.DrawSpace)
+			ifn d contains w1
+				.DrawSub(w1)
 			w1 = w1.next|window|
-			
+		for w2 in d
+			.DrawSub(w2)
 			
 		notifications.Draw
 
