@@ -455,7 +455,8 @@ function info.Load (|int64| Seed, |bool|)
 	seed := date.now & 0xffff
 	Random.shared.seed = seed
 	map.seed = seed
-	app.CWD = app.Path.parent
+	if !"Creatures.txt".FileExists
+		app.CWD = app.Path.parent
 	.GameBank = "Creatures.txt".file.parse|config|
 	.roomtypes = "Rooms.txt".file.parse|config|
 	.CellTypes = "Cells.txt".file.parse|config|
@@ -575,7 +576,8 @@ function Splash
 } 
 
 main
-	|| a = app[0]
+	printline app.cwd
+	|| a = app.args[0]
 	if info.load(a.int)
 		map.run(!a)
 
