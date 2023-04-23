@@ -206,7 +206,8 @@ class Document (RingTree)
 
 	function LoadSub (|bool| ChangedExternal, |bool|)
 		|| f		= .Location.file
-		|| Data		= f.readsafely(16MB, true)		#require
+		|| Lim      = document.AskLimit(f)
+		|| Data		= f.readsafely(lim, true)		#require
 		
 		.viewdate	= date()
 		.wascompressed = data.IsCompressed
@@ -262,6 +263,13 @@ class Document (RingTree)
 			if path
 				rz = .Cache.CachePath(path)|document|
 			rz := document(path, true)
+		function AskLimit (|file| f, |int|)
+			|| n = f.size
+			if n <= 128MB or n >= int.max
+				return 128MB
+			if "The file ${f.name} is ${n|int|.strsize} big. Do you still want to load it?\n\nText-editor performance may suffer.".confirm
+				return n+1
+			return 128MB
 
 
 

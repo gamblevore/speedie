@@ -423,13 +423,12 @@ struct ImageReader
 	|ivec4|				Rect
 	|Image|				Img
 	iterator
-		while (.rect.y < .rect.y2)
+		while (.rect.y < .rect.y2 and .rect.x < .rect.x2) // test x in case of huge single-line text drawing
 			|| v	= .rect.xy
 			|| v1	= .img[v]
-			if v1 // in case a    bad coord.
-				|| v2	= v1 + .rect.width
-				while v1 < v2
-					yield v1 (v)
-					v.x++
-					v1++
+			|| v2	= v1 + .rect.width
+			while v1 < v2
+				yield v1 (v)
+				v.x++
+				v1++
 			.rect.y++

@@ -1580,7 +1580,7 @@ class TextView (GUIControl)
 		require (expect >= 2)
 		require !.singleline
 // Just segment for longer files. No one needs 10000KB file word-wrapped.
-		return .text.length < 256K	// my largest jb file is 60k! 
+		return .text.length < 1MB	// my largest jb file is 60k! 
 
 
 	helper ParsedMessage (|message|)
@@ -1692,9 +1692,12 @@ class TextView (GUIControl)
 		if .singleline
 			charw = 4KB
 		
-		while v < 256K // too much!
+		while
 			d.vline = v++
-			p = d.FindWhereLineBreaks(.text, CharW, isinl, p)
+			if v > 1000K
+				p = d.TakeEntireText(.text,p) // just give up wrapping
+			  else
+				p = d.FindWhereLineBreaks(.text, CharW, isinl, p)
 			t = d.SetErrorsAndStuff(self, t)
 			if expect >= 2
 				msg = d.colorise(msg, ParsedOK)

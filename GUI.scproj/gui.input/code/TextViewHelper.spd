@@ -260,6 +260,12 @@ class TextViewLine (ringtree)
 		return .SetLineNum(t)
 
 
+	function TakeEntireText (|string| txt, |ind| p, |ind|)
+		.position = p
+		.ChangeText = txt[p, int.max]
+		(self is AvoidLastChar) = .EndsWithLine
+		is last
+		
 	function FindWhereLineBreaks (|string| txt, |int| MaxWidth, |bool| IsInline, |ind| p, |ind|)
 		.position = p
 		if p >= txt.length // edge case.
@@ -382,8 +388,11 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		state.font.DrawChar('\18', Where, (fx, y), nil)
 	
 	|codepoint| Prev
+	|| xlimit = .lastrect.x2
 	for (c.CodePoints2 in state.t) (pos)
 		x = state.next(c, pos)
+		if x > xlimit
+			exit
 		ifn useCol & 2
 			UseCol = (d is colored)|int|
 		|| col = ¥.GetColor(state.msg, usecol, pos)
