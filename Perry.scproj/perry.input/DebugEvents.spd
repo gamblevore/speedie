@@ -76,21 +76,44 @@ function PressingDebug (GUIAction)
 	DebugArgsGotFocus(d, 1)
 
 
-function perryide.StartDebugging (|file| f)
-	require f.MustExist
+function perryide.DebugEnvs (|message| env)
+	for rel in env
+		|| ch1 = rel.first
+		|| opp = rel[@opp, 1]
+			opp.expect(@opp, "=")
+		|| ch2 = opp.next
+			check (ch1.name) (ch1, "No name found")
+			check (ch2.name) (ch2, "No name found")
+		if StdErr.ok
+			app.ChildEnv(ch1.name) = ch2.name
 
-	|| file = .DebugArgsList.text.Parse$
-	|| args = file["args"].AllNames
-	if f.isdir
-		args = [f] + args
-		f = "/usr/bin/open".file
 
+function perryide.DebugActual (|file| f, |[string]| args)
 	|| fs = faststring()
 	.RunCompiledApp = ShellStream(f, args, fs, fs)
 	if .RunCompiledApp and .RunCompiledApp.PID
 		.RunButton.text = "\07"
-		
 
+
+function perryide.StartDebugging (|file| f)
+	require f.MustExist and StdErr.ok
+
+	|| file = .DebugArgsList.text.Parse$
+	|| ArgMsg = file["args"]
+	|| args = argmsg.AllNames
+	if f.isdir
+		check (!args) (ArgMsg, "You can't pass arguments to gui-apps (in this version).")
+		args = [f]
+		f = "/usr/bin/open".file
+	
+	using file["pwd"].goodname.TempCWD
+		.DebugEnvs(file["env"])		
+		.DebugActual(f, args)
+
+	if !StdErr.ok
+		.DebugArgsList.FillErrors(StdErr)
+		Notifications <~ StdErr.FirstError
+		
 
 function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
@@ -101,7 +124,7 @@ function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 		r.userflags |= 1
 	
 	if !r.step or kill
-		.runcompiledapp = nil
+		.RunCompiledApp = nil
 		.RunButton.text = "\02"
 		
 	.productpage <~ fs.GetResult // later we will make this NOT do string appends to create .text
