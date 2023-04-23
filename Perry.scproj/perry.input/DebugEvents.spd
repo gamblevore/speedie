@@ -95,25 +95,38 @@ function perryide.DebugActual (|file| f, |[string]| args)
 		.RunButton.text = "\07"
 
 
+function perryide.DebugPath (|file| f, |message| conf)
+	if .project.isdir
+		app.cwd = .project
+	  else
+		app.cwd = .project.parent
+	
+	|| path = conf["pwd"].goodname
+		app.cwd = path
+
+
 function perryide.StartDebugging (|file| f)
 	require f.MustExist and StdErr.ok
 
-	|| file = .DebugArgsList.text.Parse$
-	|| ArgMsg = file["args"]
+	|| conf = .DebugArgsList.text.Parse$
+	|| ArgMsg = conf["args"]
 	|| args = argmsg.AllNames
 	if f.isdir
 		check (!args) (ArgMsg, "You can't pass arguments to gui-apps (in this version).")
 		args = [f]
 		f = "/usr/bin/open".file
-	
-	using file["pwd"].goodname.TempCWD
-		.DebugEnvs(file["env"])		
-		.DebugActual(f, args)
+
+
+	|| old = app.cwd
+	.debugpath(f, conf)	
+	.DebugEnvs(conf["env"])		
+	.DebugActual(f, args)
 
 	if !StdErr.ok
 		.DebugArgsList.FillErrors(StdErr)
 		Notifications <~ StdErr.FirstError
-		
+	app.cwd = old
+
 
 function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
