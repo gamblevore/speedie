@@ -111,7 +111,10 @@ class ErrorList
 			.incr(err, false)
 			return err
 		
-		
+	
+	function Mark (|errormarker|)
+		return .ErrorCount
+	
 	function Count (|int|)
 		disabled "Do you mean .ErrorCount or .WarnCount, or .TotalCount?"
 
@@ -232,3 +235,8 @@ function bool.operatorplus (|string| s, |bool|)
 		return true
 	debugger
 	error s
+
+
+datatype ErrorMarker (uint)
+	syntax cast (|bool|)
+		return stderr.errorcount == self
