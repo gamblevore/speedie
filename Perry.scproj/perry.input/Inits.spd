@@ -28,7 +28,7 @@ extend PerryIDE
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList) 
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
-		.LogArea			= ListView(self,		nil,				nil)
+		.LogArea			= ListView(self,		nil,					nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
 		.Status				= TextView(self,		ClickedStatus,			nil)
@@ -464,7 +464,7 @@ extend PerryIDE
 		require proj.mustexist("load project")
 		.project = proj
 		.IsLoading = true
-		.LoadConfSub(proj)
+		require .LoadConfSub(proj)
 		.IsLoading = false
 		startupwindow.hide
 		.viewasproject
@@ -507,7 +507,7 @@ extend PerryIDE
 		return projfol
 	
 	
-	function StartProj
+	function StartProj (|bool|)
 		opt norefcounts
 		|| projfol = .MainProjFol
 			projfol.dirfile = ".todo"
@@ -517,11 +517,14 @@ extend PerryIDE
 			|| file = .DesiredStart(projfol, pos)
 			.EditRow(file)
 			.EditMe.showandsel(pos)
+			return true
+		  elseif .EditRow(.filelist.start)
+			return true
 		  else
-			.EditRow(.filelist.start)
+			.close(sdlapp.kactivity)
 
 
-	function LoadConfSub (|file| proj)
+	function LoadConfSub (|file| proj, |bool|)
 		|| ProjIsDir = proj.isdir
 		|| ProjConf	 = proj.child(".perry")
 		
@@ -538,5 +541,5 @@ extend PerryIDE
 		
 		.StartFiles(conf, ProjIsDir)
 		.isloading = false		// its done and we need .startproj
-		.StartProj
+		return .StartProj
 	
