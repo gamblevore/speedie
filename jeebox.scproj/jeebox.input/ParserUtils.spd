@@ -78,7 +78,7 @@ function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |Message
 
 	parser.StartParse( data )
 	parser.StopBars = 0
-	|| Count	= StdErr.errorCount
+	|| OK		= StdErr.mark
 	|| Flags	= parser.kTemporal
 	|| into		= message.new(nil, owner, 0, "", 0)
 	|| lines	= parser.ParseLoopFlags( into, "", Flags )
@@ -90,7 +90,7 @@ function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |Message
 	    parser.Expect( 0 )
 	
 	parser.StopParse // clear error message
-	if Count != StdErr.ErrorCount
+	if !OK
 		into = nil
 	return into|MessageRoot|
 
