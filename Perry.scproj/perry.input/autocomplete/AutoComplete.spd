@@ -328,16 +328,13 @@ function JumpToDefinition (GUIAction)
 	|| cmd = state == -2
 	require (cmd or rigtclick)
 	|| ide = .ide
-	|| msg = ide.editme.ClickedMsg
+	|| msg = ide.EditMe.ClickedMsg
 		if msg in @url
 			msg = msg.parent
 		if msg == @url
-			if false and msg == "file"
-				// we should ask the compiler to actually show this.
-				//ide.filelist.QuickOpenFile(msg.first.nyme, 1) // doesn't work... we'd have to find the file.
-			app.showurl(msg.render)
+			app.ShowURL(msg.render)
 		  elseif msg == @sheb
-			msg.name.reveal
+			msg.name.Reveal
 		  else
 			|| op = ("define", "callfrom")(cmd)
 			ide.MaybeSendMessage(op, msg)
@@ -413,6 +410,7 @@ function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  
 
 function message.IsUsefulTypeOfDecl (|bool|)
 	return (self == @thg) and .name and .istypeofdecl
+
 
 function message.SimpleComplete (|message| pp, |message| where, |bool|)
 	opt norefcounts
