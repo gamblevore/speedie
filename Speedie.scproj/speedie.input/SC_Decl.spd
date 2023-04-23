@@ -720,7 +720,7 @@ class SCDecl (SCObject) {
 			return .type.destructorfunc
 
 
-	function reallycontains (|scdecl|)
+	function ReallyContains (|scdecl|)
 		opt norefcounts
 		|| c = .contains ?? .type.contained
 		if c and c.type != self.type

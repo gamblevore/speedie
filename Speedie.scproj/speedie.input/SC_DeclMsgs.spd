@@ -219,7 +219,7 @@ function Message.CollectFuncTableName (|string|)
 function scdecl.NeedsContainedfix (|bool|)
 	opt NoRefCounts
 	if !.AllocSource and !.contains
-		return .reallycontains
+		return .ReallyContains
 
 
 function scdecl.ContainedNilfix (|scdecl|)
