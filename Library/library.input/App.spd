@@ -211,7 +211,7 @@ function CWD (|string|)
 
 
 function CWD (assigns:|string|, |ErrorInt|)
-	return .chdir_(Value)
+	return .chdir_(Value.resolve)
 
 helper chdir_ (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
