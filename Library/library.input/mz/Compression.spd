@@ -43,7 +43,7 @@ helper stringstream.DecompressInto (|&compressionstats| st, |int| lim, |faststri
 	|| size = .NextMsg(mz, @num)
 	|| arg = .NextMsg(mz, @arg)
 	|| total_size = size.int
-	|| ErrorCount = StdErr.ErrorCount
+	|| OK = StdErr.Mark
 	mz.name = nil
 	size.name = nil
 	ifn size and arg and total_size <= lim
@@ -61,7 +61,7 @@ helper stringstream.DecompressInto (|&compressionstats| st, |int| lim, |faststri
 				st.LiveUpdate(c.name, fs.StreamLength)
 			c.remove
 			
-	return stderr.ErrorCount == ErrorCount
+	return OK
 
 		
 helper faststring.CompressChunk (|string| str) 
