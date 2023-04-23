@@ -90,10 +90,6 @@ function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| 
 		.SetResponse(response)
 		
 		|| p = (W)(Cancel)
-		// shouldn't this exit either way?
-		// why would we want to loop here?
-		// the func we call has a loop already!
-		// all we care about is whether or not to beep, right?
 		ifn (.response isnt visible) or (p != .yes) or (.response.text)
 			beep
 			

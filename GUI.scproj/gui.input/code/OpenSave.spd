@@ -46,12 +46,9 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 	if last
 		f.select(OpenSaveDialog.FindFileName(f, last.name))
 	
-	if save
-		if w.name.text contains '.'
-			w.name.sel = (0, 8) // only works on the secon time we run this func? annoying.
-		w.name.setfocus
-	  else
-		f.setfocus
+	if save and w.name.text contains '.'
+		w.name.sel = (0, 8) // only works on the second time we run this func? annoying.
+	f.setfocus
 	
 	rz = (w)()|string|
 	if rz
@@ -141,9 +138,7 @@ class OpenSaveDialog (Window)
 
 
 	behaviour TypedString
-		if .path.hasfocus
-			.Keyboard = ""
-			return .path.__typedstring__(input)
+		require .files.HasFocus
 		if .KeyDownExpired.Fired
 			.Keyboard = ""
 		.KeyDownExpired = date() + 0.5s
@@ -166,11 +161,8 @@ class OpenSaveDialog (Window)
 			if (.focus == .Files)
 				if .name isnt visible
 					.Accept.Click
-				  elseif keys.cmd or keys.shift or keys.cmd
-					return false// 
 				  else
-					.name.setfocus
-					.name.selectall
+					.GoIntoFolder
 				return true
 		return super.keydown(key)
  
