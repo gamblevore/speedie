@@ -785,14 +785,17 @@ class TextView (GUIControl)
 	function ShowParseError
 		.errorat(.myerror)
 	
+	function FillErrors (|errorlist| err)
+		for e in err
+			.ErrorAt(e)
 	
 	function ErrorJump (|error| err)
 		.jump(err.position, .MaxVisibleLines/2)
 		
 	function ErrorAt (|error| err)
 		if err
-			.errorjump(err)
-			.lineerroradd( err )
+			.ErrorJump(err)
+			.LineErrorAdd( err )
 
 
 	function ClearErrors
