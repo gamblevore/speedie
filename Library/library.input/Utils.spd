@@ -11,7 +11,24 @@ function dictionary.sort (|SorterComparer| fn, |int| count, |[...]|)
 function message.AllNames (|[string]|)
 	opt norefcounts
 	for s in self
-		rz <~ s.name
+		|| i = s.GoodName
+			rz <~ i
+
+
+function message.GoodName (|stringthatwasreadsafely|) // we want something that looks like it could have a name
+	opt norefcounts
+	if !self
+		return ""
+	|| f = .func
+	if .IsString or f == @thg or @num
+		return .name
+	if f == @tmp
+		|| c = .first
+		if !c
+			return .name
+	error (self, "Make sure this item is a string or a proper-name.")
+	return string.Error
+
 
 function ivec4.list (|message|)
 	rz = @list.msg
