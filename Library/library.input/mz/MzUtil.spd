@@ -18,16 +18,17 @@ extend string
 	function Decompress (|&compressionstats| st=nil,  |int|lim=256MB,  |StringThatWasReadSafely|)
 		return .stream.Decompress(st, lim)
 
+
 function stringstream.Decompress (|&compressionstats| st=nil,  |int|lim=256MB,  |StringThatWasReadSafely|)
 	rz = string.error
 	|| fs = faststring()
 	if .Decompressinto(st, lim, fs)
 		rz = fs
 
+
 function Stringstream.IsCompressed (|bool|)
 	|| str = .StrNoAdvance(16)
-	return str.IsCompressed
-	
+	return str.IsCompressed	
 
 
 function FastString.CompressInto (|faststring| fs, |&compressionstats| st=nil)
@@ -43,7 +44,7 @@ function FastBuff.CompressInto (|faststring| fs, |&compressionstats| st=nil)
 Module MZLab	
 	function TestMz (|string| path, |bool|)
 		if path
-			|| f = path.ReadFile.decompress(1GB)
+			|| f = path.ReadFile.decompress(int.max)
 			return f.CompressTest(true) and .ManyTests
 		
 	helper string.CompressTest (|bool| report=false, |bool|)
