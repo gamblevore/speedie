@@ -128,11 +128,6 @@ function RightClickedTabs (GUIAction)
 	if row and self isa ButtonView
 		.FillMenuPath(row.obj|PerryIDE|.Project.path, row)
 
-
-function ClickedBird (GUIAction)
-	sdlapp.size = (414,256)
-	birdwindow().show
-
 	
 function ClickedToolbar (GUIAction)
 	opt norefcounts

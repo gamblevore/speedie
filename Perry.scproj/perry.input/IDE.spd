@@ -55,7 +55,6 @@ class PerryIDE (Window)
     |Buttonview|				GoPrev
     |Buttonview|				StartScreen
     |Buttonview|				BuildButton
-    |Buttonview|				BirdButton
     |Buttonview|				RunButton
 	|message|					PrevMarker
     |message|					Previous
@@ -326,12 +325,8 @@ class PerryIDE (Window)
 
 
 	behaviour FrameUpdate // perframe, eachframe, onframe
-		if !ShouldNotDisturbGUI
-			if !.focus
-				.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
-			if perryide.birds
-				perryide.birds = false
-				.birdbutton.click
+		if !ShouldNotDisturbGUI and !.focus
+			.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
 		.UpdateDebuggedApp(false)
 		.TestCompilerAlive
 		.SpeedieMsgReceive(.feedback)
@@ -441,10 +436,7 @@ class PerryIDE (Window)
 				clickedCreateproj(self)
 			return true
 		if key is b
-			if keys.option
-				ClickedBird(.birdbutton)
-			  else
-				Clickedcompile(.buildbutton)
+			Clickedcompile(.buildbutton)
 			return true
 		if key is t // todo
 			.view(.viewfiles)
@@ -493,7 +485,6 @@ class PerryIDE (Window)
 
 	module
 		|bool| DummyTest
-		|bool| Birds
 		|byte| StatsMode
 		syntax access (|int| i, |perryide|)
 			opt norefcounts

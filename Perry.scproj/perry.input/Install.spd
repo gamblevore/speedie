@@ -344,7 +344,7 @@ extend_module perry
 		|| fol = .SpeedieDir
 		if spd.exists and spd.delete
 			fs <~ "Deleted Link at: $spd"
-		if per.fileexists and per.movetotrash
+		if per.FileExists and per.MoveToTrash
 			fs <~ "\nDeleted Perry at: $per"
 		fs <~ "\n\nTo fully uninstall, remove folder at:\n$Fol"
 		beep fs
@@ -361,6 +361,10 @@ function ClickedUninstallMenu (GUIMenuEvent)
 
 function ClickedShowPrefs (GUIMenuEvent)
 	app.pref_path.Reveal
+
+function ClickedBirdsMenu (GUIMenuEvent)
+	sdlapp.size = (414,256)
+	birdwindow().show
 
 function ClickedTestInstallMenu (guimenuevent)
 	perry.CheckInstallStatus

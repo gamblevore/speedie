@@ -68,6 +68,7 @@ module Perry
 			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
 			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
 			appmenu <~ ("Show Preferences", ClickedShowPrefs)
+			appmenu <~ ("Birds",			ClickedBirdsMenu)
 		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
 		appmenu <~ ("Install",  		ClickedInstallMenu)
 

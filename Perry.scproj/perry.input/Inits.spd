@@ -19,7 +19,6 @@ extend PerryIDE
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile,			nil)
 		.Tabs				= ButtonView(.Toolbar,	ClickedTabs,    PressingTabs,  ReturnProjectPath,  RightClickedTabs) 
 		.StartScreen		= ButtonView(.Toolbar,	&StartupWindow.open)
-		.BirdButton			= ButtonView(.Toolbar,	ClickedBird)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
 		.GoNext				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
