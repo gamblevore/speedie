@@ -1,0 +1,43 @@
+#!/usr/local/bin/spd
+
+main {
+	"Starting to write 250mb XML file"
+	
+	|| Start = date.now
+	|| xml = "sample2.xml".out							#require
+	xml <~ `<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+`
+	
+	|| Caps = 'A' to 'Z'
+	|| Low  = 'a' to 'z'
+    while xml < 250MB
+		|| alive = ("yes", "no")(0.5[])
+
+	    xml <~ "
+	<Book>
+	    <Title>${caps*16}</Title>
+	    <Author alive=\"${alive}\">${low*8} ${low*12}</Author>
+	</Book>"
+	
+	xml <~ `
+</Catalog>`
+
+	xml.Flush
+	
+	"Finished writing 250mb XML file in ${start.ago.seconds} seconds"
+}
+
+
+struct ByteRange
+	|byte| A
+	|byte| B
+	operator Mul (|int| n, |string|)
+		return random.shared.Text(n, .a, .b)
+
+extend byte
+	operator to	(|byte| b, |byterange|)
+		rz.a = self
+		rz.b = b
+		
+	
