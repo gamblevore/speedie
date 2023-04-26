@@ -2,10 +2,7 @@
 #include "JB_Compress.h"
 #include "divsufsort.h"
 
-
 #define kExtend 0x70
-
-
 
 
 struct CompState : FastBuff {
@@ -167,7 +164,7 @@ struct CompState : FastBuff {
 
 
 static CompState	sigh;
-FastBuff			FB;
+static FastBuff		FB;
 static CompState& alloc_compress(JB_String* self, FastString* fs) {
 	CompState& C		= sigh;
 
@@ -194,7 +191,7 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 }
 
 
-extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self) { // comfort
+extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self) {
 	if (!fs or !self)
 		return;
 	
@@ -216,7 +213,23 @@ extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self) { // comf
 
 
 //////////////////////////////////////////////////// DECOMP //////////////////////////////////////////////////////////////
-u8* Copy_(u8* Addr, FastBuff& fb, int Offset, int Length);
+u8* Copy_(u8* Addr, FastBuff& fb, int Offset, int Length) {
+	u8* Write	= fb.Write;
+	u8* Src		= Write - Offset;
+	fb.Write	= Write + Length;
+	DExpect(Src >= fb.WriteStart and fb.Write <= fb.WriteEnd,	"Offset too far/too much data");
+	u8* SrcEnd = Src+Length;
+	auto W8 = (int64*)Write;  auto S8 = (int64*)Src; 
+	*W8++ = *S8++; *W8++ = *S8++;
+	if (SrcEnd <= Write) {
+		if (Length <= 16)
+			return Addr;
+		memcpy(W8, S8, Length-16);
+	} else {
+		while (Src < SrcEnd) *Write++ = *Src++;	// RLE
+	}
+	return Addr;
+}
 
 u8* DeOffset_(u8* Addr, FastBuff& fb, u32 Value) {
 	u32 Info	= (Value << 8) | *Addr++;
@@ -254,32 +267,6 @@ u8* DeBig_(u8* Addr, FastBuff& fb, u32 Code, u8* End) {
 	return DeEscape_(Addr, fb, (Value << 4) | Code);
 }
 
-u8* Copy_(u8* Addr, FastBuff& fb, int Offset, int Length) {
-	u8* Write	= fb.Write;
-	u8* Src		= Write - Offset;
-	fb.Write	= Write + Length;
-	DExpect(Src >= fb.WriteStart and fb.Write <= fb.WriteEnd,	"Offset too far/too much data");
-	u8* SrcEnd = Src+Length;
-	auto W8 = (int64*)Write;  auto S8 = (int64*)Src; 
-	*W8++ = *S8++; *W8++ = *S8++;
-	if (SrcEnd <= Write) {
-		if (Length <= 16)
-			return Addr;
-		memcpy(W8, S8, Length-16);
-	} else {
-		while (Src < SrcEnd) *Write++ = *Src++;	// RLE
-	}
-	return Addr;
-}
-
-void BackFlush_ (FastString* fs, int CurrLength) {
-	if (fs->File) {
-		memmove(fs->ResultPtr, fs->ResultPtr+fs->Length, CurrLength);
-		fs->Length = CurrLength;
-		JB_FS_Flush(fs);
-	}
-	fs->Length += CurrLength;
-}
   
 extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int TotalLength) {
 	FastBuff& fb = FB;
@@ -297,11 +284,12 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int To
 		  else
 			break; // finished!
 	}
+	
 	require (Addr != ErrP);
 	DReq(Addr == AddrEnd,						"Chunk read overflow",		0);
 	DReq(fb.Expected == fb.Length(),			"Chunk write-length error",	0);
-	BackFlush_(fs, fb.Expected);
-	return fb.Expected; 
+	fs->Length += fb.Expected;
+	return fb.Expected;
 }
 
 
@@ -324,3 +312,377 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int To
 	12x chunk-size for compress, 1MB-->12MB
 	2x  chunk-size for decomp,   1MB-->2MB
 */
+
+
+
+///
+///
+/////
+/// balz... modified from balz.cpp by Ilya Muravyov
+/////
+///
+///
+
+typedef unsigned short		ushort;
+
+const int MIN_MATCH=3;
+const int MAX_MATCH=255+MIN_MATCH;
+
+const int BUF_BITS = 25;
+const int BUF_SIZE = 1<<BUF_BITS; // I only input 4MB chunks... but I need this number
+const int BUF_MASK = BUF_SIZE-1;  // changing it reduces compression ratio! Strangely!
+  
+const int TAB_BITS = 7;
+const int TAB_SIZE = 1<<TAB_BITS;
+const int TAB_MASK = TAB_SIZE-1;
+
+
+struct Counter {
+	ushort p1;
+	ushort p2;
+
+	uint P() const {
+		return p1+p2;
+	}
+
+	void Update0() {
+		p1-=p1>>3;
+		p2-=p2>>6;
+	}
+
+	void Update1() {
+		p1+=(p1^65535)>>3;
+		p2+=(p2^65535)>>6;
+	}
+};
+
+
+struct BalzComp {
+	uint		code;
+	uint		low;
+	uint		high;
+	Counter		counter1[256][512];
+	Counter		counter2[256][TAB_SIZE];
+	// why not just use fastbuff? its literally the same info?
+	u8*			output;
+	u8*			OutputEnd;
+	u8*			input;
+	u8*			inputEnd;
+	int			cnt[1<<16];
+	uint		tab[1<<16][TAB_SIZE];
+	
+	inline int get () { // make this a u8?
+		DReq(input < inputEnd, "Chunk read overflow", 0);
+		return *input++;
+	}
+	inline void putc(u8 b) {
+		if (output < OutputEnd) {
+			*output++ = b;
+		} else if (OutputEnd) {
+			OutputEnd = 0;
+			DErr(false, "Chunk output too large");
+		}
+	}
+	
+	void Reset() {
+		memset(this, 0, sizeof(*this));
+		ushort* Start = &(counter1[0][0].p1);
+		std::fill(Start, Start+sizeof(counter1), 1<<15);
+		Start = &(counter2[0][0].p1);
+		std::fill(Start, Start+sizeof(counter2), 1<<15);
+		high = -1;
+	}
+	
+	void Encode(int bit, Counter& counter) {
+		const uint mid=low+((u64(high-low)*(counter.P()<<15))>>32);
+
+		if (bit) {
+			high=mid;
+			counter.Update1();
+		} else {
+			low=mid+1;
+			counter.Update0();
+		}
+
+		while ((low^high)<(1<<24)) {
+			putc(low>>24);
+			low <<= 8;
+			high = (high<<8)|255;
+		}
+	}
+
+	void Flush() {
+		for (int i=0; i<4; ++i) {
+			putc(low>>24);
+			low <<= 8;
+		}
+	}
+
+	void Init() {
+		for (int i=0; i<4; ++i) {
+			code=(code<<8)|get();
+		}
+	}
+
+	int Decode(Counter& counter) {
+		const uint mid = low + ((u64(high-low)*(counter.P()<<15))>>32);
+
+		const int bit = code<=mid;
+		if (bit) {
+			high=mid;
+			counter.Update1();
+		} else {
+			low=mid+1;
+			counter.Update0();
+		}
+
+		while ((low^high) < (1<<24)) {
+			code=(code<<8)|get();
+			low<<=8;
+			high=(high<<8)|255;
+		}
+
+		return bit;
+	}
+
+
+	void Encode (int t, int c1) {
+		int ctx=1;
+		while (ctx<512) {
+			const int bit=((t&256)!=0);
+			t+=t;
+			Encode(bit, counter1[c1][ctx]);
+			ctx+=ctx+bit;
+		}
+	}
+
+	void EncodeIdx (int x, int c2) {
+		int ctx=1;
+		while (ctx<TAB_SIZE) {
+			const int bit=((x&(TAB_SIZE>>1))!=0);
+			x+=x;
+			Encode(bit, counter2[c2][ctx]);
+			ctx+=ctx+bit;
+		}
+	}
+
+	int Decode (int c1) {
+		int ctx=1;
+		while (ctx<512)
+			ctx+=ctx+Decode(counter1[c1][ctx]);
+		return ctx-512;
+	}
+
+	int DecodeIdx (int c2) {
+		int ctx=1;
+		while (ctx<TAB_SIZE)
+			ctx+=ctx+Decode(counter2[c2][ctx]);
+		return ctx-TAB_SIZE;
+	}
+	
+	inline uint get_hash(u8* buf, int p) {
+		return ((reinterpret_cast<uint&>(buf[p])&0xffffff) * 2654435769UL)&~BUF_MASK;
+	}
+	
+	inline int get_pts(int len, int x) {
+		return len>=MIN_MATCH
+			? (len<<TAB_BITS)-x
+			: ((MIN_MATCH-1)<<TAB_BITS)-8;
+	}
+	
+	int get_pts_at(u8* buf, int p, int n) {
+		const int c2=reinterpret_cast<ushort&>(buf[p-2]);
+		const uint hash=get_hash(buf, p);
+		
+		int len=MIN_MATCH-1;
+		int idx=TAB_SIZE;
+		
+		int max_match=n-p;
+		if (max_match>MAX_MATCH)
+			max_match=MAX_MATCH;
+		
+		for (int x=0; x<TAB_SIZE; ++x) {
+			const uint d=tab[c2][(cnt[c2]-x)&TAB_MASK];
+			if (!d)
+				break;
+			
+			if ((d&~BUF_MASK)!=hash)
+				continue;
+			
+			const int s=d&BUF_MASK;
+			if ((buf[s+len]!=buf[p+len])||(buf[s]!=buf[p]))
+				continue;
+			
+			int l = 0;
+			while (++l<max_match)
+				if (buf[s+l]!=buf[p+l])
+					break;
+			if (l>len) {
+				idx=x;
+				len=l;
+				if (l==max_match)
+					break;
+			}
+		}
+		
+		return get_pts(len, idx);
+	}
+	
+	
+	void balz_compress(JB_String* Data, bool max) {
+		int Length = JB_Str_Length(Data);		
+		int best_idx[MAX_MATCH+1];
+		auto buf = Data->Addr;
+		
+		int p = 0;
+		while (p < 2 and p < Length)
+			Encode(buf[p++], 0);
+		
+		while (p < Length) {
+			const int c2 = reinterpret_cast<ushort&>(buf[p-2]);
+			const uint hash = get_hash(buf, p);
+			
+			int len = MIN_MATCH-1;
+			int idx = TAB_SIZE;
+			
+			int max_match=Length-p;
+			if (max_match>MAX_MATCH)
+				max_match=MAX_MATCH;
+			
+			for (int x = 0; x < TAB_SIZE; ++x) {
+				const uint d = tab[c2][(cnt[c2]-x)&TAB_MASK];
+				if (!d)
+					break;
+				
+				if ((d&~BUF_MASK)!=hash)
+					continue;
+				
+				const int s = d&BUF_MASK;
+				if ((buf[s+len]!=buf[p+len])||(buf[s]!=buf[p]))
+					continue;
+				
+				int l = 0;
+				while (++l<max_match)
+					if (buf[s+l]!=buf[p+l])
+						break;
+				if (l > len) {
+					for (int i=l; i>len; --i)
+						best_idx[i]=x;
+					idx=x;
+					len=l;
+					if (l==max_match)
+						break;
+				}
+			}
+			
+			if (max && len>=MIN_MATCH) {
+				int sum=get_pts(len, idx)+get_pts_at(buf, p+len, Length);
+				if (sum<get_pts(len+MAX_MATCH, 0)) {
+					const int lookahead=len;
+					for (int i=1; i<lookahead; ++i) {
+						const int tmp=get_pts(i, best_idx[i])+get_pts_at(buf, p+i, Length);
+						if (tmp > sum) {
+							sum=tmp;
+							len=i;
+						}
+					}
+					
+					idx = best_idx[len];
+				}
+			}
+			
+			tab[c2][++cnt[c2]&TAB_MASK]=hash|p;
+			
+			if (len >= MIN_MATCH) {
+				Encode((256-MIN_MATCH)+len, buf[p-1]);
+				EncodeIdx(idx, buf[p-2]);
+				p += len;
+			} else {
+				Encode(buf[p], buf[p-1]);
+				++p;
+			}
+		}
+
+		Flush();
+	}
+
+	
+	int balz_decompress(JB_String* S, int flen) {
+		u8* buf = output;
+		input = S->Addr;
+		inputEnd = input + S->Length;
+		
+		Init();
+		
+		int p = 0;
+		while (p < 2 and p < flen) {
+			buf[p++] = Decode(0);
+		}
+		
+		while (p < flen) {
+			const int tmp = p;
+			const int c2 = reinterpret_cast<ushort&>(buf[p-2]);
+			const int t = Decode(buf[p-1]);
+			if (t >= 256) {
+				int len=t-256;
+				int s=tab[c2][(cnt[c2]-DecodeIdx(buf[p-2]))&TAB_MASK];
+				DReq(s >= 0 and s < p, "Decode Error", -1);
+				buf[p++]=buf[s++];
+				buf[p++]=buf[s++];
+				buf[p++]=buf[s++];
+				while (len--)
+					buf[p++]=buf[s++];
+			} else {
+				buf[p++]=t;
+			}
+			
+			tab[c2][++cnt[c2]&TAB_MASK]=tmp;
+		}
+		
+		return p;
+	}
+};
+
+
+
+static BalzComp* BB;
+static BalzComp* GetComp(int N, FastString* out) {
+	if (!BB) BB = new BalzComp; 
+	BB->Reset();
+	BB->output = JB_FS_WriteAlloc_(out, N);
+	BB->OutputEnd = BB->output+N;
+	return BB;
+}
+
+extern "C" void JB_BALZ_Clear() {
+	delete BB;
+	BB = nil;
+}
+
+extern "C" int JB_BALZ_CompressChunk(FastString* fs, JB_String* In, bool Strong) {
+	if (!In or !fs)
+		return 0;
+	
+	int MaxSize = (In->Length*1.01) + 128; // worst-case
+	auto B = GetComp(MaxSize, fs);
+	auto first = B->output;
+	B->balz_compress(In, Strong);
+	int Created = (int)(B->output - first);
+	if (!B->OutputEnd) // failed
+		Created = 0;
+    JB_FS_AdjustLength_(fs, MaxSize, Created);
+    return Created;
+}
+
+
+extern "C" int JB_BALZ_DecompressChunk(FastString* fs, JB_String* In, int Expected) {
+	DReq(JB_Str_Length(In) >= 5, "Chunk read overflow",	0);    // i think 5 is the minimum?
+	if (!fs) return 0;
+	
+	auto B = GetComp(Expected, fs);
+	int Created = B->balz_decompress(In, Expected);
+	DReq(Expected == Created, "Chunk write-length error",	0);
+    return Expected;
+}
+
+

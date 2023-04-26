@@ -1,13 +1,14 @@
 
+
 extend string
-	function Compress (|&compressionstats| st = nil, |string|) 
+	function Compress (|int|Strength=mzlab.default, |&compressionstats| st = nil, |string|) 
 		|| j = jbin(0)
-		.CompressInto(j, st)
+		.CompressInto(j, Strength, st)
 		return j
 	
-	function CompressInto (|file| file, |&compressionstats| st=nil)
+	function CompressInto (|file| file, |int|Strength=mzlab.default, |&compressionstats| st=nil)
 		cpp_part CompressFileInto
-		.CompressInto(file.out, st)
+		.CompressInto(file.out, Strength, st)
 	
 	function IsCompressed (|bool|)
 		return .isjbin and self[2, "C\06µz"] or self[2, "@\01C\06µz"]
@@ -31,31 +32,52 @@ function Stringstream.IsCompressed (|bool|)
 	return str.IsCompressed	
 
 
-function FastString.CompressInto (|faststring| fs, |&compressionstats| st=nil)
+function FastString.CompressInto (|faststring| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil)
 	|| str = string.fromptr(.resultptr, .length)
-	str.CompressInto(fs, st)
+	str.CompressInto(fs, Strength, st)
 
 
-function FastBuff.CompressInto (|faststring| fs, |&compressionstats| st=nil)
-	.tmpstr.CompressInto(fs, st)
+function FastBuff.CompressInto (|faststring| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil)
+	.tmpstr.CompressInto(fs, Strength, st)
 
 	
 
-Module MZLab	
+Module MZLab 
+	constants
+		Fastest = -4 // lz
+		Fast = 0  // lz harder
+		Strong = 1   // rolz
+		Strongest = 2   // rolz harder
+		Default = strong // its good enough!
+		
 	function TestMz (|string| path, |bool|)
 		if path
 			|| f = path.ReadFile.decompress(int.max)
 			return f.CompressTest(true) and .ManyTests
 		
-	helper string.CompressTest (|bool| report=false, |bool|)
-		|compressionstats| s
-		|| c = .compress(s)
+	helper string.CompressTest (|bool| report, |int| which=3, |bool|)
+		if which & 1
+			require .compresstestsub(mzlab.strong, report)
+		if which & 2
+			require .compresstestsub(mzlab.default, report)
+		return true
+	
+	
+	helper string.CompressTestSub (|int| Strength, |bool| report, |bool|)
+		|compressionstats| stats
+		|| c = .compress(Strength, stats)
 		if report
-			printline s.Render
-		|| decomp = c.Decompress(int.max)
+			printline stats.Render
+		stats = nil
+		|| decomp = c.Decompress(stats, int.max)
 		rz = self == decomp
 		if !rz
 			error "Decompression failed when compressing: " + self
+			debugger
+			decomp = c.Decompress(int.max)
+		  elseif report
+			printline stats.Render
+		
 	
 	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
 		for j in 4 
@@ -71,10 +93,29 @@ Module MZLab
 				printline i.render
 			for sh in 0 to 4
 				.TestSub(items, fs, i>>(sh*4))
-			require fs.getresult.CompressTest
+			|| str = fs.getresult
+			require str.CompressTest(false, (i&1)+1)
 		"Compression Test: OK"
 		return true
 	
+	
+	helper BalzTest (|string| path)
+		|| in = path.file
+		|| indata = in.Readall						#require
+		|| out = in.setext("jalz").out
+		out.BALZCompressChunk(indata)
+		out.Flush
+		"Compression done"
+		
+		|| fs = faststring()
+		|| sigh = out.file.readfile
+		fs.BalzDecompressChunk(sigh, indata.length)
+		|| back = fs.getresult
+		require in.compare(back, true)
+		"Decompressed OK!"
+		mzlab.TestMz(in)
+
+
 	function TestCompression
 		|| d = "/usr/local/speedie/Speedie.scproj/speedie.input/ASMBuilder/".file
 		require d.exists
@@ -149,8 +190,8 @@ struct CompressionStats
 			rz.live = true
 }
 
+
 helper BTWSorter_64K (|string| text, |&int| ap, |&int| bp, |int|)
-// unused
 	|| a		= *ap
 	|| b		= *bp
 	|| txt		= text.addr

@@ -74,14 +74,13 @@ static bool arr_reserve(FastBuff& B,  JB_String* self,  int TotalLength,  FastSt
 	int Chunk	= 1 << C;
 	DReq(Chunk <= 1<<22, "Chunk size too large", 0);
 
-	int CL		= (int)(End - Addr);
 	B.Read		= Addr;
 	B.ReadEnd	= End;
 
 	B.Expected = min(Chunk, TotalLength - fs->Length);
 	B.Write = JB_FS_NeedSpare(fs, B.Expected);
 	DReq (B.Write, "Out of memory", 0);
-	B.WriteStart = fs->ResultPtr + fs->Length; 
+	B.WriteStart = fs->ResultPtr + fs->Length; // always the same as B.Write? 
 	B.WriteEnd = B.Write + B.Expected;
 	return true;
 }

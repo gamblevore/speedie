@@ -11,20 +11,29 @@
 */
 
 
-function string.CompressInto (|jbin| j, |&compressionstats| st=nil) 
+function string.CompressInto (|jbin| j, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
 	st := CompressionStats.All
 	st.len(j.length)
 	j.jinit
-	j.enter(@arg)
 	j.enter(@tmp, "µz")
 	j.addint(.length)
-	j.enter(@arg)
-	for s in .chunk(1MB)
+	|| Mode = ("B", "")(strength >= mzlab.strong)
+	j.enter(@arg, Mode)
+	|| Curr = 0
+	|| ChunkSize = 1MB
+	if strength >= mzlab.strong
+		ChunkSize = 4MB
+	while Curr < self
+		|| s = self[curr, curr+Chunksize]
+		Curr += ChunkSize
 		|| Place = j.OpenStream
-		j.CompressChunk(s)
+		if Mode
+			j.BalzCompressChunk(s, strength >= mzlab.strongest)
+		  else
+			j.CompressChunk(s)
 		j.CloseStream(Place)
 		st.LiveUpdate(s, j.length)
-	j.up(3)
+	j.up(2)
 	j.CompressChunk(nil) // cleanup
 
 
@@ -38,8 +47,9 @@ helper stringstream.DecompressInto (|&compressionstats| st, |int| lim, |faststri
 	|| mz = .NextMsg				#require
 	if mz == @arg
 		mz = .NextMsg(@tmp)
-	  elseif !mz.expect(@tmp)
-		mz = nil
+	  else
+		require mz.expect(@tmp)
+
 	|| size = .NextMsg(mz, @num)
 	|| arg = .NextMsg(mz, @arg)
 	|| total_size = size.int
@@ -53,12 +63,17 @@ helper stringstream.DecompressInto (|&compressionstats| st, |int| lim, |faststri
 			error (self, "Invalid mz header")
 	  else
 		st.len(fs.StreamLength)
-		|| Continue = true
-		while Continue
-			|| c = .NextMsg(arg, @bin)
-			Continue = c and fs.DecompressChunk(c.name, total_size)
-			if Continue
-				st.LiveUpdate(c.name, fs.StreamLength)
+		|| Mode = arg.name
+		while
+			|| c = .NextMsg(arg, @bin) #loop
+			if Mode == "B"
+				|| Chunk = 4MB min total_size // more messy but more correct
+				loop fs.BalzDecompressChunk(c.name, chunk)
+				total_size -= 4MB	// actually the branch below is less correct
+									// it could have issues if the faststring had previous data.
+			  else
+				loop fs.DecompressChunk(c.name, total_size)
+			st.LiveUpdate(c.name, fs.StreamLength)
 			c.remove
 			
 	return OK
@@ -67,7 +82,13 @@ helper stringstream.DecompressInto (|&compressionstats| st, |int| lim, |faststri
 helper faststring.CompressChunk (|string| str) 
 	cpp_wrapper JB_Str_CompressChunk
 
-
 helper faststring.DecompressChunk (|string| str, |int| total_length, |int|) 
 	cpp_wrapper JB_Str_DecompressChunk
+
+helper faststring.BalzCompressChunk (|string| str, |bool| Strong = false) 
+	cpp_wrapper JB_BALZ_CompressChunk
+
+helper faststring.BalzDecompressChunk (|string| str, |int| total_length, |int|) 
+	cpp_wrapper JB_BALZ_DecompressChunk
+
 

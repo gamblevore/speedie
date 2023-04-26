@@ -27,6 +27,11 @@
 extern "C" {
 
 
+void JB_BALZ_Clear();
+int JB_BALZ_CompressChunk(FastString* fs, JB_String* In, bool Strong);
+int JB_BALZ_DecompressChunk(FastString* fs, JB_String* In, int TotalLength);
+int balzmain(int argc, const char* argv[]);
+
 extern JB_String* JB_LUB[];
 
 
