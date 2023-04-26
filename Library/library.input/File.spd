@@ -176,26 +176,50 @@ class File (String)
 		return "/usr/bin/touch".SilentExecute([self])
 
 	
-	function Compare (|File| A, |bool|)
+	function Compare (|File| A, |string| Error="", |bool|)
 		cpp_part FileCompare
-		require (.Size == A.Size)
+		|| code = .comparesub(a)
+		.Close
+		A.Close
+		return .CompareMsg(code, Error)
+	
+	
+	helper CompareMsg (|errorint| code, |string| Error, |bool|)
+		if (code==0) or !error
+			return code == 0
+
+		|string| msg = self
+		if code == 1
+			msg += " has different length to "
+		  else
+			msg += " has different contents to "
+		msg += Error
+		error msg
+		
+		
+	function CompareSub (|File| A, |ErrorInt|)
+		cpp_part FileCompareSub
+		if (.Size != A.Size)
+			return 1
 		.Open(O_RDONLY)
 		A.Open(O_RDONLY)
 		
 		while {
 			|| S_ = .Read(64K)
 			|| SA = A.Read(64K)
-			require (S_ == SA)
+			ifn (S_ == SA)
+				rz = 2
+				exit
 		} (S_)
-		
-		.Close
-		A.Close
-
-		return true
 
 	
-	function Compare (|String|S, |bool|)
-		return (.Size == S.Length) and (.ReadAll(true) == S)
+	function Compare (|String| A, |string| Error="", |bool|)
+		|| code = 0
+		if (.Size != A.length)
+			code = 1
+		  elseif (.ReadAll(true) == A)
+			code = 2
+		return .comparemsg(code, error)
 
 	
 	function ReadAll (|int| lim = 128MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
@@ -327,7 +351,7 @@ class File (String)
 		return .Compare(s)
 	
 	function MatchFile (|File| f, |bool|)
-		return .Compare(f)
+		return .Compare(f,false)
 		
 	function DirectoryContains (|string| path, |bool|)
 		return path.pathfix starts .PathDir
