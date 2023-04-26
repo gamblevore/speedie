@@ -67,12 +67,6 @@ function int.TabsWidth (|int|)
 	return 4-(self & 3)
 
 
-function string.Chunk (|int| n, |[String]|)
-	|| i = 0
-	while i < .length
-		rz <~ self[i, i+n]
-		i += n
-
 function String.UTF16To8 (|faststring|fs=nil, |int|BigEndian=1, |string|)
 	cpp_wrapper JB_Str_UTF16To8
 
