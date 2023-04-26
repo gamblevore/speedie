@@ -264,8 +264,9 @@ module Feedback
 		+"perry"
 			Explain(Purpose, "")$
 			options.perry = 1
-			options.perry += value~="bin" // argvalue not needed? jsut value, right?
-			error.AutoPrint = 0
+			|| RealPerry = value~="bin"
+			options.perry += RealPerry // argvalue not needed? jsut value, right?
+			error.AutoPrint = (!RealPerry)|int|
 			compiler.insecurewords = file.PrefsFolder["klinkerhoppen.banned"].readall.dict
 		
 		check

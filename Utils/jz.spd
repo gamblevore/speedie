@@ -1,5 +1,6 @@
 #!/usr/local/bin/speedie
 
+// give jz an "-o=file" switch
 datatype Type (int)
 	flags
 		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace
@@ -22,15 +23,23 @@ datatype Type (int)
 			fs <~ "plain"
 
 
+|| DefaultStrength = mzlab.default
+
 function App.GetActions (|Type|)
 	for s in app.Switches
 		|| name = s.ArgName
 		if name ~= "r"
 			rz |= type.report
-		  elseif name ~= "j": rz |= type.box
-		  elseif name ~= "b": rz |= type.jbin
-		  elseif name ~= "c": rz |= type.compressed
-		  elseif name ~= "s": rz |= type.selfreplace
+		  elseif name ~= "j"
+			rz |= type.box
+		  elseif name ~= "b"
+			rz |= type.jbin
+		  elseif name[0].LowerCase == 'c'
+			rz |= type.compressed
+			|| str = s.ArgValue
+				DefaultStrength = str.int max 0
+		  elseif name ~= "s"
+			rz |= type.selfreplace
 		  elseif name ~= "p"
 			rz |= type.stdout
 			check (app.args == 1) ("Can't write multiple files to stdout.")
@@ -127,7 +136,7 @@ class Conv
 				"$.in is: ${detected.render}"
 				StdErr.clear
 				return true
-
+ 
 			require Detected&type.actions != Do
 	
 			if dest is box
@@ -138,7 +147,9 @@ class Conv
 				ext = "jbin"
 	
 		if dest is compressed
-			.data = .data.Compress
+			.start = date.now
+			.data = .data.Compress(DefaultStrength max 0)
+			.time("Compress")
 		if dest is stdout
 			print .data
 		  else
