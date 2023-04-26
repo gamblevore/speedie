@@ -269,7 +269,6 @@
 		AC7D3E2929A2844200148ADB /* StringConvert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StringConvert.h; path = ../Library/CppLib/StringConvert.h; sourceTree = "<group>"; };
 		AC7D3E2A29A2844200148ADB /* JB_ByteArray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_ByteArray.h; path = ../Library/CppLib/JB_ByteArray.h; sourceTree = "<group>"; };
 		AC7D3E2B29A2844200148ADB /* JB_Atomic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Atomic.h; path = ../Library/CppLib/JB_Atomic.h; sourceTree = "<group>"; };
-		AC7D3E2C29A2844200148ADB /* JB_DirReader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_DirReader.h; path = ../Library/CppLib/JB_DirReader.h; sourceTree = "<group>"; };
 		AC7D3E2D29A2844200148ADB /* JB_Math.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Math.h; path = ../Library/CppLib/JB_Math.h; sourceTree = "<group>"; };
 		AC7D3E2E29A2844200148ADB /* JB_Alloc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Alloc.h; path = ../Library/CppLib/JB_Alloc.h; sourceTree = "<group>"; };
 		AC7D3E2F29A2844200148ADB /* JB_Pipe.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Pipe.h; path = ../Library/CppLib/JB_Pipe.h; sourceTree = "<group>"; };
@@ -289,14 +288,8 @@
 		AC7D3E3D29A2844200148ADB /* JB_ByteMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_ByteMap.h; path = ../Library/CppLib/JB_ByteMap.h; sourceTree = "<group>"; };
 		AC7D3E3E29A2844E00148ADB /* Instructions.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = Instructions.i; path = ../Library/CppLib/Instructions.i; sourceTree = "<group>"; };
 		AC7D3E3F29A2844E00148ADB /* JB_VM_Helpers.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = JB_VM_Helpers.i; path = ../Library/CppLib/JB_VM_Helpers.i; sourceTree = "<group>"; };
-		AC7D3E4029A2844E00148ADB /* StringConvert.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringConvert.i; path = ../Library/CppLib/StringConvert.i; sourceTree = "<group>"; };
 		AC7D3E4129A2844E00148ADB /* StringAlterCopy.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringAlterCopy.i; path = ../Library/CppLib/StringAlterCopy.i; sourceTree = "<group>"; };
-		AC7D3E4229A2844E00148ADB /* StringCore.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringCore.i; path = ../Library/CppLib/StringCore.i; sourceTree = "<group>"; };
-		AC7D3E4329A2844E00148ADB /* StringEncoding.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringEncoding.i; path = ../Library/CppLib/StringEncoding.i; sourceTree = "<group>"; };
-		AC7D3E4429A2844E00148ADB /* StringGlobals.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringGlobals.i; path = ../Library/CppLib/StringGlobals.i; sourceTree = "<group>"; };
-		AC7D3E4529A2844E00148ADB /* StringRender.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringRender.i; path = ../Library/CppLib/StringRender.i; sourceTree = "<group>"; };
 		AC7D3E4629A2844E00148ADB /* StringCS.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringCS.i; path = ../Library/CppLib/StringCS.i; sourceTree = "<group>"; };
-		AC7D3E4729A2844E00148ADB /* StringProperties.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringProperties.i; path = ../Library/CppLib/StringProperties.i; sourceTree = "<group>"; };
 		AC7D3E4829A2844E00148ADB /* StringSearchers.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringSearchers.i; path = ../Library/CppLib/StringSearchers.i; sourceTree = "<group>"; };
 		AC7D3E4929A2844E00148ADB /* StringSplitters.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringSplitters.i; path = ../Library/CppLib/StringSplitters.i; sourceTree = "<group>"; };
 		AC7D3E4B29A284DB00148ADB /* speedie.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = speedie.input; sourceTree = "<group>"; };
@@ -415,13 +408,7 @@
 				AC7D3E3E29A2844E00148ADB /* Instructions.i */,
 				AC7D3E3F29A2844E00148ADB /* JB_VM_Helpers.i */,
 				AC7D3E4129A2844E00148ADB /* StringAlterCopy.i */,
-				AC7D3E4029A2844E00148ADB /* StringConvert.i */,
-				AC7D3E4229A2844E00148ADB /* StringCore.i */,
 				AC7D3E4629A2844E00148ADB /* StringCS.i */,
-				AC7D3E4329A2844E00148ADB /* StringEncoding.i */,
-				AC7D3E4429A2844E00148ADB /* StringGlobals.i */,
-				AC7D3E4729A2844E00148ADB /* StringProperties.i */,
-				AC7D3E4529A2844E00148ADB /* StringRender.i */,
 				AC7D3E4829A2844E00148ADB /* StringSearchers.i */,
 				AC7D3E4929A2844E00148ADB /* StringSplitters.i */,
 				AC7D3E3329A2844200148ADB /* BitFields.h */,
@@ -439,7 +426,6 @@
 				AC7D3E3C29A2844200148ADB /* JB_Date.h */,
 				AC7D3E3929A2844200148ADB /* JB_Dict.h */,
 				AC7D3E1829A2844200148ADB /* JB_DictCore.h */,
-				AC7D3E2C29A2844200148ADB /* JB_DirReader.h */,
 				AC7D3E0D29A2844100148ADB /* JB_DirReaderUnix.h */,
 				AC7D3E1C29A2844200148ADB /* JB_DirReaderWin32.h */,
 				AC7D3E2629A2844200148ADB /* JB_Errors.h */,
