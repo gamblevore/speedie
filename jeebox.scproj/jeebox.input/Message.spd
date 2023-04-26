@@ -105,12 +105,7 @@ class Message (RingTree)
 		Opt NoRefCounts
 		|| Braces = (self is style2)  or  !.hasany  or .name or  (self in @arg)
 			fs <~ '{'
-		if .name 
-			fs <~ '^'
-			fs <~ '"'
-			fs.appendescape(.name)
-			fs <~ '"'
-		.FSListArg( fs )
+		.FSListArg( fs ) // the name is already rendered by this!!
 		if Braces
 			fs.IndentLine
 			fs <~ '}'
