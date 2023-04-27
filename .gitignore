@@ -20,3 +20,5 @@ xcuserdata/
 *.scproj/Cpp/
 **/DerivedData/
 **/.todo
+*.args
+Utils/jz
