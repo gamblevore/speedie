@@ -96,7 +96,7 @@ function @jbin.JoinParseTest (|string|)
 	|| In = out.getresult.stream
 
 	|| result = Message()
-	while !in.isended
+	while !in.NoMoreChunks
 		result <~ in.Parse_Jbin
 	return result.render
 
