@@ -59,6 +59,9 @@ class StringStream
 		ifn .data has 1
 			require .NextChunk
 		return .data.byte
+		
+	syntax Compare (|int| n, |bool| aware, |int|)
+		return .length - n
 	
 	function Position (|int64|)
 		return .data.position + .StartFrom
@@ -115,6 +118,7 @@ class StringStream
 		ifn n > 0 and skip < n
 			return ""
 		if (.data has n) or (._IsEnded)
+			(n min= .Remaining)
 			|| pos = .data.position		// no need use the .startfrom
 			.data.position = n + pos
 			return .data.syntaxaccess(pos + skip, .data.position)

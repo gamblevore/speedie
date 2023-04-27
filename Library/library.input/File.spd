@@ -121,7 +121,7 @@ class File (String)
 		|| f = .Resolve(allowmissing).file
 			|| S = f.readsafely(lim, allowmissing)
 			if s.IsCompressed
-				s = s.Decompress(nil, lim)
+				s = s.Decompress(lim, nil)
 			if s
 				|memorylayer--| L = (Message).CreateLayer(f) // these 3 lines should be one
 				L.use      // 2

@@ -10,10 +10,12 @@
 
 */
 
-
 function string.CompressInto (|jbin| j, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
+	.Stream.CompressInto(j, strength, st)
+
+function stringstream.CompressInto (|jbin| j, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
 	st := CompressionStats.All
-	st.len(j.length)
+	st.len(j.length) 
 	j.jinit
 	j.enter(@tmp, "µz")
 	j.addint(.length)
@@ -23,9 +25,8 @@ function string.CompressInto (|jbin| j, |int|Strength=mzlab.default, |&compressi
 	|| ChunkSize = 1MB
 	if strength >= mzlab.strong
 		ChunkSize = 4MB
-	while Curr < self
-		|| s = self[curr, curr+Chunksize]
-		Curr += ChunkSize
+	while self
+		|| s = .str(Chunksize)
 		|| Place = j.OpenStream
 		if Mode
 			j.BalzCompressChunk(s, strength >= mzlab.strongest)
@@ -37,7 +38,7 @@ function string.CompressInto (|jbin| j, |int|Strength=mzlab.default, |&compressi
 	j.CompressChunk(nil) // cleanup
 
 
-helper stringstream.DecompressInto (|&compressionstats| st, |int| lim, |faststring| fs, |bool|)
+helper stringstream.DecompressInto (|faststring| fs, |int| lim=int.max, |&compressionstats| st=nil, |bool|)
 	if !.IsCompressed
 		fs <~ .readall
 		return true
