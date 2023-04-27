@@ -10,21 +10,17 @@
 
 */
 
-function string.CompressInto (|jbin| j, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
-	.Stream.CompressInto(j, strength, st)
 
 function stringstream.CompressInto (|jbin| j, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
+	expect (self!=nil) ("Nil object given to CompressInto")
 	st := CompressionStats.All
+	|| Mode = ("B", "")(strength >= mzlab.strong)
+	|| ChunkSize = (4MB,1MB)(mode) // don't change these! compression will fail.
 	st.len(j.length) 
 	j.jinit
 	j.enter(@tmp, "µz")
 	j.addint(.length)
-	|| Mode = ("B", "")(strength >= mzlab.strong)
 	j.enter(@arg, Mode)
-	|| Curr = 0
-	|| ChunkSize = 1MB
-	if strength >= mzlab.strong
-		ChunkSize = 4MB
 	while self
 		|| s = .str(Chunksize)
 		|| Place = j.OpenStream
@@ -33,12 +29,14 @@ function stringstream.CompressInto (|jbin| j, |int|Strength=mzlab.default, |&com
 		  else
 			j.CompressChunk(s)
 		j.CloseStream(Place)
+		j.flush	
 		st.LiveUpdate(s, j.length)
 	j.up(2)
 	j.CompressChunk(nil) // cleanup
 
 
 helper stringstream.DecompressInto (|faststring| fs, |int| lim=int.max, |&compressionstats| st=nil, |bool|)
+	expect (self!=nil) ("Nil object given to CompressInto")
 	if !.IsCompressed
 		fs <~ .readall
 		return true
@@ -67,6 +65,7 @@ helper stringstream.DecompressInto (|faststring| fs, |int| lim=int.max, |&compre
 		|| Mode = arg.name
 		while
 			|| c = .NextMsg(arg, @bin) #loop
+			|| s = c.name
 			if Mode == "B"
 				|| Chunk = 4MB min total_size // more messy but more correct
 				loop fs.BalzDecompressChunk(c.name, chunk)
@@ -74,6 +73,7 @@ helper stringstream.DecompressInto (|faststring| fs, |int| lim=int.max, |&compre
 									// it could have issues if the faststring had previous data.
 			  else
 				loop fs.DecompressChunk(c.name, total_size)
+			fs.Flush
 			st.LiveUpdate(c.name, fs.StreamLength)
 			c.remove
 			

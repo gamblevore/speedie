@@ -6,7 +6,7 @@ class StringStream
 	|int|		Length
 	|int|		ChunkSize
 	|int| 		StartFrom
-	|bool| 		_IsEnded
+	|bool| 		_NoMoreChunks
 	|object--|	UserObj // for jbin
 
 	linkage:cpp_Part SS
@@ -18,6 +18,7 @@ class StringStream
 		d := ""
 		.data.readfrom = d
 		.length = d.length
+		._NoMoreChunks = true
 	constructor (|file| file, |int| ChunkSize=4MB)
 		cpp_part ConstructorStream
 		file.close
@@ -32,7 +33,7 @@ class StringStream
 	helper ReadChunk (|bool|)
 		.data.readfrom = .file.read(.chunksize)		// for now
 		if .data.readfrom.length < .chunksize
-			._isended = true // not technically true for pipes... but this will do for now!
+			._NoMoreChunks = true // not technically true for pipes... but this will do for now!
 		return .data.readfrom
 	
 	function Skip (|int| p = 1)
@@ -105,8 +106,8 @@ class StringStream
 		rz = .str(n)
 		.Position = p
 	
-	function IsEnded (|bool|)
-		if ._isended
+	function NoMoreChunks (|bool|)
+		if ._NoMoreChunks
 			return true
 		if .data.Remaining <= 0
 			if !.file
@@ -114,11 +115,11 @@ class StringStream
 			if .length <= .startfrom
 				return true
 				
-	function Str (|int| n, |int|skip=0, |string|)
+	 function Str (|int| n, |int| skip = 0, |string|)
 		ifn n > 0 and skip < n
 			return ""
-		if (.data has n) or (._IsEnded)
-			(n min= .Remaining)
+		if (.data has n) or (.NoMoreChunks)
+			(n min= .remaining)
 			|| pos = .data.position		// no need use the .startfrom
 			.data.position = n + pos
 			return .data.syntaxaccess(pos + skip, .data.position)
@@ -157,8 +158,13 @@ class StringStream
 
 
 	
-function string.Stream (|string|T="", |StringStream|)
+function string.Stream (|string| Header, |StringStream|)
+	cpp_part StreamWithHeader
 	rz = stringstream(self)
-	if !rz.test(t)
+	if !rz.test(Header)
 		rz = nil
+
+	
+function string.Stream (|StringStream|)
+	return stringstream(self)
 

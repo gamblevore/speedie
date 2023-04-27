@@ -5,18 +5,19 @@ extend string
 		|| j = jbin(0)
 		.CompressInto(j, Strength, st)
 		return j
-	
-	function CompressInto (|file| file, |int|Strength=mzlab.default, |&compressionstats| st=nil)
-		cpp_part CompressFileInto
-		.CompressInto(file.out, Strength, st)
+		
+	function CompressInto (|faststring| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
+		.Stream.CompressInto(fs, strength, st)
 	
 	function IsCompressed (|bool|)
 		// remove the arg version (longer string). when i feel like testing all my files that is.
 		return .isjbin and self[2, "C\06µz"] or self[2, "@\01C\06µz"]
 		
-	function DecompressInto (|faststring| fs, |&compressionstats| st=nil, |bool|)
-		return .stream.Decompressinto(fs, 256MB, st)
-		
+	
+	function DecompressInto (|faststring| fs, |int| lim=256MB,  |&compressionstats| st=nil, |bool|)
+		cpp_part DecompressInto
+		return .stream.Decompressinto(fs, lim, st)
+	
 	function Decompress (|int|lim=256MB, |&compressionstats| st=nil,  |StringThatWasReadSafely|)
 		return .stream.Decompress(lim, st)
 
@@ -34,11 +35,13 @@ function Stringstream.IsCompressed (|bool|)
 
 
 function FastString.CompressInto (|faststring| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil)
+	disabled "Do you really need this?"
 	|| str = string.fromptr(.resultptr, .length)
 	str.CompressInto(fs, Strength, st)
 
 
 function FastBuff.CompressInto (|faststring| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil)
+	// remove this? just call this directly?
 	.tmpstr.CompressInto(fs, Strength, st)
 
 	
@@ -134,7 +137,7 @@ Module MZLab
 		|| back = fs.GetResult.stream
 		for orig in inputs
 			expect orig == back.decompress
-		expect (back.IsEnded) and !back.Decompress.length
+		expect (back.NoMoreChunks) and !back.Decompress.length
 		"TestCompression passed."
 
 

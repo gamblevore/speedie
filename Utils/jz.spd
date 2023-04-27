@@ -1,7 +1,8 @@
 #!/usr/local/bin/speedie
 
 
-// can't stream compress large files it seems? decode fails. is it multi-chunk that fails?
+// can't stream compress large files it seems? decode fails. seems multi-chunk fails?
+// probably a flaw in the compressor.
 datatype Type (int)
 	flags // compressed should be an action?
 		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace
@@ -123,8 +124,8 @@ module Conv
 		if .data
 			size = .data.Length
 		|| speed = ""
-		|| s = ago.seconds
-		|| s2 = (s*1000, s)(s < 0.01)
+		|| s    = ago.seconds
+		|| s2   = (s*1000, s)(s < 0.01)
 		|| unit = ("ms", "s")(s < 0.01)
 		conv.speed <~ "    $Name: ${s2}$unit"
 		if s
@@ -135,12 +136,12 @@ module Conv
 		printline out
 		|| dest = out.out
 		|| src = .in.in
-		.start = date()
+		.start = date() 
 		.size = .in.size
 		if Decomp
 			src.DecompressInto(dest)
 			.time("Decompress(streamed)")
-		  else
+		  else 
 			src.compressinto(dest) 
 			.time("Compress(streamed)")
 	
@@ -210,17 +211,17 @@ module Conv
 		if destpath
 			return destpath
 		
+		if dest is selfreplace
+			return .in
 		|| ext = ""
 		if dest is box
 			ext = "box"
 		  elseif dest is jbin
 			ext = "jbin"
-		rz = .in
-		if dest isnt selfreplace
-			rz = .in.RemoveExt("mz")
-			if ext
-				rz = rz.SetExt(ext) // killing good exts like "spd" <-- "". sigh
-			if dest is compressed
-				rz = rz.AddExt("mz")
+		rz = .in.RemoveExt("mz")
+		if ext  and  rz isa "box" or "jbin"
+			rz = rz.SetExt(ext)
+		if dest is compressed
+			rz = rz.AddExt("mz")
 	
 	
