@@ -1,6 +1,6 @@
 #!/usr/local/bin/speedie
 
-// give jz an "-o=file" switch
+
 datatype Type (int)
 	flags
 		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace
@@ -23,7 +23,6 @@ datatype Type (int)
 			fs <~ "plain"
 
 
-|| DefaultStrength = mzlab.default
 
 function App.GetActions (|Type|)
 	for s in app.Switches
@@ -34,20 +33,27 @@ function App.GetActions (|Type|)
 			rz |= type.box
 		  elseif name ~= "b"
 			rz |= type.jbin
-		  elseif name[0].LowerCase == 'c'
-			rz |= type.compressed
-			|| str = s.ArgValue
-				DefaultStrength = str.int max 0
 		  elseif name ~= "s"
 			rz |= type.selfreplace
 		  elseif name ~= "p"
 			rz |= type.stdout
-			check (app.args == 1) ("Can't write multiple files to stdout.")
+			check (app.args == 1) ("Can't write multiple files with this switch.")
 		  else
-			error "Unknown switch $s"
+			|| v = s.ArgValue
+			if name ~= "c"
+				rz |= type.compressed
+				conv.DefaultStrength = v.int max 0
+			  elseif name ~= "f"
+				Conv.destpath = v
+				check (app.args == 1) ("Can't write multiple files with this switch.")
+			  else
+				error "Unknown switch $s"
+			if !v
+				error "Add a value, eg: --$s=value"
 
 	rz |= type.plain
 	check ((rz & type.actions).CountBits <= 1) ("Too many actions.")
+
 
 
 function app.usage (|string|)
@@ -69,16 +75,21 @@ function app.usage (|string|)
 		jz -b A.xml						// xml to jbin
 "
 
+
 main  
 	if app.yes("test")
 		return 1-MZLab.TestMz(app[0]) 
-		// so we wanna run the mzlab thing
 		
-	|| action = .getactions$
+	|| action = .GetActions$
 	for r in (app.args  #expect (.Usage))
-		|| StartTime = date()
-		|| data = r.ReadFile(int.max, false)
-			conv(data, r, starttime).Process(Action)
+		|| f = r.file
+		if f.IsDir
+			"$f is a folder"
+		  else
+			|| StartTime = date()
+			|| data = f.ReadAll(int.max, false)
+				conv(data, r, starttime).Process(Action)
+				printline conv.Speed.GetResult
 	
 	if stderr.ok and !conv.done
 		"Nothing to do. All files already in destination format."
@@ -86,23 +97,33 @@ main
 
 
 class Conv
-	|string|	Data
-	|string|	In
-	|date| 		Start
-	module: |int| Done
+	|string|		Data
+	|string|		In
+	|date| 			Start
+	module
+		|int|		Done
+		|string|	DestPath
+		||			DefaultStrength = mzlab.strong
+		|| 			Speed = faststring()
 	
 	constructor (|string| Data, |string| in, |date| before)
 		.data = data
 		.in = in
 		.Start = before
-		.Time("Read")
+		.Time("Read ")
 	
 	function Time (|string| Name)
 		|| ago = .Start.ago
 		|float| scale = 1MB
 		|float| size = .data.Length
+		|| speed = ""
 		|| s = ago.seconds
-		"$Name: ${s}s  (${Size/(scale*s)}MB/s)"
+		|| s2 = (s*1000, s)(s < 0.01)
+		|| unit = ("ms", "s")(s < 0.01)
+		conv.speed <~ "    $Name: ${s2}$unit"
+		if s
+			conv.speed <~ "  (${Size/(scale*s)}MB/s)\n"
+		
 
 	function Process (|Type| Dest, |bool|)
 		|type| Detected = .data.IsCompressed * type.compressed
@@ -118,7 +139,7 @@ class Conv
 		|| Do = Dest&type.Actions
 			.start = date.now
 			|| parse = .data.parse
-			expect (parse or dest is report) ("File isn't parseable.")
+			expect (parse  or  dest is report) ("File isn't parseable.")
 			if parse
 				.time("Parse")
 			if !parse
@@ -150,17 +171,26 @@ class Conv
 			.start = date.now
 			.data = .data.Compress(DefaultStrength max 0)
 			.time("Compress")
+			
 		if dest is stdout
 			print .data
 		  else
-			|| Out = .in
-			if dest isnt selfreplace
-				out = .in.RemoveExt("mz")
-				if ext
-					out = out.SetExt(ext) // killing good exts like "spd" <-- "". sigh
-				if dest is compressed
-					out = out.AddExt("mz")
+			|| Out = .out(dest, ext)
 			if Out <~ .data
 				printline out
 		
 		return true
+
+
+	function Out (|type| dest, |string| ext,  |string|)
+		if destpath
+			return destpath
+		rz = .in
+		if dest isnt selfreplace
+			rz = .in.RemoveExt("mz")
+			if ext
+				rz = rz.SetExt(ext) // killing good exts like "spd" <-- "". sigh
+			if dest is compressed
+				rz = rz.AddExt("mz")
+	
+	
