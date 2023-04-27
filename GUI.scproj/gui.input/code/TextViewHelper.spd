@@ -229,6 +229,7 @@ class TextViewLine (ringtree)
 
 		|| sel = (x+start*N,  y,  x+finish*N,  y+parent.lineheight)
 		sel.x -= (Start == 0)
+		sel.x--
 		
 		|| LinePos = r.x2-(1+m.x1)
 		if (.text[linepos].IsTextline) or (r.x2 > m.x2)
