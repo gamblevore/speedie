@@ -1,14 +1,18 @@
 #!/usr/local/bin/speedie
 
 
+// can't stream compress large files it seems? decode fails. is it multi-chunk that fails?
 datatype Type (int)
-	flags
+	flags // compressed should be an action?
 		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace
 	
 	syntax is (|Type| test, |bool|)
 		return self & test
 	syntax isnt (|Type| test, |bool|)
 		return !(self & test)
+	
+	function Format (|Type|)
+		return Box (|) jbin (|) xml
 	
 	render
 		if self is Compressed
@@ -42,14 +46,14 @@ function App.GetActions (|Type|)
 			|| v = s.ArgValue
 			if name ~= "c"
 				rz |= type.compressed
-				conv.DefaultStrength = v.int max 0
+				if v
+					conv.DefaultStrength = v.int max 0
 			  elseif name ~= "f"
 				Conv.destpath = v
 				check (app.args == 1) ("Can't write multiple files with this switch.")
+				check (v) "Add a value, eg: --$s=value"
 			  else
 				error "Unknown switch $s"
-			if !v
-				error "Add a value, eg: --$s=value"
 
 	rz |= type.plain
 	check ((rz & type.actions).CountBits <= 1) ("Too many actions.")
@@ -86,36 +90,38 @@ main
 		if f.IsDir
 			"$f is a folder"
 		  else
-			|| StartTime = date()
-			|| data = f.ReadAll(int.max, false)
-				conv(data, r, starttime).Process(Action)
-				printline conv.Speed.GetResult
+			conv.in = f
+			conv.Process(action)
+			conv.End
 	
 	if stderr.ok and !conv.done
 		"Nothing to do. All files already in destination format."
 
 
 
-class Conv
+module Conv
 	|string|		Data
-	|string|		In
-	|date| 			Start
-	module
-		|int|		Done
-		|string|	DestPath
-		||			DefaultStrength = mzlab.strong
-		|| 			Speed = faststring()
+	|file|			In
+	|date|			Start
+	|float| 		Size
+	|int|			Done
+	|string|		DestPath
+	||				DefaultStrength = mzlab.strong
+	|| 				Speed = faststring()
 	
-	constructor (|string| Data, |string| in, |date| before)
-		.data = data
-		.in = in
-		.Start = before
-		.Time("Read ")
+
+	function End
+		.in = nil
+		.data = nil
+		.start = nil
+		printline .Speed.GetResult
+	
 	
 	function Time (|string| Name)
 		|| ago = .Start.ago
 		|float| scale = 1MB
-		|float| size = .data.Length
+		if .data
+			size = .data.Length
 		|| speed = ""
 		|| s = ago.seconds
 		|| s2 = (s*1000, s)(s < 0.01)
@@ -123,68 +129,92 @@ class Conv
 		conv.speed <~ "    $Name: ${s2}$unit"
 		if s
 			conv.speed <~ "  (${Size/(scale*s)}MB/s)\n"
+		 
 		
+	function CompressOnly (|bool| Decomp, |string| out)
+		printline out
+		|| dest = out.out
+		|| src = .in.in
+		.start = date()
+		.size = .in.size
+		if Decomp
+			src.DecompressInto(dest)
+			.time("Decompress(streamed)")
+		  else
+			src.compressinto(dest) 
+			.time("Compress(streamed)")
+	
 
-	function Process (|Type| Dest, |bool|)
-		|type| Detected = .data.IsCompressed * type.compressed
-		ifn Dest&type.Actions // (de)compress only
-			require (detected is Compressed) == (dest isnt compressed)
-		if Detected and .data.IsCompressed
+	function Process (|Type| Dest)
+		|| FileIsCompressed = .in.IsCompressed
+		|type| Detected = FileIsCompressed * type.compressed // only read compressed at first
+		if Dest&type.Actions
 			.start = date()
-			.data = .data.Decompress(int.max)
-			.time("Decompress")
+			.data = .in.ReadAll(int.max, false)
+			.Time("Read ")
+			if FileIsCompressed
+				.start = date()
+				.data = .data.Decompress(int.max)
+				.time("Decompress")
+		  else
+			require FileIsCompressed == (dest isnt compressed)
 
 		++done
-		|| ext = ""
-		|| Do = Dest&type.Actions
-			.start = date.now
-			|| parse = .data.parse
-			expect (parse  or  dest is report) ("File isn't parseable.")
-			if parse
-				.time("Parse")
-			if !parse
-				detected |= type.plain
-			  elseif .data.IsJbin
-				detected |= type.jbin
-			  elseif parse.Find(@xml)
-				detected |= type.xml
-				if !(dest is report)
-					require parse.XMLToJeebox
-			  else
-				detected |= type.box
+		|| Out = .OutPath(dest)
+		
+		ifn Dest&type.Actions
+			.CompressOnly(FileIsCompressed, out)
+			return
+			
+		.start = date.now
+		|| parse = .data.parse
+		expect (parse  or  dest is report) ("File isn't parseable.")
+		if parse
+			.time("Parse")
+		if !parse
+			detected |= type.plain
+		  elseif .data.IsJbin
+			detected |= type.jbin
+		  elseif parse.Find(@xml)
+			detected |= type.xml
+			if dest isnt report
+				require parse.XMLToJeebox
+		  else
+			detected |= type.box
 
-			if Dest is report
-				"$.in is: ${detected.render}"
-				StdErr.clear
-				return true
- 
-			require Detected&type.actions != Do
-	
+		if Dest is report
+			"$.in is: ${detected.render}"
+			StdErr.clear
+			return
+
+		if (Detected.format != Dest.format)
+			.Start = date.now
 			if dest is box
 				.data = parse.Render
-				ext = "box"
 			  else
 				.data = parse.render_jbin
-				ext = "jbin"
-	
+			.time("Render")
+
 		if dest is compressed
 			.start = date.now
-			.data = .data.Compress(DefaultStrength max 0)
+			.data = .data.Compress(DefaultStrength)
 			.time("Compress")
 			
 		if dest is stdout
 			print .data
-		  else
-			|| Out = .out(dest, ext)
-			if Out <~ .data
-				printline out
-		
-		return true
+		  elseif Out <~ .data
+			printline out
 
 
-	function Out (|type| dest, |string| ext,  |string|)
+	function OutPath (|type| dest,  |string|)
 		if destpath
 			return destpath
+		
+		|| ext = ""
+		if dest is box
+			ext = "box"
+		  elseif dest is jbin
+			ext = "jbin"
 		rz = .in
 		if dest isnt selfreplace
 			rz = .in.RemoveExt("mz")
