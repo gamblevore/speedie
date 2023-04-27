@@ -176,7 +176,7 @@ class File (String)
 		return "/usr/bin/touch".SilentExecute([self])
 
 	
-	function Compare (|File| A, |string| Error="", |bool|)
+	function CompareFile (|File| A, |string| Error="", |bool|)
 		cpp_part FileCompare
 		|| code = .comparesub(a)
 		.Close
@@ -201,6 +201,8 @@ class File (String)
 		cpp_part FileCompareSub
 		if (.Size != A.Size)
 			return 1
+		A.close
+		.close
 		.Open(O_RDONLY)
 		A.Open(O_RDONLY)
 		
@@ -213,7 +215,7 @@ class File (String)
 		} (S_)
 
 	
-	function Compare (|String| A, |string| Error="", |bool|)
+	function CompareData (|String| A, |string| Error="", |bool|)
 		|| code = 0
 		if (.Size != A.length)
 			code = 1
@@ -345,13 +347,6 @@ class File (String)
 
 	operator isdir (|string| ext, |bool|)
 		return .isdir and self isa ext
-
-	function MatchData (|string| s, |bool|)
-		cpp_part StrMatch
-		return .Compare(s)
-	
-	function MatchFile (|File| f, |bool|)
-		return .Compare(f,false)
 		
 	function DirectoryContains (|string| path, |bool|)
 		return path.pathfix starts .PathDir
@@ -379,7 +374,7 @@ class File (String)
 	
 	function string.In (|string|T="", |int| ChunkSize=4MB, |StringStream|)
 		|| f = .file
-		if f.exists
+		if f.mustexist("stream")
 			rz = stringstream(f, chunkSize)
 			if !rz.test(t)
 				rz = nil
