@@ -403,7 +403,7 @@ function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, t
 	printline
 	
 	require cpp2.mustexist and cpp3.mustexist
-	expect (Cpp2.matchFile(Cpp3)) "$Cpp2 doesn't match $Cpp3!"
+	require (Cpp2.CompareFile(Cpp3,cpp3))
 
 	return Test2.TestBatch and stderr.OK
 
@@ -436,7 +436,7 @@ function BackupCompiler (|bool|)
 	B.MakeEntirePath
 
 	|| backup1 = B["LatestBackup"] 
-	if backup1.matchFile( Product)
+	if backup1.CompareFile( Product)
 		return true
 
 	.ReplaceOld( product, b )
@@ -454,7 +454,7 @@ function BackupCompiler (|bool|)
 function InstallOne (|file| test)
 	test.parent.MakeDir
 	|| f0 = test.Path.ReplacePathComponent(-2, "Build").file
-	ifn Test.matchFile( f0)
+	ifn Test.CompareFile( f0)
 		Test.Copyto(f0)
 
 
