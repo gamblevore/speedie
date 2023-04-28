@@ -15,7 +15,7 @@ function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 	expect (self!=nil) ("Nil object given to CompressInto")
 	|jbin| j = faststring.use(dest)				#require
 	st := CompressionStats.All
-	|| Mode = ("B", "")(strength >= mzlab.strong)
+	|| Mode = ("ro", "")(strength >= mzlab.strong)
 	|| ChunkSize = (4MB, 1MB)(mode)				// don't change these! compression will fail.
 	st.len(j.length) 
 	j.jinit
@@ -73,7 +73,7 @@ helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 			|| c = .NextMsg(arg, @bin) #loop
 			|| s = c.name
 			|| Expected = Remaining min ChunkMax
-			if Mode == "B"
+			if Mode
 				loop fs.BalzDecompressChunk(c.name, Expected)
 			  else
 				loop fs.DecompressChunk(c.name, Expected)
