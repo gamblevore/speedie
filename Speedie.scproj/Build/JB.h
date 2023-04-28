@@ -55,6 +55,8 @@ typedef byte Syntax;
 
 typedef int TerminalColor;
 
+typedef int Type;
+
 typedef u16 ASMParam;
 
 typedef uint64 __junktest_7__;
@@ -847,7 +849,7 @@ JBClass ( StringStream , JB_Object ,
 	int Length;
 	int ChunkSize;
 	int StartFrom;
-	bool _IsEnded;
+	bool _NoMoreChunks;
 	JB_Object* UserObj;
 );
 
@@ -1231,19 +1233,27 @@ extern SCFunction* SC__Comp_TernaryFunc;
 extern SCFunction* SC__Comp_TernaryFunc2;
 extern FastString* SC__Comp_TimerOutput;
 extern SCBase* SC__Comp_VisibleFuncs;
+extern JB_String* SC__Conv_Data;
+extern int SC__Conv_DefaultStrength;
+extern JB_String* SC__Conv_DestPath;
+extern int SC__Conv_Done;
+extern JB_File* SC__Conv_In;
+extern float SC__Conv_Size;
+extern FastString* SC__Conv_Speed;
+extern Date SC__Conv_Start;
 #define kSC__CustomOps_LeftOnlyIsVector (65)
 #define kSC__CustomOps_Needed (64)
 #define kSC__CustomOps_NotCustom (0)
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1826])
+#define kJB__ErrorColors_bold (JB_LUB[1827])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1827])
-#define kJB__ErrorColors_good (JB_LUB[1828])
-#define kJB__ErrorColors_normal (JB_LUB[1829])
-#define kJB__ErrorColors_underline (JB_LUB[1828])
-#define kJB__ErrorColors_warn (JB_LUB[1830])
+#define kJB__ErrorColors_error (JB_LUB[1828])
+#define kJB__ErrorColors_good (JB_LUB[1829])
+#define kJB__ErrorColors_normal (JB_LUB[1830])
+#define kJB__ErrorColors_underline (JB_LUB[1829])
+#define kJB__ErrorColors_warn (JB_LUB[1831])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1458,8 +1468,8 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
 #define kSC_BitAnd (JB_LUB[339])
 #define kSC_BitNot (JB_LUB[438])
-#define kSC_BitOr (JB_LUB[645])
-#define kSC_BitXor (JB_LUB[1831])
+#define kSC_BitOr (JB_LUB[644])
+#define kSC_BitXor (JB_LUB[1832])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1489,7 +1499,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1832])
+#define kJB_SaverStart1 (JB_LUB[1833])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1632,6 +1642,16 @@ extern Array* JB__ErrorSeverity_names;
 #define kSC__SCBaseType_Struct (3)
 extern int JB__Syx_CurrFuncID;
 extern int JB__Syx_MaxFuncID;
+#define kSC__Type_actions ((8 | 16) | 32)
+#define kSC__Type_Box (8)
+#define kSC__Type_compressed (1)
+#define kSC__Type_Jbin (16)
+#define kSC__Type_LargestFlag (255)
+#define kSC__Type_plain (2)
+#define kSC__Type_Report (32)
+#define kSC__Type_selfreplace (128)
+#define kSC__Type_stdout (64)
+#define kSC__Type_xml (4)
 #define kJB__uint_max (4294967295)
 #define kJB__uint_min (0)
 #define kJB__uint16_max (65535)
@@ -2216,6 +2236,13 @@ bool SC_Comp__TryVariousStartModes();
 JB_File* SC_Comp__usingScript(JB_File* f);
 
 JB_String* SC_Comp__VariantSuffix();
+
+
+
+// Conv
+int SC_Conv__Init_();
+
+int SC_Conv__InitCode_();
 
 
 
@@ -3592,8 +3619,6 @@ bool JB_int_SyntaxAccess(int self, int bit);
 
 int JB_int_SyntaxAccessSet(int self, int bit, bool Value);
 
-int JB_int_SyntaxCompare(int self, JB_String* s, bool aware);
-
 int JB_int__max();
 
 int JB_int__min();
@@ -3700,6 +3725,9 @@ Syntax JB_Syx__StdNew(fpMsgRender msg, JB_String* name, JB_String* LongName);
 
 
 // TerminalColor
+
+
+// Type
 
 
 // uint
@@ -4296,8 +4324,6 @@ int SC_IR_FilePos(IR* self);
 void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
-
-void SC_IR_Print(IR* self);
 
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
@@ -5070,6 +5096,8 @@ FastString* JB_FS__New();
 
 FastString* JB_FS__NewSize(int size);
 
+FastString* JB_FS__Use(JB_Object* other);
+
 
 
 // JB_FixedDict
@@ -5113,8 +5141,6 @@ void JB_Lk_Constructor(LeakTester* self, JB_String* name);
 void JB_Lk_destructor(LeakTester* self);
 
 void JB_Lk_FinalTest(LeakTester* self);
-
-void JB_Lk_Test1(LeakTester* self);
 
 void JB_Lk_Test2(LeakTester* self);
 
@@ -5527,7 +5553,7 @@ JB_String* JB_Str_Child(JB_String* self, JB_String* cname);
 
 JB_String* JB_Str_Compress(JB_String* self, int Strength, CompressionStats* st);
 
-void JB_Str_CompressInto(JB_String* self, FastString* j, int Strength, CompressionStats* st);
+void JB_Str_CompressInto(JB_String* self, FastString* fs, int Strength, CompressionStats* st);
 
 bool JB_Str_CompressTest(JB_String* self, bool report, int which);
 
@@ -5541,7 +5567,7 @@ int JB_Str_Count(JB_String* self, byte b);
 
 ErrorInt JB_Str_DebugExecute(JB_String* self, Array* Args, FastString* Out, FastString* Errs);
 
-JB_String* JB_Str_Decompress(JB_String* self, CompressionStats* st, int lim);
+JB_String* JB_Str_Decompress(JB_String* self, int lim, CompressionStats* st);
 
 Dictionary* JB_Str_Dict(JB_String* self, byte sep);
 
@@ -5649,7 +5675,7 @@ bool JB_Str_optionbool(JB_String* self);
 
 int JB_Str_optionint(JB_String* self);
 
-FastString* JB_Str_out(JB_String* self);
+FastString* JB_Str_Out(JB_String* self);
 
 Ind JB_Str_OutByteWithByteIntInt(JB_String* self, byte find, int Start, int After);
 
@@ -5695,7 +5721,7 @@ Array* JB_Str_Split(JB_String* self, byte sep);
 
 JB_String* JB_Str_Squeeze(JB_String* self);
 
-StringStream* JB_Str_Stream(JB_String* self, JB_String* T);
+StringStream* JB_Str_Stream(JB_String* self);
 
 JB_String* JB_Str_SyntaxAccess(JB_String* self, JB_String* s);
 
@@ -5771,11 +5797,13 @@ StringFields* JB_FI__New(JB_String* Source, byte Sep);
 // JB_StringStream
 byte JB_SS_Byte(StringStream* self);
 
+void JB_SS_CompressInto(StringStream* self, JB_Object* dest, int Strength, CompressionStats* st);
+
 void JB_SS_Constructor(StringStream* self, JB_String* d);
 
-JB_String* JB_SS_Decompress(StringStream* self, CompressionStats* st, int lim);
+JB_String* JB_SS_Decompress(StringStream* self, int lim, CompressionStats* st);
 
-bool JB_SS_DecompressInto(StringStream* self, CompressionStats* st, int lim, FastString* fs);
+bool JB_SS_DecompressInto(StringStream* self, JB_Object* dest, int lim, CompressionStats* st);
 
 void JB_SS_destructor(StringStream* self);
 
@@ -5793,6 +5821,8 @@ Message* JB_SS_NextMsgExpect(StringStream* self, Message* parent, Syntax fn, JB_
 
 uint64 JB_SS_NextMsgInfo(StringStream* self);
 
+bool JB_SS_NoMoreChunks(StringStream* self);
+
 Message* JB_SS_Parse_Jbin(StringStream* self, bool Burst);
 
 int64 JB_SS_Position(StringStream* self);
@@ -5802,6 +5832,8 @@ void JB_SS_PositionSet(StringStream* self, int64 Value);
 JB_String* JB_SS_ReadAll(StringStream* self);
 
 bool JB_SS_ReadChunk(StringStream* self);
+
+int JB_SS_Remaining(StringStream* self);
 
 JB_String* JB_SS_Str(StringStream* self, int n, int skip);
 
@@ -5968,9 +6000,13 @@ JB_File* JB_File_Child(JB_File* self, JB_String* name, bool errs);
 
 ErrorInt JB_File_CodeSign(JB_File* self, JB_String* sign);
 
-bool JB_File_Compare(JB_File* self, JB_String* A, JB_String* Error);
+bool JB_File_CompareData(JB_File* self, JB_String* A, JB_String* Error);
+
+bool JB_File_FileCompare(JB_File* self, JB_File* A, JB_String* Error);
 
 bool JB_File_CompareMsg(JB_File* self, ErrorInt code, JB_String* Error);
+
+ErrorInt JB_File_FileCompareSub(JB_File* self, JB_File* A);
 
 Message* JB_File_conf(JB_File* self, int lim);
 
@@ -5981,10 +6017,6 @@ ErrorInt JB_File_DeleteAll(JB_File* self);
 bool JB_File_DirectoryContains(JB_File* self, JB_String* path);
 
 ErrorInt JB_File_LinkToSet(JB_File* self, JB_String* Value);
-
-bool JB_File_StrMatch(JB_File* self, JB_String* s);
-
-bool JB_File_MatchFile(JB_File* self, JB_File* f);
 
 bool JB_File_MustExist(JB_File* self, JB_String* operation);
 
@@ -8188,7 +8220,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
