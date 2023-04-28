@@ -70,7 +70,7 @@ class File (String)
 	function Length (|int|)
 		disabled "Do you mean the file's size or the file's path length?" 
 	
-	function Size (|uint64|)
+	function Size (|int64|) // actually ints are less buggy. Like "|| NewSize = oldsize-1" with uint is bad.
 		cpp_wrapper JB_File_Size
 
 	function Size (assigns:|int|N)
@@ -147,7 +147,7 @@ class File (String)
 			rz = .read(b-a)
 			if WasClosed
 				.close
-
+		
 	function IsCompressed (|bool|)
 		return .section(0,16).iscompressed
 
@@ -231,10 +231,7 @@ class File (String)
 	function MustExist (|string| operation = "", |bool|)
 		if .exists
 			return true
-		|| eerr = "Can’t find '"
-		if (self != nil)
-			eerr += self
-		eerr += "'"
+		|| eerr = "File does not exist"
 		if self and super[0] != '/'
 			eerr += " at "
 			eerr += app.cwd
