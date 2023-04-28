@@ -19,7 +19,7 @@ struct FlowPart
 		return .buff.Alloc(1MB)
 
 	function Flush
-		.buff.CompressInto(.write, .stats)
+		.buff.tmpstr.CompressInto(.write, .stats)
 		.buff.Curr = .buff.start
 		.write.Flush
 	
