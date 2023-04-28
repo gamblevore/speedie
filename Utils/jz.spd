@@ -1,8 +1,6 @@
 #!/usr/local/bin/speedie
 
-
-// can't stream compress large files it seems? decode fails. seems multi-chunk fails?
-// probably a flaw in the compressor.
+// decomp rating needs to be on the actual DECOMP size!!
 datatype Type (int)
 	flags // compressed should be an action?
 		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace
@@ -29,6 +27,9 @@ datatype Type (int)
 
 
 
+function App.Singlefile (|string| sw)
+	check (app.args == 1) ("Can't write multiple files with switch: " + sw)
+	
 function App.GetActions (|Type|)
 	for s in app.Switches
 		|| name = s.ArgName
@@ -42,7 +43,7 @@ function App.GetActions (|Type|)
 			rz |= type.selfreplace
 		  elseif name ~= "p"
 			rz |= type.stdout
-			check (app.args == 1) ("Can't write multiple files with this switch.")
+			.SingleFile(name)
 		  else
 			|| v = s.ArgValue
 			if name ~= "c"
@@ -51,8 +52,8 @@ function App.GetActions (|Type|)
 					conv.DefaultStrength = v.int max 0
 			  elseif name ~= "f"
 				Conv.destpath = v
-				check (app.args == 1) ("Can't write multiple files with this switch.")
-				check (v) "Add a value, eg: --$s=value"
+				.SingleFile(name)
+				check (v) "Add a value, eg: --f=value"
 			  else
 				error "Unknown switch $s"
 
@@ -64,13 +65,14 @@ function App.GetActions (|Type|)
 function app.usage (|string|)
 	return "Usage: ${.filename} File1 [File2, ...],  or: ${.filename} FileIn -p > FileOut
 	options:
-		-j		Convert to jeebox
-		-b		Convert to jbin
-		-c		Compress
-		-s		Replace file in-place
-		-p		Print to stdout
-		-test	Tests if compression works using input file
-		-r		Just report types, otherwise do nothing.
+		-j			Convert to jeebox
+		-b			Convert to jbin
+		-c			Compress
+		-s			Replace file in-place
+		-p			Print to stdout
+		-test		Tests if compression works using input file
+		-r			Just report types, otherwise do nothing
+		-f=name 	Sets the filename of output
 
 	examples:
 		jz -j A.xml						// xml to box
@@ -87,7 +89,7 @@ main
 		
 	|| action = .GetActions$
 	for r in (app.args  #expect (.Usage))
-		|| f = r.file
+		|| f = r.file 			
 		if f.IsDir
 			"$f is a folder"
 		  else
@@ -142,7 +144,7 @@ module Conv
 			src.DecompressInto(dest)
 			.time("Decompress(streamed)")
 		  else 
-			src.compressinto(dest) 
+			src.CompressInto(dest, DefaultStrength) 
 			.time("Compress(streamed)")
 	
 
@@ -223,5 +225,8 @@ module Conv
 			rz = rz.SetExt(ext)
 		if dest is compressed
 			rz = rz.AddExt("mz")
+		  elseif (.in isa "mz") and rz.FileExists
+			"    (Adding '.back' to avoid file-overwrite.)"
+			rz += ".back"
 	
 	
