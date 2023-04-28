@@ -139,14 +139,14 @@ class File (String)
 		rz = .read(n)
 		.offset = i
 	
-	function section (|int| a, |int| b, |string|)
+	function Section (|int| a, |int| b, |string|)
 		cpp_part AccessPeek
-		|| WasOpen = .descriptor
-		if .open
+		|| WasClosed = .descriptor < 0
+		if .open(File.O_RDONLY)
 			.offset = a
 			rz = .read(b-a)
-		if wasopen < 0
-			.close
+			if WasClosed
+				.close
 
 	function IsCompressed (|bool|)
 		return .section(0,16).iscompressed
@@ -365,12 +365,14 @@ class File (String)
 	function Writer (|FastString|) // streamout
 		disabled "Use .out"
 	
-	function string.out (|faststring|)
-		|| f = .file
-			f.close
-			if f.OpenEmpty
-				rz = FastString()
-				rz.file = f
+	
+	function string.Out (|Faststring|) // OK so this is far too low. Lets just put it on the actual types?
+		|| f = .file #require
+		f.close
+		if f.OpenEmpty
+			rz = FastString()
+			rz.file = f
+
 	
 	function string.In (|string|T="", |int| ChunkSize=4MB, |StringStream|)
 		|| f = .file

@@ -66,7 +66,7 @@ inline bool DErr(bool Cond, const char* Err) {
 }
 
 
-static bool arr_reserve(FastBuff& B,  JB_String* self,  int TotalLength,  FastString* fs) {
+static bool arr_reserve(FastBuff& B,  JB_String* self,  int Expected,  FastString* fs) {
 	auto Addr	= self->Addr;
 	auto End	= Addr + self->Length;
 
@@ -77,7 +77,7 @@ static bool arr_reserve(FastBuff& B,  JB_String* self,  int TotalLength,  FastSt
 	B.Read		= Addr;
 	B.ReadEnd	= End;
 
-	B.Expected = min(Chunk, TotalLength - fs->Length);
+	B.Expected = Expected;
 	B.Write = JB_FS_NeedSpare(fs, B.Expected);
 	DReq (B.Write, "Out of memory", 0);
 	B.WriteStart = fs->ResultPtr + fs->Length; // always the same as B.Write? 

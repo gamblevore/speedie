@@ -268,9 +268,9 @@ u8* DeBig_(u8* Addr, FastBuff& fb, u32 Code, u8* End) {
 }
 
   
-extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int TotalLength) {
+extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Expected) {
 	FastBuff& fb = FB;
-	require (arr_reserve(fb, self, TotalLength, fs));
+	require (arr_reserve(fb, self, Expected, fs));
 	u8* Addr = fb.Read; u8* AddrEnd = fb.ReadEnd;
 
 	while (Addr < AddrEnd) {

@@ -111,6 +111,15 @@ class FastString {
 
 
 	module
+		function Use (|object| other, |FastString|)
+			if other isa FastString
+				return other
+			if other isa string
+				return other.out
+			if other
+				error (other, "Faststring can't use this object.")
+		
+		
 		function New (|FastString| other, |FastString|)
 			cpp_wrapper JB_FS__FastNew
 		

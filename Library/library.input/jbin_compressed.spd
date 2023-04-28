@@ -1,0 +1,32 @@
+
+
+/*
+	Interesting idea for jbin compression concept
+	Basically, we reuse node strings, and types. Also allows the strings to be replaced with an "ID" type.
+	Ideally, we can just take a jbin data file and compress it. So we take in data, not objects!
+
+	OK so... lets display a diagram for our ideas.
+	
+	Sections:
+		Header
+		Strings					length + data(raw)
+		Types+Lengths			length + each(length+type)
+		Nodes					length + each(ID + direction. 2 bytes min)		
+		
+	Header contents:
+		"SMOL" // header start
+		types count (uint24)
+		nodes count (uint24)
+	So we need 2 numbers.
+	
+	Next comes the header, minus the "sm0l" thing!
+
+	After all the sections, can come another header... which is either sm0l or not.
+	If not, then... its part of the main thing, and we can reset some IDs.
+	If we are resetting 40 IDs, then we are resetting from the top down.
+	
+	IDs are written as a u16. The last 10 bits are noob-encoded, with the next byte to give 18 bits.
+	
+*/
+
+

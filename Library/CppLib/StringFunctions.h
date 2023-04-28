@@ -117,7 +117,7 @@ JB_String* JB_ASCII();
 JB_String* JB_Upper();
 JB_String* JB_Lower();
 void JB_Str_CompressChunk (FastString* fs, JB_String* self);
-int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int TotalLength);
+int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Expected);
 
 
 

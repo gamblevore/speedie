@@ -40,10 +40,6 @@ function FastString.CompressInto (|faststring| fs, |int|Strength=mzlab.default, 
 	str.CompressInto(fs, Strength, st)
 
 
-function FastBuff.CompressInto (|faststring| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil)
-	// remove this? just call this directly?
-	.tmpstr.CompressInto(fs, Strength, st)
-
 	
 
 Module MZLab 

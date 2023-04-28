@@ -10,12 +10,13 @@
 
 */
 
-
-function stringstream.CompressInto (|jbin| j, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
+	
+function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
 	expect (self!=nil) ("Nil object given to CompressInto")
+	|jbin| j = faststring.use(dest)				#require
 	st := CompressionStats.All
 	|| Mode = ("B", "")(strength >= mzlab.strong)
-	|| ChunkSize = (4MB,1MB)(mode) // don't change these! compression will fail.
+	|| ChunkSize = (4MB, 1MB)(mode)				// don't change these! compression will fail.
 	st.len(j.length) 
 	j.jinit
 	j.enter(@tmp, "µz")
@@ -28,15 +29,19 @@ function stringstream.CompressInto (|jbin| j, |int|Strength=mzlab.default, |&com
 			j.BalzCompressChunk(s, strength >= mzlab.strongest)
 		  else
 			j.CompressChunk(s)
+		
 		j.CloseStream(Place)
-		j.flush	
 		st.LiveUpdate(s, j.length)
+		j.flush	
 	j.up(2)
-	j.CompressChunk(nil) // cleanup
+	j.CompressChunk(nil)						// cleanup
+	j.flush // if j is created by in here... we'll definitely need to flush it.
+			// as it could be a shared-faststring.
 
 
-helper stringstream.DecompressInto (|faststring| fs, |int| lim=int.max, |&compressionstats| st=nil, |bool|)
+helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compressionstats| st=nil, |bool|)
 	expect (self!=nil) ("Nil object given to CompressInto")
+	|| fs = faststring.use(dest) #require
 	if !.IsCompressed
 		fs <~ .readall
 		return true
@@ -44,35 +49,35 @@ helper stringstream.DecompressInto (|faststring| fs, |int| lim=int.max, |&compre
 	require .ExpectJbin
 	
 	|| mz = .NextMsg				#require
-	if mz == @arg
+	if mz == @arg // remove this later
 		mz = .NextMsg(@tmp)
 	  else
 		require mz.expect(@tmp)
 
 	|| size = .NextMsg(mz, @num)
 	|| arg = .NextMsg(mz, @arg)
-	|| total_size = size.int
+	|| Remaining = size.int
 	|| OK = StdErr.Mark
 	mz.name = nil
 	size.name = nil
-	ifn size and arg and total_size <= lim
-		if (total_size > lim)
+	ifn size and arg and Remaining <= lim
+		if (Remaining > lim)
 			error (self, "mz would decompress too large")
 		  else
 			error (self, "Invalid mz header")
 	  else
 		st.len(fs.StreamLength)
 		|| Mode = arg.name
+		|| ChunkMax = (4MB, 1MB)(mode) 
 		while
 			|| c = .NextMsg(arg, @bin) #loop
 			|| s = c.name
+			|| Expected = Remaining min ChunkMax
 			if Mode == "B"
-				|| Chunk = 4MB min total_size // more messy but more correct
-				loop fs.BalzDecompressChunk(c.name, chunk)
-				total_size -= 4MB	// actually the branch below is less correct
-									// it could have issues if the faststring had previous data.
+				loop fs.BalzDecompressChunk(c.name, Expected)
 			  else
-				loop fs.DecompressChunk(c.name, total_size)
+				loop fs.DecompressChunk(c.name, Expected)
+			Remaining -= Expected
 			fs.Flush
 			st.LiveUpdate(c.name, fs.StreamLength)
 			c.remove
@@ -83,13 +88,13 @@ helper stringstream.DecompressInto (|faststring| fs, |int| lim=int.max, |&compre
 helper faststring.CompressChunk (|string| str) 
 	cpp_wrapper JB_Str_CompressChunk
 
-helper faststring.DecompressChunk (|string| str, |int| total_length, |int|) 
+helper faststring.DecompressChunk (|string| str, |int| Expected, |int|) 
 	cpp_wrapper JB_Str_DecompressChunk
 
 helper faststring.BalzCompressChunk (|string| str, |bool| Strong = false) 
 	cpp_wrapper JB_BALZ_CompressChunk
 
-helper faststring.BalzDecompressChunk (|string| str, |int| total_length, |int|) 
+helper faststring.BalzDecompressChunk (|string| str, |int| Expected, |int|) 
 	cpp_wrapper JB_BALZ_DecompressChunk
 
 
