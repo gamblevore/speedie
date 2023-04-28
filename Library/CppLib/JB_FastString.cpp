@@ -519,7 +519,6 @@ bool JB_FS_Flush(FastString* fs) {
             N = (int)JB_File_WriteRaw_( File, fs->ResultPtr, N );
             fs->WrittenLength += N;
             fs->Length = 0;
-            return N;
         }
 		return true;
     }

@@ -125,7 +125,7 @@ extern "C" {
 
 extern "C" {
 
-JBClassPlace( JB_File,          JB_File_Destructor,    JB_AsClass(JB_Object),      JB_File_Render );
+JBClassPlace( JB_File,          JB_File_Destructor,    JB_AsClass(JB_StringShared),      JB_File_Render );
 
 
 int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation);
