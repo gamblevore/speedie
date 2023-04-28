@@ -21,11 +21,6 @@ class LeakTester
 		.MemUsedStart = nil
 		app.LeakUnMarkMemory
 	
-	helper Test1
-		visible
-		|| fs = faststring()
-		fs <~ "a${1}b${2}"
-		printline fs
 	helper Test2
 		require .MemUsedStart
 		|int| NewAmount = app.objmemory
