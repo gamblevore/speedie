@@ -23,20 +23,20 @@ function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 	j.addint(.length)
 	j.enter(@arg, Mode)
 	while self
-		|| s = .str(Chunksize)
-		|| Place = j.OpenStream
+		|| str = .str(Chunksize)
+		|| Place = j.OpenSection
 		if Mode
-			j.BalzCompressChunk(s, strength >= mzlab.strongest)
+			j.BalzCompressChunk(str, strength > mzlab.strong)
 		  else
-			j.CompressChunk(s)
+			j.CompressChunk(str)
 		
-		j.CloseStream(Place)
-		st.LiveUpdate(s, j.length)
-		j.flush	
+		j.CloseSection(Place)
+		st.LiveUpdate(str, j.length)
+		if !.nomorechunks
+			j.flush // we are calling it after anyhow	
 	j.up(2)
+	j.flush			// we definitely need to flush it. -- genius theo 2023, no humour.
 	j.CompressChunk(nil)						// cleanup
-	j.flush // if j is created by in here... we'll definitely need to flush it.
-			// as it could be a shared-faststring.
 
 
 helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compressionstats| st=nil, |bool|)

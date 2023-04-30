@@ -626,7 +626,7 @@ struct BalzComp {
 			if (t >= 256) {
 				int len=t-256;
 				int s=tab[c2][(cnt[c2]-DecodeIdx(buf[p-2]))&TAB_MASK];
-				DReq(s >= 0 and s < p, "Decode Error", -1);
+				DReq(s >= 0 and s < p, "Corrupted ro data", -1);
 				buf[p++]=buf[s++];
 				buf[p++]=buf[s++];
 				buf[p++]=buf[s++];
@@ -676,13 +676,14 @@ extern "C" int JB_BALZ_CompressChunk(FastString* fs, JB_String* In, bool Strong)
 
 
 extern "C" int JB_BALZ_DecompressChunk(FastString* fs, JB_String* In, int Expected) {
-	DReq(JB_Str_Length(In) >= 5, "Chunk read overflow",	0);    // i think 5 is the minimum?
+	DReq(JB_Str_Length(In) >= 5, "Too short chunk received",	0);    // i think 5 is the minimum?
 	if (!fs) return 0;
 	
 	auto B = GetComp(Expected, fs);
 	int Created = B->balz_decompress(In, Expected);
-	DReq(Expected == Created, "Chunk write-length error",	0);
-    return Expected;
+	if (Created >= 0)
+		DReq(Expected == Created, "Chunk write-length error",	0);
+    return Created;
 }
 
 

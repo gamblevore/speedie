@@ -20,6 +20,7 @@ class FastString {
 	|Byte|			IndentChar
 //	|int|			WrittenLength // invisible
 	|bool|			Failed
+	|int|			NoFlush
 	
 /////
 

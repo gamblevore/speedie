@@ -24,6 +24,7 @@ JBClass( FastString, JB_Object,
     u16             Indent;			// Jeebox itself needs this.
     uint8           IndentChar;
     bool			Failed;
+    int				NoFlush;
 );
 
 

@@ -68,20 +68,23 @@ role JBin (Faststring)
 		if L >= 60
 			.lint(L)
 		self <~ type|byte|
-		if data // so .openstream can stream unknown data-length  
+		if data // so .opensection can stream unknown data-length  
 			.AppendMemory(data, L|int|)
 
-	function OpenStream	(|int|)
+	function OpenSection	(|int|)			// openstream 
+		.NoFlush ++
 		.AddMemory(@bin, false, nil, 1GB)
 		return .length
 
-	function CloseStream (|int| c)
+	function CloseSection (|int| c)			// closestream
 		|| nwe = .length
+		expect (nwe >= c) (self, "Unable to close section")
 		.length = c - 6
 		self <~ 191|byte|
 		.AppendInt(nwe - c)
 		self <~ (@bin)|byte|
 		.length = nwe
+		.NoFlush--
 
 
 function @string.int32 (|int| n, |string|)

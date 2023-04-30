@@ -3,7 +3,7 @@
 // balz decomp still fails! on big files or all?
 datatype Type (int)
 	flags // compressed should be an action?
-		Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace, TestThem
+		ReadOK, Compressed, Plain, XML, actions=(Box, Jbin, Report, PrintTree), StdOut, SelfReplace, TestThem
 	
 	syntax is (|Type| test, |bool|)
 		return self & test
@@ -27,12 +27,37 @@ datatype Type (int)
 
 
 
+main
+	if !app.args
+		print .usage
+		return 0
+
+	error.AutoPrint = 1
+	conv.dest = .GetActions$
+	
+	for r in app.args
+		conv.in = r.file
+		conv.Out = conv.OutPath.file
+		if conv.in.IsDir
+			"${conv.in} is a folder"
+		  elseif conv.dest is TestThem
+			conv.TestOne()
+		  else
+			conv.Process
+		conv.End
+	
+	if (stderr.ok) and (!conv.done) and (conv.dest isnt report)
+		"Nothing to do. All files already in destination format."
+
+
 function App.Singlefile (|string| sw)
 	check (app.args == 1) ("Can't write multiple files with switch: " + sw)
-	
+
+
 function App.GetActions (|Type|)
 	for s in app.Switches
 		|| name = s.ArgName
+		|| v = s.ArgValue
 		if name ~= "r"
 			rz |= type.report
 		  elseif name ~= "j"
@@ -44,20 +69,24 @@ function App.GetActions (|Type|)
 		  elseif name ~= "p"
 			rz |= type.stdout
 			.SingleFile(name)
+		  elseif name ~= "d"
+			rz |= type.PrintTree
+			.SingleFile(name)
+			if v!="true"
+				conv.MaxNodeLength = v.int
 		  elseif name ~= "test"
 			rz |= type.TestThem
+			rz |= type.compressed
+		  elseif name ~= "c"
+			rz |= type.compressed
+			if v!="true"
+				conv.DefaultStrength = v.int|int|.clamp(MZLab.Fastest, MZLab.Strongest)
+		  elseif name ~= "f"
+			Conv.destpath = v
+			.SingleFile(name)
+			check (v) "Add a value, eg: --f=value"
 		  else
-			|| v = s.ArgValue
-			if name ~= "c"
-				rz |= type.compressed
-				if v
-					conv.DefaultStrength = v.int max 0
-			  elseif name ~= "f"
-				Conv.destpath = v
-				.SingleFile(name)
-				check (v) "Add a value, eg: --f=value"
-			  else
-				error "Unknown switch $s"
+			error "Unknown switch $s"
 
 	rz |= type.plain
 	check ((rz & type.actions).CountBits <= 1) ("Too many actions.")
@@ -73,11 +102,9 @@ function app.usage (|string|)
 		-c=0		Compress for very-fast decompress
 		-s			Replace file in-place
 		-p			Print to stdout
+		-d			Print Parse Tree
 		-r			Just report types, otherwise do nothing
 		-f=name 	Sets the filename of output
-	
-	debugging:
-		-test		Tests if compression works on every file asked for!
 
 	examples:
 		jz -j A.xml						// xml to jeebox
@@ -88,28 +115,6 @@ function app.usage (|string|)
 "
 
 
-main		
-	|| action = .GetActions$
-	if !app.args
-		print .usage
-		return 0
-	
-	for r in app.args
-		|| f = r.file
-		if f.IsDir
-			"$f is a folder"
-		  else
-			conv.in = f
-			if action is TestThem
-				conv.TestOne()
-			  else
-				conv.Process(action)
-			conv.End
-	
-	if (stderr.ok) and (!conv.done) and (action isnt report)
-		"Nothing to do. All files already in destination format."
-
-
 
 module Conv
 	|string|		Data
@@ -117,8 +122,12 @@ module Conv
 	|file| 			Out
 	|date|			Start
 	|float| 		Size
+	|type| 			Dest
+	|message| 		Parse
+	|int| 			MaxNodeLength = 128 //int.max
 	|int|			Done
 	|string|		DestPath
+	|bool| 			FileIsCompressed
 	||				DefaultStrength = mzlab.strong
 	|| 				Speed = faststring()
 	
@@ -127,27 +136,60 @@ module Conv
 		.in = nil
 		.data = nil
 		.start = nil
-		printline .Speed.GetResult
+		|| s = .speed.GetResult
+			printline s
 	
 	
-	function TestOne // to test many
+	function TestOne
+		|| OrigIn = .in
+		|| OrigOut = .out
+		.DefaultStrength = MZLab.Fast
+		.TestSub(origIn)
+
+		.in = origin
+		.out = OrigOut
+		.DefaultStrength = MZLab.Strong
+		.TestSub(origIn)
+
+		.del(.out, origin)		
+		.del(origout, origin)
+	
+	
+	function del (|file| f, |file| o)
+		if f.exists and f.path != o.path	
+			"deleting ${f.name}"
+			f.delete
+	
+	function MiniTest
+		|| fs = FastString()
+		|| txt = .in.Read(4MB)
+		printline "inputting ${txt.length.strsize} chonk"
+		fs.BalzCompressChunk(txt)
+		|| str = fs.GetResult
+		fs.BalzDecompressChunk(str, txt.length)
+		str = fs.GetResult
+		printline "output ${str.length.strsize} chonk"
+		expect (str == txt) ("Strings mismatch")
+		
+		
+	function TestSub (|file| orig)
 		require StdErr.ok
 		expect (!.DestPath) ("Can't specify a dest-path!")
-		|| Orig = .in
+
 		.CompressOnly(false)
 		require stderr.ok
+
 		.in = .out
-		.out = (.in + ".decomp").file
+		.out = (.in + ".back").file
+
 		.CompressOnly(true)
 		require stderr.ok
 		
-		orig.CompareFile(Orig,Orig)
-		Orig.delete
-		.in.Delete
-		.out.delete
+		.out.CompareFile(Orig, Orig)
 		
 	
 	function Time (|string| Name)
+		require .dest isnt stdout // would ruin output
 		|| ago = .Start.ago
 		|float| scale = 1MB
 		if .data
@@ -155,8 +197,8 @@ module Conv
 		|| speed = ""
 		|| s    = ago.seconds
 		|| s2   = (s*1000, s)(s < 0.01)
-		|| unit = ("ms", "s")(s < 0.01)
-		conv.speed <~ "    $Name: ${s2}$unit"
+		|| unit = ("ms", "s")(s < 0.01) 
+		conv.speed <~ "    $Name: ${s2}$unit" 
 		if s
 			conv.speed <~ "  (${Size/(scale*s)}MB/s)\n"
 		
@@ -170,67 +212,83 @@ module Conv
 		if Decomp
 			src.DecompressInto(dest)
 			.size = dest.File.size
-			.time("Decompress(streamed)")
+			.time("Decompress(streamed )")
 		  else 
 			.size = .in.size
+			|| type = ("µz", "ro")(.defaultstrength < mzlab.strong)
 			src.CompressInto(dest, DefaultStrength) 
-			.time("Compress(streamed)")
+			.time("Compress(streamed $type)")
 	
 
-	function Process (|Type| Dest)
-		require .in.MustExist
+	function Read (|type|)
 		|| OrigSize = 0
 		|| CmpFormat = .in.CompressionInfo(OrigSize)
-		|| FileIsCompressed = CmpFormat!=""
-		|type| Detected = FileIsCompressed * type.compressed // only read compressed at first
-		if Dest&type.Actions
-			++done			
-			if (Dest is report) and CmpFormat
-				"$.in is: ${OrigSize.strsize} compressed to ${.in.size.strsize} ($CmpFormat)"
-				return
-					
-			.start = date()
-			.data = .in.ReadAll(int.max, false)
-			if (Dest is report) and .data == ""
-				if StdErr.OK
-					"$.in is empty"
-				return
-			.Time("Read ")
-			if FileIsCompressed
-				.start = date()
-				.data = .data.Decompress(int.max)
-				.time("Decompress")
-		  else
-			require FileIsCompressed == (dest isnt compressed)
-			++ done
-		.Out = .OutPath(dest).file
+		.FileIsCompressed = CmpFormat!=""
+		rz = (FileIsCompressed * type.compressed) (|) type.ReadOK // only read compressed at first
 		
 		ifn Dest&type.Actions
-			.CompressOnly(FileIsCompressed)
-			return
+			if FileIsCompressed != (dest is compressed)
+				.CompressOnly(FileIsCompressed)
+				++ done
+			return 0
+		++.done
+		
+		if (Dest is report) and CmpFormat
+			"$.in is: ${OrigSize.strsize} compressed to ${.in.size.strsize} ($CmpFormat)"
+			return 0
+				
+		.start = date()
+		.data = .in.ReadAll(int.max, false)
+		if (Dest is report) and .data == ""
+			if StdErr.OK
+				"$.in is empty"
+			return 0
+		.Time("Read ")
 			
+		
+		if FileIsCompressed and !(dest is printtree)
+			.start = date()
+			.data = .data.Decompress(int.max)
+			.time("Decompress")
+		
+		if Dest is report
+			"$.in is: ${rz.render}"
+			return 0
+
+	
+	function Detect (|type| Detected,  |type|)
 		.start = date.now
-		|error| err
-		|| parse = .data.ParseWithError(err) // no errors actually :)
-		expect (parse  or  dest is report) ("File isn't parseable.")
-		if parse
+		if (dest is PrintTree) and (.data.isjbin)
+			.parse = .data.parse_jbin			#require
+			for s.flat in .parse
+				s.name = s.name.Preview(MaxNodeLength)
+		  else
+			.parse = .data.Parse // no errors actually :)
+			if !.parse
+				stderr.pop
+		
+		if .parse
 			.time("Parse")
-		if !parse
+		if !.parse
 			detected |= type.plain
 		  elseif .data.IsJbin
 			detected |= type.jbin
-		  elseif parse.Find(@xml)
+		  elseif .parse.Find(@xml)
 			detected |= type.xml
 			if dest isnt report
+				.start = date.now
 				require parse.XMLToJeebox
+				.time("Convert XML")
 		  else
 			detected |= type.box
 
-		if Dest is report
-			"$.in is: ${detected.render}"
-			return
+		return Detected
 
-		if (Detected.format != Dest.format)
+
+	function Transform (|type| Detected)
+		if (dest is PrintTree)
+			.data = .parse.RenderAST
+		  elseif (Detected.format != Dest.format)
 			.Start = date.now
 			if dest is box
 				.data = parse.Render
@@ -242,6 +300,13 @@ module Conv
 			.start = date.now
 			.data = .data.Compress(DefaultStrength)
 			.time("Compress")
+
+
+	function Process
+		require .in.MustExist
+		|| Detected = .Read						#require
+		Detected = .Detect(Detected)			#require
+		.Transform(detected)
 			
 		if dest is stdout
 			print .data
@@ -249,9 +314,9 @@ module Conv
 			printline .out.path
 
 
-	function OutPath (|type| dest,  |string|)
+	function OutPath (|string|)
 		if destpath
-			return destpath
+			return destpath.file
 		
 		if dest is selfreplace
 			return .in
@@ -266,26 +331,27 @@ module Conv
 		if dest is compressed
 			rz = rz.AddExt("mz")
 		  elseif (.in isa "mz") and rz.FileExists
-			//"    (Adding '.back' to avoid file-overwrite.)"
+//			"    (Adding '.back' to avoid file-overwrite.)" // too noisy
 			rz += ".back"
 	
 	
 function file.CompressionInfo (|&int| Size=0, |string|)
 	|| str = .Section(0, 32)
-	if str == string.error
-		return str
-	|| mz = str.parse_jbin
-	if mz == @tmp and "µz"
-		|| arg = mz.last
-		if arg != @arg
-			rz = string.error
-		  else
-			|| s = arg.prev.int
-			if size
-				*size = s
-			if !s
-				rz = string.Error
-			  elseif arg ~= "ro"
-				rz = "ro"
+		if str == string.error
+			return str
+	if str.IsJbin
+		|| mz = str.parse_jbin
+		if mz == @tmp and "µz"
+			|| arg = mz.last
+			if arg != @arg
+				rz = string.error
 			  else
-				rz = "µz"
+				|| s = arg.prev.int
+				if size
+					*size = s
+				if !s
+					rz = string.Error
+				  elseif arg ~= "ro"
+					rz = "ro"
+				  else
+					rz = "µz"

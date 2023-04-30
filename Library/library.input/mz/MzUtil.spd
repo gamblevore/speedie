@@ -6,7 +6,7 @@ extend string
 		.CompressInto(j, Strength, st)
 		return j
 		
-	function CompressInto (|faststring| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
+	function CompressInto (|object| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
 		.Stream.CompressInto(fs, strength, st)
 	
 	function IsCompressed (|bool|)
@@ -14,7 +14,7 @@ extend string
 		return .isjbin and self[2, "C\06µz"] or self[2, "@\01C\06µz"]
 		
 	
-	function DecompressInto (|faststring| fs, |int| lim=256MB,  |&compressionstats| st=nil, |bool|)
+	function DecompressInto (|object| fs, |int| lim=256MB,  |&compressionstats| st=nil, |bool|)
 		cpp_part DecompressInto
 		return .stream.Decompressinto(fs, lim, st)
 	

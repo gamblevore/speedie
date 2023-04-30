@@ -513,7 +513,7 @@ void JB_FS_LengthSet(FastString* fs, int NewLength) {
 	
 bool JB_FS_Flush(FastString* fs) {
     JB_File* File = fs->File;
-    if ( File ) {
+    if ( File and !fs->NoFlush ) {
         int N = fs->Length;
         if ( N ) {
             N = (int)JB_File_WriteRaw_( File, fs->ResultPtr, N );
