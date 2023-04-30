@@ -95,23 +95,23 @@ function App.GetActions (|Type|)
 
 function app.usage (|string|)
 	return "Usage: ${.filename} File1 [File2...]
-	options:
-		-j			Convert to jeebox
-		-b			Convert to jbin
-		-c			Compress
-		-c=0		Compress for very-fast decompress
-		-s			Replace file in-place
-		-p			Print to stdout
-		-d			Print Parse Tree
-		-r			Just report types, otherwise do nothing
-		-f=name 	Sets the filename of output
+    options:
+        -j          Convert to jeebox
+        -b          Convert to jbin
+        -c          Compress
+        -c=0        Compress for very-fast decompress
+        -s          Replace file in-place
+        -p          Print to stdout
+        -d          Print Parse Tree
+        -r          Just report types, otherwise do nothing
+        -f=name     Sets the filename of output
 
-	examples:
-		jz -j A.xml						// xml to jeebox
-		jz -c A.xml						// compress A.xml into A.xml.mz
-		jz    A.txt.mz					// decompress A.txt.mz to A.txt
-		jz -b A.box						// jeebox to jbin
-		jz -b A.xml						// xml to jbin
+    examples:
+        jz -j A.xml   					// xml to jeebox
+        jz -c A.xml   					// compress A.xml into A.xml.mz
+        jz    A.txt.mz   				// decompress A.txt.mz to A.txt
+        jz -b A.box   					// jeebox to jbin
+        jz -b A.xml   					// xml to jbin
 "
 
 
