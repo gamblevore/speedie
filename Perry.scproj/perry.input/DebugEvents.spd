@@ -33,6 +33,7 @@ function DebugArgsGotFocus (guiaction)
 	require (self is visible) != v
 	(self is visible) = v
 	if v and self isa TextView
+//		.Document := Document(f) // debug this later!
 		.text = f.ReadAll
 		|| data = .parse
 			if !data..args

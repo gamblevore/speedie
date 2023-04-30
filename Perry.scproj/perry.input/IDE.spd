@@ -346,7 +346,7 @@ class PerryIDE (Window)
 				.ShowLeftStats
 		if fc isa 32
 			.EditMe.document.checkmodified?
-		if !ShouldNotDisturbGUI
+		if !ShouldNotDisturbGUI and !.DebugArgsList.HasFocus
 			.HideStuff
 
 
