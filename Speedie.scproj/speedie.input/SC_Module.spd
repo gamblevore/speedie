@@ -125,8 +125,8 @@ function LoadModule (|Message| node)
 	|| namemsg = node.first
 	if !.cls
 		namemsg.expect(@thg)
-	  elseif namemsg
-		namemsg.expect(@arg)
+	  //else//if namemsg // fix later... harder than it seems
+		//namemsg.expect(@arg)
 		
 
 	|| arg = namemsg
