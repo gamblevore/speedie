@@ -12,7 +12,7 @@ module Counts
 	
 	function init (|string| ss)
 		ss = ss.trim 
-		ss := "spd/box"
+		ss := "spd/box/jbin/jb"
 		for s in (ss / '/') 
 			exts[s] = s
 
@@ -37,9 +37,9 @@ function file.cloc
 	if counts.loud
 		printline .path
 	Counts.files++
-	|| s = .ReadSafely
+	|| s = .ReadSafely(int.max)
 		Counts.Lines += s.loc
-		counts.Count(s.parse)
+		counts.Count(s.parse) 
 
 
 function file.CountAll (|bool| force=false)
@@ -53,13 +53,15 @@ function file.CountAll (|bool| force=false)
 
 
 main  
-	|| a = app.args
-	if !a
-		"Usage: cloc path [--files=cpp/c/h]  [--quiet=true/false]"
+	if !app.args
+		"Usage: cloc path [--files=cpp/c/h]  [--quiet=true/false]  [-k]
+--quiet            Makes less output
+-k                 Keeps errors
+"
 		return 0
 	
 	counts.Init(app..files)
-	for path in a
+	for path in app.args
 		|| dir = path.ExistingFile
 			dir.CountAll(true)
 	counts.report
@@ -73,5 +75,8 @@ function Counts.report
 	"$l lines in $f files"
 	|| n = .names
 		"$n names in $d nodes across $p jeebox files"
-	stderr.clear
+	if !app.yes("k")
+		stderr.clear
+	if compressionstats.All.Out
+		printline compressionstats.all.render
 
