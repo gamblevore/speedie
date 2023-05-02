@@ -84,8 +84,8 @@ function perryide.ListAllFuncsMsg (|message| items, |message| result)
 	opt norefcounts
 	for line in items
 		if line == @tmp
-			|string_aware| n = line.name
-			if AutoComplete.owner[n]						// class/module/etc
+			|| n = line.name
+			if AutoComplete.owner.valuelower(n)						// class/module/etc
 				.ListAllFuncsMsg(line.funcarg, result)
 			  elseif AutoComplete.isafunc(line)
 				|| fn = result.msg(@str)
