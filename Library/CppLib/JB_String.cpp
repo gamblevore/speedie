@@ -1537,22 +1537,21 @@ JB_String* JB_Str_Reverse(JB_String* self, FastString* fs_in) {
 
 //////////    #include "StringSplitters.i"
 
-static Dictionary* StrUniquer = 0;
-void JB_Str__Uniqify(Dictionary* D) {
-    JB_SetRef(StrUniquer, D);
-}
-
-extern "C" void Str_Share_(JB_StringShared* u, JB_String* self, int i, int L) {
-	u->Addr = self->Addr + i;
+extern "C" void Str_Share_(JB_StringShared* u, JB_String* p, int i, int L) {
+	u->Addr = p->Addr + i;
 	u->Length = L;
-	JB_Class* Cls = JB_ObjClass(self);
+	JB_Class* Cls = JB_ObjClass(p);
 	if (Cls==JB_AsClass(JB_StringShared)) {
-		self = (JB_String*)((JB_StringShared*)self)->Parent;
+		p = (JB_String*)((JB_StringShared*)p)->Parent;
 	}
-	u->Parent = JB_Incr( self );
+	u->Parent = JB_Incr( p );
 }
 
-JB_String* JB_Str_UniqueSplit(JB_String* self, int StartOff, int Length, Dictionary* D);
+extern "C" void JB_Str_Clone(JB_StringShared* self, JB_String* orig) {
+	if (!orig)
+		orig = JB_Str__Empty();
+	Str_Share_(self, orig, 0, JB_Str_Length(self));
+}
 
 
 JB_String* JB_Str_Range(JB_String* self, int StartOff, int AfterOff) {
@@ -1572,9 +1571,6 @@ JB_String* JB_Str_Range(JB_String* self, int StartOff, int AfterOff) {
         return self;
 
 	if ( Length > 1 ) {
-//        if (StrUniquer) {
-//            return JB_Str_UniqueSplit(self, StartOff, Length, StrUniquer);
-//        }
         if (Length <= 4)
             return JB_Str_CopyFromPtr( (uint8*)self->Addr + StartOff, Length);
         

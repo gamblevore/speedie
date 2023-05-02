@@ -36,6 +36,8 @@ void JB_Str_Print( JB_String* s );
 void JB_Str_PrintLine( JB_String* s );
 void JB_Str_PrintError(JB_String* s);
 void JB_Str_PrintConsole(JB_String* s);
+void JB_Str_Clone(JB_StringShared* self, JB_String* Name);
+
 int JB_LogOpen_(const char* s);
 struct Array;
 void JB_Array_Print( Array* R );
