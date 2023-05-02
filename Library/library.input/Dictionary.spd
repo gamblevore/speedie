@@ -17,17 +17,21 @@ class Dictionary (saveable)
 		cpp_wrapper
 	destructor
 		cpp_wrapper
-	
+		
 	syntax Access (|string| Key, assigns:||)
 		cpp_wrapper JB_Dict_ValueSet
 	syntax Access (|string| Key, ||)
 		cpp_part ValueStr
 		return self[key,nil]
-	syntax Access (|string_aware| Key, ||)
-		cpp_part ValueAware
-		return .ValueLower(key|string|)
 	syntax Access (|string| Key, |...| Default, ||)
 		cpp_wrapper JB_Dict_Value
+		
+	function MakePlace (|int| Prefix=-1, |string| key, |&...|)
+		cpp_wrapper JB_Dict_MakePlace
+		
+	function MakePlace (|message| msg, |&...|)
+		cpp_part MakeMsgPlace
+		return .MakePlace(msg.Func|int|, msg.Name)
 		
 	syntax Access (|uint64| Key, assigns:||)
 		opt norefcounts
@@ -46,9 +50,9 @@ class Dictionary (saveable)
 	syntax append (|message| m)
 		self[m.name] = m
 	
-	function ValueLower (|string| s, ||) // remove and just use string_aware? why have two ways
+	function ValueLower (|string| s, ||)
 		return self[s.lowercase]
-	function ValueLower (|string| s, assigns:||) // remove and just use string_aware? why have two ways
+	function ValueLower (|string| s, assigns:||)
 		self[s.lowercase] = value
 
 
@@ -152,10 +156,10 @@ extend dictionary
 	function Set (|string| key, |string| Value)
 		self[key] = value
 
-	function msg (|message| m, ||)
-		return self[m.id_]
+	function msglower (|message| m, ||)
+		return self[m.id_] // this surprisingly lowercases stuff.... thats bad.
 
-	function msg (|message| m, assigns:||)
+	function msglower (|message| m, assigns:||)
 		self[m.id_] = Value
 	
 	function Expect (|message| m, ||)
@@ -170,5 +174,4 @@ helper string.idcase (|string|):    return .lowercase
 // can't remove diacritics cos... spanish needs them for disambig!
 // literally two words with different diacritics
 
-role string_aware (object)
 
