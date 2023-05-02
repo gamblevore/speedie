@@ -57,9 +57,9 @@ Module MZLab
 		
 	helper string.CompressTest (|bool| report, |int| which=3, |bool|)
 		if which & 1
-			require .compresstestsub(mzlab.strong, report)
+			require .CompressTestSub(mzlab.strong, report)
 		if which & 2
-			require .compresstestsub(mzlab.fast, report)
+			require .CompressTestSub(mzlab.fast, report)
 		return true
 	
 	
@@ -97,23 +97,6 @@ Module MZLab
 			require str.CompressTest(false, (i&1)+1)
 		"Compression Test: OK"
 		return true
-	
-	
-	helper BalzTest (|string| path)
-		|| in = path.file
-		|| indata = in.Readall						#require
-		|| out = in.setext("jalz").out
-		out.BALZCompressChunk(indata)
-		out.Flush
-		"Compression done"
-		
-		|| fs = faststring()
-		|| sigh = out.file.readfile
-		fs.BalzDecompressChunk(sigh, indata.length)
-		|| back = fs.getresult
-		require in.compare(back, true)
-		"Decompressed OK!"
-		mzlab.TestMz(in)
 
 
 	function TestCompression
