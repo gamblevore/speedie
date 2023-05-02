@@ -395,18 +395,23 @@ module SDLApp
 
 	helper FastUpdate (|bool|)
 		return !.IsBackground or .DroppingInto
-	
+		
+	helper FixKeyBugs
+		// not sure how to fix that one. or why its happening.
+//		if keys.has(keys.Lshift) and keys.has(keys.Rshift) and !keys.shift
+//			keys.RemoveKey(keys.lshift)
+//			keys.RemoveKey(keys.rshift) // this wouldn't work... we test for keys.shift anyhow.
+		
+		
 	helper FrameAndEvents (|int|)		
 		.ClearAlerts
 		|| Occured = knothing
 		while
-			object.TotalSanity
 			while .Event.Poll
 				occured |= .CheckEvent(.event)
-				object.TotalSanity
 			if .WantsQuit
 				Occured |= .TryQuit(kExiting)
-			if .newsize
+			if .NewSize
 				Occured |= kActivity
 
 			|| t_now = date()
@@ -668,8 +673,8 @@ module SDLApp
 
 	function PicturePtr (|&_voidptr|)
 		opt norefcounts
-		if .effects and keys.Control and keys.shift
-			.Effects.Blur
+//		if .effects and keys.Control and keys.shift
+//			.Effects.Blur
 		
 		return (&.effects.final._ptr)|&_voidptr|
 	
@@ -819,6 +824,7 @@ module SDLApp
 			return kActivity
 		
 		.keymod = .SDL_GetModState
+		.fixkeybugs
 		if  t is APP_TERMINATING
 			return .tryquit
 		
