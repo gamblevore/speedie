@@ -139,6 +139,8 @@ struct ASMVarType;
 
 struct CompressionStats;
 
+struct deklinker;
+
 struct FastBuff;
 
 struct FloatRange;
@@ -150,6 +152,8 @@ struct IntDownRange;
 struct IPCMessage;
 
 struct IR;
+
+struct KlinkIt;
 
 struct MessagePosition;
 
@@ -186,8 +190,6 @@ struct MemoryLayer_Behaviour;
 struct SyntaxObj_Behaviour;
 
 struct Macro_Behaviour;
-
-struct StringShared_Behaviour;
 
 struct SCObject_Behaviour;
 
@@ -233,8 +235,6 @@ struct ShellStream_Behaviour;
 
 struct DictionaryReader_Behaviour;
 
-struct Object_Behaviour;
-
 struct TokenHandler_Behaviour;
 
 struct Charset_Behaviour;
@@ -264,6 +264,10 @@ struct StringZeroTerminated_Behaviour;
 struct FastString_Behaviour;
 
 struct Message_Behaviour;
+
+struct StringShared_Behaviour;
+
+struct MessageID_Behaviour;
 
 struct SCBase_Behaviour;
 
@@ -357,8 +361,6 @@ struct SCParamArray;
 
 struct Selector;
 
-struct JB_Object;
-
 struct StringFields;
 
 struct StringStream;
@@ -408,6 +410,8 @@ struct ASMFunc2;
 struct GUIControl;
 
 struct Message;
+
+struct MessageID;
 
 struct Message;
 
@@ -543,6 +547,12 @@ struct IR {
 	byte r[4];
 	int Rest;
 	uint Debug;
+};
+
+struct KlinkIt {
+	FastString* Strings;
+	FastString* IDTable;
+	JB_String* Tree;
 };
 
 struct MessagePosition {
@@ -1105,6 +1115,9 @@ JBClass ( SCModule , SCBase ,
 	bool IsRequiredInterface;
 );
 
+struct StringShared_Behaviour: String_Behaviour {
+};
+
 struct StringZeroTerminated_Behaviour: String_Behaviour {
 };
 
@@ -1135,6 +1148,15 @@ JBClass ( Message , RingTree ,
 	MsgUIFlags Flags;
 	u16 RangeLength;
 	u16 Tag;
+);
+
+struct MessageID_Behaviour: StringShared_Behaviour {
+};
+
+JBClass ( MessageID , JB_StringShared , 
+	Syntax Func;
+	JB_Object* Obj;
+	int64 Tag;
 );
 
 struct SCArg_Behaviour: SCBase_Behaviour {
@@ -4230,6 +4252,9 @@ int JB_MzSt__InitCode_();
 
 
 
+// JB_deklinker
+
+
 // JB_FastBuff
 byte JB_FastBuff_Byte(FastBuff* self);
 
@@ -4306,6 +4331,15 @@ int SC_IR__InitCode_();
 
 
 // JB_jb_vm
+
+
+// JB_KlinkIt
+void JB_sbs_BuildTable(KlinkIt* self, Message* root);
+
+void JB_sbs_destructor(KlinkIt* self);
+
+bool JB_sbs_Run(KlinkIt* self, Message* root, FastString* out);
+
 
 
 // JB_MemoryWorld
@@ -4457,9 +4491,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_Macro_Behaviour
 
 
-// JB_StringShared_Behaviour
-
-
 // JB_SCObject_Behaviour
 
 
@@ -4526,9 +4557,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_DictionaryReader_Behaviour
 
 
-// JB_string_aware_Behaviour
-
-
 // JB_TokenHandler_Behaviour
 
 
@@ -4572,6 +4600,12 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_Message_Behaviour
+
+
+// JB_StringShared_Behaviour
+
+
+// JB_MessageID_Behaviour
 
 
 // JB_SCBase_Behaviour
@@ -5031,6 +5065,8 @@ void JB_FS_AppendInfo(FastString* self, JB_String* name, JB_String* data);
 void JB_FS_AppendInfoNum(FastString* self, JB_String* name, int64 data);
 
 void JB_FS_fieldstart(FastString* self, JB_String* name);
+
+void JB_FS_hInt(FastString* self, uint64 n);
 
 void JB_FS_includeh(FastString* self, JB_String* name);
 
@@ -5743,9 +5779,6 @@ JB_String* JB_Str__Hex(int64 i);
 
 
 
-// JB_string_aware
-
-
 // JB_StringFields
 void JB_FI_Constructor(StringFields* self, JB_String* Source, byte Sep);
 
@@ -5761,15 +5794,12 @@ StringFields* JB_FI__New(JB_String* Source, byte Sep);
 
 
 
-// JB_StringShared
-
-
 // JB_StringStream
 byte JB_SS_Byte(StringStream* self);
 
 void JB_SS_CompressInto(StringStream* self, JB_Object* dest, int Strength, CompressionStats* st);
 
-void JB_SS_Constructor(StringStream* self, JB_String* d);
+void JB_SS_Constructor(StringStream* self, JB_String* Data);
 
 JB_String* JB_SS_Decompress(StringStream* self, int lim, CompressionStats* st);
 
@@ -5781,7 +5811,7 @@ bool JB_SS_ExpectJbin(StringStream* self);
 
 bool JB_SS_IsCompressed(StringStream* self);
 
-int64 JB_SS_lint0(StringStream* self, int n);
+int64 JB_SS_lInt0(StringStream* self, int n);
 
 bool JB_SS_NextChunk(StringStream* self);
 
@@ -5817,7 +5847,7 @@ bool JB_SS_test(StringStream* self, JB_String* Header);
 
 StringStream* JB_SS__Alloc();
 
-StringStream* JB_SS__New(JB_String* d);
+StringStream* JB_SS__New(JB_String* Data);
 
 
 
@@ -5923,6 +5953,8 @@ Array* JB_Array__New0();
 JB_Object* JB_Dict_Expect(Dictionary* self, Message* m);
 
 void JB_Dict_LoadProperties(Dictionary* self, ObjectLoader* Loader);
+
+JB_Object** JB_Dict_MakeMsgPlace(Dictionary* self, Message* msg);
 
 void JB_Dict_SaveCollect(Dictionary* self, ObjectSaver* Saver);
 
@@ -6049,7 +6081,7 @@ void JB_bin_AddCstring(FastString* self, _cstring data, Syntax type);
 
 void JB_bin_addint(FastString* self, int64 data);
 
-void JB_bin_AddMemory(FastString* self, Syntax type, bool GoIn, byte* data, uint64 L);
+void JB_bin_AddMemory(FastString* self, Syntax type, byte* data, bool GoIn, uint64 L);
 
 void JB_bin_CloseSection(FastString* self, int c);
 
@@ -7255,7 +7287,7 @@ void SC_Mod_RenameVars(SCModule* self);
 
 JB_String* SC_Mod_Render(SCModule* self, FastString* fs_in);
 
-JB_String* SC_Mod_safename(SCModule* self);
+JB_String* SC_Mod_SafeName(SCModule* self);
 
 SCModule* SC_Mod_SuperMod(SCModule* self);
 
@@ -7277,6 +7309,9 @@ SCModule* SC_Mod__NewContainer(JB_String* s);
 
 
 // JB_String_ArgValue
+
+
+// JB_StringShared
 
 
 // JB_StringThatWasReadSafely
@@ -7599,6 +7634,8 @@ Message* JB_Msg_GoIntoInvisArg(Message* self, Message* tmp, int pos);
 Message* JB_Msg_HasOwnBlock(Message* self);
 
 bool JB_Msg_HasPosition(Message* self);
+
+int JB_Msg_RunMsg(Message* self, Dictionary* d, Array* table);
 
 SCFunction* JB_Msg_IdentifyFunc(Message* self);
 
@@ -8043,6 +8080,19 @@ Message* JB_Msg__NewWithLayerCopy(JB_MemoryLayer* _L, Message* other);
 Message* JB_Msg__NewWithLayerNormal(JB_MemoryLayer* _L, Syntax Func, JB_String* Name);
 
 bool JB_Msg__TreeCompare(Message* orig, Message* reparse, bool PrintIfSame);
+
+
+
+// JB_MessageID
+void JB_MessageID_Constructor(MessageID* self, JB_String* Name, Syntax Fn);
+
+void JB_MessageID_destructor(MessageID* self);
+
+MessageID* JB_MessageID__Alloc();
+
+bool JB_MessageID__IDSorter(JB_Object* a, JB_Object* b);
+
+MessageID* JB_MessageID__New(JB_String* Name, Syntax Fn);
 
 
 
