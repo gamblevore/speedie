@@ -108,5 +108,5 @@ struct FastBuff
 		cpp_part AddBuff
 		|| L = data.length
 		|| addr = (data.start, nil)(L)
-		.addmemory(type, into, addr, L)
+		.addmemory(type, addr, into, L)
 

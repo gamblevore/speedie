@@ -41,7 +41,11 @@ role JBin (Faststring)
 	function add		(|syntax| type, |string| data="", |bool|into = false)
 		|| L = data.length
 		|| addr = (data.addr, nil)(L)
-		.addmemory(type, into, addr, L)
+		.addmemory(type, addr, into, L)
+
+	function add		(|syntax| type, |faststring| fs, |bool|into = false)
+		cpp_part AddFS
+		.addmemory(Type, fs.resultptr, into, fs.length)
 
 	function sheb		(|string| data)
 		self <~ '#'
@@ -59,9 +63,9 @@ role JBin (Faststring)
 			amount  -= less
 
 	function AddCstring	(|cstring| data, |syntax| type=@str)
-		.addmemory(type, false, data|&byte|, data.length)
+		.addmemory(type, data|&byte|, false, data.length)
 	
-	function AddMemory	(|syntax| type, |bool| GoIn, |&byte| data, |uint64| L)
+	function AddMemory	(|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
 		|uint| info = 128 >> goin
 		|| L2 = (L|int|, 60+L.lelength)(L < 60)
 		self <~ (info (|) L2)|byte|
@@ -73,7 +77,7 @@ role JBin (Faststring)
 
 	function OpenSection	(|int|)			// openstream 
 		.NoFlush ++
-		.AddMemory(@bin, false, nil, 1GB)
+		.AddMemory(@bin, nil, false, 1GB)
 		return .length
 
 	function CloseSection (|int| c)			// closestream
