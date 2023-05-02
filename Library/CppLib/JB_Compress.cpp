@@ -358,30 +358,23 @@ struct Counter {
 
 
 struct BalzComp {
-	uint		code;
-	uint		low;
-	uint		high;
-	Counter		counter1[256][512];
-	Counter		counter2[256][TAB_SIZE];
-	// why not just use fastbuff? its literally the same info?
 	u8*			output;
 	u8*			OutputEnd;
 	u8*			input;
 	u8*			inputEnd;
+	uint		code;
+	uint		low;
+	uint		high;
+	// why not just use fastbuff? its literally the same info?
+	FastString* fs;
+	Counter		counter1[256][512];
+	Counter		counter2[256][TAB_SIZE];
 	int			cnt[1<<16];
 	uint		tab[1<<16][TAB_SIZE];
 	
-	inline int get () { // make this a u8?
+	inline u8 get () {
 		DReq(input < inputEnd, "Chunk read overflow", 0);
 		return *input++;
-	}
-	inline void putc(u8 b) {
-		if (output < OutputEnd) {
-			*output++ = b;
-		} else if (OutputEnd) {
-			OutputEnd = 0;
-			DErr(false, "Chunk output too large");
-		}
 	}
 	
 	void Reset() {
@@ -403,17 +396,23 @@ struct BalzComp {
 			low=mid+1;
 			counter.Update0();
 		}
-
-		while ((low^high)<(1<<24)) {
-			putc(low>>24);
-			low <<= 8;
-			high = (high<<8)|255;
+		
+		u8* out = JB_FS_WriteAlloc_(fs, 4);
+		if (out) {
+			auto start = out;
+			while ((low^high)<(1<<24)) {
+				*out++ = low>>24;
+				low <<= 8;
+				high = (high<<8)|255;
+			}
+			fs->Length -= (4-(out-start));
 		}
 	}
 
 	void Flush() {
+		u8* out = JB_FS_WriteAlloc_(fs, 4);
 		for (int i=0; i<4; ++i) {
-			putc(low>>24);
+			*out++ = low>>24;
 			low <<= 8;
 		}
 	}
@@ -539,7 +538,7 @@ struct BalzComp {
 			Encode(buf[p++], 0);
 		
 		while (p < Length) {
-			const int c2 = reinterpret_cast<ushort&>(buf[p-2]);
+			const int  c2   = reinterpret_cast<ushort&>(buf[p-2]);
 			const uint hash = get_hash(buf, p);
 			
 			int len = MIN_MATCH-1;
@@ -646,11 +645,14 @@ struct BalzComp {
 
 
 static BalzComp* BB;
-static BalzComp* GetComp(int N, FastString* out) {
+static BalzComp* GetComp(FastString* out, int N=0) {
 	if (!BB) BB = new BalzComp; 
 	BB->Reset();
-	BB->output = JB_FS_WriteAlloc_(out, N);
-	BB->OutputEnd = BB->output+N;
+	if (N) {
+		BB->output = JB_FS_WriteAlloc_(out, N);
+		BB->OutputEnd = BB->output+N;
+	}
+	BB->fs = out;
 	return BB;
 }
 
@@ -663,15 +665,10 @@ extern "C" int JB_BALZ_CompressChunk(FastString* fs, JB_String* In, bool Strong)
 	if (!In or !fs)
 		return 0;
 	
-	int MaxSize = (In->Length*1.01) + 128; // worst-case
-	auto B = GetComp(MaxSize, fs);
-	auto first = B->output;
+	auto B = GetComp(fs);
+	auto first = JB_FS_StreamLength(fs);
 	B->balz_compress(In, Strong);
-	int Created = (int)(B->output - first);
-	if (!B->OutputEnd) // failed
-		Created = 0;
-    JB_FS_AdjustLength_(fs, MaxSize, Created);
-    return Created;
+	return JB_FS_StreamLength(fs) - first;
 }
 
 
@@ -679,7 +676,7 @@ extern "C" int JB_BALZ_DecompressChunk(FastString* fs, JB_String* In, int Expect
 	DReq(JB_Str_Length(In) >= 5, "Too short chunk received",	0);    // i think 5 is the minimum?
 	if (!fs) return 0;
 	
-	auto B = GetComp(Expected, fs);
+	auto B = GetComp(fs, Expected);
 	int Created = B->balz_decompress(In, Expected);
 	if (Created >= 0)
 		DReq(Expected == Created, "Chunk write-length error",	0);
