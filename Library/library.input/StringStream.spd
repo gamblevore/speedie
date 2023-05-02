@@ -1,24 +1,26 @@
 
 
 class StringStream
-	|FastBuff|	Data
-	|file|		File
-	|int|		Length
-	|int|		ChunkSize
-	|int| 		StartFrom
-	|bool| 		_NoMoreChunks
-	|object--|	UserObj // for jbin
+	|FastBuff|		Data
+	|file|			File
+	|int|			Length
+	|int|			ChunkSize
+	|int| 			StartFrom
+	|bool| 			_NoMoreChunks
+	|object--|		UserObj // for jbin
 
 	linkage:cpp_Part SS
 	
 	Flags
 		JbinMode = 1
 	
-	constructor (|string| d)
-		d := ""
-		.data.readfrom = d
-		.length = d.length
+	constructor (|string| Data)
+		if Data == nil
+			Data = ""
+		.data.readfrom = Data
+		.length = Data.length
 		._NoMoreChunks = true
+	
 	constructor (|file| file, |int| ChunkSize=4MB)
 		cpp_part ConstructorStream
 		file.close
@@ -41,6 +43,7 @@ class StringStream
 			.position = .length
 		  else
 			.position += p
+		
 	syntax cast (|bool|)
 		require (self != nil)
 		if .data has 1
@@ -68,18 +71,28 @@ class StringStream
 		return .data.position + .StartFrom
 	setter Position (|int64|)
 		.data.position = value - .StartFrom
-	function bint (|int|n=4, |int64|)
+
+	function bInt (|int|n=4, |int64|)
 		for n
 			rz <<= 8
 			rz |= .byte
 		
-	function bint0 (|int|n=3, |int64|)
+	function bInt0 (|int|n=3, |int64|)
 		// 0-3 works better for bit-math
 		return .bint(n+1)
 
-	function lint0 (|int|n=3, |int64|)
+	function lInt0 (|int|n=3, |int64|)
 		for i in n+1
 			rz |= .byte << i << 3
+
+	function hInt (|int64|)
+		for 9
+			|| b = .byte
+			rz <<= 8
+			rz |= b >> 1
+			if b&0x80
+				exit
+	
 
 	function CString (|string|)
 		// this function doesn't work with streaming...
@@ -139,6 +152,7 @@ class StringStream
 	
 	function utf8 (|int|n, |int|skip=0, |string|)
 		return  .str(n,skip).utf16to8(2)
+
 	function test (|string| Header, |bool|)
 		if !Header
 			return true

@@ -114,7 +114,7 @@ function FillDisposeFunc
 				arg <~ NewRel(decl.name, "=", "nil")
 
 
-function safename (|string|)
+function SafeName (|string|)
 	if .name
 		return .name
 	return .cls.name
@@ -125,6 +125,9 @@ function LoadModule (|Message| node)
 	|| namemsg = node.first
 	if !.cls
 		namemsg.expect(@thg)
+	  elseif namemsg
+		namemsg.expect(@arg)
+		
 
 	|| arg = namemsg
 	if namemsg == @thg
@@ -166,7 +169,7 @@ function OKToSort (|bool|)
 	if !c
 		 Return true
 	
-	if c.isstruct
+	if c.IsStruct
 		require c.StructContainerShipGrabbed
 	
 	if c.SuperGrabbed
@@ -191,7 +194,7 @@ module
 	function Neu (CollectFunc)
 		|| m = SCModule.new
 		m.Project = scimport.curr // hack?
-
+		
 		if (name_space isa SCClass)
 			m.LookUp = nil	// So Array.Byte, File.Byte, XXX.Byte... won't be found.
 							// It's just for the looking up of functions ON the module... not in the module's code.
