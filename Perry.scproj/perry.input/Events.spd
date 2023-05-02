@@ -104,6 +104,7 @@ function PressingTabs (guiaction)
 		if ide isa PerryIDE
 			p.ListSource.clear
 			|| name = ide.Project.name
+			p <~ ( "Close", MenuCloseProject, ide)
 			p <~ ( "Copy " + name, MenuCopyProject, ide)
 			p <~ ("Show Project", MenuShowProject, ide)
 			.OpenMenu(row) // "Yes" "no"
@@ -115,6 +116,13 @@ function MenuCopyProject (guimenuevent)
 	if ide isa perryide
 		clipboard.text = ide.Project
 		Notifications <~ "Copied: " + ide.Project
+
+
+function MenuCloseProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.obj
+	if ide isa perryide
+		ide.Close(sdlapp.kactivity)
 
 
 function MenuShowProject (guimenuevent)
