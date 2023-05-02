@@ -70,7 +70,7 @@ function String.HiddenJBin (|ind|)
 
 function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |MessageRoot|)
 	// language2.scproj uses owner
-	|| data = (.decompress, self)(Allowdecomp and .iscompressed)
+	|| data = (.decompress(int.max), self)(Allowdecomp and .iscompressed)
 	|| j = data.HiddenJBin
 		return data[j, int.max].parse_jbin
 	if !Parser.CppInited
