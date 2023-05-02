@@ -178,11 +178,7 @@ void JB_Tk__TokenSet( JB_String* TokStr, TokHan* New_ ) {
     if (!New_) {
         return;
     }
-    // replace with JB_Dict_ValueSet?
-
-    // uint8* Read = TokStr->Addr;
-    JB_Object** Place = JB_Dict_MakePlace(self->WordDict, TokStr);
-//	JB_Object** Place = Dict_MakePlace_(self->WordDict, TokStr, Read, Read + TokStr->Length);
+    JB_Object** Place = JB_Dict_MakePlace(self->WordDict, -1, TokStr);
     dbgexpect(Place);
     TokHan* Old_ = (TokHan*)(*Place);
 

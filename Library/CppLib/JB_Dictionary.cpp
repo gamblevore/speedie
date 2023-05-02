@@ -507,7 +507,7 @@ bool CanFind_(Dictionary* self, JB_String* key, FindResult* F) {
 }
 
 
-bool CanSet_(Dictionary* self, JB_String* key, FindResult* F) {
+bool CanSet_(Dictionary* self, int Prefix, JB_String* key, FindResult* F) {
     if (key and self) {
         *F = BeginFind_( self,  Mini(key, 0) );
         JB_Dict_Value_(*F);
@@ -538,9 +538,9 @@ JB_String* JB_Str_UniqueSplit(JB_String* self, int StartOff, int Length, Diction
 
 
 
-JB_Object** JB_Dict_MakePlace(Dictionary* self, JB_String* key) {
+JB_Object** JB_Dict_MakePlace(Dictionary* self, int Prefix, JB_String* key) {
     FindResult F;
-    if (CanSet_(self, key, &F)) {
+    if (CanSet_(self, Prefix, key, &F)) {
         return F.Place;
     }
     return 0;
@@ -561,7 +561,7 @@ JB_Object* JB_Dict_Value(Dictionary* self, JB_String* key, JB_Object* Default) {
 
 void JB_Dict_ValueSet(Dictionary* self, JB_String* key, JB_Object* Value) {
     FindResult F;
-    if (CanSet_(self, key, &F)) {
+    if (CanSet_(self, -1, key, &F)) {
         *F.Place = JB_Incr(Value);
         if (IsValue_(F.Obj)) { // could be a direct int
             JB_Decr(F.Obj);
