@@ -1,6 +1,5 @@
 #!/usr/local/bin/speedie
 
-// balz decomp still fails! on big files or all?
 datatype Type (int)
 	flags // compressed should be an action?
 		ReadOK, Compressed, Plain, XML, actions=(Box, Jbin, Report, PrintTree), StdOut, SelfReplace, TestThem
