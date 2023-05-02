@@ -124,15 +124,6 @@ inline uint8* JB_FS_WriteAlloc_Inline_(FastString* fs, int GrowBy) {
     return JB_FS_GrowBy(fs, GrowBy);
 }
 
-//inline uint8* JB_FS_WriteAlloc2(FastString* fs, int GrowBy) {
-//	u8* W = fs->Write;
-//	u8* W2 = W+G;
-//	if (W2 <= fs->WriteEnd) {
-//		fs->Write = W2;
-//		return W;
-//	}
-//}
-
 inline void JB_FS_AdjustLength_( FastString* fs, int Expected, int Actual ) {
 	int Missing = Expected - Actual;
 	fs->Length -= Max(Missing,0);
