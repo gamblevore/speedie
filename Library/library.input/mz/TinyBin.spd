@@ -1,0 +1,139 @@
+
+struct deklinker
+	linkage
+		cpp_part ubs
+	|stringstream|	Input 
+	|stringstream|	SubParser 
+	|message|		Name
+	|message|		strings
+	|message|		IDTable
+	|message|		Tree
+	|[messageid]|	IDs
+
+	function Collect (|int|)
+		.name    = .input.nextmsg(@tmp, "Ĵµ")				#require
+		.strings = .input.nextmsg(.name, @str)				#require
+		.IDTable = .input.nextmsg(.name, @bin)				#require
+		.Tree    = .input.nextmsg(.name, @bin)				#require
+		
+		.SubParser = stringstream(.IDTable.name)
+		rz = .SubParser.hInt
+		expect (rz < 512K) (.input, "IDCount too large") 
+	
+		.IDS <~ (messageID(), rz)
+
+
+	function IDGen (|int| IDCount)
+		opt norefcounts
+		|| n   = 0
+		|| pos = 0
+		|| ids = .ids
+		|| Str = .strings.name.decompress(int.max)
+		while .SubParser
+			|| fn = .subparser.byte|syntax| #expect (.input)
+			|| length = .subparser.hint 
+			expect (n < idcount) (.input, "Too many IDs found")
+			ids[n] = MessageID(str[pos, length], fn)
+			pos += length
+			n++ 
+		expect (n == IDCount) (.input, "Too few IDs found")
+	
+
+	function MakeTree
+		opt norefcounts
+		|message| Parent
+		|| Table = .ids
+		while .input
+			|| ID = .input.byte
+			|| Dir	= ID >> 6							// 0 = up,  2 = same,  1 = down :)
+				ID = (ID << 8) (|) .input.byte
+				if ID >= 14K
+					ID = ((ID-14K)<<8) (|) .input.byte
+				|| MID = table[ID]							#expect (.input, "Bad ID")
+				|| msg = mid.msg(parent)
+				if !parent
+					parent = msg
+					.tree = msg
+				  elseif dir == 1
+					parent = msg
+			  else
+				parent = parent.upward(ID) // go up
+
+
+	function Decode
+		|| OK = stderr.mark 
+		|| N = .collect
+		if OK //      :3
+			.IDGen(n)
+		if OK //hehe
+			.MakeTree
+	
+	
+	function stringstream.UnsquashJbin (|message|)
+		|deklinker| sq
+		sq.input = self
+		sq.decode
+		rz = sq.Tree
+		
+
+
+function Message.Identify (|dictionary of messageid| d, |[messageid]| table, |int|)
+	visible
+	cpp_part RunMsg
+	opt NoRefCounts
+	for s.flat in self
+		|| Found = d.makeplace(s)
+		|| ID = *found
+			ID.tag++
+		  else
+			id = MessageID(s.name, s.func)
+			table <~ id
+			*found = id
+			rz += s.name.Length
+		s.Name = id
+			
+	
+	
+struct KlinkIt
+	linkage
+		cpp_part sbs
+	|faststring|					Strings
+	|faststring|					IDTable
+	|string|						Tree
+	
+	function BuildTable (|message| root)
+		|dictionary of messageid| d = Dictionary()
+		|[messageid]| table
+		|| Length = root.identify(d, table)
+		table.sort(&messageid.IDSorter)
+		|| fs_str = FastString(length)
+		.strings = fs_Str
+		|| fs_id = FastString()
+		.IDTable = fs_id
+		for id in table
+			fs_str <~ id.Name
+			fs_id  <~ id.Func|byte|
+			fs_id.hint(id.name.length)
+		
+
+	function Run (|message| root, |faststring| out, |bool|)
+		visible
+		opt NoRefCounts
+		
+		.BuildTable(root)
+		|| curr = root
+		|| depth = 0
+		while curr
+//			|| then write the directions
+			curr = curr.FlatNextDepth(depth)
+		
+	
+	
+	function stringstream.CompressJbin (|jbin| fs)
+		|KlinkIt| Stuff
+		require Stuff.Run(.parse_jbin, fs)
+		fs.enter(@tmp, "Ĵµ")
+		fs.add(@str, stuff.strings)
+		fs.add(@str, stuff.IDTable)
+		fs.add(@str, stuff.Tree)
+	
