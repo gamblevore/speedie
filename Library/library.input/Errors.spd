@@ -30,8 +30,10 @@ class Error (Message)
 		.OriginalData = node.OriginalParseData
 		.when = date()
 		.func = @sstr // whatever
+	
+	
 	constructor ()
-		cpp_part Nothing
+		cpp_part Nothing // Not an error actually.
 		super.constructor
 		.position = -1
 		.severity = ErrorSeverity.ok
