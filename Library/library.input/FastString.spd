@@ -70,29 +70,34 @@ class FastString {
 		cpp_wrapper JB_FS_SmartResult
 	function Copy (|string|)
 		cpp_wrapper JB_FS_Copy
-	function uint64.lelength (|int|)
-		pragma inline
-		return (self|int|.log2 max 0) >> 3
-	
-	function BInt (|uint64| val) // highest first
-		|| n = val.lelength
-		while n >= 0
-			self <~ (val>>(n<<3))|byte|
-			n--
 
+	function hInt (|uint64| n)
+		while n
+			if n > 127
+				self <~ (n (|) 128)|byte|
+			  else
+				self <~ (n)|byte|
+			n >>= 7
+			
+		
 	function lInt (|uint64| n)
 		while n
-			self <~ (N&255)|byte|
-			n>>=8
+			self <~ N|byte|
+			n >>= 8
 
-	function EncodeLength (|uint64| N)
-		|| lim = 256-8
+	function EncodeLength (|uint64| N)  // maybe hInt is better? like how many speedie-strings are over 128 anyhow?
+		|| lim = 256-8					// you get 14 bits instead of 11 in two bytes.
 		|| L2 = N|byte|
 		if N >= lim
 			l2 = lim + n.lelength
 		self <~ L2|byte|
 		if N >= lim
-			.lint(N)		
+			.lint(N)
+
+	function uint64.lelength (|int|)    // could remove this also
+		pragma inline
+		return (self|int|.log2 max 0) >> 3
+		
 	render
 		fs <~ self
 

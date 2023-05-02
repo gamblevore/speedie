@@ -86,11 +86,10 @@ class StringStream
 			rz |= .byte << i << 3
 
 	function hInt (|int64|)
-		for 9
+		for i in 9
 			|| b = .byte
-			rz <<= 8
-			rz |= b >> 1
-			if b&0x80
+			rz |= (b & 127) << (i * 7)
+			ifn b&0x80
 				exit
 	
 
