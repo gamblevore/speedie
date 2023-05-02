@@ -37,12 +37,6 @@ dataType SDL_Scancode (int)
 	function Key (|keys|)
 		cpp_wrapper SDL_GetKeyFromScancode
 
-	function Pressed (|bool|)
-		|| n = 0
-		|| state = keys.state(n)|&byte|
-		if n > self
-			return state[self]
-
 
 
 struct SDL_KeyboardEvent

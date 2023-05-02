@@ -25,7 +25,6 @@ datatype Type (int)
 			fs <~ "plain"
 
 
-
 main
 	if !app.args
 		print .usage
@@ -158,17 +157,6 @@ module Conv
 		if f.exists and f.path != o.path	
 			"deleting ${f.name}"
 			f.delete
-	
-	function MiniTest
-		|| fs = FastString()
-		|| txt = .in.Read(4MB)
-		printline "inputting ${txt.length.strsize} chonk"
-		fs.BalzCompressChunk(txt)
-		|| str = fs.GetResult
-		fs.BalzDecompressChunk(str, txt.length)
-		str = fs.GetResult
-		printline "output ${str.length.strsize} chonk"
-		expect (str == txt) ("Strings mismatch")
 		
 		
 	function TestSub (|file| orig)
