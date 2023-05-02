@@ -26,7 +26,7 @@ function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 		|| str = .str(Chunksize)
 		|| Place = j.OpenSection
 		if Mode
-			j.BalzCompressChunk(str, strength > mzlab.strong)
+			j.StrongCompressChunk(str, strength > mzlab.strong)
 		  else
 			j.CompressChunk(str)
 		
@@ -74,7 +74,7 @@ helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 			|| s = c.name
 			|| Expected = Remaining min ChunkMax
 			if Mode
-				loop fs.BalzDecompressChunk(c.name, Expected)
+				loop fs.StrongDecompressChunk(c.name, Expected)
 			  else
 				loop fs.DecompressChunk(c.name, Expected)
 			Remaining -= Expected
@@ -91,10 +91,10 @@ helper faststring.CompressChunk (|string| str)
 helper faststring.DecompressChunk (|string| str, |int| Expected, |int|) 
 	cpp_wrapper JB_Str_DecompressChunk
 
-helper faststring.BalzCompressChunk (|string| str, |bool| Strong = false) 
+helper faststring.StrongCompressChunk (|string| str, |bool| Strong = false) 
 	cpp_wrapper JB_BALZ_CompressChunk
 
-helper faststring.BalzDecompressChunk (|string| str, |int| Expected, |int|) 
+helper faststring.StrongDecompressChunk (|string| str, |int| Expected, |int|) 
 	cpp_wrapper JB_BALZ_DecompressChunk
 
 
