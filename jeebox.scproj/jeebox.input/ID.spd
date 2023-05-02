@@ -1,6 +1,6 @@
 
 
-class StringShared
+class StringShared (string)
 	linkage
 		wrapper
 		cpp_class JB_StringShared
@@ -8,24 +8,43 @@ class StringShared
 
 	cpp_refs
 		Disturbs		nil
+	
+	constructor (|string| data)
+		cpp_wrapper JB_Str_Clone
 
 	default			""
 
 
-target future
-	// I suppose we could do a different parsing scheme...
-	// where we use shared "ID" objects... per message
-	// Could save RAM/CPU during parse? if done right.
-	// Apple = Apple.eat(Apple) the Apple is thg@"Apple"
-	// sooo it can be reused 3x.
-	// doesnt work well for large strings... but most of them yes.
-	// could set a "maximum string size" that we do it to?
-	// otherwise... they DON'T get uniqufied.
 
-	class ID (StringShared)
-		contains object
-		||			OurThing
-		|syntax|	Func
-		constructor
-			.ourthing = nil
+class MessageID (stringshared)
+	contains object
+	|Syntax|			Func
+	||					Obj
+	|int64|				Tag
+	
+	constructor (|string| Name="", |Syntax| Fn=nil)
+		super.constructor(name)
+		.Func = fn
+		.obj = nil // c++ generator fails otherwise
+	
+	function Msg (|message| parent, |message|)
+		return Message(parent, .func, -1, .name, .name.length)
+	
+	module
+		function IDSorter (SorterComparer)
+			return a|MessageID|.tag  <  b|MessageID|.tag
 
+
+function Message.Identify (|dictionary of messageid| d, |[messageid]| table, |int|)
+	visible
+	opt NoRefCounts
+	for s.flat in self
+		|| Found = d.makeplace(s)
+		|| ID = *found
+			ID.tag++
+		  else
+			id = MessageID(s.name, s.func)
+			table <~ id
+			*found = id
+			rz += s.name.Length
+		s.Name = id

@@ -74,23 +74,6 @@ struct deklinker
 		sq.input = self
 		sq.decode
 		rz = sq.Tree
-		
-
-
-function Message.Identify (|dictionary of messageid| d, |[messageid]| table, |int|)
-	visible
-	cpp_part RunMsg
-	opt NoRefCounts
-	for s.flat in self
-		|| Found = d.makeplace(s)
-		|| ID = *found
-			ID.tag++
-		  else
-			id = MessageID(s.name, s.func)
-			table <~ id
-			*found = id
-			rz += s.name.Length
-		s.Name = id
 			
 	
 	
