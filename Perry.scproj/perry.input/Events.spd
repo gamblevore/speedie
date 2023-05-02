@@ -180,9 +180,9 @@ function PerryIDE.FindNotTodo (|bool|)
 function PerryIDE.ClickedTodo
 	|| todo	= .mainprojFol
 	|| fl	= .filelist
+	require todo and .findnottodo and fl // what? fl is nil? it happened tho?
 	if !todo
 		todo = fl[0]
-	require todo and .findnottodo
 	|| Jumpback = (todo is selected) and .nottodo and (fl.listsource contains .nottodo) 
 		todo = .nottodo
 		fl.show(todo)
