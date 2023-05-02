@@ -1370,10 +1370,11 @@ function message.Tran_FS
 
 
 function Tran_Ifn (TranFunc)
-	using (node)
-		node.name = "if"
-		node.first = «brel "!", node.first.needbra »
-	tran_if(fn, node, name_space)
+	|| f = node[@nil]
+		using (node)
+			node.name = "if"
+			node.first = «brel "!", f.needbra »
+		tran_if(fn, node, name_space)
 
 
 function scbase.LateAddTempory (|string| type, |string| name1, |message| Value, |message| err, |string|)
