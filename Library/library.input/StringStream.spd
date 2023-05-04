@@ -86,11 +86,15 @@ class StringStream
 			rz |= .byte << i << 3
 
 	function hInt (|int64|)
-		for i in 9
+		|| sh = 0
+		|| v  = 0
+		while
 			|| b = .byte
-			rz |= (b & 127) << (i * 7)
-			ifn b&0x80
-				exit
+			v |= (b&127) << sh
+			if b <= 127
+				return v
+			sh += 7
+			expect (sh <= 57) (self, "Corrupted hInt")
 	
 
 	function CString (|string|)
@@ -156,18 +160,21 @@ class StringStream
 		if !Header
 			return true
 		return Header == .str(Header.length)
+	
 	function UInt16 (|uint16|)
 		disabled "use .uint(2)"
 
-	syntax expect ( |string| Error )
+	syntax expect (|string| Error)
 		opt norefcounts
+		require !.data.ErrorReported
+		.data.ErrorReported = true
 		if !error
 			if (.file)	
 				error = "Error decoding file: "
 			  else
 				error = "Error decoding data."
 				
-		stderr.newError(nil, error, .file)
+		stderr.NewError(nil, error, .file)
 
 
 	
