@@ -1,15 +1,4 @@
 
-
-/*
-* OK... so lets go with an array of compressed strings. As long as .need works... the rest will work
-	* just nede to modify compression so that an array of strings is possible!
-	* also decompression... works directly from message, meaning we need the entire jbin in memory.
-		* We could alter that? Just... turn my jbin parser into some kind of generator? A func that "Gives the next string/func"
-		
-* I guess decompress can just fall off the last position...
-
-*/
-
 	
 function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
 	expect (self!=nil) ("Nil object given to CompressInto")
@@ -17,7 +6,7 @@ function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 	st := CompressionStats.All
 	|| Mode = ("ro", "")(strength >= mzlab.strong)
 	|| ChunkSize = (4MB, 1MB)(mode)				// don't change these! compression will fail.
-	st.len(j.length) 
+	st.start
 	j.jinit
 	j.enter(@tmp, "µz")
 	j.addint(.length)
@@ -31,7 +20,7 @@ function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 			j.CompressChunk(str)
 		
 		j.CloseSection(Place)
-		st.LiveUpdate(str, j.length)
+		st.LiveUpdate(str.length, j.length - place)
 		if !.NoMoreChunks
 			j.flush // we are calling it after anyhow	
 	j.up(2)
@@ -41,14 +30,15 @@ function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 
 helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compressionstats| st=nil, |bool|)
 	expect (self!=nil) ("Nil object given to CompressInto")
-	|| fs = faststring.use(dest) #require
+	|| fs = faststring.use(dest)				#require
 	if !.IsCompressed
 		fs <~ .readall
 		return true
 	st := compressionstats.all
+	st.start
 	.ExpectJbin
 	
-	|| mz = .NextMsg				#require
+	|| mz = .NextMsg							#require
 	if mz == @arg // remove this later
 		mz = .NextMsg(@tmp)
 	  else
@@ -66,11 +56,10 @@ helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 		  else
 			error (self, "Invalid mz header")
 	  else
-		st.len(fs.StreamLength)
 		|| Mode = arg.name
 		|| ChunkMax = (4MB, 1MB)(mode) 
 		while
-			|| c = .NextMsg(arg, @bin) #loop
+			|| c = .NextMsg(arg, @bin)			#loop
 			|| s = c.name
 			|| Expected = Remaining min ChunkMax
 			if Mode
@@ -79,7 +68,7 @@ helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 				loop fs.DecompressChunk(c.name, Expected)
 			Remaining -= Expected
 			fs.Flush
-			st.LiveUpdate(c.name, fs.StreamLength)
+			st.LiveUpdate(c.length, Expected)
 			c.remove
 			
 	return OK
