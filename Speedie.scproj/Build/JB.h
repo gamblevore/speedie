@@ -553,6 +553,7 @@ struct KlinkIt {
 	FastString* Strings;
 	FastString* IDTable;
 	JB_String* Tree;
+	FastString* Out;
 };
 
 struct MessagePosition {
@@ -1156,7 +1157,8 @@ struct MessageID_Behaviour: StringShared_Behaviour {
 JBClass ( MessageID , JB_StringShared , 
 	Syntax Func;
 	JB_Object* Obj;
-	int64 Tag;
+	int64 ID;
+	u16 DecodeID;
 );
 
 struct SCArg_Behaviour: SCBase_Behaviour {
@@ -1259,13 +1261,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1828])
+#define kJB__ErrorColors_bold (JB_LUB[1829])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1829])
-#define kJB__ErrorColors_good (JB_LUB[1830])
-#define kJB__ErrorColors_normal (JB_LUB[1831])
-#define kJB__ErrorColors_underline (JB_LUB[1830])
-#define kJB__ErrorColors_warn (JB_LUB[1832])
+#define kJB__ErrorColors_error (JB_LUB[1830])
+#define kJB__ErrorColors_good (JB_LUB[1831])
+#define kJB__ErrorColors_normal (JB_LUB[1832])
+#define kJB__ErrorColors_underline (JB_LUB[1831])
+#define kJB__ErrorColors_warn (JB_LUB[1833])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1463,6 +1465,7 @@ extern JB_String* JB__zalgo_up;
 extern JB_String* JB___AppConfString;
 extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
+extern JB_String* JB__JbinHeaderOld;
 extern bool _once1;
 extern bool _once2;
 extern Dictionary* JB__SyxDict_;
@@ -1481,7 +1484,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[339])
 #define kSC_BitNot (JB_LUB[438])
 #define kSC_BitOr (JB_LUB[644])
-#define kSC_BitXor (JB_LUB[1833])
+#define kSC_BitXor (JB_LUB[1834])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1511,7 +1514,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1834])
+#define kJB_SaverStart1 (JB_LUB[1835])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -4334,11 +4337,15 @@ int SC_IR__InitCode_();
 
 
 // JB_KlinkIt
-void JB_sbs_BuildTable(KlinkIt* self, Message* root);
+Array* JB_sbs_BuildTable(KlinkIt* self, Message* root);
 
 void JB_sbs_destructor(KlinkIt* self);
 
-bool JB_sbs_Run(KlinkIt* self, Message* root, FastString* out);
+void JB_sbs_GoUp(KlinkIt* self, int Depth);
+
+void JB_sbs_NextIDs(KlinkIt* self);
+
+bool JB_sbs_Run(KlinkIt* self, Message* root);
 
 
 
@@ -5809,9 +5816,9 @@ void JB_SS_destructor(StringStream* self);
 
 bool JB_SS_ExpectJbin(StringStream* self);
 
-bool JB_SS_IsCompressed(StringStream* self);
+int64 JB_SS_hInt(StringStream* self);
 
-int64 JB_SS_lInt0(StringStream* self, int n);
+bool JB_SS_IsCompressed(StringStream* self);
 
 bool JB_SS_NextChunk(StringStream* self);
 
@@ -6083,7 +6090,7 @@ void JB_bin_addint(FastString* self, int64 data);
 
 void JB_bin_AddMemory(FastString* self, Syntax type, byte* data, bool GoIn, uint64 L);
 
-void JB_bin_CloseSection(FastString* self, int c);
+void JB_bin_CloseSection(FastString* self, uint c);
 
 void JB_bin_Constructor(FastString* self, Syntax type, JB_String* data);
 
@@ -7635,7 +7642,7 @@ Message* JB_Msg_HasOwnBlock(Message* self);
 
 bool JB_Msg_HasPosition(Message* self);
 
-int JB_Msg_RunMsg(Message* self, Dictionary* d, Array* table);
+int JB_Msg_Identify(Message* self, Dictionary* d, Array* table);
 
 SCFunction* JB_Msg_IdentifyFunc(Message* self);
 
