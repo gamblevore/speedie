@@ -26,25 +26,32 @@ function FoundListKeys (GuiKeyEvent)
 		return true
 
 
-	
+|| DebugArgsArgs = "
+args {
+	// put arguments here like this:
+	// \"ArgumentValue\"
+	// you can use strings of any kind, or direct names or numbers
+}
+"
 function DebugArgsGotFocus (guiaction)
 	|| f = .ide.DebugArgsFile #require
 	|| v = state == 1
 	require (self is visible) != v
 	(self is visible) = v
-	if v and self isa TextView
-//		.Document := Document(f) // debug this later!
-		.text = f.ReadAll
-		|| data = .parse
+	if self isa TextView
+		if !.Document
+			.LoadDocument(Document(f))
+		|| data = .Parse
 			if !data..args
-				self <~ "\nargs\n\tArg1\n\tArg2\n"
+				self <~ DebugArgsArgs
 			if !data..pwd
 				self <~ "\npwd '.'\n"
 			if !data..env
 				self <~ "\nenv\n\tsetting=\"value\"\n"
-		.window.setinnerfocus(self)
-	  else
-		f.SmartData = .text
+		if v
+			.window.setinnerfocus(self)
+		  else
+			.Save
 		
 
 function fnStillRunning (fnConfirmCanceller)
