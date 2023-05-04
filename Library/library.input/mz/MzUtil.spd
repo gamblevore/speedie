@@ -138,22 +138,22 @@ struct CompressionStats
 	linkage:cpp_part MzSt
 	|date| Duration
 	|int|  In
-	|int|  LastOut
 	|int|  Out
 	|bool| Live
 	
+	function Clear
+		.Duration = nil
+		.in = nil
+		.out = nil
+
 	function start
 		.Duration = -date()
 	function end
 		.Duration += date()
-	function len (|int| n)
-		.Duration := -date()
-		.LastOut = n
 
-	function LiveUpdate (|string| s, |int| outt)
-		.in += s.length
-		.out += outt - .LastOut
-		.LastOut = .out
+	function LiveUpdate (|int| inn, |int| outt)
+		.in += inn
+		.out += outt
 		|| d = .durr
 		if .live and d > 1
 			printline .render
