@@ -2,15 +2,14 @@
 
 datatype Type (int)
 	flags // compressed should be an action?
-		ReadOK, Compressed, Plain, XML, actions=(Box, Jbin, Report, PrintTree), StdOut, SelfReplace, TestThem
+		ReadOK, Compressed, Plain, XML, actions=(Box, Jbin, Report, PrintTree, ParseSpeed), StdOut, SelfReplace, TestComp
 	
 	syntax is (|Type| test, |bool|)
 		return self & test
 	syntax isnt (|Type| test, |bool|)
 		return !(self & test)
-	
-	function Format (|Type|)
-		return Box (|) jbin (|) xml
+	function Format (|Type|) 
+		return self & (Box (|) jbin (|) xml)
 	
 	render
 		if self is Compressed
@@ -27,11 +26,12 @@ datatype Type (int)
 
 function app.UseOne (|file| f)
 	conv.in = f
-	conv.Out = conv.OutPath.file
+	if conv.dest isnt parsespeed
+		conv.Out = conv.OutPath.file
 	if conv.in.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
-	  elseif conv.dest is TestThem
+	  elseif (conv.dest is TestComp)
 		conv.TestOne
 	  else
 		conv.Process
@@ -83,6 +83,8 @@ function App.GetActions (|Type|)
 			rz |= type.jbin
 		  elseif name ~= "s"
 			rz |= type.selfreplace
+		  elseif name ~= "z"
+			rz |= type.parsespeed
 		  elseif name ~= "p"
 			rz |= type.stdout
 			.SingleFile(name)
@@ -98,7 +100,7 @@ function App.GetActions (|Type|)
 			x |= type.box  * (v contains 'j')
 			conv.DetectOnly = x
 		  elseif name ~= "test"
-			rz |= type.TestThem
+			rz |= type.TestComp
 			rz |= type.compressed
 		  elseif name ~= "c"
 			rz |= type.compressed
@@ -125,6 +127,7 @@ function app.usage (|string|)
         -c=0        Compress for very-fast decompress
         -s          Replace file in-place
         -p          Print to stdout
+        -z			Parse Speed Test
         -d          Print Parse Tree
         -r          Just report types, otherwise do nothing
         -f=name     Sets the filename of output
@@ -137,6 +140,8 @@ function app.usage (|string|)
         jz    A.txt.mz   				// decompress A.txt.mz to A.txt
         jz -b A.box   					// jeebox to jbin
         jz -b A.xml   					// xml to jbin
+        jz -z A.box   					// Displays parse-speed only
+        jz -d A.box   					// prints the parse-tree
 "
 
 
@@ -147,9 +152,10 @@ module Conv
 	|file| 			Out
 	|date|			Start
 	|type| 			DetectOnly = -1
-	|float| 		Size
 	|type| 			Dest
-	|message| 		Parse
+	|type| 			Detected
+	|float| 		Size
+	|message| 		AST
 	|int| 			MaxNodeLength = 128 //int.max
 	|int|			Done
 	|string|		DestPath
@@ -159,14 +165,18 @@ module Conv
 	
 
 	function End
+		|| s = .speed.GetResult
+			printline s
 		.in = nil
 		.data = nil
 		.start = nil
-		|| s = .speed.GetResult
-			printline s
+		.ast = nil
+		.Detected = nil
+		CompressionStats.all.Clear
 	
 	
 	function TestOne
+		require .in.MustExist("test compression")
 		|| OrigIn = .in
 		|| OrigOut = .out
 		.DefaultStrength = MZLab.Fast
@@ -179,7 +189,7 @@ module Conv
 
 		.del(.out, origin)		
 		.del(origout, origin)
-		done++
+		.done++
 	
 	
 	function del (|file| f, |file| o)
@@ -242,27 +252,32 @@ module Conv
 			.time("Compress(streamed $type)", true)
 	
 
-	function Read (|type|)
+	function Read (|bool|)
 		|| OrigSize = 0
 		|| CmpFormat = .in.FormatInfo(OrigSize)
 		|| IsJbin = CmpFormat == "jbin"
 			CmpFormat = ""
-			rz |= type.jbin
+			.Detected |= type.jbin
 		
 		.FileIsCompressed = CmpFormat!=""
-		rz |= (FileIsCompressed * type.compressed) // only read compressed at first
+		if .FileIsCompressed
+			.Detected |= type.compressed // only read compressed at first
+				
 		
 		if .DetectOnly != -1 
-			require rz & .detectonly
+			require .Detected & .detectonly
 			printline "Found: ${.in.path}"
+
+		++.done
+
+		if .FileIsCompressed and Dest is parsespeed
+			"Can't test parse-speed on compressed: $.in"
+			return 0
 
 		ifn Dest&type.Actions
 			if FileIsCompressed != (dest is compressed)
 				.CompressOnly(FileIsCompressed)
-				++ done
 			return 0
-		
-		++.done
 		
 		if (Dest is report) and CmpFormat
 			"$.in is: ${OrigSize.strsize} compressed to ${.in.size.strsize} ($CmpFormat)"
@@ -271,76 +286,90 @@ module Conv
 		.start = date()
 		.data = .in.ReadAll(int.max, false)
 		if .data != string.error
-			rz |= type.ReadOK
+			.Detected |= type.ReadOK
 		if (Dest is report) and (.data == "")
 			if StdErr.OK
 				"$.in is empty"
 			return 0
 		.Time("Read ")
 		
-		if FileIsCompressed and !(dest is printtree)
+		if .FileIsCompressed and !(dest is printtree)
 			.start = date()
 			.data = .data.Decompress(int.max)
 			.time("Decompress", true)
 		
 		if Dest is report
-			"$.in is: ${rz.render}"
+			"$.in is: ${.Detected.render}"
 			return 0
+		return true
 
 	
-	function Detect (|type| Detected,  |type|)
+	function Detect (|bool|)
+		require .detected or (.dest is parsespeed)
+		if .dest is parsespeed
+			require .detected isnt compressed
+			printline .in.path
+
 		.start = date.now
 		if (dest is PrintTree) and (.data.isjbin)
-			.parse = .data.parse_jbin			#require
-			for s.flat in .parse
+			.AST = .data.parse_jbin			#require
+			for s.flat in .AST
 				s.name = s.name.Preview(MaxNodeLength)
 		  else
-			.parse = .data.Parse // no errors actually :)
-			if !.parse
+			.AST = .data.Parse // no errors actually :)
+			if !.AST
 				stderr.pop
 		
-		if .parse
+		if .AST
 			.time("Parse")
-		if !.parse
+		if .dest is parsespeed
+			if !.ast
+				"    Parse: Failed!"
+			return false
+		require .detected
+		
+		if !.AST
 			detected |= type.plain
 		  elseif .data.IsJbin
 			detected |= type.jbin
-		  elseif .parse.Find(@xml)
+		  elseif .AST.Find(@xml)
 			detected |= type.xml
 			if dest isnt report
 				.start = date.now
-				require parse.XMLToJeebox
+				require .AST.XMLToJeebox
 				.time("Convert XML")
 		  else
 			detected |= type.box
 
-		return Detected
+		return true
 
 
-	function Transform (|type| Detected)
-		if !.parse
+	function Transform (|bool|)
+		printline "transform: " + Detected.render + " to " + dest.render
+		if !.AST
 			0
 		  elseif (dest is PrintTree)
-			.data = .parse.RenderAST
+			.data = .AST.RenderAST
 		  elseif (Detected.format != Dest.format)
 			.Start = date.now
 			if dest is box
-				.data = .parse.Render
+				.data = .AST.Render
 			  else
-				.data = .parse.render_jbin
+				.data = .AST.render_jbin
 			.time("Render")
 
 		if dest is compressed
 			.start = date.now
 			.data = .data.Compress(DefaultStrength)
 			.time("Compress")
+		return true
 
 
 	function Process
 		require .in.MustExist
-		|| Detected = .Read						#require
-		Detected = .Detect(Detected)			#require
-		.Transform(detected)
+		require .Read
+		require .Detect
+		require .Transform
 			
 		if dest is stdout
 			print .data
@@ -360,8 +389,11 @@ module Conv
 		  elseif dest is jbin
 			ext = "jbin"
 		rz = .in.RemoveExt("mz")
-		if ext  and  rz isa "box" or "jbin"
-			rz = rz.SetExt(ext)
+		if ext
+			if rz isa "box" or "jbin" or "xml"
+				rz = rz.SetExt(ext)
+			  else
+				rz = rz.AddExt(ext)
 		if dest is compressed
 			rz = rz.AddExt("mz")
 		  elseif ((.in isa "mz") and rz.FileExists) or (rz == .in)
