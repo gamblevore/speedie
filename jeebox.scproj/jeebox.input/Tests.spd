@@ -158,22 +158,22 @@ helper Jeebox.Test (|string|)
 	require str.escapetest
 
 	|| natural_input = –SELF_TEST_NATURAL
-	|| jbin_input    = –SELF_TEST_JBIN
-	// Parse, render, re-parse, compare tree, compare re-render
+	|| jbin_input    = ""//–SELF_TEST_JBIN
+	// Parse,  render,  re-parse,  compare tree,  compare re-render
 	
 	debugger (TestCasting())
 	"normal".uppercase
-	|| LKT = leaktester.new("entities")
+	|| LKT = leaktester("entities")
 	EntityTest()
 	LKT.FinalTest
 	require stderr.ok
 
-	|| root = natural_input.parse #require
+	|| root = natural_input.parse				#require
 	root.jbinTest
 	if (jbin_input)
 		message.TreeCompare( root, root.copy ) // make sure compare works
 		message.TreeCompare( root, jbin_input.parse )
-		root.Test( root.Render,      	"normal" )
+		root.Test( root.Render,			"normal" )
 		root.Test( root.render_jbin,	"jbin" )
 	
 	require StdErr.ok
