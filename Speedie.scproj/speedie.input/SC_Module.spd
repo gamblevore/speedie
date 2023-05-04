@@ -125,9 +125,8 @@ function LoadModule (|Message| node)
 	|| namemsg = node.first
 	if !.cls
 		namemsg.expect(@thg)
-	  //else//if namemsg // fix later... harder than it seems
+	  //else//if namemsg // fix later...
 		//namemsg.expect(@arg)
-		
 
 	|| arg = namemsg
 	if namemsg == @thg
@@ -138,13 +137,11 @@ function LoadModule (|Message| node)
 			.SubsFrom = sub[@thg]$.name
 			arg = sub.next
 
-
 	arg.expect(@arg)
 	arg.expectlast$
 	.Source = arg
 	
 	compiler.disammodules.TryAdd(nil, self, .safename)
-	
 	.Collect( .source, scbase.CurrVisibility )
 
 
