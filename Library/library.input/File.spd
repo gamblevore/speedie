@@ -178,7 +178,7 @@ class File (String)
 	
 	function CompareFile (|File| A, |string| Error="", |bool|)
 		cpp_part FileCompare
-		|| code = .comparesub(a)
+		|| code = .CompareSub(a)
 		.Close
 		A.Close
 		return .CompareMsg(code, Error)
@@ -364,7 +364,7 @@ class File (String)
 	
 	
 	function string.Out (|Faststring|) // OK so this is far too low. Lets just put it on the actual types?
-		|| f = .file #require
+		|| f = .file				#require
 		f.close
 		if f.OpenEmpty
 			rz = FastString()
@@ -380,9 +380,9 @@ class File (String)
 	
 	function Copy (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
 		disabled "Use .Copyto"
+	
 	function CopyTo (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
 		cpp_wrapper JB_File_Copy
-	
 	
 	function CopyAll (|string| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		if !.isdir
@@ -392,7 +392,6 @@ class File (String)
 			rz = .child(f).copyall(dest[f]) 
 			if !rz
 				exit
-		
 	
 	function List (|bool|invis = false, |[string]|)
 		for name in self
@@ -400,18 +399,15 @@ class File (String)
 				rz <~ name
 		rz.sort(stringsorter)
 	
-	
 	function MoveTo (|string| Path, |ErrorInt|)
 		cpp_wrapper JB_File_MoveTo
 		
-	
 	operator inside (|file|f, |bool|)
 		|| fp = f.pathdir
 		return super[0, fp.length] == fp
 			
 	function Read (|int| Length, |bool|AllowMissing=true, |string|)
 		cpp_wrapper JB_File_Read
-
 
 	function skip (|int| n=1)
 		.offset += n
@@ -479,7 +475,7 @@ class File (String)
 		function NewPipe (|int| Pipe, |file|)
 			cpp_wrapper JB_File_NewPipe
 		
-
+// can rename these from path into files :)
 		function TrashPath (|string|)
 			if platform.OSX
 				return "~/.Trash/"
