@@ -72,11 +72,11 @@ class FastString {
 		cpp_wrapper JB_FS_Copy
 
 	function hInt (|uint64| n)
-		while n
-			if n > 127
-				self <~ (n (|) 128)|byte|
-			  else
+		while
+			if n <= 127
 				self <~ (n)|byte|
+				exit
+			self <~ (n (|) 128)|byte|
 			n >>= 7
 			
 		
