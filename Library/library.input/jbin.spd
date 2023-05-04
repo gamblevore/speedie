@@ -1,7 +1,8 @@
 
 // jbin: streamable, binary jeebox
 
-|| _JbinHeader = "\10\03" // ugh 
+|| _JbinHeaderOld = "\10\03"
+|| _JbinHeader = "\10\03\EA\E2" 
 /// can't put a constant in a role? 
 
 
@@ -58,36 +59,41 @@ role JBin (Faststring)
 
 	function up (|int| amount = 1)
 		while amount > 0
-			|| less  = amount min 63
-			self    <~ (less(|)192)|byte|
+			|| less  = amount min 16
+			self    <~ (239+less)|byte|
 			amount  -= less
 
 	function AddCstring	(|cstring| data, |syntax| type=@str)
 		.addmemory(type, data|&byte|, false, data.length)
 	
 	function AddMemory	(|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
-		|uint| info = 128 >> goin
-		|| L2 = (L|int|, 60+L.lelength)(L < 60)
-		self <~ (info (|) L2)|byte|
-		if L >= 60
-			.lint(L)
-		self <~ type|byte|
-		if data // so .opensection can stream unknown data-length  
-			.AppendMemory(data, L|int|)
+		if type|int| >= 120
+		|uint| T = (type|uint|<<1) (|) (goin)
+		self <~ T|byte|
+		.hint(L)
+		.AppendMemory(data, L|int|)
 
-	function OpenSection	(|int|)			// openstream 
+	function OpenSection  (|int|)				// openstream 
 		.NoFlush ++
-		.AddMemory(@bin, nil, false, 1GB)
+		.length += 6
 		return .length
 
-	function CloseSection (|int| c)			// closestream
-		|| nwe = .length
-		expect (nwe >= c) (self, "Unable to close section")
+	function CloseSection (|uint| c)			// closestream
+		|| CurrLen = .length
+		expect (CurrLen >= c) (self, "Unable to close section")
 		.length = c - 6
-		self <~ 191|byte|
-		.AppendInt(nwe - c)
-		self <~ (@bin)|byte|
-		.length = nwe
+		|| blen = 5
+		c = CurrLen - c
+		|| Actual = c
+		while {
+			Actual >>= 7
+			blen--
+		} (Actual)
+
+		self <~ (0|byte|, blen) 
+		self <~ (@bin|int|<<1)|byte|
+		.hint(c)
+		.length = CurrLen
 		.NoFlush--
 
 
@@ -108,39 +114,6 @@ function @jbin.JoinParseTest (|string|)
 	return result.render
 
 
-function @jbin.ParseSpeedTest (|int| Count=10000000) 
-	.JoinParseTest
-    
-    || p = "/tmp/jbin_demo.jbin"
-	|jbin| out = p.out 
-	out.jinit
-	out.enter
-	
-    "Creating $Count nodes at '$p'"
-	for n in Count
-		if n isa 2
-			out.add(@str, string.int32(n))
-		  else
-			out.add(@str, "") // half the nodes usually have no name
-	out = nil
-
-	|int| sz = p.file.size
-	|| strsize = sz.strsize
-	"Size: $strsize"
-	
-	|| In = p.in
-
-	|| start = date.now
-	|| result = in.Parse_Jbin	#require
-	|| t = (date.now - start).seconds
-	|| node_rate = (1000000000.0 * t)/Count|f64|
-	|| size_rate = (sz|f64|/1MB|f64|)/t
-	"parsed_in: ${t}s
-duration: ${node_rate}ns / node
-parse_rate: ${size_rate}MB / s
-"
-	 
-
 function stringstream.NextMsg (|Message|)
 	return .NextMsgInfo|message|
 
@@ -158,20 +131,19 @@ helper stringstream.NextMsgInfo (|uint64|)
 	|| parent = .UserObj|message|
 	while (self)
 		|uint| info = .Byte
-		|| L	= info & 63
-		|| Dir	= info >> 6							// 3 = up,  2 = same,  1 = down :)
-		if Dir != 3
-			if L >= 60
-				L = .lint0(L - 60)|uint|
-			|| t = .byte
-			if t > @bin|int|						// need @max
-				error (.data, "Corrupted jbin" )
+		if info < 240
+			if info == 0
+				continue
+			|| T = (info >> 1)|syntax|
+			if t > @bin								// need @max
+				error (self, "Corrupted jbin" )
 				t = @arg
-			|| msg = parent.msg(t|syntax|, .str(L))|uint64|
-			if !parent or dir == 1
+			|| GoIn = info & 1
+			|| msg = parent.msg(t, .str(.hInt))|uint64|
+			if !parent or GoIn
 				.userobj = msg|object|
 			return msg
-		parent = parent.upward(L) // go up
+		parent = parent.upward(info - 239)			// go up
 		.userobj = parent
 		require parent
 	.UserObj = nil
