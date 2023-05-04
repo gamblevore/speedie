@@ -179,6 +179,7 @@ module Conv
 
 		.del(.out, origin)		
 		.del(origout, origin)
+		done++
 	
 	
 	function del (|file| f, |file| o)
