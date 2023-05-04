@@ -98,7 +98,7 @@ class Message (RingTree)
 ////////////////////////////////////////////////////////////////////////////////
 	syx Nil (WildCard)
 		Opt NoRefCounts
-		debugger
+		debugat
 	
 	
 	syx Arg (Argument)
@@ -296,25 +296,27 @@ class Message (RingTree)
 	syx Adj (Adjective)
 		opt norefcounts
 		|| f = .first
-		|| l = f.next
-		fs <~ f
-		fs <~ " ~ "
-		fs <~ l
+			|| l = f.next
+				fs <~ f
+				fs <~ " ~ "
+				fs <~ l
 
 
 	syx Badj (Backwards_Adjective)
 		opt norefcounts
 		|| f = .first
-		|| l = f.next
-		fs <~ l
-		fs <~ " ≈ "
-		fs <~ f
+			|| l = f.next
+				fs <~ l
+				fs <~ " ≈ "
+				fs <~ f
 
 
 	syx Acc (Access)				// b[2]
 		|| f = .first
-		fs <~ f
-		F.next.RenderPrm(fs, '[', ']')
+			fs <~ f
+			f = f.next
+			if f
+				f.RenderPrm(fs, '[', ']')
 	
 	
 	syx Arr (Array)					// [b, c]
