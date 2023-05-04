@@ -20,7 +20,8 @@ class MessageID (stringshared)
 	contains object
 	|Syntax|			Func
 	||					Obj
-	|int64|				Tag
+	|int64|				ID
+	|uint16| 			DecodeID
 	
 	constructor (|string| Name="", |Syntax| Fn=nil)
 		super.constructor(name)
@@ -32,7 +33,7 @@ class MessageID (stringshared)
 	
 	module
 		function IDSorter (SorterComparer)
-			return a|MessageID|.tag  <  b|MessageID|.tag
+			return a|MessageID|.id  <  b|MessageID|.id
 
 
 function Message.Identify (|dictionary of messageid| d, |[messageid]| table, |int|)
@@ -41,10 +42,11 @@ function Message.Identify (|dictionary of messageid| d, |[messageid]| table, |in
 	for s.flat in self
 		|| Found = d.makeplace(s)
 		|| ID = *found
-			ID.tag++
+			ID.id++
 		  else
 			id = MessageID(s.name, s.func)
-			table <~ id
+			if table
+				table <~ id
 			*found = id
 			rz += s.name.Length
 		s.Name = id
