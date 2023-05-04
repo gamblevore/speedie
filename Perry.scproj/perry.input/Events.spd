@@ -104,9 +104,9 @@ function PressingTabs (guiaction)
 		if ide isa PerryIDE
 			p.ListSource.clear
 			|| name = ide.Project.name
-			p <~ ( "Close", MenuCloseProject, ide)
 			p <~ ( "Copy " + name, MenuCopyProject, ide)
 			p <~ ("Show Project", MenuShowProject, ide)
+			p <~ ( "Close", MenuCloseProject, ide)
 			.OpenMenu(row) // "Yes" "no"
 
 
