@@ -1,17 +1,25 @@
 #!/usr/local/bin/spd
 
 main {
-	"Starting to write 250mb XML file"
+	|| Amount = 250MB
+	|| size = app.args[0]
+	|| n = size.Length
+	if size endswith "mb"
+		Amount = size[0, n-2].int*1MB
+	  elseif size endswith "kb"
+		Amount = size[0, n-2].int*1KB
+	
+	"Starting to write ${amount.strsize} XML file"
 	
 	|| Start = date.now
-	|| xml = "sample2.xml".out							#require
+	|| xml = "auto_generated_$size.xml".out							#require
 	xml <~ `<?xml version="1.0" encoding="utf-8"?>
 <Catalog>
 `
 	
 	|| Caps = 'A' to 'Z'
 	|| Low  = 'a' to 'z'
-    while xml < 250MB
+    while xml < Amount
 		|| alive = ("yes", "no")(0.5[])
 
 	    xml <~ "
@@ -25,7 +33,7 @@ main {
 
 	xml.Flush
 	
-	"Finished writing 250mb XML file in ${start.ago.seconds} seconds"
+	"Finished writing ${xml.file} in ${start.ago.seconds} seconds"
 }
 
 
