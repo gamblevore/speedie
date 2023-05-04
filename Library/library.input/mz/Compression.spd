@@ -32,7 +32,7 @@ function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 		
 		j.CloseSection(Place)
 		st.LiveUpdate(str, j.length)
-		if !.nomorechunks
+		if !.NoMoreChunks
 			j.flush // we are calling it after anyhow	
 	j.up(2)
 	j.flush			// we definitely need to flush it. -- genius theo 2023, no humour.
@@ -46,7 +46,7 @@ helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 		fs <~ .readall
 		return true
 	st := compressionstats.all
-	require .ExpectJbin
+	.ExpectJbin
 	
 	|| mz = .NextMsg				#require
 	if mz == @arg // remove this later
