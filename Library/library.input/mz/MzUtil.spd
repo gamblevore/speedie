@@ -11,7 +11,7 @@ extend string
 	
 	function IsCompressed (|bool|)
 		// remove the arg version (longer string). when i feel like testing all my files that is.
-		return .isjbin and self[2, "C\06µz"] or self[2, "@\01C\06µz"]
+		return .isjbin and self[_jbinheader.length, "\r\03µz"]
 		
 	
 	function DecompressInto (|object| fs, |int| lim=256MB,  |&compressionstats| st=nil, |bool|)
