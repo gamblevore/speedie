@@ -235,7 +235,7 @@ I won't deny that the Jeebox's parser is complex, but that is an internal detail
 
 If you are simply doing XML-like/JSON-like work, you only use a tiny subset of the parser. Your documents are small and the object-model is simple.
 
-When you need to do more complex things... jeebox is still there for you. If you think about it, what would you rather have? One small parser that takes 190K compiled, that can be used for 1000 tasks, and includes inbuilt-error-reporting system and memory-management...
+When you need to do more complex things... jeebox is still there for you. If you think about it, what would you rather have? One parser that takes 280K compiled, that can be used for 1000 tasks, and includes inbuilt-error-reporting system and memory-management...
 
 Or five different parsers. One for XML, another for JSON, another for C++, another for python, another for SQL, etc etc. Each of which can weigh from 200K to 1MB.
 
