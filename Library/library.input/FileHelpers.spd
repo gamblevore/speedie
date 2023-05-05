@@ -241,6 +241,8 @@ extend String
 
 		
 	function AddExt (|string| ext, |string|)
+		if !ext
+			return self
 		if ext[0] != '.'
 			ext = "." + ext
 		return self + ext
