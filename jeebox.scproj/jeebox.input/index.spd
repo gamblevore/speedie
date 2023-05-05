@@ -2,5 +2,7 @@
 linkage
 	cpp_part JB
 	type library
-	bannedclasses (file, process, shellstream, archive)
+// i guess my lib can now stream stuff...
+	bannedclasses (process, archive) //(file, process, shellstream, archive)
+
 ignore
