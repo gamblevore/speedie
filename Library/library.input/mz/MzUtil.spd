@@ -126,7 +126,7 @@ struct CompressionStats
 	function start
 	function end
 	function len (|int| n)
-	function liveupdate (|string| s, |int| outt)
+	function liveupdate (|int| s, |int| outt)
 	function durr (|float|)
 	function render (|string|)
 	module
