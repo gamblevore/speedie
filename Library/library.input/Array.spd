@@ -23,6 +23,7 @@ class Array (saveable)
 	constructor
 		visible
 		cpp_wrapper JB_Array_Constructor0
+		
 	
 	destructor
 		cpp_wrapper JB_Array_Destructor
@@ -39,8 +40,8 @@ class Array (saveable)
 	function Next (||)
 		if .marker < .length
 			return self[.marker++]
-	function Set (|| obj)
-		self[.marker++] = obj
+	setter Next (||)
+		self[.marker++] = value
 
 	function Prev (||)
 		if .marker > 0
