@@ -38,23 +38,33 @@ datatype Date (int64)
 		return self >> kTickBits
 	
 	function Seconds (|f64|)
-		return self|f64|/kOneSecond
-
+		return self|f64| / kOneSecond
+	
+	function ReportAgo (|string|)
+		|| s = .seconds
+		|| unit = "s"
+		if s < 0.01
+			s*=1000
+			unit = "ms"
+		return s.Render + unit
+		
+		
 	function ago (|date|)
 		if self
 			return now() - self
 	
 	render dmy
-		fs.appenddmy(self)
+		fs.AppendDMY(self)
 	
 	render RenderDurr
-		fs.appenddurr(self)
+		fs.AppendDurr(self)
 		
 	function Fired (|bool|)
 		if self != 0
 			return self < date()
 		
 	function Durr (|f64|)
+		disabled "is this even used? Its just .seconds?"
 		return self|f64| / kTicks|f64|
 	
 	render
