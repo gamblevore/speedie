@@ -219,7 +219,7 @@ class File (String)
 		|| code = 0
 		if (.Size != A.length)
 			code = 1
-		  elseif (.ReadAll(true) == A)
+		  elseif (.ReadAll(true) != A)
 			code = 2
 		return .comparemsg(code, error)
 
@@ -473,7 +473,7 @@ class File (String)
 
 
 		function NewPipe (|int| Pipe, |file|)
-			cpp_wrapper JB_File_NewPipe
+			cpp_wrapper JB_File__NewPipe
 		
 // can rename these from path into files :)
 		function TrashPath (|string|)
