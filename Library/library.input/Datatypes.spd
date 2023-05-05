@@ -587,6 +587,8 @@ datatype int64
 
 	helper RenderSizePart (|faststring| fs, |int| Size, |string| Suff)
 		|int64| MB = self / Size
+		if (MB < 1 and self > (Size/100))
+			MB = 1
 		fs <~ MB
 		|| Extra = (((self+(Size*0.05)|int64|) - (MB * Size))*10)/(Size) 
 			fs <~ '.'
