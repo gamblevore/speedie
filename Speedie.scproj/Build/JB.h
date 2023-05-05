@@ -139,8 +139,6 @@ struct ASMVarType;
 
 struct CompressionStats;
 
-struct deklinker;
-
 struct FastBuff;
 
 struct FloatRange;
@@ -182,6 +180,8 @@ struct StringLengthSplit;
 struct StructSaveTest;
 
 struct uint24;
+
+struct unklinker;
 
 struct Object_Behaviour;
 
@@ -305,8 +305,6 @@ struct String_Behaviour;
 
 struct Array_Behaviour;
 
-struct String_Behaviour;
-
 struct Message_Behaviour;
 
 struct Dictionary_Behaviour;
@@ -400,8 +398,6 @@ struct SCIterator;
 struct SCModule;
 
 struct SimpleGraph;
-
-struct JB_String;
 
 struct JB_String;
 
@@ -518,7 +514,6 @@ struct AsmReg {
 struct CompressionStats {
 	Date Duration;
 	int In;
-	int LastOut;
 	int Out;
 	bool Live;
 };
@@ -1189,6 +1184,8 @@ JBClass ( JB_Error , Message ,
 extern int SC____junktest_5___x[3];
 extern Message* JB__App__Conf;
 extern JB_String* JB__App__Path;
+extern JB_File* JB__App__stdin;
+extern JB_File* JB__App__StdOut;
 extern JB_String* JB__App_codesign_native;
 extern Array* JB__App_OldArgs;
 extern Message* JB__App_Prefs;
@@ -1261,13 +1258,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1829])
+#define kJB__ErrorColors_bold (JB_LUB[1830])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1830])
-#define kJB__ErrorColors_good (JB_LUB[1831])
-#define kJB__ErrorColors_normal (JB_LUB[1832])
-#define kJB__ErrorColors_underline (JB_LUB[1831])
-#define kJB__ErrorColors_warn (JB_LUB[1833])
+#define kJB__ErrorColors_error (JB_LUB[1831])
+#define kJB__ErrorColors_good (JB_LUB[1832])
+#define kJB__ErrorColors_normal (JB_LUB[1833])
+#define kJB__ErrorColors_underline (JB_LUB[1832])
+#define kJB__ErrorColors_warn (JB_LUB[1834])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1484,7 +1481,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[339])
 #define kSC_BitNot (JB_LUB[438])
 #define kSC_BitOr (JB_LUB[644])
-#define kSC_BitXor (JB_LUB[1834])
+#define kSC_BitXor (JB_LUB[1835])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1514,7 +1511,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1835])
+#define kJB_SaverStart1 (JB_LUB[1836])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1869,7 +1866,6 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_Delete (2)
 #define kJB__Wrap_Free (1)
 #define kJB__Wrap_Nothing (0)
-extern FastString* JB__FS_StdOutFS;
 #define kJB__dict_TypeDict (3)
 #define kJB__dict_TypeObj (1)
 #define kJB__dict_TypeStem (2)
@@ -4243,19 +4239,16 @@ void JB_ClassData_Restore(JB_Class* self);
 // JB_CompressionStats
 float JB_MzSt_durr(CompressionStats* self);
 
-void JB_MzSt_len(CompressionStats* self, int n);
-
-void JB_MzSt_LiveUpdate(CompressionStats* self, JB_String* s, int outt);
+void JB_MzSt_LiveUpdate(CompressionStats* self, int inn, int outt);
 
 JB_String* JB_MzSt_Render(CompressionStats* self, FastString* fs_in);
+
+void JB_MzSt_start(CompressionStats* self);
 
 int JB_MzSt__Init_();
 
 int JB_MzSt__InitCode_();
 
-
-
-// JB_deklinker
 
 
 // JB_FastBuff
@@ -4486,6 +4479,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_uint24
 
 
+// JB_unklinker
+
+
 // JB_Object_Behaviour
 
 
@@ -4667,9 +4663,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_Array_Behaviour
-
-
-// JB_String_ArgValue_Behaviour
 
 
 // JB_FileArchive_Behaviour
@@ -5100,10 +5093,6 @@ void JB_FS_SyntaxAppend(FastString* self, Message* msg);
 inline JB_String* JB_FS_SyntaxCast(FastString* self);
 
 FastString* JB_FS__Alloc();
-
-int JB_FS__Init_();
-
-int JB_FS__InitCode_();
 
 FastString* JB_FS__New();
 
@@ -7313,9 +7302,6 @@ SCModule* SC_Mod__NewContainer(JB_String* s);
 
 
 // JB_SimpleGraph
-
-
-// JB_String_ArgValue
 
 
 // JB_StringShared
