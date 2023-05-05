@@ -59,9 +59,9 @@ role JBin (Faststring)
 
 	function up (|int| amount = 1)
 		while amount > 0
-			|| less  = amount min 16
-			self    <~ (239+less)|byte|
-			amount  -= less
+			|| curr  = amount min 16
+			self    <~ (256-curr)|byte|
+			amount  -= curr
 
 	function AddCstring	(|cstring| data, |syntax| type=@str)
 		.addmemory(type, data|&byte|, false, data.length)
@@ -131,7 +131,7 @@ helper stringstream.NextMsgInfo (|uint64|)
 	|| parent = .UserObj|message|
 	while (self)
 		|uint| info = .Byte
-		if info < 240
+		if info < 160
 			if info == 0
 				continue
 			|| T = (info >> 1)|syntax|
@@ -143,7 +143,7 @@ helper stringstream.NextMsgInfo (|uint64|)
 			if !parent or GoIn
 				.userobj = msg|object|
 			return msg
-		parent = parent.upward(info - 239)			// go up
+		parent = parent.upward(256-info)			// go up
 		.userobj = parent
 		require parent
 	.UserObj = nil
