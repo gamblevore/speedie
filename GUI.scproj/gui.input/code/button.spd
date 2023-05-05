@@ -18,6 +18,8 @@ class ButtonView (GUIControl)
 	|bool|						PressingDone
 	|bool|						PressMakesLighter
 	|bool|						MouseDownDoesClick
+	|bool| 						TrimWidth
+	|bool| 						NoDrawClicked
 	|ListViewState|				Align
 
 	constructor (|guicontrol| p,  |GUIAction| act,  |GUIAction| pressing=nil,  |GUIListEvent| ret=nil, |guiaction| OnRightClick=nil)
@@ -192,7 +194,7 @@ class ButtonView (GUIControl)
 		|| disabled = (i and i is disabled) or (self isnt enabled)
 			grow = nil
 		|| MouseXInside = R.x1x2 contains sdlapp.mousexy.x
-		|| clicked = .MouseIsDown and mouseXinside
+		|| clicked = .MouseIsDown and mouseXinside and !.NoDrawClicked
 		r.x2 += 2
 		|| strength = 1.0
 		if i is Active
@@ -213,9 +215,9 @@ class ButtonView (GUIControl)
 			.drawfocusrect(where, grow, 1.0)
 		
 		|| t = (i.text, .text)(i)
-		if !i
-			|| s = .SubMenu
-				i = s.ListSource // allow these text to be added.
+		|| s = .SubMenu
+		if !i and s
+			i = s.ListSource // allow these text to be added.
 		if i is Broken
 			t += " \17"
 		if i is dead
@@ -234,21 +236,28 @@ class ButtonView (GUIControl)
 
 		
 	behaviour Draw
+		// So how do we set the width?
 		opt norefcounts
 		|| r = .lastrect
 		|| g = .MouseisInside|int| * .ExpandOnMouseOver
 		|| grow = (-g,-g, g, g)
 		where.controlclip += grow
 		|| W = .ItemWidth
-			|| m = .mousexy
-			R.x2 = R.x + W
-			for i in .items
-				|| inside = r contains m
-				.drawitem(where, R, grow*inside, i)
-				R = R right W + .itemgap
-				require r.x < where.width
-		  else
+		if !w
 			.drawitem(where, r, grow, nil)
+			return 
+			
+		|| m = .mousexy
+		|| rx1 = r.x
+		R.x2 = rx1 + W
+		for i in .items
+			|| inside = r contains m
+			.drawitem(where, R, grow*inside, i)
+			R = R right W + .itemgap
+			loop r.x < where.width
+		w = r.x - rx1
+		if .TrimWidth
+			.sizer.g(2)	= (w) ~ long
 
 
 	function OpenMenu (|listviewrow| row=nil, |bool|)
