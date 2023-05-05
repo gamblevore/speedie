@@ -205,7 +205,7 @@ class StretchDivider (GuiControl)
 	helper FadeAlpha (|float|)
 		|| now  = date()
 		|| diff = now - .entered
-		|float| f = (diff.durr - 0.6)*2.0
+		|float| f = (diff.seconds - 0.6)*2.0
 		rz = f.clamp
 		if rz >= 0 and rz < 1
 			sdlapp.touch(Self)
