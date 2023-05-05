@@ -1,5 +1,6 @@
 #!/usr/local/bin/spd
 
+
 module Counts 
 	|int64| Lines
 	|int64| Names
@@ -7,17 +8,25 @@ module Counts
 	|int64| Parsed
 	|int64| Files
 	|int64| Dirs
+	|int|   MaxNodeLength
 	|| exts = dictionary.new
 	|| loud = !(app.yes("quiet") or app.yes("q"))
+	|| PrintTree = false
+	|| PrintedTree = false
+	|| ParseSpeed = app.yes("s")
+	|string| 	DefaultExt = "spd/box/jbin/jb"
 	
-	function init (|string| ss)
+	function Init (|string| ss)
+		|| pt = app["p"]
+			PrintTree = true
+			if pt != "true"
+				MaxNodeLength = pt.int
 		ss = ss.trim 
-		ss := "spd/box/jbin/jb"
+		ss := DefaultExt
 		for s in (ss / '/') 
 			exts[s] = s
 
 	function Count (|message| Msg)
-		require msg
 		Counts.parsed++
 		|| names = 	0 
 		|| nodes = 0
@@ -34,12 +43,34 @@ function string.loc (|int|)
 
 
 function file.cloc
-	if counts.loud
-		printline .path
+	if counts.PrintTree
+		require StdErr.ok
+		expect (!counts.PrintedTree) "Can't have multiple files, with printtree."
+		counts.PrintedTree = true
+	  elseif counts.loud
+		printline .path 
+
+	|| data = .ReadSafely(int.max) #require
+	if data.IsCompressed // decompress?
+		"Decompressing $self"
+		data = data.Decompress(int.max) // might as well...
+	
 	Counts.files++
-	|| s = .ReadSafely(int.max)
-		Counts.Lines += s.loc
-		counts.Count(s.parse) 
+	
+	|| Start = date.now
+	|| msg = data.parse
+	|| Durr = start.ago
+	Counts.Lines += data.loc
+	require msg
+	counts.Count(msg) 
+	if counts.PrintTree
+		if counts.maxnodelength
+			for s.flat in msg
+				s.name = s.name.Preview(counts.MaxNodeLength)
+		msg.RenderAST(app.printline)
+	  elseif counts.ParseSpeed
+		"    Parsed: ${data.size} in ${Durr.ReportAgo} at ${data.length|float|/(1MB|float|*durr)}MB/s"
+	(msg)
 
 
 function file.CountAll (|bool| force=false)
@@ -47,16 +78,18 @@ function file.CountAll (|bool| force=false)
 		counts.dirs++
 		for c.files in self
 			c.CountAll
-	  else
-		if force or counts.exts[.ext]
-			.cloc	
+	  elseif force or counts.exts[.ext]
+		.cloc
 
 
 main  
 	if !app.args
-		"Usage: cloc path [--files=cpp/c/h]  [--quiet=true/false]  [-k]
---quiet            Makes less output
--k                 Keeps errors
+		"Usage: cloc path
+--files=cpp/c/h               Only report these files (defaults to ${counts.DefaultExt})
+--quiet=true/false            Makes less output
+-k                            Keeps errors
+-s                            Report parse speed
+-p                            Print parse Tree
 "
 		return 0
 	
@@ -68,15 +101,17 @@ main
 
 
 function Counts.report
+	if !app.yes("k")
+		stderr.clear
+	require !counts.PrintTree
 	|| f = .files
 	|| l = .lines
 	|| p = .parsed
 	|| d = .nodes
-	"$l lines in $f files"
+	"$l lines"
 	|| n = .names
-		"$n names in $d nodes across $p jeebox files"
-	if !app.yes("k")
-		stderr.clear
+		"$n names in $d nodes"
+	if p > 1 or f > 1
+		"Total files: $f, total jeebox files: $p"
 	if compressionstats.All.Out
-		printline compressionstats.all.render
-
+		compressionstats.all.render(app.printline)
