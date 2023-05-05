@@ -4,6 +4,10 @@ set -e
 cd /usr/local/speedie/Library/CppLib
 
 echo "Compiling /usr/local/lib/libjeebox.so"
+if ! [[ -w "/usr/local/lib/libjeebox.so" ]]
+then
+   echo "Can't write to /usr/local/lib/libjeebox.so  Probably you need to run this with sudo."
+fi
 g++ -o /usr/local/lib/libjeebox.so  -std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I /usr/local/speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1 -rdynamic -shared -fPIC -D AS_LIBRARY=1   JB_FlowControl.cpp JB_File.cpp JB_ObjArray.cpp JB_MSR.cpp JB_LibraryFile.cpp JB_List.cpp JB_FastString.cpp JB_Dictionary.cpp JB_Child.cpp JB_Saveable.cpp JB_Compress.cpp JB_String.cpp JB_Utils.cpp JB_Main.cpp JB_Pipe.cpp JB_DivSufSort.cpp JB_Run.cpp JB_Vectors.cpp JB_ByteMap.cpp JB_RingTree.cpp JB_PNG.cpp JB_Date.cpp JB_Errors.cpp JB_DirReaderUnix.cpp JB_Math.cpp JB_DirReaderWin32.cpp JB_BasicIO.cpp JB_VM.cpp JB_Alloc.cpp JB_Tokeniser.cpp    /usr/local/speedie/jeebox.scproj/Cpp/JB.cpp   /usr/local/speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 
 echo "Compiling Speedie to /usr/local/speedie/Terminal/Speedie"
