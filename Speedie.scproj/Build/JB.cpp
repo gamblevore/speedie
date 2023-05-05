@@ -18262,7 +18262,6 @@ void SC_Cpp_WriteHeader(Cpp_Export* self) {
 	}
 	;
 	JB_FS_AppendString(fs, JB_LUB[1098]);
-	debugger;
 	JB_String* _tmPf7 = JB_Incr(JB_FS_SyntaxCast(fs));
 	JB_Decr(fs);
 	JB_File* _tmPf8 = JB_Incr(SC_Cpp__HProduct());
