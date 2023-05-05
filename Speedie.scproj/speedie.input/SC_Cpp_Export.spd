@@ -678,7 +678,7 @@ extern "C" {
 	
 	fs <~ "}\n\n//"
 	
-	for i in Cpp_Includes
+	for i in cpp_Export.Cpp_Includes
 		fs <~ ' '
 		fs <~ i
 	
