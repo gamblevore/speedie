@@ -1,19 +1,21 @@
 
-struct deklinker
+struct unklinker
 	linkage
 		cpp_part ubs
 	|stringstream|	Input 
 	|stringstream|	SubParser 
 	|message|		Name
 	|message|		strings
+	|message|		BitSize
 	|message|		IDTable
 	|message|		Tree
 	|[messageid]|	IDs
 
 	function Collect (|int|)
-		.name    = .input.nextmsg(@tmp, "Ĵµ")				#require
-		.strings = .input.nextmsg(.name, @str)				#require
-		.IDTable = .input.nextmsg(.name, @bin)				#require
+		.name    = .input.nextmsg(@tmp, "Ĵµ")
+		.strings = .input.nextmsg(.name, @str)
+		.BitSize = .input.nextmsg(.name, @bin)
+		.IDTable = .input.nextmsg(.name, @bin)
 		.Tree    = .input.nextmsg(.name, @bin)				#require
 		
 		.SubParser = stringstream(.IDTable.name)
@@ -70,7 +72,7 @@ struct deklinker
 	
 	
 	function stringstream.UnsquashJbin (|message|)
-		|deklinker| sq
+		|unklinker| sq
 		sq.input = self
 		sq.decode
 		rz = sq.Tree
@@ -83,40 +85,75 @@ struct KlinkIt
 	|faststring|					Strings
 	|faststring|					IDTable
 	|string|						Tree
+	|faststring| 					Out
 	
-	function BuildTable (|message| root)
+	function BuildTable (|message| root, |[messageid]|)
 		|dictionary of messageid| d = Dictionary()
-		|[messageid]| table
-		|| Length = root.identify(d, table)
-		table.sort(&messageid.IDSorter)
+		|| Length = root.identify(d, rz)
+		rz.sort(&messageid.IDSorter)
 		|| fs_str = FastString(length)
 		.strings = fs_Str
 		|| fs_id = FastString()
 		.IDTable = fs_id
-		for id in table
+		for id in rz
 			fs_str <~ id.Name
 			fs_id  <~ id.Func|byte|
 			fs_id.hint(id.name.length)
 		
 
-	function Run (|message| root, |faststring| out, |bool|)
+	helper GoUp (|int| Depth)
+		while depth
+			|| amount = depth min 16
+			.out <~ (amount-1)|byte|
+			depth -= amount
+
+	
+	function NextIDs
+			
+			
+	function Run (|message| root, |bool|)
 		visible
 		opt NoRefCounts
 		
-		.BuildTable(root)
+		|| table = .BuildTable(root)
 		|| curr = root
 		|| depth = 0
+		|| Count = 0
 		while curr
-//			|| then write the directions
+			Count++
+			if count >= 30K
+				.NextIDs
+				Count = 0
+			
 			curr = curr.FlatNextDepth(depth)
-		
-	
+			if depth < 0 
+				.GoUp(-depth)
+			  else // 0 or 1
+				|| ID = curr.name|messageid|.decodeid
+				
 	
 	function stringstream.CompressJbin (|jbin| fs)
 		|KlinkIt| Stuff
-		require Stuff.Run(.parse_jbin, fs)
+		stuff.out = fs
+		require Stuff.Run(.parse_jbin)
 		fs.enter(@tmp, "Ĵµ")
 		fs.add(@str, stuff.strings)
-		fs.add(@str, stuff.IDTable)
-		fs.add(@str, stuff.Tree)
+		fs.add(@bin, "\08")
+		fs.add(@bin, stuff.IDTable)
+		fs.add(@bin, stuff.Tree)
 	
+	
+	
+/*
+	We need any possible integer value. But want smaller values to take less.
+
+	Encoding approaches:
+	
+	8-bit, 12-bit, 16-bit
+	
+	i think lets noobcode 32-values, then hint the rest. Perhaps with a callback
+	
+	
+*/
+
+
