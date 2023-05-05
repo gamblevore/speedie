@@ -46,7 +46,7 @@ extend_module file
 		|| t = Jeebox.test // bug if put into compiler.run!. Wierd!
 		if !options.perry and !options.scripting 
 			zalgoline t
-			if (Cpp_Export.FindGlobalsCpp*12).CompressTest(false)
+			if (Cpp_Export.FindGlobalsCpp*12).CompressTest(false) and options.PrintLibraries
 				"Compression: OK"
 
 
