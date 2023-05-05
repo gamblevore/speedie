@@ -129,22 +129,14 @@ class FastString {
 		function New (|FastString| other, |FastString|)
 			cpp_wrapper JB_FS__FastNew
 		
+		function New (|file| dest, |bool| PrintLineOnFlush, |FastString|)
+			cpp_wrapper JB_FS__FileFlush
+		
 		function New (|&byte| b, |int| n, |FastString|)
 			cpp_part NewDirect
 			rz = faststring()
 			rz.resultptr = b
 			rz.reserved = n
-
-		|FastString| StdOutFS // ideally, speedie should clear these at app-exit!
-							  // force flush and stuff like that.
-		function StdOut (|FastString|)
-			opt norefcounts
-			|| fs = .StdOutFS
-			if !fs
-				fs = faststring()
-				fs.file = app.stdout
-				.StdOutFS = fs
-			return fs
 
 
 	syntax Access (|int| off, |Byte|):				cpp_wrapper JB_FS_Byte

@@ -3,7 +3,6 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-//crash
 
 module App {
 |bool|						Unregistered 
@@ -11,6 +10,8 @@ module App {
 |message|					_Conf
 |config|					Prefs
 |string| 					_Path
+|file|						_StdOut
+|file|						_stdin
 |string|					codesign_native = "codesign_osx"
 
 
@@ -53,7 +54,7 @@ function Crash (|string| reason="")
 function CrashLog (|cstring| value)
 	cpp_wrapper JB_Rec__CrashLog
 
-syntax access (|string| name, |string_argvalue|)
+syntax access (|string| name, |string|)
 	cpp_part ArgValue
 	opt norefcounts
 	for R in .rawargs
@@ -199,11 +200,13 @@ function FileName (|string|)
 
 
 function StdIn (|File|)
-	return File.newpipe(pipe.stdin_)
+	opt norefcounts
+	return ._Stdin init File.newpipe(pipe.stdin_)
 
 	
 function StdOut (|File|)
-	return File.newpipe(pipe.stdout_)
+	opt norefcounts
+	return ._StdOut init File.newpipe(pipe.stdout_)
 
 
 function CWD (|string|)
@@ -293,7 +296,7 @@ function string.ArgValue (|string|)
 	return "true"
 
 
-function object.ArgValue (|String_ArgValue|)
+function object.ArgValue (|String|)
 	if (self isa string):  return .argValue
 	if (self isa message): return .argValue
 
@@ -328,12 +331,6 @@ function Message.ArgValue (|string|)
 prototype ShellOption			(|string| Name, |string| Value, |faststring| purpose=nil, |bool|)
 
 
-role String_ArgValue (string)
-	linkage
-		cpp_part Arg
-	syntax cast (|bool|)
-		disabled "On arg-value; Do you mean string.yes or do you mean string.syntaxcast"
-
 /*
 // clever idea. Just not worth it
 helper @int.MainArg (|int| Pos, |int|)
@@ -358,3 +355,10 @@ helper @string.MainArgSub (|int| Pos, |string| type, |stringthatwasreadsafely|)
 */
 
 
+function app.PrintLine (|faststring|)
+	description "Just like app.printline, except this function also prints a line after completion." 
+	return faststring(app.stdout, true)
+		
+function app.Print (|faststring|)
+	description "Pass this to render functions (like message.renderast) to directly render this to stdout, without needing to create intermediate strings." 
+	return faststring(app.stdout, false)

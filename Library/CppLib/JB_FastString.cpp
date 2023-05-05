@@ -555,8 +555,13 @@ void JB_FS_Constructor(FastString* self) {
 }
 
 void JB_FS_Destructor(FastString* self) {
+	if (self->PrintLineOnClear) {
+		JB_FS_AppendByte(self, '\n');
+	}
     JB_FS_Flush( self );
 	ClearFS_( self );
+	// why are we doing clearfs_? just to be safe? yet no other funcs do this? Remove this?
+	// we should just decr the objs...
 }
 
 FastString* JB_FS__InternalNew() {
@@ -564,6 +569,15 @@ FastString* JB_FS__InternalNew() {
     JB_FS_Constructor( fs );
     return fs;
 }
+
+FastString* JB_FS__FileFlush(JB_File* f, bool b) {
+	FastString* fs = JB_New(FastString);
+	JB_FS_Constructor( fs );
+	fs->File = JB_Incr(f);
+	fs->PrintLineOnClear = b;
+	return fs;
+}
+
 
 FastString* TheSharedFastString;
 FastString* JB_FS__FastNew(FastString* other) {
