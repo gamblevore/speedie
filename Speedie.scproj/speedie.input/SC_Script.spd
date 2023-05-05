@@ -22,7 +22,7 @@ function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
 function compiler.TryVariousStartModes (|bool|)
 	require !interact.shouldenter	
 	|| p = app.rawargs[0]
-	require p and !p.argname and !app["perry"].length
+	require p and !p.argname and !app["perry"]
 			
 	|| f   = p.file
 	|| it  = compiler.usingScript(f)$
