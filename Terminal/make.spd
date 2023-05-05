@@ -79,14 +79,18 @@ if IsCurrentPlatform
 ////////////////////////////
 <(`    (((generating script)))    `)>
 ////////////////////////////
-
 require StdErr.ok
+printline "Creating $scriptout"
 scriptout.data = "#!/bin/bash
 echo \"Started Building Speedie\"
 set -e
 cd $CppLib
 
 echo \"Compiling $LibPath\"
+if ! [[ -w \"$LibPath\" ]]
+then
+   echo \"Can't write to $LibPath  Probably you need to run this with sudo.\"
+fi
 g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 
 echo \"Compiling Speedie to $SpdTerm\"
