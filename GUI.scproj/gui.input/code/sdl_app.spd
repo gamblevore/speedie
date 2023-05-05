@@ -415,7 +415,7 @@ module SDLApp
 				Occured |= kActivity
 
 			|| t_now = date()
-			|| Durr  = (t_now - .LastFramedate).durr
+			|| Durr  = (t_now - .LastFramedate).seconds
 			.TicksDuration = (t_now - .LastFramedate) >> 10
 			|int| t_now_small = t_now >> 10
 			
