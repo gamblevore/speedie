@@ -3321,7 +3321,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[228]);
-	JB_FS_AppendInt32(_fsf0, (2023050514));
+	JB_FS_AppendInt32(_fsf0, (2023050515));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8877,7 +8877,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[598]);
-	JB_FS_AppendInt32(_fsf0, (2023050514));
+	JB_FS_AppendInt32(_fsf0, (2023050515));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -25115,11 +25115,14 @@ void JB_File__testjb() {
 	JB_String* t = JB_Incr(JB_Constants__TestJB());
 	if ((!SC__Options_Perry) and (!SC__Options_Scripting)) {
 		JB_ZalgoLine(t);
-		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12));
-		if (JB_Str_CompressTest((_tmPf0), false, 3)) {
+		if (({
+			JB_String* _tmP294 = JB_Incr((JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12)));
+			bool _tmP293 = JB_Str_CompressTest(_tmP294, false, 3);
+			JB_Decr(_tmP294);
+			 _tmP293;
+		}) and SC__Options_PrintLibraries) {
 			JB_PrintLine(JB_LUB[1390]);
 		}
-		JB_Decr(_tmPf0);
 	}
 	JB_Decr(t);
 }
