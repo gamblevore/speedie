@@ -340,23 +340,24 @@ module Conv
 			printline .out.path
 
 
+	function Ext (|string|)
+		if dest is box
+			return "box"
+		if dest is jbin
+			return "jbin"
+	
+	
 	function OutPath (|string|)
 		if destpath
 			return destpath.file
 		
 		if dest is selfreplace
 			return .in
-		|| ext = ""
-		if dest is box
-			ext = "box"
-		  elseif dest is jbin
-			ext = "jbin"
 		rz = .in.RemoveExt("mz")
-		if ext
-			if rz isa "box" or "jbin" or "xml"
-				rz = rz.SetExt(ext)
-			  else
-				rz = rz.AddExt(ext)
+		if rz isa "box" or "jbin" or "xml"
+			rz = rz.SetExt(.ext)
+		  else
+			rz = rz.AddExt(.ext)
 		if dest is compressed
 			rz = rz.AddExt("mz")
 		  elseif ((.in isa "mz") and rz.FileExists) or (rz == .in)
