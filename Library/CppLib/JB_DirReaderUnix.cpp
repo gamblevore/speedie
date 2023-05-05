@@ -4,8 +4,6 @@
 
 
 
-#ifndef AS_LIBRARY
-
 #include "JB_Umbrella.hpp"
 #include "JB_DirReaderUnix.h"
 
@@ -38,12 +36,3 @@ dirent* ReadDir_( DirReader* D ) {
 }
 	
 }
-
-#else
-
-// stop linker errors.
-extern "C" void Stub_JB_DirReaderUnix () {
-    
-}
-
-#endif

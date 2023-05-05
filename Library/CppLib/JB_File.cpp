@@ -2,8 +2,6 @@
 // Copyright, Theodore H. Smith 2019.
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
-#ifndef AS_LIBRARY
-
 #include "JB_Umbrella.hpp"
 #include <time.h>
 #include <stdlib.h>
@@ -1115,12 +1113,4 @@ void JB_munmap (void* mem, int64 n) {
 
 
 }
-
-#else 
-
-// stop linker errors
-extern "C" void Stub_JB_File() {}
-
-#endif
-
 

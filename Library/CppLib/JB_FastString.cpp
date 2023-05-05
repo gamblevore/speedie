@@ -507,10 +507,6 @@ void JB_FS_LengthSet(FastString* fs, int NewLength) {
 }
 
 
-#ifndef AS_LIBRARY
-// used by compression.
-
-	
 bool JB_FS_Flush(FastString* fs) {
     JB_File* File = fs->File;
     if ( File and !fs->NoFlush ) {
@@ -535,9 +531,6 @@ void JB_FS_FileSet(FastString* fs, JB_File* F) {
         JB_File_OpenBlank(F);
     }
 }
-#else
-    bool JB_FS_Flush(FastString* fs) {return false;}
-#endif
 
 
             /* Constructors */

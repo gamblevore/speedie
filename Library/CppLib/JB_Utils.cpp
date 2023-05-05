@@ -137,10 +137,6 @@ JB_String* JB_Platform() {
 }
 
 
-#ifndef AS_LIBRARY
-
-
-
 bool HasCStringSpace_(JB_Class* Cls, int N) {
 	if (Cls==JB_AsClass(JB_String4))
 		return 4 > N;
@@ -190,13 +186,6 @@ JB_StringC* JB_Str_MakeC ( JB_String* self ) {
     }
 	return Rz;
 }
-#else
-
-void JB_Utils_Stub() {
-	;
-}
-
-#endif
 
 } // 
 
