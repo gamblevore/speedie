@@ -3,6 +3,7 @@
 class StringStream
 	|FastBuff|		Data
 	|file|			File
+	|stringstream|	Decomp
 	|int|			Length
 	|int|			ChunkSize
 	|int| 			StartFrom
@@ -10,9 +11,6 @@ class StringStream
 	|object--|		UserObj // for jbin
 
 	linkage:cpp_Part SS
-	
-	Flags
-		JbinMode = 1
 	
 	constructor (|string| Data)
 		if Data == nil
@@ -22,12 +20,18 @@ class StringStream
 		._NoMoreChunks = true
 	
 	constructor (|file| file, |int| ChunkSize=4MB)
-		cpp_part ConstructorStream
+		cpp_part ConstructorFile
 		file.close
 		.file = file
 		.ChunkSize = chunksize
 		.length = file.size
 		.ReadChunk
+
+//	constructor (|stringstream| Compressed)
+//		cpp_part ConstructorDecomp
+//		.Decomp = Compressed
+//		.length = file.size
+//		.ReadChunk
 
 	function ReadAll (|string|)
 		return .str(.length - .startfrom)

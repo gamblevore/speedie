@@ -61,7 +61,7 @@ class ErrorList
 		require .CanAddMore(err.severity)
 		
 		err.path := .source
-		if Error.KeepTraceStack
+		if Error.KeepStackTrace
 			err.StackTrace := app.StackTrace
 		(.LogFunc)(self, err.render)?
 		if CanPrint and err.needsprint

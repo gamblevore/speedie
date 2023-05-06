@@ -173,7 +173,7 @@ class Error (Message)
 
 	module
 		|byte| AutoPrint = 0 // errorflags.PrintAndRemove
-		|bool| KeepTraceStack = false
+		|bool| KeepStackTrace = false
 
 
 

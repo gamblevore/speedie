@@ -206,7 +206,7 @@ function StdIn (|File|)
 	
 function StdOut (|File|)
 	opt norefcounts
-	return ._StdOut init File.newpipe(pipe.stdout_)
+	return ._StdOut init File.NewPipe(pipe.stdout_)
 
 
 function CWD (|string|)
