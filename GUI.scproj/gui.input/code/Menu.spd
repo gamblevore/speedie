@@ -109,6 +109,9 @@ class Menu (ListView)
 		.EditingRow = nil
 		if .isopenedmenu
 			.window.openedmenu = nil
+		|| p = .parent
+		if p isa ButtonView
+			p.__MouseUp__((-1,-1))
 
 	
 	function DoReturn (|bool|)
