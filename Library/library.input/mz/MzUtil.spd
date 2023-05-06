@@ -129,6 +129,7 @@ struct CompressionStats
 	function liveupdate (|int| s, |int| outt)
 	function durr (|float|)
 	function render (|string|)
+	function Clear
 	module
 		function all (|&compressionstats|)
 		function New (|compressionstats|)
