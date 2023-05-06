@@ -27,7 +27,7 @@ datatype Type (int)
 
 function app.UseOne (|file| f)
 	conv.in = f
-	conv.Out = conv.OutPath.file
+	conv.Out = conv.OutPath
 	if conv.in.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
@@ -57,7 +57,7 @@ main {
 	|| GotAll = false
 	for r in app.args
 		if r == "**"
-			expect (!GotAll) ("Can't do this twice: '**'.")
+			expect (!GotAll) ("Can't use '**' twice.")
 			.useall(app.cwd.file)
 			GotAll = true
 		  else
@@ -215,11 +215,13 @@ module Conv
 			|| unit = ("ms", "s")(s < 0.01) 
 			conv.speed <~ "    $Name: ${s2}$unit" 
 			if s
-				conv.speed <~ "  (${Size/(scale*s)}MB/s)\n"
+				conv.speed <~ "  (${Size/(scale*s)}MB/s)"
+			conv.speed <~ '\n'
 			// why not fill up the stats.all thing and reuse it?
 		  else
 			conv.speed <~ (' ', 4)
 			CompressionStats.all.Render(conv.speed)
+			CompressionStats.all.Clear
 			conv.speed <~ '\n'
 
 		
@@ -228,14 +230,14 @@ module Conv
 		|| dest = .out.out
 		|| src = .in.in
 		require src and dest
+		|| type = ("µz", "ro")(.defaultstrength < mzlab.strong)
 		.start = date() 
 		if Decomp
-			src.DecompressInto(dest)
 			.size = dest.File.size
+			src.DecompressInto(dest)
 			.time("Decompress(streamed )", true)
 		  else 
 			.size = .in.size
-			|| type = ("µz", "ro")(.defaultstrength < mzlab.strong)
 			src.CompressInto(dest, DefaultStrength) 
 			.time("Compress(streamed $type)", true)
 	
@@ -315,30 +317,38 @@ module Conv
 
 
 	function Transform (|bool|)
-		if !.AST
-			0
-		  elseif (Detected.format != Dest.format)
+		|faststring| fs
+		ifn dest is compressed
+			fs = .out.Out							#require
+		if .AST and (Detected.format != Dest.format)
 			.Start = date.now
 			if dest is box
-				.data = .AST.Render
+				.data = .AST.Render(fs)
 			  else
-				.data = .AST.render_jbin
+				.data = .AST.render_jbin(fs)
 			.time("Render")
+		// So what cases does this NOT run?
+		// 1) No AST
+		// 2) Has AST, but same format
+		// well... if the format is different but theres no ast... we can't do anyting
+		// if the format is the same and theres no ast, we must want to compress it?
 
 		if .dest is compressed
 			.start = date.now
-			.data = .data.Compress(DefaultStrength)
+			fs = .out.out							#require
+			.data.Compressinto(fs, DefaultStrength)
 			.time("Compress")
-		return true
+
+		fs.Flush
+		if !fs
+			"Nothing to do for: $.out"
+		if .dest isnt stdout
+			printline .out.path
 
 
 	function Process
-		require .in.MustExist and .Read and .Detect and .Transform
-			
-		if dest is stdout
-			print .data
-		  elseif .Out.data(.data)
-			printline .out.path
+		if .in.MustExist and .Read and .Detect
+			.Transform
 
 
 	function Ext (|string|)
@@ -348,21 +358,24 @@ module Conv
 			return "jbin"
 	
 	
-	function OutPath (|string|)
-		if destpath
+	function OutPath (|file|)
+		if dest is stdout
+			return app.StdOut
+		if DestPath
 			return destpath.file
 		
 		if dest is selfreplace
 			return .in
-		rz = .in.RemoveExt("mz")
-		if rz isa "box" or "jbin" or "xml"
-			rz = rz.SetExt(.ext)
+		|| str = .in.RemoveExt("mz")
+		if str isa "box" or "jbin" or "xml"
+			str = str.SetExt(.ext)
 		  else
-			rz = rz.AddExt(.ext)
+			str = str.AddExt(.ext)
 		if dest is compressed
-			rz = rz.AddExt("mz")
-		  elseif ((.in isa "mz") and rz.FileExists) or (rz == .in)
-			rz += ".back"
+			str = str.AddExt("mz")
+		  elseif ((.in isa "mz") and str.FileExists) or (str == .in)
+			str += ".back"
+		return str.file
 	
 	
 function file.FormatInfo (|&int| Size=0, |string|)
