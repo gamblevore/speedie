@@ -56,6 +56,7 @@ int JB_Str_FileSize(JB_String* self);
 JB_File* JB_Str_File( JB_String* Path );
 JB_File* JB_File__NewPipe(int Pipe);
 JB_File* JB_File__StdOut( );
+bool JB_File_IsPipe(JB_File* self);
 int JB_File_MoveTo(JB_File* self, JB_String* New);
 
 bool JB_File_Exists( JB_String* self, bool LinkExists );

@@ -982,10 +982,13 @@ JB_File* JB_File__NewPipe(int Pipe) {
 	return F;
 }
 
+bool JB_File_IsPipe(JB_File* f) {
+	return f->MyFlags & 2;
+}
+
+
 
 JB_File* JB_Str_File( JB_String* Path ) {
-	// || f = .resolve.file
-	// if resolve fails, file should be nil?
 	if (Path != JB_Str__Error()) {
 		JB_File* F = JB_New( JB_File );
 		JB_File_Constructor( F, Path );

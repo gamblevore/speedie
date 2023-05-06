@@ -132,7 +132,9 @@ class File (String)
 	
 	function Modified (|Date|)
 		cpp_wrapper JB_File_Modified
-
+			
+	function IsPipe (|bool|)
+		cpp_wrapper JB_File_IsPipe
 
 	function Peek (|int| n, |string|)
 		|| i = .offset
@@ -363,12 +365,14 @@ class File (String)
 		disabled "Use .out"
 	
 	
-	function string.Out (|Faststring|) // OK so this is far too low. Lets just put it on the actual types?
-		|| f = .file				#require
-		f.close
-		if f.OpenEmpty
-			rz = FastString()
-			rz.file = f
+	function string.Out (|bool| Clear=true, |Faststring|)
+		|| f = .file						#require
+		if Clear and !f.ispipe // we don't close pipes!
+			f.close
+			require f.openempty
+				
+		rz = FastString()
+		rz.file = f
 
 	
 	function string.In (|string|T="", |int| ChunkSize=4MB, |StringStream|)
