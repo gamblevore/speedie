@@ -77,6 +77,22 @@ function String.UTF8 (|string|)
 	return .UTF16To8
 
 
+function String.ExtractPathAndLine (|&ivec2| LineAndByte, |string|)
+	rz = .TrimStart("line ")
+	|| tr = rz.trim
+	if tr.isint
+		|| v = (tr.int|int|, 0)
+		*LineAndByte = v
+		return ""
+	
+	|| parts = rz / ':'
+	rz = parts[0].trim
+	|| v2 = (parts[1].trim.int|int|, parts[2].trim.int|int|) 
+	*LineAndByte = v2
+	if rz[0] == '~'
+		rz = rz.Resolve(true)
+
+
 helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 	|| i		= p
 	|| ParaMax	= 1K
