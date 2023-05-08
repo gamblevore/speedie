@@ -117,9 +117,9 @@ class FileViewer (ListView)
 			.HideOpenList
 			return true
 		(q is visible)
-		q.setfocus
-		q.selectall
-		.quickOpenFile(q.text)
+		q.SetFocus
+		q.SelectAll
+		.OpenQuickRelist(q.text)
 		return true
 
 
@@ -131,7 +131,7 @@ class FileViewer (ListView)
 			
 	function AddRoot (|file| fol, |bool| IsMainProj = false, |filerow|)
 		|| C = 3000
-		rz = .addrootsub(fol, IsMainProj, C)
+		rz = .AddRootSub(fol, IsMainProj, C)
 		self <~ rz
 
 
@@ -139,9 +139,9 @@ class FileViewer (ListView)
 		|| p = fol.path
 		if !fol.isdir
 			return FileRow(p, p.name)
-		|| F = FileRow(p, p.trimextandpath, .folfile)
-		f.inmainproj = ismainproj
-		(f is expanded) = ismainproj
+		|| F = FileRow(p, p.TrimExtAndPath, .folfile)
+		f.InMainProj = IsMainProj
+		(f is expanded) = IsMainProj
 		f.FillFilesSub(fol, .excludes, .folfile, c)
 		return f
 
@@ -240,7 +240,7 @@ class FileViewer (ListView)
 
 	helper string.name (|bool| YeahReally, |string|)
 		cpp_part NameMaybe
-		if yeahreally
+		if YeahReally
 			return .name
 		return self
 
@@ -255,7 +255,7 @@ class FileViewer (ListView)
 		if (path[0] == '.' and path[1] != '/') and .endswith(path, true)
 			return 1
 
-		ifn path.length >= 2
+		if path.length < 2
 			return 0
 		|| slah = path contains '/'
 		if (self, .name)(slah) contains path
@@ -279,7 +279,10 @@ class FileViewer (ListView)
 			if f isa filerow
 				|| it = f.match(path, NameOnly)
 					f.rangelength = it
+					f = FileRow(f)
 					rz <~ f
+					if f.Location.file.IsDir
+						f.name = f.name.PathDir
 		
 		rz.sort(FileRowScoreSorter)
 		|dictionary of filerow| D = dictionary.new
@@ -309,17 +312,15 @@ class FileViewer (ListView)
 	helper message.ExtractRecent (|message| into)
 		opt norefcounts
 		for s in self
-			if s isa error
-				if s.when
-					into <~ s
+			if s|error|.when
+				into <~ s
 		
 	
 	helper BatchFindSub (|string| str, |message| all)
 		opt norefcounts
 		for f in self
-			if f isa filerow
-				if !.nofind.valuelower(f.location.name)
-					f.FindAll(str, all)
+			if (f isa filerow) and !.nofind.valuelower(f.location.name)
+				f.FindAll(str, all)
 
 
 	function BatchFind (|string| str, |message|)
@@ -341,86 +342,71 @@ class FileViewer (ListView)
 		return true
 
 
-	function QuickOpenFile (|string| path, |int| FromReturnKey=0, |bool|)
-		|| line = ""
-		|| byte = ""
-		path = path.TrimStart("line ")
-		if path.trim.isint
-			line = path
-			path = ""
-		  else
-			|| parts = path / ':'
-			path = parts[0].trim
-			line = parts[1].trim
-			byte = parts[2].trim
-		if path[0] == '~'
-			path = path.Resolve(true)$
-		return .QuickOpenFileSub(path, line, "", FromReturnKey)
-
-
-	helper QuickFindPaths (|string| path, |[filerow]|)
-		ifn path[0, "/"] or path[0, "~/"]
-			return .findpaths(path)
-		|| f = path.file
-		|| invis = path endswith "/."
-		for ch in f
-			if invis or ch.visible
-				|| s = f[ch]
-				if s.IsDir
-					ch+="/"
-				rz <~ filerow(s, ch)
-		
-
-	helper QuickOpenFileSub (|string| path, |string| line, |string| BytePos, |int| FromReturnKey = 0, |bool|)
-		if path
-			|| r = .QuickFindPaths(path)
-			require .quickopenfilesub2(path, r, fromreturnkey)
-		else
-			require fromreturnkey
-		if line
-			.editme.ViewLineandsel(line.int)
-		if bytepos
-			.editme.ShowAndSel(bytepos.int)
-		return true
-		
-	helper QuickOpenFileSub2 (|string| path, |[filerow]| r, |int| FromReturnKey, |bool|)
-		if FromReturnKey
-			if (FromReturnKey >= 3) or (!path) or (path.file.exists)
-				if path
-					|| r0 = r[0] ?? .addextra(path)
-						path = ""
-					.select(nil) // force event
-					.selectfast(r0)			
-				.HideOpenList
-				if FromReturnKey >= 2
-					.editme.setfocus
-				if fromreturnkey >= 0
-					return r or !path
-			if FromReturnKey >= 2
-				return false
-		
+	function OpenQuickRelist (|string| path)
+		.QuickOpen.text = path
+		if path < 2
+			.listopen.clear
+			return
+		if path[0, "/"] or path[0, "~/"]
+			.OpenQuickRelistDir(path.file)
+			return
+			
+		|| r = .FindPaths(path)
 		|| l = .listopen
 		(l is visible) = r.length > 0
-		if path.length < 2
-			l.clear
+		l.QuickOpenFill(r)
+		l.size = the~same by 0~before back (l.desiredheight.clamp(100,200))
+
+
+	helper ListView.QuickOpenFill (|[filerow]| Items)
+		// does not need to copy these! each item is already a copy
+		// change later :D
+		.clear
+		for p in items
+			|| m = message(@str, p.name) 
+			self <~ m
+			m.obj = p
+
+	helper OpenQuickRelistDir (|file| path)
+		|| invis = path endswith "/."
+		|[filerow]| items
+		for ch in path
+			if invis or ch.visible
+				|| s = path[ch]
+				if s.IsDir
+					ch += "/"
+				items <~ filerow(s, ch)
+		items.sort(FileRowScoreSorter)
+		.listopen.QuickOpenFill(items)
+	
+	
+	function OpenQuick (|string| s)
+		|| LineByte = (0, 0)
+		|| Path = s.ExtractPathAndLine(LineByte)				
+			|| r = .FindAPath(path) ?? .AddExtra(path)
+				.Select(nil) // do we need this?
+				.SelectFast(r)
 		  else
-			l.fill(r)
-		l.size = the~same by 0~before back (l.desiredheight max 100)
-		return (l is visible)
+			.editme.SetFocus
+		
+		if LineByte.x1
+			.editme.ViewLineAndSel(LineByte.x1)
+		if LineByte.x2
+			.editme.ShowAndSel(LineByte.x2)
 
 
 	function AddExtra (|string| path, |filerow|)
-		|| x = .extra init filerow("", "(Extra)", ".") // sigh
-		ifn .listsource contains x
+		|| x = .extra
+		if !x
+			x = filerow("", "(Extra)", ".")
+			.extra = x
 			self <~ x
 		
 		|| C = 3000
-		|| r = .AddRootSub(path.file, false, C) 
-		x <~ r
-		.selectfast(r)
-		return r
+		rz = .AddRootSub(path.file, false, C) 
+		x <~ rz
+		.SelectFast(rz)
 
-			
 	
 	module
 		function FileRowRenamer (guilisteditevent)
@@ -469,75 +455,45 @@ class FileViewer (ListView)
 				return (bb.asdir)
 			return (bb.name ~<= aa.name)
 
-
-
-
-		function QuickOpenModified (guitextevent)
+		function QuickOpenModified (GUITextEvent)
 			|| fv = .tag|fileviewer|
 			require fv.mustbe(fileviewer)
-			fv.quickOpenFile(.text)
+			fv.OpenQuickRelist(.text)
 
 		function QuickOpenKey (guikeyevent)
 			|| fv = .tag|fileviewer|
 			require fv.mustbe(fileviewer)
 			|| l = fv.listopen
-			if key.isaccept
-				ClickedOpenList(l, l.sel)
-				rz =  true
-/* // stupid code... just delete this
-				|| fl = .tag
-				if row and fl isa fileviewer
-					|| f = row.obj
-					if f isa filerow
-						fl.select(f)
-					fl.hideopenlist
-				|| s = .text
-				|| fr = s.first
-				if fr != '/' and '~'
-					|| r = l.sel
-						s = r.obj|filerow|.location
-				check fv.quickOpenFile(s, 2) (Beep)
-			
-*/
-			  elseif (key is escape) or key.isaccept
-				rz = fv.hideopenlist
+			if key.IsAccept
+				|| row = l.sel
+					ClickedOpenList(l, row)
+				  else
+					fv.OpenQuick(.text)				
+				rz = true
+			  elseif (key is escape)
+				rz = fv.HideOpenList
 			  elseif key is up or down
-				rz = l.keydown(key)
+				rz = l.KeyDown(key)
 
 
 		function QuickOpenFocus (guiaction)
-			if state == 0
-				|| fv = .tag
-				if fv.MustBe(FileViewer)
-					return fv.hideopenlist
+			require state == 0
+			|| fv = .tag
+			if fv.MustBe(FileViewer)
+				rz = fv.hideopenlist
 
 
 		function ClickedOpenList (GuiListevent)
-			|| V = .tag|fileviewer|
-			require V isa fileviewer
-			if !row
-				V.quickOpenFile(v.quickopen.text, 2)
-				return true
-			
+			|| V = .tag|FileViewer|
 			|| r = row.obj|filerow|
-			require r isa filerow
+			require r isa filerow  and  V isa fileviewer
 
-			|| faa = r.location.file
-			if V.owns(r)
-				V.select(r)
-			  elseif faa.isdir
-				|| p = faa.path
-				v.QuickOpen.text = p // sigh. just setting .text did not work!
-				V.quickOpenFile(p)
-				
+			|| loc = r.location
+			if loc.file.isdir
+				V.OpenQuickRelist(loc)
 				return true
-			  else
-				r = v.findapath(faa)
-				if r
-					v.select(r)
-				  else
-					v.addextra(faa)
-			V.hideopenlist
+			v.OpenQuick(loc)
+			V.HideOpenList
 			return true
 			
 

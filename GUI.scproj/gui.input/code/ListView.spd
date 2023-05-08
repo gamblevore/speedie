@@ -1035,15 +1035,6 @@ class ListView (GUIControl) {
 		|| Srch = (.left,  y - .RowHeight,  .right,  y)
 		return Srch.contains(Search)
 	
-
-	function Fill (|[ListViewrow]| r)
-		opt norefcounts
-		.clear
-		for p in r
-			|| m = message(@str, p.name) 
-			self <~ m
-			m.obj = p
-			
 	
 	function Use (|ListViewrow| PL, |bool| SendClickEvent=false)
 		opt norefcounts
