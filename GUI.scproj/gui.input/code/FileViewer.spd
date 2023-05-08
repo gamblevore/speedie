@@ -264,11 +264,11 @@ class FileViewer (ListView)
 			return 2
 
 	
-	function FindAPath (|string| path,  |filerow| within=nil, |filerow|)
-		return .FindPaths(path, within)[0]
+	function FindAPath (|string| path,  |filerow| within=nil, |bool| Copy=false, |filerow|)
+		return .FindPaths(path, within, copy)[0]
 
 
-	function FindPaths (|string| path,  |listviewrow| within=nil,  |[filerow]|)
+	function FindPaths (|string| path,  |listviewrow| within=nil, |bool| Copy=false, |[filerow]|)
 		opt norefcounts
 		require path
 		|| NameOnly = path[0, "./"] 
@@ -279,9 +279,10 @@ class FileViewer (ListView)
 			if f isa filerow
 				|| it = f.match(path, NameOnly)
 					f.rangelength = it
-					f = FileRow(f)
+					if Copy
+						f = FileRow(f)
 					rz <~ f
-					if f.Location.file.IsDir
+					if copy and f.Location.file.IsDir
 						f.name = f.name.PathDir
 		
 		rz.sort(FileRowScoreSorter)
@@ -351,7 +352,7 @@ class FileViewer (ListView)
 			.OpenQuickRelistDir(path.file)
 			return
 			
-		|| r = .FindPaths(path)
+		|| r = .FindPaths(path, nil, true)
 		|| l = .listopen
 		(l is visible) = r.length > 0
 		l.QuickOpenFill(r)
