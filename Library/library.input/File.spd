@@ -117,8 +117,9 @@ class File (String)
 	
 	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |messageroot|)
 		// file.parse keeps track of the source+path
-		// if you don't want that for memory's sake, use file.data.parse
 		|| f = .Resolve(allowmissing).file
+//			if f.peek(16).IsJbin and !f.peek(16).IsCompressed
+// 			    return .in.parse_jbin // soemthing like that
 			|| S = f.readsafely(lim, allowmissing)
 			if s.IsCompressed
 				s = s.Decompress(lim, nil)
