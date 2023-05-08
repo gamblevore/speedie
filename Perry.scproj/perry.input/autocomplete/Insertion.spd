@@ -362,7 +362,11 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 function perryide.IsEditingSource (|bool|)
 	opt norefcounts
 	|| f = .CurrFileRow
-		return f.location isa "uwu" or "spd"// or "jb" or "jbin"
+		return f.location.issource// or "jb" or "jbin"
+
+	
+function string.isSource (|bool|)
+	return self isa "uwu" or "spd"
 
 
 function guicontrol.ide (|perryide|)

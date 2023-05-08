@@ -133,7 +133,7 @@ function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
 		
 	.AddToJumpHistory
 	.EnableHistoryChanges = false
-	.filelist.QuickOpenFileSub(path, "", "", 2)
+	.GotoAnyFile(path)
 	.editme.ShowAndSel(l)
 	.EnableHistoryChanges = true
 	.AddToJumpHistory	

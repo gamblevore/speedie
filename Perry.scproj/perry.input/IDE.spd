@@ -459,10 +459,28 @@ class PerryIDE (Window)
 			return .autocomplete.doreturn
 		return super.keydown(key)
 
+	function GotoIncludedFile (|string| path, |filerow|)
+		|| f = .FileList[path]
+			.FileList.Select(f)
+		return f
+		
+	function GotoAnyFile (|string| path, |string| line="")
+		|| f = .GotoIncludedFile(path)
+		f := .FileList.AddExtra(path)
+		if f and line
+			.EditMe.ViewLineAndSel(line.int)
 	
+		
 	function Root (|filerow|)
 		return .filelist.start|filerow|
 
+	function file.NeedsOwnWindow (|bool|)
+		if .IsProj
+			return true
+		if .isSource
+			|| m = .parse
+			if m.Find(@tmp, "main")
+				return true
 
 	function OpenDoc (GUIPasteEvent)
 		require self
@@ -474,10 +492,10 @@ class PerryIDE (Window)
 		|| f   = p.file
 		if f.isdir
 			p = p.pathdir
-		if !f.isdir or .filelist[p]
-			.filelist.quickOpenFile(p, 3)				// just open 
-		  elseif p.isproj
-			ideaddproj(p)								// add as project
+		if .GotoIncludedFile(p)
+			0
+		  elseif f.NeedsOwnWindow
+			IdeAddProj(p)								// add as project
 		  else
 			.filelist.addextra(p)						// add root
 		startupwindow.hide

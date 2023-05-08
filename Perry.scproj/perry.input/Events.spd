@@ -322,7 +322,7 @@ function PerryIDE.GoToMarker (|message| m)
 		if m.parent != .previous
 		.EnableHistoryChanges = false
 		|| l = m.first
-		.filelist.QuickOpenFileSub(m.name, l.name, "", 2)
+		.GoToAnyFile(m.name, l.name)
 		.editme.scrollpos = l.first.int
 		.EnableHistoryChanges = true
 	.EnablePrevNext
@@ -528,7 +528,7 @@ function PerryIDE.ClickedError (|error| row)
 	require !.DuringMsgFB
 	|| f = row.path.file
 	if (row.path != .editme.path) and f.IsNicelyViewable
-		.filelist.QuickOpenFile(f, 1)
+		.GoToAnyFile(f)
 	.editme.ShowAndSel(row.position)
 	.editme.MyError = row
 
@@ -541,7 +541,7 @@ function file.IsNicelyViewable (|bool|)
 
 function PerryIDE.ClickedFind (|error| row)
 	|| p = row.path
-	.filelist.quickOpenFile(p, 1)
+	.GotoIncludedFile(p)
 	if row.position
 		.editme.ShowAndSel(row.position, .MassSearchField.text.length)
 	  else

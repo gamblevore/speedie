@@ -4,7 +4,7 @@ extend PerryIDE
     constructor (|bool| ignore)
 		super.constructor 
 		
-		sdlapp.AppDocumentOpen = PerryOpenDoc
+		sdlapp.AppDocumentOpen = PerryOpenDoc // move to a different startup place
 		.EnableHistoryChanges = true
 		.InConstructor		= true
 		.Previous			= message()
