@@ -29,7 +29,6 @@ class TextViewLine (ringtree)
 
 
 	render
-		
 		if !.parent
 			for c in self
 				c.render(fs)
@@ -148,22 +147,32 @@ class TextViewLine (ringtree)
 
 	helper ColoriseSub (|message| srch, |message|)
 		opt norefcounts
-		|| r = .colorisesub2(srch)
+		rz = .colorisesub2(srch)
+		|| r = rz
+		if !r or r.startsafter(.range)
+			r = srch
+			while r
+				r = r.parent
+				if (r == @arg) and r.startsbefore(.range)
+					exit
+		
 		if r and !r.startsafter(.range)
 			(self is breakpoint) = r is breakpoint
 			.msgpos = .position // isn't it r.position?
 			.message = r
 		  else
 			isnt breakpoint
-		return r
 			
 		
 	function ColoriseSub2 (|message| srch, |message|)
 		opt norefcounts
 		|| r	= .range
-		|| prch = srch.parent
 		while srch.EndsBefore(r)
-			srch = srch.flatnext$
+			|| p = srch
+			srch = srch.flatnext
+			if !srch
+				return p
+			
 		if srch.StartsAfter(r)							// AFTER
 			return srch
 			

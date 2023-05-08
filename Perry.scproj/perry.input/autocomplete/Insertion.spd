@@ -7,7 +7,7 @@ function textview.RangeCheck (|int| r, |message| func_name, |message| prms, |boo
 		a  = prms.after
 		a += !self[a].IsTextLine
 	return r in (l, a) // allow a little lee-way
-
+	
 
 function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange, |&message| found, |int|)
 	visible
@@ -165,7 +165,7 @@ function message.FindPrms (|int| p, |message|)
 			return ch
 
 
-function textview.CharMode (|int| x, |int|)
+function string.CharMode (|int| x, |int|)
 	|| c = self[x] 
 	if c == ' ' or '\t'
 		return ' '
@@ -173,20 +173,24 @@ function textview.CharMode (|int| x, |int|)
 		return ','
 	if (c == '|' or ')')
 		return '|'
+	if jeebox.CSWordMiddle[c]
+		return '_'
 	return c
 
 
 function textview.AfterComma (|int| p, |int| x, |int|)
+	|| s = .text
 	while x > p
-		|| c = .charmode(--x) 
+		|| c = s.charmode(--x) 
 		if c == ','
 			return x
 		require c == ' '
 
 
 function textview.BeforeDecl (|int| p, |int| x, |bool|)
+	|| s = .text
 	while x < p
-		|| c = .charmode(x++) 
+		|| c = s.charmode(x++) 
 		if (c == '|')
 			return true
 		require c == ' '
@@ -197,7 +201,7 @@ function textview.InPrmsAndBetweenDecls (|message| msg, |int| x, |int|)
 	// just wanna find the msg that owns us!
 	|| list = msg.findprms(x)$
 	|| fn = list.owning_func$
-	if .charmode(x) == ','
+	if .text.charmode(x) == ','
 		return x
 	rz = .aftercomma(list.position, x)
 	if rz
@@ -265,7 +269,6 @@ function textview.IsInClass (|textviewline| d, |bool|)
 		d--
 
 
-
 function textview.PerryDeclKey (|bool|)
 	opt norefcounts
 	|| s = .selrange
@@ -292,6 +295,18 @@ function textview.PerryDeclKey (|bool|)
 		return true
 
 
+
+helper String.DetectNoSpaces (|string| find, |int| start, |bool| Fwd=true,  |ind|)
+	while
+		if .CharMode(start) == ' '
+			0
+		  elseif self[start, find]
+			return start
+		  else
+			return -1
+		start += fwd.dir
+			
+	
 function textview.PerryInsertSyntax (|keys| Key, |int|)
 	opt norefcounts
 	|| ide = .ide
@@ -300,17 +315,32 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 		return 1
 	require  .ExpectsParse >= probablyjeebox
 	|| s = .SelRange
-	if  !s.width  and  key is escape
-		return .PerryTryAutoComplete(s.x, "autocomplete", PerryAutoCompleteReason.escape)|int|
+	|| i2 = s.x2
+	if  !s.width
+		if key is escape
+			return .PerryTryAutoComplete(i2, "autocomplete", PerryAutoCompleteReason.escape)|int|
+		|| back = .text.DetectNoSpaces("|", i2-1, false)
+		|| fwd  = .text.DetectNoSpaces("|", i2)
+		if back and fwd // OK we are inside ||
+			fwd++
+			while .text.CharMode(fwd) == ' '
+				fwd++
+			
+			s = (fwd, fwd)
+			// we wanna sel the actual text
+			while .text.CharMode(s.x2) == '_'
+				s.x2++
+			.Sel = s
+			return 1
+			
 
-
+	
 	require  !.MyError  and  key isnt escape
-	|| i2	 = s.x2
-	|| d	 = .FindDrawInfo(s.x)
-	require  d and d contains i2
+	|| dd = .FindDrawInfo(s.x)
+	require  dd and dd contains i2
 	|message| where
 	|| inrange = false
-	|| state = .CodeInsertion(d, i2, inrange, where)
+	|| state = .CodeInsertion(dd, i2, inrange, where)
 	if state == -2
 		return 0
 	if state == -1
@@ -346,10 +376,6 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 	if ide.EditMeTabRetryThing
 		return 0
 	if  !s.width  and  (key is tab)  and  self[s.x].istextline
-		// printline .ide.autocomplete.listsource
-		// checking the listsource is unreliable because it is out of date
-		// and can come frmo almost anywhere...
-		// so just don't check it?
 		|| C = .ide.autocomplete.listsource.slowcount
 		if C > 0 
 			if c == 1 and .FakeAutoComplete == -1

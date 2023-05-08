@@ -567,7 +567,7 @@ class String
 		return i+from
 
 
-	function StretchyFind (|string| find, |int| from=0, |int| to=int.max, |intrange|)
+	function StretchyFind (|string| find, |int| from=0, |int| to=int.max, |intrange|) // findnospaces
 		|| n = self - find
 		to = to min n
 		from = from min n
