@@ -1312,8 +1312,8 @@ class TextView (GUIControl)
 	setter Text (|string|)
 		cpp_part TextSetReal
 		isnt modified
-		.Clear(value)
-		.undoer.ClearTo(value)?
+		if .Clear(value)
+			.undoer.ClearTo(value)?
 		
 	function TextLeft (|int|)
 		return .left + 2 + .LineNumWidth*font.width
@@ -1521,10 +1521,17 @@ class TextView (GUIControl)
 		.ShowNoExtra
 			
 	
-	function Clear (|string| newtext, |bool| KeepStart=false)
-		require super.textset(newtext) or !newtext
+	helper Clear (|string| NewText, |bool| KeepStart=false, |bool|)
+		if super.textset(NewText)
+			.ClearSub(NewText, keepstart)
+			return true
+		if NewText=="" // Setting to "" does all the extra work? why not just the first time?
+			.ClearSub(NewText, keepstart)
+
+
+	helper ClearSub (|string| newtext, |bool| KeepStart)
 		if !keepstart
-			|| sel = (.text.length, 0)(.singleline) 
+			|| sel = (.text.length, 0)(.SingleLine) 
 			.TypingPlaceDirect((sel,sel))
 		
 		.ScrollDrawTimer = 0
@@ -1532,12 +1539,12 @@ class TextView (GUIControl)
 
 		require !Keepstart
 		.lines.clear
-		._Start = .addvline
+		._Start = .AddVline
 		._start.position = -1
 		.ShowNoExtra
 
 	
-	helper AddVline (|textviewline|)
+	helper AddVline (|TextViewLine|)
 		opt norefcounts
 		|| d = textviewline(0)
 		.lines <~ d
