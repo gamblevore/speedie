@@ -49,11 +49,11 @@ static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* 
 		if (!str)
 			str = strerror(err);
 	}
-	if (str) {
+	if (str)
 		JB_FS_AppendCString(FS, str);
-	} else {
+	  else
 		JB_FS_AppendIntegerAsText(FS, err, 1);
-	}
+
 	JB_FS_AppendCString(FS, " when ");
 	JB_FS_AppendCString(FS, Operation);
 	if (self) {
