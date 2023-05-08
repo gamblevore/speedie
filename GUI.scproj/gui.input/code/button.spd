@@ -33,10 +33,10 @@ class ButtonView (GUIControl)
 		.subcontrol = .InitMenu(ret)
 
 	helper InitMenu (|GUIListEvent| ret,  |menu|)
-		if ret
-			rz = menu(self, nil, ret)
-			if rz
-				rz.AttachedToParent = true
+		require ret
+		rz = menu(self, nil, ret)
+		if rz
+			rz.AttachedToParent = true
 
 	function SubMenu (|menu|)
 		|| s = .SubControl
@@ -130,14 +130,14 @@ class ButtonView (GUIControl)
 		.ClearMouse
 		return (.Pressing)(self, 0, D)
 	
+	
 	behaviour MouseDown
 		opt norefcounts
 		|| D = .itemat(P.x)
 			if d isnt active and self is decluttered
 				d = nil
 		
-		if .clickeditem and clicks == -1
-			// drag
+		if .clickeditem and clicks == -1		// drag
 			if D and D != .ClickedItem
 				.ClickedItem.moveto(D)
 				.PressingDone = true
@@ -171,7 +171,7 @@ class ButtonView (GUIControl)
 			.PressingDone = true
 			ifn .DoPressing(D)
 				.delaytill = 0
-				return 0
+				return 1
 		return 5
 
 
