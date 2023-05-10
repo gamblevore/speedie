@@ -106,9 +106,6 @@ inline FindResult BeginFind_(Dictionary* self, MiniStr key) {
     if (!self->Width) {self->Width = 255;}
     F.Place = 0;
     F.Data = key;
-//    MiniStr Eq = {7, (uint8*)"variant"};
-//    if (StrEquals( key, Eq ))
-//		debugger;
     F.Parent = 0;
     return F;
 }
@@ -177,7 +174,9 @@ static void NodeSanity_(Dictionary0* D) {
 
 static inline bool AccessItem_(FindResult& F) {
     Dictionary* Found = Dict_(F.Obj);
-    NodeSanity_(Found);
+    if (!Found) {
+		return false;
+    }
     uint8 i = *F.Data.Addr++;
     u32 Offset = i - (u32)Found->Start;
 
@@ -261,18 +260,19 @@ static JB_String* NotSharedDict_(JB_String* Key) {
 static void WriteLeaf_(FindResult& F, JB_String* Key) {
     // should be easy...
     dbgexpect(IsValue_(F.Parent)); // not a value but just not shifted.
+	Dictionary* P = (Dictionary*)(F.Parent);
     if (F.Data.Length >= 2) {
         DictionaryLeaf* Leaf = JB_New(DictionaryLeaf);
         JB_Incr(Leaf); // I think so!
         
         *F.Place = WasLeaf_(Leaf);
         Leaf->InPlaceValue = F.Obj;
-        Leaf->Depth = F.Data - Key->Addr; // must come first!
+        Leaf->Depth = P->Depth+1; // must come first!
         Key = NotSharedDict_(Key);
         Leaf->Key = (JB_String*)(JB_Incr(Key));
         Leaf->Start = 0;
         Leaf->Width = 0;
-        Leaf->Parent = (Dictionary*)F.Parent;
+        Leaf->Parent = P;
         Leaf->Letter = F.Data[-1];
 
         F.Data.Length = 0;
@@ -286,7 +286,7 @@ static void WriteLeaf_(FindResult& F, JB_String* Key) {
         
         *F.Place = WasBranch_(D);
         D->InPlaceValue = F.Obj;
-        D->Depth = F.Data - Key->Addr;
+        D->Depth = P->Depth+1;
         D->Letter = F.Data[-1];
         D->Parent = (Dictionary*)F.Parent;
         D->Start = *F.Data.Addr++;
@@ -388,10 +388,9 @@ static void ReplaceLeaf_(FindResult& F, JB_String* NewKey) {
     *F.Place = LeafValue;
     JB_Decr(Leaf);
     
-    
     WriteItem_(F, NewKey, P);
     F.Data.Addr += F.Data.Length;
-    F.Data.Length = 0; // sigh.
+    F.Data.Length = 0;						// sigh.
 }
 
 
@@ -482,11 +481,11 @@ bool TrySet_(FindResult& F, JB_String* Key) {
     if (!F.Data.Length) {
         return true;
     }
-    if (!IsSomeDict_(F.Obj)) {      // 2) Value : Replace with leaf.
+    if (!IsSomeDict_(F.Obj)) {			// 2) Value : Replace with leaf.
         WriteLeaf_(F, Key);
 
     } else if (IsLeaf_(F.Obj)) {
-        ReplaceLeaf_(F, Key);       // 3) Leaf  : Mismatch somewhere...
+        ReplaceLeaf_(F, Key);			// 3) Leaf  : Mismatch somewhere...
 
     } else {
         debugger; // does this even ever happen?
@@ -507,7 +506,18 @@ bool CanFind_(Dictionary* self, JB_String* key, FindResult* F) {
 }
 
 
-bool CanSet_(Dictionary* self, int Prefix, JB_String* key, FindResult* F) {
+void MiniByte_(FindResult& F, int i) {
+    Dictionary* Found = Dict_(F.Obj);
+    u32 Offset = i - (u32)Found->Start;
+
+//  if (Offset <= (u32)(Found->Width)) {
+	F.Parent = Found;
+	F.Place = &Found->Items[Offset];
+	F.Obj = *F.Place;
+//  }
+}
+
+bool CanSet_(Dictionary* self, JB_String* key, FindResult* F) {
     if (key and self) {
         *F = BeginFind_( self,  Mini(key, 0) );
         JB_Dict_Value_(*F);
@@ -538,9 +548,9 @@ JB_String* JB_Str_UniqueSplit(JB_String* self, int StartOff, int Length, Diction
 
 
 
-JB_Object** JB_Dict_MakePlace(Dictionary* self, int Prefix, JB_String* key) {
+JB_Object** JB_Dict_MakePlace(Dictionary* self, JB_String* key) {
     FindResult F;
-    if (CanSet_(self, Prefix, key, &F)) {
+    if (CanSet_(self, key, &F)) {
         return F.Place;
     }
     return 0;
@@ -561,7 +571,7 @@ JB_Object* JB_Dict_Value(Dictionary* self, JB_String* key, JB_Object* Default) {
 
 void JB_Dict_ValueSet(Dictionary* self, JB_String* key, JB_Object* Value) {
     FindResult F;
-    if (CanSet_(self, -1, key, &F)) {
+    if (CanSet_(self, key, &F)) {
         *F.Place = JB_Incr(Value);
         if (IsValue_(F.Obj)) { // could be a direct int
             JB_Decr(F.Obj);

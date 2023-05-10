@@ -26,12 +26,8 @@ class Dictionary (saveable)
 	syntax Access (|string| Key, |...| Default, ||)
 		cpp_wrapper JB_Dict_Value
 		
-	function MakePlace (|int| Prefix=-1, |string| key, |&...|)
+	function MakePlace (|string| key, |&...|)
 		cpp_wrapper JB_Dict_MakePlace
-		
-	function MakePlace (|message| msg, |&...|)
-		cpp_part MakeMsgPlace
-		return .MakePlace(msg.Func|int|, msg.Name)
 		
 	syntax Access (|uint64| Key, assigns:||)
 		opt norefcounts

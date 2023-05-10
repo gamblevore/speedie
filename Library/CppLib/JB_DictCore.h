@@ -28,7 +28,7 @@ JBClass( Dictionary0, Saveable,
     uint8              Start;
     uint8              UserFlags; // not used by the dict itself.
     uint8              Width;
-    u16             Depth; 
+    uint             Depth; 
     JB_Object*      InPlaceValue;
 );
 
