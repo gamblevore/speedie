@@ -1476,7 +1476,7 @@ class FastStringCpp (FastString)
 			fs <~ .position
 
 			if (f!=nil) and .hasposition
-				|| lines = f.fdata[0, .position].count('\n')
+				|| lines = f.fdata[0, .position].Count('\n')
 				fs <~ " line: "
 				fs <~ lines + 1
 				fs <~ ' '
@@ -1497,7 +1497,7 @@ class FastStringCpp (FastString)
 		|| l = .lastpos|int|
 		.lastpos = p
 		|| Missing = .OrigSrc[l min p, p max l]
-		|| Lines = Missing.count('\n')
+		|| Lines = Missing.Count('\n')
 
 		if (p < l)
 			lines = -lines
