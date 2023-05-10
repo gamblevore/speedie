@@ -104,12 +104,13 @@ function perryide.DebugActual (|file| f, |[string]| args)
 
 
 function perryide.DebugPath (|file| f, |message| conf)
-	if .project.isdir
-		app.cwd = .project
-	  else
-		app.cwd = .project.parent
+	|| p = .Project
+	if !p.isdir
+		p = p.Parent
+	app.cwd = p
 	
 	|| path = conf["pwd"].goodname
+	if path and path != "."
 		app.cwd = path
 
 
