@@ -200,7 +200,7 @@ class File (String)
 		error msg
 		
 		
-	function CompareSub (|File| A, |ErrorInt|)
+	helper CompareSub (|File| A, |ErrorInt|)
 		cpp_part FileCompareSub
 		if (.Size != A.Size)
 			return 1
