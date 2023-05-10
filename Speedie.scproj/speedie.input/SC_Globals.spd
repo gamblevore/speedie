@@ -146,7 +146,10 @@ function TypeOfBRel (ExprResolver)
 	
 	if name == "*"
 		|| Cpy = subtype.Copy // should keep borrowedness...
-		Cpy.PointerCount--
+		if cpy.PointerCount > 0
+			Cpy.PointerCount--
+		  else
+			error (F, "Can't dereference this.")
 		return cpy // how to render?
 		
 	  elseif name == "-" // minus
