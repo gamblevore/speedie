@@ -157,7 +157,7 @@ function ReportBuild (|message| cmd, |message|)
 	if stderr.Problems
 		cmd <~ compiler.ErrorsToPerry
 	  elseif cmd.compiles
-		cmd <~ TransCompiler.productpath
+		cmd <~ TransCompiler.productpath(true)
 	  else
 		cmd <~ (@thg, "ok")
 	return cmd

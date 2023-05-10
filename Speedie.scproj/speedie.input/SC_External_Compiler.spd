@@ -37,6 +37,7 @@ function BackupPath (|string|)
 function ProductName (|string|)
 	return compiler.projectname + Compiler.VariantSuffix
 
+
 function ProductSuffix (|String|)
 	require Options.ProjectIsLibrary
 	Target OSX
@@ -46,14 +47,16 @@ function ProductSuffix (|String|)
 	return ".so"
 	
 
-function ProductPath (|String|)
+function ProductPath (|bool| Direct=false, |String|)
 	if options.output_path
 		return options.output_path
 	
 	if options.scripting
 		return compiler.originalinputpath.scriptlocation
 		
-	|| prod = .productname + .ProductSuffix
+	|| prod = compiler.projectname
+	if !Direct
+		prod = .productname + .ProductSuffix
 	if Options.SelfReplacement
 		return Compiler.Projects.child("Terminal/"+prod)
 	return Compiler.BuildFolder.path[ prod ]
@@ -461,7 +464,8 @@ function InstallOne (|file| test)
 function InstallCompiler
 	"Installing Speedie: $__time_id__"
 
-	.ProductPath.File.MoveTo( Compiler.Projects.child("Terminal/Speedie") )
+	|| dest = Compiler.Projects.child("Terminal/Speedie")
+	.ProductPath.File.MoveTo( dest )
 
 	.InstallOne Cpp_Export.CppProduct
 	.InstallOne Cpp_Export.HProduct
