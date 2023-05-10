@@ -1,0 +1,209 @@
+
+// holistic compression
+
+struct HoliReviver
+	linkage
+		cpp_part HRV
+	|stringstream|	Input 
+	|message|		Name
+	|message|		strings
+	|message|		BitSize
+	|message|		IDs
+	|message|		Types
+	|message|		Tree
+	|message|		Output
+	|[messageid]|	Table
+
+	constants
+		MaxOneByte = 255-(32+16)
+	
+	function Collect (|int|)
+		.name    = .input.nextmsg(@tmp, "ћ")
+		.strings = .input.nextmsg(.name, @str)
+		.BitSize = .input.nextmsg(.name, @bin)
+		.Types   = .input.nextmsg(.name, @bin)
+		.IDs     = .input.nextmsg(.name, @bin)
+		.Tree    = .input.nextmsg(.name, @bin)				#require
+		
+		rz = .types.Length	
+		.table <~ (messageID(), rz)
+
+
+	function IDGen (|int| IDCount)
+		opt norefcounts
+		|| IDParser = stringstream(.IDs.name)
+		|| TreeParser = stringstream(.tree.name)
+		|| Str = .strings.name.decompress(int.max)
+		|| StrParser = stringstream(Str)
+
+		for (fn in .types.name) (n)
+			expect fn (.input, "Bad syntax")
+			expect (idparser) (.input, "Too few IDs")
+			.table[n] = MessageID(strparser.str(idparser.noob), fn|syntax|)
+
+		expect (!idparser) (.input, "Too many IDs")
+	
+	
+	function MakeTree
+		opt norefcounts
+		|message| Parent
+		|| TreeParser = stringstream(.tree.name)
+		|uint64| Highest = MaxOneByte
+		
+		while TreeParser
+			|| Raw = TreeParser.noob - 16
+			if Raw >= 0
+				|| ID = Raw >> 2
+				if raw & 2
+					ID = Highest-ID
+				|| MID = .table[ID]				#expect (.input, "Bad ID")
+				(Highest max= ID+1)
+				|| msg = mid.msg(parent)
+				if !parent or Raw&1 // Down
+					parent = msg
+					.output := msg
+			  else
+				parent = parent.upward(-Raw) // go up
+
+
+	function Decode
+		|| OK = stderr.mark 
+		|| N = .collect
+		if OK //      :3
+			.IDGen(n)
+		if OK //hehe
+			.MakeTree
+	
+	
+	function stringstream.UnsquashJbin (|message|)
+		|HoliReviver| sq
+		sq.input = self
+		sq.decode
+		rz = sq.Output
+			
+	
+	
+struct HoliRest
+	linkage
+		cpp_part HR
+	|faststring|					Strings
+	|faststring|					IDs
+	|faststring|					Types
+	|faststring|					Tree
+	|faststring| 					Out
+	
+	function BuildTable (|message| root, |[messageid]|)
+		|MessageDict of messageid| md
+		.strings = FastString(root.identify(md, rz))
+		.types = FastString()
+		.IDS = FastString()
+		rz.sort(&messageid.IDSorter)
+		for (id in rz) (i)
+			id.id = i
+			.strings <~ id.Name
+			.types   <~ id.Func|byte|
+			.types.noob(id.name.length)
+		
+
+	helper GoUp (|int| Depth)
+		while depth
+			|| amount = depth min 16
+			.tree <~ (amount-1)|byte|
+			depth -= amount
+			
+			
+	function Compress (|message| root)
+		visible
+		opt NoRefCounts
+		
+		|| table = .BuildTable(root)
+		|| curr = root
+		|| depth = 0
+		|| highest = HoliReviver.MaxOneByte
+		while curr
+			|| next = curr.FlatNextDepth(depth)
+			if depth >= 0
+				debugat
+				highest = .Encode(curr, depth|bool|, highest)
+			  else
+				.GoUp(-depth)
+			curr = next
+	
+	
+	function Encode (|message| curr, |bool| Depth, |int| highest,  |uint64|)
+		debugat
+		|| M = curr.name|MessageID|
+		|| ID = M.ID
+		|| Code = Depth|uint|
+		if ID > highest
+			highest = ID + 1
+		  elseif (highest - ID)|uint| < ID|uint|
+			ID = highest - ID
+			Code |= 2
+		Code |= (ID << 2)
+		// so .... how do I encode this? lets see the distance from the highest
+		.tree.noob( Code + 16 )
+		return highest
+	
+
+	function stringstream.CompressJbin (|jbin| fs)
+		|HoliRest| Stuff
+		stuff.out = fs
+		|| OK = stderr.mark
+		Stuff.Compress(.parse_jbin)
+		if OK
+			fs.enter(@tmp, "ћ")
+			fs.add(@str, stuff.strings)
+			fs.add(@bin, "\08")
+			fs.add(@bin, stuff.types)
+			fs.add(@bin, stuff.IDs)
+			fs.add(@bin, stuff.Tree)
+	
+	module
+		function Test (|file| input)
+			target !debug
+				return
+			return
+			require input.MustExist
+			|| out = input.Sibling(input.name.addext("holi"))
+			|| back = input.Sibling(input.name.addext(".back"))
+			debugat
+			input.in.CompressJbin(out.out)
+			|| msg = out.in.UnsquashJbin()				#require
+			msg.render_jbin(back)
+			back.CompareFile(input, input)
+				
+			
+	
+	
+	
+/*	
+	Better to section this... in case of large files. Having a 10MB string section isnt ideal.
+	Try to limit each part to 1MB? We have 4MB input chunk by default anyhow
+	
+	We need any possible integer value. But want smaller values to take less.
+
+	Encoding approaches:
+	
+	8-bit, 12-bit, 16-bit
+	
+	I think lets noobcode 32~values, then hint the rest. Perhaps with a callback	
+*/
+
+
+	
+
+function faststring.noob (|uint64| n)
+	if n < 224
+		self <~ n|byte|
+	  else
+		self <~ (224+(n & 31))|byte|
+		.hInt(n>>5)
+	
+	
+function stringstream.noob (|uint64|)
+	|| b = .byte
+	if b < 224
+		return b
+	return (.hint<<5) (|) (b-224)
+
