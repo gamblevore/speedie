@@ -47,7 +47,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg)
 
 
 function PerryIDE.SubProcess (|bool| actual_compile, |fn_Subprocess|)
-	require platform.isdebug and !actual_compile
+	require platform.isdebug and actual_compile
 	if actual_compile
 		rz = Speedie_Compiler
 		Speedie_Compiler = nil
