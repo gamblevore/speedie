@@ -12,16 +12,17 @@ linkage
 
 
 
-constants
+flags
 	kBasisNotObj = 0 // just be 0, for #require
-	kBasisObj = 1
-	kBasisDeSTRUCTable = 2
-	kBasisTempStruct = 4
+	kBasisObj
+	kBasisDeSTRUCTable
+	kBasisTempStruct
+	kBasisCArray
 
-	kSufferedNoise = 8
-	kIsNoisy = 16
-	kIsDisowner = 32
-	kHoldsDisowned = 64
+	kSufferedNoise
+	kIsNoisy
+	kIsDisowner
+	kHoldsDisowned
 	kNotDisturbed = 0 // must be 0, for #require
 
 
@@ -56,26 +57,26 @@ function Message.NoPointlessBlockRefs (|message| dcl, |bool|)
 	»
 
  
+
 function RC_DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 	|| Basis = RefBasis( dcl, true )
 	if fn.dorefs
 		require basis
 	  else
-		require basis == kBasisDestructable
+		require basis & kBasisDestructable
 	
 	|| arg = Dcl.Parent
 	|| name = Dcl.DeclName
 	|Message| LastPlace
-	if (Basis == kBasisObj)	// could be a struct?
+	if (Basis & kBasisObj)	// could be a struct?
 		LastPlace = LastUsedRefPlace( name, arg )
 	
 	|| Blocker = arg.CausesUnReachable( arg, dcl, LastPlace )
 	if blocker.NoPointlessBlockRefs(dcl)
-		if (Basis == kBasisObj)
+		if (Basis == kBasisObj) // i guess we don't want the & here
 			RefIncr( name, dcl, IsJustAnArg )
 		Blocker := LastPlace
 		ReturnHandle( Blocker, arg, name, basis )
-
 	
 	|| Curr  = dcl
 	|| After = arg.FlatAfter
@@ -102,6 +103,8 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 		type = TypeOfExpr( msg, nil )$
 	
 	if type.IsReffable(setonly)
+		if type.c_array > 0
+			return kBasisCArray (|) kBasisObj
 		Return kBasisObj
 	
 	if type.hasstruct
@@ -130,9 +133,8 @@ function RC_Rel (|Message| rel)
 
 
 function RC_IgnoreReturn (|Message| msg, |bool| DoRefs)
-	// frexaf shubs tog
+// just deal with it
 	require RefBasis( msg, false ) == kBasisObj
-	// same thing as above, do this inside NeedsRefs
 	// Func(a,b,c) -> || tmp = Func(a,b,c),  JB_FreeIfDead(tmp)
 	
 	using (msg)
@@ -140,15 +142,32 @@ function RC_IgnoreReturn (|Message| msg, |bool| DoRefs)
 	msg.FuncWrap( free_if_dead )
 
 
-function RefDecr (|Message| msg, |Message| place)
-	// a = nil   ->   a = nil, JB_decr(a)
+function RefDecr (|Message| msg, |Message| place, |int| Basis)
+	// a = nil   ->   JB_decr(a),  a = nil 
+	opt norefcounts
 	
-	msg = RefDecrMsg( msg )
 	|| OldPrev = place.Prev
 	if (OldPrev) and (OldPrev == @Func) and (OldPrev.first ~= "JB_SafeDecr")
 		place = OldPrev // safedecr always comes last
 	
-	place.Prev = msg
+	|message| what 
+	if basis & kbasiscarray
+		what = DecrMulti( msg.parent.asdecl, msg.copy )
+	  else
+		what = RefDecrMsg( msg )
+	if place == @arg
+		place <~ what
+	  else
+		place.Prev = what
+
+
+function DecrMulti (|scdecl| d, |message| m, |message|)
+	|| n = d.c_array
+	|| prms = [m, n.msg]
+	rz = (macros.MultiDecr)(prms)
+	|| prm = rz.FindNested(@prm)
+		prm.obj = Compiler.RefDecrmulti
+		prm.parent.obj = typevoid
 
 
 function RefDecrMsg (|Message| msg, |Message|)
@@ -250,7 +269,7 @@ function Message.CausesUnReachable (|Message| arg, |Message| Curr, |Message| Las
 	Curr := .First // ideally should just be "for (curr in self)"
 	
 // if (s == "exit") or (s == "continue") or (s=="rejoin")
-// if (s == "exit" or "continue" or "rejoin") /// sooo much nicer.
+// if (s == "exit"  or "continue" or "rejoin") /// sooo much nicer.
 
 	while (curr)
 		require (curr != LastPlace)
@@ -373,36 +392,34 @@ function message.DoesAnything (|bool|)
 
 
 function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| Basis)
-	if (Basis == kBasisDestructable)
+	if (Basis & kBasisDestructable)
 		|message| NeedsMoreTemping
 		|message| Ch
 		if (Blocker)
 			Ch = Blocker.first
 			if (Blocker.isReturnOrRejoin  and  ch isThing name.name) or (blocker isthing name.name)
 				return
-// Actually structs are like virtual-objects, and so don't need destructor here
 			if (blocker == "return") and (ch.DoesAnything)
 				NeedsMoreTemping = SCFunction.TempMoveOut( ch, blocker ) // still need to ref it.
-				// prevent structs being destroyed before we wanted. for "using" syntax.
 
 		.DeStructable(Blocker, arg, name)
 		if NeedsMoreTemping
 			ReturnTempMoveOutSub(ch, blocker, NeedsMoreTemping)
 		return
 
-	if (basis == kBasisTempStruct)
+	if (basis & kBasisTempStruct)
 		return // no need?
 
 	if (!Blocker)
 		debug_require (arg)
-		RefDecrEnd( name, arg )
+		RefDecr( name, arg, basis )
 		Return
 
 	|| IsReturn = Blocker.IsReturnOrRejoin
 	|| Child = Blocker.first.unbratype
 
 	if (!Child)
-		RefDecr( name, blocker )
+		RefDecr( name, blocker, basis )
 		
 	  elseif (IsReturn and (child isThing name.name) )
 		RefSafeDecr( name, blocker ) // needs to come after any decr!
@@ -410,7 +427,8 @@ function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| B
 	  else
 		if IsReturn and ExprNeedsTemping( Child, name )
 			ReturnTempMoveOut(Child, blocker)
-		RefDecr( name, blocker )
+		RefDecr( name, blocker, basis )
+
 
 
 function RC_RelConstructor (|Message| rel)
@@ -530,16 +548,6 @@ function LastUsedRefPlace (|Message| name, |Message| arg, |Message|)
 	return curr.LastUsedFix
 
 
-function RefDecrAfter (|Message| msg, |Message| place)
-	// a = nil   ->   a = nil, JB_decr(a)
-	place.Next = RefDecrMsg( msg )
-
-
-function RefDecrEnd (|Message| msg, |Message| place)
-	// a = nil   ->   a = nil, JB_decr(a)
-	place <~ RefDecrMsg( msg )
-
-
 function SafeDecrMsg (|Message| msg, |Message|)
 	return RefMsg( msg, "JB_SafeDecr", Compiler.RefSafeDecr )
 
@@ -552,19 +560,20 @@ function RC_DeclArg (|scdecl| AR, |scfunction| fn)
 
 
 function Message.RefDisappears (|bool|)
+	opt norefcounts
 	for (P.up in .parent)
 		if (P == @bra)
 			0 // go up
-		elseif (P == @Type)
+		  elseif (P == @Type)
 			|| D = P.AsDecl
 			if d and !D.IsNormalObject
 				return true
-		elseif (P == @rel)
+		  elseif (P == @rel)
 			|| comp = P[1].obj
-			if (comp isa scoperator)
+			if (comp isa SCOperator)
 				return (comp.IsCompare and !comp.iscustom)
 			return false
-		else
+		  else
 			return false
 
 
@@ -589,11 +598,11 @@ function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
 	for ch.up in msg
 		if  ch == @arg
 			hitarg = true
-		elseif  ch == @rel
+		  elseif  ch == @rel
 			|| opp = ch[1]
 			if (opp == @opp) and (opp == "or" or "and")
 				return true
-		elseif  ch istmp "while"
+		  elseif  ch istmp "while"
 			if !hitarg
 				return true
 		if ch == pp
@@ -611,20 +620,17 @@ function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
 					if (fn.returnType.isnormalobject) // and its disowned or whatever
 						return true
 
-
-
+	
 function RC_Temps (|SCFunction| FN, |Message| msg, |int| Basis)
 	|| ch = msg.UseNonRefChangers
-	if Basis == kBasisDestructable or basis == kBasisTempStruct
+	if Basis & kBasisDestructable or basis & kBasisTempStruct
 		if (!msg.IsSetIntoPlace and !ch.parent.IsReturnOrRejoin)
 			scfunction.TempMoveOut(Msg)
 		return 
 	
 	require (Basis == kBasisObj) and (!msg.IsProperty)
 	|| parent = ch.niceparent
-	require (Parent != @Arg)
-	require !(parent.IsReturnOrRejoin and ch.IsOnlyChild)
-	require !ch.IsSetIntoPlace
+	require  (Parent != @Arg)  and  !(parent.IsReturnOrRejoin and ch.IsOnlyChild)  and  !ch.IsSetIntoPlace
 	
 	if !ch.RefDisappears
 		if (parent == @prm) and (parent.obj == compiler.TernaryFunc)
@@ -679,10 +685,11 @@ function scfunction.FillInDestructor
 	Using .sourcearg
 	for d in .cls.Properties
 		if d.IsReffable(true)
-			.SourceArg.AddBefore( first, SCRefs.RefDecrMsg( .DeclToDot( d ) ) )
+			.SourceArg.AddBefore( first, .RefDecr(d) )
 		  else
 			|| Destr = d.HasStructDestructor
-				|| Obj = «brel "&", .DeclToDot( d ) »
+				|| dm = .DeclToDot(d)	// Im not sure we need the type for this, at least not for refcounting
+				|| Obj = «brel "&", dm »
 				.SourceArg.AddBefore( first, SCRefs.RefDestructorMsg( Obj, destr ) )
 
 
@@ -769,7 +776,7 @@ function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 		if (fn isa kIsConstructor)
 			|| ok = self isa (kIsConstructor(|)kIsNew)
 			expect (ok) (dot, "Can only call constructors from within a constructor.")
-		elseif (fn isa kIsDestructor)
+		  elseif (fn isa kIsDestructor)
 			|| ok = self isa kIsDestructor
 			expect (ok) (dot, "Can only call destructors from within a destructor.")
 
@@ -785,12 +792,35 @@ function SCFunction.RefsCheckPropertiesAltered
 		|| ch = curr.first	 // a.b = x
 		ch.IsProperty			#continue
 		
-		
 		// (not on self, within constructor)
 		if  (self isa kIsConstructor) and ( ch.first IsThing "self" )
 			 Continue
 		
 		SCRefs.RefMarkAsDisturber( ch, self )
 
+
+function DeclToDot (|scdecl| d, |string| s, |Message|)
+	rz = @dot+s
+	rz.msg(@thg, "self")
+	rz.msg(@emb)
+	rz.obj = d // we need this, as it is a decl... but for locals... we don't need it!
 }
+
+
+extend scfunction
+	function RefDecr (|scdecl| d, |message|)
+		opt norefcounts
+		|| m = screfs.decltoDot(d, d.name)
+		if d.c_array > 0
+			return screfs.DecrMulti(d, m)
+		  else
+			return SCRefs.RefDecrMsg( m )
+
+
+struct abccc
+	|object[99]| KKKKLL
+	function @abccc.test
+		visible
+		|abccc| aaa
+	destructor
 

@@ -319,6 +319,14 @@ inline void JB_Decr(JB_Object* self) {
     }
 }
 
+#define JB_DecrMulti(a, b)  (JB_DecrMulti_((JB_Object**)(a),b))
+inline void JB_DecrMulti_(JB_Object** Start, int n) {
+	JB_Object** End = Start+n;
+	while (Start < End) {
+		JB_Decr(*Start++);
+	}
+}
+
 inline JB_Object* JB_SafeDecr_(JB_Object* self) {
     if (self) {
 		JBObjRefTest(self);

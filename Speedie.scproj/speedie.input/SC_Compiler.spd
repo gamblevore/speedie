@@ -89,6 +89,7 @@ linkage
 |SCFunction|			PrivateProperty
 |SCFunction|			RefIncr
 |SCFunction|			RefDecr
+|SCFunction|			RefDecrMulti
 |SCFunction|			RefFreeIfDead
 |SCFunction|			RefSafeDecr
 |SCFunction|			RefSetRef
@@ -279,6 +280,7 @@ function InitBasicFuncs (|bool|)
 	.RefSetRef		= .LoadRefFunc( "JB_SetRef" )
 	.RefIncr		= .LoadRefFunc( "JB_Incr" )
 	.RefDecr		= .LoadRefFunc( "JB_Decr" )
+	.RefDecrMulti	= .LoadRefFunc( "JB_DecrMulti" )
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
@@ -727,7 +729,8 @@ function CheckMaxVars
 function DoRefsB
 	opt norefcounts
 	for f in .FuncList
-		ifn f.CanDoRefs
+		if !f.CanDoRefs
+			screfs.thisfunc = f
 			f.AnalyseRefsB
 	screfs.ThisFunc = nil
 	.CheckMaxVars

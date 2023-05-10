@@ -14,6 +14,10 @@ module Macros {
 	rejoin _X
 })".macro
 
+
+|| MultiDecr = "JB_DecrMulti(_0, _1)".macro
+
+
 || MainArg2 = "|| _0 = (_1.MainArg(_2), _3)(__ArgCount > _1)".macro
 || MainArg1 = "|| _0 = _1.MainArg(_2)".macro
 

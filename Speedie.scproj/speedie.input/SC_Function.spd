@@ -1082,11 +1082,11 @@ function TreeSanity
 
 
 function DeclToDot (|SCDecl| d, |Message|)
-	|| slf = «thg "self"»
-	slf.obj = .cls.SelfStrong
+	|| slf_msg = «thg "self"»
+	slf_msg.obj = .cls.SelfStrong
 	
 	|| dot = «dot d.Name
-		slf
+		slf_msg
 		«emb »
 	»
 	dot.obj = d
