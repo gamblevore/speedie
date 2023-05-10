@@ -4,12 +4,11 @@ class FixedDict
 	contains object
 	linkage: cpp_part dict
 	|uint|					ItemTypes
+	|Byte|					ValueType
+	|Byte|					Letter
 	|_voidptr|				Value
 	|FixedDict--|			Parent
 	|_voidptr[16]|			Items
-	|Byte|					ValueType
-	|Byte|					Letter
-	|uint16|				Depth
 	
 	constants
 		TypeValue	= 0
@@ -187,7 +186,7 @@ class FixedDict
 					prefill[t] = t
 			prefill.clear
 
-			using (leaktester("oof2"))
+			using (leaktester.new("oof2"))
 				|| f = fixeddict()
 				for t in items
 					f[t] = t
