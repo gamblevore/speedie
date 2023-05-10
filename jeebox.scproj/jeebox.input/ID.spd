@@ -20,8 +20,8 @@ class MessageID (stringshared)
 	contains object
 	|Syntax|			Func
 	||					Obj
-	|int64|				ID
-	|uint16| 			DecodeID
+	|uint64|			ID
+	|uint64|			Frequency
 	
 	constructor (|string| Name="", |Syntax| Fn=nil)
 		super.constructor(name)
@@ -33,16 +33,17 @@ class MessageID (stringshared)
 	
 	module
 		function IDSorter (SorterComparer)
-			return a|MessageID|.id  <  b|MessageID|.id
+			return a|MessageID|.Frequency  <  b|MessageID|.Frequency
 
 
-function Message.Identify (|dictionary of messageid| d, |[messageid]| table, |int|)
+
+function Message.Identify (|&(MessageDict of messageid)| d,  |[messageid]| table,  |int|)
 	visible
 	opt NoRefCounts
 	for s.flat in self
 		|| Found = d.makeplace(s)
 		|| ID = *found
-			ID.id++
+			ID.Frequency++
 		  else
 			id = MessageID(s.name, s.func)
 			if table
@@ -50,3 +51,20 @@ function Message.Identify (|dictionary of messageid| d, |[messageid]| table, |in
 			*found = id
 			rz += s.name.Length
 		s.Name = id
+
+
+
+struct MessageDict 
+	contains object
+	|(dictionary of ...)[64]| D
+	
+	function MakePlace (|message| m, |&...|)
+		opt norefcounts
+		|| fn = m.func
+		if fn|int| < 64
+			|| pl = &.d[fn]
+			|| v = (*pl) init dictionary()
+			return v.makeplace(m.name)
+	destructor
+	
+			
