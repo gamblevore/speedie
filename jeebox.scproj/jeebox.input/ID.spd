@@ -17,46 +17,78 @@ class StringShared (string)
 
 
 class MessageID (stringshared)
+	linkage
+		cpp_part ID
+		
 	contains object
 	|Syntax|			Func
+	|uint|				Position
 	||					Obj
 	|uint64|			ID
 	|uint64|			Frequency
 	
-	constructor (|string| Name="", |Syntax| Fn=nil)
+	render
+		fs <~ .func.name
+		fs <~ "@"
+		if .length
+			fs.AppendQuotedEscape(self)
+	
+	constructor (|string| Name="", |Syntax| Fn=nil, |uint| pos=0)
 		super.constructor(name)
 		.Func = fn
+		.Position = pos
 		.obj = nil // c++ generator fails otherwise
-	
+		
+		
 	function Msg (|message| parent, |message|)
 		return Message(parent, .func, -1, .name, .name.length)
 	
 	module
 		function IDSorter (SorterComparer)
-			return a|MessageID|.Frequency  <  b|MessageID|.Frequency
+			opt norefcounts
+			|| aa = a|MessageID|,   || bb = b|MessageID| 
+			
+			|| diff = aa.Frequency  -  bb.Frequency
+				return diff > 0							// more frequent should have lower lengths
+				
+			return aa.Position < bb.Position
+			// Now what?
 
 
 
-function Message.Identify (|&(MessageDict of messageid)| d,  |[messageid]| table,  |int|)
-	visible
+function Message.Identify (|&(MessageDict of messageid)| d,  |[messageid]| table, |uint|)
 	opt NoRefCounts
-	for s.flat in self
+	|| s = self
+	|| Count = 0
+	while s
+		|| name = s.name
+		d.TotalCount++
+		d.TotalStringLength += name.length	// an accumulative stat 
 		|| Found = d.makeplace(s)
 		|| ID = *found
+		if ID != nil
 			ID.Frequency++
 		  else
-			id = MessageID(s.name, s.func)
-			if table
-				table <~ id
+			rz += name.Length				// a direct result within self
+			id = MessageID(name, s.func)
+			id.Position = Count++
 			*found = id
-			rz += s.name.Length
+			d.uniquecount++
+			if table != nil
+				table <~ id
 		s.Name = id
+		s = s.flatnext
+	d.UniqueStringLength += rz
 
 
 
 struct MessageDict 
 	contains object
 	|(dictionary of ...)[64]| D
+	|uint|		UniqueCount
+	|uint|		TotalCount
+	|uint64|	TotalStringLength
+	|uint64|	UniqueStringLength
 	
 	function MakePlace (|message| m, |&...|)
 		opt norefcounts
@@ -65,6 +97,7 @@ struct MessageDict
 			|| pl = &.d[fn]
 			|| v = (*pl) init dictionary()
 			return v.makeplace(m.name)
+	
 	destructor
 	
-			
+	

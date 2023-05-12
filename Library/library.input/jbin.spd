@@ -1,9 +1,7 @@
 
 // jbin: streamable, binary jeebox
 
-|| _JbinHeaderOld = "\10\03"
-|| _JbinHeader = "\10\03\EA\E2" 
-/// can't put a constant in a role? 
+|| _JbinHeader = "\01\10\EA\E2"     /// can't put a constant in a role? 
 
 
 extend message
@@ -48,6 +46,14 @@ role JBin (Faststring)
 		cpp_part AddFS
 		.addmemory(Type, fs.resultptr, into, fs.length)
 
+	function addcomp (|faststring| fs, |int| strength=mzlab.strongest)
+		if strength > 0
+			|| Place = .OpenSection
+			fs.compressinto(self, strength)
+			.CloseSection(Place)
+		  else
+			.add(@str, fs)
+		
 	function sheb		(|string| data)
 		self <~ '#'
 		self <~ '!'
@@ -132,7 +138,10 @@ helper stringstream.NextMsgInfo (|uint64|)
 	while (self)
 		|uint| info = .Byte
 		if info < 160
-			if info == 0
+			if info <= 1
+				if (info == 1)
+					error (self, "Corrupt jbin")
+					exit
 				continue
 			|| T = (info >> 1)|syntax|
 			if t > @bin								// need @max

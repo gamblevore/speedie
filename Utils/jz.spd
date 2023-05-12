@@ -3,14 +3,14 @@
 
 datatype Type (int)
 	flags // compressed should be an action?
-		ReadOK, Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace, TestComp
+		ReadOK, Compressed, Plain, XML, actions=(Box, Jbin, Holly, Report), StdOut, SelfReplace, TestComp
 	
 	syntax is (|Type| test, |bool|)
 		return self & test
 	syntax isnt (|Type| test, |bool|)
 		return !(self & test)
 	function Format (|Type|) 
-		return self & (Box (|) jbin (|) xml)
+		return self & (Box (|) jbin (|) holly (|) xml)
 	
 	render
 		if self is Compressed
@@ -33,7 +33,7 @@ function app.UseOne (|file| f)
 			"${conv.in} is a folder"
 	  elseif (conv.dest is TestComp)
 		conv.TestOne
-	  else
+	  else 
 		conv.Process
 	conv.End
 
@@ -95,10 +95,13 @@ function App.GetActions (|Type|)
 		  elseif name ~= "test"
 			rz |= type.TestComp
 			rz |= type.compressed
+		  elseif name ~= "h"
+			rz |= type.Holly
+			rz |= type.compressed
 		  elseif name ~= "c"
 			rz |= type.compressed
 			if v!="true"
-				conv.DefaultStrength = v.int|int|.clamp(MZLab.Fastest, MZLab.Strongest)
+				conv.DefaultStrength = v.int|int| max MZLab.Fastest
 		  elseif name ~= "f"
 			Conv.destpath = v
 			.SingleFile(name)
@@ -114,16 +117,17 @@ function app.usage (|string|)
 	return "Usage: ${.filename} File1 [File2...]
 Convert files between jbin, box, xml formats. Additionally can compress or decompress.
 
-    -j          Convert to jeebox
-    -b          Convert to jbin
-    -c          Compress
-    -c=0        Compress for very-fast decompress
-    -s          Replace file in-place
-    -p          Print to stdout
-    -r          Just report types, otherwise do nothing
-    -f=name     Sets the filename of output
-    -o=j/b/m/x  Detect only specified type.
-                j = jeebox, b = jbin, m = compressed, x = xml
+    -j              Convert to jeebox
+    -b              Convert to jbin
+    -c              Compress
+    -c=0            Compress for very-fast decompress
+    -s              Replace file in-place
+    -p              Print to stdout
+    -x			    Uses the the holly compressor
+    -r              Just report types, otherwise do nothing
+    -f=name         Sets the filename of output
+    -o=j/b/m/x/h    Detect only specified type.
+                    j = jeebox, b = jbin, m = compressed, x = xml
 
 examples:
     jz -j A.xml   					// xml to jeebox
@@ -163,11 +167,11 @@ module Conv
 		CompressionStats.all.Clear
 	
 	
-	function TestOne
-		require .in.MustExist("test compression")
+	function TestMZ
 		|| OrigIn = .in
 		|| OrigOut = .out
 		.DefaultStrength = MZLab.Fast
+
 		.TestSub(origIn)
 
 		.in = origin
@@ -177,8 +181,16 @@ module Conv
 
 		.del(.out, origin)		
 		.del(origout, origin)
+
+
+	function TestOne
+		require .in.MustExist("test compression")
 		.done++
-	
+		if .dest is holly
+			HollyPotter.Testholly(.in)
+		  else
+		    .testmz
+
 	
 	function del (|file| f, |file| o)
 		if f.exists and f.path != o.path	
@@ -227,19 +239,27 @@ module Conv
 		
 	function CompressOnly (|bool| Decomp)
 		printline .out|string|
-		|| dest = .out.out
+		|| d = .out.out
 		|| src = .in.in
-		require src and dest
-		|| type = ("µz", "ro")(.defaultstrength < mzlab.strong)
+		require src and d
 		.start = date() 
 		if Decomp
-			.size = dest.File.size
-			src.DecompressInto(dest)
+			.size = d.File.size
+			if .Detected is holly
+				|| ast = src.ReviveJbin
+					ast.Render(d)
+			  else
+				src.DecompressInto(d)
 			.time("Decompress(streamed )", true)
 		  else 
+			|| typ = ("µz", "ro")(.defaultstrength < mzlab.strong)
 			.size = .in.size
-			src.CompressInto(dest, DefaultStrength) 
-			.time("Compress(streamed $type)", true)
+			if .dest is holly
+				src.parse.Compress(d, DefaultStrength) 
+				typ = "holly"
+			  else
+				src.CompressInto(d, DefaultStrength) 
+			.time("Compress(streamed $typ)", true)
 	
 
 	function Read (|bool|)
@@ -249,6 +269,8 @@ module Conv
 			CmpFormat = ""
 			.Detected |= type.jbin
 		
+		if CmpFormat == "ћ"
+			.Detected |= type.holly
 		.FileIsCompressed = CmpFormat!=""
 		if .FileIsCompressed
 			.Detected |= type.compressed // only read compressed at first
@@ -316,28 +338,28 @@ module Conv
 		return true
 
 
-	function Transform (|bool|)
+	function Transform (|bool|) 
 		|faststring| fs
 		ifn dest is compressed
 			fs = .out.Out							#require
-		if .AST and (Detected.format != Dest.format)
+		if .AST and (Detected.format != Dest.format) and (dest isnt holly)
 			.Start = date.now
 			if dest is box
 				.data = .AST.Render(fs)
 			  else
 				.data = .AST.render_jbin(fs)
 			.time("Render")
-		// So what cases does this NOT run?
-		// 1) No AST
-		// 2) Has AST, but same format
-		// well... if the format is different but theres no ast... we can't do anyting
-		// if the format is the same and theres no ast, we must want to compress it?
 
-		if .dest is compressed
+		if .dest is compressed 
 			.start = date.now
 			fs = .out.out							#require
-			.data.Compressinto(fs, DefaultStrength)
-			.time("Compress")
+			if (.dest is holly)
+				expect (.ast) ("Can't hollify because file did not parse.")
+				.ast.Compress(fs, Defaultstrength)
+				.time("Compress(Holly)")
+			  else
+				.data.Compressinto(fs, DefaultStrength)
+				.time("Compress")
 
 		fs.Flush
 		if !fs
@@ -366,13 +388,18 @@ module Conv
 		
 		if dest is selfreplace
 			return .in
-		|| str = .in.RemoveExt("mz")
+		|| str = .in.path
+		if str isa "mz" or "hol"
+			str = .in.trimext
 		if str isa "box" or "jbin" or "xml"
 			str = str.SetExt(.ext)
 		  else
-			str = str.AddExt(.ext)
+			str = str.AddExt(.ext) 
 		if dest is compressed
-			str = str.AddExt("mz")
+			if dest is holly
+				str = str.AddExt("hol")
+			  else
+				str = str.AddExt("mz")
 		  elseif ((.in isa "mz") and str.FileExists) or (str == .in)
 			str += ".back"
 		return str.file
@@ -385,7 +412,9 @@ function file.FormatInfo (|&int| Size=0, |string|)
 	if str.IsJbin
 		rz = "jbin"
 		|| mz = str.parse_jbin
-		if mz == @tmp and "µz"
+		if mz == @tmp and "ћ"
+			rz = "ћ"
+		  elseif mz == @tmp and "µz"
 			|| arg = mz.last
 			if arg != @arg
 				rz = string.error
@@ -399,3 +428,4 @@ function file.FormatInfo (|&int| Size=0, |string|)
 					rz = "ro"
 				  else
 					rz = "µz"
+					

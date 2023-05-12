@@ -35,6 +35,10 @@ class StringStream
 
 	function ReadAll (|string|)
 		return .str(.length - .startfrom)
+
+	function Parse (|syntax| owner = @arg, |bool| AllowDecomp=true, |message|)
+		return .ReadAll.parse(owner, allowdecomp)
+
 	
 	helper ReadChunk (|bool|)
 		.data.readfrom = .file.read(.chunksize)		// for now
@@ -89,6 +93,14 @@ class StringStream
 		for i in n+1
 			rz |= .byte << i << 3
 
+
+	function noob (|uint64|)
+		|| b = .byte
+		if b < 224
+			return b
+		return (.hint<<5) (|) (b-224)
+
+
 	function hInt (|int64|)
 		|| sh = 0
 		|| v  = 0
@@ -100,7 +112,6 @@ class StringStream
 			sh += 7
 			expect (sh <= 57) (self, "Corrupted hInt")
 	
-
 	function CString (|string|)
 		// this function doesn't work with streaming...
 		// its not ideal. but none of my code needs this streamed!
