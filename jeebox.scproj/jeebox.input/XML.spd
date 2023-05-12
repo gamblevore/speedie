@@ -195,6 +195,9 @@ extend message
 	syx XTxt (XML_Text)
 		fs.appendmultireplace(.name, jeebox.XML_EscapeStr)
 
+	syx max (EndMarker)
+		0
+
 
 function message.XMLToJeebox (|bool|)
 	for ch in self
