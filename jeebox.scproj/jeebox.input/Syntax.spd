@@ -16,7 +16,7 @@ datatype Syntax (Byte)
 		return self|int|
 
 	function Translateable (|bool|) 
-		return self >= @thg and self <= @name
+		return self <= @Thg and self >= @tmp
 
 	function ListViewable (|bool|) 
 		return self >= @thg and self <= @emb
