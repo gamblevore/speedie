@@ -4,13 +4,6 @@
 */
 
 
-extend Message
-	syx Bin (Hex)
-		fs <~ "#("
-		fs.appendhexdata(.name)
-		fs <~ ")#"
-
-
 function Parser.fBinary (ParseHandler)
 	|| End = .data.find(")#", start+2)
 		|| S = parser[Start+2, End]

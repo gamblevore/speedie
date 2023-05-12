@@ -96,6 +96,12 @@ class Message (RingTree)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+	
+	
+	function string.IsStatementName (|bool|)
+		return (jeebox.cswordmiddle contains self) and (!self[0].IsInt)
+	
+	
 	syx Nil (WildCard)
 		Opt NoRefCounts
 		debugat
@@ -109,30 +115,32 @@ class Message (RingTree)
 		if Braces
 			fs.IndentLine
 			fs <~ '}'
-	
-	
-	syx Bra (Bracket)
-		fs <~ '('
-		fs <~ .First
-		fs <~ ')'
 
-	
-	syx Thg (Thing)
+	syx Emb (Embedded_Value)
 		fs <~ .Name
+		require .hasany
+		.RenderWithSpaces(fs)
 
-
-	syx Opp (Operator)
-		fs <~ .Name
-
+	syx Type (Typecast)
+//                                     obj|type|
+		|| obj = .First					#require
+		|| type = obj.next
+		fs <~ obj
+		fs <~ '|'
+		if type: fs <~ type
+		fs <~ '|'
 	
-	syx Cnj (conj)
-//                                  I eat cheese #when I feel hungry
-		fs <~ '#'
-		fs <~ .Name
-		
 
-	function string.IsStatementName (|bool|)
-		return (jeebox.cswordmiddle contains self) and (!self[0].IsInt)
+	syx Decl (Declaration)					//		|x| a = b
+		|| ch = .First				#require
+		fs <~ '|'
+		fs <~ ch
+		fs <~ '|'
+		ch++
+		while ch
+			fs <~ ' '
+			fs <~ ch
+			ch++
 	
 	
 	syx Tmp (Statement)
@@ -157,16 +165,9 @@ class Message (RingTree)
 				hasarg = true
 			ch++
 
-	
-	syx Name
-		|| ch = .First
-		if (ch)
-			fs <~ .Name      // sonic
-			fs <~ " @ "			
-			fs <~ ch         // the~hedgehog
-		  else
-			fs <~ '@'
-			fs <~ .Name
+	syx Oat (Operator_As_Thing)
+		fs <~ '%'
+		.renderwithspaces(fs)
 
 
 	syx Ques (Question)
@@ -176,6 +177,39 @@ class Message (RingTree)
 		|| n = .first
 			fs <~ ' '
 			fs <~ n
+
+	
+	syx Cnj (conj)
+//                                  I eat cheese #when I feel hungry
+		fs <~ '#'
+		fs <~ .Name
+
+	syx Opp (Operator)
+		fs <~ .Name
+	
+	syx Thg (Thing)
+		fs <~ .Name
+
+	syx Sheb (Shebang)
+		fs <~ "#!"
+		fs <~ .Name
+		fs <~ '\n'
+
+	syx SCnj (Syntactic_conj)
+		fs <~ .Name						// a - b --> b + -a
+
+	syx SThg (Syntactic_Thing)
+		fs <~ .Name
+
+	syx Num (Number)
+		Opt NoRefCounts
+		fs <~ .Name // 123
+	
+
+	syx SStr (Super_String)			// <(`abc`)>
+		fs <~ "<(`"
+		fs <~ .Name
+		fs <~ "`)>"
 
 
 	syx Back (Backtick)				//  `abc`
@@ -194,21 +228,10 @@ class Message (RingTree)
 		fs <~ '\''
 
 
-	syx SStr (Super_String)			// <(`abc`)>
-		fs <~ "<(`"
-		fs <~ .Name
-		fs <~ "`)>"
-
-	syx Oat (Operator_As_Thing)
-		fs <~ '%'
-		.renderwithspaces(fs)
-
-	
-	syx Sheb (Shebang)
-		fs <~ "#!"
-		fs <~ .Name
-		fs <~ '\n'
-	
+	syx Bin (Hex)
+		fs <~ "#("
+		fs.appendhexdata(.name)
+		fs <~ ")#"
 	
 	syx Str (String)
 		fs <~ '"'
@@ -225,21 +248,6 @@ class Message (RingTree)
 		fs <~ '"'
 
 
-	syx SThg (Syntactic_Thing)
-		fs <~ .Name
-	
-	syx SCnj (Syntactic_conj)
-		fs <~ .Name						// a - b --> b + -a
-	
-	syx Num (Number)
-		Opt NoRefCounts
-		fs <~ .Name // 123
-
-	syx Emb (Embedded_Value)
-		fs <~ .Name
-		require .hasany
-		.RenderWithSpaces(fs)
-	
 	syx Unit
 		|| num = .first.name
 		fs <~ num // 20cm
@@ -248,19 +256,20 @@ class Message (RingTree)
 		fs <~ .name  // 20cm, 0xFF_cm
 	
 
-	syx Type (Typecast)
-//                                     obj|type|
-		|| obj = .First					#require
-		|| type = obj.next
-		fs <~ obj
-		fs <~ '|'
-		if type: fs <~ type
-		fs <~ '|'
-	
-
 	syx ARel (After_Relationship)
 		fs <~ .First
 		fs <~ .Name
+
+	
+	syx Name
+		|| ch = .First
+		if (ch)
+			fs <~ .Name      // sonic
+			fs <~ " @ "			
+			fs <~ ch         // the~hedgehog
+		  else
+			fs <~ '@'
+			fs <~ .Name
 
 
 	syx Dot (Dot)
@@ -317,13 +326,6 @@ class Message (RingTree)
 			if f
 				f.RenderPrm(fs, '[', ']')
 	
-	
-	syx Arr (Array)					// [b, c]
-		fs <~ '['
-		.FSListSep( fs, ", " )
-		fs <~ ']'
-	
-
 	syx Item
 //                                   a: b
 // if we can use a name... we can avoid needing two items?
@@ -333,6 +335,11 @@ class Message (RingTree)
 		fs <~ ": "
 		fs <~ ch.Next
 
+	
+	syx Bra (Bracket)
+		fs <~ '('
+		fs <~ .First
+		fs <~ ')'
 	
 	syx List
 		Opt NoRefCounts
@@ -362,6 +369,12 @@ class Message (RingTree)
 			fs <~ ch
 		fs <~ ')'
 
+	
+	syx Arr (Array)					// [b, c]
+		fs <~ '['
+		.FSListSep( fs, ", " )
+		fs <~ ']'
+	
 
 	syx File (File_List)
 		Opt NoRefCounts // much simpler!
@@ -382,19 +395,6 @@ class Message (RingTree)
 				fs <~ ", "
 		
 		fs <~ " ”"
-	
-
-	syx Decl (Declaration)					//		|x| a = b
-		|| ch = .First				#require
-		fs <~ '|'
-		fs <~ ch
-		fs <~ '|'
-		ch++
-		while ch
-			fs <~ ' '
-			fs <~ ch
-			ch++
-	
 	
 ////////////////////////////////////////////////////////////////////////////////		
 	
@@ -482,7 +482,6 @@ class Message (RingTree)
 			return
 		
 		|| ON = OF.Next
-		if (ON)
 			fs <~ ' '
 			fs <~ ON
 		
@@ -1110,9 +1109,11 @@ class Message (RingTree)
 		return f == @arg or @list or @prm or @arr or @bra
 
 	function IsString (|bool|)
-		require self
-		|| f = .func
-		return f == @str or @char or @sstr or @bin or @back
+		if self
+			return .func.isstring
+
+	function syntax.IsString (|bool|)
+		return self >= @sstr and self <= @str
 
 
 	function WipePositions
