@@ -165,9 +165,11 @@ struct HollyPotter
 		j.up	
 	
 	
-	function message.Compress (|faststring| fs, |int| Strength=mzlab.fast, |string|)
+	function message.Compress (|faststring| fs_in=nil, |int| Strength=mzlab.fast, |string|)
 		|HollyPotter| Stuff
+		|| fs = FastString(fs_in)
 		Stuff.Compress(self, fs, strength)
+		return fs.GetResult(fs_in)
 	
 	module
 		function TestHolly (|file| input)
