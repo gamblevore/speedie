@@ -2,18 +2,20 @@
 
 
 module Counts 
-	|int64| Lines
-	|int64| Names
-	|int64| Nodes
-	|int64| Parsed
-	|int64| Files
-	|int64| Dirs
-	|int|   MaxNodeLength
-	|| exts = dictionary.new
-	|| loud = !(app.yes("quiet") or app.yes("q"))
-	|| PrintTree = false
-	|| PrintedTree = false
-	|| ParseSpeed = app.yes("s")
+	|int64|		Lines
+	|int64|		Names
+	|int64|		Nodes
+	|int64|		Parsed
+	|int64|		Files
+	|int64|		Dirs
+	|int|		MaxNodeLength
+	|uint[65]|	Histogram
+	
+	||			exts = dictionary.new
+	||			loud = !(app.yes("quiet") or app.yes("q"))
+	||			PrintTree = false
+	||			PrintedTree = false
+	||			ParseSpeed = app.yes("s")
 	|string| 	DefaultExt = "spd/box/jbin/jb"
 	
 	function Init (|string| ss)
@@ -31,7 +33,10 @@ module Counts
 		|| names = 	0 
 		|| nodes = 0
 		for s.flat in msg
-			names += s.name!=""
+			|| len = s.name.Length
+			names += (len>0)
+			|| n = len min 64
+			Histogram[n]++
 			nodes++
 		.Names += names
 		.Nodes += Nodes
@@ -90,6 +95,7 @@ main
 -k                            Keeps errors
 -s                            Report parse speed
 -p                            Print parse Tree
+-h                            Histogram
 "
 		return 0
 	
@@ -100,6 +106,22 @@ main
 	counts.report
 
 
+function Counts.ReportHisto
+	require app.yes("h")
+	|| h_done = false
+	|| curr = 0
+	|| total = .names + Histogram[0]
+	for i in 65
+		if histogram[i]
+			if !h_done
+				h_done = true
+				"histogram:"
+			curr += histogram[i]
+			|| pc = curr pc total
+			"    $i: $pc"
+	if h_done
+		""
+	
 function Counts.report
 	if !app.yes("k")
 		stderr.clear
@@ -111,7 +133,9 @@ function Counts.report
 	"$l lines"
 	|| n = .names
 		"$n names in $d nodes"
+		.reportHisto
 	if p > 1 or f > 1
 		"Total files: $f, total jeebox files: $p"
 	if compressionstats.All.Out
 		compressionstats.all.render(app.printline)
+		
