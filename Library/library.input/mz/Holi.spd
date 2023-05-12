@@ -166,6 +166,7 @@ struct HollyPotter
 	
 	
 	function message.Compress (|faststring| fs_in=nil, |int| Strength=mzlab.fast, |string|)
+		disabled "Probably gonna remove the holly compressor... later"
 		|HollyPotter| Stuff
 		|| fs = FastString(fs_in)
 		Stuff.Compress(self, fs, strength)
@@ -173,6 +174,7 @@ struct HollyPotter
 	
 	module
 		function TestHolly (|file| input)
+			return 
 			require input.MustExist
 			|| p = input.path
 			if input isa "jbin"
