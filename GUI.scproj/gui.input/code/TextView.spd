@@ -1237,7 +1237,6 @@ class TextView (GUIControl)
 
 
 	helper ProperSelectLine (|intrange|)
-		// i guess the other is broken. Replace it? :)
 		|| r = .selrange
 		|ind| A = .findline(r.x, 0)+1
 		|ind| B = r.x2
@@ -1249,7 +1248,6 @@ class TextView (GUIControl)
 	
 	
 	helper DeleteLine (|bool|)
-		// OK so this makes no sense
 		|| i = .ProperSelectLine
 		i -= (i.x>0)|int|.setsign(keys.shift)
 		|| H = .DeleteLineStart
