@@ -792,11 +792,11 @@ int64 JB_File_Offset( JB_File* self ) {
 }
 
 
-
 int JB_File_SizeSet( JB_File* self, IntPtr N ) {
-    int err = ftruncate(self->Descriptor, N);
-    ErrorHandle_(err, self, nil, "set size of");
-    return err;
+	int fd = JB_File_Open( self, O_RDWR, false );
+	if (fd < 0)
+		return fd;
+	return ErrorHandle_( ftruncate(self->Descriptor, N),  self,  nil,  "set size of" );
 }
 
 
