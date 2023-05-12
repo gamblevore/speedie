@@ -27,7 +27,7 @@ datatype Type (int)
 
 function app.UseOne (|file| f)
 	conv.in = f
-	conv.dest = conv.RequestedDest
+	conv.out = conv.OutPath
 	if conv.in.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
@@ -52,8 +52,8 @@ main {
 		print .usage
 		return 0
 
-	conv.RequestedDest = .GetActions$
-	expect (conv.RequestedDest.Format.CountBits <= 1) ("Error: Multiple formats specified.")
+	conv.Dest = .GetActions$
+	expect (conv.Dest.Format.CountBits <= 1) ("Error: Multiple formats specified.")
 	
 	|| GotAll = false
 	for r in app.args
@@ -121,7 +121,6 @@ Convert files between jbin, box, xml formats. Additionally can compress or decom
     -c=0            Compress for very-fast decompress
     -s              Replace file in-place
     -p              Print to stdout
-    -x			    Uses the the holly compressor
     -r              Just report types, otherwise do nothing
     -f=name         Sets the filename of output
     -o=j/b/m/x/h    Detect only specified type.
@@ -139,11 +138,10 @@ examples:
 module Conv
 	|string|		Data
 	|file|			In
-	|file| 			_Out
+	|file| 			Out
 	|date|			Start
 	|type| 			DetectOnly = -1
 	|type| 			Dest
-	|type| 			RequestedDest
 	|type| 			Detected
 	|float| 		Size
 	|message| 		AST
@@ -152,7 +150,6 @@ module Conv
 	|string|		DestPath
 	|bool| 			FileIsCompressed
 	||				DefaultStrength = mzlab.strong
-	||				HolStrength = mzlab.strong
 	|| 				Speed = faststring()
 	
 
@@ -166,9 +163,6 @@ module Conv
 		.Detected = nil
 		CompressionStats.all.Clear
 	
-	function Out (|file|)
-		return ._Out init .OutPath
-	
 
 	function TestOne
 		require .in.MustExist("test compression")
@@ -180,7 +174,7 @@ module Conv
 		.TestSub(origIn)
 
 		.in = origin
-		._out = OrigOut
+		.out = OrigOut
 		.DefaultStrength = MZLab.Strong
 		.TestSub(origIn)
 
@@ -202,7 +196,7 @@ module Conv
 		require stderr.ok
 
 		.in = .out
-		._out = (.in + ".back").file
+		.out = (.in + ".back").file
 
 		.CompressOnly(true)
 		require stderr.ok
@@ -328,7 +322,7 @@ module Conv
 		if dest isnt compressed
 			fs = .out.Out							#require
 
-		if .AST and (Detected.format != requestedDest.format)
+		if .AST and (Detected.format != Dest.format)
 			.Start = date.now
 			if dest is jbin
 				.data = .AST.render_jbin(fs)
@@ -368,13 +362,11 @@ module Conv
 			return destpath.file
 		if dest is selfreplace
 			return .in
-		if .Detected.Format and !.dest.Format
-			.dest |= type.box
 		|| str = .in.path
 		if str isa "mz"
 			str = .in.trimext
 			
-		if str isa "box" or "jbin" or "xml" or "hol"
+		if str isa "box" or "jbin" or "xml"
 			str = str.SetExt(.ext)
 		  else
 			str = str.AddExt(.ext) 
