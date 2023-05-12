@@ -560,10 +560,43 @@ function PostInitCodeCall
 	.program.initvarsarg <~ "initcode_()".parseclean
 
 
+function ExprFuncsInit
+/* @decl is BAD!   dont add it*/
+	exprfuncs[@Rel ] = (TypeOfRel)
+	exprfuncs[@BRel] = (TypeOfBRel)
+	exprfuncs[@ARel] = (TypeOfARel)
+	exprfuncs[@Adj ] = (TypeOfAdj)
+	exprfuncs[@Func] = (TypeOfFunc)
+	exprfuncs[@Acc ] = (TypeOfAccess)
+	exprfuncs[@msg ] = (TypeOfMsg)
+	exprfuncs[@sthg] = (TypeOfSthg)
+	exprfuncs[@Dot ] = (TypeOfDot)
+	exprfuncs[@Name] = (TypeOfSyx)
+	exprfuncs[@url ] = (TypeOfURL)
+	exprfuncs[@list] = (TypeOflist)
+	exprfuncs[@Arr ] = (TypeOfArr)
+	exprfuncs[@Arg ] = (TypeOfArgArr)
+	exprfuncs[@Char] = (TypeOfChar)
+	exprfuncs[@sstr] = (TypeOfSString)
+	exprfuncs[@Item] = (TypeOfLast)
+	exprfuncs[@Bra ] = (TypeOfBra)
+	exprfuncs[@Str ] = (TypeOfStr)
+	exprfuncs[@Back] = (TypeOfStr)
+	exprfuncs[@Num ] = (TypeOfNum)
+	exprfuncs[@unit] = (Typeofunit)
+	exprfuncs[@Thg ] = (TypeOfThg)
+	exprfuncs[@Ques] = (TypeOfQues)
+	exprfuncs[@SDot] = (Typeofsdot)
+	exprfuncs[@Type] = (typeoftype)
+	exprfuncs[@Emb ] = (TypeOfNothing)
+	exprfuncs[@Sheb] = (TypeOfNothing)
+
+
 function InitCompiler
 	require (.Projects.fileCH("Library").mustexist)
 	require stderr.ok
 	scoperator.Init
+	.exprfuncsinit
 	Cpp_Export.Init
 
 	.files := Dictionary.new
