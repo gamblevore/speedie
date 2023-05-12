@@ -1550,7 +1550,7 @@ extern "C" void Str_Share_(JB_StringShared* u, JB_String* p, int i, int L) {
 extern "C" void JB_Str_Clone(JB_StringShared* self, JB_String* orig) {
 	if (!orig)
 		orig = JB_Str__Empty();
-	Str_Share_(self, orig, 0, JB_Str_Length(self));
+	Str_Share_(self, orig, 0, JB_Str_Length(orig));
 }
 
 
