@@ -3,14 +3,14 @@
 
 datatype Type (int)
 	flags // compressed should be an action?
-		ReadOK, Compressed, Plain, XML, actions=(Box, Jbin, Holly, Report), StdOut, SelfReplace, TestComp
+		ReadOK, Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace, TestComp
 	
 	syntax is (|Type| test, |bool|)
-		return self & test
+		return self & test 
 	syntax isnt (|Type| test, |bool|)
 		return !(self & test)
 	function Format (|Type|) 
-		return self & (Box (|) jbin (|) holly (|) xml)
+		return self & (Box (|) jbin (|) xml)
 	
 	render
 		if self is Compressed
@@ -27,7 +27,7 @@ datatype Type (int)
 
 function app.UseOne (|file| f)
 	conv.in = f
-	conv.Out = conv.OutPath
+	conv.dest = conv.RequestedDest
 	if conv.in.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
@@ -52,7 +52,8 @@ main {
 		print .usage
 		return 0
 
-	conv.dest = .GetActions$
+	conv.RequestedDest = .GetActions$
+	expect (conv.RequestedDest.Format.CountBits <= 1) ("Error: Multiple formats specified.")
 	
 	|| GotAll = false
 	for r in app.args
@@ -94,9 +95,6 @@ function App.GetActions (|Type|)
 			conv.DetectOnly = x
 		  elseif name ~= "test"
 			rz |= type.TestComp
-			rz |= type.compressed
-		  elseif name ~= "h"
-			rz |= type.Holly
 			rz |= type.compressed
 		  elseif name ~= "c"
 			rz |= type.compressed
@@ -141,10 +139,11 @@ examples:
 module Conv
 	|string|		Data
 	|file|			In
-	|file| 			Out
+	|file| 			_Out
 	|date|			Start
 	|type| 			DetectOnly = -1
 	|type| 			Dest
+	|type| 			RequestedDest
 	|type| 			Detected
 	|float| 		Size
 	|message| 		AST
@@ -153,6 +152,7 @@ module Conv
 	|string|		DestPath
 	|bool| 			FileIsCompressed
 	||				DefaultStrength = mzlab.strong
+	||				HolStrength = mzlab.strong
 	|| 				Speed = faststring()
 	
 
@@ -166,8 +166,13 @@ module Conv
 		.Detected = nil
 		CompressionStats.all.Clear
 	
+	function Out (|file|)
+		return ._Out init .OutPath
 	
-	function TestMZ
+
+	function TestOne
+		require .in.MustExist("test compression")
+		.done++
 		|| OrigIn = .in
 		|| OrigOut = .out
 		.DefaultStrength = MZLab.Fast
@@ -175,21 +180,12 @@ module Conv
 		.TestSub(origIn)
 
 		.in = origin
-		.out = OrigOut
+		._out = OrigOut
 		.DefaultStrength = MZLab.Strong
 		.TestSub(origIn)
 
 		.del(.out, origin)		
 		.del(origout, origin)
-
-
-	function TestOne
-		require .in.MustExist("test compression")
-		.done++
-		if .dest is holly
-			HollyPotter.Testholly(.in)
-		  else
-		    .testmz
 
 	
 	function del (|file| f, |file| o)
@@ -206,7 +202,7 @@ module Conv
 		require stderr.ok
 
 		.in = .out
-		.out = (.in + ".back").file
+		._out = (.in + ".back").file
 
 		.CompressOnly(true)
 		require stderr.ok
@@ -245,20 +241,12 @@ module Conv
 		.start = date() 
 		if Decomp
 			.size = d.File.size
-			if .Detected is holly
-				|| ast = src.ReviveJbin
-					ast.Render(d)
-			  else
-				src.DecompressInto(d)
+			src.DecompressInto(d)
 			.time("Decompress(streamed )", true)
 		  else 
 			|| typ = ("µz", "ro")(.defaultstrength < mzlab.strong)
 			.size = .in.size
-			if .dest is holly
-				src.parse.Compress(d, DefaultStrength) 
-				typ = "holly"
-			  else
-				src.CompressInto(d, DefaultStrength) 
+			src.CompressInto(d, DefaultStrength) 
 			.time("Compress(streamed $typ)", true)
 	
 
@@ -269,8 +257,6 @@ module Conv
 			CmpFormat = ""
 			.Detected |= type.jbin
 		
-		if CmpFormat == "ћ"
-			.Detected |= type.holly
 		.FileIsCompressed = CmpFormat!=""
 		if .FileIsCompressed
 			.Detected |= type.compressed // only read compressed at first
@@ -279,12 +265,11 @@ module Conv
 			require .Detected & .detectonly
 			printline "Found: ${.in.path}"
 
-		ifn Dest&type.Actions
-			if FileIsCompressed != (dest is compressed)
+		if !(Dest&type.Actions)
+			if (FileIsCompressed != (dest is compressed))
 				.done++
 				.CompressOnly(FileIsCompressed)
 			return 0
-		
 		.done++
 		if (Dest is report) and CmpFormat
 			"$.in is: ${OrigSize.strsize} compressed to ${.in.size.strsize} ($CmpFormat)"
@@ -340,26 +325,22 @@ module Conv
 
 	function Transform (|bool|) 
 		|faststring| fs
-		ifn dest is compressed
+		if dest isnt compressed
 			fs = .out.Out							#require
-		if .AST and (Detected.format != Dest.format) and (dest isnt holly)
+
+		if .AST and (Detected.format != requestedDest.format)
 			.Start = date.now
-			if dest is box
-				.data = .AST.Render(fs)
-			  else
+			if dest is jbin
 				.data = .AST.render_jbin(fs)
+			  else
+				.data = .AST.Render(fs)
 			.time("Render")
 
 		if .dest is compressed 
 			.start = date.now
 			fs = .out.out							#require
-			if (.dest is holly)
-				expect (.ast) ("Can't hollify because file did not parse.")
-				.ast.Compress(fs, Defaultstrength)
-				.time("Compress(Holly)")
-			  else
-				.data.Compressinto(fs, DefaultStrength)
-				.time("Compress")
+			.data.Compressinto(fs, .DefaultStrength)
+			.time("Compress")
 
 		fs.Flush
 		if !fs
@@ -385,21 +366,20 @@ module Conv
 			return app.StdOut
 		if DestPath
 			return destpath.file
-		
 		if dest is selfreplace
 			return .in
+		if .Detected.Format and !.dest.Format
+			.dest |= type.box
 		|| str = .in.path
-		if str isa "mz" or "hol"
+		if str isa "mz"
 			str = .in.trimext
-		if str isa "box" or "jbin" or "xml"
+			
+		if str isa "box" or "jbin" or "xml" or "hol"
 			str = str.SetExt(.ext)
 		  else
 			str = str.AddExt(.ext) 
 		if dest is compressed
-			if dest is holly
-				str = str.AddExt("hol")
-			  else
-				str = str.AddExt("mz")
+			str = str.AddExt("mz")
 		  elseif ((.in isa "mz") and str.FileExists) or (str == .in)
 			str += ".back"
 		return str.file
@@ -412,9 +392,7 @@ function file.FormatInfo (|&int| Size=0, |string|)
 	if str.IsJbin
 		rz = "jbin"
 		|| mz = str.parse_jbin
-		if mz == @tmp and "ћ"
-			rz = "ћ"
-		  elseif mz == @tmp and "µz"
+		if mz == @tmp and "µz"
 			|| arg = mz.last
 			if arg != @arg
 				rz = string.error
