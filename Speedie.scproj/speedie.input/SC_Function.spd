@@ -775,19 +775,6 @@ function Paramless (|SCFunction|)
 			Return f
 
 
-function CallsParentAllocOK (|Message| dot, |bool|)
-	// calling a constructor is only allowed... within a constructor.
-	// calling a destructor is only allowed within a destructor.
-	
-	|| obj = dot[1].obj
-	if obj isa SCFunction
-		|| FuncCode = obj.AllocCode
-		if FuncCode == kIsConstructor
-			expect (.AllocCode == kIsConstructor)  ( dot, "Can only call constructors from within a constructor." )
-		  elseif (FuncCode == kIsDestructor)
-			expect (.AllocCode == kIsDestructor)   ( dot, "Can only call destructors from within a destructor." )
-
-
 function TranStrings (|bool| Add=true)
 	|| S = .SourceArg
 	if (S and !.IsWrapper)

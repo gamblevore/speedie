@@ -157,6 +157,7 @@ function TypeOfBRel (ExprResolver)
 		
 	  elseif name == "&"
 		require F.CanGetAddress(name_Space)
+		check (SubType.PointerCount < 8) (f, "Seems unlikely you actually want this.")
 		return Subtype.AsPointer
 		
 	  elseif name == "!"

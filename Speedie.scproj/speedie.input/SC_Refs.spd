@@ -770,6 +770,10 @@ function SCFunction.AnalyseRefsB
 function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 	// calling a constructor is only allowed... within a constructor.
 	// calling a destructor is only allowed within a destructor.
+	if dot in @bra
+		|| p = dot.parent
+		if p in @bra
+			return 
 	
 	|| fn = dot.last.obj
 	if (fn isa SCFunction)

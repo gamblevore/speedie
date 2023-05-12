@@ -1,6 +1,9 @@
 
 
+
 main // speedie main { 
+	hollypotter.TestHolly("/Users/theodore/Downloads/Code/90KB.xml".file)
+	debugger
 	compiler.Main
 
 

@@ -152,19 +152,19 @@ function CompileAll (|bool|)
 	.testdate
 	.ImportAll
 
-	require .Stage( "More constructors" )
 	.PrepareInterpreter
+	require .Stage( "More constructors" )
 	.RefConstructors // constructors
 	.CheckIsGoodLibrary
 
 	require .Stage( "Stripping dead code" )
 	.DeadCodeStrip
 	
-	if Options.Cpp
-		.Timer( "RefCount" )
-		require .Stage( "Exporting C" )
-		Compiler.DoRefsB				// do actual refcounts.
+	require .Stage( "Refcounting" )
+	.Timer( "RefCount" )
+	Compiler.DoRefsB				// do actual refcounts.
 
+	if Options.Cpp
 		.Timer( "Export Cpp" )
 		if linkage.Interpreter
 			ExecTable.Run
