@@ -144,7 +144,7 @@ helper stringstream.NextMsgInfo (|uint64|)
 					exit
 				continue
 			|| T = (info >> 1)|syntax|
-			if t > @bin								// need @max
+			if t >= @max
 				error (self, "Corrupted jbin" )
 				t = @arg
 			|| GoIn = info & 1
@@ -184,3 +184,13 @@ function string.digest (|string|)
 		return self
 	return .parse$.render_jbin
 
+/*
+	New jbin idea
+	16-bit
+	1bit-lz
+	1bit-DR
+	6-bit type
+	8-bit length (noob-coded)
+	
+	What about the upness? I think...
+*/
