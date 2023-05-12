@@ -147,9 +147,9 @@ struct FloatRange;
 
 struct FlowPart;
 
-struct HoliRest;
+struct HollyPlanter;
 
-struct HoliReviver;
+struct HollyPotter;
 
 struct IntDownRange;
 
@@ -534,12 +534,21 @@ struct FastBuff {
 	bool ErrorReported;
 };
 
-struct HoliRest {
+struct HollyPlanter {
+	StringStream* Input;
+	Message* Name;
+	Message* Strings;
+	Message* Types;
+	Message* Lengths;
+	Message* Tree;
+	Array* Table;
+};
+
+struct HollyPotter {
 	FastString* Strings;
-	FastString* IDs;
 	FastString* Types;
+	FastString* Lengths;
 	FastString* Tree;
-	FastString* Out;
 };
 
 struct IPCMessage {
@@ -562,6 +571,10 @@ struct IR {
 
 struct MessageDict {
 	Dictionary* D[64];
+	uint UniqueCount;
+	uint TotalCount;
+	uint64 TotalStringLength;
+	uint64 UniqueStringLength;
 };
 
 struct MessagePosition {
@@ -1165,6 +1178,7 @@ struct MessageID_Behaviour: StringShared_Behaviour {
 
 JBClass ( MessageID , JB_StringShared , 
 	Syntax Func;
+	uint Position;
 	JB_Object* Obj;
 	uint64 ID;
 	uint64 Frequency;
@@ -1273,13 +1287,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1832])
+#define kJB__ErrorColors_bold (JB_LUB[1844])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1833])
-#define kJB__ErrorColors_good (JB_LUB[1834])
-#define kJB__ErrorColors_normal (JB_LUB[1835])
-#define kJB__ErrorColors_underline (JB_LUB[1834])
-#define kJB__ErrorColors_warn (JB_LUB[1836])
+#define kJB__ErrorColors_error (JB_LUB[1845])
+#define kJB__ErrorColors_good (JB_LUB[1846])
+#define kJB__ErrorColors_normal (JB_LUB[1847])
+#define kJB__ErrorColors_underline (JB_LUB[1846])
+#define kJB__ErrorColors_warn (JB_LUB[1848])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1329,10 +1343,11 @@ extern Macro* SC__Macros_Setter;
 extern Macro* SC__Macros_Worked2;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__MZLab_Default (kJB__MZLab_Strong)
-#define kJB__MZLab_Fast (0)
-#define kJB__MZLab_Fastest (-4)
-#define kJB__MZLab_Strong (1)
-#define kJB__MZLab_Strongest (2)
+#define kJB__MZLab_Fast (2)
+#define kJB__MZLab_Fastest (1)
+#define kJB__MZLab_None (0)
+#define kJB__MZLab_Strong (3)
+#define kJB__MZLab_Strongest (4)
 extern JB_String* SC__Options_Arch;
 extern bool SC__Options_ArgStats;
 extern Dictionary* SC__Options_BannedClasses;
@@ -1480,7 +1495,6 @@ extern JB_String* JB__zalgo_up;
 extern JB_String* JB___AppConfString;
 extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
-extern JB_String* JB__JbinHeaderOld;
 extern bool _once1;
 extern bool _once2;
 extern Dictionary* JB__SyxDict_;
@@ -1496,10 +1510,10 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[340])
-#define kSC_BitNot (JB_LUB[440])
-#define kSC_BitOr (JB_LUB[646])
-#define kSC_BitXor (JB_LUB[1837])
+#define kSC_BitAnd (JB_LUB[341])
+#define kSC_BitNot (JB_LUB[441])
+#define kSC_BitOr (JB_LUB[647])
+#define kSC_BitXor (JB_LUB[1849])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1529,7 +1543,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1838])
+#define kJB_SaverStart1 (JB_LUB[1850])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -3755,6 +3769,8 @@ ivec2 JB_uint64_LongestBitStretch(uint64 self);
 
 uint64 JB_uint64_LowestBit(uint64 self);
 
+uint64 JB_uint64_OperatorMax(uint64 self, uint64 s);
+
 
 
 // vec2
@@ -4315,20 +4331,36 @@ void JB_FastBuff_SyntaxExpect(FastBuff* self, JB_String* s);
 // JB_GameFlyingMem
 
 
-// JB_HoliRest
-Array* JB_HR_BuildTable(HoliRest* self, Message* root);
+// JB_HollyPlanter
+StringStream* JB_HRV_Collect(HollyPlanter* self);
 
-void JB_HR_Compress(HoliRest* self, Message* root);
+Message* JB_HRV_Decode(HollyPlanter* self);
 
-void JB_HR_destructor(HoliRest* self);
+void JB_HRV_destructor(HollyPlanter* self);
 
-uint64 JB_HR_Encode(HoliRest* self, Message* curr, bool Depth, int highest);
+void JB_HRV_IDGen(HollyPlanter* self, StringStream* S, StringStream* T, StringStream* L);
 
-void JB_HR_GoUp(HoliRest* self, int Depth);
+Message* JB_HRV_MakeTree(HollyPlanter* self);
 
 
 
-// JB_HoliReviver
+// JB_HollyPotter
+int JB_HR_AddType(HollyPotter* self, Syntax Prev, int Count);
+
+bool JB_HR_BuildTable(HollyPotter* self, Message* root);
+
+void JB_HR_Compress(HollyPotter* self, Message* root, FastString* j, int strength);
+
+void JB_HR_destructor(HollyPotter* self);
+
+uint64 JB_HR_Encode(HollyPotter* self, Message* curr, bool Depth, int highest);
+
+void JB_HR_GoUp(HollyPotter* self, int Depth);
+
+void JB_HR_Write(HollyPotter* self, FastString* j, int str);
+
+void JB_HR__TestHolly(JB_File* input);
+
 
 
 // JB_IntDownRange
@@ -4359,6 +4391,8 @@ int SC_IR_FilePos(IR* self);
 void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
+
+void SC_IR_Print(IR* self);
 
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
@@ -5085,6 +5119,8 @@ void JB_FS_AppendObjectID(FastString* self, Saveable* o);
 
 void JB_FS_AppendObjectOrNil(FastString* self, JB_Object* o);
 
+void JB_FS_AppendQuotedEscape(FastString* self, JB_String* s);
+
 void JB_FS_AppendWidth(FastString* self, JB_String* s, int Width);
 
 void JB_FS_CArrayAdd(FastString* self, JB_String* s);
@@ -5092,6 +5128,8 @@ void JB_FS_CArrayAdd(FastString* self, JB_String* s);
 void JB_FS_CArrayAddB(FastString* self, byte B);
 
 void JB_FS_CArrayAddB0(FastString* self, byte B);
+
+void JB_FS_CompressInto(FastString* self, FastString* fs, int Strength, CompressionStats* st);
 
 void JB_FS_EncodeLength(FastString* self, uint64 N);
 
@@ -5566,6 +5604,8 @@ void JB_Sel_GiveIDs(Selector* self);
 
 
 // JB_String
+JB_String* JB_Str_AddExt(JB_String* self, JB_String* ext);
+
 JB_String* JB_Str_AfterByte(JB_String* self, byte b, int Last);
 
 JB_String* JB_Str_ArgName(JB_String* self);
@@ -5639,6 +5679,8 @@ int JB_Str_FindTrailingSlashes(JB_String* self);
 byte JB_Str_First(JB_String* self);
 
 Ind JB_Str_HiddenJBin(JB_String* self);
+
+StringStream* JB_Str_In(JB_String* self, JB_String* T, int ChunkSize);
 
 int64 JB_Str_int(JB_String* self);
 
@@ -5778,6 +5820,8 @@ void JB_Str_SyntaxExpect(JB_String* self);
 
 JB_String* JB_Str_TitleCase(JB_String* self, FastString* fs_in);
 
+JB_String* JB_Str_TrimExt(JB_String* self);
+
 JB_String* JB_Str_TrimExtAndPath(JB_String* self, bool KeepPath);
 
 JB_String* JB_Str_TrimFirst(JB_String* self, byte b);
@@ -5834,6 +5878,8 @@ void JB_SS_CompressInto(StringStream* self, JB_Object* dest, int Strength, Compr
 
 void JB_SS_Constructor(StringStream* self, JB_String* Data);
 
+void JB_SS_ConstructorFile(StringStream* self, JB_File* file, int ChunkSize);
+
 JB_String* JB_SS_Decompress(StringStream* self, int lim, CompressionStats* st);
 
 bool JB_SS_DecompressInto(StringStream* self, JB_Object* dest, int lim, CompressionStats* st);
@@ -5856,6 +5902,8 @@ uint64 JB_SS_NextMsgInfo(StringStream* self);
 
 bool JB_SS_NoMoreChunks(StringStream* self);
 
+uint64 JB_SS_noob(StringStream* self);
+
 Message* JB_SS_Parse_Jbin(StringStream* self, bool Burst);
 
 int64 JB_SS_Position(StringStream* self);
@@ -5867,6 +5915,8 @@ JB_String* JB_SS_ReadAll(StringStream* self);
 bool JB_SS_ReadChunk(StringStream* self);
 
 int JB_SS_Remaining(StringStream* self);
+
+Message* JB_SS_ReviveJbin(StringStream* self);
 
 JB_String* JB_SS_Str(StringStream* self, int n, int skip);
 
@@ -5881,6 +5931,8 @@ bool JB_SS_test(StringStream* self, JB_String* Header);
 StringStream* JB_SS__Alloc();
 
 StringStream* JB_SS__New(JB_String* Data);
+
+StringStream* JB_SS__NewFile(JB_File* file, int ChunkSize);
 
 
 
@@ -6107,6 +6159,10 @@ void JB_File__testjb();
 
 // JB_JBin
 void JB_bin_add(FastString* self, Syntax type, JB_String* data, bool into);
+
+void JB_bin_AddFS(FastString* self, Syntax type, FastString* fs, bool into);
+
+void JB_bin_addcomp(FastString* self, FastString* fs, int strength);
 
 void JB_bin_AddCstring(FastString* self, _cstring data, Syntax type);
 
@@ -7501,6 +7557,8 @@ Message* JB_Msg_CollectionPlace(Message* self);
 
 bool JB_Msg_compiles(Message* self);
 
+JB_String* JB_Msg_Compress(Message* self, FastString* fs, int Strength);
+
 Message* JB_Msg_ConfArg(Message* self);
 
 Message* JB_Msg_ConstantExpandSub(Message* self);
@@ -7544,6 +7602,8 @@ Message* JB_Msg_DclExp(Message* self);
 void JB_Msg_Decl__(Message* self, FastString* fs);
 
 Message* JB_Msg_DeclName(Message* self);
+
+StringStream* JB_Msg_DecompressStream(Message* self);
 
 bool JB_Msg_DeepEquals(Message* self, Message* B, bool Aware);
 
@@ -7665,7 +7725,7 @@ Message* JB_Msg_HasOwnBlock(Message* self);
 
 bool JB_Msg_HasPosition(Message* self);
 
-int JB_Msg_Identify(Message* self, MessageDict* d, Array* table);
+uint JB_Msg_Identify(Message* self, MessageDict* d, Array* table);
 
 SCFunction* JB_Msg_IdentifyFunc(Message* self);
 
@@ -8114,15 +8174,19 @@ bool JB_Msg__TreeCompare(Message* orig, Message* reparse, bool PrintIfSame);
 
 
 // JB_MessageID
-void JB_MessageID_Constructor(MessageID* self, JB_String* Name, Syntax Fn);
+void JB_ID_Constructor(MessageID* self, JB_String* Name, Syntax Fn, uint pos);
 
-void JB_MessageID_destructor(MessageID* self);
+void JB_ID_destructor(MessageID* self);
 
-MessageID* JB_MessageID__Alloc();
+Message* JB_ID_Msg(MessageID* self, Message* parent);
 
-bool JB_MessageID__IDSorter(JB_Object* a, JB_Object* b);
+JB_String* JB_ID_Render(MessageID* self, FastString* fs_in);
 
-MessageID* JB_MessageID__New(JB_String* Name, Syntax Fn);
+MessageID* JB_ID__Alloc();
+
+bool JB_ID__IDSorter(JB_Object* a, JB_Object* b);
+
+MessageID* JB_ID__New(JB_String* Name, Syntax Fn, uint pos);
 
 
 
@@ -8270,6 +8334,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
