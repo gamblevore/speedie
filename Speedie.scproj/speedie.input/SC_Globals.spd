@@ -15,52 +15,19 @@ constants
 prototype ExprResolver (|Message| Exp, |SCBase| name_space, |Message| side, |SCObject|)
 
 dispatch ExprFuncs (ExprResolver)  {
-	@Rel  : (TypeOfRel)
-	@BRel : (TypeOfBRel)
-	@ARel : (TypeOfARel)
-	@Adj  : (TypeOfAdj)
-	@Func : (TypeOfFunc)
-	@Acc  : (TypeOfAccess)
-	@msg  : (TypeOfMsg)
-	@sthg : (TypeOfSthg)
-	@Dot  : (TypeOfDot)
-	@Name : (TypeOfSyx)
-	@url  : (TypeOfURL)
-	@list : (TypeOflist)
-	@Arr  : (TypeOfArr)
-	@Arg  : (TypeOfArgArr)
-	@Char : (TypeOfChar)
-	@sstr : (TypeOfSString)
-	@Item : (TypeOfLast)
-	@Bra  : (TypeOfBra)
-	
-	@Str  : (TypeOfStr)
-	@Back : (TypeOfStr)
-	@Num  : (TypeOfNum)
-	@unit : (Typeofunit)
-
-	@Thg  : (TypeOfThg)
-	@Ques : (TypeOfQues)
-
-	@SDot:
-		SCFunction.Tran_Sdt( exp )
-		Return TypeOfDot( exp, name_space, side )
-
-	@Type:
-		return TypeCastCheck(Exp, name_Space, side)
-
-	@Emb:
-		Return nil
-	@Sheb:
-		Return nil
-	63:
-		return nil // stop errors with the func being too large.
-
-/* BAD!
-	@Decl
-		debugger
-*/
+	63    : (TypeOfNothing)
 }
+
+
+function TypeOfSDot (ExprResolver)
+	SCFunction.Tran_Sdt( exp )
+	Return TypeOfDot( exp, name_space, side )
+
+function TypeOfType (ExprResolver)
+	return TypeCastCheck(Exp, name_Space, side)
+
+function TypeOfNothing (ExprResolver)
+	return nil
 
 
 function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
@@ -852,10 +819,6 @@ function ArrayInOrderCheck (|int| InOrder, |message| msg, |int|)
 
 function TypeOfArr (ExprResolver)
 	|int| IsDispatch = (exp ~= "dispatch")|int|
-		//if (name_space isa scmodule)
-			//expect !name_Space.cls (exp, "This can't go here.")
-// seems to work for scfunction's "dispatch TemporalStatements"?
-// i wonder why it fails elsewhere.
 		
 	|| InOrder = 0
 	|| result = SCDecl.new
