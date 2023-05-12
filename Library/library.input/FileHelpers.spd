@@ -118,7 +118,7 @@ extend String
 
 	function RemoveExt (|string| suff, |string|)
 		if self isa suff
-			return .TrimExtKeepPath
+			return .trimext
 		return self
 			
 
@@ -156,7 +156,10 @@ extend String
 		// should really go through all the stuff in /Volumes/ or /vol/
 
 
+	function TrimExt (|string|)
+		return .TrimExtAndPath(false)
 	function TrimExtKeepPath (|string|)
+		disabled "Just use .trimext"
 		return .TrimExtAndPath(false)
 
 
@@ -251,7 +254,7 @@ extend String
 		disabled "Do you mean .addext or .setext?"
 
 	function SetExt (|string| ext, |string|)
-		return .TrimExtKeepPath.AddExt(ext)
+		return .trimext.AddExt(ext)
 	
 	function Ext (|string|)
 		|| i = .find( '.', int.max, 0 )
