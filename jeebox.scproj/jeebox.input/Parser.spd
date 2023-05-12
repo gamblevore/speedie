@@ -18,7 +18,10 @@ ignore
 
 extend Parser
 	function Init
-		debugger  @thg.translateable  and  @opp.translateable and  @cnj.translateable  and  @tmp.translateable  and  @name.translateable
+		debugger @thg.translateable  and  @opp.translateable and  @cnj.translateable  and  @tmp.translateable
+		debugger @str.isstring and @char.isstring and @sstr.isstring and @bin.isstring and @back.isstring  
+		debugger @cnj|int| == 8 
+		debugger @max|int| <= 63  
 		
 		.Tokenz( "\r \n", kEndOfLine, fEndOfLine )
 		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine) 
