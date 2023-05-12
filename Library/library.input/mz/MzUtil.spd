@@ -35,7 +35,6 @@ function Stringstream.IsCompressed (|bool|)
 
 
 function FastString.CompressInto (|faststring| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil)
-	disabled "Do you really need this?"
 	|| str = string.fromptr(.resultptr, .length)
 	str.CompressInto(fs, Strength, st)
 
@@ -44,11 +43,12 @@ function FastString.CompressInto (|faststring| fs, |int|Strength=mzlab.default, 
 
 Module MZLab 
 	constants
-		Fastest = -4		// lz
-		Fast = 0			// lz harder
-		Strong = 1			// rolz
-		Strongest = 2   	// rolz harder
-		Default = strong	// its good enough!
+		None      = 0			// none
+		Fastest   = 1			// lz
+		Fast      = 2			// lz harder
+		Strong    = 3			// rolz
+		Strongest = 4			// rolz harder
+		Default   = strong		// its good enough!
 		
 	function TestMz (|string| path, |bool|)
 		if path
