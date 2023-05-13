@@ -10,6 +10,7 @@ class FileRow (ListViewRow)
 	|int|							LastSize
 	|int|							LastScroll
 	|int|							LastFileCount
+	|byte| 							FindID
 	|bool|							HasError
 	|bool|							InMainProj
 	|bool|							AsDir

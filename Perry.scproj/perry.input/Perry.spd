@@ -8,6 +8,7 @@ module Perry
     |listviewrow|					Projects
     |string|						_SpeedieDir
     |bool|							Checked	
+    |byte| 							FindID
 	
 	constants
 		arc_newer	= 2

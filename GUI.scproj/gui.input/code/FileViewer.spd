@@ -315,23 +315,32 @@ class FileViewer (ListView)
 			if s|error|.when
 				into <~ s
 		
-	
-	helper BatchFindSub (|string| str, |message| all)
+	helper CanFind (|filerow| f, |uint| id, |bool|)
+		if id
+			require f.findid != id
+		f.findID = ID
+		
+		if .SearchWithin
+			|| Restrict = .searchwithin.location
+			if !f.location[0,Restrict]
+				return false
+		
+		if !.NoFind or !.nofind.valuelower(f.name)
+			return true
+		
+	helper BatchFindSub (|string| str, |message| all, |uint| id)
 		opt norefcounts
-		|| Restrict = (.searchwithin.location?)
 		for f in self
 			if (f isa filerow)
-				if Restrict and !f.location[0,Restrict]
-					0
-				  elseif !.nofind.valuelower(f.location.name)
+				if .canfind(f, id)
 					f.FindAll(str, all)
 
 
-	function BatchFind (|string| str, |message|)
+	function BatchFind (|string| str, |uint| findid=0, |message|)
 		|| All = message()
 		if !str
 			return all
-		.BatchFindSub(str, all)
+		.BatchFindSub(str, all, findid)
 		all.ExtractRecent(rz)			// Split into recent and not recent
 		rz.sort(ErrorSearchSorter)		// recent
 		all.sort(ErrorSearchSorter)		// not recent
@@ -340,9 +349,9 @@ class FileViewer (ListView)
 
 
 	function HideOpenList (|bool|)
-		.listopen.clear
-		.quickopen.hide
-		.listopen.hide
+		.ListOpen.clear
+		.QuickOpen.hide
+		.ListOpen.hide
 		return true
 
 

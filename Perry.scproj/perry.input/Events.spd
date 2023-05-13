@@ -300,8 +300,8 @@ function PerryIDE.clickedfile (|bool|)
 			return true
 
 
-function PerryIDE.BatchPhind (|string| text, |bool|)
-	|| found = .filelist.BatchFind(text)
+function PerryIDE.BatchPhind (|string| text, |uint| ID,  |bool|)
+	|| found = .filelist.BatchFind(text, ID)
 	.foundlist.use(found)
 	.foundlist.setfocus
 	return found.hasany
@@ -330,10 +330,12 @@ function PressedSearchKeys (GUIKeyEvent)
 	|| w = .ide
 	if key.isaccept
 		w.ViewAsProject
-		w.BatchPhind(.text)
+		|| ID = ((perry.findID+1)&255) max 1
+		perry.findID = ID
+		w.BatchPhind(.text, ID)
 		if w.foundlist.isempty and .text
 			w.noneed("The search text “${.text}” wasn't found", nil)
-			perry.FindElseWhere(w, .text)
+			perry.FindElseWhere(w, .text, ID)
 		  else
 			w.noneed
 		return true
@@ -473,9 +475,9 @@ function RightClickErrorList (GUIListEvent)
 	return true
 
 
-function perry.FindElseWhere (|perryide| ignore, |string| find)
+function perry.FindElseWhere (|perryide| ignore, |string| find, |byte| FindID)
 	for w in perry.OpenProj
-		if (w != ignore) and w.BatchPhind(find)
+		if (w != ignore) and w.BatchPhind(find, FindID)
 			if "$find not found here, but was found in '${w.name}'.\n\nTake a look?".confirm
 				w.show
 				w.ShowFind
