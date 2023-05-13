@@ -22,9 +22,6 @@ class Window (GUIControl)
 	|date|							AlphaFader
 	|date|							CreatedDate
 	
-	function Front (|Window|)
-		return window.all.last
-	
 	
 	constructor
 		super.constructor(nil)
