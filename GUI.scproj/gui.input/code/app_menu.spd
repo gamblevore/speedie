@@ -148,12 +148,12 @@ module Registration
 		registration.TestFailed
 	
 	function Name (|string|)
-		|| parts = .code.split('/')
+		|| parts = .code.Components
 		return parts[0].trim
 			
 	function TestFailed (|string| code=registration.code, |string|)
 		code = code.trim(jeebox.cswordmiddle.invert)
-		|| parts = code.split('/')
+		|| parts = code.Components
 		|| name = parts[0].trim
 		|| serial = parts[1].trim
 		ifn name and serial
