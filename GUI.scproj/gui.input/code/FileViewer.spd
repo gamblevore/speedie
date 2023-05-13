@@ -285,14 +285,15 @@ class FileViewer (ListView)
 					if copy and f.Location.file.IsDir
 						f.name = f.name.PathDir
 		
-		rz.sort(FileRowScoreSorter)
-		|dictionary of filerow| D = dictionary.new
-		for f in rz
-			f.samenameasprev = false
-			|| old = D[f.name]
-				old.SameNameAsPrev = true
-				f.samenameasprev = true
-			d[f.name] = f
+		if rz
+			rz.sort(FileRowScoreSorter)
+			|dictionary of filerow| D = dictionary.new
+			for f in rz
+				f.samenameasprev = false
+				|| old = D[f.name]
+					old.SameNameAsPrev = true
+					f.samenameasprev = true
+				d[f.name] = f
 		
 		for (f in rz) (i)
 			if f.SameNameAsPrev
@@ -300,10 +301,6 @@ class FileViewer (ListView)
 				f = filerow(f)
 				f.name = name
 				rz[i] = f
-		// sigh
-		|| ff = path.file
-		if !rz and ff.exists and !ff.isdir
-			rz <~ filerow(ff, ff)
 		
 		
 	function Listviewrow.FileSort
@@ -397,6 +394,8 @@ class FileViewer (ListView)
 
 
 	function AddExtra (|string| path, |filerow|)
+		|| f = path.file
+		require f.mustexist
 		|| x = .extra
 		if !x
 			x = filerow("", "(Extra)", ".")
