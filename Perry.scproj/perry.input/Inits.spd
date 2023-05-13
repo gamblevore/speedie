@@ -25,6 +25,7 @@ extend PerryIDE
 		.CurrFileName		= ButtonView(.RBorder,	OpenProjectPath, nil, ReturnProjectPath) 
 		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	nil,  ReturnAllFuncs) 
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
+		.SubFindCheckBox	= ButtonView(.searcharea, nil, 					PressedSearchWithin)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList) 
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
 		.LogArea			= ListView(self,		nil,					nil)

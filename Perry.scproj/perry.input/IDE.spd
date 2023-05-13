@@ -46,6 +46,7 @@ class PerryIDE (Window)
     |buttonview|				Toolbar
     |Buttonview|				Tabs
     |buttonview| 				Tabs2 // compiletabs, compilertabs, ctabs
+	|buttonview|				SubFindCheckBox    
     |Buttonview|				ViewErrors
     |Buttonview|				ViewFiles
     |Buttonview|				ViewSearch

@@ -457,6 +457,9 @@ function PressedSelInfo (GUIaction)
 	i.filelist.showquickopen
 
 
+function PressedSearchWithin (Guiaction)
+	
+	
 function PressedSearchKeys (GUIKeyEvent)
 	opt norefcounts
 	|| w = .ide
