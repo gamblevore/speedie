@@ -148,7 +148,7 @@ class PerryIDE (Window)
 		.prev|perryide|.Show(false)?
 			
 
-	function FindFirstPath (|string| path, |filerow|)
+	function LocateProjRoot (|string| path, |filerow|)
 		opt norefcounts
 		|| R = .FindPath(path)
 		|| P = .MainProjFol
@@ -523,22 +523,18 @@ class PerryIDE (Window)
 			|| f = data.split.first
 			|| find = ".scproj/"
 			|| proj = f.find(find, 0, int.max, true)
-				return f[0, proj + find.length]
-			
-			|| maybe = perry.ProjContaining(data)
-				return maybe.project.path
-			
-			return data
+				rz = f[0, proj + find.length]
+			  else
+				rz = data
 
 
 		function PerryOpenDoc (GUIPasteEvent)
-			|| i = .ide
-			i := perry.ide
-			require i
 			|| f = PerryOpenFix(data)
-			require f.file.exists
-			i = IdeAddProj(f, nil) // need to find it, not use the front!
-			i.OpenDoc(after, data, purpose)
+			if f.fileexists
+				|| i = perry.ProjContaining(f)
+				i := IdeAddProj(f, nil) // need to find it, not use the front!
+				if i
+					i.OpenDoc(after, data, purpose)
 
 
 	function TryHideJB

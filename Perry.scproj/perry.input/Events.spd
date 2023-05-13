@@ -170,8 +170,8 @@ function PerryIDE.FindNotTodo (|bool|)
 		|| root = .FileList[0]
 		if c != root
 			.NotTodo = c
-	.nottodo := .findfirstpath("./main.spd")
-	.nottodo := .findfirstpath("./index.spd")
+	.nottodo := .LocateProjRoot("./main.spd")
+	.nottodo := .LocateProjRoot("./index.spd")
 	|| F = .MainProjFol
 		.nottodo := f.first
 	return .nottodo
