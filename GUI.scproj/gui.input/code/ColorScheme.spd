@@ -64,11 +64,11 @@ class ColorScheme
 
 	function Load (|message| s)
 		|| list = s..syx$
-		|| num = 0
 		for syx in list
-			|| c = &.syxcol[num++] 
-			c.load(syx.first)
-			c.a = 255
+			|| num = syntax.Func(syx.Name, syx)
+				|| c = &.syxcol[num]
+				c.load(syx.first)
+				c.a = 255
 		.RootTmp.load(s..root)
 		.none.load(s..none)
 
