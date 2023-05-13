@@ -9,7 +9,9 @@ class FileViewer (ListView)
     |ListView|						ListOpen
     |textView|						Editme
     |filerow| 						Extra
+    |filerow| 						SearchWithin
     |[string]|						SizeCheckers
+    |GUIListEvent|					OnSearchWithin
     
 	constructor (|window| p, |GUIListEvent| sel, |GUIListEvent| ret, |textview| editme)
 		super.constructor(p, sel, ret)
@@ -550,35 +552,47 @@ extend_module filerow
 
 
 
-
+function fileviewer.FindSearchWithin (|filerow|)
+	opt norefcounts
+	|| s = .FirstSelected|filerow|
+		while (s isa filerow) and !s.AsDir
+			s = s.parent|filerow|
+		return s
+	
+	
 function RightClickFileList (GUIListEvent)
 	opt NoRefCounts
 	if self isa fileviewer
 		|| m = .newcmm
-		|| s = .FirstSelected|filerow|
-		if s and (.extra contains s) and s!=.extra
-			m <~ ("Remove From Project",	FileListRemove)
-		m <~ ("Rename File",		FileRenameFile)
-		m <~ ("Create File",		FileListCreateFile)
-		m <~ ("Copy File Path",		FileListCopyPath)
-		m <~ ("Show In Desktop",	FileListCMMShow)
+		|| within = .FindSearchWithin
+			m <~ ("Search Within: " + within.name, FileViewerSearchWithin, within)
+			m.addsep
+		
+		|| rem = .FirstSelected|filerow|
+			if rem and (.extra contains rem) and rem != .extra
+				m <~ ("Remove From Project",	FileViewerRemove)
+
+		m <~ ("Rename File",		FileViewerRenameFile)
+		m <~ ("Create File",		FileViewerCreateFile)
+		m <~ ("Copy File Path",		FileViewerCopyPath)
+		m <~ ("Show In Desktop",	FileViewerCMMShow)
 		m.addsep
-		m <~ ("Move To Trash",		FileListTrash)
+		m <~ ("Move To Trash",		FileViewerTrash)
 	return true
 
 
-function FileListCMMShow (GuiMenuEvent)
+function FileViewerCMMShow (GuiMenuEvent)
 	|| row = clicked.row
 	if row isa FileRow
 		row.location.Reveal
 
 
-function FileRenameFile (GuiMenuEvent)
+function FileViewerRenameFile (GuiMenuEvent)
 	|| row = clicked.row|filerow|
 	self|Fileviewer|.rename(row)
 	
 
-function FileListCreateFile (GuiMenuEvent)
+function FileViewerCreateFile (GuiMenuEvent)
 	|| row = clicked.row|filerow|
 	if !row.asdir
 		row = row.parent
@@ -592,21 +606,37 @@ function FileListCreateFile (GuiMenuEvent)
 		self|Fileviewer|.checksize
 
 
-function FileListCopyPath (GuiMenuEvent)
+function FileViewerCopyPath (GuiMenuEvent)
 	|GuiMenuEvent| test
 	|| row = clicked.row
 	if row isa FileRow
 		clipboard.text = row.location
 
-
-function FileListTrash (GuiMenuEvent)
+//FileListSearchWithin
+function FileViewerTrash (GuiMenuEvent)
 	|| row = clicked.row
 	if  row isa FileRow  and  self isa fileviewer
 		row.AskDelete(self)
 
 
-function FileListRemove (GuiMenuEvent)
+function FileViewerRemove (GuiMenuEvent)
 	|| row = clicked.row
 	if row isa FileRow
 		row.remove
+
+
+function FileViewerSearchWithin (GuiMenuEvent)
+	opt norefcounts
+	|filerow| row
+	|| obj = menu.obj
+	if obj isa FileRow
+		row = obj
+	if self isa FileViewer
+		if row == .listsource
+			row = nil
+		if row != .Searchwithin
+			.SearchWithin = row|filerow|
+			(.OnSearchWithin)(self, row)?
+		
+	
 

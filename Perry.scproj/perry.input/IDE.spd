@@ -57,7 +57,6 @@ class PerryIDE (Window)
     |Buttonview|				StartScreen
     |Buttonview|				BuildButton
     |Buttonview|				RunButton
-    |filerow| 					SearchWithin
 	|message|					PrevMarker
     |message|					Previous
     |string|					OldJBCloser
@@ -388,6 +387,7 @@ class PerryIDE (Window)
 
 
 	function ShowFind (|bool|)
+		.retextsubfind
 		.ViewAsProject
 		.View(.ViewSearch)
 		.MassSearchField.SelectAll

@@ -317,8 +317,11 @@ function PressedSelInfo (GUIaction)
 
 function PressedSearchWithin (Guiaction)
 	|| i = .ide
-	|| r = i.SearchWithin
-		(r is active) = (r isnt active)
+	|| f = i.FileList
+	|| r = f.SearchWithin
+		f.SearchWithin = nil
+	  else
+		f.SearchWithin = f.FindSearchWithin
 	i.ReTextSubFind
 	
 	
@@ -449,11 +452,10 @@ function ReturnErrorList (GuiListEvent)
 
 
 function perryide.ReTextSubFind
-	|| r = .SearchWithin
-	if (r is Active)
-		.SubFindCheckBox.text = "Within: " + r.Name
+	|| r = .filelist.SearchWithin
+		.SubFindCheckBox.text = "Searches: " + r.Name
 	  else
-		.SubFindCheckBox.text = "Searches All Files"
+		.SubFindCheckBox.text = "Searches: All"
 
 
 function SelectedFile (GuiListevent)
@@ -465,8 +467,8 @@ function RightClickErrorList (GUIListEvent)
 	opt NoRefCounts
 	if self isa FileViewer
 		|| m = .newcmm
-		m <~ ("Copy File Path",			FileListCopyPath)
-		m <~ ("Show In Finder",			FileListCMMShow)
+		m <~ ("Copy File Path",			FileViewerCopyPath)
+		m <~ ("Show In Finder",			FileViewerCMMShow)
 		m <~ ("Show In Project",		ProjectCMMShow)
 	return true
 
@@ -476,10 +478,17 @@ function perry.FindElseWhere (|perryide| ignore, |string| find)
 		if (w != ignore) and w.BatchPhind(find)
 			if "$find not found here, but was found in '${w.name}'.\n\nTake a look?".confirm
 				w.show
+				w.ShowFind
 			return
 
 
 function HideSomeStuffOnResize (guiaction)
 	if self isa guicontrol
 		.ide.PopupHide
+	
+
+function PerrySearchWithin (GUIListEvent)
+	opt NoRefCounts
+	.ide.ShowFind
+	
 	

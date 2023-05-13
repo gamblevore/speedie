@@ -125,7 +125,7 @@ module Perry
 			rz = rz[0, rz.length-2]
 	
 	
-	function perryide.SetTabName (|message| old)
+	function perryide.SetTab2Name (|message| old)
 		opt norefcounts
 		.tabs.selected = old
 
@@ -146,7 +146,7 @@ module Perry
 		
 		i.ProjMsg = old
 		old.obj = i
-		i.SetTabName(old)
+		i.SetTab2Name(old)
 			
 
 extend PerryIDE {

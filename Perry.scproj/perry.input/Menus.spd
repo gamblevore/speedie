@@ -1,22 +1,5 @@
 
 
-function FileListSearchWithin (GuiMenuEvent)
-	|| row = Clicked.row
-	if row isa filerow
-		.ide.SearchWithin = row
-	// so... what do we do?
-	
-	
-
-	
-function PerryRightClickFileList (GUIListEvent)
-	rz = RightClickFileList(self, row)		#require
-	if row isa filerow
-		if row.AsDir
-			.cmm.first = menuitem("Search Within Here", FileListSearchWithin)
-		 
-		
-
 function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
 	|| p = .submenu
 	|| orig = l

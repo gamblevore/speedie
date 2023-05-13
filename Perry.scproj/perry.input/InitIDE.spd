@@ -99,11 +99,11 @@ extend PerryIDE
 		with .FileList
 			.tooltip		= "Displays files in project"
 			.folfile		= ".perry"
-			.onrightclick	= PerryRightClickFileList
 			.takesfocus 	= takesfocusflag.CanFocus
 			.ID				= "FileList"
 			.size 			= the~width by the~bottom to 15~down
 			.copypaste	   |= copypasteflags.pastefile
+			.OnSearchWithin = PerrySearchWithin
 			.onpaste		= &PerryOpenDoc
 			.newcmm				// for the hideside test
 			.sizecheckers	= "spd,txt,frag,vert,sdf" / ','
