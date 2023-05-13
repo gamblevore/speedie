@@ -1234,9 +1234,10 @@ class TextView (GUIControl)
 	
 	
 	helper DeleteLine (|bool|)
-		|| i = .ProperSelectLine-1
-		if i.width > 1
-			i.x++
+		|| i = .ProperSelectLine
+		if i.width <= 1
+			return false
+		i -= (0,1)
 		.insertsub("", i, false)
 		return true
 		
@@ -1262,7 +1263,8 @@ class TextView (GUIControl)
 
 	helper DeleteKeySub (|int| d, |bool|)
 		if  keys.platCmd  and  !.singleline
-			return .DeleteLine
+			if .DeleteLine
+				return true
 			
 		|| r = .DeleteKeySel(d)
 		if r.width
@@ -1270,7 +1272,7 @@ class TextView (GUIControl)
 			return true
 
 
-	function SelectorRect (|int| pos, |ivec4|)
+	helper SelectorRect (|int| pos, |ivec4|)
 		|| i = .XYOfChar(pos)- (1,0)	
 		|| i2 = (1, .lineheight+1)
 		rz = (i, i+i2)
@@ -1631,7 +1633,7 @@ class TextView (GUIControl)
 	
 	helper TryColorise (|bool|)
 		opt norefcounts
-		if .ParsedMessage and app.needreg("(To alter your syntax text-color.)")
+		if .ParsedMessage // and app.needreg("(To alter your syntax text-color.)")
 			return ¥.randomise(self)
 		return true
 
