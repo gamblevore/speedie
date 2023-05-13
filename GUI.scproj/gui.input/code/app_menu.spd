@@ -111,7 +111,7 @@ function AppMenuQuit (GuiMenuEvent)
 
 
 function AppMenuReturnkey (GuiListEvent)
-	.window|appmenu|.ReturnValue = .sel
+	.window|appmenu|.ReturnValue = .FirstSelected
 	return true
 
 

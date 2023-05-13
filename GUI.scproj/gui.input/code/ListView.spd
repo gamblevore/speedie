@@ -81,7 +81,7 @@ class ListView (GUIControl) {
 	function TryRenameCellTo (|listviewcell| cell, |string| value, |bool|)
 		opt NoRefCounts
 		if self and .TryRenameCellSub(cell, value)
-			|| o = cell.original
+			|| o = cell.row
 			.touch
 			.show(o)
 			(.WasEdited)(self, o)? // remove this event
@@ -92,7 +92,7 @@ class ListView (GUIControl) {
 	function TryRenameCellSub (|listviewcell|cell, |string| value, |bool|)
 		opt norefcounts
 		if !.TryEditCell
-			|| orig = cell.original#require 
+			|| orig = cell.row				#require 
 			orig.__textset__(cell.column, value)
 			return true
 		return (.TryEditCell)(self, cell, value)
@@ -207,7 +207,7 @@ class ListView (GUIControl) {
 		delayEditTill = nil
 		.MouseDownCell = .DrawClickCell(P)
 		|| y = p.y
-		|| r = .MouseDownCell.original
+		|| r = .MouseDownCell.row
 			require (r isnt disabled)
 			y = .DrawYRow(r)
 		
@@ -220,7 +220,7 @@ class ListView (GUIControl) {
 	
 
 	function MenuForSelRow
-		|| sels = .sel$
+		|| sels = .FirstSelected$
 		.showfast(sels)
 		|| y = .DrawYRow(sels)
 		if .onrightclick and (.onrightclick)(self, sels)
@@ -229,7 +229,7 @@ class ListView (GUIControl) {
 	
 	function DoReturn (|bool|)
 		require .onreturn
-		(.onreturn)(self, .sel)
+		(.onreturn)(self, .FirstSelected)
 		return true
 		
 	
@@ -319,7 +319,7 @@ class ListView (GUIControl) {
 		
 	function StartRenameCell (|ListViewcell| rc, |bool|)  //  .editcell
 		opt norefcounts
-		|| r = rc.original					#require
+		|| r = rc.row					#require
 		.SelectAdd(r)
 		.Show(r)
 		|| inl = .inlinecell(true) 
@@ -376,7 +376,7 @@ class ListView (GUIControl) {
 		if key is up or down
 			if keys.Cmd
 				.SelectMove( (-int.max, int.max)(Key is up) )
-			  elseif !.sel
+			  elseif !.FirstSelected
 				.SelectMove( (-int.max, int.max)(Key is down) )
 			  else
 				|| i = 1
@@ -392,7 +392,7 @@ class ListView (GUIControl) {
 	
 	function DefaultCopy (GUICopyEvent)
 		|| fs = faststring()
-		for s.selected in self
+		for s.listsel in self
 			|| it = s.__copyid__
 			it := s.text
 			it := s.name
@@ -406,14 +406,14 @@ class ListView (GUIControl) {
 		opt norefcounts
 		.EditDelayed = nil
 		.clearinternaldrops
-		for s.selected in self
+		for s.listsel in self
 			|| it = s.__copyid__
 				rz <~ it
 
 
 	function SelList (|array of ListViewrow|)
 		opt norefcounts
-		for s.selected in self
+		for s.listsel in self
 			rz <~ s
 	
 	
@@ -573,7 +573,7 @@ class ListView (GUIControl) {
 
 
 	function BasicRowDrag (GuiListDragEvent)
-		|| s = .sel
+		|| s = .FirstSelected
 		if !s or (.Hiernext(s) == before) and !s.nextselected
 			return true // no need
 		if (before is selected)
@@ -631,7 +631,7 @@ class ListView (GUIControl) {
 			
 		  elseif !sl
 			|| LC = .DrawClickCell(P)
-			|| L = LC.original
+			|| L = LC.row
 			require (L isnt disabled)
 			if (L is selected) and (.SelCount > 1)
 				.Select(l)
@@ -641,7 +641,7 @@ class ListView (GUIControl) {
 
 	function SelCount (|int|)
 		opt norefcounts
-		for f.selected in self 
+		for f.listsel in self 
 			RZ++
 
 
@@ -661,7 +661,7 @@ class ListView (GUIControl) {
 	
 	
 	function CanDrawDrag (|ListViewrow| wantsbefore, |bool|)
-		if .draggingrowto or (.sel != .lastselected)
+		if .draggingrowto or (.FirstSelected != .lastselected)
 			return true
 		require .draggingrowfrom != WantsBefore
 		require .Hiernext(.draggingrowfrom) != wantsbefore
@@ -715,14 +715,14 @@ class ListView (GUIControl) {
 		if .ClickedScroll(P, clicks)
 			return 2
 		
-		|| FirstSel = .sel
+		|| FirstSel = .FirstSelected
 		if (Clicks > 1) and (firstsel) and !(keys.Cmd)
 			(.OnReturn)(self, firstsel)?
 			return 1
 		
 		|| LC = .DrawClickCell(P)
 		.MouseDownCell = LC
-		|| l = lc.original 
+		|| l = lc.row 
 		if !l
 			if !keys.Cmd
 				.selectnone
@@ -853,7 +853,10 @@ class ListView (GUIControl) {
 		return true
 
 
-	function Sel (|ListViewRow|)
+	function Selected (|ListViewRow|)
+		disabled "Do you mean .FirstSelected or .LastSelected?"
+	
+	function FirstSelected (|ListViewRow|)
 		opt NoRefCounts
 		|| l = .start 		
 		while l
@@ -906,7 +909,7 @@ class ListView (GUIControl) {
 	function SelectMove (|int| i, |bool| Multi=keys.shift)
 		opt norefcounts
 		debug_require i
-		|| l = (.LastSelected, .sel)(i > 0)
+		|| l = (.LastSelected, .FirstSelected)(i > 0)
 		if !l
 			if i < 0
 				return .Select(.start)
@@ -939,7 +942,7 @@ class ListView (GUIControl) {
 	function SelectNone
 		opt NoRefCounts
 		|| one = .OneAlwaysSelected
-		|| s = (.sel ?? .start, nil)(one)
+		|| s = (.FirstSelected ?? .start, nil)(one)
 		return .Select(s)
 	
 	
@@ -1057,7 +1060,7 @@ class ListView (GUIControl) {
 
 
 	helper DrawClick (|ivec2| Search, |ListViewRow|)
-		return .DrawClickCell((0,search.y)).original
+		return .DrawClickCell((0,search.y)).row
 	
 	
 	
@@ -1067,7 +1070,7 @@ class ListView (GUIControl) {
 			return .bmove(.LastVisible, 1)
 		if y > .top
 			return .bmove(._scroll, -1)
-		return .DrawClickCell((0,y)).original
+		return .DrawClickCell((0,y)).row
 	
 	
 	helper DrawClickCell (|ivec2| Search, |ListViewCell|)
@@ -1169,7 +1172,7 @@ class ListView (GUIControl) {
 	
 	
 	helper CellBounds (|ListViewRow| curr,  |ListViewCell| cell,  |ivec4|)
-		|| sc = cell.original
+		|| sc = cell.row
 		rz = .RowBounds(._scroll, sc, .rowheight) 
 		if rz
 			rz.horz = .col(cell.column, rz, sc)
@@ -1373,8 +1376,8 @@ class ListView (GUIControl) {
 		self <~ menuitem("", nil)
 
 
-	iterator Selected
-		|| f = .sel
+	iterator ListSel
+		|| f = .FirstSelected
 		while f
 			yield f
 			f = f.nextselected

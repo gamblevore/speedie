@@ -241,7 +241,7 @@ function OnAskSaveAnswer (GUIAction)
 
 
 function OpenSaveDialog.GoIntoFolder (|bool|)
-	|| f = .files.sel|filerow|
+	|| f = .files.FirstSelected|filerow|
 	|| Acceptable = f and (f isnt greyed)
 	expect Acceptable (Beep)
 	if f.asdir
@@ -269,7 +269,7 @@ function OnAskSaveName (GUIKeyEvent)
 function OnAskSaveReveal (GUIAction)
 	opt NoRefCounts
 	|| w = .Window|opensavedialog|$
-	|| f = w.files.sel
+	|| f = w.files.FirstSelected
 	if f isa filerow
 		|| p = (w.path.text, f.location)(f.name == "..")
 		p.reveal

@@ -21,7 +21,7 @@ function DebugArgsKeyDown (GUIKeyEvent)
 function FoundListKeys (GuiKeyEvent)
 	if key.IsDelete
 		if self isa ListView
-			|| s = .sel
+			|| s = .FirstSelected
 				.RemoveRow(s)
 		return true
 

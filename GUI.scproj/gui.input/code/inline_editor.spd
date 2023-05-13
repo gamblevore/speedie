@@ -96,7 +96,7 @@ struct InlineEditor
 				l = l2
 			
 		debug_require l and r
-		|| row = r.Original
+		|| row = r.row
 		require row is editable and row isnt disabled and l is editable
 		with .editor
 			.FinishEditing(false)
@@ -104,10 +104,10 @@ struct InlineEditor
 			.setfocus
 			.text = r
 			.sel = .text.length
-		l.Select(r.original)
+		l.Select(r.row)
 		l <~ .editor
 		l.isediting = true
-		l.ShowFast(r.original)
+		l.ShowFast(r.row)
 		.cell = r
 		.EditingFor = l
 		return true

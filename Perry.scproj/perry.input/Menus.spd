@@ -1,0 +1,170 @@
+
+
+function FileListSearchWithin (GuiMenuEvent)
+	|| row = Clicked.row
+	if row isa filerow
+		.ide.SearchWithin = row
+	// so... what do we do?
+	
+	
+
+	
+function PerryRightClickFileList (GUIListEvent)
+	rz = RightClickFileList(self, row)		#require
+	if row isa filerow
+		if row.AsDir
+			.cmm.first = menuitem("Search Within Here", FileListSearchWithin)
+		 
+		
+
+function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
+	|| p = .submenu
+	|| orig = l
+	p.listsource.clear
+	while l
+		|| S = filerow.icon(l, "").render + " " + l.volumename
+		p <~ filerow(l, s, (".nothing", "")(l != orig))
+		if l.IsVolume
+			exit
+		l = l.parent
+	.OpenMenu(tab)
+
+
+function PerryIDE.EnablePrevnext
+	opt norefcounts
+	|| m = .PrevMarker
+	(.gonext is enabled) = m and m.next
+	(.goprev is enabled) = m and m.prev
+
+
+function perryide.AddToJumpHistory
+	require .EnableHistoryChanges
+	|| where = message()
+	|| old = .previous.find(where)
+		where = old
+	  else
+		.Mark(where)
+
+	|| p = .PrevMarker			// .shunt all after prevmarker... before it.
+		if p.parent != .previous
+		while (|| x = p.next)
+			p.prev = x
+			
+	.previous <~ where
+	.prevmarker = where
+	if .prevmarker.parent != .previous
+	.previous.keep(40, false)
+	.EnablePrevNext
+
+
+function RightClickNext (GUIaction)
+	if self isa ButtonView
+		|| s = .submenu
+			s.ListSource = .ide.SortedPrevious
+			.OpenMenu
+
+
+function ChosePrevItem (GUIListEvent)
+	.ide.GoToMarker(row)
+	return true
+
+
+function PerryIDE.GoToMarker (|message| m)
+	if m
+		.mark(.prevmarker)
+		.prevmarker = m
+		if m.parent != .previous
+		.EnableHistoryChanges = false
+		|| l = m.first
+		.GoToAnyFile(m.name, l.name)
+		.editme.scrollpos = l.first.int
+		.EnableHistoryChanges = true
+	.EnablePrevNext
+
+	
+function perryide.SortedPrevious (|message|)
+	|dictionary of message| s = dictionary()
+	for ch in .previous
+		|| n = ch[2].name
+		|| old = s[n]
+			old.remove
+		s[n] = ch
+	return .previous
+	
+
+function PerryIDE.Mark (|message| m)
+	m.clear
+	m.become(@tmp, .currpath)
+	|| line = (@num + .editme.currline) 
+	line <~ .editme.scrollpos
+	m <~ line
+	|| name = .CurrPath.name.widen(16)
+	|| fnname = ""
+	|| msg = .Editme.ClickedMsg
+		|| fn = msg.owning_func
+			fnname = fn.OwningFullName(@emb).render
+			name += " (" + fnname + ")"
+	
+	m <~ name
+	m <~ .currpath + "/" + fnname
+
+
+function ClickedPrevNext (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	|| m = i.PrevMarker
+		m = m.step(self == i.gonext)
+		i.GoToMarker(m)
+		return true
+	
+
+
+function ProjectCMMShow (GuiMenuEvent)
+	|| row = clicked.row
+	if row isa error
+		|| i = .ide
+		i.clickederror(row)
+		i.view(i.viewfiles)
+
+
+function PressingTabs (guiaction)
+	opt norefcounts
+	if self isa ButtonView
+		|| p = .submenu|listview|
+		|| ide = row.obj
+		if ide isa PerryIDE
+			p.ListSource.clear
+			|| name = ide.Project.name
+			p <~ ( "Copy " + name, MenuCopyProject, ide)
+			p <~ ("Show Project", MenuShowProject, ide)
+			p <~ ( "Close", MenuCloseProject, ide)
+			.OpenMenu(row) // "Yes" "no"
+
+
+function MenuCopyProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.obj
+	if ide isa perryide
+		clipboard.text = ide.Project
+		Notifications <~ "Copied: " + ide.Project
+
+
+function MenuCloseProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.obj
+	if ide isa perryide
+		ide.Close(sdlapp.kactivity)
+
+
+function MenuShowProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.obj
+	if ide isa perryide
+		ide.Project$.Reveal
+	
+
+function RightClickedTabs (GUIAction)
+	if row and self isa ButtonView
+		.FillMenuPath(row.obj|PerryIDE|.Project.path, row)
+
+	

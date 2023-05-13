@@ -14,8 +14,8 @@ class FileViewer (ListView)
 	constructor (|window| p, |GUIListEvent| sel, |GUIListEvent| ret, |textview| editme)
 		super.constructor(p, sel, ret)
 		.MultiSelection 	= true
-		.onrightclick 		= RightClickFileList
 		.editme				= editme
+		.OnRightClick		= RightClickFileList
 		.quickopen			= textview(nil,		nil,		nil)
 		.Listopen			= ListView(nil,		nil, 		ClickedOpenList)
 		.ondrawrow			= InsideFileViewRowDraw
@@ -28,7 +28,7 @@ class FileViewer (ListView)
 	
 	destructor
 //		.quickopen.tag = nil
-//		.listopen.tag = nil // causes crashes to set here
+//		.listopen.tag = nil // causes crashes if set here
 		.quickopen.disposeall
 		.listopen.disposeall
 
@@ -76,7 +76,7 @@ class FileViewer (ListView)
 	
 	behaviour keydown
 		if key.isdelete
-			|| r = .sel
+			|| r = .FirstSelected
 			if r isa filerow
 				r.AskDelete(self)
 				return true
@@ -410,7 +410,7 @@ class FileViewer (ListView)
 	
 	module
 		function FileRowRenamer (guilisteditevent)
-			|| o = cell.original
+			|| o = cell.row
 			if o isa filerow
 				if o.moveto(value)
 					return true
@@ -465,7 +465,7 @@ class FileViewer (ListView)
 			require fv.mustbe(fileviewer)
 			|| l = fv.listopen
 			if key.IsAccept
-				|| row = l.sel
+				|| row = l.FirstSelected
 					ClickedOpenList(l, row)
 				  else
 					fv.OpenQuick(.text)				
@@ -547,3 +547,66 @@ extend_module filerow
 		  elseif (ext == "app" or "scproj" or "uwuz")
 			return '\19'
 		return '\11'
+
+
+
+
+function RightClickFileList (GUIListEvent)
+	opt NoRefCounts
+	if self isa fileviewer
+		|| m = .newcmm
+		|| s = .FirstSelected|filerow|
+		if s and (.extra contains s) and s!=.extra
+			m <~ ("Remove From Project",	FileListRemove)
+		m <~ ("Rename File",		FileRenameFile)
+		m <~ ("Create File",		FileListCreateFile)
+		m <~ ("Copy File Path",		FileListCopyPath)
+		m <~ ("Show In Desktop",	FileListCMMShow)
+		m.addsep
+		m <~ ("Move To Trash",		FileListTrash)
+	return true
+
+
+function FileListCMMShow (GuiMenuEvent)
+	|| row = clicked.row
+	if row isa FileRow
+		row.location.Reveal
+
+
+function FileRenameFile (GuiMenuEvent)
+	|| row = clicked.row|filerow|
+	self|Fileviewer|.rename(row)
+	
+
+function FileListCreateFile (GuiMenuEvent)
+	|| row = clicked.row|filerow|
+	if !row.asdir
+		row = row.parent
+	|| l = row.location
+	|| f = l.file.UniqueChild("untitled")
+	if f and f.create
+		|| created = filerow(f.path, f.name) 
+		row <~ created
+		row.filesort
+		self|Fileviewer|.rename(created)
+		self|Fileviewer|.checksize
+
+
+function FileListCopyPath (GuiMenuEvent)
+	|GuiMenuEvent| test
+	|| row = clicked.row
+	if row isa FileRow
+		clipboard.text = row.location
+
+
+function FileListTrash (GuiMenuEvent)
+	|| row = clicked.row
+	if  row isa FileRow  and  self isa fileviewer
+		row.AskDelete(self)
+
+
+function FileListRemove (GuiMenuEvent)
+	|| row = clicked.row
+	if row isa FileRow
+		row.remove
+

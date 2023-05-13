@@ -25,7 +25,7 @@ extend PerryIDE
 		.CurrFileName		= ButtonView(.RBorder,	OpenProjectPath, nil, ReturnProjectPath) 
 		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	nil,  ReturnAllFuncs) 
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
-		.SubFindCheckBox	= ButtonView(.searcharea, nil, 					PressedSearchWithin)
+		.SubFindCheckBox	= ButtonView(.searcharea, PressedSearchWithin   	)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList) 
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
 		.LogArea			= ListView(self,		nil,					nil)
@@ -99,6 +99,7 @@ extend PerryIDE
 		with .FileList
 			.tooltip		= "Displays files in project"
 			.folfile		= ".perry"
+			.onrightclick	= PerryRightClickFileList
 			.takesfocus 	= takesfocusflag.CanFocus
 			.ID				= "FileList"
 			.size 			= the~width by the~bottom to 15~down
@@ -132,7 +133,7 @@ extend PerryIDE
 		with .NoNeeder 
 			.takesfocus 	= 0
 			.ID				= "NoNeed"
-			.size 			= 5~inside  by  17~up to 35~down
+			.size 			= 5~inside  by  17~up to 55~down
 			isnt editable
 			isnt visible
 			isnt drawsfocus
@@ -178,8 +179,7 @@ extend PerryIDE
 			.size		= 3~inside  by  2~under back 15
 			.Tooltip	= "Searches within only selected files"
 			.id			= "SubFind"
-			.text		= "\05 Search All Files"
-			.gnormal.solid = (0, 0, 0, 0.5)
+			.gnormal.solid = (0, 0, 0, 0.25)
 
 		with .FoundList
 			is   editable
@@ -386,6 +386,7 @@ extend PerryIDE
 		
 		.ViewAsCurr
 		.SetupLogArea
+		.ReTextSubFind
 		.StdOutSelect(.SpeedieText)
 		
 

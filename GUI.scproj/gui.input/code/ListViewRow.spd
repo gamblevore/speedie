@@ -217,10 +217,12 @@ role ListViewCell (message)
 		super.Constructor(@arg, "")
 		.obj = owner
 		.position = i
+	function Original (|ListViewrow|)
+		disabled "Use .row" // or should it just be .row
 	function Column (|int|)
 		if self
 			return .position
-	function Original (|ListViewrow|)
+	function Row (|ListViewrow|)
 		if self
 			return .obj|ListViewrow|
 	syntax cast (|string|)
@@ -235,7 +237,7 @@ role ListViewCell (message)
 		return c.obj == .obj  and  c.position == .position
 	function Value (|string|)
 		require self
-		return .original.__text__(.column)
+		return .row.__text__(.column)
 	
 	
 	function tab (|bool| dir, |ListView| lv, |ListViewcell|)
@@ -245,5 +247,5 @@ role ListViewCell (message)
 			return .step( 1, 0)
 		if n < 0
 			return .step(-1, cols-1)
-		return ListViewcell(.original, n)
+		return ListViewcell(.row, n)
 

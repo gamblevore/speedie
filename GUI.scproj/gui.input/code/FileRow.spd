@@ -89,7 +89,9 @@ class FileRow (ListViewRow)
 			.location = self.readfrom
 			return true
 
-	
+	function IsDir (|bool|)
+		disabled "use .Asdir. Not quite the same, but usually close enough"
+		
 	function SavedFileData (|string|)
 		opt norefcounts
 		|| d = ._document
@@ -117,7 +119,7 @@ class FileRow (ListViewRow)
 
 	function FileViewer.TryReloadPath
 		opt norefcounts
-		for s.up in .sel
+		for s.up in .FirstSelected
 			if s isa filerow
 				s.TryReload(self)
 
@@ -336,67 +338,5 @@ function ListViewRow.ListFilesPath (|string| path, |string| types, |bool| save, 
 			(r is Greyed) = !ISOK 
 			
 	.filesort
-
-
-
-
-function RightClickFileList (GUIListEvent)
-	opt NoRefCounts
-	if self isa fileviewer
-		|| m = .newcmm
-		|| s = .sel|filerow|
-		if s and (.extra contains s) and s!=.extra
-			m <~ ("Remove From Project",	FileListRemove)
-		m <~ ("Rename File",		FileRenameFile)
-		m <~ ("Create File",		FileListCreateFile)
-		m <~ ("Copy File Path",		FileListCopyPath)
-		m <~ ("Show In Finder",		FileListCMMShow)
-		m.addsep
-		m <~ ("Move To Trash",		FileListTrash)
-	return true
-
-
-function FileListCMMShow (GuiMenuEvent)
-	|| row = clicked.original
-	if row isa FileRow
-		row.location.Reveal
-
-
-function FileRenameFile (GuiMenuEvent)
-	|| row = clicked.original|filerow|
-	self|Fileviewer|.rename(row)
-	
-
-function FileListCreateFile (GuiMenuEvent)
-	|| row = clicked.Original|filerow|
-	if !row.asdir
-		row = row.parent
-	|| l = row.location
-	|| f = l.file.UniqueChild("untitled")
-	if f and f.create
-		|| created = filerow(f.path, f.name) 
-		row <~ created
-		row.filesort
-		self|Fileviewer|.rename(created)
-		self|Fileviewer|.checksize
-
-
-function FileListCopyPath (GuiMenuEvent)
-	|GuiMenuEvent| test
-	|| row = clicked.original
-	if row isa FileRow
-		clipboard.text = row.location
-
-
-function FileListTrash (GuiMenuEvent)
-	|| row = clicked.original
-	if  row isa FileRow  and  self isa fileviewer
-		row.AskDelete(self)
-
-
-function FileListRemove (GuiMenuEvent)
-	|| row = clicked.original
-	if row isa FileRow
-		row.remove
 
 

@@ -115,7 +115,7 @@ class Menu (ListView)
 
 	
 	function DoReturn (|bool|)
-		.UseMenu  .sel|menuitem|
+		.UseMenu  .FirstSelected|menuitem|
 		return true
 
 	

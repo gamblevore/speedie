@@ -57,6 +57,7 @@ class PerryIDE (Window)
     |Buttonview|				StartScreen
     |Buttonview|				BuildButton
     |Buttonview|				RunButton
+    |filerow| 					SearchWithin
 	|message|					PrevMarker
     |message|					Previous
     |string|					OldJBCloser
@@ -201,7 +202,7 @@ class PerryIDE (Window)
 			fs <~ "${t.charcount} chars in ${t.linecount} lines"
 			
 		  elseif i == 2
-			|| f = .filelist.sel|filerow|
+			|| f = .filelist.FirstSelected|filerow|
 			if f.asdir
 				fs <~ "fol: "
 			  else
@@ -369,7 +370,7 @@ class PerryIDE (Window)
 		if !dir and !L.listsource.hasany
 			return true
 		
-		|| Err = l.sel
+		|| Err = l.FirstSelected
 		if keys.shift
 			dir = -dir
 		if err and dir
@@ -552,7 +553,7 @@ class PerryIDE (Window)
 				ActualErrors++
 			if err.path ~= path
 				txt.LineErrorAdd(err)
-				if jump and (!jumpto or err == lst.sel)
+				if jump and (!jumpto or err == lst.FirstSelected)
 					jumpto = err
 			if actual_compile
 				.logarea.first = err.copy
@@ -575,7 +576,7 @@ class PerryIDE (Window)
 
 
 	function CurrFileRow (|FileRow|)
-		|| r = .FileList.Sel
+		|| r = .FileList.FirstSelected
 		if r isa FileRow
 			return r
 			

@@ -223,7 +223,7 @@ function OutText (|textview|)
 
 function SwitchedToErrors
 	|| e = .errorlist
-	if e.listsource.hasany and !e.sel
+	if e.listsource.hasany and !e.FirstSelected
 		e.selectfirst
 	  else
 		.editme.ShowParseError
