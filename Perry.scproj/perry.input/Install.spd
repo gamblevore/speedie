@@ -149,7 +149,7 @@ extend_module perry
 			
 	
 	function InBuildFolder (|bool|)
-		|| paths = app.exepath.split('/')
+		|| paths = app.exepath.Components
 		for s.backwards in paths
 			if s.isproj
 				return true
