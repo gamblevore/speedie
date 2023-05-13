@@ -26,7 +26,7 @@ class ButtonView (GUIControl)
 		super.constructor(p)
 		.onclicked = act
 		.pressing = pressing
-		.itemgap = 6
+		.itemgap = 4
 		.OnRightClick = OnRightClick
 		.StepDuration = 0.75s
 		.align = ListViewState.aligncenter 
@@ -195,7 +195,6 @@ class ButtonView (GUIControl)
 			grow = nil
 		|| MouseXInside = R.x1x2 contains sdlapp.mousexy.x
 		|| clicked = .MouseIsDown and mouseXinside and !.NoDrawClicked
-		r.x2 += 2
 		|| strength = 1.0
 		if i is Active
 			strength += SDLApp.cycle(1s)

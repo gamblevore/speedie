@@ -170,13 +170,21 @@ extend PerryIDE
 			.ID				= "SearchField"
 			.size 			= 3~inside  by  2~down back 15
 			.takesfocus		= takesfocusflag.On
-			.gnormal.solid	= (0.0, 0.0, 0.0, 0.5)
+			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 
+
+		with .SubFindCheckBox
+			is visible
+			.size		= 3~inside  by  2~under back 15
+			.Tooltip	= "Searches within only selected files"
+			.id			= "SubFind"
+			.text		= "\05 Search All Files"
+			.gnormal.solid = (0, 0, 0, 0.5)
 
 		with .FoundList
 			is   editable
 			isnt visible
-			is   UnSearchable // lol
+			is   UnSearchable
 			isnt DrawsFocus
 			.IsTree	= true
 			.NoSeps	= true
@@ -457,10 +465,10 @@ extend PerryIDE
 		btn.tooltip = tip
 		btn.Text = txt
 		(btn is Spacer)
-		|| opa	   = 0.93
-		|| f	   = 0.15 / opa
+		|| opacity = 0.93
+		|| f	   = 0.15 / opacity
 		if btn isa buttonview
-			btn.gnormal.solid = (f, f, f, opa)
+			btn.gnormal.solid = (f, f, f, opacity)
 	
 	function LoadProject (|file| proj, |bool|)
 		require proj.mustexist("load project")

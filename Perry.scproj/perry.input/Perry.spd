@@ -186,8 +186,9 @@ function View (|ButtonView| btn)
 	for g2 in .views
 		(g2 is visible) = g == g2
 	|| vis = (.SearchArea is visible)
-	(.MassSearchField is visible) = vis
-	(.FoundList is visible) = vis
+	for c in .SearchArea
+		(c is visible) = true // just set them always visible? makes more sense, right?
+							  // can just clera the code that sets them invisible (later)...
 
 	
 	// consistancy
@@ -325,6 +326,7 @@ function ViewAsVis (|bool| vis)
 	(.searcharea is visible)		= srchvis
 	(.MassSearchField is visible)	= srchvis
 	(.FoundList is visible)			= srchvis
+	(.SubFindCheckBox is visible)	= srchvis
 
 	(.runbutton is visible)			= StillRuns
 	(.buildbutton is visible)		= StillRuns
