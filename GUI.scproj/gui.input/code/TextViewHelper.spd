@@ -147,7 +147,7 @@ class TextViewLine (ringtree)
 
 	helper ColoriseSub (|message| srch, |message|)
 		opt norefcounts
-		rz = .colorisesub2(srch)
+		rz = .ColoriseSub2(srch)
 		|| r = rz
 		if !r or r.startsafter(.range)
 			r = srch
@@ -171,6 +171,7 @@ class TextViewLine (ringtree)
 			|| p = srch
 			srch = srch.flatnext
 			if !srch
+				require p==@arg
 				return p
 			
 		if srch.StartsAfter(r)							// AFTER
@@ -194,11 +195,11 @@ class TextViewLine (ringtree)
 		while nxt
 			|| curr = nxt
 			nxt	= nxt.flatnext
-			if curr.after <= s				// too far back
+			if curr.after <= s					// too far back
 				if curr.after > lastafter
 					LastAfter = curr.after
 					rz = curr
-				continue					// go next
+				continue						// go next
 
 			|| cp	= curr.position
 			if (cp <= s)
@@ -206,7 +207,7 @@ class TextViewLine (ringtree)
 			  elseif !nxt or nxt.position > cp
 				exit
 
-			|| par	= curr.parent // special coloring
+			|| par	= curr.parent				// special coloring
 			if par and par contains s
 				|| pt = par.func
 				if pt == @type
@@ -547,3 +548,6 @@ extend message
 		return .position >= r.x2
 	function StartsBefore (|intrange| r, |bool|)
 		return .position < r.x
+		
+	
+	
