@@ -94,11 +94,13 @@ module Perry
 		opt norefcounts
 		for r in .Projects
 			|| i = r.obj
-			if i isa PerryIDE
-				rz <~ i
+				rz <~ i|perryide|
 
 	function IDE (|PerryIDE|)
-		return .OpenProj[0]	
+		opt norefcounts
+		for r in .Projects
+			|| i = r.obj
+				return i|perryIde|
 
 	function Readjust
 		for i in .OpenProj
@@ -111,10 +113,10 @@ module Perry
 
 	function ProjContaining (|string| path, |PerryIDE|)
 		opt norefcounts
-		for s in .projects
-			|| i = s.obj|PerryIDE|
-			if i.FindPath(path)
-				return i
+		for w.reverse in window.all
+			if w isa perryide
+				if w.FindPath(path)
+					return w
 
 
 	helper string.ProjCleanName (|string|)
