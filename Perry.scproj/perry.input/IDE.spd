@@ -519,22 +519,14 @@ class PerryIDE (Window)
 					if !w.root
 						return w
 	
-		function PerryOpenFix (|string| data, |string|)
-			|| f = data.split.first
-			|| find = ".scproj/"
-			|| proj = f.find(find, 0, int.max, true)
-				rz = f[0, proj + find.length]
-			  else
-				rz = data
-
-
 		function PerryOpenDoc (GUIPasteEvent)
-			|| f = PerryOpenFix(data)
-			if f.fileexists
-				|| i = perry.ProjContaining(f)
-				i := IdeAddProj(f, nil) // need to find it, not use the front!
-				if i
-					i.OpenDoc(after, data, purpose)
+			|| i = .ide
+				require data.fileexists
+			  else
+				i = perry.ProjContaining(data)
+				if !i
+					i = IdeAddProj(data, nil) // need to find it, not use the front!
+			return i.OpenDoc(after, data, purpose)
 
 
 	function TryHideJB
