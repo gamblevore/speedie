@@ -19,7 +19,10 @@ datatype Syntax (Byte)
 		return self <= @Thg and self >= @tmp
 
 	function ListViewable (|bool|) 
-		return self >= @thg and self <= @emb
+		return .translateable or .isstring
+
+	function IsString (|bool|)
+		return self >= @sstr and self <= @str
 
 	function IsRel (|bool|) 
 		return self >= @rel and self <= @yoda

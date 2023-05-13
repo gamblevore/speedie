@@ -1112,10 +1112,6 @@ class Message (RingTree)
 		if self
 			return .func.isstring
 
-	function syntax.IsString (|bool|)
-		return self >= @sstr and self <= @str
-
-
 	function WipePositions
 		opt norefcounts
 		for v.flat in self
