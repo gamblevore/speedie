@@ -163,6 +163,7 @@ extend dictionary
 
 
 
+// want to hide these... i think .id_ isnt even used except in the translation project
 helper message.id_ (|string|):      return .name.idcase
 helper object._DictName (|string|): cpp_wrapper JB_Obj_DictName
 helper  int64._DictName (|string|): cpp_wrapper JB_int64_DictName
