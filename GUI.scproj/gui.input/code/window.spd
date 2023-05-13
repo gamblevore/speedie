@@ -164,6 +164,7 @@ class Window (GUIControl)
 		rz = .KeyDownWin(key)
 		.BlockRecurseKeyDown = false
 
+
 	helper KeyDownWin (|keys| key, |bool|)
 		opt norefcounts
 		if (key iscmd keys.U) and keys.option
