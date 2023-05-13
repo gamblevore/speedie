@@ -65,7 +65,10 @@ module Notifications
 		w.CreatedDate = date.now
 		.Alerts <~ w
 		w.tag = err
-		.txt.text = err.name
+		|| s = err.name
+		if err.path
+			s += "\n\"" + err.path + "\""
+		.txt.text = s 
 
 	function Draw
 		opt norefcounts

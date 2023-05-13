@@ -187,7 +187,7 @@ class GUIControl (ringtree)
 	
 	helper DrawChildren (|image| where, |guicontrol| avoid)
 		opt norefcounts
-		for R in self							// front gets drawn last (ontop)
+		for R in self							// .last gets drawn last, so .last is actually the "front".
 			if (r!=avoid) and R.isviewable
 				r.DrawOof(Where)
 				if r.hasany
