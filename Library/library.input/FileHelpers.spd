@@ -106,9 +106,11 @@ extend String
 	function file.sibling (|string| name, |file|)
 		return super.sibling(name).file
 	
+	function Components (|[string]|)
+		return .TrimTrailingSlashes.Split('/')
+
 	function ReplacePathComponent (|int| num, |string| With, |string|)
-		|| R = .TrimTrailingSlashes.Split('/')
-		// ok so... 
+		|| R = .components
 		if (num < 0)
 			num += R.length
 		
