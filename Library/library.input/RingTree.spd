@@ -303,14 +303,6 @@ class RingTree (Saveable)
 		rz.parent = nil
 
 
-	function IsChild (|int| N, |bool|)
-		opt norefcounts
-		for C in .Parent
-			N--
-			if (C == self)
-				return !N
-
-
 	function NextPrev (||)
 		opt norefcounts
 		|| n = .next
