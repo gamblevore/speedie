@@ -48,7 +48,7 @@ function string.confirm (|string| Title="", |ConfirmCanceller| Canceller=nil, |b
 
 
 function string.ask_named (|string| Answers,  |int|)
-	return ConfirmIt(self, "", Answers.split('/'))
+	return ConfirmIt(self, "", Answers.Components)
 
 
 function string.Ask (|string| response="",  |string| Title="",  |string|)
