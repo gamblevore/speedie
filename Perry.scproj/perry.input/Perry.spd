@@ -185,12 +185,7 @@ function View (|ButtonView| btn)
 	// visable
 	for g2 in .views
 		(g2 is visible) = g == g2
-	|| vis = (.SearchArea is visible)
-	for c in .SearchArea
-		(c is visible) = true // just set them always visible? makes more sense, right?
-							  // can just clera the code that sets them invisible (later)...
-
-	
+		
 	// consistancy
 	if (btn == .viewsearch)
 		.MassSearchField.setfocus
@@ -324,9 +319,6 @@ function ViewAsVis (|bool| vis)
 	|| StillRuns = top and (vis or (.ext == "spd"))
 	|| srchvis   = vis and (.searcharea is visible) 
 	(.searcharea is visible)		= srchvis
-	(.MassSearchField is visible)	= srchvis
-	(.FoundList is visible)			= srchvis
-	(.SubFindCheckBox is visible)	= srchvis
 
 	(.runbutton is visible)			= StillRuns
 	(.buildbutton is visible)		= StillRuns

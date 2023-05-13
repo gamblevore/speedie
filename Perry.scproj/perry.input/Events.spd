@@ -489,6 +489,7 @@ function HideSomeStuffOnResize (guiaction)
 
 function PerrySearchWithin (GUIListEvent)
 	opt NoRefCounts
+	.ide.SubFindCheckBox is visible
 	.ide.ShowFind
 	
 	

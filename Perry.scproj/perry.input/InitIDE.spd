@@ -175,7 +175,7 @@ extend PerryIDE
 
 
 		with .SubFindCheckBox
-			is visible
+			isnt visible
 			.size		= 3~inside  by  2~under back 15
 			.Tooltip	= "Searches within only selected files"
 			.id			= "SubFind"
@@ -183,7 +183,7 @@ extend PerryIDE
 
 		with .FoundList
 			is   editable
-			isnt visible
+			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
 			.IsTree	= true

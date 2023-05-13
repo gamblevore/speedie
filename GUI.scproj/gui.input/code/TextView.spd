@@ -1199,20 +1199,6 @@ class TextView (GUIControl)
 			rz.x--
 		  else
 			rz.x2++ // i guess?
-	
-	
-	helper DeleteLineStart (|ind|)
-		opt norefcounts
-		|| x2 = .sel1				// text or not? 
-		|| D = .FindDrawInfo(x2)
-		|| Msg = D.message
-		if (msg == @arg and "")
-			if d contains msg.after // OK... so what do we have?
-				ifn d contains msg.position
-					rz = msg.position
-					while self[rz-1] == ' ' or '\t'
-						rz--
-
 
 	function ExtendToLineEnd (|ind| i, |ind|)
 		return .LineExpand((i,i)).x2
@@ -1232,7 +1218,7 @@ class TextView (GUIControl)
 		return .text.find(jeebox.CSLine, start, End )
 
 
-	function DoSelectLine  // select line
+	function DoSelectLine
 		.sel = .ProperSelectLine
 
 
@@ -1244,15 +1230,13 @@ class TextView (GUIControl)
 			b-- 
 		|| b2 = .findline(b)
 			return (a,b2+1)
-		return (a,.length+1) 
+		return (a, .length+1) 
 	
 	
 	helper DeleteLine (|bool|)
-		|| i = .ProperSelectLine
-		i -= (i.x>0)|int|.setsign(keys.shift)
-		|| H = .DeleteLineStart
-			|| i2 = (H, .ExtendToLineEnd(H))
-			i -= .insertloss("", i2)
+		|| i = .ProperSelectLine-1
+		if i.width > 1
+			i.x++
 		.insertsub("", i, false)
 		return true
 		

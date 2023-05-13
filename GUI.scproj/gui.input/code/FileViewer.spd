@@ -318,9 +318,13 @@ class FileViewer (ListView)
 	
 	helper BatchFindSub (|string| str, |message| all)
 		opt norefcounts
+		|| Restrict = (.searchwithin.location?)
 		for f in self
-			if (f isa filerow) and !.nofind.valuelower(f.location.name)
-				f.FindAll(str, all)
+			if (f isa filerow)
+				if Restrict and !f.location[0,Restrict]
+					0
+				  elseif !.nofind.valuelower(f.location.name)
+					f.FindAll(str, all)
 
 
 	function BatchFind (|string| str, |message|)

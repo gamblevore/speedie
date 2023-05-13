@@ -104,7 +104,7 @@ class GUIControl (ringtree)
 				prev = R.ReflowDoc(mine, prev, hard)
 
 
-	helper ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|)
+	helper ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // resizecontrolr
 		opt norefcounts
 		rz = .sizer.Calculate(parent, prev, Hard, .clipmode)
 		.LastRect = rz
