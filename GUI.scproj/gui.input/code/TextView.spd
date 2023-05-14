@@ -491,6 +491,11 @@ class TextView (GUIControl)
 		return true	
 
 
+	function Clamp (|intrange| r, |intrange|)
+		cpp_part Clamp2
+		r = r.resolve
+		return (.clamp(r.x), .clamp(r.x2))
+	
 	function Clamp (|int| x, |int|)
 		return x.clamp(.text.length)
 		
@@ -837,11 +842,11 @@ class TextView (GUIControl)
 				rz = rz max af
 	
 	
-	helper textviewline.abound (|int|)
+	helper textviewline.after_with_msg (|int|)
 		opt norefcounts
 		|| a = .after
 		|| la = .message.lastafter(a)
-			return a min la
+			return la.clamp(.position, a)
 		return a
 	
 	
@@ -855,9 +860,13 @@ class TextView (GUIControl)
 		|| d   = .findDrawInfo(pos)
 		require d and !d.error
 		|| msg = d.message						#require
-		|| abound = d.abound
-		if pos > abound
-			pos = .text.outwhite(pos, 0)
+		//if msg == @arg
+			//return msg // whatever
+		|| after = d.after_with_msg
+		if pos > after
+			pos = .text.outwhite(pos, after)
+			if pos < 0
+				return nil
 		
 		|| found = msg.FindTightest(pos, named)
 		if named and !found
@@ -1119,7 +1128,7 @@ class TextView (GUIControl)
 
 
 	helper InsertSub (|string| s, |intrange| p, |bool| selnew=false, |int|)
-		p = p.resolve
+		p = .clamp(p)
 		|| Same = (p.width == s.length) and self[p.x, s] 
 		|| i	= (p.x + s.length, p.x2)(!Same)
 		.ViewPos(i, .MaxVisibleLines/3) // just wants it in view... if not, then scrollback

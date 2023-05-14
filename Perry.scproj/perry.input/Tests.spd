@@ -1,4 +1,6 @@
-function whatever
-	printline "hello"
-	
 
+function nameaa
+	if 11111
+		0
+	else
+		0

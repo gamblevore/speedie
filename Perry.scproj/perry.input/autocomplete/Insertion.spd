@@ -354,6 +354,8 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 		if (state == 2)
 			if s.width
 				.sel = s.x2x2
+			else
+				require !self[s.x-1].istextline
 			return 1 // why not
 		return 0 // i think?
 	
