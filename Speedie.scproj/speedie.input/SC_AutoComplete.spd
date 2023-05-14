@@ -638,9 +638,9 @@ function RootTmpComplete (|message| cmd, |message|)
 	|| f = cmd[0][0]
 	|| req = f.next.nyme
 	|| flags = 0 // for now
-	flags += f.IsModuleType<<1
-	flags += f.IsClassType <<2
-	flags += f.LinkageType <<3
+	flags += f.IsModuleType  <<1
+	flags += f.IsClassType   <<2
+	flags += f.IsLinkageType <<3
 	flags := 1
 	rz = @tmp.msg(cmd.name)
 	|| arg = rz.msg(@arg, req)
@@ -1000,7 +1000,7 @@ class autoitem
 function message.IsClassType (|bool|)
 	return self ~= "class" or "datatype" or "struct" or "role"
 
-function message.LinkageType (|bool|)
+function message.IsLinkageType (|bool|)
 	return self ~= "linkage"
 
 
