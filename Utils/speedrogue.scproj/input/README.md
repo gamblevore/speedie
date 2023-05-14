@@ -2,7 +2,7 @@
 
 This is just a demo of a creating a rogue-like in Speedie.
 
-I have done it in a kind of strange way... I am directly working on the `message` class to store the world's current state.
+I am directly working on the `message` class to store the world's current state.
 
 Its a bit like having an XML file (jeebox in this case) where you do all work on, rather than work on objects. 
 
