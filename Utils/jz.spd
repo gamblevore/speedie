@@ -1,5 +1,33 @@
 #!/usr/local/bin/speedie
 
+function app.usage (|string|)
+	return "Usage: ${.filename} File1 [File2...]
+Convert files between jbin, box, xml formats. Additionally can compress or decompress.
+
+    -j              Convert to jeebox
+    -b              Convert to jbin
+    -c              Compress
+    -c=0            Compress for very-fast decompress
+    -s              Replace file in-place
+    -p              Print to stdout
+    -r              Just report types, otherwise do nothing
+    -o=name         Sets the output filename
+    -d=j/b/m/x/h    Detect only specified type.
+                    j = jeebox, b = jbin, m = compressed, x = xml
+
+examples:
+    jz -j A.xml   					// xml to jeebox
+    jz -c A.xml   					// compress A.xml into A.xml.mz
+    jz    A.txt.mz   				// decompress A.txt.mz to A.txt
+    jz -b A.box   					// jeebox to jbin
+    jz -b A.xml   					// xml to jbin
+"
+
+
+// compressing
+//jz -c MainMenu.xib.jbin // produces wrong file name! removes jbin!
+//jz -c MainMenu.xib.jbin -o=MainMenu.xib.jbin.mz  // same bug!!!! even if we specified the name!!!
+
 
 datatype Type (int)
 	flags
@@ -87,7 +115,7 @@ function App.GetActions (|Type|)
 		  elseif name ~= "p"
 			rz |= type.stdout
 			.SingleFile(name)
-		  elseif name ~= "o"
+		  elseif name ~= "d"
 			|| x = type.compressed * (v contains 'm')
 			x |= type.xml  * (v contains 'x')
 			x |= type.jbin * (v contains 'b')
@@ -100,39 +128,18 @@ function App.GetActions (|Type|)
 			rz |= type.compressed
 			if v!="true"
 				conv.DefaultStrength = v.int|int| max MZLab.Fastest
-		  elseif name ~= "f"
+				v="true"
+		  elseif name ~= "o"
 			Conv.destpath = v
 			.SingleFile(name)
 			check (v) "Add a value, eg: --f=value"
+			v="true"
 		  else
 			error "Unknown switch $s"
+		check (v=="true") ("This switch '$name' does not allow a value of '$v'.")
 
 	rz |= type.plain
 	check ((rz & type.actions).CountBits <= 1) ("Too many actions.")
-
-
-function app.usage (|string|)
-	return "Usage: ${.filename} File1 [File2...]
-Convert files between jbin, box, xml formats. Additionally can compress or decompress.
-
-    -j              Convert to jeebox
-    -b              Convert to jbin
-    -c              Compress
-    -c=0            Compress for very-fast decompress
-    -s              Replace file in-place
-    -p              Print to stdout
-    -r              Just report types, otherwise do nothing
-    -f=name         Sets the filename of output
-    -o=j/b/m/x/h    Detect only specified type.
-                    j = jeebox, b = jbin, m = compressed, x = xml
-
-examples:
-    jz -j A.xml   					// xml to jeebox
-    jz -c A.xml   					// compress A.xml into A.xml.mz
-    jz    A.txt.mz   				// decompress A.txt.mz to A.txt
-    jz -b A.box   					// jeebox to jbin
-    jz -b A.xml   					// xml to jbin
-"
 
 
 module Conv
@@ -206,18 +213,34 @@ module Conv
 	
 	function Time (|string| Name, |bool| compress=false)
 		require .dest isnt stdout // would ruin output
+		
 		if !compress
+			// this speed reporter would be a nice general function
+			// maybe something like "textutils.Rate" along textutils.ago (1 second ago, 1 week ago, july, etc.)
 			|| ago = .Start.ago
 			|float| scale = 1MB
 			if .data
 				size = .data.Length
 			|| speed = ""
 			|| s    = ago.seconds
-			|| s2   = (s*1000, s)(s < 0.01)
-			|| unit = ("ms", "s")(s < 0.01) 
-			conv.speed <~ "    $Name: ${s2}$unit" 
+			|| s2   = s
+			|| unit = "s"
+			if s < 0.01
+				unit = "ms"
+				s2 *= 1000
+			conv.speed <~ "    $Name: $s2$unit" 
+			|| rate = size / (scale*s)
+			unit = "MB"
+			if rate >= 1K
+				rate /= 1K
+				unit = "GB"
+			  elseif rate <= 1
+				rate *= 1K
+				unit = "KB"
+			if rate > 0.01
+				rate = (rate*100+0.5).floor/100
 			if s
-				conv.speed <~ "  (${Size/(scale*s)}MB/s)"
+				conv.speed <~ "  ($rate$unit/s)"
 			conv.speed <~ '\n'
 			// why not fill up the stats.all thing and reuse it?
 		  else
