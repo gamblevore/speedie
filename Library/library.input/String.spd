@@ -367,6 +367,11 @@ class String
 		cpp_wrapper JB_Str_Append6
 		
 	function insert (|string| s, |int| i, |int| n = 0, |string|)
+		if i < 0
+			n += i
+			i = 0
+		if n < 0
+			n = 0
 		|| fs = faststring()
 		fs.size = .length + s.length - n
 		fs.appendsection(self, 0, i)
