@@ -771,7 +771,7 @@ class TextView (GUIControl)
 	helper LineExpand (|IntRange| s, |bool| canback=false, |intrange|)
 		// this thing seems borked.
 		opt norefcounts
-		s = s.resolve
+		s = .clamp(s)
 		if canback
 			|| back = s.x2-1 
 			if self[back].istextline
