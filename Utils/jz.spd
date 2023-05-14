@@ -2,7 +2,7 @@
 
 
 datatype Type (int)
-	flags // compressed should be an action?
+	flags
 		ReadOK, Compressed, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace, TestComp
 	
 	syntax is (|Type| test, |bool|)
