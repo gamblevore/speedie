@@ -12,7 +12,7 @@ Convert files between jbin, box, xml formats. Additionally can compress or decom
     -p              Print to stdout
     -r              Just report types, otherwise do nothing
     -o=name         Sets the output filename
-    -d=j/b/m/x/h    Detect only specified type.
+    -d=j/b/m/x      Detect only specified type.
                     j = jeebox, b = jbin, m = compressed, x = xml
 
 examples:
@@ -22,11 +22,6 @@ examples:
     jz -b A.box   					// jeebox to jbin
     jz -b A.xml   					// xml to jbin
 "
-
-
-// compressing
-//jz -c MainMenu.xib.jbin // produces wrong file name! removes jbin!
-//jz -c MainMenu.xib.jbin -o=MainMenu.xib.jbin.mz  // same bug!!!! even if we specified the name!!!
 
 
 datatype Type (int)
@@ -217,6 +212,7 @@ module Conv
 		if !compress
 			// this speed reporter would be a nice general function
 			// maybe something like "textutils.Rate" along textutils.ago (1 second ago, 1 week ago, july, etc.)
+			// CompressionStats.report can use it
 			|| ago = .Start.ago
 			|float| scale = 1MB
 			if .data
@@ -317,11 +313,11 @@ module Conv
 		require .detected
 
 		.start = date.now
-		.AST = .data.Parse // no errors actually :)
-		if !.AST
-			stderr.pop
-		  else
+		.AST = .data.Parse
+		if .AST
 			.time("Parse")
+		  elseif !.data.IsJbin		// jbins should always parse
+			stderr.pop				// otherwise no.
 		.done++
 		
 		if !.AST
@@ -388,11 +384,12 @@ module Conv
 		|| str = .in.path
 		if str isa "mz"
 			str = .in.trimext
-			
-		if str isa "box" or "jbin" or "xml"
-			str = str.SetExt(.ext)
-		  else
-			str = str.AddExt(.ext) 
+		
+		|| x = .ext
+			if str isa "box" or "jbin" or "xml"			
+				str = str.SetExt(x)
+			  else
+				str = str.AddExt(x) 
 		if dest is compressed
 			str = str.AddExt("mz")
 		  elseif ((.in isa "mz") and str.FileExists) or (str == .in)
@@ -404,6 +401,7 @@ function file.FormatInfo (|&int| Size=0, |string|)
 	|| str = .Section(0, 32)
 		if str == string.error
 			return str
+	
 	if str.IsJbin
 		rz = "jbin"
 		|| mz = str.parse_jbin
