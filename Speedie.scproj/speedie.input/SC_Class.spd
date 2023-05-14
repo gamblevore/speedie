@@ -745,12 +745,12 @@ function TryAddToProject
 module
 	function SCClass.LoadLinkage
 		opt NoRefCounts
-		|| Arg = .LinkagePlace$
+		|| Arg = .LinkagePlace 				#require
 		if arg.FindClassoption("wrapper", "union") // for SDL2
 			.iswrapper = 2
 		  elseif arg.findclassoption("wrapper", nil)
 			.iswrapper = 1
-		.noautocomplete = arg.findclassoption("noauto")
+		.NoAutoComplete = arg.findclassoption("noauto")
 		  
 		.NoEarlyFree = arg.findclassoption("pragma", "NoEarlyFree")
 		.TreatAsBaseType = arg.findclassoption("pragma", "TreatAsBaseType")
