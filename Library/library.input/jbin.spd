@@ -44,11 +44,6 @@ role JBin (Faststring)
 		|| L = data.length
 		|| addr = (data.addr, nil)(L)
 		.addmemory(type, addr, into, L)
-	function add2		(|syntax| type, |string| data="", |bool|into = false)
-		|| L = data.length
-		|| addr = (data.addr, nil)(L)
-		.addmemory2(type, addr, into, L)
-
 	function add		(|syntax| type, |faststring| fs, |bool|into = false)
 		cpp_part AddFS
 		.addmemory(Type, fs.resultptr, into, fs.length)
@@ -70,11 +65,12 @@ role JBin (Faststring)
 	function jinit
 		self <~ _JbinHeader
 
-	function up (|int| amount = 1)
+	function up (|int| amount = 1) // we encode the upness in the range of syntax values that have no children
+		|| add = (@cnj|int|)-1
 		while amount > 0
-			|| curr  = amount min 16
-			self    <~ (256-curr)|byte|
-			amount  -= curr
+			|| expr  = (add + amount)  min  (@bin|int|)
+			self    <~ ((expr<<1) (|) 1)|byte|
+			amount  -= (expr-add)
 
 	function AddCstring	(|cstring| data, |syntax| type=@str)
 		.addmemory(type, data|&byte|, false, data.length)
@@ -110,10 +106,6 @@ role JBin (Faststring)
 		.NoFlush--
 
 
-//function @string.int32 (|int| n, |string|)
-//	return string.Copy((&n)|&byte|, 4)
-
-
 function stringstream.NextMsg (|Message|)
 	return .NextMsgInfo|message|
 
@@ -128,27 +120,22 @@ function stringstream.NextMsg (|message| parent=nil, |syntax| fn, |string| name=
 
 helper stringstream.NextMsgInfo (|uint64|)
 	opt norefcounts
-	|| parent = .UserObj|message|
 	while (self)
 		|uint| info = .Byte
-		if info < 160
-			if info <= 1
-				if (info == 1)
-					error (self, "Corrupted jbin")
-					exit
-				continue
-			|| T = (info >> 1)|syntax|
-			if t >= @max
-				error (self, "Corrupted jbin" )
-				t = @arg
-			|| msg = parent.msg(t, .str(.hInt))
-			if info & 1							// better to not check !parent
-				.userobj = msg
-			return msg|uint64|
-		parent = parent.upward(256-info)		// go up
-		.userobj = parent
-		require parent
-	.UserObj = nil
+		if info & 128
+			expect (.UserTable) (self, "Can't stream compacted jbin. Use .parse instead")
+			return info
+		if info == 0 :   continue
+		|| T = (info >> 1)|syntax|
+		expect (t < @max and T > @nil) (self, "Corrupted jbin")
+
+		ifn (info & 1) and t.NoChildren
+			|| msg = .UserObj|message|.msg(t, .str(.hInt))|uint64|
+			if info & 1
+				.userobj = msg|object|
+			return msg
+		  else
+			.UserObj = .UserObj|message|.upward(t|int|-7)			#require
 
 
 helper stringstream.NextMsgAllocate (|&message|)
@@ -183,16 +170,16 @@ helper stringstream.NextMsgLZ (|uint| Info)
 	|| Msg    = .UserObj|message|.msg(ref.func, ref.name)
 	if Info & 1
 		.UserObj = msg
-	
+
 
 helper stringstream.Parse_Jbliz (|MessageRoot|)
 	// compacted jbin, using lz-like scheme
-	rz = .NextMsginfo2|messageroot|
+	rz = .NextMsginfo|messageroot|
 	.NextMsgAllocate
 	while
-		|| lz = .NextMsginfo2 #loop
+		|| lz = .NextMsginfo #loop
 		if lz < 256
-			.NextMsgLZ(lz&127)
+			.NextMsgLZ(lz & 127)
 		  else
 			.NextMsgAdd(lz|message|)
 			
@@ -201,65 +188,6 @@ helper stringstream.Parse_Jbliz (|MessageRoot|)
 	.UserTable = nil
 	.UserTableCurr = nil
 
-
-function stringstream.Parse_Jbin2 (|MessageRoot|)	
-	.UserObj = nil
-	|| Header = .str(4)
-	
-	if header == _JbinHeader
-		rz = .NextMsginfo2|messageroot|
-		while .NextMsginfo2
-	  elseif Header == _JbinHeaderComp
-		rz = .parse_jbliz
-	  else
-		error (self, _jBinNotJbin)
-
-	.UserObj = nil
-
-
-helper stringstream.NextMsgInfo2 (|uint64|)
-	opt norefcounts
-	while (self)
-		|uint| info = .Byte
-		if info & 128
-			expect (.UserTable) (self, "Can't stream compacted jbin. Use .parse instead")
-			return info
-		if info == 0 :   continue
-		|| T = (info >> 1)|syntax|
-		expect (t < @max and T > @nil) (self, "Corrupted jbin")
-
-		ifn (info & 1) and t.NoChildren
-			|| msg = .UserObj|message|.msg(t, .str(.hInt))|uint64|
-			if info & 1
-				.userobj = msg|object|
-			return msg
-		  else
-			.UserObj = .UserObj|message|.upward(t|int|-7)			#require
-
-
-extend message
-	render render_jbin2 (|string| shell_path = "", |bool| Compact=false)
-		opt norefcounts
-		require self
-		|| js = fs|jbin|
-		if shell_path
-			js.sheb(shell_path)
-		js.jinit
-		|| ch	 = self
-		|| after = .FlatAfter
-		while ch != after
-			|| Depth	= 0
-			|| curr		= ch
-			ch			= curr.FlatNextDepth(depth)
-			js.Add2(curr.func, curr.name, depth > 0)
-			js.up(-depth)
-
-
-function jbin.AddMemory2	(|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
-	|uint| T = (type|uint|<<1) (|) (goin)
-	self <~ T|byte|
-	.hint(L)
-	.AppendMemory(data, L|int|)
 
 
 helper stringstream.ExpectJbin (|bool|)
@@ -271,15 +199,19 @@ helper stringstream.ExpectJbin (|bool|)
 		error (self, _jBinNotJbin)
 
 
-helper stringstream.Parse_Jbin (|bool| Burst = false, |MessageRoot|)	
-	require .expectjbin
+function stringstream.Parse_Jbin (|MessageRoot|)	
+	.UserObj = nil
+	|| Header = .str(4)
 	
-	.UserObj = nil
-	|| root = .NextMsginfo				// just avoid refcounting
-	while .NextMsginfo
-	.UserObj = nil
+	if header == _JbinHeader
+		rz = .NextMsginfo|messageroot|
+		while .NextMsginfo
+	  elseif Header == _JbinHeaderComp
+		rz = .parse_jbliz
+	  else
+		error (self, _jBinNotJbin)
 
-	return root|messageroot|
+	.UserObj = nil
 	
 
 function string.parse_jbin (|message|)
