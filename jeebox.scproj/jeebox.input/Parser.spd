@@ -18,8 +18,10 @@ ignore
 
 extend Parser
 	function Init
+		// assert that the funcs are ordered properly
 		debugger @thg.translateable  and  @opp.translateable and  @cnj.translateable  and  @tmp.translateable
-		debugger @str.isstring and @char.isstring and @sstr.isstring and @bin.isstring and @back.isstring  
+		debugger @str.isstring and @char.isstring and @sstr.isstring and @bin.isstring and @back.isstring 
+		debugger @Cnj.NoChildren and @Opp.NoChildren and @Thg.NoChildren and @Sheb.NoChildren and @SCnj.NoChildren and @SThg.NoChildren and @Num.NoChildren and @SStr
 		debugger @cnj|int| == 8 
 		debugger @max|int| <= 63  
 		
