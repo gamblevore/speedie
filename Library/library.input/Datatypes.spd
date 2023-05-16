@@ -425,6 +425,10 @@ datatype float
 	function Round (|float|)
 		cpp_wrapper (roundf)
 	
+	function Round (|float| to=100, |float|)
+		cpp_Part RoundTo
+		return (self * to + 0.5).floor / to
+	
 	operator avg (|float| f, |float|)
 		return (f + self) * 0.5
 	

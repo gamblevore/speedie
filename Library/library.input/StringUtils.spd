@@ -48,6 +48,7 @@ function byte.IsVowel (|bool|)
 
 
 function int.operatorpc (|int| x, |string|) 
+	// disable this... 
 	return (self|float| / x|float|).pc
 
 
@@ -131,4 +132,39 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			i = WordEnd
 			continue
 
+		
+function faststring.RenderSpeed (|float| seconds,  |int64| BytesIn, |int64| BytesOut, |string| Name)
+	|float| scale = 1MB
+	|| speed = ""
+	|| s2   = seconds
+	|| unit = "s"
+	if seconds < 0.01
+		unit = "ms"
+		s2 *= 1000
+	s2 = s2.round(100)
+	if name
+		self <~ Name
+		self <~ ": "
+	if BytesOut 
+		BytesIn.strsize(self)
+		self <~ " to "
+		Bytesout.strsize(self)
+		self <~ " ("
+		self <~ ((Bytesout|float| / Bytesin|float|)*100.0).round(10)
+		self <~ "%) "
+	self <~ "in $s2$unit" 
+	|| rate = BytesIn / (scale*seconds)
+	unit = "MB"
+	if rate >= 1K
+		rate /= 1K
+		unit = "GB"
+	  elseif rate <= 1
+		rate *= 1K
+		unit = "KB"
+	if rate > 0.01
+		rate = rate|float|.round(100)
+	if seconds
+		self <~ "  ($rate$unit/s)"
+
+//		fs <~ "${.in.strsize} to ${.out.strsize} ($pc) in at ${spd.strsize}/s (${durr}s)"
 
