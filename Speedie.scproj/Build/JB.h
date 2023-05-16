@@ -147,17 +147,11 @@ struct FloatRange;
 
 struct FlowPart;
 
-struct HollyPlanter;
-
-struct HollyPotter;
-
 struct IntDownRange;
 
 struct IPCMessage;
 
 struct IR;
-
-struct MessageDict;
 
 struct MessagePosition;
 
@@ -270,8 +264,6 @@ struct FastString_Behaviour;
 struct Message_Behaviour;
 
 struct StringShared_Behaviour;
-
-struct MessageID_Behaviour;
 
 struct SCBase_Behaviour;
 
@@ -410,8 +402,6 @@ struct ASMFunc2;
 struct GUIControl;
 
 struct Message;
-
-struct MessageID;
 
 struct Message;
 
@@ -849,14 +839,17 @@ struct StringStream_Behaviour: Object_Behaviour {
 };
 
 JBClass ( StringStream , JB_Object , 
+	int Length;
 	FastBuff Data;
 	JB_File* File;
 	StringStream* Decomp;
-	int Length;
+	JB_Object* UserObj;
+	Message** UserTableEnd;
+	Message** UserTableCurr;
+	Message** UserTable;
 	int ChunkSize;
 	int StartFrom;
 	bool _NoMoreChunks;
-	JB_Object* UserObj;
 );
 
 struct SyntaxObj_Behaviour: Object_Behaviour {
@@ -1248,13 +1241,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1833])
+#define kJB__ErrorColors_bold (JB_LUB[1835])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1834])
-#define kJB__ErrorColors_good (JB_LUB[1835])
-#define kJB__ErrorColors_normal (JB_LUB[1836])
-#define kJB__ErrorColors_underline (JB_LUB[1835])
-#define kJB__ErrorColors_warn (JB_LUB[1837])
+#define kJB__ErrorColors_error (JB_LUB[1836])
+#define kJB__ErrorColors_good (JB_LUB[1837])
+#define kJB__ErrorColors_normal (JB_LUB[1838])
+#define kJB__ErrorColors_underline (JB_LUB[1837])
+#define kJB__ErrorColors_warn (JB_LUB[1839])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1456,6 +1449,8 @@ extern JB_String* JB__zalgo_up;
 extern JB_String* JB___AppConfString;
 extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
+extern JB_String* JB__JbinHeaderComp;
+extern JB_String* JB__jBinNotJbin;
 extern bool _once1;
 extern bool _once2;
 extern Dictionary* JB__SyxDict_;
@@ -1474,7 +1469,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[340])
 #define kSC_BitNot (JB_LUB[440])
 #define kSC_BitOr (JB_LUB[646])
-#define kSC_BitXor (JB_LUB[1838])
+#define kSC_BitXor (JB_LUB[1840])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1504,7 +1499,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1839])
+#define kJB_SaverStart1 (JB_LUB[1841])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1833,7 +1828,6 @@ extern byte SC__ASM_NoisyASM;
 extern IR SC__flat_Dummy;
 extern MWrap* SC__flat_JSMSpace;
 extern CompressionStats JB__MzSt_All;
-#define kJB__HRV_MaxOneByte (255 - (32 + 16))
 #define kSC__IR_MsgDebugPosShift (19)
 extern Array* SC__IR_Resources;
 
@@ -1978,7 +1972,7 @@ void JB_App__PrefSet(JB_String* s, JB_String* Value);
 
 JB_String* JB_App__pref_path();
 
-void JB_App__PrefsInit(Date when);
+bool JB_App__PrefsInit(Date when);
 
 void JB_App__Restart();
 
@@ -3697,6 +3691,8 @@ Message* JB_Syx_IntMsg(Syntax self, int64 name);
 
 JB_String* JB_Syx_Name(Syntax self);
 
+bool JB_Syx_NoChildren(Syntax self);
+
 SyntaxObj* JB_Syx_Obj(Syntax self);
 
 Message* JB_Syx_OperatorPlus(Syntax self, JB_String* m);
@@ -4291,12 +4287,6 @@ void JB_FastBuff_SyntaxExpect(FastBuff* self, JB_String* s);
 // JB_GameFlyingMem
 
 
-// JB_HollyPlanter
-
-
-// JB_HollyPotter
-
-
 // JB_IntDownRange
 
 
@@ -4326,8 +4316,6 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
-void SC_IR_Print(IR* self);
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -4342,9 +4330,6 @@ int SC_IR__InitCode_();
 
 
 // JB_MemoryWorld
-
-
-// JB_MessageDict
 
 
 // JB_MessagePosition
@@ -4605,9 +4590,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_StringShared_Behaviour
-
-
-// JB_MessageID_Behaviour
 
 
 // JB_SCBase_Behaviour
@@ -5818,11 +5800,19 @@ Message* JB_SS_NextMsg(StringStream* self);
 
 Message* JB_SS_NextMsgExpect(StringStream* self, Message* parent, Syntax fn, JB_String* name);
 
+void JB_SS_NextMsgAdd(StringStream* self, Message* New);
+
+Message** JB_SS_NextMsgAllocate(StringStream* self);
+
 uint64 JB_SS_NextMsgInfo(StringStream* self);
+
+void JB_SS_NextMsgLZ(StringStream* self, uint Info);
 
 bool JB_SS_NoMoreChunks(StringStream* self);
 
-Message* JB_SS_Parse_Jbin(StringStream* self, bool Burst);
+Message* JB_SS_Parse_Jbin(StringStream* self);
+
+Message* JB_SS_Parse_Jbliz(StringStream* self);
 
 int64 JB_SS_Position(StringStream* self);
 
@@ -5841,8 +5831,6 @@ JB_String* JB_SS_StrNoAdvance(StringStream* self, int n, int skip);
 inline bool JB_SS_SyntaxCast(StringStream* self);
 
 void JB_SS_SyntaxExpect(StringStream* self, JB_String* Error);
-
-bool JB_SS_test(StringStream* self, JB_String* Header);
 
 StringStream* JB_SS__Alloc();
 
@@ -7867,7 +7855,7 @@ Message* JB_Msg_RemoveTypeCasts(Message* self);
 
 JB_String* JB_Msg_Render(Message* self, FastString* fs_in);
 
-JB_String* JB_Msg_render_jbin(Message* self, JB_String* shell_path, FastString* fs_in);
+JB_String* JB_Msg_render_jbin(Message* self, JB_String* shell_path, bool Compact, FastString* fs_in);
 
 void JB_Msg_RenderPrm(Message* self, FastString* fs, byte b1, byte b2);
 
@@ -8079,9 +8067,6 @@ bool JB_Msg__TreeCompare(Message* orig, Message* reparse, bool PrintIfSame);
 
 
 
-// JB_MessageID
-
-
 // JB_MessageRoot
 
 
@@ -8226,7 +8211,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
