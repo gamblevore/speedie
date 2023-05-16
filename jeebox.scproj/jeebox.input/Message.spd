@@ -1024,11 +1024,11 @@ class Message (RingTree)
 			|| mul = f.name.ParseFloat
 			if self == "K"
 				mul *= 1K
-			elseif self == "M"
+			  elseif self == "M"
 				mul *= 1M
-			elseif self == "G"
+			  elseif self == "G"
 				mul *= 1G
-			else
+			  else
 				error (self, "Invalid unit")
 				return 0
 			return mul
@@ -1120,7 +1120,6 @@ class Message (RingTree)
 	module
 /*		function SuperNew (|memorylayer| m, |message|)
 	// new design... for simpler constructors
-			visible
 			if m == nil
 				return message()
 			return message.newwithlayer(m)
