@@ -1,14 +1,17 @@
 
 
 class StringStream
+	|int|			Length
 	|FastBuff|		Data
 	|file|			File
 	|stringstream|	Decomp
-	|int|			Length
+	|object--|		UserObj				// for jbin
+	|&Message--|	UserTableEnd		// for jbin
+	|&Message--|	UserTableCurr		// for jbin
+	|&Message--|	UserTable			// for jbin
 	|int|			ChunkSize
 	|int| 			StartFrom
 	|bool| 			_NoMoreChunks
-	|object--|		UserObj // for jbin
 
 	linkage:cpp_Part SS
 	
@@ -18,6 +21,7 @@ class StringStream
 		.data.readfrom = Data
 		.length = Data.length
 		._NoMoreChunks = true
+	
 	
 	constructor (|file| file, |int| ChunkSize=4MB)
 		cpp_part ConstructorFile
@@ -171,7 +175,7 @@ class StringStream
 	function utf8 (|int|n, |int|skip=0, |string|)
 		return  .str(n,skip).utf16to8(2)
 
-	function test (|string| Header, |bool|)
+	function Test (|string| Header, |bool|)
 		if !Header
 			return true
 		return Header == .str(Header.length)
@@ -181,6 +185,7 @@ class StringStream
 
 	syntax expect (|string| Error)
 		opt norefcounts
+		.UserObj = nil
 		require !.data.ErrorReported
 		.data.ErrorReported = true
 		if !error

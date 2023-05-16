@@ -1,7 +1,9 @@
 
 // jbin: streamable, binary jeebox
 
-|| _JbinHeader = "\01\10\EA\E2"     /// can't put a constant in a role? 
+|| _JbinHeader     = "\01\10\EA\E2"     /// can't put a constant in a role? 
+|| _JbinHeaderComp = "\01\11\EA\E2"
+|| _jBinNotJbin    = "Not jbin"
 
 
 extend message
@@ -140,35 +142,123 @@ helper stringstream.NextMsgInfo (|uint64|)
 		if info < 160
 			if info <= 1
 				if (info == 1)
-					error (self, "Corrupt jbin")
+					error (self, "Corrupted jbin")
 					exit
 				continue
 			|| T = (info >> 1)|syntax|
 			if t >= @max
 				error (self, "Corrupted jbin" )
 				t = @arg
-			|| GoIn = info & 1
-			|| msg = parent.msg(t, .str(.hInt))|uint64|
-			if !parent or GoIn
-				.userobj = msg|object|
-			return msg
-		parent = parent.upward(256-info)			// go up
+			|| msg = parent.msg(t, .str(.hInt))
+			if info & 1							// better to not check !parent
+				.userobj = msg
+			return msg|uint64|
+		parent = parent.upward(256-info)		// go up
 		.userobj = parent
 		require parent
 	.UserObj = nil
 
 
+helper stringstream.NextMsgAllocate (|&message|)
+	require !.Data.ErrorReported
+	
+	|| pos = .UserTableCurr - .UserTable
+	|| Amount = (pos*2) max 4K
+	rz = Memory.realloc(.usertable, Amount * platform.PointerBytes)|&message|
+		
+	expect rz (self, "jbin can't allocate")
+	.UserTable = rz
+	.UserTableCurr = rz + pos
+	.UserTableEnd = rz + Amount
+
+
+helper stringstream.NextMsgAdd (|Message| New)
+	|| c = .UserTableCurr
+	if c >= .UserTableEnd
+		c = .NextMsgAllocate #require
+	*c++ = New
+	.UserTableCurr = c
+	
+	
+helper stringstream.NextMsgLZ (|uint| Info)
+	opt norefcounts
+	if Info < 16
+		Info |= .hInt << 4
+	  else
+		Info -= 15
+	|| Index  = Info >> 1
+	|| Ref    = .UserTableEnd[-Index]
+	|| Msg    = .UserObj|message|.msg(ref.func, ref.name)
+	if Info & 1
+		.UserObj = msg
+	
+
+function stringstream.Parse_Jbin2 (|MessageRoot|)	
+	.UserObj = nil
+	|| Header = .str(4)
+	
+	if header == _JbinHeader
+		rz = .NextMsginfo2|messageroot|
+		while .NextMsginfo2
+	
+	  elseif Header == _JbinHeaderComp
+		rz = .NextMsginfo2|messageroot|
+		.NextMsgAllocate
+		while
+			|| lz = .NextMsginfo2 #loop
+			if lz < 256
+				.NextMsgLZ(lz&127)
+			  else
+				.NextMsgAdd(lz|message|)
+				
+		memory.Free(.UserTable)
+		.UserTableEnd = nil
+		.UserTable = nil
+		.UserTableCurr = nil
+	
+	  else
+		error (self, _jBinNotJbin)
+
+	.UserObj = nil
+
+
+helper stringstream.NextMsgInfo2 (|uint64|)
+	opt norefcounts
+	while (self)
+		|uint| info = .Byte
+		if info & 128
+			expect (.UserTable) (self, "Can't stream compacted jbin. Use .parse instead")
+			return info
+		if info == 0 :   continue
+		|| T = (info >> 1)|syntax|
+		expect (t < @max and T > @nil) (self, "Corrupted jbin")
+
+		ifn (info & 1) and t.NoChildren
+			|| msg = .UserObj|message|.msg(t, .str(.hInt))|uint64|
+			if info & 1
+				.userobj = msg|object|
+			return msg
+		  else
+			.UserObj = .UserObj|message|.upward(t|int|-7)			#require
+
+
+
 helper stringstream.ExpectJbin (|bool|)
-	if .test(_JbinHeader)
-		return true
-	error (self, "Not jbin")
+	// remove this func :) only decompressinto needs it!
+	|| Header = .str(4)
+	if header == _JbinHeader
+		rz = true
+	  else
+		error (self, _jBinNotJbin)
 
 
 helper stringstream.Parse_Jbin (|bool| Burst = false, |MessageRoot|)	
 	require .expectjbin
 	
+	.UserObj = nil
 	|| root = .NextMsginfo				// just avoid refcounting
 	while .NextMsginfo
+	.UserObj = nil
 
 	return root|messageroot|
 	
@@ -184,13 +274,3 @@ function string.digest (|string|)
 		return self
 	return .parse$.render_jbin
 
-/*
-	New jbin idea
-	16-bit
-	1bit-lz
-	1bit-DR
-	6-bit type
-	8-bit length (noob-coded)
-	
-	What about the upness? I think...
-*/
