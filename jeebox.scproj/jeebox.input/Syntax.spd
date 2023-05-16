@@ -24,6 +24,9 @@ datatype Syntax (Byte)
 	function IsString (|bool|)
 		return self >= @sstr and self <= @str
 
+	function NoChildren (|bool|)
+		return self >= @Cnj	and self <= @Bin
+
 	function IsRel (|bool|) 
 		return self >= @rel and self <= @yoda
 
