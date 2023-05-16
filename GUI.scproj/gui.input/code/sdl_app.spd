@@ -372,7 +372,7 @@ module SDLApp
 	
 	helper SelectorFlash
 		.LastFlashSelector = .FlashSelector
-		.FlashSelector     = (((.FrameCount-.LastFrameSelMove)>>5) mod 2) and !.IsBackground
+		.FlashSelector     = !.IsBackground and (((.FrameCount-.LastFrameSelMove)>>6) mod 2) 
 
 
 	function ClearAlerts
@@ -443,12 +443,24 @@ module SDLApp
 		return __modules__.window.front.droppinginto?
 
 
-	function Window.EveryFrame
+	helper guicontrol.NeedsSelFlashChange (|bool|)
 		opt norefcounts
-		|| f = .realfocus$
-		if !sdlapp.isbackground and (f isa textview)
-			if (f is editable) and (!f.selrange.width) and (sdlapp.FlashSelector != sdlapp.LastFlashSelector)
-				sdlapp.touch(f)
+		if !sdlapp.isbackground and (self isa textview)
+			if (self is editable) and (!.selrange.width) and (sdlapp.FlashSelector != sdlapp.LastFlashSelector)
+				return true
+	
+	
+	helper Window.EveryFrame
+		opt norefcounts
+		|| f = .realfocus				#require
+		if !f.NeedsSelFlashChange
+			// we should optimise this.
+			// we need to copy the picture, then draw the selector into the picture.
+			// what if the selector is obscured? Like off screen? or under another control? like a popupinfofield.
+			// we could save two versions of the screen? Or save the selector pixels somewhere? Like mark them?
+			// "These are the selector pixels"... and just save both versions.
+			// there is sooo much that can go wrong with that. I'll just not do it... for now.
+			sdlapp.touch(f)
 		if f isnt visible
 			if f == .innerfocus
 				.setinnerfocus(nil)
