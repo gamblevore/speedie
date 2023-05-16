@@ -1248,7 +1248,8 @@ class TextView (GUIControl)
 		|| i = .ProperSelectLine
 		if i.width <= 1
 			return false
-		i -= (0,1)
+		if !keys.option
+			i -= (0,1)
 		.insertsub("", i, false)
 		return true
 		
