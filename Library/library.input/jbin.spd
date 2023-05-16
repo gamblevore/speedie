@@ -127,6 +127,7 @@ helper stringstream.NextMsgInfo (|uint64|)
 			return info
 		if info == 0 :   continue
 		|| T = (info >> 1)|syntax|
+		check (T > @nil) (self, "jbin header was not pre-loaded.")
 		expect (t < @max and T > @nil) (self, "Corrupted jbin")
 
 		ifn (info & 1) and t.NoChildren
@@ -188,15 +189,6 @@ helper stringstream.Parse_Jbliz (|MessageRoot|)
 	.UserTable = nil
 	.UserTableCurr = nil
 
-
-
-helper stringstream.ExpectJbin (|bool|)
-	// remove this func :) only decompressinto needs it!
-	|| Header = .str(4)
-	if header == _JbinHeader
-		rz = true
-	  else
-		error (self, _jBinNotJbin)
 
 
 function stringstream.Parse_Jbin (|MessageRoot|)	
