@@ -145,14 +145,15 @@ function faststring.RenderSpeed (|float| seconds,  |int64| BytesIn, |int64| Byte
 	if name
 		self <~ Name
 		self <~ ": "
+	BytesIn.strsize(self)
 	if BytesOut 
-		BytesIn.strsize(self)
 		self <~ " to "
 		Bytesout.strsize(self)
 		self <~ " ("
 		self <~ ((Bytesout|float| / Bytesin|float|)*100.0).round(10)
-		self <~ "%) "
-	self <~ "in $s2$unit" 
+		self <~ "%)"
+
+	self <~ " in $s2$unit" 
 	|| rate = BytesIn / (scale*seconds)
 	unit = "MB"
 	if rate >= 1K
