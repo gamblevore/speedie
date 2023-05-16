@@ -1,5 +1,6 @@
 #!/usr/local/bin/speedie
 
+
 function app.usage (|string|)
 	return "Usage: ${.filename} File1 [File2...]
 Convert files between jbin, box, xml formats. Additionally can compress or decompress.
@@ -68,7 +69,7 @@ function app.UseAll (|file| start)
 		  elseif c.IsLink
 			printline "Can't recursively enter link: " + c
 		  elseif c.visible
-			.useall(c)
+			.useall(c) 
 	
 main {
 	if !app.args
@@ -204,46 +205,21 @@ module Conv
 		require stderr.ok
 		
 		.out.CompareFile(Orig, Orig)
-		
-	
+
+
 	function Time (|string| Name, |bool| compress=false)
 		require .dest isnt stdout // would ruin output
 		
+		conv.speed <~ (' ', 4)
 		if !compress
-			// this speed reporter would be a nice general function
-			// maybe something like "textutils.Rate" along textutils.ago (1 second ago, 1 week ago, july, etc.)
-			// CompressionStats.report can use it
-			|| ago = .Start.ago
-			|float| scale = 1MB
 			if .data
-				size = .data.Length
-			|| speed = ""
-			|| s    = ago.seconds
-			|| s2   = s
-			|| unit = "s"
-			if s < 0.01
-				unit = "ms"
-				s2 *= 1000
-			conv.speed <~ "    $Name: $s2$unit" 
-			|| rate = size / (scale*s)
-			unit = "MB"
-			if rate >= 1K
-				rate /= 1K
-				unit = "GB"
-			  elseif rate <= 1
-				rate *= 1K
-				unit = "KB"
-			if rate > 0.01
-				rate = (rate*100+0.5).floor/100
-			if s
-				conv.speed <~ "  ($rate$unit/s)"
-			conv.speed <~ '\n'
-			// why not fill up the stats.all thing and reuse it?
+				size = .data.Length 
+			|| s = .Start.ago.seconds
+			conv.speed.RenderSpeed(s, size, 0, name)
 		  else
-			conv.speed <~ (' ', 4)
 			CompressionStats.all.Render(conv.speed)
 			CompressionStats.all.Clear
-			conv.speed <~ '\n'
+		conv.speed <~ '\n'
 
 		
 	function CompressOnly (|bool| Decomp)
@@ -316,7 +292,9 @@ module Conv
 		.AST = .data.Parse
 		if .AST
 			.time("Parse")
-		  elseif !.data.IsJbin		// jbins should always parse
+		  elseif (dest is box or jbin) or  .data.IsJbin
+			StdErr.Errors.Last.name += "\nUnable to parse input file for conversion to jeebox"
+		  else
 			stderr.pop				// otherwise no.
 		.done++
 		
@@ -333,7 +311,7 @@ module Conv
 		  else
 			.detected |= type.box
 
-		return true
+		return StdErr.ok
 
 
 	function Transform (|bool|) 
@@ -383,7 +361,7 @@ module Conv
 			return .in
 		|| str = .in.path
 		if str isa "mz"
-			str = .in.trimext
+			str = str.trimext
 		
 		|| x = .ext
 			if str isa "box" or "jbin" or "xml"			

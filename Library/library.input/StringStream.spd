@@ -4,11 +4,8 @@ class StringStream
 	|int|			Length
 	|FastBuff|		Data
 	|file|			File
-	|stringstream|	Decomp
 	|object--|		UserObj				// for jbin
-	|&Message--|	UserTableEnd		// for jbin
-	|&Message--|	UserTableCurr		// for jbin
-	|&Message--|	UserTable			// for jbin
+	|&MessageDecompressor| 	Decomp				// also
 	|int|			ChunkSize
 	|int| 			StartFrom
 	|bool| 			_NoMoreChunks

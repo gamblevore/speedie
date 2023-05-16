@@ -16,18 +16,14 @@ class StringShared (string)
 
 
 
-/*
-// i think we aren't using this anymore!
-class MessageID (stringshared)
+class MessageID (stringshared)				// now is usefully used! :D
 	linkage
 		cpp_part ID
 		
 	contains object
-	|Syntax|			Func
-	|uint|				Position
 	||					Obj
-	|uint64|			ID
-	|uint64|			Frequency
+	|uint64| 			Tag
+	|Syntax|			Func
 	
 	render
 		fs <~ .func.name
@@ -35,71 +31,71 @@ class MessageID (stringshared)
 		if .length
 			fs.AppendQuotedEscape(self)
 	
-	constructor (|string| Name="", |Syntax| Fn=nil, |uint| pos=0)
+	constructor (|string| Name, |Syntax| Fn, |uint64| Tag)
 		super.constructor(name)
 		.Func = fn
-		.Position = pos
-		.obj = nil // c++ generator fails otherwise
-		
+		.obj = nil               // c++ generator fails otherwise
+		.tag = tag
 		
 	function Msg (|message| parent, |message|)
 		return Message(parent, .func, -1, .name, .name.length)
-	
-	module
-		function IDSorter (SorterComparer)
-			opt norefcounts
-			|| aa = a|MessageID|,   || bb = b|MessageID| 
+
+
+
+struct MessageDecompressor
+	linkage:cpp_part Mxpd
+	|&Message--|					End
+	|&Message--|					Curr
+	|&Message--|					Table
+
+	helper Allocate (|&message|)
+		require !StdErr.ok
+		
+		|| pos = .Curr - .Table
+		|| Amount = (pos*2) max 4K
+		rz = Memory.realloc(.table, Amount * platform.PointerBytes)|&message|
 			
-			|| diff = aa.Frequency  -  bb.Frequency
-				return diff > 0							// more frequent should have lower lengths
-				
-			return aa.Position < bb.Position
-			// Now what?
-
-
-
-function Message.Identify (|&(MessageDict of messageid)| d,  |[messageid]| table, |uint|)
-	opt NoRefCounts
-	|| s = self
-	|| Count = 0
-	while s
-		|| name = s.name
-		d.TotalCount++
-		d.TotalStringLength += name.length	// an accumulative stat 
-		|| Found = d.makeplace(s)
-		|| ID = *found
-		if ID != nil
-			ID.Frequency++
-		  else
-			rz += name.Length				// a direct result within self
-			id = MessageID(name, s.func)
-			id.Position = Count++
-			*found = id
-			d.uniquecount++
-			if table != nil
-				table <~ id
-		s.Name = id
-		s = s.flatnext
-	d.UniqueStringLength += rz
-
-
-
-struct MessageDict 
-	contains object
-	|(dictionary of ...)[64]| D
-	|uint|		UniqueCount
-	|uint|		TotalCount
-	|uint64|	TotalStringLength
-	|uint64|	UniqueStringLength
+		expect rz ("jbin decompressor can't allocate")
+		.Table = rz
+		.Curr = rz + pos
+		.End = rz + Amount
 	
-	function MakePlace (|message| m, |&...|)
+	syntax append (|Message| New, |bool|)
+		|| c = .Curr
+		if c >= .End
+			c = .Allocate #require
+		*c++ = New
+		.Curr = c
+		return true
+	
+	destructor
+		memory.Free(.Table)
+		.End = nil
+		.Table = nil
+		.Curr = nil
+	
+
+
+struct MessageCompressor (MessageDecompressor)
+	linkage:cpp_part MCmp
+	|(dictionary of messageID)[64]| D
+	
+	function Position (|int|)
+		return .curr - .table
+		
+	function MakePlace (|message| m, |&byte|)
 		opt norefcounts
 		|| fn = m.func
 		if fn|int| < 64
 			|| pl = &.d[fn]
 			|| v = (*pl) init dictionary()
-			return v.makeplace(m.name)
-	
+			return v.MakePlace(m.name)|&byte|
+
+	function Find (|message| m, |MessageID|)
+		opt norefcounts
+		|| where = .MakePlace(m)|&messageID|
+			return *where init MessageID(m.name, m.func, .Position)
+		return nil
+		
 	destructor
-*/	
-	
+

@@ -15,15 +15,35 @@ extend message
 		if shell_path
 			js.sheb(shell_path)
 		js.jinit
+		if Compact
+			|MessageCompressor| D
+			.render_jbin_sub(js,   d)
+		  else
+			.render_jbin_sub(js, nil)
+			
+	helper render_jbin_sub (|jbin| js, |&MessageCompressor| D)
+		opt norefcounts
 		|| ch	 = self
 		|| after = .FlatAfter
 		while ch != after
 			|| Depth	= 0
 			|| curr		= ch
 			ch			= curr.FlatNextDepth(depth)
-			js.Add(curr.func, curr.name, depth > 0)
+			if !D or !js.Render_Compress(curr, D, depth > 0)
+				js.Add(curr.func, curr.name, depth > 0)
 			js.up(-depth)
 
+	helper faststring.Render_Compress (|message| Curr, |&MessageCompressor| D, |bool| Down, |bool|)
+		// now what? detect
+		|| back = d.Find(curr)								#require
+		|| info = ((d.position - back.Tag)-1 << 1)  (|)  Down 
+		if info < 112
+			self <~ ((info+15)(|)128)|byte|
+		  else
+			self <~ ((info&15)(|)128)|byte|
+			.hint(info>>4)
+		return true
+		
 
 role JBin (Faststring)
 	linkage: cpp_part bin
@@ -118,17 +138,17 @@ function stringstream.NextMsg (|message| parent=nil, |syntax| fn, |string| name=
 		rz = nil
 
 
-helper stringstream.NextMsgInfo (|uint64|)
+helper stringstream.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
 	opt norefcounts
 	while (self)
 		|uint| info = .Byte
 		if info & 128
-			expect (.UserTable) (self, "Can't stream compacted jbin. Use .parse instead")
+			expect (CanDecomp) (self, "Can't stream compacted jbin. Use .parse instead")
 			return info
 		if info == 0 :   continue
 		|| T = (info >> 1)|syntax|
-		check (T > @nil) (self, "jbin header was not pre-loaded.")
-		expect (t < @max and T > @nil) (self, "Corrupted jbin")
+		check  (T > @nil)				(self, "jbin header was not pre-loaded.")
+		expect (t < @max and T > @nil)	(self, "Corrupted jbin")
 
 		ifn (info & 1) and t.NoChildren
 			|| msg = .UserObj|message|.msg(t, .str(.hInt))|uint64|
@@ -138,36 +158,15 @@ helper stringstream.NextMsgInfo (|uint64|)
 		  else
 			.UserObj = .UserObj|message|.upward(t|int|-7)			#require
 
-
-helper stringstream.NextMsgAllocate (|&message|)
-	require !.Data.ErrorReported
 	
-	|| pos = .UserTableCurr - .UserTable
-	|| Amount = (pos*2) max 4K
-	rz = Memory.realloc(.usertable, Amount * platform.PointerBytes)|&message|
-		
-	expect rz (self, "jbin can't allocate")
-	.UserTable = rz
-	.UserTableCurr = rz + pos
-	.UserTableEnd = rz + Amount
-
-
-helper stringstream.NextMsgAdd (|Message| New)
-	|| c = .UserTableCurr
-	if c >= .UserTableEnd
-		c = .NextMsgAllocate #require
-	*c++ = New
-	.UserTableCurr = c
-	
-	
-helper stringstream.NextMsgLZ (|uint| Info)
+helper stringstream.NextMsgLZ (|messagedecompressor| D, |uint| Info)
 	opt norefcounts
 	if Info < 16
 		Info |= .hInt << 4
 	  else
 		Info -= 15
 	|| Index  = Info >> 1
-	|| Ref    = .UserTableEnd[-Index]
+	|| Ref    = D.End[-Index]
 	|| Msg    = .UserObj|message|.msg(ref.func, ref.name)
 	if Info & 1
 		.UserObj = msg
@@ -176,19 +175,13 @@ helper stringstream.NextMsgLZ (|uint| Info)
 helper stringstream.Parse_Jbliz (|MessageRoot|)
 	// compacted jbin, using lz-like scheme
 	rz = .NextMsginfo|messageroot|
-	.NextMsgAllocate
+	|MessageDecompressor| Decomp
 	while
-		|| lz = .NextMsginfo #loop
+		|| lz = .NextMsginfo(true) #loop
 		if lz < 256
-			.NextMsgLZ(lz & 127)
+			.NextMsgLZ(decomp, lz & 127)
 		  else
-			.NextMsgAdd(lz|message|)
-			
-	memory.Free(.UserTable)
-	.UserTableEnd = nil
-	.UserTable = nil
-	.UserTableCurr = nil
-
+			loop Decomp <~ lz|message|
 
 
 function stringstream.Parse_Jbin (|MessageRoot|)	

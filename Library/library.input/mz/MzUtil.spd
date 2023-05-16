@@ -162,10 +162,7 @@ struct CompressionStats
 			d += date()
 		return d.seconds
 	render
-		|| durr = .durr
-		|int64| spd = (.in max .out)/durr
-		|| pc = .out pc .in
-		fs <~ "${.in.strsize} to ${.out.strsize} ($pc) in at ${spd.strsize}/s (${durr}s)"
+		fs.RenderSpeed(.durr, .in, .out, "")
 	module
 		|compressionstats| All // noice
 		function New (|compressionstats|)
