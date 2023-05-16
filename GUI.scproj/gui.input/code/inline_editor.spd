@@ -27,11 +27,8 @@ struct InlineEditor
 	
 	function NextSearch
 		|| L = .EditingFor
-		if L
-			ifn L.__Search__(sdlapp.LastSearch, false)
-				beep
-			  else
-				sdlapp.touch(self.editor)
+		if L and !L.__Search__(sdlapp.LastSearch, false)
+			beep
 
 	
 	function AcceptSearch (|string|s)
@@ -89,7 +86,6 @@ struct InlineEditor
 	
 	function Edit (|ListViewCell| r, |ListView| l, |bool|)
 		opt norefcounts
-		sdlapp.touch(.editor)
 		if !l
 			|| l2 = .editingfor
 			if l2 isa listview

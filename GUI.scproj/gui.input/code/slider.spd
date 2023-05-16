@@ -32,13 +32,18 @@ class Slider (GuiControl)
 	
 	setter Value (|float|)
 		.setvalue(value)
-	function setvalue (|float| value)
+		
+	function SetValue (|float| value)
 		if (value > .valuecap) and (!keys.shift)
 			value = .valuecap
-		require (.value != value) or (.InitialValue)
-		.value = value.clamp
+		
+		value = value.clamp
+		|| diff = .value != value
+		require diff or .InitialValue
+		.value = value
 		.InitialValue = false
-		sdlapp.touch(Self)
+		if diff
+			sdlapp.touch(Self)
 		if (.onslide)
 			(.onslide)(self)
 	

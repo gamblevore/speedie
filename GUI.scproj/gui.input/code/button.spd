@@ -10,6 +10,7 @@ class ButtonView (GUIControl)
 	|date|						StepDuration
 	|date|						DelayTill
 	|guicontrol|				SubControl
+	|listviewrow|				CurrOverItem
 	|listviewrow|				Items
 	|listviewrow|				ClickedItem
 	|int|						ItemWidth
@@ -82,9 +83,14 @@ class ButtonView (GUIControl)
 
 
 	behaviour MouseMove
-		if (state is enter or leave) or .Items
+		opt norefcounts
+		if (state is enter or leave)
 			sdlapp.touch
-		(.onover)(self, state|int|, .itemat(p.x))?
+		|| item = .itemat(p.x)
+		if .CurrOverItem != item
+			.CurrOverItem = item
+			sdlapp.touch
+		(.onover)(self, state|int|, item)?
 
 
 	function XOfItem (|listviewrow| row, |ind|)

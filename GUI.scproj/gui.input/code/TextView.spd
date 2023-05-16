@@ -816,19 +816,21 @@ class TextView (GUIControl)
 				(d isnt found)
 				(d isnt currfound)
 				rz = true
+				sdlapp.touch(Self)
 
 
 	function LineErrorAdd (|error| e)
 		opt norefcounts
-		|| r = .FindDrawInfo(.clamp(e.position))
-			r.TrySetError(e)
+		|| r = .FindDrawInfo(.clamp(e.position))		#require
+		if r.TrySetError(e) or !.myerror
 			.myerror := e
 			sdlapp.touch(Self)
 
 
 	function FoundAt (|int| x, |bool| IsCurr)
 		opt norefcounts
-		|| r = .FindDrawInfo(x)
+		|| r = .FindDrawInfo(x) #require
+		if (r isnt found) or (r is currfound) != iscurr
 			(r is found)
 			(r is CurrFound) = iscurr
 			sdlapp.touch(Self)

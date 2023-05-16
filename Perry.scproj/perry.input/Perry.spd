@@ -291,7 +291,6 @@ function ext (|string|)
 
 function ViewAsVis (|bool| vis)
 	opt norefcounts
-	sdlapp.touch
 	.istextonly = !vis
 	|| AnyViews = false
 	for v in .ViewButtons

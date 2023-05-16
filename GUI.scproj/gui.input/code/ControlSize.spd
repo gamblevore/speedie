@@ -8,12 +8,19 @@ struct ControlSize
 	|controlrect|				GSize
 	
 	setter g (|int| i, |ControlPoint|)
-		.GSize[i] = value
-		sdlapp.resized
+		if .gsize[i] != value
+			.GSize[i] = value
+			sdlapp.resized
 	
 	function setsize (|controlrect| GSize) // only one we need, right?
-		.GSize = gsize
-		sdlapp.resized
+		ifn .gsize equals gsize
+			.GSize = gsize
+			sdlapp.resized
+	
+	function ivec4.operatorequals (|ivec4| v, |bool|) // sigh
+		for i in 4
+			require self[i] == v[i]
+		return true
 
 	syntax access (|int| i, |ControlPoint|)
 		return .GSize[i]

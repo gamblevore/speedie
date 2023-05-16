@@ -1,9 +1,9 @@
 
 
-|memory| Ughughugh
 class ProgressBar (GUIControl)
 	linkage
 		cpp_part Bar
+	|memory| Ughughugh
 	|float| Progress
 	|bool|	Indefinite
 	|bool|	RandomStyle
@@ -14,12 +14,12 @@ class ProgressBar (GUIControl)
 		.indefinite = true
 	
 	behaviour draw
-		sdlapp.touch
 		if .Indefinite
-			Ughughugh := byte[128]
-			if !Ughughugh[0] or sdlapp.FrameCount isa 9
-				Ughughugh.Temporal
-			where.Colorise(Ughughugh, 2)
+			.Ughughugh := byte[128]
+			if !.Ughughugh[0] or sdlapp.FrameCount isa 9
+				sdlapp.touch
+				.Ughughugh.Temporal
+			where.Colorise(.Ughughugh, 2)
 		  else
 			|| Dark  = (0.2, 0.2, 0.2, 1.0)
 			|| Light = (0.7, 0.7, 0.7, 1.0)
@@ -30,6 +30,10 @@ class ProgressBar (GUIControl)
 				p <~ (dark, light)(.StripeDark(v))
 		where.drawrect(.lastrect, .gnormal, 1.0)
 	
+	setter Progress	(|float|)
+		if .progress != value
+			sdlapp.touch
+			.progress = value
 	
 	behaviour Mouseup
 		if .lastrect contains p

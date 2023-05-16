@@ -187,6 +187,8 @@ module SDLApp
 		
 	
 	function Touch (|guicontrol| modified=nil)
+		if keys.Option
+			printline app.StackTrace
 		.TouchCount = .TouchCount|int| max 2
 
 	
@@ -370,7 +372,7 @@ module SDLApp
 	
 	helper SelectorFlash
 		.LastFlashSelector = .FlashSelector
-		.FlashSelector = (((.FrameCount-.LastFrameSelMove)>>5) mod 2) and !.IsBackground
+		.FlashSelector     = (((.FrameCount-.LastFrameSelMove)>>5) mod 2) and !.IsBackground
 
 
 	function ClearAlerts
@@ -445,7 +447,7 @@ module SDLApp
 		opt norefcounts
 		|| f = .realfocus$
 		if !sdlapp.isbackground and (f isa textview)
-			if f is editable and (sdlapp.FlashSelector != sdlapp.LastFlashSelector)
+			if (f is editable) and (!f.selrange.width) and (sdlapp.FlashSelector != sdlapp.LastFlashSelector)
 				sdlapp.touch(f)
 		if f isnt visible
 			if f == .innerfocus
@@ -613,11 +615,11 @@ module SDLApp
 
 	function ShowWindows
 		opt norefcounts
-		for w in window.shown
+		for w in window.newlyshown
 			if w is visible
 				sdlapp.Resized(w)
 				window.all <~ w
-		window.shown.Clear
+		window.newlyshown.Clear
 	
 	
 	helper SingleFrame (|bool|)

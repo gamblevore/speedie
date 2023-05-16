@@ -255,10 +255,12 @@ class TextViewLine (ringtree)
 		return t + .endswithline
 
 	
-	function TrySetError (|error| e)
+	function TrySetError (|error| e, |bool|)
+		opt norefcounts
 		|| old = .error
 			e.when = old.when
 		.error = e
+		return e == old
 
 
 	function SetErrorsAndStuff (|textview| parent, |int| t, |int|)
