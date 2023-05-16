@@ -52,7 +52,7 @@ class Word (ringtree) {
 		
 	
 	function Merge (|word| w)
-		.types (|)= w.types // simple?
+		.types |= w.types // simple?
 
 		
 	function noclashes 
@@ -121,10 +121,10 @@ class Word (ringtree) {
 			  elseif oof == @thg
 				|| argh = Gram.select(oof)
 				if argh
-					result (|)= argh
+					result |= argh
 				  else
 					|| c = Element.select(oof)		 #expect (oof, "Unknown grammar type “${oof}”." )
-					catty[0] (|)= c
+					catty[0] |= c
 			  else
 				expect (oof == @rel or oof == @bra) (oof)
 		
@@ -175,8 +175,8 @@ class Word (ringtree) {
 
 	
 	function VerifyWord {
-		error .name		(self, "No name for Word?")
-		error .owner	(self, "No concept?")
+		check .name		(self, "No name for Word?")
+		check .owner	(self, "No concept?")
 	}
 	
 	

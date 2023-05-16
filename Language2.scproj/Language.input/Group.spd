@@ -33,7 +33,7 @@ class Group {
 		|word| Best
 		|ElementList| list 
 		for v in self
-			list (|)= v.eles
+			list |= v.eles
 			|| S = V.types.PreferedScore
 			if (S < BestScore) // first one should go first... keep order!
 				best = v
@@ -164,11 +164,11 @@ class Group {
 			expect (ch == f) or (ch==@thg) or (ch == @rel) or (ch == @opp) (ch)
 			if (ch == @thg)
 				|| d = SpecialProperty.list
-				|| Ctrl = d.msg(ch) #expect (ch, "Unrecognised special property.")
-				.DefaultSpecial (|)= Ctrl
+				|| Ctrl = d.msglower(ch) #expect (ch, "Unrecognised special property.")
+				.DefaultSpecial |= Ctrl
 
 		for w in self
-			w.special (|)= .defaultspecial
+			w.special |= .defaultspecial
 			
 		return true
 	

@@ -94,7 +94,6 @@ class Dictionary (saveable)
 
 
 
-
 class DictionaryReader
 	linkage
 		wrapper
@@ -120,6 +119,7 @@ class DictionaryReader
 
 	syntax cast (|bool|)
 		return .MoveNext
+
 
 
 function String.ReplaceAll (|dictionary of string| Dict, |ErrorList| Rec=StdErr, |string|)
@@ -153,21 +153,20 @@ extend dictionary
 		self[key] = value
 
 	function msglower (|message| m, ||)
-		return self[m.id_] // this surprisingly lowercases stuff.... thats bad.
+		return self[m.name.idcase]
 
 	function msglower (|message| m, assigns:||)
-		self[m.id_] = Value
+		self[m.name.idcase] = Value
 	
 	function Expect (|message| m, ||)
 		return self[m.name]		#expect (m, "Unrecognised name: " + m.name)
 
 
 
-// want to hide these... i think .id_ isnt even used except in the translation project
-helper message.id_ (|string|):      return .name.idcase
+
 helper object._DictName (|string|): cpp_wrapper JB_Obj_DictName
 helper  int64._DictName (|string|): cpp_wrapper JB_int64_DictName
-helper string.idcase (|string|):    return .lowercase
+helper string.idcase    (|string|): return .lowercase
 // can't remove diacritics cos... spanish needs them for disambig!
 // literally two words with different diacritics
 

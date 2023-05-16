@@ -101,15 +101,15 @@ function Group.Verify (|language| master) {
 	|| Count = 0
 	|| N = .PreferedForm.name
 	
-	error (.GroupName)							(self, "No Name?")
-	error (.eles)									(self, "No element?")
+	check (.GroupName)								(self, "No Name?")
+	check (.eles)									(self, "No element?")
 	for f in self
-		error (f.owner == self)						(self, "Word points to wrong concept.")
+		check (f.owner == self)						(self, "Word points to wrong concept.")
 		f.Noclashes
 		expect (count++ < 64)						(self, "Too many words (need under 64).") 
 		if master
 			require f.LookupCheck(master)
 		require f.GrammarCheck // not multiple errs per Group.
-	error (Count)									(self, "Concept has no words?")
+	check (Count)									(self, "Concept has no words?")
 }
 

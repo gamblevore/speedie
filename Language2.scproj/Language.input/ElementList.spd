@@ -7,7 +7,7 @@ datatype ElementList (uint) {
 		|| clearout = Element.noun+Element.adjective+Element.adverb
 		|| x = self
 		if (x & clearout)
-			x (|)= clearout
+			x |= clearout
 		return x
 	}
 
@@ -33,12 +33,10 @@ datatype ElementList (uint) {
 	function SyxBits (|uint|) {
 		opt norefcounts
 		|| f = Element.__first
-		|| result
 		while f
 			if (f.catbits & self)
-				result (|)= f.syxbits 
+				rz |= f.syxbits 
 			f = f.next|Element|
-		return result
 	}
 	
 	module {

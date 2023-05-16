@@ -3,7 +3,7 @@ extend Group {
 
 function DefaultSpecials 
 	if self isa Element.aux
-		.DefaultSpecial (|)= specialproperty.grammar
+		.DefaultSpecial |= specialproperty.grammar
 
 
 function DefaultVerb (|string| N, |gram| T)
@@ -132,7 +132,7 @@ function DefaultAdjective (|string| N, |gram| T)
 			Remove = 1												// Easy, easier, easiest
 			last = 'i'
 		  elseif (last == 'h') and (last2 == 'c' or 's')
-			last = 'i'												// Bitch, bitchier, bitchiest // :3
+			last = 'i'												// twitch, twitchier, twitchiest // :3
 		  elseif !((last.IsConso and last!='w') and last2.isvowel and n.last(2).isconso)
 			last = 0
 		  elseif last.isconso and (last2.isconso or n.last(2).isconso)
@@ -185,9 +185,9 @@ function DefaultNoun (|string| N, |gram| T) {
 		extra = "ves"
 		remove = 2 
 			
-	.AddDefault(N,	gram.single, T, Element.noun)		// dog,  bitch,   box,   quiz,    tomato
+	.AddDefault(N,	gram.single, T, Element.noun)		// dog,  beach,   box,   quiz,    tomato
 	|| N2 = .engname(n, Remove, 0,	extra)
-	.AddDefault(N2,  gram.plural, T, Element.noun)		// dogs, bitches, boxes, quizzes, tomatoes
+	.AddDefault(N2,  gram.plural, T, Element.noun)		// dogs, beaches, boxes, quizzes, tomatoes
 	
 	if self isa Element.verb		// not successed!
 		.adddefault(n.EngAdd_ED, gram.past_simple, T, Element.verb) // a~(Dark haired boy)

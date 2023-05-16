@@ -11,7 +11,7 @@ module LangLoad {
 	
 
 	function LangFunc (|language| L, |message| ch, |object|)
-		|| fn = LangFuncs.msg(ch) #expect (ch)
+		|| fn = LangFuncs.msglower(ch) #expect (ch)
 		return (fn)(L, ch)
 
 
@@ -105,7 +105,7 @@ module LangLoad {
 			.activeelement = nil
 			return
 			
-		|| cat = category.list.msg(c) #expect (msg, "Unrecognised category")
+		|| cat = category.list.msglower(c) #expect (msg, "Unrecognised category")
 		expect (!cat.NextActive) (msg, "Already used this category! Can't respecify within the same file!")
 		cat.nextactive = activeCatlist
 		activeCatlist = cat

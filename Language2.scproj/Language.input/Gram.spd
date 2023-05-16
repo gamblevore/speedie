@@ -91,9 +91,9 @@ datatype Gram (uint64) {
 
 	function Default (|gram|)
 		ifn self&formality
-			self (|)= informal
+			self |= informal
 		ifn self&oldness
-			self (|)= modern
+			self |= modern
 		return self
 		
 
@@ -135,7 +135,7 @@ datatype Gram (uint64) {
 		|| result
 		for r in gram.components
 			if (self&r).ispo2
-				result (|)= self&r
+				result |= self&r
 		debug_require result.ispo2
 		return result
 	
@@ -159,9 +159,8 @@ datatype Gram (uint64) {
 		|| M = SideWith // side with this, if we can't find anything. else just merge
 		for T in gram.components
 			|| M2 = M & T & self
-			if (M2)
 				M &= ~T
-				M (|)= M2
+				M |= M2
 		return M
 	}
 		
@@ -172,11 +171,11 @@ datatype Gram (uint64) {
 			|| S2 = T & self
 
 			if (T2 != T) and T2
-				result (|)= T2
+				result |= T2
 			  elseif ((S2!=T) and s2)
-				result (|)= s2
+				result |= s2
 			  else
-				result (|)= t
+				result |= t
 
 		return result
 	}

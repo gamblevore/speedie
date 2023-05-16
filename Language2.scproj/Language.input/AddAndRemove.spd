@@ -95,9 +95,9 @@ function ImproveKidTranslation (|gram| overall, |bool|)
 	
 	|| modified = false
 	for Part in self
-		modified (|)= Part.tran.NeatenWord(Part, overall)
+		modified |= Part.tran.NeatenWord(Part, overall)
 		if part.hasany
-			modified (|)= part.ImproveKidTranslation(overall)
+			modified |= part.ImproveKidTranslation(overall)
 		
 	if modified
 		.CleanupMine
@@ -138,7 +138,9 @@ function TransState.StraightTranslate (|message| Read,  |message| cpy,  |TransIn
 
 	for r in Read
 		if r != @sheb
-			|| KidTr = .StraightTranslate(r, message(cpy, R))
+			|| ch = Message(r)
+			cpy <~ ch
+			|| KidTr = .StraightTranslate(r, ch)
 			ti <~ kidtr
 	
 	//.Stats(read, ti)
@@ -241,7 +243,7 @@ function TransState.ApplySub (|message| Stuff, |syntax| OppOrThg, |TransInfo| Gs
 		return .CaptureLoss(Stuff, ToAdd)
 
 	|| adj = @adj.msg
-	|| f = message.new(adj, OppOrThg, w2.Name)
+	|| f = adj.msg(OppOrThg, w2.Name)
 	f.Obj = TransInfo.new(nil, w2)
 	
 	stuff.next = adj
@@ -315,6 +317,3 @@ class TransInfo {
 		return true
 }
 
-
-
-// @comrade is a~cursed~evil~shit.

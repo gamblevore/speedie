@@ -24,7 +24,7 @@ class Language {
 		.name		= name
 		.words		= dictionary.new
 		.Groups	= dictionary.new
-		.grammar	= array.new(gram.HighestBit)
+		.grammar	= array.new
 	
 	function FindGrammar (|gram| s, |word|)
 		return .grammar[s.log2-1] // for now... i guess? I can't think of anything better....
@@ -138,7 +138,7 @@ function string.LocalTestFile (|string|)
 
 extend_module Language {
 	function FindLang (|message| r, |language|)
-		return .Languages.msg(r)			#expect (r, "Can't find language.")
+		return .Languages.msglower(r)			#expect (r, "Can't find language.")
 
 	function init
 		require !languages 
@@ -177,10 +177,10 @@ extend_module Language {
 	
 	
 	syntax access (|message| m, |message| m2, |language|)
-		|| L = .languages.msg(m)
+		|| L = .languages.msglower(m)
 		if (!L)
 			L = language.new(m.id, m2.name)
-			.languages.msg(m) = l
+			.languages.msglower(m) = l
 		return l
 	
 	

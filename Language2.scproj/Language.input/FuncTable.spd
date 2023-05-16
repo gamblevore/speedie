@@ -117,7 +117,7 @@ function message.ElementList (|ElementList|) {
 		  elseif (item != @thg)
 			expect (item == @opp and "/") (item)
 		  else
-			result (|)= Element.select(item)$
+			result |= Element.select(item)$
 	
 	n.remove
 	return result		    
