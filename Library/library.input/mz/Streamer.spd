@@ -7,7 +7,7 @@ function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 	|| Mode = ("ro", "")(strength >= mzlab.strong)
 	|| ChunkSize = (4MB, 1MB)(mode)				// don't change these! compression will fail.
 	st.start
-	j.jinit
+	j <~ _JbinHeader
 	j.enter(@tmp, "µz")
 	j.addint(.length)
 	j.enter(@arg, Mode)

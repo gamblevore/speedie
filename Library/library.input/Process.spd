@@ -615,7 +615,7 @@ class Process
 			|_voidptr[32]| arr
 			|| size = 32
 			|| strs = BackTrace(&arr[0], &size)
-			j.jinit
+			j <~ _JbinHeader
 			j.enter(@arg, reason)
 			for i in skip to size-1
 				j.addcstring(strs[i], @emb)

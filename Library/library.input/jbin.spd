@@ -8,17 +8,18 @@
 
 
 extend message
-	render render_jbin (|string| shell_path = "", |bool| Compact=false)
+	render render_jbin (|bool| Compress=false, |string| shell_path = "")
 		opt norefcounts
 		require self
 		|| js = fs|jbin|
 		if shell_path
 			js.sheb(shell_path)
-		js.jinit
-		if Compact
+		if Compress
 			|MessageCompressor| D
+			js <~ _JbinHeaderComp
 			.render_jbin_sub(js,   d)
 		  else
+			js <~ _JbinHeader
 			.render_jbin_sub(js, nil)
 			
 	helper render_jbin_sub (|jbin| js, |&MessageCompressor| D)
@@ -29,17 +30,19 @@ extend message
 			|| Depth	= 0
 			|| curr		= ch
 			ch			= curr.FlatNextDepth(depth)
-			if !D or !js.Render_Compress(curr, D, depth > 0)
+			if !D or !js.AddCompressed(curr, D, depth > 0)
 				js.Add(curr.func, curr.name, depth > 0)
 			js.up(-depth)
 
-	helper faststring.Render_Compress (|message| Curr, |&MessageCompressor| D, |bool| Down, |bool|)
-		// now what? detect
+	helper jbin.AddCompressed (|message| Curr, |&MessageCompressor| D, |bool| Down, |bool|)
+		opt norefcounts  // now what? detect
 		|| back = d.Find(curr)								#require
 		|| info = ((d.position - back.Tag)-1 << 1)  (|)  Down 
 		if info < 112
 			self <~ ((info+15)(|)128)|byte|
 		  else
+			if !curr.name
+				return false // no point... 2 bytes either way but this is slower
 			self <~ ((info&15)(|)128)|byte|
 			.hint(info>>4)
 		return true
@@ -49,7 +52,7 @@ role JBin (Faststring)
 	linkage: cpp_part bin
 	constructor         (|syntax| type=@arg, |string| data="")
 		cpp_part Constructor
-		.jinit
+		 self <~ _JbinHeader
 		.enter(type, data)
 	constructor (|int| n)
 		cpp_part Constructor0
@@ -81,9 +84,6 @@ role JBin (Faststring)
 		self <~ '!'
 		self <~ data
 		self <~ '\n' // noice
-
-	function jinit
-		self <~ _JbinHeader
 
 	function up (|int| amount = 1) // we encode the upness in the range of syntax values that have no children
 		|| add = (@cnj|int|)-1
@@ -159,29 +159,32 @@ helper stringstream.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
 			.UserObj = .UserObj|message|.upward(t|int|-7)			#require
 
 	
-helper stringstream.NextMsgLZ (|messagedecompressor| D, |uint| Info)
+helper stringstream.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
 	opt norefcounts
 	if Info < 16
 		Info |= .hInt << 4
 	  else
 		Info -= 15
 	|| Index  = Info >> 1
-	|| Ref    = D.End[-Index]
-	|| Msg    = .UserObj|message|.msg(ref.func, ref.name)
+	|| Ref    = D.curr-(Index+1)
+	expect (ref >= D.Table and ref < d.curr) (self, "Corrupted jbin")
+	|| r = *ref
+	|| Msg    = .UserObj|message|.msg(r.func, r.name)
 	if Info & 1
 		.UserObj = msg
 
 
 helper stringstream.Parse_Jbliz (|MessageRoot|)
 	// compacted jbin, using lz-like scheme
-	rz = .NextMsginfo|messageroot|
 	|MessageDecompressor| Decomp
+	rz = .NextMsginfo|messageroot|
+	Decomp <~ rz|message|
 	while
-		|| lz = .NextMsginfo(true) #loop
-		if lz < 256
-			.NextMsgLZ(decomp, lz & 127)
+		|| msg = .NextMsginfo(true) #loop
+		if msg < 256
+			.NextMsgLZ(decomp, msg & 127)
 		  else
-			loop Decomp <~ lz|message|
+			loop Decomp <~ msg|message|
 
 
 function stringstream.Parse_Jbin (|MessageRoot|)	

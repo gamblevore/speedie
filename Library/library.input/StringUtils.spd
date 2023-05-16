@@ -44,16 +44,18 @@ function byte.IsConso (|bool|)
 
 function byte.IsVowel (|bool|)
 	|| b = .lowercase
-	return (b =='a' or 'i' or 'e' or 'o' or 'u') 
+	return (b == 'a' or 'i' or 'e' or 'o' or 'u') 
 
 
 function int.operatorpc (|int| x, |string|) 
+	disabled 
 	// disable this... 
-	return (self|float| / x|float|).pc
+	//return (self|float| / x|float|).pc
 
 
 function string.operatorpc (|string| x, |string|) 
-	return .length pc x.length
+	disabled 
+	//return .length pc x.length
 	
 
 function string.IsFileLike (|bool|)

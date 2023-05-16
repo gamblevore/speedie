@@ -30,6 +30,9 @@ class MessageID (stringshared)				// now is usefully used! :D
 		fs <~ "@"
 		if .length
 			fs.AppendQuotedEscape(self)
+			
+	syntax cast (|bool|)
+		return self != nil
 	
 	constructor (|string| Name, |Syntax| Fn, |uint64| Tag)
 		super.constructor(name)
@@ -48,22 +51,24 @@ struct MessageDecompressor
 	|&Message--|					Curr
 	|&Message--|					Table
 
-	helper Allocate (|&message|)
-		require !StdErr.ok
+	helper Allocate (|bool|)
+		require StdErr.ok
 		
 		|| pos = .Curr - .Table
 		|| Amount = (pos*2) max 4K
-		rz = Memory.realloc(.table, Amount * platform.PointerBytes)|&message|
+		|| rz = Memory.realloc(.table, Amount * platform.PointerBytes)|&message|
 			
 		expect rz ("jbin decompressor can't allocate")
 		.Table = rz
 		.Curr = rz + pos
 		.End = rz + Amount
+		return true
 	
 	syntax append (|Message| New, |bool|)
 		|| c = .Curr
 		if c >= .End
-			c = .Allocate #require
+			require .Allocate
+			c = .curr
 		*c++ = New
 		.Curr = c
 		return true
@@ -76,13 +81,11 @@ struct MessageDecompressor
 	
 
 
-struct MessageCompressor (MessageDecompressor)
+struct MessageCompressor
 	linkage:cpp_part MCmp
 	|(dictionary of messageID)[64]| D
+	|uint|			Position
 	
-	function Position (|int|)
-		return .curr - .table
-		
 	function MakePlace (|message| m, |&byte|)
 		opt norefcounts
 		|| fn = m.func
@@ -94,7 +97,9 @@ struct MessageCompressor (MessageDecompressor)
 	function Find (|message| m, |MessageID|)
 		opt norefcounts
 		|| where = .MakePlace(m)|&messageID|
-			return *where init MessageID(m.name, m.func, .Position)
+			|| f = *where
+				return f
+			*where = MessageID(m.name, m.func, .Position++)
 		return nil
 		
 	destructor
