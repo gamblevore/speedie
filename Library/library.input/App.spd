@@ -139,12 +139,15 @@ function pref_path (|string|)
 	check (rz[0] == '/' or '~') ("App pref path should be 'default' or a full-path.")
 
 
-function PrefsInit (|date| when=date.now)
-	require !.prefs
-	|| pref_path = .pref_path #debug_require
-	.prefs = pref_path.file.conf
-	if when
-		app.pref("first") := when.render
+function PrefsInit (|date| when=date.now, |bool|)
+	if .prefs
+		return true
+	|| pref_path = .pref_path
+		.prefs = pref_path.file.conf
+		if .prefs
+			rz = true
+			if when
+				app.pref("first") := when.render
 
 
 function SavePrefs

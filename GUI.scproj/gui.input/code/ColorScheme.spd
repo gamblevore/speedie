@@ -75,9 +75,9 @@ class ColorScheme
 
 	render SaveColors
 		fs.fieldenter("syx")
-		|| n = (@bin|int|+1)
-		for i in n // sigh
-			fs.field( i|syntax|.obj.name, .SyxCol[i].render ) 
+		for i in @max|int|
+			|| obj = i|syntax|.obj
+				fs.field( obj.name, .SyxCol[i].render ) 
 		fs.indent--
 		
 		fs.field( "root", .roottmp.render ) 

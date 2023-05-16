@@ -619,14 +619,18 @@ class PerryIDE (Window)
 			i.ModifiedForCompile = true
 		.recheck				// could be delayed, too.
 
-	function SaveResponse
+	function UpdatePrefs
 		|| d = .editme.Document$
 		|| l = d.Location.Resolve
-		|| p = app.pref_path.resolve
-		require l ~= p
-		app.PrefsInit(0)
-		.notify("Reloading prefs...")
-		.LoadState
+		if l ~= app.pref_path.resolve
+			|| oldPrefs = app.prefs
+			app.prefs = nil
+			if app.PrefsInit(0)
+				.notify("Reloaded Prefs.")
+			  else
+				.notify("Prefs are corrupted")
+				app.prefs = oldPrefs
+			.LoadState
 		
 
 	function SaveEditing // savetext, savefile, filesave
@@ -638,7 +642,7 @@ class PerryIDE (Window)
 			require e.Save
 		  else
 			return
-		.SaveResponse
+		.UpdatePrefs
 		with .currfilerow
 			.lastsize = e.Length
 			if .location.pathiscode
