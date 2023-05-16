@@ -16,6 +16,8 @@ class StringShared (string)
 
 
 
+/*
+// i think we aren't using this anymore!
 class MessageID (stringshared)
 	linkage
 		cpp_part ID
@@ -99,5 +101,5 @@ struct MessageDict
 			return v.makeplace(m.name)
 	
 	destructor
-	
+*/	
 	

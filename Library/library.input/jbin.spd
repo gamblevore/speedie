@@ -1,5 +1,6 @@
 
 // jbin: streamable, binary jeebox
+// offers a compacted version too!
 
 || _JbinHeader     = "\01\10\EA\E2"     /// can't put a constant in a role? 
 || _JbinHeaderComp = "\01\11\EA\E2"
@@ -7,7 +8,7 @@
 
 
 extend message
-	render render_jbin (|string| shell_path = "")
+	render render_jbin (|string| shell_path = "", |bool| Compact=false)
 		opt norefcounts
 		require self
 		|| js = fs|jbin|
@@ -43,6 +44,10 @@ role JBin (Faststring)
 		|| L = data.length
 		|| addr = (data.addr, nil)(L)
 		.addmemory(type, addr, into, L)
+	function add2		(|syntax| type, |string| data="", |bool|into = false)
+		|| L = data.length
+		|| addr = (data.addr, nil)(L)
+		.addmemory2(type, addr, into, L)
 
 	function add		(|syntax| type, |faststring| fs, |bool|into = false)
 		cpp_part AddFS
@@ -75,11 +80,11 @@ role JBin (Faststring)
 		.addmemory(type, data|&byte|, false, data.length)
 	
 	function AddMemory	(|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
-		if type|int| >= 120
 		|uint| T = (type|uint|<<1) (|) (goin)
 		self <~ T|byte|
 		.hint(L)
 		.AppendMemory(data, L|int|)
+
 
 	function OpenSection  (|int|)				// openstream 
 		.NoFlush ++
@@ -105,21 +110,8 @@ role JBin (Faststring)
 		.NoFlush--
 
 
-function @string.int32 (|int| n, |string|)
-	return string.Copy((&n)|&byte|, 4)
-
-
-function @jbin.JoinParseTest (|string|)
-    || bin = –digest "@mary had a~little~lamb whose fleece was white as snow"
-	|| out = faststring()
-	for 5
-		out <~ bin
-	|| In = out.getresult.stream
-
-	|| result = Message()
-	while !in.NoMoreChunks
-		result <~ in.Parse_Jbin
-	return result.render
+//function @string.int32 (|int| n, |string|)
+//	return string.Copy((&n)|&byte|, 4)
 
 
 function stringstream.NextMsg (|Message|)
@@ -193,6 +185,23 @@ helper stringstream.NextMsgLZ (|uint| Info)
 		.UserObj = msg
 	
 
+helper stringstream.Parse_Jbliz (|MessageRoot|)
+	// compacted jbin, using lz-like scheme
+	rz = .NextMsginfo2|messageroot|
+	.NextMsgAllocate
+	while
+		|| lz = .NextMsginfo2 #loop
+		if lz < 256
+			.NextMsgLZ(lz&127)
+		  else
+			.NextMsgAdd(lz|message|)
+			
+	memory.Free(.UserTable)
+	.UserTableEnd = nil
+	.UserTable = nil
+	.UserTableCurr = nil
+
+
 function stringstream.Parse_Jbin2 (|MessageRoot|)	
 	.UserObj = nil
 	|| Header = .str(4)
@@ -200,22 +209,8 @@ function stringstream.Parse_Jbin2 (|MessageRoot|)
 	if header == _JbinHeader
 		rz = .NextMsginfo2|messageroot|
 		while .NextMsginfo2
-	
 	  elseif Header == _JbinHeaderComp
-		rz = .NextMsginfo2|messageroot|
-		.NextMsgAllocate
-		while
-			|| lz = .NextMsginfo2 #loop
-			if lz < 256
-				.NextMsgLZ(lz&127)
-			  else
-				.NextMsgAdd(lz|message|)
-				
-		memory.Free(.UserTable)
-		.UserTableEnd = nil
-		.UserTable = nil
-		.UserTableCurr = nil
-	
+		rz = .parse_jbliz
 	  else
 		error (self, _jBinNotJbin)
 
@@ -241,6 +236,30 @@ helper stringstream.NextMsgInfo2 (|uint64|)
 		  else
 			.UserObj = .UserObj|message|.upward(t|int|-7)			#require
 
+
+extend message
+	render render_jbin2 (|string| shell_path = "", |bool| Compact=false)
+		opt norefcounts
+		require self
+		|| js = fs|jbin|
+		if shell_path
+			js.sheb(shell_path)
+		js.jinit
+		|| ch	 = self
+		|| after = .FlatAfter
+		while ch != after
+			|| Depth	= 0
+			|| curr		= ch
+			ch			= curr.FlatNextDepth(depth)
+			js.Add2(curr.func, curr.name, depth > 0)
+			js.up(-depth)
+
+
+function jbin.AddMemory2	(|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
+	|uint| T = (type|uint|<<1) (|) (goin)
+	self <~ T|byte|
+	.hint(L)
+	.AppendMemory(data, L|int|)
 
 
 helper stringstream.ExpectJbin (|bool|)
