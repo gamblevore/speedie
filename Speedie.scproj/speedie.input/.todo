@@ -2,6 +2,7 @@
 
 						bugs
 
+* could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
 * x = (0, 0|byte|) // fails!
 * function finding fails with dictionary subclasses? dictsub["abc"]
 * || x = .SomeCArray // should just get the address... :)

@@ -1,14 +1,14 @@
 
 
 class StringStream
-	|int|			Length
-	|FastBuff|		Data
-	|file|			File
-	|object--|		UserObj				// for jbin
+	|int|					Length
+	|FastBuff|				Data
+	|file|					File
+	|object--|				UserObj				// for jbin
 	|&MessageDecompressor| 	Decomp				// also
-	|int|			ChunkSize
-	|int| 			StartFrom
-	|bool| 			_NoMoreChunks
+	|int|					ChunkSize
+	|int| 					StartFrom
+	|bool| 					_NoMoreChunks
 
 	linkage:cpp_Part SS
 	

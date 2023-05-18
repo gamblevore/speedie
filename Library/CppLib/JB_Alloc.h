@@ -20,6 +20,8 @@
 
 #define if_rare(x) if (unlikely(x))
 #define if_usual(x) if (likely(x))
+#define iif(x)  if (JB_Flow__Cond(x))
+#define wwhile(x)  uint fffflowCnt = 0; while (JB_While__Cond(x, &fffflowCnt)) 
 #define __hot __attribute__((hot))
 
 #define __visible __attribute__((__visibility__("default")))
@@ -29,6 +31,8 @@
 
 extern "C" {
 
+bool JB_Flow__Cond(bool b);
+bool JB_Flow__While(bool value, uint* p);
 
 #ifdef JB_DEBUG_ON
     #define JBSanity( a ) // nothing for now

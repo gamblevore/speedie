@@ -1,15 +1,15 @@
 
 /*
-So what do we have? we basically write a chunk of data into a file, and it gets compressed! Pretty simple!
-So we want the stringstream to be able to give us back chunks of data.
+So what do we have? we basically write a chunk of data into a file, and it gets
+compressed! Pretty simple! So we want the stringstream to be able to give us back chunks of data.
 */
 
 
 struct FlowPart
-	|FastBuff|			Buff
-	|stringstream|		Read
-	|faststring| 		Write
-	|CompressionStats|	Stats
+	linkage:cpp_part FLP
+	|FastBuff|				Buff
+	|stringstream|			Read
+	|faststring| 			Write
 	
 	function init (|string| path, |string| type, |bool|)
 		|| sign = type * 2
@@ -19,7 +19,7 @@ struct FlowPart
 		return .buff.Alloc(1MB)
 
 	function Flush
-		.buff.tmpstr.CompressInto(.write, .stats)
+		.buff.tmpstr.CompressInto(.write, flowpart.stats)
 		.buff.Curr = .buff.start
 		.write.Flush
 	
@@ -31,10 +31,12 @@ struct FlowPart
 				"Flow Control differs here: ${app.StackTrace}"
 				debugger 
 
-
+	module
+		|CompressionStats| 		Stats
 
 
 class FlowControl
+	linkage:cpp_part Flow
 	|FlowPart| 			Bits
 	|FlowPart| 			Loops
 	|bool| 				OK
@@ -43,19 +45,25 @@ class FlowControl
 	constructor (|string| Path)
 		.ok = .loops.init(path, "w") and .bits.init(path, "b")
 
-	function While (|bool| value, |bool|)
+	function While (|uint| value)
+		visible
 		if value
 			.LoopCount++
-			return true
+			return
 	
 		|| c = .LoopCount
 		.LoopCount = 0
-		if .Loops.buff <~ c
+		if .Loops.buff <~ c|uint16|
 			.loops.flush
 		.loops.Test(c, 2)
 
 	function Cond (|bool| value)	
+		visible
 		if .bits.buff <~ value|byte|
 			.bits.Flush
 		.bits.Test(value|uint|, 1)
+	
+	
+	module
+		|flowcontrol| flow 
 

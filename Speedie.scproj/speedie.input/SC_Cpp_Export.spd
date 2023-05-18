@@ -41,6 +41,9 @@ extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
 |FastStringCpp|						HeaderProj
 |FastStringCpp|						AllTypes
 |FastStringCpp|						ModuleProperties
+module 
+	|| IfName = "if"
+	|| WhileName = "while"
 
 
 
@@ -292,6 +295,10 @@ __nodebug void jb_decr(jbobject* s) {
 
 
 function Run 
+	if Options.FlowControlEnabled
+		Cpp_Export.IfName = "iif"
+		Cpp_Export.WhileName = "wwhile"
+		
 	for c in Compiler.ClassList
 		if !c.IsFunc
 			WriteType( c, .AllTypes, true )
@@ -1095,13 +1102,18 @@ module
 			fs <~ "break"
 			
 		  elseif (name == "elseif")
-			fs <~ "else if"
+			fs <~ "else "
+			fs <~ Cpp_Export.IfName
 
 		  elseif (name == "ignore")
 			return
 
 		  elseif (name == "rejoin")
 			0 //
+		  elseif (name == "if")
+			fs <~ Cpp_Export.IfName
+		  elseif (name == "while") 
+			fs <~ Cpp_Export.WhileName
 		  elseif (name == "swap")
 			fs <~ "JB_Swap"
 			debugat

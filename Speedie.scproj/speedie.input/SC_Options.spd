@@ -18,7 +18,7 @@ module Options
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
 	||		HideMultipleErrors		= true
-	||		FlowControlEnabled		= true
+	||		FlowControlEnabled		= false
 	||		Products				= native
 	||		Cpp						= true
 	||		Compile					= true
@@ -37,7 +37,6 @@ module Options
 	||		ArgStats				= false
 	||		PrintCompileString		= false
 	||		PrintFiles				= false
-	||		Flow					= false
 	||		PrintStages				= false
 	||		Warnings				= false
 	||		UseFuncCallCount		= false
