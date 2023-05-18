@@ -144,9 +144,6 @@ class String
 		fs <~ self[0].uppercase
 		fs <~ self[1, int.max].lowercase
 
-	render Size
-		.length.strsize(fs)
-
 	render Remove (|charset| remove, |int| to=-1)
 		for c in self
 			if !remove[c]

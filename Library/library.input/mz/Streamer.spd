@@ -37,7 +37,7 @@ helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 	st := compressionstats.all
 	st.start
 
-	check (.str(4) == _JbinHeader) (self, _jBinNotJbin)
+	check (.DetectJBinType == 1) (self, _jBinNotJbin)
 	
 	|| mz = .NextMsg							#require
 	if mz == @arg // remove this later

@@ -70,12 +70,15 @@ function file.cloc
 	counts.Count(msg) 
 	if counts.PrintTree
 		if counts.maxnodelength
-			for s.flat in msg
+			for s.flat in msg 
 				s.name = s.name.Preview(counts.MaxNodeLength)
 		msg.RenderAST(app.printline)
 	  elseif counts.ParseSpeed
-		"    Parsed: ${data.size} in ${Durr.ReportAgo} at ${data.length|float|/(1MB|float|*durr)}MB/s"
+		|| fs = app.print
+		fs.RenderSpeed(durr.seconds, data.length, 0, "Parsed")
+		fs <~ "\n"
 	(msg)
+		
 
 
 function file.CountAll (|bool| force=false)
