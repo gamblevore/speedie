@@ -147,11 +147,19 @@ struct FloatRange;
 
 struct FlowPart;
 
+struct HollyPlanter;
+
+struct HollyPotter;
+
 struct IntDownRange;
 
 struct IPCMessage;
 
 struct IR;
+
+struct MessageCompressor;
+
+struct MessageDecompressor;
 
 struct MessagePosition;
 
@@ -264,6 +272,8 @@ struct FastString_Behaviour;
 struct Message_Behaviour;
 
 struct StringShared_Behaviour;
+
+struct MessageID_Behaviour;
 
 struct SCBase_Behaviour;
 
@@ -403,6 +413,8 @@ struct GUIControl;
 
 struct Message;
 
+struct MessageID;
+
 struct Message;
 
 struct SCArg;
@@ -524,6 +536,12 @@ struct FastBuff {
 	bool ErrorReported;
 };
 
+struct FlowPart {
+	FastBuff Buff;
+	StringStream* Read;
+	FastString* Write;
+};
+
 struct IPCMessage {
 	uint DataLength;
 	uint SendID;
@@ -540,6 +558,17 @@ struct IR {
 	byte r[4];
 	int Rest;
 	uint Debug;
+};
+
+struct MessageCompressor {
+	Dictionary* D[64];
+	uint Position;
+};
+
+struct MessageDecompressor {
+	Message** End;
+	Message** Curr;
+	Message** Table;
 };
 
 struct MessagePosition {
@@ -662,6 +691,16 @@ JBClass ( JB_ErrorReceiver , JB_Object ,
 
 struct FastString_Behaviour: Object_Behaviour {
 };
+
+struct FlowControl_Behaviour: Object_Behaviour {
+};
+
+JBClass ( FlowControl , JB_Object , 
+	FlowPart Bits;
+	FlowPart Loops;
+	bool OK;
+	u16 LoopCount;
+);
 
 struct Instruction_Behaviour: Object_Behaviour {
 };
@@ -842,11 +881,8 @@ JBClass ( StringStream , JB_Object ,
 	int Length;
 	FastBuff Data;
 	JB_File* File;
-	StringStream* Decomp;
 	JB_Object* UserObj;
-	Message** UserTableEnd;
-	Message** UserTableCurr;
-	Message** UserTable;
+	MessageDecompressor* Decomp;
 	int ChunkSize;
 	int StartFrom;
 	bool _NoMoreChunks;
@@ -1106,6 +1142,9 @@ JBClass ( SCModule , SCBase ,
 	bool IsRequiredInterface;
 );
 
+struct StringShared_Behaviour: String_Behaviour {
+};
+
 struct StringZeroTerminated_Behaviour: String_Behaviour {
 };
 
@@ -1136,6 +1175,15 @@ JBClass ( Message , RingTree ,
 	MsgUIFlags Flags;
 	u16 RangeLength;
 	u16 Tag;
+);
+
+struct MessageID_Behaviour: StringShared_Behaviour {
+};
+
+JBClass ( MessageID , JB_StringShared , 
+	JB_Object* Obj;
+	uint64 Tag;
+	Syntax Func;
 );
 
 struct SCArg_Behaviour: SCBase_Behaviour {
@@ -1241,13 +1289,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1835])
+#define kJB__ErrorColors_bold (JB_LUB[1839])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1836])
-#define kJB__ErrorColors_good (JB_LUB[1837])
-#define kJB__ErrorColors_normal (JB_LUB[1838])
-#define kJB__ErrorColors_underline (JB_LUB[1837])
-#define kJB__ErrorColors_warn (JB_LUB[1839])
+#define kJB__ErrorColors_error (JB_LUB[1840])
+#define kJB__ErrorColors_good (JB_LUB[1841])
+#define kJB__ErrorColors_normal (JB_LUB[1842])
+#define kJB__ErrorColors_underline (JB_LUB[1841])
+#define kJB__ErrorColors_warn (JB_LUB[1843])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1311,7 +1359,6 @@ extern MaybeBool SC__Options_Compile32Bit;
 extern bool SC__Options_Cpp;
 extern bool SC__Options_ExternalCompile;
 extern bool SC__Options_Final;
-extern bool SC__Options_Flow;
 extern bool SC__Options_FlowControlEnabled;
 extern bool SC__Options_ForceRecompile;
 extern bool SC__Options_HideMultipleErrors;
@@ -1469,7 +1516,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[340])
 #define kSC_BitNot (JB_LUB[440])
 #define kSC_BitOr (JB_LUB[646])
-#define kSC_BitXor (JB_LUB[1840])
+#define kSC_BitXor (JB_LUB[1844])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1499,7 +1546,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1841])
+#define kJB_SaverStart1 (JB_LUB[1845])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1828,6 +1875,8 @@ extern byte SC__ASM_NoisyASM;
 extern IR SC__flat_Dummy;
 extern MWrap* SC__flat_JSMSpace;
 extern CompressionStats JB__MzSt_All;
+extern CompressionStats JB__FLP_Stats;
+#define kJB__HRV_MaxOneByte (255 - (32 + 16))
 #define kSC__IR_MsgDebugPosShift (19)
 extern Array* SC__IR_Resources;
 
@@ -1842,6 +1891,7 @@ extern SCClass* SC__Cpp_CurrClass;
 extern JB_String* SC__Cpp_FindGlobalsCpp;
 extern Array* SC__Cpp_H_Input;
 extern Array* SC__Cpp_H_PostInput;
+extern JB_String* SC__Cpp_IfName;
 #define kSC__Cpp_NeedsInnerBrackets (1)
 #define kSC__Cpp_NeedsNoBrackets (2)
 #define kSC__Cpp_NeedsOuterBrackets (0)
@@ -1850,6 +1900,7 @@ extern FastStringCpp* SC__Cpp_StringBlob;
 extern int SC__Cpp_StringCount;
 extern Dictionary* SC__Cpp_StringDict;
 extern FastStringCpp* SC__Cpp_StringLengths2;
+extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_Delete (2)
@@ -1859,6 +1910,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__dict_TypeObj (1)
 #define kJB__dict_TypeStem (2)
 #define kJB__dict_TypeValue (0)
+extern FlowControl* JB__Flow_flow;
 #define kSC__Instruction_TypeConst (2)
 #define kSC__Instruction_TypeFunc (1)
 extern Dictionary* SC__Instruction_TypeDict;
@@ -3558,9 +3610,9 @@ JB_String* JB_dbl_Render(double self, JB_String* fmt, FastString* fs_in);
 
 
 // float
-JB_String* JB_f_pc(float self, FastString* fs_in);
-
 float JB_f_powow(float self, int n);
+
+float JB_f_RoundTo(float self, float to);
 
 
 
@@ -3588,15 +3640,11 @@ int JB_int_OperatorMax(int self, int other);
 
 int JB_int_OperatorMin(int self, int other);
 
-JB_String* JB_int_operatorpc(int self, int x);
-
 IntRange JB_int_OperatorTo(int self, int other);
 
 AsmReg JB_int_Reg(int self);
 
 JB_String* JB_int_RenderFS(int self, FastString* fs_in);
-
-JB_String* JB_int_RenderSize(int self, FastString* fs_in);
 
 bool JB_int_SyntaxAccess(int self, int bit);
 
@@ -4260,6 +4308,8 @@ uint JB_FastBuff_CopyTo(FastBuff* self, byte* Dest, int Length);
 
 void JB_FastBuff_destructor(FastBuff* self);
 
+int JB_FastBuff_Length(FastBuff* self);
+
 bool JB_FastBuff_OperatorHas(FastBuff* self, int n);
 
 int64 JB_FastBuff_Position(FastBuff* self);
@@ -4274,7 +4324,13 @@ int JB_FastBuff_Size(FastBuff* self);
 
 JB_String* JB_FastBuff_AccessStr(FastBuff* self, int pos, int after);
 
+inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v);
+
+inline bool JB_FastBuff_AppendU16(FastBuff* self, u16 v);
+
 void JB_FastBuff_SyntaxExpect(FastBuff* self, JB_String* s);
+
+JB_String* JB_FastBuff_TmpStr(FastBuff* self);
 
 
 
@@ -4282,9 +4338,25 @@ void JB_FastBuff_SyntaxExpect(FastBuff* self, JB_String* s);
 
 
 // JB_FlowPart
+void JB_FLP_destructor(FlowPart* self);
+
+void JB_FLP_Flush(FlowPart* self);
+
+void JB_FLP_Test(FlowPart* self, uint Expected, int Bytes);
+
+int JB_FLP__Init_();
+
+int JB_FLP__InitCode_();
+
 
 
 // JB_GameFlyingMem
+
+
+// JB_HollyPlanter
+
+
+// JB_HollyPotter
 
 
 // JB_IntDownRange
@@ -4330,6 +4402,24 @@ int SC_IR__InitCode_();
 
 
 // JB_MemoryWorld
+
+
+// JB_MessageCompressor
+void JB_MCmp_Destructor(MessageCompressor* self);
+
+MessageID* JB_MCmp_Find(MessageCompressor* self, Message* m);
+
+byte* JB_MCmp_MakePlace(MessageCompressor* self, Message* m);
+
+
+
+// JB_MessageDecompressor
+bool JB_Mxpd_Allocate(MessageDecompressor* self);
+
+void JB_Mxpd_Destructor(MessageDecompressor* self);
+
+bool JB_Mxpd_SyntaxAppend(MessageDecompressor* self, Message* New);
+
 
 
 // JB_MessagePosition
@@ -4590,6 +4680,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_StringShared_Behaviour
+
+
+// JB_MessageID_Behaviour
 
 
 // JB_SCBase_Behaviour
@@ -5061,6 +5154,8 @@ void JB_FS_ProblemsFound(FastString* self, int count);
 
 JB_String* JB_FS_Render(FastString* self, FastString* fs_in);
 
+void JB_FS_RenderSpeed(FastString* self, float seconds, int64 BytesIn, int64 BytesOut, JB_String* Name);
+
 void JB_FS_AppendMultiStr(FastString* self, JB_String* data, int count);
 
 void JB_FS_AppendFastString(FastString* self, FastString* fs);
@@ -5089,6 +5184,16 @@ FastString* JB_FS__Use(JB_Object* other);
 
 
 // JB_FlowControl
+void JB_Flow_Cond(FlowControl* self, bool value);
+
+void JB_Flow_destructor(FlowControl* self);
+
+void JB_Flow_While(FlowControl* self, uint value);
+
+int JB_Flow__Init_();
+
+int JB_Flow__InitCode_();
+
 
 
 // JB_Instruction
@@ -5608,7 +5713,7 @@ bool JB_Str_IsInt(JB_String* self);
 
 bool JB_Str_IsIntFrom(JB_String* self, int i);
 
-bool JB_Str_IsJbin(JB_String* self);
+int JB_Str_IsJbin(JB_String* self);
 
 bool JB_Str_IsOKForImport(JB_String* self);
 
@@ -5740,7 +5845,7 @@ bool JB_Str_UnderScoreAtAnyEnd(JB_String* self);
 
 JB_String* JB_Str_Unescape(JB_String* self);
 
-JB_String* JB_Str_unicodesafename(JB_String* self);
+JB_String* JB_Str_UnicodeSafeName(JB_String* self);
 
 CharSet* JB_Str_UniCS(JB_String* self);
 
@@ -5788,7 +5893,7 @@ bool JB_SS_DecompressInto(StringStream* self, JB_Object* dest, int lim, Compress
 
 void JB_SS_destructor(StringStream* self);
 
-bool JB_SS_ExpectJbin(StringStream* self);
+int JB_SS_DetectJBinType(StringStream* self);
 
 int64 JB_SS_hInt(StringStream* self);
 
@@ -5800,13 +5905,9 @@ Message* JB_SS_NextMsg(StringStream* self);
 
 Message* JB_SS_NextMsgExpect(StringStream* self, Message* parent, Syntax fn, JB_String* name);
 
-void JB_SS_NextMsgAdd(StringStream* self, Message* New);
+uint64 JB_SS_NextMsgInfo(StringStream* self, bool CanDecomp);
 
-Message** JB_SS_NextMsgAllocate(StringStream* self);
-
-uint64 JB_SS_NextMsgInfo(StringStream* self);
-
-void JB_SS_NextMsgLZ(StringStream* self, uint Info);
+void JB_SS_NextMsgLZ(StringStream* self, MessageDecompressor* D, uint Info);
 
 bool JB_SS_NoMoreChunks(StringStream* self);
 
@@ -5831,6 +5932,8 @@ JB_String* JB_SS_StrNoAdvance(StringStream* self, int n, int skip);
 inline bool JB_SS_SyntaxCast(StringStream* self);
 
 void JB_SS_SyntaxExpect(StringStream* self, JB_String* Error);
+
+uint64 JB_SS_uint(StringStream* self, int size, int mult);
 
 StringStream* JB_SS__Alloc();
 
@@ -6062,6 +6165,8 @@ void JB_File__testjb();
 // JB_JBin
 void JB_bin_add(FastString* self, Syntax type, JB_String* data, bool into);
 
+bool JB_bin_AddCompressed(FastString* self, Message* Curr, MessageCompressor* D, bool Down);
+
 void JB_bin_AddCstring(FastString* self, _cstring data, Syntax type);
 
 void JB_bin_addint(FastString* self, int64 data);
@@ -6075,8 +6180,6 @@ void JB_bin_Constructor(FastString* self, Syntax type, JB_String* data);
 void JB_bin_Constructor0(FastString* self, int n);
 
 void JB_bin_enter(FastString* self, Syntax type, JB_String* data);
-
-void JB_bin_jinit(FastString* self);
 
 int JB_bin_OpenSection(FastString* self);
 
@@ -7855,7 +7958,9 @@ Message* JB_Msg_RemoveTypeCasts(Message* self);
 
 JB_String* JB_Msg_Render(Message* self, FastString* fs_in);
 
-JB_String* JB_Msg_render_jbin(Message* self, JB_String* shell_path, bool Compact, FastString* fs_in);
+JB_String* JB_Msg_render_jbin(Message* self, bool Compress, JB_String* shell_path, FastString* fs_in);
+
+void JB_Msg_render_jbin_sub(Message* self, FastString* js, MessageCompressor* D);
 
 void JB_Msg_RenderPrm(Message* self, FastString* fs, byte b1, byte b2);
 
@@ -8067,6 +8172,21 @@ bool JB_Msg__TreeCompare(Message* orig, Message* reparse, bool PrintIfSame);
 
 
 
+// JB_MessageID
+void JB_ID_Constructor(MessageID* self, JB_String* Name, Syntax Fn, uint64 Tag);
+
+void JB_ID_destructor(MessageID* self);
+
+JB_String* JB_ID_Render(MessageID* self, FastString* fs_in);
+
+inline bool JB_ID_SyntaxCast(MessageID* self);
+
+MessageID* JB_ID__Alloc();
+
+MessageID* JB_ID__New(JB_String* Name, Syntax Fn, uint64 Tag);
+
+
+
 // JB_MessageRoot
 
 
@@ -8234,6 +8354,18 @@ inline int SC_Reg_ToInt(AsmReg* self) {
 	return self->Reg;
 }
 
+inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v) {
+	(*self->Curr++) = v;
+	return self->Curr >= self->End;
+}
+
+inline bool JB_FastBuff_AppendU16(FastBuff* self, u16 v) {
+	u16* c = ((u16*)self->Curr);
+	(*c++) = v;
+	self->Curr = ((byte*)c);
+	return ((byte*)c) >= self->End;
+}
+
 inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in) {
 	Object_Behaviour* Table = ((Object_Behaviour*)JB_ObjClassBehaviours(self));
 	return (Table->render)(self, fs_in);
@@ -8295,6 +8427,10 @@ inline bool JB_Safe_SyntaxCast(JB_String* self) {
 
 inline _cstring JB_Str_SyntaxCast(JB_StringC* self) {
 	return JB_Str_cstring(self);
+}
+
+inline bool JB_ID_SyntaxCast(MessageID* self) {
+	return self != nil;
 }
 
 
