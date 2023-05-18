@@ -64,13 +64,13 @@ Just remember, jbin is always parseable by jeebox. So you have nothing to lose a
 
 * Faster parse and render
 * **Amazingly** smaller when storing binary files
-* Won't ever change. Jeebox does get tweaks from time to time, but Jbin doesn't need any.
 * Really easy to write parsers for in other languages, like javascript.
 
 #### Jbin disadvantages
 * Not human readable
 * Does not store formatting, or comments
-    
+* Is subject to change. Not final. Treat this as a caching system.
+
 #### History
 
 Lets give a little history about `jbin`. OK, so... basically, I was writing an `.m4a` parser in Speedie. This is to let me import files into a music player.
