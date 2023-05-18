@@ -1,18 +1,6 @@
 #!/usr/local/bin/speedie
 
 
-/* 
-	Leave this as it is right now.
-	One day holly can be used instead of the compressed jbin.
-	Just keep this for reference... like "holly should parse just as fast"
-	No reason it shouldn't!
-	
-	For now, don't consider jbin a storage format! Its just a speed-increasing format.
-	Like a cache...
-	
-	Because the format will probably change.
-*/
-
 
 function app.usage (|string|)
 	return "Usage: ${.filename} File1 [File2...]

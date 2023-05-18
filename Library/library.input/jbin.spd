@@ -1,8 +1,23 @@
 
 // jbin: streamable, binary jeebox
-// compressed mode is smaller and parses faster, but lower recompression.
-// a lot of compression options... maybe too many? mz/compact/hol?
-// im surprised hol was so slow.
+
+/* 
+	Leave this as it is right now.
+	One day hol can be used instead of the compressed jbin.
+	Just keep this for reference... like "hol should parse just as fast"
+	No reason it shouldn't!
+	
+	For now, don't consider jbin a storage format! Its just a speed-increasing format.
+	Like a cache...
+	
+	Because the format will probably change.
+	
+	Future improvement... allocate one block at a time! Can call constructor on each object
+	Just need a Curr+Last pointer.
+	
+	
+*/
+
 
 || _JbinHeader     = "\01\10\EA\E2"     /// can't put a constant in a role? 
 || _JbinHeaderComp = "\01\11\EA\E2"
@@ -149,8 +164,9 @@ helper stringstream.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
 			return info
 		if info == 0 :   continue
 		|| T = (info >> 1)|syntax|
-		check  (T > @nil)				(self, "jbin header was not pre-loaded.")
-		expect (t < @max and T > @nil)	(self, "Corrupted jbin")
+		if (t >= @max or T <= @nil)
+			expect (T > @nil) (self, "jbin header was not pre-loaded.")
+			expect (false)	  (self, "Corrupted jbin")
 
 		ifn (info & 1) and t.NoChildren
 			|| msg = .UserObj|message|.msg(t, .str(.hInt))|uint64|
