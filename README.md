@@ -42,17 +42,22 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 
 Use Speedie if you feel called to: Because you find it fun to work on, or work in.
 
-Describing why anyone would use Speedie is a bit difficult. I can say "the programs it makes, run fast" but most people would rather write C++ if they want speed.
+Why would you use Speedie? I can't answer that, because people make their decisions not based on good qualities but on power-structures in this world, or on some kind of destiny. But for now, lets list some good qualities.
 
-I could say "you usually only need a little code to do a lot" but most dynamic languages have this property. And besides, lacking a debugger right now really hampers development. (I'm working to fix this.)
+* The programs speedie makes, run fast.
+* I could say "you usually only need a little code to do a lot"
+* My GUI-system is platform-independant, so your code should mostly work the identical on other platforms.
+*  Accomplishes a lot from a very small code-base, useful for embedded programmers.
 
-I could say "well I have a GUI-system that is platform-independant"... except that the porting to other platforms isn't even done yet. Not much needed but SOMEONE needs to do it.
+That said, there are challenges to overcome, that will probably mean a lot of people who are already interested, would not use Speedie:
 
-I could say "Speedie is a language that accomplishes a lot from a very small code-base" which might be useful to embedded programmers... but again, without a debugger, its hard to write code.
+* Getting the IDE working on Linux+Windows
+* Making speedie run on Windows (Linux is done!)
+* Adding a good debugger, VM and executable-format!
 
-My language has a lot of good qualities but for each one, you can always find a reason why something else is better. Unfortunately that is because I am one person who has created a very large piece of work. Only extra developers contributing to Speedie can fix this.
+Unfortunately I am one person who has created a very large piece of work. Extra developers are sorely wanted!
 
-Honestly... the only reason to use Speedie right now, is if you find it interesting or fun.
+If you like the speed of C code, but hate doing memory-management, and want a modern sleek cross-platform language, speedie is probably the thing for you.
 
 Becoming a contributor could be a great way to add programming concepts to a new language. Assuming they fit with the overall existing feature set and have efficient implementations.
 
