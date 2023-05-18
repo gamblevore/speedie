@@ -416,11 +416,17 @@ function CreateAlloc (|string| ParseThing, |int| Extra)
 
 function LoadContainedType
 	.use
-	|| it = .super
-		.Contained = it.Contained
-		.SelfStrong.Contains = it.SelfStrong.Contains
-		ifn .isnotnumeric
-			.defawlt := it.defawlt
+	|| sup = .super
+		.Contained = sup.Contained
+		.SelfStrong.Contains = sup.SelfStrong.Contains
+		|| supd = sup.Defawlt
+		|| ParentHasDefault = supd and !(supd isthing "nil")
+		if .IsObject and !.IsRole
+			if !.Defawlt and ParentHasDefault
+				error (self, "Missing default value for class: "  + .name)
+		if !.isnotnumeric
+			.defawlt := supd
+		
 	
 	.defawlt := «Thg "nil"»
 
@@ -781,7 +787,7 @@ module
 		if (!ForInterface)
 			|| a = 1
 		  elseif (parent isa scmodule)
-			cls.cppclass = "__${parent.cls.name.unicodesafename}_${ForInterface.unicodesafename}__"
+			cls.CppClass = "__${parent.cls.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"
 		
 		
 		cls.defawlt = arg.findflat(@tmp, "default")[0]

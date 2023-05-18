@@ -1323,14 +1323,16 @@ function TypeOfRel (ExprResolver) {
 	if (RC != TypeNil)
 		|| IPM = IsPointerMath(LC, RC, comp, exp)
 			return IPM
-		Custom = UseCustomOperators(LC, RC, comp, exp) 
-		if Custom == CustomOps.needed
-			if (!comp.IsCompset) // bug here!!
-				return CustomFuncOp( exp, comp, name_space, RN )
-			  elseif comp.iscaseaware or CanOpCompare(exp, lc, rc, comp)
-				return DoOpCompare(exp, lc, rc, comp, name_space)
-		  elseif (comp.AsBit)
-			require RC.NoFloat(RN) and LC.NoFloat(LN)
+	Custom = UseCustomOperators(LC, RC, comp, exp) 
+	if Custom == CustomOps.needed
+		if (!comp.IsCompset) // bug here!!
+			return CustomFuncOp( exp, comp, name_space, RN )
+		  elseif RC == TypeNil
+			0 //
+		  elseif comp.iscaseaware or CanOpCompare(exp, lc, rc, comp)
+			return DoOpCompare(exp, lc, rc, comp, name_space)
+	  elseif (comp.AsBit)
+		require RC.NoFloat(RN) and LC.NoFloat(LN)
 	
 	if (custom & CustomOps.TypeCastFromBool) and !side and rn
 		lc = typeint.typenormal
