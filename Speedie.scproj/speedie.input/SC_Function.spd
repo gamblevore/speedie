@@ -1852,7 +1852,7 @@ function IsSelfOfSetter (|Message| curr, |Message|)
 
 
 
-function string.unicodesafename (|string|)
+function string.UnicodeSafeName (|string|)
 	if .isascii
 		return self
 	
