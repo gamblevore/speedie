@@ -38,16 +38,13 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 
 
 
-# Why Use Speedie? #
+# Power Features #
+* Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE*/ifstreams/fread and do everything using low-level Unix APIs.)
+* Doesn't infantilise you like Javascript or java does. Allows you to mess around with pointers or structs if you need... although its usually a buggier approach. 
+* Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
+	
 
-Use Speedie if you feel called to: Because you find it fun to work on, or work in.
-
-Why would you use Speedie? I can't answer that, because people make their decisions not based on good qualities but on power-structures in this world, or on some kind of destiny. But for now, lets list some good qualities.
-
-* The programs speedie makes, run fast.
-* I could say "you usually only need a little code to do a lot"
-* My GUI-system is platform-independant, so your code should mostly work the identical on other platforms.
-*  Accomplishes a lot from a very small code-base, useful for embedded programmers.
+# Remaining Challenges #
 
 That said, there are challenges to overcome, that will probably mean a lot of people who are already interested, would not use Speedie:
 
@@ -55,19 +52,7 @@ That said, there are challenges to overcome, that will probably mean a lot of pe
 * Making speedie run on Windows (Linux is done!)
 * Adding a good debugger, VM and executable-format!
 
-Unfortunately I am one person who has created a very large piece of work. Extra developers are sorely wanted!
-
-If you like the speed of C code, but hate doing memory-management, and want a modern sleek cross-platform language, speedie is probably the thing for you.
-
-Becoming a contributor could be a great way to add programming concepts to a new language. Assuming they fit with the overall existing feature set and have efficient implementations.
-
-
-
-# Power Features #
-* Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE*/ifstreams/fread and do everything using low-level Unix APIs.)
-* Doesn't infantilise you like Javascript or java does. Allows you to mess around with pointers or structs if you need... although its usually a buggier approach. 
-* Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
-	
+Unfortunately I am one person who has created a very large piece of work. Extra developers are sorely wanted! Becoming a contributor could be a great way to add programming concepts to a new language.
 
 # Goals #
 I have a lot of long-term goals... Overall, I want to make programming a whole lot more fun. Here goes for a partial-list of goals!
