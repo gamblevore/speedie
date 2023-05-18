@@ -19,7 +19,8 @@ class StringShared (string)
 class MessageID (stringshared)				// now is usefully used! :D
 	linkage
 		cpp_part ID
-		
+	
+	default NIL
 	contains object
 	||					Obj
 	|uint64| 			Tag
@@ -43,6 +44,39 @@ class MessageID (stringshared)				// now is usefully used! :D
 	function Msg (|message| parent, |message|)
 		return Message(parent, .func, -1, .name, .name.length)
 
+
+	module
+		function IDSorter (SorterComparer)
+			opt norefcounts
+			|| aa = a|MessageID|,   || bb = b|MessageID| 
+			
+			|| diff = aa.Tag  -  bb.Tag
+				return diff > 0							// more frequent should have lower lengths
+				
+			return aa|uint64| < bb|uint64|
+			// Now what?
+
+
+
+function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)
+	opt NoRefCounts
+	|| s = self
+	|| Count = 0
+	while s
+		|| name = s.name
+		|| Found = d.makeplace(s)|&messageID|
+		|| ID = *found
+		if ID != nil
+			ID.Tag++
+		  else
+			rz += name.Length				// a direct result within self
+			id = MessageID(name, s.func, 0)
+//			id.Position = Count++
+			*found = id
+			if table != nil
+				table <~ id
+		s.Name = id
+		s = s.flatnext
 
 
 struct MessageDecompressor

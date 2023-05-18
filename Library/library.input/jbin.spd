@@ -1,6 +1,8 @@
 
 // jbin: streamable, binary jeebox
-// offers a compacted version too!
+// compressed mode is smaller and parses faster, but lower recompression.
+// a lot of compression options... maybe too many? mz/compact/hol?
+// im surprised hol was so slow.
 
 || _JbinHeader     = "\01\10\EA\E2"     /// can't put a constant in a role? 
 || _JbinHeaderComp = "\01\11\EA\E2"
@@ -34,15 +36,15 @@ extend message
 				js.Add(curr.func, curr.name, depth > 0)
 			js.up(-depth)
 
+// this will do.
+
 	helper jbin.AddCompressed (|message| Curr, |&MessageCompressor| D, |bool| Down, |bool|)
 		opt norefcounts  // now what? detect
 		|| back = d.Find(curr)								#require
-		|| info = ((d.position - back.Tag)-1 << 1)  (|)  Down 
+		|| info = ((d.position - back.Tag)-1 << 1) (|) Down
 		if info < 112
 			self <~ ((info+15)(|)128)|byte|
 		  else
-			if !curr.name
-				return false // no point... 2 bytes either way but this is slower
 			self <~ ((info&15)(|)128)|byte|
 			.hint(info>>4)
 		return true
@@ -168,14 +170,14 @@ helper stringstream.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
 	|| Index  = Info >> 1
 	|| Ref    = D.curr-(Index+1)
 	expect (ref >= D.Table and ref < d.curr) (self, "Corrupted jbin")
-	|| r = *ref
-	|| Msg    = .UserObj|message|.msg(r.func, r.name)
+	|| r      = *ref
+	|| p      = .userobj|message|
+	|| Msg    = p.msg(r.func, r.name)
 	if Info & 1
 		.UserObj = msg
 
 
 helper stringstream.Parse_Jbliz (|MessageRoot|)
-	// compacted jbin, using lz-like scheme
 	|MessageDecompressor| Decomp
 	rz = .NextMsginfo|messageroot|
 	Decomp <~ rz|message|
@@ -187,14 +189,17 @@ helper stringstream.Parse_Jbliz (|MessageRoot|)
 			loop Decomp <~ msg|message|
 
 
+function stringstream.DetectJBinType (|int|)
+	return .str(4).IsJbin
+	
+	
 function stringstream.Parse_Jbin (|MessageRoot|)	
 	.UserObj = nil
-	|| Header = .str(4)
-	
-	if header == _JbinHeader
+	|| T = .DetectJBinType
+	if T == 1
 		rz = .NextMsginfo|messageroot|
 		while .NextMsginfo
-	  elseif Header == _JbinHeaderComp
+	  elseif T == 2
 		rz = .parse_jbliz
 	  else
 		error (self, _jBinNotJbin)
@@ -205,8 +210,11 @@ function stringstream.Parse_Jbin (|MessageRoot|)
 function string.parse_jbin (|message|)
 	return .Stream.Parse_Jbin
 
-function string.IsJbin (|bool|)
-	return self starts _JbinHeader
+function string.IsJbin (|int|)
+	if self starts _JbinHeader
+		return 1
+	if self starts _JbinHeaderComp
+		return 2
 
 function string.digest (|string|)
 	if .IsJbin
