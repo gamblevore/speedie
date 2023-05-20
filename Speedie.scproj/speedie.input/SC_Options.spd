@@ -18,7 +18,7 @@ module Options
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
 	||		HideMultipleErrors		= true
-	||		FlowControlEnabled		= false
+	||		FlowControlEnabled		= true
 	||		Products				= native
 	||		Cpp						= true
 	||		Compile					= true

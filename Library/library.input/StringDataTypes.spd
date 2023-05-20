@@ -99,6 +99,8 @@ datatype cstring
 		return string.copy(self|&byte|, .length)
 	function puts
 		cpp_wrapper puts // hehe
+	function Str (|string|)
+		return string.fromc(self)
 	render
 		if fs_in
 			fs_in <~ self

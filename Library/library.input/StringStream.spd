@@ -124,7 +124,7 @@ class StringStream
 	
 	function upto (|int| end, |int|)
 		return end - .position
-	function uint (|int| size, |int| mult=256, |uint64|)
+	function uint (|int| size, |int| mult=256, |uint64|) // mult used by selftools id3 decoder, passes 128.
 		for size
 			rz *= mult
 			rz += .Byte

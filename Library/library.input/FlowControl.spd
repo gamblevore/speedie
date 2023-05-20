@@ -2,10 +2,14 @@
 
 /*
 	API to check if something different happened to the flow control from one platform to another
-	only two functions should be called... .While and .Cond
+	only call: flowcontrol.Cond
 */
 
 
+datatype FlowControlStopper (uint)
+	syntax usingcomplete
+		flowcontrol.stop
+		
 class FlowControl
 	linkage:cpp_part Flow
 	|FastBuff|				Buff
@@ -15,16 +19,18 @@ class FlowControl
 
 	constructor (|string| Path)
 		flow off
-		printline "Capturing flow: " + path
-		.write = path.AddExt(".flow").out
 		.ok = .buff.Alloc(1MB)
-		.init
+		.init(path)
+		print "Capturing flow: "
+		printline path
 
-	helper init
-		if .write
-			|| readpath = .write.file.AddExt(".expected")
-			if readpath.fileexists 
-				.read = readpath.in
+	helper init (|string| path)
+		|| prev = path.AddExt(".expected")
+		if !prev.fileexists and path.fileexists
+			require path.file.moveto(prev)
+		.write = path.out
+		if prev.fileexists 
+			.read = prev.readFile.decompress.stream
 
 	helper Flush
 		flow off
@@ -37,11 +43,12 @@ class FlowControl
 		opt norefcounts
 		|| r = .read
 		require r != nil
-		debugat
 		|| Found = r.uint(Size)
 		if Found != Expected
-			"Flow Control differs here: ${app.StackTrace}"
-			debugger 
+			"Flow differs here: "
+			printline app.StackTrace("JB_Flow__Cond")
+			.read = nil
+			 
 
 	destructor
 		FlowControl.Disabled = int.max
@@ -55,27 +62,23 @@ class FlowControl
 		if .buff <~ value|byte|
 			.Flush
 		.Test(value|uint|, 1)
-
-	syntax UsingComplete
-		flowcontrol.stop
 	
 	module
-		|uint| 			Disabled = int.max
-		|flowcontrol|	Flow 
+		|uint| 					Disabled = int.max
+		|flowcontrol|			Flow 
 		|CompressionStats| 		Stats
 		
 		function Activate
 			.Disabled = int.max // in case its set badly
-			.flow = FlowControl(app.ExePath)
+			.flow = FlowControl(app.ExePath.AddExt(".flow"))
 			.Disabled = 0
 		
 		function Stop
-			.Flow = nil
 			.Disabled = int.max
+			.Flow = nil
 
-		syntax Using (|flowcontrol|)
+		syntax Using (|FlowControlStopper|)
 			.Activate
-			return nil
 
 
 

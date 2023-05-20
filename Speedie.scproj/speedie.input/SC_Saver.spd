@@ -303,7 +303,10 @@ module SC_Saver {
 			R <~ s
 		R <~ "hello"
 		
-		|| F = TransCompiler.tmpbase("SavingTest.txt").file
+		|| path = TransCompiler.tmpbase("SavingTest.txt")
+		|| F = path.file
+		if f.exists
+			path.file.moveto(path.sibling("SavingTestOld.txt"))
 		R.saveto(F)
 		
 		|| R2 = F.parse.RestoreLoad
