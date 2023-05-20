@@ -61,7 +61,7 @@ extend PerryIDE
 		  elseif .editsep.div.Collapsed
 			.ShowStdOut  
 		  else
-			beep
+			ClickedCancel(.BuildButton)
 			
 	
 	function CompileMsg (|string| operation, |bool| SaveAll, |message|)
