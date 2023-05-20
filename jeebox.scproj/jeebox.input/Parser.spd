@@ -1309,6 +1309,7 @@ extend Message
 
 datatype MsgUIFlags (uint16)
 	flags
+		AlreadyProcessed=  0x800
 		Reserved		= 0x1000
 		Inserted		= 0x2000
 		Style2			= 0x4000
