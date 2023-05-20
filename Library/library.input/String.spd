@@ -429,7 +429,11 @@ class String
 			disabled "cast to a cstring first"
 			cpp_Part fromcstr2
 			
-			
+		function Hash (|[string]| r, |uint64|)
+			opt norefcounts
+			for s in r
+				(rz xor= s.hash)
+				
 		function Error (|string|)
 			cpp_wrapper JB_Str__Error
 		

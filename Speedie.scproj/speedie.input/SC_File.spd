@@ -67,6 +67,7 @@ class SCFile (file)
 
 	function AST (|Message|)
 		opt norefcounts
+		flowcontrol.CurrAction = .file.path
 		return .liveast init .ASTSub$
 
 

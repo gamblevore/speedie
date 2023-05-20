@@ -997,7 +997,7 @@ function Timer (|string| name)
 function Stage (|string| name, |bool|)
 	require StdErr.OK
 	if (Options.PrintStages)
-		|| space = (" ", "")(Compiler.CurrStage <= 9)
+		|| space = " "*(Compiler.CurrStage <= 9)
 		" ${.CurrStage}$space  :: $name ::  "
 	.CurrStage++
 	return true

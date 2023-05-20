@@ -399,10 +399,13 @@ class File (String)
 				exit
 	
 	function List (|bool|invis = false, |[string]|)
+		flow off
 		for name in self
 			if (invis) or (name[0] != '.')
 				rz <~ name
 		rz.sort(stringsorter)
+		if !flowcontrol.disabled
+			flowcontrol.AddCode(string.hash(rz))
 	
 	function MoveTo (|string| Path, |ErrorInt|)
 		cpp_wrapper JB_File_MoveTo

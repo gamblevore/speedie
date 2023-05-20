@@ -37,17 +37,6 @@ class FlowControl
 		.buff.tmpstr.CompressInto(.write, stats)
 		.buff.Curr = .buff.start
 		.write.Flush
-	
-	helper Test (|uint| Expected, |int| Size)
-		flow off
-		opt norefcounts
-		|| r = .read
-		require r != nil
-		|| Found = r.uint(Size)
-		if Found != Expected
-			"Flow differs here: "
-			printline app.StackTrace("JB_Flow__Cond")
-			.read = nil
 			 
 
 	destructor
@@ -56,18 +45,36 @@ class FlowControl
 		printline stats.render
 		stats.clear
 
-	helper Cond (|bool| value)	
+	syntax append (|byte| value)
+		cpp_part Cond
 		flow off
+		opt norefcounts
 		visible
-		if .buff <~ value|byte|
+		if .buff <~ value
 			.Flush
-		.Test(value|uint|, 1)
+		|| r = .read
+		require r != nil
+		|| Found = r.byte
+		if Found != value
+			"Flow differs here:"
+			printline app.StackTrace("JB_Flow__Cond")
+			if curraction
+				print "During: "
+				printline CurrAction
+				
+			.read = nil
 	
 	module
 		|uint| 					Disabled = int.max
 		|flowcontrol|			Flow 
 		|CompressionStats| 		Stats
+		|string|				CurrAction
 		
+		function AddCode (|uint64| Code, |uint| Size=8)
+			for Size
+				flow <~ code&255
+				code >>= 8
+			
 		function Activate
 			.Disabled = int.max // in case its set badly
 			.flow = FlowControl(app.ExePath.AddExt(".flow"))

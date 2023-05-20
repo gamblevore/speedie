@@ -118,8 +118,7 @@ class SCImport
 	
 	
 	function ImportDir (|File| f,  |string| Path,  |SCFile|)
-		for cName in f
-			(cName[0] != '.') #continue
+		for cName in f.list
 			|| c		= f[cName]
 			|| CurrPath = path.child( cname )
 			|| ext		= cName.ext
