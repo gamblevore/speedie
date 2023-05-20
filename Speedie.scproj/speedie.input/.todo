@@ -2,6 +2,8 @@
 
 						bugs
 
+* "a ~ B"  vs  "a~b". first one parses wrong
+* insertion should lowercase a~B into a~b
 * could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
 * x = (0, 0|byte|) // fails!
 * function finding fails with dictionary subclasses? dictsub["abc"]
