@@ -1,0 +1,9 @@
+
+
+function Tran_Flow (TranFunc)
+	|| msg = node[@thg] #require
+	msg.ExpectLast
+	node.SafeRemove
+	check (msg == "off")  (msg, "Only allowed value is 'off'.")
+	fn.FlowDisabled = true
+	

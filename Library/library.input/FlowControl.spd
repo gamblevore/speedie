@@ -1,69 +1,81 @@
 
+
 /*
-So what do we have? we basically write a chunk of data into a file, and it gets
-compressed! Pretty simple! So we want the stringstream to be able to give us back chunks of data.
+	API to check if something different happened to the flow control from one platform to another
+	only two functions should be called... .While and .Cond
 */
-
-
-struct FlowPart
-	linkage:cpp_part FLP
-	|FastBuff|				Buff
-	|stringstream|			Read
-	|faststring| 			Write
-	
-	function init (|string| path, |string| type, |bool|)
-		|| sign = type * 2
-		.write = path.AddExt(".flow."+type).out #require
-		.read = path.AddExt(".expected."+type).in(sign)
-		.write <~ sign
-		return .buff.Alloc(1MB)
-
-	function Flush
-		.buff.tmpstr.CompressInto(.write, flowpart.stats)
-		.buff.Curr = .buff.start
-		.write.Flush
-	
-	function Test (|uint| Expected, |int| Bytes)
-		opt norefcounts
-		|| r = .read
-			|| Found = r.uint(bytes)
-			if Found != Expected
-				"Flow Control differs here: ${app.StackTrace}"
-				debugger 
-
-	module
-		|CompressionStats| 		Stats
 
 
 class FlowControl
 	linkage:cpp_part Flow
-	|FlowPart| 			Bits
-	|FlowPart| 			Loops
-	|bool| 				OK
-	|uint16| 			LoopCount
-	
+	|FastBuff|				Buff
+	|stringstream|			Read
+	|faststring| 			Write
+	|bool| 					OK
+
 	constructor (|string| Path)
-		.ok = .loops.init(path, "w") and .bits.init(path, "b")
+		flow off
+		printline "Capturing flow: " + path
+		.write = path.AddExt(".flow").out
+		.ok = .buff.Alloc(1MB)
+		.init
 
-	function While (|uint| value)
-		visible
-		if value
-			.LoopCount++
-			return
-	
-		|| c = .LoopCount
-		.LoopCount = 0
-		if .Loops.buff <~ c|uint16|
-			.loops.flush
-		.loops.Test(c, 2)
+	helper init
+		if .write
+			|| readpath = .write.file.AddExt(".expected")
+			if readpath.fileexists 
+				.read = readpath.in
 
-	function Cond (|bool| value)	
-		visible
-		if .bits.buff <~ value|byte|
-			.bits.Flush
-		.bits.Test(value|uint|, 1)
+	helper Flush
+		flow off
+		.buff.tmpstr.CompressInto(.write, stats)
+		.buff.Curr = .buff.start
+		.write.Flush
 	
+	helper Test (|uint| Expected, |int| Size)
+		flow off
+		opt norefcounts
+		|| r = .read
+		require r != nil
+		debugat
+		|| Found = r.uint(Size)
+		if Found != Expected
+			"Flow Control differs here: ${app.StackTrace}"
+			debugger 
+
+	destructor
+		FlowControl.Disabled = int.max
+		.flush
+		printline stats.render
+		stats.clear
+
+	helper Cond (|bool| value)	
+		flow off
+		visible
+		if .buff <~ value|byte|
+			.Flush
+		.Test(value|uint|, 1)
+
+	syntax UsingComplete
+		flowcontrol.stop
 	
 	module
-		|flowcontrol| flow 
+		|uint| 			Disabled = int.max
+		|flowcontrol|	Flow 
+		|CompressionStats| 		Stats
+		
+		function Activate
+			.Disabled = int.max // in case its set badly
+			.flow = FlowControl(app.ExePath)
+			.Disabled = 0
+		
+		function Stop
+			.Flow = nil
+			.Disabled = int.max
+
+		syntax Using (|flowcontrol|)
+			.Activate
+			return nil
+
+
 

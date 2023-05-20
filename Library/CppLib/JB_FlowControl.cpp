@@ -7,31 +7,17 @@
 
 
 extern "C" {
-	extern void* JB__Flow_flow;
-	void JB_Flow_Cond(void* a, bool b);
-	void JB_Flow_While(bool value, uint p);
+	struct FlowControl;
+	extern FlowControl* JB__Flow_Flow;
+	extern uint  JB__Flow_Disabled;
+	void JB_Flow_Cond(FlowControl* flow, bool b);
 	bool JB_Flow__Cond(bool cond) {
-		if (JB__Flow_flow) {
-			JB_Flow_Cond(JB__Flow_flow, cond);
+		if (!JB__Flow_Disabled) {
+			JB__Flow_Disabled++;
+			JB_Flow_Cond(JB__Flow_Flow, cond);
+			JB__Flow_Disabled--;
 		}
 		return cond;
-	}
-
-	bool JB_Flow__While(bool value, uint* p) {
-		(*p)++;
-		if (JB__Flow_flow) {
-			JB_Flow_While(JB__Flow_flow, *p);
-		}
-		return value;
-	}
-	
-	void test () {
-		uint counter = 0; while (JB_Flow__While(counter < 10, &counter)) {
-			printf("X: %i\n", counter);
-			uint counter = 0; while (JB_Flow__While(counter < 10, &counter)) {
-				printf("Y: %i\n", counter);
-			}
-		}
 	}
 }
 

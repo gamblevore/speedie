@@ -119,7 +119,7 @@ Module MZLab
 
 
 target minilib {
-struct CompressionStats
+struct CompressionStats 
 	linkage:cpp_part MzSt
 	function start
 	function end
@@ -153,8 +153,7 @@ struct CompressionStats
 	function LiveUpdate (|int| inn, |int| outt)
 		.in += inn
 		.out += outt
-		|| d = .durr
-		if .live and d > 1
+		if .live
 			printline .render
 	function durr (|float|)
 		|| d = .duration

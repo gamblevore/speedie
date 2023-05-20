@@ -42,8 +42,8 @@ extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
 |FastStringCpp|						AllTypes
 |FastStringCpp|						ModuleProperties
 module 
-	|| IfName = "if"
-	|| WhileName = "while"
+	|| IfName = ""
+	|| WhileName = ""
 
 
 
@@ -166,10 +166,20 @@ function Codify (|SCModule| scb, |string| fName)
 	cpp_Export.currclass = nil
 
 
+function SetupFlow (|SCFunction| f)
+	scfunction.CurrFunc = f
+	if Options.FlowControlEnabled and !f.FlowDisabled
+		Cpp_Export.IfName = "iif"
+		Cpp_Export.WhileName = "wwhile"
+	  else
+		Cpp_Export.IfName = "if"
+		Cpp_Export.WhileName = "while"
+
+
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
 	for (f in list)
 		if f.NeedsExport
-			scfunction.CurrFunc = f
+			.SetupFlow(F)
 			.func( file, f, .HeaderProj )
 			scfunction.CurrFunc = nil
 
@@ -294,11 +304,7 @@ __nodebug void jb_decr(jbobject* s) {
 
 
 
-function Run 
-	if Options.FlowControlEnabled
-		Cpp_Export.IfName = "iif"
-		Cpp_Export.WhileName = "wwhile"
-		
+function Run 		
 	for c in Compiler.ClassList
 		if !c.IsFunc
 			WriteType( c, .AllTypes, true )
@@ -1013,7 +1019,7 @@ module
 		opt norefcounts
 		|| d = .obj
 
-		fs <~ "{"
+		fs <~ '{'
 		fs.indent++
 		
 		for (ch in self)
@@ -1027,7 +1033,6 @@ module
 
 // closers... suck for linepos. so we just don't put a line there.
 		fs <~ '}'
-
 		if .next
 			fs.IndentLine
 	
@@ -1125,7 +1130,7 @@ module
 		for mv in self
 			fs <~ ' '
 			mv.Export( fs )
-
+		
 
 	function C_RenderOpp (fpMsgRenderCpp)
 		|| s = .name
@@ -1332,9 +1337,10 @@ module
 
 
 	function C_RenderBra (fpMsgRenderCpp)
-		fs <~ '('
-		.first.Export( fs )
-		fs <~ ')'
+		ifn self in @arg and .first == @thg
+			fs <~ '('
+			.first.Export( fs )
+			fs <~ ')'
 
 
 	function C_RenderArl (fpMsgRenderCpp)

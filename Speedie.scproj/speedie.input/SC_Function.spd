@@ -44,6 +44,7 @@ linkage
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
 |bool|					IsInline
+|bool| 					FlowDisabled
 |bool|					IsExternalLib
 |bool|					IsWrapper
 |bool|					NoRefCounts

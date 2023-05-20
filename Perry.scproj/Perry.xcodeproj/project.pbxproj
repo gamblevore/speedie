@@ -75,6 +75,8 @@
 		AC528F122961F9B4005EFB9D /* JB_Tokeniser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED82961F9B4005EFB9D /* JB_Tokeniser.cpp */; };
 		AC528F152961FB2E005EFB9D /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F142961FA8C005EFB9D /* libSDL2.dylib */; };
 		AC528F172961FB32005EFB9D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F132961F9F0005EFB9D /* AVFoundation.framework */; };
+		AC64E6782A17E010007827C9 /* JB_FlowControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC64E6772A17E010007827C9 /* JB_FlowControl.cpp */; };
+		AC64E67B2A17E032007827C9 /* JB_FlowControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC64E67A2A17E032007827C9 /* JB_FlowControl.cpp */; };
 		ACB2D24F29BCCAB70070E60F /* JB_Vectors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EBF2961F9B2005EFB9D /* JB_Vectors.cpp */; };
 		ACB2D25029BCCAB70070E60F /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528E7D2961F946005EFB9D /* JB_Globals.cpp */; };
 		ACB2D25129BCCAB70070E60F /* JB_OSX.m in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED32961F9B3005EFB9D /* JB_OSX.m */; };
@@ -254,6 +256,9 @@
 		AC528F132961F9F0005EFB9D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		AC528F142961FA8C005EFB9D /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = Build/Release/Perry.app/Contents/Frameworks/libSDL2.dylib; sourceTree = "<group>"; };
 		AC61010E2798768C00278BEF /* libSpeedie.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSpeedie.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC64E6772A17E010007827C9 /* JB_FlowControl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_FlowControl.cpp; path = ../Library/CppLib/JB_FlowControl.cpp; sourceTree = "<group>"; };
+		AC64E6792A17E016007827C9 /* JB_FlowControl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_FlowControl.cpp; path = ../Library/CppLib/JB_FlowControl.cpp; sourceTree = "<group>"; };
+		AC64E67A2A17E032007827C9 /* JB_FlowControl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_FlowControl.cpp; path = ../Library/CppLib/JB_FlowControl.cpp; sourceTree = "<group>"; };
 		AC78080D256C065000ED647E /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		ACB2D27929BCCAB70070E60F /* PerryDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACB86AF9260BB58900555758 /* Perry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perry.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -380,6 +385,9 @@
 		AC9E1718233A859B003B433F = {
 			isa = PBXGroup;
 			children = (
+				AC64E6772A17E010007827C9 /* JB_FlowControl.cpp */,
+				AC64E6792A17E016007827C9 /* JB_FlowControl.cpp */,
+				AC64E67A2A17E032007827C9 /* JB_FlowControl.cpp */,
 				AC3A6A8D296082E700CE1E91 /* README.md */,
 				AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */,
 				AC28D04B2638AAE700635A66 /* perry.input */,
@@ -432,7 +440,7 @@
 /* Begin PBXLegacyTarget section */
 		AC9220A22857A127002F3F97 /* DebugBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --externalcompile --nocompile --targetdebug  /usr/local/speedie/Perry.scproj ";
+			buildArgumentsString = "--nocolor --externalcompile --nocompile --targetdebug --flow /usr/local/speedie/Perry.scproj ";
 			buildConfigurationList = AC9220A32857A127002F3F97 /* Build configuration list for PBXLegacyTarget "DebugBuilder" */;
 			buildPhases = (
 			);
@@ -648,6 +656,7 @@
 				ACB2D25229BCCAB70070E60F /* JB_Tokeniser.cpp in Sources */,
 				ACB2D25329BCCAB70070E60F /* JB_Date.cpp in Sources */,
 				ACB2D25429BCCAB70070E60F /* JB.cpp in Sources */,
+				AC64E6782A17E010007827C9 /* JB_FlowControl.cpp in Sources */,
 				ACB2D25529BCCAB70070E60F /* JB_MSR.cpp in Sources */,
 				ACB2D25629BCCAB70070E60F /* JB_BasicIO.cpp in Sources */,
 				ACB2D25729BCCAB70070E60F /* JB_DirReaderUnix.cpp in Sources */,
@@ -692,6 +701,7 @@
 				AC528EFE2961F9B4005EFB9D /* JB_BasicIO.cpp in Sources */,
 				AC528F042961F9B4005EFB9D /* JB_DirReaderUnix.cpp in Sources */,
 				AC528EDA2961F9B4005EFB9D /* JB_Math.cpp in Sources */,
+				AC64E67B2A17E032007827C9 /* JB_FlowControl.cpp in Sources */,
 				AC528F0C2961F9B4005EFB9D /* JB_Utils.cpp in Sources */,
 				AC528F0E2961F9B4005EFB9D /* JB_Saveable.cpp in Sources */,
 				AC528F0A2961F9B4005EFB9D /* JB_Errors.cpp in Sources */,

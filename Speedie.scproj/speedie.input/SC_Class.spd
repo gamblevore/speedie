@@ -702,7 +702,6 @@ function IsA (|SCClass| S, |bool|)
 function real_isa (|SCClass| cls, |bool|)
 	opt norefcounts
 	|| s = .realclass
-	|| c = cls.realclass
 	return s.isa(cls)
 
 

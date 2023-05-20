@@ -28,6 +28,7 @@ dispatch TemporalStatements (TranFunc)
 	debugat					(Tran_DoAt)
 	doat					(Tran_DoAt)
 	visible					(Tran_Visible)
+	flow					(Tran_Flow)
 
 	print					(Tran_Print)
 	printline				(Tran_Print)

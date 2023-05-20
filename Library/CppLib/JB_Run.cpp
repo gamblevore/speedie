@@ -77,6 +77,7 @@ JBObject_Behaviour  JB_Object_FuncTable_ = {0,0};
 JB_Class*           ClassList;
 int					JB_ErrorNumber;
 extern char**		environ;
+extern uint			JB__Flow_Disabled;
 static Array*		App_Args;
 _cstring			App_CalledBy;
 
@@ -163,6 +164,7 @@ void JB_Str__LoadGlobals() {
 
 int JB_LibInit (_cstring* R) {
 	JB_ErrorNumber = 0;
+	JB__Flow_Disabled = 0x7fffFFFF;
 
 	static_assert((sizeof(ivec3) == 12 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 12 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
     if (JB_MemStandardWorld()->CurrSuper)

@@ -376,11 +376,11 @@ class File (String)
 		rz.file = f
 
 	
-	function string.In (|string|T="", |int| ChunkSize=4MB, |StringStream|)
+	function string.In (|string|Header="", |int| ChunkSize=4MB, |StringStream|)
 		|| f = .file
 		if f.mustexist("stream")
 			rz = stringstream(f, chunkSize)
-			if !rz.test(t)
+			if !rz.test(Header)
 				rz = nil
 	
 	function Copy (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
