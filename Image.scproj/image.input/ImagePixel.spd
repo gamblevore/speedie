@@ -131,7 +131,7 @@ struct ImagePixel
 		return  .R + .G + .B
 		
 	function brightness (|float|)
-		return .Gray * 0.0013071895
+		return .Gray * 765th
 		
 	syntax append (|float| v)
 		cpp_part AppendFloat
@@ -147,7 +147,7 @@ struct ImagePixel
 	
 	function Overlay (|vec4| T)
 		|| C = mix(self, T, T.a)
-		.rgb = c
+		.rgb = c // why not set .a also? would mean I can store it using __builtinconvert
 
 	function Underlay (|vec4| b) 
 		|| Old = .color
@@ -160,10 +160,10 @@ struct ImagePixel
 		(self|&uint|)[0] = r[0]
 
 	function Color (|vec4|)
-		return .raw.vec4 * (1.0/255.0) // there is no half-bright value, then... sigh. cos its not a multiple of 2.
+		return vec4.load(self|&byte|) * 255th
 		
 	function Raw (|ivec4|)
-		return (.r, .g, .b, .a)
+		return ivec4.load(self|&byte|)
 	
 	function Uint (|uint|)
 		return self|&uint|[0]

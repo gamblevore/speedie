@@ -798,6 +798,7 @@ datatype vec4
 	
 	function sqrt (|vec4|)
 		cpp_inbuilt __builtin_ia32_sqrtps
+
 	function ivec4 (|ivec4|)
 		return (.x|int|, .y|int|, .z|int|, .w|int|)	
 
@@ -818,6 +819,8 @@ datatype vec4
 		function new (|float| a, |float| b, |float| c, |float| d, |vec4|)
 			cpp_part New4
 			return (a,b,c,d)
+		function Load (|&byte| b, |vec4|)
+			cpp_inbuilt JB_vec4_Load
 
 
 datatype ivec4
@@ -830,6 +833,7 @@ datatype ivec4
 		
 	function BoundClip (|ivec4| bn, |ivec4|)
 		return .bound(bn).clip(bn)
+
 	function Bound (|ivec4| bn, |ivec4|)
 		rz = self
 		if rz.x < bn.x
@@ -844,7 +848,6 @@ datatype ivec4
 		  elseif .y2 > bn.y2
 			rz.y2 = bn.y2
 			rz.y = bn.y2 - .height
-		
 		
 	function vec4 (|vec4|)
 		return (.x|float|, .y|float|, .z|float|, .w|float|)
@@ -961,6 +964,9 @@ datatype ivec4
 		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
 	
 	module
+		function Load (|&byte| b, |ivec4|)
+			cpp_inbuilt JB_ivec4_Load
+
 		function zero (|ivec4|)
 			return (0, 0, 0, 0)
 		function new (|ivec4|)

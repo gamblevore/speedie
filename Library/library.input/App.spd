@@ -93,14 +93,25 @@ function Path (|string|)
 	return ._path
 	
 
-render StackTrace
+Function StackTraceArray (|string| StartAfter="", |[string]|)
 	|_voidptr[128]| arr
 	|| size = 128
 	|| strs = process.BackTrace(&arr[0], &size)
 	for i in size
-		fs <~ strs[i]
-		fs <~ '\n'
+		|| s = strs[i].copy
+		if !StartAfter 
+			rz <~ s
+		  elseif s contains StartAfter
+			StartAfter = nil
 	memory.free(strs)
+
+
+render StackTrace (|string| StartAfter = "")
+	|| r = .stacktracearray(StartAfter)
+	for s in r
+		fs <~ s
+		fs <~ '\n'
+
 
 function Restart
 	.turninto(.path, .rawargs)

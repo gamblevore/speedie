@@ -4,8 +4,18 @@
 
 typedef int   ivec4 __attribute__ ((vector_size (16)));
 typedef float  vec4 __attribute__ ((vector_size (16)));
+typedef unsigned char  bytevec4 __attribute__ ((vector_size (4)));
 typedef int   ivec2 __attribute__ ((vector_size (8)));
 typedef float  vec2 __attribute__ ((vector_size (8)));
+inline ivec4 JB_ivec4_Load(unsigned char* data) {
+	bytevec4 bv = *((bytevec4*)data);
+	return __builtin_convertvector(bv, ivec4);
+};
+inline vec4 JB_vec4_Load(unsigned char* data) {
+	bytevec4 bv = *((bytevec4*)data);
+	return __builtin_convertvector(bv, vec4);
+};
+
 
 
 // the problem is that vec3 if done the same way as above,... doesn't store to a size of 12.
