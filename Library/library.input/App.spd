@@ -100,12 +100,12 @@ Function StackTraceArray (|string| StartAfter="", |[string]|)
 	|_voidptr[128]| arr
 	|| size = 128
 	|| strs = process.BackTrace(&arr[0], &size)
+	|| start = 0
 	for i in size
-		|| s = strs[i].copy
-		if !StartAfter 
-			rz <~ s
-		  elseif s contains StartAfter
-			StartAfter = nil
+		if strs[i].copy contains startafter
+			start = i + 1
+	for i in start to size-1 
+		rz <~ strs[i].copy
 	memory.free(strs)
 
 
