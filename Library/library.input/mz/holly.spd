@@ -34,7 +34,7 @@ struct HollyPlanter
 		.table <~ (messageID("", @nil, 0), IDCount)
 		|| Found = 0
 		
-		while T
+		while T.hasany
 			|| Raw = T.Byte
 			|| fn = (raw&127)|syntax|				#expect (.input, "Bad syntax")
 			|| Amount = (T.noob, 1)(Raw&128)
@@ -52,7 +52,7 @@ struct HollyPlanter
 		|| TreeParser = .Tree.DecompressStream
 		|uint64| Highest = MaxOneByte
 		
-		while TreeParser
+		while TreeParser.hasany
 			|| Raw = TreeParser.noob
 			if Raw >= 16
 				Raw -= 16
@@ -68,10 +68,11 @@ struct HollyPlanter
 					rz := msg
 			  else
 				parent = parent.upward(Raw+1) // go up
-				expect (parent or !treeparser) (.input, "Went up too far")
+				expect (parent or !treeparser.hasany) (.input, "Went up too far")
 
 	function Decode (|message|)
 		|| types = .collect
+		if types.hasany
 			.IDGen(.strings.DecompressStream, types, .lengths.DecompressStream)
 			rz = .MakeTree
 	

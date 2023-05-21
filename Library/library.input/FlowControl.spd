@@ -9,7 +9,7 @@
 class FlowControl
 	linkage:cpp_part Flow
 	|FastBuff|				Buff
-	|stringstream|			Read
+	|stringstream|			ReadInput
 	|faststring| 			Write
 	|bool| 					OK
 
@@ -23,13 +23,14 @@ class FlowControl
 	helper init (|string| path)
 		flow off
 		|| prev = path.AddExt(".expected")
-		if AlwaysMove or (!prev.fileexists and path.fileexists)
+		if AlwaysMove or (!prev.filesize and path.filesize)
 			|| f = path.file
 			if f.exists
 				require f.moveto(prev)
 		.write = path.out
-		if prev.fileexists 
-			.read = prev.readFile.decompress.stream
+		if prev.filesize
+			|| S = prev.readFile
+				.ReadInput = S.decompress.stream
 
 	helper Flush
 		flow off
@@ -47,21 +48,40 @@ class FlowControl
 		stats.clear
 
 	
-	helper Cond (|byte| value, |bool|)
-		flow off, opt norefcounts, visible
+	helper addbyte (|byte| value)
 		if .buff <~ value
 			.Flush
-		|| r = .read
-		if !r
-			return true
-		require r != nil
-		|| Found = r.byte
-		if Found == value
-			return true
+		
+	helper Cond (|byte| value, |bool|)
+		flow off, opt norefcounts, visible
 
-		printline flowdiff
-		printline app.StackTrace("JB_Flow_Cond")
-		.read = nil
+		.addbyte(value)
+		|| r = .ReadInput
+		if r == nil
+			return true
+		if !r.hasany
+		|| b = r.byte
+		if b == value
+			return true
+		.fail(string.byte(value), string.byte(b))
+
+
+	function Fail (|string| found, |string| expected)
+		opt norefcounts, flow off
+		if !.readinput.hasany
+			printline "Extra-data generated, this time around. Old stream ended early."
+		  else
+			|| Sep =  ("\n", " ")(found contains '\n'  or  expected contains '\n')
+			print "Expected:"
+			print sep
+			print expected
+			print sep
+			print "but found:"
+			print sep
+			printline found
+		printline app.StackTrace("JB_Flow_")
+		.ReadInput = nil
+		debugger
 
 	
 	module
@@ -80,28 +100,30 @@ class FlowControl
 			.flow.cond(('T', 'F')(value))
 			.disabled = 0
 			return value
-			
+		
 		syntax append (|string| name, |bool| Print=true,  |bool|)
 			opt norefcounts, flow off, cpp_part AddStr
 			
 			if .disabled
 				return true
+			.disabled = 1
 			rz = true
-			|| find = 
+			|| f = .flow
+			|| r = f.ReadInput
+			if r != nil
+				|| str = r.str(name.length)
+				rz = str == name
+				if !rz
+					f.Fail(name, str)
+				
 			for c in name
-				if !.flow.cond(c)
-					if print
-						"Expected:"
-						printline name
-						"But found:"
-						
-						
-					rz = false
+				f.addbyte(c)
+			.disabled = 0
 
 		function Activate
 			flow off
 			.Disabled = int.max // in case its set badly
-			.flow = FlowControl("/tmp/flowcontrol/" + app.filename + ".flow")
+			.flow = FlowControl("/tmp/FlowControl/" + app.filename + ".txt.mz")
 			.Disabled = 0
 		
 		function Stop

@@ -54,6 +54,9 @@ class StringStream
 			.position += p
 		
 	syntax cast (|bool|)
+		disabled "Do you mean self != nil, or self.HasAny"
+		
+	function HasAny (|bool|)
 		require (self != nil)
 		if .data has 1
 			return true

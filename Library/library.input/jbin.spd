@@ -157,7 +157,7 @@ function stringstream.NextMsg (|message| parent=nil, |syntax| fn, |string| name=
 
 helper stringstream.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
 	opt norefcounts
-	while (self)
+	while .hasany
 		|uint| info = .Byte
 		if info & 128
 			expect (CanDecomp) (self, "Can't stream compacted jbin. Use .parse instead")

@@ -18,10 +18,13 @@ function Compiler.Main
 				.RandomFlowTest
 	.PrintResults
 
+
 function compiler.RandomFlowTest
+	// we want to check if its still working
 	for 100
 		if 0.5[]
 			0
+
 
 function Compiler.EnterCompile (|bool|)
 	return  !.TryVariousStartModes  and  FeedBack.ParseArgs  and  !interact.Enter

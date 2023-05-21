@@ -11,7 +11,7 @@ function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 	j.enter(@tmp, "µz")
 	j.addint(.length)
 	j.enter(@arg, Mode)
-	while self
+	while .hasany
 		|| str = .str(Chunksize)
 		|| Place = j.OpenSection
 		if Mode

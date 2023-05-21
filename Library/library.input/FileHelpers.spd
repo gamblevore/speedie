@@ -82,7 +82,11 @@ extend String
 	function FileExists (|bool|)
 		|| f = .file
 		return f.exists
-
+	
+	function FileSize (|int64|)
+		|| f = .file
+		return f.size
+		
 	function MakeEntirePath (|bool|Last=true, |ErrorInt|)
 		visible class~file
 		|| p = Self
