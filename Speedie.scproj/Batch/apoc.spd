@@ -31,7 +31,7 @@ main
 	|[country]| Europe
 	"\nWelcome to Europe Simulator 2000!!"
 	|| names = "Netherlands/United Kingdom/France/Germany/USA" / '/'
-	random.shared.reseed
+	random.shared.timeseed
 	for s in names
 		Europe <~ Country(s)
 	printline
