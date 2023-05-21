@@ -30,17 +30,10 @@ static void SafePrint (const char* c) {
 }
 
 
-void JB__PrintStackTraceAndLog(int Sig) {
-	char ErrorBuff[64];
-	snprintf(ErrorBuff, 64, "Crash: %s", strsignal(Sig));
-	JB_Rec__CrashLog(ErrorBuff);
-	JB_PrintStackTrace();
-}
-
 void JB_Rec__CrashLog(const char* c);
 void JB__ProcessReportCrash();
 
-void JB_PrintStackTrace() {
+void JB_CrashTracer() {
     int   size = 32;
     void* array[size];
     auto  strings = JB_BackTrace(array, &size);
@@ -53,6 +46,14 @@ void JB_PrintStackTrace() {
     free( strings );
 }
 
+void JB__CrashPrinter(int Sig) {
+	char ErrorBuff[64];
+	snprintf(ErrorBuff, 64, "Crash: %s", strsignal(Sig));
+	JB_Rec__CrashLog(ErrorBuff);
+	JB_CrashTracer();
+}
+
+
 
 int SigList[] = {SIGSEGV, SIGBUS, SIGILL, SIGFPE, SIGSYS, SIGTERM, SIGQUIT};
 
@@ -61,7 +62,7 @@ void JB__CrashHandler(int Sig) {
 		signal(Sig, SIG_DFL);
 	}
     if (Sig != SIGTERM and Sig != SIGQUIT) {
-		JB__PrintStackTraceAndLog(Sig);
+		JB__CrashPrinter(Sig);
 		JB__ProcessReportCrash();
 	} else if (getppid() > 1) {
 		SafePrint("Child process got signal...\n" );

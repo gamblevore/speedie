@@ -367,7 +367,8 @@ int CrashLogFile = 0;
 extern const char* JB_CrashLogFileName;
 void JB_Rec__CrashLog(const char* c) {
 	if (!c) return;
-	puts(c);
+	fputs(c, stderr);
+	fputc('\n', stderr);
 
 // this filename tho... lol. fucking lack of strings...
 	if (!CrashLogFile) {

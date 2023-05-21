@@ -218,7 +218,7 @@ class ErrorList
 extend Object
 	syntax expect
 		"Non-Fatal Internal Error"
-		app.PrintStackTrace
+		app.CrashPrint
 		"${app.ObjMemory.strsize} memory used"
 		stderr.NewError(nil, "Non-Fatal Internal Error")
 

@@ -391,7 +391,7 @@ extern "C" void Stub_JBPipe () {
     
 }
 
-extern "C" void JB_PrintStackTrace() {
+extern "C" void JB_CrashTracer(bool) {
 }
 
 #endif

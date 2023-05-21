@@ -26,6 +26,9 @@ syntax access (|int| i, |string|)
 function Yes (|string| name, |bool|)
 	return app[name].yes
 
+function No (|string| name, |bool|)
+	return !.yes(name)
+
 function conf (|string| name, |string|)
 	return ._conf[name].value
 
@@ -79,8 +82,8 @@ function args (|[string]|)
 		.oldargs = .args_
 	return .oldargs
 
-function PrintStackTrace
-	cpp_wrapper JB_PrintStackTrace
+function CrashPrint
+	cpp_wrapper JB_CrashTracer
 
 helper ExePath (|string|)
 	cpp_wrapper JB_App__Path
@@ -240,8 +243,8 @@ function LeakMarkMemory
 function LeakUnMarkMemory
 	cpp_wrapper JB_Mem_Unmark
 	
-function PrintStackTraceAndLog (|int| Signal)
-	cpp_wrapper JB__PrintStackTraceAndLog
+function ErrorStackTrace (|int| Signal)
+	cpp_wrapper JB__ErrorStackTrace
 	
 function IsQuarantined (|bool|)	
 	return .path contains "/AppTranslocation/"
