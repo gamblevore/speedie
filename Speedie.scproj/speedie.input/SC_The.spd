@@ -38,6 +38,7 @@ function TypeOfAdj (ExprResolver)
 	|| f = exp[@nil, 0]					#require
 	|| d = compiler.Adj(f)				#require
 	|| name = exp[@thg, 1]				#require
+	name.name = name.name.lowercase
 	|| found = d.expect(name)			#require
 	|[message]| args 
 	if f != @thg

@@ -6,4 +6,8 @@ function Tran_Flow (TranFunc)
 	node.SafeRemove
 	check (msg == "off")  (msg, "Only allowed value is 'off'.")
 	fn.FlowDisabled = true
+
+	
+insertion general
+	noflowcontrol	({flowcontrol.disabled++, (_0), flowcontrol.disabled--, rejoin 0})
 	

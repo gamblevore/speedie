@@ -59,8 +59,4 @@ function compiler.CompileTime
 	.PrintCompileTime(.CompileAll~timeit)
 	if stderr.ok
 		TransCompiler.TransComp
-		
 
-insertion general
-	noflowcontrol	({flowcontrol.disabled++, (_0), flowcontrol.disabled--, rejoin 0})
-	

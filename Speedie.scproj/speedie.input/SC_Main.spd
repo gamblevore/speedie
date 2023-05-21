@@ -10,13 +10,18 @@ main // speedie main {
 function Compiler.Main
 	.SetupEnv
 	if .EnterCompile
-		using FlowControl
-			.CompileTime
-			for 100
-				if 0.5[]
-					0
+		if app.no("flow")
+			.compiletime
+		  else
+			using FlowControl
+				.CompileTime
+				.RandomFlowTest
 	.PrintResults
 
+function compiler.RandomFlowTest
+	for 100
+		if 0.5[]
+			0
 
 function Compiler.EnterCompile (|bool|)
 	return  !.TryVariousStartModes  and  FeedBack.ParseArgs  and  !interact.Enter
@@ -41,6 +46,7 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 
+	FlowControl.alwaysmove = true
 	error.AutoPrint = 1
 	.Clearenvs
 	check (app.pref_path) "Conf missing prefpath"

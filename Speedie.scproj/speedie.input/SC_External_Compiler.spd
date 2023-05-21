@@ -517,7 +517,6 @@ function File.TestSpeedie (|string| Variant, |bool|) {
 	|| result = faststring()
 	.path.execute(cmd_args, result)
 	printline Result
-
 // Read output
 	print TransCompiler.TmpOut(Variant).ReadFile
 	|| test_err = TransCompiler.TmpErr(Variant).ReadFile

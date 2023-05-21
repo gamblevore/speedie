@@ -5,10 +5,6 @@
 	only call: flowcontrol.Cond
 */
 
-
-datatype FlowControlStopper (uint)
-	syntax usingcomplete
-		flowcontrol.stop
 		
 class FlowControl
 	linkage:cpp_part Flow
@@ -25,67 +21,101 @@ class FlowControl
 		printline path
 
 	helper init (|string| path)
+		flow off
 		|| prev = path.AddExt(".expected")
-		if !prev.fileexists and path.fileexists
-			require path.file.moveto(prev)
+		if AlwaysMove or (!prev.fileexists and path.fileexists)
+			|| f = path.file
+			if f.exists
+				require f.moveto(prev)
 		.write = path.out
 		if prev.fileexists 
 			.read = prev.readFile.decompress.stream
 
 	helper Flush
 		flow off
-		.buff.tmpstr.CompressInto(.write, stats)
+		if .write
+			.buff.tmpstr.CompressInto(.write, stats)
+			.write.Flush
 		.buff.Curr = .buff.start
-		.write.Flush
 			 
 
 	destructor
+		flow off
 		FlowControl.Disabled = int.max
 		.flush
 		printline stats.render
 		stats.clear
 
-	syntax append (|byte| value)
-		cpp_part Cond
-		flow off
-		opt norefcounts
-		visible
+	
+	helper Cond (|byte| value, |bool|)
+		flow off, opt norefcounts, visible
 		if .buff <~ value
 			.Flush
 		|| r = .read
+		if !r
+			return true
 		require r != nil
 		|| Found = r.byte
-		if Found != value
-			"Flow differs here:"
-			printline app.StackTrace("JB_Flow__Cond")
-			if curraction
-				print "During: "
-				printline CurrAction
-				
-			.read = nil
+		if Found == value
+			return true
+
+		printline flowdiff
+		printline app.StackTrace("JB_Flow_Cond")
+		.read = nil
+
 	
 	module
-		|uint| 					Disabled = int.max
-		|flowcontrol|			Flow 
+		|flowcontrol|			Flow // DONT directly alter this 
+		||						FlowDiff = "Flow differs here:"
+
 		|CompressionStats| 		Stats
-		|string|				CurrAction
-		
-		function AddCode (|uint64| Code, |uint| Size=8)
-			for Size
-				flow <~ code&255
-				code >>= 8
+		|uint| 					Disabled = int.max
+		|bool|					AlwaysMove
 			
+		syntax append (|bool| value, |bool|)
+			visible, flow off, cpp_name JB_Flow__Cond
+			if .disabled
+				return value
+			.disabled = 1
+			.flow.cond(('T', 'F')(value))
+			.disabled = 0
+			return value
+			
+		syntax append (|string| name, |bool| Print=true,  |bool|)
+			opt norefcounts, flow off, cpp_part AddStr
+			
+			if .disabled
+				return true
+			rz = true
+			|| find = 
+			for c in name
+				if !.flow.cond(c)
+					if print
+						"Expected:"
+						printline name
+						"But found:"
+						
+						
+					rz = false
+
 		function Activate
+			flow off
 			.Disabled = int.max // in case its set badly
-			.flow = FlowControl(app.ExePath.AddExt(".flow"))
+			.flow = FlowControl("/tmp/flowcontrol/" + app.filename + ".flow")
 			.Disabled = 0
 		
 		function Stop
+			flow off
 			.Disabled = int.max
 			.Flow = nil
 
 		syntax Using (|FlowControlStopper|)
+			flow off
 			.Activate
 
 
 
+
+datatype FlowControlStopper (uint)
+	syntax usingcomplete
+		flowcontrol.stop
