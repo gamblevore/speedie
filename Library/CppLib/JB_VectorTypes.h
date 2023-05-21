@@ -4,7 +4,7 @@
 
 typedef int   ivec4 __attribute__ ((vector_size (16)));
 typedef float  vec4 __attribute__ ((vector_size (16)));
-typedef unsigned char  bytevec4 __attribute__ ((vector_size (4)));
+typedef unsigned char  bytevec4 __attribute__ ((vector_size (4), aligned (4))); // shouldn't they all be aligned?
 typedef int   ivec2 __attribute__ ((vector_size (8)));
 typedef float  vec2 __attribute__ ((vector_size (8)));
 inline ivec4 JB_ivec4_Load(unsigned char* data) {
