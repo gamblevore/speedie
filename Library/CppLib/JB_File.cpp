@@ -370,7 +370,6 @@ void JB_Rec__CrashLog(const char* c) {
 	fputs(c, stderr);
 	fputc('\n', stderr);
 
-// this filename tho... lol. fucking lack of strings...
 	if (!CrashLogFile) {
 		mkdir("/tmp/logs", kDefaultMode);
 		int flags = O_RDWR | O_CREAT | O_TRUNC;
