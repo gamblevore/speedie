@@ -835,7 +835,8 @@ function CollectLinks (|object| obj)
 
 
 function FindReached (|scbase| from)
-	// so... just go through stuff...
+	flow off // memory order dependant!
+
 	require !.CurrReacher
 	if !from
 	.currreacher = from

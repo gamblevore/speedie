@@ -24,7 +24,7 @@ function stringstream.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 		if !.NoMoreChunks
 			j.flush // we are calling it after anyhow	
 	j.up(2)
-	j.flush			// we definitely need to flush it. -- genius theo 2023, no humour.
+	j.flush			// we definitely need to flush it.  Im serious!
 	j.CompressChunk(nil)						// cleanup
 
 
@@ -37,6 +37,7 @@ helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 	st := compressionstats.all
 	st.start
 
+	|| OK = StdErr.Mark
 	check (.DetectJBinType == 1) (self, _jBinNotJbin)
 	
 	|| mz = .NextMsg							#require
@@ -48,15 +49,14 @@ helper stringstream.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 	|| size = .NextMsg(mz, @num)
 	|| arg = .NextMsg(mz, @arg)
 	|| Remaining = size.int
-	|| OK = StdErr.Mark
-	mz.name = nil
-	size.name = nil
 	ifn size and arg and Remaining <= lim
 		if (Remaining > lim)
 			error (self, "mz would decompress too large")
 		  else
 			error (self, "Invalid mz header")
 	  else
+		mz.name = nil
+		size.name = nil
 		|| Mode = arg.name
 		|| ChunkMax = (4MB, 1MB)(mode) 
 		while

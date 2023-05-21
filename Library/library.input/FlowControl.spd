@@ -31,12 +31,12 @@ class FlowControl
 		if prev.filesize
 			|| S = prev.readFile
 				.ReadInput = S.decompress.stream
-
+	
 	helper Flush
 		flow off
 		if .write
 			.buff.tmpstr.CompressInto(.write, stats)
-			.write.Flush
+			// .write.Flush // compress always flushes
 		.buff.Curr = .buff.start
 			 
 
@@ -69,7 +69,7 @@ class FlowControl
 	function Fail (|string| found, |string| expected)
 		opt norefcounts, flow off
 		if !.readinput.hasany
-			printline "Extra-data generated, this time around. Old stream ended early."
+			"New-stream longer than old-stream."
 		  else
 			|| Sep =  ("\n", " ")(found contains '\n'  or  expected contains '\n')
 			print "Expected:"

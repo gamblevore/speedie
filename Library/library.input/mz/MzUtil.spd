@@ -21,11 +21,12 @@ extend string
 		return .stream.Decompress(lim, st)
 
 
-function stringstream.Decompress (|int|lim=256MB, |&compressionstats| st=nil, |int| Chunks=int.max,  |StringThatWasReadSafely|)
+function stringstream.Decompress (|int|lim=256MB, |&compressionstats| st=nil, |bool| Multi=true,  |StringThatWasReadSafely|)
 	|| fs = faststring()
-	while .hasany and chunks-- > 0
+	while .hasany
 		if !.Decompressinto(fs, lim, st)
 			return string.error
+		if !multi:exit
 	return fs
 
 

@@ -1,8 +1,6 @@
 
 
 
-// we need to test the flow control on speedie
-// as its not working on windows!!
 main // speedie main { 
 	compiler.Main
 
@@ -15,15 +13,7 @@ function Compiler.Main
 		  else
 			using FlowControl
 				.CompileTime
-				.RandomFlowTest
 	.PrintResults
-
-
-function compiler.RandomFlowTest
-	// we want to check if its still working
-	for 100
-		if 0.5[]
-			0
 
 
 function Compiler.EnterCompile (|bool|)

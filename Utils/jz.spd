@@ -228,7 +228,7 @@ module Conv
 		printline .out|string|
 		|| d = .out.out
 		|| src = .in.in
-		require src and d
+		require src!=nil and d != nil
 		.start = date() 
 		if Decomp
 			.size = d.File.size

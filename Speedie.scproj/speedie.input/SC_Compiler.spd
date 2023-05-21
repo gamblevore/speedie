@@ -213,6 +213,7 @@ function FastString.AppendWidth (|string| s, |int| Width)
 
 
 function Reached (|string| s, |bool|)
+	flow off
 	|| obj = self[s]
 		return (obj.currreacher)
 

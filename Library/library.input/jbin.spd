@@ -149,10 +149,9 @@ function stringstream.NextMsg (|Message|)
 
 function stringstream.NextMsg (|message| parent=nil, |syntax| fn, |string| name=nil,  |Message|)
 	cpp_part NextMsgExpect
+	opt norefcounts
 	rz = .NextMsg #require
-	if (rz.expect(fn, name)) and (parent) and (rz.parent != parent)
-		error rz
-		rz = nil
+	expect (rz.expect(fn, name) and (rz.parent == parent)) (rz)
 
 
 helper stringstream.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
@@ -174,7 +173,8 @@ helper stringstream.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
 				.userobj = msg|object|
 			return msg
 		  else
-			.UserObj = .UserObj|message|.upward(t|int|-7)			#require
+			.UserObj = .UserObj|message|.upward(t|int|-7)
+			require .userobj
 
 	
 helper stringstream.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
