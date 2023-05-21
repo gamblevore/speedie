@@ -52,7 +52,6 @@ int JB_Str_MakeDir(JB_String* self);
 JB_String* JB_File_Read(JB_File* self, IntPtr Length, bool Ignore);
 JB_String* JB_File_ReadFD( int* FD, int Length, JB_String* Path );
 bool JB_File_DataSet( JB_File* self, JB_String* Data );
-int JB_Str_FileSize(JB_String* self);
 JB_File* JB_Str_File( JB_String* Path );
 JB_File* JB_File__NewPipe(int Pipe);
 JB_File* JB_File__StdOut( );
