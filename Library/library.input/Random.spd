@@ -21,7 +21,7 @@ struct Random
 		.store = value
 		.state = 1
 		
-	function Reseed
+	function TimeSeed
 		.seed = date()
 	
 	function Text (|int| n, |byte|a, |byte|b, |string|)
@@ -96,12 +96,12 @@ struct Random
 	
 	function Init
 		if !.store
-			.reseed
+			.TimeSeed
 	
 		
 	module  // module random
 		|Random| Shared
-		.shared.reseed
+		.shared.TimeSeed
 
 		macro syntaxaccess
 			random.shared[...]
