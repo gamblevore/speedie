@@ -405,7 +405,7 @@ class File (String)
 				rz <~ name
 		rz.sort(stringsorter)
 		if !flowcontrol.disabled
-			flowcontrol <~ join2(rz, "\n")
+			flowcontrol.input(rz, self)
 	
 	function MoveTo (|string| Path, |ErrorInt|)
 		cpp_wrapper JB_File_MoveTo

@@ -154,13 +154,6 @@ int JB_Str_Length( JB_String* self ) {
 	return 0;
 }
 
-uint8* JB_Str_AddressEnd( JB_String* self ) {
-	if (self)
-		return  self->Addr + self->Length;
-	return 0;
-}
-
-
 uint8* JB_Str_Address( JB_String* self ) {
 	if (self) 
 		return (uint8*)self->Addr;
@@ -1771,16 +1764,22 @@ void crcInit() {
 	}
 }
 
-uint64 JB_Str_CRC (JB_String* S, uint64 crc) {
-	uint n = JB_Str_Length(S);
-	require(n);
-	if (!crc32_table[1])
-		crcInit();
-	uint8* buf = S->Addr;
-	for_(n) {
-		crc = (crc << 8) ^ crc32_table[((crc >> 24) ^ *buf++) & 255];
+
+uint64 JB_CRC (u8* buf, int n, uint64 crc) {
+	if (n > 0) {
+		// why just not use my xor hash?
+		if (!crc32_table[1])
+			crcInit();
+		for_(n) {
+			crc = (crc << 8) ^ crc32_table[((crc >> 24) ^ *buf++) & 255];
+		}
     }
 	return crc;
+}
+
+
+uint64 JB_Str_CRC (JB_String* S, uint64 crc) {
+	return JB_CRC( JB_Str_Address(S), JB_Str_Length(S), crc);
 }
 
 

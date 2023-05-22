@@ -67,7 +67,7 @@ class SCFile (file)
 
 	function AST (|Message|)
 		opt norefcounts
-		FlowControl <~ "AST:" + .file.path
+		FlowControl.input(.file, "AST")
 		return .liveast init .ASTSub$
 
 

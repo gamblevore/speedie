@@ -170,10 +170,10 @@ s64 JB_Str_TextIntegerValid(JB_String* self, Message* b);
 bool JB_Str_IsUnder(JB_String* self, u32 Under);
 int JB_Str_LengthUTF8(JB_String* self);
 uint64 JB_Str_CRC (JB_String* S, uint64 crc);
+uint64 JB_CRC (u8* buf, int n, uint64 crc);
 bool JB_Str_IsASCII(JB_String* self);
 int JB_Str_Length( JB_String* self );
 uint8* JB_Str_Address(JB_String* self);
-uint8* JB_Str_AddressEnd( JB_String* self );
 
 
 

@@ -127,6 +127,26 @@ JBClassPlace( JB_File,          JB_File_Destructor,    JB_AsClass(JB_StringShare
 
 
 int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation);
+extern uint JB__Flow_Disabled;
+
+void JB_Flow__ReportAddr(u8* Addr, int Length, u8* Name, int NameLen) {
+	if (!JB__Flow_Disabled) {
+		uint64 Hash = JB_CRC(Addr, Length, 0);
+		JB_String A;
+		JB_String B;
+		A.Addr = (u8*)(&Hash);
+		A.Length = 8;
+		B.Addr = Name;
+		B.Length = NameLen;
+		void JB_Flow__Input(JB_String* data, JB_String* name);
+		JB_Flow__Input(&A, &B);
+	}
+}
+
+inline void JB_Flow__Report(JB_String* data, JB_String* name) {
+	if (!JB__Flow_Disabled)
+		JB_Flow__ReportAddr(data->Addr, data->Length, name->Addr, name->Length);
+}
 
 
 bool HasFD (JB_File*f) {
@@ -136,7 +156,6 @@ bool HasFD (JB_File*f) {
 inline uint8* JB_FastFileThing( JB_File* S) {
 	return S->Addr;
 }
-
 
 int64 ErrorHandleStr_(int64 MaybeErr, JB_String* self, JB_String* other, const char* Operation) {
     if (MaybeErr >= 0) {
@@ -353,12 +372,15 @@ int JB_App__GetChar() {
 	return c;
 }
 
-int JB_FS_InterPipe(FastString* self, int Desired, int fd, int Mode) {
+int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 	uint8* Buffer = JB_FS_WriteAlloc_(self, Desired);
-	if (!Buffer) return false;
-	int Error = 0;
-	int N = InterRead(fd, Buffer, Desired, 0, Error, Mode); // we want to know if an error-happened or not.
-	JB_FS_AdjustLength_(self, Desired, N);
+	int Error = -1;
+	int N = 0;
+	if (Buffer) { 
+		N = InterRead(fd, Buffer, Desired, 0, Error, Mode);
+		JB_FS_AdjustLength_(self, Desired, N);
+	}
+	JB_Flow__ReportAddr(Buffer, N, (u8*)"pipe", 4);
 	return Error;
 }
 
@@ -388,7 +410,7 @@ bool JB_FS_AppendPipe(FastString* self, int fd, int Mode) {
 	//  -1 means  call back later
 	//  -2 means we need more buffer
     while (self) {
-		int Error = JB_FS_InterPipe(self, 64 * 1024, fd, Mode);
+		int Error = InterPipe(self, 64 * 1024, fd, Mode);
 		if (Error >=  -1) return Error == -1; // true means call back later.
 											  // false  means we are finished.
     }
@@ -397,24 +419,26 @@ bool JB_FS_AppendPipe(FastString* self, int fd, int Mode) {
 
 
 JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
+	JB_String* Result = JB_Str__Error();
 	if (self) {
 		bool WasOpen = HasFD(self);
 		int FD = JB_File_OpenStart(self, AllowMissing);
-		if (FD == -2)	// ignore it
-			return JB_Str__Empty();
+		if (FD == -2) { // ignore it
+			Result = JB_Str__Empty();
 		
-		if (FD >= 0) {
+		} else if (FD >= 0) {
 			u64 S = JB_File_Size(self); 
 			if (S <= (u64)lim) {
-				JB_String* Result = JB_File_Read( self, S, AllowMissing );
+				Result = JB_File_Read( self, S, AllowMissing );
 				if (!WasOpen)
 					JB_File_Close(self);
-				return Result;
+			} else {
+				JB_ErrorHandleFile(self, nil, EFBIG, nil, "reading");
 			}
-			JB_ErrorHandleFile(self, nil, EFBIG, nil, "reading");
 		}
 	}
-	return JB_Str__Error();
+	JB_Flow__Report(Result, self);
+	return Result;
 }
 
 
@@ -490,16 +514,18 @@ static JB_String* FileAlloc( JB_File* self, IntPtr Length ) {
 
 JB_String* JB_File_Read( JB_File* self, IntPtr Length, bool AllowMissing ) {
     int FD = JB_File_Open( self, O_RDONLY, AllowMissing );
+    JB_String* Result = JB_Str__Error();
     if (FD >= 0) {
-		JB_String* Str = FileAlloc( self, Length );
-		if (Str) {
+		Result = FileAlloc( self, Length );
+		if (Result) {
 			int Error = 0;
 			int Mode = (self->MyFlags & 2) != 0;
-			Length = InterRead( FD, Str->Addr, (int)Length, self, Error, Mode );
-			return JB_Str_Shrink( Str, (int)Length );
+			Length = InterRead( FD, Result->Addr, (int)Length, self, Error, Mode );
+			Result = JB_Str_Shrink( Result, (int)Length );
 		}
 	}
-	return JB_Str__Error();
+	JB_Flow__Report(Result, self);
+	return Result;
 }
 
 
@@ -543,7 +569,7 @@ int JB_File_OpenBlank( JB_File* self ) {
 }
 
 
-bool filenameis (const char* tmp, const char* match) {
+bool FileNameIs (const char* tmp, const char* match) {
 	char buff[1000];
 	int nw = 0;
 	int nr = 0;
@@ -567,7 +593,7 @@ bool filenameis (const char* tmp, const char* match) {
 int JB_Str_MakeDir(JB_String* self) {
     uint8 Buffer[1024];
     NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileString( self, Buffer );
-    if (filenameis(tmp, "h") or filenameis(tmp, "cpp")  or filenameis(tmp, "txt") )
+    if ( FileNameIs(tmp, "h") or FileNameIs(tmp, "cpp")  or FileNameIs(tmp, "txt") )
 		debugger; // what?
     int err = mkdir(tmp, kDefaultMode);
     if (err == -1 and errno == EEXIST) {

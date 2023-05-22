@@ -109,6 +109,7 @@ function NoGoodObject ( |string| Cpp, |File| h, |File| o, |int| )
 
  
 function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
+	flowcontrol.input(cpp, "objtest")
 	|| aslib = options.makelib or options.projectislibrary
 	require ! (aslib and (cpp contains "/JB_Main.")) // .o and .cpp
 	require ! (!asm.needed and (cpp contains "/JB_VM."))  
@@ -135,7 +136,7 @@ function FilterCppsIfAlreadyDone (|[string]| Cpps,  |File| Objects,  |&int| stda
 
 function CollectCppsInto ( |File| Fol,  |File| Objects, |&int| stdafx, |[File]| )
 	|[string]| Cpps
-	for name in Fol
+	for name in Fol.list
 		if .CanCompile(name)
 			Cpps <~ Fol.path.child( name )
 
@@ -281,8 +282,9 @@ function ClearThis
 function IsCompilerAndNeedsInstall (|bool|)
 	require (Options.SelfReplacement == kSelfReplace)
 	require (StdErr.OK and !Compiler.IsTest)
-	require (.TestNewCompiler and .BackupCompiler)
-	return true
+	flowcontrol.disabled++
+	rz = (.TestNewCompiler and .BackupCompiler)
+	flowcontrol.disabled--
 
 
 function TransComp 
@@ -291,7 +293,7 @@ function TransComp
 		if options.pack
 			TreeAssembler.BuildPack
 		if options.native
-			.RunCppCompile
+			(.RunCppCompile)~noflowcontrol
 			if .IsCompilerAndNeedsInstall
 				.InstallCompiler
 	.ClearThis

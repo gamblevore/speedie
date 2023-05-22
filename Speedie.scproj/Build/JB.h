@@ -1285,13 +1285,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1849])
+#define kJB__ErrorColors_bold (JB_LUB[1851])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1850])
-#define kJB__ErrorColors_good (JB_LUB[1851])
-#define kJB__ErrorColors_normal (JB_LUB[1852])
-#define kJB__ErrorColors_underline (JB_LUB[1851])
-#define kJB__ErrorColors_warn (JB_LUB[1853])
+#define kJB__ErrorColors_error (JB_LUB[1852])
+#define kJB__ErrorColors_good (JB_LUB[1853])
+#define kJB__ErrorColors_normal (JB_LUB[1854])
+#define kJB__ErrorColors_underline (JB_LUB[1853])
+#define kJB__ErrorColors_warn (JB_LUB[1855])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1463,9 +1463,9 @@ extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
 #define kSC_BitAnd (JB_LUB[338])
-#define kSC_BitNot (JB_LUB[602])
-#define kSC_BitOr (JB_LUB[543])
-#define kSC_BitXor (JB_LUB[1854])
+#define kSC_BitNot (JB_LUB[603])
+#define kSC_BitOr (JB_LUB[544])
+#define kSC_BitXor (JB_LUB[1856])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1495,7 +1495,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1855])
+#define kJB_SaverStart1 (JB_LUB[1857])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -5195,7 +5195,7 @@ void JB_Flow_Constructor(FlowControl* self);
 
 void JB_Flow_Destructor(FlowControl* self);
 
-void JB_Flow_Fail(FlowControl* self, JB_String* found, JB_String* expected);
+void JB_Flow_Fail(FlowControl* self, JB_String* found, JB_String* expected, JB_String* name);
 
 void JB_Flow_Flush(FlowControl* self);
 
@@ -5207,6 +5207,10 @@ int JB_Flow__Init_();
 
 int JB_Flow__InitCode_();
 
+bool JB_Flow__InputStrings(Array* lines, JB_String* name);
+
+void JB_Flow__Input(JB_String* data, JB_String* name);
+
 FlowControlStopper JB_Flow__FlowStarter(JB_String* name);
 
 FlowControl* JB_Flow__New();
@@ -5214,8 +5218,6 @@ FlowControl* JB_Flow__New();
 void JB_Flow__Stop();
 
 bool JB_Flow__Cond(bool value);
-
-bool JB_Flow__AddStr(JB_String* name, bool Print);
 
 
 

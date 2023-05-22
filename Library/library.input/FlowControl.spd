@@ -59,21 +59,20 @@ class FlowControl
 		|| b = r.byte
 		if b == value
 			return true
-		.fail(string.byte(value), string.byte(b))
+		.fail(string.byte(value), string.byte(b), "")
 
 
-	function Fail (|string| found, |string| expected)
+	function Fail (|string| found, |string| expected, |string| name)
 		opt norefcounts, flow off
 		if !.readinput.HasAny
 			"New-stream longer than old-stream."
 		  else
-			|| Sep =  ("\n", " ")(found contains '\n'  or  expected contains '\n')
-			print "Expected:"
-			print sep
+			if name
+				print "with "
+				print name
+			print " expected: "
 			print expected
-			print sep
-			print "but found:"
-			print sep
+			print "\nbut found: "
 			printline found
 		printline app.StackTrace("JB_Flow_")
 		.ReadInput = nil
@@ -97,30 +96,31 @@ class FlowControl
 			Off					= 0
 			
 		syntax append (|bool| value, |bool|)
-			visible, flow off, cpp_name JB_Flow__Cond
+			visible,  flow off,  cpp_name JB_Flow__Cond
 			if .disabled
 				return value
 			.disabled = 1
 			.flow.cond(('T', 'F')(value))
 			.disabled = 0
 			return value
-		
-		syntax append (|string| name, |bool| Print=true,  |bool|)
-			opt norefcounts, flow off, cpp_part AddStr
-			
-			if .disabled
-				return true
+
+		function Input (|[string]| lines, |string| name,  |bool|)
+			cpp_part InputStrings
+			.Input(join2(lines, "\n"), name)
+
+		function Input (|string| data, |string| name)
+			flow off
+			require !.disabled
+
 			.disabled = 1
-			rz = true
-			|| f = .flow
-			|| r = f.ReadInput
+			|flowcontrol--| f = .flow
+			|stringstream--| r = f.ReadInput
 			if r != nil
-				|| str = r.str(name.length)
-				rz = str == name
-				if !rz
-					f.Fail(name, str)
+				|| str = r.str(data.length)
+				if str != data
+					f.Fail(data, str, name)
 				
-			for c in name
+			for c in data
 				f.addbyte(c)
 			.disabled = 0
 		

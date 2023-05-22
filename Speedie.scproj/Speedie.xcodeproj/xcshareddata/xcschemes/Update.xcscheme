@@ -57,7 +57,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--flow"
+            argument = "--log"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
