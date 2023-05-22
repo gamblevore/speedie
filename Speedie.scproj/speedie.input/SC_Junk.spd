@@ -5,7 +5,7 @@
 helper __junktest_1__
 	visible
 	|| r = [1, 2, 3]
-	|errorseverity| i = 2
+	|ErrorSeverity| i = 2
 	|| v = r[i|int|]
 
 
