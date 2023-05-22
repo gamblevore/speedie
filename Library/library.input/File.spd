@@ -188,6 +188,7 @@ class File (String)
 	
 	
 	helper CompareMsg (|errorint| code, |string| Error, |bool|)
+		flow off
 		if (code==0) or !error
 			return code == 0
 
@@ -219,6 +220,7 @@ class File (String)
 
 	
 	function CompareData (|String| A, |string| Error="", |bool|)
+		flow off
 		|| code = 0
 		if (.Size != A.length)
 			code = 1
