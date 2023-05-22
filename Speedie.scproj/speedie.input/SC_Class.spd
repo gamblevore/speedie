@@ -33,12 +33,13 @@ linkage
 |SCClass|					ProcessAs
 |SCDecl|					DataTypeWrapper
 |uint16|					Size
+|uint16|					Depth
+|uint16|					StructContainerDepth
 |DataTypeCode|  			TypeInfo
 |bool|						HasCompareFunc
 |bool|						HasEqualsFunc
 |bool|						IsRole
 |Byte|						IsBehaviour
-|Byte|						Depth
 |Byte|						MinOpt
 |bool|						IsBuiltin
 |bool|						IsDataTypeLike
@@ -161,8 +162,27 @@ function LoadProperties
 
 
 function GetDepth
-	if .super
-		.depth = .super.depth + 1
+	opt norefcounts
+	
+	if !.depth
+		.depth = 1
+		for c.Upwards in self
+			.depth++
+
+
+function GetDepth2
+	require .isstruct
+	expect (.StructContainerDepth != -1) (self, "This struct contains itself?")
+	.StructContainerDepth = -1
+	
+	|| r = 0
+	for p in .properties
+		|| t = p.type
+		if (t.isstruct) and (p.pointercount == 0) 
+			debugat
+			t.getdepth
+			r = r max t.StructContainerDepth+1
+	.StructContainerDepth = r
 
 
 function CalculateSize (|int| Depth=0, |int|)
@@ -198,6 +218,9 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 	.size = Count align 4
 	return count
 
+
+function LoadSuperDepth
+	
 
 
 function LoadSuperclass

@@ -801,7 +801,7 @@ function LoadVisibility (|Message| p)
 	SC_MakeComment( p )
 
 
-function BaseType (|string|)
+function ModuleType (|string|)
 	if self isa SCModule
 		return "module"
 	return "class"
@@ -825,7 +825,7 @@ function AutoCompleteName (|string|)
 render DescribeStored
 	for (B.ListLookup in self)
 		fs <~ '\n'
-		fs <~ B.BaseType
+		fs <~ B.ModuleType
 		fs <~ ": "
 		fs <~ B.name
 

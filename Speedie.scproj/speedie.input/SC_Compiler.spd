@@ -372,6 +372,10 @@ function ImportAll
 	for c in .ClassList
 		c.LoadSuperclass
 	
+	for c. in .ClassList
+		c.GetDepth
+	
+	
 	require stderr.ok
 	
 	.SortModules
@@ -382,7 +386,6 @@ function ImportAll
 	
 	require .Stage( "Savers and behaviours" )
 	for c in .ClassList
-		c.GetDepth
 		c.LoadSaver
 
 	.DoSavers(0)
@@ -784,6 +787,7 @@ function RefConstructors
 	screfs.ThisFunc = nil
 
 
+/*
 function SCModule.CanGrabBase (|bool| IsDataType, |bool|)
 	require (self != TypeObject.Modul)
 	|| c = .cls #require
@@ -792,39 +796,63 @@ function SCModule.CanGrabBase (|bool| IsDataType, |bool|)
 	  else
 		return (c.super == TypeObject)
 
+function SortModulesBase (|[SCModule]| NewList)
+	NewList <~ TypeObject.Modul.Grab				// object
+	for m in .ModuleList							// base object
+		if m.CanGrabBase(false)
+			NewList <~ m.Grab
+*/
 
+
+function SortModules
+	.ModuleList.sort(ModulesSorter)
+
+
+function SCClass.IsDataTypeOrStruct (|bool|)
+	return .IsDataType or .IsStruct
+
+
+function ModulesSorter (SorterComparer)
+	opt norefcounts
+	|| aa = a|scmodule|
+	|| bb = b|scmodule|
+	|| ca = aa.cls
+	|| cb = bb.cls
+	if !ca or !cb
+		if ca or cb
+			return cb
+		// could use initafter?
+	  else
+		|| tt = aa.cls.basetype
+		|| D = tt|int| - bb.cls.basetype|int|
+			return D < 0
+		
+		D = ca.depth|int| - cb.depth|int|
+		if D
+			return D < 0
+
+		if tt == scbasetype.struct 
+			D = ca.StructContainerDepth|int| - cb.StructContainerDepth|int|
+			if D
+				return D < 0
+		
+	return aa.name < bb.name
+		
+	// so we need to handle superclasses... and structs
+	
+
+/*
 function SortModulesBase (|[SCModule]| NewList)
 	NewList <~ TypeObject.Modul.Grab				// object
 	for m in .ModuleList							// base object
 		if m.CanGrabBase(false)
 			NewList <~ m.Grab
 
-
-function SortModules
-	|[SCModule]| NewList
-
-	// what about subsfrom?
-	// module abc (app)
-	// we need to replace app with module abc, and set it's lookup
-	
-	for m in .ModuleList
-		m.grabbed = false
-		if !m.cls
-			NewList <~ m.Grab
-
-	.SortModulesSub( scbasetype.datatype,	NewList )
-	.SortModulesSub( scbasetype.funcproto,	NewList )
-	.SortModulesSub( scbasetype.struct,		NewList )  
+	scbasetype.datatype
+	scbasetype.funcproto
+	scbasetype.struct  
 	.SortModulesBase( NewList )
-	.SortModulesSub( scbasetype.object,		NewList )  
-		
-	expect (.ModuleList.length == NewList.length)  ("Can’t sort classes properly")
-	
-	.ModuleList = NewList
-
-
-function SCClass.IsDataTypeOrStruct (|bool|)
-	return .IsDataType or .IsStruct
+	.scbasetype.object  
 
 
 function SortModulesSub (|SCBaseType| TypeWanted, |[SCModule]| NewList)
@@ -848,6 +876,7 @@ function SortModulesSub (|SCBaseType| TypeWanted, |[SCModule]| NewList)
 			TryAgain = false
 			i = 0
 
+*/	
 
 
 function scfunction.StripTest

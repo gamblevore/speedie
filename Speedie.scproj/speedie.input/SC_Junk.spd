@@ -104,3 +104,15 @@ function __junktest_10__
 	|dictionary of int| d = dictionary.new
 	|| i = 1
 	d["abc"] = i
+
+
+struct ContainerStruct2
+	|int|				A
+	|fastbuff|			B
+
+
+struct ContainerStruct
+	|ContainerStruct2|	A
+	|int|				B
+	|FastBuff|			C
+

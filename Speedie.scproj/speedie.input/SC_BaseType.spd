@@ -6,19 +6,33 @@ datatype SCBaseType (int)
 		|SCBaseType|
 		Module = 0 // not actually a type
 		Nil
-		Object
-		Struct
 		DataType
 		FuncProto
+		Struct
+		Object
 	)
 	syntax is (|scbasetype| d, |bool|)
 		return self == d
 
 
 extend scclass
+	function BaseType (|scbasetype|)
+		if .isobject
+			return SCBaseType.object
+		if .isdatatype
+			if !.funcproto
+				return SCBaseType.datatype
+			  else
+				return SCBaseType.funcproto
+		if .isstruct
+			return SCBaseType.struct
+		debugger
+			
+		
 	syntax equals (|scbasetype| d, |bool| aware, |bool|)
 		cpp_part EqualsType
 		if self and d > scbasetype.nil
+			// use .basetype instead...
 			if d is object
 				return .isobject
 			if d is datatype
