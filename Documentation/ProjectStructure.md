@@ -23,4 +23,4 @@ You can also `import` other projects, to use them as libraries:
     main
         app.RunGUIStuff
 
-Imports are located from the Speedie directory, which  currently is at `~/Speedie/` although I'll change that later.
+Imports are located from the Speedie directory, which  is at `/usr/local/speedie/` although I'll change that later.
