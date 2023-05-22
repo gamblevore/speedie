@@ -42,6 +42,13 @@ class Message (RingTree)
 		.RangeLength= other.RangeLength
 		.Tag		= other.Tag
 
+	constructor
+		cpp_part ConstructorEmpty
+		.func = @arg
+		.Position	= parser.UsingPos
+		.flags		= parser.InsertedFlags
+		.RangeLength= parser.UsingLength
+		.tag		= parser.UsingTag // why not... 
 			
 	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
 		cpp_part ConstructorNormal
