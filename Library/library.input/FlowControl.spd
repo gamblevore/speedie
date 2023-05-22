@@ -59,7 +59,6 @@ class FlowControl
 		|| r = .ReadInput
 		if r == nil
 			return true
-		if !r.hasany
 		|| b = r.byte
 		if b == value
 			return true
@@ -81,7 +80,8 @@ class FlowControl
 			printline found
 		printline app.StackTrace("JB_Flow_")
 		.ReadInput = nil
-		debugger
+		if BreakOnFail
+			debugger
 
 	
 	module
@@ -91,6 +91,7 @@ class FlowControl
 		|CompressionStats| 		Stats
 		|uint| 					Disabled = int.max
 		|bool|					AlwaysMove
+		|bool|					BreakOnFail
 			
 		syntax append (|bool| value, |bool|)
 			visible, flow off, cpp_name JB_Flow__Cond
