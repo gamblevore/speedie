@@ -109,6 +109,7 @@ class FlowControl
 			.Input(join2(lines, "\n"), name)
 
 		function Input (|string| data, |string| name)
+			visible
 			flow off
 			require !.disabled
 
