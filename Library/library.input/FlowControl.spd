@@ -13,30 +13,27 @@ class FlowControl
 	|faststring| 			Write
 	|bool| 					OK
 
-	constructor (|string| Path)
+	constructor
 		flow off
 		.ok = .buff.Alloc(1MB)
-		.init(path)
-		print "Capturing flow: "
-		printline path
 
-	helper init (|string| path)
+	helper Init (|string| path)
 		flow off
-		|| prev = path.AddExt(".expected")
-		if AlwaysMove or (!prev.filesize and path.filesize)
-			|| f = path.file
-			if f.exists
-				require f.moveto(prev)
+		if FlowControl.FlowMode >= FlowControl.Validate
+			|| prev = path.AddExt(".expected")
+			if AlwaysMove or (!prev.filesize and path.filesize)
+				|| f = path.file
+				if f.exists
+					require f.MoveTo(prev)
+			if prev.FileSize
+				|| S = prev.ReadFile
+					.ReadInput = S.decompress.stream
 		.write = path.out
-		if prev.filesize
-			|| S = prev.readFile
-				.ReadInput = S.decompress.stream
 	
 	helper Flush
 		flow off
 		if .write
 			.buff.tmpstr.CompressInto(.write, stats)
-			// .write.Flush // compress always flushes
 		.buff.Curr = .buff.start
 			 
 
@@ -48,14 +45,14 @@ class FlowControl
 		stats.clear
 
 	
-	helper addbyte (|byte| value)
+	helper AddByte (|byte| value)
 		if .buff <~ value
 			.Flush
 		
 	helper Cond (|byte| value, |bool|)
 		flow off, opt norefcounts, visible
 
-		.addbyte(value)
+		.AddByte(value)
 		|| r = .ReadInput
 		if r == nil
 			return true
@@ -67,7 +64,7 @@ class FlowControl
 
 	function Fail (|string| found, |string| expected)
 		opt norefcounts, flow off
-		if !.readinput.hasany
+		if !.readinput.HasAny
 			"New-stream longer than old-stream."
 		  else
 			|| Sep =  ("\n", " ")(found contains '\n'  or  expected contains '\n')
@@ -86,12 +83,18 @@ class FlowControl
 	
 	module
 		|flowcontrol|			Flow // DONT directly alter this 
-		||						FlowDiff = "Flow differs here:"
+		||						FlowDiff		= "Flow differs here:"
 
 		|CompressionStats| 		Stats
-		|uint| 					Disabled = int.max
+		|uint| 					Disabled		= int.max
+		|byte|					FlowMode		= FlowControl.Validate
 		|bool|					AlwaysMove
 		|bool|					BreakOnFail
+		
+		constants
+			Validate			= 2
+			Log					= 1
+			Off					= 0
 			
 		syntax append (|bool| value, |bool|)
 			visible, flow off, cpp_name JB_Flow__Cond
@@ -120,25 +123,31 @@ class FlowControl
 			for c in name
 				f.addbyte(c)
 			.disabled = 0
-
-		function Activate
-			flow off
-			.Disabled = int.max // in case its set badly
-			.flow = FlowControl("/tmp/FlowControl/" + app.filename + ".txt.mz")
-			.Disabled = 0
 		
 		function Stop
 			flow off
 			.Disabled = int.max
 			.Flow = nil
-
-		syntax Using (|FlowControlStopper|)
+		
+		function New (|string| name, |FlowControlStopper|)
+			cpp_part FlowStarter
 			flow off
-			.Activate
-
+			require FlowMode
+			.Disabled = int.max			// in case its set badly
+			.flow = FlowControl()
+			.flow.init("/tmp/FlowControl/" + name + ".txt.mz")
 
 
 
 datatype FlowControlStopper (uint)
-	syntax usingcomplete
+	syntax UsingComplete
 		flowcontrol.stop
+
+	syntax Using (|FlowControlStopper|)
+		flow off
+		opt norefcounts
+		require FlowControl.FlowMode
+		print "Capturing flow: "
+		printline flowcontrol.flow.write.file.path
+		flowcontrol.Disabled = 0
+

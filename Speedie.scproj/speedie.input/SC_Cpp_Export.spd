@@ -168,7 +168,7 @@ function Codify (|SCModule| scb, |string| fName)
 
 function SetupFlow (|SCFunction| f)
 	scfunction.CurrFunc = f
-	if Options.FlowControlEnabled and !f.FlowDisabled
+	if Options.GenFlowControlCode and !f.FlowDisabled
 		Cpp_Export.IfName = "iif"
 		Cpp_Export.WhileName = "wwhile"
 	  else

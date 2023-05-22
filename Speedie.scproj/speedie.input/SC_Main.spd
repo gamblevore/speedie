@@ -8,11 +8,8 @@ main // speedie main {
 function Compiler.Main
 	.SetupEnv
 	if .EnterCompile
-		if app.no("flow")
-			.compiletime
-		  else
-			using FlowControl
-				.CompileTime
+		using FlowControl("Speedie")
+			.CompileTime
 	.PrintResults
 
 
@@ -39,7 +36,11 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 
-	FlowControl.alwaysmove = true
+	FlowControl.FlowMode = FlowControl.Off
+	FlowControl.AlwaysMove = true
+	// i want to be able to run it... but only if I say so
+	// do I want to be able to generate only?
+	
 	error.AutoPrint = 1
 	.Clearenvs
 	check (app.pref_path) "Conf missing prefpath"

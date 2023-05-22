@@ -18,7 +18,7 @@ module Options
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
 	||		HideMultipleErrors		= true
-	||		FlowControlEnabled		= true
+	||		GenFlowControlCode		= true
 	||		Products				= native
 	||		Cpp						= true
 	||		Compile					= true
@@ -67,6 +67,7 @@ module Feedback
 			Options.SelfReplacement = kSelfReplace
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
+			Options.GenFlowControlCode = true
 			targets.set("self")
 			TransCompiler.CompilingLibFiles++
 		  elseif t2 == 2
@@ -112,29 +113,6 @@ module Feedback
 	function string.IsSpeedieSrc (|bool|)
 		return (self isa "spd")
 
-/*
-	function Output (|string| v, |file|)
-		disabled
-		return nil
-		if options.OutputNormal.path == v
-			return options.OutputNormal
-		if options.OutputErrors.path == v
-			return options.OutputErrors
-		return file.new(v)
-	
-	function Output (|string| value, |int| Mode)
-		disabled
-		return nil
-		Options.Color = false
-		|| f = Feedback.output(value)
-		|| d = f.opendes
-		if mode & 1
-			options.OutputNormal = f
-			pipe.stdOut = d
-		if mode & 2
-			options.OutputErrors = f
-			pipe.stderror = d
-*/
 
 	function TryUseProject (|String| path, |bool| IsScript=false, |string|)
 		ifn (path contains '/' or '.' or '~')
@@ -264,38 +242,44 @@ module Feedback
 			error.AutoPrint = (!RealPerry)|int|
 			compiler.insecurewords = file.PrefsFolder["klinkerhoppen.banned"].readall.dict
 		
-		check
+		+"check"
 			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$
 			Options.Compile = false
 			Options.Cpp = false
 			options.products = 0
 		
-
-		errortest 
+		+"errortest" 
 			explain(purpose, "Tests if error handling works OK.")$
 			PrintError "Errors print successefully\n"
 			return true // does something, counts towards operationCount
 		
-		argstats
+		+"argstats"
 			Explain(Purpose, "")$
 			options.argstats = true
 		
 		+"flow"
-			explain(Purpose, "Adds flow control testing! Slow but very thorough.")$
-			options.FlowControlEnabled = value.optionbool
-			
+			explain(Purpose, "Adds control-flow logging to generated compiles")$
+			Options.GenFlowControlCode = value.optionbool
+		
+		+"log"
+			explain(Purpose, "Logs the compiler's internal behaviour.  0 = off,  1 =  log,  2 = log+validate")$
+			if value!="true"
+				FlowControl.FlowMode = value.int
+			  else
+				FlowControl.FlowMode = FlowControl.Validate
+		
 		+"noisy"
 			Explain(Purpose, "Prints more stuff.")$
 			Options.PrintCompileString = true
 			file.DebugExecute = true
 			options.PrintLibraries = true
 		
-		alive
+		+"alive"
 			Explain(purpose)$
 			"We seems alive :)" // used by perry
 			return true
 		
-		products
+		+"products"
 			Explain(purpose, `Acceptable values: pack, cpp, native. Combine like pack/native. 'native' = compiled via GCC. 'pack' = interpreted.`)$
 			|| P = 0
 			for item in (value / '/')
@@ -335,7 +319,7 @@ module Feedback
 			targets.set("direct")
 		
 		
-		single 
+		+"single" 
 			Explain(Purpose, "")$
 			options.SingleCppOutput = value.optionbool
 		
