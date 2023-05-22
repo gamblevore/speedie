@@ -55,8 +55,11 @@ I am going to use FlowControl for the Speedie VM. This is to ensure that my C++ 
 
 Internally, my FlowControl system will be a few things.
 
-* Logging `if` conditions. Also `and/or` conditions (some of them) as a boolean. This allows 8 conditions per byte.
-* Logging `while` loops. We log these as pure-numbers.
+* Logging `if` conditions.
+* `and/or` conditions (some of them) as a boolean.
+* Logging `while` loops.
+* Hashes of file-read inputs
+* List of folder contents
 * Logging function callbacks!
 
 We also compress the data we capture, and decompress older logs, for comparison. We just jump into the debugger at the first difference found.
