@@ -665,11 +665,13 @@ function CreateDisambiguation
 
 
 function FindClass (|String| name, |Message| where, |SCClass|)
-	|| Mod = .FindModule(name, where, "Expected a class but found something else")	 #require
-	return Mod.cls			#expect (where, "Expected a class but found module.")
+	opt norefcounts
+	|| Mod = .FindModule(name, where, "Expected a class but found something else")
+		return Mod.cls			#expect (where, "Expected a class but found module.")
 
 
 function FindClassOK (|String| name, |SCClass|)
+	opt norefcounts
 	|| Obj = compiler.program.access.valuelower( name )
 	if obj isa scmodule
 		return obj.cls
@@ -704,12 +706,14 @@ function CreateRoot
 
 
 function LoadRefFunc (|String| name, |SCFunction|)
-	|| o = .FindFunction(name)			  #require
-	o.AllocCode = kIsReffer
-	return o
+	opt norefcounts
+	|| o = .FindFunction(name)
+		o.AllocCode = kIsReffer
+		return o
 
 
 function FindFunction (|string| Name, |SCFunction|)
+	opt norefcounts
 	|| o = compiler.program[ name ]
 	if o isa SCFunction
 		Return o
@@ -730,8 +734,8 @@ function scfunction.HasFloatparams (|int|)
 
 function scfunction.HasFloatReturn (|int|)
 	opt norefcounts
-	|| f = .returntype #require
-	return f.isfloat|int|
+	|| f = .returntype
+		return f.isfloat|int|
 
 
 function CheckMaxVars
@@ -767,7 +771,7 @@ function DoRefsB
 	opt norefcounts
 	for f in .FuncList
 		if !f.CanDoRefs
-			screfs.thisfunc = f
+			SCRefs.thisfunc = f
 			f.AnalyseRefsB
 	screfs.ThisFunc = nil
 	.CheckMaxVars
@@ -787,23 +791,6 @@ function RefConstructors
 	screfs.ThisFunc = nil
 
 
-/*
-function SCModule.CanGrabBase (|bool| IsDataType, |bool|)
-	require (self != TypeObject.Modul)
-	|| c = .cls #require
-	if IsDataType
-		return !c.super and c.isDataTypeOrStruct
-	  else
-		return (c.super == TypeObject)
-
-function SortModulesBase (|[SCModule]| NewList)
-	NewList <~ TypeObject.Modul.Grab				// object
-	for m in .ModuleList							// base object
-		if m.CanGrabBase(false)
-			NewList <~ m.Grab
-*/
-
-
 function SortModules
 	.ModuleList.sort(ModulesSorter)
 
@@ -818,7 +805,7 @@ function ModulesSorter (SorterComparer)
 	|| bb = b|scmodule|
 	|| ca = aa.cls
 	|| cb = bb.cls
-	if !ca or !cb
+	if !ca or !cb // a module
 		if ca or cb
 			return cb
 		// could use initafter?
@@ -837,46 +824,6 @@ function ModulesSorter (SorterComparer)
 				return D < 0
 		
 	return aa.name < bb.name
-		
-	// so we need to handle superclasses... and structs
-	
-
-/*
-function SortModulesBase (|[SCModule]| NewList)
-	NewList <~ TypeObject.Modul.Grab				// object
-	for m in .ModuleList							// base object
-		if m.CanGrabBase(false)
-			NewList <~ m.Grab
-
-	scbasetype.datatype
-	scbasetype.funcproto
-	scbasetype.struct  
-	.SortModulesBase( NewList )
-	.scbasetype.object  
-
-
-function SortModulesSub (|SCBaseType| TypeWanted, |[SCModule]| NewList)
-	|| i = 0
-	|| TryAgain = false
-	|| LoopCount = 0
-	
-	While (NewList.length < .ModuleList.length)
-		expect (++LoopCount < 2000) ("SortModulesSub too many loops")
-		|| m = .ModuleList[ i ]
-		|| c = m.cls
-		if (!m.grabbed) and (c == TypeWanted)
-			if m.OKToSort
-				NewList <~ m
-			  else
-				TryAgain = true
-		
-		i++		// go over each item in the list, forever, until they are all gone.
-		if i > .ModuleList.length-1
-			require TryAgain
-			TryAgain = false
-			i = 0
-
-*/	
 
 
 function scfunction.StripTest
