@@ -223,7 +223,7 @@ function stringstream.Parse_Jbin (|MessageRoot|)
 	.UserObj = nil
 	
 
-function string.parse_jbin (|message|)
+function string.parse_jbin (|messageroot|)
 	return .Stream.Parse_Jbin
 
 function string.IsJbin (|int|)
