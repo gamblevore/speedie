@@ -20,7 +20,7 @@ class FlowControl
 	helper Init (|string| path, |string| DateStr)
 		flow off
 		if .LoadPath(path, false) or .LoadPath(path, true)
-			print "Comparing flow: "
+			print " vs new: "
 		  else
 			print "Capturing flow: "
 		printline path
@@ -49,6 +49,9 @@ class FlowControl
 			|| S = CmpFile.ReadFile
 				.ReadInput = S.decompress.stream
 				rz = .readinput.hasany
+				if rz
+					print "Old: "
+					print CmpFile
 		
 		
 	helper Flush
@@ -91,7 +94,7 @@ class FlowControl
 		opt norefcounts, flow off
 		|| fs = .Excuse									#debug_require
 		if InputName 
-			fs <~ "different input for: ${InputName}. "			
+			fs <~ "Different input for: ${InputName}. "			
 		if !.readinput.HasAny
 			fs <~ "New-stream longer than old-stream."
 		  else
@@ -160,7 +163,7 @@ class FlowControl
 			if r != nil
 				|| str = r.str(data.length)
 				if str != data
-					f.Fail(data, str, name)
+					f.Fail(str, data, name)
 				
 			for c in data
 				f.addbyte(c)
