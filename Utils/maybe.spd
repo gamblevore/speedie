@@ -9,15 +9,15 @@ class Person
         .age = value
 
     render
-		fs<~"$.name's age is $.age"
+		fs <~ "$.name's age is $.age"
 
 
 main
-	using flowcontrol
+	using flowcontrol("maybe")
 		app.stuff
 	
 
-function app.Stuff
+function app.Stuff		
 	|| B1 = 60GB
 	|| B2 = 7.9MB
 	"${B1.strsize} = $B1, ${B2.strsize} = $B2"
@@ -43,8 +43,9 @@ function app.Stuff
             "$i is odd"
     "z is $z"
     
-    || fn = (mesayer, shesayer)(random[] < 0.5)
+    || fn = (mesayer, shesayer)(0.5[])
     (fn)(app.args[0])
+    
     || G = RPGHero("fred")
     (DoAction["jump"])(G, "hes scared")
 
