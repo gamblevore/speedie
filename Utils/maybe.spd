@@ -35,16 +35,20 @@ function app.Stuff
 	if L == 4
 	    "The list $L has four items!"
     || z = 0
-    for i in 10
-        if i isa 2 // if 
+    for i in 1 to 6
+        if i isa 2
             "$i is even"
             z[i] = true
           else
             "$i is odd"
     "z is $z"
     
-    || fn = (mesayer, shesayer)(0.5[])
-    (fn)(app.args[0])
+
+	FlowControl.Disabled++
+	for 4
+	    || fn = (mesayer, shesayer)(0.5[])
+	    (fn)(app.args[0])
+	FlowControl.Disabled--
     
     || G = RPGHero("fred")
     (DoAction["jump"])(G, "hes scared")
