@@ -36,11 +36,7 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 
-	FlowControl.FlowMode = FlowControl.Off
-	FlowControl.AlwaysMove = true
-	// i want to be able to run it... but only if I say so
-	// do I want to be able to generate only?
-	
+	FlowControl.FlowMode = FlowControl.Off // can enable via "log"	
 	error.AutoPrint = 1
 	.Clearenvs
 	check (app.pref_path) "Conf missing prefpath"

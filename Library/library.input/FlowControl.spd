@@ -26,9 +26,6 @@ class FlowControl
 		printline path
 		.write = path.out
 		flowcontrol.Disabled = 0
-		// what are we doing anyhow?
-		// we want to make a test of the expected thing
-		// lets say the thing is expected... we need to test the date
 		if FlowControl.flowmode >= FlowControl.Validate
 			FlowControl.Input(DateStr, "App Creation Date")
 
@@ -105,7 +102,7 @@ class FlowControl
 		fs <~ "\n"
 		
 		if !InputName
-			fs <~ app.StackTrace("JB_Flow_")
+			app.StackTrace("JB_Flow_", fs)
 			printline fs.GetResult
 			.Excuse = nil
 			.ReadInput = nil
@@ -124,8 +121,7 @@ class FlowControl
 	
 	
 	module
-		|flowcontrol|			Flow // DONT directly alter this 
-		||						FlowDiff		= "Flow differs here:"
+		|flowcontrol|			Flow			// DONT directly alter this 
 
 		|CompressionStats| 		Stats
 		|uint| 					Disabled		= int.max
