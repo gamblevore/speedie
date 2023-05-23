@@ -3215,7 +3215,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[227]);
-	JB_FS_AppendInt32(_fsf0, (2023052309));
+	JB_FS_AppendInt32(_fsf0, (2023052310));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -6805,7 +6805,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[496]);
-	JB_FS_AppendInt32(_fsf0, (2023052309));
+	JB_FS_AppendInt32(_fsf0, (2023052310));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -16568,6 +16568,14 @@ bool SC_IR_OperatorIsa(IR* self, int m) {
 	return m == self->Op;
 }
 
+void SC_IR_Print(IR* self) {
+	iif (SC__ASM_NoisyASM >= 3) {
+		JB_String* _tmPf0 = JB_Incr(SC_IR_Render(self, nil));
+		JB_PrintLine(_tmPf0);
+		JB_Decr(_tmPf0);
+	}
+}
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in) {
 	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
 	SC_IR_fs(self, fs);
@@ -21044,7 +21052,15 @@ void JB_Proc_SendSub(Process* self, Message* msg) {
 	}
 	JB_FreeIfDead(JB_Msg_render_jbin(msg, false, JB_LUB[0], self->Writer));
 	JB_Decr(msg);
+	JB_String* _tmPf0 = JB_Incr(JB_Str_CopyFromPtr(JB_IPCMessage_Data(self->Ours), self->Writer->Length));
+	Message* reparse = JB_Incr(JB_Str_parse_jbin(_tmPf0));
+	JB_Decr(_tmPf0);
+	iif ((!reparse)) {
+		debugger;
+	}
+	;
 	JB_Proc_WriteSub(self);
+	JB_Decr(reparse);
 }
 
 void JB_Proc_SetupAdjust(Process* self, int n) {
@@ -44955,4 +44971,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 4294024640193835104 -5297291927192796708
+// 7507258756626549670 -5297291927192796708
