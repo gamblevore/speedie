@@ -89,7 +89,6 @@ function Tran_Strings (|Message| start, |SCFunction| fn)
 			String_Expand( msg, fn )
 
 
-
 function InBuiltFunc (|message| self, |string| name, |bool|)
 	opt norefcounts
 	require self in @ques
