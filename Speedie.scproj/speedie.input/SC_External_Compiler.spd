@@ -89,7 +89,7 @@ function LogName (|string|)
 function AllowedThisFile (|string| name, |bool|)
 	if !options.ProjectIsMiniLib
 		return true
-	if name ~= "JB_File.cpp" or "JB_OSX.m" or "JB_PNG.cpp" or "JB_VM.cpp" or "JB_DirReaderWin32.cpp" or "JB_DirReaderUnix.cpp" or "JB_Child.cpp"
+	if name ~= "JB_OSX.m" or "JB_PNG.cpp" or "JB_VM.cpp" or "JB_DirReaderWin32.cpp" or "JB_DirReaderUnix.cpp" or "JB_Child.cpp"
 		return false
 	return true
 
