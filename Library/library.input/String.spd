@@ -463,7 +463,7 @@ class String
 	function Byte (|int| index, |Byte| Default, |int|)
 		cpp_wrapper JB_Str_ByteValue2
 		
-	syntax Access (|int| index=0, |Byte|)
+	syntax Access (|int| index, |Byte|)
 		cpp_wrapper JB_Str_ByteValue
 		
 	syntax Access (|int| start, |int| after, |string|)
