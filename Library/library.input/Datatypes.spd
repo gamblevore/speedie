@@ -592,6 +592,14 @@ datatype int64
 		|| Addr = &self
 		|| Addr2 = Addr|&f64|
 		return Addr2[0]
+	
+	render Hex
+		if self < 0
+			fs <~ '-'
+		fs <~ "0x"
+		for 8
+			fs <~ (self >> 56)|byte|
+			self <<= 8
 
 	helper RenderSizePart (|faststring| fs, |float| Size, |string| Suff)
 		|| f = (self|float|/size).Round(10)
