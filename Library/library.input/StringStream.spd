@@ -71,9 +71,10 @@ class StringStream
 			.file = nil // why not
 		
 		
-	function Byte (|byte|)
+	function Byte (|int|)
 		ifn .data has 1
-			require .NextChunk
+			if ! .NextChunk
+				return -1
 		return .data.byte
 		
 	syntax Compare (|int| n, |bool| aware, |int|)
@@ -86,8 +87,10 @@ class StringStream
 
 	function bInt (|int|n=4, |int64|)
 		for n
+			|| b = .byte
+			loop b >= 0
 			rz <<= 8
-			rz |= .byte
+			rz |= b
 		
 	function bInt0 (|int|n=3, |int64|)
 		// 0-3 works better for bit-math
@@ -95,7 +98,9 @@ class StringStream
 
 	function lInt0 (|int|n=3, |int64|)
 		for i in n+1
-			rz |= .byte << i << 3
+			|| b = .byte
+			loop b >= 0
+			rz |= b << i << 3
 
 
 	function noob (|uint64|)
@@ -110,6 +115,7 @@ class StringStream
 		|| v  = 0
 		while
 			|| b = .byte
+			loop b >= 0
 			v |= (b&127) << sh
 			if b <= 127
 				return v
@@ -129,8 +135,10 @@ class StringStream
 		return end - .position
 	function uint (|int| size, |int| mult=256, |uint64|) // mult used by selftools id3 decoder, passes 128.
 		for size
+			|| b = .byte
+			loop b >= 0
 			rz *= mult
-			rz += .Byte
+			rz += b
 	function Trim (|int| n, |string|)
 		return .str(n).trim
 	function Remaining (|int|)
