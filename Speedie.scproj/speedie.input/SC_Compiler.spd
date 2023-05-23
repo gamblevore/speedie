@@ -257,7 +257,7 @@ function InitTypes
 
 function InitBasicStuff (|bool|) // compiler.init
 	(Message).Restore
-		
+	
 	expect (StdErr.OK)  ("Error in source syntax. Can’t continue.")
 	
 	cpp_export[""] // str0
@@ -271,6 +271,7 @@ function InitBasicStuff (|bool|) // compiler.init
 	
 	.AddGlobalConst( "__time_id__", typeint ).islookuponly = «num date.timeid »
 	.AddGlobalConst( "__now__", typedate ).islookuponly = «num date.now »
+	.AddGlobalConst( "__modified__", typedate ).islookuponly = «num scimport.recent »
 	.AddGlobalConst( "π", typef64 ).islookuponly = «num "3.1415926535897932" »
 	.AddGlobalConst( "τ", typef64 ).islookuponly = «num "6.2831853071795864" »
 
