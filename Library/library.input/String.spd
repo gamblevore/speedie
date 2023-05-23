@@ -332,7 +332,7 @@ class String
 	    return self[n, int.max] + self[0, n]
 		
 		
-	function IsBadUTF8 (|int|from, |ind|)
+	function IsBadUTF8 (|int|from=0, |ind|)
 		cpp_Wrapper JB_Str_BadUTF8
 
 	function IsBinary (|float|f=24.0, |bool|)
@@ -637,14 +637,16 @@ class String
 
 
 function Join2 (|[string]| R, |string| sep = "", |String|)
-	|| n = (r.length-1) * sep.length
+	|| n = -sep.length
 	for s in r
-		n += s.length
+		n += s.length + sep.length
 	|| fs = FastString(n)
-	for (s in r) (i)
-		if i > 0
+	|| UseSep = false
+	for s in r
+		if UseSep
 			fs <~ sep
 		fs <~ s
+		UseSep = true
 	return fs
 
 
