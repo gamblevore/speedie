@@ -1,7 +1,8 @@
 #!/usr/local/bin/speedie
 
 
-// not recognising flow files as compressed?
+// still deleting files if I convert a jbin to a precomped jbin!
+
 function app.usage (|string|)
 	return "Usage: ${.filename} File1 [File2...]
 Convert files between jbin, box, xml formats. Additionally can compress or decompress.
