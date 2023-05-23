@@ -685,7 +685,7 @@ JBClass ( FlowControl , JB_Object ,
 	FastBuff Buff;
 	StringStream* ReadInput;
 	FastString* Write;
-	bool OK;
+	FastString* Excuse;
 );
 
 struct Instruction_Behaviour: Object_Behaviour {
@@ -1285,13 +1285,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1853])
+#define kJB__ErrorColors_bold (JB_LUB[1857])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1854])
-#define kJB__ErrorColors_good (JB_LUB[1855])
-#define kJB__ErrorColors_normal (JB_LUB[1856])
-#define kJB__ErrorColors_underline (JB_LUB[1855])
-#define kJB__ErrorColors_warn (JB_LUB[1857])
+#define kJB__ErrorColors_error (JB_LUB[1858])
+#define kJB__ErrorColors_good (JB_LUB[1859])
+#define kJB__ErrorColors_normal (JB_LUB[1860])
+#define kJB__ErrorColors_underline (JB_LUB[1859])
+#define kJB__ErrorColors_warn (JB_LUB[1861])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1462,10 +1462,10 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[338])
-#define kSC_BitNot (JB_LUB[602])
-#define kSC_BitOr (JB_LUB[543])
-#define kSC_BitXor (JB_LUB[1858])
+#define kSC_BitAnd (JB_LUB[339])
+#define kSC_BitNot (JB_LUB[603])
+#define kSC_BitOr (JB_LUB[544])
+#define kSC_BitXor (JB_LUB[1862])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1495,7 +1495,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1859])
+#define kJB_SaverStart1 (JB_LUB[1863])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1968,7 +1968,6 @@ extern SCIterator* SC__Iter_pointer;
 #define kSC__Beh_BehaviourProto (2)
 #define kSC__Beh_BehaviourProtoRequired (6)
 #define kSC__Beh_BehaviourTable (1)
-extern Message* SC__Class_ConstrLayerNew;
 extern Message* SC__Class_ConstrLayerNew2;
 extern Message* SC__Class_ConstrNew;
 extern SCFunction* SC__Func_CurrFunc;
@@ -3588,6 +3587,8 @@ bool JB_byte_IsLetter(byte self);
 
 bool JB_byte_IsLower(byte self);
 
+bool JB_byte_IsTextLine(byte self);
+
 bool JB_byte_IsUpper(byte self);
 
 bool JB_byte_IsWhite(byte self);
@@ -3671,6 +3672,8 @@ int JB_int__min();
 int64 JB_int64_abs(int64 self);
 
 double JB_int64_AsFloat(int64 self);
+
+JB_String* JB_int64_Hex(int64 self, FastString* fs_in);
 
 inline bool JB_int64_OperatorInRange(int64 self, int64 d);
 
@@ -4302,6 +4305,8 @@ float JB_MzSt_durr(CompressionStats* self);
 
 void JB_MzSt_LiveUpdate(CompressionStats* self, int inn, int outt);
 
+void JB_MzSt_Print(CompressionStats* self);
+
 JB_String* JB_MzSt_Render(CompressionStats* self, FastString* fs_in);
 
 void JB_MzSt_start(CompressionStats* self);
@@ -4330,6 +4335,8 @@ uint JB_FastBuff_CopyTo(FastBuff* self, byte* Dest, int Length);
 void JB_FastBuff_destructor(FastBuff* self);
 
 int JB_FastBuff_Length(FastBuff* self);
+
+bool JB_FastBuff_NeedAlloc(FastBuff* self, int n);
 
 bool JB_FastBuff_OperatorHas(FastBuff* self, int n);
 
@@ -5155,6 +5162,8 @@ void JB_FS_lInt(FastString* self, uint64 n);
 
 void JB_FS_MsgErrorName(FastString* self, JB_String* name);
 
+void JB_FS_PrintNicely(FastString* self, JB_String* s);
+
 void JB_FS_ProblemsFound(FastString* self, int count);
 
 JB_String* JB_FS_Render(FastString* self, FastString* fs_in);
@@ -5197,11 +5206,13 @@ void JB_Flow_Constructor(FlowControl* self);
 
 void JB_Flow_Destructor(FlowControl* self);
 
-void JB_Flow_Fail(FlowControl* self, JB_String* found, JB_String* expected, JB_String* name);
+void JB_Flow_Fail(FlowControl* self, JB_String* found, JB_String* expected, JB_String* InputName);
 
 void JB_Flow_Flush(FlowControl* self);
 
-void JB_Flow_Init(FlowControl* self, JB_String* path);
+void JB_Flow_Init(FlowControl* self, JB_String* path, JB_String* DateStr);
+
+bool JB_Flow_LoadPath(FlowControl* self, JB_String* path, bool IsPrev);
 
 FlowControl* JB_Flow__Alloc();
 
@@ -5213,7 +5224,7 @@ bool JB_Flow__InputStrings(Array* lines, JB_String* name);
 
 void JB_Flow__Input(JB_String* data, JB_String* name);
 
-FlowControlStopper JB_Flow__FlowStarter(JB_String* name);
+FlowControlStopper JB_Flow__FlowStarter(JB_String* name, Date AppDate);
 
 FlowControl* JB_Flow__New();
 
@@ -5881,6 +5892,8 @@ JB_String* JB_Str_Unescape(JB_String* self);
 JB_String* JB_Str_UnicodeSafeName(JB_String* self);
 
 CharSet* JB_Str_UniCS(JB_String* self);
+
+int JB_Str_UnPrintable(JB_String* self);
 
 JB_String* JB_Str_UpperFirst(JB_String* self);
 
