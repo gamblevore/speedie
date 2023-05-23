@@ -1285,13 +1285,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1853])
+#define kJB__ErrorColors_bold (JB_LUB[1854])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1854])
-#define kJB__ErrorColors_good (JB_LUB[1855])
-#define kJB__ErrorColors_normal (JB_LUB[1856])
-#define kJB__ErrorColors_underline (JB_LUB[1855])
-#define kJB__ErrorColors_warn (JB_LUB[1857])
+#define kJB__ErrorColors_error (JB_LUB[1855])
+#define kJB__ErrorColors_good (JB_LUB[1856])
+#define kJB__ErrorColors_normal (JB_LUB[1857])
+#define kJB__ErrorColors_underline (JB_LUB[1856])
+#define kJB__ErrorColors_warn (JB_LUB[1858])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1465,7 +1465,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[338])
 #define kSC_BitNot (JB_LUB[603])
 #define kSC_BitOr (JB_LUB[544])
-#define kSC_BitXor (JB_LUB[1858])
+#define kSC_BitXor (JB_LUB[1859])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1495,7 +1495,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1859])
+#define kJB_SaverStart1 (JB_LUB[1860])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -3654,8 +3654,6 @@ AsmReg JB_int_Reg(int self);
 
 JB_String* JB_int_RenderFS(int self, FastString* fs_in);
 
-JB_String* JB_int_RenderSize(int self, FastString* fs_in);
-
 bool JB_int_SyntaxAccess(int self, int bit);
 
 int JB_int_SyntaxAccessSet(int self, int bit, bool Value);
@@ -4392,8 +4390,6 @@ int SC_IR_FilePos(IR* self);
 void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
-
-void SC_IR_Print(IR* self);
 
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
@@ -8376,7 +8372,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
