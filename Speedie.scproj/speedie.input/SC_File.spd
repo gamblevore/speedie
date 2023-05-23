@@ -17,13 +17,14 @@ class SCFile (file)
 
 	constructor (|File| f)
 		super.constructor((f.path, "")(f != nil))
+		flow off
 		.isinternal = f == nil
 		.liveast = .start_ast
 		Compiler.stTotalFileCount += .isinternal
 		(SCImport.Recent max= f.modified) 
 		
 	function start_ast (|message|)
-		if .isinternal
+		if .IsInternal
 			return message.newwithlayer((Message).createLayer(self), @arg, "")
 
 	function Use
