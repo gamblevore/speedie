@@ -68,7 +68,7 @@ Module MZLab
 		|compressionstats| stats
 		|| c = .compress(Strength, stats)
 		if report
-			printline stats.Render
+			stats.Print
 		stats = nil
 		|| decomp = c.Decompress(int.max, stats)
 		rz = self == decomp
@@ -149,21 +149,28 @@ struct CompressionStats
 
 	function start
 		.Duration = -date()
+	
 	function end
 		.Duration += date()
 
+	function Print
+		printline .render
+		
 	function LiveUpdate (|int| inn, |int| outt)
 		.in += inn
 		.out += outt
 		if .live
-			printline .render
+			.print
+	
 	function durr (|float|)
 		|| d = .duration
 		if d < 0
 			d += date()
 		return d.seconds
+	
 	render
 		fs.RenderSpeed(.durr, .in, .out, "")
+	
 	module
 		|compressionstats| All // noice
 		function New (|compressionstats|)
