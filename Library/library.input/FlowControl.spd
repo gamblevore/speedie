@@ -2,7 +2,6 @@
 
 /*
 	API to check if something different happened to the flow control from one platform to another
-	only call: flowcontrol.Cond
 */
 
 		
@@ -11,31 +10,47 @@ class FlowControl
 	|FastBuff|				Buff
 	|stringstream|			ReadInput
 	|faststring| 			Write
-	|bool| 					OK
+	|Faststring| 			Excuse
 
 	constructor
 		flow off
-		.ok = .buff.Alloc(1MB)
+		.buff.needAlloc(1MB)
+		.Excuse = FastString()
 
-	helper Init (|string| path)
+	helper Init (|string| path, |string| DateStr)
 		flow off
-		|| Found = "Capturing"
-		if FlowControl.FlowMode >= FlowControl.Validate
-			|| prev = path.AddExt(".expected")
-			if AlwaysMove or (!prev.filesize and path.filesize)
-				|| f = path.file
-				if f.exists
-					require f.MoveTo(prev)
-			if prev.FileSize
-				|| S = prev.ReadFile
-					.ReadInput = S.decompress.stream
-					if .readinput.hasany
-						Found = "Comparing"
-		print Found
-		print " flow: "
+		if .LoadPath(path, false) or .LoadPath(path, true)
+			print "Comparing flow: "
+		  else
+			print "Capturing flow: "
 		printline path
 		.write = path.out
-	
+		flowcontrol.Disabled = 0
+		// what are we doing anyhow?
+		// we want to make a test of the expected thing
+		// lets say the thing is expected... we need to test the date
+		if FlowControl.flowmode >= FlowControl.Validate
+			FlowControl.Input(DateStr, "App Creation Date")
+
+
+
+	helper LoadPath	(|string| path, |bool| IsPrev,   |bool|)
+		flow off
+		require FlowControl.FlowMode >= FlowControl.Validate
+		|| name = (".expected", ".prev")(!IsPrev)
+		|| CmpFile = path.AddExt(name)
+		if IsPrev
+			if AlwaysMove or (!CmpFile.filesize and path.filesize)
+				|| f = path.file
+				if f.exists
+					require f.MoveTo(CmpFile)
+		
+		if CmpFile.FileSize
+			|| S = CmpFile.ReadFile
+				.ReadInput = S.decompress.stream
+				rz = .readinput.hasany
+		
+		
 	helper Flush
 		flow off
 		if .write
@@ -46,12 +61,16 @@ class FlowControl
 	destructor
 		flow off
 		FlowControl.Disabled = int.max
+		
 		.flush
-		printline stats.render
+		if .ReadInput!=nil
+			"Flow: Occurred equally."
+		stats.Print
 		stats.clear
 
 	
 	helper AddByte (|byte| value)
+		flow off
 		if .buff <~ value
 			.Flush
 		
@@ -68,23 +87,38 @@ class FlowControl
 		.fail(string.byte(value), string.byte(b), "")
 
 
-	function Fail (|string| found, |string| expected, |string| name)
+	function Fail (|string| found, |string| expected, |string| InputName)
 		opt norefcounts, flow off
+		|| fs = .Excuse									#debug_require
+		if InputName 
+			fs <~ "different input for: ${InputName}. "			
 		if !.readinput.HasAny
-			"New-stream longer than old-stream."
+			fs <~ "New-stream longer than old-stream."
 		  else
-			if name
-				print "with input "
-				print name
-			print " expected: "
-			print expected
-			print "\nbut found: "
-			printline found
-		printline app.StackTrace("JB_Flow_")
-		.ReadInput = nil
-		if BreakOnFail
+			fs <~ "Expected: "
+			fs.printnicely(expected)
+			fs <~ " but found: "
+			fs.printnicely(found)
+		fs <~ "\n"
+		
+		if !InputName
+			fs <~ app.StackTrace("JB_Flow_")
+			printline fs.GetResult
+			.Excuse = nil
+			.ReadInput = nil
+		if flowcontrol.BreakOnFail
 			debugger
 
+
+	function faststring.PrintNicely (|string| s)
+		|| Cause = s.UnPrintable
+		if cause < 0
+			self <~ "#(${s.hex})#"
+		  elseif cause == '\n'
+			s.ReplaceAll("\n", `\n`, self)
+		  else
+			self <~ s
+	
 	
 	module
 		|flowcontrol|			Flow // DONT directly alter this 
@@ -112,6 +146,7 @@ class FlowControl
 
 		function Input (|[string]| lines, |string| name,  |bool|)
 			cpp_part InputStrings
+			flow off
 			.Input(join2(lines, "\n"), name)
 
 		function Input (|string| data, |string| name)
@@ -136,23 +171,21 @@ class FlowControl
 			.Disabled = int.max
 			.Flow = nil
 		
-		function New (|string| name, |FlowControlStopper|)
+		function New (|string| name, |Date| AppDate = __modified__,  |FlowControlStopper|)
 			cpp_part FlowStarter
 			flow off
 			require FlowMode
 			.Disabled = int.max			// in case its set badly
 			.flow = FlowControl()
-			.flow.init("/tmp/FlowControl/" + name + ".txt.mz")
+			.flow.init("/tmp/FlowControl/" + name + ".txt.mz", AppDate.Hex)
 
 
 
 datatype FlowControlStopper (uint)
 	syntax UsingComplete
+		flow off
 		flowcontrol.stop
-
+	
 	syntax Using (|FlowControlStopper|)
 		flow off
-		opt norefcounts
-		if FlowControl.FlowMode
-			flowcontrol.Disabled = 0
 
