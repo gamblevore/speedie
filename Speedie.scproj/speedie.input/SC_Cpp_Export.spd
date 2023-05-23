@@ -839,12 +839,12 @@ extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
 
 	function SmartWrite (|string| S, |File| F)
 		flow off
+		FlowControl.Disabled++ // we don't care about previous file contents
 		.cpp_includes <~ s.hash|int64|.render
-		require F!=nil
-		f.Offset = 0 // oof. can write \0\0\0\0 at start of file otherwise
-		require !(F.CompareData( S))
-		.wroteAny = true
-		F.Data = S
+		if F and !F.CompareData(S)
+			.wroteAny = true
+			F.Data = S
+		FlowControl.Disabled--
 	
 	
 	function DoSavers (|bool|)
