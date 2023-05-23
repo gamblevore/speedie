@@ -89,7 +89,6 @@ class File (String)
 		cpp_wrapper JB_File_Write
 	
 	Syntax Append (|string| data)
-		// .offset = -1 // sigh seems to caus issues
 		.write(Data)
 	
 	function string.visible (|bool|)
@@ -181,10 +180,12 @@ class File (String)
 	
 	function CompareFile (|File| A, |string| Error="", |bool|)
 		cpp_part FileCompare
+		FlowControl.Disabled++
 		|| code = .CompareSub(a)
 		.Close
 		A.Close
-		return .CompareMsg(code, Error)
+		rz = .CompareMsg(code, Error)
+		FlowControl.Disabled--
 	
 	
 	helper CompareMsg (|errorint| code, |string| Error, |bool|)
@@ -203,6 +204,7 @@ class File (String)
 		
 	helper CompareSub (|File| A, |ErrorInt|)
 		cpp_part FileCompareSub
+		flow off
 		if (.Size != A.Size)
 			return 1
 		A.close
@@ -213,7 +215,7 @@ class File (String)
 		while {
 			|| S_ = .Read(64K)
 			|| SA = A.Read(64K)
-			ifn (S_ == SA)
+			if S_ != SA
 				rz = 2
 				exit
 		} (S_)
@@ -226,7 +228,7 @@ class File (String)
 			code = 1
 		  elseif (.ReadAll(true) != A)
 			code = 2
-		return .comparemsg(code, error)
+		return .CompareMsg(code, error)
 
 	
 	function ReadAll (|int| lim = 128MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
@@ -248,11 +250,9 @@ class File (String)
 	
 	function Exists (|bool|TestLinkExists=false, |bool|)
 		cpp_wrapper JB_File_Exists
-
 	
 	syntax access (|string| name, |bool| Errs=false, |File|)
 		return .Child(name, errs)
-
 
 	function ListStart (|bool|)
 		cpp_wrapper
@@ -262,7 +262,6 @@ class File (String)
 
 	function ListEnd
 		cpp_wrapper
-		
 
 	function MoveNext (|bool|)
 		cpp_wrapper JB_File_MoveNext
@@ -273,7 +272,6 @@ class File (String)
 	function Open (|int| Flags = File.O_RDWR (|) File.O_CREAT, |bool|AllowMissing=false, |int|)
 		cpp_wrapper
 
-		
 	function OpenForRead (|bool| AllowMissing = false, |int|)
 		return .open(0, AllowMissing)
 	
