@@ -92,6 +92,10 @@ struct FastBuff
 		.start = Value.Address
 		.end = .start + Value.length
 		.curr = .start
+	function NeedAlloc (|int| n, |bool|)
+		if .Alloc(n)
+			return true
+		error ("Can't allocate memory.")
 	function Alloc (|int| n, |bool|)
 		.start = Memory.Zalloc(n)
 		.curr = .start
