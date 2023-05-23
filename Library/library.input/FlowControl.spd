@@ -19,7 +19,7 @@ class FlowControl
 
 	helper Init (|string| path)
 		flow off
-		|| Compare = ""
+		|| Found = "Capturing"
 		if FlowControl.FlowMode >= FlowControl.Validate
 			|| prev = path.AddExt(".expected")
 			if AlwaysMove or (!prev.filesize and path.filesize)
@@ -28,13 +28,12 @@ class FlowControl
 					require f.MoveTo(prev)
 			if prev.FileSize
 				|| S = prev.ReadFile
-					Compare = prev
 					.ReadInput = S.decompress.stream
-		print "Capturing flow: "
+					if .readinput.hasany
+						Found = "Comparing"
+		print Found
+		print " flow: "
 		printline path
-		if .ReadInput != nil
-			print "Comparing flow: "
-			printline compare
 		.write = path.out
 	
 	helper Flush
@@ -75,7 +74,7 @@ class FlowControl
 			"New-stream longer than old-stream."
 		  else
 			if name
-				print "with "
+				print "with input "
 				print name
 			print " expected: "
 			print expected
