@@ -127,7 +127,7 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			i = WordEnd
 			continue
 
-		
+	
 function faststring.RenderSpeed (|float| seconds,  |int64| BytesIn, |int64| BytesOut, |string| Name)
 	|float| scale = 1MB
 	|| speed = ""
@@ -162,5 +162,14 @@ function faststring.RenderSpeed (|float| seconds,  |int64| BytesIn, |int64| Byte
 	if seconds
 		self <~ "  ($rate$unit/s)"
 
-//		fs <~ "${.in.strsize} to ${.out.strsize} ($pc) in at ${spd.strsize}/s (${durr}s)"
 
+	
+function string.UnPrintable (|int|)
+	if .IsBadUTF8
+		return -1
+	
+	for c in self
+		ifn (c >= ' ' or c == 9)
+			if c.IsTextLine
+				return '\n'
+			return -2
