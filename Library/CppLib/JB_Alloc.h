@@ -15,18 +15,20 @@
 /// LANGUAGE ADDITIONS
 #define JBShift( exp, amount ) ( (__typeof__ ( exp )) ((byte*)(exp)+(amount)))
 
-#define likely(x)   __builtin_expect(!!(x),1)
-#define unlikely(x) __builtin_expect(!!(x),0)
+#define likely(x)				__builtin_expect(!!(x),1)
+#define unlikely(x)				__builtin_expect(!!(x),0)
 
-#define if_rare(x) if (unlikely(x))
-#define if_usual(x) if (likely(x))
+#define if_rare(x)				if (unlikely(x))
+#define if_usual(x)				if (likely(x))
 
-#define iif(x)     if (JB_Flow__Cond(x))
-#define wwhile(x)  while (JB_Flow__Cond(x)) 
+#define iif(x)					if (JB_Flow__Cond(x))
+#define wwhile(x)				while (JB_Flow__Cond(x)) 
+#define JB_Ternary(cond,a,b)	((cond)?(a):(b))
+#define JB_Ternaryy(cond,a,b)	(JB_Flow__Cond(cond)?(a):(b))
 
-#define __hot __attribute__((hot))
+#define __hot					__attribute__((hot))
 
-#define __visible __attribute__((__visibility__("default")))
+#define __visible				__attribute__((__visibility__("default")))
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -253,7 +255,6 @@ void JB_TotalMemorySet(bool b);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __hot JB_Object* JB_Alloc( JB_MemoryLayer* Mem );
-void JB_MemoryReset(JB_MemoryWorld* World, int Max);
 __hot JB_Object* JB_Alloc2( AllocationBlock* CurrBlock );
 void JB_Delete( FreeObject* Obj );
 void JB_FindLeakedObject(JB_Object* Obj, Array* R);
@@ -284,7 +285,6 @@ u32 JB_ObjCount();
 #define JB_SafeDecr(Obj)		JB_SafeDecr_((JB_Object*)(Obj))
 #define JB_SetRef(a,b)			JB_SetRef_((JB_Object**)(&a), (JB_Object*)(b))
 #define JB_Swap(a,b)			(std::swap(*(a),*(b)))
-#define JB_Ternary(cond,a,b)	((cond)?(a):(b))
 #define JB_LongObjOr(A, B)            ({ \
     JB_Object* _T = (A);                 \
     if (!_T) {                           \
