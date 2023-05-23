@@ -19,6 +19,7 @@ class FlowControl
 
 	helper Init (|string| path)
 		flow off
+		|| Compare = ""
 		if FlowControl.FlowMode >= FlowControl.Validate
 			|| prev = path.AddExt(".expected")
 			if AlwaysMove or (!prev.filesize and path.filesize)
@@ -27,7 +28,13 @@ class FlowControl
 					require f.MoveTo(prev)
 			if prev.FileSize
 				|| S = prev.ReadFile
+					Compare = prev
 					.ReadInput = S.decompress.stream
+		print "Capturing flow: "
+		printline path
+		if .ReadInput != nil
+			print "Comparing flow: "
+			printline compare
 		.write = path.out
 	
 	helper Flush
@@ -87,7 +94,7 @@ class FlowControl
 		|CompressionStats| 		Stats
 		|uint| 					Disabled		= int.max
 		|byte|					FlowMode		= FlowControl.Validate
-		|bool|					AlwaysMove
+		|bool|					AlwaysMove		= true
 		|bool|					BreakOnFail
 		
 		constants
@@ -147,8 +154,6 @@ datatype FlowControlStopper (uint)
 	syntax Using (|FlowControlStopper|)
 		flow off
 		opt norefcounts
-		require FlowControl.FlowMode
-		print "Capturing flow: "
-		printline flowcontrol.flow.write.file.path
-		flowcontrol.Disabled = 0
+		if FlowControl.FlowMode
+			flowcontrol.Disabled = 0
 
