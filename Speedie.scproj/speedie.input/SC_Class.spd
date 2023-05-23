@@ -270,19 +270,11 @@ function LoadClassName (|message| node, |string|)
 
 // maybe better to make an init func for this...
 |Message| ConstrNew
-|Message| ConstrLayerNew
 |Message| ConstrLayerNew2
 
 ConstrNew = `function New () {
+	flow off
 	|| __rz__ = alloc()|type|
-	if __rz__|bool|
-		__rz__.Constructor()
-	return __rz__
-}`.ParseClean
-
-ConstrLayerNew = `function New (|MemoryLayer| _L) {
-	visible false
-	|| __rz__ = LayerAlloc(_L)|type|
 	if __rz__|bool|
 		__rz__.Constructor()
 	return __rz__
@@ -290,6 +282,7 @@ ConstrLayerNew = `function New (|MemoryLayer| _L) {
 
 ConstrLayerNew2 = `function NewWithLayer (|MemoryLayer| _L) {
 	visible false
+	flow off
 	cpp_part NewWithLayer
 	|| __rz__ = LayerAlloc(_L)|type|
 	if __rz__|bool|
