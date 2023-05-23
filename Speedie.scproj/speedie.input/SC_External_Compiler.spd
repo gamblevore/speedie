@@ -296,7 +296,7 @@ function TransComp
 			(.RunCppCompile)~noflowcontrol
 			if .IsCompilerAndNeedsInstall
 				.InstallCompiler
-	.ClearThis
+	.ClearThis~noflowcontrol
 	if stderr.ok
 		compiler.Package
 
@@ -469,9 +469,11 @@ function InstallCompiler
 	|| dest = Compiler.Projects.child("Terminal/Speedie")
 	.ProductPath.File.MoveTo( dest )
 
+	FlowControl.Disabled++
 	.InstallOne Cpp_Export.CppProduct
 	.InstallOne Cpp_Export.HProduct
 	.InstallOne Cpp_Export.HProduct.Sibling("JB_Globals.cpp")
+	FlowControl.Disabled--
 	
 	if options.Makelib
 		.MakeLib
