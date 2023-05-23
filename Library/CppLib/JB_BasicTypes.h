@@ -139,6 +139,9 @@ typedef int64					Date;
 #endif
 
 
+#ifndef __has_builtin
+	#define __has_builtin (x) (false)
+#endif
 
 
 
