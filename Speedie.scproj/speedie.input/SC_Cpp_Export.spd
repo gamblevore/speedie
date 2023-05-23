@@ -10,28 +10,6 @@ class Cpp_Export {
 linkage
 	cpp_part		Cpp
 
-module
-	|SCClass| 	CurrClass
-	|uint64| 	LubHash
-	|string| 	FindGlobalsCpp = (`		
-
-extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
-	*src = JB_LUBSrc2;
-	*Hash = JB_LUBHash;
-	return JB_LUB;
-}
-extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
-	*src = JB_LUBSrc2;
-	return JB_LUB;
-}
-`) // just test that my compressor works...!!
-	
-	function compiler.Reachedfuncs (|int|)
-		opt norefcounts
-		for f in compiler.funclist
-			rz += f.CurrReacher!=nil
-
-
 
 |FastStringCpp|						T
 |[FastStringCpp]|					Outputs_cpp
@@ -41,18 +19,9 @@ extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
 |FastStringCpp|						HeaderProj
 |FastStringCpp|						AllTypes
 |FastStringCpp|						ModuleProperties
-module 
-	|| IfName = ""
-	|| WhileName = ""
-
-
-
-
 
 constructor
 	Init()
-
-
 
 function PreRun
 	Cpp_Export.StringBlob		= FastStringCpp.new
@@ -92,7 +61,6 @@ function OptStart (|FastStringCpp| fs, |int| m, |bool| force = 0)
 		if m <= 3
 			s = m.render
 		fs <~ "#pragma GCC optimize (\"O$s\")\n"
-
 
 
 function OptEnd (|FastStringCpp| fs, |int| m, |bool| force=0)
@@ -171,9 +139,11 @@ function SetupFlow (|SCFunction| f)
 	if Options.GenFlowControlCode and !f.FlowDisabled
 		Cpp_Export.IfName = "iif"
 		Cpp_Export.WhileName = "wwhile"
+		compiler.TernaryFunc.exportname = "JB_Ternaryy"
 	  else
 		Cpp_Export.IfName = "if"
 		Cpp_Export.WhileName = "while"
+		compiler.TernaryFunc.exportname = "JB_Ternary"
 
 
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
@@ -737,6 +707,30 @@ module
 	|[string]|					H_PostInput
 	|[string]|					Cpp_Input
 	|[string]|					Cpp_Includes
+
+
+	|| IfName = ""
+	|| WhileName = ""
+
+	|SCClass| 	CurrClass
+	|uint64| 	LubHash
+	|string| 	FindGlobalsCpp = (`		
+
+extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
+	*src = JB_LUBSrc2;
+	*Hash = JB_LUBHash;
+	return JB_LUB;
+}
+extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
+	*src = JB_LUBSrc2;
+	return JB_LUB;
+}
+`)
+	
+	function compiler.Reachedfuncs (|int|)
+		opt norefcounts
+		for f in compiler.funclist
+			rz += f.CurrReacher!=nil
 
 
 	function GenLub (|faststring| fs)
