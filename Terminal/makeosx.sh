@@ -3,7 +3,23 @@ echo "Started Building Speedie"
 set -e
 cd /usr/local/speedie/Library/CppLib
 
-echo "Compiling /usr/local/lib/libjeebox.dylib"
+
+U="$SUDO_USER"
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   U=$USER
+fi
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   U=$LOGNAME
+fi
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   U=$(basename -- "$HOME")
+fi
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   echo "Please set LOGNAME to the desired user's name so we can make these files and folders owned properly."
+   exit 1
+fi
+
+echo "Compiling /usr/local/lib/libjeebox.dylib for user '$U'"
 if ! [[ -w "/usr/local/lib/libjeebox.dylib" ]]
 then
    echo "Can't write to /usr/local/lib/libjeebox.dylib  Probably you need to run this with sudo."
@@ -18,38 +34,63 @@ cd /usr/local/speedie/jeebox.scproj/Examples
 echo "Creating directories"
 echo "Creating dir Build"
 mkdir -p "Build"
-chmod 777 Build
+chmod 775 Build
+chown $U Build
 
 echo "Creating dir /usr/local/include/"
 mkdir -p "/usr/local/include/"
-chmod 777 /usr/local/include/
+chmod 775 /usr/local/include/
+chown $U /usr/local/include/
 
 echo "Creating dir /usr/local/bin/"
 mkdir -p "/usr/local/bin/"
-chmod 777 /usr/local/bin/
+chmod 775 /usr/local/bin/
+chown $U /usr/local/bin/
 
 
 echo "Cleaning old files"
 rm -rf Build/*
 
 echo "Installing headers"
-cp *.h /usr/local/include/
+cp    *.h /usr/local/include/
 chmod 775 /usr/local/include/jeebox*
+chown $U /usr/local/include/jeebox*
 
 echo "Compiling jb.cpp"
 g++ -o Build/jb  -std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I /usr/local/speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1 -arch=arm64  -arch=x86_64  -lc++ -g -ljeebox  jb.cpp
+chmod 775 Build/jb
+chown $U Build/jb
+
 echo "Compiling xml.cpp"
 g++ -o Build/xml  -std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I /usr/local/speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1 -arch=arm64  -arch=x86_64  -lc++ -g -ljeebox  xml.cpp
+chmod 775 Build/xml
+chown $U Build/xml
+
 echo "Compiling test.cpp"
 g++ -o Build/test  -std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I /usr/local/speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1 -arch=arm64  -arch=x86_64  -lc++ -g -ljeebox  test.cpp
+chmod 775 Build/test
+chown $U Build/test
+
 echo "Compiling users.cpp"
 g++ -o Build/users  -std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I /usr/local/speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1 -arch=arm64  -arch=x86_64  -lc++ -g -ljeebox  users.cpp
+chmod 775 Build/users
+chown $U Build/users
+
 
 echo "Creating Links"
+
 ln -sf /usr/local/speedie/Terminal/Speedie /usr/local/bin/spd
+chmod 775 /usr/local/bin/spd
+chown $U /usr/local/bin/spd
+
+
 ln -sf /usr/local/speedie/Terminal/Speedie /usr/local/bin/speedie
+chmod 775 /usr/local/bin/speedie
+chown $U /usr/local/bin/speedie
+
+
 echo ""
 echo "Build Complete."
 
-echo "Speedie Compiling Perry"
+echo "Speedie Compiling Perry (Optional Extra)"
 /usr/local/speedie/Terminal/Speedie /usr/local/speedie/Perry.scproj

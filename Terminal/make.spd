@@ -3,26 +3,57 @@
 // INSTALL:
 // sudo /usr/local/speedie/Terminal/make.spd
 
-|| Speedie = "/usr/local/speedie"
-|| ExecFlags = ""
-
 
 main 
 	.gen("osx", platform.OSX)
 	.gen("linux", platform.linux)
 
 
+|| Speedie = "/usr/local/speedie"
+|| ExecFlags = ""
 
+
+|| GetUserName = `
+U="$SUDO_USER"
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   U=$USER
+fi
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   U=$LOGNAME
+fi
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   U=$(basename -- "$HOME")
+fi
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   echo "Please set LOGNAME to the desired user's name so we can make these files and folders owned properly."
+   exit 1
+fi
+`
+
+function UnMod (|string| Dir, |string|)
+	return "chmod 775 $dir
+chown \$U $dir"
+	
+	
 function comp (|string| name, |string|)
-	rz = "echo \"Compiling ${name}.cpp\"
-g++ -o Build/$name  $ExecFlags  ${name}.cpp"
+	return "echo \"Compiling ${name}.cpp\"
+g++ -o Build/$name  $ExecFlags  ${name}.cpp
+${unmod(`Build/`+name)}
+"
 
 function mkdir (|string| dir, |string|)
 	rz = "echo \"Creating dir $dir\"
 mkdir -p \"$dir\"
-chmod 777 $dir
+${unmod(dir)}
 "
 
+function link (|string| src, |string| dest, |string|)
+	return "
+ln -sf $src $dest
+${unmod(dest)}
+"
+	
+	
 
 function app.gen (|string| plat, |bool| IsCurrentPlatform) {
 expect !.args (.args, "This script takes no arguments.")
@@ -31,7 +62,7 @@ expect !.args (.args, "This script takes no arguments.")
 || shared = "shared"
 || LinkLibFlags = ""
 || ext = "so"
-if plat~="osx"
+if plat ~= "osx"
 	shared = "dynamiclib"
 	ext = "dylib"
 	CFlags += " -arch=arm64  -arch=x86_64  -lc++"
@@ -39,7 +70,7 @@ if plat ~= "linux"
 	CFlags += " -rdynamic"
 	LinkLibFlags += "-lrt -pthread"
 
-|| LibName = "libjeebox.$ext" 
+|| LibName  = "libjeebox.$ext" 
 || LibFlags = "$CFlags -$shared -fPIC -D AS_LIBRARY=1 "
 ExecFlags   = "$CFlags -g -ljeebox"
 || BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
@@ -70,7 +101,7 @@ expect !(Speedie contains ' ') ("The path: '$speedie' contains spaces and can't 
 
 PrepareCpp.data = `#!/bin/bash
 echo "Prebuild .cpp files"
-/usr/local/bin/speedie . --x --nocompile
+/usr/local/bin/speedie   .    --x --nocompile
 /usr/local/bin/speedie --self --x --nocompile
 `
 if IsCurrentPlatform
@@ -87,7 +118,8 @@ echo \"Started Building Speedie\"
 set -e
 cd $CppLib
 
-echo \"Compiling $LibPath\"
+$GetUserName
+echo \"Compiling $LibPath for user '\$U'\"
 if ! [[ -w \"$LibPath\" ]]
 then
    echo \"Can't write to $LibPath  Probably you need to run this with sudo.\"
@@ -108,8 +140,8 @@ echo \"Cleaning old files\"
 rm -rf Build/*
 
 echo \"Installing headers\"
-cp *.h /usr/local/include/
-chmod 775 /usr/local/include/jeebox*
+cp    *.h /usr/local/include/
+${unmod(`/usr/local/include/jeebox*`)}
 
 ${comp(`jb`)}
 ${comp(`xml`)}
@@ -117,12 +149,13 @@ ${comp(`test`)}
 ${comp(`users`)}
 
 echo \"Creating Links\"
-ln -sf $SpdTerm /usr/local/bin/spd
-ln -sf $SpdTerm /usr/local/bin/speedie
+${link(SpdTerm, `/usr/local/bin/spd`)}
+${link(SpdTerm, `/usr/local/bin/speedie`)}
+
 echo \"\"
 echo \"Build Complete.\"
 
-echo \"Speedie Compiling Perry\"
+echo \"Speedie Compiling Perry (Optional Extra)\"
 $SpdTerm $Speedie/Perry.scproj
 "
 
@@ -140,5 +173,4 @@ if IsCurrentPlatform
 	// NO:    unix 'make' or cmake
 	// MOVE:  All possible control-flow + vars out of bash, and into your favourite language.
 	// DO:    Create the command-lines from your fav language!
-// "Death to make-tools!"
 
