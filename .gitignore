@@ -19,6 +19,5 @@ xcuserdata/
 /Terminal/*.sh
 *.scproj/Cpp/
 **/DerivedData/
-**/.todo
 *.args
 Utils/jz
