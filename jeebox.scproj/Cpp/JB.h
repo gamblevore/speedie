@@ -375,7 +375,7 @@ JBClass ( FlowControl , JB_Object ,
 	FastBuff Buff;
 	StringStream* ReadInput;
 	FastString* Write;
-	bool OK;
+	FastString* Excuse;
 );
 
 struct LeakTester_Behaviour: Object_Behaviour {
@@ -518,13 +518,13 @@ extern JB_String* JB__App_codesign_native;
 extern Array* JB__App_OldArgs;
 
 extern bool JB__App_Unregistered;
-#define kJB__ErrorColors_bold (JB_LUB[373])
+#define kJB__ErrorColors_bold (JB_LUB[374])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[374])
-#define kJB__ErrorColors_good (JB_LUB[375])
-#define kJB__ErrorColors_normal (JB_LUB[376])
-#define kJB__ErrorColors_underline (JB_LUB[375])
-#define kJB__ErrorColors_warn (JB_LUB[377])
+#define kJB__ErrorColors_error (JB_LUB[375])
+#define kJB__ErrorColors_good (JB_LUB[376])
+#define kJB__ErrorColors_normal (JB_LUB[377])
+#define kJB__ErrorColors_underline (JB_LUB[376])
+#define kJB__ErrorColors_warn (JB_LUB[378])
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -574,7 +574,7 @@ extern JB_String* JB__JbinHeaderComp;
 extern JB_String* JB__jBinNotJbin;
 extern Dictionary* JB__SyxDict_;
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[378])
+#define kJB_SaverStart1 (JB_LUB[379])
 extern JB_ErrorReceiver* JB_StdErr;
 extern Syntax JB_SyxAcc;
 extern Syntax JB_SyxAdj;
@@ -812,7 +812,6 @@ extern bool JB__Flow_AlwaysMove;
 extern bool JB__Flow_BreakOnFail;
 extern uint JB__Flow_Disabled;
 extern FlowControl* JB__Flow_Flow;
-extern JB_String* JB__Flow_FlowDiff;
 extern byte JB__Flow_FlowMode;
 #define kJB__Flow_Log (1)
 #define kJB__Flow_Off (0)
@@ -1232,6 +1231,8 @@ bool JB_byte_IsInt(byte self);
 
 bool JB_byte_IsLetter(byte self);
 
+bool JB_byte_IsTextLine(byte self);
+
 bool JB_byte_IsUpper(byte self);
 
 bool JB_byte_IsWhite(byte self);
@@ -1514,7 +1515,7 @@ void JB_MzSt_Clear(CompressionStats* self);
 
 void JB_MzSt_liveupdate(CompressionStats* self, int s, int outt);
 
-JB_String* JB_MzSt_render(CompressionStats* self);
+void JB_MzSt_Print(CompressionStats* self);
 
 void JB_MzSt_start(CompressionStats* self);
 
@@ -1917,6 +1918,8 @@ void JB_FS_hInt(FastString* self, uint64 n);
 
 void JB_FS_MsgErrorName(FastString* self, JB_String* name);
 
+void JB_FS_PrintNicely(FastString* self, JB_String* s);
+
 void JB_FS_ProblemsFound(FastString* self, int count);
 
 JB_String* JB_FS_Render(FastString* self, FastString* fs_in);
@@ -1949,7 +1952,7 @@ bool JB_Flow_Cond(FlowControl* self, byte value);
 
 void JB_Flow_Destructor(FlowControl* self);
 
-void JB_Flow_Fail(FlowControl* self, JB_String* found, JB_String* expected, JB_String* name);
+void JB_Flow_Fail(FlowControl* self, JB_String* found, JB_String* expected, JB_String* InputName);
 
 void JB_Flow_Flush(FlowControl* self);
 
@@ -2125,6 +2128,8 @@ JB_String* JB_Str_TrimTrailingSlashes(JB_String* self);
 JB_String* JB_Str_Unescape(JB_String* self);
 
 CharSet* JB_Str_UniCS(JB_String* self);
+
+int JB_Str_UnPrintable(JB_String* self);
 
 Array* JB_Str_Words(JB_String* self);
 
