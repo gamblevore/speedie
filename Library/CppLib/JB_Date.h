@@ -8,7 +8,8 @@
 extern "C" {
     // 9 million year time range at 64K/s. Quite enough...
     struct timespec;
-    int64 JB_Date__TimeID ();
+    uint64 JB_Date__TimeID ();
+	uint64 JB_Date_TimeID (Date Time);    
 	Date JB_Date__Create( u64 S, u64 NS );
     void JB_Date__Sleep(Date Time);
     Date JB_Date__Now( );

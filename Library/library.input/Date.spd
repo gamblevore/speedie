@@ -84,6 +84,9 @@ datatype Date (int64)
 
 	function WeekOfYear (|int|)
 		return .Weeks mod 52
+	
+	function TimeID (|uint64|)
+		cpp_wrapper
 
 	function Weeks (|int64|)
 		return (.wholeSeconds / kSecondsPerWeek)
@@ -99,8 +102,8 @@ datatype Date (int64)
 			yield (CurrTime - StartDate).seconds|float|
 
 	module
-		function TimeID (|int|)
-			cpp_wrapper
+		function TimeID (|uint64|)
+			.now.timeID
 			
 		function Ticks (|int64|)
 			return (.now>>10) //64KB-->64

@@ -1766,7 +1766,7 @@ bool SC_Comp__InitBasicStuff() {
 	JB_SetRef(JB_TrueBool, SC_Comp__AddGlobalConst(JB_LUB[106], JB_TypeBool));
 	JB_SetRef(JB_FalseBool, SC_Comp__AddGlobalConst(JB_LUB[107], JB_TypeBool));
 	SCDecl* _tmPf0 = JB_Incr(SC_Comp__AddGlobalConst(JB_LUB[108], JB_TypeInt));
-	JB_SetRef(_tmPf0->IsLookupOnly, (JB_Syx_IntMsg(JB_SyxNum, JB_Date__TimeID())));
+	JB_SetRef(_tmPf0->IsLookupOnly, (JB_Syx_IntMsg(JB_SyxNum, JB_Date_TimeID(SC__Imp_Recent))));
 	JB_Decr(_tmPf0);
 	SCDecl* _tmPf1 = JB_Incr(SC_Comp__AddGlobalConst(JB_LUB[109], JB_TypeDate));
 	JB_SetRef(_tmPf1->IsLookupOnly, (JB_Syx_IntMsg(JB_SyxNum, JB_Date__Now())));
@@ -1974,7 +1974,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	iif (SC_Comp__EnterCompile()) {
 		iif (true) {
-			FlowControlStopper _using182 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowStarter(JB_LUB[150], (110419428466447)));
+			FlowControlStopper _using182 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowStarter(JB_LUB[150], (110429706853529)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_using182);
 		}
@@ -3217,7 +3217,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[228]);
-	JB_FS_AppendInt32(_fsf0, (2023052319));
+	JB_FS_AppendInt32(_fsf0, (2023052515));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -6807,7 +6807,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[496]);
-	JB_FS_AppendInt32(_fsf0, (2023052319));
+	JB_FS_AppendInt32(_fsf0, (2023052515));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);

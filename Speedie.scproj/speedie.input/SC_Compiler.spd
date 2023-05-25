@@ -269,7 +269,7 @@ function InitBasicStuff (|bool|) // compiler.init
 	TrueBool = .AddGlobalConst( "true", TypeBool )
 	FalseBool = .AddGlobalConst( "false", TypeBool )
 	
-	.AddGlobalConst( "__time_id__", typeint ).islookuponly = «num date.timeid »
+	.AddGlobalConst( "__time_id__", typeint ).islookuponly = «num scimport.recent.timeid »
 	.AddGlobalConst( "__now__", typedate ).islookuponly = «num date.now »
 	.AddGlobalConst( "__modified__", typedate ).islookuponly = «num scimport.recent »
 	.AddGlobalConst( "π", typef64 ).islookuponly = «num "3.1415926535897932" »

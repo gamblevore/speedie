@@ -58,9 +58,13 @@ void JB_Date__Sleep(Date Time) {
     }	
 }
 
-int64 JB_Date__TimeID () {
+uint64 JB_Date__TimeID () {
+	return JB_Date_TimeID(JB_Date__Now());
+}
+
+uint64 JB_Date_TimeID (Date Dt) {
 // 2017y02m13d05h10m --> 2017021305
-    time_t t = time(nil);
+    time_t t = Dt >> 16;
     tm* Time = localtime( &t );
     
     int H = Time->tm_hour;

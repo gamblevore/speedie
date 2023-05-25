@@ -41,7 +41,7 @@ function Pref (|string| s, |string|)
 function Created (|date|)
 	return __now__|date|
 	
-function TimeID (|uint|)
+function TimeID (|uint64|)
 	return __time_id__
 
 function Pref (|string| s, assigns:|string|)
