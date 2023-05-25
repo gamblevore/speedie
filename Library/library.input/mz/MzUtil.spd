@@ -130,6 +130,7 @@ struct CompressionStats
 	function durr (|float|)
 	function render (|string|)
 	function Clear
+	function Print
 	module
 		function all (|&compressionstats|)
 		function New (|compressionstats|)
