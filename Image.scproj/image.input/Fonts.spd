@@ -125,11 +125,12 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 		c = 0x80
 	
 	// (mode 1)== normal
-		// letter-pixels: totally recolor using col
 		// emoji-letter: draw it as-is. no recolor.
 	// mode 0 == colored icons
+		// emoji-letter: gets recolored
+	// letter-pixels: totally recolor using col, either way.
 
-	if !col.a
+	if !col.a and (drawmode == 1)
 		col = colors.white
 	
 	|| col4		= col.color 
