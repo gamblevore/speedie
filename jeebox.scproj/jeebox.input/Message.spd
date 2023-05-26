@@ -831,10 +831,10 @@ class Message (RingTree)
 
 	syntax append (|string| key)
 		self <~ @str.msg(key)
-		
 
 	function Arg (|message|)
 		return .last(@arg)
+	
 	function GiveArg (|message|)
 		Opt NoRefCounts
 		|| r = .last 
