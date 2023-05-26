@@ -226,11 +226,17 @@ class PerryIDE (Window)
 
 	function ShowRightStats
 		|| fs = FastString()
-		fs <~ .EditMe.sel0
-		fs.PadTo 5
+		|| t = .Editme.Text
+		|| sel = .editme.sel0
+		fs <~ "ln "
+		fs <~ t[0, sel].LineCount
+		fs.PadTo 8
+		fs <~ "ch "
+		fs <~ t.charcount(0, sel)
+		fs.PadTo 16
 		fs <~ " for "
 		fs <~ .EditMe.SelText.CharCount
-		fs.PadTo 17
+		fs.PadTo 28
 		.SelInfo.text = fs	
 
 	

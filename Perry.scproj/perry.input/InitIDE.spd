@@ -262,7 +262,7 @@ extend PerryIDE
 			.align			= ListViewState.alignright
 			isnt editable
 			.takesfocus		= 0
-			.size 			= the~right back 115  by  0 to 11
+			.size 			= the~right back 180  by  0 to 11
 			.gnormal.clear
 
 		with .FileSep
