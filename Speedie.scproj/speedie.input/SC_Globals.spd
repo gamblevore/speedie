@@ -1082,6 +1082,7 @@ function message.expfunc (|scfunction|)
 
 
 function TypeOfExprNeeded ( |message| exp, |scbase| name_space, |SCDecl| )
+	debug_require exp // what?
 	|| OldCount = stderr.errorcount
 	|| result = typeofexpr(Exp, name_space)
 	if result and result.type != typevoid_
