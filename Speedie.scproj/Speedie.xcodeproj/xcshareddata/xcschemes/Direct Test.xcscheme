@@ -56,6 +56,14 @@
             argument = "--self"
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/usr/local/speedie/Perry.scproj"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--perry"
+            isEnabled = "NO">
+         </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
