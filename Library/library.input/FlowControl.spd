@@ -170,8 +170,13 @@ class FlowControl
 			.Disabled = int.max
 			.Flow = nil
 		
+// allow target for flow... as lib is a header
+// means we need to restructure how imports are done.
+
 		function New (|string| name, |Date| AppDate = __modified__,  |FlowControlStopper|)
 			cpp_part FlowStarter
+//			Target !flow
+//				disabled "Enable flow-control first! (add 'targets flow' to the project's conf.)"
 			flow off
 			require FlowMode
 			.Disabled = int.max			// in case its set badly
