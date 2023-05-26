@@ -120,10 +120,6 @@ cd $CppLib
 
 $GetUserName
 echo \"Compiling $LibPath for user '\$U'\"
-if ! [[ -w \"$LibPath\" ]]
-then
-   echo \"Can't write to $LibPath  Probably you need to run this with sudo.\"
-fi
 g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 
 echo \"Compiling Speedie to $SpdTerm\"
@@ -174,3 +170,7 @@ if IsCurrentPlatform
 	// MOVE:  All possible control-flow + vars out of bash, and into your favourite language.
 	// DO:    Create the command-lines from your fav language!
 
+// TODO:
+	// Make this NOT alter the creator of /usr/local/include or /usr/local/bin
+	// at least if they alredy exist!
+	// what should they be owned by then?
