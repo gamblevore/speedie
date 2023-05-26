@@ -559,7 +559,7 @@ function Splash
 	for secs in 10s
 		Terminal.DrawRect((0, 0, terminal.w, h))
 		for i in 5.0
-			|| Title = " <3 Hugs ".Rotate(i + secs*3)
+			|| Title = " <3 SpeedRogue ".Rotate(i + secs*3)
 			|| f = i*1.234 + secs*(0.33+i*0.05)
 			|int| x = (1.5*f/scale).bounce * (Terminal.w-(title.length+2))
 			|int| y = f.bounce*(h-2)
