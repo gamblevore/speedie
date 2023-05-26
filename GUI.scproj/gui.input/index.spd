@@ -4,6 +4,10 @@ linkage
 	cpp_part GUI
 	type library
 
+	 
+targets
+	gui
+
 import "Image"
 import "network" // for network.guidownload
 				 // its like A, B, AB. So... gui is independant

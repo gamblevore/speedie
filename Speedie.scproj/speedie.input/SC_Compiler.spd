@@ -381,7 +381,7 @@ function ImportAll
 	for c in .ClassList
 		c.LoadSuperclass
 	
-	for c. in .ClassList
+	for c in .ClassList
 		c.GetDepth
 	
 	
