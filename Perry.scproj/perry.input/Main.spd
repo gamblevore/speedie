@@ -1,19 +1,4 @@
 
- 
-conf
-	version	0_75
-	name	Perry
-	creator	jeebox
-	helpurl	"http://jeebox.org/help"
-	prefs	"Perry.prefs"
-	targets gui
-	registration
-		prefix	PER1
-		salt	"Perry"
-		type	Donate
-		buyurl	"http://jeebox.org/donate/perry"
-
-
 
 main // main {
 	target debug

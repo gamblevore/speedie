@@ -113,12 +113,16 @@ module Feedback
 	function string.IsSpeedieSrc (|bool|)
 		return (self isa "spd")
 
+	function string.ResolveSpd (|string|)
+		if self[0, "@spd/"]
+			return (compiler.FindSpeedieRoot+self[5...]).resolve(true)
+		return .resolve(true)
 
 	function TryUseProject (|String| path, |bool| IsScript=false, |string|)
 		ifn (path contains '/' or '.' or '~')
 			Path = compiler.FindProjNoSuffix(Path)
 		
-		|| path2 = path.Resolve(true)
+		|| path2 = path.ResolveSpd
 		if path2: path = path2
 		|| F = Path.File
 		expect !(f inside compiler.library or compiler.jeebox) (f, "Don't compile Library files") 
@@ -260,6 +264,8 @@ module Feedback
 		+"flow"
 			explain(Purpose, "Adds control-flow logging to generated compiles")$
 			Options.GenFlowControlCode = value.optionbool
+			targets.set("flow")
+
 		
 		+"log"
 			explain(Purpose, "Logs the compiler's internal behaviour.  0 = off,  1 =  log,  2 = log+validate")$
@@ -351,7 +357,6 @@ module Feedback
 		m64
 			Explain(Purpose, "64-bit compile")$
 			options.Compile32Bit = 0
-
 		
 		funccount
 			Explain(Purpose, "Spams each func with a static int, to count the number of times it's called. Useful debugging feature.")$

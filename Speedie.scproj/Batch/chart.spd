@@ -4,7 +4,10 @@ import "GUI"
 conf
 	name	Energy_Chart
 	prefs	"theochart.prefs"
-	targets gui
+
+targets
+	gui
+
 
 
 main								// main {

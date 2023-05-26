@@ -204,6 +204,7 @@ function compiler.ReachedClassCount (|int|)
 
 
 function AddSubProjects (|[SCModule]| Modules)
+	opt norefcounts
 	for Imp in .ImportedList
 		Modules <~ imp.Mod
 
@@ -322,6 +323,12 @@ function ImportProj
 	SCImport.Importpath( "",   .BaseProjectPath,  0 )
 
 
+function ImportAST
+	opt norefcounts
+	for rz in .ImportedList
+		rz.PrepareAll
+
+
 
 function ImportAll
 	.Timer( "Read" )
@@ -329,6 +336,7 @@ function ImportAll
 	
 	.ImportLibs
 	.ImportProj
+	.ImportAST
 	if options.SelfReplacement //and options.MakeASM
 		VM_Builder.MakeTheVM
 
@@ -879,7 +887,7 @@ function InputFile (|File| Default, |String| s, |message| where, |File|)
 		return rz
 
 	rz := Compiler.BaseProjectPath[s]
-	if (Default!=nil)
+	if (Default != nil)
 		rz := default[s]
 	ifn rz.exists
 		rz = nil

@@ -49,7 +49,8 @@ class SCImport
 		SCImport.Importpath( name, P, .Depth + 1 )
 	
 	
-	function PrepareAll
+	function PrepareAll 
+		opt norefcounts
 		for f in .files
 			f.AST
 		// for the "targets" feature... we really want the base-projects targets set first
@@ -57,6 +58,7 @@ class SCImport
 
 
 	function ReloadImports
+		opt norefcounts
 		for f in .files
 			for j in f.AST
 				if J IsTmp "import"
@@ -73,16 +75,48 @@ class SCImport
 	
 	
 	function LoadPrefix (|SCFile| scf, |int| depth)
+		opt norefcounts
 		.Mod.ExportName = "App" // make it simple
-		|| root = scf$.AST$
-		|| link = root.findflat( @tmp, "linkage" )
-			link.remove
-			.IsSTDLib = SCImport.STDLibTime or link..type ~= "library"
-			if .canBan(scf)
-				.LoadBanned(link..bannedclasses)
-			|| name = link[@arg].findflat( @tmp, "cpp_part" )[@thg]
-				scf.ExportName = name.name
-				.Mod.ExportName = name.name
+		require scf
+		for s in scf.AST
+			if s != @tmp
+				0
+			  elseif s ~= "linkage"
+				.IndexLinkage(s, scf)
+			  elseif s ~= "conf"
+				.IndexConf(s)
+			  elseif s ~= "targets"
+				.IndexTargets(s)
+	
+	
+	function IndexTargets (|message| tar)
+		opt norefcounts
+		for t in tar.arg
+			if t.expect(@tmp)
+				|| ch = t.first
+					error ch
+				  else
+					targets.set(t.name)
+		tar.remove
+		
+	
+	function IndexConf (|message| conf)
+		|| arg = conf[@arg]
+			arg.remove
+			compiler.ConfMsg = arg
+			|| x = makedecl("", "__AppConfString", @str+arg.render)
+			conf.become(x)
+			compiler.program.movetoinitfunc(conf)
+
+	
+	function  IndexLinkage (|message| link, |scfile| scf)
+		.IsSTDLib = SCImport.STDLibTime or link..type ~= "library"
+		if .canBan(scf)
+			.LoadBanned(link..bannedclasses)
+		|| name = link[@arg].findflat( @tmp, "cpp_part" )[@thg]
+			scf.ExportName = name.name
+			.Mod.ExportName = name.name
+		link.remove
 		
 
 	function IncludeCHeaders (|file| f, |[string]| output)
@@ -210,11 +244,30 @@ class SCImport
 			rz.IncludeCHeaders( f["c_postincludes"], Cpp_Export.H_PostInput )
 			
 			rz.Depth = ImportDepth
-			rz.PrepareAll
 			rz.ReloadImports
-
 			Compiler.ImportedList <~ rz
 
+
+// currently 
+// per import
+	// loadprefix (and targets)
+	// reloadimports
+		// per ALL proj files 
+			// clean AST
+			// per import <-- loop to above
+// per ALL files
+	// clean AST
+
+
+// desired 
+// per import
+	// loadprefix (and targets)
+		// apply target to prefix AST
+		// reloadimports
+// per ALL proj files 
+	// clean AST
+		// apply target to prefix AST
+	// per import <-- loop to above
 
 
 		function ExportShaders

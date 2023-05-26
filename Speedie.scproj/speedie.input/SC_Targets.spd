@@ -6,10 +6,11 @@
 
 module Targets
 	|| Items = dictionary()
-	function Set (|message| thg)
+	function Set (|message| tmp)
 		cpp_part SetMsg
-		.set(thg.name)
+		|| thg = tmp[@thg]
+			.set(thg.name)
 	function Set (|string| name)
 		.items[name] = "true"
 	syntax Access (|string| name, |bool|)
-		return targets.items[name]
+		return targets.items.valuelower(name)

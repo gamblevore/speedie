@@ -172,14 +172,15 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 	if options.Compile32Bit.IsKnown
 		rz.AppendWords( ("-m32", "-m64")(options.Compile32Bit.default) )
 	
-	rz.appendwords("-L/usr/local/speedie/Library")
+	|| spdroot = compiler.FindSpeedieRoot
+	rz.appendwords("-L$spdroot/Library")
 	rz.appendwords("-L/usr/local/lib/")
 	rz.appendwords("-I /usr/local/include")
 	if platform.osx // OSX likes playing hide and seek
 		rz.appendwords("-F/Library/Frameworks  -framework Cocoa  ")
 		if targets..gui or linkage.interpreter
 			rz.appendwords("-rpath @executable_path/../Frameworks")
-		rz.appendwords("-rpath ~/Library/Frameworks  -rpath /usr/local/speedie/Library  -rpath /Library/Frameworks")
+		rz.appendwords("-rpath ~/Library/Frameworks  -rpath $spdroot/Library  -rpath /Library/Frameworks")
 		
 	rz.AppendWords( "-w  -Wno-return-type-c-linkage")
 	rz.AppendWords( "-finput-charset=UTF-8 -fextended-identifiers" )

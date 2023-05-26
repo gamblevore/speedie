@@ -60,15 +60,17 @@ class SCFile (file)
 
 			
 	function Orig (|message|)
-		if !.origast or .origdate < .modified
-			.origdate = .modified
-			.origast = .astsub
-		return .origast
+		if !.OrigAST or .OrigDate < .Modified
+			.OrigDate = .Modified
+			.OrigAST = .ASTSub
+		return .OrigAST
 
 
 	function AST (|Message|)
 		opt norefcounts
-		FlowControl.input(.file, "AST")
+		// we want some kinda order... so we can set the target properly
+		// perhaps the conf has to go into the index file? makes sense?
+		// the index does come first, right?
 		return .liveast init .ASTSub$
 
 
@@ -79,12 +81,13 @@ class SCFile (file)
 		|| where = (0,0)
 		|| found = words.Find(.fdata, where)
 			|| place = @thg + ""
-			place.range = where // doesn't say where though?
+			place.range = where
 			stderr.newerror(place, "Insecure word found", .path)
 		
 	
 	function ASTSub (|Message|)
 		if .IsInternal
+		FlowControl.input(.file, "AST")
 			
 		(Message).createLayer(self).use
 		|| str = .ReadSafely.decompress

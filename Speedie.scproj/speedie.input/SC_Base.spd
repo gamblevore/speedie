@@ -901,7 +901,7 @@ dispatch RootCollectTable (CollectFunc)
 	helper				SCFunction.NewHelper
 	macro				SCFunction.NewMissingFunc
 	insertion			SCThe.NewInsertion
-	conf				compiler.NewConf
+	conf				compiler.WrongConf
 	crash				{app.crash(node.first.nyme)}
 	module				SCModule.Neu
 	static				{error (node, "static is called 'module' in speedie.")}

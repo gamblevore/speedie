@@ -256,8 +256,6 @@ function Message.Clean (|bool| erl = false)
 					continue_with curr.tran_target
 				  elseif s == "is" or "isnt"
 					curr.Tran_Isnt("self")
-				  elseif s == "targets"
-					targets.set(curr.first)
 				  elseif s == "dispatch" or "functiontable"
 					IgnoreArg = curr.last
 				  elseif s == "with"

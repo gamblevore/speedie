@@ -12,15 +12,9 @@ function compiler.Package
 		.AppleBuildApp(pj.file, pd.file)
 
 	
-function compiler.NewConf (CollectFunc)
+function compiler.WrongConf (CollectFunc)
 	expect (!.ConfMsg) (node, "Conf already exists!") 
-	|| conf = node[@arg]
-		conf.remove
-		.ConfMsg = conf
-		|| x = makedecl("", "__AppConfString", @str+conf.render)
-		node.become(x)
-		compiler.program.movetoinitfunc(node)
-		return compiler.program
+	error (node, "Conf must be in the index.spd file") 
 
 
 function compiler.IdealName (|string|)
