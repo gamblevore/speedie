@@ -195,10 +195,10 @@ class FileRow (ListViewRow)
 		return n
 
 
-	function Save (|bool|)
+	function Save (|int| Purpose=documentstate.saving, |bool|)
 		opt norefcounts
 		|| d = ._Document
-			require D.save
+			require D.save(purpose)
 			.lastsize = D.length
 		return true
 

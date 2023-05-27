@@ -76,6 +76,7 @@ class FileViewer (ListView)
 	behaviour AppForegroundChanged
 		.TryReloadPath
 	
+	
 	behaviour keydown
 		if key.isdelete
 			|| r = .FirstSelected
@@ -181,13 +182,31 @@ class FileViewer (ListView)
 		(self)
 
 
-	function SaveAll (|bool|)
+	function SaveAll (|int| Purpose, |bool|)
 		cpp_part SaveAllArr
-		rz = true
-		for f in .modified
-			if !f.Save
-				debugger // sigh
-				rz = false
+		rz = true		
+		|| Decision = 0
+		|| m = .Modified // what if like 100 are invalid? THEN? ask for all?
+		for f in m
+			if .CanSave(purpose, f, Decision)
+				if !f.Save(purpose)
+					rz = false
+
+
+	helper CanSave (|int| Purpose, |filerow| f, |&int| Decision,   |bool|)
+		|| d = f._Document#require
+		if !d.DocError
+			return true
+		.editme.LoadDocument(d)
+		d.ShowErrorInViewers
+		if Purpose == DocumentState.ErrorChecking
+			return false 
+		if (purpose == DocumentState.Saving)
+			if !*Decision
+				|| q = "Save invalid jeebox for document?\n" + f.location
+				*decision = q.confirm.dir
+			return *Decision > 0
+		return true
 
 
 	function Modified (|[FileRow]|)
@@ -221,7 +240,7 @@ class FileViewer (ListView)
 		
 		|| answer = AskSaveOrCancel(fs)
 		if answer >= 1  // save
-			return .saveall
+			return .saveall(documentstate.saving)
 		if answer == -1 // cancel
 			return false
 		if answer == 0	// don't
@@ -422,7 +441,6 @@ class FileViewer (ListView)
 		x <~ rz
 		.SelectFast(rz)
 
-	
 	module
 		function FileRowRenamer (guilisteditevent)
 			|| o = cell.row

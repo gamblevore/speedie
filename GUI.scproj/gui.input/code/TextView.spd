@@ -1177,7 +1177,7 @@ class TextView (GUIControl)
 
 	helper Save (|bool|)
 		opt norefcounts
-		if .undoer.save?
+		if .undoer.save(DocumentState.saving)?
 			.AlphaFade
 			return true
 	
@@ -1764,7 +1764,7 @@ class TextView (GUIControl)
 			.sel = d.sel
 			return true
 		
-		.clear("")			// NOW... 
+		.clear("")
 
 
 	helper TextPaste (GUIPasteEvent)
