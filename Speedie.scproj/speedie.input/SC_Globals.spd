@@ -546,7 +546,6 @@ function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |
 			Return cls.ClassType.AsPointer
 
 
-
 function Message.SCFile (|SCFile|)
 	for S.up in self
 		|| r = S.memoryLayer.obj
