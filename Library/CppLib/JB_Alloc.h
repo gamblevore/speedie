@@ -76,8 +76,8 @@ void JB_Flow__PrintStats();
 //#define AlwaysInline inline __attribute__((__always_inline__))
 #define require(test)   if  (!(test)) {return {};}
 #define require0(test)  if  (!(test)) {return;}
-#define for_(count) for (int i = 0; i < count; i++)
-#define FOR_(var, count) for (int var = 0; var < count; var++)
+#define for_(count) for (int i = 0; i < (count); i++)
+#define FOR_(var, count) for (int var = 0; var < (count); var++)
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
