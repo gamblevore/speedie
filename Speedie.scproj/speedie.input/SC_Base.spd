@@ -491,7 +491,7 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 						err = "Not assignable"
 					Return o|scfunction|.ProtoDecl #expect (exp, err)
 
-	if missing	// maybe the missing stuff should ENTIRELY go within argsmatch? cos its called in two places.
+	if missing	// the missing stuff should ENTIRELY go within argsmatch? cos its called in two places.
 		return Missing.MacroFix( contains, arg_space, paramsarray )
 
 	require (exp)
