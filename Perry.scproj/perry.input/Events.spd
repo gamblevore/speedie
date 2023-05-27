@@ -224,7 +224,7 @@ function ClickedStats (GUIaction)
 
 function PerryIDE.ShowErrors (|bool| FromKeys, |bool|)
 	opt norefcounts
-	.SaveEditing
+	.SaveEditing(documentstate.ErrorChecking)
 	.recheck
 	|| t = .istextonly
 	.viewasproject
