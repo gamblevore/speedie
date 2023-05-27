@@ -107,7 +107,6 @@ class SCFile (file)
 		(Message).restore
 		
 
-
 function message.DetectBadPosition
 	opt norefcounts
 	for msg.flat in self
