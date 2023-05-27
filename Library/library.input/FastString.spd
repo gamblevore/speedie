@@ -200,9 +200,6 @@ class FastString {
 	syntax cast (|string|)
 		return .getresult
 
-
-	function Hash (|uint64|)
-		return self|string|.hash // bad
 	
 	syntax Append (|cstring| Str)
 		cpp_wrapper JB_FS_AppendCString
