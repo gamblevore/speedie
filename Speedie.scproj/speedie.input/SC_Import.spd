@@ -194,8 +194,8 @@ class SCImport
 		|scimport--|		Curr
 		|bool|				STDLibTime
 			
-		function IsInputName (|string|name, |bool|)
-			if name ~= "input" or name isa "input"
+		function IsInputName (|string| name, |bool|)
+			if name ~= "input"  or  name isa "input"
 				return true
 		
 		function NoProj
@@ -206,7 +206,7 @@ class SCImport
 			|| FirstName = ""
 			for name in f
 				if IsInputName(name)
-					ifn FirstName
+					if !FirstName
 						FirstName = name
 					  else
 						error ( nil, "Multiple input folders found! '$Name' and '$FirstName'" )
