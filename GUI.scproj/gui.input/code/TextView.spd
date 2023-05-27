@@ -1620,7 +1620,7 @@ class TextView (GUIControl)
 			return p
 		|| sel = .sel
 		if !sel.width and sel.x > 0
-			parser.dotinsertallow = true
+			parser.DotInsertAllow = true
 		p = .text.ParseWithError(.myerror)
 		if p
 			p.obj = .path
