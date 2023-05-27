@@ -177,34 +177,10 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 
 
 extend FastString
-	function Now (|uint64| M, |uint64|)
-		if M
-			return .ram_test(0) mod M
-		
 	function message.now (||)
 		|| a = .slowcount #require
 		|int| b = date.now mod a
 		return self[b]
-
-	function ram_test (|uint64|cmp, |uint64|)
-		cpp_part ram_test
-		|| x = date()			// date.timestamp seems to fail in... release builds??? 
-		|| t = .ram_test_sub	// the whole thing was taking 0 cycles!!! makes no sense but hard to debug
-		if cmp
-			expect (.hash == cmp) ("Illegal RAM alteration.")
-		|| d2 = date() - x
-		rz = (d2 << 16) + (date.timestamp & 0xffff) //sigh
-
-
-	function ram_test_sub (|int|)
-		|| n = .length/2
-		for i in n
-			|| A = self[i  ]
-			|| B = self[i+n]
-			self[i+n] = A
-			self[i  ] = B
-			rz += a+b<<8
-
 
 	function Picture (|int| c, |image| f)
 		cpp_part ram_test_encode
@@ -224,15 +200,6 @@ extend FastString
 
 
 extend string
-	function MakeFlasher (|int| n, |&uint64|out, |FastString|)
-		cpp_part make_ram_test
-		|| fs = faststring(.length * 2 * n)
-		for n
-			fs <~ (0, .length)
-			fs <~ self
-		*out = fs.hash
-		return fs
-			
 
 	render Picture (|image| font=font.small)
 		cpp_part ram_test_encode
