@@ -212,7 +212,7 @@ extend Parser
 			after = start
 			parser.DotInsertallow = false
 		  else
-			return nil
+			return .ErrorAdd("Missing name after dot", start)
 		
 		rz = parser.newskip(nil, fn, start-1, start, After)
 		if .Eats( "(" )
@@ -883,10 +883,6 @@ extend Parser
 		
 		|| Mode = Parser.kAllow
 		if !opp.name[0].isletter
-//			if !DotInsertallow
-//			Mode = Parser.kExpect
-//			  else
-//				DotInsertallow = false
 			Bits |= koppWord
 
 		Rel <~ .ProcessThing( Bits, Mode )
