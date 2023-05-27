@@ -451,7 +451,7 @@ class PerryIDE (Window)
 			return true
 		if key is s
 			if .editme is visible
-				.SaveEditing
+				.SaveEditing(documentstate.saving)
 				return true
 		if key is num0
 			.ViewAsSwap
@@ -637,13 +637,20 @@ class PerryIDE (Window)
 				.notify("Prefs are corrupted")
 				app.prefs = oldPrefs
 			.LoadState
-		
 
-	function SaveEditing // savetext, savefile, filesave
+
+	function ParseErrorDetect
+		|| err = .editme.MyError
+			.errorlist <~ err // right?
+
+
+	function SaveEditing (|int| Purpose) // savetext, savefile, filesave
 		opt norefcounts
 		|| e = .editme
+		.ParseErrorDetect
+		
 		if (!keys.shift and .IsSpeedieCode)
-			.filelist.saveall
+			.filelist.saveall(Purpose)
 		  elseif e.WasEverAltered
 			require e.Save
 		  else
