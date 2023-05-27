@@ -181,10 +181,10 @@ class FlowControl
 		function New (|string| name, |Date| AppDate = __modified__,  |FlowControlStopper|)
 			cpp_part FlowStarter
 			flow off
-			Target !flow
-				disabled "Enable flow-control first! (add 'targets flow' to the project's conf.)"
-			  else
+			target flow
 				return .allow(name, appdate)
+			  else
+				disabled "Enable flow-control first! (add 'targets flow' to the project's conf.)"
 
 
 
