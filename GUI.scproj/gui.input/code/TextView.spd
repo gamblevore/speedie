@@ -7,6 +7,7 @@ class TextView (GUIControl)
 	|bool|						SingleLine
 	|bool|						PreferPrevLine
 	|bool|						PreferStayAtEnd
+	|bool| 						ShowLineNumbers
 	|bool|						CanSeeAllLines
 	|bool|						GroupSaveAll
 	|bool|						CopyPlaceActive
@@ -1692,7 +1693,7 @@ class TextView (GUIControl)
 		|| v	 	= 0
 		|| t	 	= 1
 		|| StayAtEnd = .Endgap
-		.LineNumWidth = (.text.TextLineCount.LineNumWidth,  0)(Expect >= 3)
+		.LineNumWidth = (.text.TextLineCount.LineNumWidth,  0)(.ShowLineNumbers or Expect >= 3)
 		
 		|int| CharW	= .LastDrawWidth - .LineNumWidth
 		if .singleline

@@ -228,6 +228,7 @@ extend PerryIDE
 			isnt drawsfocus
 			.ID				= "EditMe"
 			.GroupSaveAll	= true
+			.ShowLineNumbers=true
 			.size = the~width by the~bottom to 0~before 
 			.SetsDebugLines = 13
 			.OnTextChanged	= EditMeModified
