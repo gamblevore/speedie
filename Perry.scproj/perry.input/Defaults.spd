@@ -4,7 +4,7 @@
 // how? Well... perry could detect that I am building itself
 // then copy the prefs over... just the colors.
 
-
+ 
 || DefaultColors = `
 syx 
 	nil "0c808080ff"
