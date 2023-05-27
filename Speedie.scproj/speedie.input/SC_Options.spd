@@ -69,7 +69,6 @@ module Feedback
 			options.ForceRecompile = true
 			Options.GenFlowControlCode = true
 			targets.set("self")
-			TransCompiler.CompilingLibFiles++
 		  elseif t2 == 2
 			Options.ProjectIsMiniLib = true
 
