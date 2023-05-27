@@ -1750,30 +1750,24 @@ bool JB_Str_IsASCII(JB_String* self) {
 	return IsAsciiSub_( self->Addr, self->Length );
 }
 
-
-#define WIDTH  (8 * sizeof(uint8))
-#define TOPBIT (1 << (WIDTH - 1))
-uint  crc32_table[256];
-
-void crcInit() {
-	for (uint i = 0; i < 256; i++) {
-		uint c = i << 24;
-		for_(8)
-			c = c & 0x80000000 ? (c << 1) ^ 0x04c11db7 : (c << 1);
-		crc32_table[i] = c;
-	}
-}
-
-
 uint64 JB_CRC (u8* buf, int n, uint64 crc) {
-	if (n > 0) {
-		// why just not use my xor hash?
-		if (!crc32_table[1])
-			crcInit();
-		for_(n) {
-			crc = (crc << 8) ^ crc32_table[((crc >> 24) ^ *buf++) & 255];
+	if (n <= 0)
+		return crc;
+
+	u64* six = (u64*)buf; 
+	for_(n>>3) {
+		crc ^= JB_uint64_hash(*six++);
+	}
+	if (n&7) {
+		buf = (u8*)six;
+		u64 Last = 0;
+		for_(n&7) {
+			Last <<= 8;
+			Last |= *buf++;
 		}
-    }
+		crc = JB_uint64_hash(crc);
+	}
+	
 	return crc;
 }
 
