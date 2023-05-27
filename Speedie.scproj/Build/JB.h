@@ -1285,13 +1285,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1857])
+#define kJB__ErrorColors_bold (JB_LUB[1863])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1858])
-#define kJB__ErrorColors_good (JB_LUB[1859])
-#define kJB__ErrorColors_normal (JB_LUB[1860])
-#define kJB__ErrorColors_underline (JB_LUB[1859])
-#define kJB__ErrorColors_warn (JB_LUB[1861])
+#define kJB__ErrorColors_error (JB_LUB[1864])
+#define kJB__ErrorColors_good (JB_LUB[1865])
+#define kJB__ErrorColors_normal (JB_LUB[1866])
+#define kJB__ErrorColors_underline (JB_LUB[1865])
+#define kJB__ErrorColors_warn (JB_LUB[1867])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1463,9 +1463,9 @@ extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
 #define kSC_BitAnd (JB_LUB[339])
-#define kSC_BitNot (JB_LUB[603])
-#define kSC_BitOr (JB_LUB[544])
-#define kSC_BitXor (JB_LUB[1862])
+#define kSC_BitNot (JB_LUB[605])
+#define kSC_BitOr (JB_LUB[546])
+#define kSC_BitXor (JB_LUB[1868])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1495,7 +1495,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1863])
+#define kJB_SaverStart1 (JB_LUB[1869])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2136,6 +2136,8 @@ JB_String* SC_Comp__IdealName();
 
 void SC_Comp__ImportAll();
 
+void SC_Comp__ImportAST();
+
 void SC_Comp__ImportLibs();
 
 void SC_Comp__ImportProj();
@@ -2167,8 +2169,6 @@ SCFunction* SC_Comp__LoadRefFunc(JB_String* name);
 void SC_Comp__Main();
 
 bool SC_Comp__ModulesSorter(JB_Object* a, JB_Object* b);
-
-SCBase* SC_Comp__NewConf(Message* node, SCBase* name_space, Message* ErrPlace);
 
 void SC_Comp__OrderClassList();
 
@@ -2229,6 +2229,8 @@ bool SC_Comp__TryVariousStartModes();
 JB_File* SC_Comp__usingScript(JB_File* f);
 
 JB_String* SC_Comp__VariantSuffix();
+
+SCBase* SC_Comp__WrongConf(Message* node, SCBase* name_space, Message* ErrPlace);
 
 
 
@@ -2736,8 +2738,6 @@ void SC_Sav__TestSaver();
 int SC_Targets__Init_();
 
 int SC_Targets__InitCode_();
-
-void SC_Targets__SetMsg(Message* thg);
 
 void SC_Targets__Set(JB_String* name);
 
@@ -5215,6 +5215,8 @@ bool JB_Flow_LoadPath(FlowControl* self, JB_String* path, bool IsPrev);
 
 FlowControl* JB_Flow__Alloc();
 
+FlowControlStopper JB_Flow__FlowAllow(JB_String* name, Date AppDate);
+
 int JB_Flow__Init_();
 
 int JB_Flow__InitCode_();
@@ -5440,13 +5442,19 @@ SCFile* SC_Imp_ImportSpd(SCImport* self, JB_File* c, JB_String* CurrPath);
 
 void SC_Imp_IncludeCHeaders(SCImport* self, JB_File* f, Array* output);
 
+void SC_Imp_IndexConf(SCImport* self, Message* conf);
+
+void SC_Imp_IndexLinkage(SCImport* self, Message* link, SCFile* scf);
+
+void SC_Imp_IndexTargets(SCImport* self, Message* tar);
+
 void SC_Imp_LoadBanned(SCImport* self, Message* list);
 
 void SC_Imp_LoadPrefix(SCImport* self, SCFile* scf, int depth);
 
 void SC_Imp_PrepareAll(SCImport* self);
 
-void SC_Imp_ReloadImports(SCImport* self);
+void SC_Imp_ReloadImports(SCImport* self, SCFile* index);
 
 JB_String* SC_Imp_Render(SCImport* self, FastString* fs_in);
 
@@ -5841,6 +5849,8 @@ void JB_Str_PrintlineColor(JB_String* self, JB_String* color);
 JB_String* JB_Str_ReadFile(JB_String* self, int lim, bool AllowMissing);
 
 JB_String* JB_Str_ReplacePathComponent(JB_String* self, int num, JB_String* With);
+
+JB_String* JB_Str_ResolveSpd(JB_String* self);
 
 void JB_Str_safe(JB_String* self, FastString* fs);
 
@@ -6799,6 +6809,8 @@ JB_String* JB_Msg_APICppProject(Message* self);
 void JB_Msg_AppMainFix(Message* self);
 
 void JB_Msg_ARel__(Message* self, FastString* fs);
+
+Message* JB_Msg_Arg(Message* self);
 
 void JB_Msg_Arg__(Message* self, FastString* fs);
 
