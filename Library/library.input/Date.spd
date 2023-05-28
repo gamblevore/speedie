@@ -67,7 +67,8 @@ datatype Date (int64)
 		disabled "is this even used? Its just .seconds?"
 		return self|f64| / kTicks|f64|
 	
-	render
+	render  // hmmm... i guess this is just for data-formats.
+			// but that is very inconsistant because most renders are "Readable"
 		fs.appendintegerastext(self)
 
 	function Ticks (|int|)
