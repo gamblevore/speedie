@@ -55,8 +55,8 @@ function compiler.CompileTime
 		.FileSanityTests // sometimes this fails due to lack of permissions in xcode...
 						 // xcode gives lower perms to it's builder scripts, strangely.
 	File.TestJB
-	SC_Saver.TestSaver~noflowcontrol
+	SC_Saver.TestSaver~quietly
 	.PrintCompileTime(.CompileAll~timeit)
 	if stderr.ok
-		TransCompiler.TransComp
+		TransCompiler.Export
 

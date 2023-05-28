@@ -152,7 +152,7 @@ function message.compiles (|bool|)
 function ReportBuild (|message| cmd, |message|)
 	if stderr.ok and cmd.compiles
 		.Perry <~ .Log
-		TransCompiler.TransComp
+		TransCompiler.Export
 	cmd.clear
 	if stderr.Problems
 		cmd <~ compiler.ErrorsToPerry

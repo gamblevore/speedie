@@ -9,5 +9,5 @@ function Tran_Flow (TranFunc)
 
 	
 insertion general
-	noflowcontrol	({flowcontrol.disabled++, (_0), flowcontrol.disabled--, rejoin 0})
+	quietly	({flowcontrol.disabled++, (_0), flowcontrol.disabled--, rejoin 0})
 	
