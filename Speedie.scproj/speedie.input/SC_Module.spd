@@ -98,13 +98,6 @@ function BaseDecls
 	CollectDecls( .source, self, self, 1 ) // right?
 
 
-function AddModuleToFunc (|SCBase| space)
-// so we have an issue... we can’t even really add "self" in a module...
-// because we can’t return a module from an expression, yet.
-// sigh. Try?
-	if !space["self"]
-		space.TryAdd( space.FuncSrc, self, "self" )
-
 
 function FillDisposeFunc
 	|| Arg = .DisposeFunc$.SourceArg
@@ -112,6 +105,15 @@ function FillDisposeFunc
 		if !decl.IsLookupOnly and (decl Isnt Const)
 			if (!decl.C_array)
 				arg <~ NewRel(decl.name, "=", "nil")
+
+
+function AddModuleToFunc (|SCBase| space)
+// so we have an issue... we can’t even really add "self" in a module...
+// because we can’t return a module from an expression, yet.
+// sigh. Try?
+	if !space["self"]
+		space.TryAdd( space.FuncSrc, self, "self" )
+
 
 
 function SafeName (|string|)
