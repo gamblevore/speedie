@@ -181,7 +181,8 @@ extend PerryIDE
 			.id			= "SubFind"
 			.gnormal.solid = (0, 0, 0, 0.25)
 
-		with .FoundList
+
+		with .FoundList // with .findlist
 			is   editable
 			is   visible
 			is   UnSearchable
@@ -197,8 +198,8 @@ extend PerryIDE
 			.AlwaysSendChangeEvent = true
 			.takesfocus		= takesfocusflag.On
 			.gnormal		= self.FileList.GNormal.copy
-			.gnormal.solid	= nil
-			.gRowSel		= self.FileList.gRowSel
+			.GNormal.solid  = nil // ?
+			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
 
 
 		with .tester
@@ -228,7 +229,7 @@ extend PerryIDE
 			isnt drawsfocus
 			.ID				= "EditMe"
 			.GroupSaveAll	= true
-			.ShowLineNumbers=true
+			//.ShowLineNumbers=true
 			.size = the~width by the~bottom to 0~before 
 			.SetsDebugLines = 13
 			.OnTextChanged	= EditMeModified
