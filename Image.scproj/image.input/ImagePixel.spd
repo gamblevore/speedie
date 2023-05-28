@@ -44,8 +44,8 @@ struct ImagePixel
 		return .color.lum
 
 	function RndSolid
-		|uint| abc = random.shared.int
-		self <~ abc
+		|uint| rnd = random.shared.int
+		self <~ rnd
 		.a = 0xff
 	
 	function hascolor (|bool|)

@@ -1220,9 +1220,9 @@ class TextView (GUIControl)
 		return .text.length
 
 
-	helper InsertLoss (|string|s, |ivec2| abc, |int|)
+	helper InsertLoss (|string|s, |ivec2| loss, |int|)
 		|| n = .length
-		.insertsub(s, abc, false)
+		.insertsub(s, loss, false)
 		return n - .length
 		
 	
@@ -1777,6 +1777,10 @@ class TextView (GUIControl)
 
 
 	helper FindExpectsParse (|int|)
+		if .text.HasWord("//lineson")
+			.ShowLineNumbers = true
+		if .text.HasWord("//linesoff")
+			.ShowLineNumbers = false
 		if .ExpectsParse
 			if .ExpectsParse >= AlwaysJeebox
 				return .ExpectsParse
@@ -1784,8 +1788,10 @@ class TextView (GUIControl)
 				return currentlyjeebox
 			return .ExpectsParse
 
+
 	helper IsJeeboxMode (|bool|)
-		return .FindExpectsParse >= probablyjeebox
+		return .FindExpectsParse >= ProbablyJeebox
+
 
 	function GuessExpectsParse
 		|| mode = .expectsparse
