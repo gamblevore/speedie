@@ -53,8 +53,6 @@ class SCImport
 		opt norefcounts
 		for f in .files
 			f.AST
-		// for the "targets" feature... we really want the base-projects targets set first
-		// only then import libs and stuff.
 
 
 	function ReloadImports (|scfile| index)

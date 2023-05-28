@@ -1753,7 +1753,7 @@ bool JB_Str_IsASCII(JB_String* self) {
 uint64 JB_CRC (u8* buf, uint64 crc, int n) {
 	if (n <= 0)
 		return crc;
-
+	
 	u64* six = (u64*)buf; 
 	for_(n>>3) {
 		crc ^= JB_uint64_hash(*six++);
@@ -1765,7 +1765,7 @@ uint64 JB_CRC (u8* buf, uint64 crc, int n) {
 			Last <<= 8;
 			Last |= *buf++;
 		}
-		crc = JB_uint64_hash(crc);
+		crc ^= JB_uint64_hash(Last);
 	}
 	
 	return crc;

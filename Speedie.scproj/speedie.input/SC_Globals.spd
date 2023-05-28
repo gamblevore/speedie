@@ -1519,17 +1519,23 @@ function TooManyErrors (|bool|)
 	return StdErr.errorCount >= 50
 
 
-	
-function message.PrepareAST
+function message.PrepareAST (|string| path="")
 	opt NoRefCounts
+	// has to be done after parseclean... because it contains code.
+	|uint64| ASTHash
+	|uint64| Pos
 	|| After = .FlatAfter
-	// why isnt this parseclean?
 	|| msg = self 
-	while ( msg ) and ( msg != After )
+	while msg != After
 		if (msg == @tmp) and (msg == "functiontable" or "dispatch")
 			SCFunction.Tran_FuncTable( msg )
+		(__hash__)
+		|| mh = msg.hash(++pos)
+		(ASTHash xor= mh)
 		msg = msg.FlatNext
 
+	|| v2 = Compiler.HashConstantValue xor ASTHash
+	Compiler.HashConstantValue = v2
 
 
 function Message.FixErl 

@@ -68,9 +68,6 @@ class SCFile (file)
 
 	function AST (|Message|)
 		opt norefcounts
-		// we want some kinda order... so we can set the target properly
-		// perhaps the conf has to go into the index file? makes sense?
-		// the index does come first, right?
 		return .liveast init .ASTSub$
 
 
@@ -84,7 +81,7 @@ class SCFile (file)
 			place.range = where
 			stderr.newerror(place, "Insecure word found", .path)
 		
-	
+		
 	function ASTSub (|Message|)
 		if .IsInternal
 		FlowControl.input(.file, "AST")
@@ -98,7 +95,6 @@ class SCFile (file)
 			
 			parser.UsingTag = .filenum
 			rz = .fData.ParseClean			// OK so now what?
-			rz.PrepareAST
 			.DetectInsecureWords
 			
 			parser.usingtag = 0

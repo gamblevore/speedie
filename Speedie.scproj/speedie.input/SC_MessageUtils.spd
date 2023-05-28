@@ -427,13 +427,6 @@ function Message.LocateAll
 		printline ch.locate
 
 
-function Message.HashAll (|Uint64|)
-	opt norefcounts
-	|| Pos = 0
-	for s.flat in self
-		(rz xor= s.hash(++pos))
-	
-	
 function Message.Hash (|uint64| Pos, |Uint64|)
 	Pos = (pos << 8) (|) .Func|uint64|
 	return .Name.Hash(pos)
