@@ -193,14 +193,15 @@ class SCImport
 		|date|				Recent
 		|scimport--|		Curr
 		|bool|				STDLibTime
+		
 			
 		function IsInputName (|string| name, |bool|)
-			if name ~= "input"  or  name isa "input"
+			if  name ~= "input"  or  name isa "input"
 				return true
 		
 		function NoProj
 			.curr = nil
-			(Scdecl).restore
+			(SCDecl).restore
 
 		function FindInputFolder (|file| f, |file|)
 			|| FirstName = ""
