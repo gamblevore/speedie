@@ -1,6 +1,8 @@
 #!/usr/local/bin/spd
 
-//
+targets: flow
+
+
 class Person
     |int| age
     |string| name
@@ -17,10 +19,14 @@ main
 		app.stuff
 	
 
-function app.Stuff		
-	|| B1 = 60GB
-	|| B2 = 7.9MB
-	"${B1.strsize} = $B1, ${B2.strsize} = $B2"
+function printnum (|int64| b1)
+	"${B1.strsize} = $B1"
+
+
+function app.Stuff
+	printnum(60GB)
+	printnum(7.9MB)
+	printnum(9524600)
 	
     || P = person(12, "fred")
     P.age = -2 // try to corrupt the age 
