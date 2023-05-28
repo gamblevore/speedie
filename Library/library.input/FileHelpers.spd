@@ -34,8 +34,8 @@ extend String
 	helper FileGlobSub (|[string]| parts, |[file]| result, |int| i=0)
 		|| p = parts[i++]
 		ifn p contains '*'
-			|| abc = (.child(p), "/")(self or p) 
-			abc.fileglobsub2(parts, result, i)
+			|| newpath = (.child(p), "/")(self or p) 
+			newpath.fileglobsub2(parts, result, i)
 			return 
 		for ch in .file
 			if p globs ch
