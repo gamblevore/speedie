@@ -1750,7 +1750,7 @@ bool JB_Str_IsASCII(JB_String* self) {
 	return IsAsciiSub_( self->Addr, self->Length );
 }
 
-uint64 JB_CRC (u8* buf, int n, uint64 crc) {
+uint64 JB_CRC (u8* buf, uint64 crc, int n) {
 	if (n <= 0)
 		return crc;
 
@@ -1773,7 +1773,7 @@ uint64 JB_CRC (u8* buf, int n, uint64 crc) {
 
 
 uint64 JB_Str_CRC (JB_String* S, uint64 crc) {
-	return JB_CRC( JB_Str_Address(S), JB_Str_Length(S), crc);
+	return JB_CRC( JB_Str_Address(S), crc, JB_Str_Length(S));
 }
 
 
