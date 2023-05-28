@@ -184,7 +184,7 @@ class FlowControl
 			target flow
 				return .allow(name, appdate)
 			  else
-				disabled "Enable flow-control first! (add 'targets flow' to the project's conf.)"
+				disabled "Enable flow-control first! (add 'targets: flow' .)"
 
 
 
