@@ -1529,7 +1529,6 @@ function message.PrepareAST (|string| path="")
 	while msg != After
 		if (msg == @tmp) and (msg == "functiontable" or "dispatch")
 			SCFunction.Tran_FuncTable( msg )
-		(__hash__)
 		|| mh = msg.hash(++pos)
 		(ASTHash xor= mh)
 		msg = msg.FlatNext
