@@ -79,8 +79,8 @@ extend message
 			r.flags = nil
 		
 		|| pz = b.pz
-		|| abc = pz.macrocopy(self, prms)
-		.become(abc)
+		|| cpy = pz.macrocopy(self, prms)
+		.become(cpy)
 
 		for r in prms
 			check (r is inserted)  (r, "Unused parameter to macro")
