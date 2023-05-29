@@ -91,7 +91,7 @@ class ButtonView (GUIControl)
 		if .CurrOverItem != item
 			.CurrOverItem = item
 			sdlapp.touch
-		(.onover)(self, state|int|, item)?
+			(.onover)(self, state|int|, item)?
 
 
 	function XOfItem (|listviewrow| row, |ind|)
@@ -136,6 +136,7 @@ class ButtonView (GUIControl)
 	
 	behaviour MouseDown
 		opt norefcounts
+		.clickcount = clicks
 		|| D = .itemat(P.x)
 			if d isnt active and self is decluttered
 				d = nil
@@ -146,15 +147,15 @@ class ButtonView (GUIControl)
 				.PressingDone = true
 			if !.pressing or .PressingDone
 				return 4
+			return 5 // ?
 		
 		if keys.option and .pressing
 			.DoPressing(D)
 			return 5
 		
-		require D or !.items
-		if .ItemWidth and !D
+		if !(D or !.items)  or  (.ItemWidth and !D)
 			return nil
-		.clickcount = clicks
+		
 		if .MouseDownDoesClick
 			.pressingdone = true
 			.click(p)
@@ -193,14 +194,12 @@ class ButtonView (GUIControl)
 
 
 	function DrawItem (|image| where, |ivec4| R, |ivec4| grow, |listviewrow| i)
-		opt norefcounts
 		|| disabled = (i and i is disabled) or (self isnt enabled)
 			grow = nil
 		|| MouseXInside = R.x1x2 contains sdlapp.mousexy.x
-			
 		|| clicked = .MouseIsDown and mouseXinside and !.NoDrawClicked
 		|| strength = 1.0
-		if (self ~= "projtabs") and keys.option
+		
 		|| WillDrawFocus = clicked and i and .ClickedItem
 		if i is Active
 			strength += SDLApp.cycle(1s)
@@ -211,6 +210,7 @@ class ButtonView (GUIControl)
 			grow += r
 		  else
 			grow = r
+		
 		where.ControlClip = grow
 		Where.DrawRect(Grow, .GNormal, strength)
 		if (i is Selected) or (!i and clicked)
@@ -222,16 +222,9 @@ class ButtonView (GUIControl)
 		if WillDrawFocus
 			.drawfocusrect(where, grow, 1.0)
 		
-		|| t = (i.text, .text)(i)
-		|| s = .SubMenu
-		if !i and s
-			i = s.ListSource // allow these text to be added.
-		if i is Broken
-			t += " \17"
-		if i is dead
-			t += " (!)"
-		if (i is Modified)
-			t += "*"
+		if !i and .SubMenu
+			i = .SubMenu.ListSource // allow these text to be added.
+		|| t = i.ButtonText(.text)
 		|| Pn = R.TextCorner(.gnormal,  t,  .align) + (-1, 1)
 		|| White = (.align & listviewstate.DrawWhiteSpace)!=0
 		pn.x = font.small.DrawText(t,  Where,  Pn, White) + 2
@@ -242,8 +235,20 @@ class ButtonView (GUIControl)
 			|| px = colors.gray(0.55)
 			where.fillrect(R, px, px)
 		
-
 		
+	function ListViewRow.ButtonText (|string| Default, |string|)
+		if !self
+			return default
+		rz = .text
+		rz := Default
+		if self is Broken
+			rz += " \17"
+		if self is dead
+			rz += " (!)"
+		if self is Modified
+			rz += "*"
+	
+	
 	behaviour Draw
 		// So how do we set the width?
 		opt norefcounts
