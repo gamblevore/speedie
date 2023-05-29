@@ -200,7 +200,8 @@ class Window (GUIControl)
 	function Show  
 		opt norefcounts
 		is visible
-		window.newlyshown <~ self
+		is NewlyShown
+		window.all <~ self // why not?
 
 	
 	function IsFront (|bool|)
@@ -385,7 +386,6 @@ class Window (GUIControl)
 		|object|					LeakedTestObj
 		|GUIControl|				ActiveControl
 		|guicontrol of Window|		All = guicontrol(nil)
-		|[Window]|					NewlyShown
 		|[window]|					OpenDialogs
 
 		function Front (|Window|)

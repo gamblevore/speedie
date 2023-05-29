@@ -627,11 +627,10 @@ module SDLApp
 
 	function ShowWindows
 		opt norefcounts
-		for w in window.newlyshown
-			if w is visible
+		for w in window.all
+			if w is NewlyShown
 				sdlapp.Resized(w)
-				window.all <~ w
-		window.newlyshown.Clear
+			(w isnt newlyshown)
 	
 	
 	helper SingleFrame (|bool|)

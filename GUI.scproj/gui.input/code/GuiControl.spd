@@ -4,13 +4,6 @@ class GUIControl (ringtree)
 	linkage: cpp_part ctrl
 	
 	contains GuiControl
-	constants
-		LockCenter = 3
-		LockBoth = 2
-		LockRight = 1
-		LockLeft = 0
-		LockTop = 1
-		LockBottom = 0
 	
 	|ivec4| 					LastRect
 	|string|					ID
@@ -21,6 +14,7 @@ class GUIControl (ringtree)
 	|GUIAction|					OnClicked
 	|GUIAction|					OnFocus
 	|ControlSize|				Sizer
+	|GuiControlFlags|			State
 	|TakesFocusFlag|			TakesFocus
 	|byte|						TextAlteredForDraw
 	|byte|						ExpandOnMouseOver
@@ -28,7 +22,6 @@ class GUIControl (ringtree)
 	|byte|						ClipMode
 	|bool|						ClickOutsideCloses
 	|CopyPasteFlags|			CopyPaste
-	|GuiControlFlags|			State
 
 
 	constructor (|guicontrol| parent)

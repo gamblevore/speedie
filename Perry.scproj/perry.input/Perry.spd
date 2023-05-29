@@ -88,20 +88,20 @@ module Perry
 		
 		|| old = app.Pref("currproj")
 		|| oof = (.FindProj(old),  .Projects.First)(old)
-			oof.obj|PerryIDE|.show(false)
+			oof.ide.show(false)
 
 
 	function OpenProj (|[PerryIDE]|)
 		opt norefcounts
-		for r in .Projects
-			|| i = r.obj
-				rz <~ i|perryide|
+		for w in window.all
+			if w isa PerryIDE
+				rz <~ w
 
 	function IDE (|PerryIDE|)
 		opt norefcounts
-		for r in .Projects
-			|| i = r.obj
-				return i|perryIde|
+		for w in window.all
+			if w isa PerryIDE
+				return w
 
 	function Readjust
 		for i in .OpenProj
@@ -146,7 +146,6 @@ module Perry
 			old["pos"] = ""
 		
 		i.ProjMsg = old
-		old.obj = i
 		i.SetTab2Name(old)
 			
 

@@ -79,7 +79,7 @@ function perry.HideStartifneeded
 	
 function ClickedTabs (GUIAction)
 	if row
-		row.obj|PerryIDE|.show
+		row.ide.show
 
 
 function ClickedCompileTabs (Guiaction)
@@ -92,21 +92,21 @@ function PerryIDE.StdOutSelect (|object| Desired)
 		|| obj = i.obj
 		if obj isa GUIControl
 			|| vis = (Desired == i or obj)
-			(i is selected) = vis
+			(i is selected)  = vis
 			(obj is visible) = vis
 
 
 function ClickedToolbar (GUIAction)
 	opt norefcounts
 	|| w = .ide
-	if self isa buttonview
+	if self isa ButtonView
 		if w and (.clickcount == 2)
 			w.ViewAsSwap
 
 
 function file.InputFol (|file|)
 	for c.files in self
-		if c.name ~= "input" or c isa "input"
+		if c.name ~= "input"  or  c isa "input"
 			return c
 
 
