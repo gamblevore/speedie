@@ -165,7 +165,7 @@ JB_String* JB_Str_NewInlined(int Length, JB_Class* Cls) {
     if (!Length)
         return JB_Str__Empty();
     
-    JB_String4* Result = (JB_String4*)(JB_NewClass(Cls));
+    JB_String20* Result = (JB_String20*)(JB_NewClass(Cls));
     Result->Data[Length]=0; // zero term
     Result->Addr = (Result->Data);
     Result->Length = Length;
