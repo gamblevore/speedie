@@ -504,7 +504,7 @@ extend PerryIDE
 		f.FocusOn( f.start|filerow| )
 		
 		if !IsDir
-			conf = QQFiles.Roots.parse
+			conf = TodoAndRootFiles.Roots.parse
 		for p in .roots(conf)
 			f.addroot(p.file)
 		f.checksize
@@ -514,7 +514,8 @@ extend PerryIDE
 		opt norefcounts
 		|| edit = .ProjMsg["edit"]
 			*pos = .ProjMsg["pos"].int
-			return self.filelist[edit.nyme]
+			|| n = edit.nyme
+				return self.filelist[n]
 		|| tod = .nottodo
 			return tod
 		return projfol

@@ -36,9 +36,9 @@ function string.TrimProj (|string|)
 function PerryIDE.CreateProj (|file| proj)
 	expect (!proj.exists) (proj, "Can't create over existing project.")
 	|| main = proj.child("input/main.spd")
-	proj.child(".perry").write = qqfiles.Roots
+	proj.child(".perry").write = TodoAndRootFiles.Roots
 	main.data = .EmptyMainFile(proj.trimextandpath)
-	proj.child("input/.todo").write = qqfiles.Todo
+	proj.child("input/.todo").write = TodoAndRootFiles.Todo
 	IdeAddProj(proj)
 
 
