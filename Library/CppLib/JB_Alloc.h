@@ -293,8 +293,7 @@ u32 JB_ObjCount();
     (_T);                                \
 })
 
-
-#if 0
+#if DEBUG
 	extern int RefTrap;
     #define JBObjRefTest(obj) if ( (obj->RefCount) > 100000 and !RefTrap and !(obj->RefCount&~0x10000000)) { RefTrap = 1; debugger; }
     #define JBObjRefTrap(obj) //if (JB_ObjID(obj)==RefTrap) { printf("ref of %i: %i\n", RefTrap, obj->RefCount); debugger; }
