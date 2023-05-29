@@ -242,7 +242,7 @@ function OnAskSaveAnswer (GUIAction)
 
 function OpenSaveDialog.GoIntoFolder (|bool|)
 	|| f = .files.FirstSelected|filerow|
-	|| Acceptable = f and (f isnt greyed)
+	|| Acceptable = f and (f isnt grayed)
 	expect Acceptable (Beep)
 	if f.asdir
 		if (f.name == "..") or !.types or !.types.typecontains(f.location.ext+"/")

@@ -81,7 +81,7 @@ class DrawControl (GuiControl) // imageeditor
 			.Merged.Clear
 			return 
 			
-		|| g = colors.grey
+		|| g = colors.gray
 		|| w = colors.white
 		for (p in .Merged) (v)
 			|| col = (v<<size).sum isa 2

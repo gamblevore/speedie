@@ -336,7 +336,7 @@ function ListViewRow.ListFilesPath (|string| path, |string| types, |bool| save, 
 					if isdir
 						ext = ext.pathdir
 					isok = types.typecontains(ext)
-			(r is Greyed) = !ISOK 
+			(r is Grayed) = !ISOK 
 			
 	.filesort
 

@@ -16,7 +16,7 @@ class DrawStyle
 
 
 	constructor (|float| bg, |float| edge)
-		cpp_part Grey // who wants grey???
+		cpp_part Gray // who wants gray???
 		.text <~ 1.0
 		.Edge <~ edge
 		.Bg   <~ bg

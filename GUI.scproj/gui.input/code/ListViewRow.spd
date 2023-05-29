@@ -160,8 +160,8 @@ role ListViewRow (message)
 			where.horz	= z2.h
 			where.drawcircle( z2 + (4,0,-4,0), ¥.WhiteStyle, 1)
 		
-		if self is Greyed
-			|| gr = colors.grey(0.4)
+		if self is Grayed
+			|| gr = colors.gray(0.4)
 			where.fillrect(z2 + (0,0,0,-1), gr, gr)
 			
 		if (self is found)
@@ -199,7 +199,7 @@ datatype ListViewState (uint16)
 		Selected 
 		Modified
 		Disabled
-		Greyed
+		Grayed
 		Active
 		Editable
 		Broken		

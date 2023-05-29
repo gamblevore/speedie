@@ -40,6 +40,7 @@ class ButtonView (GUIControl)
 			rz.AttachedToParent = true
 
 	function SubMenu (|menu|)
+		opt norefcounts
 		|| s = .SubControl
 		if s isa menu
 			return  s
@@ -103,7 +104,6 @@ class ButtonView (GUIControl)
 			rz += w + .itemgap
 			r++
 
-
 	function ItemAt (|int| P, |ListViewRow|)
 		opt norefcounts
 		|| W = .ItemWidth
@@ -113,7 +113,6 @@ class ButtonView (GUIControl)
 			if R contains P
 				return i
 			R += W + .itemgap
-
 
 	helper ClearMouse
 		.DelayTill = nil
@@ -127,7 +126,6 @@ class ButtonView (GUIControl)
 		  else
 			.click(p)
 
-
 	behaviour RightClick
 		opt norefcounts
 		.Click(p, !.onrightclick)
@@ -135,7 +133,6 @@ class ButtonView (GUIControl)
 	helper DoPressing (|listviewrow| D, |bool|)
 		.ClearMouse
 		return (.Pressing)(self, 0, D)
-	
 	
 	behaviour MouseDown
 		opt norefcounts
@@ -200,23 +197,29 @@ class ButtonView (GUIControl)
 		|| disabled = (i and i is disabled) or (self isnt enabled)
 			grow = nil
 		|| MouseXInside = R.x1x2 contains sdlapp.mousexy.x
+			
 		|| clicked = .MouseIsDown and mouseXinside and !.NoDrawClicked
 		|| strength = 1.0
+		if (self ~= "projtabs") and keys.option
+		|| WillDrawFocus = clicked and i and .ClickedItem
 		if i is Active
 			strength += SDLApp.cycle(1s)
 			SDLApp.Touch
 		  else
 			require self isnt decluttered
-		grow += r
+		if WillDrawFocus or MouseXInside
+			grow += r
+		  else
+			grow = r
 		where.ControlClip = grow
 		Where.DrawRect(Grow, .GNormal, strength)
 		if (i is Selected) or (!i and clicked)
 			|| darker = (!i and clicked)
-			if .pressmakeslighter
+			if .PressMakesLighter
 				darker = !darker
 			|| w = (colors.black(0.2), colors.white(0.15))(darker)
 			where.fillrect(grow, W, W) 
-		if clicked and i
+		if WillDrawFocus
 			.drawfocusrect(where, grow, 1.0)
 		
 		|| t = (i.text, .text)(i)
@@ -232,12 +235,13 @@ class ButtonView (GUIControl)
 		|| Pn = R.TextCorner(.gnormal,  t,  .align) + (-1, 1)
 		|| White = (.align & listviewstate.DrawWhiteSpace)!=0
 		pn.x = font.small.DrawText(t,  Where,  Pn, White) + 2
-		if .pressing and (r contains sdlapp.mousexy) and r.Width > 19
+		if .pressing and (MouseXInside) and r.Width > 19
 			(pn.x min= r.x2-(font.Width+2))
 			font.small.DrawText("\03", where, pn, white)
 		if disabled
-			|| px = colors.grey(0.55)
+			|| px = colors.gray(0.55)
 			where.fillrect(R, px, px)
+		
 
 		
 	behaviour Draw
@@ -246,18 +250,16 @@ class ButtonView (GUIControl)
 		|| r = .lastrect
 		|| g = .MouseisInside|int| * .ExpandOnMouseOver
 		|| grow = (-g,-g, g, g)
-		where.controlclip += grow
+		where.ControlClip() += grow
 		|| W = .ItemWidth
 		if !w
 			.drawitem(where, r, grow, nil)
 			return 
 			
-		|| m = .mousexy
 		|| rx1 = r.x
 		R.x2 = rx1 + W
 		for i in .items
-			|| inside = r contains m
-			.drawitem(where, R, grow*inside, i)
+			.drawitem(where, R, grow, i)
 			R = R right W + .itemgap
 			loop r.x < where.width
 		w = r.x - rx1

@@ -219,11 +219,14 @@ module Colors
 	function white (|float| alpha=1.0, |imagepixel|)
 		|| v = (1.0, 1.0, 1.0, alpha)
 		rz <~ v
-	function grey (|float| alpha=1.0, |imagepixel|)
+	function gray (|float| alpha=1.0, |imagepixel|)
 		|| v = (0.5, 0.5, 0.5, alpha)
 		rz <~ v
+	function red (|float| alpha=1.0, |imagepixel|)
+		|| v = (1.0, 0.0, 0.0, alpha)
+		rz <~ v
 	// these could be... thingies? a~b thingies :)
-	// macros :) adjs 1.0~grey
+	// macros :) adjs 1.0~gray
 	function black (|float| alpha=1.0, |imagepixel|)
 		|| v = (0.0, 0.0, 0.0, alpha)
 		rz <~ v

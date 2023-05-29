@@ -187,8 +187,6 @@ module SDLApp
 		
 	
 	function Touch (|guicontrol| modified=nil)
-		if keys.Option
-			printline app.StackTrace
 		.TouchCount = .TouchCount|int| max 2
 
 	
@@ -1008,6 +1006,7 @@ module SDLApp
 		|| R = window.all.lastrect.x2
 		return (r-p.x, p.y)
 
+
 	function DoAppResize (|ivec2| M, |int|)
 		|| P = .FindResizeCorner(M)
 		|| D = .AppResizingXY - p
@@ -1043,8 +1042,6 @@ module SDLApp
 				.name = info
 
 
-
 function guicontrol.description (|string|)
 	return .tooltip // :)
-
 

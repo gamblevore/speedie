@@ -116,7 +116,7 @@ class Image (memory)
 		|| after = in + data.BytesUsed$
 		|| curr = ._controlclip.x1y1
 		|| end = ._controlclip.x2y2
-		|| w = Colors.grey(0.5)
+		|| w = Colors.gray(0.5)
 		while (curr.y < end.y)
 			while (curr.x < end.x)
 				|| p = self[curr]
