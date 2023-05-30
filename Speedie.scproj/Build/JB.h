@@ -2848,6 +2848,8 @@ JB_String* SC_Ext__TmpOut(JB_String* V);
 
 bool SC_Ext__TransCompile(Array* Files, JB_String* Dest, JB_String* Type);
 
+bool SC_Ext__TransCompileWrap(Array* cpps);
+
 bool SC_Ext__UseAndCompile(Array* Input, JB_String* Output);
 
 
