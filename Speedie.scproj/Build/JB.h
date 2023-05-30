@@ -1242,6 +1242,8 @@ extern Message* SC__Comp_Extend_list;
 extern Array* SC__Comp_Extend_module_list;
 extern Dictionary* SC__Comp_Files;
 extern Array* SC__Comp_FuncList;
+extern SCDecl* SC__Comp_HashConstant;
+extern uint64 SC__Comp_HashConstantValue;
 extern bool SC__Comp_HasMainFunc;
 extern Array* SC__Comp_ImportedList;
 extern Dictionary* SC__Comp_ImportedNames;
@@ -1462,7 +1464,7 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[339])
+#define kSC_BitAnd (JB_LUB[340])
 #define kSC_BitNot (JB_LUB[605])
 #define kSC_BitOr (JB_LUB[546])
 #define kSC_BitXor (JB_LUB[1868])
@@ -2788,6 +2790,8 @@ Array* SC_Ext__CreateCompileString(Array* CppList, JB_String* Product, JB_String
 
 bool SC_Ext__ExecuteGCC(Array* Commands);
 
+void SC_Ext__Export();
+
 Array* SC_Ext__FilterCppsIfAlreadyDone(Array* Cpps, JB_File* Objects, int* stdafx);
 
 int SC_Ext__Init_();
@@ -2841,8 +2845,6 @@ JB_String* SC_Ext__TmpBase(JB_String* V);
 JB_String* SC_Ext__TmpErr(JB_String* V);
 
 JB_String* SC_Ext__TmpOut(JB_String* V);
-
-void SC_Ext__TransComp();
 
 bool SC_Ext__TransCompile(Array* Files, JB_String* Dest, JB_String* Type);
 
@@ -5215,7 +5217,7 @@ bool JB_Flow_LoadPath(FlowControl* self, JB_String* path, bool IsPrev);
 
 FlowControl* JB_Flow__Alloc();
 
-FlowControlStopper JB_Flow__FlowAllow(JB_String* name, Date AppDate);
+FlowControlStopper JB_Flow__FlowAllow(JB_String* name, Date StartCode);
 
 int JB_Flow__Init_();
 
@@ -7070,6 +7072,8 @@ Message* JB_Msg_GiveArg(Message* self);
 
 Message* JB_Msg_GoIntoInvisArg(Message* self, Message* tmp, int pos);
 
+uint64 JB_Msg_Hash(Message* self, uint64 Pos);
+
 Message* JB_Msg_HasOwnBlock(Message* self);
 
 bool JB_Msg_HasPosition(Message* self);
@@ -7278,7 +7282,7 @@ void JB_Msg_pinn__(Message* self, FastString* fs);
 
 Message* JB_Msg_PoorAnt(Message* self);
 
-void JB_Msg_PrepareAST(Message* self);
+void JB_Msg_PrepareAST(Message* self, JB_String* path);
 
 int JB_Msg_PrevIndentCheck(Message* self, Message* pr);
 
