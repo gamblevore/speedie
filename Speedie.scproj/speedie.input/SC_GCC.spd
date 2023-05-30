@@ -272,10 +272,11 @@ function UseAndCompile (|[string]| Input, |String| Output, |bool|)
 function TransCompileWrap (|[file]| cpps, |bool|)
 	rz = .TransCompile( Cpps, " -c ", "cpp" )
 	target osx
-		if rz
-			rz = .TransCompile( Cpps, " -c ", "m" )
-		if rz
-			rz =.TransCompile( Cpps, " -c ", "mm" )
+		if platform.osx // it might not realise that it is OSX! cos of cpp file-sharing.
+			if rz
+				rz = .TransCompile( Cpps, " -c ", "m" )
+			if rz
+				rz =.TransCompile( Cpps, " -c ", "mm" )
 
 
 function ClearThis
