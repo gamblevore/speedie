@@ -1988,7 +1988,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	iif (SC_Comp__EnterCompile()) {
 		iif (true) {
-			FlowControlStopper _using182 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowStarter(JB_LUB[151], (-1818030639974113084)));
+			FlowControlStopper _using182 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowStarter(JB_LUB[151], (-7597141659487059145)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_using182);
 		}
@@ -7354,11 +7354,13 @@ bool SC_Ext__TransCompile(Array* Files, JB_String* Dest, JB_String* Type) {
 bool SC_Ext__TransCompileWrap(Array* cpps) {
 	bool rz = false;
 	rz = SC_Ext__TransCompile(cpps, JB_LUB[531], JB_LUB[218]);
-	iif (rz) {
-		rz = SC_Ext__TransCompile(cpps, JB_LUB[531], JB_LUB[461]);
-	}
-	iif (rz) {
-		rz = SC_Ext__TransCompile(cpps, JB_LUB[531], JB_LUB[463]);
+	iif (JB_Platform__OSX()) {
+		iif (rz) {
+			rz = SC_Ext__TransCompile(cpps, JB_LUB[531], JB_LUB[461]);
+		}
+		iif (rz) {
+			rz = SC_Ext__TransCompile(cpps, JB_LUB[531], JB_LUB[463]);
+		}
 	}
 	return rz;
 }
