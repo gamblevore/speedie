@@ -715,11 +715,13 @@ void JB_File_Destructor( JB_File* self ) {
 
 
 void JB_File_StopSHM (JB_File* self) {
+	#ifndef AS_LIBRARY
 	if (self->MyFlags & 1) { // 1 == server!
 		printf("unlinking %s\n", self->Addr);
 		shm_unlink((const char*)(self->Addr));
 		self->MyFlags &= ~1;
 	}
+	#endif
 }
 
 void JB_File_CloseSub ( JB_File* self ) {
@@ -1071,6 +1073,7 @@ bool JB_File_IsLink (JB_File* self) {
 
 
 void* JB_File_IPC (JB_File* self, int* np) {
+#ifndef AS_LIBRARY
 	if (self->Descriptor >= 0) {
 		JB_ErrorHandleFile(self, nil, EISCONN, nil, "shm_open");
 		return 0;
@@ -1131,6 +1134,7 @@ void* JB_File_IPC (JB_File* self, int* np) {
 		}
 	}
     JB_ErrorHandleFile(self, nil, errno, nil, Try);
+#endif
 	return 0;
 }
 
