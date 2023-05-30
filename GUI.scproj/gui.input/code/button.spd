@@ -141,20 +141,21 @@ class ButtonView (GUIControl)
 			if d isnt active and self is decluttered
 				d = nil
 		
+		|| ret = 0
 		if .clickeditem and clicks == -1		// drag
 			if D and D != .ClickedItem
 				.ClickedItem.moveto(D)
 				.PressingDone = true
 			if !.pressing or .PressingDone
 				return 4
-			return 5 // ?
+			ret = 5 // ?
 		
 		if keys.option and .pressing
 			.DoPressing(D)
 			return 5
 		
 		if !(D or !.items)  or  (.ItemWidth and !D)
-			return nil
+			return ret
 		
 		if .MouseDownDoesClick
 			.pressingdone = true
