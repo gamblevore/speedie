@@ -1,0 +1,24 @@
+
+	
+							Todo
+
+* VM?
+* RefOpts?
+
+* fix the window.dispose refcount bug!!!
+	* make speedie disable "opt refcounts"? just add auto ref optimisation
+
+* backup selftool and galaxxies... on git.
+
+* if w isa P<tab>// no need to autocomplete things that w can't be.
+* Make logs hierarchical with timestamps
+* TextView error/find resync
+* double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
+* Find-replace!
+	* syntactic-mode also
+* too long text in listview draw as much as we can
+* First use of tab (in func) or () (to wrap) on opening perry doesn't work.
+
+* contact
+	* https://github.com/paypal/Checkout-PHP-SDK
+	* multiplay. find others on youtube, and discord
