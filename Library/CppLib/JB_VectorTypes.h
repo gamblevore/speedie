@@ -11,7 +11,8 @@ inline ivec4 JB_ivec4_Load(unsigned char* data) {
 	return ivec4{data[0], data[1], data[2], data[3]};
 };
 inline vec4 JB_vec4_Load(unsigned char* data) {
-	return vec4{data[0], data[1], data[2], data[3]};
+	auto iv = JB_ivec4_Load(data);
+	return (vec4)(iv);
 };
 
 
