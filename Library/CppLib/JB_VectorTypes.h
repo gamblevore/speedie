@@ -7,6 +7,7 @@ typedef float  vec4 __attribute__ ((vector_size (16)));
 typedef unsigned char  bytevec4 __attribute__ ((vector_size (4), aligned (4))); // shouldn't they all be aligned?
 typedef int   ivec2 __attribute__ ((vector_size (8)));
 typedef float  vec2 __attribute__ ((vector_size (8)));
+#if __has_builtin(__builtin_convertvector)
 inline ivec4 JB_ivec4_Load(unsigned char* data) {
 	bytevec4 bv = *((bytevec4*)data);
 	return __builtin_convertvector(bv, ivec4);
@@ -15,7 +16,14 @@ inline vec4 JB_vec4_Load(unsigned char* data) {
 	bytevec4 bv = *((bytevec4*)data);
 	return __builtin_convertvector(bv, vec4);
 };
-
+#else
+inline ivec4 JB_ivec4_Load(unsigned char* data) {
+	return ivec4{data[0], data[1], data[2], data[3]};
+};
+inline vec4 JB_vec4_Load(unsigned char* data) {
+	return vec4{data[0], data[1], data[2], data[3]};
+};
+#endif
 
 
 // the problem is that vec3 if done the same way as above,... doesn't store to a size of 12.

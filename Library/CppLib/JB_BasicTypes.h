@@ -140,7 +140,7 @@ typedef int64					Date;
 
 
 #ifndef __has_builtin
-	#define __has_builtin (x) (false)
+	#define __has_builtin(x) (false)
 #endif
 
 
