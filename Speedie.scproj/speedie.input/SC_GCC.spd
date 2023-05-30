@@ -98,7 +98,10 @@ function CanCompile ( |string| name, |bool| )
 
 
 function string.isCLike (|bool|)
-	return (self ~= "cpp" or "m" or "mm") // mm gets wierd errors that cpp doesnt?
+	target osx
+		return (self ~= "cpp" or "m" or "mm") // mm gets wierd errors that cpp doesnt?
+	  else
+		return (self ~= "cpp") // mm gets wierd errors that cpp doesnt?
 
 
 function NoGoodObject ( |string| Cpp, |File| h, |File| o, |int| )
@@ -257,16 +260,22 @@ function ExecuteGCC (|[string]| Commands, |bool|)
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
 	|| TmpFol = Output.MakeAndGoInto
 	|| Cpps = .CollectCppsInto( Input, TmpFol, nil )
-	return .TransCompile( Cpps, " -c ", "cpp" )  and  .TransCompile( Cpps, " -c ", "m" )  and  .TransCompile( Cpps, " -c ", "mm" )
+	return .TransCompileWrap(cpps)
 
 
 function UseAndCompile (|[string]| Input, |String| Output, |bool|)
-	// not sure why this is different... I think it's for external C files?
-	// can't remove it until i can test them.
-	
 	|| TmpFol = Output.MakeAndGoInto
 	|| Cpps = .FilterCppsIfAlreadyDone( Input, TmpFol, nil )
-	return .TransCompile( Cpps, " -c ", "cpp" )  and  .TransCompile( Cpps, " -c ", "m" )  and  .TransCompile( Cpps, " -c ", "mm" )
+	return .TransCompileWrap(cpps)
+
+
+function TransCompileWrap (|[file]| cpps, |bool|)
+	rz = .TransCompile( Cpps, " -c ", "cpp" )
+	target osx
+		if rz
+			rz = .TransCompile( Cpps, " -c ", "m" )
+		if rz
+			rz =.TransCompile( Cpps, " -c ", "mm" )
 
 
 function ClearThis
