@@ -4,6 +4,7 @@
 
 * VM?
 * RefOpts?
+* code to test if something is osx/linux/win kinda sucks... itsjust string comparison looks shit when compiled
 
 * fix the window.dispose refcount bug!!!
 	* make speedie disable "opt refcounts"? just add auto ref optimisation
