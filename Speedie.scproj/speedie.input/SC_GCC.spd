@@ -489,8 +489,8 @@ function String.LastLine (|string|)
 
 function file.TestBatch (|bool|)
 	|| batch = compiler.BaseProjectPath["Batch"]
-	print "Tested: " 
 	|| sep = ""
+	print "Tested: " 
 	for c.files in batch
 		if c.visible and c isa "spd"
 			print sep
@@ -498,6 +498,7 @@ function file.TestBatch (|bool|)
 			print c.Name
 			.SilentExecute([c, "--nocompile"])
 	printline
+	
 	for c.files in batch
 		if c isa "cpp" or "h"
 			printline "This file should really not be here: " + c
