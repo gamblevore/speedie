@@ -40,6 +40,7 @@ function compiler.AppBuildLibs (|file| inner)
 
 
 function compiler.AppleBuildApp (|file| project, |file| product)
+	require platform.osx
 	|| dest = product.linksto
 		error (dest, "This should not be a link")
 		return

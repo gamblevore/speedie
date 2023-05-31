@@ -40,9 +40,9 @@ function ProductName (|string|)
 
 function ProductSuffix (|String|)
 	require Options.ProjectIsLibrary
-	Target OSX
+	if platform.osx
 		return ".dylib"
-	target Win
+	if platform.windows
 		return ".lib"
 	return ".so"
 	
@@ -98,7 +98,7 @@ function CanCompile ( |string| name, |bool| )
 
 
 function string.isCLike (|bool|)
-	target osx
+	if platform.osx
 		return (self ~= "cpp" or "m" or "mm") // mm gets wierd errors that cpp doesnt?
 	  else
 		return (self ~= "cpp") // mm gets wierd errors that cpp doesnt?
@@ -271,12 +271,11 @@ function UseAndCompile (|[string]| Input, |String| Output, |bool|)
 
 function TransCompileWrap (|[file]| cpps, |bool|)
 	rz = .TransCompile( Cpps, " -c ", "cpp" )
-	target osx
-		if platform.osx // it might not realise that it is OSX! cos of cpp file-sharing.
-			if rz
-				rz = .TransCompile( Cpps, " -c ", "m" )
-			if rz
-				rz = .TransCompile( Cpps, " -c ", "mm" )
+	if platform.osx // it might not realise that it is OSX! cos of cpp file-sharing.
+		if rz
+			rz = .TransCompile( Cpps, " -c ", "m" )
+		if rz
+			rz = .TransCompile( Cpps, " -c ", "mm" )
 
 
 function ClearThis

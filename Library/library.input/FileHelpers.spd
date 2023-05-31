@@ -327,9 +327,8 @@ extend String
 		return self.Child(ch).file
 	
 	function OpenFile (|errorint|)
-		target osx
-			|| p = .pathfix
-				return "/usr/bin/open".SilentExecute([p])
+		|| p = .pathfix
+			return "/usr/bin/open".SilentExecute([p])
 	
 	function Reveal (|bool|)
 		if self and platform.osx

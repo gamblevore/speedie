@@ -122,6 +122,8 @@ function app.CodeSign (|file|)
 
 function file.CodeSign (|string| sign, |errorint|)
 	target osx
+		if !platform.osx
+			return -1
 		StdErr.ErrorsAreWarnings++
 		|[string]| args = []
 		args <~ "--deep"
