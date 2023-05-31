@@ -276,7 +276,7 @@ function TransCompileWrap (|[file]| cpps, |bool|)
 			if rz
 				rz = .TransCompile( Cpps, " -c ", "m" )
 			if rz
-				rz =.TransCompile( Cpps, " -c ", "mm" )
+				rz = .TransCompile( Cpps, " -c ", "mm" )
 
 
 function ClearThis
