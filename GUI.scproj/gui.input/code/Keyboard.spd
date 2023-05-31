@@ -120,7 +120,7 @@ dataType Keys (int) {
 		function Cmd (|bool|)
 			if KeyMod.ctrl
 				return true
-			if !platform.windows
+			if !platform.win
 				return keymod.cmd
 
 		function RealCmd (|bool|)

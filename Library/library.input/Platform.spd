@@ -33,10 +33,10 @@ module Platform
 		cpp_wrapper JB_Platform__OSX
 
 	function Lin (|bool|)
-		cpp_wrapper JB_Platform__LIN
+		cpp_wrapper JB_Platform__Lin
 
 	function Win (|bool|)
-		cpp_wrapper JB_Platform__WIN
+		cpp_wrapper JB_Platform__Win
 
 	function IsDebug (|bool|)
 		cpp_Wrapper JB_IsDebug
