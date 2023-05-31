@@ -112,8 +112,6 @@
 		ACB2D27229BCCAB70070E60F /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F142961FA8C005EFB9D /* libSDL2.dylib */; };
 		ACB2D27429BCCAB70070E60F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC259FAD2660E1AC0026C303 /* Assets.xcassets */; };
 		ACB2D27E29BCF4AD0070E60F /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC61010E2798768C00278BEF /* libSpeedie.dylib */; };
-		ACF22DA22A2786800034FB92 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACF22DA12A2786800034FB92 /* JB_OSNative.cpp */; };
-		ACF22DA32A2786800034FB92 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACF22DA12A2786800034FB92 /* JB_OSNative.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -259,7 +257,6 @@
 		AC78080D256C065000ED647E /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		ACB2D27929BCCAB70070E60F /* PerryDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACB86AF9260BB58900555758 /* Perry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perry.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		ACF22DA12A2786800034FB92 /* JB_OSNative.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_OSNative.cpp; path = ../Library/CppLib/JB_OSNative.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -383,7 +380,6 @@
 		AC9E1718233A859B003B433F = {
 			isa = PBXGroup;
 			children = (
-				ACF22DA12A2786800034FB92 /* JB_OSNative.cpp */,
 				AC3A6A8D296082E700CE1E91 /* README.md */,
 				AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */,
 				AC28D04B2638AAE700635A66 /* perry.input */,
@@ -677,7 +673,6 @@
 				ACB2D26B29BCCAB70070E60F /* JB_ObjArray.cpp in Sources */,
 				ACB2D26C29BCCAB70070E60F /* JB_List.cpp in Sources */,
 				ACB2D26D29BCCAB70070E60F /* JB_FastString.cpp in Sources */,
-				ACF22DA22A2786800034FB92 /* JB_OSNative.cpp in Sources */,
 				ACB2D26E29BCCAB70070E60F /* JB_String.cpp in Sources */,
 				ACB2D26F29BCCAB70070E60F /* JB_Dictionary.cpp in Sources */,
 			);
@@ -718,7 +713,6 @@
 				AC528EE82961F9B4005EFB9D /* JB_ObjArray.cpp in Sources */,
 				AC528EF62961F9B4005EFB9D /* JB_List.cpp in Sources */,
 				AC528EFA2961F9B4005EFB9D /* JB_FastString.cpp in Sources */,
-				ACF22DA32A2786800034FB92 /* JB_OSNative.cpp in Sources */,
 				AC528EF22961F9B4005EFB9D /* JB_String.cpp in Sources */,
 				AC528F002961F9B4005EFB9D /* JB_Dictionary.cpp in Sources */,
 			);

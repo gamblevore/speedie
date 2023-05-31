@@ -1,10 +1,8 @@
 
 
-//#include "JB_Umbrella.h"
 #include <stdio.h>
-#include "/usr/local/speedie/GUI.scproj/gui.input/c_includes/SDL.h"
+#include "SDL.h"
 #include "JB_BasicTypes.h"
-// fix this path later... obviously we don't want a full-path here.
 
 
 extern "C" {
