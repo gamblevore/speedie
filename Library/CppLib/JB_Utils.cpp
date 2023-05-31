@@ -118,13 +118,13 @@ int JB_Platform__CPU() {
 	return __CPU_TYPE__;
 }
 
-uint JB_Platform__OSX() {
+bool JB_Platform__OSX() {
 	return __PLATFORM_CURR__ == __PLATFORM_OSX__;
 }
-uint JB_Platform__Win() {
+bool JB_Platform__Win() {
 	return __PLATFORM_CURR__ == __PLATFORM_WIN__;
 }
-uint JB_Platform__Lin() {
+bool JB_Platform__Lin() {
 	return __PLATFORM_CURR__ == __PLATFORM_LINUX__;
 }
 
