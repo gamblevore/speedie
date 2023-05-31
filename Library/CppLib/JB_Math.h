@@ -19,7 +19,14 @@ extern "C" {
     inline float JB_f__nan () {
         return __builtin_nanf("");
     }
-
+#if __PLATFORM_CURR__ != __PLATFORM_OSX__
+	// seems to be differently defined outside of OSX...
+	
+	#define __sinpif	sinpif
+	#define __cospif	cospif
+	#define __tanpif	tanpif
+	#define __sincospif	sincospif
+#endif
 
 #if __has_builtin(__builtin_rotateleft64)
 	inline u64 JB_u64_RotL(u64 x, u64 N) {

@@ -7,28 +7,28 @@
 module Math
 	constants
 		// just use π for pi, or 2π for PI*2
-		E   = 2.7182818284590452353602874713526
+		E = 2.7182818284590452353602874713526
 	
 	function sin (|float| f, |float|)
 		return .sinpi(f*2)
 
+	function cos (|float| f, |float|)
+		return .cospi(f*2)
+
+	function float.sin (|float|)
+		return math.sin(self) //sigh
+
 	function float.__sincospi (|&float| a, |&float| b)
 		cpp_wrapper (__sincospif)
 		
-	function float.sin (|float|)
-		return math.sin(self) //sigh
-		
 	function float.sincos (|vec2|)
-		|float| a
+		|float| a // surely we'd have to multiply by 2 first???
 		|float| b
 		.__sincospi(a, b)
 		return (a, b)
 		
 	function cospi (|float| f, |float|)
 		cpp_wrapper (__cospif)
-
-	function cos (|float| f, |float|)
-		return .cospi(f*2)
 
 	function saw (|float| f, |float|)		 // just a saw-func
 		//   0-->0,  0.25-->1,  0.5-->0,  0.75--> -1,  1-->0
@@ -42,7 +42,6 @@ module Math
 	
 	function sinpi (|float| f, |float|)
 		cpp_wrapper (__sinpif)
-
 
 	function float.atan2 (|float| f2, |float|)
 		cpp_wrapper (atan2f)
