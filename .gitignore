@@ -6,6 +6,8 @@ xcuserdata/
 *nogit
 /Library/*.jbin
 **/*.input/garbage.jb
+*.app
+Utils/jz
 
 #Examples
 /FirstProj*
@@ -20,4 +22,3 @@ xcuserdata/
 *.scproj/Cpp/
 **/DerivedData/
 *.args
-Utils/jz
