@@ -1,5 +1,4 @@
 
-#include "JB_OSX.h"
 #import <Cocoa/Cocoa.h>
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
@@ -7,7 +6,6 @@
 
 
 
-typedef void (*JBFileOpenedCallBack)(void* str);
 void* JB_Str_CopyFromCString( const char* C );
 void JB_FreeIfDead_(void* c);
 static id							sigh;
