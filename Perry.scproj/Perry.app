@@ -1,1 +1,0 @@
-/Users/theodore/Speedie/Perry.scproj/Build/Release/Perry.app
