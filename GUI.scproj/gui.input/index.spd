@@ -17,7 +17,9 @@ import "network" // for network.guidownload
 				 // but that becomes order-dependant. sucks!
 
 compile_linking
-	flags:	osx "-framework OpenGL  -framework AVFoundation  -lSDL2"
+	flags
+		osx "-framework OpenGL  -framework AVFoundation  -lSDL2"
+		lin " -lSDL2"
 	libs:	"libSDL2.dylib"
 
 // sudo install_name_tool -add_rpath	/usr/local/lib			/usr/local/lib/libSDL2.dylib
