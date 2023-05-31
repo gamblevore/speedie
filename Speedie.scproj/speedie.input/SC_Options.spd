@@ -18,7 +18,12 @@ module Options
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
 	||		HideMultipleErrors		= true
-	||		GenFlowControlCode		= true
+	target flow
+		||		SelfFlowControl		= true
+	  else
+		||		SelfFlowControl		= false
+	
+	||		GenFlowControlCode		= false
 	||		Products				= native
 	||		Cpp						= true
 	||		Compile					= true
@@ -67,8 +72,9 @@ module Feedback
 			Options.SelfReplacement = kSelfReplace
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
-			Options.GenFlowControlCode = true
-			targets.set("self")
+			Options.GenFlowControlCode = Options.SelfFlowControl
+			Targets["flow"] = Options.SelfFlowControl
+			targets["self"] = true
 		  elseif t2 == 2
 			Options.ProjectIsMiniLib = true
 
@@ -262,10 +268,11 @@ module Feedback
 		
 		+"flow"
 			explain(Purpose, "Adds control-flow logging to generated compiles")$
-			Options.GenFlowControlCode = value.optionbool
-			targets.set("flow")
+			|| b = value.optionbool
+			Options.GenFlowControlCode = b 
+			Options.SelfFlowControl = b
+			targets["flow"] = b
 
-		
 		+"log"
 			explain(Purpose, "Logs the compiler's internal behaviour.  0 = off,  1 =  log,  2 = log+validate")$
 			if value!="true"
@@ -321,7 +328,7 @@ module Feedback
 		directtest 
 			explain(Purpose, "Allows me to test certain compiler features more easily.")
 			options.isdirecttest = value.OptionBool
-			targets.set("direct")
+			targets["direct"] = options.isdirecttest
 		
 		
 		+"single" 
@@ -351,7 +358,7 @@ module Feedback
 			Explain(Purpose, "")$
 			if value == "debug"
 				error "Use 'targetdebug' instead."
-			targets.set(value)
+			targets[value]=true
 			
 		m64
 			Explain(Purpose, "64-bit compile")$
@@ -472,7 +479,10 @@ module Feedback
 		fs <~ "Usage: "
 		fs <~ app.filename
 		fs <~ " /path/to/project\n"
-		fs <~ "Installation: ${compiler.SpeedieProj.parent}  Platform: ${platform.Name}/${platform.cpu_name}"
+		fs <~ "Installation: ${compiler.SpeedieProj.parent}"
+		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
+		fs <~ "  CanLog: "
+		fs <~ ("yes", "no")(platform.HasFlow)
 		for (v in appoptions) (k) 
 			(appoptions[k])("", "", fs_tester)
 			if (fs_tester.length) 

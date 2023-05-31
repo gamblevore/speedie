@@ -36,6 +36,7 @@
 extern "C" {
 
 bool JB_Flow__Cond(bool b);
+bool JB_Plat__HasFlow();
 void JB_Flow__PrintStats();
 
 #ifdef JB_DEBUG_ON

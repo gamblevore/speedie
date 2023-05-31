@@ -240,7 +240,7 @@ class String
 
 	function Yes (|bool|) // ispositive, isaffirmative
 		if self ~= "no" or "false" or "off" or "0" or "":	return false
-		if self ~= "yes" or "true" or "on" or "1": return true
+		if self ~= "yes" or "true" or "on"  or "1": return true
 		error ("Not a boolean value: '" + self + "'")
 
 

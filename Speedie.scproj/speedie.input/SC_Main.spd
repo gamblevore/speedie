@@ -8,7 +8,7 @@ main // speedie main {
 function Compiler.Main
 	.SetupEnv
 	if .EnterCompile
-		using FlowControl("Speedie")
+		using FlowControl.allow("Speedie")
 			.CompileTime
 	.PrintResults
 

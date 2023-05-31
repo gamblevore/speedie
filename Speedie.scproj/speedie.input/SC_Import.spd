@@ -93,7 +93,7 @@ class SCImport
 				|| ch = t.first
 					error ch
 				  else
-					targets.set(t.name)
+					targets[t.name] = true
 		tar.remove
 		
 	

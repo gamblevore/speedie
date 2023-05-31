@@ -721,9 +721,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	*Hash = JB_LUBHash;
 	return JB_LUB;
 }
-extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
-	*src = JB_LUBSrc2;
-	return JB_LUB;
+extern "C" bool JB_Plat__HasFlow() {
+	return @flow;
 }
 `)
 	
@@ -743,10 +742,7 @@ extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
 		|| blob = .StringBlob.GetResult
 		|| lengths = .StringLengths2.GetResult
 		.GenLub(fs)
-				
-		// we wanna just encode the hash, right?
 		
-		//fs <~ "static const int JB_LUBCount = ${.stringcount};\n"
 		|| blob2 = FastString()
 		blob2.EncodeLength(lengths.length)
 		blob2.EncodeLength(blob.length)
@@ -759,7 +755,9 @@ extern "C" JB_String** JB_Str__FindGlobals2(const char** src) {
 		fs <~ "static const char* JB_LUBSrc2 = "
 		fs.AppendCppAll(blob)
 		fs <~ ";\n"
-		fs <~ .FindGlobalsCpp
+		|| FlowStr = Options.GenFlowControlCode.render
+		fs <~ .FindGlobalsCpp.ReplaceAll("@flow", FlowStr)
+			
 		
 		.StringLengths2 = nil
 		.StringBlob = nil

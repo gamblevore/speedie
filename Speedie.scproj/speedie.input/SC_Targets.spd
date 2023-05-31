@@ -5,12 +5,9 @@
 
 
 module Targets
-	|| Items = dictionary()
-	function Set (|message| tmp)
-		cpp_part SetMsg
-		|| thg = tmp[@thg]
-			.set(thg.name)
-	function Set (|string| name)
-		.items[name] = "true"
+	|dictionary of string| Items = dictionary()
 	syntax Access (|string| name, |bool|)
-		return targets.items.valuelower(name)
+		return .items.valuelower(name).yes
+
+	syntax Access (|string| name, assigns:|bool|)
+		.items.valuelower(name) = value.Render

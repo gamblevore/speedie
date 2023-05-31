@@ -170,21 +170,21 @@ class FlowControl
 			.Disabled = int.max
 			.Flow = nil
 
-		function Allow (|string| name, |Date| StartCode = __hash__,  |FlowControlStopper|)
+		function Allow (|string| name, |uint64| StartCode = __hash__,  |FlowControlStopper|)
 			cpp_part FlowAllow
 			flow off
 			require FlowMode
 			.Disabled = int.max			// in case its set badly
 			.flow = FlowControl()
-			.flow.init("/tmp/FlowControl/" + name + ".txt.mz", StartCode.Hex)
+			.flow.init("/tmp/FlowControl/" + name + ".txt.mz", StartCode|int64|.Hex)
 
-		function New (|string| name, |Date| AppDate = __hash__,  |FlowControlStopper|)
+		function New (|string| name, |uint64| StartCode = __hash__,  |FlowControlStopper|)
 			cpp_part FlowStarter
 			flow off
 			target flow
-				return .allow(name, appdate)
+				return .allow(name, StartCode)
 			  else
-				disabled "Enable flow-control first! (add 'targets: flow' .)"
+				disabled "Either: Enable flow-control via 'targets: flow'... OR use 'flowcontrol.allow'"
 
 
 

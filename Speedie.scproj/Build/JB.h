@@ -1287,13 +1287,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1864])
+#define kJB__ErrorColors_bold (JB_LUB[1866])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1865])
-#define kJB__ErrorColors_good (JB_LUB[1866])
-#define kJB__ErrorColors_normal (JB_LUB[1867])
-#define kJB__ErrorColors_underline (JB_LUB[1866])
-#define kJB__ErrorColors_warn (JB_LUB[1868])
+#define kJB__ErrorColors_error (JB_LUB[1867])
+#define kJB__ErrorColors_good (JB_LUB[1868])
+#define kJB__ErrorColors_normal (JB_LUB[1869])
+#define kJB__ErrorColors_underline (JB_LUB[1868])
+#define kJB__ErrorColors_warn (JB_LUB[1870])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1381,6 +1381,7 @@ extern int SC__Options_Products;
 extern bool SC__Options_ProjectIsLibrary;
 extern bool SC__Options_ProjectIsMiniLib;
 extern bool SC__Options_Scripting;
+extern bool SC__Options_SelfFlowControl;
 extern int SC__Options_SelfReplacement;
 extern bool SC__Options_Silent;
 extern bool SC__Options_SingleCppOutput;
@@ -1464,10 +1465,10 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[340])
-#define kSC_BitNot (JB_LUB[606])
-#define kSC_BitOr (JB_LUB[547])
-#define kSC_BitXor (JB_LUB[1869])
+#define kSC_BitAnd (JB_LUB[343])
+#define kSC_BitNot (JB_LUB[609])
+#define kSC_BitOr (JB_LUB[550])
+#define kSC_BitXor (JB_LUB[1871])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1497,7 +1498,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1870])
+#define kJB_SaverStart1 (JB_LUB[1872])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2741,9 +2742,9 @@ int SC_Targets__Init_();
 
 int SC_Targets__InitCode_();
 
-void SC_Targets__Set(JB_String* name);
-
 bool SC_Targets__SyntaxAccess(JB_String* name);
+
+void SC_Targets__SyntaxAccessSet(JB_String* name, bool Value);
 
 
 
@@ -5221,7 +5222,7 @@ bool JB_Flow_LoadPath(FlowControl* self, JB_String* path, bool IsPrev);
 
 FlowControl* JB_Flow__Alloc();
 
-FlowControlStopper JB_Flow__FlowAllow(JB_String* name, Date StartCode);
+FlowControlStopper JB_Flow__FlowAllow(JB_String* name, uint64 StartCode);
 
 int JB_Flow__Init_();
 
@@ -5230,8 +5231,6 @@ int JB_Flow__InitCode_();
 bool JB_Flow__InputStrings(Array* lines, JB_String* name);
 
 void JB_Flow__Input(JB_String* data, JB_String* name);
-
-FlowControlStopper JB_Flow__FlowStarter(JB_String* name, Date AppDate);
 
 FlowControl* JB_Flow__New();
 
@@ -8366,7 +8365,7 @@ bool JB_config_Save(Message* self);
 
 //// HEADER Inlines.h
 inline bool JB_int_OperatorInRange(int self, int d) {
-	iif (d > 0) {
+	if (d > 0) {
 		return (((uint)self) < ((uint)d));
 	}
 	return false;
@@ -8409,7 +8408,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 
 inline void SC_flat_AddExtended(ASMFuncState* self, Message* err, uint Bits) {
 	int B = 1 << 31;
-	iif (((bool)(Bits & B))) {
+	if (((bool)(Bits & B))) {
 		JB_Msg_SyntaxExpect(err, nil);
 		return;
 	}
