@@ -6,11 +6,11 @@
 * RefOpts?
 * Speedie should set the chown and chmod of files/folders generated... if it is being run from sudo. Set to an acceptable state.
 
-* fix the window.dispose refcount bug!!!
-	* make speedie disable "opt refcounts"? just add auto ref optimisation
-
+// personal
 * backup selftool and galaxxies... on git.
 
+// Do later
+* clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * Make logs hierarchical with timestamps
 * TextView error/find resync
@@ -20,6 +20,3 @@
 * too long text in listview draw as much as we can
 * First use of tab (in func) or () (to wrap) on opening perry doesn't work.
 
-* contact
-	* https://github.com/paypal/Checkout-PHP-SDK
-	* multiplay. find others on youtube, and discord
