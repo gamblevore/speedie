@@ -23,11 +23,7 @@ Date JB_Date__Create( u64 S, u64 NS ) {
 Date JB_Date__Now( ) {
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
-	#if __linux__
-		return JB_Date__Create(ts.tv_sec, ts.tv_nsec);
-	#else
-		return JB_Date__Create(ts.tv_sec, ts.tv_nsec);
-	#endif
+	return JB_Date__Create(ts.tv_sec, ts.tv_nsec);
 }
 
 
