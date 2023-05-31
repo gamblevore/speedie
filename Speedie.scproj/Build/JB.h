@@ -1287,13 +1287,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1866])
+#define kJB__ErrorColors_bold (JB_LUB[1865])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1867])
-#define kJB__ErrorColors_good (JB_LUB[1868])
-#define kJB__ErrorColors_normal (JB_LUB[1869])
-#define kJB__ErrorColors_underline (JB_LUB[1868])
-#define kJB__ErrorColors_warn (JB_LUB[1870])
+#define kJB__ErrorColors_error (JB_LUB[1866])
+#define kJB__ErrorColors_good (JB_LUB[1867])
+#define kJB__ErrorColors_normal (JB_LUB[1868])
+#define kJB__ErrorColors_underline (JB_LUB[1867])
+#define kJB__ErrorColors_warn (JB_LUB[1869])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1466,9 +1466,9 @@ extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
 #define kSC_BitAnd (JB_LUB[343])
-#define kSC_BitNot (JB_LUB[609])
-#define kSC_BitOr (JB_LUB[550])
-#define kSC_BitXor (JB_LUB[1871])
+#define kSC_BitNot (JB_LUB[605])
+#define kSC_BitOr (JB_LUB[546])
+#define kSC_BitXor (JB_LUB[1870])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1498,7 +1498,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1872])
+#define kJB_SaverStart1 (JB_LUB[1871])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2579,17 +2579,11 @@ int JB_Platform__Init_();
 
 int JB_Platform__InitCode_();
 
-bool JB_Platform__linux();
-
 void JB_Platform__Log(JB_String* s);
 
 void JB_Platform__OpenLog(JB_String* name);
 
-bool JB_Platform__OSX();
-
 int JB_Platform__PointerBytes();
-
-bool JB_Platform__windows();
 
 
 

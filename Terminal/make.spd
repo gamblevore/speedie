@@ -6,7 +6,7 @@
 
 main 
 	.gen("osx", platform.OSX)
-	.gen("linux", platform.linux)
+	.gen("linux", platform.lin)
 
 
 || Speedie = "/usr/local/speedie"

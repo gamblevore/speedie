@@ -518,13 +518,13 @@ extern JB_String* JB__App_codesign_native;
 extern Array* JB__App_OldArgs;
 
 extern bool JB__App_Unregistered;
-#define kJB__ErrorColors_bold (JB_LUB[374])
+#define kJB__ErrorColors_bold (JB_LUB[375])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[375])
-#define kJB__ErrorColors_good (JB_LUB[376])
-#define kJB__ErrorColors_normal (JB_LUB[377])
-#define kJB__ErrorColors_underline (JB_LUB[376])
-#define kJB__ErrorColors_warn (JB_LUB[378])
+#define kJB__ErrorColors_error (JB_LUB[376])
+#define kJB__ErrorColors_good (JB_LUB[377])
+#define kJB__ErrorColors_normal (JB_LUB[378])
+#define kJB__ErrorColors_underline (JB_LUB[377])
+#define kJB__ErrorColors_warn (JB_LUB[379])
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -574,7 +574,7 @@ extern JB_String* JB__JbinHeaderComp;
 extern JB_String* JB__jBinNotJbin;
 extern Dictionary* JB__SyxDict_;
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[379])
+#define kJB_SaverStart1 (JB_LUB[380])
 extern JB_ErrorReceiver* JB_StdErr;
 extern Syntax JB_SyxAcc;
 extern Syntax JB_SyxAdj;
