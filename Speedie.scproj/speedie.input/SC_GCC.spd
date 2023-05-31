@@ -163,8 +163,19 @@ function MacBothArch (|[string]| r)
 	r.appendwords( "-arch x86_64 -arch arm64 -mmacosx-version-min=11.0" )
 
 
+function HasType (|[File]| CppList, |string| Type, |bool|)
+	opt norefcounts
+	for f in CppList
+		if f isa Type
+			return true
+
 function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Type, |[string]|)
+	require .HasType(cpplist, type)
 	rz.AppendWords( Product )
+
+	for f in CppList
+		if f isa Type
+			rz <~ f
 
 	|| cmode = "-std=gnu++17 "
 	if Type == "m" or "o" or "mm"
@@ -195,6 +206,8 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 	rz.AppendWords( "-finput-charset=UTF-8 -fextended-identifiers" )
 	rz.AppendWords( " -fno-strict-aliasing  -fvisibility=hidden  -fvisibility-inlines-hidden" )
 	rz.AppendWords( Linkage[Platform.name] )
+	if platform.linux
+		rz.appendwords( " -lrt" )
 	
 	// Gaming64Bit
 	rz.AppendWords("-ffast-math")
@@ -227,29 +240,15 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 		if (opt >= 2)
 			rz.AppendWords( " -flto " )
 
+	if options.ProjectIsMiniLib
+		rz.appendwords( "-D AS_LIBRARY=1" )
 
 	// Headers
 	|| cppl = .CppLib
 	|| cbf = Compiler.BuildFolder
 	|| cgcf = compiler.generatedcppsfolder
-	expect (cppl and cbf and cgcf) ("Memory corruption error! Strings seem corrupted?") // sigh
 		
-	if options.ProjectIsMiniLib
-		rz.appendwords( "-D AS_LIBRARY=1" )
 	rz.AppendWords( "   -D TARGET_UNIX=1 -D __SPEEDIE__=1  -I $cppl  -I $cbf -I $cgcf  " )
-
-	|| NoASM = !asm.needed
-	|| GotAny = false
-	for f in CppList
-		if f isa Type
-			rz <~ f
-			Gotany = true
-	
-	if platform.linux
-		rz.appendwords( " -lrt" )
-	
-	if !GotAny				// Disabled
-		rz.clear
 	
 
 
