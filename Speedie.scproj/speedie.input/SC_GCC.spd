@@ -42,7 +42,7 @@ function ProductSuffix (|String|)
 	require Options.ProjectIsLibrary
 	if platform.osx
 		return ".dylib"
-	if platform.windows
+	if platform.win
 		return ".lib"
 	return ".so"
 	
@@ -206,7 +206,7 @@ function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Typ
 	rz.AppendWords( "-finput-charset=UTF-8 -fextended-identifiers" )
 	rz.AppendWords( " -fno-strict-aliasing  -fvisibility=hidden  -fvisibility-inlines-hidden" )
 	rz.AppendWords( Linkage[Platform.name] )
-	if platform.linux
+	if platform.lin
 		rz.appendwords( " -lrt" )
 	
 	// Gaming64Bit

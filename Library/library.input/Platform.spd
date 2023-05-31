@@ -30,13 +30,13 @@ module Platform
 		if .CPU_Spd:   return "spd"
 
 	function OSX (|bool|)
-		return .name=="osx" or "mac"
+		cpp_wrapper JB_Platform__OSX
 
-	function linux (|bool|)
-		return .name=="lin"
+	function Lin (|bool|)
+		cpp_wrapper JB_Platform__LIN
 
-	function windows (|bool|)
-		return .name=="win"
+	function Win (|bool|)
+		cpp_wrapper JB_Platform__WIN
 
 	function IsDebug (|bool|)
 		cpp_Wrapper JB_IsDebug

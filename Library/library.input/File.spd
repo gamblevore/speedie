@@ -487,9 +487,9 @@ class File (String)
 		function TrashPath (|string|)
 			if platform.OSX
 				return "~/.Trash/"
-			if platform.windows
+			if platform.win
 				return `C:\$Recycle.Bin`
-			if platform.linux
+			if platform.lin
 				return "~/.local/share/Trash"
 
 		function AppPrefs (|string|name = "", |string|)
@@ -508,9 +508,9 @@ class File (String)
 		function PreferencesPath (|string|)
 			if platform.osx
 				return "~/Library/Preferences"
-			if platform.windows
+			if platform.win
 				return "~\AppData\Roaming" // whatever
-			if platform.linux
+			if platform.lin
 				return "~/.config"
 			
 		function Trash (|string|name="", |file|)

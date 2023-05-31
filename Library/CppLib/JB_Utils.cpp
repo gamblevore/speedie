@@ -118,17 +118,27 @@ int JB_Platform__CPU() {
 	return __CPU_TYPE__;
 }
 
+uint JB_Platform__OSX() {
+	return __PLATFORM_CURR__ == __PLATFORM_OSX__;
+}
+uint JB_Platform__Win() {
+	return __PLATFORM_CURR__ == __PLATFORM_WIN__;
+}
+uint JB_Platform__Lin() {
+	return __PLATFORM_CURR__ == __PLATFORM_LINUX__;
+}
+
 JB_String* JB_Platform() {
     static JB_String* Plat = 0;
     if (Plat) {
         return Plat;
     }
     
-    #if defined(__APPLE__) && defined(__MACH__)
+    #if __PLATFORM_CURR__ == __PLATFORM_OSX__
         Plat = JB_StrC("osx");
-    #elif __unix__
+    #elif __PLATFORM_CURR__ == __PLATFORM_LINUX__
         Plat = JB_StrC("lin");
-    #elif __WIN32__
+    #elif __PLATFORM_CURR__ == __PLATFORM_WIN__
         Plat = JB_StrC("win");
     #endif
     

@@ -68,9 +68,9 @@ function message.TargetTest (|bool|) // target true, target false,
 	if self ~= "osx"
 		return Platform.osx
 	if self ~= "win"
-		return Platform.windows
+		return Platform.win
 	if self ~= "lnx"
-		return Platform.linux
+		return Platform.lin
 	if self ~= "direct"
 		return options.IsDirectTest
 	return targets[.name]

@@ -2,6 +2,9 @@
 
 extern "C" {
     JB_String* JB_Platform();
+	uint JB_Platform__OSX();
+	uint JB_Platform__Win();
+	uint JB_Platform__Lin();
     int JB_Platform__CPU();
     bool JB_IsLibrary();
     Array* JB_App__Args();
