@@ -111,7 +111,7 @@ extend_module perry
 		return f
 
 
-	function FindSpeedyRoot (|string| In, |string|)
+	function FindSpeedieRoot (|string| In, |string|)
 		|| paths = in.parent
 		|| srch = "/speedie/"
 		|| found = paths.find(srch, 0, int.max, true)
@@ -127,7 +127,7 @@ extend_module perry
 		|| dest_path = where.linksto
 			|| result = dest_path.executestr(["--alive"]).trim
 			if result contains "seems alive :)"
-				return .FindSpeedyRoot(dest_path)
+				return .FindSpeedieRoot(dest_path)
 
 
 	function TestShell (|string|)
