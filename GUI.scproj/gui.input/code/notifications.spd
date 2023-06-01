@@ -69,6 +69,11 @@ module Notifications
 		if err.path
 			s += "\n\"" + err.path + "\""
 		.txt.text = s 
+		if err.IsError
+			printerror s
+		  else
+			printline s
+
 
 	function Draw
 		opt norefcounts
