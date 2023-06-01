@@ -1801,8 +1801,8 @@ Dictionary* JB_EnvC(const char** self) {
             (JB_Dict_ValueSet(D, Before, After));
             JB_FreeIfDead(Before);
             JB_FreeIfDead(After);
-            JB_FreeIfDead(S);
         }
+		JB_FreeIfDead(S);
     };
     return D;
 }
