@@ -11,7 +11,6 @@
 // Do later
 * clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
-* Make logs hierarchical with timestamps
 * TextView error/find resync
 * double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
 * Find-replace!
