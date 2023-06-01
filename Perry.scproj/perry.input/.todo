@@ -4,7 +4,6 @@
 
 * VM?
 * RefOpts?
-* Speedie should set the chown and chmod of files/folders generated... if it is being run from sudo. Set to an acceptable state.
 
 // personal
 * backup selftool and galaxxies... on git.

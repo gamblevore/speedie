@@ -18,7 +18,6 @@ JBClass( JB_File, JB_StringShared,
 
 
 int JB_File__RelaxSudo(int Active);
-int JB_File__RelaxPath(JB_String* Path);
 JB_String* JB_File__FileData( JB_String* Path );
 int JB_File_WritePng(void* file, int w, int h, const void *data);
 unsigned char* JB_LoadImage(unsigned char* data, int len, int* x, int* y, int* comp, int req_comp);

@@ -127,7 +127,7 @@ extern "C" {
 JBClassPlace( JB_File,          JB_File_Destructor,    JB_AsClass(JB_StringShared),      JB_File_Render );
 
 
-int SudoRelax = 0;
+int SudoRelax = 1;		// seems actually preferable for MOST tools. To NOT write root files.
 int CrashLogFile = 0;
 extern const char* JB_CrashLogFileName;
 
@@ -205,33 +205,67 @@ static const char* GetRealUser_() {
 }
 
 
-int JB_File__RelaxPath(JB_String* self) {
-	require (self and SudoRelax > 0);
-
-    uint8 Buffer[1024];
-    auto Path = (const char*)JB_FastCString(self, Buffer);
-	auto Action = "chmod";
-	bool IsLink = JB_File_IsLink(self);
-	int Err = chmod(Path, kDefaultMode);
-	if (IsLink)
-		Err = lchmod(Path, kDefaultMode);
-	if (!Err) {
-		Err = -1; // assume an error until everything passed
-		Action = "getlogin";
-		auto U = GetRealUser_();
-		if (U) { Action = "getpwnam";
-			auto pwd = getpwnam(U);
-			if (pwd) {
-				Action = "chown";
-				Err = chown(Path, pwd->pw_uid, pwd->pw_gid);
-				if (IsLink) 
-					Err = lchown(Path, pwd->pw_uid, pwd->pw_gid);
-			}
-		}
+static int SmartGetUID (int &G, int &U, JB_String* ErrPath) {
+	if (geteuid()) {
+		return -1; // no need? everything is hunkydory.
 	}
+	
+	// we are probably root.
+	auto Name = GetRealUser_();
+	if (!Name) {
+		return -1; // OK so we can't find the real user's name. That is a fail.
+	}
+	
+	auto pwd = getpwnam(Name);
+	if (pwd) {
+		G = pwd->pw_gid;
+		U = pwd->pw_uid;
+		return 1;
+	}
+	return -1; // failed?
+}
+
+
+static bool IsLink_(const char* Path) {
+	struct _stat st;
+	auto s = lstat( Path, &st );
+	return (s == 0) and S_ISLNK(st.st_mode);
+}
+
+
+static int RelaxPath_(const char* Path, bool NeedsMode, JB_String* ErrPath) {
+	require (SudoRelax > 0);
+	static int ChangeOwner;
+	static int GID;
+	static int UID;
+		
+	if (ChangeOwner == 0) {
+		ChangeOwner = SmartGetUID(GID, UID, ErrPath);
+	}
+	if (!NeedsMode and ChangeOwner < 0) {
+		return 0;
+	}
+	
+	int			Err = 0;
+	const char* Action = 0;
+	bool		IsLink = IsLink_(Path);
+
+	if (NeedsMode) {
+		Action = "chmod";
+		Err = chmod(Path, kDefaultMode);
+		if (IsLink)
+			Err = lchmod(Path, kDefaultMode);
+	}
+	
+	if (!Err and ChangeOwner > 0) {
+		Err = chown(Path, UID, GID);
+		if (IsLink) 
+			Err = lchown(Path, UID, GID);
+	}
+	
 	if (Err == ENOENT)
 		return 0; // no need to relax a file that doesn't exist
-	return (int)ErrorHandle_(Err, self, nil, Action);
+	return (int)ErrorHandle_(Err, ErrPath, nil, Action);
 }
 
 
@@ -254,9 +288,8 @@ int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
 		FD = open( CPath,  Flags,  kDefaultMode );
 
     if (FD >= 0) {
-		if (Flags & (O_ACCMODE|O_CREAT)) {
-			JB_File__RelaxPath(Path);
-		}
+		if (Flags & O_CREAT)
+			RelaxPath_(CPath, false, Path);
         return FD;
 	}
     
@@ -636,7 +669,7 @@ int JB_Str_MakeDir(JB_String* self) {
     if (err == -1 and errno == EEXIST)
 		return 0;
     if (!err)
-		return JB_File__RelaxPath(self);
+		return RelaxPath_(tmp, true, self);
     return (int)ErrorHandle_(err, self, nil, "creating a folder");
 }
 
@@ -810,7 +843,7 @@ int JB_Str_SymLink( JB_StringC* Existing, JB_String* ToCreate ) {
 			}
 		}
 		if (!Err) {
-			JB_File__RelaxPath(ToCreate); // needed on MacOSX but not linux!
+			RelaxPath_(Created, true, ToCreate); // needed on MacOSX but not linux!
 		} 
 	}
 	return (int)ErrorHandle_(Err, ToCreate, Existing, "linking");
@@ -1023,10 +1056,7 @@ bool JB_File_DataSet( JB_File* self, JB_String* Data ) {
 	int N = JB_File_Write(self, Data);
 	if (!WasOpen)
 		JB_File_Close(self);
-	if (N == JB_Str_Length(Data))
-		return true;
-	debugger; // why?
-	return false;
+	return (N == JB_Str_Length(Data));
 }
 
 JB_File* JB_File__NewPipe(int Pipe) {
@@ -1132,8 +1162,9 @@ void* JB_File_IPC (JB_File* self, int* np) {
 		Try = "shm_open";
 		printf("shm_opening: %s\n", self->Addr);
 		FD = shm_open((const char*)self->Addr, Mode, S_IRUSR|S_IWUSR);
-		JB_File__RelaxPath(self);
+		//JB_File__RelaxPath(self); // no need... it doesn't exist on the file-system
 	}
+	
 	if (FD >= 1) {
 		self->Descriptor = FD;
 		self->MyFlags = (int)Srv;
