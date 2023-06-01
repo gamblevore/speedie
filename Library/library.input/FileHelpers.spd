@@ -15,7 +15,7 @@ extend String
 	function FileGlob (|[file]|)
 		expect !(self contains "**") ("Can't glob '**' in: " + self)
 		for L.lines in self
-			|| fixed = L.PathFix.TrimTrailingSlashes
+			|| fixed = L.TrimTrailingSlashes(true)
 			"".FileGlobSub(fixed / '/', rz)
 
 /*
@@ -86,15 +86,16 @@ extend String
 	function FileSize (|int64|)
 		|| f = .file
 		return f.size
-		
+	
+	
 	function MakeEntirePath (|bool|Last=true, |ErrorInt|)
 		visible class~file
-		|| p = Self
-		if !last: p = .parent
+		|| p = (self, .parent)(last)
+		
 		for S.Paths in p
 			|| err = S.MakeDir|int|
 				rz = err
-				exit
+				exit		
 		
 	function PathDir (|string|)
 		if self and .last != '/'
@@ -127,9 +128,9 @@ extend String
 			return .trimext
 		return self
 			
-
-	function TrimTrailingSlashes (|string|)
-		return self[0, .FindTrailingSlashes]
+	function TrimTrailingSlashes (|bool|Pathfix = false, |string|)
+		|| p = (.pathfix, self)(pathfix)
+		return p[0, p.FindTrailingSlashes]
 	
 	function FindTrailingSlashes (|int|)
 		rz = .Length
@@ -141,7 +142,7 @@ extend String
 		cpp_wrapper JB_Str_ResolvePath
 		
 	helper Normalise (|string|)
-		return .pathfix.TrimTrailingSlashes.lowercase
+		return .TrimTrailingSlashes(true).lowercase
 	
 	Operator PathMatch (|string| path, |bool|)
 		return .Normalise == path.Normalise
@@ -288,25 +289,26 @@ extend String
 		|| before = .find('/', last, 0)+1
 		return self[before...]
 
-	
+
+	function String.FindSlash (|int| from, |ind|)
+		if from < .length
+			rz = .find('/', from)
+			if !rz
+				rz = .length		
+			
 	function CopyFileTo (|String| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		return .file.copyto(dest.file, attronly)
 	
-
 // "/a/b/c" becomes "/a", "/a/b", "/a/b/c"
 // "a/b/c"  becomes "a",  "a/b",  "a/b/c"
 
 	iterator Paths
-		|| P = .pathfix.TrimTrailingSlashes
-		|| i = 1
-		|| N = P.Length
+		|| P = .TrimTrailingSlashes(true)
+		|| i = p.FindSlash(1)
 
-		while (i <= N)
-			if (i < N) and (P[i] != '/')
-				continue
-
+		while i > 0
 			yield P[0, i]
-			i++
+			i = p.FindSlash(i+1)
 
 
 
