@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <poll.h>
 #include <termios.h>    // struct termios, tcgetattr(), tcsetattr()
+#include <pwd.h>
 
 #if __linux__
 	#include <sys/mman.h>
@@ -119,11 +120,16 @@ extern "C" {
 #endif
 
 
-#define kDefaultMode (S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)
+#define kDefaultMode (0775)
 
 extern "C" {
 
 JBClassPlace( JB_File,          JB_File_Destructor,    JB_AsClass(JB_StringShared),      JB_File_Render );
+
+
+int SudoRelax = 0;
+int CrashLogFile = 0;
+extern const char* JB_CrashLogFileName;
 
 
 int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation);
@@ -157,7 +163,7 @@ inline uint8* JB_FastFileThing( JB_File* S) {
 	return S->Addr;
 }
 
-int64 ErrorHandleStr_(int64 MaybeErr, JB_String* self, JB_String* other, const char* Operation) {
+int64 ErrorHandle_(int64 MaybeErr, JB_String* self, JB_String* other, const char* Operation) {
     if (MaybeErr >= 0) {
         return MaybeErr;
     }
@@ -166,30 +172,93 @@ int64 ErrorHandleStr_(int64 MaybeErr, JB_String* self, JB_String* other, const c
 }
 
 
-int64 ErrorHandle_(int64 MaybeErr, JB_File* self, JB_File* other, const char* Operation) {
-    return ErrorHandleStr_(MaybeErr, self, other, Operation);
+
+int JB_File__RelaxSudo(int Active) {
+	SudoRelax += Active;
+	return SudoRelax;
+}
+
+
+static bool IsRootOrBad_ (const char* C) {
+	if (!C or strlen(C) == 0) {
+		return true;
+	}
+	if (strcmp(C, "root") == 0) {
+		return true;
+	}
+	return false;
+}
+
+
+static const char* GetRealUser_() {
+	auto C = getenv("SUDO_USER");
+	if (IsRootOrBad_(C)) {
+		C = getenv("LOGNAME");
+		if (IsRootOrBad_(C)) {
+			C = getlogin();
+			if (IsRootOrBad_(C)) {
+				return 0;
+			}
+		}
+	}
+	return C;
+}
+
+
+int JB_File__RelaxPath(JB_String* self) {
+	require (self and SudoRelax > 0);
+
+    uint8 Buffer[1024];
+    auto Path = (const char*)JB_FastCString(self, Buffer);
+	auto Action = "chmod";
+	bool IsLink = JB_File_IsLink(self);
+	int Err = chmod(Path, kDefaultMode);
+	if (IsLink)
+		Err = lchmod(Path, kDefaultMode);
+	if (!Err) {
+		Err = -1; // assume an error until everthing passed
+		Action = "getlogin";
+		auto U = GetRealUser_();
+		if (U) { Action = "getpwnam";
+			auto pwd = getpwnam(U);
+			if (pwd) {
+				Action = "chown";
+				Err = chown(Path, pwd->pw_uid, pwd->pw_gid);
+				if (IsLink) 
+					Err = lchown(Path, pwd->pw_uid, pwd->pw_gid);
+			}
+		}
+	}
+	if (Err == ENOENT)
+		return 0; // no need to relax a file that doesn't exist
+	return (int)ErrorHandle_(Err, self, nil, Action);
 }
 
 
 int JB_Str_MakeEntirePath(JB_String* self, bool Last);
-bool MakeParentPath_ (JB_String* s) {
+bool RetryMakePath (JB_String* s) {
 	int Err = errno;
 	if (Err != ENOENT)
 		return false;
-	return !JB_Str_MakeEntirePath(s, false);
+	Err = JB_Str_MakeEntirePath(s, false);
+	return (!Err);
 }
 
 
 int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
     NativeFileChar2* CPath = (NativeFileChar2*)JB_FastFileThing( Path );
-
+	
     Flags |= O_Win32Sucks |  O_CLOEXEC; // mostly we dont want this... just for shm
     int FD = open( CPath,  Flags,  kDefaultMode );
-    if (FD < 0  and  Flags&O_CREAT  and  MakeParentPath_(Path))
+    if (FD < 0  and  Flags&O_CREAT  and  RetryMakePath(Path))
 		FD = open( CPath,  Flags,  kDefaultMode );
 
-    if (FD >= 0)
+    if (FD >= 0) {
+		if (Flags & (O_ACCMODE|O_CREAT)) {
+			JB_File__RelaxPath(Path);
+		}
         return FD;
+	}
     
     if ((errno == ENOENT) and AllowMissing)
         return -2;// ignore it...
@@ -213,7 +282,7 @@ bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
 	}					// So we need to refill this.
 
 	if (errno != ENOENT)
-		ErrorHandleStr_(err, self, nil, "getting info on");
+		ErrorHandle_(err, self, nil, "getting info on");
 	return false;
 }
 
@@ -286,7 +355,7 @@ int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
 }
 
 
-int InterWrite(int fd, uint8* buffer, int N) {
+static int InterWrite(int fd, uint8* buffer, int N) {
     int TotalCount = 0;
     while (N > TotalCount) {
         int written = (int)write(fd, buffer+TotalCount, N-TotalCount);
@@ -303,7 +372,7 @@ int InterWrite(int fd, uint8* buffer, int N) {
 // this function does what the C++ read function SHOULD do.
 // returns errno, and errno > 0
 // so when we set Error to -1 or -2, its clear that it is not a number from errno. basically, not an error.
-int InterRead (int fd, unsigned char* buffer, int N, JB_String* ErrorPath, int& Error, int Mode) {
+static int InterRead (int fd, unsigned char* buffer, int N, JB_String* ErrorPath, int& Error, int Mode) {
     int Total = 0;
 	Error = 0;
     do {
@@ -340,7 +409,7 @@ int InterRead (int fd, unsigned char* buffer, int N, JB_String* ErrorPath, int& 
     if (!ErrorPath and isatty(fd))
         JB_ErrorHandleFileC(ttyname(fd), Error, "reading");
       else
-        ErrorHandleStr_( -1, ErrorPath, nil, "reading" );
+        ErrorHandle_( -1, ErrorPath, nil, "reading" );
     
     return Total;
 }
@@ -372,7 +441,7 @@ int JB_App__GetChar() {
 	return c;
 }
 
-int InterPipe(FastString* self, int Desired, int fd, int Mode) {
+static int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 	uint8* Buffer = JB_FS_WriteAlloc_(self, Desired);
 	int Error = -1;
 	int N = 0;
@@ -385,8 +454,6 @@ int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 }
 
 
-int CrashLogFile = 0;
-extern const char* JB_CrashLogFileName;
 void JB_Rec__CrashLog(const char* c) {
 	if (!c) return;
 	fputs(c, stderr);
@@ -396,6 +463,7 @@ void JB_Rec__CrashLog(const char* c) {
 		mkdir("/tmp/logs", kDefaultMode);
 		int flags = O_RDWR | O_CREAT | O_TRUNC;
 		CrashLogFile = open(JB_CrashLogFileName, flags, kDefaultMode);
+		chmod(JB_CrashLogFileName, 777);
 	}
 	if (!CrashLogFile) return;
 
@@ -568,38 +636,15 @@ int JB_File_OpenBlank( JB_File* self ) {
 	return JB_File_Open( self, O_RDWR | O_CREAT | O_TRUNC, false );
 }
 
-
-bool FileNameIs (const char* tmp, const char* match) {
-	char buff[1000];
-	int nw = 0;
-	int nr = 0;
-	while (1) {
-		char s = tmp[nr++];
-		if (s>='A' and s <= 'Z')
-			s+=32;
-		buff[nw++] = s;
-		if (!s) break;
-		if (s=='/' or s == '.')
-			nw = 0;
-	};
-	if (strcmp(buff, match) == 0) {
-		return true;
-	} 
-	
-	return false;
-}
-
-
 int JB_Str_MakeDir(JB_String* self) {
     uint8 Buffer[1024];
     NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileString( self, Buffer );
-    if ( FileNameIs(tmp, "h") or FileNameIs(tmp, "cpp")  or FileNameIs(tmp, "txt") )
-		debugger; // what?
     int err = mkdir(tmp, kDefaultMode);
-    if (err == -1 and errno == EEXIST) {
-        return 0; // ignore. really. I don't need this.
-    }
-    return (int)ErrorHandleStr_(err, self, nil, "creating a folder");
+    if (err == -1 and errno == EEXIST)
+		return 0;
+    if (!err)
+		return JB_File__RelaxPath(self);
+    return (int)ErrorHandle_(err, self, nil, "creating a folder");
 }
 
 
@@ -610,7 +655,7 @@ int JB_File_Delete (JB_String* self) {
     if (err == -1 and errno == ENOENT) {
         return 0;
     }
-    return (int)ErrorHandleStr_(err, self, nil, "deleting");  // handle error
+    return (int)ErrorHandle_(err, self, nil, "deleting");  // handle error
 }
 
 
@@ -729,7 +774,7 @@ void JB_File_CloseSub ( JB_File* self ) {
 	self->Descriptor  = -1;
 	self->OpenMode = 0;
     if (R >= 0)
-		ErrorHandleStr_(close( R ), self, nil, "closing");
+		ErrorHandle_(close( R ), self, nil, "closing");
 }
 
 void JB_File_Close ( JB_File* self ) {
@@ -748,7 +793,7 @@ int JB_File_ModeSet( JB_File* self, int Mode ) {
     require (self);
 	auto C = (const char*)JB_FastFileThing(self);
 	int Err = chmod(C, Mode);
-	return (int)ErrorHandleStr_(Err, self, nil, "setting permissions");
+	return (int)ErrorHandle_(Err, self, nil, "setting permissions");
 }
 
 
@@ -766,23 +811,25 @@ int JB_Str_SymLink( JB_StringC* Existing, JB_String* ToCreate ) {
 		Err	= symlink((const char*)(Existing->Addr), Created);
 		
 		if (Err and errno == ENOENT) {
-			if (MakeParentPath_(ToCreate)) {
+			Err = 1; // creates clearer error messages.
+			if (RetryMakePath(ToCreate)) {
 				Err = symlink((const char*)(Existing->Addr), Created);
-			} else {
-				Err = 0; // creates clearer error messages. 
 			}
 		}
+		if (!Err) {
+			JB_File__RelaxPath(ToCreate); // needed on MacOSX but not linux!
+		} 
 	}
-	return (int)ErrorHandleStr_(Err, ToCreate, Existing, "linking");
+	return (int)ErrorHandle_(Err, ToCreate, Existing, "linking");
 }
 
 
 bool JB_File_HardLinkTo( JB_File* self, JB_StringC* Link ) {
 	auto C	= ((const char*)JB_FastFileThing(self));
     int Err	= link(C, (const char*)(Link->Addr));
-    if (Err and MakeParentPath_(Link))
+    if (Err and RetryMakePath(Link))
 		Err = link(C, (const char*)(Link->Addr));
-	ErrorHandleStr_(Err, self, Link, "hardlinking");
+	ErrorHandle_(Err, self, Link, "hardlinking");
 	return !Err;
 }
 
@@ -860,16 +907,6 @@ Date JB_File_Created( JB_File* self ) {
 }
 
 
-bool JB_File_Create( JB_File* self ) {
-	if (JB_File_Exists(self, false))
-		return true;
-	if (JB_File_OpenBlank(self) < 0)
-		return false;
-	JB_File_Close(self);
-	return true; // OK so... check of it exists...
-}
-
-
 bool JB_File_Exists( JB_String* self, bool LinkExists ) {
 	if (LinkExists) {
 		struct _stat st;
@@ -881,7 +918,7 @@ bool JB_File_Exists( JB_String* self, bool LinkExists ) {
 	if (!err)
 		return true;
 	if (errno != ENOENT) {
-		ErrorHandleStr_(err, self, nil, "testing the existance of");
+		ErrorHandle_(err, self, nil, "testing the existance of");
 	}
 	return false;
 }
@@ -892,9 +929,9 @@ int JB_File_MoveTo(JB_File* self, JB_String* New) {
     uint8* SelfPath = JB_FastFileThing(self);
     uint8* NewPath  = JB_FastFileString(New,        Buffer2);
     int Err			= rename((const char*)SelfPath, (const char*)NewPath);
-    if (Err and MakeParentPath_(New))
+    if (Err and RetryMakePath(New))
 		Err = rename((const char*)SelfPath, (const char*)NewPath);
-    ErrorHandleStr_(Err, self, New, "moving");
+    ErrorHandle_(Err, self, New, "moving");
 //    if (!Err) // causes so many bugs
 //        JB_SetRef(self, New);
     return Err;
@@ -1029,7 +1066,7 @@ JB_File* JB_Str_File( JB_String* Path ) {
 long JB_File__chdir( JB_String* Path ) {
     uint8 Buffer1[1024];
 	long err = trchdir( (NativeFileChar2*)JB_FastFileString( Path, Buffer1 ) );
-	return ErrorHandleStr_(err, Path, nil, "calling chdir"); 
+	return ErrorHandle_(err, Path, nil, "calling chdir"); 
 }
     
 bool JB_File_MoveNext(JB_File* self) {
@@ -1063,7 +1100,7 @@ bool JB_File_IsDir (JB_File* self) {
 }
 
 
-bool JB_File_IsLink (JB_File* self) {
+bool JB_File_IsLink (JB_String* self) {
 	struct stat st = {};
 	return Stat_(self, &st, false) and S_ISLNK(st.st_mode);
 }
@@ -1079,7 +1116,7 @@ void* JB_File_IPC (JB_File* self, int* np) {
 		return 0;
 	}	
 	
-	MakeParentPath_(self);
+	JB_Str_MakeEntirePath(self, false);
 	int Mode = O_RDWR;
 	bool Srv = *np;
 	const char* Try = 0;
@@ -1100,7 +1137,9 @@ void* JB_File_IPC (JB_File* self, int* np) {
 	
 	if (!Err and FD < 0) {
 		Try = "shm_open";
+		printf("shm_opening: %s\n", self->Addr);
 		FD = shm_open((const char*)self->Addr, Mode, S_IRUSR|S_IWUSR);
+		JB_File__RelaxPath(self);
 	}
 	if (FD >= 1) {
 		self->Descriptor = FD;

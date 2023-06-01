@@ -29,13 +29,14 @@ function Compiler.PrintResults
 function compiler.ClearEnvs
 	// osx freaks out sometimes otherwise
 	for (v in app.env) (k)
-		if k ~!= "HOME" and "LOGNAME" and "PATH" and "PWD"
+		if k ~!= "HOME" and "LOGNAME" and "PATH" and "PWD" and "USER"
 			app.childenv(k) = nil
 
 
 function compiler.SetupEnv
 	opt norefcounts
 
+	file.relaxsudo(1)		// chowns created files/folders to not-root
 	FlowControl.FlowMode = FlowControl.Off // can enable via "log"	
 	error.AutoPrint = 1
 	.Clearenvs

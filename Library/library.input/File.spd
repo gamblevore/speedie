@@ -79,9 +79,6 @@ class File (String)
 	function Created (|Date|)
 		cpp_wrapper JB_File_Created
 
-	function Create (|bool|)
-		cpp_wrapper JB_File_Create
-
 	function Close
 		cpp_wrapper JB_File_Close
 	
@@ -462,7 +459,13 @@ class File (String)
 
 	module
 		|| DebugExecute = false
-
+		
+		helper RelaxSudo (|int| Amount = 0, |int|)
+			cpp_wrapper
+		
+		helper RelaxPath (|string| Path)
+			cpp_wrapper
+		
 		function SizeSorter (SorterComparer)
 			|| aa = a|file|.size
 			|| bb = b|file|.size

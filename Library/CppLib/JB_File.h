@@ -17,6 +17,8 @@ JBClass( JB_File, JB_StringShared,
 );
 
 
+int JB_File__RelaxSudo(int Active);
+int JB_File__RelaxPath(JB_String* Path);
 JB_String* JB_File__FileData( JB_String* Path );
 int JB_File_WritePng(void* file, int w, int h, const void *data);
 unsigned char* JB_LoadImage(unsigned char* data, int len, int* x, int* y, int* comp, int req_comp);
@@ -45,7 +47,7 @@ JB_String* JB_File_PathFix_(JB_String* S);
 JB_String* JB_File__Home();
 JB_String* JB_File_Path(JB_File* S);
 bool JB_File_IsDir (JB_File* self);
-bool JB_File_IsLink (JB_File* self);
+bool JB_File_IsLink (JB_String* self);
 void* JB_File_IPC (JB_File* self, int* n);
 void JB_munmap (void* mem, int64 n);
 int JB_Str_MakeDir(JB_String* self);
@@ -61,7 +63,6 @@ int JB_File_MoveTo(JB_File* self, JB_String* New);
 bool JB_File_Exists( JB_String* self, bool LinkExists );
 Date JB_File_Modified( JB_File* self );
 Date JB_File_Created( JB_File* self );
-bool JB_File_Create( JB_File* self );
 JB_String* JB_cPath_ReadAll (const char* path, bool AllowMissingFile, int MaxFile);
 
 long JB_File__chdir( JB_String* Path );
