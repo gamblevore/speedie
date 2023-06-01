@@ -67,7 +67,7 @@ function ClickedOpenFile (GUIaction)
 
 function ClickedCreateFile (GUIaction)
 	|| path = app.AskSave("",  "",  "New File",  "New")
-		if path.file.Create
+		if path.file.Data("")
 			ideaddproj(path)
 	perry.HideStartIfNeeded
 
