@@ -20,7 +20,7 @@ void JB_App__Beep(void) {
 }
 
 void JB_App__ShowURL (const char* Path) {
-	printf("Unimplemented request to show URL: %s\n", Path);
+	SDL_OpenURL(Path);
 }
 
 void JB_App__SetIcon(const char* Path) {
