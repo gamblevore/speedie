@@ -216,7 +216,7 @@ int JB_File__RelaxPath(JB_String* self) {
 	if (IsLink)
 		Err = lchmod(Path, kDefaultMode);
 	if (!Err) {
-		Err = -1; // assume an error until everthing passed
+		Err = -1; // assume an error until everything passed
 		Action = "getlogin";
 		auto U = GetRealUser_();
 		if (U) { Action = "getpwnam";
@@ -294,18 +294,11 @@ uint8* JB_FastCString( JB_String* Path, uint8* Tmp ) {
     }
 
 	uint8* Result = Path->Addr;
-	auto Cls = JB_ObjClass(Path); 
-    if (Cls==JB_AsClass(JB_StringC) or Cls==JB_AsClass(JB_File))
+    if (JB_Str_IsC(Path))
         return Result;
 
     if (N > 1023)
         N = 1023;
-	
-    if (!Tmp) {
-        debugger;
-        return 0;
-    }
-    
     Tmp[ N ] = 0;
     return (uint8*)CopyBytes( Result, Tmp, N );
 }
