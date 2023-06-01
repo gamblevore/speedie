@@ -629,12 +629,17 @@ function FileViewerCreateFile (GuiMenuEvent)
 		row = row.parent
 	|| l = row.location
 	|| f = l.file.UniqueChild("untitled")
-	if f and f.Data("")
+	if f and f.CreateEmpty
 		|| created = filerow(f.path, f.name) 
 		row <~ created
 		row.filesort
 		self|Fileviewer|.rename(created)
 		self|Fileviewer|.checksize
+
+
+function File.CreateEmpty (|bool|)
+	expect (!.exists) (self, "File already exists, can't create empty file here.")
+	return .data("")
 
 
 function FileViewerCopyPath (GuiMenuEvent)
