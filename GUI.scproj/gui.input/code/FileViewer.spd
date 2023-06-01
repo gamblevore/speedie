@@ -629,7 +629,7 @@ function FileViewerCreateFile (GuiMenuEvent)
 		row = row.parent
 	|| l = row.location
 	|| f = l.file.UniqueChild("untitled")
-	if f and f.create
+	if f and f.Data("")
 		|| created = filerow(f.path, f.name) 
 		row <~ created
 		row.filesort
