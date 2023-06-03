@@ -1138,7 +1138,7 @@ void* JB_File_IPC (JB_File* self, int* np) {
 	if (self->Descriptor >= 0) {
 		JB_ErrorHandleFile(self, nil, EISCONN, nil, "shm_open");
 		return 0;
-	}	
+	}
 	
 	JB_Str_MakeEntirePath(self, false);
 	int Mode = O_RDWR;
@@ -1161,9 +1161,7 @@ void* JB_File_IPC (JB_File* self, int* np) {
 	
 	if (!Err and FD < 0) {
 		Try = "shm_open";
-		printf("shm_opening: %s\n", self->Addr);
 		FD = shm_open((const char*)self->Addr, Mode, S_IRUSR|S_IWUSR);
-		//JB_File__RelaxPath(self); // no need... it doesn't exist on the file-system
 	}
 	
 	if (FD >= 1) {
@@ -1171,15 +1169,19 @@ void* JB_File_IPC (JB_File* self, int* np) {
 		self->MyFlags = (int)Srv;
 		if (Srv) {
 			*np = JB_Int_RoundUp(*np, getpagesize());
-			Try = "fcntl";
-			int fdflags = fcntl(FD, F_GETFD);
-			if (fdflags == -1)
-				Err = fdflags;
-			  else
-				Err = fcntl(FD, F_SETFD, fdflags &~ FD_CLOEXEC);
-			if (!Err) {
-				Try = "ftruncate";
-				Err = ftruncate(FD, *np);
+			if (!*np) {
+				JB_ErrorHandleFile(self, nil, -1, "No IPC size", Try);
+			} else {
+				Try = "fcntl";
+				int fdflags = fcntl(FD, F_GETFD);
+				if (fdflags == -1)
+					Err = fdflags;
+				  else
+					Err = fcntl(FD, F_SETFD, fdflags &~ FD_CLOEXEC);
+				if (!Err) {
+					Try = "ftruncate";
+					Err = ftruncate(FD, *np);
+				}
 			}
 		} else {
 			struct _stat st;
@@ -1188,6 +1190,9 @@ void* JB_File_IPC (JB_File* self, int* np) {
 				*np = (int)st.st_size;
 				if (!JB_LibIsThreaded()) 
 					dup2(FD, SavedParentIPC); // store it... so restarted processes can pick it up again.
+				if (!*np) {
+					JB_ErrorHandleFile(self, nil, -1, "No IPC size", Try);
+				}
 			}
 		}
 		if (!Err and *np) {
@@ -1197,6 +1202,7 @@ void* JB_File_IPC (JB_File* self, int* np) {
 				return Result;
 		}
 	}
+	
     JB_ErrorHandleFile(self, nil, errno, nil, Try);
 #endif
 	return 0;
