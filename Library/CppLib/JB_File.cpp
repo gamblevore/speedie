@@ -1162,6 +1162,9 @@ void* JB_File_IPC (JB_File* self, int* np) {
 	if (!Err and FD < 0) {
 		Try = "shm_open";
 		FD = shm_open((const char*)self->Addr, Mode, S_IRUSR|S_IWUSR);
+		if (FD < 0 and !errno) {
+			puts("shm_open failed but did'nt set an errno");
+		}
 	}
 	
 	if (FD >= 1) {
