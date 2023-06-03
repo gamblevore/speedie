@@ -481,7 +481,7 @@ module Feedback
 		fs <~ " /path/to/project\n"
 		fs <~ "Installation: ${compiler.SpeedieProj.parent}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
-		fs <~ "  CanLog: "
+		fs <~ "  UberLog: "
 		fs <~ ("yes", "no")(platform.HasFlow)
 		for (v in appoptions) (k) 
 			(appoptions[k])("", "", fs_tester)
