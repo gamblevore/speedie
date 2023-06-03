@@ -81,6 +81,7 @@ module Perry
 
 
 	function Startup (GUIApplicationInit)
+		target lin: sdlapp.removeborder
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
 	
