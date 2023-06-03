@@ -15,6 +15,7 @@ module SDLApp
 	|f64|						FrameLength
 	|date|						OpenedFirst
 	|date|						LastFrameDate
+	|date|						LastWindowClose
 	|date|						SelSolidUntil
 	|date|						FixScreenBug
 	|date|						FastToolTipDate
@@ -27,7 +28,7 @@ module SDLApp
 	|bool|						WantsQuit
 	|bool|						IsQuitting
 	|bool|						AControlWasResized
-	|bool|						LastWasWindowClose
+	|bool|						LastWasKeyWindowClose
 	|bool|						TextInputEnabled
 	|bool|						TextInputEnabledAtStart
 	|bool|						LastFlashSelector
@@ -53,11 +54,14 @@ module SDLApp
 
 
 	
-	constants
-		kNothing = 1
-		kActivity = 2
-		kTryQuit = 4
-		kExiting = 8
+	flags
+		kNothing
+		kActivity
+		kTryQuit
+		kExiting
+		kWindowClose
+		kQuitEvent
+		kTerminating
 		
 	
 	
@@ -398,14 +402,7 @@ module SDLApp
 
 	helper FastUpdate (|bool|)
 		return !.IsBackground or .DroppingInto
-		
-	helper FixKeyBugs
-		// not sure how to fix that one. or why its happening.
-//		if keys.has(keys.Lshift) and keys.has(keys.Rshift) and !keys.shift
-//			keys.RemoveKey(keys.lshift)
-//			keys.RemoveKey(keys.rshift) // this wouldn't work... we test for keys.shift anyhow.
-		
-		
+				
 	helper FrameAndEvents (|int|)		
 		.ClearAlerts
 		|| Occured = knothing
@@ -792,7 +789,16 @@ module SDLApp
 
 	function TryQuit (|int|reason=kTryQuit, |int|)
 		opt norefcounts
-		if .dialogisopen
+		if (reason == kQuitEvent)
+			|| w = .LastWindowClose.ago
+			if (w and w < 0.1s)// or sdlapp.AskNoQuit
+				return 0 // just block it. SDL is sending duplicate events
+		  elseif reason == kwindowclose
+			.LastWindowClose = date.now
+			if sdlapp.AskNoQuit
+				return 0
+		
+		if .DialogIsOpen
 			for w in window.opendialogs
 				w.cancelreturn
 			return 0
@@ -808,7 +814,8 @@ module SDLApp
 			.WantsQuit = false // sigh.
 
 
-	function TryClose (|int|)
+	function TryCloseFrontWindow (|int|)
+		.LastWindowClose = date.now
 		if !.DialogIsOpen
 			|| w = window.front
 			if w and w.close(kactivity)
@@ -827,8 +834,8 @@ module SDLApp
 
 	function CheckEvent (|&SDL_Event| ev, |int|)
 		visible
-		|| lwwc = .LastWasWindowClose
-		.LastWasWindowClose = false
+		|| KeyW = .LastWasKeyWindowClose
+		.LastWasKeyWindowClose = false
 		|| t = ev.type
 		 
 		if (t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND)
@@ -838,20 +845,20 @@ module SDLApp
 			return kActivity
 		
 		.keymod = .SDL_GetModState
-		.fixkeybugs
 		if  t is APP_TERMINATING
-			return .tryquit
+			return .tryquit(kTerminating)
 		
-		if (t is QUIT) and !lwwc
-			return .tryquit
+		if (t is QUIT)
+			return .tryquit(kQuitEvent)
 		
 		if  t is WINDOWEVENT
 			|| wev = ev.window
 			|| wt = wev.event
 			if (wt is CLOSE)
-				.LastWasWindowClose = true
-				return .TryClose // if we are clicking... it should be a quit, but cmd-w should be close.
-								 // how to tell which?
+				if keyw
+					return .TryCloseFrontWindow
+				  else
+					return .Tryquit(kWindowClose)
 			if (wt is RESIZED)
 				.NewSize = (wev.data1, wev.data2)
 				return kActivity
@@ -972,6 +979,10 @@ module SDLApp
 			if key.IsCancelled or .CanDrag >= 2
 				return kNothing
 			beep.OK = 1
+			
+			if (key is w) // checking for keys.cmd actually doesnt always work!!
+				.LastWasKeyWindowClose = true
+
 			if !w.openedmenu and !.AllowKeyDown(kev)
 				return kNothing
 			keys.AddKey(key)
