@@ -5,7 +5,7 @@
 * VM?
 * RefOpts?
 * Perry on Ubuntu?
-	* expecting ~/Speedie... but we are using /usr/local/speedie now
+	* empty extras being added to fileviewer
 	* firstproj isn't loading properly
 	* starts up with very small window
 	* invalid argument when un-memmap
