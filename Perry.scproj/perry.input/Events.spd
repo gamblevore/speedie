@@ -43,7 +43,7 @@ function PerryIDE.CreateProj (|file| proj)
 
 
 function ClickedOpenProj (GUIaction)
-	|| start		= "~/".Resolve.Child("Speedie")
+	|| start		= "~/".resolve
 	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project")	#require
 	|| better_path	= path.GetSpeedieProj("scproj")
 		IdeAddProj(better_path)
