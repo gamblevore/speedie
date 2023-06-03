@@ -286,7 +286,7 @@ module SDLApp
 			app.saveprefs
 
 
-	function CurrDisplaySize (|ivec2|)
+	function CurrDisplaySize (|ivec2|) // screensize
 		// we call the monitor a "display"
 		// and our SDL window we call it a "screen"
 		// cos we have sub-windows. They can't both be windows
@@ -347,7 +347,7 @@ module SDLApp
 		|| PrevSize = app.prefs["screen"].ivec4
 			s = PrevSize.size
 		  else
-			s = (800, 600)
+			s = .CurrDisplaySize
 		s = s min (2K, 2K) max (400, 200)
 		
 		.GUICheck
@@ -851,7 +851,8 @@ module SDLApp
 			|| wt = wev.event
 			if (wt is CLOSE)
 				.LastWasWindowClose = true
-				return .tryclose
+				return .TryClose // if we are clicking... it should be a quit, but cmd-w should be close.
+								 // how to tell which?
 			if (wt is RESIZED)
 				.NewSize = (wev.data1, wev.data2)
 				return kActivity
