@@ -1169,19 +1169,15 @@ void* JB_File_IPC (JB_File* self, int* np) {
 		self->MyFlags = (int)Srv;
 		if (Srv) {
 			*np = JB_Int_RoundUp(*np, getpagesize());
-			if (!*np) {
-				JB_ErrorHandleFile(self, nil, -1, "No IPC size", Try);
-			} else {
-				Try = "fcntl";
-				int fdflags = fcntl(FD, F_GETFD);
-				if (fdflags == -1)
-					Err = fdflags;
-				  else
-					Err = fcntl(FD, F_SETFD, fdflags &~ FD_CLOEXEC);
-				if (!Err) {
-					Try = "ftruncate";
-					Err = ftruncate(FD, *np);
-				}
+			Try = "fcntl";
+			int fdflags = fcntl(FD, F_GETFD);
+			if (fdflags == -1)
+				Err = fdflags;
+			  else
+				Err = fcntl(FD, F_SETFD, fdflags &~ FD_CLOEXEC);
+			if (!Err) {
+				Try = "ftruncate";
+				Err = ftruncate(FD, *np);
 			}
 		} else {
 			struct _stat st;
@@ -1190,9 +1186,6 @@ void* JB_File_IPC (JB_File* self, int* np) {
 				*np = (int)st.st_size;
 				if (!JB_LibIsThreaded()) 
 					dup2(FD, SavedParentIPC); // store it... so restarted processes can pick it up again.
-				if (!*np) {
-					JB_ErrorHandleFile(self, nil, -1, "No IPC size", Try);
-				}
 			}
 		}
 		if (!Err and *np) {
@@ -1200,7 +1193,13 @@ void* JB_File_IPC (JB_File* self, int* np) {
 			void* Result = mmap(0, *np, PROT_READ | PROT_WRITE, MAP_SHARED, FD, 0);
 			if (Result != MAP_FAILED)
 				return Result;
+			  else
+				puts("No mmap");
+		} else if (!*np) {
+			JB_ErrorHandleFile(self, nil, -1, "No IPC size", Try);
 		}
+	} else {
+		puts("No FD");
 	}
 	
     JB_ErrorHandleFile(self, nil, errno, nil, Try);
