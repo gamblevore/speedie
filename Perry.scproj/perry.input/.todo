@@ -5,11 +5,11 @@
 * VM?
 * RefOpts?
 * Perry on Ubuntu?
+	* first startup shouldn't have a wierd IDE with no doc... especially if you close the splash window
+	* First proj open seems to not have the projects tab visible?
 	* empty extras being added to fileviewer
-	* firstproj isn't loading properly
-	* starts up with very small window
 	* invalid argument when un-memmap
-	* i should have g++ install and libsdl2-dev install on linux
+	* install g++, libsdl2-dev, gedit
 
 // personal
 * backup selftool and galaxxies... on git.
