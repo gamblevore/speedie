@@ -1,7 +1,7 @@
 
 
 || Speedie = "/usr/local/bin/speedie"
-|| CppCompiler = "/usr/bin/clang"
+|| CppCompiler = "/usr/bin/g++"
 
 
 module Perry
@@ -16,9 +16,15 @@ module Perry
 	
 	function SpeedieDir (|string|)
 		opt norefcounts
-		._SpeedieDir := .MakeSpeedieDir
-		._SpeedieDir := "/usr/local/speedie".resolve
-		return ._SpeedieDir := "~/Speedie".PathFix
+		if ._SpeedieDir
+			return ._SpeedieDir
+		._SpeedieDir = .MakeSpeedieDir(true)
+		if ._SpeedieDir
+			return ._SpeedieDir
+		._SpeedieDir = "/usr/local/speedie"
+		if !._SpeedieDir.resolve
+			"/usr/local/speedie didn't resolve?"
+		return ._SpeedieDir
 	
 	
 	function AnyActive (|bool|)
@@ -339,5 +345,3 @@ function FileListersInside (|guicontrol| dest)
 	dest <~ .functionmenu
 }
 
-
-		
