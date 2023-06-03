@@ -483,6 +483,8 @@ extend PerryIDE
 		.viewasproject
 		.ForceRecheck
 		app.saveprefs // for pref-file editing
+		.Show(false)
+		.ViewAsbetter
 		return true
 	
 	
