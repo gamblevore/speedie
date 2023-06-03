@@ -32,7 +32,7 @@ module SDLApp
 	|bool|						TextInputEnabled
 	|bool|						TextInputEnabledAtStart
 	|bool|						LastFlashSelector
-	|byte|						TouchCount=10 // draw the first few frames always
+	|byte|						TouchCount=4  // draw the first few frames always
 											  // helps with startup events! at least on osx
 	|byte|						SingleFrameNest
 	|byte|						TouchFingersDown
@@ -858,7 +858,7 @@ module SDLApp
 				if keyw
 					return .TryCloseFrontWindow
 				  else
-					return .Tryquit(kWindowClose)
+					return .TryQuit(kWindowClose)
 			if (wt is RESIZED)
 				.NewSize = (wev.data1, wev.data2)
 				return kActivity
