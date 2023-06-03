@@ -141,7 +141,7 @@ extend_module perry
 		|| where = .SpeedieDir.file
 		if !where.exists
 			return " * Install Speedie (compiler and libs).\n\n"
-		|| items = "GUI.scproj Image.scproj jeebox.scproj Library network Speedie.scproj Terminal" / ' '
+		|| items = "GUI.scproj Image.scproj jeebox.scproj Library network.scproj Speedie.scproj Terminal" / ' '
 		
 		for i in items
 			|| w = where[i]
