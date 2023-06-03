@@ -1199,7 +1199,7 @@ void* JB_File_IPC (JB_File* self, int* np) {
 			JB_ErrorHandleFile(self, nil, -1, "No IPC size", Try);
 		}
 	} else {
-		puts("No FD");
+		printf("No FD (%i)\n", FD);
 	}
 	
     JB_ErrorHandleFile(self, nil, errno, nil, Try);
