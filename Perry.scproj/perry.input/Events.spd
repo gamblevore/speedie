@@ -17,14 +17,6 @@ function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE|)
 	return ide
 
 
-function perryide.EmptyMainFile (|string| name, |string|)
-	return "
-
-// Basic empty file
-main
-	\"Hello $name!\"
-
-"
 
 
 function string.TrimProj (|string|)
@@ -33,12 +25,12 @@ function string.TrimProj (|string|)
 	return self
 
 
-function PerryIDE.CreateProj (|file| proj)
+function Perry.CreateProj (|file| proj)
 	expect (!proj.exists) (proj, "Can't create over existing project.")
 	|| main = proj.child("input/main.spd")
-	proj.child(".perry").write = TodoAndRootFiles.Roots
-	main.data = .EmptyMainFile(proj.trimextandpath)
-	proj.child("input/.todo").write = TodoAndRootFiles.Todo
+	proj.child(".perry").write = qqfiles.Roots
+	main.data = qqfiles.EmptyMainFile(proj.trimextandpath)
+	proj.child("input/.todo").write = qqfiles.Todo
 	IdeAddProj(proj)
 
 
@@ -55,7 +47,7 @@ function ClickedOpenProj (GUIaction)
 function ClickedCreateProj (GUIAction)
 	|| i = .ide
 	|| it = app.AskSave("scproj/",  "",  "New Project",  "Create")
-		i.CreateProj(it.file)
+		perry.CreateProj(it.file)
 	perry.HideStartIfNeeded
 
 

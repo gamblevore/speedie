@@ -40,9 +40,9 @@ module Perry
 
 
 	function CreateDefaultProject (|bool|)
-		|| s = .SpeedieDir.child("FirstProj.scproj").file
+		|| s = file.DocumentsFolder["FirstProj.scproj"]
 		if !s.Exists
-			.ide.CreateProj(s)
+			perry.CreateProj(s)
 			return true
 	
 	

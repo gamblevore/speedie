@@ -504,7 +504,7 @@ extend PerryIDE
 		f.FocusOn( f.start|filerow| )
 		
 		if !IsDir
-			conf = TodoAndRootFiles.Roots.parse
+			conf = qqfiles.Roots.parse
 		for p in .roots(conf)
 			f.addroot(p.file)
 		f.checksize
