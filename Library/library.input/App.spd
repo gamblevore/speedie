@@ -135,11 +135,14 @@ function CalledName (|string|)
 function TurnInto (|string| s, |[string]| R=nil, |errorint|)
 	cpp_Wrapper JB_App__TurnInto
 
+
 function ObjMemory (|int64|)
 	return JB_MemCount()
 
+
 function StringMemory (|int64|)
 	return Memory.used
+
 
 function pref_path (|string|)
 	rz = app.conf("prefs")$
