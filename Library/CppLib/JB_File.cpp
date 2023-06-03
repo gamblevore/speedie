@@ -1196,13 +1196,11 @@ void* JB_File_IPC (JB_File* self, int* np) {
 			void* Result = mmap(0, *np, PROT_READ | PROT_WRITE, MAP_SHARED, FD, 0);
 			if (Result != MAP_FAILED)
 				return Result;
-			  else
-				puts("No mmap");
-		} else if (!*np) {
-			JB_ErrorHandleFile(self, nil, -1, "No IPC size", Try);
 		}
-	} else {
-		printf("No FD (%i)\n", FD );
+	}
+	
+	if (!errno) { // what?
+		errno = -1; // whatever
 	}
 	
     JB_ErrorHandleFile(self, nil, errno, nil, Try);
