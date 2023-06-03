@@ -74,8 +74,8 @@ module Perry
 		|| extra = platform.isdebug or app.prefs..dev.Yes
 			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
 			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
-			appmenu <~ ("Show Preferences", ClickedShowPrefs)
 			//appmenu <~ ("Birds",			ClickedBirdsMenu)
+		appmenu <~ ("Edit Preferences", ClickedEditPrefs)
 		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
 		appmenu <~ ("Install",  		ClickedInstallMenu)
 
@@ -109,10 +109,6 @@ module Perry
 		for w in window.all
 			if w isa PerryIDE
 				return w
-
-	function Readjust
-		for i in .OpenProj
-			i.ViewAsbetter
 
 
 	function FindProj (|string| path, |message|)
