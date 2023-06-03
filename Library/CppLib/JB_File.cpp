@@ -1203,6 +1203,8 @@ void* JB_File_IPC (JB_File* self, int* np) {
 		errno = -1; // whatever
 	}
 	
+	printf("About to report error %i, %s\n", errno, strerror(errno));
+	// cos the func below does not print anything, on linux for some wierd reason.
     JB_ErrorHandleFile(self, nil, errno, nil, Try);
 #endif
 	return 0;
