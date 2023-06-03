@@ -347,8 +347,8 @@ module SDLApp
 		|| PrevSize = app.prefs["screen"].ivec4
 			s = PrevSize.size
 		  else
-			s = .CurrDisplaySize
-		s = s min (2K, 2K) max (400, 200)
+			s = (800, 600)
+		s = s min (2K, 2K) max (500, 400)
 		
 		.GUICheck
 		if !font.small
