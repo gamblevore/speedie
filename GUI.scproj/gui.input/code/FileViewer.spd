@@ -428,6 +428,8 @@ class FileViewer (ListView)
 
 
 	function AddExtra (|string| path, |filerow|)
+		if path isa "perry"
+			Notifications <~ app.StackTrace // how did we get here?
 		|| f = path.file
 		require f.mustexist
 		|| x = .extra
