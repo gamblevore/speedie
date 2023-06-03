@@ -127,7 +127,9 @@ class Process
 			return .origsize
 		.origsize = n
 		.orig = .talker.ipc(.origsize)|&byte|
-		if !.orig or (.orig|uint64| & 31)
+		if (.orig|uint64| & 31)
+			error (Self, "IPC-memory allocation not 32-aligned") // does it need to be?
+		if !.orig
 			debugger
 			error (self, "can't open ipc")
 			.orig = (&.dummy)|&byte|
@@ -734,5 +736,4 @@ struct IPCMessage
 		
 	function Debug (|string| msg)
 		printline "${msg} state: ${.datalength|int|}, ${.sendid|int|}, ${.readid|int|}, ${.state|int|}, ${.queued|int|}, ${.Special|int|}" 
-
 
