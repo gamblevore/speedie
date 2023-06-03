@@ -317,7 +317,8 @@ class Window (GUIControl)
 	function Close (|int| reason, |bool|)
 		if !sdlapp.wantsquit and (reason < sdlapp.ktryquit)
 			if window.DocumentWindows.length <= 1
-				if !"Quit this application?".confirm
+				|| q = "Quit " + app.AppName + "?"
+				if !q.confirm
 					.__CancelClose__(0)
 					return false
 				sdlapp.wantsquit = true
