@@ -519,7 +519,14 @@ class PerryIDE (Window)
 					if i <= 0
 						return w
 					i--
-			
+		
+		
+		function New (|string| path, |perryide|)
+			rz = perryide(false)
+			if rz
+				rz.LoadProject(path.file)
+		
+		
 		function EmptyBase (|perryide|)
 			opt norefcounts
 			for w in window.all
