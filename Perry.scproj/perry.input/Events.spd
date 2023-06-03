@@ -12,11 +12,7 @@ function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE|)
 	ide := PerryIDE.EmptyBase
 	ide := PerryIDE(false)
 	ide.LoadProject(path.file)
-	ide.Show(false)
-	perry.Readjust
 	return ide
-
-
 
 
 function string.TrimProj (|string|)
