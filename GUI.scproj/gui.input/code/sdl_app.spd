@@ -346,6 +346,8 @@ module SDLApp
 		app.PrefsInit(.openedfirst)
 		|| PrevSize = app.prefs["screen"].ivec4
 			s = PrevSize.size
+		  else
+			s = (800, 600)
 		s = s min (2K, 2K) max (400, 200)
 		
 		.GUICheck
@@ -356,11 +358,13 @@ module SDLApp
 
 		.InitWindow(s, .niceappname)
 		.scaling = 2 - (0.5*.ishighdpi)
-				
+		
 		.CheckQuarantine
 		app.regStartup
 		appmenu.InitAppMenu
 		.InitDelegates
+		if !PrevSize
+			.JB_SDL_FullScreen(.nativewindow)		
 		.StartedProperly = true
 		
 	
