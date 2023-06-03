@@ -1162,8 +1162,8 @@ void* JB_File_IPC (JB_File* self, int* np) {
 	if (!Err and FD < 0) {
 		Try = "shm_open";
 		FD = shm_open((const char*)self->Addr, Mode, S_IRUSR|S_IWUSR);
-		if (FD < 0 and !errno) {
-			puts("shm_open failed but did'nt set an errno");
+		if (FD < 0) {
+			printf("shm_open failed with error %i %s\n", errno, strerror(errno));
 		}
 	}
 	
@@ -1212,7 +1212,9 @@ void* JB_File_IPC (JB_File* self, int* np) {
 
 
 void JB_munmap (void* mem, int64 n) {
-	ErrorHandle_(munmap(mem, n), nil, nil, "un-memmap");
+	if (mem) {
+		ErrorHandle_(munmap(mem, n), nil, nil, "un-memmap");
+	}
 }
 
 
