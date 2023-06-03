@@ -4,6 +4,12 @@
 
 * VM?
 * RefOpts?
+* Perry on Ubuntu?
+	* expecting ~/Speedie... but we are using /usr/local/speedie now
+	* firstproj isn't loading properly
+	* starts up with very small window
+	* invalid argument when un-memmap
+	* i should have g++ install and libsdl2-dev install on linux
 
 // personal
 * backup selftool and galaxxies... on git.
