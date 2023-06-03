@@ -360,7 +360,6 @@ module SDLApp
 		.scaling = 2 - (0.5*.ishighdpi)
 		
 		.CheckQuarantine
-		app.regStartup
 		appmenu.InitAppMenu
 		.InitDelegates
 		if !PrevSize

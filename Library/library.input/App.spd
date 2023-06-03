@@ -5,7 +5,6 @@
 
 
 module App {
-|bool|						Unregistered 
 |[string]|					OldArgs = nil
 |message|					_Conf
 |config|					Prefs
