@@ -263,9 +263,8 @@ static int RelaxPath_(const char* Path, bool NeedsMode, JB_String* ErrPath) {
 			Err = lchown(Path, UID, GID);
 	}
 	
-	if (Err == ENOENT)
-		return 0; // no need to relax a file that doesn't exist
-	return (int)ErrorHandle_(Err, ErrPath, nil, Action);
+	// no need to create errors... 
+	return 0;
 }
 
 
@@ -1059,6 +1058,7 @@ bool JB_File_DataSet( JB_File* self, JB_String* Data ) {
 	return (N == JB_Str_Length(Data));
 }
 
+
 JB_File* JB_File__NewPipe(int Pipe) {
 	if (Pipe < 0) {
 		return nil;
@@ -1069,6 +1069,7 @@ JB_File* JB_File__NewPipe(int Pipe) {
 	F->MyFlags |= 2;
 	return F;
 }
+
 
 bool JB_File_IsPipe(JB_File* f) {
 	return f->MyFlags & 2;
