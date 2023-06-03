@@ -39,7 +39,7 @@ class ListView (GUIControl) {
 	|GUIKeyEvent|					OnKeyDown
 	|GUIListEvent|					OnReturn
 	|GUIListEvent|					CalculateColumnWidths
-	|GUIListEvent|					OnRightClick // god we need a lot of these... lol.
+	|GUIListEvent|					OnRightClick
 	|GUIPasteEvent|					OnPaste
 	|GUICopyEvent|					OnCopy
 	|GUIListDragEvent|				OnDragRow
