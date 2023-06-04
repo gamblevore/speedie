@@ -19,7 +19,6 @@ class ButtonView (GUIControl)
 	|bool|						PressingDone
 	|bool|						PressMakesLighter
 	|bool|						MouseDownDoesClick
-	|bool| 						TrimWidth
 	|bool| 						NoDrawClicked
 	|ListViewState|				Align
 
@@ -179,7 +178,7 @@ class ButtonView (GUIControl)
 				return 1
 		return 5
 
-
+	
 	function ivec4.TextCorner (|drawstyle| g, |string| T, |ListViewState|C, |ivec2|)
 		|| MV = (.height - g.height(t))-3
 		if C & ListViewState.aligncenter
@@ -268,9 +267,12 @@ class ButtonView (GUIControl)
 			.drawitem(where, R, grow, i)
 			R = R right W + .itemgap
 			loop r.x < where.width
-		w = r.x - rx1
-		if .TrimWidth
-			.sizer.g(2)	= (w) ~ long
+
+
+	function TrimWidth
+		|| n = .items.slowcount max 1
+		|| w = n * (.itemwidth + .itemgap) - .itemgap
+		.sizer.g(2)	= (w) ~ long
 
 
 	function OpenMenu (|listviewrow| row=nil, |bool|)

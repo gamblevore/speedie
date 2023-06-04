@@ -193,7 +193,7 @@ class ConfirmWindow_ (Window)
 
 function OnConfirmAnswer (GUIAction)
 	opt norefcounts
-	.window.CancelReturn
+	.window.ReturnValue = self // self isa button, not a window! (i made this mistake once)
 
 
 

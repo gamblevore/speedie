@@ -35,15 +35,15 @@ module Perry
 		
 		
 	function LoadWindows (|PerryIDE| r)
-		if !.LoadWindowsSub(r) and !.CreateDefaultProject
+		|| Loaded = .LoadWindowsSub(r)
+		
+		for path in app.args // load specified documents
+			if path.fileexists
+				perryide.new(path)
+				loaded = true
+				
+		if !Loaded
 			startupwindow.show
-
-
-	function CreateDefaultProject (|bool|)
-		|| s = file.DocumentsFolder["FirstProj.scproj"]
-		if !s.Exists
-			perry.CreateProj(s)
-			return true
 	
 	
 	function Save
@@ -81,21 +81,22 @@ module Perry
 
 
 	function Startup (GUIApplicationInit)
-		target lin: sdlapp.removeborder
+		target lin: sdlapp.removeborder // doesnt seem to work in Windows WSL?
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
 	
 		.Projects = (app.prefs)("lastproj")
 		
-		|| r = PerryIDE(false)
-		r.LoadState
-		r.ViewAsText
-		.LoadWindows(r)
+		|| i = PerryIDE(false)
+		i.LoadState
+		i.ViewAsText
+		.LoadWindows(i)
 		.BuildAppMenu
 		
 		|| old = app.Pref("currproj")
 		|| oof = (.FindProj(old),  .Projects.First)(old)
 			oof.ide.show(false)
+				
 
 
 	function OpenProj (|[PerryIDE]|)

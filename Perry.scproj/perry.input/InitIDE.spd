@@ -330,7 +330,6 @@ extend PerryIDE
 			|| pf = perry.projects.first 
 				 (pf is selected)
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
-			.TrimWidth = true
 
 		with .tabs2
 			.id = "CompileTabs"

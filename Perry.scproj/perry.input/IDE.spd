@@ -146,7 +146,9 @@ class PerryIDE (Window)
 		
 		if n >= 2 and reason < sdlapp.ktryquit
 			.RemoveProjFromList
-		.prev|perryide|.Show(false)?
+		|| p = .prev
+		if p isa perryide
+			p.Show(false)
 			
 
 	function LocateProjRoot (|string| path, |filerow|)
@@ -339,6 +341,7 @@ class PerryIDE (Window)
 
 
 	behaviour FrameUpdate // perframe, eachframe, onframe
+		.tabs.TrimWidth
 		if !ShouldNotDisturbGUI and !.focus
 			.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
 		.UpdateDebuggedApp(false)
@@ -347,19 +350,22 @@ class PerryIDE (Window)
 		.SpeedieMsgReceive(.compilr)
 		.UpdateSearchText
 		.UpdateStatusErrors
-		.Readlog
+		.ReadLog
 		.PopupDisplayFadeIn
 		|| fc = sdlapp.FrameCount|int|
 		require .islast
 		if fc+1 isa 64
 			require !.ProjClosed
+			
 		if !.openedmenu
 			if (perryide.statsmode == 2) and (fc isa 64)
 				.UpdateMem = true
 			if .UpdateMem
 				.ShowLeftStats
+				
 		if fc isa 32
 			.EditMe.document.checkmodified?
+		
 		if !ShouldNotDisturbGUI and !.DebugArgsList.HasFocus
 			.HideStuff
 
@@ -550,8 +556,8 @@ class PerryIDE (Window)
 				if !i
 					i = IdeAddProj(data, nil) // need to find it, not use the front!
 			return i.OpenDoc(after, data, purpose)
-
-
+		
+	
 	function TryHideJB
 		.popuphide
 		if .editme.FindExpectsParse < 2

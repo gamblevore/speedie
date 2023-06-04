@@ -5,7 +5,6 @@
 * VM?
 * RefOpts?
 * Perry on Ubuntu?
-	* first startup shouldn't have a wierd IDE with no doc... especially if you close the splash window
 	* First proj open seems to not have the projects tab visible?
 	* invalid argument when un-memmap
 	* install g++, libsdl2-dev, gedit

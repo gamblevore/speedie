@@ -791,7 +791,7 @@ module SDLApp
 		opt norefcounts
 		if (reason == kQuitEvent)
 			|| w = .LastWindowClose.ago
-			if (w and w < 0.1s)// or sdlapp.AskNoQuit
+			if (w and w < 0.1s)
 				return 0 // just block it. SDL is sending duplicate events
 		  elseif reason == kwindowclose
 			.LastWindowClose = date.now
