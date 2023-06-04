@@ -114,7 +114,7 @@ if IsCurrentPlatform
 require StdErr.ok
 printline "Creating $scriptout"
 scriptout.data = "#!/bin/bash
-echo \"Started Building Speedie\"
+echo \"Starting Speedie Build\"
 set -e
 cd $CppLib
 
