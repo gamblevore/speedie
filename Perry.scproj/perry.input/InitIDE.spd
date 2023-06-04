@@ -323,7 +323,7 @@ extend PerryIDE
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.75)
 
 		with .tabs
-			.id = "ProjTabs"
+			.id = "Tabs"
 			.size = 10~after to the~right  by  3~inside
 			.itemwidth = 75
 			.items = perry.projects
@@ -508,7 +508,7 @@ extend PerryIDE
 		f.addroot(.project, true) isnt editable
 		f.FocusOn( f.start|filerow| )
 		
-		if !IsDir
+		if !IsDir and .IsSpeedieCode
 			conf = qqfiles.Roots.parse
 		for p in .roots(conf)
 			f.addroot(p.file)

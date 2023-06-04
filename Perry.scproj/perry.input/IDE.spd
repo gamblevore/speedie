@@ -532,6 +532,7 @@ class PerryIDE (Window)
 			rz = perryide(false)
 			if rz
 				rz.LoadProject(path.file)
+				rz.EditMe.SetFocus
 		
 		
 		function EmptyBase (|perryide|)
