@@ -3,6 +3,11 @@
 							Todo
 
 * VM?
+* nil-checking seems a very good idea. shouldn't be too hard to do either!!
+	* mostly the issues will be around module variables... structure this as some kinda "problem/solution" class...
+* set self to anything... except in constructor/destructor!
+* destructors should nil each variable... Just in case someone (ME) is doing wierd stuff
+* any object can be created with an owner
 * RefOpts?
 * Perry on Ubuntu?
 	* install g++, libsdl2-dev, gedit
