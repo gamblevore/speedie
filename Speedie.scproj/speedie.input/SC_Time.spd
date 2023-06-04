@@ -8,7 +8,7 @@ function compiler.PrintCompileTime (|date| durr)
 		"${compiler.reachedfuncs} / ${compiler.funclist.length}".printlinecolor(errorcolors.good)
 
 		print "Total elapsed:	   "
-		durr.renderdurr.printlinecolor(errorcolors.good)
+		(durr.renderdurr+"s").printlinecolor(errorcolors.good)
 
 		Print "Input source code: "
 		"${Compiler.stTotalSourceSize/1024} KB\n".printcolor(errorcolors.good)
