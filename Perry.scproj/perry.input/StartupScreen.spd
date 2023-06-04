@@ -1,77 +1,83 @@
 
 
 
-module StartupWindow // splashscreen, startupscreen, startwindow
+class StartupWindow (window) // splashscreen, startupscreen, startwindow
 	linkage: cpp_part ttup
-	|int|				i
-	|window|			_win
 
-	function ClickedOpen (guimenuevent)
-		startupwindow.Show
+	behaviour cancelclose
+		if !perry.Projects.hasany
+			beep
+			return true
+		
+	module
+		|StartupWindow|			_win
 
-	function Open (guiaction)
-		startupwindow.Show
+		function ClickedOpen (guimenuevent)
+			startupwindow.Show
 
-	function Vis (|bool|)
-		return ._win is visible
+		function Open (guiaction)
+			startupwindow.Show
 
-	function Hide
-		if ._win
-			.show(false)
-	
-	function Show (|bool| vis=true)
-		opt norefcounts
-		if !vis
-			|| i = perry.ide
-			require (.Vis and i and i.project)
-		with .create
+		function Vis (|bool|)
+			return ._win is visible
+
+		function Hide
+			if ._win
+				.show(false)
+		
+		function Show (|bool| vis=true)
+			opt norefcounts
 			if !vis
-				.hide
-			  elseif sdlapp.startedproperly
-				(it)()
-			  else
-				.show
+				|| i = perry.ide
+				require (.Vis and i and i.project)
+			with .create
+				if !vis
+					.hide
+				  elseif sdlapp.startedproperly
+					(it)()
+				  else
+					.show
 
 
-	function CreateOption (|string| name,  |string| icon,  |guiaction| fnc,  |string| tooltip)
-		|| b = buttonview(._win,	fnc)
-		|| t = buttonview(._win,	fnc,		nil)
-		
-		(t isnt editable) 
-		t.text		= "\n" + name
-		t.tooltip	= tooltip
-		b.tooltip	= tooltip
-		b.text		= icon
-		b.id		= name
-		t.id		= name
-		t.takesfocus = 0
-		b.PressMakesLighter = true
-		t.PressMakesLighter = true
-		b.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
-		t.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
-		
-		b.size 		= 4~right for 30 by 4~after for 30 
-		t.size 		= 6~after to 6~left  by  the~same
-		t.align		= ListViewState.aligncenter
+		function CreateOption (|string| name,  |string| icon,  |guiaction| fnc,  |string| tooltip)
+			|| b = buttonview(._win,	fnc)
+			|| t = buttonview(._win,	fnc,		nil)
+			
+			(t isnt editable) 
+			t.text		= "\n" + name
+			t.tooltip	= tooltip
+			b.tooltip	= tooltip
+			b.text		= icon
+			b.id		= name
+			t.id		= name
+			t.takesfocus = 0
+			b.PressMakesLighter = true
+			t.PressMakesLighter = true
+			b.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
+			t.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
+			
+			b.size 		= 4~right for 30 by 4~after for 30 
+			t.size 		= 6~after to 6~left  by  the~same
+			t.align		= ListViewState.aligncenter
 
 
-	function Create (|window|)
-		opt norefcounts
-		with ._win
-			return it
-		._win = window()
-		
-		with ._win
-			.id				= "startup"
-			.size			= 200 by 140
-			.gnormal        = ¥.SystemStyle.copy
-			.gnormal.solid = ((0.01, 0.05, 0.01, 0.9))
-			.ClickOutsideCloses = true
-			isnt visible
+		function Create (|window|)
+			opt norefcounts
+			with ._win
+				return it
+			._win = StartupWindow()
+			
+			with ._win
+				.id				= "startup"
+				.size			= 200 by 140
+				.gnormal        = ¥.SystemStyle.copy
+				.gnormal.solid = ((0.01, 0.05, 0.01, 0.9))
+				.ClickOutsideCloses = true
+				isnt visible
 
-		.CreateOption("Open Project",	"\1a",	ClickedOpenProj,   "Open a Speedie project.")
-		.CreateOption("Open File",		"\11",	ClickedOpenFile,   "Open a text file.")
-		.CreateOption("Create Project", "\19+",	ClickedCreateProj, "Create new Speedie project!")
-		.CreateOption("Create File",	"\11+",	ClickedCreateFile, "Create new text file.")
-		return ._win
+			.CreateOption("Open Project",	"\1a",	ClickedOpenProj,   "Open a Speedie project.")
+			.CreateOption("Open File",		"\11",	ClickedOpenFile,   "Open a text file.")
+			.CreateOption("Create Project", "\19+",	ClickedCreateProj, "Create new Speedie project!")
+			.CreateOption("Create File",	"\11+",	ClickedCreateFile, "Create new text file.")
+			return ._win
 

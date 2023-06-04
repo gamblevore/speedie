@@ -193,7 +193,8 @@ class Window (GUIControl)
 				(f.onclicked)(f)?
 			return true
 		if (key is escape) and .IsDialog
-			.returnvalue := self
+			if !.returnvalue and !.__cancelclose__(sdlapp.kActivity)
+				.CancelReturn
 			return true
 	
 		

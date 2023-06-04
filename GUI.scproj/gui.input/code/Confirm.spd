@@ -193,8 +193,7 @@ class ConfirmWindow_ (Window)
 
 function OnConfirmAnswer (GUIAction)
 	opt norefcounts
-	|| w = .window|ConfirmWindow_|
-	.window.ReturnValue = self
+	.window.CancelReturn
 
 
 
