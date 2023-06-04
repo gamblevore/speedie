@@ -328,7 +328,7 @@ class Window (GUIControl)
 
 		|| cancelled = .__CancelClose__(reason)
 		if !cancelled or (reason & sdlapp.kExiting) or sdlapp.WantsQuit
-			.DisposeAll(true)
+			.DisposeAll
 			return true
 
 	
