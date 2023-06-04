@@ -138,7 +138,8 @@ class OpenSaveDialog (Window)
 
 
 	behaviour TypedString
-		require .files.HasFocus
+		if !.files.HasFocus
+			return super.typedstring(input)
 		if .KeyDownExpired.Fired
 			.Keyboard = ""
 		.KeyDownExpired = date() + 0.5s
