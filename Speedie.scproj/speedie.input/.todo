@@ -2,13 +2,10 @@
 
 						bugs
 
-* this (in a module) crashes
-	Operator PathMatch (|string| path, |bool|) // 
-		return .Normalise == path.Normalise
 * "a ~ B"  vs  "a~b". first one parses wrong
-* flow control should output a fixed byte if some code-section is disabled? like "M" instead of T or F?
 * could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
 * x = (0, 0|byte|) // fails!
+
 * function finding fails with dictionary subclasses? DictSub["abc"]
 * || x = .SomeCArray // should just get the address... :)
 * Errors in subprojects kinda suck with error-reporting
