@@ -180,6 +180,7 @@ class PerryIDE (Window)
 	
 	
 	behaviour PostLoad
+		require .project
 		if !perry.checked
 			perry.CheckInstallStatus(false)
 
