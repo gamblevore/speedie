@@ -535,6 +535,7 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 }
 
 
+char* realpath(const char* file_name, char* resolved_name);
 JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 	JB_String* Result = JB_Str__Error();
 	if (!JB_Str_Length(self))
@@ -543,7 +544,6 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
     uint8 Tmp[1024];
 	uint8* Path = JB_FastFileString(UserPath, Tmp);
 	if (Path) {
-		char* realpath(const char* file_name, char* resolved_name);
 		char* Resolved = realpath((const char*)Path, 0);
 		if (Resolved)
 			Result = JB_StrC( Resolved );

@@ -91,7 +91,7 @@ class PerryIDE (Window)
 			"proj" : .Project.path
 		]
 		rz = path.path_expand(d) #expect ("Unrecognised @ in: " + path)
-		rz = rz.resolve
+		rz = rz.resolve(true)
 
 
 	function GetBuildFile (|file|) 

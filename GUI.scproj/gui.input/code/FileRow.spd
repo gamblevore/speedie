@@ -273,17 +273,17 @@ class FileRow (ListViewRow)
 
 
 	helper Match (|string| path, |bool| NameOnly, |int|)
-		rz = .location.name(nameonly).pathmatch(path)
+		rz = .location.name(nameonly).FileViewMatch(path)
 		if .dirfile
 			|| r = .readfrom
 			if rz and path.last != '/' and .readfrom.file.size == 0
 				rz = 0 // folder matched uselessly
 			  else
-				rz = rz max r.name(nameonly).pathmatch(path)
+				rz = rz max r.name(nameonly).FileViewMatch(path)
 
 
 helper ListView.ListFilesUp (|string| path, |string| types, |bool| Save, |int| max = 2K)
-	path = path.trimtrailingslashes
+	path = path.TrimSlashes
 	.listfiles(path, types, save, max)
 	require path
 	|| r = filerow(path.parent, "..", ".nothing")

@@ -3,7 +3,6 @@ roots
 	"@spd/Jeebox.scproj/jeebox.input/"
 	"@spd/gui.scproj/gui.input/"
 	"@spd/image.scproj/image.input/"
-	"@spd/fail/nothing/"
 	"@spd/network.scproj/network.input/"
 
 

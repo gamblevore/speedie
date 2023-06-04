@@ -216,7 +216,7 @@ class String
 	
 
 	function TrimStart (|string|s, |string|)
-		if self starts s
+		if self starts s // should be "While" instead
 			return self[s.length...]
 		return self
 

@@ -266,7 +266,7 @@ class FileViewer (ListView)
 		return self
 
 
-	helper string.PathMatch (|string| path, |int|)
+	helper string.FileViewMatch (|string| path, |int|)
 		if path contains ".todo"
 		if path[0] == '/'
 			require (self ~= path)

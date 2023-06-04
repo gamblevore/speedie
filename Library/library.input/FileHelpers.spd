@@ -15,20 +15,8 @@ extend String
 	function FileGlob (|[file]|)
 		expect !(self contains "**") ("Can't glob '**' in: " + self)
 		for L.lines in self
-			|| fixed = L.TrimTrailingSlashes(true)
+			|| fixed = L.TrimSlashes(true)
 			"".FileGlobSub(fixed / '/', rz)
-
-/*
-	OK, so how would this work?
-	
-	/aaa/bb*b/ccc
-	
-	split by *?
-
-	/aaa/bb,  b/ccc
-	
-	then find the last "/" and jump back to there?	
-*/
 
 
 	helper FileGlobSub (|[string]| parts, |[file]| result, |int| i=0)
@@ -112,7 +100,7 @@ extend String
 		return super.sibling(name).file
 	
 	function Components (|[string]|)
-		return .TrimTrailingSlashes.Split('/')
+		return .TrimSlashes.Split('/')
 
 	function ReplacePathComponent (|int| num, |string| With, |string|)
 		|| R = .components
@@ -127,12 +115,25 @@ extend String
 		if self isa suff
 			return .trimext
 		return self
-			
-	function TrimTrailingSlashes (|bool|Pathfix = false, |string|)
-		|| p = (.pathfix, self)(pathfix)
-		return p[0, p.FindTrailingSlashes]
 	
-	function FindTrailingSlashes (|int|)
+	
+	function TrimSlashes (|bool|Pathfix = false, |string|)
+		|| p = (.pathfix, self)(pathfix)
+		ifn p.last == '/' or p contains "//"
+			return p
+		
+		|| fs = FastString()
+		|| prev = 0
+		for c in self
+			if (c != '/'  or  prev != '/')
+				fs <~ c // remove multiple "/"
+			prev = c
+		if prev == '/'
+			fs.Length--
+		return fs
+	
+	
+	helper FindTrailingSlashes (|int|)
 		rz = .Length
 		while self[rz-1] == '/'
 			rz--
@@ -140,16 +141,29 @@ extend String
 
 	function Resolve (|bool| AllowMissing=false, |string|) 
 		cpp_wrapper JB_Str_ResolvePath
-		
-	helper Normalise (|string|)
-		return .TrimTrailingSlashes(true).lowercase
 	
-	Operator PathMatch (|string| path, |bool|)
-		return .Normalise == path.Normalise
+	
+	function FixPathCase (|file|)
+		for p in .Components
+			if !rz and !p
+				rz = "/".file
+			  else
+				|| name = rz.FindLooseMatchingChild(p)
+				if !name
+					rz = nil
+					exit
+				rz = rz[name]
+	
+	
+	helper file.FindLooseMatchingChild (|string| name, |string|)
+		require self
+		for ch in self
+			if ch ~= name
+				return ch
 
 	function VolumeName (|string|)
 		opt norefcounts
-		|| s = .name // wait we wan the first path, not the last?
+		|| s = .name	// wait we wan the first path, not the last?
 			return s
 		return "Root"	// should really go through all the stuff in /Volumes/ or /vol/
 
@@ -207,7 +221,7 @@ extend String
 	function Parent (|string|)
 		description "Gets the file path's parent'" 
 		if self != "/"
-			return .TrimTrailingSlashes.BeforeLastByte('/', 1)
+			return .TrimSlashes.BeforeLastByte('/', 1)
 
 
 	function PathFix (|string|)
@@ -272,7 +286,7 @@ extend String
 
 
 	function BackToApp (|string|)
-		|| s = .trimtrailingslashes
+		|| s = .TrimSlashes
 		|| Final = ".app/Contents/MacOS/" + .name
 		if s endswith final
 			rz = s[0, 4+(s-final)]
@@ -303,7 +317,7 @@ extend String
 // "a/b/c"  becomes "a",  "a/b",  "a/b/c"
 
 	iterator Paths
-		|| P = .TrimTrailingSlashes(true)
+		|| P = .TrimSlashes(true)
 		|| i = p.FindSlash(1)
 
 		while i > 0

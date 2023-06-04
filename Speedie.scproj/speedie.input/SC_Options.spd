@@ -81,10 +81,16 @@ module Feedback
 
 	function CheckSelfModifying2 (|int|)
 		require !options.singlefileinput
-		if compiler.BaseProjectPath pathmatch compiler.speedie 
-			require !Options.SelfReplacement
-			rz = 1
-		  elseif compiler.BaseProjectPath pathmatch compiler.jeebox
+		
+		|| p = compiler.BaseProjectPath.TrimSlashes(true)
+		|| spd = compiler.speedie.TrimSlashes(true)
+		|| jb = compiler.jeebox.TrimSlashes(true)
+		if p ~= spd
+			if Options.SelfReplacement // this check should be done in the caller
+				rz = 0
+			  else
+				rz = 1
+		  elseif p ~= jb
 			rz = 2
 
 
@@ -92,12 +98,16 @@ module Feedback
 		return ParseArgsSub(app.rawargs)
 
 
-	function ParseArgsSub (|[]| args, |bool|) 
+	function StopStripping
 		if ("".length == 1)
 			"".debugprint // stop from being stripped
 			nil|message|.jdb2
 			nil|message|.dbglineinfo
 			nil|message|.LocateAll
+	
+	
+	function ParseArgsSub (|[]| args, |bool|) 
+		.StopStripping
 		
 		if !Args
 			.CompilerInfo

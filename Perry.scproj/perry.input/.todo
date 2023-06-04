@@ -7,10 +7,7 @@
 * Perry on Ubuntu?
 	* first startup shouldn't have a wierd IDE with no doc... especially if you close the splash window
 	* First proj open seems to not have the projects tab visible?
-	* empty extras being added to fileviewer
-		* because it can't find a root during adding it. if not found, it shouldn't just fail badly!
 	* invalid argument when un-memmap
-	* not reporting some shm_open errors properly on linux?
 	* install g++, libsdl2-dev, gedit
 
 // personal
