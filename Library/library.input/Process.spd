@@ -48,6 +48,7 @@ class Process
 	constructor	(|string| name,  |int| n,  |[string]| params=nil,  |fn_subprocess| sub=nil,  |bool|TrapStdOut=false)
 		cpp_part Constructor
 		
+		.Orig = (&.Dummy)|&byte|
 		.deathlimit = 12
 		.procpos = -1
 		.isserver = n != 0
@@ -81,7 +82,7 @@ class Process
 			fs <~ s
 			fs <~ '\n'
 		fs <~ "talk: ${.talker.path}, name: ${.name}\n"
-		if .orig and .orig != (&.dummy)|&byte|
+		if .orig and .orig != .DummyOrig
 			fs <~ "ipc is open: ${.origsize}\n"
 		  else
 			fs <~ "ipc not open.\n"
@@ -132,7 +133,7 @@ class Process
 		if !.orig
 			debugger
 			error (self, "can't open ipc")
-			.orig = (&.dummy)|&byte|
+			.orig = .Dummyorig
 			.origsize = 0
 		return .origsize
 
@@ -467,13 +468,17 @@ class Process
 	syntax warn (|string| err)
 		.self err
 
+	
+	helper DummyOrig (|&byte|)
+		return (&.Dummy)|&byte|
 
 	helper Unmap
-		require .orig
-		memory.unmap(.orig, .origsize)
-		.orig = nil
-		.origsize = 0
-		.usedummy
+		|| d = .Dummyorig
+		if .orig != d
+			memory.unmap(.orig, .origsize)
+			.orig = d
+			.origsize = 0
+			.usedummy
 
 
 	helper UseDummy
