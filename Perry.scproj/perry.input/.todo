@@ -5,7 +5,6 @@
 * VM?
 * RefOpts?
 * Perry on Ubuntu?
-	* First proj open seems to not have the projects tab visible?
 	* invalid argument when un-memmap
 	* install g++, libsdl2-dev, gedit
 
@@ -13,6 +12,7 @@
 * backup selftool and galaxxies... on git.
 
 // Do later
+* look into window calling .DisposeAll and it's memorymanagement
 * clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * TextView error/find resync
