@@ -36,7 +36,7 @@ class Process
 	|ringtree of message|		SendQueue
 	|ind|						ProcPos
 	|IPCMessage|				Dummy
-	|int|						OrigSize
+	|int|						SizeOfOrig
 	|int|						Offset
 	|int| 						DeathLimit
 	|int|						DiedCount
@@ -82,8 +82,8 @@ class Process
 			fs <~ s
 			fs <~ '\n'
 		fs <~ "talk: ${.talker.path}, name: ${.name}\n"
-		if .orig and .orig != .DummyOrig
-			fs <~ "ipc is open: ${.origsize}\n"
+		if .orig != .DummyOrig
+			fs <~ "ipc is open: ${.SizeOfOrig}\n"
 		  else
 			fs <~ "ipc not open.\n"
  
@@ -124,18 +124,19 @@ class Process
 
 
 	helper SetupAlloc (|int| n, |int|)
-		if .orig
-			return .origsize
-		.origsize = n
-		.orig = .talker.ipc(.origsize)|&byte|
+		|| d = .dummyorig
+		if .orig and .orig != D
+			return .SizeOfOrig
+		.SizeOfOrig = n
+		.orig = .talker.ipc(.SizeOfOrig)|&byte|
 		if (.orig|uint64| & 31)
 			error (Self, "IPC-memory allocation not 32-aligned") // does it need to be?
 		if !.orig
 			debugger
 			error (self, "can't open ipc")
-			.orig = .Dummyorig
-			.origsize = 0
-		return .origsize
+			.orig = d
+			.SizeOfOrig = 0
+		return .SizeOfOrig
 
 		
 	helper SetupAdjust (|int| n)
@@ -175,7 +176,7 @@ class Process
 		if ._StdOut
 			._StdOut.Length = 0
 		if .IsServer
-			memory.zero(.orig, .origsize)
+			memory.zero(.orig, .SizeOfOrig)
 			is Connecting
 			.ours.special = process.SpecialState
 		  else
@@ -475,9 +476,9 @@ class Process
 	helper Unmap
 		|| d = .Dummyorig
 		if .orig != d
-			memory.unmap(.orig, .origsize)
+			memory.unmap(.orig, .SizeOfOrig)
 			.orig = d
-			.origsize = 0
+			.SizeOfOrig = 0
 			.usedummy
 
 
@@ -544,7 +545,7 @@ class Process
 		if .CanActivate
 			if !.path
 			expect (.path) (self, "Can't re-activate process ${.name} without a path.")
-			.OpenSharedMemory(.origsize)
+			.OpenSharedMemory(.SizeOfOrig)
 			.self "reopen"
 			return .RunChild(.path)
 
