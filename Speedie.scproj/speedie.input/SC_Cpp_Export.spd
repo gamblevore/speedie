@@ -77,7 +77,7 @@ function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
 	if (f.IsInline)
 		fs = .Inlines // one inline can inlcude another so we still need the header first.
 	
-	|| FuncHeader = .T.getresult
+	|| FuncHeader = .T.GetResult
 	H <~ FuncHeader
 	H <~ ";\n\n"
 	require !f.isexternallib
@@ -91,9 +91,10 @@ function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
 	
 	fs.currfunc = f
 	fs.srcend = f.sourcearg
-	fs.extraafter = fs.srcend.flatafter
+	fs.ExtraAfter = fs.srcend.flatafter
 	fs <~ ' ' // space between arg.
-	f.Source[@Arg, -1]$.Export( fs )
+
+	f.Sourcearg.Export( fs )
 
 	.OptEnd(fs, f.minopt)
 	fs <~ "\n\n"
@@ -1010,8 +1011,6 @@ extern "C" bool JB_Plat__HasFlow() {
 	
 	function C_RenderArg (fpMsgRenderCpp)
 		opt norefcounts
-		|| d = .obj
-
 		fs <~ '{'
 		fs.indent++
 		
@@ -1310,7 +1309,14 @@ extern "C" bool JB_Plat__HasFlow() {
 
 
 	function CDotType (|Message| msg, |SCDecl| Type, |FastStringCpp| fs, |String|)
+		opt norefcounts
 		require type Is UpgradeableContained
+		|| p = msg.parent
+			|| fn = p.obj
+			if fn isa scfunction
+				if fn isa kIsReffer
+					return ""
+		
 		fs <~ '('
 		.WriteDeclNoName( Type, fs )
 		fs <~ ")("
