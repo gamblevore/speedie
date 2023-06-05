@@ -4,10 +4,8 @@
 
 * VM?
 * nil-checking seems a very good idea. shouldn't be too hard to do either!!
-	* mostly the issues will be around module variables... structure this as some kinda "problem/solution" class...
-* set self to anything... except in constructor/destructor!
-* destructors should nil each variable... Just in case someone (ME) is doing wierd stuff
-* any object can be created with an owner
+	* mostly the issues will be around module variables...
+* destructors should nil each variable... Just in case someone is doing wierd stuff
 * RefOpts?
 * Perry on Ubuntu?
 	* install g++, libsdl2-dev, gedit
@@ -16,7 +14,7 @@
 * backup selftool and galaxxies... on git.
 
 // Do later
-* look into window calling .DisposeAll and it's memorymanagement
+* any object can be created with an virtual-function override thing, just store before the refcount?
 * clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * TextView error/find resync
