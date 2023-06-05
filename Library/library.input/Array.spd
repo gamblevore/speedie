@@ -141,7 +141,7 @@ class Array (saveable)
 		return (self|bool|) and (.length >= 1)
 	
 	syntax Append (|| item)
-		.syntaxappend(item,1)
+		.syntaxappend(item, 1)
 	
 	syntax Append (|| item, |int| Count)
 		cpp_wrapper JB_Array_AppendCount
