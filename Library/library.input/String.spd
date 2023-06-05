@@ -215,9 +215,15 @@ class String
 		cpp_wrapper JB_Str_Trim
 	
 
-	function TrimStart (|string|s, |string|)
-		if self starts s // should be "While" instead
-			return self[s.length...]
+	function TrimStart (|string| s, |string|)
+		ifn self starts s
+			return self
+		return self[s.length...]
+	
+
+	function TrimAllStart (|string| s, |string|)
+		while self starts s
+			self = self[s.length...]
 		return self
 
 

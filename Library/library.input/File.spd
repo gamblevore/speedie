@@ -161,7 +161,7 @@ class File (String)
 
 	function Child (|string| name, |bool| errs=false, |File|)
 		if name
-			|| f = File( .PathDir + Name.trimstart("/") )
+			|| f = File( .PathDir + Name.trimallstart("/") )
 			if (!errs or f.exists)
 				return f
 			error (Self, "Can't find file/folder: '$name' in '${super}'." )
