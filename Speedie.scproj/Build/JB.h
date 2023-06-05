@@ -752,7 +752,7 @@ JBClass ( Process , JB_Object ,
 	RingTree* SendQueue;
 	Ind ProcPos;
 	IPCMessage Dummy;
-	int OrigSize;
+	int SizeOfOrig;
 	int Offset;
 	int DeathLimit;
 	int DiedCount;
@@ -1221,7 +1221,6 @@ extern JB_File* JB__App__StdOut;
 extern JB_String* JB__App_codesign_native;
 extern Array* JB__App_OldArgs;
 extern Message* JB__App_Prefs;
-extern bool JB__App_Unregistered;
 extern JB_File* SC__Comp__BuildFolder;
 extern JB_String* SC__Comp__Projects;
 extern JB_String* SC__Comp__SpeedieProj;
@@ -1287,13 +1286,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1866])
+#define kJB__ErrorColors_bold (JB_LUB[1867])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1867])
-#define kJB__ErrorColors_good (JB_LUB[1868])
-#define kJB__ErrorColors_normal (JB_LUB[1869])
-#define kJB__ErrorColors_underline (JB_LUB[1868])
-#define kJB__ErrorColors_warn (JB_LUB[1870])
+#define kJB__ErrorColors_error (JB_LUB[1868])
+#define kJB__ErrorColors_good (JB_LUB[1869])
+#define kJB__ErrorColors_normal (JB_LUB[1870])
+#define kJB__ErrorColors_underline (JB_LUB[1869])
+#define kJB__ErrorColors_warn (JB_LUB[1871])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1465,10 +1464,10 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[344])
-#define kSC_BitNot (JB_LUB[606])
-#define kSC_BitOr (JB_LUB[547])
-#define kSC_BitXor (JB_LUB[1871])
+#define kSC_BitAnd (JB_LUB[345])
+#define kSC_BitNot (JB_LUB[607])
+#define kSC_BitOr (JB_LUB[548])
+#define kSC_BitXor (JB_LUB[1872])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1498,7 +1497,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1872])
+#define kJB_SaverStart1 (JB_LUB[1873])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2391,6 +2390,8 @@ bool SC_FB__ParseArgs();
 bool SC_FB__ParseArgsSub(Array* args);
 
 void SC_FB__ParseOption(JB_Object* Obj);
+
+void SC_FB__StopStripping();
 
 JB_String* SC_FB__TryUseProject(JB_String* path, bool IsScript);
 
@@ -4373,11 +4374,11 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* self);
 
 
 // JB_IPCMessage
-bool JB_IPCMessage_Closed(IPCMessage* self);
+bool JB_IPCM_Closed(IPCMessage* self);
 
-byte* JB_IPCMessage_Data(IPCMessage* self);
+byte* JB_IPCM_Data(IPCMessage* self);
 
-bool JB_IPCMessage_IsOpen(IPCMessage* self);
+bool JB_IPCM_IsOpen(IPCMessage* self);
 
 
 
@@ -5340,6 +5341,8 @@ void JB_Proc_Died(Process* self);
 
 void JB_Proc_Disconnect(Process* self);
 
+byte* JB_Proc_DummyOrig(Process* self);
+
 void JB_Proc_Flush(Process* self);
 
 bool JB_Proc_Found(Process* self, bool send);
@@ -5791,8 +5794,6 @@ ErrorInt JB_Str_MakeEntirePath(JB_String* self, bool Last);
 
 JB_String* JB_Str_Name(JB_String* self);
 
-JB_String* JB_Str_Normalise(JB_String* self);
-
 bool JB_Str_ContainsString(JB_String* self, JB_String* s);
 
 bool JB_Str_ContainsByte(JB_String* self, byte b);
@@ -5808,8 +5809,6 @@ int JB_Str_OperatorMinus(JB_String* self, JB_String* s);
 JB_String* JB_Str_MulBool(JB_String* self, bool b);
 
 JB_String* JB_Str_OperatorMul(JB_String* self, int n);
-
-bool JB_Str_OperatorPathMatch(JB_String* self, JB_String* path);
 
 JB_String* JB_Str_PlusByte(JB_String* self, byte B);
 
@@ -5885,15 +5884,15 @@ void JB_Str_SyntaxExpect(JB_String* self);
 
 JB_String* JB_Str_TitleCase(JB_String* self, FastString* fs_in);
 
+JB_String* JB_Str_TrimAllStart(JB_String* self, JB_String* s);
+
 JB_String* JB_Str_TrimExtAndPath(JB_String* self, bool KeepPath);
 
 JB_String* JB_Str_TrimFirst(JB_String* self, byte b);
 
 int JB_Str_TrimLastSub(JB_String* self, byte b);
 
-JB_String* JB_Str_TrimStart(JB_String* self, JB_String* s);
-
-JB_String* JB_Str_TrimTrailingSlashes(JB_String* self, bool Pathfix);
+JB_String* JB_Str_TrimSlashes(JB_String* self, bool Pathfix);
 
 bool JB_Str_UnderScoreAtAnyEnd(JB_String* self);
 
@@ -8013,7 +8012,7 @@ void SC_Func_TranDebugInsert(SCFunction* self);
 
 void SC_Func_Transform(SCFunction* self);
 
-void SC_Func_TranStrings(SCFunction* self, bool Add);
+void SC_Func_TranStrings(SCFunction* self);
 
 void SC_Func_TryAdd(SCFunction* self, SCBase* b);
 
@@ -8460,7 +8459,11 @@ inline void JB_Sav___SaveWrite__(Saveable* self, ObjectSaver* Saver) {
 }
 
 inline JB_StringC* JB_Str_CastZero(JB_String* self) {
-	return JB_Str_MakeC(self);
+	JB_Incr(self);
+	JB_StringC* _tmPf0 = JB_Incr(JB_Str_MakeC(self));
+	JB_Decr(self);
+	JB_SafeDecr(_tmPf0);
+	return _tmPf0;
 }
 
 inline bool JB_Array_SyntaxCast(Array* self) {
