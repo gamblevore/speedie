@@ -203,7 +203,7 @@ class String
 		return self[0, N].UnicodeSync + "..."
 
 	function SimpleName (|string|)
-		return .lowercase.trimextandpath
+		return .lowercase.TrimExtAndPath
 	
 	function UpperFirst (|String|)
 		if (self[0].IsUpper)
@@ -215,15 +215,12 @@ class String
 		cpp_wrapper JB_Str_Trim
 	
 
-	function TrimStart (|string| s, |string|)
+	function TrimStart (|string| s, |bool| All=false,   |string|)
 		ifn self starts s
 			return self
-		return self[s.length...]
-	
-
-	function TrimAllStart (|string| s, |string|)
 		while self starts s
 			self = self[s.length...]
+			loop all
 		return self
 
 
@@ -245,8 +242,8 @@ class String
 
 
 	function Yes (|bool|) // ispositive, isaffirmative
-		if self ~= "no" or "false" or "off" or "0" or "":	return false
-		if self ~= "yes" or "true" or "on"  or "1": return true
+		if self ~= "no"  or "false" or "off" or "0" or "":	return false
+		if self ~= "yes" or "true"  or "on"  or "1": return true
 		error ("Not a boolean value: '" + self + "'")
 
 
@@ -294,7 +291,7 @@ class String
 	function DiffAt (|string| A, |ind|)
 		cpp_wrapper
 
-	function Count (|Byte|b, |int|)
+	function Count (|Byte| b, |int|)
 		for c in self
 			rz += (c==b)
 	
