@@ -31,8 +31,8 @@ class Country
 main
 	|[country]| Europe
 	"\nWelcome to Europe Simulator 2000!!"
-	|| names = "Netherlands/United Kingdom/France/Germany/USA" / '/'
-	random.shared.reseed
+	|| names = "Netherlands/United Kingdom/France/Germany/Italy" / '/'
+	random.shared.TimeSeed
 	for s in names
 		Europe <~ Country(s)
 	printline
@@ -45,4 +45,4 @@ main
 			printline
             app.sleep(0.2s)
 
-	"Europe is gone. Uwu :3"
+	"Europe is gone."

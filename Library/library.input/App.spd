@@ -373,11 +373,3 @@ helper @string.MainArgSub (|int| Pos, |string| type, |stringthatwasreadsafely|)
 	return string.Error
 */
 
-
-function app.PrintLine (|faststring|)
-	description "Just like app.printline, except this function also prints a line after completion." 
-	return faststring(app.stdout, true)
-		
-function app.Print (|faststring|)
-	description "Pass this to render functions (like message.renderast) to directly render this to stdout, without needing to create intermediate strings." 
-	return faststring(app.stdout, false)

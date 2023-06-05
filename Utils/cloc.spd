@@ -72,9 +72,10 @@ function file.cloc
 		if counts.maxnodelength
 			for s.flat in msg 
 				s.name = s.name.Preview(counts.MaxNodeLength)
-		msg.RenderAST(app.printline)
+		msg.RenderAST(app.stdout.out)
+		printline
 	  elseif counts.ParseSpeed
-		|| fs = app.print
+		|| fs = app.stdout.out
 		fs.RenderSpeed(durr.seconds, data.length, 0, "Parsed")
 		fs <~ "\n"
 	(msg)
@@ -140,5 +141,6 @@ function Counts.report
 	if p > 1 or f > 1
 		"Total files: $f, total jeebox files: $p"
 	if compressionstats.All.Out
-		compressionstats.all.render(app.printline)
+		compressionstats.all.render(app.stdout.out)
+		printline
 		
