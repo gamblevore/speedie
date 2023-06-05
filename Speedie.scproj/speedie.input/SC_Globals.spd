@@ -538,6 +538,7 @@ function TypeOfExprSub2 (|Message| Exp, |SCBase| name_space, |Message| side = ni
 
 
 function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCDecl|)
+	debug_require exp // shouldn't happen!
 	|| obj = exp.obj|scobject| ?? TypeOfExprSub2(Exp, name_Space, side)
 		if obj isa SCDecl
 			return obj

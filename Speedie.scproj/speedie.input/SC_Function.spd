@@ -776,11 +776,10 @@ function Paramless (|SCFunction|)
 			Return f
 
 
-function TranStrings (|bool| Add=true)
+function TranStrings
 	|| S = .SourceArg
 	if (S and !.IsWrapper)
-		|| fn = (self, nil)(add)
-		SCFunction.Tran_Strings( S.parent, fn )
+		SCFunction.Tran_Strings( S.parent, self )
 
 
 function IsConstructorOrDestructor (|bool|)
@@ -1716,7 +1715,7 @@ function scfunction.init_sub (|message| node,  |scbase| name_space)
 	.SetFuncType(node)
 	.ParseName( node.first )
 	.PreProcessExpects
-	.TranStrings(name_Space != nil)
+	.TranStrings()//(name_Space != nil) // seems unneeded? 
 	.ReadDisabled(Arg)
 
 	.IsInline		= arg.FindClassOption("pragma", "inline")

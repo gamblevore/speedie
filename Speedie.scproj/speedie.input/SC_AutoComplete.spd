@@ -847,8 +847,12 @@ function Define (|message| msg,  |string| purpose,  |object| found=nil,  |messag
 	expect (IsDisplay or IsDefine) ("badcmd")
 	ifn found isa scobject
 		found = nil
-	|| s = .LocateDefinition(msg, found|scobject|, IsDisplay)		#expect "nosource"	
-	return .RespondDefine(msg, s, purpose)
+	|| s = .LocateDefinition(msg, found|scobject|, IsDisplay)	
+		return .RespondDefine(msg, s, purpose)
+	if platform.isdebug
+		debugger
+		.LocateDefinition(msg, found|scobject|, IsDisplay)
+	error "nosource"
 
 
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
@@ -949,8 +953,8 @@ function LocateDefinitionSub (|message| msg, |scobject| already_defined, |bool| 
 		msg = msg.parent // :)
 	|| fn = msg.msgfunc
 		|| it = fn.source
-			return it
-	|| ty = TypeOfExpr(msg, nil)
+			return it		
+	|| ty = TypeOfExpr(msg, msg.msgarg)
 	if !ty
 		return msg.ModuleSrc
 	if ty.type == scbasetype.funcproto
