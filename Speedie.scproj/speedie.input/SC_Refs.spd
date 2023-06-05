@@ -120,7 +120,7 @@ function RC_Rel (|Message| rel)
 	// a = b.c   ->   || tmp = b.c, jb_incr(tmp), jb_decr(a), a = tmp
 	
 	|| First = rel.first
-	RelNeedsRef( rel, first )#require
+	require RelNeedsRef( rel, first )
 	
 	using (rel)
 	|| result = NewFnc( "JB_SetRef" )
@@ -151,7 +151,7 @@ function RefDecr (|Message| msg, |Message| place, |int| Basis)
 		place = OldPrev // safedecr always comes last
 	
 	|message| what 
-	if basis & kbasiscarray
+	if basis & kBasisCArray
 		what = DecrMulti( msg.parent.asdecl, msg.copy )
 	  else
 		what = RefDecrMsg( msg )
@@ -172,6 +172,11 @@ function DecrMulti (|scdecl| d, |message| m, |message|)
 
 function RefDecrMsg (|Message| msg, |Message|)
 	return RefMsg( msg, "JB_Decr", Compiler.RefDecr )
+
+
+function RefClearMsg (|Message| msg, |Message|)
+	return refdecrmsg(msg) // for now
+	return RefMsg( msg, "JB_Clear", Compiler.RefClear )
 
 
 function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
@@ -685,7 +690,7 @@ function scfunction.FillInDestructor
 	Using .sourcearg
 	for d in .cls.Properties
 		if d.IsReffable(true)
-			.SourceArg.AddBefore( first, .RefDecr(d) )
+			.SourceArg.AddBefore( first, d.RefDestructor )
 		  else
 			|| Destr = d.HasStructDestructor
 				|| dm = .DeclToDot(d)	// Im not sure we need the type for this, at least not for refcounting
@@ -811,14 +816,13 @@ function DeclToDot (|scdecl| d, |string| s, |Message|)
 }
 
 
-extend scfunction
-	function RefDecr (|scdecl| d, |message|)
-		opt norefcounts
-		|| m = screfs.decltoDot(d, d.name)
-		if d.c_array > 0
-			return screfs.DecrMulti(d, m)
-		  else
-			return SCRefs.RefDecrMsg( m )
+function scdecl.RefDestructor (|message|)
+	opt norefcounts
+	|| m = screfs.DeclToDot(self, .name)
+	if .c_array > 0
+		return screfs.DecrMulti(self, m)
+	  else
+		return SCRefs.RefClearMsg( m )
 
 
 struct abccc

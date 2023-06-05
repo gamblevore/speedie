@@ -89,6 +89,7 @@ linkage
 |SCFunction|			PrivateProperty
 |SCFunction|			RefIncr
 |SCFunction|			RefDecr
+|SCFunction|			RefClear
 |SCFunction|			RefDecrMulti
 |SCFunction|			RefFreeIfDead
 |SCFunction|			RefSafeDecr
@@ -286,6 +287,7 @@ function InitBasicFuncs (|bool|)
 	.RefSetRef		= .LoadRefFunc( "JB_SetRef" )
 	.RefIncr		= .LoadRefFunc( "JB_Incr" )
 	.RefDecr		= .LoadRefFunc( "JB_Decr" )
+	.RefClear		= .LoadRefFunc( "JB_Clear" )
 	.RefDecrMulti	= .LoadRefFunc( "JB_DecrMulti" )
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
@@ -308,8 +310,10 @@ function Constpiler (|string| name, |scclass|)
 function Library (|file|)
 	return .projects.filech("Library")
 
+
 function Jeebox (|file|)
 	return .Projects.filech("jeebox.scproj")
+
 
 function Speedie (|file|)
 	return .Projects.filech("Speedie.scproj")
