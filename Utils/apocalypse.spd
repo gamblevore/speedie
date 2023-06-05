@@ -22,7 +22,7 @@ class Country
 		if .population > 0 
 			"$.name loses ${damage}m pop. Now has ${.population}m pop."
 		  else
-			"$.name loses ${damage}m pop and died :( UwU"
+			"$.name loses ${damage}m pop and died :("
 			
 	function alive (|bool|)
 		return .population > 0
