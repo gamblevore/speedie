@@ -267,7 +267,6 @@ class FileViewer (ListView)
 
 
 	helper string.FileViewMatch (|string| path, |int|)
-		if path contains ".todo"
 		if path[0] == '/'
 			require (self ~= path)
 			return 10
@@ -290,7 +289,6 @@ class FileViewer (ListView)
 
 
 	function FindPaths (|string| path,  |listviewrow| within=nil, |bool| Copy=false, |[filerow]|)
-		opt norefcounts
 		require path
 		|| NameOnly = path[0, "./"] 
 			path = path[2...]

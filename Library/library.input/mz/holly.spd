@@ -183,7 +183,7 @@ struct HollyPotter
 				p = input.trimext
 			|| out = p.addext("hol").file 
 			|| back = p.addext("back").file
-			input.file.parse.Compress(out.out)
+			input.file.parse.Compress(out)
 			"${input.size.strsize} compressed to ${out.size.strsize}"
 			|| msg = out.in.revivejbin()				#require
 			msg.render_jbin(back.out)

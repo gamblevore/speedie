@@ -256,7 +256,7 @@ class ButtonView (GUIControl)
 		|| g = .MouseisInside|int| * .ExpandOnMouseOver
 		|| grow = (-g,-g, g, g)
 		where.ControlClip() += grow
-		|| W = .ItemWidth
+		|| w = .ItemWidth
 		if !w
 			.drawitem(where, r, grow, nil)
 			return 

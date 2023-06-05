@@ -103,9 +103,8 @@ datatype DataTypeCode (uint16)
 		if b
 			return (self) (|) (1 << 6)
 		  else
-			return (self) &~ (1 << 6)
-			
-
+			return (self)  &~ (1 << 6)
+	
 	function ItemBitCount (|int|)
 		return 8 << ._shift
 	

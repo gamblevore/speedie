@@ -2,22 +2,28 @@
 floor "."
 	walkable
 	appearance "The floor seems dirty... uncleaned. But in places trampled till it gives a polished look."
+
 wall "+"
 	color white
 	appearance "The wall is plastered with a rough patch of mud and straw. Wooden slats jut out from underneath in places."
+
 rock " "
 	appearance "The surface appears to be rough broken granite... or some kind of dark strong stone."
+
 door "@"
 	color white
 	walkable
 	appearance "The wooden door is heavy and would take quite a pounding. It still smells of unfinished wood."
+
 gate "="
 	color white
 	walkable
 	appearance "An iron gate blocks your way. It's mere prescence seems harsh."
+
 corriwall "-"
 	color white
 	appearance "You see smoothly polished stone, with battle scars scratched in." // fix this
+
 corridor ","
 	color red
 	walkable
