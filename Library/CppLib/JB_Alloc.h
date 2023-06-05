@@ -285,6 +285,7 @@ u32 JB_ObjCount();
 #define JB_Incr(Obj)			({ auto _tMp_ = Obj; JB_Incr_(_tMp_); (_tMp_);})
 #define JB_SafeDecr(Obj)		JB_SafeDecr_((JB_Object*)(Obj))
 #define JB_SetRef(a,b)			JB_SetRef_((JB_Object**)(&a), (JB_Object*)(b))
+#define JB_Clear(a)				JB_Clear_((JB_Object**)(&a))
 #define JB_Swap(a,b)			(std::swap(*(a),*(b)))
 #define JB_LongObjOr(A, B)            ({ \
     JB_Object* _T = (A);                 \
@@ -320,6 +321,17 @@ inline void JB_Decr(JB_Object* self) {
     if ( self ) {
 		JBObjRefTest(self);
         int N = --self->RefCount; 
+        if (!N)
+            JB_Delete( (FreeObject*)self );
+    }
+}
+
+inline void JB_Clear_(JB_Object** Place) {
+	JB_Object* self = *Place;
+	*Place = nil;
+    if ( self ) {
+		JBObjRefTest(self);
+        int N = --self->RefCount;
         if (!N)
             JB_Delete( (FreeObject*)self );
     }
