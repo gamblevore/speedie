@@ -1153,7 +1153,7 @@ void* JB_File_IPC (JB_File* self, int* np) {
 			Err = 0;
 		Mode |= O_CREAT;
 	} else if (!JB_LibIsThreaded()) {
-		// makse no sense from not the main thread...
+		// makes no sense from not the main thread...
 		struct stat Dummy;
 		if (!fstat(SavedParentIPC, &Dummy))
 			FD = SavedParentIPC;
@@ -1203,8 +1203,6 @@ void* JB_File_IPC (JB_File* self, int* np) {
 		errno = -1; // whatever
 	}
 	
-	printf("About to report error %i, %s\n", errno, strerror(errno));
-	// cos the func below does not print anything, on linux for some wierd reason.
     JB_ErrorHandleFile(self, nil, errno, nil, Try);
 #endif
 	return 0;

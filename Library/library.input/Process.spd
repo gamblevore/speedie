@@ -645,7 +645,7 @@ class Process
 		
 
 		function string.ipcPath (|string|)
-			 return "/tmp/shm/${app.id}${self[0,8]}${process.IncID++}"	
+			 return "/${self[0,8]}.${app.id}.${process.IncID++}"	
 
 
 		function string.ipcName (|string|)			//		/tmp/shm/1111PERRY9999
