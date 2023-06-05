@@ -1258,6 +1258,7 @@ extern SCFunction* SC__Comp_PrivateProperty;
 extern SCModule* SC__Comp_program;
 extern JB_String* SC__Comp_ProjectName;
 extern Array* SC__Comp_ProtoTypes;
+extern SCFunction* SC__Comp_RefClear;
 extern SCFunction* SC__Comp_RefDecr;
 extern SCFunction* SC__Comp_RefDecrMulti;
 extern SCFunction* SC__Comp_RefFreeIfDead;
@@ -1464,9 +1465,9 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[345])
-#define kSC_BitNot (JB_LUB[607])
-#define kSC_BitOr (JB_LUB[548])
+#define kSC_BitAnd (JB_LUB[346])
+#define kSC_BitNot (JB_LUB[608])
+#define kSC_BitOr (JB_LUB[549])
 #define kSC_BitXor (JB_LUB[1872])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
@@ -2647,6 +2648,8 @@ void SC_Refs__RC_Temps(SCFunction* FN, Message* msg, int Basis);
 int SC_Refs__RefBasis(Message* msg, bool SetOnly);
 
 int SC_Refs__RefBasisStruct(Message* msg, bool SetOnly);
+
+Message* SC_Refs__RefClearMsg(Message* msg);
 
 void SC_Refs__RefDecr(Message* msg, Message* place, int Basis);
 
@@ -5884,8 +5887,6 @@ void JB_Str_SyntaxExpect(JB_String* self);
 
 JB_String* JB_Str_TitleCase(JB_String* self, FastString* fs_in);
 
-JB_String* JB_Str_TrimAllStart(JB_String* self, JB_String* s);
-
 JB_String* JB_Str_TrimExtAndPath(JB_String* self, bool KeepPath);
 
 JB_String* JB_Str_TrimFirst(JB_String* self, byte b);
@@ -5893,6 +5894,8 @@ JB_String* JB_Str_TrimFirst(JB_String* self, byte b);
 int JB_Str_TrimLastSub(JB_String* self, byte b);
 
 JB_String* JB_Str_TrimSlashes(JB_String* self, bool Pathfix);
+
+JB_String* JB_Str_TrimStart(JB_String* self, JB_String* s, bool All);
 
 bool JB_Str_UnderScoreAtAnyEnd(JB_String* self);
 
@@ -6639,6 +6642,8 @@ SCImport* SC_Decl_Project(SCDecl* self);
 SCDecl* SC_Decl_ReallyContains(SCDecl* self);
 
 JB_String* SC_Decl_RealName(SCDecl* self);
+
+Message* SC_Decl_RefDestructor(SCDecl* self);
 
 SCDecl* SC_Decl_RefineDecl(SCDecl* self, Message* list);
 
@@ -7985,8 +7990,6 @@ void SC_Func_PreProcessExpects(SCFunction* self);
 Message* SC_Func_prms(SCFunction* self);
 
 void SC_Func_ReadDisabled(SCFunction* self, Message* arg);
-
-Message* SC_Func_RefDecr(SCFunction* self, SCDecl* d);
 
 void SC_Func_RefFunc(SCFunction* self, Message* prm, Message* after);
 
