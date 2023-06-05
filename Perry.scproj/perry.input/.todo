@@ -5,7 +5,6 @@
 * VM?
 * nil-checking seems a very good idea. shouldn't be too hard to do either!!
 	* mostly the issues will be around module variables...
-* destructors should nil each variable... Just in case someone is doing wierd stuff
 * RefOpts?
 * Perry on Ubuntu?
 	* install g++, libsdl2-dev, gedit
