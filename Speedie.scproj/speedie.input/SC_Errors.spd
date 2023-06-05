@@ -4,60 +4,6 @@
 */
 
 
-// * Setting the func as an integer, actually would help a lot!
-	// * We can compare funcs as integers, which lets us do bit-tests!
-	// * I suppose @thg would have to be considered... a number? Or else we get slow obj->num conversions when we test if message.type = @thg...
-
-
-// * There's another issue with errors...
-	// * Yep... Perhaps errors should have a... "level" associated with them???
-	// * So! No... "warn/assert" thing? Just expect/etc.
-	// * makes it simpler... less stuff.
-		// * Only 3 types...
-		// * return		 (require)
-		// * error		  (error)
-		// * return + error (expect)
-	// OK so! Thats nice. In fact, only error and expect could have "warn levels"...
-	// * while it is nice to say... ".OK" on StdErr... I think that's not actually OK.
-		// * Stderr.OK could be: return (.ErrorCount > 0)
-	// * Is it better to have just one global error-catcher?
-		// * And warn/etc be subclasses?
-		// * Or sub-lists?
-	// * OR have just StdWarn, StdErr, StdWhatever as globals...
-		// * somehow I like this more...
-		// * The thing is... subparsers/processors want to put their stuff into the global error thing?
-	// * whatever :)
-
-
-// * Printing to stderr makes it actually a lot harder to debug :( What with chaining of outputs and stuff... Or else why does the output not come through?
-	// * it's easier to have ONE output that may be success or error or whatever!
-	// * Harder to dump to a file too, when we have streams going all over... 
-
-
-// * "assert" should be the one that takes zero identifiers to WHERE the error occurred...
-	// * what's the point of an error and no clue to where it happened?
-	// * assert would use a string for the file-name and a line-number... :)
-	// * maybe a function name too...
-	// * otherwise identical... to error.
-// * the thing is... it seems most of them, we want variants that return, or don't return...
-// * except require, which of course only returns...
-// * error vs expect
-// * warn vs ?
-// * assert vs ?
-/*
-	|| X = bla() #expect // auto-location param?
-	|| X = bla() #assert
-	expect X // auto-location param?
-	require X
-	error X // so is X a location or a condition?
-	
-	|| X = bla() #assert and #require	 // seems simple enough.
-
-	|| X = bla() #assert
-	require X // clumsy
-*/
-
-
 module SC_Errors
 	linkage
 		cpp_part Errors
@@ -294,4 +240,60 @@ extend Error
 			.render(fs)
 		  else
 			.render_unix(fs)
+
+
+
+
+// * Setting the func as an integer, actually would help a lot!
+	// * We can compare funcs as integers, which lets us do bit-tests!
+	// * I suppose @thg would have to be considered... a number? Or else we get slow obj->num conversions when we test if message.type = @thg...
+
+
+// * There's another issue with errors...
+	// * Yep... Perhaps errors should have a... "level" associated with them???
+	// * So! No... "warn/assert" thing? Just expect/etc.
+	// * makes it simpler... less stuff.
+		// * Only 3 types...
+		// * return		 (require)
+		// * error		  (error)
+		// * return + error (expect)
+	// OK so! Thats nice. In fact, only error and expect could have "warn levels"...
+	// * while it is nice to say... ".OK" on StdErr... I think that's not actually OK.
+		// * Stderr.OK could be: return (.ErrorCount > 0)
+	// * Is it better to have just one global error-catcher?
+		// * And warn/etc be subclasses?
+		// * Or sub-lists?
+	// * OR have just StdWarn, StdErr, StdWhatever as globals...
+		// * somehow I like this more...
+		// * The thing is... subparsers/processors want to put their stuff into the global error thing?
+	// * whatever :)
+
+
+// * Printing to stderr makes it actually a lot harder to debug :( What with chaining of outputs and stuff... Or else why does the output not come through?
+	// * it's easier to have ONE output that may be success or error or whatever!
+	// * Harder to dump to a file too, when we have streams going all over... 
+
+
+// * "assert" should be the one that takes zero identifiers to WHERE the error occurred...
+	// * what's the point of an error and no clue to where it happened?
+	// * assert would use a string for the file-name and a line-number... :)
+	// * maybe a function name too...
+	// * otherwise identical... to error.
+// * the thing is... it seems most of them, we want variants that return, or don't return...
+// * except require, which of course only returns...
+// * error vs expect
+// * warn vs ?
+// * assert vs ?
+/*
+	|| X = bla() #expect // auto-location param?
+	|| X = bla() #assert
+	expect X // auto-location param?
+	require X
+	error X // so is X a location or a condition?
+	
+	|| X = bla() #assert and #require	 // seems simple enough.
+
+	|| X = bla() #assert
+	require X // clumsy
+*/
 

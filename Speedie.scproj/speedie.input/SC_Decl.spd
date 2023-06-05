@@ -890,9 +890,8 @@ class SCDecl (SCObject) {
 		.ExpectMatch( O, Cast, exp, ErrNode )
 		require (exp and (.Strength > o.Strength) and exp.IsSetIntoPlace)
 		|| fn = exp.MsgOwningFunc
-		if !.IsNumeric
-			if fn isa kisconstructor or kIsDestructor			
-				check (.Type.SelfStrong != self)  (exp, "You can’t modify 'self'.")
+		if fn isa kisconstructor or kIsDestructor			
+			check (.Type.SelfStrong != self)  (exp, "You can’t modify 'self'.")
 		
 		fn.RefSmooth( self )
 
