@@ -162,7 +162,7 @@ struct ASMFuncState
 
 		|| op = L.next
 		|| OV = .OpenVars
-		|| mL = .µ2(L)			// µ2 stops mR fucking mL
+		|| mL = .µ2(L)			// µ2 stops mR breaking mL
 		|| mR = .µ(op.next)
 		.CloseVars(OV)			// allow overwriting either!
 		require ml.reg (|) mr.reg

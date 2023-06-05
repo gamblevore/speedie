@@ -203,16 +203,6 @@ module Feedback
 		Explain(Purpose, "")$
 		interact.ShouldEnter = 1
 		ErrorColors.enabled = false
-		/* 
-		// this fucking thing isnt working... its not making sense either
-		// maybe just... don't use it? just print?
-		// we have the ability to alter stdout
-		// why not do that for crashlogs? that is stdout goes to the crashlog?
-		|| v = TransCompiler.LogName
-		printline "Stdout to: " + v
-		feedback.output(v, 3)
-		options.outputnormal.size = 0
-		*/
 
 
 	dispatch AppOptions (ShellOption)
