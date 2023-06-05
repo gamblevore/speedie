@@ -95,7 +95,7 @@ function ClickedToolbar (GUIAction)
 
 function file.InputFol (|file|)
 	for c.files in self
-		if c.name ~= "input"  or  c isa "input"
+		if  c.name ~= "input"  or  c isa "input"
 			return c
 
 
@@ -126,13 +126,13 @@ function PerryIDE.FindNotTodo (|bool|)
 
 
 function PerryIDE.ClickedTodo
-	|| todo	= .MainProjFol ?? .FileList[0]
-	|| fl	= .filelist
-	require .findnottodo and fl // what? fl is nil? it happened tho?
+	|| fl	= .filelist #require
+	|| todo	= .MainProjFol ?? fl[0]
+	require .FindNotTodo and fl // what? fl is nil? it happened tho?
 	if !todo
 		todo = fl[0]
 	|| Jumpback = (todo is selected) and .nottodo and (fl.listsource contains .nottodo) 
-		todo = .nottodo
+		todo = .NotTodo
 		fl.show(todo)
 		fl.scrolljump
 	  else
