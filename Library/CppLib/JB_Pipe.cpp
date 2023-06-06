@@ -353,6 +353,7 @@ static void Smooth(ShellStream& Sh) {
 }
 
 bool JB_Sh_Step(ShellStream* self) {
+	require (self);
 	ShellStream& Sh = *self;
 	if (Sh.Mode >= 0) {
 		Smooth(Sh);

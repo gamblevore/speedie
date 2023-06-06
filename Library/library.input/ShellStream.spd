@@ -19,7 +19,10 @@ class ShellStream
 		cpp_class ShellStream
 	destructor:							cpp_wrapper JB_Sh_Destructor
 
-	function Step (|bool|):				cpp_wrapper JB_Sh_Step
+	function Step (|bool|)
+//		description `Returns false if the process has exited.` // can' COMBINE!!!!!!!! CAAANNNNNNNNNNNNNNNTTTTTEEEE
+//		HACETAKLERSD:LKAS<D
+		cpp_wrapper JB_Sh_Step
 
 	function Kill
 		if self and .pid > 0
