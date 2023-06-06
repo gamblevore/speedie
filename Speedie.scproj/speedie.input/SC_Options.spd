@@ -115,7 +115,7 @@ module Feedback
 			return false
 
 		for (S in args)
-			.Parseoption(S)
+			.ParseOption(S)
 		
 		if options.OperationCount <= 0
 			StdErr.newerror( "\nError: No operations requested.\n" )
@@ -163,10 +163,10 @@ module Feedback
 		if exists and isspd and stderr.ok
 			return path
 		
-	function ParseOption (|object| Obj)
+	function ParseOption (|AppArgument| Obj)
 		// something like that?
-		|| Name  = obj.ArgName
-		|| Value = obj.ArgValue
+		|| Name  = obj.Name
+		|| Value = obj.Value
 
 		if Name
 			|| opt = AppOptions[name]

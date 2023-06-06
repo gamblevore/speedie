@@ -60,8 +60,8 @@ syntax access (|string| name, |string|)
 	cpp_part ArgValue
 	opt norefcounts
 	for R in .rawargs
-		if R.HasArgName(name)
-			return R.argvalue
+		if R|AppArgument|.name ~= name
+			return R|AppArgument|.value
 
 function Switches (|[string]|)
 	opt norefcounts
@@ -72,7 +72,7 @@ function Switches (|[string]|)
 function args_ (|[string]|)
 	opt norefcounts
 	for R in .rawargs
-		if R.HasArgName("")
+		if R|AppArgument|.name ~=""
 			rz <~ r
 
 function args (|[string]|)
@@ -291,85 +291,4 @@ function NeedsIdealPath (|file|)
 	if f.path != app.apppath
 		return f
 }
-
-
-function string.ArgName (|string|)
-	// "--Name=Value" --> "Name"
-	// "--Name" --> "Name"
-	if (self[0] == '-') 
-		|| i = .find( '=' ) ?? int.max
-		|| S = self[ 0, i ]
-		S = S.TrimFirst('-')
-		return S.lowercase
-
-
-function string.ArgValue (|string|)
-	// "--Name=Value" --> "Value"
-	// "--Name" --> ""
-	// "Value" --> "Value"
-	if (self[0] != '-')
-		return self
-
-	|| it = .find( '=' )
-		return self[it + 1...]
-	return "true"
-
-
-function object.ArgValue (|String|)
-	if (self isa string):  return .argValue
-	if (self isa message): return .argValue
-
-
-function object.HasArgName (|string| name, |bool|)
-	return .argname ~= name
-
-function object.ArgName (|string|)
-	if (self isa string):  return .argName
-	if (self isa message): return .argName
-
-
-
-// The idea is... we want to have an array of arguments... that can be messages or strings:
-	// * (name:)	  for switches:  --nocolor
-	// * (name:value) for switches:  --level=3
-	// * (value)	  for paths:	 "/usr/dir/filexx"
-
-
-function Message.ArgName (|string|)
-	require self == @item
-	return .first.nyme.lowercase
-
-
-function Message.ArgValue (|string|)
-	if (self == @item)
-		return .second.nyme ?? "true"
-	return .name
-
-
-
-prototype ShellOption			(|string| Name, |string| Value, |faststring| purpose=nil, |bool|)
-
-
-/*
-// clever idea. Just not worth it
-helper @int.MainArg (|int| Pos, |int|)
-	return string.MainArgSub(Pos, "integer")$.int
-helper @string.MainArg (|int| Pos, |string|)
-	return string.MainArgSub(Pos, "string")
-helper @file.MainArg (|int| Pos, |string|)
-	return string.MainArgSub(Pos, "file")$.file
-helper @message.MainArg (|int| Pos, |message|)
-	return string.MainArgSub(Pos, "message")$.parse
-helper @float.MainArg (|int| Pos, |f64|)
-	return string.MainArgSub(Pos, "float")$.float
-
-
-
-helper @string.MainArgSub (|int| Pos, |string| type, |stringthatwasreadsafely|)
-	if app.args > pos
-		return app.args[pos]
-	if StdErr.ok
-		error "Usage: ${app.filename} ${app.usage}"
-	return string.Error
-*/
 

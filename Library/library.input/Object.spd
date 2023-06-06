@@ -33,9 +33,7 @@ class Object
 	function Dispose				// Safely clears out all the properties...
 		cpp_wrapper JB_ObjDestroy
 
-	
-	syntax cast (|bool|)
-		return self|bool|
+
 
 	operator isa (|&ClassData|x, |bool|)
 		cpp_part Isa
