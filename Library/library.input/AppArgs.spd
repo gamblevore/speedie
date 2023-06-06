@@ -28,9 +28,6 @@ role AppArgument (object)
 		if (self isa string):  return .argValue
 		if (self isa message): return .argValue
 	
-	function HasName (|string| name, |bool|)
-		return .name ~= name
-	
 	function Name (|string|)
 		if (self isa string):  return .argName
 		if (self isa message): return .argName
@@ -56,6 +53,7 @@ function Message.ArgValue (|string|)
 
 
 prototype ShellOption			(|string| Name, |string| Value, |faststring| purpose=nil, |bool|)
+
 
 
 /*
