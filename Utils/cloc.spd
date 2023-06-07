@@ -8,6 +8,7 @@ module Counts
 	|int64|		Parsed
 	|int64|		Files
 	|int64|		Dirs
+	|int64| 	KB
 	|int|		MaxNodeLength
 	|uint[65]|	Histogram
 	
@@ -56,8 +57,7 @@ function file.cloc
 		printline .path 
 
 	|| data = .ReadSafely(int.max) #require
-	if data.IsCompressed // decompress?
-		"Decompressing $self"
+	if data.IsCompressed
 		data = data.Decompress(int.max) // might as well...
 	
 	Counts.files++
@@ -66,6 +66,7 @@ function file.cloc
 	|| msg = data.parse
 	|| Durr = start.ago
 	Counts.Lines += data.loc
+	counts.kb += data.Length
 	require msg
 	counts.Count(msg) 
 	if counts.PrintTree
@@ -134,12 +135,13 @@ function Counts.report
 	|| l = .lines
 	|| p = .parsed
 	|| d = .nodes
+	|| kb = .KB.strsize
 	"$l lines"
 	|| n = .names
 		"$n names in $d nodes"
 		.reportHisto
 	if p > 1 or f > 1
-		"Total files: $f, total jeebox files: $p"
+		"Total files: $f, total jeebox files: $p, total size: $kb"
 	if compressionstats.All.Out
 		compressionstats.all.render(app.stdout.out)
 		printline

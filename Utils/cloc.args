@@ -1,6 +1,6 @@
 args
-	"/usr/local/speedie/Utils"
+	"/usr/local/speedie/Perry.scproj/perry.input"
 	"--quiet"
-pwd '.'
 
-env {setting="value"}
+pwd '.'
+env {}
