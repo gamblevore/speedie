@@ -1004,7 +1004,10 @@ module SDLApp
 		
 	
 	helper Window.Click (|int| bn,  |int| clicks,  |ivec2| xy, |guicontrol|)
-		|| Ctrl = keys.control
+		target osx
+			|| Ctrl = keys.control // only osx needs this
+		  else
+			|| ctrl = false
 		if (bn == 3) or (Ctrl and bn == 1) 
 			rz = .ControlOrMenuAt(xy)
 			if rz

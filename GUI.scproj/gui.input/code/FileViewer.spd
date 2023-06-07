@@ -382,10 +382,7 @@ class FileViewer (ListView)
 			return
 			
 		|| r = .FindPaths(path, nil, true)
-		|| l = .listopen
-		(l is visible) = r.length > 0
-		l.QuickOpenFill(r)
-		l.size = the~same by 0~before back (l.desiredheight.clamp(100,200))
+		.listopen.QuickOpenFill(r)
 
 
 	helper ListView.QuickOpenFill (|[filerow]| Items)
@@ -396,8 +393,11 @@ class FileViewer (ListView)
 			|| m = message(@str, p.name) 
 			self <~ m
 			m.obj = p
+		(self is visible) = items.length > 0
+		.size = the~same by 0~before back (.desiredheight.clamp(100,200))
 
 	helper OpenQuickRelistDir (|file| path)
+		require path.exists
 		|| invis = path endswith "/."
 		|[filerow]| items
 		for ch in path
