@@ -1,6 +1,6 @@
 # Perry - The IDE for Speedie
 
-Perry is an IDE, that means it does all  of the things that help you to write good code in. Or it will do anyhow as I have some good features in mind.
+Perry is an IDE, that means it aims to do all the things that help you write good code.
 
 Perry is designed with minimalism in mind. That is... it purposefully DOESN'T blast your eyes with all sorts of clutter and details.
 
@@ -33,23 +33,23 @@ You'll see that it looks simple. But underneath that simplicity, is a huge amoun
 
 Each of these features was designed expertly and to a high degree of care. For example:
 
-> The tabbed interface, lets you work on multiple projects at once! It actually very quickly lets you see if one of your changes in one project, is breaking another project. This is useful if you are creating a library that many projects of yours use, and want to be quickly warned if the change breaks other projects of yours.
+> The tabbed interface, lets you work on multiple projects at once! This lets you see if a change in one project, breaks other projects. This is useful if you are creating a library that many projects of yours use, and want to be quickly warned if the change breaks other projects of yours.
 
 &nbsp;
-> The Inbuilt todo list, is available by clicking on your current project's tab. Clicking again returns you. I find this invaluable for my project management. This means your todo-list is always at-hand. Really vital.
+> The inbuilt   todo list, is available by clicking on your current project's tab. Clicking again returns you. I find this invaluable for my project management. This means your todo-list is always at-hand. Really vital.
 
 
-## Speed
+## Speed And Efficiency
 
-Overall... Perry is also a very **fast** and light small program. Weighing at only 2.1MB on OSX. Incredible that it is so small. This is because it is made in Speedie, and Speedie writes good programs.
+Overall... Perry is also a very **fast** and light small program. Weighing at only 2.1MB on OSX. Compare that to Xcode which can be over 21GB, (10000x bigger). Incredible that Perry is so small. This is because it is made in Speedie, and Speedie writes good programs.
 
-The kind of programs you used to like and enjoy maybe 20 years ago... small fast light programs that do a lot... without all the bloat.
+Perry minds us of the kind of programs you used to like and enjoy maybe 20 years ago... small fast light programs that do a lot... without all the bloat.
 
-Anyhow, the point is, that Perry generally is a fast text-editor. Despite that I didn't actually optimise it for speed. This is simply because speedie tends to make everything fast, and I tend to write fast code anyhow.
+Perry is fast overall. Finding is fast, text-editing is fast.
 
-Also, when I'm editing my projects, it takes surprising little RAM. 
+Also, when I'm editing my projects, I find takes surprising little RAM. 
 
-When I open Perry I see I have 6 projects open (3 are large projects). Yet I am only taking 1.5MB of memory for all the objects, 87KB for the strings, and 1.7MB for the screen. Its an ultra-light-weight design.
+When I open Perry I see I have 6 projects open (3 are large projects). Yet I am only taking 1.5MB of memory for all the objects, 87KB for the strings, and 1.7MB for the screen. Its an ultra-light-weight design. Xcode will take hundreds of megabytes for just one project.
 
 ## Comparisons
 
@@ -63,7 +63,7 @@ Syntax coloring is instant, unlike in Xcode.
 
 Xcode has a giant bloated IDE. And a super-confusing Build and Scheme and Task window system thingy that I still don't fully understand after using it for over 15 years.
 
-Xcode STILL regularly breaks file-paths in such ways that takes very careful manual editing of
+Xcode STILL regularly breaks file-paths in such ways that takes very careful manual hacking of projects raw hidden data-files, to fix.
 
 Perry is sleek and simple in that regard. Creating a new project is a single-click process, opening an existing project is also. In fact Perry doesn't require you to manually add files, they are auto-discovered.
 
