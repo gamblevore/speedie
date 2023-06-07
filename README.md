@@ -6,6 +6,8 @@
 * `Contact:` [theo@jeebox.org](mailto:theo@jeebox.org)
 * `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 * `Released`: New Years Eve 2022  (31/12/2022)
+* `Platforms`: MacOSX Intel • Apple Silicon (ARM) • Linux (Ubuntu) • MS Windows (via [WSL](https://learn.microsoft.com/en-us/windows/wsl/install))
+
 
 # General Features #
 * Object-oriented programming model
@@ -78,18 +80,6 @@ You can install "Perry" (the IDE), on Ubuntu on Windows. You will need libsdl2-d
 
 LibSDL2 has [install instructions](https://wiki.libsdl.org/SDL2/Installation). Gedit can be installed simply: `sudo apt install gedit`
 
-
-
-
-
-# Available Platforms #
-
-* MacOSX Intel
-* Apple Silicon (ARM)
-* Linux (Ubuntu)
-* MS Windows (via the Ubuntu WSL system).
-
-Yes the compiler, and IDE, and your built apps are now cross-platform!
 
 
 # Sponsors #
