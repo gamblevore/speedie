@@ -13,7 +13,7 @@ The reason for creating my own IDE, is that I wanted full support for Speedie. I
 You'll see that it looks simple. But underneath that simplicity, is a huge amount of features carefully hidden.
 
 ## Perry Features
-* File List has auto-discovery
+* File List auto-discovers your project files.
 * Anti-Clutter interface
 * Errors List lets you jump to error-locations.
 * Batch-Find
