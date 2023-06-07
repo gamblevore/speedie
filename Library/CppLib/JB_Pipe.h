@@ -10,9 +10,10 @@ extern "C" {
 JBClass( ShellStream, JB_Object,
 	int Mode;
 	int PID;
-	int Error;
+	int ErrorCode;
+	JB_String*  Path;
 	FastString* Output;
-	FastString* StdErr;
+	FastString* ErrorOutput;
     int CaptureOut[2]; // remove these? they are just temps?
     int StdErrPipe[2]; // check if they are!
     Date LastRead;

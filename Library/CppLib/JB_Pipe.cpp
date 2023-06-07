@@ -259,7 +259,7 @@ static bool JB_FEPDWEE_Middle(ShellStream& Sh) {
 	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], Sh.Mode);
 	// this will only return, once the app has finished... unless we are Streaming.
 	// either way, if both return false, we can finish.
-	bool ContinueErr = JB_FS_AppendPipe(Sh.StdErr, Sh.StdErrPipe[RD], Sh.Mode);
+	bool ContinueErr = JB_FS_AppendPipe(Sh.ErrorOutput, Sh.StdErrPipe[RD], Sh.Mode);
 	return (ContinueOut or ContinueErr);
 }
 
@@ -275,21 +275,21 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 bool JB_FEPDWEE_Start(ShellStream* sh, Array* R, FastString* FSOut, FastString* FSErrIn, JB_String* self, bool KeepStdOut) {
 	ShellStream& Sh = *sh;
 	Sh.Output = FSOut;
-	Sh.StdErr = JB_FS__FastNew(FSErrIn);
+	Sh.ErrorOutput = JB_FS__FastNew(FSErrIn);
 
 	const char* argv[MaxArgs + 1];
-	Sh.Error = JB_ArrayPrepare_(self, argv, R);
-	if (!Sh.Error)
-		Sh.Error = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
-	if ( Sh.Error) {
-		JB_ErrorHandleFile(self, nil, Sh.Error, nil, "call command-line tool");
+	Sh.ErrorCode = JB_ArrayPrepare_(self, argv, R);
+	if (!Sh.ErrorCode)
+		Sh.ErrorCode = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
+	if ( Sh.ErrorCode) {
+		JB_ErrorHandleFile(self, nil, Sh.ErrorCode, nil, "call command-line tool");
 		return false;
 	}
 	return true;
 }
 
 void JB_FEPDWEE_Finish(ShellStream& Sh) {
-	Sh.Error = JB_SafeWait(Sh.PID); // this is jsut to get the... exit code.
+	Sh.ErrorCode = JB_SafeWait(Sh.PID); // this is jsut to get the... exit code.
 	pipe_close(Sh.CaptureOut[RD]);
 	pipe_close(Sh.StdErrPipe[RD]);
 	Sh.Mode = -1;
@@ -297,10 +297,10 @@ void JB_FEPDWEE_Finish(ShellStream& Sh) {
 
 int JB_FEPDWEE_Finish2(ShellStream& Sh, FastString* FSErrIn ) {
 	JB_FEPDWEE_Finish(Sh);
-	if (Sh.StdErr->Length and !FSErrIn) {
-		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh.StdErr), nil);
+	if (Sh.ErrorOutput->Length and !FSErrIn) {
+		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh.ErrorOutput), nil);
 	}
-	return Sh.Error;
+	return Sh.ErrorCode;
 }
 
 int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
@@ -308,7 +308,7 @@ int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSE
 // like a busy-loop that calls .step until its finished
 	ShellStream Sh = {};
 	if (!JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, KeepStdOut))
-		return Sh.Error;
+		return Sh.ErrorCode;
 	JB_FEPDWEE_Middle(Sh);
 	return JB_FEPDWEE_Finish2(Sh, FSErrIn);
 }
@@ -322,7 +322,8 @@ ShellStream* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString
 	require(JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, FSOut==nil));
 	auto rz = JB_New(ShellStream);
 	if (rz) {
-		JB_Incr(Sh.StdErr);
+		Sh.Path = JB_Incr(self);
+		JB_Incr(Sh.ErrorOutput);
 		JB_Incr(Sh.Output);
 		*rz = Sh;
 	}
@@ -332,7 +333,8 @@ ShellStream* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString
 void JB_Sh_Destructor(ShellStream* self) {
 	ShellStream& Sh = *self;
 	JB_FEPDWEE_Finish(Sh);
-	JB_Decr(Sh.StdErr);
+	JB_Decr(Sh.ErrorOutput);
+	JB_Decr(Sh.Path);
 	JB_Decr(Sh.Output);
 }
 
