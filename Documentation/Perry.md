@@ -6,7 +6,7 @@ Perry is designed with minimalism in mind. That is... it purposefully DOESN'T bl
 
 In fact Perry goes out of it's way to hide clutter. Hopefully this will let you focus on the code more easily. Especially if you are new!
 
-The reason for creating my own IDE, is that I wanted full support for Speedie. I didn't want to have to be a second-class citizen.
+The reason for creating my own IDE, is that I wanted full support for Speedie. I refuse to be a second-class citizen, which is what vscode would make me.
 
 ![](perry.png)
 
@@ -34,13 +34,11 @@ You'll see that it looks simple. But underneath that simplicity, is a huge amoun
 
 Each of these features was designed expertly and to a high degree of care. For example:
 
-> The tabbed interface, lets you work on multiple projects at once! This lets you see if a change in one project, breaks other projects. This is useful if you are creating a library that many projects of yours use, and want to be quickly warned if the change breaks other projects of yours.
+* The tabbed interface, lets you work on multiple projects at once! This lets you see if a change in one project, breaks other projects. This is useful if you are creating a library that many projects of yours use, and want to be quickly warned if the change breaks other projects of yours.
 
-&nbsp;
-> The inbuilt todo list, is available by clicking on your current project's tab. Clicking again returns you. I find this invaluable for my project management. This means your todo-list is always at-hand. Really vital.
+* The inbuilt todo list, is available by clicking on your current project's tab. Clicking again returns you. I find this invaluable for my project management. This means your todo-list is always at-hand. Really vital.
 
-&nbsp;
-> The quick file-finding feature, is accessed via Cmd-D (control-D on Linux). This brings up a list of files that contain the name. You can also paste file-paths in there, to see all the files in that folder.
+* The quick file-finding feature, is accessed via Cmd-D (control-D on Linux). This brings up a list of files that contain the name. You can also paste file-paths in there, to see all the files in that folder.
 
 
 
@@ -48,7 +46,7 @@ Each of these features was designed expertly and to a high degree of care. For e
 
 Overall... Perry is also a very **fast** and light small program. Weighing at only 2.1MB on OSX. Compare that to Xcode which can be over 21GB, (10000x bigger). Incredible that Perry is so small. This is because it is made in Speedie, and Speedie writes good programs.
 
-Perry minds us of the kind of programs you used to like and enjoy maybe 20 years ago... small fast light programs that do a lot... without all the bloat.
+Perry reminds us of the kind of programs you used to like and enjoy maybe 20 years ago... small fast light programs that do a lot... without all the bloat.
 
 Perry is fast overall. Finding is fast, text-editing is fast, autocomplete is fast, clicking on functions to find more info about them, is fast... Everything is fast.
 
