@@ -26,11 +26,9 @@ function FoundListKeys (GuiKeyEvent)
 		return true
 
 
-|| DebugArgsArgs = "
+|| DebugArgsList = "
 args {
-	// put arguments here like this:
 	// \"ArgumentValue\"
-	// you can use strings of any kind, or direct names or numbers
 }
 "
 function DebugArgsGotFocus (guiaction)
@@ -43,7 +41,7 @@ function DebugArgsGotFocus (guiaction)
 			.LoadDocument(Document(f))
 		|| data = .Parse
 			if !data..args
-				self <~ DebugArgsArgs
+				self <~ DebugArgsList
 			if !data..pwd
 				self <~ "\npwd '.'\n"
 			if !data..env
