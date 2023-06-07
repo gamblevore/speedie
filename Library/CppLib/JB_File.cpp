@@ -536,7 +536,9 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 
 
 char* realpath(const char* file_name, char* resolved_name);
+// what to do if the case is different?
 JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
+	//self = JB_Str_LowerCase(self);
 	JB_String* Result = JB_Str__Error();
 	if (!JB_Str_Length(self))
 		return Result;
@@ -545,10 +547,15 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 	uint8* Path = JB_FastFileString(UserPath, Tmp);
 	if (Path) {
 		char* Resolved = realpath((const char*)Path, 0);
-		if (Resolved)
-			Result = JB_StrC( Resolved );
-		  else if (!(errno == ENOENT and AllowMissing))
+		if (Resolved) {
+			if (StrEquals( Mini(self), Mini2(Resolved) )) {
+				free(Resolved);
+				return self;
+			}
+			Result = JB_Str__Freeable( Resolved );
+		} else if (!(errno == ENOENT and AllowMissing)) {
 			JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
+		}
 	}
 	if (UserPath != self)
 		JB_FreeIfDead(UserPath);

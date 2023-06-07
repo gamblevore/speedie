@@ -137,6 +137,11 @@ inline MiniStr Mini(JB_String* S, int N=0) {
     return M + N;
 }
 
+inline MiniStr Mini2(const char* S) {
+    MiniStr M = {(int)strlen(S), (u8*)S};
+    return M;
+}
+
 
 // how to "unshare" this? If we are only keeping a small part of many files?
 // seems... we could try to re-link the parent memorylayer into the main memorylayer for String, and go through all the AllocationBlocks and set them to use the main memorylayer...

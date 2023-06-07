@@ -14,6 +14,7 @@ JB_StringC* JB_Str_MakeC( JB_String* self );
 bool JB_Str_IsC ( JB_String* self );
 JB_String* JB_Str3(const char* c, int N);
 JB_String* JB_StrFromPtr(void* c, int N, void* Free, void* Obj);
+JB_String* JB_Str__Freeable(const char* Msg);
 JB_StringC* JB_StrC( const char* c );
 JB_StringC* JB_StrCN( void* c, int N );
 

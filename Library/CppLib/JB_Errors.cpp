@@ -10,16 +10,20 @@
 extern "C" {
 
 
-JB_String* FreeableStr_(const char* Msg, bool CanFree) {
-    // if canfree is true, then... we will call free() on dispose.
-    // otherwise not.
-    if (!CanFree) {
-        return JB_StrC(Msg);
-    }
+JB_String* JB_Str__Freeable(const char* Msg) {
     JB_String* Str = JB_New( JB_String );
     Str->Addr = (uint8*)Msg;
     Str->Length = (int)strlen(Msg);
     return Str;
+}
+
+
+JB_String* FreeableStr_(const char* Msg, bool CanFree) {
+    // if canfree is true, then... we will call free() on dispose.
+    // otherwise not.
+    if (!CanFree)
+        return JB_StrC(Msg);
+    return JB_Str__Freeable(Msg);
 }
 
 
