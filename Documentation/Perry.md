@@ -47,7 +47,9 @@ The kind of programs you used to like and enjoy maybe 20 years ago... small fast
 
 Anyhow, the point is, that Perry generally is a fast text-editor. Despite that I didn't actually optimise it for speed. This is simply because speedie tends to make everything fast, and I tend to write fast code anyhow.
 
-Also, when I'm editing my projects, it takes surprising little RAM. When I open Perry I see I have 6 projects open.
+Also, when I'm editing my projects, it takes surprising little RAM. 
+
+When I open Perry I see I have 6 projects open (3 are large projects). Yet I am only taking 1.5MB of memory for all the objects, 87KB for the strings, and 1.7MB for the screen. Its an ultra-light-weight design.
 
 ## Comparisons
 
