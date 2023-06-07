@@ -6,7 +6,7 @@ Perry is designed with minimalism in mind. That is... it purposefully DOESN'T bl
 
 In fact Perry goes out of it's way to hide clutter. Hopefully this will let you focus on the code more easily. Especially if you are new!
 
-The reason for creating my own IDE, is that I wanted full support for Speedie. I refuse to be a second-class citizen, which is what vscode would make me.
+The reason for creating my own IDE, is that I wanted full support for Speedie. I refuse to be a second-class citizen.
 
 ![](perry.png)
 
