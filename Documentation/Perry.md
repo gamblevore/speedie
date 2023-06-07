@@ -50,7 +50,7 @@ Perry reminds us of the kind of programs you used to like and enjoy maybe 20 yea
 
 Perry is fast overall. Finding is fast, text-editing is fast, autocomplete is fast, clicking on functions to find more info about them, is fast... Everything is fast.
 
-Also, when I'm editing my projects, I find takes surprising little RAM. 
+Also, when I'm editing my projects, I find Perry takes surprising little RAM. 
 
 When I open Perry I see I have 6 projects open (3 are large projects). Yet I am only taking 1.5MB of memory for all the objects, 87KB for the strings, and 1.7MB for the screen. Its an ultra-light-weight design. Xcode will take hundreds of megabytes for just one project.
 
