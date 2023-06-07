@@ -103,3 +103,12 @@ Regarding the color-scheme, that can and will change over time. Currently I have
 
 I'll probably allow rounded buttons with pictures for backgrounds later, perhaps we can make the IDE look like something from a Civilisation Game or something :) Or a "my little IDE" kind of Hello Kitty theme, or all sorts of possibilities.
 
+## Remaining Challenges
+I still prefer Xcode sometimes. I'm actually going to continue to improve Perry, until I prefer Perry in all areas, but right now here are some areas that Xcode is better (for me).
+
+* Smooth fonts are nice in Xcode. Perry has a low-rez pixel-art font thats great if you are compiling on an embedded device. But not so great ona modern high-DPI monitor. This will be a challenge to upgrade.
+* Xcode's text-editor feels smooth. Perry's text-editor is still a little glitchy in places. In fact I've spent months ironing out bugs in the text editor, so its much better than it was. And I've seen IDEs by large companies (QT + MSVS) that have even more glitchy text-editors.
+* Needs a debugger and VM
+* Needs skinning and theme support
+* Maybe we could animate the text or add explosions or animations into Perry. That would be cool.
+
