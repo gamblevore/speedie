@@ -13,7 +13,6 @@ JB_File* JB__App__StdOut;
 JB_String* JB__App_codesign_native;
 Array* JB__App_OldArgs;
 
-bool JB__App_Unregistered;
 bool JB__ErrorColors_Enabled;
 u16 JB__API_NilHappened;
 CharSet* JB__Constants_CSAfterStatement;

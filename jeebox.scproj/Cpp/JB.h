@@ -125,6 +125,8 @@ struct StructSaveTest;
 
 struct uint24;
 
+struct Object_Behaviour;
+
 struct ByteMap_Behaviour;
 
 struct Charset_Behaviour;
@@ -200,6 +202,8 @@ struct Message_Behaviour;
 struct Message_Behaviour;
 
 struct Message_Behaviour;
+
+struct JB_Object;
 
 struct DTWrap;
 
@@ -517,7 +521,6 @@ extern JB_File* JB__App__StdOut;
 extern JB_String* JB__App_codesign_native;
 extern Array* JB__App_OldArgs;
 
-extern bool JB__App_Unregistered;
 #define kJB__ErrorColors_bold (JB_LUB[375])
 extern bool JB__ErrorColors_Enabled;
 #define kJB__ErrorColors_error (JB_LUB[376])
@@ -1683,6 +1686,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_uint24
 
 
+// JB_AppArgument_Behaviour
+
+
 // JB_ByteMap_Behaviour
 
 
@@ -1800,15 +1806,11 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_Object
 inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in);
 
-Array* JB_Object_CollectLeaks_(JB_Object* self);
-
 void jdb(JB_Object* self);
 
 bool JB_Object_FastIsa(JB_Object* self, JB_Class* x);
 
 bool JB_Object_Isa(JB_Object* self, JB_Class* x);
-
-void jbl(JB_Object* self);
 
 void JB_Object_SaveTryCollect(JB_Object* self, ObjectSaver* Saver);
 
@@ -1816,6 +1818,9 @@ void JB_Object_Fail(JB_Object* self, JB_String* Error);
 
 void JB_Object_SyntaxExpect(JB_Object* self);
 
+
+
+// JB_AppArgument
 
 
 // JB_ByteMap
@@ -1993,6 +1998,8 @@ void JB_Mrap_Free(MWrap* self);
 
 MWrap* JB_Mrap__Alloc();
 
+Array* JB_Mrap__CollectLeaks_(JB_Object* self);
+
 int JB_Mrap__Init_();
 
 int JB_Mrap__InitCode_();
@@ -2000,6 +2007,8 @@ int JB_Mrap__InitCode_();
 MWrap* JB_Mrap__NewDummy(int ItemCount, uint ItemSize, bool DummyParam);
 
 MWrap* JB_Mrap__Object(int ItemCount, int ItemSize);
+
+void jbl(JB_Object* self);
 
 
 
@@ -2065,7 +2074,7 @@ Ind JB_Str_FindByte(JB_String* self, byte find, int Start, int After);
 
 Ind JB_Str_Find(JB_String* self, CharSet* cs, int Start, int After);
 
-int JB_Str_FindTrailingSlashes(JB_String* self);
+Ind JB_Str_FindSlash(JB_String* self, int from);
 
 Ind JB_Str_HiddenJBin(JB_String* self);
 
@@ -2121,9 +2130,9 @@ void JB_Str_SyntaxExpect(JB_String* self);
 
 int JB_Str_TrimLastSub(JB_String* self, byte b);
 
-JB_String* JB_Str_TrimStart(JB_String* self, JB_String* s);
+JB_String* JB_Str_TrimSlashes(JB_String* self, bool Pathfix);
 
-JB_String* JB_Str_TrimTrailingSlashes(JB_String* self);
+JB_String* JB_Str_TrimStart(JB_String* self, JB_String* s, bool All);
 
 JB_String* JB_Str_Unescape(JB_String* self);
 
