@@ -61,6 +61,7 @@ class FileViewer (ListView)
 			is unsearchable
 			isnt editable
 			isnt visible
+			.clipmode		= ControlPoint.SlideBackInWindow
 			.onealwaysselected = true
 			.ID				= "listopen"
 			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)
@@ -386,15 +387,16 @@ class FileViewer (ListView)
 
 
 	helper ListView.QuickOpenFill (|[filerow]| Items)
-		// does not need to copy these! each item is already a copy
-		// change later :D
 		.clear
 		for p in items
 			|| m = message(@str, p.name) 
 			self <~ m
 			m.obj = p
 		(self is visible) = items.length > 0
-		.size = the~same by 0~before back (.desiredheight.clamp(100,200))
+		|| d = .DesiredHeight
+		|| d2 = d.clamp(100, 250)
+		.size = the~same by 0~before back d2
+
 
 	helper OpenQuickRelistDir (|file| path)
 		require path.exists
