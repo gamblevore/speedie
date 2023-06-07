@@ -22,6 +22,7 @@ You'll see that it looks simple. But underneath that simplicity, is a huge amoun
 * Syntax Coloring
 * Auto-Complete
 * Build and Run programs
+* Awesome quick file-finding feature.
 * Inbuilt todo list
 * Text editor is pretty good. I like it about as much as BBEdit.
 * Log area to see your programs text output
@@ -36,7 +37,11 @@ Each of these features was designed expertly and to a high degree of care. For e
 > The tabbed interface, lets you work on multiple projects at once! This lets you see if a change in one project, breaks other projects. This is useful if you are creating a library that many projects of yours use, and want to be quickly warned if the change breaks other projects of yours.
 
 &nbsp;
-> The inbuilt   todo list, is available by clicking on your current project's tab. Clicking again returns you. I find this invaluable for my project management. This means your todo-list is always at-hand. Really vital.
+> The inbuilt todo list, is available by clicking on your current project's tab. Clicking again returns you. I find this invaluable for my project management. This means your todo-list is always at-hand. Really vital.
+
+&nbsp;
+> The quick file-finding feature, is accessed via Cmd-D (control-D on Linux). This brings up a list of files that contain the name. You can also paste file-paths in there, to see all the files in that folder.
+
 
 
 ## Speed And Efficiency
@@ -79,9 +84,9 @@ Perry on the other hand, there really is no project setup. You just open a proje
 
 ## Simplicity
 
-Let me re-iterate that last point and make a whole section out of it.
+Let make a whole section out of that last point. Perry's overall design is to make your life simple.
 
-When you have a project in vscode or xcode, there is a .vscode or .xcodeproj file. In Xcode's case, that file is usually quite large. 
+When you have a project in vscode or xcode, there is a .vscode or .xcodeproj file. In Xcode's case, that file is usually quite large.  In fact my .xcodeproj files are normally 1.5MB to 2.1MB large. Thats 1.5MB **more** than nothing!
 
 **In Perry, there is no such file.** The source code that the compiler needs for your project, is enough for Perry to understand when opening that project.
 
