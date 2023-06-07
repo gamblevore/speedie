@@ -48,7 +48,7 @@ extend PerryIDE
 		sdlapp.CompileStatus = nil
 		|| err = .editme.MyError
 		if !err and (MaybeOK == "ok")
-			.errorlist.clear
+			.ErrorList.clear
 			return .CompiledOK(msg)
 
 		is Broken
@@ -113,7 +113,7 @@ extend PerryIDE
 	function CompileFB (|message| msg, |bool|)
 		|| db = .DebugIsWaitingForCompile
 		.CancelCompile
-		|| first = msg.first #require
+		|| first = msg.first						#require
 		if first == @arg // an error-list
 			return .ErrorListFB(msg)
 		.CompiledOK(msg)
@@ -136,7 +136,7 @@ extend PerryIDE
 	
 	function CancelCompile 
 		.DebugIsWaitingForCompile = false
-		.compilr.KillButOK?
+		.compilr.KillButOK? // frees memory
 		(.buildbutton is enabled)
 		(.runbutton is enabled)
 		(.progress isnt visible)
