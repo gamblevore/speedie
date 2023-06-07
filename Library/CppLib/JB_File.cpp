@@ -302,7 +302,7 @@ int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
 bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
     if (!self) return false;
     int err = 0;
-    uint8 Tmp[1024];
+    uint8 Tmp[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, Tmp);
 	if (normal)
 		err = stat( tmp, st );
@@ -536,15 +536,38 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 
 
 char* realpath(const char* file_name, char* resolved_name);
-// what to do if the case is different?
 
-void CaseFail_(JB_String* Orig, JB_String* Actual) {
-	static int x = 0;
-	if (x < 16) {
-		x++;
-		JB_ErrorHandleFile(Orig, Actual, -1, "case-incorrect", "using path", 3, "comparing");
-	}
+static int CaseFailCount;
+inline bool WorthTestingCase() {
+	#if __PLATFORM_CURR__ == __PLATFORM_OSX__
+	return CaseFailCount < 16;
+	#endif
+	return false;
 }
+static void CaseFail_(JB_String* Orig, const char* Actual, bool Owned) {
+	CaseFailCount++;
+	JB_String* Ugh = Owned?JB_Str__Freeable(Actual) : JB_Str_CopyFromCString(Actual);
+	JB_ErrorHandleFile(Orig, Ugh, -1, "case-incorrect", "using path", 3, "comparing");
+}
+
+static int CaseCompare_(JB_String* self, const char* Resolved, bool Owned) {
+	auto A = Mini(self);
+	auto B = Mini2(Resolved);
+	if (StrEquals( A, B ))
+		return 1;
+	return 0; // do this later
+	if (!WorthTestingCase() or !StrEqualsLex( A, B )) // Phew
+		return 0;
+	CaseFail_(self, Resolved, Owned); // BAD! All we did was change the case
+	return 2;
+}
+
+static void CaseTest_(JB_String* self) {
+	char Resolved[PATH_MAX];
+	realpath((const char*)(self->Addr), Resolved);
+	CaseCompare_(self, Resolved, false);
+}
+
 
 JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 	//self = JB_Str_LowerCase(self);
@@ -555,16 +578,12 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 	JB_String* Result = JB_Str__Error();
 	char* Resolved = realpath((const char*)(UserPath->Addr), 0);
 	if (Resolved) {
-		auto A = Mini(self);
-		auto B = Mini2(Resolved);
-		if (StrEquals( A, B )) {
+		int Cmp = 0; // CaseCompare_(self, Resolved, true); // do this later
+		if (Cmp == 1) {
 			free(Resolved);
 			Result = self;
 		} else {
 			Result = JB_Str__Freeable( Resolved );
-			if (StrEqualsLex( A, B )) { // OOF. All we did was change the case
-				CaseFail_(self, Result);
-			}
 		}
 	} else if (!(errno == ENOENT and AllowMissing)) {
 		JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
@@ -682,7 +701,7 @@ int JB_File_OpenBlank( JB_File* self ) {
 }
 
 int JB_Str_MakeDir(JB_String* self) {
-    uint8 Buffer[1024];
+    uint8 Buffer[PATH_MAX];
     NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileString( self, Buffer );
     int err = mkdir(tmp, kDefaultMode);
     if (err == -1 and errno == EEXIST)
@@ -694,7 +713,7 @@ int JB_Str_MakeDir(JB_String* self) {
 
 
 int JB_File_Delete (JB_String* self) {
-	uint8 Tmp[1024];
+	uint8 Tmp[PATH_MAX];
     NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileString( self, Tmp );
     int err = remove( tmp );
     if (err == -1 and errno == ENOENT) {
@@ -765,6 +784,8 @@ void JB_File_Constructor( JB_File* self, JB_String* Path ) {
     self->OpenMode = 0;
     self->Dir = 0;
     self->DirEnt = 0;
+	if (WorthTestingCase())
+		CaseTest_(self);
 }
 
 
@@ -851,7 +872,7 @@ int JB_Str_SymLink( JB_StringC* Existing, JB_String* ToCreate ) {
 		}
 	}
 	if (!Err) {
-		uint8 Tmp[1024];
+		uint8 Tmp[PATH_MAX];
 		auto Created = (const char*)JB_FastFileString(ToCreate, Tmp);
 		Err	= symlink((const char*)(Existing->Addr), Created);
 		
@@ -882,7 +903,7 @@ bool JB_File_HardLinkTo( JB_File* self, JB_StringC* Link ) {
 JB_String* JB_File_LinkToGet( JB_File* self ) {
 	// symlink
 	auto C = (const char*)JB_FastFileThing(self);
-	char Found[1024];
+	char Found[PATH_MAX];
 	int bytes = (int)readlink((const char *)C, Found, sizeof(Found));
 	return JB_Str_CopyFromPtr((uint8*)Found, bytes);
 }
@@ -957,7 +978,7 @@ bool JB_File_Exists( JB_String* self, bool LinkExists ) {
 		struct _stat st;
 		return Stat_(self, &st, false);
 	}
-    uint8 Tmp[1024];
+    uint8 Tmp[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, Tmp);
 	int err = access(tmp, 0);
 	if (!err)
@@ -970,7 +991,7 @@ bool JB_File_Exists( JB_String* self, bool LinkExists ) {
 
 
 int JB_File_MoveTo(JB_File* self, JB_String* New) {
-    uint8 Buffer2[1024];
+    uint8 Buffer2[PATH_MAX];
     uint8* SelfPath = JB_FastFileThing(self);
     uint8* NewPath  = JB_FastFileString(New,        Buffer2);
     int Err			= rename((const char*)SelfPath, (const char*)NewPath);
@@ -1108,7 +1129,7 @@ JB_File* JB_Str_File( JB_String* Path ) {
 
 
 long JB_File__chdir( JB_String* Path ) {
-    uint8 Buffer1[1024];
+    uint8 Buffer1[PATH_MAX];
 	long err = trchdir( (NativeFileChar2*)JB_FastFileString( Path, Buffer1 ) );
 	return ErrorHandle_(err, Path, nil, "calling chdir"); 
 }
