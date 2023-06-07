@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Started Building Speedie"
+echo "Starting Speedie Build"
 set -e
 cd /usr/local/speedie/Library/CppLib
 
@@ -89,4 +89,5 @@ echo ""
 echo "Build Complete."
 
 echo "Speedie Compiling Perry (Optional Extra)"
+echo "Please make sure that you have libSDL2 installed. We won't check for libSDL2, just assume it exists."
 /usr/local/speedie/Terminal/Speedie /usr/local/speedie/Perry.scproj

@@ -7,8 +7,6 @@
 	* Mostly the issues will be around module variables...
 * RefOpts?
 * path differences...
-* Perry on Ubuntu?
-	* install g++, libsdl2-dev, gedit
 
 
 // personal
@@ -16,7 +14,7 @@
 
 
 // Do later
-* any object can be created with an virtual-function override thing, just store before the refcount?
+* any object can be created with an virtual-function override table, just store before the refcount?
 * clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * TextView error/find resync
