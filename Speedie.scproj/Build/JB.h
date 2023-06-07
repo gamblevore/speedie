@@ -195,6 +195,8 @@ struct asdas2;
 
 struct uint24;
 
+struct Object_Behaviour;
+
 struct ByteMap_Behaviour;
 
 struct Charset_Behaviour;
@@ -330,6 +332,8 @@ struct TreeView_Behaviour;
 struct Message_Behaviour;
 
 struct Message_Behaviour;
+
+struct JB_Object;
 
 struct CppRefs;
 
@@ -4591,6 +4595,9 @@ void SC_asdas2_hhh(asdas2* self);
 // JB_uint24
 
 
+// JB_AppArgument_Behaviour
+
+
 // JB_ByteMap_Behaviour
 
 
@@ -4798,17 +4805,9 @@ void SC_asdas2_hhh(asdas2* self);
 // JB_Object
 inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in);
 
-JB_String* JB_Object_ArgName(JB_Object* self);
-
-JB_String* JB_Object_ArgValue(JB_Object* self);
-
 SCDecl* JB_Object_AsDecl(JB_Object* self);
 
-Array* JB_Object_CollectLeaks_(JB_Object* self);
-
 void jdb(JB_Object* self);
-
-bool JB_Object_HasArgName(JB_Object* self, JB_String* name);
 
 bool JB_Object_MustBe(JB_Object* self, JB_Class* x, Message* ErrNode);
 
@@ -4816,13 +4815,18 @@ bool JB_Object_FastIsa(JB_Object* self, JB_Class* x);
 
 bool JB_Object_Isa(JB_Object* self, JB_Class* x);
 
-void jbl(JB_Object* self);
-
 void JB_Object_SaveTryCollect(JB_Object* self, ObjectSaver* Saver);
 
 void JB_Object_Fail(JB_Object* self, JB_String* Error);
 
 void JB_Object_SyntaxExpect(JB_Object* self);
+
+
+
+// JB_AppArgument
+JB_String* JB_AppArgument_Name(JB_Object* self);
+
+JB_String* JB_AppArgument_Value(JB_Object* self);
 
 
 
@@ -5312,6 +5316,8 @@ byte* JB_Mrap_Ptr(MWrap* self);
 
 MWrap* JB_Mrap__Alloc();
 
+Array* JB_Mrap__CollectLeaks_(JB_Object* self);
+
 int JB_Mrap__Init_();
 
 int JB_Mrap__InitCode_();
@@ -5319,6 +5325,8 @@ int JB_Mrap__InitCode_();
 MWrap* JB_Mrap__NewDummy(int ItemCount, uint ItemSize, bool DummyParam);
 
 MWrap* JB_Mrap__Object(int ItemCount, int ItemSize);
+
+void jbl(JB_Object* self);
 
 byte* JB_Mrap__Zalloc(int n);
 

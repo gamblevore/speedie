@@ -310,8 +310,8 @@ JB_String* JB_App__ArgValue(JB_String* name) {
 		int _if0 = 0;
 		while (_if0 < JB_Array_Size(_LoopSrcf1)) {
 			JB_String* R = ((JB_String*)JB_Array_Value(_LoopSrcf1, _if0));
-			if (JB_Object_HasArgName(R, name)) {
-				return JB_Str_ArgValue(R);
+			if (JB_Str_Equals(JB_AppArgument_Name(((JB_Object*)R)), name, true)) {
+				return JB_AppArgument_Value(((JB_Object*)R));
 			}
 			_if0++;
 		};
@@ -393,7 +393,7 @@ void SC_Comp__AppBuildLibs(JB_File* inner) {
 	if (libs) {
 		{
 			Message* lib = ((Message*)JB_Tree_First_(libs));
-			while (lib) {
+			while ((lib)) {
 				Message* _Nf1 = ((Message*)JB_Ring_NextSib(lib));
 				if (JB_Msg_Expect(lib, JB_SyxStr, nil)) {
 					SC_Comp__AppBuildOneLib(inner, lib);
@@ -495,7 +495,7 @@ JB_String* SC_Comp__BuildErrors(ErrorSeverity MinSev) {
 	FastString* msg = JB_Incr(JB_FS__New());
 	{
 		JB_Error* err = JB_Incr(((JB_Error*)JB_Ring_First(JB_StdErr->Errors)));
-		while (err) {
+		while ((err)) {
 			JB_Error* _Nf1 = JB_Incr(((JB_Error*)JB_Ring_NextSib(err)));
 			if (err->Severity >= MinSev) {
 				Count++;
@@ -511,7 +511,7 @@ JB_String* SC_Comp__BuildErrors(ErrorSeverity MinSev) {
 		int problems = 0;
 		{
 			JB_Error* err = JB_Incr(((JB_Error*)JB_Ring_First(JB_StdErr->Errors)));
-			while (err) {
+			while ((err)) {
 				JB_Error* _Nf3 = JB_Incr(((JB_Error*)JB_Ring_NextSib(err)));
 				if (err->Severity == kJB__ErrorSeverity_Problem) {
 					if ((++problems) <= 10) {
@@ -1194,7 +1194,7 @@ void SC_Comp__ImportAll() {
 	{
 		Message* _LoopSrcf8 = JB_Incr(SC__Comp_Extend_list);
 		Message* l = JB_Incr(((Message*)JB_Tree_First_(_LoopSrcf8)));
-		while (l) {
+		while ((l)) {
 			Message* _Nf7 = JB_Incr(((Message*)JB_Ring_NextSib(l)));
 			SC_Class__ProcessExtend(l, true);
 			JB_SetRef(l, _Nf7);
@@ -1991,7 +1991,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _using182 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[153], (-9130840665013498100)));
+			FlowControlStopper _using182 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[153], (8666369021662319348)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_using182);
 		}
@@ -2087,7 +2087,7 @@ void SC_Comp__PrePrintErrors() {
 	{
 		JB_Error* _LoopSrcf2 = JB_Incr(JB_StdErr->Errors);
 		JB_Error* err = JB_Incr(((JB_Error*)JB_Tree_First_(_LoopSrcf2)));
-		while (err) {
+		while ((err)) {
 			JB_Error* _Nf1 = JB_Incr(((JB_Error*)JB_Ring_NextSib(err)));
 			JB_Err_Improve(err);
 			JB_SetRef(err, _Nf1);
@@ -2102,7 +2102,7 @@ void SC_Comp__PrePrintErrors() {
 		{
 			JB_Error* _LoopSrcf5 = JB_Incr(JB_StdErr->Errors);
 			JB_Error* err = JB_Incr(((JB_Error*)JB_Tree_First_(_LoopSrcf5)));
-			while (err) {
+			while ((err)) {
 				JB_Error* _Nf4 = JB_Incr(((JB_Error*)JB_Ring_NextSib(err)));
 				if ((!(SC_Errors__SyntaxAccess(err)))) {
 					JB_Tree_Remove(err);
@@ -2258,7 +2258,7 @@ bool SC_Comp__Reached(JB_String* s) {
 		SCBase* _tmPf0 = JB_Incr(obj->CurrReacher);
 		JB_Decr(obj);
 		JB_SafeDecr(_tmPf0);
-		return ((bool)_tmPf0);
+		return ((bool)(_tmPf0));
 	}
 	JB_Decr(obj);
 	return false;
@@ -2271,7 +2271,7 @@ int SC_Comp__ReachedClassCount() {
 		int _if0 = 0;
 		while (_if0 < JB_Array_Size(_LoopSrcf1)) {
 			SCClass* C = ((SCClass*)JB_Array_Value(_LoopSrcf1, _if0));
-			rz = (rz + (((bool)C->CurrReacher) and SC_Class_IsObject(C)));
+			rz = (rz + (((bool)(C->CurrReacher)) and SC_Class_IsObject(C)));
 			_if0++;
 		};
 	}
@@ -2656,7 +2656,7 @@ void SC_FastStringOpts__FS(Message* exp, Message* getresult) {
 	{
 		Message* ch = arg;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(arg));
-		while (((bool)ch) and (ch != _afterf1)) {
+		while (((bool)(ch)) and (ch != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(ch));
 			if (JB_Msg_OperatorIsThing(ch, name2)) {
 				JB_SetRef(ch->Name, fs1->Name);
@@ -3232,7 +3232,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[233]);
-	JB_FS_AppendInt32(_fsf0, (2023060522));
+	JB_FS_AppendInt32(_fsf0, (2023060710));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -3505,8 +3505,8 @@ bool SC_FB__ParseArgsSub(Array* args) {
 }
 
 void SC_FB__ParseOption(JB_Object* Obj) {
-	JB_String* Name = JB_Incr(JB_Object_ArgName(Obj));
-	JB_String* Value = JB_Incr(JB_Object_ArgValue(Obj));
+	JB_String* Name = JB_Incr(JB_AppArgument_Name(Obj));
+	JB_String* Value = JB_Incr(JB_AppArgument_Value(Obj));
 	if (JB_Str_Exists(Name)) {
 		DTWrap* _tmPf1 = JB_Incr(((DTWrap*)JB_Dict_ValueStr(SC__FB_AppOptions, Name)));
 		ShellOption opt = ((ShellOption)JB_Wrap_Value(_tmPf1));
@@ -3650,7 +3650,7 @@ Message* SC_AC__AllTmps() {
 	int state = 0;
 	{
 		Message* ch = ((Message*)JB_Tree_First_(rz));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(ch));
 			if (JB_Msg_EqualsSyx(ch, JB_SyxName, false)) {
 				state = JB_Msg_autocomplete_state(ch);
@@ -4144,7 +4144,7 @@ Message* SC_AC__FuncTmps() {
 	JB_SetRef(rz, JB_Macro_Pz(SC__AC_func_tmp_src));
 	{
 		Message* ch = JB_Incr(((Message*)JB_Tree_First_(rz)));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(ch)));
 			if ((!JB_Msg_EqualsSyx(ch, JB_SyxDot, false))) {
 				JB_Msg_AppendSyx(ch, JB_SyxStr, ch->Name);
@@ -4589,7 +4589,7 @@ Message* SC_AC__RootTmpComplete(Message* cmd) {
 	{
 		Message* _LoopSrcf2 = SC_AC__AllTmps();
 		Message* ch = ((Message*)JB_Tree_First_(_LoopSrcf2));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(ch));
 			JB_String* found = ch->Name;
 			if ((((bool)(ch->Flags & flags))) and (JB_Str_OperatorStarts(found, req))) {
@@ -4612,7 +4612,7 @@ Message* SC_AC__TmpAutoComplete(Message* f, JB_String* name, JB_String* type) {
 		{
 			Message* _LoopSrcf2 = JB_Incr(SC_AC__FuncTmps());
 			Message* ch = JB_Incr(((Message*)JB_Tree_First_(_LoopSrcf2)));
-			while (ch) {
+			while ((ch)) {
 				Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(ch)));
 				if ((!(JB_Msg_OperatorStarts(ch, name)))) {
 					0;
@@ -5239,7 +5239,7 @@ bool SC_Refs__ExprNeedsTemping(Message* child, Message* name) {
 	{
 		Message* s = child;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(child));
-		while (((bool)s) and (s != _afterf1)) {
+		while (((bool)(s)) and (s != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(s));
 			if (JB_Msg_OperatorIsThing(s, name->Name)) {
 				return true;
@@ -5282,7 +5282,7 @@ Message* SC_Refs__LastUsedRefPlace(Message* name, Message* arg) {
 	{
 		Message* c = JB_Incr(arg);
 		Message* _afterf1 = JB_Incr(((Message*)JB_Ring_FlatAfter(arg)));
-		while (((bool)c) and (c != _afterf1)) {
+		while (((bool)(c)) and (c != _afterf1)) {
 			Message* _N_f2 = JB_Incr(((Message*)JB_Ring_FlatNext0(c)));
 			if (JB_Msg_OperatorIsThing(c, s)) {
 				JB_SetRef(found, c);
@@ -5418,7 +5418,7 @@ bool SC_Refs__RC_NeedsOwnBlock(Message* msg, Message* pp) {
 	bool HitArg = false;
 	{
 		Message* ch = msg;
-		while (ch) {
+		while ((ch)) {
 			if (JB_Msg_EqualsSyx(ch, JB_SyxArg, false)) {
 				HitArg = true;
 			}
@@ -5584,7 +5584,7 @@ Message* SC_Refs__RefClearMsg(Message* msg) {
 
 void SC_Refs__RefDecr(Message* msg, Message* place, int Basis) {
 	Message* OldPrev = ((Message*)JB_Ring_PrevSib(place));
-	if (((bool)OldPrev) and (((JB_Msg_EqualsSyx(OldPrev, JB_SyxFunc, false))) and ((JB_Msg_SyntaxEquals(((Message*)JB_Ring_First(OldPrev)), JB_LUB[103], true))))) {
+	if (((bool)(OldPrev)) and (((JB_Msg_EqualsSyx(OldPrev, JB_SyxFunc, false))) and ((JB_Msg_SyntaxEquals(((Message*)JB_Ring_First(OldPrev)), JB_LUB[103], true))))) {
 		place = OldPrev;
 	}
 	Message* what = nil;
@@ -5806,7 +5806,7 @@ SCBase* SC_SCSelector__Build(Message* node, SCBase* name_space, Message* ErrPlac
 	JB_Tree_Remove(items);
 	{
 		Message* _Valuef2 = JB_Incr(((Message*)JB_Tree_First_(ActualNames)));
-		while (_Valuef2) {
+		while ((_Valuef2)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(_Valuef2)));
 			Message* line = JB_Incr(_Valuef2);
 			Message* init = nil;
@@ -5841,7 +5841,7 @@ SCBase* SC_SCSelector__Build(Message* node, SCBase* name_space, Message* ErrPlac
 	;
 	{
 		Message* ch = JB_Incr(((Message*)JB_Ring_Last(arg)));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf4 = JB_Incr(((Message*)JB_Ring_PrevSib(ch)));
 			Message* _tmPf5 = JB_Incr(((Message*)JB_Tree_Get(ClassCode, -1)));
 			(JB_Ring_FirstSet(_tmPf5, ch));
@@ -5916,7 +5916,7 @@ bool SC_SCSelector__HasClassStuff(Message* self) {
 	bool rz = false;
 	{
 		Message* s = JB_Incr(((Message*)JB_Tree_First_(self)));
-		while (s) {
+		while ((s)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(s)));
 			if ((!((JB_Msg_OperatorIsTmp(s, JB_LUB[432])) or (JB_Msg_OperatorIsTmp(s, JB_LUB[431]))))) {
 				if (JB_Msg_OperatorIsTmp(s, JB_LUB[433])) {
@@ -6043,7 +6043,7 @@ SCBase* SC_SCThe__NewInsertion(Message* node, SCBase* name_space, Message* ErrPl
 	{
 		Message* _LoopSrcf2 = JB_Msg_NextOf2(name, JB_SyxArg, nil);
 		Message* line = ((Message*)JB_Tree_First_(_LoopSrcf2));
-		while (line) {
+		while ((line)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(line));
 			JB_Msg_Expect(line, JB_SyxTmp, nil);
 			Message* value = JB_Msg_NeedSyxInt(line, JB_SyxNil, 0);
@@ -6104,7 +6104,7 @@ void SC_SC_API__DelayedClassAPI(Message* node, JB_String* proj) {
 	JB_Tree_Remove(_tmPf3);
 	{
 		Message* ch = JB_Incr(((Message*)JB_Tree_First_(arg)));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(ch)));
 			if ((!JB_Msg_Expect(ch, JB_SyxTmp, JB_LUB[439]))) {
 				JB_Decr(partname);
@@ -6222,7 +6222,7 @@ void SC_SC_API__NewExportAPISub(Message* node, SCObject* parent) {
 	}
 	{
 		Message* C = JB_Incr(((Message*)JB_Tree_First_(arg)));
-		while (C) {
+		while ((C)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(C)));
 			if ((JB_Msg_SyntaxEquals(C, JB_LUB[439], false)) or (JB_Msg_SyntaxEquals(C, JB_LUB[443], false))) {
 				JB_SetRef(C->Obj, parent);
@@ -6266,14 +6266,14 @@ bool SC_Errors__AlreadyIgnored(Message* F) {
 	Message* RipRoot = JB_Incr(SC_Base_SourceArg(_tmPf0));
 	{
 		Message* Curr = JB_Incr(F);
-		while (Curr) {
-			if (((JB_Msg_EqualsSyx(Curr, JB_SyxArg, false))) and ((bool)JB_FreeIfDead(({
+		while ((Curr)) {
+			if (((JB_Msg_EqualsSyx(Curr, JB_SyxArg, false))) and ((bool)(JB_FreeIfDead(({
 				JB_String* _tmP221 = JB_Incr(JB_Obj_DictName(Curr));
 				Message* _tmP220 = JB_Incr(((Message*)JB_Dict_ValueStr(SC__Errors_IgnoredBranches, _tmP221)));
 				JB_Decr(_tmP221);
 				JB_SafeDecr(_tmP220);
 				 _tmP220;
-			})))) {
+			}))))) {
 				JB_Decr(RipRoot);
 				JB_Decr(Curr);
 				return true;
@@ -6454,7 +6454,7 @@ int JB_Terminal__InitCode_() {
 void SC_TextAssembler__assemble(Message* msg) {
 	{
 		Message* ch = ((Message*)JB_Tree_First_(msg));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(ch));
 			if (JB_Msg_OperatorIsTmp(ch, JB_LUB[265])) {
 				SC_TextAssembler__TextFunc(ch);
@@ -6869,7 +6869,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[499]);
-	JB_FS_AppendInt32(_fsf0, (2023060522));
+	JB_FS_AppendInt32(_fsf0, (2023060710));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7607,7 +7607,7 @@ void SC_VM_Builder__Clean(Message* msg) {
 	{
 		Message* ch = msg;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(msg));
-		while (((bool)ch) and (ch != _afterf1)) {
+		while (((bool)(ch)) and (ch != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(ch));
 			if (JB_Msg_OperatorIn(ch, JB_SyxArg)) {
 				ch->Indent = (ch->Indent + 4);
@@ -7763,7 +7763,7 @@ void SC_VM_Builder__GenerateForms(Message* forms) {
 	{
 		Message* _LoopSrcf3 = JB_Msg_NeedSyx(forms, JB_SyxArg);
 		Message* form_msg = ((Message*)JB_Tree_First_(_LoopSrcf3));
-		while (form_msg) {
+		while ((form_msg)) {
 			Message* _Nf2 = ((Message*)JB_Ring_NextSib(form_msg));
 			bool _tmPf0 = (f < 32);
 			if ((!_tmPf0)) {
@@ -7797,7 +7797,7 @@ void SC_VM_Builder__GenerateOne(Message* form_msg, int f) {
 	}
 	{
 		Message* l = ((Message*)JB_Tree_First_(arg));
-		while (l) {
+		while ((l)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(l));
 			bit_pos = SC_VM_Builder__GenAcc(l, bit_pos, p++);
 			l = _Nf1;
@@ -7866,7 +7866,7 @@ void SC_VM_Builder__MakeVM(Message* tmp, FastString* vm) {
 	JB_FS_AppendByte(vm, '\n');
 	{
 		Message* line = ((Message*)JB_Tree_First_(arg));
-		while (line) {
+		while ((line)) {
 			Message* _Nf3 = ((Message*)JB_Ring_NextSib(line));
 			SC_VM_Builder__VMLine(line, vm);
 			line = _Nf3;
@@ -7927,7 +7927,7 @@ Array* SC_VM_Builder__VMSpd(Message* list) {
 	JB_Array_AppendCount(rz, JB_Syx_OperatorPlus(JB_SyxThg, JB_LUB[571]), 128);
 	{
 		Message* ch = ((Message*)JB_Tree_First_(list));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(ch));
 			SC_VM_Builder__VMTmp(ch, rz);
 			ch = _Nf1;
@@ -8306,7 +8306,7 @@ Array* SC_CollectDecls(Message* DeclList, SCBase* Name_Space, SCBase* AddToSpace
 	}
 	{
 		Message* _Valuef3 = JB_Incr(((Message*)JB_Tree_First_(DeclList)));
-		while (_Valuef3) {
+		while ((_Valuef3)) {
 			Message* _Nf2 = JB_Incr(((Message*)JB_Ring_NextSib(_Valuef3)));
 			Message* item = JB_Incr(_Valuef3);
 			if ((((bool)Func) and (Func->IsAssigns == 2)) and JB_Msg_IsLast(item)) {
@@ -8403,7 +8403,7 @@ Array* SC_CollectDecls(Message* DeclList, SCBase* Name_Space, SCBase* AddToSpace
 				JB_SetRef(Rdcl, ((SCArg*)Name_Space)->ParentFunc->ReturnType);
 			}
 			SCDecl* DefaultDcl = nil;
-			if (((!Func)) and ((bool)Default)) {
+			if (((!Func)) and ((bool)(Default))) {
 				JB_SetRef(DefaultDcl, SC_TypeOfExprNeeded(Default, Name_Space));
 				if ((!DefaultDcl)) {
 					JB_Decr(rz);
@@ -8426,7 +8426,7 @@ Array* SC_CollectDecls(Message* DeclList, SCBase* Name_Space, SCBase* AddToSpace
 			 else if (JB_Object_FastIsa(AddToSpace, JB_AsClass(SCClass))) {
 				0;
 			}
-			 else if (((!Func)) and (((bool)Rdcl) and (((!Default)) and (SC_Decl_CanUseDefault(Rdcl))))) {
+			 else if (((!Func)) and (((bool)(Rdcl)) and (((!Default)) and (SC_Decl_CanUseDefault(Rdcl))))) {
 				JB_SetRef(Default, SC_Decl_CreateDefault(Rdcl, Types, JB_Object_Isa(AddToSpace, JB_AsClass(SCArg))));
 				if (Default) {
 					JB_FreeIfDead(SC_TypeOfExpr(Default, Name_Space, nil));
@@ -8449,7 +8449,7 @@ Array* SC_CollectDecls(Message* DeclList, SCBase* Name_Space, SCBase* AddToSpace
 			}
 			bool OriginalRdcl = ((bool)Rdcl);
 			if ((!Rdcl)) {
-				if (((bool)Cls) and ((bool)Cls->Contained)) {
+				if (((bool)(Cls)) and ((bool)(Cls->Contained))) {
 					JB_SetRef(Rdcl, Cls->Contained);
 				}
 				 else {
@@ -9228,7 +9228,7 @@ Array* SC_FindAllSyx(Message* msg, Syntax syx) {
 	{
 		Message* c = msg;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(msg));
-		while (((bool)c) and (c != _afterf1)) {
+		while (((bool)(c)) and (c != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(c));
 			if (JB_Msg_EqualsSyx(c, syx, false)) {
 				JB_Array_SyntaxAppend(rz, c);
@@ -9248,7 +9248,7 @@ Message* SC_FindBytePos(Message* Node, bool EndInside) {
 	{
 		Message* m = Node;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(Node));
-		while (((bool)m) and (m != _afterf1)) {
+		while (((bool)(m)) and (m != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(m));
 			if (JB_Msg_HasPosition(m)) {
 				return m;
@@ -9287,7 +9287,7 @@ AsmReg SC_fn_asm_table_arg(ASMFuncState* self, Message* exp, AsmReg Reg) {
 	AsmReg garb = JB_int_Reg(31);
 	{
 		Message* ch = ((Message*)JB_Tree_First_(exp));
-		while (ch) {
+		while ((ch)) {
 			SC_flat_Reg(self, ch, garb);
 			ch = ((Message*)JB_Ring_NextSib(ch));
 		};
@@ -9979,7 +9979,7 @@ void SC_ListFunctionsSub(JB_Object* o, Array* rz) {
 	if (JB_Object_FastIsa(o, JB_AsClass(SCFunction))) {
 		{
 			SCFunction* f = ((SCFunction*)o);
-			while (f) {
+			while ((f)) {
 				JB_Array_SyntaxAppend(rz, f);
 				f = f->NextFunc;
 			};
@@ -10101,7 +10101,7 @@ void SC_MoveFutureStaticsIn(Message* msg) {
 	{
 		Message* _LoopSrcf1 = JB_Incr(((Message*)JB_Ring_NextSib(msg)));
 		Message* ch = JB_Incr(_LoopSrcf1);
-		while (ch) {
+		while ((ch)) {
 			if (JB_Msg_OperatorIsTmp(ch, JB_LUB[432])) {
 				Message* _tmPf2 = JB_Incr(JB_Msg_NeedSyxInt(ch, JB_SyxArg, -1));
 				Message* _tmPf3 = JB_Incr(((Message*)JB_Ring_Last(msg)));
@@ -10648,7 +10648,7 @@ void SC_Tran_ArgArray(Message* Exp, SCBase* name_space) {
 	ArgArrayCounter Counter = ((ArgArrayCounter){});
 	{
 		Message* itm = JB_Incr(((Message*)JB_Tree_First_(Exp)));
-		while (itm) {
+		while ((itm)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(itm)));
 			Message* rel2 = JB_Incr(SC_ArgArrayCounter_Do((&Counter), thg->Name, itm, name_space));
 			(JB_Ring_NextSibSet(Place, rel2));
@@ -10975,7 +10975,7 @@ SCObject* SC_TypeOfArgArr(Message* Exp, SCBase* name_space, Message* side) {
 	SCDecl* result = JB_Incr(SC_Decl__New());
 	{
 		Message* itm = JB_Incr(((Message*)JB_Tree_First_(Exp)));
-		while (itm) {
+		while ((itm)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(itm)));
 			if (JB_Msg_EqualsSyx(itm, JB_SyxTmp, false)) {
 				itm->Func = JB_SyxThg;
@@ -11023,7 +11023,7 @@ SCObject* SC_TypeOfArr(Message* Exp, SCBase* name_space, Message* side) {
 	JB_SetRef(Exp->Obj, result);
 	{
 		Message* _Valuef2 = JB_Incr(((Message*)JB_Tree_First_(Exp)));
-		while (_Valuef2) {
+		while ((_Valuef2)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(_Valuef2)));
 			Message* itm = JB_Incr(_Valuef2);
 			SCClass* NewArrCls = JB_Incr(JB_TypeArray);
@@ -11131,7 +11131,7 @@ SCObject* SC_TypeOfBlock(Message* Exp, SCBase* name_space, Message* side) {
 	JB_FreeIfDead(SC_CollectDecls(Exp, p, p, 0));
 	{
 		Message* ch = JB_Incr(((Message*)JB_Tree_First_(Exp)));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(ch)));
 			if (JB_Msg_EqualsSyx(ch, JB_SyxArg, false)) {
 				SCArg* _tmPf2 = JB_Incr(JB_Msg_SCArg(ch, p, nil));
@@ -11205,7 +11205,7 @@ SCObject* SC_TypeOfBRel(Message* Exp, SCBase* name_space, Message* side) {
 		JB_Decr(SubType);
 		return nil;
 	}
-	if (((bool)SubType->Type->FuncProto) and ((JB_Str_Equals(name, JB_LUB[346], false)))) {
+	if (((bool)(SubType->Type->FuncProto)) and ((JB_Str_Equals(name, JB_LUB[346], false)))) {
 		JB_Decr(name);
 		SCObject* _tmPf0 = JB_Incr(SC_TypeOfAddress(F, name_space, side));
 		JB_Decr(F);
@@ -11373,7 +11373,7 @@ SCObject* SC_TypeOfDot(Message* Exp, SCBase* name_space, Message* side) {
 			}
 			JB_SetRef(contains, ((SCDecl*)DeclSpace)->Contains);
 			SCClass* ContainsCls = JB_Incr(((SCDecl*)DeclSpace)->Type);
-			if (((!contains)) and ((bool)ContainsCls)) {
+			if (((!contains)) and ((bool)(ContainsCls))) {
 				JB_SetRef(contains, ContainsCls->Contained);
 			}
 			JB_SetRef(Class_Space, ContainsCls);
@@ -11711,7 +11711,7 @@ SCObject* SC_TypeOfList(Message* Exp, SCBase* name_space, Message* side) {
 	bool Numeric = true;
 	{
 		Message* s = JB_Incr(((Message*)JB_Tree_First_(Exp)));
-		while (s) {
+		while ((s)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(s)));
 			SCDecl* typ = JB_Incr(SC_TypeOfExpr(s, name_space, nil));
 			if ((!typ)) {
@@ -11811,7 +11811,7 @@ SCObject* SC_TypeOfMsg(Message* Exp, SCBase* name_space, Message* side) {
 	{
 		Message* _LoopSrcf1 = JB_Incr(((Message*)JB_Ring_NextSib(type)));
 		Message* ch = JB_Incr(_LoopSrcf1);
-		while (ch) {
+		while ((ch)) {
 			JB_FreeIfDead(SC_TypeOfExpr(ch, name_space, nil));
 			JB_SetRef(ch, ((Message*)JB_Ring_NextSib(ch)));
 		};
@@ -16213,7 +16213,7 @@ bool SC_flat_TextFuncSub(ASMFuncState* self, Message* m) {
 	{
 		Message* _LoopSrcf2 = SC_flat_LoadTitle(self, m);
 		Message* ch = ((Message*)JB_Tree_First_(_LoopSrcf2));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(ch));
 			if (JB_Msg_EqualsSyx(ch, JB_SyxName, false)) {
 				SC_flat_AddLabel(self, ch);
@@ -16266,7 +16266,7 @@ bool SC_flat_TextOp(ASMFuncState* self, Message* m) {
 	int write = 0;
 	{
 		Message* p = ((Message*)JB_Tree_First_(list));
-		while (p) {
+		while ((p)) {
 			Message* _Nf2 = ((Message*)JB_Ring_NextSib(p));
 			if ((!JB_Msg_EqualsSyx(p, JB_SyxName, false))) {
 				SC_IR_AddRegParam(A, p, write);
@@ -16879,7 +16879,7 @@ void JB_LD_LoadClass(ObjectLoader* self, Message* msg, Dictionary* dict) {
 	}
 	{
 		Message* line = ((Message*)JB_Tree_First_(items));
-		while (line) {
+		while ((line)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(line));
 			JB_LD_LoadObject(self, line, dict, Cls);
 			line = _Nf1;
@@ -16892,13 +16892,13 @@ void JB_LD_LoadForReal(ObjectLoader* self, Message* root, Dictionary* d) {
 	self->Dict = d;
 	{
 		Message* Cls = ((Message*)JB_Tree_First_(root));
-		while (Cls) {
+		while ((Cls)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(Cls));
 			if (JB_Msg_EqualsSyx(Cls, JB_SyxTmp, false)) {
 				{
 					Message* _LoopSrcf4 = ((Message*)JB_Ring_Last(Cls));
 					Message* line = ((Message*)JB_Tree_First_(_LoopSrcf4));
-					while (line) {
+					while ((line)) {
 						Message* _Nf3 = ((Message*)JB_Ring_NextSib(line));
 						Message* name = ((Message*)JB_Ring_First(line));
 						Saveable* result = ((Saveable*)JB_Dict_ValueStr(d, name->Name));
@@ -16957,7 +16957,7 @@ JB_Object* JB_LD_ObjectSub(ObjectLoader* self, Message* c) {
 void JB_LD_Preload(ObjectLoader* self, Message* root, Dictionary* dict) {
 	{
 		Message* Cls = ((Message*)JB_Tree_First_(root));
-		while (Cls) {
+		while ((Cls)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(Cls));
 			if (JB_Msg_EqualsSyx(Cls, JB_SyxTmp, false)) {
 				JB_LD_LoadClass(self, Cls, dict);
@@ -17242,25 +17242,6 @@ void SC_asdas2_hhh(asdas2* self) {
 
 
 
-JB_String* JB_Object_ArgName(JB_Object* self) {
-	if (JB_Object_Isa(self, JB_AsClass(JB_String))) {
-		return JB_Str_ArgName(((JB_String*)self));
-	}
-	if (JB_Object_Isa(self, JB_AsClass(Message))) {
-		return JB_Msg_ArgName(((Message*)self));
-	}
-	return JB_LUB[0];
-}
-
-JB_String* JB_Object_ArgValue(JB_Object* self) {
-	if (JB_Object_Isa(self, JB_AsClass(JB_String))) {
-		return JB_Str_ArgValue(((JB_String*)self));
-	}
-	if (JB_Object_Isa(self, JB_AsClass(Message))) {
-		return JB_Msg_ArgValue(((Message*)self));
-	}
-	return JB_LUB[0];
-}
 
 SCDecl* JB_Object_AsDecl(JB_Object* self) {
 	if (self) {
@@ -17282,13 +17263,6 @@ SCDecl* JB_Object_AsDecl(JB_Object* self) {
 	return nil;
 }
 
-Array* JB_Object_CollectLeaks_(JB_Object* self) {
-	Array* rz = JB_Incr(((Array*)JB_Array__New0()));
-	JB_FindLeakedObject(self, rz);
-	JB_SafeDecr(rz);
-	return rz;
-}
-
 __lib__ void jdb(JB_Object* self) {
 	//visible;
 	if (self) {
@@ -17300,13 +17274,6 @@ __lib__ void jdb(JB_Object* self) {
 	JB_String* _tmPf1 = JB_Incr(JB_ObjRender(self, nil));
 	JB_PrintLine(_tmPf1);
 	JB_Decr(_tmPf1);
-}
-
-bool JB_Object_HasArgName(JB_Object* self, JB_String* name) {
-	JB_String* _tmPf0 = JB_Incr(JB_Object_ArgName(self));
-	bool _tmPf1 = JB_Str_Equals(_tmPf0, name, true);
-	JB_Decr(_tmPf0);
-	return (_tmPf1);
 }
 
 bool JB_Object_MustBe(JB_Object* self, JB_Class* x, Message* ErrNode) {
@@ -17326,7 +17293,7 @@ bool JB_Object_MustBe(JB_Object* self, JB_Class* x, Message* ErrNode) {
 }
 
 bool JB_Object_FastIsa(JB_Object* self, JB_Class* x) {
-	return ((bool)self) and (JB_ObjClass(self) == x);
+	return ((bool)(self)) and (JB_ObjClass(self) == x);
 }
 
 bool JB_Object_Isa(JB_Object* self, JB_Class* x) {
@@ -17349,22 +17316,6 @@ bool JB_Object_Isa(JB_Object* self, JB_Class* x) {
 	return false;
 }
 
-void jbl(JB_Object* self) {
-	//visible;
-	{
-		Array* _LoopSrcf1 = JB_Incr(JB_Object_CollectLeaks_(self));
-		int _if0 = 0;
-		while (_if0 < JB_Array_Size(_LoopSrcf1)) {
-			JB_Object* bad = JB_Incr(JB_Array_Value(_LoopSrcf1, _if0));
-			jdb(bad);
-			JB_Decr(bad);
-			debugger;
-			_if0++;
-		};
-		JB_Decr(_LoopSrcf1);
-	};
-}
-
 void JB_Object_SaveTryCollect(JB_Object* self, ObjectSaver* Saver) {
 	if (JB_Object_Isa(self, JB_AsClass(Saveable))) {
 		if ((!JB_Sav_SaveMark(((Saveable*)self)))) {
@@ -17373,7 +17324,7 @@ void JB_Object_SaveTryCollect(JB_Object* self, ObjectSaver* Saver) {
 		JB_Array_SyntaxAppend(JB_Sav_SaverInfo(((Saveable*)self)), ((Saveable*)self));
 		JB_Sav___SaveCollect__(((Saveable*)self), Saver);
 	}
-	 else if ((bool)self) {
+	 else if ((bool)(self)) {
 		if ((!(JB_Object_Isa(self, JB_AsClass(JB_String))))) {
 			Saver->CantSaveThis = self;
 		}
@@ -17403,6 +17354,27 @@ void JB_Object_SyntaxExpect(JB_Object* self) {
 	JB_PrintLine(_tmPf2);
 	JB_Decr(_tmPf2);
 	JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_LUB[1024], nil);
+}
+
+
+JB_String* JB_AppArgument_Name(JB_Object* self) {
+	if (JB_Object_Isa(self, JB_AsClass(JB_String))) {
+		return JB_Str_ArgName(((JB_String*)self));
+	}
+	if (JB_Object_Isa(self, JB_AsClass(Message))) {
+		return JB_Msg_ArgName(((Message*)self));
+	}
+	return JB_LUB[0];
+}
+
+JB_String* JB_AppArgument_Value(JB_Object* self) {
+	if (JB_Object_Isa(self, JB_AsClass(JB_String))) {
+		return JB_Str_ArgValue(((JB_String*)self));
+	}
+	if (JB_Object_Isa(self, JB_AsClass(Message))) {
+		return JB_Msg_ArgValue(((Message*)self));
+	}
+	return JB_LUB[0];
 }
 
 
@@ -17481,7 +17453,7 @@ void SC_CppRefs_Read(CppRefs* self, Message* node) {
 	JB_Msg_ExpectLast(arg, JB_LUB[0]);
 	{
 		Message* c = JB_Incr(((Message*)JB_Tree_First_(arg)));
-		while (c) {
+		while ((c)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(c)));
 			JB_Msg_Expect(c, JB_SyxTmp, nil);
 			if ((!((JB_Msg_SyntaxEquals(c, JB_LUB[758], false)) or (JB_Msg_SyntaxEquals(c, JB_LUB[757], false))))) {
@@ -17536,7 +17508,7 @@ void SC_CppRefs_Read(CppRefs* self, Message* node) {
 		 else {
 			{
 				Message* c = JB_Incr(((Message*)JB_Tree_First_(Stuff)));
-				while (c) {
+				while ((c)) {
 					Message* _Nf3 = JB_Incr(((Message*)JB_Ring_NextSib(c)));
 					SC_CppRefs_AddOne(self, c);
 					JB_SetRef(c, _Nf3);
@@ -18644,7 +18616,7 @@ void SC_Cpp__C_FSListComma(Message* self, FastStringCpp* fs) {
 	{
 		Message* item = JB_Incr(((Message*)JB_Tree_First_(self)));
 		Message* _firstf2 = JB_Incr(item);
-		while (item) {
+		while ((item)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(item)));
 			if (_firstf2 != item) {
 				JB_FS_AppendString(fs, JB_LUB[168]);
@@ -18702,7 +18674,7 @@ void SC_Cpp__C_RenderArg(Message* self, FastStringCpp* fs) {
 	fs->Indent++;
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(ch));
 			JB_FS_AppendIndent(fs);
 			JB_Msg_Export(ch, fs);
@@ -18824,7 +18796,7 @@ void SC_Cpp__C_RenderDot(Message* self, FastStringCpp* fs) {
 			JB_String* CloseStr = JB_Incr(SC_Cpp__CDotType(self, ((SCDecl*)obj), fs));
 			JB_Msg_Export(ch, fs);
 			SCDecl* ch_decl = JB_Incr(SC_DeclOfObjForC(ch));
-			if (((bool)ch_decl) and SC_Cpp__NeedsDotForC(ch_decl)) {
+			if (((bool)(ch_decl)) and SC_Cpp__NeedsDotForC(ch_decl)) {
 				JB_FS_AppendByte(fs, '.');
 			}
 			 else {
@@ -19002,7 +18974,7 @@ void SC_Cpp__C_RenderTmp(Message* self, FastStringCpp* fs) {
 	}
 	{
 		Message* mv = ((Message*)JB_Tree_First_(self));
-		while (mv) {
+		while ((mv)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(mv));
 			JB_FS_AppendByte(fs, ' ');
 			JB_Msg_Export(mv, fs);
@@ -19681,7 +19653,7 @@ JB_Error* JB_Rec_FirstError(JB_ErrorReceiver* self) {
 	{
 		JB_Error* _LoopSrcf2 = self->Errors;
 		JB_Error* err = ((JB_Error*)JB_Tree_First_(_LoopSrcf2));
-		while (err) {
+		while ((err)) {
 			JB_Error* _Nf1 = ((JB_Error*)JB_Ring_NextSib(err));
 			if (JB_Err_IsError(err)) {
 				return err;
@@ -19823,7 +19795,7 @@ int JB_Rec_RenderErrors(JB_ErrorReceiver* self, FastString* fs, ErrorSeverity Le
 	}
 	{
 		JB_Error* err = ((JB_Error*)JB_Ring_First(self->Errors));
-		while (err) {
+		while ((err)) {
 			JB_Error* _Nf1 = ((JB_Error*)JB_Ring_NextSib(err));
 			if (err->Severity >= Level) {
 				rz++;
@@ -20828,6 +20800,13 @@ MWrap* JB_Mrap__Alloc() {
 	return ((MWrap*)JB_New(MWrap));
 }
 
+Array* JB_Mrap__CollectLeaks_(JB_Object* self) {
+	Array* rz = JB_Incr(((Array*)JB_Array__New0()));
+	JB_FindLeakedObject(self, rz);
+	JB_SafeDecr(rz);
+	return rz;
+}
+
 int JB_Mrap__Init_() {
 	{
 	}
@@ -20858,6 +20837,22 @@ MWrap* JB_Mrap__Object(int ItemCount, int ItemSize) {
 	}
 	JB_SafeDecr(rz);
 	return rz;
+}
+
+void jbl(JB_Object* self) {
+	//visible;
+	{
+		Array* _LoopSrcf1 = JB_Incr(JB_Mrap__CollectLeaks_(self));
+		int _if0 = 0;
+		while (_if0 < JB_Array_Size(_LoopSrcf1)) {
+			JB_Object* bad = JB_Incr(JB_Array_Value(_LoopSrcf1, _if0));
+			jdb(bad);
+			JB_Decr(bad);
+			debugger;
+			_if0++;
+		};
+		JB_Decr(_LoopSrcf1);
+	};
 }
 
 byte* JB_Mrap__Zalloc(int n) {
@@ -21716,7 +21711,7 @@ void SC_Imp_IndexTargets(SCImport* self, Message* tar) {
 	{
 		Message* _LoopSrcf2 = JB_Msg_Arg(tar);
 		Message* t = ((Message*)JB_Tree_First_(_LoopSrcf2));
-		while (t) {
+		while ((t)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(t));
 			if (JB_Msg_Expect(t, JB_SyxTmp, nil)) {
 				Message* ch = ((Message*)JB_Ring_First(t));
@@ -21751,7 +21746,7 @@ void SC_Imp_LoadBanned(SCImport* self, Message* list) {
 	});
 	{
 		Message* item = ((Message*)JB_Tree_First_(list));
-		while (item) {
+		while ((item)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(item));
 			JB_Msg_Expect(item, JB_SyxThg, nil);
 			(JB_Dict_ValueLowerSet(x, item->Name, JB_LUB[247]));
@@ -21769,7 +21764,7 @@ void SC_Imp_LoadPrefix(SCImport* self, SCFile* scf, int depth) {
 	{
 		Message* _LoopSrcf2 = SC_SCFile_AST(scf);
 		Message* s = ((Message*)JB_Tree_First_(_LoopSrcf2));
-		while (s) {
+		while ((s)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(s));
 			if ((!JB_Msg_EqualsSyx(s, JB_SyxTmp, false))) {
 				0;
@@ -21805,7 +21800,7 @@ void SC_Imp_ReloadImports(SCImport* self, SCFile* index) {
 	{
 		Message* _LoopSrcf2 = SC_SCFile_AST(index);
 		Message* j = ((Message*)JB_Tree_First_(_LoopSrcf2));
-		while (j) {
+		while ((j)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(j));
 			if (JB_Msg_OperatorIsTmp(j, JB_LUB[320])) {
 				SC_Imp_ImportMsg(self, j);
@@ -22055,7 +22050,7 @@ void SC_NR_CollectSelfs(SCNodeRenamer* self, Message* root) {
 	{
 		Message* Msg = JB_Incr(root);
 		Message* _afterf1 = JB_Incr(((Message*)JB_Ring_FlatAfter(root)));
-		while (((bool)Msg) and (Msg != _afterf1)) {
+		while (((bool)(Msg)) and (Msg != _afterf1)) {
 			Message* _N_f2 = JB_Incr(((Message*)JB_Ring_FlatNext0(Msg)));
 			if (JB_Msg_EqualsSyx(Msg, JB_SyxSDot, false)) {
 				SC_Func__Tran_Sdt(Msg);
@@ -22344,7 +22339,7 @@ JB_String* SC_SCObject_Render(SCObject* self, FastString* fs_in) {
 
 bool SC_SCObject_ShouldUnWrap(SCObject* self) {
 	if (JB_Object_FastIsa(self, JB_AsClass(SCDecl))) {
-		return ((bool)((SCDecl*)self)->AutoCastTo) and (SC_Decl_SyntaxIsnt(((SCDecl*)self), kSC__SCDeclInfo_newlycreated));
+		return ((bool)(((SCDecl*)self)->AutoCastTo)) and (SC_Decl_SyntaxIsnt(((SCDecl*)self), kSC__SCDeclInfo_newlycreated));
 	}
 	return false;
 }
@@ -22717,7 +22712,7 @@ bool SC_PA_PreReadTypes(SCParamArray* self, SCBase* Name_Space, Message* P, Mess
 	}
 	{
 		Message* Item = JB_Incr(((Message*)JB_Tree_First_(P)));
-		while (Item) {
+		while ((Item)) {
 			if ((!SC_PA_AddTestedParam(self, Item, Name_Space))) {
 				JB_Decr(Item);
 				return nil;
@@ -22889,7 +22884,7 @@ void JB_Sel_GiveIDs(Selector* self) {
 	int ID = 0;
 	{
 		Selector* curr = self;
-		while (curr) {
+		while ((curr)) {
 			curr->ID = ID;
 			ID++;
 			curr = curr->Next;
@@ -25296,7 +25291,7 @@ void SC_xC2xB5Form_ConstructorWithMsg(xC2xB5Form* self, Message* tmp) {
 	{
 		Message* _LoopSrcf2 = JB_Msg_Last(tmp, JB_SyxArg);
 		Message* line = ((Message*)JB_Tree_First_(_LoopSrcf2));
-		while (line) {
+		while ((line)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(line));
 			Message* f = JB_Msg_NeedSyx(line, JB_SyxNil);
 			SC_xC2xB5Form_LoadParam(self, JB_Msg_Nyme(f), f);
@@ -26646,7 +26641,7 @@ Array* JB_Tree_Flatten(RingTree* self) {
 	{
 		RingTree* c = self;
 		RingTree* _afterf1 = JB_Ring_FlatAfter(self);
-		while (((bool)c) and (c != _afterf1)) {
+		while (((bool)(c)) and (c != _afterf1)) {
 			RingTree* _N_f2 = ((RingTree*)JB_Ring_FlatNext0(c));
 			JB_Array_SyntaxAppend(rz, c);
 			c = _N_f2;
@@ -26749,7 +26744,7 @@ JB_String* JB_Tree_Render(RingTree* self, FastString* fs_in) {
 	JB_FS_AppendByte(fs, '(');
 	{
 		RingTree* f = JB_Incr(JB_Tree_First_(self));
-		while (f) {
+		while ((f)) {
 			RingTree* _Nf1 = JB_Incr(((RingTree*)JB_Ring_NextSib(f)));
 			JB_FreeIfDead(JB_Object___Render__(f, fs));
 			JB_FS_AppendByte(fs, ',');
@@ -26918,7 +26913,7 @@ void SC_Base_CollectConstants(SCBase* self, Message* src, SCImport* imp) {
 	SC__Base_ConstantsLoadingOverride = true;
 	{
 		Message* ch = JB_Incr(((Message*)JB_Tree_First_(src)));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(ch)));
 			if ((JB_Msg_OperatorIsTmp(ch, JB_LUB[736])) or (JB_Msg_OperatorIsTmp(ch, JB_LUB[376]))) {
 				SC_Base_CollectConstantsSub(self, ch, imp);
@@ -26970,7 +26965,7 @@ void SC_Base_CollectConstantsSub(SCBase* self, Message* ch, SCImport* imp) {
 	SCDecl* CurrType = nil;
 	{
 		Message* line = JB_Incr(((Message*)JB_Tree_First_(arg)));
-		while (line) {
+		while ((line)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(line)));
 			if ((((JB_Msg_EqualsSyx(line, JB_SyxRel, false))) and ((({
 				Message* _tmP263 = JB_Incr(((Message*)JB_Ring_First(line)));
@@ -27008,7 +27003,7 @@ void SC_Base_CollectConstantsSub(SCBase* self, Message* ch, SCImport* imp) {
 	;
 	{
 		Message* Line = JB_Incr(((Message*)JB_Tree_First_(arg)));
-		while (Line) {
+		while ((Line)) {
 			Message* _Nf3 = JB_Incr(((Message*)JB_Ring_NextSib(Line)));
 			if (JB_Msg_EqualsSyx(Line, JB_SyxDecl, false)) {
 				Message* _tmPf6 = JB_Incr(((Message*)JB_Ring_First(Line)));
@@ -27705,7 +27700,7 @@ SCObject* SC_Base_LookUpSub(SCBase* self, JB_String* OrigName, Message* Exp, Mes
 	SCParamArray* ParamsArray = JB_Incr(SC_PA__New(Exp, nil));
 	SCBase* Curr = JB_Incr(SC_PA_DetectDotSuper(ParamsArray, self));
 	SC_PA_PreReadTypes(ParamsArray, arg_space, ParamsHere, side);
-	bool CanFunction = ((bool)ParamsHere) and ((!ParamsArray->IsAddress));
+	bool CanFunction = ((bool)(ParamsHere)) and ((!ParamsArray->IsAddress));
 	SCFunction* Missing = nil;
 	SCFunction* f = nil;
 	if (ParamsArray->IsSuper and (JB_Str_Equals(name, JB_LUB[433], false))) {
@@ -27724,7 +27719,7 @@ SCObject* SC_Base_LookUpSub(SCBase* self, JB_String* OrigName, Message* Exp, Mes
 	}
 	{
 		SCBase* b = JB_Incr(Curr);
-		while (b) {
+		while ((b)) {
 			if ((ParamsArray->IsDot) and ((SC_PA_IsModule(ParamsArray)) and (b == SC__Comp_program))) {
 				break;
 			}
@@ -27736,7 +27731,7 @@ SCObject* SC_Base_LookUpSub(SCBase* self, JB_String* OrigName, Message* Exp, Mes
 			}
 			if (JB_Object_FastIsa(o, JB_AsClass(SCDecl))) {
 				///struct question/;
-				if ((!(ParamsArray->IsAssigns and (((bool)((SCDecl*)o)->Setter) and (JB_FreeIfDead(SC_Base_CodeCls(arg_space)) != Curr))))) {
+				if ((!(ParamsArray->IsAssigns and (((bool)(((SCDecl*)o)->Setter)) and (JB_FreeIfDead(SC_Base_CodeCls(arg_space)) != Curr))))) {
 					SCDecl* dcl = JB_Incr(((SCDecl*)o));
 					if ((!(dcl->Type))) {
 						JB_Decr(name);
@@ -28030,7 +28025,7 @@ SCObject* SC_Base_LookUpVarRootDecl(SCBase* self, JB_String* name, Message* exp)
 }
 
 bool SC_Base_NeedsExport(SCBase* self) {
-	return ((bool)self->CurrReacher);
+	return ((bool)(self->CurrReacher));
 }
 
 SCFunction* SC_Base_OwningFunc(SCBase* self) {
@@ -28047,7 +28042,7 @@ SCBase* SC_Base_ProcessLinkage(SCBase* self, Message* node, Dictionary* Table) {
 	SCFunction* fn = JB_Incr(SC_Base_OwningFunc(self));
 	{
 		Message* ch = JB_Incr(((Message*)JB_Tree_First_(node)));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(ch)));
 			if ((!JB_Msg_Expect(ch, JB_SyxTmp, nil))) {
 				JB_Decr(fn);
@@ -28078,7 +28073,7 @@ SCBase* SC_Base_ProcessLinkage(SCBase* self, Message* node, Dictionary* Table) {
 }
 
 SCBase* SC_Base_ProjectFix(SCBase* self) {
-	if ((self == SC__Comp_program) and ((bool)SC__Imp_Curr)) {
+	if ((self == SC__Comp_program) and ((bool)(SC__Imp_Curr))) {
 		return SC__Imp_Curr->Mod;
 	}
 	return self;
@@ -28269,7 +28264,7 @@ void SC_Base_Tran_Const(SCBase* self, SCDecl* D, SCBase* base) {
 	{
 		Message* curr = JB_Incr(root);
 		Message* _afterf1 = JB_Incr(((Message*)JB_Ring_FlatAfter(root)));
-		while (((bool)curr) and (curr != _afterf1)) {
+		while (((bool)(curr)) and (curr != _afterf1)) {
 			Message* _N_f2 = JB_Incr(((Message*)JB_Ring_FlatNext0(curr)));
 			if (JB_Msg_EqualsSyx(curr, JB_SyxThg, false)) {
 				if ((!JB_FreeIfDead(SC_TypeOfExpr(curr, base, nil)))) {
@@ -29039,7 +29034,7 @@ SCDecl* SC_Decl_HighestMatch(SCDecl* self, SCDecl* Other, Message* exp) {
 	 else if (o->Depth < M->Depth) {
 		M = SC_Class_GoUpTo(M, o->Depth);
 	}
-	while ((o != M) and ((bool)o->Super)) {
+	while ((o != M) and ((bool)(o->Super))) {
 		o = o->Super;
 		M = M->Super;
 	};
@@ -29489,7 +29484,7 @@ int SC_Decl_PointeryMatchSub(SCDecl* self, SCDecl* O, int TypeCast) {
 	}
 	{
 		SCClass* CurrSuper = OType;
-		while (CurrSuper) {
+		while ((CurrSuper)) {
 			if (t == CurrSuper) {
 				if (((bool)O->AllocSource) or SC_Decl_ContainsMatch(self, O, TypeCast)) {
 					if (CurrSuper != OType) {
@@ -29589,7 +29584,7 @@ SCDecl* SC_Decl_RefineDecl(SCDecl* self, Message* list) {
 	JB_SetRef(rz, SC_Decl_Copy(self, false));
 	{
 		Message* p = JB_Incr(((Message*)JB_Tree_First_(list)));
-		while (p) {
+		while ((p)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(p)));
 			if (JB_Msg_OperatorIsThing(p, JB_LUB[1499])) {
 				((SC_Decl_SyntaxIsSet(rz, kSC__SCDeclInfo_borrowed, SC__Options_ProjectIsLibrary)));
@@ -29686,7 +29681,7 @@ bool SC_Decl_SafelyWrappable(SCDecl* self) {
 	}
 	{
 		SCFunction* f = fns;
-		while (f) {
+		while ((f)) {
 			Array* p = f->Args;
 			if ((JB_Array_Size(p) == 1) and ((bool)SC_Decl_Match(((SCDecl*)JB_Array_Value(p, 0)), self, 0, nil))) {
 				return true;
@@ -29751,7 +29746,7 @@ int SC_Decl_TryTypeCast(SCDecl* self, SCDecl* O, Message* exp, int TypeCast) {
 		}
 	}
 	SCDecl* CounterPart = t->Signed;
-	if (((bool)CounterPart) and (CounterPart->Type == ot)) {
+	if (((bool)(CounterPart)) and (CounterPart->Type == ot)) {
 		if (JB_int_IsNormalMatch(SC_Decl_Match(CounterPart, O, TypeCast, exp))) {
 			return kSC_SimpleMatch;
 		}
@@ -29760,7 +29755,7 @@ int SC_Decl_TryTypeCast(SCDecl* self, SCDecl* O, Message* exp, int TypeCast) {
 	if (((bool)(TypeCast & kSC_TypeCastMost))) {
 		{
 			SCClass* b = ot;
-			while (b) {
+			while ((b)) {
 				{
 					Array* _LoopSrcf2 = b->Casts;
 					int _if1 = 0;
@@ -29883,7 +29878,7 @@ DataTypeCode SC_Decl_TypeInfo(SCDecl* self) {
 }
 
 bool SC_Decl_TypeIsReached(SCDecl* self) {
-	return ((bool)self->Type->CurrReacher);
+	return ((bool)(self->Type->CurrReacher));
 }
 
 void SC_Decl_TypeReach(SCDecl* self, SCBase* from, Message* src) {
@@ -29904,7 +29899,7 @@ SCDecl* SC_Decl_UnWrapDataType(SCDecl* self, Message* exp, SCBase* name_space) {
 	JB_SetRef(ExpReplacement->Obj, exp->Obj);
 	{
 		Message* s = JB_Incr(((Message*)JB_Tree_First_(exp)));
-		while (s) {
+		while ((s)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(s)));
 			JB_Tree_SyntaxAppend(ExpReplacement, s);
 			JB_SetRef(s, _Nf1);
@@ -30540,7 +30535,7 @@ Message* JB_Msg_AccessAdd(Message* self, JB_String* key) {
 	}
 	{
 		Message* tmp = ((Message*)JB_Tree_First_(l));
-		while (tmp) {
+		while ((tmp)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(tmp)));
 			if (JB_Msg_SyntaxEquals(tmp, key, true)) {
 				{
@@ -30642,7 +30637,7 @@ Message* JB_Msg_Ancestor(Message* self, Syntax f) {
 		{
 			Message* _LoopSrcf1 = ((Message*)JB_Ring_Parent(self));
 			Message* ch = _LoopSrcf1;
-			while (ch) {
+			while ((ch)) {
 				if (JB_Msg_EqualsSyx(ch, f, false)) {
 					return ch;
 				}
@@ -31248,7 +31243,7 @@ int JB_Msg_CastToType(Message* self, JB_String* TypeName, SCClass* type, SCBase*
 	if (name_space) {
 		JB_FreeIfDead(SC_TypeOfExpr(self, name_space, nil));
 	}
-	 else if ((bool)self->Obj) {
+	 else if ((bool)(self->Obj)) {
 		SCDecl* FoundType = JB_Incr(SC_TypeOfExprMaybeNil(self, name_space));
 		if (((bool)FoundType) and FoundType->Type->IsStruct) {
 			if ((!FoundType->PointerCount)) {
@@ -31351,7 +31346,7 @@ void JB_Msg_Clean(Message* self, bool erl) {
 	{
 		Message* curr = JB_Incr(self);
 		Message* _afterf1 = JB_Incr(((Message*)JB_Ring_FlatAfter(self)));
-		while (((bool)curr) and (curr != _afterf1)) {
+		while (((bool)(curr)) and (curr != _afterf1)) {
 			Message* _N_f2 = JB_Incr(((Message*)((Message*)JB_Ring_FlatNext0(curr))));
 			if (pos >= 0) {
 				curr->Position = pos;
@@ -31551,7 +31546,7 @@ Message* JB_Msg_ConstantExpandSub(Message* self) {
 	MessagePosition _using170 = JB_Msg_SyntaxUsing(self);
 	{
 		Message* item = JB_Incr(((Message*)JB_Tree_First_(self)));
-		while (item) {
+		while ((item)) {
 			Message* _Nf1 = JB_Incr(((Message*)((Message*)JB_Ring_NextSib(item))));
 			if (rz) {
 				Message* _tmPf2 = JB_Incr(JB_Msg_Copy(item, nil));
@@ -31659,7 +31654,7 @@ Message* JB_Msg_Copy(Message* self, Message* pos_msg) {
 	}
 	{
 		Message* v = ((Message*)JB_Tree_First_(self));
-		while (v) {
+		while ((v)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(v)));
 			JB_Tree_SyntaxAppend(rz, JB_Msg_Copy(v, pos_msg));
 			v = _Nf1;
@@ -31734,7 +31729,7 @@ void JB_Msg_CopyAllBeforeInto(Message* self, Message* into, Message* copylayer) 
 void JB_Msg_CopyAllInto(Message* self, Message* j, bool wipe) {
 	{
 		Message* c = JB_Incr(((Message*)JB_Tree_First_(self)));
-		while (c) {
+		while ((c)) {
 			Message* _Nf1 = JB_Incr(((Message*)((Message*)JB_Ring_NextSib(c))));
 			Message* _tmPf2 = JB_Incr(JB_Msg_Copy(c, j));
 			JB_Tree_SyntaxAppend(j, _tmPf2);
@@ -31799,7 +31794,7 @@ Message* JB_Msg_CutifyCopy(Message* self) {
 	JB_SetRef(rz, JB_Msg__NewCopy(self));
 	{
 		Message* v = JB_Incr(((Message*)JB_Tree_First_(self)));
-		while (v) {
+		while ((v)) {
 			Message* _Nf1 = JB_Incr(((Message*)((Message*)JB_Ring_NextSib(v))));
 			if (JB_Msg_EqualsSyx(v, JB_SyxArg, false)) {
 				0;
@@ -31934,7 +31929,7 @@ bool JB_Msg_DeepEquals(Message* self, Message* B, bool Aware) {
 Message* JB_Msg_Deepest(Message* self, Syntax Tmp, JB_String* name) {
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			Message* best = JB_Msg_Deepest(ch, Tmp, name);
 			if (best) {
@@ -32172,7 +32167,7 @@ void JB_Msg_File__(Message* self, FastString* fs) {
 	self->Indent++;
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			JB_FS_AppendIndent(fs);
 			JB_FS_SyntaxAppend(fs, ch);
@@ -32210,7 +32205,7 @@ JB_String* JB_Msg_FilePath(Message* self) {
 Message* JB_Msg_FindSyx(Message* self, Syntax s) {
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			if (JB_Msg_EqualsSyx(ch, s, false)) {
 				return ch;
@@ -32230,7 +32225,7 @@ Message* JB_Msg_FindSyxName(Message* self, Syntax s, JB_String* name) {
 Message* JB_Msg_FindName(Message* self, JB_String* name) {
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			if (JB_Msg_SyntaxEquals(ch, name, true)) {
 				return ch;
@@ -32355,7 +32350,7 @@ int JB_Msg_FindClassOption(Message* self, JB_String* name, JB_String* Kind) {
 Message* JB_Msg_FindDestructor(Message* self) {
 	{
 		Message* c = ((Message*)JB_Tree_First_(self));
-		while (c) {
+		while ((c)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(c)));
 			if (JB_Msg_EqualsSyx(c, JB_SyxFunc, false)) {
 				JB_Object* fn = ((Message*)JB_Ring_Last(c))->Obj;
@@ -32376,7 +32371,7 @@ Message* JB_Msg_FindDestructor(Message* self) {
 Message* JB_Msg_FindFlat(Message* self, Syntax s, JB_String* name, bool Err) {
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			if ((JB_Msg_EqualsSyx(ch, s, false)) and (JB_Msg_SyntaxEquals(ch, name, true))) {
 				return ch;
@@ -32396,7 +32391,7 @@ Message* JB_Msg_FindNested(Message* self, Syntax fn, JB_String* name, bool Err) 
 	{
 		Message* curr = self;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(self));
-		while (((bool)curr) and (curr != _afterf1)) {
+		while (((bool)(curr)) and (curr != _afterf1)) {
 			Message* _N_f2 = ((Message*)((Message*)JB_Ring_FlatNext0(curr)));
 			if ((JB_Msg_EqualsSyx(curr, fn, false)) or (fn == nil)) {
 				if ((name == nil) or (JB_Msg_SyntaxEquals(curr, name, true))) {
@@ -32417,7 +32412,7 @@ Message* JB_Msg_FindNested(Message* self, Syntax fn, JB_String* name, bool Err) 
 Message* JB_Msg_FindOwningLoop(Message* self, Message* top) {
 	{
 		Message* P = JB_Incr(self);
-		while (P) {
+		while ((P)) {
 			if ((!(((bool)P) and (P != top)))) {
 				JB_Decr(P);
 				return nil;
@@ -32450,7 +32445,7 @@ Message* JB_Msg_FindPosSub(Message* self, int fr, int len, bool Exact) {
 	{
 		Message* ch = self;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(self));
-		while (((bool)ch) and (ch != _afterf1)) {
+		while (((bool)(ch)) and (ch != _afterf1)) {
 			Message* _N_f2 = ((Message*)((Message*)JB_Ring_FlatNext0(ch)));
 			if (ch->Position == fr) {
 				int CurrStrength = (ch->RangeLength == len) + (!Exact);
@@ -32473,7 +32468,7 @@ Message* JB_Msg_FindPosSub(Message* self, int fr, int len, bool Exact) {
 Message* JB_Msg_FindRef(Message* self, SCFunction* fn, JB_String* name) {
 	{
 		Message* curr = self;
-		while (curr) {
+		while ((curr)) {
 			if (JB_Msg_EqualsSyx(curr, JB_SyxFunc, false)) {
 				Message* prms = ((Message*)JB_Ring_Last(curr));
 				if ((prms->Obj == fn) and (JB_Msg_OperatorIsThing(((Message*)JB_Ring_First(prms)), name))) {
@@ -32665,7 +32660,7 @@ void JB_Msg_FixErl(Message* self) {
 void JB_Msg_FixMultiArr(Message* self) {
 	{
 		Message* item = ((Message*)JB_Tree_First_(self));
-		while (item) {
+		while ((item)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(item)));
 			Message* kkey = ((Message*)JB_Ring_First(item));
 			if (JB_Msg_EqualsSyx(kkey, JB_SyxList, false)) {
@@ -32713,7 +32708,7 @@ void JB_Msg_FSListArg(Message* self, FastString* fs) {
 	}
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			if (doind) {
 				JB_FS_AppendIndent(fs);
@@ -32735,7 +32730,7 @@ void JB_Msg_FSListSep(Message* self, FastString* fs, JB_String* sep) {
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
 		Message* _firstf2 = ch;
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			if (_firstf2 != ch) {
 				JB_FS_AppendString(fs, sep);
@@ -32787,7 +32782,7 @@ int JB_Msg_FuncPos(Message* self, SCFunction* fn) {
 	{
 		Message* ss = self;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(self));
-		while (((bool)ss) and (ss != _afterf1)) {
+		while (((bool)(ss)) and (ss != _afterf1)) {
 			Message* _N_f2 = ((Message*)((Message*)JB_Ring_FlatNext0(ss)));
 			if (ss->Obj == fn) {
 				return ss->Position;
@@ -32881,7 +32876,7 @@ Message* JB_Msg_GetDclName(Message* self, bool Need) {
 Message* JB_Msg_GetMarker(Message* self, JB_String* s) {
 	{
 		Message* a = ((Message*)JB_Tree_First_(self));
-		while (a) {
+		while ((a)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(a)));
 			if (JB_Msg_OperatorIsTmp(a, s)) {
 				return a;
@@ -33085,7 +33080,7 @@ void JB_Msg_InsertBefore(Message* self, Message* j, Message* ch) {
 SCFunction* JB_Msg_InsideFunc(Message* self) {
 	{
 		Message* ch = self;
-		while (ch) {
+		while ((ch)) {
 			if (JB_Msg_EqualsSyx(ch, JB_SyxTmp, false)) {
 				SCFunction* fn = JB_Msg_AsFunc(ch);
 				if (fn) {
@@ -33310,7 +33305,7 @@ bool JB_Msg_IsVarAltered(Message* self, JB_String* name) {
 	{
 		Message* msg = self;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(self));
-		while (((bool)msg) and (msg != _afterf1)) {
+		while (((bool)(msg)) and (msg != _afterf1)) {
 			Message* _N_f2 = ((Message*)((Message*)JB_Ring_FlatNext0(msg)));
 			if ((!(JB_Msg_EqualsSyx(msg, JB_SyxRel, false)))) {
 				msg = _N_f2;
@@ -33384,7 +33379,7 @@ JB_String* JB_Msg_jdb2_(Message* self, int Flags, FastString* fs_in) {
 		fs->Indent++;
 		{
 			Message* ch = JB_Incr(((Message*)JB_Tree_First_(self)));
-			while (ch) {
+			while ((ch)) {
 				Message* _Nf1 = JB_Incr(((Message*)((Message*)JB_Ring_NextSib(ch))));
 				JB_FS_AppendIndent(fs);
 				JB_FreeIfDead(JB_Msg_jdb2_(ch, Flags, fs));
@@ -33440,7 +33435,7 @@ JB_String* JB_Msg_jdb4_(Message* self, FastString* fs_in) {
 		fs->Indent++;
 		{
 			Message* ch = JB_Incr(((Message*)JB_Tree_First_(self)));
-			while (ch) {
+			while ((ch)) {
 				Message* _Nf1 = JB_Incr(((Message*)((Message*)JB_Ring_NextSib(ch))));
 				JB_FS_AppendIndent(fs);
 				JB_FreeIfDead(JB_Msg_jdb4_(ch, fs));
@@ -33513,7 +33508,7 @@ void JB_Msg_List__(Message* self, FastString* fs) {
 	}
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			if ((++count) > 1) {
 				JB_FS_AppendString(fs, sep);
@@ -33537,7 +33532,7 @@ Array* JB_Msg_ListAll(Message* self) {
 	Array* rz = ((Array*)JB_Array__New0());
 	{
 		Message* A = ((Message*)JB_Tree_First_(self));
-		while (A) {
+		while ((A)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(A)));
 			JB_Array_SyntaxAppend(rz, A);
 			A = _Nf1;
@@ -33592,7 +33587,7 @@ void JB_Msg_LocateAll(Message* self) {
 	{
 		Message* ch = JB_Incr(self);
 		Message* _afterf1 = JB_Incr(((Message*)JB_Ring_FlatAfter(self)));
-		while (((bool)ch) and (ch != _afterf1)) {
+		while (((bool)(ch)) and (ch != _afterf1)) {
 			Message* _N_f2 = JB_Incr(((Message*)((Message*)JB_Ring_FlatNext0(ch))));
 			JB_String* _tmPf3 = JB_Incr(JB_Msg_Locate(ch));
 			JB_PrintLine(_tmPf3);
@@ -33619,7 +33614,7 @@ Message* JB_Msg_MacroCopy(Message* self, Message* root, Array* prms) {
 	rz = JB_Msg__NewCopy(self);
 	{
 		Message* v = ((Message*)JB_Tree_First_(self));
-		while (v) {
+		while ((v)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(v)));
 			JB_Tree_SyntaxAppend(rz, JB_Msg_MacroPrm(v, root, prms));
 			v = _Nf1;
@@ -33648,7 +33643,7 @@ int JB_Msg_MacroFixCount(Message* self) {
 	{
 		Message* s = self;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(self));
-		while (((bool)s) and (s != _afterf1)) {
+		while (((bool)(s)) and (s != _afterf1)) {
 			Message* _N_f2 = ((Message*)((Message*)JB_Ring_FlatNext0(s)));
 			if (((JB_Msg_EqualsSyx(s, JB_SyxSThg, false))) and (JB_Msg_IsContainer(((Message*)JB_Ring_Parent(s))))) {
 				return -111111;
@@ -33696,7 +33691,7 @@ void JB_Msg_MiniArgCpp(Message* self, FastString* fs) {
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
 		Message* _firstf2 = ch;
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			if (_firstf2 != ch) {
 				JB_FS_AppendString(fs, JB_LUB[168]);
@@ -33761,7 +33756,7 @@ int JB_Msg_ModelMode(Message* self) {
 		Message* _LoopSrcf3 = JB_Incr(((Message*)JB_Ring_Last(self)));
 		Message* C = JB_Incr(_LoopSrcf3);
 		Message* _afterf1 = JB_Incr(((Message*)JB_Ring_FlatAfter(_LoopSrcf3)));
-		while (((bool)C) and (C != _afterf1)) {
+		while (((bool)(C)) and (C != _afterf1)) {
 			Message* _N_f2 = JB_Incr(((Message*)JB_Ring_FlatNext0(C)));
 			if (JB_Msg_OperatorIsThing(C, JB_LUB[1566])) {
 				rz = (rz | 1);
@@ -33867,7 +33862,7 @@ void JB_Msg_Msg__(Message* self, FastString* fs) {
 SCArg* JB_Msg_MsgArg(Message* self) {
 	{
 		Message* ch = self;
-		while (ch) {
+		while ((ch)) {
 			JB_Object* O = ch->Obj;
 			if (JB_Object_FastIsa(O, JB_AsClass(SCArg))) {
 				return ((SCArg*)O);
@@ -33897,7 +33892,7 @@ SCFunction* JB_Msg_MsgFunc(Message* self) {
 SCFunction* JB_Msg_MsgOwningFunc(Message* self) {
 	{
 		Message* ch = self;
-		while (ch) {
+		while ((ch)) {
 			JB_Object* O = ch->Obj;
 			if (JB_Object_FastIsa(O, JB_AsClass(SCArg))) {
 				if (((SCArg*)O)->ParentFunc) {
@@ -34227,30 +34222,30 @@ bool JB_Msg_OperatorIn(Message* self, Syntax f) {
 }
 
 bool JB_Msg_OperatorIsARel(Message* self, JB_String* name) {
-	return ((bool)self) and (((JB_Msg_EqualsSyx(self, JB_SyxARel, false))) and ((JB_Str_Equals(self->Name, name, false))));
+	return ((bool)(self)) and (((JB_Msg_EqualsSyx(self, JB_SyxARel, false))) and ((JB_Str_Equals(self->Name, name, false))));
 }
 
 bool JB_Msg_OperatorIsBRel(Message* self, JB_String* name) {
-	return ((bool)self) and (((JB_Msg_EqualsSyx(self, JB_SyxBRel, false))) and ((JB_Str_Equals(self->Name, name, false))));
+	return ((bool)(self)) and (((JB_Msg_EqualsSyx(self, JB_SyxBRel, false))) and ((JB_Str_Equals(self->Name, name, false))));
 }
 
 bool JB_Msg_OperatorIsDot(Message* self, JB_String* name) {
-	return ((bool)self) and (((JB_Msg_EqualsSyx(self, JB_SyxDot, false))) and ((JB_Str_Equals(self->Name, name, true))));
+	return ((bool)(self)) and (((JB_Msg_EqualsSyx(self, JB_SyxDot, false))) and ((JB_Str_Equals(self->Name, name, true))));
 }
 
 bool JB_Msg_OperatorIsRel(Message* self, JB_String* name) {
 	Message* _tmPf0 = JB_Incr(((Message*)JB_Tree_Get(self, 1)));
-	bool _tmPf1 = ((bool)self) and (((JB_Msg_EqualsSyx(self, JB_SyxRel, false))) and ((JB_Str_Equals(_tmPf0->Name, name, false))));
+	bool _tmPf1 = ((bool)(self)) and (((JB_Msg_EqualsSyx(self, JB_SyxRel, false))) and ((JB_Str_Equals(_tmPf0->Name, name, false))));
 	JB_Decr(_tmPf0);
 	return _tmPf1;
 }
 
 bool JB_Msg_OperatorIsThing(Message* self, JB_String* name) {
-	return ((bool)self) and (((JB_Msg_EqualsSyx(self, JB_SyxThg, false))) and ((JB_Str_Equals(self->Name, name, true))));
+	return ((bool)(self)) and (((JB_Msg_EqualsSyx(self, JB_SyxThg, false))) and ((JB_Str_Equals(self->Name, name, true))));
 }
 
 bool JB_Msg_OperatorIsTmp(Message* self, JB_String* name) {
-	return ((bool)self) and (((JB_Msg_EqualsSyx(self, JB_SyxTmp, false))) and ((JB_Str_Equals(self->Name, name, false))));
+	return ((bool)(self)) and (((JB_Msg_EqualsSyx(self, JB_SyxTmp, false))) and ((JB_Str_Equals(self->Name, name, false))));
 }
 
 bool JB_Msg_OperatorStarts(Message* self, JB_String* s) {
@@ -34446,7 +34441,7 @@ void JB_Msg_Prm__(Message* self, FastString* fs) {
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
 		Message* _firstf2 = ch;
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			if (_firstf2 != ch) {
 				JB_FS_AppendString(fs, JB_LUB[168]);
@@ -34476,7 +34471,7 @@ void JB_Msg_Quot__(Message* self, FastString* fs) {
 	JB_FS_AppendString(fs, JB_LUB[936]);
 	{
 		Message* ch = ((Message*)JB_Tree_First_(self));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = ((Message*)((Message*)JB_Ring_NextSib(ch)));
 			JB_FS_SyntaxAppend(fs, ch);
 			if (((Message*)JB_Ring_NextSib(ch))) {
@@ -34510,7 +34505,7 @@ bool JB_Msg_RefDisappears(Message* self) {
 	{
 		Message* _LoopSrcf1 = ((Message*)JB_Ring_Parent(self));
 		Message* P = _LoopSrcf1;
-		while (P) {
+		while ((P)) {
 			if (JB_Msg_EqualsSyx(P, JB_SyxBra, false)) {
 				0;
 			}
@@ -34817,7 +34812,7 @@ void JB_Msg_SafeRemove(Message* self, Syntax T) {
 	(JB_Msg_SyntaxIsSet(self, kJB__MsgUIFlags_Inserted, true));
 	{
 		Message* c = JB_Incr(((Message*)JB_Tree_First_(self)));
-		while (c) {
+		while ((c)) {
 			Message* _Nf1 = JB_Incr(((Message*)((Message*)JB_Ring_NextSib(c))));
 			JB_Tree_Remove(c);
 			JB_SetRef(c, _Nf1);
@@ -34891,7 +34886,7 @@ SCArg* JB_Msg_SCArgNested(Message* self, Message* base, SCBase* p) {
 SCFile* JB_Msg_SCFile(Message* self) {
 	{
 		Message* S = JB_Incr(self);
-		while (S) {
+		while ((S)) {
 			JB_MemoryLayer* _tmPf1 = JB_Incr(JB_ObjLayer(S));
 			JB_Object* r = JB_Incr(_tmPf1->Obj);
 			JB_Decr(_tmPf1);
@@ -34976,7 +34971,7 @@ void JB_Msg_SlidePositions(Message* self, int add) {
 	{
 		Message* s = self;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(self));
-		while (((bool)s) and (s != _afterf1)) {
+		while (((bool)(s)) and (s != _afterf1)) {
 			Message* _N_f2 = ((Message*)((Message*)JB_Ring_FlatNext0(s)));
 			if (s->Position >= 0) {
 				s->Position = (s->Position + add);
@@ -35002,7 +34997,7 @@ void JB_Msg_Str__(Message* self, FastString* fs) {
 	JB_FS_AppendEscape(fs, self->Name);
 	{
 		Message* ch = JB_Incr(((Message*)JB_Tree_First_(self)));
-		while (ch) {
+		while ((ch)) {
 			Message* _Nf1 = JB_Incr(((Message*)((Message*)JB_Ring_NextSib(ch))));
 			if (JB_Msg_EqualsSyx(ch, JB_SyxEmb, false)) {
 				JB_FS_AppendEscape(fs, ch->Name);
@@ -35053,7 +35048,7 @@ Message* JB_Msg_NeedSyx(Message* self, Syntax s) {
 
 Message* JB_Msg_NeedSyxInt(Message* self, Syntax s, int n) {
 	Message* Ch = ((Message*)JB_Tree_Get(self, n));
-	if (((bool)Ch) and ((Ch->Func == s) or (!s))) {
+	if (((bool)(Ch)) and ((Ch->Func == s) or (!s))) {
 		return Ch;
 	}
 	JB_Msg_CantFind(self, s, nil, Ch);
@@ -35086,7 +35081,7 @@ Message* JB_Msg_GetConf(Message* self, JB_String* key, bool Err) {
 	{
 		Message* _LoopSrcf1 = JB_Msg_ConfArg(self);
 		Message* item = JB_config_conffirst(_LoopSrcf1);
-		while (item) {
+		while ((item)) {
 			if (JB_Msg_SyntaxEquals(item, key, true)) {
 				Message* f = ((Message*)JB_Ring_First(item));
 				if (f) {
@@ -35340,7 +35335,7 @@ void JB_Msg_test_style(Message* self) {
 	{
 		Message* s = self;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(self));
-		while (((bool)s) and (s != _afterf1)) {
+		while (((bool)(s)) and (s != _afterf1)) {
 			Message* _N_f2 = ((Message*)((Message*)JB_Ring_FlatNext0(s)));
 			if ((JB_Msg_EqualsSyx(s, JB_SyxArg, false)) or (JB_Msg_EqualsSyx(s, JB_SyxList, false))) {
 				b = (!b);
@@ -35648,7 +35643,7 @@ void JB_Msg_Tran_With(Message* self) {
 	{
 		Message* ch = JB_Incr(arg);
 		Message* _afterf1 = JB_Incr(((Message*)JB_Ring_FlatAfter(arg)));
-		while (((bool)ch) and (ch != _afterf1)) {
+		while (((bool)(ch)) and (ch != _afterf1)) {
 			Message* _N_f2 = JB_Incr(((Message*)JB_Ring_FlatNext0(ch)));
 			if (JB_Msg_EqualsSyx(ch, JB_SyxTmp, false)) {
 				if ((JB_Msg_SyntaxEquals(ch, JB_LUB[829], false)) or (JB_Msg_SyntaxEquals(ch, JB_LUB[830], false))) {
@@ -35924,7 +35919,7 @@ Message* JB_Msg_LayerWipeCopy(Message* self, Message* oof) {
 	rz->Position = -1;
 	{
 		Message* v = JB_Incr(((Message*)JB_Tree_First_(self)));
-		while (v) {
+		while ((v)) {
 			Message* _Nf1 = JB_Incr(((Message*)((Message*)JB_Ring_NextSib(v))));
 			Message* _tmPf2 = JB_Incr(JB_Msg_LayerWipeCopy(v, oof));
 			JB_Tree_SyntaxAppend(rz, _tmPf2);
@@ -35946,7 +35941,7 @@ Message* JB_Msg_WipeCopy(Message* self) {
 	rz->Position = -1;
 	{
 		Message* v = JB_Incr(((Message*)JB_Tree_First_(self)));
-		while (v) {
+		while ((v)) {
 			Message* _Nf1 = JB_Incr(((Message*)((Message*)JB_Ring_NextSib(v))));
 			Message* _tmPf2 = JB_Incr(JB_Msg_WipeCopy(v));
 			JB_Tree_SyntaxAppend(rz, _tmPf2);
@@ -35966,7 +35961,7 @@ void JB_Msg_WipePositions(Message* self) {
 	{
 		Message* v = self;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(self));
-		while (((bool)v) and (v != _afterf1)) {
+		while (((bool)(v)) and (v != _afterf1)) {
 			Message* _N_f2 = ((Message*)((Message*)JB_Ring_FlatNext0(v)));
 			v->Position = -1;
 			v = _N_f2;
@@ -36108,7 +36103,7 @@ void JB_Msg_XML__(Message* self, FastString* fs) {
 	Message* atts = ((Message*)JB_Ring_First(self));
 	{
 		Message* A = ((Message*)JB_Tree_First_(atts));
-		while (A) {
+		while ((A)) {
 			Message* _Nf2 = ((Message*)JB_Ring_NextSib(A));
 			JB_FS_SyntaxAppend(fs, A);
 			A = _Nf2;
@@ -36130,7 +36125,7 @@ void JB_Msg_XML__(Message* self, FastString* fs) {
 		fs->Indent++;
 		{
 			Message* ch = Children;
-			while (ch) {
+			while ((ch)) {
 				JB_FS_AppendIndent(fs);
 				JB_FS_SyntaxAppend(fs, ch);
 				ch = ((Message*)JB_Ring_NextSib(ch));
@@ -36929,7 +36924,7 @@ SCFunction* SC_Class_BestBehaviourFor(SCClass* self, JB_String* name) {
 			JB_SafeDecr(fn);
 			return ((SCFunction*)fn);
 		}
-		 else if ((bool)fn) {
+		 else if ((bool)(fn)) {
 			debugger;
 		}
 		JB_Decr(fn);
@@ -36980,7 +36975,7 @@ int SC_Class_CalculateSizeRaw(SCClass* self, int Depth) {
 			if ((SC_Decl_IsNormalObject(p)) or ((bool)p->PointerCount)) {
 				curr = JB_Platform__PointerBytes();
 			}
-			 else if ((bool)p) {
+			 else if ((bool)(p)) {
 				curr = SC_Class_CalculateSize(p->Type, Depth + 1);
 				if ((!curr)) {
 					JB_Decr(_LoopSrcf1);
@@ -37017,7 +37012,7 @@ bool SC_Class_CanCompare(SCClass* self, SCDecl* Against, bool AsEquals) {
 bool SC_Class_CanCompareSub(SCClass* self, JB_String* s, SCDecl* against) {
 	{
 		SCClass* b = self;
-		while (b) {
+		while ((b)) {
 			SCObject* o = ((SCObject*)JB_Dict_ValueStr(b->Access, s));
 			if (JB_Object_FastIsa(o, JB_AsClass(SCFunction))) {
 				if (SC_Func_CanCompare(((SCFunction*)o), against)) {
@@ -37204,7 +37199,7 @@ void SC_Class_CreateConstructors(SCClass* self) {
 		JB_SetRef(self->ConstructorFunc, Con);
 		{
 			SCFunction* f = JB_Incr(Con);
-			while (f) {
+			while ((f)) {
 				if (f->Cls == self) {
 					Message* _tmPf1 = JB_Incr(JB_Msg_Copy(SC__Class_ConstrNew, f->Source));
 					SC_Class_NewClassNew(self, f, _tmPf1, 0);
@@ -37488,7 +37483,7 @@ void SC_Class_FillInterFaceWrapper(SCClass* self, SCFunction* fn) {
 	JB_FreeIfDead(JB_Msg_Msg(WriteTo, JB_SyxThg, JB_LUB[232]));
 	{
 		Message* C = JB_Incr(((Message*)JB_Tree_First_(CopyFrom)));
-		while (C) {
+		while ((C)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(C)));
 			if (JB_Msg_EqualsSyx(C, JB_SyxDecl, false)) {
 				Message* it = JB_Incr(JB_Msg_DeclName(C));
@@ -37526,7 +37521,7 @@ Message* SC_Class_FindDecl(SCClass* self, JB_String* name) {
 	{
 		Message* _LoopSrcf2 = SC_Base_SourceArg(self);
 		Message* l = ((Message*)JB_Tree_First_(_LoopSrcf2));
-		while (l) {
+		while ((l)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(l));
 			if (JB_Msg_EqualsSyx(l, JB_SyxDecl, false)) {
 				if (JB_Msg_SyntaxEquals(JB_Msg_DeclName(l), name, true)) {
@@ -37546,7 +37541,7 @@ SCFunction* SC_Class_FindFunc(SCClass* self, JB_String* keyword, bool CheckParen
 	JB_SetRef(keyword, JB_Str_LowerCase(keyword));
 	{
 		SCClass* b = JB_Incr(self);
-		while (b) {
+		while ((b)) {
 			if (b->Access) {
 				SCObject* o = JB_Incr(((SCObject*)JB_Dict_ValueStr(b->Access, keyword)));
 				if ((!o)) {
@@ -37599,7 +37594,7 @@ SCFunction* SC_Class_FindSpecialFunc(SCClass* self, JB_String* keyword, bool Che
 SCFunction* SC_Class_FirstDestructor(SCClass* self) {
 	{
 		SCClass* p = JB_Incr(self);
-		while (p) {
+		while ((p)) {
 			SCFunction* fn = JB_Incr(p->DestructorFunc);
 			if ((!fn)) {
 				int a = 1;
@@ -37633,7 +37628,7 @@ void SC_Class_GetDepth(SCClass* self) {
 		self->Depth = 1;
 		{
 			SCClass* c = self;
-			while (c) {
+			while ((c)) {
 				self->Depth++;
 				c = c->Super;
 			};
@@ -37673,7 +37668,7 @@ SCIterator* SC_Class_GetIteratorAny(SCClass* self, JB_String* name, Message* nod
 	}
 	{
 		SCClass* c = self;
-		while (c) {
+		while ((c)) {
 			SCObject* R = SC_Base_SyntaxAccess(c, name);
 			if (JB_Object_FastIsa(R, JB_AsClass(SCIterator))) {
 				return ((SCIterator*)R);
@@ -37737,7 +37732,7 @@ bool SC_Class_HasOperator(SCClass* self, JB_String* op) {
 bool SC_Class_HasStuffToHandleInDestructor(SCClass* self) {
 	{
 		SCClass* p = self;
-		while (p) {
+		while ((p)) {
 			{
 				Array* _LoopSrcf2 = p->Properties;
 				int _if1 = 0;
@@ -37764,7 +37759,7 @@ SCClass* SC_Class_InterfaceFor(SCClass* self, JB_String* name, Message* errplace
 	SCModule* Result = nil;
 	{
 		SCClass* C = JB_Incr(self);
-		while (C) {
+		while ((C)) {
 			SCBehaviour* B = JB_Incr(C->Behaviour);
 			if ((!B)) {
 				JB_Msg_SyntaxExpect(errplace, nil);
@@ -37817,7 +37812,7 @@ SCClass* SC_Class_InterfaceForBehaviour(SCClass* self, SCFunction* Fn) {
 bool SC_Class_IsA(SCClass* self, SCClass* S) {
 	{
 		SCClass* p = self;
-		while (p) {
+		while ((p)) {
 			if (p == S) {
 				return true;
 			}
@@ -38276,7 +38271,7 @@ void SC_Class_NewClassNew(SCClass* self, SCFunction* con, Message* src, int Extr
 		Message* CallParams = JB_Incr(((Message*)JB_Ring_Last(_tmPf3)));
 		{
 			Message* dcl = JB_Incr(((Message*)JB_Tree_First_(A)));
-			while (dcl) {
+			while ((dcl)) {
 				Message* _Nf2 = JB_Incr(((Message*)JB_Ring_NextSib(dcl)));
 				Message* _tmPf4 = JB_Incr(JB_Msg_Copy(dcl, src));
 				JB_Tree_SyntaxAppend(NewParams, _tmPf4);
@@ -38348,7 +38343,7 @@ void SC_Class_OverrideSyntax(SCClass* self) {
 	JB_SetRef(self->Casts, JB_Array__New0());
 	{
 		SCFunction* f = JB_Incr(cast);
-		while (f) {
+		while ((f)) {
 			f->IsInline = true;
 			if ((!(JB_Array_SyntaxEquals(f->Args, 1, false)))) {
 				JB_Msg_SyntaxExpect(f->Source, JB_LUB[1684]);
@@ -38740,7 +38735,7 @@ void SC_Class_TryAddToProject(SCClass* self) {
 SCObject* SC_Class_UpCheckSub(SCClass* self, JB_String* name) {
 	{
 		SCClass* c = self;
-		while (c) {
+		while ((c)) {
 			SCObject* it = SC_Base_SyntaxAccess(c, name);
 			if (it) {
 				return it;
@@ -38957,7 +38952,7 @@ SCBase* SC_Class__NamedPropertyFields(Message* node, SCBase* name_space, Message
 	int Found = 0;
 	{
 		Message* c = JB_Incr(((Message*)JB_Tree_First_(Arg)));
-		while (c) {
+		while ((c)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(c)));
 			if ((!((!JB_Ring_HasChildren(c)) and ((JB_Msg_EqualsSyx(c, JB_SyxTmp, false)))))) {
 				JB_Msg_SyntaxExpect(c, nil);
@@ -39363,7 +39358,7 @@ Message* SC_SCFile_GetMsg(SCFile* self, int pos, bool needname) {
 		Message* _LoopSrcf3 = SC_SCFile_Orig(self);
 		Message* f = _LoopSrcf3;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(_LoopSrcf3));
-		while (((bool)f) and (f != _afterf1)) {
+		while (((bool)(f)) and (f != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(f));
 			if ((!needname) or JB_Str_Exists(f->Name)) {
 				if (JB_Rg_Contains1(JB_Msg_range(f), pos)) {
@@ -39479,7 +39474,7 @@ void SC_Func_AnalyseRefsB(SCFunction* self) {
 	{
 		Message* msg = JB_Incr(root);
 		Message* _afterf1 = JB_Incr(((Message*)JB_Ring_FlatAfter(root)));
-		while (((bool)msg) and (msg != _afterf1)) {
+		while (((bool)(msg)) and (msg != _afterf1)) {
 			Message* _N_f2 = JB_Incr(((Message*)JB_Ring_FlatNext0(msg)));
 			int it = JB_Msg_RC_HasTemporary(msg);
 			if (it) {
@@ -39633,7 +39628,7 @@ SCFunction* SC_Func_ArgsMatchSub(SCFunction* self, SCDecl* base, int TypeCast, S
 	SCFunction* Missing = nil;
 	{
 		SCFunction* f = JB_Incr(self);
-		while (f) {
+		while ((f)) {
 			if (f->IsMacro) {
 				JB_SetRef(Missing, f);
 				JB_SetRef(f, f->NextFunc);
@@ -39795,7 +39790,7 @@ Message* SC_Func_CallParents(SCFunction* self, Message* root, bool IsConstructor
 bool SC_Func_CanCompare(SCFunction* self, SCDecl* Against) {
 	{
 		SCFunction* f = self;
-		while (f) {
+		while ((f)) {
 			if (SC_Decl_IsaDecl(Against, ((SCDecl*)JB_Array_Value(f->Args, 1)))) {
 				return true;
 			}
@@ -40003,7 +39998,7 @@ void SC_Func_CopyParams(SCFunction* self, Message* list) {
 	Message* SubPrms = JB_Incr(JB_Msg_Msg(dot, JB_SyxPrm, JB_LUB[0]));
 	{
 		Message* s = JB_Incr(((Message*)JB_Tree_First_(list)));
-		while (s) {
+		while ((s)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(s)));
 			Message* _tmPf2 = JB_Incr(JB_Msg_Copy(s, nil));
 			JB_Tree_SyntaxAppend(p, _tmPf2);
@@ -40032,7 +40027,7 @@ Message* SC_Func_CountCallsToParentAlloc(SCFunction* self, Message* root) {
 	int FoundCount = 0;
 	{
 		Message* curr = JB_Incr(((Message*)JB_Tree_First_(root)));
-		while (curr) {
+		while ((curr)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(curr)));
 			SCFunction* f = JB_Incr(JB_Msg_IsParentConCall(curr));
 			if (f) {
@@ -40281,7 +40276,7 @@ SCFunction* SC_Func_Disambiguate(SCFunction* self, Message* src) {
 	}
 	{
 		SCFunction* curr = self;
-		while (curr) {
+		while ((curr)) {
 			Message* s = curr->Source;
 			if (JB_Msg_DeepEquals(s, src, false)) {
 				return curr;
@@ -40409,7 +40404,7 @@ void SC_Func_FillInConstructorAndDestructor(SCFunction* self, Message* root, boo
 	{
 		Message* curr = JB_Incr(root);
 		Message* _afterf5 = JB_Incr(((Message*)JB_Ring_FlatAfter(root)));
-		while (((bool)curr) and (curr != _afterf5)) {
+		while (((bool)(curr)) and (curr != _afterf5)) {
 			Message* _N_f6 = JB_Incr(((Message*)JB_Ring_FlatNext0(curr)));
 			if (JB_Msg_OperatorIsThing(curr, JB_LUB[232])) {
 				Message* P = JB_Incr(((Message*)JB_Ring_Parent(curr)));
@@ -40681,7 +40676,7 @@ void SC_Func_FillInSaver(SCFunction* self, JB_String* name) {
 	Message* dest = JB_Incr(SC_Base_SourceArg(self));
 	{
 		Message* line = JB_Incr(((Message*)JB_Tree_First_(Msg)));
-		while (line) {
+		while ((line)) {
 			Message* _Nf5 = JB_Incr(((Message*)((Message*)JB_Ring_NextSib(line))));
 			JB_Tree_SyntaxAppend(dest, line);
 			JB_SetRef(line, _Nf5);
@@ -40699,7 +40694,7 @@ void SC_Func_FillInSaver(SCFunction* self, JB_String* name) {
 Message* SC_Func_FindCppWrapperFunc(SCFunction* self, Message* place) {
 	{
 		Message* cpp = ((Message*)JB_Tree_First_(place));
-		while (cpp) {
+		while ((cpp)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(cpp));
 			JB_String* n = cpp->Name;
 			if ((!(JB_Str_OperatorStarts(n, JB_LUB[1753])))) {
@@ -40993,7 +40988,7 @@ void SC_Func_FLookupSet(SCFunction* self, SCBase* Value) {
 	if (SC__Imp_Curr) {
 		self->Project = SC__Imp_Curr;
 	}
-	 else if ((bool)self->Source) {
+	 else if ((bool)(self->Source)) {
 		SCFile* f = JB_Incr(JB_Msg_SCFile(self->Source));
 		if (f != nil) {
 			self->Project = f->Proj;
@@ -41039,7 +41034,7 @@ void SC_Func_FuncDecls(SCFunction* self) {
 		JB_Decr(L);
 	}
 	JB_Decr(space);
-	if (((bool)self->AllocCode) and ((bool)self->ReturnType)) {
+	if (((bool)self->AllocCode) and ((bool)(self->ReturnType))) {
 		JB_SetRef(self->ReturnType, SC_Decl_Copy(self->ReturnType, false));
 		self->ReturnType->AllocSource = self->AllocCode;
 	}
@@ -41308,7 +41303,7 @@ int SC_Func_MaxVars(SCFunction* self) {
 		Message* _LoopSrcf3 = self->Source;
 		Message* ch = _LoopSrcf3;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(_LoopSrcf3));
-		while (((bool)ch) and (ch != _afterf1)) {
+		while (((bool)(ch)) and (ch != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(ch));
 			if (JB_Msg_EqualsSyx(ch, JB_SyxArg, false)) {
 				SCArg* a = JB_Msg_AsArg(ch);
@@ -41347,7 +41342,7 @@ JB_String* SC_Func_NameOfClassAllocator(SCFunction* self, JB_String* s, JB_Strin
 }
 
 bool SC_Func_NeedsExport(SCFunction* self) {
-	return ((bool)self->CurrReacher) or self->IsAPI;
+	return ((bool)(self->CurrReacher)) or self->IsAPI;
 }
 
 Message* SC_Func_NewDefaultRel(SCFunction* self, Message* place, SCDecl* d) {
@@ -41370,7 +41365,7 @@ bool SC_Func_OperatorIsa(SCFunction* self, int Code) {
 SCFunction* SC_Func_Paramless(SCFunction* self) {
 	{
 		SCFunction* f = self;
-		while (f) {
+		while ((f)) {
 			Message* s = f->Source;
 			Message* lst = JB_Msg_FindSyx(s, JB_SyxPrm);
 			if ((!(((bool)lst) and JB_Ring_HasChildren(lst)))) {
@@ -41452,7 +41447,7 @@ void SC_Func_PostTransform(SCFunction* self) {
 	{
 		Message* msg = arg;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(arg));
-		while (((bool)msg) and (msg != _afterf1)) {
+		while (((bool)(msg)) and (msg != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(msg));
 			JB_Object* o = msg->Obj;
 			if (o) {
@@ -41483,7 +41478,7 @@ void SC_Func_PreProcessExpects(SCFunction* self) {
 		Message* _LoopSrcf3 = JB_Incr(SC_Base_SourceArg(self));
 		Message* ch = JB_Incr(_LoopSrcf3);
 		Message* _afterf1 = JB_Incr(((Message*)JB_Ring_FlatAfter(_LoopSrcf3)));
-		while (((bool)ch) and (ch != _afterf1)) {
+		while (((bool)(ch)) and (ch != _afterf1)) {
 			Message* _N_f2 = JB_Incr(((Message*)JB_Ring_FlatNext0(ch)));
 			if (JB_Msg_NeedsPreprocess(ch)) {
 				if ((!(JB_Array_SyntaxCast(list)))) {
@@ -41878,7 +41873,7 @@ void SC_Func_ValidateSaver(SCFunction* self, JB_String* name) {
 	{
 		Message* _LoopSrcf2 = SC_Base_SourceArg(self);
 		Message* line = ((Message*)JB_Tree_First_(_LoopSrcf2));
-		while (line) {
+		while ((line)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(line));
 			if (Cls->Super != JB_TypeSaveable) {
 				JB_Msg_CheckSuperDotSave(line, name, First == line);
@@ -42652,7 +42647,7 @@ void SC_Func__String_Expand(Message* msg, SCFunction* fn) {
 	Message* errpos = JB_Incr(msg);
 	{
 		Message* item = JB_Incr(((Message*)JB_Tree_First_(msg)));
-		while (item) {
+		while ((item)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(item)));
 			Syntax syx = item->Func;
 			if ((syx == JB_SyxEmb) or (syx == JB_SyxStr)) {
@@ -42673,7 +42668,7 @@ void SC_Func__String_Expand(Message* msg, SCFunction* fn) {
 	}
 	{
 		Message* item = JB_Incr(((Message*)JB_Tree_First_(msg)));
-		while (item) {
+		while ((item)) {
 			Message* _Nf3 = JB_Incr(((Message*)JB_Ring_NextSib(item)));
 			Message* _tmPf9 = JB_Incr(({
 				Message* __imPf4 = JB_Incr((JB_Syx_Msg(JB_SyxDot, JB_LUB[797])));
@@ -43019,7 +43014,7 @@ void SC_Func__Tran_Array(Message* S, SCBase* name_space) {
 	JB_Msg_FixMultiArr(S);
 	{
 		Message* item = JB_Incr(((Message*)JB_Tree_First_(S)));
-		while (item) {
+		while ((item)) {
 			Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(item)));
 			Message* Rel = nil;
 			if (JB_Msg_EqualsSyx(item, JB_SyxItem, false)) {
@@ -43495,7 +43490,7 @@ void SC_Func__Tran_ForSub(SCFunction* fn, Message* node, SCBase* name_space) {
 		{
 			Message* c = JB_Incr(node);
 			Message* _afterf1 = JB_Incr(((Message*)JB_Ring_FlatAfter(node)));
-			while (((bool)c) and (c != _afterf1)) {
+			while (((bool)(c)) and (c != _afterf1)) {
 				Message* _N_f2 = JB_Incr(((Message*)JB_Ring_FlatNext0(c)));
 				if ((JB_Msg_EqualsSyx(c, JB_SyxQues, false)) and (JB_Msg_SyntaxEquals(c, JB_LUB[828], false))) {
 					Message* _tmPf11 = JB_Incr(JB_Msg_Copy(list, nil));
@@ -43515,7 +43510,7 @@ void SC_Func__Tran_ForSub(SCFunction* fn, Message* node, SCBase* name_space) {
 	{
 		Message* msg = JB_Incr(arg);
 		Message* _afterf4 = JB_Incr(((Message*)JB_Ring_FlatAfter(arg)));
-		while (((bool)msg) and (msg != _afterf4)) {
+		while (((bool)(msg)) and (msg != _afterf4)) {
 			Message* _N_f5 = JB_Incr(((Message*)JB_Ring_FlatNext0(msg)));
 			if (JB_Msg_EqualsSyx(msg, JB_SyxTmp, false)) {
 				if ((JB_Msg_SyntaxEquals(msg, JB_LUB[1553], false)) or (JB_Msg_SyntaxEquals(msg, JB_LUB[413], false))) {
@@ -43663,7 +43658,7 @@ bool SC_Func__Tran_FuncTable(Message* msg) {
 	JB_Tree_SyntaxAppend(msg, _tmPf8);
 	{
 		Message* _Valuef3 = JB_Incr(((Message*)JB_Tree_First_(items)));
-		while (_Valuef3) {
+		while ((_Valuef3)) {
 			Message* _Nf2 = JB_Incr(((Message*)JB_Ring_NextSib(_Valuef3)));
 			Message* I = JB_Incr(_Valuef3);
 			Message* item_value = JB_Incr(((Message*)JB_Ring_Last(I)));
@@ -44166,7 +44161,7 @@ void SC_Func__Tran_Strings(Message* start, SCFunction* fn) {
 	{
 		Message* msg = start;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(start));
-		while (((bool)msg) and (msg != _afterf1)) {
+		while (((bool)(msg)) and (msg != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(msg));
 			Syntax f = msg->Func;
 			if (f == JB_SyxStr) {
@@ -44663,7 +44658,7 @@ void SC_Mod_DelayedInitFuncTransform(SCModule* self) {
 	if (it) {
 		{
 			Message* msg = JB_Incr(((Message*)JB_Tree_First_(it)));
-			while (msg) {
+			while ((msg)) {
 				Message* _Nf1 = JB_Incr(((Message*)JB_Ring_NextSib(msg)));
 				if (((JB_Msg_EqualsSyx(msg, JB_SyxDecl, false))) and ({
 					Message* _tmP277 = JB_Incr(JB_Msg_GetDclName(msg, false));
@@ -44744,7 +44739,7 @@ bool SC_Mod_HasActualCode(SCModule* self, Message* arg) {
 	{
 		Message* curr = arg;
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(arg));
-		while (((bool)curr) and (curr != _afterf1)) {
+		while (((bool)(curr)) and (curr != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(curr));
 			if (JB_Msg_EqualsSyx(curr, JB_SyxDecl, false)) {
 				curr = ((Message*)JB_Ring_FlatAfter(curr));
@@ -44996,7 +44991,7 @@ bool SC_Mod_TryInit(SCModule* self, Array* req) {
 	{
 		Message* _LoopSrcf2 = self->InitAfter;
 		Message* name = ((Message*)JB_Tree_First_(_LoopSrcf2));
-		while (name) {
+		while ((name)) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(name));
 			if ((!JB_Msg_Expect(name, JB_SyxThg, nil))) {
 				return nil;
@@ -45383,7 +45378,7 @@ JB_String* JB_Err_render_unix(JB_Error* self, FastString* fs_in) {
 		JB_FS_AppendByte(fs, ':');
 		JB_Err_SCLineIdentifiers(self, fs, data);
 	}
-	 else if ((bool)self->Node) {
+	 else if ((bool)(self->Node)) {
 		JB_FreeIfDead(JB_Msg_Render(self->Node, fs));
 		SCFunction* fn = JB_Incr(JB_Msg_MsgOwningFunc(self->Node));
 		if (fn) {
@@ -45672,4 +45667,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 3980050387549014872 5837636819031193996
+// 706476901108866043 5837636819031193996
