@@ -110,5 +110,5 @@ I still prefer Xcode sometimes. I'm actually going to continue to improve Perry,
 * Xcode's text-editor feels smooth. Perry's text-editor is still a little glitchy in places. In fact I've spent months ironing out bugs in the text editor, so its much better than it was. And I've seen IDEs by large companies (QT + MSVS) that have even more glitchy text-editors.
 * Needs a debugger and VM
 * Needs skinning and theme support
-* Maybe we could animate the text or add explosions or animations into Perry. That would be cool.
+* Maybe we could animate the text or add explosions or animations into Perry. That would be cool. I've already got a sweet build-progress button thats animated with colors from temporal-randomness... so why not add more graphical cuteness?
 
