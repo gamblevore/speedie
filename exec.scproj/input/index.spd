@@ -7,9 +7,9 @@ conf
 
 
 target !fast
-	import "gui"
+	import "GUI"
 	import "network"
-import "speedie.scproj/speedie.input/ASMExec"
+import "Speedie.scproj/speedie.input/ASMExec"
 import "temporal"
 
 linkage
