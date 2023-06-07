@@ -41,7 +41,7 @@ int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation) {
 }
 
 
-static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* str, const char* Operation) {
+static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* str, const char* Operation, const char* verb) {
     FastString* FS = JB_FS__FastNew(0);
 	if (!str) {
 		if (err == ENOENT) {
@@ -64,7 +64,10 @@ static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* 
 		JB_FS_AppendCString(FS, " '");
 		JB_FS_AppendString(FS, self);
 		if (JB_Str_Length(other)) {
-			JB_FS_AppendCString(FS, "' to '");
+			JB_FS_AppendCString(FS, "' ");
+			if (!verb) verb = "to";
+			JB_FS_AppendCString(FS, verb);
+			JB_FS_AppendCString(FS, " '");
 			JB_FS_AppendString(FS, other);
 		}
 		JB_FS_AppendCString(FS, "'.");
@@ -87,12 +90,12 @@ static JB_String* Path_(JB_String* self) {
 }
 
 
-int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errnum, const char* BackupErr, const char* op) {
+int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errnum, const char* BackupErr, const char* op, int Severity, const char* verb) {
 	if (!errnum)
 		return 0;
-    JB_String* Desc = Desc_(self, other, errnum, BackupErr, op);
+    JB_String* Desc = Desc_(self, other, errnum, BackupErr, op, verb);
     JB_String* Path = Path_(self);
-    JB_Error* Err = JB_Err__New(0, Desc, 4, Path);
+    JB_Error* Err = JB_Err__New(0, Desc, Severity, Path);
     JB_Rec_NewItem(JB_StdErr, Err);
 
     return errnum;

@@ -537,26 +537,39 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 
 char* realpath(const char* file_name, char* resolved_name);
 // what to do if the case is different?
+
+void CaseFail_(JB_String* Orig, JB_String* Actual) {
+	static int x = 0;
+	if (x < 16) {
+		x++;
+		JB_ErrorHandleFile(Orig, Actual, -1, "case-incorrect", "using path", 3, "comparing");
+	}
+}
+
 JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 	//self = JB_Str_LowerCase(self);
-	JB_String* Result = JB_Str__Error();
-	if (!JB_Str_Length(self))
-		return Result;
 	JB_String* UserPath = JB_File_PathFix_(self);
-    uint8 Tmp[1024];
-	uint8* Path = JB_FastFileString(UserPath, Tmp);
-	if (Path) {
-		char* Resolved = realpath((const char*)Path, 0);
-		if (Resolved) {
-			if (StrEquals( Mini(self), Mini2(Resolved) )) {
-				free(Resolved);
-				return self;
-			}
+	if (!JB_Str_Length(UserPath))
+		return UserPath;
+		
+	JB_String* Result = JB_Str__Error();
+	char* Resolved = realpath((const char*)(UserPath->Addr), 0);
+	if (Resolved) {
+		auto A = Mini(self);
+		auto B = Mini2(Resolved);
+		if (StrEquals( A, B )) {
+			free(Resolved);
+			Result = self;
+		} else {
 			Result = JB_Str__Freeable( Resolved );
-		} else if (!(errno == ENOENT and AllowMissing)) {
-			JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
+			if (StrEqualsLex( A, B )) { // OOF. All we did was change the case
+				CaseFail_(self, Result);
+			}
 		}
+	} else if (!(errno == ENOENT and AllowMissing)) {
+		JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
 	}
+	
 	if (UserPath != self)
 		JB_FreeIfDead(UserPath);
 	
