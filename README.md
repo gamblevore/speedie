@@ -35,6 +35,7 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 * [Message (Jeebox)](Documentation/Message.md)
 * [Strings](Documentation/Strings.md)
 * [Error Handling](Documentation/Errors.md)
+* [Perry (IDE)](Documentation/Perry.md)
 
 
 
@@ -48,8 +49,6 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 
 That said, there are challenges to overcome, that will probably mean a lot of people who are already interested, would not use Speedie:
 
-* Getting the IDE working on Linux+Windows
-* Making speedie run on Windows (Linux is done!)
 * Adding a good debugger, VM and executable-format!
 
 Unfortunately I am one person who has created a very large piece of work. Extra developers are sorely wanted! Becoming a contributor could be a great way to add programming concepts to a new language.
@@ -75,15 +74,23 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 2. `cd /usr/local/speedie`
 3. Execute `sudo Terminal/makelinux.sh` ... OR `sudo Terminal/makeosx.sh`
 
+You can install "Perry" (the IDE), on Ubuntu on Windows. You will need libsdl2-dev and `gedit`. (gedit will drag along some GUI libs that Perry needs.)
+
+LibSDL2 has [install instructions](https://wiki.libsdl.org/SDL2/Installation). Gedit can be installed simply: `sudo apt install gedit`
 
 
-# Porting #
 
-Currently Speedie fully works on MacOSX Intel and Apple Silicon (ARM). Linux Support is Partial. The compiler works, but the GUI does not work.
 
-It would be nice to have people help port Speedie to other platforms. I need one small .m (OSX) file that uses SDL2 ported to Linux or Windows, about 100 lines of code.
 
-Let me know if you want to port Speedie to Windows or Linux! In this case we'd be very eager for you to upload your work!
+# Available Platforms #
+
+* MacOSX Intel
+* Apple Silicon (ARM)
+* Linux (Ubuntu)
+* MS Windows (via the Ubuntu WSL system).
+
+Yes the compiler, and IDE, and your built apps are now cross-platform!
+
 
 # Sponsors #
 
