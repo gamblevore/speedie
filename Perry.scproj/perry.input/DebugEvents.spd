@@ -26,11 +26,12 @@ function FoundListKeys (GuiKeyEvent)
 		return true
 
 
-|| DebugArgsList = "
+|| DebugArgsList = `
 args {
-	// \"ArgumentValue\"
+	// "ArgumentValue"
 }
-"
+`
+
 function DebugArgsGotFocus (guiaction)
 	|| f = .ide.DebugArgsFile #require
 	|| v = state == 1
