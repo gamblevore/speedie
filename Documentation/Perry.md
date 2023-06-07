@@ -8,6 +8,10 @@ In fact Perry goes out of it's way to hide clutter. Hopefully this will let you 
 
 The reason for creating my own IDE, is that I wanted full support for Speedie. I didn't want to have to be a second-class citizen.
 
+![](perry.png)
+
+You'll see that it looks simple. But underneath that simplicity, is a huge amount of features carefully hidden.
+
 ## Perry Features
 * File List has auto-discovery
 * Anti-Clutter interface
@@ -94,4 +98,3 @@ Regarding the color-scheme, that can and will change over time. Currently I have
 
 I'll probably allow rounded buttons with pictures for backgrounds later, perhaps we can make the IDE look like something from a Civilisation Game or something :) Or a "my little IDE" kind of Hello Kitty theme, or all sorts of possibilities.
 
-![](perry.png)
