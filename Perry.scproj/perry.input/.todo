@@ -7,7 +7,6 @@
 	* Mostly the issues will be around module variables...
 * RefOpts?
 * path differences...
-	* if str contains "network" crash?
 * Perry on Ubuntu?
 	* install g++, libsdl2-dev, gedit
 

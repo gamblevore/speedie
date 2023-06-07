@@ -4406,6 +4406,8 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
+void SC_IR_Print(IR* self);
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -7903,6 +7905,8 @@ Message* SC_Func_CountCallsToParentAlloc(SCFunction* self, Message* root);
 
 int SC_Func_CreateTypeCast(SCFunction* self, SCDecl* MyType, Message* exp, int Loss);
 
+SCDecl* SC_Func_DeclExtract(SCFunction* self, SCDecl* decl);
+
 void SC_Func_DeclsProtoType(SCFunction* self, Message* ch0, SCClass* fpType, bool late);
 
 void SC_Func_DeclsProtoTypeAdd(SCFunction* self, SCClass* fpType);
@@ -8409,6 +8413,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
@@ -8470,11 +8475,7 @@ inline void JB_Sav___SaveWrite__(Saveable* self, ObjectSaver* Saver) {
 }
 
 inline JB_StringC* JB_Str_CastZero(JB_String* self) {
-	JB_Incr(self);
-	JB_StringC* _tmPf0 = JB_Incr(JB_Str_MakeC(self));
-	JB_Decr(self);
-	JB_SafeDecr(_tmPf0);
-	return _tmPf0;
+	return JB_Str_MakeC(self);
 }
 
 inline bool JB_Array_SyntaxCast(Array* self) {

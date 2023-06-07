@@ -492,10 +492,10 @@ extend PerryIDE
 		for ro in conf..roots
 			if ro.expect(@str)
 				|| str = .ExpandStr(ro.name) 
-//					if str contains "network" // putting this in seems to cause crash? 
 					rz <~ str
 				  else
 					error (ro, "Can't find this project root. Please fix this path.")
+
 	
 	
 	function StartFiles (|message| conf, |bool| IsDir)
