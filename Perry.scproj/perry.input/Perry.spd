@@ -1,6 +1,6 @@
 
 
-|| Speedie = "/usr/local/bin/speedie"
+|| Speedie = "/usr/local/bin/speedie".file
 || CppCompiler = "/usr/bin/g++"
 
 
