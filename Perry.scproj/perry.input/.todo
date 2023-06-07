@@ -4,13 +4,16 @@
 
 * VM?
 * nil-checking seems a very good idea. shouldn't be too hard to do either!!
-	* mostly the issues will be around module variables...
+	* Mostly the issues will be around module variables...
 * RefOpts?
+* path differences...
 * Perry on Ubuntu?
 	* install g++, libsdl2-dev, gedit
 
+
 // personal
 * backup selftool and galaxxies... on git.
+
 
 // Do later
 * any object can be created with an virtual-function override thing, just store before the refcount?
