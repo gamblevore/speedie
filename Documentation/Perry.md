@@ -45,7 +45,7 @@ Overall... Perry is also a very **fast** and light small program. Weighing at on
 
 Perry minds us of the kind of programs you used to like and enjoy maybe 20 years ago... small fast light programs that do a lot... without all the bloat.
 
-Perry is fast overall. Finding is fast, text-editing is fast.
+Perry is fast overall. Finding is fast, text-editing is fast, autocomplete is fast, clicking on functions to find more info about them, is fast... Everything is fast.
 
 Also, when I'm editing my projects, I find takes surprising little RAM. 
 
