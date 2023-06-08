@@ -62,7 +62,7 @@ When opening large files, Perry will run much much faster.
 
 Syntax coloring is instant, unlike in Xcode.
 
-Xcode has a giant bloated IDE. And a super-confusing Build and Scheme and Task window system thingy that I still don't fully understand after using it for over 15 years.
+Xcode has a giant [bloated IDE](https://www.google.com/search?q=xcode+bloated). And a super-confusing Build and Scheme and Task window system thingy that I still don't fully understand after using it for over 15 years.
 
 Xcode STILL regularly breaks file-paths in such ways that takes very careful manual hacking of projects raw hidden data-files, to fix.
 
