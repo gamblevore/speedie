@@ -56,7 +56,10 @@ class ErrorList
 		
 	
 	syntax append (|Error| Err)
-		|| CanPrint = !.BadCount and error.autoprint
+		target debug
+			|| CanPrint = !.BadCount and error.autoprint
+		  else
+			|| Canprint = false
 		.incr(err)
 		require .CanAddMore(err.severity)
 		
