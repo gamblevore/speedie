@@ -555,7 +555,7 @@ inline bool WorthTestingCase() {
 static void CaseFail_(JB_String* Orig, const char* Actual, bool Owned) {
 	CaseComparisonsAllowed -= 64;
 	JB_String* Ugh = Owned ? JB_Str__Freeable(Actual) : JB_Str_CopyFromCString(Actual);
-	JB_ErrorHandleFile(Orig, Ugh, -1, "case-differs", "using path", 3, "expected");
+	JB_ErrorHandleFile(Orig, Ugh, -1, "case-differs", "finding path", 3, "found");
 }
 
 static void TrimSlash (MiniStr& A) {

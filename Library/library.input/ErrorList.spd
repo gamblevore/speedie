@@ -56,7 +56,7 @@ class ErrorList
 		
 	
 	syntax append (|Error| Err)
-		|| CanPrint = !.ErrorCount and error.autoprint
+		|| CanPrint = !.BadCount and error.autoprint
 		.incr(err)
 		require .CanAddMore(err.severity)
 		
@@ -174,7 +174,9 @@ class ErrorList
 			self <~ 's'
 		self <~ " found.\n" // found."
 	
-	
+	function BadCount (|int|)
+		return .errorcount + .problemcount
+		
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
 		require !.BlockErrors and !ErrorList.OutOfMemory
 		if level >= ErrorSeverity.error // a warning
