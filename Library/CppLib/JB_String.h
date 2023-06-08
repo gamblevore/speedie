@@ -93,6 +93,9 @@ struct MiniStr {
     uint8 Curr() {
         return *Addr;
     }
+    uint8 Last() {
+		return Addr[Length-1];
+    }
     uint8 NextLower() {
         return LowerCaseB(Next());
     }
