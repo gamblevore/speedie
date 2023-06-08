@@ -96,7 +96,9 @@ module Perry
 		|| old = app.Pref("currproj")
 		|| oof = (.FindProj(old),  .Projects.First)(old)
 			oof.ide.show(false)
-				
+		
+		i.LoadStartupErrors
+	
 
 
 	function OpenProj (|[PerryIDE]|)
