@@ -44,7 +44,7 @@ Each of these features was designed expertly and to a high degree of care. For e
 
 ## Speed And Efficiency
 
-Overall... Perry is also a very **fast** and light small program. Weighing at only 2.1MB on OSX. Compare that to Xcode which can be over 21GB, (10000x bigger). Incredible that Perry is so small. This is because it is made in Speedie, and Speedie writes good programs.
+Perry is light, fast and small. Perry weighs at only 900KB on OSX. Compare that to Xcode which can be over 20GB, (21000x bigger). Incredible that Perry is so small. This is because Perry is made in Speedie, which is a great compiler. And also because I made it.
 
 Perry reminds us of the kind of programs you used to like and enjoy maybe 20 years ago... small fast light programs that do a lot... without all the bloat.
 
