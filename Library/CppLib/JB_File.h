@@ -50,6 +50,7 @@ bool JB_File_IsLink (JB_String* self);
 void* JB_File_IPC (JB_File* self, int* n);
 void JB_munmap (void* mem, int64 n);
 int JB_Str_MakeDir(JB_String* self);
+int JB_File_RelaxPath(JB_File* self, bool NeedsMode);
 JB_String* JB_File_Read(JB_File* self, IntPtr Length, bool Ignore);
 JB_String* JB_File_ReadFD( int* FD, int Length, JB_String* Path );
 bool JB_File_DataSet( JB_File* self, JB_String* Data );

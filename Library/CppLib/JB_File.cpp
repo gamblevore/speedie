@@ -232,7 +232,6 @@ static bool IsLink_(const char* Path) {
 	return (s == 0) and S_ISLNK(st.st_mode);
 }
 
-
 static int RelaxPath_(const char* Path, bool NeedsMode, JB_String* ErrPath) {
 	require (SudoRelax > 0);
 	static int ChangeOwner;
@@ -263,9 +262,15 @@ static int RelaxPath_(const char* Path, bool NeedsMode, JB_String* ErrPath) {
 			Err = lchown(Path, UID, GID);
 	}
 	
-	// no need to create errors... 
-	return 0;
+	return Err;
 }
+
+
+int JB_File_RelaxPath(JB_File* self, bool NeedsMode) {
+	require (self); 
+	return RelaxPath_((const char*)self->Addr, NeedsMode, self);
+}
+
 
 
 int JB_Str_MakeEntirePath(JB_String* self, bool Last);
@@ -537,32 +542,44 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 
 char* realpath(const char* file_name, char* resolved_name);
 
-static int CaseFailCount;
+static int CaseComparisonsAllowed = 1024*2;
 inline bool WorthTestingCase() {
 	#if __PLATFORM_CURR__ == __PLATFORM_OSX__
-	return CaseFailCount < 16;
+	if (CaseComparisonsAllowed > 0) {
+		CaseComparisonsAllowed--;
+		return true;
+	}
 	#endif
 	return false;
 }
 static void CaseFail_(JB_String* Orig, const char* Actual, bool Owned) {
-	CaseFailCount++;
-	JB_String* Ugh = Owned?JB_Str__Freeable(Actual) : JB_Str_CopyFromCString(Actual);
-	JB_ErrorHandleFile(Orig, Ugh, -1, "case-incorrect", "using path", 3, "comparing");
+	CaseComparisonsAllowed -= 64;
+	JB_String* Ugh = Owned ? JB_Str__Freeable(Actual) : JB_Str_CopyFromCString(Actual);
+	JB_ErrorHandleFile(Orig, Ugh, -1, "case-differs", "using path", 3, "expected");
+}
+
+static void TrimSlash (MiniStr& A) {
+	while (A.Length and A.Last()=='/') {
+		A.Length--;
+	}
 }
 
 static int CaseCompare_(JB_String* self, const char* Resolved, bool Owned) {
 	auto A = Mini(self);
 	auto B = Mini2(Resolved);
-	if (StrEquals( A, B ))
-		return 1;
-	return 0; // do this later
+	TrimSlash(A);
+	if (StrEquals( A, B )) {
+		//if (Owned and B.Length != self->Length) debugger;
+		return B.Length == self->Length;
+	}
 	if (!WorthTestingCase() or !StrEqualsLex( A, B )) // Phew
 		return 0;
-	CaseFail_(self, Resolved, Owned); // BAD! All we did was change the case
+	CaseFail_(self, Resolved, Owned); // BAD! The two paths only differ by case.
 	return 2;
 }
 
 static void CaseTest_(JB_String* self) {
+	require0 (JB_Str_Length(self));
 	char Resolved[PATH_MAX];
 	realpath((const char*)(self->Addr), Resolved);
 	CaseCompare_(self, Resolved, false);
@@ -570,7 +587,8 @@ static void CaseTest_(JB_String* self) {
 
 
 JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
-	//self = JB_Str_LowerCase(self);
+	// realpath seems to add "/" to paths?
+	// should we add them too? can we compare ignoring final "/"?
 	JB_String* UserPath = JB_File_PathFix_(self);
 	if (!JB_Str_Length(UserPath))
 		return UserPath;
@@ -578,7 +596,7 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 	JB_String* Result = JB_Str__Error();
 	char* Resolved = realpath((const char*)(UserPath->Addr), 0);
 	if (Resolved) {
-		int Cmp = 0; // CaseCompare_(self, Resolved, true); // do this later
+		int Cmp = CaseCompare_(self, Resolved, true); // do this later
 		if (Cmp == 1) {
 			free(Resolved);
 			Result = self;
@@ -706,8 +724,10 @@ int JB_Str_MakeDir(JB_String* self) {
     int err = mkdir(tmp, kDefaultMode);
     if (err == -1 and errno == EEXIST)
 		return 0;
-    if (!err)
-		return RelaxPath_(tmp, true, self);
+    if (!err) {
+		RelaxPath_(tmp, true, self);
+		return 0;
+	}
     return (int)ErrorHandle_(err, self, nil, "creating a folder");
 }
 

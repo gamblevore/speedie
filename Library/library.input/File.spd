@@ -330,7 +330,8 @@ class File (String)
 				return ch
 			test = name + (random.shared.int&0xFFFFFF).render
 			
-	
+	function Relax (|bool| NeedsMode=true, |errorint|)
+		cpp_Wrapper JB_File_RelaxPath
 	
 	function DeleteAll (|ErrorInt|)
 		if super == "/" or ""
