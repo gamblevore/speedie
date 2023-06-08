@@ -898,24 +898,27 @@ class SCDecl (SCObject) {
 		if fn isa kisconstructor or kIsDestructor
 			expect false (exp, "You can’t modify 'self' in a constructor or destructor.")
 
-		if .isnormalobject
+		if .IsNormalObject
 			debugat
-			fn.RefSmooth( fn.DeclExtract(self) )
+			fn.RefSmooth( fn.DeclSelfExtract(self) )
 	
 	
-	function SCFunction.DeclExtract (|scdecl| decl, |scdecl|)
+	function SCFunction.DeclSelfExtract (|scdecl| decl, |scdecl|)
 		opt norefcounts
 		
 		rz = decl.copy
-		for (p in .args) (i)
-			if p == decl
-				.args[i] = rz
+		if .args[0] == decl
+			.args[0] = rz
 
-		for s.flat in .source
-			if s.obj == decl
-				s.obj = rz
+		|| arg = .SourceArg.obj
+		if arg isa scarg
+			arg.access["self"] = decl
 		
-
+		for s.flat in .source
+			|| obj = s.obj
+			if obj == decl
+				s.obj = rz
+					
 
 	function WriteNilRel (|Message|)
 		return NewRel( .Name, "=", "nil" )

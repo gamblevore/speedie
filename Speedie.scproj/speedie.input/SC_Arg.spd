@@ -41,7 +41,7 @@ function Message.SCArgNested (|message|base, |SCBase| p, |SCArg|)
 	|| cp = curr.Ancestor(@arg)
 	if cp == base
 		return .scarg(p)
-	|| p2 = cp.scargnested(Base, p)
+	|| p2 = cp.SCArgNested(Base, p)
 	return .scarg(p2)
 
 
