@@ -46,13 +46,11 @@ Each of these features was designed expertly and to a high degree of care. For e
 
 Perry is light, fast and small. Perry weighs at only 900KB on OSX. Compare that to Xcode which can be over 20GB, (21000x bigger). Incredible that Perry is so small. This is because Perry is made in Speedie, which is a great compiler. And also because I made it.
 
-Perry reminds us of the kind of programs you used to like and enjoy maybe 20 years ago... small fast light programs that do a lot... without all the bloat.
+Perry reminds us of the kind of programs you used to like and enjoy maybe 20 years ago... fast programs that do a lot... without all the bloat.
 
-Perry is fast overall. Finding is fast, text-editing is fast, autocomplete is fast, clicking on functions to find more info about them, is fast... Everything is fast.
+In Perry, you'll find that finding is fast, text-editing is fast, autocomplete is fast, clicking on functions to find more info about them, is fast... Everything is fast.
 
-Also, when I'm editing my projects, I find Perry takes surprising little RAM. 
-
-When I open Perry I see I have 6 projects open (3 are large projects). Yet I am only taking 1.5MB of memory for all the objects, 87KB for the strings, and 1.7MB for the screen. Its an ultra-light-weight design. Xcode will take hundreds of megabytes for just one project.
+I find Perry takes surprisingly little RAM. When I open Perry I see I have 6 projects open (3 are large projects). Yet I am only taking 1.5MB of memory for all the objects, 87KB for the strings, and 1.7MB for the screen. Its an ultra-light-weight design. Xcode will take hundreds of megabytes for just one project.
 
 ## Comparisons
 
