@@ -2,7 +2,7 @@
 
 Perry is an IDE, that means it aims to do all the things that help you write good code.
 
-Perry is designed with minimalism in mind. That is... it purposefully DOESN'T blast your eyes with all sorts of clutter and details.
+Perry is designed with minimalism in mind, we won't blast your eyes with all sorts of clutter and details.
 
 In fact Perry goes out of it's way to hide clutter. Hopefully this will let you focus on the code more easily. Especially if you are new!
 
