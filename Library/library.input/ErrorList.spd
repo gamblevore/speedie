@@ -98,7 +98,6 @@ class ErrorList
 		|| n = (1, -1)(add)
 		
 		if err.severity == errorseverity.problem
-			debugger
 			.problemcount += n
 		  elseif err.isError
 			.errorcount += n
@@ -107,6 +106,7 @@ class ErrorList
 
 
 	function Pop (|error|)
+		opt norefcounts
 		|| err = .errors.pop
 			.incr(err, false)
 			return err
