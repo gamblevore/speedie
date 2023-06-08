@@ -899,7 +899,6 @@ class SCDecl (SCObject) {
 			expect false (exp, "You can’t modify 'self' in a constructor or destructor.")
 
 		if .IsNormalObject
-			debugat
 			fn.RefSmooth( fn.DeclSelfExtract(self) )
 	
 	
