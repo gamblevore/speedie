@@ -664,6 +664,16 @@ class PerryIDE (Window)
 		|| err = .editme.MyError
 			.errorlist <~ err // right?
 
+	
+	function LoadStartupErrors
+		while stderr.anything
+			|| err = stderr.pop
+			if err.NeedsPrint
+				.errorlist <~ err
+				is broken
+			  else
+				notifications <~ err
+
 
 	function SaveEditing (|int| Purpose) // savetext, savefile, filesave
 		opt norefcounts

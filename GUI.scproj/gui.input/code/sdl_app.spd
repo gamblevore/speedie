@@ -500,10 +500,9 @@ module SDLApp
 	function PreFrame (|int|)
 		if .FixScreenBug.Fired
 			.BumpSize
-			
-		if !stderr.ok
+		
+		while stderr.anything
 			notifications <~ stderr.pop
-			stderr.clear
 			beep
 
 		.HandleOpenFile
