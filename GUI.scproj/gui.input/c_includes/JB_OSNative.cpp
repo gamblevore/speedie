@@ -32,7 +32,7 @@ void JB_SDL_SetModified(void* w, bool b) {
 }
 
 void JB_SDL_FullScreen (void* w, bool On) {
-	uint state = On ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0;
+	uint state = On ? SDL_WINDOW_FULLSCREEN : 0; // fullscreen_desktop fails in WSL?
 	SDL_SetWindowFullscreen((SDL_Window*)w, state);
 }
 
