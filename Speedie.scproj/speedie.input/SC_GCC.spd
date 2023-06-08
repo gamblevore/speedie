@@ -169,13 +169,16 @@ function HasType (|[File]| CppList, |string| Type, |bool|)
 		if f isa Type
 			return true
 
-function CreateCompileString (|[File]| CppList,  |string| Product,  |string| Type, |[string]|)
-	require .HasType(cpplist, type)
+
+function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Type, |[string]|)
+	require .HasType(FileList, type)
 	rz.AppendWords( Product )
 
-	for f in CppList
+	for f in FileList
 		if f isa Type
 			rz <~ f
+			f.relax
+
 
 	|| cmode = "-std=gnu++17 "
 	if Type == "m" or "o" or "mm"
