@@ -516,6 +516,7 @@ class PerryIDE (Window)
 		  else
 			.filelist.addextra(p)						// add root
 		startupwindow.hide
+		.show
 
 
 	module

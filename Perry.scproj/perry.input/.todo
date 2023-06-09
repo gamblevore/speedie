@@ -6,8 +6,6 @@
 * nil-checking seems a very good idea. shouldn't be too hard to do either!!
 	* Mostly the issues will be around module variables...
 * RefOpts?
-* first file (.perry) loading doesnt work on startup?
-* opening file from finder just opens the file in the proj without moving windwos.
 
 
 // personal
