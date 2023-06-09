@@ -16,12 +16,12 @@
 * A lot of syntactic sugar, while still being tasteful.
 * Cross-platform. Create shell tools and GUI apps
 * Easy communication across multiple processes (IPC).
-* Has a native IDE “Perry”. Created to combine power + simplicity.
+* Has an awesome IDE, “Perry”.
 * Use one language, thats great at multiple areas:
     * Fast at heavy-duty data-processing
     * Making tools with few lines of code
     * Writing large well-structured programs
-    * Cross-platform code, even with GUI
+    * Create cross-platform GUI (or shell) apps
 * Not controlled by big-tech.
 
 Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D I did delete most of the rude comments before release, but still... dont expect "corporate behaviour".
