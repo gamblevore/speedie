@@ -548,13 +548,15 @@ int* JB_File__Compar() {
 }
 
 inline bool WorthTestingCase() {
-	#if __PLATFORM_CURR__ == __PLATFORM_OSX__
+#if __PLATFORM_CURR__ == __PLATFORM_LINUX__
+	return true;
+#else
 	if (CaseComparisonsAllowed > 0) {
 		CaseComparisonsAllowed--;
 		return true;
 	}
-	#endif
 	return false;
+#endif
 }
 
 static void CaseFail_(JB_String* Orig, const char* Actual, bool Owned) {
@@ -577,10 +579,15 @@ static int CaseCompare_(JB_String* self, const char* Resolved, bool Owned) {
 		//if (Owned and B.Length != self->Length) debugger;
 		return B.Length == self->Length;
 	}
+
+#if __PLATFORM_CURR__ == __PLATFORM_LINUX__
+	return 0; // no need on linux.
+#else
 	if (!StrEqualsLex( A, B )) // Phew
 		return 0;
 	CaseFail_(self, Resolved, Owned); // BAD! The two paths only differ by case.
 	return 2;
+#endif
 }
 
 static void CaseTest_(JB_String* self) {
