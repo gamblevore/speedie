@@ -141,25 +141,7 @@ extend String
 
 	function Resolve (|bool| Mode=false, |string|) 
 		cpp_wrapper JB_Str_ResolvePath
-	
-	
-	function FixPathCase (|file|)
-		for p in .Components
-			if !rz and !p
-				rz = "/".file
-			  else
-				|| name = rz.FindLooseMatchingChild(p)
-				if !name
-					rz = nil
-					exit
-				rz = rz[name]
-	
-	
-	helper file.FindLooseMatchingChild (|string| name, |string|)
-		require self
-		for ch in self
-			if ch ~= name
-				return ch
+
 
 	function VolumeName (|string|)
 		opt norefcounts
