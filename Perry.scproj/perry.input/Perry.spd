@@ -9,6 +9,9 @@ module Perry
     |string|						_SpeedieDir
     |bool|							Checked	
     |byte| 							FindID
+	|dictionary of string|			PathDict = [
+		"spd"  :  perry.SpeedieDir
+	]
 	
 	constants
 		arc_newer	= 2
@@ -96,9 +99,6 @@ module Perry
 		|| old = app.Pref("currproj")
 		|| oof = (.FindProj(old),  .Projects.First)(old)
 			oof.ide.show(false)
-		
-		i.LoadStartupErrors
-	
 
 
 	function OpenProj (|[PerryIDE]|)

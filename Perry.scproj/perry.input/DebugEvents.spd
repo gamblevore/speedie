@@ -1,7 +1,7 @@
 
 
 function ReturnDebugArgs (GUIListEvent)
-	if row isnt editable
+	if row isnt editable 
 		|| r = .AddRow
 		row.prev = r
 		(r is editable)

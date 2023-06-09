@@ -543,6 +543,10 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 char* realpath(const char* file_name, char* resolved_name);
 
 static int CaseComparisonsAllowed = 1024*2;
+int* JB_File__Compar() {
+	return &CaseComparisonsAllowed;
+}
+
 inline bool WorthTestingCase() {
 	#if __PLATFORM_CURR__ == __PLATFORM_OSX__
 	if (CaseComparisonsAllowed > 0) {
@@ -552,6 +556,7 @@ inline bool WorthTestingCase() {
 	#endif
 	return false;
 }
+
 static void CaseFail_(JB_String* Orig, const char* Actual, bool Owned) {
 	CaseComparisonsAllowed -= 64;
 	JB_String* Ugh = Owned ? JB_Str__Freeable(Actual) : JB_Str_CopyFromCString(Actual);
@@ -572,7 +577,7 @@ static int CaseCompare_(JB_String* self, const char* Resolved, bool Owned) {
 		//if (Owned and B.Length != self->Length) debugger;
 		return B.Length == self->Length;
 	}
-	if (!WorthTestingCase() or !StrEqualsLex( A, B )) // Phew
+	if (!StrEqualsLex( A, B )) // Phew
 		return 0;
 	CaseFail_(self, Resolved, Owned); // BAD! The two paths only differ by case.
 	return 2;
@@ -603,7 +608,7 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 		} else {
 			Result = JB_Str__Freeable( Resolved );
 		}
-	} else if (!(errno == ENOENT and AllowMissing)) {
+	} else if (!(errno == ENOENT and (AllowMissing&1))) {
 		JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
 	}
 	

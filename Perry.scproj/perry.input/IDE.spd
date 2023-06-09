@@ -7,7 +7,7 @@ class PerryIDE (Window)
 	|Process|					compilr
 	|string|					CompileOKString
 	|ShellStream|				RunCompiledApp
-	
+	|[error]|					StartupErrors
 	|FileViewer|				FileList
 	|Guicontrol|				Debugger
 	|Guicontrol|				Tester
@@ -84,14 +84,10 @@ class PerryIDE (Window)
 	function UpdateStatusErrors
 		.status.text = .PerryStatus
 
+
 	function ExpandStr (|string| path, |string|)
-		.array
-		|| d = [
-			"spd"  :  perry.SpeedieDir
-			"proj" : .Project.path
-		]
-		rz = path.path_expand(d) #expect ("Unrecognised @ in: " + path)
-		rz = rz.resolve(true)
+		rz = path.path_expand(perry.PathDict) #expect ("Unrecognised @ in: " + path)
+		rz = rz.resolve(fileResolveMode.allowmissing)
 
 
 	function GetBuildFile (|file|) 
@@ -593,6 +589,7 @@ class PerryIDE (Window)
 				.DuringMsgFB = false
 				lst.select(src.first)
 		(self is broken) = ActualErrors > 0
+		.RelistStartupErrors
 		.logarea.listsource.keep(144)
 
 
@@ -646,18 +643,30 @@ class PerryIDE (Window)
 			i.ModifiedForCompile = true
 		.recheck				// could be delayed, too.
 
-	function UpdatePrefs
+
+	function UpdateActiveFile
 		|| d = .editme.Document$
 		|| l = d.Location.Resolve
 		if l ~= app.pref_path.resolve
-			|| oldPrefs = app.prefs
-			app.prefs = nil
-			if app.PrefsInit(0)
-				.notify("Reloaded Prefs.")
-			  else
-				.notify("Prefs are corrupted")
-				app.prefs = oldPrefs
-			.LoadState
+			.updateprefs
+		  elseif l ~= .perryfile
+			.updateperry
+	
+	
+	function UpdatePerry
+		.startuperrors.clear
+		.StartFiles
+		.LoadStartupErrors
+	
+	function UpdatePrefs
+		|| oldPrefs = app.prefs
+		app.prefs = nil
+		if app.PrefsInit(0)
+			.notify("Reloaded Prefs.")
+		  else
+			.notify("Prefs are corrupted")
+			app.prefs = oldPrefs
+		.LoadState
 
 
 	function ParseErrorDetect
@@ -668,11 +677,9 @@ class PerryIDE (Window)
 	function LoadStartupErrors
 		while stderr.anything
 			|| err = stderr.pop
-			if err.NeedsPrint
-				.errorlist <~ err
-				is broken
-			  else
-				notifications <~ err
+			notifications <~ err
+			if err.IsBad
+				.StartupErrors <~ err.copy
 
 
 	function SaveEditing (|int| Purpose) // savetext, savefile, filesave
@@ -686,7 +693,7 @@ class PerryIDE (Window)
 			require e.Save
 		  else
 			return
-		.UpdatePrefs
+		.UpdateActiveFile
 		with .currfilerow
 			.lastsize = e.Length
 			if .location.pathiscode

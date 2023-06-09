@@ -32,7 +32,8 @@ bool JB_File_ListActive( JB_File* self );
 JB_Object JB_File__File( JB_File* self );
 bool JB_FS_AppendPipe(FastString* self, int fd, int Mode);
 
-JB_String* JB_Str_ResolvePath( JB_String* self, bool err );
+int* JB_File__Compar();
+JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing );
 int JB_Str_CopyFile(JB_String* self, JB_String* To, bool attronly);
 int JB_File_Copy(JB_File* self, JB_File* To, bool attronly);
 uint8* FastShellPath_( JB_String* Path, uint8* WriteTo );

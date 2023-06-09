@@ -343,7 +343,7 @@ function LinkOK (|file| p, |file|) // or just not a link
 	if !lto
 		return p
 
-	|| tof = lto.resolve(true).file
+	|| tof = lto.resolve(fileResolveMode.allowmissing).file
 	if tof.exists and !tof.linksto // not bad
 		return tof
 

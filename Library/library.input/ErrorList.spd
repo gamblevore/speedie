@@ -67,9 +67,9 @@ class ErrorList
 		if Error.KeepStackTrace
 			err.StackTrace := app.StackTrace
 		(.LogFunc)(self, err.render)?
-		if CanPrint and err.needsprint
+		if CanPrint and err.IsBad
 			printline err.render
-		if error.autoprint and err.severity >= Errorseverity.error
+		if error.autoprint and err.severity >= Errorseverity.problem
 			debugat
 		if error.autoprint != errorflags.PrintAndRemove
 			.errors <~ err

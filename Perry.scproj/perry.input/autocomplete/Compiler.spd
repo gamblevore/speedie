@@ -19,9 +19,9 @@ extend PerryIDE
 		.projmsg.syntaxis(s) = mod
 		
 		if (s == listviewstate.modified)
-			|| sub = .CurrFileName.SubMenu$
-			|| src = sub.ListSource$
-			(src is modified) = Mod
+			|| sub = .CurrFileName.SubMenu
+				|| src = sub.ListSource
+					(src is modified) = Mod
 
 	syntax isnt (|ListViewState| s, assigns:|bool| b)
 		.syntaxis(s)=!b
@@ -32,6 +32,7 @@ extend PerryIDE
 		.errorlist.Clear
 		.editme.ClearErrors
 		.filelist.ClearErrors
+		.RelistStartupErrors
 	
 	
 	function CompiledOK (|message| msg, |bool|)
@@ -54,6 +55,7 @@ extend PerryIDE
 		is Broken
 		.NoNeed
 		.errorlist.listsource = MaybeOK.jberrors
+		.RelistStartupErrors
 		if err
 			.ErrorList <~ err
 

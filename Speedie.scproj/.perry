@@ -1,8 +1,8 @@
 
 roots
-	"@spd/Library/Library.input/"
-	"@spd/Jeebox.scproj/Jeebox.input/"
-	"@spd/image.scproj/image.input/"
+	"@spd/Library/library.input/"
+	"@spd/jeebox.scproj/jeebox.input/"
+	"@spd/Image.scproj/image.input/"
 
 excludes 
 	"hidden"

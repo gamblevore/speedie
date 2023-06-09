@@ -22,14 +22,13 @@ class Error (Message)
 	constructor (|message| node, |string| desc = "", |errorseverity| level=errorseverity.error, |string| path="" )
 		super.constructor
 		.position = -1
-		if node: .position = node.position
 		.node = node
 		.severity = level
 		.name = desc // sigh
-		.path = (path, node.filepath)(path)
-		.OriginalData = node.OriginalParseData
+		.path = path
 		.when = date()
 		.func = @sstr // whatever
+		.UpgradeWithNode
 	
 	
 	constructor ()
@@ -52,7 +51,23 @@ class Error (Message)
 		.OriginalData = orig.OriginalData
 		.when = orig.when
 		.func = @sstr // whatever
+	
+	
+	function UpgradeWithNode
+		opt norefcounts
+		|| node = currsource.last
+			.node = node
+			if (node == @tmp) and (node.name[0] == '/')		// a filepath
+				.path = node.name
+		  else
+			node = .node #require
+		.position = node.position
 
+		|| p = node.filepath
+			.path = p
+		.OriginalData = node.OriginalParseData
+		
+		
 	function Copy (|error|)
 		return error(self, false)
 
@@ -81,7 +96,7 @@ class Error (Message)
 	function IsWarning (|bool|)
 		return (.severity <= errorseverity.Warning)
 
-	function NeedsPrint (|bool|)
+	function IsBad (|bool|)
 		return (.severity >= errorseverity.problem)
 
 	function IsError (|bool|)
@@ -172,8 +187,14 @@ class Error (Message)
 
 
 	module
-		|byte| AutoPrint = 0 // errorflags.PrintAndRemove
-		|bool| KeepStackTrace = false
+		function SourceAdd (|message| m)
+			.currsource <~ m
+		function SourceRemove
+			.currsource.pop
+			
+		|[message]|		CurrSource
+		|byte|			AutoPrint = 0 // errorflags.PrintAndRemove
+		|bool|			KeepStackTrace = false
 
 
 

@@ -1,9 +1,9 @@
 roots
 	"@spd/Library/library.input/"
-	"@spd/Jeebox.scproj/jeebox.input/"
-	"@spd/gui.scproj/gui.input/"
-	"@spd/image.scproj/image.input/"
-	"@spd/NETWORK.scproj/network.input/"
+	"@spd/jeebox.scproj/jeebox.input/"
+	"@spd/GUI.scproj/gui.input/"
+	"@spd/Image.scproj/image.input/"
+	"@spd/network.scproj/network.input/"
 
 
 /*

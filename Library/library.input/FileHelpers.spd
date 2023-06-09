@@ -139,7 +139,7 @@ extend String
 			rz--
 		
 
-	function Resolve (|bool| AllowMissing=false, |string|) 
+	function Resolve (|bool| Mode=false, |string|) 
 		cpp_wrapper JB_Str_ResolvePath
 	
 	
@@ -387,4 +387,9 @@ extend file
 		
 	function ZipUpload (|string| url, |errorint|)
 		return .ZipTmp$.uploadto(url)
+
 		
+datatype FileResolveMode (bool)
+	constants
+		AllowMissing = true
+

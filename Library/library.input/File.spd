@@ -466,6 +466,9 @@ class File (String)
 	module
 		|| DebugExecute = false
 		
+		helper ComparisonsAllowed (|&int|)
+			cpp_Wrapper JB_File__Compar
+
 		helper RelaxSudo (|int| Amount = 0, |int|)
 			cpp_wrapper
 				

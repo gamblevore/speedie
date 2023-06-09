@@ -484,21 +484,25 @@ extend PerryIDE
 		app.saveprefs // for pref-file editing
 		.Show(false)
 		.ViewAsbetter
+		.LoadStartupErrors
 		return true
 	
 	
-	function Roots (|message| conf, |[string]|)
-		opt norefcounts
-		for ro in conf..roots
-			if ro.expect(@str)
-				|| str = .ExpandStr(ro.name) 
-					rz <~ str
-				  else
-					error (ro, "Can't find this project root. Please fix this path.")
+	function RelistStartupErrors
+		for err in .startuperrors
+			.errorlist <~ err
+			is broken
 
-	
-	
-	function StartFiles (|message| conf, |bool| IsDir)
+		// * need to alter the saved errors when the .perry file is altered...
+			
+	function StartFiles
+		|| IsDir     = .project.isdir
+		|| ProjConf	 = .perryfile
+		error.SourceAdd( @tmp+projconf)
+		|message| conf
+		if IsDir and projconf.exists
+			conf = projconf.parse
+
 		|| f = .FileList
 		f.clear
 		f.Excludes = dictionary()
@@ -510,9 +514,19 @@ extend PerryIDE
 		
 		if !IsDir and .IsSpeedieCode
 			conf = qqfiles.Roots.parse
-		for p in .roots(conf)
-			f.addroot(p.file)
+		
+		for ro in conf..roots
+			error.SourceAdd(ro)
+			if ro.expect(@str)
+				*file.ComparisonsAllowed max= 1
+				|| str = .ExpandStr(ro.name)
+					f.addroot(str.file)
+				  else
+					error (ro, "Can't find this project root. Please fix this path.")
+			error.SourceRemove
+		
 		f.checksize
+		error.SourceRemove
 
 
 	function DesiredStart (|filerow| projfol, |&int| pos,  |filerow|)
@@ -543,22 +557,18 @@ extend PerryIDE
 			.close(sdlapp.kactivity)
 
 
+	function PerryFile (|file|)
+		return .project.child(".perry")
+	
 	function LoadConfSub (|file| proj, |bool|)
-		|| ProjIsDir = proj.isdir
-		|| ProjConf	 = proj.child(".perry")
-		
-		|message| conf
-		if ProjIsDir and projconf.exists
-			conf = projconf.parse
-		
 		perry.AddProj(proj.path, self)
 		|| r = .root
 			.id = r.location
-		.nottodo = nil			// awkward. should remove this property
+		.nottodo = nil
 		.Previous.clear
 		.PrevMarker = nil
 		
-		.StartFiles(conf, ProjIsDir)
+		.StartFiles
 		.isloading = false		// its done and we need .startproj
 		return .StartProj
 	
