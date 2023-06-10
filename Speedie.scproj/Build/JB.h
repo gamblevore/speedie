@@ -59,6 +59,8 @@ typedef byte ErrorSeverity;
 
 typedef int FileMode;
 
+typedef bool FileResolveMode;
+
 typedef uint FlowControlStopper;
 
 typedef u16 IPCState;
@@ -1761,6 +1763,7 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__FileMode_Other (7 << 0)
 #define kJB__FileMode_Owner (7 << 6)
 #define kJB__FileMode_Process (((7 << 6) + 5) << ((3 + 5) << 0))
+#define kJB__FileResolveMode_AllowMissing (true)
 #define kJB__IPCState_closed (4664)
 #define kJB__IPCState_connected (4662)
 #define kJB__IPCState_connecting (4661)
@@ -1982,6 +1985,7 @@ extern int SC__Func_FuncStats[12];
 extern int SC__Func_OnceCount;
 extern Dictionary* SC__Func_TemporalStatements;
 extern byte JB__Err_AutoPrint;
+extern Array* JB__Err_CurrSource;
 extern bool JB__Err_KeepStackTrace;
 
 //// HEADER JB.h
@@ -2474,7 +2478,7 @@ Message* SC_AC__JumpImport(Message* cmd);
 
 Message* SC_AC__LocateDefinition(Message* msg, SCObject* already_defined, bool DisplayOnly);
 
-Message* SC_AC__LocateDefinitionSub(Message* msg, SCObject* already_defined, bool DisplayOnly);
+Message* SC_AC__LocateDefinitionSub(Message* msg, SCObject* already_defined, SCDecl* ty, bool DisplayOnly);
 
 Message* SC_AC__Log();
 
@@ -2789,7 +2793,7 @@ Array* SC_Ext__CollectCppsInto(JB_File* Fol, JB_File* Objects, int* stdafx);
 
 JB_File* SC_Ext__CppLib();
 
-Array* SC_Ext__CreateCompileString(Array* CppList, JB_String* Product, JB_String* Type);
+Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_String* Type);
 
 bool SC_Ext__ExecuteGCC(Array* Commands);
 
@@ -3841,6 +3845,9 @@ int JB_ErrorSeverity__InitCode_();
 // FileMode
 
 
+// FileResolveMode
+
+
 // FlowControlStopper
 FlowControlStopper JB_FlowControlStopper_SyntaxUsing(FlowControlStopper self);
 
@@ -4809,6 +4816,8 @@ inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in);
 
 SCDecl* JB_Object_AsDecl(JB_Object* self);
 
+SCBase* JB_Object_ClassOrModule(JB_Object* self);
+
 void jdb(JB_Object* self);
 
 bool JB_Object_MustBe(JB_Object* self, JB_Class* x, Message* ErrNode);
@@ -5076,6 +5085,8 @@ inline bool JB_DictionaryReader_SyntaxCast(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
+
+int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -7905,7 +7916,7 @@ Message* SC_Func_CountCallsToParentAlloc(SCFunction* self, Message* root);
 
 int SC_Func_CreateTypeCast(SCFunction* self, SCDecl* MyType, Message* exp, int Loss);
 
-SCDecl* SC_Func_DeclExtract(SCFunction* self, SCDecl* decl);
+SCDecl* SC_Func_DeclSelfExtract(SCFunction* self, SCDecl* decl);
 
 void SC_Func_DeclsProtoType(SCFunction* self, Message* ch0, SCClass* fpType, bool late);
 
@@ -8299,6 +8310,8 @@ bool JB_Err_HasPosition(JB_Error* self);
 
 void JB_Err_Improve(JB_Error* self);
 
+bool JB_Err_IsBad(JB_Error* self);
+
 bool JB_Err_IsError(JB_Error* self);
 
 bool JB_Err_IsWarning(JB_Error* self);
@@ -8306,8 +8319,6 @@ bool JB_Err_IsWarning(JB_Error* self);
 bool JB_Err_LineIdentifiers(JB_Error* self, FastString* fs, JB_String* path);
 
 int JB_Err_LinePos(JB_Error* self, JB_String* data);
-
-bool JB_Err_NeedsPrint(JB_Error* self);
 
 JB_String* JB_Err_render(JB_Error* self, FastString* fs_in);
 
@@ -8332,6 +8343,8 @@ bool JB_Err_SyntaxIs(JB_Error* self, ErrorFlags F);
 void JB_Err_SyntaxIsSet(JB_Error* self, ErrorFlags F, bool Value);
 
 bool JB_Err_SyntaxIsnt(JB_Error* self, ErrorFlags F);
+
+void JB_Err_UpgradeWithNode(JB_Error* self);
 
 JB_Error* JB_Err__Alloc();
 
