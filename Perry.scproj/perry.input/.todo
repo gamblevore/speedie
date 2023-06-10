@@ -10,6 +10,7 @@
 
 
 // Do later
+* not-compilable functions blocks lookups, on a .dot function call.
 * any object can be created with an virtual-function override table, just store before the refcount?
 * clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
