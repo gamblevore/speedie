@@ -6,8 +6,6 @@
 * nil-checking seems a very good idea. shouldn't be too hard to do either!!
 	* Mostly the issues will be around module variables...
 * RefOpts?
-* Store args in pref folder
-	* perry should be perry.klinkerhoppen.org
 
 
 // personal
