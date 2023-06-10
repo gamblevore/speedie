@@ -916,6 +916,13 @@ function message.IsClassOrExtOrModule (|bool|)
 	return (self == @tmp) and (.IsClassType or .isextender or .MsgIsProperModule)
 
 
+function object.ClassOrModule (|scbase|)
+	if self isa scmodule
+		if .cls
+			return .cls
+		return self
+
+
 function IdentifyBetter (|message| node, |string| name) // p.first.name
 	opt NoRefCounts
 	node.become( @emb )
@@ -938,13 +945,14 @@ function Message.ModuleSrc (|message|)
 
 
 function LocateDefinition (|message| msg, |scobject| already_defined, |bool| DisplayOnly, |message|)
-	rz = .LocateDefinitionSub(msg, already_defined, DisplayOnly)
+	|| ty = TypeOfExpr(msg, msg.msgarg) // needs refcounts
+	rz = .LocateDefinitionSub(msg, already_defined, ty, DisplayOnly)
 	if rz == @arg
 		|| p = rz.parent
 			rz = p
 
 
-function LocateDefinitionSub (|message| msg, |scobject| already_defined, |bool| DisplayOnly, |message|)
+function LocateDefinitionSub (|message| msg, |scobject| already_defined, |scdecl| ty, |bool| DisplayOnly, |message|)
 	opt norefcounts
 	if already_defined
 		return already_defined.source
@@ -954,7 +962,6 @@ function LocateDefinitionSub (|message| msg, |scobject| already_defined, |bool| 
 	|| fn = msg.msgfunc
 		|| it = fn.source
 			return it		
-	|| ty = TypeOfExpr(msg, msg.msgarg)
 	if !ty
 		return msg.ModuleSrc
 	if ty.type == scbasetype.funcproto
@@ -977,6 +984,8 @@ function LocateDefinitionSub (|message| msg, |scobject| already_defined, |bool| 
 	if DisplayOnly
 		|| t = ty.type
 		return t.typenormal.source ?? t.sourceclass
+	|| found = msg.obj.ClassOrModule
+		return found.source
 		
 }
 
