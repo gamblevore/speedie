@@ -59,7 +59,9 @@ class SCImport
 		opt norefcounts
 		for j in index.AST
 			if J IsTmp "import"
+				error.sourceadd(j)
 				.ImportMsg(j)
+				error.sourceremove
 
 
 	function CanBan (|scfile| scf, |bool|)
