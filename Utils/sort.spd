@@ -1,5 +1,7 @@
+#!/usr/local/bin/speedie
 
-|[file]| Found
+|[file]|	Found
+|int|		Total
 
 main
 	for f in app.args
@@ -8,6 +10,8 @@ main
 	|| remover = .Findremover
 	for f in found
 		"'${f.trimstart(remover)}' --> ${f.size.strsize}"
+	"Total: ${Total.strsize}"
+
 
 
 function App.FindRemover (|string|)
@@ -26,6 +30,7 @@ function app.collect (|file| f)
 			if c.visible
 				.collect(c)
 	  elseif .TypeOK(f)
+		total += f.size
 		found <~ f
 
 	
