@@ -47,10 +47,14 @@ function string.SpdScriptName (|string|)
 	rz := .ContainerName(".uwu")
 	rz := .name.trimextandpath
 
-	
-function string.ScriptLocation (|string| container = "/tmp/SpeedieApps/", |string|)
+
+function string.ScriptContainer (|string| container = "/tmp/SpeedieApps/",  |string|)
+	return container[.hash|int64|.abs.render]
+
+
+function string.ScriptLocation (|string| container = "/tmp/SpeedieApps/",  |string|)
 	|| full = .Resolve ?? self
-	container = container[full.hash|int64|.abs.render]
-	container.makeentirepath
-	return container[full.SpdScriptName]
+	|| dest = full.Scriptcontainer(container)
+	dest.makeentirepath
+	return dest[full.SpdScriptName]
 
