@@ -116,7 +116,7 @@ function PressingTabs (guiaction)
 		|| p = .submenu|listview|
 		|| ide = row.ide
 			p.ListSource.clear
-			|| name = ide.Project.name
+			|| name = ide.name
 			p <~ ( "Copy " + name, MenuCopyProject, ide)
 			p <~ ("Show Project", MenuShowProject, ide)
 			p <~ ( "Close", MenuCloseProject, ide)
@@ -126,28 +126,30 @@ function PressingTabs (guiaction)
 
 function message.ide (|perryide|)
 	opt norefcounts
-	if self != @tmp
+	if .obj isa perryide
+		return .obj|perryide|
 	for w in window.all
 		if w isa PerryIDE
 			if self ~= w.Project
 				return w
 
+
 function MenuCopyProject (guimenuevent)
 	opt norefcounts
-	|| ide = .ide
+	|| ide = menu.ide
 		clipboard.text = ide.Project
 		Notifications <~ "Copied: " + ide.Project
 
 
 function MenuCloseProject (guimenuevent)
 	opt norefcounts
-	|| ide = .ide
+	|| ide = menu.ide
 		ide.Close(sdlapp.kactivity)
 
 
 function MenuShowProject (guimenuevent)
 	opt norefcounts
-	|| ide = .ide
+	|| ide = menu.ide
 		ide.Project.Reveal
 	
 
