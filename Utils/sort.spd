@@ -17,17 +17,11 @@ main
 	"Total: ${Total.strsize}"
 
 
-
 function App.FindRemover (|string|)
 	require app.args == 1
 	|| s = app.args[0]
 		return s.PathDir
-
-
-function app.TypeOK (|file| f, |bool|)
-	if types[f.ext]
-		return true
-
+		
 
 function app.collect (|file| f)
 	require	f
@@ -35,7 +29,7 @@ function app.collect (|file| f)
 		for c.files in f
 			if c.visible
 				.collect(c)
-	  elseif .TypeOK(f)
+	  elseif types[f.ext]
 		total += f.size
 		found <~ f
 
