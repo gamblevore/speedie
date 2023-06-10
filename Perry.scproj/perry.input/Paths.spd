@@ -15,6 +15,8 @@ function perryide.DebugArgsFile (|file|)
 	|| p = .Project
 	if p.IsDir
 		return p.Child(".args")
-	return p.SetExt("args").file
-	
+	return .PrefsFolder.child("args").child(.name)
 
+	
+function Perryide.PrefsFolder (|file|)
+	return file.PrefsFolder.Child("perry.klinkerhoppen")
