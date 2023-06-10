@@ -1,0 +1,34 @@
+
+|[file]| Found
+
+main
+	for f in app.args
+		.Collect(f.ExistingFile)
+	found.sort(MySorter, true)
+	|| remover = .Findremover
+	for f in found
+		"'${f.trimstart(remover)}' --> ${f.size.strsize}"
+
+
+function App.FindRemover (|string|)
+	require app.args == 1
+	|| s = app.args[0]
+		return s.PathDir
+
+
+function app.TypeOK (|file| f, |bool|)
+	return f isa "spd" // fix later
+
+function app.collect (|file| f)
+	require	f
+	if f.IsDir
+		for c.files in f
+			if c.visible
+				.collect(c)
+	  elseif .TypeOK(f)
+		found <~ f
+
+	
+function MySorter (SorterComparer)
+	return a|file|.size < b|file|.size
+	
