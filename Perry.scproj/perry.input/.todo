@@ -9,10 +9,6 @@
 * build from perry... NOT next to single file.
 
 
-// personal
-* backup selftool and galaxxies... on git.
-
-
 // Do later
 * any object can be created with an virtual-function override table, just store before the refcount?
 * clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
