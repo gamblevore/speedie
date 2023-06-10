@@ -638,10 +638,11 @@ function InitCompiler
 	.stFunctionProgress = 0
 	////////////////////////////////////////////////
 	
-	if Interact.Perry
-		._BuildFolder = compiler.originalinputpath.ScriptContainer.file
-	  elseif options.SingleFileInput
-		._BuildFolder = .BaseProjectPath
+	if options.SingleFileInput
+		if Interact.Perry
+			._BuildFolder = compiler.originalinputpath.ScriptContainer.file
+		  else
+			._BuildFolder = .BaseProjectPath
 	  else
 		._BuildFolder = .BaseProjectPath[ "Build" + Compiler.VariantSuffix ]
 

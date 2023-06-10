@@ -4413,8 +4413,6 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
-void SC_IR_Print(IR* self);
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5085,8 +5083,6 @@ inline bool JB_DictionaryReader_SyntaxCast(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
-
-int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -5877,6 +5873,8 @@ JB_String* JB_Str_ReplacePathComponent(JB_String* self, int num, JB_String* With
 JB_String* JB_Str_ResolveSpd(JB_String* self);
 
 void JB_Str_safe(JB_String* self, FastString* fs);
+
+JB_String* JB_Str_ScriptContainer(JB_String* self, JB_String* container);
 
 JB_String* JB_Str_ScriptLocation(JB_String* self, JB_String* container);
 
@@ -8358,6 +8356,10 @@ JB_Error* JB_Err__New(Message* node, JB_String* desc, ErrorSeverity level, JB_St
 
 JB_Error* JB_Err__NewNothing();
 
+void JB_Err__SourceAdd(Message* m);
+
+void JB_Err__SourceRemove();
+
 
 
 // JB_FileArchive
@@ -8426,7 +8428,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
