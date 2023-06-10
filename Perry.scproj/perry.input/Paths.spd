@@ -15,7 +15,7 @@ function perryide.DebugArgsFile (|file|)
 	|| p = .Project
 	if p.IsDir
 		return p.Child(".args")
-	return .PrefsFolder.child("args").child(.name)
+	return .PrefsFolder.child("args/"+.name+".args")
 
 	
 function Perryide.PrefsFolder (|file|)
