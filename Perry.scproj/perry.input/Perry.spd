@@ -9,9 +9,8 @@ module Perry
     |string|						_SpeedieDir
     |bool|							Checked	
     |byte| 							FindID
-	|dictionary of string|			PathDict = [
-		"spd"  :  perry.SpeedieDir
-	]
+	|dictionary of string|			PathDict
+	
 	
 	constants
 		arc_newer	= 2

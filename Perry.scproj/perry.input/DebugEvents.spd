@@ -1,16 +1,5 @@
 
 
-function ReturnDebugArgs (GUIListEvent)
-	if row isnt editable 
-		|| r = .AddRow
-		row.prev = r
-		(r is editable)
-		.Rename(r)
-		return true
-	  else
-		.Rename(row)
-
-
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
 	if key.IsCancel
@@ -27,22 +16,26 @@ function FoundListKeys (GuiKeyEvent)
 
 
 function DebugArgsGotFocus (guiaction)
-	|| f = .ide.DebugArgsFile #require
 	|| v = state == 1
 	require (self is visible) != v
 	(self is visible) = v
-	if self isa TextView
-		if !.Document
-			.LoadDocument(Document(f))
-		if !.text.Length
-			self <~  qqfiles.DebugArgs
-		if v
-			.window.setinnerfocus(self)
-		  else
-			if .text and .text != qqfiles.DebugArgs
-				.Save
-			else
-				f.size = 0
+	if self isa textview
+		.updatedebugargs(v)
+
+
+function textview.UpdateDebugArgs (|bool| Visible=false)
+	|| f = .ide.DebugArgsFile #require
+	if !.Document
+		.LoadDocument(Document(f))
+	if !.text.Length
+		self <~  qqfiles.DebugArgs
+	if visible
+		.window.setinnerfocus(self)
+	  else
+		if .text and .text != qqfiles.DebugArgs
+			.Save
+		  elseif f.exists
+			f.size = 0
 		
 
 function fnStillRunning (fnConfirmCanceller)
@@ -108,8 +101,9 @@ function perryide.DebugPath (|file| f, |message| conf)
 function perryide.StartDebugging (|file| f)
 	require f.MustExist and StdErr.ok
 
-	|| conf = .DebugArgsList.text.Parse$
-	|| ArgMsg = conf["args"]
+	.debugargslist.UpdateDebugArgs
+	|| debugargs = .DebugArgsFile.parse #require
+	|| ArgMsg = debugargs["args"]
 	|| args = argmsg.AllNames
 	if f.isdir
 		check (!args) (ArgMsg, "You can't pass arguments to gui-apps (in this version).")
@@ -118,8 +112,8 @@ function perryide.StartDebugging (|file| f)
 
 
 	|| old = app.cwd
-	.debugpath(f, conf)	
-	.DebugEnvs(conf["env"])		
+	.debugpath(f, debugargs)	
+	.DebugEnvs(debugargs["env"])		
 	.DebugActual(f, args)
 
 	if !StdErr.ok

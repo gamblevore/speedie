@@ -86,6 +86,8 @@ class PerryIDE (Window)
 
 
 	function ExpandStr (|string| path, |string|)
+		|| d = perry.pathdict init [ "spd"  :  perry.SpeedieDir ]
+
 		rz = path.path_expand(perry.PathDict) #expect ("Unrecognised @ in: " + path)
 		rz = rz.resolve(fileResolveMode.allowmissing)
 
