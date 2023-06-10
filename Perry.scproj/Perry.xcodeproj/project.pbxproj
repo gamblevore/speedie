@@ -1021,6 +1021,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = Build;
 			};
 			name = Debug;
 		};
@@ -1065,6 +1066,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = Build;
 			};
 			name = Release;
 		};
@@ -1107,6 +1109,7 @@
 					"-Wno-nullability-completeness",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
+				SYMROOT = Build;
 			};
 			name = Debug;
 		};
@@ -1149,6 +1152,7 @@
 					"-Wno-nullability-completeness",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
+				SYMROOT = Build;
 			};
 			name = Release;
 		};
