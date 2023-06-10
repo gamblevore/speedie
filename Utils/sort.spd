@@ -1,9 +1,13 @@
 #!/usr/local/bin/speedie
 
-|[file]|	Found
-|int|		Total
+|[file]|				Found
+|dictionary|			Types = ["spd":"x"]
+|int|					Total
 
 main
+	|| t = app["types"]
+		types = t.Dict('/')
+		
 	for f in app.args
 		.Collect(f.ExistingFile)
 	found.sort(MySorter, true)
@@ -21,7 +25,9 @@ function App.FindRemover (|string|)
 
 
 function app.TypeOK (|file| f, |bool|)
-	return f isa "spd" // fix later
+	if types[f.ext]
+		return true
+
 
 function app.collect (|file| f)
 	require	f

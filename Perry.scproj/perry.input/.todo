@@ -6,6 +6,7 @@
 * nil-checking seems a very good idea. shouldn't be too hard to do either!!
 	* Mostly the issues will be around module variables...
 * RefOpts?
+* return types[f.ext] // won't compile c++
 
 
 // Do later
