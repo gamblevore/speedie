@@ -472,6 +472,7 @@ extend PerryIDE
 		if btn isa buttonview
 			btn.gnormal.solid = (f, f, f, opacity)
 	
+
 	function LoadProject (|file| proj, |bool|)
 		require proj.mustexist("load project")
 		.project = proj

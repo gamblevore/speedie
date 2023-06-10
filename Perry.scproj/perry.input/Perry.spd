@@ -41,7 +41,7 @@ module Perry
 		|| Loaded = .LoadWindowsSub(r)
 		
 		for path in app.args // load specified documents
-			if path.fileexists
+			if path.fileexists or path.write("")
 				perryide.new(path)
 				loaded = true
 				
