@@ -24,3 +24,13 @@ main
 	\"Hello $name!\"
 
 "
+
+	|| DebugArgs = `args {
+	// "Argument Value"
+}
+pwd '.'
+env
+	setting="value"
+`
+
+

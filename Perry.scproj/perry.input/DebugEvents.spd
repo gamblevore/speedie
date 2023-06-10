@@ -26,12 +26,6 @@ function FoundListKeys (GuiKeyEvent)
 		return true
 
 
-|| DebugArgsList = `
-args {
-	// "ArgumentValue"
-}
-`
-
 function DebugArgsGotFocus (guiaction)
 	|| f = .ide.DebugArgsFile #require
 	|| v = state == 1
@@ -40,17 +34,15 @@ function DebugArgsGotFocus (guiaction)
 	if self isa TextView
 		if !.Document
 			.LoadDocument(Document(f))
-		|| data = .Parse
-			if !data..args
-				self <~ DebugArgsList
-			if !data..pwd
-				self <~ "\npwd '.'\n"
-			if !data..env
-				self <~ "\nenv\n\tsetting=\"value\"\n"
+		if !.text.Length
+			self <~  qqfiles.DebugArgs
 		if v
 			.window.setinnerfocus(self)
 		  else
-			.Save
+			if .text and .text != qqfiles.DebugArgs
+				.Save
+			else
+				f.size = 0
 		
 
 function fnStillRunning (fnConfirmCanceller)
@@ -68,7 +60,7 @@ function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
 
 function ClickedDebug (GUIAction)
 	|| i = .ide	
-	if .text == "\02" // play // the user cares about what he can see...
+	if .text == "\02"		// play
 		i.DebugIsWaitingForCompile = true
 		i.compile("debug")
 		i.ShowText(i.ProductPage, "")

@@ -108,12 +108,11 @@ function PerryIDE.ActualCompile (|message| msg)
 	(.buildbutton isnt enabled)
 	(.runbutton isnt enabled)
 	is active
-	if .Project.name ~= "Speedie.scproj"
+	if .name ~= "Speedie.scproj"
 		.editsep.show
 		.StdOutSelect(.speedietext)
 		.SpeedieText.ScrollToEnd
 	.ViewAsCurr
-
 
 
 target debug
