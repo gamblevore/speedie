@@ -102,8 +102,12 @@ class NilTest
 		|niltest|  n1 // for sure can be nil
 	
 
+
 // the problem is init order... depends who gets to read it first...
 // can I solve this with initafter?
+// I COULD try to auto-solve it. Not sure, though.
+
+
 module NilTest2
 	.hello
 	function Hello

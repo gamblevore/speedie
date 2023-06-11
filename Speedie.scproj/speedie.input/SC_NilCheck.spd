@@ -30,6 +30,42 @@
 						
 		* NilCheck:		This will create problems or even errors if not used properly
 						Do this after transform and before refcount!
+						We need to go through the entire program, and give each item found, a "timecode". That is... it has an "earliest time" that it COULD occur.
+						So for branches, thats easy, both sides get the same time. We can do some simple logic like:
+						
+						function abc
+							if !inited
+								inited = true
+								var1 = .CreateVar
+								var2 = .CreateVar
+							var1.explode
+							var2.die
+						
+						If its only set in one place... that can help.
+						
+						So var1.explode actually has a "higher time" than var1 = .createvar. So its OK.
+						
+						Like this... we can make it work!
+						
+						POSSIBLY we could allow reordering.
+						
+						while looops are easier, unless they might not fire at all.
+						
+						function pointers... are a bit trickier?
+						
+						if (random[])
+							a lot of code
+							(.func)()
+						  else
+							small code
+							(.func)()
+
+						we have to check the time twice? But thats true of function calls in general???
+						We could do it differently... "at each second in time..." there can be an array (or list whatever) of possible code we could be executing. The problem with that, is that it would explode exponentially :)
+						
+						Perhaps not? if we exclude times that not newer?
+							
+						
 		
 		* Strength:		Setting to a definite nil is ALWAYS an error... like: nil|msg|.pos=0
 						Strength is settable in the project if its an error or problem
