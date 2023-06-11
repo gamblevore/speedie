@@ -202,7 +202,7 @@ class ButtonView (GUIControl)
 		
 		|| WillDrawFocus = clicked and i and .ClickedItem
 		if i is Active
-			strength += SDLApp.cycle(1s)
+			strength += SDLApp.cycle(1s)*0.5
 			SDLApp.Touch
 		  else
 			require self isnt decluttered
@@ -217,7 +217,7 @@ class ButtonView (GUIControl)
 			|| darker = (!i and clicked)
 			if .PressMakesLighter
 				darker = !darker
-			|| w = (colors.black(0.2), colors.white(0.15))(darker)
+			|| w = (colors.black(0.2), colors.white(0.20))(darker)
 			where.fillrect(grow, W, W) 
 		if WillDrawFocus
 			.drawfocusrect(where, grow, 1.0)
@@ -250,7 +250,6 @@ class ButtonView (GUIControl)
 	
 	
 	behaviour Draw
-		// So how do we set the width?
 		opt norefcounts
 		|| r = .lastrect
 		|| g = .MouseisInside|int| * .ExpandOnMouseOver
