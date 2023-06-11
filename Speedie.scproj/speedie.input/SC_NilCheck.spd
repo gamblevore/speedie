@@ -12,7 +12,22 @@
 	
 	Passes:
 		* Collectdecls: This will set the basic variable qualities of nil or not
+			DONE.
+		
 		* Transform:	This modifies the nilness of params and vars... depending on if they are tested or not
+						if/while/ternary/??/?/and/or/expandtobool?
+						wrapper-funcs (i guess just declare them as testers)
+
+						if msg
+							// msg is now optional
+							if msg > nil, if msg != nil // same
+							// msg is now optional and NOT nil within this branch
+						
+						if msg == nil // msg is now optional... but nil within that branch
+						if msg >= nil, msg <= nil // what? just fail!
+						
+						
+						
 		* NilCheck:		This will create problems or even errors if not used properly
 						Do this after transform and before refcount!
 		
@@ -38,6 +53,8 @@ datatype NilState (byte)
 		
 
 module NilChecker
+	function Check
+	
 
 
 

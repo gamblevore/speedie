@@ -107,6 +107,8 @@ class NilTest
 module NilTest2
 	.hello
 	function Hello
+		NilChecker.Check
+		NilTest.n0
 		printline niltest.x1.v2
 
 
