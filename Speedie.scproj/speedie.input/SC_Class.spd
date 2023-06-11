@@ -14,7 +14,8 @@ linkage
 |Message|					SourceClass
 |SCModule|					Modul
 |[SCDecl]|					Properties
-|SCDecl|					TypeNormal 
+|SCDecl|					TypeNormal
+|SCDecl|					TypeOptional
 |[SCFunction]|  			Casts
 |[SCClass]|					Children
 |SCDecl|					Contained
@@ -58,19 +59,19 @@ linkage
 constructor (|Message| node, |SCBase| parent)
 	Compiler.stClasses++
 	
-	node.obj = self // for autocomplete :)
+	node.obj = self			// for autocomplete :)
 	.name   = LoadClassName(node)
-	.Source = node[@Arg, -1]				#error
-	.SourceClass = node // sigh. bad design
+	.Source = node[@Arg, -1]
+	.SourceClass = node		// sigh. bad design
 
 	.IsVisible = scbase.CurrVisibility
 	
 	|| T = SCDecl.new
 	T.NilDeclared = NilState.exists
-	T.Type = self // lame?
+	T.Type = self
 	.TypeNormal = T
-	
-	T = T.Copy // no difference
+	.TypeOptional = T.MakeOptional
+	T = T.Copy
 	T.Name = "self"
 	T.Strength = kStrSharedParams
 	if node == "struct"

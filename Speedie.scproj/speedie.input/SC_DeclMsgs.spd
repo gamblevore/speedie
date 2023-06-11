@@ -121,7 +121,6 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 			expect (names == @thg) (names, "Must be a proper name.")
 
 		|| Default = DeclsDefault( names )
-		if names ~= "_fsf0"
 		|| Rdcl = ExtractDecl( Types, name_Space )
 		if (!rdcl and !default and (Name_space isa SCArg))
 			rdcl = name_space.ParentFunc.ReturnType
@@ -155,7 +154,7 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		expect !(func and rdcl is Borrowed) (item, "Variables can’t be borrowed in function parameters or return")
 		
 		if rdcl.NeedsContainedfix
-			rdcl = rdcl.ContainedNilfix
+			rdcl = rdcl.Containedfix
 		
 		if !names		// a return value, how to return the return value?
 			expect ((Func and !func.ReturnType) and (!item.Next)) ( item, "Parameter is missing a name." )
@@ -222,7 +221,7 @@ function scdecl.NeedsContainedfix (|bool|)
 		return .ReallyContains
 
 
-function scdecl.ContainedNilfix (|scdecl|)
+function scdecl.Containedfix (|scdecl|)
 	|| t = .type
 	rz = (.copy, self)(T.typenormal == self)
 	rz.contains = t.ContainedButNotUpgrade

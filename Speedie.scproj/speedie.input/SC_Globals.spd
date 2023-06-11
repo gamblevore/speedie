@@ -412,9 +412,13 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 
 	
 	if (f == @Arel)
+		|| R = ExtractDecl( c.first, name_space ) #require
 		if (C == "--")
-			|| R = ExtractDecl( c.first, name_space ) #require
 			return R.MakeBorrowed
+		if (C == "?")
+			return R.MakeOptional
+		error (c)
+
 
 
 	if (F == @arg) // a bit ugly... |{\n\tfaststring\n}|
