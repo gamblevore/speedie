@@ -22,7 +22,7 @@ function TypeOfDotDotDot (ExprResolver)
 	return TypeOfExpr(exp.first, name_space)
 
 
-function message.Tran_QMark 
+function message.Tran_QMark
 	using (self)
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func) 
@@ -55,7 +55,7 @@ function message.Tran_QMark
 		inside.replaceWith(@thg.msg(vn))
 		arg <~ makedecl( "",  vn,  inside)
 
-	ifn UseTernary
+	if !UseTernary
 /*		a().b?
 		{|| y = a(), if y: y.b }
 */
@@ -65,7 +65,7 @@ function message.Tran_QMark
 		arg2 <~ (p, thedot)(p == @rel)
 
 
-	else
+	  else
 /*		x = a().b?
 		x = ({      || y = a(),    (y.b, "")(y)    })
 */

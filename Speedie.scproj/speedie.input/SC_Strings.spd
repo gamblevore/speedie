@@ -190,6 +190,7 @@ function Message.Clean (|bool| erl = false)
 	|| Len		= parser.UsingLength
 	|| Tag		= parser.UsingTag
 
+	|message--| QEscape
 	|message| IgnoreArg 
 	if ((message).layer == (message).defaultlayer)
 		pos = -1
@@ -199,6 +200,9 @@ function Message.Clean (|bool| erl = false)
 			curr.position = pos
 			curr.RangeLength = len
 			curr.Tag = tag
+		
+		if curr == QEscape
+			QEscape = nil
 		
 		|| f = curr.func
 		if (f != @Back and @Str and @sstr and @bin)
@@ -218,7 +222,7 @@ function Message.Clean (|bool| erl = false)
 			curr.FixErl
 
 		  elseif (f == @arel)
-			if curr == "?"
+			if !QEscape and curr == "?"
 				curr.Tran_QMark
 				continue_with curr.flatnext
 			
@@ -229,6 +233,7 @@ function Message.Clean (|bool| erl = false)
 				|| names = types.next
 				if (types and names and names.next == l)
 					l.WithDeclTransform(curr, names, l)
+			QEscape = .FlatAfter
 		
 		  elseif (f == @opp or @cnj or @erel)
 			if curr == "<>"

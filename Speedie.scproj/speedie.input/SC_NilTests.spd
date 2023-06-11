@@ -97,7 +97,8 @@ class NilTest
 		|string|   x3				// defaults
 		
 		// assume can be nil
-//		|niltest?| n2 = niltest()
+
+//		|niltest?| n0
 		|niltest|  n1 // for sure can be nil
 	
 

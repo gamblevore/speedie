@@ -57,8 +57,12 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/usr/local/speedie/Perry.scproj"
+            argument = "--directtest"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/usr/local/speedie/Perry.scproj"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--perry"

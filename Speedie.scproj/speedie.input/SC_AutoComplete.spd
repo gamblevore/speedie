@@ -76,18 +76,18 @@ function Enter (|bool|)
 	require stderr.ok and .ShouldEnter
 	.Perry = process.parent
 	if .perry.isopen
-		.ReturnsWhenPerryClosesUs
+		.CompileAndGiveFeedBack
 	return true
 
 
-function initedOK (|bool|)
-	if typebool
+function InitedOK (|bool|)
+	if compiler.InitedOK
 		return true
 	if stderr.ok
 		error "Compiler did not initialise"
 
 
-function ReturnsWhenPerryClosesUs
+function CompileAndGiveFeedBack //ReturnsWhenPerryClosesUs
 	Compiler.CompileAll
 	.reinit
 	.HandleRestartedCompile
@@ -114,9 +114,7 @@ function CmdResponse (|Message| cmd, |message| arg, |message|)
 	rz := .BuildError(cmd.nyme)
 
 
-function CmdWrap (|Message| arg)
-	if .perry.canprint
-		printline arg
+function CmdCleanUp (|Message| arg, |message|) 
 	if arg != @arg // reclaim msg
 		"missing @arg"
 		|| tmp = @arg + "Perry"
@@ -132,12 +130,20 @@ function CmdWrap (|Message| arg)
 		"missing cmd in @arg"
 		Cmd = @tmp + "error"
 		date.next = cmd
-		
+
 	cmd.removeafter
+	return cmd
+
+
+function CmdWrap (|Message| arg)
+	if .perry.canprint
+		printline arg
+
+	|| cmd = .CmdCleanUp(arg)
 	|| response = .cmdresponse(cmd, arg) 
+
 	if cmd != response
-		cmd.next = response
-		cmd.remove
+		cmd.replacewith(response)
 	.perry <~ arg
 	stderr.clear						// super-important!!!
 
@@ -162,10 +168,9 @@ function ReportBuild (|message| cmd, |message|)
 	if stderr.ok and cmd.compiles
 		.Perry <~ .Log
 		TransCompiler.Export
-	cmd.clear
 	if stderr.Problems
-		cmd <~ compiler.ErrorsToPerry
-	  elseif cmd.compiles
+		return cmd.SendPerryErrors
+	if cmd.compiles
 		cmd <~ TransCompiler.productpath(true)
 	  else
 		cmd <~ (@thg, "ok")
@@ -179,20 +184,49 @@ function ReportBuildOrRestart (|message| cmd, |message| arg, |message|)
 	return .ReportBuild(cmd)
 
 
+function Message.SendPerryErrors (|message|)
+//	interact.CompileUpToDate
+	.clear
+	self <~ compiler.ErrorsToPerry
+	return self
+	
+
 function DoCmd (|Message| cmd, |message| arg, |message|)
 	require cmd == @tmp
 	if cmd == "crash"
 		app.crash
-
-	if !.initedok
-		cmd.clear
-		cmd <~ compiler.ErrorsToPerry
-		return cmd
 	
 	if cmd.compiles or cmd == "check"
 		return .ReportBuildOrRestart(cmd, arg)
+	
+	// OK... so we have a problem
+	// basically... its not initing properly...
+	// and sometimes... we don't refresh the compiler... or don't report errors
+	// not sure how that happened? ANYHOWs... so lets fix this.
+	
+	// we need to find the various cases.... thats why my brain is getting stuck
+	// too many cases
+	// lets say... it didn't init OK.
+	// theres two cases. One is building, the other isn't building.
+	// either way... we want to send errors back.
+	// however... we also want to restart! iff we are building.
+	// the thing is... we don't want an infinite loop of restarting
+	// so then it gets confusing. Was this build from a restarted thing or not?
+	// its sooo confusing. Cos we are handling that already.
+	// I think lets start from the loop. infinite loop
+	// thats only possible if we are compiling or checking
+	// well... lets say it failed before then... we cna't get auto completes.
+	// so we can just make an error that we failed too early.
+	
+	if !.initedok
+		if StdErr.OK
+			// restart
+		  else
+			return cmd.SendPerryErrors
+
 	if cmd == 1
 		return .Jump(cmd)
+
 	|| req = cmd[@str].nyme.lowercase
 	|| my_file = compiler.files[req]
 		rz = .MainAct(cmd, my_file)

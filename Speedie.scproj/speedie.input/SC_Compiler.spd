@@ -111,6 +111,7 @@ linkage
 |scdecl| 				HashConstant
 |uint64| 				HashConstantValue
 |bool|					HasMainFunc
+|bool| 					InitedOK = true
 |int|					stClasses
 |int|					stFuncs
 |int|					stReachedFunc
@@ -258,16 +259,16 @@ function InitTypes
 	typestring.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
 
 
-function InitBasicStuff (|bool|) // compiler.init
+function InitBasicStuff // compiler.init
+	if !StdErr.ok
+		stderr.errorsarewarnings = 1
+		compiler.InitedOK = false
 	(Message).Restore
-	
-	expect (StdErr.OK)  ("Error in source syntax. Can’t continue.")
-	
+		
 	cpp_export[""] // str0
 	options.ListAllLib = linkage.interpreter
 	
 	.InitTypes
-	require stderr.ok
 	TypeNil = .AddGlobalConst( "nil", TypeObject )
 	TrueBool = .AddGlobalConst( "true", TypeBool )
 	FalseBool = .AddGlobalConst( "false", TypeBool )
@@ -280,7 +281,7 @@ function InitBasicStuff (|bool|) // compiler.init
 	.AddGlobalConst( "π", typef64 ).islookuponly = «num "3.1415926535897932" »
 	.AddGlobalConst( "τ", typef64 ).islookuponly = «num "6.2831853071795864" »
 
-	return StdErr.OK
+	stderr.errorsarewarnings = 0
 
 
 function InitBasicFuncs (|bool|)
@@ -353,11 +354,12 @@ function ImportAll
 	for L in SCImport.AllFiles
 		L.Proj.use
 		compiler.program.ImportFile( L )
-		require StdErr.OK
 
-	require .Stage( "Initialising Compiler" )
-	require .InitBasicStuff
+	.Stage( "Initialising Compiler" )
+	.InitBasicStuff
 	.AddMain
+	require StdErr.ok
+	
 	parser.insertedflags = MsgUIFlags.Inserted // noice
 	scimport.noproj
 	
@@ -934,7 +936,7 @@ function AddMain
 	if m and .ConfMsg
 		m.first = "app.configure = __AppConfString".parse
 	
-	|| b = (Truebool, falsebool)(options.projectislibrary) 
+	|| b = (Truebool, falsebool)(options.ProjectIsLibrary) 
 	.program.TryAdd( nil, b, "__IS_LIBRARY__" )
 
 
