@@ -98,7 +98,7 @@ class NilTest
 		
 		// assume can be nil
 
-//		|niltest?| n0 
+		|niltest?| n0 
 		|niltest|  n1 // for sure can be nil
 	
 

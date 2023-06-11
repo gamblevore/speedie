@@ -615,7 +615,6 @@ class SCDecl (SCObject) {
 		»
 		
 
-
 	function WriteSimpleType (|Message|)
 		require self
 
@@ -623,6 +622,7 @@ class SCDecl (SCObject) {
 		rz = «Thg name »
 		for (.pointercount|int|)
 			rz = «Brel "&", rz »
+
 		if (.c_Array)
 			rz = «acc 
 				rz
@@ -630,6 +630,9 @@ class SCDecl (SCObject) {
 					«num .c_array »
 				»
 			»
+		
+		if .NilDeclared is unknown
+			rz = «arel "?", rz »
 	
 	
 	function CreateSimpleTypeCast (|Message| exp, |Message|)
