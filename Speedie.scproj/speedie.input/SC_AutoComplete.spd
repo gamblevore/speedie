@@ -87,7 +87,7 @@ function InitedOK (|bool|)
 		error "Compiler did not initialise"
 
 
-function CompileAndGiveFeedBack //ReturnsWhenPerryClosesUs
+function CompileAndGiveFeedBack // ReturnsWhenPerryClosesUs
 	Compiler.CompileAll
 	.reinit
 	.HandleRestartedCompile
@@ -219,10 +219,7 @@ function DoCmd (|Message| cmd, |message| arg, |message|)
 	// so we can just make an error that we failed too early.
 	
 	if !.initedok
-		if StdErr.OK
-			// restart
-		  else
-			return cmd.SendPerryErrors
+		return cmd.SendPerryErrors
 
 	if cmd == 1
 		return .Jump(cmd)
