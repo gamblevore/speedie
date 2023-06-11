@@ -80,6 +80,13 @@ function Enter (|bool|)
 	return true
 
 
+function initedOK (|bool|)
+	if typebool
+		return true
+	if stderr.ok
+		error "Compiler did not initialise"
+
+
 function ReturnsWhenPerryClosesUs
 	Compiler.CompileAll
 	.reinit
@@ -103,6 +110,7 @@ function BuildError (|string| name, |message|)
 function CmdResponse (|Message| cmd, |message| arg, |message|)
 	if cmd != "error"
 		rz = .docmd(cmd, arg)
+	
 	rz := .BuildError(cmd.nyme)
 
 
@@ -124,6 +132,7 @@ function CmdWrap (|Message| arg)
 		"missing cmd in @arg"
 		Cmd = @tmp + "error"
 		date.next = cmd
+		
 	cmd.removeafter
 	|| response = .cmdresponse(cmd, arg) 
 	if cmd != response
@@ -174,6 +183,12 @@ function DoCmd (|Message| cmd, |message| arg, |message|)
 	require cmd == @tmp
 	if cmd == "crash"
 		app.crash
+
+	if !.initedok
+		cmd.clear
+		cmd <~ compiler.ErrorsToPerry
+		return cmd
+	
 	if cmd.compiles or cmd == "check"
 		return .ReportBuildOrRestart(cmd, arg)
 	if cmd == 1
