@@ -112,8 +112,8 @@ class SCDecl (SCObject) {
 	|int|				C_Array
 	|SCDeclInfo|		Info
 	|AsmReg|			DRegister
-	//|NilState|		Expected
-	//|NilState|		Found
+	|NilState|			NilDeclared
+	|NilState|			NilUsage
 	
 	function Project (|scimport|)
 		// scfunction and scclass should use this too!

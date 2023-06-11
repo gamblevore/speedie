@@ -1,0 +1,113 @@
+
+
+
+class NilTest
+	|int|		V
+	|string|	V2
+	
+	function Read (|string| path, |bool|)
+		.v2 = path.ReadFile
+		return .v > .v2.Length
+	
+	// a getter
+	function Get (|string|)
+		return .v2[3, 10+(.v mod 10)]
+		
+	// a function that tests for self
+	syntax cast (|bool|)
+		return (self != nil) and .v2
+		
+	// a func that tests the params
+	function IsSafe (|string| s, |message| m,  |bool|)
+		if s
+			return .v2 == s.reverse
+		if m
+			return m.name == .v2
+		return true
+		
+	// a func that doesn't
+	function IsQuick (|string| s, |message| m,  |bool|)
+		if .v2 == s.reverse
+		return m.name == .v2
+	
+	// a func that can return nil
+	function CanNil (|niltest|)
+		if .v
+			return self
+	
+	// a few that cant
+	function Exists (|niltest|)
+		return self ?? niltest()
+	
+	function Exists2 (|niltest|)
+		if self
+			return self
+		return niltest()
+	
+	function Exists3 (|niltest| p, |niltest|)
+		if p
+			return p
+		return self
+	
+	function Exists4 (|niltest|)
+		return (niltest(), self)(!self)
+		
+	function Exists5 (|niltest|)
+		while self
+			return self
+		return .Exists4
+		
+	function Exists6 (|niltest|)
+		while (|| x = .exists5)
+			return x
+		return .Exists3(nil)
+		
+	function Exists7 (|niltest|)
+		for 100
+			|| x = .exists5
+				return x
+		return .Exists3(nil)
+
+// pointers
+	function GoodPtr (|&niltest| p)
+		*p = self
+		
+	function DoubleGoodPtr (|&niltest| p)
+		(*p).v++
+
+	function BadGoodPtr (|&niltest| p)
+		if p
+			*p = self
+		
+	function BadBadPtr (|&niltest| p)
+		if p
+			|| v = *p
+				v.v++
+		
+	function GoodBadPtr (|&niltest| p)
+		|| v = *p
+			v.v++
+
+// I think those are some good tests... for now. but what about modules? thats a tricky one.
+
+	module
+		// assume can't be nil
+		|niltest|  x1 = niltest()
+		|niltest|  x2 = x1.exists7
+		|string|   x3				// defaults
+		
+		// assume can be nil
+//		|niltest?| n2 = niltest()
+		|niltest|  n1 // for sure can be nil
+	
+
+// the problem is init order... depends who gets to read it first...
+// can I solve this with initafter?
+module NilTest2
+	.hello
+	function Hello
+		printline niltest.x1.v2
+
+
+
+

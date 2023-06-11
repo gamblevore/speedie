@@ -1,0 +1,43 @@
+
+/*
+	Nil checking! how to do it
+	When to do it
+	Where to do it
+	AAAAARGH
+	so complex to even think about it. OK... so lets start
+	
+	Now... how do I use it? and when?
+	
+	I think we need a multi-pass system, and the final pass should follow the code flow.
+	
+	Passes:
+		* Collectdecls: This will set the basic variable qualities of nil or not
+		* Transform:	This modifies the nilness of params and vars... depending on if they are tested or not
+		* NilCheck:		This will create problems or even errors if not used properly
+						Do this after transform and before refcount!
+		
+		* Strength:		Setting to a definite nil is ALWAYS an error... like: nil|msg|.pos=0
+						Strength is settable in the project if its an error or problem
+						For now it defaults to problem
+		
+		* cpp_wrappers:	Params assume not nil unless with "?" Same with all funcs actually.
+*/
+
+
+datatype NilState (byte)
+	constants
+		|nilstate|
+		nil = 1
+		exists = 2
+		unknown = 3
+	syntax is (|nilstate| type, |bool|)
+		return self == type
+	syntax isnt (|nilstate| type, |bool|)
+		return self != type
+		
+
+module NilChecker
+
+
+
+

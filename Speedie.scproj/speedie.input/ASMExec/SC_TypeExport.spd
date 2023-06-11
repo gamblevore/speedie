@@ -6,8 +6,8 @@ struct ASMVarType
 	|int|					ClassNum
 	|int|					C_Array
 	|byte|					PointerCount
-	//|NilState|				Expected
-	//|NilState|				Found
+	|NilState|				Expected
+	|NilState|				Found
 
 // OK, so we wanna export this and import it.
 // can we make this all numbers? no pointers.
