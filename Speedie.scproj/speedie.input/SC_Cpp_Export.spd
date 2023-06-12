@@ -68,20 +68,7 @@ function OptEnd (|FastStringCpp| fs, |int| m, |bool| force=0)
 		fs <~ "\n#pragma GCC reset_options\n\n"
 	
 
-function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
-	if !f.IsExternalLib
-		require !f.IsWrapper and !f.isMacro
-	require !(f isa kIsNewStruct)
-	
-	WriteFunctionHeader( F, .T )
-	if (f.IsInline)
-		fs = .Inlines // one inline can inlcude another so we still need the header first.
-	
-	|| FuncHeader = .T.GetResult
-	H <~ FuncHeader
-	H <~ ";\n\n"
-	require !f.isexternallib
-	
+function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 	if f.isapi
 		fs <~ "__lib__ "
 	
@@ -94,6 +81,24 @@ function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
 	fs.ExtraAfter = fs.srcend.flatafter
 	fs <~ ' ' // space between arg.
 
+
+function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
+	if !f.IsExternalLib
+		require !f.IsWrapper and !f.isMacro
+	require !(f isa kIsNewStruct)
+	
+	
+	WriteFunctionHeader( F, .T )
+	if (f.IsInline)
+		fs = .Inlines // one inline can inlcude another so we still need the header first.
+	
+	|| FuncHeader = .T.GetResult
+	H <~ FuncHeader
+	H <~ ";\n\n"
+	require !f.isexternallib
+	
+	
+	.funcStart(fs, f, funcheader)
 	f.Sourcearg.Export( fs )
 
 	.OptEnd(fs, f.minopt)

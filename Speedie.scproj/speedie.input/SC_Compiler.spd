@@ -165,7 +165,7 @@ function CompileAll (|bool|)
 	
 	require .Stage( "Refcounting" )
 	.Timer( "RefCount" )
-	Compiler.DoRefsB				// do actual refcounts.
+	Compiler.DoRefAnalysis				// do actual refcounts.
 
 	if Options.Cpp
 		.Timer( "Export Cpp" )
@@ -759,7 +759,7 @@ function scfunction.HasFloatReturn (|int|)
 		return f.isfloat|int|
 
 
-function CheckMaxVars
+/*function CheckMaxVars
 	require options.CheckMaxVars
 	|| V    = 0
 	|| Used = 0
@@ -776,7 +776,6 @@ function CheckMaxVars
 			|| RP = f.HasFloatReturn
 			if fp or rp
 				"${f.RenderName} has $fp float params and $rp float result."
-	
 
 	for i in (–count argversions)
 		if argversions[i]
@@ -786,16 +785,19 @@ function CheckMaxVars
 	"$v maxvars"
 	"$used funcs used. ${.funclist.length} funcs total."
 	// what about the function count
+*/
 
 
-function DoRefsB
+function DoRefAnalysis
 	opt norefcounts
+	|[message]| list // avoid reading same thing that we alter.
 	for f in .FuncList
 		if !f.CanDoRefs
 			SCRefs.thisfunc = f
-			f.AnalyseRefsB
+			list.clear
+			f.AnalyseRefs(list)
 	screfs.ThisFunc = nil
-	.CheckMaxVars
+	//.CheckMaxVars
 
 
 function scfunction.CanDoRefs (|bool|)

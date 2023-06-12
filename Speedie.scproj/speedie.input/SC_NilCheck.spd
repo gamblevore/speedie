@@ -13,6 +13,17 @@
 	Passes:
 		* Collectdecls: This will set the basic variable qualities of nil or not
 			DONE.
+			
+			This will be harder than it seems... due to how I've done pointers. Pointers are not containers...
+			Even though they should be? Either way... we'll need to have two nilstates for a decl... one for the pointer
+			and one for the thing itself. I COULD just make pointers now be containers... but then I'd need to change
+			ALL my code.
+			
+			its easier to just add another pointer info. Also... getting what was pointed to... or that kinda thing
+			will need info copied from the pointer's nilstate to its own? I guess you can't get a nil adderss of a
+			value... so once we get the address its already not nil.
+
+
 		
 		* Transform:	This modifies the nilness of params and vars... depending on if they are tested or not
 						if/while/ternary/??/?/and/or/expandtobool?
@@ -26,11 +37,15 @@
 						if msg == nil // msg is now optional... but nil within that branch
 						if msg >= nil, msg <= nil // what? just fail!
 						
+						My loops will need some altering! Like for arrays... we'll have to check if an
+						item is nil... to exit the loop instead of checking the int value. Faster actually!
+						
 						
 						
 		* NilCheck:		This will create problems or even errors if not used properly
 						Do this after transform and before refcount!
-						We need to go through the entire program, and give each item found, a "timecode". That is... it has an "earliest time" that it COULD occur.
+						We need to go through the entire program, and give each item found, a "timecode". That
+						is... it has an "earliest time" that it COULD occur.
 						So for branches, thats easy, both sides get the same time. We can do some simple logic like:
 						
 						function abc

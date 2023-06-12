@@ -26,7 +26,7 @@ function message.Tran_QMark
 	using (self)
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func) 
-	expect (isnormal or thedot == @bra) (thedot, "Should look like a.b?  or  .b?  or  (a)(b)?  or  a.b ?= c  or  (a) ?= b")
+	expect (isnormal or thedot == @bra) (thedot, "Question-marks should look like one of:  a.b?,  .b?,  (a)(b)?,  a.b ?= c,  (a) ?= b")
 	if thedot == @sdot
 		scfunction.Tran_Sdt(thedot)
 	|| inside = (thedot.first, thedot)(isnormal)

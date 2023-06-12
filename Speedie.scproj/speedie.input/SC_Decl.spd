@@ -769,15 +769,14 @@ class SCDecl (SCObject) {
 
 
 	function MakeOptional (|SCDecl|)
-		return .MakeNil(nilstate.optional)
-
-	
-	function MakeNil (|nilstate| Type, |SCDecl|)
-		if .nildeclared == Type
+		if .nildeclared is optional
 			Return self
 		
-		rz = .Copy						// This is used all over. We need to share them, ideally.
-		rz.NilDeclared = Type
+		if self == .type.typenormal
+			return .type.typeoptional
+			
+		rz = .Copy
+		rz.NilDeclared = nilstate.optional
 
 
 	function RefineDecl (|message| list, |SCDecl|)

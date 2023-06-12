@@ -75,6 +75,8 @@ typedef byte MaybeBool;
 
 typedef u16 MsgUIFlags;
 
+typedef byte NilState;
+
 typedef int PID_Int;
 
 typedef int SCBaseInfo;
@@ -229,6 +231,8 @@ struct MemoryLayer_Behaviour;
 
 struct Memory_Behaviour;
 
+struct NilTest_Behaviour;
+
 struct Process_Behaviour;
 
 struct SCImport_Behaviour;
@@ -356,6 +360,8 @@ struct LeakTester;
 struct Macro;
 
 struct MWrap;
+
+struct NilTest;
 
 struct Process;
 
@@ -738,6 +744,14 @@ JBClass ( MWrap , JB_Object ,
 struct MemoryLayer_Behaviour: Object_Behaviour {
 };
 
+struct NilTest_Behaviour: Object_Behaviour {
+};
+
+JBClass ( NilTest , JB_Object , 
+	int V;
+	JB_String* V2;
+);
+
 struct Process_Behaviour: Object_Behaviour {
 };
 
@@ -989,6 +1003,8 @@ JBClass ( SCDecl , SCObject ,
 	int C_Array;
 	SCDeclInfo Info;
 	AsmReg DRegister;
+	NilState NilDeclared;
+	NilState NilUsage;
 );
 
 struct SCIterator_Behaviour: SCObject_Behaviour {
@@ -1089,6 +1105,7 @@ JBClass ( SCClass , SCBase ,
 	SCModule* Modul;
 	Array* Properties;
 	SCDecl* TypeNormal;
+	SCDecl* TypeOptional;
 	Array* Casts;
 	Array* Children;
 	SCDecl* Contained;
@@ -1252,6 +1269,7 @@ extern uint64 SC__Comp_HashConstantValue;
 extern bool SC__Comp_HasMainFunc;
 extern Array* SC__Comp_ImportedList;
 extern Dictionary* SC__Comp_ImportedNames;
+extern bool SC__Comp_InitedOK;
 extern Dictionary* SC__Comp_InsecureWords;
 extern SCFile* SC__Comp_InternalFile;
 extern SCBase* SC__Comp_Interpreter;
@@ -1293,13 +1311,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1867])
+#define kJB__ErrorColors_bold (JB_LUB[1861])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1868])
-#define kJB__ErrorColors_good (JB_LUB[1869])
-#define kJB__ErrorColors_normal (JB_LUB[1870])
-#define kJB__ErrorColors_underline (JB_LUB[1869])
-#define kJB__ErrorColors_warn (JB_LUB[1871])
+#define kJB__ErrorColors_error (JB_LUB[1862])
+#define kJB__ErrorColors_good (JB_LUB[1863])
+#define kJB__ErrorColors_normal (JB_LUB[1864])
+#define kJB__ErrorColors_underline (JB_LUB[1863])
+#define kJB__ErrorColors_warn (JB_LUB[1865])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1471,10 +1489,10 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[346])
-#define kSC_BitNot (JB_LUB[608])
-#define kSC_BitOr (JB_LUB[549])
-#define kSC_BitXor (JB_LUB[1872])
+#define kSC_BitAnd (JB_LUB[339])
+#define kSC_BitNot (JB_LUB[601])
+#define kSC_BitOr (JB_LUB[542])
+#define kSC_BitXor (JB_LUB[1866])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1504,7 +1522,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1873])
+#define kJB_SaverStart1 (JB_LUB[1867])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -1778,6 +1796,10 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__MsgUIFlags_LargestFlag (0)
 #define kJB__MsgUIFlags_Reserved (4096)
 #define kJB__MsgUIFlags_Style2 (16384)
+#define kSC__NilState_exists (2)
+#define kSC__NilState_nil (1)
+#define kSC__NilState_optional (3)
+#define kSC__NilState_unknown (3)
 #define kSC__SCBaseInfo_explicitexport (0)
 #define kSC__SCBaseInfo_visible (1)
 #define kSC__SCBaseType_DataType (2)
@@ -1934,6 +1956,10 @@ extern CompressionStats JB__Flow_Stats;
 extern Dictionary* SC__Instruction_TypeDict;
 extern Instruction* SC__Instruction_TypeList[128];
 extern uint64 JB__Mrap_MDummy[2];
+extern NilTest* SC__NilTest_n1;
+extern NilTest* SC__NilTest_x1;
+extern NilTest* SC__NilTest_x2;
+extern JB_String* SC__NilTest_x3;
 extern Process* JB__Proc_Children[16];
 extern byte JB__Proc_ClosePipesInstalled;
 extern int JB__Proc_IncID;
@@ -2083,8 +2109,6 @@ JB_File* SC_Comp__BuildFolder();
 
 void SC_Comp__CheckIsGoodLibrary();
 
-void SC_Comp__CheckMaxVars();
-
 void SC_Comp__ClearEnvs();
 
 void SC_Comp__CodeSign(JB_File* gui_exe);
@@ -2105,7 +2129,7 @@ void SC_Comp__CreateRoot();
 
 void SC_Comp__DeadCodeStrip();
 
-void SC_Comp__DoRefsB();
+void SC_Comp__DoRefAnalysis();
 
 void SC_Comp__DoSavers(int Stage);
 
@@ -2157,7 +2181,7 @@ int SC_Comp__Init_();
 
 bool SC_Comp__InitBasicFuncs();
 
-bool SC_Comp__InitBasicStuff();
+void SC_Comp__InitBasicStuff();
 
 int SC_Comp__InitCode_();
 
@@ -2438,9 +2462,13 @@ void SC_AC__CallFromSub(Message* arg, SCFunction* fn);
 
 bool SC_AC__CanUseName(SCBase* l);
 
+Message* SC_AC__CmdCleanUp(Message* arg);
+
 Message* SC_AC__CmdResponse(Message* cmd, Message* arg);
 
 void SC_AC__CmdWrap(Message* arg);
+
+void SC_AC__CompileAndGiveFeedBack();
 
 Message* SC_AC__Define(Message* msg, JB_String* purpose, JB_Object* found);
 
@@ -2472,6 +2500,8 @@ int SC_AC__Init_();
 
 int SC_AC__InitCode_();
 
+bool SC_AC__InitedOK();
+
 Message* SC_AC__Jump(Message* cmd);
 
 Message* SC_AC__JumpImport(Message* cmd);
@@ -2495,8 +2525,6 @@ Message* SC_AC__ReportBuildOrRestart(Message* cmd, Message* arg);
 Message* SC_AC__RespondDefine(Message* msg, Message* s, JB_String* purpose);
 
 void SC_AC__Restart(Message* arg);
-
-void SC_AC__ReturnsWhenPerryClosesUs();
 
 Message* SC_AC__RootTmpComplete(Message* cmd);
 
@@ -2556,6 +2584,18 @@ int SC_Macros__InitCode_();
 
 
 // Math
+
+
+// NilChecker
+void SC_NilChecker__Check();
+
+
+
+// NilTest2
+void SC_NilTest2__Hello();
+
+int SC_NilTest2__InitCode_();
+
 
 
 // Options
@@ -3887,6 +3927,11 @@ MaybeBool JB_MaybeBool__New(bool Default);
 // MsgUIFlags
 
 
+// NilState
+bool SC_NilState_SyntaxIs(NilState self, NilState type);
+
+
+
 // PID_Int
 
 
@@ -4650,6 +4695,9 @@ void SC_asdas2_hhh(asdas2* self);
 // JB_Memory_Behaviour
 
 
+// JB_NilTest_Behaviour
+
+
 // JB_Process_Behaviour
 
 
@@ -4910,6 +4958,8 @@ void SC_Cpp_ExportSyx(Cpp_Export* self);
 void SC_Cpp_FinalMergeOutputIntoACpp(Cpp_Export* self);
 
 void SC_Cpp_Func(Cpp_Export* self, FastStringCpp* fs, SCFunction* F, FastStringCpp* H);
+
+void SC_Cpp_FuncStart(Cpp_Export* self, FastStringCpp* fs, SCFunction* f, JB_String* funcheader);
 
 void SC_Cpp_ListAllClasses(Cpp_Export* self, FastStringCpp* fs);
 
@@ -5342,6 +5392,31 @@ byte* JB_Mrap__Zalloc(int n);
 
 
 // JB_MemoryLayer
+
+
+// JB_NilTest
+void SC_NilTest_Constructor(NilTest* self);
+
+void SC_NilTest_destructor(NilTest* self);
+
+NilTest* SC_NilTest_Exists3(NilTest* self, NilTest* p);
+
+NilTest* SC_NilTest_Exists4(NilTest* self);
+
+NilTest* SC_NilTest_Exists5(NilTest* self);
+
+NilTest* SC_NilTest_Exists7(NilTest* self);
+
+inline bool SC_NilTest_SyntaxCast(NilTest* self);
+
+NilTest* SC_NilTest__Alloc();
+
+int SC_NilTest__Init_();
+
+int SC_NilTest__InitCode_();
+
+NilTest* SC_NilTest__New();
+
 
 
 // JB_Process
@@ -6532,7 +6607,7 @@ bool SC_Decl_ConstInRange(SCDecl* self, Message* RN, SCDecl* rt);
 
 void SC_Decl_Constructor(SCDecl* self);
 
-SCDecl* SC_Decl_ContainedNilfix(SCDecl* self);
+SCDecl* SC_Decl_Containedfix(SCDecl* self);
 
 SCDecl* SC_Decl_ContainedReplace(SCDecl* self, SCClass* DotCls, SCDecl* contains, bool NeedsName);
 
@@ -6623,6 +6698,8 @@ SCDecl* SC_Decl_MakeBorrowed(SCDecl* self);
 void SC_Decl_MakeContainedObject(SCDecl* self);
 
 void SC_Decl_MakeGameFlying(SCDecl* self, SCClass* oof);
+
+SCDecl* SC_Decl_MakeOptional(SCDecl* self);
 
 SCDecl* SC_Decl_MakePointer(SCDecl* self);
 
@@ -7378,6 +7455,8 @@ void JB_Msg_SCom__(Message* self, FastString* fs);
 
 void JB_Msg_SDot__(Message* self, FastString* fs);
 
+Message* JB_Msg_SendPerryErrors(Message* self);
+
 bool JB_Msg_SettingToNil(Message* self);
 
 bool JB_Msg_ShallowEquals(Message* self, Message* B, bool Aware);
@@ -7567,8 +7646,6 @@ MessageID* JB_ID__New(JB_String* Name, Syntax Fn, uint64 Tag);
 
 // JB_SCArg
 void SC_Arg_Constructor(SCArg* self, Message* node);
-
-int SC_Arg_Count(SCArg* self);
 
 void SC_Arg_destructor(SCArg* self);
 
@@ -7876,7 +7953,7 @@ Message* SC_Func_AddParentAllocFunc(SCFunction* self, Message* root, SCFunction*
 
 void SC_Func_AddSelfToFunc(SCFunction* self, SCClass* cls);
 
-void SC_Func_AnalyseRefsB(SCFunction* self);
+void SC_Func_AnalyseRefs(SCFunction* self, Array* list);
 
 void SC_Func_AnalyseRefsConstructors(SCFunction* self);
 
@@ -7962,10 +8039,6 @@ void SC_Func_FLookupSet(SCFunction* self, SCBase* Value);
 
 void SC_Func_FuncDecls(SCFunction* self);
 
-int SC_Func_HasFloatparams(SCFunction* self);
-
-int SC_Func_HasFloatReturn(SCFunction* self);
-
 void SC_Func_init_sub(SCFunction* self, Message* node, SCBase* name_space);
 
 SCObject* SC_Func_InsertIn(SCFunction* self, SCBase* parent, JB_String* name);
@@ -7985,8 +8058,6 @@ SCFunction* SC_Func_Last(SCFunction* self);
 SCDecl* SC_Func_MacroFix(SCFunction* self, SCDecl* contains, SCBase* name_space, SCParamArray* Incoming);
 
 bool SC_Func_MacroGet(SCFunction* self, SCParamArray* paramsarray, SCFunction* prev);
-
-int SC_Func_MaxVars(SCFunction* self);
 
 JB_String* SC_Func_NameOfClassAllocator(SCFunction* self, JB_String* s, JB_String* CppPart);
 
@@ -8467,6 +8538,10 @@ inline bool JB_DictionaryReader_SyntaxCast(DictionaryReader* self) {
 
 inline JB_String* JB_FS_SyntaxCast(FastString* self) {
 	return JB_FS_GetResult(self);
+}
+
+inline bool SC_NilTest_SyntaxCast(NilTest* self) {
+	return (self != nil) and JB_Str_Exists(self->V2);
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* self) {

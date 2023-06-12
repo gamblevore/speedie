@@ -73,7 +73,7 @@ function RC_DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 	
 	|| Blocker = arg.CausesUnReachable( arg, dcl, LastPlace )
 	if blocker.NoPointlessBlockRefs(dcl)
-		if (Basis == kBasisObj) // i guess we don't want the & here
+		if (Basis == kBasisObj)								// we want == not & here
 			RefIncr( name, dcl, IsJustAnArg )
 		Blocker := LastPlace
 		ReturnHandle( Blocker, arg, name, basis )
@@ -647,6 +647,9 @@ function RC_Temps (|SCFunction| FN, |Message| msg, |int| Basis)
 		  else
 			scfunction.TempMoveOut(Msg)
 	  else
+		// I'm not sure this ever should be done?
+		// definitely not for soemthing we are about to return!!!
+		// actually BOTH sides are wrong! whatever2 will leak! it DOES need freeifdead!
 		using (msg)
 		|| fnc = NewFnc( "JB_FreeIfDead" )
 		fnc.last.obj = Compiler.RefFreeIfDead
@@ -729,18 +732,27 @@ function SCFunction.AnalyseRefsConstructors
 
 
 
-function SCFunction.AnalyseRefsB
+function SCFunction.AnalyseRefs (|[message]| list)
 	|| root				= .SourceArg
 	|| IsConstructor	= self isa kIsConstructor
+	|| count = 0
 	for (msg.flat in root)
 		|| it = msg.RC_HasTemporary  // need to always do this?
-			if .dorefs or (it != screfs.kbasisobj)  
+			if .dorefs or (it != screfs.kbasisobj)
+				count++
+				if (count == 1) and (self ~= "whatever" or "whatever2")
+					.debugprint
+					debugger
 				SCRefs.RC_Temps( self, msg, it )
+				if (count == 2) and (self ~= "whatever" or "whatever2")
+					.debugprint
 	
 		
-	|[message]| list // avoid reading same thing that we alter.
+	// avoid reading same thing that we alter.
 	for (msg.ScanArg in root)
 		list <~ msg
+	// can we remove this ^^^ at some point?
+	
 	
 	if .dorefs
 		for (ar in .args)
