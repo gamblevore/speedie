@@ -187,6 +187,8 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
+			.RowHeight += 4
+//			.RowAscendHeight += 2
 			.IsTree	= true
 			.NoSeps	= true
 			.tooltip		= self.SearchArea.Tooltip			

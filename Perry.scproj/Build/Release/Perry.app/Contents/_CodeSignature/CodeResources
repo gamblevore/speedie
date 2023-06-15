@@ -14,7 +14,7 @@
 		</data>
 		<key>Resources/speedie_install.txt</key>
 		<data>
-		VLTVWiLhiNSskbSvh3PJn4aRysc=
+		QiU++x2/u/oP4FzxWq58oZSWCIo=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -23,7 +23,7 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			WxXXy/SE1dR/fr2NSYaMO/+hqIE=
+			4Ddypfa6Rd2FqW+M2OoJsjb+lhk=
 			</data>
 			<key>requirement</key>
 			<string>identifier libSDL2 and anchor apple generic and certificate leaf[subject.CN] = "Apple Development: delete@elfdata.com (JZC3RBZ4MH)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
@@ -46,7 +46,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			zhP7CuiI3aQ7gQQgTrrtuKsP5c3pJq634tLSGVcInXQ=
+			MMIhUuKkaeDfX/fNvm+klisamz0NzNts1tlPkQLfjaY=
 			</data>
 		</dict>
 	</dict>
