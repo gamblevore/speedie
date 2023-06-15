@@ -171,13 +171,15 @@ class Array (saveable)
 			rz <~ s 
 	
 	iterator
-		|| i = 0 // remove self-check... later.
-		while ( i < .length )
-			yield self[i] (i)
+		|| i = 0
+		while
+			|| Item = self[i]
+			if item == nil:exit 
+			yield Item (i)
 			i++
 
 	iterator Backwards
-		|| i = .length // remove self-check... later.
+		|| i = .length
 		while ( i-- >= 1 )
 			yield self[i] (i)
 
