@@ -35,7 +35,7 @@ static int  TotalAllocBytes; // malloc-zones could do this, or WE COULD OURSELVE
 
 
 
-void JB_TooLargeAlloc(int N, const char* S) {
+void JB_TooLargeAlloc(int64 N, const char* S) {
 	JB_ReportMemoryError("Jeebox: Oversized alloc requested: ", N, S); 
 }
 

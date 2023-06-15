@@ -19,10 +19,10 @@ struct JB_Object;
 extern int OutOfMemoryHappenedAlready;
 bool JB_OutOfMemoryOccurred();
 u64 JB_TotalMemoryCount();
-void JB_TooLargeAlloc(int N, const char* S);
-void JB_OutOfMainMemory(int N);
-void JB_OutOfUserMemory(int N);
-void JB_ReportMemoryError(const char* A, int N, const char* B);
+void JB_TooLargeAlloc(int64 N, const char* S);
+void JB_OutOfMainMemory(int64 N);
+void JB_OutOfUserMemory(int64 N);
+void JB_ReportMemoryError(const char* A, int64 N, const char* B);
 uint8* JB_malloc(int N);
 uint8* JB_zalloc(int N);
 struct allocate_result {

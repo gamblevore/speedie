@@ -115,12 +115,12 @@ int JB_ErrorHandleC(const char* Desc, bool CanFreeDesc) {
 
 
 void JB_Str_SyntaxExpect(JB_String* self);
-void JB_OutOfUserMemory(int N) {
+void JB_OutOfUserMemory(int64 N) {
 	if (++OutOfMemoryHappenedAlready <= 10) 
 		JB_ReportMemoryError("Jeebox: Failed to allocate ", N, nil); 
 } 
 
-void JB_ReportMemoryError(const char* A, int N, const char* operation) {
+void JB_ReportMemoryError(const char* A, int64 N, const char* operation) {
     static uint8 ReportCount = 0;
     require0 (ReportCount < 10);
 	FastString* FS = JB_FS__FastNew(0);

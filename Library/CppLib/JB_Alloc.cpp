@@ -758,9 +758,9 @@ extern "C" int JB_ErrorHandleC(const char* Desc, bool CanFreeDesc);
 extern "C" uint8* JB__WriteIntToBuffer (uint8* wp, s64 LeftOver);
 
 
-void JB_OutOfMainMemory(int N) {
+void JB_OutOfMainMemory(int64 N) {
     if (!OutOfMemoryHappenedAlready) {
-        printf("Jeebox: Can't allocate %i bytes for main memory.", N);
+        printf("Jeebox: Can't allocate %lli bytes for main memory.", N);
         OutOfMemoryHappenedAlready++;
     }
 }
