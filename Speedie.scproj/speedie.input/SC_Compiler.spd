@@ -426,6 +426,10 @@ function ImportAll
 		require !TooManyErrors()
 
 
+	for c in .ClassList					  // handling function prototypes.
+		if c.isstruct
+			c.GetStructDepth
+
 	.sortmodules	// need to re-sort array??? lol.
 
 
@@ -828,6 +832,7 @@ function ModulesSorter (SorterComparer)
 	|| bb = b|scmodule|
 	|| ca = aa.cls
 	|| cb = bb.cls
+	
 	if !ca or !cb // a module
 		if ca or cb
 			return cb

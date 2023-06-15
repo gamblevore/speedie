@@ -170,10 +170,11 @@ function GetDepth
 		.depth = 1
 		for c.Upwards in self
 			.depth++
+	
 
 
-function GetDepth2
-	require .isstruct
+function GetStructDepth
+	opt norefcounts
 	expect (.StructContainerDepth != -1) (self, "This struct contains itself?")
 	.StructContainerDepth = -1
 	
@@ -182,7 +183,7 @@ function GetDepth2
 		|| t = p.type
 		if (t.isstruct) and (p.pointercount == 0) 
 			debugat
-			t.getdepth
+			t.GetStructDepth
 			r = r max t.StructContainerDepth+1
 	.StructContainerDepth = r
 

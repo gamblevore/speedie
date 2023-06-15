@@ -146,40 +146,7 @@ function LoadModule (|Message| node)
 	compiler.disammodules.TryAdd(nil, self, .safename)
 	.Collect( .source, scbase.CurrVisibility )
 
-/*
-function scclass.SuperGrabbed (|bool|)
-	|| it = .super
-		return it.Modul.Grabbed
-	return true // basically its grabbed
-	
 
-function scclass.StructContainerShipGrabbed (|bool|)
-	opt norefcounts
-	for p in .properties
-		|| t = p.type
-		if (p.pointercount == 0) and (t.isstruct)
-			require t.modul.grabbed
-	return true
-
-function OKToSort (|bool|)
-	// for sorting things correctly so C-exports don't get order issues...
-	require !.Grabbed
-	|| c = .cls
-	if !c
-		 Return true
-	
-	if c.IsStruct
-		require c.StructContainerShipGrabbed
-	
-	if c.SuperGrabbed
-		.Grabbed = true
-		Return true
-
-
-function Grab (|SCModule|)
-	expect .OKToSort
-	Return self
-*/
 
 
 module

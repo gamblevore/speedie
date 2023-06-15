@@ -769,11 +769,13 @@ class SCDecl (SCObject) {
 
 
 	function MakeOptional (|SCDecl|)
+		opt norefcounts
 		if .nildeclared is optional
 			Return self
 		
-		if self == .type.typenormal
-			return .type.typeoptional
+		|| Op = .type.typeoptional
+		if op and (self == .type.typenormal)
+			return op
 			
 		rz = .Copy
 		rz.NilDeclared = nilstate.optional
