@@ -6,9 +6,13 @@
 * nil-checking seems a very good idea. shouldn't be too hard to do either!!
 	* Mostly the issues will be around module variables...
 * RefOpts?
+* bigger lineheight for findfield?
+
+
 
 
 // Do later
+* galaxxies C++ compile issues
 * not-compilable functions blocks lookups, on a .dot function call.
 * any object can be created with an virtual-function override table, just store before the refcount?
 * clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
