@@ -1311,13 +1311,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1861])
+#define kJB__ErrorColors_bold (JB_LUB[1862])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1862])
-#define kJB__ErrorColors_good (JB_LUB[1863])
-#define kJB__ErrorColors_normal (JB_LUB[1864])
-#define kJB__ErrorColors_underline (JB_LUB[1863])
-#define kJB__ErrorColors_warn (JB_LUB[1865])
+#define kJB__ErrorColors_error (JB_LUB[1863])
+#define kJB__ErrorColors_good (JB_LUB[1864])
+#define kJB__ErrorColors_normal (JB_LUB[1865])
+#define kJB__ErrorColors_underline (JB_LUB[1864])
+#define kJB__ErrorColors_warn (JB_LUB[1866])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1492,7 +1492,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[339])
 #define kSC_BitNot (JB_LUB[601])
 #define kSC_BitOr (JB_LUB[542])
-#define kSC_BitXor (JB_LUB[1866])
+#define kSC_BitXor (JB_LUB[1867])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1522,7 +1522,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1867])
+#define kJB_SaverStart1 (JB_LUB[1868])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -4377,12 +4377,6 @@ int JB_MzSt__InitCode_();
 
 
 
-// JB_ContainerStruct
-
-
-// JB_ContainerStruct2
-
-
 // JB_FastBuff
 bool JB_FastBuff_Alloc(FastBuff* self, int n);
 
@@ -4457,6 +4451,8 @@ int SC_IR_FilePos(IR* self);
 void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
+
+void SC_IR_Print(IR* self);
 
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
@@ -4636,15 +4632,21 @@ void SC_abccc__test();
 // JB_asdas
 
 
+// JB_jb_vm
+
+
+// JB_uint24
+
+
+// JB_ContainerStruct2
+
+
 // JB_asdas2
 void SC_asdas2_hhh(asdas2* self);
 
 
 
-// JB_jb_vm
-
-
-// JB_uint24
+// JB_ContainerStruct
 
 
 // JB_AppArgument_Behaviour
@@ -5133,6 +5135,8 @@ inline bool JB_DictionaryReader_SyntaxCast(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
+
+int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -6715,6 +6719,8 @@ bool SC_Decl_MiniMatch(SCDecl* self, SCDecl* O, int TypeCast);
 
 bool SC_Decl_NeedsContainedfix(SCDecl* self);
 
+SCDecl* SC_Decl_NewOptional(SCDecl* self);
+
 SCDecl* SC_Decl_NewWrapper(SCDecl* self, SCDecl* CastTo);
 
 SCDecl* SC_Decl_NewWrapperSub(SCDecl* self, SCDecl* CastTo);
@@ -7777,6 +7783,8 @@ SCDecl* SC_Class_GetFlyingMemory(SCClass* self, Message* exp);
 
 SCIterator* SC_Class_GetIteratorAny(SCClass* self, JB_String* name, Message* node);
 
+void SC_Class_GetStructDepth(SCClass* self);
+
 SCClass* SC_Class_GoUpTo(SCClass* self, int d);
 
 bool SC_Class_HasGameType(SCClass* self);
@@ -8499,6 +8507,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
