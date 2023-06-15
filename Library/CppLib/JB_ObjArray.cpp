@@ -36,22 +36,26 @@ static bool ReAlloc_(Array* self, int C) {
 	return true;
 }
 
-static bool GrowLength_(Array* self, int N) {
+bool JB_Array_Reserve(Array* self, int64 N) {
 	int C = self->Capacity;
 	if (N <= C) {
-		self->Length = N;
 		return true;
 	}
 	
 	if (N <= kArrayLengthMax) {
-		if (ReAlloc_(self, N)) {
-			self->Length = N;
+		if (ReAlloc_(self, (int)N)) {
 			return true;
 		}
     } else {
         JB_TooLargeAlloc(N, "array allocation");
     }
     return false;
+}
+
+static bool GrowToLength_(Array* self, int64 N) {
+	require (JB_Array_Reserve(self, N));
+	self->Length = (int)N;
+	return true;
 }
 
 
@@ -72,10 +76,10 @@ static void ShrinkLength_(Array* self, int64 NewLength) {
 }
 
 
-void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
+void JB_Array_AppendCount( Array* self, JB_Object* Value, int64 Count ) {
 	require0 (Value and Count > 0);
-	int n = self->Length; 
-	require0(GrowLength_(self, n+Count));
+	int64 n = self->Length; 
+	require0(GrowToLength_(self, n+Count));
 	Value->RefCount += Count;
 	auto P = self->_Ptr + n;
 	auto Pf = P + Count;
@@ -84,24 +88,18 @@ void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
 }
 
 
-
 void JB_Array_Append( Array* self, JB_Object* Value ) {
 	JB_Array_AppendCount(self, Value, 1);
 }
 
 
 void JB_Array_SizeSet( Array* self, int64 NewLength ) {
-    require0(NewLength >= 0);
-    int Length = (int)(self->Length);	
+    int Length = self->Length;	
     if (NewLength < Length) {
         JB_Object** Curr = self->_Ptr + --Length;
         JB_Object** Last = self->_Ptr + NewLength;
         while ( Curr >= Last ) // backwards is safer.
             JB_Decr( *Curr-- );
-		ShrinkLength_(self, NewLength);
-	} else if (NewLength > Length) {
-		ReAlloc_(self, (int)NewLength);
-	} else if (self->Capacity and !NewLength) {
 		ShrinkLength_(self, NewLength);
 	}
 }
@@ -133,12 +131,12 @@ void JB_Array_Reverse( Array* self ) {
 void JB_Array_Remove( Array* self, int Pos ) {
 	auto Item = JB_Array_Value(self, Pos);
 	require0 (Item);
-	JB_Decr(Item);
 	int N = self->Length;
 	while (Pos < N) {
 		self->_Ptr[Pos] = self->_Ptr[++Pos];  
 	}
 	ShrinkLength_(self, N-1);
+	JB_Decr(Item);
 }
 
 
@@ -158,7 +156,7 @@ Array* JB_Array_Copy(Array* self) {
     require(self);
 	Array* Result = (Array*)JB_New(Array);
 	int n = self->Length;
-	if (!GrowLength_(Result, n)) {
+	if (!GrowToLength_(Result, n)) {
 		JB_Decr(Result);
 		return 0;
 	}

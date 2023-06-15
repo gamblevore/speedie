@@ -74,13 +74,6 @@ class Array (saveable)
 		// returns .size
 		cpp_wrapper JB_Array_Wipe
 	
-	/*function Wipe (|int| n, |... ~ array|)
-		disabled
-		if .Wipe > n
-			.clear
-		return self
-	*/
-
 	function Size (|int|)
 		disabled "use length"
 	
@@ -95,6 +88,10 @@ class Array (saveable)
 	
 	function Remove (|int| Pos)
 		cpp_wrapper JB_Array_Remove
+
+	function SmartRemove (|int| Pos)
+		|| p = .pop
+			self[pos] = P
 
 	function Sort (|SorterComparer| Srt, |bool| down=false)
 		cpp_wrapper JB_Array_Sort
@@ -143,7 +140,7 @@ class Array (saveable)
 	syntax Append (|| item)
 		.syntaxappend(item, 1)
 	
-	syntax Append (|| item, |int| Count)
+	syntax Append (|| item, |int64| Count)
 		cpp_wrapper JB_Array_AppendCount
 	
 	render

@@ -26,7 +26,7 @@ void JB_Array_Shuffle( Array* self );
 void JB_Array_SizeSet( Array* self, int64 NewSize );
 void JB_Array_Insert( Array* self, int Pos, JB_Object* Value );
 void JB_Array_Append( Array* self, JB_Object* Value );
-void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count );
+void JB_Array_AppendCount( Array* self, JB_Object* Value, int64 Count );
 void JB_Array_Destructor( Array* self );
 int JB_Array_Size( Array* self );
 Array* JB_Array_Copy(Array* self);
