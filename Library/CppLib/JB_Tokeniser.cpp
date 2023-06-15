@@ -178,7 +178,8 @@ void JB_Tk__TokenSet( JB_String* TokStr, TokHan* New_ ) {
     if (!New_) {
         return;
     }
-    JB_Object** Place = JB_Dict_MakePlace(self->WordDict, TokStr);
+    auto Debug = self;
+    JB_Object** Place = JB_Dict_MakePlace(Debug->WordDict, TokStr);
     dbgexpect(Place);
     TokHan* Old_ = (TokHan*)(*Place);
 
