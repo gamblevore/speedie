@@ -8,8 +8,6 @@
 
 #include "JB_Umbrella.hpp"
 
-#include <vector>
-
 extern "C" {
 
 #ifndef ENV64BIT
@@ -23,66 +21,89 @@ extern "C" {
 
 
 void OutOfMem_(Array*self, int Count=0) {
-    JB_OutOfUserMemory(((int)(self->Vec.size())+Count)*sizeof(void*));
+    JB_OutOfUserMemory((self->Capacity+Count)*sizeof(void*));
 }
 
-void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
-	if (Value) {
-		try {
-			while (Count-- > 0) {
-				self->Vec.push_back(Value);
-				JB_Incr(Value);
-			}
-		} catch (const std::bad_alloc&) {
-			OutOfMem_(self);
+
+static bool ReAlloc_(Array* self, int C) {
+	auto X = (JB_Object**)JB_realloc(self->_Ptr, C*sizeof(void*));
+	if (!X) {
+        JB_OutOfUserMemory(C*sizeof(void*));
+		return false;
+	}
+	self->_Ptr = X;
+	self->Capacity = (int)(JB_msize(X)/sizeof(void*));
+	return true;
+}
+
+static bool GrowLength_(Array* self, int N) {
+	int C = self->Capacity;
+	if (N <= C) {
+		self->Length = N;
+		return true;
+	}
+	
+	if (N <= kArrayLengthMax) {
+		if (ReAlloc_(self, N)) {
+			self->Length = N;
+			return true;
 		}
     } else {
-		static int Errs = 0;
-		Errs++;
-		if (Errs <= 16) {
-			JB_ReportMemoryError("Tried to append a nil value into an array", 0, nil);
-		}
+        JB_TooLargeAlloc(N, "array allocation");
     }
+    return false;
 }
+
+
+static void ShrinkLength_(Array* self, int64 NewLength) {
+	self->Length = (int)NewLength;
+	if (!NewLength) {
+		auto P = self->_Ptr;
+		self->Capacity = 0;
+		self->_Ptr = 0;
+		JB_free(P);
+	} else {
+		int C = self->Capacity;
+		if (NewLength <= (C/2) and C > 8) {
+			C = std::max((int)NewLength, 8);
+			ReAlloc_(self, C);
+		}
+	}
+}
+
+
+void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
+	require0 (Value and Count > 0);
+	int n = self->Length; 
+	require0(GrowLength_(self, n+Count));
+	Value->RefCount += Count;
+	auto P = self->_Ptr + n;
+	auto Pf = P + Count;
+	while (P < Pf)
+		*P++ = Value;
+}
+
+
 
 void JB_Array_Append( Array* self, JB_Object* Value ) {
 	JB_Array_AppendCount(self, Value, 1);
 }
 
-void JB_Array_Insert( Array* self, int Pos, JB_Object* Value ) {
-	if (Pos < 0 or !Value) {
-		JB_ReportMemoryError("Tried to insert a nil value into an array", 0, nil);
-		return;
-	}
-	Pos = Min(Pos, JB_Array_Size(self));
-	try {
-		self->Vec.insert( self->Vec.begin()+Pos, 1,  Value );
-		JB_Incr(Value);
-	} catch (const std::bad_alloc&) {
-		OutOfMem_(self);
-	}
-}
 
-
-void JB_Array_SizeSet( Array* self, int NewLength ) {
-    require0(self and NewLength >= 0);
-    int Length = (int)(self->Vec.size());
-	require0(NewLength!=Length);
-	
+void JB_Array_SizeSet( Array* self, int64 NewLength ) {
+    require0(NewLength >= 0);
+    int Length = (int)(self->Length);	
     if (NewLength < Length) {
-        JB_Object** Curr = &(self->Vec[--Length]);
-        JB_Object** Last = &(self->Vec[NewLength]);
+        JB_Object** Curr = self->_Ptr + --Length;
+        JB_Object** Last = self->_Ptr + NewLength;
         while ( Curr >= Last ) // backwards is safer.
             JB_Decr( *Curr-- );
-	} else if (NewLength > kArrayLengthMax) {
-        JB_TooLargeAlloc(NewLength, "array allocation");
-    }
-    
-    try {
-        self->Vec.resize(NewLength);
-    } catch (const std::bad_alloc&) {
-        JB_OutOfUserMemory(NewLength*sizeof(void*));
-    }
+		ShrinkLength_(self, NewLength);
+	} else if (NewLength > Length) {
+		ReAlloc_(self, (int)NewLength);
+	} else if (self->Capacity and !NewLength) {
+		ShrinkLength_(self, NewLength);
+	}
 }
 
 
@@ -103,14 +124,21 @@ JB_String* JB_Array_Render(Array* self, FastString* fs_in) {
 
 
 void JB_Array_Reverse( Array* self ) {
-    int n = (int)(self->Vec.size())/2;
-    auto F = self->Vec.begin();
+    int n = (int)(self->Length)/2;
+    auto F = self->_Ptr;
     for_(n)
         F[i] = F[n-(i+1)];
 }
 
 void JB_Array_Remove( Array* self, int Pos ) {
-    self->Vec.erase(self->Vec.begin()+Pos);
+	auto Item = JB_Array_Value(self, Pos);
+	require0 (Item);
+	JB_Decr(Item);
+	int N = self->Length;
+	while (Pos < N) {
+		self->_Ptr[Pos] = self->_Ptr[++Pos];  
+	}
+	ShrinkLength_(self, N-1);
 }
 
 
@@ -121,7 +149,7 @@ void JB_Array_Destructor( Array* self ) {
 
 int JB_Array_Size( Array* self ) {
     if (self)
-        return (int)(self->Vec.size());
+        return (int)(self->Length);
     return 0;
 }
 
@@ -129,39 +157,47 @@ int JB_Array_Size( Array* self ) {
 Array* JB_Array_Copy(Array* self) {
     require(self);
 	Array* Result = (Array*)JB_New(Array);
-    auto Place = &Result->Vec;
-    new (Place) std::vector<JB_Object*>(self->Vec);
-	int n = JB_Array_Size(self);
-	for_(n)
-		JB_Incr(Result->Vec[i]);
+	int n = self->Length;
+	if (!GrowLength_(Result, n)) {
+		JB_Decr(Result);
+		return 0;
+	}
+
+    auto Place = Result->_Ptr;
+	CopyBytes(self->_Ptr, Place, sizeof(void*) * n);
+	for_(n) {
+		JB_Incr(Place[i]);
+	}
     return Result;
 }
 
 void JB_Array_Swap(Array* self, uint i, uint j) {
 	uint n = JB_Array_Size(self);
 	if (i < n and j < n) {
-		std::swap(self->Vec[i], self->Vec[j]);
+		std::swap(self->_Ptr[i], self->_Ptr[j]);
 	}
 }
 
 void JB_Array_Constructor0( Array* self ) {
-    auto Place = &self->Vec;
-    new (Place) std::vector<JB_Object*>();
+	self->Length = 0;
+	self->Capacity = 0;
+	self->_Ptr = 0;
+	self->Marker = 0;
 }
 
 
 int JB_Array_Wipe(Array* self) {
-    require(self);
-    JB_Array_SizeSet(self, 0);
+    if (self)
+		JB_Array_SizeSet(self, 0);
     return 0;
 }
 
 
 void JB_Array_ValueSet( Array* self, int Pos, JB_Object* Value ) {
 	if (Value) {
-		u32 n = (u32)self->Vec.size();
+		u32 n = (u32)self->Length;
 		if ((u32)Pos < n) {
-			JB_SetRef( self->Vec[Pos], Value );
+			JB_SetRef( self->_Ptr[Pos], Value );
 		}
 	} else {
 		JB_ReportMemoryError("Tried to set a nil value into an array", 0, nil);
@@ -170,8 +206,8 @@ void JB_Array_ValueSet( Array* self, int Pos, JB_Object* Value ) {
 
 
 JB_Object* JB_Array_Value( Array* self, int Pos ) {
-    if (self and (u32)Pos < self->Vec.size()) {
-        return self->Vec[ Pos ];
+    if (self and (u32)Pos < self->Length) {
+        return self->_Ptr[ Pos ];
     }
     return 0;
 }
@@ -185,7 +221,7 @@ void JB_FillInts(int* Start, int N, int Value) {
 #ifndef AS_LIBRARY
 void JB_Array_Shuffle( Array* self ) {
 	int n = JB_Array_Size(self);
-	JB_Object** Array = &self->Vec[0];
+	JB_Object** Array = self->_Ptr;
 	uint64 Hash = ~1234567;
 
 	for_(n) {
@@ -227,7 +263,7 @@ void JB_Array_Sort ( Array* self, SorterComparer fp, bool down ) {
 	int N = JB_Array_Size(self);
 	require0 (fp and N>1);
 	
-	obj* J = &(self->Vec[0]);
+	obj* J = self->_Ptr;
 	QuickSort(J, 0, N-1, fp); // oop?
 }
 

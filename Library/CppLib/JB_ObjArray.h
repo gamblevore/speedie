@@ -11,8 +11,10 @@
 extern "C" {
 
 JBClass( Array, Saveable,
-	int Marker;
-	std::vector<JB_Object*> Vec;
+	int					Marker;
+	JB_Object**			_Ptr;
+	int					Capacity;
+	int					Length;
 );
 typedef bool (*SorterComparer)(JB_Object* a, JB_Object* b);
 
@@ -21,7 +23,7 @@ void JB_Array_Remove( Array* self, int Pos );
 void JB_Array_Reverse( Array* self );
 JB_String* JB_Array_Render(Array* self, FastString* fs);
 void JB_Array_Shuffle( Array* self );
-void JB_Array_SizeSet( Array* self, int NewSize );
+void JB_Array_SizeSet( Array* self, int64 NewSize );
 void JB_Array_Insert( Array* self, int Pos, JB_Object* Value );
 void JB_Array_Append( Array* self, JB_Object* Value );
 void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count );
