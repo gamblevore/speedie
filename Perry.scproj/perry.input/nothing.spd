@@ -1,15 +1,3 @@
 
 // empty
 
-
-target debugproject
-	|dictionary| types
-	
-	function whatever (|file| f, |bool|)
-		visible
-		return types[f.ext] // won't compile c++
-	
-	function whatever2 (|file| f, |bool|)
-		visible
-		|| tmPf1 = types[f.ext] // won't compile c++
-		return tmPf1
