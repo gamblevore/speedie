@@ -589,7 +589,7 @@ function message.IsStatementExpr (|bool|)
 		return f.asarg$.isstatementexpr
 
 
-function message.RC_HasTemporary (|int|)
+function message.RC_RefDissappears (|int|)
 	if (self == @func) or (.IsStatementExpr)
 		return screfs.RefBasisStruct(self, false)
 
@@ -626,17 +626,19 @@ function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
 						return true
 
 	
-function RC_Temps (|SCFunction| FN, |Message| msg, |int| Basis)
+function RC_HandleDisappearing (|SCFunction| FN, |Message| msg, |int| Basis)
 	|| ch = msg.UseNonRefChangers
-	if Basis & kBasisDestructable or basis & kBasisTempStruct
+	if Basis & kBasisDestructable or kBasisTempStruct
 		if (!msg.IsSetIntoPlace and !ch.parent.IsReturnOrRejoin)
 			scfunction.TempMoveOut(Msg)
 		return 
 	
 	require (Basis == kBasisObj) and (!msg.IsProperty)
-	|| parent = ch.niceparent
+	|| parent = ch.niceparent								// niceparent uses nonrefchangers! :D
 	require  (Parent != @Arg)  and  !(parent.IsReturnOrRejoin and ch.IsOnlyChild)  and  !ch.IsSetIntoPlace
 	
+	// actually for something like "return obj.func|bool|"
+	// it's better we use the first branch... even if the ref is technically disappearing! 
 	if !ch.RefDisappears
 		if (parent == @prm) and (parent.obj == compiler.TernaryFunc)
 			require ch.UseNonRefChangers == parent.first    //    (a,b)(c)-->(c,a,b)
@@ -647,6 +649,7 @@ function RC_Temps (|SCFunction| FN, |Message| msg, |int| Basis)
 		  else
 			scfunction.TempMoveOut(Msg)
 	  else
+		if fn ~= "whatever"
 		// I'm not sure this ever should be done?
 		// definitely not for soemthing we are about to return!!!
 		// actually BOTH sides are wrong! whatever2 will leak! it DOES need freeifdead!
@@ -732,56 +735,51 @@ function SCFunction.AnalyseRefsConstructors
 
 
 
-function SCFunction.AnalyseRefs (|[message]| list)
-	|| root				= .SourceArg
-	|| IsConstructor	= self isa kIsConstructor
-	|| count = 0
-	for (msg.flat in root)
-		|| it = msg.RC_HasTemporary  // need to always do this?
-			if .dorefs or (it != screfs.kbasisobj)
-				count++
-				if (count == 1) and (self ~= "whatever" or "whatever2")
-					.debugprint
-					debugger
-				SCRefs.RC_Temps( self, msg, it )
-				if (count == 2) and (self ~= "whatever" or "whatever2")
-					.debugprint
+function SCRefs.AnalyseRefs (|SCFunction|fn, |[message]| ArgItems)
 	
-		
+	for (msg.flat in fn.SourceArg)
+		|| it = msg.RC_RefDissappears
+			if fn.dorefs or (it != screfs.kbasisobj)
+				.RC_HandleDisappearing( fn, msg, it )
+	
+	|| DoRefs = fn.dorefs
+		for (ar in fn.args)
+			if (!ar.Strength and ar.IsNormalObject)
+				.RC_DeclArg(ar, fn)
+
 	// avoid reading same thing that we alter.
-	for (msg.ScanArg in root)
-		list <~ msg
+	for (msg.ScanArg in fn.SourceArg)
+		ArgItems <~ msg
 	// can we remove this ^^^ at some point?
 	
-	
-	if .dorefs
-		for (ar in .args)
-			if (!ar.Strength and ar.IsNormalObject)
-				SCRefs.RC_DeclArg(ar, self)
-
-	
-	for (msg in list)
+	|| IsConstructor = fn isa kIsConstructor
+	for (msg in ArgItems)
 		|| f = msg.func
 		
 		if (f == @Rel)
 			if (IsConstructor and SettingSelfProperty( msg ))
-				SCRefs.RC_RelConstructor( msg )
-			  elseif (.dorefs or SettingMemory(msg))
-				SCRefs.RC_Rel( msg )
+				.RC_RelConstructor( msg )
+			  elseif (DoRefs or SettingMemory(msg))
+				.RC_Rel( msg )
 			
 		  elseif (f == @Dot)
-			SCRefs.RC_IgnoreReturn( msg, .dorefs )
+			.RC_IgnoreReturn( msg, DoRefs )
 			
 		  elseif (f == @Func)
-			SCRefs.RC_CheckFuncAllocOK( self, msg )
-			SCRefs.RC_IgnoreReturn( msg, .dorefs )  // func(a,b,c)
+			.RC_CheckFuncAllocOK( fn, msg )
+			.RC_IgnoreReturn( msg, DoRefs )  // func(a, b, c)
 			
 		  elseif (msg.IsStatementExpr)
-			SCRefs.RC_IgnoreReturn( msg, .dorefs )
+			.RC_IgnoreReturn( msg, DoRefs )
 			
 		  elseif (f == @Decl)
-			SCRefs.RC_DeclInit( msg, self, false ) // || a = b, incr(b)
-
+			if fn ~= "whatever"
+			.RC_DeclInit( msg, fn, false ) // || a = b, incr(b)
+	
+	
+//	if Test
+//		printline fn
+//		debugger
 
 
 function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)

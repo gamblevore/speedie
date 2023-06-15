@@ -794,12 +794,12 @@ function scfunction.HasFloatReturn (|int|)
 
 function DoRefAnalysis
 	opt norefcounts
-	|[message]| list // avoid reading same thing that we alter.
+	|[message]| list
 	for f in .FuncList
 		if !f.CanDoRefs
 			SCRefs.thisfunc = f
 			list.clear
-			f.AnalyseRefs(list)
+			screfs.AnalyseRefs(f, list)
 	screfs.ThisFunc = nil
 	//.CheckMaxVars
 
