@@ -796,26 +796,26 @@ function DoRefAnalysis
 	opt norefcounts
 	|[message]| list
 	for f in .FuncList
-		if !f.CanDoRefs
-			SCRefs.thisfunc = f
+		if !f.CantDoRefs
+			scfunction.currfunc = f
 			list.clear
 			screfs.AnalyseRefs(f, list)
-	screfs.ThisFunc = nil
+	scfunction.currfunc = nil
 	//.CheckMaxVars
 
 
-function scfunction.CanDoRefs (|bool|)
+function scfunction.CantDoRefs (|bool|)
 	if .IsWrapper or .IsAllocOrNew or .IsMacro
-		screfs.ThisFunc = self
 		return true
+	scfunction.currfunc = self
 
 
 function RefConstructors
 	opt norefcounts
 	for f in .FuncList
-		ifn f.CanDoRefs
+		ifn f.CantDoRefs
 			f.AnalyseRefsconstructors
-	screfs.ThisFunc = nil
+	scfunction.currfunc = nil
 
 
 function SortModules

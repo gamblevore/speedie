@@ -5,7 +5,6 @@
 
 
 module SCRefs {
-|scfunction--|	ThisFunc
 
 linkage
 	cpp_part Refs
@@ -422,7 +421,6 @@ function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| B
 
 	|| IsReturn = Blocker.IsReturnOrRejoin
 	|| Child = Blocker.first.unbratype
-
 	if (!Child)
 		RefDecr( name, blocker, basis )
 		
@@ -431,6 +429,7 @@ function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| B
 		
 	  else
 		if IsReturn and ExprNeedsTemping( Child, name )
+			if scfunction ~= "whatever"
 			ReturnTempMoveOut(Child, blocker)
 		RefDecr( name, blocker, basis )
 
@@ -637,11 +636,12 @@ function RC_HandleDisappearing (|SCFunction| FN, |Message| msg, |int| Basis)
 	|| parent = ch.niceparent								// niceparent uses nonrefchangers! :D
 	require  (Parent != @Arg)  and  !(parent.IsReturnOrRejoin and ch.IsOnlyChild)  and  !ch.IsSetIntoPlace
 	
-	// actually for something like "return obj.func|bool|"
-	// it's better we use the first branch... even if the ref is technically disappearing! 
 	if !ch.RefDisappears
-		if (parent == @prm) and (parent.obj == compiler.TernaryFunc)
-			require ch.UseNonRefChangers == parent.first    //    (a,b)(c)-->(c,a,b)
+		if (parent == @prm)
+			if (parent.obj == compiler.TernaryFunc)
+				require ch.UseNonRefChangers == parent.first    //    (a,b)(c)-->(c,a,b)
+			if (parent.obj == Compiler.RefFreeIfDead)
+				return nil // already done!!!
 		
 		|| pp = ch.parentpoint
 		if RC_NeedsOwnBlock(ch, pp)
@@ -649,7 +649,6 @@ function RC_HandleDisappearing (|SCFunction| FN, |Message| msg, |int| Basis)
 		  else
 			scfunction.TempMoveOut(Msg)
 	  else
-		if fn ~= "whatever"
 		// I'm not sure this ever should be done?
 		// definitely not for soemthing we are about to return!!!
 		// actually BOTH sides are wrong! whatever2 will leak! it DOES need freeifdead!
@@ -657,6 +656,9 @@ function RC_HandleDisappearing (|SCFunction| FN, |Message| msg, |int| Basis)
 		|| fnc = NewFnc( "JB_FreeIfDead" )
 		fnc.last.obj = Compiler.RefFreeIfDead
 		fnc.obj = Compiler.RefFreeIfDead.returntype
+		// setting this to msg.obj makes more sense... HOWEVER... we'll need to tell the system to NOT
+		// do any further refcounting on this! Somehow. Perhaps we can return an obj--?
+		// like freeifdead can or something?
 		msg.ReplaceWith( fnc )
 		fnc.Last <~ msg
 
@@ -736,7 +738,6 @@ function SCFunction.AnalyseRefsConstructors
 
 
 function SCRefs.AnalyseRefs (|SCFunction|fn, |[message]| ArgItems)
-	
 	for (msg.flat in fn.SourceArg)
 		|| it = msg.RC_RefDissappears
 			if fn.dorefs or (it != screfs.kbasisobj)
@@ -773,7 +774,6 @@ function SCRefs.AnalyseRefs (|SCFunction|fn, |[message]| ArgItems)
 			.RC_IgnoreReturn( msg, DoRefs )
 			
 		  elseif (f == @Decl)
-			if fn ~= "whatever"
 			.RC_DeclInit( msg, fn, false ) // || a = b, incr(b)
 	
 	
