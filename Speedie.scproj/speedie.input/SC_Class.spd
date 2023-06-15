@@ -70,7 +70,7 @@ constructor (|Message| node, |SCBase| parent)
 	T.NilDeclared = NilState.exists
 	T.Type = self
 	.TypeNormal = T
-	.TypeOptional = T.MakeOptional
+	.TypeOptional = T.NewOptional
 	T = T.Copy
 	T.Name = "self"
 	T.Strength = kStrSharedParams
@@ -182,7 +182,6 @@ function GetStructDepth
 	for p in .properties
 		|| t = p.type
 		if (t.isstruct) and (p.pointercount == 0) 
-			debugat
 			t.GetStructDepth
 			r = r max t.StructContainerDepth+1
 	.StructContainerDepth = r
@@ -803,7 +802,6 @@ module
 												// makes impossible to extend a static section...
 
 		cls.Modul = SCModule.Neu( Static, cls, ErrPlace )|SCModule|
-
 
 		if (!ForInterface)
 			|| a = 1

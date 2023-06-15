@@ -777,6 +777,9 @@ class SCDecl (SCObject) {
 		if op and (self == .type.typenormal)
 			return op
 			
+		return .NewOptional
+
+	function NewOptional (|scdecl|) 
 		rz = .Copy
 		rz.NilDeclared = nilstate.optional
 
