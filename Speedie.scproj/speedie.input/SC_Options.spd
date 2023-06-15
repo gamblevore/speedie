@@ -355,7 +355,7 @@ module Feedback
 			options.targetdebug = value.optionbool
 		
 		+"target"
-			Explain(Purpose, "")$
+			Explain(Purpose, "Set names used by preprocessor. --target=AnyName")$
 			if value == "debug"
 				error "Use 'targetdebug' instead."
 			targets[value]=true
