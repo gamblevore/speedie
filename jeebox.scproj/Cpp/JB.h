@@ -59,6 +59,8 @@ typedef byte ErrorSeverity;
 
 typedef int FileMode;
 
+typedef bool FileResolveMode;
+
 typedef uint FlowControlStopper;
 
 typedef u16 IPCState;
@@ -783,6 +785,7 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__FileMode_Other (7 << 0)
 #define kJB__FileMode_Owner (7 << 6)
 #define kJB__FileMode_Process (((7 << 6) + 5) << ((3 + 5) << 0))
+#define kJB__FileResolveMode_AllowMissing (true)
 #define kJB__IPCState_closed (4664)
 #define kJB__IPCState_connected (4662)
 #define kJB__IPCState_connecting (4661)
@@ -837,6 +840,7 @@ extern bool JB__File_DebugExecute;
 #define kJB__File_O_TRUNC (1024)
 #define kJB__File_O_WRONLY (1)
 extern byte JB__Err_AutoPrint;
+extern Array* JB__Err_CurrSource;
 extern bool JB__Err_KeepStackTrace;
 
 //// HEADER JB.h
@@ -1382,6 +1386,9 @@ int JB_ErrorSeverity__InitCode_();
 
 
 // FileMode
+
+
+// FileResolveMode
 
 
 // FlowControlStopper
@@ -2240,6 +2247,8 @@ SyntaxObj* JB_Fn__New(fpMsgRender msg, JB_String* name, int ID);
 
 
 // JB_Array
+JB_Object* JB_Array_Last(Array* self);
+
 void JB_Array_LoadProperties(Array* self, ObjectLoader* Loader);
 
 void JB_Array_SaveCollect(Array* self, ObjectSaver* Saver);
@@ -2648,6 +2657,8 @@ void JB_Err_GrabLine(JB_Error* self, FastString* fs, bool Usecolor);
 
 bool JB_Err_HasPosition(JB_Error* self);
 
+bool JB_Err_IsBad(JB_Error* self);
+
 bool JB_Err_IsError(JB_Error* self);
 
 bool JB_Err_IsWarning(JB_Error* self);
@@ -2655,8 +2666,6 @@ bool JB_Err_IsWarning(JB_Error* self);
 bool JB_Err_LineIdentifiers(JB_Error* self, FastString* fs, JB_String* path);
 
 int JB_Err_LinePos(JB_Error* self, JB_String* data);
-
-bool JB_Err_NeedsPrint(JB_Error* self);
 
 JB_String* JB_Err_render(JB_Error* self, FastString* fs_in);
 
@@ -2667,6 +2676,8 @@ bool JB_Err_SyntaxIs(JB_Error* self, ErrorFlags F);
 void JB_Err_SyntaxIsSet(JB_Error* self, ErrorFlags F, bool Value);
 
 bool JB_Err_SyntaxIsnt(JB_Error* self, ErrorFlags F);
+
+void JB_Err_UpgradeWithNode(JB_Error* self);
 
 JB_Error* JB_Err__Alloc();
 

@@ -71,8 +71,12 @@ JB_String* JB_App__StackTrace(JB_String* StartAfter, FastString* fs_in) {
 	Array* r = JB_Incr(JB_App__StackTraceArray(StartAfter));
 	{
 		int _if0 = 0;
-		while (_if0 < JB_Array_Size(r)) {
+		while (true) {
 			JB_String* s = JB_Incr(((JB_String*)JB_Array_Value(r, _if0)));
+			if (s == nil) {
+				JB_Decr(s);
+				break;
+			}
 			JB_FS_AppendString(fs, s);
 			JB_Decr(s);
 			JB_FS_AppendByte(fs, '\n');
@@ -2509,8 +2513,12 @@ void JB_Tk__TokensFn(Array* arr, int bits, ParseHandler func) {
 void JB_Tk__TokensHan(Array* arr, TokHan* H) {
 	{
 		int _if0 = 0;
-		while (_if0 < JB_Array_Size(arr)) {
+		while (true) {
 			JB_String* s = JB_Incr(((JB_String*)JB_Array_Value(arr, _if0)));
+			if (s == nil) {
+				JB_Decr(s);
+				break;
+			}
 			(JB_Tk__TokenSet(s, H));
 			JB_Decr(s);
 			_if0++;
@@ -2927,6 +2935,7 @@ int JB_ErrorSeverity__Init_() {
 int JB_ErrorSeverity__InitCode_() {
 	return 0;
 }
+
 
 
 
@@ -3720,7 +3729,6 @@ JB_Error* JB_Rec_FirstError(JB_ErrorReceiver* self) {
 void JB_Rec_incr(JB_ErrorReceiver* self, JB_Error* err, bool add) {
 	int n = JB_Ternary(add, 1, -1);
 	if (err->Severity == kJB__ErrorSeverity_Problem) {
-		debugger;
 		self->ProblemCount = (self->ProblemCount + n);
 	}
 	 else if (JB_Err_IsError(err)) {
@@ -3774,13 +3782,11 @@ bool JB_Rec_OK(JB_ErrorReceiver* self) {
 }
 
 JB_Error* JB_Rec_Pop(JB_ErrorReceiver* self) {
-	JB_Error* err = JB_Incr(((JB_Error*)JB_Tree_Pop(self->Errors)));
+	JB_Error* err = ((JB_Error*)JB_Tree_Pop(self->Errors));
 	if (err) {
 		JB_Rec_incr(self, err, false);
-		JB_SafeDecr(err);
 		return err;
 	}
-	JB_Decr(err);
 	return nil;
 }
 
@@ -3851,7 +3857,7 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self) {
 }
 
 void JB_Rec_SyntaxAppend(JB_ErrorReceiver* self, JB_Error* Err) {
-	bool CanPrint = (!self->ErrorCount) and ((bool)JB__Err_AutoPrint);
+	bool Canprint = false;
 	JB_Rec_incr(self, Err, true);
 	if ((!JB_Rec_CanAddMore(self, Err->Severity))) {
 		return;
@@ -3873,12 +3879,12 @@ void JB_Rec_SyntaxAppend(JB_ErrorReceiver* self, JB_Error* Err) {
 		}
 	}
 	;
-	if (CanPrint and JB_Err_NeedsPrint(Err)) {
+	if (Canprint and JB_Err_IsBad(Err)) {
 		JB_String* _tmPf1 = JB_Incr(JB_Err_render(Err, nil));
 		JB_PrintLine(_tmPf1);
 		JB_Decr(_tmPf1);
 	}
-	if (((bool)JB__Err_AutoPrint) and (Err->Severity >= kJB__ErrorSeverity_Error)) {
+	if (((bool)JB__Err_AutoPrint) and (Err->Severity >= kJB__ErrorSeverity_Problem)) {
 		JB_DoAt(1);
 	}
 	if (JB__Err_AutoPrint != kJB__ErrorFlags_PrintAndRemove) {
@@ -4329,16 +4335,20 @@ MWrap* JB_Mrap__Object(int ItemCount, int ItemSize) {
 void jbl(JB_Object* self) {
 	//visible;
 	{
-		Array* _LoopSrcf1 = JB_Incr(JB_Mrap__CollectLeaks_(self));
+		Array* _LoopSrcf2 = JB_Incr(JB_Mrap__CollectLeaks_(self));
 		int _if0 = 0;
-		while (_if0 < JB_Array_Size(_LoopSrcf1)) {
-			JB_Object* bad = JB_Incr(JB_Array_Value(_LoopSrcf1, _if0));
+		while (true) {
+			JB_Object* bad = JB_Incr(JB_Array_Value(_LoopSrcf2, _if0));
+			if (bad == nil) {
+				JB_Decr(bad);
+				break;
+			}
 			jdb(bad);
 			JB_Decr(bad);
 			debugger;
 			_if0++;
 		};
-		JB_Decr(_LoopSrcf1);
+		JB_Decr(_LoopSrcf2);
 	};
 }
 
@@ -5486,6 +5496,10 @@ SyntaxObj* JB_Fn__New(fpMsgRender msg, JB_String* name, int ID) {
 
 
 
+JB_Object* JB_Array_Last(Array* self) {
+	return JB_Array_Value(self, JB_Array_Size(self) - 1);
+}
+
 void JB_Array_LoadProperties(Array* self, ObjectLoader* Loader) {
 	while (JB_LD_HasItem(Loader)) {
 		JB_Array_SyntaxAppend(self, JB_LD_Object(Loader));
@@ -5495,8 +5509,11 @@ void JB_Array_LoadProperties(Array* self, ObjectLoader* Loader) {
 void JB_Array_SaveCollect(Array* self, ObjectSaver* Saver) {
 	{
 		int _if0 = 0;
-		while (_if0 < JB_Array_Size(self)) {
+		while (true) {
 			JB_Object* v = JB_Array_Value(self, _if0);
+			if (v == nil) {
+				break;
+			}
 			JB_Object_SaveTryCollect(v, Saver);
 			_if0++;
 		};
@@ -5508,8 +5525,11 @@ void JB_Array_SaveWrite(Array* self, ObjectSaver* Saver) {
 	{
 		int _if0 = 0;
 		int _firstf2 = _if0;
-		while (_if0 < JB_Array_Size(self)) {
+		while (true) {
 			JB_Object* v = JB_Array_Value(self, _if0);
+			if (v == nil) {
+				break;
+			}
 			if (_firstf2 != _if0) {
 				JB_FS_AppendString(D, JB_LUB[323]);
 			}
@@ -7544,21 +7564,18 @@ void JB_sci_destructor(SaverClassInfo* self) {
 void JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path) {
 	JB_Msg_ConstructorNormal(self, ((Syntax)1), JB_LUB[0]);
 	JB_String* _tmPf0 = JB_LUB[0];
-	self->StackTrace = JB_Incr(_tmPf0);
+	self->OriginalData = JB_Incr(_tmPf0);
+	JB_String* _tmPf1 = JB_LUB[0];
+	self->StackTrace = JB_Incr(_tmPf1);
 	self->ErrorFlags = 0;
 	self->Position = -1;
-	if (node) {
-		self->Position = node->Position;
-	}
 	self->Node = JB_Incr(node);
 	self->Severity = level;
 	self->Name = JB_Incr(desc);
-	JB_String* _tmPf1 = ((JB_String*)JB_Ternary(JB_Str_Exists(path), path, JB_Msg_FilePath(node)));
-	self->Path = JB_Incr(_tmPf1);
-	JB_String* _tmPf2 = JB_Msg_OriginalParseData(node);
-	self->OriginalData = JB_Incr(_tmPf2);
+	self->Path = JB_Incr(path);
 	self->When = JB_Date__New0();
 	self->Func = JB_SyxSStr;
+	JB_Err_UpgradeWithNode(self);
 }
 
 void JB_Err_ConstructorNothing(JB_Error* self) {
@@ -7629,6 +7646,10 @@ bool JB_Err_HasPosition(JB_Error* self) {
 	return self->Position >= 0;
 }
 
+bool JB_Err_IsBad(JB_Error* self) {
+	return (self->Severity >= kJB__ErrorSeverity_Problem);
+}
+
 bool JB_Err_IsError(JB_Error* self) {
 	return (self->Severity >= kJB__ErrorSeverity_Error);
 }
@@ -7666,10 +7687,6 @@ int JB_Err_LinePos(JB_Error* self, JB_String* data) {
 		return _tmPf1;
 	}
 	return 0;
-}
-
-bool JB_Err_NeedsPrint(JB_Error* self) {
-	return (self->Severity >= kJB__ErrorSeverity_Problem);
 }
 
 JB_String* JB_Err_render(JB_Error* self, FastString* fs_in) {
@@ -7753,6 +7770,28 @@ bool JB_Err_SyntaxIsnt(JB_Error* self, ErrorFlags F) {
 	return (!JB_Err_SyntaxIs(self, F));
 }
 
+void JB_Err_UpgradeWithNode(JB_Error* self) {
+	Message* node = ((Message*)JB_Array_Last(JB__Err_CurrSource));
+	if (node) {
+		JB_SetRef(self->Node, node);
+		if (((JB_Msg_EqualsSyx(node, JB_SyxTmp, false))) and (JB_Str_ByteValue(node->Name, 0) == '/')) {
+			JB_SetRef(self->Path, node->Name);
+		}
+	}
+	 else {
+		node = self->Node;
+		if ((!node)) {
+			return;
+		}
+	}
+	self->Position = node->Position;
+	JB_String* p = JB_Msg_FilePath(node);
+	if (JB_Str_Exists(p)) {
+		JB_SetRef(self->Path, p);
+	}
+	JB_SetRef(self->OriginalData, JB_Msg_OriginalParseData(node));
+}
+
 JB_Error* JB_Err__Alloc() {
 	return ((JB_Error*)JB_New(JB_Error));
 }
@@ -7777,6 +7816,7 @@ void JB_Err__CantParseNum(Message* Where, JB_String* num, int Pos) {
 
 int JB_Err__Init_() {
 	{
+		JB_SetRef(JB__Err_CurrSource, JB_Array__New0());
 		JB__Err_AutoPrint = 0;
 		JB__Err_KeepStackTrace = false;
 	}
@@ -8143,7 +8183,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023060722);
+	return (2023061611);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
@@ -8155,4 +8195,4 @@ __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -4845594019514234813 513147344433498222 -5103624113141814177
+// -4845594019514234813 -917206915014559109 -1025303197606903165

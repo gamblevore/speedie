@@ -253,6 +253,7 @@ SaverClassInfo_Behaviour SaverClassInfo_FuncTable_ = InitTableSaverClassInfo_();
 JBClassPlace4(SaverClassInfo, JB_AsClass(Array), SaverClassInfo_FuncTable_);
 
 byte JB__Err_AutoPrint;
+Array* JB__Err_CurrSource;
 bool JB__Err_KeepStackTrace;
 Error_Behaviour InitTableJB_Error_() { // Behaviour 
 	Error_Behaviour Result;
