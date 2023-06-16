@@ -1061,8 +1061,15 @@ function RegType (|datatypecode|)
 	if self
 		return .returntype.regtype
 
+
 function RefSmooth (|SCDecl| N)
+	opt norefcounts
 	N.Strength = 0
+	if n is typeimprove
+		|| orig = n.islookuponly
+		if orig isa scdecl
+			orig.strength = 0
+		
 
 
 function TreeSanity

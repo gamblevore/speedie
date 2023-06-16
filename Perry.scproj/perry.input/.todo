@@ -6,10 +6,10 @@
 * nil-checking seems a very good idea. shouldn't be too hard to do either!!
 	* Mostly the issues will be around module variables...
 * RefOpts?
-* bigger lineheight for findfield?
-* perry isn't opening files that were opened... anymore, at least not in front of the todo file
-* batch-find could be a bit slicker... when selecting the group item or just doing the search itself. like clicking on a file should jump to the first item? and jumping to a project the same...
 
+
+* perry isn't opening files that were opened... anymore, at least not in front of the todo file
+* slicker batch-find... when selecting the group item or just doing the search itself. clicking on a file should jump to the first item? and jumping to a project the same...
 
 
 

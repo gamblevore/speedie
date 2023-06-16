@@ -2,20 +2,16 @@
 
 						bugs
 
-* "a ~ B"  vs  "a~b". first one parses wrong
-* could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
-* x = (0, 0|byte|) // fails!
 
+* could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
 * function finding fails with dictionary subclasses? DictSub["abc"]
 * || x = .SomeCArray // should just get the address... :)
 * Errors in subprojects kinda suck with error-reporting
 	* errors with jbin also suck
 * months.scproj demo needs better compiler support, including .render not being needed.
 * collectdecls uppercase one letter at least... within funcs, unless 1 byte long
-* return func(str.parse.first) // str.parse disappers too fast. refcounter not strong enough
 * vector constants
 * || s = "".Address.IsLower // won't compile...
-* import "speedie.scproj/speedie.input/SC_Main.spd" // does nothing
 * function RefCountBug (|object| p, |int|)
 	if p isa string: p = "abc"
 * perryide_Behaviour 
@@ -30,8 +26,6 @@
 	thg "ok"
 	prm
 		thg "yep" }    -->    ok.hi(yep)
-* oar --> \ 
-	* a = b or c  -->  a = b\c
 * |string| s = __now__.render fails
 * render float.fn {code} // won't compile
 * disallow append file into |[message]|! (Array of msg)

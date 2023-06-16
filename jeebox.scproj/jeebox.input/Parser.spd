@@ -3,7 +3,7 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-http://jeebox.org // lol.
+http://jeebox.org
 
 
 ignore
@@ -52,7 +52,6 @@ extend Parser
 //		.Token( "/" )  = .Handler( kThingSyx, fPath )
 						// fpath clashes with /=
 //		.Token( `^"` ) = .Handler( kThingSyx, fArgName )
-
 		.Token( `+` )  = .Handler( kTemporalSyx, fTmpPlus )
 		.Token( "@" )  = .Handler( kThingSyx, fAtName ).Link( kFuncAfterNormal, fAtNamedExp )
 		.Token( "~" )  = .Handler( kFuncAfterNormal, fAdjectiveThing ).Link( kAdjectiveOp, fAdjectiveOp )
