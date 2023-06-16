@@ -7,6 +7,7 @@
 	* Mostly the issues will be around module variables...
 * RefOpts?
 * bigger lineheight for findfield?
+* if speedie takes over 1 second.... dont install. It could be a bug that takes like 30 seconds for a compile and generates huge compiles
 
 
 
