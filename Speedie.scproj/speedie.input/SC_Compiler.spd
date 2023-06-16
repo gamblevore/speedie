@@ -291,6 +291,9 @@ function InitBasicFuncs (|bool|)
 	.RefClear		= .LoadRefFunc( "JB_Clear" )
 	.RefDecrMulti	= .LoadRefFunc( "JB_DecrMulti" )
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
+	//.reffreeifdead.returntype = .reffreeifdead.returntype.makeborrowed
+	//debugger
+	//printline .reffreeifdead.returntype.render 
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
 	.PrivateProperty = .CreateFuncFromSource("function Private () {disabled `This property is private.`}")

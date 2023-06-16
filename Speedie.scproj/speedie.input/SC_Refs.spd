@@ -640,8 +640,8 @@ function RC_HandleDisappearing (|SCFunction| FN, |Message| msg, |int| Basis)
 		if (parent == @prm)
 			if (parent.obj == compiler.TernaryFunc)
 				require ch.UseNonRefChangers == parent.first    //    (a,b)(c)-->(c,a,b)
-			if (parent.obj == Compiler.RefFreeIfDead)
-				return nil // already done!!!
+			//if (parent.obj == Compiler.RefFreeIfDead)
+				//return nil // already done!!!
 		
 		|| pp = ch.parentpoint
 		if RC_NeedsOwnBlock(ch, pp)
