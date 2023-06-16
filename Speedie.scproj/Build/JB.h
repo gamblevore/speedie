@@ -1431,7 +1431,6 @@ extern int SC__SC_UniqueNum;
 #define kSC__Refs_NotDisturbed (0)
 #define kSC__Refs_sufferednoise (16)
 #define kSC__Refs_LargestFlag (255)
-extern SCFunction* SC__Refs_ThisFunc;
 extern Message* SC__SCStrings_RenderFinish;
 extern Message* SC__SCStrings_RenderInsides;
 extern Message* SC__SCStrings_RenderNewParams;
@@ -1489,9 +1488,9 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[339])
-#define kSC_BitNot (JB_LUB[601])
-#define kSC_BitOr (JB_LUB[542])
+#define kSC_BitAnd (JB_LUB[341])
+#define kSC_BitNot (JB_LUB[603])
+#define kSC_BitOr (JB_LUB[544])
 #define kSC_BitXor (JB_LUB[1867])
 #define kSC_CastedMatch (6)
 #define kSC_DestructorNotFromLocalRefs (512)
@@ -2671,10 +2670,6 @@ bool SC_Refs__ExitHitsOrGoesPast(Message* msg, Message* arg);
 
 bool SC_Refs__ExprNeedsTemping(Message* child, Message* name);
 
-int SC_Refs__Init_();
-
-int SC_Refs__InitCode_();
-
 Message* SC_Refs__LastUsedRefPlace(Message* name, Message* arg);
 
 void SC_Refs__RC_CheckFuncAllocOK(SCFunction* self, Message* dot);
@@ -2683,6 +2678,8 @@ void SC_Refs__RC_DeclArg(SCDecl* AR, SCFunction* fn);
 
 void SC_Refs__RC_DeclInit(Message* dcl, SCFunction* fn, bool IsJustAnArg);
 
+void SC_Refs__RC_HandleDisappearing(SCFunction* fn, Message* msg, int Basis);
+
 void SC_Refs__RC_IgnoreReturn(Message* msg, bool DoRefs);
 
 bool SC_Refs__RC_NeedsOwnBlock(Message* msg, Message* pp);
@@ -2690,8 +2687,6 @@ bool SC_Refs__RC_NeedsOwnBlock(Message* msg, Message* pp);
 void SC_Refs__RC_Rel(Message* rel);
 
 void SC_Refs__RC_RelConstructor(Message* rel);
-
-void SC_Refs__RC_Temps(SCFunction* FN, Message* msg, int Basis);
 
 int SC_Refs__RefBasis(Message* msg, bool SetOnly);
 
@@ -2837,7 +2832,7 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 
 bool SC_Ext__ExecuteGCC(Array* Commands);
 
-void SC_Ext__Export();
+void SC_Ext__ExportAndInstall(bool CanInstall);
 
 Array* SC_Ext__FilterCppsIfAlreadyDone(Array* Cpps, JB_File* Objects, int* stdafx);
 
@@ -4452,8 +4447,6 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
-void SC_IR_Print(IR* self);
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5135,8 +5128,6 @@ inline bool JB_DictionaryReader_SyntaxCast(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
-
-int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -8271,7 +8262,7 @@ void SC_Func__Tran_Swap(SCFunction* fn, Message* node, SCBase* name_space);
 
 Message* SC_Func__Tran_Syx(Message* msg);
 
-void SC_Func__Tran_Temporal(SCFunction* FN, Message* s, SCBase* name_space);
+void SC_Func__Tran_Temporal(SCFunction* fn, Message* s, SCBase* name_space);
 
 void SC_Func__Tran_Using(SCFunction* fn, Message* node, SCBase* name_space);
 
@@ -8507,7 +8498,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
