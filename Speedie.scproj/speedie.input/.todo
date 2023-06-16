@@ -2,7 +2,7 @@
 
 						bugs
 
-
+* any object can be created with an virtual-function override table, just store before the refcount?
 * could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
 * function finding fails with dictionary subclasses? DictSub["abc"]
 * || x = .SomeCArray // should just get the address... :)
@@ -12,8 +12,6 @@
 * collectdecls uppercase one letter at least... within funcs, unless 1 byte long
 * vector constants
 * || s = "".Address.IsLower // won't compile...
-* function RefCountBug (|object| p, |int|)
-	if p isa string: p = "abc"
 * perryide_Behaviour 
 	* Make not available from speedie, c-export only.
 	* Perhaps a unicode start letter. or don't add to lookup table

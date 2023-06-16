@@ -5,14 +5,19 @@
 * VM?
 * nil-checking seems a very good idea. shouldn't be too hard to do either!!
 	* Mostly the issues will be around module variables...
-* RefOpts?
 
 
 
 // Do later
 * galaxxies C++ compile issues
 * not-compilable functions blocks lookups, on a .dot function call.
-* any object can be created with an virtual-function override table, just store before the refcount?
+* RefOpts. Do it bit by bit
+	* get property but only did math
+	* mark a few string funcs as not-modifier/disowner/capturer
+	* mark entire class
+	* fast capture of disowned things. like: r1 <~ r2.pop
+	* check entire program for modification during nil-sweep
+		* Start with leaf-funcs.
 * clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * TextView error/find resync
