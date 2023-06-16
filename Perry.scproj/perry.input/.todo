@@ -7,7 +7,8 @@
 	* Mostly the issues will be around module variables...
 * RefOpts?
 * bigger lineheight for findfield?
-* if speedie takes over 1 second.... dont install. It could be a bug that takes like 30 seconds for a compile and generates huge compiles
+* perry isn't opening files that were opened... anymore, at least not in front of the todo file
+* batch-find could be a bit slicker... when selecting the group item or just doing the search itself. like clicking on a file should jump to the first item? and jumping to a project the same...
 
 
 

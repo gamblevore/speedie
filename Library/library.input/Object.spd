@@ -144,7 +144,7 @@ function DebugAt (|int| i=1)
 
 cpp_nothing JB_SetRef				(|Object| A,			|Object| B)
 cpp_nothing JB_Incr					(|Object| Obj)
-cpp_nothing JB_FreeIfDead			(|Object| Obj,			|int|)
+cpp_nothing JB_FreeIfDead			(|Object| Obj,			|_voidptr|)
 cpp_nothing JB_SafeDecr 			(|Object| Obj,			|Object|)
 cpp_nothing JB_Decr					(|Object| Obj)
 cpp_nothing JB_Clear				(|Object| Obj)

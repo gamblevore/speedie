@@ -297,14 +297,14 @@ function IsCompilerAndNeedsInstall (|bool|)
 	flowcontrol.disabled--
 
 
-function Export 
+function ExportAndInstall (|bool| CanInstall)
 	require .ShouldTransComp
 	if options.products
 		if options.pack
 			TreeAssembler.BuildPack
 		if options.native
 			.RunCppCompile~quietly
-			if .IsCompilerAndNeedsInstall
+			if CanInstall and .IsCompilerAndNeedsInstall
 				.InstallCompiler
 	.ClearThis~quietly
 	if stderr.ok

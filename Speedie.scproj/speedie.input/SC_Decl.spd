@@ -631,6 +631,8 @@ class SCDecl (SCObject) {
 				»
 			»
 		
+		if self is borrowed
+			rz = «arel "--", rz »
 		if .NilDeclared is unknown
 			rz = «arel "?", rz »
 	

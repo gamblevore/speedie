@@ -1,8 +1,0 @@
-
-
-target debugproject
-	|dictionary| types
-	
-	function whatever (|file| f, |bool|)
-		visible
-		return types[f.ext] // won't compile c++
