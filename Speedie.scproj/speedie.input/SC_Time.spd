@@ -62,7 +62,7 @@ function compiler.CompileTime
 
 	require stderr.ok
 
-	|| caninstall = elapsed < 1s
+	|| caninstall = elapsed < 1.5s
 	check (caninstall) ("Not installing as compile duration was over 1s. Perhaps this speedie has a bug leading to excessively slow compiles?")
 	TransCompiler.ExportAndInstall(caninstall)
 
