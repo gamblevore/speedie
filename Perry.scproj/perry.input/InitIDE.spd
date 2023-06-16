@@ -187,7 +187,7 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
-			.RowHeight += 4
+			.RowHeight += 3
 //			.RowAscendHeight += 2
 			.IsTree	= true
 			.NoSeps	= true
@@ -485,7 +485,7 @@ extend PerryIDE
 		.viewasproject
 		.ForceRecheck
 		app.saveprefs // for pref-file editing
-		.Show(false)
+		.showide
 		.ViewAsbetter
 		.LoadStartupErrors
 		return true

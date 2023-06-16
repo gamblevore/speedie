@@ -97,7 +97,7 @@ module Perry
 		
 		|| old = app.Pref("currproj")
 		|| oof = (.FindProj(old),  .Projects.First)(old)
-			oof.ide.show(false)
+			oof.ide.showide
 
 
 	function OpenProj (|[PerryIDE]|)

@@ -68,7 +68,7 @@ function perry.HideStartifneeded
 	
 function ClickedTabs (GUIAction)
 	if row
-		row.ide.show
+		row.ide.showide(True)
 
 
 function ClickedCompileTabs (Guiaction)
@@ -468,7 +468,7 @@ function perry.FindElseWhere (|perryide| ignore, |string| find, |byte| FindID)
 	for w in perry.OpenProj
 		if (w != ignore) and w.BatchPhind(find, FindID)
 			if "$find not found here, but was found in '${w.name}'.\n\nTake a look?".confirm
-				w.show
+				w.showide
 				w.ShowFind
 			return
 

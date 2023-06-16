@@ -2104,7 +2104,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _using183 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[147], (-7943508711826176223)));
+			FlowControlStopper _using183 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[147], (7059298787976230550)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_using183);
 		}
@@ -16930,6 +16930,14 @@ bool SC_IR_OperatorIsa(IR* self, int m) {
 	return m == self->Op;
 }
 
+void SC_IR_Print(IR* self) {
+	if (SC__ASM_NoisyASM >= 3) {
+		JB_String* _tmPf0 = JB_Incr(SC_IR_Render(self, nil));
+		JB_PrintLine(_tmPf0);
+		JB_Decr(_tmPf0);
+	}
+}
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in) {
 	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
 	SC_IR_fs(self, fs);
@@ -19974,6 +19982,10 @@ bool JB_Rec_Anything(JB_ErrorReceiver* self) {
 	return (((bool)self) and ((bool)self->ErrorCount)) or (((bool)self->ProblemCount) or ((bool)self->WarnCount));
 }
 
+int JB_Rec_BadCount(JB_ErrorReceiver* self) {
+	return self->ErrorCount + self->ProblemCount;
+}
+
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level) {
 	if ((!((!self->BlockErrors) and (!JB_OutOfMemoryOccurred())))) {
 		return nil;
@@ -20185,7 +20197,7 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self) {
 }
 
 void JB_Rec_SyntaxAppend(JB_ErrorReceiver* self, JB_Error* Err) {
-	bool Canprint = false;
+	bool CanPrint = (!JB_Rec_BadCount(self)) and ((bool)JB__Err_AutoPrint);
 	JB_Rec_incr(self, Err, true);
 	if ((!JB_Rec_CanAddMore(self, Err->Severity))) {
 		return;
@@ -20207,7 +20219,7 @@ void JB_Rec_SyntaxAppend(JB_ErrorReceiver* self, JB_Error* Err) {
 		}
 	}
 	;
-	if (Canprint and JB_Err_IsBad(Err)) {
+	if (CanPrint and JB_Err_IsBad(Err)) {
 		JB_String* _tmPf1 = JB_Incr(JB_Err_render(Err, nil));
 		JB_PrintLine(_tmPf1);
 		JB_Decr(_tmPf1);
@@ -21659,7 +21671,15 @@ void JB_Proc_SendSub(Process* self, Message* msg) {
 	}
 	JB_FreeIfDead(JB_Msg_render_jbin(msg, false, JB_LUB[0], self->Writer));
 	JB_Decr(msg);
+	JB_String* _tmPf0 = JB_Incr(JB_Str_CopyFromPtr(JB_IPCM_Data(self->Ours), self->Writer->Length));
+	Message* reparse = JB_Incr(JB_Str_parse_jbin(_tmPf0));
+	JB_Decr(_tmPf0);
+	if ((!reparse)) {
+		debugger;
+	}
+	;
 	JB_Proc_WriteSub(self);
+	JB_Decr(reparse);
 }
 
 void JB_Proc_SetupAdjust(Process* self, int n) {
@@ -46001,4 +46021,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -5618505449567361655 -8598153564346843876
+// 6892550970451239283 -8598153564346843876

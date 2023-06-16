@@ -146,7 +146,7 @@ class PerryIDE (Window)
 			.RemoveProjFromList
 		|| p = .prev
 		if p isa perryide
-			p.Show(false)
+			p.showide
 			
 
 	function LocateProjRoot (|string| path, |filerow|)
@@ -256,11 +256,14 @@ class PerryIDE (Window)
 			return m.name.name
 
 
-	function Show (|bool| bump=true)
+	function Show (|bool| FromClick=false)
+		disabled "use .ShowIDE"
+		
+	function ShowIDE (|bool| FromClick=false)
 		debug_require self // what?
 		|| p = .Project
 			app.pref("currproj") = p.path
-		if bump
+		if FromClick
 			if .islast
 				.ClickedTodo
 			  else
@@ -518,7 +521,7 @@ class PerryIDE (Window)
 		  else
 			.filelist.addextra(p)						// add root
 		startupwindow.hide
-		.show
+		.showide
 
 
 	module

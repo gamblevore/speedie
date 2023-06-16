@@ -4447,6 +4447,8 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
+void SC_IR_Print(IR* self);
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5128,6 +5130,8 @@ inline bool JB_DictionaryReader_SyntaxCast(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
+
+int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -8498,6 +8502,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
