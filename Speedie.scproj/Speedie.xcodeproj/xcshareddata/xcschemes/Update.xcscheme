@@ -54,11 +54,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--self"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--log"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--check"
@@ -78,10 +78,18 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Perry.scproj"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--target=debugproject"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Utils/speedrogue.scproj"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/theodore/Code/Galaxxies.scproj"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -90,7 +98,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--perry"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
