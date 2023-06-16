@@ -3,10 +3,21 @@
 							Todo
 
 * VM?
-* nil-checking seems a very good idea. shouldn't be too hard to do either!!
-	* Mostly the issues will be around module variables...
+* nil-checking
+	* What is remaining?
+		* Let certain funcs be nil-testers... (Cast to bools)
+		* specify ?? and ? behaviour to be like objc.
+			* i seemed to have often trouble with "init". like on empty arrays?
+			* "init" isnt much use without optionals anyhow.
+	* What is next?
+		* test for optional use in a nil-sweep. They are "problems".
+			* nil-sweep uses a "time" feature. So each instruction or statement increases the time. branches and loops/vfuncs act differently. We always use the earliest time.
+		* Just put the nil-sweep before refcounting.
+	* What do we have?
+		* we created "optional" decls, and can mark or render optionals
 
-
+* jz doesnt work anymore?
+* show project fails
 
 // Do later
 * galaxxies C++ compile issues
