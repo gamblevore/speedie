@@ -1036,34 +1036,39 @@ extern "C" bool JB_Plat__HasFlow() {
 			fs.IndentLine
 	
 	
-	function C_RenderDot (fpMsgRenderCpp)
-		|| Backup = .Last.obj
-		require !(Backup isa SCFunction) // function call
-
-		|| ch = .first
+	function message.DotMustBeProperty (|scdecl|)
+		opt norefcounts
 		|| obj = .obj
-
 		if (obj.mustbe(SCDecl))
-			if !obj.name
-				// could be a type-override... either way we need that name!
-				expect ((Backup isa SCDecl) and Backup|scdecl|.name) (self, "Missing property name")
-				Obj = Backup|scdecl|
+			if obj.name
+				return obj
+			|| Backup = .Last.obj
+			debug_require !(Backup isa SCFunction) // function call
+			// could be a type-override... either way we need that name!
+			expect ((Backup isa SCDecl) and Backup|scdecl|.name) (self, "Missing property name")
+			return Backup|scdecl|
 
-			if (ch.obj isa SCModule)
-				obj.Name.safe(fs)
 
+	function C_RenderDot (fpMsgRenderCpp)
+		opt norefcounts
+		|| obj = .DotMustBeProperty						#require
+	
+		|| ch = .first
+		if (ch.obj isa SCModule)
+			obj.Name.safe(fs)
+
+		  else
+			|| CloseStr = cpp_export.CDotType( self, obj, fs )
+	
+			ch.Export( fs )
+			|| ch_decl = DeclOfObjForC( ch )
+			if (ch_decl) and NeedsDotForC( ch_decl )
+				fs <~ '.'
 			  else
-				|| CloseStr = cpp_export.CDotType( self, obj, fs )
-		
-				ch.Export( fs )
-				|| ch_decl = DeclOfObjForC( ch )
-				if (ch_decl) and NeedsDotForC( ch_decl )
-					fs <~ '.'
-				  else
-					fs <~ "->"
+				fs <~ "->"
 
-				obj.name.safe(fs)
-				fs <~ CloseStr
+			obj.name.safe(fs)
+			fs <~ CloseStr
 	
 
 	function C_RenderFnc (fpMsgRenderCpp)

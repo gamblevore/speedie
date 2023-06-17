@@ -102,12 +102,21 @@ module NilChecker
 
 function message.NilCheckProperty
 	pragma inline
+	|| decl = .DotMustBeProperty
+	if !decl
+		"prop fail: $decl.name"
+		return
+	
+
 
 function message.NilCheckAccess
 	pragma inline
+//	"Mem: $self"
+
 
 function message.NilCheckFP
 	pragma inline
+
 
 function message.NilCheckCond
 	pragma inline
@@ -122,6 +131,16 @@ function Message.NilCheckFlat
 			s.NilCheckArg
 		  else
 			s.NilCheckMemory
+			// so what do we have to test?
+			// if (a)
+				// || x = *a
+					// if x
+			// *a = y
+
+
+// I think we made this over complex? just need to go through it????
+// its probably quite simple? y = *a and *a = y... all depend on if a is not nil?
+
 
 
 function Message.NilCheckMemory

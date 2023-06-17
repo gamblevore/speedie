@@ -153,9 +153,6 @@ function ConstantExpand (|Message| ch)
 
 
 
-|| naawgr = {0:12312398, 0:12312398, 0:12312398}
-
-
 function message.ConstIntValueSub (|scbase| name_space, |&int64| v, |bool|)
 	opt norefcounts
 	|| s = self
