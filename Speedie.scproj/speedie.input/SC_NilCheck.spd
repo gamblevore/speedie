@@ -3,66 +3,56 @@
 	
 	Todo:
 		* Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
-					
-		* Transform:	This modifies the nilness of params and vars... depending on if they are tested or not
-						if/while/ternary/??/?/and/or/expandtobool?
-						wrapper-funcs (i guess just declare them as testers)
+						
+						
+						
+		* NilCheck:
+			Create problems / errors if not used properly
+		
+		* Init Vars Sweep: 
+			We need to go through the entire program, and give each item found, a "timecode". That
+			is... it has an "earliest time" that it COULD occur.
+			So for branches, thats easy, both sides get the same time. We can do some simple logic like:
+			
+			function abc
+				if !inited
+					inited = true
+					var1 = .CreateVar
+					var2 = .CreateVar
+				var1.explode
+				var2.die
+			
+			If its only set in one place... that can help.
+			
+			So var1.explode actually has a "higher time" than var1 = .createvar. So its OK.
+			
+			Like this... we can make it work!
+			
+			POSSIBLY we could allow reordering.
+			
+			while looops are easier, unless they might not fire at all.
+			
+			function pointers... are a bit trickier?
+			
+			if (random[])
+				a lot of code
+				(.func)()
+			  else
+				small code
+				(.func)()
 
-						if msg
-							// msg is now optional
-							if msg > nil, if msg != nil // same
-							// msg is now optional and NOT nil within this branch
-						
-						if msg == nil // msg is now optional... but nil within that branch
-						if msg >= nil, msg <= nil // what? just fail!
-						
-						My loops will need some altering! Like for arrays... we'll have to check if an
-						item is nil... to exit the loop instead of checking the int value. Faster actually!
-						
-						
-						
-		* NilCheck:		This will create problems or even errors if not used properly
-						Do this after transform and before refcount!
-						We need to go through the entire program, and give each item found, a "timecode". That
-						is... it has an "earliest time" that it COULD occur.
-						So for branches, thats easy, both sides get the same time. We can do some simple logic like:
-						
-						function abc
-							if !inited
-								inited = true
-								var1 = .CreateVar
-								var2 = .CreateVar
-							var1.explode
-							var2.die
-						
-						If its only set in one place... that can help.
-						
-						So var1.explode actually has a "higher time" than var1 = .createvar. So its OK.
-						
-						Like this... we can make it work!
-						
-						POSSIBLY we could allow reordering.
-						
-						while looops are easier, unless they might not fire at all.
-						
-						function pointers... are a bit trickier?
-						
-						if (random[])
-							a lot of code
-							(.func)()
-						  else
-							small code
-							(.func)()
-
-						we have to check the time twice? But thats true of function calls in general???
-						We could do it differently... "at each second in time..." there can be an array (or list whatever) of possible code we could be executing. The problem with that, is that it would explode exponentially :)
-						
-						Perhaps not? if we exclude times that not newer?
+			we have to check the time twice? But thats true of function calls in general???
+			We could do it differently... "at each second in time..." there can be an array (or list whatever) of possible code we could be executing. The problem with that, is that it would explode exponentially :)
+			
+			Perhaps not? if we exclude times that not newer?
+			
+			PROBABLY MAKE SOMETHING SIMPELR THAN THIS
 							
 						
-		* Strength:		Setting to a definite nil is ALWAYS an error... like: nil|msg|.pos=0
-						Strength is settable in the project if its an error or problem
-						For now it defaults to problem
+		* Strength:
+			Setting to a definite nil is ALWAYS an error... like: nil|msg|.pos=0
+			Strength is settable in the project if its an error or problem
+			For now it defaults to problem
 */
 
 
@@ -85,10 +75,11 @@ datatype NilState (byte)
 module NilChecker
 	function CheckAll
 		opt norefcounts
-		// .Sort
+		// CodeSorter.LeafsFirst
 	
 		for f in compiler.funclist
-			f.sourcearg.NilCheckArg
+			if !f.IsMacro and !f.IsWrapper
+				f.sourcearg.NilCheckArg(0)
 		
 		.Sweep
 
@@ -102,11 +93,9 @@ module NilChecker
 
 function message.NilCheckProperty
 	pragma inline
-	|| decl = .DotMustBeProperty
-	if !decl
-		"prop fail:"
-		printline decl|object|.Render
-		return
+	|| decl = .DotMustBeProperty		#require
+	
+	// OK... so now we have a decl.
 	
 
 
@@ -119,17 +108,26 @@ function message.NilCheckFP
 	pragma inline
 
 
-function message.NilCheckCond
+function message.NilCheckCond (|int| Time)
 	pragma inline
 
+// 
+//	if msg
+//		// msg is now optional
+//		if msg > nil, if msg != nil // same
+//		// msg is now optional and NOT nil within this branch
+//	
+//	if msg == nil // msg is now optional... but nil within that branch
+//	if msg >= nil, msg <= nil // what? just fail!
+//	
 
 
-	// no need timer... just go through the args...
-function Message.NilCheckFlat
+function Message.NilCheckFlat (|int| Time)
 	opt norefcounts
 	for s.flat in self
+		Time++
 		if s == @arg
-			s.NilCheckArg
+			s.NilCheckArg(Time)
 		  else
 			s.NilCheckMemory
 			// so what do we have to test?
@@ -157,13 +155,14 @@ function Message.NilCheckMemory
 
 
 
-function Message.NilCheckArg
+function Message.NilCheckArg (|int| Time)
 	opt norefcounts
 	for s in self
 		#! We have ASM if/while flags set! Just use them???
+		Time++
 		if s.func == @tmp and (s == "if" or "while")
-			s.NilCheckCond
+			s.NilCheckCond(Time)
 		  else
-			s.nilcheckflat
+			s.nilcheckflat(Time)
 			
 

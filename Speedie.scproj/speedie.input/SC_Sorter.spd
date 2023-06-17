@@ -5,13 +5,13 @@
 // perhaps not needed right now. We can move some other sort functions in here.
 
 module CodeSorter
-	function LeafFunctionsFirst
+	function LeafsFirst
 		opt norefcounts
 		for f in compiler.FuncList
 			f.FindDepths
 		compiler.funclist.sort(LeafFunctionsSorter)
 
-		
+
 	function LeafFunctionsSorter (sortercomparer)
 		opt norefcounts
 		return a|scfunction|.depth < b|scfunction|.depth
