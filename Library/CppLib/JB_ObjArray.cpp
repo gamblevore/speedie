@@ -59,13 +59,18 @@ static bool GrowToLength_(Array* self, int64 N) {
 }
 
 
-static void ShrinkLength_(Array* self, int64 NewLength) {
+static void Clear_(Array* self) {
+	auto P = self->_Ptr;
+	self->Capacity = 0;
+	self->_Ptr = 0;
+	JB_free(P);
+}
+
+
+static void AdjustCapacity_(Array* self, int64 NewLength) {
 	self->Length = (int)NewLength;
 	if (!NewLength) {
-		auto P = self->_Ptr;
-		self->Capacity = 0;
-		self->_Ptr = 0;
-		JB_free(P);
+		Clear_(self);
 	} else {
 		int C = self->Capacity;
 		if (NewLength <= (C/2) and C > 8) {
@@ -93,14 +98,28 @@ void JB_Array_Append( Array* self, JB_Object* Value ) {
 }
 
 
-void JB_Array_SizeSet( Array* self, int64 NewLength ) {
+static void Decr_(Array* self, int64 NewLength) {
+	JB_Object** Curr = self->_Ptr + self->Length-1;
+	JB_Object** First = self->_Ptr + NewLength;
+	while ( Curr >= First ) // backwards is safer.
+		JB_Decr( *Curr-- );
+}
+
+
+bool JB_Array_FastShrink( Array* self, int64 NewLength ) {
     int Length = self->Length;	
     if (NewLength < Length) {
-        JB_Object** Curr = self->_Ptr + --Length;
-        JB_Object** Last = self->_Ptr + NewLength;
-        while ( Curr >= Last ) // backwards is safer.
-            JB_Decr( *Curr-- );
-		ShrinkLength_(self, NewLength);
+		Decr_(self, NewLength);
+		self->Length = NewLength;
+		return true;
+	}
+	return false;
+}
+
+
+void JB_Array_SizeSet( Array* self, int64 NewLength ) {
+    if (JB_Array_FastShrink(self, NewLength)) {
+		AdjustCapacity_(self, NewLength);
 	}
 }
 
@@ -136,13 +155,16 @@ void JB_Array_Remove( Array* self, int Pos ) {
 		self->_Ptr[Pos] = self->_Ptr[Pos+1];
 		Pos++;  
 	}
-	ShrinkLength_(self, N-1);
+	AdjustCapacity_(self, N-1);
 	JB_Decr(Item);
 }
 
 
 void JB_Array_Destructor( Array* self ) {
-    JB_Array_SizeSet( self, 0 );
+	if (self->_Ptr) {
+		Decr_(self, 0);
+		Clear_(self);
+	}
 }
 
 
@@ -257,6 +279,7 @@ static void QuickSort(obj* array, int start, int end, SorterComparer fp) {
     QuickSort(			 array, start, p - 1, fp);
     QuickSort(			 array, p + 1, end,   fp);
 }
+
 
 void JB_Array_Sort ( Array* self, SorterComparer fp, bool down ) {
 	int N = JB_Array_Size(self);
