@@ -5,6 +5,8 @@
 * any object can be created with an virtual-function override table, just store before the refcount?
 * could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
 * function finding fails with dictionary subclasses? DictSub["abc"]
+* Make objectset from FastDict? Need to ref the keys
+	* Store object.IDs (ints). Last node can store 10 bits instead of 4.
 * || x = .SomeCArray // should just get the address... :)
 * Errors in subprojects kinda suck with error-reporting
 	* errors with jbin also suck
