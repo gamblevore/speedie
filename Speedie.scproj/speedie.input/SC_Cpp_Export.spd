@@ -509,6 +509,8 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 
 function DoInterpreter
 	require options.ListAllLib
+	if options.ListAllLib
+		compiler.funclist.sort(funcsorter_fn)
 	|| fs = .ModuleProperties
 	.listAllFuncs(fs)
 	.ListAllClasses(fs)

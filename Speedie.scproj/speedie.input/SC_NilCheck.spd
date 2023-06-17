@@ -1,30 +1,9 @@
 
-/*
-	Nil checking! how to do it
-	When to do it
-	Where to do it
-	AAAAARGH
-	so complex to even think about it. OK... so lets start
+/*	
 	
-	Now... how do I use it? and when?
-	
-	I think we need a multi-pass system, and the final pass should follow the code flow.
-	
-	Passes:
-		* Collectdecls: This will set the basic variable qualities of nil or not
-			DONE.
-			
-			This will be harder than it seems... due to how I've done pointers. Pointers are not containers...
-			Even though they should be? Either way... we'll need to have two nilstates for a decl... one for the pointer
-			and one for the thing itself. I COULD just make pointers now be containers... but then I'd need to change
-			ALL my code.
-			
-			its easier to just add another pointer info. Also... getting what was pointed to... or that kinda thing
-			will need info copied from the pointer's nilstate to its own? I guess you can't get a nil adderss of a
-			value... so once we get the address its already not nil.
-
-
-		
+	Todo:
+		* Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
+					
 		* Transform:	This modifies the nilness of params and vars... depending on if they are tested or not
 						if/while/ternary/??/?/and/or/expandtobool?
 						wrapper-funcs (i guess just declare them as testers)
@@ -81,13 +60,11 @@
 						Perhaps not? if we exclude times that not newer?
 							
 						
-		
 		* Strength:		Setting to a definite nil is ALWAYS an error... like: nil|msg|.pos=0
 						Strength is settable in the project if its an error or problem
 						For now it defaults to problem
-		
-		* cpp_wrappers:	Params assume not nil unless with "?" Same with all funcs actually.
 */
+
 
 
 datatype NilState (byte)
@@ -101,12 +78,92 @@ datatype NilState (byte)
 		return self == type
 	syntax isnt (|nilstate| type, |bool|)
 		return self != type
-		
+
+
 
 module NilChecker
+
 	function Check
+		//(all~compiler.FuncList).FindDepths
+		for f in compiler.FuncList
+			f.FindDepths
 	
+		.Sort
+	
+		for f in compiler.funclist
+			f.NilCheck
+		
+		.Sweep
+	
+	function Sweep
+		|| main = compiler.getmainfunc(nil)
+		// what about init?
+	
+		
+	function Sort
+		compiler.funclist.sort(NilCheckerOrder)
 
 
+
+// recursive is a bit akward...
+	// x --> a
+	// a --> b
+	// b --> c
+	// b --> a
+
+
+
+function scfunction.MarkRecursive (|scfunction| EndAt)
+	opt norefcounts
+	if (endat == self)
+		.alloccode |= kIsRecursive
+		return
+	
+	|| f = self
+	while f
+		f.alloccode |= kIsRecursive
+		f = f.DepthFinder
+		if f == EndAt
+			exit
+
+
+// probably should handle recursion better
+// but this will do for now!
+function scfunction.FindDepths (|int|)
+	if .depth
+		return .depth
+	
+	rz = 1
+	for f in .LinkTo
+		if f isa SCFunction
+			if f.DepthFinder
+				.MarkRecursive(f)
+			  else
+				f.DepthFinder = self
+				|| D = f.FindDepths+1
+				(rz max= D)
+				f.DepthFinder = nil
+
+	.depth = rz
+	
+	
+function NilCheckerOrder (sortercomparer)
+	opt norefcounts
+	|| fa = a|scfunction|
+	|| fb = b|scfunction|
+	return fa.depth < fb.depth
+
+
+
+function scfunction.nilcheck
+	opt norefcounts
+	for s.flat in .source
+		|| f = s.func
+		//if f == @dot // a property?
+			
+			
+//		* its just about properties, really? properties and pointers? anyhting that counts as a pointer and then accessing it...
+//		* like *abc or abc[0] or abc.var
+	
 
 

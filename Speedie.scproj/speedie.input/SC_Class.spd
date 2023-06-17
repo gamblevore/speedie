@@ -471,13 +471,15 @@ function OverrideSyntax
 	require stderr.OK
 	|| cast = .FindSpecialFunc( "SyntaxCast", false )
 	.casts = array.new
-
+	
 	for f in cast
 		f.IsInline = true
 		check  (f.args == 1)		(f.Source, "No params allowed." )
 		expect (f.ReturnType)       (f.Source, "Need a return type.")
 		f.nextfunc.DontWantSameReturnType(f)
 		.Casts <~ f
+		if f.returntype == typebool.typenormal
+			f.IsNilChecker = true
 	
 	.HasCompareFunc = .FindSpecialFunc( "SyntaxCompare", true )
 	.HasEqualsFunc = .FindSpecialFunc( "SyntaxEquals", true )

@@ -161,11 +161,14 @@ function CompileAll (|bool|)
 	.CheckIsGoodLibrary
 
 	require .Stage( "Stripping dead code" )
-	.DeadCodeStrip
+	.DeadStrip
 	
-	require .Stage( "Refcounting" )
-	.Timer( "RefCount" )
-	Compiler.DoRefAnalysis				// do actual refcounts.
+	require .Stage( "NilChecking" )
+	nilchecker.Check
+	
+	require .Stage( "RefCounting" )
+	.Timer( "RefCounting" )
+	.DoRefAnalysis				// do actual refcounts.
 
 	if Options.Cpp
 		.Timer( "Export Cpp" )
@@ -856,32 +859,36 @@ function ModulesSorter (SorterComparer)
 
 
 function scfunction.StripTest
-	if .IsVisible
-		.FindReached(Compiler.VisibleFuncs)
-	  elseif options.ListAllLib and !.disabled
-		.FindReached(Compiler.Interpreter)
+	opt norefcounts
+	|| Base = Compiler.VisibleFuncs
+	
+	if !.IsVisible	
+		require options.ListAllLib and !.disabled
+		base = Compiler.Interpreter
+	
+	if !.FindReached(base)
+		.depth = 1
 
 
-function DeadCodeStrip
+function DeadStrip
 	opt norefcounts
 	Compiler.VisibleFuncs = scbase("Visible",	false)
 	Compiler.Interpreter = scbase("Interpreter", false)
 
-	if options.ListAllLib
-		.funclist.sort(funcsorter_fn)
-	
 	.getmainfunc(nil).StripTest?
 	
 	for f in .FuncList
 		f.striptest
 
-	if options.ListAllLib
+	if options.ListAllLib // must come before the next loop
 		for c in .classlist
 			c.reach(Compiler.Interpreter)
 	
 	for c in .classlist
 		if c.CurrReacher // shorten-discovery-chains, 
 			c.ReachBehaviours // behaviour chains tend to be long.
+		
+	
 			
 
 function CheckIsGoodLibrary
@@ -1062,3 +1069,26 @@ helper FindProjectSub (|string| base, |string| Path, |File|)
 function ProjName (|String|)
 	return Compiler.Program.ExportName // OK
 
+
+
+// recursive is a bit akward...
+	// x --> a
+	// a --> b
+	// b --> c
+	// b --> a
+// a and b should be recursive
+// x and c should NOT be.
+
+
+module depthtest
+	function x				// 2 or 4?
+		.a3
+		.a1
+		.r1
+		
+		
+	function a1: .a2     		// 3
+	function a2: .a3    		// 2
+	function a3:				// 1
+	function r1: .r2			// r
+	function r2 {.r1, .a1, .a3}	// r

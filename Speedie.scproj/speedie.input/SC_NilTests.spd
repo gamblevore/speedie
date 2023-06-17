@@ -98,7 +98,7 @@ class NilTest
 		
 		// assume can be nil
 
-		//|niltest?| n0 
+		|niltest?| n0 
 		|niltest|  n1 // for sure can be nil
 	
 
@@ -109,12 +109,6 @@ class NilTest
 
 
 module NilTest2
-	.hello
 	function Hello
-		NilChecker.Check
-		//NilTest.n0
-		printline niltest.x1.v2
-
-
-
+		NilTest.n0
 
