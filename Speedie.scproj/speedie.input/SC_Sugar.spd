@@ -26,10 +26,10 @@ function message.Tran_QMark
 	using (self)
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func) 
-	expect (isnormal or thedot == @bra) (thedot, "Question-marks should look like one of:  a.b?,  .b?,  (a)(b)?,  a.b ?= c,  (a) ?= b")
+	expect (isnormal) (thedot, "Question-mark not one of:  a.b?,  (a)(b)?,  a.b? = c")
 	if thedot == @sdot
 		scfunction.Tran_Sdt(thedot)
-	|| inside = (thedot.first, thedot)(isnormal)
+	|| inside = thedot.first
 	if thedot == @func
 		require inside.expect(@bra)
 		inside = inside.first
@@ -37,6 +37,24 @@ function message.Tran_QMark
 	|| arg			= self
 	|| p			= .parent
 	|| UseTernary	= false
+
+
+	ignore
+		x = a.b?				// x = (a.b, "")(a)
+		|| x = a.b?				// || x = (a.b, "")(a)
+		x(a.b?)					// x((a.b, "")(a))
+
+
+		a.b?					// if (a) {a.b}
+		a.b? = x				// if (a) {a.b = x}
+		a.b?.c.d.e = x			// if (a) {a.b.c.d.e = x}
+		a.b?[0][1,r.pop] = x	// if (a) {a.b.c.d.e = x}
+		
+
+		if y or x(a.b?)			// if y or x((a.b, "")(a))
+		x.y(a.b?)?				// if (x) {x.y((a.b, "")(a))}
+		
+	
 	if P == @arg
 		.become(@arg)
 	  elseif p == @rel and !.prev and p.parent!=@decl						// a.b? = c --> (a.b = c)?

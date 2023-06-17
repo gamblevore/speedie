@@ -82,25 +82,26 @@ datatype NilState (byte)
 
 
 module NilChecker
-
-	function Check
-		//(all~compiler.FuncList).FindDepths
-		for f in compiler.FuncList
-			f.FindDepths
-	
-		.Sort
+	function CheckAll
+		opt norefcounts
+		//.Sort
 	
 		for f in compiler.funclist
-			f.NilCheck
+			f.sourcearg.NilCheckArg
 		
 		.Sweep
+
 	
 	function Sweep
 		|| main = compiler.getmainfunc(nil)
-		// what about init?
+		// what about "init_"?
 	
 		
 	function Sort
+		opt norefcounts
+		// not needed!?
+		for f in compiler.FuncList
+			f.FindDepths
 		compiler.funclist.sort(NilCheckerOrder)
 
 
@@ -155,15 +156,52 @@ function NilCheckerOrder (sortercomparer)
 
 
 
-function scfunction.nilcheck
+function message.NilCheckProperty
+	pragma inline
+
+
+function message.NilCheckAccess
+	pragma inline
+
+function message.NilCheckFP
+	pragma inline
+
+function message.NilCheckCond
+	pragma inline
+
+
+
+	// no need timer... just go through the args...
+function Message.NilCheckFlat
 	opt norefcounts
-	for s.flat in .source
-		|| f = s.func
-		//if f == @dot // a property?
+	for s.flat in self
+		if s == @arg
+			s.NilCheckArg
+		  else
+			s.NilCheckMemory
+
+
+function Message.NilCheckMemory
+//		checks:  *abc,  abc[0] / abc.var,  (abc)()
+	opt norefcounts
+	|| f = .func
+	if f == @dot
+		.NilCheckProperty
+	  elseif (f == @brel and self == "*") or f == @acc
+		.NilCheckAccess
+	  elseif (f == @func and .first == @bra)
+		.NilCheckFP
+
+
+function Message.NilCheckArg
+	opt norefcounts
+	for s in self
+		#! We have ASM if/while flags set! Just use them???
+		if s.func == @tmp and (s == "if" or "while")
+			s.NilCheckCond
+		  else
+			s.nilcheckflat
 			
-			
-//		* its just about properties, really? properties and pointers? anyhting that counts as a pointer and then accessing it...
-//		* like *abc or abc[0] or abc.var
 	
 
 

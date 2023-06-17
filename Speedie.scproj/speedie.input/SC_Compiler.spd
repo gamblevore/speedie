@@ -164,7 +164,7 @@ function CompileAll (|bool|)
 	.DeadStrip
 	
 	require .Stage( "NilChecking" )
-	nilchecker.Check
+	nilchecker.CheckAll
 	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )

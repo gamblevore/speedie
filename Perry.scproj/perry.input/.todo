@@ -3,15 +3,17 @@
 							Todo
 
 * VM?
+* Perry is not displaying/getting speedie's build output very well
 * nil-checking
-	* What is remaining?
 	* What is next?
-		* test for optional use in a nil-sweep. They are "problems".
-			* nil-sweep uses a "time" feature. So each instruction or statement increases the time. branches and loops/vfuncs act differently. We always use the earliest time.
+
+	* nil-sweep uses a "time" feature. So each instruction or statement increases the time. branches and loops/vfuncs act differently. We always use the earliest time.
 	* how to do the nilcheck?
-		... 
-		* its just about properties, really? properties and pointers? anyhting that counts as a pointer and then accessing it...
-		* like *abc or abc[0] or abc.var
+	* nil-check vs nil-sweep?
+		* Do we check each function individually first?
+		* is one just to detect it's behaviour first... hten to check its correctness? Maybe?
+		
+	
 
 
 // Do later
