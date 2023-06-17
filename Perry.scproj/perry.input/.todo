@@ -5,13 +5,9 @@
 * VM?
 * Perry is not displaying/getting speedie's build output very well
 * nil-checking
-	* What is next?
-
-	* nil-sweep uses a "time" feature. So each instruction or statement increases the time. branches and loops/vfuncs act differently. We always use the earliest time.
-	* how to do the nilcheck?
-	* nil-check vs nil-sweep?
-		* Do we check each function individually first?
-		* is one just to detect it's behaviour first... hten to check its correctness? Maybe?
+	* make less noisy?
+	* .NilUsage vs .Nildeclared
+	* NilSweep, just for global vars
 		
 	
 

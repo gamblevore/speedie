@@ -21,7 +21,7 @@ class ErrorList
 	|int|					ErrorCount
 	|int|					ProblemCount
 	|int|					WarnCount
-	|int|					ErrorsAreWarnings
+	|int|					LowerErrorsTo
 	|bool|					BlockErrors
 	|string|				Source
 	|object| 				LogObj
@@ -184,8 +184,9 @@ class ErrorList
 		require !.BlockErrors and !ErrorList.OutOfMemory
 		if level >= ErrorSeverity.error // a warning
 			return (.ErrorCount < .MaxErrors)
-		  else
-			return (.WarnCount < .MaxErrors)
+		if level == ErrorSeverity.problem
+			return (.problemcount < 16)
+		return (.WarnCount < .MaxErrors)
 	
 	Syntax UsingComplete
 		stderr.printerrors

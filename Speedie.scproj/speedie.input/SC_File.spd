@@ -124,7 +124,7 @@ function file.CodeSign (|string| sign, |errorint|)
 	target osx
 		if !platform.osx
 			return -1
-		StdErr.ErrorsAreWarnings++
+		using ErrorSeverity.Warning
 		|[string]| args = []
 		args <~ "--deep"
 		args <~ "--force"
@@ -146,5 +146,3 @@ function file.CodeSign (|string| sign, |errorint|)
 		if rz
 			args[0] = "-a"
 			rz = "/usr/sbin/spctl".DebugExecute(args)
-		StdErr.ErrorsAreWarnings--
-			

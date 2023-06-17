@@ -222,6 +222,14 @@ datatype ErrorSeverity (Byte)
 	
 	syntax is (|errorseverity| e, |bool|)
 		return self == e
+		
+	syntax Using (|errorseverity|)
+		rz = StdErr.LowerErrorsTo
+		StdErr.LowerErrorsTo = self
+
+	syntax UsingComplete (|errorseverity|)
+		StdErr.LowerErrorsTo = self
+
 
 	constants // Severity
 		|ErrorSeverity|

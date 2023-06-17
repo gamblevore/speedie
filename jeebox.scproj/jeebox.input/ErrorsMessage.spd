@@ -13,7 +13,7 @@ extend ErrorList
 	
 	function NewError (|Message| node=nil, |string| Desc=nil, |string| path=nil)
 		cpp_part NewErrorWithNode
-		|| sev = (ErrorSeverity.Warning, ErrorSeverity.Error)(.ErrorsAreWarnings > 0)
+		|| sev = .LowerErrorsTo ?? ErrorSeverity.Error
 		self <~ Error(node, desc, sev, path)
 
 

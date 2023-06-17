@@ -115,6 +115,9 @@ class SCDecl (SCObject) {
 	|NilState|			NilDeclared
 	|NilState|			NilUsage
 	
+	constructor
+		.NilDeclared = NilState.exists
+		
 	function Project (|scimport|)
 		// scfunction and scclass should use this too!
 		// iterator too... even. Then everything knows where it comes from
@@ -780,6 +783,7 @@ class SCDecl (SCObject) {
 			return op
 			
 		return .NewOptional
+
 
 	function NewOptional (|scdecl|) 
 		rz = .Copy

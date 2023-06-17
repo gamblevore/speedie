@@ -67,7 +67,6 @@ constructor (|Message| node, |SCBase| parent)
 	.IsVisible = scbase.CurrVisibility
 	
 	|| T = SCDecl.new
-	T.NilDeclared = NilState.exists
 	T.Type = self
 	.TypeNormal = T
 	.TypeOptional = T.NewOptional

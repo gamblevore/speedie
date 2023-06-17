@@ -22,10 +22,9 @@ extend_module ASM
 
 		require dev > 0
 
-		stderr.ErrorsAreWarnings++ // nice
-		|| T = ( file://syntax.asm ).parse[@tmp, "tests"]
-			.TestASMSub(T)
-		stderr.ErrorsAreWarnings--
+		using ErrorSeverity.Warning
+			|| T = ( file://syntax.asm ).parse[@tmp, "tests"]
+				.TestASMSub(T)
 	
 
 function message.GetASMFunc (|message|)

@@ -264,7 +264,7 @@ function InitTypes
 
 function InitBasicStuff // compiler.init
 	if !StdErr.ok
-		stderr.errorsarewarnings = 1
+		stderr.LowerErrorsTo = ErrorSeverity.Warning
 		compiler.InitedOK = false
 	(Message).Restore
 		
@@ -284,7 +284,7 @@ function InitBasicStuff // compiler.init
 	.AddGlobalConst( "π", typef64 ).islookuponly = «num "3.1415926535897932" »
 	.AddGlobalConst( "τ", typef64 ).islookuponly = «num "6.2831853071795864" »
 
-	stderr.errorsarewarnings = 0
+	stderr.LowerErrorsTo = 0
 
 
 function InitBasicFuncs (|bool|)

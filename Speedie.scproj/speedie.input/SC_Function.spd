@@ -720,7 +720,7 @@ function FillInConstructorAndDestructor (|Message| root, |bool| IsConstructor, |
 	for (curr.flat in root)
 		if curr IsThing "self"
 			|| P = curr.Parent
-			|| KindaUse = SelfKindaUse( curr )
+			|| KindaUse = curr.SelfKindaUse
 			if (KindaUse != kIsProperty)
 				|| PObj = P.Obj
 				if (Pobj isa SCFunction) and (P == @prm)
@@ -1842,9 +1842,9 @@ function SettingMemory (|Message| Rel, |bool|)
 			return true
 
 
-function SelfKindaUse (|Message| curr, |int|)
+function message.SelfKindaUse (|int|)
 	opt norefcounts
-	|| p = curr.parent
+	|| p = .parent
 	|| R = p.parent
 	if R == @Rel
 		|| Op = R[1]

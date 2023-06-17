@@ -2,7 +2,7 @@
 
 
 
-datatype NilState (byte)
+datatype NilState (byte) // Exec.scproj needs this here
 	constants
 		|nilstate|
 		nil		= 1
