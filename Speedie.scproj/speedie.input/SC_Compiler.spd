@@ -162,6 +162,7 @@ function CompileAll (|bool|)
 
 	require .Stage( "Stripping dead code" )
 	.DeadStrip
+	CodeSorter.LeafsFirst		// super-refcounter wants this
 	
 	require .Stage( "NilChecking" )
 	nilchecker.CheckAll

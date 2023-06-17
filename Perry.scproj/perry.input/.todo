@@ -4,6 +4,7 @@
 
 * VM?
 * Perry is not displaying/getting speedie's build output very well
+* opening .todo directly adds it to the external files haha
 * nil-checking
 	* make less noisy?
 	* .NilUsage vs .Nildeclared
@@ -13,7 +14,7 @@
 
 
 // Do later
-* change "?" behaviour to use "if" not ternary. and maybe blocks...  a.b?.c.d.e  will not run  .c.d.e if !a
+* change "?" behaviour
 * galaxxies C++ compile issues
 * not-compilable functions blocks lookups, on a .dot function call.
 * RefOpts. Do it bit by bit

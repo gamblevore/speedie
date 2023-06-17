@@ -8,6 +8,8 @@ constants
 module Options
 	flags: native,pack
 	
+	||		NilStrength				= ErrorSeverity.Hint // collect via options... ErrorSeverity.problem
+	
 	||		BannedClasses			= nil|dictionary of scclass|
 	||		output_path				= ""
 	||		SingleFileInput			= ""

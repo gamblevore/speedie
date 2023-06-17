@@ -62,9 +62,7 @@
 module NilChecker
 	function CheckAll
 		opt norefcounts
-		using ErrorSeverity.Problem
-
-		// CodeSorter.LeafsFirst
+		using options.NilStrength
 	
 		for f in compiler.funclist
 			if !f.IsMacro and !f.IsWrapper
