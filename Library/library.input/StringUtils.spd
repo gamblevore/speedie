@@ -21,7 +21,7 @@ function PrintLine (|object| o)
 	printline o.render
 
 
-function ZalgoLine (|string| data="I'm all kinds of Steve! >:3 ")
+function ZalgoLine (|string| data)
 	printline data
 
 
