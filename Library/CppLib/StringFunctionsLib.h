@@ -48,7 +48,7 @@ uint8* LegalUTF8_(uint8 FirstChar, uint8* source);
 
 // StringSearchers
 
-void Clear_(JB_String* self);
+//void Clear_(JB_String* self);
 u32* Mark4Find_(u32* pSelfPos, u32 pLength, u32 Mask);
 
 int StrDiffAt2( MiniStr S, MiniStr F );

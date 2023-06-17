@@ -85,7 +85,7 @@ function message.NilCheckProperty
 	if !ObjDecl
 		0 // "nil type: ${.first}"
 	  else
-		expect (objdecl.NilUsage is exists) (self, "NilObjectError. Use nil-test to fix.")
+		expect (objdecl.NilUsage is exists) (self, "NilObjectError. Use any nil-test to fix.")
 
 
 
