@@ -1,5 +1,20 @@
 
 
+
+
+datatype NilState (byte)
+	constants
+		|nilstate|
+		nil		= 1
+		exists	= 2
+		unknown = 3
+		optional = 3
+	syntax is (|nilstate| type, |bool|)
+		return self == type
+	syntax isnt (|nilstate| type, |bool|)
+		return self != type
+
+
 struct ASMVarType
 	contains object
 	|int|					Contains // also a class
