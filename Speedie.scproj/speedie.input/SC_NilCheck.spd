@@ -67,6 +67,7 @@
 
 
 
+
 datatype NilState (byte)
 	constants
 		|nilstate|
@@ -84,7 +85,7 @@ datatype NilState (byte)
 module NilChecker
 	function CheckAll
 		opt norefcounts
-		//.Sort
+		// .Sort
 	
 		for f in compiler.funclist
 			f.sourcearg.NilCheckArg
@@ -96,69 +97,11 @@ module NilChecker
 		|| main = compiler.getmainfunc(nil)
 		// what about "init_"?
 	
-		
-	function Sort
-		opt norefcounts
-		// not needed!?
-		for f in compiler.FuncList
-			f.FindDepths
-		compiler.funclist.sort(NilCheckerOrder)
-
-
-
-// recursive is a bit akward...
-	// x --> a
-	// a --> b
-	// b --> c
-	// b --> a
-
-
-
-function scfunction.MarkRecursive (|scfunction| EndAt)
-	opt norefcounts
-	if (endat == self)
-		.alloccode |= kIsRecursive
-		return
-	
-	|| f = self
-	while f
-		f.alloccode |= kIsRecursive
-		f = f.DepthFinder
-		if f == EndAt
-			exit
-
-
-// probably should handle recursion better
-// but this will do for now!
-function scfunction.FindDepths (|int|)
-	if .depth
-		return .depth
-	
-	rz = 1
-	for f in .LinkTo
-		if f isa SCFunction
-			if f.DepthFinder
-				.MarkRecursive(f)
-			  else
-				f.DepthFinder = self
-				|| D = f.FindDepths+1
-				(rz max= D)
-				f.DepthFinder = nil
-
-	.depth = rz
-	
-	
-function NilCheckerOrder (sortercomparer)
-	opt norefcounts
-	|| fa = a|scfunction|
-	|| fb = b|scfunction|
-	return fa.depth < fb.depth
 
 
 
 function message.NilCheckProperty
 	pragma inline
-
 
 function message.NilCheckAccess
 	pragma inline
@@ -182,7 +125,7 @@ function Message.NilCheckFlat
 
 
 function Message.NilCheckMemory
-//		checks:  *abc,  abc[0] / abc.var,  (abc)()
+//		checks:  *abc / abc[0],  abc.var,  (abc)()
 	opt norefcounts
 	|| f = .func
 	if f == @dot
@@ -191,6 +134,7 @@ function Message.NilCheckMemory
 		.NilCheckAccess
 	  elseif (f == @func and .first == @bra)
 		.NilCheckFP
+
 
 
 function Message.NilCheckArg
@@ -202,6 +146,4 @@ function Message.NilCheckArg
 		  else
 			s.nilcheckflat
 			
-	
-
 
