@@ -6,7 +6,7 @@
 * Perry is not displaying/getting speedie's build output very well
 * opening .todo directly adds it to the external files haha
 * nil-checking
-	* make less noisy?
+	* --nil option
 	* .NilUsage vs .Nildeclared
 	* NilSweep, just for global vars
 		
@@ -25,6 +25,7 @@
 	* check entire program for modification during nil-sweep
 		* Start with leaf-funcs.
 * skinning support? .hellokitty or .emo file endings could reskin the IDE dynamically.
+* the new constructor/destructor system?
 * clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * TextView error/find resync

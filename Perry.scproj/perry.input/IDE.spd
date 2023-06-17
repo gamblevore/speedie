@@ -61,10 +61,10 @@ class PerryIDE (Window)
     |message|					Previous
     |string|					OldJBCloser
     |string| 					lastCmdStr
-    |ivec2|						PopupDisplayCorner
     |string|					AttachedProgram
     |ProgressBar|				Progress
 	|Faststring|				Stats
+    |ivec2|						PopupDisplayCorner
 	|date|						LastAutoCompleteDate
 	|date|						PopupDateOn
 	|int|						EditMeTabRetryThing
