@@ -24,6 +24,7 @@ void JB_Array_Reverse( Array* self );
 JB_String* JB_Array_Render(Array* self, FastString* fs);
 void JB_Array_Shuffle( Array* self );
 void JB_Array_SizeSet( Array* self, int64 NewSize );
+bool JB_Array_FastShrink( Array* self, int64 NewLength );
 void JB_Array_Insert( Array* self, int Pos, JB_Object* Value );
 void JB_Array_Append( Array* self, JB_Object* Value );
 void JB_Array_AppendCount( Array* self, JB_Object* Value, int64 Count );
