@@ -16,8 +16,6 @@
 	* What do we have?
 		* we created "optional" decls, and can mark or render optionals
 
-* jz doesnt work anymore?
-* show project fails
 
 // Do later
 * galaxxies C++ compile issues
@@ -29,6 +27,7 @@
 	* fast capture of disowned things. like: r1 <~ r2.pop
 	* check entire program for modification during nil-sweep
 		* Start with leaf-funcs.
+* skinning support? .hellokitty or .emo file endings could reskin the IDE dynamically.
 * clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * TextView error/find resync
