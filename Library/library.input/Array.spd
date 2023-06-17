@@ -79,6 +79,8 @@ class Array (saveable)
 	
 	function Length (|int|)
 		cpp_wrapper JB_Array_Size
+	function FastShrink (|int| to=0)
+		cpp_Wrapper JB_Array_FastShrink
 	
 	function Reverse
 		cpp_wrapper JB_Array_Reverse
