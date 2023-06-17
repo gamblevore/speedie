@@ -133,7 +133,8 @@ void JB_Array_Remove( Array* self, int Pos ) {
 	require0 (Item);
 	int N = self->Length;
 	while (Pos < N) {
-		self->_Ptr[Pos] = self->_Ptr[++Pos];  
+		self->_Ptr[Pos] = self->_Ptr[Pos+1];
+		Pos++;  
 	}
 	ShrinkLength_(self, N-1);
 	JB_Decr(Item);
