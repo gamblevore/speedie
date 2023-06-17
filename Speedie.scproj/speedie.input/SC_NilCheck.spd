@@ -104,7 +104,8 @@ function message.NilCheckProperty
 	pragma inline
 	|| decl = .DotMustBeProperty
 	if !decl
-		"prop fail: $decl.name"
+		"prop fail:"
+		printline decl|object|.Render
 		return
 	
 
