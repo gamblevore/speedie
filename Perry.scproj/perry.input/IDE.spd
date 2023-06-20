@@ -258,7 +258,8 @@ class PerryIDE (Window)
 
 	function Show (|bool| FromClick=false)
 		disabled "use .ShowIDE"
-		
+	
+	
 	function ShowIDE (|bool| FromClick=false)
 		debug_require self // what?
 		|| p = .Project
