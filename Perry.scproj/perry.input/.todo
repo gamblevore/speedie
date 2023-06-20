@@ -8,6 +8,7 @@
 	* NilSweep, for global vars, and for function misuse.
 
 
+* x = ring.position? fails to compile
 * 3~right does not click-jump
 	* 3~ should autocomplete from the macros
 * not-compilable functions blocks lookups, on a .dot function call.

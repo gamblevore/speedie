@@ -499,12 +499,13 @@ module SDLApp
 
 	function OrderWindows (|window|)
 		|window--| w
-		|| Pos = 0
 		for c in window.all
 			if c is visible
+				if w
+					c.position = w.position + 1
 				w = c
-				c.position = pos++
 			  else
+				c.position = -1
 				window.all.first = c
 		return w
 
