@@ -8,7 +8,6 @@
 	* NilSweep, for global vars, and for function misuse.
 
 
-* Close speedie if tab hasn't been used for a few minutes. Save memory.
 * 3~right does not click-jump
 	* 3~ should autocomplete from the macros
 * not-compilable functions blocks lookups, on a .dot function call.
@@ -26,8 +25,6 @@
 	* check entire program for modification during nil-sweep
 		* Start with leaf-funcs.
 * skinning support? .hellokitty or .emo file endings could reskin the IDE dynamically.
-* the new constructor/destructor system?
-* clearing errors from an active build (perhaps the error was a C++ compile error)... (cleared by just refreshing the error) seems to clear the build state too.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * TextView error/find resync
 * double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
