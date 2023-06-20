@@ -429,12 +429,14 @@ function ClickedError (GUIListEvent)
 
 
 function LogAreaKeys (GuiKeyEvent)
-	if key is LGUI
-		return false
 	if key iscmd keys.k
-		|| s = .ide.logcomms
-		if s and "Clear log?\n\nContains ${s.slowcount} items.".confirm
-			s.clear
+		|| s1 = .ide.LogComms
+		|| s2 = .ide.LogActions
+		if s1.hasany and s2.hasany
+			|| c = s1.slowcount + s2.SlowCount
+			if "Clear log?\n\nContains $c items.".confirm
+				s1.clear
+				s2.clear
 		return true
 
 

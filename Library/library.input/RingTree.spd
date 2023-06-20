@@ -276,7 +276,7 @@ class RingTree (Saveable)
 		disabled ".clear now"
 
 
-	function Clear // rename stuff to be more inline with arrays. :)
+	function Clear
 		opt norefcounts
 		while
 			.first$.remove

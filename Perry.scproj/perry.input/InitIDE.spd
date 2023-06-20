@@ -434,7 +434,8 @@ extend PerryIDE
 		while m.position > 300
 			m.first.remove
 			m.position--
-		
+	
+	
 	function LogOneComm (|message| msg, |string|type="")
 		.logonething(msg,type, .LogComms$)
 

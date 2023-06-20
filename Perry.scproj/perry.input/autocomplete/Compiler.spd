@@ -125,7 +125,7 @@ extend PerryIDE
 		file <~ first
 		.notify(.name + "\n\nCompiled OK!", file)
 		if db
-			.StartDebugging(first.name.file)
+			.StartDebugging(msg.first.name.file)
 				
 				
 	function Notify (|string| What, |message| response=nil)
