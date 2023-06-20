@@ -1,5 +1,7 @@
 ## Flow Control
 
+(EDIT: This is actually a finished feature. Its helped get Speedie running on Unix. Probably this is an advanced feature for internal-use only.)
+
 FlowControl is my name for a new system I am working on right now.
 
 FlowControl will be one of the biggest things to improve Speedie and set it apart from other languages!
