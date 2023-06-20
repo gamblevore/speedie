@@ -411,27 +411,35 @@ extend PerryIDE
 	function SetupLogArea
 		|| g = .LogArea
 		g.istree = true
+		g.id = "log"
 		require !app.prefs["nolog"]
 		g.gnormal.seps = g.gnormal.bg
 		g.gnormal.seps.a *= 0.8
 		
 		g.OnKeyDown = LogAreaKeys
-		.sendrecv = @thg + "-- speedie comms --"
-		g.listsource <~ .sendrecv
-		g.id = "log"
-		(.sendrecv is expanded)
-		(.sendrecv is aligncenter)
+		.logcomms = .AddBaseLog("-- speedie comms --")
+		.logactions = .AddBaseLog("-- perry actions --")
+	
+	function AddBaseLog (|string| s, |listviewrow|)
+		rz = @thg + s
+		.logarea.listsource <~ rz
+		(rz is expanded)
+		(rz is aligncenter)
 
 
-	function LogComms (|message| msg, |string|type="")
+	helper LogOneThing (|message| msg, |string|type, |listviewrow| m)
 		opt norefcounts
-		require .sendrecv
-		|| m = .sendrecv
 		m <~ @emb + (type + msg.render)
 		m.position++ 
 		while m.position > 300
 			m.first.remove
 			m.position--
+		
+	function LogOneComm (|message| msg, |string|type="")
+		.logonething(msg,type, .LogComms$)
+
+	function LogOneAction (|message| msg, |string|type="")
+		.logonething(msg,type, .LogActions$)
 
 
 	function ErrorLogInit (|listview| lv, |string| s)

@@ -78,6 +78,8 @@ function perryide.DebugEnvs (|message| env)
 
 
 function perryide.DebugActual (|file| f, |[string]| args)
+	.LogOneAction(@thg + (f + " " + args.render))
+	
 	|| fs = faststring()
 	.RunCompiledApp = ShellStream(f, args, fs, fs)
 	if .RunCompiledApp and .RunCompiledApp.PID

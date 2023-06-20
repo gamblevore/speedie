@@ -227,7 +227,7 @@ function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
 	if msg == "error"
 		if msg.last == "define"
 			beep
-		.logcomms(msg, "\1b ")
+		.logonecomm(msg, "\1b ")
 		return false
 
 	.DuringMsgFB = true
@@ -238,7 +238,7 @@ function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
 		if msg.name[0, "autocomplete"] and .LastAutoCompleteDate != date.int
 			msg.name = "" // returns
 	
-	.logcomms(msg, "\1b ")
+	.logonecomm(msg, "\1b ")
 	|| f = msg.first
 	if msg ~= "autocomplete"
 		.AutoCompleteFB(f, AutoCompleteMode.default, reason)

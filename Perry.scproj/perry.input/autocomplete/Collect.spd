@@ -43,7 +43,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg)
 	|| record = .DateWrap(msg)
 	if .feedback <~ (record, 0.004s)
 		.SpeedieMsgReceive(.feedback)
-	.LogComms(msg, "\1C ")
+	.LogOneComm(msg, "\1C ")
 
 
 function PerryIDE.SubProcess (|bool| actual_compile, |fn_Subprocess|)
@@ -103,7 +103,7 @@ function PerryIDE.ActualCompile (|message| msg)
 	.speedietext.text = ""
 	
 	|| dw = .datewrap(msg)
-	.LogComms(dw, "\1C ")
+	.logonecomm(dw, "\1C ")
 	c <~ dw
 	(.buildbutton isnt enabled)
 	(.runbutton isnt enabled)

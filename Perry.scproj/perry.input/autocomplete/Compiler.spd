@@ -132,7 +132,7 @@ extend PerryIDE
 		|| c = what
 		if response
 			c = what + ("\n" + response.render) // hmmm... seems awkward
-		.LogComms(@emb + ("\1b " + c))
+		.logonecomm(@emb + ("\1b " + c))
 		notifications <~ (what, response)
 	
 	

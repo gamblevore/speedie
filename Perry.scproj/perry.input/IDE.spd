@@ -32,7 +32,8 @@ class PerryIDE (Window)
     |message|					LastExtraInfo
     |StretchControl|			EditSep
     |StretchControl|			FileSep
-	|listviewrow|				SendRecv
+	|listviewrow|				LogComms
+	|listviewrow|				LogActions
 	|menu|						AutoComplete	// ... todo
 	|ListView|					Variables		// ... todo
 	|ListView|					ErrorList

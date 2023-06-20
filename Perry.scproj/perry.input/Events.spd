@@ -432,7 +432,7 @@ function LogAreaKeys (GuiKeyEvent)
 	if key is LGUI
 		return false
 	if key iscmd keys.k
-		|| s = .ide.sendrecv
+		|| s = .ide.logcomms
 		if s and "Clear log?\n\nContains ${s.slowcount} items.".confirm
 			s.clear
 		return true
