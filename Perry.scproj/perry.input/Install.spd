@@ -363,10 +363,6 @@ function ClickedUninstallMenu (GUIMenuEvent)
 function ClickedEditPrefs (GUIMenuEvent)
 	PerryIDE.New(app.pref_path)
 
-function ClickedBirdsMenu (GUIMenuEvent)
-	sdlapp.size = (414,256)
-	birdwindow().show
-
 function ClickedTestInstallMenu (guimenuevent)
 	perry.CheckInstallStatus
 
