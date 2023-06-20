@@ -468,8 +468,8 @@ module SDLApp
 	
 	function UpdateTextFocus (|window| w)
 		opt norefcounts
-		|| f = w.realfocus #require
-		|| allow = (f is editable) or (f isa menu) 
+		|| f = w.realfocus // if theres nothing to focus, we can still type into the window!
+		|| allow = !f or (f is editable) or (f isa menu) 
 		require .TextInputEnabled != allow
 		.TextInputEnabled = allow
 		if allow
@@ -507,7 +507,14 @@ module SDLApp
 
 		.HandleOpenFile
 		
-		|| w	= __modules__.window.front$
+		|window--| w = window.all.last
+		while
+			require w
+			if w is visible
+				exit
+			w = w.prev|window|
+			
+		w.parent <~ w // move to front
 		.UpdateTextFocus(W)
 		.PreFrameText(w)
 		
@@ -980,6 +987,7 @@ module SDLApp
 		  elseif  t is KEYDOWN
 			|| kev = ev.keysym
 			|| key = kev.sym
+
 			if key.IsCancelled or .CanDrag >= 2
 				return kNothing
 			beep.OK = 1
