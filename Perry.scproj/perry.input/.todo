@@ -8,14 +8,12 @@
 	* NilSweep, for global vars, and for function misuse.
 
 
-* x = ring.position? fails to compile
 * 3~right does not click-jump
 	* 3~ should autocomplete from the macros
-* not-compilable functions blocks lookups, on a .dot function call.
-	* also properties! like: .clipmode = SomeThingThatisNotAControlPoint
 
 
 // Do later
+* x = ring.position? fails to compile
 * change "?" implementation
 * galaxxies C++ compile issues
 * RefOpts. Do it bit by bit
@@ -25,7 +23,8 @@
 	* fast capture of disowned things. like: r1 <~ r2.pop
 	* check entire program for modification during nil-sweep
 		* Start with leaf-funcs.
-* skinning support? .hellokitty or .emo file endings could reskin the IDE dynamically.
+* CollectDecls needs fixing to not return early!! or break it up into pieces
+* skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * TextView error/find resync
 * double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside

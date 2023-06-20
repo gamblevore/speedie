@@ -1,51 +1,49 @@
 
 
-						bugs
+bugs:
+	* return (self, high)|ControlLine| // self/high are controlpoints
+	* function finding fails with dictionary subclasses? DictSub["abc"]
+	* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
+	* vector constants
+	* || s = "".Address.IsLower // won't compile...
+	* perryide_Behaviour 
+		* Make not available from speedie, c-export only.
+		* Perhaps a unicode start letter. or don't add to lookup table
+	* &uint... allows &int
+	* passing .hfloatvar to  func(float) causes reporting error
+	* |string| s = __now__.render fails
+	* render float.fn {code} // won't compile
+	* disallow append file into |[message]|! (Array of msg)
+	* v.operatormul(1.33) instead of v*1.33 :(
+	* disallowed nesting should error on the children not the parent (like a bra "containing" an arg)
+	* Statement exprs should be {} first... or else it causes obscure bugs all over!
+		* before doing any fixes
+	* rejoin blocks shouldn't safedecr then incr!! pointless!
+		* "a oar b" should almost never be refcounted (unless returns a real object thats empty)
+	* oar is kinda buggy for a lot of things.
+		x = a oar x // sets x to x! should disallow? if a: x=a thats what we want.
+	*	status(.CurrMousePixelColor.render) // tmp struct.
 
-* any object can be created with an virtual-function override table, just store before the refcount?
-* could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
-* function finding fails with dictionary subclasses? DictSub["abc"]
-* Make objectset from FastDict? Need to ref the keys
-	* Store object.IDs (ints). Last node can store 10 bits instead of 4.
-* || x = .SomeCArray // should just get the address... :)
-* Errors in subprojects kinda suck with error-reporting
-	* errors with jbin also suck
-* months.scproj demo needs better compiler support, including .render not being needed.
-* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
-* vector constants
-* || s = "".Address.IsLower // won't compile...
-* perryide_Behaviour 
-	* Make not available from speedie, c-export only.
-	* Perhaps a unicode start letter. or don't add to lookup table
-* do we need lowercase in lookupsub??? all dots/funcs got lowered in parseclean?
-* &uint... allows &int
-* (node, err) = .text.parse --> |error| err, || node = .text.parse(err) // noice
-* passing .hfloatvar to  func(float) causes reporting error
-*  msg <~ {
-	dot "hi"
-	thg "ok"
-	prm
-		thg "yep" }    -->    ok.hi(yep)
-* |string| s = __now__.render fails
-* render float.fn {code} // won't compile
-* disallow append file into |[message]|! (Array of msg)
-* v.operatormul(1.33) instead of v*1.33 :(
-* disallowed nesting should error on the children not the parent (like a bra "containing" an arg)
-* Statement exprs should be {} first... or else it causes obscure bugs all over!
-	* before doing any fixes
-* rejoin blocks shouldn't safedecr then incr!! pointless!
-	* "a oar b" should almost never be refcounted (unless returns a real object thats empty)
-* oar is kinda buggy for a lot of things.
-	x = a oar x // sets x to x! should disallow? if a: x=a thats what we want.
-* MacroSystem using ast-spawner // could simplify a lot of things, especially the sugars
-	* "Try" syntax via ast-spawner? just make it... NOT inbuilt?
-*	status(.CurrMousePixelColor.render) // tmp struct.
-* new destructor! bitfield 64 for objs! no super! works for most!
-	// could be done better with ast-spawner?
-* RelSetOr
-	* if .parent == A or B -->
-		    if .parent == A or .parent == B
-		--> if ({|| p = .parent, rejoin p==A or p==B})
+
+additions:
+	* do we need lowercase in lookupsub??? all dots/funcs got lowered in parseclean?
+	*  msg <~ {
+		dot "hi"
+		thg "ok"
+		prm
+			thg "yep" }    -->    ok.hi(yep)
+	* new destructor! bitfield 64 for objs! no super! works for most!
+		// could be done better with ast-spawner?
+	* (node, err) = .text.parse --> |error| err, || node = .text.parse(err) // noice
+	* any object can be created with an virtual-function override table, just store before the refcount?
+	* could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
+	* Make objectset from FastDict? Need to ref the keys
+		* Store object.IDs (ints). Last node can store 10 bits instead of 4.
+	* || x = .SomeCArray // should just get the address... :)
+	
+	* Errors in subprojects kinda suck with error-reporting
+		* errors with jbin also suck
+	* months.scproj demo needs better compiler support, including .render not being needed.
 
 
 class-changes

@@ -62,6 +62,9 @@ class ErrorList
 			|| CanPrint = !.BadCount and error.autoprint
 		  else
 			|| Canprint = false
+		target self
+			#!"Speedie" // useful marker for debugging...
+		
 		.incr(err)
 		require .CanAddMore(err.severity)
 		

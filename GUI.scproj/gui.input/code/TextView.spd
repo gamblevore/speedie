@@ -861,7 +861,7 @@ class TextView (GUIControl)
 	function ClickedMsg (|int| pos, |bool| named=false, |message|)
 		opt NoRefCounts
 		|| d   = .findDrawInfo(pos)
-		require d and !d.error
+		require d and d isnt fakemsg
 		|| msg = d.message						#require
 		//if msg == @arg
 			//return msg // whatever

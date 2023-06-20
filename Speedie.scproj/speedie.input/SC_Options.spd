@@ -164,7 +164,8 @@ module Feedback
 
 		if exists and isspd and stderr.ok
 			return path
-		
+	
+	
 	function ParseOption (|AppArgument| Obj)
 		// something like that?
 		|| Name  = obj.Name

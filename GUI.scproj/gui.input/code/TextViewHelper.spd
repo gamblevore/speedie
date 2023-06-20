@@ -1,4 +1,5 @@
 
+
 datatype TextLineFlags (uint16)
 	flags
 		// Error
@@ -8,6 +9,7 @@ datatype TextLineFlags (uint16)
 		CurrFound
 		Last
 		AvoidLastChar
+		FakeMsg
 
 
 class TextViewLine (ringtree)
@@ -126,14 +128,18 @@ class TextViewLine (ringtree)
 	helper Colorise (|message| msg, |bool| ParsedOK, |message|)
 		.msgpos = -1
 		.message = nil
+		isnt fakemsg
+
 		if msg
 			return .ColoriseSub(msg)
-		
+
 		require !parsedok
+
 		|| r = .text.ParseWithError(texterrors)
 			.msgpos = .position
 			r.addpos(.position)
 			.ColoriseSub(r)
+			is fakemsg
 
 	
 	helper range (|intrange|)
