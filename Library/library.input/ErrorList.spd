@@ -18,6 +18,7 @@ class ErrorList
 	|Error|					Errors
 	|fnErrorLogger| 		LogFunc
 	|int|					MaxErrors
+	|int|					MaxProblems
 	|int|					ErrorCount
 	|int|					ProblemCount
 	|int|					WarnCount
@@ -29,6 +30,7 @@ class ErrorList
 	constructor
 		.errors = error()
 		.MaxErrors = 512
+		.MaxProblems = 16
 		JB_API.NilHappened = nil
 
 
@@ -182,10 +184,10 @@ class ErrorList
 		
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
 		require !.BlockErrors and !ErrorList.OutOfMemory
+		if level == ErrorSeverity.problem
+			return (.problemcount < .maxproblems)
 		if level >= ErrorSeverity.error // a warning
 			return (.ErrorCount < .MaxErrors)
-		if level == ErrorSeverity.problem
-			return (.problemcount < 16)
 		return (.WarnCount < .MaxErrors)
 	
 	Syntax UsingComplete
