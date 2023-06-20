@@ -16,7 +16,7 @@ insertion the
 
 
 
-insertion general
+insertion
 	timeit	({|| starttime = date.now, (_0), rejoin (starttime.ago)})
 	right	the~left + _0
 	left	the~right-(_0)

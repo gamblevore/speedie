@@ -357,6 +357,7 @@ extend PerryIDE
 		.AddViewButton(.viewerrors,		"\17",	.errorlist)
 		.AddViewButton(.viewdebugger,	"\18",	.debugger)
 		.AddViewButton(.viewlog,		"\0D",	.logarea)
+
 		.viewfiles.left = 5 ~ right
 		.view(.Viewfiles)
 		

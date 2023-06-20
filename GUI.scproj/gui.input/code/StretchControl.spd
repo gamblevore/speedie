@@ -122,7 +122,7 @@ class StretchDivider (GuiControl)
 		opt norefcounts
 		if !.collapsed
 			.start = .ActiveEnd
-			.ActiveEnd = (.min, 0~right)(soft)
+			.ActiveEnd = ((.min, 0)(soft)) ~ Right
 
 
 	helper SetCollapsed (|bool| Soft, |bool| value)

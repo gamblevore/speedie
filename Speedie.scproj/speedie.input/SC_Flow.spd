@@ -8,6 +8,6 @@ function Tran_Flow (TranFunc)
 	fn.FlowDisabled = true
 
 	
-insertion general
+insertion
 	quietly	({flowcontrol.disabled++, (_0), flowcontrol.disabled--, rejoin 0})
 	

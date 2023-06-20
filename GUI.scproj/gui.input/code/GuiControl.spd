@@ -280,13 +280,13 @@ class GUIControl (ringtree)
 	function Right (|int|)			// these are not synced but i dont know what to do.....
 		return .lastrect.x2			// set a controlpoint, but get a lastrect int?
 	setter Left (|ControlPoint|)
-		.size(0) = (value)~right
+		.size(0) = value
 	setter Bottom (|ControlPoint|)
-		.size(1) = (value)~up
+		.size(1) = value
 	setter Right (|ControlPoint|)
-		.size(2) = (value)~left
+		.size(2) = value
 	setter Top (|ControlPoint|)
-		.size(3) = (value)~down
+		.size(3) = value
 
 	function Left (|int|)
 		return .lastrect.x

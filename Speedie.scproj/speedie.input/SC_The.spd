@@ -9,8 +9,14 @@
 module SCThe		
 	function NewInsertion (CollectFunc)
 		opt norefcounts
-		|| name = node[@thg]
+		|| name = node[0]
+		if name == @arg
+			name = @thg + "general"
+			node.first = name
+		
+		require name.Expect(@thg)
 		expect (name == "the" or "general") (name)
+
 		|| d = compiler.AdjDicts[name.name] init dictionary.new
 
 		for line in name.next(@arg)

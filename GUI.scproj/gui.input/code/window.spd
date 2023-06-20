@@ -391,7 +391,10 @@ class Window (GUIControl)
 		|GUIControl|				ActiveControl
 		|guicontrol of Window|		All = guicontrol(nil)
 		|[window]|					OpenDialogs
-
+	
+		function Count (|int|)
+			return .all.SlowCount
+		
 		function Front (|Window|)
 			return  .all.last
 
