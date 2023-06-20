@@ -1794,15 +1794,19 @@ class TextView (GUIControl)
 
 
 	function GuessExpectsParse
+		opt norefcounts
+
 		|| mode = .expectsparse
 		require mode == AllowJeebox or ProbablyJeebox or CurrentlyJeebox
+
 		mode = AllowJeebox
 		|| d = .document
-			|| ext = d.Location.ext
-			if ext ~= "spd" or "box" or "jbin" or "xml" or "jb" // i wanna debug my xml code
-				mode = CurrentlyJeebox
-			  elseif ext ~!= "todo" and "txt"
-				mode = ProbablyJeebox // this seems wrong
+			|| l = d.Location
+				|| ext = l.ext
+				if ext ~= "spd" or "box" or "jbin" or "xml" or "jb" // i wanna debug my xml code
+					mode = CurrentlyJeebox
+				  elseif ext ~!= "todo" and "txt"
+					mode = ProbablyJeebox // this seems wrong
 		.expectsparse = mode
 	
 	

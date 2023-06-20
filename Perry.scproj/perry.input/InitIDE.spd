@@ -168,7 +168,7 @@ extend PerryIDE
 			isnt drawsfocus
 			.tooltip		= self.SearchArea.Tooltip			
 			.SingleLine		= true
-			.ID				= "SearchField"
+			.ID				= "mass"
 			.size 			= 3~inside  by  2~down back 15
 			.takesfocus		= takesfocusflag.On
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)

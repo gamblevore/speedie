@@ -8,12 +8,16 @@
 	* NilSweep, for global vars, and for function misuse.
 
 
+* Close speedie if tab hasn't been used for a few minutes. Save memory.
+* 3~right does not click-jump
+	* 3~ should autocomplete from the macros
+* not-compilable functions blocks lookups, on a .dot function call.
+	* also properties! like: .clipmode = SomeThingThatisNotAControlPoint
+
 
 // Do later
-* move birds to its own project
-* change "?" behaviour
+* change "?" implementation
 * galaxxies C++ compile issues
-* not-compilable functions blocks lookups, on a .dot function call.
 * RefOpts. Do it bit by bit
 	* get property but only did math
 	* mark a few string funcs as not-modifier/disowner/capturer
