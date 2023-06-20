@@ -19,7 +19,6 @@
 		* Start with leaf-funcs.
 * galaxxies C++ compile issues
 * x = ring.position? fails to compile
-* 3~ should autocomplete from the macros
 * CollectDecls needs fixing to not return early!! or break it up into pieces
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
