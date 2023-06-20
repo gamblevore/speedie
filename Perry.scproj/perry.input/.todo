@@ -8,14 +8,8 @@
 	* NilSweep, for global vars, and for function misuse.
 
 
-* 3~right does not click-jump
-	* 3~ should autocomplete from the macros
-
-
 // Do later
-* x = ring.position? fails to compile
 * change "?" implementation
-* galaxxies C++ compile issues
 * RefOpts. Do it bit by bit
 	* get property but only did math
 	* mark a few string funcs as not-modifier/disowner/capturer
@@ -23,6 +17,9 @@
 	* fast capture of disowned things. like: r1 <~ r2.pop
 	* check entire program for modification during nil-sweep
 		* Start with leaf-funcs.
+* galaxxies C++ compile issues
+* x = ring.position? fails to compile
+* 3~ should autocomplete from the macros
 * CollectDecls needs fixing to not return early!! or break it up into pieces
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
