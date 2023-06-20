@@ -498,19 +498,15 @@ module SDLApp
 
 
 	function OrderWindows (|window|)
-		|window--| c = window.all.last
-		|window--| w = c
-		while
-			if c is visible
-				exit
-			c = c.prev|window|
-		require c
-		window.all <~ c // move to front
+		|window--| w
 		|| Pos = 0
-		while w
-			w.Position = pos++ // perry relies on this. :)
-			w = w.prev|window|
-		return c
+		for c in window.all
+			if c is visible
+				w = c
+				c.position = pos++
+			  else
+				window.all.first = c
+		return w
 
 		
 	function PreFrame (|int|)

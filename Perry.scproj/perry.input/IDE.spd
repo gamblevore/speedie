@@ -349,7 +349,7 @@ class PerryIDE (Window)
 		if f.lastsend.ago > date.seconds(30+.position)
 			|| msg = "Released Speedie: " + .name
 			.LogOneAction(@emb + msg)
-			.feedback = nil
+			.feedback.KillButOK
 		
 
 	behaviour FrameUpdate // perframe, eachframe, onframe
