@@ -207,7 +207,7 @@ module SDLApp
 		return .event.type is textinput or keydown
 
 
-	function RunAndQuit (|GUIApplicationInit| fn, |object| Anything=nil,  |ivec2| size=(414, 256))
+	function RunAndQuit (|GUIApplicationInit| fn=nil, |object| Anything=nil,  |ivec2| size=(414, 256))
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
 		
