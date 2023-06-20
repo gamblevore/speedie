@@ -14,12 +14,12 @@ class GUIControl (ringtree)
 	|GUIAction|					OnClicked
 	|GUIAction|					OnFocus
 	|ControlSize|				Sizer
+	|controlpoint|				ClipMode
 	|GuiControlFlags|			State
 	|TakesFocusFlag|			TakesFocus
 	|byte|						TextAlteredForDraw
 	|byte|						ExpandOnMouseOver
 	|bool|						PostLoaded
-	|byte|						ClipMode
 	|bool|						ClickOutsideCloses
 	|CopyPasteFlags|			CopyPaste
 
@@ -241,15 +241,15 @@ class GUIControl (ringtree)
 	function Width (|int|)
 		return .lastrect.width
 	setter Width (|controlline|)
-		.sizer.g(0) = value[0]
-		.sizer.g(2) = value[1]
+		.sizer.g(0) = value[0]|controlpoint|
+		.sizer.g(2) = value[1]|controlpoint|
 
 	function Height (|int|)
 		return .lastrect.Height
 	// dreams... of dance, fun, youth! healinggggg...
 	setter Height (|controlline|)
-		.sizer.g(1) = value[0]
-		.sizer.g(3) = value[1]
+		.sizer.g(1) = value[0]|controlpoint|
+		.sizer.g(3) = value[1]|controlpoint|
 
 	helper DoCopy (|object| item=nil, |bool|)
 		|| S = .getcopy

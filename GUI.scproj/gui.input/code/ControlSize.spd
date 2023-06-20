@@ -23,7 +23,7 @@ struct ControlSize
 		return true
 
 	syntax access (|int| i, |ControlPoint|)
-		return .GSize[i]
+		return .GSize[i]|controlpoint|
 		
 	setter TrySetLength (|int| i, |int|)
 		if .mode(i) == ControlPoint.Length
@@ -36,8 +36,8 @@ struct ControlSize
 		return .GSize[i]>>4
 
 	helper sett (|int|i, |ivec2| value, |int| mode) // remove?
-		.g(i)   = (value.x << 4) (|) mode
-		.g(i+1) = (value.y << 4) (|) mode
+		.g(i)   = ((value.x << 4) (|) mode)|controlpoint|
+		.g(i+1) = ((value.y << 4) (|) mode)|controlpoint|
 
 	setter guicontrol.FullScreen (|ivec2|) // for full-screen windows
 		.lastrect = (0,0,value)
@@ -45,7 +45,7 @@ struct ControlSize
 		.sizer.sett(2, value, ControlPoint.length)
 
 
-	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |int| ExtentMode, |ivec4|)
+	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |controlpoint| ExtentMode, |ivec4|)
 		|| pc = parent.size >> 1
 		for i in 4
 			|| m = .mode(i)
@@ -65,10 +65,10 @@ struct ControlSize
 			if .mode(i) == ControlPoint.Length
 				rz[i] = rz[i xor 2] + ((i>=2) sign .size(i))
 		
-		if ExtentMode & ControlPoint.SlideBackInParent
+		if ExtentMode|int| & ControlPoint.SlideBackInParent|int|
 			rz = rz.Bound(parent)
 		
-		if ExtentMode & ControlPoint.SlideBackInWindow
+		if ExtentMode|int| & ControlPoint.SlideBackInWindow|int|
 			rz = rz.Bound(window)
 			rz = rz.boundclip(window) // in case parent goes outside window
 		

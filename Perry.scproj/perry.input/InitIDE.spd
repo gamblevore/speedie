@@ -47,7 +47,7 @@ extend PerryIDE
 		.viewlog			= ButtonView(.ViewButtons,		clickedaview)
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .logarea]
 		.filesep			= StretchControl.horz(self, 175~right, 110, 110)
-		.editsep			= StretchControl.vert(self, 0,         0,   100)
+		.editsep			= StretchControl.vert(self, 0~right,     0,   100)
 		.PopupDisplay		= textview(self)
 		.DebugArgsList		= textview(self	)
 		.AttachedProgram	= ""
@@ -207,7 +207,7 @@ extend PerryIDE
 		with .tester
 			.gnormal.solid	= ((0.0, 0.0, 0.1, 1.0))
 			.size = 10~wide by 10~high
-			.left = 0
+			.left = 0~right
 			
 		with .progress
 			.gnormal.edge = (1.0, 1.0, 1.0, 0.5)
@@ -357,7 +357,7 @@ extend PerryIDE
 		.AddViewButton(.viewerrors,		"\17",	.errorlist)
 		.AddViewButton(.viewdebugger,	"\18",	.debugger)
 		.AddViewButton(.viewlog,		"\0D",	.logarea)
-		.viewfiles.left = 5
+		.viewfiles.left = 5 ~ right
 		.view(.Viewfiles)
 		
 		.addlbutton(.goprev,		"<",	"prev", "Go to previous file.")
