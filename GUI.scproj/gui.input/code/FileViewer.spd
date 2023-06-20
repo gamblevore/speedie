@@ -254,9 +254,8 @@ class FileViewer (ListView)
 
 	syntax access (|string| path, |filerow|)
 		cpp_part AccessPath
-		opt norefcounts
 		for f in self
-			if f.location ~= path
+			if path ~= f.location or f.ReadFrom
 				return f
 
 

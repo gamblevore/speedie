@@ -3,7 +3,6 @@
 							Todo
 
 * VM?
-* opening .todo directly adds it to the external files haha
 * nil-checking
 	* .NilUsage vs .Nildeclared
 	* NilSweep, for global vars, and for function misuse.
