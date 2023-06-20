@@ -96,7 +96,7 @@ function message.NilCheckFP
 	pragma inline
 
 
-function message.NilCheckCond (|int| Time)
+function message.NilCheckCond (|int| Time, |int|)
 	pragma inline
 
 // 
@@ -110,7 +110,7 @@ function message.NilCheckCond (|int| Time)
 //	
 
 
-function Message.NilCheckFlat (|int| Time)
+function Message.NilCheckFlat (|int| Time, |int|)
 	opt norefcounts
 	for s.flat in self
 		Time++
@@ -149,8 +149,8 @@ function Message.NilCheckArg (|int| Time)
 		#! We have ASM if/while flags set! Just use them???
 		Time++
 		if s.func == @tmp and (s == "if" or "while")
-			s.NilCheckCond(Time)
+			time = s.NilCheckCond(Time)
 		  else
-			s.nilcheckflat(Time)
+			time = s.nilcheckflat(Time)
 			
 
