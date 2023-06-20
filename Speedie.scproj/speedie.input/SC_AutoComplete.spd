@@ -167,7 +167,7 @@ function message.compiles (|bool|)
 function ReportBuild (|message| cmd, |message|)
 	if stderr.ok and cmd.compiles
 		.Perry <~ .Log
-		TransCompiler.ExportAndInstall(false)
+		TransCompiler.ExportAndInstall(true)
 	if stderr.Problems
 		return cmd.SendPerryErrors
 	if cmd.compiles

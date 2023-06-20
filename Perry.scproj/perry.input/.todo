@@ -3,17 +3,15 @@
 							Todo
 
 * VM?
-* Perry is not displaying/getting speedie's build output very well
 * opening .todo directly adds it to the external files haha
 * nil-checking
-	* --nil option
 	* .NilUsage vs .Nildeclared
-	* NilSweep, just for global vars
-		
-	
+	* NilSweep, for global vars, and for function misuse.
+
 
 
 // Do later
+* move birds to its own project
 * change "?" behaviour
 * galaxxies C++ compile issues
 * not-compilable functions blocks lookups, on a .dot function call.

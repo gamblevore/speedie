@@ -300,9 +300,9 @@ function IsCompilerAndNeedsInstall (|bool|)
 function ExportAndInstall (|bool| CanInstall)
 	require .ShouldTransComp
 	if options.products
-		if options.pack
+		if options.products & options.pack
 			TreeAssembler.BuildPack
-		if options.native
+		if options.products & options.native
 			.RunCppCompile~quietly
 			if CanInstall and .IsCompilerAndNeedsInstall
 				.InstallCompiler
