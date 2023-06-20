@@ -797,13 +797,18 @@ module SDLApp
 			if sdlapp.AskNoQuit
 				return 0
 		
+		rz = kExiting
 		if .DialogIsOpen
 			for w in window.opendialogs
 				w.cancelreturn
-			return 0
+				if w.CanJustCloseForQuit
+					w.remove
+				  else
+					rz = 0
+			if !rz
+				return 0
 
 		.IsQuitting = true
-		rz = kExiting
 		for w in window.all
 			if !w.close(reason)
 				rz = 0

@@ -70,6 +70,16 @@ function ConfirmWindow_.Resize (|string| s)
 	.size = actual.layout
 
 
+function window.CanJustCloseForQuit (|bool|)
+	opt norefcounts
+	|| count = 0
+	if self isa ConfirmWindow_
+		for b in .Buttons
+			if b is visible
+				count++
+		return count == 1
+
+
 function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| Response=string.byte(0), |ConfirmCanceller| Cancel = nil, |int|)
 	|| w = ConfirmWindow_.asker init ConfirmWindow_()
 	if !q or w is visible		// recursive... sigh
