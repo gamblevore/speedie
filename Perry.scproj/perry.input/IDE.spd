@@ -653,7 +653,7 @@ class PerryIDE (Window)
 
 	function UpdateActiveFile
 		|| d = .editme.Document$
-		|| l = d.Location.Resolve
+		|| l = d.Location.Resolve(true)$
 		if l ~= app.pref_path.resolve
 			.updateprefs
 		  elseif l ~= .perryfile

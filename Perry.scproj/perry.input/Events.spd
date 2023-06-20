@@ -393,6 +393,8 @@ function PerryIDE.ClickedError (|error| row)
 
 
 function file.IsNicelyViewable (|bool|)
+	if .isdir
+		return true
 	require .exists
 	require .size < 512KB
 	return !.readall.isbinary
