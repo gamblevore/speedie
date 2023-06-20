@@ -615,7 +615,7 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 		} else {
 			Result = JB_Str__Freeable( Resolved );
 		}
-	} else if (!(errno == ENOENT and (AllowMissing&1))) {
+	} else if (!(errno == ENOENT and AllowMissing)) {
 		JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
 	}
 	
