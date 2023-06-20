@@ -216,7 +216,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	rz.AppendWords("-ffast-math")
 	
 	ifn platform.OSX
-		rz.appendwords( "-pthread" )
+		rz.appendwords( "-pthread -g" )
 	  elseif .CompilingLibFiles
 		.MacBothArch(rz)
 	  elseif (options.arch ~= "intel")
