@@ -35,7 +35,7 @@ function Stringstream.IsCompressed (|bool|)
 	return str.IsCompressed	
 
 
-function FastString.CompressInto (|faststring| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil)
+function FastString.CompressInto (|object| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil)
 	|| str = string.fromptr(.resultptr, .length)
 	str.CompressInto(fs, Strength, st)
 
