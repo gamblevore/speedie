@@ -678,6 +678,7 @@ JBClass ( JB_ErrorReceiver , JB_Object ,
 	JB_Error* Errors;
 	fnErrorLogger LogFunc;
 	int MaxErrors;
+	int MaxProblems;
 	int ErrorCount;
 	int ProblemCount;
 	int WarnCount;
@@ -1314,13 +1315,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1863])
+#define kJB__ErrorColors_bold (JB_LUB[1865])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1864])
-#define kJB__ErrorColors_good (JB_LUB[1865])
-#define kJB__ErrorColors_normal (JB_LUB[1866])
-#define kJB__ErrorColors_underline (JB_LUB[1865])
-#define kJB__ErrorColors_warn (JB_LUB[1867])
+#define kJB__ErrorColors_error (JB_LUB[1866])
+#define kJB__ErrorColors_good (JB_LUB[1867])
+#define kJB__ErrorColors_normal (JB_LUB[1868])
+#define kJB__ErrorColors_underline (JB_LUB[1867])
+#define kJB__ErrorColors_warn (JB_LUB[1869])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1492,10 +1493,10 @@ extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_AddressOfMatch (3)
-#define kSC_BitAnd (JB_LUB[341])
-#define kSC_BitNot (JB_LUB[603])
-#define kSC_BitOr (JB_LUB[544])
-#define kSC_BitXor (JB_LUB[1868])
+#define kSC_BitAnd (JB_LUB[343])
+#define kSC_BitNot (JB_LUB[605])
+#define kSC_BitOr (JB_LUB[546])
+#define kSC_BitXor (JB_LUB[1870])
 #define kSC_CastedMatch (6)
 #define kSC_destructornotfromlocalrefs (512)
 #define kSC_DontSaveProperty (0)
@@ -1526,7 +1527,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1869])
+#define kJB_SaverStart1 (JB_LUB[1871])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1)
@@ -2155,6 +2156,8 @@ void SC_Comp__FileSanityTests();
 
 void SC_Comp__FileTestsSub(JB_File* Dest, JB_File* Src, JB_String* A, JB_String* B);
 
+Macro* SC_Comp__FindAdj(Message* exp, Array* prms);
+
 SCClass* SC_Comp__FindClass(JB_String* name, Message* where);
 
 SCClass* SC_Comp__FindClassOK(JB_String* name);
@@ -2374,6 +2377,8 @@ bool SC_FB__AppOptions_m64(JB_String* Name, JB_String* Value, FastString* purpos
 
 bool SC_FB__AppOptions_maxvars(JB_String* Name, JB_String* Value, FastString* purpose);
 
+bool SC_FB__AppOptions_nil(JB_String* Name, JB_String* Value, FastString* purpose);
+
 bool SC_FB__AppOptions_nocolor(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppOptions_nocompile(JB_String* Name, JB_String* Value, FastString* purpose);
@@ -2495,6 +2500,8 @@ Message* SC_AC__DoCmd(Message* cmd, Message* arg);
 bool SC_AC__Enter();
 
 JB_String* SC_AC__ErrName();
+
+Message* SC_AC__FindAdj(Message* msg, bool DisplayOnly);
 
 Message* SC_AC__FuncTmps();
 
@@ -3689,6 +3696,8 @@ float JB_f_RoundTo(float self, float to);
 int JB_int___junktest_8__(int self, int Inaaaadex, bool Create);
 
 int JB_int_bits(int self);
+
+int JB_int_ClampRange(int self, int low, int high);
 
 bool JB_int_IsNormalMatch(int self);
 
@@ -5708,13 +5717,13 @@ int SC_PA_MacroSize(SCParamArray* self);
 
 bool SC_PA_MadeError(SCParamArray* self);
 
+JB_String* SC_PA_ModuleName(SCParamArray* self);
+
 bool SC_PA_PreReadTypes(SCParamArray* self, SCBase* Name_Space, Message* P, Message* side);
 
 IntRange SC_PA_Range(SCParamArray* self);
 
-JB_String* SC_PA_RenderName(SCParamArray* self);
-
-JB_String* SC_PA_RenderType(SCParamArray* self);
+JB_String* SC_PA_RenderKind(SCParamArray* self);
 
 void SC_PA_SideSet(SCParamArray* self, Message* Value);
 
@@ -7348,9 +7357,9 @@ inline void JB_Msg_NilCheckAccess(Message* self);
 
 void JB_Msg_NilCheckArg(Message* self, int Time);
 
-inline void JB_Msg_NilCheckCond(Message* self, int Time);
+inline int JB_Msg_NilCheckCond(Message* self, int Time);
 
-void JB_Msg_NilCheckFlat(Message* self, int Time);
+int JB_Msg_NilCheckFlat(Message* self, int Time);
 
 inline void JB_Msg_NilCheckFP(Message* self);
 
@@ -8622,7 +8631,8 @@ inline _cstring JB_Str_SyntaxCast(JB_StringC* self) {
 inline void JB_Msg_NilCheckAccess(Message* self) {
 }
 
-inline void JB_Msg_NilCheckCond(Message* self, int Time) {
+inline int JB_Msg_NilCheckCond(Message* self, int Time) {
+	return 0;
 }
 
 inline void JB_Msg_NilCheckFP(Message* self) {
@@ -8643,7 +8653,7 @@ inline void JB_Msg_NilCheckProperty(Message* self) {
 	}
 	 else {
 		if ((!(SC_NilState_SyntaxIs(ObjDecl->NilUsage, kSC__NilState_exists)))) {
-			JB_Msg_SyntaxExpect(self, JB_LUB[1572]);
+			JB_Msg_SyntaxExpect(self, JB_LUB[1574]);
 			JB_Decr(ObjDecl);
 			return;
 		}
