@@ -497,6 +497,22 @@ module SDLApp
 			.FixScreenBug = date.now + 1s
 
 
+	function OrderWindows (|window|)
+		|window--| c = window.all.last
+		|window--| w = c
+		while
+			if c is visible
+				exit
+			c = c.prev|window|
+		require c
+		window.all <~ c // move to front
+		|| Pos = 0
+		while w
+			w.Position = pos++ // perry relies on this. :)
+			w = w.prev|window|
+		return c
+
+		
 	function PreFrame (|int|)
 		if .FixScreenBug.Fired
 			.BumpSize
@@ -507,14 +523,7 @@ module SDLApp
 
 		.HandleOpenFile
 		
-		|window--| w = window.all.last
-		while
-			require w
-			if w is visible
-				exit
-			w = w.prev|window|
-			
-		w.parent <~ w // move to front
+		|window--| w = .OrderWindows$
 		.UpdateTextFocus(W)
 		.PreFrameText(w)
 		

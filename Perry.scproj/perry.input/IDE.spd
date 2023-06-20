@@ -343,10 +343,21 @@ class PerryIDE (Window)
 			.CrashedFB(c, "Process found dead.")
 
 
+	function SaveMemory
+		require !.IsFront
+		|| f = .Feedback$
+		if f.lastsend.ago > date.seconds(30+.position)
+			|| msg = "Released Speedie: " + .name
+			.LogOneAction(@emb + msg)
+			.feedback = nil
+		
+
 	behaviour FrameUpdate // perframe, eachframe, onframe
 		.tabs.TrimWidth
-		if !ShouldNotDisturbGUI and !.focus
-			.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
+		if !ShouldNotDisturbGUI
+			.SaveMemory
+			if !.focus
+				.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
 		.UpdateDebuggedApp(false)
 		.TestCompilerAlive
 		.SpeedieMsgReceive(.feedback)
@@ -355,6 +366,8 @@ class PerryIDE (Window)
 		.UpdateStatusErrors
 		.ReadLog
 		.PopupDisplayFadeIn
+		
+			
 		|| fc = sdlapp.FrameCount|int|
 		require .islast
 		if fc+1 isa 64

@@ -103,6 +103,8 @@ datatype Date (int64)
 			yield (CurrTime - StartDate).seconds|float|
 
 	module
+		function Seconds (|f64| s, |date|)
+			return s * kOneSecond
 		function TimeID (|uint64|)
 			.now.timeID
 			
