@@ -1010,6 +1010,8 @@ function Message.RenderType (|string|)
 	|| D = .obj
 	if (D isa SCDecl)
 		return D.WriteSimpleType.Render
+	if (D isa scmodule)
+		return d.name
 	return .Render
 
 

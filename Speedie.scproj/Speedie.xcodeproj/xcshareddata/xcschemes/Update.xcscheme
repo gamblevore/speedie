@@ -53,6 +53,26 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
+            argument = "--self"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/usr/local/speedie/Utils/jz.spd"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/usr/local/speedie/Utils/speedrogue.scproj"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/theodore/Code/Galaxxies.scproj"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--nocolor"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "/usr/local/bin/jz"
             isEnabled = "NO">
          </CommandLineArgument>
@@ -65,27 +85,11 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--self"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--nocolor"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
             argument = "--asm"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--target=debugproject"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "/usr/local/speedie/Utils/speedrogue.scproj"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "/Users/theodore/Code/Galaxxies.scproj"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>

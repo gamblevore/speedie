@@ -40,14 +40,18 @@ function compiler.Adj (|message| f, |dictionary of macro|)
 	
 
 function TypeOfAdj (ExprResolver)
+	|[message]| args 
+	|| found = compiler.findadj(exp, args)
+		exp.Become(found, Args)
+		return TypeOfExpr(exp, name_space, side)
+
+
+function compiler.FindAdj (|message| exp, |[message]| prms=nil, |macro|)
 	opt norefcounts
 	|| f = exp[@nil, 0]					#require
 	|| d = compiler.Adj(f)				#require
 	|| name = exp[@thg, 1]				#require
 	name.name = name.name.lowercase
-	|| found = d.expect(name)			#require
-	|[message]| args 
-	if f != @thg
-		args <~ f
-	exp.Become(found, Args)
-	return TypeOfExpr(exp, name_space, side)
+	if prms!=nil and (f != @thg)
+		prms <~ f
+	return d.expect(name)

@@ -42,14 +42,15 @@ class SCParamArray
 		if (.IsDot and .Isforclass)
 			return kTypeCastIgnoreContained
 
-	function RenderType (|string|)
+	function RenderKind (|string|)
 		if (.isforclass)
 			return "class"
 		return "module"
-	function RenderName (|string|)
+	
+	function ModuleName (|string|)
 		if (.isforclass)
 			return Self[0].RenderType
-		return .exp.first.render
+		return .exp.first.RenderType
 
 
 	constructor (|Message| exp, |message|side=nil)

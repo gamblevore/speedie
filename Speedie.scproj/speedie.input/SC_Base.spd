@@ -511,7 +511,7 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 	  elseif (!ParamsHere)
 		ErrMsg = "Can’t find object “${OrigName}”."
 	  elseif (ParamsArray.IsDot)
-		ErrMsg = "Can’t find “${OrigName}” on ${ParamsArray.RenderType} “${ParamsArray.RenderName}”."
+		ErrMsg = "Can’t find “${OrigName}” on ${ParamsArray.RenderKind} “${ParamsArray.ModuleName}”."
 		if self isa SCModule
 			|| cls = .cls
 				|| found = cls.UpCheck(origname)

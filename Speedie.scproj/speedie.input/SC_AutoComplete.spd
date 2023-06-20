@@ -781,7 +781,9 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 	
 	if purpose ~= "displayall"
 		if !fn.nextfunc and !fn.args
-			return rz
+			return rz // I guess we want empty result.
+	if !fn
+		return s.copy
 	
 	while fn
 		|| copy = fn.source.cutifycopy 
@@ -896,7 +898,7 @@ function Define (|message| msg,  |string| purpose,  |object| found=nil,  |messag
 	|| s = .LocateDefinition(msg, found|scobject|, IsDisplay)	
 		return .RespondDefine(msg, s, purpose)
 	if platform.isdebug
-		//debugger
+		if compiler.projectname contains "jz.spd" // easier debugging
 		.LocateDefinition(msg, found|scobject|, IsDisplay)
 	error "nosource"
 
@@ -990,7 +992,24 @@ function Message.ModuleSrc (|message|)
 			return found.source
 
 
+function FindAdj (|message| msg, |bool| DisplayOnly, |message|)
+	opt norefcounts
+	|| adj = msg
+	if msg in @adj
+		adj = msg.parent
+	ifn adj in @decl
+		|| found = compiler.findadj(adj)
+			return found.parsed // perhaps?
+	 
+
 function LocateDefinition (|message| msg, |scobject| already_defined, |bool| DisplayOnly, |message|)
+	opt norefcounts
+	if (msg in @adj) or (msg == @adj)
+		rz = .FindAdj(msg, displayonly)
+		if rz
+			return rz
+		
+		
 	|| ty = TypeOfExpr(msg, msg.msgarg) // needs refcounts
 	rz = .LocateDefinitionSub(msg, already_defined, ty, DisplayOnly)
 	if rz == @arg
