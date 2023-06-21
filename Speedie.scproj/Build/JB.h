@@ -7381,6 +7381,8 @@ bool JB_Msg_OarExpand(Message* self);
 
 void JB_Msg_Oat__(Message* self, FastString* fs);
 
+bool JB_Msg_ContainsStr(Message* self, JB_String* s);
+
 bool JB_Msg_OperatorIn(Message* self, Syntax f);
 
 bool JB_Msg_OperatorIsARel(Message* self, JB_String* name);
@@ -7422,6 +7424,8 @@ void JB_Msg_PrepareAST(Message* self, JB_String* path);
 int JB_Msg_PrevIndentCheck(Message* self, Message* pr);
 
 void JB_Msg_Prm__(Message* self, FastString* fs);
+
+Message* JB_Msg_QMarkRel(Message* self);
 
 void JB_Msg_Ques__(Message* self, FastString* fs);
 
@@ -8653,7 +8657,7 @@ inline void JB_Msg_NilCheckProperty(Message* self) {
 	}
 	 else {
 		if ((!(SC_NilState_SyntaxIs(ObjDecl->NilUsage, kSC__NilState_exists)))) {
-			JB_Msg_SyntaxExpect(self, JB_LUB[1574]);
+			JB_Msg_SyntaxExpect(self, JB_LUB[1573]);
 			JB_Decr(ObjDecl);
 			return;
 		}
