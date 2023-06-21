@@ -22,6 +22,9 @@ role StretchControl (GuiControl)
 		opt norefcounts
 		.div.ActiveEnd = .div.start
 	
+	function Flip
+		.div.flip
+	
 	function Collapse (|bool| soft = false)
 		opt norefcounts
 		.div.Collapse(soft)
@@ -132,7 +135,7 @@ class StretchDivider (GuiControl)
 			.show
 
 
-	helper ClickedFlip
+	function Flip
 		if .Collapsed
 			if .min > 0 // shouldnt be possible
 				(.onshow)(self, 1)?
@@ -173,7 +176,7 @@ class StretchDivider (GuiControl)
 	behaviour MouseDown
 		require .InTest(P, false)
 		if keys.cmd or (clicks == 2)
-			.ClickedFlip
+			.Flip
 			return 1
 		|| pr = .parent.lastrect ± 1
 		|| x  = p[.d] - pr[.d]
