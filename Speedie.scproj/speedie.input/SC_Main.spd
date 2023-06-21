@@ -36,8 +36,8 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 
-	FlowControl.FlowMode = FlowControl.Off // can enable via "log"	
-	error.AutoPrint = 1
+	FlowControl.FlowMode = FlowControl.Off // can enable via "log"
+	error.AutoPrint := 1
 	.Clearenvs
 	check (app.pref_path) "Conf missing prefpath"
 	app.PrefsInit
