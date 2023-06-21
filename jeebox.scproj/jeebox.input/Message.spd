@@ -872,10 +872,11 @@ class Message (RingTree)
 			return ch
 		.accesserr(s, nil, ch)
 	
+	
 	syntax access (|Syntax| s, |string| name, |Message|)
 		cpp_Part NeedSyxName
 		Opt NoRefCounts
-		|| f = self[s]
+		|| f = self[s] // why @nil?
 		if f.expect(@nil, name)
 			return f
 	
