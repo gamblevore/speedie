@@ -1,6 +1,4 @@
 
-
-
 class BirdWindow (Window)
 	|int|				Round
 	|PipeOwner|			Pipes
@@ -36,19 +34,18 @@ class BirdWindow (Window)
 		.speed.remain = 0
 		.pipes.clear
 		.pipes.position = 0
-		.reflow
 		.pipes.refill(0)
-		.pipes.first.left = 200
+		.pipes.first.left = 200~right
 		.player.init
-		.reflow
 	
-	
+		
 	behaviour keydown
-		if key is space
+		if key is SPACE
 			keys.space.eat
 			.player.jump
-		  elseif key is escape
+		if key is escape
 			.RestartGame // ooop
+		return true
 	
 	
 	behaviour FrameUpdate
@@ -75,18 +72,17 @@ class BirdWindow (Window)
 		|| p = .pipes.first
 		.speed.Amount += 600th
 		.speed.Amount min= 2.5
-		|| x = p.left - .speed[]
+		|| x = p.relativeleft.length - .speed[]
 		if p.width + x > 0
-			p.left = x
+			p.left = (x)~right
 		  else
 			pipeowner.Passed++
 			.updatescore
 			p.next.remove
 			p.remove
 			|| p2 = .pipes.first
-			p2.left = p2.left
+			p2.left = p2.left~right
 			.pipes.refill(.speed.Amount)
-	
 	
 	
 	constants

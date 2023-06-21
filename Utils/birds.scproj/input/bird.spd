@@ -25,12 +25,11 @@ class Bird (guicontrol)
 		opt norefcounts
 		
 		|| b = .bottom
-		if true
-			|| y = .yspeed
-			if (y > 0) and keys.space
-				y *= 1.44
-			b += y
-			.yspeed = (.yspeed - birdwindow.G) max -10
+		|| y = .yspeed
+		if (y > 0) and keys.space
+			y *= 1.44
+		b += y
+		.yspeed = (.yspeed - birdwindow.G) max -10
 
 		if b <= 0 and .yspeed <= 0 // bounces
 			.yspeed *= -0.5
@@ -47,3 +46,4 @@ class Bird (guicontrol)
 				.died = date.now
 		return .died.ago < 3s
 	 
+

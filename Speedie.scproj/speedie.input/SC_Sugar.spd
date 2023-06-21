@@ -48,10 +48,6 @@ function message.Tran_QMark
 		require inside.expect(@bra)
 		inside = inside.first
 	
-	// a().b?
-	
-
-	// a.b? = 1 
 	using (self)
 	|| rel = .QMarkRel						// a().b? = c   -->   {|| t = a(),  if t: t.b = c}
 		if rel contains "B2"
@@ -63,7 +59,6 @@ function message.Tran_QMark
 		self <~ decl
 		decl.msg(@arg) <~ rel
 		return
-
 
 	|| tern = self
 	if self in @arg					//  {if a: a.b}   OR   {|| t = a(), if t: t.b}
@@ -88,26 +83,10 @@ function message.Tran_QMark
 		options <~ thedot
 		options.msg(@thg, "nil")	// TypeOfTern could "just give the default"!
 									// So I don't even need to enter "nil"! Just delete it!
-	
 	if (inside != @thg)
 		cond.name = "_t"
 		inside.replaceWith(@thg.msg("_t"))
 		tern.prev = MakeDecl("",  "_t", inside)
-	
-	
-	// ({ || _t = a(), rejoin (_t.b, nil)(_t) })
-	// (_t.b, nil)(_t)
-	
-	// i think da communication is better
-	// but we still need to fix the lack of the decl....
-
-
-	
-//
-//|macro| 	QMarkThing		= "(_0._1, nil)(_0)".macro
-//|macro|	QMarkArg		= "|| t = _0,  (t._1, nil)(t)".macro
-//|macro| 	QMarkNested		= "({|| t = _0,  (t._1, nil)(t)})".macro
-		
 	
 
 function message.MainOneArg (|message| arg, |int64| i, |faststring| usage)
