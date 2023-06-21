@@ -290,6 +290,8 @@ class GUIControl (ringtree)
 
 	function Left (|int|)
 		return .lastrect.x
+	function RelativeLeft (|controlpoint|)
+		return .sizer.GSize[0]|controlpoint|
 	setter After (|int|)
 		.sizer.g(0) = (value)~after
 
