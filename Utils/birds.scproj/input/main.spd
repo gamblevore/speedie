@@ -1,5 +1,5 @@
 
 
 main
-	BirdWindow().show
+	BirdWindow()
 	sdlapp.RunAndQuit
