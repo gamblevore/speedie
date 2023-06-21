@@ -678,9 +678,8 @@ extend Parser
 			if NewStrPos >= After: exit
 			
 			NewStrPos++
-			|| C0 = parser[NewStrPos]  
-			if C0 == '{'
-				NewStrPos++
+			|| C0 = parser[NewStrPos]
+			NewStrPos += (C0 == '{')
 			parser.NextStart = NewStrPos
 
 			if (C0 == '{')
@@ -691,7 +690,11 @@ extend Parser
 				if (c0 == '.')
 					type = @sdot
 					NewStrPos++
-				StrPos = parser.data.OutCharSet( jeebox.cswordmiddle, newstrpos + 1, after )
+				StrPos = parser.data.OutCharSet( jeebox.CSWordMiddle, NewStrPos + 1, after )
+				// searching for "$a.b.c"?
+				// I could search for "." + cswordmiddle, and subparse through that...
+				// although my parser isn't really designed for subparsing
+				// otherwise I'd need to do this manually. Its a mess.
 				strpos := after
 				|| rr = parser.new(result, type, NewStrPos, StrPos )
 				if (c0 == '.')
