@@ -57,6 +57,10 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "--nocolor"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "/usr/local/speedie/Utils/jz.spd"
             isEnabled = "YES">
          </CommandLineArgument>
@@ -66,10 +70,6 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/theodore/Code/Galaxxies.scproj"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--nocolor"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
