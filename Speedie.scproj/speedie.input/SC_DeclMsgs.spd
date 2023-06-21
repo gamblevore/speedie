@@ -99,7 +99,9 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 				func.isassigns = 3
 				if cls.isdatatype
 					item.next = item.copy // fn x (|int|) --> fn x (|int| value, |int|)
-				item <~ «thg "Value"»
+				if !item.haschildcount(2)
+					using func.source
+						item <~ «thg "Value"»
 			
 		if item == @Item
 			expect  (Func)  (item, "Can’t use this here." )
@@ -107,7 +109,8 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 				item = item.Last
 				func.IsAssigns = 1
 				if !item.haschildcount(2)
-					item <~ «thg "Value"»
+					using func.source
+						item <~ «thg "Value"»
 
 		if item != @Decl
 			expect (!Func)  ( item, "Not a declaration." )
