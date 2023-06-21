@@ -54,11 +54,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--self"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Utils/jz.spd"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Utils/speedrogue.scproj"
@@ -70,7 +70,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nocolor"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/bin/jz"
