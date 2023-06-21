@@ -22,8 +22,22 @@ function TypeOfDotDotDot (ExprResolver)
 	return TypeOfExpr(exp.first, name_space)
 
 
+
+
+function message.QMarkRel (|message|)
+	opt norefcounts
+	|| x = self
+	while
+		|| p = x.parent
+		if (p == @rel) and x.isfirst and (p.second == "=")
+			expect !(p in @decl) (self)
+			return p
+		x = p
+		require x == @dot
+		
+
+	
 function message.Tran_QMark
-	using (self)
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func) 
 	expect (isnormal) (thedot, "Question-mark not one of:  a.b?,  (a)(b)?,  a.b? = c")
@@ -34,69 +48,67 @@ function message.Tran_QMark
 		require inside.expect(@bra)
 		inside = inside.first
 	
-	|| arg			= self
-	|| p			= .parent
-	|| UseTernary	= false
+	// a().b?
+	
+
+	// a.b? = 1 
+	using (self)
+	|| rel = .QMarkRel						// a().b? = c   -->   {|| t = a(),  if t: t.b = c}
+		if rel contains "B2"
+		.prev = thedot
+		rel.next = self
+		.become(@arg)
+		inside.replaceWith(@thg.msg("_t"))
+		|| decl = MakeDecl("",  "_t", inside) 
+		self <~ decl
+		decl.msg(@arg) <~ rel
+		return
 
 
-	ignore
-		x = a.b?				// x = (a.b, "")(a)
-		|| x = a.b?				// || x = (a.b, "")(a)
-		x(a.b?)					// x((a.b, "")(a))
+	|| tern = self
+	if self in @arg					//  {if a: a.b}   OR   {|| t = a(), if t: t.b}
+		.become(@arg)
+		is style2
+	  elseif (inside == @thg)		// (a.b, nil)(a))
+		.func = @func
+	  else							// ({ || t = a(), (t.b, nil)(t) })
+		.func = @bra
+		tern = .msg(@arg)
+		(tern is style2)
+		tern = tern.msg(@func)
+	
+	|| Cond = @thg + inside.name
+	if self in @arg
+		tern = .msg(@tmp, "if")
+		tern <~ cond
+		tern.msg(@arg) <~ thedot
+	  else
+		|| options = tern.msg(@list)
+		tern.msg(@prm) <~ cond
+		options <~ thedot
+		options.msg(@thg, "nil")	// TypeOfTern could "just give the default"!
+									// So I don't even need to enter "nil"! Just delete it!
+	
+	if (inside != @thg)
+		cond.name = "_t"
+		inside.replaceWith(@thg.msg("_t"))
+		tern.prev = MakeDecl("",  "_t", inside)
+	
+	
+	// ({ || _t = a(), rejoin (_t.b, nil)(_t) })
+	// (_t.b, nil)(_t)
+	
+	// i think da communication is better
+	// but we still need to fix the lack of the decl....
 
 
-		a.b?					// if (a) {a.b}
-		a.b? = x				// if (a) {a.b = x}
-		a.b?.c.d.e = x			// if (a) {a.b.c.d.e = x}
-		a.b?[0][1,r.pop] = x	// if (a) {a.b.c.d.e = x}
-		
-
-		if y or x(a.b?)			// if y or x((a.b, "")(a))
-		x.y(a.b?)?				// if (x) {x.y((a.b, "")(a))}
+	
+//
+//|macro| 	QMarkThing		= "(_0._1, nil)(_0)".macro
+//|macro|	QMarkArg		= "|| t = _0,  (t._1, nil)(t)".macro
+//|macro| 	QMarkNested		= "({|| t = _0,  (t._1, nil)(t)})".macro
 		
 	
-	if P == @arg
-		.become(@arg)
-	  elseif p == @rel and !.prev and p.parent!=@decl						// a.b? = c --> (a.b = c)?
-		.become(@arg)
-		.replacewith(thedot)
-		p.wrapwith(self)
-	  else
-		UseTernary = true
-		.become(@bra)
-		arg = @arg.msg(self, "")
-
-	|| vn	= inside.name
-	if inside != @thg	// or if it is a global? like module.property
-						// how can i tell? lol. sigh... i guess just test it
-		vn	= UniqueTmpVar(nil, "_INSID")
-		inside.replaceWith(@thg.msg(vn))
-		arg <~ makedecl( "",  vn,  inside)
-
-	if !UseTernary
-/*		a().b?
-		{|| y = a(), if y: y.b }
-*/
-		|| iff		= @tmp.msg(arg, "if")
-		|| test		= @thg.msg(iff, vn)
-		|| arg2		= @arg.msg(iff, "")
-		arg2 <~ (p, thedot)(p == @rel)
-
-
-	  else
-/*		x = a().b?
-		x = ({      || y = a(),    (y.b, "")(y)    })
-*/
-		|| into		= @tmp.msg(arg,	"rejoin")
-		|| func		= @func.msg(into, "")
-		|| tern1	= @list.msg(func, "")
-		tern1 <~ thedot
-		if arg != self
-			tern1 <~ (@thg, "nil") 
-		|| tern2	= @prm.msg(func, "")
-		tern2 <~ (@thg, vn)
-
-
 
 function message.MainOneArg (|message| arg, |int64| i, |faststring| usage)
 	opt norefcounts
