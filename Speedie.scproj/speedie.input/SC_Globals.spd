@@ -151,6 +151,11 @@ function TypeOfLast (ExprResolver)
 
 
 function TypeOfBlock (ExprResolver)
+	|| last = exp[@nil, -1]$
+	ifn last istmp "rejoin"
+		using last
+			last = last.wrapwith(@tmp + "rejoin")
+	
 	|| p = exp.scarg( name_space )
 	p.IsStatementExpr = true
 	|| fn = p.owningfunc
@@ -162,11 +167,10 @@ function TypeOfBlock (ExprResolver)
 		  else
 			SCFunction.Tran_All( fn, ch, p )
 	
-	|| last = exp.last
-	require last.expect(@tmp, "rejoin")
-	|| val = last.first	#expect (last, "Must return a value")
-	require val.expectlast
-	return TypeOfExpr(val, p, nil)
+	
+	|| val = last[@nil, 0]
+	if val.expectlast
+		return TypeOfExpr(val, p, nil)
 
 
 function TypeOfThg (ExprResolver)
