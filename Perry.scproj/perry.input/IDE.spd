@@ -485,6 +485,9 @@ class PerryIDE (Window)
 		if key is num0
 			.ViewAsSwap
 			return true
+		if key is num9
+			.EditSep.Flip
+			return true
 		if key is d or l				// l=line jump
 			return .filelist.showquickopen
 
