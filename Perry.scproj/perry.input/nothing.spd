@@ -1,7 +1,7 @@
 
 // empty
 
-target debug {
+target debug2 {
 function QBug
 	|| r = RingTree()
 	|| x = r.position? + 1
