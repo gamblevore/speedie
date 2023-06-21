@@ -18,8 +18,8 @@
 	* check entire program for modification during nil-sweep
 		* Start with leaf-funcs.
 * galaxxies C++ compile issues
-* x = ring.position? fails to compile
-* CollectDecls needs fixing to not return early!! or break it up into pieces
+* x = ring.position?+1        fails to compile
+* https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * TextView error/find resync
