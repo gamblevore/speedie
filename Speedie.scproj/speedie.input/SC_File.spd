@@ -35,14 +35,16 @@ class SCFile (file)
 	function Decls (|SCBase| p)
 		.Use
 		.Proj.use // should be inside use?
-		CollectDecls( .LiveAST, p, p )
+		CollectDecls( .LiveAST, p, p, 1 )
+		// not sure why CollectDecls(1) is being called in 3 places?
+		// 2 should be enough. one for modules and one for files...
 
 
 	function scmodule.InitDecls // same as scfile.decls just different
 		|| a = .initvarsarg[0]
 		if a.hasany
 			.Project.use
-			CollectDecls( a, self, self )
+			CollectDecls( a, self, self, 1 )
 
 
 	function GetMsg (|int| pos, |bool| needname, |message|)

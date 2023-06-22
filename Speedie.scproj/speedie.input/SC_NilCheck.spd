@@ -78,10 +78,13 @@ module NilChecker
 
 function message.NilCheckProperty
 	pragma inline
-	|| Prop = .DotMustBeProperty		#require
-	|| ObjDecl = TypeOfExpr(.first, nil)
+	|| Prop = .DotMustBeProperty
+	require prop and (prop isnt OnModule)
+	|| f = .first
+	|| ObjDecl = TypeOfExpr(f, nil)
 	if !ObjDecl
-		0 // "nil type: ${.first}"
+		"nil type: $f"
+		debugger 
 	  else
 		expect (objdecl.NilUsage is exists) (self, "NilObjectError. Use any nil-test to fix.")
 
@@ -125,21 +128,15 @@ function Message.NilCheckFlat (|int| Time, |int|)
 			// *a = y
 
 
-// I think we made this over complex? just need to go through it????
-// its probably quite simple? y = *a and *a = y... all depend on if a is not nil?
-
-
-
 function Message.NilCheckMemory
-//		checks:  *abc / abc[0],  abc.var,  (abc)()
 	opt norefcounts
 	|| f = .func
 	if f == @dot
-		.NilCheckProperty
+		.NilCheckProperty								// abc.var
 	  elseif (f == @brel and self == "*") or f == @acc
-		.NilCheckAccess
+		.NilCheckAccess									// *abc / abc[0]
 	  elseif (f == @func and .first == @bra)
-		.NilCheckFP
+		.NilCheckFP										//  (abc)()
 
 
 

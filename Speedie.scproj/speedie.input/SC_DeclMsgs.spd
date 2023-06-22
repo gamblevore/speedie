@@ -197,6 +197,8 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		
 		if (PropertyMode&1)
 			(dcl is property)
+		if PropertyMode == 1
+			(dcl is onmodule)
 		rz <~ dcl
 		nameitm.obj = dcl
 		dcl.Source = item

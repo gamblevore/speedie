@@ -82,6 +82,7 @@ datatype SCDeclInfo (uint)
 		GameFlyingMem
 		Property
 		Atomic
+		OnModule
 		SetTo // a var sets it... like: rz = obj
 		
 		
@@ -116,7 +117,7 @@ class SCDecl (SCObject) {
 	|NilState|			NilUsage
 	
 	constructor
-		.NilDeclared = NilState.exists
+		.NilDeclared = NilState.base
 		
 	function Project (|scimport|)
 		// scfunction and scclass should use this too!
@@ -638,6 +639,8 @@ class SCDecl (SCObject) {
 			rz = «arel "--", rz »
 		if .NilDeclared is unknown
 			rz = «arel "?", rz »
+		  elseif .NilDeclared is VeryExists
+			rz = «arel "!", rz »
 	
 	
 	function CreateSimpleTypeCast (|Message| exp, |Message|)
@@ -774,21 +777,24 @@ class SCDecl (SCObject) {
 
 
 	function MakeOptional (|SCDecl|)
+		return .MakeNil(.type.typeoptional, nilstate.optional)
+		
+	function MakeVeryExists (|SCDecl|)
+		return .MakeNil(.type.typeveryexists, nilstate.veryexists)
+	
+	function MakeNil (|scdecl| curr, |nilstate| type, |scdecl|)
 		opt norefcounts
-		if .nildeclared is optional
+		if .nildeclared == type
 			Return self
 		
-		|| Op = .type.typeoptional
-		if op and (self == .type.typenormal)
-			return op
-			
-		return .NewOptional
+		if (curr and self == .type.typenormal)
+			return curr
+		
+		return .CopyNil(type)
 
-
-	function NewOptional (|scdecl|) 
+	function CopyNil (|nilstate| type, |scdecl|) 
 		rz = .Copy
-		rz.NilDeclared = nilstate.optional
-
+		rz.NilDeclared = type
 
 	function RefineDecl (|message| list, |SCDecl|)
 		rz = .Copy

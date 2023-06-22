@@ -1,14 +1,36 @@
 
 
 
+/*
+	So what do we do?
+	we want to do the nil stuff?
+	first... perhaps make the nil option a preference?
+	so its not noisy on all computers?
+	
+	OK... so now we can do that... what next?
+	
+	well... what is next?
+	
+	im not sure...
+	
+	we wanna use it?
+	
+	so... we hav some nil checkrs...
+	
+	we gotta do this in xcode, cos actually the problem is that a lot of objects have no decl!
+*/
 
 datatype NilState (byte) // Exec.scproj needs this here
 	constants
 		|nilstate|
-		nil		= 1
-		exists	= 2
-		unknown = 3
-		optional = 3
+		nil			= 1	    // || x = nil
+		Base		= 2     // |Type| x
+		Exists		= 2     // |Type| x
+		VeryExists	= 4     // |Type!| x
+		optional	= 3		// |Type?| x
+		unknown		= 3
+
+	
 	syntax is (|nilstate| type, |bool|)
 		return self == type
 	syntax isnt (|nilstate| type, |bool|)

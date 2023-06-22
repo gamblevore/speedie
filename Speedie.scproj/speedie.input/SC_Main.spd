@@ -45,6 +45,9 @@ function compiler.SetupEnv
 	if talk.length and app.IsMainThread
 		app.IgnoreBreakPoints
 
+	|| NL = app.pref("nil")
+		options.setnil = nl.int
+
 	errorcolors.DisableIfNoTerminal
 
 

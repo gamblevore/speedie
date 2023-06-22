@@ -421,6 +421,8 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 			return R.MakeBorrowed
 		if (C == "?")
 			return R.MakeOptional
+		if (C == "?")
+			return R.MakeVeryExists
 		error (c)
 
 
