@@ -391,7 +391,6 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 
 
 	if (f == @list) and !c.hasany
-		debugger
 		|| p = c.UpToType    // abc|()--|
 			return typeofexpr(p.first, name_space)
 			
