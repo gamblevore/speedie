@@ -531,7 +531,7 @@ extend PerryIDE
 		for ro in conf..roots
 			error.SourceAdd(ro)
 			if ro.expect(@str)
-				*file.ComparisonsAllowed max= 1
+				*file.ComparisonsAllowed max= 1 // like /usr/local/bin vs /USR/LOCAL/BIN . Allows to report case errors.
 				|| str = .ExpandStr(ro.name)
 					f.addroot(str.file)
 				  else
