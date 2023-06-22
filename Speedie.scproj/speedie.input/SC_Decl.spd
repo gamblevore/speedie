@@ -69,6 +69,7 @@ datatype SCDeclInfo (uint)
 	flags
 		|SCDeclInfo|
 		Borrowed
+		StayBorrowed
 		Const
 		Static
 		UpgradeableContained
@@ -176,7 +177,11 @@ class SCDecl (SCObject) {
 		
 		.CopyTypeInfoTo( dcl )
 		dcl.IsConst  = self Is Const
+
+		// why not copy the whole info?
 		(dcl is api) = self is api
+		(dcl is stayborrowed) = self is stayborrowed
+		
 		dcl.isstatic = self is static
 		(dcl Is Borrowed) = !ForNewVariable and (self Is Borrowed)
 		dcl.Name     = .Name
@@ -769,12 +774,14 @@ class SCDecl (SCObject) {
 		Return sc.Match( oc, 0 ).IsNormalMatch
 
 
-	function MakeBorrowed (|SCDecl|)
+	function MakeBorrowed (|bool| StayBorrowed=false, |SCDecl|)
 		if self Is Borrowed
 			Return self
 		
 		rz = .Copy				// only used in extractdecl. Avoids modifying original.
 		(rz Is Borrowed)
+		if stayborrowed
+			(rz is StayBorrowed)
 
 
 	function MakeOptional (|SCDecl|)
@@ -1071,4 +1078,5 @@ role TreeViewRoot (TreeViewrow)
 		|| o = .obj
 		if o isa TreeView
 			return o
+
 

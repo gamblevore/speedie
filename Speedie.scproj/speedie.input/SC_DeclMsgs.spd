@@ -172,7 +172,7 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		
 		|| dcl = Rdcl.copy
 		|| IsFunctionBody  =  (AddToSpace isa SCArg)
-		if (!OriginalRdcl and IsFunctionBody)
+		if (!OriginalRdcl and IsFunctionBody and dcl isnt StayBorrowed)
 			Dcl.IsBorrowed = false
 
 		dcl.IsConst = false // erase IsConst, happens if we parse "|| bla = true"

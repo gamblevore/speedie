@@ -198,6 +198,17 @@ function Message.UnBraType (|Message|)
 		rz = rz.first
 
 
+function Message.UpToType (|Message|) // updecl, finddecl
+	opt norefcounts
+	|| c = self
+	while c
+		|| p = c.parent
+		if p == @type
+			require c.islast
+			return p
+		c = p
+
+	
 function Message.CastedParent (|Message|)
 	opt norefcounts
 	rz = .unbra.Parent
