@@ -2,7 +2,6 @@
 
 
 main // speedie main { 
-	|| abc = ""|()--|
 	compiler.Main
 
 
