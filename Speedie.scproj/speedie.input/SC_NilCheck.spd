@@ -65,8 +65,7 @@ module NilChecker
 	
 		for f in compiler.funclist
 			if !f.IsMacro and !f.IsWrapper
-				scfunction.currfunc = f
-				f.sourcearg.NilCheckArg(0)
+				f.NilCheck
 		
 		scfunction.currfunc = nil
 		.Sweep
@@ -77,31 +76,61 @@ module NilChecker
 		// what about "init_"?
 	
 
-function message.NilCheckProperty
+
+function SCfunction.NilCheck
+	scfunction.currfunc = self
+	|SCNilLister| nel
+	.sourcearg.NilCheckArg(nel, 0)
+	nel.Tighten(self)
+	nel.Restore // nice!
+	// need to restore the .nilused all types altered? and alter the params...
+	// we'll need a decllister... something to just keep track of the decls...
+	
+	
+function message.NilCheckProperty (|&scnillister| nel)
 	pragma inline
 	|| Prop = .DotMustBeProperty
 	require prop and (prop isnt OnModule)
 	|| f = .first
 	|| ObjDecl = TypeOfExpr(f, nil)
 	if !ObjDecl
-		printline scfunction.currfunc
-		"nil type: $f ${prop.objectid}"
-		debugger 
-	  else
-		expect (objdecl.NilUsage is exists) (self, "NilObjectError. Use any nil-test to fix.")
+		target debug
+			printline scfunction.currfunc
+			"nil type: $f ${prop.objectid}"
+			debugger 
+		return nil
+
+	|| u = ObjDecl.NilUsed
+	expect (u is exists) (self, "Nillable var accessed.")
+	ObjDecl.NilUsed &= ~NilState.Optional
+//	This definitely exists now! We tested it!
+//  Alter the declaration later!
+
+/*
+Issues:
+ what if this is a shared decl? we'll have to unshare it.
+	When? After Func is finished
+
+We'll need to refrsh the nullable states on function start... and on any decls found
+
+if/while blocks need to keep a stack of multiple variables
+	if a and b and c
+		a.a(b.b(c.c))
 
 
+*/
 
-function message.NilCheckAccess
+
+function message.NilCheckAccess (|&scnillister| nel)
 	pragma inline
 //	"Mem: $self"
 
 
-function message.NilCheckFP
+function message.NilCheckFP (|&scnillister| nel)
 	pragma inline
 
 
-function message.NilCheckCond (|int| Time, |int|)
+function message.NilCheckCond (|&scnillister| nel, |int| Time, |int|)
 	pragma inline
 
 // 
@@ -115,14 +144,14 @@ function message.NilCheckCond (|int| Time, |int|)
 //	
 
 
-function Message.NilCheckFlat (|int| Time, |int|)
+function Message.NilCheckFlat (|&scnillister| nel, |int| Time, |int|)
 	opt norefcounts
 	for s.flat in self
 		Time++
 		if s == @arg
-			s.NilCheckArg(Time)
+			s.NilCheckArg(nel, Time)
 		  else
-			s.NilCheckMemory
+			s.NilCheckMemory(nel)
 			// so what do we have to test?
 			// if (a)
 				// || x = *a
@@ -130,26 +159,26 @@ function Message.NilCheckFlat (|int| Time, |int|)
 			// *a = y
 
 
-function Message.NilCheckMemory
+function Message.NilCheckMemory (|&scnillister| nel)
 	opt norefcounts
 	|| f = .func
 	if f == @dot
-		.NilCheckProperty								// abc.var
+		.NilCheckProperty(nel)								// abc.var
 	  elseif (f == @brel and self == "*") or f == @acc
-		.NilCheckAccess									// *abc / abc[0]
+		.NilCheckAccess(nel)									// *abc / abc[0]
 	  elseif (f == @func and .first == @bra)
-		.NilCheckFP										//  (abc)()
+		.NilCheckFP(nel)										//  (abc)()
 
 
 
-function Message.NilCheckArg (|int| Time)
+function Message.NilCheckArg (|&scnillister| nel, |int| Time)
 	opt norefcounts
 	for s in self
 		#! We have ASM if/while flags set! Just use them???
 		Time++
 		if s.func == @tmp and (s == "if" or "while")
-			time = s.NilCheckCond(Time)
+			time = s.NilCheckCond(nel, Time)
 		  else
-			time = s.nilcheckflat(Time)
+			time = s.nilcheckflat(nel, Time)
 			
 

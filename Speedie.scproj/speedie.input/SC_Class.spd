@@ -71,7 +71,7 @@ constructor (|Message| node, |SCBase| parent)
 	T.Type = self
 	.TypeNormal = T
 	.TypeOptional = T.copynil(NilState.optional)
-	.TypeVeryExists = T.copynil(NilState.veryexists)
+	.TypeVeryExists = T.copynil(NilState.VeryExists)
 	T = T.Copy
 	T.Name = "self"
 	T.Strength = kStrSharedParams

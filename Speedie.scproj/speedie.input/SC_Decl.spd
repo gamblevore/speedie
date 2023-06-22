@@ -115,10 +115,11 @@ class SCDecl (SCObject) {
 	|SCDeclInfo|		Info
 	|AsmReg|			DRegister
 	|NilState|			NilDeclared
-	|NilState|			NilUsage
+	|NilState|			NilUsed
 	
 	constructor
-		.NilDeclared = NilState.base
+		.NilDeclared = NilState.unknown
+		.NilUsed = NilState.unknown
 
 		
 	function Project (|scimport|)
@@ -188,7 +189,7 @@ class SCDecl (SCObject) {
 		dcl.Default  = .Default
 		dcl.Strength = .Strength
 		dcl.NilDeclared = .NilDeclared
-		dcl.NilUsage = .NilUsage
+		dcl.NilUsed = .NilUsed
 		Return dcl
 
 	
@@ -645,7 +646,7 @@ class SCDecl (SCObject) {
 			rz = «arel "--", rz »
 		if .NilDeclared is unknown
 			rz = «arel "?", rz »
-		  elseif .NilDeclared is VeryExists
+		  elseif .NilDeclared is Exists
 			rz = «arel "!", rz »
 	
 	

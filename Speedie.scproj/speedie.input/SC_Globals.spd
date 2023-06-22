@@ -426,7 +426,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 			return R.MakeBorrowed(c.uptotype!=nil)
 		if (C == "?")
 			return R.MakeOptional
-		if (C == "?")
+		if (C == "!")
 			return R.MakeVeryExists
 		error (c)
 

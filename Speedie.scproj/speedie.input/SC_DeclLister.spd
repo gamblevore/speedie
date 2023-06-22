@@ -1,0 +1,46 @@
+
+
+struct SCNilLister
+	linkage:cpp_part nil
+	|uint| 				Count
+	|uint| 				ParamCount
+	|scdecl--[1024]|	Items
+
+	syntax Append (|scdecl| d)
+		expect (.count < 1024) (d.source, "Too many variables")
+		.items[.count++] = d
+
+	function Tighten (|scfunction| f)
+		opt norefcounts
+		|| r = f.args
+		for i in .ParamCount
+			|| d = r[i]
+				r[i] = d.NilTighten
+			  else
+				f.ReturnType = f.ReturnType.NilTighten
+			
+	function Pop (|scdecl|)
+		if .count
+			return .items[--.count]
+			
+	function Item (|uint| i, |scdecl|)
+		if .count > i
+			return .items[i]
+	
+	function Restore
+		opt norefcounts
+		for i in .count
+			.item(i).restorenil
+		
+	
+	iterator
+		|| n = 0
+		while (n < .count++)
+			yield self[n]
+
+
+function SCDecl.RestoreNil
+	.nilused = .nildeclared
+
+function SCdecl.NilTighten (|scdecl|)
+	return self
