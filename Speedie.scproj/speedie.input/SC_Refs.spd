@@ -160,11 +160,14 @@ function RefDecr (|Message| msg, |Message| place, |int| Basis)
 		place.Prev = what
 
 
+|[message]| RefPrms
 function DecrMulti (|scdecl| d, |message| m, |message|)
-	|| n = d.c_array
-	|| prms = [m, n.msg]
-	rz = (macros.MultiDecr)(prms)
-	|| prm = rz.FindNested(@prm)
+	opt norefcounts
+	RefPrms.clear
+	refprms <~ m
+	RefPrms <~ d.c_array.msg
+	rz = (macros.MultiDecr)(RefPrms)
+	|| prm = rz.second
 		prm.obj = Compiler.RefDecrmulti
 		prm.parent.obj = typevoid
 
@@ -692,6 +695,7 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 
 
 function scfunction.FillInDestructor
+	if self ~= "sc_flat_Destructor"
 	|| first = .SourceArg.FindDestructor
 	Using .sourcearg
 	for d in .cls.Properties
@@ -716,7 +720,7 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 			rz = .AddParentAllocFunc( root, parent.FirstDestructor )
 
 
-function SCFunction.AnalyseRefsConstructors
+function SCFunction.BuildConstructorDestructor
 	require self isa (kIsConstructor (|) kIsDestructor)
 	require StdErr.OK				// require !.cls.IsRole
 	
@@ -817,8 +821,11 @@ function SCFunction.RefsCheckPropertiesAltered
 
 
 function DeclToDot (|scdecl| d, |string| s, |Message|)
+	opt norefcounts
 	rz = @dot+s
-	rz.msg(@thg, "self")
+	|| slf = rz.msg(@thg, "self")
+	|| cls = scfunction.currfunc.cls
+		slf.obj = cls.selfstrong
 	rz.msg(@emb)
 	rz.obj = d // we need this, as it is a decl... but for locals... we don't need it!
 }

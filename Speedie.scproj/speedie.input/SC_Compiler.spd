@@ -801,8 +801,7 @@ function DoRefAnalysis
 	opt norefcounts
 	|[message]| list // avoid reading same thing that we alter.
 	for f in .FuncList
-		if !f.CanDoRefs
-			scfunction.currfunc = f
+		if f.CanDoRefs
 			list.clear
 			f.AnalyseRefs(list)
 	scfunction.currfunc = nil
@@ -811,15 +810,16 @@ function DoRefAnalysis
 
 function scfunction.CanDoRefs (|bool|)
 	if .IsWrapper or .IsAllocOrNew or .IsMacro
-		scfunction.currfunc = self
-		return true
+		return false
+	scfunction.currfunc = self
+	return true
 
 
 function RefConstructors
 	opt norefcounts
 	for f in .FuncList
-		ifn f.CanDoRefs
-			f.AnalyseRefsconstructors
+		if f.CanDoRefs
+			f.BuildConstructorDestructor
 	scfunction.currfunc = nil
 
 

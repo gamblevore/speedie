@@ -58,7 +58,6 @@
 
 
 
-
 module NilChecker
 	function CheckAll
 		opt norefcounts
@@ -66,8 +65,10 @@ module NilChecker
 	
 		for f in compiler.funclist
 			if !f.IsMacro and !f.IsWrapper
+				scfunction.currfunc = f
 				f.sourcearg.NilCheckArg(0)
 		
+		scfunction.currfunc = nil
 		.Sweep
 
 	
