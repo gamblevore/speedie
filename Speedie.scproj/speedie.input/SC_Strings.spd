@@ -390,9 +390,9 @@ function Message.BunchFixOof (|Message|)
 
 /*
 	({
-		|| _t = _0	
+		|| _t = _0|()--|
 		if !_t
-			_t = _1
+			_t = _1|()--|
 		rejoin _t
 	})
 */
@@ -400,8 +400,6 @@ function Message.BunchFixOof (|Message|)
 // only has 1 caller. why not fix this to use the above macro?
 function Message.BunchFix 
 	using (self)
-	|| x = 1
-	
 	|| P		= .BunchFixOof
 	|| subject	= P.first
 	|| multi_opp= subject.next(nil)$

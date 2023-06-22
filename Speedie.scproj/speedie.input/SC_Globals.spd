@@ -431,7 +431,6 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		error (c)
 
 
-
 	if (F == @arg) // a bit ugly... |{\n\tfaststring\n}|
 		|| d = extractdecl(c.first, name_Space)$
 		d.compilercreated = true

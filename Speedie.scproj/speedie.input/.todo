@@ -13,9 +13,7 @@ bugs:
 	* passing .hfloatvar to  func(float) causes reporting error
 	* |string| s = __now__.render fails
 	* render float.fn {code} // won't compile
-	* disallow append file into |[message]|! (Array of msg)
 	* v.operatormul(1.33) instead of v*1.33 :(
-	* disallowed nesting should error on the children not the parent (like a bra "containing" an arg)
 	* rejoin blocks shouldn't safedecr then incr!! pointless!
 		* "a ?? b" should almost never be refcounted (unless returns a real object thats empty)
 	* oar is kinda buggy for a lot of things.
