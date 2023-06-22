@@ -603,7 +603,7 @@ class PerryIDE (Window)
 				if jump and (!jumpto or err == lst.FirstSelected)
 					jumpto = err
 			if actual_compile
-				.logarea.first = err.copy
+				.logarea <~ err.copy
 			.filelist.ErrorAt(err)
 			
 		if jumpto
