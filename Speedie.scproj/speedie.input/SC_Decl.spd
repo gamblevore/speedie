@@ -118,6 +118,7 @@ class SCDecl (SCObject) {
 	
 	constructor
 		.NilDeclared = NilState.base
+
 		
 	function Project (|scimport|)
 		// scfunction and scclass should use this too!

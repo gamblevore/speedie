@@ -585,10 +585,11 @@ function DeclsProtoType (|Message| ch0, |SCClass| fpType=nil, |bool| late=false)
 
 function DeclsProtoTypeAdd (|SCClass| fpType)
 	|| Dcl = SCDecl.new		 // make a lookuponly decl... to allow this func to be "found".
-	dcl.IsLookupOnly = self	 // So why we expect funcs to have prototypes?	("Function must have a prototype")
+	dcl.IsLookupOnly = self
 	dcl.TypeContained = fpType
 	dcl.Name = .Name
 	(dcl is const) // right?
+	(dcl is onmodule) // not sure where this is found cos .cls is nil sometimes yet its still being found
 	.ProtoDecl = dcl
 	
 	if (.Cls)

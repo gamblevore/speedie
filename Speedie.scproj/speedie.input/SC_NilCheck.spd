@@ -84,7 +84,8 @@ function message.NilCheckProperty
 	|| f = .first
 	|| ObjDecl = TypeOfExpr(f, nil)
 	if !ObjDecl
-		"nil type: $f"
+		printline scfunction.currfunc
+		"nil type: $f ${prop.objectid}"
 		debugger 
 	  else
 		expect (objdecl.NilUsage is exists) (self, "NilObjectError. Use any nil-test to fix.")

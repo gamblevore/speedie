@@ -695,7 +695,6 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 
 
 function scfunction.FillInDestructor
-	if self ~= "sc_flat_Destructor"
 	|| first = .SourceArg.FindDestructor
 	Using .sourcearg
 	for d in .cls.Properties
