@@ -130,7 +130,7 @@ function message.ide (|perryide|)
 		return .obj|perryide|
 	for w in window.all
 		if w isa PerryIDE
-			if self ~= w.Project
+			if .name ~= w.Project
 				return w
 
 

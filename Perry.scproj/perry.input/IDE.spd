@@ -203,13 +203,16 @@ class PerryIDE (Window)
 			fs <~ "${t.charcount} chars in ${t.linecount} lines"
 			
 		  elseif i == 2
-			|| f = .filelist.FirstSelected|filerow|
-			if f.asdir
-				fs <~ "fol: "
-			  else
-				fs <~ "proj: "
-				f = .filelist.listsource|filerow|
-			fs <~ "${f.lastsize.strsize} in ${f.lastfilecount} \11"
+			|| f = .filelist.FirstSelected
+			if f isa filerow
+				if f.asdir
+					fs <~ "fol: "
+				  else
+					fs <~ "proj: "
+					|| fr = .filelist.listsource
+					if fr isa filerow
+						f = fr
+				fs <~ "${f.lastsize.strsize} in ${f.lastfilecount} \11"
 		  elseif i == 3
 			fs <~ "Obj ${app.ObjMemory.strsize}  Str ${app.stringmemory.strsize}  Scr ${sdlapp.DrawSpace.bytecapacity.strsize}"
 			
@@ -315,8 +318,9 @@ class PerryIDE (Window)
 		require HideTop == VisTop  or  HideSide == VisSide
 		if .viewing == .viewfiles
 			if HideSide
-				|| fl = .filelist.listsource|filerow|
-				.noneed fl.LastFileCount.render + " files"
+				|| fl = .filelist.listsource
+				if fl isa FileRow
+					.noneed fl.LastFileCount.render + " files"
 			  else
 				.noneed
 		
@@ -415,8 +419,8 @@ class PerryIDE (Window)
 			L.select(err)
 		  else
 			err = .editme.myerror
-			if err
-				.ClickedError(err|error|)
+			if err isa error
+				.ClickedError(err)
 		
 		return true
 
@@ -584,6 +588,11 @@ class PerryIDE (Window)
 			.editsep.Collapse
 
 
+	function listview.ListSourceError (|error|)
+		|| s = .ListSource
+		if s isa error
+			return s
+		
 	function LoadErrors (|bool| jump, |bool| actual_compile) 
 		opt norefcounts
 		|| txt = .EditMe
@@ -593,7 +602,7 @@ class PerryIDE (Window)
 		.filelist.ClearErrors
 
 		|error| jumpto 
-		|| src = lst.ListSource|error|
+		|| src = lst.ListSourceError #require
 		|| ActualErrors = 0
 		for err in src
 			if err.severity >= ErrorSeverity.Error

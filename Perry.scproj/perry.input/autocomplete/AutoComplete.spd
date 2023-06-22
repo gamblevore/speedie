@@ -44,13 +44,14 @@ function message.DefineToLine (|string| count)
 
 function CallFromSorter (SorterComparer)
 	opt norefcounts
-	|| aa = a|message|.second
-	|| bb = b|message|.second
-	if !aa and !bb
-		return b|message|.position < a|message|.Position	
-	if !aa or !bb
-		return aa
-	return bb.name < aa.name
+	if a isa Message and b isa Message
+		|| aa = a.second
+		|| bb = b.second
+		if !aa and !bb
+			return b.position < a.Position	
+		if !aa or !bb
+			return aa
+		return bb.name < aa.name
 
 
 function string.LowerDiffAt (|string| A, |ind|)

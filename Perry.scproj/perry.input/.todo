@@ -9,8 +9,6 @@
 	* Numbers/datatypes don't get allow optional types to be declared on it. (What about macros)
 
 
-* Want ability to disable blind typecasting in projects... especially perry!!!
-
 // Do later
 * RefOpts. Do it bit by bit
 	* get property but only did math

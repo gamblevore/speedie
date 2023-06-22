@@ -8,7 +8,7 @@ function FileSepClicker (guiaction)
 function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE|)
 	|| old = perry.FindProj(path)
 		ClickedTabs(nil, old)
-		return old.obj|PerryIDE|
+		return old.ide
 	ide := PerryIDE.EmptyBase
 	ide := PerryIDE(false)
 	ide.LoadProject(path.file)
@@ -231,16 +231,18 @@ function PerryIDE.ShowErrors (|bool| FromKeys, |bool|)
 
 function ClickedAView (GUIaction)
 	opt norefcounts
-	|| i = .ide
-	if (i.errorlist is visible) and .tag == i.errorlist
-		i.ShowNextError(0)
-	i.view(self|buttonview|)
+	if self isa ButtonView
+		|| i = .ide
+		if (i.errorlist is visible) and .tag == i.errorlist
+			i.ShowNextError(0)
+		i.view(self)
 
 
 function ClickedNoNeed (GUIaction)
 	opt norefcounts
-	if .tag
-		.ide.view(.tag|buttonview|)	
+	|| t = .tag
+	if t isa ButtonView
+		.ide.view(t)	
 
 
 function PerryIDE.ShowText (|textview| field, |string| Text)
@@ -361,16 +363,18 @@ function EditMeSelError (GUITextErrorSelected)
 	
 function PressedEditKeys (GUIKeyEvent)
 	opt norefcounts
-	require self|textview|.ExpectsParse >= 2
-	if key is Decl
-		return self|textview|.PerryDeclKey
-	
-	require key == -9 or -10 or 27
-	key = key.abs
-	|| tabkind = self|textview|.PerryInsertSyntax(key)
-		if tabkind == 1
-			.ide.EditMeTabRetryThing = 0
-		return true
+	if self isa TextView
+		require .ExpectsParse >= 2
+		if key is Decl
+			return .PerryDeclKey
+		
+		require key == -9 or -10 or 27
+		key = key.abs
+		
+		|| tabkind = .PerryInsertSyntax(key)
+			if tabkind == 1
+				.ide.EditMeTabRetryThing = 0
+			return true
 
 
 function PerryIDE.MoveError (|error| row,  |string| p,  |int| i,  |error|)
