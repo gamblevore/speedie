@@ -76,6 +76,10 @@ function message.Tran_QMark
 	if self in @arg
 		tern = .msg(@tmp, "if")
 		tern <~ cond
+		// add |()--| to thedot?
+		// is there an easier way? Just add... like a bit somewhere to the msg?
+		// maybe not?
+		// what if we do something like type with a name?
 		tern.msg(@arg) <~ thedot
 	  else
 		|| options = tern.msg(@list)

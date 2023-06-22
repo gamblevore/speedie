@@ -393,6 +393,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 	if (f == @list) and !c.hasany
 		|| p = c.UpToType    // abc|()--|
 			return typeofexpr(p.first, name_space)
+				
 			
 	
 	if (f == @Thg)		// usual case
@@ -428,6 +429,8 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 			return R.MakeOptional
 		if (C == "!")
 			return R.MakeVeryExists
+		if (C == "") // compiler internal
+			return R
 		error (c)
 
 
