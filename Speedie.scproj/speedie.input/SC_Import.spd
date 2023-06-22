@@ -127,9 +127,9 @@ class SCImport
 	
 	function LoadBanned (|Message| list)
 		opt norefcounts
-		require list and list.expect(@list)
+		require list.expect(@list)
 
-		|| x = options.BannedClasses := Dictionary()
+		|| x = options.BannedClasses init Dictionary()
 		for item in list
 			item.expect(@thg)
 			x.valuelower(item.name) = "x"

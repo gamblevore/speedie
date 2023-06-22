@@ -408,9 +408,7 @@ function ArgsMatchTwo (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBa
 		|| PArg_Type = TypeOfExprMaybeNil( PArg_Ch, name_Space )
 		expect (FuncArg.type) (.Source)
 
-		if Base and !fi
-			// how can that be possible? if self contains something...
-			// that doesnt mean the rest does???? how could it?
+		if Base
 			FuncArg = FuncArg.ContainedReplace(nil, base, false)
 
 		|| LArg_ch = (PArg_Ch,nil)(ThisAlter)

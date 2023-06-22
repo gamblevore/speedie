@@ -14,7 +14,7 @@ module Options
 		
 	||		NilStrength				= ErrorSeverity.Hint // collect via options... ErrorSeverity.problem
 	
-	||		BannedClasses			= nil|dictionary of scclass|
+	||		BannedClasses			= nil|dictionary|
 	||		output_path				= ""
 	||		SingleFileInput			= ""
 	||		Variant					= ""

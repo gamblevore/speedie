@@ -401,7 +401,7 @@ function scbase.CodeCls (|Scclass|)
 function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCBase| arg_space, |SCDecl| contains, |Message| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
 // could be cleaned up so that exp is NEVER nil... "AddMain", "InitRootDecl", lookupvar etc would need altering...
-
+	
 	|| name			= OrigName.Lowercase
 	|| ParamsArray	= SCParamArray.new(exp)
 	|| Curr			= ParamsArray.DetectDotSuper(self)
@@ -409,7 +409,7 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 	|| CanFunction	= (ParamsHere) and  (!ParamsArray.IsAddress)
 	|SCFunction| Missing
 	|SCFunction| f
-	
+
 	if paramsarray.issuper  and  name == "constructor"
 		|| Prev = exp.prev 
 		expect (!Prev) (Prev, "Can't come before super.constructor")
@@ -453,6 +453,8 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 		
 		if CanFunction and (o isa SCFunction)
 			f = o								// store for later return? not needed?
+			if scfunction ~= "abcc"
+	
 			o = f.ArgsMatch( contains, arg_space, ParamsArray )
 			if o
 				if o.ismacro
