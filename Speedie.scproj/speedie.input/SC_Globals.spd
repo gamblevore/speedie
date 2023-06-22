@@ -400,7 +400,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 	
 	if (c == @Acc)		// |Byte[10]| TenBytes
 		|| Prms = c[1]
-		if prms.hasany
+		if prms.HasAny
 			|| R = ExtractDecl( c.first, name_space ) #require
 			R = R.copy
 			expect  ExtractAmount( Prms, name_space, R )   ( c, "Expected something like: |Type[10]|" )
@@ -442,7 +442,6 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 
 	if (C IsBrel "&")	// pointer
 		|| R = ExtractDecl( c.first, name_space )
-		if (R)
 			R.CopyTypeInfoTo(result)
 			result.PointerCount++
 	
