@@ -9,7 +9,6 @@
 
 
 // Do later
-* change "?" implementation
 * RefOpts. Do it bit by bit
 	* get property but only did math
 	* mark a few string funcs as not-modifier/disowner/capturer
@@ -18,7 +17,6 @@
 	* check entire program for modification during nil-sweep
 		* Start with leaf-funcs.
 * galaxxies C++ compile issues
-* x = ring.position?+1        fails to compile
 * https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
