@@ -67,11 +67,11 @@ constructor (|Message| node, |SCBase| parent)
 
 	.IsVisible = scbase.CurrVisibility
 	
-	|| T = SCDecl.new
-	T.Type = self
+	|| IsDataType = node == "datatype"
+	|| T = SCDecl.new(self)
 	.TypeNormal = T
-	.TypeOptional = T.copynil(NilState.optional)
-	.TypeVeryExists = T.copynil(NilState.VeryExists)
+	.TypeOptional = T.NilConstructor(NilState.optional*IsDataType)
+	.TypeVeryExists = T.NilConstructor(NilState.VeryExists*IsDataType)
 	T = T.Copy
 	T.Name = "self"
 	T.Strength = kStrSharedParams

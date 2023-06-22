@@ -117,7 +117,8 @@ class SCDecl (SCObject) {
 	|NilState|			NilDeclared
 	|NilState|			NilUsed
 	
-	constructor
+	constructor (|scclass| type=nil)
+		.type = type
 		.NilDeclared = NilState.unknown
 		.NilUsed = NilState.unknown
 
@@ -799,12 +800,18 @@ class SCDecl (SCObject) {
 		if (curr and self == .type.typenormal)
 			return curr
 		
-		return .CopyNil(type)
-
-	function CopyNil (|nilstate| type, |scdecl|) 
 		rz = .Copy
 		rz.NilDeclared = type
 
+
+	function NilConstructor (|nilstate| type,  |scdecl|) 
+		if !Type
+			return self
+		rz = .copy
+		rz.NilDeclared = type
+
+
+		
 	function RefineDecl (|message| list, |SCDecl|)
 		rz = .Copy
 		for p in list

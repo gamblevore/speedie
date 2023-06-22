@@ -9,6 +9,7 @@
 	* Numbers/datatypes don't get allow optional types to be declared on it. (What about macros)
 
 
+
 // Do later
 * RefOpts. Do it bit by bit
 	* get property but only did math
@@ -17,6 +18,7 @@
 	* fast capture of disowned things. like: r1 <~ r2.pop
 	* check entire program for modification during nil-sweep
 		* Start with leaf-funcs.
+* "calledfrom" autocomplete needs to include references to funcs
 * galaxxies C++ compile issues
 * https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
