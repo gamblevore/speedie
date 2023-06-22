@@ -380,15 +380,21 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		Return ExtractDecl( c.first, name_space )
 	
 	if (f == @Emb)
-		expect (!c.first) (c)
+		check (!c.first) (c)
 		return nil
 	
 	if (f == @Bra)
-		c = c.first
-		f = c.func
+		return extractdecl(c.first, name_space)
 		
 	if (f == @sthg) and (c == "...")
 		return name_space.RequireContained( c )
+
+
+	if (f == @list) and !c.hasany
+		debugger
+		|| p = c.UpToType    // abc|()--|
+			return typeofexpr(p.first, name_space)
+			
 	
 	if (f == @Thg)		// usual case
 		return Compiler[ c.name, c ]$.typenormal
@@ -418,7 +424,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 	if (f == @Arel)
 		|| R = ExtractDecl( c.first, name_space ) #require
 		if (C == "--")
-			return R.MakeBorrowed
+			return R.MakeBorrowed(c.uptotype!=nil)
 		if (C == "?")
 			return R.MakeOptional
 		if (C == "?")
