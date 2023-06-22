@@ -258,7 +258,7 @@ function Message.OarExpand (|bool|)
 		if self ~= "oar"
 			deprecate (self, "Prefer '??' these days.")
 		.name = "or"
-		.parent.BunchFix
+		.parent.BunchFix()
 	return true
 
 

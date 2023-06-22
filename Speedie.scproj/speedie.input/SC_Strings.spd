@@ -387,8 +387,20 @@ function Message.BunchFixOof (|Message|)
 	return scfunction.tempmoveout(self).last
 
 
-function Message.BunchFix
+
+/*
+	({
+		|| _t = _0	
+		if !_t
+			_t = _1
+		rejoin _t
+	})
+*/
+
+// only has 1 caller. why not fix this to use the above macro?
+function Message.BunchFix 
 	using (self)
+	|| x = 1
 	
 	|| P		= .BunchFixOof
 	|| subject	= P.first
