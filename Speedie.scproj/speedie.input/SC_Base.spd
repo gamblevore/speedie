@@ -39,6 +39,12 @@ syntax is (|SCBaseInfo| i, assigns:|bool|)
 syntax isnt (|SCBaseInfo| i, assigns:|bool|)
 	.syntaxis(i, !value)
 
+function FindProject (|scimport|)
+	opt norefcounts
+	for c.listlookup in self
+		if c.Project
+			if c != self // what?
+			return c.Project
 
 function IsVisible (|bool|)
 	return self is visible

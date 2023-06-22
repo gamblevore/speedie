@@ -716,7 +716,7 @@ function ReachBehaviours
 				f.FindReached(self)
 
 
-function IsA (|SCClass| S, |bool|)
+function IsA (|SCClass| S, |bool|) // hassuper, issuper, issubclass
 	opt norefcounts
 	for p.upwards in self
 		if p == S

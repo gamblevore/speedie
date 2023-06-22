@@ -10,6 +10,7 @@ class SCImport
 		cpp_part		Imp
 	
 	|bool|					IsSTDLib
+	|bool|					NoBlindTypeCast
 	|int|					Depth
 	|[SCFile]|				Files
 	|File|					InputFolder
@@ -109,12 +110,15 @@ class SCImport
 
 	
 	function  IndexLinkage (|message| link, |scfile| scf)
-		.IsSTDLib = SCImport.STDLibTime or link..type ~= "library"
+		.IsSTDLib = SCImport.STDLibTime or link["type"] ~= "library"
 		if .canBan(scf)
-			.LoadBanned(link..bannedclasses)
-		|| name = link[@arg].findflat( @tmp, "cpp_part" )[@thg]
+			.LoadBanned(link["bannedclasses"])
+		|| arg = link[@arg]
+		|| name = arg["cpp_part"]
 			scf.ExportName = name.name
 			.Mod.ExportName = name.name
+		|| blind = arg["blindcast"]
+			.NoBlindTypeCast = !blind.Yes
 		link.remove
 		
 

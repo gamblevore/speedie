@@ -23,7 +23,7 @@ function TypeOfSDot (ExprResolver)
 	SCFunction.Tran_Sdt( exp )
 	Return TypeOfDot( exp, name_space, side )
 
-function TypeOfType (ExprResolver)
+function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 	return TypeCastCheck(Exp, name_Space, side)
 
 function TypeOfNothing (ExprResolver)
@@ -43,6 +43,11 @@ function TypeCastCheck (ExprResolver)
 	// allow MOST typecasts, but NOT typecasts to/from struct instances...
 	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
 		error (exp, "Can’t cast to/from structs/carrays (pointers to structs are OK though)")
+	|| imp = name_space.FindProject
+		if imp.NoBlindTypeCast
+			if old.IsNormalObject and new.IsNormalObject
+				expect (old.type.real_isa( new.type )) (exp, "Blind type-casting disabled. Use 'isa' instead.")
+					
 	return New
 
 
