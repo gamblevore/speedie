@@ -10,7 +10,7 @@ class SCImport
 		cpp_part		Imp
 	
 	|bool|					IsSTDLib
-	|bool|					NoBlindTypeCast
+	|bool|					NoBlindCast
 	|int|					Depth
 	|[SCFile]|				Files
 	|File|					InputFolder
@@ -118,7 +118,15 @@ class SCImport
 			scf.ExportName = name.name
 			.Mod.ExportName = name.name
 		|| blind = arg["blindcast"]
-			.NoBlindTypeCast = !blind.Yes
+			deprecate (blind, "Unfinished feature. See SC_Import.spd:IndexLinkage()")
+	// * Needs better types: "contains (a,b,c)". (|0| a, |1| b, |2| c).
+	// scdecl would use linked-list to other decls... fileviewer has GUIcontrols+filerows
+	// * Finds errors in imports that were NOT marked... like in app.spd!
+	// * has trouble with roles! does not understand them.
+	// * Some classes like documentstate "contain" documentstate as their next/prev... but their parent is actually
+	// a document... so thats awkward. Its not a uniform tree. Now we need to typecast to get the right type.
+
+			.NoBlindCast = !blind.Yes
 		link.remove
 		
 

@@ -44,7 +44,7 @@ function TypeCastCheck (ExprResolver)
 	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
 		error (exp, "Can’t cast to/from structs/carrays (pointers to structs are OK though)")
 	|| imp = name_space.FindProject
-		if imp.NoBlindTypeCast
+		if imp.NoBlindCast
 			if old.IsNormalObject and new.IsNormalObject
 				expect (old.type.real_isa( new.type )) (exp, "Blind type-casting disabled. Use 'isa' instead.")
 					
