@@ -148,3 +148,12 @@ function file.CodeSign (|string| sign, |errorint|)
 		if rz
 			args[0] = "-a"
 			rz = "/usr/sbin/spctl".DebugExecute(args)
+
+
+function string.DebugExecute (|[string]| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
+	if file.DebugExecute // shouldnt be default!
+		print self
+		print " "
+		printline args.Render
+	return .Execute(args, out, errs, false)
+	

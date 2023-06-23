@@ -520,6 +520,13 @@ class Process
 			.unmap
 			.unlink
 
+	helper string.CreateArgs (|&cstring| Space, |[string]| Args, |int|)
+		cpp_wrapper JB_ArrayPrepare_
+
+
+	helper string.StartProcess (|[string]| Args=nil, |&file|StdOut=nil, |PID_int|)
+		cpp_Wrapper JB_Str_StartProcess
+
 
 	function RunChild (|string| path, |bool|)
 		debug_require path

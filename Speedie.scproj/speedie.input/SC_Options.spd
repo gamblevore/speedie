@@ -504,3 +504,5 @@ module Feedback
 				(AppOptions[k])("", "", fs)
 		printline fs.getresult
 
+
+prototype ShellOption			(|string| Name, |string| Value, |faststring| purpose=nil, |bool|)

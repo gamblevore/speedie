@@ -52,7 +52,6 @@ function Message.ArgValue (|string|)
 
 
 
-prototype ShellOption			(|string| Name, |string| Value, |faststring| purpose=nil, |bool|)
 
 
 

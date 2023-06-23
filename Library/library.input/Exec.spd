@@ -35,25 +35,13 @@ datatype PID_Int (int)
 	syntax cast (|bool|)
 		return self > 0
 
-extend string
-	function StartProcess (|[string]| Args=nil, |&file|StdOut=nil, |PID_int|)
-		cpp_Wrapper JB_Str_StartProcess
 
-	function DebugExecute (|[string]| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
-		if file.DebugExecute // shouldnt be default!
-			print self
-			print " "
-			printline args.Render
-		return .Execute(args, out, errs, false)
-		
+extend string	
 	function Execute (|[string]| Args = [], |faststring| Out = nil, |faststring| Errs = nil, |bool| KeepStdOut=true, |ErrorInt|)
 		cpp_wrapper JB_Str_Execute
 
 	function SilentExecute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
 		return .execute(args, out, errs, false)
-
-	function CreateArgs (|&cstring| Space, |[string]| Args, |int|)
-		cpp_wrapper JB_ArrayPrepare_
 
 	function ExecuteStr (|[string]| Args=nil, |string|)
 		|| fs = faststring()
