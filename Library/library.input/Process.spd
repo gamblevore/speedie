@@ -489,8 +489,9 @@ class Process
 
 
 	function Disconnect
+		|| s = .SendQueue$ // called after dispose?
+		s.clear
 		.UpdateStdOut
-		.sendqueue.clear
 		if self isnt closed
 			.self "disconnect"
 			.ours.state   = ipcstate.closed
