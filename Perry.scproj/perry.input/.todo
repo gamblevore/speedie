@@ -6,11 +6,9 @@
 * nil-checking
 	* .NilUsage vs .Nildeclared
 	* NilSweep, for global vars, and for function misuse.
-	* Numbers/datatypes don't get allow optional types to be declared on it. (What about macros)
 
 
-
-// Do later
+// Speedie Do later
 * RefOpts. Do it bit by bit
 	* get property but only did math
 	* mark a few string funcs as not-modifier/disowner/capturer
@@ -19,7 +17,11 @@
 	* check entire program for modification during nil-sweep
 		* Start with leaf-funcs.
 * "calledfrom" autocomplete needs to include references to funcs
+	* calledfrom datatypes too
 * galaxxies C++ compile issues
+
+
+// Perry Do later
 * https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
