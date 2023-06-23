@@ -87,6 +87,7 @@ module Perry
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
 	
+		|| old = app.Pref("currproj")
 		.Projects = (app.prefs)("lastproj")
 		
 		|| i = PerryIDE(false)
@@ -95,7 +96,6 @@ module Perry
 		.LoadWindows(i)
 		.BuildAppMenu
 		
-		|| old = app.Pref("currproj")
 		|| oof = (.FindProj(old),  .Projects.First)(old)
 			oof.ide.showide
 

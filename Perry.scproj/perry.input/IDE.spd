@@ -58,6 +58,7 @@ class PerryIDE (Window)
     |Buttonview|				StartScreen
     |Buttonview|				BuildButton
     |Buttonview|				RunButton
+    |shellstream| 				Talker
 	|message|					PrevMarker
     |message|					Previous
     |string|					OldJBCloser
