@@ -59,10 +59,12 @@ function PerryFuncMenuSelected (GUIListEvent)
 			e._Start = obj
 
 
-function FuncListSorter (SorterComparer)
+// Can we... like do this more neatly? Maybe not huh? what if we wanna sort using two sortfuncs?
+prototype SorterComparerMsg (|message| a, |message| b, |bool|)
+function FuncListSorter (SorterComparerMsg)
 	opt norefcounts
-	|| aa = a|message|.first
-	|| bb = b|message|.first
+	|| aa = a.first
+	|| bb = b.first
 	|| af = aa.first
 	|| bf = bb.first
 	|| an = af.name

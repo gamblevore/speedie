@@ -284,7 +284,7 @@ function EditMeModified (guitextevent)
 				.PerryTryAutoComplete(x, "autocomplete_edit", PerryAutoCompleteReason.modified)
 	
 	(i is modified) = (self is modified)
-	|| msg = i.ProjMsg|listviewrow|
+	|listviewrow| msg = i.ProjMsg
 	|| Mod = (self is modified)
 	(msg is modified) = Mod
 	|| sub = i.CurrFileName.SubMenu

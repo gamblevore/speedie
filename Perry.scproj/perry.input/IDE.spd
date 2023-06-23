@@ -516,7 +516,10 @@ class PerryIDE (Window)
 	
 		
 	function Root (|filerow|)
-		return .filelist.start|filerow|
+		opt norefcounts
+		|| s = .FileList.start
+		if s isa filerow
+			return s
 
 	function file.NeedsOwnWindow (|bool|)
 		if .IsProj

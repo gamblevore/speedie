@@ -1,21 +1,21 @@
  
 
-function dictionary.CachePath (|string| path, ||)
+function dictionary.DocumentCached (|string| path, |document|)
 	opt norefcounts
 	require self
-	|| i = .valuelower(path)|CachedPath|
+	|| i = .valuelower(path)
+	if i isa CachedPath
 		return i.value
 
 
 class CachedPath
 	linkage
 		cpp_part CaP
-	contains object
 	|string|				Path
-	|object--|				Value
+	|document--|			Value
 	|dictionary--|			Cache
 
-	constructor (|string| p, |dictionary| c, |object| v)
+	constructor (|string| p, |dictionary| c, |document| v)
 		c.valuelower(p) = self
 		.path = p
 		.cache = c
