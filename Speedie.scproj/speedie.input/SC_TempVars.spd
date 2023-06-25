@@ -144,19 +144,20 @@ function UniqueNum (|int|)
 	Return ++SCGlobals.UniqueNum
 
 
+|| fs_tmp_num = FastString()
 function UniqueTmpVar (|SCBase| base, |string| name = "tmP", |string|)
-	|| fs = FastString()
-	fs <~ '_'
-	fs <~ name
+	opt norefcounts
+	fs_tmp_num <~ '_'
+	fs_tmp_num <~ name
 
 	if (base)
 		|| FN = base.OwningFunc
-			fs <~ 'f'
-			fs <~ FN.TmpCounter++|int|
+			fs_tmp_num <~ 'f'
+			fs_tmp_num <~ FN.TmpCounter++|int|
 	  else
-		fs <~ SCGlobals.UniqueNum++
-
-	return fs
+		debugger
+		fs_tmp_num <~ SCGlobals.UniqueNum++
+	return fs_tmp_num
 
 
 

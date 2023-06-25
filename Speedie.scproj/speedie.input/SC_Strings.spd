@@ -377,7 +377,7 @@ function message.BunchFixSub (|message| subject, |message| stuff)
 		subject = subject.copy
 
 
-function Message.BunchFixOof (|Message|)
+function Message.BunchFixPrepare (|Message|)
 	opt norefcounts
 	// if a == b or c
 	
@@ -400,7 +400,7 @@ function Message.BunchFixOof (|Message|)
 // only has 1 caller. why not fix this to use the above macro?
 function Message.BunchFix 
 	using (self)
-	|| P		= .BunchFixOof
+	|| P		= .BunchFixPrepare
 	|| subject	= P.first
 	|| multi_opp= subject.next(nil)$
 	.RelFix(false)

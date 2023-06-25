@@ -108,8 +108,6 @@ linkage
 |SCModule|				DisamClasses
 |SCModule|				DisamModules
 
-|scdecl| 				HashConstant
-|uint64| 				HashConstantValue
 |bool|					HasMainFunc
 |bool| 					InitedOK = true
 |int|					stClasses
@@ -280,8 +278,6 @@ function InitBasicStuff // compiler.init
 	.AddGlobalConst( "__time_id__", typeint ).islookuponly = «num scimport.recent.timeid »
 	.AddGlobalConst( "__now__", typedate ).islookuponly = «num date.now »
 	.AddGlobalConst( "__modified__", typedate ).islookuponly = «num scimport.recent »
-	.HashConstant = .AddGlobalConst( "__hash__", typedate )
-	.HashConstant.islookuponly = «num .hashconstantvalue » // remove this? we set it later anyhow?
 	.AddGlobalConst( "π", typef64 ).islookuponly = «num "3.1415926535897932" »
 	.AddGlobalConst( "τ", typef64 ).islookuponly = «num "6.2831853071795864" »
 

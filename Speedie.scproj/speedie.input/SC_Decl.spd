@@ -98,22 +98,21 @@ class SCDecl (SCObject) {
 	linkage
 		cpp_part			Decl
 
-	// bool in parent
-	|Byte|				PointerCount
-	|Byte|				AllocSource
-	|Byte|				Strength
+	|int|				C_Array
 	
 	|SCFunction--|		Setter		// todo: replace the .stringdata/hider thing with this.
 	|Object|			IsLookupOnly
 	|string|			StringData
 	|SCDecl|			AutoCastTo	// 4 special objects. Aren't they exclusive? Write some code to see if they are.
 	
+	//|SCDecl|			NextContains 
 	|SCDecl|			Contains
 	|Message|			Default
 	|SCClass|			Type
-	|int|				C_Array
 	|SCDeclInfo|		Info
 	|AsmReg|			DRegister
+	|Byte|				PointerCount
+	|Byte|				AllocSource
 	|NilState|			NilDeclared
 	|NilState|			NilUsed
 	

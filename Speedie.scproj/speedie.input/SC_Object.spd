@@ -10,6 +10,7 @@ class SCObject
 	|Message|				Source
 	|uint16|				TableId
 	|byte|					NoAutoComplete
+	|Byte|					Strength // used by scdecl... but we have 1 free byte here anyhow
 	
 	render
 		|| S = string.fromc(.class.name) 
