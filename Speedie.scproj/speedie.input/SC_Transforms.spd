@@ -120,7 +120,7 @@ function Tran_Using (TranFunc)
 		arg = node.parent
 	
 	Using (node)
-	|| name		= UniqueTmpVar(nil, "using")
+	|| name		= UniqueTmpVar("using")
 	|| WithFirst= with.first
 	if with != @bra
 		withfirst = with

@@ -623,7 +623,8 @@ function UniquifyExport (|String| s, |string|)
 		s = .ParamUniquer(s)
 		ifn compiler.exportnames[s] : return s
 	
-	s += UniqueNum().render
+	|| u = SCGlobals.UniqueNum++
+	s += u.render
 	ifn compiler.exportnames[s] : return s
 
 
