@@ -1,6 +1,7 @@
 
 
 import "GUI"
+import "Speedie.scproj/speedie.input/AutoCompleteHelpers"
 linkage
 	cpp_part Per
 	// blindcast false // not implemented yet

@@ -155,7 +155,6 @@ function UniqueTmpVar (|SCBase| base, |string| name = "tmP", |string|)
 			fs_tmp_num <~ 'f'
 			fs_tmp_num <~ FN.TmpCounter++|int|
 	  else
-		debugger
 		fs_tmp_num <~ SCGlobals.UniqueNum++
 	return fs_tmp_num
 

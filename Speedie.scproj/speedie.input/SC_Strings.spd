@@ -261,6 +261,8 @@ function Message.Clean (|bool| erl = false)
 					continue_with curr.tran_target
 				  elseif s == "is" or "isnt"
 					curr.Tran_Isnt("self")
+				  elseif SCGlobals.UniqueNum and AutoComplete.isafunc(s)
+					SCGlobals.UniqueNum = 0 // why not? make for smaller/more-predictable numbers
 				  elseif s == "dispatch" or "functiontable"
 					IgnoreArg = curr.last
 				  elseif s == "with"

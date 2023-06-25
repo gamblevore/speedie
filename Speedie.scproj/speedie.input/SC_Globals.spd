@@ -1548,6 +1548,7 @@ function message.PrepareAST (|string| path="")
 	while msg != After
 		if (msg == @tmp) and (msg == "functiontable" or "dispatch")
 			SCFunction.Tran_FuncTable( msg )
+		msg = msg.flatnext
 
 
 function Message.FixErl 
