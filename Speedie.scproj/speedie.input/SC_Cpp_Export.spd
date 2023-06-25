@@ -729,9 +729,6 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	*Hash = JB_LUBHash;
 	return JB_LUB;
 }
-extern "C" bool JB_Plat__HasFlow() {
-	return @flow;
-}
 `)
 	
 	function compiler.Reachedfuncs (|int|)

@@ -3,9 +3,7 @@
 	
 	Todo:
 		* Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
-						
-						
-						
+
 		* NilCheck:
 			Create problems / errors if not used properly
 		

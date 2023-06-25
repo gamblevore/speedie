@@ -24,11 +24,6 @@ module Options
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
 	||		HideMultipleErrors		= true
-	target flow
-		||		SelfFlowControl		= true
-	  else
-		||		SelfFlowControl		= false
-	
 	||		GenFlowControlCode		= false
 	||		Products				= native
 	||		Cpp						= true
@@ -78,8 +73,8 @@ module Feedback
 			Options.SelfReplacement = kSelfReplace
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
-			Options.GenFlowControlCode = Options.SelfFlowControl
-			Targets["flow"] = Options.SelfFlowControl
+			Options.GenFlowControlCode = app.prefs["self_flow"].yes
+			Targets["flow"] = options.GenFlowControlCode
 			targets["self"] = true
 		  elseif t2 == 2
 			Options.ProjectIsMiniLib = true
@@ -277,7 +272,6 @@ module Feedback
 			explain(Purpose, "Adds control-flow logging to generated compiles")$
 			|| b = value.optionbool
 			Options.GenFlowControlCode = b 
-			Options.SelfFlowControl = b
 			targets["flow"] = b
 
 		+"log"
@@ -493,7 +487,6 @@ module Feedback
 		fs <~ "Installation: ${compiler.SpeedieProj.parent}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
 		fs <~ "  UberLog: "
-		fs <~ ("yes", "no")(platform.HasFlow)
 		for (v in appoptions) (k) 
 			(appoptions[k])("", "", fs_tester)
 			if (fs_tester.length) 

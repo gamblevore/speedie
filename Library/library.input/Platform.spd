@@ -40,9 +40,6 @@ module Platform
 
 	function IsDebug (|bool|)
 		cpp_Wrapper JB_IsDebug
-		
-	function HasFlow (|bool|)
-		cpp_wrapper JB_Plat__HasFlow
 	
 	function Release (|bool|)
 		return !.Isdebug
