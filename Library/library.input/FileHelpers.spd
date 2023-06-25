@@ -85,7 +85,7 @@ extend String
 				rz = err
 				exit		
 		
-	function PathDir (|string|)
+	function PathDir (|string|) // asdir, todir
 		if self and .last != '/'
 			return self + "/"
 		return self
