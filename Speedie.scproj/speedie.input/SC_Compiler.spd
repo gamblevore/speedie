@@ -163,7 +163,7 @@ function CompileAll (|bool|)
 	CodeSorter.LeafsFirst		// super-refcounter wants this
 	
 	require .Stage( "NilChecking" )
-	nilchecker.CheckAll
+	nilsweep.CheckAll
 	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )

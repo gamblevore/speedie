@@ -56,7 +56,7 @@
 
 
 
-module NilChecker
+module NilSweep
 	function CheckAll
 		opt norefcounts
 		using options.NilStrength
@@ -90,13 +90,7 @@ function message.NilCheckProperty (|&scnillister| nel)
 	|| Prop = .DotMustBeProperty
 	require prop and (prop isnt OnModule)
 	|| f = .first
-	|| ObjDecl = TypeOfExpr(f, nil)
-	if !ObjDecl
-		target debug
-			printline scfunction.currfunc
-			"nil type: $f ${prop.objectid}"
-			debugger 
-		return nil
+	|| ObjDecl = TypeOfExpr(f, nil) #debug_require
 
 	|| u = ObjDecl.NilUsed
 	expect (u is exists) (self, "Nillable var accessed.")
