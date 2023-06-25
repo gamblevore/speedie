@@ -126,7 +126,8 @@ extend PerryIDE
 		|| str = "\n\nCompiled OK!"
 		.notify(.name + str, file)
 		target osx
-			.Talker = ShellStream("/usr/bin/say", [.name.trimext + str])
+			if SDLApp.IsBackground
+				.Talker = ShellStream("/usr/bin/say", [.name.trimext + str])
 		if db
 			.StartDebugging(msg.first.name.file)
 				
