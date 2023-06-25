@@ -523,7 +523,7 @@ extend PerryIDE
 			f.Excludes[ex.value] = "x"
 
 		f.addroot(.project, true) isnt editable
-		f.FocusOn( f.start|filerow| )
+		f.FocusOn( .root )
 		
 		if !IsDir and .IsSpeedieCode
 			conf = qqfiles.Roots.parse

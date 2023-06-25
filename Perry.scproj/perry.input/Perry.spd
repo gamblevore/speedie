@@ -168,10 +168,17 @@ function LoadState
 		colorscheme.load(it)
 	
 
+function buttonview.guitag (|guicontrol|)
+	opt norefcounts
+	|| t = .tag
+	if t isa guicontrol
+		return t
+
 function View (|ButtonView| btn)
 	opt norefcounts
 	require !.istextonly
-	|| g		= btn.tag|guicontrol|
+	|| g		= btn.guitag$
+	
 	|| changed	= g isnt visible
 	
 	|| old = .viewing

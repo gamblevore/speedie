@@ -136,7 +136,7 @@ function PerryIDE.ClickedTodo
 		fl.show(todo)
 		fl.scrolljump
 	  else
-		.nottodo = fl.FirstSelected|filerow|
+		.nottodo = .CurrFileRow
 	fl.SelectNoShow(todo)
 
 
