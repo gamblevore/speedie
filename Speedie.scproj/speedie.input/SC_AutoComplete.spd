@@ -670,13 +670,13 @@ function TmpAutoComplete (|message| f, |string| name, |string| type, |message|)
 
 
 function JumpImport (|message| cmd, |message|)
-	|| arg = cmd[@arg]
-	|| f = arg[0]
+	|| f = cmd[@arg][0]
+		cmd.clear
 		|| proj = Compiler.FindProject(f.name, false)
-		if proj.exists
-			rz = @tmp + "define"
-			rz <~ (@sstr, proj.path)
-			rz <~ 0	
+		require proj.exists
+		cmd <~ (@sstr, proj.path)
+		cmd <~ 0
+		return cmd
 
 
 function RootTmpComplete (|message| cmd, |message|)
