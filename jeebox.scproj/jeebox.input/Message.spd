@@ -994,7 +994,7 @@ class Message (RingTree)
 	function MiniName (|string|)
 		return "$.FuncName “${.name[0,64].UnicodeSync}”"
 
-	function SyntaxExpect ( |string| Error = nil )
+	Syntax Expect ( |string| Error = nil )
 		if !Error
 			if !self
 				nil.syntaxexpect
@@ -1002,18 +1002,18 @@ class Message (RingTree)
 			Error = "Unexpected " + .MiniName
 		StdErr.NewError( self, Error )
 
-	function SyntaxDeprecate ( |string| Error = "Deprecated." )
-		StdErr.Newproblem( self, Error )
-		
-	function SyntaxWarn ( |string| Error = nil )
+	Syntax Deprecate ( |string| Error = "Deprecated." )
+		StdErr.NewProblem( self, Error )
+	
+	Syntax Warn ( |string| Error = nil )
 		Error := "Unexpected " + .mininame
 		StdErr.NewWarning( self, Error )
 	
-	function SyntaxAppend (|syntax| Fn, |string| name="")
+	Syntax Append (|syntax| Fn, |string| name="")
 		cpp_part AppendSyx
 		fn.msg(self, name)
 	
-	function SyntaxAppend (|int64| Num)
+	Syntax Append (|int64| Num)
 		cpp_part AppendNum
 		@num.msg(self, num.render)
 
