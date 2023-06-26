@@ -55,16 +55,14 @@ class Error (Message)
 	
 	function UpgradeWithNode
 		opt norefcounts
-		|| node = currsource.last
+		|| node = .node
+		if ! node
+			node = currsource.last  #require
 			.node = node
-			if (node == @tmp) and (node.name[0] == '/')		// a filepath
-				.path = node.name
-		  else
-			node = .node #require
 		.position = node.position
 
-		|| p = node.filepath
-			.path = p
+		if !.path
+			.path = node.filepath
 		.OriginalData = node.OriginalParseData
 		
 		
