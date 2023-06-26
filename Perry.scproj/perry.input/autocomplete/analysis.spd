@@ -54,13 +54,11 @@ function PerryFuncMenuSelected (GUIListEvent)
 	if row
 		e.ViewPos(row.position, 1, true) is found //inviewexact
 	  else
-		|| obj = .ListSource.obj
-		if obj isa TextViewLine
+		|| obj = .ListSource.obj as TextViewLine
 			e._Start = obj
 
 
 // Can we... like do this more neatly? Maybe not huh? what if we wanna sort using two sortfuncs?
-prototype SorterComparerMsg (|message| a, |message| b, |bool|)
 function FuncListSorter (SorterComparerMsg)
 	opt norefcounts
 	|| aa = a.first

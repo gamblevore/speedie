@@ -157,8 +157,7 @@ module Perry
 extend PerryIDE {
 function IsSpeedieCode (|bool|)
 	opt norefcounts
-	|| r = .filelist.listsource.First
-	if r isa filerow
+	|| r = .filelist.listsource.First as filerow
 		return r.location.pathiscode
 
 
@@ -216,8 +215,7 @@ function ShowStdOut (|bool| AlwaysShow=false)
 
 function OutText (|textview|)
 	|| row = .tabs2.Selected
-		|| obj = row.obj
-		if obj isa textview
+		|| obj = row.obj as TextView
 			return obj
 
 

@@ -96,8 +96,7 @@ class PerryIDE (Window)
 
 	function GetBuildFile (|file|) 
 		|| inside = .filelist.listsource.first
-		|| found = inside.findnested(nil, "build.spd")
-		if found isa filerow
+		|| found = inside.findnested(nil, "build.spd") as filerow
 			return found.location.file
 
 	
@@ -204,16 +203,15 @@ class PerryIDE (Window)
 			fs <~ "${t.charcount} chars in ${t.linecount} lines"
 			
 		  elseif i == 2
-			|| f = .filelist.FirstSelected
-			if f isa filerow
-				if f.asdir
-					fs <~ "fol: "
-				  else
-					fs <~ "proj: "
-					|| fr = .filelist.listsource
-					if fr isa filerow
-						f = fr
-				fs <~ "${f.lastsize.strsize} in ${f.lastfilecount} \11"
+			|| f = .filelist.FirstSelected as filerow
+			if f.asdir
+				fs <~ "fol: "
+			  else
+				fs <~ "proj: "
+				|| fr = .filelist.listsource
+				if fr isa filerow
+					f = fr
+			fs <~ "${f.lastsize.strsize} in ${f.lastfilecount} \11"
 		  elseif i == 3
 			fs <~ "Obj ${app.ObjMemory.strsize}  Str ${app.stringmemory.strsize}  Scr ${sdlapp.DrawSpace.bytecapacity.strsize}"
 			
@@ -319,8 +317,7 @@ class PerryIDE (Window)
 		require HideTop == VisTop  or  HideSide == VisSide
 		if .viewing == .viewfiles
 			if HideSide
-				|| fl = .filelist.listsource
-				if fl isa FileRow
+				|| fl = .filelist.listsource as filerow
 					.noneed fl.LastFileCount.render + " files"
 			  else
 				.noneed
@@ -589,11 +586,6 @@ class PerryIDE (Window)
 		if .editme.FindExpectsParse < 2
 			.editsep.Collapse
 
-
-	function listview.ListSourceError (|error|)
-		|| s = .ListSource
-		if s isa error
-			return s
 		
 	function LoadErrors (|bool| jump, |bool| actual_compile) 
 		opt norefcounts
@@ -604,7 +596,7 @@ class PerryIDE (Window)
 		.filelist.ClearErrors
 
 		|error| jumpto 
-		|| src = lst.ListSourceError #require
+		|| src = lst.ListSource as Error #require
 		|| ActualErrors = 0
 		for err in src
 			if err.severity >= ErrorSeverity.Error
@@ -635,8 +627,7 @@ class PerryIDE (Window)
 
 
 	function CurrFileRow (|FileRow|)
-		|| r = .FileList.FirstSelected
-		if r isa FileRow
+		|| r = .FileList.FirstSelected as filerow
 			return r
 			
 	function CurrPath (|string|)

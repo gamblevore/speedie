@@ -78,8 +78,7 @@ function ClickedCompileTabs (Guiaction)
 function PerryIDE.StdOutSelect (|object| Desired)	
 	opt norefcounts
 	for i in .tabs2.Items
-		|| obj = i.obj
-		if obj isa GUIControl
+		|| obj = i.obj as GUIControl
 			|| vis = (Desired == i or obj)
 			(i is selected)  = vis
 			(obj is visible) = vis
@@ -197,8 +196,8 @@ function ReturnAllFuncs (GUIListEvent)
 
 	
 function OpenProjectPath (GUIaction)
-	|| f = .ide.filelist.FirstSelected
-	if (f isa filerow) and (self isa buttonview)
+	|| f = .ide.filelist.FirstSelected as FileRow
+	if (self isa buttonview)
 		.FillMenuPath(f.location)
 
 

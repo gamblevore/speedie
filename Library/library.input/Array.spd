@@ -185,10 +185,12 @@ class Array (saveable)
 
 
 prototype SorterComparer (|object| a, |object| b, |bool|)
+prototype SorterComparerMsg (|message| a, |message| b, |bool|)
 	
 function StringSorter (SorterComparer)
 	return a|string|  <  b|string|
 	
+
 
 helper SorterComparer.TestSort
 	|random| rnd

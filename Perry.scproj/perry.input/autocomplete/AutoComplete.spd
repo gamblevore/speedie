@@ -42,16 +42,16 @@ function message.DefineToLine (|string| count)
 		l.name = " - Called From " + s + " - "
 		
 
-function CallFromSorter (SorterComparer)
+function CallFromSorter (SorterComparerMsg)
 	opt norefcounts
-	if a isa Message and b isa Message
-		|| aa = a.second
-		|| bb = b.second
-		if !aa and !bb
-			return b.position < a.Position	
-		if !aa or !bb
-			return aa
-		return bb.name < aa.name
+
+	|| aa = a.second
+	|| bb = b.second
+	if !aa and !bb
+		return b.position < a.Position	
+	if !aa or !bb
+		return aa
+	return bb.name < aa.name
 
 
 function string.LowerDiffAt (|string| A, |ind|)

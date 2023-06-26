@@ -103,8 +103,7 @@ function ClickedPrevNext (GUIaction)
 
 
 function ProjectCMMShow (GuiMenuEvent)
-	|| row = clicked.row
-	if row isa error
+	|| row = clicked.row as error
 		|| i = .ide
 		i.clickederror(row)
 		i.view(i.viewfiles)
@@ -126,8 +125,8 @@ function PressingTabs (guiaction)
 
 function message.ide (|perryide|)
 	opt norefcounts
-	if .obj isa perryide
-		return .obj|perryide|
+	|| o = .obj as perryide
+		return o
 	for w in window.all
 		if w isa PerryIDE
 			if .name ~= w.Project
