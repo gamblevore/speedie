@@ -32,7 +32,7 @@ class ChartWindow (Window)
 			chartwindow().show
 		
 		function NewAge (GuiTextEvent)
-			self.Window|ChartWindow|.view.age = .Text.float
+			(.Window as ChartWindow).view.age = .Text.float
 			.touch
 
 

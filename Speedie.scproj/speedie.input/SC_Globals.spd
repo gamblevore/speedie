@@ -41,10 +41,10 @@ function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |scbase| name_space)
 		ifn scfunction.CurrFunc and scfunction.CurrFunc isa kIsAlloc
 			if imp.BlindCast and old.IsNormalObject and .IsNormalObject
 				if !old.type.real_isa2( .type )
-					stderr <~ error(exp, "Blind type-casting disabled. Use 'isa' instead.", imp.blindcast)
+					stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", imp.blindcast)
 
 
-function TypeCastCheck (ExprResolver)
+function TypeCastCheck (ExprResolver) // typecheck
 	|| exp0 = exp.first
 	|| N = exp0.next
 	|| Old = TypeOfExpr( exp0, name_space, side )		#require

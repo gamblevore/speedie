@@ -20,9 +20,10 @@ class SCImport
 	|dictionary of file| 	Resources
 	
 
-	constructor ( |File| F )
+	constructor ( |File| F, |bool| Builtin )
 		.Proj = F
 		.Resources = Dictionary()
+		.BlindCast = (0, errorseverity.error)(builtin)
 		.DeclLayer = (scdecl).CreateLayer(self)
 		|| M = SCModule.Neu( nil, compiler.program, nil )|SCModule|
 		.Mod = M
@@ -119,14 +120,9 @@ class SCImport
 			.Mod.ExportName = name.name
 		
 		|| blind = arg["blindcast"]
-			if blind ~= "off"
-				.BlindCast = ErrorSeverity.Error
-			  else
-				.BlindCast = ErrorSeverity.find(blind.name, blind)
+			.BlindCast = ErrorSeverity.find(blind.name, blind)
 		  elseif Options.SelfReplacement
 			.BlindCast = 0
-		  else
-			.BlindCast = ErrorSeverity.error
 	
 	// * Needs better types: "contains (a,b,c)". (|0| a, |1| b, |2| c).
 	// scdecl would use linked-list to other decls... fileviewer has GUIcontrols+filerows
@@ -237,7 +233,7 @@ class SCImport
 	
 			|| fpl = f.Path.lowercase
 			require (!Compiler.ImportedNames[fpl])
-			|| rz = SCImport.new(f)
+			|| rz = SCImport.new(f, builtin)
 			Compiler.ImportedNames[fpl] = rz
 			
 			if (path contains "/") and (path[0] != '/')
@@ -256,8 +252,6 @@ class SCImport
 				conf = rz.ImportDir( f, Path )
 			
 			rz.LoadConf(conf, ImportDepth)
-			if builtin
-				rz.blindcast = 0
 			rz.IncludeCHeaders( f["c_includes"],	 Cpp_Export.H_Input )
 			rz.IncludeCHeaders( f["c_postincludes"], Cpp_Export.H_PostInput )
 			

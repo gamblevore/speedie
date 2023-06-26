@@ -722,7 +722,7 @@ function FindModule (|String| name, |Message| where, |string| ErrMsg="Not a modu
 
 
 function CreateRoot
-	|| Prj = SCImport.new(nil)
+	|| Prj = SCImport.new(nil, true)
 	.InternalFile.Proj = Prj
 
 	|| M = Prj.Mod

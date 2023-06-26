@@ -750,7 +750,7 @@ SCFunction* SC_Comp__CreateFuncFromSource(JB_String* Src) {
 }
 
 void SC_Comp__CreateRoot() {
-	SCImport* Prj = JB_Incr(SC_Imp__New(nil));
+	SCImport* Prj = JB_Incr(SC_Imp__New(nil, true));
 	JB_SetRef(SC__Comp_InternalFile->Proj, Prj);
 	SCModule* M = JB_Incr(Prj->Mod);
 	JB_Decr(Prj);
@@ -2177,7 +2177,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	iif (SC_Comp__EnterCompile()) {
 		iif (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[149], (110610444968503)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[149], (110610689669727)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3463,7 +3463,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[231]);
-	JB_FS_AppendInt32(_fsf0, (2023062613));
+	JB_FS_AppendInt32(_fsf0, (2023062614));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7236,7 +7236,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[497]);
-	JB_FS_AppendInt32(_fsf0, (2023062613));
+	JB_FS_AppendInt32(_fsf0, (2023062614));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -22167,9 +22167,8 @@ bool SC_Imp_CanBan(SCImport* self, SCFile* scf) {
 	return _tmPf1;
 }
 
-void SC_Imp_Constructor(SCImport* self, JB_File* F) {
+void SC_Imp_Constructor(SCImport* self, JB_File* F, bool Builtin) {
 	self->IsSTDLib = false;
-	self->BlindCast = 0;
 	self->Depth = 0;
 	Array* _tmPf0 = JB_Array__New0();
 	self->Files = JB_Incr(_tmPf0);
@@ -22177,6 +22176,7 @@ void SC_Imp_Constructor(SCImport* self, JB_File* F) {
 	self->Proj = JB_Incr(F);
 	Dictionary* _tmPf1 = JB_Dict__New();
 	self->Resources = JB_Incr(_tmPf1);
+	self->BlindCast = JB_Ternaryy(Builtin, 0, ((int)kJB__ErrorSeverity_Error));
 	JB_MemoryLayer* _tmPf2 = JB_Mem_CreateLayer((JB_AsClass(SCDecl)), self);
 	self->DeclLayer = JB_Incr(_tmPf2);
 	SCModule* M = JB_Incr(((SCModule*)SC_Mod__Neu(nil, SC__Comp_program, nil)));
@@ -22359,18 +22359,10 @@ void SC_Imp_IndexLinkage(SCImport* self, Message* link, SCFile* scf) {
 	Message* blind = JB_Incr(JB_Msg_GetConf(arg, JB_LUB[1300], false));
 	JB_Decr(arg);
 	iif (blind) {
-		iif (JB_Msg_SyntaxEquals(blind, JB_LUB[793], true)) {
-			self->BlindCast = kJB__ErrorSeverity_Error;
-		}
-		 else {
-			self->BlindCast = JB_ErrorSeverity__Find(blind->Name, blind);
-		}
+		self->BlindCast = JB_ErrorSeverity__Find(blind->Name, blind);
 	}
 	 else iif ((bool)SC__Options_SelfReplacement) {
 		self->BlindCast = 0;
-	}
-	 else {
-		self->BlindCast = kJB__ErrorSeverity_Error;
 	}
 	JB_Tree_Remove(link);
 	JB_Decr(name);
@@ -22618,7 +22610,7 @@ void SC_Imp__ImportPath(JB_String* path, JB_File* f, int ImportDepth, bool Built
 		JB_Decr(fpl);
 		return;
 	}
-	SCImport* rz = JB_Incr(SC_Imp__New(f));
+	SCImport* rz = JB_Incr(SC_Imp__New(f, Builtin));
 	(JB_Dict_ValueSet(SC__Comp_ImportedNames, fpl, rz));
 	JB_Decr(fpl);
 	iif ((JB_Str_ContainsString(path, JB_LUB[1149])) and (JB_Str_ByteValue(path, 0) != '/')) {
@@ -22644,9 +22636,6 @@ void SC_Imp__ImportPath(JB_String* path, JB_File* f, int ImportDepth, bool Built
 		JB_SetRef(conf, SC_Imp_ImportDir(rz, f, path));
 	}
 	SC_Imp_LoadConf(rz, conf, ImportDepth);
-	iif (Builtin) {
-		rz->BlindCast = 0;
-	}
 	JB_File* _tmPf2 = JB_Incr(JB_File_SyntaxAccess(f, JB_LUB[1311], false));
 	SC_Imp_IncludeCHeaders(rz, _tmPf2, SC__Cpp_H_Input);
 	JB_Decr(_tmPf2);
@@ -22684,11 +22673,11 @@ bool SC_Imp__IsInputName(JB_String* name) {
 	return false;
 }
 
-SCImport* SC_Imp__New(JB_File* F) {
+SCImport* SC_Imp__New(JB_File* F, bool Builtin) {
 	//;
 	SCImport* __rz__ = ((SCImport*)JB_Imp__Alloc());
 	if (__rz__) {
-		SC_Imp_Constructor(__rz__, F);
+		SC_Imp_Constructor(__rz__, F, Builtin);
 	}
 	return __rz__;
 }
@@ -46542,4 +46531,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -7241496917111492756 -1465654626708888293
+// 1882494571839887130 6608577991684568104

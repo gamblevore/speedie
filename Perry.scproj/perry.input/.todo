@@ -19,10 +19,11 @@
 * "calledfrom" autocomplete needs to include references to funcs
 	* calledfrom datatypes too
 * galaxxies C++ compile issues
-* "blindcast bad" puts error in wrong file?
+* compiling jz.spd seems to create an import of "@spd/Utils"??
 
 
 // Perry Do later
+* clicking on empty errorlist should take you to the filelist
 * case completion fails in speedie?
 * https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.

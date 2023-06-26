@@ -5592,7 +5592,7 @@ void JB__ProcessReportCrash();
 // JB_SCImport
 bool SC_Imp_CanBan(SCImport* self, SCFile* scf);
 
-void SC_Imp_Constructor(SCImport* self, JB_File* F);
+void SC_Imp_Constructor(SCImport* self, JB_File* F, bool Builtin);
 
 void JB_Imp_destructor(SCImport* self);
 
@@ -5636,7 +5636,7 @@ int SC_Imp__InitCode_();
 
 bool SC_Imp__IsInputName(JB_String* name);
 
-SCImport* SC_Imp__New(JB_File* F);
+SCImport* SC_Imp__New(JB_File* F, bool Builtin);
 
 void SC_Imp__NoProj();
 
