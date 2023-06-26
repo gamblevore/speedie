@@ -35,8 +35,16 @@ function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 	return  (side.RemoveTypeCasts != @arg)
 
 
-function TypeCastCheck (ExprResolver)
+function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |scbase| name_space)
 	opt norefcounts
+	|| imp = name_space.Project
+		ifn scfunction.CurrFunc and scfunction.CurrFunc isa kIsAlloc
+			if imp.BlindCast and old.IsNormalObject and .IsNormalObject
+				if !old.type.real_isa2( .type )
+					stderr <~ error(exp, "Blind type-casting disabled. Use 'isa' instead.", imp.blindcast)
+
+
+function TypeCastCheck (ExprResolver)
 	|| exp0 = exp.first
 	|| N = exp0.next
 	|| Old = TypeOfExpr( exp0, name_space, side )		#require
@@ -44,11 +52,8 @@ function TypeCastCheck (ExprResolver)
 	// allow MOST typecasts, but NOT typecasts to/from struct instances...
 	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
 		error (exp, "Can’t cast to/from structs/carrays (pointers to structs are OK though)")
-	|| imp = name_space.Project
-		ifn scfunction.CurrFunc and scfunction.CurrFunc isa kIsAlloc
-			if imp.BlindCast and old.IsNormalObject and new.IsNormalObject
-				if !old.type.real_isa2( new.type )
-					stderr <~ error(exp, "Blind type-casting disabled. Use 'isa' instead.", imp.blindcast)
+	
+	new.NoBlindCasts(old, exp, name_Space)
 	return New
 
 
@@ -1721,12 +1726,15 @@ function DotFuncToNormalFunc (|Message|dot, |SCFunction|fn)
 
 
 function SCDecl.ProcessAs (|Message| msg, |SCDecl|)
-	|| P = msg.parent.unbra
+	|| P = msg.parent.unbra #require
 	if (P isBrel "&")					 // :)
 		return self
 	|| T = .type.processas.typenormal
 	T.CreateSimpleTypeCast(msg)
-	msg.last.obj = self					 // fix bug?
+	|| L = msg.last
+		L.obj = self					 // fix bug?
+	  else
+		error msg 
 	return T
 
 
