@@ -562,9 +562,8 @@ function Tran_ForSub (TranFunc)					// :3
 			if (ty == "...")
 				if dcl.contains
 					msg.Become(@bra)
-					msg.obj = dcl.Contains
+					msg.obj = dcl.contains
 					ty.remove
-//					ty.ReplaceWith(dcl.contains.WriteType)
 				  else
 					msg.ReplaceWith(msg.first)
 			

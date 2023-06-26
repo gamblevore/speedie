@@ -1892,7 +1892,7 @@ JB_String* JB_Obj_GenericRender(JB_Object* self, FastString* fs_in) {
     JB_Class* Cls = JB_ObjClass(self);
     JB_FS_AppendCString(fs, (const char*)Cls->Name);
     JB_FS_AppendCString(fs, "(");
-    JB_FS_AppendIntegerAsText(fs, JB_ObjID(self), 1);
+    JB_FS_AppendIntegerAsText(fs, JB_ObjectID(self), 1);
     JB_FS_AppendByte(fs, ')');
 
 	return JB_FS_SmartResult( fs, fs_in );

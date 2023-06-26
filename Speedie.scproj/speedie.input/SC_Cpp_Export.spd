@@ -1068,6 +1068,15 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ CloseStr
 	
 
+	function message.BraDeclfind (|scdecl|)
+		opt norefcounts
+		while
+			|| d = .AsDecl
+				rz = d
+			self = .parent
+			loop self == @bra
+
+				
 	function C_RenderFnc (fpMsgRenderCpp)
 		opt norefcounts
 		|| F = .first
@@ -1077,7 +1086,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 		if (fn isa SCFunction) and !fn.prototype   // easy
 			if Fn.ReturnType and (.Parent != @arg)
-				PostBracket = C_OneParamType(fs, self, .AsDecl)
+				PostBracket = C_OneParamType(fs, self, .BraDeclFind)
 
 			fs <~ fn.ExportName
 		  else

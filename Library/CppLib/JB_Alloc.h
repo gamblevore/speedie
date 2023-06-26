@@ -237,7 +237,7 @@ uint8* JB_ObjClassBehaviours(JB_Object* Obj);
 JB_Object* JB_Mem_First( JB_MemoryLayer* Mem );
 JB_Object* JB_ObjNext(JB_Object* Obj);
 JB_MemoryLayer* JB_ObjLayer( JB_Object* Obj );
-uint JB_ObjID( JB_Object* Obj );
+uint JB_ObjectID( JB_Object* Obj );
 void JB_ObjDestroy( JB_Object* Obj );
 JB_MemoryLayer* JB_Class_DefaultLayer( JB_Class* Cls );
 JB_MemoryLayer* JB_Class_Layer( JB_Class* Cls );
@@ -298,7 +298,7 @@ u32 JB_ObjCount();
 #if DEBUG
 	extern int RefTrap;
     #define JBObjRefTest(obj) if ( (obj->RefCount) > 100000 and !RefTrap and !(obj->RefCount&~0x10000000)) { RefTrap = 1; debugger; }
-    #define JBObjRefTrap(obj) //if (JB_ObjID(obj)==RefTrap) { printf("ref of %i: %i\n", RefTrap, obj->RefCount); debugger; }
+    #define JBObjRefTrap(obj) //if (JB_ObjectID(obj)==RefTrap) { printf("ref of %i: %i\n", RefTrap, obj->RefCount); debugger; }
     #define JBTestSanityOK 1
 #else
     #define JBObjRefTest(obj)

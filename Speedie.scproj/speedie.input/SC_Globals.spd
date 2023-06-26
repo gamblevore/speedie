@@ -1023,20 +1023,21 @@ struct asdas2
 		|| jjj = .www
 
 
+function message.ClassSpace (|scbase| name_space, |scobject|)
+	opt norefcounts
+	if self != @Thg
+		return TypeOfExprmodulesok( self, name_space ) 
+	// module.func, module.var
+	rz = name_space.LookUpVar( .name, self, nil )
+	.obj = rz
+
+
 function TypeOfDot (ExprResolver)
 	require !exp.Last.obj // it's a func that returns nothing. we already got it, don't get again.
-
-	||			name = exp.name
-	|scobject|	Class_Space
-	||			ch = exp.first
-	if ch == @Thg
-		// module.func, module.var
-		Class_Space = name_space.LookUpVar( ch.name, ch, nil )
-		ch.obj = Class_Space
-	  else
-		Class_Space = TypeOfExprmodulesok( ch, name_space ) 
 	
-	expect (class_space) (ch, "This expression can’t be used here.")
+	|| ch = exp.first
+	|| name = exp.name
+	|| Class_Space = ch.ClassSpace(name_space) #expect (ch, "This expression can’t be used here.")
 	|SCDecl| contains
 
 	ifn Class_Space isa SCModule

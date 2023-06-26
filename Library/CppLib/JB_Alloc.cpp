@@ -522,13 +522,16 @@ JB_MemoryLayer* JB_ObjLayer( JB_Object* Obj ) {
 }
 
 
-uint JB_ObjID( JB_Object* Obj ) {
-    AllocationBlock* Block = ObjBlock_(Obj);
-    require(((IntPtr)Block->Super) >= 4000);
-    uint SuperID = Block->Super->ID;
-    IntPtr Offset = ((IntPtr)Obj) - ((IntPtr)(Block->Super));
-    return (SuperID << 20) + (uint)(Offset >> 3);// min objectsize = 8. So we can lose 3 bits
-												// SuperID is also different. Need to increase it so it won't collPerryIDE.
+uint JB_ObjectID( JB_Object* Obj ) {
+	if (Obj) {
+		AllocationBlock* Block = ObjBlock_(Obj);
+		require(((IntPtr)Block->Super) >= 4000);
+		uint SuperID = Block->Super->ID;
+		IntPtr Offset = ((IntPtr)Obj) - ((IntPtr)(Block->Super));
+		return (SuperID << 20) + (uint)(Offset >> 3);// min objectsize = 8. So we can lose 3 bits
+													// SuperID is also different. Need to increase it so it won't collide.
+	}
+	return 0;
 }
 
 
