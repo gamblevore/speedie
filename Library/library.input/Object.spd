@@ -39,10 +39,6 @@ class Object
 		cpp_part Isa
 		if (self)
 			|| P = .Class
-			if x == p
-				return true
-			require x.hassubclasses
-			p = p.parent
 			while (P|bool|)
 				if (P == x)
 					return true
@@ -57,11 +53,20 @@ class Object
 			return true
 		error (errnode, "Expected class ${x.name|cstring|}")
 
-
 	operator fast_isa (|&ClassData|x, |bool|)
 		cpp_part FastIsa
 		return (self) and (.Class == x)
 
+	operator as (|&ClassData|x, |object|) // (*1).class
+		// needs compiler support
+		cpp_name JB_Object_As
+		if self and (self isa x)
+			return self
+
+//	operator fast_as (|&ClassData|x, |object|)
+//		cpp_part FastAs
+//		if self fast_isa x
+//			return self
 
 	api DebugPrint  // more for use in XCode, than anything else.
 		cpp_name jdb
