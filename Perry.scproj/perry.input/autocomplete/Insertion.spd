@@ -398,4 +398,4 @@ function string.isSource (|bool|)
 
 
 function guicontrol.ide (|perryide|)
-	return .window|perryide|
+	return .window as perryide
