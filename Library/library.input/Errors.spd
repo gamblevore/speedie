@@ -244,6 +244,13 @@ datatype ErrorSeverity (Byte)
 	module
 		|array of string| names
 
+		function Find (|string| name, |message| err=nil, |errorseverity|)
+			for (n in .names) (i)
+				if n ~= name
+					return i
+			if err
+				error err
+
 
 
 module ErrorColors

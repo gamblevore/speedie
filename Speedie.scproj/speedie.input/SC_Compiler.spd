@@ -324,13 +324,13 @@ function Speedie (|file|)
 
 function ImportLibs
 	SCImport.STDLibTime = true
-	SCImport.Importpath( "Library",		.Library,		1 )
-	SCImport.Importpath( "jeebox",		.Jeebox,		1 )
+	SCImport.Importpath( "Library",		.Library,		1, true )
+	SCImport.Importpath( "jeebox",		.Jeebox,		1, true )
 
 
 function ImportProj
 	SCImport.STDLibTime = false
-	SCImport.Importpath( "",   .BaseProjectPath,  0 )
+	SCImport.Importpath( "",   .BaseProjectPath,  0, false )
 
 
 function ImportAST

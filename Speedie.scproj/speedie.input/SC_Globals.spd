@@ -36,6 +36,7 @@ function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 
 
 function TypeCastCheck (ExprResolver)
+	opt norefcounts
 	|| exp0 = exp.first
 	|| N = exp0.next
 	|| Old = TypeOfExpr( exp0, name_space, side )		#require
@@ -43,11 +44,11 @@ function TypeCastCheck (ExprResolver)
 	// allow MOST typecasts, but NOT typecasts to/from struct instances...
 	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
 		error (exp, "Can’t cast to/from structs/carrays (pointers to structs are OK though)")
-	|| imp = name_space.FindProject
-		ifn scfunction.CurrFunc isa kIsAlloc
-			if imp.NoBlindCast and old.IsNormalObject and new.IsNormalObject
+	|| imp = name_space.Project
+		ifn scfunction.CurrFunc and scfunction.CurrFunc isa kIsAlloc
+			if imp.BlindCast and old.IsNormalObject and new.IsNormalObject
 				if !old.type.real_isa2( new.type )
-					error (exp, "Blind type-casting disabled. Use 'isa' instead.")
+					stderr <~ error(exp, "Blind type-casting disabled. Use 'isa' instead.", imp.blindcast)
 	return New
 
 

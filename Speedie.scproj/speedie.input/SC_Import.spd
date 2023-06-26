@@ -10,7 +10,7 @@ class SCImport
 		cpp_part		Imp
 	
 	|bool|					IsSTDLib
-	|bool|					NoBlindCast
+	|errorseverity|			BlindCast
 	|int|					Depth
 	|[SCFile]|				Files
 	|File|					InputFolder
@@ -47,7 +47,7 @@ class SCImport
 		|| Name = J[@str, -1]$.name
 		|| P	= Compiler.FindProject(Name, true) #expect ( J, "Can’t find import: '$name'" )
 
-		SCImport.Importpath( name, P, .Depth + 1 )
+		SCImport.Importpath( name, P, .Depth + 1, false )
 	
 	
 	function PrepareAll 
@@ -74,7 +74,7 @@ class SCImport
 		// scf needs to be inside the thing...
 	
 	
-	function LoadPrefix (|SCFile| scf, |int| depth)
+	function LoadConf (|SCFile| scf, |int| depth)
 		opt norefcounts
 		.Mod.ExportName = "App" // make it simple
 		require scf
@@ -118,11 +118,17 @@ class SCImport
 			scf.ExportName = name.name
 			.Mod.ExportName = name.name
 		|| blind = arg["blindcast"]
-			//deprecate (blind, "Unfinished feature. See SC_Import.spd:IndexLinkage()")
+			if blind == "off"
+				.BlindCast = ErrorSeverity.Error
+			  else
+				.BlindCast = ErrorSeverity.find(blind.name, blind)
+		  elseif Options.SelfReplacement
+			.BlindCast = 0
+		  else
+			.BlindCast = ErrorSeverity.error
 	// * Needs better types: "contains (a,b,c)". (|0| a, |1| b, |2| c).
 	// scdecl would use linked-list to other decls... fileviewer has GUIcontrols+filerows
 
-			.NoBlindCast = !blind.Yes
 		link.remove
 		
 
@@ -224,7 +230,7 @@ class SCImport
 			return f[FirstName]
 		
 		
-		function ImportPath (|string| path, |file| f, |int| ImportDepth)
+		function ImportPath (|string| path, |file| f, |int| ImportDepth, |bool| Builtin)
 			require f.mustexist and path.IsOKForImport
 	
 			|| fpl = f.Path.lowercase
@@ -241,19 +247,21 @@ class SCImport
 				require f and f.MustExist
 			
 			rz.InputFolder = f
-			|scfile| index
+			|scfile| conf
 			if (options.SingleFileInput and !path)
-				index = rz.ImportSpd( options.SingleFileInput.file, Path )
+				conf = rz.ImportSpd( options.SingleFileInput.file, Path )
 			  else
-				index = rz.ImportDir( f, Path )
+				conf = rz.ImportDir( f, Path )
 			
-			rz.LoadPrefix(index, ImportDepth)
+			rz.LoadConf(conf, ImportDepth)
+			if builtin
+				rz.blindcast = 0
 			rz.IncludeCHeaders( f["c_includes"],	 Cpp_Export.H_Input )
 			rz.IncludeCHeaders( f["c_postincludes"], Cpp_Export.H_PostInput )
 			
 			rz.Depth = ImportDepth
-			if index
-				rz.ReloadImports(index)
+			if conf
+				rz.ReloadImports(conf)
 			Compiler.ImportedList <~ rz
 
 // desired
