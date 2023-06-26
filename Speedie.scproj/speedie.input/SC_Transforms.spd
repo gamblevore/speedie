@@ -715,7 +715,7 @@ function CollectIsaTests (|Message| s, |[Message]| out, |bool|)
 			if Robj isa SCModule
 				if fexp ~= "JB_Object_Isa"
 					if Robj.cls and !robj.cls.Hassubclass
-						list.obj = typeobject["operatorfast_isa"]
+						list.obj = compiler.fnFastisa
 				if L1 == @Thg
 					out <~ s
 					Return true

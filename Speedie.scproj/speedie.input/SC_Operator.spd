@@ -320,12 +320,15 @@ function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCBase|name_space, |Me
 	|| prm = «prm, RN » 
 	exp <~ prm
 	exp[ 1 ].Remove
+	
 	|| ty = TypeOfExpr( exp, name_space )$
-	if rn and prm.obj == compiler.AsFunc
+	if rn and (prm.obj == compiler.fnAs)
 		|| ty2 = rn.obj
 		if ty2 isa scmodule
 			|| cls = ty2.cls
-				return cls.realclass.typenormal
+				if !cls.Hassubclass
+					prm.obj = compiler.fnFastas // noice
+				return cls.typenormal
 	return ty
 
 

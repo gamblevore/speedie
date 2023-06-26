@@ -596,19 +596,20 @@ class PerryIDE (Window)
 		.filelist.ClearErrors
 
 		|error| jumpto 
-		|| src = lst.ListSource as Error #require
+		|| src = lst.ListSource
 		|| ActualErrors = 0
-		for err in src
-			if err.severity >= ErrorSeverity.Error
-				ActualErrors++
-			if err.path ~= path
-				txt.LineErrorAdd(err)
-				if jump and (!jumpto or err == lst.FirstSelected)
-					jumpto = err
-			if actual_compile
-				.logarea <~ err.copy
-			.filelist.ErrorAt(err)
-			
+		if src.hasany and src mustbe error
+			for err in src
+				if err.severity >= ErrorSeverity.Error
+					ActualErrors++
+				if err.path ~= path
+					txt.LineErrorAdd(err)
+					if jump and (!jumpto or err == lst.FirstSelected)
+						jumpto = err
+				if actual_compile
+					.logarea <~ err.copy
+				.filelist.ErrorAt(err)
+				
 		if jumpto
 			txt.ErrorJump(jumpto)
 		  elseif jump and actual_compile

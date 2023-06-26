@@ -61,7 +61,15 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "/usr/local/speedie/Perry.scproj"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "/usr/local/speedie/Utils/jz.spd"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/usr/local/speedie/Utils/casting.spd"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument

@@ -18,17 +18,19 @@
 		* Start with leaf-funcs.
 * "calledfrom" autocomplete needs to include references to funcs
 	* calledfrom datatypes too
+* galaxxies wont compile
 * galaxxies C++ compile issues
 * compiling jz.spd seems to create an import of "@spd/Utils"??
+	* its because main is app.main, and app is a lib. We need delayed funcs to have different .projects
+* if a mustbe (b,c) // fucked compile?
 
 
 // Perry Do later
 * extra error is being added (first? is being saved? for some good reason but too enthusiastic)
-* path menus fail to click ? (isa bug?)
 * function list should have a field that can be typed into
 * clicking on empty errorlist should take you to the filelist
 * case completion fails in speedie?
-* https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n
+* https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * TextView error/find resync

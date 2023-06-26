@@ -1779,11 +1779,6 @@ function NeuMain (CollectFunc)
 	|| src_arg = fn_src.Last
 	|| inc_arg = node[@arg, -1]$
 	|| prms = node[0]
-	prms.name.file
-//	if prms == @list or @bra
-//		prms.func = @list
-//		prms.MainArgs(src_Arg)
-//	  else
 	expect (prms == inc_arg) (prms)
 		
 	src_arg.Remove
@@ -1793,9 +1788,6 @@ function NeuMain (CollectFunc)
 	Compiler.HasMainFunc = true
 	rz = SCFunction.NewFunc( fn_Src, name_space, ErrPlace )
 	if rz isa scmodule // sigh. Not ideal.
-		// ideally don't add to the extend-list if the class exists already
-		// but my code isn't that smart yet. It just waits until all classes are imported.
-		// but the app class will come first, right? It should?
 		scclass.ProcessExtend(fn_Src, false)
 		fn_src.remove
 

@@ -13,36 +13,9 @@ main
 	if msg
 		"Approach 3: '$s' was tested using 'as'"
 	
-//	|| blindly = losing_type|message|
+	|| blindly = losing_type|message|
 	testCasting()
 	
-
-/*
-class Vehicle {
-    var name: String
-    init(name: String) {
-        self.name = name
-    }
-}
-  
-class Car: Vehicle {
-    var brand: String
-    init(name: String, brand: String) {
-        self.brand = brand
-        super.init(name: name)
-    }
-}
-
-func TestCasting() {
-	let myVehicle = Car(name: "My Car", brand: "Tesla")
-	let myCar = myVehicle as? Car
-	if let myCar = myCar {
-	    print("My car's brand is \(myCar.brand)")
-	} else {
-	    print("myVehicle is not a Car")
-	}
-}
-*/
 
 class Vehicle
     |String| name

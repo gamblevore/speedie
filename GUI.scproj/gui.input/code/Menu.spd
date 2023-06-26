@@ -3,7 +3,6 @@
 
 class Menu (ListView)
 	|ListViewrow|						EditingRow // 
-	|Menuitem|							ChosenMenu 
 	|bool|								DelayedOpen
 	|bool|								NoCloseOnClick
 	
@@ -36,7 +35,7 @@ class Menu (ListView)
 	behaviour MouseDown
 		if .ClickedScroll(P, clicks)
 			return 2
-		|| L = .DrawClick(P) as MenuItem
+		|| L = .DrawClick(P) as listviewrow
 		if L is disabled
 			return 1
 		if (L is selected)
@@ -47,17 +46,17 @@ class Menu (ListView)
 		return 1
 	
 	
-	function UseMenu (|menuitem| L)
+	function UseMenu (|listviewrow| L)
 		|| e = .EditingRow
 		if !.NoCloseOnClick
 			.closemenu
 		require l
-		.ChosenMenu = l
 		if .DelayedOpen
 			return
-		if (L isa menuitem) and (L.MenuEvent)
-			(L.MenuEvent)(.parent,  l,  ListViewcell(e, 0))
-			return
+		if (L isa menuitem)
+			if (L.MenuEvent)
+				(L.MenuEvent)(.parent,  l,  ListViewcell(e, 0))
+				return
 		(.onreturn)(self, L)?
 			
 	

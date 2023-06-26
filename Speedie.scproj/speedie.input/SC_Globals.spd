@@ -38,7 +38,7 @@ function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |scbase| name_space)
 	opt norefcounts
 	|| imp = name_space.Project
-		ifn scfunction.CurrFunc and scfunction.CurrFunc isa kIsAlloc
+		if scfunction.CurrFunc and !(scfunction.CurrFunc isa kIsAlloc)
 			if imp.BlindCast and old.IsNormalObject and .IsNormalObject
 				if !old.type.real_isa2( .type )
 					stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", imp.blindcast)
@@ -47,11 +47,11 @@ function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |scbase| name_space)
 function TypeCastCheck (ExprResolver) // typecheck
 	|| exp0 = exp.first
 	|| N = exp0.next
-	|| Old = TypeOfExpr( exp0, name_space, side )		#require
-	|| New = ExtractDecl( N, name_space )				#require
-	// allow MOST typecasts, but NOT typecasts to/from struct instances...
+	|| Old = TypeOfExpr( exp0, name_space, side )								#require
+	|| New = ExtractDecl( N, name_space )										#require
+	// allow MOST typecasts, but NOT typecasts between struct instances...
 	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
-		error (exp, "Can’t cast to/from structs/carrays (pointers to structs are OK though)")
+		error (exp, "Can’t cast between structs/carrays (pointers to structs are OK though)")
 	
 	new.NoBlindCasts(old, exp, name_Space)
 	return New
@@ -199,7 +199,6 @@ function TypeOfThgSub (|Message| Exp, |SCBase| name_space, |Message| side, |bool
 				return Cls.GetFlyingMemory(exp)
 
 			expect cls.isobject (exp, "Can’t refer to type “${exp.name}” like that (it's not a class).")
-			expect !cls.IsRole  (exp, "roles aren't real classes!")
 
 	if R isa scdecl
 		if side

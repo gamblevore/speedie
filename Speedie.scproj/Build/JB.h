@@ -145,6 +145,8 @@ struct ContainerStruct;
 
 struct ContainerStruct2;
 
+struct FakeJBString;
+
 struct FastBuff;
 
 struct FloatRange;
@@ -1268,7 +1270,6 @@ extern Dictionary* SC__Comp_AdjDicts;
 extern Array* SC__Comp_API_Funcs;
 extern Array* SC__Comp_API_List;
 extern Message* SC__Comp_API_Place;
-extern SCFunction* SC__Comp_AsFunc;
 extern JB_File* SC__Comp_BaseProjectPath;
 extern Array* SC__Comp_ClassList;
 extern SCFunction* SC__Comp_ClassListInitFunc;
@@ -1281,6 +1282,9 @@ extern Dictionary* SC__Comp_ExportNames;
 extern Message* SC__Comp_Extend_list;
 extern Array* SC__Comp_Extend_module_list;
 extern Dictionary* SC__Comp_Files;
+extern SCFunction* SC__Comp_fnAs;
+extern SCFunction* SC__Comp_fnFastAs;
+extern SCFunction* SC__Comp_fnFastIsa;
 extern Array* SC__Comp_FuncList;
 extern bool SC__Comp_HasMainFunc;
 extern Array* SC__Comp_ImportedList;
@@ -1507,9 +1511,9 @@ extern FastString* JB_fs_tmp_num;
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_ActualTypecasts ((~(64 | 16)))
 #define kSC_AddressOfMatch (3 << 22)
-#define kSC_BitAnd (JB_LUB[344])
-#define kSC_BitNot (JB_LUB[606])
-#define kSC_BitOr (JB_LUB[547])
+#define kSC_BitAnd (JB_LUB[346])
+#define kSC_BitNot (JB_LUB[610])
+#define kSC_BitOr (JB_LUB[552])
 #define kSC_BitXor (JB_LUB[1875])
 #define kSC_CastedMatch (6 << 22)
 #define kSC_destructornotfromlocalrefs (512)
@@ -2600,6 +2604,8 @@ void JB_Constants__InitConstants();
 
 JB_String* JB_Constants__TestJB();
 
+bool JB_Constants__TestCasting();
+
 
 
 // Linkage
@@ -3277,8 +3283,6 @@ void SC_TemporalStatements_crash(SCFunction* fn, Message* node, SCBase* name_spa
 void SC_TemporalStatements_do(SCFunction* fn, Message* node, SCBase* name_space);
 
 void SC_TemporalStatements_ignore(SCFunction* fn, Message* node, SCBase* name_space);
-
-bool JB_TestCasting();
 
 bool SC_TooManyErrors();
 
@@ -4431,6 +4435,9 @@ int JB_MzSt__Init_();
 
 int JB_MzSt__InitCode_();
 
+
+
+// JB_FakeJBString
 
 
 // JB_FastBuff
@@ -8730,7 +8737,7 @@ inline void JB_Msg_NilCheckProperty(Message* self, SCNilLister* nel) {
 	}
 	NilState u = ObjDecl->NilUsed;
 	iif ((!(SC_NilState_SyntaxIs(u, kJB__NilState_Exists)))) {
-		JB_Msg_SyntaxExpect(self, JB_LUB[1578]);
+		JB_Msg_SyntaxExpect(self, JB_LUB[1579]);
 		JB_Decr(ObjDecl);
 		return;
 	}

@@ -59,13 +59,19 @@ class Object
 
 	operator as (|&ClassData|x, |object|)
 		cpp_name JB_Object_As
-		if self and (self isa x)
+		if self isa x
 			return self
-
-	operator fast_as (|&ClassData|x, |object|)
+		return x.AsFail(self)
+		
+	operator fast_as (|&ClassData| x, |object|)
 		cpp_part FastAs
 		if self fast_isa x
 			return self
+		return x.AsFail(self)
+	
+	helper ClassData.AsFail (|object| wrong, |object|)
+		if wrong
+			error ("object of '" + wrong.class.name + "' is not a: " + .name ) 
 
 	api DebugPrint  // more for use in XCode, than anything else.
 		cpp_name jdb

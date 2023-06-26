@@ -73,6 +73,38 @@ function String.UTF8 (|string|)
 	return .UTF16To8
 
 
+/*function string.Appender4 (|string| a, |string| b, |string| c=nil, |string|)
+	cpp_wrapper JB_Str_Appender4 // if we wanted 2 params just use "+"
+
+function string.Appender7 (|string| a, |string| b, |string| c, |string| d, |string| e=nil, |string| f=nil, |string|)
+	cpp_wrapper JB_Str_Appender7
+*/ // do later. compiler can use this :)
+
+
+function string.operatorplus (|cstring| c, |string|)
+	if self
+		|| tmp = c.temp
+		return self + (&tmp)|string|
+	return c.str
+
+
+function cstring.operatorplus (|string| s, |string|)
+	if s
+		|| tmp = .temp
+		return (&tmp)|string| + s
+	return .str
+
+struct FakeJBString
+	|int| Refcount
+	|int| Length
+	|&byte| Addr
+
+function cstring.temp (|fakejbstring|)
+	rz.refcount = 0
+	rz.length = .length
+	rz.addr = self|&byte|
+
+
 function String.ExtractPathAndLine (|&ivec2| LineAndByte, |string|)
 	rz = .TrimStart("line ")
 	|| tr = rz.trim

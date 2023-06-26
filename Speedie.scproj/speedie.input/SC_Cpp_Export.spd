@@ -1193,13 +1193,14 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderThg (fpMsgRenderCpp)
+		opt norefcounts
 		|| o = .obj
 		if o isa SCDecl
 			WriteThgMaybeTypeToo( self, o, fs )
 			Return
 			
 		if o isa SCModule
-			|| cls = o.Cls
+			|| cls = o.Cls.realclass
 				|| InAlloc = scfunction.CurrFunc isa kIsAlloc
 				if !InAlloc
 					fs <~ "JB_AsClass("
@@ -1268,6 +1269,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 	
 	function DontNeedMoreBrackets (|Message| msg, |int|)
+		opt norefcounts
 		if msg.first == @rel
 			return kNeedsOuterBrackets
 			
