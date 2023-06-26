@@ -725,10 +725,13 @@ function IsA (|SCClass| S, |bool|) // hassuper, issuper, issubclass
 			return true
 
 
+function real_isa2 (|SCClass| cls, |bool|)
+	opt norefcounts // why doesnt the first one do this?
+	return .realclass.isa(cls.realclass)
+
 function real_isa (|SCClass| cls, |bool|)
 	opt norefcounts
-	|| s = .realclass
-	return s.isa(cls)
+	return .realclass.isa(cls)
 
 
 function IsBuiltinChain (|bool|)
