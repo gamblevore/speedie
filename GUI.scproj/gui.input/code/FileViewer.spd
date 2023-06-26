@@ -175,9 +175,9 @@ class FileViewer (ListView)
 
 
 	iterator
-		|| _curr = .listsource.first|filerow|
+		|| _curr = .listsource.first as filerow
 		while _curr
-			|| N_ = _curr.FlatNext|filerow|
+			|| N_ = _curr.FlatNext
 			yield _curr
 			_curr = N_
 		(self)
