@@ -117,8 +117,9 @@ class SCImport
 		|| name = arg["cpp_part"]
 			scf.ExportName = name.name
 			.Mod.ExportName = name.name
+		
 		|| blind = arg["blindcast"]
-			if blind == "off"
+			if blind ~= "off"
 				.BlindCast = ErrorSeverity.Error
 			  else
 				.BlindCast = ErrorSeverity.find(blind.name, blind)
@@ -126,6 +127,7 @@ class SCImport
 			.BlindCast = 0
 		  else
 			.BlindCast = ErrorSeverity.error
+	
 	// * Needs better types: "contains (a,b,c)". (|0| a, |1| b, |2| c).
 	// scdecl would use linked-list to other decls... fileviewer has GUIcontrols+filerows
 

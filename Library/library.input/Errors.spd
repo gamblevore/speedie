@@ -214,8 +214,7 @@ datatype ErrorFlags (Byte)
 datatype ErrorSeverity (Byte)
 	render
 		if (self < MaxError)
-			names := "OK note warning problem error critical".words
-			|| name = names[self|int|]
+			|| name = errorseverity.InitNames[self|int|]
 			if !fs_in
 				return name
 			fs_in <~ name
@@ -243,9 +242,14 @@ datatype ErrorSeverity (Byte)
 	
 	module
 		|array of string| names
-
+	
+		function InitNames (|[string]|)
+			opt norefcounts
+			return .names init "OK note warning problem error critical".words
+		
 		function Find (|string| name, |message| err=nil, |errorseverity|)
-			for (n in .names) (i)
+			opt norefcounts
+			for (n in .InitNames) (i)
 				if n ~= name
 					return i
 			if err
