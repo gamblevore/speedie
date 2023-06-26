@@ -452,8 +452,6 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 		
 		if CanFunction and (o isa SCFunction)
 			f = o								// store for later return? not needed?
-			if scfunction ~= "abcc"
-	
 			o = f.ArgsMatch( contains, arg_space, ParamsArray )
 			if o
 				if o.ismacro
