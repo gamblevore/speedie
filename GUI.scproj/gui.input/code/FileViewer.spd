@@ -53,8 +53,8 @@ class FileViewer (ListView)
 			.SingleLine		= true
 			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)
 
-		with .listsource|filerow|
-			.AsDir = true
+		|| l = .listsource as filerow
+			l.AsDir = true
 			
 		with .Listopen
 			is enabled
@@ -152,7 +152,7 @@ class FileViewer (ListView)
 
 	function Conf (|string|)
 		opt NoRefCounts
-		return .start|filerow|$.location.child(.folfile)
+		return (.start as filerow)$.location.child(.folfile)
 	
 	
 	function FolFile (|string|)
@@ -249,7 +249,7 @@ class FileViewer (ListView)
 
 
 	syntax access (|int| i, |filerow|)
-		return .listsource[i]|filerow|
+		return .listsource[i] as filerow
 
 
 	syntax access (|string| path, |filerow|)
@@ -450,26 +450,22 @@ class FileViewer (ListView)
 				if o.moveto(value)
 					return true
 			
-		function FileRowScoreSorter (SorterComparer)
+		function FileRowScoreSorter (SorterComparerFileRow)
 			opt norefcounts
-			|| aa = a|filerow|
-			|| bb = b|filerow|
-			if bb.rangelength == aa.rangelength
-				|| aprj = aa.InMainProj
-				|| bprj = bb.InMainProj
+			if b.rangelength == a.rangelength
+				|| aprj = a.InMainProj
+				|| bprj = b.InMainProj
 				if aprj == bprj
-					return FileRowNameSorter(aa, bb)
+					return FileRowNameSorter(a, b)
 				return aprj
 				
-			return aa.rangelength < bb.rangelength
+			return a.rangelength < b.rangelength
 
 
-		function ErrorSearchSorter (SorterComparer)
+		function ErrorSearchSorter (SorterComparerError)
 			// spds first.
-			|| aa = a|error|
-			|| bb = b|error|
-			|| an = aa.path.name 
-			|| bn = bb.path.name 
+			|| an = a.path.name 
+			|| bn = b.path.name 
 			|| ae = an.ext
 			|| be = bn.ext
 			|| it = isbetter(ae, be, "spd")
@@ -482,13 +478,11 @@ class FileViewer (ListView)
 					rz = (be < ae, an > bn)(be != ae)
 
 
-		function FileRowNameSorter (SorterComparer)
+		function FileRowNameSorter (SorterComparerFileRow)
 			opt norefcounts
-			|| aa = a|filerow|
-			|| bb = b|filerow|
-			if (bb.asdir) != (aa.asdir)
-				return (bb.asdir)
-			return (bb.name ~<= aa.name)
+			if (b.asdir) != (a.asdir)
+				return (b.asdir)
+			return (b.name ~<= a.name)
 
 		function QuickOpenModified (GUITextEvent)
 			|| fv = .tag as fileviewer
@@ -585,9 +579,9 @@ extend_module filerow
 
 function fileviewer.FindSearchWithin (|filerow|)
 	opt norefcounts
-	|| s = .FirstSelected|filerow|
+	|| s = .FirstSelected as filerow
 		while (s isa filerow) and !s.AsDir
-			s = s.parent|filerow|
+			s = s.parent
 		return s
 	
 	
@@ -599,7 +593,7 @@ function RightClickFileList (GUIListEvent)
 			m <~ ("Search Within: " + within.name, FileViewerSearchWithin, within)
 			m.addsep
 		
-		|| rem = .FirstSelected|filerow|
+		|| rem = .FirstSelected as filerow
 			if rem and (.extra contains rem) and rem != .extra
 				m <~ ("Remove From Project",	FileViewerRemove)
 
@@ -619,22 +613,23 @@ function FileViewerCMMShow (GuiMenuEvent)
 
 
 function FileViewerRenameFile (GuiMenuEvent)
-	|| row = clicked.row|filerow|
-	self|Fileviewer|.rename(row)
+	|| row = clicked.row as filerow
+	if self isa FileViewer
+		.rename(row)
 	
 
 function FileViewerCreateFile (GuiMenuEvent)
-	|| row = clicked.row|filerow|
+	|| row = clicked.row as filerow
 	if !row.asdir
 		row = row.parent
 	|| l = row.location
 	|| f = l.file.UniqueChild("untitled")
-	if f and f.CreateEmpty
+	if f and f.CreateEmpty and self isa FileViewer
 		|| created = filerow(f.path, f.name) 
 		row <~ created
 		row.filesort
-		self|Fileviewer|.rename(created)
-		self|Fileviewer|.checksize
+		.rename(created)
+		.checksize
 
 
 function File.CreateEmpty (|bool|)
@@ -663,16 +658,15 @@ function FileViewerRemove (GuiMenuEvent)
 
 function FileViewerSearchWithin (GuiMenuEvent)
 	opt norefcounts
-	|filerow| row
-	|| obj = menu.obj
-	if obj isa FileRow
-		row = obj
+	|| row = menu.obj as filerow
 	if self isa FileViewer
 		if row == .listsource
 			row = nil
 		if row != .Searchwithin
-			.SearchWithin = row|filerow|
+			.SearchWithin = row
 			(.OnSearchWithin)(self, row)?
 		
 	
 
+prototype SorterComparerFileRow (|filerow| a, |filerow| b, |bool|)
+prototype SorterComparerError (|error| a, |error| b, |bool|)

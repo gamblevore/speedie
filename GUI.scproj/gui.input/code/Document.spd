@@ -64,10 +64,10 @@ class Document (RingTree)
 		opt NoRefCounts
 		|| o = .original
 		|| c = .current
-		if c and c.parent|document| != self
+		if c and (c.parent|object| != self|object|)
 			debugger //!!??
 			c = nil
-		if o and o.parent|document| != self
+		if o and (o.parent|object| != self|object|)
 			debugger //????
 			o = nil
 		if (!c)

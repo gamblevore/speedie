@@ -1,6 +1,7 @@
 
 
 role StretchControl (GuiControl)
+	contains stretchdivider
 	linkage
 		cpp_part SC
 	helper Add (|string| name)

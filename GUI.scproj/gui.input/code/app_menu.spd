@@ -90,6 +90,6 @@ function AppMenuAbout (GuiMenuEvent)
 
 
 function AppMenuReturnkey (GuiListEvent)
-	.window|appmenu|.ReturnValue = .FirstSelected
+	(.window as appmenu).ReturnValue = .FirstSelected
 	return true
 

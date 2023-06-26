@@ -150,7 +150,7 @@ class Window (GUIControl)
 		opt norefcounts
 		|| f = .realFocus
 			if (f isa menu) and (f != .focus) and (f is typethrough)
-				f = .focus|menu|$
+				f = .focus as menu #require
 			if f.__TypedString__(input)
 				return true
 		if (Input == 1) and Input.IsASCII			// like a space basically?

@@ -36,11 +36,11 @@ class Menu (ListView)
 	behaviour MouseDown
 		if .ClickedScroll(P, clicks)
 			return 2
-		|| L = .DrawClick(P)
+		|| L = .DrawClick(P) as MenuItem
 		if L is disabled
 			return 1
 		if (L is selected)
-			.usemenu(l|menuitem|)
+			.usemenu(l)
 			return 1
 		
 		.Select(L)
@@ -115,7 +115,7 @@ class Menu (ListView)
 
 	
 	function DoReturn (|bool|)
-		.UseMenu  .FirstSelected|menuitem|
+		.UseMenu  (.FirstSelected as MenuItem)
 		return true
 
 	

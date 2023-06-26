@@ -565,11 +565,10 @@ module SDLApp
 
 	function DrawWinFrom (|window|)
 		opt norefcounts
-		rz = window.front
-		while rz
-			if rz.isviewable and rz.isfullscreen
-				return rz
-			rz = rz.prev|window|#loop
+		for w.reverse in window.all
+			if w.isviewable and w.isfullscreen
+				return w
+		return window.all.first
 		
 
 	function StartResize
@@ -604,7 +603,7 @@ module SDLApp
 		while w1
 			ifn d contains w1
 				.DrawSub(w1)
-			w1 = w1.next|window|
+			w1 = w1.next as window // dumb check... we'd need a stronger type system... with 3 layers for ringtree
 		for w2 in d
 			.DrawSub(w2)
 			

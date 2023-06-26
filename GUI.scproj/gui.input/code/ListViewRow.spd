@@ -224,14 +224,14 @@ role ListViewCell (message)
 			return .position
 	function Row (|ListViewrow|)
 		if self
-			return .obj|ListViewrow|
+			return (.obj as Message)|listviewrow|
 	syntax cast (|string|)
 		return self$.value
 	function Step (|int|i, |ListViewcell|)	
 		return .step(i, .position)
 	function Step (|int|i, |int|col, |ListViewcell|)
 		cpp_Part StepCol
-		|| c = .obj|ListViewrow|.move(i)
+		|| c = .row.move(i)
 			return ListViewcell(c, col)  
 	syntax equals (|ListViewcell|c, |bool| aware, |bool|)
 		return c.obj == .obj  and  c.position == .position

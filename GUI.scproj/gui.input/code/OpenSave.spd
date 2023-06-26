@@ -50,7 +50,7 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 		w.name.sel = (0, 8) // only works on the second time we run this func? annoying.
 	f.setfocus
 	
-	rz = (w)()|string|
+	rz = (w)() as string
 	if rz
 		OpenSaveDialog.LastDir[types] = rz
 		sdlapp.Saveprefs // nicer
@@ -198,7 +198,7 @@ class OpenSaveDialog (Window)
 
 		function RelistKey (guitextevent)
 			opt NoRefCounts
-			|| w = .window|OpenSaveDialog|
+			|| w = .window as OpenSaveDialog
 			|| p = w.path
 			|| t = p.text
 			if (t[0] != '/' and '~')
@@ -230,7 +230,7 @@ function OpenSaveDialog.RelistFiles (|string| path, |bool| AlwaysUse=true)
 
 function OnAskSaveAnswer (GUIAction)
 	opt NoRefCounts
-	|| w = .window|opensavedialog|$
+	|| w = .window as OpenSaveDialog #require
 	if self != w.accept
 		w.cancelreturn
 		return nil
@@ -242,7 +242,7 @@ function OnAskSaveAnswer (GUIAction)
 
 
 function OpenSaveDialog.GoIntoFolder (|bool|)
-	|| f = .files.FirstSelected|filerow|
+	|| f = .files.FirstSelected as filerow
 	|| Acceptable = f and (f isnt grayed)
 	expect Acceptable (Beep)
 	if f.asdir
@@ -261,7 +261,7 @@ function OpenSaveDialog.GoIntoFolder (|bool|)
 function OnAskSaveName (GUIKeyEvent)
 	opt norefcounts
 	if key.isaccept
-		|| w = .window|opensavedialog|$
+		|| w = .window as OpenSaveDialog #require
 		|| s = .text #expect Beep
 		w.ReturnValue = w.path.text.child(s)
 		return true
@@ -269,7 +269,7 @@ function OnAskSaveName (GUIKeyEvent)
 
 function OnAskSaveReveal (GUIAction)
 	opt NoRefCounts
-	|| w = .Window|opensavedialog|$
+	|| w = .window as OpenSaveDialog #require
 	|| f = w.files.FirstSelected
 	if f isa filerow
 		|| p = (w.path.text, f.location)(f.name == "..")
@@ -277,7 +277,7 @@ function OnAskSaveReveal (GUIAction)
 
 
 function OnAskSaveEntered (GuiListEvent)
-	return .parent|OpenSaveDialog|.GoIntoFolder
+	return (.parent as OpenSaveDialog).GoIntoFolder
 
 
 function window.CancelReturn

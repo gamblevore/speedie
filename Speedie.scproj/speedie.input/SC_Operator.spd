@@ -325,7 +325,7 @@ function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCBase|name_space, |Me
 		|| ty2 = rn.obj
 		if ty2 isa scmodule
 			|| cls = ty2.cls
-				return cls.typenormal
+				return cls.realclass.typenormal
 	return ty
 
 
