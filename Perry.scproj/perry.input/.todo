@@ -23,6 +23,9 @@
 
 
 // Perry Do later
+* extra error is being added (first? is being saved? for some good reason but too enthusiastic)
+* path menus fail to click ? (isa bug?)
+* function list should have a field that can be typed into
 * clicking on empty errorlist should take you to the filelist
 * case completion fails in speedie?
 * https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n

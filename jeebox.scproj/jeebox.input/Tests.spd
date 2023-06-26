@@ -120,7 +120,7 @@ helper Message.TestSub (|string| new_render, |string| name, |bool|)
 
 
 
-helper TestCasting (|bool|)
+helper jeebox.TestCasting (|bool|)
 	|dictionary of int| d2 = dictionary.new
 	d2..abc += 1
 	
@@ -161,7 +161,7 @@ helper Jeebox.Test (|string|)
 	|| jbin_input    = –SELF_TEST_JBIN
 	// Parse,  render,  re-parse,  compare tree,  compare re-render
 	
-	debugger (TestCasting())
+	debugger (.TestCasting())
 	"normal".uppercase
 	|| LKT = leaktester("entities")
 	EntityTest()

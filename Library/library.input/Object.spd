@@ -57,16 +57,15 @@ class Object
 		cpp_part FastIsa
 		return (self) and (.Class == x)
 
-	operator as (|&ClassData|x, |object|) // (*1).class
-		// needs compiler support
+	operator as (|&ClassData|x, |object|)
 		cpp_name JB_Object_As
 		if self and (self isa x)
 			return self
 
-//	operator fast_as (|&ClassData|x, |object|)
-//		cpp_part FastAs
-//		if self fast_isa x
-//			return self
+	operator fast_as (|&ClassData|x, |object|)
+		cpp_part FastAs
+		if self fast_isa x
+			return self
 
 	api DebugPrint  // more for use in XCode, than anything else.
 		cpp_name jdb
