@@ -318,6 +318,8 @@ function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |string| reason)
 		.LastExtraInfo = M
 		.PopupDisplayCorner = p
 		.MaybeSendMessage(reason ?? "display", M)
+//		if keys.option
+//			.SendFeedbackMsg(@tmp + "mem") // for useful info
 
 
 function OnShowExtraInfo (GUITextShowEvent)

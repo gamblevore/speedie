@@ -18,7 +18,6 @@
 		* Start with leaf-funcs.
 * "calledfrom" autocomplete needs to include references to funcs
 	* calledfrom datatypes too
-* galaxxies wont compile
 * galaxxies C++ compile issues
 * compiling jz.spd seems to create an import of "@spd/Utils"??
 	* its because main is app.main, and app is a lib. We need delayed funcs to have different .projects
@@ -29,13 +28,15 @@
 * extra error is being added (first? is being saved? for some good reason but too enthusiastic)
 * function list should have a field that can be typed into
 * clicking on empty errorlist should take you to the filelist
+* if w isa P<tab>// no need to autocomplete things that w can't be.
 * case completion fails in speedie?
+* add image editor... using qoi format. Remove png from speedie!
 * https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
-* if w isa P<tab>// no need to autocomplete things that w can't be.
+	* make the IDE game-like. That is... things break and don't work (haha) and need to be "fixed" using... gameplays. Just loads of different wierd mini-games that "Restore state" that replaces missing code. Deffo do it after the VM is done. We can keep a cache of "saved states" that fix missing code-paths... Like perhaps you collect items but the items you collect are code... and gotta arrange it somehow... or at least it gets unlocked in the right order... Something that can't just be commented out and forces you to play to fix the IDE.
 * TextView error/find resync
 * double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
-* Find-replace!
+* Find-replace?
 	* syntactic-mode also
 * too long text in listview draw as much as we can
 * First use of tab (in func) or () (to wrap) on opening perry doesn't work.

@@ -117,7 +117,7 @@ function PressingTabs (guiaction)
 			p.ListSource.clear
 			|| name = ide.name
 			p <~ ( "Copy " + name, MenuCopyProject, ide)
-			p <~ ("Show Project", MenuShowProject, ide)
+			p <~ ( "Reveal Project", MenuShowProject, ide)
 			p <~ ( "Close", MenuCloseProject, ide)
 
 			.OpenMenu(row) // "Yes" "no"

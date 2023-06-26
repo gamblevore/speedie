@@ -191,6 +191,14 @@ function Message.SendPerryErrors (|message|)
 	return self
 	
 
+function ReportMemory (|Message| cmd, |message|)
+	cmd.clear
+	|| arg = cmd.msg(@arg)
+	arg <~ app.ObjMemory
+	arg <~ app.stringmemory
+	return cmd
+	
+
 function DoCmd (|Message| cmd, |message| arg, |message|)
 	require cmd == @tmp
 	if cmd == "crash"
@@ -198,6 +206,9 @@ function DoCmd (|Message| cmd, |message| arg, |message|)
 	
 	if cmd.compiles or cmd == "check"
 		return .ReportBuildOrRestart(cmd, arg)
+	
+	if cmd == "mem"
+		return .ReportMemory(cmd)
 	
 	// OK... so we have a problem
 	// basically... its not initing properly...

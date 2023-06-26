@@ -13,7 +13,7 @@ main
 	if msg
 		"Approach 3: '$s' was tested using 'as'"
 	
-	|| blindly = losing_type|message|
+	|| blindly = losing_type|message| // comment this out, to get the code working! :)
 	testCasting()
 	
 
