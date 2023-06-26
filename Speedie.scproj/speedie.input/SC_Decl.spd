@@ -267,7 +267,7 @@ class SCDecl (SCObject) {
 					if !dist
 						Return kSimpleMatch
 					if typecast & ktypecastwantsuperdistance
-						return kSuperClassMatch// (|) dist<<24 
+						return kSuperClassMatch (|) dist 
 					return kSuperClassMatch
 			dist++
 
