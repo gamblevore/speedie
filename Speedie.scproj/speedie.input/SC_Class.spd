@@ -64,7 +64,7 @@ constructor (|Message| node, |SCBase| parent)
 	.name   = LoadClassName(node)
 	.Source = node[@Arg, -1]
 	.SourceClass = node		// sigh. bad design
-
+	.project = parent.project
 	.IsVisible = scbase.CurrVisibility
 	
 	|| IsDataType = node == "datatype"
@@ -793,6 +793,7 @@ module
 
 
 	function NeuClassSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |SCClass|)
+		
 		if !ForInterface
 			expect (parent==compiler.program) (errplace, "Internal Error")
 		
