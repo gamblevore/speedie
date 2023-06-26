@@ -928,7 +928,7 @@ datatype ivec4
 	
 	function contains (|int| x, |int| y, |bool|)
 		cpp_part ContainsInt
-		return .contains((x,y))
+		return .contains((x,y), 0)
 		
 	function contains (|ivec2| P, |int| i=0, |bool|)
 		cpp_part ContainsIvec2
@@ -938,7 +938,7 @@ datatype ivec4
 	
 	function contains (|ivec2| v, |bool|)
 		cpp_part ContainsVec2
-		return .contains(v.x, v.y)
+		return .contains(v, 0)
 	
 	operator contains (|ivec4| v, |bool|)
 		disabled "why?"

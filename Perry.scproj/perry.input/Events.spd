@@ -148,8 +148,7 @@ function HeldReleaseButton (GUIaction)
 
 function ClickedRelease (GUIaction)
 	return false
-	|| name = .tag
-	if name isa string
+	|| name = .tag as string
 		.ide.compile("compile", name)
 	  else
 		beep
@@ -240,8 +239,7 @@ function ClickedAView (GUIaction)
 
 function ClickedNoNeed (GUIaction)
 	opt norefcounts
-	|| t = .tag
-	if t isa ButtonView
+	|| t = .tag as buttonview
 		.ide.view(t)	
 
 

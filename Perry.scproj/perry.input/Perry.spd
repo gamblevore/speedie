@@ -168,16 +168,10 @@ function LoadState
 		colorscheme.load(it)
 	
 
-function buttonview.guitag (|guicontrol|)
-	opt norefcounts
-	|| t = .tag
-	if t isa guicontrol
-		return t
-
 function View (|ButtonView| btn)
 	opt norefcounts
 	require !.istextonly
-	|| g		= btn.guitag$
+	|| g		= btn.tag as guicontrol #require
 	
 	|| changed	= g isnt visible
 	
@@ -256,7 +250,7 @@ function CheckViewWorthIt (|buttonview| old)
 function Viewing (|buttonview|) // currview
 	opt norefcounts
 	for i in .ViewButtons
-		if i.tag|guicontrol| is visible
+		if (i.tag as guicontrol) is visible
 			return i
 
 
@@ -305,8 +299,7 @@ function ViewAsVis (|bool| vis)
 	.istextonly = !vis
 	|| AnyViews = false
 	for v in .ViewButtons
-		|| t = v.tag
-		if t isa guicontrol
+		|| t = v.tag as guicontrol
 			(t is visible) = (v.gnormal.bg.hasany)
 			AnyViews := t is visible 
 	

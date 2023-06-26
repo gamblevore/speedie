@@ -321,7 +321,7 @@ function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCBase|name_space, |Me
 	exp <~ prm
 	exp[ 1 ].Remove
 	|| ty = TypeOfExpr( exp, name_space )$
-	if prm.obj == compiler.asfunc
+	if rn and prm.obj == compiler.asfunc
 		|| ty2 = rn.obj
 		if ty2 isa scmodule
 			|| cls = ty2.cls

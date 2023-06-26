@@ -33,8 +33,8 @@ class MessageView (ListView)
 
 
 		function RightClickJeeboxView (GuiListevent)
-			|| fl = .tag
-			if row and fl isa fileviewer
+			|| fl = .tag as FileViewer
+			if row and fl
 				|| f = row.obj
 				if f isa filerow
 					.select(f)

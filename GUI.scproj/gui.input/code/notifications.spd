@@ -38,13 +38,12 @@ module Notifications
 	function Clicked (|window| w)
 		opt norefcounts
 		(w.CreatedDate min= disappear.seconds.ago)
-		|| t = w.tag
-		if t isa error
-			|| n = t.node
-			if n == @str
-				app.alert(n.name)
-			  elseif n == @url and "file"
-				n.first.name.Reveal
+		|| t = w.tag as error
+		|| n = t.node
+		if n == @str
+			app.alert(n.name)
+		  elseif n == @url and "file"
+			n.first.name.Reveal
 		w.tag = nil
 	
 	

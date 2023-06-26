@@ -429,6 +429,7 @@ class FileViewer (ListView)
 
 
 	function AddExtra (|string| path, |filerow|)
+		require path[0] == '/' or '~'
 		|| f = path.file
 		require f.mustexist
 		|| x = .extra
@@ -490,13 +491,11 @@ class FileViewer (ListView)
 			return (bb.name ~<= aa.name)
 
 		function QuickOpenModified (GUITextEvent)
-			|| fv = .tag|fileviewer|
-			require fv.mustbe(fileviewer)
-			fv.OpenQuickRelist(.text)
+			|| fv = .tag as fileviewer
+				fv.OpenQuickRelist(.text)
 
 		function QuickOpenKey (guikeyevent)
-			|| fv = .tag|fileviewer|
-			require fv.mustbe(fileviewer)
+			|| fv = .tag as fileviewer #require
 			|| l = fv.listopen
 			if key.IsAccept
 				|| row = l.FirstSelected
@@ -518,9 +517,9 @@ class FileViewer (ListView)
 
 
 		function ClickedOpenList (GuiListevent)
-			|| V = .tag|FileViewer|
-			|| r = row.obj|filerow|
-			require r isa filerow  and  V isa fileviewer
+			|| V = .tag as FileViewer
+			|| r = row.obj as filerow
+			require r and v
 
 			|| loc = r.location
 			if loc.file.isdir
