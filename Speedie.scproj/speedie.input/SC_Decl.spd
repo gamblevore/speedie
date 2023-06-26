@@ -28,22 +28,25 @@
 
 constants
 	// order of badness?
-	kNeedsAddressOfButAlsoNeedsSuperMatch   = 64
-	kNeedsAddressOf     = 32
-	kNeedsTypeCast		= 16
+	// don't go to 1024 << 22 ! even 512 risks negative ints.
+	kNeedsAddressOfButAlsoNeedsSuperMatch  = 64 << 22
+	kNeedsAddressOf     = 32 << 22
+	kNeedsTypeCast		= 16 << 22
 	kNeeds				= kNeedsTypeCast (|) kNeedsAddressOf (|) kNeedsAddressOfButAlsoNeedsSuperMatch 
 
-	kUseDefaultParams   = 10
-	// don't use 8... no idea why but kTypeCastBothWays is 8 and conflicts with these...
-	// despite that its used as a "amount of typecasting needed", and these are "the type-casting result".
-	kLossyCastedMatch	= 7
-	kCastedMatch		= 6
-	kVoidPtrMatch		= 5
-	kSuperClassMatch	= 4
-	kAddressOfMatch     = 3		 // i REALLY don't care...
-	kNumericMatch		= 2
-	kSimpleMatch		= 1
-	kNoMatch			= 0		 // for #require
+	kUseDefaultParams   = 8 << 22
+	kLossyCastedMatch	= 7 << 22
+	kCastedMatch		= 6 << 22
+	kVoidPtrMatch		= 5 << 22
+	kSuperClassMatch	= 4 << 22
+	kAddressOfMatch     = 3 << 22
+	kNumericMatch		= 2 << 22
+	kSimpleMatch		= 1 << 22// want to move all these up.
+	kNoMatch			= 0
+	
+	// nevermind it... for now!
+	// using 8... conflicts with kTypeCastBothWays ? despite that its used as 
+	// a "amount of typecasting needed", and these are "the type-casting result".
 
 	kStrSharedParams	= 10
 	kStrOwned			= 20
@@ -61,6 +64,8 @@ constants
 	kTypeCastTrue = kTypeCastMost (|) kTypeCastNumbers   // to replace whatever we used to do when we passed "true"
 	kNoBoolTypeCast = 16
 	kTypeCastAssigns = 32
+	kTypeCastWantSuperDistance = 64
+	kActualTypecasts = ~(kTypeCastWantSuperDistance (|) kNoBoolTypeCast)  
 	kTypeCastFalse = 0
 
 
@@ -240,7 +245,7 @@ class SCDecl (SCObject) {
 		return true
 
 
-	function PointeryMatchSub (|SCDecl| O, |int| TypeCast, |int|)
+	function PointeryMatchSub (|SCDecl| O, |int| TypeCast, |uint|)
 		opt norefcounts
 		|| OType = O.Type
 		|| t = .type
@@ -254,13 +259,17 @@ class SCDecl (SCObject) {
 			while otype.IsRole
 				otype = otype.super
 		
+		|| dist = 0
 		for (CurrSuper.Upwards in OType)
 			if (t == CurrSuper)
-// .AllocSource just means it's some kinda awlloc function... at least that's what I want it to mean.
+				// OK... so what about the distance?
 				if (o.AllocSource or .ContainsMatch(o, TypeCast))
-					if (CurrSuper != otype)
-						return kSuperClassMatch
-					Return kSimpleMatch
+					if !dist
+						Return kSimpleMatch
+					if typecast & ktypecastwantsuperdistance
+						return kSuperClassMatch// (|) dist<<24 
+					return kSuperClassMatch
+			dist++
 
 	
 	function CopyTypeInfoTo (|SCDecl| Dcl)

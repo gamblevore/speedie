@@ -448,16 +448,19 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 	|| result = SCDecl.new
 	|| ErrCount = stderr.errorCount
 
-	if (C IsBrel "&")	// pointer
-		|| R = ExtractDecl( c.first, name_space )
-			R.CopyTypeInfoTo(result)
-			result.PointerCount++
-	
-	  elseif (c isbrel "~") // not a brel anymore?
-		c.name = "&"
-		c.first.func = @thg
-		|| wrapp = «thg "datatypewrapper"»
-		result.loadContained(c, wrapp, name_space)	#require
+	if f == @brel
+		if (C == "&")	// pointer
+			|| R = ExtractDecl( c.first, name_space )
+				R.CopyTypeInfoTo(result)
+				result.PointerCount++
+		
+		  elseif (c == "~") // not a brel anymore?
+			c.name = "&"
+			c.first.func = @thg
+			|| wrapp = «thg "datatypewrapper"»
+			result.loadContained(c, wrapp, name_space)	#require
+		  else
+			error c
 	
 	  elseif (f == @item)
 		|| R = ExtractDecl( c.first, name_space ) #require
@@ -477,10 +480,10 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		Result.LoadContained(c.first, c.last, name_Space)		#require
 		
 	  elseif (f == @rel)
-		|| op = c.findflat(@opp, "of", true)					#require
+		|| op = c[@opp, 1]										#require
+		op.expect(@opp, "of")
 		|| contained = c[nil, 2]								#require
 		result.loadContained(contained, c.first, name_Space)	#require
-	
 	  elseif (ErrCount == StdErr.errorCount)
 		error ( c ) // no spam
 	
@@ -1347,7 +1350,7 @@ function TypeOfRel (ExprResolver) {
 			return IPM
 	Custom = UseCustomOperators(LC, RC, comp, exp) 
 	if Custom == CustomOps.needed
-		if (!comp.IsCompset) // bug here!!
+		if (!comp.IsCompset)
 			return CustomFuncOp( exp, comp, name_space, RN )
 		  elseif RC == TypeNil
 			0 //

@@ -385,23 +385,20 @@ function ArgsMatch (|SCDecl| base, |SCBase| name_space, |SCParamArray| Incoming,
 			Return f
 
 
-function int.IsNormalMatch (|bool|)
+function uint.IsNormalMatch (|bool|)
 	return (self == kSimpleMatch or kNumericMatch or kSuperClassMatch)
 
 
-// ArgsMatchTwo "only keeps the worst problem".
-// but what if there are multiple problems? Like needing a typecast AND needing something else?
-// we need bitfields, right?
-// might solve our issues...
 
 function ArgsMatchTwo (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase| name_space,  |SCParamArray| Incoming,  |int|)
 	
 	if ((.IsAssigns!=0) != Incoming.IsAssigns)
 		require (TypeCast & kTypeCastassigns) and (!Incoming.IsAssigns)
 
-	|| Pos		= 0
-	|| Result	= kSimpleMatch
-	TypeCast   |= kNoBoolTypeCast (|) Incoming.IgnoreSelf
+	|| Pos = 0
+	|| Result = kSimpleMatch
+	TypeCast |= kNoBoolTypeCast (|) Incoming.IgnoreSelf (|) kTypeCastWantSuperDistance
+	
 
 	for (FuncArg in .Args) (fi)
 		|| PArg_Ch   = Incoming[Pos]
@@ -489,7 +486,8 @@ function ArgsMatchSub (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCPa
 		if f.isMacro
 			Missing = f
 			continue
-			
+		
+		
 		|| Match = f.ArgsMatchTwo( TypeCast, base, false, name_space, Incoming )
 		ifn Match
 			continue
@@ -1878,3 +1876,4 @@ function string.UnicodeSafeName (|string|)
 
 constants
 	kReplaced = 0x800
+

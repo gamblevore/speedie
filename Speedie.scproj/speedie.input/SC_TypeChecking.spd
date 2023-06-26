@@ -69,7 +69,7 @@ function MatchBase
 	|| y = (xxx, nil)(1)
 
 
-function scdecl.Match (|SCDecl| O, |int| TypeCast, |Message| exp = nil, |int|)
+function scdecl.Match (|SCDecl| O, |int| TypeCast, |Message| exp = nil, |uint|)
 // Make TypeCast = true able to deal with... pointers to structs!
 	if (o == nil)
 		require .default
@@ -105,7 +105,7 @@ function scdecl.Match (|SCDecl| O, |int| TypeCast, |Message| exp = nil, |int|)
 		return kCastedMatch
 
 
-	if TypeCast & ~kNoBoolTypeCast
+	if TypeCast & kActualTypecasts
 		Return .TryTypeCast( O, exp, TypeCast )
 
 

@@ -97,6 +97,7 @@ linkage
 
 |SCFunction|			TernaryFunc
 |SCFunction|			TernaryFunc2
+|SCFunction|			AsFunc
 
 |[String]|				SyxArray
 |Message|				Extend_list
@@ -293,6 +294,7 @@ function InitBasicFuncs (|bool|)
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
+	.AsFunc			= typeobject[ "operatoras" ]|scfunction|
 	.PrivateProperty = .CreateFuncFromSource("function Private () {disabled `This property is private.`}")
 	return StdErr.OK
 
