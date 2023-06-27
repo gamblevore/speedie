@@ -150,12 +150,12 @@ class GUIControl (ringtree)
 	
 	syntax is (|guicontrolflags|F, assigns:|bool|)
 		require ((.state&f)!=0) != value
+		|| test = guicontrolflags.visible (|) guicontrolflags.decluttered 
 		
 		if value
 			.state |= f
 		  else
 			.state &= ~F
-		|| test = guicontrolflags.visible (|) guicontrolflags.decluttered 
 		if f & test
 			sdlapp.resized(self)
 
@@ -172,17 +172,16 @@ class GUIControl (ringtree)
 		return self contains .window.MouseIsOver
 	
 	
-	helper DrawOof (|image| where)
-		if .IsViewable
-			where.ControlClip = self
-			.__Draw__(Where)
+	helper DrawOne (|image| where)
+		where.ControlClip = self
+		.__Draw__(Where)
 
 	
 	helper DrawChildren (|image| where, |guicontrol| avoid)
 		opt norefcounts
 		for R in self							// .last gets drawn last, so .last is actually the "front".
 			if (r!=avoid) and R.isviewable
-				r.DrawOof(Where)
+				r.DrawOne(Where)
 				if r.hasany
 					r.drawchildren(where, avoid)
 

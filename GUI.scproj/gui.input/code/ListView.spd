@@ -44,6 +44,8 @@ class ListView (GUIControl) {
 	|GUICopyEvent|					OnCopy
 	|GUIListDragEvent|				OnDragRow
 	|ListViewRowDraw|				OnDrawRow
+	|textview| 						TypingFilter
+	|GUIListEditEvent| 				OnTypingFilter
 
 
 	constructor (|guicontrol| p,  |GUIListEvent| sel,  |GUIListEvent| ret)
@@ -322,12 +324,31 @@ class ListView (GUIControl) {
 		|| r = rc.row					#require
 		.SelectAdd(r)
 		.Show(r)
-		|| inl = .inlinecell(true) 
+		|| inl = .InlineCell(true) 
 		if inl.edit(rc, self)
 			if .istree
 				inl.Editor.selectall
 			return true
 	
+	
+	helper NeedShrinker (|textview|)
+		opt norefcounts
+		|| f = .TypingFilter
+			return f
+		rz = TextView(Self)
+		rz.id = "filter"
+		(rz is editable)
+		.Typingfilter = rz
+		rz.size = the~width by 14~down
+		
+		
+	behaviour Typedstring
+		opt norefcounts
+		if .OnTypingFilter
+			.NeedShrinker.TypedString(input)
+			.touch
+			return true
+
 	
 	behaviour KeyDown
 		opt norefcounts
@@ -388,6 +409,13 @@ class ListView (GUIControl) {
 		
 		if .IsTree and (key is left or right)
 			return .openorclose(key)
+
+		if (.typingfilter)
+			if key.iscancel
+				.StopFilter
+			  else
+				.typingfilter.__keydown__(key)
+			return true
 
 	
 	function DefaultCopy (GUICopyEvent)
@@ -975,9 +1003,9 @@ class ListView (GUIControl) {
 	
 	function FocusOn (|ListViewrow| r)
 		require .listsource contains r
-		.scrollset(r)
+		.ScrollSet(r)
 		(r is expanded)
-		.select(r)
+		.Select(r)
 
 	
 	function SelChangeEvent (|ListViewRow| s, |bool| NoShow=false)
@@ -1050,7 +1078,7 @@ class ListView (GUIControl) {
 		if .OneAlwaysSelected
 			.SelectFirst
 		  else
-			.selectnone
+			.SelectNone
 		.ScrollDrawTimer = scroller.timer
 		._BlockedDuringUse = false
 
@@ -1063,7 +1091,6 @@ class ListView (GUIControl) {
 		return .DrawClickCell((0,search.y)).row
 	
 	
-	
 	helper DrawClickMenu (|int| y, |ListViewRow|)
 		opt norefcounts
 		if y <= .bottom
@@ -1073,16 +1100,31 @@ class ListView (GUIControl) {
 		return .DrawClickCell((0,y)).row
 	
 	
+	function StopFilter
+		if .typingfilter
+			.typingfilter.remove
+			.typingfilter = nil
+		
+
+
+	function FilterText (|string|)
+		if .TypingFilter
+			return .TypingFilter.text
+
+
 	helper DrawClickCell (|ivec2| Search, |ListViewCell|)
 		opt NoRefCounts
 		|| r = .lastrect
 		|| x = search.x - r.x
+		|| FL = .OnTypingFilter
+		|| flText = .FilterText
 		
 		for sc.visible in self
-			r.y = r.y2 - .rowheight
-			if r.vert contains search.y
-				return .DrawCell( sc, x )
-			r.y2 = r.y
+			if !fl or !fltext or (fl)(self, sc|ListViewCell|, flText)
+				r.y = r.y2 - .RowHeight
+				if r.vert contains search.y
+					return .DrawCell( sc, x )
+				r.y2 = r.y
 
 
 	helper DrawYRow (|ListViewrow| search, |int|)
@@ -1094,7 +1136,6 @@ class ListView (GUIControl) {
 			if row == search
 				return r.y2
 			r.y2 = r.y
-			
 
 	
 	function DefaultColumnWidths (GUIListEvent)
@@ -1283,7 +1324,15 @@ class ListView (GUIControl) {
 		.scrollshift = rem
 		return !rem
 
-		
+
+/*
+		input = shr.text
+		for row.all in self
+			cell.obj = row
+			if !(fn)(self, cell, input)
+				row.Remove
+*/
+
 	behaviour Draw
 		opt NoRefCounts
 		|| c = (.CalculateColumnWidths) ?? (DefaultColumnWidths)
@@ -1298,19 +1347,21 @@ class ListView (GUIControl) {
 		
 		rect.y2			= .ScrollSlide
 		|| End			= .end
+		|| fl			= .OnTypingFilter
+		|| flText		= .FilterText
 		
 		for r.visible in self
-			rect.y = rect.y2 - .rowheight
-			|| D = (r.depth(self), 0)(.istree)
-			r.ListRowDraw(rect, Where, self, D)
-			rect.y2 = rect.y
-			.CanSeeAllLines = (r == end and .start == ._scroll)
+			if !fl or !fltext or (fl)(self, r|listviewcell|, fltext)
+				rect.y = rect.y2 - .rowheight
+				|| D = (r.depth(self), 0)(.istree)
+				r.ListRowDraw(rect, Where, self, D)
+				rect.y2 = rect.y
+				.CanSeeAllLines = (r == end and .start == ._scroll)
 
 		where.controlclip = .lastrect
 		where.horz = .lastrect.h // redundant?
 		|| cmm = .cmm
 			.RowBorderDraw(._scroll, cmm.EditingRow, .RowHeight, where, ¥.border)
-
 
 		|| re = .rowbounds(._scroll, .draggingrowto, 1)
 			re = re up .rowheight

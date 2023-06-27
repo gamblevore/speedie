@@ -213,7 +213,7 @@ datatype ListViewState (uint16)
 role ListViewCell (message)
 	linkage
 		cpp_part Cell
-	constructor (|ListViewRow| owner, |int|i)
+	constructor (|ListViewRow| owner, |int| i)
 		super.Constructor(@arg, "")
 		.obj = owner
 		.position = i

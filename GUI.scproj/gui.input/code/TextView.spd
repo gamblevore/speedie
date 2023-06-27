@@ -1611,7 +1611,6 @@ class TextView (GUIControl)
 	
 	helper Parse (|bool| Changed, |int| expect, |message|)
 		cpp_Part ViewParseSub
-		//opt norefcounts
 		if !.canparse(expect)
 			.myerror = nil // crappy bugfix
 			return nil

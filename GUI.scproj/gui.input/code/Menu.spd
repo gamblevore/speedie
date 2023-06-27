@@ -104,6 +104,7 @@ class Menu (ListView)
 	function CloseMenu
 		opt norefcounts
 		.selectNone
+		.StopFilter
 		isnt visible
 		.EditingRow = nil
 		if .isopenedmenu
@@ -147,7 +148,9 @@ class Menu (ListView)
 
 	behaviour TypedString
 		opt norefcounts
-		|| r = .findtypedrow(input)
+		if super.typedstring(input)
+			return true
+		|| r = .FindTypedRow(input)
 			.select(r)
 		return true
 			

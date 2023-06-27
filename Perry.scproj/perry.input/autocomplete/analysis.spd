@@ -1,5 +1,6 @@
 
 
+
 function perryide.ListAllFuncs (|bool| sel=false)
 	|| result = .FunctionMenu.submenu.listsource
 	result.clear
@@ -52,11 +53,14 @@ function PerryFuncMenuSelected (GUIListEvent)
 	|| e = .ide.EditMe
 	e.ClearFound
 	if row
-		e.ViewPos(row.position, 1, true) is found //inviewexact
-	  else
-		|| obj = .ListSource.obj as TextViewLine
-			e._Start = obj
+		e.ViewPos(row.position, 1, true) is found   // InViewExact
+		return false
+	e._Start = .ListSource.obj as TextViewLine
 
+
+function PerryFuncListFilter (GUIListEditEvent)
+	opt norefcounts
+	return cell.name contains value
 
 // Can we... like do this more neatly? Maybe not huh? what if we wanna sort using two sortfuncs?
 function FuncListSorter (SorterComparerMsg)

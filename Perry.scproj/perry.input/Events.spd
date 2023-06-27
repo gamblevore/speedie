@@ -426,7 +426,7 @@ function ClickedError (GUIListEvent)
 			ide.ClickedError(row)
 		  else
 			ide.ClickedFind(row)
-	  elseif !.Start
+	  elseif !.Start and ide.filelist isnt visible
 		clickedaview(ide.ViewFiles)
 	return true
 
