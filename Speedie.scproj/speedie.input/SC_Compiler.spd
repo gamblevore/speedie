@@ -348,14 +348,14 @@ function ImportLibs
 
 function ImportProj
 	SCImport.STDLibTime = false
-	SCImport.Importpath( "",   .BaseProjectPath,  0, false )
+	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath)(options.SingleFileInput)
+	SCImport.Importpath( "",  ToUse,  0, false )
 
 
 function ImportAST
 	opt norefcounts
 	for rz in .ImportedList
 		rz.PrepareAll
-
 
 
 function ImportAll

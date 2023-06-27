@@ -233,6 +233,7 @@ class SCImport
 	
 			|| fpl = f.Path.lowercase
 			require (!Compiler.ImportedNames[fpl])
+			
 			|| rz = SCImport.new(f, builtin)
 			Compiler.ImportedNames[fpl] = rz
 			
