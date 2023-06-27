@@ -27,7 +27,6 @@
 * menu with lists of functions... should have a field that can be typed into
 * clicking on empty errorlist should take you to the filelist
 * if w isa P<tab>// no need to autocomplete things that w can't be.
-* case completion fails in speedie?
 * add image editor... using qoi format. Remove png from speedie!
 * https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.

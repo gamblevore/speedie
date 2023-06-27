@@ -17,7 +17,7 @@ class BirdWindow (Window)
 		.pipes.id = "pipeowner"
 		.size = the~area
 		.score = textview(self)
-		.score.size =  8~left back 40  by  8~down back 12
+		.score.Size =  8~left back 40  by  8~down back 12
 		.score.gnormal.solid = nil
 		.score.id = "score"
 		.player = bird(self)
@@ -42,7 +42,7 @@ class BirdWindow (Window)
 	behaviour keydown
 		if key is SPACE
 			keys.space.eat
-			.player.jump
+			.player.Jump
 		if key is escape
 			.RestartGame // ooop
 		return true

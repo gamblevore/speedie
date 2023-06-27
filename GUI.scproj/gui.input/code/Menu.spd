@@ -114,7 +114,7 @@ class Menu (ListView)
 
 	
 	function DoReturn (|bool|)
-		.UseMenu  (.FirstSelected as MenuItem)
+		.UseMenu(.FirstSelected)
 		return true
 
 	
