@@ -420,12 +420,14 @@ function PerryIDE.ClickedFind (|error| row)
 
 	
 function ClickedError (GUIListEvent)
+	|| ide = .ide
 	if row isa error
-		|| ide	= .ide
 		if self == ide.errorlist
 			ide.ClickedError(row)
 		  else
 			ide.ClickedFind(row)
+	  elseif !.Start
+		clickedaview(ide.ViewFiles)
 	return true
 
 

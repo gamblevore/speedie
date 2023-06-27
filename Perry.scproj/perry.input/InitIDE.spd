@@ -125,7 +125,7 @@ extend PerryIDE
 			isnt visible
 
 		with .errorlist
-			 .tooltip = "Displays Compile Errors. Press \1f< or \1f> to step in list."
+			.tooltip = "Displays Compile Errors. Press \1f< or \1f> to step in list."
 		
 		.ErrorLogInit(.Errorlist, "ErrorList" )
 		.ErrorLogInit(.LogArea,   "LogArea" )
