@@ -119,6 +119,7 @@ module SDLApp
 		return data.window|_Voidptr|
 
 	function Alert (|string| msg, |string| title="")
+		cpp_part MsgBox
 		visible
 		SDL_ShowSimpleMessageBox(0, title.cstr, msg.cstr, nil)
 

@@ -20,7 +20,6 @@
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
 * galaxxies C++ compile issues
-* its because main is app.main, and app is a lib. We need delayed funcs to have different .projects
 
 
 // Perry Do later

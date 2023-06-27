@@ -328,7 +328,7 @@ class FileViewer (ListView)
 		.sort(&fileviewer.FileRowNameSorter)
 	
 
-	helper message.ExtractRecent (|message| into)
+	helper error.ExtractRecent (|message| into)
 		opt norefcounts
 		for s in self
 			if s|error|.when
@@ -346,8 +346,9 @@ class FileViewer (ListView)
 		
 		if !.NoFind or !.nofind.valuelower(f.name)
 			return true
-		
-	helper BatchFindSub (|string| str, |message| all, |uint| id)
+	
+	
+	helper BatchFindSub (|string| str, |error| all, |uint| id)
 		opt norefcounts
 		for f in self
 			if (f isa filerow)
@@ -356,7 +357,7 @@ class FileViewer (ListView)
 
 
 	function BatchFind (|string| str, |uint| findid=0, |message|)
-		|| All = message()
+		|| All = error()
 		if !str
 			return all
 		.BatchFindSub(str, all, findid)

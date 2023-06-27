@@ -1,6 +1,0 @@
-args
-	"/usr/local/speedie/Perry.scproj/perry.input"
-	"--quiet"
-
-pwd '.'
-env {}

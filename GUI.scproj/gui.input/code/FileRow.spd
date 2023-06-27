@@ -233,7 +233,7 @@ class FileRow (ListViewRow)
 		found <~ rz
 
 
-	function FindAll (|string| pattern,  |message| found)
+	function FindAll (|string| pattern,  |error| found)
 		require pattern
 		|error| parent
 		|| t		= .visibletext$
