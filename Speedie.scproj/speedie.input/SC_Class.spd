@@ -970,12 +970,15 @@ module
 			PreferClass = false // whatever
 		if (PreferClass and M.Cls)
 			B = M.Cls
-
-		// OK... so now what? the base is for the lookup
-		B.project.use
 		name.func = @thg
+
+
+		|| imp = c.obj as scimport
+			imp.use
+		  else
+			B.project.use
+
 		|| fn = scfunction.NewFuncSub(c, b, c)
-		// we need to use the correct import
 		if fn != compiler.program and fn isa scfunction
 			fn.tryadd(b)
 	
@@ -992,6 +995,11 @@ module
 		|SCBase| B = M
 		if (PreferClass and M.Cls)
 			B = M.Cls
+
+		|| imp = c.obj as scimport
+			imp.use
+		  else
+			B.project.use
 
 		B.Collect(arg, scbase.CurrVisibility, m.sourcearg)
 	
