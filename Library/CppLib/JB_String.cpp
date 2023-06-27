@@ -667,6 +667,17 @@ inline uint8* u8Pos( MiniStr S, uint8 TheChar ) {
 }
 
 
+inline uint8* u8PosLex( MiniStr S, uint8 TheChar ) {
+	TheChar = LowerCaseB(TheChar);
+	while (	S ) {
+		if (S.NextLower() == TheChar) {
+			return S;
+		}
+	}
+	return 0;
+}
+
+
 inline MiniStr Theo2Pos( MiniStr S, uint8 Find1, uint8 Find2 ) {
     u32 Read1 = S.Next();
     while (	S ) {
@@ -695,9 +706,21 @@ inline MiniStr Theo2PosLex( MiniStr S, uint8 Find1, uint8 Find2 ) {
     return {0,0};
 }
 
+
 inline uint8* u8PosRev( MiniStr S, uint8 TheChar ) {
 	while (	S ) {
 		if (S.Prev() == TheChar) {
+			return S;
+		}
+	}
+	return 0;
+}
+
+
+inline uint8* u8PosRevLex( MiniStr S, uint8 TheChar ) {
+	TheChar = LowerCaseB(TheChar);
+	while (	S ) {
+		if (S.PrevLower() == TheChar) {
 			return S;
 		}
 	}
@@ -741,7 +764,10 @@ inline MiniStr Theo2PosLexRev( MiniStr S, uint8 Find1, uint8 Find2 ) {
 uint8* SearchForward_( MiniStr S, MiniStr F, bool Lex ) {
     u32 FirstChar = F.Next();
     if (!F) {
-        return u8Pos( S, FirstChar );
+		if (Lex)
+			return u8PosLex(S, FirstChar);
+		else
+			return u8Pos( S, FirstChar );
     }
     u32 SecondChar = F.Next();
     
@@ -772,8 +798,12 @@ uint8* SearchForward_( MiniStr S, MiniStr F, bool Lex ) {
 
 uint8* SearchBackward_( MiniStr S, MiniStr F, bool Lex ) {
     u32 FirstChar = F.Next();
-    if (!F)
-        return u8PosRev( S, FirstChar );
+    if (!F) {
+		if (Lex)
+			return u8PosRevLex( S, FirstChar );
+		else
+			return u8PosRev( S, FirstChar );
+	}
 	
     u32 SecondChar = F.Next();
     uint8* End = S.Addr;
