@@ -21,7 +21,6 @@
 * galaxxies C++ compile issues
 * compiling jz.spd seems to create an import of "@spd/Utils"??
 	* its because main is app.main, and app is a lib. We need delayed funcs to have different .projects
-* if a mustbe (b,c) // fucked compile?
 
 
 // Perry Do later
