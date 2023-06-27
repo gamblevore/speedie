@@ -100,6 +100,9 @@ linkage
 |SCFunction|			fnFastIsa
 |SCFunction|			fnFastAs
 |SCFunction|			fnAs
+|SCFunction|			fnIsa
+|SCFunction|			fnMustbe
+|SCFunction|			fnOpMustBe
 
 |[String]|				SyxArray
 |Message|				Extend_list
@@ -287,6 +290,14 @@ function InitBasicStuff // compiler.init
 	stderr.LowerErrorsTo = 0
 
 
+function LoadTypeTest (|string| s, |scfunction|)
+	opt norefcounts
+	|| f = typeobject[ s ]
+	if f isa scfunction
+		f.alloccode |= kIsTypeTest
+		return f
+	debugger
+	
 function InitBasicFuncs (|bool|)
 	.RefSetRef		= .LoadRefFunc( "JB_SetRef" )
 	.RefIncr		= .LoadRefFunc( "JB_Incr" )
@@ -296,10 +307,12 @@ function InitBasicFuncs (|bool|)
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
-	.fnAs			= typeobject[ "operatoras" ]|scfunction|
-	.fnFastAs		= typeobject[ "operatorfast_as" ]|scfunction|
-	.fnFastIsa		= typeobject[ "operatorfast_isa" ]|scfunction|
-	
+	.fnAs			= .LoadTypeTest( "operatoras" )
+	.fnFastAs		= .LoadTypeTest( "operatorfast_as" )
+	.fnFastIsa		= .LoadTypeTest( "operatorfast_isa" )
+	.fnIsa			= .LoadTypeTest( "operatorisa" )
+	.fnmustbe		= .LoadTypeTest( "mustbe" )
+	.fnopmustbe		= .LoadTypeTest( "operatormustbe" )
 	.PrivateProperty = .CreateFuncFromSource("function Private () {disabled `This property is private.`}")
 	return StdErr.OK
 

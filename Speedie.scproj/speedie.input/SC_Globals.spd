@@ -1484,9 +1484,7 @@ function TypeOfList (ExprResolver)
 			count += N
 			expect (count <= 4) (exp, "Too many items in vector (max 4)")
 
-	if !numeric
-		return typeofexpr(exp.first, name_space)
-
+	expect Numeric (exp, "Expected numbers.")
 	expect (count >= 2) (exp, "Too few items in vector (min 2)")
 
 

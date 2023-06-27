@@ -670,56 +670,14 @@ function Tran_Syx (|Message| msg, |Message|)
 	Return msg
 
 
+
 function Tran_Isa (|Message| S, |SCBase| p)
 	|[Message]| Isas
-	require CollectIsaTests( s.first, isas )
+	require compiler.CollectIsaTests( s.first, isas )
 	for isa_ in Isas
 		TranOneIsa( isa_, s.find(@arg), p )
 
 
-function CollectIsaTests (|Message| s, |[Message]| out, |bool|)
-	// |object| a
-	// if (a isa b) {
-	// // a is now known as a "b"...
-	//}
-	
-	s = s.unbra
-	if s == @rel
-		|| L = s.first
-		|| Op = L.Next
-		if op == "and" // append results...
-			|| R2 = s.Last
-			|| A2 = CollectIsaTests( L, out )
-			|| B2 = CollectIsaTests( R2, out )
-			Return A2 or B2
-		Return (op != "or")
-	
-	
-	if s != @func
-		Return true
-
-	|| List = s.last
-	|| f = List.AsFunc
-	ifn f isa SCFunction
-		Return true
-
-	|| fexp = f.ExportName
-	if fexp ~!=  "JB_Object_Isa" and "JB_Object_MustBe" and "JB_Object_OperatorMustBe" and "JB_Object_FastIsa"
-		Return true
-	// Awesome...
-	
-	
-	|| L1 = List.First
-		|| R1 = L1.next
-			|| RObj = R1.obj
-			if Robj isa SCModule
-				if fexp ~= "JB_Object_Isa"
-					if Robj.cls and !robj.cls.Hassubclass
-						list.obj = compiler.fnFastisa
-				if L1 == @Thg
-					out <~ s
-					Return true
- 
 
 function TranOneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
 	require (arg)
@@ -853,10 +811,47 @@ function message.NotNilRZ (|scdecl| type,  |scbase|space)
 		nel <~ @prm
 		nel.obj = nil // clear
 		typeofexpr(nel, space)
-		
+
+
 function message.MiniTran (|scbase| name_space, |string| On="app")
 	using (self)
 		self <~ «prm, .first »
 		.first = «thg on »
 		.func = @dot
 	TypeOfExpr( self, name_space )
+
+
+function compiler.CollectIsaTests (|Message| s, |[Message]| out, |bool|)
+	opt norefcounts
+	if scfunction ~= "testme"
+	s = s.unbra
+	if s == @rel
+		|| L = s.first
+		|| Op = L.Next
+		if op == "and" // append results...
+			|| R2 = s.Last
+			|| A2 = CollectIsaTests( L, out )
+			|| B2 = CollectIsaTests( R2, out )
+			Return A2 or B2
+		Return (op != "or")
+	
+	
+	if s != @func
+		Return true
+
+	|| List = s.last
+	|| f = List.AsFunc
+	ifn f isa SCFunction and kIsTypeTest
+		Return true
+	
+	|| L1 = List.First
+		|| R1 = L1.next
+			|| RObj = R1.obj
+			if Robj isa SCModule
+				if f == .fnisa
+					if Robj.cls and !robj.cls.Hassubclass
+						list.obj = .fnFastisa
+				if L1 == @Thg
+					out <~ s
+					Return true
+ 
