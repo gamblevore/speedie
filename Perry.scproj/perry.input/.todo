@@ -20,9 +20,11 @@
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
 * galaxxies C++ compile issues
+* digest confstring...
 
 
 // Perry Do later
+* no need autocomplete decl names!!!
 * extra error is being added (first? is being saved? for some good reason but too enthusiastic)
 * menu with lists of functions... should have a field that can be typed into
 * if w isa P<tab>// no need to autocomplete things that w can't be.
