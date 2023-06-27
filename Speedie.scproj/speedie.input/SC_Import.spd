@@ -105,7 +105,7 @@ class SCImport
 		|| arg = conf[@arg]
 			arg.remove
 			compiler.ConfMsg = arg
-			|| x = makedecl("", "__AppConfString", @str+arg.render)
+			|| x = makedecl("", "__AppConfString", @str+arg.render_jbin)
 			conf.become(x)
 			compiler.program.movetoinitfunc(conf)
 
