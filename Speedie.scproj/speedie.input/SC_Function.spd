@@ -372,7 +372,7 @@ function message.AssignsFix (|scfunction| f)
 function ArgsMatch (|SCDecl| base, |SCBase| name_space, |SCParamArray| Incoming, |SCFunction|)
 	opt norefcounts
 	for i in 2
-		|| Assigns = (kTypeCastAssigns,0)(i)
+		|| Assigns = (kTypeCastAssigns, 0)(i)
 		|| f = .ArgsMatchSub( base, kTypeCastFalse (|) Assigns, name_space, Incoming )			
 		ifn f.IsReal
 			f = .ArgsMatchSub( base, kTypeCastNumbers (|) Assigns, name_space, Incoming )
@@ -388,7 +388,6 @@ function ArgsMatch (|SCDecl| base, |SCBase| name_space, |SCParamArray| Incoming,
 
 function uint.IsNormalMatch (|bool|)
 	return (self == kSimpleMatch or kNumericMatch or kSuperClassMatch)
-
 
 
 function ArgsMatchTwo (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase| name_space,  |SCParamArray| Incoming,  |int|)
@@ -1376,7 +1375,7 @@ function Tran_Ifn (TranFunc)
 function scbase.LateAddTempory (|string| type, |string| name1, |message| Value, |message| err, |string|)
 	|| name = UniqueTmpVar(compiler.program, name1)
 	typeofexpr(Value, self)
-	|| msg = MakeDecl( type, name, Value)
+	|| msg = MakeDecl(type, name, Value)
 	|| D = TypeOfExpr(msg, self)$
 	(D is const) = false
 	.source <~ msg
@@ -1744,7 +1743,6 @@ function NewFunc (CollectFunc)
 	require node
 	|| name = node.first			   #expect (node, "No function name found.")
 	if name == @Dot
-		if name.last == @name or @thg
 		return SCClass.ExtendOneFunc(node, nil, ErrPlace)
 	return NewFuncSub(node, name_Space, errplace)	
 

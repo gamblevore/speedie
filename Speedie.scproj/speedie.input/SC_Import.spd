@@ -228,13 +228,13 @@ class SCImport
 			return f[FirstName]
 		
 		
-		function ImportPath (|string| path, |file| f, |int| ImportDepth, |bool| Builtin)
+		function ImportPath (|string| path, |file| f, |int| ImportDepth, |bool| Builtin, |scimport|)
 			require f.mustexist and path.IsOKForImport
 	
 			|| fpl = f.Path.lowercase
 			require (!Compiler.ImportedNames[fpl])
 			
-			|| rz = SCImport.new(f, builtin)
+			rz = SCImport.new(f, builtin)
 			Compiler.ImportedNames[fpl] = rz
 			
 			if (path contains "/") and (path[0] != '/')

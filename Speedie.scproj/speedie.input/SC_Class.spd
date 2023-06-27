@@ -925,19 +925,25 @@ module
 
 
 	function StoreExtend (CollectFunc)
-		Compiler.extend_list <~ node
+		Compiler.extendlist <~ node
+		node.obj = SCImport.curr
 		Return Compiler.program
 
 
 	function StoreExtendModule (CollectFunc)
-		Compiler.extend_module_list <~ node
+		Compiler.ExtendModuleList <~ node
+		node.obj = SCImport.curr
 		Return Compiler.program
 
 
 	function ExtendOneFunc (CollectFunc)
-		compiler.Extend_list := message()
-		Compiler.extend_list <~ node
-		
+		compiler.ExtendList := message()
+		Compiler.ExtendList <~ node
+		node.obj = SCImport.curr
+		if !SCImport.curr
+			printline "C: $node"
+			debugger
+
 		|| dot = node.first
 		|| name = dot[@thg, @name]
 			|| emb = name.next
@@ -949,33 +955,34 @@ module
 	function ProcessExtend (|Message| c, |bool| PreferClass)
 		// OK now what?
 		if (c == @tmp and "extend_module" or "extend")
-			.processextendold(c, preferclass)
+			// can we remove this?
+			.ProcessExtendOld(c, preferclass)
 			return
 			
 		|| dot = c[@dot]
 		|| name = Dot[@thg, @name]					#require
-		|| M = Compiler.FindModulemsg(name)			#require
+		|| M = Compiler.FindModuleMsg(name)			#require
 		
 		dot.clear
 		dot.func = @thg
 		|SCBase| B = M
 		if name == @name		// it's a module
-			preferclass = false // whatever
+			PreferClass = false // whatever
 		if (PreferClass and M.Cls)
 			B = M.Cls
 
+		// OK... so now what? the base is for the lookup
 		B.project.use
 		name.func = @thg
 		|| fn = scfunction.NewFuncSub(c, b, c)
+		// we need to use the correct import
 		if fn != compiler.program and fn isa scfunction
 			fn.tryadd(b)
-		scimport.curr = nil
 	
 
 	function SCFunction.TryAdd (|scbase| b)
 		b.tryadd(.source, self, .name)
 	
-
 
 	function ProcessExtendOld (|Message| c, |bool| PreferClass)
 		|| name = c[@thg]							#require
@@ -986,9 +993,7 @@ module
 		if (PreferClass and M.Cls)
 			B = M.Cls
 
-		B.project.use
 		B.Collect(arg, scbase.CurrVisibility, m.sourcearg)
-		scimport.curr = nil
 	
 	
 	function DoOneNamedField (|message| c,  |string| name,  |string| datatype,  |int| n,  |message|)

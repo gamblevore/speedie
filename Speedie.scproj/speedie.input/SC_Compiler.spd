@@ -66,6 +66,7 @@ linkage
 |SCFile|				InternalFile = SCFile.new(nil)
 |string|				ProjectName
 |string|				ReportedName
+|scimport|				UserProj
 |message|				DebugInsert
 |message|				ConfMsg
 |dictionary|			InsecureWords
@@ -73,7 +74,6 @@ linkage
 |SCFile~Dictionary|		Files = nil
 |[SCImport]|			ImportedList
 |SCImport~Dictionary|   ImportedNames = nil
-//|file~Dictionary|		FilesImported = nil
 
 
 |SCModule|				program
@@ -105,11 +105,11 @@ linkage
 |SCFunction|			fnOpMustBe
 
 |[String]|				SyxArray
-|Message|				Extend_list
+|Message|				ExtendList
+|[Message]|				ExtendModuleList
 |[Message]|				API_List
 |[SCFunction]|			API_Funcs
 |Message|				API_Place
-|[Message]|				Extend_module_list
 
 |SCModule|				DisamClasses
 |SCModule|				DisamModules
@@ -127,7 +127,6 @@ linkage
 |int|					stParseTimeTotal
 |int|					CurrStage
 |SCFunction|			ClassListInitFunc
-
 
 
 
@@ -349,7 +348,7 @@ function ImportLibs
 function ImportProj
 	SCImport.STDLibTime = false
 	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath)(options.SingleFileInput)
-	SCImport.Importpath( "",  ToUse,  0, false )
+	compiler.UserProj = SCImport.Importpath( "",  ToUse,  0, false )
 
 
 function ImportAST
@@ -387,10 +386,10 @@ function ImportAll
 		C.TryAddToProject
 	
 	require .Stage( "Processing Delayed Imports" )
-	for l in .extend_list
+	for l in .ExtendList
 		SCClass.ProcessExtend( l, true )
 
-	for l in .extend_module_list
+	for l in .ExtendModuleList
 		SCClass.ProcessExtend( l, false )
 
 	require .initbasicfuncs

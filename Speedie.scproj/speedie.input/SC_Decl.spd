@@ -617,21 +617,22 @@ class SCDecl (SCObject) {
 		return (!.PointerCount) and (!.IsNil) and !.C_Array
 
 
-	function AlreadyContains (|scdecl| c, |bool|)
+	function AlreadyContains (|bool|)
 		opt norefcounts
 		|| ty = .type.contained
-			return c.MiniMatch(ty)
+			return .contains.MiniMatch(ty)
 		
 		
-	function WriteType (|bool|minimal=false, |Message|)
+	function WriteType (|bool|minimal = false, |Message|)
 		opt norefcounts
-		ifn .Contains
-			return .WriteSimpleType
-		if minimal and .AlreadyContains(.contains)
-			return .WriteSimpleType
-		return «adj
+		|| simple = .WriteSimpleType
+		if !.Contains or (minimal and .AlreadyContains)
+			return simple
+		
+		return «rel
+			simple
+			«opp "of"»
 			«thg .Contains.Type.Name »
-			.WriteSimpleType
 		»
 		
 
@@ -653,10 +654,11 @@ class SCDecl (SCObject) {
 		
 		if self is borrowed
 			rz = «arel "--", rz »
-		if .NilDeclared is unknown
-			rz = «arel "?", rz »
-		  elseif .NilDeclared is Exists
-			rz = «arel "!", rz »
+		if !.IsDataType and .NilDeclared isnt unknown
+			if .NilDeclared is Optional
+				rz = «arel "?", rz »
+			  else
+				rz = «arel "!", rz »
 	
 	
 	function CreateSimpleTypeCast (|Message| exp, |Message|)

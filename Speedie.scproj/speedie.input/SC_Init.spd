@@ -141,6 +141,7 @@ function SCModule.HasActualCode (|message|arg, |bool|)
 		  elseif (curr != @arg)
 			return true // found something!
 
+
 function Message.InitRootDecl (|Message| before, |SCBase| name_space, |bool|) {
 	// this code just seems wrong... it finds an SCDecl and puts it into "Decl" :)
 	// have an SCDecl... that should always already have a default! So why we are creating a default?
@@ -148,7 +149,7 @@ function Message.InitRootDecl (|Message| before, |SCBase| name_space, |bool|) {
 	require .expect(@thg)
 	
 	|| P = .Parent
-	|| NewDefault = (P.last,nil)(P == @Rel)
+	|| NewDefault = (P.last, nil)(P == @Rel)
 	
 	|| O = name_space.LookUpVarRootDecl( .name, self )
 	require (O isa SCDecl)

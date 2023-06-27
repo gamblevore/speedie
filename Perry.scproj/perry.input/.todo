@@ -18,6 +18,7 @@
 		* Start with leaf-funcs.
 * "calledfrom" autocomplete needs to include references to funcs
 	* calledfrom datatypes too
+	* @dot completes to @dotAnyGlobalfunc
 * galaxxies C++ compile issues
 * its because main is app.main, and app is a lib. We need delayed funcs to have different .projects
 
