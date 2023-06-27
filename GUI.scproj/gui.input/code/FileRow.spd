@@ -289,7 +289,7 @@ helper ListView.ListFilesUp (|string| path, |string| types, |bool| Save, |int| m
 	|| r = filerow(path.parent, "..", ".nothing")
 	.listsource.first = r
 	|| f = path.file
-	|| r2 = (.listsource as filerow)[path.name]
+	|| r2 = .listsource[path.name] as filerow
 	if f.exists and !f.isdir and r2
 		(r2 is selected)
 		.show(r2)
