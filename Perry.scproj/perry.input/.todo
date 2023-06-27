@@ -20,18 +20,16 @@
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
 * galaxxies C++ compile issues
-* digest confstring...
 
 
 // Perry Do later
 * no need autocomplete decl names!!!
 * extra error is being added (first? is being saved? for some good reason but too enthusiastic)
-* menu with lists of functions... should have a field that can be typed into
 * if w isa P<tab>// no need to autocomplete things that w can't be.
 * add image editor... using qoi format. Remove png from speedie!
 * https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
-	* make the IDE game-like. That is... things break and don't work (haha) and need to be "fixed" using... gameplays. Just loads of different wierd mini-games that "Restore state" that replaces missing code. Deffo do it after the VM is done. We can keep a cache of "saved states" that fix missing code-paths... Like perhaps you collect items but the items you collect are code... and gotta arrange it somehow... or at least it gets unlocked in the right order... Something that can't just be commented out and forces you to play to fix the IDE.
+	* game-like IDE. Break functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order... Something that can't just be commented out.
 * TextView error/find resync
 * double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
 * Find-replace?

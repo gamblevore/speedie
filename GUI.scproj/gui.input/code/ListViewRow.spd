@@ -164,7 +164,7 @@ role ListViewRow (message)
 			|| gr = colors.gray(0.4)
 			where.fillrect(z2 + (0,0,0,-1), gr, gr)
 			
-		if (self is found)
+		if self is found
 			z2 += (0, 1, 0, 0)
 			z2.y2 = z2.y + 1
 			where.fillrect(z2, ¥.textselection.edge, ¥.textselection.edge)

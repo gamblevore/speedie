@@ -21,6 +21,7 @@ module clipboard
 		  else
 			beep
 
+
 function cstring.sdltext (|string|)
 	|| s = string.fromc(self).copy
 	memory.free(self|&byte|)

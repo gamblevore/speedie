@@ -339,7 +339,7 @@ class ListView (GUIControl) {
 		rz.id = "filter"
 		(rz is editable)
 		.Typingfilter = rz
-		rz.size = the~width by 14~down
+		rz.size = the~width by (.rowheight+2)~down
 		
 		
 	behaviour Typedstring
@@ -1325,13 +1325,29 @@ class ListView (GUIControl) {
 		return !rem
 
 
+// this is difficult... no matter which approach I take... it is difficult.
+
 /*
-		input = shr.text
-		for row.all in self
-			cell.obj = row
-			if !(fn)(self, cell, input)
-				row.Remove
+approach 1:
+	Ask the listview via func pointer... to refill the data. Seems OK? why did I say no?
+	
+	I think because we need to reimplement this for each filterer... and I want this in multiple places!
+
+
+approach 2:
+	Do the filtering ourself?
+	We need to store our own version of the data. This becomes a problem.
+
+	
+approach 3:
+	Draw it filtered... this has many issues. Filtering isn't perfect! What if we want a title per group...
+	We can't do that if we do it per-item.
+
+
+I think if we want the best filtering, we need to ask for it. We could create a standard filterer. Its not too hard.
 */
+
+
 
 	behaviour Draw
 		opt NoRefCounts
@@ -1341,6 +1357,9 @@ class ListView (GUIControl) {
 		
 		|| rect			= .lastrect
 		|| L			= .listsource
+		|| flText		= .FilterText
+		if .typingfilter
+			rect.y2 = rect.y2 - (.typingfilter.height)
 		
 		.CalculateSkips
 		.DrawMarks(where, rect)
@@ -1348,7 +1367,8 @@ class ListView (GUIControl) {
 		rect.y2			= .ScrollSlide
 		|| End			= .end
 		|| fl			= .OnTypingFilter
-		|| flText		= .FilterText
+		if .typingfilter
+			rect.y2 = rect.y2 - (.typingfilter.height)
 		
 		for r.visible in self
 			if !fl or !fltext or (fl)(self, r|listviewcell|, fltext)

@@ -766,7 +766,7 @@ uint8* SearchForward_( MiniStr S, MiniStr F, bool Lex ) {
     if (!F) {
 		if (Lex)
 			return u8PosLex(S, FirstChar);
-		else
+		  else
 			return u8Pos( S, FirstChar );
     }
     u32 SecondChar = F.Next();

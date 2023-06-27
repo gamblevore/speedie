@@ -8,8 +8,6 @@ main // main {
 	
 	error.AutoPrint = 1
 	sdlapp.RunAndQuit(&perry.startup)
-	printline // useful if called from the terminal
-
 
 
 function app.InitColors
