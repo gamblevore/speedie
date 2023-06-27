@@ -13,7 +13,7 @@ main
 	found.sort(MySorter, true)
 	|| remover = .Findremover
 	for f in found
-		"'${f.trimstart(remover)}' --> ${f.size.strsize}"
+		"${f.trimstart(remover)} --> ${f.size.strsize}"
 	"Total: ${Total.strsize}"
 
 
@@ -35,5 +35,6 @@ function app.collect (|file| f)
 
 	
 function MySorter (SorterComparer)
-	return a|file|.size < b|file|.size
+	if a isa file and b isa file
+		return a|file|.size < b|file|.size
 	
