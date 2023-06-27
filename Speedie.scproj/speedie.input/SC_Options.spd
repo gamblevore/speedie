@@ -159,7 +159,7 @@ module Feedback
 		.CheckSelfModifying
 
 		if !options.SingleFileInput
-			F.mustexist("read project. (You may create it with: 'speedie --create /path/to/proj' if you want)")
+			F.mustexist
 
 		if exists and isspd and stderr.ok
 			return path
