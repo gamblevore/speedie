@@ -1,9 +1,12 @@
 
 
-function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| name="", |string| reason="", |bool|) // sendmsg, msgsend
+function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| name="", |string| reason="", |bool|)
+	#!sendmsg, msgsend
 	|| fn = where.func
 	if fn == @char or @num
 		.popuphide
+		return false
+	if (fn == @name) and cmd[0, "autocomplete"]
 		return false
 	.SetAutoPoint(where.position)
 	|| isString = (fn == @str or @sstr or @back or @bin)
