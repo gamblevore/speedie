@@ -13,15 +13,15 @@ class BirdWindow (Window)
 	constructor
 		.NoDrawBackground = true	
 		.pipes = guicontrol(self)
+		.player = bird(self)
 		.pipes.size = 414~wide by 256~high
 		.pipes.id = "pipeowner"
+		.player.gnormal.solid = (0.8, 0.8, 0.1, 1.0)
 		.size = the~area
 		.score = textview(self)
 		.score.Size =  8~left back 40  by  8~down back 12
 		.score.gnormal.solid = nil
 		.score.id = "score"
-		.player = bird(self)
-		.player.gnormal.solid = (0.8, 0.8, 0.1, 1.0)
 		.RestartGame
 	
 	

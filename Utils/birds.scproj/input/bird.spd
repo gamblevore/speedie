@@ -38,7 +38,7 @@ class Bird (guicontrol)
 			.yspeed = -.yspeed
 			b = pp.top - (.height+1)
 
-		.size = 40~right for 10 by (b)~up for 10
+		.size = 0~after for 10 by (b)~up for 10
 		
 		if !.died
 			|| p = pp.controlat(self, -2, true)
