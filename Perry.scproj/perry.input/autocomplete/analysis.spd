@@ -1,17 +1,26 @@
 
 
+function PerryFuncListFilter (GUIListEditEvent)
+	opt norefcounts
+	.ide.listallfuncs(false, value)
 
-function perryide.ListAllFuncs (|bool| sel=false)
+
+function MenuAllFuncs (GUIaction)
+	opt norefcounts
+	if self isa buttonview
+		.ide.ListAllFuncs(true, "")
+		.OpenMenu
+
+
+function perryide.ListAllFuncs (|bool| sel=false, |string| filter="")
 	|| result = .FunctionMenu.submenu.listsource
 	result.clear
-	.ListAllFuncsMsg(.editme.Parse, result)
+	.ListAllFuncsMsg(.editme.Parse, result, filter)
 	if sel
 		.FindSelectedMenuItem(result)
-	|| old = result.obj
 	result.obj = (.editme._Start, nil)(sel)
-		
 	result.Sort(FuncListSorter)
-	(.FunctionMenu is visible) = result.HasAny
+	(.FunctionMenu is visible) = filter or result.HasAny
 	.FunctionMenu.text = "(" + result.SlowCount.Render + ")"
 	.ImproveFuncList(Result)
 
@@ -36,7 +45,7 @@ function PerryIDE.ImproveFuncList (|message| result)
 	|message| p0
 	for s.fast in result
 		|| p = s[0][0]
-		if !p0 or !p.shallowequals(p0, true)
+		if !p0 or !p.ShallowEquals(p0, true)
 			|| d = listviewrow()
 			d.name = "------<" + p.name + ">------"
 			(d is disabled)
@@ -55,18 +64,21 @@ function PerryFuncMenuSelected (GUIListEvent)
 	if row
 		e.ViewPos(row.position, 1, true) is found   // InViewExact
 		return false
-	e._Start = .ListSource.obj as TextViewLine
+	|| obj = .ListSource.obj as TextViewLine
+		e._Start = obj
 
-
-function PerryFuncListFilter (GUIListEditEvent)
-	opt norefcounts
-	return cell.name contains value
 
 // Can we... like do this more neatly? Maybe not huh? what if we wanna sort using two sortfuncs?
 function FuncListSorter (SorterComparerMsg)
 	opt norefcounts
 	|| aa = a.first
 	|| bb = b.first
+	if aa.func != bb.func
+		return aa.func|int| < bb.func|int|
+	
+	if aa == @emb
+		return bb.name.SyntaxCompare(aa.name, true) < 0
+	
 	|| af = aa.first
 	|| bf = bb.first
 	|| an = af.name
@@ -84,21 +96,35 @@ function message.funcarg (|message|)
 		return s
 
 
-function perryide.ListAllFuncsMsg (|message| items, |message| result)
+function perryide.ListAllFuncsMsg (|message| items, |message| result, |string| filter)
 	opt norefcounts
 	for line in items
-		if line == @tmp
-			|| n = line.name
-			if AutoComplete.owner.valuelower(n)						// class/module/etc
-				.ListAllFuncsMsg(line.funcarg, result)
+		if line == @decl
+			0 // result.IDEAddfunc(line, filter)
+		  elseif line == @tmp
+			if AutoComplete.owner.valuelower(line.name)						// class/module/etc
+				.ListAllFuncsMsg(line.funcarg, result, filter)
 			  elseif AutoComplete.isafunc(line)
-				|| fn = result.msg(@str)
-				fn <~ line.OwningFullName(@emb)
-				fn.position = line.position
+				result.IDEAddfunc(line, filter)
 
 
-function MenuAllFuncs (GUIaction)
-	if self isa buttonview
-		.ide.ListAllFuncs(true)
-		.OpenMenu
+function message.IDEAddfunc (|message| line, |string| filter)
+	opt norefcounts
+	if line == @decl
+		0 // fn.msg(@emb, line.render)
+	  else
+		|| name = line.OwningFullName(@emb) 
+		if filter.filter(name.name)
+			|| fn = .msg(@str)
+			fn.position = line.position
+			fn <~ name
+
+
+function string.filter (|string| find, |bool|)
+	if !find
+		return true
+	for s in .words
+		if s
+			require find contains s
+	return true
 

@@ -1436,7 +1436,10 @@ class TextView (GUIControl)
 			
 	helper DrawPreparedText (|image| where)
 		opt norefcounts
-		|| d		= .StartLine						#debug_require
+		|| d		= .StartLine
+		if !d
+			debugat
+			return
 		|| Base 	= 0
 		|| N		= .MaxVisibleLines
 		|| inl		= (.isinline != nil)

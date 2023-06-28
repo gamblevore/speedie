@@ -36,15 +36,18 @@ module Perry
 				return true
 		
 		
-	function LoadWindows (|PerryIDE| r)
+	function LoadWindows (|PerryIDE| r, |bool|)
 		|| Loaded = .LoadWindowsSub(r)
+		for arg in app.args // load specified documents
+			|| line = (0, 0)
+			|| path = arg.ExtractPathAndLine(line)
+			if path.FileExists or path.write("")
+				|| win = sdlapp.OpenDocument(path)
+				if win isa PerryIDE
+					rz = true
+					win.editme.ViewLineAndSel(line.x)
 		
-		for path in app.args // load specified documents
-			if path.fileexists or path.write("")
-				perryide.new(path)
-				loaded = true
-				
-		if !Loaded
+		if !Loaded and !rz
 			startupwindow.show
 	
 	
@@ -86,6 +89,7 @@ module Perry
 		target lin: sdlapp.removeborder // doesnt seem to work in Windows WSL?
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
+		.BuildAppMenu
 	
 		|| old = app.Pref("currproj")
 		.Projects = (app.prefs)("lastproj")
@@ -93,11 +97,9 @@ module Perry
 		|| i = PerryIDE(false)
 		i.LoadState
 		i.ViewAsText
-		.LoadWindows(i)
-		.BuildAppMenu
-		
-		|| oof = (.FindProj(old),  .Projects.First)(old)
-			oof.ide.showide
+		if !.LoadWindows(i)
+			|| oof = (.FindProj(old),  .Projects.First)(old)
+				oof.ide.showide
 
 
 	function OpenProj (|[PerryIDE]|)

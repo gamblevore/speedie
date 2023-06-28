@@ -207,7 +207,7 @@ class ListView (GUIControl) {
 	behaviour RightClick
 		.EditDelayed = nil
 		delayEditTill = nil
-		.MouseDownCell = .DrawClickCell(P)
+		.MouseDownCell = .FindClickedCell(P)
 		|| y = p.y
 		|| r = .MouseDownCell.row
 			require (r isnt disabled)
@@ -341,14 +341,21 @@ class ListView (GUIControl) {
 		.Typingfilter = rz
 		rz.size = the~width by (.rowheight+2)~down
 		
-		
-	behaviour Typedstring
+	
+	behaviour TypedString
 		opt norefcounts
 		if .OnTypingFilter
-			.NeedShrinker.TypedString(input)
-			.touch
-			return true
+			|| t = .NeedShrinker
+			t.TypedString(input)
+			return .UpdateFilter(t)
 
+
+	helper UpdateFilter (|textview| t, |bool|)
+		opt norefcounts
+		(.OnTypingFilter)(self, nil, t.text?)
+		.touch
+		return true
+	
 	
 	behaviour KeyDown
 		opt norefcounts
@@ -414,8 +421,8 @@ class ListView (GUIControl) {
 			if key.iscancel
 				.StopFilter
 			  else
-				.typingfilter.__keydown__(key)
-			return true
+				.typingfilter.__keydown__(key) // delete too
+			return .UpdateFilter(.typingfilter)
 
 	
 	function DefaultCopy (GUICopyEvent)
@@ -658,7 +665,7 @@ class ListView (GUIControl) {
 				(.OnDragRow)(self, t, nil) 
 			
 		  elseif !sl
-			|| LC = .DrawClickCell(P)
+			|| LC = .FindClickedCell(P)
 			|| L = LC.row
 			require (L isnt disabled)
 			if (L is selected) and (.SelCount > 1)
@@ -683,7 +690,7 @@ class ListView (GUIControl) {
 		.EditDelayed = nil
 		|| p = .mouseXY
 		if self contains p
-			|| R = .DrawClickcell(p)
+			|| R = .FindClickedCell(p)
 			if r and (R == i)
 				.startRenameCell(r)
 	
@@ -712,7 +719,7 @@ class ListView (GUIControl) {
 		
 		|| AdjustScroll = (clicks == -1) and (.draggingrowFrom)
 		if (clicks == -1) and (.window.droppinginto == self) // I guess the filter is already done...
-			|| i = .drawclick(p)
+			|| i = .FindClicked(p)
 			if (i isnt disabled)
 				.Select(i)
 			AdjustScroll = true
@@ -721,7 +728,7 @@ class ListView (GUIControl) {
 			if !.fixscroll
 				return 4
 			|| p2 = (0, .rowheight / 2)
-			|| i  = .DrawClick(P - P2)
+			|| i  = .FindClicked(P - P2)
 			|ListViewrow--| WantsTo
 			
 			if i
@@ -748,7 +755,7 @@ class ListView (GUIControl) {
 			(.OnReturn)(self, firstsel)?
 			return 1
 		
-		|| LC = .DrawClickCell(P)
+		|| LC = .FindClickedCell(P)
 		.MouseDownCell = LC
 		|| l = lc.row 
 		if !l
@@ -1087,17 +1094,17 @@ class ListView (GUIControl) {
 		return .ClickedScrollbar(P, Clicks, .slh, .ScrollDrawTimer_)
 
 
-	helper DrawClick (|ivec2| Search, |ListViewRow|)
-		return .DrawClickCell((0,search.y)).row
+	helper FindClicked (|ivec2| Search, |ListViewRow|)
+		return .FindClickedCell((0, search.y)).row
 	
 	
-	helper DrawClickMenu (|int| y, |ListViewRow|)
+	helper FindClickedMenu (|int| y, |ListViewRow|)
 		opt norefcounts
 		if y <= .bottom
 			return .bmove(.LastVisible, 1)
 		if y > .top
 			return .bmove(._scroll, -1)
-		return .DrawClickCell((0,y)).row
+		return .FindClickedCell((0,y)).row
 	
 	
 	function StopFilter
@@ -1106,25 +1113,27 @@ class ListView (GUIControl) {
 			.typingfilter = nil
 		
 
-
 	function FilterText (|string|)
 		if .TypingFilter
 			return .TypingFilter.text
 
 
-	helper DrawClickCell (|ivec2| Search, |ListViewCell|)
+	helper FilteredRect (|ivec4|)
+		rz = .lastrect
+		if .typingfilter and (._Scroll isnt Disabled)
+			rz.y2 = rz.y2 - (.typingfilter.height)
+	
+	
+	helper FindClickedCell (|ivec2| Search, |ListViewCell|)
 		opt NoRefCounts
-		|| r = .lastrect
+		|| r = .FilteredRect
 		|| x = search.x - r.x
-		|| FL = .OnTypingFilter
-		|| flText = .FilterText
 		
 		for sc.visible in self
-			if !fl or !fltext or (fl)(self, sc|ListViewCell|, flText)
-				r.y = r.y2 - .RowHeight
-				if r.vert contains search.y
-					return .DrawCell( sc, x )
-				r.y2 = r.y
+			r.y = r.y2 - .RowHeight
+			if r.vert contains search.y
+				return .DrawCell( sc, x )
+			r.y2 = r.y
 
 
 	helper DrawYRow (|ListViewrow| search, |int|)
@@ -1188,7 +1197,7 @@ class ListView (GUIControl) {
 	helper RowBounds (|ListViewrow| curr, |ListViewrow| find, |int| add, |ivec4|)
 		require find
 		
-		|| s	= .lastrect
+		|| s	= .FilteredRect
 		|| low	= s.y1
 		|| top	= s.y2
 		top += .scrollshift
@@ -1280,7 +1289,7 @@ class ListView (GUIControl) {
 		|| y	= .top
 		|| shl	= .scrollshift
 		if !shl or .ScrollPixelsSub(0)
-			return y
+			return 0
 		
 		|| real = .ScrollRealigner
 			real--
@@ -1291,7 +1300,7 @@ class ListView (GUIControl) {
 					real = 0
 			.ScrollRealigner = real
 			sdlapp.touch(Self)
-		return y + shl
+		return shl
 
 
 	function ScrollPixels (|int| rem)
@@ -1353,30 +1362,23 @@ I think if we want the best filtering, we need to ask for it. We could create a 
 		opt NoRefCounts
 		|| c = (.CalculateColumnWidths) ?? (DefaultColumnWidths)
 		(c)(self, nil)
-		.scrollProtect
+		.ScrollProtect
 		
-		|| rect			= .lastrect
-		|| L			= .listsource
-		|| flText		= .FilterText
-		if .typingfilter
-			rect.y2 = rect.y2 - (.typingfilter.height)
+		|| rect = .FilteredRect
+		|| L = .listsource
 		
 		.CalculateSkips
 		.DrawMarks(where, rect)
 		
-		rect.y2			= .ScrollSlide
-		|| End			= .end
-		|| fl			= .OnTypingFilter
-		if .typingfilter
-			rect.y2 = rect.y2 - (.typingfilter.height)
+		rect.y2 += .ScrollSlide
+		|| End = .end
 		
 		for r.visible in self
-			if !fl or !fltext or (fl)(self, r|listviewcell|, fltext)
-				rect.y = rect.y2 - .rowheight
-				|| D = (r.depth(self), 0)(.istree)
-				r.ListRowDraw(rect, Where, self, D)
-				rect.y2 = rect.y
-				.CanSeeAllLines = (r == end and .start == ._scroll)
+			rect.y = rect.y2 - .rowheight
+			|| D = (r.depth(self), 0)(.istree)
+			r.ListRowDraw(rect, Where, self, D)
+			rect.y2 = rect.y
+			.CanSeeAllLines = (r == end and .start == ._scroll)
 
 		where.controlclip = .lastrect
 		where.horz = .lastrect.h // redundant?

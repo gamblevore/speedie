@@ -529,18 +529,19 @@ class PerryIDE (Window)
 		require self
 		if !.project
 			.Loadproject(data.file)
-			return true
+			return self
 		|| p   = data
 		|| ext = p.ext
 		|| f   = p.file
 		if f.isdir
 			p = p.pathdir
 		if .GotoIncludedFile(p)
-			0
+			rz = self
 		  elseif f.NeedsOwnWindow
-			IdeAddProj(p)								// add as project
+			rz = IdeAddProj(p)								// add as project
 		  else
 			.filelist.addextra(p)						// add root
+			rz = self
 		startupwindow.hide
 		.showide
 

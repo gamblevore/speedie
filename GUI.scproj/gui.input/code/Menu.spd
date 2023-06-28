@@ -35,7 +35,7 @@ class Menu (ListView)
 	behaviour MouseDown
 		if .ClickedScroll(P, clicks)
 			return 2
-		|| L = .DrawClick(P) as listviewrow
+		|| L = .FindClicked(P) as listviewrow
 		if L is disabled
 			return 1
 		if (L is selected)
@@ -64,7 +64,7 @@ class Menu (ListView)
 		if state is leave or enter
 			return false// right? should have a different event for this
 		|| moved = super.mousemove(p, 0|SDL_WindowEventID|)
-		|| l = .DrawClickMenu(P.y)
+		|| l = .FindClickedMenu(P.y)
 		if !l
 			return true
 		.SelJustChanged = false

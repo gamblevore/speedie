@@ -487,13 +487,17 @@ module SDLApp
 			if lv isa ListView
 				lv.TryDelayedEdit
 
-
-	function HandleOpenFile
-		|| doc = .DocumentOpened			#require
+	
+	function OpenDocument (|string| path, |object|)
+		require path
 		|| d = .AppDocumentOpen
-			|| f = doc.file
+			|| f = path.file
 			if f.exists
-				(d)(nil, nil, f.path, CopyPasteFlags.PasteFile)
+				rz = (d)(nil, nil, f.path, CopyPasteFlags.PasteFile)
+	
+	
+	function HandleOpenFile
+		.opendocument(.DocumentOpened)
 		if .openedfirst.ago < 3s
 			.FixScreenBug = date.now + 1s
 
