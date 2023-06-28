@@ -51,10 +51,11 @@ function ListView.SLH (|vec3|)
 
 
 function textview.SLH (|vec3|)
+	opt norefcounts
 	// whats the total number of lines? sigh... seems like we always need the entire thing?
 	|| n = .lines.last.vline - (.maxvisiblelines - 2)
-	|| v =  .StartLine.vline 
-	return (v,  n max 1,  .lineheight).vec3
+	|| s = .StartLine
+	return (s.vline?,  n max 1,  .lineheight).vec3
 
 
 

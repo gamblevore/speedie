@@ -8,7 +8,7 @@ class Country
 		.name = name
 		.population = random[40, 100]
 		.ATP = random[4, 12]
-		"$name was founded with ${.population} population and ${.ATP} power"
+		"$name was founded with $.population population and $.ATP power"
 		
 	function Attack (|Country| other)
 		|| oth = ("itself", other.name)(self == other)

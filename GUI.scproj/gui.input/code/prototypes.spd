@@ -9,7 +9,7 @@ prototype GUIMenuEvent			(|guicontrol| self,	|menuitem| menu, |ListViewcell| Cli
 prototype GUITextEvent			(|textview| self, |int| Reason, |bool| TextWasAltered)
 prototype GUITextErrorSelected  (|guicontrol| self, |textviewline| Error)
 prototype GUIKeyEvent			(|guicontrol| self, |keys| Key, |bool|)
-prototype GUIPasteEvent			(|guicontrol| self, |ListViewrow| After, |string| Data, |copypasteflags| purpose, |bool|)
+prototype GUIPasteEvent			(|guicontrol| self, |ListViewrow| After, |string| Data, |copypasteflags| purpose, |object|)
 prototype GUITextShowEvent		(|TextView|   self, |ivec2| LeftCorner, |message| Msg, |string| reason)
 prototype GUICopyEvent			(|guicontrol| self, |object| item, |string|)
 prototype GUIMouseMoveEvent		(|window|     self, |guicontrol| Curr, |guicontrol| Old)
