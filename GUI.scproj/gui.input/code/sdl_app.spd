@@ -988,6 +988,7 @@ module SDLApp
 			return kActivity
 
 		  elseif  t is TEXTINPUT
+			#!textinput!
 			if .AllowTyping and .CanDrag < 2
 				|| e = ev.Editing.str
 				if w.__typedstring__(e)
@@ -995,6 +996,7 @@ module SDLApp
 			return kNothing
 
 		  elseif  t is KEYDOWN
+			#!keydown!
 			|| kev = ev.keysym
 			|| key = kev.sym
 

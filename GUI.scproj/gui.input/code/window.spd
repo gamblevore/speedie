@@ -151,7 +151,6 @@ class Window (GUIControl)
 		|| f = .realFocus
 			if (f isa menu) and (f != .focus) and (f is typethrough)
 				f = .focus|_voidptr||menu|
-				require f isa menu
 			if f.__TypedString__(input)
 				return true
 		if (Input == 1) and Input.IsASCII			// like a space basically?
