@@ -9,7 +9,7 @@ class BirdWindow (Window)
 	|int|				BestScore
 	|int|				PrevBestScore
 
-
+ 
 	constructor
 		.NoDrawBackground = true	
 		.pipes = guicontrol(self)

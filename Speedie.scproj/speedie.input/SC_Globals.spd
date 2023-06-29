@@ -37,11 +37,11 @@ function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 
 function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |scbase| name_space)
 	opt norefcounts
-	|| imp = name_space.Project
-		if scfunction.CurrFunc and !(scfunction.CurrFunc isa kIsAlloc)
-			if imp.BlindCast and old.IsNormalObject and .IsNormalObject
-				if !old.type.real_isa2( .type )
-					stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", imp.blindcast)
+	|| fn = scfunction.CurrFunc 
+	if fn and !(fn isa kIsAlloc) and fn.blindcasts
+		if old.IsNormalObject and .IsNormalObject
+			if !old.type.real_isa2( .type )
+				stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", fn.blindcasts)
 
 
 function TypeCastCheck (ExprResolver) // typecheck

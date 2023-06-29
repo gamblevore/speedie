@@ -110,6 +110,7 @@ typedef int64					Date;
 #elif __WIN32__ || _WIN64
 	#pragma message("Plat: Windows")
 	#define __PLATFORM_CURR__ __PLATFORM_WIN__
+	#define __WIN32__
 #endif
 
 

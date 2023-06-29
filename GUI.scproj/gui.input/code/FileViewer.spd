@@ -494,9 +494,9 @@ class FileViewer (ListView)
 			|| l = fv.listopen
 			if key.IsAccept
 				|| row = l.FirstSelected
-					ClickedOpenList(l, row)
+					ClickedOpenList(l, row, listview.kSourceKeys)
 				  else
-					fv.OpenQuick(.text)				
+					fv.OpenQuick(.text)
 				rz = true
 			  elseif (key is escape)
 				rz = fv.HideOpenList
@@ -665,7 +665,7 @@ function FileViewerSearchWithin (GuiMenuEvent)
 			row = nil
 		if row != .Searchwithin
 			.SearchWithin = row
-			(.OnSearchWithin)(self, row)?
+			(.OnSearchWithin)(self, row, listview.kSourceMenu)?
 		
 	
 

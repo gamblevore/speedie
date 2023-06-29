@@ -25,6 +25,7 @@ dispatch TemporalStatements (TranFunc)
 	crash					{app.crash("crashtest")}
 	deprecate				(Tran_Deprecate)
 	
+	blindcasts				(Tran_BlindCasts)
 	debugat					(Tran_DoAt)
 	doat					(Tran_DoAt)
 	visible					(Tran_Visible)
@@ -203,9 +204,15 @@ function Tran_Array (|Message| S, |SCBase| name_space) {
 
 
 function Tran_Description (TranFunc)
-	node.remove
-	expect !fn.description (node, "Can’t have multiple descriptions.")
+	check !fn.description (node, "Can’t have multiple descriptions.")
 	fn.Description = node[@str]$.name
+	node.remove
+
+
+function Tran_BlindCasts (tranfunc)
+	|| thg = node[@thg]$
+	node.remove
+	fn.blindcasts = thg.blind
 
 
 function Tran_Swap (TranFunc)

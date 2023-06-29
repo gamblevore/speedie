@@ -119,6 +119,9 @@ function Restart
 	.turninto(.path, .rawargs)
 
 
+function ThreadName (assigns:|string|)
+	cpp_Wrapper JB_App__SetThreadName
+
 function AppName (|string|)
 	return .apppath.name
 

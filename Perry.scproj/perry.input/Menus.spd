@@ -70,7 +70,7 @@ function PerryIDE.GoToMarker (|message| m)
 		.EnableHistoryChanges = true
 	.EnablePrevNext
 
-	
+
 function perryide.SortedPrevious (|string| filter="", |message|)
 	|| seen = dictionary()
 	rz = Message()

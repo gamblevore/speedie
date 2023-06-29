@@ -250,7 +250,7 @@ module Feedback
 			options.perry = 1
 			|| RealPerry = value~="bin"
 			options.perry += RealPerry // argvalue not needed? jsut value, right?
-			error.AutoPrint = (!RealPerry)|int|
+			//error.AutoPrint = (!RealPerry)|int|
 			compiler.insecurewords = file.PrefsFolder["klinkerhoppen.banned"].readall.dict
 		
 		+"check"

@@ -37,7 +37,8 @@ module SC_Saver {
 		|| cls		= .cls
 		|| IsSave	= (name contains "Save")
 		|| fs		= FastString.new
-
+		
+		.BlindCasts = 0
 		for (item in cls.properties) {
 			|| type = item.TryUseSaveable(IsSave, cls)
 			if (!type) {continue}

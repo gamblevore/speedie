@@ -2,19 +2,16 @@
 	
 							Todo
 
-* VM?
+* VM? 
 * nil-checking
 	* .NilUsage vs .NilDeclared
 	* NilSweep, for global vars, and for function misuse.
 
 
 // Perry Do later
-* saving when the view is "error" views files...
 * jumping to a file using gonext leaves the gonext/prev empty?
-* holding cmd-e flips fast between states? Should have a longer initial delay at least!
-* documentopening is doing the wierd screen fix with delayed open or soemthing?
-* extra error is being added (first? is being saved? for some good reason but too enthusiastic)
 * if w isa P<tab>// no need to autocomplete things that w can't be.
+* extra error is being added (first? is being saved? for some good reason but too enthusiastic)
 * add image editor... using qoi format. Remove png from speedie!
 * https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.

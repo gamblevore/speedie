@@ -86,8 +86,8 @@ class ListView (GUIControl) {
 			|| o = cell.row
 			.touch
 			.show(o)
-			(.WasEdited)(self, o)? // remove this event
-			(.onselected)(self, o)?
+			(.WasEdited)(self, o, listview.kSourceAltered)? // remove this event
+			(.onselected)(self, o, listview.kSourceAltered)?
 			return true
 
 
@@ -217,7 +217,7 @@ class ListView (GUIControl) {
 			ifn r and r is selected
 				.Select(r)
 			|| c = .onrightclick 
-			if c and (c)(self, r)
+			if c and (c)(self, r, listview.kSourceRightClicked)
 				.openmenu(r, y - .bottom, r)
 	
 
@@ -225,13 +225,13 @@ class ListView (GUIControl) {
 		|| sels = .FirstSelected$
 		.showfast(sels)
 		|| y = .DrawYRow(sels)
-		if .onrightclick and (.onrightclick)(self, sels)
+		if .onrightclick and (.onrightclick)(self, sels, listview.kSourcemenu)
 			.openmenu(sels, y - .bottom, sels)
 		
 	
 	function DoReturn (|bool|)
 		require .onreturn
-		(.onreturn)(self, .FirstSelected)
+		(.onreturn)(self, .FirstSelected, listview.kSourceselection)
 		return true
 		
 	
@@ -755,7 +755,7 @@ class ListView (GUIControl) {
 		
 		|| FirstSel = .FirstSelected
 		if (Clicks > 1) and (firstsel) and !(keys.Cmd)
-			(.OnReturn)(self, firstsel)?
+			(.OnReturn)(self, firstsel, listview.kSourceleftclicked)?
 			return 1
 		
 		|| LC = .FindClickedCell(P)
@@ -1031,7 +1031,7 @@ class ListView (GUIControl) {
 			.Show(s)
 
 		if !._BlockedDuringUse
-			(.onselected)(self, s)?
+			(.onselected)(self, s, listview.kSourceselection)?
 
 
 	function ScrollByRows (|int| Rows)
@@ -1369,7 +1369,7 @@ I think if we want the best filtering, we need to ask for it. We could create a 
 	behaviour Draw
 		opt NoRefCounts
 		|| c = (.CalculateColumnWidths) ?? (DefaultColumnWidths)
-		(c)(self, nil)
+		(c)(self, nil) // allow the thing to calculate the column widths before draw
 		.ScrollProtect
 		
 		|| rect = .FilteredRect
@@ -1502,6 +1502,14 @@ I think if we want the best filtering, we need to ask for it. We could create a 
 			yield f
 			f = f.next
 
+	constants
+		kSourceLeftClicked
+		kSourceRightClicked
+		kSourceAltered
+		kSourceKeys
+		kSourceSelection
+		kSourceMenu
+		kSourceUnknown
 
 	module
 		|drawstyle| 		gscroll

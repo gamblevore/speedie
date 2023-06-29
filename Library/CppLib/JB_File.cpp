@@ -324,7 +324,7 @@ bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
 }
 
 
-uint8* JB_FastCString( JB_String* Path, uint8* Tmp ) {
+uint8* JB_FastCString( JB_String* Path, uint8* Tmp, int Max ) {
     u32 N = JB_Str_Length( Path );
     if ( ! N ) {
         return (uint8*)"";
@@ -334,8 +334,8 @@ uint8* JB_FastCString( JB_String* Path, uint8* Tmp ) {
     if (JB_Str_IsC(Path))
         return Result;
 
-    if (N > 1023)
-        N = 1023;
+    if (N > Max)
+        N = Max;
     Tmp[ N ] = 0;
     return (uint8*)CopyBytes( Result, Tmp, N );
 }
@@ -343,7 +343,7 @@ uint8* JB_FastCString( JB_String* Path, uint8* Tmp ) {
 
 uint8* JB_FastFileString( JB_String* Path, uint8* Tmp ) { // utf-16 on windows :(? Or do we just use posix funcs?
 #ifndef TARGET_WINDOWS
-    return JB_FastCString(Path, Tmp);
+    return JB_FastCString(Path, Tmp, PATH_MAX);
 #else
 	unsigned short* Result16 = (unsigned short*)Result;
     N = local_c8to16( Result, N, &BufferData );

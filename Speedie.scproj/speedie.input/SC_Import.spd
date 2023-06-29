@@ -120,7 +120,7 @@ class SCImport
 			.Mod.ExportName = name.name
 		
 		|| blind = arg["blindcast"]
-			.BlindCast = ErrorSeverity.find(blind.name, blind)
+			.BlindCast = blind.blind
 		  elseif Options.SelfReplacement
 			.BlindCast = 0
 	
@@ -129,6 +129,9 @@ class SCImport
 
 		link.remove
 		
+
+	function message.blind (|errorseverity|)
+		return ErrorSeverity.find(.name, self)
 
 	function IncludeCHeaders (|file| f, |[string]| output)
 		for cName in f

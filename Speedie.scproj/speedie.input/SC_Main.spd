@@ -49,6 +49,8 @@ function compiler.SetupEnv
 	|| talk = app..talk
 	if talk.length and app.IsMainThread
 		app.IgnoreBreakPoints
+	  else
+		app.threadname = "SpeedieDebug"
 
 	|| NL = app.pref("nil")
 		options.setnil = nl.int

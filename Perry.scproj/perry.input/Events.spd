@@ -426,8 +426,9 @@ function ClickedError (GUIListEvent)
 			ide.ClickedError(row)
 		  else
 			ide.ClickedFind(row)
-	  elseif !.Start and ide.filelist isnt visible
-		clickedaview(ide.ViewFiles)
+	  elseif source == listview.kSourceLeftClicked or listview.kSourceRightClicked
+		if !.Start and ide.filelist isnt visible
+			clickedaview(ide.ViewFiles)
 	return true
 
 

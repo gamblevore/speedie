@@ -497,7 +497,8 @@ module SDLApp
 	
 	
 	function HandleOpenFile
-		.opendocument(.DocumentOpened)
+		|| d = .DocumentOpened$ // don't alter fixscreenBUG!!
+		.opendocument(d)
 		if .openedfirst.ago < 3s
 			.FixScreenBug = date.now + 1s
 

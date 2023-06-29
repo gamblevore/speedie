@@ -72,6 +72,18 @@ void JB_App__AtExit (fn_app_deathaction b) {
 }
 
 
+void JB_App__SetThreadName(JB_String* self) {
+	require0(self);
+	u8 CName[32];
+	auto tmp = (const char*)JB_FastCString(self, CName, sizeof(CName));
+	
+	
+#if __APPLE__
+	pthread_setname_np(tmp); // why?
+#else
+	pthread_setname_np(pthread_self(), tmp);
+#endif
+}
 
 typedef void* (*fn_pth_wrap2)(void* obj);
 
@@ -265,8 +277,8 @@ static bool JB_FEPDWEE_Middle(ShellStream& Sh) {
 
 
 int JB_Str_System(JB_String* self) { // needz escape params manually...
-    uint8 Buffer[1024];
-    uint8* Result = JB_FastCString(self, Buffer);
+    uint8 Buffer[PATH_MAX];
+    uint8* Result = JB_FastCString(self, Buffer, PATH_MAX);
     int ugh = system((const char*)Result);
     return WEXITSTATUS(ugh);
 }

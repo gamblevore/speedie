@@ -705,7 +705,7 @@ prototype fn_subprocess	(|&cstring| args, |int| Mode, |errorint|)
 
 
 extend_module app
-	helper IsMainThread (|bool|)
+	function IsMainThread (|bool|)
 		return !.IsntMainThread
 	helper IsntMainThread (|bool|)
 		cpp_wrapper JB_LibIsThreaded

@@ -1202,6 +1202,7 @@ JBClass ( SCFunction , SCBase ,
 	byte MinOpt;
 	byte IsAssigns;
 	byte IsCppInBuilt;
+	ErrorSeverity BlindCasts;
 	bool IsInline;
 	bool FlowDisabled;
 	bool IsExternalLib;
@@ -1341,13 +1342,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1873])
+#define kJB__ErrorColors_bold (JB_LUB[1875])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1874])
-#define kJB__ErrorColors_good (JB_LUB[1875])
-#define kJB__ErrorColors_normal (JB_LUB[1876])
-#define kJB__ErrorColors_underline (JB_LUB[1875])
-#define kJB__ErrorColors_warn (JB_LUB[1877])
+#define kJB__ErrorColors_error (JB_LUB[1876])
+#define kJB__ErrorColors_good (JB_LUB[1877])
+#define kJB__ErrorColors_normal (JB_LUB[1878])
+#define kJB__ErrorColors_underline (JB_LUB[1877])
+#define kJB__ErrorColors_warn (JB_LUB[1879])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1521,10 +1522,10 @@ extern FastString* JB_fs_tmp_num;
 extern Dictionary* JB_FuncLinkageTable;
 #define kSC_ActualTypecasts ((~(64 | 16)))
 #define kSC_AddressOfMatch (3 << 22)
-#define kSC_BitAnd (JB_LUB[352])
-#define kSC_BitNot (JB_LUB[614])
-#define kSC_BitOr (JB_LUB[556])
-#define kSC_BitXor (JB_LUB[1878])
+#define kSC_BitAnd (JB_LUB[354])
+#define kSC_BitNot (JB_LUB[616])
+#define kSC_BitOr (JB_LUB[558])
+#define kSC_BitXor (JB_LUB[1880])
 #define kSC_CastedMatch (6 << 22)
 #define kSC_destructornotfromlocalrefs (1024)
 #define kSC_DontSaveProperty (0)
@@ -1556,7 +1557,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1879])
+#define kJB_SaverStart1 (JB_LUB[1881])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1 << 22)
@@ -2097,8 +2098,6 @@ bool JB_App__IsMainThread();
 
 int JB_Main();
 
-int64 JB_App__ObjMemory();
-
 JB_String* JB_App__OrigPath();
 
 JB_String* JB_App__Pref(JB_String* s);
@@ -2327,6 +2326,8 @@ bool SC_Comp__TryVariousStartModes();
 JB_File* SC_Comp__usingScript(JB_File* f);
 
 JB_String* SC_Comp__VariantSuffix();
+
+void SC_Comp__VariousSelfTests();
 
 SCBase* SC_Comp__WrongConf(Message* node, SCBase* name_space, Message* ErrPlace);
 
@@ -4544,6 +4545,8 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
+void SC_IR_Print(IR* self);
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5236,6 +5239,8 @@ inline bool JB_DictionaryReader_SyntaxCast(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
+
+int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -6433,8 +6438,6 @@ JB_String* JB_File__PreferencesPath();
 
 JB_File* JB_File__PrefsFolder();
 
-void SC_File__testjb();
-
 
 
 // JB_JBin
@@ -7083,6 +7086,8 @@ void JB_Msg_Bin__(Message* self, FastString* fs);
 void JB_Msg_binn__(Message* self, FastString* fs);
 
 void JB_Msg_BinnRender(Message* self, FastString* fs, JB_String* sepa, JB_String* sepb);
+
+ErrorSeverity SC_Msg_blind(Message* self);
 
 void JB_Msg_Bra__(Message* self, FastString* fs);
 
@@ -8256,6 +8261,8 @@ JB_String* SC_Func_RenderParams(SCFunction* self, bool ForErrors, FastString* fs
 
 JB_String* SC_Func_RenderTitle(SCFunction* self, bool ForErrors, FastString* fs_in);
 
+void SC_Func_SetBlindCasts(SCFunction* self, SCBase* name_space);
+
 void SC_Func_SetFuncType(SCFunction* self, Message* node);
 
 void SC_Func_StripTest(SCFunction* self);
@@ -8361,6 +8368,8 @@ void SC_Func__Tran_All(SCFunction* fn, Message* s, SCBase* p);
 void SC_Func__Tran_Array(Message* S, SCBase* name_space);
 
 void SC_Func__Tran_Beep(SCFunction* fn, Message* node, SCBase* name_space);
+
+void SC_Func__Tran_BlindCasts(SCFunction* fn, Message* node, SCBase* name_space);
 
 void SC_Func__Tran_CppRefs(SCFunction* fn, Message* node, SCBase* name_space);
 
@@ -8620,7 +8629,7 @@ bool JB_config_Save(Message* self);
 
 //// HEADER Inlines.h
 inline bool JB_int_OperatorInRange(int self, int d) {
-	iif (d > 0) {
+	if (d > 0) {
 		return (((uint)self) < ((uint)d));
 	}
 	return false;
@@ -8658,12 +8667,13 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
 inline void SC_flat_AddExtended(ASMFuncState* self, Message* err, uint Bits) {
 	int B = 1 << 31;
-	iif (((bool)(Bits & B))) {
+	if (((bool)(Bits & B))) {
 		JB_Msg_SyntaxExpect(err, nil);
 		return;
 	}
@@ -8755,7 +8765,7 @@ inline void SC_Msg_NilCheckFP(Message* self, SCNilLister* nel) {
 
 inline void SC_Msg_NilCheckProperty(Message* self, SCNilLister* nel) {
 	SCDecl* Prop = JB_Incr(SC_Msg_DotMustBeProperty(self));
-	iif ((!(((bool)Prop) and (SC_Decl_SyntaxIsnt(Prop, kJB__SCDeclInfo_onmodule))))) {
+	if ((!(((bool)Prop) and (SC_Decl_SyntaxIsnt(Prop, kJB__SCDeclInfo_onmodule))))) {
 		JB_Decr(Prop);
 		return;
 	}
@@ -8763,14 +8773,14 @@ inline void SC_Msg_NilCheckProperty(Message* self, SCNilLister* nel) {
 	Message* f = JB_Incr(((Message*)JB_Ring_First(self)));
 	SCDecl* ObjDecl = JB_Incr(SC_TypeOfExpr(f, nil, nil));
 	JB_Decr(f);
-	iif ((!ObjDecl)) {
+	if ((!ObjDecl)) {
 		debugger;
 		JB_Decr(ObjDecl);
 		return;
 	}
 	NilState u = ObjDecl->NilUsed;
-	iif ((!(SC_NilState_SyntaxIs(u, kJB__NilState_Exists)))) {
-		JB_Msg_SyntaxExpect(self, JB_LUB[1585]);
+	if ((!(SC_NilState_SyntaxIs(u, kJB__NilState_Exists)))) {
+		JB_Msg_SyntaxExpect(self, JB_LUB[1586]);
 		JB_Decr(ObjDecl);
 		return;
 	}

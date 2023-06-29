@@ -9,7 +9,7 @@ extern "C" {
 
 struct JB_StringC;
 uint8* JB_FastFileString( JB_String* S, uint8* Buff);
-uint8* JB_FastCString( JB_String* S, uint8* Buff);
+uint8* JB_FastCString( JB_String* S, uint8* Buff, int Max);
 JB_StringC* JB_Str_MakeC( JB_String* self );
 bool JB_Str_IsC ( JB_String* self );
 JB_String* JB_Str3(const char* c, int N);

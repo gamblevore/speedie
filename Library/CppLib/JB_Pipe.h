@@ -48,6 +48,7 @@ void JB_Rec__CrashLog(const char* c);
 struct Process;
 typedef int	(*fn_pth_wrap)(Process* obj);
 int JB_ThreadStart (fn_pth_wrap wrap, JB_Object* IPC, bool join);
+void JB_App__SetThreadName(JB_String* name);
 int JB_Pipe__IgnoreBreakPoints ();
 void JB_Pipe__StdErrorSet(int F);
 void JB_Pipe__StdOutSet(int F);

@@ -47,6 +47,7 @@ linkage
 |Byte|					MinOpt
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
+|errorseverity|			BlindCasts
 |bool|					IsInline
 |bool| 					FlowDisabled
 |bool|					IsExternalLib
@@ -1709,6 +1710,13 @@ function scfunction.SetFuncType (|message| node)
 		.isassigns = 2
 
 
+function scfunction.SetBlindCasts (|scbase| name_space)
+	if name_space and name_Space.project
+		.BlindCasts		= name_space.project.blindcast
+	  elseif scimport.curr
+		.BlindCasts		= scimport.curr.blindcast
+
+
 function scfunction.init_sub (|message| node,  |scbase| name_space)
 	|| arg = node.NormaliseFunc
 	node.obj = self
@@ -1722,12 +1730,13 @@ function scfunction.init_sub (|message| node,  |scbase| name_space)
 	.SetFuncType(node)
 	.ParseName( node.first )
 	.PreProcessExpects
-	.TranStrings()//(name_Space != nil) // seems unneeded? 
+	.TranStrings 
 	.ReadDisabled(Arg)
 
 	.IsInline		= arg.FindClassOption("pragma", "inline")
 	.NoRefCounts	= arg.FindClassOption("opt",	"NoRefCounts")
 	.minopt			= arg.FindClassOption("opt",	"min")
+	.SetBlindCasts(name_space)
 
 	if  Arg.FindClassOption("pragma", "DontDestructLocally")
 		.AllocCode |= kDestructorNotFromLocalRefs
