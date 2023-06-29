@@ -658,9 +658,11 @@ static BalzComp* GetComp(FastString* out, int N=0) {
 
 extern "C" void JB_App__ClearCaches(int which) {
 	JB_unalloc((void**)&BB);
-	JB_unalloc((void**)&sigh.Suffixes);
-	JB_unalloc((void**)&sigh.SortPositionAtByte);
-	sigh.B = 0;
+	if (sigh.B) {
+		sigh.B = 0;
+		JB_unalloc((void**)&sigh.Suffixes);
+		JB_unalloc((void**)&sigh.SortPositionAtByte);
+	}
 }
 
 extern "C" int JB_BALZ_CompressChunk(FastString* fs, JB_String* In, bool Strong) {

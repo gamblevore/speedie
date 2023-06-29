@@ -177,7 +177,7 @@ class GUIControl (ringtree)
 		.__Draw__(Where)
 
 	
-	helper DrawChildren (|image| where, |guicontrol| avoid)
+	helper DrawChildren (|image| where, |guicontrol| avoid=nil)
 		opt norefcounts
 		for R in self							// .last gets drawn last, so .last is actually the "front".
 			if (r!=avoid) and R.isviewable

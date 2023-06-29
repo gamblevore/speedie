@@ -4,8 +4,27 @@
 
 * VM?
 * nil-checking
-	* .NilUsage vs .Nildeclared
+	* .NilUsage vs .NilDeclared
 	* NilSweep, for global vars, and for function misuse.
+
+
+// Perry Do later
+* saving when the view is "error" views files...
+* jumping to a file using gonext leaves the gonext/prev empty?
+* holding cmd-e flips fast between states? Should have a longer initial delay at least!
+* documentopening is doing the wierd screen fix with delayed open or soemthing?
+* extra error is being added (first? is being saved? for some good reason but too enthusiastic)
+* if w isa P<tab>// no need to autocomplete things that w can't be.
+* add image editor... using qoi format. Remove png from speedie!
+* https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
+* skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
+	* game-like IDE. Break functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order... Something that can't just be commented out.
+* TextView error/find resync
+* double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
+* Find-replace?
+	* syntactic-mode also
+* too long text in listview draw as much as we can
+* First use of tab (in func) or () (to wrap) on opening perry doesn't work.
 
 
 // Speedie Do later
@@ -20,20 +39,3 @@
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
 * galaxxies C++ compile issues
-
-
-// Perry Do later
-* no need autocomplete decl names!
-* extra error is being added (first? is being saved? for some good reason but too enthusiastic)
-* if w isa P<tab>// no need to autocomplete things that w can't be.
-* add image editor... using qoi format. Remove png from speedie!
-* https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
-* skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
-	* game-like IDE. Break functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order... Something that can't just be commented out.
-* TextView error/find resync
-* double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
-* Find-replace?
-	* syntactic-mode also
-* too long text in listview draw as much as we can
-* First use of tab (in func) or () (to wrap) on opening perry doesn't work.
-

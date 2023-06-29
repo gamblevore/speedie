@@ -229,7 +229,7 @@ class Window (GUIControl)
 		
 		if menu.isviewable
 			menu.DrawOne(Where)
-			menu.drawchildren(where, nil)
+			menu.drawchildren(where)
 		
 		where.ControlClip = self
 		.inline.DrawInline(where)

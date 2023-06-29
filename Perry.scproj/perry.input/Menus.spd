@@ -36,15 +36,21 @@ function perryide.AddToJumpHistory
 	.previous <~ where
 	.prevmarker = where
 	if .prevmarker.parent != .previous
-	.previous.keep(40, false)
+	.previous.keep(66, false)
 	.EnablePrevNext
 
 
 function RightClickNext (GUIaction)
 	if self isa ButtonView
 		|| s = .submenu
+			s.ontypingfilter = PerryFileListFilter
 			s.ListSource = .ide.SortedPrevious
 			.OpenMenu
+
+
+function PerryFileListFilter (GUIListEditEvent)
+	opt norefcounts
+	.ListSource = .ide.SortedPrevious(value)
 
 
 function ChosePrevItem (GUIListEvent)
@@ -65,14 +71,14 @@ function PerryIDE.GoToMarker (|message| m)
 	.EnablePrevNext
 
 	
-function perryide.SortedPrevious (|message|)
-	|dictionary of message| s = dictionary()
-	for ch in .previous
-		|| n = ch[2].name
-		|| old = s[n]
-			old.remove
-		s[n] = ch
-	return .previous
+function perryide.SortedPrevious (|string| filter="", |message|)
+	|| seen = dictionary()
+	rz = Message()
+	for ch in .Previous 
+		|| n = ch[2].nyme.LowerCase
+		if filter.filter(ch.second.nyme) and !seen[n]
+			seen[n] = ch
+			rz <~ ch.copy
 	
 
 function PerryIDE.Mark (|message| m)

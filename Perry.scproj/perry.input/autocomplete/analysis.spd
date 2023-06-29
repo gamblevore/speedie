@@ -1,5 +1,6 @@
 
 
+
 function PerryFuncListFilter (GUIListEditEvent)
 	opt norefcounts
 	.ide.listallfuncs(false, value)

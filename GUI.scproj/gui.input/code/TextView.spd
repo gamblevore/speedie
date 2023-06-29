@@ -1322,11 +1322,21 @@ class TextView (GUIControl)
 		if R.width
 			|| g = (¥.TextSelection, ¥.TextSelectionUnfocus)(.hasfocus)
 			.DrawSelRange(Where, r, g)
-		  elseif sdlapp.FlashSelector
-			if .hasfocus and !.hasinline and .window.islast
-				|| Cp = (1.0, 1.0, 1.0, 0.666).px
-				Where.fillrect(.SelectorRect(r.x), Cp, Cp)
-
+		  elseif .ShouldDrawSel
+			|| Cp = (1.0, 1.0, 1.0, 0.666).px
+			Where.fillrect(.SelectorRect(r.x), Cp, Cp)
+	
+	
+	helper ShouldDrawSel (|bool|)
+		opt norefcounts
+		require sdlapp.FlashSelector
+		require !.hasinline and .window.islast
+		if .hasfocus
+			return true
+		|| p = .parent
+		if p == .window.InnerFocus
+			return true
+	
 	
 	helper HasInline (|bool|)
 		opt norefcounts
