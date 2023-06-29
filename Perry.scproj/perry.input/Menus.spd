@@ -60,14 +60,10 @@ function ChosePrevItem (GUIListEvent)
 
 function PerryIDE.GoToMarker (|message| m)
 	if m
-		.mark(.prevmarker)
-		.prevmarker = m
-		if m.parent != .previous
-		.EnableHistoryChanges = false
+		.AddToJumpHistory
 		|| l = m.first
 		.GoToAnyFile(m.name, l.name)
 		.editme.scrollpos = l.first.int
-		.EnableHistoryChanges = true
 	.EnablePrevNext
 
 

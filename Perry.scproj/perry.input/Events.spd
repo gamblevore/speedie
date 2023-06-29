@@ -426,7 +426,7 @@ function ClickedError (GUIListEvent)
 			ide.ClickedError(row)
 		  else
 			ide.ClickedFind(row)
-	  elseif source == listview.kSourceLeftClicked or listview.kSourceRightClicked
+	  elseif sdlapp.event.type is mousedown
 		if !.Start and ide.filelist isnt visible
 			clickedaview(ide.ViewFiles)
 	return true

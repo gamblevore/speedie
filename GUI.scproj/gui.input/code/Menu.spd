@@ -57,7 +57,7 @@ class Menu (ListView)
 			if (L.MenuEvent)
 				(L.MenuEvent)(.parent,  l,  ListViewcell(e, 0))
 				return
-		(.onreturn)(self, L, listview.kSourcemenu)?
+		(.onreturn)(self, L)?
 			
 	
 	behaviour MouseMove

@@ -410,6 +410,7 @@ module SDLApp
 		while
 			while .Event.Poll
 				occured |= .CheckEvent(.event)
+			.Event.type = 0
 			if .WantsQuit
 				Occured |= .TryQuit(kExiting)
 			if .NewSize

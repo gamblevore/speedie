@@ -86,8 +86,8 @@ class ListView (GUIControl) {
 			|| o = cell.row
 			.touch
 			.show(o)
-			(.WasEdited)(self, o, listview.kSourceAltered)? // remove this event
-			(.onselected)(self, o, listview.kSourceAltered)?
+			(.WasEdited)(self, o)? // remove this event
+			(.onselected)(self, o)?
 			return true
 
 
@@ -217,7 +217,7 @@ class ListView (GUIControl) {
 			ifn r and r is selected
 				.Select(r)
 			|| c = .onrightclick 
-			if c and (c)(self, r, listview.kSourceRightClicked)
+			if c and (c)(self, r)
 				.openmenu(r, y - .bottom, r)
 	
 
@@ -225,13 +225,13 @@ class ListView (GUIControl) {
 		|| sels = .FirstSelected$
 		.showfast(sels)
 		|| y = .DrawYRow(sels)
-		if .onrightclick and (.onrightclick)(self, sels, listview.kSourcemenu)
+		if .onrightclick and (.onrightclick)(self, sels)
 			.openmenu(sels, y - .bottom, sels)
 		
 	
 	function DoReturn (|bool|)
 		require .onreturn
-		(.onreturn)(self, .FirstSelected, listview.kSourceselection)
+		(.onreturn)(self, .FirstSelected)
 		return true
 		
 	
@@ -755,7 +755,7 @@ class ListView (GUIControl) {
 		
 		|| FirstSel = .FirstSelected
 		if (Clicks > 1) and (firstsel) and !(keys.Cmd)
-			(.OnReturn)(self, firstsel, listview.kSourceleftclicked)?
+			(.OnReturn)(self, firstsel)?
 			return 1
 		
 		|| LC = .FindClickedCell(P)
@@ -986,7 +986,7 @@ class ListView (GUIControl) {
 		opt NoRefCounts
 		|| one = .OneAlwaysSelected
 		|| s = (.FirstSelected ?? .start, nil)(one)
-		return .Select(s)
+		return .Select(s, 0)
 	
 	
 	function SelectNoShow (|ListViewRow| s)
@@ -1031,7 +1031,7 @@ class ListView (GUIControl) {
 			.Show(s)
 
 		if !._BlockedDuringUse
-			(.onselected)(self, s, listview.kSourceselection)?
+			(.onselected)(self, s)?
 
 
 	function ScrollByRows (|int| Rows)
@@ -1501,15 +1501,6 @@ I think if we want the best filtering, we need to ask for it. We could create a 
 		while f
 			yield f
 			f = f.next
-
-	constants
-		kSourceLeftClicked
-		kSourceRightClicked
-		kSourceAltered
-		kSourceKeys
-		kSourceSelection
-		kSourceMenu
-		kSourceUnknown
 
 	module
 		|drawstyle| 		gscroll

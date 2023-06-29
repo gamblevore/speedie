@@ -12,7 +12,7 @@ struct SDL_Event
 	module 
 		function Poll (|bool|)
 			return (nil|&SDL_Event|).poll
-			
+	
 	function Poll (|bool|)
 		cpp_wrapper SDL_PollEvent
 

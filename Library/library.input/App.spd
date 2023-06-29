@@ -13,7 +13,6 @@ module App {
 |file|						_stdin
 |string|					codesign_native = "codesign_osx"
 
-
 function Sleep (|Date| Duration=1s)
 	cpp_wrapper JB_Date__Sleep
 

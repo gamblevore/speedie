@@ -410,6 +410,19 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 
 
 
+function Message.ACInIsa (|bool|)
+	opt norefcounts
+	require (self == @thg) and .islast
+	|| p = .parent$
+	if (p == @rel)
+		|| pr = .prev
+		if pr ~= "isa" or "as" or "mustbe"
+			return true
+	|| pfn = p.asfunc
+		if pfn.name ~= "isa"
+			return true
+
+
 function GetScope (|message| orig, |&int| types, |scbase|)
 	if !orig
 		return compiler.program
@@ -430,6 +443,9 @@ function GetScope (|message| orig, |&int| types, |scbase|)
 			|| type = decl.type
 				return type
 	
+	if orig.acInIsa
+		* types = 1
+		return compiler.program // right????
 	if arg
 		return arg
 	if orig.IsTypeOfDecl

@@ -9,8 +9,7 @@
 
 
 // Perry Do later
-* jumping to a file using gonext leaves the gonext/prev empty?
-* if w isa P<tab>// no need to autocomplete things that w can't be.
+* gonext/prev needs rework
 * extra error is being added (first? is being saved? for some good reason but too enthusiastic)
 * add image editor... using qoi format. Remove png from speedie!
 * https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
@@ -36,3 +35,5 @@
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
 * galaxxies C++ compile issues
+* sdleventtype.mousedown() // compiles???
+	* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and structs
