@@ -35,5 +35,3 @@
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
 * galaxxies C++ compile issues
-* sdleventtype.mousedown() // compiles???
-	* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and structs

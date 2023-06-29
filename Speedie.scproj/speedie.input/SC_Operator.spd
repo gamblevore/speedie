@@ -314,7 +314,7 @@ function Message.RelFix (|bool| force, |bool|)
 
 function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCBase|name_space, |Message|RN, |SCDecl|)
 	// a + b   --> a.operator_plus(b)
-	// a oar b --> a.operator_oar(b,syntaxcast?)
+	// a ?? b --> a.operator_oar(b,syntaxcast?)
 	opt norefcounts
 	exp.become(@Dot, comp.FuncName)
 	|| prm = «prm, RN » 
