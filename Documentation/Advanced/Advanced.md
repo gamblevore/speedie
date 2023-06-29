@@ -26,6 +26,24 @@ Which isn't great because then `Message` becomes too complex in it's behaviour a
 
 For example, `ListViewRow` is actually just a `message`
 
+
+## BlindCasting
+
+If you need to force a typecast, it is possible. There are usually better options. Its usually a bad idea. Don't blame me if things go wrong.
+
+    function Example3 (|message| msg)
+        blindcast ok // enables blindcasting in this func
+        || file1 = msg.obj|file|
+        || file2 = msg.obj as file // seriously why not just do this?
+        printline file2.readall
+
+You can work blindcasts via voidpointers.
+
+    function Example4 (|message| msg)
+        || file = msg.obj|_voidptr||file|
+        printline file.readall
+
+
 ## Function Prototypes (callbacks)
 
 Functions can be dynamic! Like this! Its a great way to make dynamic code, without needing virtual functions.

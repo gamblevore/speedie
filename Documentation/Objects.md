@@ -52,14 +52,17 @@ Object types can be tested using `isa`.
 
 Once you test the type of an object, you don't need to typecast it anymore within that branch. This means that actually, typecasting is something to avoid. Just test a type, don't blind-cast.
 
-If you need to typecast (Rare but it can happen), its done like this:
+Another way to typecast is using the `as` operator:
 
-    function CastExample
-        || s = "im a string"
-        |object| o = s    // loses track of what 's' is
-        || s2 = o|string| // typecasted!
-        if s2.length > 1  // uses string.length
-            printline s2
+    function Example2 (|message| msg)
+        || file = msg.obj as file
+        if file
+            printline file.readall
+
+If msg.obj is nil... this is OK but it will still return nil. If msg.obj is not nil or a file, then `as` will create an error and return nil.
+
+This is MUCH better than blind-casting! Turning a RingTree into a file blindly... would cause all sorts of issues. And creating an exception would SUCK totally... because it destroys control flow. My approach is the best.
+
 
 ## Subclassing
 
