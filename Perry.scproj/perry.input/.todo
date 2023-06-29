@@ -23,7 +23,6 @@
 
 
 // Perry Do later
-* typethrough not working
 * func menu release needs to restore old list.
 * no need autocomplete decl names!
 * extra error is being added (first? is being saved? for some good reason but too enthusiastic)

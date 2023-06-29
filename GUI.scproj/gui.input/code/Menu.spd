@@ -101,10 +101,12 @@ class Menu (ListView)
 		|| w = .window
 		return w.openedmenu == self
 	
-	function CloseMenu
+	
+	function CloseMenu 
 		opt norefcounts
 		.selectNone
 		.StopFilter
+		.UpdateFilter
 		isnt visible
 		.EditingRow = nil
 		if .isopenedmenu

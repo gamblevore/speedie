@@ -333,26 +333,29 @@ class ListView (GUIControl) {
 	
 	helper NeedShrinker (|textview|)
 		opt norefcounts
-		|| f = .TypingFilter
-			return f
+		rz = .TypingFilter
+		if rz
+			return rz
 		rz = TextView(Self)
-		rz.id = "filter"
-		(rz is editable)
 		.Typingfilter = rz
+		rz.id = "filter"
+		rz.gnormal.bg = (0.1,0.1,0.1,1.0)
+		rz.gnormal.edge = .gnormal.edge
+		(rz is editable)
 		rz.size = the~width by (.rowheight+2)~down
-		
+		.window.setinnerfocus(rz)
+	
 	
 	behaviour TypedString
 		opt norefcounts
 		if .OnTypingFilter
 			|| t = .NeedShrinker
 			t.TypedString(input)
-			return .UpdateFilter(t)
+			return .UpdateFilter
 
-
-	helper UpdateFilter (|textview| t, |bool|)
+	helper UpdateFilter (|bool|)
 		opt norefcounts
-		(.OnTypingFilter)(self, nil, t.text?)
+		(.OnTypingFilter)(self, nil, .typingfilter.text?)
 		.touch
 		return true
 	
@@ -422,7 +425,7 @@ class ListView (GUIControl) {
 				.StopFilter
 			  else
 				.typingfilter.__keydown__(key) // delete too
-			return .UpdateFilter(.typingfilter)
+			return .UpdateFilter
 
 	
 	function DefaultCopy (GUICopyEvent)
@@ -798,9 +801,14 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| li = .listsource 
 		return (li.hierend(li), li.last)(.IsTree)
-	function End (|int|i, |ListViewrow|)
-		cpp_part EndDir
-		return (.end, .start)(i > 0)
+	
+	function Edge (|int|i, |bool| Selectable=false, |ListViewrow|)
+		opt norefcounts
+		rz = (.end, .start)(i > 0)
+		if selectable
+			while rz and rz is disabled
+				rz = rz.step(i < 0)
+		
 	function Start (|ListViewrow|)
 		return .listsource.first 
 	function SearchStep (|ListViewrow| l, |bool| fwd, |ListViewrow|)
@@ -946,9 +954,9 @@ class ListView (GUIControl) {
 		debug_require i
 		|| l = (.LastSelected, .FirstSelected)(i > 0)
 		if !l
-			if i < 0
-				return .Select(.start)
-			return .Select(.end)
+			// what if .start or .end is disabled?
+			|| f = .edge(i, true)
+			return .Select(f)
 		
 		|| m = .bmove(l, i)
 		ifn .multiselection and multi
