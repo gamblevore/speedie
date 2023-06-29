@@ -14,7 +14,6 @@ Hidden Caches:
 	* JB_FS__FastNew
     * Dict fast name
 	* 256 byte block! speeds up splitting when the length = 1!! for .Mid
-    * Hex mapping in FastString
 */
 
 

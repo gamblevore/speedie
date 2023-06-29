@@ -171,7 +171,6 @@ cpp_nothing JB_LayerNew				(|MemoryLayer| L,		|&ClassData| Class, |Object|)
 
 
 /// debugging
-cpp_wrapper	JB_MemCount			(|int|)
 prototype	fpDestructor		(|object| self)
 
 

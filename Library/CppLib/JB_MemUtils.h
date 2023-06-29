@@ -36,6 +36,12 @@ void JB_free(const void* Arr);
 u64 JB_msize(const void* Arr);
 void JB_mtest(const void* M);
 u64 JB_memused();
+inline void JB_unalloc(void** Arr) {
+	if (*Arr) {
+		JB_free(*Arr);
+		*Arr = 0;
+	}
+}
 
 #define MemZero(Where) (memzero(Where, sizeof(Where)))
 inline void memzero(void* Where, int N) {

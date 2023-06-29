@@ -136,12 +136,14 @@ function TurnInto (|string| s, |[string]| R=nil, |errorint|)
 
 
 function ObjMemory (|int64|)
-	return JB_MemCount()
+	cpp_wrapper JB_MemCount
 
 
 function StringMemory (|int64|)
 	return Memory.used
 
+function ClearCaches (|int| which=0)
+	cpp_wrapper JB_App__ClearCaches
 
 function pref_path (|string|)
 	rz = app.conf("prefs")$

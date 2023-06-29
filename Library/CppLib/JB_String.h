@@ -30,6 +30,7 @@ extern "C" {
 void JB_BALZ_Clear();
 int JB_BALZ_CompressChunk(FastString* fs, JB_String* In, bool Strong);
 int JB_BALZ_DecompressChunk(FastString* fs, JB_String* In, int Expected);
+void JB_App__ClearCaches(int which);
 int balzmain(int argc, const char* argv[]);
 
 extern JB_String* JB_LUB[];

@@ -74,6 +74,7 @@ function Log (|message|)
 
 function Enter (|bool|)
 	require stderr.ok and .ShouldEnter
+	app.clearcaches
 	.Perry = process.parent
 	if .perry.isopen
 		.CompileAndGiveFeedBack

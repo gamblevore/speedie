@@ -179,8 +179,8 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 
 	if (CB > C.B) {
 		C.B = CB;
-		C.Suffixes				= (int*)realloc(C.Suffixes,	2*ChunkLength*sizeof(int)); // dict
-		C.SortPositionAtByte	= (int*)realloc(C.SortPositionAtByte,	ChunkLength*sizeof(int));
+		C.Suffixes				= (int*)JB_realloc(C.Suffixes,	2*ChunkLength*sizeof(int)); // dict
+		C.SortPositionAtByte	= (int*)JB_realloc(C.SortPositionAtByte,	ChunkLength*sizeof(int));
 	}
 
 	C.Expected			= Total;
@@ -646,7 +646,7 @@ struct BalzComp {
 
 static BalzComp* BB;
 static BalzComp* GetComp(FastString* out, int N=0) {
-	if (!BB) BB = new BalzComp; 
+	if (!BB) BB = (BalzComp*)JB_zalloc(sizeof(BalzComp)); 
 	BB->Reset();
 	if (N) {
 		BB->output = JB_FS_WriteAlloc_(out, N);
@@ -656,9 +656,11 @@ static BalzComp* GetComp(FastString* out, int N=0) {
 	return BB;
 }
 
-extern "C" void JB_BALZ_Clear() {
-	delete BB;
-	BB = nil;
+extern "C" void JB_App__ClearCaches(int which) {
+	JB_unalloc((void**)&BB);
+	JB_unalloc((void**)&sigh.Suffixes);
+	JB_unalloc((void**)&sigh.SortPositionAtByte);
+	sigh.B = 0;
 }
 
 extern "C" int JB_BALZ_CompressChunk(FastString* fs, JB_String* In, bool Strong) {
