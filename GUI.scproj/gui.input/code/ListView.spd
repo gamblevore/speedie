@@ -343,7 +343,6 @@ class ListView (GUIControl) {
 		rz.gnormal.edge = .gnormal.edge
 		(rz is editable)
 		rz.size = the~width by (.rowheight+2)~down
-		.window.setinnerfocus(rz)
 	
 	
 	behaviour TypedString
@@ -355,9 +354,10 @@ class ListView (GUIControl) {
 
 	helper UpdateFilter (|bool|)
 		opt norefcounts
-		(.OnTypingFilter)(self, nil, .typingfilter.text?)
-		.touch
-		return true
+		if .OnTypingFilter
+			(.OnTypingFilter)(self, nil, .typingfilter.text?)
+			.touch
+			return true
 	
 	
 	behaviour KeyDown

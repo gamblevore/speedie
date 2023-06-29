@@ -280,5 +280,6 @@ class ButtonView (GUIControl)
 		if .MouseIsDown
 			.window.CurrMouseDown = m // right?
 		|| x = .XOfItem(row)
+		m.stopfilter
 		m.ShowCmm(self, 0, x)
 		return true
