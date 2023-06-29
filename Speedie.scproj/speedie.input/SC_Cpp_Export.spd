@@ -592,29 +592,29 @@ extern \"C\" JB_String* JB_App__LibFuncs(void*** Funcs) {
 	return JB_StrCN(JB_LibFuncInfo, ${s.length});
 }
 "
-	
+
 
 function ExportModuleProperties (|SCModule| modl, |FastStringCpp| IntoModule)
 	|| fs = IntoModule ?? .TypesProj
 
-	for prop in modl.ListProperties
-		if prop is Const
-			if IntoModule: Continue
-
-			WriteConst( prop, fs )
-		  elseif prop.TypeIsReached
-			if !IntoModule
-				fs <~ "extern "
-			  elseif prop is api
-				fs <~ "__lib__ " 
-
-			if IntoModule and prop is GameFlyingMem
-				prop.stringdata.replaceall("$(N)", prop.name, fs)
-			  else
-				WriteDecl( prop, fs, nil )
-			fs <~ ';'
-		
-		fs <~ '\n'
+	for prop.vars in modl
+		if prop
+			if prop is Const
+				if IntoModule: Continue
+	
+				WriteConst( prop, fs )
+			  elseif prop.TypeIsReached
+				if !IntoModule
+					fs <~ "extern "
+				  elseif prop is api
+					fs <~ "__lib__ " 
+	
+				if IntoModule and prop is GameFlyingMem
+					prop.stringdata.replaceall("$(N)", prop.name, fs)
+				  else
+					WriteDecl( prop, fs, nil )
+				fs <~ ';'
+			fs <~ '\n'
 
 
 

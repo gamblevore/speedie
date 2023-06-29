@@ -592,7 +592,8 @@ function ImportAll
 
 	.Stage( "Building Function Link Map" )
 	for f in .FuncList
-		f.PostTransform // removed some func-calls...
+		f.PostTransform
+		
 
 
 function LoadInits

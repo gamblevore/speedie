@@ -1342,13 +1342,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1875])
+#define kJB__ErrorColors_bold (JB_LUB[1877])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1876])
-#define kJB__ErrorColors_good (JB_LUB[1877])
-#define kJB__ErrorColors_normal (JB_LUB[1878])
-#define kJB__ErrorColors_underline (JB_LUB[1877])
-#define kJB__ErrorColors_warn (JB_LUB[1879])
+#define kJB__ErrorColors_error (JB_LUB[1878])
+#define kJB__ErrorColors_good (JB_LUB[1879])
+#define kJB__ErrorColors_normal (JB_LUB[1880])
+#define kJB__ErrorColors_underline (JB_LUB[1879])
+#define kJB__ErrorColors_warn (JB_LUB[1881])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1525,7 +1525,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[354])
 #define kSC_BitNot (JB_LUB[616])
 #define kSC_BitOr (JB_LUB[558])
-#define kSC_BitXor (JB_LUB[1880])
+#define kSC_BitXor (JB_LUB[1882])
 #define kSC_CastedMatch (6 << 22)
 #define kSC_destructornotfromlocalrefs (1024)
 #define kSC_DontSaveProperty (0)
@@ -1557,7 +1557,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1881])
+#define kJB_SaverStart1 (JB_LUB[1883])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1 << 22)
@@ -5235,6 +5235,8 @@ DTWrap* JB_Wrap__New(_voidptr p);
 // JB_DictionaryReader
 inline bool JB_DictionaryReader_SyntaxCast(DictionaryReader* self);
 
+SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
+
 
 
 // JB_ErrorList
@@ -5732,6 +5734,8 @@ void JB_SCObject_destructor(SCObject* self);
 SCFunction* SC_SCObject_Disambiguate(SCObject* self, Message* src);
 
 JB_String* SC_SCObject_Display(SCObject* self, bool exact);
+
+void SC_SCObject_DoLinkFrom(SCObject* self, SCBase* B);
 
 SCObject* SC_SCObject_NextDisplay(SCObject* self, bool exact);
 
@@ -6580,8 +6584,6 @@ void JB_Base_destructor(SCBase* self);
 
 Message* SC_Base_DiissplayObj(SCBase* self, Message* rz);
 
-void SC_Base_DoLinkFrom(SCBase* self, SCBase* B);
-
 Message* SC_Base_FindCppWrapper(SCBase* self, Message* place, bool isclass);
 
 bool SC_Base_FindVis(SCBase* self, Message* c);
@@ -7010,6 +7012,8 @@ void JB_Msg_Acc__(Message* self, FastString* fs);
 Message* JB_Msg_AccessAdd(Message* self, JB_String* key);
 
 void JB_Msg_CantFind(Message* self, Syntax s, JB_String* name, Message* found);
+
+bool SC_Msg_ACInIsa(Message* self);
 
 void SC_Msg_AddBefore(Message* self, Message* before, Message* NewItem);
 
@@ -8474,10 +8478,6 @@ bool SC_Mod_IsMArray(SCModule* self, Message* arr);
 
 bool SC_Mod_IsProperModule(SCModule* self);
 
-Array* SC_Mod_ListProperties(SCModule* self);
-
-Array* SC_Mod_ListVars(SCModule* self, bool NoFuncs);
-
 void SC_Mod_LoadInitFunc(SCModule* self);
 
 void SC_Mod_LoadInitFuncSub(SCModule* self, Message* init, JB_String* name);
@@ -8780,7 +8780,7 @@ inline void SC_Msg_NilCheckProperty(Message* self, SCNilLister* nel) {
 	}
 	NilState u = ObjDecl->NilUsed;
 	if ((!(SC_NilState_SyntaxIs(u, kJB__NilState_Exists)))) {
-		JB_Msg_SyntaxExpect(self, JB_LUB[1586]);
+		JB_Msg_SyntaxExpect(self, JB_LUB[1588]);
 		JB_Decr(ObjDecl);
 		return;
 	}

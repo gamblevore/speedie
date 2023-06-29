@@ -12,7 +12,7 @@
 * gonext/prev needs rework
 * extra error is being added (first? is being saved? for some good reason but too enthusiastic)
 * add image editor... using qoi format. Remove png from speedie!
-* https://www.reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
+* reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 	* game-like IDE. Break functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order... Something that can't just be commented out.
 * TextView error/find resync
@@ -35,3 +35,6 @@
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
 * galaxxies C++ compile issues
+* finding .func in "|| x = "abc".func" would need change to how decls are collected... 
+	* Add decl.nextdecl (for contains) to store ALL init decls list... leave them in place. InitFuncs get copies.
+* autocomplete in iterators using the yield_test func would be nice.

@@ -71,5 +71,5 @@ function document.addviewer (|guicontrol| g)
 		.viewers <~ documentviewer(g)
 	if g isa textview
 		|| c = .current
-			g.UseState(c,  self,  DocumentState.InitialSet)
+			g.UseState(c,  self,  c.typingplace, DocumentState.InitialSet)
 

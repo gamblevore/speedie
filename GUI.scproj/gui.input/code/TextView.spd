@@ -269,9 +269,6 @@ class TextView (GUIControl)
 		.CanAutoComplete = false
 		.autocompletestring = ""
 		.UncorrectedSel = result
-		|| u = .undoer
-			|| c = u.current
-				c.typingplace = result
 		return true
 
 	helper TypingPlaceTry (|intrange| result, |bool|insert, |textviewline| d)
@@ -1145,6 +1142,9 @@ class TextView (GUIControl)
 		if Same
 			.TypingPlaceTry(UpdatedSel, true, nil)
 		  else
+			|| u = .undoer
+				|| c = u.current
+					c.typingplace = p
 			.CanAutoComplete = false
 			.AutoCompleteString = ""
 			|| t = .text

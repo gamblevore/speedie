@@ -819,8 +819,7 @@ function CountCallsToParentAlloc (|Message| root, |message|)
 
 
 function CollectLinks (|object| obj)
-	require obj
-	
+	opt norefcounts
 	if obj isa SCFunction
 		.DoLinkTo( obj )
 		obj.DoLinkFrom( self )
@@ -828,8 +827,8 @@ function CollectLinks (|object| obj)
 	  elseif obj isa SCDecl
 		if obj.type
 			.DoLinkTo( obj.type )
-		if obj.IsLookupOnly
-			.CollectLinks( obj.IsLookupOnly )
+		|| t = obj.IsLookupOnly
+			.CollectLinks( t )
 		
 	  elseif obj isa SCClass
 		.DoLinkTo( obj )
@@ -1102,7 +1101,7 @@ function DoLinkTo (|SCBase| B)
 	b.StoreLinkToMe(.linkto)
 
 
-function scbase.DoLinkFrom (|SCBase| B)
+function scobject.DoLinkFrom (|SCBase| B)
 	B.StoreLinkToMe(.linkfrom)
 
 

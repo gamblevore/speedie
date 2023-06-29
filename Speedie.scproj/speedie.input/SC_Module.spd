@@ -66,22 +66,24 @@ function SCDecl.PrefixedName (|SCModule| M, |string|)
 
 function RenameVars // decl.name, .declfix, .fixname, .declname
 	// Goes through our properties/constants and renames them!
-	for (decl in .ListVars)
-		if (!decl.IsLookupOnly)
-			decl.name = decl.PrefixedName(self)
+	for decl.vars in self
+		if Decl
+			decl.name = decl.PrefixedName(self)	
 
 
-function ListProperties (|[SCDecl]|)
-	return .listvars(true)
+
+iterator Vars
+	|| d = .access.navigate
+	while d.MoveNext
+		yield d.ValueDecl
 
 
-function ListVars (|bool| NoFuncs = false, |[SCDecl]|)
-// turn this into an iterator... :)
-	for o in .access
-		if o isa SCDecl
-			if NoFuncs and o.IsLookupOnly
-				Continue
-			rz <~ o
+function dictionaryreader.ValueDecl (|scdecl|)
+	opt norefcounts
+	|| t = .value
+	if t isa scdecl
+		if !t.IsLookupOnly
+			return t
 
 
 function IsProject (|bool|)
@@ -98,13 +100,11 @@ function BaseDecls
 	CollectDecls( .source, self, self, 1 ) // right?
 
 
-
 function FillDisposeFunc
 	|| Arg = .DisposeFunc$.SourceArg
-	for decl in .ListVars
-		if !decl.IsLookupOnly and (decl Isnt Const)
-			if (!decl.C_array)
-				arg <~ NewRel(decl.name, "=", "nil")
+	for decl.vars in self
+		if decl and (decl Isnt Const) and (!decl.C_array)
+			arg <~ NewRel(decl.name, "=", "nil")
 
 
 function AddModuleToFunc (|SCBase| space)
@@ -182,4 +182,3 @@ module
 		Compiler.program.TryAdd( nil, rz, s )
 
 }
-

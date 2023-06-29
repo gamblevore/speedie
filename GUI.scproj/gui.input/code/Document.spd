@@ -187,7 +187,7 @@ class Document (RingTree)
 		|| a = .current$
 		for it in .viewers
 			if it isa textview
-				it.UseState(a,  self,  Reason)
+				it.UseState(a,  self,  a.typingplace, Reason)
 
 
 	function UpdateSavedState 
@@ -309,11 +309,15 @@ extend TextView
 		opt norefcounts
 		|| u = .undoer$
 		|| m = u.ExpectCurr$
+		|| pos = m.TypingPlace.xx
+		
 		m = m.step(!undo)		#expect beep
+		if undo
+			pos = m.TypingPlace
 		u.current = m
 		
 		if .text != m.text
-			.usestate(m, u, DocumentState.UndoOrRedo)
+			.usestate(m, u, pos, DocumentState.UndoOrRedo)
 
 
 	function UpdateModState (|document| D, |int| reason)
@@ -325,13 +329,13 @@ extend TextView
 		(.OnTextChanged)(self, Reason, ismod)?
 
 
-	function UseState (|DocumentState| L,  |document| D,  |int| Reason)
+	function UseState (|DocumentState| L,  |document| D,  |ivec2| ty,   |int| Reason)
 		require .parent
 		.UndoChecker = -1
 		if reason == DocumentState.UndoOrRedo
-			.ViewPos(l.typingplace.x)
+			.ViewPos(ty.x)
 		.Clear(l.text, reason<0)
-		.TypingPlaceTry( l.typingplace, true, nil)
+		.TypingPlaceTry( ty, true, nil)
 
 		.GuessExpectsParse
 		|| pos = d.ScrollPos

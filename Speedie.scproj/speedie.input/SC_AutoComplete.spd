@@ -445,7 +445,7 @@ function GetScope (|message| orig, |&int| types, |scbase|)
 	
 	if orig.acInIsa
 		* types = 1
-		return compiler.program // right????
+		return compiler.program
 	if arg
 		return arg
 	if orig.IsTypeOfDecl
