@@ -82,12 +82,3 @@ You can install "Perry" (the IDE), on Ubuntu on Windows. You will need libsdl2-d
 LibSDL2 has [install instructions](https://wiki.libsdl.org/SDL2/Installation). Gedit can be installed simply: `sudo apt install gedit`
 
 
-
-# Sponsors #
-
-Currently sponsored by:
-
-* [@breck7](http://pd.pub) He is working on many projects including pd.pub, Scroll, Ohayo, and Music Of A People.
-* [@randonautica](https://randonautica.com/) Explore the world in a new way, and increase mystery.
-
-
