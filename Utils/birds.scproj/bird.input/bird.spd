@@ -12,7 +12,7 @@ class Bird (guicontrol)
 		.yspeed = 0
 		.lastjump = 0
 		.died = 0
-		.size =  40~up for 10  by  0~before for 10
+		.size = 0~before for 10 by -100~before for 10
 		is clickthrough
 
 
@@ -26,7 +26,7 @@ class Bird (guicontrol)
 	function GameStep (|pipeowner| pp, |bool|)
 		opt norefcounts
 		
-		|| b = .bottom
+		|| b = .absbottom - pp.absBottom
 		|| y = .yspeed
 		if (y > 0) and keys.space
 			y *= 1.44
@@ -36,11 +36,11 @@ class Bird (guicontrol)
 		if b <= 0 and .yspeed <= 0 // bounces
 			.yspeed *= -0.5
 			b = -b
-		  elseif .top >= pp.top and .yspeed > 0
+		  elseif .abstop >= pp.abstop and .yspeed > 0
 			.yspeed = -.yspeed
-			b = pp.top - (.height+1)
+			b = pp.abstop - (.height+1)
 
-		.size = 0~after for 10 by (b)~up for 10
+		.size = 0~before for 10 by (-b)~before for 10
 		
 		if !.died
 			|| p = pp.controlat(self, -2, true)
