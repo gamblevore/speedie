@@ -178,17 +178,12 @@ class GUIControl (ringtree)
 		return self contains .window.MouseIsOver
 	
 	
-	helper DrawOne (|image| where)
-		where.ControlClip = self
-		.__Draw__(Where)
-
-	
 	helper DrawChildren (|image| where, |guicontrol| avoid=nil)
 		opt norefcounts
 		for R in self							// .last gets drawn last, so .last is actually the "front".
 			if (r!=avoid) and R.isviewable
-//				where.Clip()
-				r.DrawOne(Where)
+				where.ControlClip = .LastRect.clip(r.LastRect)
+				r.__Draw__(Where) 
 				if r.hasany
 					r.drawchildren(where, avoid)
 
@@ -398,6 +393,6 @@ helper image.ControlClip (assigns:|GuiControl| G)
 
 function image.Window (assigns:|window| W)
 	|| s = w.LastRect
-	.base = s.xy
+	.windowbase = s.xy
 	.ControlClip = s.Soothe
 

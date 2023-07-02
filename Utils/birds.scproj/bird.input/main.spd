@@ -2,4 +2,4 @@
 
 main // main {
 	BirdWindow()
-	sdlapp.RunAndQuit
+	sdlapp.RunAndQuit((800,600))

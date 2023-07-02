@@ -1,6 +1,5 @@
 
 
-// add clouds with temporal height... :O
 
 class Bird (guicontrol)
 	|float|			YSpeed
@@ -12,7 +11,6 @@ class Bird (guicontrol)
 		.yspeed = 0
 		.lastjump = 0
 		.died = 0
-		.size = 0~before for 10 by -100~before for 10
 		is clickthrough
 
 
@@ -40,7 +38,7 @@ class Bird (guicontrol)
 			.yspeed = -.yspeed
 			b = pp.abstop - (.height+1)
 
-		.size = 0~before for 10 by (-b)~before for 10
+		.size = (-10)~before for 10 by (-b)~before for 10
 		
 		if !.died
 			|| p = pp.controlat(self, -2, true)

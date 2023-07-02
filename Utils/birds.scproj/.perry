@@ -1,0 +1,5 @@
+roots
+	"@spd/Library/library.input/"
+	"@spd/jeebox.scproj/jeebox.input/"
+	"@spd/GUI.scproj/gui.input/"
+

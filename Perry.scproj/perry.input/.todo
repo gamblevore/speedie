@@ -16,16 +16,6 @@
 * too long text in listview draw as much as we can
 
 
-// Perry much later
-* add image editor... using qoi format. Remove png from speedie!
-* reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
-* skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
-	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order...  that can't just be commented out.
-* double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
-* Find-replace?
-	* syntactic-mode also
-
-
 // Speedie Do later
 * RefOpts. Do it bit by bit
 	* get property but only did math
@@ -41,3 +31,13 @@
 * finding .func in "|| x = "abc".func" would need change to how decls are collected... 
 	* Add decl.nextdecl (for contains) to store ALL init decls list... leave them in place. InitFuncs get copies.
 * autocomplete in iterators using the yield_test func would be nice.
+
+
+// Perry additions
+* add image editor... using qoi format. Remove png from speedie!
+* reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
+* skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
+	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order...  that can't just be commented out.
+* double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
+* Find-replace?
+	* syntactic-mode also

@@ -6,7 +6,7 @@ class Image (memory)
 		cpp_part Img
 		opt min 3
 	|ivec2|			WH
-	|ivec2|			Base
+	|ivec2|			WindowBase
 	|ivec4|			_ControlClip
 	|string|		Name
 	contains byte
@@ -34,7 +34,7 @@ class Image (memory)
 		cpp_part ControlClipSet4
 		|| sigh = (0, 0, .wh)
 		// what if R is too big?
-		|| b = .base.xyxy
+		|| b = .WindowBase.xyxy
 		r += b
 		r = r.clip(sigh)
 		r -= b
@@ -59,12 +59,12 @@ class Image (memory)
 	
 	function whset (|ivec2| wh)
 		.wh = wh
-		.base = (0,0)
+		.WindowBase = (0,0)
 		._ControlClip = (0,0,wh)
 	
 	function whset
 		cpp_Part resetarea
-		.base = (0,0)
+		.WindowBase = (0,0)
 		._ControlClip = (0,0,.wh)
 	
 	
@@ -146,7 +146,7 @@ class Image (memory)
 	syntax access (|ivec2| P, |&ImagePixel|)
 		cpp_part AtXY
 		// We want to add something to x, then check x vs
-		P += .base
+		P += .windowbase
 		|| S = .wh
 		rz = .pixels
 		ifn p inrange s

@@ -160,7 +160,6 @@ class Window (GUIControl)
 													// missing keydown events send typedstring events
 		
 
-
 	behaviour KeyDown
 		debug_require !.BlockRecurseKeyDown
 		.BlockRecurseKeyDown = true
@@ -228,7 +227,8 @@ class Window (GUIControl)
 		.realfocus.drawfocus(where)
 		
 		if menu.isviewable
-			menu.DrawOne(Where)
+			where.ControlClip = menu
+			menu.__Draw__(Where)
 			menu.drawchildren(where)
 		
 		where.ControlClip = self
