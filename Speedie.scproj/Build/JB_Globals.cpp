@@ -562,15 +562,15 @@ StringFields_Behaviour InitTableStringFields_() { // Behaviour
 StringFields_Behaviour StringFields_FuncTable_ = InitTableStringFields_();
 JBClassPlace4(StringFields, JB_AsClass(JB_Object), StringFields_FuncTable_);
 
-StringStream_Behaviour InitTableStringStream_() { // Behaviour 
-	StringStream_Behaviour Result;
+StringReader_Behaviour InitTableStringReader_() { // Behaviour 
+	StringReader_Behaviour Result;
 	Result.__destructor__ = (void*)JB_SS_destructor;
 	Result.render = (__Object_Render__)JB_ObjRender;
 	return Result;
 }
 
-StringStream_Behaviour StringStream_FuncTable_ = InitTableStringStream_();
-JBClassPlace4(StringStream, JB_AsClass(JB_Object), StringStream_FuncTable_);
+StringReader_Behaviour StringReader_FuncTable_ = InitTableStringReader_();
+JBClassPlace4(StringReader, JB_AsClass(JB_Object), StringReader_FuncTable_);
 
 SyntaxObj_Behaviour InitTableSyntaxObj_() { // Behaviour 
 	SyntaxObj_Behaviour Result;

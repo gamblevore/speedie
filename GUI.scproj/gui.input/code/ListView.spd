@@ -371,6 +371,9 @@ class ListView (GUIControl) {
 		if .KeyDownTest(key) or (.OnKeydown)(self, key)?
 			.editdelayed = nil
 			return true
+		if (keys.cmd and !key.iscmd) and .typingfilter
+			return .typingfilter.__keydown__(key)
+			
 			
 			
 	helper KeyDownTest (|keys| key, |bool|)
@@ -932,8 +935,7 @@ class ListView (GUIControl) {
 
 	function SelectAll (|bool|)
 		opt norefcounts
-		.selectshift(.start, .end)
-		return true
+		return .selectshift(.start, .end)
 
 
 	function SelectFirst (|bool|)
@@ -943,7 +945,7 @@ class ListView (GUIControl) {
 		return true
 
 
-	function SelectShift (|ListViewrow| l, |ListViewrow| m)
+	function SelectShift (|ListViewrow| l, |ListViewrow| m, |bool|)
 		opt norefcounts
 		expect (l and m) (Beep)
 		expect (.multiselection) (Beep)
@@ -960,6 +962,7 @@ class ListView (GUIControl) {
 
 		if modified
 			.SelChangeEvent( (m, nil)(i), all )
+		return true
 
 
 	function SelectMove (|int| i, |bool| Multi=keys.shift)

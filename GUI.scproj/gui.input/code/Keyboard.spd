@@ -175,6 +175,9 @@ dataType Keys (int) {
 
 	function IsOption (|bool|)
 		return self is lalt or ralt
+	
+	function IsCmd (|bool|)
+		return self is lgui or rgui
 		
 	syntax access (|bool|)
 		return keys.has(self)

@@ -2239,7 +2239,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[157], (110629281176765)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[157], (110645424856749)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3542,7 +3542,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[241]);
-	JB_FS_AppendInt32(_fsf0, (2023062921));
+	JB_FS_AppendInt32(_fsf0, (2023070217));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7375,7 +7375,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[508]);
-	JB_FS_AppendInt32(_fsf0, (2023062921));
+	JB_FS_AppendInt32(_fsf0, (2023070217));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -15525,6 +15525,7 @@ bool JB_CP_IsWhite(Codepoint self) {
 
 
 
+
 int JB_TC__Shift(DataTypeCode self) {
 	return (self >> 4) & 3;
 }
@@ -20982,7 +20983,7 @@ bool JB_Flow_Cond(FlowControl* self, byte value) {
 	//;
 	//visible;
 	JB_Flow_AddByte(self, value);
-	StringStream* r = self->ReadInput;
+	StringReader* r = self->ReadInput;
 	if (r == nil) {
 		return true;
 	}
@@ -21173,7 +21174,7 @@ void JB_Flow__Input(JB_String* data, JB_String* name) {
 	}
 	JB__Flow_Disabled = 1;
 	FlowControl* f = JB__Flow_Flow;
-	StringStream* r = f->ReadInput;
+	StringReader* r = f->ReadInput;
 	if (r != nil) {
 		JB_String* str = JB_Incr(JB_SS_Str(r, JB_Str_Length(data), 0));
 		if ((!JB_Str_Equals(str, data, false))) {
@@ -23912,7 +23913,7 @@ JB_String* JB_Str_Compress(JB_String* self, int Strength, CompressionStats* st) 
 }
 
 void JB_Str_CompressInto(JB_String* self, JB_Object* fs, int Strength, CompressionStats* st) {
-	StringStream* _tmPf0 = JB_Incr(JB_Str_Stream(self));
+	StringReader* _tmPf0 = JB_Incr(JB_Str_Stream(self));
 	JB_SS_CompressInto(_tmPf0, fs, Strength, st);
 	JB_Decr(_tmPf0);
 }
@@ -24009,7 +24010,7 @@ ErrorInt SC_Str_DebugExecute(JB_String* self, Array* Args, FastString* Out, Fast
 }
 
 JB_String* JB_Str_Decompress(JB_String* self, int lim, CompressionStats* st) {
-	StringStream* _tmPf0 = JB_Incr(JB_Str_Stream(self));
+	StringReader* _tmPf0 = JB_Incr(JB_Str_Stream(self));
 	JB_String* _tmPf1 = JB_Incr(JB_SS_Decompress(_tmPf0, lim, st, true));
 	JB_Decr(_tmPf0);
 	JB_SafeDecr(_tmPf1);
@@ -24621,7 +24622,7 @@ Message* JB_Str_Parse(JB_String* self, Syntax owner, bool AllowDecomp) {
 }
 
 Message* JB_Str_parse_jbin(JB_String* self) {
-	StringStream* _tmPf0 = JB_Incr(JB_Str_Stream(self));
+	StringReader* _tmPf0 = JB_Incr(JB_Str_Stream(self));
 	Message* _tmPf1 = JB_Incr(JB_SS_Parse_Jbin(_tmPf0));
 	JB_Decr(_tmPf0);
 	JB_SafeDecr(_tmPf1);
@@ -24869,7 +24870,7 @@ JB_String* JB_Str_Squeeze(JB_String* self) {
 	return _tmPf3;
 }
 
-StringStream* JB_Str_Stream(JB_String* self) {
+StringReader* JB_Str_Stream(JB_String* self) {
 	return JB_SS__New(self);
 }
 
@@ -25148,7 +25149,7 @@ StringFields* JB_FI__New(JB_String* Source, byte Sep) {
 }
 
 
-int JB_SS_Byte(StringStream* self) {
+int JB_SS_Byte(StringReader* self) {
 	if ((!(JB_FastBuff_OperatorHas((&self->Data), 1)))) {
 		if ((!JB_SS_NextChunk(self))) {
 			return -1;
@@ -25157,7 +25158,7 @@ int JB_SS_Byte(StringStream* self) {
 	return JB_FastBuff_Byte((&self->Data));
 }
 
-void JB_SS_CompressInto(StringStream* self, JB_Object* dest, int Strength, CompressionStats* st) {
+void JB_SS_CompressInto(StringReader* self, JB_Object* dest, int Strength, CompressionStats* st) {
 	if ((!(self != nil))) {
 		JB_Str_SyntaxExpect(JB_LUB[1383]);
 		return;
@@ -25200,7 +25201,7 @@ void JB_SS_CompressInto(StringStream* self, JB_Object* dest, int Strength, Compr
 	JB_Decr(j);
 }
 
-void JB_SS_Constructor(StringStream* self, JB_String* Data) {
+void JB_SS_Constructor(StringReader* self, JB_String* Data) {
 	JB_Incr(Data);
 	self->Data = ((FastBuff){});
 	self->File = nil;
@@ -25217,7 +25218,7 @@ void JB_SS_Constructor(StringStream* self, JB_String* Data) {
 	self->_NoMoreChunks = true;
 }
 
-JB_String* JB_SS_Decompress(StringStream* self, int lim, CompressionStats* st, bool Multi) {
+JB_String* JB_SS_Decompress(StringReader* self, int lim, CompressionStats* st, bool Multi) {
 	FastString* fs = JB_Incr(JB_FS__New());
 	while (JB_SS_HasAny(self)) {
 		if ((!JB_SS_DecompressInto(self, fs, lim, st))) {
@@ -25234,7 +25235,7 @@ JB_String* JB_SS_Decompress(StringStream* self, int lim, CompressionStats* st, b
 	return _tmPf0;
 }
 
-bool JB_SS_DecompressInto(StringStream* self, JB_Object* dest, int lim, CompressionStats* st) {
+bool JB_SS_DecompressInto(StringReader* self, JB_Object* dest, int lim, CompressionStats* st) {
 	if ((!(self != nil))) {
 		JB_Str_SyntaxExpect(JB_LUB[1383]);
 		return nil;
@@ -25331,19 +25332,19 @@ bool JB_SS_DecompressInto(StringStream* self, JB_Object* dest, int lim, Compress
 	return JB_ErrorMarker_SyntaxCast(OK);
 }
 
-void JB_SS_destructor(StringStream* self) {
+void JB_SS_destructor(StringReader* self) {
 	JB_FastBuff_destructor((&self->Data));
 	JB_Clear(self->File);
 }
 
-int JB_SS_DetectJBinType(StringStream* self) {
+int JB_SS_DetectJBinType(StringReader* self) {
 	JB_String* _tmPf0 = JB_Incr(JB_SS_Str(self, 4, 0));
 	int _tmPf1 = JB_Str_IsJbin(_tmPf0);
 	JB_Decr(_tmPf0);
 	return _tmPf1;
 }
 
-bool JB_SS_HasAny(StringStream* self) {
+bool JB_SS_HasAny(StringReader* self) {
 	if ((!(self != nil))) {
 		return nil;
 	}
@@ -25353,7 +25354,7 @@ bool JB_SS_HasAny(StringStream* self) {
 	return JB_SS_NextChunk(self);
 }
 
-int64 JB_SS_hInt(StringStream* self) {
+int64 JB_SS_hInt(StringReader* self) {
 	int sh = 0;
 	int v = 0;
 	while (true) {
@@ -25374,14 +25375,14 @@ int64 JB_SS_hInt(StringStream* self) {
 	return 0;
 }
 
-bool JB_SS_IsCompressed(StringStream* self) {
+bool JB_SS_IsCompressed(StringReader* self) {
 	JB_String* str = JB_Incr(JB_SS_StrNoAdvance(self, 16, 0));
 	bool _tmPf0 = JB_Str_IsCompressed(str);
 	JB_Decr(str);
 	return _tmPf0;
 }
 
-bool JB_SS_NextChunk(StringStream* self) {
+bool JB_SS_NextChunk(StringReader* self) {
 	if (JB_File_SyntaxCast(self->File)) {
 		self->StartFrom = (self->StartFrom + JB_FastBuff_Size((&self->Data)));
 		if (JB_SS_ReadChunk(self)) {
@@ -25392,11 +25393,11 @@ bool JB_SS_NextChunk(StringStream* self) {
 	return false;
 }
 
-Message* JB_SS_NextMsg(StringStream* self) {
+Message* JB_SS_NextMsg(StringReader* self) {
 	return ((Message*)JB_SS_NextMsgInfo(self, false));
 }
 
-Message* JB_SS_NextMsgExpect(StringStream* self, Message* parent, Syntax fn, JB_String* name) {
+Message* JB_SS_NextMsgExpect(StringReader* self, Message* parent, Syntax fn, JB_String* name) {
 	Message* rz = nil;
 	rz = JB_SS_NextMsg(self);
 	if ((!rz)) {
@@ -25409,7 +25410,7 @@ Message* JB_SS_NextMsgExpect(StringStream* self, Message* parent, Syntax fn, JB_
 	return rz;
 }
 
-uint64 JB_SS_NextMsgInfo(StringStream* self, bool CanDecomp) {
+uint64 JB_SS_NextMsgInfo(StringReader* self, bool CanDecomp) {
 	while (true) {
 		uint info = JB_SS_Byte(self);
 		if (((bool)(info & 128))) {
@@ -25453,7 +25454,7 @@ uint64 JB_SS_NextMsgInfo(StringStream* self, bool CanDecomp) {
 	return 0;
 }
 
-void JB_SS_NextMsgLZ(StringStream* self, MessageDecompressor* D, uint Info) {
+void JB_SS_NextMsgLZ(StringReader* self, MessageDecompressor* D, uint Info) {
 	if (Info < 16) {
 		Info = (Info | (JB_SS_hInt(self) << 4));
 	}
@@ -25474,7 +25475,7 @@ void JB_SS_NextMsgLZ(StringStream* self, MessageDecompressor* D, uint Info) {
 	}
 }
 
-bool JB_SS_NoMoreChunks(StringStream* self) {
+bool JB_SS_NoMoreChunks(StringReader* self) {
 	if (self->_NoMoreChunks) {
 		return true;
 	}
@@ -25489,7 +25490,7 @@ bool JB_SS_NoMoreChunks(StringStream* self) {
 	return false;
 }
 
-Message* JB_SS_Parse_Jbin(StringStream* self) {
+Message* JB_SS_Parse_Jbin(StringReader* self) {
 	Message* rz = JB_Incr(((Message*)nil));
 	self->UserObj = nil;
 	int T = JB_SS_DetectJBinType(self);
@@ -25511,7 +25512,7 @@ Message* JB_SS_Parse_Jbin(StringStream* self) {
 	return rz;
 }
 
-Message* JB_SS_Parse_Jbliz(StringStream* self) {
+Message* JB_SS_Parse_Jbliz(StringReader* self) {
 	Message* rz = JB_Incr(((Message*)nil));
 	MessageDecompressor Decomp = ((MessageDecompressor){});
 	JB_SetRef(rz, ((Message*)JB_SS_NextMsgInfo(self, false)));
@@ -25535,19 +25536,19 @@ Message* JB_SS_Parse_Jbliz(StringStream* self) {
 	return rz;
 }
 
-int64 JB_SS_Position(StringStream* self) {
+int64 JB_SS_Position(StringReader* self) {
 	return JB_FastBuff_Position((&self->Data)) + self->StartFrom;
 }
 
-void JB_SS_PositionSet(StringStream* self, int64 Value) {
+void JB_SS_PositionSet(StringReader* self, int64 Value) {
 	(JB_FastBuff_PositionSet((&self->Data), Value - self->StartFrom));
 }
 
-JB_String* JB_SS_ReadAll(StringStream* self) {
+JB_String* JB_SS_ReadAll(StringReader* self) {
 	return JB_SS_Str(self, self->Length - self->StartFrom, 0);
 }
 
-bool JB_SS_ReadChunk(StringStream* self) {
+bool JB_SS_ReadChunk(StringReader* self) {
 	JB_String* _tmPf0 = JB_Incr(JB_File_Read(self->File, self->ChunkSize, true));
 	(JB_FastBuff_ReadFromSet((&self->Data), _tmPf0));
 	JB_Decr(_tmPf0);
@@ -25557,11 +25558,11 @@ bool JB_SS_ReadChunk(StringStream* self) {
 	return JB_Str_Exists((&self->Data)->ReadFrom);
 }
 
-int JB_SS_Remaining(StringStream* self) {
+int JB_SS_Remaining(StringReader* self) {
 	return self->Length - JB_SS_Position(self);
 }
 
-JB_String* JB_SS_Str(StringStream* self, int n, int skip) {
+JB_String* JB_SS_Str(StringReader* self, int n, int skip) {
 	if ((!((n > 0) and (skip < n)))) {
 		return JB_LUB[0];
 	}
@@ -25596,7 +25597,7 @@ JB_String* JB_SS_Str(StringStream* self, int n, int skip) {
 	return r;
 }
 
-JB_String* JB_SS_StrNoAdvance(StringStream* self, int n, int skip) {
+JB_String* JB_SS_StrNoAdvance(StringReader* self, int n, int skip) {
 	JB_String* rz = JB_Incr(JB_LUB[0]);
 	int64 p = JB_SS_Position(self);
 	JB_SetRef(rz, JB_SS_Str(self, n, 0));
@@ -25605,7 +25606,7 @@ JB_String* JB_SS_StrNoAdvance(StringStream* self, int n, int skip) {
 	return rz;
 }
 
-void JB_SS_SyntaxExpect(StringStream* self, JB_String* Error) {
+void JB_SS_SyntaxExpect(StringReader* self, JB_String* Error) {
 	self->UserObj = nil;
 	if ((&self->Data)->ErrorReported) {
 		return;
@@ -25622,13 +25623,13 @@ void JB_SS_SyntaxExpect(StringStream* self, JB_String* Error) {
 	JB_Rec_NewErrorWithNode(JB_StdErr, nil, Error, self->File);
 }
 
-StringStream* JB_SS__Alloc() {
-	return ((StringStream*)JB_New(StringStream));
+StringReader* JB_SS__Alloc() {
+	return ((StringReader*)JB_New(StringReader));
 }
 
-StringStream* JB_SS__New(JB_String* Data) {
+StringReader* JB_SS__New(JB_String* Data) {
 	//;
-	StringStream* __rz__ = ((StringStream*)JB_SS__Alloc());
+	StringReader* __rz__ = ((StringReader*)JB_SS__Alloc());
 	if (__rz__) {
 		JB_SS_Constructor(__rz__, Data);
 	}
@@ -46628,4 +46629,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -9095121591392952140 -8551937039652887387
+// -1372292045821771921 4792302308722284638

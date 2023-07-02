@@ -39,6 +39,8 @@ extern "C" {
 
 typedef uint Codepoint;
 
+typedef byte ControlClipMode;
+
 typedef ivec2 ControlLine;
 
 typedef int ControlPoint;
@@ -257,7 +259,7 @@ struct ShellStream_Behaviour;
 
 struct StringFields_Behaviour;
 
-struct StringStream_Behaviour;
+struct StringReader_Behaviour;
 
 struct String_Behaviour;
 
@@ -383,7 +385,7 @@ struct Selector;
 
 struct StringFields;
 
-struct StringStream;
+struct StringReader;
 
 struct SyntaxObj;
 
@@ -712,7 +714,7 @@ struct FlowControl_Behaviour: Object_Behaviour {
 
 JBClass ( FlowControl , JB_Object , 
 	FastBuff Buff;
-	StringStream* ReadInput;
+	StringReader* ReadInput;
 	FastString* Write;
 	FastString* Excuse;
 );
@@ -899,10 +901,10 @@ JBClass ( StringFields , JB_Object ,
 	byte Sep;
 );
 
-struct StringStream_Behaviour: Object_Behaviour {
+struct StringReader_Behaviour: Object_Behaviour {
 };
 
-JBClass ( StringStream , JB_Object , 
+JBClass ( StringReader , JB_Object , 
 	int Length;
 	FastBuff Data;
 	JB_File* File;
@@ -1733,6 +1735,10 @@ extern JB_String* JB__zalgo_up;
 #define kJB__uint16_max (65535)
 #define kJB__uint16_min (0)
 #define kJB__uint64_max (-1)
+#define kJB__ControlClipMode_debug (4)
+#define kJB__ControlClipMode_LargestFlag (7)
+#define kJB__ControlClipMode_slidebackinparent (1)
+#define kJB__ControlClipMode_slidebackinwindow (2)
 #define kJB__CL1_After (6)
 #define kJB__CL1_Before (4)
 #define kJB__CL1_Centered (7)
@@ -1740,8 +1746,6 @@ extern JB_String* JB__zalgo_up;
 #define kJB__CL1_Length (10)
 #define kJB__CL1_Low (0)
 #define kJB__CL1_Percent (8)
-#define kJB__CL1_SlideBackInParent (1)
-#define kJB__CL1_SlideBackInWindow (2)
 #define kJB__TC_atomic_byte (0 + (8 + 4))
 #define kJB__TC_atomic_int (0 + (32 + (64 + (0 + (8 + 4)))))
 #define kJB__TC_atomic_int64 (0 + (48 + (64 + (0 + (8 + 4)))))
@@ -3868,6 +3872,9 @@ bool JB_CP_IsWhite(Codepoint self);
 
 
 
+// ControlClipMode
+
+
 // ControlLine
 
 
@@ -4832,7 +4839,7 @@ void SC_asdas2_hhh(asdas2* self);
 // JB_StringFields_Behaviour
 
 
-// JB_StringStream_Behaviour
+// JB_StringReader_Behaviour
 
 
 // JB_String_Behaviour
@@ -6077,7 +6084,7 @@ Array* JB_Str_Split(JB_String* self, byte sep);
 
 JB_String* JB_Str_Squeeze(JB_String* self);
 
-StringStream* JB_Str_Stream(JB_String* self);
+StringReader* JB_Str_Stream(JB_String* self);
 
 JB_String* JB_Str_SyntaxAccess(JB_String* self, JB_String* s);
 
@@ -6146,62 +6153,62 @@ StringFields* JB_FI__New(JB_String* Source, byte Sep);
 
 
 
-// JB_StringStream
-int JB_SS_Byte(StringStream* self);
+// JB_StringReader
+int JB_SS_Byte(StringReader* self);
 
-void JB_SS_CompressInto(StringStream* self, JB_Object* dest, int Strength, CompressionStats* st);
+void JB_SS_CompressInto(StringReader* self, JB_Object* dest, int Strength, CompressionStats* st);
 
-void JB_SS_Constructor(StringStream* self, JB_String* Data);
+void JB_SS_Constructor(StringReader* self, JB_String* Data);
 
-JB_String* JB_SS_Decompress(StringStream* self, int lim, CompressionStats* st, bool Multi);
+JB_String* JB_SS_Decompress(StringReader* self, int lim, CompressionStats* st, bool Multi);
 
-bool JB_SS_DecompressInto(StringStream* self, JB_Object* dest, int lim, CompressionStats* st);
+bool JB_SS_DecompressInto(StringReader* self, JB_Object* dest, int lim, CompressionStats* st);
 
-void JB_SS_destructor(StringStream* self);
+void JB_SS_destructor(StringReader* self);
 
-int JB_SS_DetectJBinType(StringStream* self);
+int JB_SS_DetectJBinType(StringReader* self);
 
-bool JB_SS_HasAny(StringStream* self);
+bool JB_SS_HasAny(StringReader* self);
 
-int64 JB_SS_hInt(StringStream* self);
+int64 JB_SS_hInt(StringReader* self);
 
-bool JB_SS_IsCompressed(StringStream* self);
+bool JB_SS_IsCompressed(StringReader* self);
 
-bool JB_SS_NextChunk(StringStream* self);
+bool JB_SS_NextChunk(StringReader* self);
 
-Message* JB_SS_NextMsg(StringStream* self);
+Message* JB_SS_NextMsg(StringReader* self);
 
-Message* JB_SS_NextMsgExpect(StringStream* self, Message* parent, Syntax fn, JB_String* name);
+Message* JB_SS_NextMsgExpect(StringReader* self, Message* parent, Syntax fn, JB_String* name);
 
-uint64 JB_SS_NextMsgInfo(StringStream* self, bool CanDecomp);
+uint64 JB_SS_NextMsgInfo(StringReader* self, bool CanDecomp);
 
-void JB_SS_NextMsgLZ(StringStream* self, MessageDecompressor* D, uint Info);
+void JB_SS_NextMsgLZ(StringReader* self, MessageDecompressor* D, uint Info);
 
-bool JB_SS_NoMoreChunks(StringStream* self);
+bool JB_SS_NoMoreChunks(StringReader* self);
 
-Message* JB_SS_Parse_Jbin(StringStream* self);
+Message* JB_SS_Parse_Jbin(StringReader* self);
 
-Message* JB_SS_Parse_Jbliz(StringStream* self);
+Message* JB_SS_Parse_Jbliz(StringReader* self);
 
-int64 JB_SS_Position(StringStream* self);
+int64 JB_SS_Position(StringReader* self);
 
-void JB_SS_PositionSet(StringStream* self, int64 Value);
+void JB_SS_PositionSet(StringReader* self, int64 Value);
 
-JB_String* JB_SS_ReadAll(StringStream* self);
+JB_String* JB_SS_ReadAll(StringReader* self);
 
-bool JB_SS_ReadChunk(StringStream* self);
+bool JB_SS_ReadChunk(StringReader* self);
 
-int JB_SS_Remaining(StringStream* self);
+int JB_SS_Remaining(StringReader* self);
 
-JB_String* JB_SS_Str(StringStream* self, int n, int skip);
+JB_String* JB_SS_Str(StringReader* self, int n, int skip);
 
-JB_String* JB_SS_StrNoAdvance(StringStream* self, int n, int skip);
+JB_String* JB_SS_StrNoAdvance(StringReader* self, int n, int skip);
 
-void JB_SS_SyntaxExpect(StringStream* self, JB_String* Error);
+void JB_SS_SyntaxExpect(StringReader* self, JB_String* Error);
 
-StringStream* JB_SS__Alloc();
+StringReader* JB_SS__Alloc();
 
-StringStream* JB_SS__New(JB_String* Data);
+StringReader* JB_SS__New(JB_String* Data);
 
 
 
