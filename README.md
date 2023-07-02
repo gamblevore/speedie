@@ -1,6 +1,6 @@
 
 # Speedie - Fun is the main goal #
-## Beautiful, Object Oriented, Simple, Fast, Nice-Looking, Non-Infantilising ##
+## Beautiful, Object Oriented, Simple, Fast, Expressive, Non-Infantilising ##
 
 * `Creator:` [@gamblevore](http://github.com/gamblevore/)
 * `Contact:` [theo@jeebox.org](mailto:theo@jeebox.org)
