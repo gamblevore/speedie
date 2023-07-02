@@ -9,18 +9,18 @@
 
 
 // Perry Do later
-* gonext/prev needs rework
+* gonext/prev needs rework (find paths)
+* First use of tab (in func) or () (to wrap) on opening perry doesn't work.
 * extra error is being added (first? is being saved? for some good reason but too enthusiastic)
 * add image editor... using qoi format. Remove png from speedie!
 * reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
-	* game-like IDE. Break functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order... Something that can't just be commented out.
+	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order...  that can't just be commented out.
 * TextView error/find resync
 * double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
 * Find-replace?
 	* syntactic-mode also
 * too long text in listview draw as much as we can
-* First use of tab (in func) or () (to wrap) on opening perry doesn't work.
 
 
 // Speedie Do later

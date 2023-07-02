@@ -21,7 +21,7 @@ extend string
 		return .stream.Decompress(lim, st)
 
 
-function stringstream.Decompress (|int|lim=256MB, |&compressionstats| st=nil, |bool| Multi=true,  |StringThatWasReadSafely|)
+function StringReader.Decompress (|int|lim=256MB, |&compressionstats| st=nil, |bool| Multi=true,  |StringThatWasReadSafely|)
 	|| fs = faststring()
 	while .hasany
 		if !.Decompressinto(fs, lim, st)
@@ -30,7 +30,7 @@ function stringstream.Decompress (|int|lim=256MB, |&compressionstats| st=nil, |b
 	return fs
 
 
-function Stringstream.IsCompressed (|bool|)
+function StringReader.IsCompressed (|bool|)
 	|| str = .StrNoAdvance(16)
 	return str.IsCompressed	
 

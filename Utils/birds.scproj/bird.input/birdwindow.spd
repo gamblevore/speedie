@@ -13,7 +13,9 @@ class BirdWindow (Window)
 	constructor
 		.NoDrawBackground = true	
 		.pipes = guicontrol(self)
+		.pipes.GNormal.edge = (1.0,1.0,1.0,1.0)
 		.player = bird(self)
+		.Player.id = "bird"
 		.pipes.size = 414~wide by 256~high
 		.pipes.id = "pipeowner"
 		.player.gnormal.solid = (0.8, 0.8, 0.1, 1.0)

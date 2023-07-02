@@ -143,18 +143,18 @@ role JBin (Faststring)
 		.NoFlush--
 
 
-function stringstream.NextMsg (|Message|)
+function StringReader.NextMsg (|Message|)
 	return .NextMsgInfo|message|
 
 
-function stringstream.NextMsg (|message| parent=nil, |syntax| fn, |string| name=nil,  |Message|)
+function StringReader.NextMsg (|message| parent=nil, |syntax| fn, |string| name=nil,  |Message|)
 	cpp_part NextMsgExpect
 	opt norefcounts
 	rz = .NextMsg #require
 	expect (rz.expect(fn, name) and (rz.parent == parent)) (rz)
 
 
-helper stringstream.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
+helper StringReader.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
 	opt norefcounts
 	while
 		|uint| info = .Byte
@@ -179,7 +179,7 @@ helper stringstream.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
 			require .userobj
 
 	
-helper stringstream.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
+helper StringReader.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
 	opt norefcounts
 	if Info < 16
 		Info |= .hInt << 4
@@ -195,7 +195,7 @@ helper stringstream.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
 		.UserObj = msg
 
 
-helper stringstream.Parse_Jbliz (|MessageRoot|)
+helper StringReader.Parse_Jbliz (|MessageRoot|)
 	|MessageDecompressor| Decomp
 	rz = .NextMsginfo|messageroot|
 	Decomp <~ rz|message|
@@ -207,11 +207,11 @@ helper stringstream.Parse_Jbliz (|MessageRoot|)
 			loop Decomp <~ msg|message|
 
 
-function stringstream.DetectJBinType (|int|)
+function StringReader.DetectJBinType (|int|)
 	return .str(4).IsJbin
 	
 	
-function stringstream.Parse_Jbin (|MessageRoot|)	
+function StringReader.Parse_Jbin (|MessageRoot|)	
 	.UserObj = nil
 	|| T = .DetectJBinType
 	if T == 1

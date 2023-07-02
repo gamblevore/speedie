@@ -1,5 +1,7 @@
 
 
+// add clouds with temporal height... :O
+
 class Bird (guicontrol)
 	|float|			YSpeed
 	|uint|			LastJump
@@ -10,7 +12,7 @@ class Bird (guicontrol)
 		.yspeed = 0
 		.lastjump = 0
 		.died = 0
-		.size =  40~up for 10  by  100~right for 10
+		.size =  40~up for 10  by  0~before for 10
 		is clickthrough
 
 

@@ -8,7 +8,7 @@
 class FlowControl
 	linkage:cpp_part Flow
 	|FastBuff|				Buff
-	|stringstream|			ReadInput
+	|StringReader|			ReadInput
 	|faststring| 			Write
 	|Faststring| 			Excuse
 
@@ -155,7 +155,7 @@ class FlowControl
 
 			.disabled = 1
 			|flowcontrol--| f = .flow
-			|stringstream--| r = f.ReadInput
+			|StringReader--| r = f.ReadInput
 			if r != nil
 				|| str = r.str(data.length)
 				if str != data

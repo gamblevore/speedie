@@ -1,6 +1,6 @@
 
 
-class StringStream
+class StringReader
 	|int|					Length
 	|FastBuff|				Data
 	|file|					File
@@ -206,13 +206,13 @@ class StringStream
 
 
 	
-function string.Stream (|string| Header, |StringStream|)
+function string.Stream (|string| Header, |stringreader|)
 	cpp_part StreamWithHeader
-	rz = stringstream(self)
+	rz = StringReader(self)
 	if !rz.test(Header)
 		rz = nil
 
 	
-function string.Stream (|StringStream|)
-	return stringstream(self)
+function string.Stream (|StringReader|)
+	return StringReader(self)
 

@@ -379,10 +379,10 @@ class File (String)
 		rz.file = f
 
 	
-	function string.In (|string|Header="", |int| ChunkSize=4MB, |StringStream|)
+	function string.In (|string|Header="", |int| ChunkSize=4MB, |StringReader|)
 		|| f = .file
 		if f.mustexist("stream")
-			rz = stringstream(f, chunkSize)
+			rz = StringReader(f, chunkSize)
 			if !rz.test(Header)
 				rz = nil
 	

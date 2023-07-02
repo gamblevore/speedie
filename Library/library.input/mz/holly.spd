@@ -6,7 +6,7 @@
 struct HollyPlanter
 	linkage
 		cpp_part HRV
-	|stringstream|	Input 
+	|StringReader|	Input 
 	|message|		Name
 	|message|		Strings
 	|message| 		Types
@@ -17,7 +17,7 @@ struct HollyPlanter
 	constants
 		MaxOneByte = 255-(32+16)
 	
-	function Collect (|stringstream|)
+	function Collect (|StringReader|)
 		.Table   = []
 		require .input.DetectJBinType // oof
 		.name    = .input.nextmsg(@tmp, "ћ")
@@ -28,7 +28,7 @@ struct HollyPlanter
 		
 		return .types.name.Stream
 
-	function IDGen (|stringstream| S,  |stringstream| T,  |stringstream| L)
+	function IDGen (|StringReader| S,  |StringReader| T,  |StringReader| L)
 		opt norefcounts
 		|| IDCount = T.hint							#require
 		.table <~ (messageID("", @nil, 0), IDCount)
@@ -76,7 +76,7 @@ struct HollyPlanter
 			.IDGen(.strings.DecompressStream, types, .lengths.DecompressStream)
 			rz = .MakeTree
 	
-	function stringstream.ReviveJbin (|message|)
+	function StringReader.ReviveJbin (|message|)
 		|HollyPlanter| sq
 		sq.input = self
 		return sq.decode
@@ -191,7 +191,7 @@ struct HollyPotter
 				printline "Holly Tested OK: " + input
 				
 
-helper message.DecompressStream (|stringstream|)
+helper message.DecompressStream (|StringReader|)
 	if self == @bin
 		return .name.decompress(int.max).Stream()
 	  else
