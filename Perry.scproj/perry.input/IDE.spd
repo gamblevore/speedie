@@ -475,7 +475,7 @@ class PerryIDE (Window)
 				clickedCreateproj(self)
 			return true
 		if key is d
-			if keys.option
+			if keys.option or keys.Shift
 				RightClickNext(.goprev)
 				return .goprev.searchmenu
 			  else

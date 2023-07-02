@@ -65,9 +65,9 @@ class ButtonView (GUIControl)
 		|| prev = (nil, c)(always)
 
 		if left
-			(.onclicked|GUIAction|)(self, C, prev)?
+			(.onclicked)(self, C, prev)?
 		  else
-			(.onrightclick|GUIAction|)(self, C, prev)?
+			(.onrightclick)(self, C, prev)?
 
 
 	setter Selected (|ListViewRow|)

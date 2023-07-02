@@ -160,6 +160,12 @@ class GUIControl (ringtree)
 			sdlapp.resized(self)
 
 	
+	function touch
+		opt norefcounts
+		sdlapp.touch(self) // why wasnt this here before?
+		(.window is modified)
+
+	
 	setter Visible (|bool|)
 		(self is visible) = value
 

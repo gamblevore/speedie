@@ -642,17 +642,6 @@ class ListView (GUIControl) {
 		return true
 	
 	
-	function Touch
-		opt norefcounts
-		// .list.Touch // waha?
-		super.touch
-
-
-	function guicontrol.touch
-		opt norefcounts
-		sdlapp.touch(self) // why wasnt this here before?
-		(.window is modified)
-	
 	function ClearInternalDrops
 		.DraggingRowTo = nil
 		.CommandSelectRow = nil
