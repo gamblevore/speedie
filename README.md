@@ -7,6 +7,7 @@
 * `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 * `Released`: New Years Eve 2022  (31/12/2022)
 * `Platforms`: MacOSX Intel • Apple Silicon (ARM) • Linux (Ubuntu) • MS Windows (via [WSL](https://learn.microsoft.com/en-us/windows/wsl/install))
+* `Sponsor`: [Please Sponsor Speedie](https://github.com/sponsors/gamblevore) If you love my vision, please sponsor speedie. I am  struggling without sponsors. Its not going to be possible to complete without sponsors. I hate begging as I have pride, but there are so many people out there with money they could give. Just think about what is the amount you could give and be happy with that.
 
 
 # General Features #
@@ -79,14 +80,5 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 You can install "Perry" (the IDE), on Ubuntu on Windows. You will need libsdl2-dev and `gedit`. (gedit will drag along some GUI libs that Perry needs.)
 
 LibSDL2 has [install instructions](https://wiki.libsdl.org/SDL2/Installation). Gedit can be installed simply: `sudo apt install gedit`
-
-
-
-# Sponsors #
-
-Currently sponsored by:
-
-* [@breck7](http://pd.pub) He is working on many projects including pd.pub, Scroll, Ohayo, and Music Of A People.
-* [@randonautica](https://randonautica.com/) Explore the world in a new way, and increase mystery.
 
 
