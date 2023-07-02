@@ -382,7 +382,7 @@ extend PerryIDE
 			.ID = "AllFuncsMenu"
 			.onselected = PerryFuncMenuSelected
 			.ontypingfilter = PerryFuncListFilter
-			.clipmode |= controlclipmode.debug
+			//.clipmode |= controlclipmode.debug
 
 		with .currfilename.submenu
 			isnt drawsfocus

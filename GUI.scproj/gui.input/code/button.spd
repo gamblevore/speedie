@@ -274,8 +274,13 @@ class ButtonView (GUIControl)
 		.sizer.g(2)	= (w) ~ long
 
 
+	function SearchMenu (|listviewrow| row=nil, |bool|)
+		if .openmenu(row)
+			return .submenu.typedstring("")
+
+
 	function OpenMenu (|listviewrow| row=nil, |bool|)
-		|| m = .submenu			#require
+		|| m = .submenu						#require
 		expect m.listsource.hasany (beep)
 		if .MouseIsDown
 			.window.CurrMouseDown = m // right?

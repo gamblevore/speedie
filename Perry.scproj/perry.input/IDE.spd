@@ -475,8 +475,11 @@ class PerryIDE (Window)
 				clickedCreateproj(self)
 			return true
 		if key is d
-			.FunctionMenu.Click
-			.FunctionMenu.TypedString("")
+			if keys.option
+				RightClickNext(.goprev)
+				return .goprev.searchmenu
+			  else
+				return .FunctionMenu.SearchMenu
 		if key is b
 			Clickedcompile(.buildbutton)
 			return true

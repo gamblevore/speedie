@@ -263,7 +263,7 @@ class ListView (GUIControl) {
 	
 	
 	function sib (|ListViewrow|r, |ListViewrow|)
-		return .Hiernext(r) ?? .Hierprev(r)
+		return .HierNext(r) ?? .hierPrev(r)
 	
 	
 	function CheckRemoved (|ListViewrow|r)
@@ -352,6 +352,7 @@ class ListView (GUIControl) {
 			t.TypedString(input)
 			return .UpdateFilter
 
+
 	helper UpdateFilter (|bool|)
 		opt norefcounts
 		require .OnTypingFilter
@@ -360,7 +361,8 @@ class ListView (GUIControl) {
 		if .TypingFilter
 			if self isa menu
 				.Sizer.g(1) = .DesiredHeight~long
-				
+		if .selectablecount == 1
+			.SelectFirst
 		return true
 	
 	
@@ -459,7 +461,7 @@ class ListView (GUIControl) {
 			rz <~ s
 	
 	
-	function IsEmpty (|bool|)
+	function IsEmpty (|bool|) // similar: hasany, rowcount
 		return !.listsource.hasany
 	
 	
@@ -686,6 +688,12 @@ class ListView (GUIControl) {
 		for f.listsel in self 
 			RZ++
 
+	function SelectableCount (|int|)
+		opt norefcounts
+		for f.all in self 
+			if f isnt disabled
+				rz++
+
 
 	function DelayedRename (|ListViewCell| i)
 		.EditDelayed = i
@@ -811,7 +819,7 @@ class ListView (GUIControl) {
 		rz = (.end, .start)(i > 0)
 		if selectable
 			while rz and rz is disabled
-				rz = rz.step(i < 0)
+				rz = rz.step(i <= 0)
 		
 	function Start (|ListViewrow|)
 		return .listsource.first 
@@ -823,10 +831,10 @@ class ListView (GUIControl) {
 		if l != root // compare to .list? instead?
 			(l is expanded) // might as well
 		return l.hiernext(.listsource) ?? .start
-	function hierNext (|ListViewrow| l, |ListViewRow|)
+	function HierNext (|ListViewrow| l, |ListViewRow|)
 		if l
 			return (l.hiernext(.listsource), l.next)(.istree)
-	function hierPrev (|ListViewrow| l, |ListViewrow|)
+	function HierPrev (|ListViewrow| l, |ListViewrow|)
 		if l
 			return (l.hierprev(.listsource), l.prev)(.istree)
 	function HierStep (|ListViewrow| l, |bool|fwd, |ListViewrow|)
@@ -930,7 +938,8 @@ class ListView (GUIControl) {
 
 	function SelectFirst (|bool|)
 		opt norefcounts
-		.select(.start)
+		
+		.select(.edge(-1, true))
 		return true
 
 
@@ -1344,30 +1353,6 @@ class ListView (GUIControl) {
 			rem -= .rowheight
 		.scrollshift = rem
 		return !rem
-
-
-// this is difficult... no matter which approach I take... it is difficult.
-
-/*
-approach 1:
-	Ask the listview via func pointer... to refill the data. Seems OK? why did I say no?
-	
-	I think because we need to reimplement this for each filterer... and I want this in multiple places!
-
-
-approach 2:
-	Do the filtering ourself?
-	We need to store our own version of the data. This becomes a problem.
-
-	
-approach 3:
-	Draw it filtered... this has many issues. Filtering isn't perfect! What if we want a title per group...
-	We can't do that if we do it per-item.
-
-
-I think if we want the best filtering, we need to ask for it. We could create a standard filterer. Its not too hard.
-*/
-
 
 
 	behaviour Draw
