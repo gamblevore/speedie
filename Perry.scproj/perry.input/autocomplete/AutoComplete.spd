@@ -107,7 +107,7 @@ function PerryIDE.ClearAutoComplete
 
 function PerryIDE.ShowAuto (|bool| beep)
 	if .autocomplete.listsource.hasany
-		.autocomplete.Showcmm(self, .AutoPoint.y-.bottom, .AutoPoint.x)
+		.autocomplete.Showcmm(self, .AutoPoint.y-.absbottom, .AutoPoint.x)
 		(.autocomplete is typethrough)
 	  else
 		if beep

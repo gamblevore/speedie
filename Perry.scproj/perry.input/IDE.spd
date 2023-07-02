@@ -474,11 +474,11 @@ class PerryIDE (Window)
 			  else
 				clickedCreateproj(self)
 			return true
+		if key is d
+			.FunctionMenu.Click
+			.FunctionMenu.TypedString("")
 		if key is b
 			Clickedcompile(.buildbutton)
-			return true
-		if key is t // todo
-			.view(.viewfiles)
 			return true
 		if key is s
 			if .editme is visible
@@ -490,7 +490,7 @@ class PerryIDE (Window)
 		if key is num9
 			.EditSep.Flip
 			return true
-		if key is d or l				// l=line jump
+		if key is l				// l=line jump
 			return .filelist.showquickopen
 
 

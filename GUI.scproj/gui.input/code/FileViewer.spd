@@ -43,7 +43,7 @@ class FileViewer (ListView)
 			is enabled
 			is editable
 			isnt visible
-			.clipmode		= ControlPoint.SlideBackInWindow
+			.clipmode		= ControlClipMode.SlideBackInWindow
 			.ID				= "quickopen"
 			.size 			= 400~wide by 15~high
 			.OnKeyDown		= QuickOpenKey
@@ -61,7 +61,7 @@ class FileViewer (ListView)
 			is unsearchable
 			isnt editable
 			isnt visible
-			.clipmode		= ControlPoint.SlideBackInWindow
+			.clipmode		= ControlClipMode.SlideBackInWindow
 			.onealwaysselected = true
 			.ID				= "listopen"
 			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)

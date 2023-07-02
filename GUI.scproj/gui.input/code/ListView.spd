@@ -143,7 +143,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| m = .cmm	
 			m.EditingRow = r
-			m.ShowCmm(self, (y-1) - .bottom)
+			m.ShowCmm(self, (y-1) - .absbottom)
 
 
 	function DesiredHeight (|int|)
@@ -198,7 +198,7 @@ class ListView (GUIControl) {
 			.cmm.listsource.clear
 			return .cmm
 		|| m = menu(self, nil, nil)
-		m.clipmode = ControlPoint.SlideBackInWindow
+		m.clipmode = ControlClipMode.SlideBackInWindow
 		.cmm = m
 		m.id = "cmm"
 		return m
@@ -218,7 +218,7 @@ class ListView (GUIControl) {
 				.Select(r)
 			|| c = .onrightclick 
 			if c and (c)(self, r)
-				.openmenu(r, y - .bottom, r)
+				.openmenu(r, y - .absbottom, r)
 	
 
 	function MenuForSelRow
@@ -226,7 +226,7 @@ class ListView (GUIControl) {
 		.showfast(sels)
 		|| y = .DrawYRow(sels)
 		if .onrightclick and (.onrightclick)(self, sels)
-			.openmenu(sels, y - .bottom, sels)
+			.openmenu(sels, y - .absbottom, sels)
 		
 	
 	function DoReturn (|bool|)
@@ -354,10 +354,14 @@ class ListView (GUIControl) {
 
 	helper UpdateFilter (|bool|)
 		opt norefcounts
-		if .OnTypingFilter
-			(.OnTypingFilter)(self, nil, .typingfilter.text?)
-			.touch
-			return true
+		require .OnTypingFilter
+		(.OnTypingFilter)(self, nil, .typingfilter.text?)
+		.touch
+		if .TypingFilter
+			if self isa menu
+				.Sizer.g(1) = .DesiredHeight~long
+				
+		return true
 	
 	
 	behaviour KeyDown
@@ -738,12 +742,12 @@ class ListView (GUIControl) {
 				WantsTo = i
 			  else
 				WantsTo = .listsource
-				|| top = .top
-				if (p.y+p2.y > .top)
+				|| top = .abstop
+				if (p.y+p2.y > .abstop)
 					WantsTo = .bmove(._scroll, -1)
 					.ScrollByRows(-1)
 					
-				  elseif (p.y-p2.y < .bottom)
+				  elseif (p.y-p2.y < .absbottom)
 					.ScrollByRows(1)
 			
 			if .draggingrowFrom and (WantsTo and .CanDrawDrag(Wantsto))
@@ -1078,7 +1082,7 @@ class ListView (GUIControl) {
 	
 		
 	function Contains (|int| Y,  |ivec2| Search,  |bool|)
-		|| Srch = (.left,  y - .RowHeight,  .right,  y)
+		|| Srch = (.absleft,  y - .RowHeight,  .right,  y)
 		return Srch.contains(Search)
 	
 	
@@ -1108,9 +1112,9 @@ class ListView (GUIControl) {
 	
 	helper FindClickedMenu (|int| y, |ListViewRow|)
 		opt norefcounts
-		if y <= .bottom
+		if y <= .absbottom
 			return .bmove(.LastVisible, 1)
-		if y > .top
+		if y > .abstop
 			return .bmove(._scroll, -1)
 		return .FindClickedCell((0,y)).row
 	
@@ -1235,8 +1239,8 @@ class ListView (GUIControl) {
 		if rz
 			rz.horz = .col(cell.column, rz, sc)
 			rz.x += sc.depth(self) * font.width*2
-			rz = rz down .bottom
-			rz = rz left .left
+			rz = rz down .absbottom
+			rz = rz left .absleft
 
 
 	helper DrawBordersSub (|image| Where,  |ivec4| Rect)
@@ -1294,7 +1298,7 @@ class ListView (GUIControl) {
 
 
 	helper ScrollSlide (|int|)
-		|| y	= .top
+		|| y	= .abstop
 		|| shl	= .scrollshift
 		if !shl or .ScrollPixelsSub(0)
 			return 0
@@ -1415,8 +1419,8 @@ I think if we want the best filtering, we need to ask for it. We could create a 
 		opt norefcounts
 		require .AttachedToParent
 		|| p = .parent
-		rz |= (.top > p.top) * 8
-		rz |= (.bottom < p.bottom) * 4
+		rz |= (.abstop > p.abstop) * 8
+		rz |= (.absbottom < p.absbottom) * 4
 		if rz == 12
 			rz = 0
 		

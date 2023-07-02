@@ -4,7 +4,7 @@ class gamepipe (guicontrol)
 	behaviour Draw
 		|| r = .lastrect
 		|| r2 = r
-		if .bottom
+		if .Bottom.length > 5
 			r += (2, 10, -2,  0)
 			r2.y2 = r.y+1
 		  else
@@ -23,7 +23,7 @@ class gamepipe (guicontrol)
 role PipeOwner (guicontrol)
 	contains gamepipe
 	function Refill (|float| speed)
-		while self < 20
+		while self < 10
 			.addPair(speed)
 
 	function P (|string| s, |float| skip, |gamepipe|)

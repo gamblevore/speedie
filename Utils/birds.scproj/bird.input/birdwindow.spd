@@ -74,7 +74,7 @@ class BirdWindow (Window)
 		|| p = .pipes.first
 		.speed.Amount += 600th
 		.speed.Amount min= 2.5
-		|| x = p.relativeleft.length - .speed[]
+		|| x = p.left.length - .speed[]
 		if p.width + x > 0
 			p.left = (x)~right
 		  else
@@ -83,7 +83,7 @@ class BirdWindow (Window)
 			p.next.remove
 			p.remove
 			|| p2 = .pipes.first
-			p2.left = p2.left~right
+			p2.left = p2.left.length~after
 			.pipes.refill(.speed.Amount)
 	
 	

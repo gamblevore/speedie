@@ -219,7 +219,7 @@ extend PerryIDE
 			.ID				= "PopupDisplay"
 			.size 			= the~area
 			.takesfocus		= 0
-			.clipmode = ControlPoint.SlideBackInWindow
+			.clipmode = ControlClipMode.SlideBackInWindow
 			.expectsparse	= TextView.probablyjeebox
 			.gnormal.bg		<~ ((0.1, 0.3, 0.1, 1.0))
 			.gnormal.edge	<~ ((0.1, 0.3, 0.1, 0.5))
@@ -382,6 +382,7 @@ extend PerryIDE
 			.ID = "AllFuncsMenu"
 			.onselected = PerryFuncMenuSelected
 			.ontypingfilter = PerryFuncListFilter
+			.clipmode |= controlclipmode.debug
 
 		with .currfilename.submenu
 			isnt drawsfocus

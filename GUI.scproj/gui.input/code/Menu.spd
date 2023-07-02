@@ -12,7 +12,7 @@ class Menu (ListView)
 		isnt visible
 		.MultiSelection = false
 		.OnKeyDown = keys
-		.ClipMode = ControlPoint.SlideBackInWindow
+		.ClipMode = ControlClipMode.SlideBackInWindow
 		.StyleAsMenu
 
 

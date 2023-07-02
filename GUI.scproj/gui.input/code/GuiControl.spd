@@ -14,7 +14,7 @@ class GUIControl (ringtree)
 	|GUIAction|					OnClicked
 	|GUIAction|					OnFocus
 	|ControlSize|				Sizer
-	|controlpoint|				ClipMode
+	|ControlClipMode|			ClipMode
 	|GuiControlFlags|			State
 	|TakesFocusFlag|			TakesFocus
 	|byte|						TextAlteredForDraw
@@ -181,6 +181,7 @@ class GUIControl (ringtree)
 		opt norefcounts
 		for R in self							// .last gets drawn last, so .last is actually the "front".
 			if (r!=avoid) and R.isviewable
+//				where.Clip()
 				r.DrawOne(Where)
 				if r.hasany
 					r.drawchildren(where, avoid)
@@ -286,11 +287,18 @@ class GUIControl (ringtree)
 		.size(2) = value
 	setter Top (|ControlPoint|)
 		.size(3) = value
-
-	function Left (|int|)
+		
+	function AbsBottom (|int|)
+		return .lastrect.y
+	function AbsLeft (|int|)
 		return .lastrect.x
-	function RelativeLeft (|controlpoint|)
+	function AbsTop (|int|)
+		return .lastrect.y2
+
+	function Left (|controlpoint|)
 		return .sizer.GSize[0]|controlpoint|
+	function Bottom (|controlpoint|)
+		return .sizer.GSize[1]|controlpoint|
 	setter After (|int|)
 		.sizer.g(0) = (value)~after
 
@@ -300,13 +308,8 @@ class GUIControl (ringtree)
 	function Vert (|ivec2|)
 		return .lastrect.xx2
 
-	function Top (|int|)
-		return .lastrect.y2
 	setter Under (|int|)
 		.sizer.g(3) = (value)~under
-		
-	function Bottom (|int|)
-		return .lastrect.y
 
 	function HasFocus (|bool|)
 		opt norefcounts

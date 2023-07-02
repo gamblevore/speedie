@@ -121,8 +121,8 @@ class TextView (GUIControl)
 
 	helper LineAtY (|int| py, |textviewline|)
 		opt norefcounts
-		|| y = py max .bottom
-		|| Dist = .top - Y
+		|| y = py max .absbottom
+		|| Dist = .abstop - Y
 		|| L = Dist / .lineheight|int|
 		if dist < 0
 			l = -1
@@ -167,8 +167,8 @@ class TextView (GUIControl)
 		
 
 	helper XAdjust (|ivec2| p, |int|)
-		if p.y < .top
-			return p.x - (.left+.LineNumWidth*font.width+5)			
+		if p.y < .abstop
+			return p.x - (.absleft+.LineNumWidth*font.width+5)			
 		
 		
 	helper ByteAtXY (|ivec2| p, |&textviewline| d_, |ivec2|)
@@ -178,7 +178,7 @@ class TextView (GUIControl)
 			*d_ = d
 		if d
 			return .LastLineFix(d, .xadjust(p))
-		if p.y < .top
+		if p.y < .abstop
 			return (.text.length, 0)
 
 
@@ -1313,7 +1313,7 @@ class TextView (GUIControl)
 			.undoer.ClearTo(value)?
 		
 	function TextLeft (|int|)
-		return .left + 2 + .LineNumWidth*font.width
+		return .absleft + 2 + .LineNumWidth*font.width
 
 
 	helper DrawSel (|image| where)
@@ -1385,7 +1385,7 @@ class TextView (GUIControl)
 		|| d = .FindDrawInfo(pos, VLine)
 		require  d  and  vline >= 0  and  vline <= .maxvisiblelines
 		
-		|| y = .top - (VLine+1) * .lineheight|int|
+		|| y = .abstop - (VLine+1) * .lineheight|int|
 		|| x = d.XOfChar(pos) + font.width + .textleft // sigh
 		return (x-2, y-2)
 	
@@ -1453,14 +1453,14 @@ class TextView (GUIControl)
 		|| Base 	= 0
 		|| N		= .MaxVisibleLines
 		|| inl		= (.isinline != nil)
-		|| y		= ((.lineheight|int| - font.height) + .top) - inl
+		|| y		= ((.lineheight|int| - font.height) + .abstop) - inl
 		|| lc		= .LineNumColor
 		ifn self is editable
 			y += 2
 		ifn .isinline
 			y -= 2
 		y--
-		|| yen		= .bottom
+		|| yen		= .absbottom
 		|| UseCol	= .UseColorAnyway
 		while (y > yen) and (d)
 			y -= .LineHeight

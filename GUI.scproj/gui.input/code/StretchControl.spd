@@ -16,9 +16,6 @@ role StretchControl (GuiControl)
 		opt norefcounts
 		return !.div.ActiveEnd.length
 		
-	function GuiControl.PrintSizes
-		print .Sizer.GSize.Render + " : "
-
 	function Reset
 		opt norefcounts
 		.div.ActiveEnd = .div.start
@@ -108,7 +105,7 @@ class StretchDivider (GuiControl)
 	function InitDiv	
 		|| W = 3~before  for 6
 		if .collapsed
-			W = 0 ~ before for 4
+			W = 0~before for 4
 		|| H = W
 		if .d
 			W = the~width

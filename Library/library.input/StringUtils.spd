@@ -1,6 +1,6 @@
 
 
-function Print (|string| data)
+function Print (|string| data) // macro this too?
 	cpp_wrapper JB_Str_Print
 
 

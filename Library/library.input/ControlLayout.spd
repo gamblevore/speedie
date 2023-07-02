@@ -38,8 +38,23 @@ insertion
 datatype ControlRect (ivec4)
 	linkage:cpp_part CL4
 
-	function size (|ivec2|)
+	function AbsSize (|ivec2|)
 		return (.x2>>4, .y2>>4)
+	
+	function Width (|ControlLine|)
+		return (.x1, .x2)|ControlLine|
+	
+	function Height (|ControlLine|)
+		return (.y1, .y2)|ControlLine|
+	
+	render
+		self[0]|controlpoint|.AppendInto(fs)
+		fs <~ " to "
+		self[2]|controlpoint|.AppendInto(fs)
+		fs <~ " by "
+		self[1]|controlpoint|.AppendInto(fs)
+		fs <~ " to "
+		self[3]|controlpoint|.AppendInto(fs)
 
 
 function int.middleLayout (|controlline|)
@@ -98,7 +113,30 @@ datatype ControlPoint (int)
 			return self to the~top
 	function Layout (|int| value, |ControlPoint|)
 		return (self|int| (|) value<<4)|controlpoint|
-
+	
+	function AppendInto (|faststring| fs)
+		fs <~ .length
+		fs <~ "~"
+		
+		|| type = self|int| & 15
+		|| type1 = type &~ 1
+		if low|int| == type1
+			fs <~ "low"
+		  elseif high|int| == type1
+			fs <~ "high"
+		  elseif before|int| == type1
+			fs <~ "before"
+		  elseif after|int| == type1
+			fs <~ "after"
+		  elseif centered|int| == type
+			fs <~ "centered"
+		  elseif percent|int| == type
+			fs <~ "percent"
+		  elseif length|int| == type
+			fs <~ "length"
+		  else
+			fs <~ type
+		
 	constants
 		|ControlPoint|
 		Low		= 0
@@ -108,8 +146,15 @@ datatype ControlPoint (int)
 		Centered = 7
 		Percent = 8
 		Length	= 10
-		SlideBackInParent = 1
-		SlideBackInWindow = 2
+
+
+datatype ControlClipMode (byte) 
+	Flags
+		SlideBackInParent
+		SlideBackInWindow
+		Debug
+	syntax is (|controlclipmode| b, |bool|)
+		return (self & b) == b
 
 
 function ivec4.layout (|ControlRect|)
@@ -119,4 +164,4 @@ function int.operatorby (|int| h, |controlrect|)
 	return (self)~wide by (h)~high
 
 function int.syntaxcast (|controlpoint|)
-	return (self)~right
+	disabled "Do you mean '(amount)~long' ?"

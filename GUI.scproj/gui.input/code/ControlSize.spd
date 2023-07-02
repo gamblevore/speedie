@@ -45,7 +45,9 @@ struct ControlSize
 		.sizer.sett(2, value, ControlPoint.length)
 
 
-	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |controlpoint| ExtentMode, |ivec4|)
+	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |ControlClipMode| ClipMode, |ivec4|)
+		if clipmode is debug
+			printline "---------------"
 		|| pc = parent.size >> 1
 		for i in 4
 			|| m = .mode(i)
@@ -58,17 +60,75 @@ struct ControlSize
 				  elseif m == controlpoint.Centered
 					d = pc[i&1]
 				rz[i] = d + .Size(i)
+				if clipmode is debug
+					.PrintExplain(i, d, rz)
 			  elseif m == controlpoint.Percent
 				rz[i] = pc[i&1]|float| * (1.0/64K) * .size(i)
-
+				if clipmode is debug
+					.PrintExplain(i, 0, rz)
+		
 		for i in 4
 			if .mode(i) == ControlPoint.Length
-				rz[i] = rz[i xor 2] + ((i>=2) sign .size(i))
+				|| d = rz[i xor 2]
+				rz[i] = d + ((i>=2) sign .size(i))
+				if clipmode is debug
+					.PrintExplain(i, d, rz)
 		
-		if ExtentMode|int| & ControlPoint.SlideBackInParent|int|
-			rz = rz.Bound(parent)
+		if ClipMode & ControlClipMode.SlideBackInParent
+			|| rz2 = rz.Bound(parent)
+			if clipmode is debug
+				.ExplainBound(rz, rz2)
+			rz = rz2
 		
-		if ExtentMode|int| & ControlPoint.SlideBackInWindow|int|
-			rz = rz.Bound(window)
-			rz = rz.boundclip(window) // in case parent goes outside window
+		if ClipMode & ControlClipMode.SlideBackInWindow
+			|| rz2 = rz.Bound(window)
+			rz2 = rz2.boundclip(window) // in case parent goes outside window
+			if clipmode is debug
+				.ExplainBound(rz, rz2)
+			rz = rz2
+	
+	
+	function PrintExplain (|int| i, |int| New, |ivec4| rz)
+		|| fs = faststring()
+		.explain(i, new, rz, fs)
+		printline fs
+	
+	
+	function Explain (|int| i,  |int| New,  |ivec4| rz,  |faststring| fs)
+		|| m = .mode(i)
+
+		|int| d = (m&2) + (i&1)
+		fs <~ ".${ivec4.edgename(i)} (${rz[i]}) = "
+		if m ==	ControlPoint.Low or ControlPoint.High
+			fs <~ ".parent."
+		  elseif m == ControlPoint.Before or ControlPoint.After
+			fs <~ ".prev."
+		  elseif m == controlpoint.Centered
+			fs <~ ".parentcenter."
+		  elseif m == controlpoint.Percent
+			fs <~ "percent "
+		  elseif m == ControlPoint.Length
+			fs <~ "add "
+			d = d xor 2
 		
+		fs <~ "${ivec4.edgename(d)} ($new) + ${.Size(i)}"
+		
+
+	function ExplainBound (|ivec4| rz, |ivec4| rz2)
+		if rz != rz2
+			print rz.render
+			print " bounded to "
+			printline rz2.render
+
+
+function @ivec4.edgename (|int| i, |string|)
+	if i == 0
+		return "left"
+	if i == 1
+		return "bottom"
+	if i == 2
+		return "right"
+	if i == 3
+		return "top"
+		
+

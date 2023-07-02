@@ -237,7 +237,7 @@ class TextViewLine (ringtree)
 		|| Finish = .SquaresAtByte(R.x2 min M.x2)
 		require Finish > Start
 		
-		|| Y = parent.top - (vline+1) * parent.lineheight
+		|| Y = parent.abstop - (vline+1) * parent.lineheight
 		|| X = parent.TextLeft
 		|| n = font.Width
 		x += n - 2
