@@ -29,6 +29,8 @@ You'll see that it looks simple. But underneath that simplicity, is a huge amoun
 * Multi-root interface, in case your project relies on libs you created, and you want to edit those libs too.
 * Right-Click on any function or variable to see where it is defined, and even what other functions call it!
 * Hold control key (linux/windows) or command key (OSX) down, over any variable or function, to see how it is defined.
+* Function-List Menu, lists all functions in the current file and has a editable-filter to narrow down the func you are hunting for.
+* File-History Menu and buttons, lists all files previously viewed, or lets you skip forward/backward. The File-History is filterable.
 
 ## Great Care
 
