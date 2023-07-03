@@ -1,13 +1,13 @@
 
 # Speedie - Fun is the main goal #
-## Technical Qualities: Object Oriented, Simple, Fast, Nice-Looking, Non-Infantilising ##
+## Beautiful, Object Oriented, Simple, Fast, Expressive, Non-Infantilising ##
 
 * `Creator:` [@gamblevore](http://github.com/gamblevore/)
 * `Contact:` [theo@jeebox.org](mailto:theo@jeebox.org)
 * `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 * `Released`: New Years Eve 2022  (31/12/2022)
 * `Platforms`: MacOSX Intel • Apple Silicon (ARM) • Linux (Ubuntu) • MS Windows (via [WSL](https://learn.microsoft.com/en-us/windows/wsl/install))
-* `Sponsor`: [Please Sponsor Speedie](https://github.com/sponsors/gamblevore) If you love my vision, please sponsor speedie. I am  struggling without sponsors. Its not going to be possible to complete without sponsors. I hate begging as I have pride, but there are so many people out there with money they could give. Just think about what is the amount you could give and be happy with that.
+* `Sponsor ❤️`: If you love my vision, [Please Sponsor Speedie](https://github.com/sponsors/gamblevore). I am struggling without sponsors. Its not going to be possible to complete without sponsors. I hate begging as I have pride, but there are so many people out there with money they could give. Donate however much you feel happy giving. ❤️
 
 
 # General Features #

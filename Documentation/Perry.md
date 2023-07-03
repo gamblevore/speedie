@@ -6,7 +6,7 @@ Perry is designed with minimalism in mind, we won't blast your eyes with all sor
 
 In fact Perry goes out of it's way to hide clutter. Hopefully this will let you focus on the code more easily. Especially if you are new!
 
-The reason for creating my own IDE, is that I wanted full support for Speedie. I refuse to be a second-class citizen.
+I wanted full support for Speedie, and I refuse to be a second-class citizen. Thats what I created my own IDE.
 
 ![](perry.png)
 
@@ -29,6 +29,8 @@ You'll see that it looks simple. But underneath that simplicity, is a huge amoun
 * Multi-root interface, in case your project relies on libs you created, and you want to edit those libs too.
 * Right-Click on any function or variable to see where it is defined, and even what other functions call it!
 * Hold control key (linux/windows) or command key (OSX) down, over any variable or function, to see how it is defined.
+* Function-List Menu, lists all functions in the current file and has a editable-filter to narrow down the func you are hunting for.
+* File-History Menu and buttons, lists all files previously viewed, or lets you skip forward/backward. The File-History is filterable.
 
 ## Great Care
 
@@ -38,7 +40,7 @@ Each of these features was designed expertly and to a high degree of care. For e
 
 * The inbuilt todo list, is available by clicking on your current project's tab. Clicking again returns you. I find this invaluable for my project management. This means your todo-list is always at-hand. Really vital.
 
-* The quick file-finding feature, is accessed via Cmd-D (control-D on Linux). This brings up a list of files that contain the name. You can also paste file-paths in there, to see all the files in that folder.
+* The quick file-finding feature, is accessed via Cmd-L (control-L on Linux). This brings up a list of files that contain the name. You can also paste file-paths in there, to see all the files in that folder.
 
 
 
