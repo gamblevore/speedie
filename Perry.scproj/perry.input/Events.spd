@@ -386,11 +386,12 @@ function PerryIDE.MoveError (|error| row,  |string| p,  |int| i,  |error|)
 function PerryIDE.ClickedError (|error| row)
 	sdlapp.CompileStatus = row
 	require !.DuringMsgFB
-	|| f = row.path.file
-	if (row.path != .editme.path) and f.IsNicelyViewable
-		.GoToAnyFile(f)
-	.editme.ShowAndSel(row.position)
-	.editme.MyError = row
+	using self
+		|| f = row.path.file
+		if (row.path != .editme.path) and f.IsNicelyViewable
+			.GoToAnyFile(f)
+		.editme.ShowAndSel(row.position)
+		.editme.MyError = row
 
 
 function file.IsNicelyViewable (|bool|)

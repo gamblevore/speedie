@@ -132,13 +132,10 @@ function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
 	if path.isproj
 		path = path.file.FindProjectMain$
 		
-	.AddToJumpHistory
-	.EnableHistoryChanges = false
-	.GotoAnyFile(path)
-	.editme.ShowAndSel(l)
-	.editme.SetFocus
-	.EnableHistoryChanges = true
-	.AddToJumpHistory	
+	using self
+		.GotoAnyFile(path)
+		.editme.ShowAndSel(l)
+		.editme.SetFocus
 	.popuphide
 
 

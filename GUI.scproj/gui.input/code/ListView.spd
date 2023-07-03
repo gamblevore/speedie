@@ -153,8 +153,6 @@ class ListView (GUIControl) {
 	function Col (|int| col,  |ivec4| z2, |ListViewrow| sc, |intrange|)
 		|| x1	= .columns(col)
 		|| col1 = col+1
-		//if sc.__text__(col) and !sc.__text__(col1)
-			//col1++
 		|| x2	= .columns(col1) - 1
 		rz		= (x1, x2) + z2.x
 		rz.x2	= rz.x2 min z2.x2
@@ -477,7 +475,7 @@ class ListView (GUIControl) {
 	function PartialFind (|string| s, |listviewrow|)
 		opt norefcounts
 		for r.toplist in self
-			if listview.pf(r.name)[0,s]
+			if listview.pf(r.name)[0, s]
 				return r
 
 
@@ -515,8 +513,8 @@ class ListView (GUIControl) {
 			return .HasFocus
 		
 		return .MouseMovedScroll(p, .ScrollDrawTimer_)
-		
-		
+	
+	
 	behaviour LostFocus
 		.InlineCell.clear(false)?
 		.clearinternaldrops
@@ -554,7 +552,7 @@ class ListView (GUIControl) {
 			if r == s
 				return true
 
-	
+
 	function scrollProtect
 		opt norefcounts
 		|| s	= ._scroll

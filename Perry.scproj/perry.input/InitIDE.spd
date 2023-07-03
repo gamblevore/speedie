@@ -5,9 +5,8 @@ extend PerryIDE
 		super.constructor 
 		
 		sdlapp.AppDocumentOpen = PerryOpenDoc // move to a different startup place
-		.EnableHistoryChanges = true
 		.InConstructor		= true
-		.Previous			= message()
+		.FileHistory		= message()
 		.id					= "IDE"
 		.Debugger			= GUIControl(self)
 		.SearchArea			= guicontrol(self) 
@@ -216,10 +215,10 @@ extend PerryIDE
 		with .PopupDisplay
 			isnt visible
 			is clickthrough
+			.clipmode = ControlClipMode.SlideBackInWindow
 			.ID				= "PopupDisplay"
 			.size 			= the~area
 			.takesfocus		= 0
-			.clipmode = ControlClipMode.SlideBackInWindow
 			.expectsparse	= TextView.probablyjeebox
 			.gnormal.bg		<~ ((0.1, 0.3, 0.1, 1.0))
 			.gnormal.edge	<~ ((0.1, 0.3, 0.1, 0.5))
@@ -573,15 +572,17 @@ extend PerryIDE
 	function PerryFile (|file|)
 		return .project.child(".perry")
 	
+	
 	function LoadConfSub (|file| proj, |bool|)
 		perry.AddProj(proj.path, self)
 		|| r = .root
 			.id = r.location
 		.nottodo = nil
-		.Previous.clear
-		.PrevMarker = nil
+		.FileHistory.clear
 		
 		.StartFiles
 		.isloading = false		// its done and we need .startproj
 		return .StartProj
 	
+
+

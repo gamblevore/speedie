@@ -364,11 +364,6 @@ class Window (GUIControl)
 				if !.FocusWasSet and (found != .innerfocus)
 					.setfocus(Found)
 				return Found
-
-	function Guicontrol.ClearFocus
-		opt norefcounts
-		if .hasfocus
-			.window.clearfocus
 	
 	function ClearFocus
 		.setfocus(nil)

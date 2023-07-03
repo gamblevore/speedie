@@ -14,6 +14,8 @@ class PerryIDE (Window)
 	|Guicontrol|				SearchArea
 	|Guicontrol|				rborder
 	|guicontrol| 				StdOutBorder
+	|message| 					HistoryMarker
+	
 	|FileRow|					NotTodo
 	|message--|					ProjMsg
 	|[guicontrol]|				Views
@@ -59,8 +61,7 @@ class PerryIDE (Window)
     |Buttonview|				BuildButton
     |Buttonview|				RunButton
     |shellstream| 				Talker
-	|message|					PrevMarker
-    |message|					Previous
+    |message|					FileHistory
     |string|					OldJBCloser
     |string| 					lastCmdStr
     |string|					AttachedProgram
@@ -75,11 +76,11 @@ class PerryIDE (Window)
 	|bool|						UsingSpdLib
 	|bool| 						DebugIsWaitingForCompile
 	|bool|						IsLoading
+	|bool|						FromNextPrev
 	|bool|						InConstructor
 	|byte|						NoClutter
 	|bool| 						LoadingFind
 	|bool|						ModifiedForCompile
-	|bool|						EnableHistoryChanges
 	|bool| 						UpdateMem
 
 		
@@ -504,11 +505,13 @@ class PerryIDE (Window)
 			return .autocomplete.doreturn
 		return super.keydown(key)
 
+	
 	function GotoIncludedFile (|string| path, |filerow|)
 		|| f = .FileList[path]
 			.FileList.Select(f)
 		return f
-		
+	
+	
 	function GotoAnyFile (|string| path, |string| line="")
 		|| f = .GotoIncludedFile(path)
 		f := .FileList.AddExtra(path)
@@ -520,6 +523,7 @@ class PerryIDE (Window)
 		opt norefcounts
 		return .FileList.start as filerow
 
+
 	function file.NeedsOwnWindow (|bool|)
 		if .IsProj
 			return true
@@ -527,6 +531,7 @@ class PerryIDE (Window)
 			|| m = .parse
 			if m.Find(@tmp, "main")
 				return true
+
 
 	function OpenDoc (GUIPasteEvent)
 		require self
@@ -541,12 +546,21 @@ class PerryIDE (Window)
 		if .GotoIncludedFile(p)
 			rz = self
 		  elseif f.NeedsOwnWindow
-			rz = IdeAddProj(p)								// add as project
+			rz = IdeAddProj(p)							// add as project
 		  else
 			.filelist.addextra(p)						// add root
 			rz = self
 		startupwindow.hide
 		.showide
+
+
+	Syntax UsingComplete
+		//.AddToJumpHistory // probably only want source	
+
+		
+	Syntax Using (|PerryIDE|)
+		.AddToJumpHistory
+		return self
 
 
 	module
@@ -574,6 +588,7 @@ class PerryIDE (Window)
 				if w isa perryide
 					if !w.root
 						return w
+	
 	
 		function PerryOpenDoc (GUIPasteEvent)
 			|| i = .ide
@@ -657,11 +672,7 @@ class PerryIDE (Window)
 		e.ClearErrors
 		.LoadErrors(true, false)
 		.TryHideJB
-		
-		if .EnableHistoryChanges
-			.AddToJumpHistory
-		  else
-			.EnablePrevNext
+		.AddToJumpHistory
 		if .IsEditingSource and .feedback.closed
 			.Recheck
 		.updatemem = true

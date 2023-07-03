@@ -183,7 +183,7 @@ class GUIControl (ringtree)
 		for R in self							// .last gets drawn last, so .last is actually the "front".
 			if (r!=avoid) and R.isviewable
 				where.ControlClip = .LastRect.clip(r.LastRect)
-				r.__Draw__(Where) 
+				r.__Draw__(Where)
 				if r.hasany
 					r.drawchildren(where, avoid)
 
@@ -356,7 +356,13 @@ class GUIControl (ringtree)
 		opt norefcounts
 		.window$.setfocus(self)
 
-	
+
+	function ClearFocus
+		opt norefcounts
+		if .hasfocus
+			.window.clearfocus
+
+
 	helper MouseIsDown (|bool|)
 		opt norefcounts
 		return .Window.CurrMouseDown == self

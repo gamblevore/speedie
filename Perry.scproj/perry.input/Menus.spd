@@ -14,36 +14,66 @@ function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
 
 
 function PerryIDE.EnablePrevnext
-	opt norefcounts
-	|| m = .PrevMarker
+	|| m = .HistoryMarker
 	(.gonext is enabled) = m and m.next
 	(.goprev is enabled) = m and m.prev
 
 
-function perryide.AddToJumpHistory
-	require .EnableHistoryChanges
-	|| where = message()
-	|| old = .previous.find(where)
-		where = old
-	  else
-		.Mark(where)
+function perryide.FindInHistory (|string|p, |string|n, |message|)
+	opt norefcounts
+	for s in .filehistory
+		if s.name ~= p
+			if s.first == n
+				return s
 
-	|| p = .PrevMarker			// .shunt all after prevmarker... before it.
-		if p.parent != .previous
-		while (|| x = p.next)
-			p.prev = x
-			
-	.previous <~ where
-	.prevmarker = where
-	if .prevmarker.parent != .previous
-	.previous.keep(66, false)
+
+function perryide.AddToJumpHistory
+	|message| where
+	|| old = .FindInHistory(.currpath, .editme.currline.render) 
+		if .fromnextprev
+			where = old
+		  else
+			old.remove // keep the new scrollpos!
+	if !where
+		where = .buildmarker		
+
+
+// unused?
+//	|| p = .HistoryMarker			// this doesnt work cos the historymarker is removed!
+//		while (|| x = p.next)
+//			p.prev = x
+
+	if !.FromNextPrev or !old
+		.FileHistory.Keep(66, false)
+		if !.fromnextprev or !.historymarker
+			.FileHistory <~ where
+		  else
+			.historymarker.next = where
+	.historymarker = where // right?
 	.EnablePrevNext
+	
+
+function perryide.DebugPop (|string| s)
+	printline s
+	.displayinpopup(s, true)
+	.popupdisplay.size = 300~left by 20~inside
+
+
+function perryide.MiniFileHistory (|string|)
+	|| fs = faststring()
+	for ch in .filehistory
+		fs <~ ch.second.nyme
+		fs <~ "\n"
+	fs <~ "\n----------\n"
+	|| h = .HistoryMarker
+		fs <~ h.second.nyme
+	return fs
 
 
 function RightClickNext (GUIaction)
 	if self isa ButtonView
 		|| s = .submenu
-			s.ontypingfilter = PerryFileListFilter
+			s.OnTypingFilter = PerryFileListFilter
 			s.ListSource = .ide.SortedPrevious
 			.OpenMenu
 
@@ -54,34 +84,40 @@ function PerryFileListFilter (GUIListEditEvent)
 
 
 function ChosePrevItem (GUIListEvent)
-	.ide.GoToMarker(row)
+	|| i = .ide
+	|| old = i.FileHistory.find(row)
+	|| j = old ?? row
+	i.GoToMarker(j)
 	return true
 
 
 function PerryIDE.GoToMarker (|message| m)
-	if m
-		.AddToJumpHistory
-		|| l = m.first
+	require m 
+	|| l = m.first
+	.FromNextPrev = true	
+	using self
 		.GoToAnyFile(m.name, l.name)
-		.editme.scrollpos = l.first.int
-	.EnablePrevNext
+		.editme.scrollpos = l.position
+		.addtojumphistory
+	.FromNextPrev = false
 
 
-function perryide.SortedPrevious (|string| filter="", |message|)
+function perryide.SortedPrevious (|string| filter = "", |message|)
 	|| seen = dictionary()
 	rz = Message()
-	for ch in .Previous 
+	for ch in .FileHistory
 		|| n = ch[2].nyme.LowerCase
 		if filter.filter(ch.second.nyme) and !seen[n]
 			seen[n] = ch
 			rz <~ ch.copy
-	
 
-function PerryIDE.Mark (|message| m)
+
+function PerryIDE.BuildMarker (|message|)
+	|| m = message()
 	m.clear
 	m.become(@tmp, .currpath)
 	|| line = (@num + .editme.currline) 
-	line <~ .editme.scrollpos
+	line.position = .editme.scrollpos
 	m <~ line
 	|| name = .CurrPath.name.widen(16)
 	|| fnname = ""
@@ -92,12 +128,13 @@ function PerryIDE.Mark (|message| m)
 	
 	m <~ name
 	m <~ .currpath + "/" + fnname
+	return m
 
 
 function ClickedPrevNext (GUIaction)
 	opt norefcounts
 	|| i = .ide
-	|| m = i.PrevMarker
+	|| m = i.HistoryMarker
 		m = m.step(self == i.gonext)
 		i.GoToMarker(m)
 		return true
