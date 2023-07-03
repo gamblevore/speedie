@@ -26,12 +26,14 @@
 datatype NilState (byte) // Exec.scproj needs this here
 	constants
 		|nilstate|
-		Optional	= 1	    // |type| x = nil,   x = array[1000]
-		Exists		= 2     // || x = message(),  x.position
-		unknown		= 3
-		StatedExist	= 4     // |Type!| x
-		VeryExists	= 6     // |Type!| x
+		Nil			= 1	
+		Realish		= 2 
+		Either		= 3
+		Stated		= 4
+		Optional    = Either + Stated			// |type| x = nil,   x = array[1000]
+		Real		= Realish + Stated			// || x = message(),  x.position
 	
+
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type
 	syntax isnt (|nilstate| type, |bool|)

@@ -110,7 +110,7 @@ class SCDecl (SCObject) {
 	|string|			StringData
 	|SCDecl|			AutoCastTo	// 4 special objects. Aren't they exclusive? Write some code to see if they are.
 	
-	//|SCDecl|			NextContains 
+	//|SCDecl|			NextContains // for multiple contains
 	|SCDecl|			Contains
 	|Message|			Default
 	|SCClass|			Type
@@ -123,8 +123,8 @@ class SCDecl (SCObject) {
 	
 	constructor (|scclass| type=nil)
 		.type = type
-		.NilDeclared = NilState.unknown
-		.NilUsed = NilState.unknown
+		.NilDeclared = NilState.Either
+		.NilUsed = NilState.Either
 
 		
 	function Project (|scimport|)
@@ -654,7 +654,7 @@ class SCDecl (SCObject) {
 		
 		if self is borrowed
 			rz = «arel "--", rz »
-		if !.IsDataType and .NilDeclared isnt unknown
+		if !.IsDataType and .NilDeclared is Stated
 			if .NilDeclared is Optional
 				rz = «arel "?", rz »
 			  else
@@ -797,10 +797,10 @@ class SCDecl (SCObject) {
 
 
 	function MakeOptional (|SCDecl|)
-		return .MakeNil(.type.typeoptional, nilstate.optional)
+		return .MakeNil(.type.TypeOptional, nilstate.optional)
 		
-	function MakeVeryExists (|SCDecl|)
-		return .MakeNil(.type.typeveryexists, nilstate.veryexists)
+	function MakeReal (|SCDecl|)
+		return .MakeNil(.type.TypeVeryExists, nilstate.real)
 	
 	function MakeNil (|scdecl| curr, |nilstate| type, |scdecl|)
 		opt norefcounts

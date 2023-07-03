@@ -1,12 +1,231 @@
 
 /*	
-	
-	Todo:
-		* Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
+Todo:
+	* Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
+					
+	* Strength:
+		Setting to a definite nil is ALWAYS an error... like: nil|msg|.pos=0
+		Strength is settable in the project if its an error or problem
+		For now it defaults to problem
+	* ternaries
+*/
 
-		* NilCheck:
-			Create problems / errors if not used properly
+
+
+
+function SCFunction.NeedsNilCheck (|bool|)
+	require !.IsMacro and !.IsWrapper
+	if .BlindCasts < 123
+		return true
+	debugat
+
+
+function SCfunction.NilCheck (|&NilTracker| T)
+	scfunction.currfunc = self
+	// Decls start unknown... unless specified or datatypes
+	T.Start(self)
+	.sourcearg.NilCheckArg(T, 0)	// this will specify everything
+	T.Tighten(self)					// then we alter the function's nilness
+	T.Restore // nice!
+	
+	.BlindCasts = 123
+
+
+module NilSweep
+	function CheckAll
+		opt norefcounts
+		using options.NilStrength
+	
+		|NilTracker| T
+		for f in compiler.funclist
+			if f.NeedsNilCheck
+				f.NilCheck(T)
 		
+		scfunction.currfunc = nil
+		.Sweep
+
+	
+	function Sweep
+		|| main = compiler.getmainfunc(nil)
+		// what about "init_"?
+	
+
+
+/*
+Issues:
+	"if/while" must re-add decls to the tracker...
+if/while blocks need to keep a stack of multiple variables
+	if a and b and c
+		a.a(b.b(c.c))
+
+
+shared decls need unshare... after func is finished
+
+What about the fact that a function's nilness can rely on other funcs??
+like:
+
+	x = msg[0] // OK... so we don't rely on msg existing? but only cos it doesn't rely on self existing.
+what if msg[n] is recursive and complicated? then how do we check if a decl... is nil or not?
+
+The fact that we have ordered this... leaf first... helps. dependancies help... but that only reduces the problem
+not eliminiates it. There will be cases that we can't eliminate.
+
+* Make it nestable? That is... we actually can check functions?
+	* this would only be needed for actual recursive functions... non-recursives would have a strict chain...
+* what if two funcs with the same depth... and one is called before the other but the wrong one is called first?
+	* then making it nestable helps!
+
+* what about actually recursive funcs? I think for them... we let the user simply specify their nilness!! makes sense, right?
+	* I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
+
+*/
+	
+	
+function message.NilCheckProperty (|&NilTracker| tracker)
+	pragma inline, opt norefcounts				// done?
+	|| Prop = .DotMustBeProperty
+	require prop and (prop isnt OnModule)
+	|| f = .first
+	|| ObjDecl = TypeOfExpr(f, nil) #debug_require
+
+	expect (ObjDecl.NilUsed is real) (self, "Possible NilObject access.")
+	ObjDecl.NilUsed &= ~NilState.Optional
+
+
+function message.NilCheckAccess (|&NilTracker| T)
+	pragma inline
+//	"Mem: $self"
+
+
+function message.NilCheckFP (|&NilTracker| T)
+	// FP calls and behaviours should all assume NOT NIL unless specified...
+	pragma inline
+
+
+function message.NilCheckIfWhile (|&NilTracker| T, |int| Time, |int|)
+	opt norefcounts
+	|| tmp = self
+	|| t1 = time
+	
+	while tmp
+		|| cond = tmp.first  #loop
+		t1 = cond.NilCheckFlat(T, T1)
+
+		|| arg = cond.next   #loop
+		|| depth = T.EnterIf(cond)
+		|| ArgTime = arg.NilCheckArg(T, T1)
+		T.LeaveIf(depth)
+		Time = Time max argtime
+		if tmp == self
+			tmp = arg.next
+		  else
+			tmp = tmp.next
+	return Time	max t1	
+
+
+function NilTracker.EnterIf (|message| m, |int|)
+	opt norefcounts
+	pragma inline
+	// so... what do we do with this? how do we know what is happening?
+	// I guess... we need to start with the and/ors
+	// then find the individiaul items...
+
+	// what about this?	
+		// if (!a) a = b()
+	
+	// we need to build up a picture... of the nilness...
+	// also we need to know if the arg returns!!!
+	// what if it returns in multiple branches?
+		// if !a { if b {return 1} else {return 2} }
+		// a.b = 1
+		// we'll need a more sophisticated nil-tracker
+		// what is the time for?
+		// just for... the init behaviour right?
+		// its not needed for general funcs? I think we can remove it!
+
+		// nil-sweep can be a secondary thing??? and its only for globals!
+		// just remove it.
+		// Also... an arg could leave multiple decls not nil! a test too!!
+		// if (a and b):  
+
+	|| fn = m.func
+	if fn == @thg
+		|| d = m.obj as SCDecl			#require
+	if fn == @rel
+		|| f = m.first
+		|| op = f.next
+		|| l = op.next
+		if op == "and"
+			// tests add up
+		
+		// if (!a or !a.length) // welp...
+		// are there any OR tests that want to test both sides where we can build up info?
+		// seems no use... cos they should be written as AND tests... or jhust removed
+
+		
+		
+	
+	
+
+//	if msg
+//		// msg is now optional
+//		if msg > nil, if msg != nil // same
+//		// msg is now optional and NOT nil within this branch
+//	
+//	if msg == nil // msg is now optional... but nil within that branch
+//	if msg >= nil, msg <= nil // what? just fail!
+//	if !msg // msg is now nil!!
+//	if !msg
+//		return
+//	NOW msg is not nil!!
+//  
+//	
+	
+	
+function NilTracker.LeaveIf (|int| n)
+	opt norefcounts
+	pragma inline
+
+
+
+function Message.NilCheckFlat (|&NilTracker| tracker, |int| Time, |int|)
+	opt norefcounts
+	for s.flat in self
+		Time++
+		if s == @arg
+			s.NilCheckArg(tracker, Time)
+			continue_with s.FlatAfter
+		  else
+			s.NilCheckMemory(tracker)
+
+
+function Message.NilCheckMemory (|&NilTracker| tracker)
+	opt norefcounts
+	|| f = .func
+	if f == @dot
+		.NilCheckProperty(tracker)									// abc.var
+	  elseif (f == @brel and self == "*") or f == @acc
+		.NilCheckAccess(tracker)									// *abc / abc[0]
+	  elseif (f == @func and .first == @bra)
+		.NilCheckFP(tracker)										//  (abc)()
+
+
+
+function Message.NilCheckArg (|&NilTracker| nel, |int| Time, |int|)
+	#! We have ASM if/while flags set! Just use them???
+	opt norefcounts
+	for s in self
+		Time++
+		if s.func == @tmp and (s == "if" or "while")
+			time = s.NilCheckIfWhile(nel, Time)
+		  else
+			time = s.NilCheckFlat(nel, Time)
+	return time
+
+
+
+
+/*
 		* Init Vars Sweep: 
 			We need to go through the entire program, and give each item found, a "timecode". That
 			is... it has an "earliest time" that it COULD occur.
@@ -28,7 +247,7 @@
 			
 			POSSIBLY we could allow reordering.
 			
-			while looops are easier, unless they might not fire at all.
+			while loops are easier, unless they might not fire at all.
 			
 			function pointers... are a bit trickier?
 			
@@ -45,132 +264,4 @@
 			Perhaps not? if we exclude times that not newer?
 			
 			PROBABLY MAKE SOMETHING SIMPELR THAN THIS
-							
-						
-		* Strength:
-			Setting to a definite nil is ALWAYS an error... like: nil|msg|.pos=0
-			Strength is settable in the project if its an error or problem
-			For now it defaults to problem
 */
-
-
-
-
-module NilSweep
-	function CheckAll
-		opt norefcounts
-		using options.NilStrength
-	
-		for f in compiler.funclist
-			if !f.IsMacro and !f.IsWrapper
-				f.NilCheck
-		
-		scfunction.currfunc = nil
-		.Sweep
-
-	
-	function Sweep
-		|| main = compiler.getmainfunc(nil)
-		// what about "init_"?
-	
-
-
-function SCfunction.NilCheck
-	scfunction.currfunc = self
-	|SCNilLister| nel
-	.sourcearg.NilCheckArg(nel, 0)
-	nel.Tighten(self)
-	nel.Restore // nice!
-	// need to restore the .nilused all types altered? and alter the params...
-	// we'll need a decllister... something to just keep track of the decls...
-	
-	
-function message.NilCheckProperty (|&scnillister| nel)
-	pragma inline
-	|| Prop = .DotMustBeProperty
-	require prop and (prop isnt OnModule)
-	|| f = .first
-	|| ObjDecl = TypeOfExpr(f, nil) #debug_require
-
-	|| u = ObjDecl.NilUsed
-	expect (u is exists) (self, "Nillable var accessed.")
-	ObjDecl.NilUsed &= ~NilState.Optional
-//	This definitely exists now! We tested it!
-//  Alter the declaration later!
-
-/*
-Issues:
- what if this is a shared decl? we'll have to unshare it.
-	When? After Func is finished
-
-We'll need to refrsh the nullable states on function start... and on any decls found
-
-if/while blocks need to keep a stack of multiple variables
-	if a and b and c
-		a.a(b.b(c.c))
-
-
-*/
-
-
-function message.NilCheckAccess (|&scnillister| nel)
-	pragma inline
-//	"Mem: $self"
-
-
-function message.NilCheckFP (|&scnillister| nel)
-	pragma inline
-
-
-function message.NilCheckCond (|&scnillister| nel, |int| Time, |int|)
-	pragma inline
-
-// 
-//	if msg
-//		// msg is now optional
-//		if msg > nil, if msg != nil // same
-//		// msg is now optional and NOT nil within this branch
-//	
-//	if msg == nil // msg is now optional... but nil within that branch
-//	if msg >= nil, msg <= nil // what? just fail!
-//	
-
-
-function Message.NilCheckFlat (|&scnillister| nel, |int| Time, |int|)
-	opt norefcounts
-	for s.flat in self
-		Time++
-		if s == @arg
-			s.NilCheckArg(nel, Time)
-		  else
-			s.NilCheckMemory(nel)
-			// so what do we have to test?
-			// if (a)
-				// || x = *a
-					// if x
-			// *a = y
-
-
-function Message.NilCheckMemory (|&scnillister| nel)
-	opt norefcounts
-	|| f = .func
-	if f == @dot
-		.NilCheckProperty(nel)								// abc.var
-	  elseif (f == @brel and self == "*") or f == @acc
-		.NilCheckAccess(nel)									// *abc / abc[0]
-	  elseif (f == @func and .first == @bra)
-		.NilCheckFP(nel)										//  (abc)()
-
-
-
-function Message.NilCheckArg (|&scnillister| nel, |int| Time)
-	opt norefcounts
-	for s in self
-		#! We have ASM if/while flags set! Just use them???
-		Time++
-		if s.func == @tmp and (s == "if" or "while")
-			time = s.NilCheckCond(nel, Time)
-		  else
-			time = s.nilcheckflat(nel, Time)
-			
-

@@ -70,10 +70,10 @@ constructor (|Message| node, |SCBase| parent)
 	|| IsDataType = node == "datatype"
 	|| T = SCDecl.new(self)
 	if isdatatype
-		T.nildeclared = nilstate.exists
+		T.nildeclared = nilstate.Real
 	.TypeNormal = T
 	.TypeOptional = T.NilConstructor(NilState.optional*IsDataType)
-	.TypeVeryExists = T.NilConstructor(NilState.VeryExists*IsDataType)
+	.TypeVeryExists = T.NilConstructor(NilState.Real*IsDataType)
 	T = T.Copy
 	T.Name = "self"
 	T.Strength = kStrSharedParams

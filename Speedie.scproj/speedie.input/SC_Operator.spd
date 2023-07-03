@@ -30,6 +30,7 @@ linkage
 |bool|		DoesntNeedExtraBits
 |bool|		MakesSigned
 |bool|		IsBoolable
+|bool|		IsAndOr
 
 
 constructor (|fn_opasm| ASM)
@@ -117,7 +118,9 @@ module {
 			if (!result.iscustom)
 				opch.name = result.name
 		
-		result.isboolable = (op == "or" or "and" or "=" or "==" or "!=" or "<>")
+		result.isAndOr = (op == "or" or "and")
+		// why aren"
+		result.isboolable = (result.isAndOr or op == "==" or "!=" or "<>")
 		result.DoesntNeedExtraBits = (op == "&" or ">>")// or "|")
 		return Result
 

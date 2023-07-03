@@ -438,7 +438,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		if (C == "?")
 			return R.MakeOptional
 		if (C == "!")
-			return R.MakeVeryExists
+			return R.MakeReal
 		if (C == "") // compiler internal
 			return R
 		error (c)

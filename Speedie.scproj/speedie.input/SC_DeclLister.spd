@@ -1,6 +1,6 @@
 
 
-struct SCNilLister
+struct NilTracker
 	linkage:cpp_part nil
 	|uint| 				Count
 	|uint| 				ParamCount
@@ -10,15 +10,21 @@ struct SCNilLister
 		expect (.count < 1024) (d.source, "Too many variables")
 		.items[.count++] = d
 
+	function Start (|scfunction| f)
+		opt norefcounts
+		.Count = 0
+		for d in f.args
+			self <~ d
+		.ParamCount = .Count
+	
 	function Tighten (|scfunction| f)
 		opt norefcounts
-		|| r = f.args
-		for i in .ParamCount
-			|| d = r[i]
-				r[i] = d.NilTighten
-			  else
-				f.ReturnType = f.ReturnType.NilTighten
-			
+		for (d in f.args) (i)
+			if d.NeedsNilTighten
+				f.args[i] = d.NilTighten
+		if f.ReturnType.NeedsNilTighten
+			f.ReturnType = f.ReturnType.NilTighten
+							
 	function Pop (|scdecl|)
 		if .count
 			return .items[--.count]
@@ -31,7 +37,6 @@ struct SCNilLister
 		opt norefcounts
 		for i in .count
 			.item(i).restorenil
-		
 	
 	iterator
 		|| n = 0
@@ -42,5 +47,20 @@ struct SCNilLister
 function SCDecl.RestoreNil
 	.nilused = .nildeclared
 
-function SCdecl.NilTighten (|scdecl|)
+
+function SCDecl.NilTighten (|scdecl|)
+	if .NilUsed isnt Nil
+		return .MakeReal
+	if .nilused	is Either
+		return .MakeOptional
+	debugat
 	return self
+
+
+function SCdecl.NeedsNilTighten (|bool|)
+	if self
+		if (.NilDeclared isnt stated) and (.nilused is stated)
+			return true
+		if .nilused is Stated
+			//printline SCFunction.CurrFunc
+			debugat // we don't know? why?
