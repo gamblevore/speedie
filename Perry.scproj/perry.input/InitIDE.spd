@@ -363,6 +363,8 @@ extend PerryIDE
 		.addlbutton(.goprev,		"<",	"prev", "Go to previous file.")
 		.addlbutton(.gonext,		">",	"next", "Go to next file.")
 		
+		.gonext.SubControl = .GoPrev.SubControl
+		
 		with .CurrFileName
 			.MouseDownDoesClick	= true
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)

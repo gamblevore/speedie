@@ -480,7 +480,9 @@ class PerryIDE (Window)
 				RightClickNext(.goprev)
 				return .goprev.searchmenu
 			  else
-				return .FunctionMenu.SearchMenu
+				return .ShowQuickStuff(true)
+		if key is l				// l=line jump
+			return .ShowQuickStuff(false)
 		if key is b
 			Clickedcompile(.buildbutton)
 			return true
@@ -494,10 +496,23 @@ class PerryIDE (Window)
 		if key is num9
 			.EditSep.Flip
 			return true
-		if key is l				// l=line jump
-			return .filelist.showquickopen
 
 
+	function ShowQuickStuff (|bool| FuncMenu, |bool|)
+		if FuncMenu
+			if (.FunctionMenu.MenuIsOpen)
+				FuncMenu = false
+		  else
+			if (.filelist.QuickOpen is visible)
+				FuncMenu = true
+		if FuncMenu
+			.FileList.quickopen isnt visible
+			return .FunctionMenu.SearchMenu
+		  else
+			.FunctionMenu.SubMenu.CloseMenu
+			return .FileList.ShowQuickOpen
+	
+	
 	behaviour keydown
 		if keys.cmd and .cmdkey(key)
 			return true

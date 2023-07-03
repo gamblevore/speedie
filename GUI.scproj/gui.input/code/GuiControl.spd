@@ -182,7 +182,6 @@ class GUIControl (ringtree)
 		opt norefcounts
 		for R in self							// .last gets drawn last, so .last is actually the "front".
 			if (r!=avoid) and R.isviewable
-//				if (self isa window) and (.left and .bottom)
 				|| SubLim = Lim.clip(r.LastRect)
 				where.ControlClip = SubLim
 				r.__Draw__(Where)

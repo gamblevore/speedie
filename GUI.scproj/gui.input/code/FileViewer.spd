@@ -109,7 +109,7 @@ class FileViewer (ListView)
 		if f isa filerow
 			f.dirsize(.sizecheckers)
 	
-	
+		
 	function ShowQuickOpen (|bool|)
 		opt norefcounts
 		|| w = .window

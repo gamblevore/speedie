@@ -278,6 +278,8 @@ class ButtonView (GUIControl)
 		if .openmenu(row)
 			return .submenu.typedstring("")
 
+	function MenuIsOpen (|bool|)
+		return .SubControl isa menu and .subcontrol is visible
 
 	function OpenMenu (|listviewrow| row=nil, |bool|)
 		|| m = .submenu						#require
