@@ -32,6 +32,7 @@ function perryide.AddToJumpHistory
 	|| old = .FindInHistory(.currpath, .editme.currline.render) 
 		if .fromnextprev
 			where = old
+			.UpdateMarker(old)
 		  else
 			old.remove // keep the new scrollpos!
 	if !where
@@ -112,8 +113,7 @@ function perryide.SortedPrevious (|string| filter = "", |message|)
 			rz <~ ch.copy
 
 
-function PerryIDE.BuildMarker (|message|)
-	|| m = message()
+function PerryIDE.UpdateMarker (|message| m)
 	m.clear
 	m.become(@tmp, .currpath)
 	|| line = (@num + .editme.currline) 
@@ -128,7 +128,11 @@ function PerryIDE.BuildMarker (|message|)
 	
 	m <~ name
 	m <~ .currpath + "/" + fnname
-	return m
+
+	
+function PerryIDE.BuildMarker (|message|)
+	rz = Message()
+	.Updatemarker(rz)
 
 
 function ClickedPrevNext (GUIaction)
