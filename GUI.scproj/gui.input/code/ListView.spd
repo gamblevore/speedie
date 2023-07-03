@@ -1360,6 +1360,7 @@ class ListView (GUIControl) {
 		rect.y2 += .ScrollSlide
 		|| End = .end
 		
+		|| clip = where.controlclip
 		for r.visible in self
 			rect.y = rect.y2 - .rowheight
 			|| D = (r.depth(self), 0)(.istree)
@@ -1367,7 +1368,7 @@ class ListView (GUIControl) {
 			rect.y2 = rect.y
 			.CanSeeAllLines = (r == end and .start == ._scroll)
 
-		where.controlclip = .lastrect
+		where.controlclip = clip
 		where.horz = .lastrect.h // redundant?
 		|| cmm = .cmm
 			.RowBorderDraw(._scroll, cmm.EditingRow, .RowHeight, where, ¥.border)

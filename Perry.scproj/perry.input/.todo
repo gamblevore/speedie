@@ -9,7 +9,6 @@
 
 
 // Perry Do later
-* clipping too strong!
 * First use of tab (in func) or () (to wrap) on opening perry doesn't work.
 * extra error is being added (first? is being saved? for some good reason but too enthusiastic)
 * TextView error/find resync

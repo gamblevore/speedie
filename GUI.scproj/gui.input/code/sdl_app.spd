@@ -560,14 +560,12 @@ module SDLApp
 		sigh	= P.grow((10,10))
 		where.drawcircle(sigh, ¥.DragAndDrop, 7.0)
 		
-		|| old = where.controlclip
 		where.controlclip = sigh
 		|| t	= s.length.render 
 		|| x	= t.length*font.width
 		|| h	= font.height
 		|| P2	= (x,h)/2
 		font.small.drawtext(t, where, P-P2, true)
-		where.controlclip = old
 	
 
 	function DrawWinFrom (|window|)

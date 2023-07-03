@@ -178,14 +178,16 @@ class GUIControl (ringtree)
 		return self contains .window.MouseIsOver
 	
 	
-	helper DrawChildren (|image| where, |guicontrol| avoid=nil)
+	helper DrawChildren (|image| where,  |ivec4| Lim,  |guicontrol| avoid=nil)
 		opt norefcounts
 		for R in self							// .last gets drawn last, so .last is actually the "front".
 			if (r!=avoid) and R.isviewable
-				where.ControlClip = .LastRect.clip(r.LastRect)
+//				if (self isa window) and (.left and .bottom)
+				|| SubLim = Lim.clip(r.LastRect)
+				where.ControlClip = SubLim
 				r.__Draw__(Where)
 				if r.hasany
-					r.drawchildren(where, avoid)
+					r.drawchildren(where, Sublim, avoid)
 
 	
 	helper DoPaste (|Object| Data, |copypasteflags| Type = CopyPasteFlags.pastetext, |bool|)
@@ -319,11 +321,12 @@ class GUIControl (ringtree)
 
 
 	helper DrawFocus (|image| where)
-		require self
-		.drawfocusrect(Where, .lastrect, .FaintingEdge)
+		if self
+			.drawfocusrect(Where, .lastrect, .FaintingEdge)
 
 
-	helper DrawFocusRect (|image| where, |ivec4| R, |float| Strength) 
+	helper DrawFocusRect (|image| where, |ivec4| R, |float| Strength)
+		opt norefcounts
 		where.controlclip = (0, 0, 31K, 31K)
 		|| NormalBorder = (self isnt modified) or (self is NeverDrawModified)
 		|| g = (¥.Border, ¥.ModifiedBorder)(normalborder)

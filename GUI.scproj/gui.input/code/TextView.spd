@@ -1433,15 +1433,16 @@ class TextView (GUIControl)
 	behaviour Draw
 		opt norefcounts
 		Where.DrawRect(.lastrect, .gnormal)
-		(where.ControlClip ±= 1)
+		|| c = where.controlclip
+		where.ControlClip = c ± 1
 		
 		.PrepareLinesOfText
 		.DrawPreparedText(where)
-		if self is editable or alwaysscrollable
+		|| Sel = self is editable or alwaysscrollable
 			.DrawSel(where)
-			ifn .CanSeeAllLines
-				where.ControlClip = self // :) /// restore!
-				scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer)
+		where.ControlClip = c			/// restore!
+		if !.CanSeeAllLines and sel
+			scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer)
 	
 			
 	helper DrawPreparedText (|image| where)

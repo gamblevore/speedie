@@ -49,7 +49,7 @@ function perryide.AddToJumpHistory
 			.FileHistory <~ where
 		  else
 			.historymarker.next = where
-	.historymarker = where // right?
+	.historymarker = where
 	.EnablePrevNext
 	
 

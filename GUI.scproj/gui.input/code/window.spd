@@ -223,13 +223,14 @@ class Window (GUIControl)
 			where.fill(.gnormal)
 		
 		|| menu = .innerfocus
-		.DrawChildren(where, menu)			
+		|| lim = .LastRect.Soothe
+		.DrawChildren(where, lim, menu)			
 		.realfocus.drawfocus(where)
 		
 		if menu.isviewable
 			where.ControlClip = menu
 			menu.__Draw__(Where)
-			menu.drawchildren(where)
+			menu.drawchildren(where, menu.lastrect)
 		
 		where.ControlClip = self
 		.inline.DrawInline(where)
