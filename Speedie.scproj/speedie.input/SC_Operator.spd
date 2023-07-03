@@ -29,7 +29,6 @@ linkage
 |bool|		IsCustom
 |bool|		DoesntNeedExtraBits
 |bool|		MakesSigned
-|bool|		IsBoolable
 |bool|		IsAndOr
 
 
@@ -119,8 +118,7 @@ module {
 				opch.name = result.name
 		
 		result.isAndOr = (op == "or" or "and")
-		// why aren"
-		result.isboolable = (result.isAndOr or op == "==" or "!=" or "<>")
+		// why aren't 'if "" > nil' here? I think... cos no one would do that?
 		result.DoesntNeedExtraBits = (op == "&" or ">>")// or "|")
 		return Result
 
@@ -377,7 +375,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 			expect !(gotabool and comp.iscompare) (errplace, "Cant compare bools to non-bools")
 			if !CompOrSet and !comp.DoesntNeedExtraBits
 				extra = CustomOps.TypeCastToBigger
-		  elseif GotABool and !comp.isboolable
+		  elseif GotABool and !comp.IsCompare
 			extra = CustomOps.TypeCastFromBool
 
 	if (!SCBase.ConstantsLoadingOverride and LC.Type.TreatAsBaseType)

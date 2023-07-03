@@ -155,8 +155,13 @@ function NilTracker.EnterIf (|message| m, |int|)
 		|| f = m.first
 		|| op = f.next
 		|| l = op.next
-		if op == "and"
-			// tests add up
+		|| scop = op.obj as SCOperator
+		if scop.IsAndOr
+			if scop == "and"
+				// tests add up
+			
+			if scop == "or"
+				// throw away the results... in this case may not be necessary
 		
 		// if (!a or !a.length) // welp...
 		// are there any OR tests that want to test both sides where we can build up info?

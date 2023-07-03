@@ -506,12 +506,18 @@ class PerryIDE (Window)
 			if (.filelist.QuickOpen is visible)
 				FuncMenu = true
 		if FuncMenu
+			// some double -L bug here
 			.FileList.quickopen isnt visible
-			return .FunctionMenu.SearchMenu
+			if .FunctionMenu.SearchMenu
+				return true
+			return .FileList.ShowQuickOpen
+			
 		  else
 			.FunctionMenu.SubMenu.CloseMenu
-			return .FileList.ShowQuickOpen
-	
+			if .FileList.ShowQuickOpen
+				return true
+			return .FunctionMenu.SearchMenu
+			
 	
 	behaviour keydown
 		if keys.cmd and .cmdkey(key)

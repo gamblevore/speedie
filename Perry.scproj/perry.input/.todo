@@ -4,7 +4,6 @@
 
 * VM? 
 * nil-checking
-	* .NilUsage vs .NilDeclared
 	* NilSweep, for global vars, and for function misuse.
 
 
