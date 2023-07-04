@@ -8,6 +8,20 @@ Todo:
 		Strength is settable in the project if its an error or problem
 		For now it defaults to problem
 	* ternaries
+
+	|Byte|					Indent				// speedie does not use
+	|MsgUIFlags|			Flags				// speedie uses for "inserted" only!
+	|uint16|				RangeLength			// Speedie uses for debugging
+	|uint16|				Tag					// speedie uses this for ASM like "return/if/while/etc"
+	
+	
+	* thoughts on merging nil+ref
+		* bad... many issues. 
+		* We won't be able to make use of ALL the info as we won't have ALL of it at the time. Some we will... but whats the point?
+		* giant rework
+		* much more complex... merging multiple systems.
+	
+	* We could merge the "disturbance checker" with the nil checker anyhow...
 */
 
 
@@ -24,7 +38,7 @@ function SCfunction.NilCheck (|&NilTracker| T)
 	scfunction.currfunc = self
 	// Decls start unknown... unless specified or datatypes
 	T.Start(self)
-	.sourcearg.NilCheckArg(T, 0)	// this will specify everything
+	.sourcearg.NilCheckArg(T)		// this will specify everything
 	T.Tighten(self)					// then we alter the function's nilness
 	T.Restore // nice!
 	
@@ -77,7 +91,6 @@ not eliminiates it. There will be cases that we can't eliminate.
 
 * what about actually recursive funcs? I think for them... we let the user simply specify their nilness!! makes sense, right?
 	* I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
-
 */
 	
 	
@@ -94,7 +107,6 @@ function message.NilCheckProperty (|&NilTracker| tracker)
 
 function message.NilCheckAccess (|&NilTracker| T)
 	pragma inline
-//	"Mem: $self"
 
 
 function message.NilCheckFP (|&NilTracker| T)
@@ -102,25 +114,22 @@ function message.NilCheckFP (|&NilTracker| T)
 	pragma inline
 
 
-function message.NilCheckIfWhile (|&NilTracker| T, |int| Time, |int|)
+function message.NilCheckIfWhile (|&NilTracker| T)
 	opt norefcounts
 	|| tmp = self
-	|| t1 = time
 	
 	while tmp
-		|| cond = tmp.first  #loop
-		t1 = cond.NilCheckFlat(T, T1)
+		|| cond = tmp.first			#loop
+		cond.NilCheckFlat(T)
 
-		|| arg = cond.next   #loop
+		|| arg = cond.next			#loop
 		|| depth = T.EnterIf(cond)
-		|| ArgTime = arg.NilCheckArg(T, T1)
+		arg.NilCheckArg(T)
 		T.LeaveIf(depth)
-		Time = Time max argtime
 		if tmp == self
 			tmp = arg.next
 		  else
 			tmp = tmp.next
-	return Time	max t1	
 
 
 function NilTracker.EnterIf (|message| m, |int|)
@@ -146,7 +155,8 @@ function NilTracker.EnterIf (|message| m, |int|)
 		// nil-sweep can be a secondary thing??? and its only for globals!
 		// just remove it.
 		// Also... an arg could leave multiple decls not nil! a test too!!
-		// if (a and b):  
+		// if (a and b): 
+		// if (!(msg)) means I need to deal with brels and bras
 
 	|| fn = m.func
 	if fn == @thg
@@ -161,17 +171,19 @@ function NilTracker.EnterIf (|message| m, |int|)
 				// tests add up
 			
 			if scop == "or"
-				// throw away the results... in this case may not be necessary
-		
-		// if (!a or !a.length) // welp...
-		// are there any OR tests that want to test both sides where we can build up info?
-		// seems no use... cos they should be written as AND tests... or jhust removed
-
-		
-		
+				// throw away the results...
 	
-	
-
+// the results also seem to depend on the arg!!	So we can't know what to do without knowing what the arg does!
+// and how the cond is...
+// it seems very complicated and I don't know where to start...
+// maybe just start with a very simple case?
+//if (msg) {
+//	Can Use Msg
+//}
+//if (!msg) {
+//	return
+//}
+// can use msg
 //	if msg
 //		// msg is now optional
 //		if msg > nil, if msg != nil // same
@@ -193,12 +205,11 @@ function NilTracker.LeaveIf (|int| n)
 
 
 
-function Message.NilCheckFlat (|&NilTracker| tracker, |int| Time, |int|)
+function Message.NilCheckFlat (|&NilTracker| tracker)
 	opt norefcounts
 	for s.flat in self
-		Time++
 		if s == @arg
-			s.NilCheckArg(tracker, Time)
+			s.NilCheckArg(tracker)
 			continue_with s.FlatAfter
 		  else
 			s.NilCheckMemory(tracker)
@@ -216,57 +227,55 @@ function Message.NilCheckMemory (|&NilTracker| tracker)
 
 
 
-function Message.NilCheckArg (|&NilTracker| nel, |int| Time, |int|)
+function Message.NilCheckArg (|&NilTracker| T)
 	#! We have ASM if/while flags set! Just use them???
 	opt norefcounts
 	for s in self
-		Time++
 		if s.func == @tmp and (s == "if" or "while")
-			time = s.NilCheckIfWhile(nel, Time)
+			s.NilCheckIfWhile(T)
 		  else
-			time = s.NilCheckFlat(nel, Time)
-	return time
+			s.NilCheckFlat(T)
 
 
 
 
 /*
-		* Init Vars Sweep: 
-			We need to go through the entire program, and give each item found, a "timecode". That
-			is... it has an "earliest time" that it COULD occur.
-			So for branches, thats easy, both sides get the same time. We can do some simple logic like:
-			
-			function abc
-				if !inited
-					inited = true
-					var1 = .CreateVar
-					var2 = .CreateVar
-				var1.explode
-				var2.die
-			
-			If its only set in one place... that can help.
-			
-			So var1.explode actually has a "higher time" than var1 = .createvar. So its OK.
-			
-			Like this... we can make it work!
-			
-			POSSIBLY we could allow reordering.
-			
-			while loops are easier, unless they might not fire at all.
-			
-			function pointers... are a bit trickier?
-			
-			if (random[])
-				a lot of code
-				(.func)()
-			  else
-				small code
-				(.func)()
+* Init Vars Sweep: 
+	We need to go through the entire program, and give each item found, a "timecode". That
+	is... it has an "earliest time" that it COULD occur.
+	So for branches, thats easy, both sides get the same time. We can do some simple logic like:
+	
+	function abc
+		if !inited
+			inited = true
+			var1 = .CreateVar
+			var2 = .CreateVar
+		var1.explode
+		var2.die
+	
+	If its only set in one place... that can help.
+	
+	So var1.explode actually has a "higher time" than var1 = .createvar. So its OK.
+	
+	Like this... we can make it work!
+	
+	POSSIBLY we could allow reordering.
+	
+	while loops are easier, unless they might not fire at all.
+	
+	function pointers... are a bit trickier?
+	
+	if (random[])
+		a lot of code
+		(.func)()
+	  else
+		small code
+		(.func)()
 
-			we have to check the time twice? But thats true of function calls in general???
-			We could do it differently... "at each second in time..." there can be an array (or list whatever) of possible code we could be executing. The problem with that, is that it would explode exponentially :)
-			
-			Perhaps not? if we exclude times that not newer?
-			
-			PROBABLY MAKE SOMETHING SIMPELR THAN THIS
+	we have to check the time twice? But thats true of function calls in general???
+	We could do it differently... "at each second in time..." there can be an array (or list whatever) of possible code we could be executing. The problem with that, is that it would explode exponentially :)
+	
+	Perhaps not? if we exclude times that not newer?
+	
+	PROBABLY MAKE SOMETHING SIMPELR THAN THIS
 */
