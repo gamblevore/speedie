@@ -36,9 +36,7 @@ class Message (RingTree)
 		.func		= other.func
 		.Obj		= other.obj
 		.indent		= other.indent
-		.flags		= other.flags	// (|) parser.InsertedFlags // What do I use insertedflags for even?
-									// just to avoid false-matches?
-									// turns out... a false-match won't matter here cos its a COPY.
+		.flags		= other.flags
 		.RangeLength= other.RangeLength
 		.Tag		= other.Tag
 
