@@ -992,7 +992,7 @@ class TextView (GUIControl)
 			|| s = .sel
 			|| d = .finddrawinfo(s.x)
 			// bugged
-			while d and d.range.overlaps(s)
+			while d and (d.range overlaps s)
 				require !d.error
 				require d.message or .parsedmessage
 				d++
@@ -1149,12 +1149,23 @@ class TextView (GUIControl)
 			.parsedmessage = msg
 
 		if !rz and !use
-			beep
+			if .OnValidate
+				beep
 			.TakeAllErrors(stderr)
 				
 		stderr = StdErrOriginal
 	
+	
+	helper CanAlterRange (|intrange| r, |bool|)
+		disabled "This would be a massive project"
+		opt norefcounts
+		|| p = .parsedmessage
+		|| s1 = p.findtightest(r.x1)
+		|| s2 = p.findtightest(r.x2)
+		return s1 is editable and s2 is editable
+		// good for now!
 
+	
 	helper InsertSub (|string| s, |intrange| p, |bool| selnew=false, |int|)
 		p = .clamp(p)
 		|| Same = (p.width == s.length) and self[p.x, s] 
@@ -1665,8 +1676,9 @@ class TextView (GUIControl)
 		if !sel.width and sel.x > 0
 			parser.DotInsertAllow = true
 
-		if .validate(.text, true)
-			.ParsedMessage.obj = .path
+		.validate(.text, true)
+		p = .ParsedMessage
+		p.obj ?= .path
 		
 		if expect <= 1
 			.myerror = nil

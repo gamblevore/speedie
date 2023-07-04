@@ -1102,7 +1102,7 @@ datatype IntRange (ivec2)
 	operator Inside (|ivec4| R, |bool|)
 		return R.Contains(.X, .Y)
 
-	function overlaps (|intrange| r, |bool|)
+	operator overlaps (|intrange| r, |bool|)
 		return r.x1 < .x2 and r.x2 > .x1
 	function By (|intrange| r, |ivec4|)
 		return (.x, r.x, .y, r.y)
