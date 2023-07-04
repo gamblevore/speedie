@@ -160,7 +160,7 @@ function FixupColor (|message| self, |ind| pos, |message|)
 	if .position <= pos					// if we are after, its too far
 		while .after <= pos
 			self = .parent						#require
-	require (self contains pos)
+	require .contains(pos, true)
 
 	if self == @prm or self in @url
 		return .parent // NICE

@@ -63,4 +63,5 @@ function SCdecl.NeedsNilTighten (|bool|)
 			return true
 		if .nilused is Stated
 			//printline SCFunction.CurrFunc
-			debugat // we don't know? why?
+			if !options.perry
+				debugat // we don't know? why?

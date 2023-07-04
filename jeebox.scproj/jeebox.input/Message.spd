@@ -799,7 +799,10 @@ class Message (RingTree)
 		ifn N
 			return true
 		N.syntaxexpect(err)
-	
+
+	function ExpectString (|bool|)
+		check .IsString (self, "Not a string")
+		return true
 	
 	function Expect (|syntax| type, |string| name=nil, |bool|)
 		require self
@@ -1097,12 +1100,13 @@ class Message (RingTree)
 		cpp_part ContainsSyx
 		return .FindNested(s, nil, false)
 
-	operator Contains (|ind| p, |bool|)
+	function Contains (|ind| p, |bool| AllowJustAfter=false, |bool|)
 		cpp_part ContainsInd
 		opt norefcounts // we want to put textview's insertion after a name and still find it
 					    // like: abc      // abc is found still.   
 					    //			^
-		return .position <= p and .after >= p 
+		
+		return .position <= p and (.after+AllowJustAfter) > p 
 		
 	operator In (|syntax| f, |bool|)
 		opt norefcounts

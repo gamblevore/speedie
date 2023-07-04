@@ -33,6 +33,7 @@ class TextView (GUIControl)
 	|GUITextEvent|				OnTextChanged
 	|GUITextEvent|				OnSelChanged
 	|GUITextErrorSelected|		OnSelError
+	|GUITextValidate|			OnValidate
 	|GUITextShowEvent|			OnShowExtraInfo
 	|dictionary|				ColoriseAsRoot
 	|Document|					_Viewing
@@ -803,6 +804,7 @@ class TextView (GUIControl)
 
 	function ClearErrors
 		opt norefcounts
+		.myerror = nil
 		for d in .lines
 			d.error = nil
 
@@ -882,7 +884,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| size = int.max
 		for ch.flat in self
-			if (ch contains pos) and (!named or ch.name or ch == @dot or @sdot)
+			if (ch.contains(pos, true)) and (!named or ch.name or ch == @dot or @sdot)
 				|| r = ch.rangelength
 					if (r < size) or (rz!=nil and pos == rz.position and ch.after) // smallest
 						rz = ch
@@ -1127,6 +1129,32 @@ class TextView (GUIControl)
 		return .insertsub(s, .selrange, selnew)
 
 
+	helper TakeAllErrors (|errorlist| L)
+		while (|| err = stderr.pop)
+			.lineerroradd(err)
+			.myerror = err
+			Notifications <~ err
+
+
+	helper Validate (|string| Text, |bool| Use, |bool|)
+		jeebox.ParseProtect
+		
+		|| msg = text.parse
+		rz = msg!=nil
+		if msg and .onvalidate
+			(.OnValidate)(self, msg)
+			rz = stderr.ok
+			.ClearErrors
+		if use
+			.parsedmessage = msg
+
+		if !rz and !use
+			beep
+			.TakeAllErrors(stderr)
+				
+		stderr = StdErrOriginal
+	
+
 	helper InsertSub (|string| s, |intrange| p, |bool| selnew=false, |int|)
 		p = .clamp(p)
 		|| Same = (p.width == s.length) and self[p.x, s] 
@@ -1142,13 +1170,15 @@ class TextView (GUIControl)
 		if Same
 			.TypingPlaceTry(UpdatedSel, true, nil)
 		  else
+			|| t = .text
+			|| nt = t.insert(s, p.x, p.width)
+			if .OnValidate and !.Validate(nt, false)
+				return p.x
 			|| u = .undoer
 				|| c = u.current
 					c.typingplace = p
 			.CanAutoComplete = false
 			.AutoCompleteString = ""
-			|| t = .text
-			|| nt = t.insert(s, p.x, p.width)
 			|| x = (p.x, p.x2)(s)
 			|| tab = (s in '\t')
 				.undochecker = -1
@@ -1596,8 +1626,7 @@ class TextView (GUIControl)
 		return bd * mul + add 
 
 
-	helper CanParse (|int| Expect, |bool|)
-		//require ._viewing // makes no sense // find a better way... we need to color stuff!
+	helper WillAttemptParse (|int| Expect, |bool|)
 		require (expect >= 2)
 		require !.singleline
 // Just segment for longer files. No one needs 10000KB file word-wrapped.
@@ -1625,8 +1654,8 @@ class TextView (GUIControl)
 	
 	helper Parse (|bool| Changed, |int| expect, |message|)
 		cpp_Part ViewParseSub
-		if !.canparse(expect)
-			.myerror = nil // crappy bugfix
+		if !.WillAttemptParse(expect)
+			.myerror = nil // more reliable
 			return nil
 		
 		|| p = .ParsedMessage
@@ -1635,10 +1664,9 @@ class TextView (GUIControl)
 		|| sel = .sel
 		if !sel.width and sel.x > 0
 			parser.DotInsertAllow = true
-		p = .text.ParseWithError(.myerror)
-		if p
-			p.obj = .path
-		.ParsedMessage = p
+
+		if .validate(.text, true)
+			.ParsedMessage.obj = .path
 		
 		if expect <= 1
 			.myerror = nil

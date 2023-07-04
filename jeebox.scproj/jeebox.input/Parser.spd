@@ -1226,6 +1226,7 @@ module parser
 	|bool|					DotInsertAllow
 	|dictionary of string|  ErrorNames = nil
 	stderr = ErrorList.new
+	StdErrOriginal = stderr
 
 	flags
 		kAdjectiveOp
@@ -1306,9 +1307,20 @@ extend Message
 */
 
 datatype MsgUIFlags (uint16)
+	syntax is (|msguiflags| v, |bool|)
+		return self & v
+	syntax isnt (|msguiflags| v, |bool|)
+		return !(self & v)
 	flags
-		AlreadyProcessed=  0x800
-		Reserved		= 0x1000
+		Editable		= 0x0700 // 0x100, 0x200, 0x400
+		EditableString	= 0x0100
+		EditableNum		= 0x0200
+		EditableThing	= 0x0300
+		EditableSyx		= 0x0400
+		EditableAny		= 0x0700
+
+		User1			= 0x0800
+		User2			= 0x1000
 		Inserted		= 0x2000
 		Style2			= 0x4000
 		BreakPoint		= 0x8000

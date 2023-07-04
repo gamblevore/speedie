@@ -12,7 +12,7 @@ Module Jeebox
 	linkage
 		cpp_part Constants
 	
-	|ErrorList|	ParseProtector
+	|ErrorList|	_ParseProtector
 	|| Name = "\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\) "
 	|| EscapeStr = [
 		"\00"  : `\00` // just for escaping, not unescaping

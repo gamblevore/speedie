@@ -1,6 +1,7 @@
 
 
 |ErrorList| StdErr
+|ErrorList| StdErrOriginal
 
 // hmmm... what should I do?
 // how to remove log
@@ -33,6 +34,9 @@ class ErrorList
 		.MaxProblems = 16
 		JB_API.NilHappened = nil
 
+	destructor
+		if self == jeebox._parseprotector
+			debugger
 
 	function Clear
 		.errors.clear

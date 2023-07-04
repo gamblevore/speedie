@@ -46,15 +46,24 @@ function String.ParseJSON (|Messageroot|)
 	rz.ConvertJSONToJB?
 
 
+helper Jeebox.ParseProtectSub (|errorlist|)
+	opt norefcounts
+	rz = jeebox._ParseProtector init errorlist()
+	rz.clear
+
+
+function Jeebox.ParseProtect
+	// refcounting bug work around...
+	// i think I'm frustrated by bad code output... 
+	stderr = .ParseProtectSub
+	
+	
 function String.ParseWithError (|&Error| rec, |MessageRoot|)
 	visible
-	opt norefcounts
-	|| old = stderr
-	stderr = jeebox.ParseProtector init errorlist()
-	stderr.clear
+	jeebox.ParseProtect
 	rz = .parse
 	*rec = stderr.pop
-	stderr = old
+	stderr = stderroriginal
 
 
 helper String.HiddenJBin (|ind|)

@@ -17,10 +17,18 @@ function message.AllNames (|[string]|)
 			rz <~ i
 
 
-function message.GoodName (|string|) // we want something that looks like it could have a name
+ // we want something that looks like it could have a name
+function message.GoodName (|bool| NeedName=false, |string|)
+	|| name = .GoodNamesub
+		return name
+	if name.isok and needname
+		error (self, "No name found")
+		return string.Error
+	return name
+	
+	
+helper message.GoodNameSub (|bool| NeedName=false, |string|)
 	opt norefcounts
-	if !self
-		return ""
 	|| f = .func
 	if .IsString or f == @thg or @num
 		return .name

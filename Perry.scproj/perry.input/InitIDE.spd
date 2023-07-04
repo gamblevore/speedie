@@ -79,9 +79,11 @@ extend PerryIDE
 			.id = "debugargs"
 			.ClickOutsideCloses = true
 			.OnFocus = DebugArgsGotFocus
-			.gnormal.solid  = (0.0, 0.0, 0.0, 0.7)
+			.gnormal.solid  = (0.05, 0.05, 0.05, 0.95)
 			.gnormal.edge = (0.0, 0.0, 0.0, 0.125)
 			.OnKeyDown = DebugArgsKeyDown
+			.onvalidate = ArgValidation 
+			.expectsparse = textview.AlwaysJeebox			
 
 
 		with .ViewButtons 

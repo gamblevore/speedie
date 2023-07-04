@@ -214,7 +214,7 @@ class TextViewLine (ringtree)
 				exit
 
 			|| par	= curr.parent				// special coloring
-			if par and par contains s
+			if par and par.contains(s, true)
 				|| pt = par.func
 				if pt == @type
 					return par
@@ -417,6 +417,9 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		|| col = ¥.GetColor(state.msg, usecol, pos)
 		if d.Error and c == 9 and prev == 32 
 			c = -c
+
+		if (state.msg is Editable) and (c != 10 and 13) and (state.msg.contains(pos))
+			.DrawIlluminated(where, (x,y-2))
 		state.font.DrawChar(c, Where, (x, y), col, 1)
 		prev = c
 	
@@ -426,6 +429,12 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		.DrawAuto(Where, d, x, y)
 
 	
+helper TextView.DrawIlluminated (|image| where, |ivec2| P)
+	|| r	= (p, p+(font.width, .lineheight))
+	|| col	= (1.0, 1.0, 1.0, 0.2).px
+	where.fillrect(r, col, col)
+
+
 helper TextView.AutoLim (|textviewline| d, |bool|)
 	if .CanAutoComplete and .AutoCompleteString
 		|| after = d.after
@@ -467,11 +476,12 @@ struct MsgTextDrawState
 		rz   = .x
 		.x   = rz + w*font.width
 		.i  += w
-		if (.msg and !c.iswhite)
+		if (.msg)
 			|| pos	= *ppos
 			*pc		= c.ImproveDraw(.t, pos)
 			pos	   += .adder, *ppos = pos
 			.msg	= .msg.NextColor(pos)
+			
 		
 	module
 		function New (|int| x, |textviewline| d, |MsgTextDrawState|)

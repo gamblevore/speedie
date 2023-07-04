@@ -1,3 +1,2 @@
 args {"--self"}
-pwd '.'
-env
+env: a=b

@@ -1,0 +1,43 @@
+
+
+
+
+function ArgValidation (GUITextValidate)
+	msg.Expect(@arg)
+	for s in msg
+		if (msg != @arg) or !s.Expect(@tmp)
+			0
+		  elseif s == "args"
+			for a in s.Arg
+				a.expectString
+				(a is EditableAny)
+		  elseif s == "notes"
+			for f.flat in s
+				if f != s
+					(f is EditableAny)
+		  elseif s == "env"
+			for rel in s.Arg
+				if rel.Expect(@rel)
+					|| ch1 = rel[@thg, 0]
+						(ch1 is EditableThing)
+					|| opp = rel[@opp, 1]
+						opp.expect(@opp, "=")
+						(opp is EditableSyx)
+					|| ch2 = rel[@nil, 2]
+						ch2.goodname
+						(ch2 is EditableAny)
+		  elseif s == "pwd"
+			|| ch = s[@nil]
+				ch.ExpectString
+				(ch is EditableString)
+		  else
+			error s
+	
+		
+	
+	// now what?
+	// OK... so how do we do this?
+	// we want to change the coloring of text, and disable certain text from being altered.
+	// and remake the text if it goes bad... meaning we'll need a previous version.
+	// We could do this in insertsub? Validate?
+	

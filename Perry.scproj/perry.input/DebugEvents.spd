@@ -67,14 +67,9 @@ function PressingDebug (GUIAction)
 
 function perryide.DebugEnvs (|message| env)
 	for rel in env
-		|| ch1 = rel.first
-		|| opp = rel[@opp, 1]
-			opp.expect(@opp, "=")
-		|| ch2 = opp.next
-			check (ch1.name) (ch1, "No name found")
-			check (ch2.name) (ch2, "No name found")
-		if StdErr.ok
-			app.ChildEnv(ch1.name) = ch2.name
+		|| ch2 = rel[2]
+		if ch2 and rel[1] == "="
+			app.ChildEnv(rel[0].name) = ch2.name
 
 
 function perryide.DebugActual (|file| f, |[string]| args)
@@ -92,9 +87,10 @@ function perryide.DebugPath (|file| f, |message| conf)
 		p = p.Parent
 	app.cwd = p
 	
-	|| path = conf["pwd"].goodname
-	if path and path != "."
-		app.cwd = path
+	|| pwd = conf["pwd"]
+		|| path = pwd.goodname
+		if pwd != "."
+			app.cwd = path
 
 
 function perryide.StartDebugging (|file| f)
