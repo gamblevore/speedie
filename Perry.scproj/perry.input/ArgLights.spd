@@ -1,6 +1,15 @@
 
 
 
+// illuminates typeable areas of text and validates stuff too.
+// eventually we'll make unilluminated areas become untypeable :)
+// but that has some issues... like "how to type args {}" in one keystroke... which isn't possible
+// sometimes its useful to go through invalid states to reach a valid one.
+// sorting that out won't be easy... I'd need to make "correct syntax adders..."
+// but overall, its the right approach!!
+// very little code to do the right thing.
+
+// I guess the idea is... "Why have a GUI when you can just turn a textView INTO a GUI??"
 
 function ArgValidation (GUITextValidate)
 	msg.Expect(@arg)
@@ -32,12 +41,4 @@ function ArgValidation (GUITextValidate)
 				(ch is EditableString)
 		  else
 			error s
-	
-		
-	
-	// now what?
-	// OK... so how do we do this?
-	// we want to change the coloring of text, and disable certain text from being altered.
-	// and remake the text if it goes bad... meaning we'll need a previous version.
-	// We could do this in insertsub? Validate?
 	

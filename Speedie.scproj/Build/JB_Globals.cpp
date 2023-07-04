@@ -99,6 +99,7 @@ Process* SC__AC_Perry;
 byte SC__AC_ShouldEnter;
 int SC__AC_total;
 u16 JB__API_NilHappened;
+JB_ErrorReceiver* JB__Constants__ParseProtector;
 CharSet* JB__Constants_CSAfterStatement;
 CharSet* JB__Constants_CSLettersOnly;
 CharSet* JB__Constants_CSLine;
@@ -112,7 +113,6 @@ Dictionary* JB__Constants_EscapeStr;
 Dictionary* JB__Constants_JS_EscapeStr;
 Dictionary* JB__Constants_JS_UnEscapeStr;
 JB_String* JB__Constants_Name;
-JB_ErrorReceiver* JB__Constants_ParseProtector;
 Dictionary* JB__Constants_UnEscapeStr;
 Dictionary* JB__Constants_XML_EscapeStr;
 Dictionary* JB__Constants_XML_UnEscapeStr;
@@ -219,6 +219,7 @@ Dictionary* JB_FuncLinkageTable;
 JB_String* JB_kNameConf;
 Dictionary* JB_RootCollectTable;
 JB_ErrorReceiver* JB_StdErr;
+JB_ErrorReceiver* JB_StdErrOriginal;
 __lib__ Syntax JB_SyxAcc;
 __lib__ Syntax JB_SyxAdj;
 __lib__ Syntax JB_SyxARel;
@@ -388,7 +389,7 @@ JBClassPlace4(DTWrap, JB_AsClass(JB_Object), DTWrap_FuncTable_);
 
 ErrorList_Behaviour InitTableJB_ErrorReceiver_() { // Behaviour 
 	ErrorList_Behaviour Result;
-	Result.__destructor__ = (void*)JB_Rec_destructor;
+	Result.__destructor__ = (void*)JB_Rec_Destructor;
 	Result.render = (__Object_Render__)JB_Rec_Render;
 	return Result;
 }

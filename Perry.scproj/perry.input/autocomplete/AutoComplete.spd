@@ -157,7 +157,7 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 // "" '' <(``)> ``
 
 function PerryIDE.DisplayStr (|message| f, |bool|)
-	|| r = f.range// + f.rangetrim
+	|| r = f.range // + f.rangetrim
 	|| orig = .editme[r]
 	if f.name != orig
 		.PopupDisplay.expectsparse = 0

@@ -431,7 +431,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 
 function message.CanIlluminate (|ind| p, |bool|)
 	if self is Editable
-		|| r = .range + .rangetrim
+		|| r = .range // + .rangetrim
 		return r.x <= p and r.x2 > p 
 
 	
