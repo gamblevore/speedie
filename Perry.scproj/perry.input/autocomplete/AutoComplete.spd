@@ -155,10 +155,9 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 
 
 // "" '' <(``)> ``
+
 function PerryIDE.DisplayStr (|message| f, |bool|)
-	|| edge = (1, 3)(f != @sstr)
-	|| r = f.range
-	r += (edge,-edge)
+	|| r = f.range// + f.rangetrim
 	|| orig = .editme[r]
 	if f.name != orig
 		.PopupDisplay.expectsparse = 0

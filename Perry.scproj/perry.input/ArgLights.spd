@@ -13,7 +13,7 @@ function ArgValidation (GUITextValidate)
 				(a is EditableAny)
 		  elseif s == "notes"
 			for f.flat in s
-				if f != s
+				if f != s and @arg
 					(f is EditableAny)
 		  elseif s == "env"
 			for rel in s.Arg

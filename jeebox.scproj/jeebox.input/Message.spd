@@ -1060,6 +1060,12 @@ class Message (RingTree)
 		.position = r.x
 		.RangeLength = r.width
 
+	function RangeTrim (|ivec2|)
+		if self == @sstr
+			return (3,-3)
+		if .isstring
+			return (1,-1)
+
 	function FlatRange (|intrange|)
 		opt norefcounts
 		rz = (int.max, 0)

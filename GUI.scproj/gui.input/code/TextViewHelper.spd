@@ -418,7 +418,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		if d.Error and c == 9 and prev == 32 
 			c = -c
 
-		if (state.msg is Editable) and (c != 10 and 13) and (state.msg.contains(pos))
+		if state.msg.canilluminate(pos) and (c != 10 and 13)
 			.DrawIlluminated(where, (x,y-2))
 		state.font.DrawChar(c, Where, (x, y), col, 1)
 		prev = c
@@ -427,6 +427,12 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		if d.islast // last line draw too early with autocomplete
 			x += font.width // but we shouldn't need this!
 		.DrawAuto(Where, d, x, y)
+
+
+function message.CanIlluminate (|ind| p, |bool|)
+	if self is Editable
+		|| r = .range + .rangetrim
+		return r.x <= p and r.x2 > p 
 
 	
 helper TextView.DrawIlluminated (|image| where, |ivec2| P)
