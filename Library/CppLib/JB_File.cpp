@@ -16,8 +16,8 @@
 	#include <sys/mman.h>
 	#include <sys/sendfile.h>
 #else
-	#include <copyfile.h>
-	#include <sys/posix_shm.h>
+//	#include <copyfile.h>
+//	#include <sys/posix_shm.h>
 #endif
 
 

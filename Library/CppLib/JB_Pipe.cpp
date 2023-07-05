@@ -14,7 +14,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-//#include <sys/wait.h>
+#include <errno.h>
+#include <sys/stat.h>
+
 #include <pwd.h>
 #include <time.h>
 #include <stdlib.h>
