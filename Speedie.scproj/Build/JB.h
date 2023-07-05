@@ -4564,8 +4564,6 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
-void SC_IR_Print(IR* self);
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5268,8 +5266,6 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
-
-int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -8660,7 +8656,7 @@ bool JB_config_Save(Message* self);
 
 //// HEADER Inlines.h
 inline bool JB_int_OperatorInRange(int self, int d) {
-	if (d > 0) {
+	iif (d > 0) {
 		return (((uint)self) < ((uint)d));
 	}
 	return false;
@@ -8698,13 +8694,12 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
 inline void SC_flat_AddExtended(ASMFuncState* self, Message* err, uint Bits) {
 	int B = 1 << 31;
-	if (((bool)(Bits & B))) {
+	iif (((bool)(Bits & B))) {
 		JB_Msg_SyntaxExpect(err, nil);
 		return;
 	}
@@ -8729,22 +8724,22 @@ inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v) {
 
 inline int SC_nil_EnterIf(NilTracker* self, Message* m) {
 	Syntax fn = m->Func;
-	if (fn == JB_SyxThg) {
+	iif (fn == JB_SyxThg) {
 		SCDecl* d = ((SCDecl*)JB_Object_FastAs(m->Obj, JB_AsClass(SCDecl)));
-		if ((!d)) {
+		iif ((!d)) {
 			return nil;
 		}
 	}
-	if (fn == JB_SyxRel) {
+	iif (fn == JB_SyxRel) {
 		Message* f = ((Message*)JB_Ring_First(m));
 		Message* op = ((Message*)JB_Ring_NextSib(f));
 		Message* l = ((Message*)JB_Ring_NextSib(op));
 		SCOperator* scop = ((SCOperator*)JB_Object_FastAs(op->Obj, JB_AsClass(SCOperator)));
-		if (scop->IsAndOr) {
-			if (SC_Opp_SyntaxEquals(scop, JB_LUB[32], false)) {
+		iif (scop->IsAndOr) {
+			iif (SC_Opp_SyntaxEquals(scop, JB_LUB[32], false)) {
 				debugger;
 			}
-			if (SC_Opp_SyntaxEquals(scop, JB_LUB[33], false)) {
+			iif (SC_Opp_SyntaxEquals(scop, JB_LUB[33], false)) {
 				debugger;
 			}
 		}
@@ -8820,16 +8815,16 @@ inline void SC_Msg_NilCheckFP(Message* self, NilTracker* T) {
 
 inline void SC_Msg_NilCheckProperty(Message* self, NilTracker* tracker) {
 	SCDecl* Prop = SC_Msg_DotMustBeProperty(self);
-	if ((!(((bool)Prop) and (SC_Decl_SyntaxIsnt(Prop, kJB__SCDeclInfo_onmodule))))) {
+	iif ((!(((bool)Prop) and (SC_Decl_SyntaxIsnt(Prop, kJB__SCDeclInfo_onmodule))))) {
 		return;
 	}
 	Message* f = ((Message*)JB_Ring_First(self));
 	SCDecl* ObjDecl = SC_TypeOfExpr(f, nil, nil);
-	if ((!ObjDecl)) {
+	iif ((!ObjDecl)) {
 		debugger;
 		return;
 	}
-	if ((!(SC_NilState_SyntaxIs(ObjDecl->NilUsed, kJB__NilState_Real)))) {
+	iif ((!(SC_NilState_SyntaxIs(ObjDecl->NilUsed, kJB__NilState_Real)))) {
 		JB_Msg_SyntaxExpect(self, JB_LUB[1589]);
 		return;
 	}
