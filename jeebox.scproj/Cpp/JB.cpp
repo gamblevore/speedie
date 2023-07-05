@@ -322,6 +322,24 @@ void JB_Constants__InitConstants() {
 	(JB_Dict_ValueSet(JB__Constants_EscapeStr, JB_LUB[45], JB_LUB[46]));
 }
 
+void JB_Constants__ParseProtect() {
+	JB_SetRef(JB_StdErr, JB_Constants__ParseProtectSub());
+}
+
+JB_ErrorReceiver* JB_Constants__ParseProtectSub() {
+	JB_ErrorReceiver* rz = nil;
+	rz = ({
+		JB_ErrorReceiver* _X = JB__Constants__ParseProtector;
+		if ((!_X)) {
+			_X = JB_Rec__New();
+			JB_SetRef(JB__Constants__ParseProtector, _X);
+		}
+		 _X;
+	});
+	JB_Rec_Clear(rz);
+	return rz;
+}
+
 JB_String* JB_Constants__TestJB() {
 	FastString* fs = JB_Incr(JB_FS__New());
 	{
@@ -2041,6 +2059,7 @@ int JB_Tk__InitCode_() {
 	}
 	;
 	JB_SetRef(JB_StdErr, JB_Rec__New());
+	JB_SetRef(JB_StdErrOriginal, JB_StdErr);
 	return 0;
 }
 
@@ -4740,21 +4759,13 @@ Message* JB_Str_parse_jbin(JB_String* self) {
 }
 
 Message* JB_Str_ParseWithError(JB_String* self, JB_Error** rec) {
-	Message* rz = ((Message*)nil);
+	Message* rz = JB_Incr(((Message*)nil));
 	//visible;
-	JB_ErrorReceiver* old = JB_StdErr;
-	JB_StdErr = ({
-		JB_ErrorReceiver* _X = JB__Constants_ParseProtector;
-		if ((!_X)) {
-			_X = JB_Rec__New();
-			JB_SetRef(JB__Constants_ParseProtector, _X);
-		}
-		 _X;
-	});
-	JB_Rec_Clear(JB_StdErr);
-	rz = JB_Str_Parse(self, JB_SyxArg, true);
+	JB_Constants__ParseProtect();
+	JB_SetRef(rz, JB_Str_Parse(self, JB_SyxArg, true));
 	JB_SetRef((*rec), JB_Rec_Pop(JB_StdErr));
-	JB_StdErr = old;
+	JB_SetRef(JB_StdErr, JB_StdErrOriginal);
+	JB_SafeDecr(rz);
 	return rz;
 }
 
@@ -8202,7 +8213,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023070321);
+	return (2023070422);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
@@ -8214,4 +8225,4 @@ __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -4845594019514234813 -2448241252724715488 -6937734273074662994
+// -4845594019514234813 -6969642024620213535 -8117475507251233252

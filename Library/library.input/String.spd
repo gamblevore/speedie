@@ -241,7 +241,7 @@ class String
 		return fs
 
 
-	function Yes (|bool|) // ispositive, isaffirmative
+	function Yes (|bool|) // ispositive, isaffirmative, istrue
 		if self ~= "no"  or "false" or "off" or "0" or "":	return false
 		if self ~= "yes" or "true"  or "on"  or "1": return true
 		error ("Not a boolean value: '" + self + "'")
@@ -667,3 +667,4 @@ struct StringLengthSplit
 		opt norefcounts
 		for s in self
 			rz <~ s
+

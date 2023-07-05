@@ -14,6 +14,13 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+//#include <sys/wait.h>
+#include <pwd.h>
+#include <time.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <unistd.h>
+
 
 extern "C" const char** JB_BackTrace(void** space, int* size) {
     *size = backtrace( space, *size );
