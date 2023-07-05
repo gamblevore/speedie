@@ -652,11 +652,11 @@ class Process
 				rz = nil
 		
 
-		function string.ipcPath (|string|)
+		function string.IPCPath (|string|)
 			 return "/${self[0,8]}.${app.id}.${process.IncID++}"	
 
 
-		function string.ipcName (|string|)			//		/tmp/shm/1111PERRY9999
+		function string.IPCName (|string|)			//		/tmp/shm/1111PERRY9999
 			|| n = .name
 			|| s = n.find(jeebox.CSWordStart)
 			|| s2 = n.find(jeebox.CSWordStart, int.max, 0)

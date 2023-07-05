@@ -92,7 +92,11 @@ function Path (|string|)
 	._Path := .env["OrigScriptPath"]
 	._Path := .exepath
 	return ._path
-	
+
+function PrintStackTrace
+	visible
+	cpp_name JB_PrintStackTrace
+	print .StackTrace
 
 Function StackTraceArray (|string| StartAfter="", |[string]|)
 	|_voidptr[128]| arr
@@ -108,7 +112,7 @@ Function StackTraceArray (|string| StartAfter="", |[string]|)
 
 
 render StackTrace (|string| StartAfter = "")
-	|| r = .stacktracearray(StartAfter)
+	|| r = .StackTraceArray(StartAfter)
 	for s in r
 		fs <~ s
 		fs <~ '\n'
