@@ -2239,7 +2239,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	iif (SC_Comp__EnterCompile()) {
 		iif (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[157], (110652161932573)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[157], (110658048331644)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3542,7 +3542,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[241]);
-	JB_FS_AppendInt32(_fsf0, (2023070321));
+	JB_FS_AppendInt32(_fsf0, (2023070422));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -5169,6 +5169,24 @@ void JB_Constants__InitConstants() {
 	JB_MSR_DecodeEntitySet(JB__Constants_UnEscapeStr, true);
 	JB_MSR_DecodeEntitySet(JB__Constants_XML_UnEscapeStr, true);
 	(JB_Dict_ValueSet(JB__Constants_EscapeStr, JB_LUB[376], JB_LUB[377]));
+}
+
+void JB_Constants__ParseProtect() {
+	JB_SetRef(JB_StdErr, JB_Constants__ParseProtectSub());
+}
+
+JB_ErrorReceiver* JB_Constants__ParseProtectSub() {
+	JB_ErrorReceiver* rz = nil;
+	rz = ({
+		JB_ErrorReceiver* _X = JB__Constants__ParseProtector;
+		iif ((!_X)) {
+			_X = JB_Rec__New();
+			JB_SetRef(JB__Constants__ParseProtector, _X);
+		}
+		 _X;
+	});
+	JB_Rec_Clear(rz);
+	return rz;
 }
 
 JB_String* JB_Constants__TestJB() {
@@ -7376,7 +7394,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[508]);
-	JB_FS_AppendInt32(_fsf0, (2023070321));
+	JB_FS_AppendInt32(_fsf0, (2023070422));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -14491,6 +14509,7 @@ int JB_Tk__InitCode_() {
 	}
 	;
 	JB_SetRef(JB_StdErr, JB_Rec__New());
+	JB_SetRef(JB_StdErrOriginal, JB_StdErr);
 	return 0;
 }
 
@@ -24668,21 +24687,13 @@ Message* SC_Str_ParseCleanWipe(JB_String* self) {
 }
 
 Message* JB_Str_ParseWithError(JB_String* self, JB_Error** rec) {
-	Message* rz = ((Message*)nil);
+	Message* rz = JB_Incr(((Message*)nil));
 	//visible;
-	JB_ErrorReceiver* old = JB_StdErr;
-	JB_StdErr = ({
-		JB_ErrorReceiver* _X = JB__Constants_ParseProtector;
-		iif ((!_X)) {
-			_X = JB_Rec__New();
-			JB_SetRef(JB__Constants_ParseProtector, _X);
-		}
-		 _X;
-	});
-	JB_Rec_Clear(JB_StdErr);
-	rz = JB_Str_Parse(self, JB_SyxArg, true);
+	JB_Constants__ParseProtect();
+	JB_SetRef(rz, JB_Str_Parse(self, JB_SyxArg, true));
 	JB_SetRef((*rec), JB_Rec_Pop(JB_StdErr));
-	JB_StdErr = old;
+	JB_SetRef(JB_StdErr, JB_StdErrOriginal);
+	JB_SafeDecr(rz);
 	return rz;
 }
 
@@ -29949,7 +29960,9 @@ bool SC_Decl_NeedsNilTighten(SCDecl* self) {
 			return true;
 		}
 		iif (SC_NilState_SyntaxIs(self->NilUsed, kJB__NilState_Stated)) {
-			JB_DoAt(1);
+			iif ((!SC__Options_Perry)) {
+				JB_DoAt(1);
+			}
 		}
 	}
 	return false;
@@ -46694,4 +46707,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -7906247320224649296 1425886840598425437
+// -8146437002806772962 -1145524080976918930

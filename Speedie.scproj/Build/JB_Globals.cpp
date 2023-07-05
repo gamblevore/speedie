@@ -389,7 +389,7 @@ JBClassPlace4(DTWrap, JB_AsClass(JB_Object), DTWrap_FuncTable_);
 
 ErrorList_Behaviour InitTableJB_ErrorReceiver_() { // Behaviour 
 	ErrorList_Behaviour Result;
-	Result.__destructor__ = (void*)JB_Rec_Destructor;
+	Result.__destructor__ = (void*)JB_Rec_destructor;
 	Result.render = (__Object_Render__)JB_Rec_Render;
 	return Result;
 }

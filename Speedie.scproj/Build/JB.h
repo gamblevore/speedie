@@ -1368,6 +1368,7 @@ extern Process* SC__AC_Perry;
 extern byte SC__AC_ShouldEnter;
 extern int SC__AC_total;
 extern u16 JB__API_NilHappened;
+extern JB_ErrorReceiver* JB__Constants__ParseProtector;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
 extern CharSet* JB__Constants_CSLine;
@@ -1381,7 +1382,6 @@ extern Dictionary* JB__Constants_EscapeStr;
 extern Dictionary* JB__Constants_JS_EscapeStr;
 extern Dictionary* JB__Constants_JS_UnEscapeStr;
 extern JB_String* JB__Constants_Name;
-extern JB_ErrorReceiver* JB__Constants_ParseProtector;
 extern Dictionary* JB__Constants_UnEscapeStr;
 extern Dictionary* JB__Constants_XML_EscapeStr;
 extern Dictionary* JB__Constants_XML_UnEscapeStr;
@@ -1580,6 +1580,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_LargestFlag (65535)
 extern Dictionary* JB_RootCollectTable;
 extern JB_ErrorReceiver* JB_StdErr;
+extern JB_ErrorReceiver* JB_StdErrOriginal;
 extern Syntax JB_SyxAcc;
 extern Syntax JB_SyxAdj;
 extern Syntax JB_SyxARel;
@@ -1830,12 +1831,18 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__IPCState_invalid (4667)
 #define kJB__IPCState_timedout (4663)
 #define kJB__IPCState_Waiting (4660)
-#define kJB__MsgUIFlags_AlreadyProcessed (2048)
 #define kJB__MsgUIFlags_BreakPoint (32768)
+#define kJB__MsgUIFlags_Editable (1792)
+#define kJB__MsgUIFlags_EditableAny (1792)
+#define kJB__MsgUIFlags_EditableNum (512)
+#define kJB__MsgUIFlags_EditableString (256)
+#define kJB__MsgUIFlags_EditableSyx (1024)
+#define kJB__MsgUIFlags_EditableThing (768)
 #define kJB__MsgUIFlags_Inserted (8192)
 #define kJB__MsgUIFlags_LargestFlag (0)
-#define kJB__MsgUIFlags_Reserved (4096)
 #define kJB__MsgUIFlags_Style2 (16384)
+#define kJB__MsgUIFlags_User1 (2048)
+#define kJB__MsgUIFlags_User2 (4096)
 #define kJB__NilState_Either (3)
 #define kJB__NilState_Nil (1)
 #define kJB__NilState_Optional (3 + 4)
@@ -2626,6 +2633,10 @@ int JB_Constants__Init_();
 int JB_Constants__InitCode_();
 
 void JB_Constants__InitConstants();
+
+void JB_Constants__ParseProtect();
+
+JB_ErrorReceiver* JB_Constants__ParseProtectSub();
 
 JB_String* JB_Constants__TestJB();
 
