@@ -15,9 +15,10 @@
 #if __linux__
 	#include <sys/mman.h>
 	#include <sys/sendfile.h>
+	#include <linux/limits.h>
 #else
-//	#include <copyfile.h>
-//	#include <sys/posix_shm.h>
+	#include <copyfile.h>
+	#include <sys/posix_shm.h>
 #endif
 
 

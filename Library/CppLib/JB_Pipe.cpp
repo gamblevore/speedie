@@ -18,10 +18,14 @@
 #include <sys/stat.h>
 
 #include <pwd.h>
-#include <time.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <sys/mman.h>
-#include <unistd.h>
+
+#if __linux__
+	#include <sys/mman.h>
+	#include <sys/sendfile.h>
+	#include <linux/limits.h>
+#endif
 
 
 extern "C" const char** JB_BackTrace(void** space, int* size) {
