@@ -734,9 +734,15 @@ int JB_File_OpenBlank( JB_File* self ) {
 int JB_Str_MakeDir(JB_String* self) {
     uint8 Buffer[PATH_MAX];
     NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileString( self, Buffer );
-    int err = mkdir(tmp, kDefaultMode);
-    if (err == -1 and errno == EEXIST)
+	struct _stat st;
+	int err = stat( tmp, &st );
+	if (!err and S_ISDIR(st.st_mode)) {
 		return 0;
+	}
+    err = mkdir(tmp, kDefaultMode);
+    if (err == -1 and errno == ENOENT and RetryMakePath(self)) {
+		err = mkdir(tmp, kDefaultMode);
+	}
     if (!err) {
 		RelaxPath_(tmp, true, self);
 		return 0;
