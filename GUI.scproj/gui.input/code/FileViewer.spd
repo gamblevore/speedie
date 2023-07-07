@@ -195,11 +195,11 @@ class FileViewer (ListView)
 
 
 	helper CanSave (|int| Purpose, |filerow| f, |&int| Decision,   |bool|)
-		|| d = f._Document#require
-		if !d.DocError
+		|| d = f._Document		#require
+		if !d.ShouldntSave
 			return true
 		.editme.LoadDocument(d)
-		d.ShowErrorInViewers
+		d.ShowParseErrorInViewers
 		if Purpose == DocumentState.ErrorChecking
 			return false 
 		if (purpose == DocumentState.Saving)
