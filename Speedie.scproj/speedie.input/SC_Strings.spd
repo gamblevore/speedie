@@ -70,8 +70,13 @@ function ObjectifyString (|Message| msg)
 
 
 function GetFileString (|Message| msg, |string| name, |message|)
+	expect (msg ~= "file" or "img") (msg)
+	
 	|| f = compiler.InputFile(nil, name, msg)
-		msg.become(@str, f.readall)
+		|| data = f.readall
+		if msg ~= "img"
+			data = compiler.ConvertPNGToQBOI(data)
+		msg.become(@str, data)
 		(SCImport.Recent max= f.modified) 
 		msg.clear
 		.ObjectifyString(msg)

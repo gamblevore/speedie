@@ -162,6 +162,8 @@ class Image (memory)
 		return .SyntaxAccess(p.ivec2).Color
 		
 	function SavePNG (|file| f) // writetofile
+		disabled "unfinished code"
+		return
 		if f.openEmpty
 			f.RawWritePng(.wh.x, .wh.y, .ptr|&byte|)
 	
@@ -257,33 +259,23 @@ class Image (memory)
 
 	
 	module
-		function file.RawWritePng (|int| w, |int| h, |&byte| data, |int|)
-			cpp_wrapper JB_File_WritePng
-		
-		function Load (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |&byte|)
-			cpp_wrapper JB_LoadImage
-		
-		function Load (|Message| l, |image|)
-			cpp_part LoadMsg
-			|| w = l[@num, 0].int
-			|| h = l[@num, 1].int
-			|| d = l[2].nyme.decompress
-			require (w > 0) and (h > 0) and d
-			|| img = image((w,h), l.name)
-				img.Copy(d)
-				return img
+		function LoadQOI (|&byte| data, |int| len, |&int| Size, |&byte|)
+			cpp_wrapper JB_Img__LoadQOI
 
-		function string.LoadImage (|image|)
-			|| x	= 0
-			|| y	= 0
-			|| comp	= 0
-			|| buff = image.load( .addr, .length, &x, &y, &comp, 4 )
-				return image((x, y), buff)
+		function WriteQOI (|&byte| data, |&int| len, |int| w, |int| h, |&byte|)
+			cpp_wrapper JB_Img__WriteQOI
 
-		
-		function file.LoadImage (|image|)
-			|| f = .readall
-				return f.loadimage #expect (.path, "Failed to read image.")
+		function string.LoadQOI (|image|)
+			|int[2]| xy
+			|| str = .decompress
+			|| buff = image.loadqoi( str.addr, str.length, xy )
+				return image((xy[0], xy[1]), buff)
+
+		function file.LoadQOI (|image|)
+			|| s = .readall
+				return s.loadqoi #expect (.path, "Failed to read image.")
+
+
 
 
 // move over to the other file.

@@ -619,7 +619,6 @@ function ExprFuncsInit
 	exprfuncs[@sthg] = (TypeOfSthg)
 	exprfuncs[@Dot ] = (TypeOfDot)
 	exprfuncs[@Name] = (TypeOfSyx)
-	exprfuncs[@url ] = (TypeOfURL)
 	exprfuncs[@list] = (TypeOflist)
 	exprfuncs[@Arr ] = (TypeOfArr)
 	exprfuncs[@Arg ] = (TypeOfArgArr)

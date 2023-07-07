@@ -31,7 +31,7 @@ module font
 	|image| small_
 	function Small (|Image|)
 		opt norefcounts
-		return .small_ init ( file://SmallFont.png ).fontload
+		return .small_ init ( img://SmallFont.png ).fontload
 	constants
 		Width = 6 
 		Height = 9 
@@ -68,7 +68,7 @@ function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |ImagePixe
 
 
 helper string.FontLoad (|image|)
-	rz = .loadimage$
+	rz = .Loadqoi$ 
 	for v in rz
 		if !v.hascolor or !v.a
 			v <~ 0

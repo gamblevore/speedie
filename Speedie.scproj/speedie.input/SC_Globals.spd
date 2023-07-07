@@ -59,15 +59,7 @@ function TypeCastCheck (ExprResolver) // typecheck
 
 function scdecl.exists (|bool|)
 	return self and self != typevoid and typenil
-
-	
-function TypeOfURL (ExprResolver)
-//	|| OK so... we want the... URL as a file
-// could load file from http later but thats also some kind of a security flaw
-// what use is code that cant compile?
-	require exp.expect(@url, "file")
-	if scfunction.GetFileString(exp, exp.first.name)
-		return TypeOfExpr(exp, name_space)
+			
 
 
 function TypeOfARel (ExprResolver)
