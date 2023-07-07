@@ -28,17 +28,28 @@ class DrawControl (GuiControl) // imageeditor
 	
 	
 	helper LoadNative (|string| f, |bool|)
+		return false
 		|| root = f.parse_jbin
 		|| imgs = root..jdraw..layers
 		for l in imgs
 			if l.Expect(@tmp)
-				|| p = image.Load(l)
+				|| p = .Loadmsg(l)
 					.layers <~ p
 		|| size = .Size
 		for p in .Layers
 			expect (p.Size == size) ("Layers have different sizes.")
 		return true
 	
+		
+	function LoadMsg (|Message| l, |image|)
+		disabled
+		|| w = l[@num, 0].int
+		|| h = l[@num, 1].int
+		|| d = l[2].nyme.decompress
+		require (w > 0) and (h > 0) and d
+		|| img = image((w,h), l.name)
+			img.Copy(d)
+			return img
 	
 	function Save
 /*jdraw 1
@@ -89,12 +100,14 @@ class DrawControl (GuiControl) // imageeditor
 	
 	
 	function ExportPNG (|file| dest)
+		disabled "unfinished code"
+		return
 		.Domerge(false)
 		.Merged.SavePNG(dest)
 		
 		
 	helper LoadImage (|string| f, |bool|)
-		|| p = f.LoadImage
+		|| p = f.Loadqoi
 			.Layers <~ p
 			return true
 	
