@@ -75,7 +75,7 @@ class PerryIDE (Window)
 	|bool|						IsTextOnly
 	|bool|						UsingSpdLib
 	|bool| 						DebugIsWaitingForCompile
-	|bool|						IsLoading
+	|byte|						IsLoading
 	|bool|						FromNextPrev
 	|bool|						InConstructor
 	|byte|						NoClutter
@@ -685,10 +685,12 @@ class PerryIDE (Window)
 		|| Loaded =  E.LoadDocument(doc)
 		.ListAllFuncs
 		require Loaded
+		.IsLoading++
 		|| it = .projmsg
 			if !.isloading
 				it["edit"] = r.location
 			it["pos"] = doc.Position
+
 		.filelist.select(r)
 		e.ClearErrors
 		.LoadErrors(true, false)
@@ -697,6 +699,7 @@ class PerryIDE (Window)
 		if .IsEditingSource and .feedback.closed
 			.Recheck
 		.updatemem = true
+		.IsLoading--
 		return 1
 
 

@@ -491,9 +491,11 @@ extend PerryIDE
 	function LoadProject (|file| proj, |bool|)
 		require proj.mustexist("load project")
 		.project = proj
-		.IsLoading = true
-		require .LoadConfSub(proj)
-		.IsLoading = false
+		.IsLoading++
+		.LoadConfSub(proj)
+		.IsLoading--
+		require .StartProj
+
 		startupwindow.hide
 		.viewasproject
 		.ForceRecheck
@@ -510,7 +512,8 @@ extend PerryIDE
 			is broken
 
 		// * need to alter the saved errors when the .perry file is altered...
-			
+	
+	
 	function StartFiles
 		|| IsDir     = .project.isdir
 		|| ProjConf	 = .perryfile
@@ -577,7 +580,7 @@ extend PerryIDE
 		return .project.child(".perry")
 	
 	
-	function LoadConfSub (|file| proj, |bool|)
+	function LoadConfSub (|file| proj)
 		perry.AddProj(proj.path, self)
 		|| r = .root
 			.id = r.location
@@ -585,8 +588,6 @@ extend PerryIDE
 		.FileHistory.clear
 		
 		.StartFiles
-		.isloading = false		// its done and we need .startproj
-		return .StartProj
 	
 
 
