@@ -16,8 +16,10 @@
 
 #ifdef ENV64BIT
     #define kBlockSize          13  // 8K!
+    #define BadBit				3
 #else
     #define kBlockSize          12  // 4K
+    #define BadBit				3
 #endif
 
 
@@ -220,6 +222,8 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 				failed("corrupt freeobj next chain");
 			}
 		}
+		if (((IntPtr)(Obj->Next)) & BadBit)
+			failed("corrupt freeobj next ptr");
 		return Obj->Next;
 	}
 	void AllocBlock_Debug(AllocationBlock* B) {
