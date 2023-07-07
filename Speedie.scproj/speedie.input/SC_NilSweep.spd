@@ -34,7 +34,7 @@ function SCFunction.NeedsNilCheck (|bool|)
 	debugat
 
 
-function SCfunction.NilCheck (|&NilTracker| T)
+function SCfunction.GoNil (|&NilTracker| T)
 	scfunction.currfunc = self
 	// Decls start unknown... unless specified or datatypes
 	T.Start(self)
@@ -53,7 +53,7 @@ module NilSweep
 		|NilTracker| T
 		for f in compiler.funclist
 			if f.NeedsNilCheck
-				f.NilCheck(T)
+				f.gonil(T)
 		
 		scfunction.currfunc = nil
 		.Sweep

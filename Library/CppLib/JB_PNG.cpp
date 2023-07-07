@@ -3,10 +3,10 @@
 #define STBI_MAX_DIMENSIONS 1<<14
 #ifndef AS_LIBRARY
 #define STBIW_WINDOWS_UTF8
-#define QOI_NO_STDIO
 
+#define QOI_NO_STDIO
 #define QOI_IMPLEMENTATION
-#include "qoi.h" // we can dump PNGs soon I hope
+#include "qoi.h"
 
 #define STBI_NO_BMP
 #define STBI_NO_PSD
