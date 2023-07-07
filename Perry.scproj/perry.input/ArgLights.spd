@@ -12,12 +12,11 @@
 /* "Why have a GUI when you can turn a textView INTO a GUI?"
 
 todo:
-	Make tmp rendering use rangelength to pad with spaces... unifying the length
-	Attach an array of strings, to tmp.first.obj... for a user choseable list
-	Disable editing/selecting of unilluminated areas, unless in "forced mode"
-	Draw a vertical line between the tmps and the values
-	Always re-render... unless in forced mode.
-
+	* Make tmp rendering use rangelength to pad with spaces... unifying the length
+	* Attach an array of strings, to tmp.first.obj... for a user choseable list
+	* Disable editing/selecting of unilluminated areas, unless in "forced mode"
+	* Draw a vertical line between the tmps and the values
+	* Always re-render... unless in "forced mode".
 */
 
 

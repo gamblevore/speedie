@@ -6,6 +6,7 @@ bugs:
 	* return (self, high)|ControlLine| // self/high are controlpoints
 	*	opt norefcounts
 		stderr = jeebox._ParseProtector init errorlist() // doesn't refcount stderr?
+	* refcounter passing properties SHOULD NOT assume it won't be cleared... not without disturbance checker
 	* function finding fails with dictionary subclasses? DictSub["abc"]
 	* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
 	* vector constants
