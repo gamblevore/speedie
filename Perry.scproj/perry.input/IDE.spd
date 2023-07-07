@@ -736,8 +736,15 @@ class PerryIDE (Window)
 
 
 	function ParseErrorDetect
-		|| err = .editme.MyError
-			.errorlist <~ err // right?
+		// not necessarily an error!? what if the file is not spd?
+		for e.toplist in .errorlist
+			if e isa error
+				if e is parse
+					e.remove
+		
+		if .IsEditingSource	
+			|| err = .editme.MyError
+				.errorlist <~ err // right?
 
 	
 	function LoadStartupErrors

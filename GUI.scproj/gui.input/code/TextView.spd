@@ -805,6 +805,7 @@ class TextView (GUIControl)
 	// they will call finddrawinfo... which can parse and resplit the entire textview...
 	// bad to do that from within .parse itself which then becomes recursive.
 
+
 	function ClearErrors
 		opt norefcounts
 		.myerror = nil
@@ -868,8 +869,6 @@ class TextView (GUIControl)
 		|| d   = .findDrawInfo(pos)
 		require d and d isnt fakemsg
 		|| msg = d.message						#require
-		//if msg == @arg
-			//return msg // whatever
 		|| after = d.after_with_msg
 		if pos > after
 			pos = .text.outwhite(pos, after)
@@ -1135,41 +1134,47 @@ class TextView (GUIControl)
 		return .insertsub(s, .selrange, selnew)
 
 
-	helper TakeAllErrors (|errorlist| L)
+	helper LoadValErrors (|errorlist| L)
 		while (|| err = stderr.pop)
 			.lineerroradd(err, false)
 			.myerror = err
 			Notifications <~ err
 
 
-	helper Validate (|string| Text, |bool| Use, |bool|)
-		if ._InParse_ // dont want recursive!!!
-		._InParse_ = true
+	helper ValidateNewText (|message|)
 		jeebox.ParseProtect
 		
-		|| msg = text.parse
-		rz = msg!=nil
-		
-		.myerror = stderr.errors.last // corrupts memory?
-		if msg and .onvalidate
-			(.OnValidate)(self, msg)
-			rz = stderr.ok
-			.ClearErrors
+		|| msg = .text.parse
+			msg.obj = .path
+		  else
+			.myerror = stderr.pop // this will be caught in preparelines
 
-		if !rz and !use
-			if .OnValidate
-				beep
-			.TakeAllErrors(stderr)
-
-		if use
-			|| v = ._viewing
+		|| v = ._viewing
+			if .expectsparse > probablyjeebox
+				v.ShouldntSave = !msg
+				v.docparsed = msg
+			  else
 				v.ShouldntSave = false
 				v.docparsed = nil
-				if .expectsparse > probablyjeebox
-					v.docparsed = msg
-					v.ShouldntSave = .myerror
-			if msg
-				msg.obj = .path
+
+		stderr = StdErrOriginal
+		return msg
+	
+	
+	helper ValidateOnly (|string| Text, |bool|)
+		if !.OnValidate
+			return true
+		debug_require !._InParse_ // dont want recursive!!!
+		._InParse_ = true
+		jeebox.ParseProtect
+
+		.ClearErrors
+		|| msg = text.parse
+			(.OnValidate)(self, msg)
+		if !stderr.ok
+			beep
+			.LoadValErrors(stderr)
+
 		stderr = StdErrOriginal
 		._InParse_ = false
 	
@@ -1201,7 +1206,7 @@ class TextView (GUIControl)
 		  else
 			|| t = .text
 			|| nt = t.insert(s, p.x, p.width)
-			if .OnValidate and !.Validate(nt, false)
+			if !.ValidateOnly(nt)
 				return p.x
 			|| u = .undoer
 				|| c = u.current
@@ -1595,7 +1600,7 @@ class TextView (GUIControl)
 		if super.textset(NewText)
 			.ClearSub(NewText, keepstart)
 			return true
-		if NewText=="" // Setting to "" does all the extra work? why not just the first time?
+		if !.lines.hasany // in case we need to anyhow... usually for ""
 			.ClearSub(NewText, keepstart)
 
 
@@ -1670,6 +1675,7 @@ class TextView (GUIControl)
 	function Parse (|message|)
 		return .Parse(false, .FindExpectsParse)
 	
+	
 	helper Parse (|bool| Changed, |int| expect, |message|)
 		cpp_Part ViewParseSub
 
@@ -1684,7 +1690,7 @@ class TextView (GUIControl)
 		if !sel.width and sel.x > 0
 			parser.DotInsertAllow = true
 
-		.validate(.text, true)
+		p = .validatenewtext 
 		
 		if expect <= 1
 			.myerror = nil
