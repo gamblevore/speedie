@@ -20,7 +20,9 @@ JBClass( JB_File, JB_StringShared,
 int JB_File__RelaxSudo(int Active);
 JB_String* JB_File__FileData( JB_String* Path );
 int JB_File_WritePng(void* file, int w, int h, const void *data);
-unsigned char* JB_LoadImage(unsigned char* data, int len, int* x, int* y, int* comp, int req_comp);
+unsigned char* JB_Img__LoadPNG(unsigned char* data, int len, int* x, int* y, int* comp, int req_comp);
+uint8* JB_Img__LoadQOI(uint8* data, int len, int* Size);
+uint8* JB_Img__WriteQOI(uint8* data, int w, int h, int* len);
 JB_String* JB_File_CurrChild (JB_File* self);
 long JB_File_Test( );
 JB_String* JB_File_Render(JB_File* self, FastString* fs);

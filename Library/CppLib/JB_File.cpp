@@ -562,7 +562,7 @@ inline bool WorthTestingCase() {
 
 static void CaseFail_(JB_String* Orig, const char* Actual, bool Owned) {
 	CaseComparisonsAllowed -= 64;
-	JB_String* Ugh = Owned ? JB_Str__Freeable(Actual) : JB_Str_CopyFromCString(Actual);
+	JB_String* Ugh = Owned ? JB_Str__Freeable0(Actual) : JB_Str_CopyFromCString(Actual);
 	JB_ErrorHandleFile(Orig, Ugh, -1, "case-differs", "finding path", 3, "found");
 }
 
@@ -614,7 +614,7 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 			free(Resolved);
 			Result = self;
 		} else {
-			Result = JB_Str__Freeable( Resolved );
+			Result = JB_Str__Freeable0( Resolved );
 		}
 	} else if (!(errno == ENOENT and AllowMissing)) {
 		JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
