@@ -61,7 +61,7 @@ function SCdecl.NeedsNilTighten (|bool|)
 	if self
 		if (.NilDeclared isnt stated) and (.nilused is stated)
 			return true
+		return false
 		if .nilused is Stated
-			//printline SCFunction.CurrFunc
 			if !options.perry
-				debugat // we don't know? why?
+				debugat
