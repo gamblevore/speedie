@@ -1344,13 +1344,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1878])
+#define kJB__ErrorColors_bold (JB_LUB[1879])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1879])
-#define kJB__ErrorColors_good (JB_LUB[1880])
-#define kJB__ErrorColors_normal (JB_LUB[1881])
-#define kJB__ErrorColors_underline (JB_LUB[1880])
-#define kJB__ErrorColors_warn (JB_LUB[1882])
+#define kJB__ErrorColors_error (JB_LUB[1880])
+#define kJB__ErrorColors_good (JB_LUB[1881])
+#define kJB__ErrorColors_normal (JB_LUB[1882])
+#define kJB__ErrorColors_underline (JB_LUB[1881])
+#define kJB__ErrorColors_warn (JB_LUB[1883])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1527,7 +1527,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[354])
 #define kSC_BitNot (JB_LUB[616])
 #define kSC_BitOr (JB_LUB[558])
-#define kSC_BitXor (JB_LUB[1883])
+#define kSC_BitXor (JB_LUB[1884])
 #define kSC_CastedMatch (6 << 22)
 #define kSC_destructornotfromlocalrefs (1024)
 #define kSC_DontSaveProperty (0)
@@ -1559,7 +1559,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1884])
+#define kJB_SaverStart1 (JB_LUB[1885])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1 << 22)
@@ -2120,6 +2120,8 @@ JB_String* JB_App__pref_path();
 
 bool JB_App__PrefsInit(Date when);
 
+void JB_PrintStackTrace();
+
 void JB_App__Restart();
 
 void JB_App__SavePrefs();
@@ -2190,6 +2192,8 @@ bool SC_Comp__CompileAll();
 void SC_Comp__CompileTime();
 
 SCClass* SC_Comp__Constpiler(JB_String* name);
+
+JB_String* SC_Comp__ConvertPNGToQBOI(JB_String* p);
 
 void SC_Comp__CreateDisambiguation();
 
@@ -3414,8 +3418,6 @@ SCObject* SC_TypeOfType(Message* Exp, SCBase* name_space, Message* side);
 
 SCObject* SC_TypeOfUnit(Message* Exp, SCBase* name_space, Message* side);
 
-SCObject* SC_TypeOfURL(Message* Exp, SCBase* name_space, Message* side);
-
 SCDecl* SC_TypeOfVecAccess(Message* index, SCDecl* ty0, int w);
 
 JB_String* SC_UniqueTmpVar(SCBase* base, JB_String* name);
@@ -4564,6 +4566,8 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
+void SC_IR_Print(IR* self);
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5266,6 +5270,8 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
+
+int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -5984,9 +5990,9 @@ JB_String* SC_Str_InterfaceToBehaviour(JB_String* self);
 
 Ind JB_Str_InWhite(JB_String* self, int Start, int After);
 
-JB_String* JB_Str_ipcName(JB_String* self);
+JB_String* JB_Str_IPCName(JB_String* self);
 
-JB_String* JB_Str_ipcPath(JB_String* self);
+JB_String* JB_Str_IPCPath(JB_String* self);
 
 bool SC_Str_isCLike(JB_String* self);
 
@@ -8656,7 +8662,7 @@ bool JB_config_Save(Message* self);
 
 //// HEADER Inlines.h
 inline bool JB_int_OperatorInRange(int self, int d) {
-	iif (d > 0) {
+	if (d > 0) {
 		return (((uint)self) < ((uint)d));
 	}
 	return false;
@@ -8694,12 +8700,13 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
 inline void SC_flat_AddExtended(ASMFuncState* self, Message* err, uint Bits) {
 	int B = 1 << 31;
-	iif (((bool)(Bits & B))) {
+	if (((bool)(Bits & B))) {
 		JB_Msg_SyntaxExpect(err, nil);
 		return;
 	}
@@ -8724,22 +8731,22 @@ inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v) {
 
 inline int SC_nil_EnterIf(NilTracker* self, Message* m) {
 	Syntax fn = m->Func;
-	iif (fn == JB_SyxThg) {
+	if (fn == JB_SyxThg) {
 		SCDecl* d = ((SCDecl*)JB_Object_FastAs(m->Obj, JB_AsClass(SCDecl)));
-		iif ((!d)) {
+		if ((!d)) {
 			return nil;
 		}
 	}
-	iif (fn == JB_SyxRel) {
+	if (fn == JB_SyxRel) {
 		Message* f = ((Message*)JB_Ring_First(m));
 		Message* op = ((Message*)JB_Ring_NextSib(f));
 		Message* l = ((Message*)JB_Ring_NextSib(op));
 		SCOperator* scop = ((SCOperator*)JB_Object_FastAs(op->Obj, JB_AsClass(SCOperator)));
-		iif (scop->IsAndOr) {
-			iif (SC_Opp_SyntaxEquals(scop, JB_LUB[32], false)) {
+		if (scop->IsAndOr) {
+			if (SC_Opp_SyntaxEquals(scop, JB_LUB[32], false)) {
 				debugger;
 			}
-			iif (SC_Opp_SyntaxEquals(scop, JB_LUB[33], false)) {
+			if (SC_Opp_SyntaxEquals(scop, JB_LUB[33], false)) {
 				debugger;
 			}
 		}
@@ -8815,16 +8822,16 @@ inline void SC_Msg_NilCheckFP(Message* self, NilTracker* T) {
 
 inline void SC_Msg_NilCheckProperty(Message* self, NilTracker* tracker) {
 	SCDecl* Prop = SC_Msg_DotMustBeProperty(self);
-	iif ((!(((bool)Prop) and (SC_Decl_SyntaxIsnt(Prop, kJB__SCDeclInfo_onmodule))))) {
+	if ((!(((bool)Prop) and (SC_Decl_SyntaxIsnt(Prop, kJB__SCDeclInfo_onmodule))))) {
 		return;
 	}
 	Message* f = ((Message*)JB_Ring_First(self));
 	SCDecl* ObjDecl = SC_TypeOfExpr(f, nil, nil);
-	iif ((!ObjDecl)) {
+	if ((!ObjDecl)) {
 		debugger;
 		return;
 	}
-	iif ((!(SC_NilState_SyntaxIs(ObjDecl->NilUsed, kJB__NilState_Real)))) {
+	if ((!(SC_NilState_SyntaxIs(ObjDecl->NilUsed, kJB__NilState_Real)))) {
 		JB_Msg_SyntaxExpect(self, JB_LUB[1589]);
 		return;
 	}
