@@ -357,7 +357,8 @@ module SDLApp
 		
 		.GUICheck
 		if !font.small
-			app.die("smallfont not loaded.\n")
+			sdlapp.Alert("Exitting...", "SmallFont not loaded.")
+			app.quit
 		.FrameLength = 1.0/60.0
 		.FastToolTipDate = 1
 
