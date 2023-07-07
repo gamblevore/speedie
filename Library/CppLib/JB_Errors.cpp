@@ -10,11 +10,16 @@
 extern "C" {
 
 
-JB_String* JB_Str__Freeable(const char* Msg) {
+JB_String* JB_Str__Freeable(uint8* p, int n) {
     JB_String* Str = JB_New( JB_String );
-    Str->Addr = (uint8*)Msg;
-    Str->Length = (int)strlen(Msg);
+    Str->Addr = (uint8*)p;
+    Str->Length = n;
     return Str;
+}
+
+
+JB_String* JB_Str__Freeable0(const char* Msg) {
+	return JB_Str__Freeable((uint8*)Msg, (int)strlen(Msg));
 }
 
 
@@ -23,7 +28,7 @@ JB_String* FreeableStr_(const char* Msg, bool CanFree) {
     // otherwise not.
     if (!CanFree)
         return JB_StrC(Msg);
-    return JB_Str__Freeable(Msg);
+    return JB_Str__Freeable0(Msg);
 }
 
 
