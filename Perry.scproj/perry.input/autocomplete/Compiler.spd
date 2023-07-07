@@ -47,17 +47,16 @@ extend PerryIDE
 		isnt active
 		|| MaybeOK = msg.first
 		sdlapp.CompileStatus = nil
-		|| err = .editme.MyError
-		if !err and (MaybeOK == "ok")
+		if (MaybeOK == "ok")
 			.ErrorList.clear
 			return .CompiledOK(msg)
 
 		is Broken
 		.NoNeed
 		.errorlist.listsource = MaybeOK.jberrors
-		.RelistStartupErrors
-		if err
-			.ErrorList <~ err
+//		.RelistStartupErrors
+//		|| err = .editme.MyError
+//			.ErrorList <~ err
 
 
 	function Compile (|string| operation)
@@ -83,11 +82,11 @@ extend PerryIDE
 	
 		
 	function ErrorListFB (|message| msg, |bool|)
-		.filelist.ClearErrors
+		|| RealErrors	= msg ~!= "check"
+		.ClearErrors(RealErrors)
 		|| NoErrors		= .ShowCompileErrors(msg)
 		|| ErrsVis		= .isviewing(.errorlist) 
 		.errorlist.selectfirst
-		|| RealErrors	= msg ~!= "check"
 		if !RealErrors
 			0
 		  elseif NoErrors
