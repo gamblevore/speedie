@@ -227,4 +227,3 @@ struct GameFlyingMem
 		wrapper
 		cpp_part Mem
 
-
