@@ -11,6 +11,7 @@ class TextView (GUIControl)
 	|bool|						CanSeeAllLines
 	|bool|						GroupSaveAll
 	|bool|						CopyPlaceActive
+	|bool|						_InParse_
 	|bool|						CanAutoComplete
 	|byte|						ClicksDown
 	|byte|						CodeInsertionState
@@ -39,7 +40,6 @@ class TextView (GUIControl)
 	|Document|					_Viewing
 
 	function Document (|document|)
-		opt norefcounts
 		return ._Viewing
 	
 	function Document (assigns:|document|)
@@ -785,7 +785,8 @@ class TextView (GUIControl)
 		B = .findline(b) ?? .text.length
 		return (A+1, b) // don't include the line.
 
-			
+	
+	// don't call these internally...
 	function ShowParseError
 		.errorat(.myerror)
 	
@@ -799,8 +800,10 @@ class TextView (GUIControl)
 	function ErrorAt (|error| err)
 		if err
 			.ErrorJump(err)
-			.LineErrorAdd( err )
-
+			.LineErrorAdd( err, true )
+	///// end of non-internal calls
+	// they will call finddrawinfo... which can parse and resplit the entire textview...
+	// bad to do that from within .parse itself which then becomes recursive.
 
 	function ClearErrors
 		opt norefcounts
@@ -819,9 +822,12 @@ class TextView (GUIControl)
 				sdlapp.touch(Self)
 
 
-	function LineErrorAdd (|error| e)
+	helper LineErrorAdd (|error| e, |bool| ForceParse=true)
 		opt norefcounts
-		|| r = .FindDrawInfo(.clamp(e.position))		#require
+		require forceparse or !.NeedsPrepare
+		|| p = .clamp(e.position)
+		|| r = .FindDrawInfo(p)		#require
+
 		if r.TrySetError(e) or !.myerror
 			.myerror := e
 			sdlapp.touch(Self)
@@ -1131,29 +1137,41 @@ class TextView (GUIControl)
 
 	helper TakeAllErrors (|errorlist| L)
 		while (|| err = stderr.pop)
-			.lineerroradd(err)
+			.lineerroradd(err, false)
 			.myerror = err
 			Notifications <~ err
 
 
 	helper Validate (|string| Text, |bool| Use, |bool|)
+		if ._InParse_ // dont want recursive!!!
+		._InParse_ = true
 		jeebox.ParseProtect
 		
 		|| msg = text.parse
 		rz = msg!=nil
+		
+		.myerror = stderr.errors.last // corrupts memory?
 		if msg and .onvalidate
 			(.OnValidate)(self, msg)
 			rz = stderr.ok
 			.ClearErrors
-		if use
-			.parsedmessage = msg
 
 		if !rz and !use
 			if .OnValidate
 				beep
 			.TakeAllErrors(stderr)
-				
+
+		if use
+			|| v = ._viewing
+				v.ShouldntSave = false
+				v.docparsed = nil
+				if .expectsparse > probablyjeebox
+					v.docparsed = msg
+					v.ShouldntSave = .myerror
+			if msg
+				msg.obj = .path
 		stderr = StdErrOriginal
+		._InParse_ = false
 	
 	
 	helper CanAlterRange (|intrange| r, |bool|)
@@ -1647,24 +1665,14 @@ class TextView (GUIControl)
 	helper ParsedMessage (|message|)
 		if ._viewing
 			return ._viewing.DocParsed
-		
-
-	helper ParsedMessage (assigns:|message|)
-		opt norefcounts
-		with ._viewing
-			if self.expectsparse > probablyjeebox
-				.docparsed = value
-				.docerror = self.myerror
-			  else
-				.docparsed = nil
-				.docerror = nil
-				
+						
 
 	function Parse (|message|)
 		return .Parse(false, .FindExpectsParse)
 	
 	helper Parse (|bool| Changed, |int| expect, |message|)
 		cpp_Part ViewParseSub
+
 		if !.WillAttemptParse(expect)
 			.myerror = nil // more reliable
 			return nil
@@ -1677,14 +1685,10 @@ class TextView (GUIControl)
 			parser.DotInsertAllow = true
 
 		.validate(.text, true)
-		p = .ParsedMessage
-		p.obj ?= .path
 		
 		if expect <= 1
 			.myerror = nil
-		  elseif .myerror
-			.lineerroradd(.myerror)
-		  elseif .coloriseasroot
+		  elseif !.myerror and .coloriseasroot
 			.ColoriseRoot(p)
 		return p
 	
@@ -1909,3 +1913,4 @@ helper string.InsertFix (|ivec2|r, |string|)
 //	operator plus (|string| s, |int|)
 //		return s.move(self, 1)
 //	
+
