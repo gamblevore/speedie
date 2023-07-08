@@ -4,7 +4,9 @@ struct NilTracker
 	linkage:cpp_part nil
 	|uint| 				Count
 	|uint| 				ParamCount
+	|message|			If
 	|scdecl--[1024]|	Items
+	
 
 	syntax Append (|scdecl| d)
 		expect (.count < 1024) (d.source, "Too many variables")

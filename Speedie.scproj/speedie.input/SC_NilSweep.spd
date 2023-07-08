@@ -75,14 +75,22 @@ not eliminiates it. There will be cases that we can't eliminate.
 */
 	
 	
-function NilTracker.Property (|message| msg)
-	pragma inline, opt norefcounts				// done?
-	|| Prop = msg.DotMustBeProperty
-	require prop and (prop isnt OnModule)
-	|| f = msg.first
-	|| ObjDecl = TypeOfExpr(f, nil) #debug_require
+function message.NilPropAccess (|scdecl|)
+	opt norefcounts
+	|| m = .DotMustBeProperty
+	if m and m isnt onmodule
+		return m
 
-	expect (ObjDecl.NilUsed is real) (msg, "Possible NilObject access.")
+
+function NilTracker.Property (|message| msg)
+	pragma inline, opt norefcounts
+	|| Prop = msg.NilPropAccess$
+	|| ObjDecl = TypeOfExpr(msg.first, nil) #debug_require
+
+	// if (msg): msg.prop
+	if obj.nilused isnt nil
+		return 
+	expect (ObjDecl.NilUsed isnt nil) (msg, "Possible NilObject access.")
 	ObjDecl.NilUsed &= ~NilState.Optional
 
 
@@ -107,11 +115,9 @@ function NilTracker.FP (|message| msg)
 function NilTracker.IfWhile (|message| msg)
 	// must re-add decls to the tracker...
 	opt norefcounts
+	expect !.if
+	.if = msg
 	|| tmp = msg
-	.InIfCond = true
-
-	// when we hit the arg, we can leave the if?
-	// all ifs have args...
 
 	
 	while tmp
@@ -121,11 +127,6 @@ function NilTracker.IfWhile (|message| msg)
 		|| arg = cond.next			#loop
 		|| depth = .EnterIf(cond)
 		//.arg(arg)
-		.LeaveIf(depth)
-		if tmp == msg
-			tmp = arg.next
-		  else
-			tmp = tmp.next
 
 
 function NilTracker.EnterIf (|message| m, |int|)
@@ -178,12 +179,6 @@ changes nothing:
 
 */
 
-	
-function NilTracker.LeaveIf (|int| n)
-	opt norefcounts
-	pragma inline
-
-
 function NilTracker.RunAll (|message| s)
 	opt norefcounts
 	while
@@ -194,7 +189,9 @@ function NilTracker.RunAll (|message| s)
 			|| n = s.next
 				s = .Enter(n)
 				exit
-			s = .Leave(s)		#require // we can't re-go-into this....
+			.Leave(s)	
+			s = s.parent
+			require s 
 
 
 
@@ -221,10 +218,15 @@ function NilTracker.Enter  (|message| s, |message|)
 		.FP(s)											//  (abc)()
 	return s
 	
+	
+function NilTracker.LeaveIf (|message| s)
 
-function NilTracker.Leave (|message| s, |message|)
-	|| fn = s.func
-	return s.parent
+function NilTracker.Leave (|message| s)
+	opt norefcounts
+	if s == .if
+		.LeaveIf(s)
+		
+
 	
 
 
