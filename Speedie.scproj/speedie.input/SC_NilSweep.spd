@@ -88,7 +88,7 @@ function NilTracker.Property (|message| msg)
 	|| ObjDecl = TypeOfExpr(msg.first, nil) #debug_require
 
 	// if (msg): msg.prop
-	if obj.nilused isnt nil
+	if objdecl.nilused isnt nil
 		return 
 	expect (ObjDecl.NilUsed isnt nil) (msg, "Possible NilObject access.")
 	ObjDecl.NilUsed &= ~NilState.Optional
