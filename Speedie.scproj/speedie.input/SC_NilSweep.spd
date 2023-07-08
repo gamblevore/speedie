@@ -4,24 +4,16 @@ Todo:
 	* Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
 					
 	* Strength:
-		Setting to a definite nil is ALWAYS an error... like: nil|msg|.pos=0
 		Strength is settable in the project if its an error or problem
-		For now it defaults to problem
+		For now it defaults to problem, but this is ALWAYS an error: nil|msg|.pos=0
+
 	* ternaries
 
 	|Byte|					Indent				// speedie does not use
-	|MsgUIFlags|			Flags				// speedie uses for "inserted" only!
-	|uint16|				RangeLength			// Speedie uses for debugging
+	|MsgUIFlags|			Flags				// speedie uses for "inserted/breakpoint" only.
 	|uint16|				Tag					// speedie uses this for ASM like "return/if/while/etc"
 	
-	
-	* thoughts on merging nil+ref
-		* bad... many issues. 
-		* We won't be able to make use of ALL the info as we won't have ALL of it at the time. Some we will... but whats the point?
-		* giant rework
-		* much more complex... merging multiple systems.
-	
-	* We could merge the "disturbance checker" with the nil checker anyhow...
+	* merge "disturbance checker" with nil checker?
 */
 
 
@@ -29,52 +21,41 @@ Todo:
 
 function SCFunction.NeedsNilCheck (|bool|)
 	require !.IsMacro and !.IsWrapper
-	if .BlindCasts < 123
-		return true
+	|| c = .Lookup
+		return c.name contains "NilTest"
+
+
+
+function SCfunction.UltimateNilChecker (|&NilTracker| T)
 	debugat
-
-
-function SCfunction.GoNil (|&NilTracker| T)
-	scfunction.currfunc = self
-	// Decls start unknown... unless specified or datatypes
+	opt norefcounts
+	scfunction.currfunc = self		// Decls start unknown... unless specified or datatypes
 	T.Start(self)
-	.sourcearg.NilCheckArg(T)		// this will specify everything
+	t.RunAll(.sourcearg)
 	T.Tighten(self)					// then we alter the function's nilness
-	T.Restore // nice!
-	
-	.BlindCasts = 123
+	T.Restore
 
 
-module NilSweep
-	function CheckAll
+module VoidSweeper
+	function SuperUberChecker
 		opt norefcounts
 		using options.NilStrength
 	
 		|NilTracker| T
 		for f in compiler.funclist
 			if f.NeedsNilCheck
-				f.gonil(T)
+				f.UltimateNilChecker(T)
 		
 		scfunction.currfunc = nil
 		.Sweep
 
 	
 	function Sweep
-		|| main = compiler.getmainfunc(nil)
+		// || init = compiler.getfunc("init_")
 		// what about "init_"?
-	
-
 
 /*
 Issues:
-	"if/while" must re-add decls to the tracker...
-if/while blocks need to keep a stack of multiple variables
-	if a and b and c
-		a.a(b.b(c.c))
-
-
-shared decls need unshare... after func is finished
-
 What about the fact that a function's nilness can rely on other funcs??
 like:
 
@@ -94,39 +75,54 @@ not eliminiates it. There will be cases that we can't eliminate.
 */
 	
 	
-function message.NilCheckProperty (|&NilTracker| tracker)
+function NilTracker.Property (|message| msg)
 	pragma inline, opt norefcounts				// done?
-	|| Prop = .DotMustBeProperty
+	|| Prop = msg.DotMustBeProperty
 	require prop and (prop isnt OnModule)
-	|| f = .first
+	|| f = msg.first
 	|| ObjDecl = TypeOfExpr(f, nil) #debug_require
 
-	expect (ObjDecl.NilUsed is real) (self, "Possible NilObject access.")
+	expect (ObjDecl.NilUsed is real) (msg, "Possible NilObject access.")
 	ObjDecl.NilUsed &= ~NilState.Optional
 
 
-function message.NilCheckAccess (|&NilTracker| T)
+function NilTracker.Access (|message| msg)
 	pragma inline
 
 
-function message.NilCheckFP (|&NilTracker| T)
+function NilTracker.FP (|message| msg)
 	// FP calls and behaviours should all assume NOT NIL unless specified...
 	pragma inline
 
 
-function message.NilCheckIfWhile (|&NilTracker| T)
+// OK... so we have an if test... now the thing is... we are being called from within
+// a special flattened searcher. So... after this returns... we'll get to the condition...
+// so should we process the condition NOW or later? We can do it later if we say "we are in an if"?
+// we could also preprocess it... then return where we will be next.
+
+// Im gonna need an absolute simple first case that I can catch a problem.
+// its the only way.
+
+
+function NilTracker.IfWhile (|message| msg)
+	// must re-add decls to the tracker...
 	opt norefcounts
-	|| tmp = self
+	|| tmp = msg
+	.InIfCond = true
+
+	// when we hit the arg, we can leave the if?
+	// all ifs have args...
+
 	
 	while tmp
 		|| cond = tmp.first			#loop
-		cond.NilCheckFlat(T)
+		//.allnodes(cond)
 
 		|| arg = cond.next			#loop
-		|| depth = T.EnterIf(cond)
-		arg.NilCheckArg(T)
-		T.LeaveIf(depth)
-		if tmp == self
+		|| depth = .EnterIf(cond)
+		//.arg(arg)
+		.LeaveIf(depth)
+		if tmp == msg
 			tmp = arg.next
 		  else
 			tmp = tmp.next
@@ -134,30 +130,6 @@ function message.NilCheckIfWhile (|&NilTracker| T)
 
 function NilTracker.EnterIf (|message| m, |int|)
 	opt norefcounts
-	pragma inline
-	// so... what do we do with this? how do we know what is happening?
-	// I guess... we need to start with the and/ors
-	// then find the individiaul items...
-
-	// what about this?	
-		// if (!a) a = b()
-	
-	// we need to build up a picture... of the nilness...
-	// also we need to know if the arg returns!!!
-	// what if it returns in multiple branches?
-		// if !a { if b {return 1} else {return 2} }
-		// a.b = 1
-		// we'll need a more sophisticated nil-tracker
-		// what is the time for?
-		// just for... the init behaviour right?
-		// its not needed for general funcs? I think we can remove it!
-
-		// nil-sweep can be a secondary thing??? and its only for globals!
-		// just remove it.
-		// Also... an arg could leave multiple decls not nil! a test too!!
-		// if (a and b): 
-		// if (!(msg)) means I need to deal with brels and bras
-
 	|| fn = m.func
 	if fn == @thg
 		|| d = m.obj as SCDecl			#require
@@ -173,69 +145,87 @@ function NilTracker.EnterIf (|message| m, |int|)
 			if scop == "or"
 				// throw away the results...
 	
-// the results also seem to depend on the arg!!	So we can't know what to do without knowing what the arg does!
-// and how the cond is...
-// it seems very complicated and I don't know where to start...
-// maybe just start with a very simple case?
-//if (msg) {
-//	Can Use Msg
-//}
-//if (!msg) {
-//	return
-//}
-// can use msg
-//	if msg
-//		// msg is now optional
-//		if msg > nil, if msg != nil // same
-//		// msg is now optional and NOT nil within this branch
-//	
-//	if msg == nil // msg is now optional... but nil within that branch
-//	if msg >= nil, msg <= nil // what? just fail!
-//	if !msg // msg is now nil!!
-//	if !msg
-//		return
-//	NOW msg is not nil!!
-//  
-//	
-	
+/*
+refills:
+	if (!a) a = b()
+
+multiple branches:
+	if !a { if b {return 1} else {return 2} }
+	a.b = 1
+
+
+can access prop:
+	if (msg)
+		msg.prop
+
+return affecting future code:
+	if (!msg)
+		return
+	msg.prop
+
+nil within branch
+	if msg == nil
+
+fail:
+	if msg >= nil, if msg <= nil
+
+multiple tests:
+	if (a and b)
+
+changes nothing:
+	if (a or b)
+
+
+*/
+
 	
 function NilTracker.LeaveIf (|int| n)
 	opt norefcounts
 	pragma inline
 
 
-
-function Message.NilCheckFlat (|&NilTracker| tracker)
+function NilTracker.RunAll (|message| s)
 	opt norefcounts
-	for s.flat in self
-		if s == @arg
-			s.NilCheckArg(tracker)
-			continue_with s.FlatAfter
-		  else
-			s.NilCheckMemory(tracker)
-
-
-function Message.NilCheckMemory (|&NilTracker| tracker)
-	opt norefcounts
-	|| f = .func
-	if f == @dot
-		.NilCheckProperty(tracker)									// abc.var
-	  elseif (f == @brel and self == "*") or f == @acc
-		.NilCheckAccess(tracker)									// *abc / abc[0]
-	  elseif (f == @func and .first == @bra)
-		.NilCheckFP(tracker)										//  (abc)()
+	while
+		|| ch = s.first
+			s = .Enter(ch)
+			continue
+		while
+			|| n = s.next
+				s = .Enter(n)
+				exit
+			s = .Leave(s)		#require // we can't re-go-into this....
 
 
 
-function Message.NilCheckArg (|&NilTracker| T)
-	#! We have ASM if/while flags set! Just use them???
-	opt norefcounts
-	for s in self
-		if s.func == @tmp and (s == "if" or "while")
-			s.NilCheckIfWhile(T)
-		  else
-			s.NilCheckFlat(T)
+function NilTracker.EnterArg  (|message| s)
 
+
+
+function NilTracker.Enter  (|message| s, |message|)
+	|| f = s.func
+	// now... what have we entered? and where from?
+	if (f == @tmp)
+		if (s == "if" or "while") // what about elseif/else?
+			.IfWhile(s)
+	  elseif (f == @arg)
+		.EnterArg(s)
+	  elseif (f == @dot)
+		.Property(s)									// abc.var
+	  elseif (f == @acc) 
+		.Access(s)										// abc[0]
+	  elseif (f == @brel) 
+		if s == "*"
+			.Access(s)									// *abc
+	  elseif (f == @func and s.first == @bra)
+		.FP(s)											//  (abc)()
+	return s
+	
+
+function NilTracker.Leave (|message| s, |message|)
+	|| fn = s.func
+	return s.parent
+	
 
 
 
