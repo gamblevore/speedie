@@ -74,8 +74,8 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 	expect  (DeclList == @prm or @Arg)  (DeclList)
 	
 	|| OriginalErrCount = stderr.errorcount
-	|SCFunction|	Func
-	|SCClass|		Cls
+	|SCFunction--|	Func
+	|SCClass--|		Cls
 	
 	if (Name_Space isa SCFunction) and (DeclList == @prm)
 		func = Name_Space
@@ -162,9 +162,8 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		if !names		// a return value, how to return the return value?
 			expect ((Func and !func.ReturnType) and (!item.Next)) ( item, "Parameter is missing a name." )
 			if (Func)
-				expect !rdcl.Default
+				debugger (!rdcl.Default and rdcl isnt Borrowed)
 				func.ReturnType = rdcl
-				expect rdcl isnt Borrowed
 			Continue
 		
 		
@@ -174,7 +173,9 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		|| IsFunctionBody  =  (AddToSpace isa SCArg)
 		if (!OriginalRdcl and IsFunctionBody and dcl isnt StayBorrowed)
 			Dcl.IsBorrowed = false
-
+		
+		if func
+			(dcl is param)
 		dcl.IsConst = false // erase IsConst, happens if we parse "|| bla = true"
 		if (!Func) and (dcl.Strength == kStrSharedParams)
 			dcl.Strength = 0

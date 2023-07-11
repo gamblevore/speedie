@@ -24,6 +24,8 @@ linkage
 |bool|		IsCaseAware
 |bool|		IsCompare
 |bool|		IsEquals
+|bool|		IsNilTest
+|bool|		HasEquals // == >= <=
 |bool|		IsSet
 |bool|		AsBit
 |bool|		IsCustom
@@ -57,6 +59,7 @@ function InitComp (|string| name_)
 	.IsCaseAware = ( name_[0] == '~' )
 	.IsCompare = true
 	.FuncName = "OperatorCompare"
+	.IsNilTest = name_ == "!=" or "=="
 	
 	// (a==b) =   0
 	// (a<b)  =  -1
@@ -77,9 +80,11 @@ function InitComp (|string| name_)
 		.CompParam = "1"
 		.CompOp = ">="
 	  elseif (s == "<=") or (s == ">=")
+		.HasEquals = true
 		.CompParam = "0"
 	  else
 		.IsEquals = true
+		.HasEquals = s == "=="
 		.CompParam = "0"
 
 

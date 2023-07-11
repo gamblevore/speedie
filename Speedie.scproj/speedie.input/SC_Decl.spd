@@ -85,6 +85,7 @@ datatype SCDeclInfo (uint)
 		Hidden // unused... remove
 		CompilerCreated
 		Disabled
+		Param // isparam
 		GameFlyingMem
 		Property
 		Atomic

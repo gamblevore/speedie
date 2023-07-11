@@ -1,28 +1,6 @@
 
 
 
-/*
-	So what do we do?
-	we want to do the nil stuff?
-	first... perhaps make the nil option a preference?
-	so its not noisy on all computers?
-	
-	OK... so now we can do that... what next?
-	
-	well... what is next?
-	
-	im not sure...
-	
-	we wanna use it?
-	
-	so... we hav some nil checkrs...
-	
-	we gotta do this in xcode, cos actually the problem is that a lot of objects have no decl!
-*/
-
-
-// we need to spec this out
-
 datatype BranchState (byte)
 	constants
 		|BranchState|

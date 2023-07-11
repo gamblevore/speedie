@@ -3,12 +3,6 @@
 Todo:
 	* Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
 					
-	* Strength:
-		Strength is settable in the project if its an error or problem
-		For now it defaults to problem, but this is ALWAYS an error: nil|msg|.pos=0
-
-	* ternaries
-
 	|Byte|					Indent				// speedie uses for nil+disturbance checker
 	|MsgUIFlags|			Flags				// speedie uses for "inserted/breakpoint" only.
 	|uint16|				Tag					// speedie uses this for ASM like "return/if/while/etc"
@@ -17,10 +11,32 @@ Todo:
 */
 
 
+/*
+Issues:
+What about the fact that a function's param nilness can rely on other funcs??
+like:
+
+	x = msg[0] // OK... so we don't rely on msg existing? but only cos it doesn't rely on self existing.
+what if msg[n] is recursive and complicated? then how do we check if a decl... is nil or not?
+
+The fact that we have ordered this... leaf first... helps. dependancies help... but that only reduces the problem
+not eliminiates it. There will be cases that we can't eliminate.
+
+* Make it nestable? That is... we actually can check functions?
+	* this would only be needed for actual recursive functions... non-recursives would have a strict chain...
+* what if two funcs with the same depth... and one is called before the other but the wrong one is called first?
+	* then making it nestable helps!
+
+* what about actually recursive funcs? I think for them... we let the user simply specify their nilness!! makes sense, right?
+	* I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
+*/
+
+
 
 
 function SCFunction.CanNilCheck (|bool|)
-	require !.IsMacro and !.IsWrapper
+	return  false
+	require !.IsMacro and !.IsWrapper and .isOK
 	|| c = .Lookup
 		return c.name contains "NilTest"
 
@@ -53,26 +69,6 @@ module VoidSweeper
 		// || init = compiler.getfunc("init_")
 		// what about "init_"?
 
-/*
-Issues:
-What about the fact that a function's nilness can rely on other funcs??
-like:
-
-	x = msg[0] // OK... so we don't rely on msg existing? but only cos it doesn't rely on self existing.
-what if msg[n] is recursive and complicated? then how do we check if a decl... is nil or not?
-
-The fact that we have ordered this... leaf first... helps. dependancies help... but that only reduces the problem
-not eliminiates it. There will be cases that we can't eliminate.
-
-* Make it nestable? That is... we actually can check functions?
-	* this would only be needed for actual recursive functions... non-recursives would have a strict chain...
-* what if two funcs with the same depth... and one is called before the other but the wrong one is called first?
-	* then making it nestable helps!
-
-* what about actually recursive funcs? I think for them... we let the user simply specify their nilness!! makes sense, right?
-	* I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
-*/
-	
 	
 function message.NilPropAccess (|scdecl|)
 	opt norefcounts
@@ -81,36 +77,38 @@ function message.NilPropAccess (|scdecl|)
 		return m
 
 
-function NilTracker.Property (|message| msg)
-	pragma inline, opt norefcounts
-	|| Prop = msg.NilPropAccess$
-	|| ObjDecl = TypeOfExpr(msg.first, nil) #debug_require
-
+function NilTracker.ChildMustExist (|message| wrapper)
+	// a.b, *a, a[0], (a)()
+	opt norefcounts
+	pragma inline
+	|| msg = wrapper.first
+	|| ObjDecl = msg.NeedDecl #debug_require
 	// if (msg): msg.prop
 	if objdecl.nilused isnt nil
 		return 
 	
 	// fn name: msg.prop
+	if ObjDecl is param
+		ObjDecl.NilDeclared = NilState.Optional
+	// we should only change this if this is a param!!
+	// so we need to know if its a param... or not?
+	// we actually don't have such a thing... mostly cos of the self-param?
+	// the rest can be marked as params...
+	
 	ObjDecl.NilUsed &= ~NilState.nil
 	expect (ObjDecl.NilUsed) (msg, "Possible NilObject access.")
 
 
-function NilTracker.Access (|message| msg)
+function NilTracker.Property (|message| msg)
+	// FP calls and behaviours should all assume NOT NIL unless specified...
 	pragma inline
-
+	|| Prop = msg.NilPropAccess
+		.ChildMustExist(msg)
 
 function NilTracker.FP (|message| msg)
 	// FP calls and behaviours should all assume NOT NIL unless specified...
 	pragma inline
-
-
-// OK... so we have an if test... now the thing is... we are being called from within
-// a special flattened searcher. So... after this returns... we'll get to the condition...
-// so should we process the condition NOW or later? We can do it later if we say "we are in an if"?
-// we could also preprocess it... then return where we will be next.
-
-// Im gonna need an absolute simple first case that I can catch a problem.
-// its the only way.
+	.ChildMustExist(msg.first)
 
 
 function NilTracker.IfWhile (|message| msg, |message|)
@@ -126,6 +124,12 @@ function SCDecl.MustBeReal (|message| m, |scdecl|)
 	.Nilused &= ~NilState.nil
 	expect (.nilused is realish) (m, "Possible NilObject here")
 	return self
+
+
+function Message.RedundantBranch (|bool| Value, |branchstate|)
+	if Value
+		return .RedundantTrue
+	return .RedundantFalse
 
 
 function Message.RedundantTrue (|branchstate|)
@@ -151,12 +155,15 @@ function niltracker.IfIsReal (|message| m, |branchstate|)
 			return m.RedundantFalse
 	return branchstate.Perhaps
 
-			
 
 function message.MustBeReal (|scdecl|)
 	opt norefcounts
 	|| d = .NeedDecl
 		return d.MustBeReal(self)
+
+
+function SCDecl.IsNowNil (|bool|)
+	return (self == TypeNil) or (.nilused isnt real)
 
 
 function NilTracker.ProcessCondThg (|message| m, |bool| Y, |branchstate|)
@@ -177,7 +184,6 @@ function NilTracker.ProcessCondThg (|message| m, |bool| Y, |branchstate|)
 
 	return branchstate.Never
 
-	
 
 function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
 	opt norefcounts
@@ -205,8 +211,6 @@ function NilTracker.ProcessCondPtr (|message| m, |bool| Y, |branchstate|)
 	return d.PtrNildeclared.Always(Y)
 
 
-
-
 function NilTracker.ProcessCondBrel (|message| m, |bool| Y, |branchstate|)
 	opt norefcounts
 	if (m == "!")
@@ -218,20 +222,6 @@ function NilTracker.ProcessCondBrel (|message| m, |bool| Y, |branchstate|)
 	debugat
 	.RunAll(m)
 	return branchstate.Perhaps
-
-
-/*
-	|&int| p1 = 0
-	|&int| p2 = &i
-	if (p1)
-	if (*p1)
-	// can we say that the thing p2 points tooo... must exist? can we? how?
-	// seems theres 4 possible versions...
-	|&int| p2 = &i
-	|&int!| p2 = &i
-	|!&int!| p2 = &i
-	|!&int| p2 = &i
-*/
 
 
 function NilTracker.ProcessCondFunc (|message| m, |bool| Y, |branchstate|)
@@ -250,34 +240,35 @@ function NilTracker.ProcessCondFunc (|message| m, |bool| Y, |branchstate|)
 function NilTracker.ProcessCondRelSimple (|message| m, |bool| Y, |message|)
 	
 	
-function SCDecl.IsNowNil (|bool|)
-	return (self == TypeNil) or (.nilused isnt real)
-
 
 function NilTracker.ProcessCondRel (|message| m, |bool| Y, |branchstate|)
 	opt norefcounts
-	|| f = m.first
-	|| op = f.next
-	|| l = op.next
+	|| ll = m.first
+	|| op = ll.next
+	|| rr = op.next$
 	|| scop = op.obj|SCOperator|				#debug_require
-	if !scop.IsAndOr
-		if scop.IsCompare
-			|| ld = f.obj as scdecl
-			|| rd = l.obj as scdecl
-			|| LNil = ld.isnownil
-			|| RNil = rd.isnownil
-			if (lnil and rnil) : m.RedundantTrue
-			
-				
-			// so... what are we comparing to? nil or something that is nil or exists
-	  elseif scop == "and"
-		return .ProcessCond(f, Y) & .ProcessCond(l, Y)
+	if scop.IsCompare
+		|| LNil = (ll.obj as scdecl).IsNowNil
+		|| RNil = (rr.obj as scdecl).IsNowNil
+		if lnil or rnil
+			expect (scop.IsNilTest) (op, "Can't use this operator on nil. Use != or ==.")
+			if (lnil and rnil)
+				return m.RedundantBranch(scop.hasequals)
+			if lnil
+				return .ProcessCond(rr, Y != scop.hasequals)
+			  else
+				return .ProcessCond(ll, Y != scop.hasequals)
+		return BranchState.Perhaps
 	
-	  elseif scop == "or"
-		|| where = .Count
-		|| SimpleLeft = .ProcessCond(f, y)
-		|| SimpleRight = .ProcessCondRelSimple(l, y)
-		if .Count > where
+	if scop.IsAndOr
+		if scop == "and"
+			return .ProcessCond(ll, Y) & .ProcessCond(rr, Y)
+	
+		if scop == "or"
+			|| where = .Count
+			|| SimpleLeft = .ProcessCond(ll, y)
+			|| SimpleRight = .ProcessCondRelSimple(rr, y)
+			if .Count > where
 		// this will require .count to go up... so basically condthg will add it
 		// but what removes it? we have to... right?
 		
@@ -295,42 +286,6 @@ function NilTracker.ProcessCondRel (|message| m, |bool| Y, |branchstate|)
 		// if (abc and m) or (*m == 1)
 		
 	return branchstate.Perhaps
-
-	
-	
-/*
-refills:
-	if (!a) a = b()
-
-multiple branches:
-	if !a { if b {return 1} else {return 2} }
-	a.b = 1
-
-redundant "m":
-	if (m and m.length)
-	if (!m or !m.length)
-
-can access prop:
-	if (msg)
-		msg.prop
-
-return affecting future code:
-	if (!msg)
-		return
-	msg.prop
-
-nil within branch
-	if msg == nil
-
-fail:
-	if msg >= nil, if msg <= nil
-
-multiple tests:
-	if (a and b)
-
-changes nothing:
-	if (a or b)
-*/
 
 
 function NilTracker.RunAll (|message| s)
@@ -363,14 +318,18 @@ function NilTracker.Enter  (|message| s, |message|)
 	  elseif (f == @arg)
 		.EnterArg(s)
 	  elseif (f == @dot)
-		.Property(s)									// abc.var
+		.property(s)										// abc.var
 	  elseif (f == @acc) 
-		.Access(s)										// abc[0]
+		.ChildMustExist(s)									// abc[0]
 	  elseif (f == @brel) 
 		if s == "*"
-			.Access(s)									// *abc
+			.ChildMustExist(s)								// *abc
+		// what about x = &a
+		// now x exists for sure, right?
+		// the brel in transform can do that, only for || x = &a
+		// I think rel setters in general should have that property?
 	  elseif (f == @func and s.first == @bra)
-		.FP(s)											//  (abc)()
+		.FP(s)												//  (abc)()
 	return s
 	
 	
@@ -387,6 +346,85 @@ function NilTracker.Leave (|message| s)
 
 	
 
+
+/*
+TODO:
+
+* Strength is settable in the project if its an error or problem
+* make this always an error! nil|msg|.pos=0
+* return values
+* fix ChildMustExist for params
+* freeze bug
+* .if is needed?
+* pop the msgs out.
+* fn abc (|object| x)
+	x = haha()
+
+x is nil or not? haha? its literally been replaced so the original decl is unused.
+	unused decls default to optional
+
+* typecasts... what sort of nil checking do we do? do we check the original var?
+	fn abc (|object| x, |object| y)
+		x = x |int| |obj|
+		y = haha() |int| |obj|
+
+* ternaries
+
+
+BOOLEAN LOGICS:
+	refills and relsetters:
+		if (!a) a = b(), a = &e
+	
+	multiple branches:
+		if !a { if b {return 1} else {return 2} }
+		a.b = 1
+	
+	return affecting future code:
+		if (!msg)
+			return
+		msg.prop
+	
+	changes nothing:
+		if (a or b)
+
+
+
+MOSTLY DONE:
+can access prop:
+	if (msg)
+		msg.prop
+
+DONE?
+multiple tests:
+	if (a and b)
+
+redundant "m":
+	if (m and m.length)
+	if (!m or !m.length)
+
+pointless:
+	if nil == nil
+
+fail:
+	if msg >= nil, if msg <= nil
+
+nil within branch:
+	if msg == nil
+*/
+
+
+/*
+	|&int| p1 = 0
+	|&int| p2 = &i
+	if (p1)
+	if (*p1)
+	// can we say that the thing p2 points tooo... must exist? can we? how?
+	// seems theres 4 possible versions...
+	|&int| p2 = &i
+	|&int!| p2 = &i
+	|!&int!| p2 = &i
+	|!&int| p2 = &i
+*/
 
 
 /*
