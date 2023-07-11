@@ -306,6 +306,7 @@ function InitBasicFuncs (|bool|)
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
+	.FindFunction("JB_App__Quit").IsKiller ?= true
 	.fnAs			= .LoadTypeTest( "operatoras" )
 	.fnFastAs		= .LoadTypeTest( "operatorfast_as" )
 	.fnFastIsa		= .LoadTypeTest( "operatorfast_isa" )

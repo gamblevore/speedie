@@ -1,13 +1,11 @@
 
 /*	
-Todo:
-	* Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
+Notes:
 					
 	|Byte|					Indent				// speedie uses for nil+disturbance checker
 	|MsgUIFlags|			Flags				// speedie uses for "inserted/breakpoint" only.
 	|uint16|				Tag					// speedie uses this for ASM like "return/if/while/etc"
 	
-	* merge "disturbance checker" with nil checker?
 */
 
 
@@ -306,6 +304,7 @@ function NilTracker.RunAll (|message| s)
 
 
 function NilTracker.EnterArg  (|message| s)
+	
 
 
 
@@ -350,6 +349,7 @@ function NilTracker.Leave (|message| s)
 /*
 TODO:
 
+* Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
 * Strength is settable in the project if its an error or problem
 * make this always an error! nil|msg|.pos=0
 * return values
@@ -368,8 +368,13 @@ x is nil or not? haha? its literally been replaced so the original decl is unuse
 		x = x |int| |obj|
 		y = haha() |int| |obj|
 
-* ternaries
+* set the .obj to an arg or the func itself... for continue/exit/return/rejoin in transform
+	* also make app.quit into a blocker!! for refcounting and nilchecking
 
+* ternaries
+	* make ternies into (if/else) expressions!!
+	|| x = ({|int| abc, if (Len != 4) {abc = 1} else {abc = 2}, rejoin abc})
+	* also if/elses can return values... and then we don't need special ternary handling
 
 BOOLEAN LOGICS:
 	refills and relsetters:
