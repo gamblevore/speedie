@@ -71,6 +71,7 @@ constructor (|Message| node, |SCBase| parent)
 	|| T = SCDecl.new(self)
 	if isdatatype
 		T.nildeclared = nilstate.Real
+		T.nilused = nilstate.Real
 	.TypeNormal = T
 	.TypeOptional = T.NilConstructor(NilState.optional*IsDataType)
 	.TypeVeryExists = T.NilConstructor(NilState.Real*IsDataType)

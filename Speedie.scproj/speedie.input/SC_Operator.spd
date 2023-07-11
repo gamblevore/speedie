@@ -58,7 +58,7 @@ function InitComp (|string| name_)
 	.IsCompare = true
 	.FuncName = "OperatorCompare"
 	
-	// (a=b)  =   0
+	// (a==b) =   0
 	// (a<b)  =  -1
 	// (a>b)  =   1
 	// (a<=b) <=  0

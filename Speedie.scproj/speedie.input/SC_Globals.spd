@@ -115,12 +115,7 @@ function TypeOfBRel (ExprResolver)
 		return TypeOfAddress(F, name_space, side)
 	
 	if name == "*"
-		|| Cpy = subtype.Copy // should keep borrowedness...
-		if cpy.PointerCount > 0
-			Cpy.PointerCount--
-		  else
-			error (F, "Can't dereference this.")
-		return cpy // how to render?
+		return SubType.Dereference(F)
 		
 	  elseif name == "-" // minus
 		Return subtype

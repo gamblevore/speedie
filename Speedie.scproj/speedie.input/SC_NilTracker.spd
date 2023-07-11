@@ -2,22 +2,32 @@
 
 struct NilTracker
 	linkage:cpp_part nil
-	|uint| 				Count
-	|uint| 				ParamCount
+	|uint64| 			Count
 	|message|			If
-	|scdecl--[1024]|	Items
+	|message--[1024]|	Items
 	
 
 	syntax Append (|scdecl| d)
-		expect (.count < 1024) (d.source, "Too many variables")
-		.items[.count++] = d
+		opt norefcounts
+		|| m = d.source
+			// what if d is a lookup for something else?
+			// like:    if (a isa b): a.bfunc
+			self <~ (m, d)
+		  else
+			debugger 
+	
+	syntax Append (|message| m, |scdecl| d)
+		expect (.count < 1024) (m, "Too many variables")
+		m.Indent = d.NilUsed & 3
+		.items[.count++] = m
 
 	function Start (|scfunction| f)
 		opt norefcounts
+		scfunction.currfunc = f
+		.if = nil
 		.Count = 0
-		for d in f.args
-			self <~ d
-		.ParamCount = .Count
+		for d in f.args				// no need add prms.... only log changes
+			d.NilUsed = d.NilDeclared
 	
 	function Tighten (|scfunction| f)
 		opt norefcounts
@@ -26,19 +36,22 @@ struct NilTracker
 				f.args[i] = d.NilTighten
 		if f.ReturnType.NeedsNilTighten
 			f.ReturnType = f.ReturnType.NilTighten
+
+	function SCDecl.NilTighten (|scdecl|)
+		if .NilUsed isnt Nil
+			return .MakeReal
+		return .MakeOptional
+
 							
-	function Pop (|scdecl|)
-		if .count
-			return .items[--.count]
-			
-	function Item (|uint| i, |scdecl|)
-		if .count > i
-			return .items[i]
+//	function Pop (|scdecl|)
+//		if .count
+//			return .items[--.count]
 	
 	function Restore
 		opt norefcounts
 		for i in .count
-			.item(i).restorenil
+			|| m = .items[i]
+				m.AsDecl.RestoreNil
 	
 	iterator
 		|| n = 0
@@ -48,15 +61,6 @@ struct NilTracker
 
 function SCDecl.RestoreNil
 	.nilused = .nildeclared
-
-
-function SCDecl.NilTighten (|scdecl|)
-	if .NilUsed isnt Nil
-		return .MakeReal
-	if .nilused	is Either
-		return .MakeOptional
-	debugat
-	return self
 
 
 function SCdecl.NeedsNilTighten (|bool|)

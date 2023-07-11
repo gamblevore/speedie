@@ -732,6 +732,12 @@ datatype uint64
 			yield highest
 			curr = curr &~ Highest
 
+	iterator
+		|| i = 0
+		while (i < self)
+			yield i (i)
+			i++
+
 
 
 datatype MaybeBool (byte) // could just put these on int? do we need a whole new type?

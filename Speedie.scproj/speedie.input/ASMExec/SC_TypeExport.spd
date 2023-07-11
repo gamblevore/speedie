@@ -23,17 +23,40 @@
 
 // we need to spec this out
 
+datatype BranchState (byte)
+	constants
+		|BranchState|
+		Always		= 2
+		Never		= 1
+		Perhaps		= 3
+
+	function Reverse (|nilstate|)
+		if self == never
+			return always
+		if self == Always
+			return never
+		return self
+		
+
+
 datatype NilState (byte) // Exec.scproj needs this here
 	constants
 		|nilstate|
+		Failed		= 0
 		Nil			= 1	
 		Realish		= 2 
 		Either		= 3
 		Stated		= 4
 		Optional    = Either + Stated			// |type| x = nil,   x = array[1000]
 		Real		= Realish + Stated			// || x = message(),  x.position
-	
 
+	function Always (|bool| Y, |branchstate|)
+		if self is either
+			return branchstate.Perhaps
+		if (self is real) == Y
+			return branchstate.Always
+		return branchstate.Never
+			
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type
 	syntax isnt (|nilstate| type, |bool|)

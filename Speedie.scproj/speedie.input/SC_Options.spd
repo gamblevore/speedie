@@ -20,14 +20,14 @@ module Options
 	||		Variant					= ""
 	|| 		Arch					= "" // targetarchitecture
 	||		SingleCppOutput			= true
+	||		HideMultipleErrors		= true
+	|| 		NilTestAllocNeverFails	= true
+	||		Cpp						= true
+	||		Compile					= true
 	||		MakeASM					= false
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
-	||		HideMultipleErrors		= true
 	||		GenFlowControlCode		= false
-	||		Products				= native
-	||		Cpp						= true
-	||		Compile					= true
 	||		KeepAllErrors			= false
 	||		Scripting				= false
 	||		MakeLib					= false // for now
@@ -35,7 +35,6 @@ module Options
 	||		ListAllLib				= false
 	||		ForceRecompile			= false
 	||		Silent					= false
-	||		Compile32Bit			= maybebool(false)
 	||		IsDirectTest			= false
 	||		ProjectIsLibrary		= false
 	||		ProjectIsMiniLib		= false
@@ -48,9 +47,11 @@ module Options
 	||		UseFuncCallCount		= false
 	||		ExternalCompile			= false
 	||		Final					= false // won't call gcc.
-	||		Optimise				= 1
-	||		SelfReplacement			= 0
-	||		OperationCount			= 0
+	||		Products				= native
+	||		Compile32Bit			= maybebool(false)
+	|byte|	Optimise				= 1
+	|byte|	SelfReplacement			= 0
+	|byte|	OperationCount			= 0
 	|byte|	Perry					= 0
 	
 	function Color (assigns:|bool|)
@@ -424,7 +425,9 @@ module Feedback
 			Explain(Purpose)$
 			Options.Variant = (Value.parseInt|int|).Render
 			Options.Color = false
-			(options.optimise max= 1) // -Os
+			if options.optimise < 0
+				options.optimise = 1
+
 		
 		final
 			Explain(Purpose)$

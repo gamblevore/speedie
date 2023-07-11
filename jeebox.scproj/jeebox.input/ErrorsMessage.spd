@@ -6,15 +6,18 @@
 
 extend ErrorList
 	function NewWarning (|Message| node=nil, |String| Desc=nil)
-		self <~ Error(node, desc, errorseverity.Warning)
+		if .CanAddMore(errorseverity.Warning)
+			self <~ Error(node, desc, errorseverity.Warning)
 	
 	function NewProblem (|Message| node=nil, |String| Desc=nil)
-		self <~ Error(node, desc, errorseverity.problem)
+		if .CanAddMore(errorseverity.problem)
+			self <~ Error(node, desc, errorseverity.problem)
 	
 	function NewError (|Message| node=nil, |string| Desc=nil, |string| path=nil)
 		cpp_part NewErrorWithNode
 		|| sev = .LowerErrorsTo ?? ErrorSeverity.Error
-		self <~ Error(node, desc, sev, path)
+		if .CanAddMore(sev)
+			self <~ Error(node, desc, sev, path)
 
 
 function Message.ErrorLocation (|string| desc = "", |string|)

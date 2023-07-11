@@ -9,7 +9,7 @@ Todo:
 
 	* ternaries
 
-	|Byte|					Indent				// speedie does not use
+	|Byte|					Indent				// speedie uses for nil+disturbance checker
 	|MsgUIFlags|			Flags				// speedie uses for "inserted/breakpoint" only.
 	|uint16|				Tag					// speedie uses this for ASM like "return/if/while/etc"
 	
@@ -19,7 +19,7 @@ Todo:
 
 
 
-function SCFunction.NeedsNilCheck (|bool|)
+function SCFunction.CanNilCheck (|bool|)
 	require !.IsMacro and !.IsWrapper
 	|| c = .Lookup
 		return c.name contains "NilTest"
@@ -29,9 +29,8 @@ function SCFunction.NeedsNilCheck (|bool|)
 function SCfunction.UltimateNilChecker (|&NilTracker| T)
 	debugat
 	opt norefcounts
-	scfunction.currfunc = self		// Decls start unknown... unless specified or datatypes
 	T.Start(self)
-	t.RunAll(.sourcearg)
+	T.RunAll(.SourceArg)
 	T.Tighten(self)					// then we alter the function's nilness
 	T.Restore
 
@@ -43,7 +42,7 @@ module VoidSweeper
 	
 		|NilTracker| T
 		for f in compiler.funclist
-			if f.NeedsNilCheck
+			if f.CanNilCheck
 				f.UltimateNilChecker(T)
 		
 		scfunction.currfunc = nil
@@ -90,8 +89,10 @@ function NilTracker.Property (|message| msg)
 	// if (msg): msg.prop
 	if objdecl.nilused isnt nil
 		return 
-	expect (ObjDecl.NilUsed isnt nil) (msg, "Possible NilObject access.")
-	ObjDecl.NilUsed &= ~NilState.Optional
+	
+	// fn name: msg.prop
+	ObjDecl.NilUsed &= ~NilState.nil
+	expect (ObjDecl.NilUsed) (msg, "Possible NilObject access.")
 
 
 function NilTracker.Access (|message| msg)
@@ -112,39 +113,190 @@ function NilTracker.FP (|message| msg)
 // its the only way.
 
 
-function NilTracker.IfWhile (|message| msg)
+function NilTracker.IfWhile (|message| msg, |message|)
 	// must re-add decls to the tracker...
 	opt norefcounts
 	expect !.if
 	.if = msg
-	|| tmp = msg
+	.ProcessCond(msg.first, true)
+	return msg.Second
+
+
+function SCDecl.MustBeReal (|message| m, |scdecl|)
+	.Nilused &= ~NilState.nil
+	expect (.nilused is realish) (m, "Possible NilObject here")
+	return self
+
+
+function Message.RedundantTrue (|branchstate|)
+	if StdErr.CanAddMore(errorseverity.problem)
+		StdErr.NewProblem(self, "nil check is always true")
+	return BranchState.Always
+
+
+function Message.RedundantFalse (|branchstate|)
+	if StdErr.CanAddMore(errorseverity.problem)
+		StdErr.NewProblem(self, "nil check is always false")
+	return BranchState.Never
+
+
+function niltracker.IfIsReal (|message| m, |branchstate|)
+	opt norefcounts
+	|| d = m.NeedDecl
+		if d.nilused isnt nil
+			return m.RedundantTrue
+		self <~ d
+		d.Nilused &= ~NilState.nil
+		if d.nilused isnt real
+			return m.RedundantFalse
+	return branchstate.Perhaps
+
+			
+
+function message.MustBeReal (|scdecl|)
+	opt norefcounts
+	|| d = .NeedDecl
+		return d.MustBeReal(self)
+
+
+function NilTracker.ProcessCondThg (|message| m, |bool| Y, |branchstate|)
+	opt norefcounts
+	|| dest = NilState.nil + Y	
+	|| d = m.NeedDecl			#debug_require
+	|| u = d.nilused			#require
+	if u == dest
+		return m.RedundantTrue
+
+	self <~ (m, d)
+	d.Nilused = dest
+	if u == NilState.Either // typical state
+		return BranchState.Perhaps
+
+	if d.NilDeclared is either
+		return m.RedundantFalse
+
+	return branchstate.Never
 
 	
-	while tmp
-		|| cond = tmp.first			#loop
-		//.allnodes(cond)
 
-		|| arg = cond.next			#loop
-		|| depth = .EnterIf(cond)
-		//.arg(arg)
-
-
-function NilTracker.EnterIf (|message| m, |int|)
+function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
 	opt norefcounts
 	|| fn = m.func
 	if fn == @thg
-		|| d = m.obj as SCDecl			#require
+		return .ProcessCondThg(m, y)
+	if fn == @bra or @type
+		return .ProcessCond(m.first, Y)
 	if fn == @rel
-		|| f = m.first
-		|| op = f.next
-		|| l = op.next
-		|| scop = op.obj as SCOperator
-		if scop.IsAndOr
-			if scop == "and"
-				// tests add up
+		return .ProcessCondRel(m, y)
+	if fn == @func
+		return .ProcessCondFunc(m,y)
+	if fn == @brel
+		return .ProcessCondBrel(m, y)
+	debugat
+	.RunAll(m)
+	return branchstate.Perhaps
+
+
+function NilTracker.ProcessCondPtr (|message| m, |bool| Y, |branchstate|)
+	opt norefcounts
+	|| d = m.NeedDecl #require
+	require d.MustBeReal(m)
+	.RunAll(m)							// if (*msg)
+	return d.PtrNildeclared.Always(Y)
+
+
+
+
+function NilTracker.ProcessCondBrel (|message| m, |bool| Y, |branchstate|)
+	opt norefcounts
+	if (m == "!")
+		return .ProcessCond(m.first, !Y)
+	if m == "*"
+		return .ProcessCondPtr(m, Y)
+	if m == "&"			// objects always have an address
+		return NilState.Real.Always(Y)
+	debugat
+	.RunAll(m)
+	return branchstate.Perhaps
+
+
+/*
+	|&int| p1 = 0
+	|&int| p2 = &i
+	if (p1)
+	if (*p1)
+	// can we say that the thing p2 points tooo... must exist? can we? how?
+	// seems theres 4 possible versions...
+	|&int| p2 = &i
+	|&int!| p2 = &i
+	|!&int!| p2 = &i
+	|!&int| p2 = &i
+*/
+
+
+function NilTracker.ProcessCondFunc (|message| m, |bool| Y, |branchstate|)
+	opt norefcounts
+	|| prms = m.last
+	|| fn = prms.obj|SCFunction|
+	if !fn.IsNilChecker
+		return branchstate.Perhaps
+	|| p1 = prms.first
+	if p1 == @thg
+		return .ProcessCondThg(m, y)
+	
+		
+	// now what?
+
+function NilTracker.ProcessCondRelSimple (|message| m, |bool| Y, |message|)
+	
+	
+function SCDecl.IsNowNil (|bool|)
+	return (self == TypeNil) or (.nilused isnt real)
+
+
+function NilTracker.ProcessCondRel (|message| m, |bool| Y, |branchstate|)
+	opt norefcounts
+	|| f = m.first
+	|| op = f.next
+	|| l = op.next
+	|| scop = op.obj|SCOperator|				#debug_require
+	if !scop.IsAndOr
+		if scop.IsCompare
+			|| ld = f.obj as scdecl
+			|| rd = l.obj as scdecl
+			|| LNil = ld.isnownil
+			|| RNil = rd.isnownil
+			if (lnil and rnil) : m.RedundantTrue
 			
-			if scop == "or"
-				// throw away the results...
+				
+			// so... what are we comparing to? nil or something that is nil or exists
+	  elseif scop == "and"
+		return .ProcessCond(f, Y) & .ProcessCond(l, Y)
+	
+	  elseif scop == "or"
+		|| where = .Count
+		|| SimpleLeft = .ProcessCond(f, y)
+		|| SimpleRight = .ProcessCondRelSimple(l, y)
+		if .Count > where
+		// this will require .count to go up... so basically condthg will add it
+		// but what removes it? we have to... right?
+		
+		// what about the cond?
+		// if (a and b)			// a yes,   b yes		... after a may, b may
+		// if (!a and !b)		// a no,    b no    	... after a may, b may
+		// if (!(a and b))		// a may,	b may   	... after a yes, b yes
+		// if (!(!a and !b)		// a may,	b may   	... after a no,  b no
+		// if (a or b)			// a may,	b may		... after a no,  b no		
+		// if (!(a or b))		// a no,	b no		... after a may, b may
+		// if (!(!a or !b))		// a may,	b may		... after a no,  b no 
+		
+		
+		// if !msg or *msg
+		// if (abc and m) or (*m == 1)
+		
+	return branchstate.Perhaps
+
+	
 	
 /*
 refills:
@@ -154,6 +306,9 @@ multiple branches:
 	if !a { if b {return 1} else {return 2} }
 	a.b = 1
 
+redundant "m":
+	if (m and m.length)
+	if (!m or !m.length)
 
 can access prop:
 	if (msg)
@@ -175,13 +330,13 @@ multiple tests:
 
 changes nothing:
 	if (a or b)
-
-
 */
+
 
 function NilTracker.RunAll (|message| s)
 	opt norefcounts
-	while
+	|| End = s.FlatAfter
+	while 
 		|| ch = s.first
 			s = .Enter(ch)
 			continue
@@ -191,7 +346,7 @@ function NilTracker.RunAll (|message| s)
 				exit
 			.Leave(s)	
 			s = s.parent
-			require s 
+			require s != nil and end
 
 
 
@@ -219,7 +374,10 @@ function NilTracker.Enter  (|message| s, |message|)
 	return s
 	
 	
+
 function NilTracker.LeaveIf (|message| s)
+	.If = nil
+
 
 function NilTracker.Leave (|message| s)
 	opt norefcounts

@@ -120,6 +120,7 @@ class SCDecl (SCObject) {
 	|Byte|				AllocSource
 	|NilState|			NilDeclared
 	|NilState|			NilUsed
+	|NilState|			PtrNilDeclared // Id have to replace my type-system to remove this
 	
 	constructor (|scclass| type=nil)
 		.type = type
@@ -812,6 +813,7 @@ class SCDecl (SCObject) {
 		
 		rz = .Copy
 		rz.NilDeclared = type
+		rz.nilused = Type &~ NilState.Stated
 
 
 	function NilConstructor (|nilstate| type,  |scdecl|) 
@@ -819,7 +821,7 @@ class SCDecl (SCObject) {
 			return self
 		rz = .copy
 		rz.NilDeclared = type
-
+		rz.nilused = Type &~ NilState.Stated
 
 		
 	function RefineDecl (|message| list, |SCDecl|)
@@ -1060,41 +1062,16 @@ function scdecl.ByteSize (|int|)
 		n *= .C_Array
 	return N
 
+function scdecl.Dereference (|message| f, |scdecl|)
+	opt norefcounts
+	rz = .Copy // should keep borrowedness...
+	if rz.PointerCount > 0
+		rz.PointerCount--
+		|| d = .PtrNilDeclared
+		rz.NilDeclared = d
+		rz.Nilused = d &~ NilState.Stated
 
-
-class GUIControl (ringtree)
-	contains GUIControl 
-	|int| xyz
-	constructor (|guicontrol|p)
-		super.constructor(p)
-	
-
-class TreeView (GUIControl)
-	|int| abc
-
-
-role StretchControl (GUIControl)
-	function xxxtest (|guicontrol| p)
-		visible
-		Target true
-			|| g = stretchcontrol(p)
-		// we need a new-func added to stretch-control
-		// same func in two places
-
-
-role TreeViewRow (message)
-	contains TreeViewRow
-	function ViewRoot (|TreeViewRoot|)
-		
-	function FindOwner (|TreeView|)
-		return .ViewRoot$.rowowner
-
-
-role TreeViewRoot (TreeViewrow)
-	contains TreeViewRow
-	function RowOwner (|TreeView|)
-		|| o = .obj
-		if o isa TreeView
-			return o
+	  else
+		error (F, "Can't dereference this.")
 
 

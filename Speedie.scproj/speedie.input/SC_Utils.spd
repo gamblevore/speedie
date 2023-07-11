@@ -7,13 +7,19 @@
 
 //  //  //  //  //   //  // .Obj Conversion //  //  //  //  //  //  //  //  //
 
+function Message.NeedDecl (|SCDecl|)
+	opt norefcounts
+	|| obj = .obj
+	if (obj isa scdecl)
+		return obj
+	debugger
+
 function Message.AsDecl (|SCDecl|)
 	// .MsgDecl uses this
 	opt norefcounts
 	|| obj = .obj$
 	if (obj isa scdecl)
 		return obj
-	printline .parent.ObjectID
 	debugger
 
 
