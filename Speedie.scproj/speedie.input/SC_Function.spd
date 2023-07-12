@@ -411,7 +411,7 @@ function ArgsMatchTwo (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBa
 		expect (FuncArg.type) (.Source)
 
 		if Base
-			FuncArg = FuncArg.ContainedReplace(nil, base, false)
+			FuncArg = FuncArg.ContainedReplace(base, false)
 
 		|| LArg_ch = (PArg_Ch,nil)(ThisAlter)
 		|| Matched = FuncArg.Match( PArg_Type, TypeCast, LArg_ch )

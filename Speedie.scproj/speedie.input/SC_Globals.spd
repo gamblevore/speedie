@@ -1037,7 +1037,7 @@ function TypeOfDot (ExprResolver)
 									// its for when we are gonna set the name?
 									// and we might as well make a new one anyhow?
 									// not sure why its needed...
-				decl = decl.ContainedReplace( DotVar, Contains, true )
+				decl = decl.ContainedReplace( Contains, true )
 		  elseif DotVar isa scmodule
 			|| cls = DotVar.cls
 				if cls.IsRole

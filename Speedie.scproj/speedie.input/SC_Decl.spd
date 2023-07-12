@@ -583,36 +583,31 @@ class SCDecl (SCObject) {
 		return self
 
 		
-	function ContainedReplace (|scclass| DotCls, |SCDecl| contains, |bool| NeedsName,  |SCDecl|)
+	function ContainedReplace (|SCDecl| contains, |bool| NeedsName,  |SCDecl|)
 		opt NoRefCounts
 		// handles   " ...  --> string "     (.iscontained)
 		//    or     "[...] -->[string]"     (.contains.iscontained)
 
-		if (self Is UpgradeableContained) and Contains
-			if --doitwierdly == 0 
-				return self
+		rz = self
+		if self Is UpgradeableContained
 			if  (!needsname or !.name) and .SameForReplace(contains)
-				// we are missing UpgradeableContained?
-				return contains
-			|| C = contains.copy				#require
-			(C is borrowed) = self is borrowed
-			C.PointerCount = .PointerCount
+				return contains				// we are missing UpgradeableContained?
+		
+			debugat
+			|| C = .copy
+			c.type = contains.type
+			(C is UpgradeableContained) = (C.type != .type)
+			
+			Return C
+
 			//C.internal = .internal // seems bugged.
 			//if self is autocast or contains is autocast
 				//error (.source, "Compiler assumption fail")
-			C.C_array = .C_array
-			if NeedsName
-				c.name = .name
-				(C is UpgradeableContained) = (C.type != .type)
-			Return C // unless??
 
-		|| goddamn = .contains
-			if (goddamn Is UpgradeableContained) and (goddamn != contains)
-				|| result = .Copy
-				result.Contains = contains
-				Return result
-		
-		Return self
+		|| inside = .contains
+		if inside  and  inside != contains  and  inside Is UpgradeableContained
+			rz = .Copy
+			rz.Contains = contains
 	
 
 	function SameForReplace (|SCDecl| c, |bool|)
