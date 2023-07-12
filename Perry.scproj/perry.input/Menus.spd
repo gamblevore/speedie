@@ -28,6 +28,7 @@ function perryide.FindInHistory (|string|p, |string|n, |message|)
 
 
 function perryide.AddToJumpHistory
+	require !.StillJumping
 	|message| where
 	|| old = .FindInHistory(.currpath, .editme.currline.render) 
 		if .fromnextprev
@@ -99,7 +100,6 @@ function PerryIDE.GoToMarker (|message| m)
 	using self
 		.GoToAnyFile(m.name, l.name)
 		.editme.scrollpos = l.position
-		.addtojumphistory
 	.FromNextPrev = false
 
 

@@ -136,7 +136,6 @@ function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
 		.GotoAnyFile(path)
 		.editme.ShowAndSel(l)
 		.editme.SetFocus
-	.AddToJumpHistory
 	.popuphide
 
 

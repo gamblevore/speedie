@@ -71,6 +71,7 @@ class PerryIDE (Window)
 	|date|						LastAutoCompleteDate
 	|date|						PopupDateOn
 	|int|						EditMeTabRetryThing
+	|bool| 						StillJumping
 	|bool|						DuringMsgFB  // canloadfile, canupdate, .disable 
 	|bool|						IsTextOnly
 	|bool|						UsingSpdLib
@@ -576,11 +577,13 @@ class PerryIDE (Window)
 
 
 	Syntax UsingComplete
-		//.AddToJumpHistory // probably only want source	
+		.StillJumping = false
+		.AddToJumpHistory
 
 		
 	Syntax Using (|PerryIDE|)
 		.AddToJumpHistory
+		.StillJumping = true
 		return self
 
 
