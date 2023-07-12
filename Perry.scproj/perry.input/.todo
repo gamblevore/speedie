@@ -7,13 +7,12 @@
 	* NilSweep, for global vars, and for function misuse.
 
 
-* can't right click on the returntype?
-
 
 // Perry Do later
-* jump-history adds first position in file... then the actual destination. Should disable first add or just replace it.
+* can't right click on the returntype?
+* clearing logs doesnt clear both speedie and perry
+	* also speedie cant rebuild
 * First use of tab (in func) or () (to wrap) on opening perry doesn't work.
-* extra error is being added (first? is being saved? for some good reason but too enthusiastic)
 * TextView error/find resync
 * too long text in listview draw as much as we can
 
