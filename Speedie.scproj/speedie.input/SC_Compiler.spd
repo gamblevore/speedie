@@ -299,8 +299,8 @@ function LoadTypeTest (|string| s, |scfunction|)
 	if f isa scfunction
 		f.alloccode |= kIsTypeTest
 		return f
-	debugger
-	
+
+
 function InitBasicFuncs (|bool|)
 	.RefSetRef		= .LoadRefFunc( "JB_SetRef" )
 	.RefIncr		= .LoadRefFunc( "JB_Incr" )
@@ -309,10 +309,8 @@ function InitBasicFuncs (|bool|)
 	.RefDecrMulti	= .LoadRefFunc( "JB_DecrMulti" )
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
-	printline compiler.exportnames
+	
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
-	|| fn = .ModuleFunction("app", "quit")
-		fn.iskiller = true
 	.fnAs			= .LoadTypeTest( "operatoras" )
 	.fnFastAs		= .LoadTypeTest( "operatorfast_as" )
 	.fnFastIsa		= .LoadTypeTest( "operatorfast_isa" )
@@ -505,8 +503,8 @@ function ImportAll
 		c.LoadExportName
 
 	
-	require .Stage( "Initialising Modules" )
-	.LoadInits
+	require .Stage( "Initialising Modules And More" )
+	.LoadInitsAndMore
 
 
 	scimport.noproj
@@ -530,9 +528,11 @@ function ImportAll
 		f.FuncDecls
 		f.LoadExportName
 		require !TooManyErrors()
-
-
 	scfunction.currfunc = nil
+
+
+	|| fn = .exportnames["JB_App__Quit"]|scfunction|
+		fn.iskiller = true
 	
 
 	/// Then declarations "|| x = message[0]"	
@@ -603,7 +603,7 @@ function ImportAll
 		
 
 
-function LoadInits
+function LoadInitsAndMore
 	for m in .ModuleList
 		m.Use
 		m.LoadExportName
