@@ -40,13 +40,13 @@ function SCFunction.CanNilCheck (|bool|)
 
 
 
-function SCfunction.UltimateNilChecker (|&NilTracker| T)
+function NilTracker.Check (|scfunction| f)
 	debugat
 	opt norefcounts
-	T.Start(self)
-	T.RunAll(.SourceArg)
-	T.Tighten(self)					// then we alter the function's nilness
-	T.Restore
+	.Start(f)
+	.RunAll(f.SourceArg)
+	.Tighten(f)					// then we alter the function's nilness
+	.Restore
 
 
 module VoidSweeper
@@ -57,7 +57,7 @@ module VoidSweeper
 		|NilTracker| T
 		for f in compiler.funclist
 			if f.CanNilCheck
-				f.UltimateNilChecker(T)
+				T.Check(f)
 		
 		scfunction.currfunc = nil
 		.Sweep
@@ -78,23 +78,31 @@ function message.NilPropAccess (|scdecl|)
 function NilTracker.ChildMustExist (|message| wrapper)
 	// a.b, *a, a[0], (a)()
 	opt norefcounts
-	pragma inline
 	|| msg = wrapper.first
-	|| ObjDecl = msg.NeedDecl #debug_require
-	// if (msg): msg.prop
-	if objdecl.nilused isnt nil
-		return 
+	|| ObjDecl = msg.NeedDecl			#debug_require
 	
-	// fn name: msg.prop
-	if ObjDecl is param
-		ObjDecl.NilDeclared = NilState.Optional
-	// we should only change this if this is a param!!
-	// so we need to know if its a param... or not?
-	// we actually don't have such a thing... mostly cos of the self-param?
-	// the rest can be marked as params...
+	if ObjDecl.PointerCount
+		|| u = ObjDecl.ptrNilUsed
+		require u is nil
+		expect (u is realish) (msg, nilerr)
 	
-	ObjDecl.NilUsed &= ~NilState.nil
-	expect (ObjDecl.NilUsed) (msg, "Possible NilObject access.")
+		if  ObjDecl is param  and  ObjDecl.nildeclared isnt stated // fn name: msg.prop
+			// what about self-param?
+			// what about lookup via "isa class"
+			ObjDecl.ptrNilDeclared = NilState.Real
+	
+		ObjDecl.ptrNilUsed = NilState.Realish
+	  else
+		|| u = ObjDecl.NilUsed
+		require u is nil
+		expect (u is realish) (msg, nilerr)
+	
+		if  ObjDecl is param  and  ObjDecl.nildeclared isnt stated // fn name: msg.prop
+			// what about self-param?
+			// what about lookup via "isa class"
+			ObjDecl.NilDeclared = NilState.Real
+	
+		ObjDecl.NilUsed = NilState.Realish
 
 
 function NilTracker.IfWhile (|message| msg, |message|)
@@ -334,10 +342,8 @@ function NilTracker.Leave (|message| s)
 /*
 TODO:
 
-* fix ChildMustExist for params
-* Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
+* using ptrs...
 * Strength is settable in the project if its an error or problem
-* make this always an error! nil|msg|.pos=0
 * return values
 * freeze bug
 * .if is needed?
@@ -378,13 +384,11 @@ BOOLEAN LOGICS:
 		if (a or b)
 
 
-
-MOSTLY DONE:
+DONE?
 can access prop:
 	if (msg)
 		msg.prop
 
-DONE?
 multiple tests:
 	if (a and b)
 

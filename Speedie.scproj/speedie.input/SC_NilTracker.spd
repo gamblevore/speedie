@@ -57,6 +57,9 @@ struct NilTracker
 		|| n = 0
 		while (n < .count++)
 			yield self[n]
+	module
+		|| nilerr = "Possible NilObject Access."
+	
 
 
 function SCDecl.RestoreNil
