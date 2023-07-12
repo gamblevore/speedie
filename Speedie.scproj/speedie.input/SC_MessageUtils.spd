@@ -90,7 +90,7 @@ function Message.Negate (|Message|)
 
 
 function Message.IsAssignable (|bool|)
-	return self != @Func and @type // unless... its an assigns func?
+	return self != @Func and @type and @num // unless... its an assigns func?
 
 
 function message.isint (|bool|)

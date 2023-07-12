@@ -81,28 +81,16 @@ function NilTracker.ChildMustExist (|message| wrapper)
 	|| msg = wrapper.first
 	|| ObjDecl = msg.NeedDecl			#debug_require
 	
-	if ObjDecl.PointerCount
-		|| u = ObjDecl.ptrNilUsed
-		require u is nil
-		expect (u is realish) (msg, nilerr)
-	
-		if  ObjDecl is param  and  ObjDecl.nildeclared isnt stated // fn name: msg.prop
-			// what about self-param?
-			// what about lookup via "isa class"
-			ObjDecl.ptrNilDeclared = NilState.Real
-	
-		ObjDecl.ptrNilUsed = NilState.Realish
-	  else
-		|| u = ObjDecl.NilUsed
-		require u is nil
-		expect (u is realish) (msg, nilerr)
-	
-		if  ObjDecl is param  and  ObjDecl.nildeclared isnt stated // fn name: msg.prop
-			// what about self-param?
-			// what about lookup via "isa class"
-			ObjDecl.NilDeclared = NilState.Real
-	
-		ObjDecl.NilUsed = NilState.Realish
+	|| u = ObjDecl.NilUsed
+	require u is nil
+	expect (u is realish) (msg, nilerr)
+
+	if  ObjDecl is param  and  ObjDecl.nildeclared isnt stated // fn name: msg.prop
+		// what about self-param?
+		// what about lookup via "isa class"
+		ObjDecl.NilDeclared = NilState.Real
+
+	ObjDecl.NilUsed = NilState.Realish
 
 
 function NilTracker.IfWhile (|message| msg, |message|)
@@ -202,7 +190,7 @@ function NilTracker.ProcessCondPtr (|message| m, |bool| Y, |branchstate|)
 	|| d = m.NeedDecl #require
 	require d.MustBeReal(m)
 	.RunAll(m)							// if (*msg)
-	return d.PtrNildeclared.Always(Y)
+	return d.Nildeclared.Always(Y)
 
 
 function NilTracker.ProcessCondBrel (|message| m, |bool| Y, |branchstate|)

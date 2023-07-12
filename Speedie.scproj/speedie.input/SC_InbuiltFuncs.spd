@@ -36,21 +36,16 @@ function TypeOfQues (ExprResolver)
 	opt norefcounts
 	|| type
 	|| prm = exp[0 + (exp.name == "")]
-		type = TypeOfExprModulesOK(prm, name_space)
-	|| m = exp.ReplaceInbuiltSub(name_space, type.AsDecl, exp)
+		type = TypeOfExprModulesOK(prm, name_space) // AsDeclAutoComplete isnt a good name
+	|| m = exp.ReplaceInbuiltSub(name_space, type.AsDeclAutoComplete, exp)
 		exp.SafeReplaceWith(m)
 	if exp != @ques
 		return TypeOfExpr(exp, name_space)
 
 
-function Object.AsDecl (|scdecl|)
+function Object.AsDecl2 (|scdecl|)
 	if self
 		if self isa SCDecl
 			return self
-		if self isa SCClass
-			return .typenormal
-		if self isa SCModule
-			if .cls
-				return .cls.typenormal
 		if self isa scfunction
 			return .returntype

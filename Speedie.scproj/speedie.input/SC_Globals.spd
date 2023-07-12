@@ -23,8 +23,19 @@ function TypeOfSDot (ExprResolver)
 	SCFunction.Tran_Sdt( exp )
 	Return TypeOfDot( exp, name_space, side )
 
+
 function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
-	return TypeCastCheck(Exp, name_Space, side)
+	|| exp0 = exp.first
+	|| N = exp0.next
+	|| Old = TypeOfExpr( exp0, name_space, side )								#require
+	|| New = ExtractDecl( N, name_space )										#require
+	// allow MOST typecasts, but NOT typecasts between struct instances...
+	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
+		error (exp, "Can’t cast between structs/carrays (pointers to structs are OK though)")
+	
+	new.NoBlindCasts(old, exp, name_Space)
+	return New
+
 
 function TypeOfNothing (ExprResolver)
 	return nil
@@ -42,19 +53,6 @@ function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |scbase| name_space)
 		if old.IsNormalObject and .IsNormalObject
 			if !old.type.real_isa2( .type )
 				stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", fn.blindcasts)
-
-
-function TypeCastCheck (ExprResolver) // typecheck
-	|| exp0 = exp.first
-	|| N = exp0.next
-	|| Old = TypeOfExpr( exp0, name_space, side )								#require
-	|| New = ExtractDecl( N, name_space )										#require
-	// allow MOST typecasts, but NOT typecasts between struct instances...
-	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
-		error (exp, "Can’t cast between structs/carrays (pointers to structs are OK though)")
-	
-	new.NoBlindCasts(old, exp, name_Space)
-	return New
 
 
 function scdecl.exists (|bool|)
@@ -437,8 +435,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		if (C == "&")					// pointer
 			|| R = ExtractDecl( c.first, name_space )
 				rz = r.GetAddress
-				rz.PtrNilDeclared = NilState.either
-				rz.PtrNilUsed = NilState.either
+				rz.NilUsed = NilState.either
 		
 		  elseif (c == "~")				// not a brel anymore?
 			c.name = "&"
@@ -1002,49 +999,46 @@ function message.ClassSpace (|scbase| name_space, |scobject|)
 	.obj = rz
 
 
+function TypeOfSwiz (|message| exp, |scbase| name_space, |message| side, |scdecl| class_Space, |scdecl|)
+	pragma inline
+	|| W = Class_Space.type.NumericCount 
+	if ((W > 1) and !exp.last.hasany)
+		|| swz = exp.name.isSwizzle(W)
+			return TypeOfSwizzle(exp, Class_Space, name_space, side, swz)   // 
+
+
 function TypeOfDot (ExprResolver)
 	require !exp.Last.obj // it's a func that returns nothing. we already got it, don't get again.
 	
-	|| ch = exp.first
-	|| name = exp.name
-	|| Class_Space = ch.ClassSpace(name_space) #expect (ch, "This expression can’t be used here.")
+	|| Class_Space = exp.first.ClassSpace(name_space)|SCbase| #expect (exp, "This expression can’t be used here.")
 	|SCDecl| contains
 
-	ifn Class_Space isa SCModule
-		|| DeclSpace = Class_Space	// work around...
-		if (DeclSpace isa SCDecl)
-			|| W = declspace.type.NumericCount 
-			if ((W > 1) and !exp.last.hasany)
-				|| swz = name.isSwizzle(W)
-					return TypeOfSwizzle(exp, declspace, name_space, side, swz)   // 
-				
-			contains = DeclSpace.Contains
-			|| ContainsCls = DeclSpace.Type
-			if (!contains) and (ContainsCls)
-				contains = ContainsCls.Contained
-			Class_Space = ContainsCls
-
-		expect  (Class_Space isa SCClass)  ( exp, "Not a class." )
+	if (Class_Space isa SCDecl)
+		|| swiz = TypeOfSwiz(exp, name_space, side, class_space)
+			return swiz
+			
+		contains = Class_Space.Contains
+		|| ContainsCls = Class_Space.Type
+		if (!contains) and (ContainsCls)
+			contains = ContainsCls.Contained
+		Class_Space = ContainsCls|scdecl|
+	  else
+		expect  (Class_Space isa SCClass or scmodule)  ( exp, "Not a class or module." )
 	
-	|| o = Class_Space|SCbase|.LookUpDot( name, exp, name_Space, contains, side )		#require
-	|SCDecl| decl
-	
-	if (o isa SCFunction)
-		decl = o.ReturnType
-
-	  elseif (o isa SCDecl)
-		decl = o
-		
-	  elseif (o isa SCModule)
-		// make that work too...
-		if ch == @thg
+	|| o = Class_Space.LookUpDot( exp.name, exp, name_Space, contains, side )		#require
+	if (o isa SCModule)
+		if exp.first == @thg
 			exp.Func = @thg
-			exp.clear // replace...
+			exp.clear
 		return o
 	
-	if decl
+	
+	|| decl = o.asdecl2
 		if contains
-			if Class_Space isa scclass
+			if Class_Space isa scclass // I wonder if we need to pass true here?
+									   // its for when we are gonna set the name?
+									   // and we might as well make a new one anyhow?
+									   // not sure why its needed...
 				decl = decl.ContainedReplace( Class_Space, Contains, true )
 		  elseif class_Space isa scmodule
 			|| cls = class_Space.cls

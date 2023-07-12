@@ -594,12 +594,21 @@ function scobject.AutoCompleteType (|int|)
 
 function scobject.CanAutoLimit (|int| Type, |scdecl| Limiter, |bool|)
 	opt norefcounts
-	|| T = .AutoCompleteType
-	require type & T
-	if limiter
-		|| mine = .AsDecl$
+	ifn type & .AutoCompleteType
+		return false
+	ifn limiter
+		return true
+	|| mine = .AsDeclAutocomplete
 		return mine.minimatch(limiter)
-	return true
+
+
+function Object.AsDeclAutoComplete (|scdecl|)
+	if self isa SCClass
+		return .typenormal
+	if self isa SCModule
+		if .cls
+			return .cls.typenormal
+	return .asdecl2
 
 
 function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoitem]| found, |bool| exact, |int| Types, |scdecl| TypeLimiter)

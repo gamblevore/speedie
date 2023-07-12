@@ -103,13 +103,13 @@ class SCDecl (SCObject) {
 	|Byte|				AllocSource
 	|NilState|			NilDeclared
 	|NilState|			NilUsed
-	|NilState|			PtrNilDeclared // Id have to replace my type-system to remove this
-	|NilState|			PtrNilUsed // Id have to replace my type-system to remove this
+
 	
 	constructor (|scclass| type=nil)
 		.type = type
 		.NilDeclared = NilState.Either
 		.NilUsed = NilState.Either
+		//if .objectid == 39907580
 
 		
 	function Project (|scimport|)
@@ -290,30 +290,28 @@ class SCDecl (SCObject) {
 	function GetAddress (|SCDecl|)
 		rz = SCDecl.new
 		.CopyTypeInfoTo(rz)
-		// can I store the old type??
-		// .contains = self
-		// the problem... is that contains has an actual meaning?
-		// we'd have an int that contains int.
+		rz.internal = self
 		
 		rz.PointerCount++
-		rz.PtrNilDeclared = NilState.Optional	// in case we later set it to nil.
-		rz.PtrNilUsed = NilState.real			// always exists
+		rz.NilDeclared = NilState.either	// in case we later set it to nil.
+		rz.NilUsed = NilState.real			// always exists
 		check (rz.pointercount < 8) (.source, "Too much abstraction")
 	
 	
 	function Dereference (|message| f,  |bool| IsAccess,  |scdecl|)
 		opt norefcounts
-		rz = .Copy // should keep borrowedness...
-		if (rz.C_Array)
+		if (.C_Array)
 			if IsAccess
-				rz.C_Array = 0
-				return rz				// OK... so what if we try to do *Carray. We want to get an error
-		if rz.PointerCount > 0
-			rz.PointerCount--
-			|| d = .PtrNilDeclared
-			rz.NilDeclared = d
-			rz.Nilused = d &~ NilState.Stated
-			return rz
+				|| c = .Copy // should keep borrowedness...
+				c.C_Array = 0
+				return c				// OK... so what if we try to do *Carray. We want to get an error
+		if .PointerCount > 0
+			//|| actualtype = .Internal
+			//	return actualtype
+			//debugger 
+			|| c = .Copy // should keep borrowedness...
+			c.PointerCount--
+			return c
 		error (F, "Can't dereference this.")
 
 
@@ -596,6 +594,9 @@ class SCDecl (SCObject) {
 			|| C = contains.copy				#require
 			(C is borrowed) = self is borrowed
 			C.PointerCount = .PointerCount
+			//C.internal = .internal // seems bugged.
+			//if self is autocast or contains is autocast
+				//error (.source, "Compiler assumption fail")
 			C.C_array = .C_array
 			if NeedsName
 				c.name = .name
@@ -805,24 +806,9 @@ class SCDecl (SCObject) {
 	function MakeReal (|SCDecl|)
 		return .MakeNil(nilstate.real,  .type.TypeVeryExists)
 	
-	
-	function MakeNilPointer (|nilstate| type, |scdecl|)
-		opt norefcounts
-		if .PtrNilDeclared == type
-			Return self
-		
-		rz = .Copy
-		rz.ptrNilDeclared = type
-		rz.ptrnilused = Type &~ NilState.Stated
-
 
 	function MakeNil (|nilstate| type, |scdecl| Default, |scdecl|)
 		opt norefcounts
-		// this needs to take account pointerness.
-		// if we are making a decl real... well if its a pointer, we need to alter the pointertype.
-		if .PointerCount
-			return .MakeNilPointer(type)
-		
 		if .nildeclared == type
 			Return self
 		
@@ -875,7 +861,7 @@ class SCDecl (SCObject) {
 	
 	
 	function UnWrapDataType (|message| exp, |scbase| name_space, |scdecl|)
-		rz = .Internal
+		rz = .Internal #expect
 		|| ExpReplacement = exp.func.msg(exp.name)
 		ExpReplacement.obj = exp.obj
 		for s in exp

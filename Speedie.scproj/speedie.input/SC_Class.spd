@@ -853,7 +853,8 @@ module
 		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface )
 			it.IsDataType = true
 			it.ClassCollect
-			it.typenormal.isconst = true
+//			it.typenormal.isconst = true
+// makes no sense.
 		
 			expect !(it.Properties) (it.Source, "Datatypes can’t have properties.")
 					
