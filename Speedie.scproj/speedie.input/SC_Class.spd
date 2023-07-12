@@ -66,6 +66,9 @@ constructor (|Message| node, |SCBase| parent)
 	.SourceClass = node		// sigh. bad design
 	.project = parent.project
 	.IsVisible = scbase.CurrVisibility
+	.saveas = nil
+	.TypeInfo = DataTypeCode.UnusedType
+	.Banned = .TestBanned
 	
 	|| IsDataType = node == "datatype"
 	|| T = SCDecl.new(self)
@@ -75,16 +78,13 @@ constructor (|Message| node, |SCBase| parent)
 	.TypeNormal = T
 	.TypeOptional = T.NilConstructor(NilState.optional*IsDataType)
 	.TypeVeryExists = T.NilConstructor(NilState.Real*IsDataType)
+	
 	T = T.Copy
 	T.Name = "self"
 	T.Strength = kStrSharedParams
 	if node == "struct"
 		T.PointerCount = 1
-
 	.SelfStrong = T
-	.saveas = nil
-	.TypeInfo = DataTypeCode.UnusedType
-	.Banned = .TestBanned
 
 
 function IsSTDLib (|bool|)

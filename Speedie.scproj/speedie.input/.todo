@@ -83,3 +83,4 @@ I guess it's because it's a saveable? makes sense, sorta. We can just make it no
 * Make all objects saveable? Why would some not be? Simpler than marking them as saveable.
 	* If a class has specific stuff that can't be saved... we can silently mark it as non-saveable... unless already marked as saveable... or we try to save it, then we create an error.
 * burst-mode allocation, for parsing basically, seeing as we spend 80% of our time during parse in allocators!
+

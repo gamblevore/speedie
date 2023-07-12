@@ -97,18 +97,6 @@ function NilTracker.ChildMustExist (|message| wrapper)
 	expect (ObjDecl.NilUsed) (msg, "Possible NilObject access.")
 
 
-function NilTracker.Property (|message| msg)
-	// FP calls and behaviours should all assume NOT NIL unless specified...
-	pragma inline
-	|| Prop = msg.NilPropAccess
-		.ChildMustExist(msg)
-
-function NilTracker.FP (|message| msg)
-	// FP calls and behaviours should all assume NOT NIL unless specified...
-	pragma inline
-	.ChildMustExist(msg.first)
-
-
 function NilTracker.IfWhile (|message| msg, |message|)
 	// must re-add decls to the tracker...
 	opt norefcounts
@@ -317,18 +305,15 @@ function NilTracker.Enter  (|message| s, |message|)
 	  elseif (f == @arg)
 		.EnterArg(s)
 	  elseif (f == @dot)
-		.property(s)										// abc.var
+		|| Prop = s.NilPropAccess
+			.ChildMustExist(s)								// abc.var
 	  elseif (f == @acc) 
 		.ChildMustExist(s)									// abc[0]
 	  elseif (f == @brel) 
 		if s == "*"
 			.ChildMustExist(s)								// *abc
-		// what about x = &a
-		// now x exists for sure, right?
-		// the brel in transform can do that, only for || x = &a
-		// I think rel setters in general should have that property?
 	  elseif (f == @func and s.first == @bra)
-		.FP(s)												//  (abc)()
+		.ChildMustExist(s.first)							//  (abc)()
 	return s
 	
 	
@@ -349,11 +334,11 @@ function NilTracker.Leave (|message| s)
 /*
 TODO:
 
+* fix ChildMustExist for params
 * Collectdecls: Pointers still need separate treatment... and getting the address/dereffing might be different too?
 * Strength is settable in the project if its an error or problem
 * make this always an error! nil|msg|.pos=0
 * return values
-* fix ChildMustExist for params
 * freeze bug
 * .if is needed?
 * pop the msgs out.

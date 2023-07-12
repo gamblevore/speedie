@@ -122,6 +122,7 @@ class SCDecl (SCObject) {
 	|NilState|			NilDeclared
 	|NilState|			NilUsed
 	|NilState|			PtrNilDeclared // Id have to replace my type-system to remove this
+	|NilState|			PtrNilUsed // Id have to replace my type-system to remove this
 	
 	constructor (|scclass| type=nil)
 		.type = type
@@ -195,8 +196,6 @@ class SCDecl (SCObject) {
 		dcl.Name     = .Name
 		dcl.Default  = .Default
 		dcl.Strength = .Strength
-		dcl.NilDeclared = .NilDeclared
-		dcl.NilUsed = .NilUsed
 		Return dcl
 
 	
@@ -282,6 +281,8 @@ class SCDecl (SCObject) {
 		dcl.AutoCastTo	= .AutoCastTo
 		dcl.C_array		= .C_array
 		dcl.compilercreated = self is compilercreated
+		dcl.NilDeclared = .NilDeclared
+		dcl.NilUsed		= .NilUsed
 
 
 	function TypeContained (assigns:|scclass|)
@@ -298,14 +299,20 @@ class SCDecl (SCObject) {
 	function GetAddress (|SCDecl|)
 		rz = SCDecl.new
 		.CopyTypeInfoTo(rz)
-		rz.name = .name // sigh... right?
 		rz.PointerCount++
+		rz.PtrNilDeclared = NilState.Optional	// in case we later set it to nil.
+		rz.PtrNilUsed = NilState.real			// always exists
+		// what if we do:
+		// x = obj()
+		// p = &x
+		// *p = nil
+		// now what? does the compiler know that x is now nil?
+		// that would be a very involved situation. pointers can escape all over
+		// better to assume that x is now optional... unless the pointer itself is not optional.
+		// of course... the declaredness can be transfered... so we can't set it to nil
+		
+		check (rz.pointercount < 8) (.source, "Too much abstraction")
 
-
-	function GetAddress0 (|SCDecl|)
-		opt norefcounts
-		rz = .getaddress
-		rz.c_array = 0
 
 	render
 		.WriteDeclFull.Render(fs)
@@ -466,14 +473,14 @@ class SCDecl (SCObject) {
 	function MakeAsObject (|SCDecl| Container, |Message| ErrPlace, |scdecl|)
 		|| NormalContained = container.type.contained#require
 		if (.IsNormalObject)
-			expect (NormalContained.isnormalobject) (errplace, "This doesn't contain objects.")
+			check (NormalContained.isnormalobject) (errplace, "This doesn't contain objects.")
 			return self
 
 		  elseif !NormalContained.isnormalobject
 			return self // yeah not very precise, but good enough for now!
 		
 		
-		expect .CanWrap (ErrPlace, "Can't store this type as an object (in this version of speedie).")
+		check .CanWrap (ErrPlace, "Can't store this type as an object (in this version of speedie).")
 		return .NewWrapper(self)
 	
 	
@@ -758,12 +765,6 @@ class SCDecl (SCObject) {
 		|| c = .contains ?? .type.contained
 		if c and c.type != self.type
 			return c
-
-		
-	function AsPointer (|SCDecl|)
-		rz = .Copy // A pointer to a borrowed thing? Possible! No difference. Just keep.
-		rz.PointerCount++
-
 	
 	function ContainsMatch (|SCDecl| o, |int| TypeCast, |bool|)
 		opt norefcounts
@@ -799,18 +800,37 @@ class SCDecl (SCObject) {
 
 
 	function MakeOptional (|SCDecl|)
-		return .MakeNil(.type.TypeOptional, nilstate.optional)
-		
-	function MakeReal (|SCDecl|)
-		return .MakeNil(.type.TypeVeryExists, nilstate.real)
+		// this is declared optional...
+		// the default type state is "either"... which is almost the same just undeclared
+		return .MakeNil(nilstate.optional, .type.TypeOptional)
 	
-	function MakeNil (|scdecl| curr, |nilstate| type, |scdecl|)
+	
+	function MakeReal (|SCDecl|)
+		return .MakeNil(nilstate.real,  .type.TypeVeryExists)
+	
+	
+	function MakeNilPointer (|nilstate| type, |scdecl|)
 		opt norefcounts
+		if .PtrNilDeclared == type
+			Return self
+		
+		rz = .Copy
+		rz.ptrNilDeclared = type
+		rz.ptrnilused = Type &~ NilState.Stated
+
+
+	function MakeNil (|nilstate| type, |scdecl| Default, |scdecl|)
+		opt norefcounts
+		// this needs to take account pointerness.
+		// if we are making a decl real... well if its a pointer, we need to alter the pointertype.
+		if .PointerCount
+			return .MakeNilPointer(type)
+		
 		if .nildeclared == type
 			Return self
 		
-		if (curr and self == .type.typenormal)
-			return curr
+		if (Default and self == .type.typenormal)
+			return Default
 		
 		rz = .Copy
 		rz.NilDeclared = type

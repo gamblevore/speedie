@@ -195,6 +195,7 @@ class ErrorList
 			return (.ErrorCount < .MaxErrors)
 		return (.WarnCount < .MaxErrors)
 	
+	
 	Syntax UsingComplete
 		stderr.printerrors
 		stderr = self

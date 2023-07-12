@@ -168,6 +168,8 @@ function CompileAll (|bool|)
 	CodeSorter.LeafsFirst		// super-refcounter wants this
 	
 	require .Stage( "NilChecking" )
+	.Timer( "NilChecking" )
+
 	VoidSweeper.SuperUberChecker
 	
 	require .Stage( "RefCounting" )

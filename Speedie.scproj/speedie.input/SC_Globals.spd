@@ -123,7 +123,7 @@ function TypeOfBRel (ExprResolver)
 	  elseif name == "&"
 		require F.CanGetAddress(name_Space)
 		check (SubType.PointerCount < 8) (f, "Seems unlikely you actually want this.")
-		return Subtype.AsPointer
+		return Subtype.GetAddress
 		
 	  elseif name == "!"
 		|| cond = ExpandToBool( F, name_space )$
@@ -386,20 +386,17 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 	if (f == @sthg) and (c == "...")
 		return name_space.RequireContained( c )
 
-
 	if (f == @list) and !c.hasany
 		|| p = c.UpToType    // abc|()--|
-			return typeofexpr(p.first, name_space)
-				
+			return typeofexpr(p.first, name_space)				
 			
-	
 	if (f == @Thg)		// usual case
 		return Compiler[ c.name, c ]$.typenormal
 	
 	if (c == @Acc)		// |Byte[10]| TenBytes
 		|| Prms = c[1]
 		if prms.HasAny
-			|| R = ExtractDecl( c.first, name_space ) #require
+			|| R = ExtractDecl( c.first, name_space )			#require
 			R = R.copy
 			expect  ExtractAmount( Prms, name_space, R )   ( c, "Expected something like: |Type[10]|" )
 			return R
@@ -411,15 +408,13 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		c <~ «thg "memory"»
 		c <~ «opp "of"»
 		c <~ fi
-
 	
 	if (f == @func)
-		|| R = ExtractDecl( c.first, name_space ) #require
+		|| R = ExtractDecl( c.first, name_space )				#require
 		return R.RefineDecl(c.last)
-
 	
-	if (f == @Arel)
-		|| R = ExtractDecl( c.first, name_space ) #require
+	if (f == @Arel or @brel)
+		|| R = ExtractDecl( c.first, name_space )				#require
 		if (C == "--")
 			return R.MakeBorrowed(c.uptotype!=nil)
 		if (C == "?")
@@ -428,61 +423,64 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 			return R.MakeReal
 		if (C == "") // compiler internal
 			return R
-		error (c)
-
+		if f == @arel
+			error (c)
 
 	if (F == @arg) // a bit ugly... |{\n\tfaststring\n}|
-		|| d = extractdecl(c.first, name_Space)$
+		|| d = ExtractDecl(c.first, name_Space)$
 		d.compilercreated = true
 		return d
-		
 
-	|| result = SCDecl.new
+	rz = SCDecl.new
 	|| ErrCount = stderr.errorCount
 
 	if f == @brel
 		if (C == "&")	// pointer
 			|| R = ExtractDecl( c.first, name_space )
-				R.CopyTypeInfoTo(result)
-				result.PointerCount++
+				R.CopyTypeInfoTo(rz)
+				rz.PointerCount++
+				rz.PtrNilDeclared = NilState.either
+				rz.PtrNilUsed = NilState.either
 		
 		  elseif (c == "~") // not a brel anymore?
 			c.name = "&"
 			c.first.func = @thg
 			|| wrapp = «thg "datatypewrapper"»
-			result.loadContained(c, wrapp, name_space)	#require
+			rz.loadContained(c, wrapp, name_space)				#require
 		  else
 			error c
 	
 	  elseif (f == @item)
-		|| R = ExtractDecl( c.first, name_space ) #require
+		|| R = ExtractDecl( c.first, name_space )				#require
 		expect R.isnumeric and (c.last == @num) (c, "Must be numeric")
-		result.TypeContained = R.Type // use CopyTypeInfoTo? what does this do even?
+		rz.TypeContained = R.Type // use CopyTypeInfoTo? what does this do even?
 		
 	  elseif (f == @Arr)
 		|| ch = c.first
-		ifn ch										// |[]|
+		if !ch										// |[]|
 			Return TypeArray.TypeNormal
 		
 		expect (ch != @Item) (c)
-		result.Contains = ExtractDecl( ch, name_space )
-		result.TypeContained = TypeArray
+		rz.Contains = ExtractDecl( ch, name_space )
+		rz.TypeContained = TypeArray
 		
 	  elseif (f == @Adj)
-		Result.LoadContained(c.first, c.last, name_Space)		#require
+		// deprecate this! we want to use "of" all over
+		rz.LoadContained(c.first, c.last, name_Space)			#require
 		
 	  elseif (f == @rel)
 		|| op = c[@opp, 1]										#require
 		op.expect(@opp, "of")
 		|| contained = c[nil, 2]								#require
-		result.loadContained(contained, c.first, name_Space)	#require
+		rz.loadContained(contained, c.first, name_Space)		#require
+		
 	  elseif (ErrCount == StdErr.errorCount)
 		error ( c ) // no spam
 	
-	result.MakeContainedObject
-	
-	if (ErrCount == StdErr.errorCount)
-		Return result
+	if rz
+		rz.MakeContainedObject		
+		if (ErrCount != StdErr.errorCount)
+			rz = nil
 
 
 
@@ -560,7 +558,7 @@ function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |
 			return obj
 		if obj isa SCModule
 			|| cls = obj.Cls				#expect ( exp, "Can’t use a module here." )
-			Return cls.ClassType.AsPointer
+			Return cls.ClassType.GetAddress
 
 
 function Message.SCFile (|SCFile|)
@@ -1003,15 +1001,6 @@ function string.IsSwizzle (|int| Width, |int|)
 function TypeOfSyx (ExprResolver)
 	exp.becomesyx
 	return typeofthg(exp, name_space, side)
-
-struct asdas
-	|int| aaabbb
-
-struct asdas2
-	|asdas| www
-	function hhh
-		visible
-		|| jjj = .www
 
 
 function message.ClassSpace (|scbase| name_space, |scobject|)

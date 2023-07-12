@@ -133,15 +133,13 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 	|| ot = o.type
 	if (.PointerCount == O.PointerCount + 1)
 		|| OAddr = O.GetAddress
-			// if exp is nil, we are testing.
-			// but we can't test... without an exp.
-			// having the types isn't enouh?
 		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
 			return exp.GetAddressOf(OAddr)
 
 
 	if (o.c_array) and (.pointercount == 1)
-		|| oaddr = o.GetAddress0
+		|| oaddr = o.GetAddress
+		oaddr.C_Array = 0
 		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
 			return exp.GetAddressOf(OAddr, true)
 	
