@@ -28,7 +28,6 @@ function Message.FindAndRemove (|String| name,  |bool| NothingOK,  |bool| IsClas
 function Message.DeprecatedClassOption (|String| name,  |string| Kind=nil,  |int|)
 	// this is a wasteful way to do stuff.
 	// better to find them as we go through the code... not search for each at the start.
-	
 	|| place = .findflat( @Tmp, name )		#require
 
 	|| num = 1
@@ -180,11 +179,10 @@ function Message.WantAsArg (|message| ErrPlace, |string| errmsg = "Expected {arg
 
 function Message.WithinLoop (|Message| stop, |bool|)
 	opt norefcounts
-	|| curr = self
-	while (curr != stop) and curr
-		if (curr IsTmp "while" or "for")
+	while (self != stop) and self
+		if (self IsTmp "while" or "for")
 			return true // seems OK, its within a loop.
-		curr = curr.parent
+		self = .parent
 
 
 function Message.UnBra (|Message|)

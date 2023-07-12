@@ -1026,18 +1026,17 @@ function TypeOfDot (ExprResolver)
 	
 	|| o = DotVar.LookUpDot( exp.name, exp, name_Space, contains, side )		#require
 	if (o isa SCModule)
+		// for __modules__.String   // one day namespace.myclass ?
 		if exp.first == @thg
 			exp.Func = @thg
 			exp.clear
 		return o
 	
-	|| decl = o.asdecl2
+	|| decl = o.BaseAsDecl
 		if contains
-			if DotVar isa scclass	// I wonder if we need to pass true here?
-									// its for when we are gonna set the name?
-									// and we might as well make a new one anyhow?
-									// not sure why its needed...
+			if (DotVar isa scclass) and !exp.IsSettablePlace
 				decl = decl.ContainedReplace( Contains, true )
+				
 		  elseif DotVar isa scmodule
 			|| cls = DotVar.cls
 				if cls.IsRole

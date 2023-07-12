@@ -1332,6 +1332,9 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		opt norefcounts
 		require type Is UpgradeableContained
 		|| p = msg.parent
+			if (p == @rel) and (p.first == msg) and msg.next == "="
+				return ""
+			
 			|| fn = p.obj
 			if fn isa scfunction
 				if fn isa kIsReffer

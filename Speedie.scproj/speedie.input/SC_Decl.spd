@@ -593,10 +593,13 @@ class SCDecl (SCObject) {
 			if  (!needsname or !.name) and .SameForReplace(contains)
 				return contains				// we are missing UpgradeableContained?
 		
-			debugat
+			|| SameType = contains.type == .type
+				if .SameForReplace(contains) 
+					return self
+			
 			|| C = .copy
 			c.type = contains.type
-			(C is UpgradeableContained) = (C.type != .type)
+			(C is UpgradeableContained) = !sameType
 			
 			Return C
 

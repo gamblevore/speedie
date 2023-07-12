@@ -51,8 +51,10 @@ function SimpleName (|String|)
 		Return n[1...]
 	Return n
 
+
 function IsCompSet (|bool|)
 	return .IsCompare or .isset
+
 
 function InitComp (|string| name_)
 	.Name = name_
@@ -174,8 +176,8 @@ module {
 		|| it = SCOperator.new(asm)
 		it.InitComp( s )
 		dict[ s ] = it
-		it.IsCompare = false // changing this line breaks it
-		it.IsSet = true // lol
+		it.IsCompare = false
+		it.IsSet = true
 
 
 	function AddNormal (|string| s, |string| FuncName, |fn_opasm| ASM, |SCOperator|)

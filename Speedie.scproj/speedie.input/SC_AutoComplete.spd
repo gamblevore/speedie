@@ -608,7 +608,7 @@ function Object.AsDeclAutoComplete (|scdecl|)
 	if self isa SCModule
 		if .cls
 			return .cls.typenormal
-	return .asdecl2
+	return .BaseAsDecl
 
 
 function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoitem]| found, |bool| exact, |int| Types, |scdecl| TypeLimiter)

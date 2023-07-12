@@ -501,6 +501,16 @@ function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 		Last = Curr // Make sure it's not a (bracket) or obj|typecast|
 
 
+
+function Message.IsSettablePlace (|bool|)
+	opt norefcounts
+	|| p = .parent
+	while p == @bra
+		self = p
+		p = p.parent
+	return (p == @rel) and (self.isfirst) and (.next == "=")
+
+
 function Message.IsSetRel (|bool|)
 	opt norefcounts
 	if (self == @Rel) and (.first.next == "=")

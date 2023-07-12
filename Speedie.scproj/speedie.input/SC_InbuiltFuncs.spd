@@ -43,7 +43,7 @@ function TypeOfQues (ExprResolver)
 		return TypeOfExpr(exp, name_space)
 
 
-function Object.AsDecl2 (|scdecl|)
+function Object.BaseAsDecl (|scdecl|)
 	if self
 		if self isa SCDecl
 			return self
