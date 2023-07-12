@@ -1,6 +1,7 @@
 
 
 bugs:
+	* containedreplace seems to replace stuff needlessly (slow)
 	* sdleventtype.mousedown() // compiles???
 		* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and struct
 	* return (self, high)|ControlLine| // self/high are controlpoints

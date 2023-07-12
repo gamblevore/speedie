@@ -309,8 +309,10 @@ function InitBasicFuncs (|bool|)
 	.RefDecrMulti	= .LoadRefFunc( "JB_DecrMulti" )
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
+	printline compiler.exportnames
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
-//	.FindFunction("JB_App__Quit").IsKiller ?= true
+	|| fn = .ModuleFunction("app", "quit")
+		fn.iskiller = true
 	.fnAs			= .LoadTypeTest( "operatoras" )
 	.fnFastAs		= .LoadTypeTest( "operatorfast_as" )
 	.fnFastIsa		= .LoadTypeTest( "operatorfast_isa" )
@@ -714,6 +716,15 @@ function CreateDisambiguation
 	.DisamModules = SCModule.newContainer("__modules__")
 
 
+
+function ModuleFunction (|String| module_name, |string| fn_name, |scfunction|)
+	opt norefcounts
+	|| mod = compiler.findmodule(module_name, nil)
+		|| fn = mod[fn_name]
+		if fn isa scfunction
+			return fn
+	
+			
 function FindClass (|String| name, |Message| where, |SCClass|)
 	opt norefcounts
 	|| Mod = .FindModule(name, where, "Expected a class but found something else")

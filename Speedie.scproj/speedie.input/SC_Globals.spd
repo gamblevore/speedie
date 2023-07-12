@@ -222,7 +222,7 @@ function TypeOfChar (ExprResolver)
 	|| x = 'ø'
 	exp.Func = @num
 	exp.name = cp.render
-	return compiler["codepoint"].typenormal
+	return compiler.findclass("codepoint", exp).typenormal
 
 
 
@@ -990,7 +990,7 @@ function TypeOfSyx (ExprResolver)
 	return typeofthg(exp, name_space, side)
 
 
-function message.ClassSpace (|scbase| name_space, |scobject|)
+function message.DotSpace (|scbase| name_space, |scobject|)
 	opt norefcounts
 	if self != @Thg
 		return TypeOfExprmodulesok( self, name_space ) 
@@ -1010,40 +1010,38 @@ function TypeOfSwiz (|message| exp, |scbase| name_space, |message| side, |scdecl
 function TypeOfDot (ExprResolver)
 	require !exp.Last.obj // it's a func that returns nothing. we already got it, don't get again.
 	
-	|| Class_Space = exp.first.ClassSpace(name_space)|SCbase| #expect (exp, "This expression can’t be used here.")
+	|| DotVar = exp.first.DotSpace(name_space)|SCbase| #expect (exp, "This expression can’t be used here.") // DotVar is the type of the thing that the dot is on.
 	|SCDecl| contains
 
-	if (Class_Space isa SCDecl)
-		|| swiz = TypeOfSwiz(exp, name_space, side, class_space)
+	if (DotVar isa SCDecl)
+		|| swiz = TypeOfSwiz(exp, name_space, side, DotVar)
 			return swiz
 			
-		contains = Class_Space.Contains
-		|| ContainsCls = Class_Space.Type
-		if (!contains) and (ContainsCls)
-			contains = ContainsCls.Contained
-		Class_Space = ContainsCls|scdecl|
+		contains = DotVar.Contains
+		DotVar = DotVar.Type|scdecl|$ // its an scclass actually
+		if (!contains)
+			contains = DotVar|scclass|.Contained
 	  else
-		expect  (Class_Space isa SCClass or scmodule)  ( exp, "Not a class or module." )
+		expect  (DotVar isa SCClass or scmodule)  ( exp, "Not a class or module." )
 	
-	|| o = Class_Space.LookUpDot( exp.name, exp, name_Space, contains, side )		#require
+	|| o = DotVar.LookUpDot( exp.name, exp, name_Space, contains, side )		#require
 	if (o isa SCModule)
 		if exp.first == @thg
 			exp.Func = @thg
 			exp.clear
 		return o
 	
-	
 	|| decl = o.asdecl2
 		if contains
-			if Class_Space isa scclass // I wonder if we need to pass true here?
-									   // its for when we are gonna set the name?
-									   // and we might as well make a new one anyhow?
-									   // not sure why its needed...
-				decl = decl.ContainedReplace( Class_Space, Contains, true )
-		  elseif class_Space isa scmodule
-			|| cls = class_Space.cls
-			if cls and cls.IsRole
-				decl = decl.ClassActReplace(cls)		
+			if DotVar isa scclass	// I wonder if we need to pass true here?
+									// its for when we are gonna set the name?
+									// and we might as well make a new one anyhow?
+									// not sure why its needed...
+				decl = decl.ContainedReplace( DotVar, Contains, true )
+		  elseif DotVar isa scmodule
+			|| cls = DotVar.cls
+				if cls.IsRole
+					decl = decl.ClassActReplace(cls)		
 	
 	|| fn = exp.last.obj
 	if fn isa SCFunction

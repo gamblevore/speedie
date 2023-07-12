@@ -25,7 +25,10 @@ function Message.FindAndRemove (|String| name,  |bool| NothingOK,  |bool| IsClas
 
 
 
-function Message.FindClassOption (|String| name,  |string| Kind=nil,  |int|)
+function Message.DeprecatedClassOption (|String| name,  |string| Kind=nil,  |int|)
+	// this is a wasteful way to do stuff.
+	// better to find them as we go through the code... not search for each at the start.
+	
 	|| place = .findflat( @Tmp, name )		#require
 
 	|| num = 1

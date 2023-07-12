@@ -782,15 +782,15 @@ module
 	function SCClass.LoadLinkage
 		opt NoRefCounts
 		|| Arg = .LinkagePlace 				#require
-		if arg.FindClassoption("wrapper", "union") // for SDL2
+		if arg.DeprecatedClassOption("wrapper", "union") // for SDL2
 			.iswrapper = 2
-		  elseif arg.findclassoption("wrapper", nil)
+		  elseif arg.DeprecatedClassOption("wrapper", nil)
 			.iswrapper = 1
-		.NoAutoComplete = arg.findclassoption("noauto")
+		.NoAutoComplete = arg.DeprecatedClassOption("noauto")
 		  
-		.NoEarlyFree = arg.findclassoption("pragma", "NoEarlyFree")
-		.TreatAsBaseType = arg.findclassoption("pragma", "TreatAsBaseType")
-		.minopt = arg.FindClassOption("opt", "min")
+		.NoEarlyFree = arg.DeprecatedClassOption("pragma", "NoEarlyFree")
+		.TreatAsBaseType = arg.DeprecatedClassOption("pragma", "TreatAsBaseType")
+		.minopt = arg.DeprecatedClassOption("opt", "min")
 
 
 

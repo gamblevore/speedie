@@ -782,6 +782,7 @@ function ConstantExpand (|Message| ch)
 
 
 function FindVis (|Message| c, |bool|)
+	opt norefcounts
 	if !c
 		return true
 	if c == @thg

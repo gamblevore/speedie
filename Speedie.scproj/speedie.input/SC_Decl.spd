@@ -589,7 +589,10 @@ class SCDecl (SCObject) {
 		//    or     "[...] -->[string]"     (.contains.iscontained)
 
 		if (self Is UpgradeableContained) and Contains
-			if  !needsname and .SameForReplace(contains)
+			if --doitwierdly == 0 
+				return self
+			if  (!needsname or !.name) and .SameForReplace(contains)
+				// we are missing UpgradeableContained?
 				return contains
 			|| C = contains.copy				#require
 			(C is borrowed) = self is borrowed
@@ -1068,3 +1071,4 @@ function scdecl.ByteSize (|int|)
 
 
 
+|int| doitwierdly = 1

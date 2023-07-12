@@ -1736,12 +1736,12 @@ function scfunction.init_sub (|message| node,  |scbase| name_space)
 	.TranStrings 
 	.ReadDisabled(Arg)
 
-	.IsInline		= arg.FindClassOption("pragma", "inline")
-	.NoRefCounts	= arg.FindClassOption("opt",	"NoRefCounts")
-	.minopt			= arg.FindClassOption("opt",	"min")
+	.IsInline		= arg.DeprecatedClassOption("pragma", "inline")
+	.NoRefCounts	= arg.DeprecatedClassOption("opt",	"NoRefCounts")
+	.minopt			= arg.DeprecatedClassOption("opt",	"min")
 	.SetBlindCasts(name_space)
 
-	if  Arg.FindClassOption("pragma", "DontDestructLocally")
+	if  Arg.DeprecatedClassOption("pragma", "DontDestructLocally")
 		.AllocCode |= kDestructorNotFromLocalRefs
 	
 
