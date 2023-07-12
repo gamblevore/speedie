@@ -3,8 +3,6 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-// how to say that we are in JBLib?
-// via a conf, right? where is conf read from?
 
 class File (String)
 	linkage

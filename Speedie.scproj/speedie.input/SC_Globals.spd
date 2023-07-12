@@ -115,14 +115,13 @@ function TypeOfBRel (ExprResolver)
 		return TypeOfAddress(F, name_space, side)
 	
 	if name == "*"
-		return SubType.Dereference(F)
+		return SubType.Dereference(F, false)
 		
 	  elseif name == "-" // minus
 		Return subtype
 		
 	  elseif name == "&"
 		require F.CanGetAddress(name_Space)
-		check (SubType.PointerCount < 8) (f, "Seems unlikely you actually want this.")
 		return Subtype.GetAddress
 		
 	  elseif name == "!"
@@ -421,28 +420,27 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 			return R.MakeOptional
 		if (C == "!")
 			return R.MakeReal
-		if (C == "") // compiler internal
+		if (C == "")					// compiler internal
 			return R
 		if f == @arel
 			error (c)
 
-	if (F == @arg) // a bit ugly... |{\n\tfaststring\n}|
+	if (F == @arg)						// a bit ugly... |{\n\tfaststring\n}|
 		|| d = ExtractDecl(c.first, name_Space)$
-		d.compilercreated = true
+		(d is compilercreated)
 		return d
 
 	rz = SCDecl.new
 	|| ErrCount = stderr.errorCount
 
 	if f == @brel
-		if (C == "&")	// pointer
+		if (C == "&")					// pointer
 			|| R = ExtractDecl( c.first, name_space )
-				R.CopyTypeInfoTo(rz)
-				rz.PointerCount++
+				rz = r.GetAddress
 				rz.PtrNilDeclared = NilState.either
 				rz.PtrNilUsed = NilState.either
 		
-		  elseif (c == "~") // not a brel anymore?
+		  elseif (c == "~")				// not a brel anymore?
 			c.name = "&"
 			c.first.func = @thg
 			|| wrapp = «thg "datatypewrapper"»
@@ -453,7 +451,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 	  elseif (f == @item)
 		|| R = ExtractDecl( c.first, name_space )				#require
 		expect R.isnumeric and (c.last == @num) (c, "Must be numeric")
-		rz.TypeContained = R.Type // use CopyTypeInfoTo? what does this do even?
+		rz.TypeContained = R.Type		// use CopyTypeInfoTo? what does this do even?
 		
 	  elseif (f == @Arr)
 		|| ch = c.first
@@ -501,8 +499,9 @@ function SCDecl.LoadContained (|Message| Contained, |Message| c, |SCBase| Name_S
 	if typewrapper.typenormal.match(R, ktypecastfalse).isnormalmatch
 		expect (!Cont.isnormalobject)  ( c, "Datatype-wrappers can't contain objects." )
 		expect (!Cont.c_array)         ( c, "Datatype-wrappers can't contain this." )
-		.autocastto = cont
+		.Internal = cont
 		.contains = cont
+		.info |= SCDeclInfo.autocast
 	  else
 		|| RCont = R.Type.Contained 
 		expect (R.IsNormalObject or R.Type.IsStruct or R.Contains)  ( c, "Not a container class." )
@@ -622,15 +621,6 @@ function TypeOfVecAccess (|message| index, |scdecl| ty0, |int| w, |scdecl|)
 	return typeint.NotConst
 
 
-function TypeOfPointerAccess (|scdecl| ty0, |scdecl|)
-	|| Cpy = Ty0.Copy // should keep borrowedness...
-	if (Cpy.C_Array)
-		Cpy.C_Array = nil
-	else
-		Cpy.PointerCount--
-	return Cpy
-
-
 function Message.ExpectInt (|scdecl| type, |bool|)
 	expect type.Type.TypeInfo.IsInt (self, "Expected integer")
 	return true
@@ -650,11 +640,11 @@ function TypeOfAccess (ExprResolver)
 			return TypeOfVecAccess(index, ty0, w)
 		if Ty0.C_Array
 			require Index.ExpectInt(Access)
-			return TypeOfPointerAccess(ty0)
+			return ty0.Dereference(exp, true)// TypeOfPointerAccess(ty0)
 		if (Ty0.PointerCount and Access isa typeint)
 			ifn (ch == @bra and ch.first == @bra) // should work now
 				require Index.ExpectInt(Access)
-				return TypeOfPointerAccess(ty0)
+				return ty0.Dereference(exp, true)
 	if (ty0 isa scmodule)
 		if ty0.IsMArray(arr) and arr.first.expectmatch(name_Space, typeint)
 			return LowlevelArrayTransform(exp, ty0.Cls)

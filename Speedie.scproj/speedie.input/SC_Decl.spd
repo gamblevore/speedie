@@ -3,28 +3,9 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-/*
-	Decls need to be re-written... New plan:
-		* Unique type system. Pointers, classes, etc... should be one unique object per-type.
-			* Some kind of lookup-table should tell us how to remodify one type's child as another.
-				* String based? Or something better?
-				* If we have "a dict that contains strings" and later want "a dict that contains strings"... it should be quick to find that one already exists...
-		* Variables as a different concept than types.
-			* Variables should NEVER be reused. So... there.
-			* Contains, pointercount, c_Array are what need this.
-				* c_array and pointers should be "container classes".
-				* So the entire thing is about containment.
-				* Just need a set of root classes then?
-
-	// Use a dictionary of strings? If types are 2 bytes each. So a type-chain is a string.
-		
-	* Anyhow... once we have all vars separate, and all classes have SCTypes... we won't have issues with overwritings a classes's var by accident...
-		* Anytime we ned a new var, we start off creating one, and just let it be filled in...
-*/
-
-
-
-
+// scdecl isn't quite made the way I wanted it
+// i would require a rework of everything...
+// this will do for now
 
 constants
 	// order of badness?
@@ -79,6 +60,7 @@ datatype SCDeclInfo (uint)
 		Static
 		UpgradeableContained
 		NewlyCreated
+		AutoCast
 		TypeImprove
 		UsedByCode
 		API
@@ -109,7 +91,7 @@ class SCDecl (SCObject) {
 	|SCFunction--|		Setter		// todo: replace the .stringdata/hider thing with this.
 	|Object|			IsLookupOnly
 	|string|			StringData
-	|SCDecl|			AutoCastTo	// 4 special objects. Aren't they exclusive? Write some code to see if they are.
+	|SCDecl|			Internal	// 4 special objects. Aren't they exclusive? Write some code to see if they are.
 	
 	//|SCDecl|			NextContains // for multiple contains
 	|SCDecl|			Contains
@@ -152,8 +134,6 @@ class SCDecl (SCObject) {
 		.info = .info.set(SCDeclInfo.NewlyCreated, Value)
 	function IsTypeImprove (assigns:|bool|)
 		.info = .info.set(SCDeclInfo.TypeImprove, Value)
-	function CompilerCreated (assigns:|bool|)
-		.info = .info.set(SCDeclInfo.CompilerCreated, Value)
 	function IsAPI (assigns:|bool|)
 		.info = .info.set(SCDeclInfo.api, Value)
 
@@ -277,10 +257,13 @@ class SCDecl (SCObject) {
 		dcl.Type		= .Type
 		dcl.PointerCount= .PointerCount
 		dcl.Contains	= .Contains
-		(dcl Is UpgradeableContained) = self Is UpgradeableContained
-		dcl.AutoCastTo	= .AutoCastTo
+		|| cpyflags		= scdeclinfo.UpgradeableContained + scdeclinfo.compilercreated + scdeclinfo.autocast
+		// why not copy all flags?
+		// or split them into two properties?
+		dcl.info &= ~cpyflags
+		dcl.Info |= .info & cpyflags
+		dcl.internal	= .Internal
 		dcl.C_array		= .C_array
-		dcl.compilercreated = self is compilercreated
 		dcl.NilDeclared = .NilDeclared
 		dcl.NilUsed		= .NilUsed
 
@@ -296,22 +279,42 @@ class SCDecl (SCObject) {
 		return .GetAddress
 
 
+// what if we do:
+// x = obj()
+// p = &x
+// *p = nil
+// now what? does the compiler know that x is now nil?
+// that would be a very involved situation. pointers can escape all over
+// better to assume that x is now optional... unless the pointer itself is not optional.
+// of course... the declaredness can be transfered... so we can't set it to nil
 	function GetAddress (|SCDecl|)
 		rz = SCDecl.new
 		.CopyTypeInfoTo(rz)
+		// can I store the old type??
+		// .contains = self
+		// the problem... is that contains has an actual meaning?
+		// we'd have an int that contains int.
+		
 		rz.PointerCount++
 		rz.PtrNilDeclared = NilState.Optional	// in case we later set it to nil.
 		rz.PtrNilUsed = NilState.real			// always exists
-		// what if we do:
-		// x = obj()
-		// p = &x
-		// *p = nil
-		// now what? does the compiler know that x is now nil?
-		// that would be a very involved situation. pointers can escape all over
-		// better to assume that x is now optional... unless the pointer itself is not optional.
-		// of course... the declaredness can be transfered... so we can't set it to nil
-		
 		check (rz.pointercount < 8) (.source, "Too much abstraction")
+	
+	
+	function Dereference (|message| f,  |bool| IsAccess,  |scdecl|)
+		opt norefcounts
+		rz = .Copy // should keep borrowedness...
+		if (rz.C_Array)
+			if IsAccess
+				rz.C_Array = 0
+				return rz				// OK... so what if we try to do *Carray. We want to get an error
+		if rz.PointerCount > 0
+			rz.PointerCount--
+			|| d = .PtrNilDeclared
+			rz.NilDeclared = d
+			rz.Nilused = d &~ NilState.Stated
+			return rz
+		error (F, "Can't dereference this.")
 
 
 	render
@@ -403,10 +406,6 @@ class SCDecl (SCObject) {
 		return (!.PointerCount) and (!.IsNil) and (.Type.IsObject) and (!.C_Array)
 
 
-	function IsReffedObject (|bool|)
-		return .isnormalobject and (self isnt borrowed) 
-
-
 	function IsNormalNumber (|bool|)
 		return (!.C_Array) and (!.PointerCount) and (.Type.NumericCount == 1) 
 	
@@ -433,14 +432,11 @@ class SCDecl (SCObject) {
 	
 	function SCObject.ShouldUnWrap (|bool|)
 		if (self isa SCDecl)
-			return (.AutoCastTo) and (self isnt NewlyCreated)
+			return (self isnt NewlyCreated) and (self is AutoCast)
 
 	
 	function CanWrap (|bool|)
-		if (.pointercount)
-			return true
-
-		if (.type.funcproto)
+		if (.pointercount or .type.funcproto)
 			return true
 
 		require !.IsNormalStruct
@@ -455,7 +451,8 @@ class SCDecl (SCObject) {
 
 
 	function NewWrapperSub (|scdecl| CastTo, |scdecl|)
-		rz.AutoCastTo = CastTo
+		rz.Internal = CastTo
+		rz.info |= scdeclinfo.AutoCast
 		rz.contains = castto
 		rz.Type = typewrapper
 
@@ -466,8 +463,8 @@ class SCDecl (SCObject) {
 
 		|| it = .type.DataTypeWrapper
 			return it
-		rz = .newwrappersub(castto)
-		.type.datatypewrapper = rz 
+		rz = .NewWrapperSub(castto)
+		.type.DataTypeWrapper = rz 
 	
 	
 	function MakeAsObject (|SCDecl| Container, |Message| ErrPlace, |scdecl|)
@@ -878,7 +875,7 @@ class SCDecl (SCObject) {
 	
 	
 	function UnWrapDataType (|message| exp, |scbase| name_space, |scdecl|)
-		rz = .AutoCastTo
+		rz = .Internal
 		|| ExpReplacement = exp.func.msg(exp.name)
 		ExpReplacement.obj = exp.obj
 		for s in exp
@@ -1083,16 +1080,5 @@ function scdecl.ByteSize (|int|)
 		n *= .C_Array
 	return N
 
-function scdecl.Dereference (|message| f, |scdecl|)
-	opt norefcounts
-	rz = .Copy // should keep borrowedness...
-	if rz.PointerCount > 0
-		rz.PointerCount--
-		|| d = .PtrNilDeclared
-		rz.NilDeclared = d
-		rz.Nilused = d &~ NilState.Stated
-
-	  else
-		error (F, "Can't dereference this.")
 
 

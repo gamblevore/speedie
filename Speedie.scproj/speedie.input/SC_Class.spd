@@ -79,11 +79,12 @@ constructor (|Message| node, |SCBase| parent)
 	.TypeOptional = T.NilConstructor(NilState.optional*IsDataType)
 	.TypeVeryExists = T.NilConstructor(NilState.Real*IsDataType)
 	
-	T = T.Copy
+	if node == "struct"
+		T = T.GetAddress
+	  else
+		T = T.Copy
 	T.Name = "self"
 	T.Strength = kStrSharedParams
-	if node == "struct"
-		T.PointerCount = 1
 	.SelfStrong = T
 
 
@@ -214,7 +215,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 	for p in .properties
 		|| Mul = P.c_Array ?? 1
 		|| curr = 0
-		if (P.isnormalobject) or (p.pointercount)
+		if (P.IsNormalObject) or (p.PointerCount)
 			Curr = platform.PointerBytes
 		  elseif (P)
 			Curr = P.type.calculatesize(depth+1)	#require
