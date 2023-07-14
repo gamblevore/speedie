@@ -277,6 +277,8 @@ typedef bool (*__Message_textset__)(Message* self, int i, JB_String* v);
 
 typedef void (*fnErrorLogger)(JB_ErrorReceiver* self, JB_String* Data);
 
+typedef JB_String* (*fnIDGenerator)(int Start, int End, Syntax f);
+
 typedef void (*fpDestructor)(JB_Object* self);
 
 typedef void (*fpMsgRender)(Message* self, FastString* fs);
@@ -647,46 +649,46 @@ extern JB_String* JB__Tk_Data;
 extern bool JB__Tk_DotInsertAllow;
 extern Message* JB__Tk_EndOfLineMarker;
 extern Dictionary* JB__Tk_ErrorNames;
-extern JB_String* JB__Tk_ErrorTabsAfterSpaces;
 extern MsgUIFlags JB__Tk_InsertedFlags;
 #define kJB__Tk_adjectiveop (1)
 #define kJB__Tk_Allow (false)
 #define kJB__Tk_colon (2)
 #define kJB__Tk_colonarg (4)
-#define kJB__Tk_Comma (16)
-#define kJB__Tk_End ((8 | 16) | 32)
-#define kJB__Tk_EndContainer (32)
-#define kJB__Tk_EndOfLine (8)
+#define kJB__Tk_Comma (128)
+#define kJB__Tk_End ((64 | 128) | 256)
+#define kJB__Tk_EndContainer (256)
+#define kJB__Tk_EndOfLine (64)
 #define kJB__Tk_Expect (true)
-#define kJB__Tk_FuncAfterAny ((64 | 128) | 256)
-#define kJB__Tk_FuncAfterBar (256)
-#define kJB__Tk_FuncAfterNormal (64)
-#define kJB__Tk_FuncAfterNoSpace (128)
+#define kJB__Tk_FuncAfterAny ((512 | 1024) | 2048)
+#define kJB__Tk_FuncAfterBar (2048)
+#define kJB__Tk_FuncAfterNormal (512)
+#define kJB__Tk_FuncAfterNoSpace (1024)
 #define kJB__Tk_illegalchar (4194304)
-#define kJB__Tk_LameTemporal (32768 | (65536 | 131072))
-#define kJB__Tk_Opp (((((512 | 1024) | 2048) | 4096) | 8192) | 16384)
-#define kJB__Tk_OppBar (2048)
-#define kJB__Tk_OppBra (512)
-#define kJB__Tk_OppChain (8192 | 512)
-#define kJB__Tk_OppNoBar ((((((512 | 1024) | 2048) | 4096) | 8192) | 16384) & (~2048))
-#define kJB__Tk_OppSNB (1024)
-#define kJB__Tk_OppSyx (1024 | 2048)
-#define kJB__Tk_OppTemporal (4096)
-#define kJB__Tk_OppWord (8192)
-#define kJB__Tk_OppYoda (16384)
-#define kJB__Tk_Temporal ((32768 | 65536) | 131072)
-#define kJB__Tk_TemporalBar (131072)
-#define kJB__Tk_TemporalSyx (65536 | 131072)
-#define kJB__Tk_TemporalSyxNoBar (65536)
-#define kJB__Tk_TemporalWord (32768)
+#define kJB__Tk_LameTemporal (8 | (16 | 32))
+#define kJB__Tk_Opp (((((4096 | 8192) | 16384) | 32768) | 65536) | 131072)
+#define kJB__Tk_OppBar (16384)
+#define kJB__Tk_OppBra (4096)
+#define kJB__Tk_OppChain (65536 | 4096)
+#define kJB__Tk_OppNoBar ((((((4096 | 8192) | 16384) | 32768) | 65536) | 131072) & (~16384))
+#define kJB__Tk_OppSNB (8192)
+#define kJB__Tk_OppSyx (8192 | 16384)
+#define kJB__Tk_OppTemporal (32768)
+#define kJB__Tk_OppWord (65536)
+#define kJB__Tk_OppYoda (131072)
+#define kJB__Tk_Temporal ((8 | 16) | 32)
+#define kJB__Tk_TemporalBar (32)
+#define kJB__Tk_TemporalSyx (16 | 32)
+#define kJB__Tk_TemporalSyxNoBar (16)
+#define kJB__Tk_TemporalWord (8)
 #define kJB__Tk_temporalwordcolon (262144)
 #define kJB__Tk_Thing ((524288 | 1048576) | 2097152)
 #define kJB__Tk_ThingBar (1048576)
 #define kJB__Tk_ThingSyx (524288)
 #define kJB__Tk_ThingWord (2097152)
-#define kJB__Tk_TmpOpp (4096 | 65536)
+#define kJB__Tk_TmpOpp (32768 | 16)
 #define kJB__Tk_LargestFlag (8388607)
-extern int JB__Tk_StopBars;
+extern fnIDGenerator JB__Tk_Splitter;
+extern u16 JB__Tk_StopBars;
 extern u16 JB__Tk_UsingLength;
 extern int JB__Tk_UsingPos;
 extern u16 JB__Tk_UsingTag;
@@ -869,6 +871,8 @@ int JB_App__InitCode_();
 int JB_Main();
 
 JB_String* JB_App__OrigPath();
+
+void JB_PrintStackTrace();
 
 JB_String* JB_App__StackTrace(JB_String* StartAfter, FastString* fs_in);
 
@@ -1195,6 +1199,8 @@ Message* JB_Tk__ReRoute(Message* output, Message* cnj, Message* f);
 
 void JB_Tk__StopParse();
 
+inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f);
+
 void JB_Tk__TokensFn(Array* arr, int bits, ParseHandler func);
 
 void JB_Tk__TokensHan(Array* arr, TokHan* H);
@@ -1519,6 +1525,9 @@ Syntax JB_Syx__StdNew(fpMsgRender msg, JB_String* name, JB_String* LongName);
 
 
 // fnErrorLogger
+
+
+// fnIDGenerator
 
 
 // fn_app_DeathAction
@@ -2836,6 +2845,10 @@ JB_String* jb_readfile(_cstring path, bool AllowMissingFile);
 
 
 //// HEADER Inlines.h
+inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f) {
+	return (JB__Tk_Splitter)(s, e, f);
+}
+
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self) {
 	return JB_StdErr->ErrorCount == self;
 }

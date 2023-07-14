@@ -5,7 +5,6 @@
 * VM? 
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
-* remove autocasts... at least using .internal
 
 
 // Perry Do later
@@ -37,7 +36,7 @@
 
 
 // Perry additions
-* add image editor... using qoi format. Remove png from speedie!
+* add image editor...
 * reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order...  that can't just be commented out.
