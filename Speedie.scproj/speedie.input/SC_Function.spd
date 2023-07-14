@@ -32,7 +32,7 @@ linkage
 |SCClass|				Cls
 |String|				Disabled
 |CppRefs|				Refs
-|SCBase~dictionary|		LinkTo
+|dictionary of SCBase|	LinkTo
 |object|				CounterPart
 |SCFunction|			NextFunc
 |µFunc|					ASM
@@ -1579,7 +1579,7 @@ function NewHelper (CollectFunc)
 		rz.noautocomplete = 2
 
 
-function SCBase.StoreLinkToMe (|&SCBase~dictionary| dp)
+function SCBase.StoreLinkToMe (|&(dictionary of SCBase)| dp)
 	opt norefcounts
 	require self != typevoid_
 	|| d = *dp init dictionary.new

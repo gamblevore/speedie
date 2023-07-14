@@ -3,9 +3,7 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-// scdecl isn't quite made the way I wanted it
-// i would require a rework of everything...
-// this will do for now
+// scdecl is actually not bad.
 
 constants
 	// order of badness?
@@ -108,7 +106,7 @@ class SCDecl (SCObject) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.NilUsed = NilState.Either
-		if .objectid == 30465542
+//		if .objectid == 30465542
 
 		
 	function Project (|scimport|)
@@ -362,9 +360,10 @@ class SCDecl (SCObject) {
 		if (.Contains)
 			def = «type ":)"
 				def
-				«adj // seems OK :P
-					«Thg .Contains.Type.Name »
+				«rel // seems OK :P
 					«Thg .Type.Name »
+					«opp "of"»
+					«Thg .Contains.Type.Name »
 				»
 			»
 		

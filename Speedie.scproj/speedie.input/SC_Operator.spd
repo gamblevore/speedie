@@ -104,7 +104,7 @@ function InitNormal (|string| name_, |String| FuncName_)
 
 
 module {
-	|SCOperator~Dictionary|			Dict = nil
+	|Dictionary of SCOperator|			Dict = nil
 	|int|							CustomOperatorScore
 
 	function Lookup ( |Message| opch, |SCOperator| )

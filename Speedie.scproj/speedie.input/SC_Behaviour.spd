@@ -9,7 +9,7 @@ function abc
 
 class SCBehaviour (SCBase)
 	|SCModule|							FuncTayble
-	|SCModule~dictionary|				Interfaces
+	|dictionary of SCModule|				Interfaces
 	|[SCFunction]|						WrapperFuncs	
 	
 	

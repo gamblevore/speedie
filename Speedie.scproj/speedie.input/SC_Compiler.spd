@@ -71,9 +71,9 @@ linkage
 |message|				ConfMsg
 |dictionary|			InsecureWords
 
-|SCFile~Dictionary|		Files = nil
-|[SCImport]|			ImportedList
-|SCImport~Dictionary|   ImportedNames = nil
+|Dictionary of SCFile|		Files = nil
+|[SCImport]|				ImportedList
+|Dictionary of SCImport|	ImportedNames = nil
 
 
 |SCModule|				program
@@ -83,8 +83,8 @@ linkage
 |[SCFunction]|			FuncList
 |[SCFunction]|			ProtoTypes
 
-|SCBase~Dictionary|		ExportNames = nil
-|dictionary of dictionary| AdjDicts = dictionary()
+|Dictionary of SCBase|		ExportNames = nil
+|dictionary of dictionary|	AdjDicts = dictionary()
 
 |SCFunction|			PrivateProperty
 |SCFunction|			RefIncr
