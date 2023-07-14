@@ -20,6 +20,12 @@ todo:
 */
 
 
+// i actually never knew this worked!
+function testcontains (|array of array of int| s)
+	|| r = s[0]
+	|| r2 = r[0]
+
+
 function ArgValidation (GUITextValidate)
 	msg.Expect(@arg)
 	for s in msg

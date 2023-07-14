@@ -115,10 +115,9 @@ struct ObjectLoader {
 
 	function LoadClass (|message| msg, |Dictionary| dict)
 		opt norefcounts
-		// OK so... we wanna load one!? How? first, let's get the thing...
 		|| Cls = .GetClassOf(msg) #require
+		debug_require cls.name // what?
 		
-		// OK, so now let's... go through each line.
 		|| items = msg.last
 		expect (items == @list) (items)
 		
@@ -158,10 +157,10 @@ struct ObjectLoader {
 	
 	function GetClassOf (|message| msg, |&ClassData|)
 		opt norefcounts
-		|| Data = ObjectLoader.ClassList[msg.name]|&ClassData| 
+		|| Data = ObjectLoader.ClassList|dictionary of datatypewrapper|[msg.name] 
 		if (!Data)
 			.Noclass = msg
-		return data
+		return data.value|&ClassData|
 	
 	
 	module

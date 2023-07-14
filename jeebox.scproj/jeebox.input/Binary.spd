@@ -6,7 +6,7 @@
 
 function Parser.fBinary (ParseHandler)
 	|| End = .data.find(")#", start+2)
-		|| S = parser[Start+2, End]
+		|| S = parser[Start+2, End, @bin]
 		.nextstart = End + 2
 		return parser(nil, @bin, start, s.unhex)
 	return .ErrorAdd( "Binary section didn't close!", start )

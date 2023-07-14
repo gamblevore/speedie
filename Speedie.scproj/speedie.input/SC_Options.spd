@@ -172,11 +172,10 @@ module Feedback
 		|| Value = obj.Value
 
 		if Name
-			|| opt = AppOptions[name]
-			ifn opt
-				app.die("Unknown switch '$Name'\n")
+			|| opt = AppOptions|dictionary of datatypewrapper|[name]
+				options.OperationCount += ((opt.value|shelloption|)(name, value, nil))
 			  else
-				options.OperationCount += ((opt)(name, value, nil))
+				app.die("Unknown switch '$Name'\n")
 		  elseif value.isjbin // ignore it
 			0 // probably a restart compile option
 		  elseif (options.OperationCount == 1) and !options.output_path
@@ -491,14 +490,14 @@ module Feedback
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
 		fs <~ "  SelfFlow: " 
 		fs <~ app.prefs["self_flow"]
-		for (v in appoptions) (k) 
-			(appoptions[k])("", "", fs_tester)
+		for (v in appoptions|dictionary of datatypewrapper|) (k) 
+			(v.value|shelloption|)("", "", fs_tester)
 			if (fs_tester.length) 
 				fs_tester.length = 0
 				fs <~ "\n--"
 				fs <~ k
 				fs <~ (' ', 17-k.length)
-				(AppOptions[k])("", "", fs)
+				(v.value|shelloption|)("", "", fs)
 		printline fs.getresult
 
 

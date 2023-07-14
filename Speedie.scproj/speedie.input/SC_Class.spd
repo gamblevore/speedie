@@ -894,17 +894,18 @@ module
 				.defawlt := s.defawlt
 
 		|| N		= .name.lowercase
-		|| T		= DataTypeCode.Types[n, 255]
-		require T != 255
-
-		.size = T.bytesize
-		.TypeInfo	= T
-		.IsBuiltin	= true
-		
-		require T.isint and !.Signed
-		|| s2		= t.CreateSignedStuff$
-		.Signed		= s2.typenormal
-		s2.Signed	= .typenormal
+		|| Td		= DataTypeCode.Types|dictionary of datatypewrapper|[n]
+			|| t = td.value|DataTypeCode|
+			require T != 255
+	
+			.size = T.bytesize
+			.TypeInfo	= T
+			.IsBuiltin	= true
+			
+			require T.isint and !.Signed
+			|| s2		= t.CreateSignedStuff$
+			.Signed		= s2.typenormal
+			s2.Signed	= .typenormal
 	
 	
 	function datatypecode.CreateSignedStuff (|scclass|)

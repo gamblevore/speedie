@@ -94,6 +94,7 @@ role FileArchive (message)
 		if o isa string
 			return o
 
+
 function string.GetArchive (|int|lim, |FileArchive|)
 	return .decompress(lim).parse|FileArchive|.validate
 

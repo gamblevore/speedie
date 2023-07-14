@@ -1,7 +1,7 @@
 
 
-|ErrorList| StdErr
-|ErrorList| StdErrOriginal
+|ErrorList| StdErr = ErrorList.new
+|ErrorList| StdErrOriginal = stderr
 
 // hmmm... what should I do?
 // how to remove log

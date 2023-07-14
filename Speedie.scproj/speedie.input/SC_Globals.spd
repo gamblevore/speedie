@@ -496,7 +496,6 @@ function SCDecl.LoadContained (|Message| Contained, |Message| c, |SCBase| Name_S
 	if typewrapper.typenormal.match(R, ktypecastfalse).isnormalmatch
 		expect (!Cont.isnormalobject)  ( c, "Datatype-wrappers can't contain objects." )
 		expect (!Cont.c_array)         ( c, "Datatype-wrappers can't contain this." )
-		.Internal = cont
 		.contains = cont
 		.info |= SCDeclInfo.autocast
 	  else
@@ -569,8 +568,8 @@ function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message| side, |SCO
 	opt norefcounts
 	|| f = ExprFuncs[Exp.func|int|]								#expect ( exp )
 	rz = (f)(Exp, name_space, side)
-	if rz.ShouldUnWrap
-		return (rz|scdecl|).UnWrapDataType(exp, name_Space)
+//	if rz.ShouldUnWrap
+//		return (rz|scdecl|).UnWrapDataType(exp, name_Space)
 
 
 
@@ -1001,8 +1000,9 @@ function message.DotSpace (|scbase| name_space, |scobject|)
 
 function TypeOfSwiz (|message| exp, |scbase| name_space, |message| side, |scdecl| class_Space, |scdecl|)
 	pragma inline
+	opt norefcounts
 	|| W = Class_Space.type.NumericCount 
-	if ((W > 1) and !exp.last.hasany)
+	if (W > 1) and !exp.last.hasany
 		|| swz = exp.name.isSwizzle(W)
 			return TypeOfSwizzle(exp, Class_Space, name_space, side, swz)   // 
 
@@ -1042,8 +1042,7 @@ function TypeOfDot (ExprResolver)
 				if cls.IsRole
 					decl = decl.ClassActReplace(cls)		
 	
-	|| fn = exp.last.obj
-	if fn isa SCFunction
+	|| fn = exp.last.asfunc
 		decl := typevoid
 		exp.obj = decl
 		DotFuncToNormalFunc( exp, fn )
@@ -1204,7 +1203,7 @@ function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
 		if rn.isint 
 			return .cirsub(rn.int)
 	
-	elseif (rn == @thg) and (rt is const) and rt.isnormalnumber and rt.isinteger
+	  elseif (rn == @thg) and (rt is const) and rt.isnormalnumber and rt.isinteger
 		|| def = rt.default
 			return .cirsub(def.int)
 
@@ -1251,8 +1250,6 @@ function message.AndOrExpansionTest (|uint|)
 	return 2 + bs
 
 
-		
-
 function TypeOfRel (ExprResolver) {
 	|| LN = exp.first
 	|| opch = ln.Next
@@ -1262,7 +1259,6 @@ function TypeOfRel (ExprResolver) {
 		return LN.NiceIsFlagSyntax(opch, RN, name_space, side)
 	
 	expect  (RN or Comp.isCustom)  ( exp, "Invalid expression." )
-
 
 	side = nil
 	|| P = exp.niceParent
@@ -1696,8 +1692,9 @@ function Message.FindDestructor (|Message|)
 	opt norefcounts
 	for c in self
 		if c == @Func // i guess its a dot?
-			|| fn = c.last.Obj
-			if fn isa SCFunction: if fn isa kIsDestructor: Return c
+			|| fn = c.last.asfunc
+				if fn isa kIsDestructor
+					Return c
 
 
 function TypeOfArgArr (ExprResolver)
@@ -1718,7 +1715,6 @@ function TypeOfArgArr (ExprResolver)
 	exp.obj = result
 	Tran_ArgArray(exp, name_space)
 	return result
-
 
 
 function Tran_ArgArray (|Message| Exp, |SCBase| name_space)

@@ -74,7 +74,8 @@ function CollectSub (|Message| c, |SCBase|)
 			c.expect(@decl)
 		return nil
 	
-	|| FnInt = T[c.name]									#expect c	
+	|| FnObj = T|dictionary of datatypewrapper|[c.name]									#expect c
+	|| fnint = FnObj.Value|CollectFunc|
 	|| base = (Fnint)( c, self, c )							#require
 	if (base != Compiler.program) // OK
 		.TryAdd( c, base, base.Name )

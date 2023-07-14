@@ -5,10 +5,12 @@
 * VM? 
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
-
+* remove autocasts... at least using .internal
 
 
 // Perry Do later
+* not remembering the file we came from on last quit
+* uncommenting "     //   abc" doesnt work properly.
 * can't right click on the returntype?
 * clearing logs doesnt clear both speedie and perry
 	* also speedie cant rebuild

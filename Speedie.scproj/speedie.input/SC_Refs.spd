@@ -632,8 +632,7 @@ function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
 	if msg == @func
 		for prm.flat in msg.last
 			if prm == @func
-				|| fn = prm.last.obj
-				if fn isa scfunction
+				|| fn = prm.last.asfunc
 					if (fn.returnType.isnormalobject) // and its disowned or whatever
 						return true
 
@@ -801,8 +800,7 @@ function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 		if p in @bra
 			return 
 	
-	|| fn = dot.last.obj
-	if (fn isa SCFunction)
+	|| fn = dot.last.asfunc
 		if (fn isa kIsConstructor)
 			|| ok = self isa (kIsConstructor(|)kIsNew)
 			expect (ok) (dot, "Can only call constructors from within a constructor.")

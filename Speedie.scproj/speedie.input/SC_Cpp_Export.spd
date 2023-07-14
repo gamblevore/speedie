@@ -771,9 +771,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	Syntax Access (|string| name, |int|)
 		require name // "" is 0
-		rz = Cpp_Export.StringDict[name]
-		if rz
-			return rz
+		|| obj = Cpp_Export.StringDict|dictionary of datatypewrapper|[name]
+			return obj.value
 		rz = ++Cpp_Export.StringCount
 		Cpp_Export.StringDict[name] = rz
 
@@ -1026,8 +1025,6 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 		fs.indent--
 		fs.IndentLine
-
-// closers... suck for linepos. so we just don't put a line there.
 		fs <~ '}'
 		if .next
 			fs.IndentLine
@@ -1036,14 +1033,13 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function message.DotMustBeProperty (|scdecl|)
 		opt norefcounts
 		|| obj = .obj
-		if (obj.mustbe(SCDecl))
+		if obj mustbe SCDecl
 			if obj.name
 				return obj
-			|| Backup = .Last.obj
-			debug_require !(Backup isa SCFunction) // function call
-			// could be a type-override... either way we need that name!
-			expect ((Backup isa SCDecl) and Backup|scdecl|.name) (self, "Missing property name")
-			return Backup|scdecl|
+			|| Backup = .Last.obj as scdecl
+				if backup.name
+					return Backup
+			error (self, "Missing property name")
 
 
 	function C_RenderDot (fpMsgRenderCpp)
@@ -1333,6 +1329,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		require type Is UpgradeableContained
 		|| p = msg.parent
 			if (p == @rel) and (p.first == msg) and msg.next == "="
+				// debugger // shouldn't happen... but will take more investigation.
 				return ""
 			
 			|| fn = p.obj

@@ -130,8 +130,8 @@ function SCBase.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, 
 	|| fn = .owningfunc
 	for ch in node
 		require ch.expect(@tmp)
-		|| linker = Table[ch.name] #expect (ch)
-		(linker)(fn, ch, self)
+		|| linker = Table|dictionary of datatypewrapper|[ch.name] #expect (ch)
+		(linker.value|tranfunc|)(fn, ch, self)
 
 	return compiler.program
 

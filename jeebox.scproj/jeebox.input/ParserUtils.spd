@@ -13,14 +13,14 @@ function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |string| name
 function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |int| End, |Message|)
 	Opt NoRefCounts
 	cpp_part NewParent
-	|| name = parser[start, end]
+	|| name = parser[start, end, func]
 	rz = Message.new(Parent, func, Start, name, end - start)
 
 
 function parser.NewWord ( |Message| P, |Syntax| F, |int| Start, |int| SearchFrom, |Message|)
 	Opt NoRefCounts
 	|| after = parser.WordAfter( SearchFrom )
-	|| name = parser[searchfrom, after]
+	|| name = parser[searchfrom, after, f]
 	rz = message.New( P, F, start, name, after - start )
 
 
@@ -31,7 +31,7 @@ function parser.NewEmpty ( |Message| P, |Syntax| F, |int| Start, |int| After, |M
 
 function parser.NewSkip ( |Message| P, |Syntax| F, |int| Start, |int| NameStart, |int| NameEnd, |Message|)
 	Opt NoRefCounts
-	|| name = parser[namestart, nameend]
+	|| name = parser[namestart, nameend, f]
 	rz = message.New( P, F, start, name, parser.nextstart - start )
 
 
@@ -172,7 +172,7 @@ extend Parser
 			  else
 	            err <~ '\''
 	            |ind| N = parser.NextStart min (start + 100)
-	            err <~ parser[ start, N ].escape
+	            err <~ parser[ start, N, @nil ].escape
 	            err <~ '\''
 
 		Parser.ErrorAdd( err, start )
@@ -277,6 +277,7 @@ function Message.SyntaxUsingComplete { }
 // remove tokenhandler_fp, its just parsehandler!
 prototype ParseHandler    (|int| Start, |message| Parent=nil, |Message|)
 prototype TokenHandler_fp (|int| Start, |message| parent=nil, |Object|)
+prototype fnIDGenerator   (|int| Start, |int| End, |syntax| f,   |String|)
 
 
 

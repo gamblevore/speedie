@@ -31,8 +31,8 @@ byte JB_Tk__Byte (int S) {
 	return JB_Str_ByteValue(JB__Tk_Data, S);
 }
 
-JB_String* JB_Tk__Range (int S, int E) {
-	return JB_Str_Range(JB__Tk_Data,S,E);
+JB_String* JB_Tk__Range (int S, int E, byte F) {
+	return JB_Str_Range(JB__Tk_Data, S, E);
 }
 
 

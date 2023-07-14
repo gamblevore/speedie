@@ -1,7 +1,6 @@
 
 
 bugs:
-	* containedreplace seems to replace stuff needlessly (slow)
 	* sdleventtype.mousedown() // compiles???
 		* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and struct
 	* return (self, high)|ControlLine| // self/high are controlpoints
@@ -43,8 +42,6 @@ additions:
 	* (node, err) = .text.parse --> |error| err, || node = .text.parse(err) // noice
 	* any object can be created with an virtual-function override table, just store before the refcount?
 	* could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
-	* Make objectset from FastDict? Need to ref the keys
-		* Store object.IDs (ints). Last node can store 10 bits instead of 4.
 	* || x = .SomeCArray // should just get the address... :)
 	
 	* Errors in subprojects kinda suck with error-reporting
@@ -54,7 +51,10 @@ additions:
 
 class-changes
 	* delete fastappender
+	* Make objectset from FixedDict?
 	* replace dictionary with fixeddict
+		* remove the datatype wrapper? it was only used for dicts+arrays anyhow...
+			* We could use a dict of ints or carray for pointers...
 * Get galaxxies compiling
 	* Condtionally use glm in galaxxies.
 	* (|xyz| a)	// Should be @decl					// Replace fTypeCast2 with fdecl...

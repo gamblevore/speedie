@@ -67,7 +67,7 @@ extern "C" {
     int JB_Tk__ErrorStart ();
     void JB_Tk__ErrorStartSet (int Start);
 	byte JB_Tk__Byte (int P);
-	JB_String* JB_Tk__Range (int S, int E);
+	JB_String* JB_Tk__Range (int S, int E, byte F);
     JB_String* JB_Tk__Data ();
     void JB_Tk__DataSet (JB_String* Data);
     void JB_Tk__ErrorEventSet (TokErrorEvent fp);

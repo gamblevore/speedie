@@ -3,11 +3,10 @@
 // good for demos and language-tests
 
 function dictionary.sort (|SorterComparer| fn, |int| count, |[...]|)
-	|| tmp = .values // a more efficient sorter could extract only needed
-	tmp.sort(fn)
-	for i in count
-		rz <~ tmp[i]
-
+	rz = .values // a more efficient sorter could extract only needed
+	rz.sort(fn)
+	rz.Length = count
+	
 	
 function message.AllNames (|[string]|)
 	opt norefcounts

@@ -20,6 +20,7 @@ class SCObject
 	
 	function SyntaxExpect ( |string| Error )
 		cpp_part Fail
+		printline .objectid
 		StdErr.NewError( .source, Error )
 
 	syntax equals (|string| s, |bool| aware, |bool|)

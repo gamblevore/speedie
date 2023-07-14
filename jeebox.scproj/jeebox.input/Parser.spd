@@ -33,9 +33,8 @@ extend Parser
 
 
 		|| numb     =   "0123456789".bytesplit
-		|| op_comp  =   "= == === < > <= <== >= >== <> ~<> != !== <=> ~>= ~<= ~> ~< <~ ~= ~!= ~<=> := ??"
+		|| op_comp  =   "= == === < > <= <== >= >== != !== <=> ~>= ~<= ~> ~< <~ ~= ~!= ~<=> := ??"
 		|| op_math  =   "* / + - ^ & >> << >>> <<< (|)"
-		
 		|| PFix		=	"++ -- $ ! ? ..."
 		
 
@@ -86,9 +85,6 @@ extend Parser
 // a~(long tailed mouse) ate all~my~cheese
 // a◊long tailed mouse ate all~my~cheese // ◊ could parse like a-b and -b :)
 // a~(◊long tailed mouse) ate all~my~cheese
-// actually... "haired" should be a thing, right?
-// its not a verb really. I don't "hair" something.
-// its not grammar like "of" or "That"
 
 // unicode stuff.
 // Ω√∫~∂ƒ˙˚°ºª…†¡
@@ -118,7 +114,6 @@ extend Parser
 		.Tokenz( "::",			kThingSyx,				fError				)
 		.Tokenz( "!~=",			kOppSyx,				fError2				)
 
-// whats wrong with removing this?
 		|| IllegalHandler = .Handler( -1, fError ) // catch all?
 		for i in 256
 			.TokenNil( string.byte(i) ) = IllegalHandler
@@ -128,7 +123,6 @@ extend Parser
 ///////////////////////////////////////////////////////////////////////////// 
 ///////////////////////////////////////////////////////////////////////////// 
 	
-
 	function ExpectEndChar (|int|start, |string| s, |bool| Expect = true, |bool|)
 		.CleanSpaces
 		if .Eats(s)
@@ -411,7 +405,7 @@ extend Parser
 	function fCharSub (|int| pos, |int| start, |byte| find, |message|)
 		|| After = parser.data.jbfind( find, start+1, int.max )$
 		parser.NextStart = After + 1
-		|| name = parser[ start + 1, After ].unescape
+		|| name = parser[ start + 1, After, @char ].unescape
 		rz = parser.new( nil, @char, pos, name )
 
 
@@ -423,7 +417,7 @@ extend Parser
 
 	function fCommentLine (ParseHandler)
 		parser.NextStart = parser.data.find( Jeebox.CSLine, parser.Nextstart )
-		return parser.endoflinemarker
+		return parser.EndOfLineMarker
 
 
 	function fComment (ParseHandler)
@@ -1020,7 +1014,7 @@ extend Parser
 				if !rz.commas
 					rz.indent += 4
 				if (gotspaces and rz.lines)
-					.erroradd(.ErrorTabsAfterSpaces, n-1)
+					.erroradd("Can't have tabs after spaces.", n-1)
 
 			  elseif (c == ' ')
 				gotspaces = true
@@ -1204,7 +1198,11 @@ extend Parser
 	Syntax Access (|int| p, |byte|)
 		cpp_Wrapper JB_Tk__Byte
 
-	Syntax Access (|int|s, |int|e, |string|)
+	Syntax Access (|int| s, |int| e, |syntax| f, |string|)
+		pragma inline
+		return (parser.Splitter)(s,e,f)
+
+	function Range (fnidgenerator)
 		cpp_Wrapper JB_Tk__Range
 
 
@@ -1215,28 +1213,26 @@ module parser
 		visible false
 		cpp_Part Tk
 
-	|string|				ErrorTabsAfterSpaces = "Can't have tabs after spaces."
 	|string|				Data
 	|message|				EndOfLineMarker
-	|int|                   StopBars
-	|uint16|				UsingTag = 0
+	|dictionary of string|  ErrorNames = nil
+	|fnIDGenerator|			Splitter = &parser.range
 	|int|					UsingPos = -1
+	|uint16|				UsingTag = 0
 	|uint16|				UsingLength = 0
+	|uint16|                StopBars
 	|MsgUIFlags|			InsertedFlags
 	|bool|					DotInsertAllow
-	|dictionary of string|  ErrorNames = nil
-	stderr = ErrorList.new
-	StdErrOriginal = stderr
 
 	flags
 		kAdjectiveOp
 		kColon
 		kColonArg
 
+		kTemporal       = (kTemporalWord,	kTemporalSyxNoBar,  kTemporalBar)
 		kEnd            = (kEndOfLine,		kComma,				kEndContainer) 
 		kFuncAfterAny   = (kFuncAfterNormal,kFuncAfterNoSpace,  kFuncAfterBar) 
 		kOpp            = (kOppBra,			kOppSNB,			kOppBar, kOppTemporal,		kOppWord,	kOppYoda)
-		kTemporal       = (kTemporalWord,	kTemporalSyxNoBar,  kTemporalBar)
 		kTemporalWordColon
 		kThing          = (kThingSyx, kThingBar, kThingWord)
 		kOppSyx			= koppSNB (|) koppbar

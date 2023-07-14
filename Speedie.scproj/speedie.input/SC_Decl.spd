@@ -109,7 +109,7 @@ class SCDecl (SCObject) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.NilUsed = NilState.Either
-		//if .objectid == 39907580
+		if .objectid == 30465542
 
 		
 	function Project (|scimport|)
@@ -257,12 +257,12 @@ class SCDecl (SCObject) {
 		dcl.Type		= .Type
 		dcl.PointerCount= .PointerCount
 		dcl.Contains	= .Contains
+		dcl.internal	= .Internal
 		|| cpyflags		= scdeclinfo.UpgradeableContained + scdeclinfo.compilercreated + scdeclinfo.autocast
 		// why not copy all flags?
 		// or split them into two properties?
 		dcl.info &= ~cpyflags
 		dcl.Info |= .info & cpyflags
-		dcl.internal	= .Internal
 		dcl.C_array		= .C_array
 		dcl.NilDeclared = .NilDeclared
 		dcl.NilUsed		= .NilUsed
@@ -319,8 +319,8 @@ class SCDecl (SCObject) {
 		.WriteDeclFull.Render(fs)
 		
 	function SyntaxExpect
-		disabled  
-		print self
+		printline "Decl failed"
+		super.syntaxexpect("Decl failed")
 
 	
 	function AutoCompleteName (|string|)
@@ -444,12 +444,12 @@ class SCDecl (SCObject) {
 
 
 	function MakeContainedObject
+		opt norefcounts
 		if (.contains)
 			.contains = .contains.MakeAsObject(self, .source)
 
 
 	function NewWrapperSub (|scdecl| CastTo, |scdecl|)
-		rz.Internal = CastTo
 		rz.info |= scdeclinfo.AutoCast
 		rz.contains = castto
 		rz.Type = typewrapper
@@ -466,7 +466,7 @@ class SCDecl (SCObject) {
 	
 	
 	function MakeAsObject (|SCDecl| Container, |Message| ErrPlace, |scdecl|)
-		|| NormalContained = container.type.contained#require
+		|| NormalContained = container.type.contained			#require
 		if (.IsNormalObject)
 			check (NormalContained.isnormalobject) (errplace, "This doesn't contain objects.")
 			return self
@@ -474,12 +474,12 @@ class SCDecl (SCObject) {
 		  elseif !NormalContained.isnormalobject
 			return self // yeah not very precise, but good enough for now!
 		
-		
 		check .CanWrap (ErrPlace, "Can't store this type as an object (in this version of speedie).")
 		return .NewWrapper(self)
 	
 	
 	function SCClass.GoUpTo (|int|d, |SCClass|)
+		opt norefcounts
 		|| s = self
 		while (s and s.depth > d)
 			s = s.super
@@ -489,7 +489,8 @@ class SCDecl (SCObject) {
 	function HighestArrayContainMatch (|SCDecl| Other, |Message| exp, |SCDecl|)
 		rz = .highestmatch(other, exp)
 		rz := self
-		
+	
+	
 	function HighestMatch (|SCDecl| Other, |Message| exp, |SCDecl|)
 		opt norefcounts
 		require Other
@@ -588,17 +589,20 @@ class SCDecl (SCObject) {
 		// handles   " ...  --> string "     (.iscontained)
 		//    or     "[...] -->[string]"     (.contains.iscontained)
 
-		rz = self
 		if self Is UpgradeableContained
 			if  (!needsname or !.name) and .SameForReplace(contains)
 				return contains				// we are missing UpgradeableContained?
-		
-			|| SameType = contains.type == .type
+			
+			|| CType = contains.type
+			|| SameType = CType == .type
 				if .SameForReplace(contains) 
 					return self
 			
 			|| C = .copy
-			c.type = contains.type
+			c.type = ctype
+			//if .type == .internal
+			//	debugger
+			//	c.internal = ctype
 			(C is UpgradeableContained) = !sameType
 			
 			Return C
@@ -609,8 +613,10 @@ class SCDecl (SCObject) {
 
 		|| inside = .contains
 		if inside  and  inside != contains  and  inside Is UpgradeableContained
-			rz = .Copy
-			rz.Contains = contains
+			self = .Copy
+			.Contains = contains
+		return self
+		
 	
 
 	function SameForReplace (|SCDecl| c, |bool|)
@@ -862,7 +868,8 @@ class SCDecl (SCObject) {
 	
 	
 	function UnWrapDataType (|message| exp, |scbase| name_space, |scdecl|)
-		rz = .Internal #expect
+		disabled 
+		rz = .contains #expect self
 		|| ExpReplacement = exp.func.msg(exp.name)
 		ExpReplacement.obj = exp.obj
 		for s in exp
