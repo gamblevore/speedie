@@ -441,7 +441,7 @@ function ImportAll
 	
 	require .Stage( "Creating Class Allocators And Stuff" )
 	for c in .ClassList
-		c.LoadContainedType
+		c.ContainedTypeLoad
 
 
 	require .Stage( "Parsing Class Properties" ) // just moved this... used to come after

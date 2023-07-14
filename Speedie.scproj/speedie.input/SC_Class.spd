@@ -437,7 +437,7 @@ function CreateAlloc (|string| ParseThing, |int| Extra)
 		fn.IsVisible = false
 
 
-function LoadContainedType
+function ContainedTypeLoad
 	.use
 	|| sup = .super
 		.Contained = sup.Contained

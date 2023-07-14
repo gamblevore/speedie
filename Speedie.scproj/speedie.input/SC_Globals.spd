@@ -459,9 +459,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		rz.TypeContained = TypeArray
 		
 	  elseif (f == @Adj)
-		debugger
 		deprecate (c, "Use 'of' instead.")
-		// deprecate this! we want to use "of" all over
 		rz.LoadContained(c.first, c.last, name_Space)			#require
 		
 	  elseif (f == @rel)
@@ -495,18 +493,13 @@ function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Nam
 	.type = R.Type
 
 	if typewrapper.typenormal.match(R, ktypecastfalse).isnormalmatch
-		expect (!Cont.isnormalobject)  ( wrap, "Datatype-wrappers can't contain objects." )
-		expect (!Cont.c_array)         ( wrap, "Datatype-wrappers can't contain C-Arrays." )
+		expect (!Cont.isnormalobject)  ( wrap, "Datatype-wrappers can't contain this." )
 		.contains = cont
 	  else
-		|| RCont = R.Type.Contained 
-		expect (R.IsNormalObject or R.Type.IsStruct or R.Contains)  ( wrap, "Not a container class." )
-		expect (RCont) ( wrap, "Not a container class." )
-		
+		|| RCont = R.Type.Contained				#expect ( wrap, "Not a container class." )
 		// object can match anything. 
-		if RCont.type != typeobject
-			if RCont.isnormalobject
-				require (RCont.ExpectMatch(cont, 0, wrap, contained))
+		if (RCont.type != typeobject) and RCont.isnormalobject
+			RCont.ExpectMatch(cont, 0, nil, wrap)
 		.Contains = Cont
 
 	return true
