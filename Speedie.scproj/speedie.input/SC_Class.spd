@@ -894,8 +894,8 @@ module
 				.defawlt := s.defawlt
 
 		|| N		= .name.lowercase
-		|| Td		= DataTypeCode.Types|dictionary of datatypewrapper|[n]
-			|| t = td.value|DataTypeCode|
+		|| Td		= DataTypeCode.Types[n]
+			|| t = *td
 			require T != 255
 	
 			.size = T.bytesize

@@ -157,10 +157,10 @@ struct ObjectLoader {
 	
 	function GetClassOf (|message| msg, |&ClassData|)
 		opt norefcounts
-		|| Data = ObjectLoader.ClassList|dictionary of datatypewrapper|[msg.name] 
+		|| Data = ObjectLoader.ClassList[msg.name] 
 		if (!Data)
 			.Noclass = msg
-		return data.value|&ClassData|
+		return (*data)|&classdata|
 	
 	
 	module

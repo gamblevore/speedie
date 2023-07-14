@@ -1,7 +1,7 @@
 
 
 module TextAssembler
-	|dictionary of uint|			LabelsToDo // uint actually
+	|dictionary of uint|			LabelsToDo
 
 	function FindRequests (|bool|)
 		return false

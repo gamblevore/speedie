@@ -771,8 +771,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	Syntax Access (|string| name, |int|)
 		require name // "" is 0
-		|| obj = Cpp_Export.StringDict|dictionary of datatypewrapper|[name]
-			return obj.value
+		|| obj = Cpp_Export.StringDict[name]
+			return *obj
 		rz = ++Cpp_Export.StringCount
 		Cpp_Export.StringDict[name] = rz
 
