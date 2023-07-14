@@ -60,7 +60,6 @@ datatype SCDeclInfo (uint)
 		Static
 		UpgradeableContained
 		NewlyCreated
-		AutoCast
 		TypeImprove
 		UsedByCode
 		API
@@ -258,7 +257,7 @@ class SCDecl (SCObject) {
 		dcl.PointerCount= .PointerCount
 		dcl.Contains	= .Contains
 		dcl.internal	= .Internal
-		|| cpyflags		= scdeclinfo.UpgradeableContained + scdeclinfo.compilercreated + scdeclinfo.autocast
+		|| cpyflags		= scdeclinfo.UpgradeableContained + scdeclinfo.compilercreated
 		// why not copy all flags?
 		// or split them into two properties?
 		dcl.info &= ~cpyflags
@@ -428,11 +427,6 @@ class SCDecl (SCObject) {
 		Return .Match( o, TypeCast, nil )
 
 	
-	function SCObject.ShouldUnWrap (|bool|)
-		if (self isa SCDecl)
-			return (self isnt NewlyCreated) and (self is AutoCast)
-
-	
 	function CanWrap (|bool|)
 		if (.pointercount or .type.funcproto)
 			return true
@@ -448,21 +442,18 @@ class SCDecl (SCObject) {
 		if (.contains)
 			.contains = .contains.MakeAsObject(self, .source)
 
-
-	function NewWrapperSub (|scdecl| CastTo, |scdecl|)
-		rz.info |= scdeclinfo.AutoCast
-		rz.contains = castto
-		rz.Type = typewrapper
-
 	
 	function NewWrapper (|scdecl| CastTo, |scdecl|)
-		ifn castto and castto.isnormal
-			return .NewWrapperSub(castto)
-
-		|| it = .type.DataTypeWrapper
-			return it
-		rz = .NewWrapperSub(castto)
-		.type.DataTypeWrapper = rz 
+		opt norefcounts
+		|| IsNormal = castto and castto.isnormal
+			|| it = .type.DataTypeWrapper
+				return it
+		|| dcl = scdecl.new
+		dcl.contains = castto
+		dcl.Type = typewrapper
+		if isnormal
+			.type.DataTypeWrapper = dcl
+		return dcl
 	
 	
 	function MakeAsObject (|SCDecl| Container, |Message| ErrPlace, |scdecl|)
@@ -608,8 +599,6 @@ class SCDecl (SCObject) {
 			Return C
 
 			//C.internal = .internal // seems bugged.
-			//if self is autocast or contains is autocast
-				//error (.source, "Compiler assumption fail")
 
 		|| inside = .contains
 		if inside  and  inside != contains  and  inside Is UpgradeableContained

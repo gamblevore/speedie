@@ -121,7 +121,7 @@ helper Message.TestSub (|string| new_render, |string| name, |bool|)
 
 
 helper jeebox.TestCasting (|bool|)
-	|dictionary of datatypewrapper| d2 = dictionary.new
+	|dictionary of int| d2 = dictionary.new
 	d2["abc"] = d2["abc"].value + 1
 	
 	|| d = dictionary.new

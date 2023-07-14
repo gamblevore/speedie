@@ -495,9 +495,8 @@ function SCDecl.LoadContained (|Message| Contained, |Message| c, |SCBase| Name_S
 
 	if typewrapper.typenormal.match(R, ktypecastfalse).isnormalmatch
 		expect (!Cont.isnormalobject)  ( c, "Datatype-wrappers can't contain objects." )
-		expect (!Cont.c_array)         ( c, "Datatype-wrappers can't contain this." )
+		expect (!Cont.c_array)         ( c, "Datatype-wrappers can't contain C-Arrays." )
 		.contains = cont
-		.info |= SCDeclInfo.autocast
 	  else
 		|| RCont = R.Type.Contained 
 		expect (R.IsNormalObject or R.Type.IsStruct or R.Contains)  ( c, "Not a container class." )

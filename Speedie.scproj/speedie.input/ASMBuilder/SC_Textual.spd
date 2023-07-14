@@ -80,7 +80,7 @@ extend AsmFuncState
 	
 	function GetLabelJump (|message| P, |uint|)
 		opt NoRefCounts
-		|| val = textassembler.LabelsToDo.valuelower(p.name)
+		|| val = textassembler.LabelsToDo|dictionary of datatypewrapper|.valuelower(p.name)
 			return val.value
 		error (P, "Label not found")
 	
