@@ -113,7 +113,7 @@ function TypeOfBRel (ExprResolver)
 		return TypeOfAddress(F, name_space, side)
 	
 	if name == "*"
-		return SubType.Dereference(F, false)
+		return SubType.Dereference(exp, name_space, false)
 		
 	  elseif name == "-" // minus
 		Return subtype
@@ -626,11 +626,11 @@ function TypeOfAccess (ExprResolver)
 			return TypeOfVecAccess(index, ty0, w)
 		if Ty0.C_Array
 			require Index.ExpectInt(Access)
-			return ty0.Dereference(exp, true)// TypeOfPointerAccess(ty0)
+			return ty0.Dereference(exp, name_space, true)// TypeOfPointerAccess(ty0)
 		if (Ty0.PointerCount and Access isa typeint)
 			ifn (ch == @bra and ch.first == @bra) // should work now
 				require Index.ExpectInt(Access)
-				return ty0.Dereference(exp, true)
+				return ty0.Dereference(exp, name_space, true)
 	if (ty0 isa scmodule)
 		if ty0.IsMArray(arr) and arr.first.expectmatch(name_Space, typeint)
 			return LowlevelArrayTransform(exp, ty0.Cls)

@@ -10,6 +10,7 @@ class DataTypeWrapper
 	linkage
 		cpp_part Wrap
 		cpp_class DTWrap
+	contains int64
 	
 	|DataTypeCode|		DataType
 	|byte|				DeathAction
@@ -36,6 +37,8 @@ class DataTypeWrapper
 		.datatype = datatypecode.unusedtype
 		.PrivValue = p|int64|
 
+	function First (||) // for floats... perhaps use this?    macro first: .privvalue|...(samebits)|
+		return .privvalue
 	
 	function Value (|int64|)
 		if (self) {return .privvalue}

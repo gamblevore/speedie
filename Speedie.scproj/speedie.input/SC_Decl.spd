@@ -295,13 +295,20 @@ class SCDecl (SCObject) {
 		check (rz.pointercount < 8) (.source, "Too much abstraction")
 	
 	
-	function Dereference (|message| f,  |bool| IsAccess,  |scdecl|)
+	function Dereference (|message| brel, |scbase|name_space,  |bool| IsAccess,  |scdecl|)
+		opt norefcounts
+		|| c = .DereferenceSub(brel, name_space, isaccess)
+			return c
+		error (brel.first, "Can't dereference this.")
+		
+	
+	function DereferenceSub (|message| brel, |scbase|name_space,  |bool| IsAccess, |scdecl|)
 		opt norefcounts
 		if (.C_Array)
-			if IsAccess
-				|| c = .Copy // should keep borrowedness...
-				c.C_Array = 0
-				return c				// OK... so what if we try to do *Carray. We want to get an error
+			require IsAccess
+			|| c = .Copy // should keep borrowedness...
+			c.C_Array = 0
+			return c				// OK... so what if we try to do *Carray. We want to get an error
 		if .PointerCount > 0
 			//|| actualtype = .Internal
 			//	return actualtype
@@ -309,7 +316,12 @@ class SCDecl (SCObject) {
 			|| c = .Copy // should keep borrowedness...
 			c.PointerCount--
 			return c
-		error (F, "Can't dereference this.")
+		
+		if !isaccess and .isnormalobject
+			brel.become(@dot, "first")
+			brel.msg(@prm)
+			return typeofexpr(brel, name_space)
+		
 
 
 	render

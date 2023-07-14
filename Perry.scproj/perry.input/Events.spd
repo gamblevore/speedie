@@ -437,8 +437,7 @@ function LogAreaKeys (GuiKeyEvent)
 	if key iscmd keys.k
 		|| s1 = .ide.LogComms
 		|| s2 = .ide.LogActions
-		if s1.hasany and s2.hasany
-			|| c = s1.slowcount + s2.SlowCount
+		|| c = s1.slowcount + s2.SlowCount
 			if "Clear log?\n\nContains $c items.".confirm
 				s1.clear
 				s2.clear
