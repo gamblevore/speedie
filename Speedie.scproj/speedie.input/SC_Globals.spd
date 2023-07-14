@@ -505,14 +505,13 @@ function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Nam
 	return true
 
 
-
 function TypeOfExprModulesOK (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCObject|)
 	if (Exp.obj)
 		return exp.obj|scobject|
 	if (exp == @thg)
 		exp.Obj = name_space.LookUpVar( exp.name, exp, side )
 		return exp.Obj|scobject|
-	return TypeOfExprsub2(exp, name_space, side)
+	return TypeOfExprsub(exp, name_space, side)
 
 
 function TypeOfExprModulesNotOK (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCDecl|)
@@ -527,21 +526,28 @@ function TypeOfExprMaybeNil (|Message| Exp, |scbase| name_space, |SCDecl|)
 		return TypeOfExpr(Exp, name_space, nil)
 
 
-function TypeOfExprSub2 (|Message| Exp, |SCBase| name_space, |Message| side = nil, |scobject|)
+function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message| side = nil, |scobject|)
+	opt norefcounts
 	if exp == @Decl
 		|| d = exp.last.obj
 		if d isa SCDecl: Return d
 
 	expect (name_space) (Exp, "Failed to get type of this.")
 
-	exp.obj = TypeOfExprSub( exp, name_space, side )	#require
-	return exp.obj|scobject|
+	|| f = ExprFuncs[Exp.func|int|]								#expect ( exp )
+	exp.obj = (f)(Exp, name_space, side)	#require
 
+//	if rz.ShouldUnWrap
+//		return (rz|scdecl|).UnWrapDataType(exp, name_Space)
+// put this back later... get the nil pointer with .internal stuff working first.
+// its kinda nice to have a dictionary of pointers and "just use them".
+
+	return exp.obj|scobject|
 
 
 function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCDecl|)
 	debug_require exp // shouldn't happen!
-	|| obj = exp.obj|scobject| ?? TypeOfExprSub2(Exp, name_Space, side)
+	|| obj = exp.obj|scobject| ?? TypeOfExprSub(Exp, name_Space, side)
 		if obj isa SCDecl
 			return obj
 		if obj isa SCModule
@@ -555,15 +561,6 @@ function Message.SCFile (|SCFile|)
 		if r isa SCFile
 			Return r
 		require S != @arg
-
-
-function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message| side, |SCObject|)
-	opt norefcounts
-	|| f = ExprFuncs[Exp.func|int|]								#expect ( exp )
-	rz = (f)(Exp, name_space, side)
-//	if rz.ShouldUnWrap
-//		return (rz|scdecl|).UnWrapDataType(exp, name_Space)
-
 
 
 function SCModule.IsMArray (|message| arr, |bool|)
