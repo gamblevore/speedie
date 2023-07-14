@@ -68,10 +68,10 @@ function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |ImagePixe
 
 
 helper string.FontLoad (|image|)
-	rz = .Loadqoi$ 
+	rz = .Loadqoi$
 	for v in rz
 		if !v.hascolor or !v.a
-			v <~ 0
+			v <~ 0|uint|
 
 	for c in rz.width/6
 		if c > 32
