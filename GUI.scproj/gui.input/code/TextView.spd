@@ -709,6 +709,7 @@ class TextView (GUIControl)
 	helper string.DeslashComment (|string|)
 		|| i = .HasSlashComment
 			return .insert("", i, 2)
+		return self
 		
 	
 	helper DeslashComment (|bool|)
