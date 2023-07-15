@@ -49,7 +49,7 @@ The quoted text (like "`a`") is the `name`, and `rel` / `opp` / `thg` are the `f
 
 These help you locate where the `message` came from within the original code.
 
-`Position` is the byte position in the original string. This does not take UTF-8 characters or codepoints or glpyhs into account, it is purely the byte position, which makes it easier to use.
+`Position` is the byte position in the original string. This does not take UTF-8 characters or codepoints or glyphs into account, it is purely the byte position, which makes it easier to use.
 
 `RangeLength` is the original length of the `message`. So... if you look at the node "cheese" in "I like cheese", the `RangeLength` is 6. This can vary from `name.length`... For example for strings. Parsing this:
 
