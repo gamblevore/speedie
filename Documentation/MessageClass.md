@@ -13,7 +13,7 @@ BTW `message` fits into 64-bytes of RAM, meaning it fits neatly into a cache-lin
 
 I guess the first best place to understand the `message` class is to look at it's properties. Lets split them up into 3 sections:
 
-###Tree Properties:
+### Tree Properties:
 
     |message| Parent
     |message| First
@@ -22,7 +22,7 @@ I guess the first best place to understand the `message` class is to look at it'
 
 This allows us to create a tree. `Prev` and `Next` are sibling properties. You can alter any of these! Message has a lot of other functions such as `.Last` or `.Root`, but they are computed rather than actual stored properties in memory.
 
-###Definition Properties:
+### Definition Properties:
 
     |String| Name
     |Syntax| Func // syntax is uint8
@@ -39,7 +39,7 @@ For example if you parse `"a = b"` you will get these `messages`:
 The quoted text (like "`a`") is the `name`, and the names like `rel` / `opp` / `thg` are the `func`. `Func` is actually just stored as a byte in memory, so it takes up very little RAM.
 
 
-###Parse Properties:
+### Parse Properties:
 
     |uint|     Position
     |uint16|   RangeLength
@@ -60,7 +60,7 @@ The name however will be 4 bytes shorter! 2 bytes shorter because of the "" mark
 `Position` and `RangeLength` together are useful for finding messages within the original source code by position... for example I use it for my text editor in Perry.
 
 
-###Utility Properties:
+### Utility Properties:
 
 These make `message` an actually useful class... rather than just some theoretical thing. These help you to use `Message` to do real work.
 
