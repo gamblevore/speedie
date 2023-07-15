@@ -214,8 +214,11 @@ module SDLApp
 		
 		.Init(size)
 		(fn)(anything)?
+		app.clearcaches
 		while .SingleFrame
 			.PostLoads
+				// what if we end up compressing stuff? like for undo/redo?
+				// no point clearing the cache every damn frame?
 		.quit
 
 	
