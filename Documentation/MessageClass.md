@@ -24,7 +24,7 @@ This allows us to create a tree. `Prev` and `Next` are sibling properties. You c
 
 Message has a lot of other functions such as `.Last` or `.Root`. They are computed rather than actual stored properties in memory. But its usually more useful to think in terms of those... for example getting `.last` or setting `.last` (appending into a tree node).
 
-`.last` by the way actually is accessed almost immediately even with 1 million children, because `Message` (secretly) stores "`.first.prev` = `.last`" pretty cool huh! You don't see that behaviour, cos if you read `.first.prev` you will always get `nil`. But the fact is... that `.last` is constant time and fast no matter how many nodes you have. `.first` and `.last` are fast.
+`.last` by the way actually is accessed almost immediately even with 1 million children, because `Message` (secretly) stores "`.first.prev = .last`" pretty cool huh! You don't see that behaviour, cos if you read `.first.prev` you will always get `nil`. But the fact is... that `.last` is constant time and fast no matter how many nodes you have. `.first` and `.last` are fast.
 
 
 ### Definition Properties:
