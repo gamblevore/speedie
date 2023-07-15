@@ -38,7 +38,7 @@ For example if you parse `"a = b"` you will get these `messages`:
         opp "="
         thg "b"
 
-The quoted text (like "`a`") is the `name`, and the names like `rel` / `opp` / `thg` are the `func`. `Func` is actually just stored as a byte in memory, so it takes up very little RAM.
+The quoted text (like "`a`") is the `name`, and `rel` / `opp` / `thg` are the `func`. `Func` is actually just stored as a byte in memory, so it takes up very little RAM.
 
 
 ### Parse Properties:
