@@ -698,12 +698,38 @@ class TextView (GUIControl)
 			return false
 		.insertsub(s, r, true)
 		return true
+
+
+	helper string.HasSlashComment (|ind|)
+		for s.lines in self
+			|| i = s.OutWhite
+				if s[i, "//"]
+					return i
+
+	helper string.DeslashComment (|string|)
+		|| i = .HasSlashComment
+			return .insert("", i, 2)
+		
 	
+	helper DeslashComment (|bool|)
+		|| r = .CommentableRange
+		|| t = self[r]
+		require t.HasSlashComment
+		|| fs = FastString()
+		for (s.lines in t) (p)
+			fs <~ s.DeSlashComment
+			if p
+				fs <~ t[p] // match line-ending
+		._typingplace = r
+		.InsertSub(fs, r, true)
+		return true		
+		
 	
 	helper CommentSlash (|bool| star, |bool|)
 		require !.singleline
 		ifn keys.shift or star
-			.tabindent(1, "//", true)
+			if !.DeSlashcomment
+				.tabindent(1, "//", true)
 		  elseif !.decomment
 			.Insert("/*" + .seltext + "*/", true)
 		return true
@@ -895,27 +921,30 @@ class TextView (GUIControl)
 						rz = ch
 						size = r
 
-	
-	helper TabIndent (|int| dir, |string| mark, |bool| Mirror = false, |bool|)
+
+	helper CommentableRange	(|intrange|)
 		|| sel	= .selrange
 		|| r	= sel.width and self[sel.x2 - 1].istextline
 		|| r2	= (0, r|int|)
-		|| t	= .lineexpand(sel - r2)
+		|| t	= .LineExpand(sel - r2)
 		if t.width > 0
 			t.x2 -= self[t.x2].istextline
+		t.x2++ // whatever... just for now
+		return  t
 
+
+	helper TabIndent (|int| dir, |string| mark, |bool| Mirror = false, |bool|)
+		|| t = .commentablerange
 		if mirror and .text[t.x, mark]
 			dir = -dir
-		t.x2++ // whatever... just for now
 		
 		|| old = self[t]
 		|| Tabbed = .TabIndentAll(dir, mark, old)
 		if old == tabbed
 			beep
 			return true
-			
-		if ._typingplace != t
-			._typingplace = t
+		
+		._typingplace = t
 		.InsertSub(Tabbed, t, true)
 		return true
 	

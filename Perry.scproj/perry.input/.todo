@@ -5,13 +5,12 @@
 * VM? 
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
-
+		//
 
 // Perry Do later
-* uncommenting "     //   abc" doesnt work properly.
+* tab key isnt adding params to funcs anymore? at least if none existed. in textview.spd
 * can't right click on the returntype?
 * clearing logs doesnt clear both speedie and perry
-	* also speedie cant rebuild
 * First use of tab (in func) or () (to wrap) on opening perry doesn't work.
 * TextView error/find resync
 * too long text in listview draw as much as we can

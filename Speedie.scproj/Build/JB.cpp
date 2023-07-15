@@ -17204,6 +17204,14 @@ bool SC_IR_OperatorIsa(IR* self, int m) {
 	return m == self->Op;
 }
 
+void SC_IR_Print(IR* self) {
+	if (SC__ASM_NoisyASM >= 3) {
+		JB_String* _tmPf0 = JB_Incr(SC_IR_Render(self, nil));
+		JB_PrintLine(_tmPf0);
+		JB_Decr(_tmPf0);
+	}
+}
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in) {
 	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
 	SC_IR_fs(self, fs);
@@ -20562,6 +20570,10 @@ bool JB_Rec_Anything(JB_ErrorReceiver* self) {
 	return (((bool)self) and ((bool)self->ErrorCount)) or (((bool)self->ProblemCount) or ((bool)self->WarnCount));
 }
 
+int JB_Rec_BadCount(JB_ErrorReceiver* self) {
+	return self->ErrorCount + self->ProblemCount;
+}
+
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level) {
 	if ((!((!self->BlockErrors) and (!JB_OutOfMemoryOccurred())))) {
 		return nil;
@@ -20783,8 +20795,7 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self) {
 }
 
 void JB_Rec_SyntaxAppend(JB_ErrorReceiver* self, JB_Error* Err) {
-	bool Canprint = false;
-	//"Speedie" // useful marker for debugging...;
+	bool CanPrint = (!JB_Rec_BadCount(self)) and ((bool)JB__Err_AutoPrint);
 	JB_Rec_incr(self, Err, true);
 	if ((!JB_Rec_CanAddMore(self, Err->Severity))) {
 		return;
@@ -20806,7 +20817,7 @@ void JB_Rec_SyntaxAppend(JB_ErrorReceiver* self, JB_Error* Err) {
 		}
 	}
 	;
-	if (Canprint and JB_Err_IsBad(Err)) {
+	if (CanPrint and JB_Err_IsBad(Err)) {
 		JB_String* _tmPf1 = JB_Incr(JB_Err_render(Err, nil));
 		JB_PrintLine(_tmPf1);
 		JB_Decr(_tmPf1);
@@ -22264,7 +22275,15 @@ void JB_Proc_SendSub(Process* self, Message* msg) {
 	}
 	JB_FreeIfDead(JB_Msg_render_jbin(msg, false, JB_LUB[0], self->Writer));
 	JB_Decr(msg);
+	JB_String* _tmPf0 = JB_Incr(JB_Str_CopyFromPtr(JB_IPCM_Data(self->Ours), self->Writer->Length));
+	Message* reparse = JB_Incr(JB_Str_parse_jbin(_tmPf0));
+	JB_Decr(_tmPf0);
+	if ((!reparse)) {
+		debugger;
+	}
+	;
 	JB_Proc_WriteSub(self);
+	JB_Decr(reparse);
 }
 
 void JB_Proc_SetupAdjust(Process* self, int n) {
@@ -46797,4 +46816,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -2732793839872916953 3758141352381374696
+// 1254378509968506638 3758141352381374696
