@@ -32,7 +32,7 @@ Message has a lot of other functions such as `.Last` or `.Root`. They are comput
     |String| Name
     |Syntax| Func // syntax is uint8
 
-These two properties define the `message` itself. The `name` is just the text that the message contains.
+These two properties define the `message` itself. The `name` is just the text that the `message` contains.
     
 For example if you parse `"a = b"` you will get these `messages`:
     
@@ -62,7 +62,7 @@ Well... the position starts from the `"` quotemark, and the `rangelength` extend
 
 The name however will be 4 bytes shorter! 2 bytes shorter because of the "" marks, and 2 more from the escape codes (slashes).
 
-`Position` and `RangeLength` together are useful for finding messages within the original source code by position... for example I use it for my text editor in Perry.
+`Position` and `RangeLength` together are useful for finding `messages` within the original source code by position... for example I use it for my text editor in Perry.
 
 
 ### Utility Properties:
@@ -73,7 +73,7 @@ These make `message` an actually useful class... rather than just some theoretic
     |uint16|   Flags
     |uint16|   Tag
     
-Its not much... but it nicely makes `message` fit in a 64-byte object. Thus keeping message entirely within one cacheline in modern CPUs, making it very fast to use.
+Its not much... but it nicely makes `message` fit in a 64-byte object. Thus keeping `message` entirely within one cacheline in modern CPUs, making it very fast to use.
 
 
 ### Free Alteration
@@ -88,9 +88,9 @@ You can reuse `.position` to mean something else... without harm... except for t
 
 `.rangelength` actually isnt even used for error-reporting. But why fool with it if you have better properties to use? (`.Flags` and `.Tag` are better.)
 
-`.Obj` is very useful. This lets you set any object to a message. I use it all the time. My compiler speedie, uses `.obj` as the main home for all it's important knowledge. Most `messages` have something set onto `.obj`.
+`.Obj` is very useful. This lets you set any object to a `message`. I use it all the time. My compiler speedie, uses `.obj` as the main home for all it's important knowledge. Most `messages` have something set onto `.obj`.
 
-Again... its up to you what you want to set (if anything) onto a message.
+Again... its up to you what you want to set (if anything) onto a `message`.
 
 
 
