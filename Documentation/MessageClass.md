@@ -20,7 +20,7 @@ I guess the first best place to understand the `message` class is to look at it'
     |message| Prev
     |message| Next
 
-This allows us to create a tree. `Prev` and `Next` are sibling properties. You can alter any of these! Message has a lot of other functions such as `.Last` or `.Root`, but they are computed rather than actual stored properties in memory.
+This allows us to create a tree. `Prev` and `Next` are sibling properties. You can alter `.parent`, `.prev.`, `.next` or `.first`! Message has a lot of other functions such as `.Last` or `.Root`, but they are computed rather than actual stored properties in memory.
 
 ### Definition Properties:
 
