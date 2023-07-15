@@ -96,9 +96,7 @@ Again... its up to you what you want to set (if anything) onto a `message`.
 
 ## Memory Use
 
-`Message` only uses 64 bytes per node, which is much less than most AST parsers. I find for the speedie compiler's own source code, I get a 12x memory expansion by parsing. So if you parsed 2MB of source code, you'd use 24MB of `Messages`.
-
-Jeebox is very expressive, and my entire compiler sits in 1.2MB of source code. So parsing isn't a big deal.
+`Message` only uses 64 bytes per node, which is much less than most AST parsers. I find for the speedie compiler's own source code, I get a 12x memory expansion by parsing. So if you parsed 1.2MB of speedie source code, you'd use 14.4MB of `Messages`. (My entire compiler is 1.2MB of source right now.)
 
 I'm assuming it is less than most XML parsers too, but I'd need a real example with files and a specific case to compare against.
 
