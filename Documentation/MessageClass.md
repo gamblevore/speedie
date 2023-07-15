@@ -24,6 +24,9 @@ This allows us to create a tree. `Prev` and `Next` are sibling properties. You c
 
 Message has a lot of other functions such as `.Last` or `.Root`. They are computed rather than actual stored properties in memory. But its usually more useful to think in terms of those... for example getting `.last` or setting `.last` (appending into a tree node).
 
+`.last` by the way actually is accessed almost immediately even with 1 million children, because `Message` (internally) stores "`.first.prev` = `.last`" pretty cool huh! You don't see that behaviour. If you read `.first.prev` you will always get `nil`. But the fact is... that `.last` is constant time and fast no matter how many nodes you have. `.first` and `.last` are fast.
+
+
 ### Definition Properties:
 
     |String| Name
@@ -111,4 +114,4 @@ Can't say how much without a test... just that "its probably better than most XM
 
 For example, when I looked at the Python AST parser, each node has a "previous comment and white space" property, and a "next comment and white space" property too. Cos you need both... just to be sure.
 
-Thats 16 bytes more... that mine doesn't need to worry about. My parser is quite memory efficient.
+Thats 16 bytes more... that mine doesn't need to worry about. My parser is quite memory efficient.t
