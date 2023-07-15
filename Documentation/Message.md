@@ -1,11 +1,13 @@
 ## Messages
 (aka **Jeebox**)
 
-In Speedie, when you parse a string using `string.parse`, you get back a tree. A `Message` is a node within a parsed tree. The format we are parsing, is called “Jeebox” ([http://jeebox.org]()). Expert progrmamers might have heard of an "abstract syntax tree"... well Jeebox's Message class is an AST.
+This is an overview of how to us the Message class, without going into the details of the [functions and properties of Message](MessageClass.md).
 
-You can parse strings, but also files. Parsing files is better because error messages created will point back to the file.
+In Speedie, when you parse a string using `string.parse`, you get back a tree. A `Message` is a node within a parsed tree. The format we are parsing, is called “Jeebox” ([http://jeebox.org]()).
 
-The format “Jeebox” can represent both code and data (and more, be creative!). Here is some data.
+You can parse strings or files. But parsing files, lets any errors created point back to the file.
+
+The format “Jeebox” can represent both code and data (and more, be creative!). Here is some data in jeebox:
 
     file_list
         item "/path/to/file1" (Picture)

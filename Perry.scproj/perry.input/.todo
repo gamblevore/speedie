@@ -8,6 +8,8 @@
 
 
 // Perry Do later
+* function jupming should be to a function + a relative line... not bytepos... due to editing of files making things messy.
+	* what about decls? perhaps jsut relative to a node?
 * tab key isnt adding params to funcs anymore? at least if none existed. in textview.spd
 * can't right click on the returntype?
 * First use of tab (in func) or () (to wrap) on opening perry doesn't work.
