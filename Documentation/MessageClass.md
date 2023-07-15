@@ -112,4 +112,4 @@ Can't say how much without a test... just that "its probably better than most XM
 
 For example, when I looked at the Python AST parser, each node has a "previous comment and white space" property, and a "next comment and white space" property too. Cos you need both... just to be sure.
 
-Thats 16 bytes more... that mine doesn't need to worry about. My parser is quite memory efficient.t
+Thats 16 bytes more... that mine doesn't need to worry about... and thats before you get to the other additions theirs has that mine doesn't need. My parser is quite memory efficient.
