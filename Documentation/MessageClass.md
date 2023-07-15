@@ -1,4 +1,4 @@
-## The Message Class
+# The Message Class
 
 The `message` class is a real beast of a class. It does a lot of things. Thats beause it is used for a lot of things. 
 
@@ -9,11 +9,11 @@ Learning a bit about [AST](http://google.com/?q=ast+parser)s will help you get a
 BTW `message` fits into 64-bytes of RAM, meaning it fits neatly into a cache-line on modern CPUs. That makes it much faster. It has a lot of properties but many are 1 or 2 bytes long.
 
 
-### Message Properties
+## Message Properties
 
 I guess the first best place to understand the `message` class is to look at it's properties. Lets split them up into 3 sections:
 
-####Tree Properties:
+###Tree Properties:
 
     |message| Parent
     |message| First
@@ -22,7 +22,7 @@ I guess the first best place to understand the `message` class is to look at it'
 
 This allows us to create a tree. `Prev` and `Next` are sibling properties. You can alter any of these! Message has a lot of other functions such as `.Last` or `.Root`, but they are computed rather than actual stored properties in memory.
 
-####Definition Properties:
+###Definition Properties:
 
     |String| Name
     |Syntax| Func // syntax is uint8
@@ -39,7 +39,7 @@ For example if you parse `"a = b"` you will get these `messages`:
 The quoted text (like "`a`") is the `name`, and the names like `rel` / `opp` / `thg` are the `func`. `Func` is actually just stored as a byte in memory, so it takes up very little RAM.
 
 
-####Parse Properties:
+###Parse Properties:
 
     |uint|     Position
     |uint16|   RangeLength
@@ -60,7 +60,7 @@ The name however will be 4 bytes shorter! 2 bytes shorter because of the "" mark
 `Position` and `RangeLength` together are useful for finding messages within the original source code by position... for example I use it for my text editor in Perry.
 
 
-####Utility Properties:
+###Utility Properties:
 
 These make `message` an actually useful class... rather than just some theoretical thing. These help you to use `Message` to do real work.
 
@@ -71,7 +71,7 @@ These make `message` an actually useful class... rather than just some theoretic
 Its not much... but it nicely makes `message` fit in a 64-byte object. Thus keeping message entirely within one cacheline in modern CPUs, making it very fast to use.
 
 
-#### Free Alteration
+### Free Alteration
 
 The `Utility` and `Parse` properties are entirely yours to use. `Message` does not care how you use these, in terms of it's `AST` meaning or how it parses or renders.
 
@@ -89,7 +89,7 @@ Again... its up to you what you want to set (if anything) onto a message.
 
 
 
-#### Memory Use
+## Memory Use
 
 `Message` only uses 64 bytes per node, which is much less than most AST parsers. I find for the speedie compiler's own source code, I get a 12x memory expansion by parsing. So if you parsed 2MB of source code, you'd use 24MB of `Messages`.
 
