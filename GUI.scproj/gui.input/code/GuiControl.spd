@@ -171,7 +171,8 @@ class GUIControl (ringtree)
 
 	
 	function IsViewable (|bool|)
-		return (self is visible) and .lastrect.ispositive
+		if self
+			return (self is visible) and .lastrect.ispositive
 
 		
 	function MouseIsInside (|bool|)

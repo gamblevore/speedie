@@ -8,7 +8,6 @@
 
 
 // Perry Do later
-* not remembering the file we came from on last quit
 * uncommenting "     //   abc" doesnt work properly.
 * can't right click on the returntype?
 * clearing logs doesnt clear both speedie and perry

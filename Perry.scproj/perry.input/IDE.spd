@@ -673,9 +673,11 @@ class PerryIDE (Window)
 	function CurrFileRow (|FileRow|)
 		|| r = .FileList.FirstSelected as filerow
 			return r
-			
+	
+	
 	function CurrPath (|string|)
 		return .CurrFileRow.Location
+
 
 	function EditTextFile (|FileRow| r, |int|) // editfile, loadfile, fileload, fileedit, openfile, fileopen
 		require r and r.location and !.IsLoading
@@ -688,12 +690,12 @@ class PerryIDE (Window)
 		|| Loaded =  E.LoadDocument(doc)
 		.ListAllFuncs
 		require Loaded
-		.IsLoading++
 		|| it = .projmsg
 			if !.isloading
 				it["edit"] = r.location
 			it["pos"] = doc.Position
 
+		.IsLoading++
 		.filelist.select(r)
 		e.ClearErrors
 		.LoadErrors(true, false)

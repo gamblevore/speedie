@@ -36,8 +36,7 @@ module Perry
 				return true
 		
 		
-	function LoadWindows (|PerryIDE| r, |bool|)
-		|| Loaded = .LoadWindowsSub(r)
+	function LoadWindowsFromArgs (|PerryIDE| r, |bool|)
 		for arg in app.args // load specified documents
 			|| line = (0, 0)
 			|| path = arg.ExtractPathAndLine(line)
@@ -47,8 +46,6 @@ module Perry
 					rz = true
 					win.editme.ViewLineAndSel(line.x)
 		
-		if !Loaded and !rz
-			startupwindow.show
 	
 	
 	function Save
@@ -97,9 +94,13 @@ module Perry
 		|| i = PerryIDE(false)
 		i.LoadState
 		i.ViewAsText
-		if !.LoadWindows(i)
-			|| oof = (.FindProj(old),  .Projects.First)(old)
-				oof.ide.showide
+		|| Normal = .LoadWindowsSub(i)
+		|| FromArgs = .LoadWindowsFromArgs(i)
+		if !Normal and !FromArgs
+			startupwindow.show
+			return 0
+		|| oof = (.FindProj(old),  .Projects.First)(old)
+			oof.ide.showide
 
 
 	function OpenProj (|[PerryIDE]|)
@@ -107,6 +108,7 @@ module Perry
 		for w in window.all
 			if w isa PerryIDE
 				rz <~ w
+
 
 	function IDE (|PerryIDE|)
 		opt norefcounts
@@ -328,15 +330,16 @@ function ViewAsVis (|bool| vis)
 	(.progress is visible)			= Stillruns and (.buildbutton isnt enabled)
 	(.tabs is decluttered)			= !top
 
-	if .focus and (.focus isnt visible)
-		.editme.setfocus
-
 	if vis
 		.CurrFileName.size = 8 ~ after for 140 by 1~inside
 		.FileListersInside(.rborder)
 	  else
 		.CurrFileName.size = 140~wide by 3~inside
 		.FileListersInside(.toolbar)
+	
+	.reflow
+	if !.Focus.IsViewable
+		.editme.SetFocus
 
 
 function FileListersInside (|guicontrol| dest)
