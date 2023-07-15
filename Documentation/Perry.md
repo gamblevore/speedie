@@ -13,15 +13,15 @@ I wanted full support for Speedie, and I refuse to be a second-class citizen. Th
 You'll see that it looks simple. But underneath that simplicity, is a huge amount of features carefully hidden.
 
 ## Perry Features
-* File List auto-discovers your project files.
+* File-List auto-discovers your project files.
 * Anti-Clutter interface
-* Errors List lets you jump to error-locations.
+* Error-List lets you jump to error-locations.
 * Batch-Find
 * Remembers your last projects used, and what files you were last editing.
 * Multi-Project, Tabbed Interface.
 * Syntax Coloring
 * Auto-Complete
-* Build and Run programs
+* Build and Run programs (can build multiple projects at once)
 * Awesome quick file-finding feature.
 * Inbuilt todo list
 * Text editor is pretty good. I like it about as much as BBEdit.
@@ -46,13 +46,13 @@ Each of these features was designed expertly and to a high degree of care. For e
 
 ## Speed And Efficiency
 
-Perry is light, fast and small. Perry weighs at only 900KB on OSX. Compare that to Xcode which can be over 20GB, (21000x bigger). Incredible that Perry is so small. This is because Perry is made in Speedie, which is a great compiler. And also because I made it.
+Perry is light, fast and small. Perry weighs at only 1500KB on OSX. Compare that to Xcode which can be over 20GB, (13333x bigger). Incredible that Perry is so small. This is because Perry is made in Speedie, which is a great compiler. And also because I made it.
 
 Perry reminds us of the kind of programs you used to like and enjoy maybe 20 years ago... fast programs that do a lot... without all the bloat.
 
 In Perry, you'll find that finding is fast, text-editing is fast, autocomplete is fast, clicking on functions to find more info about them, is fast... Everything is fast.
 
-I find Perry takes surprisingly little RAM. When I open Perry I see I have 6 projects open (3 are large projects). Yet I am only taking 1.5MB of memory for all the objects, 87KB for the strings, and 1.7MB for the screen. Its an ultra-light-weight design. Xcode will take hundreds of megabytes for just one project.
+I find Perry takes surprisingly little RAM. When I open Perry I see I have 6 projects open (3 are large projects). Yet I am only taking 1.5MB of memory for all the objects, 87KB for the strings, and 1.7MB for the screen. Its an ultra-light-weight design. Xcode will take hundreds of megabytes for just one project, and gigabytes to compile.
 
 ## Comparisons
 

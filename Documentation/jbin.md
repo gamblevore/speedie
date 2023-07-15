@@ -58,7 +58,7 @@ There's not much you can say about the 15 lines of (speedie) parsing code it tak
 
 ### Transparent binary handling
 
-Just remember, jbin is always parseable by jeebox. So you have nothing to lose and no extra steps to do, just to parse some jbin. You literally call the same `string.parse` and jeebox will recognise the `jbin` header and parse it. 
+jbin is always parseable by jeebox. So you have nothing to lose and no extra steps to do, just to parse some jbin. You literally call the same `string.parse` and jeebox will recognise the `jbin` header and parse it. 
 
 #### Jbin advantages to Jeebox
 
@@ -69,17 +69,17 @@ Just remember, jbin is always parseable by jeebox. So you have nothing to lose a
 #### Jbin disadvantages
 * Not human readable
 * Does not store formatting, or comments
-* Is subject to change. Not final. Treat this as a caching system.
+* **Is subject to change. Not final. Treat this as a caching system.**
 
 #### History
 
 Lets give a little history about `jbin`. OK, so... basically, I was writing an `.m4a` parser in Speedie. This is to let me import files into a music player.
 
-So, I had to parse a quick-time file. This is the "`moov`" or "`atom`" format, which... to be honest, kinda sucks. `jbin` is so much better! But then, this format is used for all Apple's music and all sorts of things, so... it can't be that bad?
-
-Jbin is still better. I was writing the `m4a` parser and realised "wait... I can improve on this". So I did. I removed everything bad, added a few good things... and voila: **`jbin`** was created.
+So, I had to parse a quick-time file. This is the "`moov`" or "`atom`" format. I felt that this format kinda sucks. I was writing the `m4a` parser and realised "wait... I can improve on this". So I did. I removed everything bad, added a few good things... and voila: **`jbin`** was created.
 
 Actually jbin is nothing like `m4a`, except being binary. Thats how much I changed.
+
+jbin could literally be used as a superior movie and audio container format... if anyone wanted to. Its not just for jeebox.
 
 #### Jbin Compared to Apple's atom (quicktime) format
 

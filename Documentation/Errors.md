@@ -18,9 +18,9 @@ Let's make a simple example:
         return true
 
 
-    function CheckUserListNames (|string| userspath)
-        // '#require' will exit this function, if userlist is set to nil.
-        || userlist = userspath.file.parse            #require
+    function CheckUserListNames (|file| usersfile)
+        // '#require' will exit this function, if usersfile.parse returns nil.
+        || userlist = usersfile.parse            #require
         "User list parsed OK"
         
         for user in userlist
