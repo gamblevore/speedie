@@ -99,7 +99,7 @@ I find for the speedie compiler's own source code, I get a 12x memory expansion 
 
 Comparing Jeebox to [lxml2's tree.h](https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/include/libxml/tree.h), we can see their `xmlNode` takes at least 116 bytes (with no attributes on a node). Given how their allocator works (it allocates dynamic lengths) their xmlNode must take at least 128 bytes.
 
-My node's size, is at least half theirs! In addition to that lxml2 is actually very "memory efficient" compared to most popular XML parsers. If theirs is efficient, mine is super efficient. Looking at their benchmark page, and running my own benchmarks, I can see my parser is about 4.5x more memory efficient overall!
+My node's size, is at least half theirs! In addition to that lxml2 is actually very "memory efficient" compared to most popular XML parsers. If theirs is efficient, mine is super efficient. Looking at their benchmark page, and running my own benchmarks, I can see my parser is about 8x more memory efficient overall!
 
 And that's just an XML parser that I am comparing Jeebox to! AST Parsers are often more complex than XML parsers. Jeebox does both... data and code. With jeebox you usually need less nodes anyhow, cos its so expressive.
 
