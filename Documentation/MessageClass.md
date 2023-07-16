@@ -103,7 +103,7 @@ My node's size, is at least half theirs! In addition to that lxml2 is actually v
 
 And that's just an XML parser that I am comparing Jeebox to! AST Parsers are often more complex than XML parsers. Jeebox does both... data and code, at probably half the cost per node. In addition to being a very expressive format meaning you usually need less nodes anyhow.
 
-Also... for a large and complex compiler like my own, I've needed extra properties on my parsed message. Which is why I added the `.flags`, and `.tag` properties. These "utility properties" let me attach useful information to a node, that their xmlNode does not have... (Their xmlNode does however have `._private` which is like my `.obj` property.)
+When using `Message` in large complex programs (like my compiler), you often find yourself needing extra properties to attach information to the nodes. Which is why I added the `.flags`, and `.tag` properties. These "utility properties" let me attach useful information. Info that lxml2's xmlNode does not have... (Their xmlNode does however have `._private` which is like my `.obj` property.)
 
 Also... their parser actually contains LESS parse info than mine does! I include not just a "line number" which is less accurate, but a byte position, a rangelength, and an indent property. This gives you a lot more useful info for locating a message's original position in a file...
 
