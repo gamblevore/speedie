@@ -1,6 +1,6 @@
 # The Message Class
 
-The `message` class is a real beast of a class. It does a lot of things. Thats because it is used for a lot of things. 
+The `message` class does a lot of things, and can be used for many purposes.
 
 Actually... compared to other `AST` parsers... my `Message` class is quite light and tight.
 
