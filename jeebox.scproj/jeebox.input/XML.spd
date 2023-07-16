@@ -1,22 +1,21 @@
 
 
+	
+function parser.ThingXMLAtt (|int|start, |message| Parent, |message|)
+	|| name = parser.WordAfterSub( start, jeebox.XMLWordMiddle )
+	return parser.new( parent, @xatt, start, name )
+
+
 function parser.XMLAttribs (|message| XML,  |int| start,  |int|)
 	|| AllAtts = parser.new(xml, @arg, Start)
 	|| s = parser.data
 	while
-		|| i = .nextstart
-		|byte| c
-		while i < s.length
-			c = s[i]
-			loop c.iswhite
-			i++
+		|| i = s.outwhite(.nextstart) #loop
+		|| c = s[i]
 		if (c == '>') or (c=='/' and s[i+1]=='>')
 			return i
-		ifn jeebox.CSWordStart[c]
-			exit
-		|| Attr = fthingword(i)
-		Attr.func = @XAtt
-		AllAtts <~ Attr
+		loop jeebox.CSWordStart[c]
+		|| Attr = ThingXMLAtt(i, allatts)
 		require .ExpectEndChar(parser.nextstart, "=")
 		i = .cleanspaces
 		c = s[i]

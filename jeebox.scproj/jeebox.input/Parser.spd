@@ -1185,9 +1185,14 @@ extend Parser
 	
 	function WordAfter (|int| Start, |int|)
 		Opt NoRefCounts
+		return .wordaftersub(start, Jeebox.CSWordMiddle)
+	
+	
+	helper WordAfterSub (|int| Start, |charset| cs, |int|)
+		Opt NoRefCounts
 		|| n = .data.length
 		if (Start < n)
-			|| After = .data.OutCharSet( Jeebox.CSWordMiddle, Start ) ?? n
+			|| After = .data.OutCharSet( cs, Start ) ?? n
 			if (After > Start)
 				.NextStart = After
 				return After
