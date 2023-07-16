@@ -1,17 +1,14 @@
 # The Message Class
 
-The `message` class is a real beast of a class. It does a lot of things. Thats because it is used for a lot of things. 
-
-Actually... compared to other `AST` parsers... my `Message` class is quite light and tight.
+The `message` class does a lot of things, and can be used for many purposes. Its also designed to fit neatly into a cache-line on a modern CPU... making it fast and tight.
 
 Learning a bit about [AST](http://google.com/?q=ast+parser)s will help you get an idea of what Jeebox is. But if you already know how to manipulate or read `XML` or `JSON` trees, that might be enough, as Jeebox is similar to those too.
 
-BTW `message` fits into 64-bytes of RAM, meaning it fits neatly into a cache-line on modern CPUs. That makes it much faster. It has a lot of properties but many are 1 or 2 bytes long.
 
 
 ## Message Properties
 
-I guess the first best place to understand the `message` class is to look at it's properties. Lets split them up into 3 sections:
+I guess the first best place to understand the `message` class is to look at it's properties. Lets split them up into sections:
 
 ### Tree Properties:
 
@@ -20,9 +17,9 @@ I guess the first best place to understand the `message` class is to look at it'
     |message| Prev
     |message| Next
 
-This allows us to create a tree. `Prev` and `Next` are sibling properties. You can alter `.parent`, `.prev.`, `.next` or `.first`!
+These 4 properties are enough for Jeebox to be able to define a tree. When you alter any of these properties, the others are modified for you, to keep the whole thing self-consistant. You can alter `.parent`, `.prev.`, `.next` or `.first`!
 
-Message has a lot of other functions such as `.Last` or `.Root`. They are computed rather than actual stored properties in memory. But its usually more useful to think in terms of those... for example getting `.last` or setting `.last` (appending into a tree node).
+Message has a lot of other functions such as `.Last` or `.Root`. They are computed rather than actual stored properties in memory. Its usually more useful to think in terms of `.first` and `.last` being real properties, even if `.last` is computed.
 
 `.last` by the way actually is accessed almost immediately even with 1 million children, because `Message` (secretly) stores "`.first.prev = .last`" pretty cool huh! You don't see that behaviour, cos if you read `.first.prev` you will always get `nil`. But the fact is... that `.last` is constant time and fast no matter how many nodes you have. `.first` and `.last` are fast.
 
