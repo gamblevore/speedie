@@ -17,7 +17,7 @@ module Counts
 	||			PrintTree = false
 	||			PrintedTree = false
 	||			ParseSpeed = app.yes("s")
-	|string| 	DefaultExt = "spd/box/jbin/jb"
+	|string| 	DefaultExt = "spd/box/jbin/jb/xml"
 	
 	function Init (|string| ss)
 		|| pt = app["p"]
