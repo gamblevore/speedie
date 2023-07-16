@@ -99,14 +99,15 @@ I'm assuming it is less than most XML parsers too, but I'd need a real example w
 
 However, considering that just the tree itself will take 32 bytes of RAM, and then you need a name and `.obj` property to be useful at all... giving 48 bytes of RAM... regardless of XML or jeebox... And then you need a refcount and at least a "type", adding another 8 bytes to give 56 bytes...
 
-64 bytes is very minimal! I know that any comparison from a modern "DOM"-based XML parser will not put jeebox at a disadvantage. I'd love to see a specific case though, that I can test against. I just checked lxml2 and it's header specifies the size of an element is almost twice as large as mine, and isn't an even multiple of 64, meaning it caches slower.
+64 bytes is very minimal! I know that any comparison from a modern "DOM"-based XML parser will not put jeebox at a disadvantage. I'd love to see a specific case though, that I can test against.
 
-Most XML files tend to have large nodes, so you will see less than the 12x expansion I get from my source code which has a lot of "a = b + c" going on, which is actually 7 nodes in only 9 bytes.
+Comparing Jeebox to [lxml2's tree.h](https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/include/libxml/tree.h), we can see their `_xmlElement` takes at least 112 bytes (with no attributes on a node). Given how most allocators work, the size is probably at least 120 bytes.
 
-These worst-cases in terms of memory-expansion (for parsing "a=b+c") are offsetted by other things, like white space and large names, so that on average for my source code I'm getting 12x expansion. But for XML parsing, I know it is much less.
+My node, is perhaps half their node size. My parser is quite memory efficient. In addition to that lxml2 is actually very "memory efficient" compared to most popular XML parsers. If theirs is efficient, mine is super efficient.
 
-Can't say how much without a test... just that "its probably better than most XML parsers".
+And that's just an XML parser that I am comparing Jeebox to! AST Parsers are often more complex than XML parsers. Jeebox does both... data and code, at probably half the cost per node. In addition to being a very expressive format meaning you usually need less nodes anyhow.
 
-For example, when I looked at the Python AST parser, each node has a "previous comment and white space" property, and a "next comment and white space" property too. Cos you need both... just to be sure.
+Also... for a large and complex compiler like my own, I've needed extra properties on my parsed message. Which is why I added the `.flags`, and `.tag` properties. These "utility properties" let me attach useful information to a node, that their xmlNode does not have... (Their xmlNode does however have `._private` which is like my `.obj` property.)
 
-Thats 16 bytes more... that mine doesn't need to worry about... and thats before you get to the other additions theirs has that mine doesn't need. My parser is quite memory efficient.
+Also... their parser actually contains LESS parse info than mine does! I include not just a "line number" which is less accurate, but a byte position, a rangelength, and an indent property. This gives you a lot more useful info for locating a message's original position in a file...
+
