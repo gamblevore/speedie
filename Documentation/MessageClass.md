@@ -97,7 +97,7 @@ Again... its up to you what you want to set (if anything) onto a `message`.
 
 64 bytes is very minimal!
 
-Comparing Jeebox to [lxml2's tree.h](https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/include/libxml/tree.h), we can see their `_xmlElement` takes at least 112 bytes (with no attributes on a node). Given how most allocators work, the size is probably at least 120 bytes.
+Comparing Jeebox to [lxml2's tree.h](https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/include/libxml/tree.h), we can see their `xmlNode` takes at least 116 bytes (with no attributes on a node). Given how most allocators work, the size is probably at least 120 bytes.
 
 My node, is perhaps half their node size. My parser is quite memory efficient. In addition to that lxml2 is actually very "memory efficient" compared to most popular XML parsers. If theirs is efficient, mine is super efficient.
 
