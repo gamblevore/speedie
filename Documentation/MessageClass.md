@@ -8,7 +8,7 @@ Learning a bit about [AST](http://google.com/?q=ast+parser)s will help you get a
 
 ## Message Properties
 
-I guess the first best place to understand the `message` class is to look at it's properties. Lets split them up into 3 sections:
+I guess the first best place to understand the `message` class is to look at it's properties. Lets split them up into sections:
 
 ### Tree Properties:
 
