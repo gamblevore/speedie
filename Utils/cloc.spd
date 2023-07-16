@@ -30,6 +30,7 @@ module Counts
 			exts[s] = s
 
 	function Count (|message| Msg)
+		opt norefcounts
 		Counts.parsed++
 		|| names = 	0 
 		|| nodes = 0
@@ -73,12 +74,13 @@ function file.cloc
 		if counts.maxnodelength
 			for s.flat in msg 
 				s.name = s.name.Preview(counts.MaxNodeLength)
-		msg.RenderAST(app.stdout.out)
-		printline
+		|| fs = FastString() // should use app.stdout but its not workign right now1!!!
+		msg.RenderAST(fs)    // fix when it works!
+		printline fs
 	  elseif counts.ParseSpeed
-		|| fs = app.stdout.out
+		|| fs = FastString()
 		fs.RenderSpeed(durr.seconds, data.length, 0, "Parsed")
-		fs <~ "\n"
+		printline  fs
 	(msg)
 		
 
