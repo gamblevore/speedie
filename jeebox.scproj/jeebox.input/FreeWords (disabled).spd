@@ -40,8 +40,8 @@ extend Parser
 
 
 	function fCNL (ParseHandler)
-		|| Result = parser.new(nil, @fwrd, start)
-		|| Block = Result
+		rz = parser.new(nil, @fwrd, start)
+		|| Block = rz
 		|| LastCount = 0
 		
 		while {
@@ -53,19 +53,16 @@ extend Parser
 		} (line and parser.GrabLine)
 		
 		parser.EndToken( "/~" )
-		return result
-	
 
-	
+
 	function Words_Line (|Message|)
-		|| Result = parser.new(nil, @Line, .nextstart)
-		parser.Words_ReadItems(Result)
+		rz = parser.new(nil, @Line, .nextstart)
+		parser.Words_ReadItems(rz)
 
-		|| C = Result.First
+		|| C = rz.First
 		if (C == "*")
-			Result.Name = "*"
+			rz.Name = "*"
 			C.Remove
-		return result
 
 
 	function MoreCNL (|bool|)
