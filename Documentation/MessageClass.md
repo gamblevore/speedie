@@ -101,7 +101,7 @@ Comparing Jeebox to [lxml2's tree.h](https://gitlab.gnome.org/GNOME/libxml2/-/bl
 
 My node's size, is at least half theirs! In addition to that lxml2 is actually very "memory efficient" compared to most popular XML parsers. If theirs is efficient, mine is super efficient.
 
-And that's just an XML parser that I am comparing Jeebox to! AST Parsers are often more complex than XML parsers. Jeebox does both... data and code, at probably half the cost per node. In addition to being a very expressive format meaning you usually need less nodes anyhow.
+And that's just an XML parser that I am comparing Jeebox to! AST Parsers are often more complex than XML parsers. Jeebox does both... data and code. With jeebox you usually need less nodes anyhow, cos its so expressive.
 
 When using `Message` in large complex programs (like my compiler), you often find yourself needing extra properties to attach information to the nodes. Which is why I added the `.flags`, and `.tag` properties. These "utility properties" let me attach useful information. Info that lxml2's xmlNode does not have... (Their xmlNode does however have `._private` which is like my `.obj` property.)
 
