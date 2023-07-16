@@ -1,5 +1,7 @@
 # The Message Class
 
+If you want to understand the message class on a [conceptual level, click here.](Message.md) If you want to understand it on a technical level... keep reading.
+
 The `message` class does a lot of things, and can be used for many purposes. Its also designed to fit neatly into a cache-line on a modern CPU... making it fast and tight.
 
 Learning a bit about [AST](http://google.com/?q=ast+parser)s will help you get an idea of what Jeebox is. But if you already know how to manipulate or read `XML` or `JSON` trees, that might be enough, as Jeebox is similar to those too.
