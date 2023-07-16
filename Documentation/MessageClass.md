@@ -95,7 +95,7 @@ Again... its up to you what you want to set (if anything) onto a `message`.
 
 `Message` only uses 64 bytes per node, which is much less than most AST parsers. 64 bytes is very minimal!
 
-I find for the speedie compiler's own source code, I get a 12x memory expansion by parsing. So if you parsed 1.2MB of speedie source code, you'd use 14.4MB of `Messages`. (My entire compiler is 1.2MB of source right now.) Parsing XML tends to be much less intensive than parsing source code. I found parsing a 11.4MB XML file took only 9.8MB of parsed messages, and 2.8MB of string objects. So the memory efficiency (in this case) for parsing XML was 4.5x greater. And the speed efficiency is usually about the same.
+I find for the speedie compiler's own source code, I get a 12x memory expansion by parsing. So if you parsed 1.2MB of speedie source code, you'd use 14.4MB of `Messages`. (My entire compiler is 1.2MB of source right now.) Parsing XML tends to be much less intensive than parsing source code. I found parsing a 11.4MB XML file took only 9.8MB of parsed messages, and 2.8MB of string objects. So the memory efficiency (in this case) for parsing XML was 4.5x greater.
 
 Comparing Jeebox to [lxml2's tree.h](https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/include/libxml/tree.h), we can see their `xmlNode` takes at least 116 bytes (with no attributes on a node). Given how their allocator works (it allocates dynamic lengths) their xmlNode must take at least 128 bytes.
 
