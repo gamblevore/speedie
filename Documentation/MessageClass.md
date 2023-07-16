@@ -95,11 +95,7 @@ Again... its up to you what you want to set (if anything) onto a `message`.
 
 `Message` only uses 64 bytes per node, which is much less than most AST parsers. I find for the speedie compiler's own source code, I get a 12x memory expansion by parsing. So if you parsed 1.2MB of speedie source code, you'd use 14.4MB of `Messages`. (My entire compiler is 1.2MB of source right now.)
 
-I'm assuming it is less than most XML parsers too, but I'd need a real example with files and a specific case to compare against.
-
-However, considering that just the tree itself will take 32 bytes of RAM, and then you need a name and `.obj` property to be useful at all... giving 48 bytes of RAM... regardless of XML or jeebox... And then you need a refcount and at least a "type", adding another 8 bytes to give 56 bytes...
-
-64 bytes is very minimal! I know that any comparison from a modern "DOM"-based XML parser will not put jeebox at a disadvantage. I'd love to see a specific case though, that I can test against.
+64 bytes is very minimal!
 
 Comparing Jeebox to [lxml2's tree.h](https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/include/libxml/tree.h), we can see their `_xmlElement` takes at least 112 bytes (with no attributes on a node). Given how most allocators work, the size is probably at least 120 bytes.
 
