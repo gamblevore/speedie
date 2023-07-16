@@ -135,12 +135,16 @@ void JB_Tk__StartParse( JB_String* Data ) {
 	if ( ! Data ) {
 		Data = JB_Str__Empty();
 	}
-
 	JB_SetRef( JB__Tk_Data, Data );
+	JB_String BOM = {};
+	BOM.Length = 3;
+	BOM.Addr = (u8*)"\xEF\xBB\xBF";
 	
 	self->NextStart = 0;
 	self->ErrorStart = -1;
+	JB_Tk__EatString(&BOM);
 }
+
 
 JB_Object* DummyTokHan_( int TokenAfter );
 
