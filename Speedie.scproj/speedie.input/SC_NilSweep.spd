@@ -330,7 +330,7 @@ function NilTracker.Leave (|message| s)
 /*
 TODO:
 
-* require returns nil for strings. we need some way to return "" for strings but nil for arrays... so cant just use the default value.
+* require returns nil for strings. we need some way to return string.error for strings but nil for arrays... so cant just use the default value.
 * using ptrs...
 * Strength is settable in the project if its an error or problem
 * return values
