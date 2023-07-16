@@ -99,7 +99,7 @@ I'm assuming it is less than most XML parsers too, but I'd need a real example w
 
 However, considering that just the tree itself will take 32 bytes of RAM, and then you need a name and `.obj` property to be useful at all... giving 48 bytes of RAM... regardless of XML or jeebox... And then you need a refcount and at least a "type", adding another 8 bytes to give 56 bytes...
 
-64 bytes is very minimal! I know that any comparison from a modern "DOM"-based XML parser will not put jeebox at a disadvantage. I'd love to see a specific case though, that I can test against.
+64 bytes is very minimal! I know that any comparison from a modern "DOM"-based XML parser will not put jeebox at a disadvantage. I'd love to see a specific case though, that I can test against. I just checked lxml2 and it's header specifies the size of an element is almost twice as large as mine, and isn't an even multiple of 64, meaning it caches slower.
 
 Most XML files tend to have large nodes, so you will see less than the 12x expansion I get from my source code which has a lot of "a = b + c" going on, which is actually 7 nodes in only 9 bytes.
 
