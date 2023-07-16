@@ -1,12 +1,9 @@
 # The Message Class
 
-The `message` class does a lot of things, and can be used for many purposes.
-
-Actually... compared to other `AST` parsers... my `Message` class is quite light and tight.
+The `message` class does a lot of things, and can be used for many purposes. Its also designed to fit neatly into a cache-line on a modern CPU... making it fast and tight.
 
 Learning a bit about [AST](http://google.com/?q=ast+parser)s will help you get an idea of what Jeebox is. But if you already know how to manipulate or read `XML` or `JSON` trees, that might be enough, as Jeebox is similar to those too.
 
-BTW `message` fits into 64-bytes of RAM, meaning it fits neatly into a cache-line on modern CPUs. That makes it much faster. It has a lot of properties but many are 1 or 2 bytes long.
 
 
 ## Message Properties
