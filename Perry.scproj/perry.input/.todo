@@ -18,7 +18,6 @@
 
 
 // Speedie Do later
-* printing to app.stdout.out... closes stdout :( WE SHOULDN'T BE CLOSING STDOUT UNLESS ON PURPOSE! Like via pipe.close or soemthing
 * RefOpts. Do it bit by bit
 	* get property but only did math
 	* mark a few string funcs as not-modifier/disowner/capturer

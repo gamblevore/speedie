@@ -22,23 +22,6 @@ inline uint8 NumToHex(u32 Num) {
 }
 
 
-static void ClearFSSub_(FastString* fs) {
-	if (fs->File) {
-		// maybe DON'T close the file??? in case it is stdout?
-		JB_File_Flush(fs->File);
-		JB_SetRef( fs->File, 0 );
-	}
-    JB_FS_Constructor(fs);
-}
-
-
-static void ClearFS_(FastString* fs) {
-    JB_SetRef( fs->Result, 0 );
-    ClearFSSub_(fs);
-}
-
-
-
 void JB_FS_AppendMini(FastString* fs, MiniStr S) {
 	FS_SanityCheck_(fs);
 	dbgexpect(fs);
@@ -451,7 +434,8 @@ JB_String* JB_FS_GetResult(FastString* self) {
 	JB_String* Result = self->Result;
 	FS_SanityCheck_(self);
     JB_SafeDecr(Result);
-    ClearFSSub_(self);
+	JB_SetRef( self->File, 0 );
+    JB_FS_Constructor(self);
     if (!Result)
 		Result = JB_Str__Empty();
 
@@ -547,13 +531,14 @@ void JB_FS_Constructor(FastString* self) {
 }
 
 void JB_FS_Destructor(FastString* self) {
+	// .dispose can call this.
 	if (self->PrintLineOnClear) {
 		JB_FS_AppendByte(self, '\n');
 	}
     JB_FS_Flush( self );
-	ClearFS_( self );
-	// why are we doing clearfs_? just to be safe? yet no other funcs do this? Remove this?
-	// we should just decr the objs...
+    JB_SetRef( self->Result, 0 );
+	JB_SetRef( self->File, 0 );
+    JB_FS_Constructor(self); // clear pointers and length
 }
 
 FastString* JB_FS__InternalNew() {
@@ -563,8 +548,7 @@ FastString* JB_FS__InternalNew() {
 }
 
 FastString* JB_FS__FileFlush(JB_File* f, bool b) {
-	FastString* fs = JB_New(FastString);
-	JB_FS_Constructor( fs );
+	FastString* fs = JB_FS__InternalNew();
 	fs->File = JB_Incr(f);
 	fs->PrintLineOnClear = b;
 	return fs;
@@ -582,9 +566,8 @@ FastString* JB_FS__FastNew(FastString* other) {
 
 
 	if ( !fs or (JB_RefCount(fs) > 1)) {
-        JB_SetRef(fs, JB_New(FastString));
+        JB_SetRef(fs, JB_FS__InternalNew());
 		TheSharedFastString=fs;
-        JB_FS_Constructor( fs );
     } else {
         fs->Length = 0;
     }
