@@ -7,7 +7,7 @@ function parser.ThingXMLAtt (|int|start, |message| Parent, |message|)
 
 
 function parser.XMLAttribs (|message| XML,  |int| start,  |int|)
-	|| AllAtts = parser.new(xml, @arg, Start)
+	|| AllAtts = parser.new(xml, @list, Start)
 	|| s = parser.data
 	while
 		|| i = s.outwhite(.nextstart) #loop
@@ -234,5 +234,9 @@ helper message.XMLToJeeboxSub
 	  elseif self == @xatt
 		.func = @item
 		.first.func = @str
-		.first = @emb + .name
+		|| s = .name
+		|| fn = @emb
+		ifn s[0].IsLetter and Jeebox.CSWordMiddle contains s
+			fn = @str
+		.first = fn + s
 		.name = ""

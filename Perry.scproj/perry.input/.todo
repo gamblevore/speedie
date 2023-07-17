@@ -18,8 +18,6 @@
 
 
 // Speedie Do later
-* converting xml to jeebox... well it fails for wierd attributes like abc:..a="a"
-	* replace @arg with @list and also change my xml conv code
 * printing to app.stdout.out... closes stdout :( WE SHOULDN'T BE CLOSING STDOUT UNLESS ON PURPOSE! Like via pipe.close or soemthing
 * RefOpts. Do it bit by bit
 	* get property but only did math
