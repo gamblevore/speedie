@@ -1,5 +1,7 @@
 # The Message Class
 
+If you want to understand the message class on a [conceptual level, click here.](Message.md) If you want to understand it on a technical level... keep reading.
+
 The `message` class does a lot of things, and can be used for many purposes. Its also designed to fit neatly into a cache-line on a modern CPU... making it fast and tight.
 
 Learning a bit about [AST](http://google.com/?q=ast+parser)s will help you get an idea of what Jeebox is. But if you already know how to manipulate or read `XML` or `JSON` trees, that might be enough, as Jeebox is similar to those too.
@@ -95,11 +97,11 @@ Again... its up to you what you want to set (if anything) onto a `message`.
 
 `Message` only uses 64 bytes per node, which is much less than most AST parsers. 64 bytes is very minimal!
 
-I find for the speedie compiler's own source code, I get a 12x memory expansion by parsing. So if you parsed 1.2MB of speedie source code, you'd use 14.4MB of `Messages`. (My entire compiler is 1.2MB of source right now.) Parsing XML tends to be much less intensive than parsing source code. I found parsing a 11.4MB XML file took only 9.8MB of parsed messages. So the efficiency (in this case) for parsing XML was 13x greater.
+I find for the speedie compiler's own source code, I get a 12x memory expansion by parsing. So if you parsed 1.2MB of speedie source code, you'd use 14.4MB of `Messages`. (My entire compiler is 1.2MB of source right now.) Parsing XML tends to be much less intensive than parsing source code. I found parsing a 11.4MB XML file took only 9.8MB of parsed messages, and 2.8MB of string objects.
 
 Comparing Jeebox to [lxml2's tree.h](https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/include/libxml/tree.h), we can see their `xmlNode` takes at least 116 bytes (with no attributes on a node). Given how their allocator works (it allocates dynamic lengths) their xmlNode must take at least 128 bytes.
 
-My node's size, is at least half theirs! In addition to that lxml2 is actually very "memory efficient" compared to most popular XML parsers. If theirs is efficient, mine is super efficient.
+My node's size, is at least half theirs! In addition to that lxml2 is actually very "memory efficient" compared to most popular XML parsers. If theirs is efficient, mine is super efficient. Looking at their benchmark page, and running my own benchmarks, I can see my parser is about 8x more memory efficient overall!
 
 And that's just an XML parser that I am comparing Jeebox to! AST Parsers are often more complex than XML parsers. Jeebox does both... data and code. With jeebox you usually need less nodes anyhow, cos its so expressive.
 
