@@ -9,6 +9,8 @@ module Counts
 	|int64|		Files
 	|int64|		Dirs
 	|int64| 	KB
+	|int64| 	ObjMem
+	|int64| 	StrMem
 	|int|		MaxNodeLength
 	|uint[65]|	Histogram
 	
@@ -43,6 +45,23 @@ module Counts
 		.Names += names
 		.Nodes += Nodes
 
+	function MemStart
+		.objmem = app.ObjMemory
+		.strmem = app.stringmemory
+
+	function PrintMem
+		"Obj: ${.objmem.strsize}  Str: ${.strmem.strsize}"
+		
+	function MemEnd
+		require app["m"]
+		print "(Original) "
+		.PrintMem
+		.objmem = app.ObjMemory - .objmem
+		.strmem = app.stringmemory - .strmem
+		print "(Extra) "
+		.PrintMem
+		
+
 
 function string.loc (|int|)
 	for s.lines in self
@@ -63,9 +82,11 @@ function file.cloc
 	
 	Counts.files++
 	
+	counts.memstart
 	|| Start = date.now
 	|| msg = data.parse
 	|| Durr = start.ago
+	counts.MemEnd
 	Counts.Lines += data.loc
 	counts.kb += data.Length
 	require msg
@@ -102,6 +123,7 @@ main
 -k                            Keeps errors
 -s                            Report parse speed
 -p                            Print parse Tree
+-m                            Report Memory Usage
 -h                            Histogram
 "
 		return 0
@@ -128,7 +150,8 @@ function Counts.ReportHisto
 			"    $i: $pc"
 	if h_done
 		""
-	
+
+
 function Counts.report
 	if !app.yes("k")
 		stderr.clear
@@ -141,7 +164,7 @@ function Counts.report
 	"$l lines"
 	|| n = .names
 		"$n names in $d nodes"
-		.reportHisto
+		.ReportHisto
 	if p > 1 or f > 1
 		"Total files: $f, total jeebox files: $p, total size: $kb"
 	if compressionstats.All.Out
