@@ -24,7 +24,8 @@ inline uint8 NumToHex(u32 Num) {
 
 static void ClearFSSub_(FastString* fs) {
 	if (fs->File) {
-		JB_File_Close(fs->File);
+		// maybe DON'T close the file??? in case it is stdout?
+		JB_File_Flush(fs->File);
 		JB_SetRef( fs->File, 0 );
 	}
     JB_FS_Constructor(fs);

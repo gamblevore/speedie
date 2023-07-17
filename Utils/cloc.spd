@@ -95,13 +95,11 @@ function file.cloc
 		if counts.maxnodelength
 			for s.flat in msg 
 				s.name = s.name.Preview(counts.MaxNodeLength)
-		|| fs = FastString() // should use app.stdout but its not workign right now1!!!
-		msg.RenderAST(fs)    // fix when it works!
-		printline fs
+		msg.RenderAST(app.stdout)
+		printline
 	  elseif counts.ParseSpeed
-		|| fs = FastString()
-		fs.RenderSpeed(durr.seconds, data.length, 0, "Parsed")
-		printline  fs
+		app.stdout.out.RenderSpeed(durr.seconds, data.length, 0, "Parsed")
+		printline
 	(msg)
 		
 
