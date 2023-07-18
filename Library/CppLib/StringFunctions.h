@@ -22,7 +22,7 @@ struct JB_StringExternal;
 struct JB_StringC;
 JB_String* JB_Str_New(int64 Len);
 JB_String* JB_Str_NewCStr (int64 Length);
-JB_String* JB_Str_Shrink(JB_String* self, int Length);
+JB_String* Str_Shrink(JB_String* self, int Length);
 JB_String* JB_Str_Render(JB_String* self, FastString* fs);
 JB_String* JB_FS_Render(FastString* self, FastString* fs_in);
 JB_StringC* JB_StrC( const char* c );

@@ -684,7 +684,7 @@ JB_String* JB_File_Read( JB_File* self, IntPtr Length, bool AllowMissing ) {
 			int Error = 0;
 			int Mode = (self->MyFlags & 2) != 0;
 			Length = InterRead( FD, Result->Addr, (int)Length, self, Error, Mode );
-			Result = JB_Str_Shrink( Result, (int)Length );
+			Result = Str_Shrink( Result, (int)Length );
 		}
 	}
 	JB_Flow__Report(Result, self);

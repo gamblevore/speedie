@@ -206,8 +206,8 @@ JB_String* JB_Str_New (int64 Length) {
 }
 
 
-// we... just want a faststring....
-JB_String* JB_Str_Shrink(JB_String* u, int Length) {
+// calls freeifdead
+JB_String* Str_Shrink(JB_String* u, int Length) {
 	if (!u or u->Length == Length) {
 		return u;
 	}

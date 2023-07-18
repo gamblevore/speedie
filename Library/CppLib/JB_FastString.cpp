@@ -427,22 +427,6 @@ bool JB_FS_Grew(FastString* self, int Old) {
 }
 
 
-JB_String* JB_FS_GetResult(FastString* self) {
-	if (!self)
-		return JB_Str__Empty();
-	int Length = self->Length;
-	JB_String* Result = self->Result;
-	FS_SanityCheck_(self);
-    JB_SafeDecr(Result);
-	JB_SetRef( self->File, 0 );
-    JB_FS_Constructor(self);
-    if (!Result)
-		Result = JB_Str__Empty();
-
-	return JB_Str_Shrink(Result, Length);
-}
-
-
 
 int JB_FS_Byte(FastString* fs, int offset) {
 	if ((u32)offset < fs->Reserved)
@@ -540,6 +524,26 @@ void JB_FS_Destructor(FastString* self) {
 	JB_SetRef( self->File, 0 );
     JB_FS_Constructor(self); // clear pointers and length
 }
+
+
+JB_String* JB_FS_GetResult(FastString* self) {
+	if (!self)
+		return JB_Str__Empty();
+	if (self->PrintLineOnClear) {
+		JB_FS_AppendByte(self, '\n');
+	}
+	int Length = self->Length;
+	JB_String* Result = self->Result;
+    if (Result)
+		JB_SafeDecr(Result);
+	  else
+		Result = JB_Str__Empty();
+	JB_SetRef( self->File, 0 );
+    JB_FS_Constructor(self);
+
+	return Str_Shrink(Result, Length); // calls freeifdead
+}
+
 
 FastString* JB_FS__InternalNew() {
     FastString* fs = JB_New(FastString);
