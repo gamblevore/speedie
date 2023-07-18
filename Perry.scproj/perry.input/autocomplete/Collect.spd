@@ -8,7 +8,7 @@ function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| na
 		return false
 	if (fn == @name) and cmd[0, "autocomplete"]
 		return false
-	if (fn == @thg) and (where in @decl) and where.IsLast
+	if (fn == @thg) and (where in @decl) and !where.isfirst
 		return false
 	.SetAutoPoint(where.position)
 	|| isString = (fn == @str or @sstr or @back or @bin)

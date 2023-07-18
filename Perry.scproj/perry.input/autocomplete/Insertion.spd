@@ -58,7 +58,7 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 			return 2							// 2: function a.b*
 		if (func_name == @arg)
 			*found = msg
-			return 1 + ConstructorLike				// 1: function *{}
+			return 1 + ConstructorLike			// 1: function *{}
 												// 2: constructor *{}
 		ifn prms == @list or @bra // great
 			*found = func_name

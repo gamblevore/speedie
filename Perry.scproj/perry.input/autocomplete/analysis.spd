@@ -72,16 +72,16 @@ function PerryFuncMenuSelected (GUIListEvent)
 // Can we... like do this more neatly? Maybe not huh? what if we wanna sort using two sortfuncs?
 function FuncListSorter (SorterComparerMsg)
 	opt norefcounts
-	|| aa = a.first
-	|| bb = b.first
+	|| aa = *a
+	|| bb = *b
 	if aa.func != bb.func
 		return aa.func|int| < bb.func|int|
 	
 	if aa == @emb
 		return bb.name.SyntaxCompare(aa.name, true) < 0
 	
-	|| af = aa.first
-	|| bf = bb.first
+	|| af = *aa
+	|| bf = *bb
 	|| an = af.name
 	|| bn = bf.name
 	|| cmp = bn.SyntaxCompare(an, true)
