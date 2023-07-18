@@ -5,7 +5,11 @@ class DrawToolBar (Guicontrol)
 
 
 
-class DrawControl (GuiControl) // imageeditor
+// should have pure display mode... and edit mode.
+// can load qoi files or our own editor format
+
+
+class GraphicsEditor (GuiControl)
 	|[image]|				Layers
 	|image| 				Merged
 	|file| 					Backing
@@ -25,12 +29,13 @@ class DrawControl (GuiControl) // imageeditor
 		opt norefcounts
 		return .Layers[0]$.size
 			
-	
+	behaviour Draw
+		.merged.DrawTo(where)
 	
 	helper LoadNative (|string| f, |bool|)
 		return false
 		|| root = f.parse_jbin
-		|| imgs = root..jdraw..layers
+		|| imgs = root["jdraw"]["layers"]
 		for l in imgs
 			if l.Expect(@tmp)
 				|| p = .Loadmsg(l)
@@ -99,16 +104,20 @@ class DrawControl (GuiControl) // imageeditor
 			*p = (g,w)(col)
 	
 	
-	function ExportPNG (|file| dest)
-		disabled "unfinished code"
-		return
+	function Export (|file| dest)
 		.Domerge(false)
-		.Merged.SavePNG(dest)
+		dest <~ .Merged.WriteQOI
 		
 		
-	helper LoadImage (|string| f, |bool|)
-		|| p = f.Loadqoi
-			.Layers <~ p
+	helper LoadFile (|string| path, |bool|)
+		|| data = path.ReadFile			#require
+		if path isa "png"
+			data = image.ConvertPNGToVOI(data) #require
+		.loadimage(data)
+
+
+	helper LoadImage (|string| data, |bool|)
+		|| p = data.Loadqoi
+			.Merged = p
 			return true
-	
-	
+

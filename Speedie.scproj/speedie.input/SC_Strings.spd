@@ -75,7 +75,7 @@ function GetFileString (|Message| msg, |string| name, |message|)
 	|| f = compiler.InputFile(nil, name, msg)
 		|| data = f.readall
 		if msg ~= "img"
-			data = compiler.ConvertPNGToQBOI(data)
+			data = compiler.ConvertPNGToVOI(data)
 		msg.become(@str, data)
 		(SCImport.Recent max= f.modified) 
 		msg.clear

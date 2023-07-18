@@ -459,7 +459,7 @@ function perryide.ReTextSubFind
 
 function SelectedFile (GuiListevent)
 	if row isa FileRow
-		return .ide.EditTextFile(row)
+		return .ide.EditFile(row)
 
 
 function RightClickErrorList (GUIListEvent)

@@ -262,7 +262,7 @@ class Image (memory)
 		function LoadQOI (|&byte| data, |int| len, |&int| Size, |&byte|)
 			cpp_wrapper JB_Img__LoadQOI
 
-		function WriteQOI (|&byte| data, |&int| len, |int| w, |int| h, |&byte|)
+		function WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |&byte|)
 			cpp_wrapper JB_Img__WriteQOI
 
 		function string.LoadQOI (|image|)
@@ -274,6 +274,25 @@ class Image (memory)
 		function file.LoadQOI (|image|)
 			|| s = .readall
 				return s.loadqoi #expect (.path, "Failed to read image.")
+
+		function image.WriteQOI (|string|)
+			|| l = .BytesUsed
+			|| qoi = image.WriteQOI(.ptr, .Width, .Height, l)
+				return string.FromPtr(qoi, l)
+
+		function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |&byte|)
+			cpp_wrapper JB_Img__LoadPNG
+
+		function ConvertPNGToVOI (|string| p, |string|)
+			rz = string.error
+			|| x	= 0
+			|| y	= 0
+			|| comp	= 0
+			|| img = .loadpng( p.addr, p.length, &x, &y, &comp, 4 )
+				|| n = 0
+				|| qoi = .writeqoi(img, x, y, n)
+					rz = string.Own(qoi, n).compress(mzlab.Fast)
+			memory.free(img)
 
 
 

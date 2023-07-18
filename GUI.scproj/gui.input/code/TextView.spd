@@ -63,7 +63,6 @@ class TextView (GUIControl)
 	destructor
 		.document = nil		
 	
-
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
 		super.Constructor(p)
 		.Lines = TextViewLine(nil)
@@ -1201,7 +1200,8 @@ class TextView (GUIControl)
 		.ClearErrors
 		|| msg = text.parse
 			(.OnValidate)(self, msg)
-		if !stderr.ok
+		rz = stderr.ok
+		if !rz
 			beep
 			.LoadValErrors(stderr)
 

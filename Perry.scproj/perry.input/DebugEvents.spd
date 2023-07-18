@@ -8,6 +8,7 @@ function DebugArgsKeyDown (GUIKeyEvent)
 	
 	
 function FoundListKeys (GuiKeyEvent)
+	opt norefcounts
 	if key.IsDelete
 		if self isa ListView
 			|| s = .FirstSelected
@@ -27,7 +28,7 @@ function textview.UpdateDebugArgs (|bool| Visible=false)
 	|| f = .ide.DebugArgsFile
 	if !.Document
 		.LoadDocument(Document(f))
-	if !.text.Length
+	if !.text
 		.text = qqfiles.DebugArgs
 	if visible
 		.window.setinnerfocus(self)
@@ -66,6 +67,7 @@ function PressingDebug (GUIAction)
 
 
 function perryide.DebugEnvs (|message| env)
+	opt norefcounts
 	for rel in env
 		|| ch2 = rel[2]
 		if ch2 and rel[1] == "="
@@ -96,7 +98,7 @@ function perryide.DebugPath (|file| f, |message| conf)
 function perryide.StartDebugging (|file| f)
 	require f.MustExist and StdErr.ok
 
-	.debugargslist.UpdateDebugArgs
+	.DebugArgsList.UpdateDebugArgs
 	|| debugargs = .DebugArgsFile.parse #require
 	|| ArgMsg = debugargs["args"]
 	|| args = argmsg.AllNames

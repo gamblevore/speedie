@@ -26,6 +26,7 @@ class PerryIDE (Window)
 	|TextView|					JeeboxText
     |TextView|					MassSearchField
     |TextView|					EditMe
+    |GraphicsEditor| 			DrawMe
     |TextView|					Status
     |TextView|					StatsInfo
     |TextView|					SelInfo
@@ -83,6 +84,7 @@ class PerryIDE (Window)
 	|bool| 						LoadingFind
 	|bool|						ModifiedForCompile
 	|bool| 						UpdateMem
+	|bool| 						IsGraphics
 
 		
 	function UpdateStatusErrors
@@ -175,11 +177,10 @@ class PerryIDE (Window)
 
 
 	behaviour AppForeGroundChanged
-		.editme.document.checkmodified?
+		.CheckModified
 		.PopupHide
 		if !.focus
 			.setfocus(.editme)
-		//super.AppForegroundChanged(IsForeGround)
 	
 	
 	behaviour PostLoad
@@ -384,11 +385,15 @@ class PerryIDE (Window)
 				.ShowLeftStats
 				
 		if fc isa 32
-			.EditMe.document.checkmodified?
+			.CheckModified
 		
 		if !ShouldNotDisturbGUI and !.DebugArgsList.HasFocus
 			.HideStuff
 
+	function CheckModified
+		.EditMe.document.checkmodified?
+//		.drawme.document.checkmodified?
+		
 
 	function ProjClosed (|bool|)
 		opt norefcounts
@@ -622,12 +627,6 @@ class PerryIDE (Window)
 				if !i
 					i = IdeAddProj(data, nil) // need to find it, not use the front!
 			return i.OpenDoc(after, data, purpose)
-		
-	
-	function TryHideJB
-		.popuphide
-		if .editme.FindExpectsParse < 2
-			.editsep.Collapse
 
 		
 	function LoadErrors (|bool| jump, |bool| actual_compile) 
@@ -666,7 +665,7 @@ class PerryIDE (Window)
 
 	function EditRow (|listviewrow| r, |int|)
 		if r isa filerow
-			rz = .EditTextFile(r)
+			rz = .EditFile(r)
 			.filelist.ScrollJump
 
 
@@ -679,32 +678,62 @@ class PerryIDE (Window)
 		return .CurrFileRow.Location
 
 
-	function EditTextFile (|FileRow| r, |int|) // editfile, loadfile, fileload, fileedit, openfile, fileopen
+	function EditFile (|FileRow| r, |int|) // editfile, loadfile, fileload, fileedit, openfile, fileopen
 		require r and r.location and !.IsLoading
+		.CurrFileName.text = r.name
+		// the drawing thing needs a document too!
+		// why not the same?
+		// we could make editfield have an internal draw editor...
+		// but at that point we might as well make a general viewer...
+		// why not a 3D SDF viewer and audioplayer too.
+		// or a fileviewer or a gamepreview player
+		// better to have a generalised "fileviewer"
+		|| g = (r isa "voi" or "png" or "qoi")
+		if .IsGraphics != g
+			.IsGraphics = g
+			.ViewAsCurr
+		|| ok = (.EditDraw(r), .EditText(r))(g)
+		if ok != 1
+			return ok
+
+		.updatemem = true
+		.IsLoading++
+		.filelist.select(r)
+		
+		if !g
+			.editme.ClearErrors
+			.LoadErrors(true, false)
+			if .editme.FindExpectsParse < 2
+				.editsep.Collapse
+		
+		.popuphide
+		.AddToJumpHistory
+		if !g and .IsEditingSource and .feedback.closed
+			.Recheck
+		.IsLoading--
+		
+		return 1
+			
+
+	function EditDraw (|FileRow| r, |int|)
+		if .drawme.LoadFile(r.location)
+			return 1
+		
+
+	function EditText (|FileRow| r, |int|) // edittextfile, loadfile, fileload, fileedit, openfile, fileopen
 		|| E	= .editme
 		|| doc	= r.document
-		.CurrFileName.text = r.name
 		if e.document == doc
 			return -1
 		
 		|| Loaded =  E.LoadDocument(doc)
 		.ListAllFuncs
 		require Loaded
-		|| it = .projmsg
+		|| it = .ProjMsg
 			if !.isloading
 				it["edit"] = r.location
 			it["pos"] = doc.Position
 
-		.IsLoading++
-		.filelist.select(r)
-		e.ClearErrors
-		.LoadErrors(true, false)
-		.TryHideJB
-		.AddToJumpHistory
-		if .IsEditingSource and .feedback.closed
-			.Recheck
-		.updatemem = true
-		.IsLoading--
 		return 1
 
 
@@ -760,8 +789,14 @@ class PerryIDE (Window)
 				.StartupErrors <~ err.copy
 
 
+	function SaveDrawing
+		.DrawMe.Save
+
+
 	function SaveEditing (|int| Purpose) // savetext, savefile, filesave
 		opt norefcounts
+		if .DrawMe is visible
+			return .SaveDrawing
 		|| e = .editme
 		.ParseErrorDetect
 		

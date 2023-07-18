@@ -337,9 +337,13 @@ function ViewAsVis (|bool| vis)
 		.CurrFileName.size = 140~wide by 3~inside
 		.FileListersInside(.toolbar)
 	
+	|| IsPic = .IsGraphics
+	(.editme is visible) = !IsPic
+	(.drawme is visible) = IsPic
 	.reflow
 	if !.Focus.IsViewable
 		.editme.SetFocus
+	
 
 
 function FileListersInside (|guicontrol| dest)

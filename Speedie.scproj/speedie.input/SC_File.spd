@@ -166,7 +166,7 @@ function compiler.WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |&byte|)
 	cpp_wrapper JB_Img__WriteQOI
 
 
-function compiler.ConvertPNGToQBOI (|string| p, |string|)
+function compiler.ConvertPNGToVOI (|string| p, |string|)
 	rz = string.error
 	|| x	= 0
 	|| y	= 0

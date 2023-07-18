@@ -313,7 +313,7 @@ class FileViewer (ListView)
 				f.samenameasprev = false
 				|| old = D[f.name]
 					old.SameNameAsPrev = true
-					f.samenameasprev = true
+					f.SameNameAsPrev = true
 				d[f.name] = f
 		
 		for (f in rz) (i)

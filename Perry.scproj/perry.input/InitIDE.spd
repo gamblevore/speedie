@@ -29,6 +29,7 @@ extend PerryIDE
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
 		.LogArea			= ListView(self,		nil,					nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
+		.DrawMe				= GraphicsEditor(self)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
 		.Status				= TextView(self,		ClickedStatus,			nil)
 		.StatsInfo			= TextView(self,		ClickedStats,			nil)
@@ -243,6 +244,16 @@ extend PerryIDE
 			.onselerror		= EditMeSelError
 			.ColoriseAsRoot = autocomplete.functions
 
+		with .DrawMe
+			is   enabled
+			is   editable
+			isnt drawsfocus
+			.ID				= "DrawMe"
+			//.ShowLineNumbers=true
+			.size = the~width by the~bottom to 0~before 
+			.takesfocus		= takesfocusflag.On
+			.gnormal.solid	= (0.0, 0.0, 0.0, 0.81)
+
 
 		with .status 
 			.ID				= "Status"
@@ -296,6 +307,7 @@ extend PerryIDE
 			.AddLow  self.StdOutBorder
 			.addhigh self.rborder
 			.addhigh self.editme
+			.addhigh self.drawme
 
 
 		.JeeboxText.SetupOut("jeebox")
