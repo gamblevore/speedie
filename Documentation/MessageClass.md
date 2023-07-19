@@ -21,9 +21,7 @@ I guess the first best place to understand the `message` class is to look at it'
 
 These 4 properties are enough for Jeebox to be able to define a tree. When you alter any of these properties, the others are modified for you, to keep the whole thing self-consistant. You can alter `.parent`, `.prev.`, `.next` or `.first`!
 
-Message has a lot of other functions such as `.Last` or `.Root`. They are computed rather than actual stored properties in memory. Its usually more useful to think in terms of `.first` and `.last` being real properties, even if `.last` is computed.
-
-`.last` by the way actually is accessed almost immediately even with 1 million children, because `Message` (secretly) stores "`.first.prev = .last`" pretty cool huh! You don't see that behaviour, cos if you read `.first.prev` you will always get `nil`. But the fact is... that `.last` is constant time and fast no matter how many nodes you have. `.first` and `.last` are fast.
+Message has a lot of other functions such as `.Last` or `.Root`. They are computed rather than actual stored properties in memory. `.last` is fast, don't worry.
 
 
 ### Definition Properties:
