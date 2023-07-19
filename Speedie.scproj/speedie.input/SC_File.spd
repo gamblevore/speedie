@@ -158,22 +158,21 @@ function string.DebugExecute (|[string]| Args=nil, |faststring|Out=nil, |faststr
 	return .Execute(args, out, errs, false)
 	
 
-function compiler.LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |&byte|)
-	cpp_wrapper JB_Img__LoadPNG
+module image
+	function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |&byte|)
+		cpp_wrapper JB_Img__LoadPNG
 
+	function WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |&byte|)
+		cpp_wrapper JB_Img__WriteQOI
 
-function compiler.WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |&byte|)
-	cpp_wrapper JB_Img__WriteQOI
-
-
-function compiler.ConvertPNGToVOI (|string| p, |string|)
-	rz = string.error
-	|| x	= 0
-	|| y	= 0
-	|| comp	= 0
-	|| img = .loadpng( p.addr, p.length, &x, &y, &comp, 4 )
-		|| n = 0
-		|| qoi = .writeqoi(img, x, y, n)
-			rz = string.Own(qoi, n).compress(mzlab.Fast)
-	memory.free(img)
+	function ConvertPNGToVOI (|string| p, |string|)
+		rz = string.error
+		|| x	= 0
+		|| y	= 0
+		|| comp	= 0
+		|| img = .loadpng( p.addr, p.length, &x, &y, &comp, 4 )
+			|| n = 0
+			|| qoi = .writeqoi(img, x, y, n)
+				rz = string.Own(qoi, n).compress(mzlab.Fast)
+		memory.free(img)
 
