@@ -789,27 +789,6 @@ SCClass* SC_Comp__Constpiler(JB_String* name) {
 	return rz;
 }
 
-JB_String* SC_Comp__ConvertPNGToQBOI(JB_String* p) {
-	JB_String* rz = JB_Incr(JB_LUB[0]);
-	JB_SetRef(rz, JB_Str__Error());
-	int x = 0;
-	int y = 0;
-	int comp = 0;
-	byte* img = JB_Img__LoadPNG(p->Addr, JB_Str_Length(p), (&x), (&y), (&comp), 4);
-	if (img) {
-		int n = 0;
-		byte* qoi = JB_Img__WriteQOI(img, x, y, (&n));
-		if (qoi) {
-			JB_String* _tmPf0 = JB_Incr(JB_Str__Freeable(qoi, n));
-			JB_SetRef(rz, JB_Str_Compress(_tmPf0, kJB__MZLab_Strongest, nil));
-			JB_Decr(_tmPf0);
-		}
-	}
-	JB_free(img);
-	JB_SafeDecr(rz);
-	return rz;
-}
-
 void SC_Comp__CreateDisambiguation() {
 	JB_SetRef(SC__Comp_DisamClasses, SC_Mod__NewContainer(JB_LUB[43]));
 	JB_SetRef(SC__Comp_DisamModules, SC_Mod__NewContainer(JB_LUB[44]));
@@ -2275,7 +2254,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (110714003522969)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (110740933691839)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3580,7 +3559,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[242]);
-	JB_FS_AppendInt32(_fsf0, (2023071420));
+	JB_FS_AppendInt32(_fsf0, (2023071914));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7401,7 +7380,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[509]);
-	JB_FS_AppendInt32(_fsf0, (2023071420));
+	JB_FS_AppendInt32(_fsf0, (2023071914));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8664,6 +8643,28 @@ AsmReg SC_asmOps__SHR(ASMFuncState* self, AsmReg dest, AsmReg L, AsmReg R, Messa
 }
 
 
+
+
+JB_String* SC_image__ConvertPNGToVOI(JB_String* p) {
+	JB_String* rz = JB_Incr(JB_LUB[0]);
+	JB_SetRef(rz, JB_Str__Error());
+	int x = 0;
+	int y = 0;
+	int comp = 0;
+	byte* img = JB_Img__LoadPNG(p->Addr, JB_Str_Length(p), (&x), (&y), (&comp), 4);
+	if (img) {
+		int n = 0;
+		byte* qoi = JB_Img__WriteQOI(img, x, y, (&n));
+		if (qoi) {
+			JB_String* _tmPf0 = JB_Incr(JB_Str__Freeable(qoi, n));
+			JB_SetRef(rz, JB_Str_Compress(_tmPf0, kJB__MZLab_Fast, nil));
+			JB_Decr(_tmPf0);
+		}
+	}
+	JB_free(img);
+	JB_SafeDecr(rz);
+	return rz;
+}
 
 
 void SC___junktest_1__() {
@@ -14887,6 +14888,11 @@ void JB_Tk__StopParse() {
 	JB_Tk__StartParse(nil);
 }
 
+Message* JB_Tk__ThingXMLAtt(int start, Message* Parent) {
+	int name = JB_Tk__WordAfterSub(start, JB__Constants_XMLWordMiddle);
+	return JB_Tk__NewParent(Parent, JB_SyxXAtt, start, name);
+}
+
 void JB_Tk__TokensFn(Array* arr, int bits, ParseHandler func) {
 	TokHan* _tmPf0 = JB_Incr(JB_Tk__Handler(bits, ((TokenHandler_fp)func)));
 	JB_Tk__TokensHan(arr, _tmPf0);
@@ -14936,9 +14942,13 @@ bool JB_Tk__WillEnd() {
 }
 
 int JB_Tk__WordAfter(int Start) {
+	return JB_Tk__WordAfterSub(Start, JB__Constants_CSWordMiddle);
+}
+
+int JB_Tk__WordAfterSub(int Start, CharSet* cs) {
 	int n = JB_Str_Length(JB__Tk_Data);
 	if (Start < n) {
-		Ind After = JB_Str_OutCharSet(JB__Tk_Data, JB__Constants_CSWordMiddle, Start, JB_int__max());
+		Ind After = JB_Str_OutCharSet(JB__Tk_Data, cs, Start, JB_int__max());
 		if ((!JB_Ind_SyntaxCast(After))) {
 			After = n;
 		}
@@ -14952,29 +14962,23 @@ int JB_Tk__WordAfter(int Start) {
 }
 
 int JB_Tk__XMLAttribs(Message* XML, int start) {
-	Message* AllAtts = JB_Incr(JB_Tk__NewParentName(XML, JB_SyxArg, start, JB_LUB[0]));
+	Message* AllAtts = JB_Incr(JB_Tk__NewParentName(XML, JB_SyxList, start, JB_LUB[0]));
 	JB_String* s = JB_Incr(JB__Tk_Data);
 	while (true) {
-		int i = JB_Tk__NextStart();
-		byte c = 0;
-		while (i < JB_Str_Length(s)) {
-			c = JB_Str_ByteValue(s, i);
-			if ((!JB_byte_IsWhite(c))) {
-				break;
-			}
-			i++;
-		};
+		Ind i = JB_Str_OutWhite(s, JB_Tk__NextStart(), JB_int__max());
+		if ((!JB_Ind_SyntaxCast(i))) {
+			break;
+		}
+		byte c = JB_Str_ByteValue(s, i);
 		if ((c == '>') or ((c == '/') and (JB_Str_ByteValue(s, i + 1) == '>'))) {
 			JB_Decr(AllAtts);
 			JB_Decr(s);
 			return i;
 		}
-		if ((!(JB_CS_HasChar(JB__Constants_CSWordStart, c)))) {
+		if ((!JB_CS_HasChar(JB__Constants_CSWordStart, c))) {
 			break;
 		}
-		Message* Attr = JB_Incr(JB_Tk__fThingWord(i, nil));
-		Attr->Func = JB_SyxXAtt;
-		JB_Tree_SyntaxAppend(AllAtts, Attr);
+		Message* Attr = JB_Incr(JB_Tk__ThingXMLAtt(i, AllAtts));
 		if ((!JB_Tk__ExpectEndChar(JB_Tk__NextStart(), JB_LUB[580], true))) {
 			JB_Decr(AllAtts);
 			JB_Decr(s);
@@ -25753,7 +25757,7 @@ Message* JB_SS_Parse_Jbin(StringReader* self) {
 		};
 	}
 	 else if (T == 2) {
-		JB_SetRef(rz, JB_SS_Parse_Jbliz(self));
+		JB_SetRef(rz, JB_SS_Parse_jbz(self));
 	}
 	 else {
 		if ((!false)) {
@@ -25765,7 +25769,7 @@ Message* JB_SS_Parse_Jbin(StringReader* self) {
 	return rz;
 }
 
-Message* JB_SS_Parse_Jbliz(StringReader* self) {
+Message* JB_SS_Parse_jbz(StringReader* self) {
 	Message* rz = JB_Incr(((Message*)nil));
 	MessageDecompressor Decomp = ((MessageDecompressor){});
 	JB_SetRef(rz, ((Message*)JB_SS_NextMsgInfo(self, false)));
@@ -43261,7 +43265,7 @@ Message* SC_Func__GetFileString(Message* msg, JB_String* name) {
 	if (JB_File_SyntaxCast(f)) {
 		JB_String* data = JB_Incr(JB_File_ReadAll(f, 134217728, true));
 		if (JB_Msg_SyntaxEquals(msg, JB_LUB[1799], true)) {
-			JB_SetRef(data, SC_Comp__ConvertPNGToQBOI(data));
+			JB_SetRef(data, SC_image__ConvertPNGToVOI(data));
 		}
 		JB_Msg_BecomeStr(msg, JB_SyxStr, data);
 		JB_Decr(data);
@@ -46816,4 +46820,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 1254378509968506638 3758141352381374696
+// -1355759962796668235 3758141352381374696

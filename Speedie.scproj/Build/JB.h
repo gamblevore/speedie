@@ -2171,8 +2171,6 @@ void SC_Comp__CompileTime();
 
 SCClass* SC_Comp__Constpiler(JB_String* name);
 
-JB_String* SC_Comp__ConvertPNGToQBOI(JB_String* p);
-
 void SC_Comp__CreateDisambiguation();
 
 SCFunction* SC_Comp__CreateFuncFromSource(JB_String* Src);
@@ -3105,6 +3103,11 @@ AsmReg SC_asmOps__SHR(ASMFuncState* self, AsmReg dest, AsmReg L, AsmReg R, Messa
 // exec
 
 
+// image
+JB_String* SC_image__ConvertPNGToVOI(JB_String* p);
+
+
+
 // main
 void SC___junktest_1__();
 
@@ -3635,6 +3638,8 @@ void JB_Tk__StopParse();
 
 inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f);
 
+Message* JB_Tk__ThingXMLAtt(int start, Message* Parent);
+
 void JB_Tk__TokensFn(Array* arr, int bits, ParseHandler func);
 
 void JB_Tk__TokensHan(Array* arr, TokHan* H);
@@ -3648,6 +3653,8 @@ Message* JB_Tk__UnTmpPlace(Message* R);
 bool JB_Tk__WillEnd();
 
 int JB_Tk__WordAfter(int Start);
+
+int JB_Tk__WordAfterSub(int Start, CharSet* cs);
 
 int JB_Tk__XMLAttribs(Message* XML, int start);
 
@@ -6207,7 +6214,7 @@ bool JB_SS_NoMoreChunks(StringReader* self);
 
 Message* JB_SS_Parse_Jbin(StringReader* self);
 
-Message* JB_SS_Parse_Jbliz(StringReader* self);
+Message* JB_SS_Parse_jbz(StringReader* self);
 
 int64 JB_SS_Position(StringReader* self);
 
