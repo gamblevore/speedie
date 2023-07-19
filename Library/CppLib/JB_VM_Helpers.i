@@ -129,7 +129,7 @@ AlwaysInline uint bitstats32(s64* r, ASM Op) {
 AlwaysInline JB_Object* alloc(_voidptr o) {
 	// we need a class table, and look it up from there.
 	// we don't have dynamicly created classes anyhow...
-	return JB_Alloc((JB_MemoryLayer*)o);
+	return JB_AllocFrom(((JB_MemoryLayer*)o)->CurrBlock);
 }
 
 

@@ -100,7 +100,7 @@ struct JBObject_Behaviour;
 #define JB_NewClass(name)       (JB_Object*)(JB_AllocNew(name->DefaultBlock))
 #define JB_New(name)            (name*)(JB_AllocNew((name ## Data).DefaultBlock))
 #define JB_NewEmpty(name)       (name*)(ClearFor_(JB_New(name), sizeof(name)))
-#define JB_LayerNew(L, name)    (name*)(JB_AllocFrom(L))
+#define JB_LayerNew(L, name)    (name*)(JB_AllocNew(L->CurrBlock))
 #define JB_Zero(name)           (ClearFor_((void*)(name), sizeof(__typeof__(*name))))
 #define JBStructData(a)         extern JB_Class a ## Data;
 #define JBClass(a, b, c)        struct a : b {c}; JBStructData(a);
@@ -260,7 +260,6 @@ void JB_TotalMemorySet(bool b);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__hot JB_Object* JB_AllocFrom( JB_MemoryLayer* Mem );
 __hot JB_Object* JB_AllocNew( AllocationBlock* CurrBlock );
 void JB_Delete( FreeObject* Obj );
 void JB_FindLeakedObject(JB_Object* Obj, Array* R);

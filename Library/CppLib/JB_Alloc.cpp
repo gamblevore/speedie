@@ -1209,11 +1209,6 @@ __hot JB_Object* JB_AllocNew( AllocationBlock* CurrBlock ) {
 }
 
 
-__hot JB_Object* JB_AllocFrom( JB_MemoryLayer* Mem ) {
-    return JB_AllocNew( Mem->CurrBlock );
-}
-
-
 JB_MemoryWorld* JB_MemStandardWorld() {
     return &MemoryManager;
 }
