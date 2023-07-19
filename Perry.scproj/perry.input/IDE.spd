@@ -232,6 +232,11 @@ class PerryIDE (Window)
 
 
 	function ShowRightStats
+		if .isgraphics
+			(.selinfo isnt visible)
+			return
+		
+		(.selinfo is visible)
 		|| fs = FastString()
 		|| t = .Editme.Text
 		|| sel0 = .editme.sel0
@@ -691,7 +696,9 @@ class PerryIDE (Window)
 		|| g = (r isa "voi" or "png" or "qoi")
 		if .IsGraphics != g
 			.IsGraphics = g
+			.IsLoading++
 			.ViewAsCurr
+			.IsLoading--
 		|| ok = (.EditDraw(r), .EditText(r))(g)
 		if ok != 1
 			return ok

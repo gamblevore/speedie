@@ -128,7 +128,6 @@ function ThreadName (assigns:|string|)
 function AppName (|string|)
 	return .apppath.name
 
-
 function AppPath (|string|)
 	if platform.osx
 		return .path.backtoapp
@@ -140,10 +139,11 @@ function CalledName (|string|)
 function TurnInto (|string| s, |[string]| R=nil, |errorint|)
 	cpp_Wrapper JB_App__TurnInto
 
+function Fork (|PID_Int|)
+	cpp_wrapper JB_App__Fork
 
 function ObjMemory (|int64|)
 	cpp_wrapper JB_MemCount
-
 
 function StringMemory (|int64|)
 	return Memory.used

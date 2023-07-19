@@ -25,7 +25,7 @@ module ProcessTest
 
 
 	function ParentTest (|bool| ChildDying, |bool| Slow)
-		|| chld = app.fork(app.rawargs)
+		|| chld = app.StartChild(app.rawargs)
 		chld.canprint = ChildDying|int|
 		for i in 1 to 10000
 			chld <~ "\n\n\nhello " + i.render
@@ -57,7 +57,7 @@ module ProcessTest
 
 		
 	function ParentDieTest (|bool| timeout)
-		|| chld = app.fork(app.rawargs)
+		|| chld = app.StartChild(app.rawargs)
 		chld.canprint = 1
 		chld.DieOrTimeout(timeout)
 		(chld)

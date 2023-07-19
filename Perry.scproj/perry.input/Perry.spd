@@ -36,15 +36,20 @@ module Perry
 				return true
 		
 		
-	function LoadWindowsFromArgs (|PerryIDE| r, |bool|)
+	function LoadWindowsFromArgs (|bool|)
 		for arg in app.args // load specified documents
-			|| line = (0, 0)
-			|| path = arg.ExtractPathAndLine(line)
-			if path.FileExists or path.write("")
-				|| win = sdlapp.OpenDocument(path)
-				if win isa PerryIDE
-					rz = true
-					win.editme.ViewLineAndSel(line.x)
+			if .LoadAppArg(arg)
+				rz = true
+	
+	
+	function LoadAppArg (|string| arg, |bool|)
+		|| line = (0, 0)
+		|| path = arg.ExtractPathAndLine(line)
+		require path.FileExists or path.write("")
+		|| win = sdlapp.OpenDocument(path)
+		if win isa PerryIDE
+			win.editme.ViewLineAndSel(line.x)
+			return true
 		
 	
 	
@@ -95,7 +100,7 @@ module Perry
 		i.LoadState
 		i.ViewAsText
 		|| Normal = .LoadWindowsSub(i)
-		|| FromArgs = .LoadWindowsFromArgs(i)
+		|| FromArgs = .LoadWindowsFromArgs
 		if !Normal and !FromArgs
 			startupwindow.show
 			return 0
