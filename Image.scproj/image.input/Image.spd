@@ -335,24 +335,24 @@ class Image (memory)
 			
 	function DrawTo (|image| Where, |ivec2| D=(0,0), |drawstyle| g=nil)
 		D += where.controlclip.xy
-		|| OurShit = ._Controlclip // take our shit
-		|| Up = OurShit + D // move it up
-		|| ClippedShit = where.clip(up) //clip the shit
-		|| BackDown = ClippedShit - D // move the shit back down
+		|| OurShit = ._Controlclip		// take our shit
+		|| Up = OurShit + D				// move it up
+		|| ClippedShit = where.clip(up) // clip the shit
+		|| BackDown = ClippedShit - D	// move the shit back down
 		
-		|| b1 = g.seps?
-		|| b2 = g.edge?
-		for (P in self[BackDown]) (V)
-			|| pp = *p
-			|| C = where[v+d]
-			if !g  or  p.a >= 255 
-				*c = pp
-			  elseif (v.x>>4) + (v.y>>4) isa 2
-				pp.overlay(b1)
-				*c = pp
-			  else
-				pp.overlay(b2)
-				*c = pp
+		if !g
+			for (P in self[BackDown]) (V)
+				where[v+d] <~ p
+		  else
+			|| b1 = g.seps
+			|| b2 = g.edge
+			for (P in self[BackDown]) (V)
+				|| pp = *p
+				if (v.x>>4) + (v.y>>4) isa 2
+					pp.underlay(b1)
+				  else
+					pp.underlay(b2)
+				where[v+d] <~ pp
 	
 	
 	syntax access (|ivec4| rect, |imagereader|)

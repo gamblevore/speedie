@@ -147,12 +147,12 @@ struct ImagePixel
 	
 	function Overlay (|vec4| T)
 		|| C = mix(self, T, T.a)
-		.rgb = c // why not set .a also? would mean I can store it using __builtinconvert
+		self <~ c // why not set .a also? would mean I can store it using __builtinconvert
 
 	function Underlay (|vec4| b) 
 		|| Old = .color
 		|| C = mix(b, Old, Old.a)
-		C.a = b.a
+		// C.a = b.a // why?
 		self <~ C 
 	
 	
