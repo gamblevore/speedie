@@ -40,7 +40,7 @@ Each of these features was designed expertly and to a high degree of care. For e
 
 * The inbuilt todo list, is available by clicking on your current project's tab. Clicking again returns you. I find this invaluable for my project management. This means your todo-list is always at-hand. Really vital.
 
-* The quick file-finding feature, is accessed via Cmd-L (control-L on Linux). This brings up a list of files that contain the name. You can also paste file-paths in there, to see all the files in that folder.
+* The quick file-finding feature, is accessed via Cmd-D (control-D on Linux). This brings up a list of files that contain the name. You can also paste file-paths in there, to see all the files in that folder.
 
 
 

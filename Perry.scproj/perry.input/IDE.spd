@@ -481,13 +481,13 @@ class PerryIDE (Window)
 			  else
 				clickedCreateproj(self)
 			return true
-		if key is d
+		if key is l // l = file list
 			if keys.option or keys.Shift
 				RightClickNext(.goprev)
 				return .goprev.searchmenu
 			  else
 				return .ShowQuickStuff(true)
-		if key is l				// l=line jump
+		if key is d
 			return .ShowQuickStuff(false)
 		if key is b
 			Clickedcompile(.buildbutton)
