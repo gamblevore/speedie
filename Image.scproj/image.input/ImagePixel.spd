@@ -77,7 +77,7 @@ struct ImagePixel
 		.a = a.clamp(255)
 		
 	syntax append (|&imagepixel| r)
-		self <~ r.Uint
+		* self = *r
 
 	syntax append (|vec4| V)
 		cpp_part AppendVec

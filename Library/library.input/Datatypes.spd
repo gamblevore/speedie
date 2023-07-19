@@ -868,6 +868,12 @@ datatype ivec4
 	function vec4 (|vec4|)
 		return (.x|float|, .y|float|, .z|float|, .w|float|)
 
+	operator minus (|ivec2| D, |ivec4|)
+		return self - (D,D)
+
+	operator plus (|ivec2| D, |ivec4|)
+		return self + (D,D)
+
 	operator right (|int|x, |ivec4|)
 		return self + (x,0,x,0)
 	
@@ -1151,9 +1157,11 @@ datatype IntRange (ivec2)
 		return .X==i and .X2==i
 
 	iterator
-		while (.x < .x2)
-			yield .x (.x)
-			.x++
+		|| _End = .x2
+		|| _Curr = .x
+		while (_curr < _end)
+			yield _Curr (_Curr)
+			_Curr++
 
 
 

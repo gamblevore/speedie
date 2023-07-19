@@ -72,6 +72,12 @@ class Image (memory)
 		._controlclip.x = r.x
 		._controlclip.x2 = r.x2
 	
+	function horz (|intrange|)
+		return ._Controlclip.x1x2
+	
+	function vert (|intrange|)
+		return ._Controlclip.y1y2
+	
 		
 	function Clip (|ivec4| R, |ivec4|)
 		if (self)
@@ -267,15 +273,15 @@ class Image (memory)
 		function WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |&byte|)
 			cpp_wrapper JB_Img__WriteQOI
 
-		function string.LoadQOI (|image|)
+		function string.LoadQOI (|string| name="", |image|)
 			|int[2]| xy
 			|| str = .decompress
 			|| buff = image.loadqoi( str.addr, str.length, xy )
-				return image((xy[0], xy[1]), buff)
+				return image((xy[0], xy[1]), buff, name)
 
 		function file.LoadQOI (|image|)
 			|| s = .readall
-				return s.loadqoi #expect (.path, "Failed to read image.")
+				return s.loadqoi(self) #expect (.path, "Failed to read image.")
 
 		function image.WriteQOI (|string|)
 			|| l = .BytesUsed
@@ -319,27 +325,34 @@ class Image (memory)
 		return mix(T, B, 1.0-C)	// interpolate by how dark the pixel is.
 
 	
-	function DrawCentered (|image| Where)
+	function DrawCentered (|image| Where, |drawstyle| g = nil)
 		|| Diff = (where.CurrSize - .CurrSize)/2
-		.drawto(where, diff)
+		.drawto(where, diff, g)
 	
 	function CurrSize (|ivec2|)
 		return ._controlclip.size
 	
-	function ivec4.operatorminus (|ivec2| D, |ivec4|)
-		return self - (D,D)
-	function ivec4.operatorplus (|ivec2| D, |ivec4|)
-		return self + (D,D)
-	
-	function DrawTo (|image| Where, |ivec2| D=(0,0))
+			
+	function DrawTo (|image| Where, |ivec2| D=(0,0), |drawstyle| g=nil)
 		D += where.controlclip.xy
 		|| OurShit = ._Controlclip // take our shit
 		|| Up = OurShit + D // move it up
 		|| ClippedShit = where.clip(up) //clip the shit
 		|| BackDown = ClippedShit - D // move the shit back down
 		
+		|| b1 = g.seps?
+		|| b2 = g.edge?
 		for (P in self[BackDown]) (V)
-			Where[v + d] <~ P
+			|| pp = *p
+			|| C = where[v+d]
+			if !g  or  p.a >= 255 
+				*c = pp
+			  elseif (v.x>>4) + (v.y>>4) isa 2
+				pp.overlay(b1)
+				*c = pp
+			  else
+				pp.overlay(b2)
+				*c = pp
 	
 	
 	syntax access (|ivec4| rect, |imagereader|)

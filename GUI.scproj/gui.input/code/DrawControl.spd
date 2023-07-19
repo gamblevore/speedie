@@ -10,6 +10,8 @@ class DrawToolBar (Guicontrol)
 
 
 class GraphicsEditor (GuiControl)
+	linkage
+		cpp_part Draw
 	|[image]|				Layers
 	|image| 				Merged
 	|file| 					Backing
@@ -21,19 +23,20 @@ class GraphicsEditor (GuiControl)
 		if d.IsJbin
 			rz = .LoadNative(d)
 		  else
-			rz = .LoadImage(d)
+			rz = .LoadImage(d, .backing)
 		.Merged = nil
 		.Merged = image(.size)
 	
 	function Size (|ivec2|)
 		opt norefcounts
 		return .Layers[0]$.size
-			
-	behaviour Draw
-		where.drawrect(self, .gnormal, 1.0)
-		
-		.merged.Drawcentered(where)
 	
+	behaviour Draw
+		#!Findme:P
+		where.fillrect(self, .gnormal.bg)
+		.merged.Drawcentered(where, .gnormal)
+
+
 	helper LoadNative (|string| f, |bool|)
 		return false
 		|| root = f.parse_jbin
@@ -115,11 +118,11 @@ class GraphicsEditor (GuiControl)
 		|| data = path.ReadFile			#require
 		if path isa "png"
 			data = image.ConvertPNGToVOI(data) #require
-		.loadimage(data)
+		.loadimage(data, path)
 
 
-	helper LoadImage (|string| data, |bool|)
-		|| p = data.Loadqoi
+	helper LoadImage (|string| data, |string| path, |bool|)
+		|| p = data.Loadqoi(path)
 			.Merged = p
 			return true
 

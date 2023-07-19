@@ -305,10 +305,10 @@ class GUIControl (ringtree)
 	setter After (|int|)
 		.sizer.g(0) = (value)~after
 
-	function Horz (|ivec2|)
+	function Horz (|intrange|)
 		return .lastrect.x1x2
 
-	function Vert (|ivec2|)
+	function Vert (|intrange|)
 		return .lastrect.xx2
 
 	setter Under (|int|)
