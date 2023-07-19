@@ -195,7 +195,7 @@ helper StringReader.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
 		.UserObj = msg
 
 
-helper StringReader.Parse_Jbliz (|MessageRoot|)
+helper StringReader.Parse_jbz (|MessageRoot|)
 	|MessageDecompressor| Decomp
 	rz = .NextMsginfo|messageroot|
 	Decomp <~ rz|message|
@@ -218,7 +218,7 @@ function StringReader.Parse_Jbin (|MessageRoot|)
 		rz = .NextMsginfo|messageroot|
 		while .NextMsginfo
 	  elseif T == 2
-		rz = .parse_jbliz
+		rz = .parse_jbz
 	  else
 		error (self, _jBinNotJbin)
 
