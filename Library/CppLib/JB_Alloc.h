@@ -143,23 +143,23 @@ struct AllocationBlock {
     AllocationBlock*        Prev;
     JBObject_Behaviour*     FuncTable;		// speed things up a bit.
     SuperBlock*             Super;
+
     u16                     ObjCount;
     u16                     HiddenObjCount;
-
     u16                     CurrFast;		// allocate these in a line... 
     u16                     MaxFast;		// until we hit the max
 
-    u16                     ObjSize;
     u16                     Unused_;
     u16                     Unused2_;
     u16                     Unused3_;
+    u16                     ObjSize;
 };
 
 
 struct JB_MemoryLayer : JB_Object  { // is actually a JBObject... but a clang bug won't let me use "JBClass(JB_MemoryLayer..."
     u16                 HiddenRefCount;
     bool                IsActive;
-    bool                DontAlloc;
+    bool                BoostMode;
     AllocationBlock*    CurrBlock;
     JB_Class*           Class;
     AllocationBlock*    SpareBlock;

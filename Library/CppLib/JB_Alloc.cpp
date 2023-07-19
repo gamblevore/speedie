@@ -676,22 +676,26 @@ void* JB_BlockShadow(AllocationBlock* B) {
 }
 
 
-static void InitObjectsInBlock_(AllocationBlock* NewBlock, JB_MemoryWorld* W, int Size) {
+static void InitObjectsInBlock_(JB_MemoryLayer* Mem, AllocationBlock* NewBlock, JB_MemoryWorld* W, int Size) {
+	NewBlock->ObjSize = Size;
     auto oof = NewBlock->Owner;
-    NewBlock->ObjSize = Size;
     int BS = W->BlockSize;
     int BlockBits = (1 << BS) - 1;
-    
     FreeObject* Curr = (FreeObject*)(((IntPtr)NewBlock) &~ BlockBits);
+    NewBlock->FirstFree = Curr; // for LinkIn_
+	if (Mem->BoostMode) {
+		return;
+	}
+
     FreeObject* TrueFirst = NewBlock->Super->StartObj;
     if (Curr < TrueFirst) {
         Curr = TrueFirst;
     }
     
-    FreeObject* End =  (FreeObject*)NewBlock;
-    dbgexpect(Curr < End);
+    FreeObject* End =  (FreeObject*)NewBlock;		// we aren't using shadows anymore...
+    dbgexpect(Curr < End);							// it was a bad design...
     dbgexpect(!W->ShadowSize or W->ShadowSize > 3);
-    int Shadow = (1 << W->ShadowSize) &~ 1; // incase it's 0
+    int Shadow = (1 << W->ShadowSize) &~ 1;		// incase it's 0
     End = JBShift(End, -Shadow);
     dbgexpect(Curr < End);
     void* ShadowEnd = JB_BlockShadow(NewBlock);
@@ -743,8 +747,9 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
     NewBlock->FuncTable = NeedRealTable_(Class->FuncTable); // helps avoid touching uncached RAM.
     NewBlock->Owner = Mem;
 
-    if (NewBlock->ObjSize != Class->Size) {
-        InitObjectsInBlock_( NewBlock, World, Class->Size );
+	int Size = Class->Size;
+    if (NewBlock->ObjSize != Size) {
+		InitObjectsInBlock_( Mem, NewBlock, World, Size );
     }
 
     SelfLink_((LinkHelper*)NewBlock);
@@ -776,7 +781,6 @@ void JB_OutOfMainMemory(int64 N) {
 bool JB_OutOfMemoryOccurred () {
     return OutOfMemoryHappenedAlready;
 }
-
 
 
 static SuperBlock* Super_calloc(JB_MemoryWorld* World) {
@@ -911,10 +915,6 @@ static u16 HiddenRef_(float R, int Size) {
 
 static FreeObject* NewBlock( AllocationBlock* CurrBlock ) {
     JB_MemoryLayer* Mem = CurrBlock->Owner;
-    if (Mem->DontAlloc) {
-		failed("dontalloc");
-        return 0;
-    }
     JB_MemoryWorld* World = Mem->World;
     if (!IsDummy(CurrBlock)) {
         u16 Hidden = Mem->HiddenRefCount;       // trigger re-use of this block before it hits empty.
