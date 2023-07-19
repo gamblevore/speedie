@@ -97,10 +97,10 @@ struct JBObject_Behaviour;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define kObjMinSize 16 // safer.
 #define JB_MArray(type, num)    ((type*)(JB_MArray_(sizeof(type),num)))
-#define JB_NewClass(name)       (JB_Object*)(JB_Alloc2(name->DefaultBlock))
-#define JB_New(name)            (name*)(JB_Alloc2((name ## Data).DefaultBlock))
+#define JB_NewClass(name)       (JB_Object*)(JB_AllocNew(name->DefaultBlock))
+#define JB_New(name)            (name*)(JB_AllocNew((name ## Data).DefaultBlock))
 #define JB_NewEmpty(name)       (name*)(ClearFor_(JB_New(name), sizeof(name)))
-#define JB_LayerNew(L, name)    (name*)(JB_Alloc(L))
+#define JB_LayerNew(L, name)    (name*)(JB_AllocFrom(L))
 #define JB_Zero(name)           (ClearFor_((void*)(name), sizeof(__typeof__(*name))))
 #define JBStructData(a)         extern JB_Class a ## Data;
 #define JBClass(a, b, c)        struct a : b {c}; JBStructData(a);
@@ -137,17 +137,22 @@ struct JB_Object {
 
 
 struct AllocationBlock {
-    JB_MemoryLayer*         Owner;      // these two...
-    FreeObject*             FirstFree;  // have to be first...
+    JB_MemoryLayer*         Owner;    		// these two...
+    FreeObject*             FirstFree;		// have to be first...
     AllocationBlock*        Next;
     AllocationBlock*        Prev;
-    JBObject_Behaviour*     FuncTable; // speed things up a bit.
+    JBObject_Behaviour*     FuncTable;		// speed things up a bit.
+    SuperBlock*             Super;
     u16                     ObjCount;
     u16                     HiddenObjCount;
 
+    u16                     CurrFast;		// allocate these in a line... 
+    u16                     MaxFast;		// until we hit the max
+
     u16                     ObjSize;
     u16                     Unused_;
-    SuperBlock*             Super;		// seems like this takes 56 bytes on x64
+    u16                     Unused2_;
+    u16                     Unused3_;
 };
 
 
@@ -255,8 +260,8 @@ void JB_TotalMemorySet(bool b);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__hot JB_Object* JB_Alloc( JB_MemoryLayer* Mem );
-__hot JB_Object* JB_Alloc2( AllocationBlock* CurrBlock );
+__hot JB_Object* JB_AllocFrom( JB_MemoryLayer* Mem );
+__hot JB_Object* JB_AllocNew( AllocationBlock* CurrBlock );
 void JB_Delete( FreeObject* Obj );
 void JB_FindLeakedObject(JB_Object* Obj, Array* R);
 void JB_Mem_ClassLeakCounter ();

@@ -504,7 +504,7 @@ JB_MemoryLayer* JB_Class_CurrLayer( JB_Class* Cls ) {
 
 
 JB_Object* JB_Class_AllocZeroed( JB_Class* Cls ) {
-    JB_Object* Result = JB_Alloc2(Cls->DefaultBlock);
+    JB_Object* Result = JB_AllocNew(Cls->DefaultBlock);
     if (Result) {
         memzero(Result, Cls->Size);
     }
@@ -902,10 +902,10 @@ static AllocationBlock* ReturnSpare_(JB_MemoryLayer* Mem) {
 }
 
 
-static u16 HiddenRef_(float R, int ObjSize) {
+static u16 HiddenRef_(float R, int Size) {
     int N = (1<<kBlockSize) - sizeof(AllocationBlock);
     int N2 = N * R;
-    return N2 / ObjSize;
+    return N2 / Size;
 }
 
 
@@ -1194,7 +1194,7 @@ static inline JB_Object* Trap_(FreeObject* Obj, AllocationBlock* B) {
 }
 
 
-__hot JB_Object* JB_Alloc2( AllocationBlock* CurrBlock ) {
+__hot JB_Object* JB_AllocNew( AllocationBlock* CurrBlock ) {
 	Sanity(CurrBlock);
     auto Obj = CurrBlock->FirstFree;
     if_usual (Obj) {
@@ -1209,8 +1209,8 @@ __hot JB_Object* JB_Alloc2( AllocationBlock* CurrBlock ) {
 }
 
 
-__hot JB_Object* JB_Alloc( JB_MemoryLayer* Mem ) {
-    return JB_Alloc2( Mem->CurrBlock );
+__hot JB_Object* JB_AllocFrom( JB_MemoryLayer* Mem ) {
+    return JB_AllocNew( Mem->CurrBlock );
 }
 
 
