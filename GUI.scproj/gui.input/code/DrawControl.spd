@@ -30,7 +30,9 @@ class GraphicsEditor (GuiControl)
 		return .Layers[0]$.size
 			
 	behaviour Draw
-		.merged.DrawTo(where)
+		where.drawrect(self, .gnormal, 1.0)
+		
+		.merged.Drawcentered(where)
 	
 	helper LoadNative (|string| f, |bool|)
 		return false

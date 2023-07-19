@@ -1178,10 +1178,12 @@ datatype ivec2
 
 	function Grow (|ivec2|g, |ivec4|)
 		return (self-g, self+g)
+		
 	function clip (|int| p, |int|)
 		if p < .x
 			return .x
 		return p min .x2
+		
 	function clip (|ivec2| p, |ivec2|)
 		cpp_part Clip2
 		p.x = .x.clamp(p.x)

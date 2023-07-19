@@ -252,7 +252,7 @@ extend PerryIDE
 			//.ShowLineNumbers=true
 			.size = the~width by the~bottom to 0~before 
 			.takesfocus		= takesfocusflag.On
-			.gnormal.solid	= (0.0, 0.0, 0.0, 0.81)
+			.gnormal.solid	= (0.2, 0.2, 0.2, 0.81)
 
 
 		with .status 

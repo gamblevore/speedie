@@ -78,6 +78,8 @@ class Image (memory)
 			r = r.clip(.ControlClip)
 		return R
 
+	syntax cast (|ivec4|)
+		return ._controlclip
 
 	operator contains (|ivec2| p, |bool|)
 		return p inrange .wh
@@ -317,9 +319,26 @@ class Image (memory)
 		return mix(T, B, 1.0-C)	// interpolate by how dark the pixel is.
 
 	
-	function DrawTo (|image| Where, |int| DrawX=0, |int| DrawY=0)
-		|| d = (DrawX, DrawY)
-		for (P in self) (V)
+	function DrawCentered (|image| Where)
+		|| Diff = (where.CurrSize - .CurrSize)/2
+		.drawto(where, diff)
+	
+	function CurrSize (|ivec2|)
+		return ._controlclip.size
+	
+	function ivec4.operatorminus (|ivec2| D, |ivec4|)
+		return self - (D,D)
+	function ivec4.operatorplus (|ivec2| D, |ivec4|)
+		return self + (D,D)
+	
+	function DrawTo (|image| Where, |ivec2| D=(0,0))
+		D += where.controlclip.xy
+		|| OurShit = ._Controlclip // take our shit
+		|| Up = OurShit + D // move it up
+		|| ClippedShit = where.clip(up) //clip the shit
+		|| BackDown = ClippedShit - D // move the shit back down
+		
+		for (P in self[BackDown]) (V)
 			Where[v + d] <~ P
 	
 	
