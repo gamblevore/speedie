@@ -435,7 +435,6 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		if (C == "&")					// pointer
 			|| R = ExtractDecl( c.first, name_space )
 				rz = r.GetAddress
-				rz.NilUsed = NilState.either
 		
 		  elseif (c == "~")				// not a brel anymore?
 			c.become(@bra)
