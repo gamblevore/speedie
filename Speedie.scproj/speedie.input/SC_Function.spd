@@ -1315,11 +1315,11 @@ function Message.FindOwningLoop (|message|top, |Message|)
 			return P
 
 
-function Tran_Exit (TranFunc)
+function Tran_Exit (TranFunc)  // exitter
 	opt norefcounts
 	expect (!node.first) (node)
 	// OK so... also check it must be within a loop.
-	|| Found = node.FindowningLoop(fn.sourcearg)
+	|| Found = node.FindOwningLoop(fn.sourcearg)
 	expect Found (node, "Must be within a loop.")
 
 
@@ -1525,18 +1525,18 @@ function Tran_Visible (TranFunc)
 	fn.LoadVisibility( node )
 
 
-function Tran_Return (TranFunc)
+function Tran_Return (TranFunc)  // exitter
 	expect (! fn.IsConstructorOrDestructor)   (node, "You can’t return in a constructor or destructor")
 	node.flags |= asmtmp.ireturn
 	fn.CheckReturnValue( node )
 	node.removeafter
 
 
-function Tran_Rejoin (TranFunc)
+function Tran_Rejoin (TranFunc)  // exitter
 	|| p = node.first
 	if p == @arg
 		|| arg = p.asarg
-		expect (arg.isstatementexpr) (node, "Can't use this here.")
+		expect (arg.IsStatementExpr) (node, "Can't use this here.")
 		expect !p.next (node, "Value expected here.")
 
 

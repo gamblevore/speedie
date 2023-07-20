@@ -5,7 +5,6 @@ Notes:
 	|Byte|					Indent				// speedie uses for nil+disturbance checker
 	|MsgUIFlags|			Flags				// speedie uses for "inserted/breakpoint" only.
 	|uint16|				Tag					// speedie uses this for ASM like "return/if/while/etc"
-	
 */
 
 
@@ -330,30 +329,20 @@ function NilTracker.Leave (|message| s)
 /*
 TODO:
 
+* set the .obj to an arg or the func itself... for continue/exit/return/rejoin in transform
+	* also make app.quit into a blocker!! for refcounting and NilChecking
 * using ptrs...
-* Strength is settable in the project if its an error or problem
-* return values
+* ternaries
 * freeze bug
+
+* return values
 * .if is needed?
 * pop the msgs out.
+* modifications of objects via pointers
 * fn abc (|object| x)
-	x = haha()
+	x = haha() // x is nil or not? haha? its literally been replaced so the original decl is unused.  unused decls default to optional
 
-x is nil or not? haha? its literally been replaced so the original decl is unused.
-	unused decls default to optional
 
-* typecasts... what sort of nil checking do we do? do we check the original var?
-	fn abc (|object| x, |object| y)
-		x = x |int| |obj|
-		y = haha() |int| |obj|
-
-* set the .obj to an arg or the func itself... for continue/exit/return/rejoin in transform
-	* also make app.quit into a blocker!! for refcounting and nilchecking
-
-* ternaries
-	* make ternies into (if/else) expressions!!
-	|| x = ({|int| abc, if (Len != 4) {abc = 1} else {abc = 2}, rejoin abc})
-	* also if/elses can return values... and then we don't need special ternary handling
 
 BOOLEAN LOGICS:
 	refills and relsetters:
@@ -373,6 +362,9 @@ BOOLEAN LOGICS:
 
 
 DONE?
+nilstrength:
+	--nil=3
+
 can access prop:
 	if (msg)
 		msg.prop

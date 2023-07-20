@@ -37,20 +37,20 @@ dispatch TemporalStatements (TranFunc)
 	printerror				(Tran_Print)
 	log						(Tran_Log)
 	beep					(Tran_Beep)
-	quit					(Tran_Quit)
 	
-	continue				SCFunction.Tran_Exit
-	exit					SCFunction.Tran_Exit
-	continue_with			(TranFuncDummy)
 	ignore					{(node.remove)}
-	
-	return					(Tran_Return)
-	rejoin					(Tran_Rejoin)
+
 	alert					{ error (node, "I think you mean 'beep'?") }
 	break					{ error (node, "'break' not allowed. Either 'exit' or 'debugger'?") }
 	do						{ error (node, "'do' loops not allowed. Use 'for' or 'while'.") }
 	__instructionlist__		(vm_Builder.BuildInstructions)
 
+// these exit the function. marked with   // exitter
+	quit					(Tran_Quit)
+	continue				SCFunction.Tran_Exit
+	exit					SCFunction.Tran_Exit
+	return					(Tran_Return)
+	rejoin					(Tran_Rejoin)
 
 
 function Tran_Expect (TranFunc)
@@ -279,7 +279,7 @@ function Tran_Beep (TranFunc)
 	node.MiniTran(name_space, "app")
 
 
-function Tran_Quit (TranFunc)
+function Tran_Quit (TranFunc)  // exitter
 	node.MiniTran(name_space, "app")
 
 
