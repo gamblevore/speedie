@@ -310,11 +310,11 @@ class SCDecl (SCObject) {
 			c.C_Array = 0
 			return c				// OK... so what if we try to do *Carray. We want to get an error
 		if .PointerCount > 0
-			|| pointedto = .Internal
-				printline brel
-				if pointedto is const
-				return pointedto
-			debugger 
+//			|| pointedto = .Internal
+//				printline brel
+//				if pointedto is const
+//				return pointedto
+//			debugger 
 			|| c = .Copy // should keep borrowedness...
 			c.PointerCount--
 			return c
