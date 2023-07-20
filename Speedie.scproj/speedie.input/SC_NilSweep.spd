@@ -88,8 +88,8 @@ function NilTracker.ChildMustExist (|message| wrapper)
 		// what about self-param?
 		// what about lookup via "isa class"
 		ObjDecl.NilDeclared = NilState.Real
-
-	ObjDecl.NilUsed = NilState.Realish
+	
+	//.SetNil(ObjDecl, NilState.Realish)
 
 
 function NilTracker.IfWhile (|message| msg, |message|)
@@ -102,7 +102,7 @@ function NilTracker.IfWhile (|message| msg, |message|)
 
 
 function SCDecl.MustBeReal (|message| m, |scdecl|)
-	.Nilused &= ~NilState.nil
+	.Nilused &= ~NilState.nil // setnil
 	expect (.nilused is realish) (m, "Possible NilObject here")
 	return self
 
@@ -131,7 +131,7 @@ function niltracker.IfIsReal (|message| m, |branchstate|)
 		if d.nilused isnt nil
 			return m.RedundantTrue
 		self <~ d
-		d.Nilused &= ~NilState.nil
+		d.Nilused &= ~NilState.nil // setnil
 		if d.nilused isnt real
 			return m.RedundantFalse
 	return branchstate.Perhaps
@@ -156,7 +156,7 @@ function NilTracker.ProcessCondThg (|message| m, |bool| Y, |branchstate|)
 		return m.RedundantTrue
 
 	self <~ (m, d)
-	d.Nilused = dest
+	d.Nilused = dest // setnil
 	if u == NilState.Either // typical state
 		return BranchState.Perhaps
 
@@ -186,10 +186,10 @@ function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
 
 function NilTracker.ProcessCondPtr (|message| m, |bool| Y, |branchstate|)
 	opt norefcounts
-	|| d = m.NeedDecl #require
-	require d.MustBeReal(m)
-	.RunAll(m)							// if (*msg)
-	return d.Nildeclared.Always(Y)
+	|| f = m.first
+	|| d = f.NeedDecl
+	if d and d.MustBeReal(f)
+		return .ProcessCond(f, y)
 
 
 function NilTracker.ProcessCondBrel (|message| m, |bool| Y, |branchstate|)
@@ -329,12 +329,10 @@ function NilTracker.Leave (|message| s)
 /*
 TODO:
 
-* set the .obj to an arg or the func itself... for continue/exit/return/rejoin in transform
-	* also make app.quit into a blocker!! for refcounting and NilChecking
-* using ptrs...
 * ternaries
 * freeze bug
 
+* process continue/exit/return/rejoin/app.quit
 * return values
 * .if is needed?
 * pop the msgs out.
@@ -362,6 +360,9 @@ BOOLEAN LOGICS:
 
 
 DONE?
+using ptrs:
+	if (*msg)
+
 nilstrength:
 	--nil=3
 

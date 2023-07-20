@@ -2,6 +2,7 @@
 
 struct NilTracker
 	linkage:cpp_part nil
+	|bool| 				NeedsTracking // base does not
 	|uint64| 			Count
 	|message|			If
 	|message--[1024]|	Items
@@ -27,7 +28,7 @@ struct NilTracker
 		.if = nil
 		.Count = 0
 		for d in f.args				// no need add prms.... only log changes
-			d.NilUsed = d.NilDeclared
+			d.RestoreNil
 	
 	function Tighten (|scfunction| f)
 		opt norefcounts
