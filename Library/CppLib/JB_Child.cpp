@@ -31,7 +31,9 @@ static void SafePrint (const char* c) {
 
 
 void JB_Rec__CrashLog(const char* c);
-void JB__ProcessReportCrash();
+void JB_ProcessReportCrash();
+void JB_FinalEvents();
+
 
 void JB_CrashTracer() {
     int   size = 32;
@@ -46,7 +48,7 @@ void JB_CrashTracer() {
     free( strings );
 }
 
-void JB__CrashPrinter(int Sig) {
+void JB_CrashPrinter(int Sig) {
 	char ErrorBuff[64];
 	snprintf(ErrorBuff, 64, "Crash: %s", strsignal(Sig));
 	JB_Rec__CrashLog(ErrorBuff);
@@ -57,23 +59,24 @@ void JB__CrashPrinter(int Sig) {
 
 int SigList[] = {SIGSEGV, SIGBUS, SIGILL, SIGFPE, SIGSYS, SIGTERM, SIGQUIT};
 
-void JB__CrashHandler(int Sig) {
+void JB_CrashHandler(int Sig) {
 	for_ (sizeof(SigList)/sizeof(int)) {
 		signal(Sig, SIG_DFL);
 	}
     if (Sig != SIGTERM and Sig != SIGQUIT) {
-		JB__CrashPrinter(Sig);
-		JB__ProcessReportCrash();
+		JB_CrashPrinter(Sig);
+		JB_ProcessReportCrash();
 	} else if (getppid() > 1) {
 		SafePrint("Child process got signal...\n" );
 	} else { 
 		SafePrint("Process got signal...\n" );
 	}
+	JB_FinalEvents();
 }
 
 void JB_App__CrashInstall() {
 	for_ (sizeof(SigList)/sizeof(int)) {
-		if (signal(SigList[i], JB__CrashHandler) == SIG_IGN)
+		if (signal(SigList[i], JB_CrashHandler) == SIG_IGN)
 			signal(SigList[i], SIG_IGN); // restore the old ignore signal... make speedie more unix-friendly.
 	}
 }

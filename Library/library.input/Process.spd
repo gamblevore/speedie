@@ -677,7 +677,7 @@ class Process
 			helper TellParentIDied
 				opt norefcounts
 				visible
-				cpp_name JB__ProcessReportCrash
+				cpp_name JB_ProcessReportCrash
 				|| o = self.owner_
 					o.ours.state = o.ours.state|int| max ipcstate.Crashed
 					o.SendCrashed

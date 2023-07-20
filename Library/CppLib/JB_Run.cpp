@@ -75,6 +75,7 @@ JB_StringC*         ErrorString_;
 JBObject_Behaviour  JB_Object_FuncTable_ = {0,0};
 JB_Class*           ClassList;
 int					JB_ErrorNumber;
+byte				JB_Active = 0;
 extern char**		environ;
 extern uint			JB__Flow_Disabled;
 static Array*		App_Args;
@@ -159,19 +160,18 @@ void JB_Str__LoadGlobals() {
 	if (Read != ReadEnd) {JB_Load_StrError(2);}
 }
 
+void JB_FinalEvents() {
+	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
+	JB_LibShutdown();
+}
 
 Array*	JB_App__Args()						{ return App_Args; }
 JB_StringC*	JB_App__CalledBy()				{ return JB_StrC(App_CalledBy); }
 void	JB_LibShutdown()					{ JB_MemFree(JB_MemStandardWorld()); }
 bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
-byte	JB_Active = 0;
-byte	JB_AtExitState = 0;
 bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
 void	JB_SP_AtExit() {
-	require0 (!(JB_AtExitState & 2)); 
-	JB_AtExitState |= 2;
-	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
-	JB_LibShutdown();
+	JB_FinalEvents();
 }
 
 
@@ -205,11 +205,6 @@ int JB_LibInit (_cstring* R) {
     #if DEBUG
 	JB_TotalMemorySanity(true);
 	#endif
-	if (!JB_AtExitState) { 
-		if (!atexit(JB_SP_AtExit))
-			JB_AtExitState = 1;
-
-	}
 	return 0;
 }
 
@@ -228,7 +223,7 @@ int		JB_SP_Run (_cstring* C, int Mode)	{
 		if ((Mode & 1) and App_Args and !JB_ErrorNumber)
 			AddError(JB_Main(),			"occurred");
 		if ((Mode & 2) and App_Args) {
-			JB_SP_AtExit();
+			JB_FinalEvents();
 		}
 	}
 	JB_Active = 0;

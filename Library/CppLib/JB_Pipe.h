@@ -41,7 +41,7 @@ bool JB_PipeIsClosed(int fd);
 bool JB_IsTerminal(int FD);
 void JB_CrashTracer();
 const char** JB_BackTrace(void** space, int* size);
-typedef void (*JB_CrashHandler)(int);
+typedef void (*fnCrashHandler)(int);
 int JB_App__BelongsToParent();
 void JB__DefaultCrashHandler(int Signal);
 void JB__ErrorStackTrace(int Signal);
