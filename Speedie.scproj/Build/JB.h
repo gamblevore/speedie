@@ -575,6 +575,7 @@ struct NameAndMsg {
 };
 
 struct NilTracker {
+	bool NeedsTracking;
 	uint64 Count;
 	Message* If;
 	Message* Items[1024];
@@ -2667,7 +2668,7 @@ int SC_Options__Init_();
 
 int SC_Options__InitCode_();
 
-void SC_Options__SetNilSet(int Value);
+void SC_Options__strnilSet(int Value);
 
 
 
@@ -4560,6 +4561,8 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
+void SC_IR_Print(IR* self);
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5275,6 +5278,8 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
+
+int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -6787,8 +6792,6 @@ void SC_Decl_IsAPISet(SCDecl* self, bool Value);
 
 void SC_Decl_IsBorrowedSet(SCDecl* self, bool Value);
 
-void SC_Decl_IsConstSet(SCDecl* self, bool Value);
-
 bool SC_Decl_IsConstOf(SCDecl* self, SCDecl* b);
 
 bool SC_Decl_IsDataType(SCDecl* self);
@@ -6916,6 +6919,8 @@ bool SC_Decl_SyntaxIs(SCDecl* self, SCDeclInfo d);
 void SC_Decl_SyntaxIsSet(SCDecl* self, SCDeclInfo d, bool Value);
 
 bool SC_Decl_SyntaxIsnt(SCDecl* self, SCDeclInfo d);
+
+void SC_Decl_SyntaxIsntSet(SCDecl* self, SCDeclInfo d, bool Value);
 
 int SC_Decl_TryTypeCast(SCDecl* self, SCDecl* O, Message* exp, int TypeCast);
 
@@ -8695,6 +8700,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
@@ -8702,6 +8708,7 @@ inline void SC_flat_AddExtended(ASMFuncState* self, Message* err, uint Bits) {
 	int B = 1 << 31;
 	if (((bool)(Bits & B))) {
 		JB_Msg_SyntaxExpect(err, nil);
+		return;
 	}
 	SC_flat_RequestOp2(self, kJB__ASM_Extended)->Rest = (Bits | B);
 }
