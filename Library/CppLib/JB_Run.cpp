@@ -160,6 +160,20 @@ void JB_Str__LoadGlobals() {
 }
 
 
+Array*	JB_App__Args()						{ return App_Args; }
+JB_StringC*	JB_App__CalledBy()				{ return JB_StrC(App_CalledBy); }
+void	JB_LibShutdown()					{ JB_MemFree(JB_MemStandardWorld()); }
+bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
+byte	JB_Active = 0;
+byte	JB_AtExitState = 0;
+bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
+void	JB_SP_AtExit() {
+	require0 (!(JB_AtExitState & 2)); 
+	JB_AtExitState |= 2;
+	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
+	JB_LibShutdown();
+}
+
 
 int JB_LibInit (_cstring* R) {
 	JB_ErrorNumber = 0;
@@ -186,17 +200,19 @@ int JB_LibInit (_cstring* R) {
     JB_Str__LoadGlobals();
 
     int Err = JB_Init_();
+	if (Err)
+		return Err;
+    #if DEBUG
 	JB_TotalMemorySanity(true);
-	return Err;
+	#endif
+	if (!JB_AtExitState) { 
+		JB_AtExitState = 1;
+		atexit(JB_SP_AtExit);
+	}
+	return 0;
 }
 
 
-Array*	JB_App__Args()						{ return App_Args; }
-JB_StringC*	JB_App__CalledBy()				{ return JB_StrC(App_CalledBy); }
-void	JB_LibShutdown()					{ JB_MemFree(JB_MemStandardWorld()); }
-bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
-byte	JB_Active = false;
-bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
 
 int		JB_SP_Run (_cstring* C, int Mode)	{
 	if (JB_Active)
@@ -211,11 +227,10 @@ int		JB_SP_Run (_cstring* C, int Mode)	{
 		if ((Mode & 1) and App_Args and !JB_ErrorNumber)
 			AddError(JB_Main(),			"occurred");
 		if ((Mode & 2) and App_Args) {
-			AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
-			JB_LibShutdown();
+			JB_SP_AtExit();
 		}
 	}
-	JB_Active = false;
+	JB_Active = 0;
 	return JB_ErrorNumber;
 }
 
