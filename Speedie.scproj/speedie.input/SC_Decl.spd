@@ -106,7 +106,7 @@ class SCDecl (SCObject) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.NilUsed = NilState.Either
-//		if .objectid == 30465542
+		if .objectid == 18970426
 
 		
 	function Project (|scimport|)
@@ -308,14 +308,17 @@ class SCDecl (SCObject) {
 			require IsAccess
 			|| c = .Copy // should keep borrowedness...
 			c.C_Array = 0
-			return c				// OK... so what if we try to do *Carray. We want to get an error
+			return c
+		
 		if .PointerCount > 0
-//			|| pointedto = .Internal
-//				printline brel
-//				if pointedto is const
-//				return pointedto
-//			debugger 
-			|| c = .Copy // should keep borrowedness...
+			target debug {
+			|| pointedto = .Internal
+				printline brel
+				//if pointedto is const
+				return pointedto
+			//debugger 
+			}
+			|| c = .Copy
 			c.PointerCount--
 			return c
 		
@@ -325,10 +328,10 @@ class SCDecl (SCObject) {
 			return typeofexpr(brel, name_space)
 		
 
-
 	render
 		.WriteDeclFull.Render(fs)
-		
+	
+	
 	function SyntaxExpect
 		printline "Decl failed"
 		super.syntaxexpect("Decl failed")
