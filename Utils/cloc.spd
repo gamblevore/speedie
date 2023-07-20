@@ -164,7 +164,7 @@ function Counts.report
 		"$n names in $d nodes"
 		.ReportHisto
 	if p > 1 or f > 1
-		"Total files: $f, total jeebox files: $p, total size: $kb"
+		"Total files: $f, total jeebox files: $p, total filesize: $kb"
 	if compressionstats.All.Out
 		compressionstats.all.render(app.stdout.out)
 		printline

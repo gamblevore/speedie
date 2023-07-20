@@ -62,7 +62,7 @@ class ErrorList
 		target debug
 			|| CanPrint = !.BadCount and error.autoprint
 		  else
-			|| Canprint = false
+			|| CanPrint = false
 		target self
 			#!"Speedie" // useful marker for debugging...
 		

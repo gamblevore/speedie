@@ -50,7 +50,6 @@ function NilTracker.ChildMustExist (|message| wrapper)
 	|| msg = wrapper.first
 		.MustBeReal(msg, msg.needdecl)
 
-// merge these two? they are the same!
 
 function niltracker.MustBeReal (|message| msg, |scdecl| d, |scdecl|)
 	opt norefcounts
@@ -275,15 +274,14 @@ function NilTracker.Leave (|message| s)
 
 /*
 TODO:
-
+* pop the msgs out.
 * ternaries
 * freeze bug
 
 * process continue/exit/return/rejoin/app.quit
 * return values
 * .if is needed?
-* pop the msgs out.
-* modifications of objects via pointers
+* modifications of objects via func pointer param... during a cond
 * fn abc (|object| x)
 	x = haha() // x is nil or not? haha? its literally been replaced so the original decl is unused.  unused decls default to optional
 
@@ -336,58 +334,10 @@ nil within branch:
 
 
 /*
-	|&int| p1 = 0
-	|&int| p2 = &i
-	if (p1)
-	if (*p1)
-	// can we say that the thing p2 points tooo... must exist? can we? how?
-	// seems theres 4 possible versions...
-	|&int| p2 = &i
-	|&int!| p2 = &i
-	|!&int!| p2 = &i
-	|!&int| p2 = &i
-*/
-
-
-/*
-* Init Vars Sweep: 
+* Init Vars Sweep?
 	We need to go through the entire program, and give each item found, a "timecode". That
 	is... it has an "earliest time" that it COULD occur.
-	So for branches, thats easy, both sides get the same time. We can do some simple logic like:
-	
-	function abc
-		if !inited
-			inited = true
-			var1 = .CreateVar
-			var2 = .CreateVar
-		var1.explode
-		var2.die
-	
-	If its only set in one place... that can help.
-	
-	So var1.explode actually has a "higher time" than var1 = .createvar. So its OK.
-	
-	Like this... we can make it work!
-	
-	POSSIBLY we could allow reordering.
-	
-	while loops are easier, unless they might not fire at all.
-	
-	function pointers... are a bit trickier?
-	
-	if (random[])
-		a lot of code
-		(.func)()
-	  else
-		small code
-		(.func)()
-
-	we have to check the time twice? But thats true of function calls in general???
-	We could do it differently... "at each second in time..." there can be an array (or list whatever) of possible code we could be executing. The problem with that, is that it would explode exponentially :)
-	
-	Perhaps not? if we exclude times that not newer?
-	
-	PROBABLY MAKE SOMETHING SIMPELR THAN THIS
+perhaps just do it on a per-module basis... If a module makes no sense in terms of itself thats the programmers fault.
 */
 
 /*
