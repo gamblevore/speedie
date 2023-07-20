@@ -53,7 +53,6 @@ dispatch TemporalStatements (TranFunc)
 
 
 
-
 function Tran_Expect (TranFunc)
 // expect a=b -->
 // if !(a=b) {
@@ -70,6 +69,7 @@ function Tran_Expect (TranFunc)
 		n = "check"
 		if ch1
 			deprecate (node, "This is 'check' now.")
+
 // its always "newstyle" now? remove this check?
 	|| NewStyle = (N == "check" or "warn")
 	if (NewStyle and !ch1) // work around for now.... for: error where
@@ -98,7 +98,6 @@ function Tran_Expect (TranFunc)
 function Tran_Temporal (|SCFunction| fn, |Message| s, |SCBase| name_space)
 	|| TmpInt = TemporalStatements[s.name]		#expect (s, "Unrecognised statement")
 	(*TmpInt)( FN, s, name_space )
-
 
 
 function Tran_Using (TranFunc)

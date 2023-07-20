@@ -800,7 +800,6 @@ module
 
 
 	function NeuClassSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |SCClass|)
-		
 		if !ForInterface
 			expect (parent==compiler.program) (errplace, "Internal Error")
 		
@@ -819,14 +818,9 @@ module
 
 		cls.Modul = SCModule.Neu( Static, cls, ErrPlace )|SCModule|
 
-		if (!ForInterface)
-			|| a = 1
-		  elseif (parent isa scmodule)
+		if (ForInterface and parent isa scmodule)
 			cls.CppClass = "__${parent.cls.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"
-		
-		
-		cls.defawlt = arg.findflat(@tmp, "default")[0]
-		
+				
 		Return cls
 	
 	
