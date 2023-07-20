@@ -206,8 +206,9 @@ int JB_LibInit (_cstring* R) {
 	JB_TotalMemorySanity(true);
 	#endif
 	if (!JB_AtExitState) { 
-		JB_AtExitState = 1;
-		atexit(JB_SP_AtExit);
+		if (!atexit(JB_SP_AtExit))
+			JB_AtExitState = 1;
+
 	}
 	return 0;
 }
