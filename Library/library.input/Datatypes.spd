@@ -178,6 +178,7 @@ datatype SizeInt (int)
 
 datatype Ind (int) // an INDex. And an INT.
 	default -1
+	false -1
 	syntax cast (|bool|)
 		return self >= 0
 	function exists (|bool|)
@@ -185,7 +186,8 @@ datatype Ind (int) // an INDex. And an INT.
 
 
 datatype ErrorInt (int) // useful for unix-functions which has 0 == success
-	default 0
+	default 0 // defaults to true... unlike everyrthing else?
+	false -1
 	syntax cast (|bool|)
 		return self == 0
 

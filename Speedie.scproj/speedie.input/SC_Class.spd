@@ -11,6 +11,7 @@ linkage
 
 |SCClass|					Super
 |Message|					Defawlt
+|Message|					False
 |Message|					SourceClass
 |SCModule|					Modul
 |[SCDecl]|					Properties
@@ -437,21 +438,25 @@ function CreateAlloc (|string| ParseThing, |int| Extra)
 		fn.IsVisible = false
 
 
+function NeedsDefaultValue (|message| def, |&message| place, |string| name)
+	require !*place
+	if .IsObject and !.IsRole
+		if def and !(def isthing "nil")
+			error (self, "Missing "+name+" value for class: "  + .name)
+	*place = def
+
+
 function ContainedTypeLoad
 	.use
 	|| sup = .super
 		.Contained = sup.Contained
 		.SelfStrong.Contains = sup.SelfStrong.Contains
-		|| supd = sup.Defawlt
-		|| ParentHasDefault = supd and !(supd isthing "nil")
-		if .IsObject and !.IsRole
-			if !.Defawlt and ParentHasDefault
-				error (self, "Missing default value for class: "  + .name)
-		if !.isnotnumeric
-			.defawlt := supd
 		
+		.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
+		.NeedsDefaultValue(sup.false, .false, "false")
 	
-	.defawlt := «Thg "nil"»
+	.defawlt := «thg "nil"»
+	.false := «thg "nil"»
 
 	|| ContainedMsg = .Source.findflat(@Tmp, "contains")[@thg]		#require
 	|| cls = compiler[ ContainedMsg.name, ContainedMsg ]			#require
@@ -1035,6 +1040,14 @@ module
 		
 		return compiler.program
 	
+	
+	function GetFalse (CollectFunc)
+		if name_space isa scclass
+			name_space.false = node[0]
+	
+	function GetDefault (CollectFunc)
+		if name_space isa scclass
+			name_space.defawlt = node[0]
 	
 	function NamedPropertyFields (CollectFunc) // node, parent, errplace
 		// not a great feature???

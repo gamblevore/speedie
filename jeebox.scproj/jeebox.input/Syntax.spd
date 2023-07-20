@@ -8,6 +8,7 @@ prototype fpMsgRender (|Message| self, |FastString| fs)
 
 
 datatype Syntax (Byte)
+	default nil
 	linkage
 		cpp_Part Syx
 		numeric false // disallow implicit (syntax <--> int) conversion

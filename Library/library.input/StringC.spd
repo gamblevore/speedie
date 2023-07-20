@@ -13,6 +13,7 @@ class StringZeroTerminated (string)
 		visible true
 	cpp_refs
 		Disturbs		nil
+	false			""
 	default			""
 	function cstring (|cstring|)
 		if self != nil

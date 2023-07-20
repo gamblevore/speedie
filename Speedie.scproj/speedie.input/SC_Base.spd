@@ -967,7 +967,8 @@ dispatch ClsCollectTable (CollectFunc)
 	cpp_class			(DontRemove)
 	cpp_name			(DontRemove)
 	contains			(DontRemove)
-	default				(DontRemove)
+	default				(SCClass.GetDefault)
+	false				(SCClass.GetFalse)
 	size				(DontRemove)
 	module				(DontRemove)
 	constants			(DontRemove)
@@ -976,6 +977,7 @@ dispatch ClsCollectTable (CollectFunc)
 
 
 datatype SCBaseInfo (int)
+	//false -1
 	constants
 		ExplicitExport
 		Visible

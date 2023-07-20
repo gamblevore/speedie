@@ -1,12 +1,10 @@
 
 
-
 main // speedie main { 
 	|message| o
 	|| p = o.first?.first?
 	// to optimise these StatExprs...
 	// We should make it possible in tran_Qmark... to set the type's name to "--"
-	// and recognised in extractdecl
 	compiler.Main
 
 

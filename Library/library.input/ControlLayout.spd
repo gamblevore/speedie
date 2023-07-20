@@ -82,6 +82,7 @@ datatype ControlLine (ivec2)
 
 
 datatype ControlPoint (int)
+	default nil
 	linkage
 		cpp_part CL1
 		numeric false // disallow implicit (syntax <--> int) conversion

@@ -691,9 +691,10 @@ function CheckReturnValue (|Message| msg)
 
 	expect ( c.IsOnlyChild ) ( msg, "Can’t return multiple values" )
 	
-	if (!.ReturnType) and (c isthing "nil") // auto-generated in many places :)
-		c.Remove
-		return
+	if (!.ReturnType)
+		if c == "nil" and c==@thg or @ques // auto-generated in many places :)
+			c.Remove
+			return
 
 	
 	|| FoundReturnType = TypeOfExpr( c, msg.MsgArg )
@@ -1009,7 +1010,7 @@ function FixCnjSub (|Message| exp) {
 	  elseif (name == "loop") and pp.WithinLoop( .SourceArg )
 		arg <~ «tmp "exit"»
 	  elseif (DoesReturn)
-		arg <~ «tmp "return", «Thg "nil"»»
+		arg <~ «tmp "return", «ques "nil"»» // put –nil?
 	
 	
 	if (thg isbrel "!")  // cancel out "!!test"
@@ -1599,8 +1600,10 @@ function message.NeedsPreprocess (|bool|)
 		return (L[1] == "=") and (.last[1] == "=")
 
 
+
 function SCFunction.PreProcessExpects
 	|[Message]| list = nil
+	
 	for ch.flat in .SourceArg
 		if ch.needspreprocess
 			list := array.new
@@ -1623,16 +1626,10 @@ function SCFunction.PreProcessExpects
 				ch <~ (@str, "Time")
 				w = ch.first
 			w.needbra
-		elseif ch=="using"
+		  elseif ch=="using"
 			tran_using(self, ch, nil)
 
 
-
-/*function message.GiveArg (|message|)
-	rz = .last
-	if rz != @arg
-		rz = @arg.msg(self, "")
-*/
 
 function message.NormaliseFunc (|message|)
 	opt norefcounts

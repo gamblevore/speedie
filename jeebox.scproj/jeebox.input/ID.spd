@@ -13,6 +13,7 @@ class StringShared (string)
 		cpp_wrapper JB_Str_Clone
 
 	default			""
+	false			""
 
 
 
@@ -21,6 +22,7 @@ class MessageID (stringshared)				// now is usefully used! :D
 		cpp_part ID
 	
 	default NIL
+	false	NIL
 	contains object
 	||					Obj
 	|uint64| 			Tag

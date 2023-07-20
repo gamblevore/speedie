@@ -57,13 +57,14 @@ dispatch TemporalStatements (TranFunc)
 function Tran_Expect (TranFunc)
 // expect a=b -->
 // if !(a=b) {
-// error stuff
-// return nil
+//     error stuff
+//     return nil
 // }
 	|| ch = node[nil|syntax|] #require
 	Using (node)
 	|| Ch1 = ch.next
 	|| N = node.name
+	node.name = "if"
 	
 	if n == "error"
 		n = "check"
@@ -81,25 +82,17 @@ function Tran_Expect (TranFunc)
 
 	ch = ch.Negate.NeedBra
 	
-	|| arg = «arg »
-	node <~ arg
-
+	|| arg = node.msg(@arg)
 	if (N == "expect") or (NewStyle)
 		arg <~ ch1.ExpectParamsTransform( node.Position, ch, N )
-	
-	if (N == "debug_require")
-		arg <~ «tmp "debugger"»
-
-	if (!NewStyle)
+	  elseif (N == "debug_require")
+		arg.msg(@tmp, "debugger")
+	  elseif (!NewStyle)
 		if n == "loop"
-			arg <~ «tmp "exit"»
+			arg.msg(@tmp, "exit")
 		  else
-			|| ret = «tmp "return"»
-			ret <~ «thg "nil"»
-			arg <~ ret
-
-	node.name = "if"
-
+			|| ret = arg.msg(@tmp, "return")
+			|| q = ret.msg(@ques, "nil")
 
 
 function Tran_Temporal (|SCFunction| fn, |Message| s, |SCBase| name_space)
@@ -112,9 +105,8 @@ function Tran_Using (TranFunc)
 	// using (Exp) { f() } --> if (true) { || X = f().startusing, ..., x.stopusing }
 	
 	|| With		= node[nil|syntax|]					#require
-	|| Arg		= With.next
 	|| Start	= node
-	if (arg)
+	|| Arg		= With.next
 		require arg.expect(@arg) and arg.ExpectLast
 		start = nil
 	  else

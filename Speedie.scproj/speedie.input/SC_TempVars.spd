@@ -75,14 +75,14 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 		TmpFuncThg = rel.first
 	  else
 		arg = FuncMsg.createownblock #require
-		|| TmpFuncVar = UniqueTmpVar()							// "t2"
+		|| TmpFuncVar = UniqueTmpVar()								// "t2"
 		TmpFuncThg = .TheTmpVarOf(TmpFuncVar)
 		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg )		    // || t2 = func(t1, c.d)
 		arg <~ TmpFuncDecl
 		arg <~ «tmp "rejoin", TmpFuncThg »							// t2
 
 	|| TmpParamName = UniqueTmpVar()								// "t1"
-	rz = funcmsg.TheTmpVarOf(TmpParamName)				// t1
+	rz = funcmsg.TheTmpVarOf(TmpParamName)							// t1
 	.ReplaceWith( rz )										// func(a.b.b2, c.d) --> func(t1, c.d)
 // || t1 = a.b.b2
 	|| TmpParamDecl = MakeDecl( "", TmpParamName, self )
