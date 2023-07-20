@@ -812,11 +812,11 @@ module
 		cls.loadlinkage
 		Compiler.ClassList <~ cls
 
-		|| Static = arg.findflat( @tmp, "module" )
-		MoveFutureStaticsIn(Static)				// bad work around
+		|| Module = arg.findflat( @tmp, "module" )
+		MoveFutureStaticsIn(Module)				// bad work around
 												// makes impossible to extend a static section...
 
-		cls.Modul = SCModule.Neu( Static, cls, ErrPlace )|SCModule|
+		cls.Modul = SCModule.Neu( Module, cls, ErrPlace )|SCModule|
 
 		if (ForInterface and parent isa scmodule)
 			cls.CppClass = "__${parent.cls.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"
@@ -1037,11 +1037,11 @@ module
 	
 	function GetFalse (CollectFunc)
 		if name_space isa scclass
-			name_space.false = node[0]
+			name_space.false = node[@nil, 0]
 	
 	function GetDefault (CollectFunc)
 		if name_space isa scclass
-			name_space.defawlt = node[0]
+			name_space.defawlt = node[@nil, 0]
 	
 	function NamedPropertyFields (CollectFunc) // node, parent, errplace
 		// not a great feature???
