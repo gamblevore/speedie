@@ -52,7 +52,7 @@ function compiler.SetupEnv
 		app.threadname = "SpeedieDebug"
 
 	|| NL = app.pref("nil")
-		options.setnil = nl.int
+		options.strnil = nl.int
 
 	errorcolors.DisableIfNoTerminal
 
