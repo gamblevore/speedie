@@ -7,20 +7,20 @@ struct NilTracker
 	|message|			If
 	|message--[1024]|	Items
 	
-
-	syntax Append (|scdecl| d)
-		opt norefcounts
-		|| m = d.source
-			// what if d is a lookup for something else?
-			// like:    if (a isa b): a.bfunc
-			self <~ (m, d)
-		  else
-			debugger 
 	
-	syntax Append (|message| m, |scdecl| d)
-		expect (.count < 1024) (m, "Too many variables")
-		m.Indent = d.NilUsed & 3
-		.items[.count++] = m
+	function SetNil (|message| m, |scdecl| d, |nilstate| s, |scdecl|)
+		opt norefcounts
+
+		if (.count < 1024) 
+			m.Indent = d.NilUsed & 3
+			.items[.count++] = m
+			return d
+
+		error (m, "Too many variables")
+		return d
+
+		// what if d is a lookup for something else?
+		// like:    if (a isa b): a.bfunc
 
 	function Start (|scfunction| f)
 		opt norefcounts

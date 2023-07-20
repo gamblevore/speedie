@@ -1,52 +1,6 @@
 
-/*	
-Notes:
-					
-	|Byte|					Indent				// speedie uses for nil+disturbance checker
-	|MsgUIFlags|			Flags				// speedie uses for "inserted/breakpoint" only.
-	|uint16|				Tag					// speedie uses this for ASM like "return/if/while/etc"
-*/
 
-
-/*
-Issues:
-What about the fact that a function's param nilness can rely on other funcs??
-like:
-
-	x = msg[0] // OK... so we don't rely on msg existing? but only cos it doesn't rely on self existing.
-what if msg[n] is recursive and complicated? then how do we check if a decl... is nil or not?
-
-The fact that we have ordered this... leaf first... helps. dependancies help... but that only reduces the problem
-not eliminiates it. There will be cases that we can't eliminate.
-
-* Make it nestable? That is... we actually can check functions?
-	* this would only be needed for actual recursive functions... non-recursives would have a strict chain...
-* what if two funcs with the same depth... and one is called before the other but the wrong one is called first?
-	* then making it nestable helps!
-
-* what about actually recursive funcs? I think for them... we let the user simply specify their nilness!! makes sense, right?
-	* I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
-*/
-
-
-
-
-function SCFunction.CanNilCheck (|bool|)
-	return  false
-	require !.IsMacro and !.IsWrapper and .isOK
-	|| c = .Lookup
-		return c.name contains "NilTest"
-
-
-
-function NilTracker.Check (|scfunction| f)
-	debugat
-	opt norefcounts
-	.Start(f)
-	.RunAll(f.SourceArg)
-	.Tighten(f)					// then we alter the function's nilness
-	.Restore
-
+// fix " = .internal" all over
 
 module VoidSweeper
 	function SuperUberChecker
@@ -66,7 +20,23 @@ module VoidSweeper
 		// || init = compiler.getfunc("init_")
 		// what about "init_"?
 
-	
+
+function SCFunction.CanNilCheck (|bool|)
+	return  false
+	require !.IsMacro and !.IsWrapper and .isOK
+	|| c = .Lookup
+		return c.name contains "NilTest"
+
+
+function NilTracker.Check (|scfunction| f)
+	debugat
+	opt norefcounts
+	.Start(f)
+	.RunAll(f.SourceArg)
+	.Tighten(f)					// then we alter the function's nilness
+	.Restore
+
+
 function message.NilPropAccess (|scdecl|)
 	opt norefcounts
 	|| m = .DotMustBeProperty
@@ -78,18 +48,22 @@ function NilTracker.ChildMustExist (|message| wrapper)
 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| msg = wrapper.first
-	|| ObjDecl = msg.NeedDecl			#debug_require
-	
-	|| u = ObjDecl.NilUsed
-	require u is nil
+		.MustBeReal(msg, msg.needdecl)
+
+// merge these two? they are the same!
+
+function niltracker.MustBeReal (|message| msg, |scdecl| d, |scdecl|)
+	opt norefcounts
+	|| u = d.NilUsed
+	if u isnt nil
+		return d
 	expect (u is realish) (msg, nilerr)
 
-	if  ObjDecl is param  and  ObjDecl.nildeclared isnt stated // fn name: msg.prop
-		// what about self-param?
-		// what about lookup via "isa class"
-		ObjDecl.NilDeclared = NilState.Real
+	if  d is param  and  d.nildeclared isnt stated // fn name: msg.prop
+		// what about self-param, and lookup via "isa class"
+		d.NilDeclared = NilState.Real
 	
-	//.SetNil(ObjDecl, NilState.Realish)
+	return .SetNil(msg, d, NilState.Realish)
 
 
 function NilTracker.IfWhile (|message| msg, |message|)
@@ -99,12 +73,6 @@ function NilTracker.IfWhile (|message| msg, |message|)
 	.if = msg
 	.ProcessCond(msg.first, true)
 	return msg.Second
-
-
-function SCDecl.MustBeReal (|message| m, |scdecl|)
-	.Nilused &= ~NilState.nil // setnil
-	expect (.nilused is realish) (m, "Possible NilObject here")
-	return self
 
 
 function Message.RedundantBranch (|bool| Value, |branchstate|)
@@ -125,24 +93,6 @@ function Message.RedundantFalse (|branchstate|)
 	return BranchState.Never
 
 
-function niltracker.IfIsReal (|message| m, |branchstate|)
-	opt norefcounts
-	|| d = m.NeedDecl
-		if d.nilused isnt nil
-			return m.RedundantTrue
-		self <~ d
-		d.Nilused &= ~NilState.nil // setnil
-		if d.nilused isnt real
-			return m.RedundantFalse
-	return branchstate.Perhaps
-
-
-function message.MustBeReal (|scdecl|)
-	opt norefcounts
-	|| d = .NeedDecl
-		return d.MustBeReal(self)
-
-
 function SCDecl.IsNowNil (|bool|)
 	return (self == TypeNil) or (.nilused isnt real)
 
@@ -151,19 +101,16 @@ function NilTracker.ProcessCondThg (|message| m, |bool| Y, |branchstate|)
 	opt norefcounts
 	|| dest = NilState.nil + Y	
 	|| d = m.NeedDecl			#debug_require
-	|| u = d.nilused			#require
+	|| u = d.NilUsed
 	if u == dest
 		return m.RedundantTrue
 
-	self <~ (m, d)
-	d.Nilused = dest // setnil
-	if u == NilState.Either // typical state
+	.setnil(m, d, dest)
+	if u == NilState.Either					// typical state
 		return BranchState.Perhaps
-
 	if d.NilDeclared is either
-		return m.RedundantFalse
-
-	return branchstate.Never
+		return BranchState.Never
+	return m.RedundantFalse
 
 
 function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
@@ -188,7 +135,7 @@ function NilTracker.ProcessCondPtr (|message| m, |bool| Y, |branchstate|)
 	opt norefcounts
 	|| f = m.first
 	|| d = f.NeedDecl
-	if d and d.MustBeReal(f)
+	if d and .MustBeReal(f, d)
 		return .ProcessCond(f, y)
 
 
@@ -442,3 +389,24 @@ nil within branch:
 	
 	PROBABLY MAKE SOMETHING SIMPELR THAN THIS
 */
+
+/*
+Issues:
+What about the fact that a function's param nilness can rely on other funcs??
+like:
+
+	x = msg[0] // OK... so we don't rely on msg existing? but only cos it doesn't rely on self existing.
+what if msg[n] is recursive and complicated? then how do we check if a decl... is nil or not?
+
+The fact that we have ordered this... leaf first... helps. dependancies help... but that only reduces the problem
+not eliminiates it. There will be cases that we can't eliminate.
+
+* Make it nestable? That is... we actually can check functions?
+	* this would only be needed for actual recursive functions... non-recursives would have a strict chain...
+* what if two funcs with the same depth... and one is called before the other but the wrong one is called first?
+	* then making it nestable helps!
+
+* what about actually recursive funcs? I think for them... we let the user simply specify their nilness!! makes sense, right?
+	* I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
+*/
+
