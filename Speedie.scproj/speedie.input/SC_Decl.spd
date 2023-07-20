@@ -123,8 +123,6 @@ class SCDecl (SCObject) {
 
 	function IsBorrowed (assigns:|bool|)
 		.info = .info.set(SCDeclInfo.Borrowed, Value)
-	function IsConst (assigns:|bool|)
-		.info = .info.set(SCDeclInfo.Const, Value)
 	function IsStatic (assigns:|bool|)
 		.info = .info.set(SCDeclInfo.Static, Value)
 	function IsNewlyCreated (assigns:|bool|)
@@ -142,6 +140,8 @@ class SCDecl (SCObject) {
 		return !.syntaxis(d)
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
 		.info = .info.set(d, Value)
+	syntax isnt (|SCDeclInfo| d, assigns:|bool|)
+		.info = .info.set(d, !Value)
 
 
 	function isnil (|bool|)
@@ -162,7 +162,7 @@ class SCDecl (SCObject) {
 		|| dcl = SCDecl.new
 		
 		.CopyTypeInfoTo( dcl )
-		dcl.IsConst  = self Is Const
+		(dcl Is Const)  = self Is Const
 
 		// why not copy the whole info?
 		(dcl is api) = self is api
@@ -310,9 +310,11 @@ class SCDecl (SCObject) {
 			c.C_Array = 0
 			return c				// OK... so what if we try to do *Carray. We want to get an error
 		if .PointerCount > 0
-			//|| actualtype = .Internal
-			//	return actualtype
-			//debugger 
+			|| pointedto = .Internal
+				printline brel
+				if pointedto is const
+				return pointedto
+			debugger 
 			|| c = .Copy // should keep borrowedness...
 			c.PointerCount--
 			return c

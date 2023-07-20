@@ -176,7 +176,7 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		
 		if func
 			(dcl is param)
-		dcl.IsConst = false // erase IsConst, happens if we parse "|| bla = true"
+		(dcl Isnt Const) // erase IsConst, happens if we parse "|| bla = true"
 		if (!Func) and (dcl.Strength == kStrSharedParams)
 			dcl.Strength = 0
 		

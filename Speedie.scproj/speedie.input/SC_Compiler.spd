@@ -329,7 +329,7 @@ function CreateFuncFromSource (|String| Src, |SCFunction|)
 
 function Constpiler (|string| name, |scclass|)
 	rz = compiler[name]  #require
-	rz.typenormal.isconst = true
+	(rz.typenormal is const)
 
 
 function Library (|file|)
@@ -962,7 +962,7 @@ function OrderClassList
 function AddGlobalConst (|string| name, |SCClass| c, |SCDecl|)
 	|| d = SCDecl.new
 	d.Type = c
-	d.IsConst = true
+	(d Is Const)
 	d.IsLookupOnly = "" // it is lookuponly... but what for? "" i guess... whatever.
 	d.Name = name
 	d.default = «thg name »

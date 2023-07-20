@@ -1362,7 +1362,7 @@ function scclass.NotConst (|scdecl|)
 		d = .typenormal
 		if (d is const)
 			D = D.copy	// erase IsConst, like collectdecls does...
-			D.IsConst = false
+			(D Isnt Const)
 			// future opts could speed this up! like all da magic eggs... transform into a new space!!!
 		.NotConstUwU = d			// a space of new eggs!!!
 	return D
