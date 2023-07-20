@@ -236,8 +236,9 @@ function TranDebugInsert
 
 function Transform ()
 	opt norefcounts
+
 	require !.isMacro
-	CurrFunc = self // for debugging
+	CurrFunc = self
 	|| StillOK = StdErr.Mark
 
 	|| n = .SourceArg
@@ -1010,7 +1011,7 @@ function FixCnjSub (|Message| exp) {
 	  elseif (name == "loop") and pp.WithinLoop( .SourceArg )
 		arg <~ «tmp "exit"»
 	  elseif (DoesReturn)
-		arg <~ «tmp "return", «ques "nil"»» // put –nil?
+		arg <~ «tmp "return", «ques "nil"»»
 	
 	
 	if (thg isbrel "!")  // cancel out "!!test"

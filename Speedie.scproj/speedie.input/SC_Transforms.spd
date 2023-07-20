@@ -59,6 +59,7 @@ function Tran_Expect (TranFunc)
 //     error stuff
 //     return nil
 // }
+
 	|| ch = node[nil|syntax|] #require
 	Using (node)
 	|| Ch1 = ch.next
@@ -87,7 +88,7 @@ function Tran_Expect (TranFunc)
 		arg <~ ch1.ExpectParamsTransform( node.Position, ch, N )
 	  elseif (N == "debug_require")
 		arg.msg(@tmp, "debugger")
-	  elseif (!NewStyle)
+	if (!NewStyle)
 		if n == "loop"
 			arg.msg(@tmp, "exit")
 		  else
