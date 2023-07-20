@@ -64,7 +64,7 @@ void JB_CrashHandler(int Sig) {
 		signal(Sig, SIG_DFL);
 	}
     if (Sig != SIGTERM and Sig != SIGQUIT) {
-		JB_CrashPrinter(Sig);
+		//JB_CrashPrinter(Sig); // no need. looks ugly and the terminal already reports it.
 		JB_ProcessReportCrash();
 	} else if (getppid() > 1) {
 		SafePrint("Child process got signal...\n" );
