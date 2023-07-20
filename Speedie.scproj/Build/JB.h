@@ -1088,6 +1088,7 @@ struct SCClass_Behaviour: SCBase_Behaviour {
 JBClass ( SCClass , SCBase , 
 	SCClass* Super;
 	Message* Defawlt;
+	Message* False;
 	Message* SourceClass;
 	SCModule* Modul;
 	Array* Properties;
@@ -4559,8 +4560,6 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
-void SC_IR_Print(IR* self);
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5276,8 +5275,6 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
-
-int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -7249,6 +7246,8 @@ void JB_Msg_Export(Message* self, FastString* fs);
 
 Message* SC_Msg_FailOrCopy(Message* self, Message* p);
 
+Message* SC_Msg_FalsifyNil(Message* self);
+
 void JB_Msg_File__(Message* self, FastString* fs);
 
 JB_String* SC_Msg_FileLocation(Message* self);
@@ -7595,7 +7594,7 @@ JB_String* SC_Msg_RenderTypeAndName(Message* self);
 
 void JB_Msg_RenderWithSpaces(Message* self, FastString* fs, Message* ch);
 
-Message* SC_Msg_ReplaceInbuiltSub(Message* self, SCBase* name_space, SCDecl* self_decl, Message* self_exp);
+Message* SC_Msg_ReplaceInbuiltSub(Message* self, SCBase* name_space, SCDecl* self_decl);
 
 Message* JB_Msg_ReplaceInto(Message* self, Message* w);
 
@@ -7935,6 +7934,8 @@ void JB_Class_destructor(SCClass* self);
 
 SCFunction* SC_Class_DoSaver(SCClass* self, JB_String* name, int stage);
 
+Message* SC_Class_falsify(SCClass* self, Message* ques);
+
 void SC_Class_FillInterFaceIn(SCClass* self, SCFunction* fn, bool Late);
 
 void SC_Class_FillInterFaceWrapper(SCClass* self, SCFunction* fn);
@@ -8009,6 +8010,8 @@ void SC_Class_ModelDecls(SCClass* self);
 
 void SC_Class_MoreConstantCollection(SCClass* self);
 
+void SC_Class_NeedsDefaultValue(SCClass* self, Message* def, Message** place, JB_String* name);
+
 bool SC_Class_NeedsExport(SCClass* self);
 
 void SC_Class_NewClassNew(SCClass* self, SCFunction* con, Message* src, int ExtraCode);
@@ -8070,6 +8073,10 @@ SCModule* SC_Class__DataTypeSub(Message* Node, SCBase* Parent, Message* ErrPlace
 Message* SC_Class__DoOneNamedField(Message* c, JB_String* name, JB_String* datatype, int n);
 
 SCBase* SC_Class__ExtendOneFunc(Message* node, SCBase* name_space, Message* ErrPlace);
+
+SCBase* SC_Class__GetDefault(Message* node, SCBase* name_space, Message* ErrPlace);
+
+SCBase* SC_Class__GetFalse(Message* node, SCBase* name_space, Message* ErrPlace);
 
 int SC_Class__Init_();
 
@@ -8688,7 +8695,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
@@ -8696,7 +8702,6 @@ inline void SC_flat_AddExtended(ASMFuncState* self, Message* err, uint Bits) {
 	int B = 1 << 31;
 	if (((bool)(Bits & B))) {
 		JB_Msg_SyntaxExpect(err, nil);
-		return;
 	}
 	SC_flat_RequestOp2(self, kJB__ASM_Extended)->Rest = (Bits | B);
 }
