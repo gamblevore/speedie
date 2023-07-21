@@ -59,9 +59,9 @@ Another way to typecast is using the `as` operator:
         if file
             printline file.readall
 
-If msg.obj is nil... this is OK but it will still return nil. If msg.obj is not nil or a file, then `as` will create an error and return nil.
+If msg.obj is nil... this is OK but it will still return nil. If msg.obj is not nil and not a file, then `as` will create an error and return nil. The error will be stored in stderr, but the controlflow is not altered.
 
-This is MUCH better than blind-casting! Turning a RingTree into a file blindly... would cause all sorts of issues. And creating an exception would SUCK totally... because it destroys control flow. My approach is the best.
+This is MUCH better than blind-casting! Turning a RingTree into a file blindly... would cause all sorts of issues. And creating an exception would SUCK totally... because it destroys control flow. This approach is really nice.
 
 
 ## Subclassing
