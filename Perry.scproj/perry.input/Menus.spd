@@ -5,12 +5,19 @@ function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
 	|| orig = l
 	p.listsource.clear
 	while l
-		|| S = filerow.icon(l, "").render + " " + l.volumename
+		|| S = filerow.icon(l, "").render + " " + l.NameOrRoot
 		p <~ filerow(l, s, (".nothing", "")(l != orig))
 		if l.IsVolume
 			exit
 		l = l.parent
 	.OpenMenu(tab)
+
+
+function string.NameOrRoot (|string|)
+	opt norefcounts
+	|| s = .name
+		return s
+	return "Root"
 
 
 function PerryIDE.EnablePrevnext

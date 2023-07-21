@@ -18,7 +18,6 @@ extend String
 			|| fixed = L.TrimSlashes(true)
 			"".FileGlobSub(fixed / '/', rz)
 
-
 	helper FileGlobSub (|[string]| parts, |[file]| result, |int| i=0)
 		|| p = parts[i++]
 		ifn p contains '*'
@@ -28,7 +27,6 @@ extend String
 		for ch in .file
 			if p globs ch
 				.child(ch).fileglobsub2(parts, result, i)
-		
 			
 	operator globs (|string| txt, |bool|)
 		|&byte| text_backup
@@ -52,7 +50,6 @@ extend String
 			wild++  // ignore trailing stars
 		return wild == wildEnd
 	
-	
 	helper FileGlobSub2 (|[string]| parts, |[file]| result, |int| i=0)
 		if parts > i
 			.FileGlobSub(parts, result, i)
@@ -64,8 +61,7 @@ extend String
 		//   /*/def/ghi
 		//   /abc/def/*
 		//   /abc/d*f/ghi
-		//   /*/d*f/*
-			
+		//   /*/d*f/*		
 	
 	function FileExists (|bool|)
 		|| f = .file
@@ -74,7 +70,6 @@ extend String
 	function FileSize (|int64|)
 		|| f = .file
 		return f.size
-	
 	
 	function MakeEntirePath (|bool|Last=true, |ErrorInt|)
 		visible class~file
@@ -110,12 +105,10 @@ extend String
 		R[num] = With
 		return join2(R, "/")
 
-
 	function RemoveExt (|string| suff, |string|)
 		if self isa suff
 			return .trimext
 		return self
-	
 	
 	function TrimSlashes (|bool|Pathfix = false, |string|)
 		|| p = (.pathfix, self)(pathfix)
@@ -132,23 +125,13 @@ extend String
 			fs.Length--
 		return fs
 	
-	
 	helper FindTrailingSlashes (|int|)
 		rz = .Length
 		while self[rz-1] == '/'
 			rz--
-		
 
 	function Resolve (|bool| Mode=false, |string|) 
 		cpp_wrapper JB_Str_ResolvePath
-
-
-	function VolumeName (|string|)
-		opt norefcounts
-		|| s = .name	// wait we wan the first path, not the last?
-			return s
-		return "Root"	// should really go through all the stuff in /Volumes/ or /vol/
-
 
 	function IsVolume (|bool|)
 		if self == "/"
@@ -156,15 +139,13 @@ extend String
 		|| p = .parent.pathdir
 		if p == "/Volumes/" or "/vol/" or "/media/" or "/mnt/"
 			return true
-		// should really go through all the stuff in /Volumes/ or /vol/
-
 
 	function TrimExt (|string|)
 		return .TrimExtAndPath(false)
+	
 	function TrimExtKeepPath (|string|)
 		disabled "Just use .trimext"
 		return .TrimExtAndPath(false)
-
 
 	function TrimExtAndPath (|bool| KeepPath=true, |string|)
 		Description "already does .name, no need for .name.trimext"
@@ -175,11 +156,9 @@ extend String
 		if !KeepPath
 			slash = 0
 		return self[slash, dot]
-		
-
+	
 	function ReadFile (|int|lim=1024MB, |bool|AllowMissing=true, |stringthatwasreadsafely|)
 		return .file.readall(lim, AllowMissing)
-
 
 	function Write (assigns:|string|, |bool|)
 		return .file.data(Value)
@@ -195,25 +174,20 @@ extend String
 			Return self + "/" + cname
 		Return self + cname[1, int.max]
 
-
 	syntax access (|string| s, |string|)
 		return .child(s)
-
 
 	function Parent (|string|)
 		description "Gets the file path's parent'" 
 		if self != "/"
 			return .TrimSlashes.BeforeLastByte('/', 1)
 
-
 	function PathFix (|string|)
 		cpp_wrapper JB_File_PathFix_ // needs a better name
 		// basically just replaces "~/" with the username...
 
-
 	function MakeDir (|ErrorInt|)
 		cpp_wrapper JB_Str_MakeDir
-
 
 	function TrimLastSub (|Byte| b, |int|)
 		// replace with .outbyte(-1,0,b)?
@@ -221,30 +195,25 @@ extend String
 		while (self[N - 1] == b)
 			N--
 		return N
-
 	
 	function TrimFirst (|Byte| b, |string|)
 		|| s = .outbyte(b)
 		return self[s...]
-
 	
 	function AfterByte (|Byte| b, |int| Last=-1, |string|)
 		|| Start = .find( b, Last, 0 )
 		return self[Start + 1, Last]
-
 
 	function BeforeLastByte (|Byte| b, |int| fudge=0, |string|)
 		|| Last = .TrimLastSub(b)
 		|| Start = .find( b, Last, 0 )
 		return self[ 0, Start + fudge ]
 
-
 	function BeforeByte (|Byte| b, |int| NotFound=-1, |string|)
 		|| i = .find( b )
 		if (i < 0)
 			i = NotFound
 		return self[ 0, i ]
-
 		
 	function AddExt (|string| ext, |string|)
 		if !ext
@@ -266,7 +235,6 @@ extend String
 		if i
 			return self[i + 1, n+1]
 
-
 	function BackToApp (|string|)
 		|| s = .TrimSlashes
 		|| Final = ".app/Contents/MacOS/" + .name
@@ -279,12 +247,10 @@ extend String
 		|| Last  = .TrimLastSub('/')
 		return .AfterByte('/', Last)
 	
-	
 	function FolName (|string|)
 		|| Last  = .TrimLastSub('/')
 		|| before = .find('/', last, 0)+1
 		return self[before...]
-
 
 	function String.FindSlash (|int| from, |ind|)
 		if from < .length
@@ -313,13 +279,16 @@ extend String
 
 	operator isa (|string| s, |bool|)
 		return .ext ~= s
+		
 	function File (|File|)
 		cpp_part AsFile
 		if self isa file
 			return self
 		return .filesub
+	
 	helper FileSub (|File|)
 		cpp_Wrapper JB_Str_File
+	
 	function FileCh (|string| ch, |File|)
 		cpp_Part ChildFile
 		return self.Child(ch).file
@@ -342,6 +311,14 @@ extend String
 		for field in StringFields( self, ',' )
 			if field ~= s
 				return true
+
+
+		
+helper @file.OSXMaxCaseWarnings (|&int|)
+	cpp_Wrapper JB_File__Compar
+
+helper file.RelaxSudo (|int| Amount = 0, |int|)
+	cpp_wrapper
 		
 
 extend file
@@ -370,8 +347,18 @@ extend file
 	function ZipUpload (|string| url, |errorint|)
 		return .ZipTmp$.uploadto(url)
 
-		
+
+
 datatype FileResolveMode (bool)
 	constants
 		AllowMissing = true
 
+
+
+role StringThatWasReadSafely (string)
+	linkage
+		cpp_part Safe
+	syntax cast (|bool|)
+		opt norefcounts
+		|| o = self|object|
+		return o != string.error and nil

@@ -21,6 +21,9 @@ class Charset
 	function Invert (|charset|)
 		cpp_wrapper JB_CS_Invert
 	
+	function Reverse
+		disabled "use invert"
+	
 	function Bytes (|[string]|)
 		opt norefcounts
 		for b in self

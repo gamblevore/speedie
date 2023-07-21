@@ -12,7 +12,8 @@ class Anagrams
 				|| remain2 = remain[i...]
 					.split(v2, remain2)
 				  else
-					.out[v] = v2.sort(' ')
+					v2 = v2.sort(' ')
+					.out[v2] = v2
 		
 	
 	helper Find (|string| progress, |string| inside, |int| depth)
@@ -30,6 +31,7 @@ class Anagrams
 			return s == "i" or "a"
 			
 		function Find (|string| s, |dictionary of string|)
+			s = s.Remove(jeebox.CSLettersOnly.invert)
 			if !.d
 				|| data = ""
 				using "read":  data = file.words.ReadAll
@@ -41,6 +43,6 @@ class Anagrams
 
 main
 	using "total"
-		|| d = Anagrams.find(app[0])
-		for v in d
-			printline v
+		|| d = Anagrams.find(app[0] ?? "hedgehog")
+		for (v in d) (k)
+			printline v + " <-- " + k

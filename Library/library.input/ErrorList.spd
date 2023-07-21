@@ -86,6 +86,7 @@ class ErrorList
 		cpp_part AppendStr
 		self <~ error(nil, err)
 
+
 	setter LogFile (|string|)
 		opt norefcounts
 		visible class~file
