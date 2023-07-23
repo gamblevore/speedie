@@ -1134,6 +1134,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ "goto _after_try_$after;"
 
 		fs.indentline
+		|| c2 = fs.TryCount++
+		fs <~ "_try_$c2: ;\n"
 		fs <~ "_after_try_$after:"
 		
 			

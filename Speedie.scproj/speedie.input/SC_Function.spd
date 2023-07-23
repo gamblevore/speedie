@@ -71,11 +71,11 @@ constructor (|Message| msg = nil)
 
 
 syntax equals (|string| name, |bool| Aware, |bool|)
-	if (self)
-		// never needs !aware.
-		if .ExportName.syntaxequals( name, true )
-			return true
-		return .Name.syntaxequals( name, true )
+	require (self)
+	
+	if .ExportName.syntaxequals( name, true )
+		return true
+	return .Name.syntaxequals( name, true )		// never needs !aware.
 
 
 operator isa (|int| Code, |bool|)
@@ -111,10 +111,10 @@ render RenderParams (|bool| ForErrors=true)
 			sep = ", "
 			fs <~ a.source
 	
-	if !ForErrors
-		if .returntype
-			fs <~ sep
-			.returntype.render(fs)
+	try
+		need !ForErrors and .ReturnType
+		fs <~ sep
+		.returntype.render(fs)
 	
 	fs <~ ')'
 
@@ -611,14 +611,14 @@ function DeclsProtoTypeRemove (|SCClass| fpType, |Message| ch0, |bool| AssumeSel
 		p.Func = @prm
 		ch0.Remove
 	
-	if (.cls)
-		if late
-			p.first.remove // ooof
-		if (!AssumeSelf)
-			ch0 = p[@Decl][@thg]						#require
-			|| decl = ExtractDecl( ch0, nil )			#expect p
-			expect (decl isa .cls.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
-			ch0.parent.Remove
+	require .cls
+	if late
+		p.first.remove // ooof
+	if (!AssumeSelf)
+		ch0 = p[@Decl][@thg]						#require
+		|| decl = ExtractDecl( ch0, nil )			#expect p
+		expect (decl isa .cls.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
+		ch0.parent.Remove
 
 
 
@@ -846,8 +846,8 @@ function FindReached (|scbase| from, |bool|)
 	require !.CurrReacher
 	.currreacher = from
 	Compiler.stReachedFunc++
-	if .cls
-		.cls.Reach(self)
+
+	.cls.Reach(self)?
 		
 	for o in .LinkTo
 		if (o.CurrReacher)

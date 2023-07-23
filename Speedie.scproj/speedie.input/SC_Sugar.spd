@@ -95,14 +95,14 @@ function message.Tran_QMark
 
 function message.MainOneArg (|message| arg, |int64| i, |faststring| usage)
 	opt norefcounts
-	|| type = self[@thg]				#require
-	|| name = type.next					#require
+	|| type = self[@thg]					#require
+	|| name = type.next						#require
 	|message| value
 	|| mac = macros.MainArg1
 	if name == @rel
-		name = name[@thg]				#require
-		|| opp = name.next(@opp, "=")	#require
-		value = opp.next(@Nil)			#require
+		name = name[@thg]					#require
+		|| opp = name.next(@opp, "=")		#require
+		value = opp.next(@Nil)				#require
 		mac = macros.MainArg2
 	  else
 		require name.Expect(@thg)
