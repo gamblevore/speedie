@@ -1470,6 +1470,47 @@ function Tran_IfSub (|int| mode, |message| node, |scbase| name_space)
 	Tran_Isa(node, name_space)
 	
 
+
+function Tran_Try (TranFunc) 
+	opt norefcounts
+	/*
+	try
+		abc
+		need "pouring water"
+		if abc
+			need "pouring water"
+	  or
+		oof
+	*/
+	/*
+	try
+		abc
+		if !"pouring water"
+			cant
+		if abc
+			need "pouring water"
+	  or
+		oof
+	*/
+	// doesnt seem to need anything??? WOW.
+
+
+
+function Tran_Need (TranFunc) 
+	opt norefcounts
+	with node
+		node.name = "ifn"
+		|| arg = node.msg(@arg)
+		arg.msg(@tmp, "cant")
+		tran_ifn(fn, node, name_Space)
+
+
+function Tran_Cant (TranFunc) 
+	opt norefcounts
+	|| x = node.first
+		error (x)
+	
+
 function message.RemoveElseIf // self == cond
 	opt norefcounts
 	|| arg = .next
@@ -1480,7 +1521,6 @@ function message.RemoveElseIf // self == cond
 	if arg == @arg
 		arg.clear
 	.NeedBra
-
 
 
 function Tran_Else (TranFunc) 

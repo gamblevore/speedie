@@ -77,6 +77,7 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 	.T.Length = 0
 	
 	fs.currfunc = f
+	fs.TryCount = 0
 	fs.srcend = f.sourcearg
 	fs.ExtraAfter = fs.srcend.flatafter
 	fs <~ ' ' // space between arg.
@@ -1105,13 +1106,43 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| d = name.AsDecl				#expect
 		WriteDecl( d, fs, DeclsDefault(.last) )
 	
-
+	
+	function message.TryRenderCpp (fpMsgRenderCpp)
+		opt norefcounts			
+		|| arg = self[@arg]$
+		cpp_export.C_RenderArg(self, fs)
+		|| tmp = arg.next
+		// how to do the break?
+		// we need a label? seems fair?
+		while tmp
+			fs.IndentLine
+			|| c = fs.TryCount++
+			fs <~ "_tmp_$c: ;\n"
+			
+			arg = tmp.first						#debug_Require
+			cpp_export.C_RenderArg(arg, fs)
+			tmp++
+			
+	
 	function C_RenderTmp (fpMsgRenderCpp)
 		opt norefcounts			
 		|| name = .name
 		if (name == "exit")
 			fs <~ "break"
 			
+		  elseif (name == "if")
+			fs <~ Cpp_Export.IfName
+
+		  elseif (name == "while") 
+			fs <~ Cpp_Export.WhileName
+
+		  elseif (name == "try")
+			.TryRenderCpp(fs)
+
+		  elseif (name == "cant")
+			fs <~ "goto _tmp_${fs.trycount+1}: ;\n"
+			return
+
 		  elseif (name == "elseif")
 			fs <~ "else "
 			fs <~ Cpp_Export.IfName
@@ -1120,16 +1151,14 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			return
 
 		  elseif (name == "rejoin")
-			0 //
-		  elseif (name == "if")
-			fs <~ Cpp_Export.IfName
-		  elseif (name == "while") 
-			fs <~ Cpp_Export.WhileName
+			0
+
 		  elseif (name == "swap")
 			fs <~ "JB_Swap"
 			debugat
 			C_ParamsRender(self, fs)
 			return
+			
 		  else
 			fs <~ name
 		
@@ -1474,6 +1503,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 function message.safe (|faststring| fs)
 	.name.safe(fs)
 
+
 function string.safe (|faststring| fs)
 	if .isascii
 		fs <~ self
@@ -1495,13 +1525,11 @@ class FastStringCpp (FastString)
 	|string|		Cpp_Name
 	|message|		SrcEnd
 	|scfunction|	CurrFunc
-	|uint|			LastLine
-	|uint|			LastPos
+	|uint|			TryCount
 
 
 	constructor (|string| name = "")
 		.cpp_name = name
-		.lastline = 1
 
 	
 	function ringtree.dbglineinfo
@@ -1519,29 +1547,8 @@ class FastStringCpp (FastString)
 				fs <~ ' '
 
 			printline fs
+
 	
-	
-	function ExpectedNext (|int|)
-		return .lastline + 1
-		
-	
-	function LineNumber (|message| msg, |int|)
-		|| p = msg.position
-		if p < 0
-			require .lastline != 1
-			return .lastline
-
-		|| l = .lastpos|int|
-		.lastpos = p
-		|| Missing = .OrigSrc[l min p, p max l]
-		|| Lines = Missing.Count('\n')
-
-		if (p < l)
-			lines = -lines
-		.lastline += lines
-
-		return .lastline
-
 
 function funcsorter_fn (sortercomparer)
 	return (a|scfunction|).exportname < (b|scfunction|).exportname
