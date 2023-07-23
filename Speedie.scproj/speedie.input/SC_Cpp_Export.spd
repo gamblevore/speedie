@@ -1112,11 +1112,18 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| arg = self[@arg]$
 		cpp_export.C_RenderArg(arg, fs)
 		|| tmp = arg.next
+		
+		// consequtive tries shouldn't use the same number...
+		// nested either
+		// but neste should reset into the parent's try number
+		// where do we store this?
+		// i think just use the current one?
+		
 
 		while tmp
 			fs.IndentLine
 			|| c = fs.TryCount++
-			fs <~ "_tmp_$c: ;\n"
+			fs <~ "_try_$c: ;\n"
 			
 			arg = tmp.first						#debug_Require
 			fs.indentline
@@ -1141,7 +1148,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			return
 
 		  elseif (name == "cant")
-			fs <~ "goto _tmp_${fs.trycount+1}: ;\n"
+			|| c = fs.trycount
+			fs <~ "goto _try_$c: ;\n"
 			return
 
 		  elseif (name == "elseif")
