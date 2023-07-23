@@ -60,12 +60,12 @@ extend PerryIDE
 
 
 	function Compile (|string| operation)
-		if !.Building
-			.ActualCompile(.CompileMsg(operation, true))
-		  elseif .editsep.div.Collapsed
-			.ShowStdOut  
-		  else
-			ClickedCancel(.BuildButton)
+		if .Building
+			if .editsep.div.Collapsed
+				.ShowStdOut 
+				return 
+			require ClickedCancel(.BuildButton)
+		.ActualCompile(.CompileMsg(operation, true))
 			
 	
 	function CompileMsg (|string| operation, |bool| SaveAll, |message|)

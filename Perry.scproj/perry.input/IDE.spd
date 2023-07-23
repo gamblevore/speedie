@@ -144,7 +144,7 @@ class PerryIDE (Window)
 		
 		if !.filelist.AskSaveall
 			return true // failed
-		if ClickedCancel(self)
+		if !ClickedCancel(self)
 			return true
 		
 		if n >= 2 and reason < sdlapp.ktryquit

@@ -157,7 +157,7 @@ function fnBuildIsDead (fnConfirmCanceller)
 	if self isa perryide
 		.SpeedieMsgReceive(.compilr)
 		if !.Building
-			.CancelCompile // will return false in ClickedCancel if we return true here.
+			.CancelCompile
 			return true
 
 
@@ -167,12 +167,12 @@ function Perryide.Building (|bool|) // .isbuilding, .iscompiling, .compiling
 
 function ClickedCancel (GUIAction)
 	|| i = .ide
-	require i.building
+	if !i.building
+		return true
 	|| can = ConfirmCanceller(i, fnBuildIsDead)
 	if "Cancel Build of ${i.project.trimproj}?".confirm(can)
 		i.CancelCompile
-	  else
-		rz = true
+		return  true
 		
 
 function ClickedCompile (GUIaction)
