@@ -10,7 +10,7 @@ cpp_part AC
 |byte|				ShouldEnter = 0
 |process|			Perry 
  
-||					func_tmp_src   = <(`return, require, "log <string>", while, linkage, for, if, else, elseif, expect, warn, error, disabled, cpp_refs, once, debugger, debugat, deprecate, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "visible", "exit", "opt norefcounts", "pragma inline"
+||					func_tmp_src   = <(`return, require, "log <string>", while, linkage, for, if, else, elseif, expect, warn, error, disabled, cpp_refs, once, debugger, debugat, deprecate, `description "<describe this function>"`, print, printline, try, need, cant, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "visible", "exit", "opt norefcounts", "pragma inline"
  `)>.macro
  
 ||					all_tmp_src	= <(`
@@ -606,7 +606,6 @@ function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoite
 	while value and .active
 		try
 			cant (key ~= "self") and (value isa scmodule)
-//			need value.CanAutoLimit(Types, TypeLimiter)
 			need types & value.AutoCompleteType
 			if typelimiter
 				|| mine = value.AsDeclAutocomplete
@@ -618,26 +617,7 @@ function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoite
 			found <~ autoitem(key, src_name, value, sub_name, exact, value.auto_type)
 			
 			 
-/*			
-		if (key ~= "self") and (value isa scmodule)
-			//
-		  elseif value.CanAutoLimit(Types, TypeLimiter)
-			|| sub_name = value.display(exact)
-				.total++
-				sub_name = value.baseicon + " " + sub_name
-				found <~ autoitem(key, src_name, value, sub_name, exact, value.auto_type)
-*/
 		value = value.nextdisplay(exact)
-
-//
-//function scobject.CanAutoLimit (|int| Type, |scdecl| Limiter, |bool|)
-//	opt norefcounts
-//	ifn type & .AutoCompleteType
-//		return false
-//	ifn limiter
-//		return true
-//	|| mine = .AsDeclAutocomplete
-//		return mine.minimatch(limiter)
 
 			
 function AutoSub (|scbase| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit)
@@ -704,11 +684,12 @@ function TmpAutoComplete (|message| f, |string| name, |string| type, |message|)
 	rz = @tmp + type
 	if name ~!= "r" // too annoying.
 		for ch in .functmps
-			ifn ch starts name
-				0
-			  elseif  ch.name > 2  and  ch.name ~= name
+			try
+				cant ch starts name
+			  or
+				need  ch.name > 2  and  ch.name ~= name
 				finished = true
-			  else
+			  or
 				|| arg = rz.msg(@arg, name)
 				|| n = ch.first.name
 				@tmp.msg(arg, n) <~ (@str, n)

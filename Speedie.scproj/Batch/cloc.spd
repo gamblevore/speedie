@@ -87,7 +87,9 @@ function file.CountAll (|bool| force=false)
 		counts.dirs++
 		for c.files in self
 			c.CountAll
-	  elseif force or counts.exts[.ext]
+		return
+
+	if force or counts.exts[.ext]
 		.cloc
 
 
