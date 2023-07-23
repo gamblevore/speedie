@@ -282,7 +282,7 @@ function Message.CausesUnReachable (|Message| arg, |Message| Curr, |Message| Las
 		require (curr != LastPlace)
 		if (Curr == @Tmp)
 			|| s = Curr.name
-			if (s == "return")
+			if (s == "return" or "cant")
 				Return Curr
 
 			if (s == "exit" or "continue")

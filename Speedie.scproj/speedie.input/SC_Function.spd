@@ -890,7 +890,7 @@ function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Typ
 
 function FixCnj (|Message| exp)
 	using (exp)
-	.fixcnjsub(exp)
+	.FixCnjSub(exp)
 
 
 function FixCnjSub (|Message| exp) {
@@ -901,11 +901,10 @@ function FixCnjSub (|Message| exp) {
 	// get the name (it's important)
 	|| ch = exp.first
 	|| name = ch.Next.Name
-	// "error" sucks as a name...
-	|| CreatesError = (name == "expect" or "error" or "check")
-
-	|| DoesReturn =  (name != "error" and "loop" and "check")
-	expect (CreatesError or (name == "debug_require" or "require" or "continue" or "loop")) (exp, "Must be one of '#require, #expect, #continue, #debug_require, #loop' .")
+	|| CreatesError = (name == "expect" or "check")
+	
+	|| DoesReturn =  (name != "loop" and "check")
+	expect (CreatesError or (name == "debug_require" or "require" or "continue" or "loop" or "need")) (exp, "Must be: 'require/expect/continue/loop' .")
 	
 	// lets fix it, if its in a rel, (it shouldn't be)
 	// || x = a #require   -->   || x = (a #require)
@@ -922,11 +921,9 @@ function FixCnjSub (|Message| exp) {
 		bra.WrapWith( exp )
 		bra.ReplaceWith( bra.first )
 	
-	
-	if name == "require"
+	if name == "require" // unneeded? "cant" doesnt seem to need it?
 		nxt.Name = "return"
 		name = "return"
-	
 		
 	// helpfully replace the exp.
 	ch = exp.first
@@ -998,21 +995,24 @@ function FixCnjSub (|Message| exp) {
 		if (name != "expected")
 			L = L.ExpectParamsTransform( exp.Position, exp )
 		  else
-			error (exp, "#expected is deprecated: ")
+			error (exp)
 		arg <~ L
 
 	
 	if (name == "debug_require")
 		arg <~ «tmp "debugger"»
 
-	
-	if (name starts "continue") and pp.WithinLoop( .SourceArg )
+	if (name == "continue") and pp.WithinLoop( .SourceArg )
 		arg <~ «tmp "continue"»
+		
 	  elseif (name == "loop") and pp.WithinLoop( .SourceArg )
 		arg <~ «tmp "exit"»
+		
+	  elseif name == "need"
+		arg.msg(@tmp, "cant")
+	
 	  elseif (DoesReturn)
 		arg <~ «tmp "return", «ques "nil"»»
-	
 	
 	if (thg isbrel "!")  // cancel out "!!test"
 		thg = thg.ReplaceWithChild
@@ -1028,7 +1028,6 @@ function FixCnjSub (|Message| exp) {
 		pp.Prev = if_
 	  else
 		pp.Next = if_
-	
 	
 	if (RemoveMe)
 		RemoveMe.Remove
@@ -1477,40 +1476,21 @@ function Tran_Or (TranFunc)
 
 
 function Tran_Try (TranFunc) 
-	opt norefcounts // just validate
 	|| f = node[@arg]$
 	while
-		f = f.next#loop
+		f = f.next #loop
 		f.expect(@tmp, "or")
 		f[@arg]
 
+	node.flags |= asmtmp.itry
+
 	try
-		|| x = 1+2// #need
+		|| x = "Abc"
+		|| x2 = 1+2 #need
+		|| y = "def"
 		need x
 	  or
 		|| y = 3+4
-
-	/*
-	try
-		abc
-		need "pouring water"
-		if abc
-			need "pouring water"
-	  or
-		oof
-	*/
-	/*
-	try
-		abc
-		if !"pouring water"
-			cant
-		if abc
-			need "pouring water"
-	  or
-		oof
-	*/
-	// doesnt seem to need anything??? WOW.
-
 
 
 function Tran_Need (TranFunc) 
@@ -1527,6 +1507,8 @@ function Tran_Cant (TranFunc)
 	opt norefcounts
 	|| x = node.first
 		error (x)
+	node.flags |= asmtmp.icant
+	node.removeafter
 	
 
 function message.RemoveElseIf // self == cond
@@ -1597,8 +1579,6 @@ function Tran_Rejoin (TranFunc)  // exitter
 		|| arg = p.asarg
 		expect (arg.IsStatementExpr) (node, "Can't use this here.")
 		expect !p.next (node, "Value expected here.")
-
-
 
 
 function NewCppWrapper (CollectFunc)

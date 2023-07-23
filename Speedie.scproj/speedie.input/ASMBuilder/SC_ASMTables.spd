@@ -112,6 +112,8 @@ module ASMtmp
 		iReturn		= 60
 		iWhile		= 59
 		iSwap		= 58
+		iCant		= 57
+		iTry		= 56
 	
 	
 
