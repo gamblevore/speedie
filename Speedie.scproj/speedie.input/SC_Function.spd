@@ -1471,8 +1471,23 @@ function Tran_IfSub (|int| mode, |message| node, |scbase| name_space)
 	
 
 
-function Tran_Try (TranFunc) 
+function Tran_Or (TranFunc) 
 	opt norefcounts
+	|| p = node.parent
+	check (p istmp "try") (node)
+
+
+function Tran_Try (TranFunc) 
+	opt norefcounts // just validate
+	|| f = node[@arg]$
+	while
+		f = f.next#loop
+		f.expect(@tmp, "or")
+		f[@arg]
+	try
+		|| x = 1+2
+//	  or
+//		|| y = 3+4
 	/*
 	try
 		abc
@@ -1503,6 +1518,7 @@ function Tran_Need (TranFunc)
 		|| arg = node.msg(@arg)
 		arg.msg(@tmp, "cant")
 		tran_ifn(fn, node, name_Space)
+		
 
 
 function Tran_Cant (TranFunc) 

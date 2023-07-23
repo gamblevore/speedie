@@ -1107,7 +1107,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		WriteDecl( d, fs, DeclsDefault(.last) )
 	
 	
-	function message.TryRenderCpp (fpMsgRenderCpp)
+	function message.RenderCppTry (fpMsgRenderCpp)
 		opt norefcounts			
 		|| arg = self[@arg]$
 		cpp_export.C_RenderArg(self, fs)
@@ -1137,7 +1137,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ Cpp_Export.WhileName
 
 		  elseif (name == "try")
-			.TryRenderCpp(fs)
+			.RenderCppTry(fs)
+			return
 
 		  elseif (name == "cant")
 			fs <~ "goto _tmp_${fs.trycount+1}: ;\n"
