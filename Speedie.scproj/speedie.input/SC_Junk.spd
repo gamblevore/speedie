@@ -10,14 +10,12 @@ helper __junktest_1__
 
 	try
 		|| x = "Abc"
-		|| x2 = 1+2 #need
+		|| x2 = 1 + 2 #need
 		|| y = "def"
 		need x
-		(y)
+		printline y
 	  or
-		|| y = 3+4
-
-
+		|| y = 3 + 4
 
 
 extend ivec4
