@@ -282,10 +282,10 @@ function Message.CausesUnReachable (|Message| arg, |Message| Curr, |Message| Las
 		require (curr != LastPlace)
 		if (Curr == @Tmp)
 			|| s = Curr.name
-			if (s == "return" or "cant")
+			if (s == "return")
 				Return Curr
 
-			if (s == "exit" or "continue")
+			if (s == "exit" or "continue" or "cant")
 				if SCRefs.ExitHitsOrGoesPast( Curr, arg )
 					Return Curr
 

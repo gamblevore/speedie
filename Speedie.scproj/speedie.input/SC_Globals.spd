@@ -163,7 +163,7 @@ function TypeOfBlock (ExprResolver)
 			SCFunction.Tran_All( fn, ch, p )
 	
 	
-	|| val = last[@nil, 0]
+	|| val = last.NeedFirst
 	if val.expectlast
 		return TypeOfExpr(val, p, nil)
 

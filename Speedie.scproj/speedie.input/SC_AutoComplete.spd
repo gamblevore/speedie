@@ -1,6 +1,4 @@
 
-//crash "crash"
-
 
 module Interact { // module autocomplete
 cpp_part AC
@@ -592,14 +590,6 @@ function scobject.AutoCompleteType (|int|)
 	return 4
 
 
-function scobject.CanAutoLimit (|int| Type, |scdecl| Limiter, |bool|)
-	opt norefcounts
-	ifn type & .AutoCompleteType
-		return false
-	ifn limiter
-		return true
-	|| mine = .AsDeclAutocomplete
-		return mine.minimatch(limiter)
 
 
 function Object.AsDeclAutoComplete (|scdecl|)
@@ -614,6 +604,21 @@ function Object.AsDeclAutoComplete (|scdecl|)
 function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoitem]| found, |bool| exact, |int| Types, |scdecl| TypeLimiter)
 	
 	while value and .active
+		try
+			cant (key ~= "self") and (value isa scmodule)
+//			need value.CanAutoLimit(Types, TypeLimiter)
+			need types & value.AutoCompleteType
+			if typelimiter
+				|| mine = value.AsDeclAutocomplete
+					need mine.minimatch(typelimiter)
+			
+			|| sub_name = value.display(exact) #need
+			.total++
+			sub_name = value.baseicon + " " + sub_name
+			found <~ autoitem(key, src_name, value, sub_name, exact, value.auto_type)
+			
+			 
+/*			
 		if (key ~= "self") and (value isa scmodule)
 			//
 		  elseif value.CanAutoLimit(Types, TypeLimiter)
@@ -621,7 +626,18 @@ function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoite
 				.total++
 				sub_name = value.baseicon + " " + sub_name
 				found <~ autoitem(key, src_name, value, sub_name, exact, value.auto_type)
+*/
 		value = value.nextdisplay(exact)
+
+//
+//function scobject.CanAutoLimit (|int| Type, |scdecl| Limiter, |bool|)
+//	opt norefcounts
+//	ifn type & .AutoCompleteType
+//		return false
+//	ifn limiter
+//		return true
+//	|| mine = .AsDeclAutocomplete
+//		return mine.minimatch(limiter)
 
 			
 function AutoSub (|scbase| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit)

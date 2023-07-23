@@ -855,6 +855,12 @@ class Message (RingTree)
 				.accesserr(need, nil, found)
 	
 	
+	function NeedFirst (|message|)
+		Opt NoRefCounts
+		|| f = .first
+			return f
+		.accesserr(@nil, nil, nil)
+				
 	syntax access (|Syntax| s, |Message|)
 		cpp_Part NeedSyx
 		Opt NoRefCounts

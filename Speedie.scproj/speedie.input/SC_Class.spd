@@ -1037,11 +1037,11 @@ module
 	
 	function GetFalse (CollectFunc)
 		if name_space isa scclass
-			name_space.false = node[@nil, 0]
+			name_space.false = node.NeedFirst
 	
 	function GetDefault (CollectFunc)
 		if name_space isa scclass
-			name_space.defawlt = node[@nil, 0]
+			name_space.defawlt = node.NeedFirst
 	
 	function NamedPropertyFields (CollectFunc) // node, parent, errplace
 		// not a great feature???

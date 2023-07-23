@@ -1370,10 +1370,9 @@ function message.Tran_FS
 
 
 function Tran_Ifn (TranFunc)
-	|| f = node[@nil]
-		using (node)
-			node.name = "if"
-			node.first = «brel "!", f.needbra »
+	|| f = node.NeedFirst
+		node.name = "if"
+		f.Negate
 		tran_if(fn, node, name_space)
 
 
@@ -1466,6 +1465,8 @@ function Tran_IfSub (|int| mode, |message| node, |scbase| name_space)
 	cond.NeedBra
 	if cond.first == @arg // if a.b? --> if ({||x=a.b, rejoin x}), fails in c cos if ({}) is bad
 		cond.wrapwith(@bra.msg).obj = cond.obj 
+	if SCFunction ~= "autosub2"
+		printline cond
 	Tran_Isa(node, name_space)
 	
 
@@ -1485,20 +1486,25 @@ function Tran_Try (TranFunc)
 
 	node.flags |= asmtmp.itry
 
+
 function Tran_Need (TranFunc) 
 	opt norefcounts
 	with node
 		node.name = "ifn"
+		node.NeedFirst.expectlast
 		|| arg = node.msg(@arg)
 		arg.msg(@tmp, "cant")
 		tran_ifn(fn, node, name_Space)
-		
 
 
 function Tran_Cant (TranFunc) 
 	opt norefcounts
-	|| x = node.first
-		error (x)
+	|| cond = node.first		// cant abc --> need !abc
+		require cond.expectlast
+		node.name = "need"
+		cond = cond.Negate
+		return tran_need(fn, node, name_space)
+		
 	node.flags |= asmtmp.icant
 	node.removeafter
 	

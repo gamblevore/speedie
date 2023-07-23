@@ -81,14 +81,15 @@ function SC_MakeComment (|Message| msg)
 
 
 function Message.Negate (|Message|)
+	if self == @bra
+		.become(@brel, "!")
+		return self
 	|| ch = .unbra
 	if ch IsBRel "!"
 		return .ReplaceWith(ch.first)
 
-	|| Not = «BRel "!"»
-	.ReplaceWith(Not)
-	Not <~ self
-	return Not
+	using self
+		rz = .WrapWith(«BRel "!"»)
 
 
 function Message.IsAssignable (|bool|)

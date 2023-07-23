@@ -85,7 +85,7 @@ function message.tran_target (|message|)
 
 function message.Tran_TargetSub
 	opt norefcounts
-	|| value = self[@nil]
+	|| value = self.needfirst
 	|| IsFalse = (value == @brel and "!")
 		value = value.first
 	

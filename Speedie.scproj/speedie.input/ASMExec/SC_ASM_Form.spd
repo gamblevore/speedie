@@ -22,7 +22,7 @@ class µForm
 		opt norefcounts
 		.name = tmp.name
 		for line in tmp.last(@arg)
-			|| f = line[@nil]
+			|| f = line.needfirst
 			.loadparam(f.nyme, f)
 		.Finish
 		.index = ++µform.count

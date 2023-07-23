@@ -21,7 +21,7 @@ module SCThe
 
 		for line in name.next(@arg)
 			line.expect(@tmp)
-			|| value = line[@nil, 0]
+			|| value = line.NeedFirst
 			value.expectlast
 			|| old = d[line.name] // old is a dict...
 				error (line, kNameConf)
@@ -48,7 +48,7 @@ function TypeOfAdj (ExprResolver)
 
 function compiler.FindAdj (|message| exp, |[message]| prms=nil, |macro|)
 	opt norefcounts
-	|| f = exp[@nil, 0]					#require
+	|| f = exp.NeedFirst				#require
 	|| d = compiler.Adj(f)				#require
 	|| name = exp[@thg, 1]				#require
 	name.name = name.name.lowercase

@@ -50,7 +50,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
 	|| n = 32 - bit_pos
 	|| lname = "_L"
 	if line
-		|| f = line[@nil]$
+		|| f = line.needfirst$
 		|| f0 = f.name[0]
 		if f0 == 'r'
 			.FillTypePrm(line.name, pname)

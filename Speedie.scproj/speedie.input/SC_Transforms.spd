@@ -424,7 +424,7 @@ function Tran_For (TranFunc)
 
 function Tran_ForSub (TranFunc)					// :3
 	//////// COLLECT VARIABLES
-	|| list = node[@nil]$
+	|| list = node.needfirst$
 	|| Bad = 0
 
 	|| index = list.Next
