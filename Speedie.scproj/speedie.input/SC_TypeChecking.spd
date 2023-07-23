@@ -7,8 +7,11 @@ module exec
 
 function ExpandToBool (|Message| inside, |SCBase| name_space, |Message|)
 	|| decl = TypeOfExpr( inside, name_space )$
+
+	|| x = inside
 	rz = TypeBool.TypeNormal.ExpectMatch( decl, kTypeCastTrue, inside )
-	
+	(x) // bug work around? somecaller is opt norefcounts badly
+
 	While (rz == @bra) and (rz.first == @bra)
 		rz = rz.ReplaceWithChild
 
