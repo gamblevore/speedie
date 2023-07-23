@@ -1109,34 +1109,31 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 	function message.RenderCppTry (fpMsgRenderCpp) // rendertry
 		opt norefcounts			
-		|| arg = self[@arg]$
 		|| after = ++fs.TryCount
-		cpp_export.C_RenderArg(arg, fs)
-		|| tmp = arg.next
+		|| tmp = self
 		
 		// consequtive tries shouldn't use the same number...
 		// nested either
 		// but neste should reset into the parent's try number
 		// where do we store this?
 		// i think just use the current one?
-		
 
-		while tmp
+		while
 			fs.IndentLine
 			|| c = fs.TryCount++
 			fs <~ "_try_$c: ;\n"
 			
-			arg = tmp.first						#debug_Require
+			|| arg = tmp.first						#debug_Require
 			fs.indentline
 			cpp_export.C_RenderArg(arg, fs)
 			fs.indentline
-			fs <~ "goto _after_try_$after"
-			fs <~ ";\n"
-			tmp++
+			if tmp == self
+				tmp = arg
+			tmp = tmp.next  #loop
+			fs <~ "goto _after_try_$after;"
 
 		fs.indentline
 		fs <~ "_after_try_$after:"
-		fs <~ ";\n"
 		
 			
 	
