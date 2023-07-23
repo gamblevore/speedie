@@ -117,7 +117,7 @@ function GenerateForms (|message| forms)
 	opt norefcounts
 	|| f = 0
 	for form_msg in forms[@arg]
-		if (f < 32) #error (form_msg, "Too many forms")
+		if (f < 32) #check (form_msg, "Too many forms")
 			using form_msg
 			.GenerateOne(form_msg, ++f)
 

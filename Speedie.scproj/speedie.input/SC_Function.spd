@@ -738,15 +738,15 @@ function FillInConstructorAndDestructor (|Message| root, |bool| IsConstructor, |
 				|| t = TypeOfExpr(p, nil)
 					|| tester = TheSetter ?? p
 					if (t.IsNormalObject)
-						(!(IsConstructor and !TheSetter) #error (tester, "Can’t read object properties during a constructor."))
-						(!(!IsConstructor and TheSetter) #error (tester, "Can’t set object properties during a destructor."))
+						(!(IsConstructor and !TheSetter) #check (tester, "Can’t read object properties during a constructor."))
+						(!(!IsConstructor and TheSetter) #check (tester, "Can’t set object properties during a destructor."))
 					
 					if (IsConstructor)
 						|| s = p.name.Lowercase
 						
 						if (t.isNormalObject)
-							(!dict[ s ]					#error (tester, "Can’t set object property twice during a constructor."))
-							(TheSetter.Parent == root	#error (tester, "Object property set must be at the root. (not nested)."))
+							(!dict[ s ]					#check (tester, "Can’t set object property twice during a constructor."))
+							(TheSetter.Parent == root	#check (tester, "Object property set must be at the root. (not nested)."))
 						dict[ s ] = "x"
 	
 	
@@ -905,7 +905,7 @@ function FixCnjSub (|Message| exp) {
 	|| CreatesError = (name == "expect" or "error" or "check")
 
 	|| DoesReturn =  (name != "error" and "loop" and "check")
-	expect (CreatesError or (name == "debug_require" or "require" or "continue" or "loop")) (exp, "Must be one of '#require, #expect, #continue, #debug_require, #error, #loop' .")
+	expect (CreatesError or (name == "debug_require" or "require" or "continue" or "loop")) (exp, "Must be one of '#require, #expect, #continue, #debug_require, #loop' .")
 	
 	// lets fix it, if its in a rel, (it shouldn't be)
 	// || x = a #require   -->   || x = (a #require)

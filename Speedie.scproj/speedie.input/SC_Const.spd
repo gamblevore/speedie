@@ -198,7 +198,7 @@ struct ArgArrayCounter
 			.IsItem = true
 			|| key = item.first
 			|int64| v
-			if key.ConstIntValue(name_space, v) #error (item, "Can't load constant.")
+			if key.ConstIntValue(name_space, v) #check (item, "Can't load constant.")
 				(.max max= v)
 			arr <~ key
 			value = item.first

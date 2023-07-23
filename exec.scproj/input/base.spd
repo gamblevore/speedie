@@ -42,18 +42,18 @@ module package
 	
 	function GetStructure (|int|)
 		|| pk			= .InputPack
-		|| app_			= pk..app			#error "Missing 'app'"
+		|| app_			= pk..app			#check "Missing 'app'"
 
 		debugger.root	= pk..debug
 		debugger.meta	= pk..meta
 		
 		.strings		= app_..strs ?? Message()
 		.projclasses	= app_..clss ?? message()
-		.funcs			= app_..fncs		#error "Missing 'fncs'"
-		.linkage		= app_..link		#error "Missing 'link'"
+		.funcs			= app_..fncs		#check "Missing 'fncs'"
+		.linkage		= app_..link		#check "Missing 'link'"
 
-		|| g = app_.int						#error "No globals requested."
-		(g <= 256MB)						#error "Over 256MB of globals requested."
+		|| g = app_.int						#check "No globals requested."
+		(g <= 256MB)						#check "Over 256MB of globals requested."
 		.glob(g)
 		
 

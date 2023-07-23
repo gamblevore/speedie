@@ -109,7 +109,7 @@ module InternalTable
 				error (spd, "Missing cpp function")
 			spd++
 					
-		return (!*Internals) #error "Extra InternalFunction" 
+		return (!*Internals) #check "Extra InternalFunction" 
 		
 
 	function ReGather (|bool|)

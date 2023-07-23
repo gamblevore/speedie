@@ -20,7 +20,7 @@ class Class
 				.DataType = type.name.parsehex
 			  elseif type == @num // struct
 				.basetype = BaseType.struct
-				.size = type.int		#error "Size == 0?"
+				.size = type.int		#check "Size == 0?"
 			  elseif type == @arr
 				.basetype = Basetype.Object
 				// lib->collect the size via the system?
