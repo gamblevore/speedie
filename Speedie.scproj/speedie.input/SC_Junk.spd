@@ -8,6 +8,16 @@ helper __junktest_1__
 	|ErrorSeverity| i = 2
 	|| v = r[i|int|]
 
+	try
+		|| x = "Abc"
+		|| x2 = 1+2 #need
+		|| y = "def"
+		need x
+		(y)
+	  or
+		|| y = 3+4
+
+
 
 
 extend ivec4

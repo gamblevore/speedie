@@ -1121,7 +1121,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		while
 			fs.IndentLine
 			|| c = fs.TryCount++
-			fs <~ "_try_$c: ;\n"
+			if tmp != self
+				fs <~ "_try_$c: ;\n"
 			
 			|| arg = tmp.first						#debug_Require
 			fs.indentline

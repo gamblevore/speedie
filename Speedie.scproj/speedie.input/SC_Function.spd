@@ -1476,6 +1476,7 @@ function Tran_Or (TranFunc)
 
 
 function Tran_Try (TranFunc) 
+	opt norefcounts
 	|| f = node[@arg]$
 	while
 		f = f.next #loop
@@ -1483,15 +1484,6 @@ function Tran_Try (TranFunc)
 		f[@arg]
 
 	node.flags |= asmtmp.itry
-
-	try
-		|| x = "Abc"
-		|| x2 = 1+2 #need
-		|| y = "def"
-		need x
-	  or
-		|| y = 3+4
-
 
 function Tran_Need (TranFunc) 
 	opt norefcounts
