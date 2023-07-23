@@ -901,11 +901,11 @@ function FixCnjSub (|Message| exp) {
 	// get the name (it's important)
 	|| ch = exp.first
 	|| name = ch.Next.Name
-	// "error" sucks as a name... so does continue_with_Error...
-	|| CreatesError = (name == "expect" or "continue_with_error" or "error" or "check")
+	// "error" sucks as a name...
+	|| CreatesError = (name == "expect" or "error" or "check")
 
-	|| DoesReturn =  (name != "continue_with_error" and "error" and "loop" and "check")
-	expect (CreatesError or (name == "debug_require" or "require" or "continue" or "loop")) (exp, "Must be one of '#require, #expect, #continue, #debug_require, #continue_with_error, #error, #loop' .")
+	|| DoesReturn =  (name != "error" and "loop" and "check")
+	expect (CreatesError or (name == "debug_require" or "require" or "continue" or "loop")) (exp, "Must be one of '#require, #expect, #continue, #debug_require, #error, #loop' .")
 	
 	// lets fix it, if its in a rel, (it shouldn't be)
 	// || x = a #require   -->   || x = (a #require)
@@ -1470,7 +1470,6 @@ function Tran_IfSub (|int| mode, |message| node, |scbase| name_space)
 	Tran_Isa(node, name_space)
 	
 
-
 function Tran_Or (TranFunc) 
 	opt norefcounts
 	|| p = node.parent
@@ -1484,11 +1483,13 @@ function Tran_Try (TranFunc)
 		f = f.next#loop
 		f.expect(@tmp, "or")
 		f[@arg]
+
 	try
-		|| x = 1+2
+		|| x = 1+2// #need
 		need x
 	  or
 		|| y = 3+4
+
 	/*
 	try
 		abc
