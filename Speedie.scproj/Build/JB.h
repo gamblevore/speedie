@@ -953,8 +953,7 @@ JBClass ( FastStringCpp , FastString ,
 	JB_String* Cpp_Name;
 	Message* SrcEnd;
 	SCFunction* CurrFunc;
-	uint LastLine;
-	uint LastPos;
+	uint TryCount;
 );
 
 struct File_Behaviour: String_Behaviour {
@@ -1315,13 +1314,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1884])
+#define kJB__ErrorColors_bold (JB_LUB[1889])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1885])
-#define kJB__ErrorColors_good (JB_LUB[1886])
-#define kJB__ErrorColors_normal (JB_LUB[1887])
-#define kJB__ErrorColors_underline (JB_LUB[1886])
-#define kJB__ErrorColors_warn (JB_LUB[1888])
+#define kJB__ErrorColors_error (JB_LUB[1890])
+#define kJB__ErrorColors_good (JB_LUB[1891])
+#define kJB__ErrorColors_normal (JB_LUB[1892])
+#define kJB__ErrorColors_underline (JB_LUB[1891])
+#define kJB__ErrorColors_warn (JB_LUB[1893])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1500,7 +1499,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_BitAnd (JB_LUB[355])
 #define kSC_BitNot (JB_LUB[617])
 #define kSC_BitOr (JB_LUB[559])
-#define kSC_BitXor (JB_LUB[1889])
+#define kSC_BitXor (JB_LUB[1894])
 #define kSC_CastedMatch (6 << 22)
 #define kSC_destructornotfromlocalrefs (1024)
 #define kSC_DontSaveProperty (0)
@@ -1532,7 +1531,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1890])
+#define kJB_SaverStart1 (JB_LUB[1895])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1 << 22)
@@ -4561,8 +4560,6 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
-void SC_IR_Print(IR* self);
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -4631,6 +4628,8 @@ void SC_nil_Leave(NilTracker* self, Message* s);
 
 void SC_nil_LeaveIf(NilTracker* self, Message* s);
 
+SCDecl* SC_nil_MustBeReal(NilTracker* self, Message* msg, SCDecl* d);
+
 BranchState SC_nil_ProcessCond(NilTracker* self, Message* m, bool Y);
 
 BranchState SC_nil_ProcessCondBrel(NilTracker* self, Message* m, bool Y);
@@ -4649,9 +4648,9 @@ void SC_nil_Restore(NilTracker* self);
 
 void SC_nil_RunAll(NilTracker* self, Message* s);
 
-void SC_nil_Start(NilTracker* self, SCFunction* f);
+SCDecl* SC_nil_SetNil(NilTracker* self, Message* m, SCDecl* d, NilState s);
 
-void SC_nil_SyntaxAppendWithMsgDecl(NilTracker* self, Message* m, SCDecl* d);
+void SC_nil_Start(NilTracker* self, SCFunction* f);
 
 void SC_nil_Tighten(NilTracker* self, SCFunction* f);
 
@@ -5279,8 +5278,6 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
 
-int JB_Rec_BadCount(JB_ErrorReceiver* self);
-
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
 void JB_Rec_Clear(JB_ErrorReceiver* self);
@@ -5389,6 +5386,8 @@ void JB_FS_AppendMultiStr(FastString* self, JB_String* data, int count);
 void JB_FS_AppendFastString(FastString* self, FastString* fs);
 
 void JB_FS_AppendInt64(FastString* self, int64 data);
+
+void JB_FS_AppendUint(FastString* self, uint data);
 
 void JB_FS_AppendInt32(FastString* self, int data);
 
@@ -5667,7 +5666,7 @@ Process* JB_Proc__Parent();
 
 void JB_Proc__StackTraceJbin(FastString* j, JB_String* reason, int skip);
 
-void JB__ProcessReportCrash();
+void JB_ProcessReportCrash();
 
 
 
@@ -6860,8 +6859,6 @@ bool SC_Decl_MatchC(SCDecl* self, SCDecl* O);
 
 bool SC_Decl_MiniMatch(SCDecl* self, SCDecl* O, int TypeCast);
 
-SCDecl* SC_Decl_MustBeReal(SCDecl* self, Message* m);
-
 bool SC_Decl_NeedsContainedfix(SCDecl* self);
 
 bool SC_Decl_NeedsNilTighten(SCDecl* self);
@@ -7727,6 +7724,8 @@ void JB_Msg_Tril__(Message* self, FastString* fs);
 
 bool SC_Msg_TrueOrFalse(Message* self);
 
+void SC_Msg_TryRenderCpp(Message* self, FastStringCpp* fs);
+
 Message* JB_Msg_tviewch(Message* self);
 
 void JB_Msg_Type__(Message* self, FastString* fs);
@@ -8407,6 +8406,8 @@ void SC_Func__Tran_Beep(SCFunction* fn, Message* node, SCBase* name_space);
 
 void SC_Func__Tran_BlindCasts(SCFunction* fn, Message* node, SCBase* name_space);
 
+void SC_Func__Tran_Cant(SCFunction* fn, Message* node, SCBase* name_space);
+
 void SC_Func__Tran_CppRefs(SCFunction* fn, Message* node, SCBase* name_space);
 
 void SC_Func__Tran_Debugger(SCFunction* fn, Message* node, SCBase* name_space);
@@ -8441,6 +8442,8 @@ void SC_Func__Tran_Isa(Message* S, SCBase* p);
 
 void SC_Func__Tran_Log(SCFunction* fn, Message* node, SCBase* name_space);
 
+void SC_Func__Tran_Need(SCFunction* fn, Message* node, SCBase* name_space);
+
 void SC_Func__Tran_Once(SCFunction* fn, Message* node, SCBase* name_space);
 
 void SC_Func__Tran_Print(SCFunction* fn, Message* node, SCBase* name_space);
@@ -8468,6 +8471,8 @@ void SC_Func__Tran_Swap(SCFunction* fn, Message* node, SCBase* name_space);
 Message* SC_Func__Tran_Syx(Message* msg);
 
 void SC_Func__Tran_Temporal(SCFunction* fn, Message* s, SCBase* name_space);
+
+void SC_Func__Tran_Try(SCFunction* fn, Message* node, SCBase* name_space);
 
 void SC_Func__Tran_Using(SCFunction* fn, Message* node, SCBase* name_space);
 
@@ -8700,7 +8705,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
