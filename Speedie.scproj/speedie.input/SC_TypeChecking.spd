@@ -9,7 +9,6 @@ function ExpandToBool (|Message| inside, |SCBase| name_space, |Message|)
 	|| decl = TypeOfExpr( inside, name_space )$
 	rz = TypeBool.TypeNormal.ExpectMatch( decl, kTypeCastTrue, inside )
 	
-	inside = rz.UnBra // bug work around?
 	While (rz == @bra) and (rz.first == @bra)
 		rz = rz.ReplaceWithChild
 
