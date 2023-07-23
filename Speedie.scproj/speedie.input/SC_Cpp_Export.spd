@@ -1107,19 +1107,19 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		WriteDecl( d, fs, DeclsDefault(.last) )
 	
 	
-	function message.RenderCppTry (fpMsgRenderCpp)
+	function message.RenderCppTry (fpMsgRenderCpp) // rendertry
 		opt norefcounts			
 		|| arg = self[@arg]$
-		cpp_export.C_RenderArg(self, fs)
+		cpp_export.C_RenderArg(arg, fs)
 		|| tmp = arg.next
-		// how to do the break?
-		// we need a label? seems fair?
+
 		while tmp
 			fs.IndentLine
 			|| c = fs.TryCount++
 			fs <~ "_tmp_$c: ;\n"
 			
 			arg = tmp.first						#debug_Require
+			fs.indentline
 			cpp_export.C_RenderArg(arg, fs)
 			tmp++
 			

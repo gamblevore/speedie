@@ -1486,8 +1486,8 @@ function Tran_Try (TranFunc)
 		f[@arg]
 	try
 		|| x = 1+2
-//	  or
-//		|| y = 3+4
+	  or
+		|| y = 3+4
 	/*
 	try
 		abc

@@ -2255,7 +2255,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (110765033877356)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (110765046751279)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -35669,7 +35669,7 @@ void SC_Msg_RenderCppTry(Message* self, FastStringCpp* fs) {
 	if ((!arg)) {
 		return;
 	}
-	SC_Cpp__C_RenderArg(self, fs);
+	SC_Cpp__C_RenderArg(arg, fs);
 	Message* tmp = ((Message*)JB_Ring_NextSib(arg));
 	while (tmp) {
 		JB_FS_AppendIndent(fs);
@@ -35684,6 +35684,7 @@ void SC_Msg_RenderCppTry(Message* self, FastStringCpp* fs) {
 			debugger;
 			return;
 		}
+		JB_FS_AppendIndent(fs);
 		SC_Cpp__C_RenderArg(arg, fs);
 		tmp = ((Message*)JB_Ring_NextSib(tmp));
 	};
@@ -45609,11 +45610,12 @@ void SC_Func__Tran_Try(SCFunction* fn, Message* node, SCBase* name_space) {
 		JB_FreeIfDead(JB_Msg_NeedSyx(f, JB_SyxArg));
 	};
 	{
-		{
-			int x = 1 + 2;
-		};
-	} {
 		int x = 1 + 2;
+	}
+	
+	_tmp_0: ;
+{
+		int y = 3 + 4;
 	};
 }
 
