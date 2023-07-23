@@ -311,7 +311,7 @@ class SCDecl (SCObject) {
 			return c
 		
 		if .PointerCount > 0
-			target debug {
+			target false {
 			|| pointedto = .Internal
 				printline brel
 				//if pointedto is const
