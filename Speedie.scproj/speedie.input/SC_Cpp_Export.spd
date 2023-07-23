@@ -1110,6 +1110,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function message.RenderCppTry (fpMsgRenderCpp) // rendertry
 		opt norefcounts			
 		|| arg = self[@arg]$
+		|| after = ++fs.TryCount
 		cpp_export.C_RenderArg(arg, fs)
 		|| tmp = arg.next
 		
@@ -1128,7 +1129,15 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			arg = tmp.first						#debug_Require
 			fs.indentline
 			cpp_export.C_RenderArg(arg, fs)
+			fs.indentline
+			fs <~ "goto _after_try_$after"
+			fs <~ ";\n"
 			tmp++
+
+		fs.indentline
+		fs <~ "_after_try_$after:"
+		fs <~ ";\n"
+		
 			
 	
 	function C_RenderTmp (fpMsgRenderCpp)
@@ -1149,7 +1158,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 		  elseif (name == "cant")
 			|| c = fs.trycount
-			fs <~ "goto _try_$c: ;\n"
+			fs <~ "goto _try_$c;" // omg!
 			return
 
 		  elseif (name == "elseif")
