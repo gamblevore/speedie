@@ -1143,6 +1143,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function C_RenderTmp (fpMsgRenderCpp)
 		opt norefcounts			
 		|| name = .name
+		
 		if (name == "exit")
 			fs <~ "break"
 			

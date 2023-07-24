@@ -82,14 +82,14 @@ function SC_MakeComment (|Message| msg)
 
 function Message.Negate (|Message|)
 	if self == @bra
-		.become(@brel, "!")
+		.become(@brel, "!") // the negator!
 		return self
 	|| ch = .unbra
 	if ch IsBRel "!"
 		return .ReplaceWith(ch.first)
 
 	using self
-		rz = .WrapWith(«BRel "!"»)
+		rz = .WrapWith(«BRel "!"») // also the negator!
 
 
 function Message.IsAssignable (|bool|)

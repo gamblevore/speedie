@@ -27,9 +27,7 @@ function RelSetOrExpansion (|Message| exp)
 	l.moveallin(exp)
 	|| cond = r.first.copy
 	|| tmp = «tmp "if"
-		«bra
-			«brel "!", cond »
-		»
+		cond.Negate
 		«arg, R »
 	»
 	

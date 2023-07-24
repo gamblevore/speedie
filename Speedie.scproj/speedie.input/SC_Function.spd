@@ -1014,6 +1014,7 @@ function FixCnjSub (|Message| exp) {
 	  elseif (DoesReturn)
 		arg <~ «tmp "return", «ques "nil"»»
 	
+	// why cant we use negate?
 	if (thg isbrel "!")  // cancel out "!!test"
 		thg = thg.ReplaceWithChild
 	  else
@@ -1333,8 +1334,8 @@ function Tran_Debugger (TranFunc) {
 
 	using (node)
 		ExpandToBool(ch, name_space)
+		// why cant I use negate?
 		node.first = «brel "!", node.first »
-		// So.... transform it.
 		node.Name = "if"
 		node <~ «arg, «tmp "debugger" »»
 	
@@ -1479,32 +1480,41 @@ function Tran_Try (TranFunc)
 	|| f = node[@arg]$
 	while
 		f = f.next #loop
-		f.expect(@tmp, "or")
+		check (f == @tmp and (f == "or" or "else")) (f)
 		f[@arg]
 
 	node.flags |= asmtmp.itry
 
 
+function Message.MustBeInsideTry
+	opt norefcounts
+	for p.up in self
+		if p == @tmp and "try"
+			return
+	error (self, "Not inside 'try'")
+
+
 function Tran_Need (TranFunc) 
 	opt norefcounts
-	with node
-		node.name = "ifn"
-		node.NeedFirst.expectlast
-		|| arg = node.msg(@arg)
-		arg.msg(@tmp, "cant")
-		tran_ifn(fn, node, name_Space)
+
+	using node
+	node.MustBeInsideTry
+	node.NeedFirst.expectlast
+	|| arg = node.msg(@arg)
+	arg.msg(@tmp, "cant")
+	tran_ifn(fn, node, name_Space)
 
 
 function Tran_Cant (TranFunc) 
 	opt norefcounts
 	|| cond = node.first		// cant abc --> need !abc
 		require cond.expectlast
-		node.name = "need"
 		cond = cond.Negate
 		return tran_need(fn, node, name_space)
 		
 	node.flags |= asmtmp.icant
 	node.removeafter
+	node.MustBeInsideTry
 	
 
 function message.RemoveElseIf // self == cond

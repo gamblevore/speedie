@@ -85,7 +85,7 @@ function Tran_Expect (TranFunc)
 	if (name_Space)
 		typeofexpr(ch, name_space) // use this pre-transform or during transform... :)
 
-	ch = ch.Negate.NeedBra
+	ch = ch.Negate//.NeedBra
 	
 	|| arg = node.msg(@arg)
 	if (N == "expect") or (NewStyle)
@@ -260,7 +260,7 @@ function Tran_While (TranFunc)
 	|| Finish = arg.NeedMarker( "finish", true )
 
 	arg <~ «tmp "if"
-		«bra, «Brel "!", exitcond »»
+		«bra, exitcond.negate »
 		«arg
 			«tmp "exit"»
 		»
