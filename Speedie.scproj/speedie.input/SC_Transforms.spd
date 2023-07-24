@@ -554,6 +554,7 @@ function Tran_ForSub (TranFunc)					// :3
 				msg.Name = "continue"
 				msg.Prev = NewRel( iter.index.copy(node2), "=", msg.last )
 				continue_with msg.FlatAfter
+		
 		  elseif (msg == @thg)
 			if cankeepvalue  and  !(value.flags&kReplaced)  and  msg == value.name
 				LastMsg = msg

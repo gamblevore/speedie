@@ -5,6 +5,9 @@
 * VM? 
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
+	* What is next? A LOT OF FEAR
+	* OK... but we can just do one small thing and leave it? 
+		* What small thing?
 
 	
 // Perry Do later

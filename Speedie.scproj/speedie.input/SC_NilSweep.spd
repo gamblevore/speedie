@@ -76,21 +76,28 @@ function message.IfNextTest (|message| arg, |message|)
 function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
 	opt norefcounts
 	|| cond = test.first
-	|| arg = cond.next
+	|| Br = .ProcessCond(cond, true)
+	|| arg = test.last
+	if cond != arg
+		.RunNormal(arg)
+	
+	// blocking can be always, perhaps or never
+	// I mean like "if (Abc): return", blocks... within... but it doesnt block everything
+	// I think blocking everyhting doesnt matter anyhow? cos theres no future code?
+	// the transform stage should keep track of that, then??
+	// probably.
+	
 	|| ret = arg.last
-	.ProcessCond(cond, true)
-	.RunNormal(arg)
-
-	if ret == @tmp and (ret == "return" or "rejoin") // what about exit? or quitter funcs?
-		root.flags |= kPassThrough // continue also?
+		ifn ret.flags & kEndsblock
+			root.flags &=~ kEndsblock // bubble up
 	
 	if test == "else" // well... this is the last one... it affects the boolean logic somehow?
-
-	while 0
-		if 0
-			exit
-	// exit will exit the branch regardless?
 		
+	if 1 == 2
+		if 1==1
+			return nil
+		  else
+			return nil
 
 	return (arg.next, test.next)(test == root)
 	
@@ -99,9 +106,14 @@ function NilTracker.IfWhile (|message| msg)
 	opt norefcounts
 	|| Depth = .Count
 	.if = msg
+	msg.flags |= kEndsblock // children can clear it
+
 	|| test = .IfWhileOne(msg, msg)
 	while test
 		test = .IfWhileOne(test, msg)
+
+	if msg == "while" // while can't block
+		msg.flags &=~ kEndsblock
 	.Count = Depth
 
 
@@ -146,6 +158,8 @@ function NilTracker.ProcessCondThg (|message| m, |bool| Y, |branchstate|)
 function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
 	opt norefcounts
 	|| fn = m.func
+	if fn == @arg // "else" 
+		return .RunNormal(m)
 	if fn == @thg
 		return .ProcessCondThg(m, y)
 	if fn == @bra or @type
@@ -245,7 +259,7 @@ function NilTracker.ProcessCondRel (|message| m, |bool| Y, |branchstate|)
 	return branchstate.Perhaps
 
 
-function NilTracker.RunNormal (|message| msg)
+function NilTracker.RunNormal (|message| msg, |branchstate|)
 	opt norefcounts
 	
 	for s.fast in msg
@@ -266,6 +280,7 @@ function NilTracker.RunNormal (|message| msg)
 			.RunNormal(s)
 		  else
 			return .RunNormal(s) // tail-call opt
+	return BranchState.Always
 	
 
 	
@@ -273,11 +288,12 @@ function NilTracker.RunNormal (|message| msg)
 
 /*
 TODO:
+* tran_if should handle "if" being a blocker if both paths block
+	* process app.quit
 * pop the msgs out.
 * ternaries
 * freeze bug
 
-* process continue/exit/return/rejoin/app.quit
 * return values
 * .if is needed?
 * modifications of objects via func pointer param... during a cond

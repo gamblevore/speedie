@@ -269,14 +269,11 @@ function message.IsReturnOrRejoin (|bool|)
 
 function Message.UnReachable (|Message|)
 	debugger self == @arg
-	return .causesunreachable(self, nil, nil)  
+	return .CausesUnReachable(self, nil, nil)  
 
 
 function Message.CausesUnReachable (|Message| arg, |Message| Curr, |Message| LastPlace, |Message|)
 	Curr := .First // ideally should just be "for (curr in self)"
-	
-// if (s == "exit") or (s == "continue") or (s=="rejoin")
-// if (s == "exit"  or "continue" or "rejoin") /// sooo much nicer.
 
 	while (curr)
 		require (curr != LastPlace)
@@ -288,7 +285,7 @@ function Message.CausesUnReachable (|Message| arg, |Message| Curr, |Message| Las
 			if (s == "exit" or "continue" or "cant")
 				if SCRefs.ExitHitsOrGoesPast( Curr, arg )
 					Return Curr
-
+			// why is rejoin separate? I want to use kEndsblock!
 			  elseif (s=="rejoin") and (self == arg)
 				Return Curr
 

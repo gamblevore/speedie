@@ -1320,7 +1320,12 @@ function Tran_Exit (TranFunc)  // exitter
 	// OK so... also check it must be within a loop.
 	|| Found = node.FindOwningLoop(fn.sourcearg)
 	expect Found (node, "Must be within a loop.")
-	node.RemoveAfter
+	node.LastInBlock
+
+
+function Message.LastInBlock
+	.Flags |= kEndsBlock
+	.RemoveAfter
 
 
 function Tran_Debugger (TranFunc) {
@@ -1527,7 +1532,7 @@ function Tran_Cant (TranFunc)
 		return tran_need(fn, node, name_space)
 		
 	node.flags |= asmtmp.icant
-	node.removeafter
+	node.LastInBlock
 	node.MustBeInsideTry(fn.source)
 	
 
@@ -1590,7 +1595,7 @@ function Tran_Return (TranFunc)  // exitter
 	expect (! fn.IsConstructorOrDestructor)   (node, "You can’t return in a constructor or destructor")
 	node.flags |= asmtmp.ireturn
 	fn.CheckReturnValue( node )
-	node.removeafter
+	node.LastInBlock
 
 
 function Tran_Rejoin (TranFunc)  // exitter
@@ -1599,7 +1604,7 @@ function Tran_Rejoin (TranFunc)  // exitter
 		|| arg = p.asarg
 		expect (arg.IsStatementExpr) (node, "Can't use this here.")
 		expect !p.next (node, "Value expected here.")
-	node.RemoveAfter
+	node.LastInBlock
 
 
 function NewCppWrapper (CollectFunc)
@@ -1936,6 +1941,7 @@ function string.UnicodeSafeName (|string|)
 
 
 constants
-	kReplaced = 0x800
+	kEndsBlock = 0x0400
+	kReplaced  = 0x800
 	kPassThrough = 0x1000
 

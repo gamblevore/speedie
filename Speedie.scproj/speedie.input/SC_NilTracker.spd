@@ -12,7 +12,8 @@ struct NilTracker
 		opt norefcounts
 
 		if (.count < 1024) 
-			m.Indent = d.NilUsed & 3
+			if d.nilused > 3 // what?
+			m.Indent = d.NilUsed
 			.items[.count++] = m
 			return d
 
@@ -43,10 +44,6 @@ struct NilTracker
 			return .MakeReal
 		return .MakeOptional
 
-							
-//	function Pop (|scdecl|)
-//		if .count
-//			return .items[--.count]
 	
 	function Restore
 		opt norefcounts
