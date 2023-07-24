@@ -1476,6 +1476,7 @@ function Tran_Try (TranFunc)
 /*
 	// merge this with if/else someday!!!
 	// would be better. can still render with gotos.
+	// also... the refcounter fails with this... so its a useless feature otherwise
 		* try func1()
 			need func2()
 			abc()
@@ -1485,6 +1486,7 @@ function Tran_Try (TranFunc)
 		  else
 			abc3()
 */
+	
 	opt norefcounts
 	|| f = node[@arg]$
 	while

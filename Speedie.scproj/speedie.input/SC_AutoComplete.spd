@@ -691,18 +691,6 @@ function TmpAutoComplete (|message| f, |string| name, |string| type, |message|)
 					|| arg = rz.msg(@arg, name)
 					|| n = ch.first.name
 					@tmp.msg(arg, n) <~ (@str, n)
-
-/*
-			try
-				cant ch starts name
-			  or
-				need  ch.name > 2  and  ch.name ~= name
-				finished = true
-			  or
-				|| arg = rz.msg(@arg, name)
-				|| n = ch.first.name
-				@tmp.msg(arg, n) <~ (@str, n)
-*/
 				
 	if rz.hasany
 		0 //
