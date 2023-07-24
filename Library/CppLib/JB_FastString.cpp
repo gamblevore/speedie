@@ -371,7 +371,7 @@ bool HasDot (uint8* self, int Used) {
 void JB_FS_AppendDoubleAsText(FastString* self, double D, uint8* fmt) {
     const int Max = 64;
     if (!fmt) {
-        fmt = (uint8*)"%g";
+        fmt = (uint8*)"%.6g";
     }
 	uint8* wp = JB_FS_WriteAlloc_( self, Max );
     int Used = snprintf((char*)wp, Max, (const char*)fmt, D);
