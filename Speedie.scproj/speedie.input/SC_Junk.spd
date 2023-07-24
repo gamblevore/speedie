@@ -6,7 +6,7 @@ helper __junktest_1__
 	visible
 	|| r = [1, 2, 3]
 	|ErrorSeverity| i = 2
-	|| v = r[i|int|]
+	|| v = r[i]
 
 	try
 		|| x = "Abc"
