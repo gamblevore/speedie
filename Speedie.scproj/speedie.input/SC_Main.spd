@@ -1,11 +1,6 @@
 
 
 main // speedie main {
-	|| fs = faststring()
-	debugger
-	fs <~ -(11.0|f64| pow -1)
-	printline fs.getresult
-
 	|message| o
 	|| p = o.first?.first?
 	// to optimise these StatExprs...
