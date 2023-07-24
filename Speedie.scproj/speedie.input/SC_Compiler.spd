@@ -158,7 +158,7 @@ function CompileAll (|bool|)
 	.testdate
 	.ImportAll
 
-	errordelayer.returnerrors	
+	errordelayer.ReturnErrors
 
 	.PrepareInterpreter
 	require .Stage( "More constructors" )

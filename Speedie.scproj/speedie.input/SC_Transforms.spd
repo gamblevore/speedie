@@ -85,7 +85,7 @@ function Tran_Expect (TranFunc)
 	if (name_Space)
 		typeofexpr(ch, name_space) // use this pre-transform or during transform... :)
 
-	ch = ch.Negate//.NeedBra
+	ch = ch.Negate
 	
 	|| arg = node.msg(@arg)
 	if (N == "expect") or (NewStyle)

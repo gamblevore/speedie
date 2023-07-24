@@ -1019,13 +1019,7 @@ function FixCnjSub (|Message| exp) {
 	  elseif (DoesReturn)
 		arg <~ «tmp "return", «ques "nil"»»
 	
-	// why cant we use negate?
-	if (thg isbrel "!")  // cancel out "!!test"
-		thg = thg.ReplaceWithChild
-	  else
-		|| tmp = «brel "!", thg » // sigh. error otherwise 
-		thg = tmp
-	
+	thg = thg.Negate	
 	|| if_ = «tmp "if"
 		thg
 		arg
@@ -1340,7 +1334,7 @@ function Tran_Debugger (TranFunc) {
 	using (node)
 		ExpandToBool(ch, name_space)
 		// why cant I use negate?
-		node.first = «brel "!", node.first »
+		node.first.Negate
 		node.Name = "if"
 		node <~ «arg, «tmp "debugger" »»
 	
