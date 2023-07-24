@@ -381,7 +381,7 @@ void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp) {
 	}
     double exp = log10(D);
     int ActualExp = 0;
-    if (CanExp and exp > 16.0 or exp < -9) {
+    if (CanExp and (exp > 16.0 or exp < -9)) {
 		ActualExp = (int)floor(exp);
 		D = D / pow10(ActualExp);
 	}
