@@ -39,6 +39,8 @@ extern "C" {
 
 typedef byte BranchState;
 
+typedef byte CharProp;
+
 typedef uint Codepoint;
 
 typedef byte ControlClipMode;
@@ -142,6 +144,8 @@ struct ASMVarType;
 struct ArgArrayCounter;
 
 struct AsmReg;
+
+struct CharProps;
 
 struct CompressionStats;
 
@@ -953,7 +957,6 @@ JBClass ( FastStringCpp , FastString ,
 	JB_String* Cpp_Name;
 	Message* SrcEnd;
 	SCFunction* CurrFunc;
-	uint TryCount;
 );
 
 struct File_Behaviour: String_Behaviour {
@@ -1226,11 +1229,13 @@ JBClass ( JB_Error , Message ,
 	ErrorSeverity Severity;
 	ErrorFlags ErrorFlags;
 );
+#define kSC__ASMtmp_iCant (57)
 #define kSC__ASMtmp_iDebugger (63)
 #define kSC__ASMtmp_iIf (62)
 #define kSC__ASMtmp_iRejoin (61)
 #define kSC__ASMtmp_iReturn (60)
 #define kSC__ASMtmp_iSwap (58)
+#define kSC__ASMtmp_iTry (56)
 #define kSC__ASMtmp_iWhile (59)
 extern Message* JB__App__Conf;
 extern JB_String* JB__App__Path;
@@ -1314,13 +1319,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1889])
+#define kJB__ErrorColors_bold (JB_LUB[1890])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1890])
-#define kJB__ErrorColors_good (JB_LUB[1891])
-#define kJB__ErrorColors_normal (JB_LUB[1892])
-#define kJB__ErrorColors_underline (JB_LUB[1891])
-#define kJB__ErrorColors_warn (JB_LUB[1893])
+#define kJB__ErrorColors_error (JB_LUB[1891])
+#define kJB__ErrorColors_good (JB_LUB[1892])
+#define kJB__ErrorColors_normal (JB_LUB[1893])
+#define kJB__ErrorColors_underline (JB_LUB[1892])
+#define kJB__ErrorColors_warn (JB_LUB[1894])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1489,6 +1494,7 @@ extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
 extern int JB_doitwierdly;
+extern JB_ErrorReceiver* JB_ErrorDelayer;
 extern ExprResolver JB_ExprFuncs[64];
 extern SCDecl* JB_FalseBool;
 extern fn_asm JB_fn_asm_table[64];
@@ -1497,9 +1503,9 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_ActualTypecasts ((~(64 | 16)))
 #define kSC_AddressOfMatch (3 << 22)
 #define kSC_BitAnd (JB_LUB[355])
-#define kSC_BitNot (JB_LUB[617])
+#define kSC_BitNot (JB_LUB[618])
 #define kSC_BitOr (JB_LUB[559])
-#define kSC_BitXor (JB_LUB[1894])
+#define kSC_BitXor (JB_LUB[1895])
 #define kSC_CastedMatch (6 << 22)
 #define kSC_destructornotfromlocalrefs (1024)
 #define kSC_DontSaveProperty (0)
@@ -1531,7 +1537,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1895])
+#define kJB_SaverStart1 (JB_LUB[1896])
 #define kSC_SelfDebug (2)
 #define kSC_SelfReplace (1)
 #define kSC_SimpleMatch (1 << 22)
@@ -1711,6 +1717,17 @@ extern JB_String* JB__zalgo_up;
 #define kJB__BranchState_Always (2)
 #define kJB__BranchState_Never (1)
 #define kJB__BranchState_Perhaps (3)
+#define kJB__CharProp_almostletter (6)
+#define kJB__CharProp_letters (7)
+#define kJB__CharProp_lower (9)
+#define kJB__CharProp_nothing (0)
+#define kJB__CharProp_number (5)
+#define kJB__CharProp_punct (2)
+#define kJB__CharProp_unicode (10)
+#define kJB__CharProp_upper (8)
+#define kJB__CharProp_varnames (4)
+#define kJB__CharProp_white (1)
+#define kJB__CharProp_xmlpunct (3)
 #define kJB__ControlClipMode_debug (4)
 #define kJB__ControlClipMode_LargestFlag (7)
 #define kJB__ControlClipMode_slidebackinparent (1)
@@ -1835,18 +1852,18 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__SCBaseType_Object (5)
 #define kJB__SCBaseType_Struct (4)
 #define kJB__SCDeclInfo_api (256)
-#define kJB__SCDeclInfo_atomic (32768)
+#define kJB__SCDeclInfo_atomic (16384)
 #define kJB__SCDeclInfo_borrowed (1)
-#define kJB__SCDeclInfo_compilercreated (1024)
+#define kJB__SCDeclInfo_compilercreated (512)
 #define kJB__SCDeclInfo_const (4)
-#define kJB__SCDeclInfo_disabled (2048)
-#define kJB__SCDeclInfo_gameflyingmem (8192)
-#define kJB__SCDeclInfo_hidden (512)
+#define kJB__SCDeclInfo_disabled (1024)
+#define kJB__SCDeclInfo_gameflyingmem (4096)
+#define kJB__SCDeclInfo_implicit (65536)
 #define kJB__SCDeclInfo_LargestFlag (262143)
 #define kJB__SCDeclInfo_newlycreated (32)
-#define kJB__SCDeclInfo_onmodule (65536)
-#define kJB__SCDeclInfo_param (4096)
-#define kJB__SCDeclInfo_property (16384)
+#define kJB__SCDeclInfo_onmodule (32768)
+#define kJB__SCDeclInfo_param (2048)
+#define kJB__SCDeclInfo_property (8192)
 #define kJB__SCDeclInfo_setto (131072)
 #define kJB__SCDeclInfo_static (8)
 #define kJB__SCDeclInfo_stayborrowed (2)
@@ -2006,6 +2023,7 @@ extern int SC__Opp_CustomOperatorScore;
 extern Dictionary* SC__Opp_Dict;
 extern int SC__xC2xB5Form_Count;
 extern Dictionary* SC__xC2xB5Form_Forms;
+extern Message* SC__FastStringCpp_CurrTry;
 extern bool JB__File_DebugExecute;
 #define kJB__File_IgnoreErrors (true)
 #define kJB__File_O_APPEND (8)
@@ -2134,7 +2152,7 @@ void SC_CodeSorter__LeafsFirst();
 // Comp
 SCDecl* SC_Comp__AddGlobalConst(JB_String* name, SCClass* c);
 
-void SC_Comp__AddMain();
+bool SC_Comp__AddMain(int mark);
 
 JB_String* SC_Comp__AddSCProj(JB_String* Path);
 
@@ -2234,7 +2252,7 @@ int SC_Comp__Init_();
 
 bool SC_Comp__InitBasicFuncs();
 
-void SC_Comp__InitBasicStuff();
+int SC_Comp__InitBasicStuff();
 
 int SC_Comp__InitCode_();
 
@@ -3860,6 +3878,9 @@ uint64 JB_uint64_LowestBit(uint64 self);
 // BranchState
 
 
+// CharProp
+
+
 // Codepoint
 bool JB_CP_In(Codepoint self, int a, int b);
 
@@ -4454,6 +4475,9 @@ Message* SC_ArgArrayCounter_Do(ArgArrayCounter* self, JB_String* name, Message* 
 // JB_AsmReg
 inline int SC_Reg_ToInt(AsmReg* self);
 
+
+
+// JB_CharProps
 
 
 // JB_ClassData
@@ -5322,6 +5346,8 @@ JB_String* JB_Rec_Render(JB_ErrorReceiver* self, FastString* fs_in);
 
 int JB_Rec_RenderErrors(JB_ErrorReceiver* self, FastString* fs, ErrorSeverity Level, bool shell);
 
+void JB_Rec_ReturnErrors(JB_ErrorReceiver* self);
+
 int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self);
 
 void JB_Rec_SyntaxAppend(JB_ErrorReceiver* self, JB_Error* Err);
@@ -5390,8 +5416,6 @@ void JB_FS_AppendMultiStr(FastString* self, JB_String* data, int count);
 void JB_FS_AppendFastString(FastString* self, FastString* fs);
 
 void JB_FS_AppendInt64(FastString* self, int64 data);
-
-void JB_FS_AppendUint(FastString* self, uint data);
 
 void JB_FS_AppendInt32(FastString* self, int data);
 
@@ -5762,8 +5786,6 @@ JB_String* SC_SCObject_BaseIcon(SCObject* self);
 JB_String* SC_SCObject_CallFromName(SCObject* self);
 
 JB_String* SC_SCObject_CanAuto(SCObject* self, JB_String* search);
-
-bool SC_SCObject_CanAutoLimit(SCObject* self, int Type, SCDecl* Limiter);
 
 JB_String* SC_SCObject_CanAutoSub(SCObject* self, JB_String* search);
 
@@ -6400,6 +6422,10 @@ void SC_FastStringCpp_Constructor(FastStringCpp* self, JB_String* name);
 void JB_FastStringCpp_destructor(FastStringCpp* self);
 
 FastStringCpp* JB_FastStringCpp__Alloc();
+
+int SC_FastStringCpp__Init_();
+
+int SC_FastStringCpp__InitCode_();
 
 FastStringCpp* SC_FastStringCpp__New(JB_String* name);
 
@@ -7472,11 +7498,15 @@ SCFunction* SC_Msg_MsgFunc(Message* self);
 
 SCFunction* SC_Msg_MsgOwningFunc(Message* self);
 
+void SC_Msg_MustBeInsideTry(Message* self, Message* top);
+
 void JB_Msg_Name__(Message* self, FastString* fs);
 
 Message* SC_Msg_NeedBra(Message* self);
 
 SCDecl* SC_Msg_NeedDecl(Message* self);
+
+Message* JB_Msg_NeedFirst(Message* self);
 
 Message* SC_Msg_NeedMarker(Message* self, JB_String* s, bool b);
 
@@ -8781,7 +8811,7 @@ inline JB_StringC* JB_Str_CastZero(JB_String* self) {
 }
 
 inline bool JB_Array_SyntaxCast(Array* self) {
-	return ((bool)self) and (JB_Array_Size(self) >= 1);
+	return JB_Array_Size(self) > 0;
 }
 
 inline bool JB_File_SyntaxCast(JB_File* self) {
