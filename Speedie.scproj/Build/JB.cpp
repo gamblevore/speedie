@@ -925,7 +925,7 @@ bool SC_Comp__EnterCompile() {
 
 Message* SC_Comp__ErrorsToPerry() {
 	SC_Comp__PrePrintErrors();
-	JB_String* _tmPf0 = JB_Incr(SC_Comp__BuildErrors(kJB__ErrorSeverity_Problem));
+	JB_String* _tmPf0 = JB_Incr(SC_Comp__BuildErrors(kJB__ErrorSeverity_Warning));
 	Message* _tmPf1 = JB_Incr(JB_Str_Parse(_tmPf0, JB_SyxArg, true));
 	JB_Decr(_tmPf0);
 	JB_SafeDecr(_tmPf1);
@@ -2259,7 +2259,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (110769546530079)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (110770415506141)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -2391,12 +2391,12 @@ void SC_Comp__PrePrintErrors() {
 
 void SC_Comp__PrintCompileErrors() {
 	if (SC__Options_Warnings) {
-		if ((!JB_Rec_Anything(JB_StdErr))) {
+		if ((!JB_Rec_HasAnything(JB_StdErr))) {
 			return;
 		}
 	}
 	 else {
-		if ((!JB_Rec_Problems(JB_StdErr))) {
+		if ((!JB_Rec_HasProblems(JB_StdErr))) {
 			return;
 		}
 	}
@@ -3564,7 +3564,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[242]);
-	JB_FS_AppendInt32(_fsf0, (2023072415));
+	JB_FS_AppendInt32(_fsf0, (2023072419));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -4937,7 +4937,7 @@ Message* SC_AC__ReportBuild(Message* cmd) {
 		JB_Decr(_tmPf0);
 		SC_Ext__ExportAndInstall(true);
 	}
-	if (JB_Rec_Problems(JB_StdErr)) {
+	if (JB_Rec_HasProblems(JB_StdErr)) {
 		return SC_Msg_SendPerryErrors(cmd);
 	}
 	if (SC_Msg_compiles(cmd)) {
@@ -7394,7 +7394,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[509]);
-	JB_FS_AppendInt32(_fsf0, (2023072415));
+	JB_FS_AppendInt32(_fsf0, (2023072419));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -20603,10 +20603,6 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self) {
 }
 
 
-bool JB_Rec_Anything(JB_ErrorReceiver* self) {
-	return (((bool)self) and ((bool)self->ErrorCount)) or (((bool)self->ProblemCount) or ((bool)self->WarnCount));
-}
-
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level) {
 	if ((!((!self->BlockErrors) and (!JB_OutOfMemoryOccurred())))) {
 		return nil;
@@ -20666,6 +20662,14 @@ JB_Error* JB_Rec_FirstError(JB_ErrorReceiver* self) {
 	}
 	;
 	return nil;
+}
+
+bool JB_Rec_HasAnything(JB_ErrorReceiver* self) {
+	return (((bool)self) and ((bool)self->ErrorCount)) or (((bool)self->ProblemCount) or ((bool)self->WarnCount));
+}
+
+bool JB_Rec_HasProblems(JB_ErrorReceiver* self) {
+	return (((bool)self) and ((bool)self->ErrorCount)) or ((bool)self->ProblemCount);
 }
 
 void JB_Rec_incr(JB_ErrorReceiver* self, JB_Error* err, bool add) {
@@ -20781,10 +20785,6 @@ int JB_Rec_PrintErrorsMain(JB_ErrorReceiver* self, ErrorSeverity Level, bool Pri
 		return -1;
 	}
 	return 0;
-}
-
-bool JB_Rec_Problems(JB_ErrorReceiver* self) {
-	return (((bool)self) and ((bool)self->ErrorCount)) or ((bool)self->ProblemCount);
 }
 
 JB_String* JB_Rec_Render(JB_ErrorReceiver* self, FastString* fs_in) {
@@ -47031,4 +47031,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -6435395791974692570 2866721979520321249
+// 8027112052324846006 2866721979520321249

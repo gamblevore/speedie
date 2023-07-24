@@ -5296,8 +5296,6 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 
 // JB_ErrorList
-bool JB_Rec_Anything(JB_ErrorReceiver* self);
-
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
 void JB_Rec_Clear(JB_ErrorReceiver* self);
@@ -5307,6 +5305,10 @@ void JB_Rec_Constructor(JB_ErrorReceiver* self);
 void JB_Rec_destructor(JB_ErrorReceiver* self);
 
 JB_Error* JB_Rec_FirstError(JB_ErrorReceiver* self);
+
+bool JB_Rec_HasAnything(JB_ErrorReceiver* self);
+
+bool JB_Rec_HasProblems(JB_ErrorReceiver* self);
 
 void JB_Rec_incr(JB_ErrorReceiver* self, JB_Error* err, bool add);
 
@@ -5331,8 +5333,6 @@ JB_Error* JB_Rec_Pop(JB_ErrorReceiver* self);
 int JB_Rec_PrintErrors(JB_ErrorReceiver* self);
 
 int JB_Rec_PrintErrorsMain(JB_ErrorReceiver* self, ErrorSeverity Level, bool PrintCount, bool shell);
-
-bool JB_Rec_Problems(JB_ErrorReceiver* self);
 
 JB_String* JB_Rec_Render(JB_ErrorReceiver* self, FastString* fs_in);
 
