@@ -324,9 +324,10 @@ function OnShowExtraInfo (GUITextShowEvent)
 	
 
 function JumpToDefinition (GUIAction)
-	|| rigtclick = state == -1
+	
+	|| rightclick = state == -1
 	|| cmd = state == -2
-	require (cmd or rigtclick)
+	require (cmd or rightclick)
 	|| ide = .ide
 	|| msg = ide.EditMe.ClickedMsg
 		if msg in @url
@@ -336,6 +337,9 @@ function JumpToDefinition (GUIAction)
 		  elseif msg == @sheb
 			msg.name.Reveal
 		  else
+			|| f = msg.owning_func
+				if msg == f or msg in f
+					cmd = false
 			|| op = ("define", "callfrom")(cmd)
 			ide.MaybeSendMessage(op, msg)
 			
@@ -426,7 +430,7 @@ function message.SimpleComplete (|message| pp, |message| where, |bool|)
 		return true
 
 
-function message.owning_func (|message|)
+function message.owning_func (|message|) // isfunction
 	return .owningSyntax(AutoComplete.Functions, false)
 
 		

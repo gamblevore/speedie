@@ -1120,6 +1120,12 @@ class Message (RingTree)
 		
 		return .position <= p and (.after+AllowJustAfter) > p 
 		
+	operator In (|message| f, |bool|)
+		cpp_Part InMsg
+		opt norefcounts
+		if self
+			return .parent == f
+		
 	operator In (|syntax| f, |bool|)
 		opt norefcounts
 		require self
