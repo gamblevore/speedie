@@ -349,13 +349,12 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
 
 
 void JB_FS_AppendDurr(FastString* self, Date D) {
-    JB_FS_AppendDoubleAsText(self, ((double)D) / 0x10000, (uint8*)"%.3g");
-    // maybe convert to a double and render it?
+    JB_FS_AppendDoubleAsText(self, ((double)D) / ((double)0x10000), 3, false);
 }
 
 
 void JB_FS_AppendDoubleAsText0(FastString* self, double D) {
-    JB_FS_AppendDoubleAsText(self, D, 0);
+    JB_FS_AppendDoubleAsText(self, D, 9, true);
 }
 
 
@@ -367,18 +366,45 @@ bool HasDot (uint8* self, int Used) {
 	return false;
 }
 
+#ifndef __linux__
+	#define pow10(x) (pow(10,x))
+#endif
 
-void JB_FS_AppendDoubleAsText(FastString* self, double D, uint8* fmt) {
-    const int Max = 64;
-    if (!fmt) {
-        fmt = (uint8*)"%.6g";
-    }
-	uint8* wp = JB_FS_WriteAlloc_( self, Max );
-    int Used = snprintf((char*)wp, Max, (const char*)fmt, D);
-    JB_FS_AdjustLength_( self, Max, Min(Used, Max) );
-    if (!HasDot(wp,Used))
-		JB_FS_AppendCString(self, ".0");
+
+void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp) {
+    dp = Max(dp, 0);
+    dp = Min(dp, 16);
+    
+    if (D < 0) {
+		D = -D;
+		JB_FS_AppendByte(self, '-');
+	}
+    double exp = log10(D);
+    int ActualExp = 0;
+    if (CanExp and exp > 16.0 or exp < -9) {
+		ActualExp = (int)floor(exp);
+		D = D / pow10(ActualExp);
+	}
+    
+	double F = floor(D);
+	double Frac = D-F;
+	JB_FS_AppendIntegerAsText(self, F, 1);
+	if (Frac and dp > 0) {
+		JB_FS_AppendByte(self, '.');
+		while (Frac and dp > 0) {
+			dp--;
+			Frac *= 10;
+			double Num = floor(Frac);
+			Frac -= Num;
+			JB_FS_AppendByte(self, '0'+Num);
+		}
+	}
+	if (ActualExp) {
+		JB_FS_AppendByte(self, 'e');
+		JB_FS_AppendIntegerAsText(self, ActualExp, 1);
+	}
 }
+
 
 
 void JB_FS_AppendShort(FastString* self, int s) {

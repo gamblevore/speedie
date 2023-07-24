@@ -70,7 +70,7 @@ int JB_FS_Last (FastString* self, int off);
 void JB_FS_AppendMultiByte(FastString* self, int byte, int Count);
 void JB_FS_AppendUTF8Char(FastString* self, int Char);
 void JB_FS_AppendDoubleAsText0(FastString* self, double D);
-void JB_FS_AppendDoubleAsText(FastString* self, double D, uint8* fmt);
+void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp);
 int JB_FS_Mark(FastString* self);
 bool JB_FS_Grew(FastString* self, int m);
 int JB_FS_Byte(FastString* self, int offset);

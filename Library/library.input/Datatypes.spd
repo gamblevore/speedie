@@ -514,8 +514,8 @@ datatype f64
 	operator min (|f64| other, |f64|)
 		cpp_wrapper (fmin)
 
-	render (|string|fmt=nil)
-		fs.appenddouble(self, fmt.address)
+	render (|int|dp=6)
+		fs.appenddouble(self, dp, true)
 
 
 
