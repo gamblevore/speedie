@@ -6,12 +6,6 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 
-spd
-	* render numbers without exp?
-	* feedback crashing sometimes... AND doesnt report the error location?
-	* "rendertry" needs to keep a stack... each try func contains the last try... and we have a global currtry
-		* .indent can be our current marker
-		
 	
 // Perry Do later
 * render warnings on textview but not on errorlist
