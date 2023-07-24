@@ -920,7 +920,7 @@ class SCDecl (SCObject) {
 
 
 		|| cst = «type ":)" »
-		.ReplaceWith( cst )
+		.prev = cst
 		cst <~ self
 		cst <~ «thg typeName »
 		

@@ -1462,7 +1462,6 @@ function Tran_IfSub (|int| mode, |message| node, |scbase| name_space)
 		cond.RemoveElseIf
 		return
 	
-	
 	cond.NeedBra
 	if cond.first == @arg // if a.b? --> if ({||x=a.b, rejoin x}), fails in c cos if ({}) is bad
 		cond.wrapwith(@bra.msg).obj = cond.obj 
