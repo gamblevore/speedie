@@ -789,7 +789,7 @@ class PerryIDE (Window)
 
 	
 	function LoadStartupErrors
-		while stderr.anything
+		while stderr.HasAnything
 			|| err = stderr.pop
 			notifications <~ err
 			if err.IsBad

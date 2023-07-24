@@ -45,10 +45,10 @@ class ErrorList
 	function OK (|bool|)
 		Return self and !.errorcount
 	
-	function Problems (|bool|) // totallyok
+	function HasProblems (|bool|) // totallyok
 		Return self and .errorcount or .problemcount
 	
-	function Anything (|bool|) // totallyok
+	function HasAnything (|bool|) // totallyok
 		Return self and .errorcount or .problemcount or .warncount
 	
 	

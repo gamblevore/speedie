@@ -158,7 +158,7 @@ function Restart (|message| arg)
 
 function Compiler.ErrorsToPerry (|message|)
 	compiler.PrePrintErrors
-	return .BuildErrors(errorseverity.problem).parse
+	return .BuildErrors(errorseverity.warning).parse
 
 function message.compiles (|bool|)
 	return self ~= "compile" or "debug"
@@ -167,7 +167,9 @@ function ReportBuild (|message| cmd, |message|)
 	if stderr.ok and cmd.compiles
 		.Perry <~ .Log
 		TransCompiler.ExportAndInstall(true)
-	if stderr.Problems
+	if stderr.HasProblems
+		// how can I say its OK and that it has warnings?
+		// seems there will always be warnings.
 		return cmd.SendPerryErrors
 	if cmd.compiles
 		cmd <~ TransCompiler.productpath(true)
@@ -184,7 +186,6 @@ function ReportBuildOrRestart (|message| cmd, |message| arg, |message|)
 
 
 function Message.SendPerryErrors (|message|)
-//	interact.CompileUpToDate
 	.clear
 	self <~ compiler.ErrorsToPerry
 	return self

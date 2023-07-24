@@ -525,7 +525,7 @@ module SDLApp
 		if .FixScreenBug.Fired
 			.BumpSize
 		
-		while stderr.anything
+		while stderr.HasAnything
 			notifications <~ stderr.pop
 			beep
 
