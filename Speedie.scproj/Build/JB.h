@@ -1509,6 +1509,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kSC_CastedMatch (6 << 22)
 #define kSC_destructornotfromlocalrefs (1024)
 #define kSC_DontSaveProperty (0)
+#define kSC_EndsBlock (1024)
 #define kSC_isalloc (128)
 #define kSC_iscomparison (16)
 #define kSC_isconstructor (1)
@@ -1533,6 +1534,7 @@ extern JB_String* JB_kNameConf;
 #define kSC_NoBoolTypeCast (16)
 #define kSC_NoMatch (0)
 #define kSC_NumericMatch (2 << 22)
+#define kSC_PassThrough (4096)
 #define kSC_Replaced (2048)
 #define kSC_SaveProperty (1)
 #define kSC_SavePropertyAndGoIn (2)
@@ -4584,8 +4586,6 @@ void SC_IR_fs(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
-void SC_IR_Print(IR* self);
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -4644,15 +4644,9 @@ void SC_nil_ChildMustExist(NilTracker* self, Message* wrapper);
 
 void JB_nil_destructor(NilTracker* self);
 
-Message* SC_nil_Enter(NilTracker* self, Message* s);
+void SC_nil_IfWhile(NilTracker* self, Message* msg);
 
-void SC_nil_EnterArg(NilTracker* self, Message* s);
-
-Message* SC_nil_IfWhile(NilTracker* self, Message* msg);
-
-void SC_nil_Leave(NilTracker* self, Message* s);
-
-void SC_nil_LeaveIf(NilTracker* self, Message* s);
+Message* SC_nil_IfWhileOne(NilTracker* self, Message* test, Message* root);
 
 SCDecl* SC_nil_MustBeReal(NilTracker* self, Message* msg, SCDecl* d);
 
@@ -4672,7 +4666,7 @@ BranchState SC_nil_ProcessCondThg(NilTracker* self, Message* m, bool Y);
 
 void SC_nil_Restore(NilTracker* self);
 
-void SC_nil_RunAll(NilTracker* self, Message* s);
+BranchState SC_nil_RunNormal(NilTracker* self, Message* msg);
 
 SCDecl* SC_nil_SetNil(NilTracker* self, Message* m, SCDecl* d, NilState s);
 
@@ -5303,8 +5297,6 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 // JB_ErrorList
 bool JB_Rec_Anything(JB_ErrorReceiver* self);
-
-int JB_Rec_BadCount(JB_ErrorReceiver* self);
 
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
@@ -7442,6 +7434,8 @@ JB_String* JB_Msg_jdb_(Message* self, FastString* fs_in, int flags);
 
 Message* JB_Msg_Last(Message* self, Syntax Need);
 
+void SC_Msg_LastInBlock(Message* self);
+
 Message* SC_Msg_LastUsedFix(Message* self);
 
 int JB_Msg_Length(Message* self);
@@ -8741,7 +8735,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
