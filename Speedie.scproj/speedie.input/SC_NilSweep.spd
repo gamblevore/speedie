@@ -32,7 +32,7 @@ function NilTracker.Check (|scfunction| f)
 	debugat
 	opt norefcounts
 	.Start(f)
-	.RunAll(f.SourceArg)
+	.RunNormal(f.SourceArg)
 	.Tighten(f)					// then we alter the function's nilness
 	.Restore
 
@@ -65,14 +65,44 @@ function niltracker.MustBeReal (|message| msg, |scdecl| d, |scdecl|)
 	return .SetNil(msg, d, NilState.Realish)
 
 
-function NilTracker.IfWhile (|message| msg, |message|)
-	// must re-add decls to the tracker...
+function message.IfNextTest (|message| arg, |message|)
 	opt norefcounts
-	expect !.if
-//	|| curr = 
+	if arg in self
+		return arg.next
+	  else
+		return .next
+
+
+function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
+	opt norefcounts
+	|| cond = test.first
+	|| arg = cond.next
+	|| ret = arg.last
+	.ProcessCond(cond, true)
+	.RunNormal(arg)
+
+	if ret == @tmp and (ret == "return" or "rejoin") // what about exit? or quitter funcs?
+		root.flags |= kPassThrough // continue also?
+	
+	if test == "else" // well... this is the last one... it affects the boolean logic somehow?
+
+	while 0
+		if 0
+			exit
+	// exit will exit the branch regardless?
+		
+
+	return (arg.next, test.next)(test == root)
+	
+
+function NilTracker.IfWhile (|message| msg)
+	opt norefcounts
+	|| Depth = .Count
 	.if = msg
-	.ProcessCond(msg.first, true)
-	return msg.Second
+	|| test = .IfWhileOne(msg, msg)
+	while test
+		test = .IfWhileOne(test, msg)
+	.Count = Depth
 
 
 function Message.RedundantBranch (|bool| Value, |branchstate|)
@@ -127,7 +157,7 @@ function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
 	if fn == @brel
 		return .ProcessCondBrel(m, y)
 	debugat
-	.RunAll(m)
+	.RunNormal(m)
 	return branchstate.Perhaps
 
 
@@ -148,7 +178,7 @@ function NilTracker.ProcessCondBrel (|message| m, |bool| Y, |branchstate|)
 	if m == "&"			// objects always have an address
 		return NilState.Real.Always(Y)
 	debugat
-	.RunAll(m)
+	.RunNormal(m)
 	return branchstate.Perhaps
 
 
@@ -163,8 +193,7 @@ function NilTracker.ProcessCondFunc (|message| m, |bool| Y, |branchstate|)
 		return .ProcessCondThg(m, y)
 	
 		
-	// now what?
-
+// now what?
 function NilTracker.ProcessCondRelSimple (|message| m, |bool| Y, |message|)
 	
 	
@@ -216,59 +245,28 @@ function NilTracker.ProcessCondRel (|message| m, |bool| Y, |branchstate|)
 	return branchstate.Perhaps
 
 
-function NilTracker.RunAll (|message| s)
+function NilTracker.RunNormal (|message| msg)
 	opt norefcounts
-	|| End = s.FlatAfter
-	while 
-		|| ch = s.first
-			s = .Enter(ch)
-			continue
-		while
-			|| n = s.next
-				s = .Enter(n)
-				exit
-			.Leave(s)	
-			s = s.parent
-			require s != nil and end
-
-
-
-function NilTracker.EnterArg  (|message| s)
 	
-
-
-
-function NilTracker.Enter  (|message| s, |message|)
-	|| f = s.func
-	// now... what have we entered? and where from?
-	if (f == @tmp)
-		if (s == "if" or "while") // what about elseif/else?
+	for s.fast in msg
+		|| f = s.func
+		if (f == @dot)
+			|| Prop = s.NilPropAccess
+				.ChildMustExist(s)								// abc.var
+		  elseif (f == @acc) 
+			.ChildMustExist(s)									// abc[0]
+		  elseif (f == @brel) 
+			if s != "*"
+			.ChildMustExist(s)									// *abc
+		  elseif (f == @func and s.first == @bra)
+			.ChildMustExist(s.first)							//  (abc)()
+		  elseif (f == @tmp) and (s == "if" or "while")
 			.IfWhile(s)
-	  elseif (f == @arg)
-		.EnterArg(s)
-	  elseif (f == @dot)
-		|| Prop = s.NilPropAccess
-			.ChildMustExist(s)								// abc.var
-	  elseif (f == @acc) 
-		.ChildMustExist(s)									// abc[0]
-	  elseif (f == @brel) 
-		if s == "*"
-			.ChildMustExist(s)								// *abc
-	  elseif (f == @func and s.first == @bra)
-		.ChildMustExist(s.first)							//  (abc)()
-	return s
+		  elseif !s.IsLast
+			.RunNormal(s)
+		  else
+			return .RunNormal(s) // tail-call opt
 	
-	
-
-function NilTracker.LeaveIf (|message| s)
-	.If = nil
-
-
-function NilTracker.Leave (|message| s)
-	opt norefcounts
-	if s == .if
-		.LeaveIf(s)
-		
 
 	
 

@@ -1320,6 +1320,7 @@ function Tran_Exit (TranFunc)  // exitter
 	// OK so... also check it must be within a loop.
 	|| Found = node.FindOwningLoop(fn.sourcearg)
 	expect Found (node, "Must be within a loop.")
+	node.RemoveAfter
 
 
 function Tran_Debugger (TranFunc) {
@@ -1485,6 +1486,7 @@ function Tran_Try (TranFunc)
 			abc2()
 		  else
 			abc3()
+	// might aswell add a "notelse" block to if/else... i've wanted that for a long time.
 */
 	
 	opt norefcounts
@@ -1597,6 +1599,7 @@ function Tran_Rejoin (TranFunc)  // exitter
 		|| arg = p.asarg
 		expect (arg.IsStatementExpr) (node, "Can't use this here.")
 		expect !p.next (node, "Value expected here.")
+	node.RemoveAfter
 
 
 function NewCppWrapper (CollectFunc)
@@ -1934,4 +1937,5 @@ function string.UnicodeSafeName (|string|)
 
 constants
 	kReplaced = 0x800
+	kPassThrough = 0x1000
 
