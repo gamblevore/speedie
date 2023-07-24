@@ -1091,16 +1091,15 @@ void JB_DeleteSub_( FreeObject* Obj, AllocationBlock* Block ) {
 // It could be very good to combine with reworking the constructor/new/alloc system which is
 // overcomplex... Also allows for a simpler disposer...
 
-
 __hot void JB_Delete( FreeObject* Obj ) {
-    AllocationBlock* Block = ObjBlock_(Obj);
-    Sanity(Block);
-    fpDestructor Destructor = GetDestructor_(Block);
-    if (Destructor) {
-        (Destructor)((JB_Object*)Obj); // do this before altering memory.
-    }
-    JB_DeleteSub_(Obj, Block);
-    Sanity(Block);
+	AllocationBlock* Block = ObjBlock_(Obj);
+	Sanity(Block);
+	fpDestructor Destructor = GetDestructor_(Block);
+	if (Destructor) {
+		(Destructor)((JB_Object*)Obj); // do this before altering memory.
+	}
+	JB_DeleteSub_(Obj, Block);
+	Sanity(Block);
 }
 
 
