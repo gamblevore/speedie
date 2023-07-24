@@ -1,0 +1,82 @@
+
+
+
+// could be better than charset?
+// probably faster... 
+// could remove the whole class...?
+datatype CharProp (byte)
+	constants
+		|CharProp| 
+		Error
+		Unicode
+		Lower
+		Upper
+		Letters
+		AlmostLetter
+		Number
+		VarNames
+		XMLPunct
+		Punct
+		White
+		Nothing
+	
+	function byte.syntaxis (|CharProp| s, |bool|)
+		return .Property == s
+	function byte.syntaxisnt (|CharProp| s, |bool|)
+		return .Property != s
+	
+	operator contains (|byte| b, |bool|)
+		return b.Property <= self
+
+	module
+		function Byte.Property (|CharProp|)
+			// disabled
+//			return CharProp.default.item[self]
+//		|CharProps| default
+//		.default.MakeDefault
+		function test
+			expect 'a' is lower
+			expect 'b' is lower
+			expect 'C' is upper
+			expect 'D' is upper
+			expect Letters contains 'C' and 'c'
+			expect '5' is number
+			|| fs = FastString()
+			for c in "We ate some cheese for 5£."
+				if VarNames contains c
+					fs <~ c
+			printline fs
+
+	
+		function CharProps.MakeDefault
+			|| item = &.item[0]
+			|| no = charprop.nothing
+			for s in 0 to 32
+				if s|byte|.iswhite					
+					item[s] = charprop.white
+				  else
+					item[s] = no
+			for s in 33 to 126
+				item[s] = charprop.punct
+
+			item['-'] = CharProp.xmlpunct
+			item[':'] = CharProp.xmlpunct
+			item['.'] = CharProp.xmlpunct
+
+			item[0x7f] = no
+			item[0xC0] = no
+			item[0xFF] = no
+			item[0xFE] = no
+			
+			for s in 'A'|int| to 'Z'|int|
+				item[s] = charprop.upper
+				item[s+32] = charprop.lower
+			
+			item['_'] = charprop.almostletter
+			for s in '0'|int| to '9'|int|
+				item[s] = charprop.number
+	
+	
+struct CharProps
+	|CharProp[256]| Item
+

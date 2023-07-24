@@ -24,6 +24,7 @@ spd
 		
 	
 // Perry Do later
+* render warnings on textview but not on errorlist
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* what about decls? perhaps just relative to a node?
 * occasional tab (in func params) doesn't work.
