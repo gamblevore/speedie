@@ -209,27 +209,8 @@ function DoCmd (|Message| cmd, |message| arg, |message|)
 	
 	if cmd == "mem"
 		return .ReportMemory(cmd)
-	
-	// OK... so we have a problem
-	// basically... its not initing properly...
-	// and sometimes... we don't refresh the compiler... or don't report errors
-	// not sure how that happened? ANYHOWs... so lets fix this.
-	
-	// we need to find the various cases.... thats why my brain is getting stuck
-	// too many cases
-	// lets say... it didn't init OK.
-	// theres two cases. One is building, the other isn't building.
-	// either way... we want to send errors back.
-	// however... we also want to restart! iff we are building.
-	// the thing is... we don't want an infinite loop of restarting
-	// so then it gets confusing. Was this build from a restarted thing or not?
-	// its sooo confusing. Cos we are handling that already.
-	// I think lets start from the loop. infinite loop
-	// thats only possible if we are compiling or checking
-	// well... lets say it failed before then... we cna't get auto completes.
-	// so we can just make an error that we failed too early.
-	
-	if !.initedok
+		
+	if !.InitedOK
 		return cmd.SendPerryErrors
 
 	if cmd == 1
@@ -281,7 +262,6 @@ function scfunction.InsertIn (|scbase| parent, |string| name, |scobject|)
 		.lookup = parent // ooofffff
 	return parent[name]
 		
-
 
 function GetFunc2 (|message| cmd, |scfile| myfile, |int| f, |int| n,  |scfunction|)
 	opt norefcounts
@@ -361,18 +341,16 @@ function SCFunction.Disambiguate (|message| src, |scfunction|)
 function Jump (|message| cmd, |message|)
 	opt norefcounts
 	|| c = cmd.first
-	if c != @name
-		0
-	  elseif cmd starts "autocomplete"
-		return .AutoComplete(c.first, c.name, cmd.name)  
-	  else
-		return .DefineOrCall(c, cmd.name)
+	if c == @name
+		if cmd starts "autocomplete"
+			return .AutoComplete(c.first, c.name, cmd.name)  
+		  else
+			return .DefineOrCall(c, cmd.name)
 			
 	if cmd starts "autocomplete"
 		return .RootTmpComplete(cmd)
 	if c ~= "import"
 		return .JumpImport(cmd)
-
 
 
 function MainActAutoComplete (|Message| thg, |string| str, |message| cmd, |message|)

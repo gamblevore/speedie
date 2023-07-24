@@ -224,7 +224,7 @@ function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
 	if msg == "error"
 		if msg.last == "define"
 			beep
-		.logonecomm(msg, "\1b ")
+		.LogOneComm(msg, "\1b ")
 		return false
 
 	.DuringMsgFB = true

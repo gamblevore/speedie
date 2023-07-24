@@ -1426,42 +1426,45 @@ function Tran_Once (TranFunc)
   
 
 function Tran_If (TranFunc) 
-	Tran_IfSub(0, node, name_space)
+	Tran_IfSub(node, name_space)
 
 	
-function Tran_IfSub (|int| mode, |message| node, |scbase| name_space) 
+function Tran_IfSub (|message| node, |scbase| name_space) 
 	opt norefcounts
-	|| cond = node[nil|syntax|]					 #require
+	|| cond = node.needfirst					 #require
 	|| arg = cond.next
 	node.flags |= asmtmp.iIf // for the ASM
 	
-	if (!arg)
+	if arg
+		require arg.expect(@arg)
+	  else
 		arg = @arg.msg
 		if node == "if"
 			arg <~ (@tmp, "debugger") // better than debugat
 		cond.next = arg
 	// cond.obj = asmops.if // this causes bugs! need to fix this!
 
-	require arg.expect(@arg)
-	|| Next = arg.next
-		expect (Next isTmp "elseif" or "else")  ( node )
-		expect (next.parent != @arg) (node, "Can’t have this at the argument root!")
-
-		if next == "else"
-			|| N2 = next.first
-			next.expectlast$
-			expect  (N2 ~!= "if")         (node, "Can’t use 'else if', use 'elseif' instead.")
-			require (N2.wantasarg(next))
+	|| Test = arg.next
+		expect (Test isTmp "elseif" or "else")  ( Test )
 		
-		while next istmp "elseif"
-			Tran_Ifsub(0, next, name_Space)
-			next++
-	
+		while Test istmp "elseif"// or "else"
+			Tran_Ifsub(Test, name_Space)
+			Test++
+
+		if Test == "else"
+			Test.expectlast$
+			|| FinalArg = test.first
+				check (FinalArg ~!= "if")    (FinalArg, "Can’t use 'else if', use 'elseif' instead.")
+			Test[@arg]
+//		  elseif 
+//			0
+			
+			
 	using (node)	
 	name_space = arg.scarg(name_space)
 	
-	cond = ExpandToBool( cond, name_space )$
-	|| d = TypeOfExpr(cond, name_Space) $
+	cond = ExpandToBool( cond, name_space )			#require
+	|| d = TypeOfExpr(cond, name_Space)				#require
 	if d.IsConstOf(falsebool)
 		cond.RemoveElseIf
 		return
@@ -1550,15 +1553,12 @@ function message.RemoveElseIf // self == cond
 
 function Tran_Else (TranFunc) 
 	opt norefcounts
-	|| p = node.prev
-	// expect (p istmp "if" or "elseif") (p, "Should be else/elseif")
-	node[@arg].expectlast
-
-
-function Tran_Elsa (TranFunc) 
-	opt norefcounts
-	node.name = "else"
-	node[@arg].expectlast
+	
+	|| p = node.parent
+	expect (p == @tmp and "if" or "elseif") (node, "This must be in an 'if' block.")
+	// this looks wierd.
+	// the original-source we are compiling, actually LOOKS like its in the "if" block
+	// Speedie reorganises things to make it nested... so elseifs contain elseifs
 
 
 function Tran_Deprecate (TranFunc)
@@ -1566,7 +1566,7 @@ function Tran_Deprecate (TranFunc)
 				// -->
 	// msg.Syntaxdeprecate((test), "error")
 	
-	|| stuff = node[nil|syntax|]						#require
+	|| stuff = node.needfirst						#require
 	require stuff.expectlast
 
 	if stuff != @list and @bra

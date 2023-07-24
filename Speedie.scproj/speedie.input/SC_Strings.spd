@@ -288,7 +288,7 @@ function message.BecomeSyx
 
 function message.Tran_Isnt (|string| name)
 	// is dead --> (self is dead)
-	|| type = self[nil|syntax|]
+	|| type = self.needfirst
 	require type.ExpectLast
 	
 	using (self)
@@ -335,7 +335,7 @@ function message.WithDirectName (|message| p, |string|)
 
 
 function message.Tran_With 
-	|| obj = self[nil|syntax|]$
+	|| obj = self.needfirst$
 	|| arg = obj.next(@arg)$	
 	
 	.name = "if"

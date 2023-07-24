@@ -16,7 +16,7 @@ function scbase.CollectConstants (|Message| src=nil, |SCImport|imp)
 
 
 function scbase.CollectConstantsSub (|Message| ch, |SCImport| imp)
-	|| FuncName = ch[nil|syntax|]									#require
+	|| FuncName = ch.first									#require
 	|| arg = ch[-1]
 	|| vs = funcname
 

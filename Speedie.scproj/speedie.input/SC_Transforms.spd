@@ -21,10 +21,10 @@ dispatch TemporalStatements (TranFunc)
 	or						(Tran_Or)
 	need					(Tran_need)
 	cant					(Tran_cant)
-	elseif					(TranFuncDummy)
+	elseif					(Tran_Else)
+	else					(Tran_Else)
 	once					(Tran_Once)
 	ifn						(Tran_Ifn)
-	else					(Tran_Else)
 	debugger				(Tran_Debugger)
 	crash					{app.crash("crashtest")}
 	deprecate				(Tran_Deprecate)
@@ -64,7 +64,7 @@ function Tran_Expect (TranFunc)
 //     return nil
 // }
 
-	|| ch = node[nil|syntax|] #require
+	|| ch = node.needfirst #require
 	Using (node)
 	|| Ch1 = ch.next
 	|| N = node.name
@@ -108,7 +108,7 @@ function Tran_Temporal (|SCFunction| fn, |Message| s, |SCBase| name_space)
 function Tran_Using (TranFunc)
 	// using (Exp) { f() } --> if (true) { || X = f().startusing, ..., x.stopusing }
 	
-	|| With		= node[nil|syntax|]					#require
+	|| With		= node.needfirst					#require
 	|| Start	= node
 	|| Arg		= With.next
 		require arg.expect(@arg) and arg.ExpectLast
@@ -221,7 +221,7 @@ function Tran_Swap (TranFunc)
 function Tran_While (TranFunc)
 	node.name = "while"
 	node.flags |= asmtmp.iWhile
-	|| StartCond	= node[nil|syntax|] #require
+	|| StartCond	= node.needfirst #require
 	|| arg			= startcond.next
 
 	using (node)
@@ -759,7 +759,7 @@ function Tran_FuncTable (|Message| msg, |bool|)
 		  else
 			i.expect(@item)
 			if (item_Value == item_name)
-				i.expect(nil|syntax|)
+				i.expect(@nil)
 		  
 
 		|Message|	ARel = nil

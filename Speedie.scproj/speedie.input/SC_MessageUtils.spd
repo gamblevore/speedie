@@ -171,13 +171,6 @@ function Message.GetDclName (|bool| Need=false, |Message|)
 		error (self, "No decl name found")
 
 
-
-function Message.WantAsArg (|message| ErrPlace, |string| errmsg = "Expected {argument} here.", |message|)
-	if self == @arg
-		return self
-	expect !errplace (errplace, errmsg)
-
-
 function Message.WithinLoop (|Message| stop, |bool|)
 	opt norefcounts
 	while (self != stop) and self
