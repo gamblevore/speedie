@@ -111,8 +111,7 @@ render RenderParams (|bool| ForErrors=true)
 			sep = ", "
 			fs <~ a.source
 	
-	try
-		need !ForErrors and .ReturnType
+	if !ForErrors and .ReturnType
 		fs <~ sep
 		.returntype.render(fs)
 	
@@ -1290,27 +1289,27 @@ function AlterPostCond (|Message| PostCond, |Message| IterPostCond, |message| No
 
 
 function ArgToFunc (|string| NewName, |Message| Params, |Message| arg,  |Message|)
-	|| result = «tmp "function"
+	rz = «tmp "function"
 		«thg newname »
 	»
 
 	if (params == @prm)
-		result <~ params
+		rz <~ params
 
 	  elseif (params == @thg)	// prototype
-		result <~ «bra, params »
+		rz <~ «bra, params »
 
 	  else
 		debugger// whatever...
 
-	result <~ arg
-	result.position = arg.position
-	Return result
+	rz <~ arg
+	rz.position = arg.position
 
 
-function Message.FindOwningLoop (|message|top, |Message|) 
+function Message.FindOwningLoop (|message| top, |Message|)
+	opt norefcounts // using the new try syntax would be good here.
 	for P.up in self
-		require (P and P != top)
+		require (P != top)
 		if (P == @tmp) and (P == "while" or "for")
 			return P
 
@@ -1496,9 +1495,10 @@ function Tran_Try (TranFunc)
 	node.flags |= asmtmp.itry
 
 
-function Message.MustBeInsideTry
+function Message.MustBeInsideTry (|message| top)
 	opt norefcounts
 	for p.up in self
+		loop p != top
 		if p == @tmp and "try"
 			return
 	error (self, "Not inside 'try'")
@@ -1508,7 +1508,7 @@ function Tran_Need (TranFunc)
 	opt norefcounts
 
 	using node
-	node.MustBeInsideTry
+	node.MustBeInsideTry(fn.source)
 	node.NeedFirst.expectlast
 	|| arg = node.msg(@arg)
 	arg.msg(@tmp, "cant")
@@ -1524,7 +1524,7 @@ function Tran_Cant (TranFunc)
 		
 	node.flags |= asmtmp.icant
 	node.removeafter
-	node.MustBeInsideTry
+	node.MustBeInsideTry(fn.source)
 	
 
 function message.RemoveElseIf // self == cond

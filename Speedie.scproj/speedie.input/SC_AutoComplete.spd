@@ -684,6 +684,15 @@ function TmpAutoComplete (|message| f, |string| name, |string| type, |message|)
 	rz = @tmp + type
 	if name ~!= "r" // too annoying.
 		for ch in .functmps
+			if ch starts name
+				if ch.name > 2  and  ch.name ~= name
+					finished = true
+				  else
+					|| arg = rz.msg(@arg, name)
+					|| n = ch.first.name
+					@tmp.msg(arg, n) <~ (@str, n)
+
+/*
 			try
 				cant ch starts name
 			  or
@@ -693,6 +702,7 @@ function TmpAutoComplete (|message| f, |string| name, |string| type, |message|)
 				|| arg = rz.msg(@arg, name)
 				|| n = ch.first.name
 				@tmp.msg(arg, n) <~ (@str, n)
+*/
 				
 	if rz.hasany
 		0 //
