@@ -77,7 +77,6 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 	.T.Length = 0
 	
 	fs.currfunc = f
-	fs.TryCount = 0
 	fs.srcend = f.sourcearg
 	fs.ExtraAfter = fs.srcend.flatafter
 	fs <~ ' ' // space between arg.
@@ -1109,18 +1108,15 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 	function message.RenderCppTry (fpMsgRenderCpp) // rendertry
 		opt norefcounts			
-		|| after = ++fs.TryCount
 		|| tmp = self
-		
-		// consequtive tries shouldn't use the same number...
-		// nested either
-		// but neste should reset into the parent's try number
-		// where do we store this?
-		// i think just use the current one?
+		|| Oldtry = FastStringCpp.CurrTry
+		FastStringCpp.CurrTry = self
+		.Indent = 1
+		|| after = .Position
 
 		while
 			fs.IndentLine
-			|| c = fs.TryCount++
+			|int| c = .indent++
 			if tmp != self
 				fs <~ "_try_$c: ;\n"
 			
@@ -1134,9 +1130,11 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ "goto _after_try_$after;"
 
 		fs.indentline
-		|| c2 = fs.TryCount++
+		|int| c2 = .indent++
 		fs <~ "_try_$c2: ;\n"
 		fs <~ "_after_try_$after:"
+		
+		FastStringCpp.CurrTry = Oldtry
 		
 			
 	
@@ -1158,7 +1156,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			return
 
 		  elseif (name == "cant")
-			|| c = fs.trycount
+			|| c = faststringcpp.CurrTry.indent|int|
 			fs <~ "goto _try_$c;" // omg!
 			return
 
@@ -1544,13 +1542,11 @@ class FastStringCpp (FastString)
 	|string|		Cpp_Name
 	|message|		SrcEnd
 	|scfunction|	CurrFunc
-	|uint|			TryCount
 
 
 	constructor (|string| name = "")
 		.cpp_name = name
 
-	
 	function ringtree.dbglineinfo
 		cpp_name dbglineinfo
 		if (self isa message)
@@ -1566,6 +1562,8 @@ class FastStringCpp (FastString)
 				fs <~ ' '
 
 			printline fs
+	module
+		|message--| CurrTry
 
 	
 

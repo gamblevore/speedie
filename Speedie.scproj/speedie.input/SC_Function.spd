@@ -1475,6 +1475,18 @@ function Tran_Or (TranFunc)
 
 
 function Tran_Try (TranFunc) 
+/*
+	// merge this with if/else someday!!!
+	// would be better. can still render with gotos.
+		* try func1()
+			need func2()
+			abc()
+		  else
+			need func3()
+			abc2()
+		  else
+			abc3()
+*/
 	opt norefcounts
 	|| f = node[@arg]$
 	while

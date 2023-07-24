@@ -61,15 +61,15 @@ datatype SCDeclInfo (uint)
 		TypeImprove
 		UsedByCode
 		API
-		Hidden // unused... remove
 		CompilerCreated
 		Disabled
-		Param // isparam
+		Param
 		GameFlyingMem
 		Property
 		Atomic
 		OnModule
-		SetTo // a var sets it... like: rz = obj
+		Implicit		// self or other values that aren't declared explicitly
+		SetTo			// a var sets it... like: rz = obj
 		
 		
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)

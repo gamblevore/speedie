@@ -1,24 +1,22 @@
 
 
 
-// could be better than charset?
-// probably faster... 
-// could remove the whole class...?
+// could be better than charset?  probably faster... 
+// could remove charset...? we'd still need bytemap though.
 datatype CharProp (byte)
 	constants
 		|CharProp| 
-		Error
-		Unicode
-		Lower
-		Upper
-		Letters
-		AlmostLetter
-		Number
-		VarNames
-		XMLPunct
-		Punct
-		White
 		Nothing
+		White
+		Punct
+		XMLPunct
+		VarNames
+		Number
+		AlmostLetter
+		Letters
+		Upper
+		Lower
+		Unicode
 	
 	function byte.syntaxis (|CharProp| s, |bool|)
 		return .Property == s
@@ -26,7 +24,7 @@ datatype CharProp (byte)
 		return .Property != s
 	
 	operator contains (|byte| b, |bool|)
-		return b.Property <= self
+		return b.Property >= self
 
 	module
 		function Byte.Property (|CharProp|)
@@ -50,12 +48,9 @@ datatype CharProp (byte)
 	
 		function CharProps.MakeDefault
 			|| item = &.item[0]
-			|| no = charprop.nothing
 			for s in 0 to 32
 				if s|byte|.iswhite					
 					item[s] = charprop.white
-				  else
-					item[s] = no
 			for s in 33 to 126
 				item[s] = charprop.punct
 
@@ -63,6 +58,7 @@ datatype CharProp (byte)
 			item[':'] = CharProp.xmlpunct
 			item['.'] = CharProp.xmlpunct
 
+			|| no = charprop.nothing
 			item[0x7f] = no
 			item[0xC0] = no
 			item[0xFF] = no

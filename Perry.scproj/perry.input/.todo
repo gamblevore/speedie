@@ -9,16 +9,6 @@
 spd
 	* render numbers without exp?
 	* feedback crashing sometimes... AND doesnt report the error location?
-	* perhaps a global charproperties[256] array of bytes? can find whitespace/letters or whatever
-	* merge tran_try with if... or at least mark it in the comments...
-		* try func1()
-			need func2()
-			abc()
-		  else
-			need func3()
-			abc2()
-		  else
-			abc3()
 	* "rendertry" needs to keep a stack... each try func contains the last try... and we have a global currtry
 		* .indent can be our current marker
 		

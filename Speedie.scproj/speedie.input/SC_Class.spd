@@ -85,6 +85,7 @@ constructor (|Message| node, |SCBase| parent)
 	  else
 		T = T.Copy
 	T.Name = "self"
+	(T is implicit)
 	T.Strength = kStrSharedParams
 	.SelfStrong = T
 

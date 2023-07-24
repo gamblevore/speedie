@@ -69,6 +69,7 @@ function NilTracker.IfWhile (|message| msg, |message|)
 	// must re-add decls to the tracker...
 	opt norefcounts
 	expect !.if
+//	|| curr = 
 	.if = msg
 	.ProcessCond(msg.first, true)
 	return msg.Second

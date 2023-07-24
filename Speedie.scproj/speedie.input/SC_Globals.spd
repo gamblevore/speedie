@@ -609,12 +609,12 @@ function TypeOfVecAccess (|message| index, |scdecl| ty0, |int| w, |scdecl|)
 function Message.ExpectInt (|scdecl| type, |bool|)
 	expect type.Type.TypeInfo.IsInt (self, "Expected integer")
 	return true
-	
+
+
 function TypeOfAccess (ExprResolver)
 	|| ch = exp.first
 	|| Ty0 = TypeOfExprModulesOK( ch, name_space, nil )
 	|| arr = exp.last
-
 
 	if (Ty0 isa SCDecl) and (Arr.HasOneChild)
 		|| Index = Arr.first
@@ -635,11 +635,7 @@ function TypeOfAccess (ExprResolver)
 			return LowlevelArrayTransform(exp, ty0.Cls)
 
 	arr.Func = @prm
-	if (ch isarel "!")
-		ch.become(@bra)
-		exp.become(@dot, "SyntaxAccessExpect")
-	  else
-		exp.become(@dot, "SyntaxAccess")
+	exp.become(@dot, "SyntaxAccess")
 	exp.range = arr.range 
 	
 	Return TypeOfDot( exp, name_space, side )
