@@ -137,7 +137,7 @@ class Array (saveable)
 		self[pos|int|] = Value
 	
 	syntax cast (|bool|)
-		return (self|bool|) and (.length >= 1)
+		return .length > 0
 	
 	syntax Append (|| item)
 		.syntaxappend(item, 1)
