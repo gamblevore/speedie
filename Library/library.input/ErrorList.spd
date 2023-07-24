@@ -206,7 +206,11 @@ class ErrorList
 		|| old = stderr
 		stderr = self
 		return old
-
+	
+	function ReturnErrors
+		opt norefcounts
+		for e in self
+			stderr <~ e
 
 	function FirstError (|error|)
 		visible

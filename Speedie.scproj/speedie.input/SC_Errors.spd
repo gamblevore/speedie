@@ -297,3 +297,5 @@ extend Error
 	require X // clumsy
 */
 
+
+|| ErrorDelayer = errorlist()

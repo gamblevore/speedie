@@ -158,6 +158,8 @@ function CompileAll (|bool|)
 	.testdate
 	.ImportAll
 
+	errordelayer.returnerrors	
+
 	.PrepareInterpreter
 	require .Stage( "More constructors" )
 	.RefConstructors // constructors
@@ -268,12 +270,13 @@ function InitTypes
 	typestring.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
 
 
-function InitBasicStuff // compiler.init
-	if !StdErr.ok
+function InitBasicStuff (|int|) // compiler.init
+	rz = stderr.errorcount
+	if rz > 0
 		stderr.LowerErrorsTo = ErrorSeverity.Warning
 		compiler.InitedOK = false
 	(Message).Restore
-		
+	
 	cpp_export[""] // str0
 	options.ListAllLib = linkage.interpreter
 	
@@ -289,8 +292,6 @@ function InitBasicStuff // compiler.init
 	.AddGlobalConst( "__modified__", typedate ).islookuponly = «num scimport.recent »
 	.AddGlobalConst( "π", typef64 ).islookuponly = «num "3.1415926535897932" »
 	.AddGlobalConst( "τ", typef64 ).islookuponly = «num "6.2831853071795864" »
-
-	stderr.LowerErrorsTo = 0
 
 
 function LoadTypeTest (|string| s, |scfunction|)
@@ -380,9 +381,10 @@ function ImportAll
 		compiler.program.ImportFile( L )
 
 	.Stage( "Initialising Compiler" )
-	.InitBasicStuff
-	.AddMain
-	require StdErr.ok
+
+	|| mark = .InitBasicStuff
+	require .AddMain(mark)
+		
 	
 	parser.insertedflags = MsgUIFlags.Inserted // noice
 	scimport.noproj
@@ -970,7 +972,7 @@ function AddGlobalConst (|string| name, |SCClass| c, |SCDecl|)
 	Return d
 
 
-function AddMain
+function AddMain (|int| mark, |bool|)
 	|message| m
 
 	|| f = .getmainfunc(nil)
@@ -985,6 +987,9 @@ function AddMain
 	
 	|| b = (Truebool, falsebool)(options.ProjectIsLibrary) 
 	.program.TryAdd( nil, b, "__IS_LIBRARY__" )
+
+	stderr.LowerErrorsTo = 0
+	return mark == stderr.errorcount
 
 
 function Collect (|Message| m, |bool| visible)

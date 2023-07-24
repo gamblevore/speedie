@@ -208,7 +208,6 @@ class SCBehaviour (SCBase)
 			«Arg »
 		»
 		
-		if !.project
 		.project.use
 		|| F = SCClass.newStruct(msg, compiler.program, ErrPlace)|SCModule| #require
 		F.cls.IsBehaviour = kBehaviourTable

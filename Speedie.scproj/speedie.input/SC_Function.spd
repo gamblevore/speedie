@@ -904,7 +904,12 @@ function FixCnjSub (|Message| exp) {
 	|| CreatesError = (name == "expect" or "check")
 	
 	|| DoesReturn =  (name != "loop" and "check")
-	expect (CreatesError or (name == "debug_require" or "require" or "continue" or "loop" or "need")) (exp, "Must be: 'require/expect/continue/loop' .")
+	
+	ifn (CreatesError or (name == "debug_require" or "require" or "continue" or "loop" or "need"))
+		error (exp, "Must be: 'require/expect/continue/loop' .")
+		ch.name = "require"
+		name = "require"		// just make autocomplete more reliable.
+		// or else we leave dangling @trels
 	
 	// lets fix it, if its in a rel, (it shouldn't be)
 	// || x = a #require   -->   || x = (a #require)
@@ -1785,13 +1790,14 @@ function scfunction.init_sub (|message| node,  |scbase| name_space)
 	
 	.SetFuncType(node)
 	.ParseName( node.first )
-	.PreProcessExpects
-	.TranStrings 
+	using ErrorDelayer // not a terrible error but still an error 
+		.PreProcessExpects
+		.TranStrings 
 	.ReadDisabled(Arg)
 
 	.IsInline		= arg.DeprecatedClassOption("pragma", "inline")
-	.NoRefCounts	= arg.DeprecatedClassOption("opt",	"NoRefCounts")
-	.minopt			= arg.DeprecatedClassOption("opt",	"min")
+	.NoRefCounts	= arg.DeprecatedClassOption("opt",    "NoRefCounts")
+	.minopt			= arg.DeprecatedClassOption("opt",    "min")
 	.SetBlindCasts(name_space)
 
 	if  Arg.DeprecatedClassOption("pragma", "DontDestructLocally")
