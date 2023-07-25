@@ -614,8 +614,6 @@ class SCDecl (SCObject) {
 			
 			Return C
 
-			//C.internal = .internal // seems bugged.
-
 		|| inside = .contains
 		if inside  and  inside != contains  and  inside Is UpgradeableContained
 			self = .Copy

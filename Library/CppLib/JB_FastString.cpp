@@ -372,6 +372,7 @@ bool HasDot (uint8* self, int Used) {
 
 
 void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp) {
+// need a "mode" really... what about if we want no exp but DO want the full length?
     dp = Max(dp, 0);
     dp = Min(dp, 16);
     
