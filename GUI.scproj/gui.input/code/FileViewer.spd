@@ -479,7 +479,7 @@ class FileViewer (ListView)
 				if it
 					rz = it == 1
 				  else
-					rz = (be < ae, an > bn)(be != ae)
+					rz = (an ~< bn, ae ~< be)(be == ae)
 
 
 		function FileRowNameSorter (SorterComparerFileRow)

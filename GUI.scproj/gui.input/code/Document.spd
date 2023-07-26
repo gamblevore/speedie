@@ -16,6 +16,7 @@ class Document (RingTree)
 	|byte|					MaxUndos
 	|bool|					WasCompressed
 	|bool|					WasJbin
+	|bool| 					CompareTreesOnSave
 	|bool|					LoadedFromFile
 	|bool|					ShouldntSave	
 	|DocumentState|			Current
@@ -137,18 +138,32 @@ class Document (RingTree)
 	function Save (|int| Purpose=0, |bool|)
 		// purpose is unused, right now.
 		// it was used, originally... and might be again.
-		|| l = .Location	#require
-		|| c = .current		#require	
+		|| l = .Location			#require
+		|| c = .current				#require	
 		|| f = l.file
-		|| t = .savetext(c)
+		|| t = .SaveText(c)
+		|| KeepDate = false
 		if !t and !f.visible
 			rz = f.delete
 		  else
+			KeepDate = .FindKeepDate(t, f)
 			rz = f.data(t)
 		if rz
-			.filedate = f.modified
 			.original = c
+			if KeepDate
+				f.modified = .filedate
+			  else
+				f.modified = date() // just clear the subsecond bits
+			.filedate = f.modified  // read it back to be sure its what we think it is.
 			.UpdateSavedState
+			
+
+	function FindKeepDate (|string| t,  |file| f,  |bool|)
+		require .CompareTreesOnSave
+		|| old = f.ReadAll
+			|| jold = old.parse
+				|| bad = jold.TreeCompare(t.parse)
+				rz = !bad  
 
 
 	helper CheckModified (|bool|)

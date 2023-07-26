@@ -5,7 +5,11 @@
 
 
 extend_module Message
+	function TreeComparePrint (|message| orig)
+		"Trees ${orig.MiniName} are identical."
+		
 	function TreeCompare (|message| orig, |Message| reparse, |bool| PrintIfSame=false, |bool|)
+		opt norefcounts
 		ifn orig and reparse
 			return CompareError(orig, reparse)
 
@@ -19,9 +23,23 @@ extend_module Message
 			r1++
 			s1++
 		if PrintIfSame
-			"Trees ${orig.MiniName} are identical."
+			.TreeComparePrint(orig)
 		return true
 
+
+function message.TreeCompare (|Message| reparse, |message|)
+	opt norefcounts
+	ifn (.func == reparse.func) and (.name == reparse.name)
+		return reparse
+	|| r1 = reparse.First
+	|| s1 = .First
+	while (r1 or s1)
+		if !s1: return r1
+		if !r1: return reparse
+		|| bad = s1.TreeCompare( r1 )
+			return bad
+		r1++
+		s1++
 
 
 function Message.Locate (|string|)
