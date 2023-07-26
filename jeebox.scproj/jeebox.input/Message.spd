@@ -769,16 +769,15 @@ class Message (RingTree)
 		
 		|| fs = faststring.new
 		if found
-			fs <~ "Expected @"
+			fs <~ "Expected "
 			fs.MsgErrorName(name)
-			fs <~ s.Name
-			fs <~ " but found @"
-			fs <~ found.Func.Name
+			fs <~ s.longName
+			fs <~ " but found "
+			fs <~ found.Func.longName
 		  else
 			if s
 				fs <~ "Missing "
-				fs <~ '@'
-				fs <~ s.Name
+				fs <~ s.longName
 			  else
 				fs <~ "Missing syntax"
 			fs.MsgErrorName(name)
