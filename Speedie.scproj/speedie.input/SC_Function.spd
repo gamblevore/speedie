@@ -1330,19 +1330,6 @@ function Message.CheckLastInBlock
 
 function Message.LastInBlock (|int|)
 	opt norefcounts
-	if ""
-		if 1
-			if 2
-				if 3
-					return 1
-				else
-					return 2
-			else
-				return 3
-		else
-			return 4
-		"boomer"
-
 	.RemoveAfter
 
 	|| arg = .parent
