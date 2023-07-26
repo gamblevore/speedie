@@ -132,6 +132,9 @@ class File (String)
 	
 	function Modified (|Date|)
 		cpp_wrapper JB_File_Modified
+	
+	function Modified (assigns:|Date|)
+		cpp_wrapper JB_File_ModifiedSet
 			
 	function IsPipe (|bool|)
 		cpp_wrapper JB_File_IsPipe
