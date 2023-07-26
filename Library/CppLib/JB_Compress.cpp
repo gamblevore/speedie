@@ -179,7 +179,7 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 
 	if (CB > C.B) {
 		C.B = CB;
-		C.Suffixes				= (int*)JB_realloc(C.Suffixes,	2*ChunkLength*sizeof(int)); // dict
+		C.Suffixes				= (int*)JB_realloc(C.Suffixes,	2*ChunkLength*sizeof(int));
 		C.SortPositionAtByte	= (int*)JB_realloc(C.SortPositionAtByte,	ChunkLength*sizeof(int));
 	}
 

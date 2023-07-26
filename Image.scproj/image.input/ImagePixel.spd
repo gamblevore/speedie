@@ -152,7 +152,7 @@ struct ImagePixel
 	function Underlay (|vec4| b) 
 		|| Old = .color
 		|| C = mix(b, Old, Old.a)
-		// C.a = b.a // why?
+		C.a = old.a
 		self <~ C 
 	
 	
