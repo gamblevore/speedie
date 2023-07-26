@@ -976,7 +976,8 @@ int JB_File_SizeSet( JB_File* self, IntPtr N ) {
 	int fd = JB_File_Open( self, O_RDWR, false );
 	if (fd < 0)
 		return fd;
-	return ErrorHandle_( ftruncate(self->Descriptor, N),  self,  nil,  "set size of" );
+	int err = ftruncate(self->Descriptor, N);
+	return ErrorHandle_( err,  self,  nil,  "set size of" );
 }
 
 
@@ -999,6 +1000,16 @@ Date JB_File_Modified( JB_File* self ) {
 		return JB_Date__Create(st.st_mtimespec.tv_sec, st.st_mtimespec.tv_nsec);
 	#endif
 }
+
+void JB_File_ModifiedSet( JB_File* self, Date when ) {
+	auto path = (const char*)(self->Addr);
+	struct timeval times[2] = {};
+	times[0].tv_sec = when>>16;
+	times[1].tv_sec = when>>16;
+	int err = utimes(path, times);
+	ErrorHandle_( err,  self,  nil,  "set modified date of" );
+}
+
 
 
 Date JB_File_Created( JB_File* self ) {
@@ -1172,7 +1183,8 @@ long JB_File__chdir( JB_String* Path ) {
 	long err = trchdir( (NativeFileChar2*)JB_FastFileString( Path, Buffer1 ) );
 	return ErrorHandle_(err, Path, nil, "calling chdir"); 
 }
-    
+
+
 bool JB_File_MoveNext(JB_File* self) {
     int** I = (&self->Dir);
     DirReader* D = (DirReader*)I;
