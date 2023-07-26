@@ -161,7 +161,8 @@ class Document (RingTree)
 	function FindKeepDate (|string| t,  |file| f,  |bool|)
 		require .CompareTreesOnSave
 		|| old = f.ReadAll
-			|| jold = old.parse
+			|error| err
+			|| jold = old.ParseWithError(err)
 				|| bad = jold.TreeCompare(t.parse)
 				rz = !bad  
 

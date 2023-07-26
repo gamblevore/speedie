@@ -734,6 +734,7 @@ class PerryIDE (Window)
 			return -1
 		
 		|| Loaded =  E.LoadDocument(doc)
+		doc.CompareTreesOnSave = .IsSpeedieCode
 		.ListAllFuncs
 		require Loaded
 		|| it = .ProjMsg
