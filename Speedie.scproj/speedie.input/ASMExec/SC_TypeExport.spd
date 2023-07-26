@@ -21,11 +21,11 @@ datatype NilState (byte) // Exec.scproj needs this here
 	constants
 		|nilstate|
 		Failed		= 0
-		Nil			= 1	
+		Nilish		= 1	
 		Realish		= 2 
 		Either		= 3
 		Stated		= 4
-		ActuallyNil = Nil + Stated				// nil|message|.position
+		ActuallyNil = Nilish + Stated				// nil|message|.position
 		Optional    = Either + Stated			// || x = array[1000]
 		Real		= Realish + Stated			// || x = message(),  x.position
 

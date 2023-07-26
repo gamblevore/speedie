@@ -1,73 +1,66 @@
 
 
+datatype NilTrackerInt (uint)
+
 struct NilTracker
 	linkage:cpp_part nil
-	|bool| 				NeedsTracking // base does not
-	|uint64| 			Count
+	|uint| 				MsgCount
 	|message--|			IfMsg
 	|message--[1024]|	Items
 	
+	function Using (|NilTrackerInt|)
+		rz = .MsgCount++
+		.items[rz] = nil
 	
-	function SetNilness (|message| m, |scdecl| d, |nilstate| s, |scdecl|)
+	function Used (|NilTrackerInt| s)
+		.MsgCount = s
+		
+	function SetNilness (|message| m, |scdecl| d, |nilstate| s)
 		opt norefcounts
 		if d.nilused > 3 // what?
-		if !.NeedsTracking
+		if !.MsgCount
 			m.Indent = d.NilUsed
-			return d
+			return
 
-		if (.count < 1024) 
+		if (.MsgCount < 1024) 
 			m.Indent = d.NilUsed
-			.items[.count++] = m
-			return d
+			.items[.MsgCount++] = m
+			return
 
 		error (m, "Too many variables")
-		return d
 
 	function Start (|scfunction| f)
 		opt norefcounts
 		scfunction.currfunc = f
-		.NeedsTracking = false
 		.ifmsg = nil
-		.Count = 0
-		.restore
-	
-	function Tighten (|scfunction| f)
-		opt norefcounts
-		for (d in f.args) (i)
-			if d.NeedsNilTighten
-				f.args[i] = d.NilTighten
-		if f.ReturnType.NeedsNilTighten
-			f.ReturnType = f.ReturnType.NilTighten
-
-	function SCDecl.NilTighten (|scdecl|)
-		if .NilUsed isnt Nil
-			return .MakeReal
-		return .MakeOptional
-
-	
-	function Restore
-		opt norefcounts
+		.MsgCount = 0
 		for d in scfunction.currfunc.args				// no need add prms.... only log changes
 			d.RestoreNil
 	
+	function TightenNilness (|scfunction| f)
+		opt norefcounts
+		for (d in f.args) (i)
+			|| d2 = d.NilTighten
+				f.args[i] = d2
+		|| r = f.ReturnType.NilTighten
+			f.ReturnType = r
+
+	function SCDecl.NilTighten (|scdecl|)
+		require self
+		|| u = .nilused	
+		|| d = .NilDeclared	
+		.nilused = d
+		if (u is stated) and (d isnt stated)
+			if u isnt Nilish
+				return .MakeReal
+			return .MakeOptional
+
 	iterator
 		|| n = 0
-		while (n < .count++)
+		while (n < .MsgCount++)
 			yield self[n]
-	module
-		|| nilerr = "Possible NilObject Access."
 	
 
 
 function SCDecl.RestoreNil
 	.nilused = .nildeclared
-
-
-function SCdecl.NeedsNilTighten (|bool|)
-	if self
-		if (.NilDeclared isnt stated) and (.nilused is stated)
-			return true
-		return false
-		if .nilused is Stated
-			if !options.perry
-				debugat
