@@ -217,8 +217,6 @@ module SDLApp
 		app.clearcaches
 		while .SingleFrame
 			.PostLoads
-				// what if we end up compressing stuff? like for undo/redo?
-				// no point clearing the cache every damn frame?
 		.quit
 
 	
@@ -601,7 +599,7 @@ module SDLApp
 		opt norefcounts
 		
 		require .StartFrame(.Raw)
-		|| w1 = .DrawWinFrom
+		|| w1 = .DrawWinFrom$
 		if !w1.NoDrawBackground
 			¥.DrawBackground(.DrawSpace)
 		
