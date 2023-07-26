@@ -81,16 +81,6 @@ function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
 	if cond != arg
 		.RunNormal(arg)
 	
-	// blocking can be always, perhaps or never
-	// I mean like "if (Abc): return", blocks... within... but it doesnt block everything
-	// I think blocking everyhting doesnt matter anyhow? cos theres no future code?
-	// the transform stage should keep track of that, then??
-	// probably.
-	
-	|| ret = arg.last
-		ifn ret.flags & kEndsblock
-			root.flags &=~ kEndsblock // bubble up
-	
 	if test == "else" // well... this is the last one... it affects the boolean logic somehow?
 		
 	if 1 == 2
@@ -99,22 +89,27 @@ function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
 		  else
 			return nil
 
-	return (arg.next, test.next)(test == root)
+	return arg.next
 	
 
-function NilTracker.IfWhile (|message| msg)
+function NilTracker.IfOrWhile (|message| msg)
 	opt norefcounts
 	|| Depth = .Count
-	.if = msg
-	msg.flags |= kEndsblock // children can clear it
-
-	|| test = .IfWhileOne(msg, msg)
+	|| test = msg
 	while test
 		test = .IfWhileOne(test, msg)
 
-	if msg == "while" // while can't block
-		msg.flags &=~ kEndsblock
 	.Count = Depth
+
+
+// the tran_else thing could loopback to do the if removal?
+
+function NilTracker.If (|message| Tmp)
+	|| oldif = .ifmsg
+	Tmp.Obj = oldif
+	.ifmsg = Tmp
+	.IfOrWhile(Tmp)
+	.IfMsg = oldif
 
 
 function Message.RedundantBranch (|bool| Value, |branchstate|)
@@ -274,8 +269,11 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 			.ChildMustExist(s)									// *abc
 		  elseif (f == @func and s.first == @bra)
 			.ChildMustExist(s.first)							//  (abc)()
-		  elseif (f == @tmp) and (s == "if" or "while")
-			.IfWhile(s)
+		  elseif (f == @tmp)
+			if s == "if"
+				.If(s)
+			  elseif s == "while"
+				.IfOrWhile(s)
 		  elseif !s.IsLast
 			.RunNormal(s)
 		  else
