@@ -8,15 +8,6 @@ helper __junktest_1__
 	|ErrorSeverity| i = 2
 	|| v = r[i]
 
-	try
-		|| x = "Abc"
-		|| x2 = 1 + 2 #need
-		|| y = "def"
-		need x
-		printline y
-	  or
-		|| y = 3 + 4
-
 
 extend ivec4
 	helper __junktest_4__ (assigns:|int|, |ivec4|)

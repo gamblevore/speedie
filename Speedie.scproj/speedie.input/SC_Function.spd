@@ -78,6 +78,12 @@ syntax equals (|string| name, |bool| Aware, |bool|)
 	return .Name.syntaxequals( name, true )		// never needs !aware.
 
 
+syntax Access (|int| d, assigns:|scdecl|)
+	if d == 255 // a return
+		.ReturnType = Value
+	  else
+		.args[d] = Value
+
 operator isa (|int| Code, |bool|)
 	return ( .AllocCode & Code )
 
@@ -1317,18 +1323,11 @@ function Message.FindOwningLoop (|message| top, |Message|)
 function Tran_Exit (TranFunc)  // exitter
 	opt norefcounts
 	expect (!node.first) (node)
-	// OK so... also check it must be within a loop.
-	|| Found = node.FindOwningLoop(fn.sourcearg)
-	expect Found (node, "Must be within a loop.")
 	node.LastInBlock
+	expect node.FindOwningLoop(fn.sourcearg) (node, "Must be within a loop.")
 
 
-function Message.CheckLastInBlock
-	if .flags & kEndsBlock
-		.RemoveAfter
-
-
-function Message.LastInBlock (|int|)
+function Message.LastInBlock
 	opt norefcounts
 	.RemoveAfter
 
@@ -1448,15 +1447,8 @@ function Tran_If (TranFunc)
 	Tran_IfSub(node, name_space)
 
 
-function message.ArgBlocks (|bool|)
-	opt norefcounts
-	|| l = .last
-		return l.flags & kEndsBlock
-	if 1
-		return false
-	  else
-		return false
-	"pink pertty ponies"
+function message.Blocks (|bool|)
+	return .flags & kEndsBlock
 
 
 function Tran_IfSub (|message| node, |scbase| name_space) 
@@ -1497,15 +1489,11 @@ function Tran_IfSub (|message| node, |scbase| name_space)
 	if cond.first == @arg // if a.b? --> if ({||x=a.b, rejoin x}), fails in c cos if ({}) is bad
 		cond.wrapwith(@bra.msg).obj = cond.obj 
 	Tran_Isa(node, name_space)
-	
-
-function Tran_Or (TranFunc) 
-	opt norefcounts
-	|| p = node.parent
-	check (p istmp "try") (node)
 
 
-function Tran_Try (TranFunc) 
+
+function Tran_Try (TranFunc)
+	disabled `makes the compiler too complex... besides we ahve "expect" and "using"`
 /*
 	// merge this with if/else someday!!!
 	// would be better. can still render with gotos.

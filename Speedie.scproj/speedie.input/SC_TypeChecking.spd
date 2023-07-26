@@ -162,10 +162,9 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 		// we do bool casting after, as its usually a sign of a bug.
 		for (b.Upwards in Ot)
 			for (C in b.Casts)
-				try
-					cant NoBools and (C.returnType == typebool.typenormal)
-					need .Match( C.ReturnType, 0 ).IsNormalMatch
-					return C.CreateTypeCast( O, exp )
+				ifn NoBools and (C.returnType == typebool.typenormal)
+					if .Match( C.ReturnType, 0 ).IsNormalMatch
+						return C.CreateTypeCast( O, exp )
 		
 		
 		|| IsaBool = (t == TypeBool) and (.IsNormal)

@@ -385,6 +385,9 @@ class FileViewer (ListView)
 			return
 			
 		|| r = .FindPaths(path, nil, true)
+		target debug
+			debugger
+			r.Sort(ErrorSearchSorter, true) // ughhh. doesnt seem to work
 		.listopen.QuickOpenFill(r)
 
 

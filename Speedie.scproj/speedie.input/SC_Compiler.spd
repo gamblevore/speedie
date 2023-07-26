@@ -172,7 +172,7 @@ function CompileAll (|bool|)
 	require .Stage( "NilChecking" )
 	.Timer( "NilChecking" )
 
-	VoidSweeper.SuperUberChecker
+	NilChecker.SaveLives
 	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )
