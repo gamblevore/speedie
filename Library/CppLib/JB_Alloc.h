@@ -336,8 +336,9 @@ inline void JB_Clear_(JB_Object** Place) {
     if ( self ) {
 		JBObjRefTest(self);
         int N = --self->RefCount;
-        if (!N)
+        if (!N) {
             JB_Delete( (FreeObject*)self );
+		}
     }
 }
 

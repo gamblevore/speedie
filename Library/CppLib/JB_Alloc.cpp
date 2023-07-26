@@ -1099,7 +1099,6 @@ __hot void JB_Delete( FreeObject* Obj ) {
 		(Destructor)((JB_Object*)Obj); // do this before altering memory.
 	}
 	JB_DeleteSub_(Obj, Block);
-	Sanity(Block);
 }
 
 
