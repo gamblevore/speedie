@@ -1322,9 +1322,20 @@ function Message.FindOwningLoop (|message| top, |Message|)
 
 function Tran_Exit (TranFunc)  // exitter
 	opt norefcounts
+	node.tmptype = ASMtmp.iExit
+	.LoopExitter(fn, node, name_Space)
+
+
+function LoopExitter (Tranfunc)
 	expect (!node.first) (node)
 	node.LastInBlock
 	expect node.FindOwningLoop(fn.sourcearg) (node, "Must be within a loop.")
+
+
+function Tran_Continue (TranFunc)  // exitter
+	opt norefcounts
+	node.tmptype = ASMtmp.iContinue
+	.LoopExitter(fn, node, name_Space)
 
 
 function Message.LastInBlock
@@ -1453,9 +1464,9 @@ function message.Blocks (|bool|)
 
 function Tran_IfSub (|message| node, |scbase| name_space) 
 	opt norefcounts
+	node.tmptype = asmtmp.iIf // for the ASM
 	|| cond = node.needfirst					 #require
 	|| arg = cond.next
-	node.flags |= asmtmp.iIf // for the ASM
 	
 	if arg
 		require arg.expect(@arg)
@@ -1508,15 +1519,15 @@ function Tran_Try (TranFunc)
 			abc3()
 	// might aswell add a "notelse" block to if/else... i've wanted that for a long time.
 */
-	
-	opt norefcounts
-	|| f = node[@arg]$
-	while
-		f = f.next #loop
-		check (f == @tmp and (f == "or" or "else")) (f)
-		f[@arg]
-
-	node.flags |= asmtmp.itry
+//	
+//	opt norefcounts
+//	|| f = node[@arg]$
+//	while
+//		f = f.next #loop
+//		check (f == @tmp and (f == "or" or "else")) (f)
+//		f[@arg]
+//
+//	node.asmtmp = itry
 
 
 function Message.MustBeInsideTry (|message| top)
@@ -1526,29 +1537,6 @@ function Message.MustBeInsideTry (|message| top)
 		if p == @tmp and "try"
 			return
 	error (self, "Not inside 'try'")
-
-
-function Tran_Need (TranFunc) 
-	opt norefcounts
-
-	using node
-	node.MustBeInsideTry(fn.source)
-	node.NeedFirst.expectlast
-	|| arg = node.msg(@arg)
-	arg.msg(@tmp, "cant")
-	tran_ifn(fn, node, name_Space)
-
-
-function Tran_Cant (TranFunc) 
-	opt norefcounts
-	|| cond = node.first		// cant abc --> need !abc
-		require cond.expectlast
-		cond = cond.Negate
-		return tran_need(fn, node, name_space)
-		
-	node.flags |= asmtmp.icant
-	node.LastInBlock
-	node.MustBeInsideTry(fn.source)
 	
 
 function message.RemoveElseIf // self == cond
@@ -1601,13 +1589,14 @@ function Tran_Visible (TranFunc)
 
 
 function Tran_Return (TranFunc)  // exitter
+	node.tmptype = asmtmp.ireturn
 	expect (! fn.IsConstructorOrDestructor)   (node, "You can’t return in a constructor or destructor")
-	node.flags |= asmtmp.ireturn
 	fn.CheckReturnValue( node )
 	node.LastInBlock
 
 
 function Tran_Rejoin (TranFunc)  // exitter
+	node.tmptype = asmtmp.iRejoin
 	|| p = node.first
 	if p == @arg
 		|| arg = p.asarg

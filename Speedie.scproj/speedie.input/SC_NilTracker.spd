@@ -1,19 +1,19 @@
 
 
-datatype NilTrackerInt (uint)
-
 struct NilTracker
 	linkage:cpp_part nil
+	|uint| 				IfDepth
 	|uint| 				MsgCount
 	|message--|			IfMsg
 	|message--[1024]|	Items
 	
-	function Using (|NilTrackerInt|)
-		rz = .MsgCount++
-		.items[rz] = nil
+	function Using (|uint|)
+		.ifdepth++
+		return .MsgCount
 	
-	function Used (|NilTrackerInt| s)
+	function Used (|uint| s)
 		.MsgCount = s
+		.IfDepth--
 		
 	function SetNilness (|message| m, |scdecl| d, |nilstate| s)
 		opt norefcounts
@@ -36,24 +36,7 @@ struct NilTracker
 		.MsgCount = 0
 		for d in scfunction.currfunc.args				// no need add prms.... only log changes
 			d.RestoreNil
-	
-	function TightenNilness (|scfunction| f)
-		opt norefcounts
-		for (d in f.args) (i)
-			|| d2 = d.NilTighten
-				f.args[i] = d2
-		|| r = f.ReturnType.NilTighten
-			f.ReturnType = r
 
-	function SCDecl.NilTighten (|scdecl|)
-		require self
-		|| u = .nilused	
-		|| d = .NilDeclared	
-		.nilused = d
-		if (u is stated) and (d isnt stated)
-			if u isnt Nilish
-				return .MakeReal
-			return .MakeOptional
 
 	iterator
 		|| n = 0
@@ -64,3 +47,17 @@ struct NilTracker
 
 function SCDecl.RestoreNil
 	.nilused = .nildeclared
+
+
+function SCDecl.NilTighten
+	// set in the actual
+	opt norefcounts
+	|| u = .nilused	
+	|| d = .NilDeclared	
+	if (u is stated) and (d isnt stated)
+		|| f = SCFunction.CurrFunc
+		|| p = .NilParamPos
+		if u isnt Nilish
+			f[p] = .MakeReal
+		  else
+			f[p] = .MakeOptional

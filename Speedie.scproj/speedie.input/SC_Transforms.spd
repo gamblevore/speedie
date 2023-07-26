@@ -46,7 +46,7 @@ dispatch TemporalStatements (TranFunc)
 	__instructionlist__		(vm_Builder.BuildInstructions)
 
 // these exit the function. marked with   exitter
-	continue				SCFunction.Tran_Exit
+	continue				SCFunction.Tran_Continue
 	exit					SCFunction.Tran_Exit
 	quit					(Tran_Quit)
 	return					(Tran_Return)
@@ -208,15 +208,17 @@ function Tran_BlindCasts (tranfunc)
 
 
 function Tran_Swap (TranFunc)
+	node.tmptype = asmtmp.iSwap	
 	expect (node == 2) (node, "Just swap two items.")
 	node.name = "JB_Swap" 
 	Tran_Print(fn, node, name_space)
-	node.flags |= asmtmp.iSwap	
+	
+function message.
 
 
 function Tran_While (TranFunc)
 	node.name = "while"
-	node.flags |= asmtmp.iWhile
+	node.tmptype = asmtmp.iWhile
 	|| StartCond	= node.needfirst #require
 	|| arg			= startcond.next
 

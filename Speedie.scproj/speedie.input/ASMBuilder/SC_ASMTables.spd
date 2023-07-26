@@ -85,7 +85,8 @@ dispatch fn_asm_table (fn_asm)
 		debugger
 
 
-module ASMtmp
+datatype ASMtmp (MsgUIFlags)
+	module {
 	function StateExpr	(fn_asm)
 	function Debugger	(fn_asm)
 		debugger
@@ -104,21 +105,30 @@ module ASMtmp
 
 	function While		(fn_asm)
 		debugger
+	}
 
 	constants
+		|asmtmp| 
 		iDebugger	= 63
 		iIf			= 62
 		iRejoin		= 61
 		iReturn		= 60
 		iWhile		= 59
 		iSwap		= 58
-		iCant		= 57
-		iTry		= 56
-	
+		iExit		= 57
+		iContinue	= 56
 	
 
-extend MsgUIFlags // ideal... better than above.
-	constants
+function Message.ASMTmp (|ASMTmp|)
+	return .flags & 63
+
+function Message.tmptype (assigns:|ASMTmp| value)
+	.flags = (.flags &~ 63) (|) value
+
+
+
+extend MsgUIFlags	// ideal... better than above. the problem is testing them... with bit overlap
+	constants		// also the constants dont seem added correctly.
 		Debugger	= 63
 		If			= 62
 		Rejoin		= 61

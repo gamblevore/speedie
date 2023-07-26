@@ -1,6 +1,11 @@
 
 
-// fix " = .internal" all over
+// Later, the disturbance checker will mesh nicely! for global vars
+	// global.x = obj
+	// func()
+	// global.x.func2 // allowed or not? func() might have altered global.x
+
+
 
 module NilChecker
 	function SaveLives
@@ -33,7 +38,7 @@ function NilTracker.Check (|scfunction| f)
 	opt norefcounts
 	.Start(f)
 	.RunNormal(f.SourceArg)
-	.TightenNilness(f)
+//	.TightenNilness(f) // no need... will already be tightened
 
 
 function message.NilPropAccess (|scdecl|)
@@ -278,6 +283,7 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 				.If(s)
 			  elseif s == "while"
 				.IfOrWhile(s)
+				
 		  elseif !s.IsLast
 			.RunNormal(s)
 		  else
@@ -290,11 +296,12 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 
 /*
 TODO:
+* fix " = .internal" all over!!!! DO IT FIRST
 * update the params properly
-* pop the msgs out.
+* pop the msgs out and restore nilused
 * ternaries
 * freeze bug
-* if.lookuponly isa scdecl... we need to update that... and also its a chain
+* if .lookuponly isa scdecl... we need to update that... and also its a chain
 
 
 * return values
