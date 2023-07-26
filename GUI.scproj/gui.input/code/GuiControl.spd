@@ -93,11 +93,12 @@ class GUIControl (ringtree)
 		opt norefcounts
 		|| prev = mine.x2y2x1y1 // noice
 		for R in self
+			|| curr = R.ReflowDoc(mine, prev, hard)
 			if r is visible or Spacer
-				prev = R.ReflowDoc(mine, prev, hard)
+				prev = Curr
 
 
-	helper ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // resizecontrolr
+	helper ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // resizecontrol, recalculatesize
 		opt norefcounts
 		rz = .sizer.Calculate(parent, prev, Hard, .clipmode)
 		.LastRect = rz
