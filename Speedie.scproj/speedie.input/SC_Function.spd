@@ -1456,6 +1456,7 @@ function Tran_Once (TranFunc)
   
 
 function Tran_If (TranFunc) 
+	node.tmptype = asmtmp.kIf // for the ASM
 	Tran_IfSub(node, name_space)
 
 
@@ -1465,7 +1466,6 @@ function message.Blocks (|bool|)
 
 function Tran_IfSub (|message| node, |scbase| name_space) 
 	opt norefcounts
-	node.tmptype = asmtmp.kIf // for the ASM
 	|| cond = node.needfirst					 #require
 	|| arg = cond.next
 	
