@@ -208,7 +208,7 @@ function Tran_BlindCasts (tranfunc)
 
 
 function Tran_Swap (TranFunc)
-	node.tmptype = asmtmp.iSwap	
+	node.tmptype = asmtmp.kSwap	
 	expect (node == 2) (node, "Just swap two items.")
 	node.name = "JB_Swap" 
 	Tran_Print(fn, node, name_space)
@@ -218,7 +218,7 @@ function message.
 
 function Tran_While (TranFunc)
 	node.name = "while"
-	node.tmptype = asmtmp.iWhile
+	node.tmptype = asmtmp.kWhile
 	|| StartCond	= node.needfirst #require
 	|| arg			= startcond.next
 

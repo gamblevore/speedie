@@ -152,7 +152,7 @@ function NilTracker.ProcessCondThg (|message| msg, |bool| Y, |branchstate|)
 	if u == dest
 		return msg.RedundantTrue
 
-	.setnilness(msg, d, dest)
+	.SetNilness(msg, d, dest)
 	if u == NilState.Either					// typical state
 		if d is param
 			.ReDeclare(msg, d, u)
@@ -279,9 +279,10 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 		  elseif (f == @func and s.first == @bra)
 			.ChildMustExist(s.first)							//  (abc)()
 		  elseif (f == @tmp)
-			if s == "if"
+			|| type = S.TmpType
+			if Type is kif
 				.If(s)
-			  elseif s == "while"
+			  elseif type is kwhile
 				.IfOrWhile(s)
 				
 		  elseif !s.IsLast

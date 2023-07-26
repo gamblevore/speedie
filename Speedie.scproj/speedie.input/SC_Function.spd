@@ -1320,21 +1320,22 @@ function Message.FindOwningLoop (|message| top, |Message|)
 			return P
 
 
-function Tran_Exit (TranFunc)  // exitter
+function Tran_Exit (TranFunc)
 	opt norefcounts
-	node.tmptype = ASMtmp.iExit
+	node.tmptype = ASMtmp.kExit
 	.LoopExitter(fn, node, name_Space)
 
 
 function LoopExitter (Tranfunc)
-	expect (!node.first) (node)
+	|| f = node.first
+		error f
+	check node.FindOwningLoop(fn.sourcearg) (node, "Must be within a loop.")
 	node.LastInBlock
-	expect node.FindOwningLoop(fn.sourcearg) (node, "Must be within a loop.")
 
 
-function Tran_Continue (TranFunc)  // exitter
+function Tran_Continue (TranFunc)
 	opt norefcounts
-	node.tmptype = ASMtmp.iContinue
+	node.tmptype = ASMtmp.kContinue
 	.LoopExitter(fn, node, name_Space)
 
 
@@ -1346,14 +1347,14 @@ function Message.LastInBlock
 	arg.flags |= kEndsBlock
 	.Flags |= kEndsBlock
 	|| Test = arg.parent
-	require Test istmp "else"
+	require Test istmp "else" // this is really cool!
 
 	while test
 		arg = test.prev // if.arg
 		require arg.flags&kEndsBlock
 		test = arg.parent
 		test.flags |= kEndsBlock
-		if test == "if"
+		if test.TmpType is kif
 			return test.LastInBlock // bubble up :O
 	
 
@@ -1464,7 +1465,7 @@ function message.Blocks (|bool|)
 
 function Tran_IfSub (|message| node, |scbase| name_space) 
 	opt norefcounts
-	node.tmptype = asmtmp.iIf // for the ASM
+	node.tmptype = asmtmp.kIf // for the ASM
 	|| cond = node.needfirst					 #require
 	|| arg = cond.next
 	
@@ -1589,14 +1590,14 @@ function Tran_Visible (TranFunc)
 
 
 function Tran_Return (TranFunc)  // exitter
-	node.tmptype = asmtmp.ireturn
+	node.tmptype = asmtmp.kreturn
 	expect (! fn.IsConstructorOrDestructor)   (node, "You can’t return in a constructor or destructor")
 	fn.CheckReturnValue( node )
 	node.LastInBlock
 
 
 function Tran_Rejoin (TranFunc)  // exitter
-	node.tmptype = asmtmp.iRejoin
+	node.tmptype = asmtmp.kRejoin
 	|| p = node.first
 	if p == @arg
 		|| arg = p.asarg

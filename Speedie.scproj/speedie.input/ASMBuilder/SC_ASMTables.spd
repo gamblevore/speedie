@@ -69,11 +69,11 @@ dispatch fn_asm_table (fn_asm)
 		// could be others too? vectors?
 		debugger
 
-	(ASMtmp.iDebugger):	ASMtmp.Debugger // 63==max
-	(ASMtmp.iif):		ASMtmp.If
-	(ASMtmp.irejoin):	ASMtmp.Rejoin
-	(ASMtmp.ireturn):	ASMtmp.return
-	(ASMtmp.iwhile):	ASMtmp.While
+	(ASMtmp.kDebugger):	ASMtmp.Debugger // 63==max
+	(ASMtmp.kif):		ASMtmp.If
+	(ASMtmp.krejoin):	ASMtmp.Rejoin
+	(ASMtmp.kreturn):	ASMtmp.return
+	(ASMtmp.kwhile):	ASMtmp.While
 
 	@tmp:
 		if exp == "debugger":	return ASMtmp.Debugger(self, exp)
@@ -106,20 +106,23 @@ datatype ASMtmp (MsgUIFlags)
 	function While		(fn_asm)
 		debugger
 	}
+	
+	syntax is (|asmtmp| t, |bool|)
+		return self == t
 
 	constants
 		|asmtmp| 
-		iDebugger	= 63
-		iIf			= 62
-		iRejoin		= 61
-		iReturn		= 60
-		iWhile		= 59
-		iSwap		= 58
-		iExit		= 57
-		iContinue	= 56
+		kDebugger	= 63
+		kIf			= 62
+		kRejoin		= 61
+		kReturn		= 60
+		kWhile		= 59
+		kSwap		= 58
+		kExit		= 57
+		kContinue	= 56
 	
 
-function Message.ASMTmp (|ASMTmp|)
+function Message.TmpType (|ASMTmp|)
 	return .flags & 63
 
 function Message.tmptype (assigns:|ASMTmp| value)
