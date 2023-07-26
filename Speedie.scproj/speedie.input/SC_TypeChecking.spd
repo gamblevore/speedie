@@ -1,10 +1,6 @@
 
 
 
-module exec
-	function LoadStructure
-
-
 function ExpandToBool (|Message| inside, |SCBase| name_space, |Message|)
 	opt norefcounts
 	|| decl = TypeOfExpr( inside, name_space )$
@@ -13,7 +9,6 @@ function ExpandToBool (|Message| inside, |SCBase| name_space, |Message|)
 
 	While (rz == @bra) and (rz.first == @bra)
 		rz = rz.ReplaceWithChild
-
 
 
 function RelSetOrExpansion (|Message| exp)
