@@ -1323,10 +1323,42 @@ function Tran_Exit (TranFunc)  // exitter
 	node.LastInBlock
 
 
-function Message.LastInBlock
-	.Flags |= kEndsBlock
+function Message.CheckLastInBlock
+	if .flags & kEndsBlock
+		.RemoveAfter
+
+
+function Message.LastInBlock (|int|)
+	opt norefcounts
+	if ""
+		if 1
+			if 2
+				if 3
+					return 1
+				else
+					return 2
+			else
+				return 3
+		else
+			return 4
+		"boomer"
+
 	.RemoveAfter
 
+	|| arg = .parent
+	arg.flags |= kEndsBlock
+	.Flags |= kEndsBlock
+	|| Test = arg.parent
+	require Test istmp "else"
+
+	while test
+		arg = test.prev // if.arg
+		require arg.flags&kEndsBlock
+		test = arg.parent
+		test.flags |= kEndsBlock
+		if test == "if"
+			return test.LastInBlock // bubble up :O
+	
 
 function Tran_Debugger (TranFunc) {
 	|| ch = node.first
@@ -1428,7 +1460,18 @@ function Tran_Once (TranFunc)
 function Tran_If (TranFunc) 
 	Tran_IfSub(node, name_space)
 
-	
+
+function message.ArgBlocks (|bool|)
+	opt norefcounts
+	|| l = .last
+		return l.flags & kEndsBlock
+	if 1
+		return false
+	  else
+		return false
+	"pink pertty ponies"
+
+
 function Tran_IfSub (|message| node, |scbase| name_space) 
 	opt norefcounts
 	|| cond = node.needfirst					 #require
@@ -1442,23 +1485,17 @@ function Tran_IfSub (|message| node, |scbase| name_space)
 		if node == "if"
 			arg <~ (@tmp, "debugger") // better than debugat
 		cond.next = arg
-	// cond.obj = asmops.if // this causes bugs! need to fix this!
-
-	|| Test = arg.next
-		expect (Test isTmp "elseif" or "else")  ( Test )
+	
+	|| SubTest = arg.next
+		expect (SubTest isTmp "elseif" or "else")  ( SubTest )
+		SubTest.ExpectLast
 		
-		while Test istmp "elseif"// or "else"
-			Tran_Ifsub(Test, name_Space)
-			Test++
-
-		if Test == "else"
-			Test.expectlast$
-			|| FinalArg = test.first
-				check (FinalArg ~!= "if")    (FinalArg, "Can’t use 'else if', use 'elseif' instead.")
-			Test[@arg]
-//		  elseif 
-//			0
-			
+		if SubTest == "elseif"
+			Tran_IfSub(SubTest, name_Space)
+		  else // "else" branch
+			|| ElseArg = SubTest.first
+				check (ElseArg ~!= "if")    (ElseArg, "Use 'elseif' instead.")
+			SubTest[@arg]
 			
 	using (node)	
 	name_space = arg.scarg(name_space)
@@ -1556,9 +1593,6 @@ function Tran_Else (TranFunc)
 	
 	|| p = node.parent
 	expect (p == @tmp and "if" or "elseif") (node, "This must be in an 'if' block.")
-	// this looks wierd.
-	// the original-source we are compiling, actually LOOKS like its in the "if" block
-	// Speedie reorganises things to make it nested... so elseifs contain elseifs
 
 
 function Tran_Deprecate (TranFunc)
