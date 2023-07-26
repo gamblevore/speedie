@@ -113,8 +113,9 @@ class GUIControl (ringtree)
 	helper NextFocus (|bool| dir, |bool| force, |guicontrol|)
 		opt NoRefCounts
 		|| c = self
+		|| w = .window
 		while
-			c = c.loop(dir)
+			c = c.loop(dir, w) // flatloop!
 			if c.isviewable and c is enabled
 				if c.takesfocus.tab(force)
 					if (c isa ListView or textview)

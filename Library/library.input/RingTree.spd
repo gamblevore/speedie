@@ -116,12 +116,28 @@ class RingTree (Saveable)
 		for i
 			require rz
 			rz = rz.flatnextdepth(nil, down)
+	
 	function FlatNext  (||)	
 		cpp_wrapper JB_Ring_FlatNext0
+
+	function FlatPrev (||)
+		opt norefcounts
+		|| p = .prev
+			return p.FlatLast ?? p
+		return .parent // i think thats it?
+	// Root
+		// A
+			// B
+			// C
+				// C2
+		// D
+	
 	function FlatNextDepth  (|&int|Depth, |bool|Down=true, ||)
 		cpp_wrapper JB_Ring_FlatNextDepth
+	
 	function FlatAfter (||)
 		cpp_wrapper JB_Ring_FlatAfter
+			
 	function IsAncestor (|| root, |bool|)
 		disabled "Use inside or contains operator"
 
@@ -416,22 +432,18 @@ class RingTree (Saveable)
 				.first = f
 
 
-	function Loop (|bool| dir, ||)
-		if dir
-			return .nextloop
-		return .prevloop
-		
-
-	function NextLoop (||)
+	function Loop (|bool| dir, || flat=nil, ||)
 		opt norefcounts
-		|| f = .next
-		return (f, .parent.first)(f)
-		
+		if !flat
+			|| p = .parent
+			if dir
+				return .next ?? p.first
+			return .prev ?? p.last
+		  else
+			if dir
+				return .FlatNext ?? flat.first
+			return .flatPrev ?? flat.FlatLast
 
-	function PrevLoop (||)
-		opt norefcounts
-		|| f = .prev
-		return (f, .parent.last)(f)
 	
 	function Upward (|int| n, ||)
 		opt norefcounts
