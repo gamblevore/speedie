@@ -105,7 +105,7 @@ class String
 			require !s.islower
 		return true
 
-	function group (|int| i, |int|)
+	function group (|int| i, |int|) // replace this with charprops.spd?
 		|| b = self[i]
 		if b.IsUpper
 			return 1

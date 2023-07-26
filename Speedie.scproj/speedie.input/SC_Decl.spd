@@ -526,7 +526,7 @@ class SCDecl (SCObject) {
 		if (Matched == kCastedMatch or kLossyCastedMatch)
 			return exp.CastedParent
 
-		  elseif (Matched == kNoMatch)
+		if (Matched == kNoMatch)
 			ErrNode := exp
 			error ( ErrNode, "Type mismatch, expected '${.RenderTypeName}' but found '${o.RenderTypeName}'." )
 			.Match(O, TypeCast, exp)
@@ -586,7 +586,7 @@ class SCDecl (SCObject) {
 
 
 	function ClassActReplace (|scclass| cls, |scdecl|)
-		if .matchc(cls.typenormal)
+		if .MatchC(cls.typenormal)
 			return cls.typenormal
 		return self
 
@@ -668,7 +668,6 @@ class SCDecl (SCObject) {
 					«num .c_array »
 				»
 			»
-		
 		if self is borrowed
 			rz = «arel "--", rz »
 		if !.IsDataType and .NilDeclared is Stated

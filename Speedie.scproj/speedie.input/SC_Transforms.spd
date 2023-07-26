@@ -827,7 +827,6 @@ function message.MiniTran (|scbase| name_space, |string| On="app")
 
 function compiler.CollectIsaTests (|Message| s, |[Message]| out, |bool|)
 	opt norefcounts
-	if scfunction ~= "testme"
 	s = s.unbra
 	if s == @rel
 		|| L = s.first
