@@ -422,7 +422,7 @@ class PerryIDE (Window)
 		if keys.shift
 			dir = -dir
 		if err and dir
-			err = err.loop(dir>0)
+			err = err.loop(dir>0, nil)
 		if !err
 			err = (L.start, l.end)(dir>0)
 		if err
