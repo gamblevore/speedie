@@ -36,11 +36,11 @@ Objects have classes, which can be accessed via .class
 	|| Cls = "Abc".class
 	printline cls.name // string
 
-You can create an object via a class's module.
+You can create an object like this.
 
 	|| msg = message.new
 	
-All classes have modules, and that module will contain the `new()` function, but perhaps more. The `file` module has many helper functions, like `file.preferences` or `file.log` or `file.desktop`, etc.
+Technically, you are accessing the module "message", and then the "new" function on that module. The "new" function comes from the constructor defined on the class message.
 
 Object types can be tested using `isa`.
 
