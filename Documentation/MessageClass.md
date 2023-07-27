@@ -97,7 +97,7 @@ Again... its up to you what you want to set (if anything) onto a `message`.
 
 I find for the speedie compiler's own source code, I get a 12x memory expansion by parsing. So if you parsed 1.2MB of speedie source code, you'd use 14.4MB of `Messages`. (My entire compiler is 1.2MB of source right now.) Parsing XML tends to be much less intensive than parsing source code. I found parsing a 11.4MB XML file took only 9.8MB of parsed messages, and 2.8MB of string objects.
 
-Comparing Jeebox to [lxml2's tree.h](https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/include/libxml/tree.h), we can see their `xmlNode` takes at least 116 bytes (with no attributes on a node). Given how their allocator works (it allocates dynamic lengths) their xmlNode must take at least 128 bytes.
+Comparing Jeebox to [lxml2's tree.h](https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/include/libxml/tree.h), we can see their `xmlNode` takes at least 116 bytes (with no attributes on a node). Given how their allocator works (it allocates dynamic lengths) their xmlNode must take at least 128 bytes. But benchmarks show the size difference is worse actually.
 
 My node's size, is at least half theirs! In addition to that lxml2 is actually very "memory efficient" compared to most popular XML parsers. If theirs is efficient, mine is super efficient. Looking at their benchmark page, and running my own benchmarks, I can see my parser is about 8x more memory efficient overall!
 
