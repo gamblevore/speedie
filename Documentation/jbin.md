@@ -11,10 +11,10 @@ OK, so lets make a little example:
     
     // Str is a jeebox string
     || Str = "@mary had a~little~lamb whose fleece was white as snow"
-    // lets parse it
-    || Msg = str.parse #require
-    // now render
-    printline msg.render
+    
+    || Msg = str.parse #require  // lets parse it
+    
+    printline msg.render         // now render
    
 You will see this: `@mary had a ~ little ~ lamb whose fleece was white as snow`
 
