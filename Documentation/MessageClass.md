@@ -81,7 +81,7 @@ If you want to set some things onto a `Message` object, the best properties woul
 
 You can reuse `.position` to mean something else... without harm... except for the fact that you are losing the original `message`'s position, which is used for error-reporting. I have (very rarely) done this, for occasions where I really don't need the error-reporting.
 
-`Indent` is kind of a special case, in that it does have a real specific meaning but nothing in jeebox or speedie uses it... at least not once past the time that it is parsed. I mean you could re-use it but theres not much to use, its only 1 byte.
+`.Indent` is kind of a special case, in that it does have a real specific meaning but nothing in jeebox uses it... past the time that it is parsed. I mean you could re-use it but theres not much to use, its only 1 byte.
 
 `.rangelength` actually isnt even used for error-reporting. But why fool with it if you have better properties to use? (`.Flags` and `.Tag` are better.)
 
