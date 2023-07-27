@@ -2,7 +2,7 @@
 
 `Jbin` is just jeebox as a binary format. There isn't really much to say about `Jbin`. This is simply because the code for `Jbin` is so small. It takes about 35 lines of C++ to parse jbin.
 
-So it is an incredible format... considering that it does so much. That said... I hate over-short example documents... so lets just spell out `Jbin` with overly detailed explanation.
+So it is an incredible format... considering that it does so much. That said... I hate over-short example documents... so lets just spell out `Jbin`.
 
 
 ### Example Use
