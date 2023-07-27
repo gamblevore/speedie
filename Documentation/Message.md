@@ -38,7 +38,7 @@ Well, that leads to this tree:
             opp ">"
             thg "c"
 
-So the message "`return`" has a type of `@tmp`. "`>`" has a type of `@opp`. (We use `@` in Speedie, to represent `Message` types. So `@thg` would be a "thing" type, and `@arg` would be an "argument" type.)
+So the message "`return`" has a type of `@tmp`. "`>`" has a type of `@opp`.
 
 Jeebox (and it's `Message` class), is useful for almost anytime you need a new or custom data-format of any kind.
 
