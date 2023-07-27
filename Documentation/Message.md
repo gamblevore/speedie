@@ -1,7 +1,7 @@
 ## Messages
 (aka **Jeebox**)
 
-This is an overview of how to us the Message class, without going into the details of the [functions and properties of Message](MessageClass.md).
+This is an overview of how to use the Message class, without going into the details of the [functions and properties of Message](MessageClass.md).
 
 In Speedie, when you parse a string using `string.parse`, you get back a tree. A `Message` is a node within a parsed tree. The format we are parsing, is called “Jeebox” ([http://jeebox.org]()).
 
