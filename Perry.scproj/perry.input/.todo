@@ -22,7 +22,6 @@
 // Speedie Do later
 * x=(*Count)-- doesnt compile but x=*Count-- does?
 * all lowercase means HELPER!!! What about operators? like "or"?
-* extend constants!
 * nicer lookups... syntaxis thing can be used elsewhere too! like for almost anything
 	* if it cant be found... allow a second function to be tested.
 * RefOpts. Do it bit by bit

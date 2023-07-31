@@ -934,7 +934,6 @@ dispatch RootCollectTable (CollectFunc)
 
 
 
-
 dispatch ClsCollectTable (CollectFunc)
 	constructor			SCFunction.NewConstructor		// ??
 	destructor			SCFunction.NewDestructor		// ??

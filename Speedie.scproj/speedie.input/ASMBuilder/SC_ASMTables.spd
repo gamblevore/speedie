@@ -131,7 +131,8 @@ function Message.tmptype (assigns:|ASMTmp| value)
 
 
 extend MsgUIFlags	// ideal... better than above. the problem is testing them... with bit overlap
-	constants		// also the constants dont seem added correctly.
+	constants		// we'd need multiple lookups per "is" test
+		|asmtmp| 
 		Debugger	= 63
 		If			= 62
 		Rejoin		= 61
