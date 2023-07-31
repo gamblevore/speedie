@@ -262,6 +262,17 @@ function NilTracker.ProcessCondRel (|message| m, |bool| Y, |branchstate|)
 	return branchstate.Perhaps
 
 
+function Niltracker.CollectNilDecl (|message| declmsg)
+	opt norefcounts
+	|| exp = declmsg.last
+	if exp == @rel
+		exp = exp.last
+	|| d = exp.AsDecl
+	|| r = declmsg.AsDecl
+	r.NilTake(d)
+	
+	
+
 function NilTracker.RunNormal (|message| msg, |branchstate|)
 	opt norefcounts
 	
@@ -283,6 +294,8 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 				.If(s)
 			  elseif type is kwhile
 				.IfOrWhile(s)
+		  elseif (f == @decl)
+			.CollectNilDecl(s)
 				
 		  elseif !s.IsLast
 			.RunNormal(s)

@@ -49,6 +49,13 @@ function SCDecl.RestoreNil
 	.nilused = .nildeclared
 
 
+function SCDecl.NilTake (|scdecl| d)
+	opt norefcounts
+	|| n = d.NilDeclared
+	.NilUsed = n
+	.NilDeclared = n
+	
+	
 function SCDecl.NilTighten
 	// set in the actual
 	opt norefcounts
