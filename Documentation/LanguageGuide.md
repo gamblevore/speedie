@@ -101,7 +101,7 @@ and `app.args` is an array of strings that were passed to your app from the comm
 
 Thats it for now, but we can learn a lot more. There may be some things that surprise you or trip you up, so lets get to them first.
 
-Looking through Speedie code, you may see a lot of strangely defined functions. helper-functions, or functions with cpp_wrapper in them.
+Looking through Speedie code, you may see a lot of strangely defined functions, or functions with cpp_wrapper in them.
 
 
 ## Possibly Surprising things
@@ -115,16 +115,14 @@ Looking through Speedie code, you may see a lot of strangely defined functions. 
             .File <~ s
             .file <~ "\n"
         
-        helper OpenLog (|string| path)
+        function openlog (|string| path)
             .FILE = path.file
             .file.OpenEmpty        
 
 
 One thing you will notice immediately, is that we are accessing our properties with `.` even within a class's own functions. This is different to most languages. `self.property` is equal to `.property` in speedie. The dot `.` is necessary, you can't access self's properties or functions without it. This reduces the chances of bugs.
 
-Another thing you might spot is that actually, Speedie is case-insensitive. It doesn't care if you write `.FILE` or or `.file` or `.fILe`. This makes writing code easier.
-
-In speedie, functions are just functions. They behave the same way. So why is one function declared as `function` and the other `helper`? `helper` functions are hidden by the IDE "Perry"! So its a way for developers to unclutter their code from the perspective of users, thats all!
+Another thing you might spot is that when it comes to looking up names, Speedie is case-insensitive. It doesn't care if you write `.FILE` or or `.file` or `.fILe`. This makes writing code easier.
 
 You might see a lot of functions like this, used internally by Speedie:
 
