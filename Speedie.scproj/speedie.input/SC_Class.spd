@@ -520,11 +520,6 @@ function LoadConstructorsAndAllocators
 	(Message).Restore // restore message parsing to general
 
 
-function MoreConstantCollection
-	.Use								// comes from our source's file
-	.Modul.CollectConstants( .Source )
-
-
 function AllocStr (|string|)
 	|| s0 = .name
 	|| s = (s0, .super.name)(!.IsRole)

@@ -4,18 +4,20 @@
 */
 
 
-function scbase.CollectConstants (|Message| src=nil)
-	.project.use
+function scbase.CollectOneConstants (|Message| ch)
+	constantsloadingoverride = true
+	using ch
+	.CollectConstantsSub( ch )
+	constantsloadingoverride = false
+
+
+function scbase.CollectConstants (|Message| src)
 	src := .Source
 	constantsloadingoverride = true
 	for (ch in src)
 		if (ch IsTmp "constants") or (ch IsTmp "flags")
+			using ch
 			.CollectConstantsSub( ch )
-			|| pos = compiler.constantslist.find(ch)
-			if !pos
-				debugger
-			  else
-				printline pos
 	constantsloadingoverride = false
 
 

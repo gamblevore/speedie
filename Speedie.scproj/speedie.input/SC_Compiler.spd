@@ -467,8 +467,8 @@ function ImportAll
 	require .Stage( "Collecting Constants" )
 	
 	for c in .ClassList
-		c.Project.use
-		c.MoreConstantCollection // constants gotta come after 
+		c.Use								// comes from our source's file
+		c.Modul.CollectConstants( c.Source )
 
 
 	for f in SCImport.AllFiles
