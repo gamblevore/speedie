@@ -22,9 +22,9 @@ todo:
 
 // i actually never knew this worked!
 function testcontains (|array of array of int| s)
-	|| r = *s
-	|| r2 = *r
-	|| r3 = *r2
+	|| r = *s			// array of (datatypewrapper of) int
+	|| r2 = *r			// (datatypewrapper of) int
+	|| r3 = *r2			// int
 
 
 function ArgValidation (GUITextValidate)
