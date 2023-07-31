@@ -909,7 +909,7 @@ function DeadStrip
 
 function CheckIsGoodLibrary
 	if options.ProjectIsLibrary
-		expect compiler.api_place ("No export_api found for library-compile. Either create export_api, or create 'main' to make it not a library.")
+		expect compiler.api_place ("No 'main' or 'export_api' found. Create 'export_api' to make this a library, create 'main' to make this an app.")
 
 
 function InputFile (|File| Default, |String| s, |message| where, |File|)

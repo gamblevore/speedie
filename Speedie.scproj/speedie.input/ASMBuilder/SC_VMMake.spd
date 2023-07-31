@@ -38,10 +38,10 @@ function FillTypePrm (|string| fname, |int| pname)
 	|| prop = @thg + fname
 	|| r = [prop]
 	if pname >= 4
-		add = (macros.copier2)(r)	
+		add = (macros.ASMcopier2)(r)	
 	  else
 		r <~ @num + pname
-		add = (macros.copier)(r)	
+		add = (macros.ASMcopier)(r)	
 	.dt_prm <~ add	
 
 
@@ -63,7 +63,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
 	
 	lname = .parent + lname
 	|| arr = .DefineGet(lname, 32-n, bit_pos, bit_pos+n==32)
-	|| fnc_src = (macros.Setter)(arr)
+	|| fnc_src = (macros.ASMSetter)(arr)
 	SCFunction.newfunc(fnc_src, nil, line)
 	
 	.FillTypePrm(lname, pname)

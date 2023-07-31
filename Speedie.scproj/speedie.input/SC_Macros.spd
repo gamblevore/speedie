@@ -21,23 +21,18 @@ module Macros {
 || MainArg2 = "|| _0 = (_1.MainArg(_2), _3)(__ArgCount > _1)".macro
 || MainArg1 = "|| _0 = _1.MainArg(_2)".macro
 
-|| Worked2 = "({
-	|| _ErrCount = stderr.errorcount 
-	(_0)
-	rejoin stderr.errorcount == _ErrCount 
-})".macro
-
 || ASM_Datatype = "datatype _0 (ASM) 
 	module
 		function Encode (ASM_Encoder2,)
+			visible true
 			rz = .op << 25
 		
 ASM.Forms[_1] = &_0.Encode // for now
 ".macro
 
-|macro|     Copier  = "rz._0 = .r[_1]".macro
-|macro|     Copier2 = "rz._0 = .rest".macro
-|macro|		Setter = "function asm._0 (assigns:|uint|, |asm|): return self (|) ((value << _1) >> _2)".macro
+|macro|     ASMCopier  = "rz._0 = .r[_1]".macro
+|macro|     ASMCopier2 = "rz._0 = .rest".macro
+|macro|		ASMSetter = "function asm._0 (assigns:|uint|, |asm|): return self (|) ((value << _1) >> _2)".macro
 }
 
 

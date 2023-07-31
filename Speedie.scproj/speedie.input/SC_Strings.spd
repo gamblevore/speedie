@@ -33,7 +33,7 @@ function Tran_Render (|Message| msg, |SCClass| Cls, |bool|)
 function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 	msg.name = "function"
 	|| IsPureRender = msg.first != @thg
-		msg.first = @thg.msg("Render")
+		msg.first = @thg + "Render"
 		if cls
 			msg.name = "behaviour"
 
