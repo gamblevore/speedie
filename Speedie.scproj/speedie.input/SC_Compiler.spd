@@ -465,20 +465,7 @@ function ImportAll
 		
 
 	require .Stage( "Collecting Constants" )
-	
-	for c in .ClassList
-		c.Use								// comes from our source's file
-		c.Modul.CollectConstants( c.Source )
-
-
-	for f in SCImport.AllFiles
-		f.Use // use f.proj to collect?
-		Compiler.program.CollectConstants( f.LiveAST )
-
-	for m in .ModuleList
-		m.Use
-		m.CollectConstants( m.Source )
-
+	.CollectConstants
 	(Message).Restore
 	scimport.noproj
 

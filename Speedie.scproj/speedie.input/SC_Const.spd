@@ -6,19 +6,17 @@
 
 function scbase.CollectOneConstants (|Message| ch)
 	constantsloadingoverride = true
+	.project.use
 	using ch
 	.CollectConstantsSub( ch )
 	constantsloadingoverride = false
 
 
 function scbase.CollectConstants (|Message| src)
-	src := .Source
-	constantsloadingoverride = true
+	opt norefcounts
 	for (ch in src)
 		if (ch IsTmp "constants") or (ch IsTmp "flags")
-			using ch
-			.CollectConstantsSub( ch )
-	constantsloadingoverride = false
+			.CollectOneConstants(ch)
 
 
 function scbase.CollectConstantsSub (|Message| ch)
@@ -219,3 +217,13 @@ function @scmodule.ConstantCollector (collectfunc)
 	compiler.ConstantsList <~ node
 	node.Obj = name_space
 	return compiler.program
+
+
+function compiler.CollectConstants
+	opt norefcounts
+	for ch in .constantslist
+		|| obj = ch.obj
+		if obj isa scclass
+			obj = obj.modul|scclass|
+		if obj isa scmodule
+			obj.collectoneconstants(ch)
