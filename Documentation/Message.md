@@ -1,7 +1,7 @@
 ## Messages
 (aka **Jeebox**)
 
-This is an overview of how to us the Message class, without going into the details of the [functions and properties of Message](MessageClass.md).
+This is an overview of how to use the Message class, without going into the details of the [functions and properties of Message](MessageClass.md).
 
 In Speedie, when you parse a string using `string.parse`, you get back a tree. A `Message` is a node within a parsed tree. The format we are parsing, is called “Jeebox” ([http://jeebox.org]()).
 
@@ -38,7 +38,7 @@ Well, that leads to this tree:
             opp ">"
             thg "c"
 
-So the message "`return`" has a type of `@tmp`. "`>`" has a type of `@opp`. (We use `@` in Speedie, to represent `Message` types. So `@thg` would be a "thing" type, and `@arg` would be an "argument" type.)
+So the message "`return`" has a type of `@tmp`. "`>`" has a type of `@opp`.
 
 Jeebox (and it's `Message` class), is useful for almost anytime you need a new or custom data-format of any kind.
 

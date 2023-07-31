@@ -19,7 +19,6 @@ Let's make a simple example:
 
 
     function CheckUserListNames (|file| usersfile)
-        // '#require' will exit this function, if usersfile.parse returns nil.
         || userlist = usersfile.parse            #require
         "User list parsed OK"
         

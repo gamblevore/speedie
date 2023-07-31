@@ -2,7 +2,7 @@
 
 `Jbin` is just jeebox as a binary format. There isn't really much to say about `Jbin`. This is simply because the code for `Jbin` is so small. It takes about 35 lines of C++ to parse jbin.
 
-So it is an incredible format... considering that it does so much. That said... I hate over-short example documents... so lets just spell out `Jbin` with overly detailed explanation.
+So it is an incredible format... considering that it does so much. That said... I hate over-short example documents... so lets just spell out `Jbin`.
 
 
 ### Example Use
@@ -11,10 +11,10 @@ OK, so lets make a little example:
     
     // Str is a jeebox string
     || Str = "@mary had a~little~lamb whose fleece was white as snow"
-    // lets parse it
-    || Msg = str.parse #require
-    // now render
-    printline msg.render
+    
+    || Msg = str.parse #require  // lets parse it
+    
+    printline msg.render         // now render
    
 You will see this: `@mary had a ~ little ~ lamb whose fleece was white as snow`
 
