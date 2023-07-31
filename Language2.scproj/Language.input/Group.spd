@@ -1,13 +1,13 @@
 
 class Group {
-	|Concept|			Idea
+	|Concept|				Idea
 	|ringtree of Word|		Words
-	|ElementList|		Eles
-	|language|			Lang
-	|message|			Source
-	|message|			Phrase
-	|Group|				NextGroup
-	|SpecialProperty|	DefaultSpecial
+	|ElementList|			Eles
+	|language|				Lang
+	|message|				Source
+	|message|				Phrase
+	|Group|					NextGroup
+	|SpecialProperty|		DefaultSpecial
 	
 	
 	constructor (|ElementList| ele, |concept| idea, |Language| lang, |message| src)
@@ -165,7 +165,7 @@ class Group {
 			if (ch == @thg)
 				|| d = SpecialProperty.list
 				|| Ctrl = d.msglower(ch) #expect (ch, "Unrecognised special property.")
-				.DefaultSpecial |= Ctrl
+				.DefaultSpecial |= *Ctrl
 
 		for w in self
 			w.special |= .defaultspecial

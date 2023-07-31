@@ -22,7 +22,7 @@ class Category {
 	module
 		|dictionary of category|	List = dictionary.new
 		
-		function add (|message| c, |bool|)
+		function Add (|message| c, |bool|)
 			return .processone(c, nil)
 		
 

@@ -41,7 +41,7 @@ class Word (ringtree) {
 		.lang.grammar[t-1] = self
 	
 	
-	function insert (|string| name)
+	function Insert (|string| name)
 		opt norefcounts
 		.lang.words.AppendWord(name, self)
 
@@ -55,7 +55,7 @@ class Word (ringtree) {
 		.types |= w.types // simple?
 
 		
-	function noclashes 
+	function NoClashes 
 		opt norefcounts
 		|| w = self
 		while

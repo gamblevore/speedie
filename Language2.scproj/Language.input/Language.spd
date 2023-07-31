@@ -140,7 +140,7 @@ extend_module Language {
 	function FindLang (|message| r, |language|)
 		return .Languages.msglower(r)			#expect (r, "Can't find language.")
 
-	function init
+	function Init
 		require !languages 
 		.languages = dictionary.new
 		Element.init

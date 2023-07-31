@@ -50,7 +50,7 @@ function LeafTranFunc (|syntax|)
 	return .func
 
 
-function tran (|TransInfo|)
+function Tran (|TransInfo|)
 	opt norefcounts
 	|| w = .obj
 	if w isa transinfo

@@ -12,7 +12,7 @@ module LangLoad {
 
 	function LangFunc (|language| L, |message| ch, |object|)
 		|| fn = LangFuncs.msglower(ch) #expect (ch)
-		return (fn)(L, ch)
+		return (*fn)(L, ch)
 
 
 	function StartLoad (|message| root, |message|)

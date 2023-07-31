@@ -7,7 +7,7 @@ class Bird (guicontrol)
 	|date|			Died
 
 	
-	function init
+	function Init
 		.yspeed = 0
 		.lastjump = 0
 		.died = 0

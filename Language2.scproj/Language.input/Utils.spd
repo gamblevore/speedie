@@ -103,12 +103,12 @@ function message.Word (|word|) {
 }
 
 
-function word.operatorisa (|Element| cat, |bool|)
+function word.OperatorIsa (|Element| cat, |bool|)
 	require self
 	return .eles & cat.catbits 
 
 
-function message.operatorisa (|Element| cat, |bool|)
+function message.OperatorIsa (|Element| cat, |bool|)
 //	Disabled "Asdasd"
 	opt NoRefCounts
 	|| c = self

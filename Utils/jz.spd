@@ -1,7 +1,7 @@
 #!/usr/local/bin/speedie
 
 
-function app.usage (|string|)
+function app.Usage (|string|)
 	return "Usage: ${.filename} File1 [File2...]
 Convert files between jbin, box, xml formats. Additionally can compress or decompress.
 
@@ -186,7 +186,7 @@ module Conv
 		.del(origout, origin)
 
 	
-	function del (|file| f, |file| o)
+	function Del (|file| f, |file| o)
 		if f.exists and f.path != o.path	
 			"deleting ${f.name}"
 			f.delete
@@ -317,7 +317,7 @@ module Conv
 		if .AST and (Detected.format != Dest.format)
 			.Start = date.now
 			if dest is jbin
-				.data = .AST.render_jbin(dest is precomp, fs)
+				.data = .AST.renderjbin(dest is precomp, fs)
 			  else
 				.data = .AST.Render(fs)
 			.time("Render")
@@ -379,7 +379,7 @@ module Conv
 		if T == 2
 			.Detected |= type.precomp
 		
-		|| mz = str.parse_jbin
+		|| mz = str.parsejbin
 		ifn mz == @tmp and "µz"
 			.Detected |= type.jbin
 			return ""

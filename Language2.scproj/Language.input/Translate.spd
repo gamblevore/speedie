@@ -16,7 +16,7 @@ class TransState {
 		.dest = d
 	
 	
-	function stats (|message| m, |transinfo| ti)
+	function Stats (|message| m, |transinfo| ti)
 		opt norefcounts
 		
 		require (ti) and (m == @opp)
@@ -26,10 +26,10 @@ class TransState {
 		// so we have a verb
 		.GroupStats := dictionary.new
 		|| n = ti.myword.owner.idea.name
-		.GroupStats[n] = .GroupStats[n] + 1
+		.GroupStats[n] = *.GroupStats[n] + 1
 	
 	
-	function printstats
+	function PrintStats
 		require .Groupstats
 		for (v in .Groupstats) (k)
 			printline "$k: $v"
@@ -167,5 +167,5 @@ extend language
 			return wrd.bestCat(msg.SyxBits)
 
 
-function message.id (|string|)
+function message.ID (|string|)
 	return .name.lowercase

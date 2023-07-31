@@ -40,7 +40,7 @@ class BirdWindow (Window)
 		.player.init
 	
 		
-	behaviour keydown
+	behaviour KeyDown
 		if key is SPACE
 			keys.space.eat
 			.player.Jump

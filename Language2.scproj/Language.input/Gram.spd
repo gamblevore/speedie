@@ -100,7 +100,8 @@ datatype Gram (uint64) {
 	render RenderAll {
 		|| D = gram.list
 		fs <~ '('
-		for code in D (key)
+		for c in D (key)
+			|| code = *c
 			if (self & code) and code.ispo2
 				fs <~ key
 				fs <~ ", "
@@ -117,7 +118,7 @@ datatype Gram (uint64) {
 			G &=~ informal
 
 		for code in D (key)
-			|| C = code
+			|| C = *code
 			if (G & C) and (C.ispo2)
 				G &=~ C
 				fs <~ ' '
@@ -198,7 +199,8 @@ datatype Gram (uint64) {
 			return 64 - gram.HighestBit
 		function Select (|message| oof, |gram|)
 			|| name = oof.id
-			return gram.list[name]
+			|| g = gram.list[name]
+				return *g
 
 		|| Components = {tense, formality, plurality, gender, doer, audience, oldness, Specifics, size} 
 	}

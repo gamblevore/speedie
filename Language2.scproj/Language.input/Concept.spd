@@ -9,7 +9,7 @@ class Concept {
 		.cat = cat
 		.name = s
 		
-	function message.concept (|bool| CanCreate, |concept|)
+	function message.Concept (|bool| CanCreate, |concept|)
 		|| id = .id
 		|| item = Concept.list[id]
 		if !item and cancreate
