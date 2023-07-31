@@ -4,18 +4,22 @@
 */
 
 
-function scbase.CollectConstants (|Message| src=nil, |SCImport|imp)
-	require imp
-	imp.use
+function scbase.CollectConstants (|Message| src=nil)
+	.project.use
 	src := .Source
 	constantsloadingoverride = true
 	for (ch in src)
 		if (ch IsTmp "constants") or (ch IsTmp "flags")
-			.CollectConstantsSub( ch, imp )
+			.CollectConstantsSub( ch )
+			|| pos = compiler.constantslist.find(ch)
+			if !pos
+				debugger
+			  else
+				printline pos
 	constantsloadingoverride = false
 
 
-function scbase.CollectConstantsSub (|Message| ch, |SCImport| imp)
+function scbase.CollectConstantsSub (|Message| ch)
 	|| FuncName = ch.first									#require
 	|| arg = ch[-1]
 	|| vs = funcname
@@ -208,3 +212,8 @@ struct ArgArrayCounter
 			.max = .i
 		return NewRel( acc, "=", value )			// [1:x, 4:y]
 
+
+function @scmodule.ConstantCollector (collectfunc)
+	compiler.ConstantsList <~ node
+	node.Obj = name_space
+	return compiler.program

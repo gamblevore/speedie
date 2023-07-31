@@ -927,8 +927,8 @@ dispatch RootCollectTable (CollectFunc)
 	library				SCFunction.NeuLibrary
 	ignore				(DontRemove)
 	cpp_part			(scbase.LoadCppPart)
-	constants			(DontRemove)
-	flags				(DontRemove)
+	constants			(SCModule.ConstantCollector)
+	flags				(SCModule.ConstantCollector)
 	debuginsert			(scfunction.DebugInsert)
 	
 
@@ -971,13 +971,12 @@ dispatch ClsCollectTable (CollectFunc)
 	false				(SCClass.GetFalse)
 	size				(DontRemove)
 	module				(DontRemove)
-	constants			(DontRemove)
-	flags				(DontRemove)
+	constants			(SCModule.ConstantCollector)
+	flags				(SCModule.ConstantCollector)
 
 
 
 datatype SCBaseInfo (int)
-	//false -1
 	constants
 		ExplicitExport
 		Visible

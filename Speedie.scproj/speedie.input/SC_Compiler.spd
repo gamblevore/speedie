@@ -107,6 +107,7 @@ linkage
 |[String]|				SyxArray
 |Message|				ExtendList
 |[Message]|				ExtendModuleList
+|[Message]|				ConstantsList
 |[Message]|				API_List
 |[SCFunction]|			API_Funcs
 |Message|				API_Place
@@ -464,21 +465,19 @@ function ImportAll
 		
 
 	require .Stage( "Collecting Constants" )
+	
 	for c in .ClassList
 		c.Project.use
 		c.MoreConstantCollection // constants gotta come after 
 
 
-	scimport.noproj
-
-
 	for f in SCImport.AllFiles
-		f.Use
-		Compiler.program.CollectConstants( f.LiveAST, f.proj )
+		f.Use // use f.proj to collect?
+		Compiler.program.CollectConstants( f.LiveAST )
 
 	for m in .ModuleList
 		m.Use
-		m.CollectConstants( m.Source, m.project )
+		m.CollectConstants( m.Source )
 
 	(Message).Restore
 	scimport.noproj

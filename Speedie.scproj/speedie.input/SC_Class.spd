@@ -522,8 +522,7 @@ function LoadConstructorsAndAllocators
 
 function MoreConstantCollection
 	.Use								// comes from our source's file
-	.Modul.CollectConstants( .Source, .project )
-	(Message).Restore					// restore message parsing to general
+	.Modul.CollectConstants( .Source )
 
 
 function AllocStr (|string|)
@@ -995,7 +994,6 @@ module
 		|| name = c[@thg]							#require
 		|| arg  = c[@arg, -1]						#require
 		|| M = Compiler.FindModulemsg(name)			#require
-		if name ~= "byte"
 		
 		|SCBase| B = M
 		if (PreferClass and M.Cls)
@@ -1114,3 +1112,6 @@ extend SCClass
 			yield Curr_
 			Curr_ = Curr_.super
 
+extend byte
+	constants
+		abc = 1
