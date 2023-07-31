@@ -131,7 +131,7 @@ class FileRow (ListViewRow)
 
 
 	helper AddFileSub (|file| f, |dictionary| excl, |string| folfile, |&int| Count, |bool|)
-		|| C = (*Count)--
+		|| C = *Count--
 		require C > 0
 		|| r = filerow(f.path, f.name)
 		self <~ r
