@@ -23,8 +23,6 @@
 // Speedie Do later
 * unused func finder doesnt work perfectly on my projects
 * x=(*Count)-- doesnt compile but x=*Count-- does?
-* all lowercase means HELPER!!! What about operators? like "or"?
-	* What about all the current helpers or not? We could warn if they aren't all lower-case?
 * nicer lookups... syntaxis thing can be used elsewhere too! like for almost anything
 	* if it cant be found... allow a second function to be tested.
 * RefOpts. Do it bit by bit
