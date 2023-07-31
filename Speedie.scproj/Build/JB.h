@@ -7765,7 +7765,7 @@ void JB_Msg_Tril__(Message* self, FastString* fs);
 
 bool SC_Msg_TrueOrFalse(Message* self);
 
-Message* JB_Msg_TviewCH(Message* self);
+Message* JB_Msg_TViewCH(Message* self);
 
 void JB_Msg_Type__(Message* self, FastString* fs);
 

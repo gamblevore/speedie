@@ -2177,7 +2177,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (110809862242304)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (110809881837568)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -24448,6 +24448,7 @@ bool JB_Str_IsCompressed(JB_String* self) {
 }
 
 bool SC_Str_IsFuncHelper(JB_String* self) {
+	bool rz = false;
 	{
 		byte* _Startf0 = JB_Str_Address(self);
 		byte* _Endf1 = _Startf0 + JB_Str_Length(self);
@@ -24457,13 +24458,13 @@ bool SC_Str_IsFuncHelper(JB_String* self) {
 				return false;
 			}
 			if (JB_byte_IsLower(c)) {
-				return true;
+				rz = true;
 			}
 			_Startf0++;
 		};
 	}
 	;
-	return false;
+	return rz;
 }
 
 int JB_Str_IsHexLike(JB_String* self, int N) {
@@ -36436,14 +36437,14 @@ bool JB_Msg_TestSub(Message* self, JB_String* new_render, JB_String* name) {
 
 JB_String* JB_Msg_Text(Message* self, int i) {
 	if (i == 0) {
-		return JB_Msg_TviewCH(self)->Name;
+		return JB_Msg_TViewCH(self)->Name;
 	}
 	return JB_LUB[0];
 }
 
 bool JB_Msg_TextSet(Message* self, int i, JB_String* v) {
 	if (i == 0) {
-		JB_SetRef(JB_Msg_TviewCH(self)->Name, v);
+		JB_SetRef(JB_Msg_TViewCH(self)->Name, v);
 		return true;
 	}
 	return false;
@@ -36776,7 +36777,7 @@ bool SC_Msg_TrueOrFalse(Message* self) {
 	return false;
 }
 
-Message* JB_Msg_TviewCH(Message* self) {
+Message* JB_Msg_TViewCH(Message* self) {
 	if ((!JB_Msg_EqualsSyx(self, JB_SyxTmp, false))) {
 		return self;
 	}
@@ -46869,4 +46870,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -8794936872192477329 -2805858043559705419
+// -8232687639214529029 -2805858043559705419
