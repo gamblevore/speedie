@@ -138,7 +138,8 @@ function niltracker.Redeclare (|message| msg, |scdecl| d, |nilstate| used, |scde
 	SCFunction.CurrFunc[d.NilParamPos] = d2
 	d2.NilDeclared = used
 	return d2
-	
+
+
 // if we are testing a cond to be true (or false)... it must be optional.
 // right?
 

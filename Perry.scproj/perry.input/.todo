@@ -8,7 +8,6 @@
 	* What is next? A LOT OF FEAR
 	* OK... but we can just do one small thing and leave it? 
 		* What small thing?
-* all lowercase means HELPER!!! What about operators? like "or"?
 
 	
 // Perry Do later
@@ -21,9 +20,10 @@
 
 
 // Speedie Do later
-* x = (*Count)-- // doesnt compile.
+* x=(*Count)-- doesnt compile but x=*Count-- does?
+* all lowercase means HELPER!!! What about operators? like "or"?
+* extend constants!
 * nicer lookups... syntaxis thing can be used elsewhere too! like for almost anything
-	* extend constants!
 	* if it cant be found... allow a second function to be tested.
 * RefOpts. Do it bit by bit
 	* get property but only did math

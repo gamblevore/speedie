@@ -977,7 +977,6 @@ module
 			B = M.Cls
 		name.func = @thg
 
-
 		|| imp = c.obj as scimport
 			imp.use
 		  else
@@ -996,7 +995,8 @@ module
 		|| name = c[@thg]							#require
 		|| arg  = c[@arg, -1]						#require
 		|| M = Compiler.FindModulemsg(name)			#require
-
+		if name ~= "byte"
+		
 		|SCBase| B = M
 		if (PreferClass and M.Cls)
 			B = M.Cls

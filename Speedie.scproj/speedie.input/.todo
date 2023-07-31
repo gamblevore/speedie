@@ -3,9 +3,8 @@
 bugs:
 	* sdleventtype.mousedown() // compiles???
 		* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and struct
-	* return (self, high)|ControlLine| // self/high are controlpoints
-	*	opt norefcounts
-		stderr = jeebox._ParseProtector init errorlist() // doesn't refcount stderr?
+	* opt norefcounts
+	  stderr = jeebox._ParseProtector init errorlist() // doesn't refcount stderr?
 	* refcounter passing properties SHOULD NOT assume it won't be cleared... not without disturbance checker
 	* function finding fails with dictionary subclasses? DictSub["abc"]
 	* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
