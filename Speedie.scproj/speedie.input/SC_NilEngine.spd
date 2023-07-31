@@ -1,6 +1,6 @@
 
-
-// Later, the disturbance checker will mesh nicely! for global vars
+// DISTURBANCE CHECKER WILL HELP
+// for global vars
 	// global.x = obj
 	// func()
 	// global.x.func2 // allowed or not? func() might have altered global.x
@@ -77,8 +77,6 @@ function NilTracker.IfOrWhile (|message| msg)
 		test = .IfWhileOne(test, msg)
 	.used(old)
 
-
-// the tran_else thing could loopback to do the if removal?
 
 function NilTracker.If (|message| Tmp)
 	opt norefcounts
@@ -297,6 +295,7 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 
 /*
 TODO:
+* msg.last/first etc will have to accept nil :O. The C++ compiler will opt it.
 * fix " = .internal" all over!!!! DO IT FIRST
 * update the params properly
 * pop the msgs out and restore nilused
