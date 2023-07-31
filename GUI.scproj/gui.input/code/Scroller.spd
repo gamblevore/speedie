@@ -8,7 +8,7 @@ module Scroller
 	constants
 		asda = 45
 	
-	function timer (|uint|)
+	function Timer (|uint|)
 		return date.ticks
 	
 	function DrawScroll (|guicontrol| self, |image| where, |vec3| slh, |&uint| timer)

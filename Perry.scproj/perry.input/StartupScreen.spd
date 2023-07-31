@@ -4,7 +4,7 @@
 class StartupWindow (window) // splashscreen, startupscreen, startwindow
 	linkage: cpp_part ttup
 
-	behaviour cancelclose
+	behaviour CancelClose
 		if !perry.Projects.hasany
 			beep
 			return true

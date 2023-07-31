@@ -362,7 +362,7 @@ function ClickedUninstallMenu (GUIMenuEvent)
 	perry.uninstall
 
 function ClickedEditPrefs (GUIMenuEvent)
-	PerryIDE.New(app.pref_path)
+	PerryIDE.New(app.prefpath)
 
 function ClickedTestInstallMenu (guimenuevent)
 	perry.CheckInstallStatus

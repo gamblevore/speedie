@@ -93,7 +93,7 @@ class Window (GUIControl)
 		.CloseDialog
 
 
-	setter focus (|guicontrol|)
+	setter Focus (|guicontrol|)
 		.SetFocus(value)
 	
 

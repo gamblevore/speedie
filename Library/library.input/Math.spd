@@ -15,13 +15,13 @@ module Math
 	function Cos (|float| f, |float|)
 		return .cospi(f*2)
 
-	function float.sin (|float|)
+	function float.Sin (|float|)
 		return math.sin(self) //sigh
 
-	function float.__sincospi (|&float| a, |&float| b)
+	helper float.__sincospi (|&float| a, |&float| b)
 		cpp_wrapper (__sincospif)
 		
-	function float.sincos (|vec2|)
+	function float.SinCos (|vec2|)
 		|float| a // surely we'd have to multiply by 2 first???
 		|float| b
 		.__sincospi(a, b)
@@ -43,35 +43,35 @@ module Math
 	function SinPi (|float| f, |float|)
 		cpp_wrapper (__sinpif)
 
-	function float.atan2 (|float| f2, |float|)
+	function float.ATan2 (|float| f2, |float|)
 		cpp_wrapper (atan2f)
 
-	function float.atan3 (|float| f2, |float|)
+	function float.ATan3 (|float| f2, |float|)
 		|| Result = -.atan2(f2)				   // our result is +-pi, but we want 0-1...
 		Result /= 2π
 		if (Result < 0)
 			Result += 1.0
 		return Result	
 
-	function int.abs (|int|)
+	function int.Abs (|int|)
 		cpp_wrapper (abs)
 	
-	function float.abs (|float|)
+	function float.Abs (|float|)
 		cpp_wrapper (fabsf)
 	
-	function float.sqrt (|float|)
+	function float.Sqrt (|float|)
 		cpp_wrapper (sqrtf)
 	
-	function int.sqrt (|int|)
+	function int.Sqrt (|int|)
 		return self|f64|.sqrt
 	
-	function float.rsqrt (|float|)
+	function float.RSqrt (|float|)
 		return 1.0 / .sqrt
 	
-	function f64.sqrt (|f64|)
+	function f64.Sqrt (|f64|)
 		cpp_wrapper (sqrt)
 	
-	function float.fract (|float|)
+	function float.Fract (|float|)
 		return self - .floor
 	
 	function float.Ceil (|float|)
@@ -86,23 +86,23 @@ module Math
 		return factor / (π * v).sqrt
 
 	
-	function float.clamp (|float|L, |float|H, |float|)
+	function float.Clamp (|float|L, |float|H, |float|)
 		cpp_wrapper (fclampf)
 	
-	function float.clamp (|float|H=1.0, |float|)
+	function float.Clamp (|float|H=1.0, |float|)
 		return .clamp(0,h)
 		
-	function float.cluster (|float|)
+	function float.Cluster (|float|)
 		cpp_Wrapper JB_fCluster
 
-	function int64.hash (|uint64|)
+	function int64.Hash (|uint64|)
 		return self|uint64|.hash 
 
-	function int.hash (|uint|)
+	function int.Hash (|uint|)
 		return self|uint|.hash 
 
-	function uint64.hash (|uint64|)
-		cpp_wrapper 
+	function uint64.Hash (|uint64|)
+		cpp_wrapper JB_uint64_hash
 	
 	function int.ToOne (|int|)
 		if self > 0
@@ -120,12 +120,12 @@ module Math
 			return 1
 		return -(self|uint|>>31)
 
-	function int.clamp (|int| low, |int| high, |int|)
+	function int.Clamp (|int| low, |int| high, |int|)
 		cpp_part ClampRange
 		|| result = low max self
 		return high min result
 
-	function int.clamp (|int| high, |int|)
+	function int.Clamp (|int| high, |int|)
 		return high min (self max 0)
 
 	function Int.FlipSign (|int| Sign, |int|)
@@ -145,13 +145,13 @@ module Math
 		disabled "seems buggy, doesnt work for 0"
 		return self + (.signbit << 1) - 1
 	
-	function int.reduce (|int| d=1, |int|)
+	function int.Reduce (|int| d=1, |int|)
 		if (self > d)
 			return self - d
 		elseif (self < -d)
 			return self + d
 		
-	function int.reduce2 (|int| d, |&int| Zeros, |int|)
+	function int.Reduce2 (|int| d, |&int| Zeros, |int|)
 		pragma inline
 		if ( self > d )
 			return self - d
@@ -188,7 +188,7 @@ function Mix (|ivec2| A, |float| F, |float|)
 
 
 
-function int.copysign (|int| From, |int|)
+function int.CopySign (|int| From, |int|)
 	if (self.signbit == from.signbit)
 		return self 
 	return -self
@@ -206,15 +206,15 @@ extend int
 
 
 extend float
-	function setsign (|bool|b, |float|)
+	function SetSign (|bool|b, |float|)
 		if (b)
 			return -self
 		return self
 
-	function copysign (|float| frum, |float|)
+	function CopySign (|float| frum, |float|)
 		cpp_Wrapper (copysignf)
 	
-	function minus0 (|float| B, |float|)
+	function Minus0 (|float| B, |float|)
 		cpp_Wrapper (fdimf)
 
 	function Reduce (|float| f, |float|)
@@ -223,10 +223,10 @@ extend float
 	function Increase (|float| f, |float|)
 		return self + f.copysign(self)
 	
-	function isnan (|bool|)
+	function IsNan (|bool|)
 		cpp_wrapper (__isnanf)
 	
-	function isnormal (|bool|)
+	function IsNormal (|bool|)
 		// not inf and not nan, but what about 0? i guess 0 is normal?
 		cpp_wrapper (__isnormalf)
 	
@@ -244,7 +244,7 @@ extend float
 		return .clamp(lto, hto)
 		
 		
-	function sanity (|bool|)
+	function Sanity (|bool|)
 		debug_Require !(.isnan or .isinf)
 		return true
 	
@@ -261,32 +261,32 @@ extend float
 	function f64.isInf (|bool|)
 		cpp_wrapper (__isinfd)
 	
-	function powow (|int| n, |float|)
+	function Powow (|int| n, |float|)
 		visible
 		rz = self
 		for n
 			rz *= rz
 
-	function pow2 (|float|)
+	function Pow2 (|float|)
 		return self*self
 
-	function pow3 (|float|)
+	function Pow3 (|float|)
 		return self*self*self
 
-	function pow4 (|float|)
+	function Pow4 (|float|)
 		rz = self*self
 		rz *= rz
 
-	function pow6 (|float|)
+	function Pow6 (|float|)
 		rz = self*self
 		rz = rz*rz*rz
 
-	function pow8 (|float|)
+	function Pow8 (|float|)
 		rz = self * self
 		rz *= rz
 		rz *= rz
 
-	function pow16 (|float|)
+	function Pow16 (|float|)
 		rz = self * self
 		rz *= rz
 		rz *= rz
@@ -301,7 +301,7 @@ extend float
 		|| range = to-from
 		return (range*C) + from 
 	
-	function map (|float| from, |float| to, |float|)
+	function Map (|float| from, |float| to, |float|)
 		if (self > to)
 			return 1
 		return .minus0(from) / to
@@ -320,17 +320,17 @@ function int.Towards (|int| Dest, |int| N, |int|)
 	return self
 
 
-function float.multiply (|bool|b, |float| mul, |float|)
+function float.Multiply (|bool|b, |float| mul, |float|)
 	disabled "use .mul instead"
 
 	
-function float.mul (|float| by, |bool| Cond, |float|)
+function float.Mul (|float| by, |bool| Cond, |float|)
 	if (cond)
 		return self * by
 	return self
 
 
-function float.plus (|bool|b, |float| add=1.0, |float|)
+function float.Plus (|bool|b, |float| add=1.0, |float|)
 	if (b)
 		return self + add
 	return self

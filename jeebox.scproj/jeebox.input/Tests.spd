@@ -192,13 +192,13 @@ helper Jeebox.Test (|string|)
 		message.TreeCompare( root, root.copy ) // make sure compare works
 		message.TreeCompare( root, jbin_input.parse )
 		root.Test( root.Render,			"normal" )
-		root.Test( root.render_jbin,	"jbin" )
+		root.Test( root.renderjbin,	"jbin" )
 	
 	require StdErr.ok
 	return EntityTest()
 
 
 helper message.jbinTest (|bool|)
-	|| msg = .render_jbin.parse_jbin
+	|| msg = .renderjbin.parsejbin
 	return message.TreeCompare( self, msg )
 

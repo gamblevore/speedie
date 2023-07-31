@@ -64,7 +64,7 @@ class ListView (GUIControl) {
 		.init
 	
 	
-	function init
+	function Init
 		.gRowSel.Bg			<~ ((0.5, 0.5, 0.5, 0.65))
 		.gnormal.solid		=  ((0,   0,   0,   0.65))
 		.gnormal.seps		<~ ((0.5, 0.5, 0.5, 0.65))
@@ -260,7 +260,7 @@ class ListView (GUIControl) {
 		return orig
 	
 	
-	function sib (|ListViewrow|r, |ListViewrow|)
+	function Sib (|ListViewrow|r, |ListViewrow|)
 		return .HierNext(r) ?? .hierPrev(r)
 	
 	
@@ -1058,7 +1058,7 @@ class ListView (GUIControl) {
 		.scrolljump
 
 	
-	function owns (|ListViewrow| i, |bool|)
+	function Owns (|ListViewrow| i, |bool|)
 		return .listsource contains i
 	
 	
@@ -1487,13 +1487,13 @@ class ListView (GUIControl) {
 		|date|				DelayEditTill
 		.init
 
-		function init
+		function Init
 			.gscroll = drawstyle()
 			.gscroll.bg <~ ((0.5, 0.0, 0.7, 0.4)) 
 			.gscroll.edge <~ ((0.75, 0.25, 0.9, 0.5))
 	
 	
-		function pf (|string|s, |string|)
+		helper pf (|string|s, |string|)
 			for (c in s) (i)
 				if c.isalphanum
 					return s[i...].lowercase

@@ -307,7 +307,7 @@ class Process
 			.SendQueue.first = msg
 			msg = p
 		require msg
-		msg.render_jbin(.writer)
+		msg.renderjbin(.writer)
 		target debug
 			|| reparse = string.copy(.ours.data, .writer.length).parse_jbin
 			if !reparse // sigh. still? i guess we just leave this in then
@@ -378,7 +378,7 @@ class Process
 			expect (len <= .writer.reserved) (self, "Invalid message length")
 			|| str = string.copy(.theirs.data, len)
 			.ours.ReadID = sp.SendID
-			return str.parse_jbin
+			return str.parsejbin
 		.ours.readid = sp.SendID
 		.self "received nil"
 

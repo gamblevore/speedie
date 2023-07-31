@@ -38,14 +38,14 @@ class DocumentViewer (ringtree)
 	constructor (|GUIControl| V)
 		.viewer = V
 
-	function clear
+	function Clear
 		opt norefcounts
 		for o in self
 			if o isa textview
 				o.document = nil
 		super.clear
 		
-	function find (|GUIControl| V, |documentviewer|)
+	function Find (|GUIControl| V, |documentviewer|)
 		opt norefcounts
 		for (o in self) (s)
 			if o == v

@@ -18,9 +18,9 @@ datatype CharProp (byte)
 		Lower
 		Unicode
 	
-	function byte.syntaxis (|CharProp| s, |bool|)
+	function byte.SyntaxIs (|CharProp| s, |bool|)
 		return .Property == s
-	function byte.syntaxisnt (|CharProp| s, |bool|)
+	function byte.SyntaxIsnt (|CharProp| s, |bool|)
 		return .Property != s
 	
 	operator contains (|byte| b, |bool|)

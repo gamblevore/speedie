@@ -21,7 +21,7 @@ todo:
 
 
 // i actually never knew this worked!
-function testcontains (|array of array of int| s)
+function TestContains (|array of array of int| s)
 	|| r = *s			// array of (datatypewrapper of) int
 	|| r2 = *r			// (datatypewrapper of) int
 	|| r3 = *r2			// int

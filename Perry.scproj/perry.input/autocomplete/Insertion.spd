@@ -22,7 +22,7 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 	
 	ifn (msg == @tmp) and msg.name
 		if msg in @tmp
-			|| msg2 = msg.owning_modclass
+			|| msg2 = msg.owningmodclass
 				if (msg0 in @decl) and msg0.isfirst
 					msg0 = msg0.parent
 				if msg0 == @decl
@@ -200,7 +200,7 @@ function textview.InPrmsAndBetweenDecls (|message| msg, |int| x, |int|)
 	opt norefcounts
 	// just wanna find the msg that owns us!
 	|| list = msg.findprms(x)$
-	|| fn = list.owning_func$
+	|| fn = list.owningfunc$
 	if .text.charmode(x) == ','
 		return x
 	rz = .aftercomma(list.position, x)
@@ -265,7 +265,7 @@ function textview.IsInClass (|textviewline| d, |bool|)
 	opt norefcounts
 	while d
 		|| msg = d.message
-			return msg.owning_modclass
+			return msg.owningmodclass
 		d--
 
 
@@ -397,5 +397,5 @@ function string.isSource (|bool|)
 	return self isa "uwu" or "spd"
 
 
-function guicontrol.ide (|perryide|)
+function guicontrol.IDE (|perryide|)
 	return .window as perryide

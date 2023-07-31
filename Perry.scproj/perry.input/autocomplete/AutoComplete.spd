@@ -337,7 +337,7 @@ function JumpToDefinition (GUIAction)
 		  elseif msg == @sheb
 			msg.name.Reveal
 		  else
-			|| f = msg.owning_func
+			|| f = msg.owningfunc
 				if msg == f or msg in f
 					cmd = false
 			|| op = ("define", "callfrom")(cmd)
@@ -374,7 +374,7 @@ function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  
 	|| pp = where.parent$
 	|| ppp = pp.parent
 	|| Jump = 0
-	|| spd_func = where.owning_func
+	|| spd_func = where.owningfunc
 		if cmd != "callfrom"
 			if where == @thg
 				if pp == @dot and ppp == spd_func
@@ -383,14 +383,14 @@ function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  
 				jump = 2	// function bla (prototype)
 			
 	if !jump
-		if (pp == @bra) and pp.Owning_ModClass			// class asdasd (super)
+		if (pp == @bra) and pp.OwningModClass			// class asdasd (super)
 			jump = 1
-		  elseif pp == @tmp and where.Owning_ModClass	// extend message
+		  elseif pp == @tmp and where.OwningModClass	// extend message
 			jump = 1
 		
 	rz = @tmp + cmd
 	// pp is the @arg containing "f" right now?
-	if (where == 0 and @tmp) and (pp == @arg) and (ppp and ppp.Owning_ModClass)
+	if (where == 0 and @tmp) and (pp == @arg) and (ppp and ppp.OwningModClass)
 		ppp = nil
 	if jump or (!jump and where.IsUsefulTypeOfDecl)
 		|| jj = (@name + where.name) 
@@ -422,7 +422,7 @@ function message.SimpleComplete (|message| pp, |message| where, |bool|)
 		|| imp = .msg(@arg, "import")
 		imp <~ where.first.nyme
 		return true
-	|| cls = pp.Owning_ModClass // seems adding this info is bad?
+	|| cls = pp.OwningModClass // seems adding this info is bad?
 								// especially if we already filled it in?
 		|| simple = .msg(@arg, "simple")
 		simple <~ cls.name
@@ -430,11 +430,11 @@ function message.SimpleComplete (|message| pp, |message| where, |bool|)
 		return true
 
 
-function message.owning_func (|message|) // isfunction
+function message.OwningFunc (|message|) // isfunction
 	return .owningSyntax(AutoComplete.Functions, false)
 
 		
-function message.owning_modclass (|bool| EndAtArg=true, |message|)
+function message.OwningModclass (|bool| EndAtArg=true, |message|)
 	opt norefcounts
 	require self
 	rz = .owningSyntax(AutoComplete.owner, EndAtArg)
@@ -478,13 +478,13 @@ function message.OwningFullName (|syntax| prm, |message|)
 		name = "Render"
 	|| fn   = @name
 
-	|| mod_class = .owning_modclass(false)
+	|| mod_class = .owningmodclass(false)
 	if mod_class and (mod_class ~!= "module" and "extend_module")
 		fn = @thg 
 		if self ~= "constructor" or "destructor"
 			name = .name
 	  elseif mod_class ~= "module" and mod_class[0] == @arg // what if it's a class module?
-		|| sub = mod_class.parent.owning_modclass(false)
+		|| sub = mod_class.parent.owningmodclass(false)
 			mod_class = sub
 	
 	rz = @dot.msg(name)

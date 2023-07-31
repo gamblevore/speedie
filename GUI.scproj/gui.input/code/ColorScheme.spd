@@ -26,13 +26,13 @@ class ColorScheme
 
 	
 	module
-		function load (|message| s)
+		function Load (|message| s)
 			¥.load(s)
 	
 	constructor
 		.initcolors
 	
-	function initcolors
+	function InitColors
 		.TextSelection.bg		<~ ((1.0, 0.25, 0.75, 0.5))
 		.TextCopy.bg			<~ ((0.6, 0.6, 0.1, 0.2))
 		.TextCopy.edge			<~ ((0.6, 0.6, 0.1, 0.2))
@@ -124,7 +124,7 @@ class ColorScheme
 		return true
 	
 	
-	function fade_v (|vec4| top, |vec4| bottom)
+	function FadeV (|vec4| top, |vec4| bottom)
 		.BGCorners[0] = top
 		.BGCorners[1] = top
 		.BGCorners[2] = bottom

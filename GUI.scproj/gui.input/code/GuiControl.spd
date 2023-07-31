@@ -162,7 +162,7 @@ class GUIControl (ringtree)
 			sdlapp.resized(self)
 
 	
-	function touch
+	function Touch
 		opt norefcounts
 		sdlapp.touch(self) // why wasnt this here before?
 		(.window is modified)

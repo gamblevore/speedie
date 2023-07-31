@@ -34,13 +34,13 @@ class DrawStyle
 	function NoBorder
 		.edge = .bg
 	
-	function clear
+	function Clear
 		.solid = (0.0,0.0,0.0,0.0)
 	
 	function Copy (|DrawStyle|)
 		return DrawStyle(self)
 	
-	function solid (assigns:|vec4|c)
+	function Solid (assigns:|vec4|c)
 		.bg <~ c
 		.edge = .bg
 		.seps = .bg

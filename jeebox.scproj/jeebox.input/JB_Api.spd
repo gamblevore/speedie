@@ -388,12 +388,12 @@ module JB_API
 		printline ErrorMessage // usecallback instead.
 
 
-	function message.nil (|bool|)
+	function message.Nil (|bool|)
 		pragma inline
 		cpp_name JB_Msg_NilCheck
 		return self or JB_API.NilHandler
 
-	function syntax.nil (|bool|)
+	function syntax.Nil (|bool|)
 		pragma inline
 		cpp_name JB_Syx_NilCheck
 		return self or JB_API.NilHandler

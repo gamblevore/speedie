@@ -21,7 +21,7 @@ class ImageEffects
 		swap .read .write
 		.final = .read
 		
-	function start
+	function Start
 		opt norefcounts
 		|| P = .read.wh
 		if !.write

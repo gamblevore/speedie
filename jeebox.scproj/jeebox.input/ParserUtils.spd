@@ -81,7 +81,7 @@ function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |Message
 	// language2.scproj uses owner
 	|| data = (.decompress(int.max), self)(Allowdecomp and .iscompressed)
 	|| j = data.HiddenJBin
-		return data[j, int.max].parse_jbin
+		return data[j, int.max].parsejbin
 	if !Parser.CppInited
 	    Parser.Init
 
@@ -248,7 +248,7 @@ function Message.SyntaxUsing (|MessagePosition|)
 	    .memorylayer.use
 
 
-api ringtree.jdb2
+api ringtree.JDB2
 	cpp_name jdb2
 	visible
 	if (Self)
@@ -257,7 +257,7 @@ api ringtree.jdb2
 	    "(nil)"
 
 
-api ringtree.jdb3
+api ringtree.JDB3
 	cpp_name jdb3
 	visible
 	if (Self)

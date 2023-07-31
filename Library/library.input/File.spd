@@ -93,7 +93,7 @@ class File (String)
 	Syntax Append (|string| data)
 		.write(Data)
 	
-	function string.visible (|bool|)
+	function string.Visible (|bool|)
 		return .name[0] != '.'
 		
 	function Hidden (|bool|)

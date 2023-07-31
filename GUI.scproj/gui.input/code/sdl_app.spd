@@ -634,10 +634,10 @@ module SDLApp
 		.StartResize
 		
 		
-	function mod (|int| period, |float|)
+	function Mod (|int| period, |float|)
 		return (.FrameCount mod period)|float| / period|float|
 
-	function cycle (|date| amount, |float|)
+	function Cycle (|date| amount, |float|)
 		// FrameLength is 1/60
 		return (.mod((amount*60).WholeSeconds).sin + 1) * 0.5
 

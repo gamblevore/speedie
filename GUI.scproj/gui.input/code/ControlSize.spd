@@ -7,12 +7,12 @@ struct ControlSize
 		datatype true
 	|controlrect|				GSize
 	
-	setter g (|int| i, |ControlPoint|)
+	setter G (|int| i, |ControlPoint|)
 		if .gsize[i] != value
 			.GSize[i] = value
 			sdlapp.resized
 	
-	function setsize (|controlrect| GSize) // only one we need, right?
+	function SetSize (|controlrect| GSize) // only one we need, right?
 		ifn .gsize equals gsize
 			.GSize = gsize
 			sdlapp.resized

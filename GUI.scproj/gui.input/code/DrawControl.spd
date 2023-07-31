@@ -39,7 +39,7 @@ class GraphicsEditor (GuiControl)
 
 	helper LoadNative (|string| f, |bool|)
 		return false
-		|| root = f.parse_jbin
+		|| root = f.parsejbin
 		|| imgs = root["jdraw"]["layers"]
 		for l in imgs
 			if l.Expect(@tmp)

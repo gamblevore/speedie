@@ -46,7 +46,7 @@ class FileRow (ListViewRow)
 		.lastfilecount = (!.asdir)|int|
 		is hierarchical
 	
-	behaviour copyid
+	behaviour CopyID
 		return .location
 	
 	render
@@ -55,7 +55,7 @@ class FileRow (ListViewRow)
 		fs <~ .dirfile
 	
 	
-	behaviour text
+	behaviour Text
 		if i == 0
 			return .name
 

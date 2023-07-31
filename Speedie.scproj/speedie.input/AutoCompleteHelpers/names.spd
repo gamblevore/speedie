@@ -4,9 +4,9 @@ module AutoComplete
 	|| function_names	= "main/prototype/function/helper/api/syx/syntax/setter/operator/render/behaviour/virtual/constructor/destructor/cpp_wrapper/cpp_nothing/cpp_inbuilt"
 	|| Functions		= function_names.dict('/')
 	
-	function isafunc (|string| s, |bool|)
+	function IsAFunc (|string| s, |bool|)
 		return .functions[s] != nil
-	function isafunc (|message| m, |bool|)
+	function IsAFunc (|message| m, |bool|)
 		opt norefcounts
 		return .functions.valueLower(m.name) != nil
 

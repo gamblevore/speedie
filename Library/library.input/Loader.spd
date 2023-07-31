@@ -36,7 +36,7 @@ extend ObjectLoader {
 	function Float (|float|)
 		return .f64
 	
-	function f64 (|float|)
+	function F64 (|float|)
 		opt norefcounts
 		return .Next$.float
 	

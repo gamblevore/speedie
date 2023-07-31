@@ -78,7 +78,7 @@ class FileViewer (ListView)
 		.TryReloadPath
 	
 	
-	behaviour keydown
+	behaviour KeyDown
 		if key.isdelete
 			|| r = .FirstSelected
 			if r isa filerow
@@ -545,7 +545,7 @@ class FileViewer (ListView)
 				return (sh, 0)
 
 
-		function isbetter (|string| a, |string| b, |string| ext, |int|)
+		helper isbetter (|string| a, |string| b, |string| ext, |int|)
 			if (b == ext) != (a == ext)
 				return (a==ext)+1
 

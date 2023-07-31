@@ -21,11 +21,11 @@ module zalgo
 				fs.zalgo(s, wierdness, scale)
 
 
-function string.zalgo (|float| Wierdness=8, |string|)
+function string.Zalgo (|float| Wierdness=8, |string|)
 	return zalgo.render(self, Wierdness, nil)
 
 
-function faststring.zalgo (|byte| s, |float| Wierdness, |float| whites)
+function faststring.Zalgo (|byte| s, |float| Wierdness, |float| whites)
 	|| mul  = 1.0/(whites+1.0)
 	|| up   = zalgo.R[3, 3+Wierdness]*mul
 	for (up)

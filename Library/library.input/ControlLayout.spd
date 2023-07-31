@@ -60,9 +60,9 @@ datatype ControlRect (ivec4)
 function int.middleLayout (|controlline|)
 	return the~middle-(self>>1) to (self)~long
 
-function int.insidelayout (|controlline|)
+function int.InsideLayout (|controlline|)
 	return the~left+self to the~right-self
-function ivec2.layout (|controlrect|)
+function ivec2.Layout (|controlrect|)
 	return .x~wide by .y~high
 
 
@@ -158,11 +158,11 @@ datatype ControlClipMode (byte)
 		return (self & b) == b
 
 
-function ivec4.layout (|ControlRect|)
+function ivec4.Layout (|ControlRect|)
 	return (self<<4)|ControlRect|
 
-function int.operatorby (|int| h, |controlrect|)
+function int.OperatorBy (|int| h, |controlrect|)
 	return (self)~wide by (h)~high
 
-function int.syntaxcast (|controlpoint|)
+function int.SyntaxCast (|controlpoint|)
 	disabled "Do you mean '(amount)~long' ?"

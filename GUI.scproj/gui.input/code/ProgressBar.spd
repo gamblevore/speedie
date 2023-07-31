@@ -13,7 +13,7 @@ class ProgressBar (GUIControl)
 		.onclicked = onclicked
 		.indefinite = true
 	
-	behaviour draw
+	behaviour Draw
 		if .Indefinite
 			.Ughughugh := byte[128]
 			if !.Ughughugh[0] or sdlapp.FrameCount isa 9

@@ -21,7 +21,7 @@ class Macro
 		rz = message()
 		rz.Become(self, prms)
 	
-	function string.macro (|macro|)
+	function string.Macro (|macro|)
 		return macro(self)
 	
 

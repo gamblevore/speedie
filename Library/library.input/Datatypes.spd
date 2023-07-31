@@ -272,9 +272,9 @@ datatype uint
 		return .ispo2
 
 	function Hash (|uint|)
-		cpp_wrapper 
+		cpp_wrapper JB_uint32_hash
 	function Unhash (|uint|)
-		cpp_wrapper 
+		cpp_wrapper JB_uint32_unhash 
 	
 	function SwapEndian (|uint|)
 		cpp_Wrapper (__builtin_bswap32)
@@ -395,9 +395,9 @@ datatype float
 //		return self * date.kTicks
 	module
 		function Max (|float|)
-			cpp_wrapper
+			cpp_wrapper JB_f__max
 		function Nan (|float|)
-			cpp_wrapper
+			cpp_wrapper JB_f__nan
 	
 	render
 		fs <~ self
@@ -449,6 +449,7 @@ datatype float
 		return (self - other).abs < 0.0001 // seems close enough?
 	
 	function Mix (|float| y, |float| a, |float|)
+		cpp_part FloatMix
 		return self * (1.0 - a) + (y * a)
 
 	function SmoothStep (|float|)
@@ -1021,7 +1022,7 @@ datatype vec3
 	function Lum (|float|)
 		return ((self*self) • (0.299, 0.587, 0.114)).sqrt
 	
-	function vec4.lum (|float|)
+	function vec4.Lum (|float|)
 		return .xyz.lum
 
 	operator min (|vec3| s, |vec3|)
@@ -1363,16 +1364,16 @@ helper ivecmix (|int|a, |ivec2|b, |ivec3|)
 	return (a, b.x, b.y)
 
 
-function ivec2.abs (|ivec2|)
+function ivec2.Abs (|ivec2|)
 	return (.x.abs, .y.abs)
 
-function ivec4.clamp (|int| L, |int| H, |ivec4|)
+function ivec4.Clamp (|int| L, |int| H, |ivec4|)
 	return .max(L).min(H)
 
-function ivec4.max (|int| L, |ivec4|)
+function ivec4.Max (|int| L, |ivec4|)
 	return (.x max L, .y max L, .z max L, .w max L )
 
-function ivec4.min (|int| L, |ivec4|)
+function ivec4.Min (|int| L, |ivec4|)
 	return (.x min L, .y min L, .z min L, .w min L )
 
 function ivec4.Center (|vec2|)

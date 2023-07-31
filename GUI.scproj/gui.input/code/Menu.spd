@@ -28,7 +28,7 @@ class Menu (ListView)
 			.mousedown(p, 2)
 
 
-	behaviour draw
+	behaviour Draw
 		super.draw(Where)
 
 

@@ -1276,7 +1276,7 @@ extend Message
 		parser.ErrorAlwaysAdd( "Indents mismatch ($chin spaces)",   .position )
 
 
-	function type (|syntax|)
+	function Type (|syntax|)
 		disabled "Use .func instead"
 
 	syntax isnt (|msguiflags| F, |bool|)

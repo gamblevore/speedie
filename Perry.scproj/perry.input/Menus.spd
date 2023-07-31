@@ -129,7 +129,7 @@ function PerryIDE.UpdateMarker (|message| m)
 	|| name = .CurrPath.name.widen(16)
 	|| fnname = ""
 	|| msg = .Editme.ClickedMsg
-		|| fn = msg.owning_func
+		|| fn = msg.owningfunc
 			fnname = fn.OwningFullName(@emb).render
 			name += " (" + fnname + ")"
 	
@@ -173,7 +173,7 @@ function PressingTabs (guiaction)
 			.OpenMenu(row) // "Yes" "no"
 
 
-function message.ide (|perryide|)
+function message.IDE (|perryide|)
 	opt norefcounts
 	|| o = .obj as perryide
 		return o

@@ -31,7 +31,7 @@ struct SDL_Event
 	function Key (|&SDL_KeyboardEvent|)
 		return self|&SDL_KeyboardEvent|
 		
-	function keysym (|&sdl_keysym|)
+	function KeySym (|&sdl_keysym|)
 		return &.key.keysym
 		
 	function Drop (|&SDL_DropEvent|)
@@ -81,7 +81,7 @@ struct SDL_MouseWheelEvent
 	|int|						x
 	|int|						y
 	|int|						direction
-	function xy (|ivec2|)
+	function XY (|ivec2|)
 		return (.x,.y)
 
 
@@ -156,7 +156,7 @@ struct SDL_MouseButtonEvent
 	|int|			x				// mouse-x, window-relative
 	|int|			y				// mouse-y, window-relative
 	
-	function xy (|ivec2|)
+	function XY (|ivec2|)
 		return (.x,.y).sdlxy
 
 

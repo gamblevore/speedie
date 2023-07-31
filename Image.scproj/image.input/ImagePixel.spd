@@ -40,7 +40,7 @@ struct ImagePixel
 				v = 255
 			.SyntaxAccess(i) = v
 	
-	function lum (|float|)
+	function Lum (|float|)
 		return .color.lum
 
 	function RndSolid
@@ -48,10 +48,10 @@ struct ImagePixel
 		self <~ rnd
 		.a = 0xff
 	
-	function hascolor (|bool|)
+	function HasColor (|bool|)
 		return .r or .g or .b
 
-	function hasany (|bool|)
+	function HasAny (|bool|)
 		return *(self|&int|)
 			
 	syntax cast (|bool|)
@@ -62,7 +62,7 @@ struct ImagePixel
 		cpp_part CastVec4
 		return .color
 
-	function equals (|imagepixel|p, |bool|)
+	function Equals (|imagepixel|p, |bool|)
 		return .uint == p.uint
 	
 	syntax append (|int| r, |int| g, |int| b, |int| a=255)
@@ -72,7 +72,7 @@ struct ImagePixel
 		.b=b.clamp(255)
 		.a=a.clamp(255)
 		
-	function alpha (assigns:|float|a)
+	function Alpha (assigns:|float|a)
 		a = (a * 255.0) + 0.25
 		.a = a.clamp(255)
 		
@@ -104,7 +104,7 @@ struct ImagePixel
 		|int| v = (c * 255.0) + 0.25
 		.rgb = .raw + v 
 
-	function addint (|int| i)
+	function AddInt (|int| i)
 		.r += i
 		.g += i
 		.b += i
@@ -113,14 +113,14 @@ struct ImagePixel
 		cpp_part AddVec
 		self <~ (c+.Color)
 
-	function rgb (assigns:|ivec4|w)
+	function RGB (assigns:|ivec4|w)
 		cpp_part rbgsetints
 		w = w.clamp(0,255)
 		.R=w.r
 		.g=w.g
 		.b=w.b
 
-	function rgb (assigns:|vec4|v)
+	function RGB (assigns:|vec4|v)
 		cpp_part rbgsetfloats
 		v = (v * 255.0) + 0.25
 		.R=v.r
@@ -130,7 +130,7 @@ struct ImagePixel
 	function Gray (|float|)
 		return  .R + .G + .B
 		
-	function brightness (|float|)
+	function Brightness (|float|)
 		return .Gray * 765th
 		
 	syntax append (|float| v)
@@ -195,7 +195,7 @@ struct ImagePixel
 		|ImagePixel| White
 		|ImagePixel| Clear
 		init()
-		function init
+		function Init
 			white <~ (1.0)
 		function Char (|codepoint| c, |&imagepixel|)
 			if c&1
@@ -216,19 +216,19 @@ extend ivec4
 
 
 module Colors
-	function white (|float| alpha=1.0, |imagepixel|)
+	function White (|float| alpha=1.0, |imagepixel|)
 		|| v = (1.0, 1.0, 1.0, alpha)
 		rz <~ v
-	function gray (|float| alpha=1.0, |imagepixel|)
+	function Gray (|float| alpha=1.0, |imagepixel|)
 		|| v = (0.5, 0.5, 0.5, alpha)
 		rz <~ v
-	function red (|float| alpha=1.0, |imagepixel|)
+	function Red (|float| alpha=1.0, |imagepixel|)
 		|| v = (1.0, 0.0, 0.0, alpha)
 		rz <~ v
 	// these could be... thingies? a~b thingies :)
 	// macros :) adjs 1.0~gray
-	function black (|float| alpha=1.0, |imagepixel|)
+	function Black (|float| alpha=1.0, |imagepixel|)
 		|| v = (0.0, 0.0, 0.0, alpha)
 		rz <~ v
-	function clear (|imagepixel|)
+	function Clear (|imagepixel|)
 		0 // lol

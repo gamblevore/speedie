@@ -279,7 +279,7 @@ function PerryIDE.SelTextParse (|bool|)
 	return true
 
 
-function PerryIDE.clickedfile (|bool|)
+function PerryIDE.ClickedFile (|bool|)
 	|| t = .editme.seltext.trim
 	if t[0] == '/'
 		|| it = t.inwhite

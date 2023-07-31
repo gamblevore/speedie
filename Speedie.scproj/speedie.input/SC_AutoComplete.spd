@@ -56,7 +56,7 @@ function HandleRestartedCompile
 	if last.isjbin
 		"restart grabbing a command"
 		args.pop
-		.CmdWrap(last.parse_jbin)
+		.CmdWrap(last.parsejbin)
 	"reading commands"
 
 
@@ -152,7 +152,7 @@ function Debug (|Message| cmd, |message|)
 
 
 function Restart (|message| arg)
-	app.RawArgs <~ arg.render_jbin
+	app.RawArgs <~ arg.renderjbin
 	app.restart
 
 

@@ -30,7 +30,7 @@ role config (message)
 
 
  // why would a conf-file be so big?
-function file.conf (|int| lim = 1MB,  |config|)
+function file.Conf (|int| lim = 1MB,  |config|)
 	opt norefcounts
 	if .exists
 		rz = .parse(lim)|config|

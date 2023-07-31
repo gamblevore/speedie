@@ -57,25 +57,25 @@ class Image (memory)
 	function Height (|int|)
 		return .wh.y
 	
-	function whset (|ivec2| wh)
+	function WHSet (|ivec2| wh)
 		.wh = wh
 		.WindowBase = (0,0)
 		._ControlClip = (0,0,wh)
 	
-	function whset
+	function WHSet
 		cpp_Part resetarea
 		.WindowBase = (0,0)
 		._ControlClip = (0,0,.wh)
 	
 	
-	function horz (assigns:|ivec2|r)
+	function Horz (assigns:|ivec2|r)
 		._controlclip.x = r.x
 		._controlclip.x2 = r.x2
 	
-	function horz (|intrange|)
+	function Horz (|intrange|)
 		return ._Controlclip.x1x2
 	
-	function vert (|intrange|)
+	function Vert (|intrange|)
 		return ._Controlclip.y1y2
 	
 		

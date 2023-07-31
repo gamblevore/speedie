@@ -14,7 +14,7 @@ class AppMenu (Window)
 		.init
 
 
-	function init
+	function Init
 		is visible
 		isnt drawsfocus
 		.id = "AppMenu"
@@ -28,7 +28,7 @@ class AppMenu (Window)
 		it.StyleAsMenu
 
 
-	behaviour keydown
+	behaviour KeyDown
 		if key is escape
 			.cancelreturn
 			.Choices.selectnone

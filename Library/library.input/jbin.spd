@@ -25,7 +25,7 @@
 
 
 extend message
-	render render_jbin (|bool| Compress=false, |string| shell_path = "")
+	render RenderJbin (|bool| Compress=false, |string| shell_path = "")
 		opt norefcounts
 		require self
 		|| js = fs|jbin|
@@ -225,7 +225,7 @@ function StringReader.Parse_Jbin (|MessageRoot|)
 	.UserObj = nil
 	
 
-function string.parse_jbin (|messageroot|)
+function string.ParseJbin (|messageroot|)
 	return .Stream.Parse_Jbin
 
 function string.IsJbin (|int|)
@@ -234,8 +234,8 @@ function string.IsJbin (|int|)
 	if self starts _JbinHeaderComp
 		return 2
 
-function string.digest (|string|)
+function string.Digest (|string|)
 	if .IsJbin
 		return self
-	return .parse$.render_jbin
+	return .parse$.renderjbin
 

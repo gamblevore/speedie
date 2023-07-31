@@ -45,10 +45,10 @@ struct SDL_KeyboardEvent
 	|uint|						Timestamp
 	|SDL_Keysym|				keysym
 	
-	function scan (|SDL_Scancode|)
+	function Scan (|SDL_Scancode|)
 		return .keysym.scancode
 
-	function key (|keys|)
+	function Key (|keys|)
 		return .keysym.sym
 
 	syntax is (|keys| x, |bool|)
@@ -112,7 +112,7 @@ dataType Keys (int) {
 					.downkeys[i] = .downkeys[m]
 					.downkeys[m] = 0
 			
-		function has (|keys| s, |ind|)
+		function Has (|keys| s, |ind|)
 			for i in 8
 				if .downkeys[i] == s
 					return i
@@ -164,7 +164,7 @@ dataType Keys (int) {
 	function IsCancel (|bool|) 
 		return (self is cancelkey or escape or AC_BACK)
 
-	function isdelete (|bool|)
+	function IsDelete (|bool|)
 		return self is forwarddelete or delete or kp_delete
 
 	function IsShift (|bool|)

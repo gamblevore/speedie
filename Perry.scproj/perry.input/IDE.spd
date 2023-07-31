@@ -530,7 +530,7 @@ class PerryIDE (Window)
 			return .FunctionMenu.SearchMenu
 			
 	
-	behaviour keydown
+	behaviour KeyDown
 		if keys.cmd and .cmdkey(key)
 			return true
 		if (key is tab) and .openedmenu == .autocomplete
@@ -755,7 +755,7 @@ class PerryIDE (Window)
 	function UpdateActiveFile
 		|| d = .editme.Document$
 		|| l = d.Location.Resolve(true)$
-		if l ~= app.pref_path.resolve
+		if l ~= app.prefpath.resolve
 			.updateprefs
 		  elseif l ~= .perryfile
 			.updateperry

@@ -240,7 +240,7 @@ role ListViewCell (message)
 		return .row.__text__(.column)
 	
 	
-	function tab (|bool| dir, |ListView| lv, |ListViewcell|)
+	function Tab (|bool| dir, |ListView| lv, |ListViewcell|)
 		|| n    = .column + (1, -1)(dir)
 		|| cols = lv.DrawCols
 		if n >= cols

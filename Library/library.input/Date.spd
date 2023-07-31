@@ -92,7 +92,7 @@ datatype Date (int64)
 	function Weeks (|int64|)
 		return (.wholeSeconds / kSecondsPerWeek)
 
-	function int64.seconds (|date|)
+	function int64.Seconds (|date|)
 		return self << 16
 	
 	iterator

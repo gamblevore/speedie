@@ -110,7 +110,7 @@ class OpenSaveDialog (Window)
 		return true
 
 	
-	function init
+	function Init
 		.path.id = "opensave"
 		.path.OnTextChanged= relistkey
 		
@@ -148,7 +148,7 @@ class OpenSaveDialog (Window)
 		return true
 
 		
-	behaviour keydown
+	behaviour KeyDown
 		opt NoRefCounts
 		if (key is up or down) and !.Name.hasfocus
 			return .files.keydown(key)

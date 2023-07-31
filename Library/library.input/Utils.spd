@@ -2,7 +2,7 @@
 // allow the short sort of one-liners that other languages have...
 // good for demos and language-tests
 
-function dictionary.sort (|SorterComparer| fn, |int| count, |[...]|)
+function dictionary.Sort (|SorterComparer| fn, |int| count, |[...]|)
 	rz = .values // a more efficient sorter could extract only needed
 	rz.sort(fn)
 	rz.Length = count
@@ -39,7 +39,7 @@ helper message.GoodNameSub (|bool| NeedName=false, |string|)
 	return string.Error
 
 
-function ivec4.list (|message|)
+function ivec4.List (|message|)
 	rz = @list.msg
 	for i in 4
 		rz <~ self[i]
@@ -68,15 +68,15 @@ function string.Sort (|byte| sep = '\n', |string|)
 	return Join2(x, string.byte(sep))
 
 
-function int.msg (|message|)
+function int.Msg (|message|)
 	return @num + .render
 
-function string.msg (|message|)
+function string.Msg (|message|)
 	return @str + self
 	
-function int64.msg (|message|)
+function int64.Msg (|message|)
 	return @num + .Render
 
-function bool.msg (|message|)
+function bool.Msg (|message|)
 	return @thg + .Render
 

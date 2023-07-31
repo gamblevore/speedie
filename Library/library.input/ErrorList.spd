@@ -145,7 +145,7 @@ class ErrorList
 			if err.severity >= level
 				RZ++
 				if shell
-					err.render_clang(Fs)
+					err.renderclang(Fs)
 				  else
 					err.render(fs)
 				fs <~ "\n"

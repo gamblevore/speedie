@@ -13,6 +13,7 @@ struct Random
 	saveas struct
 
 	function Int (|int64|)
+		cpp_part RndInt
 		|| s = ++.state
 		rz = (.store + s).hash
 		.store = rz		
@@ -107,12 +108,12 @@ struct Random
 			random.shared[...]
 
 
-function int.rand (|int|)
+function int.Rand (|int|)
 	return random.shared.int(self)
 
-function uint64.now (|uint64|)
+function uint64.Now (|uint64|)
 	return date.hash mod self
 
-function int.now (|uint64|)
+function int.Now (|uint64|)
 	return self|uint64|.now
 

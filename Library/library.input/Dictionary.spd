@@ -152,10 +152,10 @@ extend dictionary
 	function Set (|string| key, |string| Value)
 		self[key] = value
 
-	function msglower (|message| m, ||)
+	function MsgLower (|message| m, ||)
 		return self[m.name.idcase]
 
-	function msglower (|message| m, assigns:||)
+	function MsgLower (|message| m, assigns:||)
 		self[m.name.idcase] = Value
 	
 	function Expect (|message| m, ||)

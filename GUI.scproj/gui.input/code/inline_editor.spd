@@ -15,7 +15,7 @@ struct InlineEditor
 			g.drawfocus(where)
 	  
 	
-	function init (|Window| w)
+	function Init (|Window| w)
 		.editor = textview(w)
 		with .editor
 			.id				= "inline_editor"
