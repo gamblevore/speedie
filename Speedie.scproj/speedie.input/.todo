@@ -48,6 +48,14 @@ additions:
 		* errors with jbin also suck
 	* months.scproj demo needs better compiler support, including .render not being needed.
 
+	* auto foo() { // multiple return?
+		struct retVals {        // Declare a local structure 
+			int i1, i2;
+			string str;
+		};
+		return retVals {10, 20, "Hi"}; // Return the local structure
+	}
+	
 
 class-changes
 	* delete fastappender
