@@ -314,7 +314,7 @@ function SCFunction.CopyParams (|message| list)
 	|| p = .prms
 	using list
 	|| a = .source.GiveArg
-	|| dot = @dot.msg("constructor")
+	|| dot = @dot.msg("Constructor")
 	a.first = dot
 	|| name = dot.msg(@thg, "super")
 	|| SubPrms = dot.msg(@prm)
@@ -368,7 +368,7 @@ function CreateConstructors
 	
 	if !.IsRole
 		|| NeedsDestructor = .IsObject or (.IsStruct and .HasObjectProperties)
-		.DestructorFunc = .FindAllocFunc( "destructor", !NeedsDestructor )
+		.DestructorFunc = .FindAllocFunc( "Destructor", !NeedsDestructor )
 
 
 function RootName (|string|)
