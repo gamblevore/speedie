@@ -107,7 +107,7 @@ class SCDecl (SCObject) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.NilUsed = NilState.Either
-		if .objectid == 18970426
+//		if .objectid == 15761884
 
 		
 	function Project (|scimport|)
@@ -140,6 +140,8 @@ class SCDecl (SCObject) {
 	syntax isnt (|SCDeclInfo| d, |bool|)
 		return !.syntaxis(d)
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
+//		if .objectid == 15761884
+//			if (d==scdeclinfo.const) and value
 		.info = .info.set(d, Value)
 	syntax isnt (|SCDeclInfo| d, assigns:|bool|)
 		.info = .info.set(d, !Value)
@@ -312,16 +314,8 @@ class SCDecl (SCObject) {
 			return c
 		
 		if .PointerCount > 0
-			target false {
-			|| pointedto = .Internal
-				printline brel
-				//if pointedto is const
-				return pointedto
-			//debugger 
-			}
-			|| c = .Copy
-			c.PointerCount--
-			return c
+			if !.internal // should always exist.
+			return .internal
 		
 		if !isaccess and .isnormalobject
 			brel.become(@dot, "first")

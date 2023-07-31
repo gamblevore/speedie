@@ -296,7 +296,6 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 /*
 TODO:
 * msg.last/first etc will have to accept nil :O. The C++ compiler will opt it.
-* fix " = .internal" all over!!!! DO IT FIRST
 * update the params properly
 * pop the msgs out and restore nilused
 * ternaries
