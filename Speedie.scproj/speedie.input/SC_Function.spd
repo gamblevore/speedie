@@ -174,7 +174,7 @@ function ParseName (|Message| node, |bool|)
 	cname.func = @thg
 	.Name = cname.name
 
-	if fType ~!= "helper" and "prototype"
+	if fType ~!= "helper" and "prototype" and "iterator"
 		if .name.IsFuncHelper
 			deprecate (node, "Function name should have one uppercase letter.")
 		if fType == "api"
