@@ -164,7 +164,7 @@ function string.IsFuncHelper	(|bool|)
 		if c.IsUpper or c >= 128
 			return false
 		if c.IsLower
-			return true
+			rz = true
 
 
 function ParseName (|Message| node, |bool|)
