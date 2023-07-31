@@ -194,7 +194,7 @@ class FastString {
 		if f.opened
 			return .appendpipe(f.descriptor, 0)
 		
-	helper AppendPipe (|int|fd, |int| mode, |bool|)
+	function appendpipe (|int|fd, |int| mode, |bool|)
 		cpp_wrapper JB_FS_AppendPipe // (FastString* self, int fd, int Mode)
 	
 	syntax cast (|string|)

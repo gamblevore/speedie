@@ -114,7 +114,7 @@ datatype Date (int64)
 		function Now (|Date|)
 			cpp_wrapper JB_Date__Now
 
-		helper Now (|&Date| out, |Date|)
+		function now (|&Date| out, |Date|)
 			cpp_part KindaNow
 			*out = .now()
 			return *out

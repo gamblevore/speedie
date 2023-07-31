@@ -68,7 +68,7 @@ function Switches (|[string]|)
 		if R.ArgName
 			rz <~ R
 	
-helper args_ (|[string]|)
+function args_ (|[string]|)
 	opt norefcounts
 	for R in .rawargs
 		if R|AppArgument|.name ~=""
@@ -84,7 +84,7 @@ function Args (|[string]|)
 function CrashPrint
 	cpp_wrapper JB_CrashTracer
 
-helper ExePath (|string|)
+function exepath (|string|)
 	cpp_wrapper JB_App__Path
 
 function Path (|string|)
@@ -198,13 +198,13 @@ function Input (|string|)
 	cpp_Wrapper JB_App__Readline
 
 
-helper sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
+function sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
 	cpp_Wrapper JB_SP_Run
 
-helper RawArgs  (|array of string|)
+function rawargs  (|array of string|)
 	cpp_wrapper JB_App__Args
 
-helper Exit (|int| Code=0)
+function exit (|int| Code=0)
 	disabled "Use app.quit instead (to avoid confusion with the 'exit' statement, which exits loops!)"
 
 
@@ -246,7 +246,7 @@ function CWD (|string|)
 function CWD (assigns:|string|, |ErrorInt|)
 	return .chdir_(Value.resolve)
 
-helper chdir_ (|string| path, |ErrorInt|)
+function chdir_ (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
 
 

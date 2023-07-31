@@ -194,14 +194,14 @@ function StringSorter (SorterComparer)
 	
 
 
-helper SorterComparer.TestSort
+function SorterComparer.testsort
 	|random| rnd
 	rnd.seed = 123
 	.TestArr(("aaa,bbb,ccc,ddd,fff,eee" / ','))
 	.TestArr(rnd.texts(10000, 10))
 
 	
-helper SorterComparer.TestArr (|[string]| r)
+function SorterComparer.testarr (|[string]| r)
 	r.sort(self)
 	for i in 0 to r.length-2
 		if r[i] > r[i+1]

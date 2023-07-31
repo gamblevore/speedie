@@ -15,13 +15,14 @@
 * render warnings on textview but not on errorlist
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* what about decls? perhaps just relative to a node?
-* occasional tab (in func params) doesn't work.
+* tab on "function app.funcname" (in func params) doesn't work.
 * TextView error/find resync
 * too long text in listview draw as much as we can
 
 
 // Speedie Do later
 * unused func finder doesnt work perfectly on my projects
+* file.wrapsub shows up in autocomplete?
 * x=(*Count)-- doesnt compile but x=*Count-- does?
 * nicer lookups... syntaxis thing can be used elsewhere too! like for almost anything
 	* if it cant be found... allow a second function to be tested.

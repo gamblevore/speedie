@@ -604,7 +604,7 @@ datatype int64
 			fs <~ (self >> 56)|byte|
 			self <<= 8
 
-	helper RenderSizePart (|faststring| fs, |float| Size, |string| Suff)
+	function rendersizepart (|faststring| fs, |float| Size, |string| Suff)
 		|| f = (self|float|/size).Round(10)
 		fs <~ f|int|
 		if f < 120
@@ -641,7 +641,7 @@ datatype int64
 
 
 
-helper _logictest (|uint64| a, |uint64| b, |uint|)
+function _logictest (|uint64| a, |uint64| b, |uint|)
 	|| pa = a&~b
 	|| pb = b&~a // purely...
 	|| ab = a&b
@@ -1323,43 +1323,43 @@ datatype vec2
 			return (v,v)
 
 
-helper vecmix (|vec2|a, |vec2|b, |vec4|)
+function vecmix (|vec2|a, |vec2|b, |vec4|)
 	cpp_part mix22
 	return (a.x, a.y, b.x, b.y)
-helper vecmix (|float|a, |vec2|b, |float|c, |vec4|)
+function vecmix (|float|a, |vec2|b, |float|c, |vec4|)
 	cpp_part mix121
 	return (a, b.x, b.y, c)
-helper vecmix (|vec3|a, |float|b, |vec4|)
+function vecmix (|vec3|a, |float|b, |vec4|)
 	cpp_part mix31
 	return (a.x, a.y, a.z, b)
-helper vecmix (|float|a, |vec3|b, |vec4|)
+function vecmix (|float|a, |vec3|b, |vec4|)
 	cpp_part mix13
 	return (a, b.x, b.y, b.z)
-helper vecmix (|vec2|a, |float|b, |vec3|)
+function vecmix (|vec2|a, |float|b, |vec3|)
 	cpp_part mix21
 	return (a.x, a.y, b)
-helper vecmix (|float|a, |vec2|b, |vec3|)
+function vecmix (|float|a, |vec2|b, |vec3|)
 	cpp_part mix12
 	return (a, b.x, b.y)
-helper ivecmix (|ivec2|a, |ivec2|b, |ivec4|)
+function ivecmix (|ivec2|a, |ivec2|b, |ivec4|)
 	cpp_part imix22
 	return (a.x, a.y, b.x, b.y)
-helper ivecmix (|int|a, |int|b, |ivec2|c, |ivec4|)
+function ivecmix (|int|a, |int|b, |ivec2|c, |ivec4|)
 	cpp_part imix112
 	return (a, b, c.x, c.y)
-helper ivecmix (|int|a, |ivec2|b, |int|c, |ivec4|)
+function ivecmix (|int|a, |ivec2|b, |int|c, |ivec4|)
 	cpp_part imix121
 	return (a, b.x, b.y, c)
-helper ivecmix (|ivec3|a, |int|b, |ivec4|)
+function ivecmix (|ivec3|a, |int|b, |ivec4|)
 	cpp_part imix31
 	return (a.x, a.y, a.z, b)
-helper ivecmix (|int|a, |ivec3|b, |ivec4|)
+function ivecmix (|int|a, |ivec3|b, |ivec4|)
 	cpp_part imix13
 	return (a, b.x, b.y, b.z)
-helper ivecmix (|ivec2|a, |int|b, |ivec3|)
+function ivecmix (|ivec2|a, |int|b, |ivec3|)
 	cpp_part imix21
 	return (a.x, a.y, b)
-helper ivecmix (|int|a, |ivec2|b, |ivec3|)
+function ivecmix (|int|a, |ivec2|b, |ivec3|)
 	cpp_part imix12
 	return (a, b.x, b.y)
 
