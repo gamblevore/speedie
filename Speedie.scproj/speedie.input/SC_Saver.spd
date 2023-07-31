@@ -360,7 +360,7 @@ class SavingTest (saveable)
 	|int|	   Value
 	|int[1]|	ABC
 
-	function constructor  (|int|n)
+	function Constructor  (|int|n)
 		.name = "fred" + n.render
 		.value = 1000 + n
 
@@ -375,5 +375,3 @@ class SavingTest (saveable)
 	// write/load are auto-generated... and collect doesn't need over-riding :)
 
 
-function oo
-	//|| x  = int[4]

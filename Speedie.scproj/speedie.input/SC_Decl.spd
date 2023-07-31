@@ -147,7 +147,7 @@ class SCDecl (SCObject) {
 		.info = .info.set(d, !Value)
 
 
-	function isnil (|bool|)
+	function IsNil (|bool|)
 		return self == typenil
 
 
@@ -179,7 +179,7 @@ class SCDecl (SCObject) {
 		Return dcl
 
 	
-	function better_numeric (|scdecl| o, |scdecl|)
+	function Better_Numeric (|scdecl| o, |scdecl|)
 		opt norefcounts
 										// int+float-->float
 										// int+double-->double
@@ -195,11 +195,11 @@ class SCDecl (SCObject) {
 		return cls.typenormal
 
 
-	function SCDecl.isfloat (|bool|)
+	function SCDecl.IsFloat (|bool|)
 		return .type.typeinfo.isfloat
 
 
-	function datatypecode.better_numeric_sub (|datatypecode| t, |SCClass|)
+	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |SCClass|)
 		|| bits	= .ItemBitCount max t.ItemBitCount
 		// what about a float + an int? f64 right?
 		if .isfloat or t.isfloat
@@ -537,7 +537,7 @@ class SCDecl (SCObject) {
 		return self and (.type == type) and (.isnormalobject)
 
 
-	function isptr (|scclass|type, |bool|)
+	function IsPtr (|scclass|type, |bool|)
 		return self and (.type == type) and .pointercount == 1
 
 		
@@ -564,7 +564,7 @@ class SCDecl (SCObject) {
 			return self isa O.TypeNormal
 	
 	
-	function isuintlike (|bool|)
+	function IsUintLike (|bool|)
 		|| t = .type.typeinfo
 		require .isnormal and .isdatatype and t.isint
 		return !t.IsSigned
@@ -708,7 +708,7 @@ class SCDecl (SCObject) {
 		rz.obj = self
 	
 
-	function message.createnil (|message|)
+	function message.CreateNil (|message|)
 		using (self)
 		rz = «Thg "nil"»
 		rz.Obj = TypeNil

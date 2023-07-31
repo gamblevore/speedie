@@ -117,14 +117,14 @@ render
 		fs <~ " model"
 
 
-function message.alreadysets (|string| name, |bool|)
+function message.AlreadySets (|string| name, |bool|)
 	opt norefcounts
 	for ch in self
 		if SettingSelfProperty(ch) and (ch.first == name)
 			return true
 
 
-function scdecl.ispassable (|bool|)
+function scdecl.IsPassable (|bool|)
 	return .c_array == 0
 
 
@@ -327,7 +327,7 @@ function SCFunction.CopyParams (|message| list)
 	
 
 
-function scfunction.prms (|message|)
+function scfunction.Prms (|message|)
 	return .source.find(@prm)
 
 
@@ -728,11 +728,11 @@ function IsA (|SCClass| S, |bool|) // hassuper, issuper, issubclass
 			return true
 
 
-function real_isa2 (|SCClass| cls, |bool|)
+function Real_Isa2 (|SCClass| cls, |bool|)
 	opt norefcounts // why doesnt the first one do this?
 	return .realclass.isa(cls.realclass)
 
-function real_isa (|SCClass| cls, |bool|)
+function Real_Isa (|SCClass| cls, |bool|)
 	opt norefcounts
 	return .realclass.isa(cls)
 

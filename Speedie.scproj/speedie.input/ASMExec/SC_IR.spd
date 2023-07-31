@@ -25,7 +25,7 @@ struct IR // µfunc uses this. // "class IR"
 	function FilePos (|int|)
 		return .debug >> IR.MsgDebugPosShift
 	
-	function fs (|FastString| fs)
+	function FS (|FastString| fs)
 		opt norefcounts
 		|| op = instruction.typelist[.op] #debug_Require
 		fs <~ op.name

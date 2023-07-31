@@ -44,7 +44,7 @@ module __junktest_5__
 		c
 	|| x = {a, b, c}
 
-	function abc (|bool| g)
+	function Abc (|bool| g)
 		visible
 		|| x = (0, 0|byte|)
 		
@@ -61,10 +61,10 @@ module __junktest_5__
 
 class __junktest_6__
 	module
-		function abcvis (|~int|)
+		function AbcVis (|~int|)
 			visible
 			|| x = ("cpp_name").length?
-	setter abc (|int|)
+	setter Abc (|int|)
 		if value == 1
 
 
@@ -97,7 +97,7 @@ helper int.__junktest_9__ (|int| X, |int| Y, |int| Z=0, |int|)
 	return .__junktest_8__(oof, false)
 
 
-function __junktest_10__
+function __JunkTest_10__
 	// dictionary of int... works?
 	// but i had a bug like this? sigh...
 	//	dict[str] = intgr // fails

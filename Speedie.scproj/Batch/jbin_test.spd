@@ -15,7 +15,7 @@ main
 		b = b.Parsetime.render(writer)
 	  else
 		with b.ParseTime
-			b = .render_jbin(writer)
+			b = .renderjbin(writer)
 	printline outpath
 
 

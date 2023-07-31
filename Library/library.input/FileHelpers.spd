@@ -91,7 +91,7 @@ extend String
 	function Sibling (|string| name, |string|)
 		return .ReplacePathComponent(-1, Name)
 		
-	function file.sibling (|string| name, |file|)
+	function file.Sibling (|string| name, |file|)
 		return super.sibling(name).file
 	
 	function Components (|[string]|)
@@ -335,7 +335,7 @@ extend file
 		|| name = p[dir.length...]
 		rz = "cd $dir; zip  -r  $zip  $name".system
 	
-	function string.shellpath (|string|)
+	function string.ShellPath (|string|)
 		return .replaceall(" ", `\ `)
 		
 	function ZipTmp (|file|)

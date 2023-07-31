@@ -27,7 +27,7 @@ helper Compiler.FileTestsSub (|file| Dest, |file| Src, |string| A, |string| B)
 	check (ReadBack == Jeebox.name) ("Testing link+write failed. Read: " + Readback)
 		
 
-function app.flowtest (|string| path)
+function app.FlowTest (|string| path)
 	|| file = path.file$
 	|| msg = file.parse$
 	|| str = msg.Render$

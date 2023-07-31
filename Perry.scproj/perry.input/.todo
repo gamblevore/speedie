@@ -21,6 +21,7 @@
 
 
 // Speedie Do later
+* report unused funcs!
 * x=(*Count)-- doesnt compile but x=*Count-- does?
 * all lowercase means HELPER!!! What about operators? like "or"?
 	* What about all the current helpers or not? We could warn if they aren't all lower-case?

@@ -3,9 +3,7 @@
 /*
 	Jeebox internals. By Theodore H. Smith...
 */
-function abc
-	|| i = "x"
-	//
+
 
 class SCBehaviour (SCBase)
 	|SCModule|							FuncTayble

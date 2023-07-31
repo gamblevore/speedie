@@ -23,7 +23,7 @@ class SCFile (file)
 		Compiler.stTotalFileCount += .isinternal
 		(SCImport.Recent max= f.modified) 
 		
-	function start_ast (|message|)
+	function Start_AST (|message|)
 		if .IsInternal
 			return message.newwithlayer((Message).createLayer(self), @arg, "")
 

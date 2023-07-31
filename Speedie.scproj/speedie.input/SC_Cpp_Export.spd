@@ -482,7 +482,7 @@ function ExportClass (|SCClass| cls, |FastStringCpp| CppFile)
 function scfunction.CanLibLoad (|bool|)
 	require .exportname
 	require !.disabled and .iscppinbuilt != 2
-	return .isstdlib
+	return .IsSTDLib
 	
 
 function scfunction.WrapName (|string|)
@@ -879,7 +879,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ s
 	
 	
-	function FastString.includeh (|string| name)
+	function FastString.IncludeH (|string| name)
 		self <~ `#include "`
 		self <~ name 
 		self <~ '"'
@@ -1517,11 +1517,11 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		// and i was... too.
 }
 
-function message.safe (|faststring| fs)
+function message.Safe (|faststring| fs)
 	.name.safe(fs)
 
 
-function string.safe (|faststring| fs)
+function string.Safe (|faststring| fs)
 	if .isascii
 		fs <~ self
 		return
@@ -1547,25 +1547,25 @@ class FastStringCpp (FastString)
 	constructor (|string| name = "")
 		.cpp_name = name
 
-	function ringtree.dbglineinfo
-		cpp_name dbglineinfo
-		if (self isa message)
-			|| f = .scfile
-			|| fs = faststring.new
-			fs <~ "pos: "
-			fs <~ .position
-
-			if (f!=nil) and .hasposition
-				|| lines = f.fdata[0, .position].Count('\n')
-				fs <~ " line: "
-				fs <~ lines + 1
-				fs <~ ' '
-
-			printline fs
+//	function ringtree.DBGLineInfo
+//		cpp_name dbglineinfo
+//		if (self isa message)
+//			|| f = .scfile
+//			|| fs = faststring.new
+//			fs <~ "pos: "
+//			fs <~ .position
+//
+//			if (f!=nil) and .hasposition
+//				|| lines = f.fdata[0, .position].Count('\n')
+//				fs <~ " line: "
+//				fs <~ lines + 1
+//				fs <~ ' '
+//
+//			printline fs
 	module
 		|message--| CurrTry
 
 	
 
-function funcsorter_fn (sortercomparer)
+helper funcsorter_fn (sortercomparer)
 	return (a|scfunction|).exportname < (b|scfunction|).exportname

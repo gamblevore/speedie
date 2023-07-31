@@ -21,7 +21,7 @@ linkage
 |SCImport--|						Project
 
 
-function IsSTDLib (|bool|) // islib, isprojlib, isproject, isntproject, isntlib
+function IsSTDLib (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isntlib
 	opt norefcounts
 	return .project.isstdlib?
 
@@ -236,7 +236,7 @@ function LinkagePlace (|message|)
 	return Link[@arg] ?? Place
 
 
-function message.cpp_wrapper (|string|)
+function message.Cpp_Wrapper (|string|)
 	opt norefcounts
 	if self
 		if self == @bra

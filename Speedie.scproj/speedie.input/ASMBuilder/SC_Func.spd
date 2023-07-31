@@ -13,7 +13,7 @@ class µFunc {
 		.fn = fn
 		fn.asm = self
 	
-	function name (|string|)
+	function Name (|string|)
 		return .fn.ExportName
 
 	function Finish (|µFunc1|)

@@ -7,7 +7,7 @@ module Linkage
 	
 	function Interpreter (|bool|)
 		return linkage..interpreter.yes
-	function conf (|string|name, |message|)
+	function Conf (|string|name, |message|)
 		return .dict[name]
 	syntax access (|string| name, |string|)
 		return .flags[name].nyme

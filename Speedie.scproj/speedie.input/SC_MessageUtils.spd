@@ -96,7 +96,7 @@ function Message.IsAssignable (|bool|)
 	return self != @Func and @type and @num // unless... its an assigns func?
 
 
-function message.isint (|bool|)
+function message.IsInt (|bool|)
 	 return (self == @num) and !.name.find('.')
 
 

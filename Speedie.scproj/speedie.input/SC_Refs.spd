@@ -846,7 +846,7 @@ function scdecl.RefDestructor (|message|)
 
 struct abccc
 	|object[99]| KKKKLL
-	function @abccc.test
+	function @abccc.Test
 		visible
 		|abccc| aaa
 	destructor

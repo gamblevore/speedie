@@ -25,7 +25,7 @@ module TextAssembler
 		// how?
 
 
-	function assemble (|message| msg)
+	function Assemble (|message| msg)
 		opt norefcounts
 		for ch in msg
 			if ch istmp "asm"
@@ -95,12 +95,12 @@ module TreeAssembler
 			.StampAll(compiler.funclist)
 
 
-	function asm_test_add (|int| a, |int| b, |int|)
+	helper asm_test_add (|int| a, |int| b, |int|)
 		cpp_name asm_test_sub
 		return (a + b) - (a / b)
 
 
-	function asm_test_func (|int| a, |int| b, |int|)
+	helper asm_test_func (|int| a, |int| b, |int|)
 		cpp_name asm_test
 		return asm_test_add(b*b, a*a)
 

@@ -185,7 +185,7 @@ extend Error
 			fs <~ ":"
 
 
-	render render_unix
+	render Render_Unix
 // <path>:<line number>:<bytedownline>: error/warning: <message>
 ///.../Speedie.scproj/BuildTest/JB.cpp:2679:10: error: conflicting types for 'JB__Comp_InputFile'
 

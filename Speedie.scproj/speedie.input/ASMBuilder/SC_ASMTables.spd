@@ -125,7 +125,7 @@ datatype ASMtmp (MsgUIFlags)
 function Message.TmpType (|ASMTmp|)
 	return .flags & 63
 
-function Message.tmptype (assigns:|ASMTmp| value)
+function Message.TmpType (assigns:|ASMTmp| value)
 	.flags = (.flags &~ 63) (|) value
 
 

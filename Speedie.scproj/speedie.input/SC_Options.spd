@@ -8,7 +8,7 @@ constants
 module Options
 	flags: native,pack
 	
-	function strnil (assigns:|int|)
+	function StrNil (assigns:|int|)
 		.NilStrength = value.clamp(errorseverity.hint, errorseverity.error)
 
 		
@@ -104,7 +104,6 @@ module Feedback
 		if ("".length == 1)
 			"".debugprint // stop from being stripped
 			nil|message|.jdb2
-			nil|message|.dbglineinfo
 			nil|message|.LocateAll
 	
 	
@@ -467,9 +466,9 @@ module Feedback
 			return true
 
 
-	function string.optionbool (|bool|)
+	function string.OptionBool (|bool|)
 		return (self ~= "" or "true" or "yes")
-	function string.optionint (|int|)
+	function string.OptionInt (|int|)
 		if .optionbool
 			return 1
 		return .int

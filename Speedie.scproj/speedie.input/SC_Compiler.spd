@@ -168,7 +168,6 @@ function CompileAll (|bool|)
 
 	require .Stage( "Stripping dead code" )
 	.DeadStrip
-	CodeSorter.LeafsFirst		// super-refcounter wants this
 	
 	require .Stage( "NilChecking" )
 	.Timer( "NilChecking" )
@@ -902,6 +901,8 @@ function DeadStrip
 	for c in .classlist
 		if c.CurrReacher // shorten-discovery-chains, 
 			c.ReachBehaviours // behaviour chains tend to be long.
+
+	CodeSorter.LeafsFirst		// super-refcounter wants this
 		
 	
 			
@@ -1099,14 +1100,14 @@ function ProjName (|String|)
 
 
 module depthtest
-	function x				// 2 or 4?
+	function X				// 2 or 4?
 		.a3
 		.a1
 		.r1
 		
 		
-	function a1: .a2     		// 3
-	function a2: .a3    		// 2
-	function a3:				// 1
-	function r1: .r2			// r
-	function r2 {.r1, .a1, .a3}	// r
+	function A1: .a2			// 3
+	function A2: .a3			// 2
+	function A3:				// 1
+	function R1: .r2			// r
+	function R2 {.r1, .a1, .a3}	// r

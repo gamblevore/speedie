@@ -85,6 +85,7 @@ struct ASMFuncState
 			return (fn)(self, exp, reg)
 		debugger
 
+
 	function µ2 (|message| exp, |AsmReg|)
 		cpp_part RegSaved
 		rz = .µ(exp)
@@ -211,7 +212,7 @@ function ASMFuncState.FinishASM
 		.AddASM(.fn.source, asm.RET, 0)
 
 
-function @fn_asm.default (fn_asm)
+function @fn_asm.Default (fn_asm)
 
 
 function @fn_asm.InitTable

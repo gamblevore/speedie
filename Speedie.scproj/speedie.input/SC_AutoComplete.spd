@@ -160,8 +160,10 @@ function Compiler.ErrorsToPerry (|message|)
 	compiler.PrePrintErrors
 	return .BuildErrors(errorseverity.warning).parse
 
-function message.compiles (|bool|)
+
+function message.Compiles (|bool|)
 	return self ~= "compile" or "debug"
+
 
 function ReportBuild (|message| cmd, |message|)
 	if stderr.ok and cmd.compiles
@@ -299,7 +301,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 		return fn
 
 
-function scfunction.update_source (|int| start, |string| text, |scfile| myfile, |scobject| orig, |bool|)
+function scfunction.Update_Source (|int| start, |string| text, |scfile| myfile, |scobject| orig, |bool|)
 	scfunction.currfunc = self
 	parser.usingpos = -1
 	parser.insertedflags = 0 // oop
@@ -482,7 +484,7 @@ function SCDecl.RealName (|string|)
 	return .name // sigh... 
 
 
-function SCObject.auto_type (|int|)
+function SCObject.Auto_Type (|int|)
 	if self isa scdecl
 		if self is property
 			return -2
@@ -634,7 +636,7 @@ function FuncTmps (|message|)
 		ch.func = @dot
 
 
-function message.autocomplete_state (|int|)
+function message.Autocomplete_State (|int|)
 	|| s = .name
 	rz += (s contains 'R')<<0
 	rz += (s contains 'M')<<1
@@ -1126,7 +1128,7 @@ function message.FindPosSub (|int| fr, |int| len, |bool| Exact, |message|)
 
 
 extend message
-	render jdb4_
+	render JDB4_
 		fs <~ .Func.name
 		fs <~ ' '
 		if (.name)
@@ -1146,7 +1148,7 @@ extend message
 			fs.IndentLine
 
 
-	api message.jdb4 (|string|)
+	api message.JDB4 (|string|)
 		cpp_name jdb4
 		visible
 		printline .jdb4_

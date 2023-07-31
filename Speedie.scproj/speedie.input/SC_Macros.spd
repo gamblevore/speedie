@@ -76,7 +76,7 @@ function message.TargetTest (|bool|) // target true, target false,
 	return targets[.name]
 
 
-function message.tran_target (|message|)
+function message.Tran_Target (|message|)
 	.tran_targetsub
 	rz  = .next
 	rz := .flatafter

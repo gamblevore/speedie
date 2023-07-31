@@ -158,6 +158,15 @@ function Message.TestFuncName (|bool|)
 	return true
 
 
+function string.IsFuncHelper	(|bool|)
+	opt norefcounts
+	for c in self
+		if c.IsUpper or c >= 128
+			return false
+		if c.IsLower
+			return true
+
+
 function ParseName (|Message| node, |bool|)
 	opt norefcounts
 	|| fType = node.name
@@ -165,8 +174,8 @@ function ParseName (|Message| node, |bool|)
 	cname.func = @thg
 	.Name = cname.name
 
-	if fType ~!= "helper"
-		if .name.IsLower
+	if fType ~!= "helper" and "prototype"
+		if .name.IsFuncHelper
 			deprecate (node, "Function name should have one uppercase letter.")
 		if fType == "api"
 			.isapi = true
@@ -1787,7 +1796,7 @@ function scfunction.SetBlindCasts (|scbase| name_space)
 		.BlindCasts		= scimport.curr.blindcast
 
 
-function scfunction.init_sub (|message| node,  |scbase| name_space)
+function scfunction.Init_Sub (|message| node,  |scbase| name_space)
 	|| arg = node.NormaliseFunc
 	node.obj = self
 	if name_space

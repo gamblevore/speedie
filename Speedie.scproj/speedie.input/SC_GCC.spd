@@ -381,7 +381,7 @@ function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 	return .ExecuteGCC( CompileString )
 
 
-function saytest (|int| n)
+function SayTest (|int| n)
 	"\n()   Test$n   ()"
 
 

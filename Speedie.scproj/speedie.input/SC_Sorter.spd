@@ -9,6 +9,8 @@ module CodeSorter
 		opt norefcounts
 		for f in compiler.FuncList
 			f.FindDepths
+			if !f.IsSTDLib and !f.IsVisible
+				deprecate (f.source, "Unused function")
 		compiler.funclist.sort(LeafFunctionsSorter)
 
 

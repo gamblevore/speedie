@@ -55,7 +55,7 @@ function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |scbase| name_space)
 				stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", fn.blindcasts)
 
 
-function scdecl.exists (|bool|)
+function scdecl.Exists (|bool|)
 	return self and self != typevoid and typenil
 			
 
@@ -232,7 +232,7 @@ function TypeOfChar (ExprResolver)
 || CSNum			= "09..".charset
 
 
-function message.unitmatch (|string| a, |string|b, |bool|)
+function message.UnitMatch (|string| a, |string|b, |bool|)
 	opt norefcounts
 	|| unit = .name
 	if unit == a: return true
@@ -574,7 +574,7 @@ function SCModule.IsMArray (|message| arr, |bool|)
 
 
 
-function message.expectmatch (|scbase| name_space, |scclass| With, |bool|)
+function message.ExpectMatch (|scbase| name_space, |scclass| With, |bool|)
 	return .ExpectClass(TypeOfExprNeeded( self, name_space ), With)
 
 function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
@@ -1046,7 +1046,7 @@ fail
 */
 
 
-function message.expfunc (|scfunction|)
+function message.ExpFunc (|scfunction|)
 	opt norefcounts
 	|| it = .unbra.last
 		|| fn = it.obj 
@@ -1381,7 +1381,7 @@ function string.IsZero (|bool|)
 	return true
 
 
-function message.iszero (|bool|)
+function message.IsZero (|bool|)
 	return  (self == @num)  and  (.name.iszero)
 
 

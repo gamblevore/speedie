@@ -182,7 +182,7 @@ struct ArgArrayCounter
 	|bool| IsItem
 	|bool| IsNotItem
 	
-	function check (|message| exp)
+	function Check (|message| exp)
 		if (.isitem and .isnotitem)
 			error (exp, "Mixed indexes found. (Some have ':' and some don't)")
 

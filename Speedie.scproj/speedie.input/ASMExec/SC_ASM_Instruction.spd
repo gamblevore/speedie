@@ -74,7 +74,7 @@ class Instruction // class instruction
 		syntax Access (|int| pos, |instruction|)
 			return .TypeList[pos]
 		
-		function add (|string| FormName, |string| name, |int| pos)
+		function Add (|string| FormName, |string| name, |int| pos)
 			|| ins = instruction(formname, name, pos)
 			.typelist[pos] = ins
 			.typedict[name] = ins

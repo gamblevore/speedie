@@ -5,7 +5,7 @@
 
 
 
-function scclass.falsify (|message| ques, |message|)
+function scclass.Falsify (|message| ques, |message|)
 	opt norefcounts
 	|| f = .false
 	if f.hasany

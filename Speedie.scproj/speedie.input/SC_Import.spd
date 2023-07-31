@@ -130,7 +130,7 @@ class SCImport
 		link.remove
 		
 
-	function message.blind (|errorseverity|)
+	function message.Blind (|errorseverity|)
 		return ErrorSeverity.find(.name, self)
 
 	function IncludeCHeaders (|file| f, |[string]| output)

@@ -215,6 +215,8 @@ function Message.CollectFuncTableName (|string|)
 	//	@msg.ID-->"msg"
 	//	"abc"-->"abc"
 	//	why? why not?
+	if self == @name
+		return .name.UpperCase
 	if .name and self != @dot
 		Return .Name
 
