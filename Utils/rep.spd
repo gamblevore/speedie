@@ -2,12 +2,17 @@
 // seems good?
 main
 	expect app.args != 4  "Usage: rep Directory Func From To"
-	|| Directory = app[0].ExistingFile
+	|| F = app[0].ExistingFile
 	require stderr.ok
-	
-	for f.flat in Directory
-		if f isfile "spd"
-			require f.SyntacticReplace
+	.Replace(F)
+
+
+function app.Replace (|file| p, |bool|)
+	if p isfile "spd"
+		return p.SyntacticReplace
+		
+	for f.files in p
+		.replace(f)
 
 
 function file.SyntacticReplace (|bool|)
@@ -27,7 +32,7 @@ module rep
 	|int|		Where = 0
 	|bool|		Aware = app..caseaware.yes
 	
-	function match (|message| msg, |bool|)
+	function Match (|message| msg, |bool|)
 		return (msg == .func)  and  msg.syntaxequals(.from, .aware)
 		
 

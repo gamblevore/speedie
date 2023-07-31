@@ -23,7 +23,7 @@ function App.FindRemover (|string|)
 		return s.PathDir
 		
 
-function app.collect (|file| f)
+function app.Collect (|file| f)
 	require	f
 	if f.IsDir
 		for c.files in f

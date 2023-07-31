@@ -1,9 +1,0 @@
-#!/usr/local/bin/spd
-
-main
-	|| args = app.args 
-	expect (args <= 1) "Too many args ${args.length} expected 0-1"
-	|| size = 10000000
-	if args == 1
-		size = args[0].int
-	jbin.ParseSpeedTest(Size)

@@ -24,7 +24,7 @@ class Country
 		  else
 			"$.name loses ${damage}m pop and died :("
 			
-	function alive (|bool|)
+	function Alive (|bool|)
 		return .population > 0
 		
 

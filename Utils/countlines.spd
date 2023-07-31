@@ -5,5 +5,5 @@ function string.CountLines (|int|)
 		if c == '\n'
 			rz++
 
-main (|string| text)
-	printline text.countlines
+main
+	printline app[0].countlines

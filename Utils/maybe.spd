@@ -6,7 +6,7 @@ targets: flow
 class Person
     |int| age
     |string| name
-    setter age (|int|)
+    setter Age (|int|)
         expect (value > 0 and value < 300) "Age $value out of range on ${.name}"
         .age = value
 
@@ -19,7 +19,7 @@ main
 		app.stuff
 	
 
-function printnum (|int64| b1)
+function PrintNum (|int64| b1)
 	"${B1.strsize} = $B1"
 
 
@@ -57,7 +57,7 @@ function app.Stuff
 	FlowControl.Disabled--
     
     || G = RPGHero("fred")
-    (DoAction["jump"])(G, "hes scared")
+    (*DoAction["jump"])(G, "hes scared")
 
 
 prototype SayerFunction (|string| input)

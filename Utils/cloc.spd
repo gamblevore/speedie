@@ -63,12 +63,12 @@ module Counts
 		
 
 
-function string.loc (|int|)
+function string.LOC (|int|)
 	for s.lines in self
 		rz += s.OutWhite >= 0
 
 
-function file.cloc
+function file.CLOC
 	if counts.PrintTree
 		require StdErr.ok
 		expect (!counts.PrintedTree) "Can't have multiple files, with printtree."
@@ -150,7 +150,7 @@ function Counts.ReportHisto
 		""
 
 
-function Counts.report
+function Counts.Report
 	if !app.yes("k")
 		stderr.clear
 	require !counts.PrintTree
