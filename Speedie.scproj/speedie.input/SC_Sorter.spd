@@ -2,7 +2,6 @@
 
 
 ///// LEAF SORTING
-// perhaps not needed right now. We can move some other sort functions in here.
 
 module CodeSorter
 	function LeafsFirst
