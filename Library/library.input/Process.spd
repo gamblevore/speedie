@@ -309,7 +309,7 @@ class Process
 		require msg
 		msg.renderjbin(.writer)
 		target debug
-			|| reparse = string.copy(.ours.data, .writer.length).parse_jbin
+			|| reparse = string.copy(.ours.data, .writer.length).parsejbin
 			if !reparse // sigh. still? i guess we just leave this in then
 			(reparse)
 		.WriteSub
