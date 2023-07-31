@@ -78,7 +78,7 @@ class FastString {
 	function Copy (|string|)
 		cpp_wrapper JB_FS_Copy
 
-	function noob (|uint64| n)
+	function Noob (|uint64| n)
 		if n < 224
 			self <~ n|byte|
 		  else
@@ -205,7 +205,7 @@ class FastString {
 		cpp_wrapper JB_FS_AppendCString
 
 	
-	function field (|string| name, |string| data)
+	function Field (|string| name, |string| data)
 		cpp_part AppendInfo
 		if data
 			.fieldstart(name)
@@ -216,25 +216,25 @@ class FastString {
 	function PadTo (|int|n, |byte| b=' ')
 		self <~ (b, n-.length)
 	
-	function fieldstart (|string| name)
+	function FieldStart (|string| name)
 		.IndentLine
 		if name
 			self <~ name
 			self <~ ' '
 
 
-	function fieldenter (|string| name)
+	function FieldEnter (|string| name)
 		.fieldstart(name)
 		.indent++
 
-	function field (|string| name, |int64| data)
+	function Field (|string| name, |int64| data)
 		cpp_part AppendInfoNum
 		if data
 			.fieldstart(name)
 			self <~ data
 			
 	
-	function fieldf (|string| name, |f64| data)
+	function FieldF (|string| name, |f64| data)
 		cpp_part AppendInfoFloat
 		if data
 			.fieldstart(name)
@@ -271,7 +271,7 @@ class FastString {
 	function Grew (|int|m, |bool|)
 		cpp_wrapper
 
-	macro syntaxappend
+	macro SyntaxAppend
 		_.render(self)
 
 	syntax Compare (|int| n, |bool|Aware, |int|)

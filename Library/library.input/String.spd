@@ -105,7 +105,7 @@ class String
 			require !s.islower
 		return true
 
-	function group (|int| i, |int|) // replace this with charprops.spd?
+	function Group (|int| i, |int|) // replace this with charprops.spd?
 		|| b = self[i]
 		if b.IsUpper
 			return 1
@@ -180,10 +180,10 @@ class String
 	function ParseInt (|Message| Where=nil, |int64|) 
 		cpp_Wrapper JB_Str_TextIntegerValid
 	
-	function int (|int64|)
+	function Int (|int64|)
 		return .parseint
 	
-	function float (|f64|)
+	function Float (|f64|)
 		return .parsefloat(nil)
 	
 	function ParseFloat (|Message| Where=nil, |f64|)
@@ -368,7 +368,7 @@ class String
 	helper Append (|string| b, |string| c, |string| d, |string| e, |string| f="")
 		cpp_wrapper JB_Str_Append6
 		
-	function insert (|string| s, |int| i, |int| n = 0, |string|)
+	function Insert (|string| s, |int| i, |int| n = 0, |string|)
 		if i < 0
 			n += i
 			i = 0
@@ -405,7 +405,7 @@ class String
 					return false
 			return true
 	
-	function cstr (|stringZeroTerminated|)
+	function CStr (|stringZeroTerminated|)
 		cpp_Wrapper JB_Str_MakeC
 
 	module
@@ -665,7 +665,7 @@ struct StringLengthSplit
 			yield .name[spos, spos+.size]
 			spos += .size
 	
-	function list (|array of string|)
+	function List (|array of string|)
 		opt norefcounts
 		for s in self
 			rz <~ s

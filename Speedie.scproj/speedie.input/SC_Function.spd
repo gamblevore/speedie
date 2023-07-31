@@ -158,9 +158,21 @@ function Message.TestFuncName (|bool|)
 	return true
 
 
-function ParseName (|Message| cName, |bool|)
+function ParseName (|Message| node, |bool|)
+	opt norefcounts
+	|| fType = node.name
+	|| cname = node.first
 	cname.func = @thg
 	.Name = cname.name
+
+	if fType ~!= "helper"
+		if .name.IsLower
+			deprecate (node, "Function name should have one uppercase letter.")
+		if fType == "api"
+			.isapi = true
+		  elseif fType == "setter"
+			.isassigns = 2
+
 	if .cls
 		if cname ~= "constructor"
 			.AllocCode = kIsConstructor
@@ -1633,15 +1645,16 @@ function NewCppWrapper (CollectFunc)
 
 
 function NewSetter (CollectFunc)
-	expect (name_space isa scclass) (errplace, "Must go in a class")
+	expect (name_space isa SCClass) (errplace, "Must go in a class")
 	return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 
 function NewHelper (CollectFunc)
-	node.name = "function"
+	if !node.name.IsLower
+		deprecate (node, "Helpers need lowercase names")
 	rz = SCFunction.NewFunc( node, name_space, ErrPlace )
 	if rz
-		rz.noautocomplete = 2
+		rz.NoAutoComplete = 2
 
 
 function SCBase.StoreLinkToMe (|&(dictionary of SCBase)| dp)
@@ -1766,13 +1779,6 @@ function scfunction.updateSourceSub (|message| source, |bool|)
 		stderr.clear // lol
 
 
-function scfunction.SetFuncType (|message| node)
-	if node == "api"
-		.isapi = true
-		node.name = "function"
-	  elseif node ~= "setter"
-		.isassigns = 2
-
 
 function scfunction.SetBlindCasts (|scbase| name_space)
 	if name_space and name_Space.project
@@ -1791,8 +1797,7 @@ function scfunction.init_sub (|message| node,  |scbase| name_space)
 		.refs = name_space.getasmodule$.defaultrefs
 		scfunction.currfunc = self
 	
-	.SetFuncType(node)
-	.ParseName( node.first )
+	.ParseName( node )
 	using ErrorDelayer // not a terrible error but still an error 
 		.PreProcessExpects
 		.TranStrings 

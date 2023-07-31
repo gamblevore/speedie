@@ -70,7 +70,7 @@ class Message (RingTree)
 		.tag		= parser.UsingTag // why not...
 
 
-	function syxid (|int|)
+	function SyxId (|int|)
 		return .Func|int|
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -577,11 +577,11 @@ class Message (RingTree)
 		fs <~ self
 
 	
-	function jdb_  (|faststring|fs_in=nil, |int| flags=1, |string|)
+	function JDB_  (|faststring|fs_in=nil, |int| flags=1, |string|)
 		return .jdb2_(flags, fs_in)
 
 
-	render jdb2_  (|int| Flags = 1)			//  function ast,  message.ast
+	render JDB2_  (|int| Flags = 1)			//  function ast,  message.ast
 		if flags&1
 			fs <~ "«"
 		fs <~ .Func.name
@@ -1023,7 +1023,7 @@ class Message (RingTree)
 		cpp_part AppendNum
 		@num.msg(self, num.render)
 
-	setter int (|int64|)
+	setter Int (|int64|)
 		.Func = @num
 		.name = Value.Render // later we can do this a different way. Like directly
 	
@@ -1054,14 +1054,14 @@ class Message (RingTree)
 	function Hex (|int64|)
 		return .name.parseint(self)
 
-	function float32 (|float|)
+	function Float32 (|float|)
 		|| d = .float
 		expect (d.abs <= float.max) ("Float64 got clipped in a float32")
 		return d
 
-	function range (|intrange|)
+	function Range (|intrange|)
 		return (.position, .position+.RangeLength)
-	function range (assigns:|intrange|r)
+	function Range (assigns:|intrange|r)
 		.position = r.x
 		.RangeLength = r.width
 
@@ -1080,7 +1080,7 @@ class Message (RingTree)
 				rz.x = rz.x min ss.x
 				rz.x2 = rz.x2 max ss.x2
 		
-	function ivec4 (|ivec4|)
+	function iVec4 (|ivec4|)
 		opt norefcounts
 		if self
 			|| c = .first

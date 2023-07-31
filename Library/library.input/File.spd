@@ -33,7 +33,7 @@ class File (String)
 	function Mode (|FileMode|)
 		cpp_Wrapper JB_File_Mode
 	
-	function path (|string|)
+	function Path (|string|)
 		cpp_Wrapper JB_File_Path
 
 	function Mode (assigns:|FileMode|)
@@ -96,7 +96,7 @@ class File (String)
 	function string.visible (|bool|)
 		return .name[0] != '.'
 		
-	function hidden (|bool|)
+	function Hidden (|bool|)
 		return !.visible
 
 	function SmartData (assigns:|String| nieu, |bool|)
@@ -421,7 +421,7 @@ class File (String)
 	function Read (|int| Length, |bool|AllowMissing=true, |string|)
 		cpp_wrapper JB_File_Read
 
-	function skip (|int| n=1)
+	function Skip (|int| n=1)
 		.offset += n
 
 	iterator
@@ -520,7 +520,7 @@ class File (String)
 			|| n = "/Contents/MacOS/" + .trimextandpath
 			return .child(n).anydate
 
-	function anydate (|date|)
+	function AnyDate (|date|)
 		return .created ?? .modified
 
 

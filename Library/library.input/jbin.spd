@@ -74,21 +74,21 @@ role JBin (Faststring)
 	constructor (|int| n)
 		cpp_part Constructor0
 		if n // what?
-	function enter		(|syntax| type=@arg, |string| data="")
+	function Enter		(|syntax| type=@arg, |string| data="")
 		.add(type, data, true)
-	function addstr		(|string| data)
+	function AddStr		(|string| data)
 		.add(@str, data)
-	function addint		(|int64| data)
+	function AddInt		(|int64| data)
 		.add(@num, data.render)
-	function add		(|syntax| type, |string| data="", |bool|into = false)
+	function Add		(|syntax| type, |string| data="", |bool|into = false)
 		|| L = data.length
 		|| addr = (data.addr, nil)(L)
 		.addmemory(type, addr, into, L)
-	function add		(|syntax| type, |faststring| fs, |bool|into = false)
+	function Add		(|syntax| type, |faststring| fs, |bool|into = false)
 		cpp_part AddFS
 		.addmemory(Type, fs.resultptr, into, fs.length)
 
-	function addcomp (|faststring| fs, |int| strength=mzlab.strongest)
+	function AddComp (|faststring| fs, |int| strength=mzlab.strongest)
 		if strength > 0
 			|| Place = .OpenSection
 			fs.compressinto(self, strength)
@@ -96,13 +96,13 @@ role JBin (Faststring)
 		  else
 			.add(@str, fs)
 		
-	function sheb		(|string| data)
+	function Sheb		(|string| data)
 		self <~ '#'
 		self <~ '!'
 		self <~ data
 		self <~ '\n' // noice
 
-	function up (|int| amount = 1) // we encode the upness in the range of syntax values that have no children
+	function Up (|int| amount = 1) // we encode the upness in the range of syntax values that have no children
 		|| add = (@cnj|int|)-1
 		while amount > 0
 			|| expr  = (add + amount)  min  (@bin|int|)

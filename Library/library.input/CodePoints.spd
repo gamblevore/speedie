@@ -30,7 +30,7 @@ datatype Codepoint (uint)
 		return self == ' ' or '\n' or '\r' or '\t' 
 	function In (|int| a, |int| b, |bool|)
 		return  (self - a)|codepoint| <= (b-a)|codepoint|
-	function str (|string|)
+	function Str (|string|)
 		return string.char(self)
 	syntax cast (|string|)
 		return string.char(self)

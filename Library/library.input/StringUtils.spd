@@ -81,14 +81,14 @@ function string.Appender7 (|string| a, |string| b, |string| c, |string| d, |stri
 */ // do later. compiler can use this :)
 
 
-function string.operatorplus (|cstring| c, |string|)
+function string.OperatorPlus (|cstring| c, |string|)
 	if self
 		|| tmp = c.temp
 		return self + (&tmp)|string|
 	return c.str
 
 
-function cstring.operatorplus (|string| s, |string|)
+function cstring.OperatorPlus (|string| s, |string|)
 	if s
 		|| tmp = .temp
 		return (&tmp)|string| + s
@@ -99,7 +99,8 @@ struct FakeJBString
 	|int| Length
 	|&byte| Addr
 
-function cstring.temp (|fakejbstring|)
+
+helper cstring.temp (|fakejbstring|)
 	rz.refcount = 0
 	rz.length = .length
 	rz.addr = self|&byte|
@@ -121,7 +122,7 @@ function String.ExtractPathAndLine (|&ivec2| LineAndByte, |string|)
 		rz = rz.Resolve(fileResolveMode.allowmissing)
 
 
-helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
+helper string.wrapsub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 	|| i		= p
 	|| ParaMax	= 1K
 	MaxWidth	= MaxWidth min Paramax

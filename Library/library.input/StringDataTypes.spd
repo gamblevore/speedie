@@ -87,7 +87,7 @@ datatype byte
 		return  self >= a  and  self <= b
 	
 	module
-		function new (|int| n, |&byte|)
+		function New (|int| n, |&byte|)
 			cpp_wrapper JB_zalloc
 
 
@@ -97,7 +97,7 @@ datatype cstring
 		cpp_wrapper strlen
 	function Copy (|string|)
 		return string.copy(self|&byte|, .length)
-	function puts
+	function Puts
 		cpp_wrapper puts // hehe
 	function Str (|string|)
 		return string.fromc(self)
@@ -107,7 +107,7 @@ datatype cstring
 		  else
 			return .copy
 	module
-		function new (|[string]| r, |cstring[]|)
+		function New (|[string]| r, |cstring[]|)
 			|| n = r.length
 			rz = memory(n, platform.PointerBytes)
 			for i in n

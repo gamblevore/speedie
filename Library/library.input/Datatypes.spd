@@ -9,27 +9,27 @@ datatype int
 	default 0
 
 	module
-		function max (|int|)
+		function Max (|int|)
 			return 0x7FFFffff_
-		function min (|int|)
+		function Min (|int|)
 			return 0x80000000_
 
-	operator avg (|int| n, |int|)
+	operator Avg (|int| n, |int|)
 		return (self+n)/2
 
-	operator in (|ivec2| i, |bool|)
+	operator In (|ivec2| i, |bool|)
 		return self >= i.x and self <= i.y
 		
-	operator bits (|int| n, |int|)
+	operator Bits (|int| n, |int|)
 		return self & n.bits
 
-	operator dtf (|uint| belf, |bool|)
+	operator DTF (|uint| belf, |bool|)
 		return self and ((self&belf) == belf)
 
-	operator ftd (|uint| belf, |bool|)
+	operator FTD (|uint| belf, |bool|)
 		return self and ((self&belf) == self)
 
-	function bits (|int|)
+	function Bits (|int|)
 		return (1<<self)-1
 		
 	syntax compare (|string|s, |bool| aware, |int|)
@@ -39,7 +39,7 @@ datatype int
 	syntax access (|int| bit, assigns:|bool|, |int|)
 		|| mask = 1<<bit
 		return (self &~ mask) (|) (value << bit) 
-	function clz (|int|)
+	function Clz (|int|)
 		cpp_inbuilt __builtin_clz
 	
 
@@ -78,22 +78,22 @@ datatype int
 		fs.appendintegerastext(self, zeros)
 
 	
-	operator min (|int| other, |int|)
+	operator Min (|int| other, |int|)
 		if self < other: return self
 		return other
 
 
-	operator absmin (|int| other, |int|)
+	operator AbsMin (|int| other, |int|)
 		if .abs < other.abs: return self
 		return other
 
 
-	operator max (|int| other, |int|)
+	operator Max (|int| other, |int|)
 		if self > other: return self
 		return other
 
 
-	operator xor (|int| X, |int|)
+	operator XOR (|int| X, |int|)
 		return self ^ X
 
 	
@@ -104,10 +104,10 @@ datatype int
 	function Log2 (|int|) // highestbit, highbit
 		cpp_wrapper JB_Int_Log2
 
-	function ctz (|int|)
+	function Ctz (|int|)
 		cpp_wrapper JB_Int_CTZ
 		
-	function tri (|int|)
+	function Tri (|int|)
 		return (self*(self+1))/2
 
 	operator ± (|int|i, |int|)
@@ -181,7 +181,7 @@ datatype Ind (int) // an INDex. And an INT.
 	false -1
 	syntax cast (|bool|)
 		return self >= 0
-	function exists (|bool|)
+	function Exists (|bool|)
 		return self >= 0
 
 
@@ -238,7 +238,7 @@ datatype uint
 		max = 0xffffFFFF_
 		min = 0
 	
-	function clearhigh (|int| p8, |uint|)
+	function ClearHigh (|int| p8, |uint|)
 		self <<= p8
 		self >>= p8
 		return self
@@ -246,7 +246,7 @@ datatype uint
 	operator isa (|uint| n, |bool|)
 		return !(self mod n)
 
-	function crc (|byte| b, |uint|)
+	function Crc (|byte| b, |uint|)
 		cpp_inbuilt __builtin_ia32_crc32qi
 		
 	operator rotl (|int| Amount, |uint64|)
@@ -268,12 +268,12 @@ datatype uint
 	function IsPow2 (|bool|)
 		disabled ".IsPo2"
 	
-	function isknown (|bool|)
+	function IsKnown (|bool|)
 		return .ispo2
 
-	function hash (|uint|)
+	function Hash (|uint|)
 		cpp_wrapper 
-	function unhash (|uint|)
+	function Unhash (|uint|)
 		cpp_wrapper 
 	
 	function SwapEndian (|uint|)
@@ -313,13 +313,13 @@ datatype uint
 
 
 datatype U24_8 (uint)
-	function big (|uint|)
+	function Big (|uint|)
 		return self >> 8
-	function big (assigns:|uint| v, |U24_8|)
+	function Big (assigns:|uint| v, |U24_8|)
 		return (self & 255) (|) (v << 8)
-	function small (|uint|)
+	function Small (|uint|)
 		return self & 255
-	function small (assigns:|uint| v, |U24_8|)
+	function Small (assigns:|uint| v, |U24_8|)
 		return (self & ~255) (|) (v & 255)
 
 
@@ -394,15 +394,15 @@ datatype float
 //		cpp_part AsDate
 //		return self * date.kTicks
 	module
-		function max (|float|)
+		function Max (|float|)
 			cpp_wrapper
-		function nan (|float|)
+		function Nan (|float|)
 			cpp_wrapper
 	
 	render
 		fs <~ self
 
-	render pc
+	render PC
 		if !self
 			fs <~ "0"
 		  else
@@ -438,7 +438,7 @@ datatype float
 	operator avg (|float| f, |float|)
 		return (f + self) * 0.5
 	
-	function bounce (|float|)
+	function Bounce (|float|)
 		|| f = .fract
 		if self|int| isa 2
 			return f
@@ -448,10 +448,10 @@ datatype float
 		disabled "what usse this even?"
 		return (self - other).abs < 0.0001 // seems close enough?
 	
-	function mix (|float| y, |float| a, |float|)
+	function Mix (|float| y, |float| a, |float|)
 		return self * (1.0 - a) + (y * a)
 
-	function smoothstep (|float|)
+	function SmoothStep (|float|)
 		|| x = .clamp-0.5
 		return x * x * (3 - 2 * x)
 
@@ -505,7 +505,7 @@ datatype f64
 	operator pow (|f64| other, |f64|)
 		cpp_wrapper (pow)
 
-	function abs (|f64|)
+	function Abs (|f64|)
 		cpp_wrapper (fabs)
 
 	operator max (|f64| other, |f64|)
@@ -561,7 +561,7 @@ datatype int64
 			return d
 		return self
 		
-	function abs (|int64|)
+	function Abs (|int64|)
 		return (-self,self)(self < 0)
 
 	operator rotl (|int| Amount, |int64|)
@@ -612,7 +612,7 @@ datatype int64
 			fs <~ frac
 		fs <~ suff
 		
-	render strsize
+	render StrSize
 		if self <= 512
 			fs <~ self
 		  elseif self <= 900KB
@@ -640,7 +640,7 @@ datatype int64
 
 
 
-function _logictest (|uint64| a, |uint64| b, |uint|)
+helper _logictest (|uint64| a, |uint64| b, |uint|)
 	|| pa = a&~b
 	|| pb = b&~a // purely...
 	|| ab = a&b
@@ -664,7 +664,7 @@ datatype uint64
 	operator isa (|uint| n, |bool|)
 		return !(self mod n)
 	
-	function exists (|uint|)
+	function Exists (|uint|)
 		return (self|bool|)|uint|
 	
 	function High (|uint|)
@@ -724,7 +724,7 @@ datatype uint64
 	operator crc (|uint64| Other, |uint64|)
 		cpp_wrapper _mm_crc32_u64
 	
-	function isknown (|bool|)
+	function IsKnown (|bool|)
 		return .ispo2
 	
 	iterator bits				// Get 1 bit of the original per loop
@@ -770,18 +770,18 @@ datatype bool
 	
 	operator sign (|int| i, |int|)
 		return (i, -i)(self)
-	function bool (|int| i, |int|)
+	function Bool (|int| i, |int|)
 		disabled "use operator sign"
-	function sign
+	function Sign
 		disabled "use .dir"
 
-	function set (|int| old, |int| flag, |int|)
+	function Set (|int| old, |int| flag, |int|)
 		cpp_part setflag
 		if self
 			return old (|) flag
 		return old &~ flag
 		
-	function dir (|int|)
+	function Dir (|int|)
 		return (self|int|<<1)-1
 	
 	function Render (|string|)
@@ -811,30 +811,30 @@ datatype vec4
 	syntax Equals (|vec4| v, |bool|Aware, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
 	
-	function clamp (|vec4|)
+	function Clamp (|vec4|)
 		return vec4(.x.clamp, .y.clamp, .z.clamp, .w.clamp)
 	
-	function sqrt (|vec4|)
+	function Sqrt (|vec4|)
 		cpp_inbuilt __builtin_ia32_sqrtps
 
-	function ivec4 (|ivec4|)
+	function iVec4 (|ivec4|)
 		return (.x|int|, .y|int|, .z|int|, .w|int|)	
 
 
-	function sum (|float|)
+	function Sum (|float|)
 		return .x + .y + .z + .w
 
 	render
 		fs <~ "${.x}, ${.y}, ${.z}, ${.w}"
 	
 	module
-		function new (|vec4|)
+		function New (|vec4|)
 			cpp_part New0
 			return (0.0,0.0,0.0,0.0)
-		function new (|float| f, |vec4|)
+		function New (|float| f, |vec4|)
 			cpp_part New1
 			return (f,f,f,f)
-		function new (|float| a, |float| b, |float| c, |float| d, |vec4|)
+		function New (|float| a, |float| b, |float| c, |float| d, |vec4|)
 			cpp_part New4
 			return (a,b,c,d)
 		function Load (|&byte| b, |vec4|)
@@ -842,7 +842,7 @@ datatype vec4
 
 
 datatype ivec4
-	function clip (|ivec4| R, |ivec4|)
+	function Clip (|ivec4| R, |ivec4|)
 		r.x  = r.x  max .x
 		r.y  = r.y  max .y
 		r.x2 = r.x2 min .x2
@@ -867,7 +867,7 @@ datatype ivec4
 			rz.y2 = bn.y2
 			rz.y = bn.y2 - .height
 		
-	function vec4 (|vec4|)
+	function Vec4 (|vec4|)
 		return (.x|float|, .y|float|, .z|float|, .w|float|)
 
 	operator minus (|ivec2| D, |ivec4|)
@@ -912,9 +912,9 @@ datatype ivec4
 	function Length (|bool|d, |int|)
 		return self[2+d|int|] - self[0+d|int|]
 	
-	function h (|ivec2|)
+	function H (|ivec2|)
 		return .x1x2
-	function v (|ivec2|)
+	function V (|ivec2|)
 		return .y1y2
 		
 	function Height (|int|)
@@ -935,22 +935,22 @@ datatype ivec4
 	function Dim (|int|d, |intrange|)
 		return self[d] to self[d+2]
 		
-	function horz (assigns:|ivec2|r, |ivec4|)
+	function Horz (assigns:|ivec2|r, |ivec4|)
 		.x1 = r.x1
 		.x2 = r.x2
 		return self
 	
-	function contains (|int| x, |int| y, |bool|)
+	function Contains (|int| x, |int| y, |bool|)
 		cpp_part ContainsInt
 		return .contains((x,y), 0)
 		
-	function contains (|ivec2| P, |int| i=0, |bool|)
+	function Contains (|ivec2| P, |int| i=0, |bool|)
 		cpp_part ContainsIvec2
 		require p.x >= .x+i and p.x < .x2-i
 		require p.y >= .y+i and p.y < .y2-i
 		return true
 	
-	function contains (|ivec2| v, |bool|)
+	function Contains (|ivec2| v, |bool|)
 		cpp_part ContainsVec2
 		return .contains(v, 0)
 	
@@ -968,10 +968,10 @@ datatype ivec4
 	operator contains (|ivec2| v, |bool|)
 		return .contains(v)
 	
-	function ispositive (|bool|)
+	function IsPositive (|bool|)
 		return (.x2 > .x) and (.y2 > .y)
 	
-	function isnegative (|bool|)
+	function IsNegative (|bool|)
 		return (.x2 < .x) or (.y2 < .y)
 		
 	syntax cast (|bool|)
@@ -981,7 +981,7 @@ datatype ivec4
 	function Soothe (|ivec4|)
 		return (0, 0, .x2 - .x1, .y2 - .y1)	
 	
-	function size (|ivec2|)
+	function Size (|ivec2|)
 		return (.x2 - .x1, .y2 - .y1)	
 
 	render
@@ -991,12 +991,12 @@ datatype ivec4
 		function Load (|&byte| b, |ivec4|)
 			cpp_inbuilt JB_ivec4_Load
 
-		function zero (|ivec4|)
+		function Zero (|ivec4|)
 			return (0, 0, 0, 0)
-		function new (|ivec4|)
+		function New (|ivec4|)
 			cpp_part New0
 			return (0, 0, 0, 0)
-		function new (|int| x, |ivec4|)
+		function New (|int| x, |ivec4|)
 			cpp_part New1
 			return (x,x,x,x)
 	
@@ -1018,7 +1018,7 @@ datatype vec3
 	syntax Equals (|vec3| v, |bool|Aware, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
 	
-	function lum (|float|)
+	function Lum (|float|)
 		return ((self*self) • (0.299, 0.587, 0.114)).sqrt
 	
 	function vec4.lum (|float|)
@@ -1030,7 +1030,7 @@ datatype vec3
 		(s.z min= .z)
 		return s
 	
-	function ivec3 (|ivec3|)
+	function iVec3 (|ivec3|)
 		return (.x|int|, .y|int|, .z|int|)
 
 	function Length (|float|)
@@ -1044,7 +1044,7 @@ datatype vec3
 		cpp_part Mul3
 		return (.x*v.x, .y*v.y, .z*v.z)
 	
-	function abs (|vec3|)
+	function Abs (|vec3|)
 		return (.x.abs, .y.abs, .z.abs)
 	
 	operator • (|vec3| other, |float|)
@@ -1052,10 +1052,10 @@ datatype vec3
 		return (self * other).sum
 
 
-	function reflect (|vec3| plane, |vec3|)
+	function Reflect (|vec3| plane, |vec3|)
 	    return self - 2.0 * (self • plane) * plane
 
-	function sum (|float|)
+	function Sum (|float|)
 		return .x + .y + .z
 
 
@@ -1066,7 +1066,7 @@ datatype vec3
 		fs <~ "${.x}, ${.y}, ${.z}"
 	
 	module
-		function zero (|vec3|)
+		function Zero (|vec3|)
 			return (0.0,  0.0, 0.0)
 		function New (|float| x, |float| y, |float| z, |vec3|)
 			return (x,y,z)
@@ -1085,7 +1085,7 @@ datatype ivec3
 		cpp_part Bool
 		return .x or .y or .z
 
-	function vec3 (|vec3|)
+	function Vec3 (|vec3|)
 		return (.x|float|, .y|float|, .z|float|)	
 
 	render
@@ -1095,7 +1095,7 @@ datatype ivec3
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
 	
 	module
-		function zero (|ivec3|)
+		function Zero (|ivec3|)
 			return (0, 0, 0)
 
 
@@ -1168,10 +1168,10 @@ datatype IntRange (ivec2)
 
 
 datatype ivec2
-	function lengthsq (|float|)
+	function LengthSq (|float|)
 		return (.x * .x)|float| + (.y * .y)|float| 
 
-	function width (|int|)
+	function Width (|int|)
 		return .x2 - .x
 
 	syntax Compare (|float| Other, |bool|Aware, |int|)
@@ -1189,18 +1189,18 @@ datatype ivec2
 	function Grow (|ivec2|g, |ivec4|)
 		return (self-g, self+g)
 		
-	function clip (|int| p, |int|)
+	function Clip (|int| p, |int|)
 		if p < .x
 			return .x
 		return p min .x2
 		
-	function clip (|ivec2| p, |ivec2|)
+	function Clip (|ivec2| p, |ivec2|)
 		cpp_part Clip2
 		p.x = .x.clamp(p.x)
 		p.y = .y.clamp(p.y)
 		return p
 			
-	function mid (|int|)
+	function Mid (|int|)
 		return (.x1+.x2)/2
 		
 	operator contains (|int| x, |bool|)
@@ -1234,22 +1234,22 @@ datatype ivec2
 	operator inrange (|ivec2| p, |bool|)
 		return .x inrange p.x  and  .y inrange p.y
 
-	function sum (|int|)
+	function Sum (|int|)
 		return .x + .y
 
-	function area (|int|)
+	function Area (|int|)
 		return .x * .y
 
 	function Inside (|ivec4| R, |bool|)
 		return R.Contains(.x, .y)
 	
-	function vec2 (|vec2|)
+	function Vec2 (|vec2|)
 		return (.x|float|, .y|float|)
 	
 	function Rect (|ivec4|)
 		return (0, 0, .x, .y)
 
-	function point (|ivec4|) 
+	function Point (|ivec4|) 
 		return .xyxy + (0,0,1,1)
 	
 	syntax cast (|bool|)
@@ -1281,7 +1281,7 @@ datatype vec2
 	render
 		fs <~ "${.x}, ${.y}"
 
-	function ivec2 (|ivec2|)
+	function iVec2 (|ivec2|)
 		return (.x|int|, .y|int|)
 
 	syntax cast (|bool|)
@@ -1295,7 +1295,7 @@ datatype vec2
 		cpp_part Dot
 		return (self * other).sum
 
-	function sum (|float|)
+	function Sum (|float|)
 		return .x + .y
 
 	function LengthSq (|float|)
@@ -1304,10 +1304,10 @@ datatype vec2
 	function Length (|float|)
 		return .LengthSq.sqrt
 		
-	function abs (|vec2|)
+	function Abs (|vec2|)
 		return (.x.abs, .y.abs)
 
-	function sincos (|vec4|)
+	function SinCos (|vec4|)
 		return (.x.sincos, .y.sincos)
 
 	syntax Compare (|float| Other, |bool|Aware, |int|)
@@ -1322,43 +1322,43 @@ datatype vec2
 			return (v,v)
 
 
-function vecmix (|vec2|a, |vec2|b, |vec4|)
+helper vecmix (|vec2|a, |vec2|b, |vec4|)
 	cpp_part mix22
 	return (a.x, a.y, b.x, b.y)
-function vecmix (|float|a, |vec2|b, |float|c, |vec4|)
+helper vecmix (|float|a, |vec2|b, |float|c, |vec4|)
 	cpp_part mix121
 	return (a, b.x, b.y, c)
-function vecmix (|vec3|a, |float|b, |vec4|)
+helper vecmix (|vec3|a, |float|b, |vec4|)
 	cpp_part mix31
 	return (a.x, a.y, a.z, b)
-function vecmix (|float|a, |vec3|b, |vec4|)
+helper vecmix (|float|a, |vec3|b, |vec4|)
 	cpp_part mix13
 	return (a, b.x, b.y, b.z)
-function vecmix (|vec2|a, |float|b, |vec3|)
+helper vecmix (|vec2|a, |float|b, |vec3|)
 	cpp_part mix21
 	return (a.x, a.y, b)
-function vecmix (|float|a, |vec2|b, |vec3|)
+helper vecmix (|float|a, |vec2|b, |vec3|)
 	cpp_part mix12
 	return (a, b.x, b.y)
-function ivecmix (|ivec2|a, |ivec2|b, |ivec4|)
+helper ivecmix (|ivec2|a, |ivec2|b, |ivec4|)
 	cpp_part imix22
 	return (a.x, a.y, b.x, b.y)
-function ivecmix (|int|a, |int|b, |ivec2|c, |ivec4|)
+helper ivecmix (|int|a, |int|b, |ivec2|c, |ivec4|)
 	cpp_part imix112
 	return (a, b, c.x, c.y)
-function ivecmix (|int|a, |ivec2|b, |int|c, |ivec4|)
+helper ivecmix (|int|a, |ivec2|b, |int|c, |ivec4|)
 	cpp_part imix121
 	return (a, b.x, b.y, c)
-function ivecmix (|ivec3|a, |int|b, |ivec4|)
+helper ivecmix (|ivec3|a, |int|b, |ivec4|)
 	cpp_part imix31
 	return (a.x, a.y, a.z, b)
-function ivecmix (|int|a, |ivec3|b, |ivec4|)
+helper ivecmix (|int|a, |ivec3|b, |ivec4|)
 	cpp_part imix13
 	return (a, b.x, b.y, b.z)
-function ivecmix (|ivec2|a, |int|b, |ivec3|)
+helper ivecmix (|ivec2|a, |int|b, |ivec3|)
 	cpp_part imix21
 	return (a.x, a.y, b)
-function ivecmix (|int|a, |ivec2|b, |ivec3|)
+helper ivecmix (|int|a, |ivec2|b, |ivec3|)
 	cpp_part imix12
 	return (a, b.x, b.y)
 

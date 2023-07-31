@@ -43,7 +43,7 @@ function compiler.SetupEnv
 	FlowControl.FlowMode = FlowControl.Off // can enable via "log"
 	error.AutoPrint := 1
 	.Clearenvs
-	check (app.pref_path) "Conf missing prefpath"
+	check (app.prefpath) "Conf missing prefpath"
 	app.PrefsInit
 	|| talk = app..talk
 	if talk.length and app.IsMainThread

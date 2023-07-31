@@ -105,9 +105,9 @@ linkage
 |SCFunction|			fnOpMustBe
 
 |[String]|				SyxArray
-|Message|				ExtendList
+|Message|				ExtendList = message()
+|Message|				ConstantsList = message()
 |[Message]|				ExtendModuleList
-|[Message]|				ConstantsList
 |[Message]|				API_List
 |[SCFunction]|			API_Funcs
 |Message|				API_Place
@@ -201,7 +201,7 @@ function SpeedieProj (|String|)
 	return ._SpeedieProj init .projects["Speedie.scproj"]
 
 
-function testdate
+function TestDate
 	|int64| day  = 5662310400
 	|int64| hour = 235929600
 	|int64| min  = 3932160

@@ -149,7 +149,7 @@ class Error (Message)
 		|| w = .when + d
 		return date() - w
 
-	render render
+	render Render
 		fs <~ "error"
 		fs.indent++
 		fs.field( "", .name )
@@ -166,7 +166,7 @@ class Error (Message)
 		fs <~ "\n"
 		fs.indent-- 
 
-	render render_clang
+	render RenderClang
 		|| M = fs.mark
 		|| p = .path
 		if ((self isnt PreferNoRenderPath) and P)

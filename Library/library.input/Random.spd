@@ -12,7 +12,7 @@ struct Random
 	
 	saveas struct
 
-	function int (|int64|)
+	function Int (|int64|)
 		|| s = ++.state
 		rz = (.store + s).hash
 		.store = rz		
@@ -103,7 +103,7 @@ struct Random
 		|Random| Shared
 		.shared.TimeSeed
 
-		macro syntaxaccess
+		macro SyntaxAccess
 			random.shared[...]
 
 

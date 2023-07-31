@@ -49,11 +49,11 @@ datatype Date (int64)
 		return s.Render + unit
 		
 		
-	function ago (|date|)
+	function Ago (|date|)
 		if self
 			return now() - self
 	
-	render dmy
+	render DMY
 		fs.AppendDMY(self)
 	
 	render RenderDurr
@@ -126,6 +126,6 @@ datatype Date (int64)
 		function TimeStamp  (|uint64|)
 			cpp_Wrapper RDTSC
 			
-		function hash  (|uint64|)
+		function Hash  (|uint64|)
 			return .timestamp.hash
 

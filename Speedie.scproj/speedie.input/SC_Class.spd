@@ -924,7 +924,7 @@ module
 
 
 	function StoreExtend (CollectFunc)
-		Compiler.extendlist <~ node
+		Compiler.ExtendList <~ node
 		node.obj = SCImport.curr
 		Return Compiler.program
 
@@ -936,7 +936,6 @@ module
 
 
 	function ExtendOneFunc (CollectFunc)
-		compiler.ExtendList := message()
 		Compiler.ExtendList <~ node
 		node.obj = SCImport.curr
 		if !SCImport.curr

@@ -105,7 +105,7 @@ class ErrorList
 			f <~ data
 			
 
-	function incr (|error| err, |bool| add=true)
+	function Incr (|error| err, |bool| add=true)
 		|| n = (1, -1)(add)
 		
 		if err.severity == errorseverity.problem
@@ -248,7 +248,7 @@ extend string
 		stderr.NewError(nil, self)
 
 
-function bool.operatorplus (|string| s, |bool|)
+function bool.OperatorPlus (|string| s, |bool|)
 	// idk... kinda usel
 	if self
 		return true

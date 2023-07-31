@@ -32,7 +32,7 @@ datatype CharProp (byte)
 //			return CharProp.default.item[self]
 //		|CharProps| default
 //		.default.MakeDefault
-		function test
+		helper test
 			expect 'a' is lower
 			expect 'b' is lower
 			expect 'C' is upper

@@ -103,7 +103,7 @@ class StringReader
 			rz |= b << i << 3
 
 
-	function noob (|uint64|)
+	function Noob (|uint64|)
 		|| b = .byte
 		if b < 224
 			return b
@@ -131,9 +131,9 @@ class StringReader
 			.position = zpos+1
 			return .data[p, zpos] // don't call .section, seeing as its not streaming anyhow
 	
-	function upto (|int| end, |int|)
+	function UpTo (|int| end, |int|)
 		return end - .position
-	function uint (|int| size, |int| mult=256, |uint64|) // mult used by selftools id3 decoder, passes 128.
+	function UInt (|int| size, |int| mult=256, |uint64|) // mult used by selftools id3 decoder, passes 128.
 		for size
 			|| b = .byte
 			loop b >= 0
@@ -180,7 +180,7 @@ class StringReader
 				 exit
 		return r
 	
-	function utf8 (|int|n, |int|skip=0, |string|)
+	function UTF8 (|int|n, |int|skip=0, |string|)
 		return  .str(n,skip).utf16to8(2)
 
 	function Test (|string| Header, |bool|)

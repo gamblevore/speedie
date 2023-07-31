@@ -11,6 +11,7 @@
 
 	
 // Perry Do later
+* tab between search fields goes to another window?
 * render warnings on textview but not on errorlist
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* what about decls? perhaps just relative to a node?
@@ -22,6 +23,7 @@
 // Speedie Do later
 * x=(*Count)-- doesnt compile but x=*Count-- does?
 * all lowercase means HELPER!!! What about operators? like "or"?
+	* What about all the current helpers or not? We could warn if they aren't all lower-case?
 * nicer lookups... syntaxis thing can be used elsewhere too! like for almost anything
 	* if it cant be found... allow a second function to be tested.
 * RefOpts. Do it bit by bit

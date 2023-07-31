@@ -211,7 +211,7 @@ class Memory
 		
 	macro SyntaxAccess
 		(.ptr|&...|)[_]
-	macro syntaxappend
+	macro SyntaxAppend
 		(.appendplace|&...|)[0] = _
 
 	syntax cast (|&...|)

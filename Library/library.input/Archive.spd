@@ -88,7 +88,7 @@ role FileArchive (message)
 			item..modified = f.modified.render
 			item..mode = f.mode.render
 
-	function base (|string|)
+	function Base (|string|)
 		opt norefcounts
 		|| o = .last.obj
 		if o isa string

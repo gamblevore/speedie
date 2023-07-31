@@ -455,7 +455,7 @@ class Process
 		.log msg
 		.log "\n"
 	
-	function log (|string| s)
+	function Log (|string| s)
 		print s
 		log s
 

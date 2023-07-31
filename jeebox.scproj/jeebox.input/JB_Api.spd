@@ -349,7 +349,7 @@ module JB_API
 		return result
 
 	
-	function errors (|Message|)
+	function Errors (|Message|)
 		Opt NoRefCounts
 		require !stderr.ok
 		rz = stderr.errors

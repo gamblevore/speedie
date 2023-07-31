@@ -148,10 +148,10 @@ struct CompressionStats
 		.in = nil
 		.out = nil
 
-	function start
+	function Start
 		.Duration = -date()
 	
-	function end
+	function End
 		.Duration += date()
 
 	function Print
@@ -163,7 +163,7 @@ struct CompressionStats
 		if .live
 			.print
 	
-	function durr (|float|)
+	function Durr (|float|)
 		|| d = .duration
 		if d < 0
 			d += date()

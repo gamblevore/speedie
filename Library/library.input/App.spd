@@ -27,10 +27,10 @@ function Yes (|string| name, |bool|)
 function No (|string| name, |bool|)
 	return !.yes(name)
 
-function conf (|string| name, |string|)
+function Conf (|string| name, |string|)
 	return ._conf[name].value
 
-function conf (|string| name, assigns:|string|)
+function Conf (|string| name, assigns:|string|)
 	disabled "Set conf values in the original app.configure..."
 
 function Pref (|string| s, |string|)
@@ -68,13 +68,14 @@ function Switches (|[string]|)
 		if R.ArgName
 			rz <~ R
 	
-function args_ (|[string]|)
+helper args_ (|[string]|)
 	opt norefcounts
 	for R in .rawargs
 		if R|AppArgument|.name ~=""
 			rz <~ r
 
-function args (|[string]|)
+function Args (|[string]|)
+	cpp_part ArgsArray
 	opt norefcounts
 	if .OldArgs == nil // == nil important here
 		.oldargs = .args_
@@ -151,7 +152,7 @@ function StringMemory (|int64|)
 function ClearCaches (|int| which=0)
 	cpp_wrapper JB_App__ClearCaches
 
-function pref_path (|string|)
+function PrefPath (|string|)
 	rz = app.conf("prefs")$
 	if rz[0] == '~'
 		rz = rz.pathfix
@@ -166,7 +167,7 @@ function pref_path (|string|)
 function PrefsInit (|date| when=date.now, |bool|)
 	if .prefs
 		return true
-	|| pref_path = .pref_path
+	|| pref_path = .prefpath
 		.prefs = pref_path.file.conf
 		if .prefs
 			rz = true
@@ -219,8 +220,10 @@ function Die (|string| Err = "", |int| code = -1)
 		printerror err
 	.quit(code)
 
+
 function Name (|string|)
 	disabled ".Filename (terminal) or .appname (gui package osx)"
+
 
 function FileName (|string|)
 	return .Path.Name
@@ -271,17 +274,17 @@ function Sudo (|string| p, |ErrorInt|)
 	return .applescript("do shell script \"$p\" with administrator privileges")
 
 
-function configure (assigns:|string|)
+function Configure (assigns:|string|)
 	._conf  = Value.parse
 	._conf := message()
 
 
 
-function icon (assigns:|string| path)
+function Icon (assigns:|string| path)
 	|| ico = path.Resolve
 		.seticon(ico.cstr)
 
-function seticon (|cstring| path)
+function SetIcon (|cstring| path)
 	cpp_wrapper JB_App__SetIcon
 
 function ShowURL (|string| path)

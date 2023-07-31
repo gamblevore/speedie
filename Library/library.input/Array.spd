@@ -46,9 +46,9 @@ class Array (saveable)
 	function Prev (||)
 		if .marker > 0
 			return self[--.marker]
-	function active (|bool|)
+	function Active (|bool|)
 		return .marker < .length
-	function reset
+	function Reset
 		.marker = 0
 	
 	function Trim
@@ -164,7 +164,7 @@ class Array (saveable)
 	operator contains (|object| o, |bool|)
 		return .find(o) >= 0
 
-	function operatorplus (|array of ...| other, |array of ...|)
+	function OperatorPlus (|array of ...| other, |array of ...|)
 		rz = .Copy
 		for s in other
 			rz <~ s 

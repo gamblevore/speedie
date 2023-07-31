@@ -162,7 +162,7 @@ class RingTree (Saveable)
 		if (Metoo)
 			.dispose
 	
-	function dist (|ringtree| r, |int|)
+	function Dist (|ringtree| r, |int|)
 		opt norefcounts
 		require self and r
 		
@@ -171,7 +171,7 @@ class RingTree (Saveable)
 			return .fwddist(R) ?? .backdist(r)
 			
 
-	function fwddist (|ringtree| F, |int|)
+	function FwdDist (|ringtree| F, |int|)
 		opt norefcounts
 		|| c = 0
 		while F
@@ -181,7 +181,7 @@ class RingTree (Saveable)
 			c++
 			
 
-	function backdist (|ringtree| B, |int|)
+	function BackDist (|ringtree| B, |int|)
 		opt norefcounts
 		|| c = 0
 		while B

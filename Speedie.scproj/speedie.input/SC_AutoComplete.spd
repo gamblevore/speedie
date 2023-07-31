@@ -553,7 +553,7 @@ function SCObject.NextDisplay (|bool| exact, |scobject|)
 || max_total = 400
 || total	 =   0
 
-function active (|bool|)
+function Active (|bool|)
 	return .total < .max_total
 
 

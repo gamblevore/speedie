@@ -208,14 +208,14 @@ struct ArgArrayCounter
 
 function @scmodule.ConstantCollector (collectfunc)
 	compiler.ConstantsList <~ node
-	node.Obj = name_space
+	if name_space isa SCClass
+		node.Obj = name_space.Modul
+	  else
+		node.Obj = name_space
 	return compiler.program
 
 
 function compiler.CollectConstants
 	opt norefcounts
 	for ch in .constantslist
-		|| obj = ch.obj|scbase|
-		if obj isa scclass
-			obj = obj.modul|scclass|
-		obj.collectoneconstants(ch)
+		(ch.obj|scbase|).CollectOneConstants(ch)

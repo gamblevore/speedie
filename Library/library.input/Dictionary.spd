@@ -40,7 +40,7 @@ class Dictionary (saveable)
 	
 	function Longest (|string| key, |&int| LengthFound, ||)
 		cpp_wrapper JB_Dict_Longest
-	function find (|string| match, |&ivec2| Found, ||)
+	function Find (|string| match, |&ivec2| Found, ||)
 		cpp_wrapper JB_Dict_FindStr
 	
 	syntax append (|message| m)
@@ -63,7 +63,7 @@ class Dictionary (saveable)
 		for V in self
 			rz <~ V
 	
-	function list (|[...]|)
+	function List (|[...]|)
 		return .values
 
 	function Keys (|array of string|)

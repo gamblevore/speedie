@@ -104,10 +104,10 @@ datatype ControlPoint (int)
 	operator by (|ControlLine| B, |controlRect|)
 		cpp_part ByLine
 		return .expand by b
-	function length (|int|)
+	function Length (|int|)
 		return self|int|>>4
 		
-	function expand (|ControlLine|)
+	function Expand (|ControlLine|)
 		if self is low
 			return the~bottom to self
 		if self is high

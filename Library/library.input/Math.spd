@@ -9,10 +9,10 @@ module Math
 		// just use π for pi, or 2π for PI*2
 		E = 2.7182818284590452353602874713526
 	
-	function sin (|float| f, |float|)
+	function Sin (|float| f, |float|)
 		return .sinpi(f*2)
 
-	function cos (|float| f, |float|)
+	function Cos (|float| f, |float|)
 		return .cospi(f*2)
 
 	function float.sin (|float|)
@@ -27,20 +27,20 @@ module Math
 		.__sincospi(a, b)
 		return (a, b)
 		
-	function cospi (|float| f, |float|)
+	function CosPi (|float| f, |float|)
 		cpp_wrapper (__cospif)
 
-	function saw (|float| f, |float|)		 // just a saw-func
+	function Saw (|float| f, |float|)		 // just a saw-func
 		//   0-->0,  0.25-->1,  0.5-->0,  0.75--> -1,  1-->0
 		f = f.fract
 		f = f * 4.0
 		f = f - f.minus0(1.0)
 		return f
 	
-	function tanpi (|float| f, |float|)
+	function TanPi (|float| f, |float|)
 		cpp_wrapper (__tanpif)
 	
-	function sinpi (|float| f, |float|)
+	function SinPi (|float| f, |float|)
 		cpp_wrapper (__sinpif)
 
 	function float.atan2 (|float| f2, |float|)

@@ -243,7 +243,7 @@ class SaverClassInfo (array)
 	|&char|				Data
 	
 
-	function adfub (|faststring| fs)
+	function AdFub (|faststring| fs)
 		// adfub????
 		// nothing uses this?
 		opt norefcounts
@@ -316,10 +316,10 @@ struct StructSaveTest {
 	function RunTest {
 		.test("")
 	}
-	function test (|string| s) {
+	function Test (|string| s) {
 		cpp_part TestStr
 	}
-	function test (|object| s) {
+	function Test (|object| s) {
 		cpp_part TestObj
 
 	}
