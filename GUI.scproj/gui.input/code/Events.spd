@@ -129,7 +129,7 @@ datatype MouseButton (uint)
 	
 
 
-function ivec2.sdlxy (|ivec2|)
+function ivec2.SDLXY (|ivec2|)
 	opt norefcounts
 	|int| x = .x / SDLApp.Scale
 	|int| y = .y / SDLApp.Scale

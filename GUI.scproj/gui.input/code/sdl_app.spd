@@ -1086,6 +1086,6 @@ module SDLApp
 				.name = info
 
 
-function guicontrol.description (|string|)
+function guicontrol.Description (|string|)
 	return .tooltip // :)
 

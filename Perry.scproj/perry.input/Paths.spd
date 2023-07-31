@@ -1,6 +1,6 @@
 
 
-function string.path_expand (|dictionary of string| dict, |string|)
+function string.Path_Expand (|dictionary of string| dict, |string|)
 	// @lib/abc --> /usr/local/lib/abc
 	// or other paths that you input into dict
 	if self[0] != '@'

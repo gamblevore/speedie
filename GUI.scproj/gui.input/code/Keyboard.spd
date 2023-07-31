@@ -86,7 +86,7 @@ dataType Keys (int) {
 		function State (|&int| n, |&byte|)
 			cpp_Wrapper SDL_GetKeyboardState
 		
-		function keys.eat
+		function keys.Eat
 			|| i = keys.has(self)
 				keys.downdate[i] = 0
 
@@ -94,7 +94,7 @@ dataType Keys (int) {
 			|| i = keys.has(self)
 				return keys.downdate[i].ago >= durr
 
-		function keys.iscancelled (|bool|)
+		function keys.IsCancelled (|bool|)
 			|| i = keys.has(self)
 				if !keys.downdate[i]
 					return true

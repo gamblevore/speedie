@@ -1,7 +1,7 @@
  
 
 extend_module perry
-	function ftp_path (|string|)  ////////
+	function FTP_Path (|string|)  ////////
 		rz = app.pref("ftp_dest")
 		if !rz or keys.Option or app.Pref("ftp_failed")
 			|| q = "Upload Perry to what URL?\n\nEG: ftp://user:pass@ftp.domain.com/dirs/perry.zip"
@@ -10,7 +10,7 @@ extend_module perry
 
 ///// abc
 
-	function monthly_name (|date| n, |string|)		
+	function Monthly_Name (|date| n, |string|)		
 		|| fs = faststring()
 		fs <~ "~/Backups/perry_monthly/".PathFix
 		fs.AppendIntegerAsText(n.MonthsApprox, 4)
@@ -18,14 +18,14 @@ extend_module perry
 		return fs
 
 
-	function latest_name (|string|)
+	function Latest_Name (|string|)
 		target debug
 			return "~/Backups/perry_latest.debug.zip".PathFix
 		  else
 			return "~/Backups/perry_latest.zip".PathFix
 
 
-	function daily_name (|date| n, |string|)
+	function Daily_Name (|date| n, |string|)
 		|| fs = faststring() 
 		fs <~ "~/Backups/perry/".PathFix
 		fs.AppendIntegerAsText(n.Days, 4)
@@ -33,7 +33,7 @@ extend_module perry
 		return fs
 	
 	
-	function remove_old (|file| fol, |int| allowed, |bool| keep_first=false, |file|)
+	function Remove_Old (|file| fol, |int| allowed, |bool| keep_first=false, |file|)
 		fol.MakeEntirePath
 		|| items = fol.list
 		while items.length > allowed
@@ -45,7 +45,7 @@ extend_module perry
 				s.delete
 
 
-	function backup (|file| zip, |file|)
+	function Backup (|file| zip, |file|)
 // Daily file per week, weekly file per month.
 		|| now  = date() - 107020500000000
 		|| latest = .latest_name
@@ -64,7 +64,7 @@ extend_module perry
 		remove_old(monthly_fol, 8)
 				
 		
-	function install_path (|string|)
+	function Install_Path (|string|)
 		|| p = app.exepath.parent
 		expect (p contains ".app/") (beep, "Can't install/uninstall while using the app directly.")
 		// we need to store this in the .app folder...
@@ -306,7 +306,7 @@ extend_module perry
 			rz = "\n\nFailed to install speedie at: " + at.path
 
 
-	function install_files (|file| f, |string|)
+	function Install_Files (|file| f, |string|)
 		|| URL		= app.conf("install_url")
 		|| str		= .DownloadData(URL, 10MB)	#require
 		|| arc		= str.GetArchive(64MB)		#expect (beep, "Can't use installation-file.")

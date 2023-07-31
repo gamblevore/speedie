@@ -797,6 +797,7 @@ function FindVis (|Message| c, |bool|)
 
 
 function LoadVisibility (|Message| p)
+	if .name ~= "encode"
 	CurrVisibility = .FindVis(p.first) //   visible false,   visibile true,   visible
 	.IsVisible = CurrVisibility
 	SC_MakeComment( p )

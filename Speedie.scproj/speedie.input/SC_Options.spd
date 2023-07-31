@@ -24,6 +24,7 @@ module Options
 	|| 		NilTestAllocNeverFails	= true
 	||		Cpp						= true
 	||		Compile					= true
+	|| 		UnusedFunctions			= false
 	||		MakeASM					= false
 	||		TargetDebug				= false
 	||		PrintLibraries			= false

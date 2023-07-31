@@ -60,12 +60,12 @@ class DocumentViewer (ringtree)
 			ff = ff.next
 
 
-function document.removeviewer (|guicontrol| g)
+function document.RemoveViewer (|guicontrol| g)
 	opt norefcounts
 	.viewers.find(g).remove?
 
 
-function document.addviewer (|guicontrol| g)
+function document.AddViewer (|guicontrol| g)
 	opt norefcounts
 	if !.viewers.find(g)
 		.viewers <~ documentviewer(g)

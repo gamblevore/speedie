@@ -6,7 +6,7 @@ module beep
 		app.beep(s)
 
 
-function errorlist.beep (|bool|)
+function errorlist.Beep (|bool|)
 	if .ok
 		return true
 	|| err = .FirstError()
@@ -18,7 +18,7 @@ extend_module app
 	function BeepSub
 		cpp_Wrapper JB_App__Beep
 	
-	function beep (|string| q="")
+	function Beep (|string| q="")
 		if beep.OK.fired
 			.beepsub
 			beep.OK = date() + 1.5s
@@ -42,12 +42,12 @@ function AskSaveOrCancel (|string| Q,  |string| Title="",  |int|)
 	return ConfirmIt(q, title, Answers)
 
 
-function string.confirm (|string| Title="", |ConfirmCanceller| Canceller=nil, |bool|)
+function string.Confirm (|string| Title="", |ConfirmCanceller| Canceller=nil, |bool|)
 	|| Answers = ["Yes", "No"]
 	return ConfirmIt(self, title, Answers, Canceller) == 1
 
 
-function string.ask_named (|string| Answers,  |int|)
+function string.Ask_Named (|string| Answers,  |int|)
 	return ConfirmIt(self, "", Answers.Components)
 
 

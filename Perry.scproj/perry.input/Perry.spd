@@ -296,7 +296,7 @@ function ViewAsSwap
 		.ViewAsText
 
 
-function ext (|string|)
+function Ext (|string|)
 	opt norefcounts
 	return .editme$.document$.location$.ext
 

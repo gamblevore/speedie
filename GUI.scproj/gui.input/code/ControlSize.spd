@@ -17,7 +17,7 @@ struct ControlSize
 			.GSize = gsize
 			sdlapp.resized
 	
-	function ivec4.operatorequals (|ivec4| v, |bool|) // sigh
+	function ivec4.OperatorEquals (|ivec4| v, |bool|) // sigh
 		for i in 4
 			require self[i] == v[i]
 		return true
@@ -121,7 +121,7 @@ struct ControlSize
 			printline rz2.render
 
 
-function @ivec4.edgename (|int| i, |string|)
+function @ivec4.EdgeName (|int| i, |string|)
 	if i == 0
 		return "left"
 	if i == 1

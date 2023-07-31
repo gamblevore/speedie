@@ -183,11 +183,11 @@ struct ImagePixel
 		|| b = &.r
 		b[i] = v
 	
-	function vec4.px (|imagepixel|)
+	function vec4.Px (|imagepixel|)
 		rz <~ self
-	function vec3.px (|imagepixel|)
+	function vec3.Px (|imagepixel|)
 		rz <~ self
-	function ivec4.px (|imagepixel|)
+	function ivec4.Px (|imagepixel|)
 		rz <~ self
 
 	module 

@@ -22,7 +22,7 @@ module clipboard
 			beep
 
 
-function cstring.sdltext (|string|)
+function cstring.SDLText (|string|)
 	|| s = string.fromc(self).copy
 	memory.free(self|&byte|)
 	return s

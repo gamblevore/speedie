@@ -1502,7 +1502,7 @@ class ListView (GUIControl) {
 
 
 
-function ListViewrow.depth (|listview| me, |int|)
+function ListViewrow.Depth (|listview| me, |int|)
 	opt norefcounts
 	|| c = self
 	rz = -1

@@ -1,6 +1,6 @@
 
  
-function network.guidownload (|string|url, |int|lim, |networkDownloader|)
+function network.GuiDownload (|string|url, |int|lim, |networkDownloader|)
 	rz = .download(url, lim)$
 	while !rz.Finished
 		require sdlapp.WaitFrame("Downloading from $url\n\n${rz.progress.pc}") 

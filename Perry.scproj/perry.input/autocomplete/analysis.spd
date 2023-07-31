@@ -90,7 +90,7 @@ function FuncListSorter (SorterComparerMsg)
 	return cmp < 0
 
 
-function message.funcarg (|message|)
+function message.FuncArg (|message|)
 	opt norefcounts
 	|| s = .last
 	if s == @arg
@@ -121,7 +121,7 @@ function message.IDEAddfunc (|message| line, |string| filter)
 			fn <~ name
 
 
-function string.filter (|string| find, |bool|)
+function string.Filter (|string| find, |bool|)
 	if !find
 		return true
 	for s in .words

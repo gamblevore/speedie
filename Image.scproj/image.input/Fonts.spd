@@ -177,7 +177,7 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 
 
 extend FastString
-	function message.now (||)
+	function message.Now (||)
 		|| a = .slowcount #require
 		|int| b = date.now mod a
 		return self[b]
@@ -200,14 +200,13 @@ extend FastString
 
 
 extend string
-
 	render Picture (|image| font=font.small)
 		cpp_part ram_test_encode
 		for c in self
 			fs.Picture(c, font)
 
 
-	render depicture
+	render Depicture
 		cpp_part ram_test_decode
 		for row in (7 downto 0)
 			for c in self
