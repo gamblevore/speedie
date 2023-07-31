@@ -234,27 +234,27 @@ function Reached (|string| s, |bool|)
 
 
 function InitTypes
-	TypeInt				= .Constpiler("int")
-	TypeInt16			= .Constpiler("int16")
-	TypeInt64			= .Constpiler("int64")
-	TypeuInt			= .Constpiler("uint")
-	TypeuInt16			= .Constpiler("uint16")
-	TypeuInt64			= .Constpiler("uint64")
-	Typef64				= .Constpiler("f64")
-	Typef32				= .Constpiler("float")
-	Typehfloat			= .Constpiler("hfloat")
+	TypeInt				= compiler["int"]
+	TypeInt16			= compiler["int16"]
+	TypeInt64			= compiler["int64"]
+	TypeuInt			= compiler["uint"]
+	TypeuInt16			= compiler["uint16"]
+	TypeuInt64			= compiler["uint64"]
+	Typef64				= compiler["f64"]
+	Typef32				= compiler["float"]
+	Typehfloat			= compiler["hfloat"]
 	Typefloat			= Typef32 // whyyyyy... why I do dis. 
-	TypeBool			= .Constpiler("bool")
-	TypeString			= .Constpiler("string")
-	TypeByte			= .Constpiler("byte")
-	TypeCharSet			= .Constpiler("charset")
-	Typevec2			= .Constpiler("vec2")
-	Typevec3			= .Constpiler("vec3")
-	Typevec4			= .Constpiler("vec4")
-	Typeivec2			= .Constpiler("ivec2")
-	Typeivec3			= .Constpiler("ivec3")
-	Typeivec4			= .Constpiler("ivec4")
-	Typedate			= .Constpiler("date")
+	TypeBool			= compiler["bool"]
+	TypeString			= compiler["string"]
+	TypeByte			= compiler["byte"]
+	TypeCharSet			= compiler["charset"]
+	Typevec2			= compiler["vec2"]
+	Typevec3			= compiler["vec3"]
+	Typevec4			= compiler["vec4"]
+	Typeivec2			= compiler["ivec2"]
+	Typeivec3			= compiler["ivec3"]
+	Typeivec4			= compiler["ivec4"]
+	Typedate			= compiler["date"]
 	TypeJBClass			= Compiler..classdata
 	TypeObject			= Compiler..object
 	TypeSyntax			= Compiler..syntax
@@ -326,11 +326,6 @@ function CreateFuncFromSource (|String| Src, |SCFunction|)
 	|| msg	= src.ParseClean
 	rz		= SCFunction.NewFunc( msg, nil, msg )|SCFunction|
 	rz.IsVisible = false
-
-
-function Constpiler (|string| name, |scclass|)
-	rz = compiler[name]  #require
-	(rz.typenormal is const)
 
 
 function Library (|file|)
