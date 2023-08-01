@@ -7,11 +7,11 @@ struct NilTracker
 	|message--|			IfMsg
 	|message--[1024]|	Items
 	
-	function Using (|uint|)
+	function Enter (|uint|)
 		.ifdepth++
 		return .MsgCount
 	
-	function Used (|uint| s)
+	function Leave (|uint| s)
 		.MsgCount = s
 		.IfDepth--
 		

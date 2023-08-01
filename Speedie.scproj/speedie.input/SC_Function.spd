@@ -158,25 +158,14 @@ function Message.TestFuncName (|bool|)
 	return true
 
 
-function string.IsFuncHelper	(|bool|)
-	opt norefcounts
-	for c in self
-		if c.IsUpper or c >= 128
-			return false
-		if c.IsLower
-			rz = true
-
-
 function ParseName (|Message| node, |bool|)
 	opt norefcounts
 	|| fType = node.name
 	|| cname = node.first
 	cname.func = @thg
 	.Name = cname.name
-
+	
 	if fType ~!= "helper" and "prototype" and "iterator"
-		if .name.IsFuncHelper
-			deprecate (node, "Function name should have one uppercase letter.")
 		if fType == "api"
 			.isapi = true
 		  elseif fType == "setter"

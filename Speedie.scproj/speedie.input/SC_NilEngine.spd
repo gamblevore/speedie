@@ -38,7 +38,6 @@ function NilTracker.Check (|scfunction| f)
 	opt norefcounts
 	.Start(f)
 	.RunNormal(f.SourceArg)
-//	.TightenNilness(f) // no need... will already be tightened
 
 
 function message.NilPropAccess (|scdecl|)
@@ -47,12 +46,21 @@ function message.NilPropAccess (|scdecl|)
 	if m and m isnt onmodule
 		return m
 
-
+function message.NilDecl (|scdecl|)
+	opt norefcounts
+	|| obj = .obj
+	if (obj isa scdecl)
+		|| l = obj.IsLookupOnly
+		if l isa scdecl
+			return l
+		return obj
+	
+	
 function NilTracker.ChildMustExist (|message| wrapper)
 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| msg = wrapper.first
-		.MustBeReal(msg, msg.NeedDecl)
+		.MustBeReal(msg, msg.NilDecl)
 
 
 function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
@@ -64,18 +72,26 @@ function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
 		|| Br = .ProcessCond(arg, true)
 		arg++
 		.RunNormal(arg)
-	// So... now what do I do?
 
 	return arg.next
 	
 
 function NilTracker.IfOrWhile (|message| msg)
 	opt norefcounts
-	|| old = .Using
+	|| old = .enter
 	|| test = msg
 	while test
 		test = .IfWhileOne(test, msg)
-	.used(old)
+	.leave(old)
+
+
+function NilTracker.Return (|message| msg)
+	opt norefcounts
+
+	|| test = msg
+	while test
+		test = .IfWhileOne(test, msg)
+
 
 
 function NilTracker.If (|message| Tmp)
@@ -146,7 +162,7 @@ function niltracker.Redeclare (|message| msg, |scdecl| d, |nilstate| used, |scde
 function NilTracker.ProcessCondThg (|message| msg, |bool| Y, |branchstate|)
 	opt norefcounts
 	|| dest = NilState.Nilish + Y	
-	|| d = msg.NeedDecl			#debug_require
+	|| d = msg.nildecl			#debug_require
 	|| u = d.NilUsed
 	if u == dest
 		return msg.RedundantTrue
@@ -182,7 +198,7 @@ function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
 function NilTracker.ProcessCondPtr (|message| m, |bool| Y, |branchstate|)
 	opt norefcounts
 	|| f = m.first
-	|| d = f.NeedDecl
+	|| d = f.nildecl
 		.MustBeReal(f, d)
 		return .ProcessCond(f, y)
 
@@ -294,6 +310,8 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 				.If(s)
 			  elseif type is kwhile
 				.IfOrWhile(s)
+			  elseif type is kReturn
+				.Return(s)
 		  elseif (f == @decl)
 			.CollectNilDecl(s)
 				

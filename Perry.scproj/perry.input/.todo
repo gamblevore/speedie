@@ -5,16 +5,16 @@
 * VM? 
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
-	* What is next? A LOT OF FEAR
-	* OK... but we can just do one small thing and leave it? 
-		* What small thing?
+	* collect returns 
+	* decl improvements
+	* thg lookups
 
 	
 // Perry Do later
 * tab between search fields goes to another window?
 * render warnings on textview but not on errorlist
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
-	* what about decls? perhaps just relative to a node?
+	* What about decls? perhaps just relative to a node?
 * tab on "function app.funcname" (in func params) doesn't work.
 * TextView error/find resync
 * too long text in listview draw as much as we can
