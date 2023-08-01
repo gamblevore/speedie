@@ -5,13 +5,11 @@
 * VM? 
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
-	* collect returns 
-	* decl improvements
-	* thg lookups
+	* param upgrade
 
 	
 // Perry Do later
-* tab between search fields goes to another window?
+* cant type into text search area?
 * render warnings on textview but not on errorlist
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?

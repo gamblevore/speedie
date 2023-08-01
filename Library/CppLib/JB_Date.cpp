@@ -48,7 +48,7 @@ void JB_Date__Sleep(Date Time) {
     ts.tv_sec = Time>>16;
     ts.tv_nsec = (Time & ((1<<16)-1)) * 15258.7890625;
     errno = 0;
-    int PID = getpid(); // for debug
+//    int PID = getpid(); // for debug
     while ((nanosleep(&ts, &ts) == -1 and errno == EINTR)) {
 		;
     }	
