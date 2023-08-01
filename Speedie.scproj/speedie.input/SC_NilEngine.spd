@@ -37,7 +37,10 @@ function NilTracker.Check (|scfunction| f)
 	debugat
 	opt norefcounts
 	.Start(f)
-	.RunNormal(f.SourceArg)
+	.RunNormal(.fn.SourceArg)
+	|| r = .fn.ReturnType
+	r.NilTake(r)
+	// how to use this?
 
 
 function message.NilPropAccess (|scdecl|)
@@ -88,10 +91,15 @@ function NilTracker.IfOrWhile (|message| msg)
 function NilTracker.Return (|message| msg)
 	opt norefcounts
 
-	|| test = msg
-	while test
-		test = .IfWhileOne(test, msg)
-
+	|| value = msg.first				#require
+	|| vd = value.NilDecl
+	|| vn = vd.nilused
+	|| rd = .fn.ReturnType
+	|| r = rd.NilDeclared
+	if r is stated
+		|| outside = ~r & vn
+			error (msg, "Nilness return error")
+	rd.nilused |= vn // find the answer at the end
 
 
 function NilTracker.If (|message| Tmp)
@@ -151,7 +159,7 @@ function niltracker.Redeclare (|message| msg, |scdecl| d, |nilstate| used, |scde
 
 	
 	|| d2 = d.copy
-	SCFunction.CurrFunc[d.NilParamPos] = d2
+	.fn[d.NilParamPos] = d2
 	d2.NilDeclared = used
 	return d2
 
@@ -278,7 +286,7 @@ function NilTracker.ProcessCondRel (|message| m, |bool| Y, |branchstate|)
 	return branchstate.Perhaps
 
 
-function Niltracker.CollectNilDecl (|message| declmsg)
+function Niltracker.Decl (|message| declmsg)
 	opt norefcounts
 	|| exp = declmsg.last
 	if exp == @rel
@@ -313,7 +321,7 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 			  elseif type is kReturn
 				.Return(s)
 		  elseif (f == @decl)
-			.CollectNilDecl(s)
+			.Decl(s)
 				
 		  elseif !s.IsLast
 			.RunNormal(s)

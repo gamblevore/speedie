@@ -4,6 +4,7 @@ struct NilTracker
 	linkage:cpp_part nil
 	|uint| 				IfDepth
 	|uint| 				MsgCount
+	|scfunction--|		fn
 	|message--|			IfMsg
 	|message--[1024]|	Items
 	
@@ -32,9 +33,10 @@ struct NilTracker
 	function Start (|scfunction| f)
 		opt norefcounts
 		scfunction.currfunc = f
+		.fn = f
 		.ifmsg = nil
 		.MsgCount = 0
-		for d in scfunction.currfunc.args				// no need add prms.... only log changes
+		for d in .fn.args				// no need add prms.... only log changes
 			d.RestoreNil
 
 
@@ -56,15 +58,14 @@ function SCDecl.NilTake (|scdecl| d)
 	.NilDeclared = n
 	
 	
-function SCDecl.NilTighten
-	// set in the actual
+function SCDecl.NilTighten (|scfunction| f)
 	opt norefcounts
-	|| u = .nilused	
-	|| d = .NilDeclared	
-	if (u is stated) and (d isnt stated)
-		|| f = SCFunction.CurrFunc
-		|| p = .NilParamPos
-		if u isnt Nilish
-			f[p] = .MakeReal
-		  else
-			f[p] = .MakeOptional
+	|| u = .nilused
+	|| d = .NilDeclared
+	if (u xor d) & nilstate.Either
+		if d isnt stated
+			|| p = .NilParamPos
+			if u isnt Nilish
+				f[p] = .MakeReal
+			  else
+				f[p] = .MakeOptional
