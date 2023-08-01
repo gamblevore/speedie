@@ -272,9 +272,9 @@ datatype uint
 		return .ispo2
 
 	function Hash (|uint|)
-		cpp_wrapper JB_uint32_hash
+		cpp_wrapper JB_uint_hash
 	function Unhash (|uint|)
-		cpp_wrapper JB_uint32_unhash 
+		cpp_wrapper JB_uint_unhash 
 	
 	function SwapEndian (|uint|)
 		cpp_Wrapper (__builtin_bswap32)
