@@ -10,6 +10,7 @@ extern "C" {
     float fclampf (float d, float min, float max);
     float JB_fCluster (float x);
     u32 JB_uint_hash (u32 x);
+    double JB_Pow10(int x);
     u32 JB_uint_unhash (u32 x);
     u64 JB_uint64_hash (u64 x);
      

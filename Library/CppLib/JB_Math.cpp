@@ -61,6 +61,15 @@ extern "C" {
             return angle;
         }
     }
+
+	double JB_Pow10(int x) {
+		double rz = 1.0;
+		for_(x) {
+			rz *= 10.0;
+		}
+		return rz;
+	}
+
     
     u32 JB_uint_hash (u32 x) {
         x ^= x >> 16;

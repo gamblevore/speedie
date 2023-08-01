@@ -366,9 +366,6 @@ bool HasDot (uint8* self, int Used) {
 	return false;
 }
 
-#ifndef __linux__
-	#define pow10(x) (pow(10,x))
-#endif
 
 
 void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp) {
@@ -384,7 +381,7 @@ void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp) {
     int ActualExp = 0;
     if (CanExp and (exp > 16.0 or exp < -9)) {
 		ActualExp = (int)floor(exp);
-		D = D / pow10(ActualExp);
+		D = D / JB_Pow10(ActualExp);
 	}
     
 	double F = floor(D);

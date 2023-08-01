@@ -6,6 +6,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <poll.h>
