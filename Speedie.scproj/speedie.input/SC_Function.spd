@@ -846,10 +846,10 @@ function CollectLinks (|object| obj)
 		obj.DoLinkFrom( self )
 		
 	  elseif obj isa SCDecl
-		if obj.type
-			.DoLinkTo( obj.type )
-		|| t = obj.IsLookupOnly
-			.CollectLinks( t )
+		|| t1 = obj.type
+			.DoLinkTo( t1 )
+		|| t2 = obj.IsLookupOnly
+			.CollectLinks( t2 )
 		
 	  elseif obj isa SCClass
 		.DoLinkTo( obj )

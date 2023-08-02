@@ -49,7 +49,7 @@ class PerryIDE (Window)
     |ButtonView|				FunctionMenu
     |buttonview|				Toolbar
     |Buttonview|				Tabs
-    |buttonview| 				Tabs2 // compiletabs, compilertabs, ctabs
+    |buttonview| 				CompileTabs // compilertabs
 	|buttonview|				SubFindCheckBox    
     |Buttonview|				ViewErrors
     |Buttonview|				ViewFiles
@@ -814,6 +814,7 @@ class PerryIDE (Window)
 			require e.Save
 		  else
 			return
+		
 		.UpdateActiveFile
 		with .currfilerow
 			.lastsize = e.Length

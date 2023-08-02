@@ -27,13 +27,6 @@ module Perry
 		if !._SpeedieDir.resolve
 			"/usr/local/speedie didn't resolve?"
 		return ._SpeedieDir
-	
-	
-	function AnyActive (|bool|)
-		opt norefcounts
-		for p in .Projects
-			if p is active
-				return true
 		
 		
 	function LoadWindowsFromArgs (|bool|)
@@ -147,7 +140,7 @@ module Perry
 		|| f = old.first
 		f.name = f.name.ProjCleanName
 		.id = "IDE: " + f.name
-		.tabs2.items.last.name = f.name + "[]"
+		.CompileTabs.items.last.name = f.name + "[]"
 		
 		
 	function AddProj (|string| path, |PerryIDE| i)
@@ -223,7 +216,7 @@ function ShowStdOut (|bool| AlwaysShow=false)
 
 
 function OutText (|textview|)
-	|| row = .tabs2.Selected
+	|| row = .CompileTabs.Selected
 		|| obj = row.obj as TextView
 			return obj
 

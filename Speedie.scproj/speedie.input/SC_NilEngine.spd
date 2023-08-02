@@ -66,6 +66,27 @@ function NilTracker.ChildMustExist (|message| wrapper)
 		.MustBeReal(msg, msg.NilDecl)
 
 
+function NilTracker.CheckFunction (|message| msg)
+	opt norefcounts
+	// check all the function params. and return too. The return must be stated
+	// print(a, b, c)
+	|| prms = msg.last
+	|| fn = prms.obj|scfunction|
+	|| ret = fn.ReturnType
+		if ret.CouldReceiveNil
+			check (ret.IsStated) (msg, "Unknown if this function returns nil.")
+
+	|| p = prms.first
+	for d in fn.args
+		|| pnd = p.NilDecl
+		if (pnd.NilUsed is Nilish) and d.CouldReceiveNil
+			if !d.IsStated
+				error (p, "Unknown if this parameter accepts nil.")
+			  elseif d.NilDeclared isnt Nilish
+				error (p, "Possible NilObject value passed.")
+		p++
+
+
 function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
 	opt norefcounts
 	|| arg = test.first
@@ -321,8 +342,11 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 		  elseif (f == @brel) 
 			if s != "*"
 			.ChildMustExist(s)									// *abc
-		  elseif (f == @func and s.first == @bra)
-			.ChildMustExist(s.first)							//  (abc)()
+		  elseif (f == @func)
+			|| ch = s.first
+			if ch == @bra
+				.ChildMustExist(ch)								//  (abc)()
+			.CheckFunction(s)
 		  elseif (f == @tmp)
 			|| type = S.TmpType
 			if Type is kif
@@ -346,7 +370,7 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 
 /*
 TODO:
-* update the params properly
+* cpp-wrappers and prototypes default to not nil unless stated.
 * pop the msgs out and restore nilused
 * ternaries
 * freeze bug
@@ -374,8 +398,22 @@ BOOLEAN LOGICS:
 	changes nothing:
 		if (a or b)
 
+	nil-checker funcs:
+		can still be realish if returns false.
+
 
 DONE?
+
+function calls:
+function gg (|object|)
+	|| a = maybenil
+	|| x = ff(a) // error: ff does not take nil.
+	|| y = gg()  // error: unknown at this time if gg returns nil.
+
+update the params:
+	function abc (|message| o)
+		o.position // o is now "!"
+
 return values:
 	if x
 		return message()

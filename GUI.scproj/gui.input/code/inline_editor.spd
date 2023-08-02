@@ -31,7 +31,7 @@ struct InlineEditor
 			beep
 
 	
-	function AcceptSearch (|string|s)
+	function AcceptSearch (|string| s)
 		sdlapp.LastSearch = s
 		.NextSearch
 	
@@ -66,7 +66,7 @@ struct InlineEditor
 		.NeedsHide = true
 		
 	
-	function Clear (|bool| Focus=true)
+	function Clear (|bool| Focus = true)
 		.NeedsHide = false
 		.cell = nil
 		|| s = .EditingFor 
@@ -118,24 +118,39 @@ function window.InlineEditor (|guicontrol|)
 	return .inlineeditorplace.editor
 
 
-function GuiControl.CanSearch (|bool|)
-	require self isnt unsearchable
+function GuiControl.CanSearch (|int|)
+	if self is unsearchable
+		return 0
 	if self isa textview
-		require !.isinline
-		require !.singleline
-	return true
+		if .isinline
+			return -1
+		if .singleline
+			return 0
+	return 1
 
 
 function GuiControl.OpenSearch (|bool|)
 	opt norefcounts
 	debug_require !(self isa window)
 	require self isnt NoSearch
-	if .CanSearch
-		return .opensearchsub
+	|| cs = .CanSearch
+	if cs > 0
+		return .OpenSearchSub
+	if cs < 0
+		return false
+
+	// we shouldn't use a loop here, cos if we have two items, it will bounce between them
+	// this seems OK... except that we might want to add a third item artificially
+	// we'd need to return false here, to do that.
+	
+	// so... lets say we are in the inline editor... just return false?
+	// if not... well... we can't search, but what about our parent?
+	// when should we look for the next one?
+	// if we have a field focussed that we don't care about.
 	
 	|| f = self
 	while {
-		if f.CanSearch
+		if f.CanSearch > 0
 			return f.opensearchsub
 		f = f.NextFocus(true, false)
 	} (f and f != self)

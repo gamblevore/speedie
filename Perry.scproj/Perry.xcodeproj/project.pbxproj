@@ -236,7 +236,6 @@
 		AC259FBF2660EF610026C303 /* image.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image.input; path = ../Image.scproj/image.input; sourceTree = "<group>"; };
 		AC28D04B2638AAE700635A66 /* perry.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perry.input; sourceTree = SOURCE_ROOT; };
 		AC310BFA2A5188FE00837DCB /* BirdDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BirdDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AC310BFB2A5188FE00837DCB /* PerryDebug copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PerryDebug copy-Info.plist"; path = "/usr/local/speedie/Perry.scproj/PerryDebug copy-Info.plist"; sourceTree = "<absolute>"; };
 		AC310C022A5189BF00837DCB /* JB_Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = ../../Utils/birds.scproj/Cpp/JB_Globals.cpp; sourceTree = "<group>"; };
 		AC310C032A5189BF00837DCB /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = ../../Utils/birds.scproj/Cpp/JB.cpp; sourceTree = "<group>"; };
 		AC310C062A518A1300837DCB /* bird.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = bird.input; path = ../Utils/birds.scproj/bird.input; sourceTree = "<group>"; };
@@ -472,7 +471,6 @@
 				AC528F142961FA8C005EFB9D /* libSDL2.dylib */,
 				AC9E1722233A859B003B433F /* Products */,
 				ACB2D27D29BCF4AD0070E60F /* Frameworks */,
-				AC310BFB2A5188FE00837DCB /* PerryDebug copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};

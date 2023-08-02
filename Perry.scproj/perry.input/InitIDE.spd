@@ -21,8 +21,8 @@ extend PerryIDE
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
 		.GoNext				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
-		.CurrFileName		= ButtonView(.RBorder,	OpenProjectPath, nil, ReturnProjectPath) 
-		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	nil,  ReturnAllFuncs) 
+		.CurrFileName		= ButtonView(.RBorder,	OpenProjectPath, nil,	ReturnProjectPath) 
+		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs) 
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.SubFindCheckBox	= ButtonView(.searcharea, PressedSearchWithin   	)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList) 
@@ -37,7 +37,7 @@ extend PerryIDE
 		.JeeboxText			= TextView(self,		nil,					nil)
 		.SpeedieText		= TextView(self,		nil,					nil)
 		.ProductPage		= TextView(self,		nil,					nil)
-		.tabs2				= ButtonView(.stdoutborder,		ClickedCompileTabs) 
+		.CompileTabs		= ButtonView(.stdoutborder,		ClickedCompileTabs) 
 		.NoNeeder			= TextView(self,		ClickedNoNeed,			nil)
 		.AutoComplete		= menu(self, 			nil,					AutoCompleteInsertText)
 		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
@@ -348,7 +348,7 @@ extend PerryIDE
 				 (pf is selected)
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
 
-		with .tabs2
+		with .CompileTabs
 			.id = "CompileTabs"
 			.size = the~area
 			.itemwidth = 75

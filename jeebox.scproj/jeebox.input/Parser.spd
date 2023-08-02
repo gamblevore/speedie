@@ -1288,11 +1288,13 @@ extend Message
 
 	syntax isnt (|msguiflags|F, assigns:|bool|)
 		.syntaxis(f) = !Value
+
 	syntax is (|msguiflags|F, assigns:|bool|)
 		if self
 			if Value
 				.flags |= f
 			  else
+				if (f == 64) and (.flags & 64)
 				.flags &= ~F
 
 

@@ -7,10 +7,9 @@
 	* NilSweep, for global vars, and for function misuse.
 	* param upgrade
 
-	
+
 // Perry Do later
 * cant type into text search area?
-* render warnings on textview but not on errorlist
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
 * tab on "function app.funcname" (in func params) doesn't work.
@@ -20,6 +19,7 @@
 
 // Speedie Do later
 * unused func finder doesnt work perfectly on my projects
+	* need add owning func!
 * file.wrapsub shows up in autocomplete?
 * x=(*Count)-- doesnt compile but x=*Count-- does?
 * nicer lookups... syntaxis thing can be used elsewhere too! like for almost anything

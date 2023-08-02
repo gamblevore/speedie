@@ -77,7 +77,7 @@ function ClickedCompileTabs (Guiaction)
 
 function PerryIDE.StdOutSelect (|object| Desired)	
 	opt norefcounts
-	for i in .tabs2.Items
+	for i in .CompileTabs.Items
 		|| obj = i.obj as GUIControl
 			|| vis = (Desired == i or obj)
 			(i is selected)  = vis
@@ -117,17 +117,19 @@ function PerryIDE.FindNotTodo (|bool|)
 		|| root = .FileList[0]
 		if c != root
 			.NotTodo = c
-	.nottodo := .LocateProjRoot("./main.spd")
-	.nottodo := .LocateProjRoot("./index.spd")
-	|| F = .MainProjFol
-		.nottodo := f.first
+	if !.nottodo
+		.nottodo = .LocateProjRoot("./main.spd")
+		if !.nottodo
+			.nottodo = .LocateProjRoot("./index.spd")
+			if !.nottodo
+				.nottodo = .MainProjFol
 	return .nottodo
 
 
 function PerryIDE.ClickedTodo
 	|| fl	= .filelist #require
 	|| todo	= .MainProjFol ?? fl[0]
-	require .FindNotTodo and fl // what? fl is nil? it happened tho?
+	require .FindNotTodo // what? fl is nil? it happened tho?
 	if !todo
 		todo = fl[0]
 	|| Jumpback = (todo is selected) and .nottodo and (fl.listsource contains .nottodo) 

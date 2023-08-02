@@ -137,7 +137,7 @@ class ButtonView (GUIControl)
 		opt norefcounts
 		.clickcount = clicks
 		|| D = .itemat(P.x)
-			if d isnt active and self is decluttered
+			if d isnt active  and  self is decluttered
 				d = nil
 		
 		|| ret = 0

@@ -409,9 +409,12 @@ class SCDecl (SCObject) {
 	function IsProto (|bool|)
 		return .Type.FuncProto
 
-
+	function IsObject (|bool|)
+		return (.Type.IsObject) and (!.C_Array)
+		
+		
 	function IsNormalObject (|bool|)
-		return (!.PointerCount) and (!.IsNil) and (.Type.IsObject) and (!.C_Array)
+		return (!.PointerCount) and (!.IsNil) and .IsObject
 
 
 	function IsNormalNumber (|bool|)

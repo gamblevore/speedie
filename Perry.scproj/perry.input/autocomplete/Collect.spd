@@ -107,11 +107,12 @@ function PerryIDE.ActualCompile (|message| msg)
 	.compilr = c
 	.speedietext.text = ""
 	
-	|| dw = .datewrap(msg)
+	|| dw = .datewrap(msg )
 	.logonecomm(dw, "\1C ")
 	c <~ dw
 	(.buildbutton isnt enabled)
 	(.runbutton isnt enabled)
+	debugger
 	is active
 	if .name ~= "Speedie.scproj"
 		.editsep.show

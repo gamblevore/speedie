@@ -110,6 +110,7 @@ class TextView (GUIControl)
 		if .isinline or .singleline
 			.sel = .text.length
 		.clearfound
+		sdlapp.SelChanged
 		super.gotfocus
 
 

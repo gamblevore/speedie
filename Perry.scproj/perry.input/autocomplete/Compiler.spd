@@ -10,17 +10,17 @@ extend PerryIDE
 		if .IsSpeedieCode and !.UsingSpdLib
 			.GetFeedbackStr "check"
 
-//	if abc
-//		1
-//	  elseif def
-//		2
-//	  else
-//		3
+
 	syntax is (|ListViewState| s, |bool|)
 		return .projmsg.syntaxis(s)
+		
+
 	syntax isnt (|ListViewState| s, |bool|)
 		return !.syntaxis(s)
+		
+
 	syntax is (|ListViewState| s, assigns:|bool| mod)
+		opt norefcounts
 		.projmsg.syntaxis(s) = mod
 		
 		if (s == listviewstate.modified)
@@ -28,8 +28,10 @@ extend PerryIDE
 				|| src = sub.ListSource
 					(src is modified) = Mod
 
+
 	syntax isnt (|ListViewState| s, assigns:|bool| b)
 		.syntaxis(s)=!b
+
 
 	function ClearErrors (|bool| Compiled)
 		isnt Broken

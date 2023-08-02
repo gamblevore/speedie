@@ -59,6 +59,7 @@ function SCDecl.NilTake (|scdecl| d)
 	
 	
 function SCDecl.NilTighten (|scfunction| f)
+	disabled "we wanna remove f[p] cos its not needed"
 	opt norefcounts
 	|| u = .nilused
 	|| d = .NilDeclared
@@ -69,3 +70,13 @@ function SCDecl.NilTighten (|scfunction| f)
 				f[p] = .MakeReal
 			  else
 				f[p] = .MakeOptional
+
+				
+		
+
+function scdecl.CouldReceiveNil (|bool|)
+	return .IsObject or .PointerCount
+
+
+function scdecl.IsStated (|bool|)
+	return .NilDeclared is Stated
