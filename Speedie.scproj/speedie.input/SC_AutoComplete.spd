@@ -443,6 +443,7 @@ function SCFunction.VisibleArgs (|int|)
 
 
 function SCObject.CanAuto (|string| search, |string|)
+	opt norefcounts
 	rz = .CanAutoSub(Search)
 	if rz
 		|| IsExact = rz ~= search
@@ -456,18 +457,22 @@ function SCObject.CanAuto (|string| search, |string|)
 
 function SCObject.CanAutoSub (|string| search, |string|)
 	opt norefcounts
+	
 	if self isa scfunction
+		require !.noautocomplete or (.name ~= search) // is .noautocomplete == 1 allowed?
 		if (.name starts "operator")  and  !(search starts "oper")
 			return ""
-		if .VisibleArgs
-			return .name
-	
+		require .VisibleArgs
+		return .name
+		
 	if self isa scdecl
 		return .realname
+		
 	if self isa scmodule
 		|| cls = .cls
-		if cls and cls.NoAutoComplete or cls.IsBehaviourTable
-			return ""
+			require !(cls.NoAutoComplete or cls.IsBehaviourTable)
+		return .name
+		
 	return .name
 
 
@@ -601,8 +606,7 @@ function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoite
 		value = value.nextdisplay(exact)
 
 			
-function AutoSub (|scbase| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit)
-	// we want to knuw what if is... and where it is going into... like is it going into a decl...
+function AutoSub (|scbase| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit) // autocompletesub
 	|scdecl| TypeLimiter = nil
 	if NeedTypeLimit
 		TypeLimiter = TypeOfExpr(needtypelimit, scope) // i guess?

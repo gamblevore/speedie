@@ -152,6 +152,7 @@ Render
 
 
 function Message.TestFuncName (|bool|)
+	opt norefcounts
 	|| fn = .func
 	expect (fn != @Func and @prm and @list) (self, "Need space between bracket and name.")
 	expect (fn == @Thg)                     (self, "Doesn't follow 'function name (|Type| Name)'")

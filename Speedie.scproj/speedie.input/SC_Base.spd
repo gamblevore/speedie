@@ -304,18 +304,17 @@ function scfunction.FindCppWrapperFunc (|message| place, |message|)
 		|| n = cpp.name
 		ifn n starts "cpp_"
 			continue
-		if n != "cpp_wrapper"
-			if n == "cpp_nothing"
-				.noautocomplete = 1
-				.IsCppInBuilt = 2
-			  elseif n == "cpp_inbuilt"
-				.noautocomplete = 1
-				.IsCppInBuilt = 1
-			  elseif n == "cpp_libwrapper"
-				.noautocomplete = 1
-				.IsExternalLib = true
-			  else
-				continue
+		if n == "cpp_nothing"
+			.noautocomplete = 1
+			.IsCppInBuilt = 2
+		  elseif n == "cpp_inbuilt"
+			.noautocomplete = 1
+			.IsCppInBuilt = 1
+		  elseif n == "cpp_libwrapper"
+			.noautocomplete = 1
+			.IsExternalLib = true
+		  else
+			continue
 		return cpp
 
 

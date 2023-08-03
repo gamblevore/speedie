@@ -60,7 +60,7 @@ function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |ImagePixe
 	|| mw	= where.ControlClip.width/font.width
 	while (i < str.length) and lines >= 1
 		|| p = i
-		i = str.WrapSub(mw, false, p)
+		i = str.wrapsub(mw, false, p)
 		|| ttt = str[p, i]
 		.DrawText(ttt, where, xy, col)
 		xy.y -= 12
