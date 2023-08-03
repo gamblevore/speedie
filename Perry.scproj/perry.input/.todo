@@ -9,7 +9,6 @@
 
 
 // Perry Do later
-* cant type into text search area?
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
 * tab on "function app.funcname" (in func params) doesn't work.
@@ -18,11 +17,10 @@
 
 
 // Speedie Do later
-* unused func finder doesnt work perfectly on my projects
-	* need add owning func!
-* file.wrapsub shows up in autocomplete?
-* x=(*Count)-- doesnt compile but x=*Count-- does?
-* nicer lookups... syntaxis thing can be used elsewhere too! like for almost anything
+* unused func finder doesnt work perfectly on my projects. need add owning func!
+* string.wrapsub shows up in autocomplete?
+* x=(*Count)-- doesnt compile?
+* nicer lookups... syntaxis approach can be used elsewhere too! like for almost anything
 	* if it cant be found... allow a second function to be tested.
 * RefOpts. Do it bit by bit
 	* get property but only did math
