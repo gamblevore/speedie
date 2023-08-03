@@ -18,29 +18,24 @@
 
 // Speedie Do later
 * unused func finder doesnt work perfectly on my projects. need add owning func!
-* string.wrapsub shows up in autocomplete?
 * x=(*Count)-- doesnt compile?
 * nicer lookups... syntaxis approach can be used elsewhere too! like for almost anything
 	* if it cant be found... allow a second function to be tested.
+* "calledfrom" autocomplete needs to include references to funcs
+	* calledfrom datatypes too
+	* @dot completes to @dotAnyGlobalfunc
+* galaxxies C++ compile issues
+* autocomplete in iterators using the yield_test func would be nice.
 * RefOpts. Do it bit by bit
 	* get property but only did math
 	* mark a few string funcs as not-modifier/disowner/capturer
 	* mark entire class
 	* fast capture of disowned things. like: r1 <~ r2.pop
 	* check entire program for modification during nil-sweep
-		* Start with leaf-funcs.
-* "calledfrom" autocomplete needs to include references to funcs
-	* calledfrom datatypes too
-	* @dot completes to @dotAnyGlobalfunc
-* galaxxies C++ compile issues
-* finding .func in "|| x = "abc".func" would need change to how decls are collected... 
-	* Add decl.nextdecl (for contains) to store ALL init decls list... leave them in place. InitFuncs get copies.
-* autocomplete in iterators using the yield_test func would be nice.
 
 
 // Perry additions
 * add image editor...
-* reddit.com/r/ProgrammingLanguages/comments/14eed4n medium.com hackernews?
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order...  that can't just be commented out.
 * double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
