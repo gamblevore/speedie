@@ -1230,17 +1230,8 @@ function Tran_AfterRel (|Message| msg, |SCBase| name_space, |message| side, |SCD
 								 // or else we can't do array.size++
 
 	|| Type = TypeOfExpr( exp, name_space )		#require
-	
-	// OK so the problem here is that it's already getting the type of this
-	// and failing, because we aren't giving it something that we are setting it to.
-	// we'd have to do the transform FIRST, THEN get the type!
-	// but we can't do the transform until we have the type.
-	// we'd ahve to remove that silly next/prev thing.
-	// So that x = x + 1 can work for nodes too. which is MORE annoying.
-	//// require type and type.ConstCheck(exp, side, nil) /// needs above fix
-
 	|| numc = Type.type.NumericCount
-	if (!Type.type.IsObject and Type.Name and !type.setter and numc <= 1) or type.pointercount > 0
+	if (!Type.type.IsObject and !type.setter and numc <= 1) or type.pointercount > 0
 		return type											// gui.scproj won't compile :(
 
 	|message| R

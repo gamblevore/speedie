@@ -18,7 +18,6 @@
 
 // Speedie Do later
 * unused func finder doesnt work perfectly on my projects. need add owning func!
-* x=(*Count)-- doesnt compile?
 * nicer lookups... syntaxis approach can be used elsewhere too! like for almost anything
 	* if it cant be found... allow a second function to be tested.
 * "calledfrom" autocomplete needs to include references to funcs
