@@ -14,6 +14,7 @@ class GUIControl (ringtree)
 	|GUIAction|					OnClicked
 	|GUIAction|					OnFocus
 	|ControlSize|				Sizer
+	|uint16|					TabIndex
 	|ControlClipMode|			ClipMode
 	|GuiControlFlags|			State
 	|TakesFocusFlag|			TakesFocus
@@ -28,13 +29,13 @@ class GUIControl (ringtree)
 		.id = ("", "root")(parent)
 		if parent
 			parent <~ self
+			.tabindex = parent.loadtabindex
 		.gnormal = drawstyle()
 
 		is visible
 		is Enabled
 		is Drawsfocus
 
-	
 	render
 		if !self
 			fs <~ "(nil)"
@@ -98,6 +99,15 @@ class GUIControl (ringtree)
 				prev = Curr
 
 
+	helper LoadTabIndex (|uint16|)
+		opt norefcounts
+		|| w = .window
+		rz = w.tabindex + 1
+		if rz >= 0x10000
+			rz = 1
+		w.tabindex = rz
+
+
 	helper ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // resizecontrol, recalculatesize
 		opt norefcounts
 		rz = .sizer.Calculate(parent, prev, Hard, .clipmode)
@@ -111,21 +121,40 @@ class GUIControl (ringtree)
 		.Reflow(mine, hard)
 
 
-	helper NextFocus (|bool| dir, |bool| force, |guicontrol|)
+	helper nextfocus (|bool| dir, |bool| force, |guicontrol|)
 		opt NoRefCounts
 		|| c = self
 		|| w = .window
+		
 		while
 			c = c.loop(dir, w) // flatloop!
-			if c.isviewable and c is enabled
-				if c.takesfocus.tab(force)
-					if (c isa ListView or textview)
-						return c
-				if c is opensmenu
-					return c
 			if c == self
-				return c
+				exit
+			if .IsBetterFocus(c, rz, force)
+				rz = c
+
+
+	helper tabbability (|guicontrol| c, |int|)
+		return  c.tabindex|int|  -  .tabindex|int|
 		
+	
+	helper isbetterfocus (|guicontrol| c, |guicontrol| b, |bool| force, |bool|)
+		require c.isviewable and c is enabled
+		require (c isa ListView or textview)
+		require c.takesfocus.tab(force) or (c is opensmenu)
+		if !b
+			return true
+		
+		require c.tabindex
+		if !b.tabindex		// 0 is lower priority... but better than nothing.
+			return true
+		
+		|| c_extra = .tabbability(c)
+		|| b_extra = .tabbability(b)
+		if c_Extra > 0 == b_Extra > 0
+			return c_Extra < b_Extra
+		return c_Extra > 0
+	
 	
 	function TextWidth (|int|)
 		opt norefcounts

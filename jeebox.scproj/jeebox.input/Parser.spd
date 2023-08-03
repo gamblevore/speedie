@@ -1294,7 +1294,6 @@ extend Message
 			if Value
 				.flags |= f
 			  else
-				if (f == 64) and (.flags & 64)
 				.flags &= ~F
 
 

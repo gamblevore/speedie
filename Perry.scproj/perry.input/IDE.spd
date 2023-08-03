@@ -136,7 +136,7 @@ class PerryIDE (Window)
 
 
 	behaviour CancelClose 
-		|| proj = .projmsg #require
+		|| proj = .projmsg					#require
 		|| n = proj.parent.slowcount?
 		proj["pos"] = .editme.sel0
 

@@ -137,16 +137,7 @@ function GuiControl.OpenSearch (|bool|)
 	if cs > 0
 		return .OpenSearchSub
 	if cs < 0
-		return false
-
-	// we shouldn't use a loop here, cos if we have two items, it will bounce between them
-	// this seems OK... except that we might want to add a third item artificially
-	// we'd need to return false here, to do that.
-	
-	// so... lets say we are in the inline editor... just return false?
-	// if not... well... we can't search, but what about our parent?
-	// when should we look for the next one?
-	// if we have a field focussed that we don't care about.
+		return false	
 	
 	|| f = self
 	while {

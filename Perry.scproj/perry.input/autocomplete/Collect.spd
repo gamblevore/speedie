@@ -112,7 +112,7 @@ function PerryIDE.ActualCompile (|message| msg)
 	c <~ dw
 	(.buildbutton isnt enabled)
 	(.runbutton isnt enabled)
-	debugger
+
 	is active
 	if .name ~= "Speedie.scproj"
 		.editsep.show
