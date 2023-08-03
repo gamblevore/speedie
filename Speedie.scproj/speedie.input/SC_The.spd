@@ -6,7 +6,14 @@
 
 
 
-module SCThe		
+module SCThe
+/*
+	function linktest2
+		visible
+		|| abc = linktest
+		(abc)(nil, nil, nil)
+	function linktest (CollectFunc)
+*/
 	function NewInsertion (CollectFunc)
 		opt norefcounts
 		|| name = node[0]

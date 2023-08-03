@@ -165,18 +165,20 @@ function ParseName (|Message| node, |bool|)
 	cname.func = @thg
 	.Name = cname.name
 	
-	if fType ~!= "helper" and "prototype" and "iterator"
-		if fType == "api"
-			.isapi = true
-		  elseif fType == "setter"
-			.isassigns = 2
+	if ftype == "helper"
+		.NoAutoComplete = 2
+	  elseif fType == "api"
+		.isapi = true
+	  elseif fType == "setter"
+		.isassigns = 2
 
-	if .cls
-		if cname ~= "constructor"
-			.AllocCode = kIsConstructor
-			.IsInline = true
-		  elseif cname ~= "destructor"
-			.AllocCode = kIsDestructor
+	if !.cls
+		0	
+	  elseif cname ~= "constructor"
+		.AllocCode = kIsConstructor
+		.IsInline = true
+	  elseif cname ~= "destructor"
+		.AllocCode = kIsDestructor
 	
 	Return cname.TestFuncName
 
@@ -841,6 +843,7 @@ function CountCallsToParentAlloc (|Message| root, |message|)
 
 function CollectLinks (|object| obj)
 	opt norefcounts
+	//if self ~= "linktest2"
 	if obj isa SCFunction
 		.DoLinkTo( obj )
 		obj.DoLinkFrom( self )
@@ -1650,9 +1653,7 @@ function NewSetter (CollectFunc)
 function NewHelper (CollectFunc)
 	if !node.name.IsLower
 		deprecate (node, "Helpers need lowercase names")
-	rz = SCFunction.NewFunc( node, name_space, ErrPlace )
-	if rz
-		rz.NoAutoComplete = 2
+	return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 
 function SCBase.StoreLinkToMe (|&(dictionary of SCBase)| dp)
