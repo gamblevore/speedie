@@ -96,10 +96,10 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 				error (item, "Can’t use this here." )
 			  else
 				// fn x (|int|) --> fn x (|int| value)
-				func.isassigns = 3
-				if cls.isdatatype
+				func.IsAssigns = 3
+				if cls.IsDataType
 					item.next = item.copy // fn x (|int|) --> fn x (|int| value, |int|)
-				if !item.haschildcount(2)
+				if !item.HasChildCount(2)
 					using func.source
 						item <~ «thg "Value"»
 			

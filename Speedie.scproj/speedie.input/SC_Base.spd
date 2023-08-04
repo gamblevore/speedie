@@ -115,7 +115,7 @@ function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {
 // OK so.. i guess functions can hide stuff below it, right?
 // so upcheck shouldn't work, if we are on a function, right?
 
-function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
+function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name, |bool| SelfIgnore=false)
 	require (IncObj)		
 	name = name.Lowercase
 	expect (name) ( ErrPlace, "Empty name." )
@@ -136,22 +136,22 @@ function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
 				old.Last.NextFunc = IncObj
 				Return
 		  elseif incobj isa scdecl and old.isassigns==2	
-			expect (!incobj.setter) (errplace, "Multiple setters found.")
+			expect (!IncObj.setter) (errplace, "Multiple setters found.")
 			incobj.setter = old
 			.access[ name ] = IncObj
 			return
 
-	
+	// the problem is that we need to add self... then probably remove it
+	// so lets... just do that? add self and remove it.
 	if name == "self"
-		error ( ErrPlace, "Can't use 'self' here." )
+		if !SelfIgnore
+			error ( ErrPlace, "Can't use 'self' here." )
 	  else
 		error ( ErrPlace, kNameConf )
-	if old isa SCObject
-		error ( old.AnySource, kNameConf )
-	  else
-		error (old.render, knameconf)
-		
-
+		if old isa SCObject
+			error (old.AnySource, kNameConf)
+		  else
+			error (old.render, kNameConf)
 
 
 constructor
@@ -232,7 +232,7 @@ function SCFunction.UseCppName (|string| CppName, |bool|)
 
 function LinkagePlace (|message|)
 	|| Place = .SourceArg
-	|| Link = Place.findflat(@tmp, "linkage")
+	|| Link = Place.find(@tmp, "linkage")
 	return Link[@arg] ?? Place
 
 
@@ -294,7 +294,7 @@ function Message.FindAndRemove2 (|message| place,  |bool| NothingOK,  |bool| IsC
 
 
 function Message.FindAndRemoveSub (|String| name,  |bool| NothingOK,  |bool| IsClass,  |Message|)
-	|| place = .findflat( @Tmp, name )
+	|| place = .find( @Tmp, name )
 		return .FindAndRemove2(place, NothingOK, isclass)
 	
 

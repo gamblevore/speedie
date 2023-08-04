@@ -4,7 +4,7 @@ function FileSepClicker (guiaction)
 	opt norefcounts
 	.ide.ViewAsSwap
 
-
+	
 function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE|)
 	|| old = perry.FindProj(path)
 		ClickedTabs(nil, old)

@@ -23,6 +23,13 @@ class SCParamArray
 	|bool|				Found
 	
 
+	constructor (|Message| exp, |message|side=nil)
+		.Exp = exp
+		.side = side
+		.IsDot = (exp == @dot)
+		.IsAddress = (exp != nil) and (exp.niceparent Isbrel "&")
+		.ErrCount = stderr.errorcount
+
 	syntax append (|| m)
 		expect (.size < 11) (m, "Too many parameters")
 		|| i = .size++
@@ -38,7 +45,8 @@ class SCParamArray
 	function MadeError (|bool|)
 		return StdErr.ErrorCount > .errcount
 	
-	function IgnoreSelf (|int|)
+	function IgnoreSelfContain (|scclass|cls, |int|)
+		require cls and cls.IgnoreContainedSelf
 		if (.IsDot and .Isforclass)
 			return kTypeCastIgnoreContained
 
@@ -52,13 +60,6 @@ class SCParamArray
 			return Self[0].RenderType
 		return .exp.first.RenderType
 
-
-	constructor (|Message| exp, |message|side=nil)
-		.Exp = exp
-		.side = side
-		.IsDot = (exp == @dot)
-		.IsAddress = (exp != nil) and (exp.niceparent Isbrel "&")
-		.ErrCount = stderr.errorcount
 
 
 	function PreReadTypes (|SCBase| Name_Space, |Message| P, |message|side, |bool|)
@@ -132,3 +133,15 @@ class SCParamArray
 		if (Value)
 			self <~ Value
 			.IsAssigns = true
+
+
+function scfunction.SelfMatch (|scparamarray| p, |scbase| name_space,  |bool|)
+	rz = true
+	|| SelfContain = .SelfContain
+		|| ty = extractdecl(selfcontain, name_space)
+			|| exty = TypeOfExpr(p.exp.first, name_space)
+				|| m = ty.Match( exty, 0, nil )
+				rz = m == kSimpleMatch or kSuperClassMatch
+	
+	
+	

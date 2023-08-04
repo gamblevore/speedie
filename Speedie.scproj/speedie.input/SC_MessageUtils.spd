@@ -28,7 +28,7 @@ function Message.FindAndRemove (|String| name,  |bool| NothingOK,  |bool| IsClas
 function Message.DeprecatedClassOption (|String| name,  |string| Kind=nil,  |int|)
 	// this is a wasteful way to do stuff.
 	// better to find them as we go through the code... not search for each at the start.
-	|| place = .findflat( @Tmp, name )		#require
+	|| place = .find( @Tmp, name )		#require
 
 	|| num = 1
 	if Kind != nil
@@ -293,7 +293,7 @@ function Message.MoveAllAfter (|Message| after)
 
 
 function Message.NeedMarker (|String| s, |bool| b, |Message|)
-	rz = .findflat( @tmp, s )
+	rz = .find( @tmp, s )
 	if !rz
 		rz = @tmp.msg(s)
 		if b

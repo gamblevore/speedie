@@ -18,7 +18,7 @@ module SC_API
 		proj += "_"
 		|| name = api[@thg]					#require
 		|| arg = api[@arg, -1]				#require
-		|| cpp = arg.findflat(@tmp, "cpp_name")
+		|| cpp = arg.find(@tmp, "cpp_name")
 		
 		using (arg)
 			if (!cpp)
@@ -46,7 +46,7 @@ module SC_API
 		|| name = node[@thg]										#require
 		|| arg = name.next(@arg)									#require
 		
-		|| lib_tmp = arg.findflat(@tmp, "libraryname", true)		#require
+		|| lib_tmp = arg.find(@tmp, "libraryname", true)		#require
 		|| lib_name = lib_tmp[@str]									#require
 		require (lib_name ~= compiler.projectname)
 		

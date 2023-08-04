@@ -62,7 +62,7 @@ class $name (selector)
 
 
 	function FindItems (|message| arg, |message|)
-		return arg.findflat(@tmp, "items", true)
+		return arg.find(@tmp, "items", true)
 		
 
 	function Build (CollectFunc)

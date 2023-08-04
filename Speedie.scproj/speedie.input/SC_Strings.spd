@@ -22,7 +22,7 @@ SCStrings.RenderNewParams = "
 	|string|
 ".ParseCleanWipe
 		
-SCStrings.RenderFinish = SCStrings.RenderInsides.findflat( @tmp, "finish" )
+SCStrings.RenderFinish = SCStrings.RenderInsides.find( @tmp, "finish" )
 
 
 function Tran_Render (|Message| msg, |SCClass| Cls, |bool|)

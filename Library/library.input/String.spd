@@ -641,6 +641,9 @@ class String
 			yield (c) (pos)
 
 
+function join3 (|array of string| self, |string| sep = "", |string|)
+	
+	
 function Join2 (|[string]| R, |string| sep = "", |String|)
 	|| n = -sep.length
 	for s in r

@@ -722,12 +722,9 @@ class Message (RingTree)
 				return ch
 
 	
-	function Find (|Syntax| s, |string| name, |Message|)
-		cpp_part FindSyxName
-		return .findflat(s, name, false)
-
 // merge these two! find and find flat... seem to do the same except the err-param
-	function FindFlat (|Syntax| s, |string| name, |bool| Err = false, |Message|)
+	function Find (|Syntax| s, |string| name, |bool| Err = false, |Message|)
+		cpp_part FindSyxName
 		opt norefcounts
 		for ch in self
 			if (ch == s  and  ch ~= name): return ch
@@ -850,7 +847,7 @@ class Message (RingTree)
 			|| found = .first
 				if found == OK or found == need or (OK == @nil)
 					return found
-			  elseif OK!=@nil
+			if OK!=@nil
 				.accesserr(need, nil, found)
 	
 	

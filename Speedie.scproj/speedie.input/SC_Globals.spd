@@ -548,15 +548,18 @@ function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message| side = nil
 
 function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCDecl|)
 	debug_require exp // shouldn't happen!
+	opt norefcounts
 	|| obj = exp.obj|scobject| ?? TypeOfExprSub(Exp, name_Space, side)
 		if obj isa SCDecl
 			return obj
 		if obj isa SCModule
 			|| cls = obj.Cls				#expect ( exp, "Can’t use a module here." )
-			Return cls.ClassType.GetAddress
+			|| T = cls.ClassType
+				return T.GetAddress
 
 
 function Message.SCFile (|SCFile|)
+	opt norefcounts
 	for S.up in self
 		|| r = S.memoryLayer.obj
 		if r isa SCFile
@@ -1536,7 +1539,7 @@ function Message.FixErl
 
 
 function AddToStaticSection (|Message| arg, |Message| ToAdd)
-	|| Static = arg.findflat(@tmp, "module")
+	|| Static = arg.find(@tmp, "module")
 
 	if (static)
 		arg = static.Last

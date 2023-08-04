@@ -6,6 +6,7 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 	* param upgrade
+* function join (|array of string| self, |string|)
 
 
 // Perry Do later
@@ -17,14 +18,13 @@
 
 
 // Speedie Do later
-* unused func finder doesnt work perfectly on my projects. need add owning func!
 * nicer lookups... syntaxis approach can be used elsewhere too! like for almost anything
 	* if it cant be found... allow a second function to be tested.
 * "calledfrom" autocomplete needs to include references to funcs
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
+* unused func finder doesnt work perfectly on my projects. need add owning func!
 * galaxxies C++ compile issues
-* autocomplete in iterators using the yield_test func would be nice.
 * RefOpts. Do it bit by bit
 	* get property but only did math
 	* mark a few string funcs as not-modifier/disowner/capturer

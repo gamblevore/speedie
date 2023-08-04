@@ -98,7 +98,6 @@ function scdecl.Match (|SCDecl| O, |int| TypeCast, |Message| exp = nil, |uint|)
 			return exp.CastToVoidPtr(nil) // actually do it.
 		return kCastedMatch
 
-
 	if TypeCast & kActualTypecasts
 		Return .TryTypeCast( O, exp, TypeCast )
 

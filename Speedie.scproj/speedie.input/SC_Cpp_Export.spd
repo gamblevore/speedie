@@ -797,8 +797,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function APIHeader (|File|)
 		|| arg = compiler.api_place[@arg, -1]
-		|| ForLib = arg.findflat(@tmp, "libraryname")[@str]#require
-		|| FolName = arg.findflat(@tmp, "exportplace")[@str]#require
+		|| ForLib = arg.find(@tmp, "libraryname")[@str]#require
+		|| FolName = arg.find(@tmp, "exportplace")[@str]#require
 		|| Fol = Compiler.BaseProjectPath[ FolName.name ]
 		require fol.mustexist("Create API-Header for API: ${arg.filelocation}")
 		return Fol[compiler.ProjectName + "_api.h"]

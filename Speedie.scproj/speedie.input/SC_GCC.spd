@@ -511,7 +511,7 @@ function file.TestBatch (|bool|)
 	// so we need a folder to test...
 
 
-function File.TestSpeedie (|string| Variant, |bool|) {
+function File.TestSpeedie (|string| Variant, |bool|)
 	require (.mustexist)
 	expect !(.path contains " ") ("Path: ${.path} contains a space! :(")
 
@@ -535,17 +535,22 @@ function File.TestSpeedie (|string| Variant, |bool|) {
 		error test_err // is this even used anymore?
 
 	return StdErr.OK
-}
 
 	
-function array.AddCStr (|string| s)
+function array.AddCStr (/*|array of string| self, */|string| s)
 	opt norefcounts
 	if s
 		self <~ s.cstr
 
-function Array.AppendWords (|string| R)
+
+function array.AppendWords (/*|array of string| self,*/ |string| R)
 	for S in R / ' '
 		.AddCStr(s)
+
+
+function array.testadd (/*|array of string| self,*/ |string| s)
+	opt norefcounts
+	self <~ s
 
 
 function string.MakeAndGoInto (|File|)

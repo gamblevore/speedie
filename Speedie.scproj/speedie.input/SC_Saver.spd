@@ -164,7 +164,7 @@ module SC_Saver {
 
 	function SCClass.LoadSaver
 		while
-			|| Msg = .SourceArg.findflat( @Tmp, "saveas" )#loop
+			|| Msg = .SourceArg.find( @Tmp, "saveas" )#loop
 			|| S = msg[@thg]$.name.lowercase
 			if (S == "nil" or "fail" or "struct")
 				.saveas = S // already fine.

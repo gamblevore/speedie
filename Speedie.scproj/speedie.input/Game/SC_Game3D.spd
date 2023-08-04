@@ -120,7 +120,7 @@ extend Message {
 
 
 	function FindShader (|string| TypeName, |Message|)
-		|| U = .findflat(@tmp, "type")				#require
+		|| U = .find(@tmp, "type")				#require
 		|| C = U[0].ModelType						#require
 		|| N = C.name.lowercase
 		if (N.last == 's')

@@ -188,7 +188,7 @@ class_api Message (msg)
 
 	api access (|syntax| Type, |string| name, |bool| IsError, |Message|)
 		Opt NoRefCounts
-		return .findflat(Type, name, IsError)
+		return .find(Type, name, IsError)
 
 
 

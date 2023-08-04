@@ -30,16 +30,17 @@ linkage
 
 |[SCDecl]|				Args
 |SCClass|				Cls
-|String|				Disabled
+|String|				Disabled		// merge these two?
+|String|				Description		// Description = "!abc" --> disabled
 |CppRefs|				Refs
 |dictionary of SCBase|	LinkTo
 |object|				CounterPart
 |SCFunction|			NextFunc
 |µFunc|					ASM
+|message|				SelfContain
 |SCDecl|				ProtoDecl
 |SCClass|				ProtoType
 |SCDecl|				ReturnType
-|string|				Description
 |scfunction--|			DepthFinder
 |uint16|				Depth
 |uint16|				TmpCounter
@@ -418,10 +419,13 @@ function ArgsMatchTwo (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBa
 	
 	if ((.IsAssigns!=0) != Incoming.IsAssigns)
 		require (TypeCast & kTypeCastassigns) and (!Incoming.IsAssigns)
-
+	//if self ~= "ptr"
 	|| Pos = 0
 	|| Result = kSimpleMatch
-	TypeCast |= kNoBoolTypeCast (|) Incoming.IgnoreSelf (|) kTypeCastWantSuperDistance
+	|| SelfCast = Incoming.ignoreselfContain(.cls)
+	TypeCast |= kNoBoolTypeCast (|) SelfCast (|) kTypeCastWantSuperDistance
+	if selfcast
+		require .SelfMatch(incoming, name_space)
 	
 
 	for (FuncArg in .Args) (fi)
@@ -1226,8 +1230,10 @@ function Tran_AfterRel (|Message| msg, |SCBase| name_space, |message| side, |SCD
 	
 	|| P = msg.parent
 	Using (exp)
-	|| exp_copy = exp.copy		 // needed before get type :(
-								 // or else we can't do array.size++
+	|message| exp_copy
+	if exp != @thg
+		exp_copy = exp.copy			// needed before get type :(
+									// or else we can't do array.size++
 
 	|| Type = TypeOfExpr( exp, name_space )		#require
 	|| numc = Type.type.NumericCount
@@ -1246,7 +1252,8 @@ function Tran_AfterRel (|Message| msg, |SCBase| name_space, |message| side, |SCD
 
 
 // X++ --> X = X.next,  ("arl" "++" ("thg" "x")) -> rel(thg("x")  opp("=")  dot("next" thg("x") lst() ))
-
+	if !exp_copy
+		exp_copy = exp.copy
 	msg.become(@rel)
 	msg <~ exp_copy
 	msg <~ (@opp, "=")
@@ -1818,7 +1825,7 @@ function NewFunc (CollectFunc)
 
 
 function SCFunction.ReadDisabled (|message| arg)
-	|| p = arg.findflat( @tmp, "disabled" )
+	|| p = arg.find( @tmp, "disabled" )
 		p.Remove
 		.disabled = "Called a disabled function."
 		|| s = p[@str, @nil]

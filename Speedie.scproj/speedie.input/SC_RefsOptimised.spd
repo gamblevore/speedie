@@ -53,10 +53,10 @@ class CppRefs
 		require stderr.ok
 
 		
-		|| Disown = arg.findflat(@tmp, "returnsdisowned")[0]
+		|| Disown = arg.find(@tmp, "returnsdisowned")[0]
 			.Owned = !disown.TrueOrFalse
 
-		|| Stuff = arg.findflat(@tmp, "disturbs")[0]
+		|| Stuff = arg.find(@tmp, "disturbs")[0]
 			.Disturbs.clear
 			.DisturbParams = 0
 			if (Stuff != @list)
