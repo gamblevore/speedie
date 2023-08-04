@@ -119,12 +119,11 @@ Or if what you have is really "binary-like", you can use the binary string.
     
 Additionally, we have "sister format" to Jeebox called "jbin". Jbin does everything jeebox does, except it is stored as binary. The C++ code to parse jbin takes about 35 lines of code, its a very small and fast format. Yes, you can now store jpegs or other pictures/music directly in a Jeebox file with no encoding-overhead, or hexing needed. This is done in speedie via like this:
 
-    || myfile = "~/Desktop/doc.jbin"
-    myfile <~ document.render_jbin
+    || data = document.renderjbin
 
 In C++ it is done like this:
 
-    auto data = document.render_jbin();
+    auto data = document.renderjbin();
     
 JeeboxLib will actually "just parse" a jbin file or a jeebox file, as-is. No need to convert it. You are free to store your files in either way.
 

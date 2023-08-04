@@ -20,7 +20,7 @@ You will see this: `@mary had a ~ little ~ lamb whose fleece was white as snow`
 
 OK great. Worked. We parsed and rendered some Jeebox. Now let's add some jbin. Add this after the code.
 
-    || bin = msg.render_jbin
+    || bin = msg.renderjbin
     printline bin
     
 Well, you will get some unprintable characters. it might look something like this, depending on how your terminal handles unprintable characters:
@@ -52,7 +52,7 @@ You should see error messages printed, including "`cold error: Unexpected thing 
 
 The first test passes and the second fails exactly where we expected it to. This proves that we have stored the `Message`s as jbin, and parsed it back successfully.
 
-There really isn't much more to it than that! All you need to do is call `message.render_jbin` instead of `message.render` and save that to your files instead, or pass it across the network or whatever you want to do with it.
+There really isn't much more to it than that! All you need to do is call `message.renderjbin` instead of `message.render` and save that to your files instead, or pass it across the network or whatever you want to do with it.
 
 There's not much you can say about the 15 lines of (speedie) parsing code it takes to parse jbin, really. (35 lines in C++). Jbin is so simple. And thats what so great about it.
 
