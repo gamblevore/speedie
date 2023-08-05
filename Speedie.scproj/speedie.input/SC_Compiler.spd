@@ -877,7 +877,7 @@ function scfunction.StripTest
 	|| Base = Compiler.VisibleFuncs
 	
 	if !.IsVisible	
-		require options.ListAllLib and !.disabled
+		require options.ListAllLib and !.isdisabled
 		base = Compiler.Interpreter
 	
 	if !.FindReached(base)

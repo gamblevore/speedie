@@ -30,7 +30,7 @@ class SCParamArray
 		.IsAddress = (exp != nil) and (exp.niceparent Isbrel "&")
 		.ErrCount = stderr.errorcount
 
-	syntax append (|| m)
+	function addsub (|| m)
 		expect (.size < 11) (m, "Too many parameters")
 		|| i = .size++
 		.items[i] = m
@@ -84,7 +84,7 @@ class SCParamArray
 			|| Exp0 = .exp.first
 			.isself = (exp0 ~= "self")
 			if .IsNotModule
-				self <~ exp0
+				.addsub(exp0)
 				if (exp0 IsThing "super")
 					.IsSuper = true
 					exp0.name = "self"
@@ -98,7 +98,7 @@ class SCParamArray
 
 
 	function AddParam (|message| item)
-		self <~ item
+		.addsub(item)
 		.HasProperParams = true
 
 
@@ -123,7 +123,7 @@ class SCParamArray
 
 	function Side (assigns:|Message|)
 		if (Value)
-			self <~ Value
+			.addsub(Value)
 			.IsAssigns = true
 
 

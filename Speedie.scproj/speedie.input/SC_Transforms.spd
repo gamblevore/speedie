@@ -196,15 +196,17 @@ function Tran_Array (|Message| S, |SCBase| name_space) {
 
 
 function Tran_Description (TranFunc)
-	check !fn.description (node, "Can’t have multiple descriptions.")
-	fn.Description = node[@str]$.name
-	node.remove
+	|| str = node[@str]
+		if !fn.isdisabled
+			check !fn.description (node, "Can’t have multiple descriptions.")
+			fn.Description = str.name
+		node.remove
 
 
 function Tran_BlindCasts (tranfunc)
-	|| thg = node[@thg]$
-	node.remove
-	fn.blindcasts = thg.blind
+	|| thg = node[@thg]
+		node.remove
+		fn.blindcasts = thg.blind
 
 
 function Tran_Swap (TranFunc)
@@ -212,8 +214,6 @@ function Tran_Swap (TranFunc)
 	expect (node == 2) (node, "Just swap two items.")
 	node.name = "JB_Swap" 
 	Tran_Print(fn, node, name_space)
-	
-function message.
 
 
 function Tran_While (TranFunc)
@@ -693,6 +693,7 @@ function TranOneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
 	|| NewDecl		= OldDecl.Copy
 	NewDecl.IsTypeImprove = true
 	NewDecl.IsLookupOnly = OldDecl
+	// if scfunction ~= "TypeOfDot"
 	
 	NewDecl.type	= cls
 	|| oldcont		= newdecl.contains

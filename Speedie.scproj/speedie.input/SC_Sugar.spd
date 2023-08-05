@@ -50,7 +50,6 @@ function message.Tran_QMark
 	
 	using (self)
 	|| rel = .QMarkRel						// a().b? = c   -->   {|| t = a(),  if t: t.b = c}
-		if rel contains "B2"
 		.prev = thedot
 		rel.next = self
 		.become(@arg)

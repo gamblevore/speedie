@@ -481,7 +481,7 @@ function ExportClass (|SCClass| cls, |FastStringCpp| CppFile)
 
 function scfunction.CanLibLoad (|bool|)
 	require .exportname
-	require !.disabled and .iscppinbuilt != 2
+	require !.isdisabled and .iscppinbuilt != 2
 	return .IsSTDLib
 	
 

@@ -64,6 +64,7 @@ datatype SCDeclInfo (uint)
 		CompilerCreated
 		Disabled
 		Param
+		Altered
 		GameFlyingMem
 		Property
 		Atomic
@@ -124,8 +125,6 @@ class SCDecl (SCObject) {
 
 	function IsBorrowed (assigns:|bool|)
 		.info = .info.set(SCDeclInfo.Borrowed, Value)
-	function IsStatic (assigns:|bool|)
-		.info = .info.set(SCDeclInfo.Static, Value)
 	function IsNewlyCreated (assigns:|bool|)
 		.info = .info.set(SCDeclInfo.NewlyCreated, Value)
 	function IsTypeImprove (assigns:|bool|)
@@ -140,8 +139,6 @@ class SCDecl (SCObject) {
 	syntax isnt (|SCDeclInfo| d, |bool|)
 		return !.syntaxis(d)
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
-//		if .objectid == 15761884
-//			if (d==scdeclinfo.const) and value
 		.info = .info.set(d, Value)
 	syntax isnt (|SCDeclInfo| d, assigns:|bool|)
 		.info = .info.set(d, !Value)
@@ -170,8 +167,8 @@ class SCDecl (SCObject) {
 		// why not copy the whole info?
 		(dcl is api) = self is api
 		(dcl is stayborrowed) = self is stayborrowed
-		
-		dcl.isstatic = self is static
+		(dcl is altered) = self is altered
+		(dcl is static) = self is static
 		(dcl Is Borrowed) = !ForNewVariable and (self Is Borrowed)
 		dcl.Name     = .Name
 		dcl.Default  = .Default
@@ -747,6 +744,7 @@ class SCDecl (SCObject) {
 		require (.Type)
 		require (.Type.IsObject)
 		require (!.Strength)
+		//require (self is altered) // 
 		require (!(SetOnly and (self Is Borrowed)))
 
 		Return true
@@ -983,7 +981,7 @@ class SCDecl (SCObject) {
 
 		|| arg = .SourceArg.obj
 		if arg isa scarg
-			arg.access["self"] = decl
+			arg.access["self"] = rz
 		
 		for s.flat in .source
 			|| obj = s.obj

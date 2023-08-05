@@ -481,7 +481,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 
 function SCDecl.MakeStatic (|SCDecl| R, |bool|)
 	R.CopyTypeInfoTo(self)
-	.isstatic = true
+	is static
 	return true
 
 
@@ -1002,13 +1002,12 @@ function TypeOfDot (ExprResolver)
 	
 	|| DotVar = exp.first.DotSpace(name_space)|SCbase| #expect (exp, "This expression can’t be used here.") // DotVar is the type of the thing that the dot is on.
 	|SCDecl| contains
-
-	if (DotVar isa SCDecl)
-		|| swiz = TypeOfSwiz(exp, name_space, side, DotVar)
+	|| DotVarIsaDecl = (DotVar isa SCDecl) 
+		|| swiz = TypeOfSwiz(exp, name_space, side, DotVar|scdecl|)
 			return swiz
 			
-		contains = DotVar.Contains
-		DotVar = DotVar.Type|scdecl|$ // its an scclass actually
+		contains = DotVar|scdecl|.Contains
+		DotVar = DotVar|scdecl|.Type$
 		if (!contains)
 			contains = DotVar|scclass|.Contained
 	  else

@@ -538,7 +538,7 @@ function SCObject.CallFromName (|string|)
 
 function SCObject.Display (|bool| exact, |string|)
 	if self isa scfunction
-		if .IsAllocOrNew or .disabled
+		if .IsAllocOrNew or .isdisabled
 			return ""
 		return (.RenderTitle(false), .name)(Exact)
 	if self isa SCDecl

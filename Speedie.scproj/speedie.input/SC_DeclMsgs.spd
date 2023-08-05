@@ -73,6 +73,7 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		return []
 	expect  (DeclList == @prm or @Arg)  (DeclList)
 	
+	
 	|| OriginalErrCount = stderr.errorcount
 	|SCFunction--|	Func
 	|SCClass--|		Cls
@@ -81,6 +82,7 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		func = Name_Space
 		cls = func.Cls
 		if (cls)
+			cls.addselftofunc(addtospace)
 			rz <~ cls.SelfStrong
 		  else
 			|| L = func.lookup
@@ -179,6 +181,7 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		(dcl Isnt Const) // erase IsConst, happens if we parse "|| bla = true"
 		if (!Func) and (dcl.Strength == kStrSharedParams)
 			dcl.Strength = 0
+		(dcl isnt altered) // in case we use a var that was already altered.
 		
 		nameitm.obj = dcl
 		if (nameitm in @Rel)

@@ -335,7 +335,7 @@ function LoadExportName
 	if self isa SCFunction
 		.IsCppInBuilt := (cw == @bra)|int|
 		|| CppWrapper = cw.cpp_Wrapper
-		require !.UseExportNameConstructor(CppPart, CppWrapper) and !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and !.disabled
+		require !.UseExportNameConstructor(CppPart, CppWrapper) and !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and !.isdisabled
 
 ///  ///  ///  ///  ///	 ///  ///  ///	 ///  ///  ///	 ///  ///  ///
 		cppname = .exportnamebuilder(cpppart)
@@ -457,8 +457,8 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 					if o.MacroGet(paramsarray, missing)
 						Missing = o
 					continue
-				if o.Disabled
-					error (exp,     o.Disabled)
+				if o.isdisabled
+					error (exp,     o.description)
 					error (o.source, "Disabled here.")
 
 				ParamsHere.obj = o // multiple return :3
@@ -496,8 +496,8 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 	
 	if f
 		if !paramsarray.MadeError //
-			if f.Disablerizer
-				error (exp, f.Disabled)
+			if f.isdisabled
+				error (exp, f.description)
 			  else
 				ParamsFail( f, paramsarray )
 		ParamsHere.obj = f // for auto-complete
