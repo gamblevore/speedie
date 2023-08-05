@@ -737,7 +737,6 @@ class SCDecl (SCObject) {
 		require (.Type)
 		require (.Type.IsObject)
 		require (self is altered)
-		//require (self is altered) // 
 		require (!(SetOnly and (self Is Borrowed)))
 
 		Return true

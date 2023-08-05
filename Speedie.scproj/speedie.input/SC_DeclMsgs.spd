@@ -179,8 +179,11 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		if func
 			(dcl is param)
 		(dcl Isnt Const) // erase IsConst, happens if we parse "|| bla = true"
-		if (!Func) and (dcl isnt altered)
+		if !func
 			(dcl is altered)
+		  elseif dcl.IsNormalObject
+			(dcl isnt altered)
+
 		
 		nameitm.obj = dcl
 		if (nameitm in @Rel)
@@ -194,10 +197,7 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 				dcl.setter = compiler.PrivateProperty
 			  else
 				names.expectlast
-		
-		if (Func and (dcl is altered) and dcl.IsNormalObject)
-			(dcl isnt altered)
-		
+				
 		if (PropertyMode&1)
 			(dcl is property)
 		if PropertyMode == 1

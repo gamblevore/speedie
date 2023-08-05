@@ -7,7 +7,8 @@
 	* NilSweep, for global vars, and for function misuse.
 	* param upgrade
 * function join (|array of string| self, |string|)
-* cls funcs need "self"
+* when fail compile in bg... make a voice.
+
 
 // Perry Do later
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
