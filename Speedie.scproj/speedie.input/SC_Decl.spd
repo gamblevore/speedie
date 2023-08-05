@@ -954,8 +954,7 @@ class SCDecl (SCObject) {
 //JB_Str_ContainsString
 	function ExpectMatchRel (|SCDecl| O,  |Message| exp,  |Message| side,  |Message| ErrNode = nil)
 		opt norefcounts
-		// Just like ExpectMatch, except also does strength transformations...
-		// and always does type-casting. and returns nothing.
+		// Just like ExpectMatch, except always does type-casting. and returns nothing.
 		
 		|| Cast = kTypeCastTrue
 		if !side
@@ -969,7 +968,7 @@ class SCDecl (SCObject) {
 			return
 		
 		if fn isa kisconstructor or kIsDestructor
-			expect false (exp, "You can’t modify 'self' in a constructor or destructor.")
+			error (exp, "You can’t modify 'self' in a constructor or destructor.")
 
 		if .IsNormalObject
 			fn.RefSmooth( fn.DeclSelfExtract(self) )

@@ -17,7 +17,7 @@ class SCParamArray
 	|bool|				HasProperParams
 	|bool|				IsDot
 	|bool|				IsAddress
-	|bool|				IsForClass
+	|bool|				IsNotModule
 	|bool|				IsSelf
 	|bool|				IsSuper
 	|bool|				Found
@@ -40,23 +40,23 @@ class SCParamArray
 			return .items[i]
 	
 	function IsModule (|bool|)
-		return !.isForClass
+		return !.IsNotModule
 		
 	function MadeError (|bool|)
 		return StdErr.ErrorCount > .errcount
 	
 	function IgnoreSelfContain (|scclass|cls, |int|)
-		require cls and cls.IgnoreContainedSelf
-		if (.IsDot and .Isforclass)
+		require cls and true//cls.IgnoreContainedSelf
+		if (.IsDot and .IsNotModule)
 			return kTypeCastIgnoreContained
 
 	function RenderKind (|string|)
-		if (.isforclass)
+		if (.IsNotModule)
 			return "class"
 		return "module"
 	
 	function ModuleName (|string|)
-		if (.isforclass)
+		if (.IsNotModule)
 			return Self[0].RenderType
 		return .exp.first.RenderType
 
@@ -70,11 +70,6 @@ class SCParamArray
 		return true
 
 
-	function scbase.IsClassFunc (|bool|)
-		opt norefcounts
-		return !.IsModuleFunc
-
-
 	function scbase.IsModuleFunc (|bool|)
 		opt norefcounts
 		if (self isa scarg)
@@ -84,11 +79,11 @@ class SCParamArray
 
 	function DetectDotSuper (|SCBase| curr, |SCBase|)
 		opt norefcounts
-		.IsForClass = Curr.IsClassFunc
+		.IsNotModule = !Curr.IsModuleFunc
 		if .IsDot
 			|| Exp0 = .exp.first
 			.isself = (exp0 ~= "self")
-			if .IsForClass
+			if .IsNotModule
 				self <~ exp0
 				if (exp0 IsThing "super")
 					.IsSuper = true
@@ -108,18 +103,15 @@ class SCParamArray
 
 
 	function AddTestedParam (|message| item, |scbase| name_space, |bool|)
-		// x(|message| a, a) fails!
-		// Because we CAN get the tpe of a decl! We shouldn't.... though? surely? hmmm....
-		// i mean they aren't things. Only params and stuff...
-		|| P = TypeOfExpr( item, name_space )
-		expect  (P)  ( item, "Can’t find type." )
+		opt norefcounts
+		expect TypeOfExpr( item, name_space ) ( item, "Can’t find type." )
 		.AddParam(Item)
 		return true
 
 
 	function Range (|IntRange|)
 		|| y = .size
-		|| x = (.isdot and .isForClass)|int|
+		|| x = (.isdot and .IsNotModule)|int|
 		return (x,y)|intrange|
 
 

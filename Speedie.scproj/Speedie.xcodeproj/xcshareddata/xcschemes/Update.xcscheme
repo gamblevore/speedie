@@ -61,6 +61,10 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "/usr/local/speedie/Speedie.scproj/Batch/chart.spd"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "/usr/local/speedie/Perry.scproj"
             isEnabled = "NO">
          </CommandLineArgument>

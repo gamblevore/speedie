@@ -63,8 +63,8 @@ function compiler.CompileTime
 	
 	|| caninstall = true
 	if Options.SelfReplacement
-		caninstall = elapsed < 2.5s
 		if platform.release
+			caninstall = elapsed < 2.5s
 			check (caninstall) ("Not installing as compile duration was over 2.5s. Perhaps this speedie has a bug leading to excessively slow compiles?")
 	TransCompiler.ExportAndInstall(caninstall)
 

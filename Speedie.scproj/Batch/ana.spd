@@ -1,3 +1,4 @@
+
 class Anagrams
 	|dictionary of string|		out
 	|string|					orig

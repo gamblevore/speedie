@@ -266,6 +266,7 @@ function LoadSuperclass
 			.modul.lookup = s.modul
 		  else
 			s.HasSubClass = true
+		.IgnoreContainedSelf = s.IgnoreContainedSelf			
 		.LookUp = S
 		|| b = .behaviour
 		|| SB = S.behaviour

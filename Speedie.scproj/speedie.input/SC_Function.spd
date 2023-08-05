@@ -515,7 +515,8 @@ function ArgsMatchSub (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCPa
 			Missing = f
 			continue
 		
-		
+		//if ugh == 20738
+		//printline ugh++
 		|| Match = f.ArgsMatchTwo( TypeCast, base, false, name_space, Incoming )
 		ifn Match
 			continue
@@ -551,7 +552,6 @@ function FLookup (assigns:|SCBase|)
 		.Project = scimport.curr
 	  elseif (.Source)
 		|| f = .Source.SCFile
-		if f != nil
 			.Project = f.Proj
 
 
@@ -1947,3 +1947,4 @@ constants
 	kReplaced  = 0x800
 	kPassThrough = 0x1000
 
+|| ugh = 0

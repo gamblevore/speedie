@@ -230,14 +230,13 @@ class SCBehaviour (SCBase)
 	
 	function SCFunction.AddSelfToFunc (|SCClass|cls)
 		|| prms = .source.find(@prm)
-		|| name = .source.first			#expect (.source, "No name found")
-		
-		|| Using = name.syntaxusing
-		ifn prms
-			prms = «prm »
-			name.next = prms
-		
-		prms.first = MakeDecl(cls.name, "self", nil)
+		|| name = .source.first	#expect (.source, "No name found")
+		using name
+			if !prms
+				prms = «prm »
+				name.next = prms
+			
+			prms.first = MakeDecl(cls.name, "self", nil)
 	
 	
 	module {

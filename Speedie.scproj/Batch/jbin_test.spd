@@ -1,3 +1,4 @@
+
 main 
 	|| args		= app.args
 	|| inpath	= args[0]
