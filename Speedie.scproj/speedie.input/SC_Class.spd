@@ -88,11 +88,11 @@ constructor (|Message| node, |SCBase| parent)
 		T = T.GetAddress
 	  else
 		T = T.Copy
+	.SelfStrong = T
 	T.Name = "self"
 	t.NilDeclared &=~ NilState.Stated // :) not stated!
 	(T is implicit)
-	T.Strength = kStrSharedParams
-	.SelfStrong = T
+	(T isnt altered)
 
 
 function IsSTDLib (|bool|)

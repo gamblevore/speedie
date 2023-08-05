@@ -174,14 +174,13 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		|| dcl = Rdcl.copy
 		|| IsFunctionBody  =  (AddToSpace isa SCArg)
 		if (!OriginalRdcl and IsFunctionBody and dcl isnt StayBorrowed)
-			Dcl.IsBorrowed = false
+			(Dcl Isnt Borrowed)
 		
 		if func
 			(dcl is param)
 		(dcl Isnt Const) // erase IsConst, happens if we parse "|| bla = true"
-		if (!Func) and (dcl.Strength == kStrSharedParams)
-			dcl.Strength = 0
-		(dcl isnt altered) // in case we use a var that was already altered.
+		if (!Func) and (dcl isnt altered)
+			(dcl is altered)
 		
 		nameitm.obj = dcl
 		if (nameitm in @Rel)
@@ -196,8 +195,8 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 			  else
 				names.expectlast
 		
-		if (Func and !dcl.Strength and dcl.IsNormalObject)
-			dcl.Strength = kStrSharedParams
+		if (Func and (dcl is altered) and dcl.IsNormalObject)
+			(dcl isnt altered)
 		
 		if (PropertyMode&1)
 			(dcl is property)

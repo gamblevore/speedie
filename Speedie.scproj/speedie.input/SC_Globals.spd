@@ -597,7 +597,7 @@ function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
 	
 	|| MemWrapper = TypeOfExpr(exp, compiler.program)	#require
 	MemWrapper = MemWrapper.copy // cos we gonna alter it.
-	memwrapper.isnewlycreated = true
+	(memwrapper is newlycreated)
 	memwrapper.contains = cls.typenormal
 	
 	return MemWrapper

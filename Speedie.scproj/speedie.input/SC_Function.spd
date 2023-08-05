@@ -1085,13 +1085,11 @@ function RegType (|datatypecode|)
 
 function RefSmooth (|SCDecl| N)
 	opt norefcounts
-	N.Strength = 0
 	(n is altered)
 	if n is typeimprove
 		|| orig = n.islookuponly
 		if orig isa scdecl
 			(orig is altered)
-			orig.strength = 0
 		
 
 

@@ -108,7 +108,7 @@ class SCDecl (SCObject) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.NilUsed = NilState.Either
-//		if .objectid == 15761884
+		.info = scdeclinfo.altered
 
 		
 	function Project (|scimport|)
@@ -123,14 +123,8 @@ class SCDecl (SCObject) {
 	syntax append (|SCDeclInfo| d)
 		.info |= d
 
-	function IsBorrowed (assigns:|bool|)
-		.info = .info.set(SCDeclInfo.Borrowed, Value)
-	function IsNewlyCreated (assigns:|bool|)
-		.info = .info.set(SCDeclInfo.NewlyCreated, Value)
 	function IsTypeImprove (assigns:|bool|)
 		.info = .info.set(SCDeclInfo.TypeImprove, Value)
-	function IsAPI (assigns:|bool|)
-		.info = .info.set(SCDeclInfo.api, Value)
 
 
 	syntax is (|SCDeclInfo| d, |bool|)
@@ -166,13 +160,12 @@ class SCDecl (SCObject) {
 
 		// why not copy the whole info?
 		(dcl is api) = self is api
-		(dcl is stayborrowed) = self is stayborrowed
-		(dcl is altered) = self is altered
-		(dcl is static) = self is static
-		(dcl Is Borrowed) = !ForNewVariable and (self Is Borrowed)
 		dcl.Name     = .Name
 		dcl.Default  = .Default
-		dcl.Strength = .Strength
+		(dcl is altered) = self is altered
+		(dcl is stayborrowed) = self is stayborrowed
+		(dcl is static) = self is static
+		(dcl Is Borrowed) = !ForNewVariable and (self Is Borrowed)
 		Return dcl
 
 	
@@ -743,7 +736,7 @@ class SCDecl (SCObject) {
 		require (!.PointerCount)
 		require (.Type)
 		require (.Type.IsObject)
-		require (!.Strength)
+		require (self is altered)
 		//require (self is altered) // 
 		require (!(SetOnly and (self Is Borrowed)))
 
@@ -839,7 +832,7 @@ class SCDecl (SCObject) {
 			if (p isthing "tag")
 				(rz is borrowed) = options.ProjectIsLibrary
 			  elseif (p isthing "api")
-				rz.isapi = true
+				(rz is api)
 			  else
 				error p
 
@@ -959,7 +952,7 @@ class SCDecl (SCObject) {
 			Cast |= kTypeCastBothWays
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
-		require (exp and (.Strength > o.Strength) and exp.IsSetIntoPlace)
+		require (exp and exp.IsSetIntoPlace)
 		|| fn = exp.MsgOwningFunc
 		if .Type.SelfStrong != self
 			fn.RefSmooth( self )
@@ -1071,6 +1064,3 @@ function scdecl.ByteSize (|int|)
 		n *= .C_Array
 	return N
 
-
-
-|int| doitwierdly = 1

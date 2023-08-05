@@ -517,8 +517,8 @@ function Message.IsSetRel (|bool|)
 function Message.IsSetIntoPlace (|message|)
 	opt norefcounts
 	|| p = .NiceParent
-	require p.IsSetRel
-	Return p.first
+	if p.IsSetRel
+		Return p.first
 
 
 function Message.IsSetIntoVar (|message|)
@@ -761,7 +761,7 @@ function SCFunction.AnalyseRefs (|[message]| list)
 	
 	if .dorefs
 		for (ar in .args)
-			if (!ar.Strength and ar.IsNormalObject)
+			if (Ar is altered) and (ar.IsNormalObject)
 				SCRefs.RC_DeclArg(ar, self)
 
 	
