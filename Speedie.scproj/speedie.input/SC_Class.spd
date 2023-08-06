@@ -655,7 +655,7 @@ function FirstDestructor (|SCFunction|)
 
 
 function AddSelfToFunc (|SCBase| space)
-	space.TryAdd( space.FuncSrc, .selfstrong, "self", true )
+	space.TryAdd( space.FuncSrc, .selfstrong, "self" )
 
 
 function scdecl.TypeReach (|scbase| from, |message| src)

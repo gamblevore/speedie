@@ -91,6 +91,7 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 	  elseif (AddToSpace isa SCClass)
 		cls = AddToSpace
 	
+	|| IsFunctionBody  =  (AddToSpace isa SCArg)
 
 	for item in DeclList
 		if (func and func.isassigns == 2) and item.islast
@@ -172,18 +173,13 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		|| NameItm = item.GetDclName #require
 		
 		|| dcl = Rdcl.copy
-		|| IsFunctionBody  =  (AddToSpace isa SCArg)
 		if (!OriginalRdcl and IsFunctionBody and dcl isnt StayBorrowed)
 			(Dcl Isnt Borrowed)
 		
+		(dcl Isnt Const) // erase IsConst, happens if we parse "|| bla = true"
 		if func
 			(dcl is param)
-		(dcl Isnt Const) // erase IsConst, happens if we parse "|| bla = true"
-		if !func
-			(dcl is altered)
-		  elseif dcl.IsNormalObject
 			(dcl isnt altered)
-
 		
 		nameitm.obj = dcl
 		if (nameitm in @Rel)
@@ -200,8 +196,8 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 				
 		if (PropertyMode&1)
 			(dcl is property)
-		if PropertyMode == 1
-			(dcl is onmodule)
+			if PropertyMode == 1
+				(dcl is onmodule)
 		rz <~ dcl
 		nameitm.obj = dcl
 		dcl.Source = item
