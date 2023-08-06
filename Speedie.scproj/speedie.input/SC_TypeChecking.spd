@@ -136,23 +136,21 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
 			return exp.GetAddressOf(OAddr, true)
 	
-
+	
 	/// hmmmm... need to test it... without the c-array? how?
 	ifn typecast & knobooltypecast
 		if (t == TypeBool) and (.IsNormal) and (o.pointercount)
 			return exp.CastToBool(nil)
 	
 	
-	// hah.... who cares. INEED ENERGY!
-	// quick check! int vs uint
-	|| CounterPart = t.Signed
-	if (CounterPart) and (CounterPart.type == ot)
-		if (CounterPart.match(o, typecast, exp).isnormalmatch)
-			return ksimplematch
+	if TypeCast & (kTypeCastMost(|)kTypeCastNumbers)
+		|| CounterPart = t.Signed				// int vs uint
+			if (CounterPart.type == ot) and (CounterPart.match(o, typecast, exp).isnormalmatch)
+				return ksimplematch
 
 
 	|| NoBools = (TypeCast&kTypeCastBothWays) or (typecast & knobooltypecast) 
-	if (TypeCast & kTypeCastMost)			// Type Casting
+	if (TypeCast & kTypeCastMost)				// Type Casting
 		// we do bool casting after, as its usually a sign of a bug.
 		for (b.Upwards in Ot)
 			for (C in b.Casts)

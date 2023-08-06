@@ -409,11 +409,11 @@ function uint.IsNormalMatch (|bool|)
 function ArgsMatchTwo (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase| name_space,  |SCParamArray| Incoming,  |int|)
 	if ((.IsAssigns!=0) != Incoming.IsAssigns)
 		require (TypeCast & kTypeCastassigns) and (!Incoming.IsAssigns)
-
+	
 	|| Pos = 0
 	|| Result = kSimpleMatch
 	|| SelfCast = Incoming.ignoreselfContain(.cls)
-	TypeCast |= kNoBoolTypeCast (|) SelfCast (|) kTypeCastWantSuperDistance
+	TypeCast |= kNoBoolTypeCast (|) kTypeCastWantSuperDistance
 	
 
 	for (FuncArg in .Args) (fi)
@@ -425,8 +425,8 @@ function ArgsMatchTwo (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBa
 			FuncArg = FuncArg.ContainedReplace(base, false)
 
 		|| LArg_ch = (PArg_Ch,nil)(ThisAlter)
-		|| Matched = FuncArg.Match( PArg_Type, TypeCast, LArg_ch )
-		TypeCast  &= ~kTypeCastIgnoreContained
+		|| Matched = FuncArg.Match( PArg_Type, TypeCast (|) SelfCast, LArg_ch )
+		SelfCast = 0
 
 		if (Matched != kNoMatch) and !((matched == kUseDefaultParams) and ThisAlter)
 			if (Matched > result)
@@ -674,16 +674,16 @@ function CreateProtoCastTo (|SCFunction| f) {
 
 
 function EqualOrMoreSpecific (|SCFunction| f, |bool|)
+	opt norefcounts
 	require self and f
 	require ((f.ReturnType)|bool| == (.ReturnType)|bool|)
 	require (f.args.length == .args.length)
 
-	
 	if (f.ReturnType)
 		require f.ReturnType isa .ReturnType
 	
-	for (i in .args.length)
-		require (f.args[i] isa .args[i])
+	for (a in .args) (i)
+		require (f.args[i] isa a)
 	
 	Return true
 

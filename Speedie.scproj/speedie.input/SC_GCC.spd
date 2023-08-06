@@ -537,18 +537,18 @@ function File.TestSpeedie (|string| Variant, |bool|)
 	return StdErr.OK
 
 	
-function array.AddCStr (/*|array of string| self, */|string| s)
+function array.AddCStr (|array of string| self, |string| s)
 	opt norefcounts
 	if s
 		self <~ s.cstr
 
 
-function array.AppendWords (/*|array of string| self,*/ |string| R)
+function array.AppendWords (|array of string| self, |string| R)
 	for S in R / ' '
 		.AddCStr(s)
 
 
-function array.testadd (/*|array of string| self,*/ |string| s)
+function array.testadd (|array of string| self, |string| s)
 	opt norefcounts
 	self <~ s
 

@@ -26,10 +26,6 @@ constants
 	// nevermind it... for now!
 	// using 8... conflicts with kTypeCastBothWays ? despite that its used as 
 	// a "amount of typecasting needed", and these are "the type-casting result".
-
-	kStrSharedParams	= 10
-	kStrOwned			= 20
-	kStrShared			= 0
 	
 	kSaveProperty		= 1 // for when we want to save the property, but not go into the object to add it to save-list
 	kSavePropertyAndGoIn= 2 // for most of them?  
@@ -39,11 +35,12 @@ constants
 	kTypeCastMost = 1
 	kTypeCastNumbers = 2
 	kTypeCastIgnoreContained = 4
-	kTypeCastBothWays = 8
+	kTypeCastIgnoreAddressOf = 8
+	kTypeCastBothWays = 16
 	kTypeCastTrue = kTypeCastMost (|) kTypeCastNumbers   // to replace whatever we used to do when we passed "true"
-	kNoBoolTypeCast = 16
-	kTypeCastAssigns = 32
-	kTypeCastWantSuperDistance = 64
+	kNoBoolTypeCast = 32
+	kTypeCastAssigns = 64
+	kTypeCastWantSuperDistance = 128
 	kActualTypecasts = ~(kTypeCastWantSuperDistance (|) kNoBoolTypeCast)  
 	kTypeCastFalse = 0
 
@@ -764,22 +761,11 @@ class SCDecl (SCObject) {
 	function ContainsMatch (|SCDecl| o, |int| TypeCast, |bool|)
 		opt norefcounts
 		if (TypeCast & kTypeCastIgnoreContained)
-			return true // for now
+			return true
 
 		|| oc = o.reallycontains
 		|| sc =  .reallycontains
-		if (oc == sc) or !(sc and oc)
-			Return true
-		
-		// OK so what cases do we have?
-		// array of nil				vs array of object 
-		// fixeddict of nil			vs fixeddict of string
-		// we can allow "of nil" to match any... i guess?
-		// the thing is... how to reject matches?
-		// like array of nil being passed into param of array of message?
-		
-		
-		if !o.contains
+		if (oc == sc) or !(sc and oc) or !o.contains
 			return true
 		Return sc.Match( oc, 0 ).IsNormalMatch
 

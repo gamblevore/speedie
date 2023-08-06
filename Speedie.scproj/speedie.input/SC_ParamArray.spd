@@ -46,9 +46,13 @@ class SCParamArray
 		return StdErr.ErrorCount > .errcount
 	
 	function IgnoreSelfContain (|scclass|cls, |int|)
-		require cls and cls.IgnoreContainedSelf
+	// need to allow addressofcasting on self struct
+		require cls
 		if (.IsDot and .IsNotModule)
-			return kTypeCastIgnoreContained
+			if cls.isstruct
+				rz |= kTypeCastIgnoreAddressOf
+			if cls.IgnoreContainedSelf
+				rz |= kTypeCastIgnoreContained
 
 	function RenderKind (|string|)
 		if (.IsNotModule)
