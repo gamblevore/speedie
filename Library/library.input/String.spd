@@ -641,22 +641,20 @@ class String
 			yield (c) (pos)
 
 
-function join3 (|array of string| self, |string| sep = "", |string|)
-	
-	
-function Join2 (|[string]| R, |string| sep = "", |String|)
+function array.join (|array of string| self, |string| sep = "", |string|)
 	|| n = -sep.length
-	for s in r
+	for s in self
 		n += s.length + sep.length
 	|| fs = FastString(n)
 	|| UseSep = false
-	for s in r
+	for s in self
 		if UseSep
 			fs <~ sep
 		fs <~ s
 		UseSep = true
 	return fs
 
+	
 
 struct StringLengthSplit
 	|int|		Size

@@ -644,6 +644,7 @@ function CheckAllocVsWrapper (|SCFunction| f, |bool| IsConstructor)
 
 
 function FirstDestructor (|SCFunction|)
+	opt norefcounts
 	for p.Upwards in self
 		|| fn = p.DestructorFunc
 		
@@ -659,6 +660,13 @@ function FirstDestructor (|SCFunction|)
 function AddSelfToFunc (|SCBase| space)
 	space.TryAdd( space.FuncSrc, .SelfDecl, "self" )
 
+
+function message.HasSelfAsFirst (|bool|)
+	opt norefcounts
+	|| d = .first
+		|| msg = d.DeclName
+			return msg.name ~= "self"
+	
 
 function scdecl.TypeReach (|scbase| from, |message| src)
 	opt norefcounts
@@ -678,9 +686,11 @@ function SCBase.ReachedName (|string|)
 
 function Compiler.Banned (|string| name, |bool|)
 	return Options.BannedClasses.valuelower(name)
-		
+
+
 function TestBanned (|bool|)
 	return compiler.banned(.name)
+
 	
 function BannedCheck (|message| src)
 	opt norefcounts
@@ -739,6 +749,7 @@ function IsA (|SCClass| S, |bool|) // hassuper, issuper, issubclass
 function Real_Isa2 (|SCClass| cls, |bool|)
 	opt norefcounts // why doesnt the first one do this?
 	return .realclass.isa(cls.realclass)
+
 
 function Real_Isa (|SCClass| cls, |bool|)
 	opt norefcounts

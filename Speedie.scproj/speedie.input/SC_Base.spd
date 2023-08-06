@@ -115,7 +115,7 @@ function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {
 // OK so.. i guess functions can hide stuff below it, right?
 // so upcheck shouldn't work, if we are on a function, right?
 
-function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name, |bool| SelfIgnore=false)
+function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
 	require (IncObj)		
 	name = name.Lowercase
 	expect (name) ( ErrPlace, "Empty name." )
@@ -144,8 +144,7 @@ function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name, |bool| Se
 	// the problem is that we need to add self... then probably remove it
 	// so lets... just do that? add self and remove it.
 	if name == "self"
-		if !SelfIgnore
-			error ( ErrPlace, "Can't use 'self' here." )
+		error ( ErrPlace, "Can't use 'self' here." )
 	  else
 		error ( ErrPlace, kNameConf )
 		if old isa SCObject

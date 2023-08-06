@@ -36,7 +36,6 @@ linkage
 |object|				CounterPart
 |SCFunction|			NextFunc
 |µFunc|					ASM
-|message|				SelfContain
 |SCDecl|				ProtoDecl
 |SCClass|				ProtoType
 |SCDecl|				ReturnType
@@ -408,16 +407,13 @@ function uint.IsNormalMatch (|bool|)
 
 
 function ArgsMatchTwo (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase| name_space,  |SCParamArray| Incoming,  |int|)
-	
 	if ((.IsAssigns!=0) != Incoming.IsAssigns)
 		require (TypeCast & kTypeCastassigns) and (!Incoming.IsAssigns)
-	//if self ~= "ptr"
+
 	|| Pos = 0
 	|| Result = kSimpleMatch
 	|| SelfCast = Incoming.ignoreselfContain(.cls)
 	TypeCast |= kNoBoolTypeCast (|) SelfCast (|) kTypeCastWantSuperDistance
-	if selfcast
-		require .SelfMatch(incoming, name_space)
 	
 
 	for (FuncArg in .Args) (fi)
@@ -507,8 +503,6 @@ function ArgsMatchSub (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCPa
 			Missing = f
 			continue
 		
-		//if ugh == 20738
-		//printline ugh++
 		|| Match = f.ArgsMatchTwo( TypeCast, base, false, name_space, Incoming )
 		ifn Match
 			continue
@@ -525,7 +519,6 @@ function ArgsMatchSub (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCPa
 		Result := f
 		OldMatch = Match
 
-	
 	if (NeedsAlter)
 		Incoming.Exp.Last.Func = @prm
 		Result.Argsmatchtwo( TypeCast, base, true, name_space, Incoming )
@@ -552,14 +545,12 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 		Return kNeedsTypeCast
 	expect  (!.isdisabled)  (exp, .description)
 
-
 	while (exp == @bra)
 		exp.obj = .ReturnType
 		exp = exp.first
 		if exp == @arg // unbra fail.
 			exp = exp.parent
 			exit // we really want args to be statement-exprs by themself
-
 
 	|| Using = exp.syntaxusing 
 	|| cst = .IsSimpleCast

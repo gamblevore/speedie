@@ -103,7 +103,7 @@ extend String
 			num += R.length
 		
 		R[num] = With
-		return join2(R, "/")
+		return r.join("/")
 
 	function RemoveExt (|string| suff, |string|)
 		if self isa suff
@@ -362,3 +362,4 @@ role StringThatWasReadSafely (string)
 		opt norefcounts
 		|| o = self|object|
 		return o != string.error and nil
+

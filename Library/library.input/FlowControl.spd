@@ -146,7 +146,7 @@ class FlowControl
 		function Input (|[string]| lines, |string| name,  |bool|)
 			cpp_part InputStrings
 			flow off
-			.Input(join2(lines, "\n"), name)
+			.Input(lines.join("\n"), name)
 
 		function Input (|string| data, |string| name)
 			visible

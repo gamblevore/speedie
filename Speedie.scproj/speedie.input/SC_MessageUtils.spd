@@ -143,7 +143,7 @@ function Message.MsgFunc (|SCFunction|)
 function Message.DclExp (|Message|)
 	opt norefcounts
 	if self == @decl // oof
-		return self[1]
+		return .second
 	return self
 
 
@@ -153,9 +153,10 @@ function Message.MsgDecl (|SCDecl|)
 
 
 function Message.DeclName (|Message|)
+	opt norefcounts
 	|| dcl = .DclExp
 	if dcl == @Rel
-		Return dcl.first
+		Return dcl[@thg]
 	if dcl == @Thg
 		Return dcl
 	expect !(dcl == @Emb)

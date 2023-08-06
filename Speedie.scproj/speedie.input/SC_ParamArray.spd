@@ -46,7 +46,7 @@ class SCParamArray
 		return StdErr.ErrorCount > .errcount
 	
 	function IgnoreSelfContain (|scclass|cls, |int|)
-		require cls and true//cls.IgnoreContainedSelf
+		require cls and cls.IgnoreContainedSelf
 		if (.IsDot and .IsNotModule)
 			return kTypeCastIgnoreContained
 
@@ -126,14 +126,3 @@ class SCParamArray
 			.addsub(Value)
 			.IsAssigns = true
 
-
-function scfunction.SelfMatch (|scparamarray| p, |scbase| name_space,  |bool|)
-	rz = true
-	|| SelfContain = .SelfContain
-		|| ty = extractdecl(selfcontain, name_space)
-			|| exty = TypeOfExpr(p.exp.first, name_space)
-				|| m = ty.Match( exty, 0, nil )
-				rz = m == kSimpleMatch or kSuperClassMatch
-	
-	
-	
