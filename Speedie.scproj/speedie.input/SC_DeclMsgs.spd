@@ -83,7 +83,7 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		cls = func.Cls
 		if (cls)
 			cls.addselftofunc(addtospace)
-			rz <~ cls.SelfStrong
+			rz <~ cls.SelfDecl
 		  else
 			|| L = func.lookup
 			if (L isa SCModule)

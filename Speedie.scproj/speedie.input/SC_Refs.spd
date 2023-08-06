@@ -682,7 +682,7 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 				// let's check for the others.
 
 	|| slf = @thg + "self"
-	slf.obj = .cls.SelfStrong
+	slf.obj = .cls.SelfDecl
 
 	|| PAF = NewFnc(fn.Name)
 	|| lst = paf.last
@@ -823,7 +823,7 @@ function DeclToDot (|scdecl| d, |string| s, |Message|)
 	rz = @dot+s
 	|| slf = rz.msg(@thg, "self")
 	|| cls = scfunction.currfunc.cls
-		slf.obj = cls.selfstrong
+		slf.obj = cls.SelfDecl
 	rz.msg(@emb)
 	rz.obj = d // we need this, as it is a decl... but for locals... we don't need it!
 }

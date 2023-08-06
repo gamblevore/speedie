@@ -1046,19 +1046,6 @@ function FixCnjSub (|Message| exp) {
 		RemoveMe.Remove
 }
 
-
-function Fix_Continue (|Message| s)
-	// this function is messed up now... needs a re-design.
-
-	require !s.WithinLoop(.sourcearg)
-	|| curr = s.first						#expect curr
-
-	using (s)
-	s.Name = "return"
-	if .ReturnType
-		s <~ «thg "nil"»
-
-
 	
 function PostTransform
 	opt norefcounts
@@ -1088,23 +1075,17 @@ function RefSmooth (|SCDecl| N)
 		|| orig = n.islookuponly
 		if orig isa scdecl
 			(orig is altered)
-		
-
-
-function TreeSanity
-	.source.treesanity
 
 
 function DeclToDot (|SCDecl| d, |Message|)
 	|| slf_msg = «thg "self"»
-	slf_msg.obj = .cls.SelfStrong
+	slf_msg.obj = .cls.SelfDecl
 	
-	|| dot = «dot d.Name
+	rz = «dot d.Name
 		slf_msg
 		«emb »
 	»
-	dot.obj = d
-	Return dot
+	rz.obj = d
 
 
 function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
@@ -1403,7 +1384,7 @@ decl
 
  
 function message.Tran_FS
-	.cleanbecome(macros.FS)
+	.CleanBecome(macros.FS)
 
 
 function Tran_Ifn (TranFunc)
@@ -1918,7 +1899,6 @@ function IsSelfOfSetter (|Message| curr, |Message|)
 	Return P
 
 
-
 function string.UnicodeSafeName (|string|)
 	if .isascii
 		return self
@@ -1938,4 +1918,3 @@ constants
 	kReplaced  = 0x800
 	kPassThrough = 0x1000
 
-|| ugh = 0

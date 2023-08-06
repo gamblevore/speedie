@@ -953,7 +953,7 @@ class SCDecl (SCObject) {
 		.ExpectMatch( O, Cast, exp, ErrNode )
 		require (exp and exp.IsSetIntoPlace)
 		|| fn = exp.MsgOwningFunc
-		if .Type.SelfStrong != self
+		if .Type.SelfDecl != self
 			fn.RefSmooth( self )
 			return
 		

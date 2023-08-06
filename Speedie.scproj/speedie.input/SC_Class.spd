@@ -28,7 +28,7 @@ linkage
 |SCFunction|				DestructorFunc
 |string|					CppClass
 |SCDecl|					ClassType
-|SCDecl|					SelfStrong
+|SCDecl|					SelfDecl
 |Message|					IsModel
 |SCBehaviour|   			Behaviour
 |string|					SaveAs
@@ -86,7 +86,7 @@ constructor (|Message| node, |SCBase| parent)
 		T = T.GetAddress
 	  else
 		T = T.Copy
-	.SelfStrong = T
+	.SelfDecl = T
 	T.Name = "self"
 	(T is implicit)
 	(T isnt altered)
@@ -459,7 +459,7 @@ function ContainedTypeLoad
 	.use
 	|| sup = .super
 		.Contained = sup.Contained
-		.SelfStrong.Contains = sup.SelfStrong.Contains
+		.SelfDecl.Contains = sup.SelfDecl.Contains
 		
 		.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
 		.NeedsDefaultValue(sup.false, .false, "false")
@@ -473,11 +473,11 @@ function ContainedTypeLoad
 	.Contained = TN.Copy											// no difference (self is never borrowed)
 	.IgnoreContainedSelf = tn.isdatatype
 	(.Contained Is UpgradeableContained)
-	.SelfStrong.Contains = TN
+	.SelfDecl.Contains = TN
 
 
 function ContainedButNotUpgrade (|scdecl|)
-	return .SelfStrong.Contains
+	return .SelfDecl.Contains
 
 
 function scfunction.DontWantSameReturnType (|scfunction| f)
@@ -657,7 +657,7 @@ function FirstDestructor (|SCFunction|)
 
 
 function AddSelfToFunc (|SCBase| space)
-	space.TryAdd( space.FuncSrc, .selfstrong, "self" )
+	space.TryAdd( space.FuncSrc, .SelfDecl, "self" )
 
 
 function scdecl.TypeReach (|scbase| from, |message| src)
