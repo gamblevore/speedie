@@ -37,4 +37,4 @@ class SCObject
 			return .source
 		if self isa scmodule
 			if .cls
-				return .cls.source 
+				return .cls.sourcearg

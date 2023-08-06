@@ -45,7 +45,7 @@ extend SCClass
 	
 	
 	function DeclModel
-		expect (.properties)  (.source, "Need properties for a Game3D Type.")
+		expect (.properties)  (.sourceclass, "Need properties for a Game3D Type.")
 			
 		|| Inst = .properties.last
 		|| Dcl = .modul[ "_AllocDraw" ]

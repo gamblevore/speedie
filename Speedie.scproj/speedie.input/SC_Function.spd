@@ -777,9 +777,7 @@ function ConstructorLinePlace (|message|)
 	if .sourcearg.hasposition
 		return .sourcearg
 	if .cls
-		return .cls.source
-	debugger
-	return compiler.program.source
+		return .cls.sourcearg
 
 
 function CanCompare (|SCDecl|Against, |bool|)

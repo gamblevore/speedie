@@ -12,7 +12,6 @@ linkage
 |SCClass|					Super
 |Message|					Defawlt
 |Message|					False
-|Message|					SourceClass
 |SCModule|					Modul
 |[SCDecl]|					Properties
 |SCDecl|					TypeNormal
@@ -22,7 +21,7 @@ linkage
 |[SCClass]|					Children
 |SCDecl|					Contained
 |scdecl|					Signed								// int/uint
-|scdecl|					NotConstUwU
+|scdecl|					_NotConst
 |SCFunction|				FuncProto
 |SCFunction|				TheIsFunc
 |SCFunction|				ConstructorFunc
@@ -67,8 +66,7 @@ constructor (|Message| node, |SCBase| parent)
 	
 	node.obj = self			// for autocomplete :)
 	.name   = LoadClassName(node)
-	.Source = node[@Arg, -1]
-	.SourceClass = node		// sigh. bad design
+	.Source = node
 	.project = parent.project
 	.IsVisible = scbase.CurrVisibility
 	.saveas = nil
@@ -90,7 +88,6 @@ constructor (|Message| node, |SCBase| parent)
 		T = T.Copy
 	.SelfStrong = T
 	T.Name = "self"
-	t.NilDeclared &=~ NilState.Stated // :) not stated!
 	(T is implicit)
 	(T isnt altered)
 
@@ -99,8 +96,13 @@ function IsSTDLib (|bool|)
 	return .Project.IsSTDLib
 
 
+function SourceClass (|message|)
+	return super.source
+
+
 function PreferAddress (|bool|)
 	return .isstruct and !.isdatatypelike
+
 
 function NumericCount (|int|)
 	if self
@@ -161,7 +163,7 @@ function AutoConstructor
 
 function LoadProperties
 	require !.IsBehaviourTable
-	.Properties = CollectDecls( .source, .Modul, self, 3 )
+	.Properties = CollectDecls( .sourcearg, .Modul, self, 3 )
 	if .properties == nil // fail gracefully
 		.properties = []
 		return
@@ -212,7 +214,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		.size = .typeinfo.bytesize
 		return .size
 
-	expect (Depth < 16) (.source, "Class hierarchy too deep")
+	expect (Depth < 16) (.sourceArg, "Class hierarchy too deep")
 	|| Count = 0
 	if self == typeobject
 		count = 4 // refcount? depends if we are "owned" or "shared".
@@ -240,7 +242,7 @@ function LoadSuperDepth
 function LoadSuperclass
 	.Modul.LookUp = compiler.program 
 	
-	|| p = .SourceClass								#require
+	|| p = .Source								#require
 	|| supc = p[ 1 ]
 	|SCClass| S
 	if (supc != @bra)
@@ -361,7 +363,7 @@ function CreateConstructors
 			.destructorfunc = .super.DestructorFunc
 			require con
 		
-		using .source
+		using .SourceClass
 		if !con and !.IsWrapper		// some wrapper classes cant be newed.
 			con = .CreateEmptyConstructors
 		.ConstructorFunc = con
@@ -402,7 +404,7 @@ function FindFunc (|string| keyword, |bool| CheckParents, |bool|DoError, |SCFunc
 				Return o // prefer improved #expect
 			  else
 				if .IsObject
-					expect (!DoError) (b.source, "'$keyword' keyword only usable with functions.")
+					expect (!DoError) (b.sourceclass, "'$keyword' keyword only usable with functions.")
 		
 		require (CheckParents)
 
@@ -465,7 +467,7 @@ function ContainedTypeLoad
 	.defawlt := «thg "nil"»
 	.false := «thg "nil"»
 
-	|| ContainedMsg = .Source.find(@Tmp, "contains")[@thg]			#require
+	|| ContainedMsg = .Sourcearg.find(@Tmp, "contains")[@thg]			#require
 	|| cls = compiler[ ContainedMsg.name, ContainedMsg ]			#require
 	|| TN = Cls.TypeNormal
 	.Contained = TN.Copy											// no difference (self is never borrowed)
@@ -578,7 +580,7 @@ function CreateEmptyFunc (|String| fname, |string| cpp_name="", |SCFunction|)
 	cpp_name := fname
 	|| e	= "function $fname { cpp_part $cpp_name }"
 	|| msg	= e.ParseClean
-	rz		= SCFunction.NewFunc( msg, self, .source )|SCFunction|
+	rz		= SCFunction.NewFunc( msg, self, .sourceclass )|SCFunction|
 	.TryAdd( msg, rz, fname )
 	rz.IsVisible = false
 
@@ -638,7 +640,7 @@ function CheckAllocVsWrapper (|SCFunction| f, |bool| IsConstructor)
 		require .FirstDestructor
 	
 	require !f.IsWrapper
-	error (.Source, "Wrapper classes must have a constructor that is a wrapper function.")
+	error (.Sourceclass, "Wrapper classes must have a constructor that is a wrapper function.")
 
 
 function FirstDestructor (|SCFunction|)
@@ -770,18 +772,19 @@ function JSStructName (|String|)
 	
 	return .SubProjName + "_" + .name
 
+
 function IsAtomic (|bool|)
 	return .typeinfo.isatomic
+
 
 function TryAddToProject
 	require !.funcproto
 	|| NameNode = .SourceClass.first
 	|| mod = Compiler.DisamClasses
-	if NameNode == @dot
-		// load the modules first.
-		mod = compiler.FindModulemsg(namenode.first)#require
+	if NameNode == @dot		// load the modules first.
+		mod = compiler.FindModulemsg(namenode.first)	#require
 
-	mod.TryAdd( .source, .modul, .name )
+	mod.TryAdd( .sourcearg, .modul, .name )
 
 
 
@@ -841,7 +844,7 @@ module
 
 	
 	function SCClass.ClassCollect
-		.Collect( .Source, .IsVisible )
+		.Collect( .Sourcearg, .IsVisible )
 
 
 	function DataTypeSub (|Message| Node, |SCBase| Parent, |Message| ErrPlace, |string| ForInterface, |SCModule|)

@@ -211,7 +211,7 @@ module SC_Saver {
 		|| IsStruct = (.saveas == "struct")
 		|| IsSave	= (name contains "Save")
 
-		|| Using = .source.syntaxusing
+		|| Using = .sourceclass.syntaxusing
 		if (IsStruct)
 			dest <~ "function "
 		  else
@@ -262,7 +262,7 @@ module SC_Saver {
 				fn.ValidateSaver(name)
 			return fn
 		  elseif (Stage == 2)
-			error (.source, "No saving behaviour $name was found for this saveable class.")
+			error (.sourceclass, "No saving behaviour $name was found for this saveable class.")
 	
 	
 	function Compiler.DoSavers (|int| Stage)

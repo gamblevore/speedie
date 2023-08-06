@@ -179,7 +179,7 @@ function WriteAPIFuncHeader (|SCFunction| F, |FastStringCpp| fs)
 
 function SCClass.APIStructName (|string|)
 	if (.isobject or .super)
-		return .source.APICppProject + .name.lowercase
+		return .sourcearg.APICppProject + .name.lowercase
 	return .Cstructname
 
 
@@ -423,11 +423,11 @@ function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 	while (b)
 		for (M in b.interfaces)
 			|| s = m.name.InterfaceToBehaviour
-			|| fn = cls.BestBehaviourFor(s)					#expect (cls.source, "Cant find behaviour '$s' on class ${cls.name}")
+			|| fn = cls.BestBehaviourFor(s)					#expect (cls.sourceclass, "Cant find behaviour '$s' on class ${cls.name}")
 			|| BaseClass = cls.InterfaceForBehaviour(fn)	#require
 			if (M.IsRequiredInterface and !cls.Behaviour[s])
 				|| msg = "Missing behaviour on class: ${cls.name}" 
-				error (cls.source, msg)
+				error (cls.sourceclass, msg)
 				error (baseclass.funcproto.source, msg)
 			fs.AppendBehaviour(s, fn, Baseclass)
 		b = b.upwards

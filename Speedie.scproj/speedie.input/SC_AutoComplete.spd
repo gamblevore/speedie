@@ -1005,7 +1005,7 @@ function Message.ModuleSrc (|message|)
 				|| fp = c.funcproto
 					return fp.source
 				  else
-					return c.source
+					return c.sourcearg
 			return found.source
 
 
@@ -1052,7 +1052,7 @@ function LocateDefinitionSub (|message| msg, |scobject| already_defined, |scdecl
 			return l.source
 	
 	if !displayonly and msg == @decl
-		return ty.Type.Source
+		return ty.Type.Sourcearg
 	|| src = ty.source
 		if  DisplayOnly  and  ty is const
 			ty.name = msg.name		// unimprove it
@@ -1065,7 +1065,7 @@ function LocateDefinitionSub (|message| msg, |scobject| already_defined, |scdecl
 	
 	if DisplayOnly
 		|| t = ty.type
-		return t.typenormal.source ?? t.sourceclass
+		return t.typenormal.source ?? t.source
 	|| found = msg.obj.ClassOrModule
 		return found.source
 		

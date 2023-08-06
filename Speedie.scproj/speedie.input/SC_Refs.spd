@@ -676,7 +676,7 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 		expect (.cls == typeobject) or (.cls.super == typeobject) (self, "Need call to superclass's constructor, but can’t auto-create one.")
 		// a problem?
 		return nil
-	require fn   // can happen in this case!	//	class B (A) --> class A --> class object
+	require fn  // can happen in this case!	//	class B (A) --> class A --> class object
 				// but none has a destructor.
 				// however... this isn't the ONLY case... it can happen in.
 				// let's check for the others.
@@ -764,10 +764,8 @@ function SCFunction.AnalyseRefs (|[message]| list)
 			if (Ar is altered) and (ar.IsNormalObject)
 				SCRefs.RC_DeclArg(ar, self)
 
-	
 	for (msg in list)
 		|| f = msg.func
-		
 		if (f == @Rel)
 			if (IsConstructor and SettingSelfProperty( msg ))
 				SCRefs.RC_RelConstructor( msg )
@@ -812,16 +810,12 @@ function SCFunction.RefsCheckPropertiesAltered
 	// then I could remove .ReturnsDisowned = true
 	
 	for (curr.ScanArg in .SourceArg)
-		(curr == @Rel)			#continue
-		
-		|| ch = curr.first	 // a.b = x
-		ch.IsProperty			#continue
-		
-		// (not on self, within constructor)
-		if  (self isa kIsConstructor) and ( ch.first IsThing "self" )
-			 Continue
-		
-		SCRefs.RefMarkAsDisturber( ch, self )
+		if (curr == @Rel)
+			|| ch = curr.first	 // a.b = x
+			if ch.IsProperty				
+				// (not on self, within constructor)
+				ifn  (self isa kIsConstructor) and ( ch.first IsThing "self" )				
+					SCRefs.RefMarkAsDisturber( ch, self )
 
 
 function DeclToDot (|scdecl| d, |string| s, |Message|)
@@ -843,11 +837,4 @@ function scdecl.RefDestructor (|message|)
 	  else
 		return SCRefs.RefClearMsg( m )
 
-
-struct abccc
-	|object[99]| KKKKLL
-	function @abccc.Test
-		visible
-		|abccc| aaa
-	destructor
 

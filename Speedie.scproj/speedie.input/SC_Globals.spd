@@ -1355,16 +1355,17 @@ function VecType (|bool|isfloat, |int|count, |SCClass|) {
 function scclass.NotConst (|scdecl|)
 // da egg didnt make it... :(
 // ORANGE GREEN FLAMES
+	opt norefcounts
 	require self
 	
-	|| d = .NotConstUwU
-	if (!d)
-		d = .typenormal
-		if (d is const)
-			D = D.copy	// erase IsConst, like collectdecls does...
-			(D Isnt Const)
-			// future opts could speed this up! like all da magic eggs... transform into a new space!!!
-		.NotConstUwU = d			// a space of new eggs!!!
+	|| d = ._NotConst
+		return d
+	d = .typenormal
+	if (d is const)
+		D = D.copy	// erase IsConst, like collectdecls does...
+		(D Isnt Const)
+		// future opts could speed this up! like all da magic eggs... transform into a new space!!!
+	._NotConst = d			// a space of new eggs!!!
 	return D
 
 
