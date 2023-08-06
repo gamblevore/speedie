@@ -1425,10 +1425,10 @@ function TypeOfList (ExprResolver)
 					S.WrapFloatOrInt(T,N, typ)
 
 			count += N
-			expect (count <= 4) (exp, "Too many items in vector (max 4)")
+			expect (count <= 4) (exp, "Over 4 items in vector.")
 
 	expect Numeric (exp, "Expected numbers.")
-	expect (count >= 2) (exp, "Too few items in vector (min 2)")
+	expect (count >= 2) (exp, "Under 2 items in vector.")
 
 
 	FoundType := Allowtype
