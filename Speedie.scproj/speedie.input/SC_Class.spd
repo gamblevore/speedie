@@ -239,7 +239,7 @@ function LoadSuperDepth
 	
 
 
-function LoadSuperclass
+function LoadSuperClass
 	.Modul.LookUp = compiler.program 
 	
 	|| p = .Source								#require
@@ -254,11 +254,11 @@ function LoadSuperclass
 		S = Compiler[ SupName, supc ]				#require
 		
 		if (.isDataType)
-			expect (S.IsDataType)	(supc, "Datatypes can only subclass datatypes.")
+			check (S.IsDataType)	(supc, "Datatypes can only subclass datatypes.")
 		  elseif (.IsStruct)
-			expect (S.IsStruct)		(supc, "Structs can only subclass structs.")
+			check (S.IsStruct)		(supc, "Structs can only subclass structs.")
 		  else
-			expect (S.IsObject)		(supc, "Classes can only subclass classes.")
+			check (S.IsObject)		(supc, "Classes can only subclass classes.")
 	
 	if (S)
 		.Super = S
@@ -268,7 +268,6 @@ function LoadSuperclass
 			.modul.lookup = s.modul
 		  else
 			s.HasSubClass = true
-		.IgnoreContainedSelf = s.IgnoreContainedSelf			
 		.LookUp = S
 		|| b = .behaviour
 		|| SB = S.behaviour
@@ -463,17 +462,20 @@ function ContainedTypeLoad
 		
 		.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
 		.NeedsDefaultValue(sup.false, .false, "false")
+		.IgnoreContainedSelf |= sup.IgnoreContainedSelf // bad assumption. we shouldn't swap objects and datatypes
 	
 	.defawlt := «thg "nil"»
 	.false := «thg "nil"»
 
 	|| ContainedMsg = .Sourcearg.find(@Tmp, "contains")[@thg]			#require
-	|| cls = compiler[ ContainedMsg.name, ContainedMsg ]			#require
+	|| cls = compiler[ ContainedMsg.name, ContainedMsg ]				#require
 	|| TN = Cls.TypeNormal
-	.Contained = TN.Copy											// no difference (self is never borrowed)
-	.IgnoreContainedSelf = tn.isdatatype
+	.Contained = TN.Copy
+	.IgnoreContainedSelf |= tn.isdatatype
 	(.Contained Is UpgradeableContained)
-	.SelfDecl.Contains = TN
+	.SelfDecl.Contains = TN // shouldn't we be setting this to .contained? but when I do... my GUI lib doesn't compile
+							// which is strange cos speedie itself compiles OK. and all the errors generated seem garbage.
+							// so we need to fix this. sighs... more work.
 
 
 function ContainedButNotUpgrade (|scdecl|)

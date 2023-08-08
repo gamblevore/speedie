@@ -20,12 +20,8 @@ constants
 	kSuperClassMatch	= 4 << 22
 	kAddressOfMatch     = 3 << 22
 	kNumericMatch		= 2 << 22
-	kSimpleMatch		= 1 << 22// want to move all these up.
+	kSimpleMatch		= 1 << 22
 	kNoMatch			= 0
-	
-	// nevermind it... for now!
-	// using 8... conflicts with kTypeCastBothWays ? despite that its used as 
-	// a "amount of typecasting needed", and these are "the type-casting result".
 	
 	kSaveProperty		= 1 // for when we want to save the property, but not go into the object to add it to save-list
 	kSavePropertyAndGoIn= 2 // for most of them?  
@@ -41,6 +37,7 @@ constants
 	kNoBoolTypeCast = 32
 	kTypeCastAssigns = 64
 	kTypeCastWantSuperDistance = 128
+	kTypeCastDescribeErrors = 256
 	kActualTypecasts = ~(kTypeCastWantSuperDistance (|) kNoBoolTypeCast)  
 	kTypeCastFalse = 0
 
@@ -107,6 +104,8 @@ class SCDecl (SCObject) {
 		.NilUsed = NilState.Either
 		.info = scdeclinfo.altered
 
+	setter contains (|scdecl|)
+		.Contains = value
 		
 	function Project (|scimport|)
 		// scfunction and scclass should use this too!
@@ -438,10 +437,10 @@ class SCDecl (SCObject) {
 		return true
 
 
-	function MakeContainedObject
+	function MakeContainedObject (|message| errplace)
 		opt norefcounts
 		if (.contains)
-			.contains = .contains.MakeAsObject(self, .source)
+			.contains = .contains.MakeAsObject(self, errplace)
 
 	
 	function NewWrapper (|scdecl| CastTo, |scdecl|)
@@ -580,7 +579,7 @@ class SCDecl (SCObject) {
 		opt NoRefCounts
 		// handles   " ...  --> string "     (.iscontained)
 		//    or     "[...] -->[string]"     (.contains.iscontained)
-
+		
 		if self Is UpgradeableContained
 			if  (!needsname or !.name) and .SameForReplace(contains)
 				return contains				// we are missing UpgradeableContained?
@@ -592,9 +591,6 @@ class SCDecl (SCObject) {
 			
 			|| C = .copy
 			c.type = ctype
-			//if .type == .internal
-			//	debugger
-			//	c.internal = ctype
 			(C is UpgradeableContained) = !sameType
 			
 			Return C

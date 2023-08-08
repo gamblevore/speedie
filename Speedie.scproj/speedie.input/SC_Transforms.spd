@@ -68,8 +68,7 @@ function Tran_Expect (TranFunc)
 	
 	if n == "error"
 		n = "check"
-		if ch1
-			deprecate (node, "This is 'check' now.")
+		ch.expectlast
 
 // its always "newstyle" now? remove this check?
 	|| NewStyle = (N == "check" or "warn")
@@ -78,7 +77,7 @@ function Tran_Expect (TranFunc)
 		ch = «thg "false"»
 		ch1.prev = ch
 
-	if (name_Space)
+	if (name_space)
 		typeofexpr(ch, name_space) // use this pre-transform or during transform... :)
 
 	ch = ch.Negate
@@ -693,7 +692,6 @@ function TranOneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
 	|| NewDecl		= OldDecl.Copy
 	NewDecl.IsTypeImprove = true
 	NewDecl.IsLookupOnly = OldDecl
-	// if scfunction ~= "TypeOfDot"
 	
 	NewDecl.type	= cls
 	|| oldcont		= newdecl.contains

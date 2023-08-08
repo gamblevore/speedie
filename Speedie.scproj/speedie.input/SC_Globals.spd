@@ -340,20 +340,19 @@ function Message.CollectionPlace (|Message|)
 
 function ParamsFail (|SCFunction| f, |SCParamArray| params)
 	|| fs = faststring.new
+	fs <~ "Wrong params, or wrong contained-type: "
 	if !interact.shouldenter
 		debugat
+
 	for i in Params.Range
-		fs <~ ", "
+		if i
+			fs <~ ", "
 		start
 		|| P = params[i]
 		|| Type = TypeOfExpr(P, nil)
 		Type.RenderTypeName( fs )
 	
 	|| str = fs.getresult
-		str = "Wrong params passed: " + str
-	  else
-		str = "Missing params."
-
 	error ( params.exp, str )
 	error ( f.Source, "to " + f.RenderTitle )
 
@@ -473,7 +472,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		error ( c ) // no spam
 	
 	if rz
-		rz.MakeContainedObject		
+		rz.MakeContainedObject(c)	
 		if (ErrCount != StdErr.errorCount)
 			rz = nil
 

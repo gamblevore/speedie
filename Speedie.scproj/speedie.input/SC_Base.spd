@@ -401,7 +401,7 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 	
 	|| name			= OrigName.Lowercase
 	|| ParamsArray	= SCParamArray.new(exp)
-	|| Curr			= ParamsArray.DetectDotSuper(self)
+	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
 	ParamsArray.PreReadTypes(Arg_Space, ParamsHere, side)
 	|| CanFunction	= (ParamsHere) and  (!ParamsArray.IsAddress)
 	|SCFunction| Missing
@@ -494,11 +494,11 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 	require (exp)
 	
 	if f
-		if !paramsarray.MadeError //
-			if f.isdisabled
-				error (exp, f.description)
-			  else
-				ParamsFail( f, paramsarray )
+		if f.isdisabled
+			error (exp, f.description)
+		  elseif !paramsarray.MadeError
+			f.ArgsMatch( contains, arg_space, ParamsArray, kTypeCastDescribeErrors )
+			ParamsFail( f, paramsarray )
 		ParamsHere.obj = f // for auto-complete
 		Return f
 

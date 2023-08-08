@@ -11,6 +11,7 @@ class SCParamArray
 
 	|Message[11]--|		Items
 	|Message--|			Exp
+	|SCClass--|			Cls
 	|int16|				Size
 	|int16|				ErrCount
 	|bool|				IsAssigns
@@ -30,6 +31,18 @@ class SCParamArray
 		.IsAddress = (exp != nil) and (exp.niceparent Isbrel "&")
 		.ErrCount = stderr.errorcount
 
+
+// exp0's type... we want it. where do we want it???? NOT IN HREERE!!! WHERE THEN
+// IN SOME PLACE THAT WE NEED it. WHICH PLACE?
+// A PLACE WITH THTE THINGS THAT WE ARE USING THIS FOR.
+// WICH PLACE IS THAT?
+// THE plACE THAT WE ARE USING THESE THING FOR???
+// its a place that we are using them...
+// and where is that.
+// the place that we are using them?
+// i cant fucking think with this shitty music.
+
+
 	function addsub (|| m)
 		expect (.size < 11) (m, "Too many parameters")
 		|| i = .size++
@@ -38,21 +51,34 @@ class SCParamArray
 	syntax access (|int| i, ||)
 		if (i < .size)
 			return .items[i]
+			
+	render
+		for i in .size|int|
+			fs <~ ','
+			fs <~ ' '
+			start
+			|| obj = .items[i] 
+			obj.render(fs)
+			|| ty = typeofexpr(obj, nil)
+				ty.render(fs)
+			
 	
 	function IsModule (|bool|)
 		return !.IsNotModule
 		
 	function MadeError (|bool|)
 		return StdErr.ErrorCount > .errcount
+		
 	
-	function IgnoreSelfContain (|scclass|cls, |int|)
+	function IgnoreSelfContain (|int|)
 	// need to allow addressofcasting on self struct
-		require cls
-		if (.IsDot and .IsNotModule)
-			if cls.isstruct
-				rz |= kTypeCastIgnoreAddressOf
-			if cls.IgnoreContainedSelf
-				rz |= kTypeCastIgnoreContained
+		opt norefcounts
+		|| cls = .cls
+			if (.IsDot and .IsNotModule)
+				if cls.isstruct
+					rz |= kTypeCastIgnoreAddressOf
+				if cls.IgnoreContainedSelf
+					rz |= kTypeCastIgnoreContained
 
 	function RenderKind (|string|)
 		if (.IsNotModule)
@@ -81,19 +107,21 @@ class SCParamArray
 		return (self isa SCModule)
 
 
-	function DetectDotSuper (|SCBase| curr, |SCBase|)
+	function DetectDotSuper (|SCBase| curr, |scbase| arg_space, |SCBase|)
 		opt norefcounts
 		.IsNotModule = !Curr.IsModuleFunc
 		if .IsDot
 			|| Exp0 = .exp.first
-			.isself = (exp0 ~= "self")
-			if .IsNotModule
-				.addsub(exp0)
-				if (exp0 IsThing "super")
-					.IsSuper = true
-					exp0.name = "self"
-					// setting isself would change property setters.
-					return Curr.Lookup
+				.isself = (exp0 ~= "self")
+				if .IsNotModule
+					|| ty = typeofexpr(exp0, arg_space)
+						.cls = ty.type
+					.addsub(exp0)
+					if (exp0 IsThing "super")
+						.IsSuper = true
+						exp0.name = "self"
+						// setting isself would change property setters.
+						return Curr.Lookup
 		return Curr
 
 

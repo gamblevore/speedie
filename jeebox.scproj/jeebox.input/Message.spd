@@ -790,11 +790,12 @@ class Message (RingTree)
 
 
 	function ExpectLast (|string| err="", |bool|)
+		opt norefcounts
 		require self
 		|| N = .next
-		ifn N
+			N.syntaxexpect(err)
+		  else
 			return true
-		N.syntaxexpect(err)
 
 	function ExpectString (|bool|)
 		check .IsString (self, "Not a string")

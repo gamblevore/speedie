@@ -6,7 +6,6 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 	* param upgrade
-* function join (|array of string| self, |string|)
 * when fail compile in bg... make a voice.
 
 

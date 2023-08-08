@@ -440,7 +440,6 @@ function ImportAll
 	for c in .ClassList
 		c.ContainedTypeLoad
 
-
 	require .Stage( "Parsing Class Properties" ) // just moved this... used to come after
 	for c in .ClassList					  // handling function prototypes.
 		c.LoadProperties
@@ -451,7 +450,7 @@ function ImportAll
 		if c.isstruct
 			c.GetStructDepth
 
-	.sortmodules	// need to re-sort array??? lol.
+	.sortmodules	// need to re-sort array by depth
 
 
 	for c in .ClassList
