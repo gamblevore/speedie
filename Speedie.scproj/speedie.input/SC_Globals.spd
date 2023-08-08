@@ -338,25 +338,6 @@ function Message.CollectionPlace (|Message|)
 		msg = p
 
 
-function ParamsFail (|SCFunction| f, |SCParamArray| params)
-	|| fs = faststring.new
-	fs <~ "Wrong params, or wrong contained-type: "
-	if !interact.shouldenter
-		debugat
-
-	for i in Params.Range
-		if i
-			fs <~ ", "
-		start
-		|| P = params[i]
-		|| Type = TypeOfExpr(P, nil)
-		Type.RenderTypeName( fs )
-	
-	|| str = fs.getresult
-	error ( params.exp, str )
-	error ( f.Source, "to " + f.RenderTitle )
-
-
 function ExtractAmount (|Message| Prms, |SCBase| name_space, |SCDecl| R, |bool|)
 	|| num = prms.first
 	if num == @unit
@@ -1600,7 +1581,7 @@ function TypeOfFuncSub (|Message| exp, |SCBase| name_space, |Message| side, |sco
 	require PList.PreReadTypes(name_space, params, side)
 	fn = fn.ArgsMatch( nil, name_space, PList )
 	if !fn
-		ParamsFail( ThgDecl.Type.FuncProto, plist )
+		fn.ArgsMatch( nil, name_space, PList, kTypeCastDescribeErrors )
 	  elseif !fn.ReturnType
 		exp.Obj = typevoid // save it being looked up over and over...
 	

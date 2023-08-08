@@ -32,17 +32,6 @@ class SCParamArray
 		.ErrCount = stderr.errorcount
 
 
-// exp0's type... we want it. where do we want it???? NOT IN HREERE!!! WHERE THEN
-// IN SOME PLACE THAT WE NEED it. WHICH PLACE?
-// A PLACE WITH THTE THINGS THAT WE ARE USING THIS FOR.
-// WICH PLACE IS THAT?
-// THE plACE THAT WE ARE USING THESE THING FOR???
-// its a place that we are using them...
-// and where is that.
-// the place that we are using them?
-// i cant fucking think with this shitty music.
-
-
 	function addsub (|| m)
 		expect (.size < 11) (m, "Too many parameters")
 		|| i = .size++

@@ -498,7 +498,6 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 			error (exp, f.description)
 		  elseif !paramsarray.MadeError
 			f.ArgsMatch( contains, arg_space, ParamsArray, kTypeCastDescribeErrors )
-			ParamsFail( f, paramsarray )
 		ParamsHere.obj = f // for auto-complete
 		Return f
 

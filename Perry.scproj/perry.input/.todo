@@ -6,7 +6,7 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 	* param upgrade
-* when fail compile in bg... make a voice.
+* When fail compile in bg... make a voice.
 
 
 // Perry Do later
