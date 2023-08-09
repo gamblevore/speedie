@@ -393,9 +393,7 @@ function ArgsMatch (|SCDecl| base, |SCBase| name_space, |SCParamArray| Incoming,
 		if !rz
 			rz = .argsmatch1(base, name_Space, incoming, kTypeCastAssigns)
 	  else
-		if !scfunction.currfunc.isok
-			scfunction.currfunc.isok = true
-			debugger // why? it should be OK at this point. or else we can't add errors.
+		// just merge these two branches. Dont think we need opposite order really...
 		.argsmatch1(base, name_Space, incoming, kTypeCastAssigns (|) Describefail)
 		.argsmatch1(base, name_Space, incoming, Describefail)
 		if scfunction.makeerr // backup
@@ -460,7 +458,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 			pos++
 			
 		  elseif (!FuncArg.Default)
-			if typecast & ktypecastdescribeerrors
+			if TypeCast & kTypeCastDescribeErrors
 				.DescribeParamFail(incoming, fi)
 
 			Return kNoMatch
@@ -476,9 +474,8 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 	if Pos >= Incoming.Size
 		Return result
 
-	if typecast & ktypecastdescribeerrors
-		if scfunction.makeerr
-			error (incoming.exp, "Too many params to " + .rendertitle)
+	if typecast & ktypecastdescribeerrors and scfunction.makeerr
+		error (incoming.exp, "Too many params to " + .rendertitle)
 
 
 function DescribeParamFail (|SCParamArray| params, |int| bad)
