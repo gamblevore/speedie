@@ -5,7 +5,6 @@ struct NilTracker
 	|uint| 				IfDepth
 	|uint| 				MsgCount
 	|scfunction--|		fn
-	|message--|			IfMsg
 	|message--[1024]|	Items
 
 
@@ -35,14 +34,20 @@ struct NilTracker
 	function Start (|scfunction| f)
 		opt norefcounts
 		scfunction.currfunc = f
-		.fn = f
-		.ifmsg = nil
 		.MsgCount = 0
+		.fn = f
+		|| r = f.returntype
+			r.NilUsed = 0 // :)
 		for (d in .fn.args) (i)				// no need add prms.... only log changes
 			d.NilParamPos = i
 			d.RestoreNil
 
 
+	function Finish (|scfunction| f)
+		opt norefcounts
+		f.ReturnType.State
+		.fn = nil
+	
 	iterator
 		|| n = 0
 		while (n < .MsgCount++)
@@ -51,6 +56,7 @@ struct NilTracker
 
 
 function SCDecl.RestoreNil
+	if .nilused != .NilDeclared // is this ever used?
 	.nilused = .nildeclared
 
 
@@ -59,7 +65,15 @@ function SCDecl.NilTake (|scdecl| d)
 	|| n = d.NilDeclared
 	.NilUsed = n
 	.NilDeclared = n
-	
+
+
+function SCDecl.IsNowNil (|bool|)
+	return (self == TypeNil) or (.nilused isnt real)
+
+function SCDecl.State
+	opt norefcounts
+	.nildeclared = .NilUsed (|) nilstate.stated
+
 
 function scdecl.SuffersNil (|bool|)
 	return .IsObject or .PointerCount

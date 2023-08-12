@@ -1,11 +1,4 @@
 
-// DISTURBANCE CHECKER WILL HELP
-// for global vars
-	// global.x = obj
-	// func()
-	// global.x.func2 // allowed or not? func() might have altered global.x
-
-
 
 module NilChecker
 	function SaveLives
@@ -35,8 +28,7 @@ function NilTracker.Check (|scfunction| f)
 
 	.Start(f)
 	.RunNormal(.fn.SourceArg)
-	|| r = .fn.ReturnType
-		r.nildeclared = r.NilUsed (|) NilState.Stated
+	.Finish(f)
 
 
 function message.NilPropAccess (|scdecl|)
@@ -125,21 +117,13 @@ function NilTracker.IfOrWhile (|message| msg)
 
 function NilTracker.If (|message| Tmp)
 	opt norefcounts
-	|| oldif = .IfMsg
-	Tmp.Obj = oldif
-	.ifmsg = Tmp
 	.IfOrWhile(Tmp)
-	.IfMsg = oldif
 
 
 function Message.RedundantBranch (|branchstate|)
 	if StdErr.CanAddMore(errorseverity.problem)
 		StdErr.NewProblem(self, "nil check is constant (always true or false)")
 	return BranchState.Perhaps
-
-
-function SCDecl.IsNowNil (|bool|)
-	return (self == TypeNil) or (.nilused isnt real)
 
 
 function niltracker.UseAsReal (|message| msg, |scdecl| d)
@@ -202,7 +186,7 @@ function NilTracker.ProcessCondPtr (|message| m, |branchstate| Y, |branchstate|)
 
 function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y, |branchstate|)
 	opt norefcounts
-	|| b = m.name[0]
+	|| b = *m.name
 	if b == '!'
 		return .ProcessCond(m.first, Y.not)
 	if b == '*'
@@ -333,12 +317,20 @@ function message.nilmsg (|string|)
 
 /*
 TODO:
+
+* do the work on args in the if-cond thing...
+	* pass the info about BOTH the conditions... in the state "Y" thing... the applicator can decide what to do about "After" conditions...
+
+* merge the behaviours of rels... and most things? brels too? and @funcs!!
+	* || x = (a and b), if x: a.a(b.b)
+	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...
+
+* modifications of objects via func pointer param... during a cond
+
 * cpp-wrappers and prototypes default to not nil unless stated.
-* pop the msgs out and restore nilused
 * ternaries
 * freeze bug
 
-* modifications of objects via func pointer param... during a cond
 * fn abc (|object| x)
 	x = haha() // x is nil or not? haha? its literally been replaced so the original decl is unused.  unused decls default to optional
 * msg.last/first etc will have to accept nil :O. The C++ compiler will opt it.
@@ -437,4 +429,12 @@ not eliminiates it. There will be cases that we can't eliminate.
 * what about actually recursive funcs? I think for them... we let the user simply specify their nilness!! makes sense, right?
 	* I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
 */
+
+
+
+// DISTURBANCE CHECKER WILL HELP
+// for global vars
+	// global.x = obj
+	// func()
+	// global.x.func2 // allowed or not? func() might have altered global.x
 
