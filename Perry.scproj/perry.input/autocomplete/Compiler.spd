@@ -100,6 +100,7 @@ extend PerryIDE
 				.debugFB(msg)
 		  elseif !errsvis
 			.view(.viewerrors)
+			.say(" didnt compile")
 		.LoadErrors(RealErrors, realerrors)
 		.showstats
 
@@ -115,6 +116,11 @@ extend PerryIDE
 		opt norefcounts
 		.speedietext <~ .Compilr.ReadStdOut
 	
+	function Say (|string| str)
+		target osx
+			if SDLApp.IsBackground
+				.Talker = ShellStream("/usr/bin/say", [.name.trimext + str])
+	
 	function CompileFB (|message| msg, |bool|)
 		|| db = .DebugIsWaitingForCompile
 		.CancelCompile
@@ -128,9 +134,7 @@ extend PerryIDE
 		file <~ first
 		|| str = "\n\nCompiled OK!"
 		.notify(.name + str, file)
-		target osx
-			if SDLApp.IsBackground
-				.Talker = ShellStream("/usr/bin/say", [.name.trimext + str])
+		.say(str)
 		if db
 			.StartDebugging(msg.first.name.file)
 				
