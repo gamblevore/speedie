@@ -642,16 +642,17 @@ class String
 
 
 function array.join (|array of string| self, |string| sep = "", |string|)
-	|| n = -sep.length
+	|| sl = sep.Length
+	|| n = -sl
 	for s in self
-		n += s.length + sep.length
+		n += s.length + sl
 	|| fs = FastString(n)
-	|| UseSep = false
+
 	for s in self
-		if UseSep
-			fs <~ sep
+		fs <~ sep
+		start
 		fs <~ s
-		UseSep = true
+
 	return fs
 
 	
