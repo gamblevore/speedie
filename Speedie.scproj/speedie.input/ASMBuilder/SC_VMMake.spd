@@ -51,7 +51,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
 	|| lname = "_L"
 	if line
 		|| f = line.needfirst$
-		|| f0 = f.name[0]
+		|| f0 = *f.name
 		if f0 == 'r'
 			.FillTypePrm(line.name, pname)
 			return 5+bit_pos

@@ -1053,6 +1053,15 @@ int JB_Str_OutByte( JB_String* self, int StartOff, int AfterOff, int SearchChar 
 
 
 
+byte JB_Str_First(JB_String* self) {
+	if (self) {
+		int n = self->Length;
+		if (n)
+			return self->Addr[0];
+	}
+	return 0;
+}
+
 
 int JB_Str_ByteValue2(JB_String* self, int offset, int Default) {
     if (self) { // remove when we got nil detection
@@ -1848,9 +1857,10 @@ JB_String* JB_Str__Empty() {
 }
 
 
-bool JB_Str_Exists(JB_String* Obj) {
-	return  (Obj and Obj->Length);
+bool JB_Str_Exists(JB_String* Str) {
+	return  (Str and Str->Length);
 }
+
 
 
 JB_String* JB_Str_FromInt( int L, int R ) {

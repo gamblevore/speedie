@@ -104,7 +104,7 @@ class Message (RingTree)
 	
 	
 	function string.IsStatementName (|bool|)
-		return (jeebox.cswordmiddle contains self) and (!self[0].IsInt)
+		return (jeebox.cswordmiddle contains self) and (!(*self).IsInt)
 	
 	
 	syx Nil (WildCard)

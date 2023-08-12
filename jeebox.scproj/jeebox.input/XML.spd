@@ -236,7 +236,7 @@ helper message.XMLToJeeboxSub
 		.first.func = @str
 		|| s = .name
 		|| fn = @emb
-		ifn s[0].IsLetter and Jeebox.CSWordMiddle contains s
+		ifn (*s).IsLetter and Jeebox.CSWordMiddle contains s
 			fn = @str
 		.first = fn + s
 		.name = ""

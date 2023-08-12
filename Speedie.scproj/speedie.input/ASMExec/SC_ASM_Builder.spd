@@ -66,7 +66,7 @@ function message.Reg (|uint|)
 	return .regornum(true)
 
 function message.RegOrNum (|bool| NeedReg = false, |uint|)
-	if !NeedReg and (.name[0].lowercase != 'r')
+	if !NeedReg and ((*.name).lowercase != 'r')
 		return .int
 	|| reg = .int(1)
 	if (reg <= 31)

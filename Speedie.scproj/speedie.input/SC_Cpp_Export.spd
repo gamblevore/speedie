@@ -1225,7 +1225,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| s = num.name.ReplaceAll( "_", "" )
 
 		fs <~ "0x"
-		if (s.length mod 2) and s[0].isletter
+		if (s.length mod 2) and (*s).isletter
 			fs <~ '0'
 		fs <~ s
 
@@ -1420,7 +1420,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		// ("chr" "x")										'x'
 		fs <~ '\''
 		
-		|| b = .name[0]
+		|| b = *.name
 		if b < 32 and b != 9 and 10
 			fs <~ "\\x"
 			fs.appendhex(b)

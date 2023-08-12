@@ -154,14 +154,14 @@ function ClearCaches (|int| which=0)
 
 function PrefPath (|string|)
 	rz = app.conf("prefs")$
-	if rz[0] == '~'
+	if *rz == '~'
 		rz = rz.pathfix
 	if rz ~= "default"
 		rz = ""
 	
-	if rz[0] != '/'
+	if *rz != '/'
 		rz = file.appPrefs(rz)
-	check (rz[0] == '/' or '~') ("App pref path should be 'default' or a full-path.")
+	check (*rz == '/' or '~') ("App pref path should be 'default' or a full-path.")
 
 
 function PrefsInit (|date| when=date.now, |bool|)

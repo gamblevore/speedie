@@ -307,11 +307,11 @@ function TypeOfUnit (ExprResolver)
 
 
 function String.IsHexConstant (|bool|)
-	return  (self[0]=='0')  and  (self[1] == 'x')
+	return  (*self=='0')  and  (self[1] == 'x')
 
 
 function String.IsBinaryConstant (|bool|)
-	return  (self[0]=='0')  and  (self[1] == 'b')
+	return  (*self=='0')  and  (self[1] == 'b')
 
 
 function TypeOfNum (ExprResolver)

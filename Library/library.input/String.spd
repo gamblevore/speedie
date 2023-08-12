@@ -65,7 +65,7 @@ class String
 		return self[.length-(1+minus)]
 	
 	function First (|Byte|)
-		return self[0]
+		cpp_wrapper JB_Str_First
 	
 	operator minus (|int|n, |int|)
 		disabled 
@@ -143,7 +143,7 @@ class String
 	function LowerCase	(|string|)					{ cpp_wrapper JB_Str_LowerCase }
 
 	render TitleCase
-		fs <~ self[0].uppercase
+		fs <~ (*self).uppercase
 		fs <~ self[1, int.max].lowercase
 
 	render Remove (|charset| remove, |int| to=-1)
@@ -208,7 +208,7 @@ class String
 		return .lowercase.TrimExtAndPath
 	
 	function UpperFirst (|String|)
-		if (self[0].IsUpper)
+		if ((*self).IsUpper)
 			return self
 		Return self[0,1].Uppercase + self[1...]
 	

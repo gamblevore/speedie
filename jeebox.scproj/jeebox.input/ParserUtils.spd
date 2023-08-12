@@ -68,7 +68,7 @@ function String.ParseWithError (|&Error| rec, |MessageRoot|)
 
 helper String.HiddenJBin (|ind|)
 	|ind| nl = 0
-	if  self[0] == '#'  and  self[1] == '!' // shebang
+	if  *self == '#'  and  self[1] == '!' // shebang
 		nl = .find('\n') + 1
 		if nl == 0
 			return -1

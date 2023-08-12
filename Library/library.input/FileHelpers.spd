@@ -167,7 +167,7 @@ extend String
 		if !self
 			Return cname
 		|| C = (.last == '/')|int|
-		C += (cname[0] == '/')
+		C += (*cname == '/')
 		if (C == 1)
 			return self+cname
 		if (C == 0)
@@ -218,7 +218,7 @@ extend String
 	function AddExt (|string| ext, |string|)
 		if !ext
 			return self
-		if ext[0] != '.'
+		if ext.first != '.'
 			ext = "." + ext
 		return self + ext
 		

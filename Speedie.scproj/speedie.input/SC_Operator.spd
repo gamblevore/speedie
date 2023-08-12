@@ -58,7 +58,7 @@ function IsCompSet (|bool|)
 
 function InitComp (|string| name_)
 	.Name = name_
-	.IsCaseAware = ( name_[0] == '~' )
+	.IsCaseAware = ( *name_ == '~' )
 	.IsCompare = true
 	.FuncName = "OperatorCompare"
 	.IsNilTest = name_ == "!=" or "=="

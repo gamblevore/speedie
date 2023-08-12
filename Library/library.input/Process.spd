@@ -58,7 +58,7 @@ class Process
 		.writer		= FastString()
 
 		name := app..talk
-		if name and name[0] != '/'
+		if name and *name != '/'
 			name = name.ipcPath
 		.name = name.ipcname
 		.talker		= name.file

@@ -253,7 +253,7 @@ function Message.Clean (|bool| erl = false)
 				curr.BecomeAppend("SyntaxSendTo")
 			  elseif curr.OppExpand
 				0 // 
-			  elseif jeebox.CSWordStart[curr.name[0]]
+			  elseif jeebox.CSWordStart[*(curr.name)]
 				curr.name = curr.name.Lowercase
 		
 		  elseif (f == @tmp)

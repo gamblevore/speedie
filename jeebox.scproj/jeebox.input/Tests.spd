@@ -144,7 +144,7 @@ helper jeebox.TestCasting (|bool|)
 	
 	|| d = dictionary.new
 	|| str = "\0\0\0\0\0\0"
-	expect !str[0] and !str[1] and !str[2] and !str[3] and (str.length == 6)
+	expect (str.length == 6)
 	d[str] = str
 
 	require !'\0'

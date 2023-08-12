@@ -29,7 +29,8 @@ datatype NilState (byte) // Exec.scproj needs this here
 		ActuallyNil = Nilish  + Stated				// nil|message|.position
 		Optional    = Either  + Stated				// || x = array[1000]
 		Real		= Realish + Stated				// || x = message(),  x.position
-
+	
+	
 //	function Always (|branchstate| Y, |branchstate|)
 //		if (self is either) or (y is perhaps)
 //			return branchstate.Perhaps

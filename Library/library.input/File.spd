@@ -94,7 +94,7 @@ class File (String)
 		.write(Data)
 	
 	function string.Visible (|bool|)
-		return .name[0] != '.'
+		return *.name != '.'
 		
 	function Hidden (|bool|)
 		return !.visible
@@ -242,7 +242,7 @@ class File (String)
 		if .exists
 			return true
 		|| eerr = "File does not exist"
-		if self and super[0] != '/'
+		if self and *super != '/'
 			eerr += " at "
 			eerr += app.cwd
 		if operation
@@ -405,7 +405,7 @@ class File (String)
 	function List (|bool|invis = false, |[string]|)
 		flow off
 		for name in self
-			if (invis) or (name[0] != '.')
+			if (invis) or (*name != '.')
 				rz <~ name
 		rz.sort(stringsorter)
 		if !flowcontrol.disabled

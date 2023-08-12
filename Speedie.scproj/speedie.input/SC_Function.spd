@@ -271,7 +271,7 @@ function Transform ()
 function Message.ParamNum (|int|)
 	if self == @thg
 		if self == "self":			return 0
-		if .name[0] == '_'
+		if *.name == '_'
 			if .length == 1:		return 1
 			if stderr.ok:			return .int
 	return -1

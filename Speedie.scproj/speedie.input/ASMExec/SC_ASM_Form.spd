@@ -68,7 +68,7 @@ class µForm
 			self <~ pl.ASMint (|) asm.num
 			return
 		expect (pl == 1) (self)
-		|| p = pl[0]
+		|| p = *pl
 		if  p == 'r'
 			self <~ 5 
 		  elseif p == 'n'
