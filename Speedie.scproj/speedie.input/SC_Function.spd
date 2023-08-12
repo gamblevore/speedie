@@ -474,7 +474,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 	if Pos >= Incoming.Size
 		Return result
 
-	if typecast & ktypecastdescribeerrors and scfunction.makeerr
+	if typecast & ktypeCastDescribeErrors and scfunction.makeerr
 		error (incoming.exp, "Too many params to " + .rendertitle)
 
 
@@ -482,18 +482,14 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 	opt norefcounts
 	require scfunction.MakeErr
 	|| P = params[bad]
-	|| str = "Wrong param: "
-	if !p
-		str = "Missing param " + bad.render
-		error ( params.exp, str )
-	  else
-		if !bad and params.isdot
-			str = "Wrong self: "
+		|| str = ("Wrong self: ",  "Wrong param: ")(!bad and params.isdot)
 		|| Type = TypeOfExpr(P, nil)
 			str += Type.RenderTypeName
 		  else
 			str += "(Unknown Type)"
 		error ( P, str )
+	  else
+		error ( params.exp, "Missing param " + bad.render )
 	error ( .Source, "to " + .RenderTitle )
 
 
