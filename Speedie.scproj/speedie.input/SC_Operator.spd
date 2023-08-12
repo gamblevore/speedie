@@ -31,7 +31,7 @@ linkage
 |bool|		IsCustom
 |bool|		DoesntNeedExtraBits
 |bool|		MakesSigned
-|bool|		IsAndOr
+|byte|		IsAndOr
 
 
 constructor (|fn_opasm| ASM)
@@ -124,7 +124,10 @@ module {
 			if (!result.iscustom)
 				opch.name = result.name
 		
-		result.isAndOr = (op == "or" or "and")
+		if op == "or"
+			result.IsAndOr = 2
+		  elseif op == "and"
+			result.IsAndOr = 3
 		// why aren't 'if "" > nil' here? I think... cos no one would do that?
 		result.DoesntNeedExtraBits = (op == "&" or ">>")// or "|")
 		return Result

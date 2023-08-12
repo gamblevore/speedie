@@ -22,13 +22,13 @@ struct NilTracker
 	function SetNilness (|message| m, |scdecl| d, |nilstate| s, |branchstate|)
 		opt norefcounts
 		if d.nilused > 3 // what?
-		if !.MsgCount
-			m.Indent = d.NilUsed
-		  elseif (.MsgCount < 1024) 
+		m.Indent = d.NilUsed
+		d.nilused = s
+		if (.MsgCount >= 1024) 
+			error (m, "Too many variables")
+		  elseif .msgcount	
 			m.Indent = d.NilUsed
 			.items[.MsgCount++] = m
-		  else
-			error (m, "Too many variables")
 		return BranchState.Perhaps
 
 
@@ -61,7 +61,7 @@ function SCDecl.NilTake (|scdecl| d)
 	.NilDeclared = n
 	
 
-function scdecl.CouldReceiveNil (|bool|)
+function scdecl.SuffersNil (|bool|)
 	return .IsObject or .PointerCount
 
 

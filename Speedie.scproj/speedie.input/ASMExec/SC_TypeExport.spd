@@ -8,13 +8,12 @@ datatype BranchState (byte)
 		Never		= 1
 		Perhaps		= 3
 
-	function Reverse (|nilstate|)
+	function Not (|BranchState|)
 		if self == never
 			return always
 		if self == Always
 			return never
 		return self
-		
 
 
 datatype NilState (byte) // Exec.scproj needs this here
@@ -25,11 +24,11 @@ datatype NilState (byte) // Exec.scproj needs this here
 		Realish		= 2 
 		Either		= 3
 		Stated		= 4
-		ActuallyNil = Nilish + Stated				// nil|message|.position
-		Optional    = Either + Stated				// || x = array[1000]
+		ActuallyNil = Nilish  + Stated				// nil|message|.position
+		Optional    = Either  + Stated				// || x = array[1000]
 		Real		= Realish + Stated				// || x = message(),  x.position
 
-	function Always (|bool| Y, |branchstate|)
+	function Always (|branchstate| Y, |branchstate|)
 		if self is either
 			return branchstate.Perhaps
 		if (self is real) == Y

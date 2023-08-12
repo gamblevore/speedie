@@ -14,8 +14,7 @@ module NilChecker
 	
 		|NilTracker| T
 		for f in compiler.funclist
-			if f.CanNilCheck
-				T.Check(f)
+			T.Check(f)
 		
 		scfunction.currfunc = nil
 		.SweepInits
@@ -26,21 +25,18 @@ module NilChecker
 		// what about "init_"?
 
 
-function SCFunction.CanNilCheck (|bool|)
-	return  false
-	require !.IsMacro and !.IsWrapper and .isOK
-	|| c = .Lookup
-		return c.name contains "NilTest"
-
-
 function NilTracker.Check (|scfunction| f)
 	debugat
 	opt norefcounts
+	require false
+	require !f.IsMacro and !f.IsWrapper and f.isOK
+	|| c = f.Lookup
+		require c.name contains "NilTest"
+
 	.Start(f)
 	.RunNormal(.fn.SourceArg)
 	|| r = .fn.ReturnType
-	r.NilTake(r)
-	// how to use this?
+		r.nildeclared = r.NilUsed (|) NilState.Stated
 
 
 function message.NilPropAccess (|scdecl|)
@@ -74,18 +70,35 @@ function NilTracker.CheckFunction (|message| msg)
 	|| prms = msg.last
 	|| fn = prms.obj|scfunction|
 	|| ret = fn.ReturnType
-		if ret.CouldReceiveNil
-			check (ret.IsStated) (msg, "Unknown if this function returns nil.")
+		check (!ret.SuffersNil or ret.IsStated) (msg, "Unknown if this function returns nil.")
 
 	|| p = prms.first
 	for d in fn.args
 		|| pnd = p.NilDecl
-		if (pnd.NilUsed is Nilish) and d.CouldReceiveNil
-			if !d.IsStated
-				error (p, "Unknown if this parameter accepts nil.")
-			  elseif d.NilDeclared isnt Nilish
-				error (p, "Possible NilObject value passed.")
+		while 
+			if (pnd.NilUsed is Nilish) and d.SuffersNil
+				if !d.IsStated
+					error (p, "Unknown if this parameter accepts nil.")
+				  elseif d.NilDeclared isnt Nilish
+					error (p, "Passing possible nil")
+		// what if we get the address of an obj? or the address of an address?
+		// we'd need to follow the chain all the way up :( oooofff
+		// same issue with .return
 		p++
+
+
+function NilTracker.Return (|message| msg)
+	opt norefcounts
+
+	|| value = msg.first				#require
+	|| vd = value.NilDecl
+	if vd.suffersnil
+		|| vn = vd.nilused
+		|| rd = .fn.ReturnType
+		|| r  = rd.NilDeclared
+		if r is real  and vn is Nilish
+			error (msg, "NilObject returned!")
+		rd.nilused |= vn // find the answer at the end
 
 
 function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
@@ -94,7 +107,7 @@ function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
 	if arg == @arg
 		.RunNormal(arg)
 	  else
-		|| Br = .ProcessCond(arg, true)
+		|| Br = .ProcessCond(arg, branchstate.always)
 		arg++
 		.RunNormal(arg)
 
@@ -110,20 +123,6 @@ function NilTracker.IfOrWhile (|message| msg)
 	.leave(old)
 
 
-function NilTracker.Return (|message| msg)
-	opt norefcounts
-
-	|| value = msg.first				#require
-	|| vd = value.NilDecl
-	|| vn = vd.nilused
-	|| rd = .fn.ReturnType
-	|| r = rd.NilDeclared
-	if r is stated
-		|| outside = ~r & vn
-			error (msg, "Nilness return error")
-	rd.nilused |= vn // find the answer at the end
-
-
 function NilTracker.If (|message| Tmp)
 	opt norefcounts
 	|| oldif = .IfMsg
@@ -133,22 +132,10 @@ function NilTracker.If (|message| Tmp)
 	.IfMsg = oldif
 
 
-function Message.RedundantBranch (|bool| Value, |branchstate|)
-	if Value
-		return .RedundantTrue
-	return .RedundantFalse
-
-
-function Message.RedundantTrue (|branchstate|)
+function Message.RedundantBranch (|branchstate|)
 	if StdErr.CanAddMore(errorseverity.problem)
-		StdErr.NewProblem(self, "nil check is always true")
-	return BranchState.Always
-
-
-function Message.RedundantFalse (|branchstate|)
-	if StdErr.CanAddMore(errorseverity.problem)
-		StdErr.NewProblem(self, "nil check is always false")
-	return BranchState.Never
+		StdErr.NewProblem(self, "nil check is constant (always true or false)")
+	return BranchState.Perhaps
 
 
 function SCDecl.IsNowNil (|bool|)
@@ -165,30 +152,29 @@ function niltracker.UseAsReal (|message| msg, |scdecl| d)
 		d.nilused = NilState.Realish
 
 
-function NilTracker.ProcessCondThg (|message| msg, |bool| Y, |branchstate|)
+function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y, |branchstate|)
 	opt norefcounts
 	|| dest = NilState.Nilish + Y	
 	|| dcl = msg.nildecl			#debug_require
 	|| u = dcl.NilUsed
-	|| ndd = dcl.NilDeclared
+	// we need to have actually 3 states set.
+	// one for this branch, one for the other branch...
+	// and one for the after branch... in case one or other branch returns.
+	// where do we store this info? id rather figure it out at this point in time...
+	// but the if/else thingy needs to restore it?
+	// seem slike the if/else needs to set it, then...
 	
 	if u == NilState.Either
-		if (dcl is param) and (ndd isnt stated)
+		if (dcl is param) and (dcl.NilDeclared isnt stated)
 			dcl.NilDeclared = NilState.optional
 		return .SetNilness(msg, dcl, dest)
 
-	// merge these two branches?
-	if u == dest
-		if ndd is either
-			return msg.RedundantTrue
-		return BranchState.Always
-	  else
-		if ndd is either
-			return msg.RedundantFalse
-		return BranchState.Never // checking for nil-obj allocations
+	if dcl.NilDeclared is Either
+		return msg.RedundantBranch
+	return BranchState.Never + (u == dest) // checking for nil-obj allocations
 
 
-function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
+function NilTracker.ProcessCond (|message| m, |branchstate| Y, |branchstate|)
 	opt norefcounts
 	|| fn = m.func
 	if fn == @thg
@@ -198,7 +184,7 @@ function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
 	if fn == @rel
 		return .ProcessCondRel(m, y)
 	if fn == @func
-		return .ProcessCondFunc(m,y)
+		return .ProcessCondFunc(m, y)
 	if fn == @brel
 		return .ProcessCondBrel(m, y)
 	debugat
@@ -206,7 +192,7 @@ function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
 	return branchstate.Perhaps
 
 
-function NilTracker.ProcessCondPtr (|message| m, |bool| Y, |branchstate|)
+function NilTracker.ProcessCondPtr (|message| m, |branchstate| Y, |branchstate|)
 	opt norefcounts
 	|| PointedTo = m.first
 	|| pd = PointedTo.nildecl
@@ -214,10 +200,10 @@ function NilTracker.ProcessCondPtr (|message| m, |bool| Y, |branchstate|)
 		return .ProcessCond(PointedTo, y)
 
 
-function NilTracker.ProcessCondBrel (|message| m, |bool| Y, |branchstate|)
+function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y, |branchstate|)
 	opt norefcounts
 	if (m == "!")
-		return .ProcessCond(m.first, !Y)
+		return .ProcessCond(m.first, Y.not)
 	if m == "*"
 		return .ProcessCondPtr(m, Y)
 	if m == "&"			// objects always have an address
@@ -227,7 +213,7 @@ function NilTracker.ProcessCondBrel (|message| m, |bool| Y, |branchstate|)
 	return branchstate.Perhaps
 
 
-function NilTracker.ProcessCondFunc (|message| m, |bool| Y, |branchstate|)
+function NilTracker.ProcessCondFunc (|message| m, |branchstate| Y, |branchstate|)
 	opt norefcounts
 	|| prms = m.last
 	|| fn = prms.obj|SCFunction|
@@ -235,44 +221,44 @@ function NilTracker.ProcessCondFunc (|message| m, |bool| Y, |branchstate|)
 		return branchstate.Perhaps
 	|| p1 = prms.first
 	if p1 == @thg
-		return .ProcessCondThg(m, y)
-	
-		
-// now what?
-function NilTracker.ProcessCondRelSimple (|message| m, |bool| Y, |message|)
-	
+		return .ProcessCondThg(m, y)	
 	
 
-function NilTracker.ProcessCondRel (|message| m, |bool| Y, |branchstate|)
+function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
 	opt norefcounts
 	|| ll = m.first
 	|| op = ll.next
-	|| rr = op.next$
-	|| scop = op.obj|SCOperator|				#debug_require
+	|| rr = op.next
+	|| scop = op.obj|SCOperator|
+	require scop and rr
+
 	if scop.IsCompare
 		|| LNil = (ll.obj as scdecl).IsNowNil
 		|| RNil = (rr.obj as scdecl).IsNowNil
 		if lnil or rnil
 			expect (scop.IsNilTest) (op, "Can't use this operator on nil. Use != or ==.")
 			if (lnil and rnil)
-				return m.RedundantBranch(scop.hasequals)
-			if lnil
-				return .ProcessCond(rr, Y != scop.hasequals)
-			  else
-				return .ProcessCond(ll, Y != scop.hasequals)
+				return m.RedundantBranch
+			if scop.HasEquals // if (a==nil or b==nil) return else a.a(b.b)
+				y = y.not
+			|| side = (rr, ll)(lnil)
+			return .ProcessCond(side, Y)
 		return BranchState.Perhaps
 	
 	if scop.IsAndOr
-		if scop == "and"
-			return .ProcessCond(ll, Y) & .ProcessCond(rr, Y)
-	
-		if scop == "or"
-			|| where = .MsgCount
-			|| SimpleLeft = .ProcessCond(ll, y)
-			|| SimpleRight = .ProcessCondRelSimple(rr, y)
-			if .msgCount > where
-		// this will require .count to go up... so basically condthg will add it
-		// but what removes it? we have to... right?
+		if scop.IsAndOr == 3 // and
+			// x = (a and b)
+			if y == BranchState.Never
+				y = BranchState.Perhaps
+		  else
+			// x = !(a or b)
+			if y == BranchState.always
+				y = BranchState.Perhaps
+		
+		.ProcessCond(ll, Y)
+		.ProcessCond(rr, Y)
+		return BranchState.Perhaps
+			
 		
 		// what about the cond?
 		// if (a and b)			// a yes,   b yes		... after a may, b may
