@@ -26,8 +26,8 @@ datatype NilState (byte) // Exec.scproj needs this here
 		Either		= 3
 		Stated		= 4
 		ActuallyNil = Nilish + Stated				// nil|message|.position
-		Optional    = Either + Stated			// || x = array[1000]
-		Real		= Realish + Stated			// || x = message(),  x.position
+		Optional    = Either + Stated				// || x = array[1000]
+		Real		= Realish + Stated				// || x = message(),  x.position
 
 	function Always (|bool| Y, |branchstate|)
 		if self is either

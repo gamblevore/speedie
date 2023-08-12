@@ -36,8 +36,10 @@ struct NilTracker
 		.fn = f
 		.ifmsg = nil
 		.MsgCount = 0
-		for d in .fn.args				// no need add prms.... only log changes
+		for (d in .fn.args) (i)				// no need add prms.... only log changes
+			d.NilParamPos = i
 			d.RestoreNil
+			
 
 
 	iterator
@@ -70,8 +72,6 @@ function SCDecl.NilTighten (|scfunction| f)
 				f[p] = .MakeReal
 			  else
 				f[p] = .MakeOptional
-
-				
 		
 
 function scdecl.CouldReceiveNil (|bool|)

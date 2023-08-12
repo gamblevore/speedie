@@ -49,6 +49,7 @@ function message.NilPropAccess (|scdecl|)
 	if m and m isnt onmodule
 		return m
 
+
 function message.NilDecl (|scdecl|)
 	opt norefcounts
 	|| obj = .obj
@@ -59,11 +60,11 @@ function message.NilDecl (|scdecl|)
 		return obj
 	
 	
-function NilTracker.ChildMustExist (|message| wrapper)
+function NilTracker.UseChildAsReal (|message| wrapper)
 	// a.b, *a, a[0], (a)()
 	opt norefcounts
-	|| msg = wrapper.first
-		.MustBeReal(msg, msg.NilDecl)
+	|| ch = wrapper.first
+		.UseAsReal(ch, ch.NilDecl)
 
 
 function NilTracker.CheckFunction (|message| msg)
@@ -154,25 +155,14 @@ function SCDecl.IsNowNil (|bool|)
 	return (self == TypeNil) or (.nilused isnt real)
 
 
-function niltracker.MustBeReal (|message| msg, |scdecl| d)
+function niltracker.UseAsReal (|message| msg, |scdecl| d)
 	opt norefcounts
 	|| u = d.NilUsed
-	if u isnt Nilish
-		return
-	expect (u is realish) (msg, "Possible NilObject Access.")
-
-	if d is param
-		// seems like each redeclarer should do its own logic.
-		|| dnd = d.NilDeclared
-		// check stated and nillish... in case we test a param?
-		// wouldn't that count as redundant? either way... this code works.
-		if dnd is Stated
-			expect (dnd isnt Nilish) (msg, `Param needs wrap with "if", or redeclare as non-nil.`)
-		  else
-			d = .ReDeclare(msg, d, nilstate.real)
-
-	.SetNilness(msg, d, NilState.Realish)
-
+	if u is Nilish
+		expect (d is param) (msg, msg.nilmsg)
+		expect (d.NilDeclared isnt Stated) (msg, `NilObjectAccess: Add '!' to param type, or wrap with "if".`)
+		d.NilDeclared = NilState.real
+		d.nilused = NilState.Realish
 
 
 function niltracker.Redeclare (|message| msg, |scdecl| d, |nilstate| used, |scdecl|)
@@ -182,7 +172,6 @@ function niltracker.Redeclare (|message| msg, |scdecl| d, |nilstate| used, |scde
 	d2.NilDeclared = used (|) NilState.Stated // i think this is stated now.
 	.fn[d.NilParamPos] = d2
 	return d2
-
 
 
 function NilTracker.ProcessCondThg (|message| msg, |bool| Y, |branchstate|)
@@ -199,7 +188,6 @@ function NilTracker.ProcessCondThg (|message| msg, |bool| Y, |branchstate|)
 		if dnd is either
 			return BranchState.Never
 		return msg.RedundantFalse
-
 
 	// u is either
 	if dcl isnt param
@@ -237,10 +225,10 @@ function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
 
 function NilTracker.ProcessCondPtr (|message| m, |bool| Y, |branchstate|)
 	opt norefcounts
-	|| f = m.first
-	|| d = f.nildecl
-		.MustBeReal(f, d)
-		return .ProcessCond(f, y)
+	|| PointedTo = m.first
+	|| pd = PointedTo.nildecl
+		.UseAsReal(PointedTo, pd)
+		return .ProcessCond(PointedTo, y)
 
 
 function NilTracker.ProcessCondBrel (|message| m, |bool| Y, |branchstate|)
@@ -325,8 +313,7 @@ function Niltracker.Decl (|message| declmsg)
 		exp = exp.last
 	|| d = exp.AsDecl
 	|| r = declmsg.AsDecl
-	r.NilTake(d)
-	
+	r.NilTake(d)	
 	
 
 function NilTracker.RunNormal (|message| msg, |branchstate|)
@@ -336,16 +323,16 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 		|| f = s.func
 		if (f == @dot)
 			|| Prop = s.NilPropAccess
-				.ChildMustExist(s)								// abc.var
+				.UseChildAsReal(s)								// abc.var
 		  elseif (f == @acc) 
-			.ChildMustExist(s)									// abc[0]
+			.UseChildAsReal(s)									// abc[0]
 		  elseif (f == @brel) 
 			if s != "*"
-			.ChildMustExist(s)									// *abc
+			.UseChildAsReal(s)									// *abc
 		  elseif (f == @func)
 			|| ch = s.first
 			if ch == @bra
-				.ChildMustExist(ch)								//  (abc)()
+				.UseChildAsReal(ch)								//  (abc)()
 			.CheckFunction(s)
 		  elseif (f == @tmp)
 			|| type = S.TmpType
@@ -363,9 +350,15 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 		  else
 			return .RunNormal(s) // tail-call opt
 	return BranchState.Always
-	
 
-	
+
+
+function message.nilmsg (|string|)
+	if self == @thg
+		return `NilObjectAccess: Needs "if" wrapping.`
+	return "Possible NilObjectAccess"
+
+
 
 
 /*
