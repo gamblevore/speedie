@@ -202,12 +202,13 @@ function NilTracker.ProcessCondPtr (|message| m, |branchstate| Y, |branchstate|)
 
 function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y, |branchstate|)
 	opt norefcounts
-	if (m == "!")
+	|| b = m.name[0]
+	if b == '!'
 		return .ProcessCond(m.first, Y.not)
-	if m == "*"
+	if b == '*'
 		return .ProcessCondPtr(m, Y)
-	if m == "&"			// objects always have an address
-		return NilState.Real.Always(Y)
+	if b == '&'			// objects always have an address
+		return Y
 	debugat
 	.RunNormal(m)
 	return branchstate.Perhaps

@@ -14,6 +14,8 @@ datatype BranchState (byte)
 		if self == Always
 			return never
 		return self
+	syntax is (|branchstate| b, |bool|)
+		return self == b
 
 
 datatype NilState (byte) // Exec.scproj needs this here
@@ -28,12 +30,12 @@ datatype NilState (byte) // Exec.scproj needs this here
 		Optional    = Either  + Stated				// || x = array[1000]
 		Real		= Realish + Stated				// || x = message(),  x.position
 
-	function Always (|branchstate| Y, |branchstate|)
-		if self is either
-			return branchstate.Perhaps
-		if (self is real) == Y
-			return branchstate.Always
-		return branchstate.Never
+//	function Always (|branchstate| Y, |branchstate|)
+//		if (self is either) or (y is perhaps)
+//			return branchstate.Perhaps
+//		if (self is real) == Y
+//			return branchstate.Always
+//		return branchstate.Never
 			
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type
