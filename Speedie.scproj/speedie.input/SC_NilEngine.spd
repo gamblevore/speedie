@@ -165,15 +165,6 @@ function niltracker.UseAsReal (|message| msg, |scdecl| d)
 		d.nilused = NilState.Realish
 
 
-function niltracker.Redeclare (|message| msg, |scdecl| d, |nilstate| used, |scdecl|)
-	opt norefcounts
-	
-	|| d2 = d.copy
-	d2.NilDeclared = used (|) NilState.Stated // i think this is stated now.
-	.fn[d.NilParamPos] = d2
-	return d2
-
-
 function NilTracker.ProcessCondThg (|message| msg, |bool| Y, |branchstate|)
 	opt norefcounts
 	|| dest = NilState.Nilish + Y	
@@ -182,16 +173,14 @@ function NilTracker.ProcessCondThg (|message| msg, |bool| Y, |branchstate|)
 	if u == dest
 		return msg.RedundantTrue
 
-	.SetNilness(msg, dcl, dest)
-	|| dnd = dcl.NilDeclared
-	if u != NilState.Either
-		if dnd is either
-			return BranchState.Never
-		return msg.RedundantFalse
+	if u == NilState.Either
+		if (dcl is param) and (dcl.NilDeclared isnt stated)
+			dcl.NilDeclared = NilState.optional
+		return .SetNilness(msg, dcl, dest)
 
-	// u is either
-	if dcl isnt param
-		return BranchState.Perhaps
+	if dcl.NilDeclared is either
+		return msg.RedundantFalse
+	return BranchState.Never // checking for nil-obj allocations
 
 // u is either and a param
 // function abc (|object| o)
@@ -199,10 +188,6 @@ function NilTracker.ProcessCondThg (|message| msg, |bool| Y, |branchstate|)
 //     o.refcount
 // OK so lets look at an optional test then.
 // So we test O.
-
-	if (dnd isnt stated)
-		.ReDeclare(msg, dcl, u)
-	return BranchState.Perhaps
 
 
 function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)

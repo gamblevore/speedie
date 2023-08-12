@@ -7,28 +7,30 @@ struct NilTracker
 	|scfunction--|		fn
 	|message--|			IfMsg
 	|message--[1024]|	Items
-	
+
+
 	function Enter (|uint|)
 		.ifdepth++
 		return .MsgCount
-	
+
+
 	function Leave (|uint| s)
 		.MsgCount = s
 		.IfDepth--
-		
-	function SetNilness (|message| m, |scdecl| d, |nilstate| s)
+
+
+	function SetNilness (|message| m, |scdecl| d, |nilstate| s, |branchstate|)
 		opt norefcounts
 		if d.nilused > 3 // what?
 		if !.MsgCount
 			m.Indent = d.NilUsed
-			return
-
-		if (.MsgCount < 1024) 
+		  elseif (.MsgCount < 1024) 
 			m.Indent = d.NilUsed
 			.items[.MsgCount++] = m
-			return
+		  else
+			error (m, "Too many variables")
+		return BranchState.Perhaps
 
-		error (m, "Too many variables")
 
 	function Start (|scfunction| f)
 		opt norefcounts
@@ -39,7 +41,6 @@ struct NilTracker
 		for (d in .fn.args) (i)				// no need add prms.... only log changes
 			d.NilParamPos = i
 			d.RestoreNil
-			
 
 
 	iterator
@@ -59,20 +60,6 @@ function SCDecl.NilTake (|scdecl| d)
 	.NilUsed = n
 	.NilDeclared = n
 	
-	
-function SCDecl.NilTighten (|scfunction| f)
-	disabled "we wanna remove f[p] cos its not needed"
-	opt norefcounts
-	|| u = .nilused
-	|| d = .NilDeclared
-	if (u xor d) & nilstate.Either
-		if d isnt stated
-			|| p = .NilParamPos
-			if u isnt Nilish
-				f[p] = .MakeReal
-			  else
-				f[p] = .MakeOptional
-		
 
 function scdecl.CouldReceiveNil (|bool|)
 	return .IsObject or .PointerCount
