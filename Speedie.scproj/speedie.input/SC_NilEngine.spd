@@ -170,24 +170,22 @@ function NilTracker.ProcessCondThg (|message| msg, |bool| Y, |branchstate|)
 	|| dest = NilState.Nilish + Y	
 	|| dcl = msg.nildecl			#debug_require
 	|| u = dcl.NilUsed
-	if u == dest
-		return msg.RedundantTrue
-
+	|| ndd = dcl.NilDeclared
+	
 	if u == NilState.Either
-		if (dcl is param) and (dcl.NilDeclared isnt stated)
+		if (dcl is param) and (ndd isnt stated)
 			dcl.NilDeclared = NilState.optional
 		return .SetNilness(msg, dcl, dest)
 
-	if dcl.NilDeclared is either
-		return msg.RedundantFalse
-	return BranchState.Never // checking for nil-obj allocations
-
-// u is either and a param
-// function abc (|object| o)
-// if (o)
-//     o.refcount
-// OK so lets look at an optional test then.
-// So we test O.
+	// merge these two branches?
+	if u == dest
+		if ndd is either
+			return msg.RedundantTrue
+		return BranchState.Always
+	  else
+		if ndd is either
+			return msg.RedundantFalse
+		return BranchState.Never // checking for nil-obj allocations
 
 
 function NilTracker.ProcessCond (|message| m, |bool| Y, |branchstate|)
