@@ -57,6 +57,7 @@ function NilTracker.UseChildAsReal (|message| wrapper)
 
 function NilTracker.CheckFunction (|message| msg)
 	opt norefcounts
+	// runnormal on the params!
 	// check all the function params. and return too. The return must be stated
 	// print(a, b, c)
 	|| prms = msg.last
@@ -131,7 +132,7 @@ function niltracker.UseAsReal (|message| msg, |scdecl| d)
 	|| u = d.NilUsed
 	if u is Nilish
 		expect (d is param) (msg, msg.nilmsg)
-		expect (d.NilDeclared isnt Stated) (msg, `NilObjectAccess: Add '!' to param type, or wrap with "if".`)
+		expect (d.NilDeclared isnt Stated) (msg, "NilObjectAccess: Don't declare with '?'... or test for nil.")
 		d.NilDeclared = NilState.real
 		d.nilused = NilState.Realish
 
@@ -171,7 +172,6 @@ function NilTracker.ProcessCond (|message| m, |branchstate| Y, |branchstate|)
 		return .ProcessCondFunc(m, y)
 	if fn == @brel
 		return .ProcessCondBrel(m, y)
-	debugat
 	.RunNormal(m)
 	return branchstate.Perhaps
 
@@ -205,9 +205,7 @@ function NilTracker.ProcessCondFunc (|message| m, |branchstate| Y, |branchstate|
 	|| fn = prms.obj|SCFunction|
 	if !fn.IsNilChecker
 		return branchstate.Perhaps
-	|| p1 = prms.first
-	if p1 == @thg
-		return .ProcessCondThg(m, y)	
+	debugat // so what do we return if it is a nilchecker??
 	
 
 function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
@@ -216,7 +214,10 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
 	|| op = ll.next
 	|| rr = op.next
 	|| scop = op.obj|SCOperator|
-	require scop and rr
+
+	// let's say that actually... each cond tester tests things
+	// so that is responsbile for calling runnormal or not.
+	// so we shouldn't call .runnormal here	
 
 	if scop.IsCompare
 		|| LNil = (ll.obj as scdecl).IsNowNil
@@ -231,6 +232,7 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
 			return .ProcessCond(side, Y)
 		return BranchState.Perhaps
 	
+	
 	if scop.IsAndOr
 		if scop.IsAndOr == 3 // and
 			// x = (a and b)
@@ -244,8 +246,7 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
 		.ProcessCond(ll, Y)
 		.ProcessCond(rr, Y)
 		return BranchState.Perhaps
-			
-		
+
 		// what about the cond?
 		// if (a and b)			// a yes,   b yes		... after a may, b may
 		// if (!a and !b)		// a no,    b no    	... after a may, b may
@@ -254,10 +255,14 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
 		// if (a or b)			// a may,	b may		... after a no,  b no		
 		// if (!(a or b))		// a no,	b no		... after a may, b may
 		// if (!(!a or !b))		// a may,	b may		... after a no,  b no 
-		
-		
 		// if !msg or *msg
 		// if (abc and m) or (*m == 1)
+
+// its a bit ops by now. all others would have gone.
+	if ll.hasany
+		.RunNormal(ll)
+	if rr.hasany
+		.RunNormal(rr)
 	return branchstate.Perhaps
 
 
@@ -266,10 +271,21 @@ function Niltracker.Decl (|message| declmsg)
 	|| exp = declmsg.last
 	if exp == @rel
 		exp = exp.last
-	|| d = exp.AsDecl
-	|| r = declmsg.AsDecl
-	r.NilTake(d)	
+		|| d = exp.AsDecl
+		|| r = declmsg.AsDecl
+		r.NilTake(d)	
 	
+
+function NilTracker.SetRel (|message| msg, |branchstate|)
+	opt norefcounts
+	|| l = msg.first
+	|| lnd = l.nildecl
+	if lnd.NilDeclared isnt nilish
+		|| r = msg.last
+		.UseAsReal(r, r.nildecl)
+	return .RunNormal(msg)
+			
+
 
 function NilTracker.RunNormal (|message| msg, |branchstate|)
 	opt norefcounts
@@ -285,12 +301,12 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 			if s != "*"
 			.UseChildAsReal(s)									// *abc
 		  elseif (f == @rel)
-			if s.tmptype is kSetVar
-				
+			if s.tmptype is kSetVar								// x = y
+				.SetRel(s)
 		  elseif (f == @func)
 			|| ch = s.first
 			if ch == @bra
-				.UseChildAsReal(ch)								//  (abc)()
+				.UseChildAsReal(ch)								// (abc)()
 			.CheckFunction(s)
 		  elseif (f == @tmp)
 			|| type = S.TmpType
@@ -305,8 +321,10 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 				
 		  elseif !s.IsLast
 			.RunNormal(s)
-		  else
+		  
+		  elseif s.hasany
 			return .RunNormal(s) // tail-call opt
+	
 	return BranchState.Always
 
 
@@ -322,14 +340,15 @@ function message.nilmsg (|string|)
 /*
 TODO:
 
+* finish CheckFunction
+	* modifications of objects via func pointer param... during a cond
+
 * do the work on args in the if-cond thing...
 	* pass the info about BOTH the conditions... in the state "Y" thing... the applicator can decide what to do about "After" conditions...
 
 * merge the behaviours of rels... and most things? brels too? and @funcs!!
 	* || x = (a and b), if x: a.a(b.b)
 	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...
-
-* modifications of objects via func pointer param... during a cond
 
 * cpp-wrappers and prototypes default to not nil unless stated.
 * ternaries
