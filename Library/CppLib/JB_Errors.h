@@ -8,7 +8,7 @@
 extern "C" {
 extern int JB_ErrorNumber;
 int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errno, const char* errmsg, const char* Operation, int Severity=4, const char* verb=0);
-int JB_ErrorHandleC(const char* Msg, bool CanFree);
+void JB_ErrorHandleC(const char* Msg, bool CanFree);
 
 }
 

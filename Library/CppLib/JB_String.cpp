@@ -1054,7 +1054,7 @@ int JB_Str_OutByte( JB_String* self, int StartOff, int AfterOff, int SearchChar 
 
 
 byte JB_Str_First(JB_String* self) {
-	if (self) {
+	if (self) { // remove when we got nil detection ??
 		int n = self->Length;
 		if (n)
 			return self->Addr[0];

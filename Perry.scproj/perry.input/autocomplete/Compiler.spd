@@ -100,7 +100,7 @@ extend PerryIDE
 				.debugFB(msg)
 		  elseif !errsvis
 			.view(.viewerrors)
-			.say(" didnt compile")
+			.say(" failed. Could not compile")
 		.LoadErrors(RealErrors, realerrors)
 		.showstats
 

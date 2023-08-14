@@ -24,7 +24,7 @@
 
 extern "C" {
 
-int JB_ErrorHandleC(const char* Desc, bool CanFreeDesc);
+void JB_ErrorHandleC(const char* Desc, bool CanFreeDesc);
 
 uint8* JB_Img__LoadQOI(uint8* data, int len, int* Size) {
 	qoi_desc desc;
