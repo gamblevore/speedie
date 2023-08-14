@@ -582,7 +582,6 @@ struct NilTracker {
 	uint IfDepth;
 	uint MsgCount;
 	SCFunction* fn;
-	Message* IfMsg;
 	Message* Items[1024];
 };
 
@@ -830,7 +829,7 @@ JBClass ( SCOperator , JB_Object ,
 	bool IsCustom;
 	bool DoesntNeedExtraBits;
 	bool MakesSigned;
-	bool IsAndOr;
+	byte IsAndOr;
 );
 
 struct SCParamArray_Behaviour: Object_Behaviour {
@@ -1312,13 +1311,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1889])
+#define kJB__ErrorColors_bold (JB_LUB[1890])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1890])
-#define kJB__ErrorColors_good (JB_LUB[1891])
-#define kJB__ErrorColors_normal (JB_LUB[1892])
-#define kJB__ErrorColors_underline (JB_LUB[1891])
-#define kJB__ErrorColors_warn (JB_LUB[1893])
+#define kJB__ErrorColors_error (JB_LUB[1891])
+#define kJB__ErrorColors_good (JB_LUB[1892])
+#define kJB__ErrorColors_normal (JB_LUB[1893])
+#define kJB__ErrorColors_underline (JB_LUB[1892])
+#define kJB__ErrorColors_warn (JB_LUB[1894])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1497,7 +1496,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_BitAnd (JB_LUB[355])
 #define kJB_BitNot (JB_LUB[616])
 #define kJB_BitOr (JB_LUB[558])
-#define kJB_BitXor (JB_LUB[1894])
+#define kJB_BitXor (JB_LUB[1895])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_destructornotfromlocalrefs (1024)
 #define kJB_DontSaveProperty (0)
@@ -1531,7 +1530,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_SaveProperty (1)
 #define kJB_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1895])
+#define kJB_SaverStart1 (JB_LUB[1896])
 #define kJB_SelfDebug (2)
 #define kJB_SelfReplace (1)
 #define kJB_SimpleMatch (1 << 22)
@@ -1818,23 +1817,17 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__IPCState_timedout (4663)
 #define kJB__IPCState_Waiting (4660)
 #define kJB__MsgUIFlags_BreakPoint (32768)
-#define kJB__MsgUIFlags_Debugger (63)
 #define kJB__MsgUIFlags_Editable (1792)
 #define kJB__MsgUIFlags_EditableAny (1792)
 #define kJB__MsgUIFlags_EditableNum (512)
 #define kJB__MsgUIFlags_EditableString (256)
 #define kJB__MsgUIFlags_EditableSyx (1024)
 #define kJB__MsgUIFlags_EditableThing (768)
-#define kJB__MsgUIFlags_If (62)
 #define kJB__MsgUIFlags_Inserted (8192)
 #define kJB__MsgUIFlags_LargestFlag (0)
-#define kJB__MsgUIFlags_Rejoin (61)
-#define kJB__MsgUIFlags_Return (60)
 #define kJB__MsgUIFlags_Style2 (16384)
-#define kJB__MsgUIFlags_Swap (58)
 #define kJB__MsgUIFlags_User1 (2048)
 #define kJB__MsgUIFlags_User2 (4096)
-#define kJB__MsgUIFlags_While (59)
 #define kSC__NilState_ActuallyNil (1 + 4)
 #define kSC__NilState_Either (3)
 #define kSC__NilState_Failed (0)
@@ -1958,6 +1951,7 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASMtmp_If (62)
 #define kSC__ASMtmp_Rejoin (61)
 #define kSC__ASMtmp_Return (60)
+#define kSC__ASMtmp_SetVar (55)
 #define kSC__ASMtmp_Swap (58)
 #define kSC__ASMtmp_While (59)
 extern IR SC__flat_Dummy;
@@ -2087,8 +2081,6 @@ void JB_App__ConfigureSet(JB_String* Value);
 void JB_App__Crash(JB_String* reason);
 
 ErrorInt JB_App__CWDSet(JB_String* Value);
-
-void JB_App__Die(JB_String* Err, int code);
 
 JB_String* JB_App__FileName();
 
@@ -3188,8 +3180,6 @@ bool SC_ExtractAmount(Message* Prms, SCBase* name_space, SCDecl* R);
 
 SCDecl* SC_ExtractDecl(Message* c, SCBase* name_space);
 
-Array* SC_FindAllSyx(Message* msg, Syntax syx);
-
 Message* SC_FindBytePos(Message* Node, bool EndInside);
 
 AsmReg SC_fn_asm_table_ACC(ASMFuncState* self, Message* exp, AsmReg Reg);
@@ -3258,11 +3248,13 @@ Message* SC_NewDeclWithStrMsg(JB_String* type, Message* RelOrName);
 
 Message* SC_NewDeclNum(SCDecl* D, int64 N, JB_String* VarName);
 
+Message* SC_NewEqRelStr(JB_String* L, JB_String* R);
+
+Message* SC_NewEqRel(Message* L, Message* R);
+
 Message* SC_NewFnc(JB_String* name);
 
-Message* SC_NewRelStr(JB_String* L, JB_String* op, JB_String* R);
-
-Message* SC_NewRel(Message* L, JB_String* op, Message* R);
+Message* SC_NewRel(Message* L, Message* R, JB_String* op);
 
 SCDecl* SC_Or_And_Expansion(SCDecl* LC, SCDecl* RC, Message* exp, SCBase* name_space);
 
@@ -3862,6 +3854,8 @@ uint64 JB_uint64_LowestBit(uint64 self);
 
 
 // BranchState
+BranchState SC_BranchState_Not(BranchState self);
+
 
 
 // CharProp
@@ -4028,8 +4022,6 @@ MaybeBool JB_MaybeBool__New(bool Default);
 
 
 // NilState
-BranchState SC_NilState_Always(NilState self, bool Y);
-
 bool SC_NilState_SyntaxIs(NilState self, NilState type);
 
 bool SC_NilState_SyntaxIsnt(NilState self, NilState type);
@@ -4643,11 +4635,11 @@ void SC_nil_Check(NilTracker* self, SCFunction* f);
 
 void SC_nil_CheckFunction(NilTracker* self, Message* msg);
 
-void SC_nil_ChildMustExist(NilTracker* self, Message* wrapper);
-
 void SC_nil_Decl(NilTracker* self, Message* declmsg);
 
 uint SC_nil_Enter(NilTracker* self);
+
+void SC_nil_Finish(NilTracker* self, SCFunction* f);
 
 void SC_nil_If(NilTracker* self, Message* Tmp);
 
@@ -4657,31 +4649,31 @@ Message* SC_nil_IfWhileOne(NilTracker* self, Message* test, Message* root);
 
 void SC_nil_Leave(NilTracker* self, uint s);
 
-void SC_nil_MustBeReal(NilTracker* self, Message* msg, SCDecl* d);
+BranchState SC_nil_ProcessCond(NilTracker* self, Message* m, BranchState Y);
 
-BranchState SC_nil_ProcessCond(NilTracker* self, Message* m, bool Y);
+BranchState SC_nil_ProcessCondBrel(NilTracker* self, Message* m, BranchState Y);
 
-BranchState SC_nil_ProcessCondBrel(NilTracker* self, Message* m, bool Y);
+BranchState SC_nil_ProcessCondFunc(NilTracker* self, Message* m, BranchState Y);
 
-BranchState SC_nil_ProcessCondFunc(NilTracker* self, Message* m, bool Y);
+BranchState SC_nil_ProcessCondPtr(NilTracker* self, Message* m, BranchState Y);
 
-BranchState SC_nil_ProcessCondPtr(NilTracker* self, Message* m, bool Y);
+BranchState SC_nil_ProcessCondRel(NilTracker* self, Message* m, BranchState Y);
 
-BranchState SC_nil_ProcessCondRel(NilTracker* self, Message* m, bool Y);
-
-Message* SC_nil_ProcessCondRelSimple(NilTracker* self, Message* m, bool Y);
-
-BranchState SC_nil_ProcessCondThg(NilTracker* self, Message* msg, bool Y);
-
-SCDecl* SC_nil_Redeclare(NilTracker* self, Message* msg, SCDecl* d, NilState used);
+BranchState SC_nil_ProcessCondThg(NilTracker* self, Message* msg, BranchState Y);
 
 void SC_nil_Return(NilTracker* self, Message* msg);
 
 BranchState SC_nil_RunNormal(NilTracker* self, Message* msg);
 
-void SC_nil_SetNilness(NilTracker* self, Message* m, SCDecl* d, NilState s);
+BranchState SC_nil_SetNilness(NilTracker* self, Message* m, SCDecl* d, NilState s);
+
+BranchState SC_nil_SetRel(NilTracker* self, Message* msg);
 
 void SC_nil_Start(NilTracker* self, SCFunction* f);
+
+void SC_nil_UseAsReal(NilTracker* self, Message* msg, SCDecl* d);
+
+void SC_nil_UseChildAsReal(NilTracker* self, Message* wrapper);
 
 
 
@@ -5318,8 +5310,6 @@ ErrorMarker JB_Rec_Mark(JB_ErrorReceiver* self);
 
 void JB_Rec_NewErrorWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_String* path);
 
-void JB_Rec_NewItem(JB_ErrorReceiver* self, JB_Error* Err);
-
 void JB_Rec_NewProblem(JB_ErrorReceiver* self, Message* node, JB_String* Desc);
 
 void JB_Rec_NewWarning(JB_ErrorReceiver* self, Message* node, JB_String* Desc);
@@ -5340,7 +5330,7 @@ void JB_Rec_ReturnErrors(JB_ErrorReceiver* self);
 
 int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self);
 
-void JB_Rec_SyntaxAppend(JB_ErrorReceiver* self, JB_Error* Err);
+void JB_Rec_NewItem(JB_ErrorReceiver* self, JB_Error* Err);
 
 JB_ErrorReceiver* JB_Rec_SyntaxUsing(JB_ErrorReceiver* self);
 
@@ -6000,8 +5990,6 @@ Ind JB_Str_Find(JB_String* self, CharSet* cs, int Start, int After);
 Ind JB_Str_FindSlash(JB_String* self, int from);
 
 int JB_Str_FindTrailingSlashes(JB_String* self);
-
-byte JB_Str_First(JB_String* self);
 
 Ind JB_Str_HiddenJBin(JB_String* self);
 
@@ -6779,8 +6767,6 @@ SCDecl* SC_Decl_Copy(SCDecl* self, bool ForNewVariable);
 
 void SC_Decl_CopyTypeInfoTo(SCDecl* self, SCDecl* Dcl);
 
-bool SC_Decl_CouldReceiveNil(SCDecl* self);
-
 Message* SC_Decl_CreateDefault(SCDecl* self, Message* errs, bool isfunc);
 
 Message* SC_Decl_CreateSimpleTypeCast(SCDecl* self, Message* exp);
@@ -6926,6 +6912,10 @@ void SC_Decl_RestoreNil(SCDecl* self);
 bool SC_Decl_SafelyWrappable(SCDecl* self);
 
 bool SC_Decl_SameForReplace(SCDecl* self, SCDecl* c);
+
+void SC_Decl_State(SCDecl* self);
+
+bool SC_Decl_SuffersNil(SCDecl* self);
 
 void SC_Decl_SyntaxAppend(SCDecl* self, SCDeclInfo d);
 
@@ -7280,10 +7270,6 @@ Message* JB_Msg_FindSyxName(Message* self, Syntax s, JB_String* name, bool Err);
 
 Message* JB_Msg_FindName(Message* self, JB_String* name);
 
-Array* SC_Msg_FindAllDclNames(Message* self);
-
-Array* SC_Msg_FindAllDcls(Message* self);
-
 JB_String* SC_Msg_FindAndRemove(Message* self, JB_String* name, bool NothingOK, bool IsClass);
 
 Message* SC_Msg_FindAndRemove2(Message* self, Message* place, bool NothingOK, bool IsClass);
@@ -7377,6 +7363,8 @@ bool SC_Msg_IsAssignable(Message* self);
 bool SC_Msg_IsClassType(Message* self);
 
 bool JB_Msg_IsContainer(Message* self);
+
+bool SC_Msg_IsFirstOfSetRel(Message* self);
 
 Message* SC_Msg_IsInDeclInBlock(Message* self);
 
@@ -7512,6 +7500,8 @@ void JB_Msg_Nil__(Message* self, FastString* fs);
 
 SCDecl* SC_Msg_NilDecl(Message* self);
 
+JB_String* SC_Msg_nilmsg(Message* self);
+
 SCDecl* SC_Msg_NilPropAccess(Message* self);
 
 bool SC_Msg_NoPointlessBlockRefs(Message* self, Message* dcl);
@@ -7535,8 +7525,6 @@ bool SC_Msg_OperatorIsARel(Message* self, JB_String* name);
 bool SC_Msg_OperatorIsBRel(Message* self, JB_String* name);
 
 bool SC_Msg_OperatorIsDot(Message* self, JB_String* name);
-
-bool SC_Msg_OperatorIsRel(Message* self, JB_String* name);
 
 bool SC_Msg_OperatorIsThing(Message* self, JB_String* name);
 
@@ -7582,11 +7570,7 @@ void JB_Msg_RangeSet(Message* self, IntRange r);
 
 int SC_Msg_RC_HasTemporary(Message* self);
 
-BranchState SC_Msg_RedundantBranch(Message* self, bool Value);
-
-BranchState SC_Msg_RedundantFalse(Message* self);
-
-BranchState SC_Msg_RedundantTrue(Message* self);
+BranchState SC_Msg_RedundantBranch(Message* self);
 
 bool SC_Msg_RefDisappears(Message* self);
 
@@ -8018,6 +8002,8 @@ bool SC_Class_IsSaveableStruct(SCClass* self);
 
 bool SC_Class_IsSTDLib(SCClass* self);
 
+void SC_Class_Iterfailed(SCClass* self, JB_String* name, Message* node);
+
 JB_String* SC_Class_JSStructName(SCClass* self);
 
 void SC_Class_LibExport(SCClass* self, FastString* j);
@@ -8192,8 +8178,6 @@ bool SC_Func_CanDoRefs(SCFunction* self);
 
 bool SC_Func_CanLibLoad(SCFunction* self);
 
-bool SC_Func_CanNilCheck(SCFunction* self);
-
 void SC_Func_CheckNotBadName(SCFunction* self);
 
 void SC_Func_CheckReturnValue(SCFunction* self, Message* msg);
@@ -8325,8 +8309,6 @@ JB_String* SC_Func_RenderTitle(SCFunction* self, bool ForErrors, FastString* fs_
 void SC_Func_SetBlindCasts(SCFunction* self, SCBase* name_space);
 
 void SC_Func_StripTest(SCFunction* self);
-
-void SC_Func_SyntaxAccessSet(SCFunction* self, int d, SCDecl* Value);
 
 bool SC_Func_SyntaxEquals(SCFunction* self, JB_String* name, bool Aware);
 
