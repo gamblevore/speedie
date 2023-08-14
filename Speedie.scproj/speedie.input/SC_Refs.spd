@@ -505,13 +505,19 @@ function Message.IsSettablePlace (|bool|)
 	while p == @bra
 		self = p
 		p = p.parent
-	return (p == @rel) and (self.isfirst) and (.next == "=")
+	return .isfirstofsetrel
 
 
 function Message.IsSetRel (|bool|)
 	opt norefcounts
-	if (self == @Rel) and (.first.next == "=")
-		return true
+	require (self == @Rel)
+	|| s = .second
+		return (s.name == "=")
+
+
+function Message.IsFirstOfSetRel (|bool|)
+	opt norefcounts
+	return .isfirst and .parent.issetrel
 
 
 function Message.IsSetIntoPlace (|message|)

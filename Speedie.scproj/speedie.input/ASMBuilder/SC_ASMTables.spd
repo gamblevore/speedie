@@ -120,6 +120,7 @@ datatype ASMtmp (MsgUIFlags)
 		kSwap		= 58
 		kExit		= 57
 		kContinue	= 56
+		kSetVar		= 55
 	
 
 function Message.TmpType (|ASMTmp|)
@@ -128,14 +129,3 @@ function Message.TmpType (|ASMTmp|)
 function Message.TmpType (assigns:|ASMTmp| value)
 	.flags = (.flags &~ 63) (|) value
 
-
-
-extend MsgUIFlags	// ideal... better than above. the problem is testing them... with bit overlap
-	constants		// we'd need multiple lookups per "is" test
-		|asmtmp| 
-		Debugger	= 63
-		If			= 62
-		Rejoin		= 61
-		Return		= 60
-		While		= 59
-		Swap		= 58

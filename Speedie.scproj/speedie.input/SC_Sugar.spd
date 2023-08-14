@@ -29,7 +29,7 @@ function message.QMarkRel (|message|)
 	|| x = self
 	while
 		|| p = x.parent
-		if (p == @rel) and x.isfirst and (p.second == "=")
+		if (p.issetrel) and x.isfirst
 			expect !(p in @decl) (self)
 			return p
 		x = p

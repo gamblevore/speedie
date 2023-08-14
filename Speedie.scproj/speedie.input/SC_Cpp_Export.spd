@@ -1373,11 +1373,11 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function CDotType (|Message| msg, |SCDecl| Type, |FastStringCpp| fs, |String|)
 		opt norefcounts
 		require type Is UpgradeableContained
+
+		if msg.IsFirstOfSetRel
+			return ""
+
 		|| p = msg.parent
-			if (p == @rel) and (p.first == msg) and msg.next == "="
-				// debugger // shouldn't happen... but will take more investigation.
-				return ""
-			
 			|| fn = p.obj
 			if fn isa scfunction
 				if fn isa kIsReffer

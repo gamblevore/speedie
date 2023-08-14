@@ -1238,6 +1238,7 @@ function TypeOfRel (ExprResolver) {
 				error (opch, "Can't use this operator here.")
 		  elseif (ShouldBeSet)
 			side = rn
+			exp.tmptype = asmtmp.ksetvar // for the ASM
 		  else
 			error (opch, "Did you mean '=='?")
 

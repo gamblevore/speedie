@@ -3,13 +3,12 @@
 
 function DeclsDefault (|Message| def, |Message|)
 	opt norefcounts
-	require (def and (def == @rel))
-	|| f = def.first 
-	|| s = f.next(@opp, "=")$
-	|| l = s.next
-	if f == @thg and l == @thg
-		expect !(f.name ~= l.name) (def, "Really bad error here!")
-	Return l
+	if def.issetrel
+		|| f = def.first
+		|| l = def.Last
+		if l == @thg
+			expect !(f.name ~= l.name) (def, "Same name!")
+		Return l
 
 
 function MakeDecl (|string| Type, |string| Name, |Message| Value, |Message|)

@@ -1680,7 +1680,7 @@ function message.NeedsPreprocess (|bool|)
 	require (self == @rel)
 	|| L = .first
 	if (L == @rel) and (L.next == "or")
-		return (L[1] == "=") and (.last[1] == "=")
+		return (L.second == "=") and (.last.second == "=")
 
 
 
@@ -1894,14 +1894,14 @@ function NeuLibrary (CollectFunc)
 function SettingSelfProperty (|Message| Rel, |bool|)
 	// .bla = X
 	opt norefcounts
-	|| Dot = SettingAProperty(rel) #require
-	return (Dot.first IsThing "self")
+	|| Dot = SettingAProperty(rel)
+		return (Dot.first IsThing "self")
 
 
 function SettingAProperty (|Message| Rel, |Message|)
 	// bla.bla = X
 	opt norefcounts
-	require (Rel IsRel "=")
+	require (Rel.IssetRel)
 	|| it = Rel.first
 		if (it.DotType == kIsProperty)
 			return it
@@ -1910,7 +1910,7 @@ function SettingAProperty (|Message| Rel, |Message|)
 function SettingMemory (|Message| Rel, |bool|)
 	// bla.bla = X
 	opt norefcounts
-	require (Rel IsRel "=")
+	require Rel.IssetRel
 	|| it = Rel.first
 		if (it.DotType == kIsProperty or kIsMemory)
 			return true
@@ -1920,9 +1920,7 @@ function message.SelfKindaUse (|int|)
 	opt norefcounts
 	|| p = .parent
 	|| R = p.parent
-	if R == @Rel
-		|| Op = R[1]
-		require (Op == "=") and Op.next
+	if R.issetrel
 		return p.DotType
 
 
@@ -1931,9 +1929,8 @@ function IsSelfOfSetter (|Message| curr, |Message|)
 	// .bla = X
 	|| dot = curr.Parent
 	|| P   = dot.Parent
-	require (P IsRel "=")
-	require (P.first == dot)
-	Return P
+	if (P.IssetRel) and (dot.isfirst)
+		Return P
 
 
 function string.UnicodeSafeName (|string|)

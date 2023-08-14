@@ -30,7 +30,7 @@ extend_module ASM
 function message.GetASMFunc (|message|)
 	opt norefcounts
 	if .reg >= 0
-		|| op = .next(@thg, "=")$
+		|| op = .next(@opp, "=")$
 		|| Adj = op.next(@adj)$
 		return adj[@func]
 

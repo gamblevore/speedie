@@ -110,8 +110,9 @@ extend Message {
 		Return (self) and (self == @Brel) and (.name == name)
 
 	operator IsRel (|String| name, |bool|)
+		opt norefcounts
 	// case blind...
-		Return (self) and (self == @Rel) and (self[1].name == name)
+		Return (self) and (self == @Rel) and (.second.name == name)
 
 
 	operator IsDot (|string| name, |bool|)
