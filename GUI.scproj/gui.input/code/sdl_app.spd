@@ -334,10 +334,10 @@ module SDLApp
 	function GUICheck
 		if app.yes("version")
 			printline app.conf("version")
-			app.quit(0)
+			app.quit
 		if app.yes("created")
 			printline __now__|date|.render
-			app.quit(0)
+			app.quit
 	
 	function NiceAppName (|string|)
 		with app.conf("selfname")

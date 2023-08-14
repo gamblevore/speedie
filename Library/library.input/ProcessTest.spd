@@ -53,7 +53,7 @@ module ProcessTest
 		if timeout
 			app.sleep(10s)
 		  else
-			app.die
+			app.quit(-1)
 
 		
 	function ParentDieTest (|bool| timeout)

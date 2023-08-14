@@ -175,7 +175,7 @@ module Feedback
 			|| opt = AppOptions[name]
 				options.OperationCount += ((*opt)(name, value, nil))
 			  else
-				app.die("Unknown switch '$Name'\n")
+				app.quit("Unknown switch '$Name'\n")
 		  elseif value.isjbin // ignore it
 			0 // probably a restart compile option
 		  elseif (options.OperationCount == 1) and !options.output_path

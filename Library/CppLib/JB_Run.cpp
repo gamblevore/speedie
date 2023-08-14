@@ -236,7 +236,11 @@ int* JB_App__ErrorNumber () {
 	return &JB_ErrorNumber;
 }
 
-void JB_App__Quit (int Code) {
+void JB_App__Quit (JB_String* Err, int Code) {
+	if (JB_Str_Length(Err)) {
+		if (!Code) {Code = -1;}
+		JB_Str_PrintLine(Err);
+	}
 	JB_Rec_ShellPrintErrors(nil);
 	if (!Code)
 		Code = JB_ErrorNumber;

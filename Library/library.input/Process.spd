@@ -390,7 +390,7 @@ class Process
 		.cid = 0
 		.other("died", true)
 		if !.isserver
-			app.die
+			app.quit(-1)
 
 
 	function Close
