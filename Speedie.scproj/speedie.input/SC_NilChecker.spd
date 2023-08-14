@@ -27,7 +27,7 @@ function NilTracker.Check (|scfunction| f)
 		require c.name contains "NilTest"
 
 	.Start(f)
-	.RunNormal(.fn.SourceArg)
+	.RunNormal(f.SourceArg)
 	.Finish(f)
 
 
@@ -200,6 +200,7 @@ function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y, |branchstate|
 
 function NilTracker.ProcessCondFunc (|message| m, |branchstate| Y, |branchstate|)
 	opt norefcounts
+	.CheckFunction(m)
 	|| prms = m.last
 	|| fn = prms.obj|SCFunction|
 	if !fn.IsNilChecker
@@ -283,6 +284,8 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 		  elseif (f == @brel) 
 			if s != "*"
 			.UseChildAsReal(s)									// *abc
+		  elseif (f == @rel)
+			0
 		  elseif (f == @func)
 			|| ch = s.first
 			if ch == @bra
