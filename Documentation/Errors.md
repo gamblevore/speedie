@@ -243,7 +243,7 @@ First lets look at "`Go`", a supposedly modern language with huge funding (not j
     
 
 
-OK, their syntax is quite understandable, in this case. `Go` has awkward syntax usually, but for this simple case it's OK! Now lets look at this in speedie:
+OK, their syntax is quite understandable, in this case! Now lets look at this in speedie:
 
 
     function Hello (|string| name, |string|)
