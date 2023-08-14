@@ -165,7 +165,7 @@ function Message.InitRootDecl (|Message| before, |SCBase| name_space, |bool|) {
 			NewDefault.Obj = nil // just keep doing what it used to do
 	
 	if NewDefault != "nil"
-		before.Prev = NewRel( «thg .name », "=", NewDefault )
+		before.Prev = NewRel( «thg .name », NewDefault, "=" )
 	Return true
 }
 

@@ -101,15 +101,19 @@ class SCIterator (SCObject)
 
 
 	function Renuqify (|SCBase| p)
+		opt norefcounts
 		for n in .names
 			n.Uniqueify( p )
 
 
 	function Uniqueify (|Message| msg, |[SCNodeRenamer]|)
-		for CurrName in msg.FindAllDclNames
-			|| ren = SCNodeRenamer.new
-			ren.CollectDclThg( CurrName )
-			rz <~ ren
+		opt norefcounts
+		for dcl.flat in msg
+			if dcl == @Decl
+				|| CurrName = dcl.getdclname
+					|| ren = SCNodeRenamer.new
+					ren.CollectDclThg( CurrName )
+					rz <~ ren
 
 
 	module
@@ -158,6 +162,9 @@ function SCClass.GetIteratorAny (|String| name, |message| node, |SCIterator|)
 		if R isa SCIterator
 			return R
 
+	.iterfailed(name, node)
+
+function scclass.Iterfailed (|string| name, |message| node)
 	error (node, "No iterator $Name for class: ${.Name}" )
 
 

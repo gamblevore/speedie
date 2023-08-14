@@ -103,7 +103,7 @@ function message.IntoVariable (|scbase| name_space, |nameandmsg|)
 	|| Block = .CreateOwnBlock
 	|| name = uniquetmpvar(name_space, "_imP")
 	
-	P = NewRel( @thg.msg(name), "=", self )
+	P = NeweqRel( @thg.msg(name), self )
 	|| arg = block.asarg
 	Block <~ «decl
 		@emb

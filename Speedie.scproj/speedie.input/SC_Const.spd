@@ -203,7 +203,7 @@ struct ArgArrayCounter
 			.IsNotItem = true
 			arr <~ (.i)++
 			.max = .i
-		return NewRel( acc, "=", value )			// [1:x, 4:y]
+		return NeweqRel( acc, value )			// [1:x, 4:y]
 
 
 function @scmodule.ConstantCollector (collectfunc)

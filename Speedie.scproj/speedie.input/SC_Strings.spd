@@ -436,9 +436,9 @@ function Message.TernaryFix (|message| exp) {
 
 	.next = «tmp "if"
 		exp
-		«arg, newrel(place, "=", list.first)»
+		«arg, neweqrel(place, list.first)»
 		«tmp "else"
-			«Arg, newrel( «Thg place.name », "=", list.last)»
+			«Arg, neweqrel( «Thg place.name », list.last)»
 		»
 	»
 	

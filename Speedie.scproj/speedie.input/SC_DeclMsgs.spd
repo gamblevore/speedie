@@ -41,7 +41,7 @@ function MakeDeclOrRel (|Message| Into, |message| namemsg, |Message| value, |Mes
 	»
 	
 	if value
-		Value = NewRel( NameMsg, "=", value )
+		Value = NeweqRel( NameMsg, value )
 	  else
 		Value = NameMsg
 	rz <~ value

@@ -1130,7 +1130,7 @@ function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
 	require !d.C_array				// we actually need to clear it!
 	
 	|| def = d.CreateDefault(place)
-	return NewRel( .DeclToDot(d), "=" , def )
+	return NeweqRel( .DeclToDot(d), def )
 
 
 function DoLinkTo (|SCBase| B)
@@ -1145,7 +1145,7 @@ function NewNilRel (|SCDecl| d, |Message|)
 	// .bla = nil
 	|| def = «thg "nil"»
 	def.Obj = TypeNil
-	return NewRel( .DeclToDot(d), "=" , def )
+	return NeweqRel( .DeclToDot(d), def )
 
 
 
@@ -1250,7 +1250,7 @@ function Tran_AfterRel (|Message| msg, |SCBase| name_space, |message| side, |SCD
 
 	|message| R
 	if numc or type.setter
-		R = NewRel(exp, msg.name[0, 1], «num "1"»)
+		R = NewRel(exp, «num "1"», msg.name[0, 1])
 	  else
 		|| name = ("next", "prev")(msg == "++")
 		R = «dot name
@@ -1311,7 +1311,7 @@ function AlterPostCond (|Message| PostCond, |Message| IterPostCond, |message| No
 	if (!PostCond)
 		Return IterPostCond
 
-	return NewRel( «Bra, postcond », "or", «bra, IterPostCond » )
+	return NewRel( «Bra, postcond », «bra, IterPostCond », "or" )
 
 
 function ArgToFunc (|string| NewName, |Message| Params, |Message| arg,  |Message|)

@@ -251,7 +251,7 @@ function VMDecl (|message| tmp, |[message]| msgs)
 	msgs[id] = tmp
 	name = "ASM_" + name
 	.ModuleArg <~ NewDecl(name)
-	.ModuleArg <~ NewRel(@thg+tmp.name, "=", @num + id) 
+	.ModuleArg <~ NeweqRel(@thg+tmp.name, @num + id)
 // TypeList
 
 

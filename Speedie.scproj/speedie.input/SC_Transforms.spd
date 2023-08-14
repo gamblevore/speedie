@@ -549,7 +549,7 @@ function Tran_ForSub (TranFunc)					// :3
 
 			  elseif (msg == "continue_with")
 				msg.Name = "continue"
-				msg.Prev = NewRel( iter.index.copy(node2), "=", msg.last )
+				msg.Prev = NeweqRel( iter.index.copy(node2), msg.last )
 				continue_with msg.FlatAfter
 		
 		  elseif (msg == @thg)

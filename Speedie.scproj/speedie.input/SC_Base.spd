@@ -755,7 +755,7 @@ function Message.ConstantExpandSub (|Message|)
 	using (self)
 	for item in self
 		if rz
-			rz = NewRel( rz, "(|)", item.copy )
+			rz = NewRel( rz, item.copy, "(|)" )
 		  else
 			rz = item.copy
 

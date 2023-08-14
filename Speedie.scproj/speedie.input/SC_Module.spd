@@ -104,7 +104,7 @@ function FillDisposeFunc
 	|| Arg = .DisposeFunc$.SourceArg
 	for decl.vars in self
 		if decl and (decl Isnt Const) and (!decl.C_array)
-			arg <~ NewRel(decl.name, "=", "nil")
+			arg <~ NeweqRel(decl.name, "nil")
 
 
 function AddModuleToFunc (|SCBase| space)

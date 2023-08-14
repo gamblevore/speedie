@@ -3,22 +3,6 @@
 
 ///////////// ///////////// ///////////// FINDING ///////////// ///////////// ///////////// 
 
-function Message.FindAllDclNames (|[Message]|)
-	for dcl in .FindAllDcls
-		|| n = dcl.GetDclName
-			rz <~ n
-
-
-function Message.FindAllDcls (|[Message]|)
-	Return FindAllSyx( self, @Decl )
-
-
-function FindAllSyx (|Message| msg, |Syntax| syx, |[Message]|)
-	opt norefcounts
-	for c.flat in msg	
-		if c == syx
-			rz <~ c
-
 
 function Message.FindAndRemove (|String| name,  |bool| NothingOK,  |bool| IsClass,  |string|)
 	return .FindAndRemoveSub(name, NothingOK, isclass)$.name
@@ -63,11 +47,12 @@ function WithinOrAnd (|Message| msg, |bool|)
 	// if ((a.f + b.f) or c.f) { }
 	// x = ((a.f + b.f) or c.f)
 	// check for rels... until we hit what? An arg? Seems sensible!
+	opt norefcounts
 	
 	|| p = msg
 	While p != @arg
 		if p == @rel
-			|| op = p[ 1 ]
+			|| op = p.second
 			if op == "and" or "or"
 				Return true
 		
@@ -165,6 +150,7 @@ function Message.DeclName (|Message|)
 
 // same as above?
 function Message.GetDclName (|bool| Need=false, |Message|)
+	opt norefcounts
 	rz = self[@Nil, 1]
 	if rz == @Rel
 		rz = rz[@thg]
@@ -276,6 +262,7 @@ function Message.InsertAfter (|Message| j, |Message| ch)
 
 
 function Message.Move (|Message| last, |Message| into)
+	opt norefcounts
 	|| curr = self
 	while (curr != last)
 		|| next_ = curr.Next
@@ -284,26 +271,30 @@ function Message.Move (|Message| last, |Message| into)
 
 
 function Message.MoveAllIn (|Message|Dest)
+	opt norefcounts
 	While .hasany
 		Dest.Last = .First
 
 
 function Message.MoveAllAfter (|Message| after)
+	opt norefcounts
 	While .hasany
 		after.Next = .Last
 
 
 function Message.NeedMarker (|String| s, |bool| b, |Message|)
-	rz = .find( @tmp, s )
-	if !rz
-		rz = @tmp.msg(s)
-		if b
-			.Last = rz
-		  else
-			.First = rz
+	opt norefcounts
+	|| f = .find( @tmp, s )
+		return f
+	rz = @tmp.msg(s)
+	if b
+		.Last = rz
+	  else
+		.First = rz
 
 
 function message.WipeCopy (|message| oof, |Message|)
+	opt norefcounts
 	cpp_part LayerWipeCopy
 	if !oof
 		return .WipeCopy
@@ -315,6 +306,7 @@ function message.WipeCopy (|message| oof, |Message|)
 
 	
 function message.WipeCopy (|Message|)
+	opt norefcounts
 	rz = Message(self)
 	rz.position = -1
 	for v in self
@@ -322,6 +314,7 @@ function message.WipeCopy (|Message|)
 
 
 function Message.CopyAllAfterBefore (|Message| Before, |message| copylayer)
+	opt norefcounts
 	|| exp = .Next
 	While exp
 		before.Prev = exp.wipeCopy(copylayer)
@@ -329,6 +322,7 @@ function Message.CopyAllAfterBefore (|Message| Before, |message| copylayer)
 
 
 function Message.CopyAllBefore (|Message| Before, |message| copylayer)
+	opt norefcounts
 	|| curr = .Prev
 	while curr
 		|| cpy = curr.Copy(copylayer)
@@ -338,6 +332,7 @@ function Message.CopyAllBefore (|Message| Before, |message| copylayer)
 
 
 function Message.CopyAllAfter (|Message| after, |message| copylayer)
+	opt norefcounts
 	|| curr = .next
 	While curr
 		|| cpy = curr.WipeCopy(copylayer)
@@ -348,11 +343,13 @@ function Message.CopyAllAfter (|Message| after, |message| copylayer)
 
 // all these copyintos need to clear position
 function Message.CopyAllInto (|Message| j, |bool| wipe = false)
+	opt norefcounts
 	for c in self
 		j <~ c.Copy(j)			// Was .wipecopy. why did I do that?
 
 
 function Message.CopyAllBeforeInto (|Message| into, |Message| copylayer)
+	opt norefcounts
 	|| curr = .Prev
 	while curr
 		into.first = curr.Copy(copylayer)	// was .WipeCopy. why did I do that?
@@ -360,6 +357,7 @@ function Message.CopyAllBeforeInto (|Message| into, |Message| copylayer)
 
 
 function Message.CopyAllAfterInto (|Message| into, |Message| copylayer)
+	opt norefcounts
 	|| curr = .Next
 	While curr
 		into <~ curr.Copy(copylayer) // was .wipecopy. why did I do that?
@@ -371,23 +369,28 @@ function Message.CopyAllAfterInto (|Message| into, |Message| copylayer)
 
 function Message.GetMarker (|String| s, |Message|)
 	opt norefcounts
-	for a in self: if a isTmp s: return a
+	for a in self
+		if a isTmp s
+			return a
 
 
-function NewRel (|string| L, |string| op, |String| R, |Message|)
-	cpp_part NewRelStr
-	return «Rel
+function NewEqRel (|string| L, |String| R, |Message|)
+	opt norefcounts
+	cpp_part NewEqRelStr
+	rz = «Rel
 		«Thg L »
-		«Opp op »
+		«Opp "=" »
 		«Thg R »
 	»
+	rz.tmptype = asmtmp.ksetvar
 
 
 function NewDecl (|string| type, |string| name="", |message|)
 	opt norefcounts
 	|| msg = («thg name », nil)(name)
 	return newdecl(type, msg)
-		
+
+
 function NewDecl (|string| type, |message| RelOrName, |message|)
 	opt norefcounts
 	rz = «decl »
@@ -399,15 +402,22 @@ function NewDecl (|string| type, |message| RelOrName, |message|)
 	rz <~ relOrName
 
 
-function NewRel (|Message| L, |string| op, |Message| R, |Message|)
+function NewRel (|Message| L, |Message| R, |string| op, |Message|)
+	opt norefcounts
 	return «rel
 		L
 		«Opp op »
 		R
 	»
+	
+function NewEqRel (|Message| L, |Message| R, |Message|)
+	opt norefcounts
+	rz = NewRel(l, r, "=")
+	rz.tmptype = ASMtmp.kSetVar
 
 
 function NewSetter (|string| L, |Message| R, |Message|)
+	opt norefcounts
 	return «rel
 		«thg L »
 		«Opp "="»
@@ -423,6 +433,7 @@ function Message.NeedBra (|Message|)
 
 
 function NewFnc (|string| name, |Message|)
+	opt norefcounts
 	return «func
 		«Thg name »
 		«prm »

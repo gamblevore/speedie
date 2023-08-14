@@ -285,7 +285,8 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 			if s != "*"
 			.UseChildAsReal(s)									// *abc
 		  elseif (f == @rel)
-			0
+			if s.tmptype is kSetVar
+				
 		  elseif (f == @func)
 			|| ch = s.first
 			if ch == @bra

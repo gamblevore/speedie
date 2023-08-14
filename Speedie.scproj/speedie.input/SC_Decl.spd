@@ -964,7 +964,7 @@ class SCDecl (SCObject) {
 					
 
 	function WriteNilRel (|Message|)
-		return NewRel( .Name, "=", "nil" )
+		return NeweqRel( .Name, "nil" )
 
 	
 	function WriteNilDecl (|Message|)
