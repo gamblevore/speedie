@@ -3,14 +3,14 @@
 datatype IPCState (uint16)
 	constants
 		|IPCState|
-		Waiting = 0x1234		// life
-		Connecting				// power
-		Connected				// magic
-		TimedOut				// i guess it failed
-		Closed					// really failed
-		Dead					// 
-		Crashed					// 
-		Invalid					// 
+		Waiting = 0x1234
+		Connecting
+		Connected
+		TimedOut
+		Closed
+		Dead
+		Crashed
+		Invalid
 	syntax cast (|bool|)
 		return  self >= Waiting  and  self < ipcstate.closed
 
@@ -76,7 +76,7 @@ class Process
 			error (Self, "No name given.")
 
 
-	render ReportConnection (|string|s)
+	render ReportConnection (|string| s)
 		fs <~ "-----------\n"
 		if s
 			fs <~ s
@@ -86,9 +86,11 @@ class Process
 			fs <~ "ipc is open: ${.SizeOfOrig}\n"
 		  else
 			fs <~ "ipc not open.\n"
+
  
 	render
 		.reportconnection("", fs)
+
 
 	function PrintState (|string| s = "")
 		printline .reportstate(s)
@@ -159,7 +161,7 @@ class Process
 		.diedcount = (.diedcount - d) max 0 // in case they think our current connection is
 		// "successful enough", but they have to decide what that means as we can't know
 		// there is no point connecting to a file server, navigating through directories
-		// and dying everytiem we download any file.
+		// and dying everytime we download any file.
 	
 	helper TheirName (|string|)
 		return .OurName(false)
@@ -369,7 +371,8 @@ class Process
 		require (self != nil)
 		rz = .getsub(timeout)
 		.UpdateStdOut
-		
+	
+	
 	helper GetSub (|Date| TimeOut, |message|)
 		if timeout > 0: .self( "get")
 		require .WaitFor(timeout, false)
@@ -405,6 +408,7 @@ class Process
 		.KillSub(true)
 	function KillCosFailed
 		.KillSub(false)
+
 
 	helper KillSub (|bool| OK)
 		if .cid
@@ -451,6 +455,8 @@ class Process
 		.log .ourname
 		.log .sideid.render
 		.log ": "
+	
+	
 	helper LogMsg (|string| msg)
 		.log msg
 		.log "\n"
@@ -458,6 +464,7 @@ class Process
 	function Log (|string| s)
 		print s
 		log s
+
 
 	syntax expect (|string| err)
 		if self isnt invalid
@@ -472,6 +479,7 @@ class Process
 	
 	helper DummyOrig (|&byte|)
 		return (&.Dummy)|&byte|
+
 
 	helper Unmap
 		|| d = .Dummyorig
@@ -520,6 +528,7 @@ class Process
 			.unmap
 			.unlink
 
+
 	helper string.CreateArgs (|&cstring| Space, |[string]| Args, |int|)
 		cpp_wrapper JB_ArrayPrepare_
 
@@ -557,12 +566,6 @@ class Process
 			.self "reopen"
 			return .RunChild(.path)
 
-	function Where (|string|)
-		if !self
-			return "(??)"
-		if .path
-			return .path
-		return "(fp)"
 
 	function Run (fn_pth_wrap)
 		return (.subprocess)(nil, 7) // 4 means thread, 1 + 2 = IDK.
@@ -585,6 +588,7 @@ class Process
 		if .procpos
 			process.children[.procpos] = nil
 			.procpos = -1
+
 
 	function AddToList
 		opt norefcounts
@@ -611,6 +615,7 @@ class Process
 			|| s = .get
 			if (!s) : exit
 			yield s
+
 
 	constants
 		PrintWaiting = 2
@@ -662,17 +667,20 @@ class Process
 			|| s2 = n.find(jeebox.CSWordStart, int.max, 0)
 			return n[s, s2+1]
 		
+		
 		function InstallCloseProcesses
 			require !.ClosePipesInstalled
 			.ClosePipesInstalled = 1
 			app <~ CloseProcesses
-			
+		
+		
 		function CloseProcesses (fn_app_deathaction)
 			"closing all process connections"
 			for f in .children
 				f.release
 				f.close
-				
+		
+		
 		target !minilib
 			helper TellParentIDied
 				opt norefcounts
@@ -751,5 +759,6 @@ struct IPCMessage
 		return (self+1)|&byte|
 		
 	function DebugIPC (|string| msg)
+		disabled 
 		printline "${msg} state: ${.datalength|int|}, ${.sendid|int|}, ${.readid|int|}, ${.state|int|}, ${.queued|int|}, ${.Special|int|}" 
 
