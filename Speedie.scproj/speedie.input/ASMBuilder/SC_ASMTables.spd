@@ -121,6 +121,7 @@ datatype ASMtmp (MsgUIFlags)
 		kExit		= 57
 		kContinue	= 56
 		kSetVar		= 55
+		kTern		= 54
 	
 
 function Message.TmpType (|ASMTmp|)
