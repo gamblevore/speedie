@@ -533,7 +533,7 @@ class Process
 		cpp_wrapper JB_ArrayPrepare_
 
 
-	helper string.StartProcess (|[string]| Args=nil, |&file|StdOut=nil, |PID_int|)
+	helper string.StartProcess (|[string]| Args=nil, |&file| StdOut=nil, |PID_int|)
 		cpp_Wrapper JB_Str_StartProcess
 
 
