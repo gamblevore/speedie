@@ -396,7 +396,7 @@ function ArgsMatch (|SCDecl| base, |SCBase| name_space, |SCParamArray| Incoming,
 		// just merge these two branches. Dont think we need opposite order really...
 		.argsmatch1(base, name_Space, incoming, kTypeCastAssigns (|) Describefail)
 		.argsmatch1(base, name_Space, incoming, Describefail)
-		if scfunction.makeerr // backup
+		if !incoming.madeerror // backup
 			error ( incoming.exp, "Wrong params to " + .RenderTitle )
 
 
@@ -434,7 +434,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 	target debug
 		if !interact.shouldenter and typecast&ktypecastdescribeerrors
 			debugat
-	
+		
 	for (FuncArg in .Args) (fi)
 		|| PArg_Ch   = Incoming[Pos]
 		|| PArg_Type = TypeOfExprMaybeNil( PArg_Ch, name_Space )
@@ -474,13 +474,13 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 	if Pos >= Incoming.Size
 		Return result
 
-	if typecast & ktypeCastDescribeErrors and scfunction.makeerr
+	if (typecast & ktypeCastDescribeErrors) and !incoming.madeerror
 		error (incoming.exp, "Too many params to " + .rendertitle)
 
 
 function DescribeParamFail (|SCParamArray| params, |int| bad)
 	opt norefcounts
-	require scfunction.MakeErr
+	require !params.madeerror
 	|| P = params[bad]
 		|| str = ("Wrong self: ",  "Wrong param: ")(!bad and params.isdot)
 		|| Type = TypeOfExpr(P, nil)
@@ -491,12 +491,6 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 	  else
 		error ( params.exp, "Missing param " + bad.render )
 	error ( .Source, "to " + .RenderTitle )
-
-
-function @scfunction.MakeErr (|bool|)
-	if .currfunc.isok
-		.currfunc.isok = false
-		return true
 
 
 function String.ArgsMatchError (|bool| TypeCast, |string|)
