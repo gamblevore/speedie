@@ -338,10 +338,10 @@ function NilTracker.RunNormal (|message| msg)
 
 function niltracker.nilmsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
 	if PointerInferred
-		return "Nil Error: Pointed-to is not nil, but could become nil here."
+		return "Nil Error: Pointed-to can't be nil."
 	if d isnt param
 		if err == @thg
-			return `Nil Access: Needs "if" wrapping.`
+			return "Nil Access: Needs 'if' wrapping."
 		return "Nil Access here."
 	if d.NilDeclared isnt Stated
 		return "Nil Error: Don't declare with '?'... or test for nil."
@@ -355,6 +355,7 @@ TODO:
 * msg.last/first etc will have to accept nil :O. The C++ compiler will opt it.
 * .contains ... the func params shouldn't accept nil? but should return it.
 * cpp-wrappers and prototypes and properties default to not nil unless stated.
+	* globals default to whatever its set to first.
 
 * do the work on args in the if-cond thing...
 	* pass the info about BOTH the conditions... in the state "Y" thing... the applicator can decide what to do about "After" conditions...
@@ -393,6 +394,8 @@ ternaries:
 	|| x = (a.b, nil)(a)
 
 rel-sets to internal pointers:
+	|| obj = nil
+	|!&!object| x = &obj // error: Pointed-to can't be nil
 
 function calls:
 	function gg (|object|)
@@ -439,30 +442,14 @@ nil within branch:
 
 
 /*
-* Init Vars Sweep?
+Init Vars Sweep?
 	We need to go through the entire program, and give each item found, a "timecode". That
 	is... it has an "earliest time" that it COULD occur.
 perhaps just do it on a per-module basis... If a module makes no sense in terms of itself thats the programmers fault.
-*/
 
-/*
-Issues:
-What about the fact that a function's param nilness can rely on other funcs??
-like:
-
-	x = msg[0] // OK... so we don't rely on msg existing? but only cos it doesn't rely on self existing.
-what if msg[n] is recursive and complicated? then how do we check if a decl... is nil or not?
-
-The fact that we have ordered this... leaf first... helps. dependancies help... but that only reduces the problem
-not eliminiates it. There will be cases that we can't eliminate.
-
-* Make it nestable? That is... we actually can check functions?
-	* this would only be needed for actual recursive functions... non-recursives would have a strict chain...
-* what if two funcs with the same depth... and one is called before the other but the wrong one is called first?
-	* then making it nestable helps!
-
-* what about actually recursive funcs? I think for them... we let the user simply specify their nilness!! makes sense, right?
-	* I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
+recursive funcs?
+	I think for them... we let the user simply specify their nilness!! makes sense, right?
+	I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
 */
 
 
