@@ -48,8 +48,7 @@ function message.NilDecl (|scdecl|)
 		return obj
 	
 	
-function NilTracker.UseChildAsReal (|message| wrapper, |bool|)
-	// a.b, *a, a[0], (a)()
+function NilTracker.UseChildAsReal (|message| wrapper, |bool|) // a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = wrapper.first
 		return .UseAsReal(ch, ch.NilDecl)	
@@ -229,12 +228,10 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
 	
 	
 	if scop.IsAndOr
-		if scop.IsAndOr == 3 // and
-			// x = (a and b)
+		if scop.IsAndOr == 3 // x = (a and b)
 			if y == BranchState.Never
 				y = BranchState.Perhaps
-		  else
-			// x = !(a or b)
+		  else // x = !(a or b)
 			if y == BranchState.always
 				y = BranchState.Perhaps
 		
@@ -355,15 +352,16 @@ function niltracker.nilmsg (|message| err, |scdecl| d, |uint| PointerInferred, |
 /*
 TODO:
 
-* all containers contain nil.... so theres that
-* cpp-wrappers and prototypes default to not nil unless stated.
+* msg.last/first etc will have to accept nil :O. The C++ compiler will opt it.
+* .contains ... the func params shouldn't accept nil? but should return it.
+* cpp-wrappers and prototypes and properties default to not nil unless stated.
+
 * do the work on args in the if-cond thing...
 	* pass the info about BOTH the conditions... in the state "Y" thing... the applicator can decide what to do about "After" conditions...
 
 * || x = (a and b), if x: a.a(b.b)
 	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...
 
-* msg.last/first etc will have to accept nil :O. The C++ compiler will opt it.
 * freeze bug
 	* what about carrays of pointers? what comes first? when does the ptrcount get used?
 

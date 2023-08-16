@@ -61,7 +61,7 @@ class RingTree (Saveable)
 
 	function TakeAllFrom (|| src)
 		opt norefcounts
-		while src.hasany: .First = src.Last
+		while src.hasany: .First = src.Last // should be .last = src.first
 
 	function AtRoot (|bool|)
 		opt norefcounts
@@ -77,10 +77,7 @@ class RingTree (Saveable)
 		return .haschildcount( n )
 	
 	operator More (|int| N, |bool|)
-		disabled ">" // has more children than N
-		return false
-		return !(self lessorequal n)
-	
+		disabled ">" // has more children than N	
 	
 	operator LessOrEqual (|int|N, |bool|)
 		// has N children or less.
@@ -106,16 +103,6 @@ class RingTree (Saveable)
 		rz = self
 		while
 			rz = rz.last#loop
-	
-	function FlatNext  (|int| i, |bool| Down, ||)
-		opt norefcounts
-		if i < 0
-			debugat
-			return self
-		rz = self
-		for i
-			require rz
-			rz = rz.flatnextdepth(nil, down)
 	
 	function FlatNext  (||)	
 		cpp_wrapper JB_Ring_FlatNext0
@@ -457,11 +444,11 @@ class RingTree (Saveable)
 		rz.To = (Low.prev, nil)(Low)
 		return rz
 
-	operator to (|| High, |RingRange of ...|)
-		|RingRange| rz
-		rz.From = self
-		rz.To = (high.next, nil)(high)
-		return rz
+//	operator to (|| High, |RingRange of ...|)
+//		|RingRange| rz
+//		rz.From = self
+//		rz.To = (high.next, nil)(high)
+//		return rz
 
 	iterator
 		|| ch_ = .First_
@@ -499,7 +486,6 @@ class RingTree (Saveable)
 			_curr = N_
 		(self)
 
-
 	
 	iterator up
 		|| _curr = self
@@ -529,15 +515,16 @@ struct RingDownRange
 			ch_ = ch_.prev
 
 
-
-struct RingRange
-	contains ringtree
-	|| From
-	|| To
-	
-	iterator
-		|| ch_ = .from
-		while ( ch_ and ch_ != .to )
-			yield ch_ (ch_)
-			ch_ = ch_.next
-
+//
+//struct RingRange
+//	contains ringtree
+//	|| From
+//	|| To
+//	
+//	iterator
+//		|| ch_ = .from
+//		while ( ch_ and ch_ != .to )
+//			yield ch_ (ch_)
+//			ch_ = ch_.next
+//
+//
