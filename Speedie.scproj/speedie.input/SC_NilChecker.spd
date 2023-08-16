@@ -57,28 +57,40 @@ function NilTracker.UseChildAsReal (|message| wrapper)
 
 function NilTracker.CheckFunction (|message| msg)
 	opt norefcounts
-	// runnormal on the params!
-	// check all the function params. and return too. The return must be stated
-	// print(a, b, c)
-	|| prms = msg.last
+	|| fp = msg.first
+	if fp.func == @bra
+		.UseChildAsReal(fp.first)						// (abc)()
+	|| prms = fp.next
 	|| fn = prms.obj|scfunction|
 	|| ret = fn.ReturnType
 		check (!ret.SuffersNil or ret.IsStated) (msg, "Unknown if this function returns nil.")
 
 	|| p = prms.first
-	for d in fn.args
-		|| pnd = p.NilDecl
-		while 
-			if (pnd.NilUsed is Nilish) and d.SuffersNil
-				if !d.IsStated
-					error (p, "Unknown if this parameter accepts nil.")
-				  elseif d.NilDeclared isnt Nilish
-					error (p, "Passing possible nil")
-		// what if we get the address of an obj? or the address of an address?
-		// we'd need to follow the chain all the way up :( oooofff
-		// same issue with .return
+	for a in fn.args
+		if p.hasany
+			.RunNormal(p)
+		a.NilCheckForSet(p)
 		p++
 
+
+function SCDecl.NilCheckForSet (|message| p)
+	opt norefcounts
+	|| pnd = p.NilDecl
+
+	// handles things like: func (|!&object!| abc)
+	
+	while pnd
+		if (pnd.NilUsed is Nilish) and .SuffersNil		
+			if !.IsStated
+				error (p, "Unknown if this parameter accepts nil.")
+			  elseif .NilDeclared isnt Nilish
+				error (p, "Passing possible nil")
+		self = self.Internal
+		pnd = pnd.Internal
+		
+
+// what about containedness also??
+// i think most (all?) containers contain nil.... so theres that
 
 function NilTracker.Return (|message| msg)
 	opt norefcounts
@@ -90,7 +102,7 @@ function NilTracker.Return (|message| msg)
 		|| rd = .fn.ReturnType
 		|| r  = rd.NilDeclared
 		if r is real  and vn is Nilish
-			error (msg, "NilObject returned!")
+			error (msg, "Nil returned, despite function declaration!")
 		rd.nilused |= vn // find the answer at the end
 
 
@@ -132,7 +144,7 @@ function niltracker.UseAsReal (|message| msg, |scdecl| d)
 	|| u = d.NilUsed
 	if u is Nilish
 		expect (d is param) (msg, msg.nilmsg)
-		expect (d.NilDeclared isnt Stated) (msg, "NilObjectAccess: Don't declare with '?'... or test for nil.")
+		expect (d.NilDeclared isnt Stated) (msg, "NilObjectError: Don't declare with '?'... or test for nil.")
 		d.NilDeclared = NilState.real
 		d.nilused = NilState.Realish
 
@@ -276,18 +288,28 @@ function Niltracker.Decl (|message| declmsg)
 		r.NilTake(d)	
 	
 
-function NilTracker.SetRel (|message| msg, |branchstate|)
+function NilTracker.SetRel (|message| msg)
 	opt norefcounts
 	|| l = msg.first
-	|| lnd = l.nildecl
-	if lnd.NilDeclared isnt nilish
-		|| r = msg.last
-		.UseAsReal(r, r.nildecl)
-	return .RunNormal(msg)
-			
+	|| ld = l.nildecl
+	|| r = msg.last
+	|| rd = r.nildecl
+	// |!&file!| abc = f	// real pointer to a real file
+							// now, f must be real? sure... but the internal object must be nil too.
+							
+	if ld.NilDeclared isnt nilish
+		.UseAsReal(r, rd)
+	while
+		ld = ld.Internal
+		rd = rd.Internal
+		loop ld and rd
+		if ld.NilDeclared isnt Nilish  and  rd.nildeclared is nilish
+			// The msg is not here anymore, so we can't upgrade. Just make an error
+			error (l, "NilObjectError: Pointed-to is not nil, but could become nil here")
+	.RunNormal(msg)			
 
 
-function NilTracker.RunNormal (|message| msg, |branchstate|)
+function NilTracker.RunNormal (|message| msg)
 	opt norefcounts
 	
 	for s.fast in msg
@@ -304,9 +326,6 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 			if s.tmptype is kSetVar								// x = y
 				.SetRel(s)
 		  elseif (f == @func)
-			|| ch = s.first
-			if ch == @bra
-				.UseChildAsReal(ch)								// (abc)()
 			.CheckFunction(s)
 		  elseif (f == @tmp)
 			|| type = S.TmpType
@@ -324,9 +343,6 @@ function NilTracker.RunNormal (|message| msg, |branchstate|)
 		  
 		  elseif s.hasany
 			return .RunNormal(s) // tail-call opt
-	
-	return BranchState.Always
-
 
 
 function message.nilmsg (|string|)
@@ -340,22 +356,17 @@ function message.nilmsg (|string|)
 /*
 TODO:
 
-* finish CheckFunction
-	* modifications of objects via func pointer param... during a cond
+* modifications of objects via func pointer param... during a cond
 
 * do the work on args in the if-cond thing...
 	* pass the info about BOTH the conditions... in the state "Y" thing... the applicator can decide what to do about "After" conditions...
 
-* merge the behaviours of rels... and most things? brels too? and @funcs!!
-	* || x = (a and b), if x: a.a(b.b)
+* || x = (a and b), if x: a.a(b.b)
 	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...
 
 * cpp-wrappers and prototypes default to not nil unless stated.
 * ternaries
 * freeze bug
-
-* fn abc (|object| x)
-	x = haha() // x is nil or not? haha? its literally been replaced so the original decl is unused.  unused decls default to optional
 * msg.last/first etc will have to accept nil :O. The C++ compiler will opt it.
 
 
@@ -382,11 +393,13 @@ BOOLEAN LOGICS:
 
 DONE?
 
+rel-sets to internal pointers:
+
 function calls:
-function gg (|object|)
-	|| a = maybenil
-	|| x = ff(a) // error: ff does not take nil.
-	|| y = gg()  // error: unknown at this time if gg returns nil.
+	function gg (|object|)
+		|| a = maybenil
+		|| x = ff(a) // error: ff does not take nil.
+		|| y = gg()  // error: unknown at this time if gg returns nil.
 
 update the params:
 	function abc (|message| o)
