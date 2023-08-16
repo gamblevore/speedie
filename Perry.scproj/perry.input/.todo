@@ -6,7 +6,6 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 	* param upgrade
-* not complaining about too many params
 
 
 // Perry Do later

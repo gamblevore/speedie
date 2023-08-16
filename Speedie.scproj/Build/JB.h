@@ -4633,13 +4633,13 @@ void SC_NameAndMsg_SyntaxAppend(NameAndMsg* self, Message* m);
 // JB_NilTracker
 void SC_nil_Check(NilTracker* self, SCFunction* f);
 
-void SC_nil_CheckFunction(NilTracker* self, Message* msg);
-
 void SC_nil_Decl(NilTracker* self, Message* declmsg);
 
 uint SC_nil_Enter(NilTracker* self);
 
 void SC_nil_Finish(NilTracker* self, SCFunction* f);
+
+void SC_nil_Function(NilTracker* self, Message* msg);
 
 void SC_nil_If(NilTracker* self, Message* Tmp);
 
@@ -4663,17 +4663,19 @@ BranchState SC_nil_ProcessCondThg(NilTracker* self, Message* msg, BranchState Y)
 
 void SC_nil_Return(NilTracker* self, Message* msg);
 
-BranchState SC_nil_RunNormal(NilTracker* self, Message* msg);
+void SC_nil_RunNormal(NilTracker* self, Message* msg);
 
 BranchState SC_nil_SetNilness(NilTracker* self, Message* m, SCDecl* d, NilState s);
 
-BranchState SC_nil_SetRel(NilTracker* self, Message* msg);
+void SC_nil_SetRel(NilTracker* self, Message* msg);
+
+void SC_nil_SetValue(NilTracker* self, SCDecl* recv, Message* passed);
 
 void SC_nil_Start(NilTracker* self, SCFunction* f);
 
-void SC_nil_UseAsReal(NilTracker* self, Message* msg, SCDecl* d);
+bool SC_nil_UseAsReal(NilTracker* self, Message* msg, SCDecl* d);
 
-void SC_nil_UseChildAsReal(NilTracker* self, Message* wrapper);
+bool SC_nil_UseChildAsReal(NilTracker* self, Message* wrapper);
 
 
 
@@ -6759,8 +6761,6 @@ SCDecl* SC_Decl_Containedfix(SCDecl* self);
 
 SCDecl* SC_Decl_ContainedReplace(SCDecl* self, SCDecl* contains, bool NeedsName);
 
-void SC_Decl_containsSet(SCDecl* self, SCDecl* Value);
-
 bool SC_Decl_ContainsMatch(SCDecl* self, SCDecl* o, int TypeCast);
 
 SCDecl* SC_Decl_Copy(SCDecl* self, bool ForNewVariable);
@@ -8365,8 +8365,6 @@ void SC_Func__Link(SCFunction* fn);
 void SC_Func__LinkAll(Array* Funcs);
 
 void SC_Func__LoopExitter(SCFunction* fn, Message* node, SCBase* name_space);
-
-bool SC_Func__MakeErr();
 
 SCBase* SC_Func__NeuLibrary(Message* node, SCBase* name_space, Message* ErrPlace);
 
