@@ -104,12 +104,8 @@ class SCDecl (SCObject) {
 		.NilUsed = NilState.Either
 		.info = scdeclinfo.altered
 
-	setter contains (|scdecl|)
-		.Contains = value
 		
 	function Project (|scimport|)
-		// scfunction and scclass should use this too!
-		// iterator too... even. Then everything knows where it comes from
 		opt norefcounts
 		|| m = .MemoryLayer
 		|| obj = m.obj

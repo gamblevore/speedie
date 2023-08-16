@@ -13,8 +13,8 @@ class SCObject
 	|Byte|						Dummy
 	
 	render
-		|| S = string.fromc(.class.name) 
-		fs <~ S[2...]
+		|| cname = ((.class.name|uint64|)+2)|cstring|
+		fs <~ cname
 		fs <~ ": "
 		fs <~ .name
 	

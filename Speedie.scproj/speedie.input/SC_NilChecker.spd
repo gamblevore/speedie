@@ -89,9 +89,6 @@ function SCDecl.NilCheckForSet (|message| p)
 		pnd = pnd.Internal
 		
 
-// what about containedness also??
-// i think most (all?) containers contain nil.... so theres that
-
 function NilTracker.Return (|message| msg)
 	opt norefcounts
 
@@ -112,7 +109,7 @@ function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
 	if arg == @arg
 		.RunNormal(arg)
 	  else
-		|| Br = .ProcessCond(arg, branchstate.always)
+		.ProcessCond(arg, branchstate.always)
 		arg++
 		.RunNormal(arg)
 
@@ -154,12 +151,6 @@ function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y, |branchstate
 	|| dest = NilState.Nilish + Y	
 	|| dcl = msg.nildecl			#debug_require
 	|| u = dcl.NilUsed
-	// we need to have actually 3 states set.
-	// one for this branch, one for the other branch...
-	// and one for the after branch... in case one or other branch returns.
-	// where do we store this info? id rather figure it out at this point in time...
-	// but the if/else thingy needs to restore it?
-	// seem slike the if/else needs to set it, then...
 	
 	if u == NilState.Either
 		if (dcl is param) and (dcl.NilDeclared isnt stated)
@@ -288,7 +279,7 @@ function Niltracker.Decl (|message| declmsg)
 		r.NilTake(d)	
 	
 
-function NilTracker.SetRel (|message| msg)
+function NilTracker.SetRel (|message| msg) // relset
 	opt norefcounts
 	|| l = msg.first
 	|| ld = l.nildecl
@@ -364,6 +355,7 @@ TODO:
 * || x = (a and b), if x: a.a(b.b)
 	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...
 
+* all containers contain nil.... so theres that
 * cpp-wrappers and prototypes default to not nil unless stated.
 * ternaries
 * freeze bug
