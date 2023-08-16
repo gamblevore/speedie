@@ -469,7 +469,7 @@ function ContainedTypeLoad
 
 	|| ContainedMsg = .Sourcearg.find(@Tmp, "contains")[@thg]			#require
 	|| cls = compiler[ ContainedMsg.name, ContainedMsg ]				#require
-	|| TN = Cls.TypeNormal
+	|| TN = Cls.TypeOptional
 	.Contained = TN.Copy
 	.IgnoreContainedSelf |= tn.isdatatype
 	(.Contained Is UpgradeableContained)

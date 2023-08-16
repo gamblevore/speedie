@@ -52,15 +52,19 @@ function NilTracker.UseChildAsReal (|message| wrapper, |bool|)
 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = wrapper.first
-		return .UseAsReal(ch, ch.NilDecl)
-
+		return .UseAsReal(ch, ch.NilDecl)	
+	
 
 function NilTracker.Function (|message| msg)
 	opt norefcounts
 	|| fp = msg.first
+	|| prms = fp.next
+	if msg.tmptype == ASMtmp.kTern
+		return .IfOrWhileOrTern(prms)
+
 	if fp.func == @bra
 		require .UseChildAsReal(fp.first)						// (abc)()
-	|| prms = fp.next
+	
 	|| fn = prms.obj|scfunction|
 	|| ret = fn.ReturnType
 		check (!ret.SuffersNil or ret.IsStated) (msg, "Unknown if this function returns nil.")
@@ -100,7 +104,9 @@ function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
 	return arg.next
 	
 
-function NilTracker.IfOrWhile (|message| msg)
+function NilTracker.IfOrWhileOrTern (|message| msg)
+	// finish off terns
+	// x = tern( (cond),   a, .func(&a) ) 
 	opt norefcounts
 	|| old = .enter
 	|| test = msg
@@ -111,7 +117,7 @@ function NilTracker.IfOrWhile (|message| msg)
 
 function NilTracker.If (|message| Tmp)
 	opt norefcounts
-	.IfOrWhile(Tmp)
+	.IfOrWhileOrTern(Tmp)
 
 
 function Message.RedundantBranch (|branchstate|)
@@ -281,23 +287,22 @@ function NilTracker.VariableSet (|scdecl| recv, |scdecl| pd, |message| errplace,
 	opt norefcounts
 	require recv.suffersnil
 
-	|| PrmPointer = 0
 	if recv.NilDeclared isnt nilish
 		require .UseAsReal(errplace, pd, isparam>>1)
 	  elseif (isparam) and (recv.SuffersNil)
 		if !recv.IsStated and (pd.NilUsed is Nilish)
 			error (errplace, "Unknown if this parameter accepts nil.")
-		PrmPointer = recv.PointerCount		// if a: myfunc(&a), printline a.name		// nil-error! "a" can be nil.
-
-	// |!&!&struct| abc = f
-	if recv.PointerCount // tail call :O
+		if IsParam == 2
+			// if (a and func(&a))
+			// So... how do we alter this?
+			// just run this to debug? its too hard to imagine.
+			
+	if recv.PointerCount	// |!&!&struct| abc = f
 		return .VariableSet(recv.internal, pd.internal, errplace, IsParam<<1)
 	
 	// we want this to act differently for params, but how? so what if its a pointer in a param?
-	// well... basically... for f(&a)... 
-	// for || x = &a... we just gonna ignore it and hope it works...
-	// we don't have setting at this point anyhow?
-	// i mean... we have "use a real"... but what about an optional being set from real... back to optional?
+		// f(&a) // alter "a"
+		// || x = &a...  // don't alter "a", just hope it works...
 
 
 function NilTracker.RunNormal (|message| msg)
@@ -320,10 +325,8 @@ function NilTracker.RunNormal (|message| msg)
 			.Function(s)
 		  elseif (f == @tmp)
 			|| type = S.TmpType
-			if Type is kif
-				.If(s)
-			  elseif type is kwhile
-				.IfOrWhile(s)
+			if Type is kif or kwhile
+				.IfOrWhileOrTern(s)
 			  elseif type is kReturn
 				.Return(s)
 		  elseif (f == @decl)
@@ -352,20 +355,17 @@ function niltracker.nilmsg (|message| err, |scdecl| d, |uint| PointerInferred, |
 /*
 TODO:
 
-* what about carrays of pointers? what comes first? when does the ptrcount get used?
-* modifications of objects via func pointer param... during a cond
-
+* all containers contain nil.... so theres that
+* cpp-wrappers and prototypes default to not nil unless stated.
 * do the work on args in the if-cond thing...
 	* pass the info about BOTH the conditions... in the state "Y" thing... the applicator can decide what to do about "After" conditions...
 
 * || x = (a and b), if x: a.a(b.b)
 	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...
 
-* all containers contain nil.... so theres that
-* cpp-wrappers and prototypes default to not nil unless stated.
-* ternaries
-* freeze bug
 * msg.last/first etc will have to accept nil :O. The C++ compiler will opt it.
+* freeze bug
+	* what about carrays of pointers? what comes first? when does the ptrcount get used?
 
 
 
@@ -390,6 +390,9 @@ BOOLEAN LOGICS:
 
 
 DONE?
+
+ternaries:
+	|| x = (a.b, nil)(a)
 
 rel-sets to internal pointers:
 

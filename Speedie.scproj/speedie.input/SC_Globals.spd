@@ -436,7 +436,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 			Return TypeArray.TypeNormal
 		
 		expect (ch != @Item) (c)
-		rz.Contains = ExtractDecl( ch, name_space )
+		rz.Contains = ExtractDecl( ch, name_space ).makeoptional
 		rz.TypeContained = TypeArray
 		
 	  elseif (f == @Adj)
@@ -473,15 +473,14 @@ function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Nam
 	|| Cont = ExtractDecl( Contained, name_space )$
 	.type = R.Type
 
+	.contains = cont.makeoptional
 	if typewrapper.typenormal.match(R, ktypecastfalse).isnormalmatch
 		expect (!Cont.isnormalobject)  ( wrap, "Datatype-wrappers can't contain this." )
-		.contains = cont
 	  else
 		|| RCont = R.Type.Contained				#expect ( wrap, "Not a container class." )
 		// object can match anything. 
 		if (RCont.type != typeobject) and RCont.isnormalobject
 			RCont.ExpectMatch(cont, 0, nil, wrap)
-		.Contains = Cont
 
 	return true
 
@@ -578,7 +577,7 @@ function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
 	|| MemWrapper = TypeOfExpr(exp, compiler.program)	#require
 	MemWrapper = MemWrapper.copy // cos we gonna alter it.
 	(memwrapper is newlycreated)
-	memwrapper.contains = cls.typenormal
+	memwrapper.contains = cls.TypeOptional
 	
 	return MemWrapper
 
@@ -777,6 +776,7 @@ function TypeOfTernary (ExprResolver)
 		list.become(@thg, "JB_Ternary")
 		params.obj = compiler.TernaryFunc
 		params <~ list.first
+		exp.tmptype = ASMtmp.ktern
 		return result
 
 
@@ -840,8 +840,11 @@ function TypeOfArr (ExprResolver)
 		exp.func = @arg
 		tran_argarray(exp, name_space)
 	  else
-		if result.Contains and !result.Contains.type.isobject
-			result.Contains = result.Contains.newwrapper(result.Contains)
+		if result.Contains 
+			if  !result.Contains.type.isobject
+				result.Contains = result.Contains.newwrapper(result.Contains)
+			else
+				result.Contains = result.Contains.makeoptional
 
 		
 	result.Type := typearray

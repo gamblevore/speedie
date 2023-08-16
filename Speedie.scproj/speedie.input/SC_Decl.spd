@@ -784,7 +784,7 @@ class SCDecl (SCObject) {
 
 	function MakeNil (|nilstate| type, |scdecl| Default, |scdecl|)
 		opt norefcounts
-		if .nildeclared == type
+		if !self or .nildeclared == type
 			Return self
 		
 		if (Default and self == .type.typenormal)
