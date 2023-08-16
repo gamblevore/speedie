@@ -67,7 +67,7 @@ function NilTracker.Function (|message| msg)
 
 	|| p = prms.first
 	for a in fn.args
-		.SetValue(a, p)
+		.VariableSet(a, p.nildecl, p, 1)
 		if p.hasany
 			.RunNormal(p)
 		p++
@@ -120,14 +120,15 @@ function Message.RedundantBranch (|branchstate|)
 	return BranchState.Perhaps
 
 
-function niltracker.UseAsReal (|message| msg, |scdecl| d, |bool|)
+function niltracker.UseAsReal (|message| err, |scdecl| d, |uint| PointerInferred=0,  |bool|)
 	opt norefcounts
-	|| u = d.NilUsed
-	if u is Nilish
-		expect (d is param) (msg, msg.nilmsg)
-		expect (d.NilDeclared isnt Stated) (msg, "Nil Error: Don't declare with '?'... or test for nil.")
-		d.NilDeclared = NilState.real
-		d.nilused = NilState.Realish
+	if d.NilUsed isnt Nilish
+		return true
+
+	|| msg = .nilmsg(err, d, PointerInferred)
+	expect  (!msg) (err, msg)
+	d.NilDeclared = NilState.real
+	d.nilused = NilState.Realish
 	return true
 
 
@@ -268,30 +269,35 @@ function NilTracker.SetRel (|message| msg)
 	opt norefcounts
 	|| l = msg.first
 	|| r = msg.last
-	.setvalue(l.nildecl, r)
+	|| pd = r.nildecl
+	.VariableSet(l.nildecl, pd, r, 0)
 	if l.hasany
 		.RunNormal(l)	
 	if r.hasany
 		.RunNormal(r)
 
 
-function NilTracker.SetValue (|scdecl| recv, |message| passed) // setrel, relset
+function NilTracker.VariableSet (|scdecl| recv, |scdecl| pd, |message| errplace, |uint| IsParam) // setrel, relset
 	opt norefcounts
 	require recv.suffersnil
 
-	|| pd = passed.nildecl
+	|| PrmPointer = 0
 	if recv.NilDeclared isnt nilish
-		require .UseAsReal(passed, pd)
-	  elseif !recv.IsStated and (recv is param) and recv.SuffersNil and (pd.NilUsed is Nilish)
-		error (passed, "Unknown if this parameter accepts nil.")
+		require .UseAsReal(errplace, pd, isparam>>1)
+	  elseif (isparam) and (recv.SuffersNil)
+		if !recv.IsStated and (pd.NilUsed is Nilish)
+			error (errplace, "Unknown if this parameter accepts nil.")
+		PrmPointer = recv.PointerCount		// if a: myfunc(&a), printline a.name		// nil-error! "a" can be nil.
 
-	while			// |!&!&struct| abc = f
-		recv = recv.Internal
-		pd = pd.Internal
-		loop recv and pd
-		if recv.NilDeclared isnt Nilish  and  pd.nildeclared is nilish
-			// Can't upgrade. Just error check. (cos no msg for ld.internal)
-			error (passed, "Nil Error: Pointed-to is not nil, but could become nil here")
+	// |!&!&struct| abc = f
+	if recv.PointerCount // tail call :O
+		return .VariableSet(recv.internal, pd.internal, errplace, IsParam<<1)
+	
+	// we want this to act differently for params, but how? so what if its a pointer in a param?
+	// well... basically... for f(&a)... 
+	// for || x = &a... we just gonna ignore it and hope it works...
+	// we don't have setting at this point anyhow?
+	// i mean... we have "use a real"... but what about an optional being set from real... back to optional?
 
 
 function NilTracker.RunNormal (|message| msg)
@@ -330,10 +336,15 @@ function NilTracker.RunNormal (|message| msg)
 			return .RunNormal(s) // tail-call opt
 
 
-function message.nilmsg (|string|)
-	if self == @thg
-		return `Nil Access: Needs "if" wrapping.`
-	return "Nil Access here."
+function niltracker.nilmsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
+	if PointerInferred
+		return "Nil Error: Pointed-to is not nil, but could become nil here."
+	if d isnt param
+		if err == @thg
+			return `Nil Access: Needs "if" wrapping.`
+		return "Nil Access here."
+	if d.NilDeclared isnt Stated
+		return "Nil Error: Don't declare with '?'... or test for nil."
 
 
 
@@ -341,6 +352,7 @@ function message.nilmsg (|string|)
 /*
 TODO:
 
+* what about carrays of pointers? what comes first? when does the ptrcount get used?
 * modifications of objects via func pointer param... during a cond
 
 * do the work on args in the if-cond thing...
