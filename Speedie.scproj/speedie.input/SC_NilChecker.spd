@@ -48,18 +48,18 @@ function message.NilDecl (|scdecl|)
 		return obj
 	
 	
-function NilTracker.UseChildAsReal (|message| wrapper)
+function NilTracker.UseChildAsReal (|message| wrapper, |bool|)
 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = wrapper.first
-		.UseAsReal(ch, ch.NilDecl)
+		return .UseAsReal(ch, ch.NilDecl)
 
 
-function NilTracker.CheckFunction (|message| msg)
+function NilTracker.Function (|message| msg)
 	opt norefcounts
 	|| fp = msg.first
 	if fp.func == @bra
-		.UseChildAsReal(fp.first)						// (abc)()
+		require .UseChildAsReal(fp.first)						// (abc)()
 	|| prms = fp.next
 	|| fn = prms.obj|scfunction|
 	|| ret = fn.ReturnType
@@ -67,27 +67,11 @@ function NilTracker.CheckFunction (|message| msg)
 
 	|| p = prms.first
 	for a in fn.args
+		.SetValue(a, p)
 		if p.hasany
 			.RunNormal(p)
-		a.NilCheckForSet(p)
 		p++
 
-
-function SCDecl.NilCheckForSet (|message| p)
-	opt norefcounts
-	|| pnd = p.NilDecl
-
-	// handles things like: func (|!&object!| abc)
-	
-	while pnd
-		if (pnd.NilUsed is Nilish) and .SuffersNil		
-			if !.IsStated
-				error (p, "Unknown if this parameter accepts nil.")
-			  elseif .NilDeclared isnt Nilish
-				error (p, "Passing possible nil")
-		self = self.Internal
-		pnd = pnd.Internal
-		
 
 function NilTracker.Return (|message| msg)
 	opt norefcounts
@@ -99,7 +83,7 @@ function NilTracker.Return (|message| msg)
 		|| rd = .fn.ReturnType
 		|| r  = rd.NilDeclared
 		if r is real  and vn is Nilish
-			error (msg, "Nil returned, despite function declaration!")
+			error (msg, "Nil returned, against function declaration!")
 		rd.nilused |= vn // find the answer at the end
 
 
@@ -132,18 +116,19 @@ function NilTracker.If (|message| Tmp)
 
 function Message.RedundantBranch (|branchstate|)
 	if StdErr.CanAddMore(errorseverity.problem)
-		StdErr.NewProblem(self, "nil check is constant (always true or false)")
+		StdErr.NewProblem(self, "Redundant branch. Object's nilness is known.")
 	return BranchState.Perhaps
 
 
-function niltracker.UseAsReal (|message| msg, |scdecl| d)
+function niltracker.UseAsReal (|message| msg, |scdecl| d, |bool|)
 	opt norefcounts
 	|| u = d.NilUsed
 	if u is Nilish
 		expect (d is param) (msg, msg.nilmsg)
-		expect (d.NilDeclared isnt Stated) (msg, "NilObjectError: Don't declare with '?'... or test for nil.")
+		expect (d.NilDeclared isnt Stated) (msg, "Nil Error: Don't declare with '?'... or test for nil.")
 		d.NilDeclared = NilState.real
 		d.nilused = NilState.Realish
+	return true
 
 
 function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y, |branchstate|)
@@ -203,7 +188,7 @@ function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y, |branchstate|
 
 function NilTracker.ProcessCondFunc (|message| m, |branchstate| Y, |branchstate|)
 	opt norefcounts
-	.CheckFunction(m)
+	.Function(m)
 	|| prms = m.last
 	|| fn = prms.obj|SCFunction|
 	if !fn.IsNilChecker
@@ -279,25 +264,34 @@ function Niltracker.Decl (|message| declmsg)
 		r.NilTake(d)	
 	
 
-function NilTracker.SetRel (|message| msg) // relset
+function NilTracker.SetRel (|message| msg)
 	opt norefcounts
 	|| l = msg.first
-	|| ld = l.nildecl
 	|| r = msg.last
-	|| rd = r.nildecl
-	// |!&file!| abc = f	// real pointer to a real file
-							// now, f must be real? sure... but the internal object must be nil too.
-							
-	if ld.NilDeclared isnt nilish
-		.UseAsReal(r, rd)
-	while
-		ld = ld.Internal
-		rd = rd.Internal
-		loop ld and rd
-		if ld.NilDeclared isnt Nilish  and  rd.nildeclared is nilish
-			// The msg is not here anymore, so we can't upgrade. Just make an error
-			error (l, "NilObjectError: Pointed-to is not nil, but could become nil here")
-	.RunNormal(msg)			
+	.setvalue(l.nildecl, r)
+	if l.hasany
+		.RunNormal(l)	
+	if r.hasany
+		.RunNormal(r)
+
+
+function NilTracker.SetValue (|scdecl| recv, |message| passed) // setrel, relset
+	opt norefcounts
+	require recv.suffersnil
+
+	|| pd = passed.nildecl
+	if recv.NilDeclared isnt nilish
+		require .UseAsReal(passed, pd)
+	  elseif !recv.IsStated and (recv is param) and recv.SuffersNil and (pd.NilUsed is Nilish)
+		error (passed, "Unknown if this parameter accepts nil.")
+
+	while			// |!&!&struct| abc = f
+		recv = recv.Internal
+		pd = pd.Internal
+		loop recv and pd
+		if recv.NilDeclared isnt Nilish  and  pd.nildeclared is nilish
+			// Can't upgrade. Just error check. (cos no msg for ld.internal)
+			error (passed, "Nil Error: Pointed-to is not nil, but could become nil here")
 
 
 function NilTracker.RunNormal (|message| msg)
@@ -317,7 +311,7 @@ function NilTracker.RunNormal (|message| msg)
 			if s.tmptype is kSetVar								// x = y
 				.SetRel(s)
 		  elseif (f == @func)
-			.CheckFunction(s)
+			.Function(s)
 		  elseif (f == @tmp)
 			|| type = S.TmpType
 			if Type is kif
@@ -338,8 +332,8 @@ function NilTracker.RunNormal (|message| msg)
 
 function message.nilmsg (|string|)
 	if self == @thg
-		return `NilObjectAccess: Needs "if" wrapping.`
-	return "Possible NilObjectAccess"
+		return `Nil Access: Needs "if" wrapping.`
+	return "Nil Access here."
 
 
 
