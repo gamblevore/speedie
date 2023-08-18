@@ -82,40 +82,10 @@ function scfunction.CollectDeclsFuncArgs (|Message| prms, |SCBase| AddToSpace, |
 
 	for item in prms
 		// can remove some shit thats only applicable here... :D
-		require item.collectdeclinfunc(self, AddToSpace, cls)
+		require item.CollectFuncArg(self, AddToSpace, cls)
 	return true
 
-
-function SCClass.CollectDeclsProperties (|bool|)
-	return CollectDeclsMulti( .sourcearg, .Modul, self, 3, .properties, self)
-
-
-function CollectDeclsGlobals (|Message| arg, |SCBase| scarg)
-	CollectDeclsMulti(arg, scarg, scarg, 1, nil)
-
-
-// remove these... but later.
-function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg) 	// remove later... :)
-	CollectdeclsMulti(arg, scarg, scarg, 8, nil)			// basically... the caller needs fixing.
-
-
-function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCBase| scarg)
-	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
-
-
-// definitely remove this!
-function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
-	CollectdeclsMulti(arg, scarg, scarg, 8, nil)
-
-
-function CollectDeclsMulti (|Message| List, |SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls=nil,  |bool|)
-	opt norefcounts
-	for item in list
-		require item.collectdecl(p, recv, mode, out, cls, nil)
-	return true
-
-
-function Message.CollectDeclInFunc (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
+function Message.CollectFuncArg (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
 	opt norefcounts
 	if (func.isassigns == 2) and .islast
 		if !cls
@@ -133,6 +103,42 @@ function Message.CollectDeclInFunc (|scfunction| func, |SCBase| Recv, |scclass| 
 		.addvalue(func)
 
 	return .CollectDecl(func, recv, 4, func.args, cls, func)
+
+
+function SCClass.CollectDeclsProperties (|bool|)
+	opt norefcounts
+	for item in .SourceArg
+		require item.CollectProp( self)
+	return true
+
+
+function Message.CollectProp (|scclass| cls, |bool|)
+	return .collectdecl( cls.modul, cls, 3, cls.properties, cls, nil)
+
+
+function CollectDeclsGlobals (|Message| arg, |SCBase| scarg)
+	opt norefcounts
+	for item in arg
+		require item.collectdecl(scarg, scarg, 1, nil, nil, nil)
+
+
+
+// remove these... but later.
+function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg) 	// remove later... :)
+	// basically... the caller needs fixing.
+	opt norefcounts
+	for item in arg
+		require item.collectdecl(scarg, scarg, 8, nil, nil, nil)
+
+
+
+function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCBase| scarg)
+	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
+
+
+// definitely remove this!
+function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
+	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
 function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |scfunction| func,  |bool|)
