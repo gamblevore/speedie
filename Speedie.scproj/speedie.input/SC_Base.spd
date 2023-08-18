@@ -747,7 +747,7 @@ function $name (|dictionary of $AllSameType|)
 
 	|| DclSrc = "|dictionary of $AllSameType| ${Name}_Dict = nil,"
 	|| DclMsg = DclSrc.ParseClean
-	CollectDecls( DclMsg, self, self )
+	CollectDeclsFuncBody( DclMsg, self )
 }
 
 

@@ -97,7 +97,7 @@ function NewModuleFunc (|Message| src, |SCFunction|)
 
 function BaseDecls
 	.Use
-	CollectDecls( .source, self, self, 1 ) // right?
+	CollectDeclsGlobals( .source, self ) // right?
 
 
 function FillDisposeFunc

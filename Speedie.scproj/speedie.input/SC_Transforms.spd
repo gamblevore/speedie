@@ -302,7 +302,7 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 	if (f == @Arg)
 		|| pr = s.parent
 		require (pr != @bra and @type)
-		CollectDecls( s, p, p )
+		CollectDeclsFuncBody( s, p )
 		
 	  elseif (f == @Decl)
 		s = DeclsDefault( s.last )
@@ -582,7 +582,7 @@ function Tran_ForSub (TranFunc)					// :3
 		FirstInLoop.Prev = MakeDeclOrRel( arg, Value, iter.Value.copy )
 
 				//////////// finish off...
-	CollectDecls( node, name_space, name_space ) // now an arg. Treat as an arg, as above!
+	CollectDeclsFuncBody( node, name_space ) // now an arg. Treat as an arg, as above!
 
 	Tran_While( fn, node2, p2 )
 	EndLoopMarker.Remove

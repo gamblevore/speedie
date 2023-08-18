@@ -231,7 +231,7 @@ function FuncDecls
 	
 	if (P==@List or @Bra or @prm)
 		p.Func = @prm
-		.Args = CollectDecls( P, self, space )
+		.Args = CollectDeclsFuncArgs( P, self, space )
 		FuncStats[.args.length min 11]++ 
 
 	if space and !.cls

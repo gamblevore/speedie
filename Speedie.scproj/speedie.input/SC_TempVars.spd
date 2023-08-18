@@ -6,12 +6,11 @@ function message.EmbToString
 		scfunction.ObjectifyString(self)
 
 
-
 function Message.HasOwnBlock (|Message|)
 	|| arg = .parent
 	require (arg == @rel)
 	arg = arg.parent
-	require (Arg == @decl) 
+	require (arg == @decl) 
 	arg = arg.parent
 	require (arg == @arg)
 	|| obj = arg.asarg
@@ -21,7 +20,7 @@ function Message.HasOwnBlock (|Message|)
 		return arg
 
 
-function Message.CreateOwnBlock (|bool| ForSelf=true, |Message|)
+function Message.CreateOwnBlock (|Message|)
 	//  adds new ({}),  marks it as temp-exprblock for parent,  and puts in the right place
 
 	using (self)
@@ -32,9 +31,8 @@ function Message.CreateOwnBlock (|bool| ForSelf=true, |Message|)
 	.replacewith(bra)
 	
 	|| NewObj = NewArg.scarg(nil)
-	if (ForSelf)
-		NewObj.TmpMovedOutFor = self
-		newobj.IsStatementExpr = true // jeez sheesh. shouldn't have to set this?
+	NewObj.TmpMovedOutFor = self
+	newobj.IsStatementExpr = true // jeez sheesh. shouldn't have to set this?
 	return NewArg
 
 
@@ -110,10 +108,7 @@ function message.IntoVariable (|scbase| name_space, |nameandmsg|)
 		P
 	»
 	
-	// _tmp0 is a name that should never be used...
-	// except here.
-	
-	collectdecls(block, name_Space, arg)
+	CollectDeclsFuncBody(block, arg)
 	block.parent.obj = arg[name]	// Stop collectdecls being called twice! (name-conflict errors)
 									// it's called in typeofblock, unless we already have the type
 									// which we just set here.

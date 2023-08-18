@@ -5,7 +5,7 @@
 * VM? 
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
-
+* make collectdecls not loopy
 
 // Perry Do later
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
@@ -18,8 +18,7 @@
 
 
 // Speedie Do later
-* nicer lookups... syntaxis approach can be used elsewhere too! like for almost anything
-	* if it cant be found... allow a second function to be tested.
+* nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
 * "calledfrom" autocomplete needs to include references to funcs
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc

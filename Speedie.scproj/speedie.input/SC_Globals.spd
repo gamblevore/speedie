@@ -157,13 +157,13 @@ function TypeOfBlock (ExprResolver)
 	p.IsStatementExpr = true
 	|| fn = p.owningfunc
 	
-	CollectDecls( exp, p, p )
+	CollectDeclsFuncBody( exp, p )
+	
 	for ch in exp			// copied from tran_all
 		if ch == @Arg
 			SCFunction.Tran_All( fn, ch, ch.scArg( p ) )
 		  else
 			SCFunction.Tran_All( fn, ch, p )
-	
 	
 	|| val = last.NeedFirst
 	if val.expectlast
