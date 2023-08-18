@@ -462,7 +462,10 @@ function SCObject.CanAutoSub (|string| search, |string|)
 		require !.noautocomplete or (.name ~= search) // is .noautocomplete == 1 allowed?
 		if (.name starts "operator")  and  !(search starts "oper")
 			return ""
-		require .VisibleArgs
+		//require .VisibleArgs // makes no sense... we don't care if the args are visible?
+							 // for some cases... yes, but not for plain autocomplete.
+							 // only for exact match
+							 // i can't remember why i added it, so just remove it :[
 		return .name
 		
 	if self isa scdecl
