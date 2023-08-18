@@ -647,11 +647,10 @@ class SCDecl (SCObject) {
 			»
 		if self is borrowed
 			rz = «arel "--", rz »
-		if !.IsDataType and .NilDeclared is Stated
-			if .NilDeclared is Optional
-				rz = «arel "?", rz »
-			  else
-				rz = «arel "!", rz »
+		if .SuffersNil and .NilDeclared is Optional
+			rz = «arel "?", rz »	// depends if this is for debug?
+									// for debug I'd rther not see ! all over
+									// for code use... we need the "!" ?
 	
 	
 	function CreateSimpleTypeCast (|Message| exp, |Message|)
