@@ -210,7 +210,7 @@ function SCFunction.UseExportNameConstructor (|string| CppPart, |string| CppWrap
 			fn.LoadExportName
 
 		|| s = .NameOfClassAllocator(fn.ExportName, CppPart)
-		.SetExportName( s, fn is ExplicitExport )
+		.SetExportName( s, fn|scbase| is ExplicitExport )
 		Return true
 
 

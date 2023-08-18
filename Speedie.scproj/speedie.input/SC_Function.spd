@@ -5,6 +5,7 @@
 
 
 flags
+	|functionkind|
 	kIsConstructor
 	kIsDestructor
 	kIsNew
@@ -24,6 +25,32 @@ flags
 	kIsBehaviour
 	kExpectsRealVars
 
+
+datatype FunctionKind (uint)
+	flags
+		|functionkind|
+		kIsConstructor
+		kIsDestructor
+		kIsNew
+		kIsProperty
+		kIsComparison
+		kIsReffer
+		kIsLayer
+		kIsAlloc
+		kIsNewStruct
+		kIsTypeTest
+		kDestructorNotFromLocalRefs
+		kIsInitFunc
+		kIsMemory
+		kIsRecursive
+		kIsEmptyConstructor
+		kIsVirtualCaller
+		kIsBehaviour
+		kExpectsRealVars
+	syntax is (|functionkind| k, |bool|)
+		return (self & k) == k
+	syntax isnt (|functionkind| k, |bool|)
+		return (self & k) == k
 
 
 class SCFunction (SCBase) {
@@ -83,6 +110,10 @@ syntax equals (|string| name, |bool| Aware, |bool|)
 operator isa (|int| Code, |bool|)
 	return .AllocCode & Code
 
+syntax is (|functionkind| k, |bool|)
+	return (.alloccode & k) == k
+syntax isnt (|functionkind| k, |bool|)
+	return (.alloccode & k) == k
 
 function IsReal (|bool|)
 	return (self != nil) and !.isMacro 
