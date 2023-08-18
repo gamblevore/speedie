@@ -107,7 +107,7 @@ function message.IntoVariable (|scbase| name_space, |nameandmsg|)
 		P
 	»
 	
-	CollectDeclsFuncBody(block, arg)
+	CollectDeclsFuncBodyJustWhatWeNewlyMade(block, arg) // we only have one decl that needs collecting...
 	block.parent.obj = arg[name]	// Stop collectdecls being called twice! (name-conflict errors)
 									// it's called in typeofblock, unless we already have the type
 									// which we just set here.

@@ -69,38 +69,65 @@ function DefaultStitch (|Message| Default, |Message| args)
 
 
 
-function CollectDeclsFuncArgs (|Message| prms, |SCBase| Name_Space, |SCBase| AddToSpace, |[SCDecl]|)
-	return CollectdeclsMulti(prms, Name_Space, AddToSpace, 0)
 
-function CollectDeclsGlobals (|Message| arg, |SCBase| scarg, |[SCDecl]|)
-	return CollectdeclsMulti(arg, scarg, scarg, 1)
-	
-function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg, |[SCDecl]|)
-	return CollectdeclsMulti(arg, scarg, scarg, 0)
+// these can remain...
+function CollectDeclsFuncArgs (|Message| prms, |scfunction| func, |SCBase| AddToSpace, |[SCDecl]|)
+	opt norefcounts
+//	|| cls = func.Cls
+//	if (!cls)
+//		|| L = func.lookup
+//		if (L isa SCModule) // i'm not sure this is correct.
+//			cls = L.Cls     // just cos its a module of a class... doesnt mean it has a class... 
+//							 cls could just be func.cls then?
+//	  elseif !prms.HasSelfAsFirst
+//		cls.AddSelfToFunc(addtospace)
+//		rz <~ cls.SelfDecl
+
+	if !CollectdeclsMulti(prms, func, AddToSpace, 4, rz)
+		rz = nil
 
 function SCClass.CollectDeclsProperties (|[SCDecl]|)
-	return CollectdeclsMulti( .sourcearg, .Modul, self, 3 )
+	if !CollectdeclsMulti( .sourcearg, .Modul, self, 3, rz)
+		rz = nil
 
 
-function CollectDeclsMulti (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSpace, |int| PropertyMode=0, |[SCDecl]|)	
+function CollectDeclsGlobals (|Message| arg, |SCBase| scarg, |[SCDecl]|)
+	CollectdeclsMulti(arg, scarg, scarg, 1, nil)
+	
+
+// remove this also... but later.
+function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg) 	// remove later... :)
+	CollectdeclsMulti(arg, scarg, scarg, 8, nil)			// basically... the caller needs fixing.
+
+
+function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCBase| scarg)
+	CollectdeclsMulti(arg, scarg, scarg, 8, nil)
+
+
+// definitely remove this!
+function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
+	CollectdeclsMulti(arg, scarg, scarg, 8, nil)
+
+
+
+function CollectDeclsMulti (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSpace, |int| PropertyMode, |[SCDecl]| out, |bool|)	
 	|| OriginalErrCount = stderr.errorcount
 	|SCFunction--|	Func
 	|SCClass--|		Cls
 	
-	if (DeclList == @prm)
+	if PropertyMode == 4
 		func = Name_Space|scfunction|
 		cls = func.Cls
-		if (!cls)
+		if (cls)
+			if !DeclList.HasSelfAsFirst
+				cls.AddSelfToFunc(addtospace)
+				out <~ cls.SelfDecl
+		  else
 			|| L = func.lookup
 			if (L isa SCModule)
 				cls = L.Cls
-		  elseif !DeclList.HasSelfAsFirst
-			cls.AddSelfToFunc(addtospace)
-			rz <~ cls.SelfDecl
 	  elseif (AddToSpace isa SCClass)
 		cls = AddToSpace
-	
-	|| IsFunctionBody  =  (AddToSpace isa SCArg)
 
 	for item in DeclList
 		if (func and func.isassigns == 2) and item.islast
@@ -184,15 +211,10 @@ function CollectDeclsMulti (|Message| DeclList, |SCBase| Name_Space, |SCBase| Ad
 		|| NameItm = item.GetDclName #require
 		|| dcl = Sdcl.copy
 		
-		if NoOriginalDcl
-			if IsFunctionBody 
-				if sdcl isnt StayBorrowed
-					(Dcl Isnt Borrowed)
-				dcl.nildeclared = NilState.Either // can be freely changed!
-		  elseif func and func is ExpectsRealVars
-			if dcl.NilDeclared isnt Stated
-				dcl.NilDeclared = NilState.real
-				// So... we got a func with a decl... lets check it.
+		if (propertymode & 8) and NoOriginalDcl // functionbody
+			if sdcl isnt StayBorrowed
+				(Dcl Isnt Borrowed)
+			dcl.nildeclared = NilState.Either // can be freely changed!
 		
 		nameitm.obj = dcl
 		if (nameitm in @Rel)
@@ -219,7 +241,8 @@ function CollectDeclsMulti (|Message| DeclList, |SCBase| Name_Space, |SCBase| Ad
 				dcl.becomereal
 			
 		
-		rz <~ dcl
+		if out!=nil
+			out <~ dcl
 		nameitm.obj = dcl
 		dcl.Source = item
 		if default and defaultdcl
@@ -227,6 +250,7 @@ function CollectDeclsMulti (|Message| DeclList, |SCBase| Name_Space, |SCBase| Ad
 		
 		if (AddToSpace)
 			AddToSpace.TryAdd( nameitm, dcl, dcl.Name )
+	return true
 
 
 

@@ -157,9 +157,11 @@ function TypeOfBlock (ExprResolver)
 	p.IsStatementExpr = true
 	|| fn = p.owningfunc
 	
-	CollectDeclsFuncBody( exp, p )
+	CollectDeclsFuncBodyUnsureHowToRemove( exp, p ) // hard to remove these. might take an hour or 2 just on removing this.
 	
-	for ch in exp			// copied from tran_all
+//	SCFunction.Tran_All( fn, exp, p ) // should be enough... not working for some odd reason.
+
+	for ch in exp			// copied from tran_all... shouldn't be necessary... 
 		if ch == @Arg
 			SCFunction.Tran_All( fn, ch, ch.scArg( p ) )
 		  else
