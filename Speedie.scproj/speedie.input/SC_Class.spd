@@ -478,10 +478,6 @@ function ContainedTypeLoad
 							// so we need to fix this. sighs... more work.
 
 
-function ContainedButNotUpgrade (|scdecl|)
-	return .SelfDecl.Contains
-
-
 function scfunction.DontWantSameReturnType (|scfunction| f)
 	require self
 	if f.ReturnType.MiniMatch(.returntype, 0)

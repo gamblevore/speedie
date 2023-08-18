@@ -747,8 +747,9 @@ class SCDecl (SCObject) {
 	function ReallyContains (|scdecl|)
 		opt norefcounts
 		|| c = .contains ?? .type.contained
-		if c and c.type != self.type
+		if c and c.type != .type
 			return c
+	
 	
 	function ContainsMatch (|SCDecl| o, |int| TypeCast, |bool|)
 		opt norefcounts

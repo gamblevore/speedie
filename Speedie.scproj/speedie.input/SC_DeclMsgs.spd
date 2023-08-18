@@ -152,8 +152,8 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		
 		require (stderr.errorcount == OriginalErrCount)
 		
-		|bool| HasOriginalDcl = Sdcl
-		if (!HasOriginalDcl)
+		|bool| NoOriginalDcl = !Sdcl
+		if (NoOriginalDcl)
 			if (cls) and (cls.Contained)
 				sdcl = cls.Contained // (|| x = Y), (|object| x = Y)
 			  else
@@ -176,10 +176,9 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 		|| NameItm = item.GetDclName #require
 		|| dcl = Sdcl.copy
 		
-		if IsFunctionBody
-			if (!HasOriginaldcl and sdcl isnt StayBorrowed)
+		if IsFunctionBody and NoOriginalDcl
+			if sdcl isnt StayBorrowed
 				(Dcl Isnt Borrowed)
-//			if rdcl is st
 			dcl.nildeclared = NilState.Either // can be freely changed!
 		
 		nameitm.obj = dcl
@@ -237,7 +236,8 @@ function scdecl.NeedsContainedfix (|bool|)
 
 
 function scdecl.Containedfix (|scdecl|)
+	opt norefcounts
 	|| t = .type
 	rz = (.copy, self)(T.typenormal == self)
-	rz.contains = t.ContainedButNotUpgrade
+	rz.contains = t.SelfDecl.Contains
 		
