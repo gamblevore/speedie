@@ -381,7 +381,7 @@ function ExportStruct (|SCClass| cls, |bool| IsBehaviour=false)
 function ExportBehaviourHeader (|SCClass| cls)
 	require !cls.IsRole
 	|| b = cls.Behaviour							#require
-	.ExportStruct( B.FuncTayble.cls, true )
+	.ExportStruct( B.FuncTable.cls, true )
 
 
 function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass| Type)
@@ -407,7 +407,7 @@ function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass
 
 function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 	|| b		= cls.behaviour									#require
-	|| TableCls = b.FuncTayble.cls
+	|| TableCls = b.FuncTable.cls
 	|| N		= TableCls.CstructName
 	|| CN		= cls.CStructName
 
@@ -652,7 +652,7 @@ extern "C" {
 	Cpp_Export.GenLub(fs)
 
 	
-	fs <~ "extern ${TypeObject.Behaviour.FuncTayble.cls.cstructname} JB_Object_FuncTable_;\n"
+	fs <~ "extern ${TypeObject.Behaviour.FuncTable.cls.cstructname} JB_Object_FuncTable_;\n"
 	if Cpp_Export.DoSavers
 		Cpp_Export.CreateClassListHeader(fs, ";\n")
 

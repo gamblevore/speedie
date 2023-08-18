@@ -943,7 +943,7 @@ dispatch ClsCollectTable (CollectFunc)
 	helper				SCFunction.NewHelper
 	fields				SCClass.NamedPropertyFields
 	behaviour			SCBehaviour.NewBehaviour
-	virtual				SCBehaviour.NewInterface
+	virtual				SCBehaviour.NewVirtual
 	iterator			SCIterator.NeuIter
 	syx					SCFunction.NeuSyx			   // jeebox specific
 	cpp_wrapper			SCFunction.NewCppWrapper

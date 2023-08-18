@@ -6,8 +6,8 @@
 
 
 class SCBehaviour (SCBase)
-	|SCModule|							FuncTayble
-	|dictionary of SCModule|				Interfaces
+	|SCModule|							FuncTable
+	|dictionary of SCModule|			Interfaces
 	|[SCFunction]|						WrapperFuncs	
 	
 	
@@ -22,13 +22,13 @@ class SCBehaviour (SCBase)
 	
 	
 	function Add (|scbase| fn)
+		opt norefcounts
 		require (fn)
 		|| Old = self[fn.name]|scbase|
-
-		check  (!Old) (fn.source,	kNameConf) 
-		expect (!Old) (old.source,	kNameConf)
-
-		.TryAdd(fn.source, fn, fn.name) // Link... later.
+			error (fn.source,	kNameConf) 
+			error (old.source,	kNameConf)
+		  else
+			.TryAdd(fn.source, fn, fn.name) // Link... later.
 	
 	
 	function Upwards (|SCBehaviour|)
@@ -42,12 +42,12 @@ class SCBehaviour (SCBase)
 			.behaviour = b
 		
 		if (M isa SCModule)
-			b.interfaces[M.name.lowercase] = M
+			b.interfaces.valuelower(M.name) = M
 		  else
 			b.add(m)
 	
 	
-	function SCModule.OperatorOneOrOther  (|SCModule| B, |SCModule|)
+	function SCModule.OneOrOther (|SCModule| B, |SCModule|)
 		if (self and b)
 			error ( .source, kNameConf)
 			error (b.source, kNameConf)
@@ -71,7 +71,7 @@ class SCBehaviour (SCBase)
 		for (C.upwards in self)
 			|| B = C.behaviour								  #expect errplace
 			|| I = B.interfaces[name]
-				Result = Result OneOrOther I
+				Result = Result.OneOrOther(I)
 
 		expect result (ErrPlace, "No interface found for this behaviour")
 		return Result.cls
@@ -119,7 +119,7 @@ class SCBehaviour (SCBase)
 		prms.Remove
 
 		|| Using = fn.source.syntaxusing
-		|| CopyFrom = fn.source[1]
+		|| CopyFrom = fn.source.Second
 		WriteTo.msg(@thg, "self")
 		/*
 			WriteTo <~ (@rel, "oop"):
@@ -150,8 +150,8 @@ class SCBehaviour (SCBase)
 	
 	
 	function SCClass.IsInterface (|bool|)
-		require self
-		return .isbehaviour & scbehaviour.kBehaviourProto
+		if self
+			return .isbehaviour & scbehaviour.kBehaviourProto
 
 
 	function String.InterfaceToBehaviour (|string|)
@@ -160,8 +160,8 @@ class SCBehaviour (SCBase)
 		
 	function SCClass.ProcessBehaviours
 		|| B = .behaviour										#require
-		|| Table = b.FuncTayble									#expect
-		|| TableCls = Table.cls									#expect
+		|| Table = b.FuncTable									#require
+		|| TableCls = Table.cls									#require
 		
 		for (fn in B)
 			.FillInterFaceIn(fn)
@@ -179,9 +179,7 @@ class SCBehaviour (SCBase)
 		|| L = fn.lookup
 		if (L isa scmodule)
 			|| cls = L.cls
-				expect fn.lookup
 				fn.AddSelfToFunc(cls)
-		check (fn.source) ("Error in ProcessInterface.")
 	
 	
 	function SCModule.AddInterfaceToTable (|SCClass| TableCls)
@@ -197,7 +195,7 @@ class SCBehaviour (SCBase)
 	
 
 	function CreateFuncTable (|Message| ErrPlace)
-		expect !.FuncTayble
+		expect !.FuncTable
 
 		|| name = .cls.behaviourname
 		|| Using = errplace.syntaxusing 
@@ -209,10 +207,10 @@ class SCBehaviour (SCBase)
 		.project.use
 		|| F = SCClass.newStruct(msg, compiler.program, ErrPlace)|SCModule| #require
 		F.cls.IsBehaviour = kBehaviourTable
-		f.cls.IsRole = .cls.IsRole				// sigh
+		f.cls.IsRole = .cls.IsRole						// sigh
 		compiler.program.TryAddBase( ErrPlace, F )
 		Compiler.ModuleList <~ F						// Sigh... should not have to do this!
-		.FuncTayble = F
+		.FuncTable = F
 		scimport.noproj
 	
 	
@@ -242,10 +240,10 @@ class SCBehaviour (SCBase)
 	module {
 		function Tran_Behaviour (|message| node, |scclass| cls, |bool|)
 			require cls and node
-			expect !cls.IsRole (node, "roles can't specify behaviours (they aren't real classes!)")
-			|| name = node[@thg]
+			expect !cls.IsRole (node, "roles can't specify behaviours (roles aren't real classes!)")
+			|| name = node[@thg]$
 			|| lst = name.next
-			expect (lst != @bra and @prm and @list)  (lst, "Behaviours can’t specify parameters")
+				expect (lst != @bra and @prm and @list)  (lst, "Behaviours can't specify parameters")
 			using node 
 				|| it = name.next
 					it.expect(@arg)
@@ -261,26 +259,18 @@ class SCBehaviour (SCBase)
 		function NewBehaviour (CollectFunc)
 			|| cls = name_space.ShouldBeClass(errplace)
 			if Tran_Behaviour(node, cls)
-				|| fn = SCFunction.NewFunc(node, cls, node)
+				|| fn = SCFunction.NewFunc(node, cls, node)|scfunction|
 					//fn.isvisible = true
 					// fn.visible causes problems
 					// then all classes basically become visible
 					// because all classes have render funcs! at least render!
 					// we need a better way.
 					cls.AddBehaviourOrInterface( fn, ErrPlace )
+					fn.AllocCode |= kIsBehaviour (|) kExpectsRealVars
 					Return fn
 
 
-		function MakeCallerSub (|string| FnStr, |SCClass| Cls, |Message| ErrPlace, |SCFunction|)
-			|| Using = Errplace.syntaxusing 
-			|| FNSrc = FNStr.ParseClean												#require
-			|| FN = SCFunction.NewFunc( fnsrc.first, Cls, ErrPlace )|SCFunction|	#require
-			fn.alloccode |= kIsVirtualCaller
-			cls.behaviour.WrapperFuncs <~ Fn
-			return FN
-
-
-		function MakeInterfaceCaller (|SCModule| Mod, |SCClass| Cls, |Message| ErrPlace, |SCFunction|)
+		function MakeVirtualCaller (|SCModule| Mod, |SCClass| Cls, |Message| ErrPlace, |SCFunction|)
 			// so it's a func, on the base, with the same name... as... the module
 			|| InterName = mod.name
 			|| Type = cls.behaviourname
@@ -291,11 +281,15 @@ function $InterName (,$InterName)
 	|| Table = .ClassBehaviours|&$Type|
 	return (Table.$FuncName)(...)
 "
-			return .MakeCallerSub(fnstr, cls, errplace)
+			using Errplace
+			|| FNSrc = FNStr.ParseClean
+				rz = SCFunction.NewFunc( fnsrc.first, Cls, ErrPlace )|SCFunction|
+				rz.AllocCode |= kIsBehaviour (|) kExpectsRealVars
+				cls.behaviour.WrapperFuncs <~ rz
 		
 		
 
-		function NewInterface (CollectFunc)
+		function NewVirtual (CollectFunc)
 			using (errplace)
 			|| cls = name_space.ShouldBeClass(errplace)
 				|| arg = node.find(@arg)
@@ -304,11 +298,11 @@ function $InterName (,$InterName)
 					node.next = beh
 					name_Space.CollectOne( beh, true ) // cos we collect from a list... sigh
 
-				|| Mod = .NewInterfaceSub(node, cls, errplace)
-					return .MakeInterfaceCaller(Mod, cls, errplace)
+				|| Mod = .NewVirtualSub(node, cls, errplace)
+					return .MakeVirtualCaller(Mod, cls, errplace)
 		
 		
-		function NewInterfaceSub (|Message| node, |SCClass| cls, |Message| ErrPlace, |scmodule|) {
+		function NewVirtualSub (|Message| node, |SCClass| cls, |Message| ErrPlace, |scmodule|) {
 			|| Thg = node.first
 			|| required = (thg isarel "++")
 				thg = thg.replacewith(thg.first)

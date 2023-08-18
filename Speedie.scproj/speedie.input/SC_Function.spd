@@ -18,9 +18,11 @@ flags
 	kDestructorNotFromLocalRefs
 	kIsInitFunc
 	kIsMemory
-	kIsVirtualCaller
 	kIsRecursive
 	kIsEmptyConstructor
+	kIsVirtualCaller
+	kIsBehaviour
+	kExpectsRealVars
 
 
 
@@ -42,7 +44,7 @@ linkage
 |scfunction--|			DepthFinder
 |uint16|				Depth
 |uint16|				TmpCounter
-|uint16|				AllocCode // some flags above 255!
+|uint|					AllocCode // some flags above 255!
 |Byte|					MinOpt
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
@@ -78,14 +80,8 @@ syntax equals (|string| name, |bool| Aware, |bool|)
 	return .Name.syntaxequals( name, true )		// never needs !aware.
 
 
-syntax Access (|int| d, assigns:|scdecl|)
-	if d == 255 // a return
-		.ReturnType = Value
-	  else
-		.args[d] = Value
-
 operator isa (|int| Code, |bool|)
-	return ( .AllocCode & Code )
+	return .AllocCode & Code
 
 
 function IsReal (|bool|)

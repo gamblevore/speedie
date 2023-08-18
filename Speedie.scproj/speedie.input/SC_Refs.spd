@@ -108,8 +108,8 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 	
 	if type.hasstruct
 		|| fn = type.type.destructorfunc
-		if fn and !(fn.alloccode & kDestructorNotFromLocalRefs) 
-			return kBasisDestructable
+			ifn fn isa kDestructorNotFromLocalRefs
+				return kBasisDestructable
 		|| p = msg.niceparent
 		if p isbrel "&"
 			return kBasisTempStruct

@@ -278,6 +278,7 @@ class SCImport
 		function ExportShaders
 			require shaders
 			
+			Compiler.stage( "Copying Shaders" )
 			compiler.Timer( "Copying Shaders" )
 			
 			|| P = compiler.BuildFolder["Resources/Shaders"]		#expect

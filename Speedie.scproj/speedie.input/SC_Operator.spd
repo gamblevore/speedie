@@ -158,6 +158,7 @@ module {
 		.AddBit( kBitOr,	"BitOr",	&asmops.BitOr)
 		.AddBit( kBitXor,	"Xor",		&asmops.bitxor)
 		dict["|"]         = dict[ "(|)" ]
+		dict["|||"]         = dict[ "(|)" ]
 		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL)
 		.AddBit( ">>>",	"RotateRight",	&asmops.ROR)
 		.addbit( ">>",	"ShiftRight",	&asmops.SHR)

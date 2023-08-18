@@ -272,7 +272,7 @@ function LoadSuperClass
 		|| b = .behaviour
 		|| SB = S.behaviour
 		if (B and SB)
-			b.FuncTayble.cls.super = SB.FuncTayble.cls
+			b.FuncTable.cls.super = SB.FuncTable.cls
 
 
 module {
@@ -719,7 +719,7 @@ function Reach (|scbase| from, |message| src=nil)
 	if .super
 		.super.Reach(self)
 	if .behaviour
-		.behaviour.FuncTayble.cls.reach(self)
+		.behaviour.FuncTable.cls.reach(self)
 	
 	if .DestructorFunc
 		.DestructorFunc.findReached(self)

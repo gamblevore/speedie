@@ -71,7 +71,10 @@ function NilTracker.Function (|message| msg)
 
 	|| p = prms.first
 	for a in fn.args
-		.VariableSet(a, p.nildecl, p, 1)
+		|| pd = p.NilDecl
+		if fn.IsNilChecker
+			.UseAsReal(p, pd)
+		.VariableSet(a, pd, p, 1)
 		if p.hasany
 			.RunNormal(p)
 		p++
