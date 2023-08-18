@@ -486,11 +486,11 @@ function scfunction.CanLibLoad (|bool|)
 	
 
 function scfunction.WrapName (|string|)
-	if .canlibload
-		if .iscppinbuilt
+	if .CanLibLoad
+		if .IsCppInBuilt
 			rz = .ExportNameBuilder + "Wrap"
 		  else
-			rz = .exportname
+			rz = .ExportName
 
 
 function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)

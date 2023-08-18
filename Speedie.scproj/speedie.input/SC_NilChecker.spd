@@ -352,11 +352,6 @@ function niltracker.nilmsg (|message| err, |scdecl| d, |uint| PointerInferred, |
 
 /*
 TODO:
-
-* .contains ... the func params shouldn't accept nil? but should return it.
-* cpp-wrappers and prototypes and properties default to not nil unless stated.
-	* globals default to whatever its set to first.
-
 * do the work on args in the if-cond thing...
 	* pass the info about BOTH the conditions... in the state "Y" thing... the applicator can decide what to do about "After" conditions...
 

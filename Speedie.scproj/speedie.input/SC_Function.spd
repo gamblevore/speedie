@@ -221,9 +221,12 @@ function FuncDecls
 		if (L isa SCModule)  and  (L.IsProperModule)
 			L.AddModuleToFunc( space )
 
-	if (.AllocCode) and (.ReturnType)
-		.ReturnType = .ReturnType.Copy // no difference, returntypes are never borrowed.
-		.ReturnType.AllocSource = .AllocCode
+	if .AllocCode
+		|| r = .ReturnType$
+		if r == r.Type.TypeNormal
+			r = r.Copy
+			.ReturnType = r
+		r.AllocSource = .AllocCode
 
 
 function AfterGotClasses
@@ -580,7 +583,7 @@ function FLookup (assigns:|SCBase|)
 			.Project = f.Proj
 
 
-function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch, |int|) {
+function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch, |int|)
 	if !exp
 		Return kNeedsTypeCast
 	expect  (!.isdisabled)  (exp, .description)
@@ -613,7 +616,6 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 	cst.obj = .ReturnType
 
 	Return loss
-}
 
 
 function DeclsProtoType (|Message| ch0, |SCClass| fpType=nil, |bool| late=false)
@@ -628,6 +630,21 @@ function DeclsProtoType (|Message| ch0, |SCClass| fpType=nil, |bool| late=false)
 		.DeclsProtoTypeRemove(fpType, ch0, IsClass, late)
 		if !late
 			.DeclsProtoTypeAdd(fpType)
+
+
+function BecomeReal
+	opt norefcounts
+	for a in .args
+		a.becomereal
+	|| r = .ReturnType
+		r.BecomeReal
+
+
+setter IsCppInBuilt (|int|)
+	|| o = .IsCppInBuilt
+	.IsCppInBuilt = Value
+	if !o
+		.BecomeReal
 
 
 function DeclsProtoTypeAdd (|SCClass| fpType)
@@ -682,7 +699,7 @@ function IsSimpleCast (|Message|)
 	Return found
 
 
-function CreateProtoCastTo (|SCFunction| f) {
+function CreateProtoCastTo (|SCFunction| f)
 	|| P  = f.prototype
 	|| sP =  .Prototype
 	
@@ -710,7 +727,6 @@ function CreateProtoCastTo (|SCFunction| f) {
 		»
 	»
 	sp.CollectSub( func )
-}
 
 
 function EqualOrMoreSpecific (|SCFunction| f, |bool|)
@@ -1618,7 +1634,7 @@ function Tran_Rejoin (TranFunc)  // exitter
 		expect (arg.IsStatementExpr) (node, "Can't use this here.")
 		expect !p.next (node, "Value expected here.")
 	node.LastInBlock
-
+	
 
 function NewCppWrapper (CollectFunc)
 	|| name = node[@thg]
