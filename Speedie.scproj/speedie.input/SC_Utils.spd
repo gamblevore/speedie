@@ -178,7 +178,7 @@ function message.IsReffer (|bool|)
 	opt norefcounts
 	if self == @func
 		|| fn = .last.asfunc
-		return fn and fn isa kisreffer
+			return fn is reffer
 
 
 

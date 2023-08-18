@@ -26,7 +26,6 @@ bugs:
 
 
 additions:
-	* Some kinda memory reporting system... print how much memory is taken by each class... (unify strings... dictionaries etc)
 	* CollectDecls needs to not return early!! or break it up into pieces
 	* –container @ques ability... for macros. This returns the syntax that contained us. Useful for (all~files).delete
 	* do we need lowercase in lookupsub??? all dots/funcs got lowered in parseclean?

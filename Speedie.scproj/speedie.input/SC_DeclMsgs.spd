@@ -180,7 +180,7 @@ function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSp
 				if sdcl isnt StayBorrowed
 					(Dcl Isnt Borrowed)
 				dcl.nildeclared = NilState.Either // can be freely changed!
-		  elseif func and func isa kExpectsRealVars
+		  elseif func and func is ExpectsRealVars
 			if dcl.NilDeclared isnt Stated
 				dcl.NilDeclared = NilState.real
 				// So... we got a func with a decl... lets check it.

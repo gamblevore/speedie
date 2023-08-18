@@ -500,7 +500,7 @@ function SCObject.Auto_Type (|int|)
 			return 5
 		return 0
 	if self isa scfunction
-		if self isa kIsVirtualCaller
+		if self is VirtualCaller
 			return 4
 		return 1
 	if self isa scclass or SCModule
@@ -516,7 +516,7 @@ function SCObject.BaseIcon (|string|)
 	if self isa scfunction
 		if .isbehaviour
 			return " b "
-		if self isa kIsVirtualCaller
+		if self is VirtualCaller
 			return " v "
 		return " f "
 	if self isa scclass

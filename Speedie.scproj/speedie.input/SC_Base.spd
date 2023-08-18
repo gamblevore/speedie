@@ -191,7 +191,7 @@ function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|
 	rz = Cpppart
 	if rz
 		rz = "_" + rz
-	  elseif self isa kIsLayer
+	  elseif self is Layer
 		rz = "_LayerNew"
 	  else
 		rz = "_New"
@@ -203,7 +203,7 @@ function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|
 
 
 function SCFunction.UseExportNameConstructor (|string| CppPart, |string| CppWrapper, |bool|)
-	require !CppWrapper and (self isa kisnew)  
+	require !CppWrapper and (self is new)  
 	|| fn = .CounterPart
 	if fn isa scfunction
 		if !fn.ExportName

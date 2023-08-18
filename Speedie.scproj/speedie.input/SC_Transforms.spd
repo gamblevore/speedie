@@ -841,7 +841,7 @@ function compiler.CollectIsaTests (|Message| s, |[Message]| out, |bool|)
 
 	|| List = s.last
 	|| f = List.AsFunc
-	ifn f isa SCFunction and kIsTypeTest
+	ifn (f isa SCFunction) and (f is TypeTest)
 		Return true
 	
 	|| L1 = List.First

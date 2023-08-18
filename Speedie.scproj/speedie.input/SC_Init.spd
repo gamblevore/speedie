@@ -49,7 +49,7 @@ function SCModule.LoadInitFuncSub (|message| init, |string| name)
 	|| msg = "function $Name (|int|)".ParseClean
 	msg <~ init
 	|| fn = .NewModuleFunc( msg )
-	fn.alloccode |= kIsInitFunc
+	(fn is InitFunc)
 	
 	|| L = init.Last
 	ifn L.hasany

@@ -298,7 +298,7 @@ function LoadTypeTest (|string| s, |scfunction|)
 	opt norefcounts
 	|| f = typeobject[ s ]
 	if f isa scfunction
-		f.alloccode |= kIsTypeTest
+		(f is TypeTest)
 		return f
 
 
@@ -751,7 +751,7 @@ function CreateRoot
 function LoadRefFunc (|String| name, |SCFunction|)
 	opt norefcounts
 	|| o = .FindFunction(name)
-		o.AllocCode = kIsReffer
+		(o is Reffer)
 		return o
 
 
@@ -765,7 +765,7 @@ function FindFunction (|string| Name, |SCFunction|)
 
 
 function scfunction.IsAllocOrNew (|bool|)
-	return self isa (kIsAlloc (|) kIsNew)
+	return self is AllocOrNew
 
 
 function scfunction.HasFloatparams (|int|)

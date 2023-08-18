@@ -85,7 +85,7 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
 	if !f.IsExternalLib
 		require !f.IsWrapper and !f.isMacro
-	require !(f isa kIsNewStruct)
+	require f isnt NewStruct
 	
 	
 	WriteFunctionHeader( F, .T )
@@ -1243,11 +1243,10 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			
 		if o isa SCModule
 			|| cls = o.Cls.realclass
-				|| InAlloc = scfunction.CurrFunc isa kIsAlloc
-				if !InAlloc
+				|| NoAlloc = scfunction.CurrFunc isnt Alloc
 					fs <~ "JB_AsClass("
 				fs <~ cls.CStructName
-				if !InAlloc
+				if NoAlloc
 					fs <~ ')'
 				return
 		.safe(fs)
@@ -1380,7 +1379,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| p = msg.parent
 			|| fn = p.obj
 			if fn isa scfunction
-				if fn isa kIsReffer
+				if fn is Reffer
 					return ""
 		
 		fs <~ '('

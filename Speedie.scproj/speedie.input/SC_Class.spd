@@ -340,7 +340,7 @@ function scfunction.Prms (|message|)
 function CreateEmptyConstructors (|scfunction|)
 	|| f = .CreateEmptyFunc( "Constructor" )
 	|| pc = .PassableCount
-	f.alloccode |= kIsEmptyConstructor
+	(f is EmptyConstructor)
 	|| s = .super
 	if s and s != TypeObject // object has no constructor-func
 		|| l = s.constructorfunc.Prms 
@@ -370,7 +370,7 @@ function CreateConstructors
 		for f in con
 			if f.cls == self // role messageroot doesnt need an allocator
 				.NewClassNew( f, ConstrNew.copy(f.source)      , 0        )
-				.NewClassNew( f, ConstrLayerNew2.copy(f.source), kIsLayer )
+				.NewClassNew( f, ConstrLayerNew2.copy(f.source), functionType.Layer )
 	
 	if !.IsRole
 		|| NeedsDestructor = .IsObject or (.IsStruct and .HasObjectProperties)
@@ -416,8 +416,8 @@ function NewClassNew (|SCFunction| con, |Message| src, |int| ExtraCode)
 	result.counterpart	= con
 	con.counterpart    := []
 	con.counterpart|array| <~ result
-	result.AllocCode   |= kIsNew (|) ExtraCode
-	(con.alloccode = functionkind.Constructor)
+	result.AllocCode   |= functiontype.New (|) ExtraCode
+	(con.alloccode = functionType.Constructor)
 	
 	|| NewParams		= src[ @prm, 1 ]
 	|| A				= con.Source.Second
@@ -441,7 +441,7 @@ function CreateAlloc (|string| ParseThing, |int| Extra)
 	|| fn = .modul.NewModuleFunc( src )
 	fn.refs = cpprefs.new
 	fn.refs.disturbs = nil
-	fn.AllocCode = kIsAlloc (|) extra
+	fn.AllocCode = FunctionType.Alloc (|) extra
 	if extra
 		fn.IsVisible = false
 
@@ -518,7 +518,7 @@ function LoadConstructorsAndAllocators
 	.CreateConstructors
 	if .IsObject and .constructorfunc
 		.CreateAlloc( .AllocStr, 0 )
-		.CreateAlloc( .AllocStrLayer, kIsLayer )
+		.CreateAlloc( .AllocStrLayer, FunctionType.Layer )
 
 	if .super
 		.NoEarlyFree := .Super.NoEarlyFree

@@ -4,35 +4,23 @@
 */
 
 
-flags
-	|functionkind|
-	Constructor
-	kIsDestructor
-	kIsNew
-	kIsProperty
-	kIsComparison
-	kIsReffer
-	kIsLayer
-	kIsAlloc
-	kIsNewStruct
-	kIsTypeTest
-	kDestructorNotFromLocalRefs
-	kIsInitFunc
-	kIsMemory
-	kIsRecursive
-	kIsEmptyConstructor
-	kIsVirtualCaller
-	kIsBehaviour
-	kExpectsRealVars
-
-
-datatype FunctionKind (uint)
+datatype DotUseType (uint)
 	flags
-		|functionkind|
+		|DotUseType|
+		Property
+		Memory
+	syntax is (|DotUseType| d, |bool|)
+		return self == d
+	syntax isnt (|DotUseType| d, |bool|)
+		return self != d
+
+
+datatype FunctionType (uint)
+	flags
+		|FunctionType|
 		Constructor
 		Destructor
 		New
-		Property
 		Comparison
 		Reffer
 		Layer
@@ -41,7 +29,6 @@ datatype FunctionKind (uint)
 		TypeTest
 		DestructorNotFromLocalRefs
 		InitFunc
-		Memory
 		Recursive
 		EmptyConstructor
 		VirtualCaller
@@ -50,10 +37,7 @@ datatype FunctionKind (uint)
 		ConOrDes = Constructor + Destructor
 		ConOrNew = Constructor + New
 		AllocOrNew = Alloc + New
-	syntax is (|functionkind| k, |bool|)
-		return (self & k) == k
-	syntax isnt (|functionkind| k, |bool|)
-		return (self & k) == k
+
 
 
 class SCFunction (SCBase) {
@@ -113,13 +97,13 @@ syntax equals (|string| name, |bool| Aware, |bool|)
 operator isa (|int| Code, |bool|)
 	return .AllocCode & Code
 
-syntax is (|functionkind| k, |bool|) // assumes ANY match. Asking "x is a+b", then a or b is enuf
+syntax is (|FunctionType| k, |bool|) // assumes ANY match. Asking "x is a+b", then a or b is enuf
 	return .alloccode & k
-syntax isnt (|functionkind| k, |bool|)
+syntax isnt (|FunctionType| k, |bool|)
 	return !(.alloccode & k)
-syntax is (|functionkind| k, assigns:|bool|)
+syntax is (|FunctionType| k, assigns:|bool|)
 	.alloccode |= k
-syntax isnt (|functionkind| k, assigns:|bool|)
+syntax isnt (|FunctionType| k, assigns:|bool|)
 	.alloccode &= ~k
 
 function IsReal (|bool|)
@@ -820,11 +804,11 @@ function FillInConstructorAndDestructor (|Message| root, |bool| IsConstructor, |
 		if curr IsThing "self"
 			|| P = curr.Parent
 			|| KindaUse = curr.SelfKindaUse
-			if (KindaUse != kIsProperty)
+			if (KindaUse isnt Property)
 				|| PObj = P.Obj
 				if (Pobj isa SCFunction) and (P == @prm)
 					if (Pobj.AllocCode == .AllocCode): continue
-				  elseif (KindaUse == kIsComparison)
+				  elseif (KindaUse == functiontype.Comparison)
 					Continue
 
 				warn !(IsConstructor) ( curr, "Don't use self before the constructor is complete." )
@@ -1859,7 +1843,7 @@ function scfunction.Init_Sub (|message| node,  |scbase| name_space)
 	.SetBlindCasts(name_space)
 
 	if  Arg.DeprecatedClassOption("pragma", "DontDestructLocally")
-		.AllocCode |= kDestructorNotFromLocalRefs
+		is DestructorNotFromLocalRefs
 	
 
 function NewFuncSub (CollectFunc)
@@ -1947,7 +1931,7 @@ function SettingAProperty (|Message| Rel, |Message|)
 	opt norefcounts
 	require (Rel.IssetRel)
 	|| it = Rel.first
-		if (it.DotType == kIsProperty)
+		if (it.DotType is Property)
 			return it
 
 
@@ -1955,12 +1939,13 @@ function SettingMemory (|Message| Rel, |bool|)
 	// bla.bla = X
 	opt norefcounts
 	require Rel.IssetRel
-	|| it = Rel.first
-		if (it.DotType == kIsProperty or kIsMemory)
+	|| f = Rel.first
+		|| d = f.DotType
+		if d // (d is Property or Memory) // only two that exist ?
 			return true
 
 
-function message.SelfKindaUse (|int|)
+function message.SelfKindaUse (|dotusetype|)
 	opt norefcounts
 	|| p = .parent
 	|| R = p.parent

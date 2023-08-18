@@ -266,7 +266,8 @@ class SCBehaviour (SCBase)
 					// because all classes have render funcs! at least render!
 					// we need a better way.
 					cls.AddBehaviourOrInterface( fn, ErrPlace )
-					fn.AllocCode |= kIsBehaviour (|) kExpectsRealVars
+					(fn is Behaviour)
+					(fn is ExpectsRealVars)
 					Return fn
 
 
@@ -284,7 +285,8 @@ function $InterName (,$InterName)
 			using Errplace
 			|| FNSrc = FNStr.ParseClean
 				rz = SCFunction.NewFunc( fnsrc.first, Cls, ErrPlace )|SCFunction|
-				rz.AllocCode |= kIsBehaviour (|) kExpectsRealVars
+				(rz is Behaviour)
+				(rz is ExpectsRealVars)
 				cls.behaviour.WrapperFuncs <~ rz
 		
 		
