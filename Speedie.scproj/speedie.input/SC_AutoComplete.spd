@@ -869,7 +869,7 @@ function CallFrom (|message| msg,  |string| purpose,  |object| found=nil,  |mess
 
 	rz = .callfromdefine(msg, fn, found)
 	|| arg = rz.first
-	ifn fn isa kisconstructor
+	if fn isnt constructor
 		.callfromsub(arg, fn)
 		return rz
 

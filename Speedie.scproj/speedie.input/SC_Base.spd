@@ -255,7 +255,7 @@ function scfunction.ExportNameBuilder (|string|CppPart="", |string| )
 	if (.Cls)
 		SubSection = .Cls.Modul.CppPart
 		AfterSub = "_"
-		if (self isa kisconstructor) and !(cpppart contains "Constructor")
+		if (self is constructor) and !(cpppart contains "Constructor")
 			cppPart = "Constructor" + cpppart
 	  else
 		|| L = .lookup

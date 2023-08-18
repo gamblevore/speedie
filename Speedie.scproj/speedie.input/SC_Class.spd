@@ -417,10 +417,10 @@ function NewClassNew (|SCFunction| con, |Message| src, |int| ExtraCode)
 	con.counterpart    := []
 	con.counterpart|array| <~ result
 	result.AllocCode   |= kIsNew (|) ExtraCode
-	con.AllocCode		= kIsConstructor
+	(con.alloccode = functionkind.Constructor)
 	
 	|| NewParams		= src[ @prm, 1 ]
-	|| A				= con.Source[ 1 ]
+	|| A				= con.Source.Second
 	|| rsrc				= result.source
 	|| TypeStr			= rsrc.FindNested(@thg, "type")
 	

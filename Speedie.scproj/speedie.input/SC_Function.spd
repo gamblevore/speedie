@@ -6,7 +6,7 @@
 
 flags
 	|functionkind|
-	kIsConstructor
+	Constructor
 	kIsDestructor
 	kIsNew
 	kIsProperty
@@ -29,24 +29,27 @@ flags
 datatype FunctionKind (uint)
 	flags
 		|functionkind|
-		kIsConstructor
-		kIsDestructor
-		kIsNew
-		kIsProperty
-		kIsComparison
-		kIsReffer
-		kIsLayer
-		kIsAlloc
-		kIsNewStruct
-		kIsTypeTest
-		kDestructorNotFromLocalRefs
-		kIsInitFunc
-		kIsMemory
-		kIsRecursive
-		kIsEmptyConstructor
-		kIsVirtualCaller
-		kIsBehaviour
-		kExpectsRealVars
+		Constructor
+		Destructor
+		New
+		Property
+		Comparison
+		Reffer
+		Layer
+		Alloc
+		NewStruct
+		TypeTest
+		DestructorNotFromLocalRefs
+		InitFunc
+		Memory
+		Recursive
+		EmptyConstructor
+		VirtualCaller
+		Behaviour
+		ExpectsRealVars
+		ConOrDes = Constructor + Destructor
+		ConOrNew = Constructor + New
+		AllocOrNew = Alloc + New
 	syntax is (|functionkind| k, |bool|)
 		return (self & k) == k
 	syntax isnt (|functionkind| k, |bool|)
@@ -110,10 +113,14 @@ syntax equals (|string| name, |bool| Aware, |bool|)
 operator isa (|int| Code, |bool|)
 	return .AllocCode & Code
 
-syntax is (|functionkind| k, |bool|)
-	return (.alloccode & k) == k
+syntax is (|functionkind| k, |bool|) // assumes ANY match. Asking "x is a+b", then a or b is enuf
+	return .alloccode & k
 syntax isnt (|functionkind| k, |bool|)
-	return (.alloccode & k) == k
+	return !(.alloccode & k)
+syntax is (|functionkind| k, assigns:|bool|)
+	.alloccode |= k
+syntax isnt (|functionkind| k, assigns:|bool|)
+	.alloccode &= ~k
 
 function IsReal (|bool|)
 	return (self != nil) and !.isMacro 
@@ -203,10 +210,10 @@ function ParseName (|Message| node, |bool|)
 	if !.cls
 		0	
 	  elseif cname ~= "constructor"
-		.AllocCode = kIsConstructor
+		is Constructor
 		.IsInline = true
 	  elseif cname ~= "destructor"
-		.AllocCode = kIsDestructor
+		is Destructor
 	
 	Return cname.TestFuncName
 
@@ -268,7 +275,7 @@ function TranDebugInsert
 	|| d = compiler.debuginsert			#require
 	|| m = .sourcearg				
 	using (d)
-		if (self isa kIsConstructor)
+		if (self is Constructor)
 			m.last = d.copy
 		  else
 			m.first = d.copy
@@ -877,7 +884,7 @@ function TranStrings
 
 
 function IsConstructorOrDestructor (|bool|)
-	return self isa ( kIsConstructor (|) kIsDestructor )
+	return self is ConOrDes
 
 
 function message.IsParentConCall (|scfunction|)

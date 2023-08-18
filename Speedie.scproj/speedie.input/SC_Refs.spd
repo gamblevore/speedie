@@ -678,7 +678,7 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 
 
 function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |message|)
-	if !fn and (self isa kIsConstructor)
+	if !fn and (self is Constructor)
 		expect (.cls == typeobject) or (.cls.super == typeobject) (self, "Need call to superclass's constructor, but can’t auto-create one.")
 		// a problem?
 		return nil
@@ -696,7 +696,7 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 	lst.obj = fn
 	paf.obj = typevoid
 
-	if (self isa kIsConstructor)
+	if (self is Constructor)
 		root.First = PAF
 	  else 
 		root <~ PAF
@@ -732,11 +732,10 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 
 
 function SCFunction.BuildConstructorDestructor
-	require self isa (kIsConstructor (|) kIsDestructor)
-	require StdErr.OK				// require !.cls.IsRole
+	require (self is ConOrDes) and StdErr.OK				// require !.cls.IsRole
 	
 	|| root = .SourceArg
-	|| IsConstructor = self isa kIsConstructor
+	|| IsConstructor = self is Constructor
 
 	|| TheCall = .CallParents( root, IsConstructor )
 	.FillInConstructorAndDestructor( root, IsConstructor, TheCall )
@@ -752,7 +751,7 @@ function SCFunction.BuildConstructorDestructor
 
 function SCFunction.AnalyseRefs (|[message]| list)
 	|| root				= .SourceArg
-	|| IsConstructor	= self isa kIsConstructor
+	|| IsConstructor	= self is Constructor
 	for (msg.flat in root)
 		|| it = msg.RC_HasTemporary  // need to always do this?
 			if .dorefs or (it != screfs.kbasisobj)
@@ -802,12 +801,12 @@ function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 			return 
 	
 	|| fn = dot.last.asfunc
-		if (fn isa kIsConstructor)
-			|| ok = self isa (kIsConstructor(|)kIsNew)
-			expect (ok) (dot, "Can only call constructors from within a constructor.")
+		if (fn is Constructor)
+			if self isnt ConOrNew
+				error (dot, "Can only call constructors from within a constructor.")
 		  elseif (fn isa kIsDestructor)
-			|| ok = self isa kIsDestructor
-			expect (ok) (dot, "Can only call destructors from within a destructor.")
+			if self isnt Destructor
+				error (dot, "Can only call destructors from within a destructor.")
 
 
 function SCFunction.RefsCheckPropertiesAltered
@@ -820,7 +819,7 @@ function SCFunction.RefsCheckPropertiesAltered
 			|| ch = curr.first	 // a.b = x
 			if ch.IsProperty				
 				// (not on self, within constructor)
-				ifn  (self isa kIsConstructor) and ( ch.first IsThing "self" )				
+				ifn  (self is Constructor) and ( ch.first IsThing "self" )				
 					SCRefs.RefMarkAsDisturber( ch, self )
 
 

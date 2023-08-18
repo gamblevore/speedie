@@ -944,7 +944,7 @@ class SCDecl (SCObject) {
 			fn.RefSmooth( self )
 			return
 		
-		if fn isa kisconstructor or kIsDestructor
+		if fn is constructor or Destructor
 			error (exp, "You can’t modify 'self' in a constructor or destructor.")
 
 		if .IsNormalObject
