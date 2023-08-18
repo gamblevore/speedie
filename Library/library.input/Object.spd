@@ -45,8 +45,9 @@ class Object
 				P = P.Parent
 	
 	
-	operator MustBe (|&ClassData|x, |bool|)
+	operator MustBe (|&ClassData|x, |bool|)  // perhaps mustbe should just be isa.
 		return self.mustbe(x)
+		// if x isa (message, ErrPlace)
 	
 	helper MustBe (|&ClassData|x, |Message|ErrNode=nil, |bool|)
 		if self isa x
