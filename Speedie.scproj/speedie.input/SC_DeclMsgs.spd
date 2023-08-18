@@ -71,19 +71,19 @@ function DefaultStitch (|Message| Default, |Message| args)
 
 
 // these can remain...
-function scfunction.CollectDeclsFuncArgs (|Message| prms, |SCBase| AddToSpace, |bool|)
+function scfunction.CollectDeclsFuncArgs (|Message| prms, |SCBase| AddToSpace)
 	opt norefcounts
 	|| cls = .Cls
 		if !prms.HasSelfAsFirst
 			cls.AddSelfToFunc(addtospace)
 			.args <~ cls.SelfDecl
 	  else
-		cls = (.lookup as SCModule).Cls
+		cls = .lookup|SCModule|.Cls
 
 	for item in prms
 		// can remove some shit thats only applicable here... :D
 		require item.CollectFuncArg(self, AddToSpace, cls)
-	return true
+
 
 function Message.CollectFuncArg (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
 	opt norefcounts
@@ -102,33 +102,57 @@ function Message.CollectFuncArg (|scfunction| func, |SCBase| Recv, |scclass| cls
 		func.IsAssigns = 1
 		.addvalue(func)
 
-	return .CollectDecl(func, recv, 4, func.args, cls, func)
+	if .Expect(@decl)
+		|| dcl = .CollectDecl(func, recv, 4, func.args, cls, func)
+			(dcl is param)
+			(dcl isnt altered)
+			return true
+
+
 
 
 function SCClass.CollectDeclsProperties (|bool|)
 	opt norefcounts
 	for item in .SourceArg
-		require item.CollectProp( self)
+		if item == @decl
+			require item.CollectProp( self)
 	return true
 
-
 function Message.CollectProp (|scclass| cls, |bool|)
-	return .collectdecl( cls.modul, cls, 3, cls.properties, cls, nil)
-
-
-function CollectDeclsGlobals (|Message| arg, |SCBase| scarg)
 	opt norefcounts
-	for item in arg
-		require item.collectdecl(scarg, scarg, 1, nil, nil, nil)
+	|| dcl = .collectdecl( cls.modul, cls, 3, cls.properties, cls, nil)
+		(dcl is property)
+		dcl.becomereal
+		return true
 
 
 
 // remove these... but later.
-function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg) 	// remove later... :)
-	// basically... the caller needs fixing.
+function CollectDeclsGlobals (|Message| arg, |SCBase| scarg)
 	opt norefcounts
 	for item in arg
-		require item.collectdecl(scarg, scarg, 8, nil, nil, nil)
+		if item == @decl
+			require item.CollectAGlobalDecl(scarg)
+
+function Message.CollectAGlobalDecl (|SCBase| scarg, |bool|)
+	opt norefcounts
+	|| dcl = .CollectDecl(scarg, scarg, 1, nil, nil, nil)	
+		(dcl is property)
+		(dcl is onmodule)
+		return true
+		
+
+
+
+function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg) 	// remove later... :)
+	opt norefcounts	// basically... the caller needs fixing.
+	for item in arg
+		if item == @decl
+			require item.CollectFromBody(scarg)
+
+function Message.CollectFromBody (|SCBase| scarg, |bool|)
+	opt norefcounts
+	return .CollectDecl(scarg, scarg, 8, nil, nil, nil)
 
 
 
@@ -136,20 +160,14 @@ function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCBase| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
+
 // definitely remove this!
 function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
-function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |scfunction| func,  |bool|)
+function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |scfunction| func,  |scdecl|)
 	// cna remove Recv also! only used at end or for modetesting (Funcarg)
-	// can just return a decl instead?
-	// if (Mode&1) can be removed
-	// if (Func) : dcl is param // can be removed!!!
-	// all put into their correct owner funcs!
-	if self != @Decl // remove this! with our new design
-		return (!Func) #expect ( self, "Not a declaration." )
-
 	|| Types = .first
 	|| Names = types.Next				
 
@@ -164,6 +182,9 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 
 	
 	|SCDecl--| DefaultDcl
+	if recv isa SCArg
+		if mode != 4 and 8
+			"oof $mode"
 	if func
 		0
 	  elseif (Default)
@@ -171,16 +192,11 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 		if (sdcl)   // make sure it matches.
 			default = sdcl.ExpectMatch( DefaultDcl, kTypeCastTrue, default )
 		
-	  elseif (cls)
-		0 // no defaults... its a property
-		
-	  elseif (sdcl) and ( !Default ) and (sdcl.CanUseDefault)
+	  elseif (!cls) and (sdcl) and ( !Default ) and (sdcl.CanUseDefault)
 		Default = sdcl.CreateDefault(types, Recv isa SCArg)
 		if (Default)
 			TypeOfExpr( default, P )
 			DefaultStitch( Default, self )
-	
-//		require (stderr.errorcount == OriginalErrCount)
 	
 	|bool| NoOriginalDcl = !Sdcl
 	if (NoOriginalDcl)
@@ -196,10 +212,9 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 		sdcl = sdcl.Containedfix
 	
 	if !names		// a return value, how to return the return value?
-		expect ((Func and !func.ReturnType) and (!.Next)) ( self, "Parameter is missing a name." )
-		if (Func)
-			func.ReturnType = sdcl
-		return true
+		expect (.islast) ( self, "Parameter is missing a name." )
+		func.ReturnType = sdcl
+		return nil
 	
 	
 	|| NameItm = .GetDclName #require
@@ -217,22 +232,12 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 	dcl.Default = Default
 	dcl.Name = nameitm.name
 	(dcl Isnt Const) // erase IsConst, happens if we parse "|| bla = true"
-	if func
-		(dcl is param)
-		(dcl isnt altered)
 
 	if names and !Default
 		if names.next == @list
 			error names
 		  else
 			names.expectlast
-			
-	if (Mode&1)
-		(dcl is property)
-		if Mode == 1
-			(dcl is onmodule)
-		  else
-			dcl.becomereal
 		
 	if out!=nil
 		out <~ dcl
@@ -241,9 +246,9 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 	if default and defaultdcl
 		dcl.ConstCheck(nil, default, DefaultDcl)
 	
-	if (Recv)
-		Recv.TryAdd( nameitm, dcl, dcl.Name )
-	return true
+	if (Recv) // this is never nil??? where is nil?
+		Recv.TryAdd( self, dcl, dcl.Name )
+	return dcl
 
 
 
