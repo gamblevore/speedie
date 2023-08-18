@@ -71,7 +71,7 @@ function DefaultStitch (|Message| Default, |Message| args)
 
 
 // these can remain...
-function CollectDeclsFuncArgs (|Message| prms, |scfunction| func, |SCBase| AddToSpace, |[SCDecl]|)
+function scfunction.CollectDeclsFuncArgs (|Message| prms, |SCBase| AddToSpace, |bool|)
 	opt norefcounts
 //	|| cls = func.Cls
 //	if (!cls)
@@ -83,16 +83,13 @@ function CollectDeclsFuncArgs (|Message| prms, |scfunction| func, |SCBase| AddTo
 //		cls.AddSelfToFunc(addtospace)
 //		rz <~ cls.SelfDecl
 
-	if !CollectdeclsMulti(prms, func, AddToSpace, 4, rz)
-		rz = nil
+	return CollectdeclsMulti(prms, self, AddToSpace, 4, .args)
 
-function SCClass.CollectDeclsProperties (|[SCDecl]|)
-	if !CollectdeclsMulti( .sourcearg, .Modul, self, 3, rz)
-		rz = nil
-
+function SCClass.CollectDeclsProperties (|bool|)
+	return CollectDeclsMulti( .sourcearg, .Modul, self, 3, .properties)
 
 function CollectDeclsGlobals (|Message| arg, |SCBase| scarg, |[SCDecl]|)
-	CollectdeclsMulti(arg, scarg, scarg, 1, nil)
+	CollectDeclsMulti(arg, scarg, scarg, 1, nil)
 	
 
 // remove this also... but later.

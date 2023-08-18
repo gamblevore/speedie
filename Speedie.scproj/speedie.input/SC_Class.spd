@@ -163,10 +163,8 @@ function AutoConstructor
 
 function LoadProperties
 	require !.IsBehaviourTable
-	.Properties = .CollectDeclsProperties
-	if .properties == nil // fail gracefully
-		.properties = []
-		return
+	require .CollectDeclsProperties
+
 	|| it = .properties.first
 		expect (!self.IsRole) (it.source, "Roles can't have properties!")
 	for (p in .properties)

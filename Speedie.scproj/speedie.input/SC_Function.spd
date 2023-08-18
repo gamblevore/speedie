@@ -217,7 +217,7 @@ function CheckNotBadName
 
 
 function FuncDecls 
-	|| P = .Source[1]		#require
+	|| P = .Source.second		#require
 	|| fc = p.first
 	
 	if (fc == @thg)
@@ -226,17 +226,14 @@ function FuncDecls
 	|| A = .SourceArg
 	|| space = (A.scarg( self ), nil)(a)
 	
-	if P == @arg
-		P = «prm »
-	
 	if (P==@List or @Bra or @prm)
 		p.Func = @prm
-		.Args = CollectDeclsFuncArgs( P, self, space )
-		FuncStats[.args.length min 11]++ 
+		.CollectDeclsFuncArgs( P, space )
+	FuncStats[.args.length min 11]++ 
 
 	if space and !.cls
 		|| L = .lookup|SCModule|
-		if (L isa SCModule)  and  (L.IsProperModule)
+		if  (L isa SCModule)  and  (L.IsProperModule)
 			L.AddModuleToFunc( space )
 
 	if .AllocCode
