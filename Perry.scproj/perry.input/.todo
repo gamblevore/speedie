@@ -19,7 +19,9 @@
 
 
 // Speedie Do later
+* allow borrowed on params.... why not? if we alter the param? "Variables can’t be borrowed in function parameters
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
+	* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
 * "calledfrom" autocomplete needs to include references to funcs
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
