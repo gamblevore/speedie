@@ -78,11 +78,12 @@ function scfunction.CollectDeclsFuncArgs (|Message| prms, |SCBase| AddToSpace, |
 			cls.AddSelfToFunc(addtospace)
 			.args <~ cls.SelfDecl
 	  else
-		|| L = .lookup as SCModule
-		if (L isa SCModule)
-			cls = L.Cls
+		cls = (.lookup as SCModule).Cls
 
-	return CollectdeclsMulti(prms, self, AddToSpace, 4, .args, cls)
+	for item in prms
+		// can remove some shit thats only applicable here... :D
+		require item.collectdecl(self, AddToSpace, 4, .args, cls)
+	return true
 
 
 function SCClass.CollectDeclsProperties (|bool|)
@@ -135,8 +136,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 			.addvalue(func)
 
 	if self != @Decl
-		expect (!Func)  ( self, "Not a declaration." )
-		return true
+		return (!Func) #expect ( self, "Not a declaration." )
 
 	|| Types = .first
 	|| Names = types.Next				
@@ -151,7 +151,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 		sdcl = P.ParentFunc.ReturnType
 
 	
-	|SCDecl| DefaultDcl
+	|SCDecl--| DefaultDcl
 	if func
 		0
 	  elseif (Default)
