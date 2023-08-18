@@ -612,14 +612,12 @@ function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoite
 function AutoSub (|scbase| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit) // autocompletesub
 	|scdecl| TypeLimiter = nil
 	if NeedTypeLimit
-		TypeLimiter = TypeOfExpr(needtypelimit, scope) // i guess?
-		// well... we want the type to match?
+		TypeLimiter = TypeOfExpr(needtypelimit, scope) // >:P
 	
 	for (value in scope.access) (key)
 		|| orig = value.canauto(name)
-		|| IsExact = orig ~= name
 		if orig and (!name or orig starts name)
-			.autosub2(value, key, orig, found, IsExact, Types, typelimiter)
+			.autosub2(value, key, orig, found, orig ~= name, Types, typelimiter)
 			
 
 
