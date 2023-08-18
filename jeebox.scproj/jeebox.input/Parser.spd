@@ -34,10 +34,9 @@ extend Parser
 
 		|| numb     =   "0123456789".bytesplit
 		|| op_comp  =   "= == === < > <= <== >= >== != !== <=> ~>= ~<= ~> ~< <~ ~= ~!= ~<=> := ??"
-		|| op_math  =   "* / + - ^ & >> << >>> <<< (|)"
+		|| op_math  =   "* / + - ^ & >> << >>> <<< (|) |||"
 		|| PFix		=	"++ -- $ ! ? ..."
 		
-
 		|| H = .Handler( kThingWord, fThingWord ).Link( kTemporalWord, fStatement ).Link( kTemporalWordColon, fStatementColon ).Link( kOppWord, fOppWord )
 		
 		.Tokens( Jeebox.CSWordStart.Bytes, H )
