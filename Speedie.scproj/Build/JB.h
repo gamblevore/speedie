@@ -1496,7 +1496,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_ActualTypecasts ((~(128 | 32)))
 #define kJB_AddressOfMatch (3 << 22)
 #define kJB_BitAnd (JB_LUB[356])
-#define kJB_BitNot (JB_LUB[617])
+#define kJB_BitNot (JB_LUB[607])
 #define kJB_BitOr (JB_LUB[559])
 #define kJB_BitXor (JB_LUB[1895])
 #define kJB_CastedMatch (6 << 22)
@@ -3155,13 +3155,15 @@ SCClass* SC_ClassOfObjForC(Message* curr);
 
 SCBase* SC_ClsCollectTable_pragma(Message* node, SCBase* name_space, Message* ErrPlace);
 
-Array* SC_CollectDecls(Message* DeclList, SCBase* Name_Space, SCBase* AddToSpace, int PropertyMode);
+void SC_CollectDeclsFuncBody(Message* arg, SCBase* scarg);
 
-Array* SC_CollectDeclsFuncArgs(Message* prms, SCBase* Name_Space, SCBase* AddToSpace);
+void SC_CollectDeclsFuncBodyJustWhatWeNewlyMade(Message* arg, SCBase* scarg);
 
-Array* SC_CollectDeclsFuncBody(Message* arg, SCBase* scarg);
+void SC_CollectDeclsFuncBodyUnsureHowToRemove(Message* arg, SCBase* scarg);
 
-Array* SC_CollectDeclsGlobals(Message* arg, SCBase* scarg);
+void SC_CollectDeclsGlobals(Message* arg, SCBase* scarg);
+
+bool SC_CollectDeclsMulti(Message* List, SCBase* P, SCBase* Recv, int Mode, Array* out, SCClass* cls);
 
 bool JB_CompareError(Message* expected, Message* found);
 
@@ -7072,6 +7074,8 @@ bool SC_Msg_ACInIsa(Message* self);
 
 void SC_Msg_AddBefore(Message* self, Message* before, Message* NewItem);
 
+inline void SC_Msg_addvalue(Message* self, SCFunction* f);
+
 void JB_Msg_Adj__(Message* self, FastString* fs);
 
 int JB_Msg_After(Message* self);
@@ -7187,6 +7191,10 @@ int JB_Msg_CleanIndent(Message* self);
 Message* SC_Msg_CmdImprove(Message* self);
 
 void JB_Msg_Cnj__(Message* self, FastString* fs);
+
+bool SC_Msg_CollectDecl(Message* self, SCBase* P, SCBase* Recv, int Mode, Array* out, SCClass* cls, SCFunction* func);
+
+bool SC_Msg_CollectDeclInFunc(Message* self, SCFunction* func, SCBase* Recv, SCClass* cls);
 
 JB_String* SC_Msg_CollectFuncTableName(Message* self);
 
@@ -7940,6 +7948,8 @@ void SC_Class_CheckIterator(SCClass* self);
 
 void SC_Class_ClassCollect(SCClass* self);
 
+bool SC_Class_CollectDeclsProperties(SCClass* self);
+
 void SC_Class_Constructor(SCClass* self, Message* node, SCBase* parent);
 
 void SC_Class_ContainedTypeLoad(SCClass* self);
@@ -8205,6 +8215,8 @@ void SC_Func_CheckNotBadName(SCFunction* self);
 void SC_Func_CheckReturnValue(SCFunction* self, Message* msg);
 
 void SC_Func_Cleanupfunc(SCFunction* self);
+
+bool SC_Func_CollectDeclsFuncArgs(SCFunction* self, Message* prms, SCBase* AddToSpace);
 
 void SC_Func_CollectLinks(SCFunction* self, JB_Object* obj);
 
@@ -8820,6 +8832,17 @@ inline bool JB_Safe_SyntaxCast(JB_String* self) {
 
 inline _cstring JB_Str_SyntaxCast(JB_StringC* self) {
 	return JB_Str_CString(self);
+}
+
+inline void SC_Msg_addvalue(Message* self, SCFunction* f) {
+	if ((!JB_Ring_HasChildCount(self, 2))) {
+		if (true) {
+			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1524])));
+			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
+			JB_MsgPos_Destructor((&_usingf0));
+		}
+	}
 }
 
 inline bool JB_ID_SyntaxCast(MessageID* self) {
