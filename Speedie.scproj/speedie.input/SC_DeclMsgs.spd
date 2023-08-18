@@ -64,7 +64,7 @@ function DefaultStitch (|Message| Default, |Message| args)
 	|| rel = «rel »
 	name.next = rel
 	rel <~ name
-	rel <~ «Opp "="»
+	rel.msg(@Opp,"=")
 	rel <~ Default
 
 
@@ -78,7 +78,7 @@ function scfunction.CollectDeclsFuncArgs (|Message| prms, |SCBase| AddToSpace, |
 			cls.AddSelfToFunc(addtospace)
 			.args <~ cls.SelfDecl
 	  else
-		|| L = .lookup
+		|| L = .lookup as SCModule
 		if (L isa SCModule)
 			cls = L.Cls
 
@@ -99,7 +99,7 @@ function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg)
 
 
 function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCBase| scarg)
-	CollectdeclsMulti(arg, scarg, scarg, 8, nil)
+	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
 // definitely remove this!
@@ -107,135 +107,131 @@ function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
 	CollectdeclsMulti(arg, scarg, scarg, 8, nil)
 
 
+function CollectDeclsMulti (|Message| List, |SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls=nil, |bool|)
+	opt norefcounts
+	for item in list
+		require item.collectdecl(p, recv, mode, out, cls)
+	return true
 
-function CollectDeclsMulti (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSpace, |int| PropertyMode, |[SCDecl]| out, |scclass| cls=nil, |bool|)	
-//	|| OriginalErrCount = stderr.errorcount
-	|SCFunction--|	Func
-	if PropertyMode == 4
-		func = name_space|scfunction|
 
+function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |bool|)
+	|SCFunction--|	Func = (P|scfunction|, nil)(Mode == 4)
 
-	for item in DeclList
-		if (func and func.isassigns == 2) and item.islast
-			if !cls
-				error (item, "Can’t use this here." )
-			  else
-				// fn x (|int|) --> fn x (|int| value)
-				func.IsAssigns = 3
-				if cls.IsDataType
-					item.next = item.copy // fn x (|int|) --> fn x (|int| value, |int|)
-				if !item.HasChildCount(2)
-					using func.source
-						item <~ «thg "Value"»
-			
-		if item == @Item
-			expect  (Func)  (item, "Can’t use this here." )
-			if item.first == "assigns" // remove this after fixing galaxxies :(
-				item = item.Last
-				func.IsAssigns = 1
-				if !item.haschildcount(2)
-					using func.source
-						item <~ «thg "Value"»
-
-		if item != @Decl
-			expect (!Func)  ( item, "Not a declaration." )
-			continue
-
-		|| Types = item.first
-		|| Names = types.Next				
-
-		expect (Func or Names)  (item, "No name found.")
-		if (PropertyMode & 2)
-			expect (names == @thg) (names, "Must be a proper name (a-z or unicode-letters)")
-
-		|| Default = DeclsDefault( names )
-		|| Sdcl = ExtractDecl( Types, name_Space )
-		if (!sdcl and !default and (Name_space isa SCArg))
-			sdcl = name_space.ParentFunc.ReturnType
-
+	if (func and func.isassigns == 2) and .islast
+		if !cls
+			error (self, "Can’t use this here." )
+		  else
+			// fn x (|int|) --> fn x (|int| value)
+			func.IsAssigns = 3
+			if cls.IsDataType
+				.next = .copy // fn x (|int|) --> fn x (|int| value, |int|)
+			.addvalue(func)
 		
-		|SCDecl| DefaultDcl
-		if func
-			0
-		  elseif (Default)
-			DefaultDcl = TypeOfExprNeeded( Default, name_space ) #require
-			if (sdcl)   // make sure it matches.
-				default = sdcl.ExpectMatch( DefaultDcl, kTypeCastTrue, default )
-			
-		  elseif (cls)
-			0 // no defaults... its a property
-			
-		  elseif (sdcl) and ( !Default ) and (sdcl.CanUseDefault)
-			Default = sdcl.CreateDefault(types, AddToSpace isa SCArg)
-			if (Default)
-				TypeOfExpr( default, Name_Space )
-				DefaultStitch( Default, item )
+	if self == @Item
+		expect  (Func)  (self, "Can’t use this here." )
+		if .first == "assigns" // remove this after fixing galaxxies :(
+			self = .Last
+			func.IsAssigns = 1
+			.addvalue(func)
+
+	if self != @Decl
+		expect (!Func)  ( self, "Not a declaration." )
+		return true
+
+	|| Types = .first
+	|| Names = types.Next				
+
+	expect (Func or Names)  (self, "No name found.")
+	if (Mode & 2)
+		expect (names == @thg) (names, "Must be a proper name (a-z or unicode-letters)")
+
+	|| Default = DeclsDefault( names )
+	|| Sdcl = ExtractDecl( Types, P )
+	if (!sdcl and !default and (P isa SCArg))
+		sdcl = P.ParentFunc.ReturnType
+
+	
+	|SCDecl| DefaultDcl
+	if func
+		0
+	  elseif (Default)
+		DefaultDcl = TypeOfExprNeeded( Default, P ) #require
+		if (sdcl)   // make sure it matches.
+			default = sdcl.ExpectMatch( DefaultDcl, kTypeCastTrue, default )
 		
+	  elseif (cls)
+		0 // no defaults... its a property
+		
+	  elseif (sdcl) and ( !Default ) and (sdcl.CanUseDefault)
+		Default = sdcl.CreateDefault(types, Recv isa SCArg)
+		if (Default)
+			TypeOfExpr( default, P )
+			DefaultStitch( Default, self )
+	
 //		require (stderr.errorcount == OriginalErrCount)
-		
-		|bool| NoOriginalDcl = !Sdcl
-		if (NoOriginalDcl)
-			if (cls) and (cls.Contained)
-				sdcl = cls.Contained // (|| x = Y), (|object| x = Y)
-			  else
-				expect (!Func and defaultdcl) ( item, ("Function declarations need a type. (Unless it's in a container class.)", "Missing type, or default value.")(!func) )
-				sdcl = DefaultDcl
-		
-		expect !(func and sdcl is Borrowed) (item, "Variables can’t be borrowed in function parameters or return")
-		
-		if sdcl.NeedsContainedfix
-			sdcl = sdcl.Containedfix
-		
-		if !names		// a return value, how to return the return value?
-			expect ((Func and !func.ReturnType) and (!item.Next)) ( item, "Parameter is missing a name." )
-			if (Func)
-				debugger (!sdcl.Default and sdcl isnt Borrowed)
-				func.ReturnType = sdcl
-			Continue
-		
-		
-		|| NameItm = item.GetDclName #require
-		|| dcl = Sdcl.copy
-		
-		if (propertymode & 8) and NoOriginalDcl // functionbody
-			if sdcl isnt StayBorrowed
-				(Dcl Isnt Borrowed)
-			dcl.nildeclared = NilState.Either // can be freely changed!
-		
-		nameitm.obj = dcl
-		if (nameitm in @Rel)
-			nameitm.Parent.obj = dcl
-		
-		dcl.Default = Default
-		dcl.Name = nameitm.name
-		(dcl Isnt Const) // erase IsConst, happens if we parse "|| bla = true"
-		if func
-			(dcl is param)
-			(dcl isnt altered)
+	
+	|bool| NoOriginalDcl = !Sdcl
+	if (NoOriginalDcl)
+		if (cls) and (cls.Contained)
+			sdcl = cls.Contained // (|| x = Y), (|object| x = Y)
+		  else
+			expect (!Func and defaultdcl) ( self, ("Function declarations need a type. (Unless it's in a container class.)", "Missing type, or default value.")(!func) )
+			sdcl = DefaultDcl
+	
+	expect !(func and sdcl is Borrowed) (self, "Variables can’t be borrowed in function parameters or return")
+	
+	if sdcl.NeedsContainedfix
+		sdcl = sdcl.Containedfix
+	
+	if !names		// a return value, how to return the return value?
+		expect ((Func and !func.ReturnType) and (!.Next)) ( self, "Parameter is missing a name." )
+		if (Func)
+			debugger (!sdcl.Default and sdcl isnt Borrowed)
+			func.ReturnType = sdcl
+		return true
+	
+	
+	|| NameItm = .GetDclName #require
+	|| dcl = Sdcl.copy
+	
+	if (Mode & 8) and NoOriginalDcl // functionbody
+		if sdcl isnt StayBorrowed
+			(Dcl Isnt Borrowed)
+		dcl.nildeclared = NilState.Either // can be freely changed!
+	
+	nameitm.obj = dcl
+	if (nameitm in @Rel)
+		nameitm.Parent.obj = dcl
+	
+	dcl.Default = Default
+	dcl.Name = nameitm.name
+	(dcl Isnt Const) // erase IsConst, happens if we parse "|| bla = true"
+	if func
+		(dcl is param)
+		(dcl isnt altered)
 
-		if names and !Default
-			if names.next == @list
-				error names
-			  else
-				names.expectlast
-				
-		if (PropertyMode&1)
-			(dcl is property)
-			if PropertyMode == 1
-				(dcl is onmodule)
-			  else
-				dcl.becomereal
+	if names and !Default
+		if names.next == @list
+			error names
+		  else
+			names.expectlast
 			
+	if (Mode&1)
+		(dcl is property)
+		if Mode == 1
+			(dcl is onmodule)
+		  else
+			dcl.becomereal
 		
-		if out!=nil
-			out <~ dcl
-		nameitm.obj = dcl
-		dcl.Source = item
-		if default and defaultdcl
-			dcl.ConstCheck(nil, default, DefaultDcl)
-		
-		if (AddToSpace)
-			AddToSpace.TryAdd( nameitm, dcl, dcl.Name )
+	if out!=nil
+		out <~ dcl
+	nameitm.obj = dcl
+	dcl.Source = self
+	if default and defaultdcl
+		dcl.ConstCheck(nil, default, DefaultDcl)
+	
+	if (Recv)
+		Recv.TryAdd( nameitm, dcl, dcl.Name )
 	return true
 
 
@@ -263,4 +259,11 @@ function scdecl.Containedfix (|scdecl|)
 	|| t = .type
 	rz = (.copy, self)(T.typenormal == self)
 	rz.contains = t.SelfDecl.Contains
-		
+
+
+function message.addvalue (|scfunction| f)
+	opt norefcounts
+	pragma inline
+	if !.HasChildCount(2)
+		using f.source
+			self <~ «thg "Value"»
