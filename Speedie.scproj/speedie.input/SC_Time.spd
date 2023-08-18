@@ -2,15 +2,17 @@
 
 function compiler.PrintCompileTime (|date| durr) 	
 	if StdErr.OK and !options.silent
+		print "\nStages:            "
+		print Compiler.CurrStage
 		print "\nClasses:           "
 		compiler.ReachedClassCount.render.printlinecolor(errorcolors.good)
-		print "Funcs:             "
+		print   "Funcs:             "
 		"${compiler.reachedfuncs} / ${compiler.funclist.length}".printlinecolor(errorcolors.good)
 
-		print "Total elapsed:	   "
+		print   "Total elapsed:	   "
 		(durr.renderdurr+"s").printlinecolor(errorcolors.good)
 
-		Print "Input source code: "
+		Print   "Input source code: "
 		"${Compiler.stTotalSourceSize/1024} KB\n".printcolor(errorcolors.good)
 
 
