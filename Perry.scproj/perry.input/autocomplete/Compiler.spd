@@ -118,7 +118,7 @@ extend PerryIDE
 	
 	function Say (|string| str)
 		target osx
-			if SDLApp.IsBackground
+			if !.IsFront
 				.Talker = ShellStream("/usr/bin/say", [.name.trimext + str])
 	
 	function CompileFB (|message| msg, |bool|)

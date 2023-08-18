@@ -163,7 +163,7 @@ function AutoConstructor
 
 function LoadProperties
 	require !.IsBehaviourTable
-	.Properties = CollectDecls( .sourcearg, .Modul, self, 3 )
+	.Properties = .CollectDeclsProperties
 	if .properties == nil // fail gracefully
 		.properties = []
 		return

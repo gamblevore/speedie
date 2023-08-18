@@ -25,15 +25,14 @@ function Message.CreateOwnBlock (|Message|)
 
 	using (self)
 		
-	|| NewArg = «arg »
-	|| bra = «bra, NewArg »
+	|| bra = «bra »
 	bra.obj = .obj
-	.replacewith(bra)
+	rz = bra.msg(@arg)
+	.ReplaceWith(bra)
 	
-	|| NewObj = NewArg.scarg(nil)
+	|| NewObj = rz.scarg(nil)
 	NewObj.TmpMovedOutFor = self
 	newobj.IsStatementExpr = true // jeez sheesh. shouldn't have to set this?
-	return NewArg
 
 
 function message.TheTmpVarOf (|string| tmpname, |message|)

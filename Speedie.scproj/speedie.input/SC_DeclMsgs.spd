@@ -70,24 +70,19 @@ function DefaultStitch (|Message| Default, |Message| args)
 
 
 function CollectDeclsFuncArgs (|Message| prms, |SCBase| Name_Space, |SCBase| AddToSpace, |[SCDecl]|)
-	return CollectDecls(prms, Name_Space, AddToSpace, 0)
+	return CollectdeclsMulti(prms, Name_Space, AddToSpace, 0)
 
 function CollectDeclsGlobals (|Message| arg, |SCBase| scarg, |[SCDecl]|)
-	return CollectDecls(arg, scarg, scarg, 1)
+	return CollectdeclsMulti(arg, scarg, scarg, 1)
 	
 function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg, |[SCDecl]|)
-	return CollectDecls(arg, scarg, scarg, 0)
+	return CollectdeclsMulti(arg, scarg, scarg, 0)
 
-function CollectDeclsProperties (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSpace, |[SCDecl]|)
-	
+function SCClass.CollectDeclsProperties (|[SCDecl]|)
+	return CollectdeclsMulti( .sourcearg, .Modul, self, 3 )
 
 
-function CollectDecls (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSpace, |int| PropertyMode=0, |[SCDecl]|)
-	if (!DeclList)
-		return []
-	expect  (DeclList == @prm or @Arg)  (DeclList)
-	
-	
+function CollectDeclsMulti (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSpace, |int| PropertyMode=0, |[SCDecl]|)	
 	|| OriginalErrCount = stderr.errorcount
 	|SCFunction--|	Func
 	|SCClass--|		Cls
