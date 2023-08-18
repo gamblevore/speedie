@@ -8,14 +8,11 @@
 
 
 // Perry Do later
-* textview jumping is a bit awkward... 
-	* selectedline on startup is right at the top... so you can't see the lines above :(
+* SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping
 
-* many autocompletes missing! like .hasany, .second, .first, etc.
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
-* tab on "function app.funcname" (in func params) doesn't work.
 * TextView error/find resync
 * too long text in listview draw as much as we can
 
