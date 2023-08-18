@@ -436,7 +436,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 			Return TypeArray.TypeNormal
 		
 		expect (ch != @Item) (c)
-		rz.Contains = ExtractDecl( ch, name_space ).makeoptional
+		rz.Contains = ExtractDecl( ch, name_space ).MakeContainedOptional
 		rz.TypeContained = TypeArray
 		
 	  elseif (f == @Adj)
@@ -473,7 +473,7 @@ function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Nam
 	|| Cont = ExtractDecl( Contained, name_space )$
 	.type = R.Type
 
-	.contains = cont.makeoptional
+	.contains = cont.MakeContainedOptional
 	if typewrapper.typenormal.match(R, ktypecastfalse).isnormalmatch
 		expect (!Cont.isnormalobject)  ( wrap, "Datatype-wrappers can't contain this." )
 	  else
@@ -844,7 +844,7 @@ function TypeOfArr (ExprResolver)
 			if  !result.Contains.type.isobject
 				result.Contains = result.Contains.newwrapper(result.Contains)
 			else
-				result.Contains = result.Contains.makeoptional
+				result.Contains = result.Contains.MakeContainedOptional
 
 		
 	result.Type := typearray

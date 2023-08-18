@@ -773,11 +773,15 @@ class SCDecl (SCObject) {
 
 
 	function MakeOptional (|SCDecl|)
-		// this is declared optional...
-		// the default type state is "either"... which is almost the same just undeclared
+		// this becomes declared optional...
+		// the default state is "either" (undeclared)
 		return .MakeNil(nilstate.optional, .type.TypeOptional)
 	
-	
+	function MakeContainedOptional (|scdecl|)
+		if .NilDeclared is Stated
+			return self
+		return .MakeOptional
+		
 	function MakeReal (|SCDecl|)
 		return .MakeNil(nilstate.real,  .type.TypeVeryExists)
 	

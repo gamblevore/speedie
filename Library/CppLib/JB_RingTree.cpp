@@ -177,7 +177,6 @@ bool JB_Ring_HasChildren( RingTree* self ) {
 }
 
 int JB_Ring_Count( RingTree* self ) {
-	Sanity( self );
 	RingTree* c = self->Child;
 	
     int N = 0;
@@ -190,7 +189,6 @@ int JB_Ring_Count( RingTree* self ) {
 }
 
 bool JB_Ring_HasChildCount( RingTree* self, int HasCount ) {
-	Sanity( self );
 	RingTree* c = self->Child;
 	
 	while ( HasCount-- >= 1 ) {
@@ -204,36 +202,43 @@ bool JB_Ring_HasChildCount( RingTree* self, int HasCount ) {
 }
 
 RingTree* JB_Ring_Last( RingTree* self ) {
-	RingTree* c = self->Child;
-
-	if ( c ) {
-		return c->Prev;
+	if (self) {
+		RingTree* c = self->Child;
+		if ( c ) {
+			return c->Prev;
+		}
 	}
 	return 0;
 }
 
 RingTree* JB_Ring_NextSib( RingTree* self ) {
-	Sanity( self );
-	return self->Next;
+	if (self) {
+		return self->Next;
+	}
+	return 0;
 }
 
 RingTree* JB_Ring_PrevSib( RingTree* self ) {
-	Sanity( self );
-	RingTree* Prev = self->Prev;
-	
-	if (Prev and Prev->Next) { // the last one has no next!
-		return Prev;
+	if (self) {
+		RingTree* Prev = self->Prev;
+		if (Prev and Prev->Next) { // the last one has no next!
+			return Prev;
+		}
 	}
-	
+		
 	return 0;
 }
 
 RingTree* JB_Ring_First( RingTree* self ) {
-	return self->Child;
+	if (self)
+		return self->Child;
+	return 0;
 }
 
 RingTree* JB_Ring_Parent( RingTree* self ) {
-	return self->Parent;
+	if (self)
+		return self->Parent;
+	return 0;
 }
 
 RingTree* JB_Ring_Root( RingTree* self ) {
@@ -247,8 +252,10 @@ RingTree* JB_Ring_Root( RingTree* self ) {
 
 
 bool JB_Ring_IsRoot( RingTree* self ) {
-	Sanity( self );
-	return ( !self->Parent );
+	if (self) {
+		return ( !self->Parent );
+	}
+	return 0;
 }
 
 
