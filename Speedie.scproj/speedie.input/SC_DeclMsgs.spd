@@ -73,26 +73,27 @@ function DefaultStitch (|Message| Default, |Message| args)
 // these can remain...
 function scfunction.CollectDeclsFuncArgs (|Message| prms, |SCBase| AddToSpace, |bool|)
 	opt norefcounts
-//	|| cls = func.Cls
-//	if (!cls)
-//		|| L = func.lookup
-//		if (L isa SCModule) // i'm not sure this is correct.
-//			cls = L.Cls     // just cos its a module of a class... doesnt mean it has a class... 
-//							 cls could just be func.cls then?
-//	  elseif !prms.HasSelfAsFirst
-//		cls.AddSelfToFunc(addtospace)
-//		rz <~ cls.SelfDecl
+	|| cls = .Cls
+		if !prms.HasSelfAsFirst
+			cls.AddSelfToFunc(addtospace)
+			.args <~ cls.SelfDecl
+	  else
+		|| L = .lookup
+		if (L isa SCModule)
+			cls = L.Cls
 
-	return CollectdeclsMulti(prms, self, AddToSpace, 4, .args)
+	return CollectdeclsMulti(prms, self, AddToSpace, 4, .args, cls)
+
 
 function SCClass.CollectDeclsProperties (|bool|)
-	return CollectDeclsMulti( .sourcearg, .Modul, self, 3, .properties)
+	return CollectDeclsMulti( .sourcearg, .Modul, self, 3, .properties, self)
 
-function CollectDeclsGlobals (|Message| arg, |SCBase| scarg, |[SCDecl]|)
+
+function CollectDeclsGlobals (|Message| arg, |SCBase| scarg)
 	CollectDeclsMulti(arg, scarg, scarg, 1, nil)
-	
 
-// remove this also... but later.
+
+// remove these... but later.
 function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg) 	// remove later... :)
 	CollectdeclsMulti(arg, scarg, scarg, 8, nil)			// basically... the caller needs fixing.
 
@@ -107,24 +108,12 @@ function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
 
 
 
-function CollectDeclsMulti (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSpace, |int| PropertyMode, |[SCDecl]| out, |bool|)	
-	|| OriginalErrCount = stderr.errorcount
+function CollectDeclsMulti (|Message| DeclList, |SCBase| Name_Space, |SCBase| AddToSpace, |int| PropertyMode, |[SCDecl]| out, |scclass| cls=nil, |bool|)	
+//	|| OriginalErrCount = stderr.errorcount
 	|SCFunction--|	Func
-	|SCClass--|		Cls
-	
 	if PropertyMode == 4
-		func = Name_Space|scfunction|
-		cls = func.Cls
-		if (cls)
-			if !DeclList.HasSelfAsFirst
-				cls.AddSelfToFunc(addtospace)
-				out <~ cls.SelfDecl
-		  else
-			|| L = func.lookup
-			if (L isa SCModule)
-				cls = L.Cls
-	  elseif (AddToSpace isa SCClass)
-		cls = AddToSpace
+		func = name_space|scfunction|
+
 
 	for item in DeclList
 		if (func and func.isassigns == 2) and item.islast
@@ -182,7 +171,7 @@ function CollectDeclsMulti (|Message| DeclList, |SCBase| Name_Space, |SCBase| Ad
 				TypeOfExpr( default, Name_Space )
 				DefaultStitch( Default, item )
 		
-		require (stderr.errorcount == OriginalErrCount)
+//		require (stderr.errorcount == OriginalErrCount)
 		
 		|bool| NoOriginalDcl = !Sdcl
 		if (NoOriginalDcl)
