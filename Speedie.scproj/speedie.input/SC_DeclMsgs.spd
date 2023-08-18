@@ -82,7 +82,7 @@ function scfunction.CollectDeclsFuncArgs (|Message| prms, |SCBase| AddToSpace, |
 
 	for item in prms
 		// can remove some shit thats only applicable here... :D
-		require item.collectdecl(self, AddToSpace, 4, .args, cls)
+		require item.collectdeclinfunc(self, AddToSpace, cls)
 	return true
 
 
@@ -108,34 +108,40 @@ function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
 	CollectdeclsMulti(arg, scarg, scarg, 8, nil)
 
 
-function CollectDeclsMulti (|Message| List, |SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls=nil, |bool|)
+function CollectDeclsMulti (|Message| List, |SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls=nil,  |bool|)
 	opt norefcounts
 	for item in list
-		require item.collectdecl(p, recv, mode, out, cls)
+		require item.collectdecl(p, recv, mode, out, cls, nil)
 	return true
 
 
-function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |bool|)
-	|SCFunction--|	Func = (P|scfunction|, nil)(Mode == 4)
-
-	if (func and func.isassigns == 2) and .islast
+function Message.CollectDeclInFunc (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
+	opt norefcounts
+	if (func.isassigns == 2) and .islast
 		if !cls
 			error (self, "Can’t use this here." )
 		  else
-			// fn x (|int|) --> fn x (|int| value)
+			// setter x (|int|) --> fn x (|int| value)
 			func.IsAssigns = 3
 			if cls.IsDataType
 				.next = .copy // fn x (|int|) --> fn x (|int| value, |int|)
 			.addvalue(func)
 		
-	if self == @Item
-		expect  (Func)  (self, "Can’t use this here." )
-		if .first == "assigns" // remove this after fixing galaxxies :(
-			self = .Last
-			func.IsAssigns = 1
-			.addvalue(func)
+	if self == @Item and .first == "assigns"
+		self = .Last
+		func.IsAssigns = 1
+		.addvalue(func)
 
-	if self != @Decl
+	return .CollectDecl(func, recv, 4, func.args, cls, func)
+
+
+function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |scfunction| func,  |bool|)
+	// cna remove Recv also! only used at end or for modetesting (Funcarg)
+	// can just return a decl instead?
+	// if (Mode&1) can be removed
+	// if (Func) : dcl is param // can be removed!!!
+	// all put into their correct owner funcs!
+	if self != @Decl // remove this! with our new design
 		return (!Func) #expect ( self, "Not a declaration." )
 
 	|| Types = .first
@@ -186,7 +192,6 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 	if !names		// a return value, how to return the return value?
 		expect ((Func and !func.ReturnType) and (!.Next)) ( self, "Parameter is missing a name." )
 		if (Func)
-			debugger (!sdcl.Default and sdcl isnt Borrowed)
 			func.ReturnType = sdcl
 		return true
 	
