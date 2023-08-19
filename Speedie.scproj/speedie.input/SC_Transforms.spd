@@ -337,13 +337,12 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 		TypeOfExpr( s, p )
 		if s == @func
 			.FastStringOpt(s, p)
-
+			
+	  elseif f == @unit
+		return  // units have internal structure that can be damaged
 	
 	if (s == @arg) and (f != @arg)
 		p = s.scarg(p) // Resync
-
-
-	require (f != @unit) // units have internal structure that can be damaged
 	
 	|| ch = s.first
 	while (ch)
@@ -357,7 +356,6 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 			ch = n				  // but why do we want to store it?: "n = ch.next"?
 							      // basially we get a bug on one line. Just fix that and remove this code.
 							      // altering the tree isn't cool really... makes things too tricky. 
-
 
 
 		
