@@ -8,7 +8,6 @@
 * make collectdecls not loopy
 
 // Perry Do later
-* on build DONT open the build area wider if its already open!!
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping
 
@@ -19,7 +18,6 @@
 
 
 // Speedie Do later
-* when speedie receives errors from sub-speedie... unpack and send them to OUR errorlist!
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
 	* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
 * "calledfrom" autocomplete needs to include references to funcs
