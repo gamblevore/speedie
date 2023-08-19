@@ -148,10 +148,10 @@ class StretchDivider (GuiControl)
 	function Show
 		opt norefcounts
 		|| pr = .parent.lastrect
-		|| s = .start.length
-		if s < 10
-			s = mix(pr[.d], pr[.d+2], 0.333)|int|
-		if .ActiveEnd.length < s
+		if .ActiveEnd.length < 10
+			|| s = .start.length
+			if s < 10
+				s = mix(pr[.d], pr[.d+2], 0.333)|int|
 			.ActiveEnd = (s)~up
 
 		
