@@ -9,7 +9,7 @@ module beep
 function errorlist.Beep (|bool|)
 	if .ok
 		return true
-	|| err = .FirstError()
+	|| err = .LastError()
 	|| s = (err.render, "Unknown error occurred.")(err)
 	app.beep(s)
 

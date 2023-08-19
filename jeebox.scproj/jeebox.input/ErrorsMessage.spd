@@ -54,3 +54,26 @@ extend_module Error
 		visible // for lib
 		|| msg = "Can’t parse number '${num[0,10]}' (found '${num[pos]}')."
 		stderr <~ error(where, msg) // we are done.
+
+	function From (|message| self, |error|)
+		opt norefcounts
+		require self
+		if self != @arg
+			return .AsError
+		rz = error()
+		for s in self
+			rz <~ s.AsError
+	
+	
+function message.AsError (|error|)
+	rz = error(nil)
+	|| arg = .Last
+	if arg == @arg
+		rz.position		= arg..pos.int|int|
+		rz.path			= arg..file.value
+		rz.severity		= arg..severity.int|errorseverity|
+		rz.name	= arg[@str].nyme
+	  else
+		rz.name = .name
+		rz.path = ""
+

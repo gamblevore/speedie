@@ -87,17 +87,12 @@ syntax access (|string| s, |scobject|)
 		return .access.valuelower(s)
 
 
-function scclass.UpCheckSub (|string| name, |scobject|)
-	opt norefcounts
-	for (c.upwards in self)
-		|| it = c[name] 
-			return it
-
-
 function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {
 	opt norefcounts
 	if LookUp and (self isa SCClass)
-		return .upchecksub(name)
+		for (c.upwards in self)
+			|| it = c[name] 
+				return it
 		
 	ifn (self isa scarg)
 		return self[name]
@@ -116,13 +111,12 @@ function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {
 // so upcheck shouldn't work, if we are on a function, right?
 
 function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
-	require (IncObj)		
-	name = name.Lowercase
-	expect (name) ( ErrPlace, "Empty name." )
-	expect (name.length <= 64) ( ErrPlace, "Name is too long." )
+	require (IncObj)
+	expect (name.length inrange 64) ( ErrPlace, "Name should be 1-64 bytes long." )
 
 	.access := Dictionary.new
 
+	name = name.Lowercase
 	|| Old = .Upcheck( name, !(IncObj isa SCFunction) )
 	if (!Old)
 		.access[ name ] = IncObj

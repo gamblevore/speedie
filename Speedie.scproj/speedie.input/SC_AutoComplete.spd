@@ -466,16 +466,12 @@ function SCObject.CanAutoSub (|string| search, |string|)
 							 // for some cases... yes, but not for plain autocomplete.
 							 // only for exact match
 							 // i can't remember why i added it, so just remove it :[
-		return .name
-		
-	if self isa scdecl
+	  elseif self isa scdecl
 		return .realname
 		
-	if self isa scmodule
+	  elseif self isa scmodule
 		|| cls = .cls
 			require !(cls.NoAutoComplete or cls.IsBehaviourTable)
-		return .name
-		
 	return .name
 
 

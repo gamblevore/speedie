@@ -206,10 +206,10 @@ class ErrorList
 		for e in self
 			stderr <~ e
 
-	function FirstError (|error|)
+	function LastError (|error|)
 		visible
 		opt norefcounts
-		for err in .errors
+		for err.reverse in .errors
 			if Err.iserror
 				return err
 

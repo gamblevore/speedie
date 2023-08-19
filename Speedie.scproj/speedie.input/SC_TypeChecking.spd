@@ -26,7 +26,7 @@ function RelSetOrExpansion (|Message| exp)
 	»
 	
 	|| P = exp.parent
-	((p,exp)(P == @decl)).next = tmp
+	((p, exp)(P == @decl)).next = tmp
 
 
 function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCBase| name_space, |SCDecl|)

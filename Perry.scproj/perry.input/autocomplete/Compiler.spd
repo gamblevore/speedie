@@ -60,7 +60,7 @@ extend PerryIDE
 
 		is Broken
 		.NoNeed
-		.errorlist.listsource = MaybeOK.jberrors
+		.errorlist.listsource = error.from(MaybeOK)
 
 
 	function Compile (|string| operation)

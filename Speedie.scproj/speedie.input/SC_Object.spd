@@ -27,14 +27,16 @@ class SCObject
 		return .name ~= s
 
 	function File (|SCFile|)
-		|| it = .Source
-			return it.SCFile
+		opt norefcounts
+		|| src = .Source
+			return src.SCFile
 		if self isa SCModule
 			return .cls.file?
 	
 	function AnySource (|message|)
-		if .source
-			return .source
+		opt norefcounts
+		|| s = .source
+			return s
 		if self isa scmodule
-			if .cls
-				return .cls.sourcearg
+			|| c = .cls
+				return c.sourcearg

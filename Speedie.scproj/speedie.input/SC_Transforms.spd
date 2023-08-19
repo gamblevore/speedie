@@ -306,6 +306,9 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 		
 	  elseif (f == @Decl)
 //		s.CollectFromBody(p) // fix later
+// this seems to require I alter loads of other stuff to make this work.
+// tran_for will need fixing and probably other stuff toooooo :(
+// things strangely interact with each other... which I didn't expect but there you go.
 		s = DeclsDefault( s.last )
 		if s
 			Tran_All( Fn, s, p )
@@ -330,9 +333,7 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 	  elseif (f == @msg)
 		Tran_Msg(fn, s, p)
 
-	  elseif (f == @Thg or @opp or @Item or @prm)
-		0 // 
-	  else
+	  elseif !(f == @Thg or @opp or @Item or @prm)
 		TypeOfExpr( s, p )
 		if s == @func
 			.FastStringOpt(s, p)

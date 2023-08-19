@@ -108,6 +108,16 @@ class Error (Message)
 		.name = desc 
 	
 	
+	function Reformulate (|string| suffix="")
+		|| list = error.from(.name.parse)
+		while list.hasany
+			|| err = list.first
+			if suffix
+				err.name += suffix
+			stderr <~ err
+		.remove
+	
+	
 	function GrabLine (|faststring| fs, |bool| Usecolor=false)
 		if Usecolor
 			fs <~ ErrorColors.Normal

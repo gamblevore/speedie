@@ -423,6 +423,7 @@ module Feedback
 		variant
 			Explain(Purpose)$
 			Options.Variant = (Value.parseInt|int|).Render
+			options.perry = 1
 			Options.Color = false
 			if options.optimise < 0
 				options.optimise = 1

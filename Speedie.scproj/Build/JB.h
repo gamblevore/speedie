@@ -1313,13 +1313,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1890])
+#define kJB__ErrorColors_bold (JB_LUB[1887])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1891])
-#define kJB__ErrorColors_good (JB_LUB[1892])
-#define kJB__ErrorColors_normal (JB_LUB[1893])
-#define kJB__ErrorColors_underline (JB_LUB[1892])
-#define kJB__ErrorColors_warn (JB_LUB[1894])
+#define kJB__ErrorColors_error (JB_LUB[1888])
+#define kJB__ErrorColors_good (JB_LUB[1889])
+#define kJB__ErrorColors_normal (JB_LUB[1890])
+#define kJB__ErrorColors_underline (JB_LUB[1889])
+#define kJB__ErrorColors_warn (JB_LUB[1891])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1496,9 +1496,9 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_ActualTypecasts ((~(128 | 32)))
 #define kJB_AddressOfMatch (3 << 22)
 #define kJB_BitAnd (JB_LUB[356])
-#define kJB_BitNot (JB_LUB[607])
+#define kJB_BitNot (JB_LUB[606])
 #define kJB_BitOr (JB_LUB[559])
-#define kJB_BitXor (JB_LUB[1895])
+#define kJB_BitXor (JB_LUB[1892])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_DontSaveProperty (0)
 #define kJB_EndsBlock (1024)
@@ -1516,7 +1516,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_SaveProperty (1)
 #define kJB_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1896])
+#define kJB_SaverStart1 (JB_LUB[1893])
 #define kJB_SelfDebug (2)
 #define kJB_SelfReplace (1)
 #define kJB_SimpleMatch (1 << 22)
@@ -3163,8 +3163,6 @@ void SC_CollectDeclsFuncBodyUnsureHowToRemove(Message* arg, SCBase* scarg);
 
 void SC_CollectDeclsGlobals(Message* arg, SCBase* scarg);
 
-bool SC_CollectDeclsMulti(Message* List, SCBase* P, SCBase* Recv, int Mode, Array* out, SCClass* cls);
-
 bool JB_CompareError(Message* expected, Message* found);
 
 SCDecl* SC_CopyDecl(Message* CopyFrom, JB_String* name);
@@ -3181,7 +3179,7 @@ SCDecl* SC_DeclOfObjForC(Message* curr);
 
 Message* SC_DeclsDefault(Message* def);
 
-void SC_DefaultStitch(Message* Default, Message* args);
+Message* SC_DefaultStitch(Message* Default, Message* dcl);
 
 SCBase* SC_DontRemove(Message* node, SCBase* name_space, Message* ErrPlace);
 
@@ -5320,13 +5318,13 @@ void JB_Rec_Constructor(JB_ErrorReceiver* self);
 
 void JB_Rec_Destructor(JB_ErrorReceiver* self);
 
-JB_Error* JB_Rec_FirstError(JB_ErrorReceiver* self);
-
 bool JB_Rec_HasAnything(JB_ErrorReceiver* self);
 
 bool JB_Rec_HasProblems(JB_ErrorReceiver* self);
 
 void JB_Rec_Incr(JB_ErrorReceiver* self, JB_Error* err, bool add);
+
+JB_Error* JB_Rec_LastError(JB_ErrorReceiver* self);
 
 void JB_Rec_LogFileSet(JB_ErrorReceiver* self, JB_String* Value);
 
@@ -6494,7 +6492,7 @@ void JB_File_Fail(JB_File* self, JB_String* Error);
 
 bool SC_File_TestBatch(JB_File* self);
 
-bool SC_File_TestSpeedie(JB_File* self, JB_String* Variant);
+bool SC_File_TestSpeedie(JB_File* self, JB_String* v);
 
 ErrorInt JB_File_Touch(JB_File* self);
 
@@ -7108,6 +7106,8 @@ SCArg* SC_Msg_AsArg(Message* self);
 
 SCDecl* SC_Msg_AsDecl(Message* self);
 
+JB_Error* JB_Msg_AsError(Message* self);
+
 SCFunction* SC_Msg_AsFunc(Message* self);
 
 void JB_Msg_Ask__(Message* self, FastString* fs);
@@ -7192,13 +7192,21 @@ Message* SC_Msg_CmdImprove(Message* self);
 
 void JB_Msg_Cnj__(Message* self, FastString* fs);
 
-bool SC_Msg_CollectDecl(Message* self, SCBase* P, SCBase* Recv, int Mode, Array* out, SCClass* cls, SCFunction* func);
+bool SC_Msg_CollectAGlobalDecl(Message* self, SCBase* scarg);
 
-bool SC_Msg_CollectDeclInFunc(Message* self, SCFunction* func, SCBase* Recv, SCClass* cls);
+Message* SC_Msg_CollectDclName(Message* self);
+
+SCDecl* SC_Msg_CollectDecl(Message* self, SCBase* P, SCBase* Recv, int Mode, Array* out, SCClass* cls, SCFunction* FuncPrms);
+
+bool SC_Msg_CollectFromBody(Message* self, SCBase* scarg);
+
+bool SC_Msg_CollectFuncPrm(Message* self, SCFunction* func, SCBase* Recv, SCClass* cls);
 
 JB_String* SC_Msg_CollectFuncTableName(Message* self);
 
 Message* SC_Msg_CollectionPlace(Message* self);
+
+bool SC_Msg_CollectProp(Message* self, SCClass* cls);
 
 bool SC_Msg_Compiles(Message* self);
 
@@ -8104,8 +8112,6 @@ bool SC_Class_TestBanned(SCClass* self);
 
 void SC_Class_TryAddToProject(SCClass* self);
 
-SCObject* SC_Class_UpCheckSub(SCClass* self, JB_String* name);
-
 void SC_Class_WriteStructOrUnion(SCClass* self, FastStringCpp* fs);
 
 SCClass* JB_Class__Alloc();
@@ -8216,7 +8222,7 @@ void SC_Func_CheckReturnValue(SCFunction* self, Message* msg);
 
 void SC_Func_Cleanupfunc(SCFunction* self);
 
-bool SC_Func_CollectDeclsFuncArgs(SCFunction* self, Message* prms, SCBase* AddToSpace);
+void SC_Func_CollectDeclsFuncPrms(SCFunction* self, Message* prms, SCBase* AddToSpace);
 
 void SC_Func_CollectLinks(SCFunction* self, JB_Object* obj);
 
@@ -8638,6 +8644,8 @@ bool JB_Err_LineIdentifiers(JB_Error* self, FastString* fs, JB_String* path);
 
 int JB_Err_LinePos(JB_Error* self, JB_String* data);
 
+void JB_Err_Reformulate(JB_Error* self, JB_String* suffix);
+
 JB_String* JB_Err_Render(JB_Error* self, FastString* fs_in);
 
 JB_String* SC_Err_Render_Unix(JB_Error* self, FastString* fs_in);
@@ -8667,6 +8675,8 @@ void JB_Err_UpgradeWithNode(JB_Error* self);
 JB_Error* JB_Err__Alloc();
 
 void JB_Err__CantParseNum(Message* Where, JB_String* num, int Pos);
+
+JB_Error* JB_Err__From(Message* self);
 
 int JB_Err__Init_();
 
@@ -8838,7 +8848,7 @@ inline void SC_Msg_addvalue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1524])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1522])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}

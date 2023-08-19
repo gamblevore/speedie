@@ -115,7 +115,7 @@ function perryide.StartDebugging (|file| f)
 
 	if !StdErr.ok
 		.DebugArgsList.FillErrors(StdErr)
-		Notifications <~ StdErr.FirstError
+		Notifications <~ StdErr.LastError
 	app.cwd = old
 
 
