@@ -57,21 +57,17 @@ function SCDecl.NoFloat (|Message| exp, |bool|)
 
 
 
-function DefaultStitch (|Message| Default, |Message| args)
+function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 	opt norefcounts
-	|| name = args.second
-	using (args)
-	|| rel = «rel »
-	name.next = rel
-	rel <~ name
-	rel.msg(@Opp,"=")
-	rel <~ Default
-
-
+	using (dcl)
+	rz = dcl.msg(@rel)
+	rz <~ dcl.second
+	rz.msg(@Opp, "=")
+	rz <~ Default
 
 
 // these can remain...
-function scfunction.CollectDeclsFuncArgs (|Message| prms, |SCBase| AddToSpace)
+function scfunction.CollectDeclsFuncPrms (|Message| prms, |SCBase| AddToSpace)
 	opt norefcounts
 	|| cls = .Cls
 		if !prms.HasSelfAsFirst
@@ -82,10 +78,10 @@ function scfunction.CollectDeclsFuncArgs (|Message| prms, |SCBase| AddToSpace)
 
 	for item in prms
 		// can remove some shit thats only applicable here... :D
-		require item.CollectFuncArg(self, AddToSpace, cls)
+		require item.CollectFuncPrm(self, AddToSpace, cls)
 
 
-function Message.CollectFuncArg (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
+function Message.CollectFuncPrm (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
 	opt norefcounts
 	if (func.isassigns == 2) and .islast
 		if !cls
@@ -166,12 +162,12 @@ function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
-function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |scfunction| func,  |scdecl|)
+function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
 	// cna remove Recv also! only used at end or for modetesting (Funcarg)
 	|| Types = .first
 	|| Names = types.Next				
 
-	expect (Func or Names)  (self, "No name found.")
+	expect (FuncPrms or Names)  (self, "No name found.")
 	if (Mode & 2)
 		expect (names == @thg) (names, "Must be a proper name (a-z or unicode-letters)")
 
@@ -182,10 +178,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 
 	
 	|SCDecl--| DefaultDcl
-	if recv isa SCArg
-		if mode != 4 and 8
-			"oof $mode"
-	if func
+	if FuncPrms
 		0
 	  elseif (Default)
 		DefaultDcl = TypeOfExprNeeded( Default, P ) #require
@@ -193,31 +186,30 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 			default = sdcl.ExpectMatch( DefaultDcl, kTypeCastTrue, default )
 		
 	  elseif (!cls) and (sdcl) and ( !Default ) and (sdcl.CanUseDefault)
-		Default = sdcl.CreateDefault(types, Recv isa SCArg)
+		Default = sdcl.CreateDefault(types, mode >= 4)
 		if (Default)
 			TypeOfExpr( default, P )
-			DefaultStitch( Default, self )
+			names = DefaultStitch( Default, self )
 	
-	|bool| NoOriginalDcl = !Sdcl
-	if (NoOriginalDcl)
+	|| NoOriginalDcl = !Sdcl
 		if (cls) and (cls.Contained)
 			sdcl = cls.Contained // (|| x = Y), (|object| x = Y)
 		  else
-			expect (!Func and defaultdcl) ( self, ("Function declarations need a type. (Unless it's in a container class.)", "Missing type, or default value.")(!func) )
+			expect (!FuncPrms and defaultdcl) ( self, ("Function declarations need a type. (Unless it's in a container class.)", "Missing type, or default value.")(!FuncPrms) )
 			sdcl = DefaultDcl
 	
-	expect !(func and sdcl is Borrowed) (self, "Variables can’t be borrowed in function parameters or return")
+	expect !(FuncPrms and sdcl is Borrowed) (self, "Variables can’t be borrowed in function parameters or return")
 	
 	if sdcl.NeedsContainedfix
 		sdcl = sdcl.Containedfix
 	
-	if !names		// a return value, how to return the return value?
+	if !names
 		expect (.islast) ( self, "Parameter is missing a name." )
-		func.ReturnType = sdcl
+		FuncPrms.ReturnType = sdcl
 		return nil
 	
 	
-	|| NameItm = .GetDclName #require
+	|| NameItm = .getDclName #require
 	|| dcl = Sdcl.copy
 	
 	if (Mode & 8) and NoOriginalDcl // functionbody
@@ -231,13 +223,10 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 	
 	dcl.Default = Default
 	dcl.Name = nameitm.name
-	(dcl Isnt Const) // erase IsConst, happens if we parse "|| bla = true"
+	(dcl Isnt Const) // on "|| bla = true", make "bla" editable.
 
 	if names and !Default
-		if names.next == @list
-			error names
-		  else
-			names.expectlast
+		names.expectlast
 		
 	if out!=nil
 		out <~ dcl
@@ -246,7 +235,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 	if default and defaultdcl
 		dcl.ConstCheck(nil, default, DefaultDcl)
 	
-	if (Recv) // this is never nil??? where is nil?
+	if (Recv) // nil for prototypes
 		Recv.TryAdd( self, dcl, dcl.Name )
 	return dcl
 
