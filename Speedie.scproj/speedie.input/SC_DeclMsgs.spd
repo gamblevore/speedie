@@ -4,11 +4,7 @@
 function DeclsDefault (|Message| def, |Message|)
 	opt norefcounts
 	if def.issetrel
-		|| f = def.first
-		|| l = def.Last
-		if l == @thg
-			expect !(f.name ~= l.name) (def, "Same name!")
-		Return l
+		return def.Last
 
 
 function MakeDecl (|string| Type, |string| Name, |Message| Value, |Message|)
@@ -148,7 +144,10 @@ function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg)
 
 function Message.CollectFromBody (|SCBase| scarg, |bool|)
 	opt norefcounts
-	return .CollectDecl(scarg, scarg, 8, nil, nil, nil)
+	|| dcl = .CollectDecl(scarg, scarg, 8, nil, nil, nil)
+		|| def = dcl.Default
+			check (def != @thg or def.name ~!= dcl.name) (def, "Same name!")
+		return true
 
 
 

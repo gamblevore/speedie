@@ -305,6 +305,7 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 		CollectDeclsFuncBody( s, p )
 		
 	  elseif (f == @Decl)
+//		s.CollectFromBody(p) // fix later
 		s = DeclsDefault( s.last )
 		if s
 			Tran_All( Fn, s, p )
