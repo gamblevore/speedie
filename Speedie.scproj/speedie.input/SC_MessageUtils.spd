@@ -158,6 +158,17 @@ function Message.GetDclName (|bool| Need=false, |Message|)
 		error (self, "No decl name found")
 
 
+function Message.CollectDclName (|Message|)
+	opt norefcounts
+	if self
+		|| thg = self
+		if thg == @Rel
+			thg = thg.first
+		if thg == @thg
+			return thg
+		error self
+
+
 function Message.WithinLoop (|Message| stop, |bool|)
 	opt norefcounts
 	while (self != stop) and self
