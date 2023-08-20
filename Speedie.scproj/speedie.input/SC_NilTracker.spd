@@ -2,34 +2,36 @@
 
 struct NilTracker
 	linkage:cpp_part nil
-	|uint| 				IfDepth
+//	|uint| 				IfDepth
 	|uint| 				MsgCount
 	|scfunction--|		fn
-	|message--[2048]|	Items
+	|scdecl--[1750]|	Decls
+	|nilstate[1750]|	Values
 
 
-	function Enter (|uint|)
-		.ifdepth++
+	function Save (|uint|)
 		return .MsgCount
 
 
-	function Leave (|uint| s)
+	function Restore (|uint| s)
+		|| c = .MsgCount
+		while --s >= c
+			.decls[s].nilused = .Values[s]
 		.MsgCount = s
-		.IfDepth--
 
 
-	function SetNilness (|message| m, |scdecl| d, |nilstate| s, |branchstate|)
+	function SetNilness (|scdecl| d, |nilstate| s, |branchstate|)
 		opt norefcounts
 		if d.nilused > 3 // what?
-		m.Indent = d.NilUsed
-		d.nilused = s
 		|| c = .MsgCount
-		if (c >= 2048) 
-			error (m, "Too many variables")
-		  elseif c
-			m.Indent = d.NilUsed
-			.items[c] = m
+		if (c < 1750) 
+			.values[c] = d.NilUsed
+			.Decls[c] = d
 			.MsgCount = c + 1
+			d.nilused = s
+			return BranchState.Perhaps
+			
+		error (.fn, "Too many variables for nilchecker")
 		return BranchState.Perhaps
 
 
@@ -41,13 +43,13 @@ struct NilTracker
 		|| r = f.returntype
 			r.NilUsed = 0 // :)
 		for (d in .fn.args) (i)				// no need add prms.... only log changes
-			d.NilParamPos = i
+			d.NilParamPos = i // unused?
 			d.RestoreNil
 
 
 	function Finish (|scfunction| f)
 		opt norefcounts
-		f.ReturnType.State
+		f.ReturnType.DeclareAsUsed?
 		.fn = nil
 	
 	iterator
@@ -72,7 +74,7 @@ function SCDecl.NilTake (|scdecl| d)
 function SCDecl.IsNowNil (|bool|)
 	return (self == TypeNil) or (.nilused isnt real)
 
-function SCDecl.State
+function SCDecl.DeclareAsUsed
 	opt norefcounts
 	.nildeclared = .NilUsed (|) nilstate.stated
 

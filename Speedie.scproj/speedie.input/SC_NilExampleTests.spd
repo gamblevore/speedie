@@ -5,8 +5,13 @@ class NilTest
 	|int|		V
 	|string|	V2
 	
-	function AndTest
+	function AndTest (|string?| a, |string?| b)
 		"nilcheck"
+		if (a and b)
+			|| x = a.Addr
+			|| y = b.Addr
+	
+	function TernTest
 		|| a = ("a",nil)(0.5[])
 		|| b = ("b",nil)(0.5[])
 		if (a and b)

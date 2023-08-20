@@ -3,14 +3,16 @@
 module NilChecker
 	function SaveLives
 		opt norefcounts
+		require StdErr.ok
 		using options.NilStrength
-	
-		|NilTracker| T
-		for f in compiler.funclist
-			T.Check(f)
-		
+			|NilTracker| T
+			for f in compiler.funclist
+				T.Check(f)
+			
 		scfunction.currfunc = nil
 		.SweepInits
+		StdErr.PrintErrors
+		StdErr.Clear
 
 	
 	function SweepInits
@@ -18,18 +20,22 @@ module NilChecker
 		// what about "init_"?
 
 
-function NilTracker.Check (|scfunction| f)
-	debugat
-	opt norefcounts
-	require false
-	require !f.IsMacro and !f.IsWrapper and f.isOK
-	|| c = f.Lookup
-		require c.name contains "NilTest"
+function scfunction.canNil (|bool|)
+	return !(.IsMacro and !.IsWrapper and .isOK)
 
-	|| arg = f.SourceArg
-	require arg contains "nilcheck"
+function scfunction.LimitTests (|bool|)
+	|| c = .Lookup #require
+	require c.name contains "NilTest"
+
+	require .SourceArg contains "nilcheck"
+
+
+function NilTracker.Check (|scfunction| f)
+	opt norefcounts
+	require f.cannil and f.limittests
+	return 
 	.Start(f)
-	.RunNormal(arg)
+	.RunNormal(f.SourceArg)
 	.Finish(f)
 
 
@@ -98,14 +104,25 @@ function NilTracker.Return (|message| msg)
 
 function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
 	opt norefcounts
-	|| arg = test.first
-	if arg == @arg
-		.RunNormal(arg)
+	|| Depth = .Save
+	|| cond = test.first
+	|| arg
+	if cond == @arg
+		arg = cond
 	  else
-		.ProcessCond(arg, branchstate.always)
-		arg++
-		.RunNormal(arg)
+		.ProcessCond(cond, branchstate.always)
+	.RunNormal(arg)
+		
+	// we need to do stuff with conditions...
+	// like testing the cond both ways...
+	// for the else-branch. Undoing changes.
+	// return handling.
+	
+	// well... restoring isn't quite so simple.
+	// we don't want to restore!
+	//	if (a and b) : a = nil, b = nil
 
+	.Restore(Depth)
 	return arg.next
 	
 
@@ -113,11 +130,9 @@ function NilTracker.IfOrWhileOrTern (|message| msg)
 	// finish off terns
 	// x = tern( (cond),   a, .func(&a) ) 
 	opt norefcounts
-	|| old = .enter
 	|| test = msg
 	while test
 		test = .IfWhileOne(test, msg)
-	.leave(old)
 
 
 function NilTracker.If (|message| Tmp)
@@ -152,7 +167,7 @@ function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y, |branchstate
 	if u == NilState.Either
 		if (dcl is param) and (dcl.NilDeclared isnt stated)
 			dcl.NilDeclared = NilState.optional
-		return .SetNilness(msg, dcl, dest)
+		return .SetNilness(dcl, dest)
 
 	if dcl.NilDeclared is Either
 		return msg.RedundantBranch
