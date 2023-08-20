@@ -162,38 +162,48 @@ helper string.wrapsub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 
 	
 function faststring.RenderSpeed (|float| seconds,  |int64| BytesIn, |int64| BytesOut, |string| Name)
-	|float| scale = 1MB
-	|| speed = ""
 	|| s2   = seconds
-	|| unit = "s"
+	|byte| unit
 	if seconds < 0.01
-		unit = "ms"
+		unit = 'm'
 		s2 *= 1000
-	s2 = s2.round(100)
 	if name
 		self <~ Name
 		self <~ ": "
+		
 	BytesIn.strsize(self)
 	if BytesOut 
 		self <~ " to "
 		Bytesout.strsize(self)
 		self <~ " ("
-		self <~ ((Bytesout|float| / Bytesin|float|)*100.0).round(10)
+		|| ratio = ((Bytesout|float| / Bytesin|float|)*100.0)
+		self.appenddouble(ratio)
 		self <~ "%)"
 
-	self <~ " in $s2$unit" 
+	self <~ " in "
+	.appenddouble(s2, 2)
+	if unit
+		self <~ unit
+	self <~ 's'
+		
+	require seconds
+	|float| scale = 1MB
+	unit = 'M'
 	|| rate = BytesIn / (scale*seconds)
-	unit = "MB"
 	if rate >= 1K
 		rate /= 1K
-		unit = "GB"
+		unit = 'G'
 	  elseif rate <= 1
 		rate *= 1K
-		unit = "KB"
-	if rate > 0.01
-		rate = rate|float|.round(100)
-	if seconds
-		self <~ "  ($rate$unit/s)"
+		unit = 'K'
+	|| dp = 2
+	if rate <= 0.01
+		dp = 5
+	self <~ "  ("
+	self.appenddouble(rate, dp)
+	self <~ unit
+	self <~ 'B'
+	self <~ "/s)"
 
 
 	

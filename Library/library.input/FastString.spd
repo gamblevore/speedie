@@ -256,7 +256,7 @@ class FastString {
 		cpp_wrapper JB_FS_AppendDoubleAsText0
 
 	
-	function AppendDouble (|f64| D, |int| dp, |bool| CanExp)
+	function AppendDouble (|f64| D, |int| dp=1, |bool| CanExp=false)
 		cpp_wrapper JB_FS_AppendDoubleAsText
 	
 	

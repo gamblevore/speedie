@@ -427,13 +427,12 @@ datatype float
 	function Round (|float|)
 		cpp_wrapper (roundf)
 	
-	function Round (|float| to=100, |float|)
+	function DecimalPlaces (|float| to=2, |float|)
 		cpp_Part RoundTo
-		|| part = self * to + 0.5
-		|| part2 = part.floor
-		rz = part2/to // 14/10 = 1.39999 which is useless. how to round it over?
-		if rz.fract > 0.99999
-			rz+=0.00001
+		|| v = 10 pow to
+		return (self * v).Round / v
+//		std::ceil(value * 100.0) / 100.0
+
 	
 	operator avg (|float| f, |float|)
 		return (f + self) * 0.5
@@ -605,7 +604,7 @@ datatype int64
 			self <<= 8
 
 	function rendersizepart (|faststring| fs, |float| Size, |string| Suff)
-		|| f = (self|float|/size).Round(10)
+		|| f = (self|float|/size).DecimalPlaces(1)
 		fs <~ f|int|
 		if f < 120
 			|| frac = (f.fract*10)|int|

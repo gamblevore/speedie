@@ -198,7 +198,11 @@ extend int
 	operator pow (|int| a, |int|)
 		if (a==2)
 			return self*self
-		debugger
+		if self >= 0
+			rz = 1
+			for a
+				rz *= self
+
 	operator minus0 (|int|a, |int|)
 		|| r = self - a
 		if r >= 0

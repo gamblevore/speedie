@@ -83,6 +83,8 @@ function file.CLOC
 	Counts.files++
 	
 	counts.memstart
+	if counts.ParseSpeed
+		"a=b+c".parse
 	|| Start = date.now
 	|| msg = data.parse
 	|| Durr = start.ago
