@@ -527,7 +527,7 @@ function File.TestSpeedie (|string| v, |bool|)
 	|| result = faststring()
 	.path.execute(cmd_args, result)
 	|| err = stderr.LastError
-		err.Reformulate(variant)
+		err.Reformulate(" subspd")
 	
 	printline Result
 	print TransCompiler.TmpOut(Variant).ReadFile

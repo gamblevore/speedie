@@ -26,8 +26,10 @@ function NilTracker.Check (|scfunction| f)
 	|| c = f.Lookup
 		require c.name contains "NilTest"
 
+	|| arg = f.SourceArg
+	require arg contains "nilcheck"
 	.Start(f)
-	.RunNormal(f.SourceArg)
+	.RunNormal(arg)
 	.Finish(f)
 
 
@@ -75,7 +77,7 @@ function NilTracker.Function (|message| msg)
 		if fn.IsNilChecker
 			.UseAsReal(p, pd)
 		.VariableSet(a, pd, p, 1)
-		if p.hasany
+		if p.HasAny
 			.RunNormal(p)
 		p++
 
@@ -362,7 +364,6 @@ TODO:
 	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...
 
 * freeze bug
-	* what about carrays of pointers? what comes first? when does the ptrcount get used?
 
 
 

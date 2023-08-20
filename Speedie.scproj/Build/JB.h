@@ -584,7 +584,7 @@ struct NilTracker {
 	uint IfDepth;
 	uint MsgCount;
 	SCFunction* fn;
-	Message* Items[1024];
+	Message* Items[2048];
 };
 
 struct ObjectLoader {
@@ -1313,13 +1313,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1887])
+#define kJB__ErrorColors_bold (JB_LUB[1889])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1888])
-#define kJB__ErrorColors_good (JB_LUB[1889])
-#define kJB__ErrorColors_normal (JB_LUB[1890])
-#define kJB__ErrorColors_underline (JB_LUB[1889])
-#define kJB__ErrorColors_warn (JB_LUB[1891])
+#define kJB__ErrorColors_error (JB_LUB[1890])
+#define kJB__ErrorColors_good (JB_LUB[1891])
+#define kJB__ErrorColors_normal (JB_LUB[1892])
+#define kJB__ErrorColors_underline (JB_LUB[1891])
+#define kJB__ErrorColors_warn (JB_LUB[1893])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1498,7 +1498,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_BitAnd (JB_LUB[356])
 #define kJB_BitNot (JB_LUB[606])
 #define kJB_BitOr (JB_LUB[559])
-#define kJB_BitXor (JB_LUB[1892])
+#define kJB_BitXor (JB_LUB[1894])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_DontSaveProperty (0)
 #define kJB_EndsBlock (1024)
@@ -1516,7 +1516,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_SaveProperty (1)
 #define kJB_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1893])
+#define kJB_SaverStart1 (JB_LUB[1895])
 #define kJB_SelfDebug (2)
 #define kJB_SelfReplace (1)
 #define kJB_SimpleMatch (1 << 22)
@@ -7558,6 +7558,8 @@ bool SC_Msg_OarExpand(Message* self);
 
 void JB_Msg_Oat__(Message* self, FastString* fs);
 
+bool JB_Msg_ContainsStr(Message* self, JB_String* s);
+
 bool JB_Msg_OperatorIn(Message* self, Syntax f);
 
 bool SC_Msg_OperatorIsARel(Message* self, JB_String* name);
@@ -8848,7 +8850,7 @@ inline void SC_Msg_addvalue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1522])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1524])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}

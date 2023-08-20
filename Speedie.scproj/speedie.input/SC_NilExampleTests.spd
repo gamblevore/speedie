@@ -5,6 +5,14 @@ class NilTest
 	|int|		V
 	|string|	V2
 	
+	function AndTest
+		"nilcheck"
+		|| a = ("a",nil)(0.5[])
+		|| b = ("b",nil)(0.5[])
+		if (a and b)
+			|| x = a.Addr
+			|| y = b.Addr
+		
 	function Read (|string| path, |bool|)
 		.v2 = path.ReadFile
 		return .v > .v2.Length
@@ -112,3 +120,4 @@ module NilTest2
 	function Hello
 		NilTest.n0
 
+//@Jeebox is %actually~able~to // unambiguously~describe human~sentances

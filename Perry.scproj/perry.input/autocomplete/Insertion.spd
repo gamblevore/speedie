@@ -103,10 +103,11 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 
 module PerryAutoCompleteReason
 	constants
-		tab = "Tab"
-		escape = "Escape"
-		sel = "Sel"
-		modified = "Modified"
+		tab			= "Tab"
+		escape		= "Escape"
+		sel			= "Sel"
+		modified	= "Modified"
+
 
 function TextView.ParamDisplayPlace (|message| msg, |int| x, |message|)
 	opt norefcounts

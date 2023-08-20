@@ -5,7 +5,7 @@ struct NilTracker
 	|uint| 				IfDepth
 	|uint| 				MsgCount
 	|scfunction--|		fn
-	|message--[1024]|	Items
+	|message--[2048]|	Items
 
 
 	function Enter (|uint|)
@@ -23,11 +23,13 @@ struct NilTracker
 		if d.nilused > 3 // what?
 		m.Indent = d.NilUsed
 		d.nilused = s
-		if (.MsgCount >= 1024) 
+		|| c = .MsgCount
+		if (c >= 2048) 
 			error (m, "Too many variables")
-		  elseif .msgcount	
+		  elseif c
 			m.Indent = d.NilUsed
-			.items[.MsgCount++] = m
+			.items[c] = m
+			.MsgCount = c + 1
 		return BranchState.Perhaps
 
 
