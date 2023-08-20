@@ -162,11 +162,6 @@ helper string.wrapsub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 
 	
 function faststring.RenderSpeed (|float| seconds,  |int64| BytesIn, |int64| BytesOut, |string| Name)
-	|| s2   = seconds
-	|byte| unit
-	if seconds < 0.01
-		unit = 'm'
-		s2 *= 1000
 	if name
 		self <~ Name
 		self <~ ": "
@@ -181,14 +176,17 @@ function faststring.RenderSpeed (|float| seconds,  |int64| BytesIn, |int64| Byte
 		self <~ "%)"
 
 	self <~ " in "
-	.appenddouble(s2, 2)
-	if unit
-		self <~ unit
+
+	if seconds < 0.01
+		.appenddouble(seconds*1000, 2)
+		self <~ 'm'
+	  else
+		.appenddouble(seconds, 2)
 	self <~ 's'
 		
 	require seconds
 	|float| scale = 1MB
-	unit = 'M'
+	|| unit = 'M'
 	|| rate = BytesIn / (scale*seconds)
 	if rate >= 1K
 		rate /= 1K
@@ -196,9 +194,7 @@ function faststring.RenderSpeed (|float| seconds,  |int64| BytesIn, |int64| Byte
 	  elseif rate <= 1
 		rate *= 1K
 		unit = 'K'
-	|| dp = 2
-	if rate <= 0.01
-		dp = 5
+	|| dp = (5,2)(rate <= 0.01)
 	self <~ "  ("
 	self.appenddouble(rate, dp)
 	self <~ unit
