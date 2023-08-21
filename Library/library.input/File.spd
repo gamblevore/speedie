@@ -78,6 +78,9 @@ class File (String)
 	function Size (|int64|) // actually ints are less buggy. Like "|| NewSize = oldsize-1" with uint is bad.
 		cpp_wrapper JB_File_Size
 
+	function Length (assigns:|int|)	
+		disabled "Use file.size"
+
 	function Size (assigns:|int|N)
 		cpp_wrapper JB_File_SizeSet
 
