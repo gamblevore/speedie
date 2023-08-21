@@ -1,0 +1,12 @@
+#!/usr/local/bin/spd
+
+main    // useful for testing speed of parsing
+	|| outputp = app.args[0]								#expect ("Pass an output file")
+	|| countp  = app.args[1]								#expect ("Pass a number of repetitions")
+	|| inputp  = app.args[2]								#expect ("Pass an input file")
+	|| output = outputp.file
+	|| data = inputp.readfile|string|						#expect ("No data in $inputp")
+	require output.OpenEmpty
+	for countp.int
+		output <~ data
+	printline output.Path
