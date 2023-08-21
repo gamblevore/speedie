@@ -59,29 +59,27 @@ function message.NilDecl (|scdecl|)
 function NilTracker.UseChildAsReal (|message| wrapper, |bool|) // a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = wrapper.first
-		return .UseAsReal(ch, ch.NilDecl)	
+		return .RealifyParam(ch, ch.NilDecl)	
 	
 
-function NilTracker.Function (|message| msg)
+function NilTracker.Function (|message| msg, |branchstate| Y=0)
 	opt norefcounts
 	|| fp = msg.first
 	|| prms = fp.next
+	|| fn = prms.obj|scfunction|
 	if msg.tmptype == ASMtmp.kTern
 		debugat
 		return .IfOrWhileOrTern(prms)
 
-	if fp.func == @bra
-		require .UseChildAsReal(fp.first)						// (abc)()
+	if (fp.func == @bra)
+		require !.UseChildAsReal(fp.first)						// (abc)()
 	
-	|| fn = prms.obj|scfunction|
 	|| ret = fn.ReturnType
 		check (!ret.SuffersNil or ret.IsStated) (msg, "Unknown if this function returns nil.")
 
 	|| p = prms.first
 	for a in fn.args
 		|| pd = p.NilDecl
-		if fn.IsNilChecker
-			.UseAsReal(p, pd)
 		.VariableSet(a, pd, p, 1)
 		if p.HasAny
 			.RunNormal(p)
@@ -107,22 +105,57 @@ function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
 	|| Depth = .Save
 	|| cond = test.first
 	|| arg
+	// in order to do this... we need to have access to both branches.
+	// that also means... we need to find what we consider a branch.
+	// for example    if (x){return}
 	if cond == @arg
 		arg = cond
 	  else
 		.ProcessCond(cond, branchstate.always)
 	.RunNormal(arg)
-		
-	// we need to do stuff with conditions...
-	// like testing the cond both ways...
-	// for the else-branch. Undoing changes.
-	// return handling.
+	.merge(Depth)
 	
-	// well... restoring isn't quite so simple.
-	// we don't want to restore!
-	//	if (a and b) : a = nil, b = nil
+/*
+	Simplest example, should just merge...
+	c = c1
+	if (a) {
+		c = c2
+	}
+	// c's value depends on merging the before and branch values
+	
+	
+	c = c1
+	if (a) {
+		c = c2
+	} else {
+		c = c3
+	}
+	// c's value depends on merging the two branch values
+	
+	there are a few cases... "merging", "notting", "return-->extending" and return handling. Also... elseif is more like:
+	
+	c = c1
+	if (a) {
+		return
+	} else {
+		c = c3
+	}
+	// the second branch simply is an extension of the first... and the fallback is just more of the same.
+	// however... we get a "!a" run on it.
+	
+	
+	if a
+		a = a1
+	  else
+		if b
+			b = b1
+		  else
+			c = c1
 
-	.Restore(Depth)
+	so we can just use the "if/else" merger. No need for an "elseif" special code.
+
+*/
+
 	return arg.next
 	
 
@@ -140,13 +173,12 @@ function NilTracker.If (|message| Tmp)
 	.IfOrWhileOrTern(Tmp)
 
 
-function Message.RedundantBranch (|branchstate|)
+function Message.RedundantBranch
 	if StdErr.CanAddMore(errorseverity.problem)
 		StdErr.NewProblem(self, "Redundant branch. Object's nilness is known.")
-	return BranchState.Perhaps
 
 
-function niltracker.UseAsReal (|message| err, |scdecl| d, |uint| PointerInferred=0,  |bool|)
+function niltracker.RealifyParam (|message| err, |scdecl| d, |uint| PointerInferred=0,  |bool|)
 	opt norefcounts
 	if d.NilUsed isnt Nilish
 		return true
@@ -158,7 +190,7 @@ function niltracker.UseAsReal (|message| err, |scdecl| d, |uint| PointerInferred
 	return true
 
 
-function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y, |branchstate|)
+function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y)
 	opt norefcounts
 	|| dest = NilState.Nilish + Y	
 	|| dcl = msg.nildecl			#debug_require
@@ -171,10 +203,10 @@ function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y, |branchstate
 
 	if dcl.NilDeclared is Either
 		return msg.RedundantBranch
-	return BranchState.Never + (u == dest) // checking for nil-obj allocations
+//	return BranchState.Never + (u == dest) // checking for nil-obj allocations
 
 
-function NilTracker.ProcessCond (|message| m, |branchstate| Y, |branchstate|)
+function NilTracker.ProcessCond (|message| m, |branchstate| Y)
 	opt norefcounts
 	|| fn = m.func
 	if fn == @thg
@@ -187,19 +219,18 @@ function NilTracker.ProcessCond (|message| m, |branchstate| Y, |branchstate|)
 		return .ProcessCondFunc(m, y)
 	if fn == @brel
 		return .ProcessCondBrel(m, y)
-	.RunNormal(m)
-	return branchstate.Perhaps
+	return .RunNormal(m)
 
 
-function NilTracker.ProcessCondPtr (|message| m, |branchstate| Y, |branchstate|)
+function NilTracker.ProcessCondPtr (|message| m, |branchstate| Y)
 	opt norefcounts
 	|| PointedTo = m.first
 	|| pd = PointedTo.nildecl
-		.UseAsReal(PointedTo, pd)
+		.RealifyParam(PointedTo, pd)
 		return .ProcessCond(PointedTo, y)
 
 
-function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y, |branchstate|)
+function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y)
 	opt norefcounts
 	|| b = *m.name
 	if b == '!'
@@ -207,23 +238,20 @@ function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y, |branchstate|
 	if b == '*'
 		return .ProcessCondPtr(m, Y)
 	if b == '&'			// objects always have an address
-		return Y
+		return // Y
 	debugat
-	.RunNormal(m)
-	return branchstate.Perhaps
+	return .RunNormal(m)
 
 
-function NilTracker.ProcessCondFunc (|message| m, |branchstate| Y, |branchstate|)
+function NilTracker.ProcessCondFunc (|message| m, |branchstate| Y)
 	opt norefcounts
-	.Function(m)
-	|| prms = m.last
-	|| fn = prms.obj|SCFunction|
+	return .Function(m, Y)
 	if !fn.IsNilChecker
 		return branchstate.Perhaps
 	debugat // so what do we return if it is a nilchecker??
 	
 
-function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
+function NilTracker.ProcessCondRel (|message| m, |branchstate| Y)
 	opt norefcounts
 	|| ll = m.first
 	|| op = ll.next
@@ -245,7 +273,7 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
 				y = y.not
 			|| side = (rr, ll)(lnil)
 			return .ProcessCond(side, Y)
-		return BranchState.Perhaps
+		return
 	
 	
 	if scop.IsAndOr
@@ -258,7 +286,7 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
 		
 		.ProcessCond(ll, Y)
 		.ProcessCond(rr, Y)
-		return BranchState.Perhaps
+		return
 
 		// what about the cond?
 		// if (a and b)			// a yes,   b yes		... after a may, b may
@@ -276,7 +304,6 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y, |branchstate|)
 		.RunNormal(ll)
 	if rr.hasany
 		.RunNormal(rr)
-	return branchstate.Perhaps
 
 
 function Niltracker.Decl (|message| declmsg)
@@ -292,13 +319,12 @@ function Niltracker.Decl (|message| declmsg)
 function NilTracker.SetRel (|message| msg)
 	opt norefcounts
 	|| l = msg.first
-	|| r = msg.last
-	|| pd = r.nildecl
-	.VariableSet(l.nildecl, pd, r, 0)
 	if l.hasany
 		.RunNormal(l)	
+	|| r = msg.last
 	if r.hasany
 		.RunNormal(r)
+	.VariableSet(l.nildecl, r.nildecl, r, 0)
 
 
 function NilTracker.VariableSet (|scdecl| recv, |scdecl| pd, |message| errplace, |uint| IsParam) // setrel, relset
@@ -306,21 +332,22 @@ function NilTracker.VariableSet (|scdecl| recv, |scdecl| pd, |message| errplace,
 	require recv.suffersnil
 
 	if recv.NilDeclared isnt nilish
-		require .UseAsReal(errplace, pd, isparam>>1)
-	  elseif (isparam) and (recv.SuffersNil)
+		require .RealifyParam(errplace, pd, isparam>>1)
+	  
+	elseif (!isparam)
+		.SetNilness(recv, pd.nilused)
+		
+	  else // a param that can accept nil
 		if !recv.IsStated and (pd.NilUsed is Nilish)
 			error (errplace, "Unknown if this parameter accepts nil.")
 		if IsParam == 2
+			.SetNilness(pd, recv.nilused)
+			debugger  // its too hard to imagine. just figure this out when we get here
 			// if (a and func(&a))
-			// So... how do we alter this?
-			// just run this to debug? its too hard to imagine.
 			
-	if recv.PointerCount	// |!&!&struct| abc = f
+	if recv.PointerCount == 1	// |!&!&struct| abc = f
+	// what about pointers to pointers to something? // just give up? i think so...
 		return .VariableSet(recv.internal, pd.internal, errplace, IsParam<<1)
-	
-	// we want this to act differently for params, but how? so what if its a pointer in a param?
-		// f(&a) // alter "a"
-		// || x = &a...  // don't alter "a", just hope it works...
 
 
 function NilTracker.RunNormal (|message| msg)

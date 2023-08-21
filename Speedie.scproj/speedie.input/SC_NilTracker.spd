@@ -19,8 +19,14 @@ struct NilTracker
 			.decls[s].nilused = .Values[s]
 		.MsgCount = s
 
+	function Merge (|uint| s)
+		|| c = .MsgCount
+		while --s >= c
+			.decls[s].nilused |= .Values[s]
+		.MsgCount = s
 
-	function SetNilness (|scdecl| d, |nilstate| s, |branchstate|)
+
+	function SetNilness (|scdecl| d, |nilstate| s)
 		opt norefcounts
 		if d.nilused > 3 // what?
 		|| c = .MsgCount
@@ -29,10 +35,9 @@ struct NilTracker
 			.Decls[c] = d
 			.MsgCount = c + 1
 			d.nilused = s
-			return BranchState.Perhaps
+			return
 			
 		error (.fn, "Too many variables for nilchecker")
-		return BranchState.Perhaps
 
 
 	function Start (|scfunction| f)
