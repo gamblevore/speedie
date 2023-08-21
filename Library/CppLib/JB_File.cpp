@@ -294,8 +294,9 @@ int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
 		FD = open( CPath,  Flags,  kDefaultMode );
 
     if (FD >= 0) {
-		if (Flags & O_CREAT)
+		if (Flags & O_CREAT) {
 			RelaxPath_(CPath, false, Path);
+		}
         return FD;
 	}
     
