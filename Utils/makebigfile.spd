@@ -5,7 +5,7 @@ main    // useful for testing speed of parsing
 	|| countp  = app.args[1]								#expect ("Pass a number of repetitions")
 	|| inputp  = app.args[2]								#expect ("Pass an input file")
 	|| output = outputp.file
-	|| data = inputp.readfile|string|						#expect ("No data in $inputp")
+	|| data = inputp.readfile(false)|string|				#expect ("No data in $inputp")
 	require output.OpenEmpty
 	for countp.int
 		output <~ data
