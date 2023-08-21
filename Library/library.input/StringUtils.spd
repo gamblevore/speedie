@@ -161,7 +161,7 @@ helper string.wrapsub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			continue
 
 	
-function faststring.RenderSpeed (|float| seconds,  |int64| BytesIn, |int64| BytesOut, |string| Name)
+function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| BytesOut, |string| Name)
 	if name
 		self <~ Name
 		self <~ ": "
