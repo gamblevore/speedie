@@ -17,7 +17,8 @@ class ErrorList
 	contains ErrorList
 
 	|Error|					Errors
-	|fnErrorLogger| 		LogFunc
+	|fnErrorLogger| 		_LogFunc
+	|object| 				_LogObj
 	|int|					MaxErrors
 	|int|					MaxProblems
 	|int|					ErrorCount
@@ -26,7 +27,6 @@ class ErrorList
 	|int|					LowerErrorsTo
 	|bool|					BlockErrors
 	|string|				Source
-	|object| 				LogObj
 
 	constructor
 		.errors = error()
@@ -66,8 +66,9 @@ class ErrorList
 		err.path := .source
 		if Error.KeepStackTrace
 			err.StackTrace := app.StackTrace
-			
-		(.LogFunc)(self, err.render)?
+		
+		|| log = ._logfunc 
+			(log)(self, err.render)
 		if CanPrint and err.IsBad
 			printline err.render
 		if error.autoprint and err.severity >= Errorseverity.problem
@@ -76,9 +77,12 @@ class ErrorList
 			.errors <~ err
 
 
-	syntax append (|string| Err)
-		cpp_part AppendStr
-		self <~ error(nil, err)
+	syntax append (|string| LogMsg)
+		cpp_part Log
+		if !._LogFunc
+			.LogFile = app.filename + ".log"
+		|| log = ._logfunc
+			(log)(self, LogMsg)
 
 
 	setter LogFile (|string|)
@@ -86,13 +90,16 @@ class ErrorList
 		visible class~file
 		ifn Value contains "/"
 			value = file.Logs[value]
-		.LogObj = value.file
-		.LogFunc = LogFileWriter
+		|| f = value.file
+		printline "Logging to: " + f
+		._LogObj = f
+		._LogFunc = LogFileWriter
 	
-	function LogFileWriter (fnErrorLogger)
+	
+	helper LogFileWriter (fnErrorLogger)
 		opt norefcounts
 		visible class~file
-		|| f = .LogObj
+		|| f = ._LogObj
 		if f isa file
 			if !f.Opened
 				f.OpenEmpty

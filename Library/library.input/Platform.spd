@@ -54,6 +54,7 @@ module Platform
 		return .PointerBits == 64
 		
 	function Log (|string| s)
+		// logging should merge with stderr logging? cos we'll want that too... usually.
 		printline s
 		if !.logger
 			.OpenLog
