@@ -377,11 +377,13 @@ void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp) {
 		D = -D;
 		JB_FS_AppendByte(self, '-');
 	}
-    double exp = log10(D);
     int ActualExp = 0;
-    if (CanExp and (exp > 16.0 or exp < -9)) {
-		ActualExp = (int)floor(exp);
-		D = D / JB_Pow10(ActualExp);
+    if (CanExp and D) {
+		double exp = log10(D);
+		if (exp > 16.0 or exp < -9) {
+			ActualExp = (int)floor(exp);
+			D = D / JB_Pow10(ActualExp);
+		}
 	}
     
 	double F = floor(D);
