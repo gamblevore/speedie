@@ -111,37 +111,35 @@ function NilTracker.If (|message| msg)
 	
 	|| Else = arg1.next									// if x: y=y1, else: y=y2
 		.Restore(IfDepth)								// undo y=y1 but keep track of it
+		|| Arg1Depth = .DeclCount
+		.ProcessCond(arg2, branchstate.Never)
 		|| arg2 = Else.first
-		if (arg2 == @arg)								// else
-			|| Arg1Depth = .DeclCount
-			.ProcessCond(arg2, branchstate.Never)
+		if (arg2 != @arg)								// elseif
+			.if(else)
+		  else
 			.RunNormal(arg2)
-			// if x
-				// return
-			// else
-				// y = z
-			require !arg1.Blocks
+		// if x
+			// return
+		// else
+			// y = z
+		require !arg1.Blocks
 
-			// if x
-				// y = z1
-			// else
-				// y = z2
-			
-			// 1 y: false
-			// if
-			// 2 x: True
-			// 3 y: true
-			// else
-			// 4 x: false
-			// 5 y: true
-			
-			.DeclCount = Arg1Depth						// skip arg2, its already current
-			.merge(IfDepth)								// merges y=y1, y=y2 :)
-			
-		  else											// elseif
-			|| cond2 = arg2
-			arg2++
-
+		// if x
+			// y = z1
+		// else
+			// y = z2
+		
+		// 1 y: false
+		// if
+		// 2 x: True
+		// 3 y: true
+		// else
+		// 4 x: false
+		// 5 y: true
+		
+		.DeclCount = Arg1Depth							// skip arg2, its already current
+		.merge(IfDepth)									// merges y=y1, y=y2 :)
+		
 	  elseif !arg1.Blocks
 		.merge(IfDepth)									// if  x: y = y2
 
