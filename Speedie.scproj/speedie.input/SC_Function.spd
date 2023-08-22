@@ -1396,7 +1396,7 @@ function Message.LastInBlock
 
 	while test
 		arg = test.prev // if.arg
-		require arg.flags&kEndsBlock
+		require arg.Blocks
 		test = arg.parent
 		test.flags |= kEndsBlock
 		if test.TmpType is kif

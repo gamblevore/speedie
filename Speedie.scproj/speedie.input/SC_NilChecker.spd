@@ -59,7 +59,7 @@ function message.NilDecl (|scdecl|)
 function NilTracker.UseChildAsReal (|message| wrapper, |bool|) // a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = wrapper.first
-		return .RealifyParam(ch, ch.NilDecl)	
+		return .FailIfNotReal(ch, ch.NilDecl)	
 	
 
 function NilTracker.Function (|message| msg, |branchstate| Y=0)
@@ -69,7 +69,7 @@ function NilTracker.Function (|message| msg, |branchstate| Y=0)
 	|| fn = prms.obj|scfunction|
 	if msg.tmptype == ASMtmp.kTern
 		debugat
-		return .IfOrWhileOrTern(prms)
+		return .tern(prms)
 
 	if (fp.func == @bra)
 		require !.UseChildAsReal(fp.first)						// (abc)()
@@ -100,77 +100,66 @@ function NilTracker.Return (|message| msg)
 		rd.nilused |= vn // find the answer at the end
 
 
-function NilTracker.IfWhileOne (|message| test, |message| root, |message|)
+function NilTracker.If (|message| msg)
 	opt norefcounts
-	|| Depth = .Save
-	|| cond = test.first
-	|| arg
-	// in order to do this... we need to have access to both branches.
-	// that also means... we need to find what we consider a branch.
-	// for example    if (x){return}
-	if cond == @arg
-		arg = cond
+	|| IfDepth = .DeclCount
+	|| cond = msg.first
+	.ProcessCond(cond, branchstate.always)
+	|| arg1 = cond.next
+	|| ArgDepth = .DeclCount
+	.RunNormal(arg1)
+	
+	|| Else = arg1.next									// if x: y=y1, else: y=y2
+		.Restore(IfDepth)								// undo y=y1 but keep track of it
+		|| arg2 = Else.first
+		if (arg2 == @arg)								// else
+			|| Arg1Depth = .DeclCount
+			.ProcessCond(arg2, branchstate.Never)
+			.RunNormal(arg2)
+			// if x
+				// return
+			// else
+				// y = z
+			require !arg1.Blocks
+
+			// if x
+				// y = z1
+			// else
+				// y = z2
+			
+			// 1 y: false
+			// if
+			// 2 x: True
+			// 3 y: true
+			// else
+			// 4 x: false
+			// 5 y: true
+			
+			.DeclCount = Arg1Depth						// skip arg2, its already current
+			.merge(IfDepth)								// merges y=y1, y=y2 :)
+			
+		  else											// elseif
+			|| cond2 = arg2
+			arg2++
+
+	  elseif !arg1.Blocks
+		.merge(IfDepth)									// if  x: y = y2
+
 	  else
-		.ProcessCond(cond, branchstate.always)
-	.RunNormal(arg)
-	.merge(Depth)
-	
-/*
-	Simplest example, should just merge...
-	c = c1
-	if (a) {
-		c = c2
-	}
-	// c's value depends on merging the before and branch values
-	
-	
-	c = c1
-	if (a) {
-		c = c2
-	} else {
-		c = c3
-	}
-	// c's value depends on merging the two branch values
-	
-	there are a few cases... "merging", "notting", "return-->extending" and return handling. Also... elseif is more like:
-	
-	c = c1
-	if (a) {
-		return
-	} else {
-		c = c3
-	}
-	// the second branch simply is an extension of the first... and the fallback is just more of the same.
-	// however... we get a "!a" run on it.
-	
-	
-	if a
-		a = a1
-	  else
-		if b
-			b = b1
-		  else
-			c = c1
+		.Undo(IfDepth)									// if !x: return
+		.ProcessCond(cond, branchstate.never)
 
-	so we can just use the "if/else" merger. No need for an "elseif" special code.
 
-*/
 
-	return arg.next
-	
-
-function NilTracker.IfOrWhileOrTern (|message| msg)
-	// finish off terns
-	// x = tern( (cond),   a, .func(&a) ) 
+function NilTracker.Tern (|message| prm)
 	opt norefcounts
-	|| test = msg
-	while test
-		test = .IfWhileOne(test, msg)
-
-
-function NilTracker.If (|message| Tmp)
-	opt norefcounts
-	.IfOrWhileOrTern(Tmp)
+	|| cond = prm.first
+	// need to reset stuff...
+	// and merge too.
+	.ProcessCond(cond, branchstate.always)
+	.RunNormal(cond.next)
+	.ProcessCond(cond, branchstate.never)
+	.RunNormal(prm.last)
 
 
 function Message.RedundantBranch
@@ -178,16 +167,17 @@ function Message.RedundantBranch
 		StdErr.NewProblem(self, "Redundant branch. Object's nilness is known.")
 
 
-function niltracker.RealifyParam (|message| err, |scdecl| d, |uint| PointerInferred=0,  |bool|)
+function niltracker.FailIfNotReal (|message| err, |scdecl| d, |uint| PointerInferred=0,  |bool|)
 	opt norefcounts
 	if d.NilUsed isnt Nilish
 		return true
 
-	|| msg = .nilmsg(err, d, PointerInferred)
-	expect  (!msg) (err, msg)
-	d.NilDeclared = NilState.real
-	d.nilused = NilState.Realish
-	return true
+	if !pointerinferred  and  d is param  and  d.NilDeclared is Stated
+		d.NilDeclared = NilState.real
+		d.nilused = NilState.Realish
+		return true
+
+	error (err, .nilmsg(err, d, PointerInferred) )
 
 
 function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y)
@@ -199,7 +189,7 @@ function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y)
 	if u == NilState.Either
 		if (dcl is param) and (dcl.NilDeclared isnt stated)
 			dcl.NilDeclared = NilState.optional
-		return .SetNilness(dcl, dest)
+		return .TestedNilness(dcl, dest)
 
 	if dcl.NilDeclared is Either
 		return msg.RedundantBranch
@@ -226,7 +216,7 @@ function NilTracker.ProcessCondPtr (|message| m, |branchstate| Y)
 	opt norefcounts
 	|| PointedTo = m.first
 	|| pd = PointedTo.nildecl
-		.RealifyParam(PointedTo, pd)
+		.FailIfNotReal(PointedTo, pd)
 		return .ProcessCond(PointedTo, y)
 
 
@@ -332,18 +322,18 @@ function NilTracker.VariableSet (|scdecl| recv, |scdecl| pd, |message| errplace,
 	require recv.suffersnil
 
 	if recv.NilDeclared isnt nilish
-		require .RealifyParam(errplace, pd, isparam>>1)
+		require .FailIfNotReal(errplace, pd, isparam>>1)
 	  
-	elseif (!isparam)
-		.SetNilness(recv, pd.nilused)
-		
-	  else // a param that can accept nil
+	  elseif isparam										// a param that can accept nil
 		if !recv.IsStated and (pd.NilUsed is Nilish)
 			error (errplace, "Unknown if this parameter accepts nil.")
 		if IsParam == 2
 			.SetNilness(pd, recv.nilused)
-			debugger  // its too hard to imagine. just figure this out when we get here
+			debugger 										// its too hard to imagine. just figure this out later
 			// if (a and func(&a))
+	  else
+		.SetNilness(recv, pd.nilused)
+		
 			
 	if recv.PointerCount == 1	// |!&!&struct| abc = f
 	// what about pointers to pointers to something? // just give up? i think so...
@@ -370,8 +360,8 @@ function NilTracker.RunNormal (|message| msg)
 			.Function(s)
 		  elseif (f == @tmp)
 			|| type = S.TmpType
-			if Type is kif or kwhile
-				.IfOrWhileOrTern(s)
+			if Type is kif
+				.If(s)
 			  elseif type is kReturn
 				.Return(s)
 		  elseif (f == @decl)
@@ -391,16 +381,17 @@ function niltracker.nilmsg (|message| err, |scdecl| d, |uint| PointerInferred, |
 		if err == @thg
 			return "Nil Access: Needs 'if' wrapping."
 		return "Nil Access here."
-	if d.NilDeclared isnt Stated
-		return "Nil Error: Don't declare with '?'... or test for nil."
+	return "Nil Error: Don't declare with '?'... or test for nil."
 
 
 
 
 /*
 TODO:
+
 * do the work on args in the if-cond thing...
-	* pass the info about BOTH the conditions... in the state "Y" thing... the applicator can decide what to do about "After" conditions...
+* we need to undo cond-changes within a branch... but not pointer changes within branch
+* so some changes need to be "remaining".... ooof. just set more bits I guess.
 
 * || x = (a and b), if x: a.a(b.b)
 	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...

@@ -93,9 +93,9 @@ class SCDecl (SCObject) {
 	|AsmReg|			DRegister
 	|Byte|				PointerCount
 	|Byte|				AllocSource
-	|byte| 				NilParamPos
 	|NilState|			NilDeclared
 	|NilState|			NilUsed
+	|Byte| 				IfDepth
 
 	
 	constructor (|scclass| type=nil)
