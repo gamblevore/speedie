@@ -22,4 +22,6 @@ Utils/jz
 *.scproj/Cpp/
 **/DerivedData/
 *.args
-Utils/helpless.spd
+
+#Notes To Self
+*.note
