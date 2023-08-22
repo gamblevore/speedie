@@ -204,6 +204,8 @@ class PerryIDE (Window)
 			|| e = .editme
 			|| t = e.text
 			fs <~ "${t.charcount} chars in ${t.linecount} lines"
+			|| msg = .editme.ParsedMessage
+				fs <~ "  (${msg.loc} LOC)"
 			
 		  elseif i == 2
 			|| f = .filelist.FirstSelected as filerow

@@ -68,6 +68,15 @@ function string.Sort (|byte| sep = '\n', |string|)
 	return x.Join(string.byte(sep))
 
 
+function message.LOC (|int|)
+	description "Calculate Lines of content" 
+	opt norefcounts
+	for s.flat in self
+		|| p = s.parent
+			|| pf = p.func
+			rz += (pf == @arg) or (pf == @tmp  and  s == @tmp)
+
+
 function int.Msg (|message|)
 	return @num + .render
 

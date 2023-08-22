@@ -1698,7 +1698,7 @@ class TextView (GUIControl)
 		return .text.length < 1MB	// my largest jb file is 60k! 
 
 
-	helper ParsedMessage (|message|)
+	function ParsedMessage (|message|)
 		if ._viewing
 			return ._viewing.DocParsed
 						

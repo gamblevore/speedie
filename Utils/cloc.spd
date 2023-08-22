@@ -67,13 +67,6 @@ function string.LOC (|int|)
 	for s.lines in self
 		rz += s.OutWhite >= 0
 
-function message.LOC (|int|)
-	opt norefcounts
-	for s.flat in self
-		|| p = s.parent
-			|| pf = p.func
-			rz += (pf == @arg) or (pf == @tmp  and  s == @tmp)
-
 
 function file.CLOC
 	if counts.PrintTree
