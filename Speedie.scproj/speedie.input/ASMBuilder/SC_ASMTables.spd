@@ -112,16 +112,17 @@ datatype ASMtmp (MsgUIFlags)
 
 	constants
 		|asmtmp| 
-		kDebugger	= 63
-		kIf			= 62
-		kRejoin		= 61
-		kReturn		= 60
-		kWhile		= 59
-		kSwap		= 58
-		kExit		= 57
-		kContinue	= 56
-		kSetVar		= 55
-		kTern		= 54
+		kElseIf = 1
+		kIf
+		kTern
+		kWhile
+		kRejoin
+		kReturn
+		kExit
+		kContinue
+		kSwap
+		kSetVar
+		kDebugger
 	
 
 function Message.TmpType (|ASMTmp|)

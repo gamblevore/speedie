@@ -100,43 +100,34 @@ function NilTracker.Return (|message| msg)
 		rd.nilused |= vn // find the answer at the end
 
 
-function NilTracker.If (|message| msg)
-	opt norefcounts
+function NilTracker.If (|message| msg, |bool|)
+	opt norefcounts	
 	|| IfDepth = .DeclCount
 	|| cond = msg.first
-	.ProcessCond(cond, branchstate.always)
 	|| arg1 = cond.next
-	|| ArgDepth = .DeclCount
-	.RunNormal(arg1)
+	|| Else = arg1.next
+	|| CondMode = BranchState.Always
+	|| arg2 = else.Last
+		if arg2.Blocks and !arg1.blocks					// swap branches
+			arg1 = arg2
+			arg2 = cond.next
+			CondMode = BranchState.never
 	
-	|| Else = arg1.next									// if x: y=y1, else: y=y2
+	.ProcessCond(cond, CondMode)
+	|| ArgDepth = .DeclCount
+	(.RunNormal(arg1), .if(else))(arg1.isfirst)
+	
+	
+	if arg2												// if x: y=y1, else: y=y2
 		.Restore(IfDepth)								// undo y=y1 but keep track of it
 		|| Arg1Depth = .DeclCount
-		.ProcessCond(arg2, branchstate.Never)
-		|| arg2 = Else.first
-		if (arg2 != @arg)								// elseif
-			.if(else)
-		  else
-			.RunNormal(arg2)
+		.ProcessCond(cond, condmode xor 3)
+		(.RunNormal(arg2), .if(else))(arg2.isfirst)
 		// if x
-			// return
-		// else
 			// y = z
+		// else
+			// return
 		require !arg1.Blocks
-
-		// if x
-			// y = z1
-		// else
-			// y = z2
-		
-		// 1 y: false
-		// if
-		// 2 x: True
-		// 3 y: true
-		// else
-		// 4 x: false
-		// 5 y: true
-		
 		.DeclCount = Arg1Depth							// skip arg2, its already current
 		.merge(IfDepth)									// merges y=y1, y=y2 :)
 		
@@ -146,6 +137,21 @@ function NilTracker.If (|message| msg)
 	  else
 		.Undo(IfDepth)									// if !x: return
 		.ProcessCond(cond, branchstate.never)
+
+	if 0
+		0
+	  elseif 0
+		0
+	  else
+		0
+
+// 1 y: false
+// if
+// 2 x: True
+// 3 y: true
+// else
+// 4 x: false
+// 5 y: true
 
 
 
@@ -207,7 +213,7 @@ function NilTracker.ProcessCond (|message| m, |branchstate| Y)
 		return .ProcessCondFunc(m, y)
 	if fn == @brel
 		return .ProcessCondBrel(m, y)
-	return .RunNormal(m)
+	.RunNormal(m)
 
 
 function NilTracker.ProcessCondPtr (|message| m, |branchstate| Y)
@@ -228,7 +234,7 @@ function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y)
 	if b == '&'			// objects always have an address
 		return // Y
 	debugat
-	return .RunNormal(m)
+	.RunNormal(m)
 
 
 function NilTracker.ProcessCondFunc (|message| m, |branchstate| Y)
@@ -338,7 +344,7 @@ function NilTracker.VariableSet (|scdecl| recv, |scdecl| pd, |message| errplace,
 		return .VariableSet(recv.internal, pd.internal, errplace, IsParam<<1)
 
 
-function NilTracker.RunNormal (|message| msg)
+function NilTracker.RunNormal (|message| msg, |bool|)
 	opt norefcounts
 	
 	for s.fast in msg
@@ -370,6 +376,7 @@ function NilTracker.RunNormal (|message| msg)
 		  
 		  elseif s.hasany
 			return .RunNormal(s) // tail-call opt
+	return true
 
 
 function niltracker.nilmsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
