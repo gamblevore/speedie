@@ -8,6 +8,8 @@ datatype BranchState (byte)
 		Never		= 1
 		Perhaps		= 3
 
+	syntax cast (|bool|)
+		return self == always 
 	function Not (|BranchState|)
 		if self == never
 			return always

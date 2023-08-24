@@ -23,6 +23,7 @@ module NilChecker
 function scfunction.canNil (|bool|)
 	return !(.IsMacro and !.IsWrapper and .isOK)
 
+
 function scfunction.LimitTests (|bool|)
 	|| c = .Lookup #require
 	require c.name contains "NilTest"
@@ -102,48 +103,39 @@ function NilTracker.Return (|message| msg)
 
 function NilTracker.If (|message| msg, |bool|)
 	opt norefcounts	
-	|| IfDepth = .DeclCount
+	|| BeginState = .DeclCount
 	|| cond = msg.first
 	|| arg1 = cond.next
 	|| Else = arg1.next
-	|| CondMode = BranchState.Always
 	|| arg2 = else.Last
-		if arg2.Blocks and !arg1.blocks					// swap branches
-			arg1 = arg2
-			arg2 = cond.next
-			CondMode = BranchState.never
 	
-	.ProcessCond(cond, CondMode)
-	|| ArgDepth = .DeclCount
-	(.RunNormal(arg1), .if(else))(arg1.isfirst)
+	.ProcessCond(cond, BranchState.Always) // setvars during conds actually should go into the parent branch... not undoable.
+	.RunNormal(arg1)
 	
-	
-	if arg2												// if x: y=y1, else: y=y2
-		.Restore(IfDepth)								// undo y=y1 but keep track of it
-		|| Arg1Depth = .DeclCount
-		.ProcessCond(cond, condmode xor 3)
-		(.RunNormal(arg2), .if(else))(arg2.isfirst)
-		// if x
-			// y = z
-		// else
-			// return
-		require !arg1.Blocks
-		.DeclCount = Arg1Depth							// skip arg2, its already current
-		.merge(IfDepth)									// merges y=y1, y=y2 :)
+	if arg2												// IF X {y=y1} ELSE {y=y2}
+		|| Arg1Only = .DeclCount
+		.Restore(BeginState)							// (undo y=y1 but keep track of it)
+		.ProcessCond(cond, BranchState.Never)
+		if !arg2.IsFirst								// ELSEIF (Y) {y=y2}
+			if arg1.Blocks
+				return .if(else)						// (tail call?)
+			.if(else)
+		  else											// ELSE {y=y2}
+			.RunNormal(arg2)
+			require !arg1.Blocks
+		
+		if arg2.blocks									// (use arg1's state, <2% likelyhood)
+			.Undo(BeginState)							// IF X {y=y1} ELSE {return}
+		  else
+			.DeclCount = Arg1Only						// (skip arg2, its already current)
+			.merge(BeginState)							// (merges y=y1, y=y2)
 		
 	  elseif !arg1.Blocks
-		.merge(IfDepth)									// if  x: y = y2
+		.merge(BeginState)								// IF X {y=y1}
 
 	  else
-		.Undo(IfDepth)									// if !x: return
+		.Undo(BeginState)								// IF X {y=y1, return}
 		.ProcessCond(cond, branchstate.never)
-
-	if 0
-		0
-	  elseif 0
-		0
-	  else
-		0
 
 // 1 y: false
 // if
@@ -158,17 +150,27 @@ function NilTracker.If (|message| msg, |bool|)
 function NilTracker.Tern (|message| prm)
 	opt norefcounts
 	|| cond = prm.first
+	|| A = cond.next
+	|| B = A.next
 	// need to reset stuff...
 	// and merge too.
 	.ProcessCond(cond, branchstate.always)
-	.RunNormal(cond.next)
+	|| BeginState = .DeclCount
+	.RunNormal(A)
+	.Restore(BeginState)
 	.ProcessCond(cond, branchstate.never)
-	.RunNormal(prm.last)
+	.RunNormal(B)
+	.merge(BeginState)								// IF X {y=y1}
+
+	|| decl = prm.NilDecl
+	decl.NilUsed = a.NilDecl.nilused (|) B.NilDecl.nilused // something like that?
 
 
-function Message.RedundantBranch
+function Message.RedundantBranch (|bool| y)
 	if StdErr.CanAddMore(errorseverity.problem)
-		StdErr.NewProblem(self, "Redundant branch. Object's nilness is known.")
+		|| str = ("Redundant branch. Always true.", "Redundant branch. Always false.")(Y)
+		StdErr.NewProblem(self, str)
+
 
 
 function niltracker.FailIfNotReal (|message| err, |scdecl| d, |uint| PointerInferred=0,  |bool|)
@@ -196,7 +198,7 @@ function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y)
 		return .TestedNilness(dcl, dest)
 
 	if dcl.NilDeclared is Either
-		return msg.RedundantBranch
+		return msg.RedundantBranch(y.syntaxcast)
 //	return BranchState.Never + (u == dest) // checking for nil-obj allocations
 
 
@@ -262,7 +264,7 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y)
 		if lnil or rnil
 			expect (scop.IsNilTest) (op, "Can't use this operator on nil. Use != or ==.")
 			if (lnil and rnil)
-				return m.RedundantBranch
+				return m.RedundantBranch(true)
 			if scop.HasEquals // if (a==nil or b==nil) return else a.a(b.b)
 				y = y.not
 			|| side = (rr, ll)(lnil)
@@ -401,31 +403,30 @@ TODO:
 * || x = (a and b), if x: a.a(b.b)
 	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...
 
-* freeze bug
-
 
 
 BOOLEAN LOGICS:
-	refills and relsetters:
-		if (!a) a = b(), a = &e
-	
-	multiple branches:
-		if !a { if b {return 1} else {return 2} }
-		a.b = 1
-	
-	return affecting future code:
-		if (!msg)
-			return
-		msg.prop
-	
-	changes nothing:
-		if (a or b)
-
 	nil-checker funcs:
 		can still be realish if returns false.
 
 
 DONE?
+
+can't tell what happened:
+	if (a or b) {nochangetoboth()} else {botharenil()}
+
+
+refills and relsetters:
+	if (!a) a = b(), a = &e
+
+multiple branches:
+	if !a { if b {return 1} else {return 2} }
+	a.b = 1
+
+return affecting future code:
+	if (!msg)
+		return
+	msg.prop
 
 ternaries:
 	|| x = (a.b, nil)(a)
