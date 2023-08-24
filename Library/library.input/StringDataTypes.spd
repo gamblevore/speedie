@@ -18,9 +18,6 @@ datatype char
 	syntax cast (|bool|)
 		return self|bool|
 
-	operator to (|char| other, |IntRange|)
-		return (self, other)|intrange|
-
 
 
 datatype byte
