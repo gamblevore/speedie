@@ -1,13 +1,15 @@
 
 
-|| Speedie = "/usr/local/bin/speedie".file
-|| CppCompiler = "/usr/bin/g++"
+|| Speedie		= "/usr/local/bin/speedie".file
+|| CppCompiler	= "/usr/bin/g++"
+|file| NewStdOut // should just take a file really... shouldn't need to set it to an int
 
 
 module Perry
     |listviewrow|					Projects
     |string|						_SpeedieDir
     |bool|							Checked	
+    |bool| 							Terminal
     |byte| 							FindID
 	|dictionary of string|			PathDict
 	
@@ -29,22 +31,27 @@ module Perry
 		return ._SpeedieDir
 		
 		
-	function LoadWindowsFromArgs (|bool|)
+	function LoadWindowsFromArgs
 		for arg in app.args // load specified documents
-			if .LoadAppArg(arg)
-				rz = true
+			|| ide = .LoadAppArg(arg)
+			if !.Terminal
+				.Terminal = true
+				.Projects = Message()
+				ide.tabs.items = .projects
+				NewStdOut = file.Logs.Child("PerryOut.log")
+				pipe.StdOut = NewStdOut.OpenEmpty
+				"Perry Log"
 	
 	
-	function LoadAppArg (|string| arg, |bool|)
+	function LoadAppArg (|string| arg, |perryide|)
 		|| line = (0, 0)
 		|| path = arg.ExtractPathAndLine(line)
 		require path.FileExists or path.write("")
-		|| win = sdlapp.OpenDocument(path)
-		if win isa PerryIDE
-			win.editme.ViewLineAndSel(line.x)
-			return true
+		|| ide = sdlapp.OpenDocument(path)
+		if ide isa PerryIDE
+			ide.editme.ViewLineAndSel(line.x)
+			return ide
 		
-	
 	
 	function Save
 		visible
@@ -84,17 +91,17 @@ module Perry
 		target lin: sdlapp.removeborder // doesnt seem to work in Windows WSL?
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
+		ColorScheme.LoadFromPrefs(DefaultColors)
 		.BuildAppMenu
 	
 		|| old = app.Pref("currproj")
 		.Projects = (app.prefs)("lastproj")
 		
 		|| i = PerryIDE(false)
-		i.LoadState
 		i.ViewAsText
-		|| Normal = .LoadWindowsSub(i)
-		|| FromArgs = .LoadWindowsFromArgs
-		if !Normal and !FromArgs
+		
+		.LoadWindowsFromArgs
+		if !.Terminal and !.LoadWindowsSub(i)
 			startupwindow.show
 			return 0
 		|| oof = (.FindProj(old),  .Projects.First)(old)
@@ -161,12 +168,6 @@ function IsSpeedieCode (|bool|)
 	opt norefcounts
 	|| r = .filelist.listsource.First as filerow
 		return r.location.pathiscode
-
-
-function LoadState
-	colorscheme.load(defaultcolors.parse)
-	|| it = app.prefs..colors
-		colorscheme.load(it)
 	
 
 function View (|ButtonView| btn)

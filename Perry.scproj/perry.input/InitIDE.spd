@@ -514,7 +514,7 @@ extend PerryIDE
 		startupwindow.hide
 		.viewasproject
 		.ForceRecheck
-		app.saveprefs // for pref-file editing
+		sdlapp.saveprefs // for pref-file editing
 		.showide
 		.ViewAsbetter
 		.LoadStartupErrors

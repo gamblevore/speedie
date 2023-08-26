@@ -3,8 +3,6 @@
 main // main {
 	target debug
 		"*** target debug ***"
-	  else
-		"*** target release ***"
 	
 	//error.AutoPrint = 1
 	sdlapp.RunAndQuit(&perry.startup)

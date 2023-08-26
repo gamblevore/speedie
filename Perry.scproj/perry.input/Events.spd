@@ -8,7 +8,8 @@ function FileSepClicker (guiaction)
 function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE|)
 	|| old = perry.FindProj(path)
 		ClickedTabs(nil, old)
-		return old.ide
+		|| o = old.ide
+			return o
 	ide := PerryIDE.EmptyBase
 	ide := PerryIDE(false)
 	ide.LoadProject(path.file)

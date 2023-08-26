@@ -25,9 +25,13 @@ class ColorScheme
 	|DrawStyle|				MenuRowSel 
 
 	
-	module
-		function Load (|message| s)
-			¥.load(s)
+	module		
+		function LoadFromPrefs (|string| defaults)
+			if Defaults
+				¥.load(defaults.parse)
+			|| s = app.prefs..colors
+				¥.load(s)
+		
 	
 	constructor
 		.initcolors

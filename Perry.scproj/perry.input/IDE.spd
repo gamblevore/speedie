@@ -631,8 +631,7 @@ class PerryIDE (Window)
 				require data.fileexists
 			  else
 				i = perry.ProjContaining(data)
-				if !i
-					i = IdeAddProj(data, nil) // need to find it, not use the front!
+				i := IdeAddProj(data, nil)
 			return i.OpenDoc(after, data, purpose)
 
 		
@@ -776,7 +775,7 @@ class PerryIDE (Window)
 		  else
 			.notify("Prefs are corrupted")
 			app.prefs = oldPrefs
-		.LoadState
+		ColorScheme.LoadFromPrefs(DefaultColors)
 
 
 	function ParseErrorDetect
