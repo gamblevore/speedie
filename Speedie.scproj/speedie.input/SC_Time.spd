@@ -3,8 +3,8 @@
 function compiler.PrintCompileTime (|date| durr) 	
 	if StdErr.OK and !options.silent
 		print "\nStages:            "
-		print Compiler.CurrStage
-		print "\nClasses:           "
+		Compiler.CurrStage.Render.PrintlineColor(errorcolors.good)
+		print   "Classes:           "
 		compiler.ReachedClassCount.render.printlinecolor(errorcolors.good)
 		print   "Funcs:             "
 		"${compiler.reachedfuncs} / ${compiler.funclist.length}".printlinecolor(errorcolors.good)
