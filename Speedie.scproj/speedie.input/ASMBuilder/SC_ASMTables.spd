@@ -83,6 +83,8 @@ dispatch fn_asm_table (fn_asm)
 		if exp == "while":		return ASMtmp.While(self, exp)
 		error (exp, "Unknown statement in ASM")
 		debugger
+	
+	63:
 
 
 datatype ASMtmp (MsgUIFlags)
