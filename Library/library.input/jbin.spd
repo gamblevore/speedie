@@ -20,26 +20,20 @@
 
 
 || _JbinHeader     = "\01\10\EA\E2"     /// can't put a constant in a role? 
-|| _JbinHeaderComp = "\01\11\EA\E2"
 || _jBinNotJbin    = "Not jbin"
 
 
 extend message
-	render RenderJbin (|bool| Compress=false, |string| shell_path = "")
+	render RenderJbin (|string| shell_path = "")
 		opt norefcounts
 		require self
 		|| js = fs|jbin|
 		if shell_path
 			js.sheb(shell_path)
-		if Compress
-			|MessageCompressor| D
-			js <~ _JbinHeaderComp
-			.render_jbin_sub(js,   d)
-		  else
-			js <~ _JbinHeader
-			.render_jbin_sub(js, nil)
+		js <~ _JbinHeader
+		.render_jbin_sub(js)
 			
-	helper render_jbin_sub (|jbin| js, |&MessageCompressor| D)
+	helper render_jbin_sub (|jbin| js)
 		opt norefcounts
 		|| ch	 = self
 		|| after = .FlatAfter
@@ -47,12 +41,11 @@ extend message
 			|| Depth	= 0
 			|| curr		= ch
 			ch			= curr.FlatNextDepth(depth)
-			if !D or !js.AddCompressed(curr, D, depth > 0)
-				js.Add(curr.func, curr.name, depth > 0)
+			js.Add(curr.func, curr.name, depth > 0)
 			js.up(-depth)
 
 // this will do.
-
+/*
 	helper jbin.AddCompressed (|message| Curr, |&MessageCompressor| D, |bool| Down, |bool|)
 		opt norefcounts  // now what? detect
 		|| back = d.Find(curr)								#require
@@ -63,7 +56,8 @@ extend message
 			self <~ ((info&15)(|)128)|byte|
 			.hint(info>>4)
 		return true
-		
+*/
+	
 
 role JBin (Faststring)
 	linkage: cpp_part bin
@@ -87,6 +81,7 @@ role JBin (Faststring)
 	function Add		(|syntax| type, |faststring| fs, |bool|into = false)
 		cpp_part AddFS
 		.addmemory(Type, fs.resultptr, into, fs.length)
+
 
 	function AddComp (|faststring| fs, |int| strength=mzlab.strongest)
 		if strength > 0
@@ -178,7 +173,7 @@ helper StringReader.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
 			.UserObj = .UserObj|message|.upward(t|int|-7)
 			require .userobj
 
-	
+/*
 helper StringReader.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
 	opt norefcounts
 	if Info < 16
@@ -193,18 +188,7 @@ helper StringReader.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
 	|| Msg    = p.msg(r.func, r.name)
 	if Info & 1
 		.UserObj = msg
-
-
-helper StringReader.Parse_jbz (|MessageRoot|)
-	|MessageDecompressor| Decomp
-	rz = .NextMsginfo|messageroot|
-	Decomp <~ rz|message|
-	while
-		|| msg = .NextMsginfo(true) #loop
-		if msg < 256
-			.NextMsgLZ(decomp, msg & 127)
-		  else
-			loop Decomp <~ msg|message|
+*/
 
 
 function StringReader.DetectJBinType (|int|)
@@ -217,8 +201,6 @@ function StringReader.Parse_Jbin (|MessageRoot|)
 	if T == 1
 		rz = .NextMsginfo|messageroot|
 		while .NextMsginfo
-	  elseif T == 2
-		rz = .parse_jbz
 	  else
 		error (self, _jBinNotJbin)
 
@@ -231,8 +213,6 @@ function string.ParseJbin (|messageroot|)
 function string.IsJbin (|int|)
 	if self starts _JbinHeader
 		return 1
-	if self starts _JbinHeaderComp
-		return 2
 
 function string.Digest (|string|)
 	if .IsJbin

@@ -1,7 +1,7 @@
 
-// merging compressor. NOT FINISHED.
-// WORK IN PROGRESS. Probably abandoned for some time
-
+// merging compressor. NOT FINISHED. WORK IN PROGRESS.
+// GOAL
+// Just... share strings, and IDs, the rest can be chucked.
 
 struct HollyPlanter
 	linkage
@@ -17,6 +17,7 @@ struct HollyPlanter
 	constants
 		MaxOneByte = 255-(32+16)
 	
+	
 	function Collect (|StringReader|)
 		.Table   = []
 		require .input.DetectJBinType // oof
@@ -27,6 +28,7 @@ struct HollyPlanter
 		.Tree    = .input.nextmsg(.name, @nil)		#require
 		
 		return .types.name.Stream
+
 
 	function IDGen (|StringReader| S,  |StringReader| T,  |StringReader| L)
 		opt norefcounts
@@ -45,6 +47,7 @@ struct HollyPlanter
 				|| ID = MessageID(S.str(Len), fn|syntax|, found)
 				.table[Found++] = ID
 		expect (Found == IDCount) (.input, "Too few IDs")
+
 
 	function MakeTree (|message|)
 		opt norefcounts
@@ -70,17 +73,19 @@ struct HollyPlanter
 				parent = parent.upward(Raw+1) // go up
 				expect (parent or !treeparser.hasany) (.input, "Went up too far")
 
+
 	function Decode (|message|)
 		|| types = .collect
 		if types.hasany
 			.IDGen(.strings.DecompressStream, types, .lengths.DecompressStream)
 			rz = .MakeTree
 	
+	
 	function StringReader.ReviveJbin (|message|)
 		|HollyPlanter| sq
 		sq.input = self
 		return sq.decode
-			
+
 	
 	
 struct HollyPotter
@@ -193,6 +198,6 @@ struct HollyPotter
 
 helper message.DecompressStream (|StringReader|)
 	if self == @bin
-		return .name.decompress(int.max).Stream()
+		return .name.decompress(int.max).Stream
 	  else
 		return .name.stream

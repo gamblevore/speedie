@@ -412,7 +412,7 @@ class PerryIDE (Window)
 		.CanAskingAboutMissing = false
 		
 		if "This project can't be found on the file-system anymore.\n\nWould you like to close it?".confirm
-			.close(sdlapp.kactivity)
+			.close(sdlapp.kWindowClose)
 			return true
 		if .issinglefileproject
 			f.write("")
