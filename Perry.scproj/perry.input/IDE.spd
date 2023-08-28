@@ -17,7 +17,7 @@ class PerryIDE (Window)
 	|message| 					HistoryMarker
 	
 	|FileRow|					NotTodo
-	|message--|					ProjMsg
+	|message|					ProjMsg
 	|[guicontrol]|				Views
 	|File|						Project
     |ivec2|						AutoPoint
@@ -73,6 +73,7 @@ class PerryIDE (Window)
 	|date|						PopupDateOn
 	|int|						EditMeTabRetryThing
 	|bool| 						StillJumping
+	|bool|						CanAskingAboutMissing
 	|bool|						DuringMsgFB  // canloadfile, canupdate, .disable 
 	|bool|						IsTextOnly
 	|bool|						UsingSpdLib
@@ -129,9 +130,10 @@ class PerryIDE (Window)
 
 	function RemoveProjFromList
 		|| r = .projmsg
+			.projmsg = message() // for now
 			|| n = r.next
 			n := r.prev
-			.tabs.selected=(n)
+			.tabs.selected = n
 			r.remove
 
 
@@ -404,14 +406,17 @@ class PerryIDE (Window)
 
 	function ProjClosed (|bool|)
 		opt norefcounts
+		require .CanAskingAboutMissing
 		|| f = .project
 		require f and !f.exists
+		.CanAskingAboutMissing = false
 		
 		if "This project can't be found on the file-system anymore.\n\nWould you like to close it?".confirm
 			.close(sdlapp.kactivity)
 			return true
-			
-		// So what if it doesn't exist? Tell the user, right?
+		if .issinglefileproject
+			f.write("")
+				
 			
 		
 	function ShowNextError (|int| dir=1, |bool|)

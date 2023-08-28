@@ -6,6 +6,7 @@ extend PerryIDE
 		
 		sdlapp.AppDocumentOpen = PerryOpenDoc // move to a different startup place
 		.InConstructor		= true
+		.CanAskingAboutMissing = true
 		.FileHistory		= message()
 		.id					= "IDE"
 		.Debugger			= GUIControl(self)

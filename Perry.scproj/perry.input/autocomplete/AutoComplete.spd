@@ -270,7 +270,7 @@ function EditMeModified (guitextevent)
 	|| i = .ide
 	require i.project and i.projmsg
 	editmekeydown(self, 0, false)
-	if reason!=documentstate.saving
+	if reason != documentstate.saving
 		|| x = .sel1
 		if !sdlapp.IsTyping
 			i.InteractUpdate

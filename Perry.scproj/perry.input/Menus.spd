@@ -175,12 +175,13 @@ function PressingTabs (guiaction)
 
 function message.IDE (|perryide|)
 	opt norefcounts
-	|| o = .obj as perryide
-		return o
-	for w in window.all
-		if w isa PerryIDE
-			if .name ~= w.Project
-				return w
+	if self
+		|| o = .obj as perryide
+			return o
+		for w in window.all
+			if w isa PerryIDE
+				if .name ~= w.Project
+					return w
 
 
 function MenuCopyProject (guimenuevent)

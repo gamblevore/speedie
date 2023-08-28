@@ -38,9 +38,10 @@ module Perry
 				.Terminal = true
 				.Projects = Message()
 				ide.tabs.items = .projects
-				NewStdOut = file.Logs.Child("PerryOut.log")
-				pipe.StdOut = NewStdOut.OpenEmpty
-				"Perry Log"
+				target !debug
+					NewStdOut = file.Logs.Child("PerryOut.log")
+					pipe.StdOut = NewStdOut.OpenEmpty
+					"Perry Log"
 	
 	
 	function LoadAppArg (|string| arg, |perryide|)

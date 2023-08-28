@@ -67,12 +67,15 @@ function perry.HideStartifneeded
 		
 	
 function ClickedTabs (GUIAction)
-	if row
-		row.ide.showide(True)
+	opt norefcounts
+	|| i = row.ide
+		i.showide(True)
 
 
 function ClickedCompileTabs (Guiaction)
-	.ide.StdOutSelect(row)
+	opt norefcounts
+	|| i = .ide
+		i.StdOutSelect(row)
 
 
 function PerryIDE.StdOutSelect (|object| Desired)	

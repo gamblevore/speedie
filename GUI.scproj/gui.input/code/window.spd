@@ -319,17 +319,19 @@ class Window (GUIControl)
 		cpp_part CloseDisabler
 		disabled "pass a reason why we are closing this (kquit/kactivity)"
 
-	helper sdlapp.AskNoQuit (|bool|) // !sdlapp.askquit
+
+	helper sdlapp.AskQuit (|bool|) // !sdlapp.askquit
 		|| q = "Quit " + app.AppName + "?"
-		return !q.confirm
-		
+		return q.confirm
+	
+	
 	function Close (|int| reason, |bool|)
 		if !sdlapp.wantsquit and (reason < sdlapp.ktryquit)
-			if window.DocumentWindows.length <= 1
-				if sdlapp.AskNoQuit
-					.__CancelClose__(0)
-					return false
+			if (window.DocumentCount == 1)  and  !.isdialog
+				require sdlapp.AskQuit and !.__CancelClose__(0)
+				.disposeall(true)
 				sdlapp.wantsquit = true
+				return true
 
 		|| cancelled = .__CancelClose__(reason)
 		if !cancelled or (reason & sdlapp.kExiting) or sdlapp.WantsQuit
@@ -398,11 +400,11 @@ class Window (GUIControl)
 		function Front (|Window|)
 			return  .all.last
 
-		function DocumentWindows (|[window]|)
+		function DocumentCount (|int|)
 			opt norefcounts
 			for w in .all
-				if (w is visible) and !.opendialogs.find(w)
-					rz <~ w
+				if (w is visible) and !w.isdialog
+					rz++
 
 
 struct SDL_Window

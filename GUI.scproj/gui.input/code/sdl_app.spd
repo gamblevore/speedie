@@ -813,7 +813,7 @@ module SDLApp
 				return 0 // just block it. SDL is sending duplicate events
 		  elseif reason == kwindowclose
 			.LastWindowClose = date.now
-			if sdlapp.AskNoQuit
+			if !sdlapp.AskQuit
 				return 0
 		
 		rz = kExiting
