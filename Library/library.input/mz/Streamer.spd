@@ -29,7 +29,6 @@ function StringReader.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 
 
 helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compressionstats| st=nil, |bool|)
-	expect (self!=nil) ("Nil object given to CompressInto")
 	|| fs = faststring.use(dest)				#require
 	if !.IsCompressed
 		fs <~ .readall
@@ -38,7 +37,7 @@ helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 	st.start
 
 	|| OK = StdErr.Mark
-	check (.DetectJBinType == 1) (self, _jBinNotJbin)
+	check (.isjbin) (self, _jBinNotJbin)
 	
 	|| mz = .NextMsg							#require
 	if mz == @arg // remove this later
