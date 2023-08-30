@@ -317,7 +317,7 @@ module Conv
 		if .AST and (Detected.format != Dest.format)
 			.Start = date.now
 			if dest is jbin
-				.data = .AST.renderjbin(dest is precomp, fs)
+				.data = .AST.renderjbin(fs)
 			  else
 				.data = .AST.Render(fs)
 			.time("Render")
@@ -376,9 +376,6 @@ module Conv
 				return str
 		
 		|| T = str.IsJbin #require
-		if T == 2
-			.Detected |= type.precomp
-		
 		|| mz = str.parsejbin
 		ifn mz == @tmp and "µz"
 			.Detected |= type.jbin
