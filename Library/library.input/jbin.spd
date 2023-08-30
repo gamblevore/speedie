@@ -153,11 +153,9 @@ helper StringReader.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
 	opt norefcounts
 	while
 		|uint| info = .Byte
-		if info & 128
-			if info == -1 // end
-				exit 
-			expect (CanDecomp) (self, "Can't stream compacted jbin. Use .parse instead")
-			return info
+//		if info & 128
+//			expect (CanDecomp) (self, "Can't stream compacted jbin. Use .parse instead")
+//			return info
 		if info == 0 :   continue
 		|| T = (info >> 1)|syntax|
 		if (t >= @max or T <= @nil)
@@ -191,28 +189,24 @@ helper StringReader.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
 */
 
 
-function StringReader.DetectJBinType (|int|)
+function StringReader.IsJBin (|bool|)
 	return .str(4).IsJbin
 	
 	
 function StringReader.Parse_Jbin (|MessageRoot|)	
+	expect .IsJBin (Self, _jBinNotJbin )
 	.UserObj = nil
-	|| T = .DetectJBinType
-	if T == 1
-		rz = .NextMsginfo|messageroot|
-		while .NextMsginfo
-	  else
-		error (self, _jBinNotJbin)
-
+	rz = .NextMsginfo|messageroot|
+	while .NextMsginfo
 	.UserObj = nil
 	
 
 function string.ParseJbin (|messageroot|)
 	return .Stream.Parse_Jbin
 
-function string.IsJbin (|int|)
+function string.IsJbin (|bool|)
 	if self starts _JbinHeader
-		return 1
+		return true
 
 function string.Digest (|string|)
 	if .IsJbin

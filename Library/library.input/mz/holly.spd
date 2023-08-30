@@ -7,7 +7,6 @@ struct HollyPlanter
 	linkage
 		cpp_part HRV
 	|StringReader|	Input 
-	|message|		Name
 	|message|		Strings
 	|message| 		Types
 	|message| 		Lengths
@@ -19,15 +18,15 @@ struct HollyPlanter
 	
 	
 	function Collect (|StringReader|)
+		require .input.isjbin // oof
 		.Table   = []
-		require .input.DetectJBinType // oof
-		.name    = .input.nextmsg(@tmp, "ћ")
-		.strings = .input.nextmsg(.name, @nil)
-		.Types   = .input.nextmsg(.name, @nil)
-		.lengths = .input.nextmsg(.name, @nil)
-		.Tree    = .input.nextmsg(.name, @nil)		#require
-		
-		return .types.name.Stream
+		|| root    = .input.nextmsg(@tmp, "ћ")
+		.strings = .input.nextmsg(root, @nil)
+		.Types   = .input.nextmsg(root, @nil)
+		.lengths = .input.nextmsg(root, @nil)
+		.Tree    = .input.nextmsg(root, @nil)
+		if .tree
+			rz = .types.name.Stream
 
 
 	function IDGen (|StringReader| S,  |StringReader| T,  |StringReader| L)
