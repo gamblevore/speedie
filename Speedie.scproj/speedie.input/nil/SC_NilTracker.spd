@@ -45,7 +45,7 @@ struct NilTracker
 
 	function SetNilness (|scdecl| d, |nilstate| s)
 		|| dd = d.ifDepth
-			debug_require dd < .ifdepth // what?
+		if dd < .ifdepth
 			.items[dd].nil = s
 		  else
 			.TestedNilness(d, s)
@@ -83,9 +83,9 @@ struct NilTracker
 		opt norefcounts
 		if d.nilused > 3 // what?
 		|| c = .DeclCount
-		if (c < 1536) 
+		|| id = .IfDepth
+		if (c < 1536) and (id < 250)
 			|| i = &.Items[c]
-			|| id = .IfDepth
 			i.nil = d.NilUsed
 			i.decl = d
 			.DeclCount = c + 1
@@ -94,6 +94,7 @@ struct NilTracker
 			i.ifDepth = id
 			return
 		
+		check (id < 250) (.fn, "Too much nested if")
 		error (.fn, "Too many variables for nilchecker")
 
 
