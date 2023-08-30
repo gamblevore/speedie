@@ -108,34 +108,38 @@ function NilTracker.If (|message| msg, |bool|)
 	|| arg1 = cond.next
 	|| Else = arg1.next
 	|| arg2 = else.Last
-	
-	.ProcessCond(cond, BranchState.Always) // setvars during conds actually should go into the parent branch... not undoable.
+
+	.IfDepth++
+	.ProcessCond(cond, BranchState.Always) // SetVars during conds actually should go into the parent branch... not undoable.
+	.IfDepth++
 	.RunNormal(arg1)
 	
 	if arg2												// IF X {y=y1} ELSE {y=y2}
 		|| Arg1Only = .DeclCount
 		.Restore(BeginState)							// (undo y=y1 but keep track of it)
+		.IfDepth--
 		.ProcessCond(cond, BranchState.Never)
-		if !arg2.IsFirst								// ELSEIF (Y) {y=y2}
-			if arg1.Blocks
-				return .if(else)						// (tail call?)
-			.if(else)
-		  else											// ELSE {y=y2}
+		if arg2.IsFirst									// ELSE {y=y2}
+			.IfDepth++
 			.RunNormal(arg2)
-			require !arg1.Blocks
+		  else											// ELSEIF (Y) {y=y2}
+			.IfDepth--
+			.if(else)
 		
-		if arg2.blocks									// (use arg1's state, <2% likelyhood)
+		if arg1.Blocks
+			0
+		  elseif arg2.blocks							// (use arg1's state, <2% likelyhood)
 			.Undo(BeginState)							// IF X {y=y1} ELSE {return}
 		  else
 			.DeclCount = Arg1Only						// (skip arg2, its already current)
 			.merge(BeginState)							// (merges y=y1, y=y2)
 		
-	  elseif !arg1.Blocks
-		.merge(BeginState)								// IF X {y=y1}
-
-	  else
+	  elseif arg1.Blocks
 		.Undo(BeginState)								// IF X {y=y1, return}
 		.ProcessCond(cond, branchstate.never)
+
+	  else
+		.merge(BeginState)								// IF X {y=y1}
 
 // 1 y: false
 // if
@@ -152,8 +156,7 @@ function NilTracker.Tern (|message| prm)
 	|| cond = prm.first
 	|| A = cond.next
 	|| B = A.next
-	// need to reset stuff...
-	// and merge too.
+
 	.ProcessCond(cond, branchstate.always)
 	|| BeginState = .DeclCount
 	.RunNormal(A)
@@ -164,6 +167,7 @@ function NilTracker.Tern (|message| prm)
 
 	|| decl = prm.NilDecl
 	decl.NilUsed = a.NilDecl.nilused (|) B.NilDecl.nilused // something like that?
+	// needs to propagate through bras and typescasts into a setrel
 
 
 function Message.RedundantBranch (|bool| y)

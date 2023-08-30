@@ -841,23 +841,7 @@ class SCDecl (SCObject) {
 			debugger
 		
 		return kCastedmatch
-	
-	
-	function UnWrapDataType (|message| exp, |scbase| name_space, |scdecl|)
-		disabled 
-		rz = .contains #expect self
-		|| ExpReplacement = exp.func.msg(exp.name)
-		ExpReplacement.obj = exp.obj
-		for s in exp
-			ExpReplacement <~ s 
 		
-		exp.func = @type
-		exp <~ «dot "Value"
-			ExpReplacement
-			«prm »
-		»
-		exp <~ «thg rz.type.name »
-	
 	
 	function Message.CastToBool (|SCBase|name_space=nil, |int|)
 		return .castToType("bool", TypeBool, name_space, kLossycastedmatch)

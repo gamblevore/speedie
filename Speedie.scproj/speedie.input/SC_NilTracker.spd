@@ -6,6 +6,14 @@ struct NilItem
 	|byte|		IfDepth
 
 
+/*
+	OK... so... how does the ifdepth work?
+	Each decl has a depth at which it is declared?
+	Or are we talking about the current state of the decl within the branch??
+	
+	Not sure? for a start lets increase the depth.
+*/
+
 struct NilTracker
 	linkage:cpp_part nil
 	|uint| 				DeclCount
@@ -36,19 +44,40 @@ struct NilTracker
 			
 
 	function SetNilness (|scdecl| d, |nilstate| s)
-//		|| x = nil
-//		x = maybe()
-//		if x
-//			x = nil
-// 		// what happens to the depth?
-// we really wanna just keep this in track within a branch...
-		
 		|| dd = d.ifDepth
 			debug_require dd < .ifdepth // what?
 			.items[dd].nil = s
 		  else
 			.TestedNilness(d, s)
 	
+	
+/*
+	What are we doing with the ifdepth?
+	
+	ifdepth.... hmmm
+	
+	so we only wanna change the value within the same branch
+	So when we declare a decl... we set it with the current value
+	
+	then within the branch its set again... but now the ifdepth has to increase
+	
+	OK... so why do we need this? what were we doing before. 
+
+	we set the decl.... we got an ifbranch, no ifdepth
+	we store any changes, then undo them. do we need an ifdepth?
+	no! i dont think so... because we keep the current depth via DeclCount
+	
+	what about multiple sets so that we don't merge invalid values. only the last state.
+	
+	x = nil
+	x = realobj()
+	// merge both? NO!
+	
+	OK... so its for multiple sets within a branch.
+	
+	OK... so if we set something during the cond... where is it set?
+	not into the cond... righht? in fact not during any of the else ifs...!
+*/
 	
 	function TestedNilness (|scdecl| d, |nilstate| s)
 		opt norefcounts
