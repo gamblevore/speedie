@@ -77,6 +77,33 @@ struct NilTracker
 	
 	OK... so if we set something during the cond... where is it set?
 	not into the cond... righht? in fact not during any of the else ifs...!
+	
+	Perhaps we don't need such an extreme design? Perhaps all setvars during the ifcond... can...
+	go back into the parent ifdepth thing? and also set the "restore" value at the same time?
+
+	It would be simpler than "going up by 2".
+	
+	OK... so how would that deal with this?
+	
+	if (x and alter(&x) and x)
+		x.y = 1
+		x = maybenil()
+		if (x and alter(&x) and x)
+			x.y = 1
+		  else
+			x = real()
+		// x = real
+	  else
+		x = nil
+	// x = maybe
+				
+
+	// just alter the state 1 up... if altered within a branch :)
+
+	// what about booltests?
+	
+	|| y = (x and alter(&x) and x)
+	
 */
 	
 	function TestedNilness (|scdecl| d, |nilstate| s)

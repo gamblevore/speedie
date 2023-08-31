@@ -140,7 +140,6 @@ function NilTracker.If (|message| msg, |bool|)
 		if arg1.Blocks
 			.Undo(BeginState)							// IF X {y=y1, return}
 			.ProcessCond(cond, branchstate.never)
-	
 		  else
 			.merge(BeginState)							// IF X {y=y1}
 
@@ -325,9 +324,9 @@ function Niltracker.Decl (|message| declmsg)
 function NilTracker.SetRel (|message| msg)
 	opt norefcounts
 	|| l = msg.first
+	|| r = msg.last
 	if l.hasany
 		.RunNormal(l)	
-	|| r = msg.last
 	if r.hasany
 		.RunNormal(r)
 	.VariableSet(l.nildecl, r.nildecl, r, 0)
@@ -356,7 +355,7 @@ function NilTracker.VariableSet (|scdecl| recv, |scdecl| pd, |message| errplace,
 		return .VariableSet(recv.internal, pd.internal, errplace, IsParam<<1)
 
 
-function NilTracker.RunNormal (|message| msg, |bool|)
+function NilTracker.RunNormal (|message| msg)
 	opt norefcounts
 	
 	for s.fast in msg
@@ -372,6 +371,8 @@ function NilTracker.RunNormal (|message| msg, |bool|)
 		  elseif (f == @rel)
 			if s.tmptype is kSetVar								// x = y
 				.SetRel(s)
+			  else
+				.ProcessCondRel(s, branchstate.always)
 		  elseif (f == @func)
 			.Function(s)
 		  elseif (f == @tmp)
@@ -388,7 +389,6 @@ function NilTracker.RunNormal (|message| msg, |bool|)
 		  
 		  elseif s.hasany
 			return .RunNormal(s) // tail-call opt
-	return true
 
 
 function niltracker.nilmsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
