@@ -85,6 +85,13 @@ function NilTracker.Function (|message| msg, |branchstate| Y=0)
 		if p.HasAny
 			.RunNormal(p)
 		p++
+	
+	if !fn.IsNilChecker
+		return
+	if y is always
+		return .ProcessCondThg
+	debugat // so what do we return if it is a nilchecker??
+		
 
 
 function NilTracker.Return (|message| msg)
@@ -169,9 +176,6 @@ function NilTracker.Tern (|message| prm)
 	.RunNormal(B)
 	.merge(BeginState)								// IF X {y=y1}
 	.IfDepth -= 2
-
-	|| decl = prm.NilDecl
-	decl.NilUsed = a.NilDecl.nilused (|) B.NilDecl.nilused // something like that?
 	// needs to propagate through bras and typescasts into a setrel
 
 
@@ -197,7 +201,8 @@ function niltracker.FailIfNotReal (|message| err, |scdecl| d, |uint| PointerInfe
 
 function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y)
 	opt norefcounts
-	|| dest = NilState.Nilish + Y	
+	|| dest = Y|NilState|
+	if dest >= nilstate.Either // hmmm?
 	|| dcl = msg.nildecl			#debug_require
 	|| u = dcl.NilUsed
 	
@@ -207,8 +212,15 @@ function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y)
 		return .TestedNilness(dcl, dest)
 
 	if dcl.NilDeclared is Either
-		return msg.RedundantBranch(y.syntaxcast)
-//	return BranchState.Never + (u == dest) // checking for nil-obj allocations
+		msg.RedundantBranch(y.syntaxcast)
+
+
+function NilTracker.ProcessCondDot (|message| dot, |branchstate| Y)
+	opt norefcounts
+	|| exp = dot.first
+	|| dcl = dot.nildecl			#debug_require
+	if dcl.NilDeclared isnt Either // perhaps allowing redundant checks sometimes is nice?
+		dot.RedundantBranch(y.syntaxcast)
 
 
 function NilTracker.ProcessCond (|message| m, |branchstate| Y)
@@ -216,6 +228,8 @@ function NilTracker.ProcessCond (|message| m, |branchstate| Y)
 	|| fn = m.func
 	if fn == @thg
 		return .ProcessCondThg(m, y)
+	if fn == @dot
+		return .ProcessCondDot(m, y)
 	if fn == @bra or @type
 		return .ProcessCond(m.first, Y)
 	if fn == @rel
@@ -224,36 +238,30 @@ function NilTracker.ProcessCond (|message| m, |branchstate| Y)
 		return .ProcessCondFunc(m, y)
 	if fn == @brel
 		return .ProcessCondBrel(m, y)
+	debugger 
 	.RunNormal(m)
 
 
-function NilTracker.ProcessCondPtr (|message| m, |branchstate| Y)
+function NilTracker.ProcessCondPtr (|message| PointedTo, |branchstate| Y)
 	opt norefcounts
-	|| PointedTo = m.first
-	|| pd = PointedTo.nildecl
-		.FailIfNotReal(PointedTo, pd)
-		return .ProcessCond(PointedTo, y)
 
 
 function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y)
 	opt norefcounts
 	|| b = *m.name
+	|| f = m.first
 	if b == '!'
-		return .ProcessCond(m.first, Y.not)
+		return .ProcessCond(f, Y.not)
 	if b == '*'
-		return .ProcessCondPtr(m, Y)
-	if b == '&'			// objects always have an address
-		return // Y
-	debugat
+		|| pd = f.nildecl
+			.FailIfNotReal(f, pd)
+		return .ProcessCond(f, y)
 	.RunNormal(m)
 
 
 function NilTracker.ProcessCondFunc (|message| m, |branchstate| Y)
 	opt norefcounts
-	return .Function(m, Y)
-	if !fn.IsNilChecker
-		return branchstate.Perhaps
-	debugat // so what do we return if it is a nilchecker??
+	.Function(m, Y)
 	
 
 function NilTracker.ProcessCondRel (|message| m, |branchstate| Y)
@@ -262,10 +270,6 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y)
 	|| op = ll.next
 	|| rr = op.next
 	|| scop = op.obj|SCOperator|
-
-	// let's say that actually... each cond tester tests things
-	// so that is responsbile for calling runnormal or not.
-	// so we shouldn't call .runnormal here	
 
 	if scop.IsCompare
 		|| LNil = (ll.obj as scdecl).IsNowNil
@@ -321,13 +325,21 @@ function Niltracker.Decl (|message| declmsg)
 		r.NilTake(d)	
 	
 
+function NilTracker.RunRel (|message| msg)
+	if .IfDepth&1
+		debugger // what?
+	.IfDepth++
+	.ProcessCondRel(msg, branchstate.always)
+	.IfDepth--
+
+
 function NilTracker.SetRel (|message| msg)
 	opt norefcounts
 	|| l = msg.first
 	|| r = msg.last
 	if l.hasany
 		.RunNormal(l)	
-	if r.hasany
+	if r.hasany // x = func() // we wanna actually call .func! not loop over .funcs insides!
 		.RunNormal(r)
 	.VariableSet(l.nildecl, r.nildecl, r, 0)
 
@@ -355,43 +367,75 @@ function NilTracker.VariableSet (|scdecl| recv, |scdecl| pd, |message| errplace,
 		return .VariableSet(recv.internal, pd.internal, errplace, IsParam<<1)
 
 
+function NilTracker.RunBrel (|message| s)
+	opt norefcounts
+	|| b = *s.name
+	if b == '!'
+		if .IfDepth&1
+			debugger // what?
+		.IfDepth++
+		.ProcessCond(s.first, branchstate.never)
+		.IfDepth--
+	  elseif b == '*'
+		.UseChildAsReal(s)										// *abc
+	  else
+		.RunNormal(s)
+
+
+function NilTracker.RunBra (|message| bra)
+	opt norefcounts
+	|| c = *bra
+	|| d = (.IfDepth&1) and (c == @arg)
+	.IfDepth += d
+	.RunNormal(c)
+	.IfDepth -= d
+
+
+function NilTracker.RunInner (|message| s, |branchstate| y)
+	opt norefcounts
+	|| f = s.func
+	if (f == @dot)
+		|| Prop = s.NilPropAccess
+			.UseChildAsReal(s)						// abc.var
+	  elseif (f == @acc) 
+		.UseChildAsReal(s)							// abc[0]
+	  elseif (f == @brel) 
+		.RunBrel(s)
+	  elseif (f == @rel)
+		if s.tmptype is kSetVar						// x = y
+			.SetRel(s)
+		  else
+			.RunRel(s)
+	  elseif (f == @func)
+		.Function(s)								// || x = y.length,  if x
+													// should this be a CondChecker?
+	  elseif (f == @tmp)
+		|| type = S.TmpType
+		if Type is kif
+			.If(s)
+		  elseif type is kReturn
+			.Return(s)
+	  elseif (f == @decl)
+		.Decl(s)
+	  elseif (f == @bra)
+		.RunBra(s, y)
+		
+	  elseif (f == @arg)
+		debugger // hmm?
+			
+	  elseif s.HasAny
+		if s.IsLast
+			return .RunNormal(s, y)					// tail-call opt
+		  else
+			.RunNormal(s, y)		  
+
 function NilTracker.RunNormal (|message| msg)
 	opt norefcounts
 	
 	for s.fast in msg
-		|| f = s.func
-		if (f == @dot)
-			|| Prop = s.NilPropAccess
-				.UseChildAsReal(s)								// abc.var
-		  elseif (f == @acc) 
-			.UseChildAsReal(s)									// abc[0]
-		  elseif (f == @brel) 
-			if s != "*"
-			.UseChildAsReal(s)									// *abc
-		  elseif (f == @rel)
-			if s.tmptype is kSetVar								// x = y
-				.SetRel(s)
-			  else
-				.ProcessCondRel(s, branchstate.always)
-		  elseif (f == @func)
-			.Function(s)
-		  elseif (f == @tmp)
-			|| type = S.TmpType
-			if Type is kif
-				.If(s)
-			  elseif type is kReturn
-				.Return(s)
-		  elseif (f == @decl)
-			.Decl(s)
-				
-		  elseif !s.IsLast
-			.RunNormal(s)
-		  
-		  elseif s.hasany
-			return .RunNormal(s) // tail-call opt
+		.RunInner(msg,branchstate.always)
 
-
-function niltracker.nilmsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
+function niltracker.NilMsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
 	if PointerInferred
 		return "Nil Error: Pointed-to can't be nil."
 	if d isnt param

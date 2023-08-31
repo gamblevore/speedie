@@ -4,8 +4,8 @@
 datatype BranchState (byte)
 	constants
 		|BranchState|
-		Always		= 2
 		Never		= 1
+		Always		= 2
 		Perhaps		= 3
 
 	syntax cast (|bool|)
