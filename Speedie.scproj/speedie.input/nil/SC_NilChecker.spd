@@ -40,11 +40,10 @@ function NilTracker.Check (|scfunction| f)
 	.Finish(f)
 
 
-function message.NilPropAccess (|scdecl|)
+function message.NilPropAccess (|bool|)
 	opt norefcounts
 	|| m = .DotMustBeProperty
-	if m and m isnt onmodule
-		return m
+	return m and m isnt onmodule
 
 
 function message.NilDecl (|scdecl|)
@@ -60,6 +59,7 @@ function message.NilDecl (|scdecl|)
 function NilTracker.UseChildAsReal (|message| wrapper, |bool|) // a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = wrapper.first
+		.RunInner(ch) // (fn * 0.5[])(a,b) // how do I know if this is real? run the child first (a tern here)
 		return .FailIfNotReal(ch, ch.NilDecl)	
 	
 
@@ -69,24 +69,21 @@ function NilTracker.Function (|message| msg, |branchstate| Y)
 	|| prms = fp.next
 	|| fn = prms.obj|scfunction|
 	if msg.tmptype == ASMtmp.kTern
-		debugat
 		return .tern(prms)
 
 	if (fp.func == @bra)
-		require !.UseChildAsReal(fp.first)						// (abc)()
+		require .UseChildAsReal(fp.first)						// (abc)()
 	
 	|| ret = fn.ReturnType
 		check (!ret.SuffersNil or ret.IsStated) (msg, "Unknown if this function returns nil.")
 
 	|| p = prms.first
-	if fn.IsNilChecker
-		if y is always
-			return .ProcessCondThg(p, y)
-		// if (!x.length) // x can still be nil?
-			
+	if fn.IsNilChecker and (y is always)
+		.ProcessCondThg(p, y)		// if (!x.length) // x can be nil
+	
+	
 	for a in fn.args
-		|| pd = p.NilDecl
-		.VariableSet(a, pd, p, 1)
+		.VariableSet(a, p.NilDecl, p, 1)
 		if p.HasAny
 			.RunNormal(p)
 		p++
@@ -167,6 +164,7 @@ function NilTracker.Tern (|message| prm)
 	|| A = cond.next
 	|| B = A.next
 
+	debugat
 	.IfDepth++
 	.ProcessCond(cond, branchstate.always)
 	.IfDepth++
@@ -237,15 +235,11 @@ function NilTracker.ProcessCond (|message| m, |branchstate| Y)
 	if fn == @rel
 		return .ProcessCondRel(m, y)
 	if fn == @func
-		return .ProcessCondFunc(m, y)
+		return .function(m, y)
 	if fn == @brel
 		return .ProcessCondBrel(m, y)
 	debugger 
 	.RunNormal(m)
-
-
-function NilTracker.ProcessCondPtr (|message| PointedTo, |branchstate| Y)
-	opt norefcounts
 
 
 function NilTracker.RunBrel (|message| s, |branchstate| y)
@@ -269,19 +263,22 @@ function NilTracker.ProcessCondBrel (|message| m, |branchstate| Y)
 	opt norefcounts
 	|| b = *m.name
 	|| f = m.first
+	.RunInner(f)
 	if b == '!'
 		return .ProcessCond(f, Y.not)
 	if b == '*'
 		|| pd = f.nildecl
 			.FailIfNotReal(f, pd)
 		return .ProcessCond(f, y)
-	.RunNormal(m)
-
-
-function NilTracker.ProcessCondFunc (|message| m, |branchstate| Y)
-	opt norefcounts
-	.Function(m, Y)
 	
+
+function NilTracker.RunRel (|message| msg)
+	if .IfDepth&1
+		debugger // what?
+	.IfDepth++
+	.ProcessCondRel(msg, branchstate.always)
+	.IfDepth--
+
 
 function NilTracker.ProcessCondRel (|message| m, |branchstate| Y)
 	opt norefcounts
@@ -344,14 +341,6 @@ function Niltracker.Decl (|message| declmsg)
 		r.NilTake(d)	
 	
 
-function NilTracker.RunRel (|message| msg)
-	if .IfDepth&1
-		debugger // what?
-	.IfDepth++
-	.ProcessCondRel(msg, branchstate.always)
-	.IfDepth--
-
-
 function NilTracker.SetRel (|message| msg)
 	opt norefcounts
 	|| l = msg.first
@@ -363,27 +352,27 @@ function NilTracker.SetRel (|message| msg)
 	.VariableSet(l.nildecl, r.nildecl, r, 0)
 
 
-function NilTracker.VariableSet (|scdecl| recv, |scdecl| pd, |message| errplace, |uint| IsParam) // setrel, relset
+function NilTracker.VariableSet (|scdecl| recv, |scdecl| sent, |message| errplace, |uint| IsParam) // setrel, relset
 	opt norefcounts
 	require recv.suffersnil
 
 	if recv.NilDeclared isnt nilish
-		require .FailIfNotReal(errplace, pd, isparam>>1)
+		require .FailIfNotReal(errplace, sent, isparam>>1)
 	  
 	  elseif isparam										// a param that can accept nil
-		if !recv.IsStated and (pd.NilUsed is Nilish)
+		if !recv.IsStated and (sent.NilUsed is Nilish)
 			error (errplace, "Unknown if this parameter accepts nil.")
 		if IsParam == 2
-			.SetNilness(pd, recv.nilused)
+			.SetNilness(sent, recv.nilused)
 			debugger 										// its too hard to imagine. just figure this out later
 			// if (a and func(&a))
 	  else
-		.SetNilness(recv, pd.nilused)
+		.SetNilness(recv, sent.nilused)
 		
 			
 	if recv.PointerCount == 1	// |!&!&struct| abc = f
 	// what about pointers to pointers to something? // just give up? i think so...
-		return .VariableSet(recv.internal, pd.internal, errplace, IsParam<<1)
+		return .VariableSet(recv.internal, sent.internal, errplace, IsParam<<1)
 
 
 
@@ -400,7 +389,7 @@ function NilTracker.RunInner (|message| s, |branchstate| y=branchstate.always)
 	opt norefcounts
 	|| f = s.func
 	if (f == @dot)
-		|| Prop = s.NilPropAccess
+		if s.NilPropAccess
 			.UseChildAsReal(s)						// abc.var
 	  elseif (f == @acc) 
 		.UseChildAsReal(s)							// abc[0]
