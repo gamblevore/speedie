@@ -304,7 +304,7 @@ class PerryIDE (Window)
 	function UpdateSearchText
 		opt norefcounts
 		|| other = .UpdateSearchSwap #require 
-		|| t = .focus.text
+		|| t = .realfocus.text // sigh
 		sdlapp.LastSearch = t
 		if other.text != t
 			other.text = t
