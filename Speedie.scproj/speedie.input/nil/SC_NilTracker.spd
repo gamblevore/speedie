@@ -50,7 +50,13 @@ struct NilTracker
 		  else
 			.TestedNilness(d, s)
 	
-	
+
+// we need to redesign this so we always know "Where we are"
+// if we are in a cond... what cond
+// or in a branch, what branch?
+// or in a func... is it in a func or a branch?
+// what about a rel in a func?
+
 /*
 	What are we doing with the ifdepth?
 	
