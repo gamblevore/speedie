@@ -333,11 +333,6 @@ class RingTree (Saveable)
 	function Rand (||)
 		return self[.slowcount.rand]
 
-	
-	function First_ (||)
-		if self
-			return .First
-
 	render
 		fs <~ "("
 		for f in self
@@ -451,7 +446,7 @@ class RingTree (Saveable)
 //		return rz
 
 	iterator
-		|| ch_ = .First_
+		|| ch_ = .First
 		while ( ch_ )
 			|| N = ch_.Next|...|
 			yield ch_ (ch_)
@@ -469,7 +464,7 @@ class RingTree (Saveable)
 			
 
 	iterator fast
-		|| ch_ = .First_
+		|| ch_ = .First
 		while ( ch_ )
 			yield ch_ (ch_)
 			ch_ = ch_.Next|...|

@@ -1,21 +1,16 @@
 
 TODO:
 
-* do the work on args in the if-cond thing...
-* we need to undo cond-changes within a branch... but not pointer changes within branch
-* so some changes need to be "remaining".... ooof. just set more bits I guess.
-
-* || x = (a and b), if x: a.a(b.b)
-	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...
-
-
-
 BOOLEAN LOGICS:
-	nil-checker funcs:
-		can still be realish if returns false.
+* double-branch merging always. not/or is done in terms of negation
+* check all new funcs that they return nilness
+* check all jump()
+* || x = (a and b), if x: a.a(b.b) // only next ifbranch tho
 
 
 DONE?
+
+nil-checker funcs:
 
 can't tell what happened:
 	if (a or b) {nochangetoboth()} else {botharenil()}
@@ -165,3 +160,15 @@ recursive funcs?
 	|| y = (x and alter(&x) and x)
 	
 */
+
+
+
+
+// if !x
+//    x = realobject()
+// If we merge the previous state with new state, we get "maybe"
+// So we need to merge both branches instead of the parent branch.
+
+// I think we are gonna calculate both states/approaches at once.
+// we only have "StateA" and "StateB"... then we can swap between them or choose one.
+

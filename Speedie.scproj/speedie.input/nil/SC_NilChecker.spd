@@ -1,42 +1,14 @@
 
 
 
-// We need to probably combine "merge" and "restore" and "negate"
-// we are always merging two branches... one just might happen to be nil
-// and one might happen to return.
-// for example:
-// 
-// if !x
-//    x = realobject()
-// how to merge the states here? If we combine the previous state of "maybe" with the new state of "real"
-// we get still "maybe". So we need to combine both branches instead of the parent branch.
-// what about returns?
-
-// if !x
-// 		return
-
-// hmmm... perhaps we can treat this differently. I mean... just apply the negative and be done with it.
-// I think we are gonna calculate both states/approaches at once.
-// we only have "StateA" and "StateB"... then we can swap between them or choose one.
-// many cases to solve!!
-
-datatype NilCheckMode (uint)
-	constants
-		|NilCheckMode| 
-		AllowRedundant = 2
-		Active = 1
-	syntax is (|NilCheckMode| other, |bool|)
-		return self == other
-
-	
 prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0, |nilstate|)
 
 	
-function NilTracker.UseChildAsReal (|message| wrapper, |bool|) // a.b, *a, a[0], (a)()
+function NilTracker.UseChildAsReal (|message| wrapper) // a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = wrapper.first
 		Jump(ch) // (fn * 0.5[])(a,b) // how do I know if this is real? run the child first (a tern here)
-		return FailIfNotReal(ch, ch.NilDecl)	
+		FailIfNotReal(ch, ch.NilDecl)	
 	
 
 
@@ -55,10 +27,10 @@ extend_module NilTracker {
 		@arg:	Argument
 		63:     // for the size
 	
-	inittable()
+	TrackerDummies()
 
 
-function InitTable
+function TrackerDummies
 	for i in 64
 		NilTable[i] := Dummy
 					
@@ -83,8 +55,11 @@ function Rel (NilTrackerFn)
 function Property (niltrackerfn)
 	opt norefcounts
 
-	|| exp = msg.first
-	Jump(exp)
+	if !msg.NilPropAccess // remove test
+	|| ch = msg.first
+	Jump(ch)
+	FailIfNotReal(ch, ch.NilDecl)	
+	T.UseChildAsReal(msg)						// abc.var
 	|| dcl = msg.nildecl			#debug_require
 	if dcl.NilDeclared isnt Either // perhaps allowing redundant checks sometimes is nice?
 		msg.RedundantBranch(dcl.nilused is realish)
@@ -96,19 +71,18 @@ function Property (niltrackerfn)
 	// if (a.b)
 	// perhaps the redundant check isn't needed at this point, but some other point?
 	// either way... we need to know "Where we are in the code". in some cond, or not?
-	if msg.NilPropAccess
-		T.UseChildAsReal(msg)						// abc.var
 
 
 function Statement (NilTrackerFn)
 	opt norefcounts
 	|| type = msg.TmpType
 	if Type is kif
-		If(msg)
-	  elseif type is kReturn
-		Return(msg)
-	  elseif type is kWhile
-		While(msg)
+		return If(msg)
+	if type is kReturn
+		return Return(msg)
+	if type is kWhile
+		return While(msg)
+	debugger 
 		
 	
 function Function (NilTrackerFn)
@@ -120,20 +94,21 @@ function Function (NilTrackerFn)
 		return tern(prms)
 
 	if (fp.func == @bra)
-		require T.UseChildAsReal(fp.first)						// (abc)()
-	
-	|| ret = fn.ReturnType
-		check (!ret.SuffersNil or ret.IsStated) (msg, "Unknown if this function returns nil.")
+		T.UseChildAsReal(fp.first)						// (abc)()
 
 	|| p = prms.first
 	if fn.IsNilChecker and (test is Active)
 		Thing(p, NilCheckMode.AllowRedundant)		// if (!x.length) // x can be nil
 	
-	
 	for a in fn.args
 		VariableSet(a, p.NilDecl, p, 1)
 		JumpAny(p)
 		p++
+
+	|| ret = fn.ReturnType				#require
+	check (ret.IsStated or !ret.SuffersNil) (msg, "Unknown if this function returns nil.")
+	return ret.NilDeclared
+	
 
 
 function Return (NilTrackerFn)
@@ -170,16 +145,16 @@ function If (NilTrackerFn)
 	T.IfDepth++
 	jump(cond, BranchState.Always) // SetVars during conds actually should go into the parent branch... not undoable.
 	T.IfDepth++
-	RunNormal(arg1)
+	RunAll(arg1)
 	
 	if arg2												// IF X {y=y1} ELSE {y=y2}
 		|| Arg1Only = T.DeclCount
-		Restore(BeginState)							// (undo y=y1 but keep track of it)
+		Restore(BeginState)								// (undo y=y1 but keep track of it)
 		T.IfDepth--
 		jump(cond, BranchState.Never)
 		if arg2.IsFirst									// ELSE {y=y2}
 			T.IfDepth++
-			RunNormal(arg2)
+			RunAll(arg2)
 			T.IfDepth -= 2
 		  else											// ELSEIF (Y) {y=y2}
 			T.IfDepth--
@@ -245,7 +220,7 @@ function Argument (Niltrackerfn)
 	|| d = t.IfDepth&1
 	
 	t.IfDepth += d
-	RunNormal(msg, test)
+	RunAll(msg, test)
 	t.IfDepth -= d   // || x = (a > b)
 					// both are good!
 					// we long as we know "Where we are... we don't need to fool around with an ifdepth"
@@ -340,7 +315,7 @@ function Jump (NilTrackerFn)
 	return (NilTable[msg.func])(msg, test)
 
 
-function RunNormal (NilTrackerFn)
+function RunAll (NilTrackerFn)
 	opt norefcounts
 	for s.fast in msg
 		if s.IsLast

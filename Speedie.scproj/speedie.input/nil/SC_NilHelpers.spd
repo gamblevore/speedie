@@ -50,6 +50,18 @@ function @scfunction.LoopExitter (Tranfunc)
 	check node.FindOwningLoop(fn.sourcearg) (node, "Must be within a loop.")
 	node.LastInBlock
 
+
 function scdecl.ParamUpgrade
 	if (self is param) and (.NilDeclared isnt stated)
 		.NilDeclared = NilState.optional
+
+
+datatype NilCheckMode (uint)
+	constants
+		|NilCheckMode| 
+		AllowRedundant = 2
+		Active = 1
+
+	syntax is (|NilCheckMode| other, |bool|)
+		return self == other
+
