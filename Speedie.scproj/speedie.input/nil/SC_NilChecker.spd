@@ -20,28 +20,23 @@
 // we only have "StateA" and "StateB"... then we can swap between them or choose one.
 // many cases to solve!!
 
-prototype NilTrackerFn (|&Niltracker| self, |message| msg, |branchstate| Y=branchstate.always, |bool| Mode=false)
-
+datatype NilCheckMode (uint)
+	constants
+		|NilCheckMode| 
+		AllowRedundant = 2
+		Active = 1
+	syntax is (|NilCheckMode| other, |bool|)
+		return self == other
 
 	
-
-
-function scfunction.canNil (|bool|)
-	return !(.IsMacro and !.IsWrapper and .isOK)
-
-
-function scfunction.LimitTests (|bool|)
-	|| c = .Lookup #require
-	require c.name contains "NilTest"
-
-	require .SourceArg contains "nilcheck"
+prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0, |nilstate|)
 
 	
 function NilTracker.UseChildAsReal (|message| wrapper, |bool|) // a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = wrapper.first
-		Jump(self, ch) // (fn * 0.5[])(a,b) // how do I know if this is real? run the child first (a tern here)
-		return .FailIfNotReal(ch, ch.NilDecl)	
+		Jump(ch) // (fn * 0.5[])(a,b) // how do I know if this is real? run the child first (a tern here)
+		return FailIfNotReal(ch, ch.NilDecl)	
 	
 
 
@@ -74,25 +69,25 @@ function Dummy (NilTrackerFn)
 
 function Access (NiLTrackerFn)
 	opt norefcounts
-	.UseChildAsReal(msg)						// abc[0]
+	T.UseChildAsReal(msg)						// abc[0]
 
 	
 function Rel (NilTrackerFn)
 	opt norefcounts
 	if msg.tmptype is kSetVar					// x = y
-		SetRel(self, msg, y, mode)
+		SetRel(msg, test)
 	  else
-		ProcessCondRel(self, msg, y, mode)
+		ProcessCondRel(msg, test)
 
 
 function Property (niltrackerfn)
 	opt norefcounts
 
 	|| exp = msg.first
-	Jump(self, exp)
+	Jump(exp)
 	|| dcl = msg.nildecl			#debug_require
 	if dcl.NilDeclared isnt Either // perhaps allowing redundant checks sometimes is nice?
-		msg.RedundantBranch(y.syntaxcast)
+		msg.RedundantBranch(dcl.nilused is realish)
 
 	//// version two?
 	// so what if we are dong this:
@@ -102,18 +97,18 @@ function Property (niltrackerfn)
 	// perhaps the redundant check isn't needed at this point, but some other point?
 	// either way... we need to know "Where we are in the code". in some cond, or not?
 	if msg.NilPropAccess
-		.UseChildAsReal(msg)						// abc.var
+		T.UseChildAsReal(msg)						// abc.var
 
 
 function Statement (NilTrackerFn)
 	opt norefcounts
 	|| type = msg.TmpType
 	if Type is kif
-		If(self, msg, y, mode)
+		If(msg)
 	  elseif type is kReturn
-		Return(self, msg, y, mode)
+		Return(msg)
 	  elseif type is kWhile
-		While(self, msg, y, mode)
+		While(msg)
 		
 	
 function Function (NilTrackerFn)
@@ -122,23 +117,22 @@ function Function (NilTrackerFn)
 	|| prms = fp.next
 	|| fn = prms.obj|scfunction|
 	if msg.tmptype == ASMtmp.kTern
-		return tern(self, prms, y, mode)
+		return tern(prms)
 
 	if (fp.func == @bra)
-		require .UseChildAsReal(fp.first)						// (abc)()
+		require T.UseChildAsReal(fp.first)						// (abc)()
 	
 	|| ret = fn.ReturnType
 		check (!ret.SuffersNil or ret.IsStated) (msg, "Unknown if this function returns nil.")
 
 	|| p = prms.first
-	if fn.IsNilChecker and (y is always)
-		Thing(self, p, y, true)		// if (!x.length) // x can be nil
+	if fn.IsNilChecker and (test is Active)
+		Thing(p, NilCheckMode.AllowRedundant)		// if (!x.length) // x can be nil
 	
 	
 	for a in fn.args
-		.VariableSet(a, p.NilDecl, p, 1)
-		if p.HasAny
-			Jump(self, p)
+		VariableSet(a, p.NilDecl, p, 1)
+		JumpAny(p)
 		p++
 
 
@@ -149,7 +143,7 @@ function Return (NilTrackerFn)
 	|| vd = value.NilDecl
 	if vd.suffersnil
 		|| vn = vd.nilused
-		|| rd = .fn.ReturnType
+		|| rd = T.fn.ReturnType
 		|| r  = rd.NilDeclared
 		if r is real  and vn is Nilish
 			error (msg, "Nil returned, against function declaration!")
@@ -167,45 +161,45 @@ function While (NilTrackerFn)
 
 function If (NilTrackerFn)
 	opt norefcounts	
-	|| BeginState = .DeclCount
+	|| BeginState = T.DeclCount
 	|| cond = msg.first
 	|| arg1 = cond.next
 	|| Else = arg1.next
 	|| arg2 = else.Last
 
-	.IfDepth++
-	jump(self, cond, BranchState.Always) // SetVars during conds actually should go into the parent branch... not undoable.
-	.IfDepth++
-	RunNormal(self, arg1)
+	T.IfDepth++
+	jump(cond, BranchState.Always) // SetVars during conds actually should go into the parent branch... not undoable.
+	T.IfDepth++
+	RunNormal(arg1)
 	
 	if arg2												// IF X {y=y1} ELSE {y=y2}
-		|| Arg1Only = .DeclCount
-		.Restore(BeginState)							// (undo y=y1 but keep track of it)
-		.IfDepth--
-		jump(self, cond, BranchState.Never)
+		|| Arg1Only = T.DeclCount
+		Restore(BeginState)							// (undo y=y1 but keep track of it)
+		T.IfDepth--
+		jump(cond, BranchState.Never)
 		if arg2.IsFirst									// ELSE {y=y2}
-			.IfDepth++
-			RunNormal(self, arg2)
-			.IfDepth -= 2
+			T.IfDepth++
+			RunNormal(arg2)
+			T.IfDepth -= 2
 		  else											// ELSEIF (Y) {y=y2}
-			.IfDepth--
-			if(self, else)
+			T.IfDepth--
+			if(else)
 		
 		if arg1.Blocks
 			0
 		  elseif arg2.blocks							// (use arg1's state, <2% likelyhood)
-			.Undo(BeginState)							// IF X {y=y1} ELSE {return}
+			Undo(BeginState)							// IF X {y=y1} ELSE {return}
 		  else
-			.DeclCount = Arg1Only						// (skip arg2, its already current)
-			.merge(BeginState)							// (merges y=y1, y=y2)
+			T.DeclCount = Arg1Only						// (skip arg2, its already current)
+			merge(BeginState)							// (merges y=y1, y=y2)
 		
 	  else
-		.IfDepth -= 2
+		T.IfDepth -= 2
 		if arg1.Blocks
-			.Undo(BeginState)							// IF X {y=y1, return}
-			jump(self, cond, branchstate.never)
+			Undo(BeginState)							// IF X {y=y1, return}
+			jump(cond, branchstate.never)
 		  else
-			.merge(BeginState)							// IF X {y=y1}
+			merge(BeginState)							// IF X {y=y1}
 
 
 function Tern (Niltrackerfn)
@@ -215,67 +209,66 @@ function Tern (Niltrackerfn)
 	|| B = A.next
 
 	debugat
-	.IfDepth++
-	jump(self, cond, branchstate.always)
-	.IfDepth++
-	|| BeginState = .DeclCount
-	RunNormal(self, A)
-	.Restore(BeginState)
-	jump(self, cond, branchstate.never)
-	RunNormal(self, B)
-	.merge(BeginState)								// IF X {y=y1}
-	.IfDepth -= 2
+	T.IfDepth++
+	jump(cond, branchstate.always)
+	T.IfDepth++
+	|| BeginState = T.DeclCount
+	rz  = jumpany(A)
+	Restore(BeginState)
+	jump(cond, branchstate.never)
+	rz |= jumpany(B)
+	merge(BeginState)								// IF X {y=y1}
+	T.IfDepth -= 2
+
 	// needs to propagate through bras and typescasts into a setrel
 
 
-
+		
 function Thing (NilTrackerFn)
 	opt norefcounts
-	if Y >= nilstate.Either
-	|| dest = Y|NilState|
+	if test {
+//	|| dest = Y|NilState|
 	|| dcl = msg.nildecl			#debug_require
-	|| u = dcl.NilUsed
 	
-	if u == NilState.Either
-		if (dcl is param) and (dcl.NilDeclared isnt stated)
-			dcl.NilDeclared = NilState.optional
-		return .TestedNilness(dcl, dest)
+	if dcl.NilUsed is Either
+		dcl.ParamUpgrade
+		return T.TestedNilness(dcl, nilstate.realish)
 
-	if !Mode and dcl.NilDeclared is Either
-		msg.RedundantBranch(y.syntaxcast)
+	if dcl.NilDeclared is Either
+		msg.RedundantBranch(dcl.nilused is realish)
+}
 
 
 function Argument (Niltrackerfn)
 	opt norefcounts
 	ifn msg in @bra
-	|| d = .IfDepth&1
+	|| d = t.IfDepth&1
 	
-	.IfDepth += d
-	RunNormal(self, msg, y, mode)
-	.IfDepth -= d   // || x = (a > b)
+	t.IfDepth += d
+	RunNormal(msg, test)
+	t.IfDepth -= d   // || x = (a > b)
 					// both are good!
 					// we long as we know "Where we are... we don't need to fool around with an ifdepth"
 	
 function Bracket (Niltrackerfn)
 	opt norefcounts
-	Jump(self, *msg, y, mode)
+	return Jump(*msg, test)
 
 
 function Brel (Niltrackerfn)
 	opt norefcounts
 	|| b = *msg.name
 	|| f = *msg
-	if b == '!'
-		|| old = .NeedCond()
-		Jump(self, f, branchstate.always, mode)
-		.NegateCond(old)
-	  elseif b == '*'
-		.UseChildAsReal(msg)										// *abc
+	if b == '*'
+		t.UseChildAsReal(msg)										// *abc
 		|| pd = f.nildecl
 			.FailIfNotReal(f, pd)
-		return jump(self, f, y)
-	  else
-		Jump(self, f, y)
+	if b != '&'
+		return Jump(f, test)
+	|| old = t.NeedCond()
+	rz = Jump(f, nilcheckmode.active)
+	t.NegateCond(old)
+
 	
 
 function ProcessCondRel (Niltrackerfn)
@@ -292,47 +285,41 @@ function ProcessCondRel (Niltrackerfn)
 			expect (scop.IsNilTest) (op, "Can't use this operator on nil. Use != or ==.")
 			if (lnil and rnil)
 				return msg.RedundantBranch(true)
-			if scop.HasEquals // if (a==nil or b==nil) return else a.a(b.b)
-				y = y.not
 			|| side = (rr, ll)(lnil)
-			return jump(self, side, Y)
-		return
+			return jump(side, scop.HasEquals|int|)
+		return 0
 	
 	
 	if scop.IsAndOr
-		if scop.IsAndOr == 3 // x = (a and b)
-			if y == BranchState.Never
-				y = BranchState.Perhaps
-		  else // x = !(a or b)
-			if y == BranchState.always
-				y = BranchState.Perhaps
+//		if scop.IsAndOr == 3 // x = (a and b)
+//			if y == BranchState.Never
+//				y = BranchState.Perhaps
+//		  else // x = !(a or b)
+//			if y == BranchState.always
+//				y = BranchState.Perhaps
 		
-		jump(self, ll, Y)
-		jump(self, rr, Y)
-		return
+		jump(ll, NilCheckMode.Active)
+		jump(rr, NilCheckMode.Active)
+		return 0
 
 // its a bit ops by now. all others would have gone.
-	if ll.hasany
-		Jump(self, ll)
-	if rr.hasany
-		Jump(self, rr)
+	JumpAny(ll)
+	JumpAny(rr)
 
 
 function Declaration (niltrackerfn)
 	opt norefcounts
 	|| exp = msg.last
 	if exp == @rel
-		setrel(self, exp, y, mode)
+		setrel(exp)
 	
 
 function SetRel (niltrackerfn)
 	opt norefcounts
 	|| l = msg.first
 	|| r = msg.last
-	if l.hasany
-		Jump(self, l)
-	if r.hasany
-		Jump(self, r)
+	JumpAny(l)
+	JumpAny(r)
 
 	// || x = &b // OK... x is not nil
 	// but how do we know this? &abc does not return anything, not via our current code.
@@ -342,16 +329,23 @@ function SetRel (niltrackerfn)
 	.VariableSet(l.nildecl, r.nildecl, r, 0)
 
 
+function JumpAny (NilTrackerFn)
+	pragma inline
+	if msg.HasAny
+		return .Jump(msg, test)
+
 function Jump (NilTrackerFn)
 	pragma inline
 	opt norefcounts
-	(NilTable[msg.func])(self, msg, y, mode)
+	return (NilTable[msg.func])(msg, test)
 
 
 function RunNormal (NilTrackerFn)
 	opt norefcounts
 	for s.fast in msg
-		Jump(self, msg)
+		if s.IsLast
+			return jump(msg, test)
+		Jump(msg)
 
 
 function NilMsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
@@ -364,12 +358,7 @@ function NilMsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
 	return "Nil Error: Don't declare with '?'... or test for nil."
 
 
-
-}
-
-
-
-function niltracker.VariableSet (|scdecl| recv, |scdecl| sent, |message| errplace, |uint| IsParam) // setrel, relset
+function VariableSet (|scdecl| recv, |scdecl| sent, |message| errplace, |uint| IsParam) // setrel, relset
 	opt norefcounts
 	require recv.suffersnil
 
@@ -380,11 +369,11 @@ function niltracker.VariableSet (|scdecl| recv, |scdecl| sent, |message| errplac
 		|| recnil = recv.nildeclared
 		check ((recnil is stated) or (sent.NilUsed isnt Nilish)) (errplace, "Unknown if this parameter accepts nil.")
 		if IsParam == 2
-			.SetNilness(sent, recnil)
+			T.SetNilness(sent, recnil)
 			debugger 										// its too hard to imagine. just figure this out later
 			// if (a and func(&a))
 	  else
-		.SetNilness(recv, sent.nilused)
+		T.SetNilness(recv, sent.nilused)
 		
 			
 	if recv.PointerCount == 1	// |!&!&struct| abc = f
@@ -393,7 +382,7 @@ function niltracker.VariableSet (|scdecl| recv, |scdecl| sent, |message| errplac
 
 
 
-function niltracker.FailIfNotReal (|message| err, |scdecl| d, |uint| PointerInferred=0,  |bool|)
+function FailIfNotReal (|message| err, |scdecl| d, |uint| PointerInferred=0,  |bool|)
 	opt norefcounts
 	if d.NilUsed isnt Nilish
 		return true
@@ -403,7 +392,10 @@ function niltracker.FailIfNotReal (|message| err, |scdecl| d, |uint| PointerInfe
 		d.nilused = NilState.Realish
 		return true
 
-	error (err, nilmsg(err, d, PointerInferred) )
+	error (err, nilmsg(err, d, PointerInferred))
+
+
+}
 
 
 

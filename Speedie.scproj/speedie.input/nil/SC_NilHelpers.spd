@@ -2,9 +2,9 @@
 
 extend Message {
 
-function RedundantBranch (|bool| y)
+function RedundantBranch (|bool| real, |nilcheckmode|)
 	if StdErr.CanAddMore(errorseverity.problem)
-		|| str = ("Redundant branch. Always true.", "Redundant branch. Always false.")(Y)
+		|| str = ("Redundant test on always-real object", "Redundant test on nil object")(real)
 		StdErr.NewProblem(self, str)
 
 
@@ -23,6 +23,7 @@ function NilDecl (|scdecl|)
 			return l
 		return obj
 
+
 function LastInBlock
 	opt norefcounts
 	.RemoveAfter
@@ -35,7 +36,7 @@ function LastInBlock
 
 	while test
 		arg = test.prev // if.arg
-		require arg.Blocks
+		require arg and arg.Blocks
 		test = arg.parent
 		test.flags |= kEndsBlock
 		if test.TmpType is kif
@@ -49,3 +50,6 @@ function @scfunction.LoopExitter (Tranfunc)
 	check node.FindOwningLoop(fn.sourcearg) (node, "Must be within a loop.")
 	node.LastInBlock
 
+function scdecl.ParamUpgrade
+	if (self is param) and (.NilDeclared isnt stated)
+		.NilDeclared = NilState.optional

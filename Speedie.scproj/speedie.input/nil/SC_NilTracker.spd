@@ -6,14 +6,6 @@ struct NilItem
 	|byte|		IfDepth
 
 
-/*
-	OK... so... how does the ifdepth work?
-	Each decl has a depth at which it is declared?
-	Or are we talking about the current state of the decl within the branch??
-	
-	Not sure? for a start lets increase the depth.
-*/
-
 struct NilTracker
 	linkage:cpp_part nil
 	|uint| 				DeclCount
@@ -33,7 +25,7 @@ struct NilTracker
 		|| id = .IfDepth
 		.DeclCount = s
 		while s >= --c
-			|| i = &(.items[c])
+			|| i = .items[c]
 			|| d = i.decl
 			|| v = i.nil
 			if Merge
@@ -54,86 +46,25 @@ struct NilTracker
 		  else
 			.TestedNilness(d, s)
 	
-
-// we need to redesign this so we always know "Where we are"
-// if we are in a cond... what cond
-// or in a branch, what branch?
-// or in a func... is it in a func or a branch?
-// what about a rel in a func?
-
-/*
-	What are we doing with the ifdepth?
 	
-	ifdepth.... hmmm
-	
-	so we only wanna change the value within the same branch
-	So when we declare a decl... we set it with the current value
-	
-	then within the branch its set again... but now the ifdepth has to increase
-	
-	OK... so why do we need this? what were we doing before. 
-
-	we set the decl.... we got an ifbranch, no ifdepth
-	we store any changes, then undo them. do we need an ifdepth?
-	no! i dont think so... because we keep the current depth via DeclCount
-	
-	what about multiple sets so that we don't merge invalid values. only the last state.
-	
-	x = nil
-	x = realobj()
-	// merge both? NO!
-	
-	OK... so its for multiple sets within a branch.
-	
-	OK... so if we set something during the cond... where is it set?
-	not into the cond... righht? in fact not during any of the else ifs...!
-	
-	Perhaps we don't need such an extreme design? Perhaps all setvars during the ifcond... can...
-	go back into the parent ifdepth thing? and also set the "restore" value at the same time?
-
-	It would be simpler than "going up by 2".
-	
-	OK... so how would that deal with this?
-	
-	if (x and alter(&x) and x)
-		x.y = 1
-		x = maybenil()
-		if (x and alter(&x) and x)
-			x.y = 1
-		  else
-			x = real()
-		// x = real
-	  else
-		x = nil
-	// x = maybe
-				
-
-	// just alter the state 1 up... if altered within a branch :)
-
-	// what about booltests?
-	
-	|| y = (x and alter(&x) and x)
-	
-*/
-	
-	function TestedNilness (|scdecl| d, |nilstate| s)
+	function TestedNilness (|scdecl| d, |nilstate| s, |nilstate|)
 		opt norefcounts
 		if d.nilused > 3 // what?
 		|| c = .DeclCount
 		|| id = .IfDepth
-		|| i = .items[0]
 		if (c < 1536) and (id < 250)
-			i += c
+			|| i = .items[c]
 			i.nil = d.NilUsed
 			i.decl = d
 			.DeclCount = c + 1
 			d.nilused = s
 			d.ifDepth = id
 			i.ifDepth = id
-			return
+			return s
 		
 		check (id < 250) (.fn, "Too much nested if")
 		error (.fn, "Too many variables for nilchecker")
+		return s
 
 
 	function Start (|scfunction| f)
@@ -160,13 +91,24 @@ struct NilTracker
 		.Start(f)
 		.RunNormal(f.SourceArg)
 		.Finish(f)
+
+
+	function scfunction.canNil (|bool|)
+		return !(.IsMacro and !.IsWrapper and .isOK)	
 	
+	function scfunction.LimitTests (|bool|)
+		|| c = .Lookup #require
+		require c.name contains "NilTest"
+		require .SourceArg contains "nilcheck"
+		return true
+	
+		
 	module {
+		|NilTracker| T
 		function SaveLives
 			opt norefcounts
 			require StdErr.ok
 			using options.NilStrength
-				|NilTracker| T
 				for f in compiler.funclist
 					T.Check(f)
 				
@@ -179,7 +121,19 @@ struct NilTracker
 		function SweepInits
 			// || init = compiler.getfunc("init_")
 			// what about "init_"?
-	}
+
+
+		function Undo (|uint| s)
+			T.Restore(s)
+			t.DeclCount = s
+		
+		function Restore (|uint| s)
+			t.merge(s, false)
+	
+		function Merge (|uint| s, |bool| Merge=true)
+			t.merge(s,merge)
+
+}
 	
 	
 
