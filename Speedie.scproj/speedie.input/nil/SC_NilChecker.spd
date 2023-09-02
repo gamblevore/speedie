@@ -58,11 +58,11 @@ function Property (niltrackerfn)
 	if !msg.NilPropAccess // remove test
 	|| ch = msg.first
 	Jump(ch)
-	FailIfNotReal(ch, ch.NilDecl)	
-	T.UseChildAsReal(msg)						// abc.var
+	FailIfNotReal(ch, ch.NilDecl)
+	require test
 	|| dcl = msg.nildecl			#debug_require
 	if dcl.NilDeclared isnt Either // perhaps allowing redundant checks sometimes is nice?
-		msg.RedundantBranch(dcl.nilused is realish)
+		msg.RedundantTest(dcl.nilused is realish)
 
 	//// version two?
 	// so what if we are dong this:
@@ -90,8 +90,9 @@ function Function (NilTrackerFn)
 	|| fp = msg.first
 	|| prms = fp.next
 	|| fn = prms.obj|scfunction|
+
 	if msg.tmptype == ASMtmp.kTern
-		return tern(prms)
+		return tern(prms, test)
 
 	if (fp.func == @bra)
 		T.UseChildAsReal(fp.first)						// (abc)()
@@ -210,7 +211,7 @@ function Thing (NilTrackerFn)
 		return T.TestedNilness(dcl, nilstate.realish)
 
 	if dcl.NilDeclared is Either
-		msg.RedundantBranch(dcl.nilused is realish)
+		msg.RedundantTest(dcl.nilused is realish)
 }
 
 
@@ -238,7 +239,7 @@ function Brel (Niltrackerfn)
 		t.UseChildAsReal(msg)										// *abc
 		|| pd = f.nildecl
 			.FailIfNotReal(f, pd)
-	if b != '&'
+	if b != '!'
 		return Jump(f, test)
 	|| old = t.NeedCond()
 	rz = Jump(f, nilcheckmode.active)
@@ -254,32 +255,32 @@ function ProcessCondRel (Niltrackerfn)
 	|| scop = op.obj|SCOperator|
 
 	if scop.IsCompare
-		|| LNil = (ll.obj as scdecl).IsNowNil
-		|| RNil = (rr.obj as scdecl).IsNowNil
+		|| LNil = ll.IsNowNil
+		|| RNil = rr.IsNowNil
 		if lnil or rnil
 			expect (scop.IsNilTest) (op, "Can't use this operator on nil. Use != or ==.")
 			if (lnil and rnil)
-				return msg.RedundantBranch(true)
+				return ll.RedundantTest(false)
 			|| side = (rr, ll)(lnil)
-			return jump(side, scop.HasEquals|int|)
-		return 0
-	
-	
-	if scop.IsAndOr
-//		if scop.IsAndOr == 3 // x = (a and b)
-//			if y == BranchState.Never
-//				y = BranchState.Perhaps
-//		  else // x = !(a or b)
-//			if y == BranchState.always
-//				y = BranchState.Perhaps
-		
-		jump(ll, NilCheckMode.Active)
-		jump(rr, NilCheckMode.Active)
+			return jump(side, NilCheckMode.Active)
+
+	|| andor = scop.IsAndOr
+	if !andor
+		Jumpany(ll)
+		Jumpany(rr)
 		return 0
 
+	|| old = t.NeedCond
+	Jump(ll, NilCheckMode.Active)
+	if andor != 3 // or					// if (!a or a.length)
+		t.NegateCond(old)
+		Jump(rr, NilCheckMode.Active)
+	.Restore(old)
+	t.CloseCond(old)
+		
+	return 0
+
 // its a bit ops by now. all others would have gone.
-	JumpAny(ll)
-	JumpAny(rr)
 
 
 function Declaration (niltrackerfn)

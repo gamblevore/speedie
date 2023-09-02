@@ -2,7 +2,7 @@
 
 extend Message {
 
-function RedundantBranch (|bool| real, |nilcheckmode|)
+function RedundantTest (|bool| real, |nilcheckmode|)
 	if StdErr.CanAddMore(errorseverity.problem)
 		|| str = ("Redundant test on always-real object", "Redundant test on nil object")(real)
 		StdErr.NewProblem(self, str)

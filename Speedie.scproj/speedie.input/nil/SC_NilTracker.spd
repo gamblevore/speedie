@@ -147,8 +147,12 @@ function SCDecl.NilTake (|scdecl| d)
 	.NilUsed = n
 	.NilDeclared = n
 
-function SCDecl.IsNowNil (|bool|)
-	return (self == TypeNil) or (.nilused isnt real)
+
+function message.IsNowNil (|bool|)
+	opt norefcounts
+	|| d = .obj as scdecl
+		return (d == TypeNil) or (d.nilused isnt real)
+
 
 function SCDecl.DeclareAsUsed
 	opt norefcounts
