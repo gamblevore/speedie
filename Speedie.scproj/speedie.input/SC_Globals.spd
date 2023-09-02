@@ -1584,13 +1584,13 @@ function TypeOfFuncSub (|Message| exp, |SCBase| name_space, |Message| side, |sco
 	
 	|| PList = SCParamArray.new(exp)				// these 3 lines should be 2 lines...
 	require PList.PreReadTypes(name_space, params, side)
-	fn = fn.ArgsMatch( nil, name_space, PList )
-	if !fn
+	|| fn2 = fn.ArgsMatch( nil, name_space, PList )
+	if !fn2
 		fn.ArgsMatch( nil, name_space, PList, kTypeCastDescribeErrors )
-	  elseif !fn.ReturnType
+	  elseif !fn2.ReturnType
 		exp.Obj = typevoid // save it being looked up over and over...
 	
-	return fn
+	return fn2
 
 
 function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
