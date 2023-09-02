@@ -1,0 +1,103 @@
+
+TODO:
+
+* do the work on args in the if-cond thing...
+* we need to undo cond-changes within a branch... but not pointer changes within branch
+* so some changes need to be "remaining".... ooof. just set more bits I guess.
+
+* || x = (a and b), if x: a.a(b.b)
+	* only the very next ifbranch only :) too many cases where x can be altered by all sorts of things...
+
+
+
+BOOLEAN LOGICS:
+	nil-checker funcs:
+		can still be realish if returns false.
+
+
+DONE?
+
+can't tell what happened:
+	if (a or b) {nochangetoboth()} else {botharenil()}
+
+
+refills and relsetters:
+	if (!a) a = b(), a = &e
+
+multiple branches:
+	if !a { if b {return 1} else {return 2} }
+	a.b = 1
+
+return affecting future code:
+	if (!msg)
+		return
+	msg.prop
+
+ternaries:
+	|| x = (a.b, nil)(a)
+
+rel-sets to internal pointers:
+	|| obj = nil
+	|!&!object| x = &obj // error: Pointed-to can't be nil
+
+function calls:
+	function gg (|object|)
+		|| a = maybenil
+		|| x = ff(a) // error: ff does not take nil.
+		|| y = gg()  // error: unknown at this time if gg returns nil.
+
+update the params:
+	function abc (|message| o)
+		o.position // o is now "!"
+
+return values:
+	if x
+		return message()
+	  else
+		return nil // now this func returns optional values. 
+
+using ptrs:
+	if (*msg)
+
+nilstrength:
+	--nil=3
+
+can access prop:
+	if (msg)
+		msg.prop
+
+multiple tests:
+	if (a and b)
+
+redundant "m":
+	if (m and m.length)
+	if (!m or !m.length)
+
+pointless:
+	if nil == nil
+
+fail:
+	if msg >= nil, if msg <= nil
+
+nil within branch:
+	if msg == nil
+
+
+
+Init Vars Sweep?
+	We need to go through the entire program, and give each item found, a "timecode". That
+	is... it has an "earliest time" that it COULD occur.
+perhaps just do it on a per-module basis... If a module makes no sense in terms of itself thats the programmers fault.
+
+recursive funcs?
+	I think for them... we let the user simply specify their nilness!! makes sense, right?
+	I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
+
+
+
+// DISTURBANCE CHECKER WILL HELP
+// for global vars
+	// global.x = obj
+	// func()
+	// global.x.func2 // allowed or not? func() might have altered global.x
+

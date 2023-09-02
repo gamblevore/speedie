@@ -172,7 +172,7 @@ function CompileAll (|bool|)
 	require .Stage( "NilChecking" )
 	.Timer( "NilChecking" )
 
-	NilChecker.SaveLives
+	Niltracker.SaveLives
 	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )

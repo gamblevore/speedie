@@ -1,6 +1,29 @@
 
 
-function Message.LastInBlock
+extend Message {
+
+function RedundantBranch (|bool| y)
+	if StdErr.CanAddMore(errorseverity.problem)
+		|| str = ("Redundant branch. Always true.", "Redundant branch. Always false.")(Y)
+		StdErr.NewProblem(self, str)
+
+
+function NilPropAccess (|bool|)
+	opt norefcounts
+	|| m = .DotMustBeProperty
+	return m and m isnt onmodule
+
+
+function NilDecl (|scdecl|)
+	opt norefcounts
+	|| obj = .obj
+	if (obj isa scdecl)
+		|| l = obj.IsLookupOnly
+		if l isa scdecl
+			return l
+		return obj
+
+function LastInBlock
 	opt norefcounts
 	.RemoveAfter
 
@@ -17,10 +40,12 @@ function Message.LastInBlock
 		test.flags |= kEndsBlock
 		if test.TmpType is kif
 			return test.LastInBlock // bubble up :O
-	
+}
+
 
 function @scfunction.LoopExitter (Tranfunc)
 	|| f = node.first
 		error f
 	check node.FindOwningLoop(fn.sourcearg) (node, "Must be within a loop.")
 	node.LastInBlock
+

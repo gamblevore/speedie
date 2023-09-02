@@ -160,6 +160,26 @@ struct NilTracker
 		.RunNormal(f.SourceArg)
 		.Finish(f)
 	
+	module {
+		function SaveLives
+			opt norefcounts
+			require StdErr.ok
+			using options.NilStrength
+				|NilTracker| T
+				for f in compiler.funclist
+					T.Check(f)
+				
+			scfunction.currfunc = nil
+			.SweepInits
+			StdErr.PrintErrors
+			StdErr.Clear
+	
+		
+		function SweepInits
+			// || init = compiler.getfunc("init_")
+			// what about "init_"?
+	}
+	
 	
 
 function SCDecl.RestoreNil
