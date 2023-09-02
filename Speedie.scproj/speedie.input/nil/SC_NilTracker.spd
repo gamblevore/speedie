@@ -41,8 +41,12 @@ struct NilTracker
 			d.nilused = v
 			if d.IfDepth >= id
 				debugger // bad
-			
-
+		
+	
+	function NeedCond (|int|)
+	function NegateCond (|int| old)
+	function CloseCond (|int| old)
+		
 	function SetNilness (|scdecl| d, |nilstate| s)
 		|| dd = d.ifDepth
 		if dd < .ifdepth
@@ -147,7 +151,16 @@ struct NilTracker
 		f.ReturnType.DeclareAsUsed?
 		.fn = nil
 		
-
+	
+	function Check (|scfunction| f)
+		opt norefcounts
+		require f.cannil and f.limittests
+		return 
+		.Start(f)
+		.RunNormal(f.SourceArg)
+		.Finish(f)
+	
+	
 
 function SCDecl.RestoreNil
 	if .nilused != .NilDeclared // is this ever used?

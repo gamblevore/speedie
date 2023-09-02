@@ -835,18 +835,17 @@ function TypeOfArr (ExprResolver)
 			result.type = NewArrCls
 	
 	
-	if isdispatch and result.type != typedictionary // dispatches use function pointers... 
-		result.type = result.contains.type
-		result.contains = nil
-		result.c_array = IsDispatch-1
-		exp.func = @arg
-		tran_argarray(exp, name_space)
-	  else
-		if result.Contains 
-			if  !result.Contains.type.isobject
-				result.Contains = result.Contains.newwrapper(result.Contains)
-			else
-				result.Contains = result.Contains.MakeContainedOptional
+	|| c = result.contains
+		if isdispatch and result.type != typedictionary // dispatches use function pointers... 
+			result.type = c.type
+			result.contains = nil
+			result.c_array = IsDispatch-1
+			exp.func = @arg
+			tran_argarray(exp, name_space)
+		  elseif  !c.type.isobject
+			result.Contains = c.newwrapper(c)
+		  else
+			result.Contains = c.MakeContainedOptional
 
 		
 	result.Type := typearray

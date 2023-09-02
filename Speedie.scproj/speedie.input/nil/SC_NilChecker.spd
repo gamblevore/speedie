@@ -1,5 +1,30 @@
 
 
+
+// We need to probably combine "merge" and "restore" and "negate"
+// we are always merging two branches... one just might happen to be nil
+// and one might happen to return.
+// for example:
+// 
+// if !x
+//    x = realobject()
+// how to merge the states here? If we combine the previous state of "maybe" with the new state of "real"
+// we get still "maybe". So we need to combine both branches instead of the parent branch.
+// what about returns?
+
+// if !x
+// 		return
+
+// hmmm... perhaps we can treat this differently. I mean... just apply the negative and be done with it.
+// I think we are gonna calculate both states/approaches at once.
+// we only have "StateA" and "StateB"... then we can swap between them or choose one.
+// many cases to solve!!
+
+prototype NilTrackerFn (|&Niltracker| self, |message| msg, |branchstate| Y, |bool| AllowRedundant)
+	
+
+
+
 module NilChecker
 	function SaveLives
 		opt norefcounts
@@ -31,15 +56,6 @@ function scfunction.LimitTests (|bool|)
 	require .SourceArg contains "nilcheck"
 
 
-function NilTracker.Check (|scfunction| f)
-	opt norefcounts
-	require f.cannil and f.limittests
-	return 
-	.Start(f)
-	.RunNormal(f.SourceArg)
-	.Finish(f)
-
-
 function message.NilPropAccess (|bool|)
 	opt norefcounts
 	|| m = .DotMustBeProperty
@@ -63,7 +79,12 @@ function NilTracker.UseChildAsReal (|message| wrapper, |bool|) // a.b, *a, a[0],
 		return .FailIfNotReal(ch, ch.NilDecl)	
 	
 
-function NilTracker.Function (|message| msg, |branchstate| Y)
+
+extend_module NilTracker {
+	dispatch NilTable (NilTrackerFn)
+		@thg: ProcessCondThg
+
+function Function (|message| msg, |branchstate| Y)
 	opt norefcounts
 	|| fp = msg.first
 	|| prms = fp.next
@@ -79,7 +100,7 @@ function NilTracker.Function (|message| msg, |branchstate| Y)
 
 	|| p = prms.first
 	if fn.IsNilChecker and (y is always)
-		.ProcessCondThg(p, y)		// if (!x.length) // x can be nil
+		ProcessCondThg(self, p, y, true)		// if (!x.length) // x can be nil
 	
 	
 	for a in fn.args
@@ -178,12 +199,6 @@ function NilTracker.Tern (|message| prm)
 	// needs to propagate through bras and typescasts into a setrel
 
 
-function Message.RedundantBranch (|bool| y)
-	if StdErr.CanAddMore(errorseverity.problem)
-		|| str = ("Redundant branch. Always true.", "Redundant branch. Always false.")(Y)
-		StdErr.NewProblem(self, str)
-
-
 
 function niltracker.FailIfNotReal (|message| err, |scdecl| d, |uint| PointerInferred=0,  |bool|)
 	opt norefcounts
@@ -198,7 +213,7 @@ function niltracker.FailIfNotReal (|message| err, |scdecl| d, |uint| PointerInfe
 	error (err, .nilmsg(err, d, PointerInferred) )
 
 
-function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y)
+function ProcessCondThg (NilTrackerFn)
 	opt norefcounts
 	if Y >= nilstate.Either			// if a or b
 	|| dest = Y|NilState|
@@ -210,11 +225,11 @@ function NilTracker.ProcessCondThg (|message| msg, |branchstate| Y)
 			dcl.NilDeclared = NilState.optional
 		return .TestedNilness(dcl, dest)
 
-	if dcl.NilDeclared is Either
+	if !AllowRedundant and dcl.NilDeclared is Either
 		msg.RedundantBranch(y.syntaxcast)
 
 
-function NilTracker.ProcessCondDot (|message| dot, |branchstate| Y)
+function ProcessCondDot (|message| dot, |branchstate| Y)
 	opt norefcounts
 	|| exp = dot.first
 	.RunInner(exp)
@@ -223,7 +238,7 @@ function NilTracker.ProcessCondDot (|message| dot, |branchstate| Y)
 		dot.RedundantBranch(y.syntaxcast)
 
 
-function NilTracker.RunBra (|message| bra, |branchstate| y)
+function RunBra (|message| bra, |branchstate| y)
 	opt norefcounts
 	|| c = *bra
 	|| d = (.IfDepth&1) and (c == @arg)
@@ -234,34 +249,16 @@ function NilTracker.RunBra (|message| bra, |branchstate| y)
 					// we long as we know "Where we are... we don't need to fool around with an ifdepth"
 
 
-function NilTracker.ProcessCond (|message| m, |branchstate| Y)
-	opt norefcounts
-	|| fn = m.func
-	if fn == @thg
-		return .ProcessCondThg(m, y)
-	if fn == @dot
-		return .ProcessCondDot(m, y)
-	if fn == @bra or @type
-		return .ProcessCond(m.first, Y)
-	if fn == @rel
-		return .ProcessCondRel(m, y)
-	if fn == @func
-		return .function(m, y)
-	if fn == @brel
-		return .brel(m, y)
-	debugger 
-	.RunNormal(m)
 
-
-function NilTracker.Brel (|message| m, |branchstate| y)
+function Brel (|message| m, |branchstate| y)
 	// MERRGEEEEE
 	opt norefcounts
 	|| b = *m.name
 	|| f = m.first
-	.RunInner(f)
 	if b == '!'
-		|| old = .NeedCond(m)
-		.RunInner(f, Y.not)
+		|| old = .NeedCond()
+		.RunInner(f, branchstate.always)
+		.NegateCond(old)
 		// x = !a // optimise away?
 
 		// hmmm... interesting... 
@@ -274,8 +271,6 @@ function NilTracker.Brel (|message| m, |branchstate| y)
 		// the thing is... if !(a and b)
 		// that gets turned into a perhaps...
 		// perhaps... we need to actually...  just do everything in the positive, and not it after?
-		
-		.RestoreCond(old)
 	  elseif b == '*'
 		.UseChildAsReal(m)										// *abc
 		|| pd = f.nildecl
@@ -285,15 +280,7 @@ function NilTracker.Brel (|message| m, |branchstate| y)
 		.RunInner(f, y)
 	
 
-function NilTracker.RunRel (|message| msg)
-	if .IfDepth&1
-		debugger // what?
-	.IfDepth++
-	.ProcessCondRel(msg, branchstate.always)
-	.IfDepth--
-
-
-function NilTracker.ProcessCondRel (|message| m, |branchstate| Y)
+function ProcessCondRel (|message| m, |branchstate| Y)
 	opt norefcounts
 	|| ll = m.first
 	|| op = ll.next
@@ -344,7 +331,7 @@ function NilTracker.ProcessCondRel (|message| m, |branchstate| Y)
 		.RunNormal(rr)
 
 
-function Niltracker.Decl (|message| declmsg)
+function Decl (|message| declmsg)
 	opt norefcounts
 	|| exp = declmsg.last
 	if exp == @rel
@@ -354,7 +341,7 @@ function Niltracker.Decl (|message| declmsg)
 		r.NilTake(d)	
 	
 
-function NilTracker.SetRel (|message| msg)
+function SetRel (|message| msg)
 	opt norefcounts
 	|| l = msg.first
 	|| r = msg.last
@@ -365,7 +352,7 @@ function NilTracker.SetRel (|message| msg)
 	.VariableSet(l.nildecl, r.nildecl, r, 0)
 
 
-function NilTracker.VariableSet (|scdecl| recv, |scdecl| sent, |message| errplace, |uint| IsParam) // setrel, relset
+function VariableSet (|scdecl| recv, |scdecl| sent, |message| errplace, |uint| IsParam) // setrel, relset
 	opt norefcounts
 	require recv.suffersnil
 
@@ -388,8 +375,26 @@ function NilTracker.VariableSet (|scdecl| recv, |scdecl| sent, |message| errplac
 		return .VariableSet(recv.internal, sent.internal, errplace, IsParam<<1)
 
 
+function ProcessCond (|message| m, |branchstate| Y)
+	opt norefcounts
+	|| fn = m.func
+	if fn == @thg
+		return ProcessCondThg(self, m, y, false)
+	if fn == @dot
+		return .ProcessCondDot(m, y)
+	if fn == @bra or @type
+		return .ProcessCond(m.first, Y)
+	if fn == @rel
+		return .ProcessCondRel(m, y)
+	if fn == @func
+		return .function(m, y)
+	if fn == @brel
+		return .brel(m, y)
+	debugger 
+	.RunNormal(m)
 
-function NilTracker.RunInner (|message| s, |branchstate| y=branchstate.always)
+
+function RunInner (|message| s, |branchstate| y=branchstate.always)
 	opt norefcounts
 	|| f = s.func
 	if (f == @dot)
@@ -428,13 +433,13 @@ function NilTracker.RunInner (|message| s, |branchstate| y=branchstate.always)
 			.RunNormal(s)		  
 
 
-function NilTracker.RunNormal (|message| msg)
+function RunNormal (|message| msg)
 	opt norefcounts
 	for s.fast in msg
 		.RunInner(msg)
 
 
-function niltracker.NilMsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
+function NilMsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
 	if PointerInferred
 		return "Nil Error: Pointed-to can't be nil."
 	if d isnt param
@@ -444,6 +449,14 @@ function niltracker.NilMsg (|message| err, |scdecl| d, |uint| PointerInferred, |
 	return "Nil Error: Don't declare with '?'... or test for nil."
 
 
+
+}
+
+
+function Message.RedundantBranch (|bool| y)
+	if StdErr.CanAddMore(errorseverity.problem)
+		|| str = ("Redundant branch. Always true.", "Redundant branch. Always false.")(Y)
+		StdErr.NewProblem(self, str)
 
 
 /*
