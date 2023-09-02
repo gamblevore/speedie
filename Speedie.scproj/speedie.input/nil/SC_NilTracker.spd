@@ -33,7 +33,7 @@ struct NilTracker
 		|| id = .IfDepth
 		.DeclCount = s
 		while s >= --c
-			|| i = &.items[c]
+			|| i = &(.items[c])
 			|| d = i.decl
 			|| v = i.nil
 			if Merge
@@ -121,8 +121,9 @@ struct NilTracker
 		if d.nilused > 3 // what?
 		|| c = .DeclCount
 		|| id = .IfDepth
+		|| i = .items[0]
 		if (c < 1536) and (id < 250)
-			|| i = &.Items[c]
+			i += c
 			i.nil = d.NilUsed
 			i.decl = d
 			.DeclCount = c + 1
