@@ -5,34 +5,39 @@ class Image (memory)
 	linkage
 		cpp_part Img
 		opt min 3
-	|ivec2|			WH
+	|ivec2|			Size
 	|ivec2|			WindowBase
 	|ivec4|			_ControlClip
 	|string|		Name
+	|int|			DebugCount
 	contains byte
 	
 	constructor (|ivec2| S, |&byte| P, |string| name="")
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
 		.name = name
-		.WHset(s)
+		.sizeset(s)
 		
 	constructor (|ivec2| wh, |string| name="")
 		cpp_Part ConstructorSizeVec2
 		super.constructor(wh.area, 4) 
 		.name = name
-		.WHset(wh)
+		.sizeset(wh)
+	
+	destructor
+		if .name
+			"Destroying: $.name"
 
 	render	
-		fs <~ "image${.wh}:${.name}"
+		fs <~ "image${.size}:${.name}"
 	
 	function CopyImage (|Image|)
-		rz = image(.wh)
+		rz = image(.size)
 		memory.Copy(rz.ptr, .ptr, .ByteCapacity)
 	
 	function ControlClip (assigns:|ivec4| R)
 		cpp_part ControlClipSet4
-		|| sigh = (0, 0, .wh)
+		|| sigh = (0, 0, .size)
 		// what if R is too big?
 		|| b = .WindowBase.xyxy
 		r += b
@@ -44,32 +49,35 @@ class Image (memory)
 	function ControlClip (|ivec4|)
 		return ._ControlClip
 	
+	function Tile (|int| t, |imagetiler|)
+		return .tile((t,t))
+	
 	function Tile (|ivec2| t, |imagetiler|)
+		cpp_Part Tile2
 		rz.tile = t
 		rz.bounds = ._Controlclip
 	
 	function Rect (|ivec4|)
-		return .wh.rect
-	function Size (|ivec2|)
-		return .rect.size
+		return .size.rect
 	
 	
 	function Width (|int|)
-		return .wh.x
+		return .size.x
 	
 	
 	function Height (|int|)
-		return .wh.y
+		return .size.y
 	
-	function WHSet (|ivec2| wh)
-		.wh = wh
-		.WindowBase = (0,0)
-		._ControlClip = (0,0,wh)
 	
-	function WHSet
+	function SizeSet (|ivec2| wh)
+		.size = wh
+		.ResetBoundsToSize
+
+
+	function ResetBoundsToSize
 		cpp_Part resetarea
-		.WindowBase = (0,0)
-		._ControlClip = (0,0,.wh)
+		.WindowBase   = (0, 0)
+		._ControlClip = (0, 0, .size)
 	
 	
 	function Horz (assigns:|ivec2|r)
@@ -92,7 +100,7 @@ class Image (memory)
 		return ._controlclip
 
 	operator contains (|ivec2| p, |bool|)
-		return p inrange .wh
+		return p inrange .size
 
 
 	operator contains (|&imagepixel| r, |bool|)
@@ -104,7 +112,7 @@ class Image (memory)
 		
 	function ResizeTo (|ivec2| WH)
 		.Free
-		.WHset(wh)
+		.sizeset(wh)
 		.length = wh.area
 		.Capacity = .Length
 	
@@ -157,18 +165,21 @@ class Image (memory)
 	
 	syntax access (|ivec2| P, |&ImagePixel|)
 		cpp_part AtXY
-		// We want to add something to x, then check x vs
 		P += .windowbase
-		|| S = .wh
-		rz = .pixels
+		|| S = .size
+		|| base = .pixels
+		rz = base
 		ifn p inrange s
-			p = p.clip(s-(1,1)) // sigh... messy
+			p = p.clip(s-(1,1))
 		p.y = s.y - (1 + p.y) // invert
 		rz += (p fma s.x)
+		// if rz < base  or  rz >= base + .Capacity // how? we already cliped the range above?
 
 	syntax call (|ivec2| P, |vec4|)
 		cpp_part ColXY
+		.debugcount++
 		return .SyntaxAccess(p).Color
+	
 	syntax call (|vec2| P, |vec4|)
 		cpp_part ColVec2// should do interpolation
 		return .SyntaxAccess(p.ivec2).Color
@@ -312,9 +323,9 @@ class Image (memory)
 // move over to the other file.
 	
 	function LoadEmpty (|int| W, |int| H, |bool|)
-		if (.wh.x != W or .wh.y != h)
+		if (.size.x != W or .size.y != h)
 			.Capacity = w*h
-			.WHset((w,h))
+			.sizeset((w,h))
 		return .Pixels
 	
 	

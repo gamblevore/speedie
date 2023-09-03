@@ -247,7 +247,7 @@ datatype uint
 		return !(self mod n)
 
 	function Crc (|byte| b, |uint|)
-		cpp_inbuilt __builtin_ia32_crc32qi
+		cpp_inbuilt __builtin_ia32_crc32qi // not on arm?
 		
 	operator rotl (|int| Amount, |uint64|)
 		cpp_wrapper JB_u32_RotL
@@ -815,7 +815,7 @@ datatype vec4
 		return vec4(.x.clamp, .y.clamp, .z.clamp, .w.clamp)
 	
 	function Sqrt (|vec4|)
-		cpp_inbuilt __builtin_ia32_sqrtps
+		return vec4(.x.sqrt, .y.sqrt, .z.sqrt, .w.sqrt) // oof
 
 	function iVec4 (|ivec4|)
 		return (.x|int|, .y|int|, .z|int|, .w|int|)	

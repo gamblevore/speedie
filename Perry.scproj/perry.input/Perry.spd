@@ -90,6 +90,7 @@ module Perry
 
 	function Startup (GUIApplicationInit)
 		target lin: sdlapp.removeborder // doesnt seem to work in Windows WSL?
+		sdlapp.DrawBackgroundMode = 1
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
 		ColorScheme.LoadFromPrefs(DefaultColors)

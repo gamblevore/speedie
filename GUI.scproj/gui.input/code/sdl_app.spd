@@ -29,6 +29,7 @@ module SDLApp
 	|date|						FixScreenBug
 	|date|						FastToolTipDate
 	|uint|						LastMouseDownRepeat
+	|uint|						DrawBackgroundMode
 	|int|						TicksDuration
 	|uint|						FrameCount
 	|uint|						LastFrameSelMove
@@ -392,11 +393,15 @@ module SDLApp
 
 
 	function DialogIsOpen (|bool|)
-		return window.opendialogs
+		opt norefcounts
+		return .FrontDialog
 
 
-	function OpenDialog (|window|)
-		return window.opendialogs.last
+	function FrontDialog (|window|)
+		opt norefcounts
+		for w.reverse in window.all
+			if w.isdialog
+				return w
 
 
 	function StatusInfo (|string|)
@@ -581,21 +586,23 @@ module SDLApp
 	function DrawFrame
 		opt norefcounts
 		
-		require .StartFrame(.Raw)
-		|| w1 = .DrawWinFrom$
-		if !w1.NoDrawBackground
+		|| w1 = .DrawWinFrom
+		require w1 and .StartFrame(.Raw)
+		if .DrawBackgroundMode == 0
 			¥.DrawBackground(.DrawSpace)
-		
-		// for some reason... the opendialogs might not be in front of the viewable windows??
-		// that is very strange. Lets say it hapened by accident. We want them to be on front, right?
-		// just check if any are drawn?
-		|| d = window.opendialogs
+		   elseif .DrawBackgroundMode == 1
+			.Effects.Jeebox
+			
+// draw windows first...
 		while w1
-			ifn d contains w1
+			if !w1.isdialog
 				.DrawSub(w1)
 			w1 = w1.next as window // dumb check... we'd need a stronger type system... with 3 layers for ringtree
-		for w2 in d
-			.DrawSub(w2)
+
+// then dialogs		
+		for w2 in window.all
+			if w2.isdialog
+				.DrawSub(w2)
 			
 		notifications.Draw
 
@@ -690,9 +697,9 @@ module SDLApp
 		opt norefcounts
 		if !.effects
 			.Effects = JeeboxEffects(.drawspace, 10)
-		debug_require (t and .effects.final)
+		debug_require (t and .effects.orig)
 		|| stride = 0
-		t.lockThatZerosEventhoughItShouldnt(nil, (&.effects.final._ptr)|&_voidptr|, &stride)  // zeros data :( This makes insertion flicking require entire screen redraw!
+		t.lockThatZerosEventhoughItShouldnt(nil, (&.effects.orig._ptr)|&_voidptr|, &stride)  // zeros data :( This makes insertion flicking require entire screen redraw!
 		return true
 
 
@@ -701,7 +708,7 @@ module SDLApp
 //		if .effects and keys.Control and keys.shift
 //			.Effects.Blur
 		
-		return (&.effects.final._ptr)|&_voidptr|
+		return (&.effects.orig._ptr)|&_voidptr|
 	
 	
 	function EndFrame (|&SDL_Texture| T)
@@ -813,15 +820,15 @@ module SDLApp
 				return 0
 		
 		rz = kExiting
-		if .DialogIsOpen
-			for w in window.opendialogs
+		for w in window.all
+			if w.isdialog
 				w.cancelreturn
 				if w.CanJustCloseForQuit
 					w.remove
 				  else
 					rz = 0
-			if !rz
-				return 0
+		if !rz
+			return 0
 
 		.IsQuitting = true
 		for w in window.all
@@ -888,7 +895,7 @@ module SDLApp
 			return knothing
 
 
-		|| w = .opendialog ?? __modules__.window.front
+		|| w = .FrontDialog ?? __modules__.window.front
 		if (!w)
 			return kNothing
 
@@ -911,7 +918,7 @@ module SDLApp
 				return kactivity
 				
 			|| InsideWin = w.lastrect.soothe contains xy
-			if !InsideWin and (w == .opendialog)
+			if !InsideWin and (w == .FrontDialog)
 				if w.ClickOutsideCloses
 					w.CloseDialog
 					return kactivity

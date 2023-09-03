@@ -457,9 +457,8 @@ class RingTree (Saveable)
 	iterator reverse
 		|| ch_ = .last
 		while ( ch_ )
-			|| N = ch_.prev|...|
 			yield ch_ (ch_)
-			ch_ = N
+			ch_ = ch_.prev|...|
 		(self)
 			
 

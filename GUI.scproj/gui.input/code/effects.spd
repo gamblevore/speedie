@@ -1,20 +1,20 @@
+// if the picture is the same, I should cache it.
+// we want to slowly leak some data through from one to the other!
 
 
 // a few graphics effects
 class JeeboxEffects
-	linkage: cpp_part fx
-	|image| 			Read
-	|image| 			Write
-	|image| 			Final
+	linkage: cpp_part jfx
+	|image| 			Orig
+	|image| 			Tmp
 	|vec4| 				Aura
-	|imageblurrer|		BlurData
+	|imageblurrer|		Blurry
 	|imagepixel[8]|		Cols
 	
 	
-	constructor (|image| Read, |float| blurr)
-		.read = read
-		.final = read
-		.blurdata.create(blurr)
+	constructor (|image| Orig, |float| blurr)
+		.orig = orig
+		.Blurry.create(blurr)
 		.cols[0] = (0.1, 0.1, 0.1)
 		.cols[1] = (0.2, 0.2, 0.2)
 		.cols[2] = (0.8, 0.1, 0.9)
@@ -25,69 +25,67 @@ class JeeboxEffects
 		.cols[7] = (0.15, 0.17, 0.12)
 
 
-	function MakeBoxes (|int| seed)
+	function MakeBoxes (|image| img, |int| seed)
+		opt norefcounts
 		|| sm = 24
 		
-		|| img = .read
 		|random| rnd
 		rnd.seed(seed)
-		for r in .read.tile((sm,sm))
+		for r in img.tile(sm)
 			|| c = .cols[rnd.int&7]
 			img.fillrect(r, c)
 		
-		for r in .read.tile((6,6))
+		for r in img.tile(6)
 			|| c = .cols[rnd.int&7]
 			c.a = 96
 			img.fillrect(r, c)
-		
-	
-	function Swap 
-		swap .read .write
-		.final = .read
 	
 	
 	function Start
 		opt norefcounts
-		|| P = .read.wh
-		.write := image(P, "write")
-		if .write.wh != P
-			.Write.resizeto(P)
+		|| P = .orig.size
+		.tmp := image(P, "temp")
+		if .tmp.size != P
+			.tmp.resizeto(P)
 	
 	
-	function Blur 
+	helper Blur (|image| rd, |image| wr, |int|v)
 		opt norefcounts
-		for v.down in 2
-			for (P in .write) (C)
-				|| total = vec4()
-				for (W in .blurdata) (O)
-					|| off = (O,O)
-					off[v] = 0
-					|| col = (.read)(C+off)+(.read)(C-off)
-					total += col*W
-				P <~ total
-			.swap
+		for (P in wr) (C)
+			|| total = vec4()
+			// not the fastest loop ever invented
+			// I suppose we'd have to hard-code the h/v versions
+			// cos we can add +1 easily but the vert is harder.
+			for (W in .Blurry) (O)
+				|| off = (O, O)
+				off[v] = 0
+				|| col = (rd)(C+off)+(rd)(C-off)
+				total += col*W
+			P <~ total
 		
 	
 	setter Aura (|float|)
 		.aura = (value, value+0.25).sincos
 
 	
-	function Sobel
-		.apply(sobelmain)
 
-
-	function Apply (|fnImageShader| fn)
-		for (px in .write) (P)
-			|| v4 = (fn)(self, P.vec2+0.5, .Read)
+	function Apply (|fnImageShader| fn, |image| w, |image| r)
+		for (px in w) (P)
+			|| v4 = (fn)(self, P.vec2+0.5, r)
 			px <~ v4
 	
 	
 	function Jeebox
+		opt norefcounts
 		.start
-		//.swap // hehe
-		.MakeBoxes(1)
-		.Blur
-		//.Sobel
+		|| A = .tmp
+		|| B = .orig
+
+		.MakeBoxes(A, 1)
+		for 2
+			.Blur(A, B, 1)
+			.Blur(B, A, 0)
+		//.apply(sobelmain, A, B)
 
 
 
@@ -169,7 +167,7 @@ struct ImageTiler
 			curr.x2 = b.x + .tile.x
 			while curr.x < B.x2
 				yield curr
-				curr.x += .tile.x
+				curr += .tile.x_x_
 			curr += .tile._y_y
 			
 

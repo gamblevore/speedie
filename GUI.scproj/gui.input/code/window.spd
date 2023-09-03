@@ -5,7 +5,7 @@ class Window (GUIControl)
 		cpp_part Win
 	|bool|							FocusWasSet
 	|bool|							AlphaSubtle
-	|bool|							NoDrawBackground
+	|bool|							IsDialog
 	|bool|							BlockRecurseKeyDown
 	|GUIControl|					Focus   // For multi-windows?
 	|Guicontrol|					InnerFocus
@@ -74,9 +74,6 @@ class Window (GUIControl)
 
 	function SetMenu (|menu| m)
 		disabled "use openedmenu"
-
-	function IsDialog (|bool|)
-		return window.opendialogs contains self
 
 
 	syntax call (|ConfirmCanceller| Cancel=nil, |object|)
@@ -234,7 +231,7 @@ class Window (GUIControl)
 		
 		where.ControlClip = self
 		.inline.DrawInline(where)
-		where.whset
+		where.ResetBoundsToSize
 
 
 	helper EveryFrame
@@ -319,7 +316,7 @@ class Window (GUIControl)
 						
 	
 	function OpenDialog
-		window.OpenDialogs	<~ self
+		.isdialog = true
 		window.all			<~ self
 		is visible
 		sdlapp.StartResize // sigh
@@ -353,8 +350,6 @@ class Window (GUIControl)
 		opt norefcounts
 		isnt visible
 		.ReturnValue := self
-		if OpenDialogs.Last == self
-			OpenDialogs.pop
 		.remove
 	
 	
@@ -402,7 +397,6 @@ class Window (GUIControl)
 		|object|					LeakedTestObj
 		|GUIControl|				ActiveControl
 		|guicontrol of Window|		All = guicontrol(nil)
-		|[window]|					OpenDialogs
 	
 		function Count (|int|)
 			return .all.SlowCount
