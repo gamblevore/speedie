@@ -459,6 +459,7 @@ extend PerryIDE
 	function LogOneComm (|message| msg, |string|type="")
 		.logonething(msg,type, .LogComms$)
 
+
 	function LogOneAction (|message| msg, |string|type="")
 		.logonething(msg,type, .LogActions$)
 

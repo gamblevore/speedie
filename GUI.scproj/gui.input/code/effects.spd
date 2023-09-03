@@ -1,4 +1,4 @@
-// if the picture is the same, I should cache it.
+
 // we want to slowly leak some data through from one to the other!
 
 
@@ -14,40 +14,41 @@ class JeeboxEffects
 	constructor (|float| blurr)
 		.tmp = image()
 		.Blurry.create(blurr)
-		.cols[0] = (0.1, 0.1, 0.1)
-		.cols[1] = (0.2, 0.2, 0.2)
-		.cols[2] = (0.8, 0.1, 0.9)
-		.cols[3] = (1.0, 0.6, 0.2)
-		.cols[4] = (0.1, 0.12, 0.12)
-		.cols[5] = (0.15, 0.17, 0.12)
-		.cols[6] = (0.4, 0.2, 1.0)
-		.cols[7] = (0.15, 0.17, 0.12)
+		.aura = (0.0,1.0, 0.0,1.0)
+		.cols[0] = (0.1,	0.1,	0.1)
+		.cols[1] = (0.2,	0.2,	0.2)
+		.cols[2] = (0.8,	0.1,	0.9)
+		.cols[3] = (1.0,	0.6,	0.2)
+		.cols[4] = (0.1,	0.12,	0.12)
+		.cols[5] = (0.15,	0.17,	0.12)
+		.cols[6] = (0.4,	0.2,	1.0)
+		.cols[7] = (0.15,	0.17,	0.12)
 
 
 	function MakeBoxes (|image| img, |int| seed)
 		opt norefcounts
-		|| sm = 24
+		|| base = 6
 		
 		|random| rnd
 		rnd.seed(seed)
-		for r in img.tile(sm)
+		for r in img.tile(base*5)
 			|| c = .cols[rnd.int&7]
 			img.fillrect(r, c)
 		
-		for r in img.tile(6)
+		for r in img.tile(base)
 			|| c = .cols[rnd.int&7]
 			c.a = 96
 			img.fillrect(r, c)
 	
 	
-	helper Blur (|image| rd, |image| wr, |int|v)
+	helper image.BlurInto (|image| wr, |&ImageBlurrer| blur, |int|v)
 		opt norefcounts
 		for (P in wr) (C)
 			|| total = vec4()
-			for (W in .Blurry) (O)
+			for (W in blur) (O)
 				|| off = (O, O)
 				off[v] = 0
-				|| col = (rd)(C+off)+(rd)(C-off)
+				|| col = (self)(C+off)+(self)(C-off)
 				total += col*W
 			P <~ total
 		
@@ -57,7 +58,7 @@ class JeeboxEffects
 
 	
 
-	function Apply (|fnImageShader| fn, |image| w, |image| r)
+	function Apply (|fnImageShader| fn, |image| r, |image| w)
 		for (px in w) (P)
 			|| v4 = (fn)(self, P.vec2+0.5, r)
 			px <~ v4
@@ -66,15 +67,27 @@ class JeeboxEffects
 	function Jeebox (|image| B)
 		opt norefcounts
 		|| A = .tmp
-		if A.size != B.size
-			A.size = B.size
+		if A.size == B.size
+			A.copyto(B)
+			return 
+	
+		|| start = date.now
+		A.size = B.size
+		.MakeBoxes(A, start)
+		for 2
+			A.BlurInto(B, .blurry, 1)
+			b.BlurInto(A, .blurry, 0)
 
-			.MakeBoxes(A, 1)
-			for 3
-				.Blur(A, B, 1)
-				.Blur(B, A, 0)
-		A.copyto(B)
-		//.apply(sobelmain, A, B)
+		if true
+			.apply(sobelmain, A, B)
+			B.copyto(A)
+		  else
+			A.copyto(B)
+		Duration += date.now - start
+		Notifications <~ "abc"
+		
+	module
+		|date| Duration
 
 
 
@@ -97,8 +110,6 @@ struct ImageBlurrer
 			W[i] = g
 			Lim += g
 		
-		// OK, so lets say lim == 0.6, now what do we do?
-		// Count the number of pixels needed
 		Lim *= 1.0 - 72th // 0.986, approx 99% brightness
 		|| Found = 0.0
 		for i in nn
@@ -139,9 +150,9 @@ helper image.SobelSub (|vec2| XY, |vec2| Move, |vec4|)
 
 
 function SobelMain (fnImageShader)
-    || S1	= read.SobelSub(P, .Aura.xy) // aura circles
-    || S2	= read.SobelSub(P, .Aura.yz)
-    || Sobel= mix(S1, S2, 0.5)
+	|| S1	= read.SobelSub(P, .Aura.xy) // aura circles
+	|| S2	= read.SobelSub(P, .Aura.yz)
+	|| Sobel= mix(S1, S2, 0.5)
 	return (Sobel.rgb, 1.0)
 
 

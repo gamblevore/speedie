@@ -165,10 +165,8 @@ class Image (memory)
 		cpp_part AtXYInt
 		return self[(x,y)]
 	
-	// seems pointless really?
-	// if you want interp... you need the vec4 version
 	syntax access (|vec2| P, |&ImagePixel|)
-		disabled "use vec2 coords or use syntax call for ivec2 coord"
+		disabled "use ivec2 coords to get &pixel, or syntaxcall for interpolated result"
 		cpp_part AtVec2
 		return self[p.ivec2]
 	
@@ -190,7 +188,17 @@ class Image (memory)
 	
 	syntax call (|vec2| P, |vec4|)
 		cpp_part ColVec2// should do interpolation
-		return .SyntaxAccess(p.ivec2).Color
+		// OK... so assume that 0.5 is the center of a pixel. let's get 4 pixels.
+		// c2 c3
+		// c0 c1
+		debugat
+		|| base = p.ivec2
+		for i in 4
+			|| base2 = base + (i>>1, i&1)
+			|| closeness = (base2.Vec2 - p).abs.sum
+			|| p0 = self[base2]
+			|| c0 = p0.color
+			rz += (closeness*c0*0.5)
 		
 	function SavePNG (|file| f) // writetofile
 		disabled "unfinished code"

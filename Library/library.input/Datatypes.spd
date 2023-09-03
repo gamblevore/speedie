@@ -603,7 +603,7 @@ datatype int64
 			fs <~ (self >> 56)|byte|
 			self <<= 8
 
-	function rendersizepart (|faststring| fs, |float| Size, |string| Suff)
+	helper RenderSizePart (|faststring| fs, |float| Size, |string| Suff)
 		|| f = (self|float|/size).DecimalPlaces(1)
 		fs <~ f|int|
 		if f < 120

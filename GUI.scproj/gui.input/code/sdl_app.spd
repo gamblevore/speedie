@@ -28,7 +28,6 @@ module SDLApp
 	|date|						FixScreenBug
 	|date|						FastToolTipDate
 	|uint|						LastMouseDownRepeat
-	|uint|						DrawBackgroundMode
 	|int|						TicksDuration
 	|uint|						FrameCount
 	|uint|						LastFrameSelMove
@@ -560,11 +559,14 @@ module SDLApp
 
 	function DrawWinFrom (|window|)
 		opt norefcounts
+		Window.All.Sort(DialogsLast)
 		for w.reverse in window.all
 			if w.isviewable and w.isfullscreen
 				return w
 		return window.all.first
-		
+	
+	function DialogsLast (SorterComparerWindow)
+		return a.IsDialog < b.isdialog
 
 	function StartResize
 		opt norefcounts
@@ -588,6 +590,7 @@ module SDLApp
 		
 		|| w1 = .DrawWinFrom$
 		.StartFrame(.Raw)
+		
 		if .DrawBackgroundMode == 0
 			¥.DrawBackground(.DrawSpace)
 		  elseif .DrawBackgroundMode == 1
