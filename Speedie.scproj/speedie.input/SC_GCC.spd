@@ -213,7 +213,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 		rz.appendwords( " -lrt" )
 	
 	// Gaming64Bit
-	rz.AppendWords("-ffast-math")
+	rz.AppendWords("-ffast-math -fno-math-errno")
 	
 	ifn platform.OSX
 		rz.appendwords( "-pthread -g" )
