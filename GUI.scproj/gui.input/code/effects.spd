@@ -1,4 +1,5 @@
 
+
 // a few graphics effects
 class JeeboxEffects
 	linkage: cpp_part fx

@@ -4,10 +4,19 @@ module SDLApp
 	linkage
 		cpp_part App
 	|SDL_Event|					Event
-	|[string]|					PendingAlerts
-	|array|						DrawDrag = nil
 	|KeyMod|					KeyMod
 	|GUIPasteEvent|				AppDocumentOpen
+	|[string]|					PendingAlerts
+	|array|						DrawDrag = nil
+	|image|						DrawSpace
+	|image|						ReadSpace
+	|JeeboxEffects|				Effects
+	|&SDL_Window|				ScreenWindow
+	|&SDL_Renderer|				Renderer
+	|&SDL_Texture|				Raw
+	|error|						ToolTip = error()
+	|error|						CompileStatus // remove
+	|string|					LastSearch
 	|ivec2| 					NewSize
 	|ivec2| 					CurrMouseXY
 	|ivec2| 					AppResizingXY
@@ -20,10 +29,14 @@ module SDLApp
 	|date|						FixScreenBug
 	|date|						FastToolTipDate
 	|uint|						LastMouseDownRepeat
+	|int|						TicksDuration
+	|uint|						FrameCount
+	|uint|						LastFrameSelMove
+	|uint|						DrawCount
+	|float|						Scale
 	|bool|						StartedProperly
 	|bool|						AlertsAreSurprising
 	|bool|						IsBackground
-	|byte|						CanDrag
 	|bool|						FlashSelector
 	|bool|						WantsQuit
 	|bool|						IsQuitting
@@ -36,20 +49,8 @@ module SDLApp
 											  // helps with startup events! at least on osx
 	|byte|						SingleFrameNest
 	|byte|						TouchFingersDown
-	|int|						TicksDuration
-	|uint|						FrameCount
-	|uint|						LastFrameSelMove
-	|uint|						DrawCount
-	|float|						Scale
-	|image|						DrawSpace
-	|image|						ReadSpace
-	|JeeboxEffects|				Effects
-	|&SDL_Window|				ScreenWindow
-	|&SDL_Renderer|				Renderer
-	|&SDL_Texture|				Raw
-	|error|						ToolTip = error()
-	|error|						CompileStatus // remove
-	|string|					LastSearch
+	|byte|						CanDrag
+	|byte|						ResizedCounter // for resize bug fix
 
 
 
@@ -646,8 +647,7 @@ module SDLApp
 			
 		|| occured  = .PreFrame (|) .FrameAndEvents
 		require !(Occured & kExiting)
-		if .NewSize
-			.AppResize
+		.HandleAppResize
 		.UpdateWindowFrames
 		if occured&kactivity
 			.DrawFrame
@@ -667,8 +667,15 @@ module SDLApp
 		  else
 			beep
 		return true
+	
+	
+	helper HandleAppResize
+		if !.NewSize
+			if .ResizedCounter
+				.ResizedCounter--
+			return
+		.ResizedCounter = 4
 		
-	helper AppResize (|ivec2|)
 		.raw.dispose
 		|| v = (.NewSize.vec2/.Scale).ivec2
 		.newsize = nil										// phew
@@ -701,10 +708,10 @@ module SDLApp
 		|| stride = 0
 		|| Img = .PicturePtr
 		.Drawcount++
-		target release  // makes it slower but also resizes work better whatever
-						// fix this later so we don't need it.
-			t.UnlockThatCopiesEvenThoughItShouldnt // wait why do we unlock and also lock?
-			t.LockThatZerosEventhoughItShouldnt(nil, img, &Stride)
+		target release
+			if .ResizedCounter
+				t.UnlockThatCopiesEvenThoughItShouldnt // wait why do we unlock and also lock?
+				t.LockThatZerosEventhoughItShouldnt(nil, img, &Stride)
 		|SDL_Rect| dstrect
 		SDL_GL_GetDrawableSize( .screenwindow,  &dstrect.w,  &dstrect.h )
 		SDL_RenderCopy(.renderer, T, nil, &dstrect)
