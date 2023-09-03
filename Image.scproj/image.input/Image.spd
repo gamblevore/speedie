@@ -42,7 +42,11 @@ class Image (memory)
 	
 	
 	function ControlClip (|ivec4|)
-		return ._ControlClip 
+		return ._ControlClip
+	
+	function Tile (|ivec2| t, |imagetiler|)
+		rz.tile = t
+		rz.bounds = ._Controlclip
 	
 	function Rect (|ivec4|)
 		return .wh.rect

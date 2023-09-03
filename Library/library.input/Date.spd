@@ -80,6 +80,10 @@ datatype Date (int64)
 	
 	function Days (|int64|)
 		return (.wholeSeconds / kSecondsPerDay)
+	
+	function Minutes (|int64|) // needs 48 bits!
+		return .wholeSeconds / 60
+
 	function MonthsApprox (|int64|)
 		return (.wholeSeconds / kSecondsPerMonthApprox)
 

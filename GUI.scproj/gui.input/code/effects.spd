@@ -1,37 +1,60 @@
 
 // a few graphics effects
-class ImageEffects
+class JeeboxEffects
 	linkage: cpp_part fx
-	|image| 		Read
-	|image| 		Write
-	|image| 		Final
-	|vec4| 			Aura
-	|imageblurrer|	BlurData
+	|image| 			Read
+	|image| 			Write
+	|image| 			Final
+	|vec4| 				Aura
+	|imageblurrer|		BlurData
+	|imagepixel[8]|		Cols
 	
 	
-	constructor (|image| Read)
+	constructor (|image| Read, |float| blurr)
 		.read = read
 		.final = read
+		.blurdata.create(blurr)
+		.cols[0] = (0.1, 0.1, 0.1)
+		.cols[1] = (0.2, 0.2, 0.2)
+		.cols[2] = (0.8, 0.1, 0.9)
+		.cols[3] = (1.0, 0.6, 0.2)
+		.cols[4] = (0.1, 0.12, 0.12)
+		.cols[5] = (0.15, 0.17, 0.12)
+		.cols[6] = (0.4, 0.2, 1.0)
+		.cols[7] = (0.15, 0.17, 0.12)
 
-	function MakeBoxes
-		// how to make the boxes?
-		// figure out later. first... just blur and sobel
+
+	function MakeBoxes (|int| seed)
+		|| sm = 24
+		
+		|| img = .read
+		|random| rnd
+		rnd.seed(seed)
+		for r in .read.tile((sm,sm))
+			|| c = .cols[rnd.int&7]
+			img.fillrect(r, c)
+		
+		for r in .read.tile((6,6))
+			|| c = .cols[rnd.int&7]
+			c.a = 96
+			img.fillrect(r, c)
+		
 	
 	function Swap 
 		swap .read .write
 		.final = .read
-		
+	
+	
 	function Start
 		opt norefcounts
 		|| P = .read.wh
-		if !.write
-			.Write = image(P, "write")
-		  elseif .write.wh != P
+		.write := image(P, "write")
+		if .write.wh != P
 			.Write.resizeto(P)
+	
 	
 	function Blur 
 		opt norefcounts
-		.start
 		for v.down in 2
 			for (P in .write) (C)
 				|| total = vec4()
@@ -51,21 +74,24 @@ class ImageEffects
 	function Sobel
 		.apply(sobelmain)
 
+
 	function Apply (|fnImageShader| fn)
-		.start
 		for (px in .write) (P)
 			|| v4 = (fn)(self, P.vec2+0.5, .Read)
 			px <~ v4
-		
+	
+	
 	function Jeebox
-		.MakeBoxes
+		.start
+		//.swap // hehe
+		.MakeBoxes(1)
 		.Blur
-		.Sobel
+		//.Sobel
 
 
 
 struct ImageBlurrer
-	|float[16]|		Values
+	|float[15]|		Values
 	|int|			Count
 	
 	constructor (|float| Sigma)
@@ -73,10 +99,11 @@ struct ImageBlurrer
 	
 	function Create (|float| Sigma)
 		.count = 0
+		|| nn = 15
 		|| Lim = 0.0 // Lim may only be 0.6 by the end!!
 		// each number is used twice.
 		|| W = &.values[0]
-		for i in 16
+		for i in nn
 			|| g = i|float|.Gaussian(Sigma)
 			if i == 0: g *= 0.5
 			W[i] = g
@@ -86,13 +113,13 @@ struct ImageBlurrer
 		// Count the number of pixels needed
 		Lim *= 1.0 - 72th // 0.986, approx 99% brightness
 		|| Found = 0.0
-		for i in 16
+		for i in nn
 			loop Found < Lim
 			Found += W[i]
 			.Count++
 	
 		|| norm = 0.5/found
-		for i in 16
+		for i in nn
 			W[i] *= norm
 
 
@@ -105,7 +132,7 @@ struct ImageBlurrer
 
 
 
-prototype fnImageShader (|ImageEffects| self, |vec2| P, |image| Read, |vec4|)
+prototype fnImageShader (|JeeboxEffects| self, |vec2| P, |image| Read, |vec4|)
 
 function image.Sqrt (|vec2| xy, |vec4|)
 	return (self)(xy).sqrt
@@ -128,4 +155,20 @@ function SobelMain (fnImageShader)
     || S2	= read.SobelSub(P, .Aura.yz)
     || Sobel= mix(S1, S2, 0.5)
 	return (Sobel.rgb, 1.0)
+
+
+struct ImageTiler
+	|ivec4| Bounds
+	|ivec2| Tile
+	iterator
+		|| b = .bounds
+		|| curr = (0, b.y, 0, b.y + .tile.y)
+		while curr.y < B.y2
+			curr.x = b.x
+			curr.x2 = b.x + .tile.x
+			while curr.x < B.x2
+				yield curr
+				curr.x += .tile.x
+			curr += .tile._y_y
+			
 

@@ -43,7 +43,7 @@ module SDLApp
 	|float|						Scale
 	|image|						DrawSpace
 	|image|						ReadSpace
-	|imageeffects| 				Effects
+	|JeeboxEffects|				Effects
 	|&SDL_Window|				ScreenWindow
 	|&SDL_Renderer|				Renderer
 	|&SDL_Texture|				Raw
@@ -682,8 +682,7 @@ module SDLApp
 	function StartFrame (|&SDL_Texture| T, |bool|)
 		opt norefcounts
 		if !.effects
-			.Effects = ImageEffects(.drawspace)
-			.effects.blurdata.create(10.0)
+			.Effects = JeeboxEffects(.drawspace, 10)
 		debug_require (t and .effects.final)
 		|| stride = 0
 		t.lockThatZerosEventhoughItShouldnt(nil, (&.effects.final._ptr)|&_voidptr|, &stride)  // zeros data :( This makes insertion flicking require entire screen redraw!
