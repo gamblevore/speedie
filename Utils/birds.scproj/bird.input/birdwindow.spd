@@ -11,7 +11,7 @@ class BirdWindow (Window)
 
  
 	constructor
-		.NoDrawBackground = true	
+		sdlapp.DrawBackgroundMode = -1
 		.pipes = guicontrol(self)
 		.player = bird(self)
 		.Player.id = "bird"

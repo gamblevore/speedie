@@ -138,7 +138,14 @@ class Memory
 		|| cap = .ByteCapacity min src.Length
 			memory.Copy(.ptr, src.Addr, cap)
 			return cap
-		
+	
+	function CopyTo (|memory| other, |bool|)
+		|| A1 = .ByteCapacity
+		|| A2 = other.ByteCapacity
+		|| A3 = A1 min A2
+		if A3
+			memory.copy(other.ptr, .ptr, A3)
+		return A3 == A1
 		
 	function AppendPlace (|&...|)
 		|| L = .length
@@ -148,7 +155,7 @@ class Memory
 			|| P2 = Memory.realloc(._ptr, NewSize)
 			if (!P2) // fail
 				return (&Memory.MDummy)|&...|
-			|| OldSize = .Capacity*.itemsize
+			|| OldSize = .ByteCapacity
 			Memory.zero(p2 + OldSize, NewSize - OldSize) 
 			._ptr = p2
 	
@@ -161,21 +168,30 @@ class Memory
 	
 		
 	setter Capacity	(|int|)
+		.setcap(value) // shouldn't be necesary!!
+		// image(class) is setting .capacity and failing, even when called like: .capacity(n)
+	
+	function SetCap (|int| value, |bool|)
 		|| Mem = Memory.realloc(._ptr, .itemsize|int|*Value)
 			._ptr = mem
 			.Capacity = Value 
+			return true
 
+	
 	function ByteCapacity (|int|)
 		return .itemsize|int|*.Capacity|int|
+	
+	
 	function BytesUsed (|int|)
 		return .itemsize|int|*.length|int|
+	
 
 	function Free
 		if (.deathaction == datatypewrapper.kfree)
 			Memory.free(._ptr)
 		._ptr = nil
-		.Capacity = 0	
-
+		.Capacity = 0
+		.Length = 0
 	
 	
 	function Clear

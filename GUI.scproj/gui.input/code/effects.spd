@@ -5,15 +5,14 @@
 // a few graphics effects
 class JeeboxEffects
 	linkage: cpp_part jfx
-	|image| 			Orig
 	|image| 			Tmp
 	|vec4| 				Aura
 	|imageblurrer|		Blurry
 	|imagepixel[8]|		Cols
 	
 	
-	constructor (|image| Orig, |float| blurr)
-		.orig = orig
+	constructor (|float| blurr)
+		.tmp = image()
 		.Blurry.create(blurr)
 		.cols[0] = (0.1, 0.1, 0.1)
 		.cols[1] = (0.2, 0.2, 0.2)
@@ -41,21 +40,10 @@ class JeeboxEffects
 			img.fillrect(r, c)
 	
 	
-	function Start
-		opt norefcounts
-		|| P = .orig.size
-		.tmp := image(P, "temp")
-		if .tmp.size != P
-			.tmp.resizeto(P)
-	
-	
 	helper Blur (|image| rd, |image| wr, |int|v)
 		opt norefcounts
 		for (P in wr) (C)
 			|| total = vec4()
-			// not the fastest loop ever invented
-			// I suppose we'd have to hard-code the h/v versions
-			// cos we can add +1 easily but the vert is harder.
 			for (W in .Blurry) (O)
 				|| off = (O, O)
 				off[v] = 0
@@ -73,18 +61,19 @@ class JeeboxEffects
 		for (px in w) (P)
 			|| v4 = (fn)(self, P.vec2+0.5, r)
 			px <~ v4
-	
-	
-	function Jeebox
-		opt norefcounts
-		.start
-		|| A = .tmp
-		|| B = .orig
 
-		.MakeBoxes(A, 1)
-		for 2
-			.Blur(A, B, 1)
-			.Blur(B, A, 0)
+	
+	function Jeebox (|image| B)
+		opt norefcounts
+		|| A = .tmp
+		if A.size != B.size
+			A.size = B.size
+
+			.MakeBoxes(A, 1)
+			for 3
+				.Blur(A, B, 1)
+				.Blur(B, A, 0)
+		A.copyto(B)
 		//.apply(sobelmain, A, B)
 
 

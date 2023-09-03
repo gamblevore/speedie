@@ -16,13 +16,17 @@ class Image (memory)
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
 		.name = name
-		.sizeset(s)
+		.SizeInfo = s
 		
 	constructor (|ivec2| wh, |string| name="")
 		cpp_Part ConstructorSizeVec2
 		super.constructor(wh.area, 4) 
 		.name = name
-		.sizeset(wh)
+		.SizeInfo = wh
+	
+	constructor
+		super.constructor(0, 4) // should we allocate 1 pixel to be safe?
+		.SizeInfo = (0,0)
 	
 	destructor
 		if .name
@@ -69,7 +73,7 @@ class Image (memory)
 		return .size.y
 	
 	
-	function SizeSet (|ivec2| wh)
+	helper SizeInfo (assigns:|ivec2| wh)
 		.size = wh
 		.ResetBoundsToSize
 
@@ -110,11 +114,16 @@ class Image (memory)
 		return true
 
 		
-	function ResizeTo (|ivec2| WH)
+	setter Size (|ivec2|)
+		.resizeto(value)
+	
+	function ResizeTo (|ivec2| value, |bool|)
+		if value == .size
+			return true
 		.Free
-		.sizeset(wh)
-		.length = wh.area
-		.Capacity = .Length
+		.SizeInfo = value
+		.length = value.area
+		return .setcap(.Length|int|)
 	
 	function Clear (|imagepixel| Color=colors.black)
 		.FillRect((0,0,.size), color)
@@ -167,13 +176,12 @@ class Image (memory)
 		cpp_part AtXY
 		P += .windowbase
 		|| S = .size
-		|| base = .pixels
-		rz = base
+		rz = .pixels
 		ifn p inrange s
 			p = p.clip(s-(1,1))
 		p.y = s.y - (1 + p.y) // invert
 		rz += (p fma s.x)
-		// if rz < base  or  rz >= base + .Capacity // how? we already cliped the range above?
+
 
 	syntax call (|ivec2| P, |vec4|)
 		cpp_part ColXY
@@ -324,8 +332,8 @@ class Image (memory)
 	
 	function LoadEmpty (|int| W, |int| H, |bool|)
 		if (.size.x != W or .size.y != h)
-			.Capacity = w*h
-			.sizeset((w,h))
+			.Capacity = w * h
+			.SizeInfo = (w,h)
 		return .Pixels
 	
 	

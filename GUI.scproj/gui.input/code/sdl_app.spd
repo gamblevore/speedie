@@ -9,7 +9,6 @@ module SDLApp
 	|[string]|					PendingAlerts
 	|array|						DrawDrag = nil
 	|image|						DrawSpace
-	|image|						ReadSpace
 	|JeeboxEffects|				Effects
 	|&SDL_Window|				ScreenWindow
 	|&SDL_Renderer|				Renderer
@@ -362,9 +361,10 @@ module SDLApp
 		if !font.small
 			sdlapp.Alert("Exitting...", "SmallFont not loaded.")
 			app.quit
-		.FrameLength = 1.0/60.0
+		.FrameLength = 60th
 		.FastToolTipDate = 1
 
+		.Effects = JeeboxEffects(10)
 		.InitWindow(s, .niceappname)
 		.scaling = 2 - (0.5*.ishighdpi)
 		
@@ -586,12 +586,12 @@ module SDLApp
 	function DrawFrame
 		opt norefcounts
 		
-		|| w1 = .DrawWinFrom
-		require w1 and .StartFrame(.Raw)
+		|| w1 = .DrawWinFrom$
+		.StartFrame(.Raw)
 		if .DrawBackgroundMode == 0
 			¥.DrawBackground(.DrawSpace)
-		   elseif .DrawBackgroundMode == 1
-			.Effects.Jeebox
+		  elseif .DrawBackgroundMode == 1
+			.Effects.Jeebox(.DrawSpace)
 			
 // draw windows first...
 		while w1
@@ -686,39 +686,28 @@ module SDLApp
 		.raw.dispose
 		|| v = (.NewSize.vec2/.Scale).ivec2
 		.newsize = nil										// phew
-		.DrawSpace.ResizeTo(v)
+		.DrawSpace.size = v
 		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, v.x, v.y)
 
 		window.all.FullScreen = v
 		.StartResize
 
 
-	function StartFrame (|&SDL_Texture| T, |bool|)
+	function StartFrame (|&SDL_Texture| T)
 		opt norefcounts
-		if !.effects
-			.Effects = JeeboxEffects(.drawspace, 10)
-		debug_require (t and .effects.orig)
 		|| stride = 0
-		t.lockThatZerosEventhoughItShouldnt(nil, (&.effects.orig._ptr)|&_voidptr|, &stride)  // zeros data :( This makes insertion flicking require entire screen redraw!
-		return true
+		|| Where = &(.DrawSpace._ptr)
+		t.lockThatZerosEventhoughItShouldnt(nil, where|&_voidptr|, &stride)
 
-
-	function PicturePtr (|&_voidptr|)
-		opt norefcounts
-//		if .effects and keys.Control and keys.shift
-//			.Effects.Blur
-		
-		return (&.effects.orig._ptr)|&_voidptr|
-	
 	
 	function EndFrame (|&SDL_Texture| T)
 		|| stride = 0
-		|| Img = .PicturePtr
 		.Drawcount++
 		target release
+			|| Img = &.DrawSpace._ptr
 			if .ResizedCounter
 				t.UnlockThatCopiesEvenThoughItShouldnt // wait why do we unlock and also lock?
-				t.LockThatZerosEventhoughItShouldnt(nil, img, &Stride)
+				t.LockThatZerosEventhoughItShouldnt(nil, img|&_voidptr|, &Stride)
 		|SDL_Rect| dstrect
 		SDL_GL_GetDrawableSize( .screenwindow,  &dstrect.w,  &dstrect.h )
 		SDL_RenderCopy(.renderer, T, nil, &dstrect)
