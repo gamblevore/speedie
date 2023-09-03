@@ -192,7 +192,7 @@ module SDLApp
 		
 	
 	function Touch (|guicontrol| modified=nil)
-		.TouchCount = .TouchCount|int| max 2
+		.TouchCount := 1
 
 	
 	function Resized (|guicontrol| modified=nil)
@@ -452,24 +452,6 @@ module SDLApp
 				return true
 	
 	
-	helper Window.EveryFrame
-		opt norefcounts
-		|| f = .realfocus				#require
-		if !f.NeedsSelFlashChange
-			// we should optimise this.
-			// we need to copy the picture, then draw the selector into the picture.
-			// what if the selector is obscured? Like off screen? or under another control? like a popupinfofield.
-			// we could save two versions of the screen? Or save the selector pixels somewhere? Like mark them?
-			// "These are the selector pixels"... and just save both versions.
-			// there is sooo much that can go wrong with that. I'll just not do it... for now.
-			sdlapp.touch(f)
-		if f isnt visible
-			if f == .innerfocus
-				.setinnerfocus(nil)
-			  else
-				.clearfocus
-
-	
 	function UpdateTextFocus (|window| w)
 		opt norefcounts
 		|| f = w.realfocus // if theres nothing to focus, we can still type into the window!
@@ -620,17 +602,25 @@ module SDLApp
 		.DoDrawDrag(ws.first, .DrawSpace)
 		.EndFrame(.Raw)
 
-		
+
 	function UpdateWindowFrames
 		opt norefcounts
 		.StartResize
+		|| nodlg = !.DialogIsOpen
 		for w  in  __modules__.window.all
 			if w isa window
 				w.EveryFrame
-		if !.DialogIsOpen
-			for w  in  __modules__.window.all
-				if w isa window
+				if nodlg
 					w.__FrameUpdate__(w.openedmenu!=nil)
+
+		|| w1 = .DrawWinFrom
+		while w1
+			|| f = w1.realfocus
+			if f.NeedsSelFlashChange
+				printline sdlapp.framecount
+				sdlapp.touch(f) // should optimise this. copy the picture, then draw the selector into the picture.
+			w1 = w1.next as window
+
 		.StartResize
 		
 		

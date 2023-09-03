@@ -235,6 +235,16 @@ class Window (GUIControl)
 		where.ControlClip = self
 		.inline.DrawInline(where)
 		where.whset
+
+
+	helper EveryFrame
+		opt norefcounts
+		|| f = .realfocus				#require
+		if f isnt visible
+			if f == .innerfocus
+				.setinnerfocus(nil)
+			  else
+				.clearfocus
 		
 
 	function guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
