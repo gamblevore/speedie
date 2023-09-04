@@ -191,9 +191,9 @@ class GUIControl (ringtree)
 			sdlapp.resized(self)
 
 	
-	function Touch
+	function Touch (|int| Amount = 1)
 		opt norefcounts
-		sdlapp.touch(self) // why wasnt this here before?
+		if sdlapp.TouchCount < amount: sdlapp.touchcount = Amount
 		(.window is modified)
 
 	

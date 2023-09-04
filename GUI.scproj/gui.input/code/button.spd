@@ -60,6 +60,7 @@ class ButtonView (GUIControl)
 		|| Always = (p == (int.min, int.min)) 
 		require always or .lastrect contains p
 
+		.Touch(2)
 		|| c = (nil, .itemat(p.x))(always)
 		.selected = c
 		|| prev = (nil, c)(always)
@@ -113,10 +114,12 @@ class ButtonView (GUIControl)
 				return i
 			R += W + .itemgap
 
+
 	helper ClearMouse
 		.DelayTill = nil
 		.ClickedItem = nil
-		
+	
+	
 	behaviour MouseUp
 		opt norefcounts
 		.clearmouse
@@ -125,13 +128,16 @@ class ButtonView (GUIControl)
 		  else
 			.click(p)
 
+
 	behaviour RightClick
 		opt norefcounts
 		.Click(p, !.onrightclick)
+
 		
 	helper DoPressing (|listviewrow| D, |bool|)
 		.ClearMouse
 		return (.Pressing)(self, 0, D)
+
 	
 	behaviour MouseDown
 		opt norefcounts
@@ -152,7 +158,7 @@ class ButtonView (GUIControl)
 		if keys.option and .pressing
 			.DoPressing(D)
 			return 5
-		
+
 		if !(D or !.items)  or  (.ItemWidth and !D)
 			return ret
 		
