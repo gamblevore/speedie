@@ -1284,6 +1284,12 @@ datatype vec2
 	function iVec2 (|ivec2|)
 		return (.x|int|, .y|int|)
 
+	function IFloor (|ivec2|)
+		return .floor.ivec2
+	
+	function Floor (|vec2|)
+		return (.x.floor, .y.floor)
+
 	syntax cast (|bool|)
 		cpp_part Bool
 		return .x or .y
@@ -1318,8 +1324,8 @@ datatype vec2
 		if (L < other)
 			return -1
 	module
-		function New (|float| v=0, |vec2|)
-			return (v,v)
+		function New (|float| a=0.0, |float| b=0.0,  |vec2|)
+			return (a, b)
 
 
 function vecmix (|vec2|a, |vec2|b, |vec4|)

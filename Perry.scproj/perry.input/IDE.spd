@@ -137,6 +137,24 @@ class PerryIDE (Window)
 			r.remove
 
 
+	behaviour Draw
+		opt norefcounts
+		|| bg = app.Pref("bg")
+		if bg == "jeebox"
+			Effects := JeeboxEffects(10)
+			Effects.Jeebox(where, date.now)
+			for c.flat in self
+				if c.effects is sobel
+					effects.marksobel(where, c.lastrect)
+			effects.DoSobel(Where)
+
+		  else
+			if bg != "flat"
+				app.pref("bg") = "flat"
+			¥.DrawBackground(where)
+		.DrawContents(where)
+
+
 	behaviour CancelClose 
 		|| proj = .projmsg					#require
 		|| n = proj.parent.slowcount?
@@ -610,8 +628,9 @@ class PerryIDE (Window)
 
 
 	module
-		|bool| DummyTest
-		|byte| StatsMode
+		|JeeboxEffects|				Effects
+		|bool|						DummyTest
+		|byte|						StatsMode
 		syntax access (|int| i, |perryide|)
 			opt norefcounts
 			for w in window.all

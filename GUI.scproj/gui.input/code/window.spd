@@ -213,12 +213,17 @@ class Window (GUIControl)
 	
 	
 	behaviour Draw
+		.DrawBackground(where)	
+		.DrawContents(where)
+	
+	function DrawBackground (|image| where)
+		if .gnormal
+			where.fill(.gnormal) // background
+	
+	
+	function DrawContents (|image| where)
 		opt norefcounts
 		where.window = self
-		
-		if .gnormal
-			where.fill(.gnormal)
-		
 		|| menu = .innerfocus
 		|| lim = .LastRect.Soothe
 		.DrawChildren(where, lim, menu)			
@@ -392,6 +397,13 @@ class Window (GUIControl)
 			|| nxt = ctrl.flatnext
 			yield ctrl
 			ctrl = nxt
+	
+	iterator flat
+		|| ctrl = .first|guicontrol|
+		while ctrl
+			|| nxt = ctrl.flatnext
+			yield ctrl
+			ctrl = nxt
 
 	module
 		|object|					LeakedTestObj
@@ -403,6 +415,9 @@ class Window (GUIControl)
 		
 		function Front (|Window|)
 			return  .all.last
+		
+		function Back (|Window|)
+			return  .all.first
 
 		function DocumentCount (|int|)
 			opt norefcounts

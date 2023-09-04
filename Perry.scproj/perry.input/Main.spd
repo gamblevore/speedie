@@ -1,10 +1,7 @@
 
 
 main // main {
-	target debug
-		"*** target debug ***"
-	
-	//error.AutoPrint = 1
+	target debug: "*** target debug ***"
 	sdlapp.RunAndQuit(&perry.startup)
 
 

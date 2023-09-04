@@ -9,6 +9,7 @@ class JeeboxEffects
 	|vec4| 				Aura
 	|imageblurrer|		Blurry
 	|imagepixel[8]|		Cols
+	|random|			rnd
 	
 	
 	constructor (|float| blurr)
@@ -18,29 +19,36 @@ class JeeboxEffects
 		.cols[0] = (0.1,	0.1,	0.1)
 		.cols[1] = (0.2,	0.2,	0.2)
 		.cols[2] = (0.8,	0.1,	0.9)
-		.cols[3] = (1.0,	0.6,	0.2)
+		.cols[3] = (1.0,	0.8,	0.2)
 		.cols[4] = (0.1,	0.12,	0.12)
 		.cols[5] = (0.15,	0.17,	0.12)
 		.cols[6] = (0.4,	0.2,	1.0)
 		.cols[7] = (0.15,	0.17,	0.12)
 
 
-	function MakeBoxes (|image| img, |int| seed)
+	helper MakeSubBoxes (|image| img, |int| Size, |float| opacity=1.0)
 		opt norefcounts
+		|int| a = opacity * 255.0
+		for r in img.tile(size)
+			|| c = .cols[.rnd.int&7]
+			c.a = a
+			img.fillrect(r, c)
+
+
+	function MarkSobel (|image| where, |ivec4| a)
+
+	function DoSobel (|image| where)
+		
+
+	function MakeBoxes (|image| img, |int| seed)
 		|| base = 6
+		.rnd.seed(seed)
 		
-		|random| rnd
-		rnd.seed(seed)
-		for r in img.tile(base*5)
-			|| c = .cols[rnd.int&7]
-			img.fillrect(r, c)
-		
-		for r in img.tile(base)
-			|| c = .cols[rnd.int&7]
-			c.a = 96
-			img.fillrect(r, c)
-	
-	
+		.MakeSubBoxes(img, base*6,  0.99)
+//		.MakeSubBoxes(img, base*12, 0.5)
+		.MakeSubBoxes(img, base,    0.35)
+
+
 	helper image.BlurInto (|image| wr, |&ImageBlurrer| blur, |int|v)
 		opt norefcounts
 		for (P in wr) (C)
@@ -51,20 +59,19 @@ class JeeboxEffects
 				|| col = (self)(C+off)+(self)(C-off)
 				total += col*W
 			P <~ total
-		
-	
+
+
 	setter Aura (|float|)
 		.aura = (value, value+0.25).sincos
 
-	
 
-	function Apply (|fnImageShader| fn, |image| r, |image| w)
+	function Apply (|fnImageShader| fn, |image| r, |image| w, |float| scale)
 		for (px in w) (P)
-			|| v4 = (fn)(self, P.vec2+0.5, r)
+			|| v4 = (fn)(self, r,  P.vec2+0.5, scale)
 			px <~ v4
 
-	
-	function Jeebox (|image| B)
+
+	function Jeebox (|image| B, |int| seed)
 		opt norefcounts
 		|| A = .tmp
 		if A.size == B.size
@@ -73,18 +80,14 @@ class JeeboxEffects
 	
 		|| start = date.now
 		A.size = B.size
-		.MakeBoxes(A, start)
-		for 2
+		.MakeBoxes(A, seed)
+		for 3
 			A.BlurInto(B, .blurry, 1)
 			b.BlurInto(A, .blurry, 0)
-
-		if true
-			.apply(sobelmain, A, B)
-			B.copyto(A)
-		  else
-			A.copyto(B)
+		
+		.apply(sobelmain, A, B, 1.5)
+		B.copyto(A)
 		Duration += date.now - start
-		Notifications <~ "abc"
 		
 	module
 		|date| Duration
@@ -131,17 +134,17 @@ struct ImageBlurrer
 
 
 
-prototype fnImageShader (|JeeboxEffects| self, |vec2| P, |image| Read, |vec4|)
+prototype fnImageShader (|JeeboxEffects| self, |image| Read, |vec2| P, |float| scale, |vec4|)
 
-function image.Sqrt (|vec2| xy, |vec4|)
-	return (self)(xy).sqrt
+function image.Sqrt (|vec2| xy, |float| scale, |vec4|)
+	return (.interp(xy)*scale).sqrt
 
 
-helper image.SobelSub (|vec2| XY, |vec2| Move, |vec4|)
-    || s1 = .Sqrt(XY - Move * 1.5)
-    || s2 = .Sqrt(XY + Move * 1.5)
-    || s3 = .Sqrt(XY - Move)
-    || s4 = .Sqrt(XY + Move)
+helper image.SobelSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
+    || s1 = .Sqrt(XY - Move * 1.5, scale)
+    || s2 = .Sqrt(XY + Move * 1.5, scale)
+    || s3 = .Sqrt(XY - Move, scale)
+    || s4 = .Sqrt(XY + Move, scale)
 
     || sx = 4.0 * ((s4 + s3) - (s2 + s1))
     || sy = 4.0 * ((s2 + s4) - (s1 + s3))
@@ -150,8 +153,8 @@ helper image.SobelSub (|vec2| XY, |vec2| Move, |vec4|)
 
 
 function SobelMain (fnImageShader)
-	|| S1	= read.SobelSub(P, .Aura.xy) // aura circles
-	|| S2	= read.SobelSub(P, .Aura.yz)
+	|| S1	= read.SobelSub(P, scale, (0.0,1.0))
+	|| S2	= read.SobelSub(P, scale, (1.0,0.0))
 	|| Sobel= mix(S1, S2, 0.5)
 	return (Sobel.rgb, 1.0)
 
@@ -171,3 +174,12 @@ struct ImageTiler
 			curr += .tile._y_y
 			
 
+datatype JeeboxEffectsFlags (byte)
+	flags
+		|JeeboxEffectsFlags|
+		None = 0
+		Pastels = 1
+		Sobel = 2
+	syntax is (|JeeboxEffectsFlags| b, |bool|)
+		return self == b
+		
