@@ -494,6 +494,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 
 	if (typecast & ktypeCastDescribeErrors) and !incoming.madeerror
 		error (incoming.exp, "Too many params to " + .rendertitle)
+		error (self.source,  "Function here:")
 
 
 function DescribeParamFail (|SCParamArray| params, |int| bad)
