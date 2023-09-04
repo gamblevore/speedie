@@ -73,6 +73,7 @@ class Object
 	helper ClassData.AsFail (|object| wrong, |object|)
 		if wrong
 			error ("object of '" + wrong.class.name + "' is not a: " + .name ) 
+			debugger
 
 	api DebugPrint  // more for use in XCode, than anything else.
 		cpp_name jdb

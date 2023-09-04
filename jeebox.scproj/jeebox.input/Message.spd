@@ -1047,10 +1047,12 @@ class Message (RingTree)
 			
 
 	function Float (|f64|)
-		return .name.parsefloat(self)
+		if self
+			return .name.parsefloat(self)
 
 	function Hex (|int64|)
-		return .name.parseint(self)
+		if self
+			return .name.parseint(self)
 
 	function Float32 (|float|)
 		|| d = .float
