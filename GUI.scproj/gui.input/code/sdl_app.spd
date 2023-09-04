@@ -492,7 +492,8 @@ module SDLApp
 
 
 	function OrderWindows (|window|)
-		|window--| w
+		opt norefcounts
+		|window| w
 		for c in window.all
 			if c is visible
 				if w
@@ -561,11 +562,20 @@ module SDLApp
 		|| curr = goafter.prev as window
 		while curr
 			|| p = curr.prev as window
-			if curr.isdialog
+			if curr.isdialog and curr is visible
 				goafter.next = curr
 				debugger
 			curr = p
-		 
+		
+		
+	function WinList (|string|)
+		disabled
+		|| fs = faststring()
+		for w.fast in window.all
+			fs <~ w.id
+			fs <~ "\n"
+		return fs
+
 
 	function FirstNonDialog (|window|)
 		opt norefcounts
@@ -667,7 +677,7 @@ module SDLApp
 		require !(Occured & kExiting)
 		.HandleAppResize
 		.UpdateWindowFrames
-		.PutDialogsInFront
+		.PutDialogsInFront // original
 		if occured&kactivity
 			.DrawFrame
 		
@@ -1073,13 +1083,26 @@ module SDLApp
 			return true
 
 
+	function GuiControl.ContainedName (|string|)
+		|| fs = FastString()
+		fs <~ "Name: "
+		while
+			fs <~ .ID
+			self = self.Parent
+			loop self and !(self isa window)
+			fs <~ " <~ "
+		return fs
+	
+	
 	function SetToolTips (|guicontrol| r)
 		opt norefcounts
 		|| w = r.window$
 		require w.ToolTipControl != r
 		w.ToolTipControl = r
-		if r.id and keys.Control and keys.LALT and keys.LGUI
-			Notifications <~ "Name: " + r.ID
+		if  r.id  and  keys.Control  and  keys.LALT  and  keys.LGUI
+			Notifications <~ r.ContainedName
+			
+			
 		|| info = ""
 		ifn r isa textview  and  r is editable
 			info = r.Description

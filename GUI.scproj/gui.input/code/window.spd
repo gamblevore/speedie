@@ -217,6 +217,7 @@ class Window (GUIControl)
 		.DrawContents(where)
 	
 	function DrawBackground (|image| where)
+		where.window = self
 		if .gnormal
 			where.fill(.gnormal) // background
 	

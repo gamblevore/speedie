@@ -3,16 +3,17 @@
 
 
 // a few graphics effects
-class JeeboxEffects
+struct JeeboxEffects
 	linkage: cpp_part jfx
 	|image| 			Tmp
 	|vec4| 				Aura
 	|imageblurrer|		Blurry
 	|imagepixel[8]|		Cols
 	|random|			rnd
+	|bool|				Invalidated
 	
 	
-	constructor (|float| blurr)
+	function Init (|float| blurr)
 		.tmp = image()
 		.Blurry.create(blurr)
 		.aura = (0.0,1.0, 0.0,1.0)
@@ -65,27 +66,34 @@ class JeeboxEffects
 		.aura = (value, value+0.25).sincos
 
 
-	function Apply (|fnImageShader| fn, |image| r, |image| w, |float| scale)
+	function MakeSobel  (|image| r, |image| w, |float| scale)
 		for (px in w) (P)
-			|| v4 = (fn)(self, r,  P.vec2+0.5, scale)
+			|| v4 = sobelmain(self, r,  P.vec2+0.5, scale)
 			px <~ v4
-
-
-	function Jeebox (|image| B, |int| seed)
+	
+	
+	function StartJeebox (|image| B, |message| conf)
 		opt norefcounts
 		|| A = .tmp
-		if A.size == B.size
+		if !.Invalidated and A.size == B.size
 			A.copyto(B)
-			return 
-	
+			return
+		
+		if keys.shift
+		.Invalidated = false
+		
+		|| seed = conf.first.int		?? 1
+		|| reps = conf["reps"].int		?? 3
+		|| sobstr = conf["sobel"].float	?? 1.75
+		
 		|| start = date.now
 		A.size = B.size
 		.MakeBoxes(A, seed)
-		for 3
+		for reps
 			A.BlurInto(B, .blurry, 1)
 			b.BlurInto(A, .blurry, 0)
 		
-		.apply(sobelmain, A, B, 1.5)
+		.MakeSobel(a, b, sobstr)
 		B.copyto(A)
 		Duration += date.now - start
 		
@@ -134,7 +142,7 @@ struct ImageBlurrer
 
 
 
-prototype fnImageShader (|JeeboxEffects| self, |image| Read, |vec2| P, |float| scale, |vec4|)
+prototype fnImageShader (|&JeeboxEffects| self, |image| Read, |vec2| P, |float| scale, |vec4|)
 
 function image.Sqrt (|vec2| xy, |float| scale, |vec4|)
 	return (.interp(xy)*scale).sqrt
@@ -173,13 +181,3 @@ struct ImageTiler
 				curr += .tile.x_x_
 			curr += .tile._y_y
 			
-
-datatype JeeboxEffectsFlags (byte)
-	flags
-		|JeeboxEffectsFlags|
-		None = 0
-		Pastels = 1
-		Sobel = 2
-	syntax is (|JeeboxEffectsFlags| b, |bool|)
-		return self == b
-		

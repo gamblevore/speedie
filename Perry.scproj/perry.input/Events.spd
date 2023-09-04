@@ -42,7 +42,6 @@ function ClickedOpenProj (GUIaction)
 		
 
 function ClickedCreateProj (GUIAction)
-	|| i = .ide
 	|| it = app.AskSave("scproj/",  "",  "New Project",  "Create")
 		perry.CreateProj(it.file)
 	perry.HideStartIfNeeded

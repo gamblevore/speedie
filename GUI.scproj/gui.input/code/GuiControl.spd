@@ -20,7 +20,6 @@ class GUIControl (ringtree)
 	|TakesFocusFlag|			TakesFocus
 	|byte|						TextAlteredForDraw
 	|byte|						ExpandOnMouseOver
-	|JeeboxEffectsFlags|		Effects
 	|bool|						PostLoaded
 	|bool|						ClickOutsideCloses
 	|CopyPasteFlags|			CopyPaste

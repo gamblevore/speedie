@@ -139,13 +139,11 @@ class PerryIDE (Window)
 
 	behaviour Draw
 		opt norefcounts
-		|| bg = app.Pref("bg")
+		|| bg = app.Prefs["bg"]
 		if bg == "jeebox"
-			Effects := JeeboxEffects(10)
-			Effects.Jeebox(where, date.now)
-			for c.flat in self
-				if c.effects is sobel
-					effects.marksobel(where, c.lastrect)
+			Effects.StartJeebox(where, bg)
+			Effects.MarkSobel(where, .EditMe)
+			Effects.MarkSobel(where, .FileSep.first) // i want this to look different to the .editme area somehow?
 			effects.DoSobel(Where)
 
 		  else
@@ -631,6 +629,9 @@ class PerryIDE (Window)
 		|JeeboxEffects|				Effects
 		|bool|						DummyTest
 		|byte|						StatsMode
+		
+		Effects.Init(10)
+
 		syntax access (|int| i, |perryide|)
 			opt norefcounts
 			for w in window.all
@@ -801,6 +802,7 @@ class PerryIDE (Window)
 		app.prefs = nil
 		if app.PrefsInit(0)
 			.notify("Reloaded Prefs.")
+			effects.Invalidated = true
 		  else
 			.notify("Prefs are corrupted")
 			app.prefs = oldPrefs
