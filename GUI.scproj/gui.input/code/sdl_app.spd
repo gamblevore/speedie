@@ -723,12 +723,12 @@ module SDLApp
 
 	
 	function EndFrame (|&SDL_Texture| T)
-		|| stride = 0
 		.Drawcount++
 		target release
+			|| stride = 0
 			|| Img = &.DrawSpace._ptr
 			if .ResizedCounter
-				t.UnlockThatCopiesEvenThoughItShouldnt // wait why do we unlock and also lock?
+				t.UnlockThatCopiesEvenThoughItShouldnt // force refresh of confused window
 				t.LockThatZerosEventhoughItShouldnt(nil, img|&_voidptr|, &Stride)
 		|SDL_Rect| dstrect
 		SDL_GL_GetDrawableSize( .screenwindow,  &dstrect.w,  &dstrect.h )

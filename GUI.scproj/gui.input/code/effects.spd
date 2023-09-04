@@ -37,6 +37,7 @@ struct JeeboxEffects
 
 
 	function MarkSobel (|image| where, |ivec4| a)
+		
 
 	function DoSobel (|image| where)
 		
@@ -79,10 +80,9 @@ struct JeeboxEffects
 			A.copyto(B)
 			return
 		
-		if keys.shift
 		.Invalidated = false
 		
-		|| seed = conf.first.int		?? 1
+		|| seed = conf["seed"].int		?? 1
 		|| reps = conf["reps"].int		?? 3
 		|| sobstr = conf["sobel"].float	?? 1.75
 		
