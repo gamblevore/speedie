@@ -201,6 +201,27 @@ class Memory
 	function Zero
 		zero(._ptr, .length * .itemsize)
 	
+
+	render Dump (|int| row, |int| cn=4)
+		|| p = ._ptr
+		|| p2 = p + .length*.itemsize 
+		|| i = 0
+		|| com = 0
+		fs <~ "dumping memory:\n"
+		
+		while (p < p2)
+			|| c = *p++
+			fs.appendhex(c, 2)
+			if (++i >= row)
+				i = 0
+				com = 0
+				fs <~ "\n"
+			  elseif ++com >= cn
+				com = 0
+				fs <~ ", "
+			
+			
+	
 	
 	destructor
 		.free
