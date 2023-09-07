@@ -138,6 +138,20 @@ class Memory
 		|| cap = .ByteCapacity min src.Length
 			memory.Copy(.ptr, src.Addr, cap)
 			return cap
+
+
+	function DiffAt (|memory|other, |ind|)
+		|| n = other.length
+		if .length != n
+			return .length min n
+		|| p1 = ._ptr
+		|| p2 = p1 + n
+		|| pc = other._ptr
+		
+		while p1 < p2
+			if *pc++ != *p1++
+				return (p1-1) - ._ptr
+		
 	
 	function CopyTo (|memory| other, |bool|)
 		|| A1 = .ByteCapacity
@@ -169,12 +183,20 @@ class Memory
 		
 	setter Capacity	(|int|)
 		.setcap(value) // shouldn't be necesary!!
-		// image(class) is setting .capacity and failing, even when called like: .capacity(n)
+		// image(class) is setting .capacity but not coming here, even when called like: .capacity(n)
+
 	
 	function SetCap (|int| value, |bool|)
-		|| Mem = Memory.realloc(._ptr, .itemsize|int|*Value)
+		require .deathaction == datatypewrapper.kfree
+		|| S = .itemsize|int|
+		|| old = S * .capacity
+		|| New = S * value
+		|| Mem = Memory.realloc(._ptr, New)
 			._ptr = mem
 			.Capacity = Value 
+			|| extra = New-Old
+			if extra > 0
+				memory.zero(mem+old, extra)
 			return true
 
 	
