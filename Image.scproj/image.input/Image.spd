@@ -122,7 +122,9 @@ class Image (memory)
 	
 	function ResizeTo (|ivec2| value, |bool|)
 		|| N = value.area
-		if (.size.area == N) or .setcap(N)
+		// !.deathaction means our memory is externally managed
+		// (not via malloc) so we assume its already been resized.
+		if (.size.area == N)  or  !.deathaction  or .setcap(N)
 			.SizeInfo = value
 			.length = .capacity
 			return true

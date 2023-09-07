@@ -59,40 +59,41 @@ struct JeeboxEffects
 		for (t in img.tile((img.size+1)/2)) (i)
 			img.fillrect(t, col[i])
 		
-
-	helper image.boxtest  (|image| wr, |int| extent)
-		|| copy = .copyimage
-		.boxblursafe(wr, extent)
-		copy.boxblur(wr, extent)
-		if .diffat(copy)
-			.DebugPixels
-			copy.DebugPixels
-			debugger
-		
-		
-	helper image.BoxBlurSafe (|image| wr, |int| extent, |bool| Tp=false)
-		debug_require wr.size == .size
-
-		for i in .height - 1 downto 0
-			.BoxBlurRow(wr, extent, false, i)
-			wr.BoxBlurRow(self, extent, Tp, i)
 	
+	helper image.BoxBlur2 (|image| tmp, |int| extent, |uint| row, |uint| Count, |bool| rotate=false)
+		if Count isa 2
+			self.BoxBlurRow(tmp,  extent,  row, rotate)
+		  else
+			tmp.BoxBlurRow(self,  extent,  row, rotate)
+		
 	
-	helper image.BoxBlur (|image| wr, |int| extent, |bool| Tp=false)
-		debug_require wr.size == .size
+	helper image.BoxBlur (|image| tmp, |int| extent, |int| Passes)
+		// BLUR EACH ROW A FEW PASSES
+		for row.down in .height
+			for i in passes-1
+				.BoxBlur2(tmp,  extent,  row,  i)
+					
 
-		for i in .height - 1 downto 0
-			.BoxBlurRow(wr, extent, false, i)
-			wr.BoxBlurRow(self, extent, Tp, i)
+		// rotate AND blur
+		tmp.size = .size.yx
+		for row.down in .height
+			.BoxBlur2(tmp,  extent,  row,  passes,  true) // or passes+1?
+
+		
+		// BLUR EACH COL A FEW PASSES
+		|| odd = passes&1
+		for row.down in tmp.height
+			for i in passes-1
+				.BoxBlur2(tmp,  extent,  row,  i+odd)
 
 
-	helper image.BoxBlurTp (|image| wr, |int| extent)
-		debug_require wr.size == .size.yx
+		// RESTORE ROTATION AND BLUR
+		tmp.size = .size.yx
+		for row.down in tmp.height
+			.BoxBlur2(tmp,  extent,  row,  1,  true)
 
-		for i in .height - 1 downto 0
-			.BoxBlurRow(wr, extent, true, i)
 
-	helper image.BoxBlurRow (|image| wr, |int| extent, |bool| Rotate, |uint| row)
+	helper image.BoxBlurRow (|image| wr, |int| extent, |uint| row, |bool| rotate)
 		row = .height - (row+1)
 		require row < .height and .width > extent
 		
@@ -168,8 +169,7 @@ struct JeeboxEffects
 			T.copyto(D)
 			return
 		
-		|| S = D.size
-		require T.resizeto(s)
+		require T.resizeto(D.size)
 		.Invalidated = false
 		
 		|| seed = conf["seed"].int		?? 1
@@ -181,20 +181,7 @@ struct JeeboxEffects
 		//.DebugBoxes(d)
 		
 		
-		T.size = S.yx
-		d.boxblurtp(t, 5)
-
-		D.size = S.yx
-		t.boxblur(D, 5)
-
-		D.size = S
-		t.boxblurtp(d, 5)
-		
-		d.size = S
-		t.size = S
-		d.copyto(t)
-		//for i in 3
-		//	T.boxblurpass(D, 4)
+		d.boxblur(t, 5, 4)
 		
 		.RunOutline(d, t, LineStr)
 		Duration += date.now - start
