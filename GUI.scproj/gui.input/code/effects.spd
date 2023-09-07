@@ -7,7 +7,6 @@ struct JeeboxEffects
 	linkage: cpp_part jfx
 	|image| 			Tmp
 	|vec4| 				Aura
-	|imageblurrer|		Blurry
 	|imagepixel[8]|		Cols
 	|random|			rnd
 	|bool|				Invalidated
@@ -15,7 +14,6 @@ struct JeeboxEffects
 	
 	function Init (|float| blurr)
 		.tmp = image()
-		.Blurry.create(blurr)
 		.aura = (0.0,1.0, 0.0,1.0)
 		.cols[0] = (0.1,	0.1,	0.1)
 		.cols[1] = (0.2,	0.2,	0.2)
@@ -51,94 +49,158 @@ struct JeeboxEffects
 		.MakeSubBoxes(img, base,    0.35)
 
 
-	helper image.BlurInto (|image| wr, |&ImageBlurrer| blur, |int|v)
-		opt norefcounts
-		for (P in wr) (C)
-			|| total = vec4()
-			for (W in blur) (O)
-				|| off = (O, O)
-				off[v] = 0
-				|| col = (self)(C+off)+(self)(C-off)
-				total += col*W
-			P <~ total
+	function DebugBoxes (|image| img)
+		|imagepixel[4]| col 
+		col[0] = (1.0, 1.0, 1.0, 1.0)
+		col[1] = (0.0, 0.0, 0.0, 1.0)
+		col[2] = (1.0, 0.0, 1.0, 1.0)
+		col[3] = (0.0, 1.0, 0.0, 1.0)
+		
+		for (t in img.tile((img.size+1)/2)) (i)
+			img.fillrect(t, col[i])
+		
 
+	helper image.boxtest  (|image| wr, |int| extent)
+		|| copy = .copyimage
+		.boxblursafe(wr, extent)
+		copy.boxblur(wr, extent)
+		if .diffat(copy)
+			.DebugPixels
+			copy.DebugPixels
+			debugger
+		
+		
+	helper image.BoxBlurSafe (|image| wr, |int| extent, |bool| Tp=false)
+		debug_require wr.size == .size
+
+		for i in .height - 1 downto 0
+			.BoxBlurRow(wr, extent, false, i)
+			wr.BoxBlurRow(self, extent, Tp, i)
+	
+	
+	helper image.BoxBlur (|image| wr, |int| extent, |bool| Tp=false)
+		debug_require wr.size == .size
+
+		for i in .height - 1 downto 0
+			.BoxBlurRow(wr, extent, false, i)
+			wr.BoxBlurRow(self, extent, Tp, i)
+
+
+	helper image.BoxBlurTp (|image| wr, |int| extent)
+		debug_require wr.size == .size.yx
+
+		for i in .height - 1 downto 0
+			.BoxBlurRow(wr, extent, true, i)
+
+	helper image.BoxBlurRow (|image| wr, |int| extent, |bool| Rotate, |uint| row)
+		row = .height - (row+1)
+		require row < .height and .width > extent
+		
+		|| wd     = .Width
+		|| wrp    = wr.Pixels + row*wd
+		|| wrend  = wrp + wd
+		|| stride = 1
+		|| sh     = 16
+		if extent|uint| > wd: extent = wd
+		|| scale  = (1<<sh) / (2*extent+1)
+		|| align  = 1<<(sh-1)
+
+		if rotate
+			stride = .height
+			wrp    = wr.pixels + row
+			wrend  = 1 + wrp + (wd-1) * stride
+
+		|| Begin  = .Pixels + row*wd
+		|| add    = Begin 
+		|| addend = Begin + wd
+		|| Sub    = Begin - extent 
+		|| LastAdd= add++.raw
+		|| LastSub= LastAdd 
+		|| tot    = LastAdd * (extent + 1)
+		for extent
+			tot += add++.raw
+		
+		while 
+			wrp.raw = (tot * scale + align) >> sh
+			wrp += stride, loop wrp < wrend
+			
+			if add < addend
+				lastadd = add.raw
+			if sub >= begin
+				lastSub = sub.raw
+			tot += lastadd - LastSub
+			add++
+			sub++
+	
+
+/*
+		20	21	22	23
+		10  11  12  13
+		00  01  02  03
+
+		03  13  23
+		02	12	22
+		01  11  21
+		00  10  20
+
+		22	03  13  23
+		11  21	02	12
+		00  10  20  01
+*/
+		
 
 	setter Aura (|float|)
 		.aura = (value, value+0.25).sincos
 
 
-	function MakeSobel  (|image| r, |image| w, |float| scale)
+	function RunOutline  (|image| r, |image| w, |float| scale)
 		for (px in w) (P)
-			|| v4 = sobelmain(self, r,  P.vec2+0.5, scale)
+			|| v4 = OutlinePixel(self, r,  P.vec2+0.5, scale)
 			px <~ v4
 	
 	
-	function StartJeebox (|image| B, |message| conf)
+	function StartJeebox (|image| D, |message| conf)
 		opt norefcounts
-		|| A = .tmp
-		if !.Invalidated and A.size == B.size
-			A.copyto(B)
+		|| T = .tmp
+		if T.size != D.size
+			.Invalidated = true
+		if !.Invalidated
+			T.copyto(D)
 			return
 		
+		|| S = D.size
+		require T.resizeto(s)
 		.Invalidated = false
 		
 		|| seed = conf["seed"].int		?? 1
 		|| reps = conf["reps"].int		?? 3
-		|| sobstr = conf["sobel"].float	?? 1.75
-		
+		|| LineStr = conf["sobel"].float?? 1.75
 		|| start = date.now
-		A.size = B.size
-		.MakeBoxes(A, seed)
-		for reps
-			A.BlurInto(B, .blurry, 1)
-			b.BlurInto(A, .blurry, 0)
+	
+		.MakeBoxes(D, seed)
+		//.DebugBoxes(d)
 		
-		.MakeSobel(a, b, sobstr)
-		B.copyto(A)
+		
+		T.size = S.yx
+		d.boxblurtp(t, 5)
+
+		D.size = S.yx
+		t.boxblur(D, 5)
+
+		D.size = S
+		t.boxblurtp(d, 5)
+		
+		d.size = S
+		t.size = S
+		d.copyto(t)
+		//for i in 3
+		//	T.boxblurpass(D, 4)
+		
+		.RunOutline(d, t, LineStr)
 		Duration += date.now - start
 		
 	module
 		|date| Duration
-
-
-
-struct ImageBlurrer
-	|float[15]|		Values
-	|int|			Count
-	
-	constructor (|float| Sigma)
-		.create(sigma)
-	
-	function Create (|float| Sigma)
-		.count = 0
-		|| nn = 15
-		|| Lim = 0.0 // Lim may only be 0.6 by the end!!
-		// each number is used twice.
-		|| W = &.values[0]
-		for i in nn
-			|| g = i|float|.Gaussian(Sigma)
-			if i == 0: g *= 0.5
-			W[i] = g
-			Lim += g
-		
-		Lim *= 1.0 - 72th // 0.986, approx 99% brightness
-		|| Found = 0.0
-		for i in nn
-			loop Found < Lim
-			Found += W[i]
-			.Count++
-	
-		|| norm = 0.5/found
-		for i in nn
-			W[i] *= norm
-
-
-	iterator
-		|| c = .count
-		|| i = 0
-		while (i < c)
-			yield .values[i]  (i)
-			i++
 
 
 
@@ -148,7 +210,7 @@ function image.Sqrt (|vec2| xy, |float| scale, |vec4|)
 	return (.interp(xy)*scale).sqrt
 
 
-helper image.SobelSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
+helper image.outlineSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
     || s1 = .Sqrt(XY - Move * 1.5, scale)
     || s2 = .Sqrt(XY + Move * 1.5, scale)
     || s3 = .Sqrt(XY - Move, scale)
@@ -160,11 +222,11 @@ helper image.SobelSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
     return sx*sx + sy*sy
 
 
-function SobelMain (fnImageShader)
-	|| S1	= read.SobelSub(P, scale, (0.0,1.0))
-	|| S2	= read.SobelSub(P, scale, (1.0,0.0))
-	|| Sobel= mix(S1, S2, 0.5)
-	return (Sobel.rgb, 1.0)
+function OutlinePixel (fnImageShader)
+	|| S1 = read.outlineSub(P, scale, (0.0,1.0))
+	|| S2 = read.outlineSub(P, scale, (1.0,0.0))
+	|| V0 = mix(S1, S2, 0.5)
+	return (v0.rgb, 1.0)
 
 
 struct ImageTiler
@@ -173,11 +235,14 @@ struct ImageTiler
 	iterator
 		|| b = .bounds
 		|| curr = (0, b.y, 0, b.y + .tile.y)
+		
+		|| i = (0)
 		while curr.y < B.y2
 			curr.x = b.x
 			curr.x2 = b.x + .tile.x
 			while curr.x < B.x2
-				yield curr
+				yield (curr) (i)
 				curr += .tile.x_x_
+				i++
 			curr += .tile._y_y
 			
