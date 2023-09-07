@@ -164,6 +164,12 @@ struct ImagePixel
 		
 	function Raw (|ivec4|)
 		return ivec4.load(self|&byte|)
+
+	function Raw (assigns:|ivec4|)
+		.r = value.r
+		.g = value.g
+		.b = value.b
+		.a = value.a
 	
 	function Uint (|uint|)
 		return self|&uint|[0]
@@ -205,12 +211,15 @@ struct ImagePixel
 
 extend vec3
 	syntax cast (|imagepixel|)
+		cpp_part AsPixel
 		rz <~ self
 extend vec4
 	syntax cast (|imagepixel|)
+		cpp_part AsPixel
 		rz <~ self
 extend ivec4
 	syntax cast (|imagepixel|)
+		cpp_part AsPixel
 		rz <~ self
 		
 
