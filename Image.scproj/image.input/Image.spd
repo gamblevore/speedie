@@ -16,11 +16,13 @@ class Image (memory)
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
 		.name = name
+		.length = .capacity 
 		.SizeInfo = s
 		
 	constructor (|ivec2| wh, |string| name="")
 		cpp_Part ConstructorSizeVec2
-		super.constructor(wh.area, 4) 
+		super.constructor(wh.area, 4)
+		.length = .capacity 
 		.name = name
 		.SizeInfo = wh
 	
@@ -117,19 +119,22 @@ class Image (memory)
 	setter Size (|ivec2|)
 		.resizeto(value)
 	
+	
 	function ResizeTo (|ivec2| value, |bool|)
-		if value == .size
+		|| N = value.area
+		if (.size.area == N) or .setcap(N)
+			.SizeInfo = value
+			.length = .capacity
 			return true
-		.Free
-		.SizeInfo = value
-		.length = value.area
-		return .setcap(.Length|int|)
+	
 	
 	function Clear (|imagepixel| Color=colors.black)
 		.FillRect((0,0,.size), color)
 	
+	
 	function Pixels (|&imagepixel|)
 		return .ptr|&imagepixel|
+	
 	
 	function imagepixel.Colorise (|byte| D)
 		|| DB = (d>>2)&3				// too brown otherwise
@@ -279,6 +284,17 @@ class Image (memory)
 			self[A>>16][] = 255
 			A += D
 
+
+	function DebugPixels
+		cpp_part Dump
+		visible
+		for y in .height
+			for x in .width
+				if x: print ", "
+				print self[x,y].render
+			printline
+		printline
+
 	
 	iterator
 		|| curr = ._controlclip.x1y1
@@ -286,9 +302,6 @@ class Image (memory)
 		|| end = ._controlclip.x2y2
 		while (curr.y < end.y)
 			while (curr.x < end.x)
-				if self[curr]|int64| < 0xc2000
-					debugger
-					self[curr]
 				yield (self[curr]) (curr)
 				curr.x++
 			curr = (xstart, curr.y+1)
