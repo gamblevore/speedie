@@ -6,7 +6,6 @@
 struct JeeboxEffects
 	linkage: cpp_part jfx
 	|image| 			Tmp
-	|vec4| 				Aura
 	|imagepixel[8]|		Cols
 	|random|			rnd
 	|bool|				Invalidated
@@ -14,7 +13,6 @@ struct JeeboxEffects
 	
 	function Init (|float| blurr)
 		.tmp = image()
-		.aura = (0.0,1.0, 0.0,1.0)
 		.cols[0] = (0.1,	0.1,	0.1)
 		.cols[1] = (0.2,	0.2,	0.2)
 		.cols[2] = (0.8,	0.1,	0.9)
@@ -42,6 +40,7 @@ struct JeeboxEffects
 
 	function MakeBoxes (|image| img, |int| seed)
 		|| base = 6
+		img.Generation = 1
 		.rnd.seed(seed)
 		
 		.MakeSubBoxes(img, base*6,  0.99)
@@ -58,103 +57,52 @@ struct JeeboxEffects
 		
 		for (t in img.tile((img.size+1)/2)) (i)
 			img.fillrect(t, col[i])
+		img.Generation = 1
 		
 	
-	helper image.BoxBlur2 (|image| tmp, |int| extent, |uint| row, |uint| Count, |bool| rotate=false)
-		if Count isa 2
-			self.BoxBlurRow(tmp,  extent,  row, rotate)
-		  else
-			tmp.BoxBlurRow(self,  extent,  row, rotate)
+	function image.BoxBlur (|image| tmp, |float| sigma)
+		require Tmp.resizeto(.size.yx)
+
+		|ImageBlurrer| blur
+		blur.Create(sigma)
+		for row in .height
+			blur.BlurRow(self, tmp, row)
+		tmp.generation = .generation + 1
+
+		for row in tmp.height
+			blur.BlurRow(tmp, self, row)
+		tmp.resizeto(.size)
+		.generation = tmp.generation + 1
+
+
+	helper ImageBlurrer.BlurRow (|image| rd, |image| wr, |uint| row)
+		|| stride = rd.height
+		|| wd     = rd.Width
+		|| Start  = rd.Pixels + row*wd
+		|| wrp    = wr.pixels + row
+		|| wrend  = 1 + wrp + (wd-1) * stride
+		|| v0 = .Weights[0]
+		|| x0 = .Extent
 		
-	
-	helper image.BoxBlur (|image| tmp, |int| extent, |int| Passes)
-		// BLUR EACH ROW A FEW PASSES
-		for row.down in .height
-			for i in passes-1
-				.BoxBlur2(tmp,  extent,  row,  i)
-					
-
-		// rotate AND blur
-		tmp.size = .size.yx
-		for row.down in .height
-			.BoxBlur2(tmp,  extent,  row,  passes,  true) // or passes+1?
-
-		
-		// BLUR EACH COL A FEW PASSES
-		|| odd = passes&1
-		for row.down in tmp.height
-			for i in passes-1
-				.BoxBlur2(tmp,  extent,  row,  i+odd)
+		for i in wd
+			|| x = 0
+			|| ts = (Start+i).raw
+			|| total = ts * v0
+			while ++x < x0
+				|| w = .Weights[x]
+				|| back = i - x, if back < 0:  back = 0
+				|| fwd = i+x,    if fwd >= wd: fwd  = wd-1
+				|| R1 = (start+back).Raw
+				|| R2 = (start+fwd).Raw
+				total += (r1 + r2) * w
+				
+			total = (total + 32K) >> 16
+			wrp.raw = total, wrp += stride
 
 
-		// RESTORE ROTATION AND BLUR
-		tmp.size = .size.yx
-		for row.down in tmp.height
-			.BoxBlur2(tmp,  extent,  row,  1,  true)
-
-
-	helper image.BoxBlurRow (|image| wr, |int| extent, |uint| row, |bool| rotate)
-		row = .height - (row+1)
-		require row < .height and .width > extent
-		
-		|| wd     = .Width
-		|| wrp    = wr.Pixels + row*wd
-		|| wrend  = wrp + wd
-		|| stride = 1
-		|| sh     = 16
-		if extent|uint| > wd: extent = wd
-		|| scale  = (1<<sh) / (2*extent+1)
-		|| align  = 1<<(sh-1)
-
-		if rotate
-			stride = .height
-			wrp    = wr.pixels + row
-			wrend  = 1 + wrp + (wd-1) * stride
-
-		|| Begin  = .Pixels + row*wd
-		|| add    = Begin 
-		|| addend = Begin + wd
-		|| Sub    = Begin - extent 
-		|| LastAdd= add++.raw
-		|| LastSub= LastAdd 
-		|| tot    = LastAdd * (extent + 1)
-		for extent
-			tot += add++.raw
-		
-		while 
-			wrp.raw = (tot * scale + align) >> sh
-			wrp += stride, loop wrp < wrend
-			
-			if add < addend
-				lastadd = add.raw
-			if sub >= begin
-				lastSub = sub.raw
-			tot += lastadd - LastSub
-			add++
-			sub++
-	
-
-/*
-		20	21	22	23
-		10  11  12  13
-		00  01  02  03
-
-		03  13  23
-		02	12	22
-		01  11  21
-		00  10  20
-
-		22	03  13  23
-		11  21	02	12
-		00  10  20  01
-*/
-		
-
-	setter Aura (|float|)
-		.aura = (value, value+0.25).sincos
-
-
-	function RunOutline  (|image| r, |image| w, |float| scale)
+	function RunOutline  (|image| r, |image| w, |float| scale) // sobel
+		w.generation = r.generation + 1
+				
 		for (px in w) (P)
 			|| v4 = OutlinePixel(self, r,  P.vec2+0.5, scale)
 			px <~ v4
@@ -163,29 +111,28 @@ struct JeeboxEffects
 	function StartJeebox (|image| D, |message| conf)
 		opt norefcounts
 		|| T = .tmp
-		if T.size != D.size
-			.Invalidated = true
-		if !.Invalidated
+		if (T.size == D.size) and !.Invalidated
 			T.copyto(D)
 			return
 		
 		require T.resizeto(D.size)
 		.Invalidated = false
 		
-		|| seed = conf["seed"].int		?? 1
-		|| reps = conf["reps"].int		?? 3
+		|| seed    = conf["seed"].int		?? 1
+		|| sig     = conf["sigma"].int		?? 3
 		|| LineStr = conf["sobel"].float?? 1.75
-		|| start = date.now
+		|| start   = date.now
 	
-		.MakeBoxes(D, seed)
 		//.DebugBoxes(d)
-		
-		
-		d.boxblur(t, 5, 4)
+		.MakeBoxes(D, seed)
+		d.BoxBlur(t, 20)
 		
 		.RunOutline(d, t, LineStr)
-		Duration += date.now - start
 		
+		t.MakeFinalGeneration(d)
+		Duration += date.now - start
+
+
 	module
 		|date| Duration
 
@@ -193,8 +140,9 @@ struct JeeboxEffects
 
 prototype fnImageShader (|&JeeboxEffects| self, |image| Read, |vec2| P, |float| scale, |vec4|)
 
-function image.Sqrt (|vec2| xy, |float| scale, |vec4|)
-	return (.interp(xy)*scale).sqrt
+
+function image.Sqrt (|vec2| P, |float| scale, |vec4|)
+	return (.interp(P)*scale).sqrt
 
 
 helper image.outlineSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
@@ -212,8 +160,8 @@ helper image.outlineSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
 function OutlinePixel (fnImageShader)
 	|| S1 = read.outlineSub(P, scale, (0.0,1.0))
 	|| S2 = read.outlineSub(P, scale, (1.0,0.0))
-	|| V0 = mix(S1, S2, 0.5)
-	return (v0.rgb, 1.0)
+	rz = mix(S1, S2, 0.5)
+	rz.w = 1.0
 
 
 struct ImageTiler
@@ -232,4 +180,34 @@ struct ImageTiler
 				curr += .tile.x_x_
 				i++
 			curr += .tile._y_y
-			
+
+
+struct ImageBlurrer
+	|int[15]|		Weights
+	|int|			Extent
+	|float[15]|		Values
+	
+	function Create (|float| Sigma)
+		.Extent = 0
+		|| nn = 15
+		|| Lim = 0.0						// Lim maybe < 0.5 by the end!!
+		|| W = &.values[0]
+		for i in nn
+			|| g = i|float|.Gaussian(Sigma)
+			W[i] = g
+			Lim += g * (1.0+(i>0))
+		
+		Lim *= 1.0 - 72th					// 0.986, approx 99% brightness
+		|| Found = 0.0
+		for i in nn
+			loop Found < Lim
+			|| F = W[i] * (1.0+(i>0))
+			Found += F
+			.Extent++
+	
+		|| norm = 1.0/found
+		
+		for i in nn
+			W[i] *= norm
+			.weights[i] = w[i]*64K
+		

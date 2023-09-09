@@ -9,7 +9,7 @@ class Image (memory)
 	|ivec2|			WindowBase
 	|ivec4|			_ControlClip
 	|string|		Name
-	|int|			DebugCount
+	|int|			Generation
 	contains byte
 	
 	constructor (|ivec2| S, |&byte| P, |string| name="")
@@ -172,15 +172,15 @@ class Image (memory)
 		cpp_part AtXYInt
 		return self[(x,y)]
 
+
 	function Interp (|vec2| P, |vec4|)
-		cpp_part ColVec2 // should do interpolation
-		
 		|| base = p.ifloor
 		for i in 4
 			|| base2 = base + (i>>1, i&1)
 			|| closeness = (base2.Vec2 - p).abs.sum
 			|| c0 = self[base2].color
 			rz += (closeness*c0*0.25)
+	
 	
 	syntax access (|vec2| P, |&ImagePixel|)
 		disabled "use ivec2 coords to get &pixel, or syntaxcall for interpolated result"
@@ -200,9 +200,13 @@ class Image (memory)
 
 	syntax call (|ivec2| P, |vec4|)
 		cpp_part ColXY
-		.debugcount++
 		return .SyntaxAccess(p).Color
-		
+	
+	
+	function MakeFinalGeneration (|image| Source)
+		if source.generation > .generation
+			.generation = source.generation + 1
+			source.copyto(self)
 		
 	function SavePNG (|file| f) // writetofile
 		disabled "unfinished code"
@@ -372,6 +376,7 @@ class Image (memory)
 		|| Diff = (where.CurrSize - .CurrSize)/2
 		.drawto(where, diff, g)
 	
+	
 	function CurrSize (|ivec2|)
 		return ._controlclip.size
 	
@@ -468,7 +473,6 @@ class Image (memory)
 			p+=4
 			
 
-
 	function DrawCircle (|ivec4| R, |DrawStyle| G=nil, |float| fade=0.0,  |bool|)
 		|| Back		= .Clip(R)$
 		
@@ -518,3 +522,18 @@ struct ImageReader
 				v.x++
 				v1++
 			.rect.y++
+
+
+
+function @image.debugblur
+	|| img = image((4,3))
+	|| i = 0
+	for (p in img) (v)
+		p.raw = ivec4(i++)
+	img.debugpixels
+	|| img2 = image((4,3))
+	img.BoxBlur(img2, 4)
+	img2.debugpixels
+	img.debugpixels
+
+
