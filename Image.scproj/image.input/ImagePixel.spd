@@ -195,7 +195,7 @@ struct ImagePixel
 		rz <~ self
 	function ivec4.Px (|imagepixel|)
 		rz <~ self
-
+	
 	module 
 		|ImagePixel| Bad
 		|ImagePixel| White

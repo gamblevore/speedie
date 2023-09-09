@@ -6,8 +6,10 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 
+
 // Perry Do later
 * the function-jumper cmd-click should do the same as cmd-L
+* ctrnl up/down should page-shift on osx
 * behaviours should list like __draw__
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping

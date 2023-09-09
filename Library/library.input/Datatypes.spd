@@ -811,8 +811,8 @@ datatype vec4
 	syntax Equals (|vec4| v, |bool|Aware, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
 	
-	function Clamp (|vec4|)
-		return vec4(.x.clamp, .y.clamp, .z.clamp, .w.clamp)
+	function Clamp (|float| max=1.0, |vec4|)
+		return vec4(.x.clamp(max), .y.clamp(max), .z.clamp(max), .w.clamp(max))
 	
 	function Sqrt (|vec4|)
 		return vec4(.x.sqrt, .y.sqrt, .z.sqrt, .w.sqrt) // oof

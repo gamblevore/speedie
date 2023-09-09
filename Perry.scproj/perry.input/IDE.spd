@@ -137,15 +137,26 @@ class PerryIDE (Window)
 			r.remove
 
 
+	function JeeboxEffects (|image| where, |message| bg)
+		effects.dest = where
+		Effects.StartJeebox(bg, 0.2)
+		|| r = .editme.lastrect
+		|| m = r._y1x1y2
+		Effects.Mark(r,         1.0)
+		Effects.Mark(m, 0.5)
+		effects.finishjeebox
+		
+		|| t = 0.33, || b = 0.66
+		|| Top = vec4(t,t,t, 0.8) 
+		|| Bot = vec4(b,b,b, 0.8)
+		where.DrawGradient(r ± 1, top, bot)
+	
+	
 	behaviour Draw
 		opt norefcounts
 		|| bg = app.Prefs["bg"]
 		if bg == "jeebox"
-			Effects.StartJeebox(where, bg)
-			Effects.MarkSobel(where, .EditMe)
-			Effects.MarkSobel(where, .FileSep.first) // i want this to look different to the .editme area somehow?
-			effects.DoSobel(Where)
-
+			.Jeeboxeffects(where, bg)
 		  else
 			if bg != "flat"
 				app.pref("bg") = "flat"
@@ -206,18 +217,21 @@ class PerryIDE (Window)
 		if !perry.checked
 			perry.CheckInstallStatus(false)
 
+
 	function StatsMode (|int|)
 		rz = perryide.StatsMode|int|
 		if rz > 3
 			rz = 0
 		rz = rz.clamp(0, 3)
 		perryide.StatsMode = rz
-		
+	
+	
 	function InfoStatus (|string|)
 		|| fs = .stats init FastString()
 		|| i = .statsmode
 		if i == 0
 			fs <~ "  --" // :)
+		
 		  elseif i == 1
 			|| e = .editme
 			|| t = e.text
@@ -235,6 +249,7 @@ class PerryIDE (Window)
 				if fr isa filerow
 					f = fr
 			fs <~ "${f.lastsize.strsize} in ${f.lastfilecount} \11"
+		
 		  elseif i == 3
 			fs <~ "Obj ${app.ObjMemory.strsize}  Str ${app.stringmemory.strsize}  Scr ${sdlapp.DrawSpace.bytecapacity.strsize}"
 			
@@ -630,7 +645,7 @@ class PerryIDE (Window)
 		|bool|						DummyTest
 		|byte|						StatsMode
 		
-		Effects.Init(10)
+		Effects.Init()
 
 		syntax access (|int| i, |perryide|)
 			opt norefcounts

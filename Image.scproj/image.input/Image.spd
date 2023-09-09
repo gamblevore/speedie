@@ -135,6 +135,21 @@ class Image (memory)
 			.length = n
 			.SizeInfo = value
 			return true
+			
+	
+	function DrawGradient (|ivec4| r, |vec4| T, |vec4| B)
+		|| hz = r.horz
+		|| vt = r.vert
+		|| Step = 1.0 / (vt[1] - vt[0])
+		|| curr = 0.0
+		for y in vt
+			|| value = mix(b,t,curr)
+			|| Px = self[hz.x  , y]
+			|| Px2 = self[hz.x2-1, y]
+			while px < px2
+				px.overlay(value)
+				px++
+			curr+=step
 	
 	
 	function Clear (|imagepixel| Color=colors.black)
