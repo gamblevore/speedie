@@ -34,7 +34,7 @@ struct JeeboxEffects
 			
 
 	function MakeBoxes (|image| img, |int| seed)
-		|| base = 4
+		|| base = 6
 		.rnd.seed(seed)
 		
 		.MakeSubBoxes(img, base*5,  0.99)

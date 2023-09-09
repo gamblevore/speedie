@@ -139,17 +139,17 @@ class PerryIDE (Window)
 
 	function JeeboxEffects (|image| where, |message| bg)
 		effects.dest = where
-		Effects.StartJeebox(bg, 0.2)
-		|| r = .editme.lastrect
-		|| m = r._y1x1y2
-		Effects.Mark(r,         1.0)
-		Effects.Mark(m, 0.5)
+		Effects.StartJeebox(bg, 0.5)
+		|| ed = .editme.lastrect
+		|| lf = ed._y1x1y2
+		Effects.Mark(ed,        0.0)
+		Effects.Mark(lf, 		1.0)
 		effects.finishjeebox
 		
 		|| t = 0.33, || b = 0.66
-		|| Top = vec4(t,t,t, 0.8) 
-		|| Bot = vec4(b,b,b, 0.8)
-		where.DrawGradient(r ± 1, top, bot)
+		|| Top = vec4(t,t,t, 0.88) 
+		|| Bot = vec4(b,b,b, 0.88)
+		where.DrawGradient(ed, top, bot)
 	
 	
 	behaviour Draw
