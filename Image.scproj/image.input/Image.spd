@@ -12,34 +12,41 @@ class Image (memory)
 	|int|			Generation
 	contains byte
 	
+	
 	constructor (|ivec2| S, |&byte| P, |string| name="")
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
 		.name = name
 		.length = .capacity 
 		.SizeInfo = s
-		
+	
+	
 	constructor (|ivec2| wh, |string| name="")
 		cpp_Part ConstructorSizeVec2
 		super.constructor(wh.area, 4)
 		.length = .capacity 
 		.name = name
 		.SizeInfo = wh
+
 	
 	constructor
 		super.constructor(0, 4) // should we allocate 1 pixel to be safe?
 		.SizeInfo = (0,0)
+
 	
 	destructor
 		if .name
 			"Destroying: $.name"
 
+	
 	render	
 		fs <~ "image${.size}:${.name}"
+	
 	
 	function CopyImage (|Image|)
 		rz = image(.size)
 		memory.Copy(rz.ptr, .ptr, .ByteCapacity)
+	
 	
 	function ControlClip (assigns:|ivec4| R)
 		cpp_part ControlClipSet4
@@ -125,8 +132,9 @@ class Image (memory)
 		// !.deathaction means our memory is externally managed
 		// (not via malloc) so we assume its already been resized.
 		if (.size.area == N)  or  !.deathaction  or .setcap(N)
+			.capacity = n // setcp might not be called if !.deathaction
+			.length = n
 			.SizeInfo = value
-			.length = .capacity
 			return true
 	
 	
@@ -471,7 +479,7 @@ class Image (memory)
 			p[2] = 255-p[2] 
 			p[3] = 255-p[3] 
 			p+=4
-			
+	
 
 	function DrawCircle (|ivec4| R, |DrawStyle| G=nil, |float| fade=0.0,  |bool|)
 		|| Back		= .Clip(R)$
