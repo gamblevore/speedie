@@ -9,7 +9,6 @@ class Image (memory)
 	|ivec2|			WindowBase
 	|ivec4|			_ControlClip
 	|string|		Name
-	|int|			Generation
 	contains byte
 	
 	
@@ -210,11 +209,6 @@ class Image (memory)
 		cpp_part ColXY
 		return .SyntaxAccess(p).Color
 	
-	
-	function MakeFinalGeneration (|image| Source)
-		if source.generation > .generation
-			.generation = source.generation + 1
-			source.copyto(self)
 		
 	function SavePNG (|file| f) // writetofile
 		disabled "unfinished code"

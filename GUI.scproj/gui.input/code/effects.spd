@@ -40,7 +40,6 @@ struct JeeboxEffects
 
 	function MakeBoxes (|image| img, |int| seed)
 		|| base = 6
-		img.Generation = 1
 		.rnd.seed(seed)
 		
 		.MakeSubBoxes(img, base*6,  0.99)
@@ -57,7 +56,6 @@ struct JeeboxEffects
 		
 		for (t in img.tile((img.size+1)/2)) (i)
 			img.fillrect(t, col[i])
-		img.Generation = 1
 		
 	
 	function image.BoxBlur (|image| tmp, |float| sigma)
@@ -67,12 +65,10 @@ struct JeeboxEffects
 		blur.Create(sigma)
 		for row in .height
 			blur.BlurRow(self, tmp, row)
-		tmp.generation = .generation + 1
 
 		for row in tmp.height
 			blur.BlurRow(tmp, self, row)
 		tmp.resizeto(.size)
-		.generation = tmp.generation + 1
 
 
 	helper ImageBlurrer.BlurRow (|image| rd, |image| wr, |uint| row)
@@ -100,9 +96,7 @@ struct JeeboxEffects
 			wrp.raw = total, wrp += stride
 
 
-	function RunOutline  (|image| r, |image| w, |float| scale) // sobel
-		w.generation = r.generation + 1
-				
+	function RunOutline  (|image| r, |image| w, |float| scale) // sobel				
 		for (px in w) (P)
 			|| v4 = OutlinePixel(self, r,  P.vec2+0.5, scale)
 			px <~ v4
@@ -124,12 +118,12 @@ struct JeeboxEffects
 		|| start   = date.now
 	
 		//.DebugBoxes(d)
-		.MakeBoxes(D, seed)
+		.MakeBoxes(d, seed)
 		d.BoxBlur(t, 20)
 		
 		.RunOutline(d, t, LineStr)
+		t.copyto(d)
 		
-		t.MakeFinalGeneration(d)
 		Duration += date.now - start
 
 
