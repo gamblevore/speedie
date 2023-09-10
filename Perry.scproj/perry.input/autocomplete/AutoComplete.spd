@@ -28,7 +28,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 
 	.autocomplete.listsource = list
 	.SetAutoPoint(.editme.sel0)
-	.showauto(false)
+	.showauto
 	(.AutoComplete isnt typethrough)
 
 
@@ -105,14 +105,20 @@ function PerryIDE.ClearAutoComplete
 	.editme.AutoCompleteString = ""
 
 
-function PerryIDE.ShowAuto (|bool| beep)
-	if .autocomplete.listsource.hasany
-		.autocomplete.Showcmm(self, .AutoPoint.y-.absbottom, .AutoPoint.x)
-		(.autocomplete is typethrough)
-	  else
-		if beep
-			beep
-		.autocomplete.closemenu
+function PerryIDE.ShowAuto (|bool| beeps)
+	if !.showauto and beeps
+		beep
+
+
+function PerryIDE.ShowAuto (|bool|)
+	|| a = .autocomplete
+	if a.listsource.hasany
+		a.ListSource.obj = .editme.Path
+		a.Showcmm(self, .AutoPoint.y - .absbottom, .AutoPoint.x)
+		(a is typethrough)
+		return true
+	a.ListSource.obj = nil
+	a.closemenu
 	
 
 function AutoCompleteInsertText (GuiListEvent)
@@ -243,20 +249,20 @@ function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
 		.AutoCompleteFB(f, AutoCompleteMode.edit, reason)
 	  elseif msg ~= "autocomplete_sel"
 		.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
-	  elseif msg starts "callfrom"
-		.CallFromFB(msg)
 	  elseif msg starts "display"
 		.DisplayFB(msg)
-	  elseif msg starts "define"
-		.DefineFB(msg)
-	  elseif msg starts "check"
-		.ErrorListFB(msg)
 	  elseif msg starts "compile" or "debug"
 		.CompileFB(msg)
 	  elseif msg starts "log"
 		.LogFB(msg)
 	  elseif msg starts "crashed"
 		.CrashedFB(c, msg.render)
+	  elseif msg starts "callfrom"
+		.CallFromFB(msg)
+	  elseif msg starts "check"
+		.ErrorListFB(msg)
+	  elseif msg starts "define"
+		.DefineFB(msg)
 	.DuringMsgFB = false
 
 
@@ -269,12 +275,13 @@ function EditMeKeyDown (guitextevent)
 function EditMeModified (guitextevent)
 	|| i = .ide
 	require i.project and i.projmsg
-	editmekeydown(self, 0, false)
-	if reason != documentstate.saving
+	EditMeKeyDown(self, 0, false)
+	
+	if (reason != documentstate.saving) and !i.DuringTempView
 		|| x = .sel1
 		if !sdlapp.IsTyping
 			i.InteractUpdate
-		  elseif !i.isloading and (.sel0 == x)
+		  elseif !i.DuringLoad and (.sel0 == x)
 			|| b = self[x]
 			if !b or b.istextline or i.autocomplete.isopenedmenu
 				.PerryTryAutoComplete(x, "autocomplete_edit", PerryAutoCompleteReason.modified)

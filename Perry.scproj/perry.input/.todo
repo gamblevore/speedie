@@ -8,11 +8,12 @@
 
 
 // Perry Do later
-* the function-jumper cmd-click should do the same as cmd-L
-* ctrnl up/down should page-shift on osx
+* frame seems to have a fast mode and slow mode?
+	* badly-responsive when rightclicking functionlists from a func
 * behaviours should list like __draw__
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping
+
 
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?

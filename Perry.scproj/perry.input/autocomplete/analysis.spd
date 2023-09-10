@@ -56,14 +56,39 @@ function PerryIDE.ImproveFuncList (|message| result)
 			n = "." + n 
 		s.name = n
 		p0 = p
-				
-					
+
+
+
+function PerryAutoCompleteSelected (GUIListEvent)
+/*
+	«tmp "line"
+		«sstr "/usr/local/speedie/Utils/birds.scproj/bird.input/birdwindow.spd"»
+		«str "BirdWindow.Constructor"»
+		«num "550"»
+	»
+*/
+	opt norefcounts
+	|| i = .ide
+	i.DuringTempView++
+
+	|| e = i.EditMe
+	|| p = row.first.nyme
+	if !row
+		p = .ListSource.obj as string
+	if i.EditPath(p)
+		e.ClearFound
+		|| rl = row[2]
+			e.ShowAndSel(rl.int) is found
+
+	i.DuringTempView--
+	
+
 function PerryFuncMenuSelected (GUIListEvent)
 	opt norefcounts
 	|| e = .ide.EditMe
 	e.ClearFound
 	if row
-		e.ViewPos(row.position, 1, true) is found   // InViewExact
+		e.ShowAndSel(row.position) is found
 		return false
 	|| obj = .ListSource.obj as TextViewLine
 		e._Start = obj

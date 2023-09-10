@@ -308,7 +308,7 @@ class ListView (GUIControl) {
 		return .startRenameCell(ListViewcell(.LastSelected, 0))
 	
 	
-	function Rename (|ListViewRow| r, |bool|) // .editrow 
+	function Rename (|ListViewRow| r, |bool|) 
 		cpp_part RenameRow
 		return .startRenameCell(ListViewcell(r, 0))
 	

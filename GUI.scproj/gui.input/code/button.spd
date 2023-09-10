@@ -44,6 +44,7 @@ class ButtonView (GUIControl)
 		if s isa menu
 			return  s
 
+
 	function Click
 		opt norefcounts
 		.click((int.min, int.min))

@@ -72,17 +72,17 @@ class PerryIDE (Window)
 	|date|						LastAutoCompleteDate
 	|date|						PopupDateOn
 	|int|						EditMeTabRetryThing
+	|byte|						DuringLoad
+	|byte| 						DuringTempView
+	|byte|						NoClutter
 	|bool| 						StillJumping
 	|bool|						CanAskingAboutMissing
 	|bool|						DuringMsgFB  // canloadfile, canupdate, .disable 
+	|bool|						DuringNextPrev
 	|bool|						IsTextOnly
 	|bool|						UsingSpdLib
 	|bool| 						DebugIsWaitingForCompile
-	|byte|						IsLoading
-	|bool|						FromNextPrev
 	|bool|						InConstructor
-	|byte|						NoClutter
-	|bool| 						LoadingFind
 	|bool|						ModifiedForCompile
 	|bool| 						UpdateMem
 	|bool| 						IsGraphics
@@ -417,7 +417,6 @@ class PerryIDE (Window)
 		.ReadLog
 		.PopupDisplayFadeIn
 		
-			
 		|| fc = sdlapp.FrameCount|int|
 		require .islast
 		if fc+1 isa 64
@@ -435,9 +434,9 @@ class PerryIDE (Window)
 		if !ShouldNotDisturbGUI and !.DebugArgsList.HasFocus
 			.HideStuff
 
-	function CheckModified
-		.EditMe.document.checkmodified?
-//		.drawme.document.checkmodified?
+
+	function CheckModified 
+		.EditMe.document.checkmodified
 		
 
 	function ProjClosed (|bool|)
@@ -715,6 +714,11 @@ class PerryIDE (Window)
 
 
 	function EditRow (|listviewrow| r, |int|)
+		description `
+-1 means "its OK, its already loaded"
+1 means "its OK, we managed to load it"
+So anything not 0 means "its OK"`
+
 		if r isa filerow
 			rz = .EditFile(r)
 			.filelist.ScrollJump
@@ -729,9 +733,13 @@ class PerryIDE (Window)
 		return .CurrFileRow.Location
 
 
+	function EditPath (|string| s, |bool|)
+		if s
+			return .editfile(.findpath(s))
+
+
 	function EditFile (|FileRow| r, |int|) // editfile, loadfile, fileload, fileedit, openfile, fileopen
-		require r and r.location and !.IsLoading
-		.CurrFileName.text = r.name
+		require r and r.location and !.DuringLoad
 		// the drawing thing needs a document too!
 		// why not the same?
 		// we could make editfield have an internal draw editor...
@@ -742,15 +750,16 @@ class PerryIDE (Window)
 		|| g = (r isa "voi" or "png" or "qoi")
 		if .IsGraphics != g
 			.IsGraphics = g
-			.IsLoading++
+			.DuringLoad++
 			.ViewAsCurr
-			.IsLoading--
+			.DuringLoad--
 		|| ok = (.EditDraw(r), .EditText(r))(g)
 		if ok != 1
 			return ok
 
+		.CurrFileName.text = r.name
 		.updatemem = true
-		.IsLoading++
+		.DuringLoad++
 		.filelist.select(r)
 		
 		if !g
@@ -763,7 +772,7 @@ class PerryIDE (Window)
 		.AddToJumpHistory
 		if !g and .IsEditingSource and .feedback.closed
 			.Recheck
-		.IsLoading--
+		.DuringLoad--
 		
 		return 1
 			
@@ -784,7 +793,7 @@ class PerryIDE (Window)
 		.ListAllFuncs
 		require Loaded
 		|| it = .ProjMsg
-			if !.isloading
+			if !.DuringLoad
 				it["edit"] = r.location
 			it["pos"] = doc.Position
 

@@ -122,6 +122,7 @@ extend PerryIDE
 
 
 		with .autocomplete
+			.onselected		= PerryAutocompleteSelected
 			.ID				= "AutoComplete"
 			.takesfocus 	= takesfocusflag.CanFocus
 			is TypeThrough
@@ -401,7 +402,6 @@ extend PerryIDE
 			.ID = "AllFuncsMenu"
 			.onselected = PerryFuncMenuSelected
 			.ontypingfilter = PerryFuncListFilter
-			//.clipmode |= controlclipmode.debug
 
 		with .currfilename.submenu
 			isnt drawsfocus
@@ -478,6 +478,7 @@ extend PerryIDE
 			.gnormal.edge	= .gnormal.bg
 			.rowheight	   *= 2
 
+
 	function AddViewButton (|ButtonView| BTN, |string| Oof, |guicontrol| tag)
 		.ViewButtons <~ btn // 
 		btn.tag		= tag
@@ -508,9 +509,9 @@ extend PerryIDE
 	function LoadProject (|file| proj, |bool|)
 		require proj.mustexist("load project")
 		.project = proj
-		.IsLoading++
+		.DuringLoad++
 		.LoadConfSub(proj)
-		.IsLoading--
+		.DuringLoad--
 		require .StartProj
 
 		startupwindow.hide
@@ -584,8 +585,8 @@ extend PerryIDE
 			(projfol is expanded)
 			|| pos = 0
 			|| file = .DesiredStart(projfol, pos)
-			.EditRow(file)
-			.EditMe.showandsel(pos)
+				.EditRow(file)
+				.EditMe.showandsel(pos)
 			return true
 		  elseif .EditRow(.filelist.start)
 			return true

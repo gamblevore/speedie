@@ -8,7 +8,7 @@ extend PerryIDE
 		
 	function ForceRecheck
 		if .IsSpeedieCode and !.UsingSpdLib
-			.GetFeedbackStr "check"
+			.SendFeedbackStr "check"
 
 
 	syntax is (|ListViewState| s, |bool|)

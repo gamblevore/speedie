@@ -15,20 +15,22 @@ function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| na
 		ifn cmd starts "autocomplete_sel"
 			return .DisplayStr(where)
 	  else
-		return .GetFeedback(cmd, where, name, reason)
+		return .SendFeedbackRequest(cmd, where, name, reason)
 
 
-function PerryIDE.GetFeedback (|string| cmd,  |message| where,  |string| name,  |string| reason, |bool|)
-	|| msg = .BuildCmd(cmd, where, name, reason)
-		if (.PopupDisplay is visible) or .PopupDateOn
-			|| cmdstr = msg.renderjbin
-			require .lastCmdStr != cmdstr
-			.lastCmdStr = cmdstr
-		.SendFeedbackMsg(msg)
-		return true
+function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string| name,  |string| reason, |bool|)
+	|| msg = .BuildCmd(cmd, where, name, reason)		#require
+
+	if (.PopupDisplay is visible) or .PopupDateOn
+		|| cmdstr = msg.renderjbin
+		require .lastCmdStr != cmdstr
+		.lastCmdStr = cmdstr
+	if .autocomplete is visible
+	.SendFeedbackMsg(msg)
+	return true
 
 
-function PerryIDE.GetFeedbackStr (|string| op)
+function PerryIDE.SendFeedbackStr (|string| op)
 	.SendFeedbackMsg(.compilemsg(op, false))
 	
 

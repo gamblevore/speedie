@@ -444,10 +444,10 @@ class TextView (GUIControl)
 		.ViewPos(x, (.MaxVisibleLines/3)) //idk
 	
 	
-	function ShowAndSel (|int| x, |int| length=0)
+	function ShowAndSel (|int| x, |int| length=0, |textviewline|)
 		opt NoRefCounts
-		|| d = .ViewPos(x, (.MaxVisibleLines/3), 2)
-		.sel2((x, x + length), d)
+		rz = .ViewPos(x, (.MaxVisibleLines/3), 2)
+		.sel2((x, x + length), rz)
 
 
 	function ViewPos (|int| x,  |int|before=0, |int| back=0, |bool| Exact=false, |TextViewLine|)
@@ -499,18 +499,29 @@ class TextView (GUIControl)
 		return x.clamp(.text.length)
 		
 
-	helper MoveSelLine (|int| i, |bool| Page, |bool|)
+	helper MoveSelLine (|int| i, |int| Page, |bool|)
 		opt norefcounts
 		debug_require i
 		sdlapp.showcursor(false)
-		
+	
+//	helper @keys.PageTest (|bool|)
+//		if Platform.osx
+//			return keys.option or keys.Control
+//		return keys.option
+ 
+		if !page
+			target osx
+				page = (keys.option or keys.Control)|int|
+			  else
+				page = (keys.Option)|int|
+			
 		|| x  = (.text.length, 0)(i > 0)
 		|| t  = .sel
-		|| bs = .FindDrawSelMove(t, i, page)
+		|| bs = .FindDrawSelMove(t, i, page>0)
 		if .singleline and (t == bs.x)
 			return .MoveListLine(i)
 
-		if Keys.Cmd
+		if !page and Keys.Cmd
 			.PreferPrevLine = i < 0
 			.jump(x)
 			.PreferPrevLine = i < 0
@@ -558,7 +569,7 @@ class TextView (GUIControl)
 			return true			
 		if (key is RGUI or LGUI) and sdlapp.CursorVisible
 			.ShowExtraInfo(.mousexy)
-		
+	
 
 	helper KeyDownTest (|keys| key, |bool|)
 		if self is editable
@@ -567,7 +578,7 @@ class TextView (GUIControl)
 				if key.IsAccept:		return .AcceptEditing(true)
 				if key iscmd keys.g:	return .AcceptEditing(false)
 				if key is tab:			return .FinishEditing
-			if key.isaccept:			return .NewLine
+			if key.IsAccept:			return .NewLine
 			if key is left:				return .MoveSel(-1)
 			if key is right:			return .MoveSel(1)
 			if key is LEFTBRACKET:		return .tabIndent(-1, "\t")
@@ -576,10 +587,10 @@ class TextView (GUIControl)
 				return .trytab
 			if key iscmd keys.SLASH:	return .CommentSlash(false)
 			if key iscmd keys.Num8:		return .CommentSlash(true)
-			if key is up:				return .MoveSelLine(-1, keys.option)
-			if key is pageup:			return .MoveSelLine(-1, true)
-			if key is down:				return .MoveSelLine( 1, keys.option)
-			if key is pagedown:			return .MoveSelLine( 1, true)
+			if key is pageup:			return .MoveSelLine(-1, 1)
+			if key is pagedown:			return .MoveSelLine( 1, 1)
+			if key is up:				return .MoveSelLine(-1, 0)
+			if key is down:				return .MoveSelLine( 1, 0)
 			if key is home:				return .jump(0)
 			if key is end:				return .jump(.text.length)
 			if key is delete:			return .DeleteKey(keys.shift)
