@@ -44,8 +44,6 @@
 		AC310BF22A5188FE00837DCB /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F142961FA8C005EFB9D /* libSDL2.dylib */; };
 		AC310BF32A5188FE00837DCB /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC61010E2798768C00278BEF /* libSpeedie.dylib */; };
 		AC310BF52A5188FE00837DCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC259FAD2660E1AC0026C303 /* Assets.xcassets */; };
-		AC310C042A5189BF00837DCB /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC310C022A5189BF00837DCB /* JB_Globals.cpp */; };
-		AC310C052A5189BF00837DCB /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC310C032A5189BF00837DCB /* JB.cpp */; };
 		AC310C072A518A1300837DCB /* bird.input in Resources */ = {isa = PBXBuildFile; fileRef = AC310C062A518A1300837DCB /* bird.input */; };
 		AC52897A2961F3FB005EFB9D /* JB_Umbrella.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */; };
 		AC528A5C2961F536005EFB9D /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528A5A2961F536005EFB9D /* JB_Globals.cpp */; };
@@ -236,8 +234,6 @@
 		AC259FBF2660EF610026C303 /* image.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image.input; path = ../Image.scproj/image.input; sourceTree = "<group>"; };
 		AC28D04B2638AAE700635A66 /* perry.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perry.input; sourceTree = SOURCE_ROOT; };
 		AC310BFA2A5188FE00837DCB /* BirdDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BirdDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AC310C022A5189BF00837DCB /* JB_Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = ../../Utils/birds.scproj/Cpp/JB_Globals.cpp; sourceTree = "<group>"; };
-		AC310C032A5189BF00837DCB /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = ../../Utils/birds.scproj/Cpp/JB.cpp; sourceTree = "<group>"; };
 		AC310C062A518A1300837DCB /* bird.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = bird.input; path = ../Utils/birds.scproj/bird.input; sourceTree = "<group>"; };
 		AC3A6A8D296082E700CE1E91 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		AC4A650125011C1600EF6E9A /* gui.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = gui.input; path = ../GUI.scproj/gui.input; sourceTree = "<group>"; };
@@ -364,15 +360,6 @@
 			path = OSX;
 			sourceTree = "<group>";
 		};
-		AC310C012A5189A500837DCB /* BIRD */ = {
-			isa = PBXGroup;
-			children = (
-				AC310C022A5189BF00837DCB /* JB_Globals.cpp */,
-				AC310C032A5189BF00837DCB /* JB.cpp */,
-			);
-			path = BIRD;
-			sourceTree = "<group>";
-		};
 		AC528A5F2961F8D3005EFB9D /* Compiled Src Perry */ = {
 			isa = PBXGroup;
 			children = (
@@ -457,7 +444,6 @@
 				AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */,
 				AC310C062A518A1300837DCB /* bird.input */,
 				AC28D04B2638AAE700635A66 /* perry.input */,
-				AC310C012A5189A500837DCB /* BIRD */,
 				AC528A5F2961F8D3005EFB9D /* Compiled Src Perry */,
 				AC610133279877CC00278BEF /* Compiled Src Speedie */,
 				AC259FBF2660EF610026C303 /* image.input */,
@@ -727,7 +713,6 @@
 				AC310BD02A5188FE00837DCB /* JB_Vectors.cpp in Sources */,
 				AC310BD22A5188FE00837DCB /* JB_OSX.m in Sources */,
 				AC310BD32A5188FE00837DCB /* JB_Tokeniser.cpp in Sources */,
-				AC310C042A5189BF00837DCB /* JB_Globals.cpp in Sources */,
 				AC310BD42A5188FE00837DCB /* JB_Date.cpp in Sources */,
 				AC310BD62A5188FE00837DCB /* JB_MSR.cpp in Sources */,
 				AC310BD72A5188FE00837DCB /* JB_BasicIO.cpp in Sources */,
@@ -741,7 +726,6 @@
 				AC310BDF2A5188FE00837DCB /* JB_Pipe.cpp in Sources */,
 				AC310BE02A5188FE00837DCB /* JB_Child.cpp in Sources */,
 				AC310BE12A5188FE00837DCB /* JB_Alloc.cpp in Sources */,
-				AC310C052A5189BF00837DCB /* JB.cpp in Sources */,
 				AC310BE22A5188FE00837DCB /* JB_PNG.cpp in Sources */,
 				AC310BE32A5188FE00837DCB /* JB_DivSufSort.cpp in Sources */,
 				AC310BE42A5188FE00837DCB /* JB_LibraryFile.cpp in Sources */,
