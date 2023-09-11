@@ -481,6 +481,9 @@ function message.OwningFullName (|syntax| prm, |message|)
 	|| name = f.nyme
 	if self ~= "syntax" or "operator"
 		name = .name.lowercase + name
+	if self ~= "behaviour" or "virtual"
+		name = "__" + name + "__" // technically... only should be virtuals...
+		// but I PREFER here too as we have so many behaviours
 	if f != @thg and self ~= "render"
 		name = "Render"
 	|| fn   = @name

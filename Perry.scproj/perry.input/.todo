@@ -23,10 +23,11 @@
 	* What about decls? perhaps just relative to a node?
 * TextView error/find resync
 * too long text in listview draw as much as we can
+* the cmm for files should have a cloc feature?
 
 
 // Speedie Do later
-* make collectdecls not loopy
+* finish off collectdecls
 * new datatypes can subclass off nothing!
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
 	* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
