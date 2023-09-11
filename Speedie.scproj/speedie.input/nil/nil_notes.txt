@@ -1,10 +1,5 @@
 
-TODO:
-
 BOOLEAN LOGICS:
-* double-branch merging always. not/or is done in terms of negation
-* check all new funcs that they return nilness
-* check all jump()
 * || x = (a and b), if x: a.a(b.b) // only next ifbranch tho
 
 

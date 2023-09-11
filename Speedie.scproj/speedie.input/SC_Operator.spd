@@ -34,6 +34,10 @@ linkage
 |byte|		IsAndOr
 
 
+constants
+	AND = 3
+	OR = 2
+	
 constructor (|fn_opasm| ASM)
 	.asm = asm
 
@@ -125,9 +129,9 @@ module {
 				opch.name = result.name
 		
 		if op == "or"
-			result.IsAndOr = 2
+			result.IsAndOr = SCOperator.OR
 		  elseif op == "and"
-			result.IsAndOr = 3
+			result.IsAndOr = SCOperator.And
 		// why aren't 'if "" > nil' here? I think... cos no one would do that?
 		result.DoesntNeedExtraBits = (op == "&" or ">>")// or "|")
 		return Result

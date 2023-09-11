@@ -36,7 +36,7 @@ function LastInBlock
 
 	while test
 		arg = test.prev // if.arg
-		require arg and arg.Blocks
+		require arg.Blocks
 		test = arg.parent
 		test.flags |= kEndsBlock
 		if test.TmpType is kif
@@ -57,11 +57,26 @@ function scdecl.ParamUpgrade
 
 
 datatype NilCheckMode (uint)
-	constants
+	flags
 		|NilCheckMode| 
-		AllowRedundant = 2
-		Active = 1
+		Positive
+		Negative
+		LiveRun
+		AllowRedundant
+		Cond = LiveRun + Positive
+		Active = Positive + Negative
 
+	function Use (|nilcheckmode|)
+		return self & liverun // what about allowredundant?
+	
 	syntax is (|NilCheckMode| other, |bool|)
-		return self == other
+		return self & other
+
+	syntax isnt (|NilCheckMode| other, |bool|)
+		return !(self & other)
+	
+	function Negate (|NilCheckmode|)
+		if self & positive
+			return (self &~ positive) (|) negative
+		return (self &~ negative) (|) positive
 

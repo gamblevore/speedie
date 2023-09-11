@@ -1481,7 +1481,8 @@ function Tran_If (TranFunc)
 
 
 function message.Blocks (|bool|)
-	return .flags & kEndsBlock
+	if self
+		return .flags & kEndsBlock
 
 
 function Tran_IfSub (|message| node, |scbase| name_space) 

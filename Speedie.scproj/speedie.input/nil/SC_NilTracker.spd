@@ -13,12 +13,6 @@ struct NilTracker
 	|scfunction--|		fn
 	|NilItem[1536]|		Items
 
-	function Undo (|uint| s)
-		.Restore(s)
-		.DeclCount = s
-	
-	function Restore (|uint| s)
-		.merge(s, false)
 
 	function Merge (|uint| s, |bool| Merge=true)
 		|| c = .DeclCount
@@ -35,8 +29,8 @@ struct NilTracker
 				debugger // bad
 		
 	
+	function StartCond (|int|)
 	function NeedCond (|int|)
-	function NegateCond (|int| old)
 	function CloseCond (|int| old)
 		
 	function SetNilness (|scdecl| d, |nilstate| s)
@@ -96,6 +90,7 @@ struct NilTracker
 	function scfunction.canNil (|bool|)
 		return !(.IsMacro and !.IsWrapper and .isOK)	
 	
+	
 	function scfunction.LimitTests (|bool|)
 		|| c = .Lookup #require
 		require c.name contains "NilTest"
@@ -124,15 +119,14 @@ struct NilTracker
 
 
 		function Undo (|uint| s)
-			T.Restore(s)
+			T.merge(s, false)
 			t.DeclCount = s
 		
 		function Restore (|uint| s)
 			t.merge(s, false)
 	
-		function Merge (|uint| s, |bool| Merge=true)
-			t.merge(s,merge)
-
+		function Merge (|uint| s)
+			t.merge(s, true)
 }
 	
 	
