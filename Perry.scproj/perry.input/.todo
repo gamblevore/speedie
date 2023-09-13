@@ -1,5 +1,5 @@
 
-	
+	 
 							Todo
 
 * VM? 
@@ -11,11 +11,9 @@
 // Perry Do later
 * typing frameupdate seems to have a fast mode and slow mode? also for scrolling! and more
 	* autocomplete responsivity seems sloowwwww. like it should be instant. we can do it! remove the hard-coded delay?
-	* badly-responsive when rightclicking functionlists from a func
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping
-
-
+// even later
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
 * TextView error/find resync

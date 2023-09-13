@@ -21,7 +21,7 @@ extend_module app
 	function Beep (|string| q="")
 		if beep.OK.fired
 			.beepsub
-			beep.OK = date() + 1.5s
+			beep.OK = date() + (1s/12)
 		if q
 			.alert(q)
 	

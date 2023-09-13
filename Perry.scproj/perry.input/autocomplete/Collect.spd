@@ -25,7 +25,6 @@ function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string|
 		|| cmdstr = msg.renderjbin
 		require .lastCmdStr != cmdstr
 		.lastCmdStr = cmdstr
-	if .autocomplete is visible
 	.SendFeedbackMsg(msg)
 	return true
 

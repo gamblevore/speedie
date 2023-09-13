@@ -1043,7 +1043,7 @@ class Message (RingTree)
 			  else
 				error (self, "Invalid unit")
 				return 0
-			return mul
+			return mul|int64|
 			
 
 	function Float (|f64|)

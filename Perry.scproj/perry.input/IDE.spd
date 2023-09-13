@@ -396,7 +396,7 @@ class PerryIDE (Window)
 			return 
 		require !.UsingSpdLib
 		|| f = .Feedback
-		if f.IsOpen and f.lastsend.ago > date.seconds(30+.position)
+		if f.IsOpen and f.lastsend.ago > (30.0+.position).date
 			|| msg = "Released Speedie: " + .name
 			.LogOneAction(@emb + msg)
 			.feedback.KillButOK

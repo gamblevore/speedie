@@ -10,7 +10,7 @@ struct SDL_Event
 
 
 	module 
-		function Poll (|bool|)
+		function HasAny (|bool|)
 			return (nil|&SDL_Event|).poll
 	
 	function Poll (|bool|)

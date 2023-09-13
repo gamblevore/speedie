@@ -10,16 +10,16 @@ datatype Date (int64)
 
 	syntax cast (|float|)
 		cpp_Part CastFloat
-		return .seconds
+		return (self|float| * kOneStep)
 	
 	syntax cast (|f64|)
 		cpp_Part CastDouble
-		return .seconds
+		return self|float| * kOneStep
 	
 	
 	constants
+		kOneStep = 0.000015258789
 		kOneSecond = 0x10000
-		kTicks = 0x10000
 		kTickBits = 16
 		kClocksPerSecond = 1000000
 		kSecondsPerDay = 86400
@@ -28,7 +28,7 @@ datatype Date (int64)
 	
 	
 	syntax Compare (|float| Other, |bool|Aware, |int|)
-		|| oof = other * kOneSecond
+		|| oof = other.date
 		if (self > oof)
 			return 1
 		if (self < oof)
@@ -65,7 +65,7 @@ datatype Date (int64)
 		
 	function Durr (|f64|)
 		disabled "is this even used? Its just .seconds?"
-		return self|f64| / kTicks|f64|
+		return self|f64| / kOnesecond|f64|
 	
 	render  // hmmm... i guess this is just for data-formats.
 			// but that is very inconsistant because most renders are "Readable"
@@ -73,7 +73,7 @@ datatype Date (int64)
 
 	function Ticks (|int|)
 		disabled "is .ticks math right?"
-		return self mod kTicks
+		return self mod kOneSecond
 	
 	function DayOfWeek (|int|)
 		return .Days mod 7
@@ -107,8 +107,6 @@ datatype Date (int64)
 			yield (CurrTime - StartDate).seconds|float|
 
 	module
-		function Seconds (|f64| s, |date|)
-			return s * kOneSecond
 		function TimeID (|uint64|)
 			.now.timeID
 			

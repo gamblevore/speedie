@@ -1,5 +1,5 @@
 
-
+//asdasdasdadasdqwlkjm, s
 class Window (GUIControl)
 	linkage
 		cpp_part Win
@@ -216,6 +216,7 @@ class Window (GUIControl)
 		.DrawBackground(where)	
 		.DrawContents(where)
 	
+	
 	function DrawBackground (|image| where)
 		where.window = self
 		if .gnormal
@@ -240,22 +241,16 @@ class Window (GUIControl)
 		where.ResetBoundsToSize
 
 
-	helper EveryFrame
+	helper FixFocus
 		opt norefcounts
 		|| f = .realfocus				#require
-		if !sdlapp.IsBackground and (f isa textview)
-			f.CheckNeedsFlashSel
-		if f isnt visible
-			if f == .innerfocus
-				.setinnerfocus(nil)
-			  else
-				.clearfocus
+		if f is visible
+			0 //
+		  elseif f == .innerfocus
+			.SetInnerFocus(nil)
+		  else
+			.ClearFocus
 		
-
-	helper textview.CheckNeedsFlashSel
-		if (self is editable) and (!.SelRange.width)
-			sdlapp.TrySelectorFlash
-	
 	
 	function guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
 		require dest != nil  and  dest != self

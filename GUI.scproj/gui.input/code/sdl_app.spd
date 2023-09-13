@@ -26,9 +26,9 @@ module SDLApp
 	|date|						SelSolidUntil
 	|date|						FixScreenBug
 	|date|						FastToolTipDate
+	|date|						ChangeSelFlash
 	|uint|						LastMouseDownRepeat
 	|uint|						FrameCount
-	|uint|						LastFrameSelMove
 	|uint|						DrawCount
 	|float|						Scale
 	|bool|						StartedProperly
@@ -109,7 +109,7 @@ module SDLApp
 
 
 	function SelChanged
-		.LastFrameSelMove = .FrameCount+32
+		.ChangeSelFlash = 1
 
 
 	function ScreenOrig (|ivec4|)
@@ -333,7 +333,7 @@ module SDLApp
 	
 	helper Init (|ivec2| s) // startup
 		require !.framelength
-		.FrameLength = 60th*1s
+		.FrameLength = 60th.date
 		.openedfirst = date.now
 		app.PrefsInit(.openedfirst)
 		|| PrevSize = app.prefs["screen"].ivec4
@@ -364,10 +364,10 @@ module SDLApp
 	
 	
 	helper TrySelectorFlash
-		|| Visible = !.IsBackground and (((.FrameCount-.LastFrameSelMove)>>6) mod 2) 
-		if .FlashSelector != Visible
-			.FlashSelector = Visible
+		if !.IsBackground and (sdlapp.ChangeSelFlash.fired)
+			.FlashSelector = !.FlashSelector
 			.Touch
+			sdlapp.ChangeSelFlash = date.now + 1s
 
 
 	function ClearAlerts
@@ -400,26 +400,23 @@ module SDLApp
 	
 	
 	helper FrameAndEvents (|sdlactivity|)		
-		while !rz
-			while .Event.Poll
-				rz |= .CheckEvent(.event)
-				.Event.type = 0
-			if .WantsQuit
-				rz |= .TryQuit(SDLActivity.Exiting)
-			if .NewSize
-				rz |= SDLActivity.activity
+		while .Event.Poll
+			rz |= .CheckEvent(.event)
+			.Event.type = 0
+		if .WantsQuit
+			rz |= .TryQuit(SDLActivity.Exiting)
+		if .NewSize
+			rz |= SDLActivity.activity
 
-			if .TouchCount				
-				|| f = (.FrameLength, 0.5s)(.FastUpdate)
-				if .LastFramedate.ago >= f
-					.TouchCount--
-					rz |= SDLActivity.activity
+		if .TouchCount				
+			|| f = (.FrameLength, 0.5s)(.FastUpdate)
+			if .LastFramedate.ago >= f
+				.TouchCount--
+				rz |= SDLActivity.activity
 			//while !sdl_event.poll
 			//	|| f = (0.005s, 0.25s)(.FastUpdate)
 			//	app.sleep( f )
 
-		.FrameCount++
-		.LastFramedate = date()
 		// how to fix this? // it has 2 problems now.
 			// its too slow
 			// its very too slow
@@ -434,6 +431,10 @@ module SDLApp
 		opt norefcounts
 		|| f = w.realfocus // if theres nothing to focus, we can still type into the window!
 		|| allow = !f or (f is editable) or (f isa menu) 
+			if (f isa textview)
+				if (!f.SelRange.width)
+					sdlapp.TrySelectorFlash
+		
 		require .TextInputEnabled != allow
 		.TextInputEnabled = allow
 		if allow
@@ -503,11 +504,12 @@ module SDLApp
 			if ed.needshide
 				ed.clear
 
-			if .candrag > 4
+			if .CanDrag > 4
 				.touch
 				w.DoMouseDrag(.MouseXY, true)
 				rz = SDLActivity.activity
 		.ClearAlerts
+		.HandleAppResize
 	
 	
 	function MouseDownRepeatOK (|bool|)
@@ -612,7 +614,7 @@ module SDLApp
 		.StartResize
 		|| nodlg = !.DialogIsOpen
 		for w  in  window.all
-			w.EveryFrame
+			w.FixFocus
 			if nodlg
 				w.__FrameUpdate__(w.openedmenu!=nil)
 		.StartResize
@@ -630,13 +632,16 @@ module SDLApp
 		require .SingleFrameNest <= 2
 		.SingleFrameNest++
 			
-		|| occured = .PreFrame (|) .FrameAndEvents
+		|| occured = .PreFrame
+		occured |= .FrameAndEvents
 		ifn Occured is Exiting
-			.HandleAppResize
 			.UpdateWindowFrames
 			.PutDialogsInFront
 			if occured is activity
+				// beep
 				.DrawFrame
+				if !sdl_event.HasAny
+					app.sleep((30th, 0.005)(sdlapp.Isbackground).date)
 			
 			.SingleFrameNest--
 			return true

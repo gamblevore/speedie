@@ -390,9 +390,6 @@ datatype float
 		cpp_part f
 	default 0
 		
-//	syntax cast (|date|) // doesn't seem to solve anything
-//		cpp_part AsDate
-//		return self * date.kTicks
 	module
 		function Max (|float|)
 			cpp_wrapper JB_f__max
@@ -417,6 +414,7 @@ datatype float
 	syntax cast (|bool|)
 		cpp_part AsBool
 		return self|bool|
+		
 	
 	function Floor (|float|)
 		cpp_wrapper (floorf)
@@ -426,6 +424,9 @@ datatype float
 	
 	function Round (|float|)
 		cpp_wrapper (roundf)
+
+	function Date (|date|)
+		return (self * date.kOneSecond)|date|
 	
 	function DecimalPlaces (|float| to=2, |float|)
 		cpp_Part RoundTo
@@ -499,6 +500,8 @@ datatype f64
 
 	function Floor (|f64|)
 		cpp_wrapper (floor)
+	
+		
 	function Fract (|f64|)
 		return self - .floor
 	
