@@ -403,7 +403,7 @@ module SDLApp
 		while !rz
 			while .Event.Poll
 				rz |= .CheckEvent(.event)
-			.Event.type = 0
+				.Event.type = 0
 			if .WantsQuit
 				rz |= .TryQuit(SDLActivity.Exiting)
 			if .NewSize
@@ -468,19 +468,22 @@ module SDLApp
 
 	function OrderWindows (|window|)
 		opt norefcounts
-		|window| w
-		for c in window.all
-			if c is visible
-				if w
-					c.position = w.position + 1
-				w = c
+		|| i = 0
+		for w in window.all
+			if w is NewlyShown
+				sdlapp.Resized(w)
+				(w isnt newlyshown)
+			if w is visible
+				if rz
+					w.position = i++
+				rz = w
 			  else
-				c.position = -1
-				window.all.first = c
-		return w
+				w.position = -1
+				window.all.first = w
 
 		
 	function PreFrame (|sdlactivity|)
+		opt norefcounts
 		if .FixScreenBug.Fired
 			.BumpSize
 			rz = SDLActivity.activity
@@ -492,19 +495,18 @@ module SDLApp
 
 		.HandleOpenFile
 		
-		|window--| w = .OrderWindows$
-		.UpdateTextFocus(W)
-		.PreFrameText(w)
-		
-		|| ed = w.inline
-		if ed.needshide
-			ed.clear
+		|| w = .OrderWindows
+			.UpdateTextFocus(W)
+			.PreFrameText(w)
+			
+			|| ed = w.inline
+			if ed.needshide
+				ed.clear
 
-		if .candrag > 4
-			.touch
-			w.DoMouseDrag(.MouseXY, true)
-			rz = SDLActivity.activity
-
+			if .candrag > 4
+				.touch
+				w.DoMouseDrag(.MouseXY, true)
+				rz = SDLActivity.activity
 		.ClearAlerts
 	
 	
@@ -516,23 +518,23 @@ module SDLApp
 			return true
 		
 	
-	function DoDrawDrag (|window|w, |image| where)
+	function DoDrawDrag (|window| w)
 		|| s = .drawdrag
-		require s
 		|| d = w.DroppingInto
-		require d and d != w.currmousedown
+		require s and d and d != w.currmousedown
 		|| P	= .mousexy
 		|| sigh	= P.grow((6,6))
-		where.drawcircle(sigh, ¥.DragAndDrop, 0.0)
+		|| img = .DrawSpace
+		img.drawcircle(sigh, ¥.DragAndDrop, 0.0)
 		sigh	= P.grow((10,10))
-		where.drawcircle(sigh, ¥.DragAndDrop, 7.0)
+		img.drawcircle(sigh, ¥.DragAndDrop, 7.0)
 		
-		where.controlclip = sigh
+		img.controlclip = sigh
 		|| t	= s.length.render 
 		|| x	= t.length*font.width
 		|| h	= font.height
-		|| P2	= (x,h)/2
-		font.small.drawtext(t, where, P-P2, true)
+		|| P2	= (x, h)/2
+		font.small.drawtext(t, img, P-P2, true)
 	
 
 	function PutDialogsInFront
@@ -591,24 +593,17 @@ module SDLApp
 	function DrawFrame
 		opt norefcounts
 		
-		|| w1 = .DrawWinFrom$
+		|| w1 = .DrawWinFrom		#require
 		.StartFrame(.Raw)
 			
-// draw windows first...
 		while w1
 			if !w1.isdialog
 				.DrawSub(w1)
-			w1 = w1.next as window // dumb check... we'd need a stronger type system... with 3 layers for ringtree
+			w1 = w1.next as window // :O
 
-// then dialogs		
-		for w2 in window.all
-			if w2.isdialog
-				.DrawSub(w2)
-			
 		notifications.Draw
 
-		|| ws = __modules__.window.all
-		.DoDrawDrag(ws.first, .DrawSpace)
+		.DoDrawDrag(window.front)
 		.EndFrame(.Raw)
 
 
@@ -629,25 +624,17 @@ module SDLApp
 	function Cycle (|date| amount, |float|)
 		// FrameLength is 1/60
 		return (.mod((amount*60).WholeSeconds).sin + 1) * 0.5
-
-	function ShowWindows
-		opt norefcounts
-		for w in window.all
-			if w is NewlyShown
-				sdlapp.Resized(w)
-			(w isnt newlyshown)
 	
 	
 	helper SingleFrame (|bool|)
 		require .SingleFrameNest <= 2
 		.SingleFrameNest++
-		.ShowWindows
 			
 		|| occured = .PreFrame (|) .FrameAndEvents
 		ifn Occured is Exiting
 			.HandleAppResize
 			.UpdateWindowFrames
-			.PutDialogsInFront // original
+			.PutDialogsInFront
 			if occured is activity
 				.DrawFrame
 			
@@ -914,7 +901,7 @@ module SDLApp
 				w.ClearFocus
 				return SDLActivity.activity
 
-			if w.Click(b.button, b.clicks, xy)
+			if w.MouseDown(b.button, b.clicks, xy)
 				return SDLActivity.activity
 			return SDLActivity.nothing
 
@@ -1013,7 +1000,7 @@ module SDLApp
 		return SDLActivity.nothing
 		
 	
-	helper Window.Click (|int| bn,  |int| clicks,  |ivec2| xy, |bool|)
+	helper Window.MouseDown (|int| bn,  |int| clicks,  |ivec2| xy, |bool|)
 		target osx
 			|| Ctrl = keys.control // only osx needs this
 		  else
