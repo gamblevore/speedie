@@ -9,7 +9,6 @@
 
 
 // Perry Do later
-* right-clicking a func doesnt work for "needcond" jumps to nowhere.
 * typing frameupdate seems to have a fast mode and slow mode? also for scrolling! and more
 	* autocomplete responsivity seems sloowwwww. like it should be instant. we can do it! remove the hard-coded delay?
 	* badly-responsive when rightclicking functionlists from a func

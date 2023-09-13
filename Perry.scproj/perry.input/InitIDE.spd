@@ -591,7 +591,7 @@ extend PerryIDE
 		  elseif .EditRow(.filelist.start)
 			return true
 		  else
-			.close(sdlapp.kactivity)
+			.close(SDLActivity.activity)
 
 
 	function PerryFile (|file|)

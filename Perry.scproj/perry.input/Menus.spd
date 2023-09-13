@@ -194,7 +194,7 @@ function MenuCopyProject (guimenuevent)
 function MenuCloseProject (guimenuevent)
 	opt norefcounts
 	|| ide = menu.ide
-		ide.Close(sdlapp.kactivity)
+		ide.Close(SDLActivity.activity)
 
 
 function MenuShowProject (guimenuevent)

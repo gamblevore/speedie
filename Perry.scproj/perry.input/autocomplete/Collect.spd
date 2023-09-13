@@ -97,7 +97,6 @@ function PerryIDE.CompilerInit (|process| C, |bool| actual_compile, |process|)  
 		proc = proc.resolve
 		if proc
 			rz = process.child(Proc, name, p, actual_compile, 128KB)
-				
 
 
 function PerryIDE.ActualCompile (|message| msg)

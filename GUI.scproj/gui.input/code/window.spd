@@ -192,7 +192,7 @@ class Window (GUIControl)
 				(f.onclicked)(f)?
 			return true
 		if (key is escape) and .IsDialog
-			if !.returnvalue and !.__cancelclose__(sdlapp.kActivity)
+			if !.returnvalue and !.__cancelclose__(SDLActivity.activity)
 				.CancelReturn
 			return true
 	
@@ -243,6 +243,8 @@ class Window (GUIControl)
 	helper EveryFrame
 		opt norefcounts
 		|| f = .realfocus				#require
+		if !sdlapp.IsBackground and (f isa textview)
+			f.CheckNeedsFlashSel
 		if f isnt visible
 			if f == .innerfocus
 				.setinnerfocus(nil)
@@ -250,6 +252,11 @@ class Window (GUIControl)
 				.clearfocus
 		
 
+	helper textview.CheckNeedsFlashSel
+		if (self is editable) and (!.SelRange.width)
+			sdlapp.TrySelectorFlash
+	
+	
 	function guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
 		require dest != nil  and  dest != self
 		require dest is editable and enabled
@@ -330,7 +337,7 @@ class Window (GUIControl)
 
 	function Close
 		cpp_part CloseDisabler
-		disabled "pass a reason why we are closing this (kquit/kactivity)"
+		disabled "pass a reason why we are closing this (kquit/SDLActivity.activity)"
 
 
 	helper sdlapp.AskQuit (|bool|) // !sdlapp.askquit
@@ -339,7 +346,7 @@ class Window (GUIControl)
 	
 	
 	function Close (|int| reason, |bool|)
-		if !sdlapp.wantsquit and (reason < sdlapp.ktryquit)
+		if !sdlapp.wantsquit and (reason < SDLQuitReason.tryquit)
 			if (window.DocumentCount == 1)  and  !.isdialog
 				require sdlapp.AskQuit and !.__CancelClose__(0)
 				.disposeall(true)
@@ -347,7 +354,7 @@ class Window (GUIControl)
 				return true
 
 		|| cancelled = .__CancelClose__(reason)
-		if !cancelled or (reason & sdlapp.kExiting) or sdlapp.WantsQuit
+		if !cancelled or (reason & SDLActivity.Exiting) or sdlapp.WantsQuit
 			.DisposeAll(true) // its probably OK????
 			return true
 

@@ -19,7 +19,7 @@ module SDLApp
 	|ivec2| 					CurrMouseXY
 	|ivec2| 					AppResizingXY
 	|ivec2|						TryResizeLater
-	|f64|						FrameLength
+	|date|						FrameLength
 	|date|						OpenedFirst
 	|date|						LastFrameDate
 	|date|						LastWindowClose
@@ -27,7 +27,6 @@ module SDLApp
 	|date|						FixScreenBug
 	|date|						FastToolTipDate
 	|uint|						LastMouseDownRepeat
-	|int|						TicksDuration
 	|uint|						FrameCount
 	|uint|						LastFrameSelMove
 	|uint|						DrawCount
@@ -42,26 +41,12 @@ module SDLApp
 	|bool|						LastWasKeyWindowClose
 	|bool|						TextInputEnabled
 	|bool|						TextInputEnabledAtStart
-	|bool|						LastFlashSelector
 	|byte|						TouchCount=4  // draw the first few frames always
 											  // helps with startup events! at least on osx
 	|byte|						SingleFrameNest
 	|byte|						TouchFingersDown
 	|byte|						CanDrag
 	|byte|						ResizedCounter // for resize bug fix
-
-
-
-	
-	flags
-		kNothing
-		kActivity
-		kTryQuit
-		kExiting
-		kWindowClose
-		kQuitEvent
-		kTerminating
-		
 	
 	
 	cpp_wrapper SDL_Init				(|uint| c)
@@ -345,8 +330,10 @@ module SDLApp
 			return it
 		return app.appname
 	
+	
 	helper Init (|ivec2| s) // startup
 		require !.framelength
+		.FrameLength = 60th*1s
 		.openedfirst = date.now
 		app.PrefsInit(.openedfirst)
 		|| PrevSize = app.prefs["screen"].ivec4
@@ -359,7 +346,6 @@ module SDLApp
 		if !font.small
 			sdlapp.Alert("Exitting...", "SmallFont not loaded.")
 			app.quit
-		.FrameLength = 60th
 		.FastToolTipDate = 1
 
 		.InitWindow(s, .niceappname)
@@ -377,9 +363,11 @@ module SDLApp
 		cpp_wrapper SDL_SetHint
 	
 	
-	helper SelectorFlash
-		.LastFlashSelector = .FlashSelector
-		.FlashSelector     = !.IsBackground and (((.FrameCount-.LastFrameSelMove)>>6) mod 2) 
+	helper TrySelectorFlash
+		|| Visible = !.IsBackground and (((.FrameCount-.LastFrameSelMove)>>6) mod 2) 
+		if .FlashSelector != Visible
+			.FlashSelector = Visible
+			.Touch
 
 
 	function ClearAlerts
@@ -406,53 +394,40 @@ module SDLApp
 		if .ToolTip.Fired
 			return .Tooltip.name
 
+
 	helper FastUpdate (|bool|)
 		return !.IsBackground or .DroppingInto
-				
-	helper FrameAndEvents (|int|)		
-		.ClearAlerts
-		|| Occured = knothing
-		while
+	
+	
+	helper FrameAndEvents (|sdlactivity|)		
+		while !rz
 			while .Event.Poll
-				occured |= .CheckEvent(.event)
+				rz |= .CheckEvent(.event)
 			.Event.type = 0
 			if .WantsQuit
-				Occured |= .TryQuit(kExiting)
+				rz |= .TryQuit(SDLActivity.Exiting)
 			if .NewSize
-				Occured |= kActivity
+				rz |= SDLActivity.activity
 
-			|| t_now = date()
-			|| Durr  = (t_now - .LastFramedate).seconds
-			.TicksDuration = (t_now - .LastFramedate) >> 10
-			|int| t_now_small = t_now >> 10
-			
 			if .TouchCount				
-				|| f = (0.0164s, 0.5s)(.FastUpdate)
-				if durr >= f
+				|| f = (.FrameLength, 0.5s)(.FastUpdate)
+				if .LastFramedate.ago >= f
 					.TouchCount--
-					Occured |= kActivity
-			if Durr >= FrameLength
-				.FrameCount++
-				.SelectorFlash
-				.LastFramedate = t_now
-				return occured
-			if occured & kActivity
-				return occured
-			if !sdl_event.poll
-				|| f = (0.005s, 0.25s)(.FastUpdate)
-				app.sleep( f )
+					rz |= SDLActivity.activity
+			//while !sdl_event.poll
+			//	|| f = (0.005s, 0.25s)(.FastUpdate)
+			//	app.sleep( f )
+
+		.FrameCount++
+		.LastFramedate = date()
+		// how to fix this? // it has 2 problems now.
+			// its too slow
+			// its very too slow
 	
 	
 	function DroppingInto (|guicontrol|)
 		opt norefcounts
 		return __modules__.window.front.droppinginto?
-
-
-	helper guicontrol.NeedsSelFlashChange (|bool|)
-		opt norefcounts
-		if !sdlapp.isbackground and (self isa textview)
-			if (self is editable) and (!.selrange.width) and (sdlapp.FlashSelector != sdlapp.LastFlashSelector)
-				return true
 	
 	
 	function UpdateTextFocus (|window| w)
@@ -505,13 +480,15 @@ module SDLApp
 		return w
 
 		
-	function PreFrame (|int|)
+	function PreFrame (|sdlactivity|)
 		if .FixScreenBug.Fired
 			.BumpSize
+			rz = SDLActivity.activity
 		
 		while stderr.HasAnything
 			notifications <~ stderr.pop
 			beep
+			rz = SDLActivity.activity
 
 		.HandleOpenFile
 		
@@ -526,7 +503,9 @@ module SDLApp
 		if .candrag > 4
 			.touch
 			w.DoMouseDrag(.MouseXY, true)
-			return kactivity
+			rz = SDLActivity.activity
+
+		.ClearAlerts
 	
 	
 	function MouseDownRepeatOK (|bool|)
@@ -637,19 +616,10 @@ module SDLApp
 		opt norefcounts
 		.StartResize
 		|| nodlg = !.DialogIsOpen
-		for w  in  __modules__.window.all
-			if w isa window
-				w.EveryFrame
-				if nodlg
-					w.__FrameUpdate__(w.openedmenu!=nil)
-
-		|| w1 = .DrawWinFrom
-		while w1
-			|| f = w1.realfocus
-			if f.NeedsSelFlashChange
-				sdlapp.touch(f) // should optimise this. copy the picture, then draw the selector into the picture.
-			w1 = w1.next as window
-
+		for w  in  window.all
+			w.EveryFrame
+			if nodlg
+				w.__FrameUpdate__(w.openedmenu!=nil)
 		.StartResize
 		
 		
@@ -673,16 +643,16 @@ module SDLApp
 		.SingleFrameNest++
 		.ShowWindows
 			
-		|| occured  = .PreFrame (|) .FrameAndEvents
-		require !(Occured & kExiting)
-		.HandleAppResize
-		.UpdateWindowFrames
-		.PutDialogsInFront // original
-		if occured&kactivity
-			.DrawFrame
-		
-		.SingleFrameNest--
-		return true
+		|| occured = .PreFrame (|) .FrameAndEvents
+		ifn Occured is Exiting
+			.HandleAppResize
+			.UpdateWindowFrames
+			.PutDialogsInFront // original
+			if occured is activity
+				.DrawFrame
+			
+			.SingleFrameNest--
+			return true
 
 
 	function CheckQuarantine
@@ -744,7 +714,7 @@ module SDLApp
 	function Quit
 		.saveprefs // in case we crash during quit
 		for w in __modules__.window.all
-			w.close(kExiting)
+			w.close(SDLActivity.Exiting)
 		.saveprefs
 		.sdl_quit
 
@@ -773,14 +743,14 @@ module SDLApp
 		return .TextInputEnabledAtStart and !keys.cmd
 	
 	
-	function Window.MenuAt (|ivec2| xy, |bool|Test, |guicontrol|)
+	function Window.MenuAt (|ivec2| xy, |bool| Test, |guicontrol|)
 		opt norefcounts
 		|| F = .openedmenu$
 		if (!test) or (f.lastrect.horz contains xy.x)
 			return f
 	
 	
-	function Window.ControlOrMenuAt (|ivec2| xy, |bool|Test=true, |guicontrol|)
+	function Window.ControlOrMenuAt (|ivec2| xy, |bool| Test = true, |guicontrol|)
 		opt norefcounts
 		return .menuat(xy, test) ?? self[xy]
 
@@ -819,18 +789,18 @@ module SDLApp
 			return gw.DoCopy
 
 
-	function TryQuit (|int|reason=kTryQuit, |int|)
+	function TryQuit (|SDLQuitReason|reason=kTryQuit, |SDLActivity|)
 		opt norefcounts
-		if (reason == kQuitEvent)
+		if (reason is QuitEvent)
 			|| w = .LastWindowClose.ago
 			if (w and w < 0.1s)
 				return 0 // just block it. SDL is sending duplicate events
-		  elseif reason == kwindowclose
+		  elseif reason is windowclose
 			.LastWindowClose = date.now
 			if !sdlapp.AskQuit
 				return 0
 		
-		rz = kExiting
+		rz = SDLActivity.Exiting
 		for w in window.all
 			if w.isdialog
 				w.cancelreturn
@@ -855,8 +825,8 @@ module SDLApp
 		.LastWindowClose = date.now
 		if !.DialogIsOpen
 			|| w = window.front
-			if w and w.close(kactivity)
-				rz = kactivity
+			if w and w.close(SDLActivity.activity)
+				rz = SDLActivity.activity
 
 
 	function AppIsBackground (|bool| v, |int|)
@@ -866,7 +836,7 @@ module SDLApp
 			for w in __modules__.window.all
 				w.__AppForegroundChanged__(!v)
 		.touch
-		return kactivity
+		return SDLActivity.activity
 		
 
 	function CheckEvent (|&SDL_Event| ev, |int|)
@@ -879,14 +849,14 @@ module SDLApp
 			beep.OK = 1
 			.keymod = 0
 			.AppIsBackground(t is APP_DIDENTERBACKGROUND)
-			return kActivity
+			return SDLActivity.activity
 		
 		.keymod = .SDL_GetModState
 		if  t is APP_TERMINATING
-			return .tryquit(kTerminating)
+			return .tryquit(sdlquitreason.Terminating)
 		
 		if (t is QUIT)
-			return .tryquit(kQuitEvent)
+			return .tryquit(sdlquitreason.QuitEvent)
 		
 		if  t is WINDOWEVENT
 			|| wev = ev.window
@@ -895,57 +865,58 @@ module SDLApp
 				if keyw
 					return .TryCloseFrontWindow
 				  else
-					return .TryQuit(kWindowClose)
+					return .TryQuit(sdlquitreason.WindowClose)
 			if (wt is RESIZED)
 				.NewSize = (wev.data1, wev.data2)
-				return kActivity
+				return SDLActivity.activity
 			  elseif (wt is FOCUS_GAINED)
 				return .appisbackground(false)
 			  elseif (wt is FOCUS_LOST)
 				return .appisbackground(true)
-			return knothing
+			return SDLActivity.nothing
 
 
 		|| w = .FrontDialog ?? __modules__.window.front
 		if (!w)
-			return kNothing
+			return SDLActivity.nothing
 
 		if T is dropbegin
 			w.DroppingInto = w[.MouseXY] ?? w
-			return kActivity
+			return SDLActivity.activity
 		if t is DROPFILE or Droptext
 			|| flags = (copypasteflags.pastefile, copypasteflags.pastetext)(t is dropfile)
 			.FileDroppedIntoApp(w, ev.drop.filestr, flags)
-			return kActivity
+			return SDLActivity.activity
 		if (t is dropcomplete)
 			w.DroppingInto = nil
-			return kActivity
+			return SDLActivity.activity
 		
 		|| b = ev.button
 		|| xy = b.xy
+		
 		if  t is MOUSEDOWN
 			beep.OK = 1
 			if notifications.Clickedat(xy)
-				return kactivity
+				return SDLActivity.activity
 				
 			|| InsideWin = w.lastrect.soothe contains xy
 			if !InsideWin and (w == .FrontDialog)
 				if w.ClickOutsideCloses
 					w.CloseDialog
-					return kactivity
-				beep
-				return kNothing
+					return SDLActivity.activity
+				return SDLActivity.nothing
 			.candrag = nil
 			if .inResizeCorner(xy)
-				return kActivity
+				return SDLActivity.activity
 
 			|| foc = w.realFocus
 			if foc and foc.ClickOutsideCloses and !(foc contains xy)
-				w.clearfocus
-			  else
-				w.Click(b.button, b.clicks, xy)	
-			  
-			return kActivity
+				w.ClearFocus
+				return SDLActivity.activity
+
+			if w.Click(b.button, b.clicks, xy)
+				return SDLActivity.activity
+			return SDLActivity.nothing
 
 
 		  elseif  t is MOUSEMOVE
@@ -957,7 +928,7 @@ module SDLApp
 				.ShowCursor
 				if (.CanDrag >= 2) and (.MouseButtons is left)
 					w.DoMouseDrag(xy, .CanDrag > 3)
-					return kActivity
+					return SDLActivity.activity
 				
 				|guicontrol--| OldMM = w.MouseIsOver
 				|guicontrol--| r     = w.ControlOrMenuAt(Xy, false)
@@ -971,19 +942,18 @@ module SDLApp
 					state = SDL_WindowEventID.enter
 					
 				if r and R.__MouseMove__(xy, state)
-					return kactivity
+					return SDLActivity.activity
 				if w.CurrMousedown
 					.touch
-					return kActivity
+					return SDLActivity.activity
 
 
 		  elseif  t is MOUSEUP
 			SDL_CaptureMouse(false)
 			.AppResizingXY = nil
-			.LastMouseDownRepeat = nil			
-			|| dd	= .drawdrag 
+			.LastMouseDownRepeat = nil
+			|| dd   = .drawdrag 
 			|| di	= w.DroppingInto
-			if di and dd
 				for c in dd
 					di.dopaste(c, copypasteflags.pastefile)
 			
@@ -995,21 +965,21 @@ module SDLApp
 			  elseif dow and (B.button!=3) and !Scroller.JustClicked
 				dow.__MouseUp__(xy)
 			Scroller.JustClicked = false
-			return kActivity
+			return SDLActivity.activity
 
 
 		  elseif  t is MOUSEWHEEL
 			|| weel = ev.wheel
 			w.__mousewheel__(weel.xy, weel.direction)
-			return kActivity
+			return SDLActivity.activity
 
 		  elseif  t is TEXTINPUT
 			#!textinput!
 			if .AllowTyping and .CanDrag < 2
 				|| e = ev.Editing.str
 				if w.__typedstring__(e)
-					return kActivity
-			return kNothing
+					return SDLActivity.activity
+			return SDLActivity.nothing
 
 		  elseif  t is KEYDOWN
 			#!keydown!
@@ -1017,21 +987,21 @@ module SDLApp
 			|| key = kev.sym
 
 			if key.IsCancelled or .CanDrag >= 2
-				return kNothing
+				return SDLActivity.nothing
 			beep.OK = 1
 			
 			if (key is w) // checking for keys.cmd actually doesnt always work!!
 				.LastWasKeyWindowClose = true
 
 			if !w.openedmenu and !.AllowKeyDown(kev)
-				return kNothing
+				return SDLActivity.nothing
 			keys.AddKey(key)
 			
 			ifn (key is escape) and keys.escape.heldkey
 				if .StandardKeys(key)
-					return kActivity
+					return SDLActivity.activity
 				if w.__keydown__(key)
-					return kActivity
+					return SDLActivity.activity
 			
 			if (.singleframenest < 2) and keys.escape.HeldKey(0.75s)
 				keys.escape.eat
@@ -1039,24 +1009,26 @@ module SDLApp
 			
 		  elseif  t is KEYUP
 			keys.Removekey(ev.key.key)
-			return kActivity
-		return kNothing
+			return SDLActivity.activity
+		return SDLActivity.nothing
 		
 	
-	helper Window.Click (|int| bn,  |int| clicks,  |ivec2| xy, |guicontrol|)
+	helper Window.Click (|int| bn,  |int| clicks,  |ivec2| xy, |bool|)
 		target osx
 			|| Ctrl = keys.control // only osx needs this
 		  else
 			|| ctrl = false
+		|guicontrol--| clicked 
 		if (bn == 3) or (Ctrl and bn == 1) 
-			rz = .ControlOrMenuAt(xy)
-			if rz
-				rz.__rightclick__(xy)
+			clicked = .ControlOrMenuAt(xy)
+			if clicked
+				clicked.__rightclick__(xy)
 		  else
-			if !rz
+			if !clicked
 				mousebutton.DownAt = date()
-			rz = .DoMouseDown(xy, clicks)
-		.currmousedown = rz		
+			clicked = .DoMouseDown(xy, clicks)
+		.currmousedown = clicked
+		return clicked
 
 
 	function FindResizeCorner (|ivec2| p, |ivec2|)
@@ -1071,7 +1043,7 @@ module SDLApp
 		|| L = window.all.lastrect.size
 		|| R = ((0, 0, l + D).vec4*.scale).ivec4
 		.ScreenOrig = R
-		return kActivity
+		return SDLActivity.activity
 	
 	
 	function InResizeCorner (|ivec2| P, |bool|)
@@ -1101,8 +1073,7 @@ module SDLApp
 		w.ToolTipControl = r
 		if  r.id  and  keys.Control  and  keys.LALT  and  keys.LGUI
 			Notifications <~ r.ContainedName
-			
-			
+		
 		|| info = ""
 		ifn r isa textview  and  r is editable
 			info = r.Description
@@ -1118,3 +1089,28 @@ module SDLApp
 function guicontrol.Description (|string|)
 	return .tooltip // :)
 
+
+//function timelog (|string| s)
+//	printline sdlapp.OpenedFirst.ago.render + ": " + s + "\n"
+	
+	
+	
+datatype SDLActivity (uint)
+	flags
+		|SDLActivity|
+		Nothing = 0
+		Activity
+		Exiting
+	syntax is (|SDLActivity| act, |bool|)
+		return self == act
+		
+	
+datatype SDLQuitReason (uint)
+	flags
+		|SDLQuitReason|
+		TryQuit
+		WindowClose
+		QuitEvent
+		Terminating
+	syntax is (|SDLQuitReason| act, |bool|)
+		return self == act

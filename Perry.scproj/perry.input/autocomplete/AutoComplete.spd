@@ -17,7 +17,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	list = list.last
 	|| define = list.first
 	define.remove
-	define.DefineToLine(list.SlowCount.render)
+	define.DefineToLine(list.SlowCount)
 	define.name = "line"
 	
 	list.sort(CallFromSorter)
@@ -32,13 +32,16 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	(.AutoComplete isnt typethrough)
 
 
-function message.DefineToLine (|string| count)
+function message.DefineToLine (|int| count)
 	|| l = self[-1]			#require
 	if self ~= "define" and l == @str and self > 1 // is that all?
 		.first.next = l
-		l.name = l.name + " has " + Count + " callers"
+		if !count
+			l.name += " is unused"
+		else
+			l.name = l.name + " has " + "caller".pluralize(count)
 	  else
-		|| s = (count + " places", "nowhere")(count)
+		|| s = "places".pluralize(count, "nowhere")
 		l.name = " - Called From " + s + " - "
 		
 

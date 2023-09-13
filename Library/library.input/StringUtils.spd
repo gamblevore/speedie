@@ -49,6 +49,12 @@ function byte.IsVowel (|bool|)
 
 function int.OperatorPC (|int| x, |string|) 
 	return (self|float| / x|float|).pc
+
+
+function string.pluralize (|int| amount, |string| nothing="", |string|)
+	if !amount and nothing
+		return nothing
+	return "$amount $self${ (`s`, ``)(amount != 1)}"
 	
 
 function string.IsFileLike (|bool|)
