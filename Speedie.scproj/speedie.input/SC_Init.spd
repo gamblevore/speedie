@@ -27,8 +27,14 @@ module SC_Init
 		if c == @Decl
 			require !c.SettingToNil
 
-	
 		.InitCodeArg := .BuildInitArg
+
+		// this func steals the original
+		// i think stealing the original is bad... for autocompletes
+		// so... what should I do instead? redirections? maybe not the best idea
+		// i think we should have one init func per-file per-module.
+		// So modules should have an array of init funcs! (Which usually contain only 1 item)
+		
 		if c == @decl
 			.InitVarsArg := .BuildInitArg
 			.initvarsarg.first <~ c
