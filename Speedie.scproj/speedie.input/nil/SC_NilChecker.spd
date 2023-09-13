@@ -1,8 +1,12 @@
 
 
-
-// * check all new funcs that they return nilness
-// * check all jump()
+// i just realsied something!!!
+// !(a and b) --> (!a or !b)
+// !(a or  b) --> (!a and !b)
+// well thats neat... cos it actually means I don't need to negate stuff!!
+// in order for the nilness tests to still work!
+// i mean the or-thing needs to be wierd still... but that was regardless!!
+// we can jsut freely... negate stuff!!!! YESSSSS no need for backtracking or all other wierdness!
 
 
 // BE BRAVE!!!
@@ -18,8 +22,6 @@ function NilTracker.UseChildAsReal (|message| wrapper, |nilstate|) // a.b, *a, a
 		|| d = ch.NilDecl
 		FailIfNotReal(ch, d)
 		return d.NilUsed
-		
-	
 
 
 extend_module NilTracker {
@@ -105,7 +107,7 @@ function Function (NilTrackerFn)
 	
 	for a in fn.args
 		.VariableSet(a, p.NilDecl, p, 1)
-		.JumpSometimes(p)
+		.Jump(p)
 		p++
 
 	|| ret = fn.ReturnType				#require
@@ -145,24 +147,18 @@ function If (NilTrackerFn)
 	|| arg2 = else.Last
 // * double-branch merging always. not/or is done in terms of negation
 
-	|| BeginState = T.StartCond //	T.IfDepth++
+	|| BeginState = T.StartCond
 	.jump(cond, NilCheckMode.positive) // SetVars during conds actually should go into the parent branch... not undoable.
-	T.IfDepth++
 	.RunAll(arg1)
 	
 													// IF X {y=y1} ELSE {y=y2}
 	|| Branch1Only = T.DeclCount
 	.Restore(BeginState)								// (undo y=y1 but keep track of it)
-	T.IfDepth--
 	.jump(cond, NilCheckMode.negative)
 	if arg2.IsFirst									// ELSE {y=y2}
-		T.IfDepth++
 		.RunAll(arg2)
-		T.IfDepth -= 2
-	  else											// ELSEIF (Y) {y=y2}
-		T.IfDepth--
-		if ELSE
-			if(ELSE)
+	  elseif ELSE
+		if(ELSE)
 	
 	if arg1.Blocks
 		0
@@ -182,15 +178,15 @@ function Tern (Niltrackerfn)
 
 	debugat
 	|| BeginState = T.DeclCount
-	T.IfDepth++
+
 	.jump(cond, nilcheckmode.Cond)
-	T.IfDepth++
-	rz  = .JumpSometimes(A)
+
+	rz = .Jump(A, test)
 	.Restore(BeginState)
 	.jump(cond, nilcheckmode.negative)
-	rz |= .JumpSometimes(B)
+	rz |= .Jump(B, test)
 	.merge(BeginState)								// IF X {y=y1}
-	T.IfDepth -= 2
+
 
 	// needs to propagate through bras and typescasts into a setrel
 
@@ -234,7 +230,7 @@ function ProcessCondRel (Niltrackerfn)
 			test = test.use
 			.jump(ll, test)
 			.jump(rr, test)
-			return 0
+			return NilState.Real
 		
 		if (lnil and rnil)
 			return ll.RedundantTest(false)
@@ -242,13 +238,11 @@ function ProcessCondRel (Niltrackerfn)
 
 		|| side = (rr, ll)(lnil)
 		.jump(side, test) // can handle !(a == nil)
-		return 0
+		return NilState.real
 
 	|| andor = scop.IsAndOr
-	if !andor		// bit ops
-		.JumpSometimes(ll)
-		.JumpSometimes(rr)
-		return 0
+	if !andor		// bit ops or math		// (ptr+1) or (1+ptr) still needs nilness check
+		return .Jump(ll).Worst(.Jump(rr))
 
 
 
@@ -256,7 +250,7 @@ function ProcessCondRel (Niltrackerfn)
 	if (andor == SCOperator.AND) or msg.IsNilSafe // isnilsafe will speed things up a lot for ints/bools and stuff
 		.Jump(ll, NilCheckMode.Cond)
 		.Jump(rr, NilCheckMode.Cond)
-		return 0
+		return NilState.real
 	
 
 	
@@ -267,6 +261,7 @@ function ProcessCondRel (Niltrackerfn)
 	
 	|| second = t.DeclCount
 	.Jump(rr, NilCheckMode.Cond)
+	return NilState.real
 	//.merge(first, second) // we want to ignore the negative state... just merge the two values
 	// so we'll need 3 ranges. A-Positive, A-negative, B-positive...
 	// then we merge the two positives
@@ -279,12 +274,11 @@ function Brel (Niltrackerfn)
 	|| f = *msg
 	if b == '*'
 		return t.UseChildAsReal(msg)										// *abc
-	if b != '!'
-		return .Jump(f, test)
-	|| old = t.DeclCount
-	.Jump(f, nilcheckmode.Cond) // OK... so we need to run it normally... just to test this works: !(a and a.prop)
-	.Restore(old)
-	return Jump(f, test.negate)
+	if b == '!'
+		return .Jump(f, test.Negate)
+	if b == '&'
+		Jump(f, test)
+		return NilState.Real // its obviously real
 
 
 function Declaration (niltrackerfn)
@@ -298,22 +292,13 @@ function SetRel (niltrackerfn)
 	opt norefcounts
 	|| l = msg.first
 	|| r = msg.last
-	.JumpSometimes(l)
-	.JumpSometimes(r)
-
-	// || x = &b // OK... x is not nil
-	// but how do we know this? &abc does not return anything, not via our current code.
-	// it has a decl... but like... what kind? a shared one? in this case... no?
-	// i think getting a pointer will never share the decl.
-
-	.VariableSet(l.nildecl, r.nildecl, r, 0)
-	return nilstate.Realish
+	.VariableSet(.JumpDecl(l), .JumpDecl(r), l, 0)
 
 
-function JumpSometimes (NilTrackerFn)
-	pragma inline
-	if msg.HasAny
-		return .Jump(msg, test)
+function JumpDecl (|message| msg, |scdecl|)
+	if msg.hasany // just for speed?
+		.Jump(msg)
+	return msg.NilDecl
 
 
 function Jump (NilTrackerFn)

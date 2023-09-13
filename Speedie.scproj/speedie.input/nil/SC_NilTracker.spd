@@ -3,20 +3,17 @@
 struct NilItem
 	|scdecl--|	Decl
 	|nilstate|	Nil
-	|byte|		IfDepth
 
 
 struct NilTracker
 	linkage:cpp_part nil
 	|uint| 				DeclCount
-	|uint| 				IfDepth
 	|scfunction--|		fn
 	|NilItem[1536]|		Items
 
 
 	function Merge (|uint| s, |bool| Merge=true)
 		|| c = .DeclCount
-		|| id = .IfDepth
 		.DeclCount = s
 		while s >= --c
 			|| i = .items[c]
@@ -25,8 +22,6 @@ struct NilTracker
 			if Merge
 				v |= d.nilused
 			d.nilused = v
-			if d.IfDepth >= id
-				debugger // bad
 		
 	
 	function StartCond (|int|)
@@ -34,29 +29,21 @@ struct NilTracker
 	function CloseCond (|int| old)
 		
 	function SetNilness (|scdecl| d, |nilstate| s)
-		|| dd = d.ifDepth
-		if dd < .ifdepth
-			.items[dd].nil = s
-		  else
-			.TestedNilness(d, s)
+		.TestedNilness(d, s)
 	
 	
 	function TestedNilness (|scdecl| d, |nilstate| s, |nilstate|)
 		opt norefcounts
 		if d.nilused > 3 // what?
 		|| c = .DeclCount
-		|| id = .IfDepth
-		if (c < 1536) and (id < 250)
+		if (c < 1536)
 			|| i = .items[c]
 			i.nil = d.NilUsed
 			i.decl = d
 			.DeclCount = c + 1
 			d.nilused = s
-			d.ifDepth = id
-			i.ifDepth = id
 			return s
 		
-		check (id < 250) (.fn, "Too much nested if")
 		error (.fn, "Too many variables for nilchecker")
 		return s
 

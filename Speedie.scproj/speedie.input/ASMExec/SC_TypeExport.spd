@@ -27,17 +27,19 @@ datatype NilState (byte) // Exec.scproj needs this here
 		Nilish		= 1	
 		Realish		= 2 
 		Either		= 3
-		NilishNega	= 4	// negated versions
-		RealishNega	= 8 
-		EitherNega	= 12
 		BothStates	= 15
 		Stated		= 128
 		ActuallyNil = Nilish  + Stated				// nil|message|.position
 		Optional    = Either  + Stated				// || x = array[1000]
 		Real		= Realish + Stated				// || x = message(),  x.position
 
-	function Swap (|nilstate|)
-		return ((self >> 2) (|) (self << 2)) & BothStates
+	
+	function Worst (|nilstate| o, |nilstate|)
+		// nil + real = nil
+		// nil + anything = nil
+		rz = self (|) o
+		if rz is Nilish
+			return Nilish
 			
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type

@@ -76,7 +76,7 @@ datatype NilCheckMode (uint)
 		return !(self & other)
 	
 	function Negate (|NilCheckmode|)
-		if self & positive
-			return (self &~ positive) (|) negative
-		return (self &~ negative) (|) positive
+		rz  = (self & positive) << 1
+		rz |= (self & negative) >> 1
+		rz |= (self &~ active)  << 0
 
