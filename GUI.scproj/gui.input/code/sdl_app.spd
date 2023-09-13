@@ -13,7 +13,6 @@ module SDLApp
 	|&SDL_Renderer|				Renderer
 	|&SDL_Texture|				Raw
 	|error|						ToolTip = error()
-	|error|						CompileStatus // remove
 	|string|					LastSearch
 	|ivec2| 					NewSize
 	|ivec2| 					CurrMouseXY
@@ -21,7 +20,7 @@ module SDLApp
 	|ivec2|						TryResizeLater
 	|date|						FrameLength
 	|date|						OpenedFirst
-	|date|						LastFrameDate
+	|date|						LastFrameDate = 1 // wont fire otherwise
 	|date|						LastWindowClose
 	|date|						SelSolidUntil
 	|date|						FixScreenBug
@@ -413,10 +412,10 @@ module SDLApp
 			if .LastFramedate.ago >= f
 				.TouchCount--
 				rz |= SDLActivity.activity
-			//while !sdl_event.poll
-			//	|| f = (0.005s, 0.25s)(.FastUpdate)
-			//	app.sleep( f )
 
+		if rz is activity
+			.framecount++
+			.lastframedate = date.now
 		// how to fix this? // it has 2 problems now.
 			// its too slow
 			// its very too slow
@@ -631,17 +630,17 @@ module SDLApp
 	helper SingleFrame (|bool|)
 		require .SingleFrameNest <= 2
 		.SingleFrameNest++
-			
+
 		|| occured = .PreFrame
 		occured |= .FrameAndEvents
 		ifn Occured is Exiting
 			.UpdateWindowFrames
 			.PutDialogsInFront
 			if occured is activity
-				// beep
+				 beep
 				.DrawFrame
-				if !sdl_event.HasAny
-					app.sleep((30th, 0.005)(sdlapp.Isbackground).date)
+//				if !sdl_event.HasAny
+//					app.sleep((30th, 0.005)(sdlapp.Isbackground).date)
 			
 			.SingleFrameNest--
 			return true

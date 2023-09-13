@@ -6,11 +6,10 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
+* dialogs seem badly placed?
 
 
 // Perry Do later
-* typing frameupdate seems to have a fast mode and slow mode? also for scrolling! and more
-	* autocomplete responsivity seems sloowwwww. like it should be instant. we can do it! remove the hard-coded delay?
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping
 // even later

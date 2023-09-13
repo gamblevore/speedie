@@ -113,12 +113,11 @@ class PerryIDE (Window)
 		|| e = .editme.myerror.useable(0)
 		if .editme.ParsedMessage and e				// don't show simple parse errors
 			return e
-		|| it = sdlapp.CompileStatus.Useable
-			return it
+		//|| it = sdlapp.CompileStatus.Useable
+			//return it
 		if e and .editme.expectsparse >= textview.probablyjeebox
 			return e
-		it = sdlapp.tooltip.useable
-		if it
+		|| it = sdlapp.tooltip.useable
 			return it
 	
 	

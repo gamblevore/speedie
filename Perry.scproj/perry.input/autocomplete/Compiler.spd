@@ -52,7 +52,6 @@ extend PerryIDE
 
 	function ShowCompileErrors (|message| msg, |bool|)
 		isnt active
-		sdlapp.CompileStatus = nil
 		|| MaybeOK = msg.first
 		if (MaybeOK == "ok")
 			.ErrorList.clear
