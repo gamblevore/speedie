@@ -29,9 +29,9 @@ class ColorScheme
 		function LoadFromPrefs (|string| defaults)
 			if Defaults
 				¥.load(defaults.parse)
-			|| s = app.prefs..colors
+			|| s = app._prefs["colors"]
 				¥.load(s)
-		
+	
 	
 	constructor
 		.initcolors

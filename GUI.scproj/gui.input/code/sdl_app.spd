@@ -31,7 +31,7 @@ module SDLApp
 	|uint|						DrawCount
 	|float|						Scale
 	|bool|						StartedProperly
-	|bool|						AlertsAreSurprising
+	|bool| 						DebugDraw
 	|bool|						IsBackground
 	|bool|						FlashSelector
 	|bool|						WantsQuit
@@ -40,7 +40,7 @@ module SDLApp
 	|bool|						LastWasKeyWindowClose
 	|bool|						TextInputEnabled
 	|bool|						TextInputEnabledAtStart
-	|byte|						TouchCount=4  // draw the first few frames always
+	|byte|						TouchCount=3  // draw the first few frames always
 											  // helps with startup events! at least on osx
 	|byte|						SingleFrameNest
 	|byte|						TouchFingersDown
@@ -199,7 +199,7 @@ module SDLApp
 		(fn)(anything)?
 		app.clearcaches
 		while .SingleFrame
-			.PostLoads
+			0
 		.quit
 
 	
@@ -271,8 +271,8 @@ module SDLApp
 
 	function SavePrefs
 		if app.prefs
-			app.prefs["screen"] = sdlapp.screenorig.list
-			app.saveprefs
+			app.prefs["screen"] = sdlapp.ScreenOrig.List
+			app.SavePrefs
 
 
 	function CurrDisplaySize (|ivec2|) // screensize
@@ -289,9 +289,12 @@ module SDLApp
 		|int[2]| BigPx
 		SDL_GetWindowSize(.ScreenWindow,  &BigPx[0],  &BigPx[1] )
 		SDL_GL_GetDrawableSize( .screenwindow,  &SmallPx[0],  &SmallPx[1] )
-		require SmallPx[0] and BigPx[0]
-		return SmallPx[0] > BigPx[0]
-		
+		|| s = SmallPx[0]
+		|| b = BigPx[0]
+		if s and b
+			return s > b
+	
+	
 	function IsFullScreen (|bool|)
 		|| scr = .CurrDisplaySize
 		return scr.x >= .ScreenOrig.x
@@ -332,7 +335,7 @@ module SDLApp
 	
 	helper Init (|ivec2| s) // startup
 		require !.framelength
-		.FrameLength = 60th.date
+		.FrameLength = 180th.date
 		.openedfirst = date.now
 		app.PrefsInit(.openedfirst)
 		|| PrevSize = app.prefs["screen"].ivec4
@@ -392,10 +395,6 @@ module SDLApp
 		// remove?
 		if .ToolTip.Fired
 			return .Tooltip.name
-
-
-	helper FastUpdate (|bool|)
-		return !.IsBackground or .DroppingInto
 	
 	
 	helper FrameAndEvents (|sdlactivity|)		
@@ -407,18 +406,12 @@ module SDLApp
 		if .NewSize
 			rz |= SDLActivity.activity
 
-		if .TouchCount				
-			|| f = (.FrameLength, 0.5s)(.FastUpdate)
-			if .LastFramedate.ago >= f
-				.TouchCount--
-				rz |= SDLActivity.activity
+		if .TouchCount and .LastFramedate.ago >= .naptime
+			.TouchCount--
+			rz |= SDLActivity.activity
 
 		if rz is activity
 			.framecount++
-			.lastframedate = date.now
-		// how to fix this? // it has 2 problems now.
-			// its too slow
-			// its very too slow
 	
 	
 	function DroppingInto (|guicontrol|)
@@ -507,8 +500,6 @@ module SDLApp
 				.touch
 				w.DoMouseDrag(.MouseXY, true)
 				rz = SDLActivity.activity
-		.ClearAlerts
-		.HandleAppResize
 	
 	
 	function MouseDownRepeatOK (|bool|)
@@ -536,34 +527,17 @@ module SDLApp
 		|| h	= font.height
 		|| P2	= (x, h)/2
 		font.small.drawtext(t, img, P-P2, true)
-	
+
+
+	function DialogSorter (SorterComparer2)
+		opt norefcounts
+		if a and b
+			return (a as window).isdialog|int| - (b as window).isdialog|int|
+
 
 	function PutDialogsInFront
-		opt norefcounts        
-		|| GoAfter = .firstnondialog
-		|| curr = goafter.prev as window
-		while curr
-			|| p = curr.prev as window
-			if curr.isdialog and curr is visible
-				goafter.next = curr
-				debugger
-			curr = p
-		
-		
-	function WinList (|string|)
-		disabled
-		|| fs = faststring()
-		for w.fast in window.all
-			fs <~ w.id
-			fs <~ "\n"
-		return fs
-
-
-	function FirstNonDialog (|window|)
 		opt norefcounts
-		for w.reverse in window.all
-			if !w.isdialog
-				return w
+		window.all.sort(DialogSorter)
 
 
 	function DrawWinFrom (|window|)
@@ -572,7 +546,7 @@ module SDLApp
 			if w.isviewable and w.isfullscreen
 				return w
 		return window.all.first
-	
+
 
 	function StartResize
 		opt norefcounts
@@ -593,13 +567,16 @@ module SDLApp
 	
 	function DrawFrame
 		opt norefcounts
+		.DebugDraw = app.Prefs("debugdraw")
+		if .DebugDraw
+			beep
 		
+		.lastframedate = date.now
 		|| w1 = .DrawWinFrom		#require
 		.StartFrame(.Raw)
 			
 		while w1
-			if !w1.isdialog
-				.DrawSub(w1)
+			.DrawSub(w1)
 			w1 = w1.next as window // :O
 
 		notifications.Draw
@@ -622,25 +599,37 @@ module SDLApp
 	function Mod (|int| period, |float|)
 		return (.FrameCount mod period)|float| / period|float|
 
+
 	function Cycle (|date| amount, |float|)
-		// FrameLength is 1/60
 		return (.mod((amount*60).WholeSeconds).sin + 1) * 0.5
 	
+	
+	helper Maintanance
+		.ClearAlerts
+		.HandleAppResize
+		.UpdateWindowFrames
+		.PostLoads
+	
+
+	helper NapTime (|date|)
+		rz = .FrameLength
+		if .IsBackground and !.DroppingInto
+			rz *= 9
+
 	
 	helper SingleFrame (|bool|)
 		require .SingleFrameNest <= 2
 		.SingleFrameNest++
 
 		|| occured = .PreFrame
+		.Maintanance
 		occured |= .FrameAndEvents
 		ifn Occured is Exiting
-			.UpdateWindowFrames
 			.PutDialogsInFront
 			if occured is activity
-				 beep
 				.DrawFrame
-//				if !sdl_event.HasAny
-//					app.sleep((30th, 0.005)(sdlapp.Isbackground).date)
+			if !sdl_event.HasAny
+				app.sleep(.naptime)
 			
 			.SingleFrameNest--
 			return true
@@ -649,6 +638,7 @@ module SDLApp
 	function CheckQuarantine
 		if platform.osx and app.isquarantined
 			sdlapp.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
+
 
 	helper Rescale (|float| NewScale, |bool|)
 		if (NewScale >= 1 and NewScale <= 8)

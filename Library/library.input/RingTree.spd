@@ -393,8 +393,7 @@ class RingTree (Saveable)
 
 
 	helper SortAfter (|SorterComparer| fnc, |ringtree|)
-		opt norefcounts
-		// find the first obj that we are "more than"
+		opt norefcounts			// find the first obj that we are "more than"
 		|| p = .prev
 		while p
 			if (fnc)(self, p)
@@ -402,7 +401,7 @@ class RingTree (Saveable)
 			p--
 
 
-	function Sort (|SorterComparer| fnc, |int|)
+	function Sort (|SorterComparer| fnc)
 		opt NoRefCounts
 		|| c = .second
 		while c
@@ -412,6 +411,28 @@ class RingTree (Saveable)
 				b.next = f
 			  else
 				.first = f
+
+
+	function Sort (|SorterComparer2| fnc)
+		cpp_part Sort2
+		opt NoRefCounts
+		for f in self
+			f.SortAfter2(self, fnc)
+
+
+	helper SortAfter2 (|ringtree| parent, |SorterComparer2| fnc)
+		opt norefcounts
+		|| p = .prev
+		// Find the first thing that we are larger than. end there.
+		// if we are smallest, we go to the end.
+		while p
+			|| diff = (fnc)(self, p) 
+			if diff >= 0 // bigger
+				p.next = self
+				return
+			  else
+				p--
+		parent.first = self // smallest
 
 
 	function Loop (|bool| dir, || flat=nil, ||)

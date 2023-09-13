@@ -6,7 +6,8 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
-* dialogs seem badly placed?
+* closing windows doesnt quite work right with the toolbar
+* not quitting properly now!
 
 
 // Perry Do later

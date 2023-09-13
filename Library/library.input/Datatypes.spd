@@ -520,6 +520,8 @@ datatype f64
 	render (|int|dp=6)
 		fs.appenddouble(self, dp, true)
 
+	function Date (|date|)
+		return (self * date.kOneSecond)|date|
 
 
 datatype hfloat

@@ -1,8 +1,12 @@
 
-
+	
 main // main {
 	target debug: "*** target debug ***"
 	sdlapp.RunAndQuit(&perry.startup)
+
+
+function object.adas (|int|)
+	return (self as message).name.first.lowercase
 
 
 function app.InitColors

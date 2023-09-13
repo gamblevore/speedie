@@ -117,14 +117,12 @@ class PerryIDE (Window)
 			//return it
 		if e and .editme.expectsparse >= textview.probablyjeebox
 			return e
-		|| it = sdlapp.tooltip.useable
-			return it
+		return sdlapp.tooltip.useable
 	
 	
 	function PerryStatus (|string|)
 		opt norefcounts
-		|| p = .PerryError
-			return p.name
+		return .PerryError.nyme
 
 
 	function RemoveProjFromList
@@ -158,7 +156,7 @@ class PerryIDE (Window)
 			.Jeeboxeffects(where, bg)
 		  else
 			if bg != "flat"
-				app.pref("bg") = "flat"
+				app.prefs("bg") = "flat"
 			¥.DrawBackground(where)
 		.DrawContents(where)
 
@@ -308,7 +306,7 @@ class PerryIDE (Window)
 	function ShowIDE (|bool| FromClick=false)
 		debug_require self // what?
 		|| p = .Project
-			app.pref("currproj") = p.path
+			app.prefs("currproj") = p.path
 		if FromClick
 			if .islast
 				.ClickedTodo
@@ -822,13 +820,13 @@ So anything not 0 means "its OK"`
 	
 	function UpdatePrefs
 		|| oldPrefs = app.prefs
-		app.prefs = nil
+		app._prefs = nil
 		if app.PrefsInit(0)
 			.notify("Reloaded Prefs.")
 			effects.Invalidated = true
 		  else
 			.notify("Prefs are corrupted")
-			app.prefs = oldPrefs
+			app._prefs = oldPrefs
 		ColorScheme.LoadFromPrefs(DefaultColors)
 
 

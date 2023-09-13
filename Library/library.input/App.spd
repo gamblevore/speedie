@@ -7,11 +7,14 @@
 module App {
 |[string]|					OldArgs = nil
 |message|					_Conf
-|config|					Prefs
+|config|					_Prefs
 |string| 					_Path
 |file|						_StdOut
 |file|						_stdin
 |string|					codesign_native = "codesign_osx"
+
+function Sleep (|float| Duration=1)
+	.sleep(duration.date)
 
 function Sleep (|Date| Duration=1s)
 	cpp_wrapper JB_Date__Sleep
@@ -33,8 +36,12 @@ function Conf (|string| name, |string|)
 function Conf (|string| name, assigns:|string|)
 	disabled "Set conf values in the original app.configure..."
 
-function Pref (|string| s, |string|)
-	return .prefs[s].value
+function Prefs (|string| s, |string|)
+	cpp_part GetPref
+	return ._prefs[s].value
+
+function Prefs (|config|)
+	return ._prefs
 
 function Created (|date|)
 	return __now__|date|
@@ -42,8 +49,11 @@ function Created (|date|)
 function TimeID (|uint64|)
 	return __time_id__
 
-function Pref (|string| s, assigns:|string|)
-	.prefs[s] = Value
+function Prefs (|string| s, assigns:|string|)
+	._prefs[s] = Value
+function Prefs (|string| s, assigns:|message|)
+	cpp_part SetPrefMsg
+	._prefs[s] = Value
 
 function Crash (|string| reason="")
 	opt norefcounts
@@ -165,19 +175,19 @@ function PrefPath (|string|)
 
 
 function PrefsInit (|date| when=date.now, |bool|)
-	if .prefs
+	if ._prefs
 		return true
 	|| pref_path = .prefpath
-		.prefs = pref_path.file.conf
-		if .prefs
+		._prefs = pref_path.file.conf
+		if ._prefs
 			rz = true
 			if when
-				app.pref("first") := when.render
+				app.prefs("first") := when.render
 
 
 function SavePrefs
-	if .prefs
-		.prefs.save
+	if ._prefs
+		._prefs.save
 	
 
 function Expired (|date| period, |date|From=__now__, |date|)

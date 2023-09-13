@@ -56,7 +56,7 @@ module Perry
 	
 	function Save
 		visible
-		app.prefs..colors = ¥.savecolors.parse
+		app.prefs("colors") = ¥.savecolors.parse
 
 		
 	function LoadWindowsSub (|PerryIDE| r, |bool|)
@@ -79,7 +79,7 @@ module Perry
 
 	function BuildAppMenu
 		appmenu.addsep
-		|| extra = platform.isdebug or app.prefs["dev"].Yes
+		|| extra = platform.isdebug or app.prefs("dev").Yes
 			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
 			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
 			//appmenu <~ ("Birds",			ClickedBirdsMenu)
@@ -95,7 +95,7 @@ module Perry
 		ColorScheme.LoadFromPrefs(DefaultColors)
 		.BuildAppMenu
 	
-		|| old = app.Pref("currproj")
+		|| old = app.Prefs("currproj")
 		.Projects = (app.prefs)("lastproj")
 		
 		|| i = PerryIDE(false)

@@ -185,7 +185,8 @@ class Array (saveable)
 
 
 prototype SorterComparer (|object| a, |object| b, |bool|)
-prototype SorterComparerMsg (|message| a, |message| b, |bool|)
+prototype SorterComparer2 (|object| a, |object| b, |int|) // this is better than SorterComparer
+														  // want to use only this, eventually.
 //function MySorter (SorterComparer) // should be: sortercomparer of message
 	// sortercomparer should be (|| a, || b, |bool|)... so a contained type, basically!
 	

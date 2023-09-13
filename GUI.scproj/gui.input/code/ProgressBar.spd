@@ -16,7 +16,7 @@ class ProgressBar (GUIControl)
 	behaviour Draw
 		if .Indefinite
 			.Ughughugh := byte[128]
-			if !.Ughughugh[0] or sdlapp.FrameCount isa 9
+			if !.Ughughugh[0] or (sdlapp.FrameCount isa 4) or SDLApp.DebugDraw
 				sdlapp.touch
 				.Ughughugh.Temporal
 			where.Colorise(.Ughughugh, 2)

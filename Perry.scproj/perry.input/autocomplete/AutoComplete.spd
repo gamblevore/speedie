@@ -314,18 +314,16 @@ function PerryIDE.InteractUpdate
 
 function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |string| reason)
 	opt norefcounts
-	|| pop = .popupdisplay
 	if !M
 		.popuphide
 		.lastextrainfo = nil
 		return
-	require (M != .lastextrainfo) or (pop isnt visible)
+
+	require (M != .lastextrainfo) or (.popupdisplay isnt visible)
 	|| s = .feedback
 		.LastExtraInfo = M
 		.PopupDisplayCorner = p
 		.MaybeSendMessage(reason ?? "display", M)
-//		if keys.option
-//			.SendFeedbackMsg(@tmp + "mem") // for useful info
 
 
 function OnShowExtraInfo (GUITextShowEvent)

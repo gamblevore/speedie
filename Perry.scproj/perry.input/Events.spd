@@ -158,23 +158,25 @@ function ClickedRelease (GUIaction)
 function fnBuildIsDead (fnConfirmCanceller)
 	if self mustbe perryide
 		.SpeedieMsgReceive(.compilr)
-		if !.Building
+		if !.IsBuilding
 			.CancelCompile
 			return true
 
 
-function Perryide.Building (|bool|) // .isbuilding, .iscompiling, .compiling 
+function Perryide.IsBuilding (|bool|) // .isbuilding, .iscompiling, .compiling 
 	return .buildbutton isnt enabled
 
 
 function ClickedCancel (GUIAction)
 	|| i = .ide
-	if !i.building
+	if !i.Isbuilding
 		return true
 	|| can = ConfirmCanceller(i, fnBuildIsDead)
-	if "Cancel Build of ${i.project.trimproj}?".confirm(can)
+	|| name = i.project.trimproj
+	|| q = "Currently building $name... Cancel Build of $name?"
+	if q.confirm(can)
 		i.CancelCompile
-		return  true
+		return true
 		
 
 function ClickedCompile (GUIaction)

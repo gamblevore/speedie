@@ -278,6 +278,7 @@ function Message.SyntaxUsingComplete { }
 prototype ParseHandler    (|int| Start, |message| Parent=nil, |Message|)
 prototype TokenHandler_fp (|int| Start, |message| parent=nil, |Object|)
 prototype fnIDGenerator   (|int| Start, |int| End, |syntax| f,   |String|)
+prototype SorterComparerMsg (|message| a, |message| b, |bool|)
 
 
 

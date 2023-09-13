@@ -226,7 +226,7 @@ class Process
 			return (.ChildAlive, .ParentAlive)(.isserver)
 
 
-	helper Wait (|int| wait, |int|)
+	helper Wait (|date| wait, |int|)
 		if wait < 1
 			return wait + 2
 		wait <<= 1

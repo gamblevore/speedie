@@ -63,7 +63,7 @@ extend PerryIDE
 
 
 	function Compile (|string| operation)
-		if .Building
+		if .isBuilding
 			if .editsep.div.Collapsed
 				.ShowStdOut 
 				return 
@@ -108,7 +108,7 @@ extend PerryIDE
 		// ignore.
 	
 	function Readlog
-		if .Building
+		if .isBuilding
 			.justreadlog
 
 	function JustReadLog
