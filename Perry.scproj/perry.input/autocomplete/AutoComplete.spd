@@ -10,8 +10,8 @@ function message.PrependHeader (|string| name, |int| pos)
 	header.Position = pos
 	.first = Header
 	(header is Disabled)
-	
-	
+
+
 function PerryIDE.CallFromFB (|message| list, |bool|)
 	.ClearAutoComplete
 	list = list.last
