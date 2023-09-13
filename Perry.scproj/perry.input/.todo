@@ -6,8 +6,6 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
-* dispatches should be clickable
-* behaviours should list like __draw__
 
 
 // Perry Do later
@@ -35,6 +33,7 @@
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
 * unused func finder doesnt work perfectly on my projects. need add owning func!
+* To make "dispatch" clickable, we need to alter MoveToInitFunc, so we have an init func per module per file.
 * galaxxies C++ compile issues
 * RefOpts. Do it bit by bit
 	* get property but only did math
