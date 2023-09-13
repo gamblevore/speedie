@@ -748,7 +748,6 @@ function SameTypeSub (|message| first,  |message| second,  |scbase| name_space, 
 		rz = t1.HighestMatch( t2, first )
 		if !rz
 			return t1
-
 // make C++ happy
 	if rz != t2
 		rz.CreateSimpleTypeCast(second)  // can delete these two lines
@@ -854,10 +853,7 @@ function TypeOfArr (ExprResolver)
 
 
 function TypeOfSwizzle (|message| Exp, |scdecl| Type, |scbase| name_space, |message| side, |int| swiz, |scdecl|)
-	// So... we are getting like: v.z --> v[2]
-	// She gave me a sharebox of chicken :[ she was so amazing! She really was...
-	// AND TELL ME WHEN TO STOP!!!	// Interdimensional harmony... 
-	
+	// So... we are getting like: v.z --> v[2]	
 	|| Count = swiz >> 16
 	|| W = type.type.NumericCount
 	expect (Count == 1 or side == nil)    (exp, "Can't swizzle that many yet.")
