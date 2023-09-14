@@ -1083,7 +1083,7 @@ datatype SDLActivity (uint)
 		Activity
 		Exiting
 	syntax is (|SDLActivity| act, |bool|)
-		return self == act
+		return self & act
 		
 	
 datatype SDLQuitReason (uint)
@@ -1094,4 +1094,4 @@ datatype SDLQuitReason (uint)
 		QuitEvent
 		Terminating
 	syntax is (|SDLQuitReason| act, |bool|)
-		return self == act
+		return self & act

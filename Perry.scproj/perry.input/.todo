@@ -7,7 +7,7 @@
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
 * closing windows doesnt quite work right with the toolbar
-* not quitting properly now!
+* closing the app shuold close the documents first, then dialogs
 
 
 // Perry Do later
