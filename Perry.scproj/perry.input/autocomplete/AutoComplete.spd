@@ -34,14 +34,12 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 
 function message.DefineToLine (|int| count)
 	|| l = self[-1]			#require
-	if self ~= "define" and l == @str and self > 1 // is that all?
+	if self ~= "define"  and  l == @str  and  self > 1 // is that all?
 		.first.next = l
-		if !count
-			l.name += " is unused"
-		else
-			l.name = l.name + " has " + "caller".pluralize(count)
+//		if !count // can't be 0?? rightclicking on some code to find it... // so its obviously used?
+		l.name += " has " + "caller".pluralize(count)
 	  else
-		|| s = "places".pluralize(count, "nowhere")
+		|| s = "places".pluralize(count, "Nowhere")
 		l.name = " - Called From " + s + " - "
 		
 
