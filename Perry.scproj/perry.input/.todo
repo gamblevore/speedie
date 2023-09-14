@@ -6,7 +6,6 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
-* cancelling quit doesnt cancel :D
 
 
 // Perry Do later
