@@ -173,7 +173,7 @@ class PerryIDE (Window)
 		if !ClickedCancel(self)
 			return true
 		
-		if n >= 2 and reason < SDLQuitReason.tryquit
+		if n >= 2 and reason|int| < SDLCloseReason.tryquit|int|
 			.RemoveProjFromList
 		|| p = .prev
 		if p isa perryide
@@ -444,7 +444,7 @@ class PerryIDE (Window)
 		.CanAskingAboutMissing = false
 		
 		if "This project can't be found on the file-system anymore.\n\nWould you like to close it?".confirm
-			.close(SDLQuitReason.WindowClose)
+			.close
 			return true
 		if .issinglefileproject
 			f.write("")

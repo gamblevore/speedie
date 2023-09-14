@@ -70,7 +70,7 @@ function ConfirmWindow_.Resize (|string| s)
 	.size = actual.layout
 
 
-function window.CanJustCloseForQuit (|bool|)
+helper window.CanJustCloseForQuit (|bool|)
 	opt norefcounts
 	|| count = 0
 	if self isa ConfirmWindow_

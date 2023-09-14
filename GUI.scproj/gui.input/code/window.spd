@@ -38,8 +38,8 @@ class Window (GUIControl)
 	virtual FrameUpdate (|bool| ShouldNotDisturbGUI)
 		0
 
-	virtual CancelClose (|int| Reason, |bool|)
-		return reason == 0
+	virtual CancelClose (|SDLCloseReason| Reason=SDLCloseReason.windowclose, |bool|)
+		return !reason
 	
 	
 	behaviour AppForegroundChanged
@@ -192,7 +192,7 @@ class Window (GUIControl)
 				(f.onclicked)(f)?
 			return true
 		if (key is escape) and .IsDialog
-			if !.returnvalue and !.__cancelclose__(SDLActivity.activity)
+			if !.returnvalue and !.__cancelclose__
 				.CancelReturn
 			return true
 	
@@ -330,26 +330,21 @@ class Window (GUIControl)
 		sdlapp.StartResize // sigh
 
 
-	function Close
-		cpp_part CloseDisabler
-		disabled "pass a reason why we are closing this (kquit/SDLActivity.activity)"
-
-
 	helper sdlapp.AskQuit (|bool|) // !sdlapp.askquit
 		|| q = "Quit " + app.AppName + "?"
 		return q.confirm
 	
 	
-	function Close (|int| reason, |bool|)
-		if !sdlapp.wantsquit and (reason < SDLQuitReason.tryquit)
+	function Close (|SDLCloseReason| reason=SDLCloseReason.windowclose, |bool|)
+		if !sdlapp.wantsquit and (reason < SDLCloseReason.tryquit)
 			if (window.DocumentCount == 1)  and  !.isdialog
-				require sdlapp.AskQuit and !.__CancelClose__(0)
+				require sdlapp.AskQuit and !.__CancelClose__(reason)
 				.disposeall(true)
 				sdlapp.wantsquit = true
 				return true
 
 		|| cancelled = .__CancelClose__(reason)
-		if !cancelled or (reason & SDLActivity.Exiting) or sdlapp.WantsQuit
+		if !cancelled or (reason is terminating) or sdlapp.WantsQuit
 			.DisposeAll(true) // its probably OK????
 			return true
 

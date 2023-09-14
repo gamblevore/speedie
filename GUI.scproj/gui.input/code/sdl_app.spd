@@ -402,7 +402,7 @@ module SDLApp
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
 		if .WantsQuit
-			rz |= .TryQuit(SDLActivity.Exiting)
+			rz |= .TryQuit
 		if .NewSize
 			rz |= SDLActivity.activity
 
@@ -695,7 +695,7 @@ module SDLApp
 	function Quit
 		.saveprefs // in case we crash during quit
 		for w in __modules__.window.all
-			w.close(SDLActivity.Exiting)
+			w.close(SDLCloseReason.terminating)
 		.saveprefs
 		.sdl_quit
 
@@ -770,43 +770,47 @@ module SDLApp
 			return gw.DoCopy
 
 
-	function TryQuit (|SDLQuitReason|reason=kTryQuit, |SDLActivity|)
+	function TryQuit (|SDLCloseReason| reason = SDLCloseReason.Terminating, |SDLActivity|)
 		opt norefcounts
 		if (reason is QuitEvent)
 			|| w = .LastWindowClose.ago
 			if (w and w < 0.1s)
 				return 0 // just block it. SDL is sending duplicate events
+			(reason is windowclose     )
 		  elseif reason is windowclose
 			.LastWindowClose = date.now
-			if !sdlapp.AskQuit
-				return 0
+			require sdlapp.AskQuit
 		
-		rz = SDLActivity.Exiting
+		.IsQuitting = true
+		if .DidCloseDialogs and .DidCloseDocuments(reason)
+			rz = SDLActivity.Exiting
+		  else
+			.WantsQuit = false
+		.IsQuitting = false
+
+
+	helper DidCloseDialogs (|bool|)
+		opt norefcounts
 		for w in window.all
 			if w.isdialog
 				w.cancelreturn
-				if w.CanJustCloseForQuit
-					w.remove
-				  else
-					rz = 0
-		if !rz
-			return 0
-
-		.IsQuitting = true
+				require w.CanJustCloseForQuit
+				w.remove
+		return true
+	
+	
+	helper DidCloseDocuments (|sdlclosereason| reason, |bool|)
+		opt norefcounts // dialogs gone by now
 		for w in window.all
-			if !w.close(reason)
-				rz = 0
-				exit
-		.IsQuitting = false
-		if !rz
-			.WantsQuit = false // sigh.
+			require w.close(reason)
+		return true
 
 
 	function TryCloseFrontWindow (|int|)
 		.LastWindowClose = date.now
 		if !.DialogIsOpen
 			|| w = window.front
-			if w and w.close(SDLActivity.activity)
+			if w and w.close
 				rz = SDLActivity.activity
 
 
@@ -834,10 +838,10 @@ module SDLApp
 		
 		.keymod = .SDL_GetModState
 		if  t is APP_TERMINATING
-			return .tryquit(sdlquitreason.Terminating)
+			return .tryquit
 		
 		if (t is QUIT)
-			return .tryquit(sdlquitreason.QuitEvent)
+			return .tryquit(sdlclosereason.QuitEvent)
 		
 		if  t is WINDOWEVENT
 			|| wev = ev.window
@@ -846,7 +850,7 @@ module SDLApp
 				if keyw
 					return .TryCloseFrontWindow
 				  else
-					return .TryQuit(sdlquitreason.WindowClose)
+					return .TryQuit(sdlclosereason.WindowClose)
 			if (wt is RESIZED)
 				.NewSize = (wev.data1, wev.data2)
 				return SDLActivity.activity
@@ -1086,12 +1090,19 @@ datatype SDLActivity (uint)
 		return self & act
 		
 	
-datatype SDLQuitReason (uint)
+datatype SDLCloseReason (uint)
 	flags
-		|SDLQuitReason|
-		TryQuit
+		|SDLCloseReason|
 		WindowClose
+		TryQuit
 		QuitEvent
 		Terminating
-	syntax is (|SDLQuitReason| act, |bool|)
-		return self & act
+	syntax is (|SDLCloseReason| act, |bool|)
+		return self|int| & act|int|
+	syntax is (|SDLCloseReason| act, assigns:|bool| value, |SDLCloseReason|)
+		cpp_Part Set
+		if value
+			return (self|int| (|) act|int|)|SDLCloseReason|
+		  else
+			return (self|int| &~ act|int|)|SDLCloseReason|
+			

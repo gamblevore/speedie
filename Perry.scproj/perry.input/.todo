@@ -6,8 +6,7 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
-* closing windows doesnt quite work right with the toolbar
-* closing the app shuold close the documents first, then dialogs
+* cancelling quit doesnt cancel :D
 
 
 // Perry Do later
