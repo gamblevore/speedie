@@ -77,7 +77,6 @@ struct NilTracker
 	
 	function Check (|scfunction| f)
 		opt norefcounts
-		require f.cannil
 		if platform.IsDebug
 			debugger 
 			.Start(f)
@@ -86,34 +85,26 @@ struct NilTracker
 
 
 	function scfunction.canNil (|bool|)
-		return !(.IsMacro and !.IsWrapper and .isOK)	
+		return !.IsMacro and !.IsWrapper and .isOK and .LimitTests
 	
 	
 	function scfunction.LimitTests (|bool|)
 		|| c = .Lookup #require
 		require c.name contains "NilTest"
-		require .SourceArg contains "nilcheck"
-		return true
+		return .SourceArg contains "nilcheck"
 	
 		
 	module {
 		|NilTracker| T
 		function SaveLives
 			opt norefcounts
-			require StdErr.ok
 			using options.NilStrength
 				for f in compiler.funclist
-					T.Check(f)
+					if f.cannil: T.Check(f)
 				
 			scfunction.currfunc = nil
-			.SweepInits
 			StdErr.PrintErrors
 			StdErr.Clear
-	
-		
-		function SweepInits
-			// || init = compiler.getfunc("init_")
-			// what about "init_"?
 }
 	
 	
