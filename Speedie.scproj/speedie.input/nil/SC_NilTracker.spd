@@ -3,30 +3,40 @@
 struct NilItem
 	|scdecl--|	Decl
 	|nilstate|	Nil
+	|byte[7]| 	Dummy
 
 
 struct NilTracker
 	linkage:cpp_part nil
-	|uint| 				DeclCount
 	|scfunction--|		fn
+	|uint| 				DeclCount
 	|NilItem[1536]|		Items
 
+	function Undo (|uint| s)
+		.merge(s, false)
+		.DeclCount = s
+	
+	function Restore (|uint| s)
+		.merge(s, false)
+
+	function Clear (|uint| a,  |uint| b)
+		while a < b
+			.items[a++].Nil = 0 // i hope?
 
 	function Merge (|uint| s, |bool| Merge=true)
 		|| c = .DeclCount
 		.DeclCount = s
-		while s >= --c
-			|| i = .items[c]
+		while s > c
+			|| i = .items[--c]
 			|| d = i.decl
 			|| v = i.nil
 			if Merge
 				v |= d.nilused
+				i.nil = v
+			  elseif !v
+				debugger 
 			d.nilused = v
 		
-	
-	function StartCond (|int|)
-	function NeedCond (|int|)
-	function CloseCond (|int| old)
 		
 	function SetNilness (|scdecl| d, |nilstate| s)
 		.TestedNilness(d, s)
@@ -51,7 +61,7 @@ struct NilTracker
 	function Start (|scfunction| f)
 		opt norefcounts
 		scfunction.currfunc = f
-		.DeclCount = 1 // because of scdecl.NilDepth
+		.DeclCount = 0
 		.fn = f
 		|| r = f.returntype
 			r.NilUsed = 0 // :)
@@ -67,11 +77,12 @@ struct NilTracker
 	
 	function Check (|scfunction| f)
 		opt norefcounts
-		require f.cannil and f.limittests
-		return 
-		.Start(f)
-		.RunNormal(f.SourceArg)
-		.Finish(f)
+		require f.cannil
+		if platform.IsDebug
+			debugger 
+			.Start(f)
+			Runall(f.SourceArg)
+			.Finish(f)
 
 
 	function scfunction.canNil (|bool|)
@@ -103,17 +114,6 @@ struct NilTracker
 		function SweepInits
 			// || init = compiler.getfunc("init_")
 			// what about "init_"?
-
-
-		function Undo (|uint| s)
-			T.merge(s, false)
-			t.DeclCount = s
-		
-		function Restore (|uint| s)
-			t.merge(s, false)
-	
-		function Merge (|uint| s)
-			t.merge(s, true)
 }
 	
 	
@@ -121,6 +121,7 @@ struct NilTracker
 function SCDecl.RestoreNil
 	if .nilused != .NilDeclared // is this ever used?
 	.nilused = .nildeclared
+
 
 function SCDecl.NilTake (|scdecl| d)
 	opt norefcounts
@@ -139,8 +140,10 @@ function SCDecl.DeclareAsUsed
 	opt norefcounts
 	.nildeclared = .NilUsed (|) nilstate.stated
 
+
 function scdecl.SuffersNil (|bool|)
 	return .IsObject or .PointerCount
+
 
 function scdecl.IsStated (|bool|)
 	return .NilDeclared is Stated

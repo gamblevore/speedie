@@ -61,13 +61,9 @@ datatype NilCheckMode (uint)
 		|NilCheckMode| 
 		Positive
 		Negative
-		LiveRun
 		AllowRedundant
-		Cond = LiveRun + Positive
 		Active = Positive + Negative
 
-	function Use (|nilcheckmode|)
-		return self & liverun // what about allowredundant?
 	
 	syntax is (|NilCheckMode| other, |bool|)
 		return self & other

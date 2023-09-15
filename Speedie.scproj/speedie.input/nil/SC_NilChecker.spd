@@ -1,17 +1,11 @@
 
 
-// i just realsied something!!!
 // !(a and b) --> (!a or !b)
 // !(a or  b) --> (!a and !b)
-// well thats neat... cos it actually means I don't need to negate stuff!!
-// in order for the nilness tests to still work!
-// i mean the or-thing needs to be wierd still... but that was regardless!!
-// we can jsut freely... negate stuff!!!! YESSSSS no need for backtracking or all other wierdness!
+// well thats simplififes everything
 
 
-// BE BRAVE!!!
-// WHAT SHOULD WE DOOOOOO
-/// DOOO ITTTT
+
 prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
 
 	
@@ -68,7 +62,7 @@ function Property (niltrackerfn)
 	opt norefcounts
 
 	|| ch = msg.first
-	.Jump(ch, test.use)
+	.Jump(ch, test)
 	.FailIfNotReal(ch, ch.NilDecl)
 	|| dcl = msg.nildecl			#debug_require
 	if test is Active
@@ -80,12 +74,13 @@ function Property (niltrackerfn)
 function Statement (NilTrackerFn)
 	opt norefcounts
 	|| type = msg.TmpType
+	test = NilCheckMode.positive
 	if Type is kif
-		return If(msg)
+		return If(msg, test)
 	if type is kReturn
-		return Return(msg)
+		return Return(msg, test)
 	if type is kWhile
-		return While(msg)
+		return While(msg, test)
 	debugger 
 		
 	
@@ -133,62 +128,64 @@ function Return (NilTrackerFn)
 function While (NilTrackerFn)
 	opt norefcounts
 
-	|| Cond = msg.first
-	|| Arg = cond.next				#require
-	// i guess its different cos of exits/continues working differently
-	// and loops and stuff.
+	|| beginning = t.DeclCount
+	.jump(msg.first, NilCheckMode.positive)
+	.RunAll(msg.second)
+	t.Merge(Beginning) // while seems very simple?
+
+
+function Else (niltrackerfn)
+	opt norefcounts
+	if msg.isfirst									// ELSE {y=y2}
+		.RunAll(msg)
+	  elseif msg
+		.if(msg.Parent, test)
 
 
 function If (NilTrackerFn)
 	opt norefcounts
-	|| cond = msg.first
-	|| arg1 = cond.next
-	|| Else = arg1.next
-	|| arg2 = else.Last
-// * double-branch merging always. not/or is done in terms of negation
+	|| Beginning = T.DeclCount
+	|| cond = msg.first,  || arg1 = cond.next,  || Else = arg1.next,  || arg2 = else.last
 
-	|| BeginState = T.StartCond
-	.jump(cond, NilCheckMode.positive) // SetVars during conds actually should go into the parent branch... not undoable.
+	.jump(cond, test)
 	.RunAll(arg1)
-	
-													// IF X {y=y1} ELSE {y=y2}
-	|| Branch1Only = T.DeclCount
-	.Restore(BeginState)								// (undo y=y1 but keep track of it)
-	.jump(cond, NilCheckMode.negative)
-	if arg2.IsFirst									// ELSE {y=y2}
-		.RunAll(arg2)
-	  elseif ELSE
-		if(ELSE)
-	
-	if arg1.Blocks
-		0
-	  elseif arg2.blocks							// (use arg1's state, <2% likelyhood)
-		.Undo(BeginState)							// IF X {y=y1} ELSE {return}
-	  else
-		T.DeclCount = Branch1Only					// (skip arg2, its already current)
-		.merge(BeginState)							// (merges y=y1, y=y2)
+	|| FirstHalf = T.DeclCount
 
+													// IF X {y=y1} ELSE {y=y2}
+	t.Restore(Beginning)							// (undo y=y1 but keep track of it)
+	.jump(cond, test.negate)
+	.else(arg2)
+	
+	if arg1.blocks
+		if !arg2.Blocks
+			t.Clear(Beginning, FirstHalf)
+		  else
+			t.undo(Beginning)						// clear for owners
+		
+	  elseif arg2.blocks
+		t.Undo(FirstHalf)							// IF X {y=y1} ELSE {return}
+		
+	  else
+		T.DeclCount = FirstHalf						// (skip arg2, its already current)
+		t.Merge(Beginning)							// (merges y=y1, y=y2)
 
 
 function Tern (Niltrackerfn)
 	opt norefcounts
-	|| cond = msg.first
-	|| A = cond.next
+	|| C = msg.first
+	|| A = C.next
 	|| B = A.next
 
 	debugat
 	|| BeginState = T.DeclCount
 
-	.jump(cond, nilcheckmode.Cond)
-
+	.jump(C, nilcheckmode.positive)
 	rz = .Jump(A, test)
-	.Restore(BeginState)
-	.jump(cond, nilcheckmode.negative)
+	t.Restore(BeginState)
+
+	.jump(C, nilcheckmode.negative)
 	rz |= .Jump(B, test)
-	.merge(BeginState)								// IF X {y=y1}
-
-
-	// needs to propagate through bras and typescasts into a setrel
+	t.merge(BeginState)								// IF X {y=y1}
 
 
 		
@@ -227,7 +224,6 @@ function ProcessCondRel (Niltrackerfn)
 		|| LNil = ll.IsNowNil
 		|| RNil = rr.IsNowNil
 		ifn lnil or rnil			// if (a > b)
-			test = test.use
 			.jump(ll, test)
 			.jump(rr, test)
 			return NilState.Real
@@ -240,32 +236,30 @@ function ProcessCondRel (Niltrackerfn)
 		.jump(side, test) // can handle !(a == nil)
 		return NilState.real
 
+
 	|| andor = scop.IsAndOr
 	if !andor		// bit ops or math		// (ptr+1) or (1+ptr) still needs nilness check
 		return .Jump(ll).Worst(.Jump(rr))
 
 
-
 	// needs to take into account whether test is positive or negative!
 	if (andor == SCOperator.AND) or msg.IsNilSafe // isnilsafe will speed things up a lot for ints/bools and stuff
-		.Jump(ll, NilCheckMode.Cond)
-		.Jump(rr, NilCheckMode.Cond)
+		.Jump(ll, NilCheckMode.positive)
+		.Jump(rr, NilCheckMode.positive)
 		return NilState.real
 	
 
-	
-	|| First = t.NeedCond // if (!a or a.length)
-	.Jump(ll, NilCheckMode.Cond)
-	.Restore(First)
+	|| First = t.DeclCount // if (!a or a.length)
+	.Jump(ll, NilCheckMode.positive)
+	t.Restore(First)
 	.Jump(ll, NilCheckMode.negative)
 	
 	|| second = t.DeclCount
-	.Jump(rr, NilCheckMode.Cond)
+	.Jump(rr, NilCheckMode.positive)
 	return NilState.real
 	//.merge(first, second) // we want to ignore the negative state... just merge the two values
 	// so we'll need 3 ranges. A-Positive, A-negative, B-positive...
 	// then we merge the two positives
-	// 
 
 
 function Brel (Niltrackerfn)
