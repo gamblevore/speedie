@@ -298,7 +298,7 @@ extend float
 	
 	syntax access (|bool|)
 		return random[] < self
-		
+
 	syntax access (|float| from, |float| to, |float|)
 		cpp_part Mix // this is the mix function
 		|| C = .clamp(0,1)

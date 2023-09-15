@@ -57,10 +57,7 @@ function Message.CastToObject (|Message|)
 	Return .CastedParent
 
 
-|AsmReg| xxx = nil
-function MatchBase
-	visible
-	|| y = (xxx, nil)(1)
+
 
 
 function scdecl.Match (|SCDecl| O, |int| TypeCast, |Message| exp = nil, |uint|)

@@ -453,18 +453,6 @@ class RingTree (Saveable)
 		rz = self
 		while rz and n-- >= 1
 			rz = rz.parent
-	
-	operator downto (|| Low, |RingDownRange of ...|)
-		|RingDownRange| rz
-		rz.From = self
-		rz.To = (Low.prev, nil)(Low)
-		return rz
-
-//	operator to (|| High, |RingRange of ...|)
-//		|RingRange| rz
-//		rz.From = self
-//		rz.To = (high.next, nil)(high)
-//		return rz
 
 	iterator
 		|| ch_ = .First
@@ -491,6 +479,13 @@ class RingTree (Saveable)
 		(self)
 
 	
+	iterator forward
+		|| _curr = self // just uses self not first
+		while _curr
+			yield _curr (_curr)
+			_curr = _curr.next
+		(self)
+
 	iterator flat
 		|| _curr = self
 		|| after = .FlatAfter
@@ -509,37 +504,4 @@ class RingTree (Saveable)
 			_curr = _curr.parent
 		(self)
 
-		
-	iterator forward
-		|| _curr = self
-		while _curr
-			yield _curr (_curr)
-			_curr = _curr.next
-		(self)
 
-
-struct RingDownRange
-	contains ringtree
-	|| From
-	|| To
-	
-	iterator
-		|| ch_ = .from
-		while ( ch_ and ch_ != .to )
-			yield ch_ (ch_)
-			ch_ = ch_.prev
-
-
-//
-//struct RingRange
-//	contains ringtree
-//	|| From
-//	|| To
-//	
-//	iterator
-//		|| ch_ = .from
-//		while ( ch_ and ch_ != .to )
-//			yield ch_ (ch_)
-//			ch_ = ch_.next
-//
-//

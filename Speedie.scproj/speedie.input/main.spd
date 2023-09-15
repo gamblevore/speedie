@@ -3,7 +3,7 @@
 main // speedie main {
 	|message| o
 	|| p = o.first?.first?
-	// to optimise these StatExprs...
+	// advice for future self: to optimise these StatExprs...
 	// We should make it possible in tran_Qmark... to set the type's name to "--"
 	compiler.Main
 

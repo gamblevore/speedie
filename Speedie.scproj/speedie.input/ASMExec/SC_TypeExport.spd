@@ -27,7 +27,6 @@ datatype NilState (byte) // Exec.scproj needs this here
 		Nilish		= 1	
 		Realish		= 2 
 		Either		= 3
-		BothStates	= 15
 		Stated		= 128
 		ActuallyNil = Nilish  + Stated				// nil|message|.position
 		Optional    = Either  + Stated				// || x = array[1000]
