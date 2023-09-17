@@ -105,8 +105,7 @@ function PerryIDE.GoToMarker (|message| m)
 	|| l = m.first
 	.duringNextPrev = true	
 	using self
-		.GoToAnyFile(m.name, l.name)
-		.editme.scrollpos = l.position
+		.GoToAnyFile(m.name, l.name, m)
 	.duringNextPrev = false
 
 

@@ -140,9 +140,9 @@ function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
 		path = path.file.FindProjectMain$
 		
 	using self
-		.GotoAnyFile(path)
-		.editme.ShowAndSel(l)
-		.editme.SetFocus
+		if .GotoAnyFile(path)
+			.editme.ShowAndSel(l)
+			.editme.SetFocus
 	.popuphide
 
 

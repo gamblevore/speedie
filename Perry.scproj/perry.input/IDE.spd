@@ -583,11 +583,15 @@ class PerryIDE (Window)
 		return f
 	
 	
-	function GotoAnyFile (|string| path, |string| line="")
-		|| f = .GotoIncludedFile(path)
-		f := .FileList.AddExtra(path)
-		if f and line
-			.EditMe.ViewLineAndSel(line.int)
+	function GotoAnyFile (|string| path, |string| line="", |message| removeme=nil, |bool|)
+		if path.fileexists
+			|| f = .GotoIncludedFile(path)
+			f := .FileList.AddExtra(path)
+			if f
+				if line
+					.EditMe.ViewLineAndSel(line.int)
+				return true
+		removeme.remove
 	
 		
 	function Root (|filerow|)
