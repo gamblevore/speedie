@@ -7,6 +7,7 @@ http://jeebox.org
 
 
 ignore
+	x = (1) (a or B) (2) // fails with || x = ...
 	–how ∆can someone fall so~far
 	–how  someone can~fall so~far
 	–how  ∆ are you slow			// how are you slow?
@@ -1243,7 +1244,7 @@ module parser
 		kTemporalSyx    = kTemporalSyxNoBar (|) kTemporalBar
 		kOppNoBar		= kopp &~ koppbar
 
-		kOppChain		= kOppWord (|) kOppBra
+		kOppChain		= kOppWord (|) kOppBra (|) koppsyx
 		kIllegalChar
 		kAllow          = false
 		kExpect         = true
