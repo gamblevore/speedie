@@ -203,7 +203,8 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 	
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )
-		FuncPrms.ReturnType = sdcl
+		if funcprms
+			FuncPrms.ReturnType = sdcl
 		return nil
 
 	if !Default
