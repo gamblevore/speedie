@@ -210,11 +210,11 @@ function TypeOfStr (ExprResolver)
 	opt norefcounts
 	// this is better than calling tran_strings, right?
 	scfunction.String_Expand(exp, exp.msgowningfunc)
-	Return TypeString.TypeNormal
+	Return TypeString.TypeVeryExists
 
 
 function TypeOfSString (ExprResolver)
-	return typestring.typenormal // really it should also be a cstring!
+	return typestring.TypeVeryExists // should return stringzeroterminated!
 
 
 function TypeOfChar (ExprResolver)

@@ -276,7 +276,7 @@ class SCDecl (SCObject) {
 		
 		rz.PointerCount++
 		rz.NilDeclared = NilState.either	// in case we later set it to nil.
-		rz.NilUsed = NilState.real			// always exists
+		rz.NilUsed = NilState.realish		// always exists
 		check (rz.pointercount < 8) (.source, "Too much abstraction")
 	
 	
@@ -775,7 +775,7 @@ class SCDecl (SCObject) {
 	function MakeOptional (|SCDecl|)
 		// this becomes declared optional...
 		// the default state is "either" (undeclared)
-		return .MakeNil(nilstate.optional, .type.TypeOptional)
+		return .MakeExistance(nilstate.optional, .type.TypeOptional)
 	
 	function MakeContainedOptional (|scdecl|)
 		if .NilDeclared is Stated
@@ -783,14 +783,14 @@ class SCDecl (SCObject) {
 		return .MakeOptional
 		
 	function MakeReal (|SCDecl|)
-		return .MakeNil(nilstate.real,  .type.TypeVeryExists)
+		return .MakeExistance(nilstate.real,  .type.TypeVeryExists)
 	
 	function BecomeReal
 		if .NilDeclared isnt Stated
 			.NilDeclared = NilState.Real
-			.NilUsed = NilState.real	
+			.NilUsed = NilState.realish	
 
-	function MakeNil (|nilstate| type, |scdecl| Default, |scdecl|)
+	function MakeExistance (|nilstate| type, |scdecl| Default, |scdecl|)
 		opt norefcounts
 		if !self or .nildeclared == type
 			Return self

@@ -283,7 +283,7 @@ function InitBasicStuff (|int|) // compiler.init
 	.InitTypes
 	TypeNil = .AddGlobalConst( "nil", TypeObject )
 	TypeNil.NilDeclared = NilState.ActuallyNil
-	TypeNil.NilUsed = NilState.ActuallyNil
+	TypeNil.NilUsed = NilState.nilish
 	TrueBool = .AddGlobalConst( "true", TypeBool )
 	FalseBool = .AddGlobalConst( "false", TypeBool )
 	

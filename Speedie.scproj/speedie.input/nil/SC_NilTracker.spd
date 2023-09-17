@@ -44,11 +44,14 @@ struct NilTracker
 	
 	function TestedNilness (|scdecl| d, |nilstate| s, |nilstate|)
 		opt norefcounts
-		if d.nilused > 3 // what?
+		|| old = d.nilused
+		if old > 3 // what?
+		require old != s
+		
 		|| c = .DeclCount
 		if (c < 1536)
 			|| i = .items[c]
-			i.nil = d.NilUsed
+			i.nil = old
 			i.decl = d
 			.DeclCount = c + 1
 			d.nilused = s
@@ -79,6 +82,7 @@ struct NilTracker
 		opt norefcounts
 		if platform.IsDebug
 			debugger 
+			f.nildebug
 			.Start(f)
 			Runall(f.SourceArg)
 			.Finish(f)
@@ -110,8 +114,9 @@ struct NilTracker
 	
 
 function SCDecl.RestoreNil
-	if .nilused != .NilDeclared // is this ever used?
-	.nilused = .nildeclared
+	|| d = .nildeclared & nilstate.either
+	if .nilused != d // is this ever used?
+	.nilused = d
 
 
 function SCDecl.NilTake (|scdecl| d)
@@ -136,6 +141,6 @@ function scdecl.SuffersNil (|bool|)
 	return .IsObject or .PointerCount
 
 
-function scdecl.IsStated (|bool|)
+function scdecl.NilStated (|bool|)
 	return .NilDeclared is Stated
 

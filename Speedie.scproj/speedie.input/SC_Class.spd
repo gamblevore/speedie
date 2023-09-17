@@ -65,7 +65,7 @@ constructor (|Message| node, |SCBase| parent)
 	Compiler.stClasses++
 	
 	node.obj = self			// for autocomplete :)
-	.name   = LoadClassName(node)
+	.name = LoadClassName(node)
 	.Source = node
 	.project = parent.project
 	.IsVisible = scbase.CurrVisibility
@@ -77,7 +77,7 @@ constructor (|Message| node, |SCBase| parent)
 	|| T = SCDecl.new(self)
 	if isdatatype
 		T.nildeclared = nilstate.Real
-		T.nilused = nilstate.Real
+		T.nilused = nilstate.Realish
 	.TypeNormal = T
 	.TypeOptional = T.NilConstructor(NilState.optional*IsDataType)
 	.TypeVeryExists = T.NilConstructor(NilState.Real*IsDataType)
@@ -496,6 +496,7 @@ function OverrideSyntax
 		.Casts <~ f
 		if f.returntype == typebool.typenormal
 			f.IsNilChecker = true
+			f.args[0] = f.args[0].makeoptional
 	
 	.HasCompareFunc = .FindSpecialFunc( "SyntaxCompare", true )
 	.HasEqualsFunc = .FindSpecialFunc( "SyntaxEquals", true )

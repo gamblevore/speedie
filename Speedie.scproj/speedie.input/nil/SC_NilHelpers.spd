@@ -1,4 +1,6 @@
 
+prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
+
 
 extend Message {
 
@@ -20,10 +22,63 @@ function NilDecl (|scdecl|)
 	if (obj isa scdecl)
 		|| l = obj.IsLookupOnly
 		if l isa scdecl
+			l.nildebug
 			return l
+		obj.nildebug
 		return obj
+	debugger // if this never happens we can just blindcast
+	
+
+function scfunction.NilDebug
+	cpp_name ndb1
+	|| fs = FastString()
+	if .cls
+		fs <~ .cls.name
+		fs <~ "."
+	fs <~ .name
+	fs <~ "( "
+	for a in .args
+		fs <~ ", "
+		start
+		fs <~ a.name
+		fs <~ " "
+		a.nildeclared.nilname(fs, true)
+	fs <~ " )"
+	printline fs
 
 
+function scdecl.NilDebug
+	cpp_name ndb2
+	|| fs = FastString()
+	fs <~ .name ?? "?"
+	fs <~ " "
+	|| d = .NilDeclared
+	d.NilName(fs, false)
+	d &= ~ NilState.Stated
+	if .nilused != d
+		fs <~ " ("
+		.nilused.nilname(fs, false)
+		fs <~ ")"
+	printline fs
+
+
+function nilstate.NilName (|faststring| fs, |bool| expectstated)
+	|| st = (self is Stated)
+	if st == expectstated
+		0
+	  elseif st
+		fs <~ "stated "
+	  else
+		fs <~ "unstated "
+	
+	if self is Either
+		fs <~ "optional"
+	  elseif self is Nilish
+		fs <~ "nil"
+	  else
+		fs <~ "real"
+	
+	
 function LastInBlock
 	opt norefcounts
 	.RemoveAfter
@@ -59,12 +114,13 @@ function scdecl.ParamUpgrade
 datatype NilCheckMode (uint)
 	flags
 		|NilCheckMode| 
+		Nothing = 0
 		Positive
 		Negative
 		AllowRedundant
+		PosRed
 		Active = Positive + Negative
 
-	
 	syntax is (|NilCheckMode| other, |bool|)
 		return self & other
 
