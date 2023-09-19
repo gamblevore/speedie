@@ -2,7 +2,7 @@
 
 // bugs:
 	// * string.addr is real... no reason it should be.
-
+	// * rework VariableSet for the new register-based system!
 
 
 function NilTracker.UseChildAsReal (|message| wrapper, |nilstate|) // a.b, *a, a[0], (a)()
@@ -99,6 +99,7 @@ function Function (NilTrackerFn)
 		.Jump(p, submode)
 		.VariableSet(a, p.NilDecl, p, 1)
 		if a.pointercount
+		// do the pointer wierdness hee
 		p++
 
 	|| ret = fn.ReturnType				#require
@@ -331,10 +332,6 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| ErrPlace, |uint| I
 		T.SetNilness(recv, sent.nilused)
 		
 	
-	// so what if we are sending the address of a thing? to a function param...
-	// sigh.
-	// shouldn't the function param caller deal with that?
-	// makes more sense! 
 	if recv.PointerCount == 1	// |!&!&struct| abc = f
 	// for pointers to pointers? use the declared type!
 		return .VariableSet(recv.internal, sent.internal, errplace, IsParam<<1)
