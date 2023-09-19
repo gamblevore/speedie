@@ -1,7 +1,6 @@
 
 
 // bugs:
-	// * func params coming as real when shouldn't be
 	// * string.addr is real... no reason it should be.
 
 
@@ -138,7 +137,6 @@ function If (NilTrackerFn)
 	.jump(cond, NilCheckMode.positive)
 	.RunAll(arg1)
 	|| FirstHalf = T.DeclCount
-
 													// IF X {y=y1} ELSE {y=y2}
 	t.Restore(Beginning)							// (undo y=y1 but keep track of it)
 	.jump(cond, NilCheckMode.negative)
