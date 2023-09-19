@@ -98,8 +98,6 @@ function Message.CanGetAddress (|scbase| name_space, |bool|)
 	expect (curr == @thg or @dot) (curr, "Can't get address of this.")
 	expect (T2 isnt const)        (curr, "Can't get the address of a const.")
 	
-	// OK... so now what? we want to disable address of local vars that are not structs or c-arrays
-	
 	if (curr == @thg) and t2.islocal and !(t2.IsNormalStruct or t2.C_array)
 		|| p = .ParentForAddress
 		expect (p == @prm) (curr, "Can't store the address of register based variables.")

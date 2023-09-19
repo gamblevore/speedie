@@ -5,10 +5,6 @@ main // main {
 	sdlapp.RunAndQuit(&perry.startup)
 
 
-function object.adas (|int|)
-	return (self as message).name.first.lowercase
-
-
 function app.InitColors
 	¥.border.edge <~ vec4(1) 
 	¥.modifiedborder.edge <~ ((1.0, 1.0, 0.5, 1.0)) 

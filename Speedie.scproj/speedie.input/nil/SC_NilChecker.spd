@@ -3,18 +3,7 @@
 // bugs:
 	// * func params coming as real when shouldn't be
 	// * string.addr is real... no reason it should be.
-	// * getting the address of a local var... should make that local var unknowable about nilness!
-/*
-function Test
-	|| a = "hello"
-	|| b = "bye"
-	|| x = &a
-	if random[] > 0.5
-		x = &b
-	settonil(x)
-	*x = nil
-	|| c = a.Reverse // nilobject error or not?
-*/
+
 
 
 function NilTracker.UseChildAsReal (|message| wrapper, |nilstate|) // a.b, *a, a[0], (a)()
