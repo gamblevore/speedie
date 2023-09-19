@@ -11,10 +11,6 @@ struct NilTracker
 	|scfunction--|		fn
 	|uint| 				DeclCount
 	|NilItem[1536]|		Items
-
-	function oooo
-		|| i1 = .items[0]
-		|| i2 = .items[4]
 		
 	function Undo (|uint| s)
 		.merge(s, false)
@@ -31,7 +27,7 @@ struct NilTracker
 		|| c = .DeclCount
 		.DeclCount = s
 		while s > c
-			|| i = .items[--c]
+			|| i = &.items[--c]
 			|| d = i.decl
 			|| v = i.nil
 			if Merge
@@ -55,7 +51,7 @@ struct NilTracker
 		
 		|| c = .DeclCount
 		if (c < 1536)
-			|| i = .items[c]
+			|| i = &.items[c]
 			i.nil = old
 			i.decl = d
 			.DeclCount = c + 1

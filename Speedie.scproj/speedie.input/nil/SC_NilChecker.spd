@@ -318,7 +318,7 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| ErrPlace, |uint| I
 	require recv.suffersnil
 
 	if recv.NilDeclared isnt nilish
-		require .FailIfNotReal(errplace, sent, (isparam>>1)!=0)
+		require .FailIfNotReal(ErrPlace, sent, (isparam>>1)!=0)
 	  
 	  elseif isparam										// a param that can accept nil
 		|| recnil = recv.nildeclared

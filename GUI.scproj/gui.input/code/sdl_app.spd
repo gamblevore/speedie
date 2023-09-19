@@ -162,19 +162,18 @@ module SDLApp
 			.JB_SDL_FullScreen(.nativewindow) // SDL2 had a bug in it... probably still exists
 			return true
 		|| Old = .SizeOrig
-		|| align = .scale * (1+.IsHighDPI)
+		|| aligned = .scale * (1+.IsHighDPI)
 		|| wh = result.size-1
-		if align > 1
-			 wh = wh align align
+		if aligned > 1
+			 wh = wh align aligned
 		.SDL_SetWindowSize(.screenwindow, wh.x, wh.y)
 		if .SizeOrig != wh
 			.TryResizeLater = wh
 		if result.xy
 			.SDL_SetWindowPosition(.ScreenWindow, result.x, result.y)
 
-		|| Niew = .SizeOrig
-		if old != Niew
-			.NewSize = niew
+		if old != .SizeOrig
+			.NewSize = .SizeOrig
 		return true
 		
 	
