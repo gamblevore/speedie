@@ -12,6 +12,10 @@ struct NilTracker
 	|uint| 				DeclCount
 	|NilItem[1536]|		Items
 
+	function oooo
+		|| i1 = .items[0]
+		|| i2 = .items[4]
+		
 	function Undo (|uint| s)
 		.merge(s, false)
 		.DeclCount = s
@@ -45,8 +49,9 @@ struct NilTracker
 	function TestedNilness (|scdecl| d, |nilstate| s, |nilstate|)
 		opt norefcounts
 		|| old = d.nilused
-		if old > 3 // what?
-		require old != s
+		if old == s
+			return s
+		if old > 3 or s > 3 // what?
 		
 		|| c = .DeclCount
 		if (c < 1536)
@@ -97,9 +102,8 @@ struct NilTracker
 		require c.name contains "NilTest"
 		return .SourceArg contains "nilcheck"
 	
-		
-	module {
-		|NilTracker| T
+	module
+		|niltracker| T
 		function SaveLives
 			opt norefcounts
 			using options.NilStrength
@@ -109,7 +113,7 @@ struct NilTracker
 			scfunction.currfunc = nil
 			StdErr.PrintErrors
 			StdErr.Clear
-}
+
 	
 	
 
