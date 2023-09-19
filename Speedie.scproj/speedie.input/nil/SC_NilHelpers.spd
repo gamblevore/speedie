@@ -118,7 +118,7 @@ datatype NilCheckMode (uint)
 		Positive
 		Negative
 		AllowRedundant
-		PosRed
+		PosRed = Positive + AllowRedundant  
 		Active = Positive + Negative
 
 	syntax is (|NilCheckMode| other, |bool|)
