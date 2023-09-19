@@ -117,9 +117,11 @@ function AddModuleToFunc (|SCBase| space)
 
 
 function SafeName (|string|)
-	if .name
-		return .name
-	return .cls.name
+	opt norefcounts
+	|| n = .name
+		return n
+	|| c = .cls
+		return c.name
 
 
 function LoadModule (|Message| node)
