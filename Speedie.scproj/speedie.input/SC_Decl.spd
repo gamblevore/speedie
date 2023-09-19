@@ -801,6 +801,7 @@ class SCDecl (SCObject) {
 			Return self
 		
 		if (Default and self == .type.typenormal)
+			if default.nildeclared != type // what?
 			return Default
 		
 		rz = .Copy

@@ -79,8 +79,8 @@ constructor (|Message| node, |SCBase| parent)
 		T.nildeclared = nilstate.Real
 		T.nilused = nilstate.Realish
 	.TypeNormal = T
-	.TypeOptional = T.NilConstructor(NilState.optional*IsDataType)
-	.TypeVeryExists = T.NilConstructor(NilState.Real*IsDataType)
+	.TypeOptional = T.NilConstructor(NilState.optional * !IsDataType)
+	.TypeVeryExists = T.NilConstructor(NilState.Real * !IsDataType)
 	
 	if node == "struct"
 		T = T.GetAddress

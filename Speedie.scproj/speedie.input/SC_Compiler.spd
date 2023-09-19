@@ -84,7 +84,7 @@ linkage
 |[SCFunction]|			ProtoTypes
 
 |Dictionary of SCBase|		ExportNames = nil
-|dictionary of dictionary|	AdjDicts = dictionary()
+|dictionary of dictionary of macro|	AdjDicts = dictionary()
 
 |SCFunction|			PrivateProperty
 |SCFunction|			RefIncr
