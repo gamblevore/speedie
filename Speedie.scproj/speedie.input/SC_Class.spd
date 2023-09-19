@@ -100,10 +100,6 @@ function SourceClass (|message|)
 	return super.source
 
 
-function PreferAddress (|bool|)
-	return .isstruct and !.isdatatypelike
-
-
 function NumericCount (|int|)
 	if self
 		return .TypeInfo.NumericCount

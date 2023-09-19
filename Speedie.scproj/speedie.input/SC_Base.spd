@@ -460,13 +460,7 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 		if o
 			paramsarray.found = true
 			if !ParamsArray
-				// this turns a.b into &(a.b) for struct access
-				// What about "|| x = c".  when c is a struct?.
-				// Just remove kPurposeDot? should work?
 				if (purpose == kPurposeDot) and !paramsarray.isaddress and (o isa scdecl) 
-					if (o.type.PreferAddress) and !o.pointercount
-						o = o.makepointer
-						exp.getaddressof2
 					Return o
 				///////
 				
@@ -519,6 +513,7 @@ constants (
 
 
 function LookUpDot (|String| name, |Message| exp, |SCBase| arg_space, |SCDecl| contains, |Message| side, |Object|)
+	opt norefcounts
 	return .LookUpSub( name, exp, exp.Last, arg_space, contains, side, kPurposeDot )
 
 
