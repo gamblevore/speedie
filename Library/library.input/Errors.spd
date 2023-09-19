@@ -155,9 +155,11 @@ class Error (Message)
 		fs <~ ':'
 		return true
 
+
 	syntax compare (|date| d, |bool| aware, |int|)
 		|| w = .when + d
 		return date() - w
+
 
 	render Render
 		fs <~ "error"
@@ -175,6 +177,7 @@ class Error (Message)
 			fs.indent--
 		fs <~ "\n"
 		fs.indent-- 
+
 
 	render RenderClang
 		|| M = fs.mark

@@ -617,7 +617,7 @@ function TypeOfAccess (ExprResolver)
 
 	if (Ty0 isa SCDecl) and (Arr.HasOneChild)
 		|| Index = Arr.first
-		|| Access = typeofexpr(index, name_space)$
+		|| Access = TypeOfExpr(index, name_space)$
 		|| W = ty0.isnumeric
 		if (W > 1)
 			require Index.ExpectInt(Access)
@@ -630,7 +630,7 @@ function TypeOfAccess (ExprResolver)
 				require Index.ExpectInt(Access)
 				return ty0.Dereference(exp, name_space, true)
 	if (ty0 isa scmodule)
-		if ty0.IsMArray(arr) and arr.first.expectmatch(name_Space, typeint)
+		if ty0.IsMArray(arr) and arr.first.ExpectMatch(name_Space, typeint)
 			return LowlevelArrayTransform(exp, ty0.Cls)
 
 	arr.Func = @prm

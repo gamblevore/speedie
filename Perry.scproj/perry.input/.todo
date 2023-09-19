@@ -7,9 +7,7 @@
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
 
-
 // Perry Do later
-* fwd/backward in history should not be an error if file not existsings :D
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping
 // even later
