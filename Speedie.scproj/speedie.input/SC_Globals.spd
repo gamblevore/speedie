@@ -100,7 +100,7 @@ function Message.CanGetAddress (|scbase| name_space, |bool|)
 	
 	// OK... so now what? we want to disable address of local vars that are not structs or c-arrays
 	
-	if t2.islocal and !(t2.IsNormalStruct or t2.C_array)
+	if (curr == @thg) and t2.islocal and !(t2.IsNormalStruct or t2.C_array)
 		|| p = .ParentForAddress
 		expect (p == @prm) (curr, "Can't store the address of register based variables.")
 			
