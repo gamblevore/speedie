@@ -117,8 +117,10 @@ module SDLApp
 
 
 	function SizeOrig (|ivec2|)
-		|| aaa = (&rz)|&int|
+		|int[2]| place
+		|| aaa = &place[0]
 		.SDL_GetWindowSize(.ScreenWindow,  aaa,  aaa+1)
+		return (place[0], place[1])
 
 
 	function SizeOrig (assigns:|ivec2|)
@@ -136,8 +138,10 @@ module SDLApp
 
 
 	function ScreenPosOrig (|ivec2|)
-		|| aaa = (&rz)|&int|
-		.SDL_GetWindowPosition(.screenwindow,  aaa, aaa+1)
+		|int[2]| place
+		|| aaa = &place[0]
+		.SDL_GetWindowPosition(.ScreenWindow,  aaa,  aaa+1)
+		return (place[0], place[1])
 
 		
 	function ShowCursor (|bool| v = true)

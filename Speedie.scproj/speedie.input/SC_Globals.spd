@@ -61,8 +61,6 @@ function scdecl.Exists (|bool|)
 
 
 function TypeOfARel (ExprResolver)
-	if exp == "&"
-		return TypeOfAddress(exp.first, name_space, side )
 	if exp == "!"
 		exp.become(@bra)
 		return TypeOfExpr(exp.first, name_space)
@@ -88,23 +86,40 @@ function TypeOfFunc (ExprResolver)
 	return fn
 
 
-function Message.CanGetAddress (|scbase| name_space, |bool| DoErr = true, |bool|)
+function Message.CanGetAddress (|scbase| name_space, |bool|)
+	opt norefcounts
 	|| curr = .unbra
-	|| err = ""
 	if (curr == @acc)
 		|| f = curr.first
-		|| T = TypeOfExpr(f, name_space) #require
-		if (T.isnumeric > 1)
-			err = "Can't get address of vector element (c++ limitation)."
-	  else
-		|| T = TypeOfExpr(curr, name_space) #require // might transform it
-		ifn (curr == @thg or @dot)
-			err = "Can't get address of this."
-		  elseif (T is const)
-			err = "Can't get the address of a const."
-	if doerr and err
-		error (curr, err)
-	return !err
+		|| T = TypeOfExpr(f, name_space)				#require
+		return (T.isnumeric <= 1) #expect (curr, "Can't get address of vector element (c++ limitation).")
+
+	|| T2 = TypeOfExpr(curr, name_space)				#require // might transform it
+	expect (curr == @thg or @dot) (curr, "Can't get address of this.")
+	expect (T2 isnt const)        (curr, "Can't get the address of a const.")
+	
+	// OK... so now what? we want to disable address of local vars that are not structs or c-arrays
+	
+	if t2.islocal and !(t2.IsNormalStruct or t2.C_array)
+		|| p = .ParentForAddress
+		expect (p == @prm) (curr, "Can't store the address of register based variables.")
+			
+	return true
+
+
+function Message.ParentForAddress (|Message|)
+	opt norefcounts
+	|| gotaddr = 0
+	self = .parent
+	while self
+		|| f = .func
+		if (f != @Bra and @Type)
+			if (f == @brel and self == "&")
+				gotaddr++
+				require gotaddr <= 1
+			  else
+				return self
+		self = .parent
 
 
 function TypeOfBRel (ExprResolver)
@@ -112,7 +127,7 @@ function TypeOfBRel (ExprResolver)
 	|| F = exp.first									#require
 	|| SubType = TypeOfExpr( F, name_space )			#require
 	if (Subtype.type.funcproto) and (name == "&")
-		return TypeOfAddress(F, name_space, side)
+		return TypeOfFuncPointer(F, name_space, side)
 	
 	if name == "*"
 		return SubType.Dereference(exp, name_space, false)
@@ -627,15 +642,15 @@ function TypeOfAccess (ExprResolver)
 	Return TypeOfDot( exp, name_space, side )
 
 
-function TypeOfAddress (|Message| Exp, |SCBase| name_space, |message|side, |SCObject|)
-	exp = exp.unbra
-	if exp == @dot
-		rz = TypeOfDot( exp, name_space, side )
-	  elseif (exp == @thg)
-		rz = name_space.LookUpVar( exp.Name, exp, side )
+function TypeOfFuncPointer (|Message| Exp, |SCBase| name_space, |message| side, |SCObject|)
+	|| ch = exp.unbra
+	if ch == @dot
+		rz = TypeOfDot( ch, name_space, side )
+	  elseif (ch == @thg)
+		rz = name_space.LookUpVar( ch.Name, ch, side )
 	  else
-		expect (false) (exp)
-	exp.obj = rz
+		error (exp)
+	ch.obj = rz
 
 
 function MoveFutureStaticsIn (|Message| msg)

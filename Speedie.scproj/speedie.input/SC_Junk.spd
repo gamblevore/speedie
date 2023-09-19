@@ -31,8 +31,7 @@ helper __junktest_2__
 	|| r1 = ringtree()
 	|| r2 = ringtree()
 	|| i2 = 0
-	|| i3 = &i2
-	*i3 = r1.dist(r2)
+	i2 = r1.dist(r2)
 	r1.parent? = r2
 
 

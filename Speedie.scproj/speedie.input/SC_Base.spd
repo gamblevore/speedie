@@ -465,12 +465,8 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 				// Just remove kPurposeDot? should work?
 				if (purpose == kPurposeDot) and !paramsarray.isaddress and (o isa scdecl) 
 					if (o.type.PreferAddress) and !o.pointercount
-						if exp
-							o = o.makepointer
-							exp.getaddressof2
-						  else
-							o = nil // sigh
-							debugger
+						o = o.makepointer
+						exp.getaddressof2
 					Return o
 				///////
 				

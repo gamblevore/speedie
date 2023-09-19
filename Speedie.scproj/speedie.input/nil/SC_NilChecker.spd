@@ -3,7 +3,18 @@
 // bugs:
 	// * func params coming as real when shouldn't be
 	// * string.addr is real... no reason it should be.
-
+	// * getting the address of a local var... should make that local var unknowable about nilness!
+/*
+function Test
+	|| a = "hello"
+	|| b = "bye"
+	|| x = &a
+	if random[] > 0.5
+		x = &b
+	settonil(x)
+	*x = nil
+	|| c = a.Reverse // nilobject error or not?
+*/
 
 
 function NilTracker.UseChildAsReal (|message| wrapper, |nilstate|) // a.b, *a, a[0], (a)()
@@ -99,6 +110,7 @@ function Function (NilTrackerFn)
 			submode = NilCheckMode.PosRed
 		.Jump(p, submode)
 		.VariableSet(a, p.NilDecl, p, 1)
+		if a.pointercount
 		p++
 
 	|| ret = fn.ReturnType				#require
@@ -280,7 +292,7 @@ function Declaration (niltrackerfn)
 function SetRel (niltrackerfn)
 	opt norefcounts
 	|| l = msg.first
-	|| B = .JumpDecl(msg.last) // c++ puts B first...
+	|| B = .JumpDecl(msg.last) // c++ runs B first...
 	|| A = .JumpDecl(l)
 	.VariableSet(A, B, l, 0)
 
@@ -304,7 +316,7 @@ function RunAll (NilTrackerFn)
 		.Jump(s)
 
 
-function NilMsg (|message| err, |scdecl| d, |uint| PointerInferred, |string|)
+function NilMsg (|message| err, |scdecl| d, |bool| PointerInferred, |string|)
 	if PointerInferred
 		return "Nil Error: Pointed-to can't be nil."
 	if d isnt param
@@ -319,7 +331,7 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| ErrPlace, |uint| I
 	require recv.suffersnil
 
 	if recv.NilDeclared isnt nilish
-		require .FailIfNotReal(errplace, sent, isparam>>1)
+		require .FailIfNotReal(errplace, sent, (isparam>>1)!=0)
 	  
 	  elseif isparam										// a param that can accept nil
 		|| recnil = recv.nildeclared
@@ -331,14 +343,18 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| ErrPlace, |uint| I
 	  else
 		T.SetNilness(recv, sent.nilused)
 		
-			
+	
+	// so what if we are sending the address of a thing? to a function param...
+	// sigh.
+	// shouldn't the function param caller deal with that?
+	// makes more sense! 
 	if recv.PointerCount == 1	// |!&!&struct| abc = f
 	// for pointers to pointers? use the declared type!
 		return .VariableSet(recv.internal, sent.internal, errplace, IsParam<<1)
 
 
 
-function FailIfNotReal (|message| err, |scdecl| d, |uint| PointerInferred=0,  |bool|)
+function FailIfNotReal (|message| err, |scdecl| d, |bool| PointerInferred=false,  |bool|)
 	opt norefcounts
 	if d.NilUsed isnt Nilish
 		return true

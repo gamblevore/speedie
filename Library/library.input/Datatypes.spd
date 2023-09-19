@@ -494,9 +494,9 @@ datatype f64
 		cpp_wrapper (fmod)
 	
 	function AsInt (|int64|)
-		|| Addr = &self
-		|| Addr2 = Addr|&int64|
-		return Addr2[0]
+		|f64[1]| abc = {self}
+		|| def = (&abc[0])|&int64|
+		return def[0]
 
 	function Floor (|f64|)
 		cpp_wrapper (floor)
@@ -596,9 +596,9 @@ datatype int64
 		return self & ((one<<n)-one)
 
 	function AsFloat (|f64|)
-		|| Addr = &self
-		|| Addr2 = Addr|&f64|
-		return Addr2[0]
+		|int64[1]| abc = {self}
+		|| def = (&abc[0])|&f64|
+		return def[0]
 	
 	render Hex
 		if self < 0

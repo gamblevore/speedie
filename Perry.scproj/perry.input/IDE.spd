@@ -584,7 +584,7 @@ class PerryIDE (Window)
 	
 	
 	function GotoAnyFile (|string| path, |string| line="", |message| removeme=nil, |bool|)
-		if path.fileexists
+		if path.FileExists
 			|| f = .GotoIncludedFile(path)
 			f := .FileList.AddExtra(path)
 			if f

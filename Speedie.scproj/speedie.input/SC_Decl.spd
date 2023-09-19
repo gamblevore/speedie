@@ -65,6 +65,7 @@ datatype SCDeclInfo (uint)
 		OnModule
 		Implicit		// self or other values that aren't declared explicitly
 		SetTo			// a var sets it... like: rz = obj
+		NotFunction = OnModule + Property
 		
 		
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
@@ -324,6 +325,8 @@ class SCDecl (SCObject) {
 		fs <~ '|'
 		return fs
 		
+	function IsLocal (|bool|) // isfunction
+		return .name and !(.info & scdeclinfo.NotFunction)
 
 	function WriteDeclFull (|String| DeclName = "", |bool| minimal = false, |Message|)
 		DeclName := .Name
@@ -373,6 +376,8 @@ class SCDecl (SCObject) {
 	function IsNormalStruct (|bool|)
 		return .Type.IsStruct and !.PointerCount and !.C_Array
 
+	function IsStruct (|bool|)
+		disabled "Use .IsNormalStruct"
 
 	function IsSwappable (|bool|)
 		require !.C_Array
