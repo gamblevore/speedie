@@ -479,14 +479,6 @@ function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Nam
 	|| Cont = ExtractDecl( Contained, Name_Space )
 		return .LoadContainedSub(cont, wrap, Name_Space)
 
-/*
-	if (c == "~")
-		|| wrapp = «thg "datatypewrapper"»
-		rz.loadContained(c.first, wrapp, name_space)		#require
-*/
-
-
-// function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Name_Space, |bool|)
 
 function SCDecl.MakeDataTypeWrapper (|SCBase| Name_Space, |scdecl|)
 	|| wrapp = «thg "datatypewrapper"»
@@ -1050,7 +1042,7 @@ fail
 function message.ExpFunc (|scfunction|)
 	opt norefcounts
 	|| it = .unbra.last
-		|| fn = it.obj 
+		|| fn = it.obj
 		if fn isa scfunction
 			return fn
 
@@ -1080,8 +1072,6 @@ function message.NiceIsFlagSyntax (|message| list,  |message| RN,  |scbase| name
 		// (a is b) --> (a is b) = true
 		
 	using (rn)
-	
-	
 
 	// a is b = true  --> a.syntaxis(s.b) = true
 	// if a is b      --> if a.syntaxis(s.b)
@@ -1217,7 +1207,6 @@ function message.AndOrExpansionTest (|uint|)
 		return ln.AndOrExpansionTest
 	require self == @rel
 
-	
 	|| op = ln.next
 	require op != "="
 
