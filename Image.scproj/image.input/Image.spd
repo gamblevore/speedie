@@ -367,8 +367,6 @@ class Image (memory)
 			memory.free(img)
 
 
-
-
 // move over to the other file.
 	
 	function LoadEmpty (|int| W, |int| H, |bool|)
