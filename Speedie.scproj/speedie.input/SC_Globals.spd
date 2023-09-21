@@ -482,7 +482,7 @@ function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Nam
 
 function SCDecl.MakeDataTypeWrapper (|SCBase| Name_Space, |scdecl|)
 	|| wrapp = «thg "datatypewrapper"»
-	rz.loadContainedsub(self, wrapp, name_space)
+	rz.LoadContainedSub(self, wrapp, name_space)
 
 	
 function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCBase| Name_Space, |bool|)

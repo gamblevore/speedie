@@ -1487,7 +1487,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_ActualTypecasts ((~(128 | 32)))
 #define kJB_AddressOfMatch (3 << 22)
 #define kJB_BitAnd (JB_LUB[356])
-#define kJB_BitNot (JB_LUB[606])
+#define kJB_BitNot (JB_LUB[605])
 #define kJB_BitOr (JB_LUB[559])
 #define kJB_BitXor (JB_LUB[1901])
 #define kJB_CastedMatch (6 << 22)
@@ -1828,11 +1828,11 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__MsgUIFlags_User2 (4096)
 #define kSC__NilCheckMode_Active (1 + 2)
 #define kSC__NilCheckMode_allowredundant (4)
-#define kSC__NilCheckMode_LargestFlag (15)
+#define kSC__NilCheckMode_LargestFlag (7)
 #define kSC__NilCheckMode_negative (2)
 #define kSC__NilCheckMode_Nothing (0)
 #define kSC__NilCheckMode_positive (1)
-#define kSC__NilCheckMode_posred (8)
+#define kSC__NilCheckMode_PosRed (1 + 4)
 #define kSC__NilState_ActuallyNil (1 + 128)
 #define kSC__NilState_Either (3)
 #define kSC__NilState_Failed (0)
@@ -4796,11 +4796,9 @@ void SC_nil_Merge(NilTracker* self, uint s, bool Merge);
 
 void SC_nil_Restore(NilTracker* self, uint s);
 
-void SC_nil_SetNilness(NilTracker* self, SCDecl* d, NilState s);
+NilState SC_nil_SetNilness(NilTracker* self, SCDecl* d, NilState s);
 
 void SC_nil_Start(NilTracker* self, SCFunction* f);
-
-NilState SC_nil_TestedNilness(NilTracker* self, SCDecl* d, NilState s);
 
 void SC_nil_Undo(NilTracker* self, uint s);
 
@@ -4818,7 +4816,7 @@ NilState SC_nil__Declaration(Message* msg, NilCheckMode Test);
 
 NilState SC_nil__Dummy(Message* msg, NilCheckMode Test);
 
-bool SC_nil__FailIfNotReal(Message* err, SCDecl* d, bool PointerInferred);
+void SC_nil__FailIfNotReal(Message* err, SCDecl* d);
 
 NilState SC_nil__Function(Message* msg, NilCheckMode Test);
 
@@ -4858,7 +4856,7 @@ NilState SC_nil__Thing(Message* msg, NilCheckMode Test);
 
 void SC_nil__TrackerDummies();
 
-void SC_nil__VariableSet(SCDecl* Recv, SCDecl* Sent, Message* ErrPlace, uint IsParam);
+void SC_nil__VariableSet(SCDecl* Recv, SCDecl* Sent, Message* ErrPlace);
 
 NilState SC_nil__While(Message* msg, NilCheckMode Test);
 
@@ -6890,6 +6888,8 @@ bool SC_Decl_IsUintLike(SCDecl* self);
 
 bool SC_Decl_LoadContained(SCDecl* self, Message* Contained, Message* wrap, SCBase* Name_Space);
 
+bool SC_Decl_LoadContainedSub(SCDecl* self, SCDecl* Cont, Message* wrap, SCBase* Name_Space);
+
 SCDecl* SC_Decl_MakeAsObject(SCDecl* self, SCDecl* Container, Message* ErrPlace);
 
 SCDecl* SC_Decl_MakeBorrowed(SCDecl* self, bool StayBorrowed);
@@ -6897,6 +6897,8 @@ SCDecl* SC_Decl_MakeBorrowed(SCDecl* self, bool StayBorrowed);
 void SC_Decl_MakeContainedObject(SCDecl* self, Message* errplace);
 
 SCDecl* SC_Decl_MakeContainedOptional(SCDecl* self);
+
+SCDecl* SC_Decl_MakeDataTypeWrapper(SCDecl* self, SCBase* Name_Space);
 
 SCDecl* SC_Decl_MakeExistance(SCDecl* self, NilState type, SCDecl* Default);
 
@@ -6910,7 +6912,7 @@ SCDecl* SC_Decl_MakeReal(SCDecl* self);
 
 SCDecl* SC_Decl_MakeSignedIfPossible(SCDecl* self);
 
-bool SC_Decl_MakeStatic(SCDecl* self, SCDecl* R);
+bool SC_Decl_MakeStatic(SCDecl* self, Message* wrap, SCBase* Name_Space);
 
 uint SC_Decl_Match(SCDecl* self, SCDecl* O, int TypeCast, Message* exp);
 
@@ -7388,8 +7390,6 @@ int SC_Msg_FuncPos(Message* self, SCFunction* fn);
 void SC_Msg_FuncWrap(Message* self, Message* fnc);
 
 int SC_Msg_GetAddressOf(Message* self, SCDecl* Type, bool WasCArray);
-
-void SC_Msg_GetAddressOf2(Message* self);
 
 Message* SC_Msg_GetASMFunc(Message* self);
 
@@ -8100,8 +8100,6 @@ int SC_Class_NumericCount(SCClass* self);
 void SC_Class_OverrideSyntax(SCClass* self);
 
 int SC_Class_PassableCount(SCClass* self);
-
-bool SC_Class_PreferAddress(SCClass* self);
 
 void SC_Class_ProcessBehaviours(SCClass* self);
 
