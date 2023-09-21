@@ -411,6 +411,10 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		|| R = ExtractDecl( c.first, name_space )				#require
 		if (C == "--")
 			return R.MakeBorrowed(c.uptotype!=nil)
+		if C == "~"
+			return R.MakeDataTypeWrapper(name_space)
+		if (C == "&")					// pointer
+			return r.GetAddress
 		if (C == "?")
 			return R.MakeOptional
 		if (C == "!")
@@ -428,19 +432,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 	rz = SCDecl.new
 	|| ErrCount = stderr.errorCount
 
-	if f == @brel
-		if (C == "&")					// pointer
-			|| R = ExtractDecl( c.first, name_space )
-				rz = r.GetAddress
-		
-		  elseif (c == "~")				// not a brel anymore?
-			c.become(@bra)
-			|| wrapp = «thg "datatypewrapper"»
-			rz.loadContained(c, wrapp, name_space)				#require
-		  else
-			error c
-	
-	  elseif (f == @item)
+	if (f == @item)
 		|| R = ExtractDecl( c.first, name_space )				#require
 		expect R.isnumeric and (c.last == @num) (c, "Must be numeric")
 		rz.TypeContained = R.Type		// use CopyTypeInfoTo? what does this do even?
@@ -474,29 +466,43 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 
 
 
-function SCDecl.MakeStatic (|SCDecl| R, |bool|)
+function SCDecl.MakeStatic (|Message| wrap, |SCBase| Name_Space, |bool|)
+	|| R = ExtractDecl( wrap, name_space )
 	R.CopyTypeInfoTo(self)
 	is static
 	return true
 
 
 function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Name_Space, |bool|)
-	|| R = ExtractDecl( wrap, name_space )$
 	if contained == @thg and "static"
-		return .MakeStatic(R)
-	
-	|| Cont = ExtractDecl( Contained, name_space )$
-	.type = R.Type
+		return .MakeStatic(wrap, name_space )
+	|| Cont = ExtractDecl( Contained, Name_Space )
+		return .LoadContainedSub(cont, wrap, Name_Space)
 
+/*
+	if (c == "~")
+		|| wrapp = «thg "datatypewrapper"»
+		rz.loadContained(c.first, wrapp, name_space)		#require
+*/
+
+
+// function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Name_Space, |bool|)
+
+function SCDecl.MakeDataTypeWrapper (|SCBase| Name_Space, |scdecl|)
+	|| wrapp = «thg "datatypewrapper"»
+	rz.loadContainedsub(self, wrapp, name_space)
+
+	
+function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCBase| Name_Space, |bool|)
+	|| R = ExtractDecl( wrap, name_space )
+	.type = R.Type
 	.contains = cont.MakeContainedOptional
-	if typewrapper.typenormal.match(R, ktypecastfalse).isnormalmatch
+	if TypeWrapper.typenormal.match(R, ktypecastfalse).IsNormalMatch
 		expect (!Cont.isnormalobject)  ( wrap, "Datatype-wrappers can't contain this." )
 	  else
 		|| RCont = R.Type.Contained				#expect ( wrap, "Not a container class." )
-		// object can match anything. 
-		if (RCont.type != typeobject) and RCont.isnormalobject
+		if (RCont.type != typeobject) and RCont.IsNormalObject
 			RCont.ExpectMatch(cont, 0, nil, wrap)
-
 	return true
 
 

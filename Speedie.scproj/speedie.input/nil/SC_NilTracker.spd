@@ -36,13 +36,9 @@ struct NilTracker
 			  elseif !v
 				debugger 
 			d.nilused = v
-		
-		
-	function SetNilness (|scdecl| d, |nilstate| s)
-		.TestedNilness(d, s)
 	
 	
-	function TestedNilness (|scdecl| d, |nilstate| s, |nilstate|)
+	function SetNilness (|scdecl| d, |nilstate| s, |nilstate|)
 		opt norefcounts
 		|| old = d.nilused
 		if old == s

@@ -92,14 +92,24 @@ function Function (NilTrackerFn)
 		T.UseChildAsReal(fp.first)						// (abc)()
 
 	|| p = prms.first
-	for a in fn.args
-		|| submode = nilcheckmode.nothing
+	for recv in fn.args
+		|| SubMode = nilcheckmode.nothing
 		if p.isfirst and fn.IsNilChecker and (test is Positive)
 			submode = NilCheckMode.PosRed
 		.Jump(p, submode)
-		.VariableSet(a, p.NilDecl, p, 1)
-		if a.pointercount
-		// do the pointer wierdness hee
+
+		|| sent = p.NilDecl
+		if sent.suffersnil
+			|| recnil = recv.NilDeclared
+			check ((recnil is stated) or (sent.NilUsed isnt Nilish)) (p, "Unknown if this parameter accepts nil.")
+	
+	//		if (a and func(&a))
+	
+			.VariableSet(recv, sent, p)
+			if recv.pointercount
+				.VariableSet(recv.internal, sent.internal, p)
+			T.SetNilness(sent, recnil)
+			debugger 										// its too hard to imagine. just figure this out later
 		p++
 
 	|| ret = fn.ReturnType				#require
@@ -184,7 +194,7 @@ function Thing (NilTrackerFn)
 	if test is Active
 		if dcl.NilUsed is Either
 			dcl.ParamUpgrade
-			return T.TestedNilness(dcl, nilstate.realish)
+			return T.SetNilness(dcl, nilstate.realish)
 	
 		if dcl.NilDeclared is Either
 			msg.RedundantTest(dcl.nilused is realish)
@@ -282,7 +292,9 @@ function SetRel (niltrackerfn)
 	|| l = msg.first
 	|| B = .JumpDecl(msg.last) // c++ runs B first...
 	|| A = .JumpDecl(l)
-	.VariableSet(A, B, l, 0)
+	if a.SuffersNil != b.SuffersNil // what?
+	if a.SuffersNil
+		.VariableSet(A, B, l)
 
 
 function JumpDecl (|message| msg, |scdecl|)
@@ -314,41 +326,25 @@ function NilMsg (|message| err, |scdecl| d, |bool| PointerInferred, |string|)
 	return "Nil Error: Don't declare with '?'... or test for nil."
 
 
-function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| ErrPlace, |uint| IsParam) // setrel, relset
+function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| ErrPlace) // setrel, relset
 	opt norefcounts
-	require recv.suffersnil
-
 	if recv.NilDeclared isnt nilish
-		require .FailIfNotReal(ErrPlace, sent, (isparam>>1)!=0)
+		.FailIfNotReal(ErrPlace, sent)
 	  
-	  elseif isparam										// a param that can accept nil
-		|| recnil = recv.nildeclared
-		check ((recnil is stated) or (sent.NilUsed isnt Nilish)) (errplace, "Unknown if this parameter accepts nil.")
-		if IsParam == 2
-			T.SetNilness(sent, recnil)
-			debugger 										// its too hard to imagine. just figure this out later
-			// if (a and func(&a))
-	  else
-		T.SetNilness(recv, sent.nilused)
-		
-	
-	if recv.PointerCount == 1	// |!&!&struct| abc = f
-	// for pointers to pointers? use the declared type!
-		return .VariableSet(recv.internal, sent.internal, errplace, IsParam<<1)
+	T.SetNilness(recv, sent.nilused)
 
 
-
-function FailIfNotReal (|message| err, |scdecl| d, |bool| PointerInferred=false,  |bool|)
+function FailIfNotReal (|message| err, |scdecl| d)
 	opt norefcounts
 	if d.NilUsed isnt Nilish
-		return true
+		return
 
-	if !PointerInferred  and  d is param  and  d.NilDeclared is Stated
+	if d is param  and  d.NilDeclared isnt Stated
 		d.NilDeclared = NilState.real
 		d.nilused = NilState.Realish
-		return true
+		return
 
-	error (err, NilMsg(err, d, PointerInferred))
+	error (err, NilMsg(err, d, false))
 }
 
 
