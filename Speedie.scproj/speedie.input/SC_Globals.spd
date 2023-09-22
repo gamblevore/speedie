@@ -414,15 +414,15 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		if C == "~"
 			return R.MakeDataTypeWrapper(name_space)
 		if (C == "&")					// pointer
-			return r.GetAddress
+			return r.GetAddress(nilstate.Optional)
 		if (C == "?")
 			return R.MakeOptional
 		if (C == "!")
-			return R.MakeReal
+			return R.MakeReal(c.first == "&")
 		if (C == "")					// compiler internal
-			return R
-		if f == @arel
-			error (c)
+			return r
+		error (c)
+		return nil
 
 	if (F == @arg)						// a bit ugly... |{\n\tfaststring\n}|
 		|| d = ExtractDecl(c.first, name_Space)$
@@ -490,7 +490,7 @@ function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCBase| Name_S
 	.type = R.Type
 	.contains = cont.MakeContainedOptional
 	if TypeWrapper.typenormal.match(R, ktypecastfalse).IsNormalMatch
-		expect (!Cont.isnormalobject)  ( wrap, "Datatype-wrappers can't contain this." )
+		check (!Cont.isnormalobject)  ( wrap, "Datatype-wrappers can't contain this." )
 	  else
 		|| RCont = R.Type.Contained				#expect ( wrap, "Not a container class." )
 		if (RCont.type != typeobject) and RCont.IsNormalObject

@@ -16,8 +16,8 @@ class String
 	default			""
 	false			""
 	
-	|int|	Length_
-	|&byte|	Addr
+	|int|		Length_
+	|!&byte|	Addr
 
 
 

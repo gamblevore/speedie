@@ -270,14 +270,14 @@ class SCDecl (SCObject) {
 // that would be a very involved situation. pointers can escape all over
 // better to assume that x is now optional... unless the pointer itself is not optional.
 // of course... the declaredness can be transfered... so we can't set it to nil
-	function GetAddress (|SCDecl|)
+	function GetAddress (|nilstate| opt = nilstate.real, |SCDecl|)
 		rz = SCDecl.new
 		.CopyTypeInfoTo(rz)
 		rz.internal = self
 		
 		rz.PointerCount++
-		rz.NilDeclared = NilState.either	// in case we later set it to nil.
-		rz.NilUsed = NilState.realish		// always exists
+		rz.NilDeclared = opt
+		rz.NilUsed = opt &~ NilState.Stated
 		check (rz.pointercount < 8) (.source, "Too much abstraction")
 	
 	
@@ -787,7 +787,11 @@ class SCDecl (SCObject) {
 			return self
 		return .MakeOptional
 		
-	function MakeReal (|SCDecl|)
+	function MakeReal (|bool| AlterSelf, |SCDecl|)
+		if AlterSelf
+			.NilDeclared = NilState.real
+			.NilUsed = NilState.Realish
+			return self
 		return .MakeExistance(nilstate.real,  .type.TypeVeryExists)
 	
 	function BecomeReal
