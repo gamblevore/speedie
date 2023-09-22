@@ -6,7 +6,7 @@
 // scdecl is actually not bad.
 
 constants
-	// order of badness?
+	// worse errors are higher numbers
 	// don't go to 1024 << 22 ! even 512 risks negative ints.
 	kNeedsAddressOfButAlsoNeedsSuperMatch  = 64 << 22
 	kNeedsAddressOf     = 32 << 22
@@ -787,8 +787,8 @@ class SCDecl (SCObject) {
 			return self
 		return .MakeOptional
 		
-	function MakeReal (|bool| AlterSelf, |SCDecl|)
-		if AlterSelf
+	function MakeReal (|SCDecl|)
+		if .PointerCount
 			.NilDeclared = NilState.real
 			.NilUsed = NilState.Realish
 			return self
