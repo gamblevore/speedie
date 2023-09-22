@@ -210,7 +210,10 @@ function SCClass.GetFlyingMemory (|Message| exp, |SCDecl|)
 		thg.obj = decl 
 		exp <~ thg
 		exp.Become( @BRel, "&" )
-		return Decl.makepointer
+		
+		if !decl.pointercount
+			decl = decl.getaddress(declmode.always)
+		return decl
 
 
 

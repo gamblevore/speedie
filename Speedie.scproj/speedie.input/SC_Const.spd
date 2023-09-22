@@ -43,7 +43,7 @@ function scbase.CollectConstantsSub (|Message| ch)
 
 	for (Line in arg)
 		if (line == @decl)
-			CurrType = ExtractDecl( line.first, self )		#expect line
+			CurrType = ExtractDecl( line.first, self, declmode.Globals )		#expect line
 			line.remove
 			continue
 		

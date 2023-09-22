@@ -122,13 +122,13 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 	|| t = .type
 	|| ot = o.type
 	if (.PointerCount == O.PointerCount + 1)
-		|| OAddr = O.GetAddress
+		|| OAddr = O.GetAddress(declmode.Always)
 		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
 			return exp.GetAddressOf(OAddr)
 
 
 	if (o.c_array) and (.pointercount == 1)
-		|| oaddr = o.GetAddress
+		|| oaddr = o.GetAddress(declmode.Always)
 		oaddr.C_Array = 0
 		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
 			return exp.GetAddressOf(OAddr, true)

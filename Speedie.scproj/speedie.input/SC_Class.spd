@@ -83,7 +83,7 @@ constructor (|Message| node, |SCBase| parent)
 	.TypeVeryExists = T.NilConstructor(NilState.Real * !IsDataType)
 	
 	if node == "struct"
-		T = T.GetAddress
+		T = T.GetAddress(declmode.Always)
 	  else
 		T = T.Copy
 	.SelfDecl = T
@@ -416,7 +416,7 @@ function NewClassNew (|SCFunction| con, |Message| src, |int| ExtraCode)
 	|| NewParams		= src[ @prm, 1 ]
 	|| A				= con.Source.Second
 	|| rsrc				= result.source
-	|| TypeStr			= rsrc.FindNested(@thg, "type")
+	|| TypeNode			= rsrc.FindNested(@thg, "type")
 	
 	if A == @prm or @list
 		|| CallParams = rsrc.FindNested(@dot).last
@@ -424,7 +424,7 @@ function NewClassNew (|SCFunction| con, |Message| src, |int| ExtraCode)
 			NewParams  <~ dcl.Copy(Src)
 			CallParams <~ dcl.GetDclName.Copy(src)
 	
-	typestr.ReplaceWith(.TypeNormal.writetype)
+	TypeNode.ReplaceWith(.TypeNormal.writetype)
 	NewParams <~ .TypeNormal.WriteDeclFull
 
 

@@ -255,29 +255,15 @@ class SCDecl (SCObject) {
 		.type = Value
 		.contains := Value.contained
 			
-		
-	function MakePointer (|SCDecl|)
-		if .PointerCount
-			return self
-		return .GetAddress
 
-
-// what if we do:
-// x = obj()
-// p = &x
-// *p = nil
-// now what? does the compiler know that x is now nil?
-// that would be a very involved situation. pointers can escape all over
-// better to assume that x is now optional... unless the pointer itself is not optional.
-// of course... the declaredness can be transfered... so we can't set it to nil
-	function GetAddress (|nilstate| opt = nilstate.real, |SCDecl|)
+	function GetAddress (|declmode| Purpose, |SCDecl|)
 		rz = SCDecl.new
 		.CopyTypeInfoTo(rz)
 		rz.internal = self
 		
 		rz.PointerCount++
-		rz.NilDeclared = opt
-		rz.NilUsed = opt &~ NilState.Stated
+		rz.NilUsed = Purpose.Policy
+		rz.NilDeclared = rz.NilUsed (|) NilState.Stated
 		check (rz.pointercount < 8) (.source, "Too much abstraction")
 	
 	
@@ -622,7 +608,7 @@ class SCDecl (SCObject) {
 			return .contains.MiniMatch(ty)
 		
 		
-	function WriteType (|bool|minimal = false, |Message|)
+	function WriteType (|bool| minimal = false, |Message|)
 		opt norefcounts
 		|| simple = .WriteSimpleType
 		if !.Contains or (minimal and .AlreadyContains)
@@ -652,10 +638,27 @@ class SCDecl (SCObject) {
 			»
 		if self is borrowed
 			rz = «arel "--", rz »
-		if .SuffersNil and .NilDeclared is Optional
-			rz = «arel "?", rz »	// depends if this is for debug?
-									// for debug I'd rther not see ! all over
-									// for code use... we need the "!" ?
+		if (.SuffersNil) // hmmm.... well heres the thing...
+						 // without a declmode, we can't know what the default state is
+						 // so we can't avoid writing this.
+						 // that or we have to simplify the rules... objects and pointers are always real
+						 // unless stated.
+						 
+						 // I dont like the declmode... really. I do like the "implicit param" though
+						 // but I don't like how it renders with "!" for all params, then.
+						 
+						 // I think this is the same. I GOTTA BE BRAVE.
+						 
+						 // DO WHAT YOU WANT. 
+			//|| normal = purpose.policy(.pointercount > 0)
+			|| ND = .nildeclared
+			//if (ND == nilstate.real)
+			//	rz = «brel "!", rz »
+			if (ND == nilstate.Optional) /// pointers are already optional
+				rz = «brel "?", rz »	// depends if this is for debug?
+										// for debug I'd rther not see ! all over
+										// for code use... we need the "!" ?
+				
 	
 	
 	function CreateSimpleTypeCast (|Message| exp, |Message|)
@@ -671,6 +674,7 @@ class SCDecl (SCObject) {
 		rz <~ exp
 		rz <~ .WriteType
 		rz.obj = self
+
 
 	function RenderType (|string|)
 		return .WriteType.render
@@ -781,23 +785,27 @@ class SCDecl (SCObject) {
 		// this becomes declared optional...
 		// the default state is "either" (undeclared)
 		return .MakeExistance(nilstate.optional, .type.TypeOptional)
+
 	
 	function MakeContainedOptional (|scdecl|)
 		if .NilDeclared is Stated
 			return self
 		return .MakeOptional
-		
+	
+	
 	function MakeReal (|SCDecl|)
 		if .PointerCount
 			.NilDeclared = NilState.real
 			.NilUsed = NilState.Realish
 			return self
 		return .MakeExistance(nilstate.real,  .type.TypeVeryExists)
-	
+
+
 	function BecomeReal
 		if .NilDeclared isnt Stated
 			.NilDeclared = NilState.Real
-			.NilUsed = NilState.realish	
+			.NilUsed = NilState.realish
+
 
 	function MakeExistance (|nilstate| type, |scdecl| Default, |scdecl|)
 		opt norefcounts

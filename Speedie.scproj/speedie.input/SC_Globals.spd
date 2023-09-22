@@ -28,7 +28,7 @@ function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 	|| exp0 = exp.first
 	|| N = exp0.next
 	|| Old = TypeOfExpr( exp0, name_space, side )								#require
-	|| New = ExtractDecl( N, name_space )										#require
+	|| New = ExtractDecl( N, name_space, declmode.TypeCast )										#require
 	// allow MOST typecasts, but NOT typecasts between struct instances...
 	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
 		error (exp, "Can’t cast between structs/carrays (pointers to structs are OK though)")
@@ -135,7 +135,7 @@ function TypeOfBRel (ExprResolver)
 		
 	  elseif name == "&"
 		require F.CanGetAddress(name_Space)
-		return Subtype.GetAddress
+		return Subtype.GetAddress(declmode.Always)
 		
 	  elseif name == "!"
 		|| cond = ExpandToBool( F, name_space )$
@@ -363,19 +363,19 @@ function ExtractAmount (|Message| Prms, |SCBase| name_space, |SCDecl| R, |bool|)
 	return true
 
 
-function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
+function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCDecl|)
 	// a bit recursive!
 	|| f = c.func
 	
 	if (f == @Decl)
-		Return ExtractDecl( c.first, name_space )
+		Return ExtractDecl( c.first, name_space, purpose )
 	
 	if (f == @Emb)
 		check (!c.first) (c)
 		return nil
 	
 	if (f == @Bra)
-		return extractdecl(c.first, name_space)
+		return extractdecl(c.first, name_space, purpose)
 		
 	if (f == @sthg) and (c == "...")
 		return name_space.RequireContained( c )
@@ -390,7 +390,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 	if (c == @Acc)		// |Byte[10]| TenBytes
 		|| Prms = c[1]
 		if prms.HasAny
-			|| R = ExtractDecl( c.first, name_space )			#require
+			|| R = ExtractDecl( c.first, name_space, purpose )			#require
 			R = R.copy
 			expect  ExtractAmount( Prms, name_space, R )   ( c, "Expected something like: |Type[10]|" )
 			return R
@@ -404,28 +404,31 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 		c <~ fi
 	
 	if (f == @func)
-		|| R = ExtractDecl( c.first, name_space )				#require
+		|| R = ExtractDecl( c.first, name_space, purpose )				#require
 		return R.RefineDecl(c.last)
 	
 	if (f == @Arel or @brel)
-		|| R = ExtractDecl( c.first, name_space )				#require
+		|| R = ExtractDecl( c.first, name_space, purpose )				#require
 		if (C == "--")
 			return R.MakeBorrowed(c.uptotype!=nil)
 		if C == "~"
-			return R.MakeDataTypeWrapper(name_space)
-		if (C == "&")					// pointer
-			return r.GetAddress(nilstate.Optional)
+			return R.MakeDataTypeWrapper(name_space, purpose)
+		if (C == "&")											// pointer
+			return r.GetAddress(purpose)
 		if (C == "?")
+			if (R.nildeclared == nilstate.Optional) and (purpose.policy==nilstate.Optional)
+				deprecate (c, "Already optional.")
 			return R.MakeOptional
 		if (C == "!")
+			if R.nildeclared == nilstate.real
+				deprecate (c, "Already real.")
 			return R.MakeReal
-		if (C == "")					// compiler internal
-			return r
-		error (c)
-		return nil
+		if (C.name)												// emptyname = compiler internal
+			error (c)
+		return r
 
-	if (F == @arg)						// a bit ugly... |{\n\tfaststring\n}|
-		|| d = ExtractDecl(c.first, name_Space)$
+	if (F == @arg)												// a bit ugly... |{\n\tfaststring\n}|
+		|| d = ExtractDecl(c.first, name_Space, purpose)$
 		(d is compilercreated)
 		return d
 
@@ -433,7 +436,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 	|| ErrCount = stderr.errorCount
 
 	if (f == @item)
-		|| R = ExtractDecl( c.first, name_space )				#require
+		|| R = ExtractDecl( c.first, name_space, purpose )				#require
 		expect R.isnumeric and (c.last == @num) (c, "Must be numeric")
 		rz.TypeContained = R.Type		// use CopyTypeInfoTo? what does this do even?
 		
@@ -443,18 +446,18 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 			Return TypeArray.TypeNormal
 		
 		expect (ch != @Item) (c)
-		rz.Contains = ExtractDecl( ch, name_space ).MakeContainedOptional
+		rz.Contains = ExtractDecl( ch, name_space, purpose ).MakeContainedOptional
 		rz.TypeContained = TypeArray
 		
 	  elseif (f == @Adj)
 		deprecate (c, "Use 'of' instead.")
-		rz.LoadContained(c.first, c.last, name_Space)			#require
+		rz.LoadContained(c.first, c.last, name_Space, purpose)			#require
 		
 	  elseif (f == @rel)
-		|| op = c[@opp, 1]										#require
+		|| op = c[@opp, 1]												#require
 		op.expect(@opp, "of")
-		|| contained = c[nil, 2]								#require
-		rz.loadContained(contained, c.first, name_Space)		#require
+		|| contained = c[nil, 2]										#require
+		rz.loadContained(contained, c.first, name_Space, purpose)		#require
 		
 	  elseif (ErrCount == StdErr.errorCount)
 		error ( c ) // no spam
@@ -466,27 +469,27 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |SCDecl|)
 
 
 
-function SCDecl.MakeStatic (|Message| wrap, |SCBase| Name_Space, |bool|)
-	|| R = ExtractDecl( wrap, name_space )
+function SCDecl.MakeStatic (|Message| wrap, |SCBase| Name_Space, |declmode| Purpose, |bool|)
+	|| R = ExtractDecl( wrap, name_space, purpose )
 	R.CopyTypeInfoTo(self)
 	is static
 	return true
 
 
-function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Name_Space, |bool|)
+function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Name_Space, |declmode| Purpose, |bool|)
 	if contained == @thg and "static"
-		return .MakeStatic(wrap, name_space )
-	|| Cont = ExtractDecl( Contained, Name_Space )
-		return .LoadContainedSub(cont, wrap, Name_Space)
+		return .MakeStatic(wrap, name_space, purpose )
+	|| Cont = ExtractDecl( Contained, Name_Space, purpose )
+		return .LoadContainedSub(cont, wrap, Name_Space, purpose)
 
 
-function SCDecl.MakeDataTypeWrapper (|SCBase| Name_Space, |scdecl|)
+function SCDecl.MakeDataTypeWrapper (|SCBase| Name_Space, |declmode| Purpose, |scdecl|)
 	|| wrapp = «thg "datatypewrapper"»
-	rz.LoadContainedSub(self, wrapp, name_space)
+	rz.LoadContainedSub(self, wrapp, name_space, purpose)
 
 	
-function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCBase| Name_Space, |bool|)
-	|| R = ExtractDecl( wrap, name_space )
+function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCBase| Name_Space, |declmode| Purpose, |bool|)
+	|| R = ExtractDecl( wrap, name_space, purpose )
 	.type = R.Type
 	.contains = cont.MakeContainedOptional
 	if TypeWrapper.typenormal.match(R, ktypecastfalse).IsNormalMatch
@@ -547,7 +550,7 @@ function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |
 		if obj isa SCModule
 			|| cls = obj.Cls				#expect ( exp, "Can’t use a module here." )
 			|| T = cls.ClassType
-				return T.GetAddress
+				return T.GetAddress(declmode.Always)
 
 
 function Message.SCFile (|SCFile|)

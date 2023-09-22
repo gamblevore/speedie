@@ -95,7 +95,7 @@ function Message.CollectFuncPrm (|scfunction| func, |SCBase| Recv, |scclass| cls
 		.addvalue(func)
 
 	if .Expect(@decl)
-		|| dcl = .CollectDecl(func, recv, 4, func.args, cls, func)
+		|| dcl = .CollectDecl(func, recv, declmode.FuncParam, func.args, cls, func)
 			(dcl is param)
 			(dcl isnt altered)
 			return true
@@ -110,9 +110,10 @@ function SCClass.CollectDeclsProperties (|bool|)
 			require item.CollectProp( self)
 	return true
 
+
 function Message.CollectProp (|scclass| cls, |bool|)
 	opt norefcounts
-	|| dcl = .collectdecl( cls.modul, cls, 3, cls.properties, cls, nil)
+	|| dcl = .collectdecl( cls.modul, cls, declmode.properties, cls.properties, cls, nil)
 		(dcl is property)
 		dcl.becomereal
 		return true
@@ -128,7 +129,7 @@ function CollectDeclsGlobals (|Message| arg, |SCBase| scarg)
 
 function Message.CollectAGlobalDecl (|SCBase| scarg, |bool|)
 	opt norefcounts
-	|| dcl = .CollectDecl(scarg, scarg, 1, nil, nil, nil)	
+	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals, nil, nil, nil)	
 		(dcl is property)
 		(dcl is onmodule)
 		return true
@@ -144,7 +145,7 @@ function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg)
 
 function Message.CollectFromBody (|SCBase| scarg, |bool|)
 	opt norefcounts
-	|| dcl = .CollectDecl(scarg, scarg, 8, nil, nil, nil)
+	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody, nil, nil, nil)
 		|| def = dcl.Default
 			check (def != @thg or def.name ~!= dcl.name) (def, "Same name!")
 		return true
@@ -171,7 +172,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 		expect (names == @thg) (names, "Must be a proper name (a-z or unicode-letters)")
 
 	|| Default = DeclsDefault( names )
-	|| Sdcl = ExtractDecl( Types, P )
+	|| Sdcl = ExtractDecl( Types, P, mode )
 	if (!sdcl and !default and (P isa SCArg))
 		sdcl = P.ParentFunc.ReturnType
 
@@ -262,9 +263,36 @@ function scdecl.Containedfix (|scdecl|)
 	rz.contains = t.SelfDecl.Contains
 
 
-function message.addvalue (|scfunction| f)
+function message.AddValue (|scfunction| f)
 	opt norefcounts
 	pragma inline
 	if !.HasChildCount(2)
 		using f.source
 			self <~ «thg "Value"»
+
+
+datatype DeclMode (uint)
+	constants
+		|DeclMode|
+		FuncParam	= 4
+		Properties	= 3
+		Globals		= 1
+		FunctionBody = 8
+		Proto		= 16
+		ProtoParam	= FuncParam + Proto
+		TypeCast	= Properties
+		Always		= 32
+	
+	syntax isnt (|DeclMode|o, |bool|)
+		return self != o
+
+	syntax is (|DeclMode|o, |bool|)
+		return self == o
+
+	function Policy (|nilstate|)
+		if self == FuncParam or functionbody
+			return nilstate.either
+		if self == Globals or properties or proto or Always
+			return nilstate.realish
+		debugger
+		return nilstate.realish // right?

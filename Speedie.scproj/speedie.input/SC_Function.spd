@@ -694,7 +694,7 @@ function DeclsProtoTypeRemove (|SCClass| fpType, |Message| ch0, |bool| AssumeSel
 		p.first.remove // ooof
 	if (!AssumeSelf)
 		ch0 = p[@Decl][@thg]						#require
-		|| decl = ExtractDecl( ch0, nil )			#expect p
+		|| decl = ExtractDecl( ch0, nil, declmode.ProtoParam )			#expect p
 		expect (decl isa .cls.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
 		ch0.parent.Remove
 

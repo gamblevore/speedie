@@ -1395,9 +1395,9 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_RenderNum (fpMsgRenderCpp)
 		fs <~ .name
-		|| d = .asdecl$
-		if d.type.typeinfo == datatypecode.float
-			fs <~ 'f'
+		|| d = .asdecl
+			if d.type.typeinfo == datatypecode.float
+				fs <~ 'f'
 
 
 	function C_RenderBra (fpMsgRenderCpp)
@@ -1450,8 +1450,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderStr (fpMsgRenderCpp)
-		/// hmmmm? this shouldn't happen? Where do we need cstrings even?
 		fs.appendcpp(.name)
+
 	
 	function Faststring.AppendCppAll (|string| s)
 		self <~ '"'
@@ -1459,6 +1459,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			self <~ `\x`
 			.appendhex(c, 2)
 		self <~ '"'
+
 		
 	function Faststring.AppendCpp (|string| s)
 		self <~ '"'
@@ -1489,7 +1490,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		if (.obj isa SCDecl) // it should be?
 			WriteDeclNoName( .AsDecl, fs )
 		  else
-			self[1].Export( fs )
+			.second.Export( fs )
 		
 		fs <~ ')'
 

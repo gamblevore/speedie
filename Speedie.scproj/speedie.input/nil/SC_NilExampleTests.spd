@@ -4,12 +4,19 @@
 class NilTest
 	|int|		V
 	|string|	V2
+	|?&byte|	V3
+	|&byte|		V4
 	
 	function AndTest (|string?| a, |string?| b)
 		"nilcheck"
 		if (a and b)
 			|| x = a.Addr
 			|| y = b.Addr
+			|| v3 = .v3
+			|| v4 = .v4
+			if (v3 and v4 and x and y)
+				"nilcheck"
+			
 	
 	function TernTest
 		|| a = ("a",nil)(0.5[])
