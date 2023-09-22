@@ -7,7 +7,7 @@ dispatch fn_asm_table (fn_asm)
 		for ch.fast in exp
 			.µ(ch, garb)
 		.closevars(OV)
-			
+
 
 	@decl: // yay
 		debugger
@@ -15,6 +15,8 @@ dispatch fn_asm_table (fn_asm)
 
 	@num:
 		debugger
+
+
 	@rel:
 		opt norefcounts
 		|| OV = .openvars
@@ -27,18 +29,18 @@ dispatch fn_asm_table (fn_asm)
 		// what if this is a constant?
 		|| d = exp.AsDecl #debug_require
 		if d is const // we want a number, really
-		|| r = d.dregister
+		|| r = d.DReg
 		if r.reg
 			return r
 		return .AllocReg(exp, d, reg)
-	
-	
+
+
 	@bra:
 		opt norefcounts
 		|| f = exp.first
-		if f != @arg
-			return .µ(f, reg)
-		return ASMtmp.StateExpr(self, f)
+			if f.func != @arg
+				return .µ(f, reg)
+			return ASMtmp.StateExpr(self, f)
 
 
 	@list: // vectors
@@ -49,7 +51,7 @@ dispatch fn_asm_table (fn_asm)
 		opt norefcounts
 		// 0, a, b, fn(), b*b, a*a
 		// 0, a, b, b*b, a*a, fn()
-		rz = .DoFunc(exp.last, reg)
+		rz = .DoFunc(exp.last!, reg)
 
 
 	@acc: // pointers?
@@ -85,9 +87,10 @@ dispatch fn_asm_table (fn_asm)
 		debugger
 	
 	63:
+		0
 
 
-datatype ASMtmp (MsgUIFlags)
+datatype ASMtmp (uint16)
 	module {
 	function StateExpr	(fn_asm)
 	function Debugger	(fn_asm)
@@ -116,20 +119,27 @@ datatype ASMtmp (MsgUIFlags)
 		|asmtmp| 
 		kElseIf = 1
 		kIf
-		kTern
 		kWhile
-		kRejoin
-		kReturn
-		kExit
 		kContinue
+		kExit
+		kReturn
+		kRejoin
 		kSwap
+		kTern
+		kStatementExpression
 		kSetVar
 		kDebugger
+		kFail
 	
 
-function Message.TmpType (|ASMTmp|)
-	return .flags & 63
 
-function Message.TmpType (assigns:|ASMTmp| value)
-	.flags = (.flags &~ 63) (|) value
+// for some reason, replacing this will cause speedie to generate bad code
+// I guess I am setting the Flags somewhere, or testing them? but I can't see where.
+
+function Message.TmpType (|ASMTmp|)
+	rz = .FLAGS & 63
+
+function Message.TmpType (assigns:|ASMTmp|)
+	value = (.FLAGS &~ 63) ||| value
+	.FLAGS = value 
 

@@ -1,0 +1,178 @@
+
+
+prototype PicoThreadFn (|&pico| Comms, |&nil| Obj, |&cstring| Args=nil, |bool|)
+
+
+
+struct PicoMessage
+	linkage: wrapper, cpp_part Pico
+	|int|			Length
+	|?&char|		Data
+	
+	syntax cast (|bool|)
+		if self
+			return .data
+	
+	module
+		function From (|string| s, |PicoMessage|)
+			rz.length = s.length
+			rz.data = s.addr|&char|
+		function FromFS (|faststring| fs, |PicoMessage|)
+			rz.length = fs.length
+			rz.data = fs.ResultPtr|&char|
+
+
+function @string.FromPico (|picomessage| M, |string|)
+	|| x = m.data|&byte|
+		return string.own(x, M.length)
+
+
+struct Pico
+	linkage: wrapper, cpp_part Pico, cpp_class PicoComms
+		
+
+	function CreateChild (|&pico|)
+		cpp_wrapper PicoChild
+
+	function IsParent (|bool|)
+		cpp_wrapper PicoIsParent
+		
+	function CanGet (|bool|)
+		cpp_wrapper PicoCanGet
+		
+	helper StartFork (|bool| Exec=false, |PID_Int|)
+		cpp_wrapper PicoStartFork
+
+	function StartThread (|PicoThreadFn| fn, |&nil| Obj, |?&cstring| Args = nil, |bool|)
+		cpp_wrapper PicoStartThread
+
+	function CompleteExec (|bool|)
+		cpp_wrapper PicoCompleteExec
+	
+	syntax append (|string| str, |bool| Wait=false, |bool|)
+		cpp_part SendString
+		return .send(picomessage.From(Str), wait)
+
+	syntax append (|faststring| fs, |bool| Wait=false, |bool|)
+		cpp_part SendFS
+		rz = .send(picomessage.Fromfs(fs), wait)
+		fs.length = 0
+		
+	function Send (|PicoMessage| msg, |bool| Wait=false, |bool|)
+		cpp_wrapper PicoSend
+
+	function Config (|&PicoConfig|)
+		// this should not allow a nil-self. why does it?
+		cpp_wrapper PicoCommsConf
+	
+	helper __Get (|float| T, |PicoMessage|)
+		nil checker
+		cpp_wrapper PicoGet
+
+	function Get (|float| T, |string|)
+		nil checker
+		return string.FromPico(.__get(T))
+		
+	function Close (|cstring| Why)
+		cpp_wrapper PicoClose
+	
+	function Status (|ErrorInt|)
+		nil checker
+		cpp_wrapper PicoError
+	
+	function IsOK (|bool|)
+		nil checker
+		|| s = .status
+		return s == 0 or 255
+
+	function IsSending (|bool|)
+		cpp_wrapper PicoStillSending
+		
+	
+	function Fork (|&pico|)
+		|| f = .startfork
+		if f >= 0
+			return self
+
+	module
+		|?&pico| Parent_
+		function Conf (|&PicoGlobalConfig|)
+			cpp_wrapper PicoGlobalConf
+			
+		function SleepForSend (|float| During=5.0, |float| After = 0.5)
+			cpp_wrapper PicoSleepForSend
+		
+		function Start
+			cpp_wrapper PicoStart
+
+		function Destroy (|&(?&pico)| Where, |Cstring| Why)
+			cpp_wrapper PicoDestroy
+			
+		function Replace (|&&pico| Where, |bool|)
+			|| New = pico.new #require
+			.destroy(where, "replace")
+			*where = new
+			return true
+
+
+		function HasParentSocket (|bool|)
+			cpp_wrapper PicoHasParentSocket
+			
+		function Create (|?&pico|)
+			cpp_wrapper PicoCreate
+
+		function New  (|stringzeroterminated| name="", |int| bits=16, |&pico|)
+			|| p = pico.Create
+				|| c = p.config
+				c.name = name
+				c.bits = bits
+				return p
+			|PicoGlobalStats| St
+			St.Read
+			error ("Couldn't create a pico object. Too many picos: " + St.OpenPicos)
+				
+			
+		function Parent (|&pico|)
+			|| p = .Parent_
+				return p
+			require .HasParentSocket
+			rz = pico.new
+			.Parent_ = rz
+			if rz
+				rz.CompleteExec
+	
+
+struct PicoConfig
+	linkage: wrapper
+	|cstring|					Name
+	|Date|						LastRead
+	|Date|						LastSend
+	|int|						Noise
+	|float|						SendTimeOut
+	|int|						SendFailCount
+	|int|						ReadFailCount
+	|int|						QueueBytesRemaining
+	|int|						Bits
+
+
+struct PicoGlobalConfig
+	linkage: wrapper
+	|Date|						LastActivity
+	|Date|						TimeOut
+	|int|						TimeOutExitCode
+	|int|						DesiredThreadCount
+	|bool|						SuicideIfParentDies
+	
+
+struct PicoGlobalStats
+	linkage: wrapper
+	|int|						TimeOutCount
+	|int|						OpenSockets
+	|int|						OpenPicos
+
+	function Read
+		cpp_wrapper PicoStats
+	module
+		function Read (|PicoGlobalStats|)
+			rz.read
+

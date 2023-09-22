@@ -1,40 +1,39 @@
 #!/usr/local/bin/speedie
 
 
-function app.Usage (|string|)
-	return "Usage: ${.filename} File1 [File2...]
+// * refering to the previous chunk could really make compression tighter.
+
+
+app.Usage = "Usage: jz File1 [File2...]
 Convert files between jbin, box, xml formats. Additionally can compress or decompress.
 
-    -j              Convert to jeebox
-    -b              Convert to jbin
-    -c              Compress
-    -c=0            Compress for very-fast decompress
-    -s              Replace file in-place
-    -p              Print to stdout
-    -r              Just report types, otherwise do nothing
-    -o=name         Sets the output filename
-    -d=j/b/m/x      Detect only specified type.
-                    j = jeebox, b = jbin, m = compressed, x = xml
+	-box -b			Convert to jeebox
+	-bin -n			Convert to jbin
+	-c				Compress (c=0 to c=6)
+	-s				Replace file in-place
+	-json			Source is json
+	-p				Print to stdout
+	-r				Just report types, otherwise do nothing
+	-o=name			Sets the output filename
 
 examples:
-    jz -j A.xml   					// xml to jeebox
-    jz -c A.xml   					// compress A.xml into A.xml.mz
-    jz    A.txt.mz   				// decompress A.txt.mz to A.txt
-    jz -b A.box   					// jeebox to jbin
-    jz -b A.xml   					// xml to jbin
-"
+	jz -box A.xml						// xml to jeebox
+	jz -b   A.xml						// same
+	jz -c   A.xml						// compress A.xml into A.xml.mz
+	jz      A.txt.mz					// decompress A.txt.mz to A.txt
+	jz -bin A.box						// jeebox to jbin
+".tabstospaces
 
 
 datatype Type (int)
 	flags
-		ReadOK, Compressed, PreComp, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace, TestComp
+		ReadOK, Compressed, PreComp, Plain, XML, Json, actions=(Box, Jbin, Report), StdOut, SelfReplace, TestComp
 	
 	syntax is (|Type| test, |bool|)
 		return self & test 
-	syntax isnt (|Type| test, |bool|)
-		return !(self & test)
+
 	function Format (|Type|) 
-		return self & (Box (|) jbin (|) xml)
+		return self & (Box ||| jbin ||| xml ||| json)
 	
 	render
 		if self is Compressed
@@ -43,6 +42,8 @@ datatype Type (int)
 			fs <~ "jbin"
 		  elseif self is box
 			fs <~ "jeebox"
+		  elseif self is json
+			fs <~ "json"
 		  elseif self is xml
 			fs <~ "xml"
 		  else // speedie can't put this on a single line. C++ compile-error!
@@ -51,8 +52,12 @@ datatype Type (int)
 
 function app.UseOne (|file| f)
 	conv.in = f
-	conv.out = conv.OutPath
-	if conv.in.IsDir
+	|| op = conv.OutPath
+	conv.out = op
+	conv.RealOut = op
+	if conv.Dest is selfreplace
+		conv.realout = op.AddExt("jztmp").file
+	if conv.in!.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
 	  elseif (conv.dest is TestComp)
@@ -69,24 +74,24 @@ function app.UseAll (|file| start)
 		  elseif c.IsLink
 			printline "Can't recursively enter link: " + c
 		  elseif c.visible
-			.useall(c) 
+			.UseAll(c) 
 	
 main {
 	if !app.args
-		print .usage
+		print app.usage
 		return 0
 
-	conv.Dest = .GetActions$
+	conv.Dest = app.GetActions$
 	expect (conv.Dest.Format.CountBits <= 1) ("Error: Multiple formats specified.")
 	
 	|| GotAll = false
 	for r in app.args
 		if r == "**"
 			expect (!GotAll) ("Can't use '**' twice.")
-			.useall(app.cwd.file)
+			app.useall(app.cwd.file)
 			GotAll = true
 		  else
-			.useone(r.file)
+			app.useone(r.file)
 	
 	if (stderr.ok) and (!conv.done) and (conv.dest isnt report)
 		"Nothing to do. All files already in destination format."
@@ -102,9 +107,9 @@ function App.GetActions (|Type|)
 		|| v = s.ArgValue
 		if name ~= "r"
 			rz |= type.report
-		  elseif name ~= "j"
+		  elseif name ~= "b" or "box" or "jeebox"
 			rz |= type.box
-		  elseif name ~= "b"
+		  elseif name ~= "n" or "bin" or "jbin"
 			rz |= type.jbin
 			if v=="2"
 				rz |= type.precomp
@@ -114,12 +119,6 @@ function App.GetActions (|Type|)
 		  elseif name ~= "p"
 			rz |= type.stdout
 			.SingleFile(name)
-		  elseif name ~= "d"
-			|| x = type.compressed * (v contains 'm')
-			x |= type.xml  * (v contains 'x')
-			x |= type.jbin * (v contains 'b')
-			x |= type.box  * (v contains 'j')
-			conv.DetectOnly = x
 		  elseif name ~= "test"
 			rz |= type.TestComp
 			rz |= type.compressed
@@ -128,6 +127,8 @@ function App.GetActions (|Type|)
 			if v!="true"
 				conv.DefaultStrength = v.int|int| max MZLab.Fastest
 				v="true"
+		  elseif name ~= "json"
+			conv.detected |= type.json
 		  elseif name ~= "o"
 			Conv.destpath = v
 			.SingleFile(name)
@@ -144,9 +145,9 @@ function App.GetActions (|Type|)
 module Conv
 	|string|		Data
 	|file|			In
+	|file| 			RealOut
 	|file| 			Out
 	|date|			Start
-	|type| 			DetectOnly = -1
 	|type| 			Dest
 	|type| 			Detected
 	|float| 		Size
@@ -161,7 +162,7 @@ module Conv
 		|| s = .speed.GetResult
 			printline s
 		.in = nil
-		.data = nil
+		.data = ""
 		.start = nil
 		.ast = nil
 		.Detected = nil
@@ -169,10 +170,10 @@ module Conv
 	
 
 	function TestOne
-		require .in.MustExist("test compression")
-		.done++
 		|| OrigIn = .in
 		|| OrigOut = .out
+		require OrigIn and origout and OrigIn.MustExist("test compression")
+		.done++
 		.DefaultStrength = MZLab.Fast
 
 		.TestSub(origIn)
@@ -182,7 +183,7 @@ module Conv
 		.DefaultStrength = MZLab.Strong
 		.TestSub(origIn)
 
-		.del(.out, origin)		
+		.del(.out!, origin)		
 		.del(origout, origin)
 
 	
@@ -200,12 +201,12 @@ module Conv
 		require stderr.ok
 
 		.in = .out
-		.out = (.in + ".back").file
+		.out = (.in! + ".back")
 
 		.CompressOnly(true)
 		require stderr.ok
 		
-		.out.CompareFile(Orig, Orig)
+		.out!.CompareFile(Orig, Orig)
 
 
 	function Time (|string| Name, |bool| compress=false)
@@ -224,9 +225,9 @@ module Conv
 
 		
 	function CompressOnly (|bool| Decomp)
-		printline .out|string|
-		|| d = .out.out
-		|| src = .in.in
+		printline .out!|string|
+		|| d = .realout!.out
+		|| src = .in!.in
 		require src!=nil and d != nil
 		.start = date() 
 		if Decomp
@@ -235,19 +236,17 @@ module Conv
 			.time("Decompress(streamed )", true)
 		  else 
 			|| typ = ("µz", "ro")(.defaultstrength < mzlab.strong)
-			.size = .in.size
+			.size = .in!.size
 			src.CompressInto(d, DefaultStrength) 
 			.time("Compress(streamed $typ)", true)
+		if dest is selfreplace
+			.RealOut!.MoveTo(.out!)
 	
 
 	function Read (|bool|)
 		|| OrigSize = 0
 		|| CmpFormat = .FormatInfo(OrigSize)
 		
-		if .DetectOnly != -1 
-			require .Detected & .detectonly
-			printline "Found: ${.in.path}"
-
 		ifn Dest&type.Actions
 			if (CmpFormat.length > 0) != (dest is compressed)
 				.done++
@@ -256,11 +255,11 @@ module Conv
 		.done++
 		
 		if (Dest is report) and CmpFormat
-			"$.in is: ${OrigSize.strsize} compressed to ${.in.size.strsize} ($CmpFormat)"
+			"$.in! is: ${OrigSize.strsize} compressed to ${.in!.size.strsize} ($CmpFormat)"
 			return 0
 				
 		.start = date()
-		.data = .in.ReadAll(int.max, false)
+		.data = .in!.ReadAll(int.max, false)
 		if .data != string.error
 			.Detected |= type.ReadOK
 		if (Dest is report) and (.data == "")
@@ -288,7 +287,8 @@ module Conv
 		if .AST
 			.time("Parse")
 		  elseif (dest is box or jbin) or  .data.IsJbin
-			StdErr.Errors.Last.name += "\nUnable to parse input file for conversion to jeebox"
+			|| err = StdErr.Errors.Last
+				err.name += "\nUnable to parse input file for conversion to jeebox"
 		  else
 			stderr.pop				// otherwise no.
 		.done++
@@ -297,6 +297,12 @@ module Conv
 			.detected |= type.plain
 		  elseif .data.IsJbin
 			.detected |= type.jbin
+		  elseif .in isa "json"
+			.detected |= type.json
+			if dest isnt report
+				.start = date.now
+				.AST.ConvertJSONToJB
+				.time("Convert JSON")
 		  elseif .AST.Find(@xml)
 			.detected |= type.xml
 			if dest isnt report
@@ -309,12 +315,8 @@ module Conv
 		return StdErr.ok
 
 
-	function Transform (|bool|) 
-		|faststring| fs
-		if dest isnt compressed
-			fs = .out.Out							#require
-
-		if .AST and (Detected.format != Dest.format)
+	function ConvertDataFormat (|faststring| fs)
+		if .AST
 			.Start = date.now
 			if dest is jbin
 				.data = .AST.renderjbin(fs)
@@ -322,22 +324,37 @@ module Conv
 				.data = .AST.Render(fs)
 			.time("Render")
 
-		if .dest is compressed 
+		
+	function Transform
+		|| FmtSame    = Detected.format == Dest.format
+		|| PathSame = .in.path == .out.path
+		if (FmtSame and PathSame)
+			"Nothing to do for: $.out"
+			return
+		
+		|| fs = .realout!.Out							#require
+		if dest isnt compressed 
+			.ConvertDataFormat(fs)
+		  else
 			.start = date.now
-			fs = .out.out							#require
+			.ConvertDataFormat(nil)
 			.data.Compressinto(fs, .DefaultStrength)
 			.time("Compress")
-
-		fs.Flush
-		if !fs
-			"Nothing to do for: $.out"
+		
+		fs = nil
+		
+		if dest is selfreplace
+			.RealOut!.moveto(.out!)
+		
 		if .dest isnt stdout
 			printline .out.path
 
 
 	function Process
-		if .in.MustExist and .Read and .Detect
-			.Transform
+		.in!.MustExist$
+		.Read$
+		.Detect$
+		.Transform
 
 
 	function Ext (|string|)
@@ -353,8 +370,8 @@ module Conv
 		if DestPath
 			return destpath.file
 		if dest is selfreplace
-			return .in
-		|| str = .in.path
+			return .in!
+		|| str = .in!.path
 		if str isa "mz"
 			str = str.trimext
 		
@@ -371,23 +388,24 @@ module Conv
 	
 	
 	function FormatInfo (|&int| Size=0, |string|)
-		|| str = .in.Section(0, 32)
+		|| str = .in!.Section(0, 64)
 			if str == string.error
 				return str
 		
-		|| T = str.IsJbin #require
-		|| mz = str.parsejbin
+		|| T = str.IsJbin						#require
+		|| mz = str.ParseJbin(3)
+		if !mz
+			printline StdErr.pop
 		ifn mz == @tmp and "µz"
 			.Detected |= type.jbin
 			return ""
-		
-		|| arg = mz.last
-		if arg != @arg
-			return string.error
 
-		*size = arg.prev.int
-		if !*size
-			return string.Error
-		.Detected |= type.compressed
-		return ("ro", "µz")(arg ~= "ro")
+		|| num = mz[@num]
+		|| arg = num.next(@arg)
+			arg.ExpectLast
+			*size = num.int
+			if *size
+				.Detected |= type.compressed
+				return "µz"
+		return string.error
 

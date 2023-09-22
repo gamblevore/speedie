@@ -4,7 +4,7 @@
 */
 
 
-function scbase.CollectOneConstants (|Message| ch)
+function SCNode.CollectOneConstants (|Message| ch)
 	constantsloadingoverride = true
 	.project.use
 	using ch
@@ -12,7 +12,7 @@ function scbase.CollectOneConstants (|Message| ch)
 	constantsloadingoverride = false
 
 
-function scbase.CollectConstantsSub (|Message| ch)
+function SCNode.CollectConstantsSub (|Message| ch)
 	|| FuncName = ch.first									#require
 	|| arg = ch[-1]
 	|| vs = funcname
@@ -43,19 +43,18 @@ function scbase.CollectConstantsSub (|Message| ch)
 
 	for (Line in arg)
 		if (line == @decl)
-			CurrType = ExtractDecl( line.first, self )		#expect line
+			CurrType = ExtractDecl( line.first!, self, declmode.Globals )		#expect line
 			line.remove
 			continue
-		
-		|| NewItem = SCDecl.new
-		NewItem <~ scdeclinfo.Const (|) scdeclinfo.onmodule
-
 		if (line == "...")
 			NextNum = StartNum
 			Continue
+		
+		|scdecl| NewItem
 			
-		  elseif (line == @Thg) // default numeric constant
+		if (line == @Thg) // default numeric constant
 			using (line)
+			NewItem = SCDecl(typeint!)
 			|| NewNum = NewDeclNum( NewItem, NextNum, line.name )
 			newitem.source = line
 			if (ch == "flags")
@@ -73,12 +72,14 @@ function scbase.CollectConstantsSub (|Message| ch)
 			|| ValueNode = Line[2]							#expect Line
 			|| thg = line[ @Thg ]							#require
 			|| OMGType = TypeOfExpr( ValueNode, self )		#require // can’t seem to remove this.
-			|| NewType = CurrType ?? OMGType
-			expect (NewType) (line)
+			|| NewType = CurrType
+			if !(NewType?)
+				newtype = OMGType
+			NewItem = SCDecl(newtype.type)
 
 			if (ValueNode == @Str)
 				SCFunction.ObjectifyString(ValueNode)
-				ValueNode.obj = TypeString.typenormal
+				ValueNode.obj = TypeString!.typenormal
 			  elseif (valuenode.isint) or (valuenode == @unit)
 				NewType.constcheck(nil, ValueNode, OMGType)  
 				nextnum = valuenode.int + 1
@@ -89,14 +90,16 @@ function scbase.CollectConstantsSub (|Message| ch)
 			NewItem.name = thg.name
 			NewItem.Default = ValueNode
 			newitem.source = thg
-		
-		NameList <~ NewItem.source // crappy work around for now...
+
+		newitem.nildeclared = nilstate.real // no point in having a nil constant.
+		NewItem <~ scdeclinfo.Const ||| scdeclinfo.Global
+		NameList <~ NewItem.source! // crappy work around for now...
 		.TryAdd( line, NewItem, NewItem.Name )
 	
 	
 	if (ch == "flags")
-		|| NewItem = SCDecl.new
-		NewItem <~ scdeclinfo.Const (|) scdeclinfo.onmodule
+		|| NewItem = SCDecl(TypeInt!)
+		NewItem <~ scdeclinfo.Const ||| scdeclinfo.Global
 		|| s = (FuncName.Name, "Flag")(FuncName)
 		NewDeclNum( NewItem, lastflag|int|.bits, "Largest" + s )
 		.TryAdd( ch, NewItem, NewItem.Name )
@@ -109,7 +112,7 @@ function scbase.CollectConstantsSub (|Message| ch)
 
 
 
-function scbase.Tran_Const (|SCDecl| D, |SCBase| base)
+function SCNode.Tran_Const (|SCDecl| D, |SCNode| base)
 	|| root = D.default
 	|| Using = root.SyntaxUsing
 
@@ -118,43 +121,25 @@ function scbase.Tran_Const (|SCDecl| D, |SCBase| base)
 			require TypeOfExpr(curr, base)
 			|| actual = base[curr.name]
 			if actual isa SCDecl
-				|| BetterVersion = actual.Default.Copy(curr)
+				|| BetterVersion = actual.Default!.Copy(curr)
 				curr.ReplaceWith( BetterVersion )				
 			  else
-				expect ((curr.obj == TypeString.typenormal) or (curr ~= "true") or (curr ~= "false")) (curr, "This type isn't allowed for a constant.")
+				expect ((curr.obj == TypeString!.typenormal) or (curr ~= "true") or (curr ~= "false")) (curr, "This type isn't allowed for a constant.")
 			
 		  elseif curr == @unit
-			require typeofexpr(curr, base)
+			require TypeOfExpr(curr, base)
 			
 		  elseif (curr == @str) or ((curr==@num) and curr.parent!=@unit)
-			require typeofexpr(curr, base)
+			require TypeOfExpr(curr, base)
 
 
 
-function ConstantExpand (|Message| ch)
-	|| L = ch.first
-	|| op = L.Next
-	|| R = op.Next
-	
-	expect ((op == "=") and (L ==@thg))  ( op, "Expected 'd=(a,b,c...)' ." )
-	
-	|| Rel = «rel
-		L
-		«opp "="»
-		R.ConstantExpandSub
-	»
 
-	ch.Next = rel
-	R.MoveAllAfter(ch)
-	ch.remove
-
-
-
-function message.ConstIntValueSub (|scbase| name_space, |&int64| v, |bool|)
+function message.ConstIntValueSub (|SCNode| name_space, |&int64| v, |bool|)
 	opt norefcounts
 	|| s = self
 	while s == @bra
-		s = s.first
+		s = s.first!
 	if s == @num
 		*v = s.int
 		return true
@@ -165,7 +150,7 @@ function message.ConstIntValueSub (|scbase| name_space, |&int64| v, |bool|)
 			return true
 
 
-function message.ConstIntValue (|scbase| name_space, |&int64| v, |bool|)
+function message.ConstIntValue (|SCNode| name_space, |&int64| v, |bool|)
 	opt norefcounts
 	if .ConstIntValueSub(name_space, v)
 		return true
@@ -186,19 +171,19 @@ struct ArgArrayCounter
 		if (.isitem and .isnotitem)
 			error (exp, "Mixed indexes found. (Some have ':' and some don't)")
 
-	function Do (|string| name, |message| item, |scbase| name_space, |message|)
+	function Do (|string| name, |message| item, |SCNode| name_space, |message|)
 		opt norefcounts
 		|| acc = «acc, «thg name » »
 		|| arr = acc.msg(@arr)
 		|| value = item
 		if value == @item
 			.IsItem = true
-			|| key = item.first
-			|int64| v
-			if key.ConstIntValue(name_space, v) #check (item, "Can't load constant.")
-				(.max max= v)
-			arr <~ key
-			value = item.first
+			|| key = item[@nil]
+				|int64| v
+				if key.ConstIntValue(name_space, v) #check (item, "Can't load constant.")
+					(.max max= v)
+				arr <~ key
+				value = item.first
 		  else
 			.IsNotItem = true
 			arr <~ (.i)++
@@ -218,4 +203,5 @@ function @scmodule.ConstantCollector (collectfunc)
 function compiler.CollectConstants
 	opt norefcounts
 	for ch in .constantslist
-		(ch.obj|scbase|).CollectOneConstants(ch)
+		|| b = ch.obj as SCNode
+			b.CollectOneConstants(ch)

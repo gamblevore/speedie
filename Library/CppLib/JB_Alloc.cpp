@@ -3,14 +3,13 @@
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
 // todo
-// * Use ringtree for world/super/block! makes code simpler!
+// * Use list for world/super/block! makes code simpler!
 // * Can just do block = JB_RT_Next2(block); // goes up and down if hits end
 // 												easy way to list all blocks in the world!
 // * also... can put worlds together. Like sound/map/graphics/obj
 
 
 #include "JB_Alloc.h"
-#include "JB_Log.h"
 
 
 
@@ -27,7 +26,7 @@
 extern "C" {
 
 int RefTrap = 0;
-bool DoTotalMemoryTest=true;
+bool DoTotalMemoryTest=false;
 
 inline void failed(const char* c) {
 	printf("jbmem error: %s\n", c);
@@ -39,35 +38,6 @@ struct FreeObject {
 		int         FakeRefCount; // 
 		FreeObject* Next;
 	}; 
-};
-
-
-struct LinkHelper {
-    LinkHelper*     Unused[2];
-    LinkHelper*     Next;
-    LinkHelper*     Prev;
-};
-
-
-struct SuperBlock {
-    JB_MemoryWorld*         World;
-    AllocationBlock*        FirstBlock;
-    SuperBlock*             Next;
-    SuperBlock*             Prev;
-    u16                     ID;
-    u16                     BlocksActive;
-    AllocationBlock*        StartBlock;
-    FreeObject*             StartObj;
-    void*                   BlockEnd;
-};
-
-
-
-struct JBAllocTable {       // for pretending to be realloc. (we aren't)
-    // Actually this is VERY inefficient, you lose about 3x of the speed compared to calling
-    // JB_Alloc directly, however... many codebases can't simply be altered! That's why this exists.
-    uint8          Bins[128];  // 63bytes wasted. actually need 65, not 64!
-    JB_Class    Classes[20];
 };
 
 
@@ -103,7 +73,7 @@ static fpDestructor GetDestructor_(AllocationBlock* B) {
 
 
 static inline AllocationBlock* OfficialStart_(SuperBlock* NewSuper, IntPtr BlockSize) {
-    return (AllocationBlock*)(((IntPtr)NewSuper | (BlockSize-1)) &~ (sizeof(AllocationBlock)-1));
+	return (AllocationBlock*)(((IntPtr)NewSuper | (BlockSize-1)) &~ (sizeof(AllocationBlock)-1));
 }
 static inline AllocationBlock* StartBlock_(SuperBlock* Super) {
     return Super->StartBlock;
@@ -395,19 +365,19 @@ void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-void JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls ) {
+JB_MemoryLayer* JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls ) {
+	JB_New2(JB_MemoryLayer);
     JB_Zero(self);
     self->Class = Cls;
     self->CurrBlock = (AllocationBlock*)&(self->Dummy);
     self->Dummy.Owner = self;
     self->World = JB_MemStandardWorld();
+    return self;
 }
 
 
 JB_MemoryLayer* JB_Mem_CreateLayer(JB_Class* Cls, JB_Object* Obj) {
-    JB_MemoryLayer* Mem = JB_New(JB_MemoryLayer);
-    JB_Mem_Constructor(Mem, Cls);
+    JB_MemoryLayer* Mem = JB_Mem_Constructor(0, Cls);
     JB_SetRef(Mem->Obj, Obj);
     return Mem;
 }
@@ -461,28 +431,34 @@ void JB_Mem_Destructor( JB_MemoryLayer* self ) {
 
 
 
-static void SelfLink_(LinkHelper* New) {
-    New->Next = New;
+void JB_Helper_SelfLink(JB_RingList* New) {
+	New->PID = 0;
     New->Prev = New;
+    New->Next = New;
 }
 
 
-static void AddLink_(LinkHelper* Old, LinkHelper* New) {
-    if (Old) {
-        LinkHelper* P = Old->Prev;
-        P->Next = New;
-        New->Prev = P;
-        New->Next = Old;
-        Old->Prev = New;
-    } else {
-        SelfLink_(New);
-    }
+void JB_Helper_PutBefore(JB_RingList* Old, JB_RingList* New) {
+	JB_RingList* P = Old->Prev;
+	P->Next = New;
+	New->Prev = P;
+	New->Next = Old;
+	Old->Prev = New;
 }
 
 
-static void Unlink_(LinkHelper* Curr) {
-    LinkHelper* N = Curr->Next;
-    LinkHelper* P = Curr->Prev;
+void JB_Helper_PutAfter(JB_RingList* Old, JB_RingList* New) {
+	JB_RingList* N = Old->Next;
+	N->Prev = New;
+	New->Next = N;
+	New->Prev = Old;
+	Old->Next = New;
+}
+
+
+void JB_Helper_Unlink(JB_RingList* Curr) {
+    JB_RingList* N = Curr->Next;
+    JB_RingList* P = Curr->Prev;
     N->Prev = P;
     P->Next = N;
     Curr->Next = Curr;
@@ -554,7 +530,8 @@ int JB_ObjRefCount(JB_Object* Obj) {
 
 uint8* JB_ObjClassBehaviours(JB_Object* Obj) {
     // assume exists.
-    return (uint8*)(ObjBlock_(Obj)->FuncTable);
+    auto Block = ObjBlock_(Obj);
+    return (uint8*)(Block->FuncTable);
 }
 
 
@@ -589,11 +566,11 @@ Sanity(NewBlock);
 }
 
 
-void JB_TotalMemorySet(bool b)  {
+void JB_DebugAllMemory(bool b)  {
 	DoTotalMemoryTest = b;
 }
 
-bool JB_TotalMemorySanity(bool Force) {
+bool JB_TotalSanity(bool Force) {
 	if (!Force and !DoTotalMemoryTest)
 		return true;
 	auto cls = AllClasses;
@@ -724,7 +701,11 @@ static void InitObjectsInBlock_(JB_MemoryLayer* Mem, AllocationBlock* NewBlock, 
 
 
 static AllocationBlock* SuperBlockSetup_( SuperBlock* Super, JB_MemoryWorld* World ) {
-    AddLink_((LinkHelper*)(World->CurrSuper), (LinkHelper*)Super);
+	if (World->CurrSuper) {
+		JB_Helper_PutBefore((JB_RingList*)(World->CurrSuper), (JB_RingList*)Super);
+    } else {
+        JB_Helper_SelfLink((JB_RingList*)Super);
+    }
     SetupSuper_( Super, World );
     return LinkInSuper_(World, Super);
 }
@@ -752,7 +733,7 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
 		InitObjectsInBlock_( Mem, NewBlock, World, Size );
     }
 
-    SelfLink_((LinkHelper*)NewBlock);
+    JB_Helper_SelfLink((JB_RingList*)NewBlock);
 
     return LinkIn_(Mem, NewBlock);
 }
@@ -772,8 +753,9 @@ extern "C" uint8* JB__WriteIntToBuffer (uint8* wp, s64 LeftOver);
 
 void JB_OutOfMainMemory(int64 N) {
     if (!OutOfMemoryHappenedAlready) {
-        printf("Jeebox: Can't allocate %lli bytes for main memory.", N);
+        printf("Jeebox: Failed to allocate %lli bytes of main memory.\n", N);
         OutOfMemoryHappenedAlready++;
+		JB_ErrorHandleC("Memory Manager failed to allocate Object", false);
     }
 }
 
@@ -878,7 +860,7 @@ static AllocationBlock* FindAllocBlock_(JB_MemoryWorld* World) {
 static AllocationBlock* ReturnSpareHidden_(AllocationBlock* CurrBlock) {
     AllocationBlock* NewBlock = CurrBlock->Next;
     if (NewBlock != CurrBlock) {        // use this!
-        Unlink_((LinkHelper*)CurrBlock);
+        JB_Helper_Unlink((JB_RingList*)CurrBlock);
         return NewBlock;
     }
     return 0;
@@ -983,7 +965,7 @@ static void PossiblyLast_(SuperBlock* Super) {
 
 static void JustGetRidOfIt_(SuperBlock* Super, bool ResettingApp) {
     PossiblyLast_(Super);
-    Unlink_( (LinkHelper*)Super );
+    JB_Helper_Unlink( (JB_RingList*)Super );
     if (!ResettingApp) {
         CleanSpares_( Super );
     }
@@ -1024,7 +1006,7 @@ static void BlockFree_( AllocationBlock* FreeBlock ) {
         }
         SetCurrBlock_(Mem, NewCurr);
     }
-    Unlink_((LinkHelper*)FreeBlock);
+    JB_Helper_Unlink((JB_RingList*)FreeBlock);
 
     if (!Mem->SpareBlock) {
         Mem->SpareBlock = FreeBlock;
@@ -1064,7 +1046,7 @@ void JB_DeleteSub_( FreeObject* Obj, AllocationBlock* Block ) {
         if ( IsDummy(Curr) ) {
             SetCurrBlock_(Block->Owner, Block);
         } else {
-            AddLink_( (LinkHelper*)Curr, (LinkHelper*)Block ); // allow it to be allocated from.
+            JB_Helper_PutBefore( (JB_RingList*)Curr, (JB_RingList*)Block ); // allow it to be allocated from.
         }
         Sanity(Block);
     } else {
@@ -1082,7 +1064,7 @@ void JB_DeleteSub_( FreeObject* Obj, AllocationBlock* Block ) {
 // number that stores all the stuff we need to delete an object. PerryIDE only has 61 objects
 // we can perhaps store the class-hierarchy within the 64-bit number or whatever.
 // no need to worry about jbobject/savable... PerryIDE is only 3 classes deep...
-// ringtree is a bit of an issue, but that can be separately optimised :)
+// list is a bit of an issue, but that can be separately optimised :)
 // could store the delete-info in the behaviour table or the allocationblock... either is ok.
 
 // we could specify a compile flag that warns if any classes unnecssarily have too many vars
@@ -1183,10 +1165,9 @@ void JB_Mem_ClassLeakCounter () {
 }
 
 
-static inline JB_Object* Trap_(FreeObject* Obj, AllocationBlock* B) {
-//	if (JB_ObjID((JB_Object*)Obj)==123456)
+static inline JB_Object* Trap_ (FreeObject* Obj) { // what a task_ to trap
+//	if (JB_ObjectID((JB_Object*)Obj)==7462052)
 //		debugger;
-	ObjInBlock(Obj, B);
 	Obj->FakeRefCount = 0;
     return (JB_Object*)Obj;
 }
@@ -1198,12 +1179,12 @@ __hot JB_Object* JB_AllocNew( AllocationBlock* CurrBlock ) {
     if_usual (Obj) {
         CurrBlock->ObjCount++;
         CurrBlock->FirstFree = Obj->Next;
-        Obj->FakeRefCount = 0;
+//        Obj->FakeRefCount = 0;
 		Sanity(CurrBlock);
-        return (JB_Object*)Obj;
+        return Trap_(Obj);
     }
 	
-	return Trap_(NewBlock( CurrBlock ), CurrBlock->Owner->CurrBlock);
+	return Trap_(NewBlock( CurrBlock ));
 }
 
 

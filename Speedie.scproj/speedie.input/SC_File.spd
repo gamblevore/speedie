@@ -8,121 +8,125 @@ class SCFile (file)
 	|string|		ExportName
 	|SCImport|		Proj
 	|string|		FData
-	|Message|		LiveAST
-	|Message|		OrigAST
-	|date|			OrigDate
+	|Message?|		LiveAST
+	|Message?|		OrigAST
+//	|date|			OrigDate
 	|uint16|		filenum
 	|bool|			IsInternal
 
 
-	constructor (|File| f)
+	constructor (|File| f, |scimport| p)
 		super.constructor((f.path, "")(f != nil))
 		flow off
+		.Proj = p
 		.isinternal = f == nil
 		.liveast = .start_ast
 		Compiler.stTotalFileCount += .isinternal
 		(SCImport.Recent max= f.modified) 
-		
+	
+	
 	function Start_AST (|message|)
 		if .IsInternal
-			return message.newwithlayer((Message).createLayer(self), @arg, "")
-
+			(Message).createLayer(self).use
+			rz = message(@arg, "")
+			(message).restore
+	
+	
 	function Use
-		require .LiveAst // if parse fails...
-		.LiveAST.memoryLayer.Use
-
-
-	function Decls (|SCBase| p)
+		|| l = .LiveAst // if parse fails...
+			l.memoryLayer.Use
+	
+	
+	function CollectGlobals (|SCNode| p)
 		.Proj.use // should be inside use?
 		CollectDeclsGlobals( .LiveAST, p )
-
-
+	
+	
 	function scmodule.InitDecls // same as scfile.decls just different
 		|| a = .initvarsarg.First
 		if a.hasany
 			.Project.use
 			CollectDeclsGlobals( a, self )
-
-
-	function GetMsg (|int| pos, |bool| needname, |message|)
+	
+	
+	function GetMsg (|int| pos, |message|)
 		opt norefcounts
 		for f.flat in .orig
-			if !needname or f.name
+			if f.name
 				if f.range contains pos
 					return f
-
-
-	function SavedData (|string|)
-		if .origdate < .modified
-			.fData = .ReadAll.decompress // why not.
-		return .fdata
-
-			
+	
+	
+//	function SavedData (|string|)
+//		if !.fdata
+////	if .origdate < .modified
+//			.fData = .ReadAll.decompress // why not.
+//		return .fdata
+	
+	
 	function Orig (|message|)
-		if !.OrigAST or .OrigDate < .Modified
-			.OrigDate = .Modified
-			.OrigAST = .ASTSub
+		if !.OrigAST// or .OrigDate < .Modified
+//			.OrigDate = .Modified
+			.OrigAST = .ASTSub(true)
 		return .OrigAST
-
-
+	
+	
 	function AST (|Message|)
 		opt norefcounts
-		return .liveast init .ASTSub$
-
-
+		return .LiveAST init .ASTSub(false)
+	
+	
 	function DetectInsecureWords
 		opt norefcounts
-		require options.perry
+		require options.perryoutput
 		|| words = compiler.InsecureWords$
 		|| where = (0,0)
 		|| found = words.Find(.fdata, where)
 			|| place = @thg + ""
 			place.range = where
-			stderr.newerror(place, "Insecure word found", .path)
+			errorreceiver.newerror(place, "Insecure word found", .path)
 		
 		
-	function ASTSub (|Message|)
-		if .IsInternal
-		FlowControl.input(.file, "AST")
-			
-		(Message).createLayer(self).use
-		|| str = .ReadSafely.decompress
+	function ASTSub (|bool| Orig, |Message|)
+		FlowControl.input(self, "AST")
+		
+		|| str = .Readall(true).decompress
+			|| Layer = (Message).CreateUseLayer(self, str)
 			.fData = str
-			.origdate = .modified
 			StdErr.source = .path
 			parser.DotInsertallow = true	// more consistant with IDE
 			
-			parser.UsingTag = .filenum
-			rz = .fData.ParseClean			// OK so now what?
+			|| oldimp = scimport.CurrIsManuallyImported
+			scimport.CurrIsManuallyImported = .proj.depth
+			parser.Using.Tag = 0  // I'd rather remove this dumb thing. Each scfunction has a file already
+										// so only macros would need this. Its just used for to make vm-debug positions
+			if !orig
+				rz = .fData.ParseClean
+			  else
+				rz = .fdata.parse
+			scimport.CurrIsManuallyImported = oldimp
 			.DetectInsecureWords
 			
-			parser.usingtag = 0
+			parser.using.tag = 0
 			parser.DotInsertallow = false
-			StdErr.source = nil
+			StdErr.source = ""
 		(Message).restore
-		
-
-function message.DetectBadPosition
-	opt norefcounts
-	for msg.flat in self
-		if (msg != self) and !msg.position
-			printline msg.filelocation
-			debugat
 
 
-function app.CodeSign (|file|)
-	|| sign = app.prefs[codesign_native] // code
-		|| me = app.apppath.file
-		me.codesign(sign.value)
-		return me
 
-	StdErr.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign self." )
+//function app.CodeSign (|file|)
+//	|| sign = app.prefs[codesign_native] // code
+//		|| me = app.apppath.file
+//		me.codesign(sign.value)
+//		return me
+//
+//	errorreceiver.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign self." )
 
 
-function file.CodeSign (|string| sign, |errorint|)
+function file.CodeSign (|string| sign, |errorint2|)
 	target osx
 		if !platform.osx
-			return -1
+			return (-1, -1)|errorint2|
 		using ErrorSeverity.Warning
 		|[string]| args = []
 		args <~ "--deep"
@@ -147,7 +151,7 @@ function file.CodeSign (|string| sign, |errorint|)
 			rz = "/usr/sbin/spctl".DebugExecute(args)
 
 
-function string.DebugExecute (|[string]| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
+function string.DebugExecute (|[string]?| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt2|)
 	if file.DebugExecute // shouldnt be default!
 		print self
 		print " "
@@ -156,10 +160,10 @@ function string.DebugExecute (|[string]| Args=nil, |faststring|Out=nil, |faststr
 	
 
 module image
-	function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |&byte|)
+	function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |?&byte|)
 		cpp_wrapper JB_Img__LoadPNG
 
-	function WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |&byte|)
+	function WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |?&byte|)
 		cpp_wrapper JB_Img__WriteQOI
 
 	function ConvertPNGToVOI (|string| p, |string|)

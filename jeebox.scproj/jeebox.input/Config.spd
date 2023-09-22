@@ -18,14 +18,12 @@ role config (message)
 			return l|message|.first
 			
 	syntax cast (|string|)
-		return .nyme
+		return .name
 	
 	function Save (|bool|)
-		|| f = .obj
-		if f isa file
+		|| f = .obj as file
 			|| p = .render
-			|error| err
-			if p.ParseWithError(Err)
+			if p.ParseWithError(nil)
 				return f.smartdata(p) 
 
 
@@ -59,16 +57,17 @@ extend message
 			error (self, key + " not found.")
 		
 	function Value (|string|)
-		if self == @tmp and self in @arg
-			return .first.nyme
-		if self != @arg
-			return .nyme
+		if self
+			if self == @tmp and self in @arg
+				return .firstname
+			if self != @arg
+				return .name
 
 // move these to utils?
 	function IsTypeOfDecl (|bool|)
-		return .istype(1)
+		return .WithinType(1)
 			
-	function IsType (|int| Allowed=3, |bool|)
+	function WithinType (|int| Allowed=3, |bool|)
 		opt norefcounts
 		|| p = .parent
 		|| msg = self

@@ -2,20 +2,8 @@
 // jbin: streamable, binary jeebox
 
 /* 
-	Leave this as it is right now.
-	One day hol can be used instead of the compressed jbin.
-	Just keep this for reference... like "hol should parse just as fast"
-	No reason it shouldn't!
-	
-	For now, don't consider jbin a storage format! Its just a speed-increasing format.
-	Like a cache...
-	
-	Because the format will probably change.
-	
 	Future improvement... allocate one block at a time! Can call constructor on each object
 	Just need a Curr+Last pointer.
-	
-	
 */
 
 
@@ -32,31 +20,18 @@ extend message
 			js.sheb(shell_path)
 		js <~ _JbinHeader
 		.render_jbin_sub(js)
-			
+	
+	
 	helper render_jbin_sub (|jbin| js)
 		opt norefcounts
 		|| ch	 = self
 		|| after = .FlatAfter
-		while ch != after
+		while ch and ch != after
 			|| Depth	= 0
 			|| curr		= ch
 			ch			= curr.FlatNextDepth(depth)
 			js.Add(curr.func, curr.name, depth > 0)
 			js.up(-depth)
-
-// this will do.
-/*
-	helper jbin.AddCompressed (|message| Curr, |&MessageCompressor| D, |bool| Down, |bool|)
-		opt norefcounts  // now what? detect
-		|| back = d.Find(curr)								#require
-		|| info = ((d.position - back.Tag)-1 << 1) (|) Down
-		if info < 112
-			self <~ ((info+15)(|)128)|byte|
-		  else
-			self <~ ((info&15)(|)128)|byte|
-			.hint(info>>4)
-		return true
-*/
 	
 
 role JBin (Faststring)
@@ -97,21 +72,22 @@ role JBin (Faststring)
 		self <~ data
 		self <~ '\n' // noice
 
-	function Up (|int| amount = 1) // we encode the upness in the range of syntax values that have no children
-		|| add = (@cnj|int|)-1
+	function Up (|int| amount = 1)
+		|| add = 239
 		while amount > 0
-			|| expr  = (add + amount)  min  (@bin|int|)
-			self    <~ ((expr<<1) (|) 1)|byte|
-			amount  -= (expr-add)
+			|| B  = (add + amount)  min  (255)
+			self    <~ B|byte|
+			amount  -= (B-add)
 
-	function AddCstring	(|cstring| data, |syntax| type=@str)
+	function AddCstring (|syntax| type=@str, |cstring| data)
 		.addmemory(type, data|&byte|, false, data.length)
 	
-	function AddMemory	(|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
-		|uint| T = (type|uint|<<1) (|) (goin)
+	function AddMemory (|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
+		|uint| T = (type|uint|<<1) ||| (goin)
 		self <~ T|byte|
 		.hint(L)
-		.AppendMemory(data, L|int|)
+		if data
+			.AppendMemory(data, L|int|)
 
 
 	function OpenSection  (|int|)				// openstream 
@@ -138,10 +114,6 @@ role JBin (Faststring)
 		.NoFlush--
 
 
-function StringReader.NextMsg (|Message|)
-	return .NextMsgInfo|message|
-
-
 function StringReader.NextMsg (|message| parent=nil, |syntax| fn, |string| name=nil,  |Message|)
 	cpp_part NextMsgExpect
 	opt norefcounts
@@ -149,60 +121,48 @@ function StringReader.NextMsg (|message| parent=nil, |syntax| fn, |string| name=
 	expect (rz.expect(fn, name) and (rz.parent == parent)) (rz)
 
 
-helper StringReader.NextMsgInfo (|bool| CanDecomp=false, |uint64|)
-	opt norefcounts
-	while
-		|uint| info = .Byte
-//		if info & 128
-//			expect (CanDecomp) (self, "Can't stream compacted jbin. Use .parse instead")
-//			return info
-		if info == 0 :   continue
-		|| T = (info >> 1)|syntax|
-		if (t >= @max or T <= @nil)
-			expect (T > @nil) (self, "jbin header was not pre-loaded.")
-			expect (false)	  (self, "Corrupted jbin")
+helper StringReader.NextMsg (|message|)
+	return .nextmsginfo|message|
 
-		ifn (info & 1) and t.NoChildren
-			|| msg = .UserObj|message|.msg(t, .str(.hInt))|uint64|
-			if info & 1
-				.userobj = msg|object|
-			return msg
-		  else
-			.UserObj = .UserObj|message|.upward(t|int|-7)
-			require .userobj
 
-/*
-helper StringReader.NextMsgLZ (|&messagedecompressor| D, |uint| Info)
+helper StringReader.NextMsgInfo (|uint64|)
 	opt norefcounts
-	if Info < 16
-		Info |= .hInt << 4
-	  else
-		Info -= 15
-	|| Index  = Info >> 1
-	|| Ref    = D.curr-(Index+1)
-	expect (ref >= D.Table and ref < d.curr) (self, "Corrupted jbin")
-	|| r      = *ref
-	|| p      = .userobj|message|
-	|| Msg    = p.msg(r.func, r.name)
-	if Info & 1
-		.UserObj = msg
-*/
+	|| Msg = .UserObj|message|
+	|int| info
+	while 
+		info = .NonZeroByte
+		loop info > 239
+		msg = Msg.upward(info - 239)
+		.userobj = msg, require msg
+
+	|| T = (info >> 1)|syntax|
+	if (t < @max and T > @nil) // 01 --> T=@nil
+		msg = msg.msg(t, .str(.hInt))			
+		if info & 1
+			.userobj = msg
+		return msg|uint64|
+	
+	expect (T > @nil) (self, "StringReader.IsJBin was not called.")
+	error (self, "Corrupted jbin")
 
 
 function StringReader.IsJBin (|bool|)
 	return .str(4).IsJbin
 	
 	
-function StringReader.Parse_Jbin (|MessageRoot|)	
+function StringReader.ParseJbin (|int64| Remain=int64.max, |MessageRoot|)	
 	expect .IsJBin (Self, _jBinNotJbin )
 	.UserObj = nil
-	rz = .NextMsginfo|messageroot|
-	while .NextMsginfo
-	.UserObj = nil
+	rz = .NextMsg
+	while --Remain > 0
+		loop .NextMsginfo
+	
+	if .Data.ErrorReported
+		rz = nil // be consistant with .parse!
 	
 
-function string.ParseJbin (|messageroot|)
-	return .Stream.Parse_Jbin
+function string.ParseJbin (|int64| max=int64.max, |messageroot|)
+	return .Stream.ParseJbin(max)
 
 function string.IsJbin (|bool|)
 	if self starts _JbinHeader

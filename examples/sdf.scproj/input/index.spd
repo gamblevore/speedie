@@ -1,0 +1,10 @@
+import "GUI"
+
+conf
+    name	"SDF Demo"
+    targets gui
+    prefs "sdf"
+	version	1.0
+	creator	jeebox
+	helpurl	"http://shadertoy.org"
+    

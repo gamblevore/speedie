@@ -4,31 +4,33 @@
 */
  
 //
-class SCArg (SCBase)
+class SCArg (SCNode)
 	linkage
 		cpp_part		Arg
 
-	|SCFunction|	ParentFunc
-	|Message|		TmpMovedOutFor
+	|SCFunction?|	ParentFunc
+	|Message?|		TmpMovedOutFor
 	|bool|			IsClassArg
 	|bool|			IsStatementExpr
 
 	function Cls (|SCClass|)
-		Return .ParentFunc$.Cls
+		opt norefcounts
+		|| p = .ParentFunc
+			Return p.Cls
 	
 	constructor (|Message| node)
 	// shouldn't be necessary!
 		super.Constructor(node)
 	 
 	 
-	function Count (|int|)
-		opt norefcounts
-		for (v in .access)
-			RZ += (v isa scdecl)
-
-		|| l = .lookup
-		if l isa scarg
-			RZ += l.count + 1		
+//	function Count (|int|)
+//		opt norefcounts
+//		for (v in .access)
+//			RZ += (v isa scdecl)
+//
+//		|| l = .parent
+//		if l isa scarg
+//			RZ += l.count + 1		
 	
 	render
 		fs <~ "SCArg: (\n"
@@ -36,18 +38,18 @@ class SCArg (SCBase)
 		fs <~ ")\n"
 
 
-function Message.SCArgNested (|message|base, |SCBase| p, |SCArg|)
-	|| curr = self
-	|| cp = curr.Ancestor(@arg)
-	if cp == base
-		return .scarg(p)
-	|| p2 = cp.SCArgNested(Base, p)
-	return .scarg(p2)
+function Message.SCArgNested (|message| base, |SCNode| p, |SCArg?|)
+	opt norefcounts
+	while 
+		|| cp = .Ancestor(@arg)
+		if cp == base
+			return .scarg(p)
+		self = cp$
 
 
-function Message.SCArg (|SCBase| p, |message| avoid=nil, |SCArg|)
-	debug_require (self == @arg)
-	
+function Message.SCArg (|SCNode| p, |message| avoid=nil, |SCArg?|)
+	opt norefcounts
+	require self	
 	if avoid and (avoid != @arg and @tmp)
 		if p isa scarg
 			return p
@@ -61,15 +63,16 @@ function Message.SCArg (|SCBase| p, |message| avoid=nil, |SCArg|)
 		if (p isa SCArg)
 			R.ParentFunc = p.ParentFunc
 			r.IsClassArg = p.IsClassArg
-			R.LookUp = p
+			R.parent = p
 
 		  elseif (p isa SCFunction)
 			R.ParentFunc = p
 			r.IsClassArg = p.cls
-			R.LookUp = p.lookup // skip the function entirely.
+			R.parent = p.parent // skip the function entirely.
 
 		.obj = R
-	r.project = p.project // right?
+	if p and r
+		r.project = p.project // right?
 
 	Return R
 

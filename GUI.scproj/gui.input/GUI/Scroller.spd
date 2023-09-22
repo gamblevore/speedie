@@ -1,0 +1,154 @@
+
+
+
+module ScrollInfo
+	constants
+		TimerStart = 45
+	
+	|int|								InDrag = -1
+	|bool|								JustClicked
+	
+	function Timer (|uint|)
+		return date.ticks
+	
+	function EndDrag
+		if .InDrag >= 0 
+			.InDrag = -1	
+
+
+function ListView.SLH (|vec3|)
+	|| D = .distto(._Scroll)
+	|| r = 1 + d.x - .visiblerows
+	return (d.y,  (r max 0),  .rowheight).vec3
+
+
+function textview.SLH (|vec3|)
+	opt norefcounts
+	// whats the total number of lines? sigh... seems like we always need the entire thing?
+	|| s = .StartLine
+	|| ll = ._lines.last!
+	|| n = ll.vline - (.maxvisiblelines - 2)
+	return (s.vline,  n max 1,  .lineheight).vec3
+
+
+
+extend guicontrol {
+function CanDrawScroll (|bool|)
+	opt NoRefCounts
+	return (._ScrollDrawTimer > 1) or (!sdlapp.MouseButtons and .InScrollArea(.mousexy))
+
+
+function DrawScroll (|vec3| slh, |image?| where=nil, |float|)
+	opt NoRefCounts
+	require .CanDrawScroll
+	
+	|| t = ._ScrollDrawTimer
+	|| mb	= sdlapp.MouseButtons
+	if !.MouseNotDownOverOther
+		if where
+			.ScrollDrawTimer = 0
+		return 0
+	
+	|| now = ScrollInfo.timer
+	if (t == 0) or .InScrollArea(.mousexy) or (mb)
+		if where
+			.ScrollDrawTimer = now
+		t = now
+	|| R	= .ScrollRect(slh)
+	|| d	= (scrollinfo.TimerStart - (now - t)) max 0
+	|| s	= 1.0
+	|| range = 30.0
+	if d <= range
+		s = d / range
+	if !where
+		return s
+	if s
+		using listview.gscroll
+			sdlapp.touch
+			ListView.gscroll.Strengthen(s)
+			where.RectStyled(R, ListView.gscroll)
+	  else
+		._ScrollDrawTimer = 0
+
+
+
+function ScrollRectFind (|vec3| slh, |int| shift, |int|)
+	return .scrollrect(slh, shift).x
+
+
+function ScrollRect (|vec3|slh, |ivec4|)
+	return .scrollrect(slh, 0).ivec4
+
+
+function InScrollArea (|ivec2| p, |bool|)
+	|| x  = .lastrect.x2
+	|| xr = (x-10, x)
+	return (xr contains p.x) and (self contains p)
+
+
+function HandleMouseInScrollArea (|ivec2| p, |&uint| timer, |bool|)
+	if .HasFocus or *timer
+		if .InScrollArea(p)
+			*timer = ScrollInfo.TimerStart + date.ticks
+			sdlapp.touch
+			return true
+
+
+function ScrollBarMove (|vec3| slh, |int| shift)
+	if shift
+		|| t = .ScrollRectFind(slh, shift)
+		if self isa ListView
+			.ScrollMoveTo(t)
+		  elseif self isa textview
+			.StartLine = t
+
+
+function ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |&uint| Timer,  |bool|)
+	|| t = *Timer
+	if !t
+		return false
+	|| r = .ScrollRect(slh)				// need to figure out where in P it is...
+	|| y = (p.y - r.y)
+
+	if clicks == -1 // dragged
+		require (ScrollInfo.InDrag >= 0) 
+		.ScrollbarMove(slh, y - ScrollInfo.InDrag)
+	  elseif r contains p
+		ScrollInfo.JustClicked = true
+		ScrollInfo.InDrag = y
+	  else
+		ScrollInfo.indrag = -1
+		return false
+	*Timer = ScrollInfo.TimerStart + date.ticks
+	return true
+
+
+function ScrollRect (|vec3| slh, |int| shift, |vec4|)
+	cpp_part ScrollRectSub
+	|| s  = slh[0]
+	|| l  = slh[1]
+	|| rh = slh[2]
+	|| f  = 1.0 - (s / l)
+	|| d  = 10
+	if l > 0
+		|float| h = .height
+		|| div = l * rh
+		div = div max h
+		|| porp = (h * h) / (div*4)
+		d = (20 + porp) min (h * 0.375)
+
+	|| si = .lastrect + (0,d,0,-1-d)
+	|| w = 10
+	|int| p = mix(si.y1, si.y2, f)
+	|| y = p - d
+	
+	if shift
+		y += shift
+		p = y + d
+		f = unmix(si.y1, si.y2, p)
+		s = (1.0-f) * l
+		return (s, s, s, s)
+	
+	return (si.x2 - w,  y,  si.x2,  p + d+1).vec4
+}
+

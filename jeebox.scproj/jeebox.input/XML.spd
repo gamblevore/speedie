@@ -25,7 +25,7 @@ function parser.XMLAttribs (|message| XML,  |int| start,  |int|)
 		
 		|| After	= s.find(c, i+1)
 		|| Txt		= parser.new(Attr, @xtxt, start)
-		txt.name	= s[i+1,after].ReplaceAll(jeebox.xml_unescapestr)
+		txt.name	= s[i+1,after].ReplaceAll(jeebox.xml_unescapestr!)
 		.nextstart	= after+1
 	
 	.erroradd("Element malformed.", .nextstart)
@@ -61,7 +61,7 @@ function Parser.AddXMLText (|message| XML, |string| s, |int| start, |int| i)
 	require (a < i)
 	|| str = s[start, i]
 	|| str2 = str.trim
-	|| str3 = str2.replaceall(jeebox.xml_unescapestr)
+	|| str3 = str2.replaceall(jeebox.xml_unescapestr!)
 	.new(xml, @xtxt, start, str3)
 
 
@@ -233,10 +233,11 @@ helper message.XMLToJeeboxSub
 		.func = @str
 	  elseif self == @xatt
 		.func = @item
-		.first.func = @str
-		|| s = .name
-		|| fn = @emb
-		ifn (*s).IsLetter and Jeebox.CSWordMiddle contains s
-			fn = @str
-		.first = fn + s
-		.name = ""
+		|| f = .first
+			f.func = @str
+			|| s = .name
+			|| fn = @emb
+			ifn (*s).IsLetter and Jeebox.CSWordMiddle contains s
+				fn = @str
+			.first = fn + s
+			.name = ""

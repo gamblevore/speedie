@@ -18,8 +18,8 @@
 #include <sys/stat.h>
 
 #include <pwd.h>
-//#include <stdlib.h>
 #include <sys/mman.h>
+
 
 #if __linux__
 	#include <sys/mman.h>
@@ -28,60 +28,37 @@
 #endif
 
 
-extern "C" const char** JB_BackTrace(void** space, int* size) {
-    *size = backtrace( space, *size );
-    return (const char**)backtrace_symbols( space, *size );
+extern "C" {
+JBClassPlace( ProcessOwner,   JB_PID_UnRegister,     JB_AsClass(JB_Object),      0 );
 }
 
 
 #ifndef AS_LIBRARY
 #include <string>
 #include <iostream>
-#define KillZombs 1
 
 
 extern "C" {
 const int RD = 0; const int WR = 1;
-JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(JB_Object),      0 );
+JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),   0 );
 
 
-void JB_Rec_NewErrorWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
-
-const int MaxArgs = 256;
-bool ChildClosed;
-void JB_SigChild (int signum) {
-	ChildClosed = true;
-}
-int JB_App__LostChild () {
-    while (ChildClosed) {
-		int pid = waitpid(-1, nil, WNOHANG);
-		if (pid == 0)
-			ChildClosed = 0;
-		if (pid >= 0  or  errno != EINTR)
-			return pid;
-    }
-    return -1;
-}
+void JB_Rec__NewErrorWithNode (Message* node, JB_String* Desc, JB_Object* Source);
+bool JB_Dup2 (int, int);
 
 
 JB_String* JB_App__Readline() {
     std::string L;
     if (std::getline(std::cin, L))
         return JB_Str_CopyFromPtr((uint8*)L.c_str(), (int)L.length());
-    return 0;
+    return JB_Str__Error();
 }
 
-static bool pipe_close (int fd) {
-	if (fd <= 0) return true;
-	while (close(fd) == -1)
-		if (errno != EINTR)
-			return false;
-	return true;
-}
-
-
-void JB_App__AtExit (fn_app_deathaction b) {
-	atexit(b);
+static void pipe_close (int& fd) {
+	if (fd > 0) {
+		close(fd);
+		fd = -1;
+	}
 }
 
 
@@ -98,49 +75,6 @@ void JB_App__SetThreadName(JB_String* self) {
 #endif
 }
 
-typedef void* (*fn_pth_wrap2)(void* obj);
-
-int JB_ThreadStart (fn_pth_wrap wrap, JB_Object* oof, bool join) {
-	pthread_t thr = nil;
-	int Err = pthread_create(&thr, nil, (fn_pth_wrap2)wrap, oof);
-
-	if (!Err) {
-		void* rz = 0;
-		Err = join? pthread_join(thr, &rz) : pthread_detach(thr);
-		if (!Err)
-			return 0;
-	}
-	
-	JB_ErrorHandleFile(nil, nil, Err, nil, "run pthread");
-	return Err;
-}
-
-
-static bool pipe_dup2(int to, int from) { // so this kinda does what dup2 should do.
-	if (to <= 0)
-		return true;
-	while (true) {
-		int res = dup2(to, from);
-		if (res != -1)
-			return true;
-		int err = errno;
-		if (err != EINTR and err != EBUSY)	
-			return false;
-	}
-}
-
-
-int JB_SafeWait (int pid) {
-	siginfo_t IWouldDoItSimpler = {};
-	int WaitErr = 0;
-	do {
-		errno = 0;
-		WaitErr = waitid(P_PID,  pid,  &IWouldDoItSimpler,  WEXITED|WSTOPPED);
-	} while (WaitErr == -1 and errno == EINTR);
-	if (!WaitErr)
-		return IWouldDoItSimpler.si_status;
-	return WaitErr;
-}
 
 bool CanASMBKPT = true;
 int JB_Pipe__IgnoreBreakPoints() {
@@ -148,149 +82,163 @@ int JB_Pipe__IgnoreBreakPoints() {
 	int rz = sigignore(SIGINT);
 	if (rz)
 		rz = errno;
-	debugger;
 	return rz;
 }
 
-const char* ArrayCStrOne_(JB_String* S, int& ugh) {
-	if (!JB_Str_Length(S)) {return "";}
-	if (JB_Str_IsC(S)) return (const char*)JB_Str_Address(S);
-	JB_ErrorHandleFile(S, nil, EINVAL, "Speedie string not zero-terminated", "Executing shell-command");
-	JB_Str_IsC(S); // for testing
-	ugh = EINVAL;
-	return 0;
-}
 
-void JB_Str__Terminate(Array* strs) {
+bool JB_Str__Terminate(Array* strs) {
 	int n = JB_Array_Size(strs);
 	for_(n) {
 		JB_String* A = (JB_String*)JB_Array_Value(strs, i);
-		JB_Array_ValueSet(strs, i, JB_Str_MakeC(A));
+		auto B = JB_Str_MakeC(A);
+		require (B);
+		if (B != A) {
+			JB_Array_ValueSet(strs, i, B);
+		}
 	};
+	return true;
 }
 
 
-int JB_ArrayPrepare_(JB_String* self, const char** argv, Array* R) {
-	JB_Str__Terminate(R);
-	errno	= 0;
-	int Err = 0;
-	auto last = argv + MaxArgs-1;
-	*argv++ = ArrayCStrOne_(self, Err);
-	
+const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 	int N = JB_Array_Size(R);
-	if (argv+N >= last)
-		return E2BIG;
-	for_(N) {
-		*argv++ = ArrayCStrOne_((JB_String*)JB_Array_Value(R, i), Err);
+	int Strs = JB_Str_Length(self) + 1;
+
+	for_(N) 
+		Strs += JB_Str_Length((JB_String*)JB_Array_Value(R, i)) + 1;
+
+	if (Strs >= ARG_MAX-1) {
+		JB_ErrorHandleFile(self, nil, E2BIG, "Arguments too long", "Creating shell-arguments");
+		return 0;
 	}
-	*argv++ = 0;
-    return Err;
+
+	int Ptrs = sizeof(void*) * (N+2);
+	const char** PtrSpace = (const char**)calloc(Ptrs + Strs, 1);
+	char* ByteSpace = ((char*)PtrSpace) + Ptrs;
+	auto Orig = PtrSpace; char* Orig2 = ByteSpace;
+	
+	for_(N+1) {
+		auto B = (const char*)JB_Str_Address(self);
+		auto N = (int)JB_Str_Length(self);
+		*PtrSpace++ = ByteSpace;
+		memcpy(ByteSpace, B, N);
+		ByteSpace += N+1;
+		self = (JB_String*)JB_Array_Value(R, i);
+	}
+	PtrSpace++;
+	
+	if ((char*)PtrSpace != Orig2) // ouch
+		debugger;
+    return Orig;
 }
 
 
 int JB_Kill(int PID) {
-	int KillErr = kill(PID, SIGKILL);
-	if (!KillErr)
-		KillErr = JB_SafeWait(PID); // i could do better
-	return KillErr;
+	return kill(PID, SIGKILL);
 }
 
 
-int JB_App__Fork() {
-	return fork();
+extern "C" bool JB_Dup2(int from, int to) { // so this kinda does what dup2 should do.
+	while (from > 0 and dup2(from, to) == -1) {
+		int err = errno;
+		if (err != EINTR and err != EBUSY)	
+			return false;
+	}
+	return true;
 }
 
 
-const char* _StartProcess (JB_String* self, const char** argv, Array* Args, int* childpipe, int& PID) {
-	if (!JB_Str_Length(self)) {
-		return "received empty-path";
-	}
-	if (JB_ArrayPrepare_(self, argv, Args)) {
-		return "prepare ipc";
-	}
-	int Err = access(argv[0], X_OK | F_OK);
-	if (Err) return "access";
+static void Unblock (int fd) {
+	if (fd < 0) return;
+	int FL = fcntl(fd, F_GETFL, 0);
+	if (FL!=-1)
+		fcntl(fd, F_SETFL, FL | O_NONBLOCK);
+}
 
-	if (childpipe) {
-		if (pipe(childpipe)) return "pipe";
-		fcntl(childpipe[0], F_SETFL, O_NONBLOCK);
-	}
 
-	signal(SIGCHLD, JB_SigChild);
-	PID = fork();
+static bool PIDDied_ (ShellStream* Sh) {
+	return kill(Sh->PID, 0) != 0; // this kill function actually doesnt fucking work. FUCK UNIX!
+								  // it is breaking it's own guidelines! As usual!
+}
+
+
+static void CheckStillAlive (ShellStream* Sh) {
+	if (Sh->_Exit == -1 and PIDDied_(Sh)) {
+		int Exit = 0;
+		int PID = waitpid(-1, &Exit, WNOHANG);
+		if (PID>0) {
+			Sh->_Exit = Exit;
+		} else {
+			Sh->_Exit = 0;
+		}
+		
+		Sh->_Status = 0;
+		JB_PID_UnRegister(Sh); // actually the spdprocess checker does a lot more work than this.
+	}
+}
+
+
+bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
+// fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr,_exit // unix simplicity :)
+	auto& Sh = *self; auto sh = self;
+	auto argv = JB_Proc__CreateArgs(path, Args);
+	if (!argv) return false;
 	
-	if (PID == -1)
-		return "fork";
-	if (PID) {		// parent
-		if (childpipe)
-			pipe_close(childpipe[1]);
-		return 0;
-	}
-	
-	// çhild
-	if (childpipe) {
-		pipe_dup2(childpipe[1], 1); // We can now capture stdout cleanly!
-		pipe_close(childpipe[0]);
-	}
-	execvp(argv[0], 	(char* const*)argv);
-	printf("execv(\"%s\") failed\n",  argv[0]);
-	exit(-1);
-}
-
-
-
-int JB_Str_StartProcess (JB_String* self, Array* Args, JB_File** StdOut) {
-	const char* argv[MaxArgs] = {};
-    int Pipes[2] = {};
-    int PID = 0;
-	auto Err = _StartProcess(self, argv, Args, StdOut?Pipes:0, PID);
-	if (Err) {
-		JB_ErrorHandleFile(self, nil, errno, nil, Err); return -1;
-	}
-	if (StdOut) {
-		JB_SetRef(*StdOut, JB_File__NewPipe(Pipes[0]));
-	}
-	return PID;
-}
-
-
-static int JB_FEPDWEE_Call(ShellStream& Sh, const char** argv, bool NewStdOut) {
-// Fork,Exec,Pipe,Dup2,Waitid,Errno,Eintr // unix simplicity :)
-	if (NewStdOut or Sh.Output)
+	if (CaptureStdOut or Sh.Output)
 		pipe(Sh.CaptureOut);
-	pipe(Sh.StdErrPipe);
-	if (Sh.Mode == 1) {	// 1 means... no block. So we wanna restore it.
-		if (Sh.CaptureOut[RD])
-			fcntl(Sh.CaptureOut[RD], F_SETFL, O_NONBLOCK);
-		fcntl(Sh.StdErrPipe[RD], F_SETFL, O_NONBLOCK);
-	}
-	Sh.PID = fork();
-	if (Sh.PID == -1) {
-		return EPERM;
-	}
-	if (Sh.PID) {
+	pipe(Sh.CaptureErr);
+	Unblock(Sh.CaptureErr[RD]); // should never block
+	Unblock(Sh.CaptureOut[RD]); // even this blocking at all is kinda sus...
+	
+	JB_PID_Register(&Sh);
+	int PID = PicoStartFork(C, true);
+	bool OK = true;
+
+	if (PID == 0) {
+		JB_Dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
 		pipe_close(Sh.CaptureOut[WR]);
-		pipe_close(Sh.StdErrPipe[WR]);
-		return 0;
+		pipe_close(Sh.CaptureOut[RD]);
+		
+		JB_Dup2( Sh.CaptureErr[WR], STDERR_FILENO );
+		pipe_close(Sh.CaptureErr[WR]);
+		pipe_close(Sh.CaptureErr[RD]);
+		execvp(argv[0], (char* const*)argv);
+		_exit(errno-!errno); // in case execvp fails
+		return false;
+	} else if (PID > 0) {
+		sh->_Exit = -1;
+		sh->_Status = 0;
+		Sh.PID = PID;
+		pipe_close(Sh.CaptureOut[WR]);
+		pipe_close(Sh.CaptureErr[WR]);
+		CheckStillAlive(sh);
+	} else {
+		OK = false;
+		JB_ErrorHandleFile(path, nil, errno, nil, "run");
 	}
-	
-	pipe_dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
-	pipe_close(Sh.CaptureOut[WR]);
-	pipe_close(Sh.CaptureOut[RD]);
-	
-	pipe_dup2( Sh.StdErrPipe[WR], STDERR_FILENO );
-	pipe_close(Sh.StdErrPipe[WR]);
-	pipe_close(Sh.StdErrPipe[RD]);
-	execvp(argv[0], (char* const*)argv);  _exit(errno); // in case execvp fails
+
+	JB_FreeIfDead(path);
+	free(argv);
+	return OK;
 }
 
 
-static bool JB_FEPDWEE_Middle(ShellStream& Sh) {
-	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], Sh.Mode);
+bool JB_Sh_UpdatePipes(ShellStream* self) {
+	auto& Sh = *self;
+	CheckStillAlive(self);
+	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], 1);
 	// this will only return, once the app has finished... unless we are Streaming.
 	// either way, if both return false, we can finish.
-	bool ContinueErr = JB_FS_AppendPipe(Sh.ErrorOutput, Sh.StdErrPipe[RD], Sh.Mode);
+	bool ContinueErr = JB_FS_AppendPipe(Sh.ErrorOutput, Sh.CaptureErr[RD], 1);
 	return (ContinueOut or ContinueErr);
+}
+
+
+void JB_Sh_ClosePipes(ShellStream* self) {
+	for (int i = 0; i < 4; i++) {
+		pipe_close(self->CaptureOut[i]);
+	}
+	self->IsClosed = true;
 }
 
 
@@ -302,63 +250,73 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 }
 
 
-bool JB_FEPDWEE_Start(ShellStream* sh, Array* R, FastString* FSOut, FastString* FSErrIn, JB_String* self, bool KeepStdOut) {
-	ShellStream& Sh = *sh;
-	Sh.Output = FSOut;
-	Sh.ErrorOutput = JB_FS__FastNew(FSErrIn);
-
-	const char* argv[MaxArgs + 1];
-	Sh.ErrorCode = JB_ArrayPrepare_(self, argv, R);
-	if (!Sh.ErrorCode)
-		Sh.ErrorCode = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
-	if ( Sh.ErrorCode) {
-		JB_ErrorHandleFile(self, nil, Sh.ErrorCode, nil, "call command-line tool");
-		return false;
-	}
-	return true;
-}
-
 void JB_FEPDWEE_Finish(ShellStream& Sh) {
-	Sh.ErrorCode = JB_SafeWait(Sh.PID); // this is jsut to get the... exit code.
 	pipe_close(Sh.CaptureOut[RD]);
-	pipe_close(Sh.StdErrPipe[RD]);
-	Sh.Mode = -1;
+	pipe_close(Sh.CaptureErr[RD]);
+	Sh.IsClosed = true;
 }
 
-int JB_FEPDWEE_Finish2(ShellStream& Sh, FastString* FSErrIn ) {
-	JB_FEPDWEE_Finish(Sh);
-	if (Sh.ErrorOutput->Length and !FSErrIn) {
-		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh.ErrorOutput), nil);
-	}
-	return Sh.ErrorCode;
-}
 
-int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
-// what if I just do this in terms of JB_Sh__New?
-// like a busy-loop that calls .step until its finished
-	ShellStream Sh = {};
-	if (!JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, KeepStdOut))
-		return Sh.ErrorCode;
-	JB_FEPDWEE_Middle(Sh);
-	return JB_FEPDWEE_Finish2(Sh, FSErrIn);
-}
-
-void JB_Sh_Constructor(ShellStream* self) {
-	*self = {}; self->Mode = 1;
-}
-
-ShellStream* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn) {
-	ShellStream Sh = {}; Sh.Mode = 1;
-	require(JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, FSOut==nil));
-	auto rz = JB_New(ShellStream);
-	if (rz) {
-		Sh.Path = JB_Incr(self);
-		JB_Incr(Sh.ErrorOutput);
-		JB_Incr(Sh.Output);
-		*rz = Sh;
+ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru) {
+	auto rz = JB_Sh_Constructor(0, self);
+	rz->Output = JB_Incr(FSOut);
+	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
+	rz->Params = JB_Incr(Args);
+	bool OK = JB_Sh_StartProcess(rz, self, Args, 0, !StdOutFlowThru);
+	if (!OK) {
+		JB_SetRef(rz, 0);
 	}
 	return rz;
 }
+
+
+ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru) {
+	auto Sh = ShellStart(self, R, FSOut, FSErrIn, StdOutFlowThru);
+	if (!Sh) return ivec2{1, 0};
+	
+	while (true) {
+		JB_Sh_UpdatePipes(Sh);
+		if (JB_PID_Exit(Sh) != -1  or  JB_PID_Status(Sh) != 0)
+			break;
+		JB_Date__Sleep(1);
+	}
+
+	JB_Sh_UpdatePipes(Sh);
+	JB_FEPDWEE_Finish(*Sh);
+
+	auto ShErr = Sh->ErrorOutput;
+	if (!FSErrIn and JB_FS_Length(ShErr)) {
+		JB_Rec__NewErrorWithNode(nil, JB_FS_GetResult(ShErr), nil);
+	}
+	
+	int Signal = Sh->_Status;
+	int Exit = Sh->_Exit;
+	JB_FreeIfDead(Sh);
+	if (Signal)			// died from a signal // usually its what we want, despite being mixed up
+		JB_ErrorHandleFile(self, nil, Signal, "crashed", "running");
+	return ivec2{Exit, Signal}; // ivec2 specifier needed for linux
+}
+
+
+ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn) {
+	return ShellStart(self, R, FSOut, FSErrIn, FSOut==nil);
+}
+
+
+///*(^&£^/ Shellstream vvvvv >>>>>>>
+
+ShellStream* JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
+	JB_New2(ShellStream);
+	*self = {};
+	JB_PID_Constructor(self);
+	for (int i = 0; i < 4; i++)
+		self->CaptureOut[i] = -1;
+	
+	self->IsClosed = false;
+	self->Path = JB_Incr(Path);
+	return self;
+}
+
 
 void JB_Sh_Destructor(ShellStream* self) {
 	ShellStream& Sh = *self;
@@ -366,9 +324,12 @@ void JB_Sh_Destructor(ShellStream* self) {
 	JB_Decr(Sh.ErrorOutput);
 	JB_Decr(Sh.Path);
 	JB_Decr(Sh.Output);
+	JB_Decr(Sh.Params);
+	JB_PID_Destructor(self);
 }
 
-static void Smooth(ShellStream& Sh) {
+
+static void Smooth_(ShellStream& Sh) {
 // or else certain apps will lock up.
 // funnily enough, sleeping makes these apps run FASTER.
 // probably by triggering the printf statements instead 
@@ -384,12 +345,13 @@ static void Smooth(ShellStream& Sh) {
 	Sh.LastRead = C;
 }
 
+
 bool JB_Sh_Step(ShellStream* self) {
 	require (self);
 	ShellStream& Sh = *self;
-	if (Sh.Mode >= 0) {
-		Smooth(Sh);
-		if (JB_FEPDWEE_Middle(Sh))
+	if (!Sh.IsClosed) {
+		Smooth_(Sh);
+		if (JB_Sh_UpdatePipes(self))
 			return true;
 		JB_FEPDWEE_Finish(Sh);
 	}
@@ -398,15 +360,10 @@ bool JB_Sh_Step(ShellStream* self) {
 
 
 
-int JB_App__TurnInto(JB_String* self, Array* R) {
-	const char* argv[MaxArgs + 1];
-	int Err			= JB_ArrayPrepare_(self, argv, R);
-	if (!Err) {
-		execvp(argv[0], (char* const*)argv); Err = errno;	// in case execvp fails
-	}
-	if (Err)
-		JB_ErrorHandleFile(self, nil, Err, nil, "turninto");
-	return Err;
+void JB_App__TurnInto(JB_String* self, Array* R) {
+	auto argv = JB_Proc__CreateArgs(JB_Str_MakeC(self), R);
+	execvp(argv[0], (char* const*)argv);
+	exit(-1);	// in case execvp fails
 }
 
 
@@ -419,14 +376,12 @@ bool JB_IsTerminal(int FD) {
 
 #else
 
-// stop linker errors.
-extern "C" void Stub_JBPipe () {
-    
-}
-
-extern "C" void JB_CrashTracer() {
-}
+extern "C" void JB_CrashTracer() {}
 
 #endif
 
+extern "C" const char** JB_App__BackTrace(void** space, int* size) {
+    *size = backtrace( space, *size );
+    return (const char**)backtrace_symbols( space, *size );
+}
 

@@ -7,7 +7,7 @@ class Country
 		.name = name
 		.population = random[40, 100]
 		.ATP = random[4, 12]
-		"$name was founded with $.population population and $.ATP evil"
+		"$name was founded with $.population population and $.ATP power"
 		
 	function Attack (|Country| other)
 		|| oth = ("itself", other.name)(self == other)
@@ -34,14 +34,14 @@ main
 	random.shared.timeseed
 	for s in names
 		Europe <~ Country(s)
-	printline
+	""
 	
 	while Europe
 		for (cun.backwards in Europe) (i)
-			cun.Attack Europe[]
+			cun.Attack Europe[]!
 			if !cun.alive
 				Europe.remove(i)
-			printline
+			""
             app.sleep(0.2s)
 
 	"Europe is gone. Uwu :3"

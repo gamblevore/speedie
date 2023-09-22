@@ -1,6 +1,26 @@
 #!/usr/local/bin/spd
 
 
+app.usage = "Usage: cloc path [...]
+--types=cpp/c/h               Only report these types
+--quiet=true/false            Makes less output
+-k                            Keeps errors
+-s                            Report parse speed
+-p                            Print parse Tree
+-m                            Report Memory Usage
+-h                            Histogram
+" // set this before getting into main
+
+
+
+main  (|[existingfile]| files)
+	counts.Init(app["types"])
+	for dir in files
+		dir.CountAll(true)
+	counts.Report
+
+
+
 module Counts 
 	|int64|		Lines
 	|int64|		Names
@@ -70,27 +90,27 @@ function string.LOC (|int|)
 
 function file.CLOC
 	if counts.PrintTree
-		require StdErr.ok
+		require StdErr.OK
 		expect (!counts.PrintedTree) "Can't have multiple files, with printtree."
 		counts.PrintedTree = true
 	  elseif counts.loud
 		printline .path 
 
-	|| data = .ReadSafely(int.max) #require
+	|| data = .ReadAll(int.max, true) #require
 	if data.IsCompressed
 		data = data.Decompress(int.max) // might as well...
 	
 	Counts.files++
 	
-	counts.memstart
+	counts.MemStart
 	if counts.ParseSpeed
-		"a=b+c".parse
+		"a=b+c".parse // warmup
 	|| Start = date.now
 	|| msg = data.parse
 	|| Durr = start.ago
 	counts.MemEnd
 	if msg
-		counts.lines += msg.loc
+		counts.Lines += msg.loc[0]
 	  else
 		Counts.Lines += data.loc
 	counts.kb += data.Length
@@ -103,7 +123,7 @@ function file.CLOC
 		msg.RenderAST(app.stdout)
 		printline
 	  elseif counts.ParseSpeed
-		app.stdout.out.RenderSpeed(durr.seconds, data.length, 0, "Parsed")
+		app.stdout.out!.RenderSpeed(durr.seconds, data.length, 0, "Parsed")
 		printline
 	(msg)
 		
@@ -114,32 +134,13 @@ function file.CountAll (|bool| force=false)
 		counts.dirs++
 		for c.files in self
 			c.CountAll
-	  elseif force or counts.exts[.ext]
+		return
+	if force or counts.exts[.ext]
 		.cloc
 
 
-main  
-	if !app.args
-		"Usage: cloc path
---files=cpp/c/h               Only report these files (defaults to ${counts.DefaultExt})
---quiet=true/false            Makes less output
--k                            Keeps errors
--s                            Report parse speed
--p                            Print parse Tree
--m                            Report Memory Usage
--h                            Histogram
-"
-		return 0
-	
-	counts.Init(app..files)
-	for path in app.args
-		|| dir = path.ExistingFile
-			dir.CountAll(true)
-	counts.report
-
-
 function Counts.ReportHisto
-	require app.yes("h")
+	require app.Yes("h")
 	|| h_done = false
 	|| curr = 0
 	|| total = .names + Histogram[0]
@@ -166,10 +167,10 @@ function Counts.Report
 	|| kb = .KB.strsize
 	"$l lines"
 	|| n = .names
-		"$n names in $d nodes"
+		"$n names, in $d nodes"
 		.ReportHisto
 	if p > 1 or f > 1
-		"Total files: $f, total jeebox files: $p, total filesize: $kb"
+		"Total files: $f,  total jeebox files: $p,  total filesize: $kb"
 	if compressionstats.All.Out
 		compressionstats.all.render(app.stdout.out)
 		printline

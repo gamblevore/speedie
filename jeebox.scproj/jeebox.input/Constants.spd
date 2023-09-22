@@ -12,7 +12,6 @@ Module Jeebox
 	linkage
 		cpp_part Constants
 	
-	|ErrorList|	_ParseProtector
 	|| Name = "\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\) "
 	|| EscapeStr = [
 		"\00"  : `\00` // just for escaping, not unescaping
@@ -62,36 +61,38 @@ Module Jeebox
 
 	.InitConstants
 
-	function string.UniCS (|charset|)
+
+	function string.UniCS (|charset!|)
 		// all valid unicode-ranges
 		return (self + #(80BFC2F4)#).charset 	
-	
+
+
 	function AddEscape (|byte| i, |faststring| fs)
 		opt norefcounts
 		|| f = string.byte(i)
-		require  !.EscapeStr[f]  or  !.Escapechr[f]
+		require  !.EscapeStr![f]  or  !.EscapeChr![f]
 		fs <~ '\\'
 		fs.appendhex(i, 2)
 		|| t = fs.getresult
-		.EscapeStr[f] := t 
-		.Escapechr[f] := t
+		.EscapeStr![f] := t 
+		.Escapechr![f] := t
+
 
 	function InitConstants
 		array.new // needed by argv
 
-		.EscapeChr = dictionary.Copy(.EscapeStr)
+		.EscapeChr = dictionary.Copy(.EscapeStr!)
 		.EscapeStr[`$`] = `\$`
-		.UnEscapeStr		= dictionary.Reverse(.EscapeStr)			// unify data
-		.JS_UnEscapeStr		= dictionary.Reverse(.JS_EscapeStr)			// unify data 
-		.XML_UnEscapeStr	= dictionary.Reverse(.XML_EscapeStr)		// unify data 
-		.EscapeChr[`"`]		= nil|string|
-		.EscapeChr[`$`] 	= nil|string|
+		.UnEscapeStr		= dictionary.Reverse(.EscapeStr!)			// unify data
+		.JS_UnEscapeStr		= dictionary.Reverse(.JS_EscapeStr!)		// unify data 
+		.XML_UnEscapeStr	= dictionary.Reverse(.XML_EscapeStr!)		// unify data 
+		.EscapeChr![`"`]	= nil|string|
+		.EscapeChr![`$`] 	= nil|string|
 
-		.UnEscapeStr[`\0`]	= nil|string|					// handle normally
+		.UnEscapeStr![`\0`]	= nil|string|					// handle normally
 		//.JS_UnEscapeStr[`\n`]	= ""						// c/js compat
-		.Unescapestr[`\`]	= ""
-		.EscapeStr["'"]		= nil|string|
-		
+		.Unescapestr![`\`]	= ""
+		.EscapeStr!["'"]		= nil|stringzeroterminated|
 		
 		|| tfs = faststring()
 		for i in 256
@@ -99,15 +100,15 @@ Module Jeebox
 			if i <= 31 or (i == 127 or 0xc0 or 0xc1) or i >= 0xf5
 				.addescape(i, tfs)
 		
-		SetEscapeCode(.UnEscapeStr, true)
-		SetDecodeEntities(.UnEscapeStr, true)
-		SetDecodeEntities(.XML_UnEscapeStr, true)
+		SetEscapeCode(.UnEscapeStr!, true)
+		SetDecodeEntities(.UnEscapeStr!, true)
+		SetDecodeEntities(.XML_UnEscapeStr!, true)
 
-		.EscapeStr[`${`] = `$\{`
+		.EscapeStr![`${`] = `$\{`
 	
 
-	function string.UnBackTick (|string|)
-		return .replaceall("``", "`")
+//	function string.UnBackTick (|string|)
+//		return .replaceall("``", "`")
 
 
 	Function string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
@@ -136,11 +137,11 @@ Module Jeebox
 
 
 function String.Unescape (|string|)
-	return .ReplaceAll( Jeebox.UnEscapeStr )
+	return .ReplaceAll( Jeebox.UnEscapeStr! )
 
 function String.Escape (|string|)
-	return .ReplaceAll( jeebox.EscapeStr )
+	return .ReplaceAll( jeebox.EscapeStr! )
 
 function String.EscapeChr (|string|)
-	return .ReplaceAll( jeebox.EscapeChr )
+	return .ReplaceAll( jeebox.EscapeChr! )
 

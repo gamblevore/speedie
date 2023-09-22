@@ -1,0 +1,129 @@
+
+
+class Slider (GuiControl)
+	linkage
+		cpp_part Sl
+	|guiaction?|		OnSlide 
+	|int|				LastDrawPos
+	|int|				LastMouseY
+	|byte|				YShrink
+	|bool|				InitialValue			// or else event wont get called setting to 1!
+	|float|				Value
+	|float|				ValueStep
+	|float|				ValueCap
+	
+	
+	constructor (|window| p, |guiaction| Changed=nil)
+		super.constructor(p)
+		.ValueStep		= 1.0 / 16.0
+		.InitialValue	= true
+		.Value			= 1
+		.Valuecap		= 1
+		.Onslide		= changed
+		.LastMouseY		= -int.max
+		.Init
+	
+	
+	function SilentValue (assigns:|float|v)
+		.value = v.clamp
+		if .DrawPos(.value) != .lastdrawpos
+			sdlapp.touch(Self)
+	
+	
+	setter Value (|float|)
+		.setvalue(value)
+		
+	function SetValue (|float| value)
+		if (value > .valuecap) and (!keys.shift)
+			value = .valuecap
+		
+		value = value.clamp
+		|| diff = .value != value
+		require diff or .InitialValue
+		.value = value
+		.InitialValue = false
+		if diff
+			sdlapp.touch(Self)
+		(.onslide)(self)?
+	
+		
+	function Init
+		.gnormal.solid = (0.5, 0.5, 0.5, 0.5)
+	
+	
+	behaviour MouseUp
+		.lastmousey = -int.max
+		|| c = .OnClicked
+			(c)(self)
+
+	function Down
+		.setvalue(.value - .valuestep)
+	
+	
+	function Up
+		.setvalue(.value + .valuestep)
+
+
+	behaviour KeyDown
+		|| v = .value		// up/down keys...
+		if key is up
+			v += .valuestep
+		if key is down
+			v -= .valuestep
+		.setvalue(v)
+	
+	
+	behaviour MouseDown
+		|| s = .MiniSize
+		|| D = s.width > s.height
+		|| V = s.vert(d).vec2
+		|| Y = p[1-d]|float|
+		|| f = (y - v.x) / (v.x2 - v.x)
+		if .lastmousey != y
+			.LastMouseY = y
+			.setvalue(f)
+		return MouseDragging.Beyond
+	
+	
+	function MiniSize (|ivec4|)
+		|| s		= .lastrect
+		|| yshrink	= .yshrink 
+		s[1] += yshrink
+		s[3] -= yshrink
+		
+		if s.width > s.height
+			s[0] += 5
+			s[2] -= 5
+		return s
+	
+
+	function DrawPos (|float|v, |int|)
+		|| s  = .MiniSize
+		|| D  = s.width > s.height
+		return mix(s.vert(d), v)
+
+
+	behaviour Draw
+		|| s  = .MiniSize
+		|| D  = s.width > s.height
+		|| x  = 0 + !D 
+		|| x2 = 2 + !D 
+		Where.RectStyled(s, .Gnormal)
+		
+		|| y  = .DrawPos(.value)
+		.lastDrawPos = y
+		|| w  = s.length(d) / 2
+		s[x]  = y - w
+		s[x2] = y + w
+
+		if .ValueCap < 1
+			|| s2 = .MiniSize
+			y = mix(s2.vert(d), .valuecap)
+			s2[x] = y
+			s2[x2] = y
+			|| px = colors.white(0.15)
+			Where.RectBasic(s2, px)
+		
+		where.DrawCircle(s, .gnormal)
+
+

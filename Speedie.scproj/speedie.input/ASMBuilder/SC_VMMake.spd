@@ -9,7 +9,7 @@ module VM_Builder {
 |[message]| 	NameList
 |message|   	ModuleArg
 |file|			vm_file
-|faststring|	form_h
+|faststring|	form_h = faststring()
 |message|		dt_prm
 |string|		parent
 |byte|			NormalPos = 0
@@ -28,21 +28,17 @@ function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |[messa
 		.DefineGetSub(fname, up, down, 'i', ' ')
 	.DefineGetSub(fname, up, down, 'u', 'u')
 	rz <~ @thg + fname
-	rz <~ @num + up
-	rz <~ @num + down
+	rz <~ up.msg
+	rz <~ down.msg
 
 
 // we need to create an array of forms...
 function FillTypePrm (|string| fname, |int| pname)
-	|message| add
 	|| prop = @thg + fname
-	|| r = [prop]
 	if pname >= 4
-		add = (macros.ASMcopier2)(r)	
+		.dt_prm <~ macros.ASMcopier2.run(prop)	
 	  else
-		r <~ @num + pname
-		add = (macros.ASMcopier)(r)	
-	.dt_prm <~ add	
+		.dt_prm <~ macros.ASMcopier.run(prop, pname.msg)
 
 
 function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
@@ -63,7 +59,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
 	
 	lname = .parent + lname
 	|| arr = .DefineGet(lname, 32-n, bit_pos, bit_pos+n==32)
-	|| fnc_src = (macros.ASMSetter)(arr)
+	|| fnc_src = macros.ASMSetter.run(arr)
 	SCFunction.newfunc(fnc_src, nil, line)
 	
 	.FillTypePrm(lname, pname)
@@ -75,7 +71,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
 
 function DataTypeModule
 	opt norefcounts
-	|| module = "extend_module ASM:constants:".parse
+	|| module = "extend_module ASM:constants:"~parse
 	compiler <~ module
 	.modulearg = module.last.last.last
 
@@ -102,10 +98,10 @@ function string.ASMNormalise (|string|)
 function DataTypeCreate (|message| form,  |int| fnum,  |message|)
 	opt norefcounts
 	|| name = "ASM_" + form.name
-	|| sigh = (Macros.ASM_Datatype)([
+	|| sigh = Macros.ASM_Datatype.run(
 		@thg + name
-		@num + fnum
-	])
+		fnum.msg
+	)
 	rz = sigh.findnested(@list)
 	rz++
 	#!"This would be better if speedie grouped these, rather than spamming JB_InitCode_"
@@ -145,14 +141,14 @@ function CppLibFile (|string| ch, |file|)
 	
 
 function BuildFiles (|bool|)
-	.vm_file = Compiler.InputFile( nil, "vm.box", nil )	#require
-	|| x = .vm_file.parse								#require
+	|| v = Compiler.InputFile( nil, "vm.box", nil )	#require
+	|| x = v.parse									#require
+	.vm_file = v
 	|| forms = x.find("forms")
 	forms.remove
 
 	|| code = faststring()
 	|| jump = faststring()
-	.form_h = faststring()
 
 	.Clean(x)
 	.DataTypeModule
@@ -160,15 +156,15 @@ function BuildFiles (|bool|)
 	.NameList = .VMSpd(x)
 	.VMCpp(code, jump)
 
-	.CppLibFile("InstructionGetters.h").SmartData = form_h
-	.CppLibFile("Instructions.i").SmartData = code
-	.CppLibFile("InstructionList.h").SmartData = jump
-	.form_h = nil
+	.CppLibFile("InstructionGetters.h")!.SmartData = form_h
+	.CppLibFile("Instructions.i")!.SmartData = code
+	.CppLibFile("InstructionList.h")!.SmartData = jump
+	.form_h.size = 0
 	return true
 
 	
 function MakeTheVM
-	compiler.UserProj.use
+	compiler.Project.use
 	require .BuildFiles	
 	treeassembler.InitAll
 	asm.TestASM
@@ -180,12 +176,12 @@ function BuildInstructions (TranFunc) // __instructionlist__
 
 	|| after = node
 	for (tmp in .namelist) (pos)
-		|| form = tmp[0][0].nyme
+		|| form = tmp[0][0].name
 			|| fnc = @sdot + "add" 
 			|| list = fnc.msg(@list)
-			list.msg(@str, form.lowercase)
-			list.msg(@str, tmp.name)
-			list.msg(@num, pos.render)
+			list <~ (@str, form.lowercase)
+			list <~ (@str, tmp.name)
+			list <~ pos
 			after.next = fnc
 			after = fnc
 
@@ -204,7 +200,7 @@ function Clean   (|message| msg)
 		if ch == @opp
 			if ch == "mod"
 				ch.name = "%"
-			  elseif ch == "(|)"
+			  elseif ch == "|||"
 				ch.name = "|"
 
 
@@ -244,14 +240,14 @@ function VMDecl (|message| tmp, |[message]| msgs)
 	opt norefcounts
 	|| arg = tmp.last
 	|| prms = tmp.first
-	|| name = prms.first.name.asmnormalise
+	|| name = prms.firstname.asmnormalise
 	|| form = µform.forms.valuelower(name)			#require
 	|| id = (.highpos++, .normalpos++)(form.varies)
 	asm.Encoders[id] = asm.Forms[form.Index]
 	msgs[id] = tmp
 	name = "ASM_" + name
 	.ModuleArg <~ NewDecl(name)
-	.ModuleArg <~ NeweqRel(@thg+tmp.name, @num + id)
+	.ModuleArg <~ NeweqRel(@thg+tmp.name, id|int|.msg)
 // TypeList
 
 

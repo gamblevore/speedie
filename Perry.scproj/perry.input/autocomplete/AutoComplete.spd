@@ -1,12 +1,13 @@
 
+
 helper message.list_desired (|int| common, |string|)
-	rz = .first.name[0, Common]
+	rz = .firstname[0, Common]
 	if self == rz
 		rz = "" // oof
 
 
 function message.PrependHeader (|string| name, |int| pos)
-	|listviewrow| Header = @str + name
+	|ListViewRow| Header = @str + name
 	header.Position = pos
 	.first = Header
 	(header is Disabled)
@@ -16,17 +17,17 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	.ClearAutoComplete
 	list = list.last
 	|| define = list.first
+	require define and list
 	define.remove
 	define.DefineToLine(list.SlowCount)
 	define.name = "line"
 	
 	list.sort(CallFromSorter)
 //	.ImproveFuncList(list) // the lists are too different. I'd need to reorganise it
-// no point i'll do it later
 	list.prependheader("", 1)
 	list.first = define
 
-	.autocomplete.listsource = list
+	.autocomplete.listsource = list!
 	.SetAutoPoint(.editme.sel0)
 	.showauto
 	(.AutoComplete isnt typethrough)
@@ -35,11 +36,11 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 function message.DefineToLine (|int| count)
 	|| l = self[-1]			#require
 	if self ~= "define"  and  l == @str  and  self > 1 // is that all?
-		.first.next = l
-//		if !count // can't be 0?? rightclicking on some code to find it... // so its obviously used?
-		l.name += " has " + "caller".pluralize(count)
+		.first!.next = l
+		// count can't be 0 here	
+		l.name += " has " + (count of "caller")
 	  else
-		|| s = "places".pluralize(count, "Nowhere")
+		|| s = "place".pluralize(count, "Nowhere")
 		l.name = " - Called From " + s + " - "
 		
 
@@ -92,7 +93,7 @@ function PerryIDE.AutoCompleteFB (|message| list, |AutoCompleteMode| Mode, |stri
 			return false
 		if .autocomplete.isopenedmenu or (canshow and mode is default)
 			|| open = mode is default
-			.showauto(open)
+			.ShowAutoBeep(open)
 			
 		return false
 	if mode is default
@@ -106,7 +107,7 @@ function PerryIDE.ClearAutoComplete
 	.editme.AutoCompleteString = ""
 
 
-function PerryIDE.ShowAuto (|bool| beeps)
+function PerryIDE.ShowAutoBeep (|bool| beeps)
 	if !.showauto and beeps
 		beep
 
@@ -115,7 +116,7 @@ function PerryIDE.ShowAuto (|bool|)
 	|| a = .autocomplete
 	if a.listsource.hasany
 		a.ListSource.obj = .editme.Path
-		a.Showcmm(self, .AutoPoint.y - .absbottom, .AutoPoint.x)
+		a.ShowCmm(self, .AutoPoint.y - .absbottom, .AutoPoint.x)
 		(a is typethrough)
 		return true
 	a.ListSource.obj = nil
@@ -124,14 +125,14 @@ function PerryIDE.ShowAuto (|bool|)
 
 function AutoCompleteInsertText (GuiListEvent)
 	opt norefcounts
-	|| i = .ide
+	|| i = .ide!
 	|| e = i.editme
 	if row >= 3
-		|| file = row.first.name
+		|| file = row.firstname
 		|| num = row.last.int
 		i.DefineSub(file, num|int|)
 	  else
-		e.autocompletestring = row.name
+		e.autocompletestring = row.Name
 		e.insertautocomplete
 
 
@@ -147,7 +148,7 @@ function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
 
 
 function PerryIDE.DefineFB (|message| msg, |bool|)
-	.DefineSub(msg.first.nyme, msg.second.int|int|)
+	.DefineSub(msg.firstname, msg.second.int|int|)
 
 
 function PerryIDE.DisplayFB (|message| display, |bool|)
@@ -156,77 +157,99 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 	if (f == @arg) and !f.hasany and (display starts "displayall")
 		.PopupHide
 	  else
-		.PopupDisplay.expectsparse = textview.probablyjeebox
+		.PopupDisplay.ExpectsParse = textview.probablyjeebox
+		(f is style2)
+		.popupreason = 1
+		// using guitask would be better... sigh.
 		.DisplayInPopup(f.render, display.name contains "forced")
 
 
 // "" '' <(``)> ``
 
 function PerryIDE.DisplayStr (|message| f, |bool|)
-	|| r = f.range // + f.rangetrim
-	|| orig = .editme[r]
+	|| r = f.Range // + f.rangetrim
+	|| orig = .EditMe[r]
 	if f.name != orig
 		.PopupDisplay.expectsparse = 0
+		.popupreason = 1
+		// using guitask would be better... sigh.
 		.DisplayInPopup(f.name, false)
 
 
-function PerryIDE.DisplayInPopup (|string| s, |bool| instant)
+function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec4(),  |ivec2| Corner=.PopupDisplayCorner)
+	// using guitask would be better... sigh.
 	|| sizer_str = s.wrap(80)
-	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 0)
+	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 2)
 	(size.x max= 40)
-	|| c = .PopupDisplayCorner				// set the top above it
-	.PopupDisplay.size =   c.x~right for size.x   by   c.y~up back size.y
-	.PopupDisplay.text = s 
+	if Corner.x < 0
+		Corner.x = .editme.lastrect.x2 - (size.x + 10)
+	.PopupDisplay.size = Corner.x~right for size.x   by   Corner.y~up back size.y
+	.PopupDisplay.text = s
+	|| pg = .PopupDisplay.GNormal
+	
+	|| def = .FileList.GNormal.bg.color
+	if color
+		color = mix(def, color, 0.3)
+	  else
+		color = def
+	pg.bg = color
+	color = mix(colors.white(0.5), color, 0.8)
+	pg.edge	= color
 	.StartPopupVis(instant)
 
 
 function PerryIDE.StartPopupVis (|bool| instant)
 	if !.PopupDateOn
-		|| add = (-10.0s, 0.5s)(instant)
+		// using guitask would be better... sigh.
+		|| add = (-10.0s, 0.5s)(instant or keys.CmdAgo(2s))
 		.PopupDateOn = date.now + add
 	.PopupDisplayFadeIn
 
 
 function PerryIDE.PopupDisplayFadeIn
+	// using guitask would be better... sigh.
 	(.PopupDisplay is visible) = .PopupDisplayFadeInSub
 
 
 function PerryIDE.PopupDisplayFadeInSub (|bool|)
 	require .PopupDisplay.text
-	|| alpha = (.PopupDateOn.ago.seconds|float|*2.0).clamp
-	if (alpha < 0.5) and !keys.cmd
+	|| ago = .PopupDateOn.ago.seconds|float|
+	|| alpha = (ago*2.0).clamp
+	if (alpha < 0.5) and !keys.cmd and .PopupReason == 1
 		.PopupDateOn = 0
-	if !alpha
-		return false
+	if keys.shift
+		return true
+	require alpha
+
 	|| g = .PopupDisplay.GNormal
 	|int| New = alpha * 255
-	|int| old = g.BG.a
+	if g.BG.a != New
+		sdlapp.touch
 	g.BG.a = New
 	g.Text.a = New
-	if old != New
-		sdlapp.touch
 	return true
-	
-	
+
 
 function PerryIDE.PopupHide
 	.PopupDateOn = 0
-	.PopupDisplay.text = ""
-	.lastextrainfo = nil
-	.PopupDisplay.visible = false
+	if .popupdisplay is visible
+		.PopupDisplay.text = ""
+		.lastextrainfo = nil
+		.PopupDisplay.visible = false
 	
 
 
-// SpeedieDidReceiveMsg, receivedmsg, maybedidgetmsg, gotmsg, msgreceived
-function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
+// SpeedieDidReceiveMsg, receivedmsg, maybedidgetmsg, gotmsg, msgreceived, receivefb, fbreceived
+function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
+	debug_require c
 	if (c == .compilr) and !c.alive
 		isnt active
 
-	|| msg = C.Get(0) 		#require
+	|| msg = C.Get 		#require
 	|message| date
 	if msg == @arg and "Perry"
 		date = msg[@num]
-		msg = date.next
+		msg = date.Next$
 
 	if msg == "error"
 		if msg.last == "define"
@@ -237,45 +260,44 @@ function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
 	.DuringMsgFB = true
 	|| reason = ""
 	if msg ~= "result"
-		reason = msg.first.nyme
-		msg = msg.second
-		if msg.name[0, "autocomplete"] and .LastAutoCompleteDate != date.int
+		reason = msg.firstname
+		msg = msg[@nil, 1]$ // in case of garbled result?
+		if msg.name[0, "autocomplete"] and (.LastAutoCompleteDate != date.int)
 			msg.name = "" // returns
 	
 	.logonecomm(msg, "\1b ")
 	|| f = msg.first
-	if msg ~= "autocomplete"
-		.AutoCompleteFB(f, AutoCompleteMode.default, reason)
-	  elseif msg ~= "autocomplete_edit"
-		.AutoCompleteFB(f, AutoCompleteMode.edit, reason)
-	  elseif msg ~= "autocomplete_sel"
-		.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
-	  elseif msg starts "display"
-		.DisplayFB(msg)
-	  elseif msg starts "compile" or "debug"
-		.CompileFB(msg)
-	  elseif msg starts "log"
-		.LogFB(msg)
-	  elseif msg starts "crashed"
-		.CrashedFB(c, msg.render)
-	  elseif msg starts "callfrom"
-		.CallFromFB(msg)
-	  elseif msg starts "check"
-		.ErrorListFB(msg)
-	  elseif msg starts "define"
-		.DefineFB(msg)
+		if msg ~= "autocomplete"
+			.AutoCompleteFB(f, AutoCompleteMode.default, reason)
+		  elseif msg ~= "autocomplete_edit"
+			.AutoCompleteFB(f, AutoCompleteMode.edit, reason)
+		  elseif msg ~= "autocomplete_sel"
+			.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
+		  elseif msg starts "display"
+			.DisplayFB(msg)
+		  elseif msg starts "unused_funcs"
+			.UnusedFuncsFB(msg)
+		  elseif msg starts "log"
+			.LogFB(msg)
+		  elseif msg starts "callfrom"
+			.CallFromFB(msg)
+		  elseif msg starts "check"
+			.ErrorListFB(msg)
+		  elseif msg starts "define"
+			.DefineFB(msg)
 	.DuringMsgFB = false
 
 
 function EditMeKeyDown (guitextevent)
 	opt norefcounts 
-	.ide.EditMeTabRetryThing = 0
-	.ide.ShowStats
+	.ide!.EditMeTabRetryThing = 0
+	.ide!.ShowStats
 
 
 function EditMeModified (guitextevent)
-	|| i = .ide
-	require i.project and i.projmsg
+	|| i = .ide!
+	i.lastsendtime = 0
+	require i.projmsg
 	EditMeKeyDown(self, 0, false)
 	
 	if (reason != documentstate.saving) and !i.DuringTempView
@@ -289,11 +311,10 @@ function EditMeModified (guitextevent)
 	
 	(i is modified) = (self is modified)
 	|listviewrow| msg = i.ProjMsg
-	|| Mod = (self is modified)
-	(msg is modified) = Mod
-	|| sub = i.CurrFileName.SubMenu
-		|| src = sub.ListSource
-			(src is modified) = Mod
+		|| Mod = (self is modified)
+		(msg is modified) = Mod
+		|| sub = i.CurrFileName.SubMenu
+			(sub.ListSource is modified) = Mod
 
 
 function PerryIDE.ShowStats
@@ -310,12 +331,19 @@ function PerryIDE.InteractUpdate
 	.popuphide
 
 
-function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |string| reason)
+function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err, |string| reason, |bool| Instant)
 	opt norefcounts
-	if !M
-		.popuphide
+	if err
+		// using guitask would be better... sigh.
 		.lastextrainfo = nil
-		return
+		.PopupDisplay.ExpectsParse = 0
+		.PopupDisplayCorner = p
+		.popupreason = 2
+		.DisplayInPopup(err.name, Instant, err.severity.color, P)
+		return 
+	
+	if !M
+		return .popuphide
 
 	require (M != .lastextrainfo) or (.popupdisplay isnt visible)
 	|| s = .feedback
@@ -326,18 +354,17 @@ function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |string| reason)
 
 function OnShowExtraInfo (GUITextShowEvent)
 	opt NoRefCounts
-	.ide.ShowExtraInfo(LeftCorner, msg, reason)
+	.ide.ShowExtraInfo(LeftCorner, msg, err, reason, !WasDelayed)
 	
 
 function JumpToDefinition (GUIAction)
-	
 	|| rightclick = state == -1
 	|| cmd = state == -2
 	require (cmd or rightclick)
-	|| ide = .ide
+	|| ide = .ide!
 	|| msg = ide.EditMe.ClickedMsg
 		if msg in @url
-			msg = msg.parent
+			msg = msg.parent!
 		if msg == @url
 			app.ShowURL(msg.render)
 		  elseif msg == @sheb
@@ -377,10 +404,19 @@ function message.CommandIsOK (|bool|)
 	
 	
 function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
+	|| spd_func = where.OwningFunc
+	if spd_func == where
+		|| thg = where.first
+		if thg == @dot or @thg
+			where = thg
+	  else
+		if  (where == @tmp)  and  !(cmd starts "autocomplete")
+			return nil // annoy speedie less. it will only generate errors and slow communication down
 	|| pp = where.parent$
 	|| ppp = pp.parent
 	|| Jump = 0
-	|| spd_func = where.owningfunc
+		
+	if spd_func
 		if cmd != "callfrom"
 			if where == @thg
 				if pp == @dot and ppp == spd_func
@@ -426,7 +462,7 @@ function message.SimpleComplete (|message| pp, |message| where, |bool|)
 	opt norefcounts
 	if where == "import"
 		|| imp = .msg(@arg, "import")
-		imp <~ where.first.nyme
+		imp <~ where.firstname
 		return true
 	|| cls = pp.OwningModClass // seems adding this info is bad?
 								// especially if we already filled it in?
@@ -436,8 +472,8 @@ function message.SimpleComplete (|message| pp, |message| where, |bool|)
 		return true
 
 
-function message.OwningFunc (|message|) // isfunction
-	return .owningSyntax(AutoComplete.Functions, false)
+function message.OwningFunc (|bool| EndAtArg = false, |message|) // isfunction
+	return .owningSyntax(AutoComplete.Functions, EndAtArg)
 
 		
 function message.OwningModclass (|bool| EndAtArg=true, |message|)
@@ -462,11 +498,16 @@ function message.owningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
 		s = p
 
 
+function autocomplete.IsAFunc (|message| m, |bool|)
+	opt norefcounts
+	return .functions.valueLower(m.name) != nil
+
+
 function message.OwningFullName (|syntax| prm, |message|)
 	if self != @tmp // it's always a tmp?
 		return nil
 	if self == @tmp and self ~= "main"
-		return "@app.main".parse
+		return "@app.main"~parse
 	|| f = .first
 	if (f == @dot) and autocomplete.isafunc(self)
 		// OK... so heres the problem... we don't know if we are module or not.
@@ -477,11 +518,11 @@ function message.OwningFullName (|syntax| prm, |message|)
 		f.first.RemoveAfter
 		f <~ prm
 		return f
-	|| name = f.nyme
+	|| name = f.name_
 	if self ~= "syntax" or "operator"
 		name = .name.lowercase + name
 	if self ~= "behaviour" or "virtual"
-		name = "__" + name + "__" // technically... only should be virtuals...
+		name = name.moat // technically... only should be virtuals...
 		// but I PREFER here too as we have so many behaviours
 	if f != @thg and self ~= "render"
 		name = "Render"
@@ -497,7 +538,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 			mod_class = sub
 	
 	rz = @dot.msg(name)
-	|| modname = mod_class[0].nyme
+	|| modname = mod_class[0].name_
 	modname := "main"
 	rz.msg(fn, modname)
 	rz <~ prm
@@ -510,7 +551,5 @@ datatype AutoCompleteMode (int)
 		Edit	= 1
 	syntax is (|AutoCompleteMode| i, |bool|)
 		return self == i
-	syntax isnt (|AutoCompleteMode| i, |bool|)
-		return self != i
 
 

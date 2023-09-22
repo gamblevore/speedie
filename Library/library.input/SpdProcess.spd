@@ -1,0 +1,239 @@
+		
+class SpdProcess (Process)
+	linkage
+		cpp_part Proc
+	contains SpdProcess
+	|jbin|						Writer
+	|&pico|						Pico
+	|stringzeroterminated|		_DebugName
+	|?SpdMainFn|				SubProcess
+	|int| 						DeathLimit
+	|int|						DiedCount
+	|bool|						WeAreParent
+	|bool|						AlreadyWarnedDied
+	|ProcessMode|				Mode
+
+	constructor	(|string| path, |?SpdMainFn| fn, |&pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
+		super.constructor(path) // <-- mode should be passed here
+		
+		.deathlimit = 12
+		._DebugName = path
+		.WeAreParent = path != "" or fn != nil
+		.params	= params
+		.SubProcess = fn
+		.mode = mode
+		.output = (faststring(), nil)(.Mode is CaptureStdOut)
+		.erroroutput = (faststring(), nil)(.mode is CaptureOrPrintErrors)
+		.writer = FastString()
+		.pico = pico // (pico.new(path), pico.parent)(.WeAreParent)
+
+			
+	destructor
+		pico.destroy(.pico, "destructor")
+			
+	function CommsOpen (|bool|)
+		return self and .pico.status == 0
+
+	helper Alive (|bool|)
+		if self != nil
+			return (.ChildAlive, .ParentAlive)(.WeAreParent)
+	
+	helper ParentAlive (|bool|)
+		if app.ParentID > 1
+			return true
+
+	helper ChildAlive (|bool|)
+		if .SubProcess
+			return .CommsOpen
+		if .isrunning
+			return true
+
+
+	syntax append (|string| str, |bool|)
+		cpp_Part SendStr
+		return self <~ (@sstr.msg(str))
+
+
+	syntax append (|message| msg, |bool|)
+		cpp_part Send 
+		opt norefcounts			
+		|| p = .pico
+		if p.status
+			msg.RenderJbin(.writer)
+			p <~ .writer
+			.UpdatePipes
+
+ 
+	function Get (|float| T=0, |message|)
+		opt norefcounts
+		if self
+			.UpdatePipes
+			|| str = .pico.get(T)
+				rz = str.parse
+	
+
+	function LastSend (|date|)
+		|| p = .pico
+		return p.config.lastsend
+		
+	
+	function TimeWaitingForReply (|date|)
+		|| p = .pico
+		|| c = p.config
+		|| last = c.lastsend
+		if c.lastread < last
+			return last.ago
+
+	
+	helper HandleDied
+		|| OK = .status
+		.DiedCount += !OK
+		if (.ErrorOutput!=nil) and (.mode is AutoPrintErrors)
+			printline .ErrorOutput.GetResult
+		.Disconnect(OK.signalname) // removes us from the check-list
+
+
+	function CanActivate (|bool|)
+		if .Diedcount < .Deathlimit
+			.alreadywarneddied = false
+			return true
+		if !.AlreadyWarnedDied
+			.AlreadyWarnedDied = true
+			error (.path, "Too many disconnections, blocking reconnection.")
+	
+	
+	helper Kill
+		disabled "Explain why"
+		
+	helper Kill (|stringzeroterminated| why)
+		super.kill
+		.Disconnect(why)
+
+	syntax expect (|string| err)
+		if .CommsOpen
+			printline err
+			errorreceiver.NewError(nil, err, .path)
+		.Disconnect(err)
+
+
+	function Disconnect (|stringzeroterminated| Why="")
+		opt norefcounts
+		.UpdatePipes
+		.UnRegister
+		.ClosePipes
+		if .alive and !why and .CommsOpen
+			why = "UnknownReason"
+			debugger
+		.pico!.close(Why)
+
+
+	helper StartProcess (|string| path, |[string]| Args=nil, |&pico| C = nil, |bool| CaptureStdOut, |bool|)
+		cpp_Wrapper JB_Sh_StartProcess
+
+	
+	function RunChild (|bool|)
+		if !.pico.isok
+			require pico.replace(.pico)
+
+		return .StartProcess(.path, .params, .pico, .output!=nil)
+
+
+	function TimedOut (|date| Durr, |bool|)
+		if (.TimeWaitingForReply > durr)
+			error (self, "child timed out.")
+			return true
+	
+	function IsOpen (|bool|)
+		nil checker // shouldn't be necessary
+		require .CommsOpen
+		if .WeAreParent
+			return .isrunning
+		return app.ParentID > 1
+			
+	function Deactivate
+		|| ChAlive = .isrunning
+		if .CommsOpen and !ChAlive	// inconsistant...
+			.handledied				// disconnect comms
+		if ChAlive
+			.Kill("lost comms")		// kill child
+	
+	
+	function ActivateChild (|bool|)
+		if .isopen
+			return true
+
+		.Deactivate
+		
+		if .CanActivate
+			expect (.path) (self, "Can't re-activate process without a path.")
+			return .RunChild
+
+
+	iterator
+		while .pico.Canget
+			yield .get(1000)
+
+
+	module
+		InitOwner()
+		|SpdProcess| Parent = nil
+		
+		function InitOwner
+			target !minilib
+				|| p = pico.parent 
+					.parent = SpdProcess("", nil, p)
+
+		function CheckAllAlive
+			opt norefcounts
+			|| m = ProcessOwner.First
+			while m
+				|| ch = m
+				m++
+				if !ch.IsRunning
+					if (ch isa SpdProcess)
+						ch.HandleDied
+					ch.UnRegister
+		
+
+		helper CreateArgs (|string| path, |[string]| Args, |&cstring|)
+			cpp_wrapper
+
+
+		function BackTrace (|&nil| space, |&int| size, |&cstring|) 
+			cpp_wrapper JB_App__BackTrace
+
+
+		function RunChild (|string| app_path, |string| DebugName="", |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
+			require app_path.file.mustexist
+			|| pico = pico.new(app_path)
+				 // (pico.new(path), pico.parent)(.WeAreParent)
+				rz = SpdProcess(app_path, nil, pico, params, Mode)
+				if !rz.RunChild
+					rz = nil
+
+
+datatype ProcessMode (byte)
+	flags
+		CaptureStdOut
+		CaptureOrPrintErrors = (CaptureErrors, AutoPrintErrors)
+		CaptureAll = CaptureStdOut ||| AutoPrintErrors
+
+	syntax is (|ProcessMode| M, |bool|)
+		return self&M
+
+
+prototype SpdMainFn	(|&nil| Obj, |&cstring| args, |&pico| Comms, |bool|)
+	function RunThreaded (|[string]| R = [],  |SpdProcess|)
+		|| c_args = SpdProcess.CreateArgs("", r)
+		|| pico_fn = pico.new("SpdMainFn()")
+			rz = SpdProcess("SpdMainFn()", self, pico_fn, r)
+			if !rz.pico.startthread(self|picothreadfn|, 7|&nil|, c_args)
+				rz = nil
+
+
+prototype SpdDeathActionFn
+
+
+function app.Fork (|[string]| r, |SpdProcess|)
+	return SpdProcess.RunChild(.path, r)
+

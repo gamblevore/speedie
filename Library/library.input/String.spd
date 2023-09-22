@@ -17,26 +17,35 @@ class String
 	false			""
 	
 	|int|		Length_
-	|!&byte|	Addr
+	|&byte|		Addr
 
 
 
 // accessing
-	function Length (|int|)					{ cpp_wrapper JB_Str_Length }
-	function Address (|&byte|)				{ cpp_wrapper JB_Str_Address }
-	function LengthUTF8 (|int|)				{ cpp_wrapper JB_Str_LengthUTF8 }
+	function Length (|int|)
+		nil checker
+		cpp_wrapper JB_Str_Length
+	function Address (|&byte|)		// actually not a nil-checker, cos it can return "" hmmmmm.
+		cpp_wrapper JB_Str_Address	// change this?
+	function LengthUTF8 (|int|)
+		nil checker
+		cpp_wrapper JB_Str_LengthUTF8
 
 // (need to reorder these func params to put find first)
-	helper InByte_ ( |int| Start, |int| After=int.max, |Byte| find, |int| )
+	helper InByte_ ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
+		nil checker
 		cpp_wrapper JB_Str_InByte
 
-	function OutByte_ ( |int| Start, |int| After=int.max, |Byte| find, |int| )
+	function OutByte_ ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
+		nil checker
 		cpp_wrapper JB_Str_OutByte
 
 	helper CharSet_ (|int|Start=0, |int|After=int.max, |CharSet| cs, |bool|IsIn, |ind|)
+		nil checker
 		cpp_wrapper JB_Str_CharSet
 
 	helper White_ (|int|Start=0, |int|After=int.max, |bool| IsIn, |ind|)
+		nil checker
 		cpp_wrapper JB_Str_WhiteSpace
 	
 	function InWhite (|int|Start=0, |int|After=int.max, |ind|) { return .white_(Start, After, true) }
@@ -47,6 +56,7 @@ class String
 
 // searching
 	function Find ( |string| find, |int|Start=0, |int|After=int.max, |bool|CaseAware=false, |ind|)
+		nil checker
 		cpp_wrapper JB_Str_InStr
 
 	function Find ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| )
@@ -67,7 +77,7 @@ class String
 	function First (|Byte|)
 		cpp_wrapper JB_Str_First
 	
-	operator minus (|int|n, |int|)
+	operator minus (|int| n, |int|)
 		disabled 
 		return .length - n
 		
@@ -119,14 +129,17 @@ class String
 			return 5
 
 
-	function Map (|bytemap|b, |int|clear=-1, |string|)
+	function Map (|bytemap| b, |int| clear = -1, |string|)
 		cpp_wrapper JB_Str_MapBytes
 
 
-	function Compare (|string| other, |bool| Insensitive, |int|) { cpp_wrapper JB_Str_Compare }
+	function Compare (|string?| other, |bool| Insensitive, |int|)
+		nil checker
+		cpp_wrapper JB_Str_Compare
 
 	function IsInt (|bool|)
 		return .isint(0)
+	
 	function IsInt (|int|i, |bool|)
 		cpp_part IsIntFrom
 		require self
@@ -164,32 +177,40 @@ class String
 			fs <~ '\n'
 
 	
-	function ReplaceAll (|string| from, |string| to, |bool|Lexer=false, |Faststring|fs_in=nil, |string|) { cpp_wrapper JB_Str_ReplaceAll }
+	function ReplaceAll (|string| from, |string| to, |bool|Lexer=false, |Faststring|fs_in=nil, |string|)
+		cpp_wrapper JB_Str_ReplaceAll
 
-	function Hex (|int|Spaces=0,|faststring| fs=nil,|string|)					{ cpp_wrapper JB_Str_Hex }
+	function Hex (|int|Spaces=0, |faststring| fs=nil, |string|)
+		cpp_wrapper JB_Str_Hex
 
-	function UnHex (|faststring| fs=nil,|string|)				{ cpp_wrapper JB_Str_UnHex }
-
+	function UnHex (|faststring| fs=nil,|string|)
+		cpp_wrapper JB_Str_UnHex
 
 	function ParseInt (|int| Start, |message| where, |int64|)
+		nil checker
 		cpp_Wrapper JB_Str_TextIntegerSection
 	
 	function ParseHex (|int| Start=0, |message| where=nil, |int64|)
+		nil checker
 		cpp_Wrapper JB_Str_HexIntegerSection
 	
 	function ParseInt (|Message| Where=nil, |int64|) 
+		nil checker
 		cpp_Wrapper JB_Str_TextIntegerValid
 	
 	function Int (|int64|)
 		return .parseint
 	
 	function Float (|f64|)
+		nil checker
 		return .parsefloat(nil)
 	
 	function ParseFloat (|Message| Where=nil, |f64|)
+		nil checker
 		cpp_Wrapper JB_Str_TextDouble
 	
 	function ParseHexInt (|message|where=nil,|int|) 
+		nil checker
 		cpp_Wrapper JB_Str_HexInteger
 
 	function UnicodeSync (|string|)
@@ -214,16 +235,17 @@ class String
 	
 
 	function Trim (|charset| cs = nil, |string|)
+		nil self
 		cpp_wrapper JB_Str_Trim
 	
 
-	function TrimStart (|string| s, |bool| All=false,   |string|)
-		ifn self starts s
-			return self
-		while self starts s
-			self = self[s.length...]
-			loop all
-		return self
+	function TrimStart (|string| s, |bool| All=false,  |string|)
+		|| i = 0
+		while self[i, s]
+			i += s.length
+			if !all
+				exit
+		return self[i, int.max]
 
 
 	function Squeeze (|string|)
@@ -244,12 +266,14 @@ class String
 
 
 	function Yes (|bool|) // ispositive, isaffirmative, istrue
+		if !self
+			return false
 		if self ~= "no"  or "false" or "off" or "0" or "":	return false
 		if self ~= "yes" or "true"  or "on"  or "1": return true
 		error ("Not a boolean value: '" + self + "'")
 
 
-	function CharSet (|bool| Range = true, |CharSet|)
+	function CharSet (|bool| Range = true, |!CharSet|)
 		return CharSet.new(self, range)
 
 
@@ -269,11 +293,11 @@ class String
 
 
 	function FirstLine (|string|)
-		return .before("\n")
+		return .Before("\n")
 		
-	function Before (|string|s, |string|)
-		|| it = .find(s)
-			return self[0, it]
+	function Before (|string| s, |string|)
+		|| f = .find(s)
+			return self[0, f]
 		return self
 	
 	function ByteSplit (|[string]|)
@@ -420,11 +444,9 @@ class String
 			cpp_wrapper JB_Str_CopyFromCString
 
 		function Hex (|int64| i, |string|)
-			|| fs = faststring()
-			fs.AppendHex(i)
-			return fs
+			return i.hex!
 		
-		function FromPtr (|_voidptr| Addr, |int| N, |_voidptr|free=nil, |_voidptr| obj=nil, |string|)
+		function FromPtr (|&nil| Addr,  |int| N,  |&nil| free = nil,  |&nil| obj = nil,  |string|)
 			cpp_wrapper JB_StrFromPtr
 		
 		function FromC (|cstring| Addr, |string|)
@@ -469,10 +491,11 @@ class String
 		cpp_wrapper JB_Str_ByteValue2
 		
 	syntax Access (|int| index, |Byte|)
+		nil checker
 		cpp_wrapper JB_Str_ByteValue
 		
 	syntax Access (|int| start, |int| after, |string|)
-		cpp_wrapper JB_Str_Range
+		cpp_wrapper JB_Str_Range // technically it does nil check but its in a slow-path doesnt like it
 		
 	function Codepoint (|codepoint|)
 		cpp_wrapper JB_Str_UTF8Value
@@ -482,6 +505,7 @@ class String
 		return self[r.x, r.x2]
 
 	syntax Access (|int| index, |string| Compare, |bool| Aware=false, |bool|)
+		nil checker
 		cpp_wrapper JB_Str_MidEquals
 
 	syntax Compare (|string| Other, |bool|Aware, |int|)
@@ -492,13 +516,15 @@ class String
 		cpp_part CompareInt
 		return .length - other
 	
-	syntax Equals (|string| Other, |bool|Aware, |bool|)
+	syntax Equals (|string?| Other, |bool|Aware, |bool|)
+		nil self
 		cpp_wrapper JB_Str_Equals
+	
 	syntax Equals (|int| Other, |bool|Aware, |bool|)
 		cpp_part EqualsInt
 		return .length == other
 	
-	function Move (|ind| Pos, |int| CodePoints, |ind|)
+	helper MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)
 		|| n	= .length
 		|| s0	= .address
 		|| s	= s0 + pos
@@ -563,18 +589,18 @@ class String
 			|| f = find[i++]
 			if f != ' '
 				require c eq f
-				continue
-			|| extra = 0
-			|| found = 0
-			while (find[i+extra] == ' ')
-				extra++
-			// so now we need to find that many extra spaces
-			while c == ' ' or '\t'
-				c = self[from + i + found]
-				found++
-			require found > extra
-			i+=extra
-			from+=found-(extra+1)
+			  else
+				|| extra = 0
+				|| found = 0
+				while (find[i+extra] == ' ')
+					extra++
+				// so now we need to find that many extra spaces
+				while c == ' ' or '\t'
+					c = self[from + i + found]
+					found++
+				require found > extra
+				i+=extra
+				from+=found-(extra+1)
 		return i+from
 
 
@@ -615,9 +641,10 @@ class String
 			yield Start[i] (i)
 			i--
 
-	iterator lines
+
+	iterator Lines
 		|| Prev = 0
-		while (self != nil) {
+		while (self) {
 			|| Curr_ = .find( jeebox.CSLine, Prev )
 			yield  self[prev,curr_] (curr_)
 			Prev = Curr_ + 1
@@ -631,6 +658,7 @@ class String
 			|| c = codepoint.UTF8Read(&start)
 			yield (c) (start)
 
+
 	iterator CodePoints2
 		|| First	= .Address
 		|| Curr		= First
@@ -639,6 +667,13 @@ class String
 			|| pos = (Curr - first)|int|
 			|| c = codepoint.UTF8Read(&curr)
 			yield (c) (pos)
+
+
+function array.remove (|array of string| self, |string| item, |bool| CaseAware=false,  |string|)
+	opt norefcounts
+	for (s.backwards in self) (ind)
+		if s.SyntaxCompare(item, CaseAware) // very annoying xcode behaviour
+			.remove(ind)
 
 
 function array.join (|array of string| self, |string| sep = "", |string|)

@@ -1,0 +1,583 @@
+#!/usr/local/bin/spd
+
+module Info
+	|config| 		GameBank
+	|config| 		RoomTypes
+	|config| 		CellTypes
+
+
+role RogueObject (Message)
+    render Str
+		fs <~ "${.name} has ${..strength} STR and ${..health} HP. "
+
+	function Cell (|RogueCell|)
+		return .parent.parent
+		
+	function TryAttack (|RogueCell| cell, |bool|)
+		|| mon = cell.monster #require
+		|int| dmg = .ATK * random[0.7, 1.5]  -  mon.DEF * random[0.2, 1.0]
+		|int| LIF = mon.hp - (dmg max 0)
+		mon.HP = LIF
+		.DescribeAttack(mon, dmg)
+		if LIF <= 0
+			mon.Kill
+		return true
+		
+	function DescribeAttack (|rogueobject| mon, |int| dmg)
+		|| w = .weapon!
+		|| fs = map.FrameText
+		fs <~ "You ${w.verb(mon)} the ${mon.name} with your ${w.name} for $dmg DMG."
+	
+	function Kill
+		.name += " Corpse"
+		.clear
+		self <~ (@char, "x")
+		
+	function Verb (|rogueobject| mon, |string|)
+		if mon.hp <= 0
+			return "kill"
+		return (self[0]!.name, "hit")(self)
+	function Gain (|int| Amount)
+		require amount > 0
+		.hp = (.hp + amount) min .max
+	function HP (|int|)
+		return self..health.int
+	setter HP (|int|)
+		self..health = @num+value
+	function Max (|int|)
+		return self..max.int
+	Syntax Append (|int| Amount)
+		.gain(amount)
+	function Strength (|int|)
+		return self..strength.int
+	function Weapon (|rogueobject|)
+		return self..weapon|rogueobject|
+	function Armour (|rogueobject|)
+		return self..armour|rogueobject|
+	function DEF (|int|)
+		return .armour.strength
+	function ATK (|int|)
+		return .weapon.strength + .strength
+	function IsMonster (|bool|)
+		return .first == @str
+	function FrameStep
+		require .ismonster
+		// now what?
+		|| IsPlayer = self == map.Player
+		|| c = .cell!
+		|| pos = c.Pos
+		|| r = 7
+		for V.rect in (-r, -r, r, r)
+			|| cell = map[v+pos]
+			if !cell or v > r
+				0
+			  elseif IsPlayer
+				cell.flags |= RogueCellState.Discovered
+				cell.flags |= RogueCellState.visible
+			  elseif cell.HasPlayer
+				|| found = c.CanSee(cell, v)
+					found <~ self
+					return 
+
+
+class RogueRoom // this class is only to be used during generation! Doesn't exist during run/reload
+	|ivec4|		Size
+	|message| 	Purpose
+	|int| 		MonsterCount
+	|int| 		ID
+	|int| 		ConnectedTo
+	|uint| 		What
+	constructor (|ivec4| size, |message| purpose, |int| n)
+		.size = size, .purpose = purpose, .ID = 1<<n
+		.ConnectedTo = .ID
+	function IsSpawn (|bool|)
+		return .purpose.IsFirst
+	function Connect (|RogueRoom| Other)
+		.ConnectedTo |= other.ID
+		other.ConnectedTo |= .ID
+	function IsConnected (|rogueroom| r, |bool|)
+		return r and (r.ConnectedTo&.ID)
+
+
+datatype RogueCellState (byte)
+	flags
+		Debug
+		Visited
+		Visible
+		Discovered
+
+
+role RogueCell	(message)
+	contains RogueObject
+	
+	constructor (|message| parent, |int| x,  |message| Type)
+		super.Constructor(parent, @tmp, x, type.name)
+		.msg(@arg)
+	
+	function Room (|RogueRoom|)
+		opt norefcounts
+		|| o = .obj
+		if o and o mustbe rogueroom
+			return o
+	function Describe (|string|)
+		return .type..appearance.value
+	function Color (|message| f, |int|)
+		return (f.indent, terminal.yellow)(!.tag)
+	function Type (|message|)
+		return map.types[.name]	// The compiler can opt this? An ideal compiler would
+	function InSpawn (|bool|)
+		opt norefcounts
+		return .room.IsSpawn?
+	function HasPlayer (|bool|)
+		opt norefcounts
+		for obj in self
+			if obj == map.Player
+				return true
+	function CanSee (|RogueCell| Cell, |ivec2| Dir,  |roguecell|)
+	setter Type (|message|)
+		.Name = Value.name	
+	function Pos (|ivec2|) 
+		return (.position, .parent!.position)
+	syntax Append (|rogueobject| value)
+		.arg <~ value
+	function Walkable (|bool|)
+		opt norefcounts
+		return self and .type..walkable!=nil
+	function Monster (|rogueobject|)
+		for c in self
+			if c.IsMonster
+				return c
+		
+	function DrawOne (|rogueobject| t, |bool| vis, |bool|)
+		require (t != map.Player) or map.CanDrawPlayer
+		|| mon = t.IsMonster
+		if !mon or vis
+			|| f = t.first
+				Terminal <~ (f.name, .pos, .color(F))
+			if mon
+				return false
+		return true
+		
+	function Draw 
+		opt norefcounts
+		|| Seen = .flags & roguecellstate.discovered
+		|| Vis = .flags & roguecellstate.visible
+		require seen or vis
+		.drawone(.type, true)
+		for obj in self
+			require .DrawOne(obj, vis!=0)
+
+	iterator
+		|rogueobject| src = .arg[0]
+		while src
+			yield src
+			src++
+
+
+|| Map = Rogue()
+Class Rogue {
+|(dictionary of message)?| types
+|[RogueCell]|	Data
+|ivec2|			Size
+|date|			FlickerAfter
+|int64| 		Seed
+|FastString|	FrameText
+|message?|		MapState
+|message?| 		Level
+|rogueobject?|	Player
+|retrofloat| 	Healing
+|message?| door, |message?| floor,    |message?| corriwall
+|message?| rock, |message?| corridor, |message?| wall
+
+constructor
+	.flickerafter = 1
+	.frametext = FastString()
+		
+
+syntax access (|ivec2| s, |RogueCell|)
+	if s inrange .size
+		return .data[s.y * .size.x  +  s.x]
+
+function Init (|ivec2| size)
+	.size = size
+	.MapState = Message()
+	|| maplist = .MapState.msg(@tmp, "maps").msg(@arg)
+	for i in 6
+		|| rowlist = maplist.msg(@tmp, "map").msg(@arg)
+		rowlist.prev = @num + (i+1)
+		for y in size.y
+			|| row = rowlist.msg(@tmp, "row").msg(@arg)
+			row.Position = y
+			for x in size.x
+				RogueCell(row, x, .rock!)
+
+function CanDrawPlayer (|bool|)
+	return !.FlickerAfter.fired or ((date.now / 0.8s)|int| isa 2)
+
+function LoadLevel (|int| i)
+	.Level = (.mapstate..maps)[i-1]
+	.data.clear
+	for row in .level.arg
+		for cell in row.arg
+			.data <~ cell
+	.player = info.GameBank..classes[]!.copy
+	.Player..max = .Player..health!.copy
+	|| Wep = info.GameBank..weapons.filter(.player.strength)[]
+		.Player..weapon = wep.copy
+	
+
+function IsRoomOK (|ivec4| i, |bool|)
+	for p.rect in i
+		require self[p]!.Type! != .Floor
+	return true
+
+function OKSize (|ivec4|)
+	for attempt in 1000
+		|| RoomSize = .rndsize
+		if .IsRoomOK(RoomSize)
+			return RoomSize
+
+function RndSize (|ivec4|)
+	|| c1 = .size.rnd
+	|int| w = random[5, 25, 1]+2
+	|int| h = random[4, 15, 1]+2
+	|| c2 = c1 + (w,h)
+	if c2.x >= .size.x // reflect room size back inwards if too far
+		c2.x = c1.x
+		c1.x -= w
+	if c2.y >= .size.y
+		c2.y = c1.y
+		c1.y -= h
+	return (c1, c2)
+
+function ivec4.EdgeLength (|int|)
+	return .area - (self ± 2).area
+
+function ivec4.Edge (|int| where, |ivec4|)
+	// no corners!
+	|| W = .Width-2
+	|| H = .Height-2
+	while where >= 0 and w > 0 and h > 0
+		if (where < W)		// bottom
+			return (.x + where+1, .Y, 0, -1)
+		where -= w
+
+		if (where < H)		// right
+			return (.X2-1, .y+where+1, 1, 0)
+		where -= h
+
+		if (where < W)		// top
+			return (.x + where+1, .Y2-1, 0, 1)
+		where -= w
+
+		if (where < H)		// left
+			return (.X, .y + where+1, -1, 0)
+		where -= h
+		
+	
+function Connect (|ivec2| p, |ivec2| d)
+	|| first = self[p] #require
+	|| Length = 1
+	|roguecell| last
+	|| d2 = d.yx
+	while Length < 30
+		p += d
+		|| c = self[p] #require
+		|| ctype = c.type
+		ifn cType == .rock or .wall or .Corridor
+			exit
+		last = c
+		Length++
+		c.Type = .Corridor!
+		with self[p+d2]
+			if .type == map.Rock
+				.type = map.corriwall!
+		with self[p-d2]
+			if .type == map.Rock
+				.type = map.corriwall!
+	
+	if last
+		last.Room!.Connect(first.room!)
+		if length > 2
+			last.Type = .door!
+		  elseif length == 2
+			last.Type = .Floor!
+	if Length >= 2
+		first.Type = .door!
+
+
+function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| AllowCoridoors=false,  |bool|)
+	|| s = r.size
+	|| hitwall = 1
+	for length in 30
+		p += d
+		|| c = self[p]$
+//		c.flags = 1
+//		c.indent = length+2
+		|| r2 = c.room
+		|| ct = c.type
+		if r.IsConnected(r2)
+			require 0.1[]
+		if ct == .wall
+			require hitwall++ <= 1
+		if (ct == .Floor)
+			return true
+		require (ct == .rock or .wall) or (AllowCoridoors and ct == .corridor)
+
+
+function ConnectRoom (|rogueroom| r)
+	|| n = 5 * r.size.area/(25*15)
+	|| needed = random[1, n, 1]|int|
+	|| ToTest = r.size.EdgeLength
+	for 1000
+		|| Cell = r.size.Edge(Random[0, ToTest])
+		if .CanConnect(r, cell.xy, cell.x2y2)
+			.Connect(cell.xy, cell.x2y2)
+			needed--
+			require needed > 0
+//		else // seems that some good positions ARE being tested, but are failing. Can't see why?
+// everything seems OK?'
+//			self[cell.xy].Type = roguetype.gate
+
+
+function ivec2.isCornerOf (|ivec4| R, |bool|)
+	r -= (0,0,1,1)
+	return self == R.x1y1 or R.x1y2 or R.x2y1 or R.x2y2 // fix later
+
+
+function RoomPurpose (|[rogueroom]| rooms, |message|)
+	if !rooms
+		return info.RoomTypes.first
+	
+	|| Types = .AllowedRoom #require
+	|| Count = 0.0
+	for r in types
+		Count += r.first.Float
+	
+	|| rnd = random[0,count]
+	for r in types
+		count -= r.first.Float
+		if count <= 0
+			return r
+	return types.Last
+	
+	
+function GenRoom (|[rogueroom]| rooms)
+	|| RoomSize = .oksize #require
+	|| room = RogueRoom(roomsize, .roompurpose(rooms)!, rooms.length)
+	rooms <~ room
+	for P.rect in RoomSize
+		|| cell = self[p]
+			if RoomSize.contains(P, 1)
+				cell.type = .floor!
+			  elseif cell.type != .wall!
+				cell.Type = .wall!
+			  elseif p.IsCornerOf(Roomsize)
+				0
+			  elseif !cell.InSpawn and !room.IsSpawn
+				cell.Type = .floor!
+			cell.obj = room
+
+	if room.isspawn
+		.PositionPlayer(room)
+		
+
+function PositionPlayer (|rogueroom| Room)
+	for 100
+		for P.rect in room.Size
+			|| cell = self[p]
+				if (cell.type == .floor) and 100th[]
+					cell <~ .Player
+					return 
+
+	
+function GenMap
+	|[rogueroom]| 	Rooms
+	for i in 10
+		.GenRoom(rooms)
+	for r in Rooms
+		.ConnectRoom(r)
+
+	
+function GenMonster
+	|| lim = random[18,30,1]
+	|| Mon = .AllowedMonsters				#expect ("no monsters?")
+	for 1000
+		for c in .data // all cells
+			if !c.inspawn and c.walkable and 100th[]
+				c <~ Mon[]!.copy
+				require --lim> 0
+
+
+function AllowedMonsters (|int| Level_Num = 0, |[rogueobject]|)
+	return (info.GameBank..monsters).Filter(level_num, true)
+		
+function AllowedRoom (|int| Level_Num = 0, |[message]|)
+	return (info.RoomTypes).Filter(level_num)
+
+
+function message.Filter (|int| L, |bool| IsMonster=false,  |[rogueobject]|)
+	L := map.level[0].int
+	opt norefcounts
+	for Mon in self
+		if IsMonster
+			|| str = mon[@str] // expect a name!
+			expect (str and str.name) (Mon, "Monster has no name!")
+		|| bra = mon[@bra,1]
+			|| allowed = bra[0]
+			if allowed == @rel
+				allowed[@opp, 1].Expect(nil, "-")
+				|| f = allowed[@num].int
+				|| t = allowed[@num, -1].int
+				if L >= f and L <= t
+					rz <~ mon
+			  elseif allowed.int <= L
+				rz <~ mon
+				
+
+function info.LoadColors (|Message| msg, |TerminalColor| Default=0)
+	for s in msg
+		|| col = s..color
+		|| f = s.first!
+		|| c = default
+		if col ~= "white"
+			c = Terminal.white
+		if col ~= "red"
+			c = Terminal.red
+		if col ~= "blue"
+			c = Terminal.blue
+		if col ~= "yellow"
+			c = Terminal.yellow
+		f.Indent = c
+
+
+function info.Load (|int64| Seed, |bool|)
+	seed := date.now & 0xffff
+	Random.shared.seed = seed
+	map.seed = seed
+	if !"Creatures.txt".FileExists
+		app.CWD = app.Path.parent
+	.GameBank = "Creatures.txt".file.parse|config|
+	.roomtypes = "Rooms.txt".file.parse|config|
+	.CellTypes = "Cells.txt".file.parse|config|
+
+	|| c = map.types init .CellTypes.Dict
+	map.door = c["door"]
+	map.wall = c["wall"]
+	map.floor = c["floor"]
+	map.rock = c["rock"]
+	map.corriwall = c["corriwall"]
+	map.corridor = c["corridor"]
+
+	.LoadColors(.celltypes)
+	.LoadColors(.gamebank..classes, terminal.white)
+	.LoadColors(.gamebank..monsters, terminal.yellow)
+	
+	return StdErr.ok
+
+
+function Search (|roguecell| where, |bool|)
+	|| fs = .FrameText
+	fs <~ "You see: "
+	for obj in where
+		if obj != .player
+			fs <~ "${obj.name}. "
+	fs <~ where.Describe
+	return true
+
+		
+function Move (|int| x, |int| y)
+	|| p0 = .Player.cell!.Pos
+	|| cell = self[p0 + (x,y)]      #require
+	if !cell.Walkable
+		.search(cell)
+		return 
+
+	.FlickerAfter = date.now + 2s
+	if !.player.TryAttack(cell)
+		cell <~ .player
+		cell.flags |= RogueCellState.visited
+	.FrameStep
+
+	
+function Input (|bool|)
+	|| c = Terminal[] 
+	if c == ' '
+		return .Search(.player.cell!)
+	|| up    = "123qwe"  contains c
+	|| down  = "789zxcs" contains c
+	|| left  = "147qaz"  contains c
+	|| right = "369edc"  contains c
+	if right!=left or down!=up
+		.move(right-left, down-up)
+		return true
+
+
+function Run (|bool| Splash)
+	.init(terminal.size)
+	.LoadLevel(1)
+	.GenMap
+	.GenMonster
+	if Splash 
+		.splash
+	|| modified = true
+	while "forever"
+		if modified
+			.FrameStep
+			.DrawMap
+			Terminal.Display
+		Modified = .Input
+
+
+function FrameStep
+	.Heal
+	for c in .data
+		(c.flags &= ~roguecellstate.visible)
+	for c in .data
+		for obj in c
+			obj.FrameStep
+
+
+function Heal
+	.Healing <~ 12th
+	.Player <~ .Healing[]
+	
+	
+function DrawMap
+	for i in .size
+		self[i]!.draw
+	terminal <~ ( "${.player!.name}: ${.player!.HP}/${.player.Max}",  (30,  0) )
+	|| str = .FrameText.GetResult
+		|| s = Terminal.Size
+		Terminal.FrameText(str, (s-(30, 10), s))
+
+
+function Splash
+	|| scale = Terminal.w|float| / Terminal.h|float|
+	|| h = 24
+
+	for secs in 10s
+		Terminal.DrawRect((0, 0, terminal.w, h))
+		for i in 5.0
+			|| Title = " <3 SpeedRogue ".Rotate(i + secs*3)
+			|| f = i*1.234 + secs*(0.33+i*0.05)
+			|int| x = (1.5*f/scale).bounce * (Terminal.w-(title.length+2))
+			|int| y = f.bounce*(h-2)
+			Terminal <~ (Title, (x+1, y+1), terminal.Red+i)
+
+		|| title2 = "Welcome to SpeedRogue"
+		|| x2 = (terminal.w - title2.length) / 2
+		Terminal <~ (title2, (x2, 0), Terminal.Red)
+		Terminal <~ ( file://HeartLogo.txt , (32, 10), terminal.red)
+		Terminal.Display
+		if Terminal[]
+			exit
+
+} 
+
+main
+	printline app.cwd
+	|| a = app.args[0]
+	if info.load(a.int)
+		map.run(!a)
+

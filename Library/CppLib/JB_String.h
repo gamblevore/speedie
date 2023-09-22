@@ -31,14 +31,13 @@ void JB_BALZ_Clear();
 int JB_BALZ_CompressChunk(FastString* fs, JB_String* In, bool Strong);
 int JB_BALZ_DecompressChunk(FastString* fs, JB_String* In, int Expected);
 void JB_App__ClearCaches(int which);
-int balzmain(int argc, const char* argv[]);
 
-extern JB_String* JB_LUB[];
+extern JB_StringC* JB_LUB[];
 
 
 inline uint8 LowerCaseB(uint8 c) {
     if (c <= 90 and c >= 65) {
-        return (uint8)(c + 32);
+		return (uint8)(c + 32);
     }
     return c;
 }
@@ -170,7 +169,7 @@ inline bool SectFix_( int& srOffset, int& srLength, int CurrLen ) {
     if (Final > (u32)CurrLen) {
         srLength = CurrLen - srOffset;
     }
-    return (srLength >= 1);
+	return (srLength >= 1);
 }
 
 
@@ -193,9 +192,9 @@ inline MiniStr ReadAddrs_( JB_String* self, int StartOff, int AfterOff ) {
 
 inline int ResultFix_(uint8* Result, JB_String* S, int Dir) {
     if (Result) {
-        return (int)(Result - (S->Addr + Dir));
+		return (int)(Result - (S->Addr + Dir));
     } else {
-        return -1;
+		return -1;
     }
 }
 

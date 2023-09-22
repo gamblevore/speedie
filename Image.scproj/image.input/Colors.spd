@@ -1,0 +1,61 @@
+
+
+module Colors
+	// should make this return vec4! better to do all our work in vec4...
+	// just store/read imagepixel only. 
+	function White (|float| alpha=1.0, |imagepixel|)
+		return vec4(1.0, alpha).px
+	function Gray (|float| alpha=1.0, |imagepixel|)
+		return vec4(0.5, alpha).px
+	function Black (|float| alpha=1.0, |imagepixel|)
+		return vec4(0.0, alpha).px
+	function Red (|float| alpha=1.0, |imagepixel|)
+		return vec4(1.0, 0.0, 0.0, alpha).px
+	function Orange (|float| alpha=1.0, |imagepixel|)
+		return vec4(1.0, 0.5, 0.0, alpha).px
+	function Yellow (|float| alpha=1.0, |imagepixel|)
+		return vec4(1.0, 1.0, 0.0, alpha).px
+	function Green (|float| alpha=1.0, |imagepixel|)
+		return vec4(0.0, 1.0, 0.0, alpha).px
+	function Blue (|float| alpha=1.0, |imagepixel|)
+		return vec4(0.0, 0.0, 1.0, alpha).px
+	function Purple (|float| alpha=1.0, |imagepixel|)
+		return vec4(0.5, 0.0, 1.0, alpha).px
+	function Magenta (|float| alpha=1.0, |imagepixel|)
+		return vec4(1.0, 0.0, 1.0, alpha).px
+	function Clear (|imagepixel|)
+		0 // lol
+
+insertion
+	black	colors.black(_0)
+	gray	colors.gray(_0)
+	white	colors.white(_0)
+
+
+datatype PreMultipliedColor (ivec4)
+
+
+function imagepixel.PreMul (|PreMultipliedColor|)
+	return .Color.PreMul
+
+
+function imagepixel.PreMul (|imagepixel| self, |PreMultipliedColor|)
+	cpp_part PreMul2 // shouldn't have to write this... dont do this!
+	return .Color.PreMul
+
+
+function vec4.PreMul (|PreMultipliedColor|)
+	|| M = .Clamp
+	|| A = m.a
+	m = (m * (A * 255.0)) + 0.25
+	m.a = (1.0-A) * 64K
+	return m.ivec4|PreMultipliedColor|
+
+
+function errorseverity.color (|vec4|)
+	if self == ErrorSeverity.Warning
+		return colors.yellow
+	if self < ErrorSeverity.Warning
+		return colors.White
+	return colors.red
+	

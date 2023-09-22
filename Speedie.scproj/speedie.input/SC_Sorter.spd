@@ -2,48 +2,56 @@
 
 
 ///// LEAF SORTING
+prototype SorterComparerFn		(|scfunction| a, |scfunction| b, |bool|)
 
 module CodeSorter
 	function LeafsFirst
 		opt norefcounts
 		for f in compiler.FuncList
 			f.FindDepths
-			if options.unusedfunctions and !f.IsSTDLib and !f.IsVisible // should be any kind of lib at all... std or not
-				deprecate (f.source, "Unused function")
 		compiler.funclist.sort(LeafFunctionsSorter)
 
 
-	function LeafFunctionsSorter (sortercomparer)
+	function LeafFunctionsSorter (SorterComparerFn)
 		opt norefcounts
-		return a|scfunction|.depth < b|scfunction|.depth
+		|| x = a.LinkDepth|int| - b.LinkDepth|int|
+		if x < 0
+			return true
+		if x == 0
+			return a.exportname < b.exportname
+		return false
 	
 	
 function scfunction.MarkRecursive (|scfunction| EndAt)
 	opt norefcounts
+	|| s = self
 	while
-		is Recursive
-		require self != endat
-		self = .DepthFinder
-		require self != nil and EndAt
+		(s is Recursive)
+		require s != endat
+		s = s.DepthFinder
+		require s != nil and EndAt
 
 
 function scfunction.FindDepths (|int|)
+	opt norefcounts
 	flow off
 	// Orders the functions in terms of which ones need others.
 	// So we can process leaf functions first. Maybe easier to optimise
-	if .depth
-		return .depth
+
+	if .LinkDepth
+		return .LinkDepth
 	
 	rz = 1
 	for f in .LinkTo
-		if f isa SCFunction
-			if f.DepthFinder
+		if (f isa SCFunction)
+			if (f == self) or f.DepthFinder
 				.MarkRecursive(f)
 			  else
 				f.DepthFinder = self
 				|| D = f.FindDepths+1
 				(rz max= D)
 				f.DepthFinder = nil
-	.depth = rz
+
+	.LinkDepth = rz
 
 	

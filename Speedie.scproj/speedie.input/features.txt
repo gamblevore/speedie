@@ -33,7 +33,7 @@
 
 
 * Better expect syntax! explained in expect.txt
-* remove arrays/linkedlists. Use FixedDict+RingTree.
+* remove arrays/linkedlists. Use FixedDict+list.
 * Static vars?
 * struct/array unpacking too.
 	* var = {a,b,c}|nameandmsg| // a struct... or even a class? why not?
@@ -55,7 +55,6 @@
 			c : 9
 		}
 
-* Remove FastAppender, use fixeddict instead.
 * Replace with string param adder if so few into faststring
 * Allow constants for array sizes!
 * "||" parsing... requries an "inside |" boolean. What if... instead we use the same func that parses stuff inside of strings? Like... distance based :)
@@ -98,6 +97,8 @@ Do when it's fun...
 
 
 							Actually already good:
+
+* obj.property().func --> obj.property.func... the () is superfluous, ignored.
 
 * "a:b" I need to change language?
 
@@ -149,7 +150,7 @@ Do when it's fun...
 
 * Constructors/new are already good! Because constructors inline in C anyhow...
 
-*	msg[0] was finding a func in message[(default params)] instead of ringtree[(exact match)]
+*	msg[0] was finding a func in message[(default params)] instead of list[(exact match)]
 	I think this actually is good behaviour... I should just create an error about "Shadowing"... rather than make my compiler awkward.
 	
 * a = b:c

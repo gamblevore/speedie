@@ -44,29 +44,16 @@ function String.ParseJSON (|Messageroot|)
 	rz = .parse
 	jeebox.UnEscapeStr = tmp
 	rz.ConvertJSONToJB?
-
-
-helper Jeebox.ParseProtectSub (|errorlist|)
-	opt norefcounts
-	rz = jeebox._ParseProtector init errorlist()
-	rz.clear
-
-
-function Jeebox.ParseProtect
-	// refcounting bug work around...
-	// i think I'm frustrated by bad code output... 
-	stderr = .ParseProtectSub
 	
-	
+
 function String.ParseWithError (|&Error| rec, |MessageRoot|)
-	visible
-	jeebox.ParseProtect
 	rz = .parse
-	*rec = stderr.pop
-	stderr = stderroriginal
+	if !rz
+		|| r = stderr.pop
+		if rec: *rec = r 
 
 
-helper String.HiddenJBin (|ind|)
+helper String.ExecuteableJBin (|ind|)
 	|ind| nl = 0
 	if  *self == '#'  and  self[1] == '!' // shebang
 		nl = .find('\n') + 1
@@ -79,8 +66,10 @@ helper String.HiddenJBin (|ind|)
 
 function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |MessageRoot|)
 	// language2.scproj uses owner
-	|| data = (.decompress(int.max), self)(Allowdecomp and .iscompressed)
-	|| j = data.HiddenJBin
+	|| data = self
+	if allowdecomp and .iscompressed
+		data = data.decompress(int.max)
+	|| j = data.ExecuteableJBin
 		return data[j, int.max].parsejbin
 	if !Parser.CppInited
 	    Parser.Init
@@ -127,8 +116,8 @@ extend Parser
 	
 	
 	function ErrorAdd (|String| s, |ind|Start = parser.NextStart, |Message|)
-		require .OK //  multiple errors... per parse gets STUPID.
-		return .ErrorAlwaysAdd(s, start)
+		if .OK //  multiple errors... per parse gets STUPID.
+			return .ErrorAlwaysAdd(s, start)
 	
 
 	function OK (|bool|)
@@ -187,21 +176,23 @@ extend Parser
 
 
 	function MessageErrorSub (|FastString| fs, |int| num, |int| ButFound, |int|)
-		if (!ErrorNames)
-			ErrorNames = dictionary.new
-	        ErrorNames[kTemporal]           = "temporal"
-	        ErrorNames[kTemporalSyx]        = "declaration"
-	        ErrorNames[kTemporalWord]       = "statement"
-	        ErrorNames[kEndOfLine]          = "end-of-line"
-	        ErrorNames[kColon]              = "':'"
-	        ErrorNames[kOppSyx]             = "operator"
-	        ErrorNames[kOppWord]            = "operator"
-	        ErrorNames[kOpp]                = "operator"
-	        ErrorNames[kOppTemporal]        = "temporal-operator"
-	        ErrorNames[kThing]              = "a name"
-	        ErrorNames[kThingWord]          = "a name"
-	        ErrorNames[kThingSyx]           = "something"
-	        ErrorNames[kIllegalChar]        = "illegal-character"
+		|| e = .ErrorNames
+		if !e
+			e = Dictionary()
+			.ErrorNames = e
+	        e[kTemporal]           = "temporal"
+	        e[kTemporalSyx]        = "declaration"
+	        e[kTemporalWord]       = "statement"
+	        e[kEndOfLine]          = "end-of-line"
+	        E[kColon]              = "':'"
+	        E[kOppSyx]             = "operator"
+	        E[kOppWord]            = "operator"
+	        E[kOpp]                = "operator"
+	        E[kOppTemporal]        = "temporal-operator"
+	        E[kThing]              = "a name"
+	        E[kThingWord]          = "a name"
+	        E[kThingSyx]           = "something"
+	        E[kIllegalChar]        = "illegal-character"
 	    
 		if fs.length
 			fs <~ " / "
@@ -209,7 +200,10 @@ extend Parser
 			fs <~ "Expected "
 		
 		|| BestValue = FindError(num)
-			fs <~ ErrorNames[ BestValue ]
+			|| s = e[ BestValue ]
+				fs <~ s
+			else
+				fs <~ "something"
 			return num &~ BestValue
 		
 		fs <~ "something else"
@@ -221,34 +215,20 @@ struct MessagePosition
 		cpp_part MsgPos
 		noauto
 	
-	|int|               OldPosition
-	|uint|              OldLength
-	|uint|              OldTag
-	|MemoryLayer--|     OldLayer
+	|MemoryLayer--|     Layer
+	|int|               Position
+	|uint|              Length
+	|MsgParseFlags|		Flags
+	|uint16|            Tag
 	
 	destructor
-	    parser.UsingPos = .OldPosition 
-	    parser.UsingLength = .OldLength 
-	    parser.UsingTag = .OldTag 
-	    .OldLayer.use 
+		parser.using = *self
+	    .Layer.use 
 	
 	function SyntaxUsingComplete 
 
 
-function Message.SyntaxUsing (|MessagePosition|)
-	Opt NoRefCounts
-	rz.OldPosition = parser.UsingPos
-	rz.OldTag = parser.UsingTag
-	rz.OldLength = parser.UsingLength
-	rz.OldLayer = (message).Layer
-	if (self)
-	    parser.UsingPos = .position
-	    parser.UsingLength = .RangeLength
-		parser.UsingTag = .Tag
-	    .memorylayer.use
-
-
-api ringtree.JDB2
+api list.JDB2
 	cpp_name jdb2
 	visible
 	if (Self)
@@ -257,28 +237,24 @@ api ringtree.JDB2
 	    "(nil)"
 
 
-api ringtree.JDB3
+api list.JDB3
 	cpp_name jdb3
 	visible
 	if (Self)
 		printline self|message|.jdb_(3)
 	  else
-	    "(nil)"
+		"(nil)"
 
 
 function byte.CanPrintAsNormalChar (|bool|)
 	return (self < 127 and self >= 32)
 
 
-function Message.SyntaxUsingComplete { }
-
-
-
 // remove tokenhandler_fp, its just parsehandler!
-prototype ParseHandler    (|int| Start, |message| Parent=nil, |Message|)
-prototype TokenHandler_fp (|int| Start, |message| parent=nil, |Object|)
-prototype fnIDGenerator   (|int| Start, |int| End, |syntax| f,   |String|)
-prototype SorterComparerMsg (|message| a, |message| b, |bool|)
+prototype ParseHandler			(|int| Start, |message?| Parent=nil, |Message?|)
+prototype TokenHandler_fp		(|int| Start, |message?| parent=nil, |Object?|)
+prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f,   |String|)
+prototype SorterComparerMsg		(|message| a, |message| b, |bool|)
 
 
 
@@ -296,4 +272,6 @@ role MessageRoot (Message)
 	linkage
 		noauto
 		pragma noearlyfree
+	operator isa (|string| s, |bool|)
+		return .FilePath isa s
 

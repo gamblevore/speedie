@@ -21,11 +21,12 @@ class Selector
 	syntax cast (|uint16|)
 		cpp_part U16Cast
 		return .ID
-	function Idee (|int|)
+	function ID (|int|)
+		nil safe
 		if (self)
 			return .id
 	
-	constructor (|selector| Next, |&selector| Place, |string| name)
+	constructor (|selector?| Next, |&selector| Place, |string| name)
 		.name = name
 		.next = next
 		*place = self
@@ -47,7 +48,7 @@ class Selector
 
 /*
 // even better would be:
-	struct selector {
+	struct Selector {
 		|int|	   ID
 		|string|	Name
 	}

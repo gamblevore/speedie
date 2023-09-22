@@ -1,0 +1,76 @@
+
+	
+function StringReader.CompressInto (|object| dest, |int|Strength=mzlab.default, |?&compressionstats| st=nil) 
+	expect (self!=nil) ("Nil object given to CompressInto")
+	|jbin| j = faststring.use(dest)				#require
+	if !st
+		st = CompressionStats.All
+	st.start
+	j <~ _JbinHeader
+	j.enter(@tmp, "µz")
+	j.addint(.length)
+	j.enter(@arg)
+	while .hasany
+		|| str = .str(1MB)
+		|| Place = j.OpenSection
+		j.CompressChunk(str)
+		
+		j.CloseSection(Place)
+		st.LiveUpdate(str.length, j.length - place)
+		if !.NoMoreChunks
+			j.flush // we are calling it after anyhow	
+	j.up(2)
+	j.flush			// we definitely need to flush it.  Im serious!
+	j.CompressChunk(nil)						// cleanup
+	st.end
+
+
+helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compressionstats| st=nil, |bool|)
+	|| fs = faststring.use(dest)				#require
+	if !.IsCompressed
+		fs <~ .readall
+		return true
+	st := compressionstats.all
+
+	|| OK = StdErr.Mark
+	check (.isjbin) (self, _jBinNotJbin)
+	
+	|| mz = .NextMsg
+	if mz == @arg // remove this later
+		mz = .NextMsg(@tmp)
+	  elseif !mz.expect(@tmp)
+		mz = nil
+	require mz
+	st.start
+
+	|| size = .NextMsg(mz, @num)
+	|| arg = .NextMsg(mz, @arg)
+	|| Remaining = size.int
+	ifn size and arg and Remaining <= lim
+		if (Remaining > lim)
+			error (self, "mz would decompress too large")
+		  else
+			error (self, "Invalid mz header")
+	  else
+		mz.name = ""
+		size.name = ""
+		while
+			|| c = .NextMsg(arg, @bin)			#loop
+			|| s = c.name
+			|| Expected = Remaining min 1MB
+			loop fs.DecompressChunk(c.name, Expected)
+			Remaining -= Expected
+			fs.Flush
+			st.LiveUpdate(c.length, Expected)
+			c.remove
+	st.end
+	return OK
+
+		
+helper faststring.CompressChunk (|string?| str) 
+	description "Passing nil will free the internal buffers" 
+	cpp_wrapper JB_Str_CompressChunk
+
+helper faststring.DecompressChunk (|string| str, |int| Expected, |int|) 
+	cpp_wrapper JB_Str_DecompressChunk
+

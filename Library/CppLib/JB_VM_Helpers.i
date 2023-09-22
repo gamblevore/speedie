@@ -126,7 +126,7 @@ AlwaysInline uint bitstats32(s64* r, ASM Op) {
 #define setref(t, a, b)		{if (t) JB_SetRef(a,b); else incr(b);}  
 
 
-AlwaysInline JB_Object* alloc(_voidptr o) {
+AlwaysInline JB_Object* alloc(void* o) {
 	// we need a class table, and look it up from there.
 	// we don't have dynamicly created classes anyhow...
 	return JB_AllocFrom(((JB_MemoryLayer*)o)->CurrBlock);

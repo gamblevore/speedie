@@ -30,12 +30,16 @@ struct allocate_result {
 	bool OK;
 };
 
+allocate_result JB_AllocateString (int N, const void* Arr = 0);
+void JB_FreeString(const void* Arr);
+
 allocate_result JB_allocate (int N, const void* Arr = 0);
-uint8* JB_realloc(const void* Arr, int N);
 void JB_free(const void* Arr);
+uint8* JB_realloc(const void* Arr, int N);
 u64 JB_msize(const void* Arr);
 void JB_mtest(const void* M);
-u64 JB_memused();
+u64 JB_MemUsedString();
+u64 JB_MemUsedOther();
 inline void JB_unalloc(void** Arr) {
 	if (*Arr) {
 		JB_free(*Arr);
@@ -69,7 +73,7 @@ inline uint64 JB_u64_Log2 (u64 X) {
     return 63-__builtin_clzll(X);
 }
 
-inline uint64 JB_u32_Log2 (u64 X) {
+inline uint64 JB_u32_Log2 (u64 X) { // fix this... we mean the other two!
     return 31-__builtin_clzl(X);
 }
 

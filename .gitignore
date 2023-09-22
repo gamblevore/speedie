@@ -4,6 +4,8 @@ cpp.hidden
 .DS_Store
 xcuserdata/
 *nogit
+*.mz
+
 /Library/*.jbin
 **/*.input/garbage.jb
 *.app
@@ -25,3 +27,8 @@ Utils/jz
 
 #Notes To Self
 *.note
+Speedie.scproj/Speedie.xcodeproj/xcshareddata/xcschemes/Update.xcscheme
+*.xcscheme
+Perry.scproj/perry.input/.todo
+examples/prototest.spd
+examples/prototest

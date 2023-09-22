@@ -11,29 +11,34 @@ linkage
 	cpp_part		Cpp
 
 
-|FastStringCpp|						T
 |[FastStringCpp]|					Outputs_cpp
 |[FastStringCpp]|					Outputs_h
-|FastStringCpp|						Inlines
+
+|FastStringCpp|						T
+|FastStringCpp|						AllTypes
 |FastStringCpp|						TypesProj
 |FastStringCpp|						HeaderProj
-|FastStringCpp|						AllTypes
+|FastStringCpp|						Inlines
 |FastStringCpp|						ModuleProperties
 
 constructor
-	Init()
-
-function PreRun
-	Cpp_Export.StringBlob		= FastStringCpp.new
-	Cpp_Export.StringLengths2	= FastStringCpp.new
-	Cpp_Export.StringDict		= dictionary()
-
+	.Outputs_cpp = []
+	.Outputs_h = []
+	.T = FastStringCpp.new
 	.AllTypes   = .StreamChild( "AllTypes.h"  )
 	.TypesProj  = .StreamChild( "Proj.h" )
 	
 	.HeaderProj = .StreamChild( "JB.h" )
 	.Inlines	= .StreamChild( "Inlines.h" )
 	.ModuleProperties = .StreamChild( "ModuleProperties.cpp" )
+	Init()
+
+
+function PreRun
+	Cpp_Export.StringBlob		= FastStringCpp.new
+	Cpp_Export.StringLengths2	= FastStringCpp.new
+	Cpp_Export.StringDict		= dictionary()
+
 	
 	.AllTypes <~ "
 #ifndef ObjCID
@@ -42,7 +47,6 @@ function PreRun
 "
 
 	.Headerproj <~ '\n'
-	.T = FastStringCpp.new
 	
 	.ModuleProperties <~ `// Globals put into a separate file to make things faster.
 #include "JB_Umbrella.hpp"
@@ -54,9 +58,17 @@ function PreRun
 	.moduleproperties <~ str
 
 
+function CanOpt (|bool| force, |bool|)
+	opt norefcounts
+	if force
+		return true
+	|| c = CurrClass
+		return !c.minopt
+
+
 function OptStart (|FastStringCpp| fs, |int| m, |bool| force = 0)
 	opt min 3
-	if m and (force or !currclass.minopt)
+	if m and .CanOpt(force)
 		|| s = "s"
 		if m <= 3
 			s = m.render
@@ -64,7 +76,7 @@ function OptStart (|FastStringCpp| fs, |int| m, |bool| force = 0)
 
 
 function OptEnd (|FastStringCpp| fs, |int| m, |bool| force=0)
-	if m and (force or !currclass.minopt)
+	if m and .CanOpt(force)
 		fs <~ "\n#pragma GCC reset_options\n\n"
 	
 
@@ -76,37 +88,42 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 	fs <~ FuncHeader
 	.T.Length = 0
 	
-	fs.currfunc = f
-	fs.srcend = f.sourcearg
-	fs.ExtraAfter = fs.srcend.flatafter
 	fs <~ ' ' // space between arg.
 
 
-function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
+
+function CanExportFunc (|SCFunction| F, |bool|)
 	if !f.IsExternalLib
 		require !f.IsWrapper and !f.isMacro
-	require f isnt NewStruct
-	
-	
-	WriteFunctionHeader( F, .T )
-	if (f.IsInline)
-		fs = .Inlines // one inline can inlcude another so we still need the header first.
-	
-	|| FuncHeader = .T.GetResult
-	H <~ FuncHeader
-	H <~ ";\n\n"
-	require !f.isexternallib
-	
-	
+	return f isnt NewStruct and f isnt alreadyexported
+
+
+function FuncHeader (|FastStringCpp| fs, |SCFunction| F, |string|)
+	WriteFunctionHeader( F, .T )	
+	rz = .T.GetResult
+	.HeaderProj <~ rz
+	.HeaderProj <~ ";\n\n"
+	if f.IsExternalLib
+		rz = ""
+
+
+function CppFunc (|FastStringCpp| fs, |SCFunction| F)
+	opt norefcounts	
+	require .CanExportFunc(f)
+	scfunction.currfunc = f
+	(f is AlreadyExported)
+	|| funcheader = .FuncHeader(fs, f)$
+	.SetupFlow(F)
+
 	.funcStart(fs, f, funcheader)
-	f.Sourcearg.Export( fs )
+	f.Sourcearg!.Export( fs )
 
 	.OptEnd(fs, f.minopt)
 	fs <~ "\n\n"
 
 
 function SCClass.NeedsExport (|bool|)
-	return super.needsexport or .isbehaviourTable
+	return super.NeedsExport or .IsBehaviourTable
 
 
 function Codify (|SCModule| scb, |string| fName)
@@ -126,7 +143,10 @@ function Codify (|SCModule| scb, |string| fName)
 		
 	cpp_Export.currclass = cls
 	|| File = .StreamChild( fname + ".cpp" )
-	.HeaderProj <~ ("\n\n// $fname\n")
+	.HeaderProj <~ "\n\n// "
+	.headerproj <~ fname
+	.headerproj <~ "\n"
+
 	.ExportModuleProperties( scb, .ModuleProperties )
 
 
@@ -145,23 +165,34 @@ function SetupFlow (|SCFunction| f)
 	if Options.GenFlowControlCode and !f.FlowDisabled
 		Cpp_Export.IfName = "iif"
 		Cpp_Export.WhileName = "wwhile"
-		compiler.TernaryFunc.exportname = "JB_Ternaryy"
+		compiler.TernaryFunc!.exportname = "JB_Ternaryy"
 	  else
 		Cpp_Export.IfName = "if"
 		Cpp_Export.WhileName = "while"
-		compiler.TernaryFunc.exportname = "JB_Ternary"
+		compiler.TernaryFunc!.exportname = "JB_Ternary"
+
+
+function CodifyInlines
+	opt norefcounts
+	for (f in compiler.funclist)
+		if f.isinline
+			if f.NeedsExport and .CanExportFunc(f)
+				.cppfunc( .Inlines, f )
+	scfunction.CurrFunc = nil
 
 
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
+	opt norefcounts
 	for (f in list)
-		if f.NeedsExport
-			.SetupFlow(F)
-			.func( file, f, .HeaderProj )
-			scfunction.CurrFunc = nil
+		if !f.isinline
+			//if f.cls ~= "DelayedShowError"
+			if f.NeedsExport
+				.cppfunc( file, f )
+	scfunction.CurrFunc = nil
 
 
-function StreamChild (|String| s, |FastStringCpp|)			// zero amy dokh doomed...
-	rz = FastStringCpp(s.trimextandpath) #expect
+function StreamChild (|String| s, |FastStringCpp|)
+	rz = FastStringCpp(s.TrimExtAndPath)
 	if s isa "h"
 		.Outputs_h <~ rz
 		rz <~ "//// HEADER "
@@ -222,7 +253,7 @@ struct jbobject {int RefCount;};
 			|| cls = compiler[f]#require
 			if (cls.isobject)
 				fs <~ "struct ${cls.APIStructName} : jbobject {};\n"
-			  elseif (cls.isdatatype)
+			  elseif (cls.isdatatypeOrFP)
 				fs <~ "typedef ${cls.super.CStructName} ${cls.APIStructName};\n"
 			  else
 				error (m, "Can't export this.")
@@ -251,7 +282,7 @@ struct jbobject {int RefCount;};
 		fs <~ "\n\n\t\t// Jeebox Syntax\n\n"
 		for (s in Compiler.SyxArray)
 			|| slower = s.lowercase
-			|| id = _syxdict_[slower].id|int|
+			|| id = _syxdict_[slower]!.id|int|
 			fs <~ "#define JB_Syx$s $id;\n"
 			fs <~ "#define \$$slower $id\n"
 	
@@ -295,7 +326,8 @@ function Run
 	for c in Compiler.ModuleList
 		.ExportModuleProperties( c, nil )
 	
-
+	.CodifyInlines
+	
 	if options.ProjectIsLibrary
 		|| WriteTo = Cpp_Export.APIHeader
 			|| File = .StreamChild( "API.cpp" )
@@ -305,13 +337,6 @@ function Run
 			file <~ "#pragma GCC visibility pop\n"
 			file <~ "//// API END! ////\n"
 			.WriteAPIHeader(WriteTo)
-
-
-
-function SCClass.ExportDestructor (|string|)
-	|| it = .FirstDestructor
-		return it.ExportName
-	return "0"
 
 
 function SCClass.CSuperStructName (|string|)
@@ -333,7 +358,7 @@ function AppendCppField (|string|prop, |FastStringCpp| fs)
 	fs <~ ';'
 
 
-function ExportProperties (|SCClass| cls, |FastStringCpp|fs, |string| Ignore=nil)
+function ExportProperties (|SCClass| cls, |FastStringCpp|fs, |string?| Ignore=nil)
 	for prop in cls.Properties
 		if prop.name != Ignore
 			.AppendPropField(prop, fs)
@@ -380,11 +405,12 @@ function ExportStruct (|SCClass| cls, |bool| IsBehaviour=false)
 
 function ExportBehaviourHeader (|SCClass| cls)
 	require !cls.IsRole
-	|| b = cls.Behaviour							#require
-	.ExportStruct( B.FuncTable.cls, true )
+	|| b = cls.Behaviour
+		.ExportStruct( B.FuncTable!.cls!, true )
 
 
 function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass| Type)
+	opt norefcounts
 	self <~ "\tResult."
 	if name
 		self <~ name
@@ -392,12 +418,12 @@ function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass
 		self <~ "__destructor__"
 
 	self <~ " = "
-	ifn fn
+	if !fn
 		self <~ "nil"
 	  else
 		self <~ '('
 		if Type
-			self <~ (Type.Cstructname#expect)
+			self <~ (Type.CStructName #expect)
 		  else
 			self <~ "void*"
 		self <~ ')'
@@ -407,7 +433,7 @@ function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass
 
 function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 	|| b		= cls.behaviour									#require
-	|| TableCls = b.FuncTable.cls
+	|| TableCls = b.FuncTable!.cls
 	|| N		= TableCls.CstructName
 	|| CN		= cls.CStructName
 
@@ -418,18 +444,20 @@ function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 	fs <~ N
 	fs <~ " Result;\n"
 	
-	fs.AppendBehaviour(nil, cls.destructorfunc, nil)
+	fs.AppendBehaviour("", cls.destructorfunc, nil)
 	
 	while (b)
 		for (M in b.interfaces)
 			|| s = m.name.InterfaceToBehaviour
-			|| fn = cls.BestBehaviourFor(s)					#expect (cls.sourceclass, "Cant find behaviour '$s' on class ${cls.name}")
-			|| BaseClass = cls.InterfaceForBehaviour(fn)	#require
-			if (M.IsRequiredInterface and !cls.Behaviour[s])
-				|| msg = "Missing behaviour on class: ${cls.name}" 
-				error (cls.sourceclass, msg)
-				error (baseclass.funcproto.source, msg)
-			fs.AppendBehaviour(s, fn, Baseclass)
+			|| fn = cls.BestBehaviourFor(s)
+				|| BaseClass = cls.InterfaceForBehaviour(fn)
+					if (M.IsRequiredInterface and !cls.Behaviour![s])
+						|| msg = "Missing behaviour on class: " + cls.name
+						error (cls.source, msg)
+						error (baseclass.funcproto!.source, msg)
+					fs.AppendBehaviour(s, fn, Baseclass)
+			  else
+				error (cls.source, "Missing behaviour on class: " + s)
 		b = b.upwards
 	
 	fs <~ "\treturn Result;\n}\n\n"
@@ -438,45 +466,46 @@ function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 
 
 function ExportClass (|SCClass| cls, |FastStringCpp| CppFile)
-	require !cls.IsDataType
-	require !cls.IsFunc
+	require !cls.IsDataTypeOrFP
 	require !cls.isbehaviourTable
-	require !cls.IsRole
-	if cls.iswrapper
-		.ExportBehaviourHeader(cls)
-	require !cls.IsWrapper
-	
-	if cls.IsStruct
-		.ExportStruct( cls )
-		return
-	
+	require cls.IsRole != 1
+
+	if cls.isrole != 2
+		if cls.iswrapper
+			.ExportBehaviourHeader(cls)
+		require !cls.IsWrapper
+		if cls.IsStruct
+			.ExportStruct( cls )
+			return
 
 	|| HFile = .TypesProj
-	.ExportBehaviourHeader(cls)
+	
+	if !cls.isrole
+		.ExportBehaviourHeader(cls) // can we move this lower?
 	
 	HFile <~ "\nJBClass ( "
-	HFile <~ cls.CStructName
-	HFile <~ " , "
+	hfile <~ cls.CStructName
+	hfile <~ " , "
 	if (cls.super)
-		HFile <~ cls.super.CStructName
+		hfile <~ cls.super.CStructName
 	  else
-		HFile <~ "JB_Object"
-	HFile <~ " , "
+		hfile <~ "JB_Object"
+	hfile <~ " , "
 	
 	for (prop in cls.Properties)
-		HFile <~ "\n\t"
-		WriteDecl( prop, HFile )
-		HFile <~ ';'
+		hfile <~ "\n\t"
+		WriteDecl( prop, hfile )
+		hfile <~ ';'
 	
-	HFile <~ "\n);\n"
-	
+	hfile <~ "\n);\n"
 
-	|| HasTable = .ExportBehaviourInstance(cls, cppfile)
-	CppFile <~ "JBClassPlace4(${cls.CStructName}, ${cls.CSuperStructName}, "
-	if (!HasTable)
-		cls = TypeObject
-	cppfile <~ cls.CStructName
-	cppfile <~ "_FuncTable_);\n\n"
+	if !cls.isrole
+		|| HasTable = .ExportBehaviourInstance(cls, cppfile)
+		CppFile <~ "JBClassPlace4(${cls.CStructName}, ${cls.CSuperStructName}, "
+		if (!HasTable)
+			cls = TypeObject
+		cppfile <~ cls.CStructName
+		cppfile <~ "_FuncTable_);\n\n"
 
 
 function scfunction.CanLibLoad (|bool|)
@@ -520,7 +549,7 @@ function DoInterpreter
 function SCClass.LibExport (|jbin| j)
 	j.enter(@tmp, .name)
 	if .isobject
-		|| b = .behaviour
+		|| b = .behaviour!
 		j.enter(@arr)
 		for fn in b.WrapperFuncs
 			j.add(@tmp, fn.exportname)
@@ -594,26 +623,30 @@ extern \"C\" JB_String* JB_App__LibFuncs(void*** Funcs) {
 "
 
 
-function ExportModuleProperties (|SCModule| modl, |FastStringCpp| IntoModule)
-	|| fs = IntoModule ?? .TypesProj
+function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
+	|| fs = IntoModule
+	if !fs
+		fs = .TypesProj
 
 	for prop.vars in modl
-		if prop
-			if prop is Const
-				if IntoModule: Continue
-	
+		if !prop
+			0
+		  elseif prop is Const
+			if !IntoModule
 				WriteConst( prop, fs )
-			  elseif prop.TypeIsReached
-				if !IntoModule
-					fs <~ "extern "
-				  elseif prop is api
-					fs <~ "__lib__ " 
-	
-				if IntoModule and prop is GameFlyingMem
-					prop.stringdata.replaceall("$(N)", prop.name, fs)
-				  else
-					WriteDecl( prop, fs, nil )
-				fs <~ ';'
+				fs <~ '\n'
+
+		  elseif prop.TypeIsReached
+			if !IntoModule
+				fs <~ "extern "
+			  elseif prop is api
+				fs <~ "__lib__ " 
+
+			if IntoModule and prop is GameFlyingMem
+				prop.stringdata.replaceall("$(N)", prop.name, fs)
+			  else
+				WriteDecl( prop, fs, nil )
+			fs <~ ';'
 			fs <~ '\n'
 
 
@@ -627,7 +660,7 @@ function ExportSyx
 
 
 function ExportOneSyx (|int| i, |FastStringCpp| fs)
-	|| syx = Compiler.SyxArray[ i ]
+	|| syx = Compiler.SyxArray[ i ]!
 	fs <~ "#define kSyx$syx $i\n"
 
 
@@ -652,13 +685,12 @@ extern "C" {
 	Cpp_Export.GenLub(fs)
 
 	
-	fs <~ "extern ${TypeObject.Behaviour.FuncTable.cls.cstructname} JB_Object_FuncTable_;\n"
+	fs <~ "extern ${TypeObject!.Behaviour!.FuncTable!.cls!.cstructname} JB_Object_FuncTable_;\n"
 	if Cpp_Export.DoSavers
 		Cpp_Export.CreateClassListHeader(fs, ";\n")
 
 	cpp_export.GenStrings(.ModuleProperties)
-	|| glob_file = Cpp_Export.product("JB_Globals.cpp")
-	Cpp_Export.SmartWrite(.ModuleProperties, glob_file)
+	Cpp_Export.SmartWrite(.ModuleProperties, Cpp_Export.product("JB_Globals.cpp"))
 	.ModuleProperties.length = 0
 
 	for f in .Outputs_cpp
@@ -724,7 +756,7 @@ module
 	|uint64| 	LubHash
 	|string| 	FindGlobalsCpp = (`		
 
-extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
+extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	*src = JB_LUBSrc2;
 	*Hash = JB_LUBHash;
 	return JB_LUB;
@@ -734,11 +766,11 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function compiler.Reachedfuncs (|int|)
 		opt norefcounts
 		for f in compiler.funclist
-			rz += f.CurrReacher!=nil
+			rz += f.MyReacher!=nil
 
 
 	function GenLub (|faststring| fs)
-		fs <~ "JB_String* JB_LUB["
+		fs <~ "JB_StringC* JB_LUB["
 		fs <~ .StringCount + 1 // + 1 for the emptystring
 		fs <~ "];\n\n"
 
@@ -774,34 +806,35 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| obj = Cpp_Export.StringDict[name]
 			return *obj
 		rz = ++Cpp_Export.StringCount
-		Cpp_Export.StringDict[name] = rz
+		Cpp_Export.StringDict![name] = rz
 
 // add string
-		.StringBlob <~ name
-		.StringBlob <~ 0|byte|
+		.StringBlob! <~ name
+		.StringBlob! <~ 0|byte|
 
-		StringLengths2.encodelength(name.length)
+		StringLengths2!.EncodeLength(name.length)
 
 
 	function CppProduct (|File|)
-		return Compiler.GeneratedCppsFolder[ "JB.cpp" ]
+		return Compiler.GeneratedCppsFolder![ "JB.cpp" ]!
 
 
 	function HProduct (|File|)
-		return Compiler.GeneratedCppsFolder[ "JB.h" ]
+		return Compiler.GeneratedCppsFolder![ "JB.h" ]!
 
 
 	function Product (|string| name, |File|)
-		return Compiler.GeneratedCppsFolder[ name ]
+		return Compiler.GeneratedCppsFolder![ name ]!
 
 
 	function APIHeader (|File|)
-		|| arg = compiler.api_place[@arg, -1]
-		|| ForLib = arg.find(@tmp, "libraryname")[@str]#require
-		|| FolName = arg.find(@tmp, "exportplace")[@str]#require
-		|| Fol = Compiler.BaseProjectPath[ FolName.name ]
-		require fol.mustexist("Create API-Header for API: ${arg.filelocation}")
-		return Fol[compiler.ProjectName + "_api.h"]
+		|| arg = compiler.api_place.last(@arg)
+		|| ForLib = arg.find(@tmp, "libraryname")[@str]
+		|| FolName = arg.find(@tmp, "exportplace")[@str]
+		if FolName and ForLib
+			|| Fol = Compiler.BaseProjectPath![ FolName.name ]
+				if fol.mustexist("Create API-Header for API: ${arg.filelocation}")
+					rz = Fol[compiler.ProjectName + "_api.h"]
 	
 	
 	function WriteFuncSub (|SCFunction| F, |string| E, |FastStringCpp| T)
@@ -820,18 +853,22 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function WriteDecl (|SCDecl| D, |FastStringCpp| T, |Message| equality = nil) 
+		opt norefcounts
 		if (!d)
 			t <~ "void"
 			Return
 		
-		.WriteDeclNoName( d, T )
+		if d.iscarray
+			.WriteDeclNoName( d.internal!, T )
+		  else
+			.WriteDeclNoName( d, T )
 		
-		if (d.Name)
+		if (d.exportName)
 			T <~ ' '
-			d.Name.safe(t)
-			if (d.C_Array)
+			d.exportName.safe(t)
+			if d.IsCArray
 				T <~ '['
-				T <~ d.C_Array|int|
+				T <~ d.C_Array
 				T <~ ']'
 		
 		if (equality)
@@ -857,7 +894,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function CppLicence (|string|)
 		if !.CppLicenceStr
 			|| f = compiler.inputfile(nil, "licence.txt", nil)
-			.Cpplicencestr = f.readall(16KB, true)
+				.Cpplicencestr = f.readall(16KB, true)
 			.CppLicenceStr := " "
 		return .CppLicenceStr
 
@@ -891,7 +928,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		.CreateClassListHeader(fs, " {\n")
 
 		for ( c in compiler.ClassList )
-			if (c.IsSaveableObject and c.CurrReacher)
+			if (c.IsSaveableObject and c.MyReacher)
 				fs <~ "\tfn(&"
 				fs <~ c.CStructName
 				fs <~ "Data, (char*)" 
@@ -918,16 +955,15 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function WriteType (|SCClass| c, |FastStringCpp| fs, |bool| always)
 		require !c.IsBuiltin
-		ifn always
+		if !always
 			require c.NeedsExport
-		//iswrapper
 		|| f = c.FuncProto
 			fs <~ "\ntypedef "
 			.WriteDecl( f.ReturnType, fs )
 			fs <~ " (*${c.CStructName})"
 			.WriteFuncArgs( f, fs )
 		  else
-			if c.IsDatatype
+			if c.IsDataTypeOrFP
 				|| name = c.super.CStructName #require // can be nil!
 				fs <~ "\ntypedef $name "
 			  else
@@ -965,14 +1001,14 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		@Type.ExportAddr = C_RenderTyp
 		@Tmp.ExportAddr  = C_RenderTmp
 		@opp.ExportAddr  = C_RenderOpp
-		@brel.ExportAddr = C_RenderBrl
+		@brel.ExportAddr = C_RenderBrel
 		
 		@Rel.ExportAddr  = C_RenderRel
 		
 		@Num.ExportAddr  = C_RenderNum
 		@unit.ExportAddr = C_RenderUnt
 		@Bra.ExportAddr  = C_RenderBra
-		@ARel.ExportAddr = C_RenderArl
+		@ARel.ExportAddr = C_RenderArel
 
 		@Char.ExportAddr = C_RenderChr
 		@Str.ExportAddr  = C_RenderStr
@@ -983,15 +1019,16 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 	
 	function C_RenderAcc (fpMsgRenderCpp) // name, params
-		.first.Export(fs)
+		opt norefcounts
+		.first!.Export(fs)
 		fs <~ '['
-		self[1].first.Export(fs)
+		.second.first!.Export(fs)
 		fs <~ ']'
 	
 	
 	function C_RenderItem (fpMsgRenderCpp)
 		// func(a:b, c:d)
-		self[1].Export( fs )
+		.second!.Export( fs )
 
 	
 	function C_RenderList (fpMsgRenderCpp)
@@ -1036,7 +1073,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		if obj mustbe SCDecl
 			if obj.name
 				return obj
-			|| Backup = .Last.obj as scdecl
+			|| Backup = .Last!.obj as scdecl
 				if backup.name
 					return Backup
 			error (self, "Missing property name")
@@ -1045,27 +1082,28 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function C_RenderDot (fpMsgRenderCpp)
 		opt norefcounts
 		|| obj = .DotMustBeProperty						#require
-	
-		|| ch = .first
+		|| ch = .first!
+		
 		if (ch.obj isa SCModule)
-			obj.Name.safe(fs)
+			obj.exportName.safe(fs)
 
 		  else
 			|| CloseStr = cpp_export.CDotType( self, obj, fs )
 	
 			ch.Export( fs )
 			|| ch_decl = DeclOfObjForC( ch )
-			if (ch_decl) and NeedsDotForC( ch_decl )
-				fs <~ '.'
-			  else
-				fs <~ "->"
+				if NeedsDotForC( ch_decl )
+					fs <~ '.'
+				  else
+					fs <~ "->"
 
-			obj.name.safe(fs)
+			obj.exportName.safe(fs)
 			fs <~ CloseStr
 	
 
 	function message.BraDeclfind (|scdecl|)
 		opt norefcounts
+		
 		while
 			|| d = .AsDecl
 				rz = d
@@ -1075,8 +1113,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 				
 	function C_RenderFnc (fpMsgRenderCpp)
 		opt norefcounts
-		|| F = .first
-		|| ch1 = f.next
+		|| F = .first!
+		|| ch1 = f.next!
 		|| fn = ch1.obj|scfunction|
 		|| PostBracket = false
 		
@@ -1101,41 +1139,10 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderDcl (fpMsgRenderCpp)
-		|| name = .GetDclName
+		opt norefcounts
+		|| name = .GetDclName!
 		|| d = name.AsDecl				#expect
 		WriteDecl( d, fs, DeclsDefault(.last) )
-	
-	
-	function message.RenderCppTry (fpMsgRenderCpp) // rendertry
-		opt norefcounts			
-		|| tmp = self
-		|| Oldtry = FastStringCpp.CurrTry
-		FastStringCpp.CurrTry = self
-		.Indent = 1
-		|| after = .Position
-
-		while
-			fs.IndentLine
-			|int| c = .indent++
-			if tmp != self
-				fs <~ "_try_$c: ;\n"
-			
-			|| arg = tmp.first						#debug_Require
-			fs.indentline
-			cpp_export.C_RenderArg(arg, fs)
-			fs.indentline
-			if tmp == self
-				tmp = arg
-			tmp = tmp.next  #loop
-			fs <~ "goto _after_try_$after;"
-
-		fs.indentline
-		|int| c2 = .indent++
-		fs <~ "_try_$c2: ;\n"
-		fs <~ "_after_try_$after:"
-		
-		FastStringCpp.CurrTry = Oldtry
-		
 			
 	
 	function C_RenderTmp (fpMsgRenderCpp)
@@ -1150,15 +1157,6 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 		  elseif (name == "while") 
 			fs <~ Cpp_Export.WhileName
-
-		  elseif (name == "try")
-			.RenderCppTry(fs)
-			return
-
-		  elseif (name == "cant")
-			|| c = faststringcpp.CurrTry.indent|int|
-			fs <~ "goto _try_$c;" // omg!
-			return
 
 		  elseif (name == "elseif")
 			fs <~ "else "
@@ -1188,11 +1186,11 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| s = .name
 		if s == kBitOr
 			fs <~ "|"
-		  elseif s == kBitAnd
+		  elseif s == "&"
 			fs <~ "&"
-		  elseif s == kBitXor
+		  elseif s == "^"
 			fs <~ "^"
-		  elseif s == kBitNot
+		  elseif s == "~"
 			fs <~ "~"
 		  elseif s == "mod"
 			fs <~ "%"
@@ -1200,28 +1198,28 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ s
 
 
-	function C_RenderBrl (fpMsgRenderCpp)
+	function C_RenderBrel (fpMsgRenderCpp)
 		fs <~ '('
 		|| s = .name
-		if (s == kBitNot)
+		if (s == "~")
 			s = "~"
 		
 		fs <~ s
-		RenderInBracketsIfRel( .first, fs )		
+		RenderInBracketsIfRel( .first!, fs )		
 		fs <~ ')'
 
 
 	function WriteConst (|SCDecl| D, |FastStringCpp| T)
 		T <~ "#define "
-		D.Name.safe(T)
+		D.exportName.safe(T)
 		t <~ " ("
-		D.Default.Export( T )
+		D.Default!.Export( T )
 		t <~ ')'
 
 
 	function C_RenderUnt (fpMsgRenderCpp)
 		expect (self == "x")
-		|| num = .first
+		|| num = .first!
 		|| s = num.name.ReplaceAll( "_", "" )
 
 		fs <~ "0x"
@@ -1240,30 +1238,24 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		if o isa SCDecl
 			WriteThgMaybeTypeToo( self, o, fs )
 			Return
-			
-		if o isa SCModule
-			|| cls = o.Cls.realclass
-				|| NoAlloc = scfunction.CurrFunc isnt Alloc
-					fs <~ "JB_AsClass("
-				fs <~ cls.CStructName
-				if NoAlloc
-					fs <~ ')'
-				return
+		
+		printline "Found @thg with .obj=nil: " + .objectid
+		debugger
 		.safe(fs)
 
 
 	function C_RenderRel (fpMsgRenderCpp)
-		|| first	= .first
+		|| first	= .first!
 		|| ch		= first
 		RenderInBracketsIfRel( ch, fs )
 
 		fs <~ ' '
 		ch++
-		ch.Export( fs )
+		ch!.Export( fs )
 		fs <~ ' '
 		
 		ch++
-		RenderInBracketsIfRel( ch, fs )
+		RenderInBracketsIfRel( ch!, fs )
 
 
 	function RenderInBracketsIfRel (fpMsgRenderCpp)
@@ -1294,6 +1286,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_OneParamType (|FastStringCpp| fs, |Message| Curr, |SCDecl| D, |bool|)
 		// because C doesn't do type-inferencing
+		require d // sigh
 		|| ActualType = ClassOfObjForC( Curr )$
 		if ActualType != D.type
 			fs <~ '('							//  wrapper calls ')' after
@@ -1332,7 +1325,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_RenderTyp (fpMsgRenderCpp)
 		|| Saveness = DontNeedMoreBrackets(self)
-		|| fc		= .first
+		|| fc		= .first!
 		if (Saveness == kNeedsNoBrackets)
 			fc.Export(fs)
 			return
@@ -1394,29 +1387,33 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderNum (fpMsgRenderCpp)
+		opt norefcounts
 		fs <~ .name
-		|| d = .asdecl$
-		if d.type.typeinfo == datatypecode.float
-			fs <~ 'f'
+		|| d = .asdecl
+			if d.type.typeinfo == datatypecode.float
+				fs <~ 'f'
 
 
 	function C_RenderBra (fpMsgRenderCpp)
-		ifn self in @arg and .first == @thg
+		opt norefcounts
+		|| f = .first!
+		ifn self in @arg and f == @thg
 			fs <~ '('
-			.first.Export( fs )
+			f.Export( fs )
 			fs <~ ')'
 
 
-	function C_RenderArl (fpMsgRenderCpp)
-		// ("arl" @x "++" )							x++
-		
-		.first.Export( fs )
-		if (.name != "&")
+	function C_RenderArel (fpMsgRenderCpp)
+		opt norefcounts
+		// ("arl" @x "++" )								x++
+		.first!.Export( fs )
+		|| s = .name.first
+		if (s != '&' and '!')
 			fs <~ .name
 
 
 	function C_RenderChr (fpMsgRenderCpp)
-		// ("chr" "x")										'x'
+		// ("chr" "x")									'x'
 		fs <~ '\''
 		
 		|| b = *.name
@@ -1450,8 +1447,8 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderStr (fpMsgRenderCpp)
-		/// hmmmm? this shouldn't happen? Where do we need cstrings even?
 		fs.appendcpp(.name)
+
 	
 	function Faststring.AppendCppAll (|string| s)
 		self <~ '"'
@@ -1459,6 +1456,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			self <~ `\x`
 			.appendhex(c, 2)
 		self <~ '"'
+
 		
 	function Faststring.AppendCpp (|string| s)
 		self <~ '"'
@@ -1486,10 +1484,10 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function WriteDeclBrackets (fpMsgRenderCpp)
 		fs <~ '('
 		
-		if (.obj isa SCDecl) // it should be?
-			WriteDeclNoName( .AsDecl, fs )
+		|| d = .AsDecl // it should be?
+			WriteDeclNoName( d, fs )
 		  else
-			self[1].Export( fs )
+			.second!.Export( fs )
 		
 		fs <~ ')'
 
@@ -1500,20 +1498,24 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function WriteThgMaybeTypeToo (|Message| msg, |SCDecl| d, |FastStringCpp| fs)
-		if !d.Name
+		// ADD MORE ❤️‍🔥FIRE❤️‍🔥
+		
+		if !d.exportName
 			msg.safe(fs)
+			"@thg has no declname! 😭"
 
 		  elseif (d is TypeImprove) and (MsgOKToImprove(msg))
 			fs <~ '('
 			WriteDeclBrackets( msg, fs )
-			d.name.safe(fs)
+			d.exportname.safe(fs)
 			fs <~ ')'
 
 		  else
-			d.name.safe(fs)
+			d.exportname.safe(fs)
 		// plink plink plonk
 		// plantasy star is so beautiful.
-		// and i was... too.
+		// and i was... too. 
+		// ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥
 }
 
 function message.Safe (|faststring| fs)
@@ -1535,35 +1537,12 @@ function string.Safe (|faststring| fs)
 
 prototype fpMsgRenderCpp (|Message|self, |FastStringCpp| fs)
 class FastStringCpp (FastString)
-	|message|		ExtraAfter
-	|scfile|		OrigFile
-	|string|		OrigSrc
 	|string|		Cpp_Name
-	|message|		SrcEnd
-	|scfunction|	CurrFunc
+//	|scfunction|	CurrFunc
 
 
 	constructor (|string| name = "")
 		.cpp_name = name
-
-//	function ringtree.DBGLineInfo
-//		cpp_name dbglineinfo
-//		if (self isa message)
-//			|| f = .scfile
-//			|| fs = faststring.new
-//			fs <~ "pos: "
-//			fs <~ .position
-//
-//			if (f!=nil) and .hasposition
-//				|| lines = f.fdata[0, .position].Count('\n')
-//				fs <~ " line: "
-//				fs <~ lines + 1
-//				fs <~ ' '
-//
-//			printline fs
-	module
-		|message--| CurrTry
-
 	
 
 helper funcsorter_fn (sortercomparer)

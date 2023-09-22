@@ -54,17 +54,18 @@ module Platform
 		return .PointerBits == 64
 		
 	function Log (|string| s)
+		visible
+		opt norefcounts
 		// logging should merge with stderr logging? cos we'll want that too... usually.
-		printline s
-		if !.logger
-			.OpenLog
-		.logger <~ s
-		.Logger <~ "\n"
+		// should not printline... that should be it's own function...
+		|| L = .logger init openlog()
+		L <~ s
+		L <~ "\n"
 	
-	helper OpenLog (|string| name = "")
-		name:=app.AppName
-		|| path = file.logs[name + ".log"]
-		.logger = path.file
-		.Logger.OpenEmpty
+	helper OpenLog (|file|)
+		rz = file.logs[app.appname + ".log"]!
+		.logger = rz
+		rz.OpenEmpty
+	
 	|file| Logger
 		

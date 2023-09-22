@@ -1,0 +1,179 @@
+
+
+extend string
+	function Compress (|int|Strength=mzlab.default, |?&compressionstats| st = nil, |string|) 
+		|| j = jbin(0)
+		.CompressInto(j, Strength, st)
+		return j
+		
+	function CompressInto (|object| fs, |int| Strength = mzlab.default, |?&compressionstats| st=nil) 
+		.Stream.CompressInto(fs, strength, st)
+	
+	function IsCompressed (|bool|)
+		return .isjbin and self[_jbinheader.length, "\0B\03µz"]
+	
+	function DecompressInto (|object| fs, |int| lim=256MB,  |?&compressionstats| st=nil, |bool|)
+		cpp_part DecompressInto
+		return .stream.Decompressinto(fs, lim, st)
+	
+	function Decompress (|int|lim=256MB, |?&compressionstats| st=nil,  |StringThatWasReadSafely|)
+		return .stream.Decompress(lim, st)
+
+
+function StringReader.Decompress (|int|lim=256MB, |?&compressionstats| st=nil, |bool| Multi=true,  |StringThatWasReadSafely|)
+	|| fs = faststring()
+	while .HasAny
+		if !.Decompressinto(fs, lim, st)
+			return string.error
+		if !multi:exit
+	return fs
+
+
+function StringReader.IsCompressed (|bool|)
+	|| str = .StrNoAdvance(16)
+	return str.IsCompressed	
+
+
+function FastString.CompressInto (|object| fs, |int|Strength=mzlab.default, |?&compressionstats| st=nil)
+	|| str = string.fromptr(.resultptr, .length)
+	str.CompressInto(fs, Strength, st)
+
+
+	
+
+Module MZLab 
+	constants
+		None      = 0			// none
+		Fastest   = 1			// lz
+		Fast      = 2			// lz harder
+		Strong    = 3			// rolz
+		Strongest = 4			// rolz harder
+		Default   = strong		// its good enough!
+		
+	function TestMz (|string| path, |bool|)
+		if path
+			|| f = path.ReadFile.decompress(int.max)
+			return f.CompressTest(true) and .ManyTests
+		
+	helper string.CompressTest (|bool| report, |int| which=3, |bool|)
+		if which & 1
+			require .CompressTestSub(mzlab.strong, report)
+		if which & 2
+			require .CompressTestSub(mzlab.fast, report)
+		return true
+	
+	
+	helper string.CompressTestSub (|int| Strength, |bool| report, |bool|)
+		|compressionstats| stats
+		|| c = .compress(Strength, stats)
+		if report
+			stats.Print
+		stats = nil
+		|| decomp = c.Decompress(int.max, stats)
+		rz = self == decomp
+		if !rz
+			error "Decompression failed on: " + self
+			decomp = c.Decompress(int.max)
+		  elseif report
+			printline stats.Render
+		
+	
+	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
+		for j in 4 
+			if i & (1<<j)
+				fs <~ items[j]!
+
+	helper ManyTests (|bool|) // mztest
+		|| Items = "abcd efgh ijkl mnop".words
+		|| fs = faststring()
+		
+		for i in 1024*64
+			if i  and  i isa 16K
+				printline i.render
+			for sh in 0 to 4
+				.TestSub(items, fs, i>>(sh*4))
+			|| str = fs.getresult
+			require str.CompressTest(false, (i&1)+1)
+		"Compression Test: OK"
+		return true
+
+
+	function TestCompression
+		|| d = "/usr/local/speedie/Speedie.scproj/speedie.input/ASMBuilder/".file
+		require d.exists
+		|[string]| Inputs
+		for ch.files in d
+			if ch.visible
+				inputs <~ ch.readall
+	
+		|| total = 0
+		|| fs = FastString()
+		for str in inputs
+			total += str.length
+			str.CompressInto(fs)
+		
+		|| back = fs.GetResult.stream
+		for orig in inputs
+			expect orig == back.decompress
+		expect (back.NoMoreChunks) and !back.Decompress.length
+		"TestCompression passed."
+
+
+target minilib {
+struct CompressionStats 
+	linkage:cpp_part MzSt
+	function start
+	function end
+	function len (|int| n)
+	function liveupdate (|int| s, |int| outt)
+	function durr (|float|)
+	function render (|string|)
+	function Clear
+	function Print
+	module
+		|CompressionStats| all
+		function New (|compressionstats|)
+
+} else {
+struct CompressionStats
+	linkage:cpp_part MzSt
+	|date| Duration
+	|int|  In
+	|int|  Out
+	|bool| Live
+	
+	function Clear
+		.Duration = nil
+		.in = nil
+		.out = nil
+
+	function Start
+		.Duration -= date()
+	
+	function End
+		.Duration += date()
+
+	function Print
+		printline .render
+		
+	function LiveUpdate (|int| inn, |int| outt)
+		.in += inn
+		.out += outt
+		if .live
+			.print
+	
+	function Durr (|float|)
+		|| d = .duration
+		if d < 0
+			d += date()
+		return d.seconds
+	
+	render
+		fs.RenderSpeed(.durr, .in, .out, "")
+	
+	module
+		|CompressionStats| All // noice
+		function New (|compressionstats|)
+			rz.live = true
+}
+

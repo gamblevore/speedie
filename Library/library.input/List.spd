@@ -1,0 +1,520 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+class list (Saveable)
+	size 40
+	|ind| 	Position
+	linkage
+		wrapper
+		cpp_part		Tree
+		cpp_class		JB_List
+
+	cpp_refs
+		disturbs nil
+		disowns  false
+
+	
+	saveas nil
+	contains		list
+
+	
+	constructor							{ cpp_wrapper JB_Ring_Constructor0 }
+	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor }
+	destructor							{ cpp_wrapper JB_Ring_Destructor }
+	
+	function Parent (||)				{ cpp_wrapper JB_Ring_Parent, nil checker }
+	function Parent (assigns:|...?|)
+		nil self // for .remove
+		cpp_wrapper JB_Ring_ParentSet // allows set parent to nil, also self can be nil if parent is nil 
+		cpp_refs {disturbs self} 
+	
+	function Next (||)					{ cpp_wrapper JB_Ring_NextSib, nil checker }
+	function Next (assigns:||)			{ cpp_wrapper JB_Ring_NextSibSet }
+
+	function Prev (||)					{ cpp_wrapper JB_Ring_PrevSib, nil checker  }
+	function Prev (assigns:|...?|)		{ cpp_wrapper JB_Ring_PrevSibSet }
+
+	function First (||)					{ cpp_wrapper JB_Ring_First, nil checker }
+	function First (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_FirstSet, nil checker }
+	
+	function Last (||)					{ cpp_wrapper JB_Ring_Last, nil checker }
+	function Last (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_LastSet, nil checker }
+
+	function Second (||)
+		nil checker
+		opt norefcounts
+		|| x = .first
+			return x.next
+
+
+	function Root	 (|...!|)			{ cpp_wrapper JB_Ring_Root }
+	function IsRoot  (|bool|)			{ cpp_wrapper JB_Ring_IsRoot, nil checker }
+	function IsFirst (|bool|)			{ opt norefcounts, return .prev == nil }
+	function IsLast  (|bool|)			{ opt norefcounts, return .next == nil}
+
+	function HasAny	 (|bool|)			{ cpp_wrapper JB_Ring_HasChildren, nil checker }
+	function HasChildren   (|bool|)		{ Disabled ".hasany" }
+	function HasChildCount (|int|Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount, nil checker }
+		
+
+	function TakeAllFrom (|| src)
+		opt norefcounts
+		while src.hasany
+			.First = src.Last // should be .last = src.first
+
+	function AtRoot (|bool|)
+		opt norefcounts
+		|| p = .parent
+		if !p or !p.parent
+			return true
+
+	
+	syntax Compare (|int| n, |bool|Aware, |int|)
+		return .SlowCount - n
+	
+	syntax Equals (|int| n, |bool|Aware, |bool|)
+		return .HasChildCount( n )
+	
+	operator More (|int| N, |bool|)
+		disabled ">" // has more children than N	
+	
+	operator LessOrEqual (|int|N, |bool|)
+		// has N children or less.
+		opt norefcounts
+		|| c = .first
+		while c
+			require n > 0
+			n--
+			c++
+		return true
+
+	
+	function Across (||)
+		opt norefcounts
+		|| n = .next
+			return n
+		return .parent.next.first
+
+			
+	function FlatLast (||)
+		opt norefcounts
+		rz = self
+		while
+			rz = rz.last	#loop
+
+
+	function FlatNext  (||)	
+		nil checker
+		cpp_wrapper JB_Ring_FlatNext0
+
+	function WrapWith (|...!| W, |...!|)
+		.Prev = W
+		W.first = self
+		return W
+
+	function FlatPrev (||)
+		opt norefcounts
+		|| p = .prev
+			return p.FlatLast ?? p
+		return .parent // i think thats it?
+	// Root
+		// A
+			// B
+			// C
+				// C2
+		// D
+	
+	function FlatNextDepth  (|&int|Depth, |bool|Down=true, ||)
+		cpp_wrapper JB_Ring_FlatNextDepth, nil checker
+	
+	function FlatAfter (||)
+		cpp_wrapper JB_Ring_FlatAfter, nil checker
+			
+	function IsAncestor (|| root, |bool|)
+		disabled "Use inside or contains operator"
+
+
+	operator inside (|| s, |bool|)
+		return s contains self
+
+
+	operator contains (|| r, |bool|)
+		opt norefcounts
+		for s.up in r
+			if s == self
+				return true
+		
+	function Remove
+		.Parent = nil
+	
+	function DisposeAll (|bool| MeToo=false)
+		opt norefcounts
+		require self
+		while (|| f = .first)
+			f.disposeall(true)
+		if (Metoo)
+			.dispose
+	
+	function Dist (|list| r, |int|)
+		opt norefcounts
+		require self and r
+		
+		debug_require r.parent == .parent
+		if r != self
+			return .fwddist(R) ?? .backdist(r)
+			
+
+	function FwdDist (|list!| F, |int|)
+		opt norefcounts
+		|| c = 0
+		while F
+			if self == F
+				return c
+			F++
+			c++
+			
+
+	function BackDist (|list!| B, |int|)
+		opt norefcounts
+		|| c = 0
+		while B
+			if self == B
+				return c
+			B--
+			c--
+		
+	operator gt (|list| rt, |bool|)
+		return .fwddist(rt)
+
+	operator min (|| rt, ||)
+		if rt gt self
+			return self
+		return rt
+
+	operator plus (|int| n, ||)
+		disabled ".moveflat or .move?"
+	operator minus (|int| n, ||)
+		disabled ".moveflat or .move?"
+	
+
+	function Move (|bool| fw, ||)
+		if fw
+			return .next ?? self
+		return .prev ?? self
+		
+	
+	function Move (|int| n, ||)
+		cpp_part MoveN
+		return .movesub(n, nil)
+
+	function Step (|bool| dir, ||)
+		cpp_Part stepbool
+		if dir
+			return .next
+		return .prev
+	
+	function Step (|int| i, ||)
+		disabled "use .move(int) or .step(bool)"
+		if i
+			return .step(i>0)
+		return self
+
+	
+	function MoveCapped (|int| n, |?&int| r=nil, |...!|)
+		cpp_part StepN
+		opt NoRefCounts
+		real self
+		|| p = .parent
+			|| c = .movesub(n, r)
+				return c
+			return (p.first!, p.last!)(n < 0)
+		return self
+
+	helper MoveSub (|int| n, |&int| r, ||)
+		opt NoRefCounts
+		real self
+		if !n
+			return self
+		|| m = 0
+		|| c = self
+		|| lim = n.abs
+		while m < lim
+			c = c.step(n > 0)
+			if !c: Exit
+			m++
+
+		if r
+			*r = m
+		return c
+
+
+	function Pop (||)
+		// don't opt this :3
+		rz = .last
+		if rz 
+			rz.remove // really bad bug here if you do
+
+
+	function PopFirst (||)
+		rz = .first
+		if rz
+			rz.remove
+
+
+	function ReplaceWith (|| x)
+		.Prev = x
+		.Parent = nil
+
+
+	function MoveTo (|...!| dest)
+		require self != dest
+		if Dest gt self
+			dest.next = self
+		  else
+			dest.prev = self
+
+
+	function ShuffleNow
+		opt norefcounts
+		|| n = .slowcount
+		for n
+			.first = .last!.move(-n.now)
+
+
+	function IsOnlyChild (|bool|)
+		return .IsLast and .IsFirst
+
+	function HasOneChild (|bool|)
+		return .HasChildCount(1)
+
+
+	function RemoveChildren
+		disabled ".clear now"
+
+
+	function Clear
+		opt norefcounts
+		while
+			.first$.remove
+
+
+	function Count (|int|)
+		disabled "This function is slow. Use .HasChildCount or .SlowCount (a more honestly named version of .count... there is no fast way to do this.)"
+
+
+	function SlowCount (|int|)
+		opt norefcounts
+		for c in self
+			rz++
+
+
+	function FlatCount (|int|)
+		opt norefcounts
+		for c.flat in self
+			rz++
+
+
+	function ExtractChild (||)
+		rz = .First
+		rz.parent = nil
+
+
+	syntax access (||)
+		return .rand
+
+
+	syntax Access (|int| n, ||)
+		cpp_part Get
+		opt norefcounts
+		if self
+			if n >= 0
+				rz = .First
+				while rz and (--n >= 0)
+					rz++
+			  else
+				rz = .last
+				while rz and (++n < 0)
+					rz--
+	
+	function Rand (||)
+		return self[.slowcount()]
+
+	render
+		fs <~ "("
+		for f in self
+			f.__render__(Fs)
+			fs <~ ","
+			fs <~ " "
+		fs <~ ")"
+
+
+	syntax Append (|| Last)
+		.Last = Last
+
+
+	function RemoveAfter
+		opt norefcounts
+		while (|| x = .next)
+			x.remove
+
+	function RemoveBefore
+		opt norefcounts
+		while (|| x = .prev)
+			x.remove
+
+
+	function Keep (|int| n, |bool| First = true)
+		opt norefcounts
+		if n <= 0
+			.clear
+		  elseif first
+			self[n-1].removeafter?
+		  else
+			self[-n].removebefore?
+
+
+	function AppendAfter (|| item, || after)
+		if after
+			after.next = item
+		  else
+			.first = item
+	
+	
+	function Flatten (|[...]|)
+		opt norefcounts
+		for c.flat in self
+			rz <~ c
+	
+	
+	function Array (|[...]|)
+		opt norefcounts
+		for msg in self
+			rz <~ msg
+
+
+	function AppendBefore (|| item, || Before)
+		if Before
+			before.prev = item
+		  else
+			.Last = item
+
+
+	helper SortAfter (|SorterComparer| fnc, |list|)
+		opt norefcounts			// find the first obj that we are "more than"
+		|| p = .prev
+		while p
+			if (fnc)(self, p)
+				return p
+			p--
+
+
+	function Sort (|SorterComparer| fnc) // remove this func????
+		opt NoRefCounts
+		|| c = .second
+		while c
+			|| f = c
+			c = c.next
+			|| b = f.SortAfter(fnc)
+				b.next = f
+			  else
+				.first = f
+
+
+	function Sort (|SorterComparer2| fnc)
+		cpp_part Sort2
+		opt NoRefCounts
+		for f in self
+			f.SortAfter2(self, fnc)
+
+
+	helper SortAfter2 (|list| parent, |SorterComparer2| fnc)
+		opt norefcounts
+		|| p = .prev
+		// Find the first thing that we are larger than. end there.
+		// if we are smallest, we go to the end.
+		while p
+			|| diff = (fnc)(self, p) 
+			if diff >= 0 // bigger
+				p.next = self
+				return
+			  else
+				p--
+		parent.first = self // smallest
+
+
+	function Loop (|bool| dir=true, |list| Owner=nil, |...!|)
+		description "Owner must be nil... or contain us. Otherwise this function will break."
+		opt norefcounts
+		real self
+		if Owner
+			if dir
+				return .FlatNext ?? Owner.first!
+			return .flatPrev ?? Owner.FlatLast!
+		
+		|| p = .parent
+		if !p
+			return self
+		if dir
+			return .next ?? p.first!
+		return .prev ?? p.last!
+	
+	
+	function Upward (|int| n, |...?|)
+		opt norefcounts
+		while self and n-- >= 1
+			self = .parent
+		return self
+
+
+	iterator
+		|| ch_ = .First
+		while ( ch_ )
+			|| N = ch_.Next|...|
+			yield ch_ (ch_)
+			ch_ = N
+		(self)
+	
+	
+	iterator reverse
+		|| ch_ = .last
+		while ( ch_ )
+			yield ch_ (ch_)
+			ch_ = ch_.prev|...|
+		(self)
+			
+
+	iterator fast
+		|| ch_ = .First
+		while ( ch_ )
+			yield ch_ (ch_)
+			ch_ = ch_.Next|...|
+		(self)
+
+	
+	iterator forward
+		|| _curr = self // just uses self not first
+		while _curr
+			yield _curr (_curr)
+			_curr = _curr.next
+		(self)
+
+	iterator flat
+		|| _curr = self
+		|| after = .FlatAfter
+
+		while ( _curr ) and ( _curr != after )
+			|| N_ = _curr.FlatNext|...|
+			yield _curr (_curr)
+			_curr = N_
+		(self)
+
+	
+	iterator up
+		|| _curr = self
+		while _curr
+			yield _curr (_curr)
+			_curr = _curr.parent
+		(self)
+

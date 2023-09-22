@@ -6,7 +6,7 @@ class YingYang
 	// what about the middle?  low/high/medium? small/big/average
 	constructor (|message| line)
 		.name = line.name
-		.Opposite = line.first.Nyme
+		.Opposite = line.firstName
 	
 
 module iChing

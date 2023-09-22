@@ -37,7 +37,7 @@ extend message
 
 
 	virtual CopyID		(|string|)
-		return nil
+		return ""
 
 
 	function SearchColumns (|string| find, |int| n, |int|)

@@ -1,0 +1,60 @@
+
+
+prototype ShaderToyFunc (|ShaderToy| self,  |vec2| Resolution,  |vec2| Pos,  |vec2| Coord,  |vec4|)
+	linkage: cpp_Part ToyFn
+	syntax cast (|ErrorInt|)
+		cpp_name GUI_Toy_SilentRun
+		|| win = ShaderToy(self)
+		return win.RunAsMain
+
+
+class ShaderToy (window)
+	|date| 			LastDraw
+	|date| 			LastFPSChange
+	|textview| 		FPS
+	|vec3|			cam
+	|float|			Time
+	|ShaderToyFunc| Shader
+	linkage: cpp_Part Toy
+
+	constructor (|ShaderToyFunc| fn)
+		.Shader = fn
+		.FPS = .TextView(false)
+		.GNormal.clear // black background
+	
+	
+	behaviour Drawbackground
+		opt norefcounts
+		opt min 3
+		|| Ago = .LastDraw.ago
+		.LastDraw = date.now
+		.LastFPSChange := .LastDraw
+		if .LastFPSChange.ago > 0.5s
+			.fps.text = ago.rate.Render(1) + "fps"
+			printline .fps.text
+			.LastFPSChange = .LastDraw
+		
+		|| size = where.size.vec2
+		|| scale = 1.0/size.xx
+		|| adjust = size*-0.5	
+		for (c in where) (p)
+			.time = (.LastDraw - .CreatedDate).Seconds
+			|| pv = p.vec2
+			|| XY = (pv + adjust) * scale
+			|| Col = (.Shader)(self, size, pv, XY)
+			c <~ col
+				
+	
+	
+	function Moved (|vec3|)
+		rz.y = keys.SPACE[] - keys.LSHIFT[]
+		rz.z = keys.W[]     - keys.S[]
+		rz.x = keys.D[]     - keys.A[]
+
+	
+	behaviour FrameUpdate
+		|| m = .moved
+			.cam += m * 0.2
+			printline "cam: " + $.cam
+		SDLApp.touch
+

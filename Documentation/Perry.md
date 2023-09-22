@@ -43,6 +43,7 @@ Each of these features was designed expertly and to a high degree of care. For e
 * The quick file-finding feature, is accessed via Cmd-D (control-D on Linux). This brings up a list of files that contain the name. You can also paste file-paths in there, to see all the files in that folder.
 
 
+![](bananas.mov)
 
 ## Speed And Efficiency
 
@@ -107,8 +108,8 @@ I'll probably allow rounded buttons with pictures for backgrounds later, perhaps
 I still prefer Xcode sometimes. I'm actually going to continue to improve Perry, until I prefer Perry in all areas, but right now here are some areas that Xcode is better (for me).
 
 * Smooth fonts are nice in Xcode. Perry has a low-res pixel-art font thats great on a low-res screen. But not ideal on high-DPI monitors. Smooth fonts would fix this.
-* Xcode's text-editor feels smooth. Perry's text-editor is still a little glitchy in places. In fact I've spent months ironing out bugs in the text editor, so its much better than it was. And I've seen IDEs by large companies (QT + MSVS) that have even more glitchy text-editors.
+* Perry's text-editor still needs a few tweaks.
 * Needs a debugger and VM
-* Needs skinning and theme support
+* Needs skinning and themes
 * Maybe we could animate the text or add explosions or animations into Perry. That would be cool.
 

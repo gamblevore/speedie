@@ -16,6 +16,12 @@ function message.AllNames (|[string]|)
 			rz <~ i
 
 
+function message.List (|[Message]|)
+	opt norefcounts
+	for s in self
+		rz <~ s
+
+
  // we want something that looks like it could have a name
 function message.GoodName (|bool| NeedName=false, |string|)
 	|| name = .GoodNamesub
@@ -24,6 +30,10 @@ function message.GoodName (|bool| NeedName=false, |string|)
 		error (self, "No name found")
 		return string.Error
 	return name
+
+function message.smartname (assigns:|string|)
+	if .name != value
+		.name = value // save memory for often generated strings
 	
 	
 helper message.GoodNameSub (|bool| NeedName=false, |string|)
@@ -56,10 +66,10 @@ function @file.Dictionary (|file|)
 function @file.Words (|file|)
 	return "/usr/share/dict/words".file
 		
-function string.Dict (|byte|zep='\n', |dictionary|)
+function string.Dict (|byte| sep='\n', |!dictionary|)
 	rz = Dictionary()
 	if self
-		for l in StringFields( self, zep )
+		for l in StringFields( self, sep )
 			rz[l] = "x"
 
 function string.Sort (|byte| sep = '\n', |string|)
@@ -68,13 +78,60 @@ function string.Sort (|byte| sep = '\n', |string|)
 	return x.Join(string.byte(sep))
 
 
-function message.LOC (|int|)
+function Message.FindNotInserted (|message|)
+	opt norefcounts
+	nil self
+	for c.up in self
+		if c.position > -1
+			return c
+	return self
+
+
+helper message.FindTightest (|int| pos, |bool| named=false, |bool| SamePosition=false,  |message|) // findpos, findat
+	opt norefcounts
+	nil checker
+	|| size = int.max
+	for ch.flat in self
+		|| r = ch.rangelength
+		if !r
+			0
+		  elseif (ch.contains(pos, true)) and (!named or ch.name or (ch == @dot or @sdot))
+			if sameposition and ch.position != pos
+				0// fail
+			
+			  elseif (r < size) or ((rz!=nil) and (pos == rz.position and pos == ch.after)) // smallest
+				rz = ch
+				size = r
+
+
+function message.LOC (|ivec2|)
 	description "Calculate Lines of content" 
 	opt norefcounts
 	for s.flat in self
+		rz[1] ++
 		|| p = s.parent
 			|| pf = p.func
-			rz += (pf == @arg) or (pf == @tmp  and  s == @tmp)
+			rz[0] += (pf == @arg) or (pf == @tmp  and  s == @tmp)
+
+
+struct StringDigitIterator
+	|string| S
+	|int|    i
+	
+	iterator
+		while .i < .s.length
+			yield (.s[.i]|int| - '0') (.i)
+			.i++
+	
+	function ZeroValue (|int64|)
+
+
+function String.Digits (|StringDigitIterator|)
+	rz.S = self	
+
+
+function int.Digits (|StringDigitIterator|)
+	return .Render.digits
 
 
 function int.Msg (|message|)
@@ -88,4 +145,29 @@ function int64.Msg (|message|)
 
 function bool.Msg (|message|)
 	return @thg + .Render
+
+
+datatype HumanDate (date)
+	render
+		fs.AppendLocalTime(self)
+		
+function message.date (|humanDate|)
+	return .int
+
+
+insertion
+	parse (–digest _0).ParseJbin!
+
+
+// seems not worth it
+// we'd want a sum(_0, _1*2) macro!
+// we'd need to be able to pass types
+//insertion
+//	sum	({
+//		|| Src = _0
+//		|| V = Src.ZeroValue
+//		for (c in Src)
+//			V += c
+//		rejoin (V)
+//	})
 

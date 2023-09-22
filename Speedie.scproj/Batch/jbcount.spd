@@ -1,0 +1,13 @@
+#!/usr/local/bin/spd
+
+// about 1.2K songs... for 253K
+// 1230 songs in 39.7KB (253KB) at 33.1 chars / song
+
+main (|file| f)
+	|| size = f.size
+	|| size2 = f.readall.decompress.length
+	|| count = 0
+	for ch in f.parse
+		count += ch == "song"
+	"$count songs in ${size.strsize} (${size2.strsize}) at ${size|float|/count} / song"
+

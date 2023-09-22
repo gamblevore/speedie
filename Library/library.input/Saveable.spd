@@ -7,9 +7,9 @@ struct ObjectSaver
 	linkage
 		cpp_Part Saver
 
-	|FastString|				Dest
-	|object--|					CantSaveThis
-	|object--|					Root
+	|?FastString|				Dest
+	|?object--|					CantSaveThis
+	|?object--|					Root
 		
 	destructor
 		check !.CantSaveThis (.CantSaveThis, "This class has no saving function for it.")
@@ -50,19 +50,21 @@ class Saveable
 		cpp_part Sav
 
 	
-	virtual   SaveWrite (|&ObjectSaver| Saver)
-		Saver.CantSaveThis = self
-		saver.dest <~ "nil,"
-	
-	virtual   LoadProperties (|&ObjectLoader| Loader,)
-		Loader.CouldntLoad = self
-
-	virtual   SaveCollect (|&ObjectSaver| Saver)
-	Behaviour SaveCollect { /* not all objects need to collect anything... */ }
-
 	constructor
 		cpp_wrapper
+
+	virtual SaveWrite (|&ObjectSaver| Saver)
+		Saver.CantSaveThis = self
+		saver.dest! <~ "nil,"
 	
+	virtual LoadProperties (|&ObjectLoader| Loader,)
+	
+	behaviour LoadProperties // how to hide this? just use "_"?
+		Loader.CouldntLoad = self
+
+	virtual SaveCollect (|&ObjectSaver| Saver)
+
+	behaviour SaveCollect { /* not all objects need to collect anything... */ }	
 	
 	helper IsSaveMarked (|bool|)
 		|| p = self|&int|
@@ -73,7 +75,7 @@ class Saveable
 		|| p = self|&int|
 		|| rc = p[0] 
 		require !(rc & ObjectSaver.RefMark)
-		p[0] = Rc (|) ObjectSaver.RefMark
+		p[0] = Rc ||| ObjectSaver.RefMark
 		return true
 	
 	helper SaveUnMark
@@ -83,21 +85,21 @@ class Saveable
 	function SaveTo (|File| f)
 		cpp_part SaveToFile
 		|| it = f.out
-			.saveto(it)
+			.SaveTo(it)
 	
 	function ObjectSaver.Finish (|saveable| first)
 		opt norefcounts
-		|| fs = .dest
+		|| fs = .dest!
 		fs <~ '\n'
 		fs <~ '@'
 		fs.AppendObjectID(first)
 		fs <~ '\n'
 		fs <~ kSaverEnd
 
-	// textview uses "Saveto" as a property.
+	// textview uses "SaveTo" as a property.
 	function SaveTo (|FastString| fs_in = nil, |string|)
 		cpp_part SaveTo
-		|| fs = FastString(fs_in) #require
+		|| fs = FastString(fs_in)
 		|| Saver = objectsaver.new
 		saver.dest = fs
 		saver.root = self
@@ -128,25 +130,25 @@ class Saveable
 
 extend ObjectSaver
 	function AppendBool (|bool| b)
-		.dest <~ b|int|
-		.dest <~ ','
+		.dest! <~ b|int|
+		.dest! <~ ','
 
 	function AppendString (|string| s)
 		// seems fine, to be honest.
-		.dest <~ '`'
+		.dest! <~ '`'
 		s.replaceall("`","``", .dest)
-		.dest <~ '`'
-		.dest <~ ','
+		.dest! <~ '`'
+		.dest! <~ ','
 	
 	function AppendInt (|int64| i)
-		.dest <~ i
-		.dest <~ ','
+		.dest! <~ i
+		.dest! <~ ','
 	function AppendRaw (|&byte| f, |int| n)
-		.dest.AppendHexData(f, n)
-		.dest <~ ','
+		.dest!.AppendHexData(f, n)
+		.dest! <~ ','
 	function AppendObject (|object| o)
-		.dest.AppendObjectOrNil(o)
-		.dest <~ ','
+		.dest!.AppendObjectOrNil(o)
+		.dest! <~ ','
 
 
 helper FastString.AppendObjectID (|saveable| o)
@@ -177,12 +179,12 @@ extend Array
 		opt NoRefCounts
 
 	Behaviour SaveWrite
-		|| D = saver.dest
+		opt NoRefCounts
+		|| D = saver.dest!
 		for (v in self)
 			D <~ ", "
 			start
 			D.AppendObjectOrNil(v)
-		opt NoRefCounts
 
 
 extend Dictionary
@@ -193,10 +195,10 @@ extend Dictionary
 	
 	behaviour SaveWrite
 		opt NoRefCounts
-		|| D = saver.dest
+		|| D = saver.dest!
 		|| L = .navigate
 		
-		while (l)
+		while (l.movenext)
 			D <~ l.name // what if it's an int?
 			D <~ ": "
 			D.AppendObjectOrNil(l.value)
@@ -239,16 +241,16 @@ class SaverClassInfo (array)
 	saveas				nil
 	
 	|&ClassData|		Cls
-	|SaverClassInfo|	NextInfo
+	|SaverClassInfo?|	NextInfo
 	|&char|				Data
 	
 
-	function AdFub (|faststring| fs)
-		// adfub????
-		// nothing uses this?
-		opt norefcounts
-		for (Obj in self)
-			fs.AppendObjectID(obj)
+//	function AdFub (|faststring| fs)
+//		// adfub????
+//		// nothing uses this?
+//		opt norefcounts
+//		for (Obj in self)
+//			fs.AppendObjectID(obj)
 
 
 	constructor ( |&ClassData| Cls, |&char| Data )
@@ -257,12 +259,12 @@ class SaverClassInfo (array)
 
 	
 	function HasData (|bool|)
-		return (.data != nil) and (.data[0])
+		return .data[0]
 
 	
 	function Saveable.SaverInfo (|SaverClassInfo|)
 		opt norefcounts
-		return .class.saveinfo|Saverclassinfo|
+		return .Class.saveinfo|Saverclassinfo|
 
 
 	function Clear
@@ -274,12 +276,11 @@ class SaverClassInfo (array)
 
 	
 	function Output (|&ObjectSaver| Saver)
-		opt norefcounts
-		require self
-		
+		opt norefcounts		
 		|| D = saver.dest
+		require d and self
 		D <~ '\n'
-		D <~ string.fromc(.cls.name).lowercase // lol.
+		D <~ string.fromc(.cls!.name).lowercase // lol.
 		D <~ ' '
 		
 		if (.HasData)
@@ -307,21 +308,18 @@ class SaverClassInfo (array)
 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 
 
 
-struct StructSaveTest {
+struct StructSaveTest
 	saveas struct
-	|saveable|	Sav
+	|saveable?|	Sav
 	|int64|		Intt
 	|string|	Str
 	
-	function RunTest {
+	function RunTest
 		.test("")
-	}
-	function Test (|string| s) {
+		
+	function Test (|string| s)
 		cpp_part TestStr
-	}
-	function Test (|object| s) {
-		cpp_part TestObj
 
-	}
-}
+	function Test (|object| s)
+		cpp_part TestObj
 

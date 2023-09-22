@@ -4,7 +4,7 @@
 */
 
 
-module Targets
+module SC_Targets
 	|dictionary of string| Items = dictionary()
 	syntax Access (|string| name, |bool|)
 		return .items.valuelower(name).yes

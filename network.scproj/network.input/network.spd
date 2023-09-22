@@ -1,15 +1,14 @@
 
 
+function string.download (|date| timeout=10s, |string|cookielist="", |string|)
+	rz = string.error
+	|| fs = faststring()
+	if fs.appendurl(self, cookielist)
+		rz = fs
+	
 
-module network
-	function Download (|string|url, |int|lim, |networkDownloader|)
-
-
-class NetworkDownloader
-	linkage
-		cpp_part Down
-	|faststring|	Result
-	|bool|			Finished
-	function Progress (|float|)
-	syntax cast (|string|)
+function faststring.AppendURL (|stringzeroterminated| URL, |date| timeout = 10s, |stringzeroterminated| cookielist=nil, |errorint|)
+	cpp_wrapper JB_FS_AppendURL
+	
+	
 

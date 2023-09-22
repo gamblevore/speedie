@@ -1,53 +1,70 @@
 
 
+/*
+"Why have a GUI when you can turn a textView INTO a GUI?"  !!Deleted this idea!!
 
-// illuminates typeable areas of text and validates stuff too.
-// eventually we'll make unilluminated areas become untypeable :)
-// but that has some issues... like "how to type args {}" in one keystroke... which isn't possible
-// sometimes its useful to go through invalid states to reach a valid one.
-// sorting that out won't be easy... I'd need to make "correct syntax adders..."
-// but overall, its the right approach!!
-// very little code to do the right thing.
-
-/* "Why have a GUI when you can turn a textView INTO a GUI?"
-
-todo:
-	* Make tmp rendering use rangelength to pad with spaces... unifying the length
-	* Attach an array of strings, to tmp.first.obj... for a user choseable list
-	* Disable editing/selecting of unilluminated areas, unless in "forced mode"
-	* Draw a vertical line between the tmps and the values
-	* Always re-render... unless in "forced mode".
-*/
-
-
-function ArgValidation (GUITextValidate)
-	msg.Expect(@arg)
-	for s in msg
-		if (msg != @arg) or !s.Expect(@tmp)
-			0
-		  elseif s == "args"
-			for a in s.Arg
-				a.expectString
-				(a is EditableAny)
-		  elseif s == "notes"
-			for f.flat in s
-				if f != s and @arg
-					(f is EditableAny)
-		  elseif s == "env"
-			for rel in s.Arg
-				if rel.Expect(@rel)
-					|| ch1 = rel[@thg, 0]
-						(ch1 is EditableThing)
-					|| opp = rel[@opp, 1]
-						opp.expect(@opp, "=")
-						(opp is EditableSyx)
-					|| ch2 = rel[@nil, 2]
-						ch2.goodname
-						(ch2 is EditableAny)
-		  elseif s == "pwd"
-			|| ch = s[@nil]
-				ch.ExpectString
-				(ch is EditableString)
-		  else
-			error s
+Instead we want a jeebox DTD, that auto-generates a GUI. Like:	
+ 	{
+		(unordered)
+		args	{"*"++}
+		notes	{"*"}++
+		env		{(@thg="*")++}
+		pwd		{"*"}
+	}
 	
+	so would be validating Jeebox for data-files only... not the generalised jeebox.
+
+*/
+//
+//
+//function textview.EnvValidation (|message| msg)
+//	require msg.ExpectLast and msg.Expect(@arg)
+//	for rel in msg
+//		if rel == @rel
+//			|| ch1 = rel[@thg, 0]
+//				(ch1 is Editable)
+//			|| opp = rel[@opp, 1]
+//				opp.expect(@opp, "=")
+//				(opp is Editable)
+//			|| ch2 = rel[@nil, 2]
+//				ch2.goodname
+//				(ch2 is Editable)
+//		  else
+//			rel.expect(@rel)
+//
+//
+//function ArgValidation (guitextevent)
+//	using errorreceiver()	
+//		|| msg = .text.parse // really we should be able to use textview.parse, but it seems one state behind for this.
+//			.ArgValidationSub(msg)
+//		while (|| err = StdErr.Pop)
+//			beep
+//			.LoadOneError(err)
+//
+//	
+//function textview.ArgValidationSub (|message| msg)
+//	msg.Expect(@arg)
+//	for s in msg
+//		if (msg != @arg) or !s.Expect(@tmp)
+//			0
+//		  elseif s == "flags"
+//			0
+//		  elseif s == "args"
+//			for a in s.Arg
+//				a.GoodName(true)
+//				(a is Editable)
+//		  elseif s == "notes"
+//			for f.flat in s
+//				if f != s and @arg
+//					(f is Editable)
+//		  elseif s == "env"
+//			|| arg = s.first
+//				.EnvValidation(arg)
+//		  elseif s == "pwd"
+//			|| ch = s[@nil]
+//				ch.ExpectString
+//				(ch is Editable)
+//		  else
+//			error s
+//	
+//	

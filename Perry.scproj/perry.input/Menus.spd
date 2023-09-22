@@ -1,7 +1,7 @@
 
 
 function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
-	|| p = .submenu
+	|| p = .SubMenu		#require
 	|| orig = l
 	p.listsource.clear
 	while l
@@ -20,142 +20,83 @@ function string.NameOrRoot (|string|)
 	return "Root"
 
 
-function PerryIDE.EnablePrevnext
-	|| m = .HistoryMarker
-	(.gonext is enabled) = m and m.next
-	(.goprev is enabled) = m and m.prev
+function PerryIDE.EnablePrevNext
+	|| m = .FindInHistory(.path)
+	(.GoNext is enabled) = m.next!=nil
+	(.GoPrev is enabled) = m.prev!=nil
 
 
-function perryide.FindInHistory (|string|p, |string|n, |message|)
+function perryide.FindInHistory (|string| p, |message|)
 	opt norefcounts
-	for s in .filehistory
-		if s.name ~= p
-			if s.first == n
-				return s
+	for s in .RecentFiles
+		if s.firstname ~= p
+			return s
 
 
 function perryide.AddToJumpHistory
 	require !.StillJumping
-	|message| where
-	|| old = .FindInHistory(.currpath, .editme.currline.render) 
-		if .duringnextprev
-			where = old
-			.UpdateMarker(old)
-		  else
-			old.remove // keep the new scrollpos!
-	if !where
-		where = .buildmarker		
-
-
-// unused?
-//	|| p = .HistoryMarker			// this doesnt work cos the historymarker is removed!
-//		while (|| x = p.next)
-//			p.prev = x
-
-	if !.duringNextPrev or !old
-		.FileHistory.Keep(66, false)
-		if !.duringnextprev or !.historymarker
-			.FileHistory <~ where
-		  else
-			.historymarker.next = where
-	.historymarker = where
+	|| p = .path
+	|| old = .findinhistory(p)
+	if  !.duringNextPrev  or  !old
+		if old
+			old.remove
+		.RecentFiles.msg(@str, p.name).msg(@str, p)
+		.RecentFiles.Keep(60, false)
 	.EnablePrevNext
 	
 
-function perryide.DebugPop (|string| s)
-	printline s
-	.displayinpopup(s, true)
-	.popupdisplay.size = 300~left by 20~inside
-
-
-function perryide.MiniFileHistory (|string|)
-	|| fs = faststring()
-	for ch in .filehistory
-		fs <~ ch.second.nyme
-		fs <~ "\n"
-	fs <~ "\n----------\n"
-	|| h = .HistoryMarker
-		fs <~ h.second.nyme
-	return fs
-
-
 function RightClickNext (GUIaction)
 	if self isa ButtonView
-		|| s = .submenu
+		|| s = .SubMenu
 			s.OnTypingFilter = PerryFileListFilter
 			s.ListSource = .ide.SortedPrevious
 			.OpenMenu
 
+
+function ChosePrevItem (GUIListEvent)
+	|| i = .ide
+	|| old = i.FindInHistory(row.firstname)
+	i.GoToMarker(old ?? row, 1)
+	return true
+
+
+function ClickedPrevNext (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	|| m = i.FindInHistory(i.Path)
+		|| fwd = self == i.gonext
+		m = m.step(fwd)
+		i.GoToMarker(m, fwd.dir)
+		return true
+	
 
 function PerryFileListFilter (GUIListEditEvent)
 	opt norefcounts
 	.ListSource = .ide.SortedPrevious(value)
 
 
-function ChosePrevItem (GUIListEvent)
-	|| i = .ide
-	|| old = i.FileHistory.find(row)
-	|| j = old ?? row
-	i.GoToMarker(j)
-	return true
-
-
-function PerryIDE.GoToMarker (|message| m)
+function PerryIDE.GoToMarker (|message| m, |int| dir)
 	require m 
 	|| l = m.first
-	.duringNextPrev = true	
+	.duringNextPrev = dir
 	using self
-		.GoToAnyFile(m.name, l.name, m)
-	.duringNextPrev = false
+		.GoToAnyFile(m.firstname)
+	.duringNextPrev = 0
 
 
-function perryide.SortedPrevious (|string| filter = "", |message|)
-	|| seen = dictionary()
+function perryide.SortedPrevious (|string| StrFilter = "", |message|)
 	rz = Message()
-	for ch in .FileHistory
-		|| n = ch[2].nyme.LowerCase
-		if filter.filter(ch.second.nyme) and !seen[n]
-			seen[n] = ch
-			rz <~ ch.copy
+	for ch in .RecentFiles
+		if StrFilter.filter(ch.name)
+			|| cpy = ch.copy
+			rz <~ cpy
 
 
-function PerryIDE.UpdateMarker (|message| m)
-	m.clear
-	m.become(@tmp, .currpath)
-	|| line = (@num + .editme.currline) 
-	line.position = .editme.scrollpos
-	m <~ line
-	|| name = .CurrPath.name.widen(16)
-	|| fnname = ""
-	|| msg = .Editme.ClickedMsg
-		|| fn = msg.owningfunc
-			fnname = fn.OwningFullName(@emb).render
-			name += " (" + fnname + ")"
-	
-	m <~ name
-	m <~ .currpath + "/" + fnname
-
-	
-function PerryIDE.BuildMarker (|message|)
-	rz = Message()
-	.Updatemarker(rz)
-
-
-function ClickedPrevNext (GUIaction)
-	opt norefcounts
-	|| i = .ide
-	|| m = i.HistoryMarker
-		m = m.step(self == i.gonext)
-		i.GoToMarker(m)
-		return true
-	
-
-
-function ProjectCMMShow (GuiMenuEvent)
-	|| row = clicked.row as error
-		|| i = .ide
-		i.clickederror(row)
-		i.view(i.viewfiles)
+//function ProjectCMMShow (GuiMenuEvent)
+//	|| row = clicked!.row as error
+//		|| i = .ide
+//		i.clickederror(row)
+//		i.view(i.viewfiles)
 
 
 function PressingTabs (guiaction)
@@ -163,10 +104,11 @@ function PressingTabs (guiaction)
 	if self isa ButtonView
 		|| p = .submenu|listview|
 		|| ide = row.ide
+		if p and ide
 			p.ListSource.clear
 			|| name = ide.name
 			p <~ ( "Copy " + name, MenuCopyProject, ide)
-			p <~ ( "Reveal Project", MenuShowProject, ide)
+			p <~ ( "Show In Desktop", MenuShowProject, ide)
 			p <~ ( "Close", MenuCloseProject, ide)
 
 			.OpenMenu(row) // "Yes" "no"
@@ -204,6 +146,6 @@ function MenuShowProject (guimenuevent)
 
 function RightClickedTabs (GUIAction)
 	if row and self isa ButtonView
-		.FillMenuPath(row.ide.Project, row)
+		|| i = row.ide
+			.FillMenuPath(i.Project, row)
 
-	

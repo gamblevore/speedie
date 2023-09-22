@@ -1,32 +1,34 @@
 
 
 main // speedie main {
-	|message| o
-	|| p = o.first?.first?
-	// advice for future self: to optimise these StatExprs...
-	// We should make it possible in tran_Qmark... to set the type's name to "--"
+	compiler.SetupEnv
+	compiler.MiniTests
 	compiler.Main
+	compiler.PrintResults
 
 
 function Compiler.Main
-	.SetupEnv
 	if .EnterCompile
 		using FlowControl.allow("Speedie")
 			.CompileTime
-	.PrintResults
 
 
 function Compiler.EnterCompile (|bool|)
-	return  !.TryVariousStartModes  and  FeedBack.ParseArgs  and  !interact.Enter
+	return  !.TryVariousStartModes  and  FeedBack.ParseArgs  and  !interact.EnterAutoComplete
 
 
 function Compiler.PrintResults
 	.PrintStats
-	if !stderr.ok
-		printline "Installation: " + .projects
 	.PrintCompileErrors
-	if interact.Perry != nil
-		printline "exiting speedie " + app.id.render
+	if SpdProcess.parent != nil
+		printline "Exiting Speedie " + app.id.render
+	if Options.Beep
+		"\07"
+
+
+function Compiler.MiniTests
+	.testdate
+	.testTask
 
 
 function compiler.ClearEnvs
@@ -41,27 +43,27 @@ function compiler.SetupEnv
 	opt norefcounts
 
 	FlowControl.FlowMode = FlowControl.Off // can enable via "log"
-	error.AutoPrint := 1
 	.Clearenvs
-	check (app.prefpath) "Conf missing prefpath"
-	app.PrefsInit
-	|| talk = app..talk
-	if talk.length and app.IsMainThread
-		app.IgnoreBreakPoints
-	  else
-		app.threadname = "SpeedieDebug"
-
-	|| NL = app.prefs("nil")
-		options.strnil = nl.int
+	app.PrefsInit(-1)
+	
+	if !app.IsMainThread
+		app.ThreadName = "SpeedieDebug"
 
 	errorcolors.DisableIfNoTerminal
+	error.AutoPrint = 1
+	pico.conf.DesiredThreadCount = 1
+	
+	if pico.parent
+		error.AutoPrint = 0
+		ErrorColors.enabled = false
 
 
-function app.IgnoreBreakPoints
-	cpp_wrapper JB_Pipe__IgnoreBreakPoints
-
-
-api Speedie_Main (|&cstring| args, |int| Mode, |ErrorInt|)
+api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)
 	cpp_name Speedie_Main 
-	return app.sp_run(args, mode)
+	pico.parent_ = comms // phew
+	rz = app.sp_run(args, mode&4)
+	comms.config.name = "speedie"
+	if rz == 0
+		rz = app.sp_run(args, mode)
+
 

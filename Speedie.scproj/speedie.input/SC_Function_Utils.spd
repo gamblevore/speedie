@@ -1,0 +1,172 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+
+prototype fnPreReader (|scfunction| self, |message| msg, |bool|)
+
+function scfunction.PreRead (|message| Arg)
+	opt norefcounts
+	for s in arg
+		if s == @tmp
+			|| fn = FuncPreReader[s.name]
+				(*fn)(self, s)
+				s.remove
+
+
+dispatch FuncPreReader (fnPreReader)
+	+"disabled"
+		opt norefcounts
+		.isdisabled = true
+		.description = "Called a disabled function."
+		|| s = msg[@str, @nil]
+			.description = s.name
+			
+	+"todo"
+		opt norefcounts
+		msg[@nil].expectlast
+		compiler.TodoList <~ msg
+	
+	
+	+"pragma"
+		opt norefcounts
+		|| f = msg[@thg]
+		if f ~= "inline"
+			.IsInline = true
+		  else
+			error f
+	
+	
+	+"opt"
+		opt norefcounts
+		|| f = msg[@thg]
+		if f ~= "NoRefCounts"
+			.NoRefCounts = true
+		  elseif f ~= "min"
+			|| Min = f.next(@num)
+				.minopt = min.int
+		  else
+			error f
+	
+	
+	+"nil"
+		opt norefcounts
+		|| f = msg[@thg]$
+		if f ~= "self"
+			.NilSelff(msg, nilstate.optional)
+		  elseif f ~= "checker"
+			.MakeNilChecker(msg)
+		  elseif f ~= "safe"
+			.MakeNilChecker(msg)
+			.HidesProperties = true 
+			.isinline = true
+			.isvisible = true
+			
+		  else
+			error f
+	
+	
+	+"real"
+		opt norefcounts
+		|| f = msg[@thg]$
+		if f ~= "self"
+			.NilSelff(msg, nilstate.real)
+		  else
+			error f
+	
+
+	+"description"
+		|| str = msg[@str]
+			if .IsDisabled
+				error (msg, "Already disabled")
+			  else
+				check !.description (msg, "Can’t have multiple descriptions.")
+				.Description = str.name
+	
+
+
+function scfunction.MakeNilChecker (|message| msg)
+	.NilSelff(msg, nilstate.optional)
+	.IsNilChecker = 1
+	
+
+function SettingSelfProperty (|Message| Rel, |bool|)
+	// .bla = X
+	opt norefcounts
+	|| Dot = SettingAProperty(rel)
+		return (Dot.first IsThing "self")
+
+
+function SettingAProperty (|Message| Rel, |Message|)
+	// bla.bla = X
+	opt norefcounts
+	require (Rel.IssetRel)
+	|| f = Rel.first
+	if f and f.DotType
+		return f
+
+
+function SettingMemory (|Message| Rel, |bool|)
+	// bla.bla = X
+	opt norefcounts
+	require Rel.IsSetRel
+	|| f = Rel.first
+		|| d = f.SetType
+			return true
+
+
+//function IsSelfOfSetter (|Message| curr, |Message|)
+//	opt norefcounts
+//	// .bla = X
+//	|| dot = curr.Parent
+//	if dot.IsFirst
+//		|| P   = dot.Parent
+//		if P.IsSetRel
+//			Return P
+
+
+function scfunction.NilSelff (|message| where, |nilstate| v)
+	expect (!.nilself) (where, "Already stated")
+	.nilself = v
+
+
+function string.UnicodeSafeName (|faststring| fs_in=nil, |string|)
+	if .isascii
+		if fs_in
+			fs_in <~ self
+		return self
+	
+	|| fs = faststring(fs_in)
+	for s in self
+		if C_Letters[s]
+			fs <~ s
+		  else
+			fs <~ 'x'
+			fs.appendhex(s)
+	return fs.getresult(fs_in)
+
+
+
+constants
+	kASM			= 0x3F			// 1 to 0x3F is used by the ASM
+
+
+datatype SCBlockage (uint)
+	flags
+		Bits		= 0b111100000	// reserve 1 more bit
+	
+		Continue	= 0x0040
+		Exit		= 0x0080
+		Return		= 0x00C0
+	
+		Quit		= Return		// for now
+	
+	
+	syntax is (|SCBlockage| b, |bool|)
+		return self == b
+	
+	
+	

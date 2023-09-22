@@ -42,7 +42,7 @@ void JB_Dict_Dispose(Dictionary* self);
 JB_String* JB_Dict_Render(Dictionary* self, FastString* fs);
 void JB_Dict_Destructor(Dictionary* self);
 void JB_Leaf_Destructor(DictionaryLeaf* self);
-void JB_Dict_Constructor(Dictionary* self);
+Dictionary* JB_Dict_Constructor(Dictionary* self);
 int JB_Dict_Count(Dictionary* self);
 int JB_Dict_RAMUsed(Dictionary* self);
 int JB_Dict_Search(
@@ -85,7 +85,7 @@ bool JB_Nav_MoveNext(DictionaryReader* self);
 JB_Object* JB_Nav_NextValue(DictionaryReader* self);
 void JB_Nav_Destructor( DictionaryReader* self );
 bool JB_Nav_Equals( DictionaryReader* self, DictionaryReader* other );
-void JB_Nav_Constructor( DictionaryReader* self, Dictionary* Dict );
+DictionaryReader* JB_Nav_Constructor( DictionaryReader* self, Dictionary* Dict );
 
 
 } // ExternCEnd

@@ -1,0 +1,150 @@
+
+
+class DrawToolBar (Guicontrol)
+	// selection/airbrush/stamps/eraser
+
+
+// unfinished!
+// should have pure display mode... and edit mode.
+// can load qoi files or our own editor format
+
+
+class GraphicsEditor (GuiControl)
+	linkage
+		cpp_part Draw
+	|[image]|				Layers
+	|image| 				Merged
+	|file?| 				Backing
+	|int| 					BG
+	
+	constructor (|guicontrol| parent)
+		super.Constructor(parent)
+		.Merged = image()
+	
+	
+	function Load (|bool|)
+		require .Backing
+		|| d = .backing!.Read(64MB)
+		if d.IsJbin
+			rz = .LoadNative(d)
+		  else
+			rz = .LoadImage(d, .backing!)
+	
+	
+	function Size (|ivec2|)
+		opt norefcounts
+		return .merged.size
+	
+	behaviour Draw
+		where.RectBasic(self, .gnormal.bg)
+		.merged.Drawcentered(where, .gnormal)
+
+
+	helper LoadNative (|string| f, |bool|)
+		return false
+		|| root = f.parsejbin
+		|| imgs = root["jdraw"]["layers"]
+		for l in imgs
+			if l.Expect(@tmp)
+				|| p = .Loadmsg(l)
+					.layers <~ p
+		|| size = .Size
+		for p in .Layers
+			expect (p.Size == size) ("Layers have different sizes.")
+		return true
+	
+		
+	function LoadMsg (|Message| l, |image|)
+		disabled
+		|| w = l[@num, 0].int
+		|| h = l[@num, 1].int
+		|| d = l[2].name.decompress
+		require (w > 0) and (h > 0) and d
+		|| img = image((w,h), l.name)
+			img.Copy(d)
+			return img
+	
+	function Save
+/*jdraw 1
+	layers
+		oof (#data#)*/
+		|| b = .backing		#expect ("This image has no file to save to.")
+		|jbin| j = b.out	#require
+		j <~ _JbinHeader
+		j.enter @arg
+		j.enter(@tmp, "jdraw")
+		j.addint 1
+		j.enter @arg
+		j.enter(@tmp, "layers")
+		j.enter @arg
+		for l in .Layers
+			j.addimage(l, l.name)
+		j.up 5
+		j.Flush
+	
+	
+	function image.RawData (|string|)
+		return string.FromPtr(.ptr, .ByteCapacity)
+	
+					
+	function jbin.AddImage	(|image| img, |string| name)
+		.enter(@tmp, name)
+		.addint(img.Width)
+		.addint(img.height)
+		.add(@bin, img.rawdata.compress)
+		.up
+	
+	
+	function DoMerge (|bool| bg=true)
+		if bg
+			.DoBG
+		for p in .layers
+			p.DrawTo(.Merged) // cell-system would be better than doing all this work
+							  // everytime a single pixel is altered! Of course... we'd need cells...
+							  // just get it working for now!
+
+	behaviour MouseDown
+		if Clicks >= 1
+			.Rotate(keys.shift)
+			return MouseDragging.Handled
+	
+	behaviour RightClick
+		.Rotate(true)
+	
+	function Rotate (|bool| right)
+		|| s = .size$
+		|| img2 = image(s.yx)
+			.Merged.Rotate(img2, right)
+			.Merged = img2
+			SDLApp.Touch
+	
+		
+	function DoBG (|int| size=3)
+		if .bg == 0 // checkerboard
+			.Merged.Clear
+			return 
+			
+		|| g = colors.gray
+		|| w = colors.white
+		for (p in .Merged) (v)
+			|| col = (v<<size).sum isa 2
+			*p = (g,w)(col)
+	
+	
+	function Export (|file| dest)
+		.Domerge(false)
+		dest <~ .Merged.WriteQOI
+		
+		
+	helper LoadFile (|string| path, |bool|)
+		|| data = path.ReadFile			#require
+		if path isa "png"
+			data = image.ConvertPNGToVOI(data) #require
+		.loadimage(data, path)
+
+
+	helper LoadImage (|string| data, |string| path, |bool|)
+		|| p = data.Loadqoi(path)
+			.Merged = p
+			return true
+

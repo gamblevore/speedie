@@ -37,11 +37,15 @@ class Charset
 	
 	syntax Access (|uint| C, |bool|)
 		cpp_wrapper JB_CS_HasChar
-	
+		
+	helper NextInCharset (|&int| p, |bool|)
+		|| i = *p
+		while ++i < 256
+			if self[i]
+				*p = i
+				return true
+		
 	iterator
-		|| i = 0
-		while (i < 256)
-			if !self[i]
-				continue
+		|| i = -1
+		while .NextInCharset(i)
 			yield i|Byte|
-			i++

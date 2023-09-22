@@ -1,13 +1,14 @@
 
 main 
 	|| args		= app.args
-	|| inpath	= args[0]
-	|| OutPath	= args[1]
 	expect (args >= 1 and args <= 2)		("Usage: jbin InPath [OutPath]")
+	|| inpath	= args[0]!
+	|| OutPath	= args[1]!
 	expect (inpath!=outpath)				("InPath = OutPath??")
-	|| b		= inpath.file.ReadSafely(1GB)	#require
+	|| b		= inpath.file.Readall(1GB, true)	#require
 	if b.isjbin
 		OutPath := inpath.Removeext("jbin").UniqueFile
+		expect (outpath) ("Can't make a unique file path at: " + inpath)
 	  else
 		Outpath := inpath + ".jbin"
 	|| writer = outpath.out				#require

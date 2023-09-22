@@ -5,17 +5,16 @@
 
 
 
-class SCModule (SCBase) {
+class SCModule (SCNode) {
 linkage
 	cpp_part		Mod
 
-|SCClass|					Cls
-|Message|					InitVarsArg
-|Message|					InitCodeArg
+|SCClass?|					Cls
+|Message?|					InitVarsArg
+|Message?|					InitCodeArg
 |string|					CppPart
-|SCFunction|				DisposeFunc
 |CppRefs|					DefaultRefs
-|message|					InitAfter
+|message?|					InitAfter
 |string|					SubsFrom
 |bool|						Grabbed
 |bool|						IsImport
@@ -25,50 +24,53 @@ linkage
 
 constructor
 	.defaultrefs = cpprefs.new
-	if .isvisible
+	if compiler.modulelist != nil
+		compiler.modulelist <~ self
 
 
 render
-	if (.cls)
+	|| c = .cls
 		fs <~ "module of "
-		.cls.render(fs)
+		c.render(fs)
 	  else
 		super.render(fs)
+
 
 function SuperMod (|scmodule|)
 	opt norefcounts
 	|| c = .cls
-		return c.super.modul
+		|| s = c.Super
+			return s.modul
+
 
 function IsProperModule (|bool|)
 // not "main" or any other auto-generated module that doesn't properly have a "module name {" thing going on...
-	require .Lookup
-	if (.Lookup == compiler.program) and (.source == nil)
+	require .parent
+	if (.parent == compiler.program) and (.source == nil)
 		return false
 	return true
 
 
-function GetPrefix (|SCDecl| D, |string|)
+function SCDecl.PrefixedName (|faststring| fs, |SCModule| M)
 	opt norefcounts
-	rz = d.project.Mod.ExportName + "_"
-	if .CppPart
-		rz += "_" + .CppPart + "_"
-	if D Is Const
-		rz = "k" + rz
+	if self Is Const
+		fs <~ "k"
+	fs <~ .project.Mod.ExportName
+	fs <~ "_"
+	if m.CppPart
+		fs <~ "_"
+		fs <~ m.CppPart
+		fs <~ "_"
+	.name.unicodesafename(fs)
+	.ExportName = fs
 
 
-function SCDecl.PrefixedName (|SCModule| M, |string|)
-	|| s = .name
-	if (self is Const) and (*s == 'k')
-		s = s[1...]
-	return M.GetPrefix(self) + s.unicodesafename
-
-
-function RenameVars // decl.name, .declfix, .fixname, .declname
+function GlobalsFix
 	// Goes through our properties/constants and renames them!
+	|| fs = faststring()
 	for decl.vars in self
 		if Decl
-			decl.name = decl.PrefixedName(self)	
+			decl.PrefixedName(fs, self)
 
 
 
@@ -78,39 +80,31 @@ iterator Vars
 		yield d.ValueDecl
 
 
-function dictionaryreader.ValueDecl (|scdecl|)
+function DictionaryReader.ValueDecl (|scdecl|)
 	opt norefcounts
 	|| t = .value
-	if t isa scdecl
+	if t isa SCDecl
 		if !t.IsLookupOnly
 			return t
 
 
-function IsProject (|bool|)
-	return .Project.Mod == self
+//function IsProject (|bool|)
+//	opt norefcounts
+//	return .Project.Mod? == self
 
 
 function NewModuleFunc (|Message| src, |SCFunction|)
 	rz = SCFunction.NewFunc( src, self, src )|SCFunction|
-	.TryAddBase( src, rz )
+	if rz
+		.TryAddBase( src, rz )
 
 
-function BaseDecls
+function BaseDecls 
 	.Use
 	CollectDeclsGlobals( .source, self ) // right?
 
 
-function FillDisposeFunc
-	|| Arg = .DisposeFunc$.SourceArg
-	for decl.vars in self
-		if decl and (decl Isnt Const) and (!decl.C_array)
-			arg <~ NeweqRel(decl.name, "nil")
-
-
-function AddModuleToFunc (|SCBase| space)
-// so we have an issue... we can’t even really add "self" in a module...
-// because we can’t return a module from an expression, yet.
-// sigh. Try?
+function AddModuleToFunc (|SCNode| space)
 	if !space["self"]
 		space.TryAdd( space.FuncSrc, self, "self" )
 
@@ -126,11 +120,9 @@ function SafeName (|string|)
 
 function LoadModule (|Message| node)
 	node.obj = self
-	|| namemsg = node.first
+	|| NameMsg = node.first
 	if !.cls
 		namemsg.expect(@thg)
-	  //else//if namemsg // fix later...
-		//namemsg.expect(@arg)
 
 	|| arg = namemsg
 	if namemsg == @thg
@@ -145,14 +137,24 @@ function LoadModule (|Message| node)
 	arg.expectlast$
 	.Source = arg
 	
-	compiler.disammodules.TryAdd(nil, self, .safename)
-	.Collect( .source, scbase.CurrVisibility )
+	compiler.disammodules!.TryAdd(nil, self, .safename)
+	.Collect( .source, SCNode.CurrVisibility )
 
 
+function GetTheNewer (|SCObject|)
+	opt norefcounts
+	while self
+		|| o2 = self["new"]
+			return o2
+		|| cls = .cls #require
+		require cls.isrole
+		self = .supermod
 
 
 module
-	function SCBase.GetAsModule (|message| errplace = nil, |scmodule|)
+	|scmodule--|	Curr
+
+	function SCNode.SpaceModule (|message| errplace = nil, |scmodule|)
 		if (self isa scmodule)
 			return self
 		if (self isa scclass)
@@ -160,18 +162,28 @@ module
 		error (errplace, "This should go into a module or class.")
 	
 		
-	function Neu (CollectFunc)
-		|| m = SCModule.new
-		m.Project = scimport.curr // hack?
+	function scclass.LoadModuleForCls (|message| node, |scnode| P)
+		|| M = .modul
+		m.Project = SCImport.curr
 		
-		if (name_space isa SCClass)
-			m.LookUp = nil	// So Array.Byte, File.Byte, XXX.Byte... won't be found.
-							// It's just for the looking up of functions ON the module... not in the module's code.
-			m.Cls = name_space
-			m.name = name_space.Name
+//		|| x = array.byte
+//		if p != compiler.program
+//			"route: ${self.name} --> ${p.name} --> ${p.parent.name}"
+		m.parent = p
+		m.Cls = self
+		m.name = .Name
+		
+		if node
+			MoveFutureStaticsIn(node) // fix this? Current this makes impossible to extend a static section...
+			m.LoadModule( node )
 		  else
-			m.LookUp = name_space.ProjectFix
-		
+			m.source = .source
+	
+	
+	function NeuModule (CollectFunc)
+		|| m = SCModule.new
+		m.Project = scimport.curr
+		m.parent = name_space.ProjectFix
 		if node
 			m.LoadModule( node )
 		Return m

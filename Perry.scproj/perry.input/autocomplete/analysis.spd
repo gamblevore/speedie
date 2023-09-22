@@ -14,7 +14,8 @@ function MenuAllFuncs (GUIaction)
 
 
 function perryide.ListAllFuncs (|bool| sel=false, |string| filter="")
-	|| result = .FunctionMenu.submenu.listsource
+	|| submenu = .FunctionMenu.submenu!
+	|| result = submenu.listsource
 	result.clear
 	.ListAllFuncsMsg(.editme.Parse, result, filter)
 	if sel
@@ -38,44 +39,39 @@ function PerryIDE.FindSelectedMenuItem (|message| result)
 	opt norefcounts
 	require result.hasany
 	|| fn = result.FuncAtPos(.editme.sel0 )
-	.FunctionMenu.submenu.select(result)
+	.FunctionMenu.submenu!.select(result)
 	
 	
 function PerryIDE.ImproveFuncList (|message| result)
 	opt NoRefCounts
 	|message| p0
 	for s.fast in result
-		|| p = s[0][0]
-		if !p0 or !p.ShallowEquals(p0, true)
-			|| d = listviewrow()
-			d.name = "------<" + p.name + ">------"
-			(d is disabled)
-			s.prev = d
-		|| n = s[0].name
-		if p != @name
-			n = "." + n 
-		s.name = n
-		p0 = p
+		|| p = s[@nil][@nil]
+			if !p0 or !p.ShallowEquals(p0, true)
+				|| d = listviewrow()
+				d.name = "------<" + p.name + ">------"
+				(d is disabled)
+				s.prev = d
+			|| n = s.first!.name
+			if p != @name
+				n = "." + n 
+			s.name = n
+			p0 = p
 
 
 
 function PerryAutoCompleteSelected (GUIListEvent)
-/*
-	«tmp "line"
-		«sstr "/usr/local/speedie/Utils/birds.scproj/bird.input/birdwindow.spd"»
-		«str "BirdWindow.Constructor"»
-		«num "550"»
-	»
-*/
 	opt norefcounts
-	|| i = .ide
+	require mode isnt initialselection
+
+	|| i = .ide!
 	i.DuringTempView++
 
 	|| e = i.EditMe
-	|| p = row.first.nyme
+	|| p = row.firstname
 	if !row
 		p = .ListSource.obj as string
-	if i.EditPath(p)
+	if p and i.EditPath(p)
 		e.ClearFound
 		|| rl = row[2]
 			e.ShowAndSel(rl.int) is found
@@ -94,11 +90,12 @@ function PerryFuncMenuSelected (GUIListEvent)
 		e._Start = obj
 
 
-// Can we... like do this more neatly? Maybe not huh? what if we wanna sort using two sortfuncs?
 function FuncListSorter (SorterComparerMsg)
 	opt norefcounts
 	|| aa = *a
 	|| bb = *b
+	if (!aa or !bb)
+		return aa < bb
 	if aa.func != bb.func
 		return aa.func|int| < bb.func|int|
 	
@@ -107,6 +104,8 @@ function FuncListSorter (SorterComparerMsg)
 	
 	|| af = *aa
 	|| bf = *bb
+	if (!af or !bf)
+		return af < bf
 	|| an = af.name
 	|| bn = bf.name
 	|| cmp = bn.SyntaxCompare(an, true)
@@ -128,7 +127,11 @@ function perryide.ListAllFuncsMsg (|message| items, |message| result, |string| f
 		if line == @decl
 			0 // result.IDEAddfunc(line, filter)
 		  elseif line == @tmp
-			if AutoComplete.owner.valuelower(line.name)						// class/module/etc
+			if line ~= "target"
+				|| arg = line.last
+				if arg == @arg
+					.ListAllFuncsMsg(arg, result, filter)
+			  elseif AutoComplete.owner.valuelower(line.name)						// class/module/etc
 				.ListAllFuncsMsg(line.funcarg, result, filter)
 			  elseif AutoComplete.isafunc(line)
 				result.IDEAddfunc(line, filter)
@@ -136,11 +139,9 @@ function perryide.ListAllFuncsMsg (|message| items, |message| result, |string| f
 
 function message.IDEAddfunc (|message| line, |string| filter)
 	opt norefcounts
-	if line == @decl
-		0 // fn.msg(@emb, line.render)
-	  else
+	if line != @decl
 		|| name = line.OwningFullName(@emb) 
-		if filter.filter(name.name)
+		if name and filter.filter(name.name)
 			|| fn = .msg(@str)
 			fn.position = line.position
 			fn <~ name

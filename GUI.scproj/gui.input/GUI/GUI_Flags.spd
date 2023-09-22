@@ -1,0 +1,95 @@
+
+datatype CopyPasteFlags (Byte)
+	linkage
+		cpp_part CPF
+	Flags
+		|CopyPasteFlags| 
+		Copy  = (CopyFile,  CopyText,  CopyImage,  CopyNode)
+		Paste = (PasteFile, PasteText, PasteImage, PasteNode)
+		PasteTextLike = (PasteText|||PasteFile)
+	function CanCopy (|CopyPasteFlags|)
+		return self&Copy
+	function CanPaste (|CopyPasteFlags|)
+		return self&Paste
+	function CanPasteInto (|CopyPasteFlags| dest, |bool|)
+		return (dest >> 4) & (self&copy)
+	syntax is (|CopyPasteFlags| v, |bool|)
+		return self & v
+
+
+
+datatype TakesFocusFlag (byte)
+	linkage
+		cpp_part TFF
+	flags
+		CanFocus
+		CanTabInto
+		None = 0
+		On = CanTabInto ||| CanFocus 
+
+	function Able (|bool|)
+		return (self&canfocus) != 0
+	
+	syntax cast (|bool|)
+		disabled "What?"
+		
+	function Tab (|bool| force=false, |bool|)
+		if (self&CanTabInto) != 0
+			return true
+		if force and self != 0
+			return true
+
+
+datatype GuiControlFlags (uint)
+	linkage
+		cpp_part GCF
+	flags
+		|guicontrolflags| 
+		Visible
+		Enabled
+		Editable
+		UnSearchable
+		NoSearch
+		TypeThrough
+		ClickThrough
+		Spacer
+		AlwaysScrollable
+		Modified
+		NeverDrawModified
+		OpensMenu
+		NewlyShown
+		DrawsFocus // showborder, showsborder, hasborder, drawborder
+
+
+struct TimeFader
+	linkage: cpp_part Fade
+	|Date| 		Final
+	|float|		Scale
+	
+	function Strength (|date| now=date.now, |bool| touch=true, |float|)
+		|| f = .final
+		if !f
+			return 1.0
+		|| remy = f - now
+		if remy > 0
+			|float| str = remy.seconds * .Scale
+			if touch
+				sdlapp.touch
+			rz = str.clamp
+			if rz == 0.0
+				.final = 0
+				.scale = 0
+	
+	function Finished (|date| now=date.now, |bool|)
+		|| f = .final
+			return now >= f
+
+	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)
+		sdlapp.touch
+		if value
+			.final = date.now + (seconds+delay).date
+			.scale = 1.0 / seconds
+		  else
+			.final = 0
+			.scale = 0 
+		

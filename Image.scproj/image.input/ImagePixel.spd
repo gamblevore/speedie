@@ -12,7 +12,7 @@ struct ImagePixel
 		opt min 3
 
 	constructor
-		self <~ (0,0,0,255)
+		.a = 255
 		
 
 	render
@@ -38,15 +38,10 @@ struct ImagePixel
 				v = c.parsehex|int|
 			  elseif i == 3
 				v = 255
-			.SyntaxAccess(i) = v
+			.parts[i] = v
 	
 	function Lum (|float|)
 		return .color.lum
-
-	function RndSolid
-		|uint| rnd = random.shared.int
-		self <~ rnd
-		.a = 0xff
 	
 	function HasColor (|bool|)
 		return .r or .g or .b
@@ -56,14 +51,40 @@ struct ImagePixel
 			
 	syntax cast (|bool|)
 		cpp_part Exists
-		return .hascolor
+		return self and .a
 
 	syntax cast (|vec4|)
 		cpp_part CastVec4
 		return .color
 
+	syntax cast (|PremultipliedColor|)
+		cpp_part CastPremul
+		return .PreMul
+
 	function Equals (|imagepixel|p, |bool|)
 		return .uint == p.uint
+		
+	function Alpha (assigns:|float| a)
+		a = (a * 255.0) + 0.25
+		.a = a.clamp(255)
+		
+	function Alpha (|float|)
+		return .a * 255th
+	
+	function AddAlpha (|float| v)
+		.Alpha = .Alpha + v
+		
+	syntax append (|&imagepixel| r)
+		*self = *r
+
+	syntax append (|vec4| V)
+		cpp_part AppendVec
+		v = (v.clamp * 255.0) + 0.25
+		|| b = v.iVec4
+		.r = b.r
+		.g = b.g
+		.b = b.b
+		.a = b.a
 	
 	syntax append (|int| r, |int| g, |int| b, |int| a=255)
 		cpp_part AppendInts
@@ -72,82 +93,36 @@ struct ImagePixel
 		.b=b.clamp(255)
 		.a=a.clamp(255)
 		
-	function Alpha (assigns:|float|a)
-		a = (a * 255.0) + 0.25
-		.a = a.clamp(255)
+	syntax append (|float| v)
+		disabled "Use a vector?"
+		cpp_part AppendFloat
+		self <~ ((v,v,v,1.0))
 		
-	syntax append (|&imagepixel| r)
-		* self = *r
+	syntax append (|float| r, |float| g, |float| b, |float| a=255)
+		cpp_part AppendFloats
+		disabled "Just make a vector out of this and pass that instead"
 
-	syntax append (|vec4| V)
-		cpp_part AppendVec
-		v = (v * 255.0) + 0.25
-		self <~ (v.r, v.g, v.b, v.a)
-
-	syntax append (|vec3| V)
-		cpp_part AppendVec3
-		self <~ ((V,1.0))
-		
-	syntax append (|ivec4| V)
-		cpp_part AppendIvec
-		self <~ (v.r, v.g, v.b, v.a)
-
-	syntax append (|uint| P)
-		cpp_part AppendUint
-		(self|&uint|)[0] = p
-
-	function Solid (|uint|)
-		|| d = self|&uint|
-		return d[0]
-
-	function Add (|float| c)
-		|int| v = (c * 255.0) + 0.25
-		.rgb = .raw + v 
 
 	function AddInt (|int| i)
+		// remove this func, only one thing needs it
 		.r += i
 		.g += i
 		.b += i
 		
 	function Add (|vec4| c)
 		cpp_part AddVec
-		self <~ (c+.Color)
-
-	function RGB (assigns:|ivec4|w)
-		cpp_part rbgsetints
-		w = w.clamp(0,255)
-		.R=w.r
-		.g=w.g
-		.b=w.b
-
-	function RGB (assigns:|vec4|v)
-		cpp_part rbgsetfloats
-		v = (v * 255.0) + 0.25
-		.R=v.r
-		.g=v.g
-		.b=v.b
+		self <~ (c + .Color)
 		
-	function Gray (|float|)
-		return  .R + .G + .B
-		
-	function Brightness (|float|)
-		return .Gray * 765th
-		
-	syntax append (|float| v)
-		cpp_part AppendFloat
-		self <~ ((v,v,v,1.0))
-		
-	operator mul (|float| F, |vec4|)
-		cpp_Part Mul
-		return .color * F
-	
-	operator mul (|vec4| F, |vec4|)
-		cpp_Part MulVec
-		return .color * F
-	
 	function Overlay (|vec4| T)
-		|| C = mix(self, T, T.a)
-		self <~ c // why not set .a also? would mean I can store it using __builtinconvert
+		disabled "Call .Premul on this first for great speed boost!"
+
+		
+	function Overlay (|PreMultipliedColor| T)
+		|| R = .raw
+		|| D = ((R * t.a)>>16)+T
+		D.a = r.a
+		.raw = D
+		
 
 	function Underlay (|vec4| b) 
 		|| Old = .color
@@ -155,12 +130,9 @@ struct ImagePixel
 		C.a = old.a
 		self <~ C 
 	
-	
-	function Take (|&uint| r)
-		(self|&uint|)[0] = r[0]
-
 	function Color (|vec4|)
-		return vec4.load(self|&byte|) * 255th
+		rz = vec4.load(self|&byte|)
+		rz *= (1.0/254.99)
 		
 	function Raw (|ivec4|)
 		return ivec4.load(self|&byte|)
@@ -172,29 +144,17 @@ struct ImagePixel
 		.a = value.a
 	
 	function Uint (|uint|)
-		return self|&uint|[0]
-	
-	function RGB (|ivec3|)
-		return (.r, .g, .b)
-	
-	function Color (assigns:|vec4|R)
-		self <~ R
+		return *(self|&uint|)
 		
-	syntax access (assigns:|int|R)
-		cpp_Part SetAll
-		self <~ (r, r, r)
-		
-	syntax access (|int|i, assigns:|int|v)
-		cpp_Part SetPart
-		|| b = &.r
-		b[i] = v
+	function Parts (|&byte|)
+		return &.r
 	
 	function vec4.Px (|imagepixel|)
 		rz <~ self
 	function vec3.Px (|imagepixel|)
-		rz <~ self
+		rz <~ ((self,1.0))
 	function ivec4.Px (|imagepixel|)
-		rz <~ self
+		rz <~ (.r, .g, .b, .a)
 	
 	module 
 		|ImagePixel| Bad
@@ -202,7 +162,7 @@ struct ImagePixel
 		|ImagePixel| Clear
 		init()
 		function Init
-			white <~ (1.0)
+			white <~ vec4(1.0)
 		function Char (|codepoint| c, |&imagepixel|)
 			if c&1
 				return .white
@@ -212,32 +172,13 @@ struct ImagePixel
 extend vec3
 	syntax cast (|imagepixel|)
 		cpp_part AsPixel
-		rz <~ self
+		return .px
 extend vec4
 	syntax cast (|imagepixel|)
 		cpp_part AsPixel
-		rz <~ self
+		return .px
 extend ivec4
 	syntax cast (|imagepixel|)
 		cpp_part AsPixel
-		rz <~ self
+		return .px
 		
-
-
-module Colors
-	function White (|float| alpha=1.0, |imagepixel|)
-		|| v = (1.0, 1.0, 1.0, alpha)
-		rz <~ v
-	function Gray (|float| alpha=1.0, |imagepixel|)
-		|| v = (0.5, 0.5, 0.5, alpha)
-		rz <~ v
-	function Red (|float| alpha=1.0, |imagepixel|)
-		|| v = (1.0, 0.0, 0.0, alpha)
-		rz <~ v
-	// these could be... thingies? a~b thingies :)
-	// macros :) adjs 1.0~gray
-	function Black (|float| alpha=1.0, |imagepixel|)
-		|| v = (0.0, 0.0, 0.0, alpha)
-		rz <~ v
-	function Clear (|imagepixel|)
-		0 // lol

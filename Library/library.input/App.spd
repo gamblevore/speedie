@@ -5,24 +5,31 @@
 
 
 module App {
-|[string]|					OldArgs = nil
+|[string]?|					OldArgs = nil
+|string| 					Usage
 |message|					_Conf
 |config|					_Prefs
 |string| 					_Path
-|file|						_StdOut
-|file|						_stdin
-|string|					codesign_native = "codesign_osx"
+|file?|						_StdOut
+|file?|						_stdin
 
-function Sleep (|float| Duration=1)
+function Sleep (|float| Duration)
 	.sleep(duration.date)
 
 function Sleep (|Date| Duration=1s)
 	cpp_wrapper JB_Date__Sleep
-
+	
+function TrySleep (|date| Duration=1s, |bool|)
+	cpp_wrapper JB_Date__TrySleep
+	
+function TrySleep (|float| Duration, |bool|)
+	return .trysleep(duration.date)
+	
 syntax access (|int| i, |string|)
-	if .args > i
-		return .args[i]
-	error "Missing shell argument: " + i.Render
+	disabled "use app.args[i]"
+
+function Option (|string| name, |bool|)
+	disabled "Use app.yes()"
 
 function Yes (|string| name, |bool|)
 	return app[name].yes
@@ -36,12 +43,12 @@ function Conf (|string| name, |string|)
 function Conf (|string| name, assigns:|string|)
 	disabled "Set conf values in the original app.configure..."
 
-function Prefs (|string| s, |string|)
+function Pref (|string| s, |string|)
 	cpp_part GetPref
 	return ._prefs[s].value
-
-function Prefs (|config|)
-	return ._prefs
+	
+function PrefMsg (|string| s, |message|)
+	return ._prefs[s]
 
 function Created (|date|)
 	return __now__|date|
@@ -49,11 +56,17 @@ function Created (|date|)
 function TimeID (|uint64|)
 	return __time_id__
 
-function Prefs (|string| s, assigns:|string|)
-	._prefs[s] = Value
-function Prefs (|string| s, assigns:|message|)
+function Pref (|string| s, assigns:|string|)
+	opt norefcounts
+	.PrefsInit()[s] = Value
+
+function Pref (|string| s, assigns:|message|)
+	opt norefcounts
 	cpp_part SetPrefMsg
-	._prefs[s] = Value
+	.prefsinit()[s] = Value
+
+function AllowInteruptCrash (assigns:|bool|)
+	cpp_wrapper JB_App__CrashOnInterupt
 
 function Crash (|string| reason="")
 	opt norefcounts
@@ -61,6 +74,9 @@ function Crash (|string| reason="")
 		printline reason
 	.CrashLog "AboutToCrash".cstr
 	*(-1|&byte|) = 0
+	"Crash Failed!"
+	app.quit(-1)
+
 
 function CrashLog (|cstring| value)
 	cpp_wrapper JB_Rec__CrashLog
@@ -69,8 +85,12 @@ syntax access (|string| name, |string|)
 	cpp_part ArgValue
 	opt norefcounts
 	for R in .rawargs
-		if R|AppArgument|.name ~= name
-			return R|AppArgument|.value
+		if R.argname ~= name
+			return R.argvalue
+
+
+function Options (|[string]|)
+	disabled "Use switches"
 
 function Switches (|[string]|)
 	opt norefcounts
@@ -81,15 +101,16 @@ function Switches (|[string]|)
 function args_ (|[string]|)
 	opt norefcounts
 	for R in .rawargs
-		if R|AppArgument|.name ~=""
+		if R.argname ~= ""
 			rz <~ r
 
 function Args (|[string]|)
 	cpp_part ArgsArray
 	opt norefcounts
-	if .OldArgs == nil // == nil important here
-		.oldargs = .args_
-	return .oldargs
+	rz = .OldArgs
+	if rz == nil // == nil important here
+		rz = .args_
+		.OldArgs = rz
 
 function CrashPrint
 	cpp_wrapper JB_CrashTracer
@@ -100,33 +121,31 @@ function exepath (|string|)
 function Path (|string|)
 	cpp_part OrigPath
 	visible class~file
-	._Path := .env["OrigScriptPath"]
-	._Path := .exepath
-	return ._path
+	|| p = ._Path
+		return p
+	p = .env["OrigScriptPath"]
+	if p
+		._Path = p
+		return p
+	p = .exepath
+	if p
+		._Path = p
+		return p
 
 function PrintStackTrace
 	visible
 	cpp_name JB_PrintStackTrace
 	print .StackTrace
 
-Function StackTraceArray (|string| StartAfter="", |[string]|)
-	|_voidptr[128]| arr
-	|| size = 128
-	|| strs = process.BackTrace(&arr[0], &size)
-	|| start = 0
-	for i in size
-		if strs[i].copy contains startafter
-			start = i + 1
-	for i in start to size-1 
-		rz <~ strs[i].copy
-	memory.free(strs)
 
-
-render StackTrace (|string| StartAfter = "")
-	|| r = .StackTraceArray(StartAfter)
-	for s in r
-		fs <~ s
+render StackTrace (|int| skip = 2)
+	|(&nil)[128]| arr
+	|| size = –count arr
+	|| strs = SpdProcess.BackTrace(&arr[0], &size)
+	for i in skip to size-1 
+		fs <~ strs[i]
 		fs <~ '\n'
+	memory.free(strs)
 
 
 function Restart
@@ -144,20 +163,20 @@ function AppPath (|string|)
 		return .path.backtoapp
 	return .path
 
-function CalledName (|string|)
-	cpp_wrapper JB_App__CalledBy
+function CallPath (|stringzeroterminated|)
+	cpp_wrapper JB_App__CallPath
 		
-function TurnInto (|string| s, |[string]| R=nil, |errorint|)
+function TurnInto (|string| s, |[string]| R=nil)
 	cpp_Wrapper JB_App__TurnInto
-
-function Fork (|PID_Int|)
-	cpp_wrapper JB_App__Fork
 
 function ObjMemory (|int64|)
 	cpp_wrapper JB_MemCount
 
 function StringMemory (|int64|)
-	return Memory.used
+	return Memory.usedstring
+
+function OtherMemory (|int64|)
+	return Memory.usedOther
 
 function ClearCaches (|int| which=0)
 	cpp_wrapper JB_App__ClearCaches
@@ -174,23 +193,25 @@ function PrefPath (|string|)
 	check (*rz == '/' or '~') ("App pref path should be 'default' or a full-path.")
 
 
-function PrefsInit (|date| when=date.now, |bool|)
+function PrefsInit (|date| when=0, |config!|)
 	if ._prefs
-		return true
+		return ._prefs!
 	|| pref_path = .prefpath
 		._prefs = pref_path.file.conf
-		if ._prefs
-			rz = true
-			if when
-				app.prefs("first") := when.render
+	if !._prefs
+		._prefs = Message(@arg, string.error)
+	if when
+		if when < 0: When = date.now
+		app.pref("first") := when.renderint
+	return ._prefs!
 
 
 function SavePrefs
-	if ._prefs
-		._prefs.save
+	opt norefcounts
+	._prefs.save?
 	
 
-function Expired (|date| period, |date|From=__now__, |date|)
+function Expired (|date| period, |date| From = __now__, |date|)
 	|| expiry = period + from
 	if date() > expiry
 		return expiry
@@ -200,12 +221,24 @@ function Expired (|date| period, |date|From=__now__, |date|)
 function Env (|dictionary of string|)
 	cpp_wrapper JB_App__Env
 
-function ChildEnv (|StringZeroTerminated| s, assigns:|StringZeroTerminated| value, |int|)
+function ChildEnv (|StringZeroTerminated| s, assigns:|?StringZeroTerminated| value, |int|)
 	cpp_wrapper JB_App__SetEnv
 
 
 function Input (|string|)
 	cpp_Wrapper JB_App__Readline
+
+function IsMainThread (|bool|)
+	return !.IsntMainThread
+
+helper IsntMainThread (|bool|)
+	cpp_wrapper JB_LibIsThreaded
+	
+helper ParentID (|pid_int|)
+	cpp_wrapper JB_App__ParentID
+	
+helper ID (|pid_int|)
+	cpp_wrapper JB_App__ID
 
 
 function sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
@@ -233,12 +266,12 @@ function FileName (|string|)
 	return .Path.Name
 
 
-function StdIn (|File|)
+function StdIn (|File!|)
 	opt norefcounts
 	return ._Stdin init File.newpipe(pipe.stdin_)
 
 	
-function StdOut (|File|)
+function StdOut (|File!|)
 	opt norefcounts
 	return ._StdOut init File.NewPipe(pipe.stdout_)
 
@@ -246,11 +279,10 @@ function StdOut (|File|)
 function CWD (|string|)
 	cpp_wrapper JB_File__CWD
 
-
 function CWD (assigns:|string|, |ErrorInt|)
-	return .chdir_(Value.resolve)
+	return ._chdir(Value.resolve)
 
-function chdir_ (|string| path, |ErrorInt|)
+helper _chdir (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
 
 
@@ -267,19 +299,25 @@ function IsQuarantined (|bool|)
 	return .path contains "/AppTranslocation/"
 
 
-function Say (|string| s, |errorint|)
+function Say (|string| s, |bool| print=true,  |errorint2|)
+	visible
+	if print
+		printline s
 	return "/usr/bin/say".execute([s])
 	
-function AppleScript (|string| str, |ErrorInt|)
+function AppleScript (|string| str, |ErrorInt2|)
 	return "/usr/bin/osascript".execute(["-e",str], nil)
 
 
-function Sudo (|string| p, |ErrorInt|)
+function Sudo (|string| p, |ErrorInt2|)
 	return .applescript("do shell script \"$p\" with administrator privileges")
 
 
 function Configure (assigns:|string|)
-	._conf  = Value.parse
+	|error| err
+	._conf  = Value.parsewitherror(err)
+	if err
+		printline err.render
 	._conf := message()
 
 

@@ -9,16 +9,14 @@ function Message.FindAndRemove (|String| name,  |bool| NothingOK,  |bool| IsClas
 
 
 
-function Message.DeprecatedClassOption (|String| name,  |string| Kind=nil,  |int|)
+function Message.DeprecatedClassOption (|String| name,  |string| Kind="!",  |int|)
 	// this is a wasteful way to do stuff.
 	// better to find them as we go through the code... not search for each at the start.
 	|| place = .find( @Tmp, name )		#require
-
 	|| num = 1
-	if Kind != nil
+	if Kind != "!"
 		|| ch = place.first
-		require ch and ch.expect(@thg)
-		require ch ~= Kind
+		require ch and ch.expect(@thg) and ch ~= Kind
 		|| num_msg = ch.next 
 			num_msg.expect(@num)
 			num = num_msg.int
@@ -33,56 +31,77 @@ function Message.DeprecatedClassOption (|String| name,  |string| Kind=nil,  |int
 
 function Message.MsgOwningFunc (|SCFunction|)
 	opt norefcounts
+	nil self
 	for ch.up in self
 		|| O = ch.obj
 		if O isa SCArg
-			if O.ParentFunc
-				Return O.ParentFunc
+			|| pf = o.ParentFunc
+				Return pf
 		  elseif (O isa SCFunction) and (ch != @prm)
 			// could be a func associated with the lst on "obj.func".
 			Return o
 
 
-function WithinOrAnd (|Message| msg, |bool|)
-	// if ((a.f + b.f) or c.f) { }
-	// x = ((a.f + b.f) or c.f)
-	// check for rels... until we hit what? An arg? Seems sensible!
-	opt norefcounts
-	
-	|| p = msg
-	While p != @arg
-		if p == @rel
-			|| op = p.second
-			if op == "and" or "or"
-				Return true
-		
-		p = p.Parent
-
-
-function SC_MakeComment (|Message| msg)
+function SC_MakeComment (|Message| msg) // ignorenode
 	expect (msg == @tmp)
 	msg.func = @Sheb
 	msg.clear
 
 
-function Message.Negate (|Message|)
-	if self == @bra
-		.become(@brel, "!") // the negator!
+function Message.NegateThg (|Message|)
+	opt norefcounts
+	if .name == "true"
+		.name = "false"
+		.obj = FalseBool
 		return self
-	|| ch = .unbra
-	if ch IsBRel "!"
-		return .ReplaceWith(ch.first)
+	if .name == "false"
+		.name = "true"
+		.obj = TrueBool
+		return self
+	return .WrapWith(@BRel, "!")
+
+
+function Message.Negate (|Message|)
+	opt norefcounts
+	real self
+	|| upon = self
+	|| f = .func
+	if f == @thg
+		return .negatethg
+	
+	if f == @bra
+		upon = .unbra
+		if upon.func == @thg
+			upon.negatethg
+			.obj = upon.obj
+			return self
+	
+	if upon isbrel "!"
+		upon.become(@bra)
+		return self
+	
+	if upon.func == @rel
+		|| opmsg = upon.second!
+		|| op = scoperator.dict[opmsg.name]
+			|| nega = op.opposite
+				opmsg.become(nega)
+				return self
+
+	if f == @bra
+		.Become(@brel, "!")					// the negator!
+		return self
 
 	using self
-		rz = .WrapWith(«BRel "!"») // also the negator!
+		rz = .WrapWith(@BRel,  "!")			// also the negator!
 
 
 function Message.IsAssignable (|bool|)
-	return self != @Func and @type and @num // unless... its an assigns func?
+	|| f = .func
+	return f != @Func and @type and @num // unless... its an assigns func?
 
 
 function message.IsInt (|bool|)
-	 return (self == @num) and !.name.find('.')
+	return (self == @num) and !.name.find('.')
 
 
 function Message.ParentPoint (|Message|)
@@ -104,10 +123,8 @@ function Message.IsVarUseableInLoop (|String| name, |bool|)
 function Message.IsVarAltered (|String| name, |bool|)
 	opt norefcounts
 	for msg.flat in self
-		(msg == @Rel)						#continue
-		(msg in @arg)						#continue
-		(msg[0] IsThing name)				#continue
-		Return true
+		if (msg == @Rel) and (msg in @arg) and (*msg IsThing name)
+			Return true
 
 
 function Message.MsgArg (|SCArg|)
@@ -134,7 +151,8 @@ function Message.DclExp (|Message|)
 
 function Message.MsgDecl (|SCDecl|)
 	opt norefcounts
-	return .DclExp.AsDecl
+	|| d = .DclExp
+		return d.AsDecl
 
 
 function Message.DeclName (|Message|)
@@ -144,17 +162,24 @@ function Message.DeclName (|Message|)
 		Return dcl[@thg]
 	if dcl == @Thg
 		Return dcl
-	expect !(dcl == @Emb)
+	expect !(dcl == @Emb) (self)
+
+
+function Message.VarName (|string|)
+	opt norefcounts
+	return self[@thg, 1].name
 
 
 
 // same as above?
-function Message.GetDclName (|bool| Need=false, |Message|)
+function Message.GetDclName (|bool| IsConstructor=false, |Message|)
 	opt norefcounts
+	if isconstructor
+		expect (self == 2) (self, "Constructors can't return things")
 	rz = self[@Nil, 1]
 	if rz == @Rel
 		rz = rz[@thg]
-	if !rz and need
+	if !rz
 		error (self, "No decl name found")
 
 
@@ -179,16 +204,18 @@ function Message.WithinLoop (|Message| stop, |bool|)
 
 function Message.UnBra (|Message|)
 	opt norefcounts
-	rz = self
-	While rz == @bra and rz.first != @arg
-		rz = rz.first
+	real self
+	While self == @bra and .first != @arg
+		self = .first!
+	return self
 
 
 function Message.UnBraType (|Message|)
 	opt norefcounts
-	rz = self
-	While (rz == @type) or (rz == @bra and rz.first != @arg)
-		rz = rz.first
+	real self
+	While (self == @type) or (self == @bra and .first != @arg)
+		self = .first!
+	return self
 
 
 function Message.UpToType (|Message|) // updecl, finddecl
@@ -214,14 +241,7 @@ function Message.CastedParent (|Message|)
 ///////////// ///////////// ///////////// MOVING ///////////// ///////////// ///////////// 
 
 
-
-function Message.ReplaceIntoFirst (|message| With, |message|)
-	.prev = with
-	with.first
-	return with
-
-
-function Message.ReplaceWith (|message|j, |Message|)
+function Message.ReplaceWith (|message!| j, |Message!|)
 	.Prev = j
 	.Remove
 	return j
@@ -234,21 +254,16 @@ function Message.ReplaceWithChild (||)
 
 
 function Message.SafeRemove (|syntax| T=@sheb)
-	.become(T)
-	is inserted // stop issues with autocomplete :)
-	for (c in self)
-		c.remove
+	if self
+		.become(T)
+		is inserted // stop issues with autocomplete :)
+		for (c in self)
+			c.remove
 
 
 function Message.SafeReplaceWith (|message| Incoming)
 	.saferemove(@bra)
 	self <~ incoming
-
-
-function Message.WrapWith (|Message| W, |Message|)
-	.Prev = W
-	W.first = self
-	return W
 
 
 function Message.AddBefore (|Message| before, |Message| NewItem)
@@ -265,11 +280,11 @@ function Message.InsertBefore (|Message| j, |Message| ch)
 		.Last = j
 
 
-function Message.InsertAfter (|Message| j, |Message| ch)
-	if ch
-		ch.next = j
+function Message.InsertAfter (|Message| ins, |Message| after)
+	if after
+		after.next = ins
 	  else
-		.first = j
+		.first = ins
 
 
 function Message.Move (|Message| last, |Message| into)
@@ -281,7 +296,7 @@ function Message.Move (|Message| last, |Message| into)
 		curr = next_
 
 
-function Message.MoveAllIn (|Message|Dest)
+function Message.AppendAllInto (|Message|Dest)
 	opt norefcounts
 	While .hasany
 		Dest.Last = .First
@@ -304,19 +319,17 @@ function Message.NeedMarker (|String| s, |bool| b, |Message|)
 		.First = rz
 
 
-function message.WipeCopy (|message| oof, |Message|)
-	opt norefcounts
+function message.WipeCopy (|message?| oof, |Message!|)
 	cpp_part LayerWipeCopy
 	if !oof
-		return .WipeCopy
-	|| L = oof.memorylayer
-	rz = Message.NewWithLayer(L, self) // looks better
-	rz.position = -1
-	for v in self
-		rz <~ v.WipeCopy(oof)
+		return .wipecopy
+	|| old = (message).layer
+	oof.memorylayer.use
+	rz = .wipecopy
+	old.use
 
 	
-function message.WipeCopy (|Message|)
+function message.WipeCopy (|Message!|)
 	opt norefcounts
 	rz = Message(self)
 	rz.position = -1
@@ -387,24 +400,29 @@ function Message.GetMarker (|String| s, |Message|)
 
 function NewEqRel (|string| L, |String| R, |Message|)
 	opt norefcounts
-	cpp_part NewEqRelStr
-	rz = «Rel
-		«Thg L »
-		«Opp "=" »
-		«Thg R »
-	»
-	rz.tmptype = asmtmp.ksetvar
+	rz = @rel.msg
+	rz <~ (@Thg, L)
+	rz <~ (@Opp, "=")
+	rz <~ (@Thg, R)
+	
+	rz.TmpType = asmtmp.ksetvar
+
+
+
+function NewRejoin (|message|)
+	rz = @tmp + "rejoin"
+	rz.tmptype = asmtmp.kRejoin
 
 
 function NewDecl (|string| type, |string| name="", |message|)
 	opt norefcounts
-	|| msg = («thg name », nil)(name)
+	|| msg = (@thg+name, nil)(name)
 	return newdecl(type, msg)
 
 
 function NewDecl (|string| type, |message| RelOrName, |message|)
 	opt norefcounts
-	rz = «decl »
+	rz = @decl.msg
 	if type
 		rz <~ (@thg, type)
 	  else
@@ -415,48 +433,77 @@ function NewDecl (|string| type, |message| RelOrName, |message|)
 
 function NewRel (|Message| L, |Message| R, |string| op, |Message|)
 	opt norefcounts
-	return «rel
-		L
-		«Opp op »
-		R
-	»
+	rz = @rel.msg
+	rz <~ L
+	rz <~ (@Opp, op)
+	rz <~ R
 	
 function NewEqRel (|Message| L, |Message| R, |Message|)
 	opt norefcounts
 	rz = NewRel(l, r, "=")
-	rz.tmptype = ASMtmp.kSetVar
+	rz.TmpType = ASMtmp.kSetVar
 
 
-function NewSetter (|string| L, |Message| R, |Message|)
+function message.WrapWith (|syntax| f, |string| s="", |message|)
 	opt norefcounts
-	return «rel
-		«thg L »
-		«Opp "="»
-		R
-	»
+	rz = f + s
+	.prev = rz
+	rz <~ self
 
 
 function Message.NeedBra (|Message|)
 	if (self == @Bra)
 		 return self
 	
-	return .wrapwith(«bra »)
+	return .wrapwith(@bra)
 
 
 function NewFnc (|string| name, |Message|)
 	opt norefcounts
-	return «func
-		«Thg name »
-		«prm »
-	»
-
-
-function Message.LocateAll
-	for ch.flat in self
-		printline ch.locate
-
-
-function Message.Hash (|uint64| Pos, |Uint64|)
-	Pos = (pos << 8) (|) .Func|uint64|
-	return .Name.Hash(pos)
+	rz = @func.msg
+	rz <~ (@thg, name)
+	rz <~ @prm
 	
+	
+function message.ExpectEmpty
+	opt norefcounts
+	|| f = .first
+		error f
+
+
+function message.IsAlwaysBool (|maybebool|)
+	opt norefcounts
+	|| d = .obj as SCDecl
+		if d.IsConstOf(falsebool)
+			return false
+		if d.IsConstOf(truebool)
+			return true
+
+
+function message.IsAlwaysTrue (|bool|)
+	return .IsAlwaysBool.istrue
+
+function message.IsAlwaysFalse (|bool|)
+	return .IsAlwaysBool.isfalse
+
+
+function Message.StartUsingAfter // for "return" debugging.
+	opt norefcounts
+	|| biggest = -1
+	|| L = .memorylayer
+	|| d = .originalparsedata
+		for s.flat in self
+			if s.position >= 0 and s.memorylayer == l 
+				(biggest max= s.after)
+		|| b2 = d.find("\n", biggest)
+			biggest = b2
+		biggest++
+	parser.Using.Position = biggest
+	parser.Using.Flags = MsgParseFlags.Inserted
+	.MemoryLayer.use
+
+
+extend string
+	function DebugFunc
+		visible
+		if scfunction.currfunc ~= self

@@ -1,10 +1,25 @@
 
 
+/*
+	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
+	* can fold the refcount optimiser into the nilchecker... mostly in .function and .variableset
+	* can just store each class disturbance as one bit? just use 128 bits per... function?
+		* if list is disturbed, everything is disturbed... because list could be a message, and message could have an obj... which could be anything.
+	* look into how things like "Disowner checking" would work within the nil-checker.
 
+* Approach: Do bit by bit
+	* get property but only did math
+	* mark a few string funcs as not-modifier/disowner/capturer
+	* mark entire class
+	* fast capture of disowned things. like: r1 <~ r2.pop
+*/	
+
+
+// unfinished
 class CppRefs
 	|uint16|			DisturbParams
 	|bool|				Owned
-	|[string]|			Disturbs		// cant be a class cos this is called BEFORE the classes are inited.
+	|[string]?|			Disturbs		// cant be a class cos this is called BEFORE the classes are inited.
 										// awkward.
 	
 	constructor (|message| s=nil)
@@ -16,18 +31,25 @@ class CppRefs
 		.Owned			= false
 		.Disturbs		= array.new
 		.disturbparams	= -1
-		.disturbs		<~ "object"
+		.disturbsget	<~ "object"
 
 
+	function DisturbsGet (|[string]|)
+		|| ds = .disturbs
+			return ds
+		rz = array()
+		.Disturbs = ds
+		
 	function AddOne (|message| C)
-		if (C ~= "nil")
+		opt norefcounts
+		if (C ~= "nil") // typeofnil
 			// 
-		  elseif (C ~= "self")
+		  elseif (C ~= "self") // dcl is self
 			.DisturbParams |= 1
 		  elseif (C == @num)
 			.DisturbParams |= (C.int << 1)
 		  else
-			.Disturbs <~ C.name
+			.Disturbsget <~ C.name
 	
 
 	function Read (|message| node)
@@ -69,20 +91,21 @@ class CppRefs
 		function Linkage (collectfunc)
 			return name_space.ProcessLinkage(node[@arg], ClassLinkageTable)		
 		function ReadIntoCppRefs (CollectFunc)
-			name_space.GetAsModule$.DefaultRefs.Read(node)
+			name_space.SpaceModule$.DefaultRefs.Read(node)
 			return compiler.program
 
 
 
 dispatch CppRefTable (TranFunc)
 	disowns				{} //(SCFunction.NewCppWrapper)
-	disturbs			{} //(SCBase.LoadCppPart)
+	disturbs			{} //(SCNode.LoadCppPart)
 	paramsafe			scfunction.tran_cpprefs
 
 
 
 extend_module SCFunction	
 	function Tran_CppRefs (TranFunc)
+		expect (fn) (node, "Only use this on functions")
 		fn.refs = cpprefs.new(node)
 		node.remove
 
@@ -90,7 +113,7 @@ extend_module SCFunction
 dispatch FuncLinkageTable (TranFunc)
 	cpp_wrapper			{}
 	cpp_part			{
-		SCBase.LoadCppPart(node, name_space, node)
+		SCNode.LoadCppPart(node, name_space, node)
 	}
 	cpp_refs			scfunction.tran_cpprefs
 	visible				{} // (SCFunction.Tran_Visible)
@@ -103,30 +126,30 @@ dispatch ClassLinkageTable (TranFunc)
 	// it would have been better to process them all here. but I wrote this after
 	// So the older code still needs removing and using this instead.
 	cpp_wrapper			{}
-	cpp_part			{SCBase.LoadCppPart(node, name_space, node)}
+	cpp_part			{SCNode.LoadCppPart(node, name_space, node)}
 	cpp_refs			scfunction.tran_cpprefs
 	cpp_class			{}
 	visible				{} // (SCFunction.Tran_Visible)
 	ignore				{}
 	noearlyfree			{}
-	dontdestructlocally {}
+//	dontdestructlocally {}
 	wrapper				{} //if name_space.mustbe(scclass) : name_space.IsWrapper = true}
 	datatype
 		if name_space.mustbe(SCClass, node)
 			expect (name_space.isstruct) (node, "Expected this for a struct")
 			|| value = node[@thg]
 				value.expectlast
-				name_space.IsDataTypeLike = value.trueorfalse
 
 	numeric
 		if name_space.mustbe(SCClass, node)
-			expect (name_space.isdatatype) (node, "Expected this for a datatype")
+			expect (name_space.isdatatypeOnly) (node, "Expected this for a datatype")
 			if node[@thg] == "false"
 				name_space.typeinfo = datatypecode.unusedtype
 				name_space.IsNotNumeric = true
 
 
-function SCBase.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, |scbase|)
+function SCNode.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, |SCNode|)
+	opt norefcounts
 	|| fn = .owningfunc
 	for ch in node
 		require ch.expect(@tmp)

@@ -7,14 +7,8 @@
 module Pipe
 	constants
 		StdIn_  = 0
-		StdOut_ = 1 // i guess it should be a getter func
-		StdErr_ = 2 // considering we have setter funcs
-
-	function StdError (assigns:|int|)
-		cpp_wrapper
-
-	function StdOut (assigns:|int|)
-		cpp_wrapper
+		StdOut_ = 1
+		StdErr_ = 2
 
 	function StdOutIsTerminal (|bool|)
 		return .IsTerminal(.StdOut_)
@@ -25,28 +19,48 @@ module Pipe
 	function ErrorIsTerminal (|bool|)
 		.IsTerminal(.StdErr_)
 		
-	function KillPID (|int| pid, |int|)
-		cpp_wrapper JB_Kill
-	
-			
+
 
 
 datatype PID_Int (int)
 	syntax cast (|bool|)
 		return self > 0
+	function Kill (|ErrorInt|)
+		cpp_wrapper JB_Kill
+	function Signal (|int| Sig, |errorint|)
+		cpp_wrapper JB_PID_Signal
+
+
+
+datatype ErrorInt2 (ivec2)
+// just a clever class to deal with the fact that many many things really want TWO error ints, not just one.
+// or else we'd need to wrap the one int, in a struct, cos unix ExitCodes are not ints, they are bitfield...
+// and we'd accidentally treat the exit-code as an int when its really not, its a bitfield.
+// basically processes can exit with two different kinds of error codes... one being a crash
+// the other being that it completed normally but the program itself said something is wrong.
+
+	linkage
+		cpp_part Err2
+	function Exit (|errorint|)
+		return self[0]
+	function Signal (|errorint|)
+		return self[1]
+	syntax cast (|bool|)
+		return self == (0, 0)
+
 
 
 extend string	
-	function Execute (|[string]| Args = [], |faststring| Out = nil, |faststring| Errs = nil, |bool| KeepStdOut=true, |ErrorInt|)
+	function Execute (|[string]?| Args = [],  |faststring?| Out = nil,  |faststring?| Errs = nil,  |bool| StdOutFlowsThroughUs=true, |ErrorInt2|)
 		cpp_wrapper JB_Str_Execute
 
-	function SilentExecute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
+	function SilentExecute (|[string]| Args=[],  |faststring|Out=nil,  |faststring| Errs=nil,  |ErrorInt2|)
 		return .execute(args, out, errs, false)
 
 	function ExecuteStr (|[string]| Args=nil, |string|)
 		|| fs = faststring()
 		if .execute(args, fs)
-			return fs
+			rz = fs
 
 	function System (|int|)
 		cpp_wrapper	// bad? execute is better?

@@ -1,12 +1,11 @@
- 
 
 extend_module perry
 	function FTP_Path (|string|)  ////////
-		rz = app.prefs("ftp_dest")
-		if !rz or keys.Option or app.Prefs("ftp_failed")
+		rz = app.pref("ftp_dest")
+		if !rz or keys.Option or app.Pref("ftp_failed")
 			|| q = "Upload Perry to what URL?\n\nEG: ftp://user:pass@ftp.domain.com/dirs/perry.zip"
 			rz = q.Ask(rz)$
-			app.prefs("ftp_dest") = rz
+			app.pref("ftp_dest") = rz
 
 ///// abc
 
@@ -37,7 +36,8 @@ extend_module perry
 		fol.MakeEntirePath
 		|| items = fol.list
 		while items.length > allowed
-			|| s = fol[items.pop]
+			|| i = items.pop #loop
+			|| s = fol[i]!
 			if keep_first
 				keep_first = false
 				rz = s
@@ -82,16 +82,17 @@ extend_module perry
 		|| older = FastString()
 		
 		for i in arc
-			|| curr_file = base[i.name]
-			if curr_File.isdir or curr_file.readall(true) != i..data.Value
-				|| diskmod = curr_file.modified
-				|| arcmod = i..modified.int|date|
-				if diskmod <= arcmod
-					rz |= arc_newer
-					newer.FileDiff(i.name, "And newer ones too")
-				  else
-					rz |= arc_older
-					older.FileDiff(i.name, "Archive contains older files")
+			|| s = i.name
+				|| curr_file = base[s]!
+				if curr_File.isdir or curr_file.readall(true) != i..data.Value
+					|| diskmod = curr_file.modified
+					|| arcmod = i..modified.int|date|
+					if diskmod <= arcmod
+						rz |= arc_newer
+						newer.FileDiff(i.name, "And newer ones too")
+					  else
+						rz |= arc_older
+						older.FileDiff(i.name, "Archive contains older files")
 				
 		diff <~ older
 		if newer.length and older.length
@@ -120,21 +121,16 @@ extend_module perry
 		return paths[0, found+srch.length]
 
 
-	function MakeSpeedieDir (|bool| Print, |string|)
-// over complex? it just returns (speedie.file)?
-// i mean testing is important... but what if it fails? does it do anything special to help with that?
-		|| where = speedie.file
-		|| dest_path = where.linksto
-		if where.exists and dest_path
+	function MakeSpeedieDir (|string|)
+		|| dest_path = speedie.LinksTo
+		if speedie.exists and dest_path
 			|| result = dest_path.executestr(["--alive"]).trim
 			if result contains "seems alive"
 				rz = .FindSpeedieRoot(dest_path)
-				if print
-					"Speedie Found At: $rz"
 
 
 	function TestShell (|string|)
-		if !.makespeediedir(false)
+		if !.makespeediedir
 			return " * Link $speedie\n\n"
 		
 		
@@ -179,9 +175,9 @@ extend_module perry
 
 
 	function MoveToAppFolder (|string|) // disabled?
-		|| me = app.apppath.file
-		|| t = file.trash(me.name)
 		|| dest = app.NeedsIdealPath$
+		|| me = app.apppath.file
+		|| t = file.trash(me.name)$
 		
 		for 10
 			if dest.exists and !dest.moveto(t)
@@ -193,28 +189,9 @@ extend_module perry
 				rz = "\n\nFailed to move $me to destination"
 		
 	function TestCompiler (|string|)
-		if !CppCompiler.file.exists
+		if !CppCompiler.fileexists
 			return "No c++ compiler exists at '$CppCompiler' ! Please make one available from that path."
 
-	function CheckInstallStatus (|bool| MsgIfNothing=true)
-		.checked = true
-		|| CompilerMsg = .TestCompiler
-		|| HasNewerApp = .testnewer
-		|| ShellBad = .testshell
-		|| InstallBad = .testinstall
-		|| probs = false
-		if ShellBad or InstallBad
-			if HasNewerApp				// what should we do?
-				beep ("A newer version of Perry exists... at $HasNewerApp. Please use it to install Speedie.")
-				return
-			|| Msg = "Some installation needs to be done to use Perry:\n\n$ShellBad$InstallBad"
-			if msg.confirm
-				.install(installbad!="", shellbad!="")
-			probs = true
-		if CompilerMsg
-			beep CompilerMsg
-		  elseif !probs and MsgIfNothing
-			beep "No errors detected with install."
 
 
 	function GenerateArchive
@@ -228,14 +205,14 @@ extend_module perry
 		for f in list
 			fs <~ f
 			fs <~ " "
-			fs <~ f.file.Size|int|.strsize
+			fs <~ f.Size|int|.strsize
 			fs <~ "\n"
 		return fs.render.confirm
 			
 	helper GenerateArchiveSub (|bool|)
 		|| outpath = .install_path
 		|| p = .SpeedieDir
-		|| f = p.existingFile("generate archive")
+		|| f = p.FileThatExists("generate archive")
 		require f and outpath
 		
 		|array of file| list 
@@ -294,16 +271,15 @@ extend_module perry
 
 
 	function SetupLinks (|file|f, |string|)
-		|| term = f["Terminal/Speedie"]
+		|| term = f["Terminal/Speedie"]!
 		require term.mustexist
-		|| at = speedie.file
-		|| dest = at.linksto
+		|| dest = speedie.linksto
 		if Dest == term.path
 			//
-		  elseif at.linkto(term)
-			rz = "\n\nInstalled speedie at: " + at.path
+		  elseif speedie.linkto(term)
+			rz = "\n\nInstalled speedie at: " + speedie
 		  else
-			rz = "\n\nFailed to install speedie at: " + at.path
+			rz = "\n\nFailed to install speedie at: " + speedie
 
 
 	function Install_Files (|file| f, |string|)
@@ -341,11 +317,10 @@ extend_module perry
 			
 	function UnInstall
 		|| fs = FastString()
-		|| spd = speedie.file
 		|| per = app.Idealpath
 		|| fol = .SpeedieDir
-		if spd.exists and spd.delete
-			fs <~ "Deleted Link at: $spd"
+		if speedie.exists and speedie.delete
+			fs <~ "Deleted Link at: $speedie"
 		if per.FileExists and per.MoveToTrash
 			fs <~ "\nDeleted Perry at: $per"
 		fs <~ "\n\nTo fully uninstall, remove folder at:\n$Fol"
@@ -364,14 +339,11 @@ function ClickedUninstallMenu (GUIMenuEvent)
 function ClickedEditPrefs (GUIMenuEvent)
 	PerryIDE.New(app.prefpath)
 
-function ClickedTestInstallMenu (guimenuevent)
-	perry.CheckInstallStatus
-
 function string.IsProj (|bool|)
 	return self isa "scproj" or "uwuz"
 
 function string.PathIsCode (|bool|)
-	return .isproj or (self isa "spd" or "uwu")
+	return .isproj or .isSource
 
 function faststring.FileDiff (|string| name, |string| Title)
 	if !.length
@@ -381,3 +353,11 @@ function faststring.FileDiff (|string| name, |string| Title)
 	self <~ name
 	self <~ "\n"
 
+
+function file.AppDate (|date|)
+	if self
+		ifn self isa "app"
+			return .anydate
+		|| n = "/Contents/MacOS/" + .TrimExtAndPath
+		|| c = .childexisting(n)
+			return c.anydate

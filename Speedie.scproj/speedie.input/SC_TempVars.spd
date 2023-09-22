@@ -1,12 +1,6 @@
 
-
-function message.EmbToString
-	if (self == @emb) and !.name
-		.func = @str
-		scfunction.ObjectifyString(self)
-
-
 function Message.HasOwnBlock (|Message|)
+	opt norefcounts
 	|| arg = .parent
 	require (arg == @rel)
 	arg = arg.parent
@@ -14,32 +8,36 @@ function Message.HasOwnBlock (|Message|)
 	arg = arg.parent
 	require (arg == @arg)
 	|| obj = arg.asarg
-	debug_require (obj isa scarg)
-
-	if (obj.TmpMovedOutFor == self)
+	if (obj and obj.TmpMovedOutFor == self)
 		return arg
 
 
-function Message.CreateOwnBlock (|Message|)
+function Message.CreateOwnBlock (|Message?|)
 	//  adds new ({}),  marks it as temp-exprblock for parent,  and puts in the right place
 
 	using (self)
 		
-	|| bra = «bra »
+	|| bra = @bra.msg
 	bra.obj = .obj
 	rz = bra.msg(@arg)
 	.ReplaceWith(bra)
 	
 	|| NewObj = rz.scarg(nil)
-	NewObj.TmpMovedOutFor = self
-	newobj.IsStatementExpr = true // jeez sheesh. shouldn't have to set this?
+		NewObj.TmpMovedOutFor = self
+		bra.statementexpr = newobj
+
+
+function message.StatementExpr (assigns:|scarg| arg)
+	.TmpType = asmtmp.kStatementExpression
+	arg.IsStatementExpr = true
 
 
 function message.TheTmpVarOf (|string| tmpname, |message|)
-	|| d = .AsDecl.Copy
-	d.Name = ""
-	rz = «Thg tmpname »
-	rz.obj = d
+	rz = @Thg + tmpname
+	|| ad = .AsDecl
+		|| d = ad.copydecl
+		d.Name = ""
+		rz.obj = d
 
 
 
@@ -48,11 +46,13 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 // Will make it harder if we use tempintoblock from multiple places...
 // cos then "How it is used" becomes important.
 
-	|| FuncMsg = .parent
+	|| FuncMsg = .parent!
 	if (funcmsg == @dot) and (funcmsg.first == self)
 		0 // || x = R.pop().Property
 	  else
-		debug_require (FuncMsg==@prm)
+		if FuncMsg!=@prm
+			.RefDisappears // still not sure what this is doing
+			return nil
 		FuncMsg = FuncMsg.parent
 
 	|| fn = FuncMsg.MsgFunc
@@ -67,53 +67,54 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 	|message| TmpFuncThg
 	|message| TmpFuncDecl
 	if (Arg)
-		|| rel = FuncMsg.parent
-		TmpFuncDecl = rel.parent
-		TmpFuncThg = rel.first
+		|| rel = FuncMsg.parent!
+		TmpFuncDecl = rel.parent!
+		TmpFuncThg = rel.first!
 	  else
 		arg = FuncMsg.createownblock #require
-		|| TmpFuncVar = UniqueTmpVar()								// "t2"
-		TmpFuncThg = .TheTmpVarOf(TmpFuncVar)
-		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg )		    // || t2 = func(t1, c.d)
+		|| TmpFuncVar = UniqueTmpVar()
+		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg, scdeclinfo.body )
+		TmpFuncThg = «Thg TmpFuncVar »
+		TmpFuncThg.obj = TmpFuncDecl.obj
 		arg <~ TmpFuncDecl
-		arg <~ «tmp "rejoin", TmpFuncThg »							// t2
+		|| rej = NewRejoin()
+		rej <~ tmpfuncthg
+		arg <~ rej
 
-	|| TmpParamName = UniqueTmpVar()								// "t1"
-	rz = funcmsg.TheTmpVarOf(TmpParamName)							// t1
-	.ReplaceWith( rz )										// func(a.b.b2, c.d) --> func(t1, c.d)
-// || t1 = a.b.b2
-	|| TmpParamDecl = MakeDecl( "", TmpParamName, self )
+	|| TmpParamName = UniqueTmpVar()
+	rz = @thg + TmpParamName 
+	.ReplaceWith( rz )
+	|| TmpParamDecl = MakeDecl( "", TmpParamName, self, scdeclinfo.body )
+	rz.obj = TmpParamDecl.obj 
 	TmpFuncDecl.prev = TmpParamDecl
 
 
 
-function message.IntoVariable (|scbase| name_space, |nameandmsg|)
+function message.IntoVariable (|SCNode| name_space, |nameandmsg|)
 	|| P = .NiceParent
 	|| Place = P.IsInDeclInBlock
-		|| NameMsg = P.first.usenonrefchangers
+		|| NameMsg = P.first!.usenonrefchangers
 		if (NameMsg == @thg)
 			rz.name = NameMsg.name
-			rz.arg = place.Ancestor(@arg)
+			rz.arg = place.Ancestor(@arg)!
 			rz.msg = place.next // result uses .arg as backup if !.msg
 			return rz
 	
-	|| Block = .CreateOwnBlock
+	|| Block = .CreateOwnBlock #require
 	|| name = uniquetmpvar(name_space, "_imP")
 	
-	P = NeweqRel( @thg.msg(name), self )
-	|| arg = block.asarg
-	Block <~ «decl
-		@emb
-		P
-	»
-	
-	CollectDeclsFuncBodyJustWhatWeNewlyMade(block, arg) // we only have one decl that needs collecting...
-	block.parent.obj = arg[name]	// Stop collectdecls being called twice! (name-conflict errors)
+	P = NewEqRel( @thg.msg(name), self )
+	|| arg = block.asarg!
+	|| decl = block.msg(@decl)
+	decl <~ @emb
+	decl <~ P
+	decl.CollectFromBody(arg)
+	block.parent!.obj = arg[name]	// Stop collectdecls being called twice! (name-conflict errors)
 									// it's called in typeofblock, unless we already have the type
 									// which we just set here.
-	|| last = «tmp "rejoin"
-		«thg name »
-	»
+	|| last = NewRejoin()
+	|| RetVal = last.msg(@thg, name)
+	RetVal.obj = P.obj
 	 
 	block <~ last
 	rz.msg = last
@@ -123,20 +124,21 @@ function message.IntoVariable (|scbase| name_space, |nameandmsg|)
 
 
 struct NameAndMsg
-	|message|   Msg
-	|string|	Name
-	|message|   Arg
+	|message?|   Msg
+	|string|	 Name
+	|message?|   Arg
 	
 	syntax append (|message| m)
-		if (.msg)
-			.msg.prev = m
+		opt norefcounts
+		|| msg = .msg
+			msg.prev = m
 		  else
 			.arg <~ m
 
 
 
 || fs_tmp_num = FastString()
-function UniqueTmpVar (|SCBase| base=scfunction.currfunc, |string| name = "tmP", |string|)
+function UniqueTmpVar (|SCNode| base=scfunction.currfunc, |string| name = "tmP", |string|)
 	opt norefcounts
 	fs_tmp_num <~ '_'
 	fs_tmp_num <~ name
@@ -152,16 +154,16 @@ function UniqueTmpVar (|SCBase| base=scfunction.currfunc, |string| name = "tmP",
 
 
 extend_module scfunction
-	function TempMoveOut (|Message| msg, |string|name="", |Message|)
+	function TempMoveOut (|Message| msg, |string| name="", |Message!|)
 		cpp_part TypedTempMoveOut
 		// a.b.c -> || tmp1 = a.b.c
 	
-		|| Using = msg.syntaxusing
-		name := UniqueTmpVar(msg.msgowningfunc)
+		|| Using = msg.SyntaxUsing
+		name := UniqueTmpVar(msg.MsgOwningFunc)
 		|| repl = «thg name »
 		msg.ReplaceWith( repl )
 		
-		|| p = repl.ParentPoint
+		|| p = repl.ParentPoint!
 		|| insert = msg
 		if (msg == @rel)
 			insert = «bra, (msg)»
@@ -173,7 +175,7 @@ extend_module scfunction
 		
 		|| OldDcl = msg.AsDecl
 			insert.obj = OldDcl
-			OldDcl = OldDcl.Copy // no difference, its a temp
+			OldDcl = OldDcl.copydecl // no difference, its a temp
 			OldDcl.Name = name
 			repl.obj = OldDcl
 			dcl.obj = OldDcl
@@ -182,24 +184,24 @@ extend_module scfunction
 
 
 
-	function TempMoveOut (|Message| msg, |Message| parent, |Message|)
-		expect (msg != @str)
-		
+	function TempMoveOut (|Message!| msg, |Message!| parent, |Message|)
 		|| OldDecl = msg.AsDecl
-		ifn olddecl
+		if !OldDecl
 			parent.prev = msg
 			return msg // right?
 	
 		|| Using = msg.syntaxusing
 		|| Name = UniqueTmpVar(msg.msgowningfunc)
-		|| d = OldDecl.Copy // no difference? This ACTUALLY may or may NOT be borrowed, BUT surely the temp should have the SAME borrowedness? Or else why are we temping it?
-		d.Name = ""
 		
 		// a.b.c -> || tmp1 = a.b, tmp1.c
-		|| NameThing = «Thg name »
-		NameThing.obj = d
+		|| NameThing = @Thg + name
 		msg.ReplaceWith( NameThing )
 		
-		(parent, namething)(parent).prev = MakeDecl( "", name, msg )		
+		// here
+		|| declmsg = MakeDecl( "", name, msg, scdeclinfo.body )
+		parent.prev = declmsg
+		
+		|| d = declmsg.Obj!|scdecl|
+		NameThing.obj = d
 		Return NameThing
 

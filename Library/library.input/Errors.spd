@@ -14,16 +14,19 @@ class Error (Message)
 	|String|				Path
 	|String|				OriginalData
 	|String|				StackTrace
-	|message|				Node
+	|f64|					Progress // for long operations where you want to know how far you have gone before getting an error.
+	|message?|				Node
 	|date|					When
 	|ErrorSeverity|			Severity
 	|ErrorFlags|			ErrorFlags
 
-	constructor (|message| node, |string| desc = "", |errorseverity| level=errorseverity.error, |string| path="" )
+	constructor (|message?| node, |string| desc = "", |errorseverity| level=errorseverity.error, |string| path="" )
+		visible
 		super.constructor
 		.position = -1
 		.node = node
 		.severity = level
+		.progress = errorreceiver.progress
 		.name = desc // sigh
 		.path = path
 		.when = date()
@@ -69,9 +72,6 @@ class Error (Message)
 	function Copy (|error|)
 		return error(self, false)
 
-	syntax isnt (|ErrorFlags|F, |bool|)
-		return !.syntaxis(F)
-
 	syntax is (|ErrorFlags| F, |bool|)
 		return self and .ErrorFlags&F
 		
@@ -87,6 +87,12 @@ class Error (Message)
 
 	function HasPosition (|bool|)
 		return .Position >= 0 
+		
+	function ShiftPosition (|int| i)
+		opt norefcounts
+		.position += i
+		|| node = .node
+			node.position += i
 	
 	function Fired (|bool|)
 		return .when.fired
@@ -110,8 +116,7 @@ class Error (Message)
 	
 	function Reformulate (|string| suffix="")
 		|| list = error.from(.name.parse)
-		while list.hasany
-			|| err = list.first
+		while (|| err = list.first)
 			if suffix
 				err.name += suffix
 			stderr <~ err
@@ -169,6 +174,8 @@ class Error (Message)
 			fs.field( "pos", .position )
 		fs.field( "file", .path )
 		fs.field( "severity", .severity )
+		if .progress
+			fs.fieldfloat( "progress", .progress )
 		if .StackTrace
 			fs.field( "stack", "" )
 			fs.indent++
@@ -227,8 +234,11 @@ datatype ErrorSeverity (Byte)
 		if (self < MaxError)
 			|| name = errorseverity.InitNames[self|int|]
 			if !fs_in
-				return name
-			fs_in <~ name
+				if name != nil
+					return name
+				return ""
+			if name
+				fs_in <~ name
 	
 	syntax is (|errorseverity| e, |bool|)
 		return self == e

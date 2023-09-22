@@ -55,25 +55,23 @@ function SCModule.LoadInitFuncSub (|message| init, |string| name)
 	|| msg = "function $Name (|int|)".ParseClean
 	msg <~ init
 	|| fn = .NewModuleFunc( msg )
-	(fn is InitFunc)
-	
-	|| L = init.Last
-	ifn L.hasany
-		L.Remove // never called anymore?
+		(fn is InitFunc)
+		
+		|| L = init.Last
+		if !L.hasany
+			L.Remove // never called anymore?
 
 
 function SCModule.LoadInitFunc
-	scbase.CurrVisibility = true
-	scbase.currmodule = self
+	SCNode.CurrVisibility = true
+	scmodule.curr = self
 	|| arg = .initcodeArg
 		.LoadInitFuncSub(arg, "InitCode_")
 	
 	arg = .initVarsArg
 	if arg
 		.LoadInitFuncSub(arg, "Init_")
-		|| Msg = "function Dispose () { visible false }".ParseClean
-		.DisposeFunc = .NewModuleFunc(Msg)
-	scbase.currmodule = nil
+	scmodule.curr = nil
 
 
 
@@ -81,8 +79,8 @@ function scmodule.TryInit (|array of scmodule| req, |bool|)
 	opt norefcounts
 	for name in .initafter
 		name.expect(@thg)$
-		|| m = compiler.FindModulemsg(name)$
-		require m.inited
+		|| m = compiler.findmodulemsg(name)
+		require m and m.inited
 
 	.inited = true
 	req <~ self
@@ -92,7 +90,7 @@ function scmodule.TryInit (|array of scmodule| req, |bool|)
 extend_module scmodule
 	function DoInitAfter (CollectFunc)
 		opt norefcounts
-		|| mod = name_Space.getasmodule(node)$
+		|| mod = name_Space.SpaceModule(node)$
 		mod.InitAfter = node[@prm, @bra]
 		return compiler.program
 
@@ -130,10 +128,12 @@ function SCModule.AddDelayedInit (|message| src, |message|dest, |string| fn_name
 
 function SCModule.DelayedInitFuncTransform
 	|| v = .initvarsarg
-	|| it = v[0]
+	|| it = v.first
 		for (msg in it)
-			if (msg == @Decl) and msg.GetDclName.InitRootDecl( msg, self )
-				msg.Remove
+			if (msg == @Decl)
+				|| name = msg.GetDclName
+					if name.InitRootDecl( msg, self )
+						msg.Remove
 		.AddDelayedInit(v, Compiler.program.initvarsarg, "Init_")
 
 	.AddDelayedInit(.initcodearg, Compiler.program.initcodearg, "InitCode_")
@@ -148,7 +148,7 @@ function SCModule.HasActualCode (|message|arg, |bool|)
 			return true // found something!
 
 
-function Message.InitRootDecl (|Message| before, |SCBase| name_space, |bool|) {
+function Message.InitRootDecl (|Message| before, |SCNode| name_space, |bool|) {
 	// this code just seems wrong... it finds an SCDecl and puts it into "Decl" :)
 	// have an SCDecl... that should always already have a default! So why we are creating a default?
 

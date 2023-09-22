@@ -24,7 +24,6 @@ class Array (saveable)
 		visible
 		cpp_wrapper JB_Array_Constructor0
 		
-	
 	destructor
 		cpp_wrapper JB_Array_Destructor
 
@@ -40,14 +39,17 @@ class Array (saveable)
 	function Next (||)
 		if .marker < .length
 			return self[.marker++]
-	setter Next (||)
+	
+	setter Next (|...!|)
 		self[.marker++] = value
 
 	function Prev (||)
 		if .marker > 0
 			return self[--.marker]
+
 	function Active (|bool|)
 		return .marker < .length
+
 	function Reset
 		.marker = 0
 	
@@ -55,12 +57,9 @@ class Array (saveable)
 		.length = .length - 1
 	
 	function Pop (||)
-		|| n = .length$
-		n--
-		rz = self[n]
-		.length = n
+		cpp_wrapper JB_Array_Pop
 
-	function SetAt (|| c, |int| i)
+	function SetAt (|...!| c, |int| i)
 		|| n = .length
 		if n == i
 			self <~ c
@@ -68,17 +67,21 @@ class Array (saveable)
 			self[i] = c
 		
 	function Clear
-		.length = 0
+		nil self
+		if self!=nil
+			.length = 0
 	
 	function Wipe (|int|)
-		// returns .size
+		description "Clears entire array, then returns the previous size."
 		cpp_wrapper JB_Array_Wipe
 	
 	function Size (|int|)
 		disabled "use length"
 	
 	function Length (|int|)
+		nil checker
 		cpp_wrapper JB_Array_Size
+	
 	function FastShrink (|int| to=0)
 		cpp_Wrapper JB_Array_FastShrink
 	
@@ -91,7 +94,8 @@ class Array (saveable)
 	function Remove (|int| Pos)
 		cpp_wrapper JB_Array_Remove
 
-	function SmartRemove (|int| Pos)
+	function FastRemove (|int| Pos)
+		opt norefcounts
 		|| p = .pop
 			self[pos] = P
 
@@ -114,38 +118,28 @@ class Array (saveable)
 	function Swap (|int| i, |int| j)
 		cpp_wrapper JB_Array_Swap
 	
-	syntax Access (|int| pos, assigns:||)
-		cpp_wrapper JB_Array_ValueSet
-		
+	syntax Access (|int| pos, assigns:|...!|)
+		cpp_wrapper JB_Array_ValueSet // disable set nil? makes internals simpler/faster!
 	
 	syntax Access (|int| pos, ||)
+		nil checker
 		cpp_wrapper JB_Array_Value
 	
 	syntax Access (||)
 		cpp_part Rand
 		return self[.length.now]
 	
-	syntax Access (|bool| pos, ||)
-		return self[!pos]
-	
-	function Reserve (|int| Needed)
-		if .length < Needed
-			.length = Needed
-		
-	syntax Access (|syntax| pos, assigns:||)
-		.reserve(1 + pos|int|)
-		self[pos|int|] = Value
-	
 	syntax cast (|bool|)
 		return .length > 0
 	
-	syntax Append (|| item)
-		.syntaxappend(item, 1)
+	syntax Append (|...?| item)
+		.SyntaxAppend(item, 1)
 	
-	syntax Append (|| item, |int64| Count)
+	syntax Append (|...?| item, |int64| Count)
 		cpp_wrapper JB_Array_AppendCount
 	
 	render
+		nil self
 		cpp_wrapper
 	
 	function Find (|| f, |ind|)
@@ -156,9 +150,11 @@ class Array (saveable)
 
 
 	syntax Compare (|int| n, |bool|Aware, |int|)
+		nil self
 		return .length - n
 	
 	syntax Equals (|int| n, |bool|Aware, |bool|)
+		nil self
 		return .length == n
 	
 	operator contains (|object| o, |bool|)
@@ -173,20 +169,22 @@ class Array (saveable)
 		|| i = 0
 		while
 			|| Item = self[i]
-			if item == nil:exit 
+			if item == nil: exit 
 			yield Item (i)
 			i++
 
 	iterator Backwards
-		|| i = .length
-		while ( i-- >= 1 )
-			yield self[i] (i)
+		|| i = .length - 1
+		while
+			|| Item = self[i]
+			if item == nil: exit 
+			yield Item (i)
+			i--
 
 
 
 prototype SorterComparer (|object| a, |object| b, |bool|)
-prototype SorterComparer2 (|object| a, |object| b, |int|) // this is better than SorterComparer
-														  // want to use only this, eventually.
+prototype SorterComparer2 (|object| a, |object| b, |int|) // we have two list sort funcs... need to remove one
 //function MySorter (SorterComparer) // should be: sortercomparer of message
 	// sortercomparer should be (|| a, || b, |bool|)... so a contained type, basically!
 	
@@ -194,18 +192,3 @@ function StringSorter (SorterComparer)
 	return a|string|  <  b|string|
 	
 
-
-function SorterComparer.testsort
-	|random| rnd
-	rnd.seed = 123
-	.TestArr(("aaa,bbb,ccc,ddd,fff,eee" / ','))
-	.TestArr(rnd.texts(10000, 10))
-
-	
-function SorterComparer.testarr (|[string]| r)
-	r.sort(self)
-	for i in 0 to r.length-2
-		if r[i] > r[i+1]
-			"${r[i]} > ${r[i+1]}"
-			debugger
-	printline r

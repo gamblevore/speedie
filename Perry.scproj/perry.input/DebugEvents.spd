@@ -3,10 +3,10 @@
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
 	if key.IsCancel
-		.window.clearfocus
+		.window!.ClearFocus
 		return true
 	
-	
+
 function FoundListKeys (GuiKeyEvent)
 	opt norefcounts
 	if key.IsDelete
@@ -18,10 +18,10 @@ function FoundListKeys (GuiKeyEvent)
 
 function DebugArgsGotFocus (guiaction)
 	|| v = state == 1
-	require (self is visible) != v
-	(self is visible) = v
-	if self isa textview
-		.updatedebugargs(v)
+	if (self is visible) != v
+		(self is visible) = v
+		if self isa textview
+			.UpdateDebugArgs(v)
 
 
 function textview.UpdateDebugArgs (|bool| Visible=false)
@@ -29,9 +29,9 @@ function textview.UpdateDebugArgs (|bool| Visible=false)
 	if !.Document
 		.LoadDocument(Document(f))
 	if !.text
-		.text = qqfiles.DebugArgs
+		.text = defaultfiles.DebugArgs
 	if visible
-		.window.setinnerfocus(self)
+		.window.SetInnerFocus(self)?
 	  else
 		.Save
 		
@@ -50,19 +50,23 @@ function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
 	
 
 function ClickedDebug (GUIAction)
-	|| i = .ide	
+	|| i = .ide!
 	if .text == "\02"		// play
 		i.DebugIsWaitingForCompile = true
 		i.compile("debug")
-		i.ShowText(i.ProductPage, "")
+		i.ShowText(i.ProductOut, "", false)
+		|| itm = i.CompileTabs.items[3]
+			(itm is hidden)
+		i.ProductErrors.text = ""
 	  elseif .text == "\07" // stop
-		if i.RunCompiledApp and i.confirm("Kill running product " + i.Name + "?", fnStillRunning)
-			i.RunCompiledApp.kill
+		|| prod = i.runcompiledapp
+		if prod and i.confirm("Kill running product " + i.Name + "?", fnStillRunning)
+			prod.kill
 			i.UpdateDebuggedApp(true)
 
 
 function PressingDebug (GUIAction)
-	|| d = .ide.DebugArgsList
+	|| d = .ide!.DebugArgsList
 	DebugArgsGotFocus(d, 1)
 
 
@@ -71,15 +75,27 @@ function perryide.DebugEnvs (|message| env)
 	for rel in env
 		|| ch2 = rel[2]
 		if ch2 and rel[1] == "="
-			app.ChildEnv(rel[0].name) = ch2.name
+			app.ChildEnv(rel.first!.name) = ch2.name
 
 
-function perryide.DebugActual (|file| f, |[string]| args)
-	.LogOneAction(@emb + (f + " " + args.render))
-	
-	|| fs = faststring()
-	.RunCompiledApp = ShellStream(f, args, fs, fs)
-	if .RunCompiledApp and .RunCompiledApp.PID
+function PerryIDE.DebugActualStr (|file| f, |[string]| args, |faststring|)
+	rz = FastString()
+	rz <~ f.name
+	rz <~ ":"
+	for a in args
+		rz <~ ","
+		start
+		rz <~ " "
+		rz.AppendQuotedEscape(a)
+
+
+function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct, actualdebug, debugproduct
+	|| out = .DebugActualStr(F, args)
+	.LogOneAction(@emb + out.Copy)
+	out <~ ("\n", 2)
+	|| r = Process.stream(f, args, out)
+	.RunCompiledApp = r
+	if r and r.PID
 		.RunButton.text = "\07"
 
 
@@ -95,44 +111,77 @@ function perryide.DebugPath (|file| f, |message| conf)
 			app.cwd = path
 
 
-function perryide.StartDebugging (|file| f)
+function PerryIDE.StartDebugging (|file!| f)
 	require f.MustExist and StdErr.ok
 
 	.DebugArgsList.UpdateDebugArgs
-	|| debugargs = .DebugArgsFile.parse #require
-	|| ArgMsg = debugargs["args"]
+	|| debugargs = .DebugArgsFile.parse				#require
+	|| ArgMsg = DebugArgs["args"]					#require
+	ArgMsg = ArgMsg.Copy
+	for a in ArgMsg
+		if a == @arel
+			expect (a == "?") (a)
+			|| str = a.firstname.Ask				#require
+			a.Become(@str, str)
+			a.clear
+				
 	|| args = argmsg.AllNames
-	if f.isdir
-		check (!args) (ArgMsg, "You can't pass arguments to gui-apps (in this version).")
+	if debugargs["flags"]["open"].yes
+		check (!args) (ArgMsg, "You can't pass arguments, when using open-flags")
 		args = [f]
 		f = "/usr/bin/open".file
-
-
+	  elseif f.IsDir and Platform.OSX
+		f = f.Child("Contents/MacOS/" + f.TrimExtAndPath)!
+	
 	|| old = app.cwd
-	.debugpath(f, debugargs)	
+	.DebugPath(f, debugargs)	
 	.DebugEnvs(debugargs["env"])		
 	.DebugActual(f, args)
 
 	if !StdErr.ok
 		.DebugArgsList.FillErrors(StdErr)
-		Notifications <~ StdErr.LastError
+		|| err = StdErr.LastError
+			Notifications <~ err
 	app.cwd = old
+
+
+function perryide.CompileTab (|int| i, |listviewrow|) // for autocomplete
+	return .CompileTabs.items[i]
+
+
+function perryide.AddProductErr (|string| err)
+	if err
+		.ProductErrors <~ err
+		|| t = .CompileTab(3)$
+		if .ProductSep.iscollapsed or t is hidden
+			.ShowText(.ProductErrors, nil, true)
+		(t isnt hidden)
 
 
 function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
-	// so what if we have a shellstream? then what?
-	|| fs = r.output
-	if !r.userflags and fs.length
-		.ShowStdOut
+
+	|| rout = r.Output
+	if !(r.userflags&1) and rout and rout.length
+		.ShowCompileTab(.productout, true)
 		r.userflags |= 1
 	
-	if !r.step or kill
+	r.step
+	if kill or !r.IsRunning
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
-		
-	.productpage <~ fs.GetResult // later we will make this NOT do string appends to create .text
+	
+	.ProductOut <~ rout
+	.AddProductErr(r.ErrorOutput)
+	
 	if kill
-		.productpage <~ "(--Process Killed--)"
+		.ProductOut <~ "\n(--Process Killed--)"
+	  elseif !r.IsRunning
+		|| exitcode = "\n(--Exit OK--)"
+		if r.exit > 0
+			exitcode = "\n(--Exit Error: ${r.Exit}--)"
+			.addProductErr(exitcode)
+		.ProductOut <~ exitcode
+	
 	return !kill
 		

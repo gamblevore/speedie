@@ -15,6 +15,7 @@ role FileArchive (message)
 
 
 	function Validate (|FileArchive|)
+		require self
 		|| arc = (.first, self)(self == @arg)
 		require .expect(@tmp, "archive")
 		for p in arc.last(@arg)
@@ -27,14 +28,14 @@ role FileArchive (message)
 
 	function Install (|message| item, |file| base, |bool| overwrite, |int64|)
 		|| path = item.name
-		|| data = item..data.value
-		|| chld = base.child(path)
-		if overwrite and chld.isdir
-			chld.deleteall
-		if chld.Data(data)
-			|| it = item..mode
-				chld.mode = it.int
-			return data.length
+			|| data = item..data.value
+			|| chld = base.child(path)!
+			if overwrite and chld.isdir
+				chld.DeleteAll
+			if chld.Data(data)
+				|| it = item..mode
+					chld.mode = it.int
+				rz = data.length
 	
 	
 	iterator
@@ -55,7 +56,7 @@ role FileArchive (message)
 	
 	function SaveTo (|file| dest)
 		require self
-		.renderjbin.compressInto(dest.out, nil)
+		.renderjbin.compressInto(dest.out)
 	
 	
 	function StripFileContents (|FileArchive|)
@@ -64,8 +65,8 @@ role FileArchive (message)
 		rz = .copy
 		for file in rz
 			|| d = file..data
-			file..size = d.value.length
-			d.remove
+				file..size = d.value.length
+				d.remove
 	
 	
 	function Size (|int|)
@@ -85,14 +86,15 @@ role FileArchive (message)
 		if where != p
 			|| item = .last.msg(@tmp, where)
 			item..data = f.readall
-			item..modified = f.modified.render
+			item..modified = f.modified.renderint
 			item..mode = f.mode.render
 
 	function Base (|string|)
 		opt norefcounts
-		|| o = .last.obj
-		if o isa string
-			return o
+		|| l = .last
+			|| o = l.obj
+			if o isa string
+				return o
 
 
 function string.GetArchive (|int|lim, |FileArchive|)

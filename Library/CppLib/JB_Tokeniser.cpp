@@ -63,8 +63,7 @@ bool JB_Tk__CppInited() {
     }
     
     self->RefCount = 1000;
-    Dictionary* Dict = JB_NewEmpty( Dictionary );
-    JB_Dict_Constructor(Dict);
+    Dictionary* Dict = JB_Dict_Constructor(0);
 	self->WordDict = Dict;
     JB_Dict_ValueSet(Dict, JB_Str__Empty(), JB_NewEmpty(TokHan));
     return false;
@@ -132,16 +131,17 @@ int JB_Tk__NextStart(  ) {
 
 
 void JB_Tk__StartParse( JB_String* Data ) {
+	self->NextStart = 0;
+	self->ErrorStart = -1;
 	if ( ! Data ) {
-		Data = JB_Str__Empty();
+		JB_SetRef( JB__Tk_Data, JB_Str__Empty() );
+		return;
 	}
+
 	JB_SetRef( JB__Tk_Data, Data );
 	JB_String BOM = {};
 	BOM.Length = 3;
 	BOM.Addr = (u8*)"\xEF\xBB\xBF";
-	
-	self->NextStart = 0;
-	self->ErrorStart = -1;
 	JB_Tk__EatString(&BOM);
 }
 

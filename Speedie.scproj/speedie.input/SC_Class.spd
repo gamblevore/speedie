@@ -5,35 +5,37 @@
 
 
 
-class SCClass (SCBase) {
+class SCClass (SCNode) {
 linkage
 	cpp_part		Class
 
-|SCClass|					Super
-|Message|					Defawlt
-|Message|					False
+|SCClass?|					Super
+|Message?|					Defawlt
+|Message?|					False
 |SCModule|					Modul
 |[SCDecl]|					Properties
 |SCDecl|					TypeNormal
 |SCDecl|					TypeOptional
-|SCDecl|					TypeVeryExists
+|SCDecl|					TypeReal
 |[SCFunction]|  			Casts
 |[SCClass]|					Children
-|SCDecl|					Contained
-|scdecl|					Signed								// int/uint
-|scdecl|					_NotConst
-|SCFunction|				FuncProto
-|SCFunction|				TheIsFunc
-|SCFunction|				ConstructorFunc
-|SCFunction|				DestructorFunc
+|SCDecl?|					Contained
+|scdecl?|					Signed								// int/uint
+|scdecl?|					_NotConst
+|SCFunction?|				FuncProto
+|SCFunction?|				TheIsFunc
+|SCFunction?|				ConstructorFunc
+|SCFunction?|				DestructorFunc
 |string|					CppClass
-|SCDecl|					ClassType
+|SCDecl?|					ClassType
 |SCDecl|					SelfDecl
-|Message|					IsModel
-|SCBehaviour|   			Behaviour
+|Message?|					IsModel
+|SCBehaviour?|   			Behaviour
 |string|					SaveAs
-|SCClass|					ProcessAs
-|SCDecl|					DataTypeWrapper
+|SCClass?|					ProcessAs
+|SCClass?|					DowngradeTo
+|SCDecl?|					DataObject
+|uint|						TaskObjectCount
 |uint16|					Size
 |uint16|					Depth
 |uint16|					StructContainerDepth
@@ -52,52 +54,42 @@ linkage
 |bool|						SavingCanSkip
 |bool|						TreatAsBaseType
 |bool| 						Banned
-|bool|						IsRole
-|bool|						IsBuiltin
-|bool|						IsDataTypeLike
-|bool|						IsStruct
-|bool|						IsDataType
+|bool|						HasNilChecker
+|bool|						DefaultsToReal
+|byte|						IsRole
+|bool|						IsBuiltin // SCNodeType
+|SCNodetype| 				BaseType
 |bool|						IsASM
 |bool|						IsNotNumeric
 
 
-constructor (|Message| node, |SCBase| parent)
+constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
 	Compiler.stClasses++
 	
 	node.obj = self			// for autocomplete :)
 	.name = LoadClassName(node)
 	.Source = node
+	.Modul = m
 	.project = parent.project
-	.IsVisible = scbase.CurrVisibility
-	.saveas = nil
+	.IsVisible = SCNode.CurrVisibility
+	.saveas = ""
 	.TypeInfo = DataTypeCode.UnusedType
 	.Banned = .TestBanned
 	
-	|| IsDataType = node == "datatype"
-	|| T = SCDecl.new(self)
-	if isdatatype
-		T.nildeclared = nilstate.Real
-		T.nilused = nilstate.Realish
+	|| T = SCDecl(self)
+	t.nildeclared = (nilstate.real >> HasPtrs)
 	.TypeNormal = T
-	.TypeOptional = T.NilConstructor(NilState.optional * !IsDataType)
-	.TypeVeryExists = T.NilConstructor(NilState.Real * !IsDataType)
+	.TypeOptional = T.NilConstructor(NilState.optional * HasPtrs)
+	.TypeReal = T.NilConstructor(NilState.Real * HasPtrs)
 	
 	if node == "struct"
-		T = T.GetAddress
+		T = T.GetAddress(declmode.funcparam)
 	  else
-		T = T.Copy
+		T = T.CopyDecl
 	.SelfDecl = T
 	T.Name = "self"
-	(T is implicit)
+	(T is SelfImplicit)
 	(T isnt altered)
-
-
-function IsSTDLib (|bool|)
-	return .Project.IsSTDLib
-
-
-function SourceClass (|message|)
-	return super.source
 
 
 function NumericCount (|int|)
@@ -113,56 +105,65 @@ render
 		fs <~ " numeric"
 	if (.funcProto)
 		fs <~ " prototype"
-	  elseif (.isdatatype)
+	  elseif (.isdatatypeonly)
 		fs <~ " datatype"
 	if .ismodel
 		fs <~ " model"
 
 
-function message.AlreadySets (|string| name, |bool|)
-	opt norefcounts
-	for ch in self
-		if SettingSelfProperty(ch) and (ch.first == name)
-			return true
-
-
-function scdecl.IsPassable (|bool|)
-	return .c_array == 0
-
 
 function PassableCount (|int|)
 	opt norefcounts
 	for p in .properties
-		rz += p.ispassable
+		rz += !p.IsCArray
 
 
-function AutoConstructor
+function CreateAutoConstructor (|scfunction|)
 	opt norefcounts
-	|| fn = .CreateEmptyFunc( "Constructor", "ConstructorAuto" )
-	|| node = fn.source
-	|| prms = node[1]
+	rz = .CreateEmptyFunc( "Constructor", "ConstructorAuto" )		#require
+	|| node = rz.source
+	|| prms = node.Second
 	|| arg	= prms.next
+
 	for prop in .properties
-		if prop.ispassable
+		if !prop.IsCArray
 			|| name = prop.name
 			if name ~= "super"
 				name = "sooper"
 			check (name != "__rz__") (prop.source, "Invalid name.")
-			prms <~ prop.WriteDeclTypeAndName(name, false)
-			arg  <~ «rel
-				«sdot name »
-				«opp "=" »
-				«thg  name »
-			»
-	(fn)
+			prms <~ prop.WriteDeclTypeAndName(name, 0)
+			|| rel = arg.msg(@rel)
+			rel <~ (@sdot, name)
+			rel <~ (@opp,  "=")
+			rel <~ (@thg,  name)
 
 
-function LoadProperties
+function IsTask (|bool|)
+	return self and .isrole & 2
+
+
+// how can we get the size of each property?
+function TaskProperties 
+	opt norefcounts
+	for (p in .Properties) (i)
+		(p is task)
+
+
+function CollectProperties 
+	opt norefcounts
 	require !.IsBehaviourTable
-	require .CollectDeclsProperties
 
-	|| it = .properties.first
-		expect (!self.IsRole) (it.source, "Roles can't have properties!")
+	scmodule.curr = .modul
+	for item in .SourceArg
+		if item == @decl
+			.CollectProp(item)
+			
+	if .IsTask
+		.TaskProperties
+	  else
+		|| it = .properties.first
+			expect (!.IsRole) (it.source, "Roles can't have properties!")
+
 	for (p in .properties)
 		expect (!p.default) (p.source, "Class properties can’t have default values.")
 
@@ -178,6 +179,11 @@ function GetDepth
 		.depth = 1
 		for c.Upwards in self
 			.depth++
+			
+	|| msg = .defawlt
+	if msg and .isobject and !(msg isthing "nil")
+		.DefaultsToReal = true // what if .defawlt is optional? // fuck them :D
+		.TypeNormal.NilDeclared = NilState.real
 	
 
 
@@ -189,22 +195,25 @@ function GetStructDepth
 	|| r = 0
 	for p in .properties
 		|| t = p.type
-		if (t.isstruct) and (p.pointercount == 0) 
+		if (t.IsStruct) and (p.pointercount == 0) 
 			t.GetStructDepth
 			r = r max t.StructContainerDepth+1
 	.StructContainerDepth = r
 
 
-function CalculateSize (|int| Depth=0, |int|)
+function CalculateSize (|int| Depth = 0, |int|)
 	.CalculateSizeRaw(Depth)
 	return .size
 
 
 function CalculateSizeRaw (|int| Depth=0, |int|)
-	if (.size)
-		return .size
+	|| si = .size
+		return si
 
-	if .isdatatype
+	if .IsFunc
+		.size = Platform.PointerBytes
+		return .size
+	if .IsDataTypeOnly
 		.size = .typeinfo.bytesize
 		return .size
 
@@ -212,103 +221,97 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 	|| Count = 0
 	if self == typeobject
 		count = 4 // refcount? depends if we are "owned" or "shared".
-	if .super
-		Count = .super.CalculateSizeRaw				#debug_require
+	|| s = .super
+		Count = s.CalculateSizeRaw				#debug_require
 
+	|| bits = 0
 	for p in .properties
-		|| Mul = P.c_Array ?? 1
-		|| curr = 0
-		if (P.IsNormalObject) or (p.PointerCount)
-			Curr = platform.PointerBytes
-		  elseif (P)
+		|| curr = platform.PointerBytes
+		ifn P.Type.IsObject or p.PointerCount
 			Curr = P.type.calculatesize(depth+1)	#require
+		if (p is task) and p.isobject
+			bits[(count+platform.PointerBytes)>>3] = true
 		Count = Count Align Curr
+
+		|| Mul = P.c_Array ?? 1
 		Count += Curr * Mul 
 
 	.size = Count align 4
-	return count
-
-
-function LoadSuperDepth
-	
+	if .istask
+		.taskobjectcount = bits
+		check (.size <= 128) (.source, "Task size is over 128.")
+	return count	
 
 
 function LoadSuperClass
-	.Modul.LookUp = compiler.program 
+	opt norefcounts
+	
+	|| OldMod = .modul.parent // in case it was already set, like in a task... which has a name_space
+	if !oldmod
+		.Modul.parent = compiler.program 
 	
 	|| p = .Source								#require
-	|| supc = p[ 1 ]
+	|| supc = p.Second
 	|SCClass| S
 	if (supc != @bra)
 		if supc: expect (supc == @arg) (supc)
 		if (.IsObject) and (self != TypeObject)
 			S = TypeObject
 	  else
-		|| SupName = supc[@Thg].Nyme				#require
-		S = Compiler[ SupName, supc ]				#require
-		
-		if (.isDataType)
-			check (S.IsDataType)	(supc, "Datatypes can only subclass datatypes.")
-		  elseif (.IsStruct)
-			check (S.IsStruct)		(supc, "Structs can only subclass structs.")
+		|| thg = supc[@nil]								#require
+		if thg == @sdot
+			thg.func = @thg
+			S = .modul.findclassmsg( thg, 0 )
+		  elseif oldmod
+			S = oldmod.findclassmsg( thg )
 		  else
-			check (S.IsObject)		(supc, "Classes can only subclass classes.")
+			S = Compiler[ thg ]
+		
+		if !S
+			0 //
+		  elseif (.FuncProto)
+			error						(supc, "Can't subclass this.")
+		  elseif (.isDataTypeonly)
+			check (S.isDataTypeonly)	(supc, "Datatypes can only subclass datatypes.")
+		  elseif (.IsStruct)
+			check (S.IsStruct)			(supc, "Structs can only subclass structs.")
+		  else
+			check (S.IsObject)			(supc, "Classes can only subclass classes.")
 	
 	if (S)
 		.Super = S
 		if Options.ListAllLib
 			s.Children <~ self
-		if .IsRole
-			.modul.lookup = s.modul
-		  else
+		if !.IsRole
 			s.HasSubClass = true
-		.LookUp = S
-		|| b = .behaviour
-		|| SB = S.behaviour
-		if (B and SB)
-			b.FuncTable.cls.super = SB.FuncTable.cls
+		  elseif !oldmod
+			.modul.parent = s.modul
+		.parent = S
+
+
+function LoadSuperBehaviours
+	opt norefcounts
+	|| s = .super
+	|| b = .behaviour
+		while (s and !S.behaviour)
+			s = s.super
+		if s
+			b.FuncTable!.cls!.super = s.behaviour!.FuncTable!.cls
 
 
 module {
+function SetSize (CollectFunc)
+	if name_space isa scclass
+		name_space.size = node.first.int
+	return compiler.program
+
 function LoadClassName (|message| node, |string|)
 	|| S = node.first
 	if (s == @thg or @dot)
-		return s.name
+		return s.name 
 	if (node istmp "class")
 		error (node, "Can't find class name.")
-
-
-// maybe better to make an init func for this...
-|Message| ConstrNew
-|Message| ConstrLayerNew2
-
-ConstrNew = `function New () {
-	flow off
-	|| __rz__ = alloc()|type|
-	if __rz__|bool|
-		__rz__.Constructor()
-	return __rz__
-}`.ParseClean
-
-ConstrLayerNew2 = `function NewWithLayer (|MemoryLayer| _L) {
-	visible false
-	flow off
-	cpp_part NewWithLayer
-	|| __rz__ = LayerAlloc(_L)|type|
-	if __rz__|bool|
-		__rz__.Constructor()
-	return __rz__
-}`.ParseClean
 }
-
-
-
-// CreateConstructors is so we don't HAVE to call the parent's constructor
-// For example, SCModule doesn't have a constructor set, so it creates one
-// however, the parent SCBase.Constructor has a param, so the empty constructor
-// doesn't know how to call it. So we create one for EVERY class... then the
-// problem goes away.
-
 
 function SCFunction.CopyParams (|message| list)
 	|| p = .prms
@@ -321,123 +324,152 @@ function SCFunction.CopyParams (|message| list)
 	
 	for s in list
 		p <~ s.copy
-		subprms <~ s.DeclName.copy
-		
-	
-	
+		|| c = s.DeclName
+			subprms <~ c.copy
 
 
 function scfunction.Prms (|message|)
 	return .source.find(@prm)
 
 
+function CanHaveEmptyConstructor (|bool|)
+// just having this function is evidence that automatically
+// creating an empty constructor, is a bad idea. We should
+// explicitly create it... like:
+// 			class abc: constructor empty, constructor auto
+
+	opt norefcounts
+	for p in .Properties
+		if p.TypeSuffers and p.StatedReal
+			require p.type.DefaultsToReal
+	return true
+
+
 function CreateEmptyConstructors (|scfunction|)
-	|| f = .CreateEmptyFunc( "Constructor" )
+	if .CanHaveEmptyConstructor
+		rz = .CreateEmptyFunc( "Constructor" )		#require
+		(rz is EmptyConstructor)
+
 	|| pc = .PassableCount
-	(f is EmptyConstructor)
 	|| s = .super
-	if s and s != TypeObject // object has no constructor-func
-		|| l = s.constructorfunc.Prms 
-		if l.hasany
-			f.CopyParams(l)
+	if s and rz and s != TypeObject // object has no constructor-func
+		|| l = s.constructorfunc!.Prms 
+		if l.HasAny
+			rz.CopyParams(l)
 			pc = 0 // i guess?
 	
 	if pc >= 1 and pc <= 8
-		.AutoConstructor
-	return f
+		|| f2 = .CreateAutoConstructor
+		rz := f2
+
+
+function scfunction.AddConstructorReturn2
+	require !.IsWrapper and self is newnew
+	|| args = .source[@arg,2]
+	using .source
+	|| type = message(@thg, .cls!.name)
+	if .cls.IsTask
+		args.first = macros.ConstructorNewTask.run(type)
+	  else
+		args.first = macros.ConstructorNew.run(type)
+	args.msg(@tmp, "return") <~ (@thg, "self")
+
+
+function scfunction.AddConstructorReturn (|message| prms)
+	opt norefcounts
+	require (.cls!.isobject)
+	is newnew
+	using prms
+	|| dcl = prms.msg(@decl)
+	dcl.msg(@arel, "!") <~ (@thg, .cls!.name)
+
 
 
 function CreateConstructors 
 	if .IsObject
 		|| Con = .FindAllocFunc( "Constructor" )
 		if .IsRole
-			check (!con or .super.ConstructorFunc) (con.source, "Role's super lacks a constructor.")
-			con := .super.ConstructorFunc
-			.destructorfunc = .super.DestructorFunc
+			|| s = .super! // roles always have supers
+			check (!con or s.ConstructorFunc) (con.source, "Role's super lacks a constructor.")
+			con := s.ConstructorFunc
+			.DestructorFunc = s.DestructorFunc
 			require con
 		
-		using .SourceClass
+		using .Source
 		if !con and !.IsWrapper		// some wrapper classes cant be newed.
 			con = .CreateEmptyConstructors
 		.ConstructorFunc = con
 		
-		for f in con
-			if f.cls == self // role messageroot doesnt need an allocator
-				.NewClassNew( f, ConstrNew.copy(f.source)      , 0        )
-				.NewClassNew( f, ConstrLayerNew2.copy(f.source), functionType.Layer )
+		if con
+			.modul.tryadd(con.source, con, "new") // maybe?
+			.FillRoleConstructor(con)
+			
 	
 	if !.IsRole
 		|| NeedsDestructor = .IsObject or (.IsStruct and .HasObjectProperties)
 		.DestructorFunc = .FindAllocFunc( "Destructor", !NeedsDestructor )
+	  elseif .isrole == 3
+		check (.super!.isrole == 2) (self, "Tasks can't nestedly subclass.")
 
 
-function RootName (|string|)
+function scclass.FillRoleConstructor (|scfunction| con)
 	opt norefcounts
-	|| c = self
-	while
-		|| s = c.super
-		if !s or s == typeobject: exit
-		c = s
-	return c.name
-
+	for f in con
+		(f is new)
+		if .istask
+			.FillTaskConstructor(f)
 
 function FindSpecialFunc (|string| keyword, |bool| CheckParents, |SCFunction|)
-	return .FindFunc(keyword, CheckParents, true)
+	return .FindFunc(keyword.lowercase, CheckParents, true)
 
 
-function FindFunc (|string| keyword, |bool| CheckParents, |bool|DoError, |SCFunction|)
-	keyword = keyword.Lowercase
-	
+function FindFunc (|string| keyword, |bool| CheckParents, |bool| DoError, |SCFunction|)
+	opt norefcounts
 	for (b.upwards in self)
-		if (b.access)
-			|| o = b.access[ keyword ]
-			if (!o)
-				|| a = 1
-			  elseif (o isa SCFunction)
-				Return o // prefer improved #expect
-			  else
-				if .IsObject
-					expect (!DoError) (b.sourceclass, "'$keyword' keyword only usable with functions.")
+		|| o = b.access[ keyword ]
+			if o isa SCFunction
+				return o
+			expect (!.IsObject or !doerror) (b.source, keyword + " keyword only usable with functions.")
 		
-		require (CheckParents)
+		loop CheckParents
 
 
 
-function NewClassNew (|SCFunction| con, |Message| src, |int| ExtraCode)
-	src.Position = con.Source.Position
+function NewClassNew (|SCFunction| con, |Message| src)
+	|| IsOK = stderr.mark
+	.NewClassNewSub(con, src)
+	if !IsOK
+		con.badness |= 1
+
+
+function NewClassNewSub (|SCFunction| con, |Message| src)
+	src.Position = con.Source!.Position
 	
-	|| result			= .Modul.NewModuleFunc( src )
+	|| result			= .Modul.NewModuleFunc( src )$
 	result.counterpart	= con
-	con.counterpart    := []
-	con.counterpart|array| <~ result
-	result.AllocCode   |= functiontype.New (|) ExtraCode
+	|| c = con.CounterPart|array|
+	if !c
+		c = []
+		con.CounterPart = c
+	c <~ result
+	(result is New)
 	(con.alloccode = functionType.Constructor)
 	
 	|| NewParams		= src[ @prm, 1 ]
-	|| A				= con.Source.Second
-	|| rsrc				= result.source
-	|| TypeStr			= rsrc.FindNested(@thg, "type")
-	
-	if A == @prm or @list
-		|| CallParams = rsrc.FindNested(@dot).last
-		for dcl in A
-			NewParams  <~ dcl.Copy(Src)
-			CallParams <~ dcl.GetDclName.Copy(src)
-	
-	typestr.ReplaceWith(.TypeNormal.writetype)
-	NewParams <~ .TypeNormal.WriteDeclFull
-
-
-function CreateAlloc (|string| ParseThing, |int| Extra)
-	require .IsObject and !.IsRole
-	
-	|| src = ParseThing.ParseClean.first
-	|| fn = .modul.NewModuleFunc( src )
-	fn.refs = cpprefs.new
-	fn.refs.disturbs = nil
-	fn.AllocCode = FunctionType.Alloc (|) extra
-	if extra
-		fn.IsVisible = false
+	|| A				= con.Source!.Second
+	|| rsrc				= result.source!
+	|| TypeNode			= rsrc.FindNested(@thg, "type", true)
+	if TypeNode and NewParams
+		if A == @prm or @list
+			|| CallParams = rsrc.FindNested(@dot).last
+			for dcl in A
+				|| dcpy = dcl.Copy(Src)
+				NewParams  <~ dcpy
+				|| dn = dcpy.GetDclName(true)
+					CallParams <~ dn.Copy
+		
+		TypeNode.ReplaceWith(.TypeNormal.writetype)
+		NewParams <~ .TypeNormal.WriteDeclFull
 
 
 function NeedsDefaultValue (|message| def, |&message| place, |string| name)
@@ -454,19 +486,24 @@ function ContainedTypeLoad
 		.Contained = sup.Contained
 		.SelfDecl.Contains = sup.SelfDecl.Contains
 		
-		.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
-		.NeedsDefaultValue(sup.false, .false, "false")
+		if .IsNotNumeric == sup.IsNotNumeric
+			.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
+			.NeedsDefaultValue(sup.false,   .false,   "false")
 		.IgnoreContainedSelf |= sup.IgnoreContainedSelf // bad assumption. we shouldn't swap objects and datatypes
 	
 	.defawlt := «thg "nil"»
-	.false := «thg "nil"»
+	if .NumericCount == 1 // what if its a vec4? (0,0,0,0)? sigh.
+		.false := «num "0"»
+	  else
+		.false := «thg "nil"»
 
 	|| ContainedMsg = .Sourcearg.find(@Tmp, "contains")[@thg]			#require
-	|| cls = compiler[ ContainedMsg.name, ContainedMsg ]				#require
+	|| cls = compiler[ ContainedMsg ]									#require
 	|| TN = Cls.TypeOptional
-	.Contained = TN.Copy
-	.IgnoreContainedSelf |= tn.isdatatype
-	(.Contained Is UpgradeableContained)
+	|| cont = TN.CopyDecl
+	(cont Is UpgradeableContained)
+	.Contained = cont
+	.IgnoreContainedSelf |= cls.IsDataTypeOrFP
 	.SelfDecl.Contains = TN // shouldn't we be setting this to .contained? but when I do... my GUI lib doesn't compile
 							// which is strange cos speedie itself compiles OK. and all the errors generated seem garbage.
 							// so we need to fix this. sighs... more work.
@@ -474,7 +511,8 @@ function ContainedTypeLoad
 
 function scfunction.DontWantSameReturnType (|scfunction| f)
 	require self
-	if f.ReturnType.MiniMatch(.returntype, 0)
+	|| r = f.ReturnType					#debug_require
+	if r.MiniMatch(.returntype, 0)
 		error (.source,  "Multiple casts found [1]")
 		error (f.source, "Multiple casts found [2]")
 	
@@ -483,80 +521,62 @@ function OverrideSyntax
 	require stderr.OK
 	|| cast = .FindSpecialFunc( "SyntaxCast", false )
 	.casts = array.new
+
+	if !.IsStruct
+		.HasNilChecker = true // default to true
 	
 	for f in cast
 		f.IsInline = true
-		check  (f.args == 1)		(f.Source, "No params allowed." )
-		expect (f.ReturnType)       (f.Source, "Need a return type.")
-		f.nextfunc.DontWantSameReturnType(f)
+		check  (f.args == 1)		  (f.Source, "No params allowed." )
+		|| ret = f.ReturnType #expect (f.Source, "Need a return type.")
+		f.NextFunc.DontWantSameReturnType(f)
 		.Casts <~ f
-		if f.returntype == typebool.typenormal
-			f.IsNilChecker = true
-			f.args[0] = f.args[0].makeoptional
+		if ret.IsNormalBool
+			|| OK = !f.isdisabled
+				f.args.first!.nildeclared = nilstate.Optional
+			|| Mode = f.sourcearg!.nilcheckmode(ok)
+			f.IsNilChecker = Mode
+			.HasNilChecker = true
 	
 	.HasCompareFunc = .FindSpecialFunc( "SyntaxCompare", true )
 	.HasEqualsFunc = .FindSpecialFunc( "SyntaxEquals", true )
 	.TheIsFunc = .FindSpecialFunc( "SyntaxIs", true )
 
 
-
 function HasObjectProperties (|bool|)
+	opt norefcounts
 	for p in .properties
 		if p.isnormalobject
 			return true
 
 
-function LoadConstructorsAndAllocators
+function LoadConstructors
 	.Use									// parsed messages come from our source's file
-	scbase.CurrVisibility = false			// for allocators that we generate
+	SCNode.CurrVisibility = false			// for allocators that we generate
 	
 	.CreateConstructors
-	if .IsObject and .constructorfunc
-		.CreateAlloc( .AllocStr, 0 )
-		.CreateAlloc( .AllocStrLayer, FunctionType.Layer )
-
-	if .super
-		.NoEarlyFree := .Super.NoEarlyFree
+		
+	|| s = .super
+		.NoEarlyFree := s.NoEarlyFree
 
 	(Message).Restore // restore message parsing to general
-
-
-function AllocStr (|string|)
-	|| s0 = .name
-	|| s = (s0, .super.name)(!.IsRole)
-	return "
-	helper Alloc (|$s0|)
-		return JB_New(__classes__.$s)|$s0|
-	"
-
-
-function AllocStrLayer (|string|)
-	|| s0 = .name
-	|| s = (s0, .super.name)(!.IsRole)
-	return "
-	helper LayerAlloc (|MemoryLayer| _L, |$s0|)
-		visible false
-		return JB_LayerNew(_L, __classes__.$s)|$s0|
-	"
 
 
 function AfterFuncsDecled
 	.OverrideSyntax
 		
 	|| f = .ConstructorFunc
-		expect (!f.ReturnType)  ( f.Source, "Constructors can’t return things." )
+//		expect (!f.ReturnType)  ( f.Source, "Constructors can’t return things." )
 		.CheckAllocVsWrapper( f, true )
-	
 	
 	f = .DestructorFunc
 	if (f)
 		expect (!f.NextFunc) ( f.Source, "Can’t have multiple destructors" )
 		expect (!f.ReturnType and (f.args.length == 1))   ( f.Source, "Destructor can’t have a return type or parameters." )
-	.CheckAllocVsWrapper( f, false )
+		.CheckAllocVsWrapper( f, false )
 	
-	
-	.ClassType = TypeJBClass.TypeNormal.Copy // no difference
-	.ClassType.Name = .CStructName
+	|| cls = .ClassType
+		cls.Name = "&" + .CStructName + "Data" // sigh. Not pleasant.
 
 
 
@@ -565,20 +585,22 @@ function IsFunc (|bool|)
 
 
 function IsObject (|bool|)
-	Return (!.IsDataType) and (!.IsStruct)
+	Return (!.IsDataTypeOrFP) and (!.IsStruct)
 
 
 function CreateEmptyFunc (|String| fname, |string| cpp_name="", |SCFunction|)
-	scbase.CurrVisibility = .IsVisible
+	SCNode.CurrVisibility = .IsVisible
 	cpp_name := fname
 	|| e	= "function $fname { cpp_part $cpp_name }"
 	|| msg	= e.ParseClean
-	rz		= SCFunction.NewFunc( msg, self, .sourceclass )|SCFunction|
-	.TryAdd( msg, rz, fname )
-	rz.IsVisible = false
+	rz		= SCFunction.NewFunc( msg, self, .source )|SCFunction|
+	if rz
+		.TryAdd( msg, rz, fname )
+		rz.IsVisible = false
 
 
 function FindAllocFunc (|String| fname, |bool| DontCreate = true, |SCFunction|)
+	opt norefcounts
 	|| it = .FindSpecialFunc( fname, false )
 		Return it
 	
@@ -588,10 +610,15 @@ function FindAllocFunc (|String| fname, |bool| DontCreate = true, |SCFunction|)
 
 function CStructName (|String|)
 	opt norefcounts
-	if self
-		if !.IsRole
-			return .CppClass init .name.unicodesafename
-		return .RealClass.cstructname
+	require self
+	if .IsRole == 1
+		return .RealClass.CStructNamesub
+	return .CStructNameSub
+
+
+function CStructNameSub (|String|)
+	opt norefcounts
+	return .CppClass init .name.UnicodeSafeName
 
 
 function HasStuffToHandleInDestructor (|bool|)
@@ -599,7 +626,7 @@ function HasStuffToHandleInDestructor (|bool|)
 	for p.upwards in self
 		for d in p.Properties
 			if d.HasStructDestructor: return true
-			if d.IsReffable(true): Return true
+			if d.IsReffable(true):    return true
 
 
 function CanCompareSub (|string|s, |scdecl|against, |bool|)
@@ -624,16 +651,14 @@ function CanCompare (|SCDecl| Against, |bool| AsEquals, |bool|)
 
 
 function CheckAllocVsWrapper (|SCFunction| f, |bool| IsConstructor)
-	require .IsWrapper
-	require .IsObject
-	require .super
+	require .IsWrapper and .IsObject and .super
 	require (!f == isconstructor)
 
 	if !IsConstructor
 		require .FirstDestructor
 	
-	require !f.IsWrapper
-	error (.Sourceclass, "Wrapper classes must have a constructor that is a wrapper function.")
+	if !f.IsWrapper
+		error (.Source, "Wrapper classes must have a constructor that is a wrapper function.")
 
 
 function FirstDestructor (|SCFunction|)
@@ -643,15 +668,25 @@ function FirstDestructor (|SCFunction|)
 		
 		if !fn
 			|| a = 1
-		  elseif (p.IsWrapper and p.super) // don't count "object" as having properties!
+		  elseif (p.IsWrapper and p.super)	// don't count "object" as having properties!
 			Return fn
 			
 		  elseif (p.HasStuffToHandleInDestructor or fn.SourceArg.Hasany)
 			return fn
 
 
-function AddSelfToFunc (|SCBase| space)
-	space.TryAdd( space.FuncSrc, .SelfDecl, "self" )
+function scfunction.AddSelfToFunc (|scclass| cls, |SCNode| space)
+	opt norefcounts
+	|| sl = cls.SelfDecl					// for my nil-checker
+	if sl.TypeSuffers						// refcounting will set MarkAsRefAltered
+		sl = sl.copydecl
+		if self is destructor
+			sl = sl.MakeNewReal
+		  elseif (self is constructor) and cls.isobject
+			sl = sl.makenewoptional // nice
+		(sl is SelfImplicit)				// I shouldn't have to specify this, it should be copied!
+	space.TryAdd( space.FuncSrc, sl, "self" )
+	.args <~ sl
 
 
 function message.HasSelfAsFirst (|bool|)
@@ -661,24 +696,19 @@ function message.HasSelfAsFirst (|bool|)
 			return msg.name ~= "self"
 	
 
-function scdecl.TypeReach (|scbase| from, |message| src)
-	opt norefcounts
-	flow off
-	require self
-	|| t = .type
-		t.reach(from, src)
 
-
-function SCBase.ReachedName (|string|)
+function SCNode.ReachedName (|string|)
 	opt norefcounts
-	|| c = .CurrReacher
+	|| c = .MyReacher
 	rz = "    via: " + .name
-	if c.class == scbase
+	if c.class == SCNode
 		rz += " (visible func)"
 
 
 function Compiler.Banned (|string| name, |bool|)
-	return Options.BannedClasses.valuelower(name)
+	opt norefcounts
+	|| b = Options.BannedClasses
+		return b.valuelower(name)
 
 
 function TestBanned (|bool|)
@@ -689,47 +719,17 @@ function BannedCheck (|message| src)
 	opt norefcounts
 	require .TestBanned
 	error (self, "Banned class reached: " + .name)
-	|| curr = .CurrReacher
-	for 100
-		if !curr or curr.class == SCBase
+	|| curr = .MyReacher
+	for 16
+		if !curr or curr.class == SCNode
 			exit
 		if src
 			error (src, curr.ReachedName)
 			src = nil
 		  else
 			error (curr, curr.ReachedName)
-		curr = curr.CurrReacher
+		curr = curr.MyReacher
 
-
-function Reach (|scbase| from, |message| src=nil)
-	opt norefcounts
-	flow off
-	require !.currreacher
-	if !from
-	.CurrReacher = from
-	Compiler.stReachedClass++
-	
-	if Options.BannedClasses
-		.BannedCheck(src)
-	if .super
-		.super.Reach(self)
-	if .behaviour
-		.behaviour.FuncTable.cls.reach(self)
-	
-	if .DestructorFunc
-		.DestructorFunc.findReached(self)
-	
-	for d in .Properties
-		d.TypeReach(self, d.source)
-		d.contains.TypeReach(self, d.source)
-
-
-function ReachBehaviours
-	flow off
-	for f in .Access
-		if f isa SCFunction
-			if f.IsBehaviour
-				f.FindReached(self)
 
 
 function IsA (|SCClass| S, |bool|) // hassuper, issuper, issubclass
@@ -749,46 +749,56 @@ function Real_Isa (|SCClass| cls, |bool|)
 	return .realclass.isa(cls)
 
 
-function IsBuiltinChain (|bool|)
-	opt norefcounts
-	for p.upwards in self
-		if (p.IsBuiltin)
-			Return true
-
-
-function AfterAfterFuncs
-	if .super
-		.HasCompareFunc := .super.HasCompareFunc
+function AfterAfterFuncs 
+	|| s = .Super
+		.HasCompareFunc := s.HasCompareFunc
+		.HasEqualsFunc := s.HasEqualsFunc
 	
-	if .super
-		.HasEqualsFunc := .super.HasEqualsFunc
+	|| def = .Defawlt
+		|| D = TypeOfExpr( def, .Modul )
+		if d and .DefaultsToReal
+			check (d.StatedReal) (def, "Object default must be real (non-nil)")
 	
-	if .defawlt
-		TypeOfExpr( .defawlt, .Modul )
-	
-	if .IsModel
-		.DeclModel
+	.DeclModel
 
 
-function JSStructName (|String|)
-	if .IsDataType
+function StructName (|String|)
+	if .IsDataTypeOrFP
 		Return .Name
-	
 	return .SubProjName + "_" + .name
 
 
-function IsAtomic (|bool|)
-	return .typeinfo.isatomic
+function MakeClassType (|scdecl| d, |scdecl|)
+	opt norefcounts
+	|| c = scdecl(TypeJBClass!)
+	c.name = .name.lowercase
+	c.source = .source
+	C.pointercount = 1
+	(c is ClassObj)
+	C.nildeclared = nilstate.real
+	C.Contains = d
+	return c
 
 
-function TryAddToProject
-	require !.funcproto
-	|| NameNode = .SourceClass.first
-	|| mod = Compiler.DisamClasses
+function LoadClassType
+	if .isobject
+		.ClassType = .MakeClassType(.typenormal)
+		
+
+
+function TryAddToProject 
+	opt norefcounts
+	require !.FuncProto
+	|| NameNode = .Source.first!
+	|| mod = Compiler.DisamClasses!
 	if NameNode == @dot		// load the modules first.
-		mod = compiler.FindModulemsg(namenode.first)	#require
+		mod = compiler.findmodulemsg(namenode.first!)	#require
+	  else
+		if .name == "interface" and self isa scclass
+			require .isrole != 1
 
-	mod.TryAdd( .sourcearg, .modul, .name )
+	
+	mod.TryAdd( .SourceArg, .Modul, .Name )
 
 
 
@@ -798,7 +808,7 @@ module
 		|| Arg = .LinkagePlace 				#require
 		if arg.DeprecatedClassOption("wrapper", "union") // for SDL2
 			.iswrapper = 2
-		  elseif arg.DeprecatedClassOption("wrapper", nil)
+		  elseif arg.DeprecatedClassOption("wrapper")
 			.iswrapper = 1
 		.NoAutoComplete = arg.DeprecatedClassOption("noauto")
 		  
@@ -807,14 +817,18 @@ module
 		.minopt = arg.DeprecatedClassOption("opt", "min")
 
 
+	function scnode.ExpectModule (|message| errplace, |bool|)
+		expect (self isa scmodule) (errplace, "Must be in a module." )
+		return true
 
-	function NeuClassSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |SCClass|)
+
+	function NeuClassSub (|Message| node, |SCNode| parent, |Message| ErrPlace, |string| ForInterface, |SCNodetype| base,  |SCClass|)
 		if !ForInterface
-			expect (parent==compiler.program) (errplace, "Internal Error")
+			require parent.ExpectModule(errplace)
 		
 		|| arg = node.GiveArg
-		|| cls = SCClass.new( node, parent )
-		
+		|| cls = SCClass.new( node, parent, base.hasptrs, SCModule.new )
+		cls.BaseType = base
 		cls.IsRole = (node ~= "role")
 
 		|| SA = cls.SourceArg
@@ -822,14 +836,11 @@ module
 		Compiler.ClassList <~ cls
 
 		|| Module = arg.find( @tmp, "module" )
-		MoveFutureStaticsIn(Module)				// bad work around
-												// makes impossible to extend a static section...
-
-		cls.Modul = SCModule.Neu( Module, cls, ErrPlace )|SCModule|
+		cls.loadModuleForCls( Module, parent )
 
 		if (ForInterface and parent isa scmodule)
-			cls.CppClass = "__${parent.cls.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"
-				
+			cls.CppClass = "__${parent.cls!.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"
+		
 		Return cls
 	
 	
@@ -842,27 +853,24 @@ module
 		
 	
 	function NeuClass (CollectFunc)
-		|| it = .NeuClassSub(node, name_space, ErrPlace, nil)
-			it.ClassCollect
-			return it.modul
+		|| cls = .NeuClassSub(node, name_space, ErrPlace, "", SCNodetype.object)
+			cls.ClassCollect
+			rz = cls.modul
 
 	
 	function SCClass.ClassCollect
 		.Collect( .Sourcearg, .IsVisible )
 
 
-	function DataTypeSub (|Message| Node, |SCBase| Parent, |Message| ErrPlace, |string| ForInterface, |SCModule|)
-		if node.obj isa SCModule	// already processed.
-			Return Compiler.program // OK
+	function DataTypeSub (|Message| Node, |SCNode| Parent, |Message| ErrPlace, |string| ForInterface, |SCNodetype| BaseType, |SCModule|)
+		if node.obj
+			Return Compiler.program						// already done
 		
-		scbase.CurrVisibility = false
-		node.givearg
+		SCNode.CurrVisibility = false
+		node.GiveArg
 		
-		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface )
-			it.IsDataType = true
+		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface, BaseType )
 			it.ClassCollect
-//			it.typenormal.isconst = true
-// makes no sense.
 		
 			expect !(it.Properties) (it.Source, "Datatypes can’t have properties.")
 					
@@ -872,58 +880,61 @@ module
 	
 	
 	function DataType (CollectFunc)
-		return .datatypesub(node, name_space, errplace, nil)
+		return .DataTypeSub(node, name_space, errplace, "", SCNodetype.datatype)
 	
 
 	function NewStruct (CollectFunc)
-		|| it = .NeuClassSub(node, name_space, errplace, nil)
-			it.IsStruct = true
+		|| it = .NeuClassSub(node, name_space, errplace, "", SCNodetype.struct)
+			it.basetype = SCNodeType.struct
 			it.classcollect
 			return it.modul
 
 
-	function NewCast (CollectFunc)
-		expect (name_space isa SCClass)  (node, "'cast' only goes inside classes." )
-		
-		node[0].name = "function"
-		|| NameNode = «Thg "operator_cast"»
-		node[0].Next = NameNode
-		
-		return SCFunction.NewFunc( node, name_space, ErrPlace )
+//	function NewCast (CollectFunc)
+//		expect (name_space isa SCClass)  (node, "'cast' only goes inside classes." )
+//		
+//		|| f = node.first
+//			f.name = "function"
+//			f.Next = «Thg "operator_cast"»
+//		
+//		return SCFunction.NewFunc( node, name_space, ErrPlace )
 	
 
 	function SCClass.DataTypePostLoad
-		require .IsDataType and !.IsFunc
-		|| node = .SourceClass
-		|| s = .super
-			.Size = s.Size
+		require .IsDataTypeOnly
+		|| node = .Source
+		|| sup = .super
+			.Size = sup.Size
 			if !.IsNotNumeric
-				.TypeInfo = s.TypeInfo
-				.defawlt := s.defawlt
+				.TypeInfo = sup.TypeInfo
+				.defawlt := sup.defawlt
 
 		|| N		= .name.lowercase
 		|| Td		= DataTypeCode.Types[n]
 			|| t = *td
-			require T != 255
-	
-			.size = T.bytesize
-			.TypeInfo	= T
-			.IsBuiltin	= true
-			
-			require T.isint and !.Signed
-			|| s2		= t.CreateSignedStuff$
-			.Signed		= s2.typenormal
-			s2.Signed	= .typenormal
+			if T != 255
+				.size = T.bytesize
+				if t == datatypecode.Vec3 or datatypecode.iVec3
+					.size = 16 // sigh 
+				.TypeInfo	= T
+				.IsBuiltin	= true
+				
+				require T.isint and !.Signed
+				|| s2		= t.CreateSignedStuff
+					.Signed		= s2.typenormal
+					s2.Signed	= .typenormal
+
+		expect (sup or .HasGameType) (node, "Datatypes must subclass off another type")
 	
 	
 	function datatypecode.CreateSignedStuff (|scclass|)
 		opt norefcounts
-		|| s = .setsigned(!.issigned)
-		for (c in datatypecode.types) (key)
+		|| s = .SetSigned(!.IsSigned)
+		|| keymsg = Message(@thg)
+		for (c in datatypecode.Types) (key)
 			if (c == s)
-				|| M = compiler.program.access[ key ]
-				if M isa scmodule
-					return m.cls
+				keymsg.name = key
+				Return compiler[ keymsg ]
 		
 
 	function LoadSyntax (CollectFunc)
@@ -935,7 +946,11 @@ module
 
 		Return SCFunction.NewFunc( node, name_space, ErrPlace )
 
-
+	
+	function NewInnerClass (CollectFunc)
+		if name_space isa scclass
+			return scclass.neuclass(node, name_Space.modul, errplace)
+	
 	function StoreExtend (CollectFunc)
 		Compiler.ExtendList <~ node
 		node.obj = SCImport.curr
@@ -954,32 +969,33 @@ module
 		|| dot = node.first
 		|| name = dot.first
 		check (name == @thg or @name or @bra) (name)
-		|| emb = name.next
-		check (emb != @prm) (emb, "Need space between bracket and name.")
-		emb.remove
+		|| emb = name.next // its never not nil...
+			check (emb != @prm) (emb, "Need space between bracket and name.")
+			emb.remove
 		return compiler.program
 
 
-	function ProcessExtend (|Message| c, |bool| PreferClass)
+	function ProcessExtend (|Message| c, |bool| PreferClass, |scmodule| m=nil, |scfunction|)
 		// OK now what?
 
 		if (c == @tmp and "extend_module" or "extend")
-			// can we remove this?
 			.ProcessExtendOld(c, preferclass)
-			return
+			return nil
 		
-		|| dot = c[@dot]
-		|| name = Dot[@nil, 0]						#require
+		|| dot = c[@dot]							#require
+		|| name = Dot[@nil]							#require
 		expect (name == @thg or @name) (name)
 
-		|| M = Compiler.FindModuleMsg(name)			#require
+		M := Compiler.findmodulemsg(name)
+		require m
 		dot.clear
 		dot.func = @thg
-		|SCBase| B = M
+		|SCNode| B = M
 		if name == @name		// it's a module
 			PreferClass = false // whatever
-		if (PreferClass and M.Cls)
-			B = M.Cls
+		|| mcls = m.cls
+		if (PreferClass and MCls)
+			B = MCls
 		name.func = @thg
 
 		|| imp = c.obj as scimport
@@ -987,49 +1003,50 @@ module
 		  else
 			B.project.use
 
-		|| fn = scfunction.NewFuncSub(c, b, c)
-		if fn != compiler.program and fn isa scfunction
-			fn.tryadd(b)
+		|| fn = scfunction.NewFuncSub(c, b)
+		fn.tryadd(b)
+		return fn
 	
 
-	function SCFunction.TryAdd (|scbase| b)
+	function SCFunction.TryAdd (|SCNode| b)
 		b.tryadd(.source, self, .name)
 	
 
 	function ProcessExtendOld (|Message| c, |bool| PreferClass)
-		|| name = c[@thg]							#require
-		|| arg  = c[@arg, -1]						#require
-		|| M = Compiler.FindModulemsg(name)			#require
+		|| name = c[@thg]
+			|| arg  = c.last(@arg)
+			|| M = Compiler.findmodulemsg(name)
+			if m and arg
+				|SCNode| B = M
+				|| cls = m.cls
+				if (PreferClass and cls)
+					B = cls
 		
-		|SCBase| B = M
-		if (PreferClass and M.Cls)
-			B = M.Cls
+				|| imp = c.obj as scimport
+					imp.use
+				  else
+					B.project.use
+		
+				B.Collect(arg, SCNode.CurrVisibility, m.SourceArg)
 
-		|| imp = c.obj as scimport
-			imp.use
-		  else
-			B.project.use
-
-		B.Collect(arg, scbase.CurrVisibility, m.sourcearg)
 	
-	
-	function DoOneNamedField (|message| c,  |string| name,  |string| datatype,  |int| n,  |message|)
-		using c 
-		|| src = "
-		function ${c.name} (|$Datatype|)
-			return .$name[$n]
-		function ${c.name} (assigns:|$Datatype|)
-			.$name[$n] = value
-		".parse
-		return src
-	
-	
-	function SCClass.FindDecl (|string| name, |message|)
-		opt norefcounts
-		for l in .sourcearg
-			if l == @decl
-				if l.declname ~= name
-					return l
+//	function DoOneNamedField (|message| c,  |string| name,  |string| datatype,  |int| n,  |message|)
+//		using c 
+//		|| src = "
+//		function ${c.name} (|$Datatype|)
+//			return .$name[$n]
+//		function ${c.name} (assigns:|$Datatype|)
+//			.$name[$n] = value
+//		".parse
+//		return src
+//	
+//	
+//	function SCClass.FindDecl (|string| name, |message|)
+//		opt norefcounts
+//		for l in .sourcearg
+//			if l == @decl
+//				if l.declname ~= name
+//					return l
 	
 	
 	function ProcessAs (CollectFunc) // node, parent, errplace
@@ -1045,69 +1062,11 @@ module
 		if name_space isa scclass
 			name_space.false = node.NeedFirst
 	
-	function GetDefault (CollectFunc)
-		if name_space isa scclass
-			name_space.defawlt = node.NeedFirst
 	
-	function NamedPropertyFields (CollectFunc) // node, parent, errplace
-		// not a great feature???
-		// only galaxxies used this. we should remove
-	/*
-		|float[5]| Stats
-		Fields (Stats) {
-			Speed
-			Jump
-			Health
-		}
-		// creates
-		function Speed (|float|) {
-			return .fields[Speed]
-		}
-		function Speed (assigns:|float|) {
-			.fields[Speed] = Value
-		}
-	*/
-			
-		|| Name 	= node[@bra][@thg]									#require
-		|| decl 	= name_space|scclass|.FindDecl(name.name)			#require
-		|| Type		= decl[@acc]										#require
-		|| Arg		= node[@arg, 1]										#require
-		|| DataType = Type[@Thg]										#require
-		|| Cls		= compiler[datatype]								#require
-		|| CountMsg = Type[@arr, 1][@num]								#require
-		|| Consts	= «Arg »
-		|int| Count = CountMsg.int
-		|| Found	= 0
-		
-		
-		for (c in arg)
-			expect (!c.hasany and (c == @tmp)) (C)
-			|| src = .DoOneNamedField(c, name.name, Cls.name, found)	#require
-			|| getter = src.first
-			|| setter = getter.next
-			(src)
-			
-			consts <~ «rel
-				«thg name.name + c.name »
-				«opp "="»
-				found
-			»
-			name_space.Collectone(getter, false)
-			name_space.Collectone(setter, false)
-
-			Found++
-
-		
-		expect (Count >= Found) (countmsg, "Too few fields specified")
-		
-		consts <~ «rel
-			«Thg "kCount"»
-			«opp "="»
-			found
-		»
-		name_space.sourcearg <~ «tmp "constants", consts »
-		node.remove
-		return compiler.program
+	function GetDefault (CollectFunc)
+		|| cls = name_space as scclass
+			cls.defawlt = node.NeedFirst
+	
 }
 
 
@@ -1118,6 +1077,4 @@ extend SCClass
 			yield Curr_
 			Curr_ = Curr_.super
 
-extend byte
-	constants
-		abc = 1
+

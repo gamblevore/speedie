@@ -16,17 +16,19 @@
 |SCClass|	TypeuInt
 |SCClass|	TypeuInt64
 |SCClass|	TypeString
+|SCClass|	TypeStringZero
 |SCClass|	TypeSyntax
 |SCClass|	TypeBool
 |SCClass|	TypeCharSet
 |SCClass|	TypeByte
+|scclass|	TypeCodePoint
 |SCClass|	TypeObject
-|SCClass|	TypeVoidPtr
 |SCClass|	TypeWrapper
 |SCClass|	TypeArray
 |SCClass|	TypeDictionary
 |SCClass|	TypeFastString
 |SCClass|	TypeJBClass
+|scclass|	TypeTask
 |SCClass|	TypeVec4
 |SCClass|	TypeVec3
 |SCClass|	TypeVec2
@@ -36,98 +38,102 @@
 |SCDecl|	TypeNil
 |SCClass|	TypeVoid_
 |SCDecl|	TypeVoid
+|scdecl|	TypeVoidPtr
 |SCDecl|	TrueBool
 |SCDecl|	FalseBool
-
-extend_module compiler
-	|SCBase|	VisibleFuncs
-	|SCBase|	Interpreter
-
 
 
 function Compiler.FindSpeedieRoot (|string|)
 	|| paths = app.exepath.resolve.parent
 	|| srch = "/Speedie/"
-	|| found = paths.find(srch,0,int.max,true)
+	|| found = paths.find(srch, 0, int.max, true)
 		return paths[0, found + srch.length]
 	return "/usr/local/speedie"
 	
+
 
 module Compiler {
 linkage
 	cpp_part Comp
 
-|File|					BaseProjectPath
-|string|				OriginalInputPath
-|File|					_BuildFolder
-|File|					TempFolder
-|String|				_Projects
-|String|				_SpeedieProj
-|SCFile|				InternalFile = SCFile.new(nil)
-|string|				ProjectName
-|string|				ReportedName
-|scimport|				UserProj
-|message|				DebugInsert
-|message|				ConfMsg
-|dictionary|			InsecureWords
+|SCNode|					VisibleFuncs
+|SCNode|					Interpreter
+
+|File|						BaseProjectPath
+|string|					OriginalInputPath
+|File|						_BuildFolder
+|String|					_Projects
+|String|					_SpeedieProj
+|File|						TempFolder
+|SCFile|					InternalFile = SCFile.new(nil, SCImport.new(nil, true))
+|string|					ProjectName
+|string|					ReportedName
+|scimport|					Project
+|scfunction|				MainFunc
+|message|					ConfMsg
+|dictionary|				InsecureWords
+|[message]| 				TodoList
 
 |Dictionary of SCFile|		Files = nil
 |[SCImport]|				ImportedList
-|Dictionary of SCImport|	ImportedNames = nil
+|Dictionary of SCImport|	ImportedNames = Dictionary.new
 
 
-|SCModule|				program
+|SCModule|					program = InternalFile.Proj.Mod
 
-|[SCClass]|				ClassList
-|[SCModule]|			ModuleList
-|[SCFunction]|			FuncList
-|[SCFunction]|			ProtoTypes
+|[SCClass]|					ClassList
+|[SCModule]|				ModuleList
+|[SCFunction]|				FuncList
+|[SCFunction]|				ProtoTypes
 
-|Dictionary of SCBase|		ExportNames = nil
+|Dictionary of SCNode|		ExportNames = Dictionary()
 |dictionary of dictionary of macro|	AdjDicts = dictionary()
 
-|SCFunction|			PrivateProperty
-|SCFunction|			RefIncr
-|SCFunction|			RefDecr
-|SCFunction|			RefClear
-|SCFunction|			RefDecrMulti
-|SCFunction|			RefFreeIfDead
-|SCFunction|			RefSafeDecr
-|SCFunction|			RefSetRef
+|SCFunction|				PrivateProperty
+|SCFunction|				RefIncr
+|SCFunction|				RefDecr
+|SCFunction|				RefClear
+|SCFunction|				RefDecrMulti
+|SCFunction|				RefFreeIfDead
+|SCFunction|				RefSafeDecr
+|SCFunction|				RefSetRef
 
-|SCFunction|			TernaryFunc
-|SCFunction|			TernaryFunc2
-|SCFunction|			fnFastIsa
-|SCFunction|			fnFastAs
-|SCFunction|			fnAs
-|SCFunction|			fnIsa
-|SCFunction|			fnMustbe
-|SCFunction|			fnOpMustBe
+|SCFunction|				NewFunc
+|SCFunction|				TernaryFunc
+|SCFunction|				fnFastIsa
+|SCFunction|				fnFastAs
+|SCFunction|				fnAs
+|SCFunction|				fnIsa
+|SCFunction|				fnMustbe
+|SCFunction|				fnOpMustBe
 
-|[String]|				SyxArray
-|Message|				ExtendList = message()
-|Message|				ConstantsList = message()
-|[Message]|				ExtendModuleList
-|[Message]|				API_List
-|[SCFunction]|			API_Funcs
-|Message|				API_Place
+|[String]|					SyxArray
+|Message|					ExtendList = message()
+|Message|					ConstantsList = message()
+|Message|					TasksList = message()
+|Message|					TasksTodo = message()
+|[Message]|					ExtendModuleList
+|[Message]|					API_List
+|[SCFunction]|				API_Funcs
+|Message|					API_Place
 
-|SCModule|				DisamClasses
-|SCModule|				DisamModules
+|SCModule|					DisamClasses
+|SCModule|					DisamModules
 
-|bool|					HasMainFunc
-|bool| 					InitedOK = true
-|int|					stClasses
-|int|					stFuncs
-|int|					stReachedFunc
-|int|					stReachedClass
-|int|					stFunctionProgress
-|int|					stParseTime
-|int|					stTotalSourceSize
-|int|					stTotalFileCount
-|int|					stParseTimeTotal
-|int|					CurrStage
-|SCFunction|			ClassListInitFunc
+|bool|						InPerry 
+|bool|						HasMainFunc
+|bool| 						InitedOK = true
+|int|						stClasses
+|int|						stFuncs
+|int|						stReachedFunc
+|int|						stReachedClass
+|int|						stFunctionProgress
+|int|						stParseTime
+|int|						stTotalSourceSize
+|int|						stTotalFileCount
+|int|						stParseTimeTotal
+|int|						CurrStage
+|SCFunction|				ClassListInitFunc
 
 
 
@@ -136,17 +142,11 @@ constants
 
 
 function BuildFolder (|file|)
-	ifn ._BuildFolder.Exists
-		._BuildFolder.MakeDir
-	return ._buildfolder
-
-
-function GetMainFunc (|message| where, |ScFunction|)
 	opt norefcounts
-	|| mod = Compiler.FindModule("app", where)
-		|| fn = mod["main"]
-		if fn isa SCFunction
-			return fn
+	|| b = ._buildfolder!
+	if !B.Exists
+		B.MakeDir
+	return B!
 
 
 function PrepareInterpreter
@@ -156,23 +156,22 @@ function PrepareInterpreter
 function CompileAll (|bool|)
 	require .stage("Compilation")
 	.InitCompiler
-	.testdate
 	.ImportAll
-
-	errordelayer.ReturnErrors
-
+	
+	ErrorDelayer.ReturnErrors
+	require .InitedOK
+	
 	.PrepareInterpreter
-	require .Stage( "More constructors" )
-	.RefConstructors // constructors
+	if .Stage( "More constructors" )
+		.BuildConstructors // constructors
 	.CheckIsGoodLibrary
 
-	require .Stage( "Stripping dead code" )
-	.DeadStrip
+	if .Stage( "Stripping dead code" )
+		.DeadStrip
 	
-	require .Stage( "NilChecking" )
-	.Timer( "NilChecking" )
-
-	Niltracker.SaveLives
+	if (options.NilStrength > 0) and .Stage( "NilChecking" )
+		.Timer( "NilChecking" )
+		ArchonPurger.FixArchons
 	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )
@@ -189,7 +188,7 @@ function CompileAll (|bool|)
 	require .Stage( "Finished" )
 	.TimerSub("Parse", .stParseTimeTotal)
 	.Timer( "" )
-	return true
+	return stderr.ok
 
 
 function Projects (|String|)
@@ -214,7 +213,7 @@ function TestDate
 function compiler.ReachedClassCount (|int|)
 	opt norefcounts
 	for C in compiler.classlist
-		RZ += ((C.currreacher) and c.isobject)
+		RZ += ((C.MyReacher) and c.isobject)
 
 
 function AddSubProjects (|[SCModule]| Modules)
@@ -230,7 +229,7 @@ function FastString.AppendWidth (|string| s, |int| Width)
 function Reached (|string| s, |bool|)
 	flow off
 	|| obj = self[s]
-		return (obj.currreacher)
+		return (obj.MyReacher)
 
 
 function InitTypes
@@ -246,7 +245,9 @@ function InitTypes
 	Typefloat			= Typef32 // whyyyyy... why I do dis. 
 	TypeBool			= compiler["bool"]
 	TypeString			= compiler["string"]
+	TypeStringZero		= compiler["stringzeroterminated"]	
 	TypeByte			= compiler["byte"]
+	TypeCodePoint		= compiler["codepoint"]
 	TypeCharSet			= compiler["charset"]
 	Typevec2			= compiler["vec2"]
 	Typevec3			= compiler["vec3"]
@@ -255,19 +256,23 @@ function InitTypes
 	Typeivec3			= compiler["ivec3"]
 	Typeivec4			= compiler["ivec4"]
 	Typedate			= compiler["date"]
-	TypeJBClass			= Compiler..classdata
-	TypeObject			= Compiler..object
-	TypeSyntax			= Compiler..syntax
-	TypeVoidPtr			= Compiler.._voidptr
-	TypeVoid_           = Compiler.._void
-	TypeWrapper			= Compiler..datatypewrapper
-	TypeDictionary		= Compiler..dictionary
-	TypeFastString		= Compiler..faststring
-	TypeArray			= Compiler..array
-	TypeSaveable		= Compiler..saveable
-
-	typevoid            = typevoid_.TypeNormal
-	typestring.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
+	TypeJBClass			= Compiler["classdata"]
+	TypeTask			= Compiler["task"]
+	TypeObject			= Compiler["object"]
+	TypeSyntax			= Compiler["syntax"]
+	TypeVoid_           = Compiler["_void"]
+	TypeWrapper			= Compiler["dataobject"]
+	TypeDictionary		= Compiler["dictionary"]
+	TypeFastString		= Compiler["faststring"]
+	TypeArray			= Compiler["array"]
+	TypeSaveable		= Compiler["saveable"]
+		
+	require StdErr.ok
+	TypeVoid_!.LinkedFrom = int.max //noice
+	TypeStringZero!.DowngradeTo = TypeString
+	typevoid = TypeVoid_!.TypeNormal
+	TypeVoidPtr = typevoid!.GetAddress
+	TypeString!.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
 
 
 function InitBasicStuff (|int|) // compiler.init
@@ -279,24 +284,26 @@ function InitBasicStuff (|int|) // compiler.init
 	
 	cpp_export[""] // str0
 	options.ListAllLib = linkage.interpreter
+	.ModuleList <~ .program
 	
 	.InitTypes
-	TypeNil = .AddGlobalConst( "nil", TypeObject )
-	TypeNil.NilDeclared = NilState.ActuallyNil
-	TypeNil.NilUsed = NilState.nilish
-	TrueBool = .AddGlobalConst( "true", TypeBool )
-	FalseBool = .AddGlobalConst( "false", TypeBool )
+	TypeNil   = .AddGlobalConst( "nil",   TypeObject!,   NilState.ActuallyNil )
+	TrueBool  = .AddGlobalConst( "true",  TypeBool!,     NilState.real ||| NilState.trueValue )
+	FalseBool = .AddGlobalConst( "false", TypeBool!,     NilState.real ||| NilState.falseValue )
 	
-	.AddGlobalConst( "__time_id__", typeint ).islookuponly = «num scimport.recent.timeid »
-	.AddGlobalConst( "__now__", typedate ).islookuponly = «num date.now »
-	.AddGlobalConst( "__modified__", typedate ).islookuponly = «num scimport.recent »
-	.AddGlobalConst( "π", typef64 ).islookuponly = «num "3.1415926535897932" »
-	.AddGlobalConst( "τ", typef64 ).islookuponly = «num "6.2831853071795864" »
+	.AddGlobalConstNum( "__time_id__",  typeint!,  scimport.recent.timeid )
+	.AddGlobalConstNum( "__now__",      typedate!, date.now )
+	.AddGlobalConstNum( "__modified__", typedate!, scimport.recent)
+	.AddGlobalConstNum( "π",            typef64! , "3.1415926535897932")
+	.AddGlobalConstNum( "τ",            typef64! , "6.2831853071795864")
+	if stderr.ErrorCount > rz
+		compiler.InitedOK = false
+		
 
 
 function LoadTypeTest (|string| s, |scfunction|)
 	opt norefcounts
-	|| f = typeobject[ s ]
+	|| f = TypeObject![ s ]
 	if f isa scfunction
 		(f is TypeTest)
 		return f
@@ -311,6 +318,7 @@ function InitBasicFuncs (|bool|)
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	
+	.NewFunc		= .FindFunction( "JB_New" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
 	.fnAs			= .LoadTypeTest( "operatoras" )
 	.fnFastAs		= .LoadTypeTest( "operatorfast_as" )
@@ -324,8 +332,9 @@ function InitBasicFuncs (|bool|)
 
 function CreateFuncFromSource (|String| Src, |SCFunction|)
 	|| msg	= src.ParseClean
-	rz		= SCFunction.NewFunc( msg, nil, msg )|SCFunction|
-	rz.IsVisible = false
+		rz		= SCFunction.NewFunc( msg, nil, msg )|SCFunction|
+		if rz
+			rz.IsVisible = false
 
 
 function Library (|file|)
@@ -348,8 +357,9 @@ function ImportLibs
 
 function ImportProj
 	SCImport.STDLibTime = false
-	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath)(options.SingleFileInput)
-	compiler.UserProj = SCImport.Importpath( "",  ToUse,  0, false )
+	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
+	compiler.Project = SCImport.ImportPath( "",  ToUse,  0, false )
+	expect compiler.Project ("No user-project found.")
 
 
 function ImportAST
@@ -381,9 +391,10 @@ function ImportAll
 	require .AddMain(mark)
 		
 	
-	parser.insertedflags = MsgUIFlags.Inserted // noice
+	parser.using.Flags = MsgParseFlags.Inserted // noice
 	scimport.noproj
 	
+	sctasks.CollectAll
 	for c in .classlist
 		C.TryAddToProject
 	
@@ -395,21 +406,13 @@ function ImportAll
 		SCClass.ProcessExtend( l, false )
 
 	require .initbasicfuncs
-	
-	.ModuleList = ListModules( .program.access )
-	.AddSubProjects(.ModuleList)
-	.ModuleList <~ .program
-	
-	
 	require .Stage( "Creating Class Hierarchy" )
-	for c in .classlist
-		c.AddInterfacesTo(.modulelist)
 		
+
 	for c in .ClassList
 		c.CreateBehaviour	// creates new classes, put before loadsuperclass
 	
-	for c in .ClassList
-		c.LoadSuperclass
+	.LoadSuperClasses
 	
 	for c in .ClassList
 		c.GetDepth
@@ -417,8 +420,7 @@ function ImportAll
 	
 	require stderr.ok
 	
-	.SortModules
-	.OrderClassList
+	.SortModulesAndClasses
 
 	for c in .ClassList
 		c.DataTypePostLoad
@@ -432,8 +434,11 @@ function ImportAll
 	for c in .ClassList
 		c.ProcessBehaviours
 	
+	// ProcessBehaviours generates classes
+	
 	require stderr.ok
 	for c in .ClassList
+		c.LoadClassType
 		c.ProcessInterfaces
 	
 	require .Stage( "Creating Class Allocators And Stuff" )
@@ -442,7 +447,7 @@ function ImportAll
 
 	require .Stage( "Parsing Class Properties" ) // just moved this... used to come after
 	for c in .ClassList					  // handling function prototypes.
-		c.LoadProperties
+		c.CollectProperties
 		require !TooManyErrors()
 
 
@@ -450,18 +455,15 @@ function ImportAll
 		if c.isstruct
 			c.GetStructDepth
 
-	.sortmodules	// need to re-sort array by depth
+	.SortModulesAndClasses	// need to re-sort array by depth
 
 
 	for c in .ClassList
 		c.CalculateSize
 
 
-	for c in .ClassList
-		c.Project.use
-		c.LoadConstructorsAndAllocators
-		
-
+	for c in .ClassList: c.LoadConstructors
+	
 	require .Stage( "Collecting Constants" )
 	.CollectConstants
 	(Message).Restore
@@ -472,16 +474,14 @@ function ImportAll
 	// can we move decls earlier?
 	if .API_Place
 		|| Proj = .API_Place[@thg]
-		for m in .api_list
-			sc_api.DelayedClassAPI(m, proj.name)
+			for m in .api_list
+				sc_api.DelayedClassAPI(m, proj.name)
 
 	.DoSavers(1)
 
 
 	require .Stage( "Creating Class Exportnames" )
-	for c in .ClassList
-		c.Use
-		c.LoadExportName
+	for c in .ClassList: c.LoadExportName
 
 	
 	require .Stage( "Initialising Modules And More" )
@@ -493,10 +493,10 @@ function ImportAll
 
 	require .Stage( "Handling Function Prototypes" )
 	for f in .ProtoTypes
-		scfunction.currfunc = f
+		f.ProtoExportName
 		f.FuncDecls
-		f.BecomeReal
-	scfunction.currfunc = nil
+		f.MakeParamsReal
+	scfunction.currfunc = nil // set in funcdecls
 
 	require StdErr.OK
 	
@@ -506,7 +506,6 @@ function ImportAll
 	
 	require .Stage( "Parsing Function Parameters" )
 	for f in .FuncList
-		scfunction.currfunc = f
 		f.FuncDecls
 		f.LoadExportName
 		require !TooManyErrors()
@@ -517,40 +516,32 @@ function ImportAll
 		fn.iskiller = true
 	
 
-	/// Then declarations "|| x = message[0]"	
 	require .Stage( "A Bit More Stuff On Classes" )
 	for c in .ClassList
-		c.ExportName = c.JSStructName // minifier...
-		c.AfterFuncsDecled
+		c.ExportName = c.StructName // minifier...
+		c.AfterFuncsDecled //
 	  
-
-	require .Stage( "Collecting File Variables" )
-	for m in .ModuleList
-		m.InitDecls
-	for F in SCImport.AllFiles
-		F.Decls Compiler.Program
-
-	scimport.noproj
-	(Message).Restore
-
 
 	require .Stage( "Even More Stuff On Classes" )
 	for c in .ClassList
 		c.AfterAfterFuncs
-	
 
-	.Stage( "Collecting Module Variables" )
+
+	require .Stage( "Collecting Globals" )
+	for m in .ModuleList
+		m.InitDecls
+	for F in SCImport.AllFiles
+		F.CollectGlobals Compiler.Program
+
+	scimport.noproj
+	(Message).Restore
+
 	for m in .ModuleList
 		if m != Compiler.program
 			m.BaseDecls
-			m.FillDisposeFunc
-	
-
-	.Stage( "Renaming Module Variables" )
-	for m in .ModuleList
-		m.RenameVars
-		if m.cls
-			m.cls.RenameInterfaces
+		m.GlobalsFix
+		|| c = m.cls
+			c.RenameInterfaces
 
 
 	for m in SortInitOrder(.ModuleList)
@@ -560,8 +551,10 @@ function ImportAll
 
 	.Stage( "Creating Exportnames For Function Prototypes" )
 	for f in .FuncList
-		if f.ProtoDecl
-			f.ProtoDecl.Name = f.ExportName
+		|| p = f.ProtoDecl
+			p.Name = f.ExportName
+		  else
+			f.AddConstructorReturn2
 	
 	
 	.Stage( "Checking Iterators" )
@@ -573,19 +566,27 @@ function ImportAll
 	.Stage( "Transforming Functions" )
 
 	for f in .FuncList
-		require !TooManyErrors()
-		f.CheckNotBadName
-		f.Transform
-		
-		.stFunctionProgress++	
+		if !TooManyErrors()
+			f.CheckNotBadName
+			f.Transform
+			.stFunctionProgress++	
 
 	.Stage( "Building Function Link Map" )
 	for f in .FuncList
-		f.PostTransform
+		LinkMap.Collect(f)
+	scfunction.currfunc = nil
 		
+
+function LoadSuperClasses
+	opt norefcounts
+	for c in .ClassList
+		c.LoadSuperclass
+	for c in .classlist
+		c.LoadSuperBehaviours
 
 
 function LoadInitsAndMore
+	opt norefcounts
 	for m in .ModuleList
 		m.Use
 		m.LoadExportName
@@ -593,76 +594,34 @@ function LoadInitsAndMore
 
 
 function PostInitCodeCall
-	.program.initvarsarg <~ "initcode_()".parseclean
-
-
-function ExprFuncsInit
-/* @decl is BAD!   dont add it*/
-	exprfuncs[@Rel ] = (TypeOfRel)
-	exprfuncs[@BRel] = (TypeOfBRel)
-	exprfuncs[@ARel] = (TypeOfARel)
-	exprfuncs[@Adj ] = (TypeOfAdj)
-	exprfuncs[@Func] = (TypeOfFunc)
-	exprfuncs[@Acc ] = (TypeOfAccess)
-	exprfuncs[@msg ] = (TypeOfMsg)
-	exprfuncs[@sthg] = (TypeOfSthg)
-	exprfuncs[@Dot ] = (TypeOfDot)
-	exprfuncs[@Name] = (TypeOfSyx)
-	exprfuncs[@list] = (TypeOflist)
-	exprfuncs[@Arr ] = (TypeOfArr)
-	exprfuncs[@Arg ] = (TypeOfArgArr)
-	exprfuncs[@Char] = (TypeOfChar)
-	exprfuncs[@sstr] = (TypeOfSString)
-	exprfuncs[@Item] = (TypeOfLast)
-	exprfuncs[@Bra ] = (TypeOfBra)
-	exprfuncs[@Str ] = (TypeOfStr)
-	exprfuncs[@Back] = (TypeOfStr)
-	exprfuncs[@Num ] = (TypeOfNum)
-	exprfuncs[@unit] = (Typeofunit)
-	exprfuncs[@Thg ] = (TypeOfThg)
-	exprfuncs[@Ques] = (TypeOfQues)
-	exprfuncs[@SDot] = (Typeofsdot)
-	exprfuncs[@Type] = (typeoftype)
-	exprfuncs[@Emb ] = (TypeOfNothing)
-	exprfuncs[@Sheb] = (TypeOfNothing)
+	.program.initvarsarg <~ "initcode_()"~parse
 
 
 function InitCompiler
-	require (.Projects.fileCH("Library").mustexist)
-	require stderr.ok
+	require (.Projects.fileCH("Library").mustexist) and stderr.ok
 	scoperator.Init
-	.exprfuncsinit
 	Cpp_Export.Init
 
 	.files := Dictionary.new
 	
 	////////////////////////////////////////////////
-	.ExportNames = Dictionary.new
-	.TimerOutput = FastString.new
 	.TimerOutput <~ "\n"
 
-	.ImportedNames = Dictionary.new      // stop projects imported twice.
 	.CurrStage = 1
-
-	.stReachedClass = 0
-	.stParseTimeTotal = 0
-	.stReachedFunc = 0
 	SCGlobals.UniqueNum = 100
-	.stClasses = 0
-	.stFuncs = 0
-	.stFunctionProgress = 0
 	////////////////////////////////////////////////
 	
 	if options.SingleFileInput
-		if Interact.Perry
+		if SpdProcess.parent
 			._BuildFolder = compiler.originalinputpath.ScriptContainer.file
 		  else
 			._BuildFolder = .BaseProjectPath
 	  else
-		._BuildFolder = .BaseProjectPath[ "Build" + Compiler.VariantSuffix ]
+		._BuildFolder = .BaseProjectPath![ "Build" + Compiler.VariantSuffix ]
 
-	.TempFolder = TransCompiler.ProjTmpPath.file  ///Tmp/Speedie/Proj
-	.TempFolder.MakeEntirePath
+	|| t = TransCompiler.ProjTmpPath.file!  /// Tmp/Speedie/Proj
+	.TempFolder = t
+	t.MakeEntirePath
 	.GeneratedCppsFolder.makeEntirePath
 	
 	.CreateRoot
@@ -683,10 +642,10 @@ function GeneratedCppsFolder (|File|)
 	// I guess it's considered "self-replacement". It's OK.
 
 	if !Options.ExternalCompile
-		return .TempFolder
+		return .TempFolder!
 	if  Options.SelfReplacement
-		return .BuildFolder
-	return .BaseProjectPath["Cpp"]
+		return .BuildFolder!
+	return .BaseProjectPath!["Cpp"]!
 
 
 
@@ -698,54 +657,40 @@ function CreateDisambiguation
 	.DisamModules = SCModule.newContainer("__modules__")
 
 
+syntax access (|string| name, |SCClass|)
+	cpp_part FindClassName
+	return compiler.program.FindClass(name, nil)
 
-function ModuleFunction (|String| module_name, |string| fn_name, |scfunction|)
+
+syntax access (|Message| name, |SCClass|)
+	if name
+		return compiler.program.FindClassMsg( name, 0 )
+
+
+function FindClassType (|message| n, |scdecl|)
 	opt norefcounts
-	|| mod = compiler.findmodule(module_name, nil)
-		|| fn = mod[fn_name]
-		if fn isa scfunction
-			return fn
-	
-			
-function FindClass (|String| name, |Message| where, |SCClass|)
-	opt norefcounts
-	|| Mod = .FindModule(name, where, "Expected a class but found something else")
-		return Mod.cls			#expect (where, "Expected a class but found module.")
+	|| m = SCModule.curr
+	if !m
+		m = compiler.program
+	|| c = m.findclassmsg(n)
+		return c.typenormal
 
 
-function FindClassOK (|String| name, |SCClass|)
-	opt norefcounts
-	|| Obj = compiler.program.access.valuelower( name )
-	if obj isa scmodule
-		return obj.cls
+function FindModule (|string| name, |Message| where=nil, |SCNodeFindMode| Mode=0, |SCModule|)
+	return compiler.program.FindModule(name, where, Mode)
 
 
-function FindModuleMsg (|Message| where, |SCModule|)
-	return .FindModule(where.name, where)
-
-
-function FindModule (|String| name, |Message| where, |string| ErrMsg="Not a module.", |SCModule|)
-	|| Obj = compiler.program.access.valuelower( name )
-
-	if Obj isa SCModule
-		return Obj
-	
-	if where and !obj
-		error (where, "Can’t find: " + name) // OK
-	  elseif errmsg
-		error (where, ErrMsg)
+function FindModulemsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
+	return compiler.program.FindModulemsg(where, Mode)
 
 
 function CreateRoot
-	|| Prj = SCImport.new(nil, true)
-	.InternalFile.Proj = Prj
-
-	|| M = Prj.Mod
+	|| M = .InternalFile.Proj.Mod
 	.program = M
 
 	M.ExportName = "JB"
 	M.Name = "main"
-	M.Lookup = nil
+	M.parent = nil
 
 
 function LoadRefFunc (|String| name, |SCFunction|)
@@ -765,10 +710,10 @@ function FindFunction (|string| Name, |SCFunction|)
 
 
 function scfunction.IsAllocOrNew (|bool|)
-	return self is AllocOrNew
+	return self is New
 
 
-function scfunction.HasFloatparams (|int|)
+/*function scfunction.HasFloatparams (|int|)
 	opt norefcounts
 	for arg in .args
 		|| d = arg.type.TypeInfo
@@ -781,7 +726,7 @@ function scfunction.HasFloatReturn (|int|)
 		return f.isfloat|int|
 
 
-/*function CheckMaxVars
+function CheckMaxVars
 	require options.CheckMaxVars
 	|| V    = 0
 	|| Used = 0
@@ -818,30 +763,46 @@ function DoRefAnalysis
 			list.clear
 			f.AnalyseRefs(list)
 	scfunction.currfunc = nil
-	//.CheckMaxVars
 
 
 function scfunction.CanDoRefs (|bool|)
-	if .IsWrapper or .IsAllocOrNew or .IsMacro
+	if .IsWrapper or .IsMacro
 		return false
 	scfunction.currfunc = self
 	return true
 
 
-function RefConstructors
+function scfunction.CanBuildConstructor (|bool|)
+	if (self is ConOrDes) and .CanDoRefs
+		return true
+
+
+function BuildConstructors 
 	opt norefcounts
+	require stderr.ok
 	for f in .FuncList
-		if f.CanDoRefs
+		if f.CanBuildConstructor
 			f.BuildConstructorDestructor
+		
 	scfunction.currfunc = nil
 
 
-function SortModules
+function SortModulesAndClasses 
 	.ModuleList.sort(ModulesSorter)
+	.ClassList.sort(ClassSorter)
 
 
-function SCClass.IsDataTypeOrStruct (|bool|)
-	return .IsDataType or .IsStruct
+/*
+function TaskPropertySorter (SorterComparer)
+	opt norefcounts
+	|| aa = a|scdecl|
+	|| bb = b|scdecl|
+	return aa.isobject >= bb.isobject
+*/
+	
+
+function ClassSorter (SorterComparer)
+	return ModulesSorter(a|scclass|.modul, b|scclass|.modul)
 
 
 function ModulesSorter (SorterComparer)
@@ -856,15 +817,15 @@ function ModulesSorter (SorterComparer)
 			return cb
 		// could use initafter?
 	  else
-		|| tt = aa.cls.basetype
-		|| D = tt|int| - bb.cls.basetype|int|
+		|| tt = ca.basetype
+		|| D = tt|int| - cb.basetype|int|
 			return D < 0
 		
 		D = ca.depth|int| - cb.depth|int|
 		if D
 			return D < 0
 
-		if tt == scbasetype.struct 
+		if tt == SCNodetype.struct 
 			D = ca.StructContainerDepth|int| - cb.StructContainerDepth|int|
 			if D
 				return D < 0
@@ -874,36 +835,14 @@ function ModulesSorter (SorterComparer)
 
 function scfunction.StripTest
 	opt norefcounts
-	|| Base = Compiler.VisibleFuncs
+	|| Base = Compiler.VisibleFuncs!
 	
 	if !.IsVisible	
-		require options.ListAllLib and !.isdisabled
-		base = Compiler.Interpreter
+		require options.ListAllLib and !.IsDisabled
+		base = Compiler.Interpreter!
 	
-	if !.FindReached(base)
-		.depth = 1
+	.FindReached(base)
 
-
-function DeadStrip
-	opt norefcounts
-	Compiler.VisibleFuncs = scbase("Visible",	false)
-	Compiler.Interpreter = scbase("Interpreter", false)
-
-	.getmainfunc(nil).StripTest?
-	
-	for f in .FuncList
-		f.striptest
-
-	if options.ListAllLib // must come before the next loop
-		for c in .classlist
-			c.reach(Compiler.Interpreter)
-	
-	for c in .classlist
-		if c.CurrReacher // shorten-discovery-chains, 
-			c.ReachBehaviours // behaviour chains tend to be long.
-
-	CodeSorter.LeafsFirst		// super-refcounter wants this
-		
 	
 			
 
@@ -916,8 +855,8 @@ function InputFile (|File| Default, |String| s, |message| where, |File|)
 	opt norefcounts
 	expect !(s contains "../") (where, "Insecure path")
 	// find the "highest" file...
-	if SCImport.Curr
-		|| found = SCImport.Curr.Resources.ValueLower(s)
+	|| c = SCImport.Curr
+		|| found = c.Resources.ValueLower(s)
 			return found
 			
 	|| best = int.max
@@ -929,24 +868,23 @@ function InputFile (|File| Default, |String| s, |message| where, |File|)
 	if rz
 		return rz
 
-	rz := Compiler.BaseProjectPath[s]
+	rz = Compiler.BaseProjectPath![s]
 	if (Default != nil)
 		rz := default[s]
-	ifn rz.exists
+	if !rz.exists
 		rz = nil
 
 
-function OrderClassList
-	// put the .ClassList in the same order as the ModuleList
-	.ClassList.Clear
-	for m in .ModuleList
-		.ClassList <~ (m.cls		#continue)
+function AddGlobalConstNum (|string| name, |SCClass| c, |int64| value)
+	.AddGlobalConstNum(name, c, value.render)
 
+function AddGlobalConstNum (|string| name, |SCClass| c, |string| value)
+	.AddGlobalConst(name, c).IsLookupOnly = @num + value
 
-function AddGlobalConst (|string| name, |SCClass| c, |SCDecl|)
-	|| d = SCDecl.new
-	d.Type = c
-	(d Is Const)
+function AddGlobalConst (|string| name, |SCClass| c, |nilstate| dcl = NilState.real, |SCDecl|)
+	|| d = SCDecl(c)
+	(D is dataconst)
+	d.NilDeclared = dcl
 	d.IsLookupOnly = "" // it is lookuponly... but what for? "" i guess... whatever.
 	d.Name = name
 	d.default = «thg name »
@@ -954,20 +892,23 @@ function AddGlobalConst (|string| name, |SCClass| c, |SCDecl|)
 	Return d
 
 
-function AddMain (|int| mark, |bool|)
-	|message| m
+function MakeMainFunc (|message|)
+	|| f = compiler.MainFunc 
+		f.blindcasts = errorseverity.error // this for now.
+		return f.sourcearg
+	"Compiling as library."
+	Options.ProjectisLibrary = true
+	return .program.CollectString( "main:\n" ).last				// mainproj.collect
 
-	|| f = .getmainfunc(nil)
-		m = f.sourcearg
-	  else
-		"Compiling as library."
-		m = .program.CollectString( "main:\n" ).last				// mainproj.collect
-	Options.ProjectisLibrary = !f
+
+
+function AddMain (|int| mark, |bool|)
+	|| m = .MakeMainFunc()
+	|| b = (Truebool, falsebool)(Options.ProjectisLibrary) 
 	
 	if m and .ConfMsg
-		m.first = "app.configure = __AppConfString".parse
+		m.first = "app.configure = __AppConfString"~parse
 	
-	|| b = (Truebool, falsebool)(options.ProjectIsLibrary) 
 	.program.TryAdd( nil, b, "__IS_LIBRARY__" )
 
 	stderr.LowerErrorsTo = 0
@@ -981,21 +922,12 @@ function Collect (|Message| m, |bool| visible)
 syntax append (|message| m)
 	.InternalFile.LiveAST <~ m
 
-syntax access (|string| name, |Message| where=nil, |SCClass|)
-	cpp_part AccessStr
-	return .FindClass( name, where )
-
-
-syntax access (|Message| name, |SCClass|)
-	if name
-		return .FindClass( name.name, name )
-
 
 ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  
 
 |Date|			LastTime
 |string|		LastTimeName
-|FastString|	TimerOutput
+|FastString|	TimerOutput = FastString.new
 
 function AppendCompilerTime (|string| s, |int| Durr)
 	compiler.TimerOutput.appendwidth(s, compiler.kTimeWidth)
@@ -1035,6 +967,10 @@ function Stage (|string| name, |bool|)
 	return true
 
 
+function @transcompiler.PrintProduct (|string| s)
+	printline (s + " `") + (transcompiler.ProductPath + "`")
+
+
 function IsTest (|bool|)
 	return (App.fileName contains "Test")
 
@@ -1060,7 +996,7 @@ function FindProjNoSuffix (|string| Path, |string|)
 
 
 function FindProject (|string| Path, |bool| error, |File|)
-	|| p = .BaseProjectPath.parent
+	|| p = .BaseProjectPath!.parent
 	|| B = .FindProjectSub(p, path)
 		return B
 	|| A = .FindProjectSub(.projects, path)
@@ -1069,7 +1005,7 @@ function FindProject (|string| Path, |bool| error, |File|)
 	
 helper FindProjectSub (|string| base, |string| Path, |File|)
 	if (*Path == '/')
-		return Path.ExistingFile
+		return Path.FileThatExists
 	
 	|| First = Path
 	|| SlashPos = Path.find('/')
@@ -1084,30 +1020,3 @@ helper FindProjectSub (|string| base, |string| Path, |File|)
 		rz = nil
 }
 
-
-function ProjName (|String|)
-	return Compiler.Program.ExportName // OK
-
-
-
-// recursive is a bit akward...
-	// x --> a
-	// a --> b
-	// b --> c
-	// b --> a
-// a and b should be recursive
-// x and c should NOT be.
-
-
-module depthtest
-	function X				// 2 or 4?
-		.a3
-		.a1
-		.r1
-		
-		
-	function A1: .a2			// 3
-	function A2: .a3			// 2
-	function A3:				// 1
-	function R1: .r2			// r
-	function R2 {.r1, .a1, .a3}	// r

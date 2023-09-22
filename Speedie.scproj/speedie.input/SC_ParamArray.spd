@@ -9,9 +9,9 @@ class SCParamArray
 		cpp_part		PA
 	contains message
 
-	|Message[11]--|		Items
-	|Message--|			Exp
-	|SCClass--|			Cls
+	|Message--?[11]|	Items
+	|Message--?|		Exp
+	|SCClass--?|		Cls
 	|int16|				Size
 	|int16|				ErrCount
 	|bool|				IsAssigns
@@ -22,14 +22,16 @@ class SCParamArray
 	|bool|				IsSelf
 	|bool|				IsSuper
 	|bool|				Found
+	|bool|				ConstructorAsNew
 	
 
-	constructor (|Message| exp, |message|side=nil)
+	constructor (|Message?| exp)
+		opt norefcounts
 		.Exp = exp
-		.side = side
 		.IsDot = (exp == @dot)
-		.IsAddress = (exp != nil) and (exp.niceparent Isbrel "&")
+		.IsAddress = (exp and exp.niceparent Isbrel "&")
 		.ErrCount = stderr.errorcount
+//		.side = nil
 
 
 	function addsub (|| m)
@@ -50,7 +52,11 @@ class SCParamArray
 			obj.render(fs)
 			|| ty = typeofexpr(obj, nil)
 				ty.render(fs)
-			
+	
+	function CopyArgs (|[message]|)
+		opt norefcounts
+		for s in self
+			rz <~ s
 	
 	function IsModule (|bool|)
 		return !.IsNotModule
@@ -75,28 +81,33 @@ class SCParamArray
 		return "module"
 	
 	function ModuleName (|string|)
-		if (.IsNotModule)
-			return Self[0].RenderType
-		return .exp.first.RenderType
+		opt norefcounts
+		|| p = self[0] 
+		if !.IsNotModule
+			p = .exp.first
+		
+		if p
+			return p.RenderType
 
 
 
-	function PreReadTypes (|SCBase| Name_Space, |Message| P, |message|side, |bool|)
-		.exp := p
+	function PreReadTypes (|SCNode| Name_Space, |Message?| P, |message?| side, |bool|)
+		if p and !.exp
+			.exp = p
 		for  Item.fast in P  // in case '...' adds a param
 			require  .AddTestedParam(item, name_space)
 		.side = side
 		return true
 
 
-	function scbase.IsModuleFunc (|bool|)
+	function SCNode.IsModuleFunc (|bool|)
 		opt norefcounts
 		if (self isa scarg)
 			return !.IsClassArg
 		return (self isa SCModule)
 
 
-	function DetectDotSuper (|SCBase| curr, |scbase| arg_space, |SCBase|)
+	function DetectDotSuper (|SCNode| curr, |SCNode| arg_space, |SCNode|)
 		opt norefcounts
 		.IsNotModule = !Curr.IsModuleFunc
 		if .IsDot
@@ -110,12 +121,12 @@ class SCParamArray
 						.IsSuper = true
 						exp0.name = "self"
 						// setting isself would change property setters.
-						return Curr.Lookup
+						return Curr.parent
 		return Curr
 
 
 	syntax cast (|bool|)
-		return .HasProperParams
+		return (self != nil) and .HasProperParams
 
 
 	function AddParam (|message| item)
@@ -123,17 +134,17 @@ class SCParamArray
 		.HasProperParams = true
 
 
-	function AddTestedParam (|message| item, |scbase| name_space, |bool|)
+	function AddTestedParam (|message| item, |SCNode| name_space, |bool|)
 		opt norefcounts
 		expect TypeOfExpr( item, name_space ) ( item, "Can’t find type." )
 		.AddParam(Item)
 		return true
 
 
-	function Range (|IntRange|)
-		|| y = .size
-		|| x = (.isdot and .IsNotModule)|int|
-		return (x,y)|intrange|
+//	function Range (|IntRange|)
+//		|| yyy = .size
+//		|| x = (.isdot and .IsNotModule)|int|
+//		return (x,yyy)|intrange|
 
 
 	function MacroSize (|int|)
@@ -147,3 +158,9 @@ class SCParamArray
 			.addsub(Value)
 			.IsAssigns = true
 
+	iterator
+		|int| n = .size
+		|int| i = 0
+		while i < n
+			yield .items[i]
+			i++

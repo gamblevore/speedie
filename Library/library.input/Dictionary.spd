@@ -24,6 +24,7 @@ class Dictionary (saveable)
 		cpp_part ValueStr
 		return self[key,nil]
 	syntax Access (|string| Key, |...| Default, ||)
+		nil checker
 		cpp_wrapper JB_Dict_Value
 		
 	function MakePlace (|string| key, |&...|)
@@ -47,6 +48,8 @@ class Dictionary (saveable)
 		self[m.name] = m
 	
 	function ValueLower (|string| s, ||)
+		if s.islower
+			return self[s]
 		return self[s.lowercase]
 	function ValueLower (|string| s, assigns:||)
 		self[s.lowercase] = value
@@ -57,7 +60,7 @@ class Dictionary (saveable)
 
 	// "..." means "Whatever it is that we contain"
 	// so.. we return a dictionary reader containing whatever we contain.
-	function Navigate (|DictionaryReader of ...|) { cpp_wrapper JB_Dict_Navigate }
+	function Navigate (|DictionaryReader of ...|) { cpp_wrapper JB_Dict_Navigate, nil checker }
 
 	function Values (|[...]|)
 		for V in self
@@ -76,8 +79,10 @@ class Dictionary (saveable)
 	
 	iterator
 		|| nav = .Navigate
-		while (nav.MoveNext)
-			yield nav.Value (nav.Name)
+		while
+			|| v = nav.NextValue
+			if v == nil: exit
+			yield v (nav.Name)
 			
 	module
 		function Reverse (|dictionary of string|Dict, |dictionary of string|)
@@ -110,6 +115,10 @@ class DictionaryReader
 	
 	function MoveNext (|bool|)
 		cpp_wrapper JB_Nav_MoveNext
+		
+	function NextValue (|...|)
+		if .MoveNext
+			return .value
 	
 	constructor (|dictionary| dict)
 		cpp_wrapper JB_Nav_Constructor
@@ -118,11 +127,12 @@ class DictionaryReader
 		cpp_wrapper JB_Nav_Destructor
 
 	syntax cast (|bool|)
-		return .MoveNext
+		disabled "Do you mean .movenext or self!=nil"
+		// return .MoveNext
 
 
 
-function String.ReplaceAll (|dictionary of string| Dict, |ErrorList| Rec=StdErr, |string|)
+function String.ReplaceAll (|dictionary of string| Dict, |ErrorReceiver| Rec=StdErr, |string|)
 	cpp_wrapper JB_Str_MultiReplaceAll
 
 function SetDecodeEntities (|dictionary of string|Dict, |bool| Value)
@@ -159,7 +169,7 @@ extend dictionary
 		self[m.name.idcase] = Value
 	
 	function Expect (|message| m, ||)
-		return self[m.name]		#expect (m, "Unrecognised name: " + m.name)
+		return self[m.name]		#expect (m)
 
 
 

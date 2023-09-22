@@ -1,0 +1,43 @@
+
+
+class Task (list)
+	linkage
+		visible
+		cpp_class JB_Task
+
+	|taskstate| 		State
+	|uint|				_Object
+	|&nil|				_func
+	
+	constructor
+		cpp_part Empty
+		._Func = &(message.dummy)
+		._Object = 0
+	
+	constructor (|uint| Obj, |&nil| func)
+		._Object = Obj
+		._Func = func
+		
+	destructor
+		visible
+		|| curr = self|&object|
+		|| o = ._object
+		while o
+			|| i = o.lowestbit
+			o &= ~i
+			i = i|int|.log2
+			jb_decr( curr[i] )          // noice
+
+
+datatype TaskState (byte)
+	flags
+		|TaskState| 
+		Started
+		Paused
+		HadErrors
+		Successful
+		Finished
+	
+	syntax is (|TaskState| t, |bool|)
+		return self & t
+

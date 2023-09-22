@@ -68,10 +68,11 @@ function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |ImagePixe
 
 
 helper string.FontLoad (|image|)
-	rz = .Loadqoi$
+	rz = .LoadQOI$
+	|| blank = colors.clear
 	for v in rz
 		if !v.hascolor or !v.a
-			v <~ 0|uint|
+			v <~ blank
 
 	for c in rz.width/6
 		if c > 32
@@ -94,13 +95,6 @@ function vec4.FontPixelCleanup (|vec4|)
 	if total < full						// "anything above this is 100% white"
 		rz.a = total/full				// anything else... is white, but less opaque
 
-
-function CodePoint.DrawCharfix (|codepoint|)
-	if self == 171 // sigh
-		return 128
-	  elseif self == 187 // we need a proper unicode drawing code
-		return 129
-	return ' '
 
 
 function image.DrawIcon (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| Col=colors.white)
@@ -141,7 +135,7 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 	
 	|| X2  		= C|int| * font.Width
 	|| v0		= (X2, 0) - xy
-	if (c < 32) and (col4 == vec4(1) or drawmode == 1)			// draws faster
+	if (c < 32) and (col4 == vec4(1) or drawmode == 1)
 		drawmode = -1
 	  elseif drawmode == 1
 		drawmode = col.a + 1
@@ -160,14 +154,14 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 			
 			if sz.uint
 				if drawmode > 0
-					|| A = (sz.a + 1) * drawmode				// now... this depends on if... 
+					|| A = (sz.a + 1) * DrawMode
 					if A >= 64K									
-						dz <~ col.uint							// opaque pixel
+						dz <~ col								// opaque pixel
 					  else
-						|| f = A|float|/64K|float|
+						|| f = A|float| * 65536th
 						dz <~ mix(dz.color, col4, f)			// transparent pixel
 				  elseif drawmode < 0
-					dz <~ sz.uint								// emoji direct
+					dz <~ sz									// emoji direct
 				  else
 					dz <~ mix(sz.color, col4, col4.a)			// emoji darkened
 			sz++
@@ -176,43 +170,44 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 		y++
 
 
-extend FastString
-	function message.Now (||)
-		|| a = .slowcount #require
-		|int| b = date.now mod a
-		return self[b]
+function message.Now (||)
+	|| a = .slowcount #require
+	|int| b = date.now mod a
+	return self[b]
 
-	function Picture (|int| c, |image| f)
-		cpp_part ram_test_encode
-		if c > 127 // unicode...
-			c = 32
-		elseif c == 32
-			c = 0
-		
-		|| X0 = C * font.Width
-		for x in font.Width
-			|| B = 0
-			for y in 8
-				|| rz = f[x0 + x,  y]
-				if (rz != nil) and rz.hascolor
-					b |= (1<<y)
-			self <~ b|byte|
-
-
-extend string
-	render Picture (|image| font=font.small)
-		cpp_part ram_test_encode
-		for c in self
-			fs.Picture(c, font)
+//extend FastString
+//
+//	function Picture (|int| c, |image| f)
+//		cpp_part ram_test_encode
+//		if c > 127 // unicode...
+//			c = 32
+//		elseif c == 32
+//			c = 0
+//		
+//		|| X0 = C * font.Width
+//		for x in font.Width
+//			|| B = 0
+//			for y in 8
+//				|| rz = f[x0 + x,  y]
+//				if rz.hascolor
+//					b |= (1<<y)
+//			self <~ b|byte|
 
 
-	render Depicture
-		cpp_part ram_test_decode
-		for row in (7 downto 0)
-			for c in self
-				|| bit = c & (1 << row)
-				fs <~ ('*', ' ')(bit)
-			fs <~ '\n'
+//extend string
+//	render Picture (|image| font=font.small)
+//		cpp_part ram_test_encode
+//		for c in self
+//			fs.Picture(c, font)
+//
+//
+//	render Depicture
+//		cpp_part ram_test_decode
+//		for row in (7 downto 0)
+//			for c in self
+//				|| bit = c & (1 << row)
+//				fs <~ ('*', ' ')(bit)
+//			fs <~ '\n'
 
 		
 function string.EndsWithLine (|bool|)

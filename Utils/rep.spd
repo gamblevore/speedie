@@ -1,10 +1,7 @@
 
 // seems good?
-main
-	expect app.args != 4  "Usage: rep Directory Func From To"
-	|| F = app[0].ExistingFile
-	require stderr.ok
-	.Replace(F)
+main (|existingfile| folder, |string| Func, |string| From, |String| To)
+	app.Replace(folder)
 
 
 function app.Replace (|file| p, |bool|)
@@ -16,7 +13,7 @@ function app.Replace (|file| p, |bool|)
 
 
 function file.SyntacticReplace (|bool|)
-	|| str = .ReadSafely	#require
+	|| str = .Readall	#require
 	|| ch = str.Parse		#require
 	|| fs = faststring()
 	rep.ReplaceAll(ch, fs, str)
@@ -26,9 +23,9 @@ function file.SyntacticReplace (|bool|)
 
 
 module rep
-	|string|	From  = app[2]
-	|string|	To    = app[3]
-	|syntax|	Func  = syntax.Func(app[1])
+	|string?|	From  = app.args[2]
+	|string?|	To    = app.args[3]
+	|syntax?|	Func  = syntax.Func(app.args[1])
 	|int|		Where = 0
 	|bool|		Aware = app..caseaware.yes
 	

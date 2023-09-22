@@ -4,7 +4,7 @@
 */
 
 
-prototype TranFunc (|SCFunction| fn, |Message| node, |SCBase| name_space)
+prototype TranFunc (|SCFunction?| fn, |Message| node, |SCNode| name_space)
 
 extend_module SCFunction {
 
@@ -22,15 +22,15 @@ dispatch TemporalStatements (TranFunc)
 	once					(Tran_Once)
 	ifn						(Tran_Ifn)
 	debugger				(Tran_Debugger)
-	crash					{app.crash("crashtest")}
+	crash					{app.crash(node.firstname)}
 	deprecate				(Tran_Deprecate)
+	borks					(Tran_Fails)
 	
 	blindcasts				(Tran_BlindCasts)
 	debugat					(Tran_DoAt)
 	doat					(Tran_DoAt)
 	visible					(Tran_Visible)
 	flow					(Tran_Flow)
-
 	print					(Tran_Print)
 	printline				(Tran_Print)
 	zalgoline				(Tran_Print)
@@ -46,8 +46,8 @@ dispatch TemporalStatements (TranFunc)
 	__instructionlist__		(vm_Builder.BuildInstructions)
 
 // these exit the function. marked with exitter
-	continue				SCFunction.Tran_Continue
-	exit					SCFunction.Tran_Exit
+	continue				SCFunction.Tran_NotAllowed
+	exit					SCFunction.Tran_NotAllowed
 	quit					(Tran_Quit)
 	return					(Tran_Return)
 	rejoin					(Tran_Rejoin)
@@ -74,11 +74,11 @@ function Tran_Expect (TranFunc)
 	|| NewStyle = (N == "check" or "warn")
 	if (NewStyle and !ch1) // work around for now.... for: error where
 		ch1 = ch
-		ch = «thg "false"»
+		ch = @thg + "false"
 		ch1.prev = ch
 
 	if (name_space)
-		typeofexpr(ch, name_space) // use this pre-transform or during transform... :)
+		TypeOfExpr(ch, name_space) // use this pre-transform or during transform... :)
 
 	ch = ch.Negate
 	
@@ -86,37 +86,37 @@ function Tran_Expect (TranFunc)
 	if (N == "expect") or (NewStyle)
 		arg <~ ch1.ExpectParamsTransform( node.Position, ch, N )
 	  elseif (N == "debug_require")
-		arg.msg(@tmp, "debugger")
+		arg <~ (@tmp, "debugger")
 	if (!NewStyle)
 		if n == "loop"
-			arg.msg(@tmp, "exit")
+			arg <~ (@tmp, "exit")
 		  else
-			|| ret = arg.msg(@tmp, "return")
-			|| q = ret.msg(@ques, "nil")
+			arg.msg(@tmp, "return") <~ (@ques, "nil")
 
 
-function Tran_Temporal (|SCFunction| fn, |Message| s, |SCBase| name_space)
-	|| TmpInt = TemporalStatements[s.name]		#expect (s, "Unrecognised statement")
+function Tran_Temporal (|SCFunction| fn, |Message| s, |SCNode| name_space)
+	opt norefcounts
+	|| TmpInt = TemporalStatements[s.name]		#expect (s)
 	(*TmpInt)( FN, s, name_space )
 
 
 function Tran_Using (TranFunc)
 	// using (Exp) { f() } --> if (true) { || X = f().startusing, ..., x.stopusing }
 	
-	|| With		= node.needfirst					#require
-	|| Start	= node
-	|| Arg		= With.next
+	|| With     = node.needfirst					#require
+	|| Start    = node
+	|| Arg      = With.next
 		require arg.expect(@arg) and arg.ExpectLast
 		start = nil
 	  else
-		arg = node.parent
+		arg = node.parent!
 	
 	Using (node)
 	|| name		= UniqueTmpVar("using")
 	|| WithFirst= with.first
 	if with != @bra
 		withfirst = with
-		node.first = «bra ""»
+		node.first = @bra.msg
 	|| UsingObj	= «dot "SyntaxUsing"
 		withfirst
 		«emb »
@@ -137,19 +137,18 @@ function Tran_Using (TranFunc)
 		SC_MakeComment(node)
 
 
-function Tran_Array (|Message| S, |SCBase| name_space) {
+function Tran_Array (|Message| S, |SCNode| name_space) {
 	// || x = [("a", "b", "c"):d()] 	// wouldve been better? than my 'dispatch' thing...
 	// || tmp = d(), || x = ["a":tmp, "b":tmp, "c":tmp] 	// wouldve been better? than my 'dispatch' thing...
 	|| Type = S.AsDecl #require
 	|| thg = s.IsSetIntoVar
 		
 	if (!thg)
-		thg = scfunction.tempmoveout(s, s.parentpoint)
+		thg = scfunction.tempmoveout(s, s.parentpoint!)
 		name_Space.tryadd(thg, thg.asdecl, thg.name)
 	
-	|| P = S.NiceParent
-	|| Place = P.ParentPoint
-
+	|| P = S.NiceParent!
+	|| Place = P.ParentPoint!
 	
 	using (S)
 	// type.type contains the class to create
@@ -190,11 +189,12 @@ function Tran_Array (|Message| S, |SCBase| name_space) {
 	
 	// i think we are done!
 	TypeOfExpr( DotNew, name_space )
-	s.safeReplaceWith( DotNew )
+	s.SafeReplaceWith( DotNew )
 }
 
 
 function Tran_Description (TranFunc)
+	expect (fn) (node, "Only use this on functions")
 	|| str = node[@str]
 		if !fn.isdisabled
 			check !fn.description (node, "Can’t have multiple descriptions.")
@@ -203,6 +203,7 @@ function Tran_Description (TranFunc)
 
 
 function Tran_BlindCasts (tranfunc)
+	expect (fn) (node, "Only use this on functions")
 	|| thg = node[@thg]
 		node.remove
 		fn.blindcasts = thg.blind
@@ -216,65 +217,61 @@ function Tran_Swap (TranFunc)
 
 
 function Tran_While (TranFunc)
+	if node.tmptype == asmtmp.kwhile
+		return
+
 	node.name = "while"
 	node.tmptype = asmtmp.kWhile
-	|| StartCond	= node.needfirst #require
-	|| arg			= startcond.next
+	|| Cond	= node.needfirst					#require
+	|| arg	= cond.next
 
 	using (node)
-	if (StartCond == @arg)
-		StartCond = «Thg "true"»
-		node.first = StartCond
-		arg = startcond.next
+	if (Cond == @arg)
+		Cond = «Thg "true"»
+		node.first = Cond
+		arg = cond.next
 		
 	  else
-		arg := node.givearg 
-		|| decl = startcond.first
+		arg := node.GiveArg
+		|| decl = cond.first
 		if (decl == @decl)
-			StartCond <~ «Thg "true"»
-			startcond.func = @bra
+			cond.func = @bra
+			cond = Cond.msg(@Thg, "true")
 			arg.first = decl
-			decl.next = «tmp "if"
-				«bra, «Brel "!", decl.declname.copy »»
-				«arg, «tmp "exit"»»
-			»
-
+			|| dname = decl.declname
+				decl.next = macros.WhileDecl.run(dname.copy)
 		  else
-			startcond = ExpandToBool( StartCond, name_Space )$
-
-
-	StartCond.NeedBra
-	Tran_Isa(node, name_space)
-	
-	|| ExitCond = arg.Next						#require
-	expect (ExitCond == @bra)					(ExitCond)
+			cond = ExpandToBool( Cond, name_Space ) #require
 
 	
-	ExitCond.Remove
-	while ExitCond == @Bra
-		ExitCond = ExitCond.first
+	Cond.NeedBra
+	arg.CheckContinuesAndExits
+	
+	Tran_Isa(node, name_space)	
 
-	|| Finish = arg.NeedMarker( "finish", true )
-
-	arg <~ «tmp "if"
-		«bra, exitcond.negate »
-		«arg
-			«tmp "exit"»
+	|| ExitCond = arg.Next
+	if ExitCond.Expect(@bra)
+		ExitCond.Remove
+		ExitCond = ExitCond.Negate
+	
+		|| Exit = «tmp "exit"»
+		arg <~ «tmp "if"
+			ExitCond.NeedBra
+			«arg, exit »
 		»
-	»
+		exit.LoopExit
+		cond = ExitCond
 	
-	Finish.Remove
 
 
-
-function MsgInsideDcl (|Message| msg, |bool|)
-	opt norefcounts
-	|| Count = 0				// |["":string]|
-	
-	for p.up in msg.parent
-		if p == @Decl
-			Return true
-		require (p != @Tmp and @Rel) and (++Count < 3)
+//function MsgInsideDcl (|Message| msg, |bool|)
+//	opt norefcounts
+//	|| Count = 0				// |["":string]|
+//	
+//	for p.up in msg.parent
+//		if p == @Decl
+//			Return true
+//		require (p != @Tmp and @Rel) and (++Count < 3)
 
 	
 function Tran_Beep (TranFunc)
@@ -295,7 +292,7 @@ function Tran_Print (TranFunc)
 	TypeOfExpr( node, name_space )
 
 
-function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
+function Tran_All (|SCFunction| fn, |Message| s, |SCNode!| p) // transform ()
 	require !TooManyErrors()
 	|| f = s.func
 	
@@ -318,7 +315,7 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 		SCFunction.Tran_Array( s, p )
 		
 	  elseif (f == @Type)
-		Tran_All( Fn, s.first, p )
+		Tran_All( Fn, s.first!, p )
 		Return
 		
 	  elseif (f == @Tmp)
@@ -342,13 +339,13 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 		return  // units have internal structure that can be damaged
 	
 	if (s == @arg) and (f != @arg)
-		p = s.scarg(p) // Resync
+		p = s.scarg(p)! // Resync
 	
 	|| ch = s.first
 	while (ch)
 		|| n = ch.next
 		if (ch == @Arg)
-			Tran_All( fn, ch, ch.scarg(p, s) )
+			Tran_All( fn, ch, ch.scarg(p, s)! )
 		  else
 			Tran_All( fn, ch, p )		
 		ch = ch.next
@@ -358,25 +355,26 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 							      // altering the tree isn't cool really... makes things too tricky. 
 
 
-		
-function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
-	|| Src = f.SourceArg
+function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
+	opt norefcounts
+	|| Src = f.SourceArg!
 	|| d = r_z.MsgDecl
 	|| Used = (d and d is usedbycode)
-	ifn used
+	src.StartUsingAfter
+	if !used
 		r_z.Remove
-	  elseif !(d is setto)
-		r_z.NotNilRZ(f.ReturnType, space)
+	  elseif d isnt setto
+		r_z.NotNilRZ(f.ReturnType!, space)
 
-	if src.last istmp "return"
-		return
-	
-	|| ret = «tmp "return"»
-	src <~ ret
-	if used
-		ret <~ «thg "rz"»
-	  else
-		ret <~ f.ReturnType.CreateDefault(src)
+	ifn (src.blocks is return) or (src.last istmp "return") 
+		|| ret = src.msg(@tmp, "return")
+		ret.tmptype = asmtmp.kreturn 
+		if used
+			ret.msg(@thg, "rz").obj = d 
+		  else
+			ret <~ f.ReturnType!.CreateDefault(src)
+
+	parser.Using.Flags = 0
 
 
 function Tran_Result (|SCFunction| f, |message|)
@@ -386,7 +384,7 @@ function Tran_Result (|SCFunction| f, |message|)
 	require type and src and !(Src.Last IsTmp "return")
 	|| errs = src.last ?? src
 	using (errs)
-	parser.UsingPos = -1
+	parser.Using.Position = -1
 	
 	|| ret = type.WriteDeclFull("rz")
 	src.first = ret
@@ -398,7 +396,7 @@ function CanKeepAsSource (|Message| list, |Message| arg, |scdecl| d, |bool|)
 		return true
 	if list == @num
 		return true
-	if d.c_array	// hmmmmm
+	if d.IsCArray	// hmmmmm
 		return true
 
 
@@ -406,7 +404,7 @@ function CanKeepAsValue (|sciterator| iter, |Message| arg, |scdecl| dcl, |Messag
 	require (iter.Value == @thg)
 	require value
 	require (!arg.IsVarUseableInLoop( value.name ))
-	require !dcl.c_array
+	require !dcl.IsCArray
 	return true
 
 
@@ -415,7 +413,6 @@ function Tran_For (TranFunc)
 		node.become(@Arg)							// calls destructors :)
 		name_space = node.scarg( name_space )
 		tran_ForSub(fn, node, name_space)
-
 
 
 
@@ -445,7 +442,8 @@ function Tran_ForSub (TranFunc)					// :3
 	list = list.unbra
 	if (list == @rel)
 		value = list.First
-		|| opp = value.next(@opp, "in")
+		|| opp = value.next
+		if opp isopp "in"
 			list = opp.next
 			bad +=! list
 			if value == @Dot
@@ -460,7 +458,7 @@ function Tran_ForSub (TranFunc)					// :3
 	|sciterator| iter
 	|scdecl| dcl
 	if !bad
-		dcl = TypeOfExprModulesNotOK( list, name_space )
+		dcl = TypeOfExpr( list, name_space ) #check ( list, "No class found.")
 	if dcl
 		iter = dcl.GetIteratorAny( itername, node )
 		if iter
@@ -471,7 +469,7 @@ function Tran_ForSub (TranFunc)					// :3
 			  elseif index
 				bad +=! index[@thg]
 	
-	require dcl and !bad and iter
+	require dcl and !bad and iter and list
 
 	if index // remove nodes AFTER the error tests
 		index.Remove
@@ -481,7 +479,7 @@ function Tran_ForSub (TranFunc)					// :3
 	
 				////////  CHECK IF VARS ALTERED
 	|| CanKeepSource = CanKeepAsSource(list, arg, dcl)
-	|| CanKeepValue  = CanKeepAsValue(iter, arg, dcl, value)
+	|| CanKeepValue  = CanKeepAsValue(iter, arg, dcl, value)|int|
 	
 	
 				//////// Uniquify source/value names ////////
@@ -491,21 +489,21 @@ function Tran_ForSub (TranFunc)					// :3
 		ListName = «Thg UniqueTmpVar( name_space, "LoopSrc" )»
 		// what? listname.name? why not pass the thing itself?
 		MakeDeclOrRel( node, listname, list )
-	  elseif  dcl.c_Array
+	  elseif  dcl.IsCArray
 		listname = «ques "."» // not my best code ever
 
 	iter.RenameSelf( ListName )
 
 	if (CanKeepValue)
-		iter.RenameValue( value.name )
+		iter.RenameValue( value! )
 	  else
-		iter.RenameValue( UniqueTmpVar(name_space, "Value") )
+		iter.RenameValue( @thg + UniqueTmpVar(name_space, "Value") )
 			
 	
 				////////  CONSTRUCT "WHILE" STRUCTURE
 	|| PostCond = AlterPostCond( arg.Next, iter.LoopEndCond, node )
 		postcond = postcond.needbra
-	|| node2 = iter.MakeWhile(arg, PostCond)
+	|| node2 = iter.MakeWhile(arg, PostCond)				#require // sigh
 	node <~ node2
 	
 	
@@ -531,32 +529,31 @@ function Tran_ForSub (TranFunc)					// :3
 		iter.Yield.CopyAllBeforeInto( arg, node )
 
 
-	if (dcl.c_array)
+	if (dcl.IsCArray)
 		for c.flat in node
 			if (c == @ques and ".")
 				c.replacewith(list.copy)
 
 
 				////////  COPY STUFF AFTER CONTINUES  ////////
-	|message| LastMsg
 	for msg.flat in arg
 		if (msg == @tmp)
 			if (msg == "for" or "while")
 				continue_with msg.FlatAfter
 			
-			if (msg == "continue")
+			  elseif (msg == "continue")
+				msg.ExpectEmpty
 				iter.Yield.CopyAllAfterBefore( msg, node )
-
+				
 			  elseif (msg == "continue_with")
 				msg.Name = "continue"
-				msg.Prev = NeweqRel( iter.index.copy(node2), msg.last )
+				msg.Next_Index(iter, node2)
 				continue_with msg.FlatAfter
 		
 		  elseif (msg == @thg)
-			if cankeepvalue  and  !(value.flags&kReplaced)  and  msg == value.name
-				LastMsg = msg
-				msg.ReplaceWith(value)
-				(value.flags |= kReplaced)
+			if CanKeepValue==1  and  msg == value!.name
+				msg.ReplaceWith(value!)
+				CanKeepValue = 2
 			
 		  elseif (msg == @type)
 			|| ty = msg.last
@@ -566,26 +563,32 @@ function Tran_ForSub (TranFunc)					// :3
 					msg.obj = dcl.contains
 					ty.remove
 				  else
-					msg.ReplaceWith(msg.first)
+					msg.ReplaceWith(msg.first!)
 			
 
 
 				////////  COPY VARIABLES, IF USED
 	// what about nested args
 	|| p2 = arg.SCArgNested( node, name_space )    // :) Allow variable capture to work!! :D
-	if (index)
-		FirstInLoop.Prev = MakeDeclOrRel( arg, index, iter.Index.copy )
-
-
-	if (value and !CanKeepValue)
-		// for (x,y) in oof
-		FirstInLoop.Prev = MakeDeclOrRel( arg, Value, iter.Value.copy )
-
-				//////////// finish off...
-	CollectDeclsFuncBodyJustWhatWeNewlyMade( node, name_space ) // now an arg. Treat as an arg, as above!
-	// what if we just collect only the decls we added?
-
-	Tran_While( fn, node2, p2 )
+	if !p2
+		error (arg, "Can't create argument") // should never happen
+	  else
+		if (index)
+			|| it_ind = iter.Index
+				FirstInLoop.Prev = MakeDeclOrRel( arg, index, it_ind.copy(index) )
+			  else
+				error (index, "This iterator has no index")
+	
+	
+		if (value and !CanKeepValue)
+			// for (x,y) in oof
+			FirstInLoop.Prev = MakeDeclOrRel( arg, Value, iter.Value!.copy(value) )
+	
+					//////////// finish off...
+		CollectDeclsFuncBodyJustWhatWeNewlyMade( node, name_space ) // now an arg. Treat as an arg, as above!
+		// what if we just collect only the decls we added?
+	
+		Tran_While( fn, node2, p2 )
 	EndLoopMarker.Remove
 
 
@@ -597,14 +600,14 @@ function Tran_Sdt (|Message| exp)
 	exp.Func = @dot
 
 
-function Tran_ForStart (|Message| arg, |Message| index, |SCBase| p)
-	|| start = arg.GetMarker( "start" )			#require
+function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
+	|| start = arg.GetMarker( "start" )				#require
 	
 	expect (index) (arg, "No index found for the iterator for this loop." ) 
 	
 	using (arg)
 	|| CondName = UniqueTmpVar(p, "first")			// copy the index
-	Arg.parent.Prev = MakeDecl( "", CondName, index.copy(arg) )
+	Arg.parent!.Prev = MakeDecl( "", CondName, index.copy(arg) )
 
 	|| IfTest = «tmp "if"
 		«bra
@@ -618,7 +621,7 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCBase| p)
 	»
 	
 	arg.First = IfTest
-	IfTest.Next.Move( start, iftest.last )
+	IfTest.Next!.Move( start, iftest.last )
 	SC_MakeComment(start)
 
 
@@ -631,11 +634,11 @@ function Tran_Syx (|Message| msg, |Message|)
 	
 	msg.name	= "helper"
 	|| name		= msg[@thg]							#require
-	|| arg		= msg[@arg, -1]						#require
+	|| arg		= msg.last(@arg)					#require
 	|| Params	= msg.find(@bra).find(@thg)
 
 	using (msg)
-	ifn Params
+	if !Params
 		params = «thg »
 		name.Next = «bra, params »
 
@@ -671,7 +674,7 @@ function Tran_Syx (|Message| msg, |Message|)
 		»
 	»
 
-	dcl.first.replacewith(fn_msg)
+	dcl.first!.replacewith(fn_msg)
 
 	Compiler.SyxArray <~ OldName
 	Compiler.Collect( dcl, true )
@@ -680,24 +683,30 @@ function Tran_Syx (|Message| msg, |Message|)
 
 
 
-function Tran_Isa (|Message| S, |SCBase| p)
-	|[Message]| Isas
-	require compiler.CollectIsaTests( s.first, isas )
-	for isa_ in Isas
-		TranOneIsa( isa_, s.find(@arg), p )
+function Tran_Isa (|Message| S, |SCNode!| p)
+	expect (!IsaTester.t.inuse) (s, "Too many nested isas")
+	isatester.t.inuse = true
+	if compiler.CollectIsaTests( s.first! )
+		|| n = isatester.t.count
+		for i in n
+			|| isa_ = isatester.t.items[i]
+			Tran_OneIsa( isa_, s.find(@arg), p )
+	isatester.t.inuse = false
+	isatester.t.count = 0
 
 
 
-function TranOneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
+function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCNode!| space)
 	require (arg)
 	
-	|| List			= isa_f.Last
-	|| L			= List.First
-	|| R			= L.next
-	|| cls			= R.AsModule.Cls
+	|| List			= isa_f.Last!
+	|| L			= List.First!
+	|| R			= L.next!
+	|| cls			= R.ObjCls
+	expect (cls) (r, "This is not a real class.")
 	expect (!cls.IsRole) (r, "This is not a real class. Test it's super-class instead.")
 	|| OldDecl		= space.LookupVarDecl( L.name )					#require
-	|| NewDecl		= OldDecl.Copy
+	|| NewDecl		= OldDecl.copydecl
 	NewDecl.IsTypeImprove = true
 	NewDecl.IsLookupOnly = OldDecl
 	
@@ -707,18 +716,18 @@ function TranOneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
 		if !oldcont or it.type.real_isa(oldcont.type)
 			newdecl.contains = it // oop
 	Space.access := Dictionary.new
-	Space.access[ L.name.lowercase ] = NewDecl // I think?
+	Space.access![ L.name.lowercase ] = NewDecl // I think?
 
 
 
 function Tran_FuncTable (|Message| msg, |bool|)
 	|| nameMsg		= msg[@thg]$
-	|| protoMsg		= namemsg.next
+	|| protoMsg		= namemsg.next$
     expect (protomsg == @bra or @prm or @list) (protomsg)
-	|| items		= protoMsg.next(@arg)$
-	|| ProtoFirst	= protomsg.first
+	|| items		= protoMsg.Next(@arg)$
+	|| ProtoFirst	= protomsg.first!
 	|| name			= namemsg.name
-	|| protoName	= protofirst.name
+	|| protoName	= ProtoFirst.name
 	if (protofirst != @thg)								// seems to work???
 		protomsg.replacewith( «thg protoname » )
 		protoname = "Fn_" + name
@@ -734,7 +743,7 @@ function Tran_FuncTable (|Message| msg, |bool|)
 	msg.clear
 	msg.func = @decl
 	msg <~ «emb »
-	msg <~ neweqrel( «thg name », items )
+	msg <~ NewEqRel( «thg name », items )
 	
 	for I in items
 		|| item_value	= I.Last
@@ -743,7 +752,7 @@ function Tran_FuncTable (|Message| msg, |bool|)
 		|| sigh			= item_name // lol... needed
 
 		|| ListOK = (item_name == @prm) and (i == @item) 
-			i.become(@tmp, item_name.first.name) // too awkward otherwise
+			i.become(@tmp, item_name.firstname) // too awkward otherwise
 
 		if (i == @tmp)
 			// tmp (asdasdasdas)
@@ -771,28 +780,28 @@ function Tran_FuncTable (|Message| msg, |bool|)
 
 		while item_value
 			if (item_value == @Thg or @dot or @bra)
-				ifn ARel
+				if !ARel
 					ARel = «brel "&"»
 				  else
 					arel = arel.copy
-				item_value = item_value.unbra.WrapWith( ARel )
+				item_value = item_value.unbra!.WrapWith( ARel )
 			  else
+				check (item_value != @emb) (item_value, "Use an argument instead.")
 				if (item_value != @arg)
 					item_value = item_value.wrapwith(@arg.msg)
 			
 				// create a function...
-				ifn newname
+				if !newname
 					NewName = name + "_" + item_name.CollectFuncTableName
 					msg.CollectionPlace <~ ArgToFunc( NewName, «Thg protoName », item_value )
 				I <~ «brel "&", «Thg NewName »»
 			
 			|| iname = i.name
-			if  i == @tmp
+			if  (i == @tmp) and table_name // why would this be nil?
 				i.first = «str table_name.name »
 				i.become(@item)
 			
-			table_name = table_name.next
-			if (sigh != @prm) or !table_name
+			if (sigh != @prm) or table_name.IsLast
 				exit
 			|| newi = «tmp iname »
 			i.prev = newi
@@ -804,7 +813,7 @@ function Tran_FuncTable (|Message| msg, |bool|)
 
 
 
-function message.NotNilRZ (|scdecl| type,  |scbase|space)
+function message.NotNilRZ (|scdecl| type,  |SCNode|space)
 	opt norefcounts
 	|| rel = .last$
 	|| Nel = rel.last$
@@ -818,7 +827,7 @@ function message.NotNilRZ (|scdecl| type,  |scbase|space)
 		typeofexpr(nel, space)
 
 
-function message.MiniTran (|scbase| name_space, |string| On="app")
+function message.MiniTran (|SCNode| name_space, |string| On="app")
 	using (self)
 		self <~ «prm, .first »
 		.first = «thg on »
@@ -826,16 +835,31 @@ function message.MiniTran (|scbase| name_space, |string| On="app")
 	TypeOfExpr( self, name_space )
 
 
-function compiler.CollectIsaTests (|Message| s, |[Message]| out, |bool|)
+
+struct IsaTester // annoyed at creating arrays all over.
+	|Message--[4]|	Items
+	|int| 			Count
+	|bool|			InUse
+	
+	module
+		|IsaTester| T
+		syntax append (|message| o)
+			if t.count < 4
+				t.items[t.count++] = o
+
+
+function compiler.CollectIsaTests (|Message| s, |bool|)
+	// use a global array
 	opt norefcounts
 	s = s.unbra
 	if s == @rel
 		|| L = s.first
 		|| Op = L.Next
+		expect (l and op) (s, "Missing syntax") // can this ever not exist, though?
 		if op == "and" // append results...
-			|| R2 = s.Last
-			|| A2 = CollectIsaTests( L, out )
-			|| B2 = CollectIsaTests( R2, out )
+			|| R2 = s.Last!
+			|| A2 = CollectIsaTests( L )
+			|| B2 = CollectIsaTests( R2 )
 			Return A2 or B2
 		Return (op != "or")
 	
@@ -843,19 +867,61 @@ function compiler.CollectIsaTests (|Message| s, |[Message]| out, |bool|)
 	if s != @func
 		Return true
 
-	|| List = s.last
+	|| List = s.last!
 	|| f = List.AsFunc
 	ifn (f isa SCFunction) and (f is TypeTest)
 		Return true
 	
 	|| L1 = List.First
 		|| R1 = L1.next
-			|| RObj = R1.obj
-			if Robj isa SCModule
+			|| cls = R1.ObjCls
 				if f == .fnisa
-					if Robj.cls and !robj.cls.Hassubclass
+					if !cls.Hassubclass
 						list.obj = .fnFastisa
 				if L1 == @Thg
-					out <~ s
+					IsaTester <~ s
 					Return true
  
+ 
+function message.ObjCls (|scclass|)
+	opt norefcounts
+	|| o = .obj as scdecl // blindcast instead? its never NOT this.
+		if o is ClassObj
+			return o.contains!.type
+
+
+function Message.Next_Index (|sciterator| iter, |message| node2)
+	|| i = iter.index
+		.prev = NewEqRel( i.copy(node2), .last )
+	  else
+		debugger 
+
+
+function message.CheckContinuesAndExits
+	opt norefcounts
+	nil self
+	
+	for msg.flat in self
+		if (msg == @tmp)
+			if (msg == "for" or "while")
+				continue_with msg.FlatAfter
+			
+			  elseif (msg == "continue")
+				msg.LoopContinue
+			  elseif (msg == "exit")
+				msg.LoopExit
+
+
+function message.LoopExit
+	.LoopExitter(ASMtmp.kExit, SCBlockage.Exit)
+
+
+function message.LoopContinue
+	.LoopExitter(ASMtmp.kContinue, SCBlockage.Continue)
+
+
+function message.LoopExitter (|int| ASMType, |SCBlockage| ExitCode)
+	.ExpectEmpty
+	.TmpType = ASMType
+	.LastInBlock(ExitCode)
+	

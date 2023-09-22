@@ -1,3 +1,11 @@
+#!/usr/local/bin/spd
+
+main (|string| name)
+	using "total"
+	|| d = Anagrams.find(name)
+	for v in d
+		printline v
+
 
 class Anagrams
 	|dictionary of string|		out
@@ -38,8 +46,3 @@ class Anagrams
 			using "anagram"
 				Anagrams(rz, s).find("", "", 0)
 
-main
-	using "total"
-		|| d = Anagrams.find(app[0])
-		for v in d
-			printline v

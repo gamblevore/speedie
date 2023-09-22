@@ -8,12 +8,8 @@ constants
 module Options
 	flags: native,pack
 	
-	function StrNil (assigns:|int|)
-		.NilStrength = value.clamp(errorseverity.hint, errorseverity.error)
-
 		
-	||		NilStrength				= ErrorSeverity.Hint // collect via options... ErrorSeverity.problem
-	
+	||		NilStrength				= errorseverity.error	
 	||		BannedClasses			= nil|dictionary|
 	||		output_path				= ""
 	||		SingleFileInput			= ""
@@ -22,9 +18,9 @@ module Options
 	||		SingleCppOutput			= true
 	||		HideMultipleErrors		= true
 	|| 		NilTestAllocNeverFails	= true
+	|| 		Beep					= false
 	||		Cpp						= true
 	||		Compile					= true
-	|| 		UnusedFunctions			= false
 	||		MakeASM					= false
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
@@ -53,7 +49,8 @@ module Options
 	|byte|	Optimise				= 1
 	|byte|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
-	|byte|	Perry					= 0
+	|byte|	PerryOutput				= 0
+	|byte|	UseScriptLoc			= 0
 	
 	function Color (assigns:|bool|)
 		ErrorColors.enabled = Value
@@ -72,12 +69,12 @@ module Feedback
 	function CheckSelfModifying
 		|| t2 = .CheckSelfModifying2
 		if t2 == 1
-			Options.SelfReplacement = kSelfReplace
+			Options.SelfReplacement = kSelfReplace // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
-			Options.GenFlowControlCode = app.prefs["self_flow"].yes
-			Targets["flow"] = options.GenFlowControlCode
-			targets["self"] = true
+			Options.GenFlowControlCode = app.pref("self_flow").yes
+			SC_Targets["flow"] = options.GenFlowControlCode
+			SC_Targets["self"] = true
 		  elseif t2 == 2
 			Options.ProjectIsMiniLib = true
 
@@ -85,7 +82,8 @@ module Feedback
 	function CheckSelfModifying2 (|int|)
 		require !options.singlefileinput
 		
-		|| p = compiler.BaseProjectPath.TrimSlashes(true)
+		|| bpp = compiler.BaseProjectPath$
+		|| p = bpp.TrimSlashes(true)
 		|| spd = compiler.speedie.TrimSlashes(true)
 		|| jb = compiler.jeebox.TrimSlashes(true)
 		if p ~= spd
@@ -102,12 +100,9 @@ module Feedback
 
 
 	function StopStripping
-		if ("".length == 1)
+		if ""
 			"".debugprint // stop from being stripped
 			nil|message|.jdb2
-			nil|message|.LocateAll
-			nil|scfunction|.NilDebug
-			nil|scdecl|.NilDebug
 	
 	
 	function ParseArgsSub (|[]| args, |bool|) 
@@ -122,9 +117,9 @@ module Feedback
 			.ParseOption(S)
 		
 		if options.OperationCount <= 0
-			StdErr.newerror( "\nError: No operations requested.\n" )
+			errorreceiver.newerror( "\nError: No operations requested.\n" )
 		  elseif options.OperationCount >= 2
-			StdErr.newerror( "\nToo many operations requested.\n" )
+			errorreceiver.newerror( "\nToo many operations requested.\n" )
 
 		return StdErr.OK and Compiler.BaseProjectPath.Exists
 
@@ -180,8 +175,8 @@ module Feedback
 				app.quit("Unknown switch '$Name'\n")
 		  elseif value.isjbin // ignore it
 			0 // probably a restart compile option
-		  elseif (options.OperationCount == 1) and !options.output_path
-			feedback.AppOptions_output_path("output_path", value) // change to output_path
+		  elseif (options.OperationCount == 1)
+			error ("Too many input projects: " + value)
 		  else
 			.TryUseProject(Value)
 			options.OperationCount++
@@ -203,38 +198,35 @@ module Feedback
 		return CompilerInfo()
 
 
-	function AppTalk (ShellOption) 
-		Explain(Purpose, "")$
-		interact.ShouldEnter = 1
-		ErrorColors.enabled = false
-
-
 	dispatch AppOptions (ShellOption)
-		nocompile // remove this later
+		+"nocompile" // remove this later
 			Explain(Purpose, "Will not compile any .cpp generated.")$
 			Options.Compile = false
 			options.products &=~ (options.pack+options.native)
 			
-		breakonerr 
+		+"breakonerr" 
 			Explain(Purpose, "")$
 			error.AutoPrint = value.optionint
 		
-		path
+		+"path"
 			Explain(Purpose, "")$
 			printline app.exepath
+			
+		+"beep"
+			Explain(Purpose, "Beeps after compile is complete")$
+			options.beep = value.optionbool
 		
-		keepallerrors
+		+"keepallerrors"
 			explain(purpose, "Show more errors that were hidden.")$
 			options.KeepAllErrors = value.optionbool
 
-		env
+		+"env"
 			explain(purpose, "Print environment variables")$
 			for (s in app.env) (k)
 				printline k + ": " + s
 			return true
-			
-		externalcompile (AppTransCompile) // deprecated. remove
-		x (AppTransCompile)
+		
+		+"x" (AppTransCompile)
 		
 		+"arch"
 			|| str = "intel/arm/ppc/spd"
@@ -249,12 +241,15 @@ module Feedback
 				
 		+"perry"
 			Explain(Purpose, "")$
-			options.perry = 1
+			options.perryoutput = 1
 			|| RealPerry = value~="bin"
-			options.perry += RealPerry // argvalue not needed? jsut value, right?
-			//error.AutoPrint = (!RealPerry)|int|
-			compiler.insecurewords = file.PrefsFolder["klinkerhoppen.banned"].readall.dict
-		
+			options.perryoutput += RealPerry // argvalue not needed? jsut value, right?
+			compiler.insecurewords = file.PrefsFolder["klinkerhoppen.banned"]!.readall.dict
+
+		+"usescriptloc"
+			Explain(Purpose, "")$
+			options.usescriptloc = true
+
 		+"check"
 			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$
 			Options.Compile = false
@@ -274,7 +269,7 @@ module Feedback
 			explain(Purpose, "Adds control-flow logging to generated compiles")$
 			|| b = value.optionbool
 			Options.GenFlowControlCode = b 
-			targets["flow"] = b
+			SC_Targets["flow"] = b
 
 		+"log"
 			explain(Purpose, "Logs the compiler's internal behaviour.  0 = off,  1 =  log,  2 = log+validate")$
@@ -285,6 +280,7 @@ module Feedback
 		
 		+"noisy"
 			Explain(Purpose, "Prints more stuff.")$
+			"NoiseActivated"
 			Options.PrintCompileString = true
 			file.DebugExecute = true
 			options.PrintLibraries = true
@@ -307,31 +303,36 @@ module Feedback
 			options.products = P
 			
 
-		ignorecantsave 
+		+"ignorecantsave" 
 			Explain(Purpose)$
 			options.IgnoreCantSaveErrors = true
 		
 
-		quiet 
+		+"quiet" 
 			Explain(Purpose, "Prints less stuff")$
 			Options.PrintCompileString = false
+
+		+"silent"
+			Explain(Purpose, "Prints much less")$
+			Options.PrintCompileString = false
+			options.silent = true
 		
 		
-		stages
+		+"stages"
 			Explain(Purpose, "Prints the stages")$
 			options.printstages = value.optionbool
 		
 		
-		print 
+		+"print" 
 			Explain(Purpose)$
 			print Value
 			return true // does something, counts towards operationCount
 		
 		
-		directtest 
+		+"directtest" 
 			explain(Purpose, "Allows me to test certain compiler features more easily.")
 			options.isdirecttest = value.OptionBool
-			targets["direct"] = options.isdirecttest
+			SC_Targets["direct"] = options.isdirecttest
 		
 		
 		+"single" 
@@ -341,19 +342,21 @@ module Feedback
 		
 		+"self" 
 			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$
+			options.perryoutput = 1
 			feedback.TryUseProject( Compiler.SpeedieProj )
 			return true // does something, counts towards operationCount
 		
 		+"nil"
-			Explain(Purpose, "Changes how bad nil-errors are.")$
-			options.strnil = value.int
+			Explain(Purpose, "Enable/disable nil-errors.")$
+			if value.yes
+				options.nilstrength = errorseverity.error
+			  else
+				options.nilstrength = 0
 			
 		+"crash"
 			explain(purpose, "Crashes speedie to test it's crash handlers.")$
 			app.crash
-		+"__talk__" (AppTalk)
-			
-		+"talk" (AppTalk)
+		
 		+"asm" // nothing... for now.
 			options.MakeASM = value.optionbool
 		
@@ -365,36 +368,36 @@ module Feedback
 			Explain(Purpose, "Set names used by preprocessor. --target=AnyName")$
 			if value == "debug"
 				error "Use 'targetdebug' instead."
-			targets[value]=true
+			SC_Targets[value] = true
 			
-		m64
+		+"m64"
 			Explain(Purpose, "64-bit compile")$
-			options.Compile32Bit = 0
+			options.Compile32Bit = false
 		
-		funccount
+		+"funccount"
 			Explain(Purpose, "Spams each func with a static int, to count the number of times it's called. Useful debugging feature.")$
 			options.UseFuncCallCount = value.optionbool
 
 
-		m32
+		+"m32"
 			Explain(Purpose, "32-bit compile")$
-			options.Compile32Bit = 1
+			options.Compile32Bit = true
 
 		
-		warn
+		+"warn"
 			Explain(Purpose, "Show warnings.")$
 			Options.Warnings = value.optionbool
 
 		
-		maxvars
+		+"maxvars"
 			Explain(Purpose, "Reports maximum number of vars/funcs/args used in program.")$
 			Options.checkmaxvars = value.optionbool
 		
-		nocolor
+		+"nocolor"
 			Explain(Purpose, "Don't print text coloring symbols for terminals.")$
 			Options.Color = false
 		
-		selfdebug
+		+"selfdebug"
 			Explain(Purpose, "Self-test only.")$
 			Options.SelfReplacement = kSelfDebug
 			options.targetdebug = true
@@ -404,51 +407,50 @@ module Feedback
 			feedback.TryUseProject( Compiler.SpeedieProj )
 			return true // does something, counts towards operationCount
 		
-		optimise
+		+"optimise"
 			Explain(Purpose, "Optimisation level. (0 to 3... EG: '--Optimise=1')")$
 			Options.Optimise = Value.parseint
 
-		cpp
+		+"cpp"
 			explain(purpose, "Compiles to cpp. Default true")$
 			options.cpp = value.optionbool
-		
-		output_path
+				
+		+"output_path"
 			explain(purpose, "Specifies the build product path")$
 			options.output_path = value.pathfix
 			options.output_path.parent.file.mustexist
 			options.ForceRecompile = true // it's what we expect
 		
-		force
+		+"force"
 			explain(purpose, "Forces recompilation even if the output is newer than the input files.")$
 			options.ForceRecompile = true
 
-		variant
+		+"variant"
 			Explain(Purpose)$
-			Options.Variant = (Value.parseInt|int|).Render
-			options.perry = 1
+			Options.Variant = (Value.ParseInt|int|).Render
+			options.perryoutput = 1
 			Options.Color = false
 			if options.optimise < 0
 				options.optimise = 1
 
-		
-		final
+		+"final"
 			Explain(Purpose)$
 			Options.Final = true
 		
-		codesign
+		+"codesign"
 			Explain(Purpose, "Gets/Sets the codesign certificate")$
 			if value == ""
-				printline app.prefs(codesign_native)
+				printline app.pref(codesign_native)
 				return true
 			
 			if value == "none" or "nil" or "-"
 				value = ""
-			app.prefs(codesign_native) = value
+			app.pref(codesign_native) = value
 			app.saveprefs
 			printline "Codesign set to " + value
 			return true
 		
-		dosign
+		+"dosign"
 			Explain( Purpose, "Code signs an app." )
 			
 			return true
@@ -460,11 +462,11 @@ module Feedback
 				"Cleaned"
 			return true // does something, counts towards operationCount
 		
-		version (AppVersionNumber)
+		+"version" (AppVersionNumber)
 		
-		v		(AppVersionNumber)
+		+"v"		(AppVersionNumber)
 		
-		help
+		+"help"
 			Explain(Purpose, "This.")$
 			Help()
 			return true
@@ -472,8 +474,10 @@ module Feedback
 
 	function string.OptionBool (|bool|)
 		return (self ~= "" or "true" or "yes")
+	
+	
 	function string.OptionInt (|int|)
-		if .optionbool
+		if .OptionBool
 			return 1
 		return .int
 
@@ -491,17 +495,18 @@ module Feedback
 		fs <~ " /path/to/project\n"
 		fs <~ "Installation: ${compiler.SpeedieProj.parent}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
-		fs <~ "  SelfFlow: " 
-		fs <~ app.prefs["self_flow"]
-		for (v in appoptions) (k) 
+		fs <~ "  SelfFlow: ",  fs <~ app.pref("self_flow")
+		fs <~ "  @max: ${@max|int|}"
+		for (v in AppOptions) (k) 
 			(*v)("", "", fs_tester)
-			if (fs_tester.length) 
+			|| val = v.Value|shelloption|
+			if (val and fs_tester.length) 
 				fs_tester.length = 0
 				fs <~ "\n--"
 				fs <~ k
 				fs <~ (' ', 17-k.length)
-				(v.value|shelloption|)("", "", fs)
-		printline fs.getresult
+				(val)("", "", fs)
+		printline fs.GetResult
 
 
 prototype ShellOption			(|string| Name, |string| Value, |faststring| purpose=nil, |bool|)

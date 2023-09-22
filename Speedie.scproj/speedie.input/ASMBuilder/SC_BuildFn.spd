@@ -14,7 +14,7 @@ extend_module ASM
 	function TestASM 
 		.enc1
 		require options.makeasm
-		|| dev = app.prefs["dev"].int
+		|| dev = app.pref("dev").int
 		if dev >= 2
 			asm.noisyasm = 3
 		if asm.noisyasm >= 3
@@ -31,7 +31,7 @@ function message.GetASMFunc (|message|)
 	opt norefcounts
 	if .reg >= 0
 		|| op = .next(@opp, "=")$
-		|| Adj = op.next(@adj)$
+		|| Adj = op.Next(@adj)$
 		return adj[@func]
 
 
@@ -39,7 +39,7 @@ extend_module SCFunction
 	function LinkAll (|[scfunction]| Funcs)
 		opt norefcounts
 		for fn in funcs
-			if fn.CurrReacher
+			if fn.MyReacher
 				.Link(fn)
 
 	function Link (|SCFunction| fn)
@@ -50,7 +50,7 @@ extend_module SCFunction
 
 
 function IR.Encode (|ASM|)
-	return (ASM.encoders[.op])(self)		
+	return (ASM.encoders[.op]!)(self)		
 
 	
 function @asm.Enc1

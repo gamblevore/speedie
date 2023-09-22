@@ -1,0 +1,29 @@
+
+
+// watch those morons burn
+
+
+
+
+class GlyphString
+	linkage
+		cpp_part gly
+	|string|		Text
+	|int|			Pos
+	|int|			Length
+	
+	constructor (|string| t, |int| pos)
+		.text = t
+		.pos = pos
+
+	function Next (|string|)
+		|| p = .pos
+		require (p < .text.Length)
+		.Length = .text[p].utf8size
+		.Pos = p + .Length
+		return .text[p, .pos]
+
+	syntax cast (|bool|)
+		return self!=nil and .Pos < .Length
+
+

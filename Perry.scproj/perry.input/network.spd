@@ -1,5 +1,0 @@
-
-// first we need to figure out what lib to use...
-// then wrap it
-// libcurl has gigantic dependancies that I don't want to have to deal with.
-

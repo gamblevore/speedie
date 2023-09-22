@@ -1,134 +1,191 @@
-
-prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
-
+/*
+	OK, how to redesign function pointers
+	
+	So... they should always be pointers, right?
+	
+	even the original? the original just happens to be a "real" pointer, but otherwise they should be
+	declared as optional... at least as a param. Or just be realish like normal pointers... basically.
+	
+*/
 
 extend Message {
 
-function RedundantTest (|bool| real, |nilcheckmode|)
-	if StdErr.CanAddMore(errorseverity.problem)
-		|| str = ("Redundant test on always-real object", "Redundant test on nil object")(real)
-		StdErr.NewProblem(self, str)
+function RedundantDeclare (|nilstate| D,  |nilstate|)
+	|| str = .origrender + " redundantly tested. Declared as real." 
+	error (self, str)
+	return D
 
 
-function NilPropAccess (|bool|)
+function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
+	if (Test is soft or while) // allow redundant
+		return Test & nilstate.either
+
+	if ArchonPurger.loops.NestDepth == 0
+		|| str = .origrender + " redundantly tested. Currently is: " + dcl.nilcurr.rawname 
+		error (self, str)
+	return Test & nilstate.either
+
+
+function FastDecl (|SCDecl!|)
 	opt norefcounts
-	|| m = .DotMustBeProperty
-	return m and m isnt onmodule
-
-
-function NilDecl (|scdecl|)
-	opt norefcounts
-	|| obj = .obj
-	if (obj isa scdecl)
+	|| obj = .obj|SCDecl|
+		target debugnil
+			obj.mustbe(SCDecl)
 		|| l = obj.IsLookupOnly
+		if !l
+			return obj // faster
 		if l isa scdecl
-			l.nildebug
 			return l
-		obj.nildebug
 		return obj
-	debugger // if this never happens we can just blindcast
-	
-
-function scfunction.NilDebug
-	cpp_name ndb1
-	|| fs = FastString()
-	if .cls
-		fs <~ .cls.name
-		fs <~ "."
-	fs <~ .name
-	fs <~ "( "
-	for a in .args
-		fs <~ ", "
-		start
-		fs <~ a.name
-		fs <~ " "
-		a.nildeclared.nilname(fs, true)
-	fs <~ " )"
-	printline fs
+	app.Crash 
 
 
-function scdecl.NilDebug
-	cpp_name ndb2
-	|| fs = FastString()
-	fs <~ .name ?? "?"
-	fs <~ " "
-	|| d = .NilDeclared
-	d.NilName(fs, false)
-	d &= ~ NilState.Stated
-	if .nilused != d
-		fs <~ " ("
-		.nilused.nilname(fs, false)
-		fs <~ ")"
-	printline fs
+function SCBlockage.BlockCombine (|SCBlockage| B, |int|)
+	if B == self
+		return self
+	if self is Return
+		return B
+	if B is Return
+		return self
+	debugger,	#!would this even happen ever???
+	return SCBlockage.Continue 	// continue is weaker than exit, so return continue?
 
 
-function nilstate.NilName (|faststring| fs, |bool| expectstated)
-	|| st = (self is Stated)
-	if st == expectstated
-		0
-	  elseif st
-		fs <~ "stated "
-	  else
-		fs <~ "unstated "
-	
-	if self is Either
-		fs <~ "optional"
-	  elseif self is Nilish
-		fs <~ "nil"
-	  else
-		fs <~ "real"
-	
-	
-function LastInBlock
+function LastInBlock (|SCBlockage| Reason)
 	opt norefcounts
 	.RemoveAfter
 
-	|| arg = .parent
-	arg.flags |= kEndsBlock
-	.Flags |= kEndsBlock
+	|| arg = .parent!
+	arg.Blocks = reason
+	.Blocks = reason
 	|| Test = arg.parent
-	require Test istmp "else" // this is really cool!
+	require Test istmp "else"
 
 	while test
-		arg = test.prev // if.arg
-		require arg.Blocks
-		test = arg.parent
-		test.flags |= kEndsBlock
-		if test.TmpType is kif
-			return test.LastInBlock // bubble up :O
+		arg = test.prev!
+		|| B = arg.Blocks		#require
+		Reason = Reason.BlockCombine(B)
+
+		test = arg.parent!
+		if test.TmpType is kif // what about kElseIf? does this already handle that
+			return test.LastInBlock(reason) // bubble up :O
+		  else
+			test.Blocks = Reason
+		
 }
 
 
-function @scfunction.LoopExitter (Tranfunc)
-	|| f = node.first
-		error f
-	check node.FindOwningLoop(fn.sourcearg) (node, "Must be within a loop.")
-	node.LastInBlock
+|message| ReturnSelfEqNil
+
+function @message.NilchCompare (|message|)
+	if ReturnSelfEqNil
+		return ReturnSelfEqNil
+	ReturnSelfEqNil = "return self!=nil"~parse
+	return ReturnSelfEqNil
 
 
-function scdecl.ParamUpgrade
-	if (self is param) and (.NilDeclared isnt stated)
-		.NilDeclared = NilState.optional
+function message.NilCheckMode (|bool| ok, |int|)
+	opt norefcounts
+	rz = 2*OK
+	if rz
+		|| f = .first
+			rz += f.deepequals(message.NilchCompare)
 
 
-datatype NilCheckMode (uint)
-	flags
-		|NilCheckMode| 
-		Nothing = 0
-		Positive
-		Negative
-		AllowRedundant
-		PosRed = Positive + AllowRedundant  
-		Active = Positive + Negative
-
-	syntax is (|NilCheckMode| other, |bool|)
-		return self & other
-
-	syntax isnt (|NilCheckMode| other, |bool|)
-		return !(self & other)
+function message.KinderRemoveAfter
+	opt norefcounts
+	while (|| x = .next)
+		check (x is inserted) (x, "Unreachable code found.") // only complain about user-generated code...
+		x.remove
 	
-	function Negate (|NilCheckmode|)
-		rz  = (self & positive) << 1
-		rz |= (self & negative) >> 1
-		rz |= (self &~ active)  << 0
+
+
+function scdecl.CanUpgradeInternalPointer (|scdecl|)
+	opt norefcounts
+	|| infernal = .internal
+	if (infernal Is Local) and infernal.NilReg
+		return infernal
+
+
+/*
+function scdecl.PrmStateMsg (|string| Err = "Please state", |scfunction| f=nil, |string|)
+	|| fs = faststring()
+	fs <~ Err
+	fs <~ ' '
+	if self is self
+		fs <~ "self"
+	  else
+		fs <~ "param "
+		fs <~ .name
+	fs <~ "'s nilness"
+	if f
+		if f is recursive
+			fs <~ ", on recursive function "
+		  else
+			fs <~ ", to function "
+		f.rendertitle(fs)
+	return fs
+*/
+
+
+function scdecl.PrmStateMsg (|string| Needed, |scfunction| f=nil, |string|)
+	|| fs = faststring()
+	fs <~ "Please state "
+	if self is self
+		fs <~ "self"
+	  else
+		fs <~ "param "
+		fs <~ .name
+	fs <~ "'s nilness. "
+	fs <~ Needed
+	return fs
+
+
+function scdecl.NilPrmFail (|message| where, |scfunction| f)
+	error (f.Source, .PrmStateMsg("", f))
+/*	|| fs = faststring()
+	fs <~ .PrmStateMsg("", f)
+	if f is recursive
+		fs <~ ", on recursive function."
+*/
+
+
+function message.IsNowNil (|int|)
+	opt norefcounts
+	|| d = .obj|scdecl|
+		Target debugnil: if !(d as scdecl)
+		if (d == TypeNil)
+			return 1
+		if d.NilCurr == nilstate.nilish
+			return 2
+
+
+function scdecl.TypeSuffers (|bool|)
+	if .iscarray
+		return false
+	if .PointerCount
+		return true
+	|| d = .type.BaseType
+	return d == SCNodetype.FuncProto or SCNodetype.Object
+
+
+function SCdecl.IsCArray (|bool|)
+	return .c_array > 0 // change this later to allow carrays of 0.
+
+
+function scdecl.NilStated (|bool|)
+	return .NilDeclared is Stated
+
+
+function scfunction.CanNil (|bool|)
+	if .badness != 0 and .badness != 128
+		return false
+	return !.IsMacro and !.IsWrapper and !.isdisabled
+
+
+function scfunction.WantAs (|nilstate| NS)
+	opt norefcounts
+	|| dcl = .args.first
+	expect (dcl and dcl.typesuffers and .cls) (.source, `This function should not specify nilness of self.`)
+	dcl.nildeclared = NS
 

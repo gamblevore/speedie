@@ -2,21 +2,26 @@
 
 extend PerryIDE
 	function Recheck 
-		require .ModifiedForCompile
-		.ModifiedForCompile = false
-		.ForceRecheck
+		if .ModifiedForCompile
+			.ForceRecheck
+		|| p = .path					#debug_require
+		|| unused = @tmp + "unused_funcs"
+		unused <~ p
+		|| lf = .LostFunks
+			unused <~ lf.copy
+		.SendFeedbackMsg(unused)
 		
 	function ForceRecheck
+		.ModifiedForCompile = false
+		.Feedback = nil
 		if .IsSpeedieCode and !.UsingSpdLib
-			.SendFeedbackStr "check"
-
+			.AskCheck
+	
+	function AskCheck
+		.SendFeedbackStr "check"
 
 	syntax is (|ListViewState| s, |bool|)
 		return .projmsg.syntaxis(s)
-		
-
-	syntax isnt (|ListViewState| s, |bool|)
-		return !.syntaxis(s)
 		
 
 	syntax is (|ListViewState| s, assigns:|bool| mod)
@@ -25,12 +30,7 @@ extend PerryIDE
 		
 		if (s == listviewstate.modified)
 			|| sub = .CurrFileName.SubMenu
-				|| src = sub.ListSource
-					(src is modified) = Mod
-
-
-	syntax isnt (|ListViewState| s, assigns:|bool| b)
-		.syntaxis(s)=!b
+				(sub.ListSource is modified) = Mod
 
 
 	function ClearErrors (|bool| Compiled)
@@ -40,38 +40,73 @@ extend PerryIDE
 		.editme.ClearErrors
 		.filelist.ClearErrors
 		.RelistStartupErrors
+		.UpdateErrorCount
+		
 	
 	
-	function CompiledOK (|message| msg, |bool|)
-		isnt active
-		.ClearErrors(msg=="compile")
+	function CheckedOK (|string| kind, |bool|)
+		.ClearErrors(kind=="compile")
 		if .viewing == .ViewErrors
 			.NoNeed(.CompileOKString, .viewfiles)
 		return true
 
+	function message.ActualReplaceError (|string| src)
+		|| SubError = src.parse.first
+			.ReplaceWith(suberror)
+	
+	function message.CleanErrors
+		opt norefcounts
+		for e in self
+			|| a = e.arg
+				|| f = a["file"]
+				|| str = a.firstName
+				if (f ~= "(string)") and (str[0, "error\n"])
+					e.ActualReplaceError(str)
 
-	function ShowCompileErrors (|message| msg, |bool|)
-		isnt active
-		|| MaybeOK = msg.first
-		if (MaybeOK == "ok")
+
+	function ShowCompileErrors (|message!| msg, |bool|)
+		|| MaybeOK = msg.last
+		if (MaybeOK == @thg and "ok")
 			.ErrorList.clear
-			return .CompiledOK(msg)
-
+			.UpdateErrorCount
+			return .CheckedOK(msg.name)
+	
+		// inconsistant input...
+		|| arg = msg
+		if arg != @arg
+			arg = msg.arg
+		  else
+			maybeok = msg
+		arg.cleanErrors
+		
 		is Broken
 		.NoNeed
-		.errorlist.listsource = error.from(MaybeOK)
+		|| newlist = error.from(MaybeOK)
+		newlist := Error()
+		.errorlist.listsource = newlist
+		.UpdateErrorCount
+		if .ErrorList isnt Visible
+			beep
+		.ShowErrors
 
+
+	function UpdateErrorCount
+		opt norefcounts
+		|| h = .errorlist.headers
+			|| n = .errorlist.listsource.slowcount
+				h.name = n of "error"
+			  else
+				h.name = ""
 
 	function Compile (|string| operation)
-		if .isBuilding
-			if .editsep.div.Collapsed
-				.ShowStdOut 
-				return 
+		if .isBuilding // they pressed it twice
+			if .ProductSep.div.Collapsed
+				return .ShowCompileTab(.SpeedieText, true)
 			require ClickedCancel(.BuildButton)
-		.ActualCompile(.CompileMsg(operation, true))
+		.ActualCompile(operation)
 			
 	
-	function CompileMsg (|string| operation, |bool| SaveAll, |message|)
+	function CheckMsg (|string| operation, |bool| SaveAll, |message|)
 		if SaveAll
 			require .filelist.SaveAll(documentstate.saving)
 		|| cmd = @tmp + operation
@@ -84,12 +119,12 @@ extend PerryIDE
 		// we actually... hmmm... can't open the debugger yet. not until it's made!
 	
 		
-	function ErrorListFB (|message| msg, |bool|)
+	function ErrorListFB (|message| msg, |bool|)			// errorfb, errorsfb
 		|| RealErrors	= msg ~!= "check"
 		.ClearErrors(RealErrors)
 		|| NoErrors		= .ShowCompileErrors(msg)
-		|| ErrsVis		= .isviewing(.errorlist) 
-		.errorlist.selectfirst
+		|| ErrsVis		= .isviewing(.ErrorList) 
+		.errorlist.SelectFirst
 		if !RealErrors
 			0
 		  elseif NoErrors
@@ -107,51 +142,76 @@ extend PerryIDE
 	function LogFB (|message| msg)
 		// ignore.
 	
-	function Readlog
-		if .isBuilding
-			.justreadlog
-
-	function JustReadLog
-		opt norefcounts
-		.speedietext <~ .Compilr.ReadStdOut
 	
+	function Readlog (|bool| Killed=false)
+		|| c = .Compilr $
+		.speedietext <~ c.ReadStdOut
+		require !c.IsRunning or Killed
+
+		|| OK = !killed and .TestCompilerAlive
+
+		|| errs = c.ErrorOutput.GetResult
+			|| p = errs.parse
+				.ShowCompileErrors(p)
+			// notifications will pick up the err otherwise!
+		  elseif OK
+			|| msg = @tmp + "compile"
+			msg <~ (@thg, "ok")
+			.ShowCompileErrors(msg)
+			.CompiledOK
+		.compilr = nil
+		.RenableAfterCompile
+
+
 	function Say (|string| str)
 		target osx
 			if !.IsFront or SDLApp.IsBackground
-				.Talker = ShellStream("/usr/bin/say", [.name.trimext + str])
+				.Talker = Process.stream("/usr/bin/say", [.name.trimext + str])
 	
-	function CompileFB (|message| msg, |bool|)
+	
+	function CompiledOK
 		|| db = .DebugIsWaitingForCompile
-		.CancelCompile
-		|| first = msg.first						#require
-		if first == @arg // an error-list
-			return .ErrorListFB(msg)
-		.CompiledOK(msg)
+		.CheckedOK("compile")
+		|| msg = .speedietext.text.parse
 		
-		require self isnt broken
-		|| file = @url + "file"
-		file <~ first
-		|| str = "\n\nCompiled OK!"
-		.notify(.name + str, file)
-		.say(str)
-		if db
-			.StartDebugging(msg.first.name.file)
-				
+		|| last = msg[@tmp, -1]
+		if last.expect(@tmp, "Product")
+			|| path = last[@nil]
+			if path.ExpectString
+				|| file = @url + "file"
+				file <~ path
+				|| str = "\n\nCompiled OK!"
+				|| f = path.name.file
+				if !f.exists
+					str += " But it doesn't exist :("
+				.notify(.name + str, file)
+				.say(str)
+				if db
+					.StartDebugging(f)
+					
 				
 	function Notify (|string| What, |message| response=nil)
 		|| c = what
 		if response
 			c = what + ("\n" + response.render) // hmmm... seems awkward
-		.logonecomm(@emb + ("\1b " + c))
+		.LogOneComm(@emb + ("\1b " + c))
 		notifications <~ (what, response)
 	
 	
-	function CancelCompile 
+	function CancelCompile (|string| why="CompiledOK")
+		|| c = .Compilr
+			c.Kill
+			app.Sleep(0.025) // allow pipes to work
+			.Readlog(true)
+		  else
+			.RenableAfterCompile
+	
+	function RenableAfterCompile
 		.DebugIsWaitingForCompile = false
-		.compilr.KillButOK? // frees memory
 		(.buildbutton is enabled)
+		(.buildbutton is visible)
 		(.runbutton is enabled)
 		(.progress isnt visible)
-		.JustReadlog
+		.HideStuff
 		isnt active
 

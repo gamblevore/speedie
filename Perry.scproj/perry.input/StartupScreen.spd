@@ -12,8 +12,8 @@ class StartupWindow (window) // splashscreen, startupscreen, startwindow
 	module
 		|StartupWindow|			_win
 
-		function ClickedOpen (guimenuevent)
-			startupwindow.Show
+//		function ClickedOpen (guimenuevent)
+//			startupwindow.Show
 
 		function Open (guiaction)
 			startupwindow.Show
@@ -29,7 +29,7 @@ class StartupWindow (window) // splashscreen, startupscreen, startwindow
 			opt norefcounts
 			if !vis
 				|| i = perry.ide
-				require (.Vis and i and i.project)
+				require (.Vis and i)
 			with .create
 				if !vis
 					.hide

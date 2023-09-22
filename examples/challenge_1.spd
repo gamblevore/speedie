@@ -1,0 +1,10 @@
+#!/usr/local/bin/spd
+
+https://www.youtube.com/watch?v=pxHd8tLI65Q
+
+main (|float| n)
+	for a in 0 to n
+		|| i = 2.0*(n*a).sqrt
+		|| b = n - i + a
+		if !b.fract
+			printline (a, b|int|)

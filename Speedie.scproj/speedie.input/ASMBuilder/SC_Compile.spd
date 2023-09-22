@@ -2,7 +2,7 @@
 
 // ADDC? optimise stages... OR special-case it specifically.
 
-struct ASMFuncState 
+struct ASMFuncState // why not just be a subclass of memory?
 	linkage: cpp_part flat
 	|SCFunction--|				fn       
 	|µFunc|						Out      
@@ -33,7 +33,7 @@ struct ASMFuncState
 		rz.r[2] = c
 		rz.r[3] = d
 		rz.debug = dbg
-		target debug
+		if platform.isdebug
 			rz.print
 
 
@@ -41,7 +41,7 @@ struct ASMFuncState
 		pragma inline
 		|| B = 1<<31
 		expect !(Bits&B) (err)
-		.RequestOp(asm.extended).rest = bits (|) B
+		.RequestOp(asm.extended).rest = bits ||| B
 		
 	
 	function RequestOp (|uint| Code, |&IR|)
@@ -81,9 +81,7 @@ struct ASMFuncState
 	function µ (|message| exp,  |AsmReg| reg = 0.reg, |AsmReg|)
 		opt norefcounts
 		cpp_part Reg
-		|| fn = exp.ASMFunc
-			return (fn)(self, exp, reg)
-		debugger
+		return (exp.ASMFunc)(self, exp, reg)
 
 
 	function µ2 (|message| exp, |AsmReg|)
@@ -108,7 +106,7 @@ struct ASMFuncState
 		debugger
 		// A REL
 		|| L = exp.first
-		|| R = L.next(@opp, "=").next(nil)$
+		|| R = L.next(@opp, "=").Next$
 		
 		|| Dest = .AllocReg(L)$
 		|| result = .µ( r, dest )$
@@ -122,8 +120,8 @@ struct ASMFuncState
 		cpp_Part AllocRegDecl
 // what if "@thg:" calling this is a global?
 // Also, do we need R?
-		.NeedSomewhere(exp, &decl.dregister, decl.RegType)
-		return decl.DRegister
+		.NeedSomewhere(exp, &decl.DReg, decl.RegType)
+		return decl.DReg
 	
 	
 	function FuncPrms (|message| pr, |int| Remain, |uint| Bits, |Message|)
@@ -143,10 +141,10 @@ struct ASMFuncState
 		|| fn = prms.asfunc					#debug_require
 
 		.NeedSomeWhere(prms, &dest, fn.RegType)
-		.AddASM(prms.parent, asm.fnc, 0).rest = fn.TableId
+		.AddASM(prms.parent!, asm.fnc, 0).rest = fn.TableId
 
 		|| OV     = .OpenVars
-		|| Bits   = Dest.reg<<25 (|) ov.log2<<20					// 6+5 bits, 20 left.
+		|| Bits   = Dest.reg<<25 ||| ov.log2<<20					// 6+5 bits, 20 left.
 		|| Remain = 20
 		|| p      = prms.first
 		while
@@ -161,12 +159,12 @@ struct ASMFuncState
 	function DoRels (|message| L, |asmreg| dest, |asmreg|)
 		opt norefcounts
 
-		|| op = L.next
+		|| op = L.next!
 		|| OV = .OpenVars
 		|| mL = .µ2(L)			// µ2 stops mR breaking mL
-		|| mR = .µ(op.next)
+		|| mR = .µ(op.next!)
 		.CloseVars(OV)			// allow overwriting either!
-		require ml.reg (|) mr.reg
+		require ml.reg ||| mr.reg
 		
 		.NeedSomewhere(op, dest, ml.atype)
 		|| scop = op.obj|scoperator|
@@ -176,18 +174,22 @@ struct ASMFuncState
 
 	module
 		|IR|					Dummy
-		|IR[]|					JSMSpace
+		|IR[]|					JSMSpace = IR[0]!
 		
 
 function message.ASMFunc (|fn_asm|)
-	|| ASM = .flags & 63
+	|| ASM = .tmptype
 	asm := .func|int|
-	return fn_asm_table[asm]
+	rz = fn_asm_table[asm]!
+	target debug
+		if !rz?
+			return rz!
 
 
 function ASMFuncState.TotalInit
 	opt norefcounts
-	|| j = ASMFuncState.JSMSpace init (IR[1MB])$		// big enough
+	|| j = ASMFuncState.JSMSpace
+	j.Capacity = 1MB
 	.maxlength = j.Capacity
 	.start = j.ptr
 	.Written = 0
@@ -209,7 +211,7 @@ function ASMFuncState.FinishASM
 	opt norefcounts
 	.out.length += .written
 	ifn .last isa asm.ret
-		.AddASM(.fn.source, asm.RET, 0)
+		.AddASM(.fn.source!, asm.RET, 0)
 
 
 function @fn_asm.Default (fn_asm)

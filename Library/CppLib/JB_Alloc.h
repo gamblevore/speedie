@@ -97,10 +97,10 @@ struct JBObject_Behaviour;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define kObjMinSize 16 // safer.
 #define JB_MArray(type, num)    ((type*)(JB_MArray_(sizeof(type),num)))
-#define JB_NewClass(name)       (JB_Object*)(JB_AllocNew(name->DefaultBlock))
+#define JB_NewClass(Cls)        (JB_Object*)(JB_AllocNew((Cls)->DefaultBlock))
 #define JB_New(name)            (name*)(JB_AllocNew((name ## Data).DefaultBlock))
+#define JB_New2(T)				{if (!self) self = JB_New(T);}
 #define JB_NewEmpty(name)       (name*)(ClearFor_(JB_New(name), sizeof(name)))
-#define JB_LayerNew(L, name)    (name*)(JB_AllocNew(L->CurrBlock))
 #define JB_Zero(name)           (ClearFor_((void*)(name), sizeof(__typeof__(*name))))
 #define JBStructData(a)         extern JB_Class a ## Data;
 #define JBClass(a, b, c)        struct a : b {c}; JBStructData(a);
@@ -136,18 +136,39 @@ struct JB_Object {
 };
 
 
-struct AllocationBlock {
-    JB_MemoryLayer*         Owner;    		// these two...
-    FreeObject*             FirstFree;		// have to be first...
-    AllocationBlock*        Next;
-    AllocationBlock*        Prev;
-    JBObject_Behaviour*     FuncTable;		// speed things up a bit.
-    SuperBlock*             Super;
+struct JB_RingList : JB_Object { // a list that does not own its items... unlike JB_List
+	uint					PID;
+    JB_RingList*			Next;
+    JB_RingList*			Prev;
+};
 
+
+struct SuperBlock {
+    uint                    ID;
+    uint                    BlocksActive;
+    SuperBlock*             Next;
+    SuperBlock*             Prev;
+    JB_MemoryWorld*         World;
+    AllocationBlock*        FirstBlock;
+    AllocationBlock*        StartBlock;
+    FreeObject*             StartObj;
+    void*                   BlockEnd;
+};
+
+
+struct AllocationBlock {
     u16                     ObjCount;
     u16                     HiddenObjCount;
     u16                     CurrFast;		// allocate these in a line... 
     u16                     MaxFast;		// until we hit the max
+    AllocationBlock*        Next;
+    AllocationBlock*        Prev;
+    
+    JB_MemoryLayer*         Owner;
+    FreeObject*             FirstFree;
+    JBObject_Behaviour*     FuncTable;		// speed things up a bit.
+    SuperBlock*             Super;
+
 
     u16                     Unused_;
     u16                     Unused2_;
@@ -226,6 +247,11 @@ struct Array;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void JB_Helper_SelfLink(JB_RingList* New);
+void JB_Helper_PutBefore(JB_RingList* Old, JB_RingList* New);
+void JB_Helper_PutAfter(JB_RingList* Old, JB_RingList* New);
+void JB_Helper_Unlink(JB_RingList* Curr);
+
 JB_MemoryWorld* JB_MemStandardWorld();
 JB_MemoryLayer* JB_Mem__New( JB_Class* Cls );
 JB_MemoryLayer* JB_Mem__NewObj(JB_Class* Cls, JB_Object* Obj);
@@ -252,11 +278,11 @@ void JB_Class_Add( JB_Class* Cls, const char* s );
 JB_Class* JB_Class__First();
 JB_MemoryLayer* JB_Mem_CreateLayer(JB_Class* Cls, JB_Object* Obj);
 void JB_Mem_InitAndUse(JB_MemoryLayer* Mem, JB_Class* Cls);
-void JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls );
+JB_MemoryLayer* JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls );
 void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size);
 void JB_Class_SetIndex(JB_Class* cls, int i);
 int JB_Class_Index(JB_Class* cls);
-void JB_TotalMemorySet(bool b);
+void JB_DebugAllMemory(bool b);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -309,13 +335,14 @@ u32 JB_ObjCount();
     #define JBTestSanityOK 0
 #endif
 
-bool JB_TotalMemorySanity(bool Force);
+bool JB_TotalSanity(bool Force);
 extern JB_Class ProcessData;
 
 
 inline JB_Object* JB_Incr_(JB_Object* self) {
     if (self) {
 		JBObjRefTest(self);
+		JB_TotalSanity(false);
         self->RefCount++;
     }
     return self;
@@ -324,6 +351,7 @@ inline JB_Object* JB_Incr_(JB_Object* self) {
 inline void JB_Decr(JB_Object* self) {
     if ( self ) {
 		JBObjRefTest(self);
+		JB_TotalSanity(false);
         int N = --self->RefCount; 
         if (!N)
             JB_Delete( (FreeObject*)self );

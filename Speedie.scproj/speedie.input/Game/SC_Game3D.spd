@@ -25,7 +25,7 @@ module SCGame3D
 		|| Inst = Node.TranModel			#expect (node, "Not a good model.")
 		|| M = SCClass.newStruct(node, name_space, ErrPlace)
 		if M isa SCModule
-			M.Cls.IsModel = Inst
+			M.Cls!.IsModel = Inst
 		return M
 
 
@@ -38,31 +38,31 @@ module SCGame3D
 
 extend SCClass
 	function NewDeclInClassModule (|string| S, |SCClass| T)
-		|| Dcl = SCDecl.new
-		dcl.TypeContained = T 
+		|| Dcl = SCDecl(T)
 		dcl.Name = S
 		.Modul.TryAdd( .IsModel, Dcl, S )
 	
 	
 	function DeclModel
-		expect (.properties)  (.sourceclass, "Need properties for a Game3D Type.")
-			
-		|| Inst = .properties.last
+		opt norefcounts
+		|| m = .IsModel			#require
+		expect (.properties)  (.source, "Need properties for a Game3D Type.")
+		
 		|| Dcl = .modul[ "_AllocDraw" ]
 		
 		if (Dcl isa SCDecl)
-			dcl.MakeGameFlying(self)
+			dcl.MakeGameFlying(self, m)
 		  else
 			debugger
 
 
 	function GetFlyingMemClassFor (|SCClass|)
-		return Compiler.FindClass("GameFlyingMem", .IsModel)
+		return Compiler["GameFlyingMem"]
 
 	
 	function ModelDecls
-		|| M = .GetFlyingMemClassFor #require
-		.NewDeclInClassModule("_AllocDraw", M)
+		|| M = .GetFlyingMemClassFor
+			.NewDeclInClassModule("_AllocDraw", M)
 	
 	function HasGameType (|bool|)
 		return (.TypeInfo != DataTypeCode.UnusedType)
@@ -89,8 +89,8 @@ function FastString.CArrayAddB (|Byte| B)
 
 
 function FastString.CArrayAddB0 (|Byte| B)
-	.carrayaddb(b)
-	.carrayaddb(0)
+	.CArrayAddB(b)
+	.CArrayAddB(0)
 
 
 extend Message {
@@ -113,15 +113,15 @@ extend Message {
 		
 
 	function TranModel (|Message|)
-		|| Arg = self[@arg, -1]							#require
-		|| Shader = Arg.ParseShaderSub				    #require // should be empty by now.
+		|| Arg = .last(@arg)								#require
+		|| Shader = Arg.ParseShaderSub						#require // should be empty by now.
 		.Name = "struct"
 		return Shader
 
 
 	function FindShader (|string| TypeName, |Message|)
-		|| U = .find(@tmp, "type")				#require
-		|| C = U[0].ModelType						#require
+		|| U = .find(@tmp, "type")							#require
+		|| C = U.first!.ModelType							#require
 		|| N = C.name.lowercase
 		if (N.last == 's')
 			N = N[0, N.length - 1]
@@ -131,11 +131,11 @@ extend Message {
 
 		// We want to get stuff... alpha and depth
 
-		SCGame3D.NeedShader(TypeName + ".frag") #require
+		SCGame3D.NeedShader(TypeName + ".frag")				#require
 		if (F.Length >= 2) // Cube, sdf, etc... use a standard vertex shader
 			F = F[0, 1]
 		  else
-			SCGame3D.NeedShader(TypeName + ".vert") #require
+			SCGame3D.NeedShader(TypeName + ".vert")			#require
 		
 		// "type points" --> "type P"
 		// and then the temporal_statement is removed.
@@ -147,7 +147,7 @@ extend Message {
 
 
 	function ParseShaderSub (|Message|)
-		|| Name = .parent[0].name #expect (.parent, "Expected a name")
+		|| Name = .parent.first!.name #expect (.parent, "Expected a name")
 		rz = .FindShader(Name) #require
 		
 		|| StaticAdditions = "function New (|&$name|) {
@@ -175,19 +175,18 @@ extend SCDecl
 		expect !(.PointerCount) (.source, "Can’t be a pointer")
 
 		|| T = .type
-		expect (T and T.HasGameType) ( .source, "SC_GameTypes.box doesn't contain type '${.Type.Name}'." )
+		expect (T.HasGameType) ( .source, "SC_GameTypes.box doesn't contain type '${.Type.Name}'." )
 		return T.TypeInfo
 
 
-	function MakeGameFlying (|scclass| oof)
-		require oof
+	function MakeGameFlying (|scclass| oof, |message| m)
 		|| fs = faststring()
 		fs <~ "const char $(N)_Init[] = {"
 
 		fs.CArrayAdd( oof.name )
-		fs.CArrayAddB( *oof.ismodel.ModelType.name )
+		fs.CArrayAddB( *M.ModelType!.name )
 		fs.CArrayAddB0( 8 ) // SuggestedCount. for the moment!
-		fs.CArrayAddB0( oof.ismodel.ModelMode ) // Alpha + Depth
+		fs.CArrayAddB0( M.ModelMode ) // Alpha + Depth
 
 		for (p in oof.Properties)
 			fs.CArrayAddB( p.GameType|Byte| )
@@ -196,7 +195,7 @@ extend SCDecl
 		fs <~ "0 };\n"
 		fs <~ "GameFlyingMem $(N) = {.InitData=(u8*)$(N)_Init, .InitDataLength=sizeof($(N)_Init)}"
 		(self is gameflyingmem)
-		.stringdata = fs
+		.StringData = fs
 
 
 function SCClass.GetFlyingMemory (|Message| exp, |SCDecl|)
@@ -210,7 +209,10 @@ function SCClass.GetFlyingMemory (|Message| exp, |SCDecl|)
 		thg.obj = decl 
 		exp <~ thg
 		exp.Become( @BRel, "&" )
-		return Decl.makepointer
+		
+		if !decl.pointercount
+			decl = decl.getaddress
+		return decl
 
 
 

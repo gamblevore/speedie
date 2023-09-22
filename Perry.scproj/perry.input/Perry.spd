@@ -2,17 +2,15 @@
 
 || Speedie		= "/usr/local/bin/speedie".file
 || CppCompiler	= "/usr/bin/g++"
-|file| NewStdOut // should just take a file really... shouldn't need to set it to an int
 
 
 module Perry
-    |listviewrow|					Projects
+    |ListViewRow|					Projects
     |string|						_SpeedieDir
     |bool|							Checked	
-    |bool| 							Terminal
     |byte| 							FindID
-	|dictionary of string|			PathDict
-	
+	|Dictionary of String|			PathDict
+	prototype abc (|int| i, |bool|)
 	
 	constants
 		arc_newer	= 2
@@ -22,26 +20,23 @@ module Perry
 		opt norefcounts
 		if ._SpeedieDir
 			return ._SpeedieDir
-		._SpeedieDir = .MakeSpeedieDir(true)
+		._SpeedieDir = .MakeSpeedieDir
 		if ._SpeedieDir
 			return ._SpeedieDir
 		._SpeedieDir = "/usr/local/speedie"
 		if !._SpeedieDir.resolve
 			"/usr/local/speedie didn't resolve?"
 		return ._SpeedieDir
-		
-		
-	function LoadWindowsFromArgs
+	
+	
+	function LoadWindowsFromArgs (|bool|)
+		require app.args > 0
+		|| OldProj = .projects
+		.Projects = Message()
 		for arg in app.args // load specified documents
 			|| ide = .LoadAppArg(arg)
-			if !.Terminal
-				.Terminal = true
-				.Projects = Message()
-				ide.tabs.items = .projects
-				target !debug
-					NewStdOut = file.Logs.Child("PerryOut.log")
-					pipe.StdOut = NewStdOut.OpenEmpty
-					"Perry Log"
+				ide.ProjectTabs.items = .projects
+				rz = true
 	
 	
 	function LoadAppArg (|string| arg, |perryide|)
@@ -52,14 +47,14 @@ module Perry
 		if ide isa PerryIDE
 			ide.editme.ViewLineAndSel(line.x)
 			return ide
-		
+	
 	
 	function Save
 		visible
-		app.prefs("colors") = ¥.savecolors.parse
+		app.pref("colors") = ¥.savecolors.parse
 
 		
-	function LoadWindowsSub (|PerryIDE| r, |bool|)
+	function LoadWindowsSub (|bool|)
 		|| Found = false
 		for proj_item in .projects
 			if proj_item.name.fileExists
@@ -70,39 +65,41 @@ module Perry
 		require Found
 		for proj_item in .projects
 			|| proj = proj_item.name.file
-			|| r2 = R ?? PerryIDE(false)
-			r2.Loadproject(proj)
+			|| r2 = PerryIDE(proj)
+			r2.Loadproject
 			startupwindow.hide
-			r = nil
+		
 		return true
 
 
 	function BuildAppMenu
 		appmenu.addsep
-		|| extra = platform.isdebug or app.prefs("dev").Yes
+		|| extra = platform.isdebug or app.pref("dev").Yes
 			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
 			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
-			//appmenu <~ ("Birds",			ClickedBirdsMenu)
 		appmenu <~ ("Edit Preferences", ClickedEditPrefs)
-		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
+//		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
 		appmenu <~ ("Install",  		ClickedInstallMenu)
 
 
 	function Startup (GUIApplicationInit)
 		target lin: sdlapp.removeborder // doesnt seem to work in Windows WSL?
+		sdlapp.AppDocumentOpen = &perryide.PerryOpenDoc
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
-		ColorScheme.LoadFromPrefs(DefaultColors)
+		¥.LoadDefaults
 		.BuildAppMenu
 	
-		|| old = app.Prefs("currproj")
-		.Projects = (app.prefs)("lastproj")
+		|| old = app.Pref("currproj")
+		.Projects = app.prefmsg("lastproj")
 		
-		|| i = PerryIDE(false)
-		i.ViewAsText
-		
-		.LoadWindowsFromArgs
-		if !.Terminal and !.LoadWindowsSub(i)
+		if app.CWD == "/"
+			app.args.remove("YES")
+
+		if pipe.StdOutIsTerminal
+			app.AllowInteruptCrash = true // fails with 0 params... sigh whatever
+
+		if !.LoadWindowsFromArgs and !.LoadWindowsSub()
 			startupwindow.show
 			return 0
 		|| oof = (.FindProj(old),  .Projects.First)(old)
@@ -143,12 +140,13 @@ module Perry
 	
 	function perryide.SetTab2Name (|message| old)
 		opt norefcounts
-		.tabs.selected = old
+		.ProjectTabs.selected = old
 
-		|| f = old.first
-		f.name = f.name.ProjCleanName
-		.id = "IDE: " + f.name
-		.CompileTabs.items.last.name = f.name + "[]"
+		|| f = old[@nil]
+			f.name = f.name.ProjCleanName
+			.id = "IDE: " + f.name
+			|| ii = .CompileTabs.items[@nil, 2]
+				ii.name = f.name + "[]"
 		
 		
 	function AddProj (|string| path, |PerryIDE| i)
@@ -156,7 +154,7 @@ module Perry
 		|| old	= .FindProj(path)
 		if !old
 			old = .projects.msg(@tmp, path)
-			old.msg(@str, path.TrimProj)
+			old.msg(@str, path.TrimCodeExt)
 			old["edit"] = ""
 			old["pos"] = ""
 		
@@ -168,7 +166,7 @@ extend PerryIDE {
 function IsSpeedieCode (|bool|)
 	opt norefcounts
 	|| r = .filelist.listsource.First as filerow
-		return r.location.pathiscode
+		return r.location.PathIsCode
 	
 
 function View (|ButtonView| btn)
@@ -209,18 +207,23 @@ function View (|ButtonView| btn)
 	.CheckViewWorthIt(old)
 
 
-function ShowStdOut (|bool| AlwaysShow=false)
-	if AlwaysShow or .EditSep.Collapsed
-		.EditSep.Show // needs reflow first?
-		.outtext.ScrollToEnd?
-	  else
-		.EditSep.Collapse
+function ShowCompileCutely (|bool| Always=false)
+	require .ProductSep.iscollapsed
+	if !always
+		if .AlreadyExpandedCompileTab
+			return
+		.AlreadyExpandedCompileTab = true
+	.ProductSep.Show
+
+	
+function ShowCompileTab (|object| tab, |bool| always) // showtab
+	.ShowCompileCutely
+	.CompileTabSelect(tab, always)
 
 
 function OutText (|textview|)
 	|| row = .CompileTabs.Selected
-		|| obj = row.obj as TextView
-			return obj
+		return row.obj as TextView
 
 
 function SwitchedToErrors
@@ -228,7 +231,7 @@ function SwitchedToErrors
 	if e.listsource.hasany and !e.FirstSelected
 		e.selectfirst
 	  else
-		.editme.ShowParseError
+		.editme.ShowNextParseError
 
 
 function NoNeed (|string| s = "", |buttonview| old = nil)
@@ -261,11 +264,9 @@ function IsViewing (|guicontrol| g, |bool|)
 
 
 function IsSingleFileProject (|bool|)// IsProj
-	if .project
-		return !.project.isdir
+	return !.project.isdir
 	
 function ViewAsBetter
-	require .project
 	if .IsSingleFileProject
 		.viewasproject
 	  else
@@ -291,46 +292,29 @@ function ViewAsSwap
 		.ViewAsText
 
 
-function Ext (|string|)
+function ViewAsVis (|bool| AsProject)
 	opt norefcounts
-	return .editme$.document$.location$.ext
-
-
-function ViewAsVis (|bool| vis)
-	opt norefcounts
-	.istextonly = !vis
+	.istextonly = !AsProject
 	|| AnyViews = false
 	for v in .ViewButtons
 		|| t = v.tag as guicontrol
 			(t is visible) = (v.gnormal.bg.hasany)
 			AnyViews := t is visible 
 	
-	if vis and !AnyViews
+	if AsProject and !AnyViews
 		.viewfiles.click(nil)
 
-	|| top = !(.noclutter&1) and vis
-	.filesep.Collapsed = !vis
-	(.gonext is visible)	= vis
-	(.goPrev is visible)	= vis
-	(.rborder is visible)	= vis
-	(.ViewButtons is visible) = vis
-	(.filesep.div is visible) = vis
-	(.StartScreen is visible) = (.noclutter & 1)==0
-	(.filelist is decluttered)  = (.noclutter & 2)!=0
-	(.noneeder is visible)  = .noneeder.text and vis
-	if !top and !Platform.IsDebug
-		(.DebugArgsList isnt visible)
-	
-	|| StillRuns = top and (vis or (.ext == "spd"))
-	|| srchvis   = vis and (.searcharea is visible) 
-	(.searcharea is visible)		= srchvis
+	.filesep.isCollapsed = !AsProject
+	(.gonext is visible)	= AsProject
+	(.goPrev is visible)	= AsProject
+	(.rborder is visible)	= AsProject
+	(.ViewButtons is visible) = AsProject
+	(.filesep.div is visible) = AsProject
+		
+	(.noneeder is visible)  = .noneeder.text and AsProject and (.FileList isnt visible)
+	(.searcharea is visible)		= AsProject and (.searcharea is visible) 
 
-	(.runbutton is visible)			= StillRuns
-	(.buildbutton is visible)		= StillRuns
-	(.progress is visible)			= Stillruns and (.buildbutton isnt enabled)
-	(.tabs is decluttered)			= !top
-
-	if vis
+	if AsProject
 		.CurrFileName.size = 8 ~ after for 140 by 1~inside
 		.FileListersInside(.rborder)
 	  else

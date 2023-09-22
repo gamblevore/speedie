@@ -4,64 +4,68 @@
 */
 
 
-class SCIterator (SCObject)
+class SCIterator (SCNamed)
 	linkage
 		cpp_part			Iter
 
 	|[SCNodeRenamer]|	Names
-	|SCNodeRenamer|		selfs
-	|SCNodeRenamer|		ValueRenamer
-	|message|			Index
-	|message|			LoopCond
-	|message|			LoopEndCond
-	|message|			Value
-	|message|			WhileLoop
-	|message|			Yield
-	|scclass|			parent
+	|SCNodeRenamer?|	selfs
+	|SCNodeRenamer?|	ValueRenamer
+	|message?|			Index
+	|message?|			LoopCond
+	|message?|			LoopEndCond
+	|message?|			Value
+	|message?|			WhileLoop
+	|message?|			Yield
+	|scclass?|			Parent
+	|bool| 				OK
 	
-	constructor (|scclass| parent)
+	constructor (|scclass?| parent, |Message!| msg)
 		.parent = parent
 		
-	function InitIter (|Message| msg, |bool|)
-		require msg
-		
 		|| thg = msg.first
-		if thg == @thg
-			.Name = thg.name
+		|| x = (thg.name ?? "DefaultIterator")
+		.Name = x
 		
-		.source = msg[@Arg, -1]									#expect msg
+		|| M = StdErr.mark
+		|| src = msg.last(@arg)									#check msg
+		.source = src
 		
-		.WhileLoop = .source.find( @tmp, "while" )			#expect (msg, "missing while")
-		|| WhileArg = .WhileLoop.find(@Arg)						#expect (.WhileLoop, "missing argument for 'while'")
+		
+		.WhileLoop  = .source.find( @tmp, "while" )				#check (msg, "missing while")
+		|| WhileArg = .WhileLoop.find(@Arg)						#check (.WhileLoop, "missing argument for 'while'")
 
-		.LoopEndCond = WhileArg.Next
-		if (.LoopEndCond)
-			 .LoopEndCond = .LoopEndCond.first
+		.LoopEndCond = WhileArg.Next.first
 		
-		.LoopCond = .WhileLoop[0]
-		if (.LoopCond == WhileArg)
-			.LoopCond = «thg "true"»
-		  else
-			.LoopCond = .loopcond.NeedBra
+		|| Cond = .WhileLoop.first
+		if (Cond == WhileArg)
+			Cond = «thg "true"»
+		  elseif cond
+			Cond = Cond.NeedBra
+		.LoopCond = Cond
 		
-		.yield = WhileArg.FindNested( @Tmp, "yield" )			#expect (WhileArg, "Missing yield statement.")
+		|message| w
+		if whilearg
+			w = WhileArg.FindNested( @Tmp, "yield" )			#check (WhileArg, "Missing yield statement.")		
+		.yield = w
+		.Value = .yield.first									#check (.yield, "Missing value")
+
+		|| i = .yield.second
+			i.Expect(@bra)
+			i = i.first
+		.Index = i
 		
-		.Index = .yield[1]
-		.Value = .yield[0]
-		
-		if (.Index)
-			(.Index == @Bra)									#expect .Index
-			.Index = .Index[0]
-		
-		.selfs = SCNodeRenamer.new
-		.selfs.CollectSelfs( .source )
-		.Names = .Uniqueify( .source )
-		
-		Return true
+		|| sn = SCNodeRenamer.new
+		.selfs = sn
+		if src
+			sn.CollectSelfs( src )
+		.Names = .Uniqueify( src )
+		.OK = M
 
 
-	function message.Deepest (|syntax| Tmp, |string| name, |message|)
+	function message.Deepest (|syntax| Tmp, |string| name, |message?|)
 		opt norefcounts
+		real self // unneeded?
 		for ch in self
 			|| best = ch.deepest(tmp, name)
 				return best
@@ -70,7 +74,7 @@ class SCIterator (SCObject)
 
 
 	function MakeWhile (|message| arg, |message| postcond, |message|)
-		|| result = .whileloop.copy(arg)				 // hmmm... this position thing doesn't work.
+		|| result = .WhileLoop!.copy(arg)				 // hmmm... this position thing doesn't work.
 		|| Loop = result.Deepest(@tmp, "while") #require // for (x,y) loops...
 		|| larg = Loop.find(@arg)				#require
 		|| it = larg.next // postcond
@@ -81,7 +85,7 @@ class SCIterator (SCObject)
 	
 	
 	function RenameSelf (|Message| Name)
-		.selfs.Rename( Name )
+		.selfs!.Rename( Name )
 
 
 	function Check (|SCClass| cls)
@@ -89,24 +93,26 @@ class SCIterator (SCObject)
 		|| dot = ("." + .name, "")(.name)
 		|| msg = "iterator iter_test () {for yield_test$dot in self {(yield_test)}}".parseclean
 		|| fnc = SCFunction.NewFunc( msg, cls, .source )|SCFunction|
-		fnc.FuncDecls
-		fnc.Transform
+			fnc.FuncDecls
+			fnc.Transform
 
 
-	function RenameValue (|String| s)
-		if !.ValueRenamer
-			.ValueRenamer = SCNodeRenamer.new
-			.ValueRenamer.Collect(  .source,  .value.name,  .source.FlatAfter )
-		.ValueRenamer.Renamestr( s )
+	function RenameValue (|message| s)
+		|| v = .ValueRenamer
+		if !v
+			v = SCNodeRenamer.new
+			.ValueRenamer = v
+			v.Collect(  .source,  .value!.name,  .source.FlatAfter )
+		v.Rename( s )
 
 
-	function Renuqify (|SCBase| p)
+	function Renuqify (|SCNode| p)
 		opt norefcounts
 		for n in .names
 			n.Uniqueify( p )
 
 
-	function Uniqueify (|Message| msg, |[SCNodeRenamer]|)
+	function Uniqueify (|Message?| msg, |[SCNodeRenamer]|)
 		opt norefcounts
 		for dcl.flat in msg
 			if dcl == @Decl
@@ -117,41 +123,40 @@ class SCIterator (SCObject)
 
 
 	module
-		|sciterator| c_array
+		|sciterator| carray
 		|sciterator| pointer
 		
 		function SimpleIter (|string| src, |sciterator|)
-			|| it = SCIterator.new(nil)
-			if it.InitIter( src.parse[0] )
+			|| s = src.parse.first!
+			|| it = SCIterator.new(nil, s)
+			if it.OK
 				rz = it
 
+		function NeuIter (CollectFunc)
+			if name_space.mustbe(SCClass, node)
+				|| it = SCIterator.new(name_space, node)
+				if it.OK
+					name_space.tryadd(node, it, it.name)
+					Return Compiler.program // OK
+
 		
-		c_array = SimpleIter(
+		carray = SimpleIter(
 "iterator	// eyyy mammi, i aint doin this
 	|| first = &self[0]
 	|| i = 0
 	while (i <  –count self)
 		yield first[i] (i)
-		i++")
-
+		i++"
+)
 
 		pointer = SimpleIter(
 "iterator
 	|| curr = self
 	while self[0]
 		yield self[0] (self)
-		self++")
+		self++"
+)
 		
-		function NeuIter (CollectFunc)
-			if name_space.mustbe(SCClass, node)
-				|| it = SCIterator.new(name_space)
-				require it.InitIter( node )
-				
-				|| s = it.name ?? "DefaultIterator"
-				name_space.tryadd(node, it, s)
-				
-				Return Compiler.program // OK
-
 
 
 function SCClass.GetIteratorAny (|String| name, |message| node, |SCIterator|)
@@ -177,9 +182,9 @@ function SCClass.CheckIterator
 
 
 function scdecl.GetIteratorAny (|String| name, |message| node, |SCIterator|)
-	if .c_Array
-		return sciterator.c_array
-	|| cls = .type								#expect ( node, "No class found." )
+	if .IsCArray
+		return sciterator.carray
+	|| cls = .type
 	if .PointerCount and !cls.isstruct
 		return sciterator.pointer
 	

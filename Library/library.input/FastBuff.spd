@@ -4,46 +4,58 @@ struct FastBuff
 	|&byte|		Curr
 	|&byte|		Start
 	|&byte|		End
-	|string|	ReadFrom
-	|bool| 		ErrorReported
+	|?string|	ReadFrom
+	|uint| 		ErrorReported
 	
 	destructor
 		visible
+	
 	function TmpStr (|string|)
 		return string.FromPtr(.start, .length)
+	
 	function String (|string|)
-		if .ReadFrom!=nil
-			return .ReadFrom
+		opt norefcounts
+		|| s = .ReadFrom
+		if s!=nil
+			return s
 		return string.copy(.start, .length)
 	
 	syntax Compare (|int| n, |bool| aware,  |int|)
 		return .Length - n
+	
 	syntax Append (|byte| v, |bool|)
 		cpp_part AppendByte
 		pragma inline
 		*.curr++ = v
 		return .curr >= .end
+	
 	syntax Append (|uint16| v, |bool|)
 		cpp_part AppendU16
 		pragma inline
 		|| c = .curr|&uint16|,  *c++ = v,  .curr = c|&byte|
 		return c|&byte| >= .end
+	
 	syntax access (|int| pos, |byte|)
 		cpp_part AccessByte
 		return .start[pos]
+	
 	syntax access (|int| pos, |int| after,  |string|)
+		opt norefcounts
 		cpp_part AccessStr
-		if .readfrom != nil
-			return .readfrom[pos, after] // better
+		|| r = .ReadFrom
+		if r != nil
+			return r[pos, after] // better
 		|| A = .clip(pos)
 		|| B = .clip(after, 0)
 		if B >= A
 			return string.Copy(A, B-A)
+	
 	function Clip (|int| v, |int| reduce=1, |&byte|)
 		if v <= 0
 			return .start
 		v = v min (.size-reduce)
 		return .start + v
+		
 	function CopyTo (|&byte| Dest, |int| Length, |uint|)
 		|| A = .curr
 		require (A < .end and length > 0)
@@ -72,8 +84,8 @@ struct FastBuff
 	
 	syntax Expect (|string| s)
 		if !.ErrorReported
-			.ErrorReported = true
 			error s
+		.ErrorReported++
 		
 	function UInt16 (|uint16|)
 		|| c = .curr|&uint16|,  rz = *c++,  .curr = c|&byte|
@@ -86,33 +98,43 @@ struct FastBuff
 				return pos - .Start
 			Pos++
 		
-	operator has (|int| n, |bool|)
+	function Has (|int| n, |bool|)
 		return .end - .curr >= n
+	
+	function HasAny (|bool|)
+		cpp_Part HasAny
+		return .end > .curr
 	
 	setter ReadFrom (|string|)
 		.ReadFrom = Value
 		.start = Value.Address
 		.end = .start + Value.length
 		.curr = .start
+	
 	function NeedAlloc (|int| n, |bool|)
 		if .Alloc(n)
 			return true
 		error ("Can't allocate memory.")
+	
 	function Alloc (|int| n, |bool|)
-		.start = Memory.Zalloc(n)
-		.curr = .start
-		.end = (.start+n, nil)(.start)
-		.readfrom = nil
+		|| mem = Memory.Zalloc(n)$
+		.start = mem
+		.curr = mem
+		.end = mem+n
+		.ReadFrom = nil
 		return .start
+	
 	function Length (|int|)
 		if self
 			return .curr - .start
+	
 	function Size (|int|)
 		if self
 			return .end - .start
-	function jbin.Add		(|syntax| type, |&FastBuff| data, |bool|into = false)
-		cpp_part AddBuff
-		|| L = data.length
-		|| addr = (data.start, nil)(L)
-		.addmemory(type, addr, into, L)
+	
+function jbin.Add		(|syntax| type, |&FastBuff| data, |bool|into = false)
+	cpp_part AddBuff
+	|| L = data.length
+	|| addr = (data.start, nil)(L)
+	.addmemory(type, addr, into, L)
 

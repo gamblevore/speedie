@@ -1,49 +1,47 @@
 
 
-
-datatype BranchState (byte)
-	constants
-		|BranchState|
-		Never		= 1
-		Always		= 2
-		Perhaps		= 3
-
-	syntax cast (|bool|)
-		return self == always 
-	function Not (|BranchState|)
-		if self == never
-			return always
-		if self == Always
-			return never
-		return self
-	syntax is (|branchstate| b, |bool|)
-		return self == b
-
-
 datatype NilState (byte) // Exec.scproj needs this here
 	constants
 		|nilstate|
 		Failed		= 0
-		Nilish		= 1	
-		Realish		= 2 
+		Nilish		= 1
+		Realish		= 2
 		Either		= 3
-		Stated		= 128
-		ActuallyNil = Nilish  + Stated				// nil|message|.position
-		Optional    = Either  + Stated				// || x = array[1000]
-		Real		= Realish + Stated				// || x = message(),  x.position
-
+		Stated		= 4
+		FnBecomesNilCh= 8
+		FalseValue	= 16
+		TrueValue	= 32
+		Solved		= 64		// compiler figured this out during niltest
+		KnownValue	= FalseValue + TrueValue
+		ActuallyNil = Nilish  + Stated + FalseValue
+		Optional    = Either  + Stated
+		Real		= Realish + Stated
+		Basic		= Realish
+		Borked		= 128
+		Killer		= 255
 	
-	function Worst (|nilstate| o, |nilstate|)
-		// nil + real = nil
-		// nil + anything = nil
-		rz = self (|) o
-		if rz is Nilish
-			return Nilish
-			
+	function RawName (|string|)
+		description "'Raw', cos does not include whether its stated or not." 
+		if self is either
+			return "optional"
+		if self is nilish
+			return "nil"
+		if self is realish
+			return "real"
+		return "lost"
+		
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type
-	syntax isnt (|nilstate| type, |bool|)
-		return !.SyntaxIs(type)
+	
+	function StatedReal (|nilstate|)
+		if self & nilstate.optional == NilState.Real
+			return NilState.real
+			
+//	function StatedOptional (|nilstate|)
+//		if self & nilstate.optional == NilState.Optional
+//			return NilState.real
+
+	
 
 
 struct ASMVarType

@@ -5,9 +5,11 @@
 
 extend String
 	function IsOK (|bool|)
-		return self != string.error
+		opt norefcounts
+		nil checker
+		return self != nil  and  self|object| != string.error|object|
 	
-	function ExistingFile (|string| operation="access",  |File|)
+	function FileThatExists (|string| operation="access",  |File|)
 		|| f = .file
 		if f.MustExist(operation)
 			return f
@@ -19,7 +21,7 @@ extend String
 			"".FileGlobSub(fixed / '/', rz)
 
 	helper FileGlobSub (|[string]| parts, |[file]| result, |int| i=0)
-		|| p = parts[i++]
+		|| p = parts[i++] ?? ""
 		ifn p contains '*'
 			|| newpath = (.child(p), "/")(self or p) 
 			newpath.fileglobsub2(parts, result, i)
@@ -27,7 +29,8 @@ extend String
 		for ch in .file
 			if p globs ch
 				.child(ch).fileglobsub2(parts, result, i)
-			
+	
+	
 	operator globs (|string| txt, |bool|)
 		|&byte| text_backup
 		|&byte| wild_backup
@@ -35,6 +38,7 @@ extend String
 		|| textEnd = text + txt.length
 		|| wild = .address
 		|| wildEnd = wild + .length
+		
 		while text < textEnd
 			|| w = (*wild).lowercase
 			if w == '*'
@@ -44,11 +48,14 @@ extend String
 				text++
 				wild++
 			  else
-				wild = wild_backup #require
-				text = ++text_backup 
+				wild = wild_backup
+				text = ++text_backup
+				require wild and text
+		
 		while (wild < wildEnd and *wild == '*')
 			wild++  // ignore trailing stars
 		return wild == wildEnd
+	
 	
 	helper FileGlobSub2 (|[string]| parts, |[file]| result, |int| i=0)
 		if parts > i
@@ -67,9 +74,11 @@ extend String
 		|| f = .file
 		return f.exists
 	
+	
 	function FileSize (|int64|)
 		|| f = .file
 		return f.size
+	
 	
 	function MakeEntirePath (|bool|Last=true, |ErrorInt|)
 		visible class~file
@@ -79,14 +88,24 @@ extend String
 			|| err = S.MakeDir|int|
 				rz = err
 				exit		
-		
+	
+	
 	function PathDir (|string|) // asdir, todir
 		if self and .last != '/'
 			return self + "/"
 		return self
-		
+	
+	
 	function SyntaxAppend (|string| s, |bool|)
 		return .write(s)
+
+
+	Syntax Append (|messageroot!| msg, |bool|)
+		cpp_Part WriteMsg
+		|| fs = .out
+			msg.render(fs)
+			return true
+
 
 	function Sibling (|string| name, |string|)
 		return .ReplacePathComponent(-1, Name)
@@ -123,7 +142,10 @@ extend String
 			prev = c
 		if prev == '/'
 			fs.Length--
-		return fs
+		rz = fs
+		if !rz and self
+			rz = "/"
+			
 	
 	helper FindTrailingSlashes (|int|)
 		rz = .Length
@@ -157,7 +179,7 @@ extend String
 			slash = 0
 		return self[slash, dot]
 	
-	function ReadFile (|int|lim=1024MB, |bool|AllowMissing=true, |stringthatwasreadsafely|)
+	function ReadFile (|int|lim=1024MB, |bool|AllowMissing=true, |stringthatwasreadsafely!|)
 		return .file.readall(lim, AllowMissing)
 
 	function Write (assigns:|string|, |bool|)
@@ -189,7 +211,7 @@ extend String
 	function MakeDir (|ErrorInt|)
 		cpp_wrapper JB_Str_MakeDir
 
-	function TrimLastSub (|Byte| b, |int|)
+	helper TrimLastSub (|Byte| b, |int|)
 		// replace with .outbyte(-1,0,b)?
 		|| N = .Length
 		while (self[N - 1] == b)
@@ -229,11 +251,9 @@ extend String
 		return .trimext.AddExt(ext)
 	
 	function Ext (|string|)
-		|| i = .find( '.', int.max, 0 )
-		|| n = .outbyte('/', int.max, 0)
-		n := .length
-		if i
-			return self[i + 1, n+1]
+		|| i = .find( '.', int.max, 0 ) #require
+		|| n = .outbyte('/', int.max, 0) ?? .length
+		return self[i + 1, n+1]
 
 	function BackToApp (|string|)
 		|| s = .TrimSlashes
@@ -278,9 +298,10 @@ extend String
 /// ACTUAL FILE STUFF
 
 	operator isa (|string| s, |bool|)
-		return .ext ~= s
+		if self
+			return .ext ~= s
 		
-	function File (|File|)
+	function File (|File!|)
 		cpp_part AsFile
 		if self isa file
 			return self
@@ -293,9 +314,9 @@ extend String
 		cpp_Part ChildFile
 		return self.Child(ch).file
 	
-	function OpenFile (|errorint|)
+	function OpenFile (|errorint2|)
 		|| p = .pathfix
-			return "/usr/bin/open".SilentExecute([p])
+			return "/usr/bin/open".SilentExecute([p], NIL, nil)
 	
 	function Reveal (|bool|)
 		if self and platform.osx
@@ -317,12 +338,13 @@ extend String
 helper @file.OSXMaxCaseWarnings (|&int|)
 	cpp_Wrapper JB_File__Compar
 
+
 helper file.RelaxSudo (|int| Amount = 0, |int|)
 	cpp_wrapper
 		
 
 extend file
-	function UploadTo (|string| url, |errorint|) // move to the network module
+	function UploadTo (|string| url, |errorint2|) // move to the network module
 		return "/usr/bin/curl".silentexecute([
 			"-T"
 			self
@@ -344,7 +366,7 @@ extend file
 		if .zipto(zip)
 			return zip.file
 		
-	function ZipUpload (|string| url, |errorint|)
+	function ZipUpload (|string| url, |errorint2|)
 		return .ZipTmp$.uploadto(url)
 
 
@@ -360,7 +382,10 @@ role StringThatWasReadSafely (string)
 		cpp_part Safe
 	false string.error
 	syntax cast (|bool|)
-		opt norefcounts
-		|| o = self|object|
-		return o != string.error and nil
+		return .isok
+
+
+datatype FileSizeInt (int64)
+	render
+		return .strsize(fs)
 

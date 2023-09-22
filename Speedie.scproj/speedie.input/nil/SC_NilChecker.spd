@@ -1,358 +1,692 @@
 
 
-// bugs:
-	// * string.addr is real... no reason it should be.
-	// * rework VariableSet for the new register-based system!
-
-
-function NilTracker.UseChildAsReal (|message| wrapper, |nilstate|) // a.b, *a, a[0], (a)()
-	opt norefcounts
-	|| ch = wrapper.first
-		Jump(ch)
-		|| d = ch.NilDecl
-		FailIfNotReal(ch, d)
-		return d.NilUsed
-
-
-extend_module NilTracker {
-	dispatch NilTable (NilTrackerFn)
+extend_module ArchonPurger {
+	dispatch NilSyxes (NilTrackerFn)
 		@thg:	Thing
 		@bra:	Bracket
-		@type:	Bracket // pretty much
+		@type:	Type
 		@func:	Function
-		@tmp:   Statement
+		@tmp:   StatementJump
 		@dot:	Property
 		@acc:	Access
+		@item:	Item
 		@brel:	brel
+		@arel:	arel
 		@rel:	Rel
+		@list:	List
 		@decl:	Declaration
 		@arg:	Argument
-		@sstr:	JustReal
-		@str:	JustReal
-		@num:	JustReal
-		@char:	JustReal
-		63:     // for the size
+		@sheb:  Ignore
+		@sstr:	String
+		@str:	String
+		@num:	Number
+		@char:	Char
+		63:
+			0     // for the size
+
+
+	dispatch NilTmps (niltrackerfn)
+		(asmtmp.kif):			If
+		(asmtmp.kWhile):		While
+		(asmtmp.kContinue):		Continue
+		(asmtmp.kExit):			Exit
+		(asmtmp.kReturn):		Return
+		(asmtmp.kDebugger):		Debugger
+		(asmtmp.kFail):			Fail
+		(asmtmp.krejoin):		Rejoin
+		63:
+			0 // for size also
+
 	
 	TrackerDummies()
+	function TrackerDummies
+		for i in 64
+			NilSyxes[i] := Dummy
+			NilTmps[i] := Dummy
 
 
-function TrackerDummies
-	for i in 64
-		NilTable[i] := Dummy
-					
 
-function Dummy (NilTrackerFn)
-	debugger
+function Dummy (NilTrackerFn): debugger
 
 
-function Access (NilTrackerFn)
-	opt norefcounts
-	return T.UseChildAsReal(msg)						// abc[0]
-
-	
-function Rel (NilTrackerFn)
-	opt norefcounts
-	if msg.tmptype is kSetVar					// x = y
-		return SetRel(msg, test)
-	return ProcessCondRel(msg, test)
-
-
-function Property (niltrackerfn)
-	opt norefcounts
-
-	|| ch = msg.first
-	.Jump(ch, test)
-	.FailIfNotReal(ch, ch.NilDecl)
-	|| dcl = msg.nildecl			#debug_require
-	return dcl.NilDeclared
-
-
-function Statement (NilTrackerFn)
-	opt norefcounts
-	|| type = msg.TmpType
-	if Type is kif
-		return .If(msg)
-	if type is kReturn
-		return .Return(msg)
-	if type is kWhile
-		return .While(msg)
-		
-	
-function Function (NilTrackerFn)
-	opt norefcounts
-	|| fp = msg.first
-	|| prms = fp.next
-	|| fn = prms.obj|scfunction|
-	fn.nildebug
-
-	if msg.tmptype == ASMtmp.kTern
-		return tern(prms, test)
-
-	if (fp.func == @bra)
-		T.UseChildAsReal(fp.first)						// (abc)()
-
-	|| p = prms.first
-	for recv in fn.args
-		|| SubMode = nilcheckmode.nothing
-		if p.isfirst and fn.IsNilChecker and (test is Positive)
-			submode = NilCheckMode.PosRed
-		.Jump(p, submode)
-
-		|| sent = p.NilDecl
-		if sent.suffersnil
-			|| recnil = recv.NilDeclared
-			check ((recnil is stated) or (sent.NilUsed isnt Nilish)) (p, "Unknown if this parameter accepts nil.")
-	
-	//		if (a and func(&a))
-	
-			.VariableSet(recv, sent, p)
-			if recv.pointercount
-				.VariableSet(recv.internal, sent.internal, p)
-			T.SetNilness(sent, recnil)
-			debugger 										// its too hard to imagine. just figure this out later
-		p++
-
-	|| ret = fn.ReturnType				#require
-	check (ret.NilStated or !ret.SuffersNil) (msg, "Unknown if this function returns nil.")
-	return ret.NilDeclared
-
-
-function Return (NilTrackerFn)
-	opt norefcounts
-
-	|| value = msg.first				#require
-	|| vd = value.NilDecl
-	if vd.suffersnil
-		|| vn = vd.nilused
-		|| rd = T.fn.ReturnType
-		|| r  = rd.NilDeclared
-		if r is real  and vn is Nilish
-			error (msg, "Nil returned, against function declaration!")
-		rd.nilused |= vn // find the answer at the end
-
-
-function While (NilTrackerFn)
-	opt norefcounts
-
-	|| beginning = t.DeclCount
-	.jump(msg.first, NilCheckMode.positive)
-	.RunAll(msg.second)
-	t.Merge(Beginning) // while seems very simple?
-
-
-function If (NilTrackerFn)
-	opt norefcounts
-	|| Beginning = T.DeclCount
-	|| cond = msg.first,  || arg1 = cond.next,  || Else = arg1.next,  || arg2 = else.last
-
-	.jump(cond, NilCheckMode.positive)
-	.RunAll(arg1)
-	|| FirstHalf = T.DeclCount
-													// IF X {y=y1} ELSE {y=y2}
-	t.Restore(Beginning)							// (undo y=y1 but keep track of it)
-	.jump(cond, NilCheckMode.negative)
-	if arg2.isfirst									// ELSE {y=y2}
-		.RunAll(arg2)
-	  elseif arg2
-		.if(else)
-	
-	if arg1.blocks
-		if !arg2.Blocks
-			t.Clear(Beginning, FirstHalf)
-		  else
-			t.undo(Beginning)						// clear for owners
-		
-	  elseif arg2.blocks
-		t.Undo(FirstHalf)							// IF X {y=y1} ELSE {return}
-		
-	  else
-		T.DeclCount = FirstHalf						// (skip arg2, its already current)
-		t.Merge(Beginning)							// (merges y=y1, y=y2)
-
-
-function Tern (Niltrackerfn)
-	opt norefcounts
-	|| C = msg.first
-	|| A = C.next
-	|| B = A.next
-
-	debugat
-	|| BeginState = T.DeclCount
-
-	.jump(C, nilcheckmode.positive)
-	rz = .Jump(A, test)
-	t.Restore(BeginState)
-
-	.jump(C, nilcheckmode.negative)
-	rz |= .Jump(B, test)
-	t.merge(BeginState)								// IF X {y=y1}
+function Ignore (NilTrackerFn)
 
 		
-function Thing (NilTrackerFn)
-	opt norefcounts
-	|| dcl = msg.nildecl			#debug_require
-	if test is Active
-		if dcl.NilUsed is Either
-			dcl.ParamUpgrade
-			return T.SetNilness(dcl, nilstate.realish)
-	
-		if dcl.NilDeclared is Either
-			msg.RedundantTest(dcl.nilused is realish)
-	return dcl.NilUsed
-
-
-function Argument (Niltrackerfn)
-	opt norefcounts
-	ifn msg in @bra
-	.RunAll(msg, test)
-
-	
-function Bracket (Niltrackerfn)
-	opt norefcounts
-	return .Jump(*msg, test)
-	
-
-function JustReal (Niltrackerfn)
-	opt norefcounts
-	return nilstate.realish
-
-
-function ProcessCondRel (Niltrackerfn)
-	opt norefcounts
-	|| ll = msg.first
-	|| op = ll.next
-	|| rr = op.next
-	|| scop = op.obj|SCOperator|
-
-	if scop.IsCompare
-		|| LNil = ll.IsNowNil
-		|| RNil = rr.IsNowNil
-		ifn lnil or rnil			// if (a > b)
-			.jump(ll, test)
-			.jump(rr, test)
-			return NilState.Real
-		
-		if (lnil and rnil)
-			return ll.RedundantTest(false)
-		expect (scop.IsNilTest) (op, "Can't use this operator on nil. Use != or ==.")
-
-		|| side = (rr, ll)(lnil)
-		.jump(side, test) // can handle !(a == nil)
-		return NilState.real
-
-
-	|| andor = scop.IsAndOr
-	if !andor		// bit ops or math		// (ptr+1) or (1+ptr) still needs nilness check
-		return .Jump(ll).Worst(.Jump(rr))
-
-
-	// needs to take into account whether test is positive or negative!
-	if (andor == SCOperator.AND) or msg.IsNilSafe // isnilsafe will speed things up a lot for ints/bools and stuff
-		.Jump(ll, NilCheckMode.positive)
-		.Jump(rr, NilCheckMode.positive)
-		return NilState.real
-	
-
-	|| First = t.DeclCount // if (!a or a.length)
-	.Jump(ll, NilCheckMode.positive)
-	t.Restore(First)
-	.Jump(ll, NilCheckMode.negative)
-	
-	|| second = t.DeclCount
-	.Jump(rr, NilCheckMode.positive)
-	return NilState.real
-	//.merge(first, second) // we want to ignore the negative state... just merge the two values
-	// so we'll need 3 ranges. A-Positive, A-negative, B-positive...
-	// then we merge the two positives
-
-
-function Brel (Niltrackerfn)
-	opt norefcounts
-	|| b = *msg.name
-	|| f = *msg
-	if b == '*'
-		return t.UseChildAsReal(msg)										// *abc
-	if b == '!'
-		return .Jump(f, test.Negate)
-	if b == '&'
-		Jump(f, test)
-		return NilState.Real // its obviously real
-
-
-function Declaration (niltrackerfn)
-	opt norefcounts
-	|| rel = msg.last
-	if rel == @rel
-		setrel(rel)
-	// the decl-checker is done in variableset    // checks if we are setting a ? into a ! :)
-	
-
-function SetRel (niltrackerfn)
-	opt norefcounts
-	|| l = msg.first
-	|| B = .JumpDecl(msg.last) // c++ runs B first...
-	|| A = .JumpDecl(l)
-	if a.SuffersNil != b.SuffersNil // what?
-	if a.SuffersNil
-		.VariableSet(A, B, l)
-
-
-function JumpDecl (|message| msg, |scdecl|)
-	.Jump(msg)
-	return msg.NilDecl
+function StatementJump (NilTrackerFn)
+	return (NilTmps[msg.TmpType]!)(msg)
 
 
 function Jump (NilTrackerFn)
 	pragma inline
+	return (NilSyxes[msg.func]!)(msg, test)
+
+/*
+dot "b"
+	thg "a"
+	emb 
+func 
+	thg "a"
+	prm 
+		thg "b"
+*/
+
+function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	opt norefcounts
-	return (NilTable[msg.func])(msg, test)
+	// a.b( c )
+	// b(a, c)
+	
+	dot.func = @func
+	|| upon = dot.First!
+	|| Prms = dot.Last!
+	Prms.obj = fn
+	Prms.Func = @prm
+	Prms.First = upon
+
+	dot.memorylayer.use
+	dot.First = message(nil, @thg, dot.position, fn.exportname, 0)
+	return nilstate.real
+	
+	
+function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |NilState|) 	// a.b, *a, a[0], (a)()
+	opt norefcounts
+
+	// So... UseChildAsReal... well... if its a property, we can still do this?
+	|| dcl = msg.FastDecl
+	if dcl is Global
+		return dcl.NilDeclared
+	|| ch = msg.first
+		|| actual = .Jump(ch)
+		if actual is nilish
+			|| ddd = dcl.hiderfunc
+			if ddd and (reason is property) and !ddd.isassigns				// OK... 
+				return .PropertyToFunc(msg, ddd)
+				
+			.BecomeReal(ch.FastDecl, ch, reason)
+		|| nd = dcl.nildeclared
+		if test isnt active or test is soft
+			return nd
+		if nd.statedreal and dcl.typesuffers
+			return msg.RedundantDeclare(nd)
+		return nd
+	debugger // what?
 
 
-function RunAll (NilTrackerFn)
+function Rel (NilTrackerFn)
+	if msg.TmpType is kSetVar							// x = y
+		return SetRel(msg, test)
+	return ProcessCondRel(msg, test)
+
+
+function List (NilTrackerFn)
 	opt norefcounts
+	for s in msg
+		.jump(s)
+	return nilstate.Real
+
+
+function Item (NilTrackerFn)
+	return .jump(msg.last!, test)
+
+
+function Access (NilTrackerFn)
+	return .UseChildAsReal(msg, test, nilreason.accessing)
+
+
+function Property (NilTrackerFn)
+	return .UseChildAsReal(msg, test, nilreason.property)
+
+
+function RealBool (|bool| b, |nilstate|)
+	rz = nilstate.real
+	rz |= nilstate.truevalue >> b
+
+
+function Number (niltrackerfn)
+	return .RealBool(msg.name.iszero)
+
+
+function Char (niltrackerfn)
+	return .RealBool(msg.name.isnull)
+
+
+function String (niltrackerfn)
+	return .RealBool(!msg.length)
+
+
+function Function (NilTrackerFn)
+	opt norefcounts
+	test &=~ NilCheckMode.Disappears
+	|| fp = msg.first!
+	|| prms = fp.next!
+	if msg.tmptype == ASMtmp.kTern
+		return tern(prms, test)
+	
+	|| fn = prms.obj|SCFunction|
+	if !fn
+		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
+		fn = fp.GetFunctionPointer
+		require fn and .UseChildAsReal(fp, 0, nilreason.accessing)					// (abc)()
+
+	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
+	
+	if (test is active) and fn.IsNilChecker
+		if fn.isnilchecker != 3
+			Test |= NilCheckMode.Soft
+		if t.FnAbleToNilCheck
+			rz = nilstate.FnBecomesNilCh
+	  else
+		Test = 0
+	
+	|| P = prms.first
+	|| HasAddrs = false
+	for recv in fn.args
+		if (recv.nildeclared is optional) and (fn.IsNilChecker != 3)
+			test |= nilcheckmode.Soft
+			
+		expect (p) (msg, "Compiler did not generate correct code for function.") 
+		|| v = .Jump(p!, test)
+		if rz and !(v is FnBecomesNilCh) and p!.isfirst
+			rz = 0 // can't work
+		|| sent = p!.FastDecl
+		HasAddrs := sent.CanUpgradeInternalPointer
+		if (v is nilish) // and recv.NilReg	
+			.NilParamPass(recv, sent, p!, fn, v)
+
+		Test = 0
+		p++
+	
+	if HasAddrs
+		p = prms.first
+		for recv in fn.args
+			|| infernal = p!.FastDecl.CanUpgradeInternalPointer
+				|| ri = recv.internal!
+				.VariableSet(infernal, recv.source!, ri, p!, ri.nilcurr)
+			p++
+
+	if fn.IsKiller
+		.DeclKill
+		if (t.nestdepth == 0)  and  !t.AnyReturns // also if no returns happened...
+			scfunction.currfunc!.iskiller = true
+		return nilstate.Killer
+	
+	|| ret = fn.ReturnType
+		rz |= ret.NilDeclared
+		check ((rz is stated) or !ret.TypeSuffers) (msg, "Nil-decoration needed on return type of function: " + fn.RenderName)
+
+
+function Rejoin (NilTrackerFn)
+	opt norefcounts
+	return .jump(msg.first!, Test) 
+
+
+function DetectStillChecks (|message| first, |nilstate|)
+	require first
+	rz = .jump(first)
+	if !t.FnAbleToNilCheck or (rz is FnBecomesNilCh)
+		return rz
+
+	|| F = first.TrueNess(rz)
+	|| SelfNil = t.self is nilish 
+	if f.isfalse
+		if !SelfNil
+			t.FnAbleToNilCheck = false		// also require that false returns ALWAYS have self nil!
+		// optional is allowed to return false
+	  elseif rz is FnBecomesNilCh			// its ok
+		0
+	  elseif SelfNil
+		t.FnAbleToNilCheck = false			// Nilcheckers require only return true if self is not nil!
+
+
+function Return (NilTrackerFn)
+	opt norefcounts
+	|| v = .DetectStillChecks(msg.first)
+	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
+	.DeclKill
+	t.anyreturns = true
+	|| ret = t.return
+	if ret and ret.typesuffers
+		if ret.StatedReal
+			expect (v isnt nilish) (msg, "Declaration does not allow returning " + v.rawname)
+		
+		ret.NilDeclared = ret.nildeclared ||| (v&nilstate.either)					// assume real, unless it becomes optional??
+		target debugnil
+			ret.NilPrint("return")
+
+
+function Exit (NilTrackerFn)
+	.loops.ExitRecord |= .EndBlock
+	.loops.hasEscape = true
+
+
+function Continue (NilTrackerFn)
+	.loops.ContRecord |= .EndBlock
+
+
+function WhileInner (|message| Cond)
+	opt norefcounts
+	//|nilrecord| OldCont // remove oldcont later, and lower loop count to 2
+
+	for i in 3
+		.jump(cond, NilCheckMode.whilepos)
+		.Argument(cond.next)
+		.Loops.NextLoop
+		//if i == 1:    OldCont =  .Value // seems to change even after the second time?
+		//if i == 2 and OldCont != .Value : debugat // Test the first two loops.
+	
+
+function While (NilTrackerFn)
+	opt norefcounts
+	|| cond = msg.first!
+	|| CondTest = cond.IsAlwaysBool
+
+	require !CondTest.IsFalse and T.BranchEnter(msg)
+
+	|| W = .loops.BeginLoop(!condtest.IsTrue)
+	WhileInner(cond)
+	if !condtest.IsTrue
+		.jump(cond, NilCheckMode.whileneg)
+		.loops.exitrecord |= .value // merge this
+	
+	.loops.FinishLoop(msg)
+	ArchonPurger.loops = W
+
+	return t.BranchExit
+	
+
+
+function If (NilTrackerFn)
+	opt norefcounts
+	|| cond = msg.first!,  || arg1 = cond.next!
+	|| Else = arg1.next!,  || arg2 = else.first!
+	|| Always = cond.IsAlwaysBool
+	if always.istrue
+		// what about something like   (x.func(&obj) or true)
+		// it is always true. I think we just don't need this.
+		return .Argument(arg1)
+	
+	if always.isfalse
+		return .Argument(arg2)
+	
+	if NilTrapper
+	|| Orig = T.BranchEnter(msg)				#require
+	#!"First Branch"
+	.Jump(Cond, NilCheckMode.positive)
+	.Argument(arg1)
+	
+	|| First = T.BranchSwap(Orig)
+
+	#!"Second Branch"
+	.jump(cond, NilCheckMode.negative) // we need the negative, for the merging.
+	if arg2.HasAny
+		if arg2.islast
+			.Argument(arg2)
+		  else
+			.if(else)
+	return t.BranchExit(First)
+
+
+function Tern (Niltrackerfn)
+	opt norefcounts
+	|| Orig = T.BranchEnter(msg)			#require
+	|| tC = msg.first!,  || tA = tC.next!,  || tB = tA.next!
+
+	#!"First Branch"
+	.jump(tC, NilCheckMode.positive)
+	rz = .Jump(tA, test)
+	|| First = T.BranchSwap(Orig)
+
+	#!"Second Branch"
+	.jump(tC, nilcheckmode.negative)
+	rz |= .Jump(tB, test)
+	t.BranchExit(First)
+	rz &= ~nilstate.FnBecomesNilCh	// in theory if BOTH were nil-testers... its OK
+									// but thats sooo awkward to even think of a real-case
+									// where I want this! Just don't do it!
+
+
+function BooleanLogic (niltrackerfn)
+	opt norefcounts
+	|| AA = msg.first!
+	|| BB = msg.last!
+	|| IsAnd = test is AND
+	(test is AND) = false 
+	if IsAnd == (test is positive)
+		|| NC = .Jump(AA, test)						// x = (!a or !a.y)
+		NC   |= .Jump(BB, test)
+		return nilstate.real ||| (NC & nilstate.FnBecomesNilCh)
+
+	|| Orig = T.BranchEnter(AA)				#require
+	
+	#!"test A+"
+	.Jump(AA, test)
+	|| First = T.BranchSwap(Orig)
+
+	#!"test A-B+"
+	.Jump(AA, test.negate)
+	.Jump(BB, test)
+
+	return t.BranchExit(First)
+
+
+
+function SuperSmartMagicCompare (|message| ll, |message| rr, |nilcheckmode| test, |scoperator| scop,   |nilstate|)
+	opt norefcounts
+	|| todo = 3
+	
+	if  ll.func == @thg and rr.func == @thg and test is Active
+		if (scop Is EqualOrNot) and (test is positive) == (scop is ExactlyEquals)|bool|
+		//	if real == x
+		//		x becomes real
+		// if real != x
+		//     0
+		//   else
+		// 		x becomes real
+			|| ld = ll.obj|scdecl|!
+			|| rd = rr.obj|scdecl|!
+			|| ldl = ld is local
+			|| rdl = rd is Local
+			if ldl or rdl
+				if rdl and ld.NilCurr == NilState.Realish
+					T.SetNilness(rd, NilState.real)
+					todo &= ~2
+				if ldl and rd.NilCurr == NilState.Realish
+					T.SetNilness(ld, NilState.real)
+					todo &= ~1
+	
+	if todo & 1
+		.jump(ll, NilCheckMode.soft)
+	if todo & 2	
+		.jump(rr, NilCheckMode.soft)
+	return nilstate.real
+
+
+function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperator| scop,  |nilstate|)
+	opt norefcounts
+		
+	|| LNil = ll.IsNowNil
+	|| RNil = rr.IsNowNil
+	if !lnil and !rnil
+		return SuperSmartMagicCompare(ll, rr, test, scop)
+
+	if lnil and rnil
+		|| lld = ll.FastDecl
+		if lld.NilAllocDepth >= .Loops.NestDepth
+			return ll.Redundantvar(lld, test)
+		if lnil + rnil != 3				// how super-fiddly is this?
+			return nilstate.real		// "if nil1 == nil2"... who gives a damn.
+	
+	  elseif (2 == (lnil + rnil))		// || x = (a.b.c == objThatisCurrentlyNil)
+		.jump(ll)
+		.jump(rr)
+		return nilstate.real
+
+	if scop Is NilTest
+		|| side = (rr, ll)(lnil == 1)
+		if test is active
+			(test is reversed) = scop Is ExactlyEquals
+			test = test.activate
+		return .jump(side, test)
+	
+	error (ll.next, "Nil can't accept this operator. Use != or ==.")
+
+
+function ProcessCondRel (NilTrackerfn)
+	opt norefcounts
+	|| ll = msg.first!
+	|| op = ll.next!
+	|| scop = op.obj!|SCOperator|
+	|| rr = op.next!
+
+	if scop Is Compare
+		return .CompareObjs(ll, rr, test, scop)
+	
+	|| AndOr = scop is AndOr
+		(test is AND) = (andor == opmode.AND)
+		return .BooleanLogic(msg, test.activate)
+
+	|| L = .Jump(ll) & NilState.Either		// (ptr+1) or (1+ptr) still needs nilness check
+	|| R = .Jump(rr) & NilState.Either
+	|| D = msg.FastDecl
+	if !D.TypeSuffers			// (ptr-ptr) is actually a number... so thats OK.
+		return nilstate.real
+	if NilState.Nilish == l or r
+		return nilstate.nilish
+	return l ||| r
+
+
+
+function Thing (NilTrackerFn)
+	opt norefcounts
+	|| dcl = msg.FastDecl
+	rz = .ThingSub(msg, test, dcl)
+	msg.Indent = rz				// The msg now knows the current state! Nice!
+	if t.FnAbleToNilCheck and dcl is self
+		rz |= nilstate.FnBecomesNilCh
+
+
+function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstate|)
+	opt norefcounts										// Handles 10 different cases :O
+
+	if !dcl.NilReg
+		return dcl.nildeclared
+	
+	|| Y = dcl.NilCurr
+	|| Unknown = dcl.IsUnknownParam 
+	if Unknown and (test isnt soft and disappears)
+		if test isnt Active							// set var A to unknown prm B, so default to real
+			return .BecomeReal(dcl, msg, NilReason.Reading)
+		dcl.NilDeclared = nilstate.optional
+
+	if  test isnt active  or  test is soft and Negative
+		return Y
+
+	if Unknown or Y != test
+		return T.SetNilness(dcl, Test)
+
+	return msg.Redundantvar(dcl, test)
+
+
+
+function Argument (Niltrackerfn)
+	opt norefcounts
+	|| v = .value.depthofvars + 1
 	for s.fast in msg
-		if s.IsLast
-			return .jump(s, test)
-		.Jump(s)
+		target debugnil
+			s.DebugPrint
+		|| t = test&-s.islast
+		|| prev = rz
+		rz = .jump(s, T ||| nilcheckmode.Disappears)
+		if prev is borked
+			error.autoprint = .oldprint
+			expect !(stderr.ok) (s, "Borking but no zergs found?")
+			stderr.pop
+		if rz is Killer
+			exit
+	
+	|| Allowed = (1|uint64| << (v<<1)) - 1|uint64|
+	t.SetAllNil(ArchonPurger.value & Allowed)
 
 
-function NilMsg (|message| err, |scdecl| d, |bool| PointerInferred, |string|)
-	if PointerInferred
-		return "Nil Error: Pointed-to can't be nil."
-	if d isnt param
-		if err == @thg
-			return "Nil Access: Needs 'if' wrapping."
-		return "Nil Access here."
-	return "Nil Error: Don't declare with '?'... or test for nil."
-
-
-function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| ErrPlace) // setrel, relset
+function Bracket (Niltrackerfn)
 	opt norefcounts
-	if recv.NilDeclared isnt nilish
-		.FailIfNotReal(ErrPlace, sent)
-	  
-	T.SetNilness(recv, sent.nilused)
+	if msg.length					// a? --> (a) // but the bra has a name
+		test |= NilCheckMode.Soft
+	return .Jump((*msg)!, test)
 
 
-function FailIfNotReal (|message| err, |scdecl| d)
+function Type (NilTrackerFn)
 	opt norefcounts
-	if d.NilUsed isnt Nilish
-		return
+	|| F = msg.first!
+	|| ns = .Jump(F, test) &~ nilstate.FnBecomesNilCh
+	|| d = msg.FastDecl
+	if !d.TypeSuffers
+		return nilstate.real
+	|| fd = f.FastDecl
+	if fd.TypeSuffers // return inner suffering
+		return ns
+	
+	return d.nildeclared // we created new suffering, so lets pass that back.
 
-	if d is param  and  d.NilDeclared isnt Stated
-		d.NilDeclared = NilState.real
-		d.nilused = NilState.Realish
-		return
 
-	error (err, NilMsg(err, d, false))
+function Brel (Niltrackerfn)
+	opt norefcounts
+	|| b = msg.name.first
+	if b == '*'
+		return .UseChildAsReal(msg, test, nilreason.accessing)				// *abc
+
+	|| ch = (*msg)!
+	if b == '-' or '+' // for ++ or --
+		return .jump(ch, test)
+	if b == '!'
+		return .Not(ch, test)
+	
+	.Jump(ch, test)
+	return nilstate.real // & ~ both return real
+
+
+function Not (niltrackerfn)
+	test = (test ||| nilcheckmode.reversed).activate
+	|| a = .jump(msg, test)
+	return a &~ nilstate.FnBecomesNilCh
+
+
+function arel (Niltrackerfn)
+	opt norefcounts
+	|| ch = *msg
+		rz = .jump(ch, test)
+		|| b = msg.name.first
+		if b == '!'
+//			expect (rz&nilstate.either != NilState.Nilish) (ch, "This value is known to be nil")
+// what if it's later optional? or real? due to a loop... sigh.
+			rz &=~ nilstate.nilish
+			rz |=  nilstate.realish
+
+
+// 
+function Declaration (niltrackerfn) // function decl 
+	opt norefcounts
+	|| rel = msg.last
+	if rel != @thg
+		|| d = rel.first!.FastDecl
+		if d.IsReg
+			|| J = .Jump(rel.last!)
+			return T.Declare(D, J)
+
+
+function SetRel (NilTrackerfn)
+	opt norefcounts
+	|| R = msg.last!
+	|| L = msg.first!
+	|| LD = L.FastDecl
+	test = (nilcheckmode.soft) * (ld isnt local  and  ld.nildeclared == nilstate.optional)
+	|| RN = .Jump(R, test)			// R is defined as coming first
+	.Jump(L)
+	return .VariableSet(LD, L, R.FastDecl, R, RN)
+
+
+function Fail (NilTrackerFn)
+	.OldPrint = error.autoprint 
+	error.AutoPrint = 0
+	return nilstate.borked
+
+
+function Debugger (NilTrackerFn)
+	// do nothing :)
+
+
+function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |scfunction| f, |nilstate| v)
+	opt norefcounts
+	if recv.StatedReal
+		.BecomeRealSub(sent, where, nilreason.passing, recv, f, v)
+	  elseif !recv.nilstated and f != scfunction.currfunc  // haha
+		recv.NilPrmFail(where, f)
+	
+
+function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message| SentMsg, |nilstate| SentState, |nilstate|) // setrel, relset
+	opt norefcounts
+	
+	if !recv.typesuffers
+		return nilstate.real
+	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg("Need to set it into another var."))
+
+	if recv.StatedReal and recv isnt local
+		if sentstate isnt nilish
+			return sentstate
+		if (SentState is realish) 
+			return .BecomeReal(sent, SentMsg, nilreason.using)
+		if (recv is property) and recvmsg.func == @dot
+			if (scfunction.currfunc is constructor) and (recvmsg.first!.fastdecl is self)
+				error (RecvMsg, "Property should be non-nil in constructor: " + recv.name)
+				return nilstate.real
+		
+		error (RecvMsg, "Nil is not allowed on: " + recvmsg.origrender)
+		return nilstate.real
+		
+	if recv.NilReg
+		return T.SetNilness(recv, SentState)
+
+
+function BecomeReal (|scdecl| sent,  |message| where,  |nilreason| reason,  |scdecl?| recv = nil,  |scfunction?| To = nil, |nilstate|)
+	opt norefcounts
+	|| Curr = sent.NilCurr
+	if curr == NilState.Realish
+		return curr
+	
+	return .BecomeRealSub(sent, where, reason, recv, to, curr)
+
+
+function BecomeRealSub (|scdecl| sent,  |message| where,  |nilreason| reason,  |scdecl?| recv,  |scfunction?| To, |nilstate| curr, |nilstate|)
+	if (Curr == nilstate.either) and sent.IsUnknownParam
+		T.BecomeRealSub(sent)
+		return T.SetNilness(sent, NilState.real)
+
+	if recv and !recv.TypeSuffers		// passing nil to int
+		return NilState.Real
+
+	return .FailedReal(to, where, reason, curr)
+
+
+function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nilstate| state, |nilstate|)
+	|| fs = faststring()					// "Passing optional: S.pop to RefCount"
+	fs <~ nilreason.values[reason]!
+	|| raw = state.RawName
+	ifn where isthing raw
+		fs <~ ' '
+		fs <~ raw
+	fs <~ ':'
+	fs <~ ' '
+	where.OrigRender(fs)
+	if To
+		fs <~ " to "
+		if where.isfirst and to.cls
+			fs <~ to.Name
+		  else
+			to.rendertitle(fs)
+	error (where, fs)
 }
 
 
-function message.IsNilSafe (|bool|)
-	// just a speed optimisation...  can check if all values are datatypes or whatever :) then just ignore those nodes
-	return false
+function scdecl.IsUnknownParam (|bool|)
+	pragma inline
+	return (!.nilstated) and (self is param)
 
 
-// !(a and b) --> (!a or !b)
-// !(a or  b) --> (!a and !b)
+function message.Trueness (|nilstate| found, |maybebool|)
+	opt norefcounts
+	|| d = .FastDecl
+	|| ret = ArchonPurger.t.Return$
+	if d.FastMatch(ret)
+		|| n = d.nildeclared
+		if n & nilstate.KnownValue
+			return n is TrueValue
+		if found & nilstate.knownValue
+			return found is TrueValue
+
+	  elseif Ret.isdatatypeonly and d.isdatatypeonly // nothing special
+		while self == @arg or @bra
+			self = self.last
+		|| rtf = ret.type.false
+		if rtf and self and self matches rtf
+			return false
+	// return maybe
 

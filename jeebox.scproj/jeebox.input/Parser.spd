@@ -30,7 +30,7 @@ extend Parser
 		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine) 
 		.token(":") = .handler(kColon, fEndOfLine).link(kColonArg, fArgColon)
 
-		.EndOfLineMarker = message(nil, "\n")
+		.EndOfLineMarker = message(@nil, "\n")
 
 
 		|| numb     =   "0123456789".bytesplit
@@ -48,9 +48,7 @@ extend Parser
 		.Token( ".." ) = .Handler( kFuncAfterNoSpace, fDotAccess )
 		.Token("://")  = .Handler( kFuncAfterNoSpace, fURL)
 		.Token( "|" )  = .handler( kTemporalBar, fDecl ).link(kFuncAfterBar, fTypeCast).link( kThingBar, fdecl )
-//		.Token( "/" )  = .Handler( kThingSyx, fPath )
-						// fpath clashes with /=
-//		.Token( `^"` ) = .Handler( kThingSyx, fArgName )
+		.Token( `^"` ) = .Handler( kthingsyx, fArgName )
 		.Token( `+` )  = .Handler( kTemporalSyx, fTmpPlus )
 		.Token( "@" )  = .Handler( kThingSyx, fAtName ).Link( kFuncAfterNormal, fAtNamedExp )
 		.Token( "~" )  = .Handler( kFuncAfterNormal, fAdjectiveThing ).Link( kAdjectiveOp, fAdjectiveOp )
@@ -66,6 +64,7 @@ extend Parser
 		.Tokenz( "{",			kThingSyx,              fArgOpen			)
 		.Tokenz( "--> <-- <--> <≈", kTmpOpp,			fTemporalRelSyx		)
 		.Tokenz( "/#",			kTmpOpp,				fSyntacticComment	)
+// i think better syntax that is less confusible with comments is better
 		.Tokenz( "%",			kThingSyx,				fOpAsThing			)
 		.Tokens( numb,			kThingSyx,              fNumber				)
 		.Tokenz( "#!",			kTemporalSyxNoBar,      fShebang			)
@@ -150,12 +149,12 @@ extend Parser
 
 
 	function PostInnerAdj (|Message| Rel, |Message| opp, |Message|)
-		|| f = rel.first
+		|| f = rel.first!
 		if !(rel == @rel) and !(rel==@bra and f==@rel)
 			return .ErrorAdd("Expected a rel.", rel.position)
 		if rel == @bra
 			rel = f
-			f = f.first
+			f = f.first!
 		
 		|| Adverb = .Process( kOppWord (|) kOppBra, Parser.kExpect ) #require
 		|| adj = @adj.msg
@@ -166,7 +165,7 @@ extend Parser
 		return rel
 	
 	
-	function ChainTemporalRels (|Message| FirstThing, |Message| opp, |Message|)
+	function ChainTemporalRels (|Message!| FirstThing, |Message!| opp, |Message!|)
 		if opp == @scom
 			opp <~ firstthing
 			return opp
@@ -190,7 +189,7 @@ extend Parser
 		  else // I think this works!
 			self <~ Last.First
 			Last.First = self
-			self = Last
+			return Last
 		return self
 	
 
@@ -287,10 +286,6 @@ extend Parser
 		return Result
 
 
-	function fTodoList (ParseHandler)
-		0 // maybe actually a todo-list, is a kind of markdown thing
-
-
 	function fAtName (ParseHandler)
 		opt norefcounts
 		return parser.newWord( nil,  @name,  Start,  Parser.NextStart )
@@ -302,7 +297,7 @@ extend Parser
 	
 		
 	function fURL (ParseHandler)
-		require  .needname(parent)
+		require .NeedName(parent!)
 		.NextStart = .data.inwhite(start)
 		parent.Func = @url
 		parent.RangeLength += 3
@@ -312,8 +307,9 @@ extend Parser
 		
 	function fTmpPlus (ParseHandler)
 		opt norefcounts
-		if .nextbyte == '"'
-			|| tmp = fCharSub(start, start+1, '"')
+		|| c = .nextbyte
+		if c == '"' or '\''  // I prefer '' // deprecate "" later?
+			|| tmp = fCharSub(start, start+1, c)
 				tmp.func = @tmp
 				tmp = ftmpsub(tmp, kOpp & ~kOppBra, kthing )
 				if tmp != @thg
@@ -322,8 +318,7 @@ extend Parser
 
 
 	function fAtNamedExp (ParseHandler)
-		debug_require parent
-		require  .needname(parent)
+		require  parent and .needname(parent)
 		parent.func = @name
 		parent <~ parser.ProcessThing(0, Parser.kExpect)
 		return parent
@@ -402,21 +397,31 @@ extend Parser
 		.ParseLoopFlags(result, ")", kTemporalSyxNoBar)
 
 
+	function CharName (|int| start, |byte| find, |string?|)
+		|| After = parser.data.jbfind( find, start+1, int.max )
+			parser.NextStart = After + 1
+			return parser[ start + 1, After, @char ].unescape
+		return nil
+	
 	function fCharSub (|int| pos, |int| start, |byte| find, |message|)
-		|| After = parser.data.jbfind( find, start+1, int.max )$
-		parser.NextStart = After + 1
-		|| name = parser[ start + 1, After, @char ].unescape
-		rz = parser.new( nil, @char, pos, name )
+		|| name = .CharName(start, find)
+		if name != nil
+			rz = parser.new( nil, @char, pos, name )
 
 
 	function fChar (ParseHandler)
 		rz = fcharsub(start, start, '\'')
-		ifn rz
+		if !rz
 			Return parser.ErrorAdd( "Char didn't close!" )
 
 
+	function GotoEndOfLine (|int| from, |int|)
+		parser.NextStart = parser.data.find( Jeebox.CSLine, from )
+		return parser.NextStart
+	
+	
 	function fCommentLine (ParseHandler)
-		parser.NextStart = parser.data.find( Jeebox.CSLine, parser.Nextstart )
+		.gotoendofline(parser.Nextstart)
 		return parser.EndOfLineMarker
 
 
@@ -437,11 +442,6 @@ extend Parser
 		
 		parser.NextStart = i + 1
 		return parser.endoflinemarker
-
-
-	function fPath (ParseHandler)
-		.NextStart = .data.inwhite(start)
-		return parser.new( nil, @str, start, .NextStart )
 
 
 	function fDecl (ParseHandler)
@@ -466,7 +466,7 @@ extend Parser
 	function fDotAccess (ParseHandler)
 		opt norefcounts
 		|| n = .nextstart
-		|| name = parser.NewWord(nil, @str, n, n) #require
+		|| name = parser.NewWord(nil, @str, n, n)
 		|| after = parser.nextstart
 		name.name = name.name.replaceall("–", " ")
 		rz = parser.NewEmpty(nil, @acc, start, after) 
@@ -480,7 +480,7 @@ extend Parser
 
 
 	function fFuncCall (ParseHandler)
-		rz = parser.new(nil, @Func, parent.position)
+		rz = parser.new(nil, @Func, parent!.position)
 		parser.Params( rz, start )
 
 
@@ -544,12 +544,11 @@ extend Parser
 	
 	function OppChain (|Message| opp, |Message|)
 		|| result = parser.Process( kAdjectiveOp, opp )
-		if !result
-			return opp
+			if !opp.parent
+				result.First = opp
+			return result
+		return opp
 	
-		ifn opp.parent
-			result.First = opp
-		return result
 	
 	
 	function fOppWord (ParseHandler)
@@ -640,15 +639,23 @@ extend Parser
 		return parser.NewSkip( parent, @Sheb, start, S, S2 )
 
 
+	function fArgName (ParseHandler)
+		if parent
+			|| f = parent.func
+			if f == @arg or @list or @bra or @arr
+				|| name = .CharName(start+1, '"')
+				if name != nil
+					parent.name = name 
+					return parent
+	
+	
 	function fArgOpen (ParseHandler)
 		rz = parser.new( nil, @Arg, start )
-		(rz is style2)
 		parser.ParseLoopFlags( rz, "}", ktemporal )
 
 
 	function fArgColon (ParseHandler)
 		rz = parser.new( nil, @arg, start )
-		(rz is style2)
 		rz.RangeLength = 1
 		while {
 			|| Item = .Process( kTemporal, rz ) ?? .ProcessThing
@@ -700,7 +707,7 @@ extend Parser
 		
 		parser.NextStart = ++After
 		result.RangeLength = after - start
-		result.UnEmbed
+		result.UnEmbedStr
 		return result
 	}
 	
@@ -710,8 +717,11 @@ extend Parser
 	
 	
 	function fSyntacticComment (ParseHandler)
-		rz = parser.new( nil, @SCom, start )
-		parser.EmbeddedArg( "#/", rz, ktemporalsyx )
+//		rz = parser.new( nil, @SCom, start )
+//		parser.EmbeddedArg( "#/", rz, ktemporalsyx )
+		rz = parser.new(nil, @list, start)
+		|| Lines = parser.ParseLoopFlags( rz, "#/", kTemporalSyxNoBar )
+		rz.Func = @scom
 
 
 	function fTemporalRelSyx (ParseHandler)
@@ -734,7 +744,7 @@ extend Parser
 	function CanStatement (|bool|)
 		return  Jeebox.CSAfterStatement[parser.NextByte]
 	
-	function fTmpSub (|message| result, |int| OpFlags, |int| ThingFlags, |message|)
+	function fTmpSub (|message!| result, |int| OpFlags, |int| ThingFlags, |message|)
 		if .WillEnd
 			return result
 		if parser.CanStatement
@@ -755,8 +765,8 @@ extend Parser
 		result.func = @thg
 		if result.hasany						// a is b = true		// rare
 			return result						// oops
-		result = decoratething(result, kOpp)
-		return parseitem(result, ktemporalsyx, kopp)
+		result = DecorateThing(result, kOpp)
+		return ParseItem(result, kTemporalSyx, kopp)
 	
 	
 	function fStatementColon (ParseHandler)
@@ -773,15 +783,12 @@ extend Parser
 		return .processthing
 	
 	
-	function fTemporalThing (ParseHandler)
-		return fTmp(parser.nextstart, kOpp & ~kOppBra, kthing, parent )
-
-
-	function ProcessThingOrTmp (|int| opps = kopp, |message|)
+	function ProcessThingOrTmp (|int| opps = kopp, |message?|)
 		return parser.ProcessThingSub(nil, opps, kthingsyx(|)kthingword(|)ktemporalsyx, false)
 
-	// ive been~running #since morning
-	// #since (morning) (ive been~running)
+/*
+ive been~running #since morning
+#since (morning) (ive been~running) */
  
 	function fTemporalHashThing (ParseHandler)
 		|| Result = .New( parent, @tril, start )
@@ -813,7 +820,7 @@ extend Parser
 		// should this... make sure we get at least one?
 		
 		|| result = .Data.find( close, parser.NextStart )
-		ifn result
+		if !result
 			parser.ErrorAdd( "Missing close $close" )
 			return result
 		
@@ -834,7 +841,7 @@ extend Parser
 		return  b  ==  '\t' or ' ' or '\\'
 
 
-	function GetFuncAfter (|Message| result, |Message|)
+	function GetFuncAfter (|Message!| result, |Message!|)
 		while
 			|| ThisAfter = kFuncAfterAny &~ StopBars
 			if NoFuncAfter(.NextByte)
@@ -849,24 +856,11 @@ extend Parser
 		return result
 
 
-	function MakePostOpp (|Message| first, |int| Bits, |Message| Rel, |Message| Name, |Message|)
-		|| thg = .ProcessThing( bits&~kopp, Parser.kExpect )		#require 
-		Bits = (Bits&~koppyoda) (|) kOppBra							// why remove koppyoda? OR even use kopp yoda?
-																	// could be better as a normal opp?
-
-		rel <~ thg
-		|| opp = .Process( bits, Parser.kExpect )					#require
-
-		rel.func = @yoda // nice
-		rel <~ opp
-		rel <~ first
-		return rel
 	
-	
-	function MakeRel (|Message| first, |int| Bits, |Message|)
+	function MakeRel (|Message!| first, |int| Bits, |Message!|)
 		opt norefcounts
 		|| opp = .Process( Bits )              					 // kOpp
-		ifn Opp
+		if !Opp
 			return first
 		
 		|| Rel = parser( nil, @Rel, first.position )
@@ -882,7 +876,7 @@ extend Parser
 			Bits |= koppWord
 
 		Rel <~ .ProcessThing( Bits, Mode )
-		rel.after = rel.last.after
+		rel.after = rel.last!.after
 		return Rel
 	
 
@@ -900,7 +894,7 @@ extend Parser
 		if (!f)
 			return .ErrorAdd("Can’t use temporals like this.")
 		
-		rz = .ChainTemporalRels( f, cnj )				#require
+		rz = .ChainTemporalRels( f, cnj )
 		if rz.HasChildCount(2) and .Allow(kEndOfLine) // good
 			rz <~ .ProcessThing
 		
@@ -945,19 +939,21 @@ extend Parser
 	function MakeInvisArg (|message| tmp, |int| indent, |message|)
 		Opt NoRefCounts
 		if (tmp == @item)
-			|| last = tmp.last
+			|| last = tmp.last!
 			if last != @emb
 				return parser.UnexpectedSyntax(last)
 			last.func = @arg
+			(last is style2)
 			return last
 	
-		return parser.new( tmp, @Arg, tmp.position)
+		rz = parser.new( tmp, @Arg, tmp.position)
+		(rz is style2)
 
 
 	helper Message.InInvisArg (|bool|)
 		Opt NoRefCounts
 		|| p = .parent
-		return (p == @arg) and (p isnt style2)
+		return (p == @arg) and (p is style2)
 
 
 	helper Message.IndentScore (|int|)
@@ -971,7 +967,6 @@ extend Parser
 	
 	
 	function parser.IndentBug (|message| curr, |message|)
-		debugat()
 		return parser.ErrorAlwaysAdd("Indent too low.", curr.position)
 	
 	
@@ -984,7 +979,7 @@ extend Parser
 	
 		|| chin = curr.CleanIndent
 		while output.indentScore > chin
-			if  output == @arg  and  output is style2
+			if  output == @arg  and  output isnt style2
 				return parser.indentbug(curr)
 			output = output.parent
 			if !output
@@ -1006,53 +1001,61 @@ extend Parser
 		|| D			= .data
 		|| end			= D.length
 		|| addr			= D.addr
-		|| GotSpaces	= false
+		|| State		= 0		// 2 = line, 1 = space, 0 = neither, 3 = both
 
 		while (n < end)
 			|| c = addr[n++]
 			if (c == '\t')
 				if !rz.commas
 					rz.indent += 4
-				if (gotspaces and rz.lines)
+				if ((State&1) and rz.lines)
 					.erroradd("Can't have tabs after spaces.", n-1)
 
-			  elseif (c == ' ')
-				gotspaces = true
-				if !rz.commas
-					rz.indent++
-
-			  elseif (c == '\n') or (c == '\r')
-				rz.lines++
-				rz.isdebug=(c == '\r')|int|
-				rz.indent = 0
-				rz.commas = 0 // right?
-				rz.pos    = n-1 // sigh
-				gotspaces = false
-				if parent == @list
-					(parent is style2)
-				
 			  elseif (c == ',')
 				rz.commas++
 				|| l = parent.last
 					rz.indent = l.indent
 				  else
 					rz.indent = 0									// int.min
-				gotspaces = false
-				
-			  else
-				gotspaces = false
-					
-				n--
-				if (c != '/')
+				State = 0
+
+			  elseif (c == ' ')
+				State |= 1
+				if !rz.commas
+					rz.indent++
+
+			  elseif (c == '/')
+				|| c2 = d[n]
+				if (c2 != '/' and '*')
+					if state&2 // not quite working yet! but soon!
+						rz.IsDebug = true
+					n--
 					exit
-				if (addr[n+1] == '*')
-					rz.lines++
-					rz.indent = 0
-				.nextstart = n
+				State = 2
+				if c2 != '*'
+					n = .GotoEndOfLine(n+1)
+					continue
+
+				rz.lines++
+				rz.indent = 0
+				.nextstart = n-1
 				|| line = .Process( kendofline, Parser.kAllow, parent )
 				n = .nextstart
-				ifn line == parser.endoflinemarker
+				if line != parser.EndOfLineMarker
 					exit
+
+			  else
+				ifn (c == '\n' or '\r')
+					n--
+					exit
+				rz.lines++
+				rz.isdebug=false
+				rz.indent = 0
+				rz.commas = 0 // right?
+				rz.pos    = n-1 // sigh
+				State = 2
+				if parent.func == @list
+					(parent is style2)
 
 		rz.lines += rz.commas
 		.nextstart = n
@@ -1063,13 +1066,15 @@ extend Parser
 	function ParseLoopItem (|Message| Output, |int| TmpoFlags, |message| Prev, |int| Indent, |message|)
 		|| ch = .Process( kTemporal&TmpoFlags, output)
 		if (!ch)
-			|| item = .ProcessThingparent(output)						#require
+			|| item = .ProcessThingparent(output)
+			if !item or item == Output
+				return item // {^"oof"}
 			TmpoFlags &= kTemporal&~kTemporalWord		// for consistancy with ftmp
 			ch = .ParseItem(Item, TmpoFlags, kopp)		// or else...
 														// a:b, (a):b ... will parse differently!
 		  elseif (ch ==@Cnj or @SCnj)
 			ch = .ReRoute(Output, ch, prev)				#require
-			indent = ch.first.indent
+			indent = ch.first!.indent
 		
 		ch.indent = indent
 		return ch
@@ -1107,15 +1112,16 @@ extend Parser
 			if .WillEnd or (prev and !info.lines)
 				exit
 			
-			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.indent) #loop				
-			RZ += (ch == @item)
-			if info.isdebug
-				ch.flags |= msguiflags.breakpoint
-			output = .addToOutput(output, ch, prev, info.pos)
-			prev = ch
+			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.indent)		#loop
+			if ch != output // haha
+				RZ += (ch == @item)
+				if info.IsDebug
+					ch.flags |= MsgParseFlags.breakpoint
+				output = .AddToOutput(output, ch, prev, info.pos)
+				prev = ch
 
 	
-	function DecorateThing (|message| R, |int| Ops, |Message|)
+	function DecorateThing (|message!| R, |int| Ops, |Message!|)
 		R = .GetFuncAfter( R )
 		if .WillEnd: Return R
 		
@@ -1127,6 +1133,8 @@ extend Parser
 			|| opp = .Process( kOppTemporal )
 				if opp == "<≈"
 					|| A = .PostInnerAdj( R, opp )
+					if !A
+						return R
 					return .DecorateThing( A, ops ) // recursive? 
 				return .ChainTemporalRels( R, opp )
 		return R
@@ -1140,13 +1148,13 @@ extend Parser
 		return parser.ProcessThingSub(nil, ops, kthingsyx(|)kthingword, expect)
 
 	
-	function ProcessThing (|int| Ops = kOpp, |bool| Expect=false, |Message|)
+	function ProcessThing (|int| Ops = kOpp, |bool| Expect=false, |Message?|)
 		return .ProcessThingSub(nil, ops, kThing, expect)
 
 	
-	function ProcessThingSub (|message| Parent, |int| Ops, |int| KindOfThing, |bool| Expect, |Message|)
-		|| result = .Process( KindOfThing, Expect, parent ) #require
-		if .WillEnd
+	function ProcessThingSub (|message?| Parent, |int| Ops, |int| KindOfThing, |bool| Expect, |Message?|)
+		|| result = .Process( KindOfThing, Expect, parent )
+		if !result or (result == parent) or .WillEnd
 			return result
 		return .DecorateThing(result, ops)
 
@@ -1169,11 +1177,6 @@ extend Parser
 		  else
 			.Token( s ) = .Handler( bits, func )
 
-
-	function Tokenz (|string| s, |TokenHandler| H)
-		cpp_part TokenzHan
-		.Tokens( s.words, H )
-	
 
 	function WillEnd (|bool|)
 		return .CheckEnded(kEnd)
@@ -1222,12 +1225,12 @@ module parser
 	|message|				EndOfLineMarker
 	|dictionary of string|  ErrorNames = nil
 	|fnIDGenerator|			Splitter = &parser.range
-	|int|					UsingPos = -1
-	|uint16|				UsingTag = 0
-	|uint16|				UsingLength = 0
+	|MessagePosition|		Using
 	|uint16|                StopBars
-	|MsgUIFlags|			InsertedFlags
 	|bool|					DotInsertAllow
+
+	using.Position = -1
+
 
 	flags
 		kAdjectiveOp
@@ -1272,24 +1275,17 @@ extend Message
 			if (IndExtra > 0) and (pr == @tmp)
 				return IndExtra
 
-		parser.ErrorAlwaysAdd( "Indents mismatch ($prin spaces)", pr.position )
-		parser.ErrorAlwaysAdd( "Indents mismatch ($chin spaces)",   .position )
+		parser.ErrorAlwaysAdd( "Indents mismatch ($prin vs $chin spaces)", .position )
 
 
 	function Type (|syntax|)
 		disabled "Use .func instead"
-
-	syntax isnt (|msguiflags| F, |bool|)
-		return !.syntaxis(F)
 			
-	syntax is (|msguiflags| F, |bool|)
+	syntax is (|MsgParseFlags| F, |bool|)
 		if self
 			return .flags & F
 
-	syntax isnt (|msguiflags|F, assigns:|bool|)
-		.syntaxis(f) = !Value
-
-	syntax is (|msguiflags|F, assigns:|bool|)
+	syntax is (|MsgParseFlags|F, assigns:|bool|)
 		if self
 			if Value
 				.flags |= f
@@ -1308,22 +1304,13 @@ extend Message
 	In the end... I love myself...
 */
 
-datatype MsgUIFlags (uint16)
-	syntax is (|msguiflags| v, |bool|)
+datatype MsgParseFlags (uint16)
+	syntax is (|MsgParseFlags| v, |bool|)
 		return self & v
-	syntax isnt (|msguiflags| v, |bool|)
-		return !(self & v)
 	flags
-		Editable		= 0x0700 // 0x100, 0x200, 0x400
-		EditableString	= 0x0100
-		EditableNum		= 0x0200
-		EditableThing	= 0x0300
-		EditableSyx		= 0x0400
-		EditableAny		= 0x0700
+		NicelyPositioned	= 0x0800
+		Editable			= 0x1000
+		Inserted			= 0x2000
+		Style2				= 0x4000
+		BreakPoint			= 0x8000
 
-		User1			= 0x0800
-		User2			= 0x1000
-		Inserted		= 0x2000
-		Style2			= 0x4000
-		BreakPoint		= 0x8000
-		

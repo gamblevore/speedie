@@ -1,0 +1,90 @@
+
+
+prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
+
+
+datatype NilRecord (Uint64)
+	linkage:cpp_part NRD
+
+	syntax Access (|int| item, |nilstate|)
+		item <<= 1
+		return (self >> item) & NilState.either
+		
+	function DepthOfVars (|uint|)
+		if self
+			return .log2|uint|>>1
+
+
+struct NilRecorder 
+	linkage:cpp_part NRC
+	|nilrecord| 	Value
+	syntax call (|uint64| item, assigns:|uint64| value)
+		value &= nilstate.either
+		item <<= 1
+		|| Mask = NilState.either|uint64| << item
+		|| Prev = .value
+		.value = (Prev &~ Mask) ||| (value << item)
+		target debugnil: archonpurger.ndb4
+
+
+datatype NilCheckMode (uint)
+	linkage: cpp_part khalai
+	flags
+		|NilCheckMode| 
+		Nothing = 0
+		Negative
+		Positive
+		Soft
+		And
+		Reversed
+		While
+		Disappears
+		WhilePos = Positive + While 
+		WhileNeg = Negative + While
+		Active  = Positive + Negative
+		Basic   = Active + Soft
+
+	syntax is (|NilCheckMode| other, |bool|)
+		return self & other
+
+	syntax is (|nilcheckmode| other, assigns:|bool|, |nilcheckmode|)
+		if value
+			return self ||| other
+		  else
+			return self & ~other
+	
+	function Activate (|NilCheckmode|)
+		if self is active
+			return .normal
+		|| rev = (self is reversed)
+		return self ||| (positive + rev)
+
+	function Normal (|NilCheckmode|)
+		if self is reversed
+			return .Negate &~ reversed
+		return self
+	
+	function Negate (|NilCheckmode|)
+		|| p = (self & positive) >> 1
+		p   |= (self & negative) << 1
+		return  p ||| (self &~ active)
+
+
+datatype NilReason (byte)
+	constants
+		|nilreason|
+		Accessing
+		Property
+		Reading 
+		Using
+		Passing
+	module
+		|| values = [
+			"Accessing"
+			"Accessing property on"
+			"Reading" 
+			"Using"
+			"Passing"
+		]
+	syntax is (|nilreason| x, |bool|)
+		return x == self

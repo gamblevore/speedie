@@ -1,12 +1,12 @@
 
 
 bugs:
+	* unify numeric types a lot. Many functions want to work on uint, int, etc... and one func is good enough for all!
+	* recursion blocker. We block any func from being recursive unless explicitly stated it could be. (can mark entire file as recursive though... like for my parser)
+	* don't use "syntax append", simply "function append". Same with "call". I mean *x --> x.first
 	* sdleventtype.mousedown() // compiles???
 		* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and struct
-	* opt norefcounts
-	  stderr = jeebox._ParseProtector init errorlist() // doesn't refcount stderr?
-	* refcounter passing properties SHOULD NOT assume it won't be cleared... not without disturbance checker
-	* function finding fails with dictionary subclasses? DictSub["abc"]
+	* Function finding fails with dictionary subclasses? DictSub["abc"]
 	* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
 	* vector constants
 	* || s = "".Address.IsLower // won't compile...
@@ -18,17 +18,21 @@ bugs:
 	* |string| s = __now__.render fails
 	* render float.fn {code} // won't compile
 	* v.operatormul(1.33) instead of v*1.33 :(
-	* rejoin blocks shouldn't safedecr then incr!! pointless!
-		* "a ?? b" should almost never be refcounted (unless returns a real object thats empty)
 	* ?? is kinda buggy for a lot of things.
 		x = a ?? x // sets x to x! should disallow? if a: x=a thats what we want.
 	*	status(.CurrMousePixelColor.render) // tmp struct.
-
+	* The "function case affects visibility" (from GoLang) thing needs deletion.
+	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
 
 additions:
-	* nil-checker could eliminate scope-escape... of locals vars whose address we give out. Its an error regardless.
+	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
+		* first byte (if float) can also store the sign of the exponent.
+		* could be an interesting type to have generally... like perhaps as a string subclass?
+	* refcount optimiser
+	* nil-checker could eliminate scope-escape... of local vars addresses. Its an error regardless.
 	* CollectDecls needs to not return early!! or break it up into pieces
 	* –container @ques ability... for macros. This returns the syntax that contained us. Useful for (all~files).delete
+	* unify macros? or just modernise. Why pass an array? why not a message~list? Arrays suck. list sexy.
 	* do we need lowercase in lookupsub??? all dots/funcs got lowered in parseclean?
 		* perhaps parseclean should use an ID system...
 	*  msg <~ {
@@ -40,6 +44,8 @@ additions:
 		// could be done better with ast-spawner?
 	* (node, err) = .text.parse --> |error| err, || node = .text.parse(err) // noice
 	* any object can be created with an virtual-function override table, just store before the refcount?
+		* if refcounts come in multiple of 2 (or even 4), we could store if we have a override table... per object
+
 	* could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
 	* || x = .SomeCArray // should just get the address... :)
 	
@@ -57,7 +63,6 @@ additions:
 	
 
 class-changes
-	* delete fastappender
 	* Make objectset from FixedDict?
 	* replace dictionary with fixeddict
 		* remove the datatype wrapper? it was only used for dicts+arrays anyhow...

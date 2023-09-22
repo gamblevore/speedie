@@ -34,6 +34,7 @@ class File (String)
 		cpp_Wrapper JB_File_Mode
 	
 	function Path (|string|)
+		nil checker
 		cpp_Wrapper JB_File_Path
 
 	function Mode (assigns:|FileMode|)
@@ -62,7 +63,8 @@ class File (String)
 		return .MoveTo( super.Parent[Name] )
 	
 	syntax cast (|bool|)
-		return self!=nil
+		opt norefcounts // what? why is this necessary?
+		RETURN self != nil
 
 	syntax cast (|faststring|)
 		cpp_part CastToStream
@@ -76,10 +78,11 @@ class File (String)
 		disabled "Do you mean the file's size or the file's path length?" 
 	
 	function Size (|int64|) // actually ints are less buggy. Like "|| NewSize = oldsize-1" with uint is bad.
+		description "Return the file-size."
 		cpp_wrapper JB_File_Size
 
 	function Length (assigns:|int|)	
-		disabled "Use file.size"
+		disabled "Use .size"
 
 	function Size (assigns:|int|N)
 		cpp_wrapper JB_File_SizeSet
@@ -90,11 +93,12 @@ class File (String)
 	function Close
 		cpp_wrapper JB_File_Close
 	
-	function Write (|string| Data, |ind|)
-		cpp_wrapper JB_File_Write
-	
 	Syntax Append (|string| data)
 		.write(Data)
+	
+	Syntax Append (|messageroot| msg)
+		cpp_Part WriteMsg
+		.msg.render(.out(false))
 	
 	function string.Visible (|bool|)
 		return *.name != '.'
@@ -106,34 +110,33 @@ class File (String)
 		if (.size != nieu.length) or (.readall(true) != nieu)
 			return .data(Nieu)
 	
-	operator plus (|string|s, |file|)
+	operator plus (|string| s, |file|)
 		return (super+S).file
 	
+	function File (|file|)
+		disabled "This is already a file."
 	
 	function Data (assigns:|String|Data, |bool|)
 		cpp_wrapper JB_File_DataSet
-	
-	
-	function ReadSafely (|int| lim = 128MB, |bool| AllowMissing = false, |StringThatWasReadSafely|)
-		// normally allowmissing is good, but here it is bad.
-		return .readall(lim, allowmissing)
-	
+
+	function Write (|string| Data, |ind|)
+		cpp_wrapper JB_File_Write	
 	
 	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |messageroot|)
+		// normally allowmissing is good, but here it is bad.
 		// file.parse keeps track of the source+path
 		|| f = .Resolve(allowmissing).file
-			|| S = f.readsafely(lim, allowmissing)
-			if s.IsCompressed
-				s = s.Decompress(lim, nil)
-			if s
-				|memorylayer--| L = (Message).CreateLayer(f) // these 3 lines should be one
-				L.use      // 2
-				L.obj2 = S // 3 // data set here, path set in createlayer 
-				rz = S.parse(@arg, false) // already decompressed.
-				(message).restore
+		|| S = f.readall(lim, allowmissing)
+		if s.IsCompressed
+			s = s.Decompress(lim, nil)
+		if s
+			|memorylayer--| L = (Message).CreateUseLayer(f, s) 
+			rz = S.parse(@arg, false) // already decompressed.
+			(message).restore
 
 	
 	function Modified (|Date|)
+		nil checker
 		cpp_wrapper JB_File_Modified
 	
 	function Modified (assigns:|Date|)
@@ -168,19 +171,21 @@ class File (String)
 		cpp_wrapper
 
 
-	function Child (|string| name, |bool| errs=false, |File|)
-		if name
-			|| f = File( .PathDir + Name.trimstart("/", true) )
-			if (!errs or f.exists)
-				return f
-			error (Self, "Can't find file/folder: '$name' in '${super}'." )
+	function Child (|string| name, |File|)
+		|| name2 = Name.trimstart("/", true)
+			return File( .PathDir + name )
 		error (Self, "No name specified for sub-file of directory: " + self)
+	
+	function ChildExisting (|string| name, |File|)
+		rz = .child(name)
+		if rz
+			expect (rz.exists) (Self, "Can't find file/folder: " + rz)
 	
 	
 	function Parent (|File|)
 		return File.new( super.Parent )
 	
-	function Touch (|errorint|)
+	function Touch (|errorint2|)
 		return "/usr/bin/touch".SilentExecute([self])
 
 	
@@ -237,28 +242,33 @@ class File (String)
 		return .CompareMsg(code, error)
 
 	
-	function ReadAll (|int| lim = 128MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
+	function ReadAll (|int| lim = 128MB, |bool| AllowMissing = true, |stringthatwasreadsafely!|)
 		cpp_wrapper JB_File_ReadAll
 	
 	
 	function MustExist (|string| operation = "", |bool|)
 		if .exists
 			return true
-		|| eerr = "File does not exist"
-		if self and *super != '/'
-			eerr += " at "
-			eerr += app.cwd
+		|| fs = faststring()
+		fs <~ "File does not exist"
+		if *super != '/'
+			fs <~ " at "
+			fs <~ app.cwd
 		if operation
-			eerr += ", trying to "
-			eerr += operation
-		error (self, eerr)
+			fs <~ ", trying to "
+			fs <~ operation
+		fs <~ " "
+		fs <~ super
+			
+		error (self, fs)
 
 	
 	function Exists (|bool|TestLinkExists=false, |bool|)
+		nil checker
 		cpp_wrapper JB_File_Exists
 	
-	syntax access (|string| name, |bool| Errs=false, |File|)
-		return .Child(name, errs)
+	syntax access (|string| name, |File|)
+		return .Child(name)
 
 	function ListStart (|bool|)
 		cpp_wrapper
@@ -269,13 +279,13 @@ class File (String)
 	function ListEnd
 		cpp_wrapper
 
-	function MoveNext (|bool|)
+	helper MoveNext (|bool|)
 		cpp_wrapper JB_File_MoveNext
 
-	function CurrChild (|String|)
+	helper CurrChild (|String|)
 		cpp_wrapper
 	
-	function Open (|int| Flags = File.O_RDWR (|) File.O_CREAT, |bool|AllowMissing=false, |int|)
+	function Open (|int| Flags = File.O_RDWR ||| File.O_CREAT, |bool|AllowMissing=false, |int|)
 		cpp_wrapper
 
 	function OpenForRead (|bool| AllowMissing = false, |int|)
@@ -287,10 +297,9 @@ class File (String)
 	
 	
 	function OpenBlank (|int|)
-		cpp_wrapper JB_File_Open____
 		disabled "Use OpenEmpty instead"
 
-	function OpenEmpty (|ind|)
+	function OpenEmpty (|bool|)
 		cpp_wrapper JB_File_OpenBlank
 	
 	function EOF (|bool|)
@@ -332,7 +341,8 @@ class File (String)
 			|| ch = .child(test)
 			if !ch.exists
 				return ch
-			test = name + (random.shared.int&0xFFFFFF).render
+			test = name + (0xFFFFFF()).render
+		error (self, "Unable to find unique child name.")
 			
 	function Relax (|bool| NeedsMode=true, |errorint|)
 		cpp_Wrapper JB_File_RelaxPath
@@ -361,20 +371,18 @@ class File (String)
 	operator IsNewerThan (|File| F, |bool|)
 		cpp_Part NewerThanFile
 		return self isnewerthan f.modified
+	
 	operator IsNewerThan (|date| F, |bool|)
 		return (.Modified > F)
-	
 	
 	operator IsOlderThan (|File| F, |bool|)
 		return (.Modified < F.Modified)
 	
-	
 	function Writer (|FastString|) // streamout
 		disabled "Use .out"
 	
-	
 	function string.Out (|bool| Clear=true, |Faststring|)
-		|| f = .file						#require
+		|| f = .file
 		if Clear and !f.ispipe // we don't close pipes!
 			f.close
 			require f.openempty
@@ -382,18 +390,17 @@ class File (String)
 		rz = FastString()
 		rz.file = f
 
-	
-	function string.In (|string|Header="", |int| ChunkSize=4MB, |StringReader|)
+	function string.In (|string| Header="", |int| ChunkSize=4MB, |StringReader|)
 		|| f = .file
 		if f.mustexist("stream")
 			rz = StringReader(f, chunkSize)
 			if !rz.test(Header)
 				rz = nil
 	
-	function Copy (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
+	function Copy (|File| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		disabled "Use .Copyto"
 	
-	function CopyTo (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
+	function CopyTo (|File| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		cpp_wrapper JB_File_Copy
 	
 	function CopyAll (|string| Dest, |bool| AttrOnly=false, |ErrorInt|)
@@ -401,11 +408,11 @@ class File (String)
 			return .copyto(dest.file, AttrOnly)
 
 		for f in self
-			rz = .child(f).copyall(dest[f]) 
+			rz = .child(f)!.copyall(dest[f]) 
 			if !rz
 				exit
 	
-	function List (|bool|invis = false, |[string]|)
+	function List (|bool| invis = false, |[string]|)
 		flow off
 		for name in self
 			if (invis) or (*name != '.')
@@ -421,7 +428,7 @@ class File (String)
 		|| fp = f.pathdir
 		return super[0, fp.length] == fp
 			
-	function Read (|int| Length, |bool|AllowMissing=true, |string|)
+	function Read (|int| Length, |bool| AllowMissing=true, |string|)
 		cpp_wrapper JB_File_Read
 
 	function Skip (|int| n=1)
@@ -436,14 +443,14 @@ class File (String)
 	iterator Files
 		.ListStart
 		while ( .MoveNext )
-			yield self.child(.CurrChild)
+			yield self.child(.CurrChild)!
 		.listend
 	
 
 	function SyntaxExpect (|string| Error)
 		opt norefcounts
 		cpp_part Fail
-		StdErr.NewError( nil, Error, (.path, "")(self) )
+		errorreceiver.NewError( nil, Error, (.path, "")(self) )
 
 	module
 		|| DebugExecute = false
@@ -504,24 +511,19 @@ class File (String)
 				rz = rz.uniquechild(name)
 
 		function ReadCPath (|cstring| path, |bool| AllowMissingFile, |int| MaxSize = 100000000, |string|)
-			cpp_wrapper JB_cPath_ReadAll
+			cpp_wrapper JB_CPath_ReadAll
 
 		function DocumentsFolder (|file|)
 			return "~/Documents/".file			// .file calls pathfix already
 
 		function PrefsFolder (|file|)
-			if platform.osx
+			target osx
 				return "~/Library/Preferences".file
+			target lin
+				return "~/.config/".file
 
 		function Logs (|file|)
 			return "/tmp/logs/".file
-
-	function AppDate (|date|)
-		if self
-			ifn self isa "app"
-				return .anydate
-			|| n = "/Contents/MacOS/" + .trimextandpath
-			return .child(n).anydate
 
 	function AnyDate (|date|)
 		return .created ?? .modified

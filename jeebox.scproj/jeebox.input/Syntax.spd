@@ -5,7 +5,7 @@
 
 
 prototype fpMsgRender (|Message| self, |FastString| fs)
-
+		
 
 datatype Syntax (Byte)
 	default nil
@@ -13,8 +13,8 @@ datatype Syntax (Byte)
 		cpp_Part Syx
 		numeric false // disallow implicit (syntax <--> int) conversion
 
-	function ID (|int|) 
-		return self|int|
+//	function ID (|int|) 
+//		return self|int|
 
 	function Translateable (|bool|) 
 		return self <= @Thg and self >= @tmp
@@ -40,9 +40,10 @@ datatype Syntax (Byte)
 	function Message.Translateable (|bool|) 
 		return .Func.Translateable
 
-	render 
-		if Self
-			.obj.render(fs)
+//	render 
+//		opt norefcounts
+//		|| o = .Obj
+//			o.render(fs)
 	
 	operator plus (|string| m, |message|)
 		return self.msg(m)
@@ -51,67 +52,70 @@ datatype Syntax (Byte)
 		cpp_Part PlusNum
 		return self.msg(m.render)
 	
-	syntax access (|string| m, |message|)
-		return .msg(m)
+//	syntax access (|string| m, |message|)
+//		return .msg(m)
 	
 	function Name (|string|) 
 		Opt NoRefCounts
-		if (!self)
-			return "child"
-		return .obj.name
+		if self
+			|| o = .obj
+				return o.name
+		return "child"
 	
 	
 	function LongName (|string|) 
 		Opt NoRefCounts
-		if (!self)
-			return "child"
-		return .obj.longname
-	
+		if self
+			|| o = .obj
+				return o.longname
+		return "child"
 	
 	function Obj (|syntaxobj|) 
 		return _FuncArray_[self|int|]
 	
 	
 	function Msg ( |string| name="", |Message| ) 
-		return Message( nil, self, parser.usingpos, name, name.length )
+		return Message( nil, self, parser.using.position, name, name.length )
 	
 	// remove this? node.msg seems better?
 	function Msg ( |message| parent, |string| name, |Message| )
-		cpp_part ParentMsg
-		return Message( parent, self, parser.usingpos, name, name.length )
+		disabled "Use node.msg(@syx, name) instead"
 	
 	function message.Msg ( |syntax| fn, |string| name="", |Message| )
-		return Message( self, fn, parser.usingpos, name, name.length )
+		return Message( self, fn, parser.using.position, name, name.length )
+	
 	
 	// replace with int64.msg? seems better.
-	function Msg ( |int64| name, |Message| ) 
+	function Msg ( |int64| name, |Message| )
 		cpp_part IntMsg
 		return .msg(name.render)
 		
 	function ExportAddr (assigns:|fpMsgRender|) 
 		Opt NoRefCounts
-		.obj.exportaddr = Value
+		.obj!.exportaddr = Value
 	
 	function ExportAddr (|fpMsgRender|) 
 		Opt NoRefCounts
-		return .obj.exportaddr
+		return .obj!.exportaddr
 	
-	function RenderAddr (assigns:|fpMsgRender|) 
-		Opt NoRefCounts
-		.obj.renderaddr = Value
+//	function RenderAddr (assigns:|fpMsgRender|) 
+//		Opt NoRefCounts
+//		.obj!.renderaddr = Value
 	
 	function RenderAddr (|fpMsgRender|) 
 		Opt NoRefCounts
-		return .obj.renderaddr
+		return .obj!.renderaddr
 	
 	
 	module 
 		|int|		CurrFuncID
 		|int|		MaxFuncID  
 		
-		function Func (|string| name, |message| where=nil, |syntax|)
-			|| obj = _syxdict_.valuelower(name) #expect (where, "Unknown syntax " + name)
-			return obj.id
+		function Func (|string?| name, |message| where=nil, |syntax|)
+			visible
+			if name!=nil
+				|| obj = _syxdict_.valuelower(name) #expect (where, "Unknown syntax " + name)
+				return obj.id
 			
 		function StdNew (|fpMsgRender| msg, |string|name, |String| LongName, |Syntax|) 
 		// called by the compiler via "syx" syntax.
@@ -147,12 +151,13 @@ class SyntaxObj
 		.RenderAddr = msg
 		.Name		= Name
 		.ID			= ID|syntax|
-		.ExportAddr = Message.Dummy
+		.ExportAddr = Message.Dummy!
 	
 	
 	render 
-		ifn fs_in 
+		if !fs_in 
 			return .LongName.lowercase
 		fs_in <~ .LongName.LowerCase
 	
+
 

@@ -25,7 +25,7 @@ class MessageID (stringshared)				// now is usefully used! :D
 	false	NIL
 	contains object
 	||					Obj
-	|uint64| 			Tag
+	|uint64| 			MTag
 	|Syntax|			Func
 	
 	render
@@ -41,7 +41,7 @@ class MessageID (stringshared)				// now is usefully used! :D
 		super.constructor(name)
 		.Func = fn
 		.obj = nil               // c++ generator fails otherwise
-		.tag = tag
+		.mtag = tag
 		
 	function Msg (|message| parent, |message|)
 		return Message(parent, .func, -1, .name, .name.length)
@@ -52,7 +52,7 @@ class MessageID (stringshared)				// now is usefully used! :D
 			opt norefcounts
 			|| aa = a|MessageID|,   || bb = b|MessageID| 
 			
-			|| diff = aa.Tag  -  bb.Tag
+			|| diff = aa.mTag  -  bb.mTag
 				return diff > 0							// more frequent should have lower lengths
 				
 			return aa|uint64| < bb|uint64|
@@ -60,7 +60,7 @@ class MessageID (stringshared)				// now is usefully used! :D
 
 
 
-function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)
+/*function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)
 	opt NoRefCounts
 	|| s = self
 	|| Count = 0
@@ -69,7 +69,7 @@ function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)
 		|| Found = d.makeplace(s)|&messageID|
 		|| ID = *found
 		if ID != nil
-			ID.Tag++
+			ID.mTag++
 		  else
 			rz += name.Length				// a direct result within self
 			id = MessageID(name, s.func, 0)
@@ -83,9 +83,9 @@ function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)
 
 struct MessageDecompressor
 	linkage:cpp_part Mxpd
-	|&Message--|					End
-	|&Message--|					Curr
-	|&Message--|					Table
+	|(&Message--)?|					End
+	|(&Message--)?|					Curr
+	|(&Message--)?|					Table
 
 	helper Allocate (|bool|)
 		require StdErr.ok
@@ -140,3 +140,4 @@ struct MessageCompressor
 		
 	destructor
 
+*/

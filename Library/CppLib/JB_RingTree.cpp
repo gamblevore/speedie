@@ -6,7 +6,7 @@
 /*
     A tree good for fast insert, append, remove and with no cyclical refcounting.
 
-    No RingTree can be moved into it's own desendant or itself.
+    No JB_List can be moved into it's own desendant or itself.
 
     I do things a bit lopsided, but it works out for the best!
     LastChild.next = 0, apart from that it's a plain double-ring.
@@ -18,10 +18,10 @@
 
 extern "C" {
 
-static void RingLeave_( RingTree* rt );
+static void RingLeave_( JB_List* rt );
 
 
-inline bool RingIsRoot_( RingTree* rt ) {
+inline bool RingIsRoot_( JB_List* rt ) {
 	if ( !rt->Parent ) {
 		dbgexpect2( !rt->Prev );
 		dbgexpect2( !rt->Next );
@@ -32,9 +32,9 @@ inline bool RingIsRoot_( RingTree* rt ) {
 
 #define Sanity(s)
 
-static void AncestorSanity_(RingTree* Curr) {
+static void AncestorSanity_(JB_List* Curr) {
     // not parent of myself
-    RingTree* Parent = Curr->Parent;
+    JB_List* Parent = Curr->Parent;
     while (Parent) {
         if (Curr == Parent) {
             debugger;
@@ -44,12 +44,12 @@ static void AncestorSanity_(RingTree* Curr) {
 }
 
 
-static void LoopSanity_(RingTree* self) {
-	RingTree* Curr = self->Next;
+static void LoopSanity_(JB_List* self) {
+	JB_List* Curr = self->Next;
 	while (Curr) {
 		if (Curr == self)
 			debugger;
-		RingTree* N = Curr->Next;
+		JB_List* N = Curr->Next;
 		if (N and N->Prev != Curr)
 			debugger;
 		Curr = N;
@@ -57,15 +57,15 @@ static void LoopSanity_(RingTree* self) {
 }
 
 
-static void AmContainedSanity_(RingTree* Curr) {
+static void AmContainedSanity_(JB_List* Curr) {
     // find self in parent
-    RingTree* Parent = Curr->Parent;
+    JB_List* Parent = Curr->Parent;
     if (!Parent) {
         return;
     }
 
     bool Found = false;
-    RingTree* Ch = Parent->Child;
+    JB_List* Ch = Parent->Child;
     while (Ch) {
         if (Ch == Curr) {
             Found = true;
@@ -75,7 +75,7 @@ static void AmContainedSanity_(RingTree* Curr) {
             break;
         }
 
-        RingTree* Prev = Ch->Prev;
+        JB_List* Prev = Ch->Prev;
         if (Prev->Next != Ch) {
             debugger;
         }
@@ -86,7 +86,7 @@ static void AmContainedSanity_(RingTree* Curr) {
     }
 }
 
-static void Sanity_(RingTree* Curr) {
+static void Sanity_(JB_List* Curr) {
     if (!Curr) {
         return;
     }
@@ -98,8 +98,8 @@ static void Sanity_(RingTree* Curr) {
 }
 
 
-static RingTree* LastSanity = 0;
-void JB_Ring_TotalSanity(RingTree* Root) {
+static JB_List* LastSanity = 0;
+void JB_Ring_TotalSanity(JB_List* Root) {
     if (!Root) {
         Root = LastSanity;
         if (!Root) {
@@ -109,8 +109,8 @@ void JB_Ring_TotalSanity(RingTree* Root) {
         LastSanity = Root;
     }
     
-    RingTree* After = JB_Ring_FlatAfter(Root);
-    RingTree* Curr = Root;
+    JB_List* After = JB_Ring_FlatAfter(Root);
+    JB_List* Curr = Root;
     while (Curr != After) {
         AmContainedSanity_(Curr);
         Curr = JB_Ring_FlatNext0(Curr);
@@ -119,15 +119,15 @@ void JB_Ring_TotalSanity(RingTree* Root) {
 
 
 
-inline void RingOwnForDeref_( RingTree* Curr ) {
+inline void RingOwnForDeref_( JB_List* Curr ) {
     Curr->Next = 0;
     Curr->Parent = 0;
     Curr->Prev = 0;
 }
 
 
-bool JB_Ring_IsAncestor( RingTree* child, RingTree* ance ) {
-	RingTree* p = child->Parent;
+bool JB_Ring_IsAncestor( JB_List* child, JB_List* ance ) {
+	JB_List* p = child->Parent;
 	while ( p ) {
 		if ( p == ance ) {
 			return true;
@@ -139,7 +139,7 @@ bool JB_Ring_IsAncestor( RingTree* child, RingTree* ance ) {
 	return false;   
 }
 
-static bool DB_RingIsAncestor_( RingTree* child, RingTree* ance ) {
+static bool DB_RingIsAncestor_( JB_List* child, JB_List* ance ) {
 #if DEBUG || AS_LIBRARY // important!
 	return JB_Ring_IsAncestor(child, ance);
 #endif
@@ -148,7 +148,7 @@ static bool DB_RingIsAncestor_( RingTree* child, RingTree* ance ) {
 }
 
 
-inline bool PrepareMove_( RingTree* place, RingTree* mover ) {
+inline bool PrepareMove_( JB_List* place, JB_List* mover ) {
     if (!mover)
         return false;
     
@@ -165,19 +165,19 @@ inline bool PrepareMove_( RingTree* place, RingTree* mover ) {
         }
     }
 
-    JB_ErrorHandleC("Error: moved a RingTree node to the wrong place", false);
+    JB_ErrorHandleC("Error: moved a JB_List node to the wrong place", 0, false);
 	JB_DoAt(1);
 
     return false;
 }
 
 
-bool JB_Ring_HasChildren( RingTree* self ) {
+bool JB_Ring_HasChildren( JB_List* self ) {
     return self and self->Child;
 }
 
-int JB_Ring_Count( RingTree* self ) {
-	RingTree* c = self->Child;
+int JB_Ring_Count( JB_List* self ) {
+	JB_List* c = self->Child;
 	
     int N = 0;
 	while ( c ) {
@@ -188,8 +188,8 @@ int JB_Ring_Count( RingTree* self ) {
 	return N;
 }
 
-bool JB_Ring_HasChildCount( RingTree* self, int HasCount ) {
-	RingTree* c = self->Child;
+bool JB_Ring_HasChildCount( JB_List* self, int HasCount ) {
+	JB_List* c = self->Child;
 	
 	while ( HasCount-- >= 1 ) {
 		if ( !c ) {
@@ -201,9 +201,9 @@ bool JB_Ring_HasChildCount( RingTree* self, int HasCount ) {
 	return ( !c );
 }
 
-RingTree* JB_Ring_Last( RingTree* self ) {
+JB_List* JB_Ring_Last( JB_List* self ) {
 	if (self) {
-		RingTree* c = self->Child;
+		JB_List* c = self->Child;
 		if ( c ) {
 			return c->Prev;
 		}
@@ -211,16 +211,16 @@ RingTree* JB_Ring_Last( RingTree* self ) {
 	return 0;
 }
 
-RingTree* JB_Ring_NextSib( RingTree* self ) {
+JB_List* JB_Ring_NextSib( JB_List* self ) {
 	if (self) {
 		return self->Next;
 	}
 	return 0;
 }
 
-RingTree* JB_Ring_PrevSib( RingTree* self ) {
+JB_List* JB_Ring_PrevSib( JB_List* self ) {
 	if (self) {
-		RingTree* Prev = self->Prev;
+		JB_List* Prev = self->Prev;
 		if (Prev and Prev->Next) { // the last one has no next!
 			return Prev;
 		}
@@ -229,20 +229,20 @@ RingTree* JB_Ring_PrevSib( RingTree* self ) {
 	return 0;
 }
 
-RingTree* JB_Ring_First( RingTree* self ) {
+JB_List* JB_Ring_First( JB_List* self ) {
 	if (self)
 		return self->Child;
 	return 0;
 }
 
-RingTree* JB_Ring_Parent( RingTree* self ) {
+JB_List* JB_Ring_Parent( JB_List* self ) {
 	if (self)
 		return self->Parent;
 	return 0;
 }
 
-RingTree* JB_Ring_Root( RingTree* self ) {
-	RingTree* rz = self;
+JB_List* JB_Ring_Root( JB_List* self ) {
+	JB_List* rz = self;
 	while ( self ) {
 		rz = self;
 		self = self->Parent;
@@ -251,7 +251,7 @@ RingTree* JB_Ring_Root( RingTree* self ) {
 }
 
 
-bool JB_Ring_IsRoot( RingTree* self ) {
+bool JB_Ring_IsRoot( JB_List* self ) {
 	if (self) {
 		return ( !self->Parent );
 	}
@@ -259,13 +259,13 @@ bool JB_Ring_IsRoot( RingTree* self ) {
 }
 
 
-static void RingLeave_( RingTree* rt ) {
+static void RingLeave_( JB_List* rt ) {
     Sanity(rt);
 	dbgexpect( rt );
 	dbgexpect( !RingIsRoot_( rt ) ); // 
-	RingTree* n = rt->Next;
-	RingTree* p = rt->Prev;
-	RingTree* Parent = rt->Parent;
+	JB_List* n = rt->Next;
+	JB_List* p = rt->Prev;
+	JB_List* Parent = rt->Parent;
     rt->Parent = 0;
 	dbgexpect( p );
 	dbgexpect( Parent );
@@ -286,13 +286,13 @@ static void RingLeave_( RingTree* rt ) {
 }
 
 
-inline void InsertBefore_( RingTree* pl, RingTree* rt ) {
+inline void InsertBefore_( JB_List* pl, JB_List* rt ) {
 	dbgexpect( rt );
 	dbgexpect( pl );
-	RingTree* Parent = pl->Parent;
+	JB_List* Parent = pl->Parent;
 	dbgexpect( Parent );
 
-	RingTree* Prev = pl->Prev;
+	JB_List* Prev = pl->Prev;
 	if ( Parent->Child == pl ) {
 		Parent->Child = rt; // put ourselves first!
 	} else {
@@ -305,13 +305,13 @@ inline void InsertBefore_( RingTree* pl, RingTree* rt ) {
 }
 
 
-inline void InsertAfter_( RingTree* pl, RingTree* rt ) {
+inline void InsertAfter_( JB_List* pl, JB_List* rt ) {
 	dbgexpect( rt );
 	dbgexpect( pl );
-	RingTree* Parent = pl->Parent;
+	JB_List* Parent = pl->Parent;
 	dbgexpect( Parent );
 
-	RingTree* Next = pl->Next;
+	JB_List* Next = pl->Next;
 
 	rt->Next = Next;
 	rt->Prev = pl;
@@ -326,13 +326,13 @@ inline void InsertAfter_( RingTree* pl, RingTree* rt ) {
 }
 
 
-struct DepthNode { RingTree* Node; int Depth; };
+struct DepthNode { JB_List* Node; int Depth; };
 
-DepthNode FlatNext( RingTree* self, bool AllowDown ) {
+DepthNode FlatNext( JB_List* self, bool AllowDown ) {
 	Sanity( self );
 	
-	RingTree* c = self->Child;
-	RingTree* up = self->Parent;
+	JB_List* c = self->Child;
+	JB_List* up = self->Parent;
 	int Depth = 0;
 
 	if (AllowDown and c) {
@@ -343,7 +343,7 @@ DepthNode FlatNext( RingTree* self, bool AllowDown ) {
 	}
 
 	while (up != self  and  up) {
-		RingTree* n = self->Next;
+		JB_List* n = self->Next;
 
 		if ( n ) {
 			return {n, Depth};
@@ -359,12 +359,14 @@ DepthNode FlatNext( RingTree* self, bool AllowDown ) {
 }
 
 // very cool
-RingTree* JB_Ring_FlatNext0( RingTree* self ) {
-	return FlatNext( self, true ).Node;
+JB_List* JB_Ring_FlatNext0( JB_List* self ) {
+	if (self)
+		return FlatNext( self, true ).Node;
+	return 0;
 }
 
 
-RingTree* JB_Ring_FlatNextDepth( RingTree* self, int* Depth, bool Down ) {
+JB_List* JB_Ring_FlatNextDepth( JB_List* self, int* Depth, bool Down ) {
 	auto D = FlatNext( self, Down );
 	if (Depth)
 		*Depth += D.Depth;
@@ -372,14 +374,14 @@ RingTree* JB_Ring_FlatNextDepth( RingTree* self, int* Depth, bool Down ) {
 }
 
 
-RingTree* JB_Ring_FlatAfter( RingTree* self ) {
+JB_List* JB_Ring_FlatAfter( JB_List* self ) {
 	if (self)
 		return FlatNext( self, false ).Node;
 	return 0;
 }
 
 
-void JB_Ring_ParentSet( RingTree* self, RingTree* NewParent ) {
+void JB_Ring_ParentSet( JB_List* self, JB_List* NewParent ) {
 	if (NewParent) {
 		JB_Ring_LastSet( NewParent, self );
 	} else if (self and self->Parent) {
@@ -390,7 +392,7 @@ void JB_Ring_ParentSet( RingTree* self, RingTree* NewParent ) {
 }
 
 
-void JB_Ring_NextSibSet( RingTree* self, RingTree* Mover ) {
+void JB_Ring_NextSibSet( JB_List* self, JB_List* Mover ) {
 	if ( self->Parent and PrepareMove_( self, Mover ) ) {
 		InsertAfter_( self, Mover );
 	}
@@ -398,7 +400,7 @@ void JB_Ring_NextSibSet( RingTree* self, RingTree* Mover ) {
 }
 
 
-bool JB_Ring_PrevSibSet( RingTree* self, RingTree* Mover ) {
+bool JB_Ring_PrevSibSet( JB_List* self, JB_List* Mover ) {
 	if ( self->Parent and PrepareMove_( self, Mover ) ) {
 		InsertBefore_( self, Mover );
 		return true;
@@ -407,20 +409,20 @@ bool JB_Ring_PrevSibSet( RingTree* self, RingTree* Mover ) {
 }
 
 
-bool JB_Ring_LastSet( RingTree* self, RingTree* New ) {
+bool JB_Ring_LastSet( JB_List* self, JB_List* New ) {
 	if ( !self or !PrepareMove_( self, New ) ) {
         return false;
     }
 
 	New->Parent = self;
-	RingTree* c = self->Child;
+	JB_List* c = self->Child;
 
 	if ( !c ) {
 		self->Child = New;
 		New->Next = 0;
 		New->Prev = New;
 	} else {
-		RingTree* Last = c->Prev;
+		JB_List* Last = c->Prev;
 
 		c->Prev = New;
 
@@ -434,9 +436,9 @@ bool JB_Ring_LastSet( RingTree* self, RingTree* New ) {
 
 
 
-bool JB_Ring_FirstSet( RingTree* self, RingTree* Mover ) {
+bool JB_Ring_FirstSet( JB_List* self, JB_List* Mover ) {
 	if ( Mover and self ) {
-        RingTree* First = JB_Ring_First( self );
+        JB_List* First = JB_Ring_First( self );
         if ( !First )
             return JB_Ring_LastSet( self, Mover );
 		  else if (First != Mover) 
@@ -446,13 +448,13 @@ bool JB_Ring_FirstSet( RingTree* self, RingTree* Mover ) {
 }
 
 
-RingTree* JB_Ring_MakeFirst( RingTree* self ) {
+JB_List* JB_Ring_MakeFirst( JB_List* self ) {
 	// buggy? the order seems altered...
-	RingTree* P = self->Parent;
+	JB_List* P = self->Parent;
 	require(P);
-	RingTree* F = P->Child;
-	RingTree* L = F->Prev;
-	RingTree* Pr = self->Prev;
+	JB_List* F = P->Child;
+	JB_List* L = F->Prev;
+	JB_List* Pr = self->Prev;
 	L->Next = F;							// Restore the links!
 	P->Child = self;						// OK... so we become the first...
 	Pr->Next = nil;							// Thats it???
@@ -461,32 +463,35 @@ RingTree* JB_Ring_MakeFirst( RingTree* self ) {
 }
 
 
-void JB_Ring_Constructor0( RingTree* self ) {
+JB_List* JB_Ring_Constructor0( JB_List* self ) {
+	JB_New2(JB_List);
     self->Position = 0;
     self->Parent = 0;
     self->Next = 0;
     self->Prev = 0;
     self->Child = 0;
+    return self;
 }
     
     
-void JB_Ring_Constructor( RingTree* self, RingTree* Parent ) {
+JB_List* JB_Ring_Constructor( JB_List* self, JB_List* Parent ) {
+	JB_New2(JB_List);
     self->Position = 0;
     self->Next = 0;
     self->Child = 0;
     self->Parent = Parent;
     if (!Parent) {
         self->Prev = 0;
-        return;
+        return self;
     }
 
     Sanity(Parent);
-	RingTree* First = Parent->Child;
+	JB_List* First = Parent->Child;
 
     JB_Incr( self );
 	
     if ( First ) {
-        RingTree* Last = First->Prev;
+        JB_List* Last = First->Prev;
         First->Prev = self;
         Last->Next = self;
         self->Prev = Last;
@@ -496,19 +501,15 @@ void JB_Ring_Constructor( RingTree* self, RingTree* Parent ) {
     }
     Sanity(self);
     Sanity(Parent);
+    return self;
 }
     
 
 
-void JB_Ring_Destructor( RingTree* self ) {
-	RingTree* Curr = self->Child;
-	
-	// if it's got a prev...
-		// it has either got a parent (so its dispose)
-		// it it doesnt               (so its a weaklist destructor, but check for the refcount)
-	
+void JB_Ring_Destructor( JB_List* self ) {
+	JB_List* Curr = self->Child;
 	while (Curr) {
-		RingTree* Next = Curr->Next;
+		JB_List* Next = Curr->Next;
 		RingOwnForDeref_( Curr );
 		JB_Decr( Curr );
 		Curr = Next;
@@ -518,8 +519,6 @@ void JB_Ring_Destructor( RingTree* self ) {
 		RingOwnForDeref_( self );
 		JB_SafeDecr( self );
 	}
-	// weaklist can just decrement an existing node?/?
-	
 }
 
 }

@@ -8,6 +8,6 @@ main 	  	  	  	  	  	 	// main {
 	function.LoadApp						#require
 	class.Behave							#require
 	debugger.load
-	rz  = apptable[0].Run
-	rz := apptable[1].Run
+	rz  = apptable[0]!.Run
+	rz := apptable[1]!.Run
 

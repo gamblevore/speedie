@@ -2,26 +2,41 @@
 
 
 module Linkage
-	|| Dict  = message()
-	|| Flags = message() // for the linker i guess...
+	|| OSXFrameworks = message()
+	|| Flagz = message()		// for the linker i guess...
 	
 	function Interpreter (|bool|)
-		return linkage..interpreter.yes
-	function Conf (|string|name, |message|)
-		return .dict[name]
+		return linkage["interpreter"].yes
+	
 	syntax access (|string| name, |string|)
-		return .flags[name].nyme
+		|| fs = faststring()
+		for ch in .Flagz
+			if ch ~= name
+				|| str = ch.firstname
+					if fs.length
+						fs <~ ' '
+					fs <~ str
+		return fs
 
-	function LinkerSub (CollectFunc)
+
+	function message.ConfTake (|message| dest, |string| name)
+		opt norefcounts
+		|| F = self[name]
+			dest.takeallfrom(F)
+			F.parent!.remove
+
+	
+	function LinkerSub (CollectFunc) // linkagesub
+		opt norefcounts
 		|| arg = node[@arg]
-			|| cf = arg..flags
-				cf.remove
-				.flags.takeallfrom(cf)
-
-			.dict.TakeAllFrom(arg)
+			arg.ConfTake(.Flagz, "flags")
+			arg.ConfTake(.osxframeworks, "frameworks")
+			for ch in arg
+				error (ch)
 			return Compiler.program
-	
-	
+			
+				
+		
 	function Collect (CollectFunc)
 		expect  (name_space == Compiler.Program)  (node, "This must be at root.")
 

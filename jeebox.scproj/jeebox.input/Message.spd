@@ -4,12 +4,12 @@
 */
 
 
-|Dictionary of SyntaxObj|	_SyxDict_ = Dictionary.New // must be at root. compiler init order.
-|SyntaxObj[64]|             _FuncArray_
+|Dictionary of SyntaxObj|	_SyxDict_ = Dictionary.New  // must be at root. compiler init order.
+|SyntaxObj[64]|             _FuncArray_					// what if these were moved into jeebox module? seems good?
 
 
 
-class Message (RingTree)
+class Message (list)
 	linkage
 		cpp_part Msg
 		visible true
@@ -17,17 +17,18 @@ class Message (RingTree)
 ////////////////////////////////
 	contains Message
 	|string|				Name
-	|Object(tag)|			Obj					// Allow users to attach interesting information.
-												// better to remove "tag" and just use "target minilib"
-												// then we can do |object| or |uint64|
+	|Object(tag)?|			Obj					// Allow users to attach interesting information.
 	|Syntax|				Func
 	|Byte|					Indent
-	|MsgUIFlags|			Flags
 	|uint16|				RangeLength
-	|uint16|				Tag
+
+
+////////////////////////////////		
+	|MsgParseFlags|			Flags				// Output only. Change freely or reuse.
+	|uint16|				Tag					// Jeebox does not use these itself.
 ////////////////////////////////		
 			
-	constructor (|Message| other)
+	constructor (|Message!| other)
 		cpp_part ConstructorCopy
 		super.constructor
 		
@@ -36,26 +37,28 @@ class Message (RingTree)
 		.func		= other.func
 		.Obj		= other.obj
 		.indent		= other.indent
-		.flags		= other.flags
+		.flags		= other.flags ||| parser.using.flags // insertedness
 		.RangeLength= other.RangeLength
 		.Tag		= other.Tag
+
 
 	constructor
 		cpp_part ConstructorEmpty
 		.func = @arg
-		.Position	= parser.UsingPos
-		.flags		= parser.InsertedFlags
-		.RangeLength= parser.UsingLength
-		.tag		= parser.UsingTag // why not... 
+		.Position	= parser.Using.position
+		.flags		= parser.using.Flags
+		.RangeLength= parser.Using.Length
+		.tag		= parser.Using.Tag
+
 			
 	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
 		cpp_part ConstructorNormal
 		.name		= name
 		.func		= func
-		.Position	= parser.UsingPos
-		.flags		= parser.InsertedFlags
-		.RangeLength= parser.UsingLength
-		.tag		= parser.UsingTag // why not... 
+		.Position	= parser.Using.Position
+		.flags		= parser.using.Flags
+		.RangeLength= parser.Using.Length
+		.tag		= parser.Using.Tag
 
 	
 	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength=0)
@@ -66,26 +69,28 @@ class Message (RingTree)
 		.Position	= BytePos
 		.func		= func
 		.RangeLength= RangeLength
-		.flags		= parser.InsertedFlags // speedie's .AppMainFix likes this, for msg is inserted
-		.tag		= parser.UsingTag // why not...
+		.flags		= parser.using.Flags
+		.tag		= parser.Using.Tag
 
 
-	function SyxId (|int|)
-		return .Func|int|
 ///////////////////////////////////////////////////////////////////////////////
-
-
-	function Copy (|message| pos_msg=nil, |Message|)
+	
+	
+	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
-		require self
-		|| L = (pos_msg.memorylayer, .memorylayer)(pos_msg)
-				
-		rz = message.NewWithLayer(L, self)				// looks better
-		if pos_msg
-			rz.position = pos_msg.position
-			rz.rangelength = pos_msg.rangelength
+		rz = pos_msg ?? self
+		using rz
+			rz = .copysub(pos_msg)
+	
+	
+	helper CopySub (|message?| P = nil, |Message!|)
+		opt norefcounts
+		rz = message(self)
+		if P
+			rz.position = P.position
+			rz.rangelength = P.rangelength
 		for v in self
-			rz <~ v.Copy(pos_msg)
+			rz <~ v.CopySub(P)
 
 
 	operator matches (|message| m, |bool|)
@@ -96,8 +101,8 @@ class Message (RingTree)
 		return .name[0, s, true]
 
 
-	function ClearPosition
-		.Position = parser.usingpos
+//	function ClearPosition
+//		.Position = parser.using.position
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,12 +119,16 @@ class Message (RingTree)
 	
 	syx Arg (Argument)
 		Opt NoRefCounts
-		|| Braces = (self is style2)  or  !.hasany  or .name or  (self in @arg)
+		|| Braces = (.parent and self isnt style2)  or  !.hasany  or .name or  (self in @arg)
 			fs <~ '{'
-		.FSListArg( fs ) // the name is already rendered by this!!
+		.FSListArg( fs, braces ) // the name is already rendered by this!!
 		if Braces
-			fs.IndentLine
+			fs.AppendIndent
 			fs <~ '}'
+			fs <~ '\n'
+		if !.parent
+			fs <~ "\n" // make sure it will reparse as an arg
+		
 
 	syx Emb (Embedded_Value)
 		fs <~ .Name
@@ -150,12 +159,11 @@ class Message (RingTree)
 	
 	syx Tmp (Statement)
 		Opt NoRefCounts
-//							return x
 		if .name.IsStatementName
 			fs <~ .name
 		  else
 			fs <~ '+'
-			fs.AppendQuotedEscape(.name)
+			fs.AppendQuotedEscape(.name) // use +''  ???  it is visually lighter.
 
 		require .hasany
 
@@ -169,6 +177,7 @@ class Message (RingTree)
 			if ch == @arg
 				hasarg = true
 			ch++
+
 
 	syx Oat (Operator_As_Thing)
 		fs <~ '%'
@@ -226,8 +235,7 @@ class Message (RingTree)
 			fs <~ '`'
 	
 	
-	syx Char (Character)
-//									'x'
+	syx Char (Character)			//  'x'
 		fs <~ '\''
 		fs <~ .Name.EscapeChr
 		fs <~ '\''
@@ -253,9 +261,9 @@ class Message (RingTree)
 		fs <~ '"'
 
 
-	syx Unit
-		|| num = .first.name
-		fs <~ num // 20cm
+	syx Unit						// 20cm
+		|| num = .FirstName
+		fs <~ num
 		if (num.ishexlike) and (num.last != '_')       // 0xFF
 			fs <~ '_'
 		fs <~ .name  // 20cm, 0xFF_cm
@@ -277,13 +285,13 @@ class Message (RingTree)
 			fs <~ .Name
 
 
-	syx Dot (Dot)
-//										x.fn(a)
-		|| ch = .First					#require
-		fs <~ ch
+	syx Dot (Dot)					// x.fn(a)
+		|| ch = .First
+			fs <~ ch
 		fs <~ '.'
 		fs <~ .Name
-		fs <~ ch.Next
+		if ch
+			fs <~ ch.Next
 		
 
 	syx SDot (Self_Dot)
@@ -521,6 +529,10 @@ class Message (RingTree)
 	
 	syx SCom (Syntactic_Comment)
 		|| ch = .first
+		if !ch
+			fs <~ " /# "
+			return 
+		
 
 		fs <~ ch.next
 		fs <~ " /# "
@@ -546,7 +558,8 @@ class Message (RingTree)
 	syx url (URL)
 		fs <~ .Name
 		fs <~ "://"
-		fs <~ .First.name
+		|| f = .first
+			fs <~ f.name
 	
 	function RenderPrm (|FastString| fs, |Byte| b1, |Byte| b2)
 		fs <~ b1
@@ -562,18 +575,19 @@ class Message (RingTree)
 		Opt NoRefCounts
 		for (m in self)
 			if (m == @item)
-				|| Tmp = m.first // a string
-				m.prev = Tmp
-				Tmp.Func = @tmp
-				|| value = m.first
-				Tmp <~ value
-				m.remove
-				value.ConvertJSONToJB
+				|| Tmp = m[@nil] // a string
+					m.prev = Tmp
+					Tmp.Func = @tmp
+					|| value = m.first
+					Tmp <~ value
+					m.remove
+					value.ConvertJSONToJB
 			  else
 				m.ConvertJSONToJB
 
 
 	render
+		opt norefcounts
 		fs <~ self
 
 	
@@ -609,26 +623,26 @@ class Message (RingTree)
 			.jdb2_(flags, fs)
 	
 	
-	function ParseAST (|message|)
+	function ParseAST (|message?|)
 		if self == @arg
-			|| f = .first
+			|| f = .first$
 			f.ExpectLast
 			return f.ParseAST
 		|| fn = Syntax.Func(.name, self)		#require
 		|| name = .first
-		|| isStr = name==@str
-		rz = Message(fn, (name.name, "")(isstr))
-		|| arg = (name.next, name)(isstr)
-		if arg == @arg
-			for ch in arg
-				rz <~ ch.ParseAST
+			|| isStr = name==@str
+			rz = Message(fn, (name.name, "")(isstr))
+			|| arg = (name.next, name)(isstr)
+			if arg == @arg
+				for ch in arg
+					rz <~ ch.ParseAST
 	
 	
-	function UnEmbed
+	function UnEmbedStr
 		|| s1 = .First
-		require (s1 == @Emb) and (!s1.Next)
-		s1.Remove
-		.Name = s1.Name
+		if (s1 == @Emb) and !s1.Next
+			s1.Remove
+			.Name = s1.Name
 
 
 	function FSListSep (|FastString| fs, |String| sep)
@@ -639,25 +653,25 @@ class Message (RingTree)
 			fs <~ ch
 	
 
-	function FSListArg (|FastString| fs)
+	function FSListArg (|FastString| fs, |bool| AddLine=false)
 		opt NoRefCounts
 		|| hasp = .parent!=nil
 		fs.indent += hasp
 		
-		|| doind = hasp
+		AddLine |= hasp
 		if .name
-			doind = true
+			AddLine = true
 			fs.IndentLine
 			fs <~ "^"
 			fs.AppendQuotedEscape(.name)
 		for ch in self
-			if doind
+			if AddLine
 				fs.IndentLine
 			fs <~ ch
-			doind = true
+			AddLine = true
 
 		fs.indent -= hasp
-		if hasp
+		if hasp and fs.last != '\n'
 			fs <~ '\n'
 
 
@@ -670,8 +684,9 @@ class Message (RingTree)
 	function ShallowEquals (|message| B, |bool| Aware=false, |bool|)
 		return (.func == b.func) and .name.syntaxequals(b.name, aware)
 	
-	function DeepEquals (|message| B, |bool| Aware=false, |bool|)
+	function DeepEquals (|message?| B, |bool| Aware=false, |bool|)
 		opt norefcounts
+		nil self
 		|| A = self
 		|| A2 = .FlatAfter
 		|| B2 = b.FlatAfter
@@ -681,29 +696,37 @@ class Message (RingTree)
 			if ADone And BDone
 				return true
 
-			if (ADone!=BDone) or (!a.ShallowEquals(b, aware))
+			if (ADone!=BDone) or (!a!.ShallowEquals(b!, aware))
 				return false
 				
 			A = A.flatnext
 			b = b.flatnext
+
 		
-	function Find (|message| match, |message|)
-		cpp_part FindMatch
-		opt norefcounts
-		for old in self
-			if old.DeepEquals(match)
-				return old
-			
-	function ShortDesc (|string|)
-		if !.name
-			return .funcname
-		return "${.funcname} ‘${.name}’"
-
-
-	function Nyme (|string|)
-		// this function won't be necessary in the future!
+	function Name (|string|)
+		nil safe
 		if self
-			return .Name 
+			return .Name
+
+
+	function Func (|Syntax|)
+		nil safe
+		if self
+			return .func
+
+	function Name_ (|string|) // for use within the message class!
+		// seems unnecessary?
+		description "For use within the message class, which can't use the 'name' function directly."
+		nil safe
+		if self
+			return .Name
+
+
+	function FirstName (|string|)
+		nil checker
+		opt norefcounts
+		|| f = .first
+			return f.name
 
 
 	function Ancestor (|Syntax| f, |Message|)
@@ -716,11 +739,19 @@ class Message (RingTree)
 
 	function Find (|Syntax| s, |Message|)
 		cpp_part FindSyx
+		nil self // remove once we improve the nil-checker to "link" variables
 		Opt NoRefCounts
 		for ch in self
 			if ch == s
 				return ch
 
+	function FindAll (|syntax| fn=@tmp, |string| name, |[message]|)
+		opt norefcounts
+		nil self // remove once we improve the nil-checker to "link" variables
+		for s in self
+			if s.func == fn and s.name == name
+				rz <~ s
+		
 	
 // merge these two! find and find flat... seem to do the same except the err-param
 	function Find (|Syntax| s, |string| name, |bool| Err = false, |Message|)
@@ -741,9 +772,9 @@ class Message (RingTree)
 				return ch
 	
 
-	function FindNested (|Syntax| fn, |string| name = nil, |bool| Err=false, |Message|)
+	function FindNested (|Syntax| fn, |string?| name = nil, |bool| Err=false, |Message|)
 		Opt NoRefCounts
-		
+		nil self
 		for curr.flat in self
 			if curr == fn or fn == nil
 				if name == nil  or  curr ~= name: Return curr
@@ -751,14 +782,14 @@ class Message (RingTree)
 			.accesserr(fn, name, nil)
 	
 	
-	function FastString.MsgErrorName (|string| name)
+	function FastString.MsgErrorName (|string?| name)
 		if (name)
 			self <~ " '"
 			self <~ name
 			self <~ "' "
 
 
-	function AccessErr (|syntax|s, |string| name, |message| found)
+	function AccessErr (|syntax|s, |string?| name=nil, |message?| found=nil)
 		cpp_part CantFind
 		if !self
 			jb_api.NilHandler
@@ -780,28 +811,32 @@ class Message (RingTree)
 			fs.MsgErrorName(name)
 			found = self
 
-		StdErr.NewError( found, fs.getresult )
+		errorreceiver.NewError( found, fs.getresult )
 	
 
-	function AccessErr (|int| i)
-		cpp_part CantFindAt
-		|| errnum = (" at item " + i.render, "")(i)
-		StdErr.NewError( self, "Incomplete syntax" + errnum )
+//	function AccessErr (|int| i)
+//		cpp_part CantFindAt
+//		|| errnum = (" at item " + i.render, "")(i)
+//		errorreceiver.NewError( self, "Incomplete syntax" + errnum )
 
 
 	function ExpectLast (|string| err="", |bool|)
 		opt norefcounts
-		require self
-		|| N = .next
-			N.syntaxexpect(err)
-		  else
-			return true
+		if self
+			|| N = .next
+				N.syntaxexpect(err)
+			  else
+				return true
+
 
 	function ExpectString (|bool|)
-		check .IsString (self, "Not a string")
-		return true
-	
-	function Expect (|syntax| type, |string| name=nil, |bool|)
+		if .IsString
+			return true
+		error (self, "Not a string")
+		
+
+	function Expect (|syntax| type, |string?| name=nil, |bool|)
+		nil checker
 		require self
 		if (!type or (.Func == type))
 			if (name == nil) or (.name ~= name)
@@ -827,12 +862,16 @@ class Message (RingTree)
 			return .msg(@tmp, key).GiveArg
 		return message() // sigh
 
+
 	syntax append (|string| key)
-		self <~ @str.msg(key)
+		cpp_part AppendString
+		self <~ (@str, key)
+
 
 	function Arg (|message|)
 		return .last(@arg)
-	
+
+
 	function GiveArg (|message|)
 		Opt NoRefCounts
 		|| r = .last 
@@ -857,24 +896,25 @@ class Message (RingTree)
 		|| f = .first
 			return f
 		.accesserr(@nil, nil, nil)
-				
+
+
 	syntax access (|Syntax| s, |Message|)
 		cpp_Part NeedSyx
 		Opt NoRefCounts
+		|| found = .first
+			if s == nil or found == s
+				return found
 		if self
-			|| found = .first
-				if s == nil or found == s
-					return found
-			.accesserr(s, nil, found)
+			.accesserr(s, "", found)
 
 
 	Syntax Access (|syntax| s, |int| n, |message|)
 		cpp_Part NeedSyxInt
 		Opt NoRefCounts
 		|| Ch = self[n]
-		if (ch) and ((ch.func==s) or !s)
-			return ch
-		.accesserr(s, nil, ch)
+			if !s or ch.func==s
+				return ch
+		.accesserr(s, Nil, ch)
 	
 	
 	syntax access (|Syntax| s, |string| name, |Message|)
@@ -892,14 +932,14 @@ class Message (RingTree)
 
 	syntax access (|string| key, assigns:|int64|)
 		cpp_part SetInt
-		self[key] = @num.msg(Value.render)
+		self[key] = value.msg
 
 	
 	syntax access (|string| key, assigns:|message|)
 		cpp_part SetMsg
 		opt norefcounts
-		debug_require self
 		.AccessAdd(key) <~ Value		
+	
 	
 	function AccessAdd (|string| key, |message|)
 		opt norefcounts
@@ -920,24 +960,26 @@ class Message (RingTree)
 		.func = fn
 		.name = name
 
+
 	function Become (|int64| num)
 		cpp_part BecomeNum
 		.clear
 		.func = @num
 		.name = num.render
 
-	
-	function BeLike (|Message| belikeme)
-		debug_require !(belikeme.hasany)
-		// if we upgrade this, we can use lists in for-loops? 
-		.func = belikeme.func
-		.name = belikeme.name
+
+	function Become (|message| src)
+		cpp_part BecomeMsg
+		.func = src.func
+		.name = src.name
+		.clear
+		.TakeAllFrom(src)
 
 	
 	function Next (|syntax| Need, |string| Name, |Message|)
 		Opt NoRefCounts
-		cpp_part NextOf
-		|| ch = .next(need, @nil) #require
+		cpp_part NextOfName
+		|| ch = .Next(need) #require
 		if ch ~= name
 			return ch
 		.accesserr(need, nil, ch)
@@ -945,30 +987,26 @@ class Message (RingTree)
 	function Last (|syntax| Need, |Message|)
 		Opt NoRefCounts
 		|| ch = .last
-		if  (ch==Need)
+		if ch and (!need or ch==Need)
 			return ch
 		.accesserr(Need, nil, ch)
 
 	
-	function Next (|syntax| Need, |syntax|OK=nil, |Message|)
+	function Next (|syntax| Need, |Message|)
 		Opt NoRefCounts
-		cpp_part NextOf2
-		|message| ch
+		cpp_part NextOf
 		if (self)
-			ch = .next
-			if !need or (ch==Need)
+			|| ch = .next
+			if ch and (!need or ch==Need)
 				return ch
-			if (OK and ch==OK)
-				ch.func = ok
-				return ch
-		.accesserr(Need, nil, ch)
+			.accesserr(Need, nil, ch)
 
 	
-	syntax Compare (|string| Other, |bool|Aware, |int|)
-		return .name.Compare(other, Aware)
+//	syntax Compare (|string| Other, |bool|Aware, |int|)
+//		return .name.Compare(other, Aware)
 
 
-	syntax equals (|string| name, |bool|Aware, |bool|)
+	syntax equals (|string?| name, |bool|Aware, |bool|)
 		return self and .name.SyntaxEquals( name, aware )
 
 
@@ -976,11 +1014,6 @@ class Message (RingTree)
 		cpp_part EqualsSyx
 		return self and (.Func == X)
 	
-	function List (|[Message]|)
-		opt norefcounts
-		for s in self
-			rz <~ s
-
 	function HasPosition (|bool|)
 		return .Position >= 0
 
@@ -995,42 +1028,51 @@ class Message (RingTree)
 		|| fn = (.Func.ExportAddr)
 		(fn)( self, fs )
 
-	function MiniName (|string|)
-		return "$.FuncName “${.name[0,64].UnicodeSync}”"
+	function MiniName (|string|prefix="", |string|)
+		require self
+		return "$prefix$.FuncName “${.name[0,64].UnicodeSync}”"
 
-	Syntax Expect ( |string| Error = nil )
-		if !Error
-			if !self
-				nil.syntaxexpect
-				return
-			Error = "Unexpected " + .MiniName
-		StdErr.NewError( self, Error )
+	Syntax Expect (|string?| Error = nil)
+		errorreceiver.NewError( self, Error )
 
 	Syntax Deprecate ( |string| Error = "Deprecated." )
-		StdErr.NewProblem( self, Error )
+		errorreceiver.NewProblem( self, Error )
 	
 	Syntax Warn ( |string| Error = nil )
-		Error := "Unexpected " + .mininame
-		StdErr.NewWarning( self, Error )
+		errorreceiver.NewWarning( self, Error )
 	
 	Syntax Append (|syntax| Fn, |string| name="")
+		opt norefcounts
 		cpp_part AppendSyx
-		fn.msg(self, name)
+		.msg(fn, name)
 	
 	Syntax Append (|int64| Num)
 		cpp_part AppendNum
-		@num.msg(self, num.render)
+		self <~ (@num, num.render)
 
-	setter Int (|int64|)
-		.Func = @num
-		.name = Value.Render // later we can do this a different way. Like directly
+	Syntax Using (|MessagePosition|)
+		Opt NoRefCounts
+		rz = parser.Using
+		rz.Layer = (Message).layer
+		
+		parser.Using.Position = .position
+		parser.Using.Length = .RangeLength
+		parser.Using.Tag = .Tag
+		parser.Using.Flags = MsgParseFlags.Inserted // right?
+		.MemoryLayer.use
+
+	Syntax UsingComplete { }
+	
+//	setter Int (|int64|)
+//		.Func = @num
+//		.name = Value.Render // later we can do this a different way. Like directly
 	
 	function Int (|int|i = 0, |int64|)
 		opt norefcounts
 		if self
-			if self != @unit
-				return .name.parseint(i, self)
-			|| f = .first
+			|| f = .First
+			if !f or self != @unit
+				return .name.ParseInt(i, self)
 			if self == "x"
 				return F.name.ParseHex(i, F)
 			|| mul = f.name.ParseFloat
@@ -1048,11 +1090,11 @@ class Message (RingTree)
 
 	function Float (|f64|)
 		if self
-			return .name.parsefloat(self)
+			return .name.ParseFloat(self)
 
-	function Hex (|int64|)
-		if self
-			return .name.parseint(self)
+//	function Hex (|int64|)
+//		if self
+//			return .name.ParseInt(self)
 
 	function Float32 (|float|)
 		|| d = .float
@@ -1064,29 +1106,6 @@ class Message (RingTree)
 	function Range (assigns:|intrange|r)
 		.position = r.x
 		.RangeLength = r.width
-
-	function RangeTrim (|ivec2|)
-		if self == @sstr
-			return (3,-3)
-		if .isstring
-			return (1,-1)
-
-	function FlatRange (|intrange|)
-		opt norefcounts
-		rz = (int.max, 0)
-		for ch.flat in self
-			|| ss = ch.range
-			if ss.x >= 0
-				rz.x = rz.x min ss.x
-				rz.x2 = rz.x2 max ss.x2
-		
-	function iVec4 (|ivec4|)
-		opt norefcounts
-		if self
-			|| c = .first
-			for i in 4
-				rz[i] = (C #loop).int|int|
-				c++
 
 
 	function Yes (|bool|)
@@ -1104,12 +1123,12 @@ class Message (RingTree)
 	operator Contains (|string| s, |bool|)
 		opt norefcounts
 		cpp_part ContainsStr
-		return .FindNested(nil, s, false)
+		return .FindNested(@nil, s, false)
 
-	operator Contains (|syntax| s, |bool|)
-		opt norefcounts
-		cpp_part ContainsSyx
-		return .FindNested(s, nil, false)
+//	operator Contains (|syntax| s, |bool|)
+//		opt norefcounts
+//		cpp_part ContainsSyx
+//		return .FindNested(s, nil, false)
 
 	function Contains (|ind| p, |bool| AllowJustAfter=false, |bool|)
 		cpp_part ContainsInd
@@ -1122,12 +1141,10 @@ class Message (RingTree)
 	operator In (|message| f, |bool|)
 		cpp_Part InMsg
 		opt norefcounts
-		if self
-			return .parent == f
+		return .parent == f
 		
 	operator In (|syntax| f, |bool|)
 		opt norefcounts
-		require self
 		|| p = .parent
 			return p.func == f
 
@@ -1145,12 +1162,6 @@ class Message (RingTree)
 			v.position = -1
 
 	module
-/*		function SuperNew (|memorylayer| m, |message|)
-	// new design... for simpler constructors
-			if m == nil
-				return message()
-			return message.newwithlayer(m)
-*/
 		function Dictionary.Syntax (|string| Key, ||)
 			return self[key.SyntaxLower] 
 		

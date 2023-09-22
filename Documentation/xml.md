@@ -201,8 +201,8 @@ JSON is notoriously fiddly. Extra or missing "," mess everything up. Jeebox does
 
     {
       "userlist": {
-          "user": 12355,
-          "user": 12365, // json fails here
+          "user1": 12355,
+          "user2": 12365, // json hates this comment
       },
     }
 

@@ -14,12 +14,32 @@ module Macros {
 	rejoin _X
 })".macro
 
+|| WhileDecl = "if (!_0) {
+	exit
+}".macro
+
+
 
 || MultiDecr = "JB_DecrMulti(_0, _1)".macro
 
+|| ConstructorNew = `if self == nil {
+	self = JB_NewClass(_0)|_0|}`.macro
+|| ConstructorNewTask = `if self == nil {
+	self = task(–taskvars, &syntaxcall)|_0|
+}`.macro
+|| MainArgBasic      = `|| _0 =  _1.MainArg(_2, "_0"),           `.macro
+|| MainArgBasicReq   = `|| _0 =  _1.MainArg(_2, "_0") #require,  `.macro
+|| MainArgDefault    = `|| _0 =  _1.MainArg(_2, "_0"),  _0 := _3 `.macro
+|| MainArgArray      = `
+|[_1]| _0
+|| __ArgCurr = _2
+while __ArgCurr < __ArgCount
+	_0 <~ _1.MainArg(__ArgCurr++, "_0")
+`.macro
 
-|| MainArg2 = "|| _0 = (_1.MainArg(_2), _3)(__ArgCount > _1)".macro
-|| MainArg1 = "|| _0 = _1.MainArg(_2)".macro
+|| MainArgNoNE = `
+	check (__ArgCount <= _0) ("Unexpected argument: " + app.args[_0]!)
+`.macro
 
 || ASM_Datatype = "datatype _0 (ASM) 
 	module
@@ -32,43 +52,49 @@ ASM.Forms[_1] = &_0.Encode // for now
 
 |macro|     ASMCopier  = "rz._0 = .r[_1]".macro
 |macro|     ASMCopier2 = "rz._0 = .rest".macro
-|macro|		ASMSetter = "function asm._0 (assigns:|uint|, |asm|): return self (|) ((value << _1) >> _2)".macro
+|macro|		ASMSetter = "function asm._0 (assigns:|uint|, |asm|): return self ||| ((value << _1) >> _2)".macro
 }
 
 
 
-function message.CleanBecome (|macro| m)
-	if !m.Cleaned
-		m.cleaned = true
-		m.Pz.clean
-	.become(m)
+function macro.clean (|macro|)
+	if !.Cleaned
+		.cleaned = true
+		|| s = .source
+			s.clean
+	return self
 
-	
+
+
 function message.TargetTest (|bool|) // target true, target false, 
 	.expect(@thg)
+	expect (self ~!= "mac" or "macos")     (self, "Use OSX")
+	expect (self ~!= "linux")   (self, "Use lin")
+	expect (self ~!= "windows") (self, "Use win")
+	expect (self ~!= "import")  (self, "Use imported")
 	if self ~= "debug"
 		return options.TargetDebug
 	if self ~= "release"
 		return !options.TargetDebug
 	if self ~= "perry"
-		return options.perry
+		return options.perryoutput
 	if self ~= "minilib"
 		return options.ProjectIsMiniLib
+	if self ~= "imported"
+		return scimport.CurrIsManuallyImported
 	if self ~= "true"
 		return true
 	if self ~= "false"
 		return false
-	if self ~= "mac"
-		error (self, "Use OSX")
 	if self ~= "osx"
 		return Platform.osx
 	if self ~= "win"
 		return Platform.win
-	if self ~= "lnx"
+	if self ~= "lin"
 		return Platform.lin
 	if self ~= "direct"
 		return options.IsDirectTest
-	return targets[.name]
+	return SC_Targets[.name]
 
 
 function message.Tran_Target (|message|)
@@ -80,11 +106,11 @@ function message.Tran_Target (|message|)
 
 function message.Tran_TargetSub
 	opt norefcounts
-	|| value = self.needfirst
+	|| value = self.needfirst					#require
 	|| IsFalse = (value == @brel and "!")
-		value = value.first
+		value = value.first!
 	
-	|| arg = self[@arg, 1]#require
+	|| arg = self[@arg, 1]						#require
 	
 	if value.TargetTest == IsFalse
 		arg = self[2][@arg]

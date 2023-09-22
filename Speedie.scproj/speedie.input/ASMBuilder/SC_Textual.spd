@@ -8,13 +8,13 @@ extend AsmFuncState
 		|| name = m[@thg]$
 		.fn.exportname = name.name
 		.fn.name = name.name
-		|| bra = name.next(@bra)$
+		|| bra = name.Next(@bra)$
 		|| n = bra[@num].int
 		expect (n>=0 and n<=10) (m, "Too many arguments")
 		for n
-			.fn.args <~ TypeInt64.TypeNormal // :) just ints!
+			.fn.args <~ TypeInt64!.TypeNormal // :) just ints!
 
-		rz = bra.next(@arg)
+		rz = bra.Next(@arg)
 		rz.expectlast
 
 		
@@ -33,9 +33,9 @@ extend AsmFuncState
 
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
 		opt norefcounts								// set1: r1, 123
-		|| RegMsg = list[@thg]
+		|| RegMsg = list[@thg] #require
 		|| Reg    = RegMsg.reg
-		|| Value  = regmsg.Next(nil)$.ASMConst
+		|| Value  = regmsg.Next$.ASMConst
 
 		if !.TrySmallConst(reg, value, orig)
 			debugat
@@ -96,13 +96,14 @@ extend AsmFuncState
 	
 	
 	function IR.File (|string|)
-		return IR.Resources[.filepos]
+		|| s = IR.Resources[.filepos]
+			return s
 	
 	
 	function IR.SyntaxExpect (|string| Error)
 		|| err = Error(nil, error, ErrorSeverity.Error, .file)
-			err.position = .BytePos
-			stderr <~ err
+		err.position = .BytePos
+		stderr <~ err
 
 
 	function FindLabel (|&IR| dbg, |&IR|)
@@ -120,7 +121,7 @@ extend AsmFuncState
 		.last.label = ++.labelcount			#expect (ch, "Too many labels")
 		expect (!T.valuelower(ch.name))		        (ch, "Label already used" )
 		#!debugger
-		T.valuelower(ch.name) = datatypewrapper(.out.length)
+		T.valuelower(ch.name) = dataobject(.out.length)
 
 
 	function TextFuncSub (|message| m, |bool|)
@@ -136,7 +137,7 @@ extend AsmFuncState
 function message.ASMConst (|uint64|) 
 	opt norefcounts
 	if (self == @unit)
-		.expect(nil, "d")$
+		.expect(@nil, "d")$
 		return .first.float.AsInt
 	.expect(@num)$
 	if (.name contains '.')

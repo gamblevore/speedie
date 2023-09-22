@@ -1,0 +1,99 @@
+#!/usr/local/bin/spd
+
+// maybe.spd: Tests a lot of different syntax and features in one project.
+// doesnt really actually do anything useful otherwise.
+
+targets: flow
+
+
+class Person
+    |int| age
+    |string| name
+    setter Age (|int|)
+        expect (value > 0 and value < 300) "Age $value out of range on ${.name}"
+        .age = value
+
+    render
+		fs <~ "$.name's age is $.age"
+
+
+main
+	using flowcontrol("maybe")
+		app.stuff
+	
+
+function PrintNum (|int64| b1)
+	"${B1.strsize} = $B1"
+
+
+function app.Stuff
+	printnum(60GB)
+	printnum(7.9MB)
+	printnum(9524600)
+	
+    || P = person(12, "fred")
+    P.age = -2 // try to corrupt the age 
+    "$p" // see if it worked or not?
+	|| x = ["a", "b", "c"]
+	if x == 3
+	    "$x has three items."
+	|| H = "house"
+	if H == 5
+	    "'$H' has five letters"
+	|| L = "(a,b,c,d)".parse
+	if L == 4
+	    "The list $L has four items!"
+    || z = 0
+    for i in 1 to 6
+        if i isa 2
+            "$i is even"
+            z[i] = true
+          else
+            "$i is odd"
+    "z is $z"
+    
+
+	FlowControl.Disabled++
+	for 4
+	    || fn = (mesayer, shesayer)(0.5[])
+	    (fn)(app.args[0])
+	FlowControl.Disabled--
+    
+    || G = RPGHero("fred")
+    (*DoAction["jump"])(G, "hes scared")
+
+
+prototype SayerFunction (|string?| input)
+
+function MeSayer (SayerFunction)
+    "Me says: $input"
+
+function SheSayer (SayerFunction)
+    "Rebecca says: $input (very quietly)"
+
+
+class RPGHero // for a tile-based board game
+    |string| Name
+    |bool|   OnGround
+    |bool|   IsDucking
+    |int|    YSpeed
+    |int|    GroundSpeed
+    
+    constructor (|string| name)
+        .name = name
+
+
+dispatch DoAction (|rpghero|self, |string| Reason)
+    jump
+        "$.Name jumped because $Reason"
+        if .OnGround
+            .YSpeed = (.YSpeed max 0) + 2 
+        
+    run 
+        "$.Name ran because $Reason"
+        .GroundSpeed = .GroundSpeed min 5
+    
+    duck
+        "$.Name ducked because $Reason"
+        .IsDucking = true
+

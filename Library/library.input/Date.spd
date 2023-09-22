@@ -37,6 +37,8 @@ datatype Date (int64)
 	function WholeSeconds (|int64|) // needs 48 bits!
 		return self >> kTickBits
 	
+	function Rate (|f64|)
+		return 1.0 / .Seconds
 	function Seconds (|f64|)
 		return self|f64| / kOneSecond
 	
@@ -53,11 +55,18 @@ datatype Date (int64)
 		if self
 			return now() - self
 	
-	render DMY
-		fs.AppendDMY(self)
+	render LocalTime
+		fs.AppendLocalTime(self)
 	
 	render RenderDurr
 		fs.AppendDurr(self)
+
+	render RenderInt
+		fs.appendintegerastext(self)
+	
+	render  // hmmm... i guess this is just for data-formats.
+		disabled "Do you mean .LocalTime or .RenderInt"
+
 		
 	function Fired (|bool|)
 		if self != 0
@@ -66,10 +75,6 @@ datatype Date (int64)
 	function Durr (|f64|)
 		disabled "is this even used? Its just .seconds?"
 		return self|f64| / kOnesecond|f64|
-	
-	render  // hmmm... i guess this is just for data-formats.
-			// but that is very inconsistant because most renders are "Readable"
-		fs.appendintegerastext(self)
 
 	function Ticks (|int|)
 		disabled "is .ticks math right?"

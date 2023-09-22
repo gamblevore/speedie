@@ -10,6 +10,8 @@
 extern "C" {
 
 
+JB_Error* JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, unsigned char level, JB_String* path);
+
 JB_String* JB_Str__Freeable(uint8* p, int n) {
     JB_String* Str = JB_New( JB_String );
     Str->Addr = (uint8*)p;
@@ -33,9 +35,9 @@ JB_String* FreeableStr_(const char* Msg, bool CanFree) {
 
 
 void JB_ErrorHandle2C(const char* Desc, bool CanFreeDesc, const char* Path, bool CanFreePath) {
-	JB_Error* Err = JB_Err__New(0, nil, 4, nil);
+	JB_Error* Err = JB_Err_Constructor(nil, 0, nil, 4, nil);
 	JB_Err_Fill(Err, FreeableStr_(Path, CanFreePath), FreeableStr_(Desc, CanFreeDesc)); 
-	JB_Rec_NewItem(JB_StdErr, Err);
+	JB_Rec_AppendErr(JB_StdErr, Err);
 }
 
 
@@ -65,7 +67,7 @@ static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* 
 
 	JB_FS_AppendCString(FS, " when ");
 	JB_FS_AppendCString(FS, Operation);
-	if (self) {
+	if (JB_Str_Length(self)) {
 		JB_FS_AppendCString(FS, " '");
 		JB_FS_AppendString(FS, self);
 		if (JB_Str_Length(other)) {
@@ -100,20 +102,22 @@ int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errnum, const char
 		return 0;
 	JB_String* Desc = Desc_(self, other, errnum, BackupErr, op, verb);
 	JB_String* Path = Path_(self);
-	JB_Error* Err = JB_Err__New(0, Desc, Severity, Path);
-	JB_Rec_NewItem(JB_StdErr, Err);
+	extern JB_Class JB_ErrorData;
+	JB_Error* Err = (JB_Error*)JB_NewClass(&JB_ErrorData);
+	JB_Err_Constructor(Err, 0, Desc, Severity, Path);
+	JB_Rec_AppendErr(JB_StdErr, Err);
 
     return errnum;
 }
 
 
-void JB_ErrorHandleC(const char* Desc, bool CanFreeDesc) {
-    JB_Error* Err = JB_Err__New(0, nil, 4, nil);
+void JB_ErrorHandleC(const char* Desc, JB_String* path, bool CanFreeDesc) {
+    JB_Error* Err = JB_Err_Constructor(nil, 0, nil, 4, path);
     if (!Err) {
         return;
     }
 	JB_Err_Fill(Err, nil, FreeableStr_(Desc, CanFreeDesc)); 
-	JB_Rec_NewItem(JB_StdErr, Err);
+	JB_Rec_AppendErr(JB_StdErr, Err);
 }
 
 

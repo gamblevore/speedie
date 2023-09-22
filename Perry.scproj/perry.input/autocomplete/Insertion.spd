@@ -130,7 +130,7 @@ function TextView.DoTheParamDisplayThing (|int| x, |bool| Force, |bool|) // para
 		// say that it is "forced" here? (by sending "displayallforced" to showextrainfoatpos)?
 		// and if it IS forced... we need to send that across to maybesendmessage
 		// and react to that by instantly showing the popup.
-		.ShowExtraInfoAtPos(x, type)
+		.ShowExtraInfoAtPos(x, type, nil)
 	return true
 	// we now have a place for params but what func?
 
@@ -146,11 +146,11 @@ function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason,
 			return .DoTheParamDisplayThing(x, reason ~= PerryAutoCompleteReason.escape)
 	
 	if (reason ~!= "Sel") and (type ~= "autocomplete") and (.FakeAutoComplete >= 1)
-		.ide.ShowAuto(true)
+		.ide!.ShowAutoBeep(true)
 		return true
 	
 	|| ok2 = false
-	|| i = .ide
+	|| i = .ide!
 	|| msg = .ClickedMsg(x, true)
 		i.editme.CanAutoComplete = true
 		ok2 = i.MaybeSendMessage(type, msg, msg.name, reason)
@@ -186,6 +186,7 @@ function string.CharMode (|int| x, |int|)
 
 
 function textview.AfterComma (|int| p, |int| x, |int|)
+	opt norefcounts
 	|| s = .text
 	while x > p
 		|| c = s.charmode(--x) 
@@ -195,6 +196,7 @@ function textview.AfterComma (|int| p, |int| x, |int|)
 
 
 function textview.BeforeDecl (|int| p, |int| x, |bool|)
+	opt norefcounts
 	|| s = .text
 	while x < p
 		|| c = s.charmode(x++) 
@@ -207,7 +209,7 @@ function textview.InPrmsAndBetweenDecls (|message| msg, |int| x, |int|)
 	opt norefcounts
 	// just wanna find the msg that owns us!
 	|| list = msg.findprms(x)$
-	|| fn = list.owningfunc$
+	|| fn = list.owningfunc(true)$
 	if .text.charmode(x) == ','
 		return x
 	rz = .aftercomma(list.position, x)
@@ -255,7 +257,7 @@ function PerryInsert2 (|textview| self, |message| where, |intrange| A, |bool|)
 function PerryInsert1 (|textview| self, |message| where, |intrange| a, |bool|)
 	.undochecker = -1
 	.InsertSub(" name ", a)
-	.sel = (a.x2+1, a.x2+5)
+	.selrange = (a.x2+1, a.x2+5)
 	return true								// f* --> fn *
 
 
@@ -281,7 +283,7 @@ function textview.PerryDeclKey (|bool|)
 	|| s = .selrange
 	require !s.width
 
-	|| d = .FindDrawInfo(s.x)					#require
+	|| d = .FindDrawInfo(s.x)
 	|| m = d.message
 		|| com = .InPrmsAndBetweenDecls(m, s.x)
 			return PerryInsert6(self, (com,com)+1)
@@ -289,11 +291,12 @@ function textview.PerryDeclKey (|bool|)
 		require .parsedmessage
 	
 	|| clearback = .IsClearBackLine(s.x-1)
-	|| endofline = self[s.x].istextline
+	|| endofline = self.FindEndOfLineIgnoringWhite(s.x)
 	|| inclass = .IsInClass(d) 
 	if clearback and !inclass
 		return .insert("|| ")
-	  elseif endofline or inclass
+	
+	if endofline or inclass
 		if d.BackHasIgnoringSpaces("||", s.x)
 			.insert(" ") // whatever
 			return true
@@ -316,8 +319,8 @@ helper String.DetectNoSpaces (|string| find, |int| start, |bool| Fwd=true,  |ind
 	
 function textview.PerryInsertSyntax (|keys| Key, |int|)
 	opt norefcounts
-	|| ide = .ide
-	if key is escape  and  ide.PopupDateOn.ago > 0.5
+	|| ide = .ide!
+	if  key is escape  and  ide.PopupDateOn.ago > 0.5
 		ide.PopupHide
 		return 1
 	require  .ExpectsParse >= probablyjeebox
@@ -337,13 +340,13 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 			// we wanna sel the actual text
 			while .text.CharMode(s.x2) == '_'
 				s.x2++
-			.Sel = s
+			.Selrange = s
 			return 1
 			
 
 	require key isnt escape
 	|| dd = .FindDrawInfo(s.x)
-	require  dd  and  (dd contains i2)  and  !dd.error
+	require  (dd contains i2)  and  !dd.drawerror
 	|message| where
 	|| inrange = false
 	|| state = .CodeInsertion(dd, i2, inrange, where)
@@ -361,7 +364,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 			return (s.x <= i2)|int|
 		if (state == 2)
 			if s.width
-				.sel = s.x2x2
+				.selrange = s.x2x2
 			return 1 // why not
 		return 0 // i think?
 	
@@ -384,7 +387,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 	if ide.EditMeTabRetryThing
 		return 0
 	if  !s.width  and  (key is tab)  and  self[s.x].istextline
-		|| C = .ide.autocomplete.listsource.slowcount
+		|| C = .ide!.autocomplete.listsource.slowcount
 		if C > 0 
 			if c == 1 and .FakeAutoComplete == -1
 				return 0 // what?
@@ -403,5 +406,6 @@ function string.isSource (|bool|)
 	return self isa "uwu" or "spd"
 
 
-function guicontrol.IDE (|perryide|)
-	return .window as perryide
+function guicontrol.IDE (|perryide!|)
+	opt norefcounts
+	return (.window as perryide)!

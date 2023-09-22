@@ -1,0 +1,204 @@
+
+// we want to slowly leak some data through from one to the other!
+
+
+// a few graphics effects
+struct JeeboxEffects
+	linkage: cpp_part jfx
+	|image|				Dest
+	|image| 			Tmp
+	|imagepixel[8]|		Cols
+	|random|			rnd
+	|uint64|			XHash
+	|date|				Duration
+	
+	
+	function Init
+		.tmp = image()
+		.cols[0] = (0.1,	0.1,	0.1)
+		.cols[1] = (0.2,	0.2,	0.2)
+		.cols[2] = (0.8,	0.1,	0.9)
+		.cols[3] = (1.0,	0.8,	0.2)
+		.cols[4] = (0.1,	0.12,	0.12)
+		.cols[5] = (0.15,	0.17,	0.12)
+		.cols[6] = (0.4,	0.2,	1.0)
+		.cols[7] = (0.15,	0.17,	0.12)
+
+
+	helper MakeSubBoxes (|image| img, |int| Size, |float| opacity=1.0)
+		opt norefcounts
+		|int| a = opacity * 255.0
+		for r in img.tile(size)
+			|| c = .cols[.rnd.int&7]
+			c.a = a
+			img.RectBasic(r, c)
+			
+
+	function MakeBoxes (|image| img, |int| seed)
+		|| base = 6
+		.rnd.seed(seed)
+		
+		.MakeSubBoxes(img, base*5,  0.99)
+//		.MakeSubBoxes(img, base*12, 0.5)
+		.MakeSubBoxes(img, base,    0.35)
+
+
+	function DebugBoxes (|image| img)
+		|imagepixel[4]| col 
+		col[0] = (1.0, 1.0, 1.0, 1.0)
+		col[1] = (0.0, 0.0, 0.0, 1.0)
+		col[2] = (1.0, 0.0, 1.0, 1.0)
+		col[3] = (0.0, 1.0, 0.0, 1.0)
+		
+		for (t in img.tile((img.size+1)/2)) (i)
+			img.RectBasic(t, col[i])
+		
+	
+	function image.blur (|float| sigma)
+		|| tmp = .NeedTemp
+			.blur(sigma, tmp)
+	
+	helper image.Blur (|float| sigma, |image| tmp)
+		require (sigma > 0) and Tmp.resizeto(.size.yx)
+
+		|ImageBlurrer| blur
+		blur.Create(sigma)
+		for row in .height
+			blur.BlurRow(self, tmp, row)
+
+		for row in tmp.height
+			blur.BlurRow(tmp, self, row)
+		tmp.resizeto(.size)
+
+
+	helper ImageBlurrer.BlurRow (|image| rd, |image| wr, |uint| row)
+		|| stride = rd.height
+		|| wd     = rd.Width
+		|| Start  = rd.Pixels + row*wd
+		|| wrp    = wr.pixels + row
+		|| wrMax  = wr.pixels + wr.size.area
+		|| wrend  = 1 + wrp + (wd-1) * stride
+		|| v0 = .Weights[0]
+		|| x0 = .Extent
+		
+		for i in wd
+			|| x = 0
+			|| ts = (Start+i).raw
+			|| total = ts * v0
+			while ++x < x0
+				|| w = .Weights[x]
+				|| back = i - x, if back < 0:  back = 0
+				|| fwd = i+x,    if fwd >= wd: fwd  = wd-1
+				|| R1 = (start+back).Raw
+				|| R2 = (start+fwd).Raw
+				total += (r1 + r2) * w
+				
+			total = (total + 32K) >> 16
+//			if wrp >= wrMax
+//				debugger
+//				exit
+			wrp.raw = total, wrp += stride
+
+
+	function RunOutline  (|image| r, |image| w, |float| scale, |float| def) // sobel				
+		for (px in w) (coord)
+			|| P = coord.vec2+0.5
+			|| S1 = r.outlineSub(P, scale, (0.0,1.0))
+			|| S2 = r.outlineSub(P, scale, (1.0,0.0))
+			|| M = mix(S1, S2, 0.5)
+			M.w = def
+			px <~ M
+	
+	
+	function StartJeebox (|message| conf, |float| v, |uint64| hash=0, |bool|)
+		opt norefcounts
+		|| T = .tmp
+		|| d = .dest
+		
+		require (T.size != D.size) or hash != .xhash
+		
+		|| seed    = conf["seed"].int		?? 1
+		|| sig     = conf["sigma"].int		?? 3
+		|| LineStr = conf["sobel"].float?? 1.75
+		|| start   = date.now
+	
+		.xhash = hash
+		.MakeBoxes(d, seed)
+		d.Blur(20, t)
+		
+		.RunOutline(d, t, LineStr, v)
+		.Duration += date.now - start
+		return true
+
+
+	function Backup
+		.dest.copyto(.tmp)
+
+	function Restore
+		.tmp.copyto(.dest)
+
+
+
+function image.Sqrt (|vec2| P, |float| scale, |vec4|)
+	return (.interp(P)*scale).sqrt
+
+
+helper image.outlineSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
+    || s1 = .Sqrt(XY - Move * 1.5, scale)
+    || s2 = .Sqrt(XY + Move * 1.5, scale)
+    || s3 = .Sqrt(XY - Move, scale)
+    || s4 = .Sqrt(XY + Move, scale)
+
+    || sx = 4.0 * ((s4 + s3) - (s2 + s1))
+    || sy = 4.0 * ((s2 + s4) - (s1 + s3))
+
+    return sx*sx + sy*sy
+
+
+struct ImageTiler
+	|ivec4| Bounds
+	|ivec2| Tile
+	iterator
+		|| b = .bounds
+		|| curr = (0, b.y, 0, b.y + .tile.y)
+		
+		|| i = (0)
+		while curr.y < B.y2
+			curr.x = b.x
+			curr.x2 = b.x + .tile.x
+			while curr.x < B.x2
+				yield (curr) (i)
+				curr += .tile.x_x_
+				i++
+			curr += .tile._y_y
+
+
+struct ImageBlurrer
+	|int[15]|		Weights
+	|int|			Extent
+	|float[15]|		Values
+	
+	function Create (|float| Sigma)
+		.Extent = 0
+		|| nn = 15
+		|| Lim = 0.0						// Lim maybe < 0.5 by the end!!
+		|| W = &.values[0]
+		for i in nn
+			|| g = i|float|.Gaussian(Sigma)
+			W[i] = g
+			Lim += g * (1.0+(i>0))
+		
+		Lim *= 1.0 - 72th					// 0.986, approx 99% brightness
+		|| Found = 0.0
+		for i in nn
+			loop Found < Lim
+			|| F = W[i] * (1.0+(i>0))
+			Found += F
+			.Extent++
+	
+		|| norm = 1.0/found
+		
+		for i in nn
+			W[i] *= norm
+			.weights[i] = w[i]*64K
+		

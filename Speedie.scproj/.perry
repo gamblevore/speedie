@@ -8,8 +8,6 @@ excludes
 	"hidden"
 	"xcodeproj"
 
-checks
-	"@spd/temporal.scproj"
-	"@spd/SelfTool.scproj"
-	"@spd/PerryBug.scproj"
-	"@spd/Language2.scproj"
+unused_lib_funcs
+	"@spd/Library"
+	"@spd/jeebox.scproj/"

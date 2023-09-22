@@ -36,17 +36,18 @@ void JB_BM_Clear( ByteMap* cs, int F ) {
 	for ( int i = 0; i < 256; i++ ) {
 		if (F < 0)
 			Cache[i] = i;
-		else
+		  else
 			Cache[i] = F;
 	}
 }
 
 
-void JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges) {
+CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges) {
+	JB_New2(CharSet);
 	MemZero( self->Cache );
-	if ( Source ) {
+	if ( Source )
 		InitCharset_( self, Source->Addr, Source->Length, Ranges );
-	}
+	return self;
 }
 
 
@@ -123,22 +124,14 @@ inline void JB_BM_MapWrite( ByteMap* cs, uint8* fr, uint8* tr, int Len) {
 }
 
 
-void JB_BM_Constructor( ByteMap* self, JB_String* From, JB_String* To ) {
+ByteMap* JB_BM_Constructor( ByteMap* self, JB_String* From, JB_String* To ) {
+	JB_New2(ByteMap);
 	JB_BM_Clear( self, -1 );
     int Len = Min( JB_Str_Length( From ), JB_Str_Length( To ) );
-    if ( Len ) {
+    if ( Len )
         JB_BM_MapWrite( self, (uint8*)JB_Str_Address(From), (uint8*)JB_Str_Address(To), Len );
-    }
+    return self;
 }
-
-
-ByteMap* JB_BM_( JB_String* a, JB_String* b ) {
-    ByteMap* Result = JB_New( ByteMap );
-    JB_BM_Constructor( Result, a, b );
-    JB_Incr(Result);
-    return Result;
-}
-
 
 
 

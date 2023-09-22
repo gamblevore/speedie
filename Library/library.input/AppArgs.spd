@@ -33,7 +33,6 @@ role AppArgument (object)
 		if (self isa message): return .argName
 
 
-
 // The idea is... we want to have an array of arguments... that can be messages or strings:
 	// * (name:)	  for switches:  --nocolor
 	// * (name:value) for switches:  --level=3
@@ -41,40 +40,81 @@ role AppArgument (object)
 
 
 function Message.ArgName (|string|)
+	opt norefcounts
 	require self == @item
-	return .first.nyme.lowercase
+	return .firstname.lowercase
 
 
 function Message.ArgValue (|string|)
+	opt norefcounts
 	if (self == @item)
-		return .second.nyme ?? "true"
+		return .second.name ?? "true"
 	return .name
 
 
 
+helper @int.MainArg         (|int| Pos, |string| name,  |int|)
+	return string.MainArgSub(Pos, name, "integer")$.int
+
+helper @bool.MainArg        (|int| Pos, |string| name,  |bool|)
+	return string.MainArgSub(Pos, name, "boolean")$.Yes
+
+helper @string.MainArg      (|int| Pos, |string| name, |string|)
+	return string.MainArgSub(Pos, name, "string")
+
+helper @message.MainArg     (|int| Pos, |string| name, |message|)
+	return string.MainArgSub(Pos, name, "jeebox")$.parse
+
+helper @float.MainArg       (|int| Pos, |string| name, |f64|)
+	return string.MainArgSub(Pos, name, "float")$.float
+
+helper @file.MainArg		(|int| Pos, |string| name, |file|)
+	return string.MainArgSub(Pos, name, "file-path")$.file
+
+helper @ExistingFile.MainArg (|int| Pos, |string| name, |file|)
+	return string.MainArgSub(Pos, name, "file-path")$.FileThatExists
+
+helper @JeeboxFile.MainArg   (|int| Pos, |string| name, |messageroot|)
+	return ExistingFile.MainArg(pos, name)$.parse
+
+helper @OutputFile.MainArg   (|int| Pos, |string| name, |faststring|)
+	return file.MainArg(pos, name)$.Out
 
 
+// these roles really should be submodules on the file-module.
+// like these:
+//			module file.Jeebox: helper MainArg (...)
+// 			module file.Output: helper MainArg (...)
+//			module file.Existing: helper MainArg (...)
+//			module file.Data: helper MainArg (...)
 
-/*
-// clever idea. Just not worth it
-helper @int.MainArg (|int| Pos, |int|)
-	return string.MainArgSub(Pos, "integer")$.int
-helper @string.MainArg (|int| Pos, |string|)
-	return string.MainArgSub(Pos, "string")
-helper @file.MainArg (|int| Pos, |string|)
-	return string.MainArgSub(Pos, "file")$.file
-helper @message.MainArg (|int| Pos, |message|)
-	return string.MainArgSub(Pos, "message")$.parse
-helper @float.MainArg (|int| Pos, |f64|)
-	return string.MainArgSub(Pos, "float")$.float
+role ExistingFile (file)
+role JeeboxFile   (file)
+role OutputFile   (faststring)
 
 
-
-helper @string.MainArgSub (|int| Pos, |string| type, |stringthatwasreadsafely|)
-	if app.args > pos
-		return app.args[pos]
+// i can't help but like the idea
+helper @string.MainArgSub (|int| Pos,  |string| name, |string| type,   |stringthatwasreadsafely|)
+	// could remove "pos", and use array.mark?
+	opt norefcounts
+	|| str = app.args[pos]
+	if str != nil
+		return str
 	if StdErr.ok
-		error "Usage: ${app.filename} ${app.usage}"
+		|| usage = app.Usage
+		error "Missing $name ($type).\n\n$usage"
 	return string.Error
-*/
 
+
+helper @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
+	|| size = string.MainArgSub(Pos, name, "file-size")$
+	|| Mul = 1
+	if size endswith "kb"
+		mul = 1KB
+	  elseif size endswith "mb"
+		mul = 1MB
+	  elseif size endswith "gb"
+		mul = 1GB
+	  else
+		return size.float
+	return size[0, size.length - 2].float*mul

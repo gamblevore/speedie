@@ -51,9 +51,6 @@ function ProductPath (|bool| Direct=false, |String|)
 	if options.output_path
 		return options.output_path
 	
-	if options.scripting
-		return compiler.originalinputpath.scriptlocation
-		
 	|| prod = compiler.projectname
 	if !Direct
 		prod = .productname + .ProductSuffix
@@ -77,8 +74,8 @@ function ProjTmpPath (|string|)
 function LibTmpPath (|string|)
 	return .tmpbase("Lib") + .LibSuff
 
-function LogName (|string|)
-	return .ProjTmpPath.child("build.txt")
+//function LogName (|string|)
+//	return .ProjTmpPath.child("build.txt")
 
 
 
@@ -116,19 +113,19 @@ function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
 	|| aslib = options.makelib or options.projectislibrary
 	require ! (aslib and (cpp contains "/JB_Main.")) // .o and .cpp
 	require ! (!asm.needed and (cpp contains "/JB_VM."))  
-	require ! (!(targets..gui or linkage.interpreter) and cpp contains "/JB_OSX.")  // should be "JB_Native.o"
+	require ! (!(SC_Targets..gui or linkage.interpreter) and cpp contains "/JB_OSX.")  // should be "JB_Native.o"
 
 	|| name		= cpp.name
 	|| Prefix	= name.trimextandpath
 	|| h		= cpp.Sibling(Prefix + ".h").file
-	|| o		= Objects[Prefix + ".o"]
+	|| o		= Objects[Prefix + ".o"]!
 	.FoundObjects <~ o
 
 	return .NoGoodObject(Cpp, h, o)
 
 
 
-function FilterCppsIfAlreadyDone (|[string]| Cpps,  |File| Objects,  |&int| stdafx,  |[File]|)
+function FilterCppsIfAlreadyDone (|[string]| Cpps,  |File| Objects,  |?&int| stdafx,  |[File]|)
 	|| wierd = cpp_export.CppProduct
 	for Cpp in Cpps
 		|| reason = .NeedNewObjForSrc(cpp, objects) 
@@ -137,7 +134,7 @@ function FilterCppsIfAlreadyDone (|[string]| Cpps,  |File| Objects,  |&int| stda
 				*stdafx = 1
 
 
-function CollectCppsInto ( |File| Fol,  |File| Objects, |&int| stdafx, |[File]| )
+function CollectCppsInto ( |File| Fol,  |File| Objects, |?&int| stdafx, |[File]| )
 	|[string]| Cpps
 	for name in Fol.list
 		if .CanCompile(name)
@@ -201,7 +198,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	rz.appendwords("-I /usr/local/include")
 	if platform.osx // OSX likes playing hide and seek
 		rz.appendwords("-F/Library/Frameworks  -framework Cocoa  ")
-		if targets..gui or linkage.interpreter
+		if SC_Targets..gui or linkage.interpreter
 			rz.appendwords("-rpath @executable_path/../Frameworks")
 		rz.appendwords("-rpath ~/Library/Frameworks  -rpath $spdroot/Library  -rpath /Library/Frameworks")
 		
@@ -256,8 +253,11 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 
 
 function ExecuteGCC (|[string]| Commands, |bool|)
-	return CppCompilerPath.SilentExecute(Commands, nil) #expect ("C++ compiler failed to compile source code.")
-
+	if CppCompilerPath.Execute(Commands)
+		return true
+	error ("C++ compiler failed to compile source code. Command:\n\n " + commands.join(" "))
+	CppCompilerPath.Execute(Commands)		
+	
 
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
 	|| TmpFol = Output.MakeAndGoInto
@@ -298,25 +298,40 @@ function IsCompilerAndNeedsInstall (|bool|)
 
 
 function ExportAndInstall (|bool| CanInstall)
-	require .ShouldTransComp
-	if options.products
-		if options.products & options.pack
-			TreeAssembler.BuildPack
-		if options.products & options.native
-			.RunCppCompile~quietly
-			if CanInstall and .IsCompilerAndNeedsInstall
-				.InstallCompiler
-	.ClearThis~quietly
-	if stderr.ok
-		compiler.Package
+	if .ShouldTransComp
+		if options.products
+			if options.products & options.pack
+				TreeAssembler.BuildPack
+			if options.products & options.native
+				.RunCppCompile~quietly
+				if CanInstall and .IsCompilerAndNeedsInstall
+					.InstallCompiler
+		.ClearThis~quietly
+		if stderr.ok
+			compiler.Package
+	if stderr.ok and !options.scripting
+		 .PrintProduct("Product")
+
+
+// copy this... by hard-linking. this is because xcode goes around fucking up all my files
+// I can't just hard-link it myself... xcode UNHARD-LINKS IT!! Now I get separate versions
+// cos xcode fucks up my shit for me. So I have to do this to work around it's stupidity.
+function CollectPico
+	|| OfficialLocation = "/usr/local/include/PicoMsg/PicoMsg.h".file
+	require OfficialLocation.exists
+	|| SpdLocation = "/usr/local/speedie/Library/CppLib/PicoMsg.h".file
+	if SpdLocation.exists // remove it.
+		SpdLocation.delete
+	OfficialLocation.HardLinkTo(SpdLocation)
 
 
 function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
-		"\nCompiling c++ to: \"${.ProductPath}\""
+		.PrintProduct("\nCompiling c++ to")
 	
+	.CollectPico
 	.CompilingLibFiles++
 	.CollectAndCompile(	.CppLib,						.LibTmpPath )$
 	.CompilingLibFiles--
@@ -361,7 +376,8 @@ function ShouldTransComp (|bool|)
 	|| p = .linkOK(.ProductPath.file)
 	if   !p   or   p.modified < scimport.recent
 		return true
-	printline p.path + " already up to date"
+	if !options.silent
+		"Already up to date"
 
 
 
@@ -381,7 +397,7 @@ function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 	return .ExecuteGCC( CompileString )
 
 
-function SayTest (|int| n)
+function SayTest (|string| n)
 	"\n()   Test$n   ()"
 
 
@@ -399,18 +415,18 @@ function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, t
 	.Cleanup <~ Test3
 	
 // OldSpeedie has compiled SpeedyTest, at Test1. It is different.
-	.saytest(1)
+	.saytest("1")
 	require Test1.TestSpeedie("2")
 
 
 // Test1 has been run. It created Test2. Test2 is different than Test1, because Test1 had a chance to optimise itself.
 
-	.saytest(2)
+	.saytest("2")
 	require Test2.TestSpeedie("3")
 
 
 // Test2 creates Test3 in .cpp form only, for speed. The outputs SHOULD match.
-	.saytest(3)
+	.saytest("3")
 	printline
 	
 	require cpp2.mustexist and cpp3.mustexist
@@ -446,7 +462,7 @@ function BackupCompiler (|bool|)
 	|| B = .BackupPath.File
 	B.MakeEntirePath
 
-	|| backup1 = B["LatestBackup"] 
+	|| backup1 = B["LatestBackup"]!
 	if backup1.CompareFile( Product)
 		return true
 
@@ -472,8 +488,10 @@ function InstallOne (|file| test)
 function InstallCompiler
 	"Installing Speedie: $__time_id__"
 
-	|| dest = Compiler.Projects.child("Terminal/Speedie")
-	.ProductPath.File.MoveTo( dest )
+	// so that the (product `bla`) prints properly =)
+	|| OldProd = .ProductPath 
+	options.output_path = Compiler.Projects.child("Terminal/Speedie")
+	OldProd.File.MoveTo( options.output_path )
 
 	FlowControl.Disabled++
 	.InstallOne Cpp_Export.CppProduct
@@ -486,25 +504,27 @@ function InstallCompiler
 }
 
 
-function String.LastLine (|string|)
-	return .AfterByte('\n')
+//function String.LastLine (|string|)
+//	return .AfterByte('\n')
 
 
 function file.TestBatch (|bool|)
-	|| batch = compiler.BaseProjectPath["Batch"]
-	|| sep = ""
+	|| batch = compiler.BaseProjectPath!["Batch"]!
+	|| Printed = false
 	print "Tested: " 
 	for c.files in batch
 		if c.visible and c isa "spd"
-			print sep
-			sep = ", "
+			if printed
+				print ", "
+			printed = true
 			print c.Name
-			.SilentExecute([c, "--nocompile"])
+			.SilentExecute([c, "--nocompile", "--perry"])
 	printline
 	
 	for c.files in batch
 		if c isa "cpp" or "h"
-			printline "This file should really not be here: " + c
+			print "This file should really not be here: "
+			printline c
 			debugger
 	return stderr.ok
 	// we want to test each file... how? we need to call the new speedie!
@@ -512,8 +532,8 @@ function file.TestBatch (|bool|)
 
 
 function File.TestSpeedie (|string| v, |bool|)
-	require (.mustexist)
-	expect !(.path contains " ") ("Path: ${.path} contains a space! :(")
+	require (.MustExist)
+	expect !(.path contains " ") ("Path contains a space: " + .path)
 
 	|| variant = "--variant=" + v
 	|| cmd_args = ["--self",  "--nocolor",  Variant]
@@ -524,12 +544,10 @@ function File.TestSpeedie (|string| v, |bool|)
 	if Options.arch
 		cmd_args <~ "--arch="+options.arch
 	
-	|| result = faststring()
-	.path.execute(cmd_args, result)
-	|| err = stderr.LastError
-		err.Reformulate(" subspd")
-	
-	printline Result
+	|| p = .path
+	p.execute(cmd_args)
+	|| TestProd = "/usr/local/speedie/Terminal/SpeedieTest" + v
+	testprod.file.mustexist("Compile Speedie")	
 	print TransCompiler.TmpOut(Variant).ReadFile
 	|| test_err = TransCompiler.TmpErr(Variant).ReadFile
 	if test_Err.length
@@ -549,9 +567,9 @@ function array.AppendWords (|array of string| self, |string| R)
 		.AddCStr(s)
 
 
-function array.testadd (|array of string| self, |string| s)
-	opt norefcounts
-	self <~ s
+//function array.testadd (|array of string| self, |string| s)
+//	opt norefcounts
+//	self <~ s
 
 
 function string.MakeAndGoInto (|File|)

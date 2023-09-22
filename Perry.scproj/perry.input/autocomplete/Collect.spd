@@ -2,15 +2,15 @@
 
 function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| name="", |string| reason="", |bool|)
 	#!sendmsg, msgsend
-	|| fn = where.func
+	|| fn = where.Func
 	if fn == @char or @num
-		.popuphide
+		.PopupHide
 		return false
 	if (fn == @name) and cmd[0, "autocomplete"]
 		return false
 	if (fn == @thg) and (where in @decl) and !where.isfirst
 		return false
-	.SetAutoPoint(where.position)
+	.SetAutoPoint(where.Position)
 	|| isString = (fn == @str or @sstr or @back or @bin)
 		ifn cmd starts "autocomplete_sel"
 			return .DisplayStr(where)
@@ -18,19 +18,27 @@ function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| na
 		return .SendFeedbackRequest(cmd, where, name, reason)
 
 
+function PerryIDE.CanSend (|string| cmd, |bool|)
+	if .LastCmdStr != cmd
+		return true
+	if !.LastSendTime or .LastSendTime.ago > 0.66s
+		return true
+
+
 function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string| name,  |string| reason, |bool|)
 	|| msg = .BuildCmd(cmd, where, name, reason)		#require
 
-	if (.PopupDisplay is visible) or .PopupDateOn
-		|| cmdstr = msg.renderjbin
-		require .lastCmdStr != cmdstr
-		.lastCmdStr = cmdstr
-	.SendFeedbackMsg(msg)
+	|| CmdStr = msg.RenderJbin
+	if .CanSend(Cmdstr)
+		.SendFeedbackMsg(msg)
+	.LastCmdStr = CmdStr
+	.LastSendTime = date.now
 	return true
 
 
 function PerryIDE.SendFeedbackStr (|string| op)
-	.SendFeedbackMsg(.compilemsg(op, false))
+	if .IsSpeedieCode
+		.SendFeedbackMsg(.checkmsg(op, false))
 	
 
 function PerryIDE.DateWrap (|message| msg, |message|)
@@ -43,89 +51,79 @@ function PerryIDE.DateWrap (|message| msg, |message|)
 
 
 function PerryIDE.SendFeedbackMsg (|message| msg)
-	require msg
-	.feedback = .CompilerInit(.feedback, false)			#require
-	
+	require msg and .IsSpeedieCode
+	|| fb = .FeedbackInit(.feedback)			#require
+	.feedback = fb
 	|| record = .DateWrap(msg)
-	if .feedback <~ (record, 0.004s)
-		.SpeedieMsgReceive(.feedback)
+	fb <~ record
+	.SpeedieMsgReceive(fb)
 	.LogOneComm(msg, "\1C ")
 
 
-function PerryIDE.SubProcess (|bool| actual_compile, |fn_Subprocess|)
-	require platform.isdebug and !actual_compile
-	if actual_compile
-		rz = Speedie_Compiler
-		Speedie_Compiler = nil
-	  else
-		rz = Speedie_Checker
-		Speedie_Checker = nil
+function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler, initfeedback
+	if c
+		if !c.subprocess and C.TimedOut(5s)
+			c.Deactivate
+		if c.IsOpen
+			return c
+		if c.ActivateChild
+			return c
+		return nil // ded?
 
-
-function PerryIDE.CrashedFB (|process| c, |string| msg="")
-	|| s = ("crashed feedback ", "crashed compiler ")(c == .feedback)
-	(self is dead)
-	.notify(s, @emb + msg)
-	.CancelCompile
-
-
-function PerryIDE.CompilerInit (|process| C, |bool| actual_compile, |process|)   //InitCompiler
-	|| time = 5s
-	|| Active = C.Activate(time, actual_compile)
-	if active == -1
-		return nil
-	if Active
-		return C
-
-	|| p = [.project, "--perry=bin", "--quiet"]
-	|| f = .projmsg.first 
+	|| p = [.project, "--perry=bin", "--nocolor"]
+	|| f = .projmsg[@nil]$
 	|| name = .name
-	if !actual_compile
-		p <~ "--check"
+	|| Noisy = false//SpdLibAlreadyInUse
+	if noisy
+		p <~ "--noisy"		
+
+	p <~ "--check"
 	
-	|| SubProcess = .SubProcess(actual_compile)
+	// 
+	|SpdProcess| spd 
+	
+	if !SpdLibAlreadyInUse
+		SpdLibAlreadyInUse = true
+		target debug {
 		if !.UsingSpdLib
 			.UsingSpdLib = true
 			f.name = name.TrimExt + "()"
-		rz = (SubProcess).RunAsProcess(name, p, 128KB)
-	  else
-		target false // debug
-			|string| Proc = "/usr/local/speedie/Terminal/Debug/uwu"
-		  else
-			|string| Proc = Speedie
-		proc = proc.resolve
+		spd = (Speedie_Main).RunThreaded(p)
+		}
+
+	if !spd?
+		|| proc = speedie.resolve
+		target debug
+			proc = "/usr/local/speedie/Speedie.scproj/Build/Products/Debug/Speedie"
 		if proc
-			rz = process.child(Proc, name, p, actual_compile, 128KB)
+			|| Mode = ProcessMode.CaptureAll * !noisy
+			spd = SpdProcess.RunChild(Proc, .project.name, p, mode)
+	if noisy and spd
+		spd.pico.config.noise = -1
+	return spd
 
 
-function PerryIDE.ActualCompile (|message| msg)
-	require msg
-	|| c = .CompilerInit(.compilr, true)
-	if c == nil
-		isnt active
-		return
-	.compilr = c
-	.speedietext.text = ""
+function PerryIDE.ActualCompile (|string| operation)
+	if .compilr: return app.beep // wah?
 	
-	|| dw = .datewrap(msg )
-	.logonecomm(dw, "\1C ")
-	c <~ dw
-	(.buildbutton isnt enabled)
-	(.runbutton isnt enabled)
+	require .filelist.SaveAll(documentstate.saving)
+	|| args = [.project, "--perry=bin", "--nocolor"]
+	if .DebugIsWaitingForCompile
+		args <~ "--usescriptloc"
+
+	.compilr = process.Stream(speedie, args)		#require
+	.SpeedieText.text = ""
+	
+	(.BuildButton isnt enabled)
+	(.BuildButton isnt visible)
+	(.RunButton isnt enabled)
+	(.Progress is visible)
 
 	is active
-	if .name ~= "Speedie.scproj"
-		.editsep.show
-		.StdOutSelect(.speedietext)
-		.SpeedieText.ScrollToEnd
+	.ShowCompileTab(.speedietext, .name ~= "Speedie.scproj")
 	.ViewAsCurr
 
 
 target debug
-	cpp_libwrapper Speedie_Main (fn_subprocess)
-	|fn_subprocess| Speedie_Checker = Speedie_Main
-	|fn_subprocess| Speedie_Compiler = Speedie_Main
-  else
-	|fn_subprocess| Speedie_Checker = nil
-	|fn_subprocess| Speedie_Compiler = nil
-
+	cpp_libwrapper Speedie_Main (SpdMainFn)
+|| SpdLibAlreadyInUse = true

@@ -39,7 +39,7 @@ datatype byte
 		if (!fs_in)
 			return string.byte(self)
 		fs_in <~ self|Byte|
-		return nil
+		return ""
 
 	function UTF8Size (|int|)
 		cpp_wrapper JB_u8_Size
@@ -58,7 +58,7 @@ datatype byte
 		return .IsInt  or  .in('a', 'f')  or  .in('A', 'F')
 
 	function IsInt (|bool|)
-		return .in('0', '9')
+		return (self|int| - '0')|uint| <= 9
 		
 	operator eq (|byte| b, |bool|)
 		self = .lowercase
@@ -84,7 +84,7 @@ datatype byte
 		return  self >= a  and  self <= b
 	
 	module
-		function New (|int| n, |&byte|)
+		function ZAlloc (|int| n, |?&byte|)
 			cpp_wrapper JB_zalloc
 
 
@@ -92,23 +92,30 @@ datatype cstring
 	linkage: cpp_class _cstring
 	function Length (|int|)
 		cpp_wrapper strlen
+	
 	function Copy (|string|)
 		return string.copy(self|&byte|, .length)
+	
 	function Puts
 		cpp_wrapper puts // hehe
+	
 	function Str (|string|)
 		return string.fromc(self)
+
+	function Name (|cstring|)
+		|| c = self|&byte|
+		|| b = c
+		
+		while *c
+			if *c++ == '/'
+				b = c
+		return b|cstring|
+	
+	syntax cast (|&byte|)
+		return self|&byte|
+	
 	render
 		if fs_in
 			fs_in <~ self
 		  else
 			return .copy
-	module
-		function New (|[string]| r, |cstring[]|)
-			|| n = r.length
-			rz = memory(n, platform.PointerBytes)
-			for i in n
-				|| s = r[i].cstr
-				r[i] = s
-				rz <~ s.addr|cstring|
-

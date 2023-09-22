@@ -10,12 +10,14 @@ class Object
 		cpp_class JB_Object
 	
 	virtual Render (|FastString|fs_in=nil, |string|)
+		nil self
 		cpp_wrapper JB_ObjRender
 
 	helper GenericRender (|FastString| fs_in=nil)
 		cpp_wrapper JB_Obj_GenericRender
 
 	function Class (|&ClassData|)
+		nil checker
 		cpp_wrapper JB_ObjClass
 
 	helper ClassBehaviours (|&byte|)
@@ -27,53 +29,59 @@ class Object
 	helper RefCount (|int|)
 		cpp_Wrapper JB_ObjRefCount
 	
-	helper ObjectID (|uint|)			// stable across Runs!
+	helper ObjectID (|int|)			// stable across Runs!
+		nil checker
 		cpp_wrapper JB_ObjectID		// uses pos within the superblock :)
 	
 	function Dispose				// Safely clears out all the properties...
 		cpp_wrapper JB_ObjDestroy
 
 
-
-	operator isa (|&ClassData|x, |bool|)
+	operator isa (|&ClassData| cls, |bool|)
 		cpp_part Isa
 		if (self)
 			|| P = .Class
 			while (P|bool|)
-				if (P == x)
+				if (P == cls)
 					return true
 				P = P.Parent
 	
 	
-	operator MustBe (|&ClassData|x, |bool|)  // perhaps mustbe should just be isa.
+	operator MustBe (|&ClassData| x, |bool|)  // perhaps mustbe should just be isa.
+		nil checker
 		return self.mustbe(x)
-		// if x isa (message, ErrPlace)
 	
-	helper MustBe (|&ClassData|x, |Message|ErrNode=nil, |bool|)
+	helper MustBe (|&ClassData| x, |Message|ErrNode=nil, |bool|)
+		nil checker
 		if self isa x
 			return true
-		error (errnode, "Expected class ${x.name|cstring|}")
+		if self
+			.TypeFailed(x, errnode)
 
-	operator fast_isa (|&ClassData|x, |bool|)
+	operator fast_isa (|&ClassData| x, |bool|)
 		cpp_part FastIsa
 		return (self) and (.Class == x)
 
-	operator as (|&ClassData|x, |object|)
+	operator as (|&ClassData| x, |object|)
 		cpp_name JB_Object_As
 		if self isa x
 			return self
-		return x.AsFail(self)
+		if self
+			return .TypeFailed(x, nil)
 		
 	operator fast_as (|&ClassData| x, |object|)
 		cpp_part FastAs
-		if self fast_isa x
-			return self
-		return x.AsFail(self)
+		if self
+			if .class == x
+				return self
+			return .TypeFailed(x, nil)
 	
-	helper ClassData.AsFail (|object| wrong, |object|)
-		if wrong
-			error ("object of '" + wrong.class.name + "' is not a: " + .name ) 
-			debugger
+	helper TypeFailed (|&ClassData| Cls, |message?| where,  |object|)
+		|| name = .Class.name.str
+		error (where, name + " (object) is not a: " + cls.name )
+		platform.log "TypeFail"
+		platform.log app.stacktrace
+		debugger
 
 	api DebugPrint  // more for use in XCode, than anything else.
 		cpp_name jdb
@@ -89,23 +97,28 @@ class Object
 		cpp_part Fail
 		
 		if self isa message
-			StdErr.NewError( self, Error )
+			errorreceiver.NewError( self, Error )
 		  else
-			StdErr.NewError( Error )
+			errorreceiver.NewError( Error )
 
 
 	helper string.SyntaxWarn
 		cpp_part Warn
-		StdErr.Newwarning( self )
+		errorreceiver.Newwarning( self )
 	
-
+	
+	function MemorySanity
+		|| r = .refcount
+		if r < 0 or r > 100000 // sigh
+		
 	module
 		function DebugAllMemory (assigns:|bool|)
-			cpp_wrapper JB_TotalMemorySet
-		function TotalSanity (|bool| Force=true, |bool|)
+			cpp_wrapper JB_DebugAllMemory
+		function TotalSanity (|bool| Force=false, |bool|)
 			target debug
-				cpp_wrapper JB_TotalMemorySanity
+				cpp_wrapper JB_TotalSanity
 			// something like that?
+
 
 struct ClassData
 	linkage
@@ -127,8 +140,13 @@ struct ClassData
 	function AllocZeroed (|Object|)
 		cpp_Wrapper JB_Class_AllocZeroed
 
-	function CreateLayer (|Object| obj, |MemoryLayer|)
+	function CreateLayer (|Object| obj, |MemoryLayer!|)
 		cpp_Wrapper JB_Mem_CreateLayer
+
+	function CreateUseLayer (|Object| obj, |object| obj2, |MemoryLayer!|)
+		rz = .createlayer(obj)
+		rz.use
+		rz.obj2 = obj2
 
 	function Layer (|MemoryLayer|)
 		cpp_Wrapper JB_Class_Layer
@@ -154,12 +172,12 @@ function DebugAt (|int| i=1)
 	cpp_nothing JB_DoAt
 
 
-cpp_nothing JB_SetRef				(|Object| A,			|Object| B)
-cpp_nothing JB_Incr					(|Object| Obj)
-cpp_nothing JB_FreeIfDead			(|Object| Obj,			|_voidptr|)
-cpp_nothing JB_SafeDecr 			(|Object| Obj,			|Object|)
-cpp_nothing JB_Decr					(|Object| Obj)
-cpp_nothing JB_Clear				(|Object| Obj)
+cpp_nothing JB_SetRef				(|Object?| A,			|Object?| B)
+cpp_nothing JB_Incr					(|Object?| Obj)
+cpp_nothing JB_FreeIfDead			(|Object?| Obj,			|&nil|)
+cpp_nothing JB_SafeDecr 			(|Object?| Obj,			|Object?|)
+cpp_nothing JB_Decr					(|Object?| Obj)
+cpp_nothing JB_Clear				(|Object?| Obj)
 cpp_nothing JB_DecrMulti			(|Object| Obj,			|int| n)
 cpp_nothing JB_Ternary				(|Object| Obj,			|int|) // weird, only 1 param?
 cpp_nothing JB_Swap					(|&Object| A,			|&Object| B)
@@ -168,7 +186,9 @@ cpp_wrapper JB_FindLeakedObject 	(|object| Obj,			|array| dest)
 cpp_wrapper JB_Mem_ClassLeakCounter ()
 cpp_wrapper JB_Str3					(|Object| Data,			|int| N, |string|)
 cpp_nothing JB_New					(|&ClassData|  Class,	|Object|)
+cpp_nothing JB_NewClass				(|&ClassData|  Class,	|Object|)
 cpp_nothing JB_LayerNew				(|MemoryLayer| L,		|&ClassData| Class, |Object|)
+cpp_nothing JB_LayerNewClass		(|MemoryLayer| L,		|&ClassData| Class, |Object|)
 
 
 
@@ -207,6 +227,9 @@ class MemoryLayer
 
 	function Use
 		cpp_wrapper JB_Mem_Use
+	
+//	syntax Using (|memorylayer|) // need the default for this class... sigh
+		
 
 
 

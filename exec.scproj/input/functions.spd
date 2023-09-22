@@ -3,15 +3,15 @@ class function
 	|int|				Index
 	|int|				Length
 	|string|			Name
-	|Message|			Src
-	|&ASMblob|			SpeedieFunc
-	|_voidptr|			CFunc
+	|Message?|			Src
+	|?&ASMblob|			SpeedieFunc
+	|?&nil|				CFunc
 
 	constructor (|string| name)
 		cpp_Part Basic
 		.name  = name
 	
-	constructor (|_voidptr| cpp, |message| spd)
+	constructor (|?&nil| cpp, |message| spd)
 		.name = spd.name
 		|| ASM = spd[0]
 		.speediefunc = nil
@@ -31,7 +31,7 @@ class function
 	
 	function Run (|int64|)
 		jb_vm.vm.ClearRegisters 
-		return jb_vm.Run(.speediefunc.ASM, .length)
+		return jb_vm.Run(.speediefunc!.ASM[0], .length)
 	
 	
 	function LinkCpp
@@ -96,11 +96,11 @@ module InternalTable
 		return .table[i]
 
 	function Build (|bool|)
-		|&_voidptr| Internals 
+		|&&nil| Internals 
 		||			spd = package.LibFuncLayout(&Internals).decompress.parse
 		rz = .Buildsub(spd.first, internals)
 	
-	function BuildSub (|message| spd, |&_voidptr| Internals, |bool|)
+	function BuildSub (|message| spd, |&&nil| Internals, |bool|)
 		opt norefcounts
 		while spd
 			|| fn = (*Internals++, nil)(*Internals)
@@ -127,7 +127,7 @@ module InternalTable
 			.Failed = l
 			if l
 				AppTable.linkorder <~ internaltable.names[l]$
-		.Failed = nil
+		.Failed = ""
 
 
 

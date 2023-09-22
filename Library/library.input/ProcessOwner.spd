@@ -1,0 +1,43 @@
+
+
+class ProcessOwner
+	linkage
+		wrapper
+		cpp_part PID
+	contains ProcessOwner
+	
+	|PID_Int| 			PID
+
+	constructor
+		cpp_wrapper JB_PID_Constructor
+		
+	destructor
+		cpp_Wrapper JB_PID_Destructor
+	
+	function Exit (|ErrorInt|)
+		cpp_Wrapper JB_PID_Exit
+	
+	function Status (|ErrorInt|)
+		cpp_Wrapper JB_PID_Status
+
+	function IsRunning (|bool|)
+		return .exit == -1
+		
+	function Register
+		cpp_wrapper JB_PID_Register
+
+	function UnRegister
+		description "Removes from the list. Doesnt change the exit, pid, or status codes" 
+		cpp_wrapper JB_PID_UnRegister
+
+	function Kill
+		cpp_wrapper JB_PID_Kill
+	
+	function Next (|ProcessOwner|)
+		cpp_wrapper JB_PID_Next
+	
+	module
+		function First (|ProcessOwner|)
+			cpp_wrapper JB_PID__First
+
+// the signal constants are different per-platform

@@ -1,0 +1,221 @@
+
+
+class StringReader
+	|int|						Length
+	|FastBuff|					Data
+	|file?|						File
+	|object--?|					UserObj				// for jbin
+	|int|						ChunkSize
+	|int| 						StartFrom
+	|bool| 						_NoMoreChunks
+
+	linkage:cpp_Part SS
+	
+	constructor (|string| Data)
+		.data.readfrom = Data
+		.length = Data.length
+		._NoMoreChunks = true
+	
+	
+	constructor (|file!| file, |int| ChunkSize=4MB)
+		cpp_part ConstructorFile
+		file.close
+		.file = file
+		.ChunkSize = chunksize
+		.length = file.size
+		.ReadChunk(file)
+
+	function ReadAll (|string|)
+		return .str(.length - .startfrom)
+
+	function Parse (|syntax| owner = @arg, |bool| AllowDecomp=true, |message|)
+		return .ReadAll.parse(owner, allowdecomp)
+
+	
+	helper ReadChunk (|file| f, |bool|)
+		.data.readfrom = f.read(.chunksize)		// for now
+		if .data.readfrom.length < .chunksize
+			._NoMoreChunks = true // not technically true for pipes... but this will do for now!
+		return .data.readfrom
+	
+	function Skip (|int| p = 1)
+		if p < 0 // end
+			.position = .length
+		  else
+			.position += p
+		
+	syntax cast (|bool|)
+		disabled "Do you mean self != nil, or self.HasAny"
+		
+	function HasAny (|bool|)
+		nil checker
+		require (self != nil)
+		if .data.hasany
+			return true
+		return .NextChunk
+
+
+	helper NextChunk (|bool|)
+		opt norefcounts
+		|| f = .file
+			.startfrom += .data.size
+			if .ReadChunk(f)
+				return true
+			.file = nil // why not
+		
+		
+	function NonZeroByte (|int|)
+		while 
+			|| b = .byte
+				return b
+	
+	function Byte (|int|)
+		if .data.HasAny()
+			return .data.byte
+		if .NextChunk
+			return .data.byte
+		return -1
+		
+	syntax Compare (|int| n, |bool| aware, |int|)
+		return .length - n
+	
+	function Position (|int64|)
+		return .data.position + .StartFrom
+	setter Position (|int64|)
+		.data.position = value - .StartFrom
+
+	function bInt (|int|n=4, |int64|)
+		for n
+			|| b = .byte
+			loop b >= 0
+			rz <<= 8
+			rz |= b
+		
+	function bInt0 (|int|n=3, |int64|)
+		// 0-3 works better for bit-math
+		return .bint(n+1)
+
+	function lInt0 (|int|n=3, |int64|)
+		for i in n+1
+			|| b = .byte
+			loop b >= 0
+			rz |= b << i << 3
+
+
+	function Noob (|uint64|)
+		|| b = .byte
+		if b < 224
+			return b
+		return (.hint<<5) ||| (b-224)
+
+
+	function hInt (|int64|)
+		|| sh = 0
+		|| v  = 0
+		while
+			|| b = .byte
+			loop b >= 0
+			v |= (b&127) << sh
+			if b <= 127
+				return v
+			sh += 7
+			expect (sh <= 57) (self, "Corrupted hInt")
+	
+	function DString (|byte| split, |string|)
+		// this function doesn't work with streaming...
+		// its not ideal. but none of my code needs this streamed!
+		// they just read the entire file in. So I don't need it!
+		|| p = .position
+		|| zpos = .data.find(split, p, int.max)
+			.position = zpos+1
+			return .data[p, zpos] // don't call .section, seeing as its not streaming.
+
+	function CString (|string|)
+		return .dstring(0)
+	
+	function UpTo (|int| end, |int|)
+		return end - .position
+	function UInt (|int| size, |int| mult=256, |uint64|) // mult used by selftools id3 decoder, passes 128.
+		for size
+			|| b = .byte
+			loop b >= 0
+			rz *= mult
+			rz += b
+	function Trim (|int| n, |string|)
+		return .str(n).trim
+	function Remaining (|int|)
+		return .length - .position
+	
+	function StrNoAdvance (|int| n, |int|skip=0, |string|)
+		|| p = .Position
+		rz = .str(n)
+		.Position = p
+	
+	function NoMoreChunks (|bool|)
+		if ._NoMoreChunks
+			return true
+		if .data.Remaining <= 0
+			if !.file
+				return true
+			if .length <= .startfrom
+				return true
+				
+	 function Str (|int| n, |int| skip = 0, |string|)
+		ifn n > 0 and skip < n
+			return ""
+		if (.data.has(n)) or (.NoMoreChunks)
+			(n min= .remaining)
+			|| pos = .data.position		// no need use the .startfrom
+			.data.position = n + pos
+			return .data.syntaxaccess(pos + skip, .data.position)
+
+		|| Remaining = n - skip
+		|| r = string(Remaining) #require
+		|| Dest = r.address
+		while
+			|| Copied = .data.CopyTo(dest, .data.Remaining min Remaining)
+			Remaining -= Copied
+			dest += copied
+			loop Remaining > 0
+			if !.NextChunk
+				 r = r[0, r.length - remaining].copy
+				 exit
+		return r
+	
+	function UTF8 (|int|n, |int|skip=0, |string|)
+		return  .str(n,skip).utf16to8(2)
+
+	function Test (|string| Header, |bool|)
+		if !Header
+			return true
+		return Header == .str(Header.length)
+	
+	function UInt16 (|uint16|)
+		disabled "use .uint(2)"
+
+	syntax expect (|string| Error)
+		opt norefcounts
+		.UserObj = nil
+		|| D = .data.ErrorReported++
+		require !D
+		
+		if !error
+			if (.file)	
+				error = "Error decoding file: "
+			  else
+				error = "Error decoding data."
+				
+		errorreceiver.NewError(nil, error, .file)
+
+
+	
+function string.Stream (|string| Header, |stringreader|)
+	cpp_part StreamWithHeader
+	rz = StringReader(self)
+	if !rz.test(Header)
+		rz = nil
+
+	
+function string.Stream (|StringReader|)
+	return StringReader(self)
+

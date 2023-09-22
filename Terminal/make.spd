@@ -5,8 +5,8 @@
 
 
 main 
-	.gen("osx", platform.OSX)
-	.gen("linux", platform.lin)
+	app.gen("osx", platform.OSX)
+	app.gen("linux", platform.lin)
 
 
 || Speedie = "/usr/local/speedie"
@@ -52,80 +52,59 @@ function link (|string| src, |string| dest, |string|)
 ln -sf $src $dest
 ${unmod(dest)}
 "
-	
-	
 
-function app.gen (|string| plat, |bool| IsCurrentPlatform) {
-expect !.args (.args, "This script takes no arguments.")
 
-|| CFlags   = "-std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1"
-|| shared = "shared"
-|| LinkLibFlags = ""
-|| ext = "so"
-|| PerryPreReqs = ""
-if plat ~= "osx"
-	shared = "dynamiclib"
-	ext = "dylib"
-	CFlags += " -arch=arm64  -arch=x86_64  -lc++"
-if plat ~= "linux"
-	CFlags += " -rdynamic"
-	LinkLibFlags += "-lrt -pthread"
-	PerryPreReqs = `
+module Vars
+	|string| CFlags
+	|string| shared
+	|string| LinkLibFlags
+	|string| ext
+	|string| PerryPreReqs
+	|string| LibName
+	|string| LibFlags
+	|file|   BuildFol
+	|file|   CppLib
+	|string| SpdSrc
+	|string| SpdTerm
+	|string| LibPath
+	
+	function InitVars (|string| plat)
+		CFlags   = "-std=gnu++17 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -flto -D TARGET_UNIX=1 -D __SPEEDIE__=1"
+		shared = "shared"
+		LinkLibFlags = ""
+		ext = "so"
+		PerryPreReqs = ""
+		if plat ~= "osx"
+			shared = "dynamiclib"
+			ext = "dylib"
+			CFlags += " -arch=arm64  -arch=x86_64  -lc++"
+		if plat ~= "linux"
+			CFlags += " -rdynamic"
+			LinkLibFlags += "-lrt -pthread"
+			PerryPreReqs = `
 echo "Getting GUI files that Perry needs"
 sudo apt install libsdl2-dev
 sudo apt install gedit
 `
-  else
-	PerryPreReqs = `echo "Please make sure that you have libSDL2 installed. We won't check for libSDL2, just assume it exists."`
+		  else
+			PerryPreReqs = `echo "Please make sure that you have libSDL2 installed. We won't check for libSDL2, just assume it exists."`
+		
+		
+		LibName  = "libjeebox.$ext" 
+		LibFlags = "$CFlags -$shared -fPIC -D AS_LIBRARY=1 "
+		ExecFlags   = "$CFlags -g -ljeebox"
+		BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
+		CppLib   = "$Speedie/Library/CppLib".file
+		SpdSrc   = "$Speedie/Speedie.scproj/Build"
+		SpdTerm  = "$Speedie/Terminal/Speedie"
+		LibPath  = "/usr/local/lib/$LibName"
 
 
-|| LibName  = "libjeebox.$ext" 
-|| LibFlags = "$CFlags -$shared -fPIC -D AS_LIBRARY=1 "
-ExecFlags   = "$CFlags -g -ljeebox"
-|| BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
-|| CppLib   = "$Speedie/Library/CppLib".file
-|| SpdSrc   = "$Speedie/Speedie.scproj/Build"
-|| SpdTerm  = "$Speedie/Terminal/Speedie"
-|| LibPath  = "/usr/local/lib/$LibName"
-
-|| tocompile = FastString()
-|| Count = 2 //jb.cpp and jb_globals.cpp
-for ch in CppLib
-	if ch isa "cpp"
-		tocompile <~ ch
-		tocompile <~ ' '
-		Count++
-|| list = tocompile.render
-
-
-////////////////////////////
-<(`    (((generating cpp files)))    `)>
-////////////////////////////
-
-expect !(Speedie contains ' ') ("The path: '$speedie' contains spaces and can't be compiled.")
-.cwd = Speedie.child("jeebox.scproj").resolve
-|| ScriptOut = "$Speedie/Terminal/make$plat.sh".file
-|| PrepareCpp = "$Speedie/Terminal/PrepareSpeedie.sh".file
-
-
-PrepareCpp.data = `#!/bin/bash
-echo "Prebuild .cpp files"
-/usr/local/bin/speedie   .    --x --nocompile
-/usr/local/bin/speedie --self --x --nocompile
-`
-if IsCurrentPlatform
-	PrepareCpp.Execute
-
-
-////////////////////////////
-<(`    (((generating script)))    `)>
-////////////////////////////
-require StdErr.ok
-printline "Creating $scriptout"
-scriptout.data = "#!/bin/bash
+	function ScriptOut (|string| list, |string|)
+		return "#!/bin/bash
 echo \"Starting Speedie Build\"
 set -e
-cd $CppLib
+cd ${vars.CppLib}
 
 $GetUserName
 echo \"Compiling $LibPath for user '\$U'\"
@@ -165,6 +144,50 @@ $PerryPreReqs
 $SpdTerm $Speedie/Perry.scproj
 "
 
+
+
+function app.gen (|string| plat, |bool| IsCurrentPlatform) {
+expect !.args (.args, "This script takes no arguments.")
+vars.initvars(plat)
+
+
+|| tocompile = FastString()
+|| Count = 2 //jb.cpp and jb_globals.cpp
+for ch in vars.CppLib!
+	if ch isa "cpp"
+		tocompile <~ ch
+		tocompile <~ ' '
+		Count++
+|| list = tocompile.render
+
+
+////////////////////////////
+<(`    (((generating cpp files)))    `)>
+////////////////////////////
+
+expect !(Speedie contains ' ') ("The path: '$speedie' contains spaces and can't be compiled.")
+.cwd = Speedie.child("jeebox.scproj").resolve
+|| ScriptOut = "$Speedie/Terminal/make$plat.sh".file
+|| PrepareCpp = "$Speedie/Terminal/PrepareSpeedie.sh".file
+
+
+PrepareCpp.data = `#!/bin/bash
+echo "Prebuild .cpp files"
+/usr/local/bin/speedie   .    --x --nocompile
+/usr/local/bin/speedie --self --x --nocompile
+`
+if IsCurrentPlatform
+	printline "cwd: " + app.cwd
+	PrepareCpp.Execute
+
+
+////////////////////////////
+<(`    (((generating script)))    `)>
+////////////////////////////
+require StdErr.ok
+
+printline "Creating $scriptout"
+scriptout.data = vars.scriptout(list)
 
 require StdErr.ok
 "Script generated at: $scriptout"

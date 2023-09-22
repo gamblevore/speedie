@@ -1,33 +1,34 @@
 
 # Speedie - Fun is the main goal #
-## Beautiful, Object Oriented, Simple, Fast, Expressive, Non-Infantilising ##
+## Beautiful, Modern, Fast, Expressive, Non-Infantilising ##
 
 * `Creator:` [@gamblevore](http://github.com/gamblevore/)
 * `Contact:` [theo@jeebox.org](mailto:theo@jeebox.org)
 * `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 * `Released`: New Years Eve 2022  (31/12/2022)
 * `Platforms`: MacOSX Intel • Apple Silicon (ARM) • Linux (Ubuntu) • MS Windows (via [WSL](https://learn.microsoft.com/en-us/windows/wsl/install))
-* `Sponsor ❤️`: If you love my vision, [Please Sponsor Speedie](https://github.com/sponsors/gamblevore). I am struggling without sponsors. Its not going to be possible to complete without sponsors. I hate begging as I have pride, but there are so many people out there with money they could give. Donate however much you feel happy giving. ❤️
+* `Sponsor ❤️`: If you love my vision, [Please Sponsor Speedie](https://github.com/sponsors/gamblevore). Donate however much you feel happy giving. Or possibly... just hire me? ❤️
 
 
 # General Features #
+* Modern language, slightly more expressive than Python.
+* Faster than idiomatic C++ (allocators / string / files / etc are faster than C++ std-lib)
+* Fast compilation.
 * Object-oriented programming model
-* Works natively with Jeebox... Probably the best way to learn how to use Jeebox.
-* Simple but powerful syntax.
-* A lot of syntactic sugar, while still being tasteful.
 * Cross-platform. Create shell tools and GUI apps
-* Easy communication across multiple processes (IPC).
+* Message-passing-interface lets your multiple-processes talk.
 * Has an awesome IDE, “Perry”.
-* Use one language, thats great at multiple areas:
-    * Fast at heavy-duty data-processing
-    * Making tools with few lines of code
-    * Writing large well-structured programs
-    * Create cross-platform GUI (or shell) apps
+* Stick with one language, when your needs change:
+    * Fast: When you are doing heavy-duty data-processing
+    * Expressive: When making tools with few lines of code
+    * Type-safe and modern: Allows writing large complex programs
+    * The GUI and everything else is cross-platform.
+* Works natively with Jeebox... Learn how to use Jeebox!
 * Not controlled by big-tech.
 
-Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D I did delete most of the rude comments before release, but still... dont expect "corporate behaviour".
+Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D Dont expect "corporate behaviour". But do expect love for the project and the community.
 
-If you'd like to financially support the ongoing development of Speedie, consider [sponsoring through GitHub](https://github.com/sponsors/gamblevore).
+If you'd like to support the ongoing development of Speedie, consider [sponsoring through GitHub](https://github.com/sponsors/gamblevore).
 
 Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't NEED C++, but being able to is a great property to have, so that property will remain.
 
@@ -39,12 +40,14 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 * [Strings](Documentation/Strings.md)
 * [Error Handling](Documentation/Errors.md)
 * [Perry (IDE)](Documentation/Perry.md)
+* [Nil Checking](Documentation/Nil.md)
 
 
 
 # Power Features #
-* Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE*/ifstreams/fread and do everything using low-level Unix APIs.)
-* Doesn't infantilise you like Javascript or java does. Allows you to mess around with pointers or structs if you need... although its usually a buggier approach. 
+* Has an awesome nil-checker and type-safety system! Write safe code while having an easy time of doing it!
+* Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE*/fread/etc and do everything using low-level Unix APIs.)
+* Doesn't infantilise you like Javascript or Java. Allows you to mess around with pointers if you need... (but try to avoid pointers anyhow).
 * Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
 	
 
@@ -54,7 +57,8 @@ That said, there are challenges to overcome, that will probably mean a lot of pe
 
 * Adding a good debugger, VM and executable-format!
 
-Unfortunately I am one person who has created a very large piece of work. Extra developers are sorely wanted! Becoming a contributor could be a great way to add programming concepts to a new language.
+Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked.
+
 
 # Goals #
 I have a lot of long-term goals... Overall, I want to make programming a whole lot more fun. Here goes for a partial-list of goals!
@@ -73,12 +77,11 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 
 # Installation #
 
-1. Download/Clone repo, and place at `/usr/local/speedie`
+1. Run "`git clone https://github.com/gamblevore/speedie.git`" then move the folder to `/usr/local/speedie/` if it wasn't cloned there already.
 2. `cd /usr/local/speedie`
 3. Execute `sudo Terminal/makelinux.sh` ... OR `sudo Terminal/makeosx.sh`
 
-You can install "Perry" (the IDE), on Ubuntu on Windows. You will need libsdl2-dev and `gedit`. (gedit will drag along some GUI libs that Perry needs.)
+My IDE Perry, will need libsdl2-dev to compile. LibSDL2 has [install instructions](https://wiki.libsdl.org/SDL2/Installation).
 
-LibSDL2 has [install instructions](https://wiki.libsdl.org/SDL2/Installation). Gedit can be installed simply: `sudo apt install gedit`
 
 

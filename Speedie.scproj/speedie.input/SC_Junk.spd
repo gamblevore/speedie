@@ -25,15 +25,31 @@ helper __junktest_3__ (|intrange| data, |bool|)
 			return true
 
 
-
 helper __junktest_2__
 	visible
-	|| r1 = ringtree()
-	|| r2 = ringtree()
-	|| i2 = 0
-	i2 = r1.dist(r2)
-	r1.parent? = r2
+	|| r1 = list()
+	if (0.5)
+		r1 = nil
+	|| r2 = list()
+	with r1.first
+		|| i2 = 0
+		i2 = .dist(r2)
 
+
+helper message.__junktest_18__ (|bool| named=false) // findpos, findat
+	opt norefcounts
+	|message| rz 
+	for ch in self
+		if ((rz!=nil) and !rz.position) // smallest
+			rz = ch
+
+
+
+helper __junktest_19__
+	|| w = message()
+	with w
+		.name = ""
+	
 
 
 module __junktest_5__
@@ -62,7 +78,7 @@ class __junktest_6__
 	module
 		function AbcVis (|~int|)
 			visible
-			|| x = ("cpp_name").length?
+			|| x = ({|| y = "a", rejoin y})
 	setter Abc (|int|)
 		if value == 1
 
@@ -99,11 +115,27 @@ helper int.__junktest_9__ (|int| X, |int| Y, |int| Z=0, |int|)
 function __JunkTest_10__
 	// dictionary of int... works?
 	// but i had a bug like this? sigh...
-	//	dict[str] = intgr // fails
+	// dict[str] = intgr // fails
 
 	|dictionary of int| d = dictionary.new
 	|| i = 1
 	d["abc"] = i
+
+
+helper __junktest_11__
+	visible
+	|| sss = "abc"
+	|| y = (sss.decompress(int.max), sss)(0.5[]) // make sure .decomp doesnt get extracted
+	printline y
+
+
+helper voidtest  (|&nil| abc, |&nil|)
+	visible
+	return abc
+
+helper voidtest2 (|&nil| abc, |&nil|)
+	|| abc2 = voidtest(abc)
+	visible
 
 
 struct ContainerStruct2

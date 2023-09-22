@@ -18,10 +18,10 @@ SCStrings.RenderInsides = "
 ".ParseCleanWipe
 
 SCStrings.RenderNewParams = "
-	|FastString| fs_in = nil
+	|?FastString| fs_in = nil
 	|string|
 ".ParseCleanWipe
-		
+
 SCStrings.RenderFinish = SCStrings.RenderInsides.find( @tmp, "finish" )
 
 
@@ -36,33 +36,28 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 		msg.first = @thg + "Render"
 		if cls
 			msg.name = "behaviour"
-
 	|| arg = msg.NormaliseFunc
 	|| name = msg.first
 	|| params = name.next 
 
-	if msg.name == "behaviour"
+	if msg.isbehaviour
 		params <~ (@thg, "render")
-//		arg.first = @tmp.msg("visible") // why? all behaviours would need visible then?
 	  else
 		SCStrings.RenderNewParams.CopyAllInto(params)
 	
 	if msg.FindNested( @thg, "fs" )
-		using arg
-			SCStrings.RenderFinish.CopyAllBeforeInto( arg, nil )
-		using arg.flatlast
-			SCStrings.RenderFinish.CopyAllAfterInto( arg, nil )
-	if msg.name == "behaviour"
-		msg[1].remove
+		SCStrings.RenderFinish.CopyAllBeforeInto( arg, nil )
+		SCStrings.RenderFinish.CopyAllAfterInto( arg, nil )
+	if msg.isbehaviour
+		msg.second.remove
 		return true
 
 
 function NewRender (CollectFunc)
 	|| cls = name_space.isnormalobject 
 	if Tran_Render( node, cls )
-		return SCBehaviour.NewBehaviour( node, name_space, ErrPlace )
+		return SCBehaviour.NewActual( node, name_space, ErrPlace )
 	return SCFunction.NewFunc( node, name_space, ErrPlace )
-
 
 
 function ObjectifyString (|Message| msg)
@@ -105,7 +100,7 @@ function InBuiltFunc (|message| self, |string| name, |bool|)
 
 
 function String_Expand (|Message| msg, |SCFunction| fn) {
-	|| P = msg.parent 
+	|| P = msg.parent !
 	if (P istmp "disabled" or "description")
 		msg.Func = @str					// in case of description ''
 		return
@@ -117,14 +112,14 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	if InbuiltFunc(msg, "digest")
 		msg.name = msg.name.digest
 	  elseif P == @arg
-		msg.wrapwith(@tmp + "printline")
+		msg.wrapwith(@tmp, "printline")
 		
 	if !msg.first
 		ObjectifyString( msg )
 		Return
 	
 	require fn
-	|| Point = msg.ParentPoint
+	|| Point = msg.ParentPoint!
 	using (msg)
 	|| FSName = UniqueTmpVar( fn, "fs" )
 	|| StrName = fsName + "_str"
@@ -143,7 +138,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 				errpos = item
 			ObjectifyString( item )
 	
-	check !(scbase.CurrModule) (errpos, "Strings with expressions, must be in proper functions. (Compiler limitation)")
+	check !(scmodule.curr) (errpos, "Strings with expressions, must be in proper functions. (Compiler limitation)")
 		// would need to totally redesign how I do strings... and init code. sigh. collectdecls seems to have happened already so... its too late at this point to add new vars? something like that.
 
 	for (item in msg)
@@ -156,12 +151,9 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 		if fnc ~= @dot and "SyntaxAppend"
 			WeAreAppending = true
 	// wrong approach.
-	if false
-		msg.become(@thg, fsname) // keep the reference the same so it doesn't whoop up.
-	  else
-		msg.become(@dot, "getresult") // keep the reference the same so it doesn't whoop up.
-		msg <~ «thg fsname » 
-		msg <~ «emb »
+	msg.become(@dot, "getresult") // keep the reference the same so it doesn't whoop up.
+	msg <~ «thg fsname » 
+	msg <~ «emb »
 	(decl)
 }
 }
@@ -180,20 +172,13 @@ function String.ParseClean (|Message|)
 	Compiler.stParseTime += (Date.Now - P1)|int|
 	rz.clean(True)
 	rz.PrepareAST
-	
-	
-function message.UnicodeSafe
-	opt norefcounts
-	|| n = .name
-	require !n.isascii
-	.name = n.UnicodeSafeName
 
 
 
 function Message.Clean (|bool| erl = false)
-	|| pos		= parser.usingpos
-	|| Len		= parser.UsingLength
-	|| Tag		= parser.UsingTag
+	|| pos		= parser.using.position
+	|| Len		= parser.Using.Length
+	|| Tag		= parser.Using.Tag
 
 	|message--| QEscape
 	|message| IgnoreArg 
@@ -247,7 +232,7 @@ function Message.Clean (|bool| erl = false)
 			  elseif curr == "~<>"
 				deprecate (curr, "Use ~!=")
 				curr.name = "~!="
-			  elseif curr == "<~" or (curr == "<" and curr in @arg)
+			  elseif curr == "<~"
 				curr.BecomeAppend("SyntaxAppend")
 			  elseif curr == "~>" // noice
 				curr.BecomeAppend("SyntaxSendTo")
@@ -268,7 +253,7 @@ function Message.Clean (|bool| erl = false)
 					curr.Tran_Isnt("self")
 				  elseif SCGlobals.UniqueNum and AutoComplete.isafunc(s)
 					SCGlobals.UniqueNum = 0 // why not? make for smaller/more-predictable numbers
-				  elseif s == "dispatch" or "functiontable"
+				  elseif s == "dispatch" or "functiontable" or "flags" or "constants"
 					IgnoreArg = curr.last
 				  elseif s == "with"
 					curr.tran_with
@@ -317,7 +302,7 @@ function message.BecomeAppend (|string| s)
 	// typeofsend actually does a lot more than this
 	// so it can't be removed just yet
 	opt NoRefCounts
-	|| p = .parent
+	|| p = .parent!
 	require p.expect(@rel)
 	p.become(@dot, s)
 	.func = @prm
@@ -329,26 +314,36 @@ function message.BecomeAppend (|string| s)
 		.last = n
 
 
-function message.WithDirectName (|message| p, |string|)
-	expect (self!=@rel and self != @bra) (self)
-	return scfunction.tempmoveout(self).DeclName.name
-
-
 function message.Tran_With 
-	|| obj = self.needfirst$
-	|| arg = obj.next(@arg)$	
+	|| obj = .needfirst$
+	|| arg = obj.Next(@arg)	
+	if obj == @rel
+		error obj
 	
-	.name = "if"
-	|| name = obj.WithDirectName(self)$	
-
+	require arg and obj != @rel
 	
 	using (obj)
+	|| name = obj.name
+	|| If = self
+	if obj.func == @thg
+		.name = "if"
+	  else
+		.become(@arg)
+		If = @tmp + "if"
+		.first = If
+		if <~ obj
+		if <~ arg
+		|| dcl  = scfunction.tempmoveout(obj)
+		name = dcl.DeclName!.name
+
+	if.first!.wrapwith(@bra, "?")
+	
 	for ch.flat in arg
 		if ch == @tmp
 			if ch == "is" or "isnt"
 				ch.Tran_Isnt("it")
 				continue_With ch
-			if ch == "with"
+			  elseif ch == "with"
 				continue_with ch.flatafter
 		  elseif ch == @sdot
 			ch.func = @dot
@@ -356,17 +351,17 @@ function message.Tran_With
 		  elseif ch == @thg
 			if ch == "it"
 				ch.name = name
-
+	
 
 
 function message.WithDeclTransform (|message| decl, |message| rel, |message| arg)
 	require rel.expect(@rel)
 	|| name = rel[@thg]
-	using arg
-	|| IF = @tmp + "if"
-	decl.next = if
-	if <~ (@thg, name.name)
-	if <~ arg
+		using arg
+		|| IF = @tmp + "if"
+		decl.next = if
+		if <~ (@thg, name.name)
+		if <~ arg
 
 
 function message.BunchFixSub (|message| subject, |message| stuff)
@@ -379,7 +374,7 @@ function message.BunchFixSub (|message| subject, |message| stuff)
 			stuff.replaceinto(Test)
 			exit
 		|| R = stuff[2]							#expect (stuff, "Rel missing right side.")
-		stuff.first.ReplaceInto(test)
+		stuff.first!.ReplaceInto(test)
 		stuff = R
 		subject = subject.copy
 
@@ -389,9 +384,9 @@ function Message.BunchFixPrepare (|Message|)
 	// if a == b or c
 	
 	|| P = .NiceParent
-	if (P == @rel)
+	if P == @rel
 		return p
-	return scfunction.tempmoveout(self).last
+	return scfunction.tempmoveout(self).last!
 
 
 
@@ -407,17 +402,17 @@ function Message.BunchFixPrepare (|Message|)
 // only has 1 caller. why not fix this to use the above macro?
 function Message.BunchFix 
 	using (self)
-	|| P		= .BunchFixPrepare
-	|| subject	= P.first
-	|| multi_opp= subject.next(nil)$
-	.RelFix(false)
-	P.ReplaceWith(self)
-	multi_opp.BunchFixSub(subject, self)
+	|| P			= .BunchFixPrepare
+	|| subject		= P.first!
+	|| multi_opp	= subject.Next
+		.RelFix(false)
+		P.ReplaceWith(self)
+		multi_opp.BunchFixSub(subject, self)
 
 	
 function Message.BunchlessFix
 	|| subject		= .first
-	|| multi_opp	= subject.next(nil)$ // or
+	|| multi_opp	= subject.Next$ // or
 	|| c			= multi_opp.next$
 	// P			is the rel (a=b or c)
 	// self/stuff	is the bunch (b or c)
@@ -425,35 +420,35 @@ function Message.BunchlessFix
 	// multi_opp	is the opp (=)
 	.become(c)
 	using (self)
-	multi_opp.BunchFixSub(subject, self)
+	multi_opp.BunchFixSub(subject!, self)
 
 
-function Message.TernaryFix (|message| exp) {
-	|| place = .IsSetIntoVar			#expect self	
-	using (self)
-	|| list = .first
-	expect list.haschildcount(2) (self, "Expected two children")
-
-	.next = «tmp "if"
-		exp
-		«arg, neweqrel(place, list.first)»
-		«tmp "else"
-			«Arg, neweqrel( «Thg place.name », list.last)»
-		»
-	»
-	
-	.remove
+//function Message.TernaryFix (|message| exp) {
+//	|| place = .IsSetIntoVar			#expect self	
+//	using (self)
+//	|| list = .first
+//	expect list.haschildcount(2) (self, "Expected two children")
+//
+//	.next = «tmp "if"
+//		exp
+//		«arg, neweqrel(place, list.first)»
+//		«tmp "else"
+//			«Arg, neweqrel( «Thg place.name », list.last)»
+//		»
+//	»
+//	
+//	.remove
 	
 	 
 //	|| x = ("true", "false")(exp2)
 // -->
 //  if (exp2) {x = "true"} else {x="false"}
-}
+//}
 
 
 
 function Create_JeeboxTest (|Message| msg)
-	using (errorlist.new)
+	using (ErrorReceiver.new)
 		|| f = Compiler.InputFile( nil, "self_test.txt", nil )
 		expect (f!=nil) "self_test.txt can’t be found."
 		|| s = f.ReadAll
@@ -462,4 +457,7 @@ function Create_JeeboxTest (|Message| msg)
 			s = s.digest
 
 		msg.become(@str, s)
-		
+
+
+
+

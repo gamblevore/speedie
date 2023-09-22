@@ -37,16 +37,20 @@ function message.QMarkRel (|message|)
 		
 
 	
-function message.Tran_QMark
+function message.Tran_QMark 
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func) 
-	expect (isnormal) (thedot, "Question-mark not one of:  a.b?,  (a)(b)?,  a.b? = c")
+	if !isnormal
+		expect (thedot == @thg) (thedot, "Question-mark not one of:  a.b?,  (a)(b)?,  a.b? = c")
+		.func = @bra
+		return
+
 	if thedot == @sdot
 		scfunction.Tran_Sdt(thedot)
-	|| inside = thedot.first
+	|| inside = thedot.first!
 	if thedot == @func
 		require inside.expect(@bra)
-		inside = inside.first
+		inside = inside.first!
 	
 	using (self)
 	|| rel = .QMarkRel						// a().b? = c   -->   {|| t = a(),  if t: t.b = c}
@@ -84,7 +88,7 @@ function message.Tran_QMark
 		|| options = tern.msg(@list)
 		tern.msg(@prm) <~ cond
 		options <~ thedot
-		options.msg(@thg, "nil")	// TypeOfTern could "just give the default"!
+		options <~ (@thg, "nil")	// TypeOfTern could "just give the default"!
 									// So I don't even need to enter "nil"! Just delete it!
 	if (inside != @thg)
 		cond.name = "_t"
@@ -92,52 +96,96 @@ function message.Tran_QMark
 		tern.prev = MakeDecl("",  "_t", inside)
 	
 
-function message.MainOneArg (|message| arg, |int64| i, |faststring| usage)
+function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	opt norefcounts
-	|| type = self[@thg]					#require
-	|| name = type.next						#require
-	|message| value
-	|| mac = macros.MainArg1
-	if name == @rel
-		name = name[@thg]					#require
-		|| opp = name.next(@opp, "=")		#require
-		value = opp.next(@Nil)				#require
-		mac = macros.MainArg2
-	  else
-		require name.Expect(@thg)
-	arg.MainOneArgSub(mac, name, type, i.msg, value)
 	
-	usage <~ "${name.name}"
-	ifn type ~= "string"
-		usage <~ "(${type.name}) "
+	|| type = self[@nil]
+	|| name = type.next(@nil)$
+	|| IsArray = type == @arr
+		.ExpectLast$
+		type = Type.first
+	
+	|| MaybeNil = Type isarel "?"
+		Type = Type.first
+	require type.expect(@thg)
+	
+	
+	|| prms = [name, type, i.msg]
+	require (prms == 3)
+	check !(found & 1) (arg, "Can't come after arrays")
+	if IsArray
+		arg.AppendMacro(macros.mainargArray.clean, prms)
+		return 1
+	if name != @rel
+		check !(found & 4) (arg, "Can't come after defaults")
+		if MaybeNil
+			arg.AppendMacro(macros.MainArgBasic.clean, prms)
+		  else
+			arg.AppendMacro(macros.MainArgbasicreq.clean, prms)
+		return 2
+	name = name[@thg]					#require
+	prms[0] = name
+	|| opp = name.next(@opp, "=")
+	|| l = opp.Next(@Nil)
+		prms <~ l
+	require prms == 4
+	arg.AppendMacro(macros.MainArgDefault.clean, prms)
+	return 4
+	
+	
 
-
-function message.MainOneArgSub (|macro| mac, |message| name, |message| type, |message| i, |message| value)
-	|| args = [name, type, i]
-	if value
-		args <~ value
-	self <~ (mac)(args)
-	
-	
-/*
-main (|file| f, |string| s, |int| n = 0)
-	-->
-main
-    |file|   f = file.MainArg(0)
-    |string| s = string.MainArg(1)
-    |int|    n = (int.MainArg(2), 0)(__ArgCount > 2)
-*/
-	
-	
-function message.MainArgs (|message| arg)
-	opt norefcounts
-	arg <~ "|| __ArgCount = app.args.length".parse
-	|| i = 0
-	|| usage = faststring()
+function message.CollectUsage (|string|)
+	|| fs = FastString()
+	fs <~ "Usage: \$app "
 	for ch in self
 		if ch.expect(@decl)
-			ch.MainOneArg(arg, i++, usage)
-	arg.first = ("app.usage = <(`$usage`)>").parse
+			if !ch.IsFirst
+				fs <~ "   "
+			|| name = ch.DeclName
+			|| optional = (ch.first == @rel)
+				fs <~ "["
+			|| ty = ch.first!
+			fs <~ name
+			|| tyfn = ty.func
+			if tyfn == @arr
+				ty = ty.first
+			|| type = ty.name
+			if type contains "file"
+				type = "file-path" // clean up messy stuff like "filedata"
+			  elseif type ~!= "string"
+				fs <~ " ($type)"
+			if optional
+				fs <~ "]"
+			if tyfn == @arr
+				fs <~ " [...]"				// def (string),  abc (int)...
+	return fs
 
+
+function message.InsertMainArgs (|message| prms)
+	opt norefcounts
+	|| usage = prms.CollectUsage
+	|| FirstArg = `
+
+if !app.usage
+	app.usage = "_0"
+|| __ArgCount = app.args.length
+if __ArgCount == 0
+	printline app.usage.replaceall("\$app", app.callpath.name)
+	return 0
+
+`.macro
+
+	using prms
+	.AppendMacro(firstarg, [Usage.msg])
+	|| i = 0
+	|| Found = 0
+	for ch in prms
+		Found |= ch.MainOneArg(self, i++, Found)
+
+	ifn found&1
+		macros.mainargNone.clean
+		.AppendMacro(macros.mainargNone, [i.msg])
+
+	self <~ "require stderr.ok"~parse
 
 

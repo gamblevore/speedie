@@ -6,7 +6,4 @@ module AutoComplete
 	
 	function IsAFunc (|string| s, |bool|)
 		return .functions[s] != nil
-	function IsAFunc (|message| m, |bool|)
-		opt norefcounts
-		return .functions.valueLower(m.name) != nil
 

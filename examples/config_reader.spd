@@ -1,0 +1,27 @@
+
+
+|| ConfData = `
+date "109638486383396"
+dev true
+theme "hello_kitty"
+lastproj {
+	+"/usr/local/speedie/Perry.scproj/" "Perry" {
+		edit "/usr/local/speedie/Perry.scproj/perry.input/"
+		pos 0
+	}
+
+	+"/usr/local/speedie/examples/config_reader.spd" "config_reader" {
+		edit "/usr/local/speedie/examples/config_reader.spd"
+		pos 0
+	}
+}
+
+curropen "/usr/local/speedie/examples/config_reader.spd"
+`
+
+main
+	|| conf = ConfData.parse		#require
+	"Theme: ${conf[`theme`]}"
+	"Last Opened: ${conf[`date`].date}"
+	"Curr File: ${conf[`curropen`]}"
+

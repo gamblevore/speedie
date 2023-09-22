@@ -7,28 +7,13 @@
 
 //  //  //  //  //   //  // .Obj Conversion //  //  //  //  //  //  //  //  //
 
-function Message.NeedDecl (|SCDecl|)
-	opt norefcounts
-	|| obj = .obj
-	if (obj isa scdecl)
-		return obj
-	debugger
 
 function Message.AsDecl (|SCDecl|)
 	// .MsgDecl uses this
 	opt norefcounts
-	|| obj = .obj$
+	|| obj = .obj
 	if (obj isa scdecl)
 		return obj
-	debugger
-
-
-function Message.AsCls (|SCClass|)
-	opt norefcounts
-	|| obj = .obj$
-	if (obj isa SCClass)
-		return obj
-	debugger
 
 
 function Message.AsFunc (|SCFunction|)
@@ -38,30 +23,12 @@ function Message.AsFunc (|SCFunction|)
 		return obj
 
 
-function Message.AsBase (|SCBase|)
-	|| obj = .obj$
-	if (obj isa SCBase)
-		return obj
-	debugger
-
-
 function Message.AsArg (|SCArg|)
 	opt norefcounts
-	|| obj = .obj$
+	|| obj = .obj
 	if (obj isa SCArg)
 		return obj
 
-
-function Message.AsModule (|SCModule|)
-	opt norefcounts
-	|| obj = .obj$
-	if (obj isa SCModule)
-		return obj
-	debugger
-
-
-function Message.IsLast (|bool|)
-	return self and !.Next
 
 
 function Message.ListAll (|[Message]|)
@@ -79,49 +46,43 @@ extend Message {
 	// case aware....
 	// if I had my... "nil.fnc always returns nil"... then I could
 	// remove the self-check! :D So beautiful code.
-		Return (self) and (self == @Thg) and (.name ~= name)
-
-
-	operator IsThing (|bool|)
-		disabled "ooop"
-		Return (self) and (self == @Thg)
-
+		Return (self) and (.func == @Thg) and (.name ~= name)
 
 	operator IsOpp (|string|name, |bool|)
-		Return (self) and (self == @Opp) and (.name ~= name)
+		Return (self) and (.func == @Opp) and (.name ~= name)
 
 
-	operator IsArg (|string|name, |bool|)
-		Return (self) and (self == @arg) and (.name == name)
+//	operator IsArg (|string|name, |bool|)
+//		Return (self) and (.func == @arg) and (.name == name)
 
 
 	operator IsTmp (|String| name, |bool|)
 	// case blind...
-		Return (self) and (self == @Tmp) and (.name == name)
+		Return (self) and (.func == @Tmp) and (.name == name)
 
 
 	operator IsARel (|String| name, |bool|)
 	// case blind...
-		Return (self) and (self == @Arel) and (.name == name)
+		Return (self) and (.func == @Arel) and (.name == name)
 
 
 	operator IsBRel (|String| name, |bool|)
 	// case blind...
-		Return (self) and (self == @Brel) and (.name == name)
+		Return (self) and (.func == @Brel) and (.name == name)
 
-	operator IsRel (|String| name, |bool|)
-		opt norefcounts
-	// case blind...
-		Return (self) and (self == @Rel) and (.second.name == name)
+//	operator IsRel (|String| name, |bool|)
+//		opt norefcounts
+//	// case blind...
+//		Return (self) and (.func == @Rel) and (.second == name)
 
 
 	operator IsDot (|string| name, |bool|)
-		Return (self) and (self == @dot) and (.name ~= name)
+		Return (self) and (.func == @dot) and (.name ~= name)
 
 	
-	syntax access (|message|)
-		if (self)
-			return .Parent
+//	syntax access (|message|)
+//		if (self)
+//			return .Parent
 
 	
 	function TrueOrFalse (|bool|)
@@ -139,8 +100,6 @@ extend Message		// scanning
 	iterator ScanArg
 // Just go through all the arg-level children! Will return temporal
 // statements. but also go into the arguments within a temporal statement.
-		debugger (self == @Arg)
-		
 		|| Curr_  = .First
 		|| After_ = .FlatAfter
 		
@@ -151,16 +110,17 @@ extend Message		// scanning
 			Curr_ = Curr_.FlatNext
 
 
-function scbase.ListFunctions (|[SCFunction]|)
-	require .access
+function SCNode.ListFunctions (|[SCFunction]|)
+	if !.Access
+		return []
 	for o in .access
 		ListFunctionsSub(o, rz)
 
 
-function ListFunctionsSub (|object|o, |[SCFunction]| rz)
+function ListFunctionsSub (|object!| o, |[SCFunction]| rz)
 	opt norefcounts
-	if o isa scdecl
-		 o = o.setter|scdecl|
+	if o isa SCDecl
+		o = o.hiderfunc|scdecl|
 	if o isa SCFunction
 		for f in o
 			rz <~ f
@@ -177,8 +137,9 @@ function ListModules (|Dictionary| access, |[SCModule]|)
 function message.IsReffer (|bool|)
 	opt norefcounts
 	if self == @func
-		|| fn = .last.asfunc
-			return fn is reffer
+		|| l = .last
+			|| fn = l.asfunc
+				return fn is reffer
 
 
 
@@ -188,11 +149,38 @@ module SCGlobals
 	|int| UniqueNum
 
 
-function message.OperatorInFunc (|string| s, |bool|)
-	return .msgowningfunc ~= s
+//function message.OperatorInFunc (|string| s, |bool|)
+//	return .msgowningfunc ~= s
+//
+//
+//function Message.Op (|message|)
+//	if self == @rel
+//		return .Second
 
 
-function Message.Op (|message|)
-	if self == @rel
-		return self[1]
+
+// Was only used for a short time
+class FileComparer
+	|?faststring| 			out
+	|?stringreader| 		in
+	constructor (|string| s)
+		|| f = s.file
+		|| x = f.exists
+		.in = (f.in, nil)(x)
+		.out = (nil, f.out)(x)
+		
+	function close
+		.out = nil
+		.in = nil
+		
+	function check (|int| v)
+		|| i = .in
+		|| o = .out
+			o <~ v
+			o <~ '\n'
+		  elseif i != nil
+			|| str = i.DString('\n')
+			if str.int != v
+				"found $v expected $str"
+				debugger
 

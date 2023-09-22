@@ -1,0 +1,572 @@
+
+
+class Window (GUIControl)
+	linkage
+		cpp_part Win
+	|bool|								FocusWasSet
+	|bool|								AlphaSubtle
+	|bool|								IsDialog
+	|bool|								FlashSelf
+	|bool|								BlockRecurseKeyDown
+	|bool| 								IsLiveAction
+	|GUIControl?|						Focus
+	|Guicontrol?|						InnerFocus
+	|GUIControl?|						CurrMouseDown
+	|GuiControl?|						SelBeforeMouseDown
+	|guicontrol?|						ToolTipControl // probably better to remove this
+	|guicontrol?|						DroppingInto
+	|guicontrol?|						MouseIsOver
+	|guicontrol?|						FocusAttempt
+	|InlineEditor|						InlineEditorPlace
+	|GUIPasteEvent?|					OnPaste
+	|GUICopyEvent?|						OnCopy
+	|GUIMouseMoveEvent?|				OnMouseMove
+	|list of GUITask|					Tasks
+	|object?|							ReturnValue
+	|date|								AlphaFader
+	|date|								CreatedDate
+	
+	
+	constructor
+		super.constructor(window.all)
+		.Tasks = list()
+		.subconstructor(the~area)
+		
+
+	constructor (|ControlRect| Size)
+		cpp_part ConstructorSize
+		super.constructor(window.all)
+		.Tasks = list()
+		.subconstructor(size)
+	
+	
+	helper SubConstructor (|ControlRect| Size)
+		if !sdlapp.framelength
+			sdlapp.init()
+		.size = Size
+		.createddate = date.now
+		.InlineEditorPlace.Init(self)
+		.reflow
+		.show
+
+	
+	destructor
+		.disposeall
+
+
+	virtual FrameUpdate (|bool| ShouldNotDisturbGUI)
+		0
+
+	virtual CancelClose (|SDLCloseReason| Reason=SDLCloseReason.windowclose, |bool|)
+		return !reason
+
+
+	virtual DrawBackground (|image| where)
+		|| a = .GNormal.bg.Alpha()
+		if .IsFullScreen and a < 1
+			¥.DrawBackground(where)
+		
+		if a > 0
+			where.RectStyled(.lastrect.soothe, .GNormal, 1)
+	
+	
+	behaviour AppForegroundChanged
+		opt norefcounts
+		for c in self
+			c.__AppForegroundChanged__(isforeground)
+	
+	
+	setter Size (|ivec2|)
+		cpp_Part Size2
+		.lastrect = value.rect
+		.size = .lastrect.layout
+ 
+	helper RealFocus (|guicontrol|)
+		opt norefcounts
+		return .innerfocus ?? .focus
+
+	setter OpenedMenu (|menu|)
+		.setinnerfocus(value)
+
+	function OpenedMenu (|menu|)
+		opt norefcounts
+		|| f = .InnerFocus
+		if f isa menu
+			return f 
+
+	function SetMenu (|menu| m)
+		disabled "use openedmenu"
+
+	function RunAsMain (|ErrorInt|)
+		.IsLiveAction = true // probably true
+		.show
+		return SDLApp.run
+
+	syntax cast (|ErrorInt|)
+		return .RunAsMain
+		
+	syntax call (|ConfirmCanceller| Cancel=nil, |object?|)
+		require !(Cancel)() and self isnt visible // recursive... sigh
+		.OpenDialog
+		.returnvalue = nil
+		while sdlapp.SingleFrame
+			rz = .returnvalue
+			if rz or (Cancel)()
+				exit
+		.ReturnValue = nil
+		if rz == self
+			rz = nil
+		.CloseDialog
+
+
+	setter Focus (|guicontrol|)
+		.SetFocus(value)
+	
+
+	helper SetInnerFocus (|guicontrol| Focus)
+		|| old = .InnerFocus
+		require old != Focus
+		if old isa menu
+			(old isnt visible) // makes sense?
+		.InnerFocus = focus
+		.finishfocus(focus)
+		focus.__GotFocus__?
+		old.__LostFocus__?
+
+
+	helper FinishFocus (|guicontrol| focus)
+		if focus and .parent and focus isnt drawsfocus
+			.alphafader = date()
+		  else
+			.alphafader = 0
+		
+		.FocusWasSet = true // for stop mousedown bug
+		sdlapp.UpdateTextFocus(self)
+		sdlapp.touch(Self)
+
+
+	helper SetFocus (|guicontrol| Focus)
+		.FocusAttempt = Focus
+		if focus
+			require focus.Takesfocus.able and (focus is visible)
+
+		if focus == .inlineeditor
+			.setInnerFocus(focus)
+			return
+		
+		.setinnerfocus(nil)
+		require (.focus != focus)
+		
+		|| old = .focus
+		.focus = focus
+
+		focus.__GotFocus__?
+		old.__LostFocus__?
+		
+		.FinishFocus(focus)
+
+
+	syntax is (|guicontrolflags| F, assigns:|bool|)
+		require self
+		|| n = sdlapp.nativewindow
+			if (f == guicontrolflags.Modified) and ((self is modified) != value)
+				sdlapp.JB_SDL_SetModified(n, value)
+		super.syntaxis(f) = value
+
+
+	behaviour MouseWheel
+		opt norefcounts
+		|| it = .OpenedMenu()
+			return it.__MouseWheel__(P, direction)
+			
+		|| R = self[sdlapp.MouseXY]
+			R.__MouseWheel__(P, Direction)
+		return true
+
+
+	behaviour TypedString
+		opt norefcounts
+		|| f = .realFocus
+			|| o = f
+			if (f isa menu) and (f != .focus) and (f is typethrough)
+				o = .focus$
+			if o.__TypedString__(input)
+				return true
+		if (Input == 1) and Input.IsASCII			// like a space basically?
+			return .__KeyDown__(input.codepoint)	// i think the ascii codes are the same?
+													// keydown doesn't handle non-ascii codes.
+													// probably would make more sense to do it the other way!
+													// missing keydown events send typedstring events
+	
+	helper DoListViewNext (|bool| fwd, |bool|)
+		opt norefcounts
+		|| l = .MainlistView
+		if !l
+			return true
+
+		|| Item = l.FirstSelected
+		if keys.shift
+			fwd = !fwd
+		if !Item
+			item = (L.start, l.end)(fwd)
+		  else
+			item = l.SearchStep(item, fwd)
+		if item
+			L.select(item)
+		return L.doreturn
+	
+	
+	function MainlistView (|listview|)
+		opt norefcounts
+		|| s = .flatnext
+		|| e = .flatafter
+		while s and s != e
+			if !s.isviewable
+				s = s.flatafter
+				continue
+			if (s isa listview) and !(s isa menu)
+				if s.IsMainListView
+					rz = s
+				
+			s = s.flatnext
+			
+	
+	behaviour KeyDown
+		debug_require !.BlockRecurseKeyDown
+		.BlockRecurseKeyDown = true
+		rz = .KeyDownWin(key)
+		.BlockRecurseKeyDown = false
+
+
+	helper KeyDownWin (|keys| key, |bool|)
+		opt norefcounts
+		|| F = .realfocus
+		|| menu = .openedmenu
+			if menu isnt typethrough
+				if key isnt tab
+					return menu.__keydown__(key)
+				menu.CloseMenu
+				
+			  elseif key isnt tab
+				return menu.__keydown__(key) or (f and f.__keydown__(key))
+		  elseif f and f.__keydown__(key)
+			return true
+		
+		if key is tab
+			f := .first!
+			f = f.NextFocus(!keys.shift, keys.option)
+			if f
+				if f isnt opensmenu
+					f.setfocus
+				  else
+					(f.onclicked)(f)?
+			return true
+		if (key is escape) and .IsDialog
+			if !.returnvalue and !.__cancelclose__
+				.CancelReturn
+			return true
+	
+		
+	function Show  
+		opt norefcounts
+		is visible
+		is NewlyShown
+		window.all <~ self // why not?
+
+
+	function IsFront (|bool|)
+		return .islast
+
+
+	function IsFullScreen (|bool|)
+		return .lastrect == All.lastrect
+
+
+	function DrawWindow (|image| where)
+		where.window = self
+		.__drawbackground__(where)
+		.DrawContents(where)
+		.__draw__(where)
+		|| gd = .GNormal.Drawer
+			(gd)(where, .LastRect, .GNormal, true)
+
+
+	behaviour Draw
+		// do nothing... let children override
+
+
+	function DrawContents (|image| where)
+		opt norefcounts
+		where.window = self
+		|| menu = .InnerFocus
+		|| lim = .LastRect.Soothe
+		
+		.DrawChildren(where, lim, menu)
+		|| i = .InnerFocus
+		|| f = .Focus
+			|| str = (0.70, 1.0)(i)
+			f.drawfocus(where, str)
+		
+		if menu.IsViewable
+			where.ControlClip = menu
+			menu.__Draw__(Where)
+			menu.DrawChildren(where, menu.lastrect)
+		
+		where.ControlClip = self
+
+		i.DrawFocus(where)?
+
+		where.ResetBoundsToSize
+		if .AlphaFader and .FlashSelf
+			.DrawFocusRect(Where, .lastrect, .FaintingEdgeSub)
+
+
+	helper FixFocus
+		opt norefcounts
+		|| f = .realfocus
+		require f and f isnt visible
+		if f == .innerfocus
+			.SetInnerFocus(nil)
+		  else
+			.ClearFocus
+
+
+	function guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
+		require dest != nil  and  dest != self
+		require dest is editable and enabled
+		|| copies = .Copypaste.CanCopy
+		if copies.CanPasteInto(dest.CopyPaste)
+			return dest
+	
+	
+	function ClearDrops
+		sdlapp.candrag = 0
+		sdlapp.drawdrag = nil
+		.DroppingInto = nil
+		.currmousedown = nil
+
+
+	function DoDragAcrossControls (|ivec2| P, |guicontrol| r, |bool|)
+		sdlapp.drawdrag := r.CopyList
+		if sdlapp.drawdrag
+			|| dest = r.CanPasteInto(self[p, true])
+			.DroppingInto = dest
+			if dest
+				dest.setfocus
+				dest.__mousedown__(p, -1)
+				return true
+
+
+	function DoMouseDrag (|ivec2| P, |bool| Beyond)
+		opt norefcounts
+		|| r = .CurrMouseDown$
+		require (r is visible) or (r == .openedmenu)
+		
+		if keys.cancel
+			.cleardrops
+			return
+		
+		if r contains p
+			.DroppingInto = nil
+		  elseif beyond and .DoDragAcrossControls(p,r)
+			return
+		
+		if !Beyond
+			require (r.lastrect ± -20) contains p
+		sdlapp.candrag = R.__mousedown__(p, -1)
+
+	
+	syntax access (|ivec2| P, |bool|fordrag=false, |guicontrol|)
+		opt NoRefCounts
+		cpp_part ControlAtXY
+		|| r = p.point
+		rz = .controlat(r,  0)
+		if ForDrag
+			rz := .controlat(r, 10)
+	
+	syntax access (|ivec4| P, |guicontrol|)
+		opt norefcounts
+		return .controlat(p,  0)
+
+
+	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| clicks=false, |Guicontrol?|)
+		opt norefcounts
+		for R.reverse in self
+			if r is visible and enabled
+				|| rr = r.lastrect ± -pad 
+				if rr overlaps p
+					if r > 0
+						|| it = r.controlat(p, pad, clicks)
+							return it
+					if !clicks or r isnt clickthrough
+						return r
+						
+	
+	function OpenDialog
+		.isdialog = true
+		window.all			<~ self
+		is visible
+		sdlapp.StartResize // sigh
+
+
+	helper sdlapp.AskQuit (|bool|) // !sdlapp.askquit
+		|| q = "Quit " + app.AppName + "?"
+		return q.confirm
+	
+	
+	function Close (|SDLCloseReason| reason=SDLCloseReason.windowclose, |bool|)
+		if !sdlapp.wantsquit and (reason < SDLCloseReason.tryquit)
+			if (window.DocumentCount == 1)  and  !.isdialog
+				require sdlapp.AskQuit and !.__CancelClose__(reason)
+				.disposeall(true)
+				sdlapp.wantsquit = true
+				return true
+
+		|| cancelled = .__CancelClose__(reason)
+		if !cancelled or (reason is terminating) or sdlapp.WantsQuit
+			.DisposeAll(true) // its probably OK????
+			return true
+
+	
+	function CloseDialog
+		opt norefcounts
+		isnt visible
+		.ReturnValue := self
+		.remove
+	
+	
+	function DoMouseDown (|ivec2| P, |int| Clicks, |guicontrol|)
+		.SelBeforeMouseDown = .focus
+		|| M = .openedmenu 
+			|| O = .focus
+			if (m contains p) and (m is enabled)
+				SdlApp.CanDrag = M.__mousedown__(p, clicks)
+				return m
+			
+			m.CloseMenu
+			|| R = self[p]
+			require  r  and  r is opensmenu  and  r != O
+		
+		.FocusWasSet = false
+		|| Found = .ControlAt(p.point, 0, true)
+			|| clicks2 = Found.__MouseDown__(p, clicks)
+				SdlApp.CanDrag = clicks2 * (clicks2 > mousedragging.handled)
+				if !.FocusWasSet and (found != .innerfocus)
+					.setfocus(Found)
+				return Found
+
+
+	function ClearFocus
+		.SetFocus(nil)
+
+
+	function RunTasks (|date| now)
+		opt norefcounts
+		for p in .tasks
+			if !p.runtask(now)
+				p.Remove
+			 
+	
+	iterator
+		|| ctrl = .first|guicontrol|
+		while ctrl
+			|| nxt = ctrl.flatnext
+			yield ctrl
+			ctrl = nxt
+	
+	iterator flat
+		|| ctrl = .first|guicontrol|
+		while ctrl
+			|| nxt = ctrl.flatnext
+			yield ctrl
+			ctrl = nxt
+
+	module
+		|object|					LeakedTestObj
+		|GUIControl|				ActiveControl
+		|guicontrol of Window|		All = guicontrol(nil)
+	
+		function Count (|int|)
+			return .all.SlowCount
+		
+		function Front (|Window|)
+			return  .all.last
+		
+		function Back (|Window|)
+			return  .all.first
+
+		function DocumentCount (|int|)
+			opt norefcounts
+			for w in .all
+				if (w is visible) and !w.isdialog
+					rz++
+
+
+struct SDL_Window
+	linkage:wrapper
+	destructor
+		cpp_wrapper SDL_DestroyWindow
+	cpp_wrapper SDL_GetWindowWMInfo (|&SDL_SysWMinfo| info, |bool|)
+
+
+
+
+
+struct SDL_SysWMinfo
+	|int|		A
+	|int|		B
+	|&nil|		window //actually a "datatype ObjCID:"
+	|byte[56]|	Buffer
+
+
+struct SDL_DisplayMode
+	linkage: wrapper
+	|uint| format
+	|int| w 
+	|int| h
+	|int| refresh_rate
+	|&nil| driverdata
+
+
+struct SDL_Renderer
+	linkage: wrapper
+	destructor
+		cpp_wrapper SDL_DestroyRenderer
+
+
+struct SDL_Texture
+	linkage: wrapper
+	function Dispose
+		cpp_wrapper SDL_DestroyTexture
+
+	function UnlockThatCopiesEvenThoughItShouldnt
+		cpp_wrapper SDL_UnlockTexture
+	
+	function LockThatZerosEvenThoughItShouldnt (|?&ivec4| b, |&&nil| p, |&int| n)
+		cpp_wrapper SDL_LockTexture
+		
+	destructor
+		.dispose
+
+
+function window.MouseXY (|ivec2|)
+	return sdlapp.MouseXY - .lastrect.xy
+
+
+function guicontrol.MouseXY (|ivec2|)
+	opt norefcounts
+	|| w = .window
+		return sdlapp.mousexy - w.lastrect.xy
+
+
+
+
+/*
+// your the best... you know that! ooop-
+folder1/
+	file
+		data
+	folder2/
+	file2
+*/
+

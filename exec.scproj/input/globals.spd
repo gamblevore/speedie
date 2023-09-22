@@ -7,8 +7,8 @@ function package.Glob (|int| size)
 	|| n_strs		= package.strings.slowcount
 	expect (n_strs <= 1000_000) ("Too many strings in pack: " + n_strs.render)
 	size		   += (n_strs+1)*ptr_size
-	.globals = Memory(size, 1)	#require
-	|| write = .globals.Ptr|&string|
+	.globals = byte[size]	#require
+	|| write = .globals!.Ptr|&string|
 	for ch in .strings
 		*(write++) = ch.name
 		write = write + 1

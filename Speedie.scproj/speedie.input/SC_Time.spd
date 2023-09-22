@@ -16,7 +16,7 @@ function compiler.PrintCompileTime (|date| durr)
 		"${Compiler.stTotalSourceSize/1024} KB\n".printcolor(errorcolors.good)
 
 
-function compiler.PrintStats
+function compiler.PrintStats 
 	require options.argstats
 	|| fs = faststring()
 	fs <~ "FuncStats: "
@@ -33,7 +33,7 @@ function compiler.PrintCompileErrors
 		require stderr.hasanything
 	  else
 		require StdErr.hasproblems
-	.PrePrintErrors
+	stderr.PrePrintErrors
 
 	if (SCFunction.DisabledPoints)
 		"Disabled functions called ${scfunction.DisabledPoints}x!".printlinecolor(errorcolors.error)
@@ -45,12 +45,15 @@ function compiler.PrintCompileErrors
 
 function compiler.VariousSelfTests
 	|| t = Jeebox.test // bug if put into compiler.run!. Wierd!
-	if (options.perry < 2) and !options.scripting and !interact.shouldenter
+	if (options.perryoutput < 2) and !options.scripting and !SpdProcess.Parent
 		if (Cpp_Export.FindGlobalsCpp*12).CompressTest(false) and options.PrintLibraries
 			"Compression: OK"
 
 
 function compiler.CompileTime 
+	if !options.output_path and options.UseScriptLoc
+		.ScriptLoc(compiler.originalinputpath)		
+	
 	if options.SelfReplacement // avoid failing needlessly
 		.FileSanityTests // sometimes this fails due to lack of permissions in xcode...
 						 // xcode gives lower perms to it's builder scripts, strangely.

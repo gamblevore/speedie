@@ -19,8 +19,7 @@ extern JB_ErrorReceiver* JB_StdErr;
 
 
 JB_Error* JB_Err__New(Message* Msg, JB_String* Desc, unsigned char Level, JB_String* Path);
-void JB_Rec_NewItem(JB_ErrorReceiver* self, JB_Error* Err);
-void JB_Rec_NewItemWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc);
+void JB_Rec_AppendErr(JB_ErrorReceiver* self, JB_Error* Err);
 bool JB_Rec_OK(JB_ErrorReceiver* self);
 void JB_Err_Fill(JB_Error* Err, JB_String* Path, JB_String* Desc ); 
 

@@ -69,7 +69,6 @@ jbin is always parseable by jeebox. So you have nothing to lose and no extra ste
 #### Jbin disadvantages
 * Not human readable
 * Does not store formatting, or comments
-* **Is subject to change. Not final. Treat this as a caching system.**
 
 #### History
 

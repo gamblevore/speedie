@@ -4,7 +4,7 @@
 
 module ExecTable
 	|[scfunction]|			Funcs
-	|[scbase]|				Globs
+	|[SCNode]|				Globs
 	
 	function FuncFile (|file|)
 		return compiler.Library.child("funcs.jbin")
@@ -19,9 +19,10 @@ module ExecTable
 	
 	function Run 
 		.AddAll(.funcs, true)
-		.funcfile.SmartData = .FuncStr
+		|| f = .FuncFile
+			f.SmartData = .FuncStr
 		
-	function scbase.Addtotable (|[scbase]| r)
+	function scfunction.Addtotable (|[SCNode]| r)
 		r <~ self
 		.tableid = r.length
 	

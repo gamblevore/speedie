@@ -5,7 +5,7 @@
 
 function compiler.Package 
 	require !Compiler.IsTest and !Options.ExternalCompile
-	require targets..gui
+	require SC_Targets..gui
 	|| Pd = TransCompiler.productpath
 	|| Pj = .BaseProjectPath.path
 	if platform.osx
@@ -23,20 +23,19 @@ function compiler.IdealName (|string|)
 	return TransCompiler.productname.trimextandpath
 
 
+
 function compiler.AppBuildOneLib (|file| inner, |message| lib)
-	|| dir = "/usr/local/lib/".file
-	|| libf = Dir[lib.name]
-	|| ldest = inner.parent.parent["Frameworks/" + libf.name]
-	ifn ldest.exists
-		libf.hardlinkto(ldest.path)
+	|| ldest = inner.parent.sibling("Frameworks/" + lib.name)
+	if !ldest.exists
+		|| dir = "/usr/local/lib/".file
+		Dir[lib.name]!.hardlinkto(ldest)
 
 
 function compiler.AppBuildLibs (|file| inner)
 	opt norefcounts
-	|| libs = linkage.conf("libs")
-		for lib in libs 
-			if lib.expect(@str)				// ok so... hard-link it?
-				.AppBuildOneLib(inner, lib)
+	for lib in linkage.osxframeworks 
+		if lib.expect(@str)				// ok so... hard-link it?
+			.AppBuildOneLib(inner, lib)
 
 
 function compiler.AppleBuildApp (|file| project, |file| product)
@@ -51,7 +50,7 @@ function compiler.AppleBuildApp (|file| project, |file| product)
 	|| prefered_app	= product.sibling(prefered_name)
 	|| xcode_place	= prefered_app.sibling("Release/"+prefered_name)
 	|| final_app	= (xcode_place, prefered_app)(xcode_place.fileexists)
-	|| inner		= final_app["Contents/MacOS/"+name]
+	|| inner		= final_app["Contents/MacOS/"+name]!
 	if product.moveto( inner )
 		.AppBuildLibs(inner)
 		.CodeSign(final_app)
@@ -62,9 +61,11 @@ function compiler.AppleBuildApp (|file| project, |file| product)
 
 
 
-|| codesign_native = "codesign_osx"
+constants
+	codesign_native = "codesign_osx"
+
 function compiler.CodeSign (|file| gui_exe)
-	|| sign = app.prefs(codesign_native)
+	|| sign = app.pref(codesign_native)
 		gui_exe.codesign(sign)
 	  else
-		StdErr.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_exe.path )
+		errorreceiver.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_exe.path )

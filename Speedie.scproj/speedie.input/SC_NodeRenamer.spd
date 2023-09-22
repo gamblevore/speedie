@@ -9,24 +9,23 @@
 // bad design and only sciterator uses it!
 // better to NOT use it!
 class SCNodeRenamer {
-|string|	Name
-|[Message]| nodes
+|string|		Name
+|[Message]| 	Nodes
 linkage
 	cpp_part		NR
 	
 
 function Rename (|message| name)
 	opt norefcounts
-	expect !(name.hasany) (name, "We can't do that yet")
+	expect !(name.HasAny) (name, "We can't do that yet")
 	for n in .nodes
-		n.belike(name)
-
-
-function RenameStr (|string| s, |syntax|func=@thg)
-	.rename(func.msg(s))
+		n.func = name.func
+		n.name = name.name
+		n.position = name.position	
 
 
 function Message.FullAfter (|Message|)
+	opt norefcounts
 	|| P = .Parent
 	|| N = P.Next
 	while (N)
@@ -36,6 +35,7 @@ function Message.FullAfter (|Message|)
 
 
 function CollectDclThg (|Message| DclThg)
+	opt norefcounts
 	|| Dcl = DclThg.Ancestor( @Decl )
 	expect (dcl and dclthg == @thg) (dclthg)
 
@@ -52,13 +52,12 @@ function CollectDclThg (|Message| DclThg)
 	.Collect( DclThg,  DclThg.name,  dcl.FullAfter )
 
 
-function Uniqueify (|SCBase| p)
-	.Renamestr( UniqueTmpVar(p, .Name) )
+function Uniqueify (|SCNode| p)
+	.Rename( @thg + UniqueTmpVar(p, .Name) )
 
 
-function Collect (|Message| msg, |String| name, |Message| after)
+function Collect (|Message?| msg, |String| name, |Message?| after)
 	.Name = name
-	
 	While msg != after
 		if (msg IsThing name)
 			.nodes <~ msg

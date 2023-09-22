@@ -1,0 +1,10 @@
+import "GUI"
+
+conf
+    name	UnderstandableRayTracing
+    targets gui
+    prefs "uray"
+	version	1.0
+	creator	jeebox
+	helpurl	"https://github.com/gamblevore/speedie/blob/main/examples/understandable_raytracing.scproj/UnderstandableRaytracing.md"
+    

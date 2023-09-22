@@ -1,0 +1,114 @@
+
+module Notifications
+	linkage: cpp_part Note 
+	|list of window|	Alerts = list()
+	
+	constants
+		height = 60
+		width = 160
+		|int64|
+		disappear = 7.5
+	
+	
+	function ShouldDraw (|window| w, |bool|)
+		opt norefcounts		
+		|| ago = w.CreatedDate.ago.seconds
+		|controlrect| sz
+		if !w.tag									// fall
+			sz = ((0.5-ago)*width*2.0)~left  by  (height)~up back height
+			if ago >= 0.5
+				return false
+		  elseif ago < 1.0							// raise
+			sz = (width)~left  by  (ago*height)~up back height
+		  elseif ago < 5.0							// stay
+			sz = (width)~left  by  (height)~up back height
+		  elseif !(w contains sdlapp.mousexy)		// swap-direction
+			w.CreatedDate = date.now
+			w.tag = nil
+				
+		w.Size = sz
+		return true
+		
+
+	function Clicked (|window| w)
+		opt norefcounts
+		|| t = w.tag as error
+			|| n = t.node
+			if n == @str
+				app.alert(n.name)
+			  elseif n == @url and "file"
+				n.firstname.Reveal
+		w.tag = nil
+		w.CreatedDate = date.now
+	
+	
+	function ClickedAt (|ivec2| XY, |bool|)
+		opt norefcounts
+		for w in .Alerts
+			if w contains xy
+				.Clicked(w)
+				return true
+
+
+	function Draw // drawnotifications, drawnote
+		opt norefcounts
+		for w in .Alerts
+			w.drawwindow(sdlapp.DrawSpace)
+
+
+	function CheckForDisappear
+		opt norefcounts
+		for w in .Alerts
+			if !.shoulddraw(w)
+				w.remove
+		
+	
+	syntax append (|string| desc, |message| details=@emb.msg)
+		cpp_part Str
+		self <~ error(details, desc)
+
+
+	syntax append (|error| note)
+		cpp_part Msg
+		|| s = note.name
+		if note.path
+			s += "\n\"" + note.path + "\""
+		|| w = .NewWindow(s)
+			w.tag = note
+			if note.IsError
+				printerror s
+				printerror "\n"
+
+
+	function NewWindow (|string| s, |window|)
+		opt norefcounts
+		|| last = .alerts.last
+			if last.text ~= s
+				return nil // sigh
+		rz = Window()
+		.Alerts <~ rz
+		(rz isnt visible)
+		rz.id = "note"
+		rz.text = s
+		rz.size = (width)~left by 0~up back (height) 
+		|| txt = TextView(rz)
+		txt.id = "note"
+		txt.size = the~area
+		txt.text = s
+		|| W = 0.8~white
+		|| B = 0.8~black
+		rz.GNormal.Edge <~ W
+		rz.GNormal.BG <~ B
+	
+
+function error.Useable (|date| ago=8s, |error|)
+	require self and .name
+	if !.when
+		.when = date.now
+		return self
+	if !ago
+		return self
+	if .when.fired and self < ago
+		return self
+
+		

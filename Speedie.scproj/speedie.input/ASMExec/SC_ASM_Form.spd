@@ -23,7 +23,7 @@ class µForm
 		.name = tmp.name
 		for line in tmp.last(@arg)
 			|| f = line.needfirst
-			.loadparam(f.nyme, f)
+			.loadparam(f.name, f)
 		.Finish
 		.index = ++µform.count
 
@@ -39,7 +39,7 @@ class µForm
 		for (s in self) (i)
 			if s & asm.remainder
 				s |= (25 - total)
-			self[i] = s (|) (total << 11)
+			self[i] = s ||| (total << 11)
 			total += s.bitsize
 		
 
@@ -61,18 +61,18 @@ class µForm
 			i++
 
 	function AddRemainder (|uint| U=0)
-		self <~ asm.num (|) asm.remainder (|) U
+		self <~ asm.num ||| asm.remainder ||| U
 	
 	function LoadParam (|string| pl, |message| place)
 		if (pl.isint)
-			self <~ pl.ASMint (|) asm.num
+			self <~ pl.ASMint ||| asm.num
 			return
 		expect (pl == 1) (self)
 		|| p = *pl
 		if  p == 'r'
 			self <~ 5 
 		  elseif p == 'n'
-			self <~ 5 (|) asm.num
+			self <~ 5 ||| asm.num
 		  elseif p == 'l'
 			.addremainder
 		  elseif p == 'L'

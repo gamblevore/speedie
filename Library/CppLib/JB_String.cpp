@@ -64,7 +64,7 @@ bool JB_Byte_IsWhite(byte b);
 
 bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
     if (Length <= 0) {
-        JB_free( self->Addr );
+        JB_FreeString( self->Addr );
         self->Addr = 0; self->Length = 0;
         return 0;
     }
@@ -74,7 +74,7 @@ bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
         return 0;
     }
     
-    auto Result = JB_allocate( Length+1, self->Addr );
+    auto Result = JB_AllocateString( Length+1, self->Addr );
     require (Result.OK);
     Result.Result[Length] = 0;
     self->Addr = Result.Result;
@@ -84,13 +84,15 @@ bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
     
 
 void JB_BA_Destructor( JB_String* self ) {
-    JB_free( self->Addr );
+    JB_FreeString( self->Addr );
 }
 
 
-void JB_Str_Constructor( JB_String* self ) {
-    * self = {};
-}
+//JB_String* JB_Str_Constructor( JB_String* self ) {
+//	JB_New2(JB_String);
+//    * self = {};
+//    return self;
+//}
 
 
 JB_String* JB_Str_CopyFromPtr( uint8* Addr, int N ) {
@@ -157,7 +159,7 @@ int JB_Str_Length( JB_String* self ) {
 uint8* JB_Str_Address( JB_String* self ) {
 	if (self) 
 		return (uint8*)self->Addr;
-	return 0;
+	return (uint8*)"";
 }
 
       
@@ -958,7 +960,7 @@ int JB_Str_Compare(JB_String* self, JB_String* Find, bool Lexer) {
 
 extern JB_StringC* EmptyString_;
 extern JB_StringC* ErrorString_;
-bool JB_Str_MidEquals(JB_String* self, int BeginOff, JB_String* find, bool Lexer) {
+bool JB_Str_MidEquals(JB_String* self, int BeginOff, JB_String* find, bool CaseAware) {
 	int n = JB_Str_Length(find); 
 	if (!n)
 		return false;
@@ -966,7 +968,7 @@ bool JB_Str_MidEquals(JB_String* self, int BeginOff, JB_String* find, bool Lexer
 		self = EmptyString_;
 
 	MiniStr S = ReadAddrs_( self,  BeginOff,  BeginOff + n );
-	if ( Lexer ) {
+	if ( CaseAware ) {
 		return StrEqualsLex( Mini(find), S );
 	} else {
 		return StrEquals( Mini(find), S );
@@ -1091,8 +1093,6 @@ int JB_Str_ByteValue(JB_String* self, int offset) {
 
 void JB_Err__CantParseNum(Message* Where, JB_String* self, int Pos);
 void ParseNumErr_( JB_String* self, uint8* BadPos, Message*& Where ) {
-    require0(Where);
-    
     int CharPos = (int)(BadPos - self->Addr - 1);
     JB_Err__CantParseNum(Where, self, CharPos);
     
@@ -1324,7 +1324,7 @@ JB_String* JB_FS_SmartResult( FastString* fs, FastString* Orig ) {
 	if ( !Orig ) {
 		return JB_FS_GetResult( fs );
 	}
-	return 0;
+	return EmptyString_;
 }
 
 
@@ -1446,7 +1446,8 @@ JB_String* JB_Str_FastLower (JB_String* self) {
 ByteMap* JB_BM__Lower() {
     static ByteMap* LowerMap_ = 0;
     if (!LowerMap_) {
-        LowerMap_ = JB_BM_( JB_Upper(), JB_Lower() );
+        LowerMap_ = JB_BM_Constructor( 0, JB_Upper(), JB_Lower() );
+        JB_Incr(LowerMap_);
     }
     return LowerMap_;
 }
@@ -1458,7 +1459,8 @@ JB_String* JB_Str_LowerCase(JB_String* self) {
 JB_String* JB_Str_UpperCase(JB_String* self) {
     static ByteMap* UpperMap_ = 0;
     if (!UpperMap_) {
-        UpperMap_ = JB_BM_( JB_Lower(), JB_Upper() );
+        UpperMap_ = JB_BM_Constructor( 0, JB_Lower(), JB_Upper() );
+        JB_Incr(UpperMap_);
     }
 	return JB_Str_MapBytes( self, UpperMap_, -1 );
 }
@@ -1490,12 +1492,12 @@ bool JB_Byte_IsWhite(byte self) {
 }
 
 
-CharSet* JB_CS__New(JB_String* charset, bool Ranges);
+CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);
 CharSet* TrimCS_() {
 	static CharSet* cs;
 	if (!cs) {
 		JB_String Dummy;  Dummy.Addr = (uint8*)" \t\n\r\0";  Dummy.Length = 5;
-		cs = JB_CS__New(&Dummy, false);
+		cs = JB_CS_Constructor(nil, &Dummy, false);
 	}
 	return cs;
 }
@@ -1816,9 +1818,9 @@ uint64 JB_Str_CRC (JB_String* S, uint64 crc) {
 }
 
 
-Array* JB_Array__New0();
+Array* JB_Array_Constructor0( Array* self );
 Array* JB_Str_ArgV(const char** ArgV) {
-    Array* Result = JB_Array__New0();
+    Array* Result = JB_Array_Constructor0(nil);
     while (ArgV) {
         const char* c = *++ArgV;
         if (!c) {break;}
@@ -1829,7 +1831,7 @@ Array* JB_Str_ArgV(const char** ArgV) {
 
 
 Dictionary* JB_EnvC(const char** self) {
-    Dictionary* D = JB_Dict__New();
+    Dictionary* D = JB_Dict_Constructor(nil);
     
 	if (self) for (int i = 0; const char* C = self[i]; i++) {
         JB_String* S = JB_StrC(C);
@@ -1926,7 +1928,7 @@ JB_String* JB_Obj_GenericRender(JB_Object* self, FastString* fs_in) {
     // ["abc"] // array of string
     // [1234]  // array of int-object
     // [(1,2,3)] // array of set
-    // [RingTree(741)] // seems to make sense?
+    // [JB_List(741)] // seems to make sense?
     FastString* fs = JB_FS__FastNew(fs_in);
 
     JB_Class* Cls = JB_ObjClass(self);

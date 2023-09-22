@@ -518,7 +518,7 @@ void MiniByte_(FindResult& F, int i) {
 }
 
 bool CanSet_(Dictionary* self, JB_String* key, FindResult* F) {
-    if (key and self) {
+    if (key) {
         *F = BeginFind_( self,  Mini(key, 0) );
         JB_Dict_Value_(*F);
         return TrySet_(*F, key);
@@ -644,11 +644,8 @@ JB_Object* JB_Dict_Longest( Dictionary* self, JB_String* Key, int* Found ) {
     ////////////////////////     Navigator     /////////////////////////
 
 DictionaryReader* JB_Dict_Navigate( Dictionary* Dict ) {
-    if (Dict) {
-        DictionaryReader* Result = JB_New( DictionaryReader );
-        JB_Nav_Constructor(Result, Dict);
-        return Result;
-    }
+    if (Dict)
+        return JB_Nav_Constructor(0, Dict);
     return 0;
 }
 
@@ -734,9 +731,11 @@ void JB_Dict_Destructor(Dictionary* self) {
 }
 
 
-void JB_Dict_Constructor(Dictionary* self) {
+Dictionary* JB_Dict_Constructor(Dictionary* self) {
+	JB_New2(Dictionary);
     JB_Zero( self );
     self->Width = 255;
+    return self;
 }
 
 
@@ -886,9 +885,11 @@ void JB_Nav_Destructor( DictionaryReader* self ) {
     // nothing
 }
 
-void JB_Nav_Constructor( DictionaryReader* self, Dictionary* Dict ) {
+DictionaryReader* JB_Nav_Constructor( DictionaryReader* self, Dictionary* Dict ) {
+	JB_New2(DictionaryReader);
     MiniStr Tmp = { 0, 0 };
     self->State = BeginFind_( Dict, Tmp );
+    return self;
 }
 
 

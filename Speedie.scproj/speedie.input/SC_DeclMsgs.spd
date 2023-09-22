@@ -7,28 +7,36 @@ function DeclsDefault (|Message| def, |Message|)
 		return def.Last
 
 
-function MakeDecl (|string| Type, |string| Name, |Message| Value, |Message|)
+function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose=0, |Message!|)
+	opt norefcounts
 	rz = «decl »
+	|| f = rz.msg(@arg),    todo "this should change... I don't like @arg types."
+	
 	if (Type)
-		|| arg = rz.msg(@arg)
-		(arg is style2)
-		arg <~ (@thg, type)
-	  else 
-		rz <~ @emb
+		(f is style2)
+		f <~ (@thg, type)
+	  else
+		f.func = @emb
 	
-	|| NameMsg = «thg name »
-	if value
-		|| Rel = «rel
-			NameMsg
-			@opp+"="
-			value
-		»
-		NameMsg.obj = CopyDecl( value, name )
-		Rel.obj = NameMsg.obj
-		NameMsg = Rel
+	if !Value
+		rz <~ (@thg, name)
+		return rz
 	
-	rz <~ NameMsg
-
+	|| Rel = rz.msg(@rel)
+	|| NameMsg = rel.msg(@thg, name)
+	rel <~ (@opp, "=")
+	rel <~ value
+	
+	|| o = value.obj as scdecl
+		|| dcl = o.copydecl(true)
+		dcl.info |= purpose
+		dcl.Name = name
+		dcl.Default = value
+		NameMsg.obj = dcl		
+		Rel.obj = dcl
+		rz.obj = dcl
+		f.obj = dcl
+	
 
 function MakeDeclOrRel (|Message| Into, |message| namemsg, |Message| value, |Message|)
 	require into
@@ -58,61 +66,69 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 	using (dcl)
 	rz = dcl.msg(@rel)
 	rz <~ dcl.second
-	rz.msg(@Opp, "=")
+	rz <~ (@Opp, "=")
 	rz <~ Default
 
 
-// these can remain...
-function scfunction.CollectDeclsFuncPrms (|Message| prms, |SCBase| AddToSpace)
+function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 	opt norefcounts
+	scmodule.curr = .parent|scmodule|
 	|| cls = .Cls
-		if !prms.HasSelfAsFirst
-			cls.AddSelfToFunc(addtospace)
-			.args <~ cls.SelfDecl
-	  else
-		cls = .lookup|SCModule|.Cls
+	if !cls
+		cls = .parent|SCModule|!.Cls
+	  elseif !prms.HasSelfAsFirst
+		expect (addtospace) (prms)
+		.AddSelfToFunc(cls, AddToSpace)
 
 	for item in prms
-		// can remove some shit thats only applicable here... :D
-		require item.CollectFuncPrm(self, AddToSpace, cls)
+		item.CollectOneParam(self, AddToSpace, cls)
+
+	|| ns = .nilself
+		.WantAs(ns)
+	|| r = .returntype
+	if r and .HidesProperties
+		.returntype = r.makereal
+			
 
 
-function Message.CollectFuncPrm (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
+function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cls, |bool|)
 	opt norefcounts
+	real self
 	if (func.isassigns == 2) and .islast
 		if !cls
 			error (self, "Can’t use this here." )
 		  else
 			// setter x (|int|) --> fn x (|int| value)
 			func.IsAssigns = 3
-			if cls.IsDataType
+			if cls.IsDataTypeOrFP
 				.next = .copy // fn x (|int|) --> fn x (|int| value, |int|)
-			.addvalue(func)
+			.AddValue(func)
 		
-	if self == @Item and .first == "assigns"
+	if  self == @Item  and  .first == "assigns"
 		self = .Last
 		func.IsAssigns = 1
 		.addvalue(func)
 
-	if .Expect(@decl)
-		|| dcl = .CollectDecl(func, recv, 4, func.args, cls, func)
-			(dcl is param)
-			(dcl isnt altered)
-			return true
-
-
-
-
-function SCClass.CollectDeclsProperties (|bool|)
-	opt norefcounts
-	for item in .SourceArg
-		if item == @decl
-			require item.CollectProp( self)
+	require .Expect(@decl)
+	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, cls, func) #require
+	if dcl.default isthing "nil"
+		dcl.nildeclared = nilstate.optional
+	func.args <~ dcl
+	(dcl isnt DataConst)
+	if dcl.name
+		(dcl is Param)
+		(dcl isnt Altered)
+	  else
+		(dcl is return)
+	
 	return true
 
-function Message.CollectProp (|scclass| cls, |bool|)
+
+
+function scclass.CollectProp (|Message| msg, |bool|)
 	opt norefcounts
-	|| dcl = .collectdecl( cls.modul, cls, 3, cls.properties, cls, nil)
+	|| dcl = msg.CollectDecl( .modul, self, declmode.properties, self, nil)
+		.properties <~ dcl
 		(dcl is property)
 		dcl.becomereal
 		return true
@@ -120,118 +136,132 @@ function Message.CollectProp (|scclass| cls, |bool|)
 
 
 // remove these... but later.
-function CollectDeclsGlobals (|Message| arg, |SCBase| scarg)
+function CollectDeclsGlobals (|Message| arg, |SCNode| scarg)
 	opt norefcounts
 	for item in arg
 		if item == @decl
 			require item.CollectAGlobalDecl(scarg)
 
-function Message.CollectAGlobalDecl (|SCBase| scarg, |bool|)
+
+function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	opt norefcounts
-	|| dcl = .CollectDecl(scarg, scarg, 1, nil, nil, nil)	
+	
+	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals, nil, nil)
+		|| def = dcl.Default
+		if def and !dcl.nilstated
+			|| d = def.msgdecl
+			if d and d.StatedReal
+				dcl.nildeclared = nilstate.real // in case of something like |object| x = real()
 		(dcl is property)
-		(dcl is onmodule)
+		(dcl is Global)
 		return true
-		
 
 
-
-function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg) 	// remove later... :)
+function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCNode| scarg) 	// remove later... :)
 	opt norefcounts	// basically... the caller needs fixing.
 	for item in arg
 		if item == @decl
-			require item.CollectFromBody(scarg)
+			item.CollectFromBody(scarg) // keep on going even if one failed. good for autocomplete
 
-function Message.CollectFromBody (|SCBase| scarg, |bool|)
+
+function Message.CollectFromBody (|SCNode| scarg, |bool|)
 	opt norefcounts
-	|| dcl = .CollectDecl(scarg, scarg, 8, nil, nil, nil)
+	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody, nil, nil)
+		(dcl is body)
+		(dcl isnt dataconst)
 		|| def = dcl.Default
 			check (def != @thg or def.name ~!= dcl.name) (def, "Same name!")
 		return true
 
 
 
-function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCBase| scarg)
+function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCNode| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
 
 // definitely remove this!
-function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
+function CollectDeclsFuncBody (|Message| arg, |SCNode| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
-function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
-	
-	|| Types = .first
-	|| Names = types.Next				
+function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
+	|| Types = .first!
+	|| Names = types.Next
 
 	expect (FuncPrms or Names)  (self, "No name found.")
 	if (Mode & 2)
 		expect (names == @thg) (names, "Must be a proper name (a-z or unicode-letters)")
 
 	|| Default = DeclsDefault( names )
-	|| Sdcl = ExtractDecl( Types, P )
-	if (!sdcl and !default and (P isa SCArg))
-		sdcl = P.ParentFunc.ReturnType
+	|| Sdcl = ExtractDecl( Types, P, mode )
+	if !sdcl  and  !default  and  (P isa SCArg)
+		sdcl = P.ParentFunc!.ReturnType
 
-	
 	|| NameItm = names.CollectDclName
 	|SCDecl--| DefaultDcl
 	if FuncPrms
 		0
 	  elseif (Default)
 		DefaultDcl = TypeOfExprNeeded( Default, P ) #require
+		DefaultDcl = DefaultDcl.Downgrade
 		if (sdcl)   // make sure it matches.
 			default = sdcl.ExpectMatch( DefaultDcl, kTypeCastTrue, default )
 		
-	  elseif (!cls) and (sdcl) and ( !Default ) and (sdcl.CanUseDefault)
+	  elseif (!cls) and (sdcl) and (sdcl.CanUseDefault)
 		Default = sdcl.CreateDefault(types, mode >= 4)
 		if (Default)
 			TypeOfExpr( default, P )
 			names = DefaultStitch( Default, self )
 	
-	|| NoOriginalDcl = !Sdcl
+	|| NoOriginalDcl = false
+	if !Sdcl
+		NoOriginalDcl = true
 		if (cls) and (cls.Contained)
-			sdcl = cls.Contained // (|| x = Y), (|object| x = Y)
+			sdcl = cls.Contained! // (|| x = Y), (|object| x = Y)
 		  else
-			expect (!FuncPrms and defaultdcl) ( self, ("Function declarations need a type. (Unless it's in a container class.)", "Missing type, or default value.")(!FuncPrms) )
+			expect (!FuncPrms and defaultdcl) ( self, ("Missing type", "Missing type, or default value.")(!FuncPrms) )
 			sdcl = DefaultDcl
 	
 	if sdcl.NeedsContainedfix
 		sdcl = sdcl.Containedfix
 	
+	// TODO: if sdcl's refcount is 1... just keep it? its obviously just been created.
+	// like: |dictionary of string| x
+	|| dcl = Sdcl.copydecl
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )
 		if funcprms
-			FuncPrms.ReturnType = sdcl
+			if FuncPrms.CollectReturnAsReal // allocs dont fail (assumed so)
+				dcl.nildeclared = nilstate.real
+			FuncPrms.ReturnType = dcl // we need the copy
 		return nil
 
 	if !Default
 		names.expectlast
 	
-	|| dcl = Sdcl.copy
-	nameitm.obj = dcl
+	if mode != declmode.Properties // the old .obj is needed
+		nameitm.obj = dcl
 	
 	if (Mode & 8) and NoOriginalDcl // functionbody
 		if sdcl isnt StayBorrowed
 			(Dcl Isnt Borrowed)
-		dcl.nildeclared = NilState.Either // can be freely changed!
+		dcl.nildeclared = NilState.real >> dcl.TypeSuffers 
 	
 	if (nameitm in @Rel)
-		nameitm.Parent.obj = dcl
+		nameitm.Parent!.obj = dcl
 	
+	.obj = dcl
+	types.obj = dcl // might as well set it everywhere.
 	dcl.Default = Default
 	dcl.Name = nameitm.name
 	dcl.Source = self
 	(dcl Isnt Const) // on "|| bla = true", make "bla" editable.
 
-	if out!=nil
-		out <~ dcl
 	if default and defaultdcl
 		dcl.ConstCheck(nil, default, DefaultDcl)
-	
-	if (Recv) // nil for prototypes
+
+	if Recv // nil for prototypes
 		Recv.TryAdd( self, dcl, dcl.Name )
 	return dcl
 
@@ -246,7 +276,7 @@ function Message.CollectFuncTableName (|string|)
 	if .name and self != @dot
 		Return .Name
 
-	Return .First.Name 
+	Return .Firstname 
 	
 
 function scdecl.NeedsContainedfix (|bool|)
@@ -258,13 +288,40 @@ function scdecl.NeedsContainedfix (|bool|)
 function scdecl.Containedfix (|scdecl|)
 	opt norefcounts
 	|| t = .type
-	rz = (.copy, self)(T.typenormal == self)
+	rz = (.copydecl, self)(T.typenormal == self)
 	rz.contains = t.SelfDecl.Contains
 
 
-function message.addvalue (|scfunction| f)
+function scdecl.DownGrade (|scdecl|)
+	opt norefcounts
+	if !.IsNormalObject
+		return self
+	|| y = .type.DowngradeTo
+		return y.TypeNormal
+	return self
+	
+	
+function message.AddValue (|scfunction| f)
 	opt norefcounts
 	pragma inline
 	if !.HasChildCount(2)
 		using f.source
 			self <~ «thg "Value"»
+
+
+datatype DeclMode (uint)
+	constants
+		|DeclMode|
+		FuncParam	= 4
+		Properties	= 3
+		Globals		= 1
+		FunctionBody = 8
+		Local = FuncParam+FunctionBody
+		Proto		= 16
+		TypeCast	= 32
+		ProtoParam	= FuncParam + Proto
+		Always		= 64
+
+	syntax is (|DeclMode|o, |bool|)
+		return self == o
+

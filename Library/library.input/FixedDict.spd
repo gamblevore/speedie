@@ -2,13 +2,13 @@
 
 class FixedDict
 	contains object
-	linkage: cpp_part dict
+	linkage: cpp_part fix
 	|uint|					ItemTypes
 	|Byte|					ValueType
 	|Byte|					Letter
-	|_voidptr|				Value
-	|FixedDict--|			Parent
-	|_voidptr[16]|			Items
+	|(&nil)?|				Value
+	|FixedDict--?|			Parent
+	|(&nil)[16]|			Items
 	
 	constants
 		TypeValue	= 0
@@ -16,7 +16,7 @@ class FixedDict
 		TypeStem	= 2
 		TypeDict    = 3
 	
-	constructor (|_voidptr| Value = nil, |Byte| type = 0)
+	constructor (|&nil| Value = nil, |Byte| type = 0)
 		cpp_part ConstructorValue
 		.value = value
 		.valuetype = type
@@ -25,10 +25,10 @@ class FixedDict
 	
 	constructor (|FixedDict| Parent, |int| Part, || old, |byte| type)
 		cpp_part ConstructorReplace
-		.value = old|_voidptr|
+		.value = old|&nil|
 		.valuetype = type
 		parent.typeof(part) = typedict
-		parent.items[part] = self|_voidptr|
+		parent.items[part] = self|&nil|
 		jb_incr(self)
 
 
@@ -52,11 +52,15 @@ class FixedDict
 	
 	function TypeOf (|int| i, |int|)
 		return 3 & .itemtypes >> (i<<1)
+
+
 	function TypeOf (|int| i2, assigns:|uint|)
 		i2 <<= 1
-		.itemtypes	= (.itemtypes &~ (3 << i2))  (|)  (Value << i2)
-	syntax access (|int|i, |fixeddict|)
-		return .items[i]|fixeddict|
+		.itemtypes	= (.itemtypes &~ (3 << i2))  |||  (Value << i2)
+
+
+	syntax access (|int| i, |fixeddict?|)
+		return .items[i]|fixeddict?|
 
 
 	function SetPart (|int| B, || Val, |int| type)
@@ -68,13 +72,16 @@ class FixedDict
 		|| place = &.items[b]
 		|| obj = (*place)|fixeddict|		// verbose but faster
 		if BT >= typestem
-			if obj.valuetype
-				jb_decr( obj.value|...| )
-			obj.valuetype = type
-			obj.value = val|_voidptr|
-		else
+			if obj
+				if obj.valuetype
+					jb_decr( obj.value|object| )
+				obj.valuetype = type
+				obj.value = val|&nil|
+			  else
+				debugger // obj will never be nil here
+		  else
 			.typeof(b) = type
-			*place = val|_voidptr|
+			*place = val|&nil|
 			if bt
 				jb_decr( obj )				// cos we call this last, compiler can opt it.
 	
@@ -84,7 +91,7 @@ class FixedDict
 		|| rt = .typeof(part)
 		|| r  = self[Part]
 		if rt == TypeDict
-			return r
+			return r!
 		return fixeddict(self, part, r, rt)
 	
 
@@ -124,7 +131,7 @@ class FixedDict
 				curr	= curr[B&15]				#require
 				|| T	= curr.typeof(B>>4)
 				curr	= curr[B>>4]
-				if i >= n: return curr.valueobj(t)
+				if i >= n: debug_require curr, return curr.valueobj(t) // can curr be nil or not? perhaps just require is needed
 				require T == typedict
 
 
@@ -215,7 +222,6 @@ class FixedDict
 	Could replace:
 		* Array			(arrays suck in every language. we only wanna go forward/backward!)
 		* Dictionary	(kinda bloated, and slower!! and takes more memory!)
-		* FastAppender	(looked ugly)
 		* Hashes		(Assuming we got good removal)
 */
 

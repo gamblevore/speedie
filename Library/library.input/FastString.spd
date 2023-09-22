@@ -4,14 +4,6 @@
 */
 
 
-// possible improvement?
-// then make .smartresult do .bla-- and fastnew do .bla++
-// once it reaches 0, we call .flush. so we can stream using a singular faststring.
-// like giantfile.render(app.stdout)
-// possibly: remove faststring.printline (From the c++). printing a line has nothing to do with actually
-// rendering...
-
-
 class FastString {
 	linkage
 		wrapper
@@ -35,7 +27,7 @@ class FastString {
 	constructor (|int|size)				{ cpp_wrapper JB_FS_ConstructorSize }
 	destructor							{ cpp_wrapper JB_FS_Destructor }
 
-	setter Length (|int|)				{cpp_wrapper JB_FS_LengthSet}
+	setter Length (|int|)				{ cpp_wrapper JB_FS_LengthSet }
 	
 	function AppendLower (|string| data)
 		cpp_wrapper JB_FS_AppendLower
@@ -47,9 +39,9 @@ class FastString {
 
 	function Size (|int|)				{ cpp_wrapper JB_FS_Size }
 	function Size (assigns:|int|)		{ cpp_wrapper JB_FS_SizeSet }
-	function AppendMultiReplace (|string|s, |dictionary of string| m, |ErrorList| Rec=stderr) { cpp_wrapper JB_FS_AppendMultiReplace }
+	function AppendMultiReplace (|string|s, |dictionary of string| m, |ErrorReceiver| Rec=stderr) { cpp_wrapper JB_FS_AppendMultiReplace }
 		
-	function AppendHex (|int64|Num, |int|RoundTo=2)
+	function AppendHex (|int64| Num, |int|RoundTo=2)
 		cpp_wrapper JB_FS_AppendHex
 	
 	function AppendHexData (|string| Data)
@@ -60,20 +52,22 @@ class FastString {
 	function AppendHexData (|&byte| Data, |int| N, |int| Spaces=0)
 		cpp_wrapper JB_FS_AppendHexData
 
-
 	function AppendSection (|String| Data, |int| Start, |int| Length)
 		cpp_wrapper JB_FS_AppendSection
 
 	function AppendHex3 (|int|Num)
 		cpp_wrapper JB_FS_AppendHex3
 	
-	function AppendUTF8 (|int|Num)		{ cpp_wrapper JB_FS_AppendUTF8Char }
-	function IndentLine					{ cpp_wrapper JB_FS_AppendIndent }
-	function Flush	(|bool|)			{ cpp_wrapper JB_FS_Flush }
-	function Remove (|Byte| b)			{ cpp_wrapper JB_FS_RemoveByte }
+	function AppendUTF8 (|codepoint| Num)	{ cpp_wrapper JB_FS_AppendUTF8Char }
+	function IndentLine						{ cpp_wrapper JB_FS_LineIndent }
+	function AppendIndent					{ cpp_wrapper JB_FS_AppendIndent }
+	function Flush	(|bool|)				{ cpp_wrapper JB_FS_Flush }
+	function Remove (|Byte| b)				{ cpp_wrapper JB_FS_RemoveByte }
 	function GetResult (|string|)
+		nil self
 		cpp_wrapper JB_FS_GetResult
-	function GetResult (|FastString| other, |string|)
+	function GetResult (|FastString?| other, |string|)
+		nil self
 		cpp_wrapper JB_FS_SmartResult
 	function Copy (|string|)
 		cpp_wrapper JB_FS_Copy
@@ -90,7 +84,7 @@ class FastString {
 			if n <= 127
 				self <~ (n)|byte|
 				exit
-			self <~ (n (|) 128)|byte|
+			self <~ (n ||| 128)|byte|
 			n >>= 7
 			
 		
@@ -130,6 +124,7 @@ class FastString {
 		self <~ '"'
 		.appendescape(s)
 		self <~ '"'
+	
 	function AppendEscape (|string| s)
 		.AppendMultiReplace( s, jeebox.EscapeStr )
 
@@ -144,7 +139,7 @@ class FastString {
 				error (other, "Faststring can't use this object.")
 		
 		
-		function New (|FastString| other, |FastString|)
+		function New (|FastString?| other, |FastString|)
 			cpp_wrapper JB_FS__FastNew
 		
 		function New (|file| dest, |bool| PrintLineOnFlush, |FastString|)
@@ -153,18 +148,28 @@ class FastString {
 		function New (|&byte| b, |int| n, |FastString|)
 			cpp_part NewDirect
 			rz = faststring()
-			rz.resultptr = b
-			rz.reserved = n
+			rz.ResultPtr = b
+			rz.Reserved = n
 
 
-	syntax Access (|int| off, |Byte|):				cpp_wrapper JB_FS_Byte
-	syntax Access (|int| off, assigns:|Byte|)		{ cpp_wrapper JB_FS_ByteSet }
-	syntax Append (|string| data)
+	syntax Access (|int| off, |Byte|)
+		cpp_wrapper JB_FS_Byte
+	
+	syntax Access (|int| off, assigns:|Byte|)
+		cpp_wrapper JB_FS_ByteSet
+	
+	function Last (|int| off=0, |int|)
+		cpp_wrapper JB_FS_Last
+	
+	syntax Append (|string?| data)
 		cpp_wrapper JB_FS_AppendString
+	
 	syntax Append (|FastString| fs)
 		cpp_part AppendFastString
 		.AppendMemory(fs.resultptr, fs.length)
-	syntax Append (|Byte| data)						{ cpp_wrapper JB_FS_AppendByte }
+		
+	syntax Append (|Byte| data)
+		cpp_wrapper JB_FS_AppendByte
 
 	function AppendIntegerAsText (|int64| data, |int|RoundTo=1)
 		cpp_wrapper JB_FS_AppendIntegerAsText
@@ -181,20 +186,20 @@ class FastString {
 	syntax Append (|int64| data)
 		cpp_part AppendInt64
 		.AppendIntegerAsText(data, 1)
+	
 	syntax Append (|uint| data)
 		cpp_part AppendUint
-		self <~ data|int64|
+		.AppendIntegerAsText(data, 1)
 
-	
 	syntax Append (|int| data)
 		cpp_part AppendInt32
-		self <~ data|int64|
+		.AppendIntegerAsText(data, 1)
 		
 	function AppendFile (|File| f, |bool|)
 		if f.opened
 			return .appendpipe(f.descriptor, 0)
 		
-	function appendpipe (|int|fd, |int| mode, |bool|)
+	helper AppendPipe (|int|fd, |int| mode, |bool|)
 		cpp_wrapper JB_FS_AppendPipe // (FastString* self, int fd, int Mode)
 	
 	syntax cast (|string|)
@@ -227,19 +232,17 @@ class FastString {
 		.fieldstart(name)
 		.indent++
 
-	function Field (|string| name, |int64| data)
-		cpp_part AppendInfoNum
-		if data
-			.fieldstart(name)
-			self <~ data
-			
-	
-	function FieldF (|string| name, |f64| data)
+	function FieldFloat (|string| name, |f64| data)
 		cpp_part AppendInfoFloat
 		if data
 			.fieldstart(name)
 			self <~ data
 
+	function Field (|string| name, |int64| data)
+		cpp_part AppendInfoNum
+		if data
+			.fieldstart(name)
+			self <~ data
 
 	function AppendMemory (|&byte| Str, |uint| N)
 		cpp_wrapper JB_FS_AppendMem_
@@ -248,8 +251,8 @@ class FastString {
 	function AppendDurr (|Date| D)
 		cpp_wrapper JB_FS_AppendDurr
 
-	function AppendDMY (|Date| D)
-		cpp_wrapper JB_FS_AppendDMY
+	function AppendLocalTime (|Date| D)
+		cpp_wrapper JB_FS_AppendLocalTime
 
 
 	syntax Append (|f64| D)
@@ -268,11 +271,12 @@ class FastString {
 	function Mark (|int|)
 		cpp_wrapper
 	
-	function Grew (|int|m, |bool|)
+	function Grew (|int| m, |bool|)
 		cpp_wrapper
 
 	macro SyntaxAppend
-		_.render(self)
+		_1.render(_0)
+		
 
 	syntax Compare (|int| n, |bool|Aware, |int|)
 		return .streamlength - n

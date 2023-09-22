@@ -1,0 +1,16 @@
+
+
+datatype MouseDragging (int)
+	constants
+		Ignored = 0
+		Handled = 1<<4
+		Within = 2<<4
+		Beyond = 3<<4
+		EvenIfNoMovement = 4<<4
+		
+
+/*
+	return (x,y).sdlxy
+	#define SDL_BUTTON(X)       (1 << ((X)-1))
+*/
+

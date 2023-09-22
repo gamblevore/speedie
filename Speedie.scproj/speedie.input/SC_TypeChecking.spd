@@ -1,11 +1,11 @@
 
 
 
-function ExpandToBool (|Message| inside, |SCBase| name_space, |Message|)
+function ExpandToBool (|Message| inside, |SCNode| name_space, |Message|)
 	opt norefcounts
 	|| decl = TypeOfExpr( inside, name_space )$
 
-	rz = TypeBool.TypeNormal.ExpectMatch( decl, kTypeCastTrue, inside )
+	rz = TypeBool!.TypeNormal.ExpectMatch( decl, kTypeCastTrue, inside )
 
 	While (rz == @bra) and (rz.first == @bra)
 		rz = rz.ReplaceWithChild
@@ -18,8 +18,8 @@ function RelSetOrExpansion (|Message| exp)
 	|| R = exp.last						// should probably go within collectdecls at least?
 	using (exp)
 	exp.clear
-	l.moveallin(exp)
-	|| cond = r.first.copy
+	l.AppendAllInto(exp)
+	|| cond = r.first!.copy
 	|| tmp = «tmp "if"
 		cond.Negate
 		«arg, R »
@@ -29,47 +29,50 @@ function RelSetOrExpansion (|Message| exp)
 	((p, exp)(P == @decl)).next = tmp
 
 
-function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCBase| name_space, |SCDecl|)
-	|| LBool = LC.Minimatch( TypeBool.TypeNormal, kTypecastFalse )
-	|| RBool = RC.Minimatch( TypeBool.TypeNormal, kTypecastFalse )
+function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCNode| name_space, |SCDecl|)
+	|| LBool = LC.Minimatch( TypeBool!.TypeNormal, kTypecastFalse )
+	|| RBool = RC.Minimatch( TypeBool!.TypeNormal, kTypecastFalse )
 		
 	if RBool and LBool
 		Return LC // easy
 	
 	// x = (mybool and myint) // convert to bool
-	|| ch0 = exp.first
-	|| ch2 = ch0.next.next // ch0 could change
+	|| ch0 = exp.first!
+	|| ch2 = ch0.next.next! // ch0 could change
 	if !LBool
 		ExpandToBool( ch0, name_space )
 	if !RBool
 		ExpandToBool( ch2, name_space )
 	
-	Return TypeBool.TypeNormal
+	Return TypeBool!.TypeNormal
 
 
-function Message.CastToObject (|Message|)
-	|| d = .AsDecl #expect
-	if (d.Type.IsObject)
-		 Return self
-	
-	|| Match = TypeObject.TypeNormal.TryTypeCast( d, self, kTypeCastTrue )
-	expect (Match >= kSimpleMatch) (self)
-	Return .CastedParent
-
-
+//function Message.CastToObject (|Message|)
+//	|| d = .AsDecl #expect
+//	if (d.Type.IsObject)
+//		 Return self
+//	
+//	|| Match = TypeObject!.TypeNormal.TryTypeCast( d, self, kTypeCastTrue )
+//	expect (Match >= kSimpleMatch) (self)
+//	Return .CastedParent
 
 
 
-function scdecl.Match (|SCDecl| O, |int| TypeCast, |Message| exp = nil, |uint|)
+function scdecl.FastMatch (|SCDecl| O, |bool|)
+	require o.type == .type
+	require o.pointercount == .pointercount
+	return o.c_array == .c_array
+
+
+function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |uint|)
 // Make TypeCast = true able to deal with... pointers to structs!
+	real self
 	if (o == nil)
 		require .default
 		Return kUseDefaultParams
 
 	if (o == self)
-		Return kSimpleMatch
-	require o.type and .type
-		
+		Return kSimpleMatch		
 
 	if (o.IsNil and (TypeCast & kTypeCastTrue))		// nil cast
 		if .CantBeNilInCpp							// |mystruct| x = nil
@@ -88,11 +91,11 @@ function scdecl.Match (|SCDecl| O, |int| TypeCast, |Message| exp = nil, |uint|)
 		if (ooop)
 			return ooop
 
-	if (TypeCast & kTypeCastTrue) and (.type == typevoidptr) and (o.pointercount or o.type.funcproto)
+	if (TypeCast & kTypeCastTrue) and (.IsvoidPtr) and (o.pointercount or o.type.funcproto)
 		if (!exp)
-			return kNeedsTypeCast (|) kVoidPtrMatch
+			return kNeedsTypeCast ||| kVoidPtrMatch
 		if (o.type.funcproto)
-			return exp.CastToVoidPtr(nil) // actually do it.
+			return exp.CastFPToVoidPtr // actually do it.
 		return kCastedMatch
 
 	if TypeCast & kActualTypecasts
@@ -103,17 +106,27 @@ function scdecl.Match (|SCDecl| O, |int| TypeCast, |Message| exp = nil, |uint|)
 function scdecl.SafelyWrappable (|bool|)
 	opt norefcounts
 	|| n = .isnumeric
-	if (n <= 1) or (self == typebool.typenormal)
+	if (n <= 1) or (self == typebool!.typenormal)
 		return true
 	
-	|| fns = TypeWrapper.modul["new"]|scfunction|
+	|| fns = TypeWrapper!.modul["new"]|scfunction|
 	require fns isa scfunction
 
 	for f in fns
 		|| p = f.args
-		if (p.length == 1) and p[0].match(self, 0)
+		if (p.length == 1) and p[0]!.TypeMatch(self, 0)
 			return true
  
+
+function scdecl.TryTypeCastPointer (|SCDecl| O, |Message| exp, |int| TypeCast, |bool| CArray, |int|)
+	|| i = .Internal
+	if i and i.MiniMatch(O)	
+		|| OAddr = O.GetAddress
+		if carray
+			oaddr.C_Array = 0
+		
+		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
+			rz = exp.GetAddressOf(OAddr, CArray)
 
 
 function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
@@ -122,16 +135,12 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 	|| t = .type
 	|| ot = o.type
 	if (.PointerCount == O.PointerCount + 1)
-		|| OAddr = O.GetAddress
-		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
-			return exp.GetAddressOf(OAddr)
+		|| found = .TryTypeCastPointer(o, exp, typecast, false)
+			return found
 
-
-	if (o.c_array) and (.pointercount == 1)
-		|| oaddr = o.GetAddress
-		oaddr.C_Array = 0
-		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
-			return exp.GetAddressOf(OAddr, true)
+	if (o.IsCArray) and (.pointercount == 1)
+		|| found = .TryTypeCastPointer(o, exp, typecast, true)
+			return found
 	
 	
 	/// hmmmm... need to test it... without the c-array? how?
@@ -140,9 +149,9 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 			return exp.CastToBool(nil)
 	
 	
-	if TypeCast & (kTypeCastMost(|)kTypeCastNumbers)
+	if TypeCast & (kTypeCastMost|||kTypeCastNumbers)
 		|| CounterPart = t.Signed				// int vs uint
-			if (CounterPart.type == ot) and (CounterPart.match(o, typecast, exp).isnormalmatch)
+			if (CounterPart.type == ot) and (CounterPart.TypeMatch(o, typecast, exp).isnormalmatch)
 				return ksimplematch
 
 
@@ -151,8 +160,8 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 		// we do bool casting after, as its usually a sign of a bug.
 		for (b.Upwards in Ot)
 			for (C in b.Casts)
-				ifn NoBools and (C.returnType == typebool.typenormal)
-					if .Match( C.ReturnType, 0 ).IsNormalMatch
+				ifn NoBools and (C.returnType == typebool!.typenormal)
+					if .TypeMatch( C.ReturnType, 0 ).IsNormalMatch
 						return C.CreateTypeCast( O, exp )
 		
 		
@@ -164,14 +173,14 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 		// use better_numeric
 		// try datatype conversion here...
 		if (!isabool or !NoBools) and O.canwrap
-			if (Typewrapper.typenormal.Match( self, 0 ).IsNormalMatch)
+			if (Typewrapper!.typenormal.TypeMatch( self, 0 ).IsNormalMatch)
 				// Already have all the type info! So check the contained type is correct!
 				|| it = .contains
-					require it.match(O, kTypeCastNumbers)
+					require it.TypeMatch(O, kTypeCastNumbers)
 					return exp.WrapExpr(O)
 
 			// self == object/datatype-wrapper
-			if .Match( Typewrapper.typenormal, 0 ).isNormalMatch and O.SafelyWrappable 
+			if .TypeMatch( Typewrapper!.typenormal, 0 ).isNormalMatch and O.SafelyWrappable 
 				return exp.WrapExpr(o)  // only OK to turn to a bool if O is a bool.
 
 	

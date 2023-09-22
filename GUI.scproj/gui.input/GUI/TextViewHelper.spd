@@ -1,0 +1,612 @@
+
+
+datatype TextLineFlags (uint16)
+	flags
+		// Error
+		BreakPoint
+		Colored
+		Found
+		CurrFound
+		Last
+		AvoidLastChar
+		FakeMsg
+
+
+class TextViewLine (list)
+	linkage
+		cpp_part Line
+	contains TextViewLine
+
+	|string|				Text
+	|message?|				Message
+	|Error?|				DrawError
+	|int|					MsgPos
+	|int|					vline
+	|int|					tline
+	|TextLineFlags|			State
+
+
+	constructor (|int| pos)
+		.position = pos
+
+
+	render
+		if !.parent
+			for c in self
+				c.render(fs)
+				fs <~ '\n'
+		  else
+			fs <~ "${.position}: "
+			fs <~ '"'
+			fs.appendescape(.text)
+			fs <~ '"'
+
+	helper BackHasIgnoringSpaces (|string| name, |int| pos, |bool|)
+		pos = pos-.Position
+		while --pos >= 0
+			|| t = .text[pos]
+			ifn t == ' ' or '\t'
+				return .Text[pos-(name.length-1), name]
+		
+	function DrawRange (|ivec2|)
+		|| p = .position
+		|| L = .text.length
+		return (P, P+L)
+		
+
+	operator contains (|ind| b, |bool|)
+		|| d = .drawrange
+		ifn self is last
+			d.x2 -= 1 
+		return d contains b
+
+	syntax is (|TextLineFlags| F, |bool|)
+		return .state&F
+	
+	syntax is (|TextLineFlags|F, assigns:|bool|)
+		if value
+			.state |= f
+		  else
+			.state &= ~F
+
+//	function Contains (|int| x, |bool|)
+//		return x >= .position and x < .after
+//
+//	function NotReallyContains (|int| x, |bool|)
+//		if x < .position
+//			return true
+//		if x+1 > .after
+//			return true // what about being on the last byte?
+
+
+	function XOfChar (|ind| Pos, |int|)
+		return .SquaresAtByte(pos) * font.width
+
+	
+	function SquaresAtByte (|ind| B, |int|)
+		b -= .position
+		require b > 0
+		
+		|| StrEnd = b + .text.address
+		for (c.CodePoints in .text) (after)
+			if c == '\t'
+				rz += rz.tabswidth
+			  else
+				rz++
+			if after >= Strend
+				exit
+
+	
+	function After (|int|)
+		return .position + .text.length
+
+
+	function ByteOfX (|int| X, |ind|)
+		|| chars	= (x max 0) / font.width
+		|| bytes	= .text.CountBytesInSquares(chars) min .text.length
+		return bytes + .position
+	
+
+	helper message.addpos (|int| p)
+		opt norefcounts
+		for ch.flat in self: ch.position += p
+
+
+	helper Colorise (|message| msg, |bool| ParsedOK, |message|)
+		.msgpos = -1
+		.message = nil
+		isnt fakemsg
+
+		if msg
+			return .ColoriseSub(msg)
+
+		require !parsedok
+
+		|| r = .text.ParseWithError(nil)
+			.msgpos = .position
+			r.addpos(.position)
+			.ColoriseSub(r)
+			is fakemsg
+
+	
+	helper range (|intrange|)
+		return (.position, .after)
+
+	
+	helper EmptyLine (|bool|)
+		require self
+		return (.text.length == 1) and .text[0].istextline
+
+
+	helper ColoriseSub (|message| srch, |message|)
+		opt norefcounts
+		rz = .ColoriseSub2(srch)
+		|| r = rz
+		if !r or r.startsafter(.range)
+			r = srch
+			while r
+				r = r.parent
+				if (r == @arg) and r.startsbefore(.range)
+					exit
+		
+		if r and !r.startsafter(.range)
+			(self is breakpoint) = r is breakpoint
+			.msgpos = .position // isn't it r.position?
+			.message = r
+		  else
+			isnt breakpoint
+			
+		
+	function ColoriseSub2 (|message| srch, |message|)
+		opt norefcounts
+		|| r	= .range
+		while srch.EndsBefore(r)
+			|| p = srch
+			srch = srch.flatnext
+			if !srch
+				require p==@arg
+				return p
+			
+		if srch.StartsAfter(r)							// AFTER
+			return srch
+			
+		while srch.startsbefore(R) and srch.iscontainer
+			|| nxt = srch.flatnext #loop
+			if nxt.StartsAfter(r)
+				exit
+			srch = nxt									// what about...
+		
+		(self is breakpoint) = srch is breakpoint
+		return srch
+
+
+	helper message.NextColor (|int| s, |message|)
+		opt norefcounts
+		|| nxt = self
+		rz = nxt
+		|| LastAfter = nxt.after
+		while nxt
+			|| curr = nxt
+			nxt	= nxt.flatnext
+			if curr.after <= s					// too far back
+				if curr.after > lastafter
+					LastAfter = curr.after
+					rz = curr
+				continue						// go next
+
+			|| cp	= curr.position
+			if (cp <= s)
+				rz = curr
+			  elseif !nxt or nxt.position > cp
+				exit
+
+			|| par	= curr.parent				// special coloring
+			if par and par.contains(s, true)
+				|| pt = par.func
+				if pt == @type
+					return par
+				if !curr.prev
+					if (pt == @decl) or (pt == @func and curr == @thg) 
+						return par
+
+
+	function Ends (|bool|)
+		return .endswithline or self is last
+		
+		
+	function EndsWithLine (|bool|)
+		return .text.EndsWithLine
+
+
+	function DrawSelSub (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| g)
+		opt min 3
+		|| M = .DrawRange
+		require (r.x <= m.x2) and (r.x2 >= m.x)
+		|| Start  = .SquaresAtByte(R.x1 max M.x1)
+		|| Finish = .SquaresAtByte(R.x2 min M.x2)
+		require Finish > Start
+		
+		|| Y = parent.abstop - (vline+1) * parent.lineheight
+		|| X = parent.TextLeft
+		|| n = font.Width
+		x += n - 2
+
+		|| sel = (x+start*N,  y,  x+finish*N,  y+parent.lineheight)
+		sel.x -= (Start == 0)
+		sel.x--
+		
+		|| LinePos = r.x2-(1+m.x1)
+		if (.text[linepos].IsTextline) or (r.x2 > m.x2)
+			sel.x2 = parent.right-1
+		  elseif r.x2==m.x2
+			sel.x2++
+
+		Where.RectStyled(sel, g)
+
+
+	function SetLineNum (|int| t, |int|)
+		.tline = t
+		return t + .endswithline
+
+	
+	function TrySetError (|error| e, |bool|)
+		opt norefcounts
+		|| old = .drawerror
+			e.when = old.when
+		.drawerror = e
+		e.Obj = self
+		return e == old
+
+
+	function InitDefaults (|textview| parent, |int| t, |int|)
+		opt norefcounts
+		|| e = parent.MyError
+			if (self contains e.position) and (!e.obj) 
+				e.obj = self
+				.drawerror = e
+		if parent.ParsedMessage
+			is colored
+		return .SetLineNum(t)
+
+
+	function TakeEntireText (|string| txt, |ind| p, |ind|)
+		.Text = txt[p, int.max]
+		(self is AvoidLastChar) = .EndsWithLine
+		is last
+	
+	
+	function FindWhereLineBreaks (|string| txt, |int| MaxWidth, |bool| IsInline, |ind| p, |ind|)
+		.position = p
+		if .vline > 1000K
+			return .TakeEntireText(txt, p)					// just give up wrapping
+
+		if p >= txt.length // edge case.
+			.Text = ""
+			is last
+			return -1
+
+		|| i = txt.WrapSub(MaxWidth, IsInline, p)
+		.Text = txt[p, i]
+		(self is AvoidLastChar) = .EndsWithLine
+		if (i >= txt.length) and !.EndsWithLine
+			is last
+			return -1
+		isnt last
+		return i
+	
+	module
+		|Error|					TextErrors 
+
+
+
+helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
+	opt norefcounts
+	|| e = d.drawerror$
+	if (e is parse) and .ParsedMessage			// obviously it parsed ok.
+		d.drawerror = nil
+		return
+	|| r = .lastrect
+	y++
+	r.y	= y
+	r.y2 = y + .lineheight
+	|| lm= 0.225
+	|| v = (1.0, 0.1, 0.1, lm)
+	if e == .myerror
+		v = (1.0, 0.15, 0.1, 0.35)
+	 
+	if e.severity == errorseverity.ok
+		v = (0.6, 0.6, 0.6, 0.25)
+	  elseif e.severity < errorseverity.problem
+		v = (0.6, 0.6, 0.1, 0.25)
+
+	if d contains .sel1
+		.myerror = e
+	if e is parse
+		|| Alpa = (e.when.ago.seconds - 1.0) * lm
+		if (Alpa <= lm)
+			sdlapp.touch(Self)
+		v.a = alpa min lm
+	where.RectBasic(r, v.px)
+
+
+helper textview.DrawFound (|image| Where, |int| y, |TextViewLine| D)
+	opt norefcounts
+	|| r = .lastrect
+	r.y	= y
+	r.y2 = y + 2
+	|| add = (0.15, 0.0)(d is currfound)
+	|| v = (0.6+Add, 0.5+Add, 0.1+Add, 0.4).px
+	where.RectBasic(r, v)
+
+
+helper textview.DrawLighter (|image| Where, |int| y)
+	|| r	= .lastrect
+	r.y		= y + 1
+	r.y2	= y + .lineheight + 1
+	|| col	= (1.0, 1.0, 1.0, 0.06).px
+	where.RectBasic(r, col)
+
+
+helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |imagepixel| lc,  |int|)
+	opt norefcounts
+	|| x = .DrawOneStartLine(d.text) 
+	|| big		    = .LineNumWidth
+		|| P		= (x-3, y)
+		|| shift	= big - d.tline.LineNumWidth
+		|byte[8]|   buff
+		for i in 8
+			buff[i] = '0'
+		d.tline.render(&Buff[shift], 8-shift)
+		if d.tline != (d.prev.tline?)
+			|| draw	= false
+			for i in 8
+				|| c = buff[i] #loop
+				if c != '0'
+					draw = true
+				if draw
+					p.x = font.small!.DrawChar(c, Where, p, lc)
+		x += big * font.width
+	if .Alignment is right and .Alignment isnt left
+		|| m = d.text.Bounds.x*font.width+8
+		|| w = .width
+		x += w - m
+	return x
+
+
+helper TextView.UseColorAnyway (|int|)
+	// what about the expectsparse thing?
+	ifn .isinline
+		if .ParsedMessage or .myerror
+			return 2
+		return 3
+
+
+helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| usecol, |imagepixel| lc)
+	opt norefcounts
+	opt min 3
+	|| GoUp = (7 - .lineheight)/2
+	if d.drawError //  i guess right?
+		if .myerror 
+			.drawerror(where, y+GoUp, d)
+		  else
+			d.drawerror = nil // sigh. crappy bug fix
+	if d is found
+		.drawfound(where, y+GoUp, d)
+	if .CanDrawLight(d)				// linelight
+		lc.addint(80)				// need to use ._PreferPrevLine
+		.DrawLighter(where, y+goup)
+
+	|| x	 = .DrawLineNumber(where, d, y, lc)-1
+	|| state = MsgTextDrawState(x, d)
+	if d is breakpoint
+		|| fx = x - (font.width+1)
+		state.font.DrawChar('\18', Where, (fx, y), nil)
+	
+	|codepoint| Prev
+	|| xlimit = .lastrect.x2
+	for (c.CodePoints2 in state.t) (pos)
+		x = state.next(c, pos)
+		if x > xlimit
+			exit
+		ifn useCol & 2
+			UseCol = (d is colored)|int|
+		|| col = ¥.GetColor(state.msg, usecol, pos)
+		if d.drawError and c == 9 and prev == 32 
+			c = -c
+		  elseif c.istextline
+			0
+		  else
+			if state.msg.canilluminate(pos)
+				.DrawIlluminated(where, (x,y-2))
+		state.font.DrawChar(c, Where, (x, y), col, 1)
+		prev = c
+	
+	if .autolim(d)
+		if d.islast // last line draw too early with autocomplete
+			x += font.width // but we shouldn't need this!
+		.DrawAuto(Where, d, x, y)
+
+
+function message.CanIlluminate (|ind| p, |bool|)
+	if self is Editable
+		|| r = .range // + .rangetrim
+		return r.x <= p and r.x2 > p 
+
+	
+helper TextView.DrawIlluminated (|image| where, |ivec2| P)
+	|| r	= (p, p+(font.width, .lineheight))
+	|| col	= (1.0, 1.0, 1.0, 0.2).px
+	where.RectBasic(r, col)
+
+
+helper TextView.AutoLim (|textviewline| d, |bool|)
+	if .CanAutoComplete and .AutoCompleteString
+		|| after = d.after
+		if d is last
+			after++ // ??
+		if (.Sel1 == after-1)  and  (d.Ends)
+			return true
+
+
+helper TextView.FakeAutoComplete (|int|)
+	|| n = .autocompleteback
+	if .autocompletestring=="" or .autocompletestring.length == n
+		// if the length is equal, we don't want to do it.
+		// cos we got the entire thing already. no point.
+		// why replace abc with abc. is that what this does?
+		return -1
+	return n
+
+
+helper TextView.DrawAuto (|image| where, |textviewline| d, |int| x, |int| y)
+	|| n = .FakeAutoComplete
+	|| str = (.autocompletestring[n, int.max], "...")(n>=0)
+	|| fs = font.small
+		fs.drawtext(str, where, (x,y), colors.white(0.3))
+	
+
+
+struct MsgTextDrawState
+	linkage: cpp_Part msc
+	|int|					i
+	|int|					x
+	|int|					Adder
+	|message--?|			msg
+	|string--|				t
+	|image--|				font
+	
+	function Next (|&codepoint| pc, |&int| ppos, |int|)
+		opt norefcounts
+		|| c = *pc
+		|| w = (1, .i.tabsWidth)(c != '\t')
+		rz   = .x
+		.x   = rz + w*font.width
+		.i  += w
+		|| m = .msg
+			|| pos	= *ppos
+			*pc		= c.ImproveDraw(.t, pos)
+			pos	   += .adder, *ppos = pos
+			.msg	= m.NextColor(pos)
+			
+		
+	module
+		function New (|int| x, |textviewline| d, |MsgTextDrawState|)
+			rz.i = 0
+			rz.x = x
+			rz.adder = d.msgpos
+			rz.msg = d.message
+			rz.t = d.text
+			rz.font = font.small!
+
+
+helper codepoint.ImproveDraw (|string| t, |int|pos, |codepoint|)
+	if self == '!'
+		if t[pos+1] == '='
+			return 130
+	  elseif self == '='
+		if t[pos-1] == '!'
+			return 131
+	  elseif self == '<'
+		if t[pos+1] == '~'
+			return 132
+	  elseif self == '~'
+		if t[pos-1] == '<'
+			return 133
+	return self
+
+
+function int.LineNumWidth (|int|)
+	opt norefcounts
+	|| l = self
+	if l < 100 // 2 min
+		return 2
+	if l < 1000
+		return 3
+	if l < 10000
+		return 4
+	return 5
+
+
+function string.TextLineCount (|int|)
+	|| a = 0
+	|| b = 0
+	for c in self
+		a += c == 10 // faster
+		b += c == 13
+	return a + b
+
+
+helper string.CountBytesInSquares (|int| Remain, |int|)
+	|| n = .length
+	|| i = 0
+	require remain > 0 and n > 0
+	for (c.codepoints in self) (After)
+		if c == '\t'
+			i += i.tabswidth
+		  else
+			i++
+		if i >= remain
+			return (after - .address)|int|
+	return .length
+
+
+function TextView.DrawOneStartLine (|string| txt, |int|)
+	|| s = .lastrect
+	|| b = font.width
+	|| x = s.x1 + b
+	if .Alignment is CenterH
+		|| W = (txt.length) * font.width
+		x += (s.width - W)/2
+	return x
+
+
+helper string.HasWord (|string| s, |ind| i = 0, |bool|)
+	return self[i, s]  and  self[s.length].iswhite
+
+
+extend message
+	function EndsBefore (|intrange| r, |bool|)
+		return .after <= r.x
+	function StartsAfter (|intrange| r, |bool|)
+		return .position >= r.x2
+	function StartsBefore (|intrange| r, |bool|)
+		return .position < r.x
+		
+	
+	
+function Textviewline.ReclaimStart (|int| p, |textviewline|)
+	opt norefcounts
+	rz = self
+	while
+		if rz.after > p
+			return rz 
+		rz = rz.next #loop
+
+
+function Textviewline.ReclaimEnd (|int| T, |int| dp, |textviewline|)
+	opt norefcounts
+	|| v  = .vline
+	
+	while
+		self = .next #loop
+		.position += dp
+		T = .setlinenum(T)
+		.vline = ++v
+	return self
+
+
+//function message.RangeTrim (|ivec2|)
+//	if self == @sstr
+//		return (3,-3)
+//	if .isstring
+//		return (1,-1)
+
+function message.FlatRange (|intrange|)
+	opt norefcounts
+	rz = (int.max, 0)
+	for ch.flat in self
+		|| ss = ch.range
+		if ss.x >= 0
+			rz.x = rz.x min ss.x
+			rz.x2 = rz.x2 max ss.x2
+

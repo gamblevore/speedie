@@ -1,0 +1,29 @@
+
+
+role BigNum (string) {
+
+
+module {
+
+
+function Int   (|&byte| p, |int| n,  |int64|)
+	|int| b = *p++
+	if b & 2
+		return 0 // float	
+	rz = b >> 2
+	while --n >= 1
+		rz <<= 8
+		rz |= *p++
+		
+	if b & 1	// sign
+		rz = -rz
+	
+	// now we have just bits to get
+	// so we have a thing that could be an int or not
+	
+	// floats will be stored directly... no point encoding, we want this to be fast.
+	// however... ints as fast enough
+}
+	
+}
+

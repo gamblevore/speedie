@@ -1,0 +1,20 @@
+
+
+struct Mat4
+	|vec4[4]| Rows
+	constructor
+		for i in 4
+			self[i, i] = 1.0
+	
+	syntax access (|int| x, |int| y, |float|)
+		return .rows[y][x]
+		
+	syntax access (|int| x, |int| y, assigns:|float|)
+		.rows[y][x] = value
+	
+	
+function vec4.operatormul (|&mat4| M, |vec4|)
+	rz[0] = self • m.rows[0]
+	rz[1] = self • m.rows[1]
+	rz[2] = self • m.rows[2]
+	rz[3] = self • m.rows[3]

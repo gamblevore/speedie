@@ -1,5 +1,5 @@
 
-module QQFiles	
+module DefaultFiles	
 	
 	|| Todo = "
 		 			*** Todo file ***
@@ -10,7 +10,7 @@ module QQFiles
 "
 	
 	|| Roots = `
-roots 	// extra roots to search from. This doesn't affect compilation.
+roots 	// Extra roots for the IDE to display. This doesn't affect compilation.
 	"@spd/Library/library.input/"
 	"@spd/jeebox.scproj/jeebox.input/"
 
@@ -26,11 +26,17 @@ main
 "
 
 	|| DebugArgs = `args {
-	// "Argument Value"
+
 }
+
+/* // The format looks like this: //
+args
+	"arg1"
+	"arg2"
 pwd '.'
 env
 	setting="value"
+*/
 `
 
 

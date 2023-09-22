@@ -43,16 +43,27 @@ Date JB_Date__Now( ) {
 #endif
 
 
-void JB_Date__Sleep(Date Time) {
+static timespec DateToTimeSpec(Date Durr) {
     struct timespec ts;
-    ts.tv_sec = Time>>16;
-    ts.tv_nsec = (Time & ((1<<16)-1)) * 15258.7890625;
-    errno = 0;
-//    int PID = getpid(); // for debug
+    ts.tv_sec = Durr>>16;
+    ts.tv_nsec = (Durr & ((1<<16)-1)) * 15258.7890625;
+    return ts;
+}
+
+void JB_Date__Sleep(Date Durr) {
+    auto ts = DateToTimeSpec(Durr);
     while ((nanosleep(&ts, &ts) == -1 and errno == EINTR)) {
 		;
     }	
 }
+
+bool JB_Date__TrySleep (Date Durr) {
+	if (Durr <= 0)
+		return Durr == 0;
+    auto ts = DateToTimeSpec(Durr);
+    return nanosleep(&ts, 0) == 0;
+}
+
 
 uint64 JB_Date__TimeID () {
 	return JB_Date_TimeID(JB_Date__Now());

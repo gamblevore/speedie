@@ -51,32 +51,40 @@ struct jbstring : jbobject {};
 
 		// Message functions
 
-jbstring* jb_msg_name(jbmessage* self);
-jbsyntax jb_msg_func(jbmessage* self);
-int jb_msg_position(jbmessage* self);
-_voidptr jb_msg_tag(jbmessage* self);
+jbstring* jb_msg_name(jbmessage* self); /* The name of the node! */
+jbsyntax jb_msg_func(jbmessage* self); /* The node's syntactic-type. For example parsing "{}" would give a node of type 'arg', but parsing "()" would give a node of type 'list'. */
+int jb_msg_position(jbmessage* self); /* The byte-position of the original syntax that created this node. Useful for error-reporting. */
+void* jb_msg_tag(jbmessage* self); /* Attached user-defined value. */
 void jb_msg_nameset(jbmessage* self, jbstring* Result); /* Sets the name. */
 void jb_msg_funcset(jbmessage* self, jbsyntax Result); /* Sets the syntactic type */
 void jb_msg_positionset(jbmessage* self, int Result); /* Sets the byte-position. Jeebox doesn't use this value other than to store it for you. You might want to set the position if you created some nodes yourself via jb_msg_create. Obviously those nodes wouldn't have a position. */
-void jb_msg_tagset(jbmessage* self, _voidptr Result); /* In case you want to attach a user-defined value to the node, to use for your own purposes. */
+void jb_msg_tagset(jbmessage* self, void* Result); /* In case you want to attach a user-defined value to the node, to use for your own purposes. */
 void jb_msg_firstset(jbmessage* self, jbmessage* Result); /* Inserts 'Result' as the first child, and safely-removes it from it's old tree. You don't need to do anything to keep the next/prev/parent/etc values correct! They are updated for you. Same for all tree-node setters: jb_msg_lastset, jb_msg_prevset, jb_msg_nextset */
 void jb_msg_lastset(jbmessage* self, jbmessage* Result); /* Same as jb_msg_firstset. Inserts 'Result' as the last child. */
 void jb_msg_prevset(jbmessage* self, jbmessage* Result); /* Same as jb_msg_firstset. Inserts 'Result' as our prev-sibling. Does nothing if 'self' has no parent. */
 void jb_msg_nextset(jbmessage* self, jbmessage* Result); /* Same as jb_msg_firstset. Inserts 'Result' as our next-sibling. Does nothing if 'self' has no parent. */
-jbmessage* jb_msg_first(jbmessage* self);
-jbmessage* jb_msg_last(jbmessage* self);
-jbmessage* jb_msg_prev(jbmessage* self);
-jbmessage* jb_msg_next(jbmessage* self);
-jbmessage* jb_msg_parent(jbmessage* self);
-jbmessage* jb_msg_flatnext(jbmessage* self);
-jbmessage* jb_msg_flatafter(jbmessage* self);
-jbmessage* jb_msg_root(jbmessage* self);
+jbmessage* jb_msg_first(jbmessage* self); /* Gets the first child of this node, if it exists. */
+jbmessage* jb_msg_last(jbmessage* self); /* Gets the last child of this node, if it exists. */
+jbmessage* jb_msg_prev(jbmessage* self); /* Gets the previous-sibling, if it exists. */
+jbmessage* jb_msg_next(jbmessage* self); /* Gets the next-sibling, if it exists. */
+jbmessage* jb_msg_parent(jbmessage* self); /* Gets the parent of this node, if it exists. */
+jbmessage* jb_msg_flatnext(jbmessage* self); /* Lists over the tree as if it were one-dimensional! A kind of 'stateless-tree-traversal'! */
+jbmessage* jb_msg_flatafter(jbmessage* self); /* If you want to loop over all the nested-children (descendants) of one node, but that node is contained in a tree (it's not the root), you'll need to call this function first. Returned node is the 'end-marker'. Once you reach it, you stop. Example:
+	Message* SearchMe = TheMsgYouWantToSearch();
+	Message* LoopEnd = jb_msg_flatafter(SearchMe);
+	for (Message* LoopCurr = SearchMe;  LoopCurr!=LoopEnd;  LoopCurr = jb_msg_flatnext(LoopCurr)) {
+		DoSomethingTo(LoopCurr); // every descendant of SearchMe comes here!
+	}
+ */
+jbmessage* jb_msg_root(jbmessage* self); /* Finds the top-most parent. */
 void jb_msg_remove(jbmessage* self); /* Removes the node from the tree. */
 jbstring* jb_msg_render(jbmessage* self, int mode); /* Renders the tree as a string! */
-jbstring* jb_msg_ast(jbmessage* self);
-jbmessage* jb_msg_parseast(jbmessage* self);
-jbmessage* jb_msg_copy(jbmessage* self, jbmessage* layer);
-jbmessage* jb_msg_create(jbmessage* self, jbsyntax Type, jbstring* Name);
+jbstring* jb_msg_ast(jbmessage* self); /* Renders the structure of the tree in a human-readable format. Useful to understand the parse-tree. This gives you an idea of how to move across the tree using jb_msg_child/prev/parent/etc! */
+jbmessage* jb_msg_parseast(jbmessage* self); /* Does the opposite of jb_msg_ast, almost. You'll need to parse the string first, then call jb_msg_parseast */
+jbmessage* jb_msg_copy(jbmessage* self, jbmessage* layer); /* Copies the node's entire tree structure, positions, names and all. */
+jbmessage* jb_msg_create(jbmessage* self, jbsyntax Type, jbstring* Name); /* Creates a new node with the type and name provided.
+
+		The node is created as the last child of 'self'. If 'self' is nil... the node is created with no parent (this is fine). */
 void jb_msg_error(jbmessage* self, jbstring* ErrorMsg); /* Lets you add your own error messages to the tree. */
 jbmessage* jb_msg_expect(jbmessage* self, jbsyntax Type, jbstring* name, jbmessage* ErrPlace); /* Test the name and type, (or existance) of a message node. */
 jbmessage* jb_msg_access(jbmessage* self, jbsyntax Type, jbstring* name, bool IsError);
@@ -84,38 +92,44 @@ jbmessage* jb_msg_access(jbmessage* self, jbsyntax Type, jbstring* name, bool Is
 
 		// Syntax functions
 
-jbstring* jb_syx_name(jbsyntax self);
-jbstring* jb_syx_longname(jbsyntax self);
+jbstring* jb_syx_name(jbsyntax self); /* The syntax's short-name, for example "a=b" would return "rel". */
+jbstring* jb_syx_longname(jbsyntax self); /* The syntax's human-readable name, for example "a=b" would return "relationship". */
 
 
 		// String functions
 
 _cstring jb_string_address(jbstring* self);
-int jb_string_length(jbstring* self);
-jbstring* jb_string_compress(jbstring* self);
-jbstring* jb_string_decompress(jbstring* self);
-jbstring* jb_string_copy(jbstring* self);
-jbmessage* jb_string_parse(jbstring* self, jbstring* path);
-jbstring* jb_string_escape(jbstring* self);
+int jb_string_length(jbstring* self); /* String length, in bytes. A nil-string is acceptable and gives 0 length. */
+jbstring* jb_string_compress(jbstring* self); /* Compresses the string using the inbuilt 'mz' format. */
+jbstring* jb_string_decompress(jbstring* self); /* Deompresses the string using the inbuilt 'mz' format. */
+jbstring* jb_string_copy(jbstring* self); /* Copies the string into a new string, which you can modify the contents as you like, before passing it to anything else. (Strings are meant to be "immutable" (their content doesn't change), but it's OK to modify it right after copying. */
+jbmessage* jb_string_parse(jbstring* self, jbstring* path); /* Parses the string into a tree! Parsing is the most important function in Jeebox! Returns nil if invalid jeebox code is detected. You must call jb_errors to detect that parse-error or else you can’t parse more jeebox code.
+
+The optional path is not used for anything except generating better error messages, but good error-messages are quite important! */
+jbstring* jb_string_escape(jbstring* self); /* Turns a string like "${}" into a string like "\${}". To make it safe to be parsed b Jeebox. */
 void jb_string_print(jbstring* self); /* Prints this string to console. Useful for debugging. */
 void jb_string_printline(jbstring* self); /* Same as jb_string_print except it ends with a \n. */
-int64 jb_string_int(jbstring* self, jbmessage* m);
-double jb_string_float(jbstring* self, jbmessage* m);
+int64 jb_string_int(jbstring* self, jbmessage* m); /* Parses this string into an integer. Allows hex also, like '0xffff'. If you pass a 'message' into this, then invalid strings will get reported into jb_errors()  */
+double jb_string_float(jbstring* self, jbmessage* m); /* Parses this string into a double-precision float. If you pass a 'message' into this, then invalid strings will get reported into jb_errors()  */
 
 
 		// Global functions
 
-jbsyntax jb_syntax(jbstring* name);
-jbstring* jb_str(_cstring Str, int Length, _voidptr Release, _voidptr Tag);
+jbsyntax jb_syntax(jbstring* name); /* Looks up the syntax of that name from the syntax-table. The name must be in short-form, like "arg", not "argument". (The list of short-form names is in api.h, you will see $arg, $acc... its those minus the $.) */
+jbstring* jb_str(_cstring Str, int Length, void* Release, void* Tag); /* Creates a JBString from a c-string. Expects the c-string to remain unchanged until the JBString is freed. Length is optional. Can optionally pass a call-back to release your c-string, during freeing the JBString. */
 jbstring* jb_cstr(_cstring Str); /* Creates a JBString from a c-string. Expects the c-string to remain unchanged until the JBString is freed. */
 void jb_delete_(jbobject* obj); /* Deletes the object from memory. Don't call directly, use jb_incr jb_decr. */
-jbmessage* jb_errors();
-bool jb_ok();
+jbmessage* jb_errors(); /* Returns a list of errors as children of the returned node. Also clears the error-list. Each child's name is the error-description and each child's position is the error-position. */
+bool jb_ok(); /* Returns if any errors were detected. Doesn't change anything. Call jb_errors to actually get the error-list and remove them. */
 void jb_debug(jbobject* o); /* Prints a description of this object, useful for debugging. */
-int jb_init(int Flags);
+int jb_init(int Flags); /* Inits Jeebox. Call this before any other Jeebox functions. Pass 1 to succeed silently, or else a message is printed. Returns zero for success.
+	
+If jb_init fails it will try print a debug message. If jb_init returns 0x10000 that means an out-of-memory error occurred. You can free memory and try again. */
 int jb_shutdown(); /* Frees all memory used by jeebox! */
 int jb_version();
-jbstring* jb_readfile(_cstring path, bool AllowMissingFile);
+jbstring* jb_readfile(_cstring path, bool AllowMissingFile); /* Reads entire file at this path. Relative paths are allowed. Will create errors if the file can't be read for any reason.
+	
+	If AllowMissingFile is true then it's OK for the file to not exist, no error is created in that case. This helps make your code is a bit less pedantic. */
 
 
 		// Jeebox Syntax

@@ -1,0 +1,103 @@
+
+
+class Macro 
+	|bool|				Cleaned
+	|string|  			Input
+	|message?| 			_Parsed
+	
+	constructor (|string| s)
+		cpp_part ConstructorStr
+		.input = s
+		
+	constructor (|message| s)
+		cpp_part ConstructorMsg
+		._parsed = s
+		
+	function Source (|message|)
+		opt norefcounts
+		rz = ._parsed
+		if !rz
+			rz = .input.parse
+			if rz
+				rz.wipepositions
+				._parsed = rz
+	
+	function Run (|[message]| prms=nil, |message|)
+		rz = message()
+		rz.BecomeMacro(self, prms)
+	
+	function Run (|message| prm1=nil, |message| prm2=nil, |message|)
+		cpp_part CallFast
+		rz = message()
+		TmpPrms <~ prm1
+		TmpPrms <~ prm2
+		rz.BecomeMacro(self, TmpPrms)
+		TmpPrms.clear
+	
+	module
+		|array of message| TmpPrms
+
+
+macro string.Macro
+	macro(–digest "_0")
+	
+
+extend message
+	helper MacroAvoidCopy (|message|)
+		if self isnt Inserted
+			is Inserted
+			return self
+		return  .copy
+
+
+	helper MacroSame (|message| prm, |message|)
+		rz = .copy
+		(prm is inserted)
+		rz.name = prm.name // why?
+	
+	
+	helper MacroPrm (|message| root,  |array? of message| prms,  |message| dest,  |Message|)
+		opt norefcounts
+		|| n = .name
+		|| c = n.First
+		if (c == '*') and (self == @brel)
+			|| f = .first
+			if f == "_" and @thg
+				for p in prms
+					if p isnt Inserted
+						dest <~ p.MacroAvoidCopy
+				return nil
+				// (first, secnd, A, B, C, D, E)
+			
+		if (c == '_'  and  n > 1) and n.IsInt(1) 
+			|| oop = prms[n.int|int|]		#expect (root, "Not enough params.")
+			|| f = .func
+			if f == @dot or @sdot or @str or @sstr or @char // anything except @thg?
+				return .MacroSame(oop)
+			return oop.MacroAvoidCopy
+		rz = Message(self)
+		.MacroCopy(root, prms, rz)
+
+
+	helper MacroCopy (|Message| root,  |array? of message| prms,  |Message| dest)
+		opt norefcounts
+		for v in self
+			dest <~ v.MacroPrm(root, prms, dest)
+
+
+	function BecomeMacro (|Macro| M,  |array? of message| prms=nil)
+		opt norefcounts
+		|| s = m.source
+			.clear
+			.func = s.func
+			.name = s.name
+			.appendmacro(m, prms)
+	
+		
+	function AppendMacro (|Macro| M,  |array of message| prms=nil)
+		using self,  opt norefcounts
+		m.Source.MacroCopy(self, prms, self)
+		for r in prms
+			check (r is inserted)  (r, "Unused parameter to macro")
+
+

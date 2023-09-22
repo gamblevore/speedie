@@ -1,14 +1,15 @@
+
 roots
 	"@spd/Library/library.input/"
 	"@spd/jeebox.scproj/jeebox.input/"
 	"@spd/GUI.scproj/gui.input/"
 	"@spd/Image.scproj/image.input/"
 	"@spd/network.scproj/network.input/"
+	
+unused_lib_funcs
+	"@spd/GUI.scproj"
+	"@spd/Image.scproj/"
 
-
-// something has gone horribly wrong somewhere?
-	// cant find things
-	// cant click on the todo file?
 /*
 Bloat fix plan:
 	* use macros! get rid of loads of stuff

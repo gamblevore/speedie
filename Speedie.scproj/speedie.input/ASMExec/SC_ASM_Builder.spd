@@ -25,7 +25,7 @@ function IR.AddRegParam (|message| src, |uint| write)
 datatype µParam (uint16) {
 	linkage: cpp_class ASMParam
 	function Form2 (|byte|)
-		return .bitsize (|) (.issigned << 7)
+		return .bitsize ||| (.issigned << 7)
 	function Max (|int|)
 		|| oof = .issigned|int|
 		return (1 << ((.bitsize|int|)-oof))|int|

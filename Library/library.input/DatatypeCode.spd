@@ -8,7 +8,7 @@ datatype DataTypeCode (uint16)
 		|DataTypeCode|
 	// 8 = "is a number" bit...
 		sign	= 64
-		u8	    =               0   + 8
+		byte    =               0   + 8
 		char	= 0 + 0  + 64 + 0   + 8
 		Byte2   = 1 + 0  + 0  + 0   + 8
 		Byte3   = 2 + 0  + 0  + 0   + 8
@@ -31,11 +31,9 @@ datatype DataTypeCode (uint16)
 		Float   = 0 + 32 + 64 + 128 + 8
 		Double  = 0 + 48 + 64 + 128 + 8
 		Vec2	= 1 + 32 + 64 + 128 + 8
-		Vec3	= 2 + 32 + 64 + 128 + 8
+		Vec3    = 2 + 32 + 64 + 128 + 8 // vec3 sucks kinda
 		Vec4	= 3 + 32 + 64 + 128 + 8
-		// no need
-		// Mat2	  
-		// Mat4	// use higher bits
+		// Mat4	// make it a struct? mat3 also?
 		Int		= 0 + 32 + 64 + 0   + 8
 		UInt	= 0 + 32 + 0  + 0   + 8
 		bool	= 0
@@ -44,10 +42,8 @@ datatype DataTypeCode (uint16)
 		u64	 = uint64
 		f64	 = double
 		f16	 = hfloat
-		s8	 = char
-		byte = u8
-		int8 = char // remove s8+u8!!
-		uint8 = u8
+		int8 = char
+		uint8 = byte
 		u16	 = uint16
 		s16	 = int16
 		atomic_int64	= 0 + 48 + 64 + 0   + 8 + 4
@@ -56,14 +52,15 @@ datatype DataTypeCode (uint16)
 		atomic_uint		= 0 + 32 + 0  + 0   + 8 + 4
 		atomic_byte		=               0   + 8 + 4
 		
+		_void = 0
+		_voidptr = 48
+		cstring = 48
+		
 		UnusedType = int64 &~ 8
 	
 	
 	syntax is (|datatypecode| M, |bool|)
 		return self == M
-
-	syntax isnt (|datatypecode| M, |bool|)
-		return self != M
 
 	function ExistsButBadlyNamedOrDesigned (|bool|)
 		// not sure what this is meant to do. Only used in one place anyhow.
@@ -101,7 +98,7 @@ datatype DataTypeCode (uint16)
 	
 	function SetSigned (|bool| b, |DataTypeCode|)
 		if b
-			return (self) (|) (1 << 6)
+			return (self) ||| (1 << 6)
 		  else
 			return (self)  &~ (1 << 6)
 	

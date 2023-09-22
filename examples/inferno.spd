@@ -1,0 +1,36 @@
+
+http://shadertoy.com/user/Xor	// Original by @XorDev, 
+
+
+import "GUI"
+
+main
+	sdlapp.Rescale(8)
+	return MainImage
+
+
+function MainImage (shadertoyfunc)
+	|vec3| Q
+	|| r = resolution
+	|float| itau = 1.0 / (π*2.0)
+	|| T = .Time * 0.2 + vec4(0,11,33,0)
+	|| Mat2 = mat2((T*itau).cos)
+	|| it = (.time*itau).sin*0.1
+	|| ip = (2.0*Pos-r.xy, 0.0) / r.y
+	|| p2 = ip • ip
+	
+	for i in (1.0, 0.0) by (-0.02)
+		|| p = ip
+		|| z = i - p2
+		z = (z max (z/-10000.0)).sqrt
+		p.z = z+it
+		|| xz = p.xz * mat2
+		p = (xz.x, p.y, xz.y)
+		q += p * 0.5
+		
+		|| c = (q*itau).cos • (q.yzx*itau).sin
+		c = (c * itau * 3.3333).cos * 0.5 + 0.5
+
+		|| s = i*20.0 + vec4(6,5,4,3)
+		s = i * (s*itau).sin + i
+		rz += z.sqrt * (c pow 8.0) * s / 7.0

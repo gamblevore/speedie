@@ -27,8 +27,8 @@ extend ObjectLoader {
 
 	function Int (|int64|)
 		opt norefcounts
-		|| C = .Next #require
-		return C.name.parseint(c)
+		|| C = .Next
+			return C.int
 
 	function Bool (|bool|)
 		return .int|bool|
@@ -40,10 +40,10 @@ extend ObjectLoader {
 		opt norefcounts
 		return .Next$.float
 	
-	function ObjectSub (|message|c, |object|)
+	function ObjectSub (|message| c, |object|)
 		opt norefcounts
 		if (c == @thg)
-			return .dict[c.name]
+			return .dict![c.name]
 		  elseif (C == @str)
 			return c.name.unshare
 	
@@ -59,7 +59,7 @@ extend ObjectLoader {
 	function ItemName (|string|)
 		opt norefcounts
 		|| c = .curritem
-		return c.first.nyme.unshare
+		return c.firstname.unshare
 
 	function ItemIsInt (|bool|)
 		opt norefcounts
@@ -81,7 +81,7 @@ extend ObjectLoader {
 
 	function LoadRaw (|&byte| f, |int| n)
 		opt norefcounts
-		|| Raw = .next.nyme.unhex // write zero if can’t find? makes sense...
+		|| Raw = .next.name.unhex // write zero if can’t find? makes sense...
 		memory.copy(f, raw.addr, n min raw.length)
 		
 	
@@ -91,12 +91,12 @@ extend ObjectLoader {
 struct ObjectLoader {
 	linkage
 		cpp_part LD
-	|dictionary--|				Dict
-	|Message--|					CurrItem
-	|object--|					CouldntLoad
-	|Saveable|					Result
-	|Message--|					DataError
-	|Message--|					NoClass
+	|dictionary--?|				Dict
+	|Message--?|				CurrItem
+	|object--?|					CouldntLoad
+	|Saveable?|					Result
+	|Message--?|				DataError
+	|Message--?|				NoClass
 	
 	function VerifyFormat (|message|root, |bool|)
 		opt norefcounts
@@ -115,9 +115,7 @@ struct ObjectLoader {
 
 	function LoadClass (|message| msg, |Dictionary| dict)
 		opt norefcounts
-		|| Cls = .GetClassOf(msg) #require
-		debug_require cls.name // what?
-		
+		|| Cls = .GetClassOf(msg) #require		
 		|| items = msg.last
 		expect (items == @list) (items)
 		
@@ -128,8 +126,8 @@ struct ObjectLoader {
 	function LoadObject (|message| msg, |Dictionary| dict, |&ClassData| Cls)
 		opt norefcounts
 		require (msg == @item)
-		|| name = msg.first
-		|| Result = Cls.AllocZeroed|saveable|
+		|| name = msg.first $
+		|| Result = Cls.AllocZeroed?|saveable|
 			dict[name.name] = result
 
 
@@ -140,10 +138,10 @@ struct ObjectLoader {
 			if (cls == @tmp)
 				for (line in cls.last)
 					|| name = line.first
-					|| result = d[name.name]
-					if (result)
-						.CurrItem = line.last.first
-						result.__loadproperties__(self)
+						|| result = d[name.name]
+						if (result)
+							.CurrItem = line.last.first
+							result.__loadproperties__(self)
 			  elseif (cls == @name)
 				.result = d[cls.name]
 	
@@ -157,18 +155,17 @@ struct ObjectLoader {
 	
 	function GetClassOf (|message| msg, |&ClassData|)
 		opt norefcounts
-		|| Data = ObjectLoader.ClassList[msg.name] 
-		if (!Data)
-			.Noclass = msg
-		return (*data)|&classdata|
+		|| Data = ObjectLoader.ClassList![msg.name] 
+			return (*data)|&classdata|
+		.Noclass = msg
 	
 	
 	module
-		|dictionary of int64| ClassList = nil		// _voidptr is better
+		|dictionary of int64| ClassList
 		
 		function LoadOne (SaverLoadClass)
-			|| naem = string.fromc(cls.name).lowercase
-			objectloader.classlist[naem] = cls|int64|
+			|| name = string.fromc(cls.name).lowercase
+			objectloader.classlist![name] = cls|int64|
 
 		function Init
 			require !.ClassList

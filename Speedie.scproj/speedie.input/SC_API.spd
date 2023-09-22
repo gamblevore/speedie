@@ -5,19 +5,19 @@ module SC_API
 	function Message.APICppProject (|string|)
 		opt norefcounts
 		|| f = .scfile
-		|| it = f.exportname
-			return it.lowercase
-		|| a = f.proj
+			|| it = f.exportname
+				return it.lowercase
+			|| a = f.proj
 			|| b = a.mod
-				|| c = b.exportname
-					return c.lowercase
+			|| c = b.exportname
+				return c.lowercase
 		return "app"
 
 
-	function NewAPI (|message| api, |string| part, |SCBase| parent, |string| proj)
+	function NewAPI (|message| api, |string| part, |SCNode| parent, |string| proj)
 		proj += "_"
 		|| name = api[@thg]					#require
-		|| arg = api[@arg, -1]				#require
+		|| arg = api.last(@arg)				#require
 		|| cpp = arg.find(@tmp, "cpp_name")
 		
 		using (arg)
@@ -42,9 +42,9 @@ module SC_API
 		return compiler.program
 
 
-	function NewExportAPISub (|message| node, |scobject| parent)
+	function NewExportAPISub (|message| node, |SCObject| parent)
 		|| name = node[@thg]										#require
-		|| arg = name.next(@arg)									#require
+		|| arg = name.Next(@arg)								#require
 		
 		|| lib_tmp = arg.find(@tmp, "libraryname", true)		#require
 		|| lib_name = lib_tmp[@str]									#require
@@ -67,10 +67,10 @@ module SC_API
 			.NewAPI(node, "", Compiler.program, proj)
 			return
 		
-		|| name		= node[@thg]								#require
-		|| partname = name.next(@bra)[@thg]						#require
-		|| arg		= node[@Arg, -1]							#require
-		|| cls		= compiler[name]							#require
+		|| name		= node[@thg]						#require
+		|| partname = name.Next(@bra)[@thg]				#require
+		|| arg		= node.last(@arg)					#require
+		|| cls		= compiler[name]					#require
 
 		partname.parent.remove
 		for ch in arg

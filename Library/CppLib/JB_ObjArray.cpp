@@ -36,26 +36,23 @@ static bool ReAlloc_(Array* self, int C) {
 	return true;
 }
 
-bool JB_Array_Reserve(Array* self, int64 N) {
+
+static bool GrowToLength_(Array* self, int N) {
 	int C = self->Capacity;
 	if (N <= C) {
+		self->Length = N;
 		return true;
 	}
 	
 	if (N <= kArrayLengthMax) {
-		if (ReAlloc_(self, (int)N)) {
+		if (ReAlloc_(self, N)) {
+			self->Length = N;
 			return true;
 		}
     } else {
         JB_TooLargeAlloc(N, "array allocation");
     }
     return false;
-}
-
-static bool GrowToLength_(Array* self, int64 N) {
-	require (JB_Array_Reserve(self, N));
-	self->Length = (int)N;
-	return true;
 }
 
 
@@ -67,23 +64,24 @@ static void Clear_(Array* self) {
 }
 
 
-static void AdjustCapacity_(Array* self, int64 NewLength) {
-	self->Length = (int)NewLength;
-	if (!NewLength) {
-		Clear_(self);
-	} else {
+static void ShrinkCapacity_(Array* self, uint Smaller) {
+	self->Length = Smaller;
+	if (Smaller > 0) {
 		int C = self->Capacity;
-		if (NewLength <= (C/2) and C > 8) {
-			C = std::max((int)NewLength, 8);
-			ReAlloc_(self, C);
-		}
+		if (C <= 8 or Smaller*2 > C)
+			return;
+		C = std::max((int)Smaller, 8);
+		self->Capacity = C;
+		self->_Ptr = (JB_Object**)JB_realloc(self->_Ptr, C*sizeof(void*));
+		return;
 	}
+	Clear_(self);
 }
 
 
-void JB_Array_AppendCount( Array* self, JB_Object* Value, int64 Count ) {
+void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
 	require0 (Value and Count > 0);
-	int64 n = self->Length; 
+	int n = self->Length; 
 	require0(GrowToLength_(self, n+Count));
 	Value->RefCount += Count;
 	auto P = self->_Ptr + n;
@@ -106,35 +104,39 @@ static void Decr_(Array* self, int64 NewLength) {
 }
 
 
-bool JB_Array_FastShrink( Array* self, int64 NewLength ) {
+bool JB_Array_FastShrink( Array* self, int NewLength ) {
     int Length = self->Length;	
     if (NewLength < Length) {
 		Decr_(self, NewLength);
-		self->Length = NewLength;
+		self->Length = (int)NewLength;
 		return true;
 	}
 	return false;
 }
 
 
-void JB_Array_SizeSet( Array* self, int64 NewLength ) {
+void JB_Array_SizeSet( Array* self, int NewLength ) {
     if (JB_Array_FastShrink(self, NewLength)) {
-		AdjustCapacity_(self, NewLength);
+		ShrinkCapacity_(self, NewLength);
 	}
 }
 
 
 JB_String* JB_Array_Render(Array* self, FastString* fs_in) {
 	FastString* fs = JB_FS__FastNew(fs_in);
-	JB_FS_AppendByte(fs, '[');
-	int n = JB_Array_Size(self);
-    for_(n) {
-        JB_Object* obj = JB_Array_Value(self, i);
-        if (i)
-            JB_FS_AppendCString(fs, ", ");
-        JB_ObjRender(obj, fs);
-    }
-	JB_FS_AppendByte(fs, ']');
+	if (!self) {
+		JB_FS_AppendCString(fs, "nil");
+	} else {
+		JB_FS_AppendByte(fs, '[');
+		int n = JB_Array_Size(self);
+		for_(n) {
+			JB_Object* obj = JB_Array_Value(self, i);
+			if (i)
+				JB_FS_AppendCString(fs, ", ");
+			JB_ObjRender(obj, fs);
+		}
+		JB_FS_AppendByte(fs, ']');
+	}
 	return JB_FS_SmartResult(fs, fs_in);
 }
 
@@ -155,7 +157,7 @@ void JB_Array_Remove( Array* self, int Pos ) {
 		self->_Ptr[Pos] = self->_Ptr[Pos+1];
 		Pos++;  
 	}
-	AdjustCapacity_(self, N-1);
+	ShrinkCapacity_(self, N-1);
 	JB_Decr(Item);
 }
 
@@ -199,11 +201,13 @@ void JB_Array_Swap(Array* self, uint i, uint j) {
 	}
 }
 
-void JB_Array_Constructor0( Array* self ) {
+Array* JB_Array_Constructor0( Array* self ) {
+	JB_New2(Array);
 	self->Length = 0;
 	self->Capacity = 0;
 	self->_Ptr = 0;
 	self->Marker = 0;
+	return self;
 }
 
 
@@ -215,14 +219,22 @@ int JB_Array_Wipe(Array* self) {
 
 
 void JB_Array_ValueSet( Array* self, int Pos, JB_Object* Value ) {
-	if (Value) {
-		u32 n = (u32)self->Length;
-		if ((u32)Pos < n) {
-			JB_SetRef( self->_Ptr[Pos], Value );
-		}
-	} else {
-		JB_ReportMemoryError("Tried to set a nil value into an array", 0, nil);
+	if ((u32)Pos < (u32)(self->Length)) {
+		JB_SetRef( self->_Ptr[Pos], Value );
 	}
+}
+
+
+JB_Object* JB_Array_Pop(Array* self) {
+	if (self) {
+		int n = self->Length - 1;
+		if (n >= 0) {
+			JB_Object* rz = self->_Ptr[n];
+			ShrinkCapacity_(self, n);
+			return rz;
+		}
+	}
+	return nil;
 }
 
 

@@ -1,24 +1,23 @@
 
 
-|ErrorList| StdErr = ErrorList.new
-|ErrorList| StdErrOriginal = stderr
+|ErrorReceiver| StdErr = ErrorReceiver.new
+|ErrorReceiver| StdErrOriginal = stderr // remove?
 
-// hmmm... what should I do?
 // how to remove log
 
-prototype fnErrorLogger (|errorlist| self, |string| Data)
+prototype fnErrorLogger (|ErrorReceiver| self, |string| Data)
 
-class ErrorList
+class ErrorReceiver
 	linkage
 		cpp_part Rec
 		cpp_class JB_ErrorReceiver
 		visible true
 
-	contains ErrorList
+	contains ErrorReceiver
 
 	|Error|					Errors
-	|fnErrorLogger| 		_LogFunc
-	|object| 				_LogObj
+	|fnErrorLogger?| 		_LogFunc
+	|object?| 				_LogObj
 	|int|					MaxErrors
 	|int|					MaxProblems
 	|int|					ErrorCount
@@ -46,13 +45,13 @@ class ErrorList
 		Return self and !.errorcount
 	
 	function HasProblems (|bool|) // totallyok
-		Return self and .errorcount or .problemcount
+		Return self and (.errorcount ||| .problemcount)
 	
 	function HasAnything (|bool|) // totallyok
-		Return self and .errorcount or .problemcount or .warncount		
+		Return self and (.errorcount ||| .problemcount ||| .warncount)
 	
 	syntax append (|Error| Err)
-		cpp_part NewItem
+		cpp_part AppendErr
 		target debug
 			|| CanPrint = !.BadCount and error.autoprint
 		  else
@@ -61,7 +60,6 @@ class ErrorList
 			#!"Speedie" // useful marker for debugging...
 		
 		.incr(err)
-		require .CanAddMore(err.severity)
 		
 		err.path := .source
 		if Error.KeepStackTrace
@@ -87,13 +85,11 @@ class ErrorList
 
 	setter LogFile (|string|)
 		opt norefcounts
-		visible class~file
 		ifn Value contains "/"
 			value = file.Logs[value]
-		|| f = value.file
-		printline "Logging to: " + f
-		._LogObj = f
-		._LogFunc = LogFileWriter
+		if value
+			._LogObj = value.file
+			._LogFunc = LogFileWriter
 	
 	
 	helper LogFileWriter (fnErrorLogger)
@@ -168,7 +164,9 @@ class ErrorList
 	
 	function PrintErrors (|errorseverity| Level, |bool| PrintCount, |bool| shell, |int|)
 		cpp_part PrintErrorsMain
-		|| rec = self ?? stderr
+		|| rec = StdErr
+		if self
+			rec = self
 
 		|| fs    = faststring()
 		|| Count = rec.rendererrors(fs, level, shell)$
@@ -187,10 +185,11 @@ class ErrorList
 		self <~ " found.\n" // found."
 	
 	function BadCount (|int|)
+		visible
 		return .errorcount + .problemcount
 		
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
-		require !.BlockErrors and !ErrorList.OutOfMemory
+		require !.BlockErrors and !ErrorReceiver.OutOfMemory
 		if level == ErrorSeverity.problem
 			return (.problemcount < .maxproblems)
 		if level >= ErrorSeverity.error // a warning
@@ -199,20 +198,16 @@ class ErrorList
 	
 	
 	Syntax UsingComplete
-		stderr.printerrors
+//		stderr.printerrors // don't do this!
 		stderr = self
 
 		
-	Syntax Using (|ErrorList|)
+	Syntax Using (|ErrorReceiver|)
 		|| old = stderr
 		stderr = self
 		return old
 	
-	function ReturnErrors
-		opt norefcounts
-		for e in self
-			stderr <~ e
-
+	
 	function LastError (|error|)
 		visible
 		opt norefcounts
@@ -222,6 +217,8 @@ class ErrorList
 
 
 	module
+		|f64|		Progress
+		|String|	NonFatal = "Non-Fatal Internal Error"
 		function OutOfMemory (|bool|)
 			cpp_Wrapper JB_OutOfMemoryOccurred
 			
@@ -237,24 +234,16 @@ class ErrorList
 
 extend Object
 	syntax expect
-		"Non-Fatal Internal Error"
+		printline errorreceiver.NonFatal
 		app.CrashPrint
 		"${app.ObjMemory.strsize} memory used"
-		stderr.NewError(nil, "Non-Fatal Internal Error")
+		errorreceiver.NewError(nil, errorreceiver.NonFatal)
 
 
 extend string
 	syntax expect
 		visible
-		stderr.NewError(nil, self)
-
-
-function bool.OperatorPlus (|string| s, |bool|)
-	// idk... kinda usel
-	if self
-		return true
-	debugger
-	error s
+		errorreceiver.NewError(nil, self)
 
 
 datatype ErrorMarker (uint)

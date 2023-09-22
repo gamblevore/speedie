@@ -6,19 +6,26 @@
 
 
 
-class DataTypeWrapper
+//role DataObject (DataTypeWrapper)
+
+
+class DataObject
 	linkage
 		cpp_part Wrap
 		cpp_class DTWrap
 	contains int64
+	constants
+		kNothing = 0
+		kFree    = 1
+		kDelete  = 2
 	
 	|DataTypeCode|		DataType
 	|byte|				DeathAction
-	|int64|				PrivValue		//()
+	|int64|				PrivValue
 	
 	destructor
-		if .deathaction == kfree
-			Memory.free(.privvalue|_voidptr|)
+		if .deathaction == DataObject.kfree
+			Memory.free(.privvalue|&nil|)
 
 	
 	constructor (|int64| v)
@@ -33,12 +40,15 @@ class DataTypeWrapper
 		.PrivValue = b|int|
 
 	
-	constructor (|_voidptr| p)
+	constructor (|&nil| p)
+		cpp_part ConstructorVoidPtr
 		.datatype = datatypecode.unusedtype
 		.PrivValue = p|int64|
 
+
 	function First (||) // for floats... perhaps use this?    macro first: .privvalue|...(samebits)|
 		return .privvalue
+
 	
 	function Value (|int64|)
 		if (self) {return .privvalue}
@@ -65,61 +75,42 @@ class DataTypeWrapper
 			fs <~ .PrivValue
 
 	module
-		function NewFloat (|f64| v, |DataTypeWrapper|)
-			rz = DataTypeWrapper(true) 
+		function NewFloat (|f64| v, |Dataobject|)
+			rz = DataObject(true) 
 			rz.datatype = datatypecode.f64
 			rz.PrivValue = v.AsInt
-	
-	constants
-		kNothing = 0
-		kFree = 1
-		kDelete = 2
 
 
 
+// probably the capcity should just be raw byte capacity.
+// seems to make more sense... right? 
 class Memory
 	linkage
 		cpp_part Mrap
 		cpp_class MWrap
 		pragma noearlyfree
 	
-	|int|				Capacity		//()
-	|&byte|				_Ptr			//()
+	|int|				Capacity
+	|&byte|				_Ptr
 	|int|				Length
-	|uint16|			ItemSize		//()
-	|DataTypeCode|		DataType		//()
-	|byte|				DeathAction		//()
+	|uint16|			ItemSize
+	|DataTypeCode|		DataType
+	|byte|				DeathAction
 	contains byte // should be byte?
 	
-	
-	constructor (|int| ItemCount, |uint| ItemSize, |bool| DummyParam)
-		cpp_part ConstructorDummy // these two are the same?
-		|| Request = ItemCount * ItemSize
-		.ItemSize = ItemSize
-		.length = 0
-		._ptr = byte(Request)
-		.Capacity = (itemcount, 0)(._ptr)
-		.deathAction = datatypewrapper.kFree
-	
-	
-	constructor (|int| ItemCount, |uint| ItemSize)
-		|| Request = ItemCount * ItemSize
-		.ItemSize = ItemSize
-		.length = 0
-		._ptr = byte(Request)
-		.Capacity = (itemcount, 0)(._ptr)
-		.deathaction = datatypewrapper.kFree
-	
 
-	constructor (|int| ItemCount, |uint| ItemSize, |&byte| ptr)
+	constructor (|int| ItemCount, |uint| ItemSize, |&byte| ptr, |byte| DeathAction=DataObject.kfree)
 		cpp_part ConstructorPtr
 		.ItemSize = ItemSize
-		.length = itemcount
+		.length = 0
 		.Capacity = itemcount
 		._ptr = ptr
 	
 	function Ptr (|&...|)
 		return ._ptr|&...|
+		
+	function After (|&...|)
+		return (._ptr + .BytesUsed)|&...|
 		
 	setter Length (|int|)
 		if Value > .Capacity
@@ -140,15 +131,16 @@ class Memory
 			return cap
 
 
-	function DiffAt (|memory|other, |ind|)
+	function DiffAt (|memory| other, |ind|) // seems unused
+		disabled  "Unused? Also seems bad design."
 		|| n = other.length
 		if .length != n
 			return .length min n
 		|| p1 = ._ptr
-		|| p2 = p1 + n
+		|| pz = p1 + n
 		|| pc = other._ptr
 		
-		while p1 < p2
+		while p1 < pz
 			if *pc++ != *p1++
 				return (p1-1) - ._ptr
 		
@@ -157,9 +149,9 @@ class Memory
 		|| A1 = .ByteCapacity
 		|| A2 = other.ByteCapacity
 		|| A3 = A1 min A2
-		if A3
 			memory.copy(other.ptr, .ptr, A3)
 		return A3 == A1
+		
 		
 	function AppendPlace (|&...|)
 		|| L = .length
@@ -170,7 +162,7 @@ class Memory
 			if (!P2) // fail
 				return (&Memory.MDummy)|&...|
 			|| OldSize = .ByteCapacity
-			Memory.zero(p2 + OldSize, NewSize - OldSize) 
+			Memory.zero((p2 + OldSize), NewSize - OldSize) 
 			._ptr = p2
 	
 		.length = l + 1
@@ -187,33 +179,25 @@ class Memory
 
 	
 	function SetCap (|int| value, |bool|)
-		require .deathaction == datatypewrapper.kfree
+		require .deathaction == DataObject.kfree
 		|| S = .itemsize|int|
 		|| old = S * .capacity
 		|| New = S * value
 		|| Mem = Memory.realloc(._ptr, New)
 			._ptr = mem
 			.Capacity = Value 
-			|| extra = New-Old
-			if extra > 0
-				memory.zero(mem+old, extra)
+			if New > Old
+				memory.Zero((mem+old), New-Old)
 			return true
+		error (self, "Can't allocate enough bytes: " + new.render)
 
 	
 	function ByteCapacity (|int|)
-		return .itemsize|int|*.Capacity|int|
+		return .ItemSize|int|*.Capacity|int|
 	
 	
 	function BytesUsed (|int|)
-		return .itemsize|int|*.length|int|
-	
-
-	function Free
-		if (.deathaction == datatypewrapper.kfree)
-			Memory.free(._ptr)
-		._ptr = nil
-		.Capacity = 0
-		.Length = 0
+		return .ItemSize|int|*.Length|int|
 	
 	
 	function Clear
@@ -241,12 +225,11 @@ class Memory
 			  elseif ++com >= cn
 				com = 0
 				fs <~ ", "
-			
-			
-	
+
 	
 	destructor
-		.free
+		if (.deathaction == DataObject.kfree)
+			Memory.free(._ptr)
 		
 
 	iterator safe
@@ -265,40 +248,35 @@ class Memory
 			Curr++
 
 		
-	Macro Last
-		(.ptr|&...|)[.length-1]
-		
 	macro SyntaxAccess
-		(.ptr|&...|)[_]
+		(_0.ptr|&...|)[_1]
+	
 	macro SyntaxAppend
-		(.appendplace|&...|)[0] = _
+		(_0.appendplace|&...|)[0] = _1
 
 	syntax cast (|&...|)
 		return .ptr
 
 	module
 		|uint64[2]| MDummy
-		function Object (|int| ItemCount, |int| ItemSize, |Memory|)
+		function Object (|int| Count, |int| ItemSize, |Memory|)
 			visible 
-			rz = .new(ItemCount, ItemSize, false)
-			require rz._ptr
+			|| p = byte.zalloc(Count * ItemSize)
+				return .new(Count, ItemSize, p)
 
 		function Random  (|int| n, |memory|)
 			rz = byte[n]
-			random.shared.temporal(rz)
+			if rz
+				random.shared.temporal(rz)
 		
 		function FillInt (|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
-		function Unmap	 (|_voidptr| p, |int| n):						cpp_wrapper JB_munmap
-		function Used	 (|int64|):										cpp_wrapper JB_memused
-		function _Alloc  (|int| n, |&byte|):							cpp_wrapper JB_malloc
-		function Zalloc  (|int| n, |&byte|)
-			return byte(n)
-		function Realloc (|_voidptr| b, |int| n, |&byte|):				cpp_wrapper JB_realloc
-		function Free	 (|_voidptr| b):								cpp_wrapper JB_free
-		function Zero	 (|_voidptr| addr, |int| n):					cpp_wrapper memzero
-		function Copy	 (|_voidptr| dest, |_voidptr|src, |int| N):		cpp_wrapper memcpy
-		function Copy	 (|object| dest, |object|src, |int| N)
-			.copy(dest|_voidptr|, src|_voidptr|, n)
-		function CopyObject (|object|src, |object| dest, |int| N)
-			Memory.copy(self|&byte|+4, src|&byte|+4, n-4)
-		
+		function Unmap	 (|&nil| p, |int| n):							cpp_wrapper JB_munmap
+		function UsedString	 (|int64|):									cpp_wrapper JB_MemUsedString
+		function UsedOther	 (|int64|):									cpp_wrapper JB_MemUsedOther
+		function Zalloc  (|int| n, |?&byte|)
+			return byte.zalloc(n)
+		function Realloc (|&nil| b, |int| n, |?&byte|):				cpp_wrapper JB_realloc
+		function Free	 (|?(&nil)| b):								cpp_wrapper JB_free
+		function Zero	 (|&nil| addr, |int| n):						cpp_wrapper memzero (||)
+		function Copy	 (|&nil| dest, |&nil| src, |int| N):		cpp_wrapper memcpy
+

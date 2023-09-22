@@ -9,7 +9,7 @@ module package
 	|config|		strings
 	
 	
-	function LibFuncLayout (|&&_voidptr| funcs, |string|)
+	function LibFuncLayout (|&&&nil| funcs, |string|)
 		cpp_wrapper JB_App__LibFuncs
 	
 	function LibClassLayout (|string|)
@@ -19,11 +19,6 @@ module package
 		return .LibClassLayout().decompress.parse
 	
 	
-	/*
-	ringtree
-		sub1
-		sub2
-	*/
 	function LoadAppClasses (|message| list)
 		for s in list
 			|| cls = class.Table[s.name]
@@ -60,6 +55,6 @@ module package
 	function InputPack (|messageroot|)
 		|| x = app.args[0]
 		x := "~/Speedie/exec.scproj/demo.jx"
-		|| fl = x.ExistingFile("load executable")
+		|| fl = x.FileThatExists("load executable")
 			return fl.parse[@tmp, "pack"]
 

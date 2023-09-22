@@ -44,8 +44,7 @@ class Instruction // class instruction
 		.opcode = pos
 		.name = name
 		.sizes = µform.NeedForm(.FormName)
-		if .sizes
-			.PCount = .sizes.count
+		.PCount = .sizes.count
 	
 	syntax equals (|string| other, |bool| aware, |bool|)
 		return .name.syntaxequals(other, aware)

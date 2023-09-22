@@ -5,46 +5,22 @@
 
 
 
-prototype CollectFunc (|Message| node, |SCBase| name_space, |Message| ErrPlace, |SCBase|)
+prototype CollectFunc (|Message| node, |SCNode| name_space, |Message?| ErrPlace, |SCNode?|)
 
 
-
-class SCBase (SCObject) {
+class SCNode (SCNamed) {
 linkage
 	cpp_part		Base
 
-|SCBaseInfo|						BaseInfo
-|Dictionary of scobject|			Access
-|String|							ExportName
-|SCBase--|							Lookup
-|SCBase--|							CurrReacher
-|SCImport--|						Project
+|Dictionary? of SCObject|			Access
+|SCNode--?|							Parent
+|SCNode--?|							MyReacher
+|SCImport--?|						Project
 
 
 function IsSTDLib (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isntlib
 	opt norefcounts
-	return .project.isstdlib?
-
-syntax is (|SCBaseInfo| i, |bool|)
-	return .baseinfo[i]
-syntax isnt (|SCBaseInfo| i, |bool|)
-	return !.baseinfo[i]
-
-syntax is (|SCBaseInfo| i, assigns:|bool|)
-	|int| x = .baseinfo
-	x[i] = value
-	.baseinfo = x
-	
-
-syntax isnt (|SCBaseInfo| i, assigns:|bool|)
-	.syntaxis(i, !value)
-
-function IsVisible (|bool|)
-	return self is visible
-
-
-function IsVisible (assigns:|bool|)
-	(self is visible) = value
+	return .Project.IsSTDLib?
 
 
 function Collect (|Message| AST, |bool| Visible, |message| dest=nil)
@@ -64,7 +40,7 @@ function FuncSrc (|Message|)
 	return .Owningfunc$.Source
 
 
-function CollectSub (|Message| c, |SCBase|)
+function CollectSub (|Message| c, |SCNode|)
 	|| T = ClsCollectTable
 	if self == compiler.program  or  self isa scmodule
 		T = RootCollectTable
@@ -82,12 +58,76 @@ function CollectSub (|Message| c, |SCBase|)
 	Return base
 
 
-syntax access (|string| s, |scobject|)
-	if (.access)
-		return .access.valuelower(s)
+syntax access (|string| s, |SCObject|)
+	opt norefcounts
+	|| a = .Access
+		return a.ValueLower(s)
 
 
-function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {
+
+function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule?|)
+	//debugat 3402
+	opt norefcounts
+	real self
+	
+	|| fn = where.func
+	if fn == @dot
+		|| f = where.first!
+		f.next.expect(@emb)
+		self = .FindModuleMsg(f, Mode) #require
+	  else
+		expect (fn == @thg or @name) (where)
+	return .findmodule(where.name, where, Mode)
+
+
+function scnode.FindClassMsg (|Message| where, |SCNodeFindMode| Mode=scnodefindmode.WantAType,  |SCClass|)
+	opt norefcounts
+	|| mod = .FindModuleMsg(where, Mode)
+		|| C = mod.cls
+			return C
+		if mode isnt noerrors
+			error (where, "Expected a class but found module.")
+
+
+function FindClass (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0,  |SCClass|)
+	opt norefcounts
+	|| Mod = .FindModule(name, where, Mode)
+		if mod.cls
+			return mod.cls
+		if Mode isnt noerrors
+			error (where, "Expected a class but found module.")
+
+
+function FindModuleParent (|SCNodeFindMode| Mode, |SCnode|)
+	opt norefcounts
+	if mode is wantatype // allow going up superclasses instead.
+		|| cls = self|scmodule|.cls
+			|| p = cls.parent|scclass|
+				return p.modul
+	return .parent
+
+
+function FindModule (|String| name, |Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
+	opt norefcounts
+
+	|| Upon = self
+	while upon
+		if name ~= upon.name
+			if upon isa scmodule
+				return upon
+
+		|| Obj = upon[ name ]
+		if Obj isa SCModule
+			return Obj
+		if mode is dontgoup
+			exit
+		upon = upon.FindModuleParent(mode)
+		
+	if where and (Mode isnt noerrors)
+		error (where, "Can’t find module: " + name)
+
+
+function UpCheck (|string| name, |bool| LookUp=true, |SCObject|) {
 	opt norefcounts
 	if LookUp and (self isa SCClass)
 		for (c.upwards in self)
@@ -102,7 +142,7 @@ function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {
 		|| found = curr[name] 
 			return found
 		require lookup
-		curr = curr.lookup|scarg|
+		curr = curr.parent|scarg|
 }
 
 
@@ -110,33 +150,39 @@ function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {
 // OK so.. i guess functions can hide stuff below it, right?
 // so upcheck shouldn't work, if we are on a function, right?
 
-function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
-	require (IncObj)
+function TryAdd (|Message?| ErrPlace, |SCObject?| IncObj, |String| name)
+	real self
+	require IncObj
 	expect (name.length inrange 64) ( ErrPlace, "Name should be 1-64 bytes long." )
-
+	if (self isa scclass)
+		|| scls = incobj.class
+		if (scls == scclass or scmodule)
+			self = self.modul|scclass|
 	.access := Dictionary.new
+	.tryaddsub(errplace, incobj, name.Lowercase)
 
-	name = name.Lowercase
+	
+function TryAddSub (|Message| ErrPlace, |SCObject| IncObj, |String| name)
+	opt norefcounts
 	|| Old = .Upcheck( name, !(IncObj isa SCFunction) )
 	if (!Old)
-		.access[ name ] = IncObj
+		.access![ name ] = IncObj
 		return
 	
 	require (Old != IncObj) // possible?
 	
 	if (Old isa SCFunction)
 		if (IncObj isa SCFunction)		// link
-			if (old.cls == IncObj.cls)
+			if (old.cls == IncObj.cls) or incobj.IsConstructorOnModule(old)
 				old.Last.NextFunc = IncObj
 				Return
-		  elseif incobj isa scdecl and old.isassigns==2	
-			expect (!IncObj.setter) (errplace, "Multiple setters found.")
-			incobj.setter = old
-			.access[ name ] = IncObj
-			return
+		  elseif incobj isa scdecl
+			if old.HidesProperties
+				expect (!IncObj.hiderfunc) (errplace, "Multiple property-hiders found.")
+				incobj.hiderfunc = old
+				.access![ name ] = IncObj
+				return
 
-	// the problem is that we need to add self... then probably remove it
-	// so lets... just do that? add self and remove it.
 	if name == "self"
 		error ( ErrPlace, "Can't use 'self' here." )
 	  else
@@ -147,6 +193,12 @@ function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
 			error (old.render, kNameConf)
 
 
+function scfunction.IsConstructorOnModule (|scfunction| old, |bool|)
+	opt norefcounts
+	if self is constructor
+		|| p = old.parent
+		return p == .cls!.modul
+
 constructor
 	cpp_part Constructor0
 	.Project = scimport.curr
@@ -156,10 +208,9 @@ constructor
 constructor (|string| Name, |bool| Dummy)
 	cpp_part ConstructorStr
 	.name = name
-	
 
 
-constructor (|Message| node)
+constructor (|Message?| node)
 	cpp_part ConstructorMsg
 	.source = node
 	.IsVisible = CurrVisibility
@@ -167,26 +218,20 @@ constructor (|Message| node)
 
 
 function Use
-	if (.Source)
-		.Source.memoryLayer.Use
+	|| s = .source
+		s.memoryLayer.Use
 	.Project.use
 
 
 
 function SubProjName (|string|)
-// well... hmm.... it's source has an SCFile? Unless it was auto-generated...
-// so... how to do this? basically... we want... different names per project.
-// so if SC includes JB... all the JB files get JB, and SC keeps SC.
-// first we need different projects to have different names!
-	return ProjName()
+	return Compiler.Program.ExportName
 
 
 function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|)
 	rz = Cpppart
 	if rz
 		rz = "_" + rz
-	  elseif self is Layer
-		rz = "_LayerNew"
 	  else
 		rz = "_New"
 	
@@ -197,6 +242,8 @@ function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|
 
 
 function SCFunction.UseExportNameConstructor (|string| CppPart, |string| CppWrapper, |bool|)
+	// REMOVE THIS
+	// return true
 	require !CppWrapper and (self is new)  
 	|| fn = .CounterPart
 	if fn isa scfunction
@@ -204,7 +251,7 @@ function SCFunction.UseExportNameConstructor (|string| CppPart, |string| CppWrap
 			fn.LoadExportName
 
 		|| s = .NameOfClassAllocator(fn.ExportName, CppPart)
-		.SetExportName( s, fn|scbase| is ExplicitExport )
+		.SetExportName( s, fn|SCNode| is ExplicitExport )
 		Return true
 
 
@@ -233,12 +280,11 @@ function message.Cpp_Wrapper (|string|)
 	opt norefcounts
 	if self
 		if self == @bra
-			return .first.name
+			return .firstname
 		return .name
-	return nil
 
 
-function scfunction.ExportNameBuilder (|string|CppPart="", |string| )
+function SCFunction.ExportNameBuilder (|string|CppPart="", |string| )
 	if !CppPart
 		CppPart = .Name
 		if .IsAssigns and !(cpppart endswith "Hider")
@@ -246,23 +292,22 @@ function scfunction.ExportNameBuilder (|string|CppPart="", |string| )
 
 	|| SubSection = ""
 	|| AfterSub = ""
-	if (.Cls)
-		SubSection = .Cls.Modul.CppPart
+	|| c = .cls
+		SubSection = c.Modul.CppPart
 		AfterSub = "_"
-		if (self is constructor) and !(cpppart contains "Constructor")
-			cppPart = "Constructor" + cpppart
+		if (self is constructor) and !(CppPart contains "Constructor")
+			cppPart = "Constructor" + CppPart
 	  else
-		|| L = .lookup
+		|| L = .parent
 		if (L isa SCModule) and L|scmodule|.CppPart
 			SubSection = L.CppPart
 			AfterSub = "__"
 
-	|| P = .project ?? .lookup.project
-	|| wanted = p.mod.exportname
-	if wanted != subsection
-		rz = (wanted + "_")
-	rz += (Subsection + aftersub + CppPart)
-	// OK so... with the exportname?
+	|| P = .project // never nil but whatever
+		|| wanted = p.mod.exportname
+		if wanted != subsection
+			rz = (wanted + "_")
+	rz += (Subsection + AfterSub + CppPart)
 
 
 function FindCppWrapper (|message| place, |bool|isclass, |message|)
@@ -294,32 +339,34 @@ function Message.FindAndRemoveSub (|String| name,  |bool| NothingOK,  |bool| IsC
 function scfunction.FindCppWrapperFunc (|message| place, |message|)
 	opt NoRefCounts
 	for cpp in place
-		|| n = cpp.name
-		ifn n starts "cpp_"
-			continue
-		if n == "cpp_nothing"
-			.noautocomplete = 1
-			.IsCppInBuilt = 2
-		  elseif n == "cpp_inbuilt"
-			.noautocomplete = 1
-			.IsCppInBuilt = 1
-		  elseif n == "cpp_libwrapper"
-			.noautocomplete = 1
-			.IsExternalLib = true
-		  else
-			continue
-		return cpp
+		if (cpp.name starts "cpp_") and .FoundOneCpp(cpp.name)
+			return cpp
 
 
-function LoadExportName
+function scfunction.FoundOneCpp (|string| n, |bool|)
+	if n == "cpp_nothing"
+		.noautocomplete = 1
+		.IsCppInBuilt = 2
+		return true
+	if n == "cpp_inbuilt"
+		.noautocomplete = 1
+		.IsCppInBuilt = 1
+		return true
+	if n == "cpp_libwrapper"
+		.noautocomplete = 1
+		.IsExternalLib = true
+		return true
+
+
+function LoadExportName 
 	// Project_Class_Func
 	// Project_Module__Func	
 	require !.ExportName
 	
 	|| place	= .LinkagePlace
 	|| IsClass	= (self isa SCClass)
-	// probably should use some kinda... callback, right?
-	// we want to check so many things, wrapper, name, part, inbuilt, library?
+	// probably should use a dispatch table
+	// we want to check so many things, wrapper, name, part, inbuilt, library...
 	|| CW		= .FindCppWrapper(place, isclass)
 	|| CppName	= place.FindAndRemove( "cpp_name",	false,  IsClass )
 	|| CppPart	= place.FindAndRemove( "cpp_part",	false,  IsClass )
@@ -328,6 +375,7 @@ function LoadExportName
 	if self isa SCFunction
 		.IsCppInBuilt := (cw == @bra)|int|
 		|| CppWrapper = cw.cpp_Wrapper
+			.MakeParamsReal
 		require !.UseExportNameConstructor(CppPart, CppWrapper) and !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and !.isdisabled
 
 ///  ///  ///  ///  ///	 ///  ///  ///	 ///  ///  ///	 ///  ///  ///
@@ -343,118 +391,93 @@ function LoadExportName
 		  elseif self isa scclass
 			.Modul.CppPart = CppPart
 			|| e = place.FindAndRemove( "cpp_class", false, true )
-			if e: .CppClass = e.unicodesafename
+				.CppClass = e.unicodesafename
 			.Modul.SetExportName( CppPart + "_", false ) // remove this? just try... once everything is working.
 
 	.SetExportName( CppName, false )
 
 
 
-function TryAddBase (|Message| c, |scbase| neu) 
+function TryAddBase (|Message| c, |SCNode| neu) 
 	.TryAdd( c, neu, neu.Name )
 
 
-
-function LookUpAddress (|string| name, |Message| exp, |Object|)
-	if (exp == @dot)
-		|| lst = exp[ 1 ]				  // OK so... we don't allow this.
-		|| NoParams = !( (lst == @prm) and (lst.First) ) #expect ( exp,  "No parameters allowed here..."  )
-
-	return .LookUpSub( name, exp, nil, self, nil, nil, kPurposeAddress )
-
-
-function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scobject|)
-	expect (ParamsHere)
-	return .LookUpSub( name, exp, ParamsHere, self, nil, nil, kPurposeFunc ) // right? we use "me" for both the receiver and the argspace?
+function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scfunction|)
+	return .LookUpSub( name, exp, ParamsHere, self, nil, nil, kPurposeFunc )|scfunction|
 
 
 
-function MyProj (|SCBase|)
-	return Compiler.Program.ProjectFix
+//function MyProj (|SCNode|)
+//	return Compiler.Program!.ProjectFix
 
 
-function ProjectFix (|SCBase|)
-	if (self == compiler.program) and (scimport.curr)
-		return scimport.curr.Mod
+function ProjectFix (|SCNode|)
+	opt norefcounts
+	if (self == compiler.program)
+		|| c = scimport.curr
+			return c.Mod
 	return self
 
 
-function scbase.CodeCls (|Scclass|)
-	opt norefcounts
-	|| s = self
-	while s
-		if s isa scmodule
-			if s.cls
-				return s.cls
-		s = s.lookup
-
-
-function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCBase| arg_space, |SCDecl| contains, |Message| side, |int| Purpose, |SCObject|)
+function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
 // could be cleaned up so that exp is NEVER nil... "AddMain", "InitRootDecl", lookupvar etc would need altering...
 	
-	|| name			= OrigName.Lowercase
 	|| ParamsArray	= SCParamArray.new(exp)
 	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
 	ParamsArray.PreReadTypes(Arg_Space, ParamsHere, side)
 	|| CanFunction	= (ParamsHere) and  (!ParamsArray.IsAddress)
+	|| ConstructorAsNew = (purpose == kPurposeDot) and (origname ~= "new") and (self isa scmodule)
 	|SCFunction| Missing
 	|SCFunction| f
-
-	if paramsarray.issuper  and  name == "constructor"
-		|| Prev = exp.prev 
-		expect (!Prev) (Prev, "Can't come before super.constructor")
-
+	|scclass| owning_cls
+	if scfunction.currfunc
+		owning_cls = scfunction.currfunc!.cls
+	
 	for (b.ListLookup in Curr)
+		|| o = b[ origname ]
+		if (!o)
+			continue
 		if (ParamsArray.IsDot)  and  (ParamsArray.IsModule)  and  (b == compiler.program)
 			exit								// Stop SCFunction.Byte looking up Main.Byte...
 		
-		|| o = b[ name ]		#continue
 		if o isa SCDecl
-			#!/struct question/
-			// what if this is a struct?
-			// we should be more specific? or just assume we mean the struct's actual address?
-			
-			ifn paramsarray.isassigns and (o.setter) and (arg_space.CodeCls != curr)
-				|| dcl = o
-				ifn dcl.Type
-					return (dcl, nil)(dcl.isnil)
-
-				if dcl.Type.FuncProto
-					expect ((ParamsArray.IsDot or !ParamsHere) and (!ParamsArray))  ( exp, "Wrap this expression in a bracket before calling a function on it." )
+			if o.Hiderfunc.Hidermatch(paramsarray.isassigns) and (owning_cls != curr)
+				o = o.hiderfunc|scdecl|
+			  else
+				if o.Type.FuncProto
+					expect ((ParamsArray.IsDot or !ParamsHere) and (!ParamsArray))  ( exp, "Wrap this in a bracket, before calling it as a function." )
 					Return o
 
-				if (!side and paramsarray.isdot and dcl.type.processas)
-					return dcl.ProcessAs(exp)
-			  else
-				o = o.setter|scdecl|
+				if (!side and paramsarray.isdot and o.type.processas)
+					debug_require exp
+					return o.ProcessAs(exp)
 
 		
-		if paramshere and !paramsarray.isdot and (o isa scmodule)
-			while
-				|| o2 = o["new"]					// OK... but what if o isa module?
-					o = o2|scmodule|				// hack
-					exit
-				if o.cls and o.cls.isrole
-					o = o.supermod
-					if !o: exit
-				  else
-					exit
+		paramsarray.ConstructorAsNew = ConstructorAsNew
+		if (paramshere and paramshere.func == @prm) and (o isa scmodule)
+			o = o.GetTheNewer|scmodule|
+			paramsarray.ConstructorAsNew = true
 		
 		
 		if CanFunction and (o isa SCFunction)
 			f = o								// store for later return? not needed?
 			o = f.ArgsMatch( contains, arg_space, ParamsArray )
-			if o
+			if !o
+				0
+			  elseif o.ismacro
 				if o.ismacro
-					if o.MacroGet(paramsarray, missing)
-						Missing = o
-					continue
+					Missing = o
+				o = nil
+			  else
 				if o.isdisabled
 					error (exp,     o.description)
 					error (o.source, "Disabled here.")
 
-				ParamsHere.obj = o // multiple return :3
+				if Paramshere
+					ParamsHere.obj = o // multiple return :3
+				if paramsarray.ConstructorAsNew and o is constructor
+					ParamsHere.first = paramshere.CreateNil
 				Return o
 		
 		if o
@@ -470,7 +493,8 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 					|| err = "Function must have a prototype."		// what about the side thing?
 					if side and !paramsarray.MacroSize
 						err = "Not assignable"
-					Return o|scfunction|.ProtoDecl #expect (exp, err)
+					check (o|scfunction|.ProtoDecl) (exp, err)
+					Return o|scfunction|.ProtoDecl
 
 	if missing	// the missing stuff should ENTIRELY go within argsmatch? cos its called in two places.
 		return Missing.MacroFix( contains, arg_space, paramsarray )
@@ -482,7 +506,8 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 			error (exp, f.description)
 		  elseif !paramsarray.MadeError
 			f.ArgsMatch( contains, arg_space, ParamsArray, kTypeCastDescribeErrors )
-		ParamsHere.obj = f // for auto-complete
+		if ParamsHere
+			ParamsHere.obj = f // for auto-complete
 		Return f
 
 	|| ErrMsg = "" // can't find "" on something "".
@@ -511,8 +536,13 @@ constants (
 	kPurposeHider=0x10000
 )
 
+flags (
+	NoErrors = 1
+	DontGoUp = 2
+)
 
-function LookUpDot (|String| name, |Message| exp, |SCBase| arg_space, |SCDecl| contains, |Message| side, |Object|)
+
+function LookUpDot (|String| name, |Message| exp, |SCNode| arg_space, |SCDecl| contains, |Message| side, |Object|)
 	opt norefcounts
 	return .LookUpSub( name, exp, exp.Last, arg_space, contains, side, kPurposeDot )
 
@@ -550,7 +580,10 @@ function RequireContained (|Message| exp, |SCDecl|)
 	|SCClass| cls
 	
 	if (self isa SCFunction)
-		cls = .Cls ?? (.lookup|SCModule|).Cls
+		cls = .Cls
+		if !cls
+			|| p = .parent as SCModule
+				cls = p.Cls
 		
 	  elseif (self isa SCClass)
 		cls = self
@@ -575,6 +608,13 @@ function SourceArg (|Message|)
 	return p.find( @Arg )
 
 
+function scfunction.SourceArg (|message|)
+	opt norefcounts
+	|| arg = .Source.last
+	if arg == @arg
+		return arg
+
+
 function scfunction.ParamUniquer (|string| s, |string|)
 	|| fs = faststring.new
 	fs <~ s
@@ -586,19 +626,22 @@ function scfunction.ParamUniquer (|string| s, |string|)
 		fs <~ '0'
 	  else
 		for (i in first to last)
-			fs <~ .args[i].type.modul.CppPart.Titlecase
+			|| a = .args[i]
+				fs <~ a.type.modul.CppPart.Titlecase
 	
 	return fs
 
 
 function UniquifyExport (|String| s, |string|)
 	if (self isa scfunction)
-		s = .ParamUniquer(s)
-		ifn compiler.exportnames[s] : return s
+		|| s2 = .ParamUniquer(s)
+		if !compiler.exportnames[s2]
+			return s2
 	
 	|| u = SCGlobals.UniqueNum++
-	s += u.render
-	ifn compiler.exportnames[s] : return s
+	|| s3 = s + u.render
+	if !compiler.exportnames[s3]
+		return s3
 
 
 function RehomeExport (|bool|)
@@ -624,7 +667,6 @@ function TestExportName (|String| s, |bool| Explicit, |string|) {
 	  elseif o isnt ExplicitExport
 		if o.RehomeExport: return s
 	
-	debugat
 	|| Err = "Export-name conflict: " + s
 	error ( o.Source, Err )
 	error (  .Source, Err )
@@ -635,10 +677,9 @@ function SetExportName (|String| s, |bool| Explicit)
 	if self isa scfunction
 		require !.ismacro
 
-	s = s.unicodesafename
+	s = s.UnicodeSafeName
 	ifn (self isa SCModule) or (self isa SCClass)		// modules aren't really accessable like that.
 		s = .TestExportName(s, explicit)				#require
-		
 		Compiler.ExportNames[ s ] = self
 
 	(self is ExplicitExport) = Explicit
@@ -649,11 +690,11 @@ function SetExportName (|String| s, |bool| Explicit)
 
 
 function SCFunction.NeedsExport (|bool|)
-	Return  (.currreacher) or .isapi
+	Return  (.MyReacher) or .isapi
 
 
 function NeedsExport (|bool|)
-	Return  (.currreacher)
+	Return  (.MyReacher)
 
 
 function message.InsideFunc (|SCFunction|) //owningfunc, infunc
@@ -710,29 +751,31 @@ function CreateNameDict (|Message| FuncName, |[message]| NameList) {
 	fs <~ "
 function $name (|dictionary of $AllSameType|)
 	visible false
-	ifn ${name}_Dict
-		${name}_Dict = dictionary.new
+	|| _T = ${name}_Dict 
+	if _T
+		return _T
+	_T = dictionary.new
+	${name}_Dict = _T
 "
 
 	for s in NameList
-		fs <~ ('\t', 2)
-		fs <~ name
-		fs <~ `_Dict.Set("`
+		fs <~ `	_T.Set("`
 		fs <~ s.name.Lowercase
 		fs <~ `", `
 		fs <~ s
 		fs <~ ")\n"
 		
 	fs <~ "
-	return ${name}_Dict
+	return _T
 "
 
 	|| FuncSrc = fs.GetResult
-	.CollectSub( FuncSrc.ParseClean[0] #expect )
+	|| msg = FuncSrc.ParseClean[0]
+	.CollectSub( msg #expect )
 
-	|| DclSrc = "|dictionary of $AllSameType| ${Name}_Dict = nil,"
+	|| DclSrc = "|dictionary of $AllSameType| ${Name}_Dict = nil"
 	|| DclMsg = DclSrc.ParseClean
-	CollectDeclsFuncBodyJustWhatWeNewlyMade( DclMsg, self )
+		DclMsg.CollectFromBody(self)
 }
 
 
@@ -740,7 +783,7 @@ function Message.ConstantExpandSub (|Message|)
 	using (self)
 	for item in self
 		if rz
-			rz = NewRel( rz, item.copy, "(|)" )
+			rz = NewRel( rz, item.copy, "|||" )
 		  else
 			rz = item.copy
 
@@ -772,8 +815,8 @@ function FindVis (|Message| c, |bool|)
 	if c == @adj
 		|| first = c[@thg]
 		first.expect(@thg, "class")
-		|| name  = c[@thg, 1].nyme
-		|| cls   = compiler.FindClassOK(name)
+		|| name  = c[@thg, 1].name
+		|| cls   = compiler[name]
 		return cls and !cls.banned
 	error c
 
@@ -784,64 +827,38 @@ function LoadVisibility (|Message| p)
 	SC_MakeComment( p )
 
 
-function ModuleType (|string|)
-	if self isa SCModule
-		return "module"
-	return "class"
+//function ModuleType (|string|)
+//	if self isa SCModule
+//		return "module"
+//	return "class"
 
 
-function AutoCompleteName (|string|)
+function AutoCompleteKind (|string|)
 	if self isa SCModule
 		return "module"
 	if self isa scclass
-		if .isdatatype
-			return "datatype"
-		if .isstruct
-			return "struct"
-		if .isobject
-			return "class"
-		if .funcproto
+		if .FuncProto
 			return "function prototype"
+		if .IsDataTypeOnly
+			return "datatype"
+		if .IsStruct
+			return "struct"
+		if .IsObject
+			return "class"
 	return "unknown"
-
-
-render DescribeStored
-	for (B.ListLookup in self)
-		fs <~ '\n'
-		fs <~ B.ModuleType
-		fs <~ ": "
-		fs <~ B.name
-
-		for (b.access) (name)
-			fs <~ '\n'
-			fs <~ name
-
-		fs <~ '\n'
 
 
 iterator ListLookup
 	|| Curr = self
 	while (Curr)
 		yield Curr
-		Curr = Curr.lookup
-
-
-function SCModule.NonRoleModule (|SCBase|)
-	opt norefcounts
-	|| s = self
-	while s
-		|| cls = s.cls
-		ifn cls and cls.isrole
-			exit
-		s = s.SuperMod
-	return s
+		Curr = Curr.parent
 
 
 
 module {
 	|bool|			CurrVisibility
 	|bool|			ConstantsLoadingOverride
-	|scmodule--|	CurrModule
 
 	function LoadCppPart (CollectFunc)
 		require (name_space isa scclass) or (name_space isa scmodule)
@@ -862,103 +879,107 @@ function DontRemove (CollectFunc)
 	return Compiler.Program // OK
 
 
-extend_module scfunction
-	function DebugInsert (CollectFunc)
-		debugger
-		node.remove
-		expect (!compiler.debuginsert) (node, "Already got one of these.")
-		compiler.debuginsert = node.first
-		return compiler.program
-
-
 
 dispatch RootCollectTable (CollectFunc)
-	love				SCGame3D.Love
-	function			SCFunction.NewFunc
-	extend_function		SCFunction.NewFunc // user shouldn't write these
-	api					SCFunction.NewFunc
-	cpp_libwrapper		SCFunction.NewCppWrapper
-	cpp_wrapper			SCFunction.NewCppWrapper
-	cpp_inbuilt			SCFunction.NewCppWrapper
-	cpp_nothing			SCFunction.NewCppWrapper
-	helper				SCFunction.NewHelper
-	macro				SCFunction.NewMissingFunc
-	insertion			SCThe.NewInsertion
-	conf				compiler.WrongConf
-	crash				{app.crash(node.first.nyme)}
-	module				SCModule.Neu
-	static				{error (node, "static is called 'module' in speedie.")}
-	selector			SCSelector.neu
-	class				SCClass.neuClass
-	role				SCClass.neuRole
-	export_api			SC_API.NewExportAPI
-	model				SCGame3D.NeuModel
-	prototype			SCFunction.NewProtoType
-	render				SCFunction.NewRender
-	import				(DontRemove)
-	compile_linking		Linkage.Collect
-	shell_args			InbuiltShellArgs.collect
-	syntax				SCClass.LoadSyntax
-	linkage				CppRefs.Linkage
-	struct				SCClass.newstruct
-	datatype			SCClass.DataType
-	extend				SCClass.StoreExtend
-	extend_module		SCClass.StoreExtendModule
-	extends				{ error (node, "I think you mean 'extend'"), return compiler.program }
-	main				SCFunction.NeuMain
-	library				SCFunction.NeuLibrary
-	ignore				(DontRemove)
-	cpp_part			(scbase.LoadCppPart)
-	constants			(SCModule.ConstantCollector)
-	flags				(SCModule.ConstantCollector)
-	debuginsert			(scfunction.DebugInsert)
+	+"love"					SCGame3D.Love
+	+"function"				SCFunction.NewFunc
+	+"extend_function"		SCFunction.NewFunc // user shouldn't write these
+	+"api"					SCFunction.NewFunc
+	+"cpp_libwrapper"		SCFunction.NewCppWrapper
+	+"cpp_wrapper"			SCFunction.NewCppWrapper
+	+"cpp_inbuilt"			SCFunction.NewCppWrapper
+	+"cpp_nothing"			SCFunction.NewCppWrapper
+	+"helper"				SCFunction.NewHelper
+	+"macro"				SCFunction.NewMacro
+	+"insertion"			SCThe.NewInsertion
+	+"conf"					compiler.WrongConf
+	+"crash"				{app.crash(node.firstname)}
+	+"module"				SCModule.NeuModule
+	+"static"				{error (node, "static is called 'module' in speedie.")}
+	+"selector"				SCSelector.neu
+	+"class"				SCClass.neuClass
+	+"task"					sctasks.NewTask
+	+"role"					SCClass.neuRole
+	+"export_api"			SC_API.NewExportAPI
+	+"model"				SCGame3D.NeuModel
+	+"prototype"			SCFunction.NewProtoType
+	+"render"				SCFunction.NewRender
+	+"import"				(DontRemove)
+	+"compile_linking"		Linkage.Collect
+	+"shell_args"			InbuiltShellArgs.collect
+	+"syntax"				SCClass.LoadSyntax
+	+"linkage"				CppRefs.Linkage
+	+"struct"				SCClass.newstruct
+	+"datatype"				SCClass.DataType
+	+"extend"				SCClass.StoreExtend
+	+"extend_module"		SCClass.StoreExtendModule
+	+"extends"				{ error (node, "I think you mean 'extend'"), return compiler.program }
+	+"main"					SCFunction.NeuMain
+	+"library"				SCFunction.NeuLibrary
+	+"ignore"				(DontRemove)
+	+"cpp_part"				(SCNode.LoadCppPart)
+	+"constants"			(SCModule.ConstantCollector)
+	+"flags"				(SCModule.ConstantCollector)
 	
 
 
 
 dispatch ClsCollectTable (CollectFunc)
-	constructor			SCFunction.NewConstructor		// ??
-	destructor			SCFunction.NewDestructor		// ??
-	render				SCFunction.NewRender			// ??
-	function			SCFunction.NewFunc
-	extend_function		SCFunction.NewFunc // user shouldn't write these
-	setter				SCFunction.NewSetter
-	api					SCFunction.NewFunc
-	macro				SCFunction.NewMissingFunc
-	helper				SCFunction.NewHelper
-	fields				SCClass.NamedPropertyFields
-	behaviour			SCBehaviour.NewBehaviour
-	virtual				SCBehaviour.NewVirtual
-	iterator			SCIterator.NeuIter
-	syx					SCFunction.NeuSyx			   // jeebox specific
-	cpp_wrapper			SCFunction.NewCppWrapper
-	cpp_libwrapper		SCFunction.NewCppWrapper
-	prototype			SCFunction.NewProtoType
-	syntax				SCClass.LoadSyntax
-	operator			SCClass.LoadSyntax
-	processas			SCClass.ProcessAs
-	cpp_refs			cpprefs.ReadIntoCppRefs
-	linkage				CppRefs.Linkage
-	pragma				{ error (node,  "Unrecognised pragma." ) }
+	+"constructor"			SCFunction.NewConstructor		// ??
+	+"destructor"			SCFunction.NewDestructor		// ??
+	+"render"				SCFunction.NewRender			// ??
+	+"function"				SCFunction.NewFunc
+	+"extend_function"		SCFunction.NewFunc // user shouldn't write these
+	+"setter"				SCFunction.NewHider
+	+"api"					SCFunction.NewFunc
+	+"macro"				SCFunction.NewMacro
+	+"helper"				SCFunction.NewHelper
+	+"behaviour"			SCBehaviour.NewActual
+	+"actual"				SCBehaviour.NewActual
+	+"virtual"				SCBehaviour.NewVirtual
+	+"iterator"				SCIterator.NeuIter
+	+"syx"					SCFunction.NeuSyx			   // jeebox specific
+	+"cpp_wrapper"			SCFunction.NewCppWrapper
+	+"cpp_libwrapper"		SCFunction.NewCppWrapper
+	+"prototype"			SCFunction.NewProtoType
+	+"syntax"				SCClass.LoadSyntax
+	+"operator"				SCClass.LoadSyntax
+	+"processas"			SCClass.ProcessAs
+	+"cpp_refs"				cpprefs.ReadIntoCppRefs
+	+"linkage"				CppRefs.Linkage
+	+"pragma"				{ error (node) }
 
-	initafter			(SCModule.DoInitAfter)
-	ignore				(DontRemove)
-	saveas				(DontRemove)
-	cpp_part			(DontRemove)
-	cpp_class			(DontRemove)
-	cpp_name			(DontRemove)
-	contains			(DontRemove)
-	default				(SCClass.GetDefault)
-	false				(SCClass.GetFalse)
-	size				(DontRemove)
-	module				(DontRemove)
-	constants			(SCModule.ConstantCollector)
-	flags				(SCModule.ConstantCollector)
+	+"class"				SCClass.NewInnerClass
+	+"role"					SCClass.NewInnerClass
+	+"task"					sctasks.NewTask
+
+	+"initafter"			(SCModule.DoInitAfter)
+	+"ignore"				(DontRemove)
+	+"saveas"				(DontRemove)
+	+"cpp_part"				(DontRemove)
+	+"cpp_class"			(DontRemove)
+	+"cpp_name"				(DontRemove)
+	+"contains"				(DontRemove)
+	+"default"				(SCClass.GetDefault)
+	+"false"				(SCClass.GetFalse)
+	+"size"					(SCClass.SetSize)
+	+"module"				(DontRemove)
+	+"constants"			(SCModule.ConstantCollector)
+	+"flags"				(SCModule.ConstantCollector)
 
 
 
-datatype SCBaseInfo (int)
+datatype SCNodeInfo (int)
 	constants
 		ExplicitExport
 		Visible
 
+
+datatype SCNodeFindMode (int)
+	flags
+		|SCNodeFindMode|
+		NoErrors = 1
+		DontGoUp = 2
+		WantAType = 4
+	syntax is (|SCNodeFindMode| m, |bool|)
+		return self & m

@@ -1,6 +1,6 @@
 
 
-function Print (|string| data) // macro this too?
+function Print (|string?| data) // macro this too?
 	cpp_wrapper JB_Str_Print
 
 
@@ -9,24 +9,24 @@ function PrintLine (|string| data="")
 
 
 macro PrintLine
-	StrPrintline(_.render) // not self-referential anymore.
+	StrPrintline(_0.render) // not self-referential anymore.
 
-	
-function StrPrintLine (|string| data)
+
+function StrPrintLine (|string?| data)
 	cpp_wrapper JB_Str_PrintLine
 
 
-function PrintLine (|object| o)
+function PrintLine (|object?| o)
 	cpp_name JB_Obj_PrintLine
 	printline o.render
 
 
 function ZalgoLine (|string| data)
-	printline data
+	printline data.zalgo
 
 
 macro ZalgoLine
-	Printline _.render
+	Printline _0.render.zalgo
 
 
 function Print (|object| o)
@@ -50,12 +50,35 @@ function byte.IsVowel (|bool|)
 function int.OperatorPC (|int| x, |string|) 
 	return (self|float| / x|float|).pc
 
+function int.operatorof (|string| type, |string| nothing="", |string|)
+	return type.Pluralize(self, nothing)
 
-function string.pluralize (|int| amount, |string| nothing="", |string|)
+function string.Pluralize (|int| amount, |string| nothing="", |string|)
 	if !amount and nothing
 		return nothing
-	return "$amount $self${ (`s`, ``)(amount != 1)}"
-	
+		
+	|| fs = FastString()
+	if amount
+		fs <~ amount
+	  else
+		fs <~ "no"
+	fs <~ " "
+	fs <~ self
+	if amount != 1
+		if .Last == 's'
+			fs <~ "e"
+		fs <~ "s"
+	return fs
+
+
+function string.Moat (|string|)
+	|| fs = faststring()
+	fs.size = .length + 4
+	fs <~ "__"
+	fs <~ self
+	fs <~ "__"
+	return fs
+
 
 function string.IsFileLike (|bool|)
 	|| c = *self
@@ -63,6 +86,9 @@ function string.IsFileLike (|bool|)
 	// so... we want to wrap to w... but prefer to wrap at a SPACE or comma
 	
 function byte.IsTextLine (|bool|)
+	 return self == '\n' or '\r'
+
+function codepoint.IsTextLine (|bool|)
 	 return self == '\n' or '\r'
 
 function int.TabsWidth (|int|)
@@ -100,6 +126,7 @@ function cstring.OperatorPlus (|string| s, |string|)
 		return (&tmp)|string| + s
 	return .str
 
+
 struct FakeJBString
 	|int| Refcount
 	|int| Length
@@ -113,6 +140,19 @@ helper cstring.temp (|fakejbstring|)
 
 
 function String.ExtractPathAndLine (|&ivec2| LineAndByte, |string|)
+	if .LineCount > 1	
+		|| parsed = .Parse
+			|| curr = (parsed.first, parsed)(parsed == @arg)
+			while curr
+				|| pos = curr["pos"]
+				|| path = curr["file"]
+				path := curr["path"]
+				if path and pos
+					|int| n = pos.int // make the c++ compile D:
+					*LineAndByte = (1, n)
+					return path.name
+				curr++
+
 	rz = .TrimStart("line ")
 	|| tr = rz.trim
 	if tr.isint
@@ -128,7 +168,7 @@ function String.ExtractPathAndLine (|&ivec2| LineAndByte, |string|)
 		rz = rz.Resolve(fileResolveMode.allowmissing)
 
 
-helper string.wrapsub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
+helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 	|| i		= p
 	|| ParaMax	= 1K
 	MaxWidth	= MaxWidth min Paramax
@@ -140,7 +180,9 @@ helper string.wrapsub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 		if c < 0
 			return i
 		if c|byte|.IsTextLine
-			return i + 1
+			if !isinline
+				return i + 1
+			c = ' '
 		if i >= ParaMax or MaxWidth <= 0
 			return i
 		
@@ -149,11 +191,11 @@ helper string.wrapsub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			maxwidth -= (Orig-MaxWidth).TabsWidth
 		  elseif isinline
 			i++
-		  elseif jeebox.cswrapsplit[c]
+		  elseif jeebox.CSWrapSplit[c]
 			i++
 			MaxWidth--
 		  else									 // so where does the word end?
-			|| WordEnd = .find(jeebox.cswrapsplit, i, ParaMax)
+			|| WordEnd = .find(jeebox.CSWrapSplit, i, ParaMax)
 				WordEnd += (self[WordEnd] > 32)
 			  else
 				WordEnd = .length min paramax
@@ -164,15 +206,69 @@ helper string.wrapsub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 				return i
 			MaxWidth = MW2
 			i = WordEnd
-			continue
 
+
+helper String.UnTabbifySub (|faststring| fs)
+	|| Tabs = .OutByte('\t') ?? .Length
+	if tabs == 0
+		fs <~ self
+	  else
+		fs <~ (' ', tabs*4)
+		fs.AppendSection(self, tabs, int.max)
+
+
+helper String.TabbifySub (|faststring| fs)
+	|| Sp = .OutByte(' ') ?? .length
+	if Sp == 0
+		fs <~ self
+	  else
+		sp = Sp.AlignDown(4)
+		fs <~ ('\t', Sp>>2)
+		fs.AppendSection(self, sp, int.max)
 	
+
+function String.AddTabs (|bool| Tabs=true, |string|)
+	|| fs = faststring()
+	|| n = 0
+	for t.lines in self
+		if n++
+			fs <~ '\n'
+		if tabs
+			t.TabbifySub(fs)
+		  else
+			t.UntabbifySub(fs)
+	rz = fs.GetResult
+	if rz == self // nice opt
+		rz = self
+
+
+helper String.TabsToSpacesSub (|faststring| fs)
+	|| i = 0 
+	for (c in self)
+		if c == '\t'
+			|| remain = 4 - (i mod 4)
+			fs <~ (' ', remain)
+			i += remain
+		  else
+			fs <~ c
+			i++
+		
+
+function String.TabsToSpaces (|string|)
+	|| fs = FastString()
+	for (l.lines in self) (p)
+		l.TabsToSpacesSub(fs)
+		if p
+			fs <~ self[p] // match line-ending
+	return fs
+		
+		
 function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| BytesOut, |string| Name)
 	if name
 		self <~ Name
 		self <~ ": "
 		
-	BytesIn.strsize(self)
+	BytesIn.StrSize(self)
 	if BytesOut 
 		self <~ " to "
 		Bytesout.strsize(self)
@@ -218,3 +314,8 @@ function string.UnPrintable (|int|)
 			if c.IsTextLine
 				return '\n'
 			return -2
+
+
+function String.Spin (|int| f, |byte|)
+	return `|/-\`[f&3] // useful for printing "processing" things to stdout
+

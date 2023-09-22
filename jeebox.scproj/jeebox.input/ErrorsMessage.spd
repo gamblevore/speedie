@@ -1,23 +1,23 @@
 
 
-// Put all the message-specific stuff in here, in case I want to remove
-// jeebox from the library? To compile without jeebox. Maybe?
-
-
-extend ErrorList
-	function NewWarning (|Message| node=nil, |String| Desc=nil)
-		if .CanAddMore(errorseverity.Warning)
-			self <~ Error(node, desc, errorseverity.Warning)
+extend_module ErrorReceiver
+	function NewWarning (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+		.NewErrorSub(node, desc, path, errorseverity.warning)
 	
-	function NewProblem (|Message| node=nil, |String| Desc=nil)
-		if .CanAddMore(errorseverity.problem)
-			self <~ Error(node, desc, errorseverity.problem)
-	
-	function NewError (|Message| node=nil, |string| Desc=nil, |string| path=nil)
+	function NewProblem (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+		.NewErrorSub(node, desc, path, errorseverity.problem)
+
+	function NewError (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
 		cpp_part NewErrorWithNode
-		|| sev = .LowerErrorsTo ?? ErrorSeverity.Error
-		if .CanAddMore(sev)
-			self <~ Error(node, desc, sev, path)
+		|| sev = stderr.LowerErrorsTo ?? ErrorSeverity.Error
+		.NewErrorSub(node, desc, path, sev)
+
+	helper NewErrorSub (|Message| node, |string?| Desc, |string?| path, |int| sev)
+		opt norefcounts
+		if stderr.CanAddMore(sev)
+			if desc == nil
+				desc = node.MiniName("Unexpected ")
+			stderr <~ Error(node.FindNotInserted, desc, sev, path??"")
 
 
 function Message.ErrorLocation (|string| desc = "", |string|)
@@ -26,36 +26,27 @@ function Message.ErrorLocation (|string| desc = "", |string|)
 
 function Message.FilePath (|string|)
 	Opt NoRefCounts
-	|| L = .OriginalParseLayer$
-	|| O = L.obj
-	if O isa String
-		return O
+	|| O = .memorylayer.obj
 	if !__IS_LIBRARY__ and (O isa File)
 		return O.path
-
-
-function Message.OriginalParseLayer (|memorylayer|)
-	Opt NoRefCounts
-	require self
-	|| L = .memorylayer
-	if (L and L != (Message).defaultlayer)
-		return L
+	if O isa String
+		return O
 
 
 function Message.OriginalParseData (|string|)
 	Opt NoRefCounts
-	|| L = .OriginalParseLayer
-	if (L and L.obj2 isa string)
-		return L.obj2|string|
+	|| D = .memorylayer.obj2
+	if D isa string
+		return D
 
 
 extend_module Error
 	function CantParseNum (|Message| Where, |string| num, |int| Pos)
 		visible // for lib
-		|| msg = "Can’t parse number '${num[0,10]}' (found '${num[pos]}')."
-		stderr <~ error(where, msg) // we are done.
+		|| str = "Can’t parse number '${num.preview}' (found '${num[pos]}')."
+		stderr <~ error(where, str)
 
-	function From (|message| self, |error|)
+	function From (|message?| self, |error|)
 		opt norefcounts
 		require self
 		if self != @arg
@@ -69,10 +60,10 @@ function message.AsError (|error|)
 	rz = error(nil)
 	|| arg = .Last
 	if arg == @arg
-		rz.position		= arg..pos.int|int|
-		rz.path			= arg..file.value
-		rz.severity		= arg..severity.int|errorseverity|
-		rz.name	= arg[@str].nyme
+		rz.position = arg..pos.int|int|
+		rz.path	= arg..file.value
+		rz.severity = arg..severity.int|errorseverity|
+		rz.name	= arg[@str].name
 	  else
 		rz.name = .name
 		rz.path = ""

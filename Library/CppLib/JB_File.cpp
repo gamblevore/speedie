@@ -138,6 +138,7 @@ int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation);
 extern uint JB__Flow_Disabled;
 
 void JB_Flow__ReportAddr(u8* Addr, int Length, u8* Name, int NameLen) {
+#ifndef AS_LIBRARY
 	if (!JB__Flow_Disabled) {
 		uint64 Hash = JB_CRC(Addr, Length, 0);
 		JB_String A;
@@ -149,11 +150,14 @@ void JB_Flow__ReportAddr(u8* Addr, int Length, u8* Name, int NameLen) {
 		void JB_Flow__Input(JB_String* data, JB_String* name);
 		JB_Flow__Input(&A, &B);
 	}
+#endif
 }
 
 inline void JB_Flow__Report(JB_String* data, JB_String* name) {
+#ifndef AS_LIBRARY
 	if (!JB__Flow_Disabled)
 		JB_Flow__ReportAddr(data->Addr, data->Length, name->Addr, name->Length);
+#endif
 }
 
 
@@ -388,8 +392,11 @@ int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
 }
 
 
-static int InterWrite(int fd, uint8* buffer, int N) {
+// this is what the write() function should do.
+// well kinda. It could write some of the bytes and STILL get an error. so the interface is just bad.
+int JB_Write(int fd, uint8* buffer, int N) {
     int TotalCount = 0;
+
     while (N > TotalCount) {
         int written = (int)write(fd, buffer+TotalCount, N-TotalCount);
         if (written == -1) {
@@ -482,26 +489,31 @@ static int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 		N = InterRead(fd, Buffer, Desired, 0, Error, Mode);
 		JB_FS_AdjustLength_(self, Desired, N);
 	}
+#ifndef AS_LIBRARY
 	JB_Flow__ReportAddr(Buffer, N, (u8*)"pipe", 4);
+#endif
 	return Error;
 }
 
 
 void JB_Rec__CrashLog(const char* c) {
 	if (!c) return;
-	fputs(c, stderr);
-	fputc('\n', stderr);
 
 	if (!CrashLogFile) {
 		mkdir("/tmp/logs", kDefaultMode);
 		int flags = O_RDWR | O_CREAT | O_TRUNC;
 		CrashLogFile = open(JB_CrashLogFileName, flags, kDefaultMode);
 		chmod(JB_CrashLogFileName, 777);
+		if (CrashLogFile)
+			fprintf(stderr, "CrashLogAt: %s\n", JB_CrashLogFileName);
 	}
-	if (!CrashLogFile) return;
 
-    InterWrite( CrashLogFile, (u8*)c, (int)strlen(c) );
-    InterWrite( CrashLogFile, (u8*)"\n", 1 );
+	fputs(c, stderr);
+	fputc('\n', stderr);
+
+	if (!CrashLogFile) return;
+    JB_Write( CrashLogFile, (u8*)c, (int)strlen(c) );
+    JB_Write( CrashLogFile, (u8*)"\n", 1 );
 }
 
 
@@ -510,7 +522,7 @@ bool JB_FS_AppendPipe(FastString* self, int fd, int Mode) {
 	//	0  means finished. we wanna close. Same with errors. So (>= 0) --> close
 	//  -1 means  call back later
 	//  -2 means we need more buffer
-    while (self) {
+    while (self and fd >= 0) {
 		int Error = InterPipe(self, 64 * 1024, fd, Mode);
 		if (Error >=  -1) return Error == -1; // true means call back later.
 											  // false  means we are finished.
@@ -542,8 +554,6 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 	return Result;
 }
 
-
-char* realpath(const char* file_name, char* resolved_name);
 
 static int CaseComparisonsAllowed = 1024*2;
 int* JB_File__Compar() {
@@ -593,11 +603,22 @@ static int CaseCompare_(JB_String* self, const char* Resolved, bool Owned) {
 #endif
 }
 
+
+static void LogPut (const char* a) {
+	static int Log = open("/tmp/logs/spd.txt", O_RDWR | O_CREAT | O_TRUNC, 0775);
+	if (Log > 0)
+		write(Log, a, strlen(a));
+		write(Log, "\n", 1);
+}
+
+
 static void CaseTest_(JB_String* self) {
 	require0 (JB_Str_Length(self));
 	char Resolved[PATH_MAX];
-	realpath((const char*)(self->Addr), Resolved);
-	CaseCompare_(self, Resolved, false);
+	const char* s = (const char*)(self->Addr);
+//	LogPut(s);
+	if (realpath(s, Resolved))
+		CaseCompare_(self, Resolved, false);
 }
 
 
@@ -708,7 +729,7 @@ bool JB_File_EOF( JB_File* self ) {
 
 
 int64 JB_File_WriteRaw_( JB_File* self, uint8* Data, int N ) {
-    N = InterWrite( self->Descriptor, Data, N );
+    N = JB_Write( self->Descriptor, Data, N );
     return ErrorHandle_(N, self, nil, "write to");
 }
 
@@ -729,8 +750,8 @@ void JB_File_Flush(JB_File* self) {
 }
 
 
-int JB_File_OpenBlank( JB_File* self ) {
-	return JB_File_Open( self, O_RDWR | O_CREAT | O_TRUNC, false );
+bool JB_File_OpenBlank( JB_File* self ) {
+	return JB_File_Open( self, O_RDWR | O_CREAT | O_TRUNC, false ) >= 0;
 }
 
 int JB_Str_MakeDir(JB_String* self) {
@@ -813,7 +834,8 @@ JB_String* JB_File_PathFix_(JB_String* P) {
 }
 
 
-void JB_File_Constructor( JB_File* self, JB_String* Path ) {
+JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
+	JB_New2(JB_File);
 	if (!Path)
 		Path = JB_Str__Empty();
 	Path = JB_File_PathFix_(Path);
@@ -827,6 +849,7 @@ void JB_File_Constructor( JB_File* self, JB_String* Path ) {
     self->DirEnt = 0;
 	if (WorthTestingCase())
 		CaseTest_(self);
+	return self;
 }
 
 
@@ -1156,8 +1179,7 @@ JB_File* JB_File__NewPipe(int Pipe) {
 	if (Pipe < 0) {
 		return nil;
 	}
-	JB_File* F = JB_New( JB_File );
-	JB_File_Constructor( F, 0 );
+	JB_File* F = JB_File_Constructor( 0, 0 );
 	F->Descriptor = Pipe;
 	F->MyFlags |= 2;
 	return F;
@@ -1171,19 +1193,17 @@ bool JB_File_IsPipe(JB_File* f) {
 
 
 JB_File* JB_Str_File( JB_String* Path ) {
-	if (Path != JB_Str__Error()) {
-		JB_File* F = JB_New( JB_File );
-		JB_File_Constructor( F, Path );
-		return F;
-	}
-	return 0;
+//	if (Path != JB_Str__Error()) {
+	return JB_File_Constructor( 0, Path );
+//	}
+//	return 0;
 }
 
 
-long JB_File__chdir( JB_String* Path ) {
+int JB_File__chdir( JB_String* Path ) {
     uint8 Buffer1[PATH_MAX];
-	long err = trchdir( (NativeFileChar2*)JB_FastFileString( Path, Buffer1 ) );
-	return ErrorHandle_(err, Path, nil, "calling chdir"); 
+	int err = trchdir( (NativeFileChar2*)JB_FastFileString( Path, Buffer1 ) );
+	return (int)ErrorHandle_(err, Path, nil, "calling chdir"); 
 }
 
 
@@ -1221,85 +1241,6 @@ bool JB_File_IsDir (JB_File* self) {
 bool JB_File_IsLink (JB_String* self) {
 	struct stat st = {};
 	return Stat_(self, &st, false) and S_ISLNK(st.st_mode);
-}
-
-
-#define SavedParentIPC 321
-
-
-void* JB_File_IPC (JB_File* self, int* np) {
-#ifndef AS_LIBRARY
-	if (self->Descriptor >= 0) {
-		JB_ErrorHandleFile(self, nil, EISCONN, nil, "shm_open");
-		return 0;
-	}
-	
-	JB_Str_MakeEntirePath(self, false);
-	int Mode = O_RDWR;
-	bool Srv = *np;
-	const char* Try = 0;
-	int Err = 0;
-	int FD = -1;
-	if (Srv) {
-		Try  = "shm_unlink"; // create in a clean space
-		Err  = shm_unlink((const char*)(self->Addr));
-		if (Err == -1 and errno == ENOENT)
-			Err = 0;
-		Mode |= O_CREAT;
-	} else if (!JB_LibIsThreaded()) {
-		// makes no sense from not the main thread...
-		struct stat Dummy;
-		if (!fstat(SavedParentIPC, &Dummy))
-			FD = SavedParentIPC;
-	}
-	
-	if (!Err and FD < 0) {
-		Try = "shm_open";
-		FD = shm_open((const char*)self->Addr, Mode, S_IRUSR|S_IWUSR);
-		if (FD < 0) {
-			printf("shm_open failed with error %i %s\n", errno, strerror(errno));
-		}
-	}
-	
-	if (FD >= 1) {
-		self->Descriptor = FD;
-		self->MyFlags = (int)Srv;
-		if (Srv) {
-			*np = JB_Int_RoundUp(*np, getpagesize());
-			Try = "fcntl";
-			int fdflags = fcntl(FD, F_GETFD);
-			if (fdflags == -1)
-				Err = fdflags;
-			  else
-				Err = fcntl(FD, F_SETFD, fdflags &~ FD_CLOEXEC);
-			if (!Err) {
-				Try = "ftruncate";
-				Err = ftruncate(FD, *np);
-			}
-		} else {
-			struct _stat st;
-			Try = "fstat";
-			if ((Err = fstat( FD, &st )) == 0) {
-				*np = (int)st.st_size;
-				if (!JB_LibIsThreaded()) 
-					dup2(FD, SavedParentIPC); // store it... so restarted processes can pick it up again.
-			}
-		}
-		if (!Err and *np) {
-			Try = "mmap";
-			void* Result = mmap(0, *np, PROT_READ | PROT_WRITE, MAP_SHARED, FD, 0);
-			if (Result != MAP_FAILED)
-				return Result;
-		}
-	}
-	
-	if (!errno) { // what?
-		errno = -1; // whatever
-	}
-	
-    JB_ErrorHandleFile(self, nil, errno, nil, Try);
-#endif
-	return 0;
 }
 
 

@@ -1,7 +1,7 @@
 
 
 extend_module scfunction
-	function FastStringOpt (|message| s, |scbase| name_space)
+	function FastStringOpt (|message| s, |SCNode| name_space)
 		opt norefcounts
 		|| fn = s.msgfunc
 		|| prms = s.second
@@ -26,15 +26,15 @@ function ByteFunc (|scfunction|)
 
 function FS (|Message| exp, |Message| getresult)
 	opt norefcounts
-	|| fs2 = getresult.last.first
+	|| fs2 = getresult.last.first!
 	|| t2 = TypeOfExpr(fs2, nil)
 	require t2 is compilercreated
 
-	|| Place = t2.default.parentpoint
+	|| Place = t2.default!.ParentPoint
 	|| arg = place.parent
 	require arg.expect(@arg)
 	
-	|| fs1 = getresult.prev
+	|| fs1 = getresult.prev!
 	|| name2 = fs2.name
 	for ch.flat in arg
 		if ch isthing name2
@@ -49,8 +49,8 @@ function FS (|Message| exp, |Message| getresult)
 function String (|Message| exp, |Message| str)
 	opt norefcounts
 	require (str == @str or @sstr or @back) and str.name == 1
-	str.obj = typebyte.typenormal
-	str.parent.obj = .bytefunc
+	str.obj = typebyte!.typenormal
+	str.parent!.obj = .bytefunc
 	str.func = @char
 	.StrRemoved++
 }

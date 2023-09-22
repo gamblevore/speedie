@@ -1,0 +1,55 @@
+
+
+class ProgressBar (GUIControl)
+	linkage
+		cpp_part Bar
+	|float|		Progress
+	|bool|		Indefinite
+	|bool|		RandomStyle
+
+	constructor (|guicontrol| p, |guiaction| onclicked=nil)
+		super.constructor(p)
+		.onclicked = onclicked
+		.indefinite = true
+
+	helper RandomData (|memory|)
+		if sdlapp.FrameCount isa 4
+			sdlapp.touch
+			RandomData.Temporal
+		return RandomData
+		
+	behaviour Draw
+		|| s = .Declutterer.Strength
+		|| edge = .gnormal.edge
+		edge.Alpha = s
+		where.RectOutlineOnly(self, edge)
+		where.ControlClip = where.ControlClip ± 1
+		if .Indefinite
+			where.Colorise(.RandomData, s)
+			sdlapp.touch
+			
+		  else
+			|| Dark  = vec4(0.2, s).PreMul
+			|| Light = vec4(0.7, s).PreMul
+			if !.RandomStyle
+				light = vec4(0.4, s).PreMul
+				
+			for (p in where) (v)
+				p.overlay((dark, light)(.StripeDark(v)))
+	
+	setter Progress	(|float|)
+		if .Progress != value
+			sdlapp.touch
+			.Progress = value
+	
+	behaviour Mouseup
+		if .lastrect contains p
+			(.onclicked)(self)?
+	
+	module
+		|| RandomData = byte[128]!
+	
+	function StripeDark (|ivec2| v, |bool|)
+		if .RandomStyle
+			return 0.5[]
+		return ((v.sum - date.ticks/3) / 4) mod 2

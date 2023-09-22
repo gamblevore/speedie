@@ -1,11 +1,19 @@
 
 
-function compiler.usingScript (|file| f, |file|)
-	require !f.isdir
+function Compiler.ScriptLoc (|string| f, |file|)
+	rz = feedback.TryUseProject(f, true).ScriptLocation.file
+	options.output_path = rz
+
+
+function compiler.UsingScript (|file| f, |file|)
+	require options.compile and !f.isdir
 	require f.Read(16) starts "#!/"
-	rz = feedback.TryUseProject(f.path, true).scriptlocation.file #require
+	
+	rz = .ScriptLoc(f)
+	
 	if error.autoprint == errorflags.printandkeep
 		error.AutoPrint = 0
+	
 	options.scripting = true
 	options.silent = true
 	options.PrintCompileString = false
@@ -21,12 +29,13 @@ function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
 
 
 function compiler.TryVariousStartModes (|bool|)
-	require !interact.shouldenter	
+	require !spdprocess.parent
+	require !app["perry"] and !app["nocompile"]
 	|| p = app.rawargs[0]
-	require p and !p.argname and !app["perry"]
+	require p and !p.argname
 			
 	|| f   = p.file
-	|| it  = compiler.usingScript(f)$
+	|| it  = compiler.UsingScript(f)$
 	|| cwd = app.cwd
 	if compiler.ScriptRecompile(f, it)
 		compiler.CompileTime
@@ -35,6 +44,7 @@ function compiler.TryVariousStartModes (|bool|)
 		app.ChildEnv("OrigScriptPath") = f
 		app.turninto(it.path, app.rawargs)
 	return true
+
 
 
 function string.ContainerName (|string|ext, |string|)

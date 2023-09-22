@@ -2,40 +2,54 @@
 
 class DrawStyle
 	linkage
-		cpp_part sty
+		cpp_part Sty
 	default DrawStyle.new 
-	|imagePixel|		Text
-	|imagePixel|		BG
-	|imagePixel|		Edge
-	|imagePixel|		Seps
+	|imagePixel|			BG
+	|imagePixel|			Edge
+	|imagePixel|			Seps
+	|imagePixel|			Text
+	|imagePixel|			_BG
+	|imagePixel|			_Edge
+	|GUIDrawEvent?|			Drawer
+	|Byte|					CornerSize
+	|byte| 					CornersCut
+	|Byte|					LineWidth
 
 		
 	constructor
-		.text <~ 1.0
+		.LineWidth = 1
 		.clear
+		.text <~ vec4(1.0)
 
-
-	constructor (|float| bg, |float| edge)
-		cpp_part Gray // who wants gray???
-		.text <~ 1.0
-		.Edge <~ edge
-		.Bg   <~ bg
-		.seps = .edge
-	
-	
 	constructor (|DrawStyle| c)
 		cpp_part ConstructorCopy
 		.text = c.text
 		.bg = c.bg
 		.edge = c.edge
 		.seps = c.seps
+		.CornerSize = c.CornerSize
+		.CornersCut = c.CornersCut
 	
+		
+	render
+		fs <~ "BG: "
+		.bg.Render(fs)
+		fs <~ "\nEdge: "
+		.edge.Render(fs)
+		fs <~ "\nSeps: "
+		.seps.Render(fs)
+		fs <~ "\ntext: "
+		.text.Render(fs)
 	
-	function NoBorder
-		.edge = .bg
-	
+	function Overlay (|PreMultipliedColor| T, |float| a=0)
+		.BG.overlay(T)
+		.Edge.overlay(T)
+		if a
+			.bg.AddAlpha(a)
+			.Edge.addalpha(A)
+
 	function Clear
-		.solid = (0.0,0.0,0.0,0.0)
+		.solid = (0.0, 0.0, 0.0, 0.0)
 	
 	function Copy (|DrawStyle|)
 		return DrawStyle(self)
@@ -45,17 +59,39 @@ class DrawStyle
 		.edge = .bg
 		.seps = .bg
 		
-
-	function EdgeColor (|bool| B, |imagepixel|)
+	function SafeEdge (|imagepixel|)
 		if self
-			return (.edge, .Bg)(B)
-		|| l1 = (0.5, 0.5, 0.5, 1.0)
-		|| l2 = (0.0, 0.0, 0.0, 1.0)
-		return (l1, l2)(b)
+			return .edge
+		return (0.5, 0.5, 0.5, 1.0)
+	
+	function SafeBG (|imagepixel|)
+		if self
+			return .Bg
+		return (0.0, 0.0, 0.0, 1.0)
 		
 	function Width (|string| s, |int|)
 		return s.length * font.width
 		
 	function Height (|string| s, |int|)
 		return font.height
+
+	syntax using (|drawstyle|)
+		._bg = .bg
+		._Edge = .edge
+		return self
+
+	syntax UsingComplete
+		.Edge = ._Edge
+		.bg = ._BG
+
+	function Strengthen (|float| s)
+		require s!=1
+		.edge.alpha *= s
+		.bg.alpha *= s
+		if s > 1
+			|| a = .bg.a
+			.bg <~ (.bg.Color * s)
+			.bg.a = a
+
+
 

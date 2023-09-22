@@ -8,9 +8,9 @@
 class FlowControl
 	linkage:cpp_part Flow
 	|FastBuff|				Buff
-	|StringReader|			ReadInput
-	|faststring| 			Write
-	|Faststring| 			Excuse
+	|StringReader?|			ReadInput
+	|faststring?| 			Write
+	|Faststring?| 			Excuse
 
 	constructor
 		flow off
@@ -102,7 +102,7 @@ class FlowControl
 		fs <~ "\n"
 		
 		if !InputName
-			app.StackTrace("JB_Flow_", fs)
+			app.StackTrace(3, fs)
 			printline fs.GetResult
 			.Excuse = nil
 			.ReadInput = nil
@@ -139,7 +139,7 @@ class FlowControl
 			if .disabled
 				return value
 			.disabled = 1
-			.flow.cond(('T', 'F')(value))
+			.flow!.cond(('T', 'F')(value))
 			.disabled = 0
 			return value
 
@@ -154,7 +154,7 @@ class FlowControl
 			require !.disabled
 
 			.disabled = 1
-			|flowcontrol--| f = .flow
+			|flowcontrol--| f = .flow!
 			|StringReader--| r = f.ReadInput
 			if r != nil
 				|| str = r.str(data.length)
@@ -175,8 +175,9 @@ class FlowControl
 			flow off
 			require FlowMode
 			.Disabled = int.max			// in case its set badly
-			.flow = FlowControl()
-			.flow.init("/tmp/FlowControl/" + name + ".txt.mz", StartCode|int64|.Hex)
+			|| f = FlowControl()
+			.flow = f
+			f.init("/tmp/FlowControl/" + name + ".txt.mz", StartCode|int64|.Hex)
 
 		function New (|string| name, |uint64| StartCode = __modified__,  |FlowControlStopper|)
 			cpp_part FlowStarter

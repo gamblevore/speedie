@@ -6,17 +6,38 @@
 
 module Math
 	constants
-		// just use π for pi, or 2π for PI*2
 		E = 2.7182818284590452353602874713526
+		iTau = 0.15915494309
+	
+	function Pi (|float|)
+		disabled "Use π for pi, or 2π for PI*2"
 	
 	function Sin (|float| f, |float|)
-		return .sinpi(f*2)
+		return .sinpi(f*2.0)
 
 	function Cos (|float| f, |float|)
-		return .cospi(f*2)
+		return .cospi(f*2.0)
+		
+	function float.cos (|float|)
+		return math.cos(self)
+		
+	function float.exp2 (|float|)
+		return 2.0 pow self
 
+	function ACosBad (|float| f, |float|)
+		cpp_wrapper (acosf)
+	
+	function Tan (|float| f, |float|)
+		return .TanPi(f*2.0)
+	
+	function float.Acos (|float|)
+		return math.acosbad(self) * math.iTau
+		
 	function float.Sin (|float|)
 		return math.sin(self) //sigh
+
+	function float.tan (|float|)
+		return math.tan(self) //sigh
 
 	helper float.__sincospi (|&float| a, |&float| b)
 		cpp_wrapper (__sincospif)
@@ -43,48 +64,28 @@ module Math
 	function SinPi (|float| f, |float|)
 		cpp_wrapper (__sinpif)
 
-	function float.ATan2 (|float| f2, |float|)
+	function float.ATan2Bad (|float| f2, |float|)
 		cpp_wrapper (atan2f)
 
-	function float.ATan3 (|float| f2, |float|)
-		|| Result = -.atan2(f2)				   // our result is +-pi, but we want 0-1...
-		Result /= 2π
-		if (Result < 0)
-			Result += 1.0
-		return Result	
+	function float.ATan2 (|float| y, |float|)
+		rz = -.ATan2Bad(y)				   // our result is +-pi, but we want 0-1...
+		rz *= math.iTau
+		if rz < 0.0
+			rz += 1.0
 
 	function int.Abs (|int|)
 		cpp_wrapper (abs)
 	
-	function float.Abs (|float|)
-		cpp_wrapper (fabsf)
-	
-	function float.Sqrt (|float|)
-		cpp_wrapper (sqrtf)
-	
 	function int.Sqrt (|int|)
 		return self|f64|.sqrt
 	
-	function float.RSqrt (|float|)
-		return 1.0 / .sqrt
-	
 	function f64.Sqrt (|f64|)
 		cpp_wrapper (sqrt)
-	
-	function float.Fract (|float|)
-		return self - .floor
-	
-	function float.Ceil (|float|)
-		|| F = .floor
-		if self != F
-			F++
-		return F
 	
 	function float.Gaussian (|float| v, |float|)
 		|| exp = self*self / v
 		|| factor = math.e pow -exp
 		return factor / (π * v).sqrt
-
 	
 	function float.Clamp (|float|L, |float|H, |float|)
 		cpp_wrapper (fclampf)
@@ -103,11 +104,6 @@ module Math
 
 	function uint64.Hash (|uint64|)
 		cpp_wrapper JB_uint64_hash
-	
-	function int.ToOne (|int|)
-		if self > 0
-			return 1
-		return self|uint| >> 31
 	
 	function int.LowestBit (|int|)
 		return self & -self 
@@ -162,6 +158,9 @@ module Math
 	function uint64.LowestBit (|uint64|)
 		return self & -self 
 
+	function uint.LowestBit (|uint|)
+		return self & -self 
+
 	function uint64.RemoveOneBit (|uint64|)
 		return self & (self-1)
 
@@ -203,10 +202,15 @@ extend int
 			for a
 				rz *= self
 
-	operator minus0 (|int|a, |int|)
+	operator minus0 (|int| a, |int|)
 		|| r = self - a
 		if r >= 0
 			return r
+			
+extend ivec2
+	operator minus0 (|ivec2| a, |ivec2|)
+		return (.x minus0 a.x, .y minus0 a.y)
+
 
 
 extend float
@@ -236,7 +240,6 @@ extend float
 	
 	function RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |float| )
 		|| fr = hfrom - lfrom
-		|| tr = hto - lto
 		// if its lfrom, return lto
 		// if its hfrom, return hto
 		|| inbetweenfromness = (self - lfrom) / fr
@@ -265,7 +268,7 @@ extend float
 	function f64.isInf (|bool|)
 		cpp_wrapper (__isinfd)
 	
-	function Powow (|int| n, |float|)
+	function Pow (|int| n, |float|)
 		visible
 		rz = self
 		for n
@@ -299,16 +302,24 @@ extend float
 	syntax access (|bool|)
 		return random[] < self
 
-	syntax access (|float| from, |float| to, |float|)
-		cpp_part Mix // this is the mix function
-		|| C = .clamp(0,1)
-		|| range = to-from
-		return (range*C) + from 
-	
-	function Map (|float| from, |float| to, |float|)
-		if (self > to)
-			return 1
-		return .minus0(from) / to
+
+function math.RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |FloatRangeConverter|)
+	description "Converts numbers in one range, to another range. Very awkward to do, normally!" 
+	cpp_part RangeConv4
+	return (-lfrom,  1.0 / (hfrom - lfrom),  lto,  hto)|FloatRangeConverter|
+
+function math.RangeConvert (|float| lfrom, |float| hfrom, |FloatRangeConverterBasic|)
+	description "Same as math.RangeConvert(lfrom, hfrom, 0, 1)" 
+	cpp_part RangeConv2
+	return (-lfrom,  1.0 / (hfrom - lfrom))|FloatRangeConverterBasic|
+
+datatype FloatRangeConverter (vec4)
+	function Convert (|float| x, |float|)
+		return mix(self[2], self[3], (x + self[0]) * self[1])
+
+datatype FloatRangeConverterBasic (vec2)
+	function Convert (|float| x, |float|)
+		return (x + self[0]) * self[1]
 
 
 

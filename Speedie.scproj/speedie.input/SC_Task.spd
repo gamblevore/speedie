@@ -1,0 +1,178 @@
+
+
+// new task system
+
+module SCTasks {
+
+function CollectAll
+	opt norefcounts
+	|| T = typetask		// now what?
+	require T
+	for ch in compiler.TasksTodo
+		|| P = ch.obj|SCNode|!
+		if P == Compiler.program
+			P = T.Modul
+		  elseif p isa SCClass
+			p = p.modul|SCClass|
+		|| found = NewTaskActual(ch, P)
+			found.parent = p
+			P.TryAdd(ch, found, found.name)
+
+
+function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
+	opt norefcounts
+	|| name = node[@thg]
+	|| fields = name.Next(@nil)
+	require name and fields
+	if fields == @bra or @list
+		fields.func = @bra
+	  else
+		fields = @bra.msg
+		name.next = fields
+	
+	|| arg = fields.next(@arg)		#require
+	|| Supper = fields.first
+	arg.TakeAllFrom(fields)
+	
+	|| level = 2
+	using node
+		if Supper == @thg or @dot
+			fields <~ Supper
+			level = 3
+		  else
+			fields <~ (@sdot, "task")
+		arg.BuildTask
+		node.name = "role" 
+
+	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
+		task.cls!.IsRole = level
+	return task
+
+
+function NewTask (CollectFunc)
+	node.obj = name_space
+	compiler.taskstodo <~ node
+	return compiler.program
+
+
+function Message.MakeTaskVar  (|message!| con, |message| before)
+	opt norefcounts
+	|| prm = con.second!
+	|| arg = prm.next!
+	|| name = .VarName
+		before.prev = NewEqRel(@sdot + name, @thg + name)
+		prm <~ .copy // :)
+
+
+function scclass.FillTaskConstructor (|scfunction| con)
+	opt norefcounts
+	|| src = con.source!
+	using src
+	.FillTaskConstructorSub(src, src.last.TaskConBefore)
+	
+
+function message.TaskConBefore (|message!|)
+	opt norefcounts
+	|| marker = .find(@dot, "constructor")
+	if !marker
+		marker = .first
+	marker++
+	if marker
+		return marker
+	
+	return .msg(@sheb, "task")
+
+
+function scclass.FillTaskConstructorSub (|message| src, |message| before)
+	opt norefcounts
+	|| pr = .super
+	if pr.istask
+		pr.FillTaskConstructorSub(src, before)
+	for p in .properties
+		p.source!.MakeTaskVar(src, before)
+
+
+function Message.BuildRunTask (|bool|)
+	opt norefcounts
+	|| prms = self[@nil]
+	|| arg = prms.next(@arg)
+	require arg.ExpectLast
+	|| f = prms.func
+	expect (f == @bra or @list) (prms)
+	
+	.name = "syntax"
+	f = prms.first.func
+
+	ifn f == @thg or @dot
+		|| brah = @bra.msg
+		brah <~ (@thg, "interface")
+		.first = brah
+		|| pr = .parent!
+		pr.AppendMacro(sctasks.TaskMacro, [prms])
+		|| callprms = pr.flatlast
+		callprms <~ (@thg, "self")
+		for p in prms
+			|| ty = p.second
+				callprms <~ ty.copy
+	
+	.first = @thg + "call"
+	return true
+
+
+
+function Message.BuildTask 
+	|| Runs = .FindAll("run")
+	if runs == 0
+		runs <~ .Msg(@tmp, "run")
+	  else
+		check (runs < 2) (runs[0], "Multiple run statements")
+	|| run = runs[0]!
+	if run.BuildRunTask and !.findall("constructor")
+		run.prev = "constructor () {}"~parse
+
+
+	
+|| TaskMacro = `
+	role interface (task)
+		prototype prototype (^"_0")
+		syntax call (^"_0")
+			return (._func|prototype|)()
+`.macro
+
+}
+
+
+
+function compiler.TestTask
+	|| xxx = task.LessThan3("a", 5, "c")
+	|| z = (xxx)(8)
+
+
+task LessThan3 (|string| a, |int| b, |string| c)
+	run (|int| i, |bool|)
+		return i < .b
+
+
+module SCTasks2
+	function run
+		|| xxx = lessthan("a", 5, "c")
+		|| z = LessThan.abc(xxx, 1)
+		|| yyy = task.lessthan2(1.2)
+		|| w = LessThan.abc(yyy, 1)
+		"w is: ${w.render}"
+
+		
+	task LessThan (|string| a, |int| b, |string| c)
+		run (|int| LESSTHAN, |bool|)
+			cpp_part TaskTest
+			return LESSTHAN < .b
+		
+		module
+			function abc (lessthan) 
+				return (self)(LessThaN)
+
+
+task LessThan2 (|float| f)
+	run 	(SCTasks2.lessthan)
+		return lessthan*2.1 < .f
+

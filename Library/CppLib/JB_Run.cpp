@@ -65,8 +65,10 @@ JBClassPlaceSaver( Saveable,     0,                     0,                      
 JBClassPlace( FastString,       JB_FS_Destructor,      JB_AsClass(JB_Object),      JB_FS_Render );
 JBClassPlace( ByteMap,          0,                     JB_AsClass(JB_Object),      0 );
 JBClassPlace( CharSet,          0,                     JB_AsClass(JB_Object),      JB_CS_Render );
-JBClassPlace( RingTree,         JB_Ring_Destructor,    JB_AsClass(Saveable),       0 );
+JBClassPlace( JB_List,         JB_Ring_Destructor,    JB_AsClass(Saveable),       0 );
 JBClassPlace( TokHan,           0,                     JB_AsClass(JB_Object),      0 );
+
+extern JB_Class JB_TaskData;
 
 
 CharSet*            WhiteSpace_;
@@ -79,7 +81,7 @@ byte				JB_Active = 0;
 extern char**		environ;
 extern uint			JB__Flow_Disabled;
 static Array*		App_Args;
-_cstring			App_CalledBy;
+_cstring			App_CallPath;
 
 
 Dictionary* JB_App__Env() {
@@ -103,8 +105,9 @@ static JB_StringC* emptystr() {
 }
 
 
-CharSet* JB_CS__New(JB_String* charset, bool Ranges);
+CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);
 JB_String** JB_Str__FindGlobals(u8** src, uint64* Hash);
+void JB_RemoveHandlers();
 
 
 static uint DecodeLength(u8*& p) {
@@ -163,54 +166,59 @@ void JB_Str__LoadGlobals() {
 void JB_FinalEvents() {
 	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
 	JB_LibShutdown();
+	JB_RemoveHandlers(); // some stupid systems call signals after we exit??
 }
 
 Array*	JB_App__Args()						{ return App_Args; }
-JB_StringC*	JB_App__CalledBy()				{ return JB_StrC(App_CalledBy); }
+JB_StringC*	JB_App__CallPath()				{ return JB_StrC(App_CallPath); }
 void	JB_LibShutdown()					{ JB_MemFree(JB_MemStandardWorld()); }
 bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
 bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
-void	JB_SP_AtExit() {
-	JB_FinalEvents();
-}
+void	JB_App__CrashInstall();
 
 
-int JB_LibInit (_cstring* R) {
+int JB_LibInit (_cstring* R, bool IsThread) {
 	JB_ErrorNumber = 0;
+	JB_TaskData.Size = 128;
 	JB__Flow_Disabled = 0x7fffFFFF;
 
-	static_assert((sizeof(ivec3) == 12 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 12 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
+	static_assert((sizeof(ivec3) == 16 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 16 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
     if (JB_MemStandardWorld()->CurrSuper)
         return EADDRINUSE;
     if (!(EmptyString_ = emptystr()))
         return ENOMEM;
 	if (R) {
-		App_CalledBy = *R;
+		App_CallPath = *R;
 		#ifndef AS_LIBRARY
-			void JB_App__CrashInstall();
-			JB_App__CrashInstall();
+			if (!IsThread) {
+				JB_App__CrashInstall();
+				if (getppid() > 1)
+					PicoGlobalConf()->SuicideIfParentDies = true;
+				// default Pico to suicide, if run. SDLapp.init will reset this.
+			}
 		#endif
 	}
 	App_Args = JB_Incr(JB_Str_ArgV(R));	// allow caller to remove their c-string data.
-
+    
     ErrorString_ = emptystr();
-    WhiteSpace_ = JB_CS__New( JB_StrC("\x9\xA\xD\x20"), false );
+    WhiteSpace_ = JB_CS_Constructor( nil, JB_StrC("\x9\xA\xD\x20"), false );
     JB_FS__FastNew( 0 );		// stop leak tests catching this.
     JB_Dict__Init();
     JB_Str__LoadGlobals();
+    JB_PID_Start();
 
     int Err = JB_Init_();
 	if (Err)
 		return Err;
     #if DEBUG
-	JB_TotalMemorySanity(true);
+	JB_TotalSanity(true);
 	#endif
 	return 0;
 }
 
 
 
-int		JB_SP_Run (_cstring* C, int Mode)	{
+int JB_SP_Run (_cstring* C, int Mode)	{
 	if (JB_Active)
 		return EALREADY;
 	JB_Active = 1 | (Mode&4);
@@ -218,7 +226,7 @@ int		JB_SP_Run (_cstring* C, int Mode)	{
 		AddError(EACCES, "jb.shutdown");
 	} else {
 		if (!App_Args and C)
-			AddError(JB_LibInit(C),		"jb.init");
+			AddError(JB_LibInit(C, Mode&4), "jb.init");
 		
 		if ((Mode & 1) and App_Args and !JB_ErrorNumber)
 			AddError(JB_Main(),			"occurred");

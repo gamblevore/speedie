@@ -20,11 +20,8 @@ extend Parser {
 	function NextByte (|int|)
 		cpp_wrapper
 
-	function Eats ( |string| s, |bool| )
+	function Eats (|string| s, |bool|)
 		cpp_wrapper JB_Tk__EatString
-	
-	function Avoid (|message|)
-		return endoflinemarker
 
 	function ErrorStart (|ind|)
 		cpp_wrapper
@@ -32,43 +29,44 @@ extend Parser {
 	function ErrorStart (assigns:|ind|)
 		cpp_wrapper
 
-	function StartParse (|string| result) { cpp_wrapper  }
-	function StopParse { .startparse(nil) }
+	function StartParse (|string?| result)
+		cpp_wrapper
 
-	function NextStart (|int|)			{ cpp_wrapper	}
-	function NextStart (assigns:|int|)	{ cpp_wrapper  }
+	function StopParse
+		.StartParse(nil)
 
-	function Running (|bool|)			{ cpp_wrapper  }
+	function NextStart (|int|)
+		cpp_wrapper
+
+	function NextStart (assigns:|int|)
+		cpp_wrapper
+
+	function Running (|bool|)
+		cpp_wrapper
 
 
-	function CppInited (|bool|)
+	function CppInited		(|bool|)
 		cpp_wrapper 
-	function Token (|string| name, assigns:|TokenHandler|)
+	function Token			(|string| name, assigns:|TokenHandler!|)
 		cpp_wrapper
-	function Token (|string| name, |TokenHandler|)
+
+	function TokenNil		(|string| name, assigns:|TokenHandler!|)
 		cpp_wrapper
-	function TokenNil (|string| name, assigns:|TokenHandler|)
+	function Handler		(|int| BitTypes, |TokenHandler_fp|Func=nil, |TokenHandler!|)
 		cpp_wrapper
-	function Handler (|int|BitTypes, |TokenHandler_fp|Func=nil, |TokenHandler|)
+	function Process		(|int| BitTypes, |bool|Mode=false, |message?| paren=nil, |message?|)
 		cpp_wrapper
-	function Process (|int|BitTypes, |bool|Mode=false, |message| paren=nil, |message|)
-		cpp_wrapper
-	function CleanSpaces (|int|)
-		cpp_wrapper
-	function ClearIndent (|int|)
+	function CleanSpaces	(|int|)
 		cpp_wrapper
 
 
-	function Expect (|int|BitTypes, |bool|)
+	function Expect			(|int| BitTypes, |bool|)
 		cpp_wrapper
 
-	function Allow (|int|BitTypes, |bool|)
+	function Allow			(|int| BitTypes, |bool|)
 		cpp_wrapper
 
-	function Consume (|int|BitTypes, |bool|Expect, |bool|)
-		cpp_wrapper
-
-	function CheckEnded (|int|BitTypes, |bool|)
+	function CheckEnded		(|int|BitTypes, |bool|)
 		cpp_wrapper
 	
 	// function Indentation (|int| Start, |int|) { cpp_wrapper }

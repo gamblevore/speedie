@@ -21,13 +21,13 @@ These are special functions. They work like any other function, but are called v
         printline x[2] // "l"
     
 
-+ `syntax append` - Useful if your class can have things appended into it.
-+ `syntax equals` - Used for comparing if two objects are equal.
++ `syntax append`  - Useful if your class can have things appended into it.
++ `syntax equals`  - Used for comparing if two objects are equal.
 + `syntax compare` - Used for comparing if one object is more or less than the other.
-+ `syntax access` - Used for accessing an object as if it were an array. Can take params of any kind, strings or messages even. Can even take multiple parameters.
-+ `syntax expect` - Used for error-handling.
-+ `syntax cast` - Decides how an object gets turned into a bool. Useful for `"if"` tests. Also used so you can return a `faststring` object from a function that expects a `string`... because the `faststring` has a cast to a `string`.
-+ `syntax is/isnt` - See below.
++ `syntax access`  - Used for accessing an object as if it were an array. Can take params of any kind, strings or messages even. Can even take multiple parameters.
++ `syntax expect`  - Used for error-handling.
++ `syntax cast`    - Decides how an object gets turned into a bool. Useful for `"if"` tests. Also used so you can return a `faststring` object from a function that expects a `string`... because the `faststring` has a cast to a `string`.
++ `syntax is`      - See below.
 
 ---
 ### 'is' and 'isnt'
@@ -53,13 +53,16 @@ Speedie checks the first param, and assumes we want a constant within `ListViewS
             Selected 
             Modified
             Disabled
-            ...
+            ...    
+
+The `isnt` operator is automatically defined as being the opposite of `is`. So as long as you define `syntax is`...  then both the `is` and `isnt` operators are enabled for you!
+
+So these two versions are equivalent:
+
+    require row isnt Disabled                    // version one
+    if row.syntaxis(listviewstate.disabled)      // version two
+        return nil
     
-
-So these two lines are equivalent:
-
-    require row isnt Disabled
-    require row.syntaxisnt(listviewstate.disabled)
 
 Obviously, the first looks better, but they both do the same thing, and the second is how people normally would be testing for flags on states in classes, in other languages. You can also do things like this:
 
@@ -119,7 +122,7 @@ As a bonus, I've also demonstrated auto-constructors, which are created for anyt
 
 ---
 ### Custom Operators
-Speedie uses custom operators a lot. For string appends obviously, but for all sorts of classes. For example, you can compare an array to an int. `Strings` too. And `RingTree`!
+Speedie uses custom operators a lot. For string appends obviously, but for all sorts of classes. For example, you can compare an array to an int. `Strings` too. And `list`!
 
     || x = ["a", "b", "c"]
     if x == 3
@@ -131,16 +134,18 @@ Speedie uses custom operators a lot. For string appends obviously, but for all s
     if L == 4
         "The list $L has four items!"
         
-`Isa` works on ints too, it checks if something is a multiple of somerthing else. We can also set bits on ints even.
+`Isa` works on ints too, it checks if something is a multiple of something else. `(x isa 3)` is `true` for 0, 3, 6, 9, etc.
 
     || x = 0
     for i in 10
-        if i isa 2 // if 
+        if i isa 2
             "$i is even"
             x[i] = true
           else
             "$i is odd"
     "x is $x"
+    
+We can also set bits on ints even. Like above where I did `x[i] = true`, that is setting an individual bit on an int.
 
 We have ternary expressions too. Useful sometimes.
 
@@ -249,8 +254,30 @@ Speedie has some handy constants!
 Obviously, these are in power of 2, so 1KB = 1024. Reporting sizes can be done nicely too!
 
     "${x.strsize} ${x2.strsize} ${x3.strsize}" // prints: "1024 2MB 1.5MB"
+    
+ <small>_(We reject the stupid ISO change that means 1KB = 1000. That is utterly retarded, and has nothing to do with programming, because programmers need powers of 2 numbers. kibble-bytes or whatever will never be added. We are proud believers of 1024 is a kilobyte and everyone else can go to hell.)_</small>
 
 ---
 ### Parsing
 Remembering to use Jeebox instead of making a custom file format, is a good way to reduce code-size, even for very simple file formats like a file separated by lines and commas.
+
+
+---
+### Config Files
+
+Quite often you have some kind of config file, and you want to access it as if it were like a "record". That is... you have rows and values in those rows. Here is an example:
+
+    main
+    	|| conf = ConfData.parse		#require
+    	"Theme: ${conf[`theme`]}"
+    	"Last Opened: ${conf[`date`].date}"
+    	"Curr File: ${conf[`curropen`]}"
+
+You should find this example in `/usr/local/speedie/examples/config_reader.spd`
+
+Treating `message` class as a config, is done by accessing it with `msg[string]`. Config files probably need their own file to explain how they work, as there some details, but mostly its just there to enable short-simple code.
+
+
+
+
 

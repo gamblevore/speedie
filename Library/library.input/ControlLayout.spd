@@ -47,6 +47,12 @@ datatype ControlRect (ivec4)
 	function Height (|ControlLine|)
 		return (.y1, .y2)|ControlLine|
 	
+	function BasicSize (|ivec4|)
+		return self >> 4
+	
+	function IsBasic (|bool|)
+		return .syntaxequals(.BasicSize.Layout, false)
+		
 	render
 		self[0]|controlpoint|.AppendInto(fs)
 		fs <~ " to "
@@ -57,11 +63,12 @@ datatype ControlRect (ivec4)
 		self[3]|controlpoint|.AppendInto(fs)
 
 
-function int.middleLayout (|controlline|)
+helper int.MiddleLayout (|controlline|)
 	return the~middle-(self>>1) to (self)~long
 
-function int.InsideLayout (|controlline|)
+helper int.InsideLayout (|controlline|)
 	return the~left+self to the~right-self
+
 function ivec2.Layout (|controlrect|)
 	return .x~wide by .y~high
 
@@ -89,7 +96,7 @@ datatype ControlPoint (int)
 	syntax is (|ControlPoint| m, |bool|)
 		return (self|int|&15)==m
 	operator plus (|int| n, |ControlPoint|)
-		return ((self|int|&15) (|) ( (.length+n) << 4))|controlpoint|
+		return ((self|int|&15) ||| ( (.length+n) << 4))|controlpoint|
 	operator minus (|int| n, |ControlPoint|)
 		return .operatorplus(-n)
 	operator to (|ControlPoint| High, |ControlLine|)
@@ -113,7 +120,7 @@ datatype ControlPoint (int)
 		if self is high
 			return self to the~top
 	function Layout (|int| value, |ControlPoint|)
-		return (self|int| (|) value<<4)|controlpoint|
+		return (self|int| ||| value<<4)|controlpoint|
 	
 	function AppendInto (|faststring| fs)
 		fs <~ .length

@@ -42,9 +42,9 @@ module TreeAssembler
 	function InitAll
 		instruction.instructionInit
 		fn_asm.InitTable
-		Instruction[asm.SET1].Const
-		Instruction[asm.SETK].Const
-		Instruction[asm.SETN].Const
+		Instruction[asm.SET1]!.Const
+		Instruction[asm.SETK]!.Const
+		Instruction[asm.SETN]!.Const
 		return 
 		TextAssembler.Requests		:= dictionary()
 		TextAssembler.RequestTable	:= array()
@@ -66,14 +66,13 @@ module TreeAssembler
 		for l in exp / ','
 			|| fn = compiler.ExportNames[l]
 			if fn isa SCFunction
-				if fn.CanLibLoad // nope
 				fn.addtotable(rz)
 		
 		
 	function StampAll (|[scfunction]| Funcs)
 		opt norefcounts
 		for fn in funcs
-			if fn.CurrReacher
+			if fn.MyReacher
 				.Stamp(fn)
 	
 		
@@ -88,8 +87,8 @@ module TreeAssembler
 		.StampAll(list)
 		scfunction.linkall(list)
 		|| args = {8725l, 275l}
-		|| mu   = list[0].asm
-			|| Result = mu.finish.run(args, –count args)
+		|| mu   = list[0]!.asm
+			|| Result = mu.finish.run( &args[0], –count args )
 			if result != 9000
 			
 			.StampAll(compiler.funclist)
@@ -106,8 +105,8 @@ module TreeAssembler
 
 
 	function scfunction.Flatten
-		|| fp = fn_asm_table[@arg]
-		(fp)(TreeAssembler.StdState, .SourceArg)
+		|| fp = fn_asm_table[@arg]!
+		(fp)(TreeAssembler.StdState, .SourceArg!)
 
 
 	function Stamp (|SCFunction| fn)
@@ -123,7 +122,7 @@ module TreeAssembler
 extend_module ASM
 	function Needed (|bool|)
 		|| fn = compiler.exportnames["JB_ASM_Run"]
-			return fn.CurrReacher
+			return fn.MyReacher
 
 
 //|| ASMPack = "digest" <(`

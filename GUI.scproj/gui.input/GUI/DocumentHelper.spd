@@ -1,0 +1,76 @@
+ 
+
+function dictionary.DocumentCached (|string| path, |document|)
+	opt norefcounts
+	require self
+	|| i = .valuelower(path)
+	if i isa CachedPath
+		return i.value
+
+
+class CachedPath
+	linkage
+		cpp_part CaP
+	|string|				Path
+	|document--?|			Value
+	|dictionary--?|			Cache
+
+	constructor (|string| p, |dictionary| c, |document| v)
+		c.valuelower(p) = self
+		.path = p
+		.cache = c
+		.value = v
+
+
+	function Clear
+		require self
+		|| c = .Cache
+			c.valuelower(.path) = nil
+		.path = ""
+		.value = nil
+		.cache = nil
+
+
+class DocumentViewer (list)
+	linkage: cpp_part docview
+	contains DocumentViewer
+	|GUIControl--?|				Viewer
+
+	constructor (|GUIControl| V)
+		.viewer = V
+
+	function Clear
+		opt norefcounts
+		for o in self
+			if o isa textview
+				o.document = nil
+		super.clear
+		
+	function Find (|GUIControl| V, |documentviewer|)
+		opt norefcounts
+		for (o in self) (s)
+			if o == v
+				return s
+	destructor
+		.clear
+	
+	iterator
+		|| ff = .first
+		while ff
+			yield (ff.viewer) (ff)
+			ff = ff.next
+
+
+function document.RemoveViewer (|guicontrol| g)
+	opt norefcounts
+	.viewers.find(g).remove?
+
+
+function document.AddViewer (|guicontrol| g)
+	opt norefcounts
+	if !.viewers.find(g)
+		.viewers <~ documentviewer(g)
+	if g isa textview
+		|| c = .current
+			g.UseState(c,  self,  c.typingplace, DocumentState.InitialSet)
+

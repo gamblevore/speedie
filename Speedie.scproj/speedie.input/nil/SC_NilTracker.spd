@@ -1,142 +1,267 @@
 
 
-struct NilItem
-	|scdecl--|	Decl
-	|nilstate|	Nil
-	|byte[7]| 	Dummy
+/*
+	NilTracker keeps track of a 3D-ish table. (2D + 2-layers)
+	
+	We have rows (declarations), columns (branch-depth), and each cell has two values for the two branch-side.
+	
+	We actually store it as bit-fields, but its still the same.
+	
+	Its a true work of art. Beyond which giants cannot compare.	
+*/
 
 
-struct NilTracker
-	linkage:cpp_part nil
-	|scfunction--|		fn
-	|uint| 				DeclCount
-	|NilItem[1536]|		Items
+struct LoopInfo 
+	|NilRecord| 		ContRecord
+	|NilRecord| 		ExitRecord
+	|byte| 				VarCount
+	|byte| 				NestDepth
+	|bool| 				HasEscape
+	
+	function BeginLoop (|bool| HasExitCond, |Loopinfo|)
+		rz = *self
+		|| v = ArchonPurger.value
 		
-	function Undo (|uint| s)
-		.merge(s, false)
-		.DeclCount = s
+		.ExitRecord = HasExitCond|nilrecord| * V	// .Finish will check for non-zero
+		.HasEscape = HasExitCond
+		.ContRecord = V								// in case loop fails the first condition
+		.VarCount = V.DepthOfVars
+		.NestDepth = ArchonPurger.t.nestdepth
 	
-	function Restore (|uint| s)
-		.merge(s, false)
+	
+	function FinishLoop (|message| msg)
+		|| Ex = .ExitRecord						#check (msg, "Loop never exits.")
+		if !.HasEscape and !msg.islast
+			msg.KinderRemoveAfter
+		ArchonPurger.t.SetAllNil(Ex)
+	
+	
+	function NextLoop 
+		.ContRecord |= ArchonPurger.value
+		ArchonPurger.t.SetAllNil(.contrecord)
 
-	function Clear (|uint| a,  |uint| b)
-		while a < b
-			.items[a++].Nil = 0 // i hope?
 
-	function Merge (|uint| s, |bool| Merge=true)
-		|| c = .DeclCount
-		.DeclCount = s
-		while s > c
-			|| i = &.items[--c]
-			|| d = i.decl
-			|| v = i.nil
-			if Merge
-				v |= d.nilused
-				i.nil = v
-			  elseif !v
-				debugger 
-			d.nilused = v
+	
+
+struct ArchonPurger
+	linkage: cpp_part nil
+	|&NilRecord| 			Neel
+	|&NilRecord| 			RowEnd
+	|Nilrecord| 			Realnesses		// could be removed after we remove the param upgrader!
+	|Scdecl--[32]| 			Decls
+	|scdecl?|				Return
+	|bool|					FnAbleToNilCheck
+	|bool| 					RootReturned	// for recursive funcs
+	|bool|					AnyReturns
+	|NilRecord[64]| 		Rows
 	
 	
-	function SetNilness (|scdecl| d, |nilstate| s, |nilstate|)
-		opt norefcounts
-		|| old = d.nilused
-		if old == s
-			return s
-		if old > 3 or s > 3 // what?
+	function NestDepth (|int|)
+		return (.Neel - &.rows[0])|int|
+	
+	
+	function BecomeRealSub (|scdecl| V)
+		V.NilDeclared = NilState.real
+		if v is self
+			.FnAbleToNilCheck = false
+		if .NestDepth > 0				// We need to affect the other branches.
+			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
+	
+	
+	function BranchEnter (|message| where, |NilRecord|)
+		expect (.Neel < .RowEnd) (where, "Branch depth too deep (over 63)")
+		rz = *(.Neel++)
+		*.neel = rz // no realnesses
+	
+	
+	function BranchSwap (|NilRecord| A, |nilrecord|)
+		rz = value()
+		.SetAllNil(A)
+	
+	
+	function BranchExit (|NilRecord| A=0,  |nilstate|)
+		|| B = value()
+		*.Neel-- = 0 // cleanup
 		
-		|| c = .DeclCount
-		if (c < 1536)
-			|| i = &.items[c]
-			i.nil = old
-			i.decl = d
-			.DeclCount = c + 1
-			d.nilused = s
-			return s
+		.SetAllNil(A ||| B)
+		if .NestDepth == 0
+			.Realnesses = -1
+		return nilstate.real
+
+			
+	function Declare (|scdecl| D, |nilstate| nd, |nilstate|)
+		rz = .DeclareSub(d, nd)
+		target debugnil	
+			d.NilPrint("add")
+	
+	
+	function DeclareSub (|scdecl| D, |nilstate| nd, |nilstate|)
+		nd &= nilstate.either
+		|| N = .value.DepthOfVars + 1
+		expect (N < 31)								(D, "Too many declarations")
+		.decls[n] = d
+		d.NilReg = N * d.TypeSuffers			
+		d.DReg.Reg = n								// right? might as well do this at the same time?
+		d.NilAllocDepth = .NestDepth
+		|| P = (.Neel)|&nilrecorder|
+		(p)(n) = nd
+		return nd
+	
+	
+	function scdecl.NilCurr (|nilstate|)
+		if self Isnt Local
+			return .NilDeclared & nilstate.either
+		return (ArchonPurger.Value)[.NilReg]
+	
+	
+	function SetNilness (|SCDecl| d, |NilState| New, |NilState|)
+		pragma inline
+		|| P = (.Neel)|&nilrecorder|
+		(P)(d.NilReg) = new
+		target debugnil
+			d.NilPrint("set")
+		return New
+
+
+	function StartNil (|SCFunction| f, |message|)
+		opt norefcounts
+		require f.CanNil
+
+		SCFunction.CurrFunc = f
+		.rows[0] = nilstate.Basic
+		.Neel = .rows[0]
+		.rowend = .Neel + 63
+		.Realnesses = -1
+		ArchonPurger.loops = nil
+		.AnyReturns = false
+		.RootReturned = false
+		.CheckNilCheck(F)
 		
-		error (.fn, "Too many variables for nilchecker")
-		return s
+		for d in f.args
+			.DeclareSub(d, d.nildeclared)
 
-
-	function Start (|scfunction| f)
-		opt norefcounts
-		scfunction.currfunc = f
-		.DeclCount = 0
-		.fn = f
-		|| r = f.returntype
-			r.NilUsed = 0 // :)
-		for d in .fn.args
-			d.RestoreNil
-
-
-	function Finish (|scfunction| f)
-		opt norefcounts
-		f.ReturnType.DeclareAsUsed?
-		.fn = nil
+		target debugnil
+			f.NilPrint("\n ****** ", false)
 		
-	
-	function Check (|scfunction| f)
+		|| r = f.ReturnType
+			if !r.nilstated
+				r.nildeclared = 0 // build this up carefully.
+		target debugnil
+			if "": ArchonPurger.ndb4
+
+		return f.SourceArg
+
+
+	function FinishNil (|SCFunction| f)
 		opt norefcounts
-		if platform.IsDebug
-			debugger 
-			f.nildebug
-			.Start(f)
-			Runall(f.SourceArg)
-			.Finish(f)
+		|| r = f.ReturnType
+			r.nildeclared |= nilstate.stated
+		for a in f.Args
+			a.nildeclared |= nilstate.stated
+		target debugnil
+			f.NilPrint(" !!!!! ", true)
+	
+
+	function CheckNilCheck (|SCFunction| f)
+		opt norefcounts
+		.FnAbleToNilCheck = false
+		.return = f.returntype
+		|| s = f.args.first
+			if (s.nildeclared is nilish) and s.TypeSuffers and .return.CanNilCheck
+				.FnAbleToNilCheck = true
 
 
-	function scfunction.canNil (|bool|)
-		return !.IsMacro and !.IsWrapper and .isOK and .LimitTests
+	function Value (|nilrecord|)
+		pragma inline
+		return *.Neel
 	
 	
-	function scfunction.LimitTests (|bool|)
-		|| c = .Lookup #require
-		require c.name contains "NilTest"
-		return .SourceArg contains "nilcheck"
-	
+	function Self (|nilstate|)
+		return (.value)[1]
+
+
+	target debugnil {
+		function SetAllNil (|NilRecord| Dest)
+			dest &= .Realnesses
+
+			|| diff = dest xor value()
+			*.neel = dest
+			
+			for i in 32
+				|| d = .decls[i]
+				if d and diff[i]
+					d.nilprint("change")
+	} else {
+		function SetAllNil (|NilRecord| Dest)
+			pragma inline
+			*.neel = dest & .Realnesses
+	}
+
+
 	module
-		|niltracker| T
-		function SaveLives
+		|LoopInfo| 				Loops
+		|ArchonPurger|			T
+		|byte|					OldPrint
+		|byte|					NilTrapper
+
+
+		function Value (|NilRecord|)
+			pragma inline
+			return t.value
+
+
+		function EndBlock (|nilrecord|)
+			pragma inline
+			rz = .value
+			t.SetAllNil(nilstate.basic)
+
+
+		function DeclKill
+			pragma inline
+			if !t.nestdepth
+				t.RootReturned = true
+			t.SetAllNil(nilstate.Basic)
+		
+
+		function ExterminateZergBugs (|scfunction| f)
 			opt norefcounts
-			using options.NilStrength
-				for f in compiler.funclist
-					if f.cannil: T.Check(f)
-				
-			scfunction.currfunc = nil
-			StdErr.PrintErrors
-			StdErr.Clear
+			|| arg = t.Startnil(f)
+				Argument(arg)
+				if t.FnAbleToNilCheck and !f.isnilchecker
+					f.isnilchecker = 1
+			t.FinishNil(f)
 
-	
-	
+		
+		function FixArchons
+			opt norefcounts
+			using options.NilStrength	
+			|| Old = stderr
+			|| Rec = ErrorReceiver()
+			using rec
+				for (xoxo in compiler.funclist) (i)
+					.ExterminateZergBugs(xoxo)
+					rec.ReturnErrors(old)
 
-function SCDecl.RestoreNil
-	|| d = .nildeclared & nilstate.either
-	if .nilused != d // is this ever used?
-	.nilused = d
+			SCFunction.currfunc = nil
 
 
-function SCDecl.NilTake (|scdecl| d)
+			
+function message.OrigRender	(|faststring| fs = nil, |string|)
 	opt norefcounts
-	|| n = d.NilDeclared
-	.NilUsed = n
-	.NilDeclared = n
+	|| n = .OrigMsg
+		return n.Render(fs)
+	return .Render(fs)
 
 
-function message.IsNowNil (|bool|)
+function message.OrigMsg (|message|)
 	opt norefcounts
-	|| d = .obj as scdecl
-		return (d == TypeNil) or (d.nilused isnt real)
+	|| f = .SCFile
+		return f.orig.findtightest(.position, false, true)
 
 
-function SCDecl.DeclareAsUsed
+function errorreceiver.ReturnErrors (|errorreceiver| To = StdErr, |int|)
 	opt norefcounts
-	.nildeclared = .NilUsed (|) nilstate.stated
-
-
-function scdecl.SuffersNil (|bool|)
-	return .IsObject or .PointerCount
-
-
-function scdecl.NilStated (|bool|)
-	return .NilDeclared is Stated
+	for e in self
+		To <~ e
+		rz ++
 

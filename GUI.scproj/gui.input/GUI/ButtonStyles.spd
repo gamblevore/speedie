@@ -1,0 +1,114 @@
+
+function image.RoundRectDrawer (GUIDrawEvent)
+	require !EdgeOnly
+    || Col = g.bg.PreMul
+    || Edge = g.edge.Color
+
+
+    || center = rect.Center
+    center.y-=0.5
+    || CS = G.CornerSize * 0.25 + 1.0
+    || Lim1 = (CS-0.5).pow2
+    || Lim2 = (CS+g.LineWidth-0.5).pow2
+    || Conv = math.RangeConvert(lim2, lim1)
+    || SubX = center.x - (rect.x + CS)
+    || SubY = center.y - (rect.y + CS)
+    
+    for Y in rect.Vert
+        || Y2 = (Y - center.Y).abs.minus0(suby).Pow2
+        || W = self[rect.x, Y]
+        for X in rect.Horz
+            || X2 = (X - center.X).abs.minus0(subx).pow2
+            || D2 = X2 + Y2
+            
+            if D2 <= lim1
+                w.Overlay(Col)
+              elseif D2 <= Lim2
+                || E = Edge
+                E.a *= Conv.Convert(d2)
+                w.Overlay(E.premul)
+            W++
+
+
+function image.ClippedRectDrawer (GUIDrawEvent)
+	require !EdgeOnly
+	rect.y2-- // seems to draw too high? not sure why.
+	|| Col = g.bg.PreMul
+	|| Edge = g.edge.Color.PreMul
+	|int| Lim = G.CornerSize * 0.5 + 1.0
+	|| center = rect.Center.iVec2
+	|| Active = g.CornersCut
+	
+	for Y in rect.Vert
+		|| W = self[rect.x, Y]
+		|| YCorner = (y >= center.y)
+		for X in rect.Horz
+			|| D = rect.DistToCorner((X,Y))
+			|| DS = d.sum
+			|| XCorner = (x >= center.x)
+			|| Corner = 1 << (XCorner+(YCorner<<1))
+			ifn (Corner) & Active
+				if !d.x or !d.y
+					w.Overlay(Edge)
+				  else
+					w.overlay(col)
+			  elseif DS >= lim
+				if (DS == Lim) or (!d.x or !d.y)
+					w.Overlay(Edge)
+				  else
+					w.Overlay(Col)
+
+			W++
+
+
+
+extend_module Image
+	|image| _CurlieQue
+	function CurlieQue (|image|)
+		|| c = ._Curlieque
+			return c
+		c = ( img://curlieque.png ).LoadQOI #require
+		c.Rotate(c)
+		._Curlieque = c
+		return c
+
+
+// So... edge draws last. rework so edge draws last. no need to drawbg then.
+// not in here?
+function image.CurlieQueDrawer (GUIDrawEvent)
+	|| BG = g.bg.PreMul
+	|| Edge = vec4(1).premul  //g.edge.Color.PreMul
+	|| Nothing = vec4(0).PreMul
+	|| center = rect.Center.iVec2
+	|| Active = g.CornersCut
+	|| Q = image.CurlieQue
+	
+	for Y in rect.Vert
+		|| W = self[rect.x, Y]
+		|| YCorner = (y >= center.y)
+		for X in rect.Horz
+			|| D = rect.DistToCorner((X,Y)).abs
+			if 16 > d.x and d.y			
+				if q and Q[D].r > 128 // white
+					w.overlay(edge)
+				  elseif EdgeOnly
+					0
+				  elseif (d.x+d.y) >= 2
+					w.overlay(bg)
+				  else
+					w.overlay(nothing)
+			  elseif !d.x or !d.y
+				w.overlay(edge)
+			  elseif EdgeOnly
+				0
+			  else
+				w.overlay(bg)
+
+			W++
+
+
+function ivec4.DistToCorner (|ivec2| xy, |ivec2|)
+	return (xy - .x1y1)  min  (.x2y2 - xy)
+
+
+		

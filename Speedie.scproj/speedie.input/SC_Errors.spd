@@ -8,9 +8,9 @@ module SC_Errors
 	linkage
 		cpp_part Errors
 	
-	function Color (|string| Col)
-		if Pipe.ErrorIsTerminal
-			PrintError( Col )
+//	function Color (|string| Col)
+//		if Pipe.ErrorIsTerminal
+//			PrintError( Col )
 	
 /*	
 0: reset colors/style
@@ -37,26 +37,26 @@ module SC_Errors
 			return true // why not
 		
 		|| A = Err.node.Ancestor(@arg)
-		if Options.HideMultipleErrors
-			require !.AlreadyIgnored(A)
-		.IgnoredBranches[A._DictName] = A
+			if Options.HideMultipleErrors
+				require !.AlreadyIgnored(A)
+			.IgnoredBranches[A._DictName] = A
 		return true
 
  
-function Compiler.PrePrintErrors
-	for err in stderr.errors
+function errorreceiver.PrePrintErrors 
+	for err in .errors
 		err.improve
-	ifn options.KeepAllErrors
-		for err in stderr.errors
-			ifn SC_Errors[err]
+	if !options.KeepAllErrors
+		for err in .errors
+			if !SC_Errors[err]
 				err.remove
 
 
 function Compiler.PrintErrors (|errorseverity| MinSev)
 	stderr.BlockErrors = true
-	|| s = .builderrors(minsev)
+	|| s = .RenderErrors(stderr, minsev)
 	stderr.BlockErrors = false
-	if options.perry == 2
+	if options.perryoutput == 2
 		s = s.digest
 	if stderr.errorcount
 		printerror s
@@ -64,7 +64,7 @@ function Compiler.PrintErrors (|errorseverity| MinSev)
 		print s
 
 
-function Compiler.BuildErrors (|errorseverity| MinSev, |string|)
+function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, |string|)
 	|| Printable = stderr.problemcount+stderr.errorcount 
 	if (Printable and minsev < errorseverity.problem)
 		minsev = errorseverity.problem
@@ -82,7 +82,7 @@ function Compiler.BuildErrors (|errorseverity| MinSev, |string|)
 			if (err.severity == errorseverity.problem)
 				if ++problems <= 10
 					err.scrender(msg)
-	  elseif !options.perry
+	  elseif !options.perryoutput
 		msg.problemsfound(count)
 	
 	return msg
@@ -97,18 +97,19 @@ function Error.Improve
 	opt norefcounts
 	|| node = FindBytePos( .node )		#require
 	
-	ifn .HasPosition
+	if !.HasPosition
 		.position = node.position
 
 	if !.path
-		|| SC = node.SCfile$
-		ifn sc == .node.scfile
+		|| SC = node.SCFile$
+		
+		if sc != .node.scfile
 			.node = node // wrong file!!
 		if sc.exists
 			.path = sc.path
 
 
-function FindBytePos (|Message|Node, |bool| EndInside=false, |Message|)
+function FindBytePosSub (|Message?| Node, |Message?|)
 	opt norefcounts
 	if !node or node.HasPosition
 		Return node
@@ -118,14 +119,16 @@ function FindBytePos (|Message|Node, |bool| EndInside=false, |Message|)
 		if m.HasPosition
 			Return m
 
-	require !EndInside
-	|| msg = FindBytePos( node.parent, true )
+
+function FindBytePos (|Message?| Node, |Message?|)
+	|| first = FindBytePosSub( node )
+		return first
+	|| msg = FindBytePosSub( node.parent )
 		Return msg
 
-
-	// last try...
+	// Last try...
 	|| fn = node.MsgOwningFunc
-		return FindBytePos( fn.Source, true )
+		return FindBytePosSub( fn.Source )
 
 
 
@@ -148,18 +151,17 @@ extend Error
 		// mark where in the line the error occurs?
 
 		|| Spaces = (.Position - Start)
-		debug_require (Spaces < 100) // it happened once, due to bugs. Another bug could cause this to be off and ruin things.
 		fs <~ '\n'
 		if Usecolor
 			fs <~ ErrorColors.Underline
-		fs <~ (' ', Spaces)
+		fs <~ (' ', spaces min 100) // it happened once, due to bugs. Another bug could cause this to be off and ruin things.
 		fs <~ '^'
 
 
 	function SCOriginalData (|string|)
 		|| p = .SCOriginalpath
 			|| f = p.file
-			if f and f.exists and !f.isdir
+			if f.exists and !f.isdir
 				return f.readall
 		return .originaldata
 
@@ -190,18 +192,19 @@ extend Error
 ///.../Speedie.scproj/BuildTest/JB.cpp:2679:10: error: conflicting types for 'JB__Comp_InputFile'
 
 		if options.color: fs <~ errorcolors.Bold
-
+		
+		|| node = .node
 		|| data = .SCOriginalData
 			|| p = .SCOriginalPath ?? "(string)"
 			fs <~ p
 			fs <~ ':'
 			.SCLineIdentifiers(fs, data)
 			
-		  elseif (.node)
-			.node.render(fs)
-			|| fn = .node.msgowningfunc // could be an error in a variable outside of a func! (module/global)
+		  elseif node
+			node.render(fs)
+			|| fn = node.msgowningfunc // could be an error in a variable outside of a func! (module/global)
 				fs <~ " in:\n"
-				.node.msgowningfunc.render(fs)
+				fn.render(fs)
 		
 		fs <~ ' '
 		if options.color
@@ -231,11 +234,11 @@ extend Error
 	render SCRender
 		// probably not needed, but whatever leave it for now.
 		.path := .SCOriginalPath ?? "(string)"
-		if options.perry
+		if options.perryoutput
 			.render(fs)
 		  else
 			.render_unix(fs)
 
 
 
-|| ErrorDelayer = errorlist()
+|| ErrorDelayer = ErrorReceiver()

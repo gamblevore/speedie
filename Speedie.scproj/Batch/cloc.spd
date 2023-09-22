@@ -55,7 +55,7 @@ function file.cloc
 	  elseif counts.loud
 		printline .path 
 
-	|| data = .ReadSafely(int.max) #require
+	|| data = .ReadAll(int.max) #require
 	if data.IsCompressed // decompress?
 		"Decompressing $self"
 		data = data.Decompress(int.max) // might as well...
@@ -73,9 +73,9 @@ function file.cloc
 			for s.flat in msg 
 				s.name = s.name.Preview(counts.MaxNodeLength)
 		msg.RenderAST(app.stdout.out)
-		printline
+		""
 	  elseif counts.ParseSpeed
-		|| fs = app.stdout.out
+		|| fs = app.stdout.out!
 		fs.RenderSpeed(durr.seconds, data.length, 0, "Parsed")
 		fs <~ "\n"
 	(msg)
@@ -107,7 +107,7 @@ main
 	
 	counts.Init(app..files)
 	for path in app.args
-		|| dir = path.ExistingFile
+		|| dir = path.filethatexists
 			dir.CountAll(true)
 	counts.report
 
@@ -144,5 +144,5 @@ function Counts.report
 		"Total files: $f, total jeebox files: $p"
 	if compressionstats.All.Out
 		compressionstats.all.render(app.stdout.out)
-		printline
+		""
 		

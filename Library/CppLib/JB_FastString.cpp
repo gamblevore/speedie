@@ -63,14 +63,14 @@ uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { //JB_FS_FreeSizeSet
 }
 
 
-void JB_FS_AppendDMY (FastString* fs, Date self) {
+void JB_FS_AppendLocalTime (FastString* fs, Date self) {
     time_t t = self >> 16; // lol
     tm TimeSpec;
     if (localtime_r( &t, &TimeSpec )) {
-		char* write = (char*)JB_FS_WriteAlloc_(fs,26);
+		char* write = (char*)JB_FS_WriteAlloc_(fs, 26);
 		if (write) {
 			asctime_r(&TimeSpec, write);
-			fs->Length-=2; // sigh
+			fs->Length -= 2; // sigh
 		}
     }
 }
@@ -225,10 +225,14 @@ void JB_FS_AppendMultiByte(FastString* self, int byte, int Count) { // - numbers
 
 
 void JB_FS_AppendIndent( FastString* self ) {
-	JB_FS_AppendByte( self, '\n' );
     if (self->IndentChar) {
         JB_FS_AppendMultiByte( self, self->IndentChar, self->Indent );
     }
+}
+
+void JB_FS_LineIndent( FastString* self ) {
+	JB_FS_AppendByte( self, '\n' );
+	JB_FS_AppendIndent(self);
 }
 
 
@@ -484,8 +488,9 @@ void JB_FS_SizeSet(FastString* fs, int NewSize) {
 
 
 int JB_FS_Length(FastString* self) {
-	FS_SanityCheck_(self);
-	return self->Length;
+	if (self) 
+		return self->Length;
+	return 0;
 }
 
 int JB_FS_StreamLength(FastString* self) {
@@ -528,16 +533,20 @@ void JB_FS_FileSet(FastString* fs, JB_File* F) {
 
             /* Constructors */
 
-void JB_FS_ConstructorSize(FastString* self, int Size) {
+FastString* JB_FS_ConstructorSize(FastString* self, int Size) {
+	JB_New2(FastString);
     JB_FS_Constructor(self);
 	if ( Size ) {
 		JB_FS_SizeSet( self, Size );
 	}
+	return self;
 }
 
-void JB_FS_Constructor(FastString* self) {
+FastString* JB_FS_Constructor(FastString* self) {
+	JB_New2(FastString);
     JB_Zero(self);
     self->IndentChar = '\t';
+	return self;
 }
 
 void JB_FS_Destructor(FastString* self) {
@@ -572,9 +581,7 @@ JB_String* JB_FS_GetResult(FastString* self) {
 
 
 FastString* JB_FS__InternalNew() {
-    FastString* fs = JB_New(FastString);
-    JB_FS_Constructor( fs );
-    return fs;
+    return JB_FS_Constructor( 0 );
 }
 
 FastString* JB_FS__FileFlush(JB_File* f, bool b) {

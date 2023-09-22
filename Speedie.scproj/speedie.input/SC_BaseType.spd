@@ -1,43 +1,40 @@
 
 
 
-datatype SCBaseType (int)
+datatype SCNodeType (byte)
 	constants (
-		|SCBaseType|
-		Module = 0 // not actually a type
-		Nil
+		|SCNodeType|
+		Module = 0	// not actually a type
+		Nil			// hasptr
 		DataType
-		FuncProto
+		FuncProto	// hasptr
 		Struct
-		Object
+		Object		// hasptr
 	)
-	syntax is (|scbasetype| d, |bool|)
+	syntax is (|SCNodetype| d, |bool|)
 		return self == d
+	function HasPtrs (|bool|)
+		return self & 1
 
 
 extend scclass
-	function BaseType (|scbasetype|)
-		if .isobject
-			return SCBaseType.object
-		if .isdatatype
-			if !.funcproto
-				return SCBaseType.datatype
-			  else
-				return SCBaseType.funcproto
-		if .isstruct
-			return SCBaseType.struct
-		debugger
-			
-		
-	syntax equals (|scbasetype| d, |bool| aware, |bool|)
+	function IsStruct (|bool|)
+		return .BaseType == SCNodeType.struct
+	
+	function IsDataTypeOnly (|bool|)
+		return .BaseType == SCNodeType.datatype
+	
+	function IsDataTypeOrFP (|bool|)
+		return .BaseType == SCNodeType.datatype or SCNodeType.funcproto
+	
+
+	syntax equals (|string| name, |bool| aware, |bool|)
+		cpp_part EqualsName
+		if self
+			return .name ~= name
+
+
+	syntax equals (|SCNodeType| d, |bool| aware, |bool|)
 		cpp_part EqualsType
-		if self and d > scbasetype.nil
-			// use .basetype instead...
-			if d is object
-				return .isobject
-			if d is datatype
-				return .isdatatype and !.funcproto
-			if d is struct
-				return .isstruct
-			if d is funcproto
-				return .funcproto
+		if self and d > SCNodeType.nil
+			return .BaseType == d

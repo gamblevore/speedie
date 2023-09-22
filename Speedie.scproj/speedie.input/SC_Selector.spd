@@ -13,11 +13,11 @@ class $name (selector)
 	module $name
 		function __LoadSel (|&$type| Place, |string| Name)
 			visible
-			$name.__First = $type.new($name.__First, place|&selector|, name)
+			$name.__First = $type.new($name.__First!, place|&selector|, name)
 
 		|$type| __First
 		...
-		$name.__first.GiveIDs
+		$name.__first!.GiveIDs
 
 		").parse.first
 		
@@ -42,7 +42,6 @@ class $name (selector)
 		
 		if prms
 			if prms != @prm
-				if prms == @list
 				prms = «prm, prms »
 			// should be SelectorInit
 			|| Line2 = «dot "selector_init"
@@ -66,17 +65,18 @@ class $name (selector)
 		
 
 	function Build (CollectFunc)
-		|| arg = node[@arg, -1]								#require
-		|| name = node[@thg]								#require
-		|| items = .FindItems(arg)							#require
-		|| ActualNames = items[@list]						#require
+		|| arg = node.last(@arg)
+		|| name = node[@thg]
+		|| items = .FindItems(arg)
+		|| ActualNames = items[@list]
+		require arg and name and items and ActualNames
 
 		Using (node)
 		|| IsClass = HasClassStuff(arg)
 
 		|| type = (name.name, "selector")(IsClass)
-		|| ClassCode = BuildClassCode(name.name, type)
-		|| dot3 = ClassCode.findnested(@sthg, "...", true)
+		|| ClassCode = BuildClassCode(name.name, type)		#require
+		|| dot3 = ClassCode.findnested(@sthg, "...", true)!
 		
 		items.remove
 		
@@ -86,7 +86,7 @@ class $name (selector)
 		for (line in ActualNames)
 			|message| init
 			if line == @item			// EROR: (1, SomeForm)
-				line = line.first
+				line = line.first!
 				init = line.next
 				if init == @list
 					init.func = @prm
@@ -99,7 +99,7 @@ class $name (selector)
 		for ch.reverse in arg
 			classcode[-1].first = ch
 
-		ifn IsClass
+		if !IsClass
 			classcode = dot3.parent.parent
 
 		dot3.remove
