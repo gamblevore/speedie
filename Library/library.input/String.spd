@@ -17,7 +17,7 @@ class String
 	false			""
 	
 	|int|		Length_
-	|!&byte|	Addr
+	|&byte|		Addr
 
 
 
