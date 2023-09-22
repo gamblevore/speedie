@@ -6836,7 +6836,7 @@ void SC_Decl_ExpectMatchRel(SCDecl* self, SCDecl* O, Message* exp, Message* side
 
 DataTypeCode SC_Decl_GameType(SCDecl* self);
 
-SCDecl* SC_Decl_GetAddress(SCDecl* self);
+SCDecl* SC_Decl_GetAddress(SCDecl* self, NilState opt);
 
 SCIterator* SC_Decl_GetIteratorAny(SCDecl* self, JB_String* name, Message* node);
 

@@ -2175,7 +2175,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (111103439798272)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (111107917807616)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3487,7 +3487,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[243]);
-	JB_FS_AppendInt32(_fsf0, (2023092114));
+	JB_FS_AppendInt32(_fsf0, (2023092209));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7316,7 +7316,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[509]);
-	JB_FS_AppendInt32(_fsf0, (2023092114));
+	JB_FS_AppendInt32(_fsf0, (2023092209));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -9246,7 +9246,7 @@ SCDecl* SC_ExtractDecl(Message* c, SCBase* name_space) {
 		}
 		if (JB_Msg_SyntaxEquals(c, JB_LUB[356], false)) {
 			JB_Decr(rz);
-			SCDecl* _tmPf25 = JB_Incr(SC_Decl_GetAddress(R));
+			SCDecl* _tmPf25 = JB_Incr(SC_Decl_GetAddress(R, kSC__NilState_Optional));
 			JB_Decr(R);
 			JB_SafeDecr(_tmPf25);
 			return _tmPf25;
@@ -9271,11 +9271,11 @@ SCDecl* SC_ExtractDecl(Message* c, SCBase* name_space) {
 			return R;
 		}
 		JB_Decr(R);
-		if (f == JB_SyxARel) {
-			if ((!false)) {
-				JB_Msg_SyntaxExpect(c, nil);
-			}
+		if ((!false)) {
+			JB_Msg_SyntaxExpect(c, nil);
 		}
+		JB_Decr(rz);
+		return nil;
 	}
 	if (f == JB_SyxArg) {
 		Message* _tmPf10 = JB_Incr(((Message*)JB_Ring_First(c)));
@@ -11179,7 +11179,7 @@ SCObject* SC_TypeOfBRel(Message* Exp, SCBase* name_space, Message* side) {
 		}
 		JB_Decr(name);
 		JB_Decr(F);
-		SCDecl* _tmPf2 = JB_Incr(SC_Decl_GetAddress(SubType));
+		SCDecl* _tmPf2 = JB_Incr(SC_Decl_GetAddress(SubType, kSC__NilState_Real));
 		JB_Decr(SubType);
 		JB_SafeDecr(_tmPf2);
 		return _tmPf2;
@@ -11418,7 +11418,7 @@ SCDecl* SC_TypeOfExpr(Message* Exp, SCBase* name_space, Message* side) {
 			}
 			SCDecl* T = cls->ClassType;
 			if (T) {
-				return SC_Decl_GetAddress(T);
+				return SC_Decl_GetAddress(T, kSC__NilState_Real);
 			}
 		}
 	}
@@ -29382,14 +29382,14 @@ DataTypeCode SC_Decl_GameType(SCDecl* self) {
 	return _tmPf2;
 }
 
-SCDecl* SC_Decl_GetAddress(SCDecl* self) {
+SCDecl* SC_Decl_GetAddress(SCDecl* self, NilState opt) {
 	SCDecl* rz = nil;
 	JB_SetRef(rz, SC_Decl__New(nil));
 	SC_Decl_CopyTypeInfoTo(self, rz);
 	JB_SetRef(rz->Internal, self);
 	rz->PointerCount++;
-	rz->NilDeclared = kSC__NilState_Either;
-	rz->NilUsed = kSC__NilState_Realish;
+	rz->NilDeclared = opt;
+	rz->NilUsed = (opt & (~kSC__NilState_Stated));
 	if ((!(rz->PointerCount < 8))) {
 		JB_Msg_SyntaxExpect(self->Source, JB_LUB[1493]);
 	}
@@ -29609,8 +29609,6 @@ bool SC_Decl_LoadContainedSub(SCDecl* self, SCDecl* Cont, Message* wrap, SCBase*
 	if (SC_uint_IsNormalMatch(SC_Decl_Match(JB_TypeWrapper->TypeNormal, R, kJB_TypeCastFalse, nil))) {
 		if ((!(!SC_Decl_IsNormalObject(Cont)))) {
 			JB_Msg_SyntaxExpect(wrap, JB_LUB[1495]);
-			JB_Decr(R);
-			return nil;
 		}
 	}
 	 else {
@@ -29754,10 +29752,15 @@ SCDecl* SC_Decl_MakePointer(SCDecl* self) {
 	if (self->PointerCount) {
 		return self;
 	}
-	return SC_Decl_GetAddress(self);
+	return SC_Decl_GetAddress(self, kSC__NilState_Real);
 }
 
 SCDecl* SC_Decl_MakeReal(SCDecl* self) {
+	if (self->PointerCount) {
+		self->NilDeclared = kSC__NilState_Real;
+		self->NilUsed = kSC__NilState_Realish;
+		return self;
+	}
 	return SC_Decl_MakeExistance(self, kSC__NilState_Real, self->Type->TypeVeryExists);
 }
 
@@ -30241,13 +30244,13 @@ int SC_Decl_TryTypeCast(SCDecl* self, SCDecl* O, Message* exp, int TypeCast) {
 	SCClass* t = self->Type;
 	SCClass* ot = O->Type;
 	if (self->PointerCount == (O->PointerCount + 1)) {
-		SCDecl* OAddr = SC_Decl_GetAddress(O);
+		SCDecl* OAddr = SC_Decl_GetAddress(O, kSC__NilState_Real);
 		if (SC_Decl_MiniMatch(self, OAddr, TypeCast) and ((!exp) or SC_Msg_CanGetAddress(exp, nil))) {
 			return SC_Msg_GetAddressOf(exp, OAddr, false);
 		}
 	}
 	if (((bool)O->C_Array) and (self->PointerCount == 1)) {
-		SCDecl* oaddr = SC_Decl_GetAddress(O);
+		SCDecl* oaddr = SC_Decl_GetAddress(O, kSC__NilState_Real);
 		oaddr->C_Array = 0;
 		if (SC_Decl_MiniMatch(self, oaddr, TypeCast) and ((!exp) or SC_Msg_CanGetAddress(exp, nil))) {
 			return SC_Msg_GetAddressOf(exp, oaddr, true);
@@ -38067,7 +38070,7 @@ void SC_Class_Constructor(SCClass* self, Message* node, SCBase* parent) {
 	SCDecl* _tmPf6 = SC_Decl_NilConstructor(T, kSC__NilState_Real * (!IsDataType));
 	self->TypeVeryExists = JB_Incr(_tmPf6);
 	if (JB_Msg_SyntaxEquals(node, JB_LUB[728], false)) {
-		JB_SetRef(T, SC_Decl_GetAddress(T));
+		JB_SetRef(T, SC_Decl_GetAddress(T, kSC__NilState_Real));
 	}
 	 else {
 		JB_SetRef(T, SC_Decl_Copy(T, false));
@@ -46907,4 +46910,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 5318806280936451489 5072675298448104586
+// -1375987545640282359 5072675298448104586
