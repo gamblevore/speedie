@@ -39,6 +39,8 @@ datatype NilState (byte) // Exec.scproj needs this here
 		rz = self (|) o
 		if rz is Nilish
 			return Nilish
+	function Failed (|bool|)
+		return self isnt realish
 			
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type

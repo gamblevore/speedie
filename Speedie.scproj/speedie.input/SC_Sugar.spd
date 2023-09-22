@@ -40,7 +40,11 @@ function message.QMarkRel (|message|)
 function message.Tran_QMark
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func) 
-	expect (isnormal) (thedot, "Question-mark not one of:  a.b?,  (a)(b)?,  a.b? = c")
+	if !isnormal
+		expect (thedot == @thg) (thedot, "Question-mark not one of:  a.b?,  (a)(b)?,  a.b? = c")
+		.func = @bra
+		return
+
 	if thedot == @sdot
 		scfunction.Tran_Sdt(thedot)
 	|| inside = thedot.first

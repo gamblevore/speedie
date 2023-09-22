@@ -127,14 +127,13 @@ function CollectDeclsGlobals (|Message| arg, |SCBase| scarg)
 		if item == @decl
 			require item.CollectAGlobalDecl(scarg)
 
+
 function Message.CollectAGlobalDecl (|SCBase| scarg, |bool|)
 	opt norefcounts
 	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals, nil, nil, nil)	
 		(dcl is property)
 		(dcl is onmodule)
 		return true
-		
-
 
 
 function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg) 	// remove later... :)
@@ -165,7 +164,7 @@ function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
 function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
 	
 	|| Types = .first
-	|| Names = types.Next				
+	|| Names = types.Next
 
 	expect (FuncPrms or Names)  (self, "No name found.")
 	if (Mode & 2)
@@ -176,7 +175,6 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 	if (!sdcl and !default and (P isa SCArg))
 		sdcl = P.ParentFunc.ReturnType
 
-	
 	|| NameItm = names.CollectDclName
 	|SCDecl--| DefaultDcl
 	if FuncPrms
@@ -227,7 +225,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 	dcl.Source = self
 	(dcl Isnt Const) // on "|| bla = true", make "bla" editable.
 
-	if out!=nil
+	if out != nil
 		out <~ dcl
 	if default and defaultdcl
 		dcl.ConstCheck(nil, default, DefaultDcl)

@@ -4,9 +4,15 @@ prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
 
 extend Message {
 
-function RedundantTest (|bool| real, |nilcheckmode|)
+function Redundant (|int| real, |nilcheckmode|)
 	if StdErr.CanAddMore(errorseverity.problem)
-		|| str = ("Redundant test on always-real object", "Redundant test on nil object")(real)
+		
+		|| str = "Redundant test on real object: "
+		if real == 1
+			str = "Redundant test on nil object: "
+		elseif real == -1
+			str = "No need for this Qmark: "
+		str += .render 
 		StdErr.NewProblem(self, str)
 
 
