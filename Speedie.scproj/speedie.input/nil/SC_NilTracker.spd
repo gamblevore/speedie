@@ -94,7 +94,8 @@ struct NilTracker
 		return .SourceArg contains "nilcheck"
 	
 	module
-		|niltracker| T
+		|scdecl--|		CurrDecl
+		|niltracker|	T
 		function SaveLives
 			opt norefcounts
 			using options.NilStrength

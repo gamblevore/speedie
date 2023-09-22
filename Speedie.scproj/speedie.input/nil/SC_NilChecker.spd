@@ -197,12 +197,13 @@ function Thing (NilTrackerFn)
 	|| dcl = msg.nildecl			#debug_require
 	if test is Active
 		|| QMark = msg.parent
-		ifn QMark == @bra and "?"
+		ifn QMark.func == @bra and qmark.name == "?"
 			QMark = nil
 		if dcl.NilUsed is Either
 			if QMark
 				qmark.Redundant(-1)
-			dcl.ParamUpgrade
+			if (dcl is param) 
+				dcl.ParamUpgrade
 			return T.SetNilness(dcl, nilstate.realish)
 	
 		if !QMark and dcl.NilDeclared is Either
@@ -304,13 +305,14 @@ function SetRel (niltrackerfn)
 	|| r = msg.last
 	|| B = .JumpDecl(r) // c++ runs B first...
 	|| A = .JumpDecl(l)
+	.CurrDecl := a
 	if a.SuffersNil != b.SuffersNil // what?
 	if a.SuffersNil
 		.VariableSet(A, B, l)
 
 
 function JumpDecl (|message| msg, |scdecl|)
-	(NilTable[msg.func])(msg)
+	.jump(msg)
 	return msg.NilDecl
 
 
@@ -323,6 +325,8 @@ function JumpOK (NilTrackerFn)
 
 function Jump (NilTrackerFn)
 	pragma inline
+	if .currdecl
+		.currdecl.NilDebug // :) track progress!
 	return (NilTable[msg.func])(msg, test)
 
 
