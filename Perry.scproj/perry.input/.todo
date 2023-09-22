@@ -6,6 +6,7 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
+* (pos.int, 0) doesnt compile in C++! typegaynarrowing
 
 // Perry Do later
 * SelectedLine on startup is right at the top... so you can't see the lines above :(

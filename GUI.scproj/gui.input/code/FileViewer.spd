@@ -323,7 +323,7 @@ class FileViewer (ListView)
 				f.name = name
 				rz[i] = f
 		
-		
+	
 	function Listviewrow.FileSort
 		.sort(&fileviewer.FileRowNameSorter)
 	
@@ -333,6 +333,7 @@ class FileViewer (ListView)
 		for s in self
 			if s|error|.when
 				into <~ s
+
 		
 	helper CanFind (|filerow| f, |uint| id, |bool|)
 		if id
