@@ -16,12 +16,15 @@ struct NilTracker
 		.merge(s, false)
 		.DeclCount = s
 	
+
 	function Restore (|uint| s)
 		.merge(s, false)
+
 
 	function Clear (|uint| a,  |uint| b)
 		while a < b
 			.items[a++].Nil = 0 // i hope?
+
 
 	function Merge (|uint| s, |bool| Merge=true)
 		|| c = .DeclCount
@@ -33,9 +36,10 @@ struct NilTracker
 			if Merge
 				v |= d.nilused
 				i.nil = v
-			  elseif !v
+			  elseif v == 0
 				debugger 
 			d.nilused = v
+			d.nildebug
 	
 	
 	function SetNilness (|scdecl| d, |nilstate| s, |nilstate|)
@@ -52,6 +56,7 @@ struct NilTracker
 			i.decl = d
 			.DeclCount = c + 1
 			d.nilused = s
+			d.NilDebug
 			return s
 		
 		error (.fn, "Too many variables for nilchecker")
@@ -66,7 +71,9 @@ struct NilTracker
 		|| r = f.returntype
 			r.NilUsed = 0 // :)
 		for d in .fn.args
-			d.RestoreNil
+			|| nd = d.nildeclared & nilstate.either
+			if d.nilused != nd // just on self, right?
+			d.nilused = nd
 
 
 	function Finish (|scfunction| f)
@@ -78,8 +85,8 @@ struct NilTracker
 	function Check (|scfunction| f)
 		opt norefcounts
 		if platform.IsDebug
-			f.nildebug
 			.Start(f)
+			f.nildebug
 			Runall(f.SourceArg)
 			.Finish(f)
 
@@ -105,21 +112,6 @@ struct NilTracker
 			scfunction.currfunc = nil
 			StdErr.PrintErrors
 			StdErr.Clear
-
-	
-	
-
-function SCDecl.RestoreNil
-	|| d = .nildeclared & nilstate.either
-	if .nilused != d // is this ever used?
-	.nilused = d
-
-
-function SCDecl.NilTake (|scdecl| d)
-	opt norefcounts
-	|| n = d.NilDeclared
-	.NilUsed = n
-	.NilDeclared = n
 
 
 function message.IsNowNil (|bool|)

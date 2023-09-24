@@ -58,14 +58,17 @@ datatype SCDeclInfo (uint)
 		CompilerCreated
 		Disabled
 		Param
+		Body
+		Property
+		OnModule
+		Return
+		AlteredViaPointer
 		Altered
 		GameFlyingMem
-		Property
 		Atomic
-		OnModule
 		Implicit		// self or other values that aren't declared explicitly
 		SetTo			// a var sets it... like: rz = obj
-		NotFunction = OnModule + Property
+		Local = Body + Param
 		
 		
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
@@ -83,8 +86,8 @@ class SCDecl (SCObject) {
 	
 	|SCFunction--|		Setter		// todo: replace the .stringdata/hider thing with this.
 	|Object|			IsLookupOnly
-	|string|			StringData
-	|SCDecl|			Internal	// 4 special objects. Aren't they exclusive? Write some code to see if they are.
+	|string|			StringData	// 3 special objects. Aren't they exclusive? Write some code to see if they are.
+	|SCDecl|			Internal	// only for pointers :)
 	
 	//|SCDecl|			NextContains // for multiple contains
 	|SCDecl|			Contains
@@ -310,9 +313,6 @@ class SCDecl (SCObject) {
 		fs <~ .WriteType
 		fs <~ '|'
 		return fs
-		
-	function IsLocal (|bool|) // isfunction
-		return .name and !(.info & scdeclinfo.NotFunction)
 
 	function WriteDeclFull (|String| DeclName = "", |bool| minimal = false, |Message|)
 		DeclName := .Name
@@ -822,7 +822,7 @@ class SCDecl (SCObject) {
 
 
 	function NilConstructor (|nilstate| type,  |scdecl|) 
-		if !Type
+		if Type == 0
 			return self
 		rz = .copy
 		rz.NilDeclared = type

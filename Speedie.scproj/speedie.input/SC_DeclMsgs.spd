@@ -94,13 +94,14 @@ function Message.CollectFuncPrm (|scfunction| func, |SCBase| Recv, |scclass| cls
 		func.IsAssigns = 1
 		.addvalue(func)
 
-	if .Expect(@decl)
-		|| dcl = .CollectDecl(func, recv, declmode.FuncParam, func.args, cls, func)
-			(dcl is param)
-			(dcl isnt altered)
-			return true
-
-
+	require .Expect(@decl)
+	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, func.args, cls, func) #require
+	if dcl.name
+		(dcl is param)
+		(dcl isnt altered)
+	  else
+		(dcl is return)
+	return true
 
 
 function SCClass.CollectDeclsProperties (|bool|)
@@ -142,9 +143,11 @@ function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg)
 		if item == @decl
 			require item.CollectFromBody(scarg)
 
+
 function Message.CollectFromBody (|SCBase| scarg, |bool|)
 	opt norefcounts
 	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody, nil, nil, nil)
+		(dcl is body)
 		|| def = dcl.Default
 			check (def != @thg or def.name ~!= dcl.name) (def, "Same name!")
 		return true

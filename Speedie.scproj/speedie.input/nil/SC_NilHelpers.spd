@@ -6,12 +6,11 @@ extend Message {
 
 function Redundant (|int| real, |nilcheckmode|)
 	if StdErr.CanAddMore(errorseverity.problem)
-		
 		|| str = "Redundant test on nil object: "
 		if real == 1
 			str = "Redundant test on real object: "
 		  elseif real
-			str = "No need for this Qmark: "
+			str = "No need for this question-mark: " // so questionable
 		str += .render 
 		StdErr.NewProblem(self, str)
 
@@ -19,18 +18,17 @@ function Redundant (|int| real, |nilcheckmode|)
 function NilPropAccess (|bool|)
 	opt norefcounts
 	|| m = .DotMustBeProperty
-	return m and m isnt onmodule
+		return m isnt onmodule
 
 
 function NilDecl (|scdecl|)
 	opt norefcounts
+	require self
 	|| obj = .obj
 	if (obj isa scdecl)
 		|| l = obj.IsLookupOnly
 		if l isa scdecl
-			l.nildebug
 			return l
-		obj.nildebug
 		return obj
 	debugger // if this never happens we can just blindcast
 	

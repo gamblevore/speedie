@@ -1,8 +1,8 @@
 
 
-// bugs:
-	// * string.addr is real... no reason it should be.
-	// * rework VariableSet for the new register-based system!
+// todo:
+	// * variableset should be called only for funcdecl/params internals
+	
 
 
 
@@ -36,8 +36,7 @@ function TrackerDummies
 function UseChildAsReal (|message| wrapper) // a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = wrapper.first
-		|| NilCh = .Jump(ch)
-		if NilCh.failed
+		if .Jump(ch) is Nilish
 			.Failednil(ch)
 
 function Dummy (NilTrackerFn)
@@ -48,7 +47,8 @@ function Access (NilTrackerFn)
 	opt norefcounts
 	.UseChildAsReal(msg)						// abc[0]
 	return msg.nildecl.nildeclared
-	
+
+
 function Rel (NilTrackerFn)
 	opt norefcounts
 	if msg.tmptype is kSetVar					// x = y
@@ -60,8 +60,7 @@ function Property (niltrackerfn)
 	opt norefcounts
 
 	|| ch = msg.first
-	|| NilCh = .Jump(ch, test)
-	if NilCh.failed
+	if .Jump(ch, test) is Nilish
 		.Failednil(ch)
 	return msg.nildecl.NilDeclared
 
@@ -90,8 +89,8 @@ function Function (NilTrackerFn)
 	if (fp.func == @bra)
 		.UseChildAsReal(fp.first)						// (abc)()
 
-	|| p = prms.first
-	|| PtrCount = 0
+	|| P = prms.first
+	|scdeclinfo| HasAddrs = 0
 	for recv in fn.args
 		|| SubMode = nilcheckmode.nothing
 		if p.isfirst and fn.IsNilChecker and (test is Positive)
@@ -100,20 +99,20 @@ function Function (NilTrackerFn)
 
 		|| sent = p.NilDecl
 		if sent.suffersnil
-			PtrCount += sent.pointercount
-			|| recnil = recv.NilDeclared
-			check ((recnil is stated) or (sent.NilUsed isnt Nilish)) (p, "Unknown if this parameter accepts nil.")
+			|| infernal = sent.internal
+			if (infernal Is Local) and infernal.SuffersNil
+				HasAddrs = SCDeclInfo.AlteredViaPointer
+				recv.info |= HasAddrs
+			
+			check ((recv.NilStated) or (sent.NilUsed isnt Nilish)) (p, "Unknown if this parameter accepts nil.")
 			.VariableCheck(recv, sent, p)
 		p++
-
 	
-	if PtrCount and stderr.ok
+	if HasAddrs and StdErr.ok
 		p = prms.first
 		for recv in fn.args
-			|| sent = p.NilDecl
-			if sent.suffersnil and sent.pointercount
-				|| recnil = recv.NilDeclared
-				.VariableSet(recv.internal, sent.internal, p)
+			if recv is AlteredViaPointer
+				.VariableSet(recv.internal, p.NilDecl.internal, p)
 			p++
 
 	|| ret = fn.ReturnType
@@ -126,13 +125,16 @@ function Return (NilTrackerFn)
 
 	|| value = msg.first				#require
 	|| vd = value.NilDecl
-	if vd.suffersnil
-		|| vn = vd.nilused
-		|| rd = T.fn.ReturnType
-		|| r  = rd.NilDeclared
-		if r is real  and vn is Nilish
-			error (msg, "Nil returned, against function declaration!")
-		rd.nilused |= vn // find the answer at the end
+	require vd.SuffersNil
+
+	|| rd = T.fn.ReturnType
+	|| v = vd.nilused
+	if v is Nilish  and  rd.NilDeclared == nilstate.real
+		error (msg, "Nil returned, despite function declaration!")
+	
+	if (rd.nilused & v) != v
+		rd.nilused |= v
+		rd.NilDebug
 
 
 function While (NilTrackerFn)
@@ -295,7 +297,9 @@ function Declaration (niltrackerfn)
 	opt norefcounts
 	|| rel = msg.last
 	if rel == @rel
-		setrel(rel)
+		SetRel(rel)
+	  else
+		msg.first.NilDecl.NilDebug
 	// the decl-checker is done in variableset    // checks if we are setting a ? into a ! :)
 	
 
@@ -325,8 +329,6 @@ function JumpOK (NilTrackerFn)
 
 function Jump (NilTrackerFn)
 	pragma inline
-	if .currdecl
-		.currdecl.NilDebug // :) track progress!
 	return (NilTable[msg.func])(msg, test)
 
 
@@ -338,34 +340,31 @@ function RunAll (NilTrackerFn)
 		.Jump(s)
 
 
-function NilMsg (|message| err, |scdecl| d, |string|)
-	if d isnt param
-		if err == @thg
-			return "Nil Access: Needs 'if' wrapping."
-		return "Nil Access here."
-	return "Nil Error: Don't declare with '?'... or test for nil."
-
-
-function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| msg) // setrel, relset
+function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
 	opt norefcounts
-	if (recv.NilDeclared isnt nilish) and sent.nilused.failed
-		.FailedNil(msg)
+	if (recv.NilDeclared isnt nilish) and (sent.nilused is Nilish)
+		.FailedNil(where)
 
-function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| msg) // setrel, relset
+
+function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
 	opt norefcounts
-	.VariableCheck(recv, sent, msg)
+	.VariableCheck(recv, sent, where)
 	T.SetNilness(recv, sent.nilused)
 
 
-function FailedNil (|message| msg, |nilstate|)
+function FailedNil (|message| where, |nilstate|)
 	opt norefcounts
-	|| d = msg.nildecl
-	if d is param  and  d.NilDeclared isnt Stated
+	|| d = where.nildecl
+	if  d is param  and  d.NilDeclared isnt Stated
 		d.NilDeclared = NilState.real
 		d.nilused = NilState.Realish
+		d.NilDebug
 		return nilstate.realish
 
-	error (msg, NilMsg(msg, d))
+	|| err = "Nil Error: Don't declare with '?'... or test for nil."
+	if d isnt param
+		err = ("Nil Access: Needs 'if' wrapping.", "Nil Access here.")(where == @thg)
+	error (where, err)
 	return d.nilused
 }
 
