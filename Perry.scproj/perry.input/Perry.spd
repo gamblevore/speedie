@@ -317,6 +317,9 @@ function ViewAsVis (|bool| vis)
 	(.filesep.div is visible) = vis
 	(.StartScreen is visible) = (.noclutter & 1)==0
 	(.filelist is decluttered)  = (.noclutter & 2)!=0
+	if .filelist.hasfocus and .filelist is decluttered
+		.editme.SetFocus
+		
 	(.noneeder is visible)  = .noneeder.text and vis
 	if !top and !Platform.IsDebug
 		(.DebugArgsList isnt visible)
