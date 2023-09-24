@@ -54,6 +54,8 @@ function scfunction.NilDebug
 function scdecl.NilDebug (|string| reason)
 	cpp_name ndb2
 	|| fs = FastString()
+	fs <~ reason
+	fs <~ ": "
 	fs <~ .name ?? "?"
 	fs <~ " "
 	|| d = .NilDeclared

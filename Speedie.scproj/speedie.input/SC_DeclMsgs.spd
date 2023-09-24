@@ -66,15 +66,23 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 function scfunction.CollectDeclsFuncPrms (|Message| prms, |SCBase| AddToSpace)
 	opt norefcounts
 	|| cls = .Cls
-		if !prms.HasSelfAsFirst
-			cls.AddSelfToFunc(addtospace)
-			.args <~ cls.SelfDecl
-	  else
+	if !cls
 		cls = .lookup|SCModule|.Cls
+	  elseif !prms.HasSelfAsFirst
+		cls.AddSelfToFunc(AddToSpace)
+		cls.SelfDeclReal(self)
 
 	for item in prms
 		// can remove some shit thats only applicable here... :D
 		require item.CollectFuncPrm(self, AddToSpace, cls)
+
+
+function scclass.SelfDeclReal (|scfunction| f)
+	opt norefcounts
+	|| sl = .SelfDecl // for my nil-checker
+	if sl.SuffersNil
+		sl = sl.copy
+	f.args <~ sl
 
 
 function Message.CollectFuncPrm (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)

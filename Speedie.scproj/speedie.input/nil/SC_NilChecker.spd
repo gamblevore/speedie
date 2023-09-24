@@ -2,6 +2,7 @@
 
 // todo:
 	// bug fixes
+	// * Self needs to be made unshared for all "nilsuffering" funcs
 	
 
 extend_module NilTracker {
@@ -95,9 +96,9 @@ function Function (NilTrackerFn)
 		if sent.SuffersNil
 			.VariableCheck(recv, sent, p)
 			check ((recv.NilStated) or (sent.NilUsed isnt Nilish)) (p, "Unknown if this parameter accepts nil.")
+			HasAddrs := sent.PointerUpgrade
 		.Jump(p, submode)
 		SubMode = 0
-		HasAddrs := sent.PointerUpgrade
 		p++
 	
 	if HasAddrs and StdErr.ok
@@ -197,9 +198,9 @@ function Thing (NilTrackerFn)
 		if (dcl is param) and !dcl.nilstated
 			dcl.NilDeclared = NilState.optional		
 		qmark.Redundant(-1)
-		return T.SetNilness(dcl, test)
+		return T.SetNilness(dcl, test&nilstate.either)
 
-	if (dcl.NilDeclared is Either) and !qmark // qmark disables redunandancy errors...
+	if !qmark // qmark disables redundancy errors...
 		msg.Redundant((dcl.nilused is realish)|int|)
 	return dcl.NilUsed
 
@@ -288,10 +289,9 @@ function Declaration (niltrackerfn)
 	opt norefcounts
 	|| rel = msg.last
 	if rel == @rel
-		SetRel(rel)
-	  else
-		msg.first.NilDecl.NilDebug("decl")
-	// the decl-checker is done in variableset    // checks if we are setting a ? into a ! :)
+		.SetRel(rel)
+		rel = rel.first
+	rel.NilDecl.NilDebug("decl")
 	
 
 function SetRel (niltrackerfn)
@@ -340,7 +340,7 @@ function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
 	opt norefcounts
 	.VariableCheck(recv, sent, where)
-	T.SetNilness(recv, sent.nilused)
+	T.SetNilness(recv, sent.NilUsed)
 
 
 function FailedNil (|message| where, |nilstate|)

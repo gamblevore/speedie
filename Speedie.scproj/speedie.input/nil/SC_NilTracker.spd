@@ -42,7 +42,7 @@ struct NilTracker
 			d.nildebug(("merge", "restore")(merge))
 	
 	
-	function SetNilness (|scdecl| d, |nilstate| s, |nilstate|)
+	function SetNilness (|scdecl| d, |nilstate| s,  |nilstate|)
 		opt norefcounts
 		|| old = d.nilused
 		if old == s
@@ -70,10 +70,6 @@ struct NilTracker
 		.fn = f
 		|| r = f.returntype
 			r.NilUsed = 0 // :)
-		for d in .fn.args
-			|| nd = d.nildeclared & nilstate.either
-			if d.nilused != nd // just on self, right?
-			d.nilused = nd
 
 
 	function Finish (|scfunction| f)
