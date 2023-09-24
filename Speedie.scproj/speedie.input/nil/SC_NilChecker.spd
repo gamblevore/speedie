@@ -99,11 +99,6 @@ function Function (NilTrackerFn)
 
 		|| sent = p.NilDecl
 		if sent.suffersnil
-			|| infernal = sent.internal
-			if (infernal Is Local) and infernal.SuffersNil
-				HasAddrs = SCDeclInfo.AlteredViaPointer
-				recv.info |= HasAddrs
-			
 			check ((recv.NilStated) or (sent.NilUsed isnt Nilish)) (p, "Unknown if this parameter accepts nil.")
 			.VariableCheck(recv, sent, p)
 		p++
@@ -111,8 +106,9 @@ function Function (NilTrackerFn)
 	if HasAddrs and StdErr.ok
 		p = prms.first
 		for recv in fn.args
-			if recv is AlteredViaPointer
-				.VariableSet(recv.internal, p.NilDecl.internal, p)
+			|| infernal = p.NilDecl.internal
+			if (infernal Is Local) and infernal.SuffersNil
+				.VariableSet(recv.internal, infernal, p)
 			p++
 
 	|| ret = fn.ReturnType
@@ -127,7 +123,7 @@ function Return (NilTrackerFn)
 	|| vd = value.NilDecl
 	require vd.SuffersNil
 
-	|| rd = T.fn.ReturnType
+	|| rd = t.fn.ReturnType
 	|| v = vd.nilused
 	if v is Nilish  and  rd.NilDeclared == nilstate.real
 		error (msg, "Nil returned, despite function declaration!")
