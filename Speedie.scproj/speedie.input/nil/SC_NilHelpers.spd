@@ -5,7 +5,7 @@ prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
 extend Message {
 
 function Redundant (|int| real, |nilcheckmode|)
-	if StdErr.CanAddMore(errorseverity.problem)
+	if self and StdErr.CanAddMore(errorseverity.problem)
 		|| str = "Redundant test on nil object: "
 		if real == 1
 			str = "Redundant test on real object: "
@@ -110,17 +110,12 @@ function @scfunction.LoopExitter (Tranfunc)
 	node.LastInBlock
 
 
-function scdecl.ParamUpgrade
-	if (.NilDeclared isnt stated)
-		.NilDeclared = NilState.optional
-
-
 datatype NilCheckMode (uint)
 	flags
 		|NilCheckMode| 
 		Nothing = 0
-		Positive
 		Negative
+		Positive
 		AllowRedundant
 		PosRed = Positive + AllowRedundant  
 		Active = Positive + Negative
@@ -132,7 +127,7 @@ datatype NilCheckMode (uint)
 		return !(self & other)
 	
 	function Negate (|NilCheckmode|)
-		rz  = (self & positive) << 1
-		rz |= (self & negative) >> 1
+		rz  = (self & negative) << 1
+		rz |= (self & positive) >> 1
 		rz |= (self &~ active)  << 0
 

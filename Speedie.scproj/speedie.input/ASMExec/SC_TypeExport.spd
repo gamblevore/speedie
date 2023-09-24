@@ -1,25 +1,5 @@
 
 
-
-datatype BranchState (byte)
-	constants
-		|BranchState|
-		Never		= 1
-		Always		= 2
-		Perhaps		= 3
-
-	syntax cast (|bool|)
-		return self == always 
-	function Not (|BranchState|)
-		if self == never
-			return always
-		if self == Always
-			return never
-		return self
-	syntax is (|branchstate| b, |bool|)
-		return self == b
-
-
 datatype NilState (byte) // Exec.scproj needs this here
 	constants
 		|nilstate|

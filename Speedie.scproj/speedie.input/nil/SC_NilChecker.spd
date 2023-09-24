@@ -1,10 +1,8 @@
 
 
 // todo:
-	// * variableset should be called only for funcdecl/params internals
+	// bug fixes
 	
-
-
 
 extend_module NilTracker {
 	dispatch NilTable (NilTrackerFn)
@@ -89,18 +87,17 @@ function Function (NilTrackerFn)
 	if (fp.func == @bra)
 		.UseChildAsReal(fp.first)						// (abc)()
 
+	|| SubMode = NilCheckMode.PosRed * (fn.IsNilChecker and (test is Positive))
 	|| P = prms.first
-	|scdeclinfo| HasAddrs = 0
+	|| HasAddrs = false
 	for recv in fn.args
-		|| SubMode = nilcheckmode.nothing
-		if p.isfirst and fn.IsNilChecker and (test is Positive)
-			submode = NilCheckMode.PosRed
-		.Jump(p, submode)
-
 		|| sent = p.NilDecl
-		if sent.suffersnil
-			check ((recv.NilStated) or (sent.NilUsed isnt Nilish)) (p, "Unknown if this parameter accepts nil.")
+		if sent.SuffersNil
 			.VariableCheck(recv, sent, p)
+			check ((recv.NilStated) or (sent.NilUsed isnt Nilish)) (p, "Unknown if this parameter accepts nil.")
+		.Jump(p, submode)
+		SubMode = 0
+		HasAddrs := sent.PointerUpgrade
 		p++
 	
 	if HasAddrs and StdErr.ok
@@ -116,6 +113,11 @@ function Function (NilTrackerFn)
 		return ret.NilDeclared
 
 
+function abc (|&int| a, |&int| b, |&int| c)
+	if (a)
+		abc(a,a,a)
+	
+	
 function Return (NilTrackerFn)
 	opt norefcounts
 
@@ -193,19 +195,17 @@ function Tern (Niltrackerfn)
 function Thing (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.nildecl			#debug_require
-	if test is Active
-		|| QMark = msg.parent
-		ifn QMark.func == @bra and qmark.name == "?"
-			QMark = nil
-		if dcl.NilUsed is Either
-			if QMark
-				qmark.Redundant(-1)
-			if (dcl is param) 
-				dcl.ParamUpgrade
-			return T.SetNilness(dcl, nilstate.realish)
-	
-		if !QMark and dcl.NilDeclared is Either
-			msg.Redundant((dcl.nilused is realish)|int|)
+	if test isnt Active: return dcl.nilused
+
+	|| QMark = msg.InQ
+	if (dcl.NilUsed is Either)
+		if (dcl is param) and !dcl.nilstated
+			dcl.NilDeclared = NilState.optional		
+		qmark.Redundant(-1)
+		return T.SetNilness(dcl, test)
+
+	if (dcl.NilDeclared is Either) and !qmark
+		msg.Redundant((dcl.nilused is realish)|int|)
 	return dcl.NilUsed
 
 
@@ -369,7 +369,14 @@ function message.IsNilSafe (|bool|)
 	// just a speed optimisation...  can check if all values are datatypes or whatever :) then just ignore those nodes
 	return false
 
+function message.InQ (|message|)
+	opt norefcounts
+	|| P = .parent
+	if P.func == @bra and P.name == "?"
+		return P
 
-// !(a and b) --> (!a or !b)
-// !(a or  b) --> (!a and !b)
-
+function scdecl.PointerUpgrade (|bool|)
+	opt norefcounts
+	|| infernal = .internal
+	if (infernal Is Local) and infernal.SuffersNil
+		return true
