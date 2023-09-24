@@ -107,7 +107,7 @@ module Feedback
 			nil|message|.jdb2
 			nil|message|.LocateAll
 			nil|scfunction|.NilDebug
-			nil|scdecl|.NilDebug
+			nil|scdecl|.NilDebug("")
 	
 	
 	function ParseArgsSub (|[]| args, |bool|) 

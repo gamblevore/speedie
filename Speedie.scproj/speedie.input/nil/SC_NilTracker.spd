@@ -39,7 +39,7 @@ struct NilTracker
 			  elseif v == 0
 				debugger 
 			d.nilused = v
-			d.nildebug
+			d.nildebug(("merge", "restore")(merge))
 	
 	
 	function SetNilness (|scdecl| d, |nilstate| s, |nilstate|)
@@ -56,7 +56,7 @@ struct NilTracker
 			i.decl = d
 			.DeclCount = c + 1
 			d.nilused = s
-			d.NilDebug
+			d.NilDebug("set")
 			return s
 		
 		error (.fn, "Too many variables for nilchecker")

@@ -51,7 +51,7 @@ function scfunction.NilDebug
 	printline fs
 
 
-function scdecl.NilDebug
+function scdecl.NilDebug (|string| reason)
 	cpp_name ndb2
 	|| fs = FastString()
 	fs <~ .name ?? "?"

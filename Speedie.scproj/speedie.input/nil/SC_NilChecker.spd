@@ -111,11 +111,6 @@ function Function (NilTrackerFn)
 	|| ret = fn.ReturnType
 		check (ret.NilStated or !ret.SuffersNil) (msg, "Unknown if this function returns nil.")
 		return ret.NilDeclared
-
-
-function abc (|&int| a, |&int| b, |&int| c)
-	if (a)
-		abc(a,a,a)
 	
 	
 function Return (NilTrackerFn)
@@ -132,7 +127,7 @@ function Return (NilTrackerFn)
 	
 	if (rd.nilused & v) != v
 		rd.nilused |= v
-		rd.NilDebug
+		rd.NilDebug("return")
 
 
 function While (NilTrackerFn)
@@ -204,7 +199,7 @@ function Thing (NilTrackerFn)
 		qmark.Redundant(-1)
 		return T.SetNilness(dcl, test)
 
-	if (dcl.NilDeclared is Either) and !qmark
+	if (dcl.NilDeclared is Either) and !qmark // qmark disables redunandancy errors...
 		msg.Redundant((dcl.nilused is realish)|int|)
 	return dcl.NilUsed
 
@@ -295,7 +290,7 @@ function Declaration (niltrackerfn)
 	if rel == @rel
 		SetRel(rel)
 	  else
-		msg.first.NilDecl.NilDebug
+		msg.first.NilDecl.NilDebug("decl")
 	// the decl-checker is done in variableset    // checks if we are setting a ? into a ! :)
 	
 
@@ -354,7 +349,7 @@ function FailedNil (|message| where, |nilstate|)
 	if  d is param  and  d.NilDeclared isnt Stated
 		d.NilDeclared = NilState.real
 		d.nilused = NilState.Realish
-		d.NilDebug
+		d.NilDebug("param")
 		return nilstate.realish
 
 	|| err = "Nil Error: Don't declare with '?'... or test for nil."
