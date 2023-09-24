@@ -133,3 +133,57 @@ module NilTest2
 		NilTest.n0
 
 //@Jeebox is %actually~able~to // unambiguously~describe human~sentances
+
+
+function scfunction.NilDebug
+	cpp_name ndb1
+	|| fs = FastString()
+	if .cls
+		fs <~ .cls.name
+		fs <~ "."
+	fs <~ .name
+	fs <~ "( "
+	for a in .args
+		fs <~ ", "
+		start
+		fs <~ a.name
+		fs <~ " "
+		a.nildeclared.nilname(fs, true)
+	fs <~ " )"
+	printline fs
+
+
+function scdecl.NilDebug (|string| reason)
+	cpp_name ndb2
+	|| fs = FastString()
+	fs <~ reason
+	fs <~ ": "
+	fs <~ .name ?? "?"
+	fs <~ " "
+	|| d = .NilDeclared
+	d.NilName(fs, false)
+	d &= ~ NilState.Stated
+	if .nilused != d
+		fs <~ " ("
+		.nilused.nilname(fs, false)
+		fs <~ ")"
+	printline fs
+
+
+function nilstate.NilName (|faststring| fs, |bool| expectstated)
+	|| st = (self is Stated)
+	if st == expectstated
+		0
+	  elseif st
+		fs <~ "stated "
+	  else
+		fs <~ "unstated "
+	
+	if self is Either
+		fs <~ "optional"
+	  elseif self is Nilish
+		fs <~ "nil"
+	  else
+		fs <~ "real"
+	
+	
