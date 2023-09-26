@@ -18,6 +18,9 @@ datatype NilState (byte) // Exec.scproj needs this here
 		rz = self (|) o
 		if rz is Nilish
 			return Nilish
+	
+	function Name (|string|)
+		return ("nil", "real")(self is nilish)
 			
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type

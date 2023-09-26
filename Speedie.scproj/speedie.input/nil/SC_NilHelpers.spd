@@ -6,9 +6,9 @@ extend Message {
 
 function Redundant (|nilstate| IsReal=nilstate.nilish, |nilcheckmode|)
 	if StdErr.CanAddMore(errorseverity.problem)
-		|| str = "Redundant test on nil object: "
-		if IsReal is real
-			str = "Redundant test on real object: "
+		|| str = "Nil test is redundant on "
+		str += isreal.name
+		str += " object: "
 		str += .render 
 		StdErr.NewProblem(self, str)
 

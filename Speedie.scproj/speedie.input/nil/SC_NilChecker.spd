@@ -94,7 +94,7 @@ function Function (NilTrackerFn)
 		|| sent = p.NilDecl
 		if sent.SuffersNil
 			.VariableCheck(recv, sent, p)
-			check ((recv.NilStated) or (sent.NilUsed isnt Nilish)) (p, "Unknown if this parameter accepts nil.")
+			check ((recv.NilStated) or (sent.NilUsed isnt Nilish)) (p, "Nilness of parameter unknown.")
 			HasAddrs := sent.PointerUpgrade
 		.Jump(p, submode)
 		SubMode = 0
@@ -109,7 +109,7 @@ function Function (NilTrackerFn)
 			p++
 
 	|| ret = fn.ReturnType
-		check (ret.NilStated or !ret.SuffersNil) (msg, "Unknown if this function returns nil.")
+		check (ret.NilStated or !ret.SuffersNil) (msg, "Nilness of function return unknown.")
 		return ret.NilDeclared
 	
 	
@@ -204,11 +204,11 @@ function Thing (NilTrackerFn)
 	if msg.AllowRedundant
 		return test&dcl.nilused
 
-	expect (test == dcl.nilused) (msg, "Nil Logic contradiction")
-	// if A and !A  // branch never fires
-	// if B or B 	// the second test never fires...
-
-	return msg.Redundant(test) // no setnilness. decl increase only used for if/or. contradiction or redundant.
+	expect (test == dcl.nilused) (msg, "Nil Contradiction: Object can't be " + dcl.nilused.name)
+	if test is allowredundant
+		return test
+	// if A and !A  (never fires),  // if B or B (second test never fires)
+	return msg.Redundant(test)		// no setnilness. decl increase only used for if/or. contra/redund.
 	
 
 function Argument (Niltrackerfn)
@@ -244,7 +244,7 @@ function ProcessCondRel (Niltrackerfn)
 		
 		if (lnil and rnil)
 			return ll.Redundant
-		expect (scop.IsNilTest) (op, "Can't use this operator on nil. Use != or ==.")
+		expect (scop.IsNilTest) (op, "Nil can't accept this operator. Use != or ==.")
 
 		|| side = (rr, ll)(lnil)
 		.jump(side, test) // can handle !(a == nil)

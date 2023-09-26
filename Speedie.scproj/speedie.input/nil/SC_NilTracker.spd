@@ -67,7 +67,7 @@ struct NilTracker
 			d.NilDebug("set")
 			return s
 		
-		error (.fn, "Too many variables for nilchecker")
+		error (.fn, "Nilchecker got too many vars")
 		return s
 
 
