@@ -2,7 +2,6 @@
 
 // todo:
 	// bug fixes
-	// * Self needs to be made unshared for all "nilsuffering" funcs
 	
 
 extend_module NilTracker {
@@ -148,15 +147,17 @@ function If (NilTrackerFn)
 	.jump(cond, NilCheckMode.positive)
 	.RunAll(arg1)
 	|| FirstHalf = T.DeclCount
-													// IF X {y=y1} ELSE {y=y2}
-	t.Restore(Beginning)							// (undo y=y1 but keep track of it)
-	.jump(cond, NilCheckMode.negative)
-	if arg2.isfirst									// ELSE {y=y2}
+	if firsthalf > beginning
+		t.Restore(Beginning)
+		.jump(cond, NilCheckMode.negative)
+	if arg2.isfirst
 		.RunAll(arg2)
 	  elseif arg2
 		.if(else)
 	
-	if arg1.blocks
+	if T.DeclCount == firsthalf
+		return 0
+	  elseif arg1.blocks
 		if !arg2.Blocks
 			t.Clear(Beginning, FirstHalf)
 		  else
@@ -181,9 +182,10 @@ function Tern (Niltrackerfn)
 
 	.jump(C, nilcheckmode.positive)
 	rz = .Jump(A, test)
-	t.Restore(BeginState)
-
-	.jump(C, nilcheckmode.negative)
+	|| State2 = t.declcount
+	if state2 > beginstate
+		t.Restore(BeginState)
+		.jump(C, nilcheckmode.negative)
 	rz |= .Jump(B, test)
 	t.merge(BeginState)								// IF X {y=y1}
 
@@ -193,16 +195,14 @@ function Thing (NilTrackerFn)
 	|| dcl = msg.nildecl			#debug_require
 	if test isnt Active: return dcl.nilused
 
-	|| QMark = msg.InQ
-	if (dcl.NilUsed is Either)
-		if (dcl is param) and !dcl.nilstated
-			dcl.NilDeclared = NilState.optional		
-		qmark.Redundant(-1)
-		return T.SetNilness(dcl, test&nilstate.either)
-
-	if !qmark // qmark disables redundancy errors...
-		msg.Redundant((dcl.nilused is realish)|int|)
-	return dcl.NilUsed
+	|| QMark = msg.InQ  // disable redundancy warn
+	if (dcl.NilUsed isnt Either)
+		if !qmark
+			msg.Redundant((dcl.nilused is realish)|int|)
+	  elseif (dcl is param) and !dcl.nilstated
+		dcl.NilDeclared = NilState.optional
+	
+	return T.SetNilness(dcl, test&nilstate.either)
 
 
 function Argument (Niltrackerfn)
@@ -340,7 +340,9 @@ function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
 	opt norefcounts
 	.VariableCheck(recv, sent, where)
-	T.SetNilness(recv, sent.NilUsed)
+	|| sn = sent.NilUsed
+	if recv.nilused != sn
+		T.SetNilness(recv, sn)
 
 
 function FailedNil (|message| where, |nilstate|)

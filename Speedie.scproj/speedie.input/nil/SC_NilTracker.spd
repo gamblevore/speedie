@@ -29,7 +29,7 @@ struct NilTracker
 	function Merge (|uint| s, |bool| Merge=true)
 		|| c = .DeclCount
 		.DeclCount = s
-		while s > c
+		while c > s
 			|| i = &.items[--c]
 			|| d = i.decl
 			|| v = i.nil
@@ -38,15 +38,14 @@ struct NilTracker
 				i.nil = v
 			  elseif v == 0
 				debugger 
-			d.nilused = v
-			d.nildebug(("merge", "restore")(merge))
+			if d.nilused != v
+				d.nilused = v
+				d.nildebug(("merge", "restore")(merge))
 	
 	
-	function SetNilness (|scdecl| d, |nilstate| s,  |nilstate|)
+	function SetNilness (|SCDecl| d, |NilState| s, |nilstate|)
 		opt norefcounts
 		|| old = d.nilused
-		if old == s
-			return s
 		if old > 3 or s > 3 // what?
 		
 		|| c = .DeclCount
