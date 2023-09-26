@@ -35,7 +35,7 @@ function UseChildAsReal (|message| wrapper) // a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = wrapper.first
 		if .Jump(ch) is Nilish
-			.Failednil(ch)
+			.FailedReal(ch)
 
 function Dummy (NilTrackerFn)
 	debugger
@@ -59,7 +59,7 @@ function Property (niltrackerfn)
 
 	|| ch = msg.first
 	if .Jump(ch, test) is Nilish
-		.Failednil(ch)
+		.FailedReal(ch)
 	return msg.nildecl.NilDeclared
 
 
@@ -87,7 +87,7 @@ function Function (NilTrackerFn)
 	if (fp.func == @bra)
 		.UseChildAsReal(fp.first)						// (abc)()
 
-	|| SubMode = NilCheckMode.PosRed * (fn.IsNilChecker and (test is Positive))
+	|| SubMode = (fn.IsNilChecker and (test is Positive)) * NilCheckMode.PosRed
 	|| P = prms.first
 	|| HasAddrs = false
 	for recv in fn.args
@@ -103,16 +103,15 @@ function Function (NilTrackerFn)
 	if HasAddrs and StdErr.ok
 		p = prms.first
 		for recv in fn.args
-			|| infernal = p.NilDecl.internal
-			if (infernal Is Local) and infernal.SuffersNil
+			|| infernal = p.NilDecl.PointerUpgrade
 				.VariableSet(recv.internal, infernal, p)
 			p++
 
 	|| ret = fn.ReturnType
 		check (ret.NilStated or !ret.SuffersNil) (msg, "Nilness of function return unknown.")
 		return ret.NilDeclared
-	
-	
+
+
 function Return (NilTrackerFn)
 	opt norefcounts
 
@@ -122,7 +121,7 @@ function Return (NilTrackerFn)
 
 	|| rd = t.fn.ReturnType
 	|| v = vd.nilused
-	if v is Nilish  and  rd.NilDeclared == nilstate.real
+	if  v is Nilish  and  rd.NilDeclared == nilstate.real
 		error (msg, "Nil returned, despite function declaration!")
 	
 	if (rd.nilused & v) != v
@@ -146,10 +145,12 @@ function If (NilTrackerFn)
 
 	.jump(cond, NilCheckMode.positive)
 	.RunAll(arg1)
+	
 	|| FirstHalf = T.DeclCount
 	if firsthalf > beginning
 		t.Restore(Beginning)
 		.jump(cond, NilCheckMode.negative)
+	
 	if arg2.isfirst
 		.RunAll(arg2)
 	  elseif arg2
@@ -195,20 +196,18 @@ function Thing (NilTrackerFn)
 	|| dcl = msg.nildecl
 	if test isnt Active: return dcl.nilused
 
-	test &= nilstate.either
-	if (dcl.NilUsed is Either)
+	|| Desired = nilstate.either & Test 
+	if (dcl.NilUsed is Either)									// This is OK.
 		if (dcl is param) and !dcl.nilstated
 			dcl.NilDeclared = NilState.optional
-		return T.SetNilness(dcl, test)
+		return T.SetNilness(dcl, Desired)
 	
-	if msg.AllowRedundant
-		return test&dcl.nilused
-
-	expect (test == dcl.nilused) (msg, "Nil Contradiction: Object can't be " + dcl.nilused.name)
-	if test is allowredundant
-		return test
 	// if A and !A  (never fires),  // if B or B (second test never fires)
-	return msg.Redundant(test)		// no setnilness. decl increase only used for if/or. contra/redund.
+	expect (Desired == dcl.nilused) (msg, "Nil Contradiction: Object can't be " + Desired.name)
+	if (test is allowredundant) or msg.AllowRedundant			// if a.length // allow
+		return Desired											// if a and a? // also!
+
+	return msg.Redundant(Desired)		// no setnilness. decl increase-opt unneeded cos only redund/contra possible.
 	
 
 function Argument (Niltrackerfn)
@@ -257,12 +256,8 @@ function ProcessCondRel (Niltrackerfn)
 		return L.Worst(.Jump(rr))
 
 
-	// !(a or b)  --> (!a and !b)
-	// !(a and b) --> (!a or !b)
-	if test isnt active										// x = (!a or !a.y)
-		(test |= nilcheckmode.positive)
-	|| IsAnd = AndOr == SCOperator.AND
-	if IsAnd == (test == nilcheckmode.positive)
+	test = test.activate										// x = (!a or !a.y)
+	if (AndOr == SCOperator.AND) == (test is positive)
 		.Jump(ll, test)
 		.JumpOK(rr, test)
 		return NilState.real
@@ -301,7 +296,7 @@ function Brel (Niltrackerfn)
 		.UseChildAsReal(msg)										// *abc
 		return msg.nildecl.nildeclared
 	if b == '!'
-		return .Jump(f, test.Negate)
+		return .Jump(f, test.activate.Negate)
 	if b == '&'
 		Jump(f, test)
 		return NilState.Real // its obviously real
@@ -356,7 +351,7 @@ function RunAll (NilTrackerFn)
 function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
 	opt norefcounts
 	if (recv.NilDeclared isnt nilish) and (sent.nilused is Nilish)
-		.FailedNil(where)
+		.FailedReal(where)
 
 
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
@@ -367,21 +362,19 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, 
 		T.SetNilness(recv, sn)
 
 
-function FailedNil (|message| where, |nilstate|)
+function FailedReal (|message| where, |nilstate|)
 	opt norefcounts
 	|| d = where.nildecl
-	if  d is param  and  d.NilDeclared isnt Stated
+	if  (d is param)  and  !d.Nilstated
 		d.NilDeclared = NilState.real
 		d.nilused = NilState.Realish
 		d.NilDebug("param")
 		return nilstate.realish
 
-	|| err = "Nil Error: Don't declare with '?'... or test for nil."
-	if d isnt param
-		err = ("Nil Access: Needs 'if' wrapping.", "Nil Access here.")(where == @thg)
-	error (where, err)
+	error (where, "Nil Access: Perhaps wrap with 'if' or redeclare without '?'.")
 	return d.nilused
 }
+
 
 function message.AllowRedundant (|message|)
 	opt norefcounts
@@ -389,8 +382,9 @@ function message.AllowRedundant (|message|)
 	if P.func == @bra and P.name == "?"
 		return P
 
-function scdecl.PointerUpgrade (|bool|)
+
+function scdecl.PointerUpgrade (|scdecl|)
 	opt norefcounts
 	|| infernal = .internal
 	if (infernal Is Local) and infernal.SuffersNil
-		return true
+		return infernal

@@ -74,6 +74,11 @@ datatype NilCheckMode (uint)
 	syntax isnt (|NilCheckMode| other, |bool|)
 		return !(self & other)
 	
+	function Activate (|NilCheckmode|) 
+		if (self isnt active)
+			return self (|) nilcheckmode.positive
+		return self
+	
 	function Negate (|NilCheckmode|)
 		rz  = (self & negative) << 1
 		rz |= (self & positive) >> 1
