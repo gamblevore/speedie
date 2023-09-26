@@ -25,31 +25,34 @@ extend_module NilTracker {
 	
 	TrackerDummies()
 
-
 function TrackerDummies
 	for i in 64
 		NilTable[i] := Dummy
+
+function Dummy (NilTrackerFn): debugger
+
 		
+function Jump (NilTrackerFn)
+	pragma inline
+	return (NilTable[msg.func])(msg, test)
+
 					
-function UseChildAsReal (|message| wrapper) // a.b, *a, a[0], (a)()
+function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
-	|| ch = wrapper.first
+	|| ch = msg.first
 		if .Jump(ch) is Nilish
 			.FailedReal(ch)
-
-function Dummy (NilTrackerFn)
-	debugger
+	return msg.nildecl.nildeclared
 
 
 function Access (NilTrackerFn)
 	opt norefcounts
-	.UseChildAsReal(msg)						// abc[0]
-	return msg.nildecl.nildeclared
+	return .UseChildAsReal(msg)							// abc[0]
 
 
 function Rel (NilTrackerFn)
 	opt norefcounts
-	if msg.tmptype is kSetVar					// x = y
+	if msg.tmptype is kSetVar							// x = y
 		return SetRel(msg, test)
 	return ProcessCondRel(msg, test)
 
@@ -134,7 +137,7 @@ function While (NilTrackerFn)
 
 	|| beginning = t.DeclCount
 	.jump(msg.first, NilCheckMode.positive)
-	.RunAll(msg.second)
+	.Argument(msg.second)
 	t.Merge(Beginning) // while seems very simple?
 
 
@@ -144,7 +147,7 @@ function If (NilTrackerFn)
 	|| cond = msg.first,  || arg1 = cond.next,  || Else = arg1.next,  || arg2 = else.last
 
 	.jump(cond, NilCheckMode.positive)
-	.RunAll(arg1)
+	.Argument(arg1)
 	
 	|| FirstHalf = T.DeclCount
 	if firsthalf > beginning
@@ -152,7 +155,7 @@ function If (NilTrackerFn)
 		.jump(cond, NilCheckMode.negative)
 	
 	if arg2.isfirst
-		.RunAll(arg2)
+		.Argument(arg2)
 	  elseif arg2
 		.if(else)
 	
@@ -202,7 +205,6 @@ function Thing (NilTrackerFn)
 			dcl.NilDeclared = NilState.optional
 		return T.SetNilness(dcl, Desired)
 	
-	// if A and !A  (never fires),  // if B or B (second test never fires)
 	expect (Desired == dcl.nilused) (msg, "Nil Contradiction: Object can't be " + Desired.name)
 	if (test is allowredundant) or msg.AllowRedundant			// if a.length // allow
 		return Desired											// if a and a? // also!
@@ -212,8 +214,10 @@ function Thing (NilTrackerFn)
 
 function Argument (Niltrackerfn)
 	opt norefcounts
-	ifn msg in @bra
-	.RunAll(msg, test)
+	for s.fast in msg
+		if s.IsLast
+			return .jump(s, test)
+		.Jump(s)
 
 	
 function Bracket (Niltrackerfn)
@@ -237,8 +241,8 @@ function ProcessCondRel (Niltrackerfn)
 		|| LNil = ll.IsNowNil
 		|| RNil = rr.IsNowNil
 		ifn lnil or rnil			// if (a > b)
-			.jump(ll, test)
-			.jumpOK(rr, test)
+			.jump(ll, test), require stderr.ok
+			.jump(rr, test)
 			return NilState.Real
 		
 		if (lnil and rnil)
@@ -258,22 +262,20 @@ function ProcessCondRel (Niltrackerfn)
 
 	test = test.activate										// x = (!a or !a.y)
 	if (AndOr == SCOperator.AND) == (test is positive)
-		.Jump(ll, test)
-		.JumpOK(rr, test)
+		.Jump(ll, test), require stderr.ok
+		.Jump(rr, test)
 		return NilState.real
 	
 	return .BooleanLogic(ll, rr, test)
 
 
-// RUNS:  A in pos+neg,  B in pos,  merge whole thing!
-// if A is false, we can test B. And if its true then A must be false.
-// if A is true, we have no idea if B is true
+// if A is false, we can test B. And if B is true then A must be false.
+// if A is true,  we have no idea if B is true
 
 // We need some kinda special merge... just for B...
 // we don't know if B actually happened or not.
 // isn't that the same as undoing it?
 // no... cos undoing it doesnt help.
-
 
 function BooleanLogic (|message| AA, |message| BB, |nilcheckmode| Test, |nilstate|)
 	|| ACount = t.DeclCount									// POSITIVE A
@@ -291,15 +293,15 @@ function BooleanLogic (|message| AA, |message| BB, |nilcheckmode| Test, |nilstat
 function Brel (Niltrackerfn)
 	opt norefcounts
 	|| b = *msg.name
-	|| f = *msg
 	if b == '*'
-		.UseChildAsReal(msg)										// *abc
-		return msg.nildecl.nildeclared
-	if b == '!'
-		return .Jump(f, test.activate.Negate)
+		return .UseChildAsReal(msg)							// *abc
+	|| f = *msg
 	if b == '&'
 		Jump(f, test)
 		return NilState.Real // its obviously real
+	if b == '!'
+		return .Jump(f, test.activate.Negate)
+	// ~Num
 
 
 function Declaration (niltrackerfn)
@@ -313,39 +315,13 @@ function Declaration (niltrackerfn)
 
 function SetRel (niltrackerfn)
 	opt norefcounts
-	|| l = msg.first
-	|| r = msg.last
-	|| B = .JumpDecl(r) // c++ runs B first...
-	|| A = .JumpDecl(l)
+	|| L = msg.first,  || R = msg.last
+	.Jump(R)			// R is defined as coming first?
+	.Jump(L)
+	|| A = L.nildecl
 	.CurrDecl := a
-	if a.SuffersNil != b.SuffersNil // what?
 	if a.SuffersNil
-		.VariableSet(A, B, l)
-
-
-function JumpDecl (|message| msg, |scdecl|)
-	.jump(msg)
-	return msg.NilDecl
-
-
-function JumpOK (NilTrackerFn)
-	pragma inline // reduce redundant errors
-	if stderr.ok
-		return (NilTable[msg.func])(msg, test)
-	return NilState.Either
-
-
-function Jump (NilTrackerFn)
-	pragma inline
-	return (NilTable[msg.func])(msg, test)
-
-
-function RunAll (NilTrackerFn)
-	opt norefcounts
-	for s.fast in msg
-		if s.IsLast
-			return .jump(s, test)
-		.Jump(s)
+		.VariableSet(A, R.nildecl, L)
 
 
 function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
@@ -362,29 +338,13 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, 
 		T.SetNilness(recv, sn)
 
 
-function FailedReal (|message| where, |nilstate|)
+function FailedReal (|message| where)
 	opt norefcounts
 	|| d = where.nildecl
-	if  (d is param)  and  !d.Nilstated
-		d.NilDeclared = NilState.real
-		d.nilused = NilState.Realish
-		d.NilDebug("param")
-		return nilstate.realish
+	expect (d is param  and  d.nilused == nilstate.either) (where, "Nil Access on: " + where.render)
+	d.NilDeclared = NilState.real
+	d.nilused = NilState.Realish
+	d.NilDebug("param")
 
-	error (where, "Nil Access: Perhaps wrap with 'if' or redeclare without '?'.")
-	return d.nilused
 }
 
-
-function message.AllowRedundant (|message|)
-	opt norefcounts
-	|| P = .parent
-	if P.func == @bra and P.name == "?"
-		return P
-
-
-function scdecl.PointerUpgrade (|scdecl|)
-	opt norefcounts
-	|| infernal = .internal
-	if (infernal Is Local) and infernal.SuffersNil
-		return infernal

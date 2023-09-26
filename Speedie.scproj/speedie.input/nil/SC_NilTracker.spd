@@ -91,7 +91,7 @@ struct NilTracker
 		if platform.IsDebug
 			.Start(f)
 			f.nildebug
-			Runall(f.SourceArg)
+			Argument(f.SourceArg)
 			.Finish(f)
 
 
