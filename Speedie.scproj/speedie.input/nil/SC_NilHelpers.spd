@@ -4,10 +4,10 @@ prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
 
 extend Message {
 
-function Redundant (|int| real, |nilcheckmode|)
+function Redundant (|nilstate| IsReal=nilstate.nilish, |nilcheckmode|)
 	if StdErr.CanAddMore(errorseverity.problem)
 		|| str = "Redundant test on nil object: "
-		if real == 1
+		if IsReal is real
 			str = "Redundant test on real object: "
 		str += .render 
 		StdErr.NewProblem(self, str)

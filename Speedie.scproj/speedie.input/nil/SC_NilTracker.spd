@@ -17,8 +17,16 @@ struct NilTracker
 		.DeclCount = s
 	
 
-	function Restore (|uint| s)
-		.merge(s, false)
+	function Restore (|uint| begin)
+		.merge(begin, false)
+
+
+	function RestoreForMerge (|uint| begin, |bool|)
+		|| Curr = .declcount
+		if Curr > begin
+			.Restore(Begin)
+			.declcount = Curr
+			return true
 
 
 	function Clear (|uint| a,  |uint| b)
@@ -27,6 +35,7 @@ struct NilTracker
 
 
 	function Merge (|uint| s, |bool| Merge=true)
+		opt norefcounts
 		|| c = .DeclCount
 		.DeclCount = s
 		while c > s

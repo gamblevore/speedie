@@ -192,18 +192,24 @@ function Tern (Niltrackerfn)
 		
 function Thing (NilTrackerFn)
 	opt norefcounts
-	|| dcl = msg.nildecl			#debug_require
+	|| dcl = msg.nildecl
 	if test isnt Active: return dcl.nilused
 
-	|| QMark = msg.InQ  // disable redundancy warn
-	if (dcl.NilUsed isnt Either)
-		if !qmark
-			msg.Redundant((dcl.nilused is realish)|int|)
-	  elseif (dcl is param) and !dcl.nilstated
-		dcl.NilDeclared = NilState.optional
+	test &= nilstate.either
+	if (dcl.NilUsed is Either)
+		if (dcl is param) and !dcl.nilstated
+			dcl.NilDeclared = NilState.optional
+		return T.SetNilness(dcl, test)
 	
-	return T.SetNilness(dcl, test&nilstate.either)
+	if msg.AllowRedundant
+		return test&dcl.nilused
 
+	expect (test == dcl.nilused) (msg, "Nil Logic contradiction")
+	// if A and !A  // branch never fires
+	// if B or B 	// the second test never fires...
+
+	return msg.Redundant(test) // no setnilness. decl increase only used for if/or. contradiction or redundant.
+	
 
 function Argument (Niltrackerfn)
 	opt norefcounts
@@ -237,7 +243,7 @@ function ProcessCondRel (Niltrackerfn)
 			return NilState.Real
 		
 		if (lnil and rnil)
-			return ll.Redundant(0)
+			return ll.Redundant
 		expect (scop.IsNilTest) (op, "Can't use this operator on nil. Use != or ==.")
 
 		|| side = (rr, ll)(lnil)
@@ -251,24 +257,40 @@ function ProcessCondRel (Niltrackerfn)
 		return L.Worst(.Jump(rr))
 
 
-	// needs to take into account whether test is positive or negative!
-	if (andor == SCOperator.AND) or msg.IsNilSafe // isnilsafe will speed things up a lot for ints/bools and stuff
-		.Jump(ll, NilCheckMode.positive)
-		.JumpOK(rr, NilCheckMode.positive)
+	// !(a or b)  --> (!a and !b)
+	// !(a and b) --> (!a or !b)
+	if test isnt active										// x = (!a or !a.y)
+		(test |= nilcheckmode.positive)
+	|| IsAnd = AndOr == SCOperator.AND
+	if IsAnd == (test == nilcheckmode.positive)
+		.Jump(ll, test)
+		.JumpOK(rr, test)
 		return NilState.real
 	
+	return .BooleanLogic(ll, rr, test)
 
-	|| First = t.DeclCount // if (!a or a.length)
-	.Jump(ll, NilCheckMode.positive)
-	t.Restore(First)
-	.Jump(ll, NilCheckMode.negative)
+
+// RUNS:  A in pos+neg,  B in pos,  merge whole thing!
+// if A is false, we can test B. And if its true then A must be false.
+// if A is true, we have no idea if B is true
+
+// We need some kinda special merge... just for B...
+// we don't know if B actually happened or not.
+// isn't that the same as undoing it?
+// no... cos undoing it doesnt help.
+
+
+function BooleanLogic (|message| AA, |message| BB, |nilcheckmode| Test, |nilstate|)
+	|| ACount = t.DeclCount									// POSITIVE A
+	.Jump(AA, test),   require stderr.ok
+	if t.RestoreForMerge(ACount)
+		.Jump(AA, test.negate)								// NEGATIVE A
+
+
+	.Jump(BB, test)											// POSITIVE B
 	
-	|| second = t.DeclCount
-	.JumpOK(rr, NilCheckMode.positive)
+	t.merge(ACount)											// WHOLE MERGE
 	return NilState.real
-	//.merge(first, second) // we want to ignore the negative state... just merge the two values
-	// so we'll need 3 ranges. A-Positive, A-negative, B-positive...
-	// then we merge the two positives
 
 
 function Brel (Niltrackerfn)
@@ -361,12 +383,7 @@ function FailedNil (|message| where, |nilstate|)
 	return d.nilused
 }
 
-
-function message.IsNilSafe (|bool|)
-	// just a speed optimisation...  can check if all values are datatypes or whatever :) then just ignore those nodes
-	return false
-
-function message.InQ (|message|)
+function message.AllowRedundant (|message|)
 	opt norefcounts
 	|| P = .parent
 	if P.func == @bra and P.name == "?"
