@@ -20,6 +20,8 @@ datatype NilState (byte) // Exec.scproj needs this here
 			return Nilish
 	
 	function Name (|string|)
+		if !self
+			return "contradicted"
 		return ("nil", "real")(self is nilish)
 			
 	syntax is (|nilstate| type, |bool|)

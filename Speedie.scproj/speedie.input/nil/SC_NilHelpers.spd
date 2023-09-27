@@ -4,13 +4,6 @@ prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
 
 extend Message {
 
-function AllowRedundant (|message|)
-	opt norefcounts
-	|| P = .parent
-	if P.func == @bra and P.name == "?"
-		return P
-
-
 function Redundant (|nilstate| IsReal=nilstate.nilish, |nilcheckmode|)
 	if StdErr.CanAddMore(errorseverity.problem)
 		|| str = "Nil test is redundant on "

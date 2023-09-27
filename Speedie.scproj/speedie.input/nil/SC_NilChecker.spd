@@ -1,14 +1,20 @@
 
 
-// todo:
-	// bug fixes
-	
+/* todo:
+	* We need a better merger for "if" specifically... able to run backwards and forwards... 
+		* running backwards needs to store the latest version! So we can just run forwards again
+		* we can just run forwards or backwards to get the oldest or latest.
+	* contradictions can be erased by doing if (A and !A) or B
+	* The "or" thing needs to have ALL 4 tests! not just 3!
+		* the "or" merger needs to be able to erase contradictions
+*/
+
 
 extend_module NilTracker {
 	dispatch NilTable (NilTrackerFn)
 		@thg:	Thing
 		@bra:	Bracket
-		@type:	Bracket // pretty much
+		@type:	Type
 		@func:	Function
 		@tmp:   Statement
 		@dot:	Property
@@ -140,7 +146,7 @@ function While (NilTrackerFn)
 	.Argument(msg.second)
 	t.Merge(Beginning) // while seems very simple?
 
-
+			
 function If (NilTrackerFn)
 	opt norefcounts
 	|| Beginning = T.DeclCount
@@ -148,31 +154,36 @@ function If (NilTrackerFn)
 
 	.jump(cond, NilCheckMode.positive)
 	.Argument(arg1)
+
+	if !arg2.HasAny
+		t.Merge(beginning)
+		Return 0
 	
 	|| FirstHalf = T.DeclCount
 	if firsthalf > beginning
 		t.Restore(Beginning)
 		.jump(cond, NilCheckMode.negative)
 	
-	if arg2.isfirst
-		.Argument(arg2)
-	  elseif arg2
+	if arg2.prev
 		.if(else)
-	
-	if T.DeclCount == firsthalf
-		return 0
-	  elseif arg1.blocks
-		if !arg2.Blocks
-			t.Clear(Beginning, FirstHalf)
-		  else
-			t.undo(Beginning)						// clear for owners
-		
-	  elseif arg2.blocks
-		t.Undo(FirstHalf)							// IF X {y=y1} ELSE {return}
-		
 	  else
-		T.DeclCount = FirstHalf						// (skip arg2, its already current)
-		t.Merge(Beginning)							// (merges y=y1, y=y2)
+		.Argument(arg2)
+
+	if t.DeclCount > FirstHalf
+		.MergeIf(arg1, arg2, Beginning, FirstHalf)
+
+
+function MergeIf (|message| arg1, |message| arg2, |uint| Beginning,  |uint| FirstHalf)
+	|| Blocks = (Arg1.Blocks << 0) (|) (arg2.blocks << 1)
+	if Blocks == 0
+		debugat, T.DeclCount = FirstHalf				// (skip arg2, its already current)
+		t.Merge(Beginning)								// (merges y=y1, y=y2)
+	  elseif Blocks == 1
+		debugat, t.Undo(FirstHalf)						// IF X {y=y1} ELSE {return}
+	  elseif Blocks == 2	
+		debugat, t.Clear(Beginning, FirstHalf)
+	  else
+		debugat, t.undo(Beginning)						// clear for owners
 
 
 function Tern (Niltrackerfn)
@@ -205,11 +216,10 @@ function Thing (NilTrackerFn)
 			dcl.NilDeclared = NilState.optional
 		return T.SetNilness(dcl, Desired)
 	
-	expect (Desired == dcl.nilused) (msg, "Nil Contradiction: Object can't be " + Desired.name)
-	if (test is allowredundant) or msg.AllowRedundant			// if a.length // allow
+	if (test is allowredundant)									// if a.length // allow
 		return Desired											// if a and a? // also!
 
-	return msg.Redundant(Desired)		// no setnilness. decl increase-opt unneeded cos only redund/contra possible.
+	return msg.Redundant(dcl.nilused)
 	
 
 function Argument (Niltrackerfn)
@@ -222,8 +232,15 @@ function Argument (Niltrackerfn)
 	
 function Bracket (Niltrackerfn)
 	opt norefcounts
+	if msg.name.length
+		test |= NilCheckMode.allowredundant
 	return .Jump(*msg, test)
-	
+
+
+function Type (Niltrackerfn)
+	opt norefcounts
+	return .Jump(*msg, test)
+
 
 function JustReal (Niltrackerfn)
 	opt norefcounts
@@ -341,7 +358,10 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, 
 function FailedReal (|message| where)
 	opt norefcounts
 	|| d = where.nildecl
-	expect (d is param  and  d.nilused == nilstate.either) (where, "Nil Access on: " + where.render)
+	|| msg = "Nil Access on: "
+	if !d.nilused
+		msg = "Contradictory Object Used: "
+	check (d is param  and  d.nilused == nilstate.either) (where, msg + where.render)
 	d.NilDeclared = NilState.real
 	d.nilused = NilState.Realish
 	d.NilDebug("param")

@@ -2,8 +2,9 @@
 
 struct NilItem
 	|scdecl--|	Decl
-	|nilstate|	Nil
-	|byte[7]| 	Dummy
+	|nilstate|	New
+	|nilstate|	Old
+	|byte[6]| 	Dummy
 
 
 struct NilTracker
@@ -31,7 +32,7 @@ struct NilTracker
 
 	function Clear (|uint| a,  |uint| b)
 		while a < b
-			.items[a++].Nil = 0 // i hope?
+			.items[a++].Old = 0 // i hope?
 
 
 	function Merge (|uint| s, |bool| Merge=true)
@@ -41,10 +42,10 @@ struct NilTracker
 		while c > s
 			|| i = &.items[--c]
 			|| d = i.decl
-			|| v = i.nil
+			|| v = i.Old
 			if Merge
 				v |= d.nilused
-				i.nil = v
+				i.Old = v
 			  elseif v == 0
 				debugger 
 			if d.nilused != v
@@ -60,7 +61,7 @@ struct NilTracker
 		|| c = .DeclCount
 		if (c < 1536)
 			|| i = &.items[c]
-			i.nil = old
+			i.Old = old
 			i.decl = d
 			.DeclCount = c + 1
 			d.nilused = s
