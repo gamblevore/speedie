@@ -1,13 +1,11 @@
 
 
 /* todo:
-	* make all decl info unique? or else we can't easily reason about it
-		* what about multiple branches altering the same thing?
-			* easy! Just merge them :D (Or not so easy? cos we need to still suck in the old values if they were not altered cos hte branch didn't execute)
- 	* contradictions can be erased by doing if (A and !A) or B
-	* The "or" thing needs to have ALL 4 tests! not just 3!
-		* the "or" merger needs to be able to erase contradictions
-
+* make all decl info unique? or else we can't easily reason about it
+	* what about multiple branches altering the same thing?
+		* easy! Just merge them :D (Or not so easy? cos we need to still suck in the old values if they were not altered cos hte branch didn't execute)
+* contradictions can be erased by doing if (A and !A) or B
+	* the "or" merger needs to be able to erase contradictions
 */
 
 
@@ -47,8 +45,7 @@ function Jump (NilTrackerFn)
 function UseChildAsReal (NilTrackerFn) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = msg.first
-		if .Jump(ch) is Nilish
-			.FailedReal(ch)
+		.CheckIsReal(.Jump(ch), ch)
 	return msg.nildecl.nildeclared
 
 
@@ -63,8 +60,7 @@ function Property (niltrackerfn)
 	opt norefcounts
 
 	|| ch = msg.first
-	if .Jump(ch, test) is Nilish
-		.FailedReal(ch)
+	.CheckIsReal(.Jump(ch, test), ch)
 	return msg.nildecl.NilDeclared
 
 
@@ -126,8 +122,8 @@ function Return (NilTrackerFn)
 
 	|| rd = t.fn.ReturnType
 	|| v = vd.nilused
-	if  v is Nilish  and  rd.NilDeclared == nilstate.real
-		error (msg, "Nil returned, despite function declaration!")
+	if  v != nilstate.real  and  rd.NilDeclared == nilstate.real
+		error (msg, v.name + " returned, despite function declaration!")
 	
 	if (rd.nilused & v) != v
 		rd.nilused |= v
@@ -341,8 +337,8 @@ function SetRel (niltrackerfn)
 
 function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
 	opt norefcounts
-	if (recv.NilDeclared isnt nilish) and (sent.nilused is Nilish)
-		.FailedReal(where)
+	if (recv.NilDeclared isnt nilish)
+		.CheckIsReal(sent.nilused, where)
 
 
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
@@ -352,13 +348,11 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, 
 		T.SetNilness(recv, sent.NilUsed)
 
 
-function FailedReal (|message| where)
+function CheckIsReal (|nilstate| actual, |message| where)
 	opt norefcounts
+	require actual != NilState.real
 	|| d = where.nildecl
-	|| msg = "Nil Access on: "
-	if !d.nilused
-		msg = "Contradictory Object Used: "
-	check (d is param  and  d.nilused == nilstate.either) (where, msg + where.render)
+	check (d is param  and  d.nilused == nilstate.either) (where, actual.name + " Object Used: " + where.render)
 	d.NilDeclared = NilState.real
 	d.nilused = NilState.Realish
 	d.NilDebug("param")

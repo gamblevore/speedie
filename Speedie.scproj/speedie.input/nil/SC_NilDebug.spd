@@ -178,12 +178,6 @@ function nilstate.NilName (|faststring| fs, |bool| expectstated)
 		fs <~ "stated "
 	  else
 		fs <~ "unstated "
-	
-	if self is Either
-		fs <~ "optional"
-	  elseif self is Nilish
-		fs <~ "nil"
-	  else
-		fs <~ "real"
+	fs <~ .name
 	
 	

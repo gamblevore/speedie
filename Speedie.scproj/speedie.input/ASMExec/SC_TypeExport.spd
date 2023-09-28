@@ -17,12 +17,16 @@ datatype NilState (byte) // Exec.scproj needs this here
 		// nil + anything = nil
 		rz = self (|) o
 		if rz is Nilish
-			return Nilish
+			rz = Nilish
 	
 	function Name (|string|)
-		if !self
-			return "contradicted"
-		return ("nil", "real")(self is nilish)
+		if self == failed
+			return "contradiction"
+		if self == either
+			return "optional"
+		if self == nilish
+			return "nil"
+		return "real"
 			
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type
