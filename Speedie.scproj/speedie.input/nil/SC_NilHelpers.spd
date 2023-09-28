@@ -91,3 +91,14 @@ datatype NilCheckMode (uint)
 		rz |= (self & positive) >> 1
 		rz |= (self &~ active)  << 0
 
+
+datatype NilSweep (ivec2)
+	iterator
+		|| i = &niltracker.t.items[.x2]
+		|| B = &niltracker.t.items[.x]
+		while --i >= B
+			yield (i)
+
+
+function uint.operatorsweep (|int| after, |nilsweep|)
+	return (self|int|, after)|nilsweep|

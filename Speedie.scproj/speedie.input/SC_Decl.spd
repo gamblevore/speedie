@@ -99,7 +99,7 @@ class SCDecl (SCObject) {
 	|Byte|				AllocSource
 	|NilState|			NilDeclared
 	|NilState|			NilUsed
-	|Byte| 				IfDepth
+	|NilState|			NilTmp
 
 	
 	constructor (|scclass| type=nil)

@@ -5,6 +5,22 @@ struct NilItem
 	|nilstate|	New
 	|nilstate|	Old
 	|byte[6]| 	Dummy
+	
+	function OldToTmp
+		.decl.NilTmp = .old
+	function NewToTmp
+		.decl.NilTmp = .new
+	function Restore
+		.decl.nilused = .old
+	function TmpToUsed
+		opt norefcounts
+		|| d = .decl
+		d.nilused = d.niltmp
+	function UsedPlusOldToTmp
+		opt norefcounts
+		|| d = .Decl
+		d.NilTmp = d.NilUsed (|) .old
+
 
 
 struct NilTracker
@@ -12,45 +28,57 @@ struct NilTracker
 	|scfunction--|		fn
 	|uint| 				DeclCount
 	|NilItem[1536]|		Items
-		
-	function Undo (|uint| s)
-		.merge(s, false)
-		.DeclCount = s
 	
 
-	function Restore (|uint| begin)
-		.merge(begin, false)
-
-
-	function RestoreForMerge (|uint| begin, |bool|)
-		|| Curr = .declcount
-		if Curr > begin
-			.Restore(Begin)
-			.declcount = Curr
-			return true
-
-
-	function Clear (|uint| a,  |uint| b)
-		while a < b
-			.items[a++].Old = 0 // i hope?
-
-
-	function Merge (|uint| s, |bool| Merge=true)
+	function Forward (|uint| back, |uint| front, |uint| Mode)
 		opt norefcounts
-		|| c = .DeclCount
-		.DeclCount = s
-		while c > s
-			|| i = &.items[--c]
+		while front > back
+			|| i = &.items[back++]
 			|| d = i.decl
-			|| v = i.Old
-			if Merge
-				v |= d.nilused
-				i.Old = v
-			  elseif v == 0
-				debugger 
-			if d.nilused != v
-				d.nilused = v
-				d.nildebug(("merge", "restore")(merge))
+			if Mode == 0
+				D.NilUsed = i.New
+			  elseif Mode == 1
+				D.NilTmp = i.New
+			  else
+				D.NilUsed = D.NilTmp
+
+
+	function TmpToUsed (|nilsweep| sw)
+		for i in sw
+			i.TmpToUsed
+
+
+	function UsedPlusOldToTmp (|nilsweep| sw)
+		for i in sw
+			i.UsedPlusOldToTmp
+
+
+	function Restore (|nilsweep| sw, |bool|)
+		for i in sw
+			i.Restore
+		return true
+		
+		
+	function Restore (|uint| s, |bool|)
+		|| f = .DeclCount
+		if f > s
+			return .Restore(s sweep f)
+
+
+	function MoveDown (|uint| s, |uint| f)
+		require f > s
+		|| n = .declcount
+		.DeclCount = s + (n-f)
+		|| W = &.items[s]
+		|| R = &.items[f]
+		|| R2 = &.items[n]
+		while R < R2
+			*W++ = *R++
+
+	function Merge (|uint| back)			// merges oldest values and newest values
+		|| Range = (back sweep .DeclCount)
+		.UsedPlusOldToTmp(Range)
+		.TmpToUsed(Range)
 	
 	
 	function SetNilness (|SCDecl| d, |NilState| s, |nilstate|)
@@ -62,6 +90,7 @@ struct NilTracker
 		if (c < 1536)
 			|| i = &.items[c]
 			i.Old = old
+			i.New = s
 			i.decl = d
 			.DeclCount = c + 1
 			d.nilused = s
@@ -114,7 +143,7 @@ struct NilTracker
 				for f in compiler.funclist
 					if f.cannil: T.Check(f)
 				
-			scfunction.currfunc = nil
+			SCFunction.currfunc = nil
 			StdErr.PrintErrors
 			StdErr.Clear
 
@@ -136,4 +165,5 @@ function scdecl.SuffersNil (|bool|)
 
 function scdecl.NilStated (|bool|)
 	return .NilDeclared is Stated
+
 

@@ -1,12 +1,13 @@
 
 
 /* todo:
-	* We need a better merger for "if" specifically... able to run backwards and forwards... 
-		* running backwards needs to store the latest version! So we can just run forwards again
-		* we can just run forwards or backwards to get the oldest or latest.
-	* contradictions can be erased by doing if (A and !A) or B
+	* make all decl info unique? or else we can't easily reason about it
+		* what about multiple branches altering the same thing?
+			* easy! Just merge them :D (Or not so easy? cos we need to still suck in the old values if they were not altered cos hte branch didn't execute)
+ 	* contradictions can be erased by doing if (A and !A) or B
 	* The "or" thing needs to have ALL 4 tests! not just 3!
 		* the "or" merger needs to be able to erase contradictions
+
 */
 
 
@@ -152,38 +153,35 @@ function If (NilTrackerFn)
 	|| Beginning = T.DeclCount
 	|| cond = msg.first,  || arg1 = cond.next,  || Else = arg1.next,  || arg2 = else.last
 
-	.jump(cond, NilCheckMode.positive)
+	.Jump(cond, NilCheckMode.positive)
 	.Argument(arg1)
-
-	if !arg2.HasAny
-		t.Merge(beginning)
-		Return 0
-	
 	|| FirstHalf = T.DeclCount
-	if firsthalf > beginning
-		t.Restore(Beginning)
+
+	if T.Restore(Beginning)
 		.jump(cond, NilCheckMode.negative)
-	
+
 	if arg2.prev
 		.if(else)
 	  else
 		.Argument(arg2)
 
-	if t.DeclCount > FirstHalf
-		.MergeIf(arg1, arg2, Beginning, FirstHalf)
+	|| Blocks = arg1.Blocks (|) (arg2.blocks << 1)
+	if Blocks == 3					// both
+		debugat
+		t.restore(Beginning)
+		T.DeclCount = Beginning
+		
+	  elseif Blocks == 0			// neither
+		debugat // fix this. some kinda super-merge?
 
-
-function MergeIf (|message| arg1, |message| arg2, |uint| Beginning,  |uint| FirstHalf)
-	|| Blocks = (Arg1.Blocks << 0) (|) (arg2.blocks << 1)
-	if Blocks == 0
-		debugat, T.DeclCount = FirstHalf				// (skip arg2, its already current)
-		t.Merge(Beginning)								// (merges y=y1, y=y2)
 	  elseif Blocks == 1
-		debugat, t.Undo(FirstHalf)						// IF X {y=y1} ELSE {return}
-	  elseif Blocks == 2	
-		debugat, t.Clear(Beginning, FirstHalf)
+		debugat
+		t.restore(FirstHalf)
+		T.DeclCount = FirstHalf
+	
 	  else
-		debugat, t.undo(Beginning)						// clear for owners
+		debugat
+		T.MoveDown(Beginning, FirstHalf)
 
 
 function Tern (Niltrackerfn)
@@ -297,11 +295,14 @@ function ProcessCondRel (Niltrackerfn)
 function BooleanLogic (|message| AA, |message| BB, |nilcheckmode| Test, |nilstate|)
 	|| ACount = t.DeclCount									// POSITIVE A
 	.Jump(AA, test),   require stderr.ok
-	if t.RestoreForMerge(ACount)
+	if t.Restore(ACount)
 		.Jump(AA, test.negate)								// NEGATIVE A
 
 
-	.Jump(BB, test)											// POSITIVE B
+	|| BCount = t.DeclCount									// POSITIVE B
+	.Jump(BB, test)
+	if t.Restore(BCount)
+		.Jump(BB, test.negate)								// NEGATIVE B
 	
 	t.merge(ACount)											// WHOLE MERGE
 	return NilState.real

@@ -9,6 +9,7 @@
 * (pos.int, 0) doesnt compile in C++! typegaynarrowing
 
 // Perry Do later
+* catch crashes + completion when running exes
 * don't put "" unless at end of line (or selected)
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping
