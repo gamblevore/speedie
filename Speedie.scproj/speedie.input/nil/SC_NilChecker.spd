@@ -19,7 +19,7 @@ extend_module NilTracker {
 		@func:	Function
 		@tmp:   Statement
 		@dot:	Property
-		@acc:	Access
+		@acc:	UseChildAsReal
 		@brel:	brel
 		@rel:	Rel
 		@decl:	Declaration
@@ -44,17 +44,12 @@ function Jump (NilTrackerFn)
 	return (NilTable[msg.func])(msg, test)
 
 					
-function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
+function UseChildAsReal (NilTrackerFn) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = msg.first
 		if .Jump(ch) is Nilish
 			.FailedReal(ch)
 	return msg.nildecl.nildeclared
-
-
-function Access (NilTrackerFn)
-	opt norefcounts
-	return .UseChildAsReal(msg)							// abc[0]
 
 
 function Rel (NilTrackerFn)
@@ -146,6 +141,7 @@ function While (NilTrackerFn)
 	.jump(msg.first, NilCheckMode.positive)
 	.Argument(msg.second)
 	t.Merge(Beginning) // while seems very simple?
+	// its probably not... right? cos of exits. they jump forward
 
 			
 function If (NilTrackerFn)
@@ -155,33 +151,32 @@ function If (NilTrackerFn)
 
 	.Jump(cond, NilCheckMode.positive)
 	.Argument(arg1)
+	
+	
 	|| FirstHalf = T.DeclCount
-
 	if T.Restore(Beginning)
 		.jump(cond, NilCheckMode.negative)
-
 	if arg2.prev
 		.if(else)
 	  else
 		.Argument(arg2)
 
-	|| Blocks = arg1.Blocks (|) (arg2.blocks << 1)
-	if Blocks == 3					// both
-		debugat
-		t.restore(Beginning)
-		T.DeclCount = Beginning
-		
-	  elseif Blocks == 0			// neither
+
+	|| BlockingArg = arg1.Blocks (|) (arg2.blocks << 1)		
+	if BlockingArg == 0			// neither
 		debugat // fix this. some kinda super-merge?
 
-	  elseif Blocks == 1
+	if BlockingArg == 1
 		debugat
-		t.restore(FirstHalf)
-		T.DeclCount = FirstHalf
+		return t.restore(FirstHalf, true)
+
+	if BlockingArg == 2
+		debugat
+		return T.MoveDown(Beginning, FirstHalf)
 	
-	  else
-		debugat
-		T.MoveDown(Beginning, FirstHalf)
+	debugat		// both
+	return t.Restore(Beginning, true)
+
 
 
 function Tern (Niltrackerfn)
@@ -241,8 +236,24 @@ function Type (Niltrackerfn)
 
 
 function JustReal (Niltrackerfn)
-	opt norefcounts
 	return nilstate.realish
+
+
+function Compareable (|message| ll, |message| rr, |scoperator| scop, |nilcheckmode| test,  |nilstate|)
+	|| LNil = ll.IsNowNil
+	|| RNil = rr.IsNowNil
+	if !lnil and !rnil			// if (a > b)
+		.jump(ll, test), require stderr.ok
+		.jump(rr, test)
+		return NilState.Real
+	
+	if (lnil and rnil)
+		return ll.Redundant
+	expect (scop.IsNilTest) (ll.next, "Nil can't accept this operator. Use != or ==.")
+
+	|| side = (rr, ll)(lnil)
+	.jump(side, test) // can handle !(a == nil)
+	return NilState.real
 
 
 function ProcessCondRel (Niltrackerfn)
@@ -253,21 +264,7 @@ function ProcessCondRel (Niltrackerfn)
 	|| scop = op.obj|SCOperator|
 
 	if scop.IsCompare
-		|| LNil = ll.IsNowNil
-		|| RNil = rr.IsNowNil
-		ifn lnil or rnil			// if (a > b)
-			.jump(ll, test), require stderr.ok
-			.jump(rr, test)
-			return NilState.Real
-		
-		if (lnil and rnil)
-			return ll.Redundant
-		expect (scop.IsNilTest) (op, "Nil can't accept this operator. Use != or ==.")
-
-		|| side = (rr, ll)(lnil)
-		.jump(side, test) // can handle !(a == nil)
-		return NilState.real
-
+		.Compareable(ll, rr, scop, test)
 
 	|| andor = scop.IsAndOr
 	if !andor		// bit ops or math		// (ptr+1) or (1+ptr) still needs nilness check
@@ -334,7 +331,7 @@ function Declaration (niltrackerfn)
 function SetRel (niltrackerfn)
 	opt norefcounts
 	|| L = msg.first,  || R = msg.last
-	.Jump(R)			// R is defined as coming first?
+	.Jump(R)			// R is defined as coming first? (C++ compatibility)
 	.Jump(L)
 	|| A = L.nildecl
 	.CurrDecl := a
@@ -351,9 +348,8 @@ function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
 	opt norefcounts
 	.VariableCheck(recv, sent, where)
-	|| sn = sent.NilUsed
-	if recv.nilused != sn
-		T.SetNilness(recv, sn)
+	if recv.nilused != sent.NilUsed
+		T.SetNilness(recv, sent.NilUsed)
 
 
 function FailedReal (|message| where)

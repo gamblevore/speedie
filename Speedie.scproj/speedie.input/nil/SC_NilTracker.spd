@@ -53,19 +53,21 @@ struct NilTracker
 			i.UsedPlusOldToTmp
 
 
-	function Restore (|nilsweep| sw, |bool|)
+	function Restore (|nilsweep| sw, |nilstate|)
 		for i in sw
 			i.Restore
-		return true
+		return nilstate.realish
 		
 		
-	function Restore (|uint| s, |bool|)
+	function Restore (|uint| s, |bool| ChangeBack=false,  |nilstate|)
 		|| f = .DeclCount
 		if f > s
+			if ChangeBack
+				.DeclCount = f
 			return .Restore(s sweep f)
+		
 
-
-	function MoveDown (|uint| s, |uint| f)
+	function MoveDown (|uint| s, |uint| f, |nilstate|)
 		require f > s
 		|| n = .declcount
 		.DeclCount = s + (n-f)
