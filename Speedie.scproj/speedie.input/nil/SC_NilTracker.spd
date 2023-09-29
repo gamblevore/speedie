@@ -1,56 +1,27 @@
 
 
 struct NilItem
-	|scdecl--|	Decl
-	|nilstate|	New
-	|nilstate|	Old
-	|byte[6]| 	Dummy
+	|scdecl--|		Decl
+	|nilstate[2]|	New
+	|uint16| 		PrevPos
+	|nilstate|		Old
+	|byte[3]| 		Dummy
 	
-	function OldToTmp
-		.decl.NilTmp = .old
-	function NewToTmp
-		.decl.NilTmp = .new
+
 	function Restore
 		.decl.nilused = .old
-	function TmpToUsed
-		opt norefcounts
-		|| d = .decl
-		d.nilused = d.niltmp
-	function UsedPlusOldToTmp
-		opt norefcounts
-		|| d = .Decl
-		d.NilTmp = d.NilUsed (|) .old
+	function Merge
+		.decl.nilused = .new[0] (|) .new[1]
 
 
 
 struct NilTracker
-	linkage:cpp_part nil
+	linkage: cpp_part nil
 	|scfunction--|		fn
 	|uint| 				DeclCount
+	|uint| 				CurrIf
 	|NilItem[1536]|		Items
-	
 
-	function Forward (|uint| back, |uint| front, |uint| Mode)
-		opt norefcounts
-		while front > back
-			|| i = &.items[back++]
-			|| d = i.decl
-			if Mode == 0
-				D.NilUsed = i.New
-			  elseif Mode == 1
-				D.NilTmp = i.New
-			  else
-				D.NilUsed = D.NilTmp
-
-
-	function TmpToUsed (|nilsweep| sw)
-		for i in sw
-			i.TmpToUsed
-
-
-	function UsedPlusOldToTmp (|nilsweep| sw)
-		for i in sw
-			i.UsedPlusOldToTmp
 
 
 	function Restore (|nilsweep| sw, |nilstate|)
@@ -79,27 +50,35 @@ struct NilTracker
 
 	function Merge (|uint| back)			// merges oldest values and newest values
 		|| Range = (back sweep .DeclCount)
-		.UsedPlusOldToTmp(Range)
-		.TmpToUsed(Range)
+		for i in range
+			i.merge
+
+		
+	function Pos (|scdecl| d, |&int| v,  |&NilItem|)		
+		|| n = .DeclCount
+		check (n < 1536) (.fn, "NilChecker got too many vars")
+		.DeclCount = n + 1
+		
+		// we need to know where we are writign to
+		// the info has to be here
+		// how do we store this?
+		// i guess just in one number... the best way
+		return &.items[n]
 	
-	
+
 	function SetNilness (|SCDecl| d, |NilState| s, |nilstate|)
 		opt norefcounts
 		|| old = d.nilused
-		if old > 3 or s > 3 // what?
+		if  old > 3  or s > 3  or  d isnt local
 		
-		|| c = .DeclCount
-		if (c < 1536)
-			|| i = &.items[c]
-			i.Old = old
-			i.New = s
-			i.decl = d
-			.DeclCount = c + 1
-			d.nilused = s
-			d.NilDebug("set")
-			return s
-		
-		error (.fn, "Nilchecker got too many vars")
+		|| v = 0
+		|| i = .Pos(d, v)
+		i.Old = old
+		i.New[v] = s
+		i.new[1-v] = old
+		i.decl = d
+		d.nilused = s
+		d.NilDebug("set")
 		return s
 
 
@@ -135,6 +114,7 @@ struct NilTracker
 		|| c = .Lookup #require
 		require c.name contains "NilTest"
 		return .SourceArg contains "nilcheck"
+	
 	
 	module
 		|scdecl--|		CurrDecl
