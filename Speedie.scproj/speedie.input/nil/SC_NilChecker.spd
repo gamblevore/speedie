@@ -1,9 +1,8 @@
 
 
 /* todo:
-* make all decl info unique? or else we can't easily reason about it
-	* what about multiple branches altering the same thing?
-		* easy! Just merge them :D (Or not so easy? cos we need to still suck in the old values if they were not altered cos hte branch didn't execute)
+* decls should allocate new decls (Always)
+	* args should remove all decls (always)
 * contradictions can be erased by doing if (A and !A) or B
 	* the "or" merger needs to be able to erase contradictions
 */
@@ -142,9 +141,8 @@ function While (NilTrackerFn)
 			
 function If (NilTrackerFn)
 	opt norefcounts
-	|| Beginning = T.DeclCount
+	|| Beginning = T.BranchEnter
 	|| cond = msg.first,  || arg1 = cond.next,  || Else = arg1.next,  || arg2 = else.last
-
 	.Jump(cond, NilCheckMode.positive)
 	.Argument(arg1)
 	
@@ -162,16 +160,17 @@ function If (NilTrackerFn)
 	if BlockingArg == 0			// neither
 		debugat // fix this. some kinda super-merge?
 
-	if BlockingArg == 1
+	  elseif BlockingArg == 1
 		debugat
-		return t.restore(FirstHalf, true)
+		t.restore(FirstHalf, true)
 
-	if BlockingArg == 2
+	  elseif BlockingArg == 2
 		debugat
-		return T.MoveDown(Beginning, FirstHalf)
-	
-	debugat		// both
-	return t.Restore(Beginning, true)
+		T.MoveDown(Beginning, FirstHalf)
+
+	  else	 		// both
+		t.Restore(Beginning, true)
+	t.BranchExit(beginning)
 
 
 
@@ -211,18 +210,26 @@ function Thing (NilTrackerFn)
 	return msg.Redundant(dcl.nilused)
 	
 
-function Argument (Niltrackerfn)
+function ArgumentSub (|message| msg,  |NilCheckMode| Test=0,  |nilstate|)
 	opt norefcounts
-	for s.fast in msg
-		if s.IsLast
-			return .jump(s, test)
-		.Jump(s)
+	|| L = msg.last
+		|| s = msg.first
+		while s != l
+			.jump(s)
+			s++
+		return .jump(l)
+
+
+function Argument (Niltrackerfn)
+	|| C = t.DeclCount
+	rz = .ArgumentSub(msg, test)
+	t.declcount = C
 
 	
 function Bracket (Niltrackerfn)
 	opt norefcounts
 	if msg.name.length
-		test |= NilCheckMode.allowredundant
+		test |= NilCheckMode.AllowRedundant
 	return .Jump(*msg, test)
 
 
@@ -321,8 +328,11 @@ function Declaration (niltrackerfn)
 	if rel == @rel
 		.SetRel(rel)
 		rel = rel.first
-	rel.NilDecl.NilDebug("decl")
+	|| dcl = rel.NilDecl
+	dcl.NilDebug("decl")
+	return T.AddDecl(dcl)
 	
+
 
 function SetRel (niltrackerfn)
 	opt norefcounts
@@ -332,7 +342,7 @@ function SetRel (niltrackerfn)
 	|| A = L.nildecl
 	.CurrDecl := a
 	if a.SuffersNil
-		.VariableSet(A, R.nildecl, L)
+		return .VariableSet(A, R.nildecl, L)
 
 
 function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
@@ -341,11 +351,11 @@ function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel
 		.CheckIsReal(sent.nilused, where)
 
 
-function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
+function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|) // setrel, relset
 	opt norefcounts
 	.VariableCheck(recv, sent, where)
 	if recv.nilused != sent.NilUsed
-		T.SetNilness(recv, sent.NilUsed)
+		return T.SetNilness(recv, sent.NilUsed)
 
 
 function CheckIsReal (|nilstate| actual, |message| where)

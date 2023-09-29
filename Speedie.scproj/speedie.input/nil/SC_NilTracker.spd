@@ -23,7 +23,6 @@ struct NilTracker
 	|NilItem[1536]|		Items
 
 
-
 	function Restore (|nilsweep| sw, |nilstate|)
 		for i in sw
 			i.Restore
@@ -48,23 +47,50 @@ struct NilTracker
 		while R < R2
 			*W++ = *R++
 
+
 	function Merge (|uint| back)			// merges oldest values and newest values
 		|| Range = (back sweep .DeclCount)
 		for i in range
 			i.merge
 
-		
-	function Pos (|scdecl| d, |&int| v,  |&NilItem|)		
-		|| n = .DeclCount
-		check (n < 1536) (.fn, "NilChecker got too many vars")
-		.DeclCount = n + 1
-		
-		// we need to know where we are writign to
-		// the info has to be here
-		// how do we store this?
-		// i guess just in one number... the best way
-		return &.items[n]
+
+	function BranchExit (|uint| Old)
+		.currif = old
+		|| sw = old sweep .DeclCount
+		for i in sw
+			i.decl.NilPlace = i.PrevPos
+
+	// i can't think of a better way.
+	// what if we did all our work on nilitems, not on scdecls?
+	// scdecls only contain the current nilitem?
+	// we'd still need to associate them per branch on the decl... though.
+	// still need enter/exit.
 	
+	
+	function BranchEnter (|uint|)
+		rz = .DeclCount
+		.currif = rz
+		
+		
+	function Pos (|scdecl| d, |&int| v,  |&NilItem|)
+		|| pl = .CurrIf
+		|| dp = d.nilplace
+		if dp >= pl
+			return &.items[dp]
+		
+
+	function AddDecl (|scdecl| d, |nilstate|)
+		|| n = .DeclCount++
+		check (n < 1536) (.fn, "NilChecker got too many vars")
+		|| i = &.items[n]
+		i.PrevPos = 0
+		d.NilPlace = n
+		|| s = d.NilDeclared & nilstate.Either
+		i.Old = s
+		i.New[0] = s
+		i.new[s] = s
+		i.decl = d
+
 
 	function SetNilness (|SCDecl| d, |NilState| s, |nilstate|)
 		opt norefcounts
@@ -102,7 +128,7 @@ struct NilTracker
 		if platform.IsDebug
 			.Start(f)
 			f.nildebug
-			Argument(f.SourceArg)
+			ArgumentSub(f.SourceArg)
 			.Finish(f)
 
 
