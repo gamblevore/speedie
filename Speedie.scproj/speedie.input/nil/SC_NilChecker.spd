@@ -1,8 +1,8 @@
 
 
 /* todo:
-* decls should allocate new decls (Always)
-	* args should remove all decls (always)
+* finish if cleanup
+* allow setrel/cond to allocate into deeper place in a new if-branch.
 * contradictions can be erased by doing if (A and !A) or B
 	* the "or" merger needs to be able to erase contradictions
 */
@@ -50,7 +50,7 @@ function UseChildAsReal (NilTrackerFn) 	// a.b, *a, a[0], (a)()
 
 function Rel (NilTrackerFn)
 	opt norefcounts
-	if msg.tmptype is kSetVar							// x = y
+	if msg.TmpType is kSetVar							// x = y
 		return SetRel(msg, test)
 	return ProcessCondRel(msg, test)
 
@@ -138,40 +138,55 @@ function While (NilTrackerFn)
 	t.Merge(Beginning) // while seems very simple?
 	// its probably not... right? cos of exits. they jump forward
 
-			
-function If (NilTrackerFn)
+
+function CondAndArg1 (|message| Cond,  |Message| arg, |uint|)
+	.Jump(Cond, NilCheckMode.positive)
+	.Argument(arg)
+	return T.DeclCount
+
+
+function CondAndArg2 (|message| Cond,  |message| Else,  |Message| arg,  |uint| Beginning,   |uint|)
 	opt norefcounts
-	|| Beginning = T.BranchEnter
-	|| cond = msg.first,  || arg1 = cond.next,  || Else = arg1.next,  || arg2 = else.last
-	.Jump(cond, NilCheckMode.positive)
-	.Argument(arg1)
-	
-	
-	|| FirstHalf = T.DeclCount
-	if T.Restore(Beginning)
+	if t.declcount > Beginning
+		T.Restore(beginning)
 		.jump(cond, NilCheckMode.negative)
-	if arg2.prev
+
+	if arg.prev // has a sub-cond
 		.if(else)
 	  else
-		.Argument(arg2)
+		.Argument(arg)
+	return T.DeclCount
+	
+	
+function If (NilTrackerFn)
+	opt norefcounts
+	|| A = T.BranchEnter
+	|| cond = msg.first,  || arg1 = cond.next
+	|| B = .CondAndArg1(cond, arg1)
+
+	|| Else = arg1.next,  || arg2 = else.last
+	.CondAndArg2(cond, else, arg2, A)
+
+	.IfCleanup(A, B,  arg1 vs arg2)
+	return t.BranchExit(A)
 
 
-	|| BlockingArg = arg1.Blocks (|) (arg2.blocks << 1)		
-	if BlockingArg == 0			// neither
+function IfCleanup (|uint| A, |uint| B, |uint| Arg)
+	if Arg == 0
 		debugat // fix this. some kinda super-merge?
 
-	  elseif BlockingArg == 1
+	if Arg == 1
 		debugat
-		t.restore(FirstHalf, true)
+		t.restore(B)
+		T.DeclCount = B
 
-	  elseif BlockingArg == 2
+	if Arg == 2
 		debugat
-		T.MoveDown(Beginning, FirstHalf)
+		T.MoveDown(A, B)
 
-	  else	 		// both
-		t.Restore(Beginning, true)
-	t.BranchExit(beginning)
-
+	if Arg == 3	 		// both
+		t.Restore(A)
+		T.DeclCount = A
 
 
 function Tern (Niltrackerfn)
@@ -208,22 +223,24 @@ function Thing (NilTrackerFn)
 		return Desired											// if a and a? // also!
 
 	return msg.Redundant(dcl.nilused)
-	
-
-function ArgumentSub (|message| msg,  |NilCheckMode| Test=0,  |nilstate|)
-	opt norefcounts
-	|| L = msg.last
-		|| s = msg.first
-		while s != l
-			.jump(s)
-			s++
-		return .jump(l)
 
 
 function Argument (Niltrackerfn)
-	|| C = t.DeclCount
-	rz = .ArgumentSub(msg, test)
+	opt norefcounts
+	|| C = .PreDeclareOOFs(msg)
+	for s in msg
+		rz = .jump(s, test*s.islast)
 	t.declcount = C
+
+
+function PreDeclareOOFs (|message| msg, |uint|)
+	opt norefcounts
+	rz = t.DeclCount
+	for s in msg
+		if s == @decl
+			|| dcl = s.first.NilDecl
+			dcl.NilDebug("decl")
+			T.AddDecl(dcl)
 
 	
 function Bracket (Niltrackerfn)
@@ -327,22 +344,19 @@ function Declaration (niltrackerfn)
 	|| rel = msg.last
 	if rel == @rel
 		.SetRel(rel)
-		rel = rel.first
-	|| dcl = rel.NilDecl
-	dcl.NilDebug("decl")
-	return T.AddDecl(dcl)
 	
 
 
 function SetRel (niltrackerfn)
 	opt norefcounts
 	|| L = msg.first,  || R = msg.last
-	.Jump(R)			// R is defined as coming first? (C++ compatibility)
+	.Jump(R)			// R is defined as coming first. (C++ compatibility)
 	.Jump(L)
 	|| A = L.nildecl
 	.CurrDecl := a
-	if a.SuffersNil
-		return .VariableSet(A, R.nildecl, L)
+	if !a.SuffersNil
+		return nilstate.real
+	return .VariableSet(A, R.nildecl, L)
 
 
 function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset

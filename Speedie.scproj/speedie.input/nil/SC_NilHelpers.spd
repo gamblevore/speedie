@@ -102,3 +102,6 @@ datatype NilSweep (ivec2)
 
 function uint.operatorsweep (|int| after, |nilsweep|)
 	return (self|int|, after)|nilsweep|
+
+function message.operatorvs (|message| arg2, |uint|)
+	return .blocks (|) (arg2.blocks << 1)

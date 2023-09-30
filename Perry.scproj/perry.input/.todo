@@ -8,11 +8,15 @@
 * constants and globals don't autocomplete nicely
 * (pos.int, 0) doesnt compile in C++! typegaynarrowing
 
-// Perry Do later
+
+// Perry NOW
 * catch crashes + completion when running exes
 * don't put "" unless at end of line (or selected)
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping
+
+// Perry Do later
+* can't find "operatorvs" on message
 // even later
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
