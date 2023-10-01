@@ -695,7 +695,7 @@ function DeclsProtoTypeRemove (|SCClass| fpType, |Message| ch0, |bool| AssumeSel
 	if (!AssumeSelf)
 		ch0 = p[@Decl][@thg]						#require
 		|| decl = ExtractDecl( ch0, nil, declmode.ProtoParam )			#expect p
-		expect (decl isa .cls.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
+		expect (decl matches .cls.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
 		ch0.parent.Remove
 
 
@@ -752,10 +752,10 @@ function EqualOrMoreSpecific (|SCFunction| f, |bool|)
 	require (f.args.length == .args.length)
 
 	if (f.ReturnType)
-		require f.ReturnType isa .ReturnType
+		require f.ReturnType matches .ReturnType
 	
 	for (a in .args) (i)
-		require (f.args[i] isa a)
+		require (f.args[i] matches a)
 	
 	Return true
 
@@ -846,7 +846,7 @@ function ConstructorLinePlace (|message|)
 function CanCompare (|SCDecl|Against, |bool|)
 	opt norefcounts
 	for (f in self)
-		if (against isa f.args[ 1 ])
+		if (against matches f.args[ 1 ])
 			return true
 
 

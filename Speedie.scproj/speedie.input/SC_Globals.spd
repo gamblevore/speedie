@@ -626,7 +626,7 @@ function TypeOfAccess (ExprResolver)
 		if Ty0.C_Array
 			require Index.ExpectInt(Access)
 			return ty0.Dereference(exp, name_space, true)// TypeOfPointerAccess(ty0)
-		if (Ty0.PointerCount and Access isa typeint)
+		if (Ty0.PointerCount and Access matches typeint)
 			ifn (ch == @bra and ch.first == @bra) // should work now
 				require Index.ExpectInt(Access)
 				return ty0.Dereference(exp, name_space, true)
@@ -814,16 +814,16 @@ function TypeOfArr (ExprResolver)
 		
 		if (itm == @Item)
 			|| IdxType = TypeOfExpr( itm.first, name_space )
-			if (IdxType isa TypeString)
+			if (IdxType matches TypeString)
 				NewArrCls = TypeDictionary
-			  elseif (IdxType isa TypeInt)
+			  elseif (IdxType matches TypeInt)
 				// remove this! arrays never are specified like [0:item, 1:item] // !!!
 				// items should always be dictionaries unless a dispatch.
 				if !IsDispatch
 					InOrder = ArrayInOrderCheck(InOrder, itm.first)
 					if (InOrder <= 0)
 						NewArrCls = TypeDictionary
-			  elseif !(IdxType isa TypeSyntax)
+			  elseif !(IdxType matches TypeSyntax)
 				error ( exp, "Array index is wrong type." )
 				continue
 			
@@ -1382,14 +1382,13 @@ function message.IsZero (|bool|)
 
 function message.WrapFloatOrInt (|datatypecode| T, |int| N, |scdecl| D)
 	require T isnt float and int
-	|| V = VecType(T.isfloat, N)$
-	require !(d isa v)
-
-	using (self)
-	|| W = «type
-		«thg V.name »
-	»
-	.wrapwith(w)
+	|| V = VecType(T.isfloat, N)
+	ifn d exact_isa v
+		using (self)
+		|| W = «type
+			«thg V.name »
+		»
+		.wrapwith(w)
 
 
 function TypeOfList (ExprResolver)
@@ -1404,7 +1403,7 @@ function TypeOfList (ExprResolver)
 		|| N = typ.isnumeric
 		if !n
 			numeric = false
-		if numeric
+		  elseif numeric
 			if (N > 1)
 				HasBig = true
 
@@ -1414,12 +1413,12 @@ function TypeOfList (ExprResolver)
 					AllowType = T.floatintmerge(AllowType, s)
 				  else
 					FoundType = T.floatintmerge(FoundType, s) 
-					S.WrapFloatOrInt(T,N, typ)
+					S.WrapFloatOrInt(T, N, typ)
 
 			count += N
 			expect (count <= 4) (exp, "Over 4 items in vector.")
 
-	expect Numeric (exp, "Expected numbers.")
+	expect Numeric      (exp, "Expected numbers.")
 	expect (count >= 2) (exp, "Under 2 items in vector.")
 
 

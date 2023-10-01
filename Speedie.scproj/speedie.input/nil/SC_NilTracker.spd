@@ -128,7 +128,7 @@ struct NilTracker
 	
 	function Check (|scfunction| f)
 		opt norefcounts
-		if platform.IsDebug
+		if platform.IsDebug and false
 			.Start(f)
 			f.nildebug
 			Argument(f.SourceArg)

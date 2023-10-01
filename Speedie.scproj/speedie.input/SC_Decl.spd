@@ -523,10 +523,14 @@ class SCDecl (SCObject) {
 		// same as operator isa but not backwards :(
 
 	
-	operator isa (|SCDecl| O, |bool|)
-		cpp_part IsaDecl
+	operator matches (|SCDecl| O, |bool|)
+		cpp_part MatchesDecl
 		// should disable/deprecate this
 		return .matchC(O)
+
+
+	operator exact_isa (|scclass| v, |bool|)
+		Return .isnormal and (.type == v)
 
 
 	operator isa (|string| s, |bool|)
@@ -535,9 +539,9 @@ class SCDecl (SCObject) {
 			return .isnormal and .type.name ~= s
 	
 
-	operator isa (|SCClass| O, |bool|)
+	operator matches (|SCClass| O, |bool|)
 		if o and self
-			return self isa O.TypeNormal
+			return self matches O.TypeNormal
 	
 	
 	function IsUintLike (|bool|)

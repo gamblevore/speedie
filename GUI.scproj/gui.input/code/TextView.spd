@@ -1045,11 +1045,23 @@ class TextView (GUIControl)
 		return true
 
 
-	helper CounterPartSel (|string| s, |bool| Force=false, |bool|)
+	helper AfterIsOnlyWhiteOrNothing (|int| p, |bool|)
+		|| n = .length
+		while p < n
+			|| c = self[p++]
+			if c.IsTextLine
+				return true
+			if '/' == c and self[p]
+				return true 
+			require c.IsWhite
+
+		
+	helper CounterPartType (|string| s, |bool| Force=false, |bool|)
 		require (!.singleline and s.length == 1)
 		|| sel  = .sel
-		|| t    = .seltext
 		|| sel2 = sel.x2
+		require sel.width or .AfterIsOnlyWhiteOrNothing(sel2)
+		|| t    = .seltext
 
 		if (!sel.width and s == "=")			//   a |=| b   -->   a |= b
 			if  self[sel2] == '|'  and  self[sel2-1] == '|'
@@ -1075,11 +1087,6 @@ class TextView (GUIControl)
 			return true
 		
 		if .SelMsgValid
-// blocking things like x = x.parse() is bad, cus we WANT that ()
-// or else we get garbage jb all the time. better to keep it in a valid-state
-// but what if it gets into an invalid state?
-// we could undo... then try redo without the double-insertion???
-// can't see anything better than that.	still.. lets just block "{" for now.
 			if !sel.width
 				require s != "{" 
 			.undochecker = -1
@@ -1114,7 +1121,7 @@ class TextView (GUIControl)
 		debug_require self is editable
 		SdlApp.ShowCursor(false)
 		
-		if .CounterPartSel(s, ForceCounter)
+		if .CounterPartType(s, ForceCounter)
 			return 2
 		.insert(S)
 		return 1
