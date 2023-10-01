@@ -54,7 +54,9 @@ function ClickedDebug (GUIAction)
 	if .text == "\02"		// play
 		i.DebugIsWaitingForCompile = true
 		i.compile("debug")
-		i.ShowText(i.ProductPage, "")
+		i.ShowText(i.ProductOut, "")
+		(i.CompileTabs.items[3] is hidden)
+		i.ProductErrors.text = ""
 	  elseif .text == "\07" // stop
 		if i.RunCompiledApp and i.confirm("Kill running product " + i.Name + "?", fnStillRunning)
 			i.RunCompiledApp.kill
@@ -77,8 +79,7 @@ function perryide.DebugEnvs (|message| env)
 function perryide.DebugActual (|file| f, |[string]| args)
 	.LogOneAction(@emb + (f + " " + args.render))
 	
-	|| fs = faststring()
-	.RunCompiledApp = ShellStream(f, args, fs, fs)
+	.RunCompiledApp = ShellStream(f, args)
 	if .RunCompiledApp and .RunCompiledApp.PID
 		.RunButton.text = "\07"
 
@@ -119,20 +120,36 @@ function perryide.StartDebugging (|file| f)
 	app.cwd = old
 
 
+function perryide.CompileTab (|int| i, |listviewrow|) // for autocomplete
+	return .CompileTabs.items[i]
+
+
+function perryide.AddProductErr (|string| err)
+	if err
+		.ProductErrors <~ err
+		(.CompileTab(3) isnt hidden)
+
+
 function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
 	// so what if we have a shellstream? then what?
-	|| fs = r.output
-	if !r.userflags and fs.length
-		.ShowStdOut
+	if !r.userflags and r.output.length
+		.ShowCompileTab(.productout)
 		r.userflags |= 1
 	
 	if !r.step or kill
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
 		
-	.productpage <~ fs.GetResult // later we will make this NOT do string appends to create .text
+	.ProductOut <~ r.output
+	.AddProductErr(r.ErrorOutput)
+	
 	if kill
-		.productpage <~ "(--Process Killed--)"
+		.ProductOut <~ "\n(--Process Killed--)"
+	  elseif r.ErrorCode
+		|| exitcode = "\n(--Exit Error: ${r.ErrorCode}--)"
+		.ProductOut <~ exitcode
+		.addProductErr(exitcode)
+	
 	return !kill
 		

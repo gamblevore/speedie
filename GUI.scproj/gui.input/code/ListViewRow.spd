@@ -209,6 +209,7 @@ datatype ListViewState (uint16)
 		Found
 		Hierarchical
 		DrawWhiteSpace
+		Hidden
 
 
 role ListViewCell (message)

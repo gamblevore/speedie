@@ -95,15 +95,16 @@ class ButtonView (GUIControl)
 			(.onover)(self, state|int|, item)?
 
 
-	function XOfItem (|listviewrow| row, |ind|)
+	function XOfItem (|listviewrow| row, |int|)
 		opt norefcounts
-		require  row
-		rz = 0
+		require row and row isnt hidden
 		|| W = .ItemWidth
 		|| r = .items.first
-		while row != r
-			rz += w + .itemgap
+		while row
+			if r isnt hidden
+				rz += w + .itemgap
 			r++
+
 
 	function ItemAt (|int| P, |ListViewRow|)
 		opt norefcounts
@@ -111,9 +112,10 @@ class ButtonView (GUIControl)
 		|| R = .lastrect.horz
 		R.x2 = R.x + W
 		for i in .items
-			if R contains P
-				return i
-			R += W + .itemgap
+			if i isnt hidden
+				if R contains P
+					return i
+				R += W + .itemgap
 
 
 	helper ClearMouse
@@ -270,8 +272,9 @@ class ButtonView (GUIControl)
 		|| rx1 = r.x
 		R.x2 = rx1 + W
 		for i in .items
-			.drawitem(where, R, grow, i)
-			R = R right W + .itemgap
+			if i isnt hidden
+				.drawitem(where, R, grow, i)
+				R = R right W + .itemgap
 			loop r.x < where.width
 
 

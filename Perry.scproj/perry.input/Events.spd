@@ -74,16 +74,18 @@ function ClickedTabs (GUIAction)
 function ClickedCompileTabs (Guiaction)
 	opt norefcounts
 	|| i = .ide
-		i.StdOutSelect(row)
+		i.CompileTabSelect(row)
 
 
-function PerryIDE.StdOutSelect (|object| Desired)	
+function PerryIDE.CompileTabSelect (|object| Desired, |bool| select=false)	
 	opt norefcounts
 	for i in .CompileTabs.Items
-		|| obj = i.obj as GUIControl
+		|| obj = i.obj as textview
 			|| vis = (Desired == i or obj)
 			(i is selected)  = vis
 			(obj is visible) = vis
+			if vis and select
+				obj.ScrollToEnd		
 
 
 function ClickedToolbar (GUIAction)
@@ -249,7 +251,7 @@ function ClickedNoNeed (GUIaction)
 function PerryIDE.ShowText (|textview| field, |string| Text)
 	field.text = text
 	.editsep.show
-	.StdOutSelect(field)
+	.CompileTabSelect(field)
 	
 	
 function PerryIDE.SelTextParse (|bool|)

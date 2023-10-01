@@ -1,5 +1,15 @@
 #!/usr/local/bin/spd
 
+main  
+	if !app.args
+		return .Usage
+	
+	counts.Init(app..files)
+	for path in app.args
+		|| dir = path.ExistingFile
+			dir.CountAll(true)
+	counts.report
+
 
 module Counts 
 	|int64|		Lines
@@ -119,9 +129,9 @@ function file.CountAll (|bool| force=false)
 		.cloc
 
 
-main  
-	if !app.args
-		"Usage: cloc path
+
+function app.Usage (|int|)
+	"Usage: cloc path
 --files=cpp/c/h               Only report these files (defaults to ${counts.DefaultExt})
 --quiet=true/false            Makes less output
 -k                            Keeps errors
@@ -130,13 +140,6 @@ main
 -m                            Report Memory Usage
 -h                            Histogram
 "
-		return 0
-	
-	counts.Init(app..files)
-	for path in app.args
-		|| dir = path.ExistingFile
-			dir.CountAll(true)
-	counts.report
 
 
 function Counts.ReportHisto

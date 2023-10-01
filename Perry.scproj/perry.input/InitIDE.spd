@@ -37,7 +37,8 @@ extend PerryIDE
 		.SelInfo			= TextView(self,		PressedSelInfo,			nil)
 		.JeeboxText			= TextView(self,		nil,					nil)
 		.SpeedieText		= TextView(self,		nil,					nil)
-		.ProductPage		= TextView(self,		nil,					nil)
+		.ProductOut			= TextView(self,		nil,					nil)
+		.ProductErrors		= TextView(self,		nil,					nil)
 		.CompileTabs		= ButtonView(.stdoutborder,		ClickedCompileTabs) 
 		.NoNeeder			= TextView(self,		ClickedNoNeed,			nil)
 		.AutoComplete		= menu(self, 			nil,					AutoCompleteInsertText)
@@ -316,7 +317,8 @@ extend PerryIDE
 
 		.JeeboxText.SetupOut("jeebox")
 		.SpeedieText.SetupOut("speedie")
-		.ProductPage.SetupOut("product")
+		.ProductOut.SetupOut("product")
+		.ProductErrors.SetupOut("errors")
 				
 		.runbutton.SubControl = self.DebugArgsList
 
@@ -355,7 +357,7 @@ extend PerryIDE
 			.size = the~area
 			.itemwidth = 75
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
-			|| items = "Speedie, Jeebox, ''".parse|listviewrow|
+			|| items = "Speedie, Jeebox, '', Errors".parse|listviewrow|
 			.items = items
 			items = items.first
 			(items is selected)
@@ -363,7 +365,10 @@ extend PerryIDE
 			items++
 			items.obj = self.JeeboxText
 			items++
-			items.obj = self.ProductPage
+			items.obj = self.ProductOut
+			items++
+			items.obj = self.ProductErrors
+			(items is hidden)
 			
 
 		.AddIDEButton(.StartScreen,	"\1a", "Startup screen", "startup")
@@ -410,7 +415,7 @@ extend PerryIDE
 		.ViewAsCurr
 		.SetupLogArea
 		.ReTextSubFind
-		.StdOutSelect(.SpeedieText)
+		.CompileTabSelect(.SpeedieText)
 		
 
 	function textview.SetupOut (|string| name)

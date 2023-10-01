@@ -131,15 +131,20 @@ static bool pipe_dup2(int to, int from) { // so this kinda does what dup2 should
 
 
 int JB_SafeWait (int pid) {
-	siginfo_t IWouldDoItSimpler = {};
+	siginfo_t Sig = {};
 	int WaitErr = 0;
+	int err = 0;
 	do {
 		errno = 0;
-		WaitErr = waitid(P_PID,  pid,  &IWouldDoItSimpler,  WEXITED|WSTOPPED);
-	} while (WaitErr == -1 and errno == EINTR);
+		WaitErr = waitid(P_PID,  pid,  &Sig,  WEXITED|WSTOPPED);
+		err = errno;
+	} while (WaitErr == -1 and err == EINTR);
 	if (!WaitErr)
-		return IWouldDoItSimpler.si_status;
-	return WaitErr;
+		return Sig.si_status;
+	if (WaitErr == -1 and err == ECHILD) { // closed already
+		err = 0;
+	}
+	return err;
 }
 
 bool CanASMBKPT = true;
@@ -319,11 +324,17 @@ bool JB_FEPDWEE_Start(ShellStream* sh, Array* R, FastString* FSOut, FastString* 
 }
 
 void JB_FEPDWEE_Finish(ShellStream& Sh) {
-	Sh.ErrorCode = JB_SafeWait(Sh.PID); // this is jsut to get the... exit code.
+	Sh.ErrorCode = JB_SafeWait(Sh.PID); // this is just to get the... exit code.
 	pipe_close(Sh.CaptureOut[RD]);
 	pipe_close(Sh.StdErrPipe[RD]);
 	Sh.Mode = -1;
 }
+
+
+// JB_FEPDWEE_Finish needs to be re-written... it will block until the process exits
+// or is already exited. only 1 func needs to wait
+// and if its already exited, we will miss the error code (usually?)
+// we need to use waitpid and all sorts of crap for "Already exited".
 
 int JB_FEPDWEE_Finish2(ShellStream& Sh, FastString* FSErrIn ) {
 	JB_FEPDWEE_Finish(Sh);

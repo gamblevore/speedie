@@ -6,11 +6,11 @@
 
 
 class ShellStream
-	|int|			PID
-	|int|			ErrorCode
 	|string|		Path
 	|FastString|	Output
 	|FastString|	ErrorOutput
+	|int|			ErrorCode
+	|int|			PID
     |Date|			LastRead
     |int64|			UserFlags
     |object|		UserObj
@@ -19,6 +19,7 @@ class ShellStream
 		wrapper
 		cpp_part Sh
 		cpp_class ShellStream
+	
 	destructor:							cpp_wrapper JB_Sh_Destructor
 
 	function Step (|bool|)

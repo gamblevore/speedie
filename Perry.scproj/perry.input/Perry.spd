@@ -148,7 +148,7 @@ module Perry
 		|| f = old.first
 		f.name = f.name.ProjCleanName
 		.id = "IDE: " + f.name
-		.CompileTabs.items.last.name = f.name + "[]"
+		.CompileTabs.items[2].name = f.name + "[]"
 		
 		
 	function AddProj (|string| path, |PerryIDE| i)
@@ -209,18 +209,17 @@ function View (|ButtonView| btn)
 	.CheckViewWorthIt(old)
 
 
-function ShowStdOut (|bool| AlwaysShow=false)
-	if AlwaysShow or .EditSep.Collapsed
+function ShowCompileTab (|object| tab)
+	if .EditSep.Collapsed
 		.EditSep.Show // needs reflow first?
-		.outtext.ScrollToEnd?
+		.CompileTabSelect(tab, true)
 	  else
 		.EditSep.Collapse
 
 
 function OutText (|textview|)
 	|| row = .CompileTabs.Selected
-		|| obj = row.obj as TextView
-			return obj
+		return row.obj as TextView
 
 
 function SwitchedToErrors

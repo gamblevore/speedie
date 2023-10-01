@@ -690,6 +690,7 @@ class TextView (GUIControl)
 		if s
 			.text += s	// ideally we can optimise this. to not create a whole new string
 						// useful for large log files.
+						// by NOT doing string appends to create .text
 
 	syntax access (|int| i, |string| s, |bool|)
 		cpp_Part Match
@@ -1060,7 +1061,6 @@ class TextView (GUIControl)
 		require (!.singleline and s.length == 1)
 		|| sel  = .sel
 		|| sel2 = sel.x2
-		require sel.width or .AfterIsOnlyWhiteOrNothing(sel2)
 		|| t    = .seltext
 
 		if (!sel.width and s == "=")			//   a |=| b   -->   a |= b
@@ -1068,7 +1068,7 @@ class TextView (GUIControl)
 				.sel = (sel2, sel2+1)
 			return false
 
-		require t or (.expectsparse >= probablyjeebox)
+		require t or (.ExpectsParse >= probablyjeebox)
 		|| c     = counterparts.find(s)
 		|| After = self[sel2]
 		if !c
@@ -1080,6 +1080,7 @@ class TextView (GUIControl)
 			
 		if (t.length == 1) and counterparts.find(t)  // stop awkward things like: " --> (")
 			require (s == "'" or "\"") and (s != t)
+		require  sel.width or .AfterIsOnlyWhiteOrNothing(sel2)
 			
 		|| Other = CounterParts2[c]
 		if other.equals(s) and other==after

@@ -65,8 +65,7 @@ extend PerryIDE
 	function Compile (|string| operation)
 		if .isBuilding
 			if .editsep.div.Collapsed
-				.ShowStdOut 
-				return 
+				return .ShowCompileTab(.SpeedieText)
 			require ClickedCancel(.BuildButton)
 		.ActualCompile(.CompileMsg(operation, true))
 			
@@ -142,7 +141,7 @@ extend PerryIDE
 		|| c = what
 		if response
 			c = what + ("\n" + response.render) // hmmm... seems awkward
-		.logonecomm(@emb + ("\1b " + c))
+		.LogOneComm(@emb + ("\1b " + c))
 		notifications <~ (what, response)
 	
 	

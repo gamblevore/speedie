@@ -21,7 +21,8 @@ class PerryIDE (Window)
 	|[guicontrol]|				Views
 	|File|						Project
     |ivec2|						AutoPoint
-    |TextView| 					ProductPage
+    |TextView| 					ProductOut
+    |TextView| 					ProductErrors
 	|TextView|					SpeedieText
 	|TextView|					JeeboxText
     |TextView|					MassSearchField
