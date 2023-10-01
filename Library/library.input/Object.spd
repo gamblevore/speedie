@@ -35,7 +35,7 @@ class Object
 
 
 
-	operator isa (|&ClassData|x, |bool|)
+	operator isa (|&ClassData| x, |bool|)
 		cpp_part Isa
 		if (self)
 			|| P = .Class
