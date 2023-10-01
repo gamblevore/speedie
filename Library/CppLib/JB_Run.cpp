@@ -186,6 +186,8 @@ int JB_LibInit (_cstring* R) {
         return ENOMEM;
 	if (R) {
 		App_CalledBy = *R;
+		signal(SIGCHLD, JB_SigChild); // this might be a problem when used as a lib.
+									  // better to find THEIR existing lib func and call it after we are done!
 		#ifndef AS_LIBRARY
 			void JB_App__CrashInstall();
 			JB_App__CrashInstall();

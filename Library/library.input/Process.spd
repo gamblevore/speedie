@@ -290,12 +290,14 @@ class Process
 		opt norefcounts
 		if .subprocess
 			return !.closed
-		|| lost = app.lostchild
-		if lost > 0
-			for ch in process.children
-				if ch != nil and ch.cid == lost
-					ch.died
-		return .cid > 0
+
+		|| AmAlive = true
+		for ch in process.children
+			if (ch != nil) and app.ChildDied(ch.cid)
+				if ch == self
+					AmAlive = false
+				ch.died
+		return AmAlive
 
 
 	syntax append (|string| str, |date| TimeOut=0, |bool|)
@@ -725,8 +727,8 @@ extend_module app
 	helper HasIPC (|bool|)
 		return app..talk.length
 			
-	helper LostChild (|pid_int|)
-		cpp_wrapper JB_App__LostChild
+	helper ChildDied (|pid_int| i, |ind|)
+		cpp_wrapper JB_App__ChildDied
 
 	function StartChild (|[string]| r, |process|)
 		return process.Child(.path, .path.name + .path.hash|int64|.render, r)

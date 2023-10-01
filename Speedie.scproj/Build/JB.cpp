@@ -2175,7 +2175,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (111159430467303)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[158], (111160242733056)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3487,7 +3487,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[243]);
-	JB_FS_AppendInt32(_fsf0, (2023100112));
+	JB_FS_AppendInt32(_fsf0, (2023100115));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7316,7 +7316,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[509]);
-	JB_FS_AppendInt32(_fsf0, (2023100112));
+	JB_FS_AppendInt32(_fsf0, (2023100115));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -16838,14 +16838,6 @@ bool SC_IR_OperatorIsa(IR* self, int m) {
 	return m == self->Op;
 }
 
-void SC_IR_Print(IR* self) {
-	if (SC__ASM_NoisyASM >= 3) {
-		JB_String* _tmPf0 = JB_Incr(SC_IR_Render(self, nil));
-		JB_PrintLine(_tmPf0);
-		JB_Decr(_tmPf0);
-	}
-}
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in) {
 	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
 	SC_IR_FS(self, fs);
@@ -20456,10 +20448,6 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self) {
 }
 
 
-int JB_Rec_BadCount(JB_ErrorReceiver* self) {
-	return self->ErrorCount + self->ProblemCount;
-}
-
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level) {
 	if ((!((!self->BlockErrors) and (!JB_OutOfMemoryOccurred())))) {
 		return nil;
@@ -20690,7 +20678,8 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self) {
 }
 
 void JB_Rec_NewItem(JB_ErrorReceiver* self, JB_Error* Err) {
-	bool CanPrint = (!JB_Rec_BadCount(self)) and ((bool)JB__Err_AutoPrint);
+	bool CanPrint = false;
+	//"Speedie" // useful marker for debugging...;
 	JB_Rec_Incr(self, Err, true);
 	if ((!JB_Rec_CanAddMore(self, Err->Severity))) {
 		return;
@@ -21812,21 +21801,23 @@ bool JB_Proc_ChildAlive(Process* self) {
 	if (self->SubProcess) {
 		return (!JB_Proc_Closed(self));
 	}
-	PID_Int lost = JB_App__LostChild();
-	if (lost > 0) {
-		{
-			Process** _firstf0 = (&JB__Proc_Children[0]);
-			int _if1 = 0;
-			while (_if1 < (16)) {
-				Process* ch = _firstf0[_if1];
-				if ((ch != nil) and (ch->CID == lost)) {
-					JB_Proc_Died(ch);
+	bool AmAlive = true;
+	{
+		Process** _firstf0 = (&JB__Proc_Children[0]);
+		int _if1 = 0;
+		while (_if1 < (16)) {
+			Process* ch = _firstf0[_if1];
+			if ((ch != nil) and JB_Ind_SyntaxCast(JB_App__ChildDied(ch->CID))) {
+				if (ch == self) {
+					AmAlive = false;
 				}
-				_if1++;
-			};
+				JB_Proc_Died(ch);
+			}
+			_if1++;
 		};
 	}
-	return self->CID > 0;
+	;
+	return AmAlive;
 }
 
 bool JB_Proc_Closed(Process* self) {
@@ -22159,15 +22150,7 @@ void JB_Proc_SendSub(Process* self, Message* msg) {
 	}
 	JB_FreeIfDead(JB_Msg_RenderJbin(msg, JB_LUB[0], self->Writer));
 	JB_Decr(msg);
-	JB_String* _tmPf0 = JB_Incr(JB_Str_CopyFromPtr(JB_IPCM_Data(self->Ours), self->Writer->Length));
-	Message* reparse = JB_Incr(JB_Str_ParseJbin(_tmPf0));
-	JB_Decr(_tmPf0);
-	if ((!reparse)) {
-		debugger;
-	}
-	;
 	JB_Proc_WriteSub(self);
-	JB_Decr(reparse);
 }
 
 void JB_Proc_SetupAdjust(Process* self, int n) {
@@ -40912,9 +40895,6 @@ int SC_Func_ArgsMatch3(SCFunction* self, int TypeCast, SCDecl* base, bool ThisAl
 	int Result = kJB_SimpleMatch;
 	int SelfCast = SC_PA_IgnoreSelfContain(Incoming);
 	TypeCast = (TypeCast | (kJB_NoBoolTypeCast | kJB_TypeCastWantSuperDistance));
-	if ((!SC__AC_ShouldEnter) and ((bool)(TypeCast & kJB_TypeCastDescribeErrors))) {
-		JB_DoAt(1);
-	}
 	{
 		Array* _LoopSrcf2 = JB_Incr(self->Args);
 		int _if0 = 0;
@@ -47103,4 +47083,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 1506862656675981827 -6453876923945864578
+// -3919215003572463906 -6453876923945864578

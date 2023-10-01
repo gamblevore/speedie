@@ -140,7 +140,7 @@ class_api Message (msg)
 	api render (|int| mode, |string|)
 		.nil$
 		if mode & 1
-			rz = .render_jbin
+			rz = .renderjbin
 		  else
 			rz = .render
 		if mode & 2

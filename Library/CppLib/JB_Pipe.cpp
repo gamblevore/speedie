@@ -21,6 +21,7 @@
 //#include <stdlib.h>
 #include <sys/mman.h>
 
+
 #if __linux__
 	#include <sys/mman.h>
 	#include <sys/sendfile.h>
@@ -34,10 +35,70 @@ extern "C" const char** JB_BackTrace(void** space, int* size) {
 }
 
 
+struct LostChild {
+	int PID;
+	int Exit;
+};
+LostChild   LostChildren[32]; // sigh
+atomic_uint ChildAvail = {0xFFFFffff};
+JB_Lockable ChildFinder;
+
+
+void JB_SigChild (int signum) {
+	while (!ChildFinder.Use()) {
+		; // spin
+	}
+	
+	// we need to add them even if we are "full", some lazy code might be bloating our space.
+	// so how? Do later. Catch it later...
+	if (ChildAvail == 0) {
+		debugger;
+		ChildAvail = 0xFFFF0000;
+	}
+	
+	while (ChildAvail) {
+		int Exit = 0;
+		int PID = waitpid(-1, &Exit, WNOHANG);
+		if (PID > 0) {
+			uint Slot = JB_Int_Log2(ChildAvail);
+			LostChildren[Slot] = {PID, Exit};
+			Slot = ~(1 << Slot);
+			ChildAvail &= Slot;
+		} else if (PID == 0 or errno != EINTR) {
+			break;
+		}
+	}
+	ChildFinder.Finish();
+}
+
+
+int JB_App__ChildDied (int PID) {
+	if (!PID or ChildAvail==0xFFFFffff or !ChildFinder.Use()) {
+		return -1;
+	}
+
+	int Exit = -1;
+	uint Remain = ChildAvail;
+	while (Remain != 0xFFFFffff) {
+		uint i = JB_Int_Log2(~Remain);
+		uint slot = 1<<i;
+		Remain |= slot;
+		if (LostChildren[i].PID == PID) {
+			Exit = LostChildren[i].Exit;
+			LostChildren[i] = {};
+			ChildAvail |= slot;
+			break;
+		}
+	}
+	ChildFinder.Finish();
+    return Exit;
+}
+
+
+
 #ifndef AS_LIBRARY
 #include <string>
 #include <iostream>
-#define KillZombs 1
 
 
 extern "C" {
@@ -48,27 +109,12 @@ JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(JB_Object),     
 void JB_Rec_NewErrorWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
 
 const int MaxArgs = 256;
-bool ChildClosed;
-void JB_SigChild (int signum) {
-	ChildClosed = true;
-}
-int JB_App__LostChild () {
-    while (ChildClosed) {
-		int pid = waitpid(-1, nil, WNOHANG);
-		if (pid == 0)
-			ChildClosed = 0;
-		if (pid >= 0  or  errno != EINTR)
-			return pid;
-    }
-    return -1;
-}
-
 
 JB_String* JB_App__Readline() {
     std::string L;
     if (std::getline(std::cin, L))
         return JB_Str_CopyFromPtr((uint8*)L.c_str(), (int)L.length());
-    return 0;
+    return JB_Str__Error();
 }
 
 static bool pipe_close (int fd) {
@@ -130,23 +176,6 @@ static bool pipe_dup2(int to, int from) { // so this kinda does what dup2 should
 }
 
 
-int JB_SafeWait (int pid) {
-	siginfo_t Sig = {};
-	int WaitErr = 0;
-	int err = 0;
-	do {
-		errno = 0;
-		WaitErr = waitid(P_PID,  pid,  &Sig,  WEXITED|WSTOPPED);
-		err = errno;
-	} while (WaitErr == -1 and err == EINTR);
-	if (!WaitErr)
-		return Sig.si_status;
-	if (WaitErr == -1 and err == ECHILD) { // closed already
-		err = 0;
-	}
-	return err;
-}
-
 bool CanASMBKPT = true;
 int JB_Pipe__IgnoreBreakPoints() {
 	CanASMBKPT = false;
@@ -195,8 +224,14 @@ int JB_ArrayPrepare_(JB_String* self, const char** argv, Array* R) {
 
 int JB_Kill(int PID) {
 	int KillErr = kill(PID, SIGKILL);
-	if (!KillErr)
-		KillErr = JB_SafeWait(PID); // i could do better
+	if (!KillErr) {
+		int Waited = waitid(P_PID,  PID,  nil,  WEXITED);
+		if (Waited!=-1) debugger; // cool
+		for_ (1000) {
+			if (JB_App__ChildDied(PID)>=0) break;
+			JB_Date__Sleep(1);
+		}
+	}
 	return KillErr;
 }
 
@@ -324,17 +359,14 @@ bool JB_FEPDWEE_Start(ShellStream* sh, Array* R, FastString* FSOut, FastString* 
 }
 
 void JB_FEPDWEE_Finish(ShellStream& Sh) {
-	Sh.ErrorCode = JB_SafeWait(Sh.PID); // this is just to get the... exit code.
+	int code = JB_App__ChildDied(Sh.PID);
+	if (code < 0) code = 0;
+	Sh.ErrorCode = code;
 	pipe_close(Sh.CaptureOut[RD]);
 	pipe_close(Sh.StdErrPipe[RD]);
 	Sh.Mode = -1;
 }
 
-
-// JB_FEPDWEE_Finish needs to be re-written... it will block until the process exits
-// or is already exited. only 1 func needs to wait
-// and if its already exited, we will miss the error code (usually?)
-// we need to use waitpid and all sorts of crap for "Already exited".
 
 int JB_FEPDWEE_Finish2(ShellStream& Sh, FastString* FSErrIn ) {
 	JB_FEPDWEE_Finish(Sh);
@@ -351,6 +383,8 @@ int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSE
 	if (!JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, KeepStdOut))
 		return Sh.ErrorCode;
 	JB_FEPDWEE_Middle(Sh);
+	waitid(P_PID,  Sh.PID,  nil,  WEXITED);
+	
 	return JB_FEPDWEE_Finish2(Sh, FSErrIn);
 }
 
