@@ -564,7 +564,7 @@ module SDLApp
 	
 	
 	helper DrawSub (|window| w)
-		if w.isviewable
+		if w.IsViewable
 			w.__draw__(.DrawSpace)
 	
 	
@@ -588,7 +588,7 @@ module SDLApp
 		.EndFrame(.Raw)
 
 
-	function UpdateWindowFrames
+	function FrameUpdatesAndResize
 		opt norefcounts
 		.StartResize
 		|| nodlg = !.DialogIsOpen
@@ -606,13 +606,6 @@ module SDLApp
 	function Cycle (|date| amount, |float|)
 		return (.mod((amount*60).WholeSeconds).sin + 1) * 0.5
 	
-	
-	helper Maintanance
-		.ClearAlerts
-		.HandleAppResize
-		.UpdateWindowFrames
-		.PostLoads
-	
 
 	helper NapTime (|date|)
 		rz = .FrameLength
@@ -625,8 +618,11 @@ module SDLApp
 		.SingleFrameNest++
 
 		|| occured = .PreFrame
-		.Maintanance
+		.ClearAlerts
+		.HandleAppResize
+		.PostLoads
 		occured |= .FrameAndEvents
+		.FrameUpdatesAndResize
 		ifn Occured is Exiting
 			.PutDialogsInFront
 			if occured is activity
@@ -635,7 +631,7 @@ module SDLApp
 				app.sleep(.naptime)
 			
 			.SingleFrameNest--
-			return true
+			rz = true
 
 
 	function CheckQuarantine
