@@ -55,7 +55,7 @@ module Platform
 		
 	function Log (|string| s)
 		// logging should merge with stderr logging? cos we'll want that too... usually.
-		printline s
+		// should not printline... that should be it's own function...
 		if !.logger
 			.OpenLog
 		.logger <~ s
