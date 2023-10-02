@@ -84,7 +84,7 @@ module Perry
 			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
 			//appmenu <~ ("Birds",			ClickedBirdsMenu)
 		appmenu <~ ("Edit Preferences", ClickedEditPrefs)
-		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
+//		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
 		appmenu <~ ("Install",  		ClickedInstallMenu)
 
 

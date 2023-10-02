@@ -249,7 +249,8 @@ static int JB_FEPDWEE_Call(ShellStream& Sh, const char** argv, bool NewStdOut) {
 	pipe_dup2( Sh.StdErrPipe[WR], STDERR_FILENO );
 	pipe_close(Sh.StdErrPipe[WR]);
 	pipe_close(Sh.StdErrPipe[RD]);
-	execvp(argv[0], (char* const*)argv);  _exit(errno); // in case execvp fails
+	execvp(argv[0], (char* const*)argv);
+	_exit(errno); // in case execvp fails
 }
 
 
@@ -270,22 +271,6 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 }
 
 
-bool JB_FEPDWEE_Start(ShellStream* sh, Array* R, FastString* FSOut, FastString* FSErrIn, JB_String* self, bool KeepStdOut) {
-	ShellStream& Sh = *sh;
-	Sh.Output = FSOut;
-	Sh.ErrorOutput = JB_FS__FastNew(FSErrIn);
-
-	const char* argv[MaxArgs + 1];
-	Sh.Exit = JB_ArrayPrepare_(self, argv, R);
-	if (!Sh.Exit)
-		Sh.Exit = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
-	if ( Sh.Exit) {
-		JB_ErrorHandleFile(self, nil, Sh.Exit, nil, "call command-line tool");
-		return false;
-	}
-	return true;
-}
-
 void JB_FEPDWEE_Finish(ShellStream& Sh) {
 	pipe_close(Sh.CaptureOut[RD]);
 	pipe_close(Sh.StdErrPipe[RD]);
@@ -293,48 +278,65 @@ void JB_FEPDWEE_Finish(ShellStream& Sh) {
 }
 
 
-int JB_FEPDWEE_FinishStackAlloc(ShellStream& Sh, FastString* FSErrIn ) {
-	JB_FEPDWEE_Finish(Sh);
-	if (Sh.ErrorOutput->Length and !FSErrIn) {
-		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh.ErrorOutput), nil);
+ShellStream* ShellStart(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
+	auto rz = JB_New(ShellStream);
+	JB_Sh_Constructor(rz, self);
+	auto& Sh = *rz;
+	Sh.Output = JB_Incr(FSOut);
+	Sh.ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
+
+	const char* argv[MaxArgs + 1];
+	int Err = JB_ArrayPrepare_(self, argv, R);
+	if (!Err) {
+		Err = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
 	}
-	JB_PID_UnRegister(&Sh);
-	return Sh.Exit;
+	if ( Err) {
+		JB_ErrorHandleFile(self, nil, Sh.Exit, nil, "call command-line tool");
+		JB_SetRef(rz, 0);
+	}
+	return rz;
 }
+
 
 int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
-// what if I just do this in terms of JB_Sh__New?
-// like a busy-loop that calls .step until its finished
-	ShellStream Sh = {};
-	if (!JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, KeepStdOut))
-		return Sh.Exit;
-	JB_FEPDWEE_Middle(Sh);
-	waitpid(Sh.PID,  &Sh.Exit,  WEXITED);
+	auto Sh = ShellStart(self, R, FSOut, FSErrIn, KeepStdOut);
+	if (!Sh) {return 1;}
+	JB_FEPDWEE_Middle(*Sh);
 	
-	return JB_FEPDWEE_FinishStackAlloc(Sh, FSErrIn);
+	while (Sh->Exit==-1) {
+		int Err = waitpid(Sh->PID,  &Sh->Exit,  0); // in case sigchld handler is overridden
+		if (!(Err == -1 and errno == EINTR)) {
+			break;
+		}
+		JB_Date__Sleep(1);
+	}
+
+	JB_FEPDWEE_Finish(*Sh);
+	int Exit = Sh->Exit;
+	if (Sh->ErrorOutput->Length and !FSErrIn) {
+		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh->ErrorOutput), nil);
+		if (!Exit)
+			Exit = 1; // generic error code
+	}
+	JB_FreeIfDead(Sh);
+	return Exit;
 }
 
 
+ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn) {
+	return ShellStart(self, R, FSOut, FSErrIn, FSOut==nil);
+}
 
 
 ///*(^&£^/ Shellstream vvvvv >>>>>>>
 
-void JB_Sh_Constructor(ShellStream* self) {
-	*self = {}; self->Mode = 1;
+void JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
+	*self = {};
+	JB_PID_Constructor(self);
+	self->Mode = 1;
+	self->Path = JB_Incr(Path);
 }
 
-ShellStream* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn) {
-	ShellStream Sh = {}; Sh.Mode = 1;
-	require(JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, FSOut==nil));
-	auto rz = JB_New(ShellStream);
-	if (rz) {
-		Sh.Path = JB_Incr(self);
-		JB_Incr(Sh.ErrorOutput);
-		JB_Incr(Sh.Output);
-		*rz = Sh;
-	}
-	return rz;
-}
 
 
 

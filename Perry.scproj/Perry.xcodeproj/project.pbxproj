@@ -145,6 +145,10 @@
 		ACB2D27229BCCAB70070E60F /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F142961FA8C005EFB9D /* libSDL2.dylib */; };
 		ACB2D27429BCCAB70070E60F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC259FAD2660E1AC0026C303 /* Assets.xcassets */; };
 		ACB2D27E29BCF4AD0070E60F /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC61010E2798768C00278BEF /* libSpeedie.dylib */; };
+		ACE7CA482ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */; };
+		ACE7CA492ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */; };
+		ACE7CA4A2ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */; };
+		ACE7CA4B2ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -308,6 +312,7 @@
 		AC78080D256C065000ED647E /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		ACB2D27929BCCAB70070E60F /* PerryDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACB86AF9260BB58900555758 /* Perry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perry.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ProcessOwner.cpp; path = ../Library/CppLib/JB_ProcessOwner.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -424,6 +429,7 @@
 				AC528E842961F99E005EFB9D /* JB_ObjArray.cpp */,
 				AC528E952961F99F005EFB9D /* JB_OSX.m */,
 				AC528E932961F99F005EFB9D /* JB_Pipe.cpp */,
+				ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */,
 				AC528E852961F99E005EFB9D /* JB_PNG.cpp */,
 				AC528E8D2961F99E005EFB9D /* JB_RingTree.cpp */,
 				AC528E8F2961F99E005EFB9D /* JB_Run.cpp */,
@@ -714,6 +720,7 @@
 				AC310BD22A5188FE00837DCB /* JB_OSX.m in Sources */,
 				AC310BD32A5188FE00837DCB /* JB_Tokeniser.cpp in Sources */,
 				AC310BD42A5188FE00837DCB /* JB_Date.cpp in Sources */,
+				ACE7CA492ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */,
 				AC310BD62A5188FE00837DCB /* JB_MSR.cpp in Sources */,
 				AC310BD72A5188FE00837DCB /* JB_BasicIO.cpp in Sources */,
 				AC310BD82A5188FE00837DCB /* JB_DirReaderUnix.cpp in Sources */,
@@ -772,6 +779,7 @@
 				AC528EB62961F99F005EFB9D /* JB_DirReaderUnix.cpp in Sources */,
 				AC528EAC2961F99F005EFB9D /* JB_Run.cpp in Sources */,
 				AC528E9F2961F99F005EFB9D /* JB_BasicIO.cpp in Sources */,
+				ACE7CA4B2ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */,
 				AC528EBB2961F9A0005EFB9D /* JB_Saveable.cpp in Sources */,
 				AC528EA22961F99F005EFB9D /* JB_PNG.cpp in Sources */,
 				AC528EA02961F99F005EFB9D /* JB_Dictionary.cpp in Sources */,
@@ -785,6 +793,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACE7CA482ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */,
 				ACB2D24F29BCCAB70070E60F /* JB_Vectors.cpp in Sources */,
 				ACB2D25029BCCAB70070E60F /* JB_Globals.cpp in Sources */,
 				ACB2D25129BCCAB70070E60F /* JB_OSX.m in Sources */,
@@ -824,6 +833,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACE7CA4A2ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */,
 				AC528EE02961F9B4005EFB9D /* JB_Vectors.cpp in Sources */,
 				AC528E812961F946005EFB9D /* JB_Globals.cpp in Sources */,
 				AC528F082961F9B4005EFB9D /* JB_OSX.m in Sources */,

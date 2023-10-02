@@ -256,8 +256,11 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 
 
 function ExecuteGCC (|[string]| Commands, |bool|)
-	return CppCompilerPath.SilentExecute(Commands, nil) #expect ("C++ compiler failed to compile source code.")
-
+	if CppCompilerPath.Execute(Commands)
+		return true
+	error ("C++ compiler failed to compile source code. Command:\n\n " + commands.join(" "))
+	CppCompilerPath.Execute(Commands)		
+	
 
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
 	|| TmpFol = Output.MakeAndGoInto
@@ -381,7 +384,7 @@ function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 	return .ExecuteGCC( CompileString )
 
 
-function SayTest (|int| n)
+function SayTest (|string| n)
 	"\n()   Test$n   ()"
 
 
@@ -399,18 +402,18 @@ function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, t
 	.Cleanup <~ Test3
 	
 // OldSpeedie has compiled SpeedyTest, at Test1. It is different.
-	.saytest(1)
+	.saytest("1")
 	require Test1.TestSpeedie("2")
 
 
 // Test1 has been run. It created Test2. Test2 is different than Test1, because Test1 had a chance to optimise itself.
 
-	.saytest(2)
+	.saytest("2")
 	require Test2.TestSpeedie("3")
 
 
 // Test2 creates Test3 in .cpp form only, for speed. The outputs SHOULD match.
-	.saytest(3)
+	.saytest("3")
 	printline
 	
 	require cpp2.mustexist and cpp3.mustexist
@@ -525,7 +528,13 @@ function File.TestSpeedie (|string| v, |bool|)
 		cmd_args <~ "--arch="+options.arch
 	
 	|| result = faststring()
-	.path.execute(cmd_args, result)
+	|| p = .path
+	p.execute(cmd_args, result)
+	|| TestProd = "/usr/local/speedie/Terminal/SpeedieTest" + v
+	if !testprod.file.mustexist("Compile Speedie")
+		debugger
+		p.execute(cmd_args, result)
+		
 	|| err = stderr.LastError
 		err.Reformulate(" subspd")
 	

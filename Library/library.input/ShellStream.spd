@@ -9,7 +9,6 @@ class ShellStream (processowner)
 	|string|		Path
 	|FastString|	Output
 	|FastString|	ErrorOutput
-	|int|			ErrorCode
     |Date|			LastRead
     |int64|			UserFlags
     |object|		UserObj
@@ -19,6 +18,7 @@ class ShellStream (processowner)
 		cpp_part Sh
 		cpp_class ShellStream
 	
+	constructor (|string| path):		cpp_wrapper JB_Sh_Constructor
 	destructor:							cpp_wrapper JB_Sh_Destructor
 
 	function Step (|bool|)
@@ -30,5 +30,5 @@ class ShellStream (processowner)
 			pipe.KillPID(.pid)
 
 	module
-		function New (|String| app, |[array of string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |ShellStream|)
-			cpp_wrapper JB_Sh__New
+		function Stream (|String| app, |[array of string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |ShellStream|)
+			cpp_wrapper JB_Sh__Stream

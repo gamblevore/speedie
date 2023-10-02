@@ -210,12 +210,6 @@ class PerryIDE (Window)
 			.setfocus(.editme)
 	
 	
-	behaviour PostLoad
-		require .project
-		if !perry.checked
-			perry.CheckInstallStatus(false)
-
-
 	function StatsMode (|int|)
 		rz = perryide.StatsMode|int|
 		if rz > 3

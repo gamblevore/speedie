@@ -283,14 +283,15 @@ class Process (ProcessOwner)
 			return !.closed
 
 		|| AmAlive = true
-		|| ch = processowner.first
-		while ch
+		|| m = processowner.first
+		while m
+			|| ch = m
+			m++
 			if ch.exit >= 0
 				if ch == self
 					AmAlive = false
 				if ch isa process
 					ch.died
-			ch++
 		return AmAlive
 
 

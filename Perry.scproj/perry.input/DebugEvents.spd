@@ -79,7 +79,7 @@ function perryide.DebugEnvs (|message| env)
 function perryide.DebugActual (|file| f, |[string]| args)
 	.LogOneAction(@emb + (f + " " + args.render))
 	
-	.RunCompiledApp = ShellStream(f, args)
+	.RunCompiledApp = ShellStream.stream(f, args)
 	if .RunCompiledApp and .RunCompiledApp.PID
 		.RunButton.text = "\07"
 
@@ -146,8 +146,8 @@ function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	
 	if kill
 		.ProductOut <~ "\n(--Process Killed--)"
-	  elseif r.ErrorCode
-		|| exitcode = "\n(--Exit Error: ${r.ErrorCode}--)"
+	  elseif r.Exit
+		|| exitcode = "\n(--Exit Error: ${r.Exit}--)"
 		.ProductOut <~ exitcode
 		.addProductErr(exitcode)
 	

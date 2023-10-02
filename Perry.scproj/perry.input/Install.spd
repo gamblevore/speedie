@@ -196,25 +196,6 @@ extend_module perry
 		if !CppCompiler.file.exists
 			return "No c++ compiler exists at '$CppCompiler' ! Please make one available from that path."
 
-	function CheckInstallStatus (|bool| MsgIfNothing=true)
-		.checked = true
-		|| CompilerMsg = .TestCompiler
-		|| HasNewerApp = .testnewer
-		|| ShellBad = .testshell
-		|| InstallBad = .testinstall
-		|| probs = false
-		if ShellBad or InstallBad
-			if HasNewerApp				// what should we do?
-				beep ("A newer version of Perry exists... at $HasNewerApp. Please use it to install Speedie.")
-				return
-			|| Msg = "Some installation needs to be done to use Perry:\n\n$ShellBad$InstallBad"
-			if msg.confirm
-				.install(installbad!="", shellbad!="")
-			probs = true
-		if CompilerMsg
-			beep CompilerMsg
-		  elseif !probs and MsgIfNothing
-			beep "No errors detected with install."
 
 
 	function GenerateArchive
@@ -363,9 +344,6 @@ function ClickedUninstallMenu (GUIMenuEvent)
 
 function ClickedEditPrefs (GUIMenuEvent)
 	PerryIDE.New(app.prefpath)
-
-function ClickedTestInstallMenu (guimenuevent)
-	perry.CheckInstallStatus
 
 function string.IsProj (|bool|)
 	return self isa "scproj" or "uwuz"

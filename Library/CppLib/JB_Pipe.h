@@ -38,11 +38,11 @@ JBClass( ShellStream, ProcessOwner,
 
 
 void JB_Sh_Destructor(ShellStream* self);
-void JB_Sh_Constructor(ShellStream* self);
-ShellStream* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn);
+void JB_Sh_Constructor(ShellStream* self, JB_String* Path);
+ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn);
 bool JB_Sh_Step(ShellStream* self);
 int JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, bool KeepStdOut);
-int JB_App__TurnInto(JB_String* self, Array* R);
+int JB_App__TurnInto(JB_String* self, Array* R); 
 typedef void (*fn_app_deathaction)();
 void JB_App__AtExit (fn_app_deathaction b);
 int JB_ArrayPrepare_(JB_String* self, const char** argv, Array* R);
