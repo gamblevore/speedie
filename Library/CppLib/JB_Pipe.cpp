@@ -35,66 +35,6 @@ extern "C" const char** JB_BackTrace(void** space, int* size) {
 }
 
 
-struct LostChild {
-	int PID;
-	int Exit;
-};
-LostChild   LostChildren[32]; // sigh
-atomic_uint ChildAvail = {0xFFFFffff};
-JB_Lockable ChildFinder;
-
-
-void JB_SigChild (int signum) {
-	while (!ChildFinder.Use()) {
-		; // spin
-	}
-	
-	// we need to add them even if we are "full", some lazy code might be bloating our space.
-	// so how? Do later. Catch it later...
-	if (ChildAvail == 0) {
-		debugger;
-		ChildAvail = 0xFFFF0000;
-	}
-	
-	while (ChildAvail) {
-		int Exit = 0;
-		int PID = waitpid(-1, &Exit, WNOHANG);
-		if (PID > 0) {
-			uint Slot = JB_Int_Log2(ChildAvail);
-			LostChildren[Slot] = {PID, Exit};
-			Slot = ~(1 << Slot);
-			ChildAvail &= Slot;
-		} else if (PID == 0 or errno != EINTR) {
-			break;
-		}
-	}
-	ChildFinder.Finish();
-}
-
-
-int JB_App__ChildDied (int PID) {
-	if (!PID or ChildAvail==0xFFFFffff or !ChildFinder.Use()) {
-		return -1;
-	}
-
-	int Exit = -1;
-	uint Remain = ChildAvail;
-	while (Remain != 0xFFFFffff) {
-		uint i = JB_Int_Log2(~Remain);
-		uint slot = 1<<i;
-		Remain |= slot;
-		if (LostChildren[i].PID == PID) {
-			Exit = LostChildren[i].Exit;
-			LostChildren[i] = {};
-			ChildAvail |= slot;
-			break;
-		}
-	}
-	ChildFinder.Finish();
-    return Exit;
-}
-
-
 
 #ifndef AS_LIBRARY
 #include <string>
@@ -103,7 +43,8 @@ int JB_App__ChildDied (int PID) {
 
 extern "C" {
 const int RD = 0; const int WR = 1;
-JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(JB_Object),      0 );
+JBClassPlace( ProcessOwner,   JB_PID_UnRegister,     JB_AsClass(JB_Object),      0 );
+JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),   0 );
 
 
 void JB_Rec_NewErrorWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
@@ -223,21 +164,7 @@ int JB_ArrayPrepare_(JB_String* self, const char** argv, Array* R) {
 
 
 int JB_Kill(int PID) {
-	int KillErr = kill(PID, SIGKILL);
-	if (!KillErr) {
-		int Waited = waitid(P_PID,  PID,  nil,  WEXITED);
-		if (Waited!=-1) debugger; // cool
-		for_ (1000) {
-			if (JB_App__ChildDied(PID)>=0) break;
-			JB_Date__Sleep(1);
-		}
-	}
-	return KillErr;
-}
-
-
-int JB_App__Fork() {
-	return fork();
+	return kill(PID, SIGKILL);
 }
 
 
@@ -304,6 +231,7 @@ static int JB_FEPDWEE_Call(ShellStream& Sh, const char** argv, bool NewStdOut) {
 			fcntl(Sh.CaptureOut[RD], F_SETFL, O_NONBLOCK);
 		fcntl(Sh.StdErrPipe[RD], F_SETFL, O_NONBLOCK);
 	}
+	JB_PID_Register(&Sh);
 	Sh.PID = fork();
 	if (Sh.PID == -1) {
 		return EPERM;
@@ -348,32 +276,30 @@ bool JB_FEPDWEE_Start(ShellStream* sh, Array* R, FastString* FSOut, FastString* 
 	Sh.ErrorOutput = JB_FS__FastNew(FSErrIn);
 
 	const char* argv[MaxArgs + 1];
-	Sh.ErrorCode = JB_ArrayPrepare_(self, argv, R);
-	if (!Sh.ErrorCode)
-		Sh.ErrorCode = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
-	if ( Sh.ErrorCode) {
-		JB_ErrorHandleFile(self, nil, Sh.ErrorCode, nil, "call command-line tool");
+	Sh.Exit = JB_ArrayPrepare_(self, argv, R);
+	if (!Sh.Exit)
+		Sh.Exit = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
+	if ( Sh.Exit) {
+		JB_ErrorHandleFile(self, nil, Sh.Exit, nil, "call command-line tool");
 		return false;
 	}
 	return true;
 }
 
 void JB_FEPDWEE_Finish(ShellStream& Sh) {
-	int code = JB_App__ChildDied(Sh.PID);
-	if (code < 0) code = 0;
-	Sh.ErrorCode = code;
 	pipe_close(Sh.CaptureOut[RD]);
 	pipe_close(Sh.StdErrPipe[RD]);
 	Sh.Mode = -1;
 }
 
 
-int JB_FEPDWEE_Finish2(ShellStream& Sh, FastString* FSErrIn ) {
+int JB_FEPDWEE_FinishStackAlloc(ShellStream& Sh, FastString* FSErrIn ) {
 	JB_FEPDWEE_Finish(Sh);
 	if (Sh.ErrorOutput->Length and !FSErrIn) {
 		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh.ErrorOutput), nil);
 	}
-	return Sh.ErrorCode;
+	JB_PID_UnRegister(&Sh);
+	return Sh.Exit;
 }
 
 int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
@@ -381,12 +307,17 @@ int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSE
 // like a busy-loop that calls .step until its finished
 	ShellStream Sh = {};
 	if (!JB_FEPDWEE_Start(&Sh, R, FSOut, FSErrIn, self, KeepStdOut))
-		return Sh.ErrorCode;
+		return Sh.Exit;
 	JB_FEPDWEE_Middle(Sh);
-	waitid(P_PID,  Sh.PID,  nil,  WEXITED);
+	waitpid(Sh.PID,  &Sh.Exit,  WEXITED);
 	
-	return JB_FEPDWEE_Finish2(Sh, FSErrIn);
+	return JB_FEPDWEE_FinishStackAlloc(Sh, FSErrIn);
 }
+
+
+
+
+///*(^&£^/ Shellstream vvvvv >>>>>>>
 
 void JB_Sh_Constructor(ShellStream* self) {
 	*self = {}; self->Mode = 1;
@@ -405,12 +336,15 @@ ShellStream* JB_Sh__New(JB_String* self, Array* R, FastString* FSOut, FastString
 	return rz;
 }
 
+
+
 void JB_Sh_Destructor(ShellStream* self) {
 	ShellStream& Sh = *self;
 	JB_FEPDWEE_Finish(Sh);
 	JB_Decr(Sh.ErrorOutput);
 	JB_Decr(Sh.Path);
 	JB_Decr(Sh.Output);
+	JB_PID_Destructor(self);
 }
 
 static void Smooth(ShellStream& Sh) {

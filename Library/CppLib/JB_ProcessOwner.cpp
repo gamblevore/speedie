@@ -1,0 +1,88 @@
+
+// Copyright, Theodore H. Smith 2023.
+// Released under jeebox-licence http://jeebox.org/licence.txt
+
+
+#include "JB_Umbrella.hpp"
+
+
+extern "C" {
+
+JB_CriticalSection	ChildFinder;
+ProcessOwner		Root;
+
+
+static void AddLostChild_(int PID, int Exit) {
+	ProcessOwner* F = JB_PID_Next(&Root);
+	while (F) {
+		if (F->PID == PID) {
+			F->Exit = Exit;
+			return;
+		}
+		F = JB_PID_Next(F);
+	}
+}
+
+
+void JB_SigChild (int signum) {
+	if (!JB_PID_Next(&Root)) return;
+	ChildFinder.Lock();
+
+	while (true) {
+		int Exit = 0;
+		int PID = waitpid(-1, &Exit, WNOHANG);
+		if (PID > 0) {
+			AddLostChild_(PID, Exit);
+		} else if (PID == 0 or errno != EINTR) {
+			break;
+		}
+	}
+
+	ChildFinder.Finish();
+}
+
+
+
+
+
+////*&(^!@^*& ^^^^^^^ PiD ^^^^^^^^
+//// BATCHES LOST CONTROL
+
+void JB_PID_Constructor(ProcessOwner* self) {
+	if (!self and !Root.Next) {
+		self = &Root;
+	}
+	JB_Helper_SelfLink((JB_RingList*)self);
+	self->PID = 0;
+}
+
+void JB_PID_Register(ProcessOwner* self) {
+	ChildFinder.Lock();
+	JB_Helper_PutAfter((JB_RingList*)(&Root), (JB_RingList*)self);
+	ChildFinder.Finish();
+}
+
+void JB_PID_Destructor(ProcessOwner* self) {
+	JB_PID_UnRegister(self);
+}
+
+void JB_PID_UnRegister(ProcessOwner* self) {
+	ChildFinder.Lock();
+	JB_Helper_Unlink((JB_RingList*)self);
+	ChildFinder.Finish();
+}
+
+ProcessOwner* JB_PID_Next(ProcessOwner* self) {
+	auto Result = (ProcessOwner*)(self->Next);
+	if (Result != &Root) {
+		return Result;
+	}
+	return 0;
+}
+
+ProcessOwner* JB_PID__First() {
+	return (ProcessOwner*)Root.Next;
+}
+
+
+}

@@ -7,10 +7,24 @@
 
 extern "C" {
 
-JBClass( ShellStream, JB_Object,
+
+JBClass( ProcessOwner, JB_RingList,
+	uint PID;
+);
+
+void JB_PID_Constructor(ProcessOwner* self);
+void JB_PID_UnRegister(ProcessOwner* self);
+void JB_PID_Destructor(ProcessOwner* self);
+void JB_PID_Register(ProcessOwner* self);
+ProcessOwner* JB_PID_Next(ProcessOwner* self);
+ProcessOwner* JB_PID__First();
+
+
+
+
+
+JBClass( ShellStream, ProcessOwner,
 	int Mode;
-	int PID;
-	int ErrorCode;
 	JB_String*  Path;
 	FastString* Output;
 	FastString* ErrorOutput;
@@ -35,7 +49,8 @@ int JB_ArrayPrepare_(JB_String* self, const char** argv, Array* R);
 int JB_Str_System(JB_String* self);
 int JB_Kill(int PID);
 void JB_SigChild (int signum);
-int JB_App__ChildDied (int PID);
+void JB_SigChildLock ();
+void JB_SigChildUnLock ();
 int JB_App__Fork();
 int JB_Str_StartProcess (JB_String* self, Array* Args, JB_File** StdOut);
 void JB_AtExit(void* func);

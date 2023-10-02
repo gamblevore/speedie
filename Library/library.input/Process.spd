@@ -16,7 +16,7 @@ datatype IPCState (uint16)
 
 
 
-class Process
+class Process (ProcessOwner)
 	linkage
 		cpp_part Proc
 	contains Process
@@ -34,13 +34,11 @@ class Process
 	|file|						_StdOutFile
 	|FastString|				_StdOut
 	|ringtree of message|		SendQueue
-	|ind|						ProcPos
 	|IPCMessage|				Dummy
 	|int|						SizeOfOrig
 	|int|						Offset
 	|int| 						DeathLimit
 	|int|						DiedCount
-	|int|						CID
 	|bool|						IsServer
 	|bool|						TrapStdOut
 	|byte|						CanPrint
@@ -50,7 +48,6 @@ class Process
 		
 		.Orig = (&.Dummy)|&byte|
 		.deathlimit = 12
-		.procpos = -1
 		.isserver = n != 0
 		.subprocess = sub
 		.TrapStdOut = TrapStdOut
@@ -156,13 +153,7 @@ class Process
 		  else 
 			return "Child  " + .name
 
-	
-	function ReduceDeaths (|int| d)
-		.diedcount = (.diedcount - d) max 0 // in case they think our current connection is
-		// "successful enough", but they have to decide what that means as we can't know
-		// there is no point connecting to a file server, navigating through directories
-		// and dying everytime we download any file.
-	
+		
 	helper TheirName (|string|)
 		return .OurName(false)
 	
@@ -266,7 +257,7 @@ class Process
 					if !send
 						.other "timed out", is timedout, debugger
 					return false
-				if .cid and now > print_time
+				if .pid and now > print_time
 					.self "waiting...", print_time += 5s
 
 			  elseif wait == 1-2KB
@@ -292,11 +283,14 @@ class Process
 			return !.closed
 
 		|| AmAlive = true
-		for ch in process.children
-			if (ch != nil) and app.ChildDied(ch.cid)
+		|| ch = processowner.first
+		while ch
+			if ch.exit >= 0
 				if ch == self
 					AmAlive = false
-				ch.died
+				if ch isa process
+					ch.died
+			ch++
 		return AmAlive
 
 
@@ -389,10 +383,11 @@ class Process
 
 	
 	function Died
+		.unregister
 		.DiedCount++
 		.Disconnect
 		.theirs.state = ipcstate.Dead
-		.cid = 0
+		.pid = 0
 		.other("died", true)
 		if !.isserver
 			app.quit(-1)
@@ -413,11 +408,10 @@ class Process
 
 
 	helper KillSub (|bool| OK)
-		if .cid
+		if .pid
 			if !OK
 				.diedcount++
-			pipe.killpid(.cid)
-			.cid = 0
+			pipe.killpid(.pid)
 			.self("killed child", true)
 		.Disconnect
 
@@ -524,7 +518,6 @@ class Process
 
 
 	destructor
-		.release
 		.disconnect
 		if .isserver
 			.unmap
@@ -542,10 +535,10 @@ class Process
 	function RunChild (|string| path, |bool|)
 		debug_require path
 		require (self isnt invalid)
-		.cid = path.cstr.Startprocess(.params, (&._stdoutfile, nil)(.trapstdout))
-		if .cid > 0
+		.pid = path.cstr.Startprocess(.params, (&._stdoutfile, nil)(.trapstdout))
+		if .pid > 0
+			.Register
 			.path = path
-			.AddToList
 			return true
 		is closed
 
@@ -559,7 +552,7 @@ class Process
 		if !.closed
 			return true
 		debug_require .IsServer
-		if .cid
+		if .pid
 			.killsub(false)
 		if .CanActivate
 			if !.path
@@ -582,23 +575,6 @@ class Process
 		|| r = "".CreateArgs(space2.ptr, .params)
 		r := (process)(space2.ptr, 0)
 		return r
-
-
-// just make a class that does this... later...
-// maybe an allocation or something
-	function Release
-		if .procpos
-			process.children[.procpos] = nil
-			.procpos = -1
-
-
-	function AddToList
-		opt norefcounts
-		for (ch in process.children) (i)
-			if ch == nil
-				process.children[i] = self
-				.procpos = i
-				exit
 
 
 	function SendCrashed
@@ -627,7 +603,6 @@ class Process
 		|byte|							ClosePipesInstalled = 0
 		|byte|							SpecialState = 0
 		|Process|						Owner_ = nil
-		|Process--[16]|					Children
 		|int|							IncID
 
 		function BackTrace (|&_voidptr| space, |&int| size, |&cstring|) 
@@ -678,9 +653,12 @@ class Process
 		
 		function CloseProcesses (fn_app_deathaction)
 			"closing all process connections"
-			for f in .children
-				f.release
-				f.close
+			|| f = processowner.first
+			while f
+				if f isa process
+					f.unregister
+					f.close
+				f++
 		
 		
 		target !minilib
@@ -726,9 +704,6 @@ extend_module app
 	
 	helper HasIPC (|bool|)
 		return app..talk.length
-			
-	helper ChildDied (|pid_int| i, |ind|)
-		cpp_wrapper JB_App__ChildDied
 
 	function StartChild (|[string]| r, |process|)
 		return process.Child(.path, .path.name + .path.hash|int64|.render, r)

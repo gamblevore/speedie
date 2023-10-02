@@ -27,8 +27,39 @@ module Pipe
 		
 	function KillPID (|int| pid, |int|)
 		cpp_wrapper JB_Kill
+
+
+
+class ProcessOwner
+	linkage
+		wrapper
+		cpp_part PID
+	contains ProcessOwner
 	
-			
+	|int| 				Exit
+	|ProcessOwner--|	_Next
+	|ProcessOwner--|	_Prev
+	|PID_Int| 			PID
+	
+	constructor
+		cpp_wrapper JB_PID_Constructor
+		
+	destructor
+		cpp_Wrapper JB_PID_Destructor
+	
+	function Register
+		cpp_wrapper JB_PID_Register
+
+	function UnRegister
+		cpp_wrapper JB_PID_UnRegister
+	
+	function Next (|ProcessOwner|)
+		cpp_wrapper JB_PID_Next
+	
+	module
+		function First (|ProcessOwner|)
+			cpp_wrapper JB_PID__First
+
 
 
 datatype PID_Int (int)
@@ -36,11 +67,12 @@ datatype PID_Int (int)
 		return self > 0
 
 
+
 extend string	
-	function Execute (|[string]| Args = [], |faststring| Out = nil, |faststring| Errs = nil, |bool| KeepStdOut=true, |ErrorInt|)
+	function Execute (|[string]| Args = [],  |faststring| Out = nil,  |faststring| Errs = nil,  |bool| KeepStdOut=true, |ErrorInt|)
 		cpp_wrapper JB_Str_Execute
 
-	function SilentExecute (|[string]| Args=[], |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
+	function SilentExecute (|[string]| Args=[],  |faststring|Out=nil,  |faststring| Errs=nil,  |ErrorInt|)
 		return .execute(args, out, errs, false)
 
 	function ExecuteStr (|[string]| Args=nil, |string|)

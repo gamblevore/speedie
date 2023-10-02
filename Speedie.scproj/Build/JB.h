@@ -247,7 +247,7 @@ struct Memory_Behaviour;
 
 struct NilTest_Behaviour;
 
-struct Process_Behaviour;
+struct ProcessOwner_Behaviour;
 
 struct SCImport_Behaviour;
 
@@ -262,8 +262,6 @@ struct SCParamArray_Behaviour;
 struct Saveable_Behaviour;
 
 struct Selector_Behaviour;
-
-struct ShellStream_Behaviour;
 
 struct StringFields_Behaviour;
 
@@ -297,6 +295,8 @@ struct FastString_Behaviour;
 
 struct MaterialsLol_Behaviour;
 
+struct Process_Behaviour;
+
 struct RingTree_Behaviour;
 
 struct SCBase_Behaviour;
@@ -306,6 +306,8 @@ struct SCDecl_Behaviour;
 struct SCIterator_Behaviour;
 
 struct SavingTest_Behaviour;
+
+struct ShellStream_Behaviour;
 
 struct StringShared_Behaviour;
 
@@ -367,8 +369,6 @@ struct MWrap;
 
 struct NilTest;
 
-struct Process;
-
 struct SCImport;
 
 struct SCNodeRenamer;
@@ -402,6 +402,8 @@ struct FastStringCpp;
 struct FastString;
 
 struct MaterialsLol;
+
+struct Process;
 
 struct SCBase;
 
@@ -757,35 +759,8 @@ JBClass ( NilTest , JB_Object ,
 	byte* V4;
 );
 
-struct Process_Behaviour: Object_Behaviour {
+struct ProcessOwner_Behaviour: Object_Behaviour {
 };
-
-JBClass ( Process , JB_Object , 
-	JB_File* Talker;
-	FastString* Writer;
-	JB_String* Name;
-	JB_String* Path;
-	byte* Orig;
-	IPCMessage* Ours;
-	IPCMessage* Theirs;
-	Date LastSend;
-	fn_subprocess SubProcess;
-	Array* Params;
-	JB_File* LogFile;
-	JB_File* _StdOutFile;
-	FastString* _StdOut;
-	RingTree* SendQueue;
-	Ind ProcPos;
-	IPCMessage Dummy;
-	int SizeOfOrig;
-	int Offset;
-	int DeathLimit;
-	int DiedCount;
-	int CID;
-	bool IsServer;
-	bool TrapStdOut;
-	byte CanPrint;
-);
 
 struct SCImport_Behaviour: Object_Behaviour {
 };
@@ -977,6 +952,34 @@ struct MaterialsLol_Behaviour: Selector_Behaviour {
 
 JBClass ( MaterialsLol , Selector , 
 	JB_String* oof;
+);
+
+struct Process_Behaviour: ProcessOwner_Behaviour {
+};
+
+JBClass ( Process , ProcessOwner , 
+	JB_File* Talker;
+	FastString* Writer;
+	JB_String* Name;
+	JB_String* Path;
+	byte* Orig;
+	IPCMessage* Ours;
+	IPCMessage* Theirs;
+	Date LastSend;
+	fn_subprocess SubProcess;
+	Array* Params;
+	JB_File* LogFile;
+	JB_File* _StdOutFile;
+	FastString* _StdOut;
+	RingTree* SendQueue;
+	IPCMessage Dummy;
+	int SizeOfOrig;
+	int Offset;
+	int DeathLimit;
+	int DiedCount;
+	bool IsServer;
+	bool TrapStdOut;
+	byte CanPrint;
 );
 
 struct RingTree_Behaviour: Saveable_Behaviour {
@@ -2036,12 +2039,6 @@ extern NilTest* SC__NilTest_n1;
 extern NilTest* SC__NilTest_x1;
 extern NilTest* SC__NilTest_x2;
 extern JB_String* SC__NilTest_x3;
-extern Process* JB__Proc_Children[16];
-extern byte JB__Proc_ClosePipesInstalled;
-extern int JB__Proc_IncID;
-extern Process* JB__Proc_Owner_;
-#define kJB__Proc_PrintWaiting (2)
-extern byte JB__Proc_SpecialState;
 extern Array* SC__Imp_AllFiles;
 extern SCImport* SC__Imp_Curr;
 extern Date SC__Imp_Recent;
@@ -2068,6 +2065,11 @@ extern MaterialsLol* SC__MaterialsLol_Iron;
 extern MaterialsLol* SC__MaterialsLol_Pellets;
 extern MaterialsLol* SC__MaterialsLol_WierdBlock;
 extern MaterialsLol* SC__MaterialsLol_Wood;
+extern byte JB__Proc_ClosePipesInstalled;
+extern int JB__Proc_IncID;
+extern Process* JB__Proc_Owner_;
+#define kJB__Proc_PrintWaiting (2)
+extern byte JB__Proc_SpecialState;
 extern bool SC__Base_ConstantsLoadingOverride;
 extern SCModule* SC__Base_CurrModule;
 extern bool SC__Base_CurrVisibility;
@@ -4094,6 +4096,8 @@ NilState SC_NilState_Worst(NilState self, NilState o);
 
 
 // PID_Int
+inline bool JB_PID_Int_SyntaxCast(PID_Int self);
+
 
 
 // SCBaseInfo
@@ -4965,7 +4969,7 @@ NilState SC_nil__While(Message* msg, NilCheckMode Test);
 // JB_NilTest_Behaviour
 
 
-// JB_Process_Behaviour
+// JB_ProcessOwner_Behaviour
 
 
 // JB_SCImport_Behaviour
@@ -4987,9 +4991,6 @@ NilState SC_nil__While(Message* msg, NilCheckMode Test);
 
 
 // JB_Selector_Behaviour
-
-
-// JB_ShellStream_Behaviour
 
 
 // JB_StringFields_Behaviour
@@ -5040,6 +5041,9 @@ NilState SC_nil__While(Message* msg, NilCheckMode Test);
 // JB_MaterialsLol_Behaviour
 
 
+// JB_Process_Behaviour
+
+
 // JB_RingTree_Behaviour
 
 
@@ -5053,6 +5057,9 @@ NilState SC_nil__While(Message* msg, NilCheckMode Test);
 
 
 // JB_SavingTest_Behaviour
+
+
+// JB_ShellStream_Behaviour
 
 
 // JB_StringShared_Behaviour
@@ -5679,109 +5686,7 @@ NilTest* JB_NilTest__New();
 
 
 
-// JB_Process
-bool JB_Proc_Alive(Process* self);
-
-bool JB_Proc_CanSend(Process* self);
-
-bool JB_Proc_ChildAlive(Process* self);
-
-bool JB_Proc_Closed(Process* self);
-
-void JB_Proc_Constructor(Process* self, JB_String* name, int n, Array* params, fn_subprocess sub, bool TrapStdOut);
-
-void JB_Proc_Destructor(Process* self);
-
-void JB_Proc_Died(Process* self);
-
-void JB_Proc_Disconnect(Process* self);
-
-byte* JB_Proc_DummyOrig(Process* self);
-
-void JB_Proc_Flush(Process* self);
-
-bool JB_Proc_Found(Process* self, bool send);
-
-Message* JB_Proc_Get(Process* self, Date TimeOut);
-
-Message* JB_Proc_GetSub(Process* self, Date TimeOut);
-
-bool JB_Proc_IsOpen(Process* self);
-
-void JB_Proc_Log(Process* self, JB_String* s);
-
-void JB_Proc_LogMsg(Process* self, JB_String* msg);
-
-void JB_Proc_LogUs(Process* self);
-
-void JB_Proc_OpenSharedMemory(Process* self, int n);
-
-void JB_Proc_Other(Process* self, JB_String* msg, bool strong);
-
-JB_String* JB_Proc_OurName(Process* self, bool us);
-
-bool JB_Proc_ParentAlive(Process* self);
-
-void JB_Proc_RefillOpen(Process* self);
-
-void JB_Proc_Release(Process* self);
-
-JB_String* JB_Proc_Render(Process* self, FastString* fs_in);
-
-JB_String* JB_Proc_ReportConnection(Process* self, JB_String* s, FastString* fs_in);
-
-void JB_Proc_Self(Process* self, JB_String* msg, bool strong);
-
-void JB_Proc_SendCrashed(Process* self);
-
-void JB_Proc_SendSub(Process* self, Message* msg);
-
-void JB_Proc_SetupAdjust(Process* self, int n);
-
-int JB_Proc_SetupAlloc(Process* self, int n);
-
-void JB_Proc_SetupServerState(Process* self);
-
-PID_Int JB_Proc_SideID(Process* self);
-
-bool JB_Proc_Send(Process* self, Message* msg, Date TimeOut);
-
-void JB_Proc_SyntaxExpect(Process* self, JB_String* err);
-
-void JB_Proc_SyntaxIsSet(Process* self, IPCState d, bool Value);
-
-bool JB_Proc_SyntaxIsnt(Process* self, IPCState d);
-
-JB_String* JB_Proc_TheirName(Process* self);
-
-void JB_Proc_Unlink(Process* self);
-
-void JB_Proc_Unmap(Process* self);
-
-void JB_Proc_UpdateStdOut(Process* self);
-
-void JB_Proc_UseDummy(Process* self);
-
-int JB_Proc_Wait(Process* self, Date wait);
-
-bool JB_Proc_WaitFor(Process* self, Date TimeOut, bool Send);
-
-void JB_Proc_WriteSub(Process* self);
-
-Process* JB_Proc__Alloc();
-
-int JB_Proc__Init_();
-
-int JB_Proc__InitCode_();
-
-Process* JB_Proc__New(JB_String* name, int n, Array* params, fn_subprocess sub, bool TrapStdOut);
-
-Process* JB_Proc__Parent();
-
-void JB_Proc__StackTraceJbin(FastString* j, JB_String* reason, int skip);
-
-void JB_ProcessReportCrash();
-
+// JB_ProcessOwner
 
 
 // JB_SCImport
@@ -6013,9 +5918,6 @@ void JB_Sel_Destructor(Selector* self);
 
 void JB_Sel_GiveIDs(Selector* self);
 
-
-
-// JB_ShellStream
 
 
 // JB_String
@@ -6638,6 +6540,109 @@ MaterialsLol* SC_MaterialsLol__New(Selector* Next, Selector** Place, JB_String* 
 
 
 
+// JB_Process
+bool JB_Proc_Alive(Process* self);
+
+bool JB_Proc_CanSend(Process* self);
+
+bool JB_Proc_ChildAlive(Process* self);
+
+bool JB_Proc_Closed(Process* self);
+
+void JB_Proc_Constructor(Process* self, JB_String* name, int n, Array* params, fn_subprocess sub, bool TrapStdOut);
+
+void JB_Proc_Destructor(Process* self);
+
+void JB_Proc_Died(Process* self);
+
+void JB_Proc_Disconnect(Process* self);
+
+byte* JB_Proc_DummyOrig(Process* self);
+
+void JB_Proc_Flush(Process* self);
+
+bool JB_Proc_Found(Process* self, bool send);
+
+Message* JB_Proc_Get(Process* self, Date TimeOut);
+
+Message* JB_Proc_GetSub(Process* self, Date TimeOut);
+
+bool JB_Proc_IsOpen(Process* self);
+
+void JB_Proc_Log(Process* self, JB_String* s);
+
+void JB_Proc_LogMsg(Process* self, JB_String* msg);
+
+void JB_Proc_LogUs(Process* self);
+
+void JB_Proc_OpenSharedMemory(Process* self, int n);
+
+void JB_Proc_Other(Process* self, JB_String* msg, bool strong);
+
+JB_String* JB_Proc_OurName(Process* self, bool us);
+
+bool JB_Proc_ParentAlive(Process* self);
+
+void JB_Proc_RefillOpen(Process* self);
+
+JB_String* JB_Proc_Render(Process* self, FastString* fs_in);
+
+JB_String* JB_Proc_ReportConnection(Process* self, JB_String* s, FastString* fs_in);
+
+void JB_Proc_Self(Process* self, JB_String* msg, bool strong);
+
+void JB_Proc_SendCrashed(Process* self);
+
+void JB_Proc_SendSub(Process* self, Message* msg);
+
+void JB_Proc_SetupAdjust(Process* self, int n);
+
+int JB_Proc_SetupAlloc(Process* self, int n);
+
+void JB_Proc_SetupServerState(Process* self);
+
+PID_Int JB_Proc_SideID(Process* self);
+
+bool JB_Proc_Send(Process* self, Message* msg, Date TimeOut);
+
+void JB_Proc_SyntaxExpect(Process* self, JB_String* err);
+
+void JB_Proc_SyntaxIsSet(Process* self, IPCState d, bool Value);
+
+bool JB_Proc_SyntaxIsnt(Process* self, IPCState d);
+
+JB_String* JB_Proc_TheirName(Process* self);
+
+void JB_Proc_Unlink(Process* self);
+
+void JB_Proc_Unmap(Process* self);
+
+void JB_Proc_UpdateStdOut(Process* self);
+
+void JB_Proc_UseDummy(Process* self);
+
+int JB_Proc_Wait(Process* self, Date wait);
+
+bool JB_Proc_WaitFor(Process* self, Date TimeOut, bool Send);
+
+void JB_Proc_WriteSub(Process* self);
+
+Process* JB_Proc__Alloc();
+
+int JB_Proc__Init_();
+
+int JB_Proc__InitCode_();
+
+Process* JB_Proc__New(JB_String* name, int n, Array* params, fn_subprocess sub, bool TrapStdOut);
+
+Process* JB_Proc__Parent();
+
+void JB_Proc__StackTraceJbin(FastString* j, JB_String* reason, int skip);
+
+void JB_ProcessReportCrash();
+
+
+
 // JB_RingTree
 void JB_Tree_AppendAfter(RingTree* self, RingTree* item, RingTree* after);
 
@@ -7111,6 +7116,9 @@ bool SC_SavingTest__IsEqual(JB_Object* A, JB_Object* B);
 
 SavingTest* SC_SavingTest__New(int n);
 
+
+
+// JB_ShellStream
 
 
 // JB_StringShared
@@ -8825,6 +8833,10 @@ inline bool JB_IPCState_SyntaxCast(IPCState self) {
 
 inline bool JB_Ind_SyntaxCast(Ind self) {
 	return self >= 0;
+}
+
+inline bool JB_PID_Int_SyntaxCast(PID_Int self) {
+	return self > 0;
 }
 
 inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b, int c, int d) {

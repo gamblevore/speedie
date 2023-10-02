@@ -17,7 +17,7 @@ typedef std::atomic<short> atomic_int16;
 typedef std::atomic<long long> atomic_int64;
 
 
-struct JB_Lockable {
+struct JB_CriticalSection {
 	atomic_bool Value;
 	bool Use () {
 		bool Expected = false;
@@ -25,6 +25,11 @@ struct JB_Lockable {
 	}
 	void Finish() {
 		Value = false;
+	}
+	void Lock() {
+		while (!Use()) {
+			; // spin
+		}
 	}
 };
 

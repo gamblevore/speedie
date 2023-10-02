@@ -136,18 +136,39 @@ struct JB_Object {
 };
 
 
-struct AllocationBlock {
-    JB_MemoryLayer*         Owner;    		// these two...
-    FreeObject*             FirstFree;		// have to be first...
-    AllocationBlock*        Next;
-    AllocationBlock*        Prev;
-    JBObject_Behaviour*     FuncTable;		// speed things up a bit.
-    SuperBlock*             Super;
+struct JB_RingList : JB_Object { // a list that does not own its items... unlike ringtree
+	int						Exit; // dummy
+    JB_RingList*			Next;
+    JB_RingList*			Prev;
+};
 
+
+struct SuperBlock {
+    uint                    ID;
+    uint                    BlocksActive;
+    SuperBlock*             Next;
+    SuperBlock*             Prev;
+    JB_MemoryWorld*         World;
+    AllocationBlock*        FirstBlock;
+    AllocationBlock*        StartBlock;
+    FreeObject*             StartObj;
+    void*                   BlockEnd;
+};
+
+
+struct AllocationBlock {
     u16                     ObjCount;
     u16                     HiddenObjCount;
     u16                     CurrFast;		// allocate these in a line... 
     u16                     MaxFast;		// until we hit the max
+    AllocationBlock*        Next;
+    AllocationBlock*        Prev;
+    
+    JB_MemoryLayer*         Owner;
+    FreeObject*             FirstFree;
+    JBObject_Behaviour*     FuncTable;		// speed things up a bit.
+    SuperBlock*             Super;
+
 
     u16                     Unused_;
     u16                     Unused2_;
@@ -225,6 +246,11 @@ JBStructData(JB_Object);
 struct Array;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void JB_Helper_SelfLink(JB_RingList* New);
+void JB_Helper_PutBefore(JB_RingList* Old, JB_RingList* New);
+void JB_Helper_PutAfter(JB_RingList* Old, JB_RingList* New);
+void JB_Helper_Unlink(JB_RingList* Curr);
 
 JB_MemoryWorld* JB_MemStandardWorld();
 JB_MemoryLayer* JB_Mem__New( JB_Class* Cls );

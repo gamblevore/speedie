@@ -5,12 +5,11 @@
 */
 
 
-class ShellStream
+class ShellStream (processowner)
 	|string|		Path
 	|FastString|	Output
 	|FastString|	ErrorOutput
 	|int|			ErrorCode
-	|int|			PID
     |Date|			LastRead
     |int64|			UserFlags
     |object|		UserObj
@@ -29,7 +28,6 @@ class ShellStream
 	function Kill
 		if self and .pid > 0
 			pipe.KillPID(.pid)
-			.pid = 0
 
 	module
 		function New (|String| app, |[array of string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |ShellStream|)

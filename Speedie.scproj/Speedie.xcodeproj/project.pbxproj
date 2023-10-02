@@ -131,6 +131,10 @@
 		ACB3785E29A5026400795F00 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACB3785C29A5026400795F00 /* JB_DivSufSort.cpp */; };
 		ACB3785F29A5026400795F00 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACB3785C29A5026400795F00 /* JB_DivSufSort.cpp */; };
 		ACB3786029A5026400795F00 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACB3785C29A5026400795F00 /* JB_DivSufSort.cpp */; };
+		ACE7CA432ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */; };
+		ACE7CA442ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */; };
+		ACE7CA452ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */; };
+		ACE7CA462ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -290,6 +294,7 @@
 		AC7D3E4B29A284DB00148ADB /* speedie.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = speedie.input; sourceTree = "<group>"; };
 		AC7D3E4C29A284EA00148ADB /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		ACB3785C29A5026400795F00 /* JB_DivSufSort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DivSufSort.cpp; path = ../Library/CppLib/JB_DivSufSort.cpp; sourceTree = "<group>"; };
+		ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ProcessOwner.cpp; path = ../Library/CppLib/JB_ProcessOwner.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -373,6 +378,7 @@
 				AC7D3C9629A27C1D00148ADB /* JB_MSR.cpp */,
 				AC7D3C8029A27C1D00148ADB /* JB_ObjArray.cpp */,
 				AC7D3C8529A27C1D00148ADB /* JB_Pipe.cpp */,
+				ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */,
 				AC7D3C8A29A27C1D00148ADB /* JB_PNG.cpp */,
 				AC7D3C7929A27C1D00148ADB /* JB_RingTree.cpp */,
 				AC7D3C8329A27C1D00148ADB /* JB_Run.cpp */,
@@ -645,6 +651,7 @@
 				AC7D3CB929A27C9900148ADB /* JB_Globals.cpp in Sources */,
 				AC7D3C9E29A27C7700148ADB /* JB_MSR.cpp in Sources */,
 				AC7D3CAE29A27C7700148ADB /* JB_Dictionary.cpp in Sources */,
+				ACE7CA432ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */,
 				AC7D3CB529A27C7700148ADB /* JB_Compress.cpp in Sources */,
 				AC7D3CA629A27C7700148ADB /* JB_Child.cpp in Sources */,
 				AC7D3C9A29A27C7700148ADB /* JB_Vectors.cpp in Sources */,
@@ -683,6 +690,7 @@
 				AC7D3D9B29A280A700148ADB /* JB_Globals.cpp in Sources */,
 				AC7D3D9C29A280A700148ADB /* JB_MSR.cpp in Sources */,
 				AC7D3D9D29A280A700148ADB /* JB_Dictionary.cpp in Sources */,
+				ACE7CA442ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */,
 				AC7D3D9E29A280A700148ADB /* JB_Compress.cpp in Sources */,
 				AC7D3D9F29A280A700148ADB /* JB_Child.cpp in Sources */,
 				AC7D3DA029A280A700148ADB /* JB_Vectors.cpp in Sources */,
@@ -721,6 +729,7 @@
 				AC7D3DCB29A2816600148ADB /* JB_LibraryFile.cpp in Sources */,
 				AC7D3DCD29A2816600148ADB /* JB_MSR.cpp in Sources */,
 				AC7D3DCE29A2816600148ADB /* JB_Dictionary.cpp in Sources */,
+				ACE7CA452ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */,
 				AC7D3DCF29A2816600148ADB /* JB_Compress.cpp in Sources */,
 				AC7D3DD029A2816600148ADB /* JB_Child.cpp in Sources */,
 				AC7D3E0A29A2822B00148ADB /* JB.cpp in Sources */,
@@ -759,6 +768,7 @@
 				AC7D3DF429A2816700148ADB /* JB_LibraryFile.cpp in Sources */,
 				AC7D3DF629A2816700148ADB /* JB_MSR.cpp in Sources */,
 				AC7D3DF729A2816700148ADB /* JB_Dictionary.cpp in Sources */,
+				ACE7CA462ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */,
 				AC7D3DF829A2816700148ADB /* JB_Compress.cpp in Sources */,
 				AC7D3E0B29A2822B00148ADB /* JB.cpp in Sources */,
 				AC7D3DF929A2816700148ADB /* JB_Child.cpp in Sources */,
