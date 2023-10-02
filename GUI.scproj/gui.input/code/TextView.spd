@@ -1080,12 +1080,12 @@ class TextView (GUIControl)
 			
 		if (t.length == 1) and counterparts.find(t)  // stop awkward things like: " --> (")
 			require (s == "'" or "\"") and (s != t)
-		require  sel.width or .AfterIsOnlyWhiteOrNothing(sel2)
 			
 		|| Other = CounterParts2[c]
 		if other.equals(s) and other==after
 			.sel = sel2+1
 			return true
+		require  sel.width or .AfterIsOnlyWhiteOrNothing(sel2)
 		
 		if .SelMsgValid
 			if !sel.width

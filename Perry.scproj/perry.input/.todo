@@ -9,7 +9,6 @@
 
 
 // Perry NOW
-* typethrough shouldn't be cancelled for asdk;alskd
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping
 
