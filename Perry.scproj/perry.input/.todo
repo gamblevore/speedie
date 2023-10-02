@@ -6,6 +6,12 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
+* everything is crashing even though its not
+* cloc can't seem to print errors anymore?
+* building cloc seems to crash
+* can't build cloc a second time
+* That woman is an evil ‚·°‚·°‹›
+* compiletab draws with no background sometimes
 
 
 // Perry NOW

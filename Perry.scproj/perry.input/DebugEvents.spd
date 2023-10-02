@@ -137,7 +137,8 @@ function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 		.ShowCompileTab(.productout)
 		r.userflags |= 1
 	
-	if !r.step or kill
+	r.step
+	if kill or r.Exit >= 0
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
 		
@@ -146,10 +147,12 @@ function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	
 	if kill
 		.ProductOut <~ "\n(--Process Killed--)"
-	  elseif r.Exit
-		|| exitcode = "\n(--Exit Error: ${r.Exit}--)"
+	  elseif r.Exit >= 0
+		|| exitcode = "\n(--Exit OK--)"
+		if r.exit
+			exitcode = "\n(--Exit Error: ${r.Exit}--)"
+			.addProductErr(exitcode)
 		.ProductOut <~ exitcode
-		.addProductErr(exitcode)
 	
 	return !kill
 		
