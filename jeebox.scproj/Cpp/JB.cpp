@@ -640,10 +640,10 @@ int JB_Init_() {
 	JB_Rnd__Init_();
 	//// FlowControl;
 	JB_Flow__Init_();
-	//// Process;
-	JB_Proc__Init_();
 	//// File;
 	JB_File__Init_();
+	//// Process;
+	JB_Proc__Init_();
 	//// Error;
 	JB_Err__Init_();
 	JB_InitCode_();
@@ -3464,6 +3464,7 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver) {
 
 
 
+
 __lib__ void jdb(JB_Object* self) {
 	//visible;
 	if (self) {
@@ -4324,20 +4325,6 @@ void jbl(JB_Object* self) {
 
 
 
-int JB_Proc__Init_() {
-	{
-		JB__Proc_ClosePipesInstalled = 0;
-		JB__Proc_SpecialState = 0;
-		JB__Proc_IncID = 0;
-	}
-	;
-	return 0;
-}
-
-int JB_Proc__InitCode_() {
-	return 0;
-}
-
 
 bool JB_Sav_IsSaveMarked(Saveable* self) {
 	int* p = ((int*)self);
@@ -4369,7 +4356,6 @@ void JB_Sav_SaveWrite(Saveable* self, ObjectSaver* Saver) {
 	Saver->CantSaveThis = self;
 	JB_FS_AppendString(Saver->Dest, JB_LUB[308]);
 }
-
 
 
 
@@ -5721,6 +5707,21 @@ FastString* JB_bin__New0(int n) {
 }
 
 
+int JB_Proc__Init_() {
+	{
+		JB__Proc_ClosePipesInstalled = 0;
+		JB__Proc_SpecialState = 0;
+		JB__Proc_IncID = 0;
+	}
+	;
+	return 0;
+}
+
+int JB_Proc__InitCode_() {
+	return 0;
+}
+
+
 void JB_Tree_Clear(RingTree* self) {
 	while (true) {
 		RingTree* _tmPf0 = JB_Ring_First(self);
@@ -5817,6 +5818,7 @@ RingTree* JB_Tree_Upward(RingTree* self, int n) {
 	};
 	return rz;
 }
+
 
 
 
@@ -8020,7 +8022,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023100115);
+	return (2023100222);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
@@ -8032,4 +8034,4 @@ __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -4845594019514234813 -3857727263510544267 4746586083049471055
+// -4845594019514234813 436914444137931543 4433743178191451108

@@ -1315,13 +1315,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1900])
+#define kJB__ErrorColors_bold (JB_LUB[1901])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1901])
-#define kJB__ErrorColors_good (JB_LUB[1902])
-#define kJB__ErrorColors_normal (JB_LUB[1903])
-#define kJB__ErrorColors_underline (JB_LUB[1902])
-#define kJB__ErrorColors_warn (JB_LUB[1904])
+#define kJB__ErrorColors_error (JB_LUB[1902])
+#define kJB__ErrorColors_good (JB_LUB[1903])
+#define kJB__ErrorColors_normal (JB_LUB[1904])
+#define kJB__ErrorColors_underline (JB_LUB[1903])
+#define kJB__ErrorColors_warn (JB_LUB[1905])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1499,7 +1499,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_BitAnd (JB_LUB[356])
 #define kJB_BitNot (JB_LUB[606])
 #define kJB_BitOr (JB_LUB[560])
-#define kJB_BitXor (JB_LUB[1905])
+#define kJB_BitXor (JB_LUB[1906])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_DontSaveProperty (0)
 #define kJB_EndsBlock (1024)
@@ -1517,7 +1517,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_SaveProperty (1)
 #define kJB_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1906])
+#define kJB_SaverStart1 (JB_LUB[1907])
 #define kJB_SelfDebug (2)
 #define kJB_SelfReplace (1)
 #define kJB_SimpleMatch (1 << 22)
@@ -4654,8 +4654,6 @@ void SC_IR_FS(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
-void SC_IR_Print(IR* self);
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5403,8 +5401,6 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 
 // JB_ErrorList
-int JB_Rec_BadCount(JB_ErrorReceiver* self);
-
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
 void JB_Rec_Clear(JB_ErrorReceiver* self);
@@ -6557,8 +6553,6 @@ void JB_Proc_Constructor(Process* self, JB_String* name, int n, Array* params, f
 
 void JB_Proc_Destructor(Process* self);
 
-void JB_Proc_Died(Process* self);
-
 void JB_Proc_Disconnect(Process* self);
 
 byte* JB_Proc_DummyOrig(Process* self);
@@ -6586,6 +6580,8 @@ void JB_Proc_Other(Process* self, JB_String* msg, bool strong);
 JB_String* JB_Proc_OurName(Process* self, bool us);
 
 bool JB_Proc_ParentAlive(Process* self);
+
+void JB_Proc_ProcessDied(Process* self);
 
 void JB_Proc_RefillOpen(Process* self);
 
@@ -8851,7 +8847,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
@@ -8945,7 +8940,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1528])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1529])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}

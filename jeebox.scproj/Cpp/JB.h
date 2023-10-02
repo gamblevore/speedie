@@ -157,13 +157,11 @@ struct MemoryLayer_Behaviour;
 
 struct Memory_Behaviour;
 
-struct Process_Behaviour;
+struct ProcessOwner_Behaviour;
 
 struct Saveable_Behaviour;
 
 struct Selector_Behaviour;
-
-struct ShellStream_Behaviour;
 
 struct StringFields_Behaviour;
 
@@ -185,7 +183,11 @@ struct File_Behaviour;
 
 struct FastString_Behaviour;
 
+struct Process_Behaviour;
+
 struct RingTree_Behaviour;
+
+struct ShellStream_Behaviour;
 
 struct StringShared_Behaviour;
 
@@ -225,8 +227,6 @@ struct Macro;
 
 struct MWrap;
 
-struct Process;
-
 struct Selector;
 
 struct StringFields;
@@ -238,6 +238,8 @@ struct SyntaxObj;
 struct TerminalCell;
 
 struct FastString;
+
+struct Process;
 
 struct JB_String;
 
@@ -833,12 +835,6 @@ extern byte JB__Flow_FlowMode;
 extern CompressionStats JB__Flow_Stats;
 #define kJB__Flow_Validate (2)
 extern uint64 JB__Mrap_MDummy[2];
-
-extern byte JB__Proc_ClosePipesInstalled;
-extern int JB__Proc_IncID;
-
-#define kJB__Proc_PrintWaiting (2)
-extern byte JB__Proc_SpecialState;
 extern bool JB__File_DebugExecute;
 #define kJB__File_IgnoreErrors (true)
 #define kJB__File_O_APPEND (8)
@@ -848,6 +844,11 @@ extern bool JB__File_DebugExecute;
 #define kJB__File_O_RDWR (2)
 #define kJB__File_O_TRUNC (1024)
 #define kJB__File_O_WRONLY (1)
+extern byte JB__Proc_ClosePipesInstalled;
+extern int JB__Proc_IncID;
+
+#define kJB__Proc_PrintWaiting (2)
+extern byte JB__Proc_SpecialState;
 extern byte JB__Err_AutoPrint;
 extern Array* JB__Err_CurrSource;
 extern bool JB__Err_KeepStackTrace;
@@ -1753,16 +1754,13 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_Memory_Behaviour
 
 
-// JB_Process_Behaviour
+// JB_ProcessOwner_Behaviour
 
 
 // JB_Saveable_Behaviour
 
 
 // JB_Selector_Behaviour
-
-
-// JB_ShellStream_Behaviour
 
 
 // JB_StringFields_Behaviour
@@ -1795,7 +1793,13 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_JBin_Behaviour
 
 
+// JB_Process_Behaviour
+
+
 // JB_RingTree_Behaviour
+
+
+// JB_ShellStream_Behaviour
 
 
 // JB_StringShared_Behaviour
@@ -2041,11 +2045,7 @@ void jbl(JB_Object* self);
 // JB_MemoryLayer
 
 
-// JB_Process
-int JB_Proc__Init_();
-
-int JB_Proc__InitCode_();
-
+// JB_ProcessOwner
 
 
 // JB_Saveable
@@ -2066,9 +2066,6 @@ void JB_Sav_SaveWrite(Saveable* self, ObjectSaver* Saver);
 
 
 // JB_Selector
-
-
-// JB_ShellStream
 
 
 // JB_String
@@ -2353,6 +2350,13 @@ FastString* JB_bin__New0(int n);
 
 
 
+// JB_Process
+int JB_Proc__Init_();
+
+int JB_Proc__InitCode_();
+
+
+
 // JB_RingTree
 void JB_Tree_Clear(RingTree* self);
 
@@ -2374,6 +2378,9 @@ void JB_Tree_SyntaxAppend(RingTree* self, RingTree* Last);
 
 RingTree* JB_Tree_Upward(RingTree* self, int n);
 
+
+
+// JB_ShellStream
 
 
 // JB_StringShared

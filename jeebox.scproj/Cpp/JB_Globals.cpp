@@ -177,11 +177,6 @@ Memory_Behaviour InitTableMWrap_() { // Behaviour
 Memory_Behaviour MWrap_FuncTable_ = InitTableMWrap_();
 JBClassPlace4(MWrap, JB_AsClass(JB_Object), MWrap_FuncTable_);
 
-
-byte JB__Proc_ClosePipesInstalled;
-int JB__Proc_IncID;
-
-byte JB__Proc_SpecialState;
 StringFields_Behaviour InitTableStringFields_() { // Behaviour 
 	StringFields_Behaviour Result;
 	Result.__destructor__ = (void*)JB_FI_Destructor;
@@ -213,6 +208,10 @@ SyntaxObj_Behaviour SyntaxObj_FuncTable_ = InitTableSyntaxObj_();
 JBClassPlace4(SyntaxObj, JB_AsClass(JB_Object), SyntaxObj_FuncTable_);
 
 bool JB__File_DebugExecute;
+byte JB__Proc_ClosePipesInstalled;
+int JB__Proc_IncID;
+
+byte JB__Proc_SpecialState;
 Message_Behaviour InitTableMessage_() { // Behaviour 
 	Message_Behaviour Result;
 	Result.__destructor__ = (void*)JB_Msg_Destructor;
