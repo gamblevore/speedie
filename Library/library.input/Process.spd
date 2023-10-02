@@ -190,6 +190,7 @@ class Process (ProcessOwner)
 
 	syntax is (|IPCState| d, |bool|)
 		return .ours.state == d
+	
 	syntax isnt (|IPCState| d, |bool|)
 		return .ours.state != d
 
@@ -198,7 +199,6 @@ class Process (ProcessOwner)
 		|| old = .ours.state
 		if old >= ipcstate.closed
 			debug_require (d >= old) or (d <= ipcstate.connected)
-			// actually harmful to think we cleared a dead code...
 		.ours.state = d
 
 	helper Found (|bool| send, |bool|)
@@ -291,7 +291,7 @@ class Process (ProcessOwner)
 				if ch == self
 					AmAlive = false
 				if ch isa process
-					ch.died
+					ch.ProcessDied
 		return AmAlive
 
 
@@ -341,7 +341,6 @@ class Process (ProcessOwner)
 
 	syntax Compare (|date| Seconds, |bool| CompareDummy, |int|)
 		cpp_part TimedOut
-		// what if tis is dead?
 		if (self == nil) or !.ours.state
 			return -1
 		if .Found(true) // sent
@@ -383,15 +382,16 @@ class Process (ProcessOwner)
 		.self "received nil"
 
 	
-	function Died
+	function ProcessDied
+		.theirs.state = ipcstate.Dead // IS DEAD?
+		if !.isserver
+			printline app.path + " died"
+			app.printstacktrace
+			app.quit(-1)
 		.unregister
 		.DiedCount++
 		.Disconnect
-		.theirs.state = ipcstate.Dead
 		.pid = 0
-		.other("died", true)
-		if !.isserver
-			app.quit(-1)
 
 
 	function Close

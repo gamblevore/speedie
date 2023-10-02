@@ -311,6 +311,7 @@ int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSE
 		JB_Date__Sleep(1);
 	}
 
+	JB_FEPDWEE_Middle(*Sh);
 	JB_FEPDWEE_Finish(*Sh);
 	int Exit = Sh->Exit;
 	if (Sh->ErrorOutput->Length and !FSErrIn) {
