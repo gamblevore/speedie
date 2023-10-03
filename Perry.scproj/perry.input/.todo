@@ -7,6 +7,10 @@
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
 * can't build cloc a second time
+* speed up the sleep system...
+	* also lower delay before sending the msg.
+	* "too many disconnections"?? it didnt even mark one!
+* rightclick on the function/syntax should count as clicking on the name
 
 
 // Perry NOW
