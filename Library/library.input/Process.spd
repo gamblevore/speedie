@@ -635,24 +635,6 @@ class Process (ProcessOwner)
 			return n[s, s2+1]
 		
 		
-		function InstallCloseProcesses
-			require !.ClosePipesInstalled
-			.ClosePipesInstalled = 1
-			app <~ CloseProcesses
-		
-		
-		function CloseProcesses (fn_app_deathaction)
-			"closing all process connections"
-			|| f = processowner.first
-			while f
-				if f isa process
-					if f.IsServer
-						f.KillButOK
-					  else
-						f.disconnect
-				f++
-		
-		
 		target !minilib
 			helper TellParentIDied
 				opt norefcounts
