@@ -1315,13 +1315,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1901])
+#define kJB__ErrorColors_bold (JB_LUB[1899])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1902])
-#define kJB__ErrorColors_good (JB_LUB[1903])
-#define kJB__ErrorColors_normal (JB_LUB[1904])
-#define kJB__ErrorColors_underline (JB_LUB[1903])
-#define kJB__ErrorColors_warn (JB_LUB[1905])
+#define kJB__ErrorColors_error (JB_LUB[1900])
+#define kJB__ErrorColors_good (JB_LUB[1901])
+#define kJB__ErrorColors_normal (JB_LUB[1902])
+#define kJB__ErrorColors_underline (JB_LUB[1901])
+#define kJB__ErrorColors_warn (JB_LUB[1903])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1499,7 +1499,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_BitAnd (JB_LUB[356])
 #define kJB_BitNot (JB_LUB[606])
 #define kJB_BitOr (JB_LUB[560])
-#define kJB_BitXor (JB_LUB[1906])
+#define kJB_BitXor (JB_LUB[1904])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_DontSaveProperty (0)
 #define kJB_EndsBlock (1024)
@@ -1517,7 +1517,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_SaveProperty (1)
 #define kJB_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1907])
+#define kJB_SaverStart1 (JB_LUB[1905])
 #define kJB_SelfDebug (2)
 #define kJB_SelfReplace (1)
 #define kJB_SimpleMatch (1 << 22)
@@ -1593,6 +1593,7 @@ extern Syntax JB_SyxXML;
 extern Syntax JB_SyxXPI;
 extern Syntax JB_SyxXTxt;
 extern Syntax JB_SyxYoda;
+extern Date JB_TimeDelayBug;
 extern SCDecl* JB_TrueBool;
 extern SCClass* JB_TypeArray;
 extern SCClass* JB_TypeBool;
@@ -2039,6 +2040,38 @@ extern NilTest* SC__NilTest_n1;
 extern NilTest* SC__NilTest_x1;
 extern NilTest* SC__NilTest_x2;
 extern JB_String* SC__NilTest_x3;
+#define kJB__PID_SIGABRT (6)
+#define kJB__PID_SIGALRM (14)
+#define kJB__PID_SIGBUS (10)
+#define kJB__PID_SIGCHLD (20)
+#define kJB__PID_SIGCONT (19)
+#define kJB__PID_SIGEMT (7)
+#define kJB__PID_SIGFPE (8)
+#define kJB__PID_SIGHUP (1)
+#define kJB__PID_SIGILL (4)
+#define kJB__PID_SIGINFO (29)
+#define kJB__PID_SIGINT (2)
+#define kJB__PID_SIGIO (23)
+#define kJB__PID_SIGKILL (9)
+#define kJB__PID_SIGPIPE (13)
+#define kJB__PID_SIGPOLL (7)
+#define kJB__PID_SIGPROF (27)
+#define kJB__PID_SIGQUIT (3)
+#define kJB__PID_SIGSEGV (11)
+#define kJB__PID_SIGSTOP (17)
+#define kJB__PID_SIGSYS (12)
+#define kJB__PID_SIGTERM (15)
+#define kJB__PID_SIGTRAP (5)
+#define kJB__PID_SIGTSTP (18)
+#define kJB__PID_SIGTTIN (21)
+#define kJB__PID_SIGTTOU (22)
+#define kJB__PID_SIGURG (16)
+#define kJB__PID_SIGUSR1 (30)
+#define kJB__PID_SIGUSR2 (31)
+#define kJB__PID_SIGVTALRM (26)
+#define kJB__PID_SIGWINCH (28)
+#define kJB__PID_SIGXCPU (24)
+#define kJB__PID_SIGXFSZ (25)
 extern Array* SC__Imp_AllFiles;
 extern SCImport* SC__Imp_Curr;
 extern Date SC__Imp_Recent;
@@ -2068,7 +2101,7 @@ extern MaterialsLol* SC__MaterialsLol_Wood;
 extern byte JB__Proc_ClosePipesInstalled;
 extern int JB__Proc_IncID;
 extern Process* JB__Proc_Owner_;
-#define kJB__Proc_PrintWaiting (2)
+#define kJB__Proc_PrintAfterSomeTime (2)
 extern byte JB__Proc_SpecialState;
 extern bool SC__Base_ConstantsLoadingOverride;
 extern SCModule* SC__Base_CurrModule;
@@ -4629,9 +4662,9 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* self);
 
 
 // JB_IPCMessage
-bool JB_IPCM_Closed(IPCMessage* self);
-
 byte* JB_IPCM_Data(IPCMessage* self);
+
+bool JB_IPCM_IsClosed(IPCMessage* self);
 
 bool JB_IPCM_IsOpen(IPCMessage* self);
 
@@ -6547,8 +6580,6 @@ bool JB_Proc_CanSend(Process* self);
 
 bool JB_Proc_ChildAlive(Process* self);
 
-bool JB_Proc_Closed(Process* self);
-
 void JB_Proc_Constructor(Process* self, JB_String* name, int n, Array* params, fn_subprocess sub, bool TrapStdOut);
 
 void JB_Proc_Destructor(Process* self);
@@ -6565,6 +6596,8 @@ Message* JB_Proc_Get(Process* self, Date TimeOut);
 
 Message* JB_Proc_GetSub(Process* self, Date TimeOut);
 
+bool JB_Proc_IsClosed(Process* self);
+
 bool JB_Proc_IsOpen(Process* self);
 
 void JB_Proc_Log(Process* self, JB_String* s);
@@ -6572,6 +6605,8 @@ void JB_Proc_Log(Process* self, JB_String* s);
 void JB_Proc_LogMsg(Process* self, JB_String* msg);
 
 void JB_Proc_LogUs(Process* self);
+
+void JB_Proc_MarkClosed(Process* self);
 
 void JB_Proc_OpenSharedMemory(Process* self, int n);
 
@@ -6582,8 +6617,6 @@ JB_String* JB_Proc_OurName(Process* self, bool us);
 bool JB_Proc_ParentAlive(Process* self);
 
 void JB_Proc_ProcessDied(Process* self);
-
-void JB_Proc_RefillOpen(Process* self);
 
 JB_String* JB_Proc_Render(Process* self, FastString* fs_in);
 
@@ -6621,9 +6654,7 @@ void JB_Proc_UpdateStdOut(Process* self);
 
 void JB_Proc_UseDummy(Process* self);
 
-int JB_Proc_Wait(Process* self, Date wait);
-
-bool JB_Proc_WaitFor(Process* self, Date TimeOut, bool Send);
+bool JB_Proc_WaitFor(Process* self, Date TimeOut, bool ModeIsSend);
 
 void JB_Proc_WriteSub(Process* self);
 
@@ -8940,7 +8971,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1529])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1527])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
