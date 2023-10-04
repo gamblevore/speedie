@@ -170,6 +170,7 @@ JB_StringC*	JB_App__CalledBy()				{ return JB_StrC(App_CalledBy); }
 void	JB_LibShutdown()					{ JB_MemFree(JB_MemStandardWorld()); }
 bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
 bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
+void    JB_DefaultSignals();
 void	JB_SP_AtExit() {
 	JB_FinalEvents();
 }
@@ -186,8 +187,7 @@ int JB_LibInit (_cstring* R) {
         return ENOMEM;
 	if (R) {
 		App_CalledBy = *R;
-		signal(SIGCHLD, JB_SigChild); // this might be a problem when used as a lib.
-									  // better to find THEIR existing lib func and call it after we are done!
+		JB_DefaultSignals();
 		#ifndef AS_LIBRARY
 			void JB_App__CrashInstall();
 			JB_App__CrashInstall();

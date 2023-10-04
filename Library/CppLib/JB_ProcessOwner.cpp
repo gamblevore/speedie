@@ -4,6 +4,7 @@
 
 
 #include "JB_Umbrella.hpp"
+#include <unistd.h>
 
 
 extern "C" {
@@ -23,6 +24,11 @@ static void AddLostChild_(int PID, int Exit) {
 	}
 }
 
+
+uint SignalsReceived;
+void JB_SigMsgReceived(int signum) {
+	SignalsReceived++;
+};
 
 void JB_SigChild (int signum) {
 	if (!JB_PID_Next(&Root)) return;
@@ -82,6 +88,29 @@ ProcessOwner* JB_PID_Next(ProcessOwner* self) {
 
 ProcessOwner* JB_PID__First() {
 	return (ProcessOwner*)Root.Next;
+}
+
+int JB_PID_Signal(ProcessOwner* self, int sig) {
+	int PID = self->PID;
+	if (!PID) PID = getpid();
+	return kill(PID, sig);
+}
+
+
+typedef void (*SignalHandler)(int Sig);
+
+static void TrySetSig(int S, SignalHandler H) {
+	struct sigaction Found;
+	int Err = sigaction(S, 0, &Found);
+	if (!Found.sa_handler) {
+		signal(S, H);
+	}
+}
+
+void JB_DefaultSignals() {
+	TrySetSig(SIGUSR1, JB_SigMsgReceived);
+	TrySetSig(SIGCHLD, JB_SigChild); // this might be a problem when used as a lib.
+									 // better to find THEIR existing lib func and call it after we are done!
 }
 
 

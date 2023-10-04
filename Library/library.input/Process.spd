@@ -78,13 +78,13 @@ class Process (ProcessOwner)
 		if s
 			fs <~ s
 			fs <~ '\n'
-		fs <~ "talk: ${.talker.path}, name: ${.name}\n"
+		fs  <~  "talk: ${.talker.path}, name: ${.name}\n"
 		if .orig != .DummyOrig
 			fs <~ "ipc is open: ${.SizeOfOrig}\n"
 		  else
 			fs <~ "ipc not open.\n"
 
- 
+
 	render
 		.reportconnection("", fs)
 
@@ -95,8 +95,8 @@ class Process (ProcessOwner)
 
 	render ReportState (|string| s = "")
 		.ReportConnection(s, fs)
-		|| S1 = .ours.sendid
-		|| R2 = .theirs.readid
+		|int| S1 = .ours.sendid
+		|int| R2 = .theirs.readid
 		
 		fs <~ "(Us == '"
 		fs <~ .OurName
@@ -131,13 +131,12 @@ class Process (ProcessOwner)
 		if (.orig|uint64| & 31)
 			error (Self, "IPC-memory allocation not 32-aligned") // does it need to be?
 		if !.orig
-			debugger
 			error (self, "can't open ipc")
 			.orig = d
 			.SizeOfOrig = 0
 		return .SizeOfOrig
 
-		
+
 	helper SetupAdjust (|int| n)
 		.writer.reserved = n - (–sizeof IPCMessage)
 		
@@ -145,19 +144,19 @@ class Process (ProcessOwner)
 		.ours		= (.orig + n* b)|&IPCMessage|
 		.theirs		= (.orig + n*!b)|&IPCMessage|		
 		.writer.resultptr = .ours.data
-	
-	
+
+
 	helper OurName (|bool| us=true, |string|)
 		if .IsServer == us
 			return "Parent " + .name
 		  else 
 			return "Child  " + .name
 
-		
+
 	helper TheirName (|string|)
 		return .OurName(false)
-	
-	
+
+
 	helper OpenSharedMemory (|int| n)
 		.UseDummy
 		n = .SetupAlloc(n) #require
@@ -168,23 +167,24 @@ class Process (ProcessOwner)
 	helper SetupServerState
 		if ._StdOut
 			._StdOut.Length = 0
-		if .IsServer
-			memory.zero(.orig, .SizeOfOrig)
-			is Connecting
-			.ours.special = process.SpecialState
-		  else
+		if !.IsServer
 			expect (.theirs.state) (self, "MemorySharingFailed.")
 			is Connected
-	
-	
+			return
+
+		memory.zero(.orig, .SizeOfOrig)
+		is Connecting
+		.ours.special = process.SpecialState
+
+
 	function IsOpen (|bool|)
-		return !.closed
+		return !.Isclosed
 
 
-	function Closed (|bool|)
-		if  (self == nil)  or  .ours.closed
+	function IsClosed (|bool|)
+		if  (self == nil)  or  .ours.isclosed
 			return true
-		if .theirs.closed
+		if .theirs.isclosed
 			is closed
 			return true
 
@@ -215,84 +215,72 @@ class Process (ProcessOwner)
 	helper Alive (|bool|)
 		if self != nil
 			return (.ChildAlive, .ParentAlive)(.isserver)
-
-
-	helper Wait (|date| wait, |int|)
-		if wait < 1
-			return wait + 2
-		wait <<= 1
-		if wait > 0.05s
-			wait = 0.05s
-			if !.Alive
-				.self "connection died during wait"
-				return nil
-		app.sleep(wait)
-		return wait
-
-
-	function RefillOpen
-		if .theirs.IsOpen
-			is connected
 	
 
-	function WaitFor (|date| TimeOut, |bool| Send, |bool|)
+	function WaitFor (|date| TimeOut, |bool| ModeIsSend, |bool|)
 		|| now			= date.now
 		|| FinalDate	= now + timeout
-		|| print_time	= now + 5s + (.canprint<PrintWaiting) * 1000years
-		|| wait			= 1 - 2KB
-
-		while wait
-			if !send
+		|| print_time	= now + 500_000years
+		if (.pid and .CanPrint >= PrintAfterSomeTime)
+			print_time = now + 5s
+		|| ModeIsGet = !ModeIsSend
+		|date| SleepAmount = -(1s/640)
+		
+		while
+			if ModeIsGet // we are looping get, so lets also send backedup items
 				.flush
-
-			if .found(send)
-				.RefillOpen
+			if .found(ModeIsSend)
+				if .theirs.IsOpen
+					is connected // refill
 				return true
-			if !.theirs.isopen
+
+			if .theirs.isclosed
 				.other "closed connection"
 				exit
-			if wait > 0
-				now = date.now
-				if timeout and now > FinalDate
-					if !send
-						.other "timed out", is timedout, debugger
-					return false
-				if .pid and now > print_time
-					.self "waiting...", print_time += 5s
 
-			  elseif wait == 1-2KB
-				.Alive
-				require Timeout > 0 //  no point waiting... if its not instant
+			require  .Alive
 
-			wait = .wait(wait)
+			now = date.now
+			if now > FinalDate
+				if timeout and ModeIsGet
+					is timedout
+					.other "timed out" 
+				return false
+
+			if  now > print_time
+				.self "waiting...",  print_time += 5s
+
+			if SleepAmount <= 0
+				SleepAmount++
+			  elseif SleepAmount < 1s/32
+				SleepAmount <<= 1
+
+			app.TrySleep(SleepAmount)
+			
+
+		.MarkClosed
+		.self "WaitFor ended"
+	
+	
+	function MarkClosed
 		if (.Ours.State < IPCState.closed)
 			is closed
-		.self "WaitFor ended"
-
-
+	
+		
 	helper ParentAlive (|bool|)
 		if app.ParentID > 1
 			return true
 		.other "died"
-		debugat
+
 
 
 	helper ChildAlive (|bool|)
-		opt norefcounts
 		if .subprocess
-			return !.closed
+			return .IsOpen
 
-		|| AmAlive = true
-		|| m = processowner.first
-		while m
-			|| ch = m
-			m++
-			if ch.exit >= 0
-				if ch == self
-					AmAlive = false
-				if ch isa process
-					ch.ProcessDied
-		return AmAlive
+		if .exit < 0
+			return true
+		.processdied
 
 
 	syntax append (|string| str, |date| TimeOut=0, |bool|)
@@ -306,11 +294,11 @@ class Process (ProcessOwner)
 			.SendQueue.first = msg
 			msg = p
 		require msg
+		|| t = date.now
+		
+		//printline "TDB: ${t-TimeDelayBug}"
 		msg.renderjbin(.writer)
-		target debug
-			|| reparse = string.copy(.ours.data, .writer.length).parsejbin
-			if !reparse // sigh. still? i guess we just leave this in then
-			(reparse)
+		
 		.WriteSub
 
 
@@ -325,7 +313,7 @@ class Process (ProcessOwner)
 			.Disconnect
 		  elseif !msg
 			0 //
-		  elseif .Closed
+		  elseif .IsClosed
 			.other("sent something to a closed parent.")
 		  elseif (.ours.queued < 255) and .sendqueue
 			.SendQueue.first(msg)
@@ -353,10 +341,11 @@ class Process (ProcessOwner)
 
 	helper WriteSub
 		.self "sending"
-		expect (!.writer.failed) (self, "Message too long")
+		expect (!.Writer.failed) (self, "Message too long")
 		|| sp = .ours
 		sp.datalength = .writer.length
 		sp.SendID++
+		.SendSignal(ProcessOwner.SIGUSR1)
 		.LastSend = date.now
 		.writer.length = 0
 		.UpdateStdOut
@@ -384,31 +373,19 @@ class Process (ProcessOwner)
 	
 	function ProcessDied
 		.theirs.state = ipcstate.Dead // IS DEAD?
-		if !.isserver
-			printline app.path + " died"
-			app.printstacktrace
-			app.quit(-1)
-		.unregister
-		.DiedCount++
 		.Disconnect
+		if !.isserver
+			app.quit(-1)
+		.DiedCount++
+		.self "died"
 		.pid = 0
 
-
-	function Close
-		if .IsServer
-			.KillButOK
-		  else
-			.disconnect
-		.dispose
-
 	
-	function KillButOK
-		.KillSub(true)
 	function KillCosFailed
-		.KillSub(false)
+		.KillButOK(false)
 
 
-	helper KillSub (|bool| OK)
+	helper KillButOK (|bool| OK=true)
 		if .pid
 			if !OK
 				.diedcount++
@@ -493,9 +470,8 @@ class Process (ProcessOwner)
 		.dummy.state = ipcstate.closed
 
 
-	function Disconnect
-		|| s = .SendQueue$ // called after dispose?
-		s.clear
+	function Disconnect 
+		.unregister
 		.UpdateStdOut
 		if self isnt closed
 			.self "disconnect"
@@ -504,6 +480,8 @@ class Process (ProcessOwner)
 			.usedummy
 		  else
 			.unmap
+		|| s = .SendQueue // called after dispose?
+			s.clear
 
 
 	function FailedConnect (|bool|)
@@ -545,16 +523,17 @@ class Process (ProcessOwner)
 
 
 	function CanActivate (|bool|)
-		expect .diedcount < .deathlimit (self, "Too many disconnections, blocking reconnection.")
-		return true
+		if .diedcount < .deathlimit
+			return true
+		error (self, "Too many disconnections, blocking reconnection.")
 	
 	
 	function Activate (|bool|)
-		if !.closed
+		if .IsOpen
 			return true
 		debug_require .IsServer
 		if .pid
-			.killsub(false)
+			.KillButOK(false)
 		if .CanActivate
 			if !.path
 			expect (.path) (self, "Can't re-activate process ${.name} without a path.")
@@ -597,7 +576,7 @@ class Process (ProcessOwner)
 
 
 	constants
-		PrintWaiting = 2
+		PrintAfterSomeTime = 2
 
 
 	module
@@ -605,6 +584,16 @@ class Process (ProcessOwner)
 		|byte|							SpecialState = 0
 		|Process|						Owner_ = nil
 		|int|							IncID
+
+		function CheckAllAlive
+			opt norefcounts
+			|| m = processowner.first
+			while m
+				|| ch = m
+				m++
+				if (ch.exit >= 0) and ch isa process
+					ch.ProcessDied
+		
 
 		function BackTrace (|&_voidptr| space, |&int| size, |&cstring|) 
 			cpp_wrapper JB_BackTrace
@@ -640,8 +629,8 @@ class Process (ProcessOwner)
 
 
 		function string.IPCName (|string|)			//		/tmp/shm/1111PERRY9999
-			|| n = .name
-			|| s = n.find(jeebox.CSWordStart)
+			|| n  = .name
+			|| s  = n.find(jeebox.CSWordStart)
 			|| s2 = n.find(jeebox.CSWordStart, int.max, 0)
 			return n[s, s2+1]
 		
@@ -657,8 +646,10 @@ class Process (ProcessOwner)
 			|| f = processowner.first
 			while f
 				if f isa process
-					f.unregister
-					f.close
+					if f.IsServer
+						f.KillButOK
+					  else
+						f.disconnect
 				f++
 		
 		
@@ -727,7 +718,7 @@ struct IPCMessage
 	|byte|						Queued
 	|byte|						Special
 
-	function Closed (|bool|)
+	function IsClosed (|bool|)
 		return !.isopen
 
 	function IsOpen (|bool|)
@@ -739,4 +730,7 @@ struct IPCMessage
 	function DebugIPC (|string| msg)
 		disabled 
 		printline "${msg} state: ${.datalength|int|}, ${.sendid|int|}, ${.readid|int|}, ${.state|int|}, ${.queued|int|}, ${.Special|int|}" 
+
+
+|date| TimeDelayBug
 

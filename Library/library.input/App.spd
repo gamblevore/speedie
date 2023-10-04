@@ -13,12 +13,18 @@ module App {
 |file|						_stdin
 |string|					codesign_native = "codesign_osx"
 
-function Sleep (|float| Duration=1)
+function Sleep (|float| Duration)
 	.sleep(duration.date)
 
 function Sleep (|Date| Duration=1s)
 	cpp_wrapper JB_Date__Sleep
 
+function TrySleep (|date| Duration=1s, |bool|)
+	cpp_wrapper JB_Date__TrySleep
+	
+function TrySleep (|float| Duration, |bool|)
+	return .trysleep(duration.date)
+	
 syntax access (|int| i, |string|)
 	if .args > i
 		return .args[i]

@@ -147,7 +147,9 @@ extend PerryIDE
 	
 	function CancelCompile 
 		.DebugIsWaitingForCompile = false
-		.compilr.KillButOK? // frees memory
+		if .compilr
+			.compilr.KillButOK // frees memory
+			.compilr = nil
 		(.buildbutton is enabled)
 		(.runbutton is enabled)
 		(.progress isnt visible)

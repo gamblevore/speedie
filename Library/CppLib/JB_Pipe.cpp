@@ -168,6 +168,7 @@ int JB_Kill(int PID) {
 }
 
 
+
 const char* _StartProcess (JB_String* self, const char** argv, Array* Args, int* childpipe, int& PID) {
 	if (!JB_Str_Length(self)) {
 		return "received empty-path";
@@ -183,7 +184,6 @@ const char* _StartProcess (JB_String* self, const char** argv, Array* Args, int*
 		fcntl(childpipe[0], F_SETFL, O_NONBLOCK);
 	}
 
-	signal(SIGCHLD, JB_SigChild);
 	PID = fork();
 	
 	if (PID == -1)

@@ -617,11 +617,14 @@ module SDLApp
 		require .SingleFrameNest <= 2
 		.SingleFrameNest++
 
+		process.CheckAllAlive
+		
 		|| occured = .PreFrame
 		.ClearAlerts
 		.HandleAppResize
 		.PostLoads
 		occured |= .FrameAndEvents
+		
 		.FrameUpdatesAndResize
 		ifn Occured is Exiting
 			.PutDialogsInFront
@@ -635,7 +638,7 @@ module SDLApp
 
 
 	function CheckQuarantine
-		if platform.osx and app.isquarantined
+		if platform.osx and app.isQuarantined
 			sdlapp.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
 
 
@@ -969,6 +972,7 @@ module SDLApp
 			#!keydown!
 			|| kev = ev.keysym
 			|| key = kev.sym
+			//TimeDelayBug = date.now()
 
 			if key.IsCancelled or .CanDrag >= 2
 				return SDLActivity.nothing
@@ -1105,3 +1109,4 @@ datatype SDLCloseReason (uint)
 		  else
 			return (self|int| &~ act|int|)|SDLCloseReason|
 			
+

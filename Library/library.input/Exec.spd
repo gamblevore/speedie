@@ -30,38 +30,6 @@ module Pipe
 
 
 
-class ProcessOwner
-	linkage
-		wrapper
-		cpp_part PID
-	contains ProcessOwner
-	
-	|int| 				Exit
-	|ProcessOwner--|	_Next
-	|ProcessOwner--|	_Prev
-	|PID_Int| 			PID
-	
-	constructor
-		cpp_wrapper JB_PID_Constructor
-		
-	destructor
-		cpp_Wrapper JB_PID_Destructor
-	
-	function Register
-		cpp_wrapper JB_PID_Register
-
-	function UnRegister
-		cpp_wrapper JB_PID_UnRegister
-	
-	function Next (|ProcessOwner|)
-		cpp_wrapper JB_PID_Next
-	
-	module
-		function First (|ProcessOwner|)
-			cpp_wrapper JB_PID__First
-
-
-
 datatype PID_Int (int)
 	syntax cast (|bool|)
 		return self > 0

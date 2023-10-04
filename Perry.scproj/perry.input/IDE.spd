@@ -372,7 +372,7 @@ class PerryIDE (Window)
 				if c is dead
 					.CrashedFB(c)
 				c.Disconnect
-			  elseif (c.closed)
+			  elseif (c.IsClosed)
 				.CancelCompile
 		c = .feedback
 		if c != nil and C is dead
@@ -766,7 +766,7 @@ So anything not 0 means "its OK"`
 		
 		.popuphide
 		.AddToJumpHistory
-		if !g and .IsEditingSource and .feedback.closed
+		if  !g  and  .IsEditingSource  and  .feedback.IsClosed
 			.Recheck
 		.DuringLoad--
 		

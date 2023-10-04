@@ -12,6 +12,7 @@ extern "C" {
 	uint64 JB_Date_TimeID (Date Time);    
 	Date JB_Date__Create( u64 S, u64 NS );
     void JB_Date__Sleep(Date Time);
+    bool JB_Date__TrySleep (Date Time);
     Date JB_Date__Now( );
 }
 
