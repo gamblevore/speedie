@@ -557,6 +557,7 @@ int JB_Init_() {
 	{
 		JB_SetRef(JB_StdErr, JB_Rec__New());
 		JB_SetRef(JB_StdErrOriginal, JB_StdErr);
+		JB_TimeDelayBug = 0;
 		JB_SetRef(JB__JbinHeader, JB_LUB[60]);
 		JB_SetRef(JB__jBinNotJbin, JB_LUB[61]);
 		JB_SetRef(JB__SyxDict_, JB_Dict__New());
@@ -8022,7 +8023,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023100222);
+	return (2023100421);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
@@ -8034,4 +8035,4 @@ __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -4845594019514234813 436914444137931543 4433743178191451108
+// -4845594019514234813 8622592083955314744 5667782042990923020

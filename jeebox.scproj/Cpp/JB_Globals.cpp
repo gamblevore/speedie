@@ -99,6 +99,7 @@ __lib__ Syntax JB_SyxXML;
 __lib__ Syntax JB_SyxXPI;
 __lib__ Syntax JB_SyxXTxt;
 __lib__ Syntax JB_SyxYoda;
+Date JB_TimeDelayBug;
 JB_String* JB__Tk_Data;
 bool JB__Tk_DotInsertAllow;
 Message* JB__Tk_EndOfLineMarker;
