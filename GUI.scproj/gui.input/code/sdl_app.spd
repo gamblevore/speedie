@@ -572,6 +572,7 @@ module SDLApp
 	
 	helper DrawSub (|window| w)
 		if w.IsViewable
+			.DrawSpace.window = w
 			w.__draw__(.DrawSpace)
 	
 	

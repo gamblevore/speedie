@@ -213,14 +213,9 @@ class Window (GUIControl)
 	
 	
 	behaviour Draw
-		.DrawBackground(where)	
-		.DrawContents(where)
-	
-	
-	function DrawBackground (|image| where)
 		where.window = self
-		if .gnormal
-			where.fill(.gnormal) // background
+		where.drawrect(.lastrect, .gnormal)
+		.DrawContents(where)
 	
 	
 	function DrawContents (|image| where)

@@ -142,7 +142,7 @@ class ColorScheme
 		|| C2 = .BGCorners[2]
 		|| C3 = .BGCorners[3]
 		if c0 == c1 and c2 and c3
-			where.fillrect(where.rect, c0)
+			where.fillrect(where.controlclip, c0)
 		  else
 			|| scale = (2.0, 2.0)/(where.size.vec2)		// interpolate these... sigh.
 			for (P in where) (v) 

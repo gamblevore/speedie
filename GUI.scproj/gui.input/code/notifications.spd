@@ -78,7 +78,7 @@ module Notifications
 		opt norefcounts
 		for w in .Alerts
 			if .DrawSlide(w)
-				w.__Draw__(sdlapp.DrawSpace)
+				w.__draw__(sdlapp.DrawSpace)
 			  else
 				w.remove
 
