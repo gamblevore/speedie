@@ -207,15 +207,15 @@ class TextView (GUIControl)
 
 	function EditClick (|ivec2| p, |int| clicks, |bool| CmdKey)
 		|textviewline| d
-		|| bs = .byteatxy(p, d)
+		|| bs = .ByteAtXY(p, d)
 		|| b = bs.x
-		if !cmdkey and !clicks and .selrange contains b
+		if !cmdkey  and  !clicks  and  .SelRange contains b
 			return
 		
 		ifn .lastrect.vert contains p.y
 			.ViewPos(b)
 		
-		|| t = .uncorrectedsel
+		|| t = .UncorrectedSel
 		if keys.shift or (clicks == -1)
 			t.x2 = b
 		  else
@@ -580,6 +580,7 @@ class TextView (GUIControl)
 				if key is tab:			return .FinishEditing
 			if key.IsAccept:			return .NewLine
 			if key is left:				return .MoveSel(-1)
+			if key is section:			return .SectionKey
 			if key is right:			return .MoveSel(1)
 			if key is LEFTBRACKET:		return .tabIndent(-1, "\t")
 			if key is RIGHTBRACKET:		return .TabIndent(1, "\t")
@@ -610,7 +611,10 @@ class TextView (GUIControl)
 		.sel = (0, .text.length)
 		return true
 	
-	
+	helper SectionKey (|bool|)
+		(.onclicked)(self, -2)?
+		return true
+		
 	helper DoCut (|bool|)
 		.docopy
 		.Insert("")
@@ -1112,6 +1116,8 @@ class TextView (GUIControl)
 			input = "|"
 		  elseif input == "|"
 			input = "\\"
+		  elseif (input == "§") and !(keys.option or keys.shift)
+			return false
 		if input.length == 1
 			if (.onkeydown)(self, input.codepoint)?
 				return true

@@ -6,18 +6,18 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * constants and globals don't autocomplete nicely
-* Drawing black sometimes (winsize change)
-* delay on moving across tab buttons?
-* lower delay before sending msgs... time the keyboard key press... and the time the msg is sent
-* rightclick on the function/syntax should count as clicking on the name
-	* § is a specialkey :)
 
+* external reloads shouldn't reset scroll position
 
 // Perry NOW
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
 	* pasting line-jumping acts different than typing line-jumping
 
+
 // Perry Do later
+* Drawing black sometimes (winsize change)
+	* draw seems to have a delay at least for pressing the mouse button?
+	* lower delay before sending msgs... time the keyboard key press... and the time the msg is sent
 * can't find "operatorvs" on message
 // even later
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.

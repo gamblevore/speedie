@@ -372,15 +372,15 @@ class Window (GUIControl)
 				return Found
 	
 	function ClearFocus
-		.setfocus(nil)
+		.SetFocus(nil)
 	
 	behaviour MouseWheel
 		opt norefcounts
-		|| it = .openedmenu
-			return it.__mousewheel__(P, direction)
+		|| it = .OpenedMenu()
+			return it.__MouseWheel__(P, direction)
 			
-		|| R = self[sdlapp.mousexy]
-			R.__mousewheel__(P, direction)
+		|| R = self[sdlapp.MouseXY]
+			R.__MouseWheel__(P, Direction)
 		return true
 	
 	
@@ -464,7 +464,7 @@ struct SDL_Texture
 
 
 function window.MouseXY (|ivec2|)
-	return sdlapp.mousexy - .lastrect.xy
+	return sdlapp.MouseXY - .lastrect.xy
 
 
 function guicontrol.MouseXY (|ivec2|)

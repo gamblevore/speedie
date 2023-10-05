@@ -377,10 +377,16 @@ function message.CommandIsOK (|bool|)
 	
 	
 function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
+	|| spd_func = where.owningfunc
+	if spd_Func == where
+		|| thg = where.first
+		if thg == @dot or @thg
+			where = thg
 	|| pp = where.parent$
 	|| ppp = pp.parent
 	|| Jump = 0
-	|| spd_func = where.owningfunc
+		
+	if spd_func
 		if cmd != "callfrom"
 			if where == @thg
 				if pp == @dot and ppp == spd_func

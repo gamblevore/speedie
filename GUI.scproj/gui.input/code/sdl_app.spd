@@ -183,7 +183,9 @@ module SDLApp
 		
 	
 	function Touch (|guicontrol| modified=nil)
-		.TouchCount := 1
+		.TouchCount := 2	// 2 cos we have a draw bug that seems to delay draws by 1 frame?
+							// the draw is being DONE... but not getting to the screen somehow
+							// even though I'm telling it to
 
 	
 	function Resized (|guicontrol| modified=nil)
@@ -196,7 +198,7 @@ module SDLApp
 	
 	
 	helper IsTyping (|bool|)
-		return .event.type is textinput or keydown
+		return .event.type is TEXTINPUT or KEYDOWN
 
 
 	function RunAndQuit (|GUIApplicationInit| fn=nil, |object| Anything=nil,  |ivec2| size=(414, 256))
@@ -205,10 +207,10 @@ module SDLApp
 		
 		.Init(size)
 		(fn)(anything)?
-		app.clearcaches
+		app.ClearCaches
 		while .SingleFrame
 			0
-		.quit
+		.Quit
 
 	
 	helper PostLoads
@@ -374,6 +376,7 @@ module SDLApp
 	
 	
 	helper TrySelectorFlash
+//		return
 		if !.IsBackground and (sdlapp.ChangeSelFlash.fired)
 			.FlashSelector = !.FlashSelector
 			.Touch
@@ -407,16 +410,18 @@ module SDLApp
 			return .Tooltip.name
 	
 	
-	helper FrameAndEvents (|sdlactivity|)		
+	helper FrameAndEvents (|sdlactivity|)	
 		while .Event.Poll
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
+		//"B".PrintTime
 		if .WantsQuit
 			rz |= .TryQuit
 		if .NewSize
 			rz |= SDLActivity.activity
 
-		if .TouchCount and .LastFramedate.ago >= .naptime
+		if .TouchCount // and .LastFramedate.ago >= .naptime // this isn't the problem...
+			//"C".PrintTime
 			.TouchCount--
 			rz |= SDLActivity.activity
 
@@ -585,7 +590,9 @@ module SDLApp
 		.lastframedate = date.now
 		|| w1 = .DrawWinFrom		#require
 		.StartFrame(.Raw)
-			
+		
+		//"D".PrintTimeEnd
+		
 		while w1
 			.DrawSub(w1)
 			w1 = w1.next as window // :O
@@ -679,8 +686,8 @@ module SDLApp
 	function StartFrame (|&SDL_Texture| T)
 		opt norefcounts
 		|| stride = 0
-		|| Where = &(.DrawSpace._ptr)
-		t.lockThatZerosEventhoughItShouldnt(nil, where|&_voidptr|, &stride)
+		|| bytes = &(.DrawSpace._ptr)
+		t.lockThatZerosEventhoughItShouldnt(nil, bytes|&_voidptr|, &stride)
 
 	
 	function EndFrame (|&SDL_Texture| T)
@@ -1117,4 +1124,27 @@ datatype SDLCloseReason (uint)
 		  else
 			return (self|int| &~ act|int|)|SDLCloseReason|
 			
+
+|date| FirstTime
+function string.PrintTime
+// we got PrintTimeEnd fast enough... but we seem to be 1 frame behind??
+	require FirstTime
+	|| n = date.now
+	|| diff = n - firsttime
+	require diff < 1s
+	"$self  ${(n - FirstTime)}"
+
+
+function string.PrintTimeStart
+	|| n = date.now
+	FirstTime = n
+	""
+	"$self  0"
+
+function string.PrintTimeEnd
+	if FirstTime
+		.printtime
+		FirstTime = 0
+		beep
+
 

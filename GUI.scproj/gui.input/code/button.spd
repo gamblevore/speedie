@@ -93,6 +93,7 @@ class ButtonView (GUIControl)
 			.CurrOverItem = item
 			sdlapp.touch
 			(.onover)(self, state|int|, item)?
+			//"A".PrintTimeStart
 
 
 	function XOfItem (|listviewrow| row, |int|)
