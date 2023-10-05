@@ -1279,6 +1279,10 @@ datatype ivec2
 				yield curr
 				curr.x++
 			curr = (0,curr.y+1)
+			
+	module
+		function New (|int| x, |ivec2|)
+			return (x,x)
 
 
 

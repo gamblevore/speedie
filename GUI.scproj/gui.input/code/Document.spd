@@ -1,7 +1,7 @@
  
 
 // use the simplegraph instead...
-// this way... documents can have multiple viewers...
+// this way... document can have multiple viewers...
 // and viewers can have multiple documents... 
 // for example, a project has a something open.
 // i wonder how do we describe the strength of the link, though?
@@ -228,9 +228,14 @@ class Document (RingTree)
 			data = data.parse.render
 			
 		.filedate	= f.modified
-		if !ChangedExternal
+		|| OldPos = (0,0)
+		if ChangedExternal
+			|| c = .Current
+				OldPos = ivec2(.scrollpos)
+		  else
 			.clear
-		.AddState(data, nil)
+			
+		.AddState(data, OldPos)
 		.Original = .Current
 		.LoadedFromFile = true
 		return true
@@ -345,20 +350,22 @@ extend TextView
 		(.OnTextChanged)(self, Reason, ismod)?
 
 
-	function UseState (|DocumentState| L,  |document| D,  |ivec2| ty,   |int| Reason)
+	function UseState (|DocumentState| L,  |document| D,  |ivec2| ty,  |int| Reason)
 		require .parent
 		.UndoChecker = -1
 		if reason == DocumentState.UndoOrRedo
 			.ViewPos(ty.x)
-		.Clear(l.text, reason<0)
+		.Clear(l.text, reason < 0)
+		if (reason == 0) // or just always?
+			d.scrollpos = ty.x2
 		.TypingPlaceTry( ty, true, nil)
 
 		.GuessExpectsParse
 		|| pos = d.ScrollPos
-		if reason != DocumentState.UndoOrRedo and pos >= 2
+		if reason != DocumentState.UndoOrRedo  and  pos >= 2
 			.PrepareLinesOfText
 			if reason != DocumentState.typing 
-				.Goto(pos)
+				.viewpos(pos)
 		
 		.UpdateModState(d, reason)
 	

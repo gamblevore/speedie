@@ -465,6 +465,7 @@ class TextView (GUIControl)
 	// whats the difference even???? view/goto??? ooofff
 	// seem almost the same!
 	function Goto (|int| x)
+		disabled "unused?"
 		|| vis = .MaxVisibleLines
 		|| d   = .FindDrawInfo(x)
 			|| d2 = d.move(vis).move(-vis) // not too far
@@ -1648,8 +1649,14 @@ class TextView (GUIControl)
 		|| last = .lines.last.move(3 - .maxvisiblelines)
 		if d gt last
 			d = last
+		.ReallySetStart(d)
+	
+	
+	helper ReallySetStart (|textviewline| d)
 		._Start = d
 		.ShowNoExtra
+		if .document
+			.document.scrollpos = d.position
 			
 	
 	helper Clear (|string| NewText, |bool| KeepStart=false, |bool|)
@@ -1670,9 +1677,9 @@ class TextView (GUIControl)
 
 		require !Keepstart
 		.lines.clear
-		._Start = .AddVline
-		._start.position = -1
-		.ShowNoExtra
+		|| d = .AddVline
+		d.position = -1
+		.ReallySetStart(D)
 
 	
 	helper AddVline (|TextViewLine|)

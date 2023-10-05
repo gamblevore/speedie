@@ -5,9 +5,8 @@
 * VM? 
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
-* constants and globals don't autocomplete nicely
+* Constants and globals don't autocomplete nicely
 
-* external reloads shouldn't reset scroll position
 
 // Perry NOW
 * SelectedLine on startup is right at the top... so you can't see the lines above :(
