@@ -89,17 +89,21 @@ module SDLApp
 	function DocumentOpened  (|bool|Clear=true, |String|)
 		cpp_Wrapper JB_App__DocumentOpened
 		
+
 	function InitDelegates
 		cpp_Wrapper JB_App__InitStuff
+
 
 	function Screen (|ivec4|)
 		cpp_Part GetScreen
 		return (.ScreenOrig.vec4 / .scale).ivec4 	
 
+
 	function NativeWindow (|_voidptr|)
 		|SDL_SysWMinfo| data
 		.screenwindow.SDL_GetWindowWMInfo(data)
 		return data.window|_Voidptr|
+
 
 	function Alert (|string| msg, |string| title="")
 		cpp_part MsgBox
@@ -108,6 +112,7 @@ module SDLApp
 
 
 	function SelChanged
+		.FlashSelector = true
 		.ChangeSelFlash = 1
 
 
@@ -372,6 +377,8 @@ module SDLApp
 		if !.IsBackground and (sdlapp.ChangeSelFlash.fired)
 			.FlashSelector = !.FlashSelector
 			.Touch
+			if .ChangeSelFlash == 1
+				.FlashSelector = true
 			sdlapp.ChangeSelFlash = date.now + 1s
 
 
