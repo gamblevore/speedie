@@ -6,6 +6,7 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * Constants and globals don't autocomplete nicely
+* background in some windows is broken
 
 
 // Perry Do later

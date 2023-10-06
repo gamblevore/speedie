@@ -35,14 +35,15 @@ role PipeOwner (guicontrol)
 		|| R0	= R
 		|| gap	= random[75,  100 ,    12.5].floor
 		|| D	= (prevtop - r) * (100.0 / gap)
-		|| lim = 0.3
-		if D > lim			// too high up
-			R = PrevTop - (lim+0.05)
-		  elseif d < -lim	// too far down
-			R = PrevTop + (lim+0.05)
+//		|| lim  = 0.3
+//		if D > lim			// too high up
+//			R = PrevTop - (lim+0.05)
+//		  elseif d < -lim	// too far down
+//			R = PrevTop + (lim+0.05)
 		|| hg	= random[0.08, 0.13, 0.025, 2]
 		|| R1	= R - hg
 		|| R2	= (1.0-hg) - R
+
 
 		|| w = (gap)~after for 18
 		|| H = 256

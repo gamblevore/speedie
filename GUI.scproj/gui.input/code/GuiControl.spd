@@ -26,9 +26,9 @@ class GUIControl (ringtree)
 
 
 	constructor (|guicontrol| parent)
+		super.constructor(parent)
 		.id = ("", "root")(parent)
 		if parent
-			parent <~ self
 			.tabindex = parent.loadtabindex
 		.gnormal = drawstyle()
 
@@ -102,10 +102,10 @@ class GUIControl (ringtree)
 	helper LoadTabIndex (|uint16|)
 		opt norefcounts
 		|| w = .window
-		rz = w.tabindex + 1
-		if rz >= 0x10000
-			rz = 1
-		w.tabindex = rz
+			rz = w.tabindex + 1
+			if rz >= 0x10000
+				rz = 1
+			w.tabindex = rz
 
 
 	helper ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // resizecontrol, recalculatesize

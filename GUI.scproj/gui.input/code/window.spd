@@ -7,7 +7,7 @@ class Window (GUIControl)
 	|bool|							AlphaSubtle
 	|bool|							IsDialog
 	|bool|							BlockRecurseKeyDown
-	|GUIControl|					Focus   // For multi-windows?
+	|GUIControl|					Focus
 	|Guicontrol|					InnerFocus
 	|GUIControl|					CurrMouseDown
 	|GuiControl--|					SelBeforeMouseDown
@@ -24,7 +24,7 @@ class Window (GUIControl)
 	
 	
 	constructor (|ControlRect| Size = the~area)
-		super.constructor(nil)
+		super.constructor(window.all)
 		.size = Size
 		.createddate = date.now
 		.inlineeditorplace.init(self)

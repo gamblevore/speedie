@@ -101,7 +101,9 @@ class ButtonView (GUIControl)
 		require row and row isnt hidden
 		|| W = .ItemWidth
 		|| r = .items.first
-		while row
+		while r
+			if r == row
+				exit
 			if r isnt hidden
 				rz += w + .itemgap
 			r++

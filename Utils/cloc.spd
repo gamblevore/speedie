@@ -8,7 +8,7 @@ main
 	for path in app.args
 		|| dir = path.ExistingFile
 			dir.CountAll(true)
-	counts.report
+	counts.Report
 
 
 module Counts 
