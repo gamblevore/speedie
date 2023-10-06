@@ -34,7 +34,8 @@ class ColorScheme
 	
 	
 	constructor
-		.initcolors
+		.InitColors
+	
 	
 	function InitColors
 		.TextSelection.bg		<~ ((1.0, 0.25, 0.75, 0.5))
@@ -60,11 +61,13 @@ class ColorScheme
 		.menus.edge			= (1.0, 0, 1.0, 1.0).px
 		.menus.bg			= (0.0, 0.0, 0.0, 1.0).px
 		.menus.seps			= nil
-		.Menurowsel.solid	= (0.5, 0.5, 0.5, 0.65)
+		.MenuRowSel.solid	= (0.5, 0.5, 0.5, 0.65)
+
 	
 	setter BG (|vec3|)
 		for i in 4
 			.bgcorners[i] = (value, 1.0)
+
 
 	function Load (|message| s)
 		|| list = s..syx$
@@ -78,7 +81,7 @@ class ColorScheme
 
 
 	render SaveColors
-		fs.fieldenter("syx")
+		fs.FieldEnter("syx")
 		for i in @max|int|
 			|| obj = i|syntax|.obj
 				fs.field( obj.name, .SyxCol[i].render ) 
@@ -154,21 +157,20 @@ class ColorScheme
 
 
 
-
 function FixupColor (|message| self, |ind| pos, |message|)
 	opt norefcounts						// need to fixup container colors...
 	require self
 	if self == @emb
-		self = .parent
+		self = .Parent
 
-	if .position <= pos					// if we are after, its too far
-		while .after <= pos
-			self = .parent						#require
-	require .contains(pos, true)
+	if .Position <= pos					// if we are after, its too far
+		while .After <= pos
+			self = .Parent						#require
+	require .Contains(pos, true)
 
 	if self == @prm or self in @url
-		return .parent // NICE
-	if .iscontainer
+		return .Parent // NICE
+	if .IsContainer
 		require !(self == @arg and "\t")
 		if (pos == .position) or pos == (.after-1)
 			return self
@@ -177,7 +179,7 @@ function FixupColor (|message| self, |ind| pos, |message|)
 
 
 helper message.UseRootTmpColor (|bool|)
-	return (self == @tmp)  and  !(.flags & textview.NotRoot)  and  .atroot
+	return (self == @tmp)  and  !(.flags & TextView.NotRoot)  and  .atroot
 
 
 function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagepixel|)

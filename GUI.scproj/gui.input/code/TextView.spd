@@ -440,13 +440,13 @@ class TextView (GUIControl)
 		.ShowAndSel(d.position)
 
 	
-	function Show (|int| x)
-		.ViewPos(x, (.MaxVisibleLines/3)) //idk
+	function Show (|int| x, |TextViewLine|)
+		return .ViewPos(x, (.MaxVisibleLines/3))
 	
 	
 	function ShowAndSel (|int| x, |int| length=0, |textviewline|)
 		opt NoRefCounts
-		rz = .ViewPos(x, (.MaxVisibleLines/3), 2)
+		rz = .show(x)
 		.sel2((x, x + length), rz)
 
 
@@ -1250,7 +1250,7 @@ class TextView (GUIControl)
 		p = .clamp(p)
 		|| Same = (p.width == s.length) and self[p.x, s] 
 		|| i	= (p.x + s.length, p.x2)(!Same)
-		.ViewPos(i, .MaxVisibleLines/3) // just wants it in view... if not, then scrollback
+		.show(i)
 		
 		if !same
 			i = p.x + s.length
@@ -1653,6 +1653,7 @@ class TextView (GUIControl)
 	
 	
 	helper ReallySetStart (|textviewline| d)
+		if (self ~= "editme") and .document.Location contains "ColorScheme.spd"
 		._Start = d
 		.ShowNoExtra
 		if .document

@@ -567,13 +567,22 @@ module SDLApp
 		opt norefcounts
 		require .acontrolwasresized
 		.acontrolwasresized = false
-		|| BigRect = .DrawSpace.rect
-		|| Rect = (0, 0, 0, 0)
-		for w in __modules__.window.all
-			rect = w.reflowdoc(bigrect, rect, bigrect)
-		for w in notifications.Alerts
-			w.reflowdoc(bigrect, nil, bigrect)
+		for w.fast in __modules__.window.all
+			w.reflow
+		for w.fast in notifications.Alerts
+			w.reflow(false)
 	
+	helper Window.Reflow (|bool| UsePrev = true, |ivec4|)
+		opt norefcounts
+		|| p = .parent ?? window.all
+		|| BigRect = sdlapp.DrawSpace.rect
+		|| rect = (0,0,0,0)
+		if UsePrev
+			|| b = .prev
+				rect = b.lastrect
+//		.reflow(self, p)
+		return .reflowdoc(bigrect, rect, bigrect)
+
 	
 	helper DrawSub (|window| w)
 		if w.IsViewable

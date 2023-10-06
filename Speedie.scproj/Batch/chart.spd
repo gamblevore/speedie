@@ -20,6 +20,7 @@ class ChartWindow (Window)
 	|ChartControl|		View
 	|textview|			HumanAge
 	constructor
+		super.constructor
 		.View = chartcontrol(self)
 		.View.Size = 10~inside by 10~inside
 		.HumanAge = textview(self)
