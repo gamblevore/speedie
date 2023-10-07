@@ -1653,7 +1653,6 @@ class TextView (GUIControl)
 	
 	
 	helper ReallySetStart (|textviewline| d)
-		if (self ~= "editme") and .document.Location contains "ColorScheme.spd"
 		._Start = d
 		.ShowNoExtra
 		if .document
