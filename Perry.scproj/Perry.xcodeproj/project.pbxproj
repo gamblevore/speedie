@@ -500,7 +500,7 @@
 /* Begin PBXLegacyTarget section */
 		AC310BC62A5188E600837DCB /* BirdBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --externalcompile --nocompile --targetdebug /usr/local/speedie/Utils/Birds.scproj";
+			buildArgumentsString = "--nocolor --externalcompile --nocompile --targetdebug /usr/local/speedie/Utils/birds.scproj";
 			buildConfigurationList = AC310BC72A5188E600837DCB /* Build configuration list for PBXLegacyTarget "BirdBuilder" */;
 			buildPhases = (
 			);
