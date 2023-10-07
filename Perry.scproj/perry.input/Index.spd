@@ -2,7 +2,7 @@
 
 import "GUI"
 import "Speedie.scproj/speedie.input/AutoCompleteHelpers"
-import "/usr/local/speedie/Utils/birds.scproj/bird.input"
+//import "/usr/local/speedie/Utils/birds.scproj/bird.input"
 
 linkage
 	cpp_part Per
