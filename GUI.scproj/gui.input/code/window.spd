@@ -209,7 +209,7 @@ class Window (GUIControl)
 	
 	behaviour Draw
 		where.window = self
-		where.drawrect(.lastrect, .gnormal)
+		where.drawrect(.lastrect.soothe, .gnormal)
 		.DrawContents(where)
 	
 	
