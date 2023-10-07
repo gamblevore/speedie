@@ -7,6 +7,7 @@ class Window (GUIControl)
 	|bool|							AlphaSubtle
 	|bool|							IsDialog
 	|bool|							BlockRecurseKeyDown
+	|bool| 							DrawBackgroundOnFullScreen
 	|GUIControl|					Focus
 	|Guicontrol|					InnerFocus
 	|GUIControl|					CurrMouseDown
@@ -25,6 +26,7 @@ class Window (GUIControl)
 	
 	constructor (|ControlRect| Size = the~area)
 		super.constructor(window.all)
+		.DrawBackgroundOnFullScreen = true
 		.size = Size
 		.createddate = date.now
 		.inlineeditorplace.init(self)
@@ -209,7 +211,10 @@ class Window (GUIControl)
 	
 	behaviour Draw
 		where.window = self
-		where.drawrect(.lastrect.soothe, .gnormal)
+		if .IsFullScreen and .DrawBackgroundOnFullScreen
+			¥.DrawBackground(where)
+		  else
+			where.drawrect(.lastrect.soothe, .gnormal)
 		.DrawContents(where)
 	
 	
