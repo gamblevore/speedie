@@ -365,7 +365,7 @@ module Feedback
 			Explain(Purpose, "Set names used by preprocessor. --target=AnyName")$
 			if value == "debug"
 				error "Use 'targetdebug' instead."
-			targets[value]=true
+			targets[value] = true
 			
 		m64
 			Explain(Purpose, "64-bit compile")$

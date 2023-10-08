@@ -45,10 +45,19 @@ class SCImport
 		
 		
 	function ImportMsg (|Message| j)
-		|| Name = J[@str, -1]$.name
-		|| P	= Compiler.FindProject(Name, true) #expect ( J, "Can’t find import: '$name'" )
+		|| l	= J.last(@str)$
+		|| Name = l.name
+		|| P	= Compiler.FindProject(Name, true)
+		if !P
+			if name[0] != '/'
+				P = compiler.Projects[name].existingfile
+			  else
+				P = name.existingfile
+		expect P ( J, "Can’t find import: '$name'" )
 
+		scimport.CurrIsManuallyImported++
 		SCImport.Importpath( name, P, .Depth + 1, false )
+		scimport.CurrIsManuallyImported--
 	
 	
 	function PrepareAll 
@@ -208,6 +217,7 @@ class SCImport
 		|date|				Recent
 		|scimport--|		Curr
 		|bool|				STDLibTime
+		|byte|				CurrIsManuallyImported
 		
 			
 		function IsInputName (|string| name, |bool|)
@@ -217,6 +227,7 @@ class SCImport
 		function NoProj
 			.curr = nil
 			(SCDecl).restore
+
 
 		function FindInputFolder (|file| f, |file|)
 			|| FirstName = ""

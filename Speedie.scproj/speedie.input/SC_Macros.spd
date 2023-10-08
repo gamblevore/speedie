@@ -46,6 +46,9 @@ function message.CleanBecome (|macro| m)
 	
 function message.TargetTest (|bool|) // target true, target false, 
 	.expect(@thg)
+	expect (self ~!= "mac")     (self, "Use OSX")
+	expect (self ~!= "linux")   (self, "Use lin")
+	expect (self ~!= "windows") (self, "Use win")
 	if self ~= "debug"
 		return options.TargetDebug
 	if self ~= "release"
@@ -54,17 +57,17 @@ function message.TargetTest (|bool|) // target true, target false,
 		return options.perry
 	if self ~= "minilib"
 		return options.ProjectIsMiniLib
+	if self ~= "imported"
+		return scimport.CurrIsManuallyImported
 	if self ~= "true"
 		return true
 	if self ~= "false"
 		return false
-	if self ~= "mac"
-		error (self, "Use OSX")
 	if self ~= "osx"
 		return Platform.osx
 	if self ~= "win"
 		return Platform.win
-	if self ~= "lnx"
+	if self ~= "lin"
 		return Platform.lin
 	if self ~= "direct"
 		return options.IsDirectTest
