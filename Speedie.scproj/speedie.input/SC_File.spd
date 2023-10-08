@@ -92,8 +92,11 @@ class SCFile (file)
 			StdErr.source = .path
 			parser.DotInsertallow = true	// more consistant with IDE
 			
+			|| oldimp = scimport.CurrIsManuallyImported
+			scimport.CurrIsManuallyImported = .proj.depth
 			parser.UsingTag = .filenum
-			rz = .fData.ParseClean			// OK so now what?
+			rz = .fData.ParseClean
+			scimport.CurrIsManuallyImported = oldimp
 			.DetectInsecureWords
 			
 			parser.usingtag = 0
