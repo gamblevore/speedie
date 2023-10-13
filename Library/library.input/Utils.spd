@@ -77,6 +77,25 @@ function message.LOC (|int|)
 			rz += (pf == @arg) or (pf == @tmp  and  s == @tmp)
 
 
+struct StringDigitIterator
+	|string| S
+	|int|    i
+	
+	iterator
+		while .i < .s.length
+			yield (.s[.i]|int| - '0') (.i)
+			.i++
+	
+	function ZeroValue (|int64|)
+
+
+function String.Digits (|StringDigitIterator|)
+	rz.S = self	
+
+function int.Digits (|StringDigitIterator|)
+	return .Render.digits
+
+
 function int.Msg (|message|)
 	return @num + .render
 
@@ -88,4 +107,15 @@ function int64.Msg (|message|)
 
 function bool.Msg (|message|)
 	return @thg + .Render
+
+
+ignore // seems not worth it
+	insertion
+		sum	({
+			|| Src = _0
+			|| V = Src.ZeroValue
+			for (c in Src)
+				V += c
+			(V)
+		})
 
