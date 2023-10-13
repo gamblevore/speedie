@@ -1,23 +1,17 @@
 
+// simple demonstration of finding armstrong numbers
+// just a simple way to demonstrate basic language features!
 
-main
-	for exp in 2 to 5: for num in 2 to 100000 {
+main {
+for exp in 2 to 5
+	for num in 2 to 100000
 		if num.IsArmStrong(exp)
-			"	$num is armstrong($exp)"
-	}
+			"$num is armstrong($exp)"
+}
 
 
 function int.IsArmStrong (|int| exp = 3, |bool|)
 	for d in .digits
 		self -= d pow exp
 	return self == 0
-	
 
-function string.IsArmStrong2 (|int| exp = 3, |bool|)
-// doesnt seem worth it... to add all that	
-// n.digits().map(it**3).sum()
-//	|| Value = .digits.map(_0 pow 3).sum
-//	return .int == Value
-	
-	
-	
