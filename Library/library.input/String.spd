@@ -615,7 +615,8 @@ class String
 			yield Start[i] (i)
 			i--
 
-	iterator lines
+
+	iterator Lines
 		|| Prev = 0
 		while (self != nil) {
 			|| Curr_ = .find( jeebox.CSLine, Prev )
@@ -630,6 +631,7 @@ class String
 		while (Start < End)
 			|| c = codepoint.UTF8Read(&start)
 			yield (c) (start)
+
 
 	iterator CodePoints2
 		|| First	= .Address

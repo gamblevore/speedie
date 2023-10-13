@@ -31,6 +31,9 @@ datatype int
 
 	function Bits (|int|)
 		return (1<<self)-1
+
+	function AlignDown (|int| To, |int64|)
+		return self - (self mod to) // ???
 		
 	syntax compare (|string|s, |bool| aware, |int|)
 		return self - s.length
@@ -547,7 +550,7 @@ datatype int64
 	render
 		fs <~ self
 
-	function AlignTo (|int64| To, |int64|)
+	function AlignUp (|int64| To, |int64|)
 		return self + (-self|uint64| mod to) // ???
 
 	operator InRange (|int64| d, |bool|)

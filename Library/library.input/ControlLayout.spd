@@ -57,10 +57,10 @@ datatype ControlRect (ivec4)
 		self[3]|controlpoint|.AppendInto(fs)
 
 
-function int.middleLayout (|controlline|)
+helper int.MiddleLayout (|controlline|)
 	return the~middle-(self>>1) to (self)~long
 
-function int.InsideLayout (|controlline|)
+helper int.InsideLayout (|controlline|)
 	return the~left+self to the~right-self
 function ivec2.Layout (|controlrect|)
 	return .x~wide by .y~high

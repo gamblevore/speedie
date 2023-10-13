@@ -141,7 +141,7 @@ function String.ExtractPathAndLine (|&ivec2| LineAndByte, |string|)
 		rz = rz.Resolve(fileResolveMode.allowmissing)
 
 
-helper string.wrapsub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
+helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 	|| i		= p
 	|| ParaMax	= 1K
 	MaxWidth	= MaxWidth min Paramax
@@ -179,7 +179,44 @@ helper string.wrapsub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			i = WordEnd
 			continue
 
+
+
+helper String.TabbifySub (|string|)
+	|| Tabs = .OutByte('\t')
+	if tabs == -1
+		debugger // does this ever happen?
+		tabs = .Length
+	if tabs == 0
+		return self
+	|| spaces = tabs*4
+	return (" "*spaces) + self[tabs, int.max]
+
+
+helper String.UnTabbifySub (|string|)
+	|| Sp = .OutByte(' ')
+	if Sp == -1
+		debugger // does this ever happen?
+		sp = .length
+	if Sp == 0
+		return self
+	debugger // check dis
+	sp = Sp.aligndown(4)
+	|| Tabs = Sp>>2
+	return (" "*Tabs) + self[sp, int.max]
 	
+
+function String.Tabbify (|bool| Tabs=true, |string|)
+	|array of string| s
+	for t.lines in self
+		if tabs
+			s <~ t.TabbifySub
+		  else
+			s <~ t.Untabbifysub
+	rz = s.join("\n")
+	if rz == self // nice opt
+		rz = self	
+
+
 function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| BytesOut, |string| Name)
 	if name
 		self <~ Name

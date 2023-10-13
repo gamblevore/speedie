@@ -104,11 +104,6 @@ module Math
 	function uint64.Hash (|uint64|)
 		cpp_wrapper JB_uint64_hash
 	
-	function int.ToOne (|int|)
-		if self > 0
-			return 1
-		return self|uint| >> 31
-	
 	function int.LowestBit (|int|)
 		return self & -self 
 
