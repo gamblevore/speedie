@@ -168,7 +168,7 @@ class Process (ProcessOwner)
 		if ._StdOut
 			._StdOut.Length = 0
 		if !.IsServer
-			expect (.theirs.state) (self, "MemorySharingFailed.")
+			expect (.theirs.state) (self, "MemorySharingFailed")
 			is Connected
 			return
 
@@ -273,14 +273,14 @@ class Process (ProcessOwner)
 		.other "died"
 
 
-
 	helper ChildAlive (|bool|)
-		if .subprocess
+		if .SubProcess
 			return .IsOpen
-
 		if .exit < 0
 			return true
-		.processdied
+		if .pid == 0
+			return false
+		.ProcessDied
 
 
 	syntax append (|string| str, |date| TimeOut=0, |bool|)
@@ -372,13 +372,18 @@ class Process (ProcessOwner)
 
 	
 	function ProcessDied
-		.theirs.state = ipcstate.Dead // IS DEAD?
+		.theirs.state = IPCState.Dead // IS DEAD?
 		.Disconnect
-		if !.isserver
+		if !.IsServer
 			app.quit(-1)
-		.DiedCount++
-		.self "died"
-		.pid = 0
+		.IncrDiedCount
+        .self "died"
+
+
+	function IncrDiedCount
+		if .PID
+			.DiedCount++
+	        .pid = 0
 
 	
 	function KillCosFailed
@@ -386,12 +391,13 @@ class Process (ProcessOwner)
 
 
 	helper KillButOK (|bool| OK=true)
-		if .pid
-			if !OK
-				.diedcount++
-			pipe.killpid(.pid)
+		|| P = .pid
+			pipe.KillPID(P)
+            if !OK
+                .IncrDiedCount
 			.self("killed child", true)
 		.Disconnect
+
 
 		
 	function ReadStdOut (|string|)
@@ -402,15 +408,15 @@ class Process (ProcessOwner)
 		
 	helper UpdateStdOut
 		opt norefcounts
-		if ._stdoutfile
+		if ._StdOutFile
 			|| fs = ._stdout init faststring()
 			fs.appendfile(._stdoutfile)
 
 
 	helper Self (|string| msg, |bool| strong=false)
 		if .CanPrint or strong
-			.logus
-			.logmsg(msg)
+			.LogUs
+			.LogMsg(msg)
 
 
 	helper Other (|string| msg, |bool| strong=false)
@@ -475,11 +481,11 @@ class Process (ProcessOwner)
 		.UpdateStdOut
 		if self isnt closed
 			.self "disconnect"
-			.ours.state   = ipcstate.closed
-		if .isserver
-			.usedummy
+			.ours.state = ipcstate.closed
+		if .IsServer
+			.UseDummy
 		  else
-			.unmap
+			.Unmap
 		|| s = .SendQueue // called after dispose?
 			s.clear
 
@@ -514,6 +520,7 @@ class Process (ProcessOwner)
 	function RunChild (|string| path, |bool|)
 		debug_require path
 		require (self isnt invalid)
+		.exit = -1
 		.pid = path.cstr.Startprocess(.params, (&._stdoutfile, nil)(.trapstdout))
 		if .pid > 0
 			.Register
@@ -585,13 +592,14 @@ class Process (ProcessOwner)
 		|Process|						Owner_ = nil
 		|int|							IncID
 
+
 		function CheckAllAlive
 			opt norefcounts
-			|| m = processowner.first
+			|| m = ProcessOwner.First
 			while m
 				|| ch = m
 				m++
-				if (ch.exit >= 0) and ch isa process
+				if (ch.exit >= 0) and (ch isa process)
 					ch.ProcessDied
 		
 
