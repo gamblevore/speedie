@@ -721,8 +721,8 @@ So anything not 0 means "its OK"`
 
 
 	function CurrFileRow (|FileRow|)
-		|| r = .FileList.FirstSelected as filerow
-			return r
+		opt norefcounts
+		return .FileList.FirstSelected as filerow
 	
 	
 	function CurrPath (|string|)

@@ -100,6 +100,7 @@ function cstring.OperatorPlus (|string| s, |string|)
 		return (&tmp)|string| + s
 	return .str
 
+
 struct FakeJBString
 	|int| Refcount
 	|int| Length
@@ -186,7 +187,7 @@ helper String.UnTabbifySub (|faststring| fs)
 		fs <~ self
 	  else
 		fs <~ (' ', tabs*4)
-		fs.appendsection(self, tabs, int.max)
+		fs.AppendSection(self, tabs, int.max)
 
 
 helper String.TabbifySub (|faststring| fs)
@@ -196,7 +197,7 @@ helper String.TabbifySub (|faststring| fs)
 	  else
 		sp = Sp.AlignDown(4)
 		fs <~ ('\t', Sp>>2)
-		fs.appendsection(self, sp, int.max)
+		fs.AppendSection(self, sp, int.max)
 	
 
 function String.Tabbify (|bool| Tabs=true, |string|)
@@ -208,8 +209,8 @@ function String.Tabbify (|bool| Tabs=true, |string|)
 		if tabs
 			t.TabbifySub(fs)
 		  else
-			t.Untabbifysub(fs)
-	rz = fs.getresult
+			t.UntabbifySub(fs)
+	rz = fs.GetResult
 	if rz == self // nice opt
 		rz = self	
 
