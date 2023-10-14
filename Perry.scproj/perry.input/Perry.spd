@@ -168,7 +168,7 @@ extend PerryIDE {
 function IsSpeedieCode (|bool|)
 	opt norefcounts
 	|| r = .filelist.listsource.First as filerow
-		return r.location.pathiscode
+		return r.location.PathIsCode
 	
 
 function View (|ButtonView| btn)
