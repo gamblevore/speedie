@@ -1226,7 +1226,7 @@ class TextView (GUIControl)
 
 		.ClearErrors
 		|| msg = text.parse
-			(.OnValidate)(self, msg, sdlapp.event is TEXTINPUT)
+			(.OnValidate)(self, msg, sdlapp.istyping)
 		rz = stderr.ok
 		if !rz
 			beep

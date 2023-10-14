@@ -192,17 +192,13 @@ module SDLApp
 		.AControlWasResized = true
 		.Touch(modified)
 
-	
-	syntax is (|sdleventtype| t, |bool|)
-		return .event.type == t
-
 
 	function DropEnable
 		SDL_EventState(SDLEventType.DROPFILE, 1)
 	
 	
 	helper IsTyping (|bool|)
-		return .event.type is TEXTINPUT or KEYDOWN
+		return .event is TEXTINPUT or KEYDOWN
 		
 
 	function RunAndQuit (|GUIApplicationInit| fn=nil, |object| Anything=nil,  |ivec2| size=(414, 256))

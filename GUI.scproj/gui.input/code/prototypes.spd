@@ -1,4 +1,5 @@
 
+
 // prototypes
 
 prototype GUIBackgroundDrawer	(|object| self, |image| where)
@@ -25,5 +26,5 @@ prototype SorterComparerWindow  (|window| a, |window| b, |int|)
 
 ///
 
-prototype GUIMouseMoveEvent		(|window|     self, |guicontrol| Curr, |guicontrol| Old) // remove this? we have a mousemove virtual! SelfTool uses it.
+prototype GUIMouseMoveEvent		(|window| self,  |guicontrol| Curr,  |guicontrol| Old) // remove this? we have a mousemove virtual! SelfTool uses it.
 
