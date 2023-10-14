@@ -3405,6 +3405,7 @@ int JB_Rnd__InitCode_() {
 
 
 
+
 void JB_StructSaveTest_Destructor(StructSaveTest* self) {
 	JB_Clear(self->Sav);
 	JB_Clear(self->Str);
@@ -8023,7 +8024,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2023100421);
+	return (2023101422);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
@@ -8035,4 +8036,4 @@ __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -4845594019514234813 8622592083955314744 5667782042990923020
+// -4845594019514234813 8715509943874527334 5667782042990923020

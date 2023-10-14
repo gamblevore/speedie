@@ -125,6 +125,8 @@ struct RetroFloat;
 
 struct SpeedTester;
 
+struct StringDigitIterator;
+
 struct StringLengthSplit;
 
 struct StructSaveTest;
@@ -1731,6 +1733,9 @@ int JB_Rnd__InitCode_();
 
 
 // JB_SpeedTester
+
+
+// JB_StringDigitIterator
 
 
 // JB_StringLengthSplit

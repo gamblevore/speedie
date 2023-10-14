@@ -207,6 +207,8 @@ struct RetroFloat;
 
 struct SpeedTester;
 
+struct StringDigitIterator;
+
 struct StringLengthSplit;
 
 struct StructSaveTest;
@@ -1315,13 +1317,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1899])
+#define kJB__ErrorColors_bold (JB_LUB[1904])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1900])
-#define kJB__ErrorColors_good (JB_LUB[1901])
-#define kJB__ErrorColors_normal (JB_LUB[1902])
-#define kJB__ErrorColors_underline (JB_LUB[1901])
-#define kJB__ErrorColors_warn (JB_LUB[1903])
+#define kJB__ErrorColors_error (JB_LUB[1905])
+#define kJB__ErrorColors_good (JB_LUB[1906])
+#define kJB__ErrorColors_normal (JB_LUB[1907])
+#define kJB__ErrorColors_underline (JB_LUB[1906])
+#define kJB__ErrorColors_warn (JB_LUB[1908])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1499,7 +1501,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_BitAnd (JB_LUB[356])
 #define kJB_BitNot (JB_LUB[606])
 #define kJB_BitOr (JB_LUB[560])
-#define kJB_BitXor (JB_LUB[1904])
+#define kJB_BitXor (JB_LUB[1909])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_DontSaveProperty (0)
 #define kJB_EndsBlock (1024)
@@ -1517,7 +1519,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_SaveProperty (1)
 #define kJB_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1905])
+#define kJB_SaverStart1 (JB_LUB[1910])
 #define kJB_SelfDebug (2)
 #define kJB_SelfReplace (1)
 #define kJB_SimpleMatch (1 << 22)
@@ -2074,6 +2076,7 @@ extern JB_String* SC__NilTest_x3;
 #define kJB__PID_SIGXFSZ (25)
 extern Array* SC__Imp_AllFiles;
 extern SCImport* SC__Imp_Curr;
+extern byte SC__Imp_CurrIsManuallyImported;
 extern Date SC__Imp_Recent;
 extern Dictionary* SC__Imp_Shaders;
 extern bool SC__Imp_STDLibTime;
@@ -4834,6 +4837,9 @@ int JB_Rnd__InitCode_();
 // JB_SpeedTester
 
 
+// JB_StringDigitIterator
+
+
 // JB_StringLengthSplit
 
 
@@ -6595,6 +6601,8 @@ bool JB_Proc_Found(Process* self, bool send);
 Message* JB_Proc_Get(Process* self, Date TimeOut);
 
 Message* JB_Proc_GetSub(Process* self, Date TimeOut);
+
+void JB_Proc_IncrDiedCount(Process* self);
 
 bool JB_Proc_IsClosed(Process* self);
 
