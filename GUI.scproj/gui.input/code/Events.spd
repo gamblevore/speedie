@@ -39,6 +39,9 @@ struct SDL_Event
 		
 	function Editing (|&SDL_TextEditingEvent|)
 		return self|&SDL_TextEditingEvent| 
+		
+	syntax is (|SDLEventType| b, |bool|)
+		return .type == b
 
 
 

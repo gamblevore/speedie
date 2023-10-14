@@ -22,16 +22,21 @@ todo:
 
 function EnvValidation (GUITextValidate)
 	require msg.ExpectLast and msg.Expect(@arg)
-    for rel in msg
-        if rel.Expect(@rel)
-            || ch1 = rel[@thg, 0]
-                (ch1 is EditableThing)
-            || opp = rel[@opp, 1]
-                opp.expect(@opp, "=")
-                (opp is EditableSyx)
-            || ch2 = rel[@nil, 2]
-                ch2.goodname
-                (ch2 is EditableAny)
+	for rel in msg
+		if rel == @rel
+			|| ch1 = rel[@thg, 0]
+				(ch1 is EditableThing)
+			|| opp = rel[@opp, 1]
+				opp.expect(@opp, "=")
+				(opp is EditableSyx)
+			|| ch2 = rel[@nil, 2]
+				ch2.goodname
+				(ch2 is EditableAny)
+//		  elseif Typed
+//			.insert(`name="value"`,true) // better to return a new string than edit the text in-flight
+		  else
+			rel.expect(@rel)
+
 
 
 function ArgValidation (GUITextValidate)
@@ -41,7 +46,7 @@ function ArgValidation (GUITextValidate)
 			0
 		  elseif s == "args"
 			for a in s.Arg
-				a.expectString
+				a.ExpectString
 				(a is EditableAny)
 		  elseif s == "notes"
 			for f.flat in s
@@ -49,7 +54,7 @@ function ArgValidation (GUITextValidate)
 					(f is EditableAny)
 		  elseif s == "env"
 			|| arg = s.first
-				envvalidation(self, arg)
+				EnvValidation(self, arg, typed)
 		  elseif s == "pwd"
 			|| ch = s[@nil]
 				ch.ExpectString

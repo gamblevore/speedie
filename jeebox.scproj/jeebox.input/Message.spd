@@ -797,10 +797,12 @@ class Message (RingTree)
 		  else
 			return true
 
+
 	function ExpectString (|bool|)
 		check .IsString (self, "Not a string")
 		return true
 	
+
 	function Expect (|syntax| type, |string| name=nil, |bool|)
 		require self
 		if (!type or (.Func == type))
@@ -827,12 +829,15 @@ class Message (RingTree)
 			return .msg(@tmp, key).GiveArg
 		return message() // sigh
 
+
 	syntax append (|string| key)
 		self <~ @str.msg(key)
 
+
 	function Arg (|message|)
 		return .last(@arg)
-	
+
+
 	function GiveArg (|message|)
 		Opt NoRefCounts
 		|| r = .last 
@@ -857,7 +862,8 @@ class Message (RingTree)
 		|| f = .first
 			return f
 		.accesserr(@nil, nil, nil)
-				
+
+
 	syntax access (|Syntax| s, |Message|)
 		cpp_Part NeedSyx
 		Opt NoRefCounts

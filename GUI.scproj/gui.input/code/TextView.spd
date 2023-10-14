@@ -1226,7 +1226,7 @@ class TextView (GUIControl)
 
 		.ClearErrors
 		|| msg = text.parse
-			(.OnValidate)(self, msg)
+			(.OnValidate)(self, msg, sdlapp.event is TEXTINPUT)
 		rz = stderr.ok
 		if !rz
 			beep
@@ -1901,7 +1901,7 @@ class TextView (GUIControl)
 		if (self is editable) and (purpose & copypasteflags.PasteTextLike)
 			if data > 1
 				.UndoChecker = -1
-			if .ExpectsParse == textview.alwaysjeebox
+			if .ExpectsParse >= textview.currentlyjeebox
 				data = data.Tabbify
 			.Insert(data)
 			return true
