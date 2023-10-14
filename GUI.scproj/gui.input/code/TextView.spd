@@ -1857,7 +1857,7 @@ class TextView (GUIControl)
 	
 	helper TextCopy (GUICopyEvent)
 		rz = self[.selrange]
-		if .ExpectsParse >= alwaysjeebox
+		if .ExpectsParse >= CurrentlyJeebox
 			rz = rz.tabbify(false)
 
 	

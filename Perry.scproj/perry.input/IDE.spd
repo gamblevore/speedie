@@ -781,11 +781,12 @@ So anything not 0 means "its OK"`
 	function EditText (|FileRow| r, |int|) // edittextfile, loadfile, fileload, fileedit, openfile, fileopen
 		|| E	= .editme
 		|| doc	= r.document
-		if e.document == doc
+		if e.Document == doc
 			return -1
 		
 		|| Loaded =  E.LoadDocument(doc)
-		doc.CompareTreesOnSave = .IsSpeedieCode
+		|| spd = .IsSpeedieCode
+		doc.CompareTreesOnSave = spd
 		.ListAllFuncs
 		require Loaded
 		|| it = .ProjMsg
