@@ -6,13 +6,14 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * Constants and globals don't autocomplete nicely
+* disconnects a lot
 
 
-// Perry Do later
+ Perry Do later
 * Drawing black sometimes (winsize change)
-	* draw seems to have a delay at least for pressing the mouse button? (check if fixes the msg sending delay too)
+	* draw seems to have a delay except with keyboard events? (check if fixing this, also fixes the msg sending delay)
 * can't find "operatorvs" on message
-// even later
+ even later
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
 * TextView error/find resync
@@ -20,7 +21,7 @@
 * the cmm for files should have a cloc feature?
 
 
-// Speedie Do later
+ Speedie Do later
 * finish off collectdecls
 * new datatypes can subclass off nothing!
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
@@ -39,7 +40,7 @@
 	* check entire program for modification during nil-sweep
 
 
-// Perry additions
+ Perry additions
 * add image editor...
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order...  that can't just be commented out.
