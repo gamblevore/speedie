@@ -5,6 +5,7 @@
 
 #include "JB_Umbrella.hpp"
 #include <unistd.h>
+#include <sys/wait.h>
 
 
 extern "C" {
