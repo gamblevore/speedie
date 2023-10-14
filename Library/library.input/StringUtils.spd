@@ -180,39 +180,36 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			continue
 
 
-
-helper String.TabbifySub (|string|)
-	|| Tabs = .OutByte('\t')
-	if tabs == -1
-		debugger // does this ever happen?
-		tabs = .Length
+helper String.UnTabbifySub (|faststring| fs)
+	|| Tabs = .OutByte('\t') ?? .Length
 	if tabs == 0
-		return self
-	|| spaces = tabs*4
-	return (" "*spaces) + self[tabs, int.max]
+		fs <~ self
+	  else
+		fs <~ (' ', tabs*4)
+		fs.appendsection(self, tabs, int.max)
 
 
-helper String.UnTabbifySub (|string|)
-	|| Sp = .OutByte(' ')
-	if Sp == -1
-		debugger // does this ever happen?
-		sp = .length
+helper String.TabbifySub (|faststring| fs)
+	|| Sp = .OutByte(' ') ?? .length
 	if Sp == 0
-		return self
-	debugger // check dis
-	sp = Sp.aligndown(4)
-	|| Tabs = Sp>>2
-	return (" "*Tabs) + self[sp, int.max]
+		fs <~ self
+	  else
+		sp = Sp.AlignDown(4)
+		fs <~ ('\t', Sp>>2)
+		fs.appendsection(self, sp, int.max)
 	
 
 function String.Tabbify (|bool| Tabs=true, |string|)
-	|array of string| s
+	|| fs = faststring()
+	|| n = 0
 	for t.lines in self
+		if n++
+			fs <~ '\n'
 		if tabs
-			s <~ t.TabbifySub
+			t.TabbifySub(fs)
 		  else
-			s <~ t.Untabbifysub
-	rz = s.join("\n")
+			t.Untabbifysub(fs)
+	rz = fs.getresult
 	if rz == self // nice opt
 		rz = self	
 

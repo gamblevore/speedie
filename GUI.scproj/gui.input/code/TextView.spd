@@ -1187,7 +1187,7 @@ class TextView (GUIControl)
 	
 	
 	function Insert (|string| s, |bool|selnew=false, |int|)
-		return .insertsub(s, .selrange, selnew)
+		return .InsertSub(s, .selrange, selnew)
 
 
 	helper LoadValErrors (|errorlist| L)
@@ -1753,9 +1753,9 @@ class TextView (GUIControl)
 		if !sel.width and sel.x > 0
 			parser.DotInsertAllow = true
 
-		p = .validatenewtext 
+		p = .ValidateNewText
 		
-		if expect <= 1
+		if expect <= textview.AllowJeebox
 			.myerror = nil
 		  elseif !.myerror and .coloriseasroot
 			.ColoriseRoot(p)
@@ -1853,9 +1853,12 @@ class TextView (GUIControl)
 		.window.reflow
 		.preparelinesoftext // sigh
 		.StartWithoutScrollDraw = .FindStayAtEnd
-		
+	
+	
 	helper TextCopy (GUICopyEvent)
-		return self[.selrange]
+		rz = self[.selrange]
+		if .ExpectsParse >= alwaysjeebox
+			rz = rz.tabbify(false)
 
 	
 	function ScrollPos (|int|)
@@ -1891,14 +1894,16 @@ class TextView (GUIControl)
 			.sel = d.sel
 			return true
 		
-		.clear("")
+		.Clear("")
 
 
 	helper TextPaste (GUIPasteEvent)
 		if (self is editable) and (purpose & copypasteflags.PasteTextLike)
 			if data > 1
 				.UndoChecker = -1
-			.insert(data)
+			if .ExpectsParse == textview.alwaysjeebox
+				data = data.Tabbify
+			.Insert(data)
 			return true
 
 
@@ -1911,7 +1916,7 @@ class TextView (GUIControl)
 			if .ExpectsParse >= AlwaysJeebox
 				return .ExpectsParse
 			if .text.HasWord("<?jb?>") or .text.hasword("//jb")
-				return currentlyjeebox
+				return CurrentlyJeebox
 			return .ExpectsParse
 
 
@@ -1923,7 +1928,7 @@ class TextView (GUIControl)
 		opt norefcounts
 
 		|| mode = .expectsparse
-		require mode == AllowJeebox or ProbablyJeebox or CurrentlyJeebox
+		require mode > 0 and mode < alwaysjeebox
 
 		mode = AllowJeebox
 		|| d = .document
