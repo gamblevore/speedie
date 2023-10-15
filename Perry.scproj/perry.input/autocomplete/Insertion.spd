@@ -146,7 +146,7 @@ function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason,
 			return .DoTheParamDisplayThing(x, reason ~= PerryAutoCompleteReason.escape)
 	
 	if (reason ~!= "Sel") and (type ~= "autocomplete") and (.FakeAutoComplete >= 1)
-		.ide.ShowAuto(true)
+		.ide.ShowAutoBeep(true)
 		return true
 	
 	|| ok2 = false

@@ -92,7 +92,7 @@ function PerryIDE.AutoCompleteFB (|message| list, |AutoCompleteMode| Mode, |stri
 			return false
 		if .autocomplete.isopenedmenu or (canshow and mode is default)
 			|| open = mode is default
-			.showauto(open)
+			.ShowAutoBeep(open)
 			
 		return false
 	if mode is default
@@ -106,7 +106,7 @@ function PerryIDE.ClearAutoComplete
 	.editme.AutoCompleteString = ""
 
 
-function PerryIDE.ShowAuto (|bool| beeps)
+function PerryIDE.ShowAutoBeep (|bool| beeps)
 	if !.showauto and beeps
 		beep
 
@@ -330,7 +330,6 @@ function OnShowExtraInfo (GUITextShowEvent)
 	
 
 function JumpToDefinition (GUIAction)
-	
 	|| rightclick = state == -1
 	|| cmd = state == -2
 	require (cmd or rightclick)
