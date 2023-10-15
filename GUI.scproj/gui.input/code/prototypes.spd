@@ -7,7 +7,7 @@ prototype GUIApplicationInit    (|Object| Anything, |errorint|)
 prototype GUIImageDrawEvent		(|Image|  self, 		|bool|)
 
 prototype GUIListDragEvent		(|ListView|   self,	|ListViewrow| Before, |ListViewrow| Into, |bool|)
-prototype GUIListEvent			(|ListView|   self,	|ListViewrow| Row, |bool|)
+prototype GUIListEvent			(|ListView|   self,	|ListViewrow| Row, |listviewselectmode| Mode=listviewselectmode.normal, |bool|)
 prototype GUIListEditEvent		(|ListView|   self,	|ListViewcell| Cell, |string| Value, |bool|)
 prototype ListViewRowDraw		(|ListViewrow| self, |int| rowy, |int| texty, |image| where, |ListView| Parent, |int| col, |ivec2|)
 

@@ -78,8 +78,8 @@ class TextView (GUIControl)
 	
 	behaviour MouseDown
 		.clickedpos = p.x // for selectin text
-		if (clicks == 1) and keys.cmd
-			.SendClick(p, keys.PlatCmd)
+		if (clicks == 1) and (keys.cmd or keys.control)
+			.SendSpecialClick(p, !keys.PlatCmd)
 			return 1
 		if .ClickedScroll(P, clicks)
 			return 2
@@ -229,15 +229,16 @@ class TextView (GUIControl)
 		.uncorrectedsel = t
 
 
-	function SendClick (|ivec2| p, |bool| FromCmdKey)
-		.EditClick(p, 0, fromcmdkey)
-		ifn .__keydown__(keys.section)
-			|| Code = (-2, -1)(fromcmdkey)
-			(.onclicked)(self, Code)?
+	function SendSpecialClick (|ivec2| p, |bool| IsRightClick)
+		.EditClick(p, 0, !IsRightClick)
+		if IsRightClick and .__keydown__(keys.section)
+			return
+		|| Code = (-1, -2)(IsRightClick)
+		(.onclicked)(self, Code)?
 	
 	
 	behaviour RightClick
-		.sendclick(p, false)
+		.SendSpecialClick(p, true)
 					
 
 
@@ -612,9 +613,10 @@ class TextView (GUIControl)
 		.sel = (0, .text.length)
 		return true
 	
+	
 	helper SectionKey (|bool|)
-		(.onclicked)(self, -2)?
-		return true
+		return (.onclicked)(self, -1)?
+	
 		
 	helper DoCut (|bool|)
 		.docopy
@@ -1239,7 +1241,7 @@ class TextView (GUIControl)
 	helper CanAlterRange (|intrange| r, |bool|)
 		disabled "This would be a massive project"
 		opt norefcounts
-		|| p = .parsedmessage
+		|| p = .ParsedMessage
 		|| s1 = p.findtightest(r.x1)
 		|| s2 = p.findtightest(r.x2)
 		return s1 is editable and s2 is editable

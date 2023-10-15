@@ -678,6 +678,7 @@ class ListView (GUIControl) {
 		for f.listsel in self 
 			RZ++
 
+
 	function SelectableCount (|int|)
 		opt norefcounts
 		for f.all in self 
@@ -925,10 +926,10 @@ class ListView (GUIControl) {
 		return .selectshift(.start, .end)
 
 
-	function SelectFirst (|bool|)
+	function SelectFirst (|listviewselectmode| mode = listviewselectmode.normal, |bool|)
 		opt norefcounts
 		
-		.select(.edge(-1, true))
+		.select(.edge(-1, true), mode)
 		return true
 
 
@@ -940,7 +941,7 @@ class ListView (GUIControl) {
 		
 		|| modified = 0
 		|| all		= (l == .start) and (m == .end) 
-		|| i		= .distbetween(l,m)
+		|| i		= .DistBetween(l,m)
 		|| n		= i.abs + 1
 		for n
 			if (l isnt disabled)
@@ -948,7 +949,10 @@ class ListView (GUIControl) {
 			 l = .hierstep(l, i > 0)
 
 		if modified
-			.SelChangeEvent( (m, nil)(i), all )
+			|| mode = listviewselectmode.normal
+			if all
+				mode = listviewselectmode.noshow
+			.SelChangeEvent( (m, nil)(i), mode )
 		return true
 
 
@@ -989,22 +993,19 @@ class ListView (GUIControl) {
 		opt NoRefCounts
 		|| one = .OneAlwaysSelected
 		|| s = (.FirstSelected ?? .start, nil)(one)
-		return .Select(s, 0)
+		return .Select(s)
 	
 	
 	function SelectNoShow (|ListViewRow| s)
-		.select(s, -1)
+		.select(s, ListViewSelectMode.Noshow)
 	
 	function SelectFast (|ListViewRow| s)
-		.select(s, 1)
+		.select(s, ListViewSelectMode.Fast)
 		
-	function Select (|ListViewRow| s, |int|Mode=0)
-		// 0  == normal
-		// 1  == fast
-		// -1 == noshow 
+	function Select (|ListViewRow| s, |ListViewSelectMode| Mode = ListViewSelectMode.Normal)
 		opt norefcounts
-		require s != .ListSource
-		require !s or .owns(s)
+		require s and s != .ListSource
+		require .owns(s)
 		
 		.ExpandParents(s)
 		|| Modified = 0
@@ -1012,10 +1013,10 @@ class ListView (GUIControl) {
 			modified += r.ChangeSel(r == s)
 		
 		if modified or .AlwaysSendChangeEvent
-			.SelChangeEvent(s, mode < 0)
-		if Mode >= 0
+			.SelChangeEvent(s, mode)
+		if mode isnt noshow
 			.show(s)
-			if Mode == 1
+			if mode is fast
 				.scrolljump
 
 	
@@ -1026,15 +1027,15 @@ class ListView (GUIControl) {
 		.Select(r)
 
 	
-	function SelChangeEvent (|ListViewRow| s, |bool| NoShow=false)
+	function SelChangeEvent (|ListViewRow| s, |ListViewSelectMode| Mode=ListViewSelectMode.normal)
 		opt norefcounts
 		.ClearEdits
 		.SelJustChanged = true
-		if s and !NoShow
+		if s and (Mode isnt noshow)
 			.Show(s)
 
-		if !._BlockedDuringUse
-			(.onselected)(self, s)?
+		if (mode isnt noevent) and !._BlockedDuringUse
+			(.onselected)(self, s, mode)?
 
 
 	function ScrollByRows (|int| Rows)

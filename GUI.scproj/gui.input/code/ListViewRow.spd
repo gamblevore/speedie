@@ -212,6 +212,24 @@ datatype ListViewState (uint16)
 		Hidden
 
 
+datatype ListViewSelectMode (uint)
+	linkage
+		numeric false
+	flags
+		|ListViewSelectMode|
+		InitialSelection
+		Fast
+		NoShow
+		NoEvent
+		Normal = 0
+	
+	syntax is (|ListViewSelectMode| s, |bool|)
+		return (self|uint| & s|uint|) == s
+
+	syntax isnt (|ListViewSelectMode| s, |bool|)
+		return !.syntaxis(s)
+
+
 role ListViewCell (message)
 	linkage
 		cpp_part Cell

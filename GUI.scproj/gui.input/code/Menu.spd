@@ -89,7 +89,7 @@ class Menu (ListView)
 		win.openedmenu = self
 		is visible // shouln't really be visible? seems no?
 		._Scroll = nil
-		.SelectFirst
+		.SelectFirst(listviewselectmode.initialselection)
 	
 	function IsCmm (|bool|)
 		|| p = .parent

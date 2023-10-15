@@ -68,6 +68,8 @@ function PerryAutoCompleteSelected (GUIListEvent)
 	»
 */
 	opt norefcounts
+	require mode isnt initialselection
+
 	|| i = .ide
 	i.DuringTempView++
 
