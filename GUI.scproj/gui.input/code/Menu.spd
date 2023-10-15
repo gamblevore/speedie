@@ -80,7 +80,7 @@ class Menu (ListView)
 		|| W = owner.BestXForMenu(x, .TextWidth+14 max mw)
 		|| H = (Y)~up back .DesiredHeight
 		.size = w by h
-		.showmenu(owner)
+		.ShowMenu(owner)
 	
 	
 	function ShowMenu (|guicontrol| Owner)

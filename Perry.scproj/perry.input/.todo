@@ -6,10 +6,9 @@
 * nil-checking
 	* NilSweep, for global vars, and for function misuse.
 * Constants and globals don't autocomplete nicely
-* disconnects a lot
 
 
- Perry Do later
+						 Perry Do later
 * Drawing black sometimes (winsize change)
 	* draw seems to have a delay except with keyboard events? (check if fixing this, also fixes the msg sending delay)
 * can't find "operatorvs" on message
@@ -21,7 +20,7 @@
 * the cmm for files should have a cloc feature?
 
 
- Speedie Do later
+						 Speedie Do later
 * finish off collectdecls
 * new datatypes can subclass off nothing!
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
