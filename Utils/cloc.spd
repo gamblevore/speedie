@@ -94,7 +94,7 @@ function file.CLOC
 	
 	counts.memstart
 	if counts.ParseSpeed
-		"a=b+c".parse
+		"a=b+c".parse // warmup
 	|| Start = date.now
 	|| msg = data.parse
 	|| Durr = start.ago
