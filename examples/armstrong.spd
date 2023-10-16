@@ -6,7 +6,9 @@ main {
 for exp in 2 to 5
 	for num in 2 to 100000
 		if num.IsArmStrong(exp)
-			"$num is armstrong($exp)"
+			|| str = "$num is armstrong $exp"
+			printline str
+			app.say str
 }
 
 

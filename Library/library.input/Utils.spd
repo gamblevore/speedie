@@ -92,6 +92,7 @@ struct StringDigitIterator
 function String.Digits (|StringDigitIterator|)
 	rz.S = self	
 
+
 function int.Digits (|StringDigitIterator|)
 	return .Render.digits
 
@@ -110,6 +111,7 @@ function bool.Msg (|message|)
 
 
 ignore // seems not worth it
+		// we'd want a sum(_*2) macro!
 	insertion
 		sum	({
 			|| Src = _0
