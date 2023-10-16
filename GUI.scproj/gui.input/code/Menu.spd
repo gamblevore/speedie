@@ -161,9 +161,10 @@ class Menu (ListView)
 class MenuItem (ListViewrow)
 	|GUIMenuEvent|		MenuEvent
 	
-	constructor (|string| name, |GUIMenuEvent| ev)
+	constructor (|string| name, |GUIMenuEvent| ev, |object| obj=nil)
 		.name = name
 		.MenuEvent = ev
+		.obj = obj
 		(self is disabled) = (name == "")
 		
 	render

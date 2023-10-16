@@ -349,7 +349,7 @@ function string.IsProj (|bool|)
 	return self isa "scproj" or "uwuz"
 
 function string.PathIsCode (|bool|)
-	return .isproj or (self isa "spd" or "uwu")
+	return .isproj or .isSource
 
 function faststring.FileDiff (|string| name, |string| Title)
 	if !.length

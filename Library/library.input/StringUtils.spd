@@ -154,7 +154,10 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 		if c < 0
 			return i
 		if c|byte|.IsTextLine
-			return i + 1
+			if isinline
+				c = ' '
+			  else
+				return i + 1
 		if i >= ParaMax or MaxWidth <= 0
 			return i
 		

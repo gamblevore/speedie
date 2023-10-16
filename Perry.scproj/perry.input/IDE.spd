@@ -210,26 +210,27 @@ class PerryIDE (Window)
 			.setfocus(.editme)
 	
 	
-	function StatsMode (|int|)
+	function MyStatsMode (|int|)
 		rz = perryide.StatsMode|int|
-		if rz > 3
+		if rz > 2
 			rz = 0
-		rz = rz.clamp(0, 3)
+		if rz < 0
+			rz = 0
 		perryide.StatsMode = rz
 	
 	
 	function InfoStatus (|string|)
 		|| fs = .stats init FastString()
-		|| i = .statsmode
-		if i == 0
+		|| i = .MyStatsMode
+		if       i == 0
 			fs <~ "  --" // :)
 		
 		  elseif i == 1
 			|| e = .editme
 			|| t = e.text
 			fs <~ "${t.charcount} chars in ${t.linecount} lines"
-			|| msg = .editme.ParsedMessage
-				fs <~ "  (${msg.loc} LOC)"
+			|| msg = .EditMe.ParsedMessage
+				fs <~ "\n\n(${msg.loc} LOC)"
 			
 		  elseif i == 2
 			|| f = .filelist.FirstSelected as filerow
@@ -249,11 +250,12 @@ class PerryIDE (Window)
 
 
 	function ClickedStats
-		perryide.StatsMode++
-		.ShowLeftStats
+		.ShowLeftStats(perryide.StatsMode+1)
 
 
-	function ShowLeftStats
+	function ShowLeftStats (|int| i = -1)
+		if i >= 0
+			perryide.StatsMode = i
 		.updatemem = false
 		.StatsInfo.text = .InfoStatus	
 

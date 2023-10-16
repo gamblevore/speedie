@@ -290,9 +290,9 @@ function ViewAsSwap
 		.ViewAsText
 
 
-function Ext (|string|)
+function Path (|string|)
 	opt norefcounts
-	return .editme$.document$.location$.ext
+	return .editme$.document$.location
 
 
 function ViewAsVis (|bool| vis)
@@ -323,7 +323,7 @@ function ViewAsVis (|bool| vis)
 	if !top and !Platform.IsDebug
 		(.DebugArgsList isnt visible)
 	
-	|| StillRuns = top and (vis or (.ext == "spd"))
+	|| StillRuns = top and (vis or .path.isSource)
 	|| srchvis   = vis and (.searcharea is visible) 
 	(.searcharea is visible)		= srchvis
 

@@ -9,6 +9,9 @@
 
 
 						 Perry Do later
+
+* going backwards seems to put the line at the TOP of the window... but forward puts it in the middle
+	* if we aren't in any func, find the nearest above or below us.
 * Drawing black sometimes (winsize change)
 	* draw seems to have a delay except with keyboard events? (check if fixing this, also fixes the msg sending delay)
 * can't find "operatorvs" on message
@@ -17,7 +20,6 @@
 	* What about decls? perhaps just relative to a node?
 * TextView error/find resync
 * too long text in listview draw as much as we can
-* the cmm for files should have a cloc feature?
 
 
 						 Speedie Do later

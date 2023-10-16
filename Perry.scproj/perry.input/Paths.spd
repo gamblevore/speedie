@@ -5,7 +5,7 @@ function string.Path_Expand (|dictionary of string| dict, |string|)
 	// or other paths that you input into dict
 	if self[0] != '@'
 		return self
-	|| i = .find('/') ?? .length
+	|| i = .Find('/') ?? .length
 	|| name = self[1, i]
 	|| found = dict[name]
 		return found.TrimSlashes + self[i...]

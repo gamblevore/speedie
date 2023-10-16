@@ -1686,9 +1686,8 @@ class TextView (GUIControl)
 	
 	helper AddVline (|TextViewLine|)
 		opt norefcounts
-		|| d = textviewline(0)
-		.lines <~ d
-		return d
+		rz = textviewline(0)
+		.lines <~ rz
 
 
 	helper NeedsPrepare (|int|)
@@ -1762,15 +1761,15 @@ class TextView (GUIControl)
 		  elseif !.myerror and .coloriseasroot
 			.ColoriseRoot(p)
 		return p
-	
-	
+
+
 	helper ColoriseRoot (|message| p)
 		opt norefcounts
 		for m in p	// do this directly in the actual coloriser!!
 					// uncool to do this here
 			if (m == @tmp) and .coloriseasroot.ValueLower(m.name)
 				m.flags |= textview.NotRoot
-	
+
 	
 	helper TryColorise (|bool|)
 		opt norefcounts
@@ -1792,6 +1791,7 @@ class TextView (GUIControl)
 			rz = 0
 			._start.position = 0
 
+
 	helper EndGap (|bool|)
 		opt norefcounts
 		require .PreferStayAtEnd
@@ -1803,10 +1803,12 @@ class TextView (GUIControl)
 			curr--
 			rz++
 		return true
+
 		
 	helper FindStayAtEnd (|textviewline|) // findend
 		opt norefcounts
 		return .lines.last.move(1 - .MaxVisibleLines, nil, true)
+
 
 	helper PrepareLinesOfText
 		opt norefcounts
@@ -1815,12 +1817,11 @@ class TextView (GUIControl)
 		|| msg   	= .Parse(changed >= 2, expect)
 		|| ParsedOK = msg!=nil
 		|| Pos	 	= .StartPos
-		|| isinl 	= .singleline
 		|| d	 	= .lines.first
 		|| p	 	= 0
 		|| v	 	= 0
 		|| t	 	= 1
-		|| StayAtEnd = .Endgap
+		|| StayAtEnd = .EndGap
 		.LineNumWidth = (.text.TextLineCount.LineNumWidth,  0)(.ShowLineNumbers or Expect >= 3)
 		
 		|int| CharW	= .LastDrawWidth - .LineNumWidth
@@ -1832,7 +1833,7 @@ class TextView (GUIControl)
 			if v > 1000K
 				p = d.TakeEntireText(.text,p) // just give up wrapping
 			  else
-				p = d.FindWhereLineBreaks(.text, CharW, isinl, p)
+				p = d.FindWhereLineBreaks(.text, CharW, .singleline, p)
 			t = d.SetErrorsAndStuff(self, t)
 			if expect >= 2
 				msg = d.colorise(msg, ParsedOK)

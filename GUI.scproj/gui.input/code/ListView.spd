@@ -1418,11 +1418,10 @@ class ListView (GUIControl) {
 				return rz
 	
 	
-	syntax Append (|string| name, |GUIMenuEvent| ev, |object| o=nil)
+	syntax Append (|string| name, |GUIMenuEvent| ev, |object| obj=nil)
 		cpp_part AppendMenuItem
-		|| m = menuitem(name, ev)
-		m.obj = o
-		self <~ m
+		self <~ menuitem(name, ev, obj)
+
 	
 	Syntax append (|ListViewRow| R)
 		|| needsel = .OneAlwaysSelected and !.ListSource.HasAny

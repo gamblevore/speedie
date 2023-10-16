@@ -115,6 +115,7 @@ extend PerryIDE
 			isnt drawsfocus
 			is NoSearch
 			
+			.OnRightClick = PerryFileViewRightClick
 			.WasEdited = PerryfileRenamed
 			.UseColorScheme	= true
 			.OneAlwaysSelected = true
@@ -272,6 +273,7 @@ extend PerryIDE
 		with .StatsInfo 
 			.ID				= "StatsInfo"
 			.align			= ListViewState.alignleft
+			.SingleLine		= true
 			isnt editable 
 			.takesfocus		= 0
 			.size 			= the~left to the~middle+100  by  0 to 11
@@ -281,6 +283,7 @@ extend PerryIDE
 		with .SelInfo 
 			.ID				= "SelInfo"
 			.align			= ListViewState.alignright
+			.SingleLine		= true
 			isnt editable
 			.takesfocus		= 0
 			.size 			= the~right back 180  by  0 to 11

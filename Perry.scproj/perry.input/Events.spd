@@ -111,7 +111,7 @@ function file.FindProjectMain (|file|)
 	if best.exists
 		return best
 	for c.files in inp
-		if c isa "spd"
+		if c.isSource
 			return c
 
 
@@ -496,6 +496,36 @@ function PerrySearchWithin (GUIListEvent)
 	.ide.SubFindCheckBox is visible
 	.ide.ShowFind
 	
+
+
+function PerryFileViewRightClick (GuiListEvent)
+	require RightClickFileList(self, row, mode)
+	if row isa filerow
+		|| m = .CMM	#require
+		|| menu = menuitem("Count Lines Of Code", FileViewerCountCode)
+		m.listsource.Last.prev.prev = menu
+	return true
+
+
+function FileViewerCountCode (GuiMenuEvent)
+	|| row = clicked.row as filerow		#require
+	if !row.asdir
+		|| i = .ide
+		i.ShowLeftStats(1)
+		beep i.StatsInfo.text
+		return 
+
+	|| CLOC = 0
+	|| Files = 0
+	for c.flat in row
+		|| L = c.ReadFrom
+		if l.isSource
+			|| f = l.file
+				|| p = f.parse
+					Files++
+					CLOC += p.loc
+					
+	beep "$Cloc lines of sourcecode in $files files.\n\nPath: ${row.location}"
 
 
 
