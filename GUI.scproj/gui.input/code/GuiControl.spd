@@ -91,7 +91,18 @@ class GUIControl (ringtree)
 	setter Size (|controlrect|)
 		.sizer.setsize(value)
 		if value.IsBasic
-			.LastRect = value.basicsize // right?
+			.MiniSizeSet(value.basicsize)
+
+
+	function MiniSizeSet (|ivec4| Rect)
+		opt norefcounts
+		|| p = .parent
+		|| l = p.lastrect
+		if p isa window
+			l = l.soothe
+		rect += l.xyxy
+		.LastRect = rect // right?
+
 
 	helper Reflow (|ivec4| mine, |ivec4| Hard) 
 		opt norefcounts

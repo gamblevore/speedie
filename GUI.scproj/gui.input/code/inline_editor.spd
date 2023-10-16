@@ -18,6 +18,7 @@ struct InlineEditor
 	function Init (|Window| w)
 		.editor = textview(w)
 		with .editor
+			//.clipmode		= controlclipmode.debug
 			.id				= "inline_editor"
 			.visible		= false
 			.SingleLine		= true

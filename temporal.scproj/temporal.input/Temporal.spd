@@ -1,13 +1,14 @@
 
 
+
 module Temporal	
+
 	function InputBit (|uint64| x=temporal.inputbyte,  |bool|)
 		return x.CountBits & 1
 			
 	function InputByte (|byte|)
-		return  -1
-		// want a thread that creates a buffer of data... ideally chooseable via
-		// temporal inputs
+		return  -1	// want a thread that creates a buffer of data... ideally chooseable via temporal inputs
+
 	function Input8 (|int|)
 		return .Inputbyte|int|.countbits
 	

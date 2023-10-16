@@ -1212,8 +1212,7 @@ class ListView (GUIControl) {
 		
 		|| s	= .FilteredRect
 		|| low	= s.y1
-		|| top	= s.y2
-		top += .scrollshift
+		|| top	= s.y2 + .scrollshift - .rowheight
 		while curr != find
 			top -= .rowheight
 			require (curr) and (top >= low)
@@ -1223,8 +1222,8 @@ class ListView (GUIControl) {
 
 	helper SetInlineSize
 		opt norefcounts
-		|| inl = .InlineCell						#require
-		|| cell = inl.cell							#require
+		|| inl = .InlineCell								#require
+		|| cell = inl.cell									#require
 		|| cb = .CellBounds(._scroll, cell)
 			if (cb.y2 <= .height+1) and (cb.y1 >= -1)
 				inl.editor.size = cb.layout
@@ -1233,13 +1232,12 @@ class ListView (GUIControl) {
 
 
 	helper CellBounds (|ListViewRow| curr,  |ListViewCell| cell,  |ivec4|)
+		opt norefcounts
 		|| sc = cell.row
-		rz = .RowBounds(._scroll, sc, .rowheight)
-		if rz
-			rz.horz = .col(cell.column, rz, sc)
-			rz.x += sc.depth(self) * font.width*2
-			rz = rz down .absbottom
-			rz = rz left .absleft
+		|| B = .RowBounds(._scroll, sc, .rowheight)			#require
+		B.horz = .col(cell.column, B, sc)
+		B.x += sc.depth(self) * font.width*2
+		return (B down .absbottom) left .absleft 
 
 
 	helper DrawBordersSub (|image| Where,  |ivec4| Rect)

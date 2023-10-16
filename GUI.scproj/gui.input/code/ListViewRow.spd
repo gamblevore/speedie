@@ -26,7 +26,6 @@ role ListViewRow (message)
 		if b
 			.state |= s
 		  else
-			if s == ListViewState.active
 			.state &= ~s
 
 	syntax isnt (|ListViewState| s, assigns:|bool| b)
@@ -195,6 +194,7 @@ role ListViewRow (message)
 
 datatype ListViewState (uint16)
 	flags
+		|ListViewState| 
 		AlignLeft = 0
 		Align		= (AlignCenter, AlignRight)
 		Selected 
@@ -210,6 +210,8 @@ datatype ListViewState (uint16)
 		Hierarchical
 		DrawWhiteSpace
 		Hidden
+	syntax is (|ListViewState| s, |bool|)
+		return self & s
 
 
 datatype ListViewSelectMode (uint)
