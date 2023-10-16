@@ -4,6 +4,7 @@ role StretchControl (GuiControl)
 	contains stretchdivider
 	linkage
 		cpp_part SC
+	
 	helper Add (|string| name)
 		|| rz = guicontrol(self)
 		rz.ID = name
@@ -243,4 +244,5 @@ class StretchDivider (GuiControl)
 
 function GuiControl.MouseNotDownOverOther (|bool|)
 	opt norefcounts
-	return (.window.CurrMouseDown == self or nil)
+	|| c = .window.CurrMouseDown
+	return (c == self or nil)
