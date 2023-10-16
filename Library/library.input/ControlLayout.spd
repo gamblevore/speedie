@@ -47,6 +47,12 @@ datatype ControlRect (ivec4)
 	function Height (|ControlLine|)
 		return (.y1, .y2)|ControlLine|
 	
+	function BasicSize (|ivec4|)
+		return self >> 4
+	
+	function IsBasic (|bool|)
+		return .syntaxequals(.BasicSize.Layout, false)
+		
 	render
 		self[0]|controlpoint|.AppendInto(fs)
 		fs <~ " to "
@@ -62,6 +68,7 @@ helper int.MiddleLayout (|controlline|)
 
 helper int.InsideLayout (|controlline|)
 	return the~left+self to the~right-self
+
 function ivec2.Layout (|controlrect|)
 	return .x~wide by .y~high
 

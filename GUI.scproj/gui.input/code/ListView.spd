@@ -1207,35 +1207,34 @@ class ListView (GUIControl) {
 	
 	
 	helper RowBounds (|ListViewrow| curr, |ListViewrow| find, |int| add, |ivec4|)
+		opt norefcounts
 		require find
 		
 		|| s	= .FilteredRect
 		|| low	= s.y1
 		|| top	= s.y2
 		top += .scrollshift
-		top -= .rowheight
 		while curr != find
-			ifn (curr) and (top >= low)
-				return nil
-			curr = .hiernext(curr)
 			top -= .rowheight
+			require (curr) and (top >= low)
+			curr = .hiernext(curr)
 		return (s.x, top, s.x2, top + add)
-	
 
-	helper SetCellBounds
+
+	helper SetInlineSize
 		opt norefcounts
-		|| inl = .InlineCell
-			|| cell = inl.cell
-				|| cb = .CellBounds(._scroll, cell)
-				if cb and cb.y2 <= .height+1 and cb.y1 >= -1
-					inl.editor.size = cb.layout
-				  else
-					inl.FinishAndClear
-	
-	
+		|| inl = .InlineCell						#require
+		|| cell = inl.cell							#require
+		|| cb = .CellBounds(._scroll, cell)
+			if (cb.y2 <= .height+1) and (cb.y1 >= -1)
+				inl.editor.size = cb.layout
+				return
+		inl.FinishAndClear
+
+
 	helper CellBounds (|ListViewRow| curr,  |ListViewCell| cell,  |ivec4|)
 		|| sc = cell.row
-		rz = .RowBounds(._scroll, sc, .rowheight) 
+		rz = .RowBounds(._scroll, sc, .rowheight)
 		if rz
 			rz.horz = .col(cell.column, rz, sc)
 			rz.x += sc.depth(self) * font.width*2
@@ -1380,7 +1379,7 @@ class ListView (GUIControl) {
 				re = re down 2
 			where.drawrect(re, ¥.border)
 		
-		.SetCellBounds
+		.SetInlineSize
 		
 		if .CanSeeAllLines
 			.scrolldrawtimer = 0
@@ -1512,3 +1511,5 @@ function ListViewrow.Depth (|listview| me, |int|)
 		rz++
 		c = c.parent
 
+
+|ivec4| LastCB

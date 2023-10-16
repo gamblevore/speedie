@@ -183,9 +183,10 @@ module SDLApp
 		
 	
 	function Touch (|guicontrol| modified=nil)
-		.TouchCount := 2	// 2 cos we have a draw bug that seems to delay draws by 1 frame?
+		if .TouchCount < 2	// 2 cos we have a draw bug that seems to delay draws by 1 frame?
 							// the draw is being DONE... but not getting to the screen somehow
 							// even though I'm telling it to
+			.touchcount = 2
 
 	
 	function Resized (|guicontrol| modified=nil)

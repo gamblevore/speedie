@@ -87,8 +87,11 @@ class GUIControl (ringtree)
 
 	function Size (|ivec2|)
 		return .lastrect.size
+
 	setter Size (|controlrect|)
 		.sizer.setsize(value)
+		if value.IsBasic
+			.LastRect = value.basicsize // right?
 
 	helper Reflow (|ivec4| mine, |ivec4| Hard) 
 		opt norefcounts
