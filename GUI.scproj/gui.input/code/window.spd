@@ -29,7 +29,7 @@ class Window (GUIControl)
 		.DrawBackgroundOnFullScreen = true
 		.size = Size
 		.createddate = date.now
-		.inlineeditorplace.init(self)
+		.InlineEditorPlace.Init(self)
 		.reflow
 		.show
 

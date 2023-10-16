@@ -12,6 +12,7 @@ role StretchControl (GuiControl)
 	setter Collapsed (|bool|)
 		opt norefcounts
 		.div.setcollapsed(false, value)
+	
 	function Collapsed (|bool|)
 		opt norefcounts
 		return !.div.ActiveEnd.length
@@ -145,6 +146,7 @@ class StretchDivider (GuiControl)
 			  else
 				.setCollapsed(true, true)
 
+
 	function Show
 		opt norefcounts
 		|| pr = .parent.lastrect
@@ -154,7 +156,7 @@ class StretchDivider (GuiControl)
 				s = mix(pr[.d], pr[.d+2], 0.333)|int|
 			.ActiveEnd = (s)~up
 
-		
+
 	function High (|guicontrol|)
 		opt norefcounts
 		return .parent.second

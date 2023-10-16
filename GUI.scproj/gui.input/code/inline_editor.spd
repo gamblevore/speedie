@@ -111,20 +111,21 @@ struct InlineEditor
 
 function window.Inline (|&InlineEditor|) // avoid getting the struct itself
 	opt norefcounts
-	return &.inlineeditorplace
+	return &.InlineEditorPlace
+
 
 function window.InlineEditor (|guicontrol|)
 	opt norefcounts
-	return .inlineeditorplace.editor
+	return .InlineEditorPlace.Editor
 
 
 function GuiControl.CanSearch (|int|)
 	if self is unsearchable
 		return 0
 	if self isa textview
-		if .isinline
+		if .IsInline
 			return -1
-		if .singleline
+		if .SingleLine
 			return 0
 	return 1
 
