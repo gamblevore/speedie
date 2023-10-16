@@ -577,13 +577,13 @@ module SDLApp
 	helper Window.Reflow (|bool| UsePrev = true, |ivec4|)
 		opt norefcounts
 		|| p = .parent ?? window.all
-		|| D = sdlapp.DrawSpace
-			|| BigRect = d.rect
-			|| rect = (0,0,0,0)
-			if UsePrev
-				|| b = .prev
-					rect = b.lastrect
-			return .reflowdoc(bigrect, rect, bigrect)
+		|| D = sdlapp.DrawSpace					#require
+		|| BigRect = d.rect
+		|| rect = (0,0,0,0)
+		if UsePrev
+			|| b = .prev
+				rect = b.lastrect
+		return .reflowdoc(bigrect, rect, bigrect)
 
 	
 	helper DrawSub (|window| w)
@@ -1151,6 +1151,7 @@ function string.PrintTimeStart
 	FirstTime = n
 	""
 	"$self  0"
+
 
 function string.PrintTimeEnd
 	if FirstTime
