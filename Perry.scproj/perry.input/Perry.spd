@@ -13,7 +13,6 @@ module Perry
     |byte| 							FindID
 	|dictionary of string|			PathDict
 	
-	
 	constants
 		arc_newer	= 2
 		arc_older	= 1
@@ -212,9 +211,10 @@ function View (|ButtonView| btn)
 function ShowCompileTab (|object| tab)
 	if .EditSep.Collapsed
 		.EditSep.Show // needs reflow first?
-		.CompileTabSelect(tab, true)
-	  else
-		.EditSep.Collapse
+		// whats the difference bewteen show and expand?
+	.CompileTabSelect(tab, true)
+//	  else
+//		.EditSep.expand
 
 
 function OutText (|textview|)
