@@ -124,7 +124,7 @@ extend_module perry
 // over complex? it just returns (speedie.file)?
 // i mean testing is important... but what if it fails? does it do anything special to help with that?
 		|| where = speedie.file
-		|| dest_path = where.linksto
+		|| dest_path = where.LinksTo
 		if where.exists and dest_path
 			|| result = dest_path.executestr(["--alive"]).trim
 			if result contains "seems alive"
