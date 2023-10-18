@@ -380,7 +380,7 @@ helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D, |int| y, |imag
 
 helper TextView.UseColorAnyway (|int|)
 	// what about the expectsparse thing?
-	ifn .singleline or .isinline
+	ifn .isinline
 		if .ParsedMessage or .myerror
 			return 2
 		return 3
