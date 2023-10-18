@@ -361,17 +361,15 @@ class File (String)
 	operator IsNewerThan (|File| F, |bool|)
 		cpp_Part NewerThanFile
 		return self isnewerthan f.modified
+	
 	operator IsNewerThan (|date| F, |bool|)
 		return (.Modified > F)
-	
 	
 	operator IsOlderThan (|File| F, |bool|)
 		return (.Modified < F.Modified)
 	
-	
 	function Writer (|FastString|) // streamout
 		disabled "Use .out"
-	
 	
 	function string.Out (|bool| Clear=true, |Faststring|)
 		|| f = .file						#require
@@ -382,7 +380,6 @@ class File (String)
 		rz = FastString()
 		rz.file = f
 
-	
 	function string.In (|string|Header="", |int| ChunkSize=4MB, |StringReader|)
 		|| f = .file
 		if f.mustexist("stream")
