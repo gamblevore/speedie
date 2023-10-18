@@ -76,10 +76,22 @@ function perryide.DebugEnvs (|message| env)
 			app.ChildEnv(rel[0].name) = ch2.name
 
 
-function perryide.DebugActual (|file| f, |[string]| args)
-	.LogOneAction(@emb + (f + " " + args.render))
-	
-	.RunCompiledApp = ShellStream.stream(f, args)
+function PerryIDE.DebugActualStr (|file| f, |[string]| args, |faststring|)
+	rz = FastString()
+	rz <~ f.name
+	rz <~ ":"
+	for a in args
+		rz <~ ","
+		start
+		rz <~ " "
+		rz.AppendQuotedEscape(a)
+
+
+function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct
+	|| out = .DebugActualStr(F, args)
+	.LogOneAction(@emb + out.Copy)
+	out <~ ("\n", 2)
+	.RunCompiledApp = ShellStream.stream(f, args, out)
 	if .RunCompiledApp and .RunCompiledApp.PID
 		.RunButton.text = "\07"
 
@@ -96,19 +108,18 @@ function perryide.DebugPath (|file| f, |message| conf)
 			app.cwd = path
 
 
-function perryide.StartDebugging (|file| f)
+function PerryIDE.StartDebugging (|file| f)
 	require f.MustExist and StdErr.ok
 
 	.DebugArgsList.UpdateDebugArgs
-	|| debugargs = .DebugArgsFile.parse #require
-	|| ArgMsg = debugargs["args"]
+	|| debugargs = .DebugArgsFile.parse				#require
+	|| ArgMsg = DebugArgs["args"]
 	|| args = argmsg.AllNames
 	if f.isdir
 		check (!args) (ArgMsg, "You can't pass arguments to gui-apps (in this version).")
 		args = [f]
 		f = "/usr/bin/open".file
-
-
+	
 	|| old = app.cwd
 	.debugpath(f, debugargs)	
 	.DebugEnvs(debugargs["env"])		
@@ -149,7 +160,7 @@ function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 		.ProductOut <~ "\n(--Process Killed--)"
 	  elseif r.Exit >= 0
 		|| exitcode = "\n(--Exit OK--)"
-		if r.exit
+		if r.exit > 0
 			exitcode = "\n(--Exit Error: ${r.Exit}--)"
 			.addProductErr(exitcode)
 		.ProductOut <~ exitcode
