@@ -10,6 +10,9 @@ role StretchControl (GuiControl)
 		rz.ID = name
 		self <~ rz
 
+	function Expand
+		.Collapsed = false
+		
 	setter Collapsed (|bool|)
 		opt norefcounts
 		.div.setcollapsed(false, value)
