@@ -10,12 +10,12 @@
 
 						 Perry Do later
 
+* Editable fields should align same as uneditable! (output)
 * going backwards seems to put the line at the TOP of the window... but forward puts it in the middle
-	* if we aren't in any func, find the nearest above or below us.
+
 * Drawing black sometimes (winsize change)
 	* draw seems to have a delay except with keyboard events? (check if fixing this, also fixes the msg sending delay)
-* can't find "operatorvs" on message
- even later
+						 even later
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
 * TextView error/find resync
@@ -24,7 +24,8 @@
 
 						 Speedie Do later
 * finish off collectdecls
-* new datatypes can subclass off nothing!
+* new datatypes shouldn't be able to subclass off nothing!
+* can't find "operatorvs" on message
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
 	* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
 * "calledfrom" autocomplete needs to include references to funcs
