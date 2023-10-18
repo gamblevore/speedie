@@ -157,7 +157,7 @@ int JB_Str_Length( JB_String* self ) {
 uint8* JB_Str_Address( JB_String* self ) {
 	if (self) 
 		return (uint8*)self->Addr;
-	return 0;
+	return (uint8*)"";
 }
 
       
