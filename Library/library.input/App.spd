@@ -153,7 +153,7 @@ function AppPath (|string|)
 function CalledName (|string|)
 	cpp_wrapper JB_App__CalledBy
 		
-function TurnInto (|string| s, |[string]| R=nil, |errorint|)
+function TurnInto (|string| s, |[string]| R=nil)
 	cpp_Wrapper JB_App__TurnInto
 
 function ObjMemory (|int64|)

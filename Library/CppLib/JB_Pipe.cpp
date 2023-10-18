@@ -127,39 +127,39 @@ int JB_Pipe__IgnoreBreakPoints() {
 	return rz;
 }
 
-const char* ArrayCStrOne_(JB_String* S, int& ugh) {
-	if (!JB_Str_Length(S)) {return "";}
-	if (JB_Str_IsC(S)) return (const char*)JB_Str_Address(S);
-	JB_ErrorHandleFile(S, nil, EINVAL, "Speedie string not zero-terminated", "Executing shell-command");
-	JB_Str_IsC(S); // for testing
-	ugh = EINVAL;
-	return 0;
-}
 
-void JB_Str__Terminate(Array* strs) {
+bool JB_Str__Terminate(Array* strs) {
 	int n = JB_Array_Size(strs);
 	for_(n) {
 		JB_String* A = (JB_String*)JB_Array_Value(strs, i);
-		JB_Array_ValueSet(strs, i, JB_Str_MakeC(A));
+		auto B = JB_Str_MakeC(A);
+		require (B);
+		if (B != A) {
+			JB_Array_ValueSet(strs, i, B);
+		}
 	};
+	return true;
 }
 
 
-int JB_ArrayPrepare_(JB_String* self, const char** argv, Array* R) {
-	JB_Str__Terminate(R);
-	errno	= 0;
-	int Err = 0;
-	auto last = argv + MaxArgs-1;
-	*argv++ = ArrayCStrOne_(self, Err);
-	
+bool JB_Proc__CreateArgs(JB_String** self, Array* R, const char** argv) {
+	auto last = argv + MaxArgs - 1;
 	int N = JB_Array_Size(R);
-	if (argv+N >= last)
-		return E2BIG;
+	if (argv+1+N >= last) {
+		JB_ErrorHandleFile(*self, nil, E2BIG, "Too many arguments", "Creating shell-arguments");
+		return false;
+	}
+	
+	JB_String* self0 = JB_Str_MakeC(*self);
+	require(self0 and JB_Str__Terminate(R));
+	JB_SetRef(*self, self0);
+	
+	*argv++ = (const char*)JB_Str_Address(self0);
 	for_(N) {
-		*argv++ = ArrayCStrOne_((JB_String*)JB_Array_Value(R, i), Err);
+		*argv++ = ((const char*)JB_Str_Address((JB_StringC*)JB_Array_Value(R, i)));
 	}
 	*argv++ = 0;
-    return Err;
+    return true;
 }
 
 
@@ -168,62 +168,15 @@ int JB_Kill(int PID) {
 }
 
 
-
-const char* _StartProcess (JB_String* self, const char** argv, Array* Args, int* childpipe, int& PID) {
-	if (!JB_Str_Length(self)) {
-		return "received empty-path";
-	}
-	if (JB_ArrayPrepare_(self, argv, Args)) {
-		return "prepare ipc";
-	}
-	int Err = access(argv[0], X_OK | F_OK);
-	if (Err) return "access";
-
-	if (childpipe) {
-		if (pipe(childpipe)) return "pipe";
-		fcntl(childpipe[0], F_SETFL, O_NONBLOCK);
-	}
-
-	PID = fork();
-	
-	if (PID == -1)
-		return "fork";
-	if (PID) {		// parent
-		if (childpipe)
-			pipe_close(childpipe[1]);
-		return 0;
-	}
-	
-	// çhild
-	if (childpipe) {
-		pipe_dup2(childpipe[1], 1); // We can now capture stdout cleanly!
-		pipe_close(childpipe[0]);
-	}
-	execvp(argv[0], 	(char* const*)argv);
-	printf("execv(\"%s\") failed\n",  argv[0]);
-	exit(-1);
-}
-
-
-
-int JB_Str_StartProcess (JB_String* self, Array* Args, JB_File** StdOut) {
-	const char* argv[MaxArgs] = {};
-    int Pipes[2] = {};
-    int PID = 0;
-	auto Err = _StartProcess(self, argv, Args, StdOut?Pipes:0, PID);
-	if (Err) {
-		JB_ErrorHandleFile(self, nil, errno, nil, Err); return -1;
-	}
-	if (StdOut) {
-		JB_SetRef(*StdOut, JB_File__NewPipe(Pipes[0]));
-	}
-	return PID;
-}
-
-
-static int JB_FEPDWEE_Call(ShellStream& Sh, const char** argv, bool NewStdOut) {
+bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, bool CaptureStdOut) {
 // Fork,Exec,Pipe,Dup2,Waitid,Errno,Eintr // unix simplicity :)
-	if (NewStdOut or Sh.Output)
+	auto& Sh = *self;
+	const char* argv[MaxArgs] = {};
+	bool OK = JB_Proc__CreateArgs(&path, Args, argv);
+	if (!OK) return false;
+	
+	Sh.ExitCode = -1;
+	if (CaptureStdOut or Sh.Output)
 		pipe(Sh.CaptureOut);
 	pipe(Sh.StdErrPipe);
 	if (Sh.Mode == 1) {	// 1 means... no block. So we wanna restore it.
@@ -233,28 +186,31 @@ static int JB_FEPDWEE_Call(ShellStream& Sh, const char** argv, bool NewStdOut) {
 	}
 	JB_PID_Register(&Sh);
 	Sh.PID = fork();
-	if (Sh.PID == -1) {
-		return EPERM;
+	if (Sh.PID == 0) {
+		pipe_dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
+		pipe_close(Sh.CaptureOut[WR]);
+		pipe_close(Sh.CaptureOut[RD]);
+		
+		pipe_dup2( Sh.StdErrPipe[WR], STDERR_FILENO );
+		pipe_close(Sh.StdErrPipe[WR]);
+		pipe_close(Sh.StdErrPipe[RD]);
+		execvp(argv[0], (char* const*)argv);
+		_exit(errno); // in case execvp fails
+		return false;
 	}
-	if (Sh.PID) {
+	JB_FreeIfDead(path);
+	if (Sh.PID > 0) {
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.StdErrPipe[WR]);
-		return 0;
+		return true;
 	}
-	
-	pipe_dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
-	pipe_close(Sh.CaptureOut[WR]);
-	pipe_close(Sh.CaptureOut[RD]);
-	
-	pipe_dup2( Sh.StdErrPipe[WR], STDERR_FILENO );
-	pipe_close(Sh.StdErrPipe[WR]);
-	pipe_close(Sh.StdErrPipe[RD]);
-	execvp(argv[0], (char* const*)argv);
-	_exit(errno); // in case execvp fails
+	JB_ErrorHandleFile(path, nil, errno, nil, "call command-line tool");
+	return false;
 }
 
 
-static bool JB_FEPDWEE_Middle(ShellStream& Sh) {
+bool JB_Sh_UpdatePipes(ShellStream* self) {
+	auto& Sh = *self;
 	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], Sh.Mode);
 	// this will only return, once the app has finished... unless we are Streaming.
 	// either way, if both return false, we can finish.
@@ -278,20 +234,13 @@ void JB_FEPDWEE_Finish(ShellStream& Sh) {
 }
 
 
-ShellStream* ShellStart(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
+ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
 	auto rz = JB_New(ShellStream);
 	JB_Sh_Constructor(rz, self);
-	auto& Sh = *rz;
-	Sh.Output = JB_Incr(FSOut);
-	Sh.ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
-
-	const char* argv[MaxArgs + 1];
-	int Err = JB_ArrayPrepare_(self, argv, R);
-	if (!Err) {
-		Err = JB_FEPDWEE_Call(Sh, argv, !KeepStdOut); // once this is called... we don't need argv anymore.
-	}
-	if ( Err) {
-		JB_ErrorHandleFile(self, nil, Sh.Exit, nil, "call command-line tool");
+	rz->Output = JB_Incr(FSOut);
+	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
+	bool OK = JB_Sh_StartProcess(rz, self, Args, !KeepStdOut);
+	if (!OK) {
 		JB_SetRef(rz, 0);
 	}
 	return rz;
@@ -301,26 +250,31 @@ ShellStream* ShellStart(JB_String* self, Array* R, FastString* FSOut, FastString
 int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
 	auto Sh = ShellStart(self, R, FSOut, FSErrIn, KeepStdOut);
 	if (!Sh) {return 1;}
-	JB_FEPDWEE_Middle(*Sh);
+	JB_Sh_UpdatePipes(Sh);
 	
-	while (Sh->Exit==-1) {
-		int Err = waitpid(Sh->PID,  &Sh->Exit,  0); // in case sigchld handler is overridden
+	while (Sh->ExitCode==-1) {
+		int Err = waitpid(Sh->PID,  &Sh->ExitCode,  0); // in case sigchld handler is overridden
 		if (!(Err == -1 and errno == EINTR)) {
 			break;
 		}
 		JB_Date__Sleep(1);
+		JB_Sh_UpdatePipes(Sh);
 	}
 
-	JB_FEPDWEE_Middle(*Sh);
 	JB_FEPDWEE_Finish(*Sh);
-	int Exit = Sh->Exit;
+	
+	int Code = Sh->ExitCode;
+	if (WIFEXITED(Code)) {				// called exit()
+		Code = WEXITSTATUS(Code);
+	} else if (WIFSIGNALED(Code)) {		// died from a signal
+		Code = WTERMSIG(Code);		// usually its what we want, despite being mixed up
+	} 
+
 	if (Sh->ErrorOutput->Length and !FSErrIn) {
 		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh->ErrorOutput), nil);
-		if (!Exit)
-			Exit = 1; // generic error code
 	}
 	JB_FreeIfDead(Sh);
-	return Exit;
+	return Code;
 }
 
 
@@ -371,7 +325,7 @@ bool JB_Sh_Step(ShellStream* self) {
 	ShellStream& Sh = *self;
 	if (Sh.Mode >= 0) {
 		Smooth(Sh);
-		if (JB_FEPDWEE_Middle(Sh))
+		if (JB_Sh_UpdatePipes(&Sh))
 			return true;
 		JB_FEPDWEE_Finish(Sh);
 	}
@@ -380,15 +334,11 @@ bool JB_Sh_Step(ShellStream* self) {
 
 
 
-int JB_App__TurnInto(JB_String* self, Array* R) {
+void JB_App__TurnInto(JB_String* self, Array* R) {
 	const char* argv[MaxArgs + 1];
-	int Err			= JB_ArrayPrepare_(self, argv, R);
-	if (!Err) {
-		execvp(argv[0], (char* const*)argv); Err = errno;	// in case execvp fails
-	}
-	if (Err)
-		JB_ErrorHandleFile(self, nil, Err, nil, "turninto");
-	return Err;
+	JB_Proc__CreateArgs(&self, R, argv);
+	execvp(argv[0], (char* const*)argv);
+	exit(-1);	// in case execvp fails
 }
 
 

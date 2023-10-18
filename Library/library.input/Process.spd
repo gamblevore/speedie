@@ -16,14 +16,13 @@ datatype IPCState (uint16)
 
 
 
-class Process (ProcessOwner)
+class Process (ShellStream)
 	linkage
 		cpp_part Proc
 	contains Process
 	|file|						Talker
 	|jbin|						Writer
 	|string|					Name
-	|string|					Path
 	|&byte|						Orig
 	|&IPCMessage|				Ours
 	|&IPCMessage|				Theirs
@@ -31,8 +30,6 @@ class Process (ProcessOwner)
 	|fn_subprocess|				SubProcess
 	|[string]|					Params
 	|file|						LogFile
-	|file|						_StdOutFile
-	|FastString|				_StdOut
 	|ringtree of message|		SendQueue
 	|IPCMessage|				Dummy
 	|int|						SizeOfOrig
@@ -43,8 +40,9 @@ class Process (ProcessOwner)
 	|bool|						TrapStdOut
 	|byte|						CanPrint
 
-	constructor	(|string| name,  |int| n,  |[string]| params=nil,  |fn_subprocess| sub=nil,  |bool|TrapStdOut=false)
+	constructor	(|string| path, |string| ID,  |int| n,  |[string]| params=nil,  |fn_subprocess| sub=nil,  |bool|TrapStdOut=false)
 		cpp_part Constructor
+		super.constructor(path)
 		
 		.Orig = (&.Dummy)|&byte|
 		.deathlimit = 12
@@ -54,11 +52,11 @@ class Process (ProcessOwner)
 		.sendqueue	= ringtree()
 		.writer		= FastString()
 
-		name := app..talk
-		if name and *name != '/'
-			name = name.ipcPath
-		.name = name.ipcname
-		.talker		= name.file
+		ID := app..talk
+		if ID and *ID != '/'
+			ID = ID.ipcPath
+		.name = ID.ipcname
+		.talker		= ID.file
 		if .isserver
 			params := []
 			params = params.copy
@@ -67,7 +65,7 @@ class Process (ProcessOwner)
 			app.BelongsToParent // should die if the parent dies!
 		.params		= params
 
-		if name
+		if ID
 			.OpenSharedMemory(n)
 		  else
 			error (Self, "No name given.")
@@ -165,8 +163,8 @@ class Process (ProcessOwner)
 
 
 	helper SetupServerState
-		if ._StdOut
-			._StdOut.Length = 0
+		if .Output
+			.Output.Length = 0
 		if !.IsServer
 			expect (.theirs.state) (self, "MemorySharingFailed")
 			is Connected
@@ -195,11 +193,9 @@ class Process (ProcessOwner)
 		return .ours.state != d
 
 	syntax is (|IPCState| d, assigns:|bool|)
-		require value
-		|| old = .ours.state
-		if old >= ipcstate.closed
-			debug_require (d >= old) or (d <= ipcstate.connected)
-		.ours.state = d
+		if value
+			.ours.state = d
+			if d >= ipcstate.closed
 
 	helper Found (|bool| send, |bool|)
 		if send
@@ -258,11 +254,11 @@ class Process (ProcessOwner)
 			app.TrySleep(SleepAmount)
 			
 
-		.MarkClosed
+		.UpgradeToClosed
 		.self "WaitFor ended"
 	
 	
-	function MarkClosed
+	function UpgradeToClosed
 		if (.Ours.State < IPCState.closed)
 			is closed
 	
@@ -348,14 +344,14 @@ class Process (ProcessOwner)
 		.SendSignal(ProcessOwner.SIGUSR1)
 		.LastSend = date.now
 		.writer.length = 0
-		.UpdateStdOut
+		.UpdatePipes
 
 
 	function Get (|Date| TimeOut = 2years, |message|)
 		opt norefcounts
 		require (self != nil)
 		rz = .getsub(timeout)
-		.UpdateStdOut
+		.UpdatePipes
 	
 	
 	helper GetSub (|Date| TimeOut, |message|)
@@ -399,20 +395,12 @@ class Process (ProcessOwner)
 		.Disconnect
 
 
-		
 	function ReadStdOut (|string|)
 		if self
-			.UpdateStdOut
-			return ._stdout
+			.UpdatePipes
+			return .Output
 		
-		
-	helper UpdateStdOut
-		opt norefcounts
-		if ._StdOutFile
-			|| fs = ._stdout init faststring()
-			fs.appendfile(._stdoutfile)
-
-
+	
 	helper Self (|string| msg, |bool| strong=false)
 		if .CanPrint or strong
 			.LogUs
@@ -478,10 +466,10 @@ class Process (ProcessOwner)
 
 	function Disconnect 
 		.unregister
-		.UpdateStdOut
+		.UpdatePipes
 		if self isnt closed
 			.self "disconnect"
-			.ours.state = ipcstate.closed
+			.ours.state = ipcstate.closed 
 		if .IsServer
 			.UseDummy
 		  else
@@ -509,22 +497,16 @@ class Process (ProcessOwner)
 			.unlink
 
 
-	helper string.CreateArgs (|&cstring| Space, |[string]| Args, |int|)
-		cpp_wrapper JB_ArrayPrepare_
+	helper StartProcess (|string| path, |[string]| Args=nil, |bool| CaptureStdOut, |bool|)
+		cpp_Wrapper JB_Sh_StartProcess
 
+	
+//	bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args)  { 
 
-	helper string.StartProcess (|[string]| Args=nil, |&file| StdOut=nil, |PID_int|)
-		cpp_Wrapper JB_Str_StartProcess
-
-
-	function RunChild (|string| path, |bool|)
-		debug_require path
+	function RunChild (|bool|)
+		debug_require .path
 		require (self isnt invalid)
-		.exit = -1
-		.pid = path.cstr.Startprocess(.params, (&._stdoutfile, nil)(.trapstdout))
-		if .pid > 0
-			.Register
-			.path = path
+		if .Startprocess(.path, .params, .trapstdout)
 			return true
 		is closed
 
@@ -546,7 +528,7 @@ class Process (ProcessOwner)
 			expect (.path) (self, "Can't re-activate process ${.name} without a path.")
 			.OpenSharedMemory(.SizeOfOrig)
 			.self "reopen"
-			return .RunChild(.path)
+			return .RunChild
 
 
 	function Run (fn_pth_wrap)
@@ -557,11 +539,13 @@ class Process (ProcessOwner)
 		return (.subprocess)(nil, 1)
 
 
-	function Fill_CArgs (|fn_subprocess| process, |errorint|)
+	function Fill_CArgs (|fn_subprocess| fn, |errorint|)
 		|| space2 = cstring[256]
-		|| r = "".CreateArgs(space2.ptr, .params)
-		r := (process)(space2.ptr, 0)
-		return r
+		|| nothing = ""
+		if process.CreateArgs(nothing, .params, space2.ptr)
+			rz = (fn)(space2.ptr, 0)
+		  else
+			rz = -1
 
 
 	function SendCrashed
@@ -603,6 +587,10 @@ class Process (ProcessOwner)
 					ch.ProcessDied
 		
 
+		helper CreateArgs (|&string| path, |[string]| Args, |&cstring| Space, |bool|)
+			cpp_wrapper
+
+
 		function BackTrace (|&_voidptr| space, |&int| size, |&cstring|) 
 			cpp_wrapper JB_BackTrace
 		
@@ -620,15 +608,13 @@ class Process (ProcessOwner)
 
 		function Parent (|Process|)
 			opt norefcounts
-			if self.owner_ == nil
-				self.owner_ = process("", 0, nil, nil)
-			return self.owner_
+			return .owner_ init process("", "", 0, nil, nil)
 			
 
-		function Child (|string| app_path, |string| name, |[string]| params=nil, |bool| TrapStdOut=false, |int|size=16KB, |Process|)
+		function Child (|string| app_path, |string| ID, |[string]| params=nil, |bool| TrapStdOut=false, |int|size=16KB, |Process|)
 			require app_path.file.mustexist
-			rz = process(name, size, params, trapstdout)
-			if !rz.RunChild(app_path)
+			rz = process(app_path, ID, size, params, trapstdout)
+			if !rz.RunChild
 				rz = nil
 		
 
@@ -664,8 +650,8 @@ prototype fn_pth_wrap (|Process| ipc, |int|)
 
 prototype fn_app_DeathAction
 prototype fn_subprocess	(|&cstring| args, |int| Mode, |errorint|)
-	function RunAsProcess (|string| name, |[string]| R = nil,  |int| size = 16KB,  |bool| join = false,  |Process|)
-		rz = process(name, size, r, self)
+	function RunAsProcess (|string| ID, |[string]| R = nil,  |int| size = 16KB,  |bool| join = false,  |Process|)
+		rz = process("", ID, size, r, self)
 		|| bad = !rz.Fill_CArgs(self)
 		|| Err = (process.Run).Start(rz, join)
 		bad := Err != 0

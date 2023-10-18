@@ -16,6 +16,9 @@ void JB_PID_Constructor(ProcessOwner* self);
 void JB_PID_UnRegister(ProcessOwner* self);
 void JB_PID_Destructor(ProcessOwner* self);
 void JB_PID_Register(ProcessOwner* self);
+int JB_PID_Exit(ProcessOwner* self);
+int JB_PID_TermSig(ProcessOwner* self);
+void JB_PID_ClearExit(ProcessOwner* self);
 ProcessOwner* JB_PID_Next(ProcessOwner* self);
 ProcessOwner* JB_PID__First();
 
@@ -28,8 +31,8 @@ JBClass( ShellStream, ProcessOwner,
 	JB_String*  Path;
 	FastString* Output;
 	FastString* ErrorOutput;
-    int CaptureOut[2]; // remove these? they are just temps?
-    int StdErrPipe[2]; // check if they are!
+    int CaptureOut[2];
+    int StdErrPipe[2];
     Date LastRead;
     int64 UserFlags;
     JB_Object* UserObj; // just like jeebox!
@@ -42,10 +45,12 @@ void JB_Sh_Constructor(ShellStream* self, JB_String* Path);
 ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn);
 bool JB_Sh_Step(ShellStream* self);
 int JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, bool KeepStdOut);
-int JB_App__TurnInto(JB_String* self, Array* R); 
+bool JB_Proc__CreateArgs(JB_String** self, Array* R, const char** argv);
+bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, bool capture);
+bool JB_Sh_UpdatePipes(ShellStream* self);
+void JB_App__TurnInto(JB_String* self, Array* R); 
 typedef void (*fn_app_deathaction)();
 void JB_App__AtExit (fn_app_deathaction b);
-int JB_ArrayPrepare_(JB_String* self, const char** argv, Array* R);
 int JB_Str_System(JB_String* self);
 int JB_Kill(int PID);
 int JB_PID_Signal(ProcessOwner* self, int sig);
@@ -54,7 +59,7 @@ void JB_SigMsgReceived(int signum);
 void JB_SigChildLock ();
 void JB_SigChildUnLock ();
 int JB_App__Fork();
-int JB_Str_StartProcess (JB_String* self, Array* Args, JB_File** StdOut);
+//int JB_Str_StartProcess (JB_String* self, Array* Args, JB_File** StdOut);
 void JB_AtExit(void* func);
 bool JB_PipeIsClosed(int fd);
 bool JB_IsTerminal(int FD);

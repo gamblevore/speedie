@@ -433,7 +433,7 @@ void JB_Mem_Destructor( JB_MemoryLayer* self ) {
 
 
 void JB_Helper_SelfLink(JB_RingList* New) {
-	New->Exit = -1;
+	New->ExitCode = -1;
     New->Prev = New;
     New->Next = New;
 }
@@ -753,8 +753,9 @@ extern "C" uint8* JB__WriteIntToBuffer (uint8* wp, s64 LeftOver);
 
 void JB_OutOfMainMemory(int64 N) {
     if (!OutOfMemoryHappenedAlready) {
-        printf("Jeebox: Can't allocate %lli bytes for main memory.", N);
+        printf("Jeebox: Failed to allocate %lli bytes of main memory.\n", N);
         OutOfMemoryHappenedAlready++;
+		JB_ErrorHandleC("Memory Manager failed to allocate Object", false);
     }
 }
 

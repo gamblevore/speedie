@@ -6,7 +6,6 @@ class ProcessOwner
 		cpp_part PID
 	contains ProcessOwner
 	
-	|int| 				Exit
 	|ProcessOwner--|	_Next
 	|ProcessOwner--|	_Prev
 	|PID_Int| 			PID
@@ -17,6 +16,10 @@ class ProcessOwner
 	destructor
 		cpp_Wrapper JB_PID_Destructor
 	
+	function Exit (|int|)
+		cpp_wrapper JB_PID_Exit
+	function TermSig (|int|)
+		cpp_wrapper JB_PID_TermSig
 	function Register
 		cpp_wrapper JB_PID_Register
 

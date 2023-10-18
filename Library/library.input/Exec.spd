@@ -46,7 +46,7 @@ extend string
 	function ExecuteStr (|[string]| Args=nil, |string|)
 		|| fs = faststring()
 		if .execute(args, fs)
-			return fs
+			rz = fs
 
 	function System (|int|)
 		cpp_wrapper	// bad? execute is better?

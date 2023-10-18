@@ -15,11 +15,11 @@ JB_CriticalSection	ChildFinder;
 ProcessOwner		Root;
 
 
-static void AddLostChild_(int PID, int Exit) {
+static void AddLostChild_(int PID, int ExitCode) {
 	ProcessOwner* F = JB_PID_Next(&Root);
 	while (F) {
 		if (F->PID == PID) {
-			F->Exit = Exit;
+			F->ExitCode = ExitCode;
 			return;
 		}
 		F = JB_PID_Next(F);
@@ -37,10 +37,10 @@ void JB_SigChild (int signum) {
 	ChildFinder.Lock();
 
 	while (true) {
-		int Exit = 0;
-		int PID = waitpid(-1, &Exit, WNOHANG);
+		int ExitCode = 0;
+		int PID = waitpid(-1, &ExitCode, WNOHANG);
 		if (PID > 0) {
-			AddLostChild_(PID, Exit);
+			AddLostChild_(PID, ExitCode);
 		} else if (PID == 0 or errno != EINTR) {
 			break;
 		}
@@ -63,6 +63,25 @@ void JB_PID_Constructor(ProcessOwner* self) {
 	JB_Helper_SelfLink((JB_RingList*)self);
 	self->PID = 0;
 }
+
+
+int JB_PID_Exit(ProcessOwner* self) {
+	int Code = self->ExitCode;
+	if (WIFEXITED(Code)) {				// called exit()
+		return WEXITSTATUS(Code);
+	}
+	return -1;
+}
+
+
+int JB_PID_TermSig(ProcessOwner* self) {
+	int Code = self->ExitCode;
+	if (WIFSIGNALED(Code)) {			// died from a signal
+		return WTERMSIG(Code);
+	}
+	return 0; 
+}
+
 
 void JB_PID_Register(ProcessOwner* self) {
 	ChildFinder.Lock();
