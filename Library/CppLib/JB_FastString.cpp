@@ -484,8 +484,9 @@ void JB_FS_SizeSet(FastString* fs, int NewSize) {
 
 
 int JB_FS_Length(FastString* self) {
-	FS_SanityCheck_(self);
-	return self->Length;
+	if (self) 
+		return self->Length;
+	return 0;
 }
 
 int JB_FS_StreamLength(FastString* self) {
