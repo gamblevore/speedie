@@ -106,8 +106,8 @@ module Feedback
 			"".debugprint // stop from being stripped
 			nil|message|.jdb2
 			nil|message|.LocateAll
-			nil|scfunction|.NilDebug
-			nil|scdecl|.NilDebug("")
+			nil|scfunction|.NilPrint
+			nil|scdecl|.NilPrint("")
 	
 	
 	function ParseArgsSub (|[]| args, |bool|) 

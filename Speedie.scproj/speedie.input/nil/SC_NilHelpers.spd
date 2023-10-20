@@ -94,8 +94,8 @@ datatype NilCheckMode (uint)
 
 datatype NilSweep (ivec2)
 	iterator
-		|| i = &niltracker.t.items[.x2]
-		|| B = &niltracker.t.items[.x]
+		|| i = &niltracker.t.resets[.x2]
+		|| B = &niltracker.t.resets[.x]
 		while --i >= B
 			yield (i)
 

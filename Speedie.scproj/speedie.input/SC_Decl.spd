@@ -97,15 +97,15 @@ class SCDecl (SCObject) {
 	|AsmReg|			DRegister
 	|Byte|				PointerCount
 	|Byte|				AllocSource
-	|uint16| 			NilPlace
+	|byte|				NilBranchDepth
 	|NilState|			NilDeclared
-	|NilState|			NilUsed
+	|NilState|			NilCurr
+	|uint16|			NilPlace
 
 	
 	constructor (|scclass| type=nil)
 		.type = type
 		.NilDeclared = NilState.Either
-		.NilUsed = NilState.Either
 		.info = scdeclinfo.altered
 
 		
@@ -251,7 +251,6 @@ class SCDecl (SCObject) {
 		dcl.Info |= .info & cpyflags
 		dcl.C_array		= .C_array
 		dcl.NilDeclared = .NilDeclared
-		dcl.NilUsed		= .NilUsed
 
 
 	function TypeContained (assigns:|scclass|)
@@ -265,8 +264,7 @@ class SCDecl (SCObject) {
 		rz.internal = self
 		
 		rz.PointerCount++
-		rz.NilUsed = Purpose.Policy
-		rz.NilDeclared = rz.NilUsed (|) NilState.Stated
+		rz.NilDeclared = Purpose.Policy (|) NilState.Stated
 		check (rz.pointercount < 8) (.source, "Too much abstraction")
 	
 	
@@ -800,7 +798,6 @@ class SCDecl (SCObject) {
 	function MakeReal (|SCDecl|)
 		if .PointerCount
 			.NilDeclared = NilState.real
-			.NilUsed = NilState.Realish
 			return self
 		return .MakeExistance(nilstate.real,  .type.TypeVeryExists)
 
@@ -808,7 +805,6 @@ class SCDecl (SCObject) {
 	function BecomeReal
 		if .NilDeclared isnt Stated
 			.NilDeclared = NilState.Real
-			.NilUsed = NilState.realish
 
 
 	function MakeExistance (|nilstate| type, |scdecl| Default, |scdecl|)
@@ -822,7 +818,6 @@ class SCDecl (SCObject) {
 		
 		rz = .Copy
 		rz.NilDeclared = type
-		rz.nilused = Type &~ NilState.Stated
 
 
 	function NilConstructor (|nilstate| type,  |scdecl|) 
@@ -830,7 +825,6 @@ class SCDecl (SCObject) {
 			return self
 		rz = .copy
 		rz.NilDeclared = type
-		rz.nilused = Type &~ NilState.Stated
 
 		
 	function RefineDecl (|message| list, |SCDecl|)

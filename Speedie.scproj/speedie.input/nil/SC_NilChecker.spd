@@ -44,7 +44,9 @@ function Jump (NilTrackerFn)
 function UseChildAsReal (NilTrackerFn) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = msg.first
-		.CheckIsReal(.Jump(ch), ch)
+		|| actual = .Jump(ch)
+		if actual != nilstate.realish
+			.BecomeReal(ch.nildecl, ch)
 	return msg.nildecl.nildeclared
 
 
@@ -56,11 +58,7 @@ function Rel (NilTrackerFn)
 
 
 function Property (niltrackerfn)
-	opt norefcounts
-
-	|| ch = msg.first
-	.CheckIsReal(.Jump(ch, test), ch)
-	return msg.nildecl.NilDeclared
+	return .UseChildAsReal(msg, test)
 
 
 function Statement (NilTrackerFn)
@@ -79,7 +77,7 @@ function Function (NilTrackerFn)
 	|| fp = msg.first
 	|| prms = fp.next
 	|| fn = prms.obj|scfunction|
-	fn.nildebug
+	fn.NilPrint
 
 	if msg.tmptype == ASMtmp.kTern
 		return tern(prms, test)
@@ -91,12 +89,12 @@ function Function (NilTrackerFn)
 	|| P = prms.first
 	|| HasAddrs = false
 	for recv in fn.args
-		|| sent = p.NilDecl
-		if sent.SuffersNil
-			.VariableCheck(recv, sent, p)
-			check ((recv.NilStated) or (sent.NilUsed isnt Nilish)) (p, "Nilness of parameter unknown.")
-			HasAddrs := sent.PointerUpgrade
 		.Jump(p, submode)
+		|| sent = p.NilDecl
+		HasAddrs := sent.PointerUpgrade
+		if recv.SuffersNil	
+			.NilParamPass(recv, sent, p)
+
 		SubMode = 0
 		p++
 	
@@ -104,7 +102,7 @@ function Function (NilTrackerFn)
 		p = prms.first
 		for recv in fn.args
 			|| infernal = p.NilDecl.PointerUpgrade
-				.VariableSet(recv.internal, infernal, p)
+				.VariableSet(recv.internal, infernal, recv.source, p)
 			p++
 
 	|| ret = fn.ReturnType
@@ -120,23 +118,24 @@ function Return (NilTrackerFn)
 	require vd.SuffersNil
 
 	|| rd = t.fn.ReturnType
-	|| v = vd.nilused
+	|| v = vd.NilCurr
 	if  v != nilstate.real  and  rd.NilDeclared == nilstate.real
 		error (msg, v.name + " returned, despite function declaration!")
 	
-	if (rd.nilused & v) != v
-		rd.nilused |= v
-		rd.NilDebug("return")
+	if (rd.NilCurr & v) != v
+		rd.nilcurr |= v
+		rd.NilPrint("return")
 
 
 function While (NilTrackerFn)
 	opt norefcounts
 
+	// we need to run this twice at least...
+	// also exit can jump forward
 	|| beginning = t.DeclCount
 	.jump(msg.first, NilCheckMode.positive)
 	.Argument(msg.second)
 	t.Merge(Beginning) // while seems very simple?
-	// its probably not... right? cos of exits. they jump forward
 
 
 function CondAndArg1 (|message| Cond,  |Message| arg, |uint|)
@@ -211,10 +210,10 @@ function Tern (Niltrackerfn)
 function Thing (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.nildecl
-	if test isnt Active: return dcl.nilused
+	if test isnt Active: return dcl.NilCurr
 
 	|| Desired = nilstate.either & Test 
-	if (dcl.NilUsed is Either)									// This is OK.
+	if (dcl.NilCurr is Either)									// This is OK.
 		if (dcl is param) and !dcl.nilstated
 			dcl.NilDeclared = NilState.optional
 		return T.SetNilness(dcl, Desired)
@@ -222,24 +221,24 @@ function Thing (NilTrackerFn)
 	if (test is allowredundant)									// if a.length // allow
 		return Desired											// if a and a? // also!
 
-	return msg.Redundant(dcl.nilused)
+	return msg.Redundant(dcl.NilCurr)
 
 
 function Argument (Niltrackerfn)
 	opt norefcounts
-	|| C = .PreDeclareOOFs(msg)
+	|| C = .PreDeclareDecls(msg)
 	for s in msg
 		rz = .jump(s, test*s.islast)
 	t.declcount = C
 
 
-function PreDeclareOOFs (|message| msg, |uint|)
+function PreDeclareDecls (|message| msg, |uint|)
 	opt norefcounts
 	rz = t.DeclCount
 	for s in msg
 		if s == @decl
 			|| dcl = s.first.NilDecl
-			dcl.NilDebug("decl")
+			dcl.NilPrint("decl")
 			T.AddDecl(dcl)
 
 	
@@ -330,13 +329,13 @@ function Brel (Niltrackerfn)
 	|| b = *msg.name
 	if b == '*'
 		return .UseChildAsReal(msg)							// *abc
+
 	|| f = *msg
-	if b == '&'
-		Jump(f, test)
-		return NilState.Real // its obviously real
 	if b == '!'
 		return .Jump(f, test.activate.Negate)
-	// ~Num
+	
+	Jump(f, test)
+	return NilState.Real // & and ~ both return real
 
 
 function Declaration (niltrackerfn)
@@ -349,37 +348,49 @@ function Declaration (niltrackerfn)
 
 function SetRel (niltrackerfn)
 	opt norefcounts
-	|| L = msg.first,  || R = msg.last
-	.Jump(R)			// R is defined as coming first. (C++ compatibility)
-	.Jump(L)
-	|| A = L.nildecl
-	.CurrDecl := a
-	if !a.SuffersNil
-		return nilstate.real
-	return .VariableSet(A, R.nildecl, L)
+	|| R = msg.last,	.Jump(R)			// R is defined as coming first. (C++ compatibility)
+	|| L = msg.first,	.Jump(L)
+	|| Dest = L.nildecl
+	if Dest.SuffersNil
+		return .VariableSet(Dest, R.nildecl, L, R)
+	return nilstate.real
 
 
-function VariableCheck (|scdecl| Recv, |scdecl| Sent, |message| where) // setrel, relset
+function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|)
+	opt norefcounts // recv.suffersnil==true
+	|| D = recv.NilDeclared
+	if (D == nilstate.real)
+		return .BecomeReal(sent, where)
+	expect (D is stated) (where, "Nilness of parameter unknown.")	
+
+
+function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message| SentMsg,  |nilstate|) // setrel, relset
+	opt norefcounts // recv.suffersnil==true
+	if (recv.NilDeclared == nilstate.real)
+		// return here, as recv CANT change... cos sent did instead
+		return .BecomeReal(sent, SentMsg)		// should x = nil, be allowed for local vars?
+
+	|| SC = sent.NilCurr
+	if SC is Nilish // this prevents parameters being set to nil/optional if they aren't set yet.
+					// for locals, they should always be stated!! if not, change collectdecls :)
+		expect (recv.NilStated) (SentMsg, "Unstated variable can't be set to nil")
+		
+	if SC == recv.NilCurr
+		return SC
+	return T.SetNilness(recv, SC)
+
+
+function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 	opt norefcounts
-	if (recv.NilDeclared isnt nilish)
-		.CheckIsReal(sent.nilused, where)
-
-
-function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|) // setrel, relset
-	opt norefcounts
-	.VariableCheck(recv, sent, where)
-	if recv.nilused != sent.NilUsed
-		return T.SetNilness(recv, sent.NilUsed)
-
-
-function CheckIsReal (|nilstate| actual, |message| where)
-	opt norefcounts
-	require actual != NilState.real
-	|| d = where.nildecl
-	check (d is param  and  d.nilused == nilstate.either) (where, actual.name + " Object Used: " + where.render)
-	d.NilDeclared = NilState.real
-	d.nilused = NilState.Realish
-	d.NilDebug("param")
+	|| Curr = sent.NilCurr
+	if curr == nilstate.realish
+		return curr
+	
+	expect (!sent.NilStated  and  sent is param  and  Curr == nilstate.either) (where, "Expected Real Object: " + where.render)
+	sent.NilDeclared = NilState.real
+	sent.nilcurr = NilState.Realish
+	sent.NilPrint("param")
+	return nilstate.Realish
 
 }
 

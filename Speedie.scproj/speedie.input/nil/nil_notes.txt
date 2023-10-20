@@ -1,4 +1,39 @@
 
+So how do I do the new system?
+
+I think, the idea was that all changes are written into the current branch within the nilitem
+So nilitem has new[2]... new[0] or new[1] contain the current branch
+
+Old was the value before the branch ran.
+
+We should remove nilused then? Or put all values into the decl itself. I don't like that.
+
+So... what do we do on these situations?
+
+		c = maybe
+		d = nil
+		if (a and b)
+			c = nil
+			d = real
+		  else
+			c = real
+			d = real
+
+What is the value of c and d? Where is it stored? I guess on alteration... if its being altered with a deeper branch... we must create a new nilitem. Seems simple enough? What about this?
+
+
+	x = maybe
+	y = (!x or x.length > 0)
+
+I guess the "or" needs to bump the branchyness up. Always, right? Same with and? Unless its ALREADY bumped up... cos its the branches condition. What about ints? or structs?
+
+	x = maybe
+	y = (!num or (x == nil))
+
+x would be nilled and unnilled within the branch but literally nothing is happening. We could disable adding/removal as an opt... if we know it can't change anything (last comparison perhaps)
+
+
+
 
 todo:
 	debugging

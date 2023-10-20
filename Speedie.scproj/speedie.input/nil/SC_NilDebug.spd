@@ -135,7 +135,7 @@ module NilTest2
 //@Jeebox is %actually~able~to // unambiguously~describe human~sentances
 
 
-function scfunction.NilDebug
+function scfunction.NilPrint
 	cpp_name ndb1
 	|| fs = FastString()
 	if .cls
@@ -153,7 +153,7 @@ function scfunction.NilDebug
 	printline fs
 
 
-function scdecl.NilDebug (|string| reason)
+function scdecl.NilPrint (|string| reason)
 	cpp_name ndb2
 	|| fs = FastString()
 	fs <~ reason
@@ -163,9 +163,9 @@ function scdecl.NilDebug (|string| reason)
 	|| d = .NilDeclared
 	d.NilName(fs, false)
 	d &= ~ NilState.Stated
-	if .nilused != d
+	if .nilcurr != d
 		fs <~ " ("
-		.nilused.nilname(fs, false)
+		.nilcurr.nilname(fs, false)
 		fs <~ ")"
 	printline fs
 

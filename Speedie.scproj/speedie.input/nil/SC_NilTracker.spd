@@ -2,16 +2,21 @@
 
 struct NilItem
 	|scdecl--|		Decl
-	|nilstate[2]|	New
 	|uint16| 		PrevPos
+	|nilstate|		Curr
+	|nilstate|		Flip
 	|nilstate|		Old
 	|byte[3]| 		Dummy
 	
 
 	function Restore
-		.decl.nilused = .old
+		debugger 
+		.flip = .old // we should only be setting one value! not both!
+		.curr = .old
+
 	function Merge
-		.decl.nilused = .new[0] (|) .new[1]
+		debugger // merge should merge into a higher nilitem?
+//		.decl.nilused = .new[0] (|) .new[1]
 
 
 
@@ -19,8 +24,8 @@ struct NilTracker
 	linkage: cpp_part nil
 	|scfunction--|		fn
 	|uint| 				DeclCount
-	|uint| 				CurrIf
-	|NilItem[1536]|		Items
+	|uint| 				BranchDepth
+	|NilItem[1536]|		Resets
 
 
 	function Restore (|nilsweep| sw, |nilstate|)
@@ -39,9 +44,9 @@ struct NilTracker
 		require f > s
 		|| n = .declcount
 		.DeclCount = s + (n-f)
-		|| W = &.items[s]
-		|| R = &.items[f]
-		|| R2 = &.items[n]
+		|| W = &.resets[s]
+		|| R = &.resets[f]
+		|| R2 = &.resets[n]
 		while R < R2
 			*W++ = *R++
 
@@ -52,9 +57,9 @@ struct NilTracker
 			i.merge
 
 
-	function BranchExit (|uint| Old, |nilstate|)
-		.currif = old
-		|| sw = old sweep .DeclCount
+	function BranchExit (|uint| OldDecls, |nilstate|)
+		.branchdepth++
+		|| sw = olddecls sweep .DeclCount
 		for i in sw
 			i.decl.NilPlace = i.PrevPos
 
@@ -67,45 +72,45 @@ struct NilTracker
 	
 	function BranchEnter (|uint|)
 		rz = .DeclCount
-		.currif = rz
-		
-		
-	function Pos (|scdecl| d, |&int| v,  |&NilItem|)
-		|| pl = .CurrIf
-		|| dp = d.nilplace
-		if dp >= pl
-			return &.items[dp]
-		
+		.branchdepth++
+
+
+// I can't remember how my decls worked... I'm assuming, that each decl has a place?
+
+
 
 	function AddDecl (|scdecl| d, |nilstate|)
 		if !d.SuffersNil
 			return nilstate.realish
 		|| n = .DeclCount++
 		check (n < 1536) (.fn, "NilChecker got too many vars")
-		|| i = &.items[n]
+		|| i = &.resets[n]
 		i.PrevPos = 0
-		d.NilPlace = n
+		d.NilBranchDepth = .branchdepth + 1
 		|| s = d.NilDeclared & nilstate.Either
 		i.Old = s
-		i.New[0] = s
-		i.new[1] = s
+		i.curr = s
+		i.flip = s
 		i.decl = d
 		return s
 
 
+	function AlterReset (|SCDecl| d)
+
 	function SetNilness (|SCDecl| d, |NilState| s, |nilstate|)
 		opt norefcounts
-		|| old = d.nilused
-		if  old > 3  or s > 3  or  d isnt local
+		|| old = d.nilcurr
+		d.nilcurr = s
+		d.NilPrint("set")
+		|| dp = d.NilBranchDepth
+		if dp < .BranchDepth
+			return .AddDecl(d)
+		|| i = &.resets[dp]
 		
-		|| v = 0
-		|| i = .Pos(d, v)
 		i.Old = old
-		i.New[v] = s
-		i.new[1-v] = old
+		i.curr = s
+		i.flip = old
 		i.decl = d
-		d.nilused = s
-		d.NilDebug("set")
 		return s
 
 
@@ -113,25 +118,27 @@ struct NilTracker
 		opt norefcounts
 		scfunction.currfunc = f
 		.DeclCount = 0
+		.BranchDepth = 0
 		.fn = f
-		|| r = f.returntype
-			r.NilUsed = 0 // :)
 		for a in f.args
 			T.AddDecl(a)
 
 
 	function Finish (|scfunction| f)
 		opt norefcounts
-		f.ReturnType.DeclareAsUsed?
+		|| r = f.ReturnType
+			r.nildeclared |= nilstate.stated
 		.fn = nil
 		
 	
-	function Check (|scfunction| f)
+	function NilCheck (|scfunction| f)
 		opt norefcounts
-		if platform.IsDebug and false
+		if platform.IsDebug
 			.Start(f)
-			f.nildebug
-			Argument(f.SourceArg)
+			f.NilPrint
+			|| a = f.SourceArg
+			debugger 
+			Argument(a)
 			.Finish(f)
 
 
@@ -146,13 +153,12 @@ struct NilTracker
 	
 	
 	module
-		|scdecl--|		CurrDecl
 		|niltracker|	T
 		function SaveLives
 			opt norefcounts
 			using options.NilStrength
 				for f in compiler.funclist
-					if f.cannil: T.Check(f)
+					if f.cannil: T.NilCheck(f)
 				
 			SCFunction.currfunc = nil
 			StdErr.PrintErrors
@@ -162,12 +168,8 @@ struct NilTracker
 function message.IsNowNil (|bool|)
 	opt norefcounts
 	|| d = .obj as scdecl
-		return (d == TypeNil) or (d.nilused isnt real)
+		return (d == TypeNil) or (d.NilCurr isnt real)
 
-
-function SCDecl.DeclareAsUsed
-	opt norefcounts
-	.nildeclared = .NilUsed (|) nilstate.stated
 
 
 function scdecl.SuffersNil (|bool|)
