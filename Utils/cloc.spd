@@ -81,7 +81,7 @@ function string.LOC (|int|)
 
 function file.CLOC
 	if counts.PrintTree
-		require StdErr.ok
+		require StdErr.OK
 		expect (!counts.PrintedTree) "Can't have multiple files, with printtree."
 		counts.PrintedTree = true
 	  elseif counts.loud
@@ -93,7 +93,7 @@ function file.CLOC
 	
 	Counts.files++
 	
-	counts.memstart
+	counts.MemStart
 	if counts.ParseSpeed
 		"a=b+c".parse // warmup
 	|| Start = date.now
@@ -101,7 +101,7 @@ function file.CLOC
 	|| Durr = start.ago
 	counts.MemEnd
 	if msg
-		counts.lines += msg.loc
+		counts.Lines += msg.loc
 	  else
 		Counts.Lines += data.loc
 	counts.kb += data.Length
@@ -144,7 +144,7 @@ function app.Usage (|int|)
 
 
 function Counts.ReportHisto
-	require app.yes("h")
+	require app.Yes("h")
 	|| h_done = false
 	|| curr = 0
 	|| total = .names + Histogram[0]
@@ -171,7 +171,7 @@ function Counts.Report
 	|| kb = .KB.strsize
 	"$l lines"
 	|| n = .names
-		"$n names in $d nodes"
+		"$n names, in $d nodes"
 		.ReportHisto
 	if p > 1 or f > 1
 		"Total files: $f,  total jeebox files: $p,  total filesize: $kb"
