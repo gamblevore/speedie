@@ -36,7 +36,7 @@ function message.DefineToLine (|int| count)
 	|| l = self[-1]			#require
 	if self ~= "define"  and  l == @str  and  self > 1 // is that all?
 		.first.next = l
-//		if !count // can't be 0?? rightclicking on some code to find it... // so its obviously used?
+		// count can't be 0 here	
 		l.name += " has " + "caller".pluralize(count)
 	  else
 		|| s = "place".pluralize(count, "Nowhere")
