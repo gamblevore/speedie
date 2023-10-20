@@ -39,7 +39,7 @@ function message.DefineToLine (|int| count)
 //		if !count // can't be 0?? rightclicking on some code to find it... // so its obviously used?
 		l.name += " has " + "caller".pluralize(count)
 	  else
-		|| s = "places".pluralize(count, "Nowhere")
+		|| s = "place".pluralize(count, "Nowhere")
 		l.name = " - Called From " + s + " - "
 		
 
