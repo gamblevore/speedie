@@ -1,36 +1,58 @@
+    
 
-So how do I do the new system?
+    // So how do we do this?
+    a = maybe
+    c = maybe
+    if (a)				// we add A as new nilitem
+//		a.old/flip = maybe/nil
+        c = nil
+        c.old = maybe/nil
+        c.flip = ?
+      else	//  FLIP all the things we added.
+//		a.old/flip = maybe/real
+        x = 1
+        c.old = ?
+        c.flip = ?
+        
+// What if... we don't do the flip, but set he values correctly?
+// that is... if we are in branch A... we set the flip value, otherwise we just use the curr?
+// OK... so where do we do the flip?
+// like... if we are testing A...
+// then we will have 3 NilItems for A...
+// theres a few cases, though...
 
-I think, the idea was that all changes are written into the current branch within the nilitem
-So nilitem has new[2]... new[0] or new[1] contain the current branch
-
-Old was the value before the branch ran.
-
-We should remove nilused then? Or put all values into the decl itself. I don't like that.
-
-So... what do we do on these situations?
-
-		c = maybe
-		d = nil
-		if (a and b)
-			c = nil
-			d = real
-		  else
-			c = real
-			d = real
-
-What is the value of c and d? Where is it stored? I guess on alteration... if its being altered with a deeper branch... we must create a new nilitem. Seems simple enough? What about this?
+a = real
+if	SomeInt
+    a = nil
 
 
-	x = maybe
-	y = (!x or x.length > 0)
+a = real
+if	SomeInt
+    a = nil
+  else
+    a = nil
 
-I guess the "or" needs to bump the branchyness up. Always, right? Same with and? Unless its ALREADY bumped up... cos its the branches condition. What about ints? or structs?
 
-	x = maybe
-	y = (!num or (x == nil))
+a = real
+if	SomeInt
+    0
+  else
+    a = nil
 
-x would be nilled and unnilled within the branch but literally nothing is happening. We could disable adding/removal as an opt... if we know it can't change anything (last comparison perhaps)
+
+a = maybe
+if	!a
+    return
+
+if !a
+    0
+  else
+    return
+
+do we NEED the flip var? Or can we just make use of the "old" or "various decl pieces" thingy?
+
+Just write the merger and flipper, I guess.
+
 
 
 
@@ -128,4 +150,5 @@ recursive funcs?
 	// global.x = obj
 	// func()
 	// global.x.func2 // allowed or not? func() might have altered global.x
+
 
