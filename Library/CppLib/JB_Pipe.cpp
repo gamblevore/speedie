@@ -18,7 +18,6 @@
 #include <sys/stat.h>
 
 #include <pwd.h>
-//#include <stdlib.h>
 #include <sys/mman.h>
 
 
@@ -169,7 +168,7 @@ int JB_Kill(int PID) {
 
 
 bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, bool CaptureStdOut) {
-// Fork,Exec,Pipe,Dup2,Waitid,Errno,Eintr // unix simplicity :)
+// fnctrl,Fork,Exec,Pipe,Dup2,Waitid,Errno,Close,Eintr // unix simplicity :)
 	auto& Sh = *self;
 	const char* argv[MaxArgs] = {};
 	bool OK = JB_Proc__CreateArgs(&path, Args, argv);
@@ -270,8 +269,9 @@ int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSE
 		Code = WTERMSIG(Code);		// usually its what we want, despite being mixed up
 	} 
 
-	if (Sh->ErrorOutput->Length and !FSErrIn) {
-		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(Sh->ErrorOutput), nil);
+	auto ShErr = Sh->ErrorOutput;
+	if (!FSErrIn and JB_FS_Length(ShErr)) {
+		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(ShErr), nil);
 	}
 	JB_FreeIfDead(Sh);
 	return Code;
@@ -293,8 +293,6 @@ void JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
 }
 
 
-
-
 void JB_Sh_Destructor(ShellStream* self) {
 	ShellStream& Sh = *self;
 	JB_FEPDWEE_Finish(Sh);
@@ -304,7 +302,8 @@ void JB_Sh_Destructor(ShellStream* self) {
 	JB_PID_Destructor(self);
 }
 
-static void Smooth(ShellStream& Sh) {
+
+static void Smooth_(ShellStream& Sh) {
 // or else certain apps will lock up.
 // funnily enough, sleeping makes these apps run FASTER.
 // probably by triggering the printf statements instead 
@@ -320,12 +319,13 @@ static void Smooth(ShellStream& Sh) {
 	Sh.LastRead = C;
 }
 
+
 bool JB_Sh_Step(ShellStream* self) {
 	require (self);
 	ShellStream& Sh = *self;
 	if (Sh.Mode >= 0) {
-		Smooth(Sh);
-		if (JB_Sh_UpdatePipes(&Sh))
+		Smooth_(Sh);
+		if (JB_Sh_UpdatePipes(self))
 			return true;
 		JB_FEPDWEE_Finish(Sh);
 	}
