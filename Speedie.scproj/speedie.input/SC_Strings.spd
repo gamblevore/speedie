@@ -157,7 +157,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 			WeAreAppending = true
 	// wrong approach.
 	if false
-		msg.become(@thg, fsname) // keep the reference the same so it doesn't whoop up.
+		msg.become(@thg, fsname)
 	  else
 		msg.become(@dot, "getresult") // keep the reference the same so it doesn't whoop up.
 		msg <~ «thg fsname » 
@@ -180,13 +180,6 @@ function String.ParseClean (|Message|)
 	Compiler.stParseTime += (Date.Now - P1)|int|
 	rz.clean(True)
 	rz.PrepareAST
-	
-	
-function message.UnicodeSafe
-	opt norefcounts
-	|| n = .name
-	require !n.isascii
-	.name = n.UnicodeSafeName
 
 
 

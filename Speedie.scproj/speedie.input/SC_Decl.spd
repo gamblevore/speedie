@@ -132,7 +132,9 @@ class SCDecl (SCObject) {
 
 	function IsNil (|bool|)
 		return self == typenil
-
+	
+	function NilEither (|nilstate|)
+		return .nilDeclared&nilstate.either
 
 	function RegType (|datatypecode|)
 		require self

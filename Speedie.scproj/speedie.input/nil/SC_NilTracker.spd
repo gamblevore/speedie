@@ -45,13 +45,17 @@ struct NilTracker
 		debugger 
 		.branchdepth--
 //		|| sw = olddecls sweep .DeclCount
-//		for i in sw
-//			i.decl.NilPlace = i.PrevPos
 	
 	
 	function BranchEnter (|uint|)
 		rz = .DeclCount
 		.branchdepth++
+		.BranchSide = 0
+
+	
+	function BranchSwap (|uint|)
+		rz = .DeclCount
+		.BranchSide = 1
 
 
 	function AddDecl (|scdecl| d)
@@ -65,7 +69,6 @@ struct NilTracker
 	
 	
 	function SetNilness (|SCDecl| d, |NilState| New, |nilstate|)
-		opt norefcounts			// combine these into one number... later. If we want.	
 		d.nil[.branchdepth].Side[.BranchSide] = New
 		d.NilCurr = new
 		d.NilPrint("set")
@@ -78,7 +81,7 @@ struct NilTracker
 		.BranchDepth = 0
 		for d in f.args
 			.AddDecl(d)
-			.SetNilness(d, d.NilDeclared&nilstate.either)
+			.SetNilness(d, d.NilEither)
 		f.NilPrint
 
 

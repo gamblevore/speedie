@@ -1104,38 +1104,6 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| name = .GetDclName
 		|| d = name.AsDecl				#expect
 		WriteDecl( d, fs, DeclsDefault(.last) )
-	
-	
-	function message.RenderCppTry (fpMsgRenderCpp) // rendertry
-		opt norefcounts			
-		|| tmp = self
-		|| Oldtry = FastStringCpp.CurrTry
-		FastStringCpp.CurrTry = self
-		.Indent = 1
-		|| after = .Position
-
-		while
-			fs.IndentLine
-			|int| c = .indent++
-			if tmp != self
-				fs <~ "_try_$c: ;\n"
-			
-			|| arg = tmp.first						#debug_Require
-			fs.indentline
-			cpp_export.C_RenderArg(arg, fs)
-			fs.indentline
-			if tmp == self
-				tmp = arg
-			tmp = tmp.next  #loop
-			fs <~ "goto _after_try_$after;"
-
-		fs.indentline
-		|int| c2 = .indent++
-		fs <~ "_try_$c2: ;\n"
-		fs <~ "_after_try_$after:"
-		
-		FastStringCpp.CurrTry = Oldtry
-		
 			
 	
 	function C_RenderTmp (fpMsgRenderCpp)
@@ -1150,15 +1118,6 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 		  elseif (name == "while") 
 			fs <~ Cpp_Export.WhileName
-
-		  elseif (name == "try")
-			.RenderCppTry(fs)
-			return
-
-		  elseif (name == "cant")
-			|| c = faststringcpp.CurrTry.indent|int|
-			fs <~ "goto _try_$c;" // omg!
-			return
 
 		  elseif (name == "elseif")
 			fs <~ "else "
@@ -1562,8 +1521,7 @@ class FastStringCpp (FastString)
 //				fs <~ ' '
 //
 //			printline fs
-	module
-		|message--| CurrTry
+
 
 	
 

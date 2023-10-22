@@ -139,55 +139,51 @@ function While (NilTrackerFn)
 	.Argument(msg.second)
 	t.Merge(Beginning) // while seems very simple?
 
+/*
+	if a // testing structure for "if" function
+		0
+	  elseif b
+		1
+*/
 
-function CondAndArg1 (|message| Cond,  |Message| arg, |uint|)
-	.Jump(Cond, NilCheckMode.positive)
-	.Argument(arg)
-	return T.DeclCount
-
-
-function CondAndArg2 (|message| Cond,  |message| Else,  |Message| arg,  |uint| Beginning,   |uint|)
-	opt norefcounts
-	if t.declcount > Beginning
-		T.Restore(beginning)
-		.jump(cond, NilCheckMode.negative)
-
-	if arg.prev // has a sub-cond
-		.if(else)
-	  else
-		.Argument(arg)
-	return T.DeclCount
-	
-	
 function If (NilTrackerFn)
 	opt norefcounts
-	|| A = T.BranchEnter
 	|| cond = msg.first,  || arg1 = cond.next
-	|| B = .CondAndArg1(cond, arg1)
+	|| Else = arg1.next,  || arg2 = else.first
+	|| RetCase = arg1 vs arg2
+	
+	#!"First Branch"
+	|| A = T.BranchEnter
+	.Jump(Cond, NilCheckMode.positive)
+	.Argument(arg1)
+	
+	#!"Swap"
+	|| B = T.BranchSwap
 
-	|| Else = arg1.next,  || arg2 = else.last
-	.CondAndArg2(cond, else, arg2, A)
+	#!"Second Branch"
+	.jump(cond, NilCheckMode.negative)
+	( .Argument(arg2), .if(else) )(arg2.islast)
 
-	.IfCleanup(A, B,  arg1 vs arg2)
-	return t.BranchExit(A)
+	return .IfCleanup(A, B,  RetCase)
 
 
-function IfCleanup (|uint| A, |uint| B, |uint| Arg)
-	if Arg == 0
+function IfCleanup (|uint| A, |uint| B, |uint| Returns, |nilstate|)
+	if Returns == 0
 		debugat // fix this. some kinda super-merge?
 
-	if Arg == 1
+	  elseif Returns == 1
 		debugat
 		t.restore(B)
 		T.DeclCount = B
 
-	if Arg == 2
+	  elseif Returns == 2
 		debugat
 		T.MoveDown(A, B)
 
-	if Arg == 3	 		// both
+	  else
 		t.Restore(A)
 		T.DeclCount = A
+	return t.BranchExit(A)
 
 
 function Tern (Niltrackerfn)
@@ -210,6 +206,10 @@ function Tern (Niltrackerfn)
 
 		
 function Thing (NilTrackerFn)
+	rz = .thingsub(msg, test)
+	msg.Indent = rz				// nice. now we know the current state!
+
+function ThingSub (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.nildecl
 	|| ND = dcl.nilcurr
