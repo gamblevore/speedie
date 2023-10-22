@@ -14,8 +14,6 @@
 	
 	Future improvement... allocate one block at a time! Can call constructor on each object
 	Just need a Curr+Last pointer.
-	
-	
 */
 
 
