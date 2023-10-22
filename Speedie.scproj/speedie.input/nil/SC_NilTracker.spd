@@ -54,32 +54,20 @@ struct NilTracker
 		.branchdepth++
 
 
-	function AddDecl (|scdecl| d,  |&nildecl|)
-		return .AddDecl(d, d.NilDeclared&nilstate.either)
-
-	function NewRow (|scdecl| d, |&nildecl|)
+	function AddDecl (|scdecl| d)
 		|| n = .DeclCount++
-		rz = .rows[n]
-		rz.Decl = d
-
-	function AddDecl (|scdecl| d, |nilstate| New,  |&nildecl|)
-		debug_require d.SuffersNil
-		|| i = .NewRow(d)
-		|| br = i.newbranch(.branchdepth)
-		br.curr[0] = New
-		br.curr[1] = New
-		return i
+		|| i = .rows[n]
+		i.AllocDepth = .BranchDepth
+		i.ID = n
+		i.Decl = d
+		d.nil = i.Record
+		debug_require d.SuffersNil and n <= 31
 	
 	
 	function SetNilness (|SCDecl| d, |NilState| New, |nilstate|)
-		opt norefcounts
-		|| i1 = d.nil
-		|| Act = i1.Activation
-		if .BranchDepth == Act
-			0
-		  elseif .branchdepth > act
-			|| i2 = .AddDecl(d, d.NilCurr)
-		i1.curr[.BranchSide] = New
+		opt norefcounts			// combine these into one number... later. If we want.	
+		d.nil[.branchdepth].Side[.BranchSide] = New
+		d.NilCurr = new
 		d.NilPrint("set")
 		return New
 		
@@ -88,8 +76,9 @@ struct NilTracker
 		opt norefcounts
 		.DeclCount = 0
 		.BranchDepth = 0
-		for a in f.args
-			T.AddDecl(a)
+		for d in f.args
+			.AddDecl(d)
+			.SetNilness(d, d.NilDeclared&nilstate.either)
 		f.NilPrint
 
 

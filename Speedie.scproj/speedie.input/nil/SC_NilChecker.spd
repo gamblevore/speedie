@@ -386,8 +386,8 @@ function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 
 	|| i = sent.Nil
 	debugger // actually need to upgrade this all the way up
-	i.Curr[0] = R
-	i.Curr[1] = R
+	i.Side[0] = R
+	i.Side[1] = R
 
 	sent.NilDeclared = NilState.real
 	sent.nilcurr = R

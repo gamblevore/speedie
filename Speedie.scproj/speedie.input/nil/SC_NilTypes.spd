@@ -4,18 +4,14 @@ prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
 
 
 struct NilInst
-	|byte|				Activation
-	|byte|				ID
-	|nilstate[2]|		Curr
+	|nilstate[2]|		Side
 
 
 struct NilDecl
     |scdecl--|			Decl
-    |NilInst[30]| 		Depth
-
-	function NewBranch (|uint| Depth, |&nilinst|)
-		rz = .Depth[depth]
-		rz.activation = depth + 1
+    |int| 				AllocDepth
+    |int| 				ID
+    |NilInst[30]| 		Record
 
 //struct NilItem
 //    |scdecl--|			Decl
