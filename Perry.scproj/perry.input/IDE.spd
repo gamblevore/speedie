@@ -430,7 +430,7 @@ class PerryIDE (Window)
 
 
 	function CheckModified 
-		.EditMe.document.checkmodified
+		.EditMe.document.checkmodified?
 		
 
 	function ProjClosed (|bool|)
