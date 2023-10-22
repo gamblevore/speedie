@@ -10,7 +10,7 @@ class SCObject
 	|Message|					Source
 	|uint16|					TableId
 	|byte|						NoAutoComplete
-	|Byte|						Dummy
+	|Byte|						AllocSource
 	
 	render
 		|| cname = ((.class.name|uint64|)+2)|cstring|
