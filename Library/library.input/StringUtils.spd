@@ -65,6 +65,9 @@ function string.IsFileLike (|bool|)
 function byte.IsTextLine (|bool|)
 	 return self == '\n' or '\r'
 
+function codepoint.IsTextLine (|bool|)
+	 return self == '\n' or '\r'
+
 function int.TabsWidth (|int|)
 	return 4-(self & 3)
 
@@ -154,10 +157,9 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 		if c < 0
 			return i
 		if c|byte|.IsTextLine
-			if isinline
-				c = ' '
-			  else
+			if !isinline
 				return i + 1
+			c = ' '
 		if i >= ParaMax or MaxWidth <= 0
 			return i
 		
@@ -166,11 +168,11 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			maxwidth -= (Orig-MaxWidth).TabsWidth
 		  elseif isinline
 			i++
-		  elseif jeebox.cswrapsplit[c]
+		  elseif jeebox.CSWrapSplit[c]
 			i++
 			MaxWidth--
 		  else									 // so where does the word end?
-			|| WordEnd = .find(jeebox.cswrapsplit, i, ParaMax)
+			|| WordEnd = .find(jeebox.CSWrapSplit, i, ParaMax)
 				WordEnd += (self[WordEnd] > 32)
 			  else
 				WordEnd = .length min paramax
