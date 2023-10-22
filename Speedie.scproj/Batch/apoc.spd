@@ -34,14 +34,14 @@ main
 	random.shared.timeseed
 	for s in names
 		Europe <~ Country(s)
-	printline
+	""
 	
 	while Europe
 		for (cun.backwards in Europe) (i)
 			cun.Attack Europe[]
 			if !cun.alive
 				Europe.remove(i)
-			printline
+			""
             app.sleep(0.2s)
 
 	"Europe is gone. Uwu :3"
