@@ -1,6 +1,4 @@
 
-prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
-
 
 extend Message {
 
@@ -21,14 +19,12 @@ function NilPropAccess (|bool|)
 
 function NilDecl (|scdecl|)
 	opt norefcounts
-	require self
-	|| obj = .obj
-	if (obj isa scdecl)
-		|| l = obj.IsLookupOnly
-		if l isa scdecl
-			return l
-		return obj
-	debugger // if this never happens we can just blindcast
+	if self
+		|| obj = .obj as SCDecl // blindcast instead?
+			|| l = obj.IsLookupOnly
+			if l isa scdecl
+				return l
+			return obj
 	
 
 function LastInBlock
@@ -65,43 +61,20 @@ function @scfunction.LoopExitter (Tranfunc)
 	node.LastInBlock
 
 
-datatype NilCheckMode (uint)
-	flags
-		|NilCheckMode| 
-		Nothing = 0
-		Negative
-		Positive
-		AllowRedundant
-		PosRed = Positive + AllowRedundant  
-		Active = Positive + Negative
-
-	syntax is (|NilCheckMode| other, |bool|)
-		return self & other
-
-	syntax isnt (|NilCheckMode| other, |bool|)
-		return !(self & other)
-	
-	function Activate (|NilCheckmode|) 
-		if (self isnt active)
-			return self (|) nilcheckmode.positive
-		return self
-	
-	function Negate (|NilCheckmode|)
-		rz  = (self & negative) << 1
-		rz |= (self & positive) >> 1
-		rz |= (self &~ active)  << 0
-
-
-datatype NilSweep (ivec2)
-	iterator
-		|| i = &niltracker.t.resets[.x2]
-		|| B = &niltracker.t.resets[.x]
-		while --i >= B
-			yield (i)
-
-
-function uint.operatorsweep (|int| after, |nilsweep|)
-	return (self|int|, after)|nilsweep|
-
 function message.operatorvs (|message| arg2, |uint|)
 	return .blocks (|) (arg2.blocks << 1)
+
+
+function message.IsNowNil (|bool|)
+	opt norefcounts
+	|| d = .obj as scdecl
+		return (d == TypeNil) or (d.NilCurr == nilstate.nilish)
+
+function scdecl.SuffersNil (|bool|)
+	return .IsObject or .PointerCount
+
+
+function scdecl.NilStated (|bool|)
+	return .NilDeclared is Stated
+
+

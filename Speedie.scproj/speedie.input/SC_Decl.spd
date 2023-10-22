@@ -93,22 +93,19 @@ class SCDecl (SCObject) {
 	|SCDecl|			Contains
 	|Message|			Default
 	|SCClass|			Type
+	|&NilInst| 			Nil
 	|SCDeclInfo|		Info
 	|AsmReg|			DRegister
 	|Byte|				PointerCount
-	|Byte|				AllocSource
-	|byte|				NilBranchDepth
 	|NilState|			NilDeclared
 	|NilState|			NilCurr
-	|uint16|			NilPlace
 
 	
 	constructor (|scclass| type=nil)
 		.type = type
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered
-
-		
+	
 	function Project (|scimport|)
 		opt norefcounts
 		|| m = .MemoryLayer
@@ -120,9 +117,8 @@ class SCDecl (SCObject) {
 		.info |= d
 
 	function IsTypeImprove (assigns:|bool|)
-		.info = .info.set(SCDeclInfo.TypeImprove, Value)
-
-
+		.info = .info.set(SCDeclInfo.TypeImprove, Value)		
+		
 	syntax is (|SCDeclInfo| d, |bool|)
 		if self
 			return .info & d
@@ -826,7 +822,6 @@ class SCDecl (SCObject) {
 		rz = .copy
 		rz.NilDeclared = type
 
-		
 	function RefineDecl (|message| list, |SCDecl|)
 		rz = .Copy
 		for p in list

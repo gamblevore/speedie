@@ -113,18 +113,20 @@ function Function (NilTrackerFn)
 function Return (NilTrackerFn)
 	opt norefcounts
 
-	|| value = msg.first				#require
+	|| value = msg.first
 	|| vd = value.NilDecl
-	require vd.SuffersNil
+	require vd and vd.SuffersNil
 
-	|| rd = t.fn.ReturnType
+	|| ret = scfunction.currfunc.ReturnType
 	|| v = vd.NilCurr
-	if  v != nilstate.real  and  rd.NilDeclared == nilstate.real
-		error (msg, v.name + " returned, despite function declaration!")
+	|| RC = ret.nilcurr
+	if  v is nilish  and  ret.NilDeclared == NilState.real
+		error (msg, v.name + " returned")
 	
-	if (rd.NilCurr & v) != v
-		rd.nilcurr |= v
-		rd.NilPrint("return")
+	|| rd2 = RC (|) v
+	if RC != rd2
+		ret.nilcurr = rd2
+		ret.NilPrint("return")
 
 
 function While (NilTrackerFn)
@@ -210,10 +212,11 @@ function Tern (Niltrackerfn)
 function Thing (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.nildecl
-	if test isnt Active: return dcl.NilCurr
+	|| ND = dcl.nilcurr
+	if test isnt Active: return ND
 
 	|| Desired = nilstate.either & Test 
-	if (dcl.NilCurr is Either)									// This is OK.
+	if (ND is Either)											// This is OK.
 		if (dcl is param) and !dcl.nilstated
 			dcl.NilDeclared = NilState.optional
 		return T.SetNilness(dcl, Desired)
@@ -221,25 +224,16 @@ function Thing (NilTrackerFn)
 	if (test is allowredundant)									// if a.length // allow
 		return Desired											// if a and a? // also!
 
-	return msg.Redundant(dcl.NilCurr)
+	return msg.Redundant(ND)
 
 
 function Argument (Niltrackerfn)
 	opt norefcounts
-	|| C = .PreDeclareDecls(msg)
+	|| C = t.declcount
 	for s in msg
 		rz = .jump(s, test*s.islast)
 	t.declcount = C
 
-
-function PreDeclareDecls (|message| msg, |uint|)
-	opt norefcounts
-	rz = t.DeclCount
-	for s in msg
-		if s == @decl
-			|| dcl = s.first.NilDecl
-			dcl.NilPrint("decl")
-			T.AddDecl(dcl)
 
 	
 function Bracket (Niltrackerfn)
@@ -341,6 +335,7 @@ function Brel (Niltrackerfn)
 function Declaration (niltrackerfn)
 	opt norefcounts
 	|| rel = msg.last
+	T.AddDecl(rel.nildecl)
 	if rel == @rel
 		.SetRel(rel)
 	
@@ -371,7 +366,7 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 		return .BecomeReal(sent, SentMsg)		// should x = nil, be allowed for local vars?
 
 	|| SC = sent.NilCurr
-	if SC is Nilish // this prevents parameters being set to nil/optional if they aren't set yet.
+	if SC is Nilish // this prevents unstated parameters being set to nil/optional.
 					// for locals, they should always be stated!! if not, change collectdecls :)
 		expect (recv.NilStated) (SentMsg, "Unstated variable can't be set to nil")
 		
@@ -383,14 +378,21 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 	opt norefcounts
 	|| Curr = sent.NilCurr
-	if curr == nilstate.realish
+	|| R = NilState.Realish
+	if curr == R
 		return curr
 	
 	expect (!sent.NilStated  and  sent is param  and  Curr == nilstate.either) (where, "Expected Real Object: " + where.render)
+
+	|| i = sent.Nil
+	debugger // actually need to upgrade this all the way up
+	i.Curr[0] = R
+	i.Curr[1] = R
+
 	sent.NilDeclared = NilState.real
-	sent.nilcurr = NilState.Realish
+	sent.nilcurr = R
 	sent.NilPrint("param")
-	return nilstate.Realish
+	return R
 
 }
 

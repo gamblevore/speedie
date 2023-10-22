@@ -10,6 +10,7 @@
 
 						 Perry Do later
 
+* renaming files/discovering files/deleting files should count as a "check project" event.
 * Editable fields should align same as uneditable! (output)
 * going backwards seems to put the line at the TOP of the window... but forward puts it in the middle
 

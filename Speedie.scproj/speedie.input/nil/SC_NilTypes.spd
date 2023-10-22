@@ -1,0 +1,63 @@
+
+
+prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
+
+
+struct NilInst
+	|byte|				Activation
+	|byte|				ID
+	|nilstate[2]|		Curr
+
+
+struct NilDecl
+    |scdecl--|			Decl
+    |NilInst[30]| 		Depth
+
+	function NewBranch (|uint| Depth, |&nilinst|)
+		rz = .Depth[depth]
+		rz.activation = depth + 1
+
+//struct NilItem
+//    |scdecl--|			Decl
+//    |uint16| 			PrevPos
+//    |uint16| 			Pos
+//    |nilstate[2]|		Base
+//    |byte| 				BranchDepth
+//    
+//
+//    function Restore
+//        debugger 
+//		.flip = .Base // we should only be setting one value! not both!
+//
+//    function Merge
+//        debugger // merge should merge into a higher nilitem?
+//		.decl.nilused = .new[0] (|) .new[1]
+
+
+
+datatype NilCheckMode (uint)
+	flags
+		|NilCheckMode| 
+		Nothing = 0
+		Negative
+		Positive
+		AllowRedundant
+		PosRed = Positive + AllowRedundant  
+		Active = Positive + Negative
+
+	syntax is (|NilCheckMode| other, |bool|)
+		return self & other
+
+	syntax isnt (|NilCheckMode| other, |bool|)
+		return !(self & other)
+	
+	function Activate (|NilCheckmode|) 
+		if (self isnt active)
+			return self (|) nilcheckmode.positive
+		return self
+	
+	function Negate (|NilCheckmode|)
+		rz  = (self & negative) << 1
+		rz |= (self & positive) >> 1
+		rz |= (self &~ active)  << 0
+
