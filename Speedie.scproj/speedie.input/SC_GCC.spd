@@ -535,8 +535,8 @@ function File.TestSpeedie (|string| v, |bool|)
 		debugger
 		p.execute(cmd_args, result)
 		
-	|| err = stderr.LastError
-		err.Reformulate(" subspd")
+	//|| err = stderr.LastError			// didnt seem to help
+		//err.Reformulate(" subspd")	// need to test this on actual crashing subspd
 	
 	printline Result
 	print TransCompiler.TmpOut(Variant).ReadFile
