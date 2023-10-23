@@ -202,15 +202,16 @@ module SDLApp
 		return .event is TEXTINPUT or KEYDOWN
 		
 
-	function RunAndQuit (|GUIApplicationInit| fn=nil, |object| Anything=nil,  |ivec2| size=(414, 256), |errorint|)
-		target !gui
-			disabled `Put "targets gui" in the app's conf section to use this!`
-		
-		.Init(size)
-		|| err = (fn)(anything)?
-		if err!=0
-			return err
-		return .run
+//	function RunAndQuit (|GUIApplicationInit| fn=nil, |object| Anything=nil,  |ivec2| size=(414, 256), |errorint|)
+////		 cumbersome
+//		target !gui
+//			disabled `Put "targets gui" in the app's conf section to use this!`
+//		
+//		.Init(size)
+//		|| err = (fn)(anything)?
+//		if err!=0
+//			return err
+//		return .run
 	
 	
 	function Run (|errorint|)
