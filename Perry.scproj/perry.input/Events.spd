@@ -22,41 +22,48 @@ function string.TrimProj (|string|)
 	return self
 
 
-function Perry.CreateProj (|file| proj)
-	expect (!proj.exists) (proj, "Can't create over existing project.")
-	|| main = proj.child("input/main.spd")
-	proj.child(".perry").write = qqfiles.Roots
-	main.data = qqfiles.EmptyMainFile(proj.trimextandpath)
-	proj.child("input/.todo").write = qqfiles.Todo
-	IdeAddProj(proj)
+function Perry.CreateProj (|string| path)
+	ifn path isa "scproj"
+		require path.file.CreateEmpty
+	  else
+		expect (!path.fileexists) (path, "Can't create over existing project.")
+
+		|| proj = path.file
+		|| Main = defaultfiles.EmptyMainFile(proj.trimextandpath)
+		proj.child("input/main.spd").data(Main) #require
+
+		|| R = defaultfiles.Roots
+		|| T = defaultfiles.Todo
+		proj.child(".perry").data = R
+		proj.child("input/.todo").data = T
+	IdeAddProj(path)
 
 
 function ClickedOpenProj (GUIaction)
 	|| start		= "~/".resolve
-	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project")	#require
-	|| better_path	= path.GetSpeedieProj("scproj")
+	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project", "Open", "OpenProj")	#require
+	|| better_path	= path.GetSpeedieProj
 		IdeAddProj(better_path)
 	  else
 		IdeAddProj(path)
 	perry.HideStartIfNeeded
-		
+
 
 function ClickedCreateProj (GUIAction)
-	|| it = app.AskSave("scproj/",  "",  "New Project",  "Create")
-		perry.CreateProj(it.file)
+	|| path = app.AskSave("scproj/",  "",  "New Project",  "Create", "OpenProj")
+		perry.CreateProj(path)
 	perry.HideStartIfNeeded
 
 
 function ClickedOpenFile (GUIaction)
-	|| file = app.AskOpen("",  "",  "Open File")
+	|| file = app.AskOpen("",  "",  "Open File", "Open", "OpenProj")
 		IdeAddProj(file)
 	perry.HideStartIfNeeded
 
 
 function ClickedCreateFile (GUIaction)
-	|| path = app.AskSave("",  "",  "New File",  "New")
-		if path.file.CreateEmpty
-			ideaddproj(path)
+	|| path = app.AskSave("spd",  "",  "New File",  "New", "OpenProj")
+		perry.CreateProj(path)
 	perry.HideStartIfNeeded
 
 
@@ -68,7 +75,7 @@ function perry.HideStartifneeded
 function ClickedTabs (GUIAction)
 	opt norefcounts
 	|| i = row.ide
-		i.showide(True)
+		i.ShowIDE(True)
 
 
 function ClickedCompileTabs (Guiaction)
@@ -185,8 +192,9 @@ function ClickedCompile (GUIaction)
 	.ide.compile("compile")
 
 		
-function PerryFileRenamed (guilistevent)
-	.ide.recheck
+function PerryRecheckEvent (guilistevent)
+	.ide.ForceRecheck
+
 
 function ReturnProjectPath (GUIListEvent)
 	if row isa filerow
@@ -218,7 +226,7 @@ function ClickedStats (GUIaction)
 function PerryIDE.ShowErrors (|bool| FromKeys, |bool|)
 	opt norefcounts
 	.SaveEditing(documentstate.ErrorChecking)
-	.recheck
+	.Recheck
 	|| t = .istextonly
 	.viewasproject
 	if t and .isviewing(.errorlist)
@@ -248,10 +256,10 @@ function ClickedNoNeed (GUIaction)
 		.ide.view(t)	
 
 
-function PerryIDE.ShowText (|textview| field, |string| Text)
+function PerryIDE.ShowText (|textview| field, |string| Text, |bool| Always)
 	field.text = text
-	.editsep.show
 	.CompileTabSelect(field)
+	.ShowCompileCutely(Always)
 	
 	
 function PerryIDE.SelTextParse (|bool|)
@@ -268,7 +276,7 @@ function PerryIDE.SelTextParse (|bool|)
 	.OldJBCloser = s
 	|error| where
 	|| msg = s.parsewitherror(where)
-	.ShowText(.JeeboxText, (msg.renderast(0), where.render)(!where) )
+	.ShowText(.JeeboxText, (msg.renderast(0), where.render)(!where), true )
 	
 	// could put some tabs into that area? QT creator does the same???
 	// one for jeebox... one for stdout from shellstreamer...
@@ -294,7 +302,7 @@ function PerryIDE.ClickedFile (|bool|)
 			return true
 
 
-function PerryIDE.BatchPhind (|string| text, |uint| ID,  |bool|)
+function PerryIDE.BatchPhind (|string| text, |uint| ID, |bool|)
 	|| found = .filelist.BatchFind(text, ID)
 	.foundlist.use(found)
 	.foundlist.setfocus
@@ -359,7 +367,7 @@ function EditMeSelError (GUITextErrorSelected)
 	|| i = .ide
 	|| el = i.errorlist
 	i.DuringMsgFB = true
-	el.select(error.error)
+	el.select(error.drawerror)
 	i.DuringMsgFB = false
 
 	
@@ -394,7 +402,7 @@ function PerryIDE.ClickedError (|error| row)
 	using self
 		|| f = row.path.file
 		if (row.path != .editme.path) and f.IsNicelyViewable
-			.GoToAnyFile(f, row)
+			.GoToAnyFile(f)
 		.editme.ShowAndSel(row.position)
 		.editme.MyError = row
 
@@ -419,7 +427,7 @@ function PerryIDE.ClickedFind (|error| row)
 	.editme.ClearFound
 
 	while curr
-		.editme.FoundAt(curr.position, row == curr)
+		.editme.MarkAsFound(curr, row == curr)
 		if curr == last
 			exit
 		curr++
@@ -509,23 +517,22 @@ function PerryFileViewRightClick (GuiListEvent)
 
 function FileViewerCountCode (GuiMenuEvent)
 	|| row = clicked.row as filerow		#require
-	if !row.asdir
-		|| i = .ide
-		i.ShowLeftStats(1)
-		beep i.StatsInfo.text
-		return 
-
-	|| CLOC = 0
-	|| Files = 0
+	|| CLOC = (0,0)
+	|| FileCount = 0
+	|| Size = 0
 	for c.flat in row
 		|| L = c.ReadFrom
 		if l.isSource
 			|| f = l.file
 				|| p = f.parse
-					Files++
+					FileCount++
+					size += f.size
 					CLOC += p.loc
-					
-	beep "$Cloc lines of sourcecode in $files files.\n\nPath: ${row.location}"
+	
+	|| fstr = "file".pluralize(FileCount)
+	app.alert "${Cloc[0]} lines of code and ${Cloc[1]} nodes in ${size.strsize} text\n\n$fstr at: ${row.location}"
 
+//	10 lines of code and 50 nodes in 30KB text.
+//  2 files at: /abc/bd/e
 
 

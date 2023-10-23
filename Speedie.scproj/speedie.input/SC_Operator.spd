@@ -109,16 +109,18 @@ function InitNormal (|string| name_, |String| FuncName_)
 
 module {
 	|Dictionary of SCOperator|			Dict = nil
-	|int|							CustomOperatorScore
+	|int|								CustomOperatorScore
 
 	function Lookup ( |Message| opch, |SCOperator| )
 		opt norefcounts
-		|| result = opch.obj|scoperator|
+		|| result = opch.obj|SCOperator|
+			if (!result.iscustom)
+				opch.name = result.name
 			return result
 		
 		|| op = opch.name
 		Result = dict[ op ]
-
+		
 		if (!Result)
 			result = AddNormal( op, op.UpperFirst, nil )
 			result.IsCustom = true
@@ -161,8 +163,9 @@ module {
 		.AddBit( kBitAnd,	"BitAnd",	&asmops.BitAnd)
 		.AddBit( kBitOr,	"BitOr",	&asmops.BitOr)
 		.AddBit( kBitXor,	"Xor",		&asmops.bitxor)
-		dict["|"]         = dict[ "(|)" ]
-		dict["|||"]         = dict[ "(|)" ]
+		|| BitOr = dict[ "(|)" ]
+		dict["|"]         = bitor // for: a |= b
+		dict["|||"]       = bitor
 		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL)
 		.AddBit( ">>>",	"RotateRight",	&asmops.ROR)
 		.addbit( ">>",	"ShiftRight",	&asmops.SHR)

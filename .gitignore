@@ -4,6 +4,8 @@ cpp.hidden
 .DS_Store
 xcuserdata/
 *nogit
+*.mz
+
 /Library/*.jbin
 **/*.input/garbage.jb
 *.app

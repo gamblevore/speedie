@@ -29,9 +29,9 @@ class SCIterator (SCObject)
 		if thg == @thg
 			.Name = thg.name
 		
-		.source = msg[@Arg, -1]									#expect msg
+		.source = msg.last(@arg)								#expect msg
 		
-		.WhileLoop = .source.find( @tmp, "while" )			#expect (msg, "missing while")
+		.WhileLoop = .source.find( @tmp, "while" )				#expect (msg, "missing while")
 		|| WhileArg = .WhileLoop.find(@Arg)						#expect (.WhileLoop, "missing argument for 'while'")
 
 		.LoopEndCond = WhileArg.Next

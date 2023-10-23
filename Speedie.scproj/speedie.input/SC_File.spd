@@ -67,7 +67,7 @@ class SCFile (file)
 
 	function AST (|Message|)
 		opt norefcounts
-		return .liveast init .ASTSub$
+		return .LiveAST init .ASTSub
 
 
 	function DetectInsecureWords
@@ -82,9 +82,8 @@ class SCFile (file)
 		
 		
 	function ASTSub (|Message|)
-		if .IsInternal
 		FlowControl.input(.file, "AST")
-			
+		
 		(Message).createLayer(self).use
 		|| str = .ReadSafely.decompress
 			.fData = str
@@ -123,10 +122,10 @@ function app.CodeSign (|file|)
 	StdErr.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign self." )
 
 
-function file.CodeSign (|string| sign, |errorint|)
+function file.CodeSign (|string| sign, |errorint2|)
 	target osx
 		if !platform.osx
-			return -1
+			return (-1, -1)|errorint2|
 		using ErrorSeverity.Warning
 		|[string]| args = []
 		args <~ "--deep"
@@ -151,7 +150,7 @@ function file.CodeSign (|string| sign, |errorint|)
 			rz = "/usr/sbin/spctl".DebugExecute(args)
 
 
-function string.DebugExecute (|[string]| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt|)
+function string.DebugExecute (|[string]| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt2|)
 	if file.DebugExecute // shouldnt be default!
 		print self
 		print " "

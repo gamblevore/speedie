@@ -152,3 +152,33 @@ recursive funcs?
 	// global.x.func2 // allowed or not? func() might have altered global.x
 
 
+
+/*
+    while def()
+        while abc()
+            || x = real()
+            if x
+                print "got x"
+            x = nil
+
+    while def()
+        || x = real()
+        while abc()
+            if x // not redundant even though we don't know it
+                 // very difficult to write code to understand this
+                print "got x"
+            x = nil
+
+    while def()
+        || x = real()
+        if x
+            print "got x"
+        x = nil
+
+*/
+/*
+    |type| x
+    while !x
+        x = maybe()
+    x.var
+*/

@@ -57,11 +57,15 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "--nil"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "--nocolor"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/usr/local/speedie/Speedie.scproj/Batch/chart.spd"
+            argument = "/usr/local/speedie/examples/SpamLines.spd"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -73,23 +77,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/usr/local/speedie/Utils/casting.spd"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "/usr/local/speedie/Utils/speedrogue.scproj"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
             argument = "/Users/theodore/Code/Galaxxies.scproj"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "/usr/local/bin/jz"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-c=6"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -98,10 +86,6 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--asm"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--target=debugproject"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>

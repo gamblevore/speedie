@@ -77,18 +77,20 @@ class DataTypeWrapper
 
 
 
+// probably the capcity should just be raw byte capacity.
+// seems to make more sense... right? 
 class Memory
 	linkage
 		cpp_part Mrap
 		cpp_class MWrap
 		pragma noearlyfree
 	
-	|int|				Capacity		//()
-	|&byte|				_Ptr			//()
+	|int|				Capacity
+	|&byte|				_Ptr
 	|int|				Length
-	|uint16|			ItemSize		//()
-	|DataTypeCode|		DataType		//()
-	|byte|				DeathAction		//()
+	|uint16|			ItemSize
+	|DataTypeCode|		DataType
+	|byte|				DeathAction
 	contains byte // should be byte?
 	
 	
@@ -289,7 +291,8 @@ class Memory
 		
 		function FillInt (|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
 		function Unmap	 (|_voidptr| p, |int| n):						cpp_wrapper JB_munmap
-		function Used	 (|int64|):										cpp_wrapper JB_memused
+		function UsedString	 (|int64|):									cpp_wrapper JB_MemUsedString
+		function UsedOther	 (|int64|):									cpp_wrapper JB_MemUsedOther
 		function _Alloc  (|int| n, |&byte|):							cpp_wrapper JB_malloc
 		function Zalloc  (|int| n, |&byte|)
 			return byte(n)

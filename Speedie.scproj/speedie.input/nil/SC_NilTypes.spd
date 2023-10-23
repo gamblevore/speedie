@@ -3,32 +3,28 @@
 prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
 
 
-struct NilInst
-	|nilstate[2]|		Side
+datatype NilRecord (Uint64)
+	linkage:cpp_part NRD
+
+	syntax Access (|int| item, |nilstate|)
+		item <<= 1
+		return (self >> item) & NilState.either
+		
+	function Count (|uint|)
+		return (.log2|uint|+1)>>1
 
 
-struct NilDecl
-    |scdecl--|			Decl
-    |int| 				AllocDepth
-    |int| 				ID
-    |NilInst[30]| 		Record
-
-//struct NilItem
-//    |scdecl--|			Decl
-//    |uint16| 			PrevPos
-//    |uint16| 			Pos
-//    |nilstate[2]|		Base
-//    |byte| 				BranchDepth
-//    
-//
-//    function Restore
-//        debugger 
-//		.flip = .Base // we should only be setting one value! not both!
-//
-//    function Merge
-//        debugger // merge should merge into a higher nilitem?
-//		.decl.nilused = .new[0] (|) .new[1]
-
+struct NilRecorder
+	linkage:cpp_part NRC
+	|nilrecord| 	Value
+	syntax call (|int| item, assigns:|nilstate| value)
+		if value &~ nilstate.either
+		item <<= 1
+		|| Mask = NilState.either << item
+		.value = (.value &~ Mask) (|) (value << item)
+	syntax Call (|nilrecord| v, |nilrecord|)
+		rz = .Value
+		.Value = v
 
 
 datatype NilCheckMode (uint)
@@ -37,8 +33,9 @@ datatype NilCheckMode (uint)
 		Nothing = 0
 		Negative
 		Positive
-		AllowRedundant
-		PosRed = Positive + AllowRedundant  
+		Soft
+		SoftPos  = Positive + Soft  
+		SoftNeg = Negative + Soft
 		Active = Positive + Negative
 
 	syntax is (|NilCheckMode| other, |bool|)

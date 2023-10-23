@@ -44,20 +44,9 @@ function Message.LastUsedFix (|Message|)
 				return it.Next
 	
 	return .Next  
-
-
-function Message.NoPointlessBlockRefs (|message| dcl, |bool|)
-	return true // for now... not sure how to fix.
-	// like this one
-	|| inside = «acc 
-		«arr 
-			«num "0"»
-		»
-	»
-
  
 
-function RC_DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
+function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 	|| Basis = RefBasis( dcl, true )
 	if fn.dorefs
 		require basis
@@ -71,17 +60,17 @@ function RC_DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 		LastPlace = LastUsedRefPlace( name, arg )
 	
 	|| Blocker = arg.CausesUnReachable( arg, dcl, LastPlace )
-	if blocker.NoPointlessBlockRefs(dcl)
-		if (Basis == kBasisObj)								// we want == not & here
-			RefIncr( name, dcl, IsJustAnArg )
-		Blocker := LastPlace
-		ReturnHandle( Blocker, arg, name, basis )
+	
+	if (Basis == kBasisObj)								// we want == not & here
+		RefIncr( name, dcl, IsJustAnArg )
+	Blocker := LastPlace
+	ReturnHandle( Blocker, arg, name, basis )
 	
 	|| Curr  = dcl
 	|| After = arg.FlatAfter
 	while  (Curr != After)  and  (Curr != LastPlace) 
 		if (Curr == @Arg)
-			Blocker = Curr.CausesUnReachable( arg, nil, nil )
+			Blocker = Curr.CausesUnReachable( arg )
 			if (Blocker)
 				ReturnHandle( Blocker, nil, name, basis )
 		Curr = Curr.FlatNext
@@ -160,13 +149,9 @@ function RefDecr (|Message| msg, |Message| place, |int| Basis)
 		place.Prev = what
 
 
-|[message]| RefPrms
 function DecrMulti (|scdecl| d, |message| m, |message|)
 	opt norefcounts
-	RefPrms.clear
-	refprms <~ m
-	RefPrms <~ d.c_array.msg
-	rz = (macros.MultiDecr)(RefPrms)
+	rz = (macros.MultiDecr)(m, d.c_array.msg)
 	|| prm = rz.second
 		prm.obj = Compiler.RefDecrmulti
 		prm.parent.obj = typevoid
@@ -206,6 +191,7 @@ function scfunction.RefFunc (|message| prm, |message| after)
 
 
 function RefIncr (|Message| msg, |Message| Place, |bool| IsJustAnArg=false)
+	opt norefcounts
 	if (IsJustAnArg)
 		Place = msg.parent.parent
 	  else
@@ -213,12 +199,29 @@ function RefIncr (|Message| msg, |Message| Place, |bool| IsJustAnArg=false)
 			msg = Place.last
 			if (msg == @rel)
 				msg = msg.last
+				if msg.IsStatementExpr
+					return msg.AvoidSafeDecr
 		require !(msg.unbra isthing "nil")
 		Place = msg
 
 	Compiler.RefIncr.RefFunc(msg, place)
 
 
+function Message.AvoidSafeDecr
+	opt norefcounts
+	|| arg = .first
+	|| decr = arg.last.prev
+	|| prms = decr.Last
+		if prms.obj == Compiler.RefSafeDecr
+			prms.first.becomenil?  // remove it without, removing it. cos its still tested for in RefDecr!
+
+
+function message.BecomeNil
+	.name = "nil"
+	.obj = TypeNil
+	.clear
+
+	
 function RefDestructorMsg (|Message| msg, |SCFunction| fn, |Message|)
 	return RefMsg( msg, fn.exportname, fn )
 
@@ -268,31 +271,37 @@ function message.IsReturnOrRejoin (|bool|)
 
 
 function Message.UnReachable (|Message|)
-	debugger self == @arg
-	return .CausesUnReachable(self, nil, nil)  
+	return .CausesUnReachable(self)
 
 
-function Message.CausesUnReachable (|Message| arg, |Message| Curr, |Message| LastPlace, |Message|)
-	Curr := .First // ideally should just be "for (curr in self)"
+function Message.CausesUnReachable (|Message| arg, |Message| Dcl=nil, |Message| LastPlace=nil, |Message|)
+	opt norefcounts
+	|| Curr = dcl ?? .First
 
-	while (curr)
-		require (curr != LastPlace)
+	while (curr and curr != LastPlace)
 		if (Curr == @Tmp)
 			|| s = Curr.name
 			if (s == "return")
 				Return Curr
 
-			if (s == "exit" or "continue" or "cant")
+			if (s == "exit" or "continue")
 				if SCRefs.ExitHitsOrGoesPast( Curr, arg )
 					Return Curr
-			// why is rejoin separate? I want to use kEndsblock!
-			  elseif (s=="rejoin") and (self == arg)
+			  elseif (s == "rejoin") and (self == arg)
 				Return Curr
-
 		Curr++
 
 
+//function Message.ReachableRejoin (|message| name, |bool|)
+//	opt norefcounts
+//	|| rej = .first
+//	if (rej isthing Name.name)
+//		return true
+//		// this was a bad idea
+
+
 function ExitHitsOrGoesPast (|Message| msg, |Message| arg, |bool|)
+	opt norefcounts
 	// while {||A, exit}			 // true
 	// while {||A, if(true){exit}}   // true
 	// while {if(true){||A, exit}}   // true
@@ -392,9 +401,9 @@ function ReturnTempMoveOutSub (|Message| Child, |Message| blocker, |message| tem
 
 
 function message.DoesAnything (|bool|)
-	require self
-	require self != @thg and @num and @str and @char
-	return true
+	if self
+		require self != @thg and @num and @str and @char
+		return true
 
 
 function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| Basis)
@@ -417,7 +426,7 @@ function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| B
 		return // no need?
 
 	if (!Blocker)
-		debug_require (arg)
+		if !arg
 		RefDecr( name, arg, basis )
 		Return
 
@@ -577,7 +586,7 @@ function SafeDecrMsg (|Message| msg, |Message|)
 function RC_DeclArg (|scdecl| AR, |scfunction| fn)
 	|| dcl = AR.WriteNilDecl
 	fn.SourceArg.First = dcl
-	RC_DeclInit( dcl, fn, true )
+	.DeclInit( dcl, fn, true )
 	dcl.remove
 
 
@@ -601,9 +610,7 @@ function Message.RefDisappears (|bool|)
 
 function message.IsStatementExpr (|bool|)
 	opt norefcounts
-	|| f = .first
-	if (self == @bra) and (f == @arg)
-		return f.asarg$.isstatementexpr
+	return .TmpType == ASMtmp.kStatementExpression
 
 
 function message.RC_HasTemporary (|int|)
@@ -771,7 +778,7 @@ function SCFunction.AnalyseRefs (|[message]| list)
 			if (Ar is altered) and (ar.IsNormalObject)
 				SCRefs.RC_DeclArg(ar, self)
 
-	for (msg in list)
+	for (msg.backwards in list)
 		|| f = msg.func
 		if (f == @Rel)
 			if (IsConstructor and SettingSelfProperty( msg ))
@@ -790,7 +797,7 @@ function SCFunction.AnalyseRefs (|[message]| list)
 			SCRefs.RC_IgnoreReturn( msg, .dorefs )
 			
 		  elseif (f == @Decl)
-			SCRefs.RC_DeclInit( msg, self, false ) // || a = b, incr(b)
+			SCRefs.DeclInit( msg, self, false ) // || a = b, incr(b)
 
 
 

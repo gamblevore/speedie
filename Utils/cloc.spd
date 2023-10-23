@@ -1,13 +1,12 @@
 #!/usr/local/bin/spd
 
-main  
+main  (|[existingfile]| files)
 	if !app.args
 		return .Usage
 	
-	counts.Init(app..files)
-	for path in app.args
-		|| dir = path.ExistingFile
-			dir.CountAll(true)
+	counts.Init(app["types"])
+	for dir in files
+		dir.CountAll(true)
 	counts.Report
 
 
@@ -101,7 +100,7 @@ function file.CLOC
 	|| Durr = start.ago
 	counts.MemEnd
 	if msg
-		counts.Lines += msg.loc
+		counts.Lines += msg.loc[0]
 	  else
 		Counts.Lines += data.loc
 	counts.kb += data.Length
@@ -133,7 +132,7 @@ function file.CountAll (|bool| force=false)
 
 function app.Usage (|int|)
 	"Usage: cloc path
---files=cpp/c/h               Only report these files (defaults to ${counts.DefaultExt})
+--types=cpp/c/h               Only report these types (defaults to ${counts.DefaultExt})
 --quiet=true/false            Makes less output
 -k                            Keeps errors
 -s                            Report parse speed

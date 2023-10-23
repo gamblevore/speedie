@@ -63,29 +63,20 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 
 
 // these can remain...
-function scfunction.CollectDeclsFuncPrms (|Message| prms, |SCBase| AddToSpace)
+function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
 	opt norefcounts
 	|| cls = .Cls
 	if !cls
 		cls = .lookup|SCModule|.Cls
 	  elseif !prms.HasSelfAsFirst
-		cls.AddSelfToFunc(AddToSpace)
-		cls.SelfDeclReal(self)
+		.AddSelfToFunc(cls, AddToSpace)
 
 	for item in prms
 		// can remove some shit thats only applicable here... :D
-		require item.CollectFuncPrm(self, AddToSpace, cls)
+		require item.CollectOneParam(self, AddToSpace, cls)
 
 
-function scclass.SelfDeclReal (|scfunction| f)
-	opt norefcounts
-	|| sl = .SelfDecl // for my nil-checker
-	if sl.SuffersNil
-		sl = sl.copy
-	f.args <~ sl
-
-
-function Message.CollectFuncPrm (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
+function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
 	opt norefcounts
 	if (func.isassigns == 2) and .islast
 		if !cls
@@ -95,7 +86,7 @@ function Message.CollectFuncPrm (|scfunction| func, |SCBase| Recv, |scclass| cls
 			func.IsAssigns = 3
 			if cls.IsDataType
 				.next = .copy // fn x (|int|) --> fn x (|int| value, |int|)
-			.addvalue(func)
+			.AddValue(func)
 		
 	if self == @Item and .first == "assigns"
 		self = .Last
@@ -301,7 +292,4 @@ datatype DeclMode (uint)
 	function Policy (|nilstate|)
 		if self == FuncParam or functionbody
 			return nilstate.either
-		if self == Globals or properties or proto or Always
-			return nilstate.realish
-		debugger
-		return nilstate.realish // right?
+		return nilstate.realish

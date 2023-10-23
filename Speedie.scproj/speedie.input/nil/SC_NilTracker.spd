@@ -1,89 +1,96 @@
 
+
+/*
+	NilTracker keeps track of a 3D-ish table. (2D + 2-layers)
+	
+	We have rows (declarations), columns (branch-depth), and each cell has two values for the two branch-side.
+	
+	We actually store it as bit-fields, but its still the same.
+	
+	Its a true work of art. Beyond which giants cannot compare.	
+*/
+
+
+struct LoopInfo
+	|int| 				Depth
+	|int| 				ExitCount
+	|NilRecord| 		Exit
+	|NilRecord| 		Cont
+
+
 struct NilTracker
 	linkage: cpp_part nil
-	|byte| 				DeclCount
-	|byte| 				BranchDepth
-	|bool| 				BranchSide
-	|uint| 				ChangeTracker
-	|NilDecl[31]| 		Rows
-
-
-	function Restore (|uint| sw, |nilstate|)
-		debugger 
-//		for i in sw
-//			i.Restore
-		return nilstate.realish
+	|&NilRecord| 		Line
+	|&NilRecord| 		RowEnd
+	|LoopInfo| 			Loops
+	|NilRecord[64]| 	Rows
+	
 		
+	function WhileEnter (|message| Where, |bool| WhileTrue,  |LoopInfo|)
+		|| l = &.Loops
+		rz = *l
+		l.ExitCount = 1-WhileTrue
+		l.Cont = decls()
+		l.Exit = (l.Cont * !WhileTrue) (|) NilState.Either
+		l.Depth = .CurrDepth
+	
+	function CurrDepth (|int|)
+		return (.line - &.rows[0])|int|
+	
+	function BranchEnter (|message| abc, |NilRecord|)
+		if .line < .rowend
+			|| N = *(.line++)
+			*.line = N
+			return N
+		error (abc, "Branch depth too deep (over 63)")
+
+	
+	function BranchSwap (|NilRecord| OldState, |nilrecord|)
+		rz = *.line
+		*.line = OldState
+
+
+	function BranchExit (|NilRecord| Earlier,  |nilstate|)
+		|| Dest = --.line
+		Dest[0] = Earlier (|) Dest[1]
+
+			
+	function Declare (|scdecl| d, |nilstate| nd, |nilstate|)
+		nd &= nilstate.either
+		|| P = .place
+		|| N = p.value.Count
+		expect (N < 31)								(D, "Too many declarations")
+		(p)(n) = nd
 		
-	function Restore (|bool| s,  |nilstate|)
-		debugger 
-//		|| f = .DeclCount
-//		if f > s
-//			return .Restore(s sweep f)
-		
-
-	function MoveDown (|uint| s, |uint| f, |nilstate|)
-		debugger 
-		require f > s
-//		|| n = .DeclCount
-//		.DeclCount = s + (n-f)
-//		|| W = &.resets[s]
-//		|| R = &.resets[f]
-//		|| R2 = &.resets[n]
-//		while R < R2
-//			*W++ = *R++
-
-
-	function Merge (|uint| back)			// merges oldest values and newest values
-		debugger 
-//		|| Range = (back sweep .DeclCount)
-//		for i in range
-//			i.merge
-
-
-	function BranchExit (|uint| OldDecls, |nilstate|)
-		debugger 
-		.branchdepth--
-//		|| sw = olddecls sweep .DeclCount
+		if d.Suffers
+			d.NilSuffering = N
+		d.NilAllocDepth = .currDepth
+		d.NilPrint("add")
+		return nd
 	
-	
-	function BranchEnter (|uint|)
-		rz = .DeclCount
-		.branchdepth++
-		.BranchSide = 0
-
-	
-	function BranchSwap (|uint|)
-		rz = .DeclCount
-		.BranchSide = 1
-
-
-	function AddDecl (|scdecl| d)
-		|| n = .DeclCount++
-		|| i = .rows[n]
-		i.AllocDepth = .BranchDepth
-		i.ID = n
-		i.Decl = d
-		d.nil = i.Record
-		debug_require d.SuffersNil and n <= 31
-	
+	function scdecl.NilCurr (|nilstate|)
+		if self Isnt Local
+			return .nildeclared &~ nilstate.stated
+		return (niltracker.Decls)[.NilSuffering]
 	
 	function SetNilness (|SCDecl| d, |NilState| New, |nilstate|)
-		d.nil[.branchdepth].Side[.BranchSide] = New
-		d.NilCurr = new
+		|| R = .place
+		(R)(d.nilsuffering) = new
 		d.NilPrint("set")
 		return New
-		
 
-	function Start (|scfunction| f)
+	function Start (|scfunction| f, |message|)
 		opt norefcounts
-		.DeclCount = 0
-		.BranchDepth = 0
+		require f.CanNil
+		SCFunction.CurrFunc = f
+		.Line = .rows[0]
+		.rowend = .line + 63
+		*.line = nilstate.either
+		.loops = nil
 		for d in f.args
-			.AddDecl(d)
-			.SetNilness(d, d.NilEither)
+			.Declare(d, d.nildeclared)
 		f.NilPrint
-
+		return f.SourceArg
 
 	function Finish (|scfunction| f)
 		opt norefcounts
@@ -91,43 +98,35 @@ struct NilTracker
 			r.nildeclared |= nilstate.stated
 		f.NilPrint
 	
-	
-	function NilCheck (|scfunction| f)
-		opt norefcounts
-		if platform.IsDebug
-			.Start(f)
-			debugger 
-			Argument(f.SourceArg)
-			.Finish(f)
+	function Place (|&NilRecorder|)
+		return (T.line)|&nilrecorder|
 
-
-	function scfunction.CanNil (|bool|)
-		return !.IsMacro and !.IsWrapper and .isOK and .LimitTests
-	
-	
-	function scfunction.LimitTests (|bool|)
-		|| c = .Lookup #require
-		require c.name contains "NilTest"
-		return .SourceArg contains "nilcheck"
-	
-	
 	module
 		|NilTracker|	T
 
-		function SaveLives
-			opt norefcounts
-			for f in compiler.funclist
-				SCFunction.CurrFunc = f
-				f.CheckNilDepth
-				if f.CanNil
-					T.NilCheck(f)
+		function Place (|&NilRecorder|)
+			return (T.line)|&nilrecorder|
 		
-			.cleanup
+		function Decls (|NilRecord|)
+			return .place.Value
+		
+		function Decls (assigns:|NilRecord|)
+			.place.Value = Value
 
 
-		function Cleanup
-			MaxNilDepth.Report("depth")
-			MaxNilObjs.Report("objs")
+		function NilTracker.Purify (|scfunction| f)
+			opt norefcounts
+			|| arg = .Start(f)
+				Argument(arg)
+				.Finish(f)
+		
+		
+		function SaveTheWorld
+			opt norefcounts
+			require app["nil"].Yes
+			
+			for f in compiler.funclist
+				t.purify(f)
+
 			SCFunction.currfunc = nil
 			StdErr.PrintErrors
-			StdErr.Clear

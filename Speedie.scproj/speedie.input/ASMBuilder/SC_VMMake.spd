@@ -34,15 +34,11 @@ function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |[messa
 
 // we need to create an array of forms...
 function FillTypePrm (|string| fname, |int| pname)
-	|message| add
 	|| prop = @thg + fname
-	|| r = [prop]
 	if pname >= 4
-		add = (macros.ASMcopier2)(r)	
+		.dt_prm <~ (macros.ASMcopier2)(prop)	
 	  else
-		r <~ @num + pname
-		add = (macros.ASMcopier)(r)	
-	.dt_prm <~ add	
+		.dt_prm <~ (macros.ASMcopier)(prop, @num + pname)
 
 
 function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
@@ -102,10 +98,10 @@ function string.ASMNormalise (|string|)
 function DataTypeCreate (|message| form,  |int| fnum,  |message|)
 	opt norefcounts
 	|| name = "ASM_" + form.name
-	|| sigh = (Macros.ASM_Datatype)([
+	|| sigh = (Macros.ASM_Datatype)(
 		@thg + name
 		@num + fnum
-	])
+	)
 	rz = sigh.findnested(@list)
 	rz++
 	#!"This would be better if speedie grouped these, rather than spamming JB_InitCode_"

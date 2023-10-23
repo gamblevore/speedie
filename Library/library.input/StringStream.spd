@@ -71,11 +71,17 @@ class StringReader
 			.file = nil // why not
 		
 		
+	function NonZeroByte (|int|)
+		while 
+			|| b = .byte
+				return b
+	
 	function Byte (|int|)
-		ifn .data has 1
-			if ! .NextChunk
-				return -1
-		return .data.byte
+		if .data has
+			return .data.byte
+		if .NextChunk
+			return .data.byte
+		return -1
 		
 	syntax Compare (|int| n, |bool| aware, |int|)
 		return .length - n
@@ -194,8 +200,9 @@ class StringReader
 	syntax expect (|string| Error)
 		opt norefcounts
 		.UserObj = nil
-		require !.data.ErrorReported
-		.data.ErrorReported = true
+		|| D = .data.ErrorReported++
+		require !D
+		
 		if !error
 			if (.file)	
 				error = "Error decoding file: "

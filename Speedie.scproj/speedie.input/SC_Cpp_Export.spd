@@ -54,9 +54,16 @@ function PreRun
 	.moduleproperties <~ str
 
 
+function CanOpt (|bool| force, |bool|)
+	if force
+		return true
+	if currclass
+		return !currclass.minopt
+
+
 function OptStart (|FastStringCpp| fs, |int| m, |bool| force = 0)
 	opt min 3
-	if m and (force or !currclass.minopt)
+	if m and .CanOpt(force)
 		|| s = "s"
 		if m <= 3
 			s = m.render
@@ -64,7 +71,7 @@ function OptStart (|FastStringCpp| fs, |int| m, |bool| force = 0)
 
 
 function OptEnd (|FastStringCpp| fs, |int| m, |bool| force=0)
-	if m and (force or !currclass.minopt)
+	if m and .CanOpt(force)
 		fs <~ "\n#pragma GCC reset_options\n\n"
 	
 
@@ -600,9 +607,10 @@ function ExportModuleProperties (|SCModule| modl, |FastStringCpp| IntoModule)
 	for prop.vars in modl
 		if prop
 			if prop is Const
-				if IntoModule: Continue
+				if !IntoModule
+					WriteConst( prop, fs )
+					fs <~ '\n'
 	
-				WriteConst( prop, fs )
 			  elseif prop.TypeIsReached
 				if !IntoModule
 					fs <~ "extern "
@@ -614,7 +622,7 @@ function ExportModuleProperties (|SCModule| modl, |FastStringCpp| IntoModule)
 				  else
 					WriteDecl( prop, fs, nil )
 				fs <~ ';'
-			fs <~ '\n'
+				fs <~ '\n'
 
 
 
@@ -796,7 +804,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function APIHeader (|File|)
-		|| arg = compiler.api_place[@arg, -1]
+		|| arg = compiler.api_place.last(@arg)
 		|| ForLib = arg.find(@tmp, "libraryname")[@str]#require
 		|| FolName = arg.find(@tmp, "exportplace")[@str]#require
 		|| Fol = Compiler.BaseProjectPath[ FolName.name ]

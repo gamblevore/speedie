@@ -180,7 +180,7 @@ class File (String)
 	function Parent (|File|)
 		return File.new( super.Parent )
 	
-	function Touch (|errorint|)
+	function Touch (|errorint2|)
 		return "/usr/bin/touch".SilentExecute([self])
 
 	
@@ -269,7 +269,7 @@ class File (String)
 	function ListEnd
 		cpp_wrapper
 
-	function MoveNext (|bool|)
+	helper MoveNext (|bool|)
 		cpp_wrapper JB_File_MoveNext
 
 	function CurrChild (|String|)
@@ -287,10 +287,9 @@ class File (String)
 	
 	
 	function OpenBlank (|int|)
-		cpp_wrapper JB_File_Open____
 		disabled "Use OpenEmpty instead"
 
-	function OpenEmpty (|ind|)
+	function OpenEmpty (|bool|)
 		cpp_wrapper JB_File_OpenBlank
 	
 	function EOF (|bool|)
@@ -332,7 +331,7 @@ class File (String)
 			|| ch = .child(test)
 			if !ch.exists
 				return ch
-			test = name + (random.shared.int&0xFFFFFF).render
+			test = name + (0xFFFFFF()).render
 			
 	function Relax (|bool| NeedsMode=true, |errorint|)
 		cpp_Wrapper JB_File_RelaxPath

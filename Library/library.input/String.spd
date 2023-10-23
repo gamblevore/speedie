@@ -498,7 +498,7 @@ class String
 		cpp_part EqualsInt
 		return .length == other
 	
-	function Move (|ind| Pos, |int| CodePoints, |ind|)
+	helper MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)
 		|| n	= .length
 		|| s0	= .address
 		|| s	= s0 + pos
@@ -563,18 +563,18 @@ class String
 			|| f = find[i++]
 			if f != ' '
 				require c eq f
-				continue
-			|| extra = 0
-			|| found = 0
-			while (find[i+extra] == ' ')
-				extra++
-			// so now we need to find that many extra spaces
-			while c == ' ' or '\t'
-				c = self[from + i + found]
-				found++
-			require found > extra
-			i+=extra
-			from+=found-(extra+1)
+			  else
+				|| extra = 0
+				|| found = 0
+				while (find[i+extra] == ' ')
+					extra++
+				// so now we need to find that many extra spaces
+				while c == ' ' or '\t'
+					c = self[from + i + found]
+					found++
+				require found > extra
+				i+=extra
+				from+=found-(extra+1)
 		return i+from
 
 

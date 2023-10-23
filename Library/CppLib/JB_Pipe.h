@@ -44,7 +44,7 @@ void JB_Sh_Destructor(ShellStream* self);
 void JB_Sh_Constructor(ShellStream* self, JB_String* Path);
 ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn);
 bool JB_Sh_Step(ShellStream* self);
-int JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, bool KeepStdOut);
+ivec2 JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, bool StdOutFlowThru);
 bool JB_Proc__CreateArgs(JB_String** self, Array* R, const char** argv);
 bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, bool capture);
 bool JB_Sh_UpdatePipes(ShellStream* self);

@@ -44,29 +44,16 @@ function String.ParseJSON (|Messageroot|)
 	rz = .parse
 	jeebox.UnEscapeStr = tmp
 	rz.ConvertJSONToJB?
-
-
-helper Jeebox.ParseProtectSub (|errorlist|)
-	opt norefcounts
-	rz = jeebox._ParseProtector init errorlist()
-	rz.clear
-
-
-function Jeebox.ParseProtect
-	// refcounting bug work around...
-	// i think I'm frustrated by bad code output... 
-	stderr = .ParseProtectSub
 	
-	
+
 function String.ParseWithError (|&Error| rec, |MessageRoot|)
-	visible
-	jeebox.ParseProtect
 	rz = .parse
-	*rec = stderr.pop
-	stderr = stderroriginal
+	if !rz
+		|| r = stderr.pop
+		if rec: *rec = r 
 
 
-helper String.HiddenJBin (|ind|)
+helper String.ExecuteableJBin (|ind|)
 	|ind| nl = 0
 	if  *self == '#'  and  self[1] == '!' // shebang
 		nl = .find('\n') + 1
@@ -80,7 +67,7 @@ helper String.HiddenJBin (|ind|)
 function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |MessageRoot|)
 	// language2.scproj uses owner
 	|| data = (.decompress(int.max), self)(Allowdecomp and .iscompressed)
-	|| j = data.HiddenJBin
+	|| j = data.ExecuteableJBin
 		return data[j, int.max].parsejbin
 	if !Parser.CppInited
 	    Parser.Init
@@ -296,4 +283,6 @@ role MessageRoot (Message)
 	linkage
 		noauto
 		pragma noearlyfree
+	operator isa (|string| s, |bool|)
+		return .FilePath isa s
 

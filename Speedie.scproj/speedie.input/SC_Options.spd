@@ -72,7 +72,7 @@ module Feedback
 	function CheckSelfModifying
 		|| t2 = .CheckSelfModifying2
 		if t2 == 1
-			Options.SelfReplacement = kSelfReplace
+			Options.SelfReplacement = kSelfReplace // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
 			Options.GenFlowControlCode = app.prefs["self_flow"].yes
@@ -252,7 +252,6 @@ module Feedback
 			options.perry = 1
 			|| RealPerry = value~="bin"
 			options.perry += RealPerry // argvalue not needed? jsut value, right?
-			//error.AutoPrint = (!RealPerry)|int|
 			compiler.insecurewords = file.PrefsFolder["klinkerhoppen.banned"].readall.dict
 		
 		+"check"
@@ -491,8 +490,8 @@ module Feedback
 		fs <~ " /path/to/project\n"
 		fs <~ "Installation: ${compiler.SpeedieProj.parent}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
-		fs <~ "  SelfFlow: " 
-		fs <~ app.prefs["self_flow"]
+		fs <~ "  SelfFlow: ",  fs <~ app.prefs["self_flow"]
+		fs <~ "  @max: ${@max|int|}"
 		for (v in appoptions) (k) 
 			(*v)("", "", fs_tester)
 			if (fs_tester.length) 

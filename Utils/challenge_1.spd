@@ -2,11 +2,8 @@
 
 https://www.youtube.com/watch?v=pxHd8tLI65Q
 
-main
-	solution((app[0] ?? "11").int)
-
-function Solution (|f64| n)
-	for a in n|int|+1
+main (|float| n)
+	for a in 0 to n
 		|| i = 2.0*(n*a).sqrt
 		|| b = n - i + a
 		if !b.fract

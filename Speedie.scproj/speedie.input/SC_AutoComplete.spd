@@ -625,9 +625,9 @@ function AutoCompleteSorter (autosort_fn)
 
 function FuncTmps (|message|)
 	if .func_tmp_src.cleaned
-		return .func_tmp_src.pz
+		return .func_tmp_src.Source
 	.func_tmp_src.cleaned = true
-	rz = .func_tmp_src.pz
+	rz = .func_tmp_src.Source
 	
 	for ch in rz
 		if ch != @dot
@@ -648,9 +648,9 @@ function message.Autocomplete_State (|int|)
 function AllTmps (|message|)
 	opt norefcounts
 	if .all_tmp_src.cleaned
-		return .all_tmp_src.pz
+		return .all_tmp_src.Source
 	.all_tmp_src.cleaned = true
-	rz = .all_tmp_src.pz
+	rz = .all_tmp_src.Source
 	
 	|| state = 0
 	for ch in rz
@@ -780,6 +780,8 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 	rz = @arg.msg
 	|| fn = s.Identifyfunc
 	if msg == @name
+		if purpose == "display"  and  s istmp "prototype"
+			return s
 		msg.func = @thg // findmoduleorclass needs this
 		|| obj = compiler.findmoduleorclass(msg, true)
 			return obj.diissplayobj(rz)
@@ -862,11 +864,11 @@ function CallFrom (|message| msg,  |string| purpose,  |object| found=nil,  |mess
 	|| fn = msg.AutoMsgFuncFn
 	fn := msg.AutoMsgFunc
 	require fn
-
-	rz = .callfromdefine(msg, fn, found)
+	
+	rz = .CallFromDefine(msg, fn, found)
 	|| arg = rz.first
 	if fn isnt constructor
-		.callfromsub(arg, fn)
+		.CallFromSub(arg, fn)
 		return rz
 
 	while fn
@@ -880,20 +882,14 @@ function CallFrom (|message| msg,  |string| purpose,  |object| found=nil,  |mess
 
 
 function CallFromSub (|message| arg, |scfunction| fn)
-	opt norefcounts
 	for call_point in fn.linkfrom
 		|| s = call_point.source
-			// find exactly where within the function is it
-			// also restore my youth and energy and emotions to how I used to be as a child
-			// seeing as I'm not really doing this and YOU LOT ARE. SIGH. So just do both
-			// and stop taxing me. Be on MY SIDE THIS TIME. 
-			// Restore my youth and energy as a child but make me financially rich this time.
-			// as a child who is like a star, well-looked after.
 			|| f = s.filepath
 				|| item = arg.msg(@tmp, "line")
 				item <~ (@sstr, f)
 				item <~ call_point.CallFromName
 				item <~ s.FuncPos(fn)
+
 
 helper Message.FuncPos (|scfunction|fn, |int|)				
 	opt norefcounts
@@ -912,7 +908,6 @@ function Define (|message| msg,  |string| purpose,  |object| found=nil,  |messag
 	|| s = .LocateDefinition(msg, found|scobject|, IsDisplay)	
 		return .RespondDefine(msg, s, purpose)
 	if platform.isdebug
-		if compiler.projectname contains "jz.spd" // easier debugging
 		.LocateDefinition(msg, found|scobject|, IsDisplay)
 	error "nosource"
 
@@ -1013,7 +1008,7 @@ function FindAdj (|message| msg, |bool| DisplayOnly, |message|)
 		adj = msg.parent
 	ifn adj in @decl
 		|| found = compiler.findadj(adj)
-			return found.parsed // perhaps?
+			return found._parsed // why not .source?
 	 
 
 function LocateDefinition (|message| msg, |scobject| already_defined, |bool| DisplayOnly, |message|)
@@ -1023,12 +1018,18 @@ function LocateDefinition (|message| msg, |scobject| already_defined, |bool| Dis
 		if rz
 			return rz
 		
-		
 	|| ty = TypeOfExpr(msg, msg.msgarg) // needs refcounts
 	rz = .LocateDefinitionSub(msg, already_defined, ty, DisplayOnly)
 	if rz == @arg
 		|| p = rz.parent
 			rz = p
+
+	if msg in @tmp
+		msg = msg.parent
+	if (msg == @tmp)
+		|| fn = msg.obj
+		if fn isa SCFunction
+			return fn.Source
 
 
 function LocateDefinitionSub (|message| msg, |scobject| already_defined, |scdecl| ty, |bool| DisplayOnly, |message|)
@@ -1040,7 +1041,8 @@ function LocateDefinitionSub (|message| msg, |scobject| already_defined, |scdecl
 		msg = msg.parent // :)
 	|| fn = msg.msgfunc
 		|| it = fn.source
-			return it		
+			return it
+
 	if !ty
 		return msg.ModuleSrc
 	if ty.type == scbasetype.funcproto

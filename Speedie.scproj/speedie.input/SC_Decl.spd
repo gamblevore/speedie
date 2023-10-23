@@ -66,9 +66,11 @@ datatype SCDeclInfo (uint)
 		Altered
 		GameFlyingMem
 		Atomic
+		Self
 		Implicit		// self or other values that aren't declared explicitly
 		SetTo			// a var sets it... like: rz = obj
 		Local = Body + Param
+		SelfImplicit = Self + Implicit + local // local is set by CollectOneParam, anyhow?
 		
 		
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
@@ -93,12 +95,12 @@ class SCDecl (SCObject) {
 	|SCDecl|			Contains
 	|Message|			Default
 	|SCClass|			Type
-	|&NilInst| 			Nil
 	|SCDeclInfo|		Info
 	|AsmReg|			DRegister
 	|Byte|				PointerCount
 	|NilState|			NilDeclared
-	|NilState|			NilCurr
+	|byte| 				NilSuffering
+	|byte| 				NilAllocDepth
 
 	
 	constructor (|scclass| type=nil)
@@ -106,13 +108,15 @@ class SCDecl (SCObject) {
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered
 	
+	setter NilDeclared (|nilstate|)
+//		if .name ~= "cc"
+		.NilDeclared = value
+	
 	function Project (|scimport|)
 		opt norefcounts
 		|| m = .MemoryLayer
-		|| obj = m.obj
-		if obj isa scimport
-			return obj
-		
+			return m.obj as SCImport
+			
 	syntax append (|SCDeclInfo| d)
 		.info |= d
 
@@ -256,7 +260,7 @@ class SCDecl (SCObject) {
 		.contains := Value.contained
 			
 
-	function GetAddress (|declmode| Purpose, |SCDecl|)
+	function GetAddress (|declmode| Purpose=declmode.always, |SCDecl|)
 		rz = SCDecl.new
 		.CopyTypeInfoTo(rz)
 		rz.internal = self
@@ -266,14 +270,14 @@ class SCDecl (SCObject) {
 		check (rz.pointercount < 8) (.source, "Too much abstraction")
 	
 	
-	function Dereference (|message| brel, |scbase|name_space,  |bool| IsAccess,  |scdecl|)
+	function DeReference (|message| brel, |scbase|name_space,  |bool| IsAccess,  |scdecl|)
 		opt norefcounts
-		|| c = .DereferenceSub(brel, name_space, isaccess)
+		|| c = .DeReferenceSub(brel, name_space, isaccess)
 			return c
 		error (brel.first, "Can't dereference this.")
 		
 	
-	function DereferenceSub (|message| brel, |scbase|name_space,  |bool| IsAccess, |scdecl|)
+	function DeReferenceSub (|message| brel, |scbase|name_space,  |bool| IsAccess, |scdecl|)
 		opt norefcounts
 		if (.C_Array)
 			require IsAccess
@@ -292,7 +296,8 @@ class SCDecl (SCObject) {
 		
 
 	render
-		.WriteDeclFull.Render(fs)
+		if self
+			.WriteDeclFull.Render(fs)
 	
 	
 	function SyntaxExpect
@@ -309,6 +314,7 @@ class SCDecl (SCObject) {
 		fs <~ .WriteType
 		fs <~ '|'
 		return fs
+
 
 	function WriteDeclFull (|String| DeclName = "", |bool| minimal = false, |Message|)
 		DeclName := .Name
@@ -407,7 +413,7 @@ class SCDecl (SCObject) {
 
 
 	function MiniMatch (|SCDecl| O, |int| TypeCast = 0, |bool|)
-		Return .Match( o, TypeCast, nil )
+		Return .TypeMatch( o, TypeCast, nil )
 
 	
 	function CanWrap (|bool|)
@@ -489,14 +495,14 @@ class SCDecl (SCObject) {
 	
 
 	function ExpectMatch (|SCDecl| O, |int| TypeCast, |Message| exp, |Message| ErrNode = nil, |Message|)
-		|| Matched = .Match(O, TypeCast, exp)
+		|| Matched = .TypeMatch(O, TypeCast, exp)
 		if (Matched == kCastedMatch or kLossyCastedMatch)
 			return exp.CastedParent
 
 		if (Matched == kNoMatch)
 			ErrNode := exp
 			error ( ErrNode, "Type mismatch, expected '${.RenderTypeName}' but found '${o.RenderTypeName}'." )
-			.Match(O, TypeCast, exp)
+			.TypeMatch(O, TypeCast, exp)
 
 		return exp
 
@@ -510,7 +516,7 @@ class SCDecl (SCObject) {
 
 
 	function IsPtr (|scclass|type, |bool|)
-		return self and (.type == type) and .pointercount == 1
+		return self and (.type == type) and (.pointercount == 1)
 
 		
 	operator isa_not_stupid (|SCClass| O, |bool|)
@@ -553,7 +559,7 @@ class SCDecl (SCObject) {
 		
 	
 	function MatchC (|SCDecl| O, |bool|)
-		Return .Match( o, kTypeCastTrue, nil )
+		Return .TypeMatch( o, kTypeCastTrue, nil )
 
 
 	function ClassActReplace (|scclass| cls, |scdecl|)
@@ -638,22 +644,8 @@ class SCDecl (SCObject) {
 			»
 		if self is borrowed
 			rz = «arel "--", rz »
-		if (.SuffersNil) // hmmm.... well heres the thing...
-						 // without a declmode, we can't know what the default state is
-						 // so we can't avoid writing this.
-						 // that or we have to simplify the rules... objects and pointers are always real
-						 // unless stated.
-						 
-						 // I dont like the declmode... really. I do like the "implicit param" though
-						 // but I don't like how it renders with "!" for all params, then.
-						 
-						 // I think this is the same. I GOTTA BE BRAVE.
-						 
-						 // DO WHAT YOU WANT. 
-			//|| normal = purpose.policy(.pointercount > 0)
+		if (.Suffers)
 			|| ND = .nildeclared
-			//if (ND == nilstate.real)
-			//	rz = «brel "!", rz »
 			if (ND == nilstate.Optional) /// pointers are already optional
 				rz = «brel "?", rz »	// depends if this is for debug?
 										// for debug I'd rther not see ! all over
@@ -768,7 +760,7 @@ class SCDecl (SCObject) {
 		|| sc =  .reallycontains
 		if (oc == sc) or !(sc and oc) or !o.contains
 			return true
-		Return sc.Match( oc, 0 ).IsNormalMatch
+		Return sc.TypeMatch( oc, 0 ).IsNormalMatch
 
 
 	function MakeBorrowed (|bool| StayBorrowed=false, |SCDecl|)
@@ -805,20 +797,24 @@ class SCDecl (SCObject) {
 			.NilDeclared = NilState.Real
 
 
-	function MakeExistance (|nilstate| type, |scdecl| Default, |scdecl|)
+	function DefaultToReal (|scdecl|)
+		return .MakeExistance(nilstate.real)
+
+
+	function MakeExistance (|nilstate| type, |scdecl| Default=nil, |scdecl|)
 		opt norefcounts
 		if !self or .nildeclared == type
 			Return self
 		
 		if (Default and self == .type.typenormal)
-			if default.nildeclared != type // what?
 			return Default
 		
 		rz = .Copy
 		rz.NilDeclared = type
 
 
-	function NilConstructor (|nilstate| type,  |scdecl|) 
+	function NilConstructor (|nilstate| type,  |scdecl|)
+		opt norefcounts
 		if Type == 0
 			return self
 		rz = .copy
@@ -882,7 +878,7 @@ class SCDecl (SCObject) {
 		if (name_Space)
 			TypeOfExpr(self, name_space)
 		  elseif (.obj)
-			|| FoundType = TypeOfExprMaybeNil(self, name_Space)
+			|| FoundType = TypeOfExpr(self, name_Space)
 			if FoundType and FoundType.type.isstruct
 				expect FoundType.PointerCount (self, "Can't typecast a struct!")
 
@@ -924,8 +920,8 @@ class SCDecl (SCObject) {
 		.func = @brel
 		self <~ sigh
 
-//JB_Str_ContainsString
-	function ExpectMatchRel (|SCDecl| O,  |Message| exp,  |Message| side,  |Message| ErrNode = nil)
+
+	function ExpectRelMatch (|SCDecl| O,  |Message| exp,  |Message| side,  |Message| ErrNode = nil)
 		opt norefcounts
 		// Just like ExpectMatch, except always does type-casting. and returns nothing.
 		
@@ -934,35 +930,13 @@ class SCDecl (SCObject) {
 			Cast |= kTypeCastBothWays
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
-		require (exp and exp.IsSetIntoPlace)
-		|| fn = exp.MsgOwningFunc
-		if .Type.SelfDecl != self
-			fn.RefSmooth( self )
-			return
+		require (exp and exp.IsSetIntoPlace and .suffers)
 		
-		if fn is constructor or Destructor
+		if (self is self) and (scfunction.currfunc is constructor or Destructor) 
 			error (exp, "You can’t modify 'self' in a constructor or destructor.")
-
-		if .IsNormalObject
-			fn.RefSmooth( fn.DeclSelfExtract(self) )
-	
-	
-	function SCFunction.DeclSelfExtract (|scdecl| decl, |scdecl|)
-		opt norefcounts
-		
-		rz = decl.copy
-		if .args[0] == decl
-			.args[0] = rz
-
-		|| arg = .SourceArg.obj
-		if arg isa scarg
-			arg.access["self"] = rz
-		
-		for s.flat in .source
-			|| obj = s.obj
-			if obj == decl
-				s.obj = rz
-					
+		  elseif self is local
+			.MarkAsRefAltered
+						
 
 	function WriteNilRel (|Message|)
 		return NeweqRel( .Name, "nil" )
@@ -1034,7 +1008,7 @@ function Message.RenderType (|string|)
 
 
 function scdecl.TypeIsReached (|bool|)
-	return (.type.CurrReacher)
+	return .type.CurrReacher
 
 
 function scdecl.ByteSize (|int|)
@@ -1045,4 +1019,13 @@ function scdecl.ByteSize (|int|)
 	if .C_Array
 		n *= .C_Array
 	return N
+
+
+
+datatype IntObjectID (uint)
+	
+function object.operatorisa (|IntObjectID| i, |bool|)
+	return .objectid == i
+function int.id (|IntObjectID|)
+	return self|IntObjectID|
 

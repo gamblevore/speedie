@@ -68,13 +68,14 @@ function string.Sort (|byte| sep = '\n', |string|)
 	return x.Join(string.byte(sep))
 
 
-function message.LOC (|int|)
+function message.LOC (|ivec2|)
 	description "Calculate Lines of content" 
 	opt norefcounts
 	for s.flat in self
+		rz[1] ++
 		|| p = s.parent
 			|| pf = p.func
-			rz += (pf == @arg) or (pf == @tmp  and  s == @tmp)
+			rz[0] += (pf == @arg) or (pf == @tmp  and  s == @tmp)
 
 
 struct StringDigitIterator
@@ -118,6 +119,6 @@ ignore // seems not worth it
 			|| V = Src.ZeroValue
 			for (c in Src)
 				V += c
-			(V)
+			rejoin (V)
 		})
 

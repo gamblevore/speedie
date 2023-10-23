@@ -1,5 +1,8 @@
 #!/usr/local/bin/spd
 
+// maybe.spd: Tests a lot of different syntax and features in one project.
+// doesnt really actually do anything useful otherwise.
+
 targets: flow
 
 

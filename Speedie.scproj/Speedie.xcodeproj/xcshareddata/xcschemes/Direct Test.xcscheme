@@ -54,7 +54,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--self"
-            isEnabled = "NO">
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--nocolor"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--directtest"
@@ -62,7 +66,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Perry.scproj"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Exec.scproj"

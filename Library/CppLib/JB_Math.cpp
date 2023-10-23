@@ -38,29 +38,36 @@ extern "C" {
         return z;
     }
     
-    /*
-    theta1=0.1963 * r^3 - 0.9817 * r + pi/4 (2a)
-    theta2=0.1963 * r^3 - 0.9817 * r + 3*pi/4 (4a)
-    */
-    // could replace our arctan3 with this one... seems fair?
-    float arctan3 (float y, float x) {
-    //    http://dspguru.com/dsp/tricks/fixed-point-atan2-with-self-normalization/
-        const float pio4 = 0.7853981634; //pi/4
-        float abs_y = fabsf(y) + 1e-10;      // kludge to prevent 0/0 condition
-        float r; float angle;
-        if (x >= 0) {
-            r = (x - abs_y) / (x + abs_y);
-            angle = 0.1963 * (r*r*r) - 0.9817 * r + pio4;    // (2a)
-        } else {
-            r = (x + abs_y) / (abs_y - x);
-            angle = 0.1963 * (r*r*r) - 0.9817 * r + 3*pio4;  // (4a)
-        }
-        if (y < 0) {
-            return -angle;     // negate if in quad III or IV
-        } else {
-            return angle;
-        }
-    }
+//	static inline float atan_fma_approximation (float x) {
+//		const float a1  =  0.99997726f / (M_PI*2);
+//		const float a3  = -0.33262347f / (M_PI*2);
+//		const float a5  =  0.19354346f / (M_PI*2);
+//		const float a7  = -0.11643287f / (M_PI*2);
+//		const float a9  =  0.05265332f / (M_PI*2);
+//		const float a11 = -0.01172120f / (M_PI*2);
+//
+//		// Compute approximation using Horner's method
+//		float x_sq = x*x;
+//		return
+//			x * fmaf(x_sq, fmaf(x_sq, fmaf(x_sq, fmaf(x_sq, fmaf(x_sq, a11, a9), a7), a5), a3), a1);
+//	}
+//    
+//    // nevermind this... I can't get it to the same range as the other atan2
+//	float JB_ATan2Fast (float x, float y) {
+//		const float pi = 0.5;
+//		const float pi_2 = 0.25;
+//
+//		// Ensure input is in [-1, +1]
+//		bool swap = fabs(x) < fabs(y);
+//		float atan_input = (swap ? x : y) / (swap ? y : x);
+//		float res = atan_fma_approximation(atan_input);
+//
+//		if (swap)
+//			res = copysignf(pi_2, atan_input) - res;
+//
+//		// Adjust the result depending on the input quadrant
+//		return res + copysignf(pi, y) * (x < 0.0f);
+//	}
 
 	double JB_Pow10(int x) {
 		double rz = 1.0;

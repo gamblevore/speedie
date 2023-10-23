@@ -64,7 +64,7 @@ bool JB_Byte_IsWhite(byte b);
 
 bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
     if (Length <= 0) {
-        JB_free( self->Addr );
+        JB_FreeString( self->Addr );
         self->Addr = 0; self->Length = 0;
         return 0;
     }
@@ -74,7 +74,7 @@ bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
         return 0;
     }
     
-    auto Result = JB_allocate( Length+1, self->Addr );
+    auto Result = JB_AllocateString( Length+1, self->Addr );
     require (Result.OK);
     Result.Result[Length] = 0;
     self->Addr = Result.Result;
@@ -84,7 +84,7 @@ bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
     
 
 void JB_BA_Destructor( JB_String* self ) {
-    JB_free( self->Addr );
+    JB_FreeString( self->Addr );
 }
 
 
@@ -958,7 +958,7 @@ int JB_Str_Compare(JB_String* self, JB_String* Find, bool Lexer) {
 
 extern JB_StringC* EmptyString_;
 extern JB_StringC* ErrorString_;
-bool JB_Str_MidEquals(JB_String* self, int BeginOff, JB_String* find, bool Lexer) {
+bool JB_Str_MidEquals(JB_String* self, int BeginOff, JB_String* find, bool CaseAware) {
 	int n = JB_Str_Length(find); 
 	if (!n)
 		return false;
@@ -966,7 +966,7 @@ bool JB_Str_MidEquals(JB_String* self, int BeginOff, JB_String* find, bool Lexer
 		self = EmptyString_;
 
 	MiniStr S = ReadAddrs_( self,  BeginOff,  BeginOff + n );
-	if ( Lexer ) {
+	if ( CaseAware ) {
 		return StrEqualsLex( Mini(find), S );
 	} else {
 		return StrEquals( Mini(find), S );

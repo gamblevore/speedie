@@ -5,23 +5,19 @@ function app.Usage (|string|)
 	return "Usage: ${.filename} File1 [File2...]
 Convert files between jbin, box, xml formats. Additionally can compress or decompress.
 
-    -j              Convert to jeebox
-    -b              Convert to jbin
-    -c              Compress
-    -c=0            Compress for very-fast decompress
+    -box            Convert to jeebox
+    -bin            Convert to jbin
+    -c              Compress (c=0 to c=6)
     -s              Replace file in-place
     -p              Print to stdout
     -r              Just report types, otherwise do nothing
     -o=name         Sets the output filename
-    -d=j/b/m/x      Detect only specified type.
-                    j = jeebox, b = jbin, m = compressed, x = xml
 
 examples:
-    jz -j A.xml   					// xml to jeebox
+    jz -b A.xml   					// xml to jeebox
     jz -c A.xml   					// compress A.xml into A.xml.mz
     jz    A.txt.mz   				// decompress A.txt.mz to A.txt
-    jz -b A.box   					// jeebox to jbin
-    jz -b A.xml   					// xml to jbin
+    jz -n A.box   					// jeebox to jbin
 "
 
 
@@ -52,6 +48,9 @@ datatype Type (int)
 function app.UseOne (|file| f)
 	conv.in = f
 	conv.out = conv.OutPath
+	conv.RealOut = conv.out
+	if conv.Dest is selfreplace
+		conv.realout = conv.realout.AddExt("jztmp").file
 	if conv.in.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
@@ -102,9 +101,9 @@ function App.GetActions (|Type|)
 		|| v = s.ArgValue
 		if name ~= "r"
 			rz |= type.report
-		  elseif name ~= "j"
+		  elseif name ~= "b" or "box" or "jeebox"
 			rz |= type.box
-		  elseif name ~= "b"
+		  elseif name ~= "n" or "bin" or "jbin"
 			rz |= type.jbin
 			if v=="2"
 				rz |= type.precomp
@@ -114,12 +113,6 @@ function App.GetActions (|Type|)
 		  elseif name ~= "p"
 			rz |= type.stdout
 			.SingleFile(name)
-		  elseif name ~= "d"
-			|| x = type.compressed * (v contains 'm')
-			x |= type.xml  * (v contains 'x')
-			x |= type.jbin * (v contains 'b')
-			x |= type.box  * (v contains 'j')
-			conv.DetectOnly = x
 		  elseif name ~= "test"
 			rz |= type.TestComp
 			rz |= type.compressed
@@ -144,9 +137,9 @@ function App.GetActions (|Type|)
 module Conv
 	|string|		Data
 	|file|			In
+	|file| 			RealOut
 	|file| 			Out
 	|date|			Start
-	|type| 			DetectOnly = -1
 	|type| 			Dest
 	|type| 			Detected
 	|float| 		Size
@@ -225,7 +218,7 @@ module Conv
 		
 	function CompressOnly (|bool| Decomp)
 		printline .out|string|
-		|| d = .out.out
+		|| d = .realout.out
 		|| src = .in.in
 		require src!=nil and d != nil
 		.start = date() 
@@ -238,16 +231,14 @@ module Conv
 			.size = .in.size
 			src.CompressInto(d, DefaultStrength) 
 			.time("Compress(streamed $typ)", true)
+		if dest is selfreplace
+			.RealOut.MoveTo(.out)
 	
 
 	function Read (|bool|)
 		|| OrigSize = 0
 		|| CmpFormat = .FormatInfo(OrigSize)
 		
-		if .DetectOnly != -1 
-			require .Detected & .detectonly
-			printline "Found: ${.in.path}"
-
 		ifn Dest&type.Actions
 			if (CmpFormat.length > 0) != (dest is compressed)
 				.done++
@@ -309,12 +300,8 @@ module Conv
 		return StdErr.ok
 
 
-	function Transform (|bool|) 
-		|faststring| fs
-		if dest isnt compressed
-			fs = .out.Out							#require
-
-		if .AST and (Detected.format != Dest.format)
+	function ConvertDataFormat (|faststring| fs)
+		if .AST
 			.Start = date.now
 			if dest is jbin
 				.data = .AST.renderjbin(fs)
@@ -322,15 +309,28 @@ module Conv
 				.data = .AST.Render(fs)
 			.time("Render")
 
-		if .dest is compressed 
+		
+	function Transform
+		|| FmtSame    = Detected.format == Dest.format
+		|| PathSame = .in.path == .out.path
+		if (FmtSame and PathSame)
+			"Nothing to do for: $.out"
+			return
+		
+		|| fs = .realout.Out							#require
+		if dest isnt compressed 
+			.ConvertDataFormat(fs)
+		  else
 			.start = date.now
-			fs = .out.out							#require
+			.ConvertDataFormat(nil)
 			.data.Compressinto(fs, .DefaultStrength)
 			.time("Compress")
-
-		fs.Flush
-		if !fs
-			"Nothing to do for: $.out"
+		
+		fs = nil
+		
+		if dest is selfreplace
+			.RealOut.moveto(.out)
+		
 		if .dest isnt stdout
 			printline .out.path
 
@@ -371,9 +371,16 @@ module Conv
 	
 	
 	function FormatInfo (|&int| Size=0, |string|)
-		|| str = .in.Section(0, 32)
+		using ErrorList()
+			rz = .FormatInfoSub(size) // to protect against clipping errors
+	
+	
+	function FormatInfoSub (|&int| Size=0, |string|)
+		|| str = .in.Section(0, 32) // can't just clip jbin like this. We just want a preview :(
 			if str == string.error
 				return str
+		// we'd have to make a new API that can read say 2 or 3 messages, with a small stream chunksize
+		// not doing that now!!
 		
 		|| T = str.IsJbin #require
 		|| mz = str.parsejbin

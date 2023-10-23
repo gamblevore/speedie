@@ -179,7 +179,7 @@ class SCBehaviour (SCBase)
 		|| L = fn.lookup
 		if (L isa scmodule)
 			|| cls = L.cls
-				fn.AddSelfToFunc(cls)
+				fn.AddSelfPrm(cls)
 	
 	
 	function SCModule.AddInterfaceToTable (|SCClass| TableCls)
@@ -226,7 +226,7 @@ class SCBehaviour (SCBase)
 		return .Cls.FuncProto
 
 	
-	function SCFunction.AddSelfToFunc (|SCClass|cls)
+	function SCFunction.AddSelfPrm (|SCClass| cls)
 		|| prms = .source.find(@prm)
 		|| name = .source.first	#expect (.source, "No name found")
 		using name

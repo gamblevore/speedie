@@ -43,23 +43,7 @@ function Message.MsgOwningFunc (|SCFunction|)
 			Return o
 
 
-function WithinOrAnd (|Message| msg, |bool|)
-	// if ((a.f + b.f) or c.f) { }
-	// x = ((a.f + b.f) or c.f)
-	// check for rels... until we hit what? An arg? Seems sensible!
-	opt norefcounts
-	
-	|| p = msg
-	While p != @arg
-		if p == @rel
-			|| op = p.second
-			if op == "and" or "or"
-				Return true
-		
-		p = p.Parent
-
-
-function SC_MakeComment (|Message| msg)
+function SC_MakeComment (|Message| msg) // ignorenode
 	expect (msg == @tmp)
 	msg.func = @Sheb
 	msg.clear
@@ -104,10 +88,8 @@ function Message.IsVarUseableInLoop (|String| name, |bool|)
 function Message.IsVarAltered (|String| name, |bool|)
 	opt norefcounts
 	for msg.flat in self
-		(msg == @Rel)						#continue
-		(msg in @arg)						#continue
-		(msg[0] IsThing name)				#continue
-		Return true
+		if (msg == @Rel) and (msg in @arg) and (*msg IsThing name)
+			Return true
 
 
 function Message.MsgArg (|SCArg|)
@@ -281,7 +263,7 @@ function Message.Move (|Message| last, |Message| into)
 		curr = next_
 
 
-function Message.MoveAllIn (|Message|Dest)
+function Message.AppendAllInto (|Message|Dest)
 	opt norefcounts
 	While .hasany
 		Dest.Last = .First
@@ -460,3 +442,25 @@ function Message.Hash (|uint64| Pos, |Uint64|)
 	Pos = (pos << 8) (|) .Func|uint64|
 	return .Name.Hash(pos)
 	
+	
+function message.ExpectEmpty
+	opt norefcounts
+	|| f = .first
+		error f
+
+
+function message.IsAlwaysBool (|maybebool|)
+	opt norefcounts
+	|| d = .obj as SCDecl
+		if d.IsConstOf(falsebool)
+			return false|MaybeBool|
+		if d.IsConstOf(truebool)
+			return true|MaybeBool|
+
+
+function message.IsAlwaysTrue (|bool|)
+	return .IsAlwaysBool.istrue
+
+function message.IsAlwaysFalse (|bool|)
+	return .IsAlwaysBool.isfalse
+

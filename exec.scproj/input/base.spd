@@ -60,6 +60,6 @@ module package
 	function InputPack (|messageroot|)
 		|| x = app.args[0]
 		x := "~/Speedie/exec.scproj/demo.jx"
-		|| fl = x.ExistingFile("load executable")
+		|| fl = x.FileThatExists("load executable")
 			return fl.parse[@tmp, "pack"]
 

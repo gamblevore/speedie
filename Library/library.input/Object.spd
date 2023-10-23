@@ -52,7 +52,7 @@ class Object
 	helper MustBe (|&ClassData|x, |Message|ErrNode=nil, |bool|)
 		if self isa x
 			return true
-		error (errnode, "Expected class ${x.name|cstring|}")
+		.TypeFailed(x, errnode)
 
 	operator fast_isa (|&ClassData|x, |bool|)
 		cpp_part FastIsa
@@ -62,18 +62,20 @@ class Object
 		cpp_name JB_Object_As
 		if self isa x
 			return self
-		return x.AsFail(self)
+		if self
+			return .TypeFailed(x, nil)
 		
 	operator fast_as (|&ClassData| x, |object|)
 		cpp_part FastAs
 		if self fast_isa x
 			return self
-		return x.AsFail(self)
+		if self
+			return .TypeFailed(x, nil)
 	
-	helper ClassData.AsFail (|object| wrong, |object|)
-		if wrong
-			error ("object of '" + wrong.class.name + "' is not a: " + .name ) 
-			debugger
+	helper TypeFailed (|&ClassData| Cls, |message| where,  |object|)
+		|| name = .Class.name?.str  ?? "nil"
+		error (where, "object of '" + name + "' is not a: " + cls.name ) 
+		debugger
 
 	api DebugPrint  // more for use in XCode, than anything else.
 		cpp_name jdb

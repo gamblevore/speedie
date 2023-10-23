@@ -14,12 +14,27 @@ module Macros {
 	rejoin _X
 })".macro
 
+|| WhileDecl = "if (!_0) {
+	exit
+}".macro
+
 
 || MultiDecr = "JB_DecrMulti(_0, _1)".macro
 
 
-|| MainArg2 = "|| _0 = (_1.MainArg(_2), _3)(__ArgCount > _1)".macro
-|| MainArg1 = "|| _0 = _1.MainArg(_2)".macro
+
+|| MainArgBasic   = `|| _0 =  _1.MainArg(_2, "_0"),`.macro
+|| MainArgDefault = `|| _0 = (_1.MainArg(_2, "_0"), _3)(__ArgCount > _1),`.macro
+|| MainArgArray = `
+	|[_1]| _0
+	|| __ArgCurr = _2
+	while __ArgCurr < __ArgCount
+		_0 <~ _1.MainArg(__ArgCurr++, "_0")
+`.macro
+
+|| MainArgFinal = `
+	check (__ArgCount <= _0) ("Unexpected argument (max=$_0): '${app.args[_0]}'")
+`.macro
 
 || ASM_Datatype = "datatype _0 (ASM) 
 	module
@@ -37,18 +52,20 @@ ASM.Forms[_1] = &_0.Encode // for now
 
 
 
-function message.CleanBecome (|macro| m)
-	if !m.Cleaned
-		m.cleaned = true
-		m.Pz.clean
-	.become(m)
+function macro.clean (|macro|)
+	if !.Cleaned
+		.cleaned = true
+		.Source.clean
+	return self
 
-	
+
+
 function message.TargetTest (|bool|) // target true, target false, 
 	.expect(@thg)
 	expect (self ~!= "mac")     (self, "Use OSX")
 	expect (self ~!= "linux")   (self, "Use lin")
 	expect (self ~!= "windows") (self, "Use win")
+	expect (self ~!= "import") (self, "Use imported")
 	if self ~= "debug"
 		return options.TargetDebug
 	if self ~= "release"
@@ -87,7 +104,7 @@ function message.Tran_TargetSub
 	|| IsFalse = (value == @brel and "!")
 		value = value.first
 	
-	|| arg = self[@arg, 1]#require
+	|| arg = self[@arg, 1]						#require
 	
 	if value.TargetTest == IsFalse
 		arg = self[2][@arg]

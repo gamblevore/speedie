@@ -1,10 +1,6 @@
 
 
 main // speedie main {
-	|message| o
-	|| p = o.first?.first?
-	// advice for future self: to optimise these StatExprs...
-	// We should make it possible in tran_Qmark... to set the type's name to "--"
 	compiler.Main
 
 
@@ -41,20 +37,24 @@ function compiler.SetupEnv
 	opt norefcounts
 
 	FlowControl.FlowMode = FlowControl.Off // can enable via "log"
-	//error.AutoPrint := 1
 	.Clearenvs
-	check (app.prefpath) "Conf missing prefpath"
-	app.PrefsInit
+	if app.prefpath
+		app.PrefsInit
+	  else
+		"Conf missing prefpath"
+		debugger
+	
 	|| talk = app..talk
 	if talk.length and app.IsMainThread
 		app.IgnoreBreakPoints
 	  else
-		app.threadname = "SpeedieDebug"
+		app.ThreadName = "SpeedieDebug"
 
 	|| NL = app.prefs("nil")
 		options.strnil = nl.int
 
 	errorcolors.DisableIfNoTerminal
+	error.autoprint = 1
 
 
 function app.IgnoreBreakPoints

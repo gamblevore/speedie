@@ -7,6 +7,7 @@ function message.EmbToString
 
 
 function Message.HasOwnBlock (|Message|)
+	opt norefcounts
 	|| arg = .parent
 	require (arg == @rel)
 	arg = arg.parent
@@ -32,7 +33,12 @@ function Message.CreateOwnBlock (|Message|)
 	
 	|| NewObj = rz.scarg(nil)
 	NewObj.TmpMovedOutFor = self
-	newobj.IsStatementExpr = true // jeez sheesh. shouldn't have to set this?
+	bra.statementexpr = newobj
+
+
+function message.StatementExpr (assigns:|scarg| arg)
+	.TmpType = asmtmp.kStatementExpression
+	arg.IsStatementExpr = true
 
 
 function message.TheTmpVarOf (|string| tmpname, |message|)

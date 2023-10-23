@@ -5,7 +5,7 @@ struct FastBuff
 	|&byte|		Start
 	|&byte|		End
 	|string|	ReadFrom
-	|bool| 		ErrorReported
+	|uint| 		ErrorReported
 	
 	destructor
 		visible
@@ -72,8 +72,8 @@ struct FastBuff
 	
 	syntax Expect (|string| s)
 		if !.ErrorReported
-			.ErrorReported = true
 			error s
+		.ErrorReported++
 		
 	function UInt16 (|uint16|)
 		|| c = .curr|&uint16|,  rz = *c++,  .curr = c|&byte|
@@ -88,6 +88,10 @@ struct FastBuff
 		
 	operator has (|int| n, |bool|)
 		return .end - .curr >= n
+	
+	operator has (|bool|)
+		cpp_Part HasAny
+		return .end > .curr
 	
 	setter ReadFrom (|string|)
 		.ReadFrom = Value

@@ -31,7 +31,7 @@ class function
 	
 	function Run (|int64|)
 		jb_vm.vm.ClearRegisters 
-		return jb_vm.Run(.speediefunc.ASM, .length)
+		return jb_vm.Run(.speediefunc.ASM[0], .length)
 	
 	
 	function LinkCpp

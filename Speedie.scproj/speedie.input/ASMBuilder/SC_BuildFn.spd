@@ -31,7 +31,7 @@ function message.GetASMFunc (|message|)
 	opt norefcounts
 	if .reg >= 0
 		|| op = .next(@opp, "=")$
-		|| Adj = op.next(@adj)$
+		|| Adj = op.Next(@adj)$
 		return adj[@func]
 
 

@@ -7,7 +7,7 @@ extend String
 	function IsOK (|bool|)
 		return self != string.error
 	
-	function ExistingFile (|string| operation="access",  |File|)
+	function FileThatExists (|string| operation="access",  |File|)
 		|| f = .file
 		if f.MustExist(operation)
 			return f
@@ -123,7 +123,10 @@ extend String
 			prev = c
 		if prev == '/'
 			fs.Length--
-		return fs
+		rz = fs
+		if !rz and self
+			rz = "/"
+			
 	
 	helper FindTrailingSlashes (|int|)
 		rz = .Length
@@ -293,7 +296,7 @@ extend String
 		cpp_Part ChildFile
 		return self.Child(ch).file
 	
-	function OpenFile (|errorint|)
+	function OpenFile (|errorint2|)
 		|| p = .pathfix
 			return "/usr/bin/open".SilentExecute([p])
 	
@@ -322,7 +325,7 @@ helper file.RelaxSudo (|int| Amount = 0, |int|)
 		
 
 extend file
-	function UploadTo (|string| url, |errorint|) // move to the network module
+	function UploadTo (|string| url, |errorint2|) // move to the network module
 		return "/usr/bin/curl".silentexecute([
 			"-T"
 			self
@@ -344,7 +347,7 @@ extend file
 		if .zipto(zip)
 			return zip.file
 		
-	function ZipUpload (|string| url, |errorint|)
+	function ZipUpload (|string| url, |errorint2|)
 		return .ZipTmp$.uploadto(url)
 
 

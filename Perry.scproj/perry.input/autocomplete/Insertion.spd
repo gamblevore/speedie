@@ -186,6 +186,7 @@ function string.CharMode (|int| x, |int|)
 
 
 function textview.AfterComma (|int| p, |int| x, |int|)
+	opt norefcounts
 	|| s = .text
 	while x > p
 		|| c = s.charmode(--x) 
@@ -195,6 +196,7 @@ function textview.AfterComma (|int| p, |int| x, |int|)
 
 
 function textview.BeforeDecl (|int| p, |int| x, |bool|)
+	opt norefcounts
 	|| s = .text
 	while x < p
 		|| c = s.charmode(x++) 
@@ -207,7 +209,7 @@ function textview.InPrmsAndBetweenDecls (|message| msg, |int| x, |int|)
 	opt norefcounts
 	// just wanna find the msg that owns us!
 	|| list = msg.findprms(x)$
-	|| fn = list.owningfunc$
+	|| fn = list.owningfunc(true)$
 	if .text.charmode(x) == ','
 		return x
 	rz = .aftercomma(list.position, x)
@@ -289,7 +291,7 @@ function textview.PerryDeclKey (|bool|)
 		require .parsedmessage
 	
 	|| clearback = .IsClearBackLine(s.x-1)
-	|| endofline = self[s.x].istextline
+	|| endofline = self.FindEndOfLineIgnoringWhite(s.x)
 	|| inclass = .IsInClass(d) 
 	if clearback and !inclass
 		return .insert("|| ")
@@ -317,7 +319,7 @@ helper String.DetectNoSpaces (|string| find, |int| start, |bool| Fwd=true,  |ind
 function textview.PerryInsertSyntax (|keys| Key, |int|)
 	opt norefcounts
 	|| ide = .ide
-	if key is escape  and  ide.PopupDateOn.ago > 0.5
+	if  key is escape  and  ide.PopupDateOn.ago > 0.5
 		ide.PopupHide
 		return 1
 	require  .ExpectsParse >= probablyjeebox
@@ -343,7 +345,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 
 	require key isnt escape
 	|| dd = .FindDrawInfo(s.x)
-	require  dd  and  (dd contains i2)  and  !dd.error
+	require  dd  and  (dd contains i2)  and  !dd.drawerror
 	|message| where
 	|| inrange = false
 	|| state = .CodeInsertion(dd, i2, inrange, where)

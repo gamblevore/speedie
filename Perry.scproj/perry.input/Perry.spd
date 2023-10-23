@@ -6,12 +6,12 @@
 
 
 module Perry
-    |listviewrow|					Projects
+    |ListViewRow|					Projects
     |string|						_SpeedieDir
     |bool|							Checked	
     |bool| 							Terminal
     |byte| 							FindID
-	|dictionary of string|			PathDict
+	|Dictionary of String|			PathDict
 	
 	constants
 		arc_newer	= 2
@@ -39,8 +39,8 @@ module Perry
 				ide.tabs.items = .projects
 				target !debug
 					NewStdOut = file.Logs.Child("PerryOut.log")
-					pipe.StdOut = NewStdOut.OpenEmpty
-					"Perry Log"
+					if NewStdOut.OpenEmpty
+						pipe.StdOut = NewStdOut.Descriptor
 	
 	
 	function LoadAppArg (|string| arg, |perryide|)
@@ -91,7 +91,7 @@ module Perry
 		target lin: sdlapp.removeborder // doesnt seem to work in Windows WSL?
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
-		ColorScheme.LoadFromPrefs(DefaultColors)
+		¥.LoadDefaults
 		.BuildAppMenu
 	
 		|| old = app.Prefs("currproj")
@@ -208,13 +208,18 @@ function View (|ButtonView| btn)
 	.CheckViewWorthIt(old)
 
 
+function ShowCompileCutely (|bool| Always=false)
+	require .editsep.collapsed
+	if !always
+		if .AlreadyExpandedCompileTab
+			return
+		.AlreadyExpandedCompileTab = true
+	.EditSep.Show
+
+	
 function ShowCompileTab (|object| tab)
-	if .EditSep.Collapsed
-		.EditSep.Show // needs reflow first?
-		// whats the difference bewteen show and expand?
+	.ShowCompileCutely
 	.CompileTabSelect(tab, true)
-//	  else
-//		.EditSep.expand
 
 
 function OutText (|textview|)
@@ -288,11 +293,6 @@ function ViewAsSwap
 		.ViewAsProject
 	  else
 		.ViewAsText
-
-
-function Path (|string|)
-	opt norefcounts
-	return .editme$.document$.location
 
 
 function ViewAsVis (|bool| vis)

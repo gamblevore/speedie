@@ -2,37 +2,29 @@
 	 
 							Todo
 
+* nil-checking	
+	* Collectdecls (on function AndTest), makes params+locals with "x=nil" when its NOT NIL.
 * VM? 
-* nil-checking
-	* NilSweep, for global vars, and for function misuse.
 * Constants and globals don't autocomplete nicely
+* Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
 
 
 						 Perry Do later
 
-* renaming files/discovering files/deleting files should count as a "check project" event.
-* Editable fields should align same as uneditable! (output)
-* going backwards seems to put the line at the TOP of the window... but forward puts it in the middle
-
-* Drawing black sometimes (winsize change)
-	* draw seems to have a delay except with keyboard events? (check if fixing this, also fixes the msg sending delay)
-						 even later
+* multiple fwd/back funcs per-file would be nice, at least from right-click jumps, cmd-L and other jumps
+	* having a func-name per-point is nice
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
-* TextView error/find resync
 * too long text in listview draw as much as we can
 
 
 						 Speedie Do later
-* finish off collectdecls
-* new datatypes shouldn't be able to subclass off nothing!
-* can't find "operatorvs" on message
+
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
 	* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
 * "calledfrom" autocomplete needs to include references to funcs
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
-* unused func finder doesnt work perfectly on my projects. need add owning func!
 * To make "dispatch" clickable, we need to alter MoveToInitFunc, so we have an init func per module per file.
 * galaxxies C++ compile issues
 * RefOpts. Do it bit by bit
@@ -40,15 +32,17 @@
 	* mark a few string funcs as not-modifier/disowner/capturer
 	* mark entire class
 	* fast capture of disowned things. like: r1 <~ r2.pop
-	* check entire program for modification during nil-sweep
 
 
- Perry additions
+						 Perry additions
 * add image editor...
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order...  that can't just be commented out.
+	* Colorthemes... So a theme takes 2 colors, and the drawstyles can darken, grayen, or chooose between them, or use the alpha. This way, we can change the entire IDE by only changing two colors! Each window can have it's own theme. The system can have it's own theme too, or use the front full-screen window's theme. DrawStyle's color, are only computed now.	
 * double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
 * Find-replace?
 	* syntactic-mode also
 
-* That woman is an evil ‚·°‚·°‹›
+
+* The paradise realm is patiently waiting to be discovered, at the end of the first song
+

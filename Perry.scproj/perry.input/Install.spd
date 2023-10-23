@@ -216,7 +216,7 @@ extend_module perry
 	helper GenerateArchiveSub (|bool|)
 		|| outpath = .install_path
 		|| p = .SpeedieDir
-		|| f = p.existingFile("generate archive")
+		|| f = p.FileThatExists("generate archive")
 		require f and outpath
 		
 		|array of file| list 

@@ -3,16 +3,16 @@
 main // main {
 	target debug: "*** target debug ***"
 	SDLApp.init
-	Perry.Startup(nil)
+	Perry.Startup
 	return SDLApp.Run
 
 
 function app.InitColors
-	¥.border.edge <~ vec4(1) 
-	¥.modifiedborder.edge <~ ((1.0, 1.0, 0.5, 1.0)) 
+	¥.border.edge			<~ vec4(1) 
+	¥.modifiedborder.edge	<~ vec4(1, 1, 0.5, 1) 
 	¥.bg = ¥.bgCorners[0].rgb
 	¥.MenuRowSel.solid		= (0.5, 0.9, 0.5, 0.6)
-	¥.Menus.edge			= (1.0, 1.0, 1.0, 0.2).px
+	¥.Menus.edge			= vec4(1, 1, 1, 0.2).px
 	¥.Menus.bg				= (0.106, 0.154, 0.031, 1.0)
 
 

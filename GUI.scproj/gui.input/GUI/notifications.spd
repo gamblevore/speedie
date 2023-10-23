@@ -1,0 +1,115 @@
+
+module Notifications
+	linkage: cpp_part Note 
+	|ringtree of window|	Alerts = ringtree()
+	|textview|				Txt
+	
+	constants
+		hi = 60
+		wd = 160
+		|int64|
+		disappear = 7.5
+	
+	function ShouldDraw (|window| w, |bool|)
+		opt norefcounts
+		|| br = window.all.lastrect
+		|| r = br
+		
+		|| ago = w.createddate.ago.seconds
+		|int| b = ago*100.0
+		b = b min hi 
+		r = (r.x2-wd, b-hi, r.x2, b)
+		ago -= disappear
+		if (ago > 0)
+			if w.tag and (w contains sdlapp.mousexy)
+				w.createddate = disappear.seconds.ago
+			  else
+				r = r right ago*140.0
+				require r.x <= br.x2
+				b = 0
+		  
+		w.LastRect = r
+		if b < hi
+			sdlapp.touch
+		return true
+		
+
+	function Clicked (|window| w)
+		opt norefcounts
+		(w.CreatedDate min= disappear.seconds.ago)
+		|| t = w.tag as error
+		|| n = t.node
+		if n == @str
+			app.alert(n.name)
+		  elseif n == @url and "file"
+			n.first.name.Reveal
+		w.tag = nil
+	
+	
+	function ClickedAt (|ivec2| XY, |bool|)
+		opt norefcounts
+		for w in .Alerts
+			if w contains xy
+				.Clicked(w)
+				return true
+
+
+	function Draw
+		opt norefcounts
+		for w in .Alerts
+			w.drawwindow(sdlapp.DrawSpace)
+
+
+	function CheckForDisappear
+		opt norefcounts
+		for w in .Alerts
+			if !.shoulddraw(w)
+				w.remove
+		
+	
+	syntax append (|string| desc, |message| details=@emb.msg)
+		cpp_part Str
+		self <~ error(details, desc)
+
+
+	syntax append (|error| note)
+		cpp_part Msg
+		|| w = .NewWindow
+		w.tag = note
+		|| s = note.name
+		if note.path
+			s += "\n\"" + note.path + "\""
+		.txt.text = s 
+		if note.IsError
+			printerror s
+		  else
+			printline s
+
+
+	function NewWindow (|window|)
+		opt norefcounts
+		rz = Window()
+		.Alerts <~ rz
+		(rz isnt visible)
+		rz.id = "note"
+		rz.size = (wd)~left by 0~up back (hi) 
+		.txt = TextView(rz)
+		.txt.id = "note"
+		.txt.size = the~area
+		|| W = 0.8~white
+		|| B = 0.8~black
+		rz.GNormal.Edge <~ W
+		rz.GNormal.BG <~ B
+	
+
+function error.Useable (|date| ago=8s, |error|)
+	require self and .name
+	if !.when
+		.when = date.now
+		return self
+	if !ago
+		return self
+	if .when.fired and self < ago
+		return self
+
+		

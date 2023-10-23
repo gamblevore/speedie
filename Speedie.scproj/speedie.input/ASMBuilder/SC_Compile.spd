@@ -108,7 +108,7 @@ struct ASMFuncState
 		debugger
 		// A REL
 		|| L = exp.first
-		|| R = L.next(@opp, "=").next(nil)$
+		|| R = L.next(@opp, "=").Next$
 		
 		|| Dest = .AllocReg(L)$
 		|| result = .µ( r, dest )$
@@ -187,7 +187,7 @@ function message.ASMFunc (|fn_asm|)
 
 function ASMFuncState.TotalInit
 	opt norefcounts
-	|| j = ASMFuncState.JSMSpace init (IR[1MB])$		// big enough
+	|| j = ASMFuncState.JSMSpace init IR[1MB] #require
 	.maxlength = j.Capacity
 	.start = j.ptr
 	.Written = 0

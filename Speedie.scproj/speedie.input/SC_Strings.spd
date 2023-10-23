@@ -329,7 +329,7 @@ function message.WithDirectName (|message| p, |string|)
 
 function message.Tran_With 
 	|| obj = self.needfirst$
-	|| arg = obj.next(@arg)$	
+	|| arg = obj.Next(@arg)$	
 	
 	.name = "if"
 	|| name = obj.WithDirectName(self)$	
@@ -341,7 +341,7 @@ function message.Tran_With
 			if ch == "is" or "isnt"
 				ch.Tran_Isnt("it")
 				continue_With ch
-			if ch == "with"
+			  elseif ch == "with"
 				continue_with ch.flatafter
 		  elseif ch == @sdot
 			ch.func = @dot
@@ -402,7 +402,7 @@ function Message.BunchFix
 	using (self)
 	|| P		= .BunchFixPrepare
 	|| subject	= P.first
-	|| multi_opp= subject.next(nil)$
+	|| multi_opp= subject.Next$
 	.RelFix(false)
 	P.ReplaceWith(self)
 	multi_opp.BunchFixSub(subject, self)
@@ -410,7 +410,7 @@ function Message.BunchFix
 	
 function Message.BunchlessFix
 	|| subject		= .first
-	|| multi_opp	= subject.next(nil)$ // or
+	|| multi_opp	= subject.Next$ // or
 	|| c			= multi_opp.next$
 	// P			is the rel (a=b or c)
 	// self/stuff	is the bunch (b or c)
@@ -455,4 +455,7 @@ function Create_JeeboxTest (|Message| msg)
 			s = s.digest
 
 		msg.become(@str, s)
-		
+
+
+
+

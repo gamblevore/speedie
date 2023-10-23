@@ -115,7 +115,7 @@ function PerryIDE.ActualCompile (|message| msg)
 
 	is active
 	if .name ~= "Speedie.scproj"
-		.editsep.show
+		.showcompilecutely
 		.CompileTabSelect(.speedietext, true)
 	.ViewAsCurr
 

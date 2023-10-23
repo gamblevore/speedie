@@ -180,7 +180,7 @@ int JB_LibInit (_cstring* R) {
 	JB_ErrorNumber = 0;
 	JB__Flow_Disabled = 0x7fffFFFF;
 
-	static_assert((sizeof(ivec3) == 12 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 12 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
+	static_assert((sizeof(ivec3) == 16 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 16 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
     if (JB_MemStandardWorld()->CurrSuper)
         return EADDRINUSE;
     if (!(EmptyString_ = emptystr()))

@@ -65,7 +65,7 @@ static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* 
 
 	JB_FS_AppendCString(FS, " when ");
 	JB_FS_AppendCString(FS, Operation);
-	if (self) {
+	if (JB_Str_Length(self)) {
 		JB_FS_AppendCString(FS, " '");
 		JB_FS_AppendString(FS, self);
 		if (JB_Str_Length(other)) {

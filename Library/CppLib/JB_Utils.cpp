@@ -29,9 +29,9 @@ int JB_PointerSize() {
 
 
 int OutOfMemoryHappenedAlready;
-static int  TotalAllocObjs;  // malloc stats get confused with OUR stats...
-static int  TotalAllocBytes; // malloc-zones could do this, or WE COULD OURSELVES
-							// just easier.
+static uint  TotalAllocations;  // malloc stats get confused with OUR stats...
+static uint  TotalOtherBytes; // malloc-zones could do this, or WE COULD OURSELVES
+static uint  TotalStringBytes;
 
 
 
@@ -43,25 +43,33 @@ void JB_TooLargeAlloc(int64 N, const char* S) {
 // So the problem with realloc, is that... what if it fails?
 // we wanna return the original pointer.
 // does this not free? what if we realloc to 0?
-allocate_result JB_allocate (int N, const void* Arr) {
+static allocate_result AllocateSub (int N, const void* Arr, uint* Where) {
 	uint8* Result = 0;
+	int64 Diff = 0;
 	if (Arr) {
-		TotalAllocBytes -= JB_msize(Arr);
+		Diff = -JB_msize(Arr);
 		Result = (uint8*)realloc((void*)Arr, N);
 	} else {
-		TotalAllocObjs++;
+		TotalAllocations++;
 		Result = (uint8*)calloc(1, N); // zeroed
 	}
 	if (Result) {
-		TotalAllocBytes += JB_msize(Result);
+		Diff += JB_msize(Result);
+		*Where += Diff;
 		return {Result, true};
 	}
 	
-	TotalAllocBytes += JB_msize(Arr);
 	JB_OutOfUserMemory(N);					// Nothing has changed...
     return {(uint8*)Arr, false};
 }
 
+allocate_result JB_allocate (int N, const void* Arr) {
+	return AllocateSub(N, Arr, &TotalOtherBytes);
+}
+
+allocate_result JB_AllocateString (int N, const void* Arr) {
+	return AllocateSub(N, Arr, &TotalStringBytes);
+}
 
 uint8* JB_zalloc(int N) {
 	return JB_allocate(N).Result;
@@ -88,15 +96,27 @@ u64 JB_msize(const void* M) {
 #endif
 }
 
-u64 JB_memused() {
-	return TotalAllocBytes + TotalAllocObjs*4;
+u64 JB_MemUsedString() {
+	return TotalStringBytes;
+}
+
+u64 JB_MemUsedOther() {
+	return TotalOtherBytes + TotalAllocations*16;
 }
 
 
 void JB_free(const void* Arr) {
 	if (Arr) {
-		TotalAllocObjs--;
-		TotalAllocBytes -= JB_msize(Arr);
+		TotalAllocations--;
+		TotalOtherBytes -= JB_msize(Arr);
+		free((void*)Arr);
+    }
+}
+
+void JB_FreeString(const void* Arr) {
+	if (Arr) {
+		TotalAllocations--;
+		TotalStringBytes -= JB_msize(Arr);
 		free((void*)Arr);
     }
 }

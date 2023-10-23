@@ -26,7 +26,7 @@ module SCThe
 
 		|| d = compiler.AdjDicts[name.name] init dictionary.new
 
-		for line in name.next(@arg)
+		for line in name.Next(@arg)
 			line.expect(@tmp)
 			|| value = line.NeedFirst
 			value.expectlast
@@ -49,7 +49,7 @@ function compiler.Adj (|message| f, |dictionary of macro|)
 function TypeOfAdj (ExprResolver)
 	|[message]| args 
 	|| found = compiler.findadj(exp, args)
-		exp.Become(found, Args)
+		exp.BecomeMacro(found, Args)
 		return TypeOfExpr(exp, name_space, side)
 
 

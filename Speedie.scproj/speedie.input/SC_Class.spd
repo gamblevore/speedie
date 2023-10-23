@@ -82,12 +82,13 @@ constructor (|Message| node, |SCBase| parent)
 	.TypeVeryExists = T.NilConstructor(NilState.Real * !IsDataType)
 	
 	if node == "struct"
-		T = T.GetAddress(declmode.Always)
+		T = T.GetAddress
 	  else
 		T = T.Copy
 	.SelfDecl = T
 	T.Name = "self"
-	(T is implicit)
+	(T is SelfImplicit)
+	(T.nildeclared = nilstate.realish) // unstated real
 	(T isnt altered)
 
 
@@ -225,11 +226,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		Count += Curr * Mul 
 
 	.size = Count align 4
-	return count
-
-
-function LoadSuperDepth
-	
+	return count	
 
 
 function LoadSuperClass
@@ -649,8 +646,15 @@ function FirstDestructor (|SCFunction|)
 			return fn
 
 
-function AddSelfToFunc (|SCBase| space)
-	space.TryAdd( space.FuncSrc, .SelfDecl, "self" )
+
+function scfunction.AddSelfToFunc (|scclass| cls, |SCBase| space)
+	opt norefcounts
+	|| sl = cls.SelfDecl		// for my nil-checker
+	if sl.Suffers				// refcounting will set MarkAsRefAltered
+		sl = sl.copy
+		(sl is selfimplicit)	// I shouldn't have to specify this, it should be copied!
+	space.TryAdd( space.FuncSrc, sl, "self" )
+	.args <~ sl
 
 
 function message.HasSelfAsFirst (|bool|)
@@ -661,8 +665,7 @@ function message.HasSelfAsFirst (|bool|)
 	
 
 function scdecl.TypeReach (|scbase| from, |message| src)
-	opt norefcounts
-	flow off
+	opt norefcounts, flow off
 	require self
 	|| t = .type
 		t.reach(from, src)
@@ -860,8 +863,6 @@ module
 		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface )
 			it.IsDataType = true
 			it.ClassCollect
-//			it.typenormal.isconst = true
-// makes no sense.
 		
 			expect !(it.Properties) (it.Source, "Datatypes can’t have properties.")
 					
@@ -894,25 +895,28 @@ module
 	function SCClass.DataTypePostLoad
 		require .IsDataType and !.IsFunc
 		|| node = .SourceClass
-		|| s = .super
-			.Size = s.Size
+		|| sup = .super
+			.Size = sup.Size
 			if !.IsNotNumeric
-				.TypeInfo = s.TypeInfo
-				.defawlt := s.defawlt
+				.TypeInfo = sup.TypeInfo
+				.defawlt := sup.defawlt
 
 		|| N		= .name.lowercase
 		|| Td		= DataTypeCode.Types[n]
 			|| t = *td
-			require T != 255
-	
-			.size = T.bytesize
-			.TypeInfo	= T
-			.IsBuiltin	= true
-			
-			require T.isint and !.Signed
-			|| s2		= t.CreateSignedStuff$
-			.Signed		= s2.typenormal
-			s2.Signed	= .typenormal
+			if T != 255
+				.size = T.bytesize
+				if t == datatypecode.Vec3 or datatypecode.iVec3
+					.size = 16 // sigh 
+				.TypeInfo	= T
+				.IsBuiltin	= true
+				
+				require T.isint and !.Signed
+				|| s2		= t.CreateSignedStuff
+					.Signed		= s2.typenormal
+					s2.Signed	= .typenormal
+
+		expect (sup or .HasGameType) (node, "Datatypes have to subclass off another type")
 	
 	
 	function datatypecode.CreateSignedStuff (|scclass|)
@@ -997,7 +1001,7 @@ module
 
 	function ProcessExtendOld (|Message| c, |bool| PreferClass)
 		|| name = c[@thg]							#require
-		|| arg  = c[@arg, -1]						#require
+		|| arg  = c.last(@arg)						#require
 		|| M = Compiler.FindModulemsg(name)			#require
 		
 		|SCBase| B = M
@@ -1117,6 +1121,5 @@ extend SCClass
 			yield Curr_
 			Curr_ = Curr_.super
 
-extend byte
-	constants
-		abc = 1
+
+

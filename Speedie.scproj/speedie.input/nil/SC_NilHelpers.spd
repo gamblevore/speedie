@@ -4,17 +4,9 @@ extend Message {
 
 function Redundant (|nilstate| IsReal=nilstate.nilish, |nilcheckmode|)
 	if StdErr.CanAddMore(errorseverity.problem)
-		|| str = "Nil test is redundant on "
-		str += isreal.name
-		str += " object: "
-		str += .render 
+		|| str = "Nil test is redundant on " + isreal.rawname
+		str += " object: " + .render 
 		StdErr.NewProblem(self, str)
-
-
-function NilPropAccess (|bool|)
-	opt norefcounts
-	|| m = .DotMustBeProperty
-		return m isnt onmodule
 
 
 function NilDecl (|scdecl|)
@@ -22,47 +14,56 @@ function NilDecl (|scdecl|)
 	if self
 		|| obj = .obj as SCDecl // blindcast instead?
 			|| l = obj.IsLookupOnly
+			if !l
+				return obj // faster
 			if l isa scdecl
 				return l
 			return obj
-	
+	debugger 
 
-function LastInBlock
+
+function blockage.BlockCombine (|blockage| B, |int|)
+	if B == self
+		return self
+	if self is Return
+		return B
+	if B is Return
+		return self
+	debugger,	#!would this even happen ever???
+	return Blockage.Continue 	// continue is weaker than exit, so return continue?
+
+
+
+function LastInBlock (|blockage| Reason)
 	opt norefcounts
 	.RemoveAfter
 
 	|| arg = .parent
-	arg.flags |= kEndsBlock
-	.Flags |= kEndsBlock
+	arg.Blocks = reason
+	.Blocks = reason
 	|| Test = arg.parent
-	require Test istmp "else" // this is really cool!
+	require Test istmp "else"
 
 	while test
-		arg = test.prev // if.arg
-		require arg.Blocks
+		arg = test.prev
+		|| B = arg.Blocks		#require
+		Reason = Reason.BlockCombine(B)
+
 		test = arg.parent
-		test.flags |= kEndsBlock
-		if test.TmpType is kif
-			return test.LastInBlock // bubble up :O
+		|| TestType = test.TmpType
+		if testType is kif // what about kElseIf? does this already handle that
+			return test.LastInBlock(reason) // bubble up :O
+		  else
+			test.Blocks = Reason
+		
 }
 
 
 function scdecl.PointerUpgrade (|scdecl|)
 	opt norefcounts
 	|| infernal = .internal
-	if (infernal Is Local) and infernal.SuffersNil
+	if (infernal Is Local) and infernal.NilSuffering
 		return infernal
-
-
-function @scfunction.LoopExitter (Tranfunc)
-	|| f = node.first
-		error f
-	check node.FindOwningLoop(fn.sourcearg) (node, "Must be within a loop.")
-	node.LastInBlock
-
-
-function message.operatorvs (|message| arg2, |uint|)
-	return .blocks (|) (arg2.blocks << 1)
 
 
 function message.IsNowNil (|bool|)
@@ -70,7 +71,8 @@ function message.IsNowNil (|bool|)
 	|| d = .obj as scdecl
 		return (d == TypeNil) or (d.NilCurr == nilstate.nilish)
 
-function scdecl.SuffersNil (|bool|)
+
+function scdecl.Suffers (|bool|)
 	return .IsObject or .PointerCount
 
 
@@ -78,3 +80,12 @@ function scdecl.NilStated (|bool|)
 	return .NilDeclared is Stated
 
 
+function scfunction.CanNil (|bool|)
+	return !.IsMacro and !.IsWrapper and .isOK and .LimitTests
+
+
+function scfunction.LimitTests (|bool|)
+	opt norefcounts
+	|| c = .Lookup
+		if c.name contains "NilTest"
+			return .SourceArg contains "nilcheck"

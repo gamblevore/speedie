@@ -69,9 +69,10 @@ function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |ImagePixe
 
 helper string.FontLoad (|image|)
 	rz = .Loadqoi$
+	|| blank = colors.clear
 	for v in rz
 		if !v.hascolor or !v.a
-			v <~ 0|uint|
+			v <~ blank
 
 	for c in rz.width/6
 		if c > 32
@@ -162,12 +163,12 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 				if drawmode > 0
 					|| A = (sz.a + 1) * drawmode				// now... this depends on if... 
 					if A >= 64K									
-						dz <~ col.uint							// opaque pixel
+						dz <~ col							// opaque pixel
 					  else
 						|| f = A|float|/64K|float|
 						dz <~ mix(dz.color, col4, f)			// transparent pixel
 				  elseif drawmode < 0
-					dz <~ sz.uint								// emoji direct
+					dz <~ sz									// emoji direct
 				  else
 					dz <~ mix(sz.color, col4, col4.a)			// emoji darkened
 			sz++

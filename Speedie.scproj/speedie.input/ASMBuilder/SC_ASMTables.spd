@@ -116,16 +116,18 @@ datatype ASMtmp (MsgUIFlags)
 		|asmtmp| 
 		kElseIf = 1
 		kIf
-		kTern
 		kWhile
-		kRejoin
-		kReturn
-		kExit
 		kContinue
+		kExit
+		kReturn
+		kRejoin
 		kSwap
+		kTern
+		kStatementExpression
 		kSetVar
 		kDebugger
 	
+
 
 function Message.TmpType (|ASMTmp|)
 	return .flags & 63

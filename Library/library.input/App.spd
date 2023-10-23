@@ -160,7 +160,10 @@ function ObjMemory (|int64|)
 	cpp_wrapper JB_MemCount
 
 function StringMemory (|int64|)
-	return Memory.used
+	return Memory.usedstring
+
+function OtherMemory (|int64|)
+	return Memory.usedOther
 
 function ClearCaches (|int| which=0)
 	cpp_wrapper JB_App__ClearCaches
@@ -249,11 +252,10 @@ function StdOut (|File|)
 function CWD (|string|)
 	cpp_wrapper JB_File__CWD
 
-
 function CWD (assigns:|string|, |ErrorInt|)
-	return .chdir_(Value.resolve)
+	return ._chdir(Value.resolve)
 
-function chdir_ (|string| path, |ErrorInt|)
+helper _chdir (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
 
 
@@ -270,19 +272,22 @@ function IsQuarantined (|bool|)
 	return .path contains "/AppTranslocation/"
 
 
-function Say (|string| s, |errorint|)
+function Say (|string| s, |errorint2|)
 	return "/usr/bin/say".execute([s])
 	
-function AppleScript (|string| str, |ErrorInt|)
+function AppleScript (|string| str, |ErrorInt2|)
 	return "/usr/bin/osascript".execute(["-e",str], nil)
 
 
-function Sudo (|string| p, |ErrorInt|)
+function Sudo (|string| p, |ErrorInt2|)
 	return .applescript("do shell script \"$p\" with administrator privileges")
 
 
 function Configure (assigns:|string|)
-	._conf  = Value.parse
+	|error| err
+	._conf  = Value.parsewitherror(err)
+	if err
+		printline err.render
 	._conf := message()
 
 

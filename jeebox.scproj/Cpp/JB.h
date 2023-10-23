@@ -57,6 +57,8 @@ typedef byte ErrorFlags;
 
 typedef int ErrorInt;
 
+typedef ivec2 ErrorInt2;
+
 typedef uint ErrorMarker;
 
 typedef byte ErrorSeverity;
@@ -185,8 +187,6 @@ struct File_Behaviour;
 
 struct FastString_Behaviour;
 
-struct Process_Behaviour;
-
 struct RingTree_Behaviour;
 
 struct ShellStream_Behaviour;
@@ -200,6 +200,8 @@ struct StringZeroTerminated_Behaviour;
 struct MessageID_Behaviour;
 
 struct Message_Behaviour;
+
+struct Process_Behaviour;
 
 struct SaverClassInfo_Behaviour;
 
@@ -241,13 +243,13 @@ struct TerminalCell;
 
 struct FastString;
 
-struct Process;
-
 struct JB_String;
 
 struct Message;
 
 struct MessageID;
+
+struct Process;
 
 struct SaverClassInfo;
 
@@ -512,7 +514,6 @@ JBClass ( JB_Error , Message ,
 );
 extern Message* JB__App__Conf;
 extern JB_String* JB__App__Path;
-
 extern JB_File* JB__App__stdin;
 extern JB_File* JB__App__StdOut;
 extern JB_String* JB__App_codesign_native;
@@ -525,7 +526,6 @@ extern bool JB__ErrorColors_Enabled;
 #define kJB__ErrorColors_underline (JB_LUB[373])
 #define kJB__ErrorColors_warn (JB_LUB[375])
 extern u16 JB__API_NilHappened;
-extern JB_ErrorReceiver* JB__Constants__ParseProtector;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
 extern CharSet* JB__Constants_CSLine;
@@ -550,6 +550,7 @@ extern CharSet* JB__Constants_XMLWordMiddle;
 #define kJB__MZLab_Strong (3)
 #define kJB__MZLab_Strongest (4)
 #define kJB__Math_E (2.7182818284590452353602874713526f)
+#define kJB__Math_InvPi2 (0.15915494309f)
 #define kJB__Pipe_StdErr_ (2)
 #define kJB__Pipe_StdIn_ (0)
 #define kJB__Pipe_StdOut_ (1)
@@ -881,7 +882,6 @@ extern bool JB__File_DebugExecute;
 #define kJB__File_O_WRONLY (1)
 extern byte JB__Proc_ClosePipesInstalled;
 extern int JB__Proc_IncID;
-
 #define kJB__Proc_PrintAfterSomeTime (2)
 extern byte JB__Proc_SpecialState;
 extern byte JB__Err_AutoPrint;
@@ -941,10 +941,6 @@ int JB_Constants__Init_();
 int JB_Constants__InitCode_();
 
 void JB_Constants__InitConstants();
-
-void JB_Constants__ParseProtect();
-
-JB_ErrorReceiver* JB_Constants__ParseProtectSub();
 
 JB_String* JB_Constants__TestJB();
 
@@ -1430,6 +1426,9 @@ Date JB_Date__New0();
 // ErrorInt
 
 
+// ErrorInt2
+
+
 // ErrorMarker
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self);
 
@@ -1831,9 +1830,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_JBin_Behaviour
 
 
-// JB_Process_Behaviour
-
-
 // JB_RingTree_Behaviour
 
 
@@ -1853,6 +1849,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_Message_Behaviour
+
+
+// JB_Process_Behaviour
 
 
 // JB_SaverClassInfo_Behaviour
@@ -1898,6 +1897,8 @@ void JB_Object_SyntaxExpect(JB_Object* self);
 
 // JB_Charset
 Array* JB_CS_Bytes(CharSet* self);
+
+bool JB_CS_NextInCharset(CharSet* self, int* p);
 
 bool JB_CS_OperatorContains(CharSet* self, JB_String* Data);
 
@@ -2388,13 +2389,6 @@ FastString* JB_bin__New0(int n);
 
 
 
-// JB_Process
-int JB_Proc__Init_();
-
-int JB_Proc__InitCode_();
-
-
-
 // JB_RingTree
 void JB_Tree_Clear(RingTree* self);
 
@@ -2684,6 +2678,13 @@ void JB_Msg__TreeComparePrint(Message* orig);
 
 
 // JB_MessageID
+
+
+// JB_Process
+int JB_Proc__Init_();
+
+int JB_Proc__InitCode_();
+
 
 
 // JB_SaverClassInfo

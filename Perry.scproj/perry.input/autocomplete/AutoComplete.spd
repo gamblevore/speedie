@@ -1,4 +1,5 @@
 
+
 helper message.list_desired (|int| common, |string|)
 	rz = .first.name[0, Common]
 	if self == rz
@@ -22,7 +23,6 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	
 	list.sort(CallFromSorter)
 //	.ImproveFuncList(list) // the lists are too different. I'd need to reorganise it
-// no point i'll do it later
 	list.prependheader("", 1)
 	list.first = define
 
@@ -115,7 +115,7 @@ function PerryIDE.ShowAuto (|bool|)
 	|| a = .autocomplete
 	if a.listsource.hasany
 		a.ListSource.obj = .editme.Path
-		a.Showcmm(self, .AutoPoint.y - .absbottom, .AutoPoint.x)
+		a.ShowCmm(self, .AutoPoint.y - .absbottom, .AutoPoint.x)
 		(a is typethrough)
 		return true
 	a.ListSource.obj = nil
@@ -163,8 +163,8 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 // "" '' <(``)> ``
 
 function PerryIDE.DisplayStr (|message| f, |bool|)
-	|| r = f.range // + f.rangetrim
-	|| orig = .editme[r]
+	|| r = f.Range // + f.rangetrim
+	|| orig = .EditMe[r]
 	if f.name != orig
 		.PopupDisplay.expectsparse = 0
 		.DisplayInPopup(f.name, false)
@@ -172,7 +172,7 @@ function PerryIDE.DisplayStr (|message| f, |bool|)
 
 function PerryIDE.DisplayInPopup (|string| s, |bool| instant)
 	|| sizer_str = s.wrap(80)
-	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 0)
+	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 3)
 	(size.x max= 40)
 	|| c = .PopupDisplayCorner				// set the top above it
 	.PopupDisplay.size =   c.x~right for size.x   by   c.y~up back size.y
@@ -217,7 +217,7 @@ function PerryIDE.PopupHide
 	
 
 
-// SpeedieDidReceiveMsg, receivedmsg, maybedidgetmsg, gotmsg, msgreceived
+// SpeedieDidReceiveMsg, receivedmsg, maybedidgetmsg, gotmsg, msgreceived, receivefb, fbreceived
 function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
 	if (c == .compilr) and !c.alive
 		isnt active
@@ -441,8 +441,8 @@ function message.SimpleComplete (|message| pp, |message| where, |bool|)
 		return true
 
 
-function message.OwningFunc (|message|) // isfunction
-	return .owningSyntax(AutoComplete.Functions, false)
+function message.OwningFunc (|bool| EndAtArg = false, |message|) // isfunction
+	return .owningSyntax(AutoComplete.Functions, EndAtArg)
 
 		
 function message.OwningModclass (|bool| EndAtArg=true, |message|)

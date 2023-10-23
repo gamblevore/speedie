@@ -29,7 +29,9 @@ static void AddLostChild_(int PID, int ExitCode) {
 
 uint SignalsReceived;
 void JB_SigMsgReceived(int signum) {
-	SignalsReceived++;
+	uint X = SignalsReceived + 1;
+	if (!X) X = 1;
+	SignalsReceived = X;
 };
 
 void JB_SigChild (int signum) {

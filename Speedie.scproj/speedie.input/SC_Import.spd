@@ -13,7 +13,6 @@ class SCImport
 	|errorseverity|			BlindCast
 	|int|					Depth
 	|[SCFile]|				Files
-	|File|					InputFolder
 	|File|					Proj
 	|MemoryLayer|			DeclLayer
 	|SCModule|				Mod
@@ -50,9 +49,9 @@ class SCImport
 		|| P	= Compiler.FindProject(Name, true)
 		if !P
 			if name[0] != '/'
-				P = compiler.Projects[name].existingfile
+				P = compiler.Projects[name].FileThatExists
 			  else
-				P = name.existingfile
+				P = name.FileThatExists
 		expect P ( J, "Can’t find import: '$name'" )
 
 		scimport.CurrIsManuallyImported++
@@ -84,7 +83,7 @@ class SCImport
 		// scf needs to be inside the thing...
 	
 	
-	function LoadConf (|SCFile| scf, |int| depth)
+	function LoadConf (|SCFile| scf)
 		opt norefcounts
 		.Mod.ExportName = "App" // make it simple
 		require scf
@@ -114,7 +113,9 @@ class SCImport
 		|| arg = conf[@arg]
 			arg.remove
 			compiler.ConfMsg = arg
-			|| x = makedecl("", "__AppConfString", @str+arg.renderjbin)
+			// check Options.SelfReplacement, in case I alter how jbin works 
+			|| str = (arg.render, arg.renderjbin)(Options.SelfReplacement)
+			|| x = makedecl("", "__AppConfString", @str+str)
 			conf.become(x)
 			compiler.program.movetoinitfunc(conf)
 
@@ -159,7 +160,7 @@ class SCImport
 			x.valuelower(item.name) = "x"
 	
 	
-	function ImportSpd (|File| c, |string| CurrPath, |SCFile|)
+	function ImportSpd (|File| c, |SCFile|)
 		|| path = c.lowercase
 		check (!compiler.files[ path ]) (c, "File included twice")
 		rz = SCFile( c )
@@ -174,18 +175,17 @@ class SCImport
 		scimport.allfiles <~ rz
 	
 	
-	function ImportDir (|File| f,  |string| Path,  |SCFile|)
+	function ImportDir (|File| f,  |SCFile|)
 		for cName in f.list
 			|| c		= f[cName]
-			|| CurrPath = path.child( cname )
 			|| ext		= cName.ext
 
 			if cname contains "(disabled)"
 				0 //
 			  elseif (c.IsDir)
-				.ImportDir( c, CurrPath )
+				.ImportDir( c )
 			  elseif (cname.isspeediesrc)
-				|| B = .ImportSpd(c, currpath)
+				|| B = .ImportSpd(c)
 				if cName ~= "index.spd"
 					rz = B
 			  elseif ext == "vert" or "frag" or "shad" or "sdf"
@@ -249,28 +249,24 @@ class SCImport
 			require (!Compiler.ImportedNames[fpl])
 			
 			rz = SCImport.new(f, builtin)
+			rz.Depth = ImportDepth
 			Compiler.ImportedNames[fpl] = rz
 			
-			if (path contains "/") and (*path != '/')
-				// import "lib/item"
-			  elseif (options.SingleFileInput and !path)
-				// 
-			  else
-				f = FindInputFolder(f)
-				require f and f.MustExist
-			
-			rz.InputFolder = f
 			|scfile| conf
 			if (options.SingleFileInput and !path)
-				conf = rz.ImportSpd( options.SingleFileInput.file, Path )
+				conf = rz.ImportSpd( options.SingleFileInput.file )
+			  elseif !f.isdir
+				conf = rz.importspd( f )
 			  else
-				conf = rz.ImportDir( f, Path )
+				ifn (path contains "/") and (path[0] != '/')   // import "lib/items"
+					f = FindInputFolder(f)
+					require f and f.MustExist
+				conf = rz.ImportDir( f )
 			
-			rz.LoadConf(conf, ImportDepth)
+			rz.LoadConf(conf)
 			rz.IncludeCHeaders( f["c_includes"],	 Cpp_Export.H_Input )
 			rz.IncludeCHeaders( f["c_postincludes"], Cpp_Export.H_PostInput )
-			
-			rz.Depth = ImportDepth
+						
 			if conf
 				rz.ReloadImports(conf)
 			Compiler.ImportedList <~ rz

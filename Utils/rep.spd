@@ -1,10 +1,7 @@
 
 // seems good?
-main
-	expect app.args != 4  "Usage: rep Directory Func From To"
-	|| F = app[0].ExistingFile
-	require stderr.ok
-	.Replace(F)
+main (|existingfile| folder, |string| Func, |string| From, |String| To)
+	.Replace(folder)
 
 
 function app.Replace (|file| p, |bool|)

@@ -2,11 +2,11 @@
 
 extend PerryIDE
 	function Recheck 
-		require .ModifiedForCompile
-		.ModifiedForCompile = false
-		.ForceRecheck
+		if .ModifiedForCompile
+			.ForceRecheck
 		
 	function ForceRecheck
+		.ModifiedForCompile = false
 		if .IsSpeedieCode and !.UsingSpdLib
 			.SendFeedbackStr "check"
 
@@ -51,7 +51,6 @@ extend PerryIDE
 
 
 	function ShowCompileErrors (|message| msg, |bool|)
-		isnt active
 		|| MaybeOK = msg.first
 		if (MaybeOK == "ok")
 			.ErrorList.clear
@@ -83,12 +82,12 @@ extend PerryIDE
 		// we actually... hmmm... can't open the debugger yet. not until it's made!
 	
 		
-	function ErrorListFB (|message| msg, |bool|)
+	function ErrorListFB (|message| msg, |bool|)			// errorfb, errorsfb
 		|| RealErrors	= msg ~!= "check"
 		.ClearErrors(RealErrors)
 		|| NoErrors		= .ShowCompileErrors(msg)
-		|| ErrsVis		= .isviewing(.errorlist) 
-		.errorlist.selectfirst
+		|| ErrsVis		= .isviewing(.ErrorList) 
+		.errorlist.SelectFirst
 		if !RealErrors
 			0
 		  elseif NoErrors

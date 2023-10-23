@@ -11,7 +11,7 @@ function PrintLine (|string| data="")
 macro PrintLine
 	StrPrintline(_.render) // not self-referential anymore.
 
-	
+
 function StrPrintLine (|string| data)
 	cpp_wrapper JB_Str_PrintLine
 
@@ -54,7 +54,8 @@ function int.OperatorPC (|int| x, |string|)
 function string.pluralize (|int| amount, |string| nothing="", |string|)
 	if !amount and nothing
 		return nothing
-	return "$amount $self${ (`s`, ``)(amount != 1)}"
+	|| s = "s" * (amount != 1)
+	return "$amount $self$s"
 	
 
 function string.IsFileLike (|bool|)
@@ -183,7 +184,6 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 				return i
 			MaxWidth = MW2
 			i = WordEnd
-			continue
 
 
 helper String.UnTabbifySub (|faststring| fs)
@@ -271,3 +271,8 @@ function string.UnPrintable (|int|)
 			if c.IsTextLine
 				return '\n'
 			return -2
+
+
+function String.Spin (|int| f, |byte|)
+	return `|/-\`[f&3] // useful for printing "processing" things to stdout
+

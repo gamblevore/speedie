@@ -1,18 +1,11 @@
 #!/usr/local/bin/spd
 
-main {
-	|| Amount = 250MB
-	|| size = app.args[0]
-	|| n = size.Length
-	if size endswith "mb"
-		Amount = size[0, n-2].int*1MB
-	  elseif size endswith "kb"
-		Amount = size[0, n-2].int*1KB
-	
-	"Starting to write ${amount.strsize} XML file"
+main (|FileSizeInt| Amount) {	
+	|| name = amount.strsize
+	"Starting to write $name XML file"
 	
 	|| Start = date.now
-	|| xml = "auto_generated_$size.xml".out							#require
+	|| xml = "auto_generated_$name.xml".out							#require
 	xml <~ `<?xml version="1.0" encoding="utf-8"?>
 <Catalog>
 `
@@ -47,5 +40,18 @@ extend byte
 	operator to	(|byte| b, |byterange|)
 		rz.a = self
 		rz.b = b
+
 		
-	
+datatype FileSizeInt (int)
+helper @FileSizeInt.MainArg (|int| Pos, |string| name,  |int|)
+	|| size = string.MainArgSub(Pos, name, "file-size")$
+	|| Mul = 1
+	if size endswith "kb"
+		mul = 1KB
+	  elseif size endswith "mb"
+		mul = 1MB
+	  elseif size endswith "gb"
+		mul = 1GB
+	  else
+		return size.int
+	return size[0, size.length - 2].int*mul

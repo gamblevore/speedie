@@ -21,6 +21,11 @@ function Rename (|message| name)
 	for n in .nodes
 		n.belike(name)
 
+function message.BeLike (|Message| belikeme)
+	// if we upgrade this, we can use lists in for-loops? 
+	.func = belikeme.func
+	.name = belikeme.name	
+
 
 function RenameStr (|string| s, |syntax|func=@thg)
 	.rename(func.msg(s))

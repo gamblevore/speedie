@@ -5,10 +5,6 @@ roots
 	"@spd/Image.scproj/image.input/"
 	"@spd/network.scproj/network.input/"
 
-
-// something has gone horribly wrong somewhere?
-	// cant find things
-	// cant click on the todo file?
 /*
 Bloat fix plan:
 	* use macros! get rid of loads of stuff

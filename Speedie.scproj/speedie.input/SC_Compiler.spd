@@ -141,9 +141,9 @@ function BuildFolder (|file|)
 	return ._buildfolder
 
 
-function GetMainFunc (|message| where, |ScFunction|)
+function GetMainSub (|ScFunction|)
 	opt norefcounts
-	|| mod = Compiler.FindModule("app", where)
+	|| mod = Compiler.FindModule("app", nil)
 		|| fn = mod["main"]
 		if fn isa SCFunction
 			return fn
@@ -173,7 +173,7 @@ function CompileAll (|bool|)
 	.Timer( "NilChecking" )
 
 	using options.NilStrength
-		Niltracker.SaveLives
+		Niltracker.SaveTheWorld
 	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )
@@ -495,7 +495,7 @@ function ImportAll
 	for f in .ProtoTypes
 		scfunction.currfunc = f
 		f.FuncDecls
-		f.BecomeReal
+		f.MakeParamsReal
 	scfunction.currfunc = nil
 
 	require StdErr.OK
@@ -889,7 +889,7 @@ function DeadStrip
 	Compiler.VisibleFuncs = scbase("Visible",	false)
 	Compiler.Interpreter = scbase("Interpreter", false)
 
-	.getmainfunc(nil).StripTest?
+	.getmainSub().StripTest?
 	
 	for f in .FuncList
 		f.striptest
@@ -940,7 +940,8 @@ function OrderClassList
 	// put the .ClassList in the same order as the ModuleList
 	.ClassList.Clear
 	for m in .ModuleList
-		.ClassList <~ (m.cls		#continue)
+		|| cls = m.cls
+			.ClassList <~ cls
 
 
 function AddGlobalConst (|string| name, |SCClass| c, |SCDecl|)
@@ -954,20 +955,22 @@ function AddGlobalConst (|string| name, |SCClass| c, |SCDecl|)
 	Return d
 
 
-function AddMain (|int| mark, |bool|)
-	|message| m
+function MakeMainFunc (|message|)
+	|| f = .GetMainSub
+		return f.sourcearg
+	"Compiling as library."
+	Options.ProjectisLibrary = true
+	return .program.CollectString( "main:\n" ).last				// mainproj.collect
 
-	|| f = .getmainfunc(nil)
-		m = f.sourcearg
-	  else
-		"Compiling as library."
-		m = .program.CollectString( "main:\n" ).last				// mainproj.collect
-	Options.ProjectisLibrary = !f
+
+
+function AddMain (|int| mark, |bool|)
+	|| m = .MakeMainFunc()
+	|| b = (Truebool, falsebool)(Options.ProjectisLibrary) 
 	
 	if m and .ConfMsg
 		m.first = "app.configure = __AppConfString".parse
 	
-	|| b = (Truebool, falsebool)(options.ProjectIsLibrary) 
 	.program.TryAdd( nil, b, "__IS_LIBRARY__" )
 
 	stderr.LowerErrorsTo = 0
@@ -1069,7 +1072,7 @@ function FindProject (|string| Path, |bool| error, |File|)
 	
 helper FindProjectSub (|string| base, |string| Path, |File|)
 	if (*Path == '/')
-		return Path.ExistingFile
+		return Path.FileThatExists
 	
 	|| First = Path
 	|| SlashPos = Path.find('/')

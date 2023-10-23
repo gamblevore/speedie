@@ -791,17 +791,17 @@ class Message (RingTree)
 
 	function ExpectLast (|string| err="", |bool|)
 		opt norefcounts
-		require self
-		|| N = .next
-			N.syntaxexpect(err)
-		  else
-			return true
+		if self
+			|| N = .next
+				N.syntaxexpect(err)
+			  else
+				return true
 
 
 	function ExpectString (|bool|)
 		check .IsString (self, "Not a string")
 		return true
-	
+		
 
 	function Expect (|syntax| type, |string| name=nil, |bool|)
 		require self
@@ -926,24 +926,26 @@ class Message (RingTree)
 		.func = fn
 		.name = name
 
+
 	function Become (|int64| num)
 		cpp_part BecomeNum
 		.clear
 		.func = @num
 		.name = num.render
 
-	
-	function BeLike (|Message| belikeme)
-		debug_require !(belikeme.hasany)
-		// if we upgrade this, we can use lists in for-loops? 
-		.func = belikeme.func
-		.name = belikeme.name
+
+	function Become (|message| src)
+		cpp_part BecomeMsg
+		.func = src.func
+		.name = src.name
+		.clear
+		.TakeAllFrom(src)
 
 	
 	function Next (|syntax| Need, |string| Name, |Message|)
 		Opt NoRefCounts
-		cpp_part NextOf
-		|| ch = .next(need, @nil) #require
+		cpp_part NextOfName
+		|| ch = .Next(need) #require
 		if ch ~= name
 			return ch
 		.accesserr(need, nil, ch)
@@ -956,18 +958,14 @@ class Message (RingTree)
 		.accesserr(Need, nil, ch)
 
 	
-	function Next (|syntax| Need, |syntax|OK=nil, |Message|)
+	function Next (|syntax| Need, |Message|)
 		Opt NoRefCounts
-		cpp_part NextOf2
-		|message| ch
+		cpp_part NextOf
 		if (self)
-			ch = .next
-			if !need or (ch==Need)
+			|| ch = .next
+			if (ch==Need)
 				return ch
-			if (OK and ch==OK)
-				ch.func = ok
-				return ch
-		.accesserr(Need, nil, ch)
+			.accesserr(Need, nil, ch)
 
 	
 	syntax Compare (|string| Other, |bool|Aware, |int|)

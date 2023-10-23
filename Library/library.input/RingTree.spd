@@ -61,7 +61,8 @@ class RingTree (Saveable)
 
 	function TakeAllFrom (|| src)
 		opt norefcounts
-		while src.hasany: .First = src.Last // should be .last = src.first
+		while src.hasany
+			.First = src.Last // should be .last = src.first
 
 	function AtRoot (|bool|)
 		opt norefcounts
@@ -331,7 +332,7 @@ class RingTree (Saveable)
 					rz--
 	
 	function Rand (||)
-		return self[.slowcount.rand]
+		return self[.slowcount()]
 
 	render
 		fs <~ "("

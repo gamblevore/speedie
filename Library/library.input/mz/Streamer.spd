@@ -26,6 +26,7 @@ function StringReader.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 	j.up(2)
 	j.flush			// we definitely need to flush it.  Im serious!
 	j.CompressChunk(nil)						// cleanup
+	st.end
 
 
 helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compressionstats| st=nil, |bool|)
@@ -34,7 +35,6 @@ helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 		fs <~ .readall
 		return true
 	st := compressionstats.all
-	st.start
 
 	|| OK = StdErr.Mark
 	check (.isjbin) (self, _jBinNotJbin)
@@ -44,6 +44,7 @@ helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 		mz = .NextMsg(@tmp)
 	  else
 		require mz.expect(@tmp)
+	st.start
 
 	|| size = .NextMsg(mz, @num)
 	|| arg = .NextMsg(mz, @arg)
@@ -70,7 +71,7 @@ helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 			fs.Flush
 			st.LiveUpdate(c.length, Expected)
 			c.remove
-			
+	st.end
 	return OK
 
 		

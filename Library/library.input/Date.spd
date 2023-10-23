@@ -37,6 +37,8 @@ datatype Date (int64)
 	function WholeSeconds (|int64|) // needs 48 bits!
 		return self >> kTickBits
 	
+	function Rate (|f64|)
+		return 1.0 / .Seconds
 	function Seconds (|f64|)
 		return self|f64| / kOneSecond
 	

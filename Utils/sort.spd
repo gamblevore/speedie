@@ -4,12 +4,12 @@
 |dictionary|			Types = ["spd":"x"]
 |int|					Total
 
-main
+main (|[existingfile]| files)
 	|| t = app["types"]
 		types = t.Dict('/')
 		
-	for f in app.args
-		.Collect(f.ExistingFile)
+	for f in files
+		.Collect(f)
 	found.sort(MySorter, true)
 	|| remover = .Findremover
 	for f in found

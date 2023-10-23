@@ -96,52 +96,70 @@ function message.Tran_QMark
 		tern.prev = MakeDecl("",  "_t", inside)
 	
 
-function message.MainOneArg (|message| arg, |int64| i, |faststring| usage)
+function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	opt norefcounts
-	|| type = self[@thg]					#require
-	|| name = type.next						#require
-	|message| value
-	|| mac = macros.MainArg1
-	if name == @rel
-		name = name[@thg]					#require
-		|| opp = name.next(@opp, "=")		#require
-		value = opp.next(@Nil)				#require
-		mac = macros.MainArg2
-	  else
-		require name.Expect(@thg)
-	arg.MainOneArgSub(mac, name, type, i.msg, value)
 	
-	usage <~ "${name.name}"
-	ifn type ~= "string"
-		usage <~ "(${type.name}) "
-
-
-function message.MainOneArgSub (|macro| mac, |message| name, |message| type, |message| i, |message| value)
-	|| args = [name, type, i]
-	if value
-		args <~ value
-	self <~ (mac)(args)
+	|| type = self[@nil]
+	|| name = type.next
+	|| IsArray = type == @arr
+		.expectlast$
+		type = Type.first
+	type.expect(@thg)
+	
+		
+	|| prms = [name, type, i.msg]
+	require (prms == 3)
+	check !(found & 1) (arg, "Can't come after arrays")
+	if IsArray
+		arg <~ (macros.mainargArray.clean, prms)
+		return 1
+	if name != @rel
+		check !(found & 4) (arg, "Can't come after defaults")
+		arg <~ (macros.MainArgBasic.clean, prms)
+		return 2
+	name = name[@thg]					#require
+	prms[0] = name
+	|| opp = name.next(@opp, "=")
+	prms <~ opp.Next(@Nil)
+	require prms == 4
+	arg <~ (macros.MainArgDefault.clean, prms)
+	return 4
 	
 	
 /*
-main (|file| f, |string| s, |int| n = 0)
-	-->
-main
-    |file|   f = file.MainArg(0)
-    |string| s = string.MainArg(1)
-    |int|    n = (int.MainArg(2), 0)(__ArgCount > 2)
-*/
-	
-	
-function message.MainArgs (|message| arg)
-	opt norefcounts
-	arg <~ "|| __ArgCount = app.args.length".parse
-	|| i = 0
-	|| usage = faststring()
-	for ch in self
-		if ch.expect(@decl)
-			ch.MainOneArg(arg, i++, usage)
-	arg.first = ("app.usage = <(`$usage`)>").parse
+	main (|file| f, |string| s, |int| n = 0)
+		-->
+	main
+		|file|   f = file.MainArg(0)
+		|string| s = string.MainArg(1)
+		|int|    n = (int.MainArg(2), 0)(__ArgCount > 2)
 
+
+	main (|file| a, |[file]| b)
+		-->
+	main
+		|file|   a = file.MainArg(0)
+		|[file]| b
+		|| __ArgCurr = 1
+		while __ArgCurr < __ArgCount
+			b <~ file.MainArg(__ArgCurr)
+*/
+
+
+
+function message.InsertMainArgs (|message| prms)
+	opt norefcounts
+	self <~ "|| __ArgCount = app.args.length".parse
+	|| i = 0
+	|| Found = 0
+	for ch in prms
+		if ch.expect(@decl)
+			Found |= ch.MainOneArg(self, i++, Found)
+
+	ifn found&1
+		macros.mainargfinal.clean
+		self <~ (macros.mainargfinal, [i.msg])
+
+	self <~ "require stderr.ok".parse
 
 

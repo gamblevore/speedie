@@ -46,8 +46,8 @@ dispatch TemporalStatements (TranFunc)
 	__instructionlist__		(vm_Builder.BuildInstructions)
 
 // these exit the function. marked with exitter
-	continue				SCFunction.Tran_Continue
-	exit					SCFunction.Tran_Exit
+	continue				SCFunction.Tran_NotAllowed
+	exit					SCFunction.Tran_NotAllowed
 	quit					(Tran_Quit)
 	return					(Tran_Return)
 	rejoin					(Tran_Rejoin)
@@ -96,6 +96,7 @@ function Tran_Expect (TranFunc)
 
 
 function Tran_Temporal (|SCFunction| fn, |Message| s, |SCBase| name_space)
+	opt norefcounts
 	|| TmpInt = TemporalStatements[s.name]		#expect (s, "Unrecognised statement")
 	(*TmpInt)( FN, s, name_space )
 
@@ -216,55 +217,50 @@ function Tran_Swap (TranFunc)
 
 
 function Tran_While (TranFunc)
+	if node.tmptype == asmtmp.kwhile
+		return
+
 	node.name = "while"
 	node.tmptype = asmtmp.kWhile
-	|| StartCond	= node.needfirst #require
-	|| arg			= startcond.next
+	|| Cond	= node.needfirst					#require
+	|| arg	= cond.next
 
 	using (node)
-	if (StartCond == @arg)
-		StartCond = «Thg "true"»
-		node.first = StartCond
-		arg = startcond.next
+	if (Cond == @arg)
+		Cond = «Thg "true"»
+		node.first = Cond
+		arg = cond.next
 		
 	  else
-		arg := node.givearg 
-		|| decl = startcond.first
+		arg := node.GiveArg
+		|| decl = cond.first
 		if (decl == @decl)
-			StartCond <~ «Thg "true"»
-			startcond.func = @bra
+			cond.func = @bra
+			cond = Cond.msg(@Thg, "true")
 			arg.first = decl
-			decl.next = «tmp "if"
-				«bra, «Brel "!", decl.declname.copy »»
-				«arg, «tmp "exit"»»
-			»
-
+			decl.next = (macros.WhileDecl)(decl.declname.copy)
 		  else
-			startcond = ExpandToBool( StartCond, name_Space )$
-
-
-	StartCond.NeedBra
-	Tran_Isa(node, name_space)
-	
-	|| ExitCond = arg.Next						#require
-	expect (ExitCond == @bra)					(ExitCond)
+			cond = ExpandToBool( Cond, name_Space ) #require
 
 	
-	ExitCond.Remove
-	while ExitCond == @Bra
-		ExitCond = ExitCond.first
+	Cond.NeedBra
+	arg.CheckContinuesAndExits
+	
+	Tran_Isa(node, name_space)	
 
-	|| Finish = arg.NeedMarker( "finish", true )
-
-	arg <~ «tmp "if"
-		«bra, exitcond.negate »
-		«arg
-			«tmp "exit"»
+	|| ExitCond = arg.Next
+	if ExitCond.Expect(@bra)
+		ExitCond.Remove
+		ExitCond = ExitCond.Negate
+	
+		|| Exit = «tmp "exit"»
+		arg <~ «tmp "if"
+			ExitCond.NeedBra
+			«arg, exit »
 		»
-	»
+		exit.LoopExit
+		cond = ExitCond
 	
-	Finish.Remove
-
 
 
 function MsgInsideDcl (|Message| msg, |bool|)
@@ -418,7 +414,6 @@ function Tran_For (TranFunc)
 
 
 
-
 function Tran_ForSub (TranFunc)					// :3
 	//////// COLLECT VARIABLES
 	|| list = node.needfirst$
@@ -445,7 +440,8 @@ function Tran_ForSub (TranFunc)					// :3
 	list = list.unbra
 	if (list == @rel)
 		value = list.First
-		|| opp = value.next(@opp, "in")
+		|| opp = value.next
+		if opp isopp "in"
 			list = opp.next
 			bad +=! list
 			if value == @Dot
@@ -460,7 +456,7 @@ function Tran_ForSub (TranFunc)					// :3
 	|sciterator| iter
 	|scdecl| dcl
 	if !bad
-		dcl = TypeOfExprModulesNotOK( list, name_space )
+		dcl = TypeOfExpr( list, name_space )
 	if dcl
 		iter = dcl.GetIteratorAny( itername, node )
 		if iter
@@ -481,7 +477,7 @@ function Tran_ForSub (TranFunc)					// :3
 	
 				////////  CHECK IF VARS ALTERED
 	|| CanKeepSource = CanKeepAsSource(list, arg, dcl)
-	|| CanKeepValue  = CanKeepAsValue(iter, arg, dcl, value)
+	|| CanKeepValue  = CanKeepAsValue(iter, arg, dcl, value)|int|
 	
 	
 				//////// Uniquify source/value names ////////
@@ -538,25 +534,24 @@ function Tran_ForSub (TranFunc)					// :3
 
 
 				////////  COPY STUFF AFTER CONTINUES  ////////
-	|message| LastMsg
 	for msg.flat in arg
 		if (msg == @tmp)
 			if (msg == "for" or "while")
 				continue_with msg.FlatAfter
 			
-			if (msg == "continue")
+			  elseif (msg == "continue")
+				msg.ExpectEmpty
 				iter.Yield.CopyAllAfterBefore( msg, node )
-
+				
 			  elseif (msg == "continue_with")
 				msg.Name = "continue"
-				msg.Prev = NeweqRel( iter.index.copy(node2), msg.last )
+				msg.Next_Index(iter, node2)
 				continue_with msg.FlatAfter
 		
 		  elseif (msg == @thg)
-			if cankeepvalue  and  !(value.flags&kReplaced)  and  msg == value.name
-				LastMsg = msg
+			if CanKeepValue==1  and  msg == value.name
 				msg.ReplaceWith(value)
-				(value.flags |= kReplaced)
+				CanKeepValue = 2
 			
 		  elseif (msg == @type)
 			|| ty = msg.last
@@ -631,7 +626,7 @@ function Tran_Syx (|Message| msg, |Message|)
 	
 	msg.name	= "helper"
 	|| name		= msg[@thg]							#require
-	|| arg		= msg[@arg, -1]						#require
+	|| arg		= msg.last(@arg)					#require
 	|| Params	= msg.find(@bra).find(@thg)
 
 	using (msg)
@@ -715,7 +710,7 @@ function Tran_FuncTable (|Message| msg, |bool|)
 	|| nameMsg		= msg[@thg]$
 	|| protoMsg		= namemsg.next
     expect (protomsg == @bra or @prm or @list) (protomsg)
-	|| items		= protoMsg.next(@arg)$
+	|| items		= protoMsg.Next(@arg)$
 	|| ProtoFirst	= protomsg.first
 	|| name			= namemsg.name
 	|| protoName	= protofirst.name
@@ -859,3 +854,36 @@ function compiler.CollectIsaTests (|Message| s, |[Message]| out, |bool|)
 					out <~ s
 					Return true
  
+
+
+function Message.Next_Index (|sciterator| iter, |message| node2)
+	.prev = NewEqRel( iter.index.copy(node2), .last )
+
+
+function message.CheckContinuesAndExits
+	opt norefcounts
+	
+	for msg.flat in self
+		if (msg == @tmp)
+			if (msg == "for" or "while")
+				continue_with msg.FlatAfter
+			
+			  elseif (msg == "continue")
+				msg.LoopContinue
+			  elseif (msg == "exit")
+				msg.LoopExit
+
+
+function message.LoopExit
+	.LoopExitter(ASMtmp.kExit, Blockage.Exit)
+
+
+function message.LoopContinue
+	.LoopExitter(ASMtmp.kContinue, Blockage.Continue)
+
+
+function message.LoopExitter (|int| ASMType, |blockage| ExitCode)
+	.ExpectEmpty
+	.TmpType = ASMType
+	.LastInBlock(ExitCode)
+	

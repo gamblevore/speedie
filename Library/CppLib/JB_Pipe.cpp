@@ -203,7 +203,7 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, bool Ca
 		pipe_close(Sh.StdErrPipe[WR]);
 		return true;
 	}
-	JB_ErrorHandleFile(path, nil, errno, nil, "call command-line tool");
+	JB_ErrorHandleFile(path, nil, errno, nil, "run");
 	return false;
 }
 
@@ -233,12 +233,12 @@ void JB_FEPDWEE_Finish(ShellStream& Sh) {
 }
 
 
-ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
+ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru) {
 	auto rz = JB_New(ShellStream);
 	JB_Sh_Constructor(rz, self);
 	rz->Output = JB_Incr(FSOut);
 	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
-	bool OK = JB_Sh_StartProcess(rz, self, Args, !KeepStdOut);
+	bool OK = JB_Sh_StartProcess(rz, self, Args, !StdOutFlowThru);
 	if (!OK) {
 		JB_SetRef(rz, 0);
 	}
@@ -246,11 +246,11 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 }
 
 
-int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool KeepStdOut) {
-	auto Sh = ShellStart(self, R, FSOut, FSErrIn, KeepStdOut);
-	if (!Sh) {return 1;}
-	JB_Sh_UpdatePipes(Sh);
+ivec2 JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru) {
+	auto Sh = ShellStart(self, R, FSOut, FSErrIn, StdOutFlowThru);
+	if (!Sh) {return ivec2{1,0};}
 	
+	JB_Sh_UpdatePipes(Sh);
 	while (Sh->ExitCode==-1) {
 		int Err = waitpid(Sh->PID,  &Sh->ExitCode,  0); // in case sigchld handler is overridden
 		if (!(Err == -1 and errno == EINTR)) {
@@ -259,22 +259,27 @@ int JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSE
 		JB_Date__Sleep(1);
 		JB_Sh_UpdatePipes(Sh);
 	}
+	JB_Sh_UpdatePipes(Sh);
 
 	JB_FEPDWEE_Finish(*Sh);
-	
-	int Code = Sh->ExitCode;
-	if (WIFEXITED(Code)) {				// called exit()
-		Code = WEXITSTATUS(Code);
-	} else if (WIFSIGNALED(Code)) {		// died from a signal
-		Code = WTERMSIG(Code);		// usually its what we want, despite being mixed up
-	} 
 
 	auto ShErr = Sh->ErrorOutput;
 	if (!FSErrIn and JB_FS_Length(ShErr)) {
 		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(ShErr), nil);
 	}
+	
+	int Code = Sh->ExitCode;
 	JB_FreeIfDead(Sh);
-	return Code;
+	int Signal = 0;
+	int Exit = 0;
+	if (WIFEXITED(Code)) {				// called exit()
+		Exit = WEXITSTATUS(Code);
+	}
+	if (WIFSIGNALED(Code)) {			// died from a signal
+		Signal = WTERMSIG(Code);		// usually its what we want, despite being mixed up
+		JB_ErrorHandleFile(self, nil, Signal, "crashed", "running");
+	} 
+	return ivec2{Exit, Signal}; // ivec2 specifier needed for linux
 }
 
 

@@ -62,7 +62,7 @@ class __junktest_6__
 	module
 		function AbcVis (|~int|)
 			visible
-			|| x = ("cpp_name").length?
+			|| x = ({|| y = "a", rejoin y})
 	setter Abc (|int|)
 		if value == 1
 

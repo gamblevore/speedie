@@ -60,9 +60,6 @@ function Message.AsModule (|SCModule|)
 	debugger
 
 
-function Message.IsLast (|bool|)
-	return self and !.Next
-
 
 function Message.ListAll (|[Message]|)
 	opt norefcounts
@@ -80,12 +77,6 @@ extend Message {
 	// if I had my... "nil.fnc always returns nil"... then I could
 	// remove the self-check! :D So beautiful code.
 		Return (self) and (self == @Thg) and (.name ~= name)
-
-
-	operator IsThing (|bool|)
-		disabled "ooop"
-		Return (self) and (self == @Thg)
-
 
 	operator IsOpp (|string|name, |bool|)
 		Return (self) and (self == @Opp) and (.name ~= name)

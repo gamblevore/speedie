@@ -28,10 +28,10 @@ function Message.FilePath (|string|)
 	Opt NoRefCounts
 	|| L = .OriginalParseLayer$
 	|| O = L.obj
-	if O isa String
-		return O
 	if !__IS_LIBRARY__ and (O isa File)
 		return O.path
+	if O isa String
+		return O
 
 
 function Message.OriginalParseLayer (|memorylayer|)

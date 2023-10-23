@@ -37,10 +37,9 @@ class Process (ShellStream)
 	|int| 						DeathLimit
 	|int|						DiedCount
 	|bool|						IsServer
-	|bool|						TrapStdOut
 	|byte|						CanPrint
 
-	constructor	(|string| path, |string| ID,  |int| n,  |[string]| params=nil,  |fn_subprocess| sub=nil,  |bool|TrapStdOut=false)
+	constructor	(|string| path, |string| ID,  |int| n,  |[string]| params=nil,  |fn_subprocess| sub=nil,  |bool| CaptureStdOut=false)
 		cpp_part Constructor
 		super.constructor(path)
 		
@@ -48,7 +47,7 @@ class Process (ShellStream)
 		.deathlimit = 12
 		.isserver = n != 0
 		.subprocess = sub
-		.TrapStdOut = TrapStdOut
+		.output = (faststring(), nil)(capturestdout)
 		.sendqueue	= ringtree()
 		.writer		= FastString()
 
@@ -195,7 +194,6 @@ class Process (ShellStream)
 	syntax is (|IPCState| d, assigns:|bool|)
 		if value
 			.ours.state = d
-			if d >= ipcstate.closed
 
 	helper Found (|bool| send, |bool|)
 		if send
@@ -220,7 +218,7 @@ class Process (ShellStream)
 		if (.pid and .CanPrint >= PrintAfterSomeTime)
 			print_time = now + 5s
 		|| ModeIsGet = !ModeIsSend
-		|date| SleepAmount = -(1s/640)
+		|date| SleepAmount = -256
 		
 		while
 			if ModeIsGet // we are looping get, so lets also send backedup items
@@ -341,7 +339,7 @@ class Process (ShellStream)
 		|| sp = .ours
 		sp.datalength = .writer.length
 		sp.SendID++
-		.SendSignal(ProcessOwner.SIGUSR1)
+		//.SendSignal(ProcessOwner.SIGUSR1) // this is crashing speedie?
 		.LastSend = date.now
 		.writer.length = 0
 		.UpdatePipes
@@ -501,12 +499,10 @@ class Process (ShellStream)
 		cpp_Wrapper JB_Sh_StartProcess
 
 	
-//	bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args)  { 
-
 	function RunChild (|bool|)
 		debug_require .path
 		require (self isnt invalid)
-		if .Startprocess(.path, .params, .trapstdout)
+		if .Startprocess(.path, .params, .output!=nil)
 			return true
 		is closed
 
@@ -611,9 +607,9 @@ class Process (ShellStream)
 			return .owner_ init process("", "", 0, nil, nil)
 			
 
-		function Child (|string| app_path, |string| ID, |[string]| params=nil, |bool| TrapStdOut=false, |int|size=16KB, |Process|)
+		function Child (|string| app_path, |string| ID, |[string]| params=nil, |bool| CaptureStdOut=false, |int|size=16KB, |Process|)
 			require app_path.file.mustexist
-			rz = process(app_path, ID, size, params, trapstdout)
+			rz = process(app_path, ID, size, params, CaptureStdOut)
 			if !rz.RunChild
 				rz = nil
 		

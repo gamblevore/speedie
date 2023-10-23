@@ -1,0 +1,42 @@
+
+
+datatype MouseDragging (int)
+	constants
+		Ignored = 0
+		Handled = 1<<4
+		Within = 2<<4
+		Beyond = 3<<4
+		EvenIfNoMovement = 4<<4
+		
+
+/*
+	return (x,y).sdlxy
+	#define SDL_BUTTON(X)       (1 << ((X)-1))
+*/
+
+
+datatype MoveCode (byte)
+	Flags
+		Right
+		Left
+		Up
+		Down
+		Forward
+		Backward
+		Top = Up
+		Bottom = Down
+		Front = Forward
+		Back = Backward
+		CenterV = Up + Down
+		CenterH = Right + Left
+		MiddleLeft = Left + CenterV
+		MiddleRight = Right + CenterV
+		All = 63
+		Center = 63
+
+	syntax is (|movecode| m, |bool|)
+		return (self & m) == m
+	
+	syntax isnt (|movecode| m, |bool|)
+		return !.SyntaxIs(m)
+

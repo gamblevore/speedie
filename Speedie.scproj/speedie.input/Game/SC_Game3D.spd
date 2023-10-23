@@ -113,7 +113,7 @@ extend Message {
 		
 
 	function TranModel (|Message|)
-		|| Arg = self[@arg, -1]							#require
+		|| Arg = .last(@arg)							#require
 		|| Shader = Arg.ParseShaderSub				    #require // should be empty by now.
 		.Name = "struct"
 		return Shader
@@ -212,7 +212,7 @@ function SCClass.GetFlyingMemory (|Message| exp, |SCDecl|)
 		exp.Become( @BRel, "&" )
 		
 		if !decl.pointercount
-			decl = decl.getaddress(declmode.always)
+			decl = decl.getaddress
 		return decl
 
 

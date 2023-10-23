@@ -8,14 +8,12 @@ const char* JB_CrashLogFileName = "/tmp/logs/jeebox.crash.txt";
 
 Message* JB__App__Conf;
 JB_String* JB__App__Path;
-
 JB_File* JB__App__stdin;
 JB_File* JB__App__StdOut;
 JB_String* JB__App_codesign_native;
 Array* JB__App_OldArgs;
 bool JB__ErrorColors_Enabled;
 u16 JB__API_NilHappened;
-JB_ErrorReceiver* JB__Constants__ParseProtector;
 CharSet* JB__Constants_CSAfterStatement;
 CharSet* JB__Constants_CSLettersOnly;
 CharSet* JB__Constants_CSLine;
@@ -209,10 +207,6 @@ SyntaxObj_Behaviour SyntaxObj_FuncTable_ = InitTableSyntaxObj_();
 JBClassPlace4(SyntaxObj, JB_AsClass(JB_Object), SyntaxObj_FuncTable_);
 
 bool JB__File_DebugExecute;
-byte JB__Proc_ClosePipesInstalled;
-int JB__Proc_IncID;
-
-byte JB__Proc_SpecialState;
 Message_Behaviour InitTableMessage_() { // Behaviour 
 	Message_Behaviour Result;
 	Result.__destructor__ = (void*)JB_Msg_Destructor;
@@ -229,6 +223,9 @@ Message_Behaviour InitTableMessage_() { // Behaviour
 Message_Behaviour Message_FuncTable_ = InitTableMessage_();
 JBClassPlace4(Message, JB_AsClass(RingTree), Message_FuncTable_);
 
+byte JB__Proc_ClosePipesInstalled;
+int JB__Proc_IncID;
+byte JB__Proc_SpecialState;
 SaverClassInfo_Behaviour InitTableSaverClassInfo_() { // Behaviour 
 	SaverClassInfo_Behaviour Result;
 	Result.__destructor__ = (void*)JB_sci_Destructor;

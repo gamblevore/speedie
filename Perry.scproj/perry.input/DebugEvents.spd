@@ -3,7 +3,7 @@
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
 	if key.IsCancel
-		.window.clearfocus
+		.window.ClearFocus
 		return true
 	
 	
@@ -29,7 +29,7 @@ function textview.UpdateDebugArgs (|bool| Visible=false)
 	if !.Document
 		.LoadDocument(Document(f))
 	if !.text
-		.text = qqfiles.DebugArgs
+		.text = defaultfiles.DebugArgs
 	if visible
 		.window.setinnerfocus(self)
 	  else
@@ -54,7 +54,7 @@ function ClickedDebug (GUIAction)
 	if .text == "\02"		// play
 		i.DebugIsWaitingForCompile = true
 		i.compile("debug")
-		i.ShowText(i.ProductOut, "")
+		i.ShowText(i.ProductOut, "", false)
 		(i.CompileTabs.items[3] is hidden)
 		i.ProductErrors.text = ""
 	  elseif .text == "\07" // stop
@@ -87,7 +87,7 @@ function PerryIDE.DebugActualStr (|file| f, |[string]| args, |faststring|)
 		rz.AppendQuotedEscape(a)
 
 
-function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct
+function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct, actualdebug, debugproduct
 	|| out = .DebugActualStr(F, args)
 	.LogOneAction(@emb + out.Copy)
 	out <~ ("\n", 2)
@@ -115,13 +115,15 @@ function PerryIDE.StartDebugging (|file| f)
 	|| debugargs = .DebugArgsFile.parse				#require
 	|| ArgMsg = DebugArgs["args"]
 	|| args = argmsg.AllNames
-	if f.isdir
-		check (!args) (ArgMsg, "You can't pass arguments to gui-apps (in this version).")
+	if debugargs["flags"]["open"].yes
+		check (!args) (ArgMsg, "You can't pass arguments, when using open-flags")
 		args = [f]
 		f = "/usr/bin/open".file
+	  elseif f.IsDir and Platform.OSX
+		f = f.Child("Contents/MacOS/" + f.TrimExtAndPath)
 	
 	|| old = app.cwd
-	.debugpath(f, debugargs)	
+	.DebugPath(f, debugargs)	
 	.DebugEnvs(debugargs["env"])		
 	.DebugActual(f, args)
 

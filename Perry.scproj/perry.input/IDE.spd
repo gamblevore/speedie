@@ -14,28 +14,27 @@ class PerryIDE (Window)
 	|Guicontrol|				SearchArea
 	|Guicontrol|				rborder
 	|guicontrol| 				StdOutBorder
-	|message| 					HistoryMarker
 	
 	|FileRow|					NotTodo
 	|message|					ProjMsg
 	|[guicontrol]|				Views
 	|File|						Project
-    |ivec2|						AutoPoint
-    |TextView| 					ProductOut
-    |TextView| 					ProductErrors
+	|ivec2|						AutoPoint
+	|TextView| 					ProductOut
+	|TextView| 					ProductErrors
 	|TextView|					SpeedieText
 	|TextView|					JeeboxText
-    |TextView|					MassSearchField
-    |TextView|					EditMe
-    |GraphicsEditor| 			DrawMe
-    |TextView|					Status
-    |TextView|					StatsInfo
-    |TextView|					SelInfo
-    |TextView|					NoNeeder
-    |TextView|					PopupDisplay
-    |message|					LastExtraInfo
-    |StretchControl|			EditSep
-    |StretchControl|			FileSep
+	|TextView|					MassSearchField
+	|TextView|					EditMe
+	|GraphicsEditor| 			DrawMe
+	|TextView|					Status
+	|TextView|					StatsInfo
+	|TextView|					SelInfo
+	|TextView|					NoNeeder
+	|TextView|					PopupDisplay
+	|message|					LastExtraInfo
+	|StretchControl|			EditSep
+	|StretchControl|			FileSep
 	|listviewrow|				LogComms
 	|listviewrow|				LogActions
 	|menu|						AutoComplete	// ... todo
@@ -43,49 +42,50 @@ class PerryIDE (Window)
 	|ListView|					ErrorList
 	|listview|					LogArea
 	|ListView|					FoundList
-    |textview| 					DebugArgsList
+	|textview| 					DebugArgsList
 	|Guicontrol of buttonview|	ViewButtons
 	|buttonview|				PrevView
-    |ButtonView|				CurrFileName
-    |ButtonView|				FunctionMenu
-    |buttonview|				Toolbar
-    |Buttonview|				Tabs
-    |buttonview| 				CompileTabs // compilertabs
+	|ButtonView|				CurrFileName
+	|ButtonView|				FunctionMenu
+	|buttonview|				Toolbar
+	|Buttonview|				Tabs
+	|buttonview| 				CompileTabs // compilertabs
 	|buttonview|				SubFindCheckBox    
-    |Buttonview|				ViewErrors
-    |Buttonview|				ViewFiles
-    |Buttonview|				ViewSearch
-    |Buttonview|				ViewDebugger
-    |Buttonview|				ViewLog
-    |Buttonview|				GoNext
-    |Buttonview|				GoPrev
-    |Buttonview|				StartScreen
-    |Buttonview|				BuildButton
-    |Buttonview|				RunButton
-    |shellstream| 				Talker
-    |message|					FileHistory
-    |string|					OldJBCloser
-    |string| 					lastCmdStr
-    |string|					AttachedProgram
-    |ProgressBar|				Progress
+	|Buttonview|				ViewErrors
+	|Buttonview|				ViewFiles
+	|Buttonview|				ViewSearch
+	|Buttonview|				ViewDebugger
+	|Buttonview|				ViewLog
+	|Buttonview|				GoNext
+	|Buttonview|				GoPrev
+	|Buttonview|				StartScreen
+	|Buttonview|				BuildButton
+	|Buttonview|				RunButton
+	|shellstream| 				Talker
+	|message|					RecentFiles
+	|string|					OldJBCloser
+	|string| 					lastCmdStr
+	|string|					AttachedProgram
+	|ProgressBar|				Progress
 	|Faststring|				Stats
-    |ivec2|						PopupDisplayCorner
+	|ivec2|						PopupDisplayCorner
 	|date|						LastAutoCompleteDate
 	|date|						PopupDateOn
+	|uint[3]| 					LastMemory
 	|int|						EditMeTabRetryThing
 	|byte|						DuringLoad
 	|byte| 						DuringTempView
 	|byte|						NoClutter
+	|bool|						AlreadyExpandedCompileTab
 	|bool| 						StillJumping
 	|bool|						CanAskingAboutMissing
 	|bool|						DuringMsgFB  // canloadfile, canupdate, .disable 
-	|bool|						DuringNextPrev
+	|char|						DuringNextPrev
 	|bool|						IsTextOnly
 	|bool|						UsingSpdLib
 	|bool| 						DebugIsWaitingForCompile
 	|bool|						InConstructor
 	|bool|						ModifiedForCompile
-	|bool| 						UpdateMem
 	|bool| 						IsGraphics
 
 		
@@ -137,36 +137,25 @@ class PerryIDE (Window)
 
 	function JeeboxEffects (|image| where, |message| bg)
 		effects.dest = where
-		Effects.StartJeebox(bg, 0.5)
-		|| ed = .editme.lastrect
-		|| lf = ed._y1x1y2
-		Effects.Mark(ed,        0.0)
-		Effects.Mark(lf, 		1.0)
-		effects.finishjeebox
-		
-		|| t = 0.33, || b = 0.66
-		|| Top = vec4(t,t,t, 0.88) 
-		|| Bot = vec4(b,b,b, 0.88)
-		where.DrawGradient(ed, top, bot)
+		if Effects.StartJeebox(bg, 0.5)
+			Effects.Backup
+		  else
+			Effects.Restore
 	
 	
-	behaviour Draw
+	behaviour Drawbackground
 		opt norefcounts
 		|| bg = app.Prefs["bg"]
-		if bg == "jeebox"
-			.Jeeboxeffects(where, bg)
-		  else
-			if bg != "flat"
-				app.prefs("bg") = "flat"
-			¥.DrawBackground(where)
-		.DrawContents(where)
+		if bg == "flat"
+			return super.drawbackground(where)
+		if !bg
+			app.prefs("bg") = "jeebox"
+		.Jeeboxeffects(where, bg)
 
 
 	behaviour CancelClose 
 		|| proj = .projmsg					#require
-		|| n = proj.parent.slowcount?
 		proj["pos"] = .editme.sel0
-
 		Perry.save
 		
 		if !.filelist.AskSaveall
@@ -174,7 +163,8 @@ class PerryIDE (Window)
 		if !ClickedCancel(self)
 			return true
 		
-		if n >= 2 and reason|int| < SDLCloseReason.tryquit|int|
+		|| n = proj.parent.slowcount
+		if n >= 2 and reason|int| < SDLCloseReason.TryQuit|int|
 			.RemoveProjFromList
 		|| p = .prev
 		if p isa perryide
@@ -186,8 +176,7 @@ class PerryIDE (Window)
 		|| R = .FindPath(path)
 		|| P = .MainProjFol
 		if R and P and r.location[0, p.location]
-			return r
-			// what do i wanna do?
+			return r			// what do i wanna do?
 			
 
 	function FindPath (|string| path, |filerow|)
@@ -212,7 +201,7 @@ class PerryIDE (Window)
 	
 	function MyStatsMode (|int|)
 		rz = perryide.StatsMode|int|
-		if rz > 2
+		if rz > 3
 			rz = 0
 		if rz < 0
 			rz = 0
@@ -222,29 +211,34 @@ class PerryIDE (Window)
 	function InfoStatus (|string|)
 		|| fs = .stats init FastString()
 		|| i = .MyStatsMode
-		if       i == 0
+		if i == 0
 			fs <~ "  --" // :)
 		
 		  elseif i == 1
 			|| e = .editme
 			|| t = e.text
-			fs <~ "${t.charcount} chars in ${t.linecount} lines"
+
+			// * char count:  x~chars  x~lines  x~loc  x~nodes, Same for memory
+			fs <~ "Chars ${t.charcount}   Lines ${t.linecount}"
 			|| msg = .EditMe.ParsedMessage
-				fs <~ "\n\n(${msg.loc} LOC)"
+				|| loc = msg.loc
+				fs <~ "   LOC ${loc[0]}   Nodes ${loc[1]}"
 			
 		  elseif i == 2
 			|| f = .filelist.FirstSelected as filerow
 			if f.asdir
-				fs <~ "fol: "
+				fs <~ f.Name + "/"
 			  else
-				fs <~ "proj: "
-				|| fr = .filelist.listsource
-				if fr isa filerow
-					f = fr
-			fs <~ "${f.lastsize.strsize} in ${f.lastfilecount} \11"
+				fs <~ "proj"
+				f = (.filelist.listsource as filerow)
+			|| s = f.lastsize
+				fs <~ " ${s.strsize} in (${f.lastfilecount} \11)"
+			  else
+				fs.Length = 0
+				fs <~ "no source found"
 		
 		  elseif i == 3
-			fs <~ "Obj ${app.ObjMemory.strsize}  Str ${app.stringmemory.strsize}  Scr ${sdlapp.DrawSpace.bytecapacity.strsize}"
+			fs <~ "Obj ${app.ObjMemory.strsize}   Str ${app.stringmemory.strsize}   Img ${app.OtherMemory.strsize}"
 			
 		return fs
 
@@ -256,7 +250,6 @@ class PerryIDE (Window)
 	function ShowLeftStats (|int| i = -1)
 		if i >= 0
 			perryide.StatsMode = i
-		.updatemem = false
 		.StatsInfo.text = .InfoStatus	
 
 
@@ -320,10 +313,13 @@ class PerryIDE (Window)
 	helper UpdateSearchSwap (|textview|)
 		opt norefcounts
 		require .isfront
-		if .focus == .inline.editor
-			return .MassSearchField
-		  elseif .focus == .MassSearchField
-			return .inline.editor
+		|| E = .inline.editor
+		|| M = .MassSearchField
+		|| F = .realfocus
+		if F == E
+			return M
+		  elseif F == M
+			return E
 	
 	
 	function UpdateSearchText
@@ -355,7 +351,7 @@ class PerryIDE (Window)
 		if .viewing == .viewfiles
 			if HideSide
 				|| fl = .filelist.listsource as filerow
-					.noneed fl.LastFileCount.render + " files"
+					.noneed "file".pluralize(fl.LastFileCount)
 			  else
 				.noneed
 		
@@ -384,9 +380,9 @@ class PerryIDE (Window)
 
 	function SaveMemory
 		if .IsFront
-			|| d = JeeboxEffects.Duration
-				JeeboxEffects.Duration = 0
-				.LogOneAction(@emb + "Image effect time: " + d.RenderDurr)
+			|| d = PerryIDE.Effects.Duration
+				PerryIDE.Effects.Duration = 0
+				.LogOneAction(@emb + ("Image effect time: " + d.RenderDurr))
 			return 
 		require !.UsingSpdLib
 		|| f = .Feedback
@@ -412,21 +408,31 @@ class PerryIDE (Window)
 		.PopupDisplayFadeIn
 		
 		|| fc = sdlapp.FrameCount|int|
-		require .islast
+		require .IsFront
 		if fc+1 isa 64
 			require !.ProjClosed
 			
-		if !.openedmenu
-			if (perryide.statsmode == 2) and (fc isa 64)
-				.UpdateMem = true
-			if .UpdateMem
-				.ShowLeftStats
+		if .UpdateMem 
+			.ShowLeftStats
 				
 		if fc isa 32
 			.CheckModified
 		
 		if !ShouldNotDisturbGUI and !.DebugArgsList.HasFocus
 			.HideStuff
+
+
+	function UpdateMemOne (|int| i, |uint| c, |bool|)
+		require .LastMemory[i] != c
+		.LastMemory[i] = c
+		return true
+			
+		
+	function UpdateMem (|bool|)
+		require perryide.StatsMode == 3
+		rz |= .UpdateMemOne(0, app.ObjMemory)
+		rz |= .UpdateMemOne(1, app.stringmemory)
+		rz |= .UpdateMemOne(2, app.OtherMemory)
 
 
 	function CheckModified 
@@ -443,7 +449,7 @@ class PerryIDE (Window)
 		if "This project can't be found on the file-system anymore.\n\nWould you like to close it?".confirm
 			.close
 			return true
-		if .issinglefileproject
+		if .IsSingleFileProject
 			f.write("")
 				
 			
@@ -501,6 +507,9 @@ class PerryIDE (Window)
 			return .SelTextParse
 		if key is e
 			return .ShowErrors(true)
+		if key is i
+			FileViewerCountCode(.filelist, nil, .filelist.LastSelected.cell)
+			return true
 		if key is comma
 			return ClickedPrevNext(.goprev)
 		if key is period
@@ -569,26 +578,23 @@ class PerryIDE (Window)
 	behaviour KeyDown
 		if keys.cmd and .cmdkey(key)
 			return true
-		if (key is tab) and .openedmenu == .autocomplete
+		if (key is tab) and .OpenedMenu == .autocomplete
 			return .autocomplete.doreturn
 		return super.keydown(key)
 
 	
-	function GotoIncludedFile (|string| path, |filerow|)
+	function GotoIncludedFile (|string| path, |bool|)
 		|| f = .FileList[path]
 			.FileList.Select(f)
-		return f
+			return true
 	
 	
-	function GotoAnyFile (|string| path, |string| line="", |message| removeme=nil, |bool|)
+	function GotoAnyFile (|string| path, |bool|)
 		if path.FileExists
-			|| f = .GotoIncludedFile(path)
-			f := .FileList.AddExtra(path)
-			if f
-				if line
-					.EditMe.ViewLineAndSel(line.int)
+			if .GotoIncludedFile(path)
 				return true
-		removeme.remove
+			if .FileList.AddExtra(path)
+				return true
 	
 		
 	function Root (|filerow|)
@@ -727,9 +733,11 @@ So anything not 0 means "its OK"`
 		return .FileList.FirstSelected as filerow
 	
 	
-	function CurrPath (|string|)
-		return .CurrFileRow.Location
 
+	function Path (|string|)
+		opt norefcounts
+		return .editme$.document$.location
+	
 
 	function EditPath (|string| s, |bool|)
 		if s
@@ -756,7 +764,6 @@ So anything not 0 means "its OK"`
 			return ok
 
 		.CurrFileName.text = r.name
-		.updatemem = true
 		.DuringLoad++
 		.filelist.select(r)
 		
@@ -820,16 +827,16 @@ So anything not 0 means "its OK"`
 		.StartFiles
 		.LoadStartupErrors
 	
+	
 	function UpdatePrefs
 		|| oldPrefs = app.prefs
 		app._prefs = nil
 		if app.PrefsInit(0)
 			.notify("Reloaded Prefs.")
-			effects.Invalidated = true
 		  else
 			.notify("Prefs are corrupted")
 			app._prefs = oldPrefs
-		ColorScheme.LoadFromPrefs(DefaultColors)
+		¥.LoadFromPrefs
 
 
 	function ParseErrorDetect
@@ -878,8 +885,8 @@ So anything not 0 means "its OK"`
 		(self is modified) = (e is modified)
 
 
-function string.GetSpeedieProj (|string| wanted, |string|)
+function string.GetSpeedieProj (|string|)
 	rz = self
-	while rz and rz.ext ~!= wanted
+	while rz and !(rz isa "scproj")
 		rz = rz.parent
 

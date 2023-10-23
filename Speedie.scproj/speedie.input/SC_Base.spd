@@ -235,7 +235,6 @@ function message.Cpp_Wrapper (|string|)
 		if self == @bra
 			return .first.name
 		return .name
-	return nil
 
 
 function scfunction.ExportNameBuilder (|string|CppPart="", |string| )
@@ -294,21 +293,23 @@ function Message.FindAndRemoveSub (|String| name,  |bool| NothingOK,  |bool| IsC
 function scfunction.FindCppWrapperFunc (|message| place, |message|)
 	opt NoRefCounts
 	for cpp in place
-		|| n = cpp.name
-		ifn n starts "cpp_"
-			continue
-		if n == "cpp_nothing"
-			.noautocomplete = 1
-			.IsCppInBuilt = 2
-		  elseif n == "cpp_inbuilt"
-			.noautocomplete = 1
-			.IsCppInBuilt = 1
-		  elseif n == "cpp_libwrapper"
-			.noautocomplete = 1
-			.IsExternalLib = true
-		  else
-			continue
-		return cpp
+		if (cpp.name starts "cpp_") and .FoundOneCpp(cpp.name)
+			return cpp
+
+
+function scfunction.FoundOneCpp (|string| n, |bool|)
+	if n == "cpp_nothing"
+		.noautocomplete = 1
+		.IsCppInBuilt = 2
+		return true
+	if n == "cpp_inbuilt"
+		.noautocomplete = 1
+		.IsCppInBuilt = 1
+		return true
+	if n == "cpp_libwrapper"
+		.noautocomplete = 1
+		.IsExternalLib = true
+		return true
 
 
 function LoadExportName
@@ -328,6 +329,7 @@ function LoadExportName
 	if self isa SCFunction
 		.IsCppInBuilt := (cw == @bra)|int|
 		|| CppWrapper = cw.cpp_Wrapper
+			.MakeParamsReal
 		require !.UseExportNameConstructor(CppPart, CppWrapper) and !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and !.isdisabled
 
 ///  ///  ///  ///  ///	 ///  ///  ///	 ///  ///  ///	 ///  ///  ///
@@ -409,7 +411,7 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 		if (ParamsArray.IsDot)  and  (ParamsArray.IsModule)  and  (b == compiler.program)
 			exit								// Stop SCFunction.Byte looking up Main.Byte...
 		
-		|| o = b[ name ]		#continue
+		|| o = b[ name ]
 		if o isa SCDecl
 			#!/struct question/
 			// what if this is a struct?
@@ -449,13 +451,14 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 				if o.ismacro
 					if o.MacroGet(paramsarray, missing)
 						Missing = o
-					continue
-				if o.isdisabled
-					error (exp,     o.description)
-					error (o.source, "Disabled here.")
-
-				ParamsHere.obj = o // multiple return :3
-				Return o
+					o = nil
+				  else
+					if o.isdisabled
+						error (exp,     o.description)
+						error (o.source, "Disabled here.")
+	
+					ParamsHere.obj = o // multiple return :3
+					Return o
 		
 		if o
 			paramsarray.found = true
@@ -573,6 +576,13 @@ function SourceArg (|Message|)
 	if p == @Arg
 		Return p
 	return p.find( @Arg )
+
+
+function scfunction.SourceArg (|message|)
+	opt norefcounts
+	|| arg = .Source.last
+	if arg == @arg
+		return arg
 
 
 function scfunction.ParamUniquer (|string| s, |string|)

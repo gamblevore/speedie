@@ -1,0 +1,31 @@
+https://www.shadertoy.com/view/mtyGWy // original by kishimisu
+https://youtu.be/f4s1h2YETNY
+
+import "GUI", main
+	sdlapp.Rescale(4)
+	return MainImage
+
+	
+function palette (|float| t,  |vec3|)
+	|| col = (0.263, 0.416, 0.557)
+	return ((t+col).cos + 1.0) *0.5
+
+
+function MainImage ( ShaderToyFunc )
+	|| uv = Coord * 2.0
+	|| L = uv.Length
+	|| lexp = (-L).exp
+	|| cam = 1.5 + .cam.xz * 0.2
+	
+	for i in (0.0 to 4.0)
+		uv *= cam
+		uv = uv.fract - 0.5
+
+		|| d = uv.length * lexp
+		|| col = palette(L + (i+.Time)*0.4)
+
+		d = (d*1.25 + .Time*0.125).sin*0.125
+		d = (0.01 / d.abs) pow 1.2
+
+		rz += (col * d, 0.0)
+
