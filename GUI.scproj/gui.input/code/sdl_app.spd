@@ -90,7 +90,7 @@ module SDLApp
 		cpp_Wrapper JB_App__DocumentOpened
 		
 
-	function InitDelegates
+	helper InitDelegates
 		cpp_Wrapper JB_App__InitStuff
 
 
@@ -202,16 +202,27 @@ module SDLApp
 		return .event is TEXTINPUT or KEYDOWN
 		
 
-	function RunAndQuit (|GUIApplicationInit| fn=nil, |object| Anything=nil,  |ivec2| size=(414, 256))
+	function RunAndQuit (|GUIApplicationInit| fn=nil, |object| Anything=nil,  |ivec2| size=(414, 256), |errorint|)
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
 		
 		.Init(size)
-		(fn)(anything)?
+		|| err = (fn)(anything)?
+		if err!=0
+			return err
+		return .run
+	
+	
+	function Run (|errorint|)
+		target !gui
+			disabled `Put "targets gui" in the app's conf section to use this!`
 		app.ClearCaches
 		while .SingleFrame
 			0
 		.Quit
+		
+		if !StdErr.OK
+			return 1
 
 	
 	helper PostLoads
@@ -344,7 +355,9 @@ module SDLApp
 		return app.appname
 	
 	
-	helper Init (|ivec2| s) // startup
+	helper Init (|ivec2| s=(414,256)) // startup
+		target !gui
+			disabled `Put "targets gui" in the app's conf section to use this!`
 		require !.framelength
 		.FrameLength = 180th.date
 		.openedfirst = date.now
@@ -377,7 +390,6 @@ module SDLApp
 	
 	
 	helper TrySelectorFlash
-//		return
 		if !.IsBackground and (sdlapp.ChangeSelFlash.fired)
 			.FlashSelector = !.FlashSelector
 			.Touch

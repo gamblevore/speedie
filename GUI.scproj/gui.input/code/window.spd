@@ -24,8 +24,18 @@ class Window (GUIControl)
 	|date|							CreatedDate
 	
 	
-	constructor (|ControlRect| Size = the~area)
+	constructor
 		super.constructor(window.all)
+		.subconstructor(the~area)
+		
+
+	constructor (|ControlRect| Size)
+		cpp_part ConstructorSize
+		super.constructor(window.all)
+		.subconstructor(size)
+	
+	
+	helper SubConstructor (|ControlRect| Size)
 		.DrawBackgroundOnFullScreen = true
 		.size = Size
 		.createddate = date.now

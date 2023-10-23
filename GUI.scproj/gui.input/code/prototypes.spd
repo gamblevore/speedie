@@ -3,7 +3,7 @@
 // prototypes
 
 prototype GUIBackgroundDrawer	(|object| self, |image| where)
-prototype GUIApplicationInit    (|Object| Anything, |errorint|)
+prototype GUIApplicationInit    (|Object| Anything = nil, |errorint|)
 prototype GUIImageDrawEvent		(|Image|  self, 		|bool|)
 
 prototype GUIListDragEvent		(|ListView|   self,	|ListViewrow| Before, |ListViewrow| Into, |bool|)
