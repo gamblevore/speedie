@@ -2,5 +2,6 @@
 
 target !imported
 	main // main {
+		sdlapp.init((800,600))
 		BirdWindow()
-		sdlapp.RunAndQuit((800,600))
+		return sdlapp.Run
