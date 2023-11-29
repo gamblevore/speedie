@@ -1770,6 +1770,7 @@ class TextView (GUIControl)
 
 		d = d.ReclaimStart(._reclaim[0])
 		|| recl = d
+		if (self ~= "Editme") and keys.shift
 		while recl and recl.position <= ._reclaim[1]
 			recl++
 				
@@ -1783,14 +1784,14 @@ class TextView (GUIControl)
 				msg = d.colorise(msg, ParsedOK)
 			loop p >= 0
 			|| n = d.next
-			if n  and  n.position >= ._reclaim[1]
-				if D == recl
-					d = d.ReclaimEnd(t, ._reclaim[2])
-					exit
-				  else
-					d = .nextvline(d, nil)
-			  else
+			if  !n  or  n.position < ._reclaim[1]
 				d = .nextvline(d, d)
+			  elseif d != recl
+				d = .nextvline(d, nil)
+			  else
+				d = d.ReclaimEnd(t, ._reclaim[2])
+				exit
+			
 			
 		d.RemoveAfter
 		.PreferPrevLine = false

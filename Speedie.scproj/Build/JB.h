@@ -195,6 +195,8 @@ struct IntDownRange;
 
 struct LoopInfo;
 
+struct Mat4;
+
 struct MessageCompressor;
 
 struct MessageDecompressor;
@@ -313,6 +315,8 @@ struct FastString_Behaviour;
 
 struct MaterialsLol_Behaviour;
 
+struct FastString_Behaviour;
+
 struct RingTree_Behaviour;
 
 struct SCBase_Behaviour;
@@ -426,6 +430,8 @@ struct FastStringCpp;
 struct FastString;
 
 struct MaterialsLol;
+
+struct FastString;
 
 struct SCBase;
 
@@ -1709,7 +1715,6 @@ extern JB_String* JB__zalgo_down;
 extern JB_String* JB__zalgo_mid;
 extern Random JB__zalgo_R;
 extern JB_String* JB__zalgo_up;
-#define kJB__byte_abc (1)
 #define kJB__byte_max (255)
 #define kJB__byte_min (0)
 #define kJB__char_max (127)
@@ -1751,17 +1756,20 @@ extern JB_String* JB__zalgo_up;
 #define kJB__CL1_Length (10)
 #define kJB__CL1_Low (0)
 #define kJB__CL1_Percent (8)
+#define kJB__TC__void (0)
+#define kJB__TC__voidptr (48)
 #define kJB__TC_atomic_byte (0 + (8 + 4))
 #define kJB__TC_atomic_int (0 + (32 + (64 + (0 + (8 + 4)))))
 #define kJB__TC_atomic_int64 (0 + (48 + (64 + (0 + (8 + 4)))))
 #define kJB__TC_atomic_uint (0 + (32 + (0 + (0 + (8 + 4)))))
 #define kJB__TC_atomic_uint64 (0 + (48 + (0 + (0 + (8 + 4)))))
 #define kJB__TC_bool (0)
-#define kJB__TC_byte (kJB__TC_u8)
+#define kJB__TC_byte (0 + 8)
 #define kJB__TC_Byte2 (1 + (0 + (0 + (0 + 8))))
 #define kJB__TC_Byte3 (2 + (0 + (0 + (0 + 8))))
 #define kJB__TC_Byte4 (3 + (0 + (0 + (0 + 8))))
 #define kJB__TC_char (0 + (0 + (64 + (0 + 8))))
+#define kJB__TC_cstring (48)
 #define kJB__TC_Double (0 + (48 + (64 + (128 + 8))))
 #define kJB__TC_f16 (kJB__TC_HFloat)
 #define kJB__TC_f64 (kJB__TC_Double)
@@ -1779,7 +1787,6 @@ extern JB_String* JB__zalgo_up;
 #define kJB__TC_s16x3 (2 + (16 + (64 + (0 + 8))))
 #define kJB__TC_s16x4 (3 + (16 + (64 + (0 + 8))))
 #define kJB__TC_s64 (kJB__TC_int64)
-#define kJB__TC_s8 (kJB__TC_char)
 #define kJB__TC_SByte (0 + (0 + (64 + (0 + 8))))
 #define kJB__TC_SByte2 (1 + (0 + (64 + (0 + 8))))
 #define kJB__TC_SByte3 (2 + (0 + (64 + (0 + 8))))
@@ -1789,11 +1796,10 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__TC_u16 (kJB__TC_uint16)
 #define kJB__TC_u32 (kJB__TC_UInt)
 #define kJB__TC_u64 (kJB__TC_uint64)
-#define kJB__TC_u8 (0 + 8)
 #define kJB__TC_UInt (0 + (32 + (0 + (0 + 8))))
 #define kJB__TC_uint16 (0 + (16 + (0 + (0 + 8))))
 #define kJB__TC_uint64 (0 + (48 + (0 + (0 + 8))))
-#define kJB__TC_uint8 (kJB__TC_u8)
+#define kJB__TC_uint8 (kJB__TC_byte)
 #define kJB__TC_UnusedType ((0 + (48 + (64 + (0 + 8)))) & (~8))
 #define kJB__TC_Vec2 (1 + (32 + (64 + (128 + 8))))
 #define kJB__TC_Vec3 (2 + (32 + (64 + (128 + 8))))
@@ -3767,9 +3773,6 @@ int JB_zalgo__InitCode_();
 
 
 
-// ObjCID
-
-
 // _void
 
 
@@ -4755,6 +4758,8 @@ void SC_IR_FS(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
+void SC_IR_Print(IR* self);
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -4769,6 +4774,9 @@ int SC_IR__InitCode_();
 
 
 // JB_LoopInfo
+
+
+// JB_Mat4
 
 
 // JB_MemoryWorld
@@ -5154,6 +5162,9 @@ void SC_nil__WhileInner(Message* Cond);
 // JB_MaterialsLol_Behaviour
 
 
+// JB_OutputFile_Behaviour
+
+
 // JB_RingTree_Behaviour
 
 
@@ -5529,6 +5540,8 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 
 // JB_ErrorList
+int JB_Rec_BadCount(JB_ErrorReceiver* self);
+
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
 void JB_Rec_Clear(JB_ErrorReceiver* self);
@@ -6113,6 +6126,8 @@ JB_String* JB_Str_EscapeChr(JB_String* self);
 
 bool JB_Str_EscapeTest(JB_String* self);
 
+Ind JB_Str_ExecuteableJBin(JB_String* self);
+
 JB_String* JB_Str_Ext(JB_String* self);
 
 JB_File* JB_Str_AsFile(JB_String* self);
@@ -6132,8 +6147,6 @@ Ind JB_Str_Find(JB_String* self, CharSet* cs, int Start, int After);
 Ind JB_Str_FindSlash(JB_String* self, int from);
 
 int JB_Str_FindTrailingSlashes(JB_String* self);
-
-Ind JB_Str_HiddenJBin(JB_String* self);
 
 int64 JB_Str_Int(JB_String* self);
 
@@ -6670,6 +6683,9 @@ int SC_MaterialsLol__InitCode_();
 
 MaterialsLol* SC_MaterialsLol__New(Selector* Next, Selector** Place, JB_String* name1);
 
+
+
+// JB_OutputFile
 
 
 // JB_RingTree
@@ -9014,6 +9030,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
@@ -9103,7 +9120,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1500])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1499])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
