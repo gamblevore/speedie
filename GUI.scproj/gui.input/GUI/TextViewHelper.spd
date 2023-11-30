@@ -12,32 +12,6 @@ datatype TextLineFlags (uint16)
 		FakeMsg
 
 
-/*
-	Please don't worry. You don't need to get all tense and stuff. Or high pressurised.
-	
-	Its supposed to be nice and fun :( I don't know why it didnt happen. But we should go and do other stuff also!!!
-	
-	Try to build a fun nice world for yourself. Please.
-	
-	Or just do.
-	
-	hugs
-	
-	-- your local theo
-	
-
-	Now we just need to save! Thats the interesting part! How to save. I guess during insert?
-	
-	Makes sense! It should be the best place to put it. A wonderful place lol.
-	
-	Saving them seems possible. But what about the NEW parts. That still needs to be done? I should
-	probably have only one wrapper. Not two behaviours.
-	
-	So insertsub will call preparelines?
-
-*/
-
-
 class TextViewLine (ringtree)
 	linkage
 		cpp_part Line
@@ -241,12 +215,14 @@ class TextViewLine (ringtree)
 					if (pt == @decl) or (pt == @func and curr == @thg) 
 						return par
 
+
 	function Ends (|bool|)
 		return .endswithline or self is last
 		
 		
 	function EndsWithLine (|bool|)
 		return .text.EndsWithLine
+
 
 	function DrawSel (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| g)
 		opt min 3
@@ -611,7 +587,7 @@ function Textviewline.ReclaimStart (|int| p, |textviewline|)
 		rz = rz.next #loop
 
 
-function Textviewline.ReclaimEnd (|int| T, |int|dp, |textviewline|)
+function Textviewline.ReclaimEnd (|int| T, |int| dp, |textviewline|)
 	opt norefcounts
 	|| v  = .vline
 	

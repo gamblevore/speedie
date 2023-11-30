@@ -65,7 +65,7 @@ class TextView (GUIControl)
 	
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
 		super.Constructor(p)
-		._reclaim = (0, int.max, 0)
+		._reclaim = (0, 1GB, 0)
 		.Lines = TextViewLine(nil)
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
@@ -1203,10 +1203,7 @@ class TextView (GUIControl)
 			|| tab = (s in '\t')
 				.UndoChecker() = -1
 			
-			if p != (0, t.length)
-				._Reclaim = (p, s.length - p.width)
-			  else
-				.ClearReclaim
+			._Reclaim = (p, s.length - p.width)
 			.TryCaptureUndo(x, nt, updatedsel)
 			|| it = .isinline
 				it.UpdateSearch(nt)
@@ -1341,7 +1338,7 @@ class TextView (GUIControl)
 
 
 	helper SelectorRect (|int| pos, |ivec4|)
-		|| i = .XYOfChar(pos)- (1,0)	
+		|| i = .XYOfChar(pos) + (-1,1)	
 		|| i2 = (1, .lineheight+1)
 		rz = (i, i+i2)
 		ifn .singleline
@@ -1386,8 +1383,7 @@ class TextView (GUIControl)
 	
 	helper ShouldDrawSel (|bool|)
 		opt norefcounts
-		require sdlapp.FlashSelector
-		require !.hasinline and .window.islast
+		require sdlapp.FlashSelector and !.hasinline and .window.islast
 		if .hasfocus
 			return true
 		|| p = .parent
@@ -1754,25 +1750,25 @@ class TextView (GUIControl)
 
 	helper PrepareLinesOfText
 		opt norefcounts
-		|| Changed  = .NeedsPrepare						#require
+		|| Changed    = .NeedsPrepare						#require
 		.TextAlteredForDraw = 0
-		|| expect	= .FindExpectsParse
-		|| msg   	= .Parse(changed >= 2, expect)
-		|| ParsedOK = msg!=nil
-		|| Pos	 	= .StartPos
-		|| d	 	= .lines.first
-		|| StayAtEnd = .EndGap
-		.LineNumWidth = (.text.TextLineCount.LineNumWidth,  0)(.ShowLineNumbers or Expect >= 3)
+		|| expect	  = .FindExpectsParse
+		|| msg   	  = .Parse(changed >= 2, expect)
+		|| ParsedOK   = msg!=nil
+		|| Pos	 	  = .StartPos
+		|| d	 	  = .lines.first
+		|| StayAtEnd  = .EndGap
+		.LineNumWidth = (.text.TextLineCount.LineNumWidth, 0)(.ShowLineNumbers or Expect >= 3)
 		
 		|int| CharW	= .LastDrawWidth - .LineNumWidth
 		if .SingleLine
 			charw = 4KB
-
+	
+		target debug
+			if (self ~= "Editme")
+				if keys.shift
 		d = d.ReclaimStart(._reclaim[0])
-		|| recl = d
-		if (self ~= "Editme") and keys.shift
-		while recl and recl.position <= ._reclaim[1]
-			recl++
+		|| FUCKKKKK = .reclaimrestart(d)
 				
 		|| t = d.tline
 		|| p = d.position
@@ -1786,13 +1782,24 @@ class TextView (GUIControl)
 			|| n = d.next
 			if  !n  or  n.position < ._reclaim[1]
 				d = .nextvline(d, d)
-			  elseif d != recl
+			  elseif p < FUCKKKKK
 				d = .nextvline(d, nil)
 			  else
 				d = d.ReclaimEnd(t, ._reclaim[2])
 				exit
-			
-			
+
+		.EndPrepare(d, stayatend, pos)
+
+	
+	function ReclaimRestart (|textviewline| d, |int|)
+		return int.max // still can't solve this fucker.
+		// absolutely fucked on this.
+		// putting it away.
+		// i hate this.
+		opt norefcounts
+
+
+	function EndPrepare (|TextViewLine| d, |bool| StayAtEnd, |int| pos)
 		d.RemoveAfter
 		.PreferPrevLine = false
 		if StayAtEnd
@@ -1801,10 +1808,21 @@ class TextView (GUIControl)
 			d = .FindDrawInfoSub2(pos, nil, false)
 		.StartWithoutScrollDraw = d
 		.ClearReclaim
-	
 
-	function textview.ClearReclaim
-		._reclaim = (0, int.max, 0)
+	
+	helper MapToOld (|int| P, |int|)
+		|| add = ._reclaim[2]
+		if p < ._reclaim[0]
+			return p
+		
+		|| R1 = ._reclaim[1]
+		if p - add > R1
+			return p - add
+		return R1
+		
+	
+	helper textview.ClearReclaim
+		._reclaim  = (0, 1GB, 0)
 		
 		
 	function ScrollToEnd
