@@ -48,7 +48,7 @@ function scbase.CollectConstantsSub (|Message| ch)
 			continue
 		
 		|| NewItem = SCDecl.new
-		NewItem <~ scdeclinfo.Const (|) scdeclinfo.onmodule
+		NewItem <~ scdeclinfo.Const ||| scdeclinfo.onmodule
 
 		if (line == "...")
 			NextNum = StartNum
@@ -96,7 +96,7 @@ function scbase.CollectConstantsSub (|Message| ch)
 	
 	if (ch == "flags")
 		|| NewItem = SCDecl.new
-		NewItem <~ scdeclinfo.Const (|) scdeclinfo.onmodule
+		NewItem <~ scdeclinfo.Const ||| scdeclinfo.onmodule
 		|| s = (FuncName.Name, "Flag")(FuncName)
 		NewDeclNum( NewItem, lastflag|int|.bits, "Largest" + s )
 		.TryAdd( ch, NewItem, NewItem.Name )

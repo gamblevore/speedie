@@ -279,7 +279,7 @@ class File (String)
 	function CurrChild (|String|)
 		cpp_wrapper
 	
-	function Open (|int| Flags = File.O_RDWR (|) File.O_CREAT, |bool|AllowMissing=false, |int|)
+	function Open (|int| Flags = File.O_RDWR ||| File.O_CREAT, |bool|AllowMissing=false, |int|)
 		cpp_wrapper
 
 	function OpenForRead (|bool| AllowMissing = false, |int|)

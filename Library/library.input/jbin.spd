@@ -82,7 +82,7 @@ role JBin (Faststring)
 		.addmemory(type, data|&byte|, false, data.length)
 	
 	function AddMemory	(|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
-		|uint| T = (type|uint|<<1) (|) (goin)
+		|uint| T = (type|uint|<<1) ||| (goin)
 		self <~ T|byte|
 		.hint(L)
 		if L

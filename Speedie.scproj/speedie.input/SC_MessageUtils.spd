@@ -439,7 +439,7 @@ function Message.LocateAll
 
 
 function Message.Hash (|uint64| Pos, |Uint64|)
-	Pos = (pos << 8) (|) .Func|uint64|
+	Pos = (pos << 8) ||| .Func|uint64|
 	return .Name.Hash(pos)
 	
 	

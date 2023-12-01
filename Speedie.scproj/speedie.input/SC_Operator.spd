@@ -397,10 +397,10 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 			extra = CustomOps.TypeCastFromBool
 
 	if (!SCBase.ConstantsLoadingOverride and LC.Type.TreatAsBaseType)
-		return CustomOps.Needed (|) extra
+		return CustomOps.Needed ||| extra
 	
 	if ((LN > 1) and CompOrSet)					// can't compare vectors directly in C++
-		return CustomOps.Needed (|) extra
+		return CustomOps.Needed ||| extra
 	if !extra
 		|| t = lc.type
 		if t.super and t.hasOperator(comp.funcname)

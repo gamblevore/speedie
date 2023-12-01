@@ -9,7 +9,7 @@ class NilTest
 	
 	function Abc		
 		|| v = .v3
-		borks // 
+		borks // amazing
 		*v = 'x'
 		
 	function AndTest (|string?| a, |string?| b, |string| cc)
@@ -165,6 +165,10 @@ function scfunction.NilPrint
 		fs <~ " "
 		a.nildeclared.nilname(fs, true)
 	fs <~ " )"
+	if .returntype
+		fs <~ " as "
+		.returntype.nildeclared.nilname(fs, true)
+	
 	printline fs
 
 

@@ -18,7 +18,7 @@ class SimpleGraph (dictionary)
 			A >>= 32
 		  else
 			B >>= 32
-		|| Data = A (|) B
+		|| Data = A ||| B
 		|| str = string.Copy((&Data)|&byte|, 8)
 		other[str] = (self, nil)(value)
 		self[str] = (other, nil)(value)

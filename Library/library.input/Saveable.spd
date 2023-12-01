@@ -73,7 +73,7 @@ class Saveable
 		|| p = self|&int|
 		|| rc = p[0] 
 		require !(rc & ObjectSaver.RefMark)
-		p[0] = Rc (|) ObjectSaver.RefMark
+		p[0] = Rc ||| ObjectSaver.RefMark
 		return true
 	
 	helper SaveUnMark

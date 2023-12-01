@@ -92,7 +92,7 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 	
 	if type.IsReffable(setonly)
 		if type.c_array > 0
-			return kBasisCArray (|) kBasisObj
+			return kBasisCArray ||| kBasisObj
 		Return kBasisObj
 	
 	if type.hasstruct

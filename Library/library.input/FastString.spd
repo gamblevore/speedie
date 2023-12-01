@@ -90,7 +90,7 @@ class FastString {
 			if n <= 127
 				self <~ (n)|byte|
 				exit
-			self <~ (n (|) 128)|byte|
+			self <~ (n ||| 128)|byte|
 			n >>= 7
 			
 		

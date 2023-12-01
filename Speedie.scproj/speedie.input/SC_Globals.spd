@@ -416,8 +416,6 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 		if (C == "&")											// pointer
 			return r.GetAddress(purpose)
 		if (C == "?")
-			if (R.nildeclared == nilstate.Optional) and (purpose.policy==nilstate.Optional)
-				deprecate (c, "Already optional.")
 			return R.MakeOptional
 		if (C == "!")
 			if R.nildeclared == nilstate.real
@@ -956,7 +954,7 @@ function string.IsSwizzle (|int| Width, |int|)
 		total  |= (c << (shift++ * 3))
 
 	if HasLetter
-		return total (|) (shift<<16)
+		return total ||| (shift<<16)
 
 
 function TypeOfSyx (ExprResolver)
@@ -1207,10 +1205,10 @@ function message.AndOrExpansionTest (|uint|)
 	|| rn = op.next$
 	|| ls = ln.AndOrExpansionTest
 	|| rs = rn.AndOrExpansionTest
-	|| bs = ls (|) rs
+	|| bs = ls ||| rs
 	|| orand = 1
 	if (op == "or"  or  op == "and")
-		return orand (|) bs
+		return orand ||| bs
 	if (ls == 2 or ls == 0) and (rs == orand) // ls should be 0? not 2?
 		.BunchlessFix
 		return -1

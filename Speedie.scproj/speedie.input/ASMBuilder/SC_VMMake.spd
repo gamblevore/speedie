@@ -200,7 +200,7 @@ function Clean   (|message| msg)
 		if ch == @opp
 			if ch == "mod"
 				ch.name = "%"
-			  elseif ch == "(|)"
+			  elseif ch == "|||"
 				ch.name = "|"
 
 

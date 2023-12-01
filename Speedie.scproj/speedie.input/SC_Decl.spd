@@ -11,7 +11,7 @@ constants
 	kNeedsAddressOfButAlsoNeedsSuperMatch  = 64 << 22
 	kNeedsAddressOf     = 32 << 22
 	kNeedsTypeCast		= 16 << 22
-	kNeeds				= kNeedsTypeCast (|) kNeedsAddressOf (|) kNeedsAddressOfButAlsoNeedsSuperMatch 
+	kNeeds				= kNeedsTypeCast ||| kNeedsAddressOf ||| kNeedsAddressOfButAlsoNeedsSuperMatch 
 
 	kUseDefaultParams   = 8 << 22
 	kLossyCastedMatch	= 7 << 22
@@ -33,12 +33,12 @@ constants
 	kTypeCastIgnoreContained = 4
 	kTypeCastIgnoreAddressOf = 8
 	kTypeCastBothWays = 16
-	kTypeCastTrue = kTypeCastMost (|) kTypeCastNumbers   // to replace whatever we used to do when we passed "true"
+	kTypeCastTrue = kTypeCastMost ||| kTypeCastNumbers   // to replace whatever we used to do when we passed "true"
 	kNoBoolTypeCast = 32
 	kTypeCastAssigns = 64
 	kTypeCastWantSuperDistance = 128
 	kTypeCastDescribeErrors = 256
-	kActualTypecasts = ~(kTypeCastWantSuperDistance (|) kNoBoolTypeCast)  
+	kActualTypecasts = ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast)  
 	kTypeCastFalse = 0
 
 
@@ -75,7 +75,7 @@ datatype SCDeclInfo (uint)
 		
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
 		if b
-			return self (|) d
+			return self ||| d
 		return self &~ d
 		
 	
@@ -236,7 +236,7 @@ class SCDecl (SCObject) {
 					if !dist
 						Return kSimpleMatch
 					if typecast & ktypecastwantsuperdistance
-						return kSuperClassMatch (|) dist 
+						return kSuperClassMatch ||| dist 
 					return kSuperClassMatch
 			dist++
 
@@ -266,7 +266,7 @@ class SCDecl (SCObject) {
 		rz.internal = self
 		
 		rz.PointerCount++
-		rz.NilDeclared = Purpose.Policy (|) NilState.Stated
+		rz.NilDeclared = Purpose.Policy
 		check (rz.pointercount < 8) (.source, "Too much abstraction")
 	
 	
@@ -873,7 +873,7 @@ class SCDecl (SCObject) {
 		if (!self)
 			// its not "loss" here? or else we get kcastedmatch on things that
 			// aren't casted.
-			Return kNeedsTypeCast (|) loss
+			Return kNeedsTypeCast ||| loss
 
 
 		if (name_Space)

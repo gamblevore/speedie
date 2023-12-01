@@ -33,7 +33,7 @@ struct NilTracker
 		rz = *l
 		l.ExitCount = 1-WhileTrue
 		l.Cont = decls()
-		l.Exit = (l.Cont * !WhileTrue) (|) NilState.Either
+		l.Exit = (l.Cont * !WhileTrue) ||| NilState.Either
 		l.Depth = .CurrDepth
 	
 	function CurrDepth (|int|)
@@ -55,7 +55,7 @@ struct NilTracker
 	function BranchExit (|NilRecord| Earlier,  |nilstate|)
 		|| src = .line
 		.line = src - 1
-		.set(Earlier (|) *src, "branchexit")
+		.set(Earlier ||| *src, "branchexit")
 
 			
 	function Declare (|scdecl| D, |nilstate| nd, |nilstate|)
@@ -108,7 +108,8 @@ struct NilTracker
 		return (T.line)|&nilrecorder|
 
 	module
-		|| ThisLineFails = 0
+		|byte| OldPrint
+		|byte| ThisLineFails
 		|NilTracker| T
 
 		function Place (|&NilRecorder|)
@@ -124,6 +125,7 @@ struct NilTracker
 		function NilTracker.Purify (|scfunction| f)
 			opt norefcounts
 			|| arg = .Start(f)
+				debugat
 				Argument(arg)
 				.Finish(f)
 		

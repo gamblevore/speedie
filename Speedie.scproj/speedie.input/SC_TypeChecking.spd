@@ -90,7 +90,7 @@ function scdecl.TypeMatch (|SCDecl| O, |int| TypeCast, |Message| exp = nil, |uin
 
 	if (TypeCast & kTypeCastTrue) and (.type == typevoidptr) and (o.pointercount or o.type.funcproto)
 		if (!exp)
-			return kNeedsTypeCast (|) kVoidPtrMatch
+			return kNeedsTypeCast ||| kVoidPtrMatch
 		if (o.type.funcproto)
 			return exp.CastToVoidPtr(nil) // actually do it.
 		return kCastedMatch
@@ -146,7 +146,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 			return exp.CastToBool(nil)
 	
 	
-	if TypeCast & (kTypeCastMost(|)kTypeCastNumbers)
+	if TypeCast & (kTypeCastMost|||kTypeCastNumbers)
 		|| CounterPart = t.Signed				// int vs uint
 			if (CounterPart.type == ot) and (CounterPart.TypeMatch(o, typecast, exp).isnormalmatch)
 				return ksimplematch

@@ -96,7 +96,7 @@ datatype ControlPoint (int)
 	syntax is (|ControlPoint| m, |bool|)
 		return (self|int|&15)==m
 	operator plus (|int| n, |ControlPoint|)
-		return ((self|int|&15) (|) ( (.length+n) << 4))|controlpoint|
+		return ((self|int|&15) ||| ( (.length+n) << 4))|controlpoint|
 	operator minus (|int| n, |ControlPoint|)
 		return .operatorplus(-n)
 	operator to (|ControlPoint| High, |ControlLine|)
@@ -120,7 +120,7 @@ datatype ControlPoint (int)
 		if self is high
 			return self to the~top
 	function Layout (|int| value, |ControlPoint|)
-		return (self|int| (|) value<<4)|controlpoint|
+		return (self|int| ||| value<<4)|controlpoint|
 	
 	function AppendInto (|faststring| fs)
 		fs <~ .length

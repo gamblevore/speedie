@@ -369,6 +369,7 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
 		return
 	
 	|| ret = «tmp "return"»
+	ret.tmptype = asmtmp.kreturn 
 	src <~ ret
 	if used
 		ret <~ «thg "rz"»

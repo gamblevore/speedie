@@ -130,7 +130,7 @@ function Return (NilTrackerFn)
 
 	|| ret = scfunction.currfunc.ReturnType
 	|| RD = ret.NilDeclared
-	|| rd2 = RD (|) v
+	|| rd2 = RD ||| v
 	if RD2 == rd
 		return v
 
@@ -315,9 +315,9 @@ function ThingSub (NilTrackerFn)
 
 function Argument (Niltrackerfn)
 	opt norefcounts
-	|| C = .Decls // noice
+	|| C = .Decls					// noice
 	for s.fast in msg
-		|| T = test * s.islast  // easier debugging
+		|| T = test * s.islast		// easier debugging
 		debugger
 		rz = .jump(s, T)
 		.HandleFail(s)
@@ -329,6 +329,7 @@ function HandleFail (|message| msg)
 	require .ThisLineFails
 	.ThisLineFails--
 	if !.ThisLineFails
+		error.autoprint = .oldprint
 		expect (!stderr.ok) (msg, "Nil-checker did not detect error here!")
 		stderr.clear
 
@@ -383,7 +384,10 @@ function SetRel (niltrackerfn)
 
 
 function Fail (NilTrackerFn)
+	.OldPrint = error.autoprint 
+	error.autoprint = 0
 	.ThisLineFails = 2
+
 
 function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|)
 	opt norefcounts
@@ -419,13 +423,12 @@ function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 		return curr
 	
 	debugat
-	expect (!sent.NilStated  and  sent is param  and  Curr == nilstate.either) (where, "Expected Real Object: " + where.render)
+	if sent is param  and  Curr == nilstate.either
+		if !sent.NilStated
+			sent.NilDeclared = NilState.real
+			return T.SetNilness(sent, NilState.real)
 
-	debugger // fix dis
-//	sent.SuffersNil.Upgrade(R, 0, t.branchdepth)
-	sent.NilDeclared = NilState.real
-	sent.NilPrint("param")
-	return R
+	error (where, "Expected Real Object: " + where.render)
 
 }
 

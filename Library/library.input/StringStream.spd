@@ -113,7 +113,7 @@ class StringReader
 		|| b = .byte
 		if b < 224
 			return b
-		return (.hint<<5) (|) (b-224)
+		return (.hint<<5) ||| (b-224)
 
 
 	function hInt (|int64|)

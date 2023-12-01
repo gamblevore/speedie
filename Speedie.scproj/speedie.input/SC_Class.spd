@@ -406,7 +406,7 @@ function NewClassNew (|SCFunction| con, |Message| src, |int| ExtraCode)
 	result.counterpart	= con
 	con.counterpart    := []
 	con.counterpart|array| <~ result
-	result.AllocCode   |= functiontype.New (|) ExtraCode
+	result.AllocCode   |= functiontype.New ||| ExtraCode
 	(con.alloccode = functionType.Constructor)
 	
 	|| NewParams		= src[ @prm, 1 ]
@@ -431,7 +431,7 @@ function CreateAlloc (|string| ParseThing, |int| Extra)
 	|| fn = .modul.NewModuleFunc( src )
 	fn.refs = cpprefs.new
 	fn.refs.disturbs = nil
-	fn.AllocCode = FunctionType.Alloc (|) extra
+	fn.AllocCode = FunctionType.Alloc ||| extra
 	if extra
 		fn.IsVisible = false
 

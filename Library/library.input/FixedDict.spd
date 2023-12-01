@@ -54,7 +54,7 @@ class FixedDict
 		return 3 & .itemtypes >> (i<<1)
 	function TypeOf (|int| i2, assigns:|uint|)
 		i2 <<= 1
-		.itemtypes	= (.itemtypes &~ (3 << i2))  (|)  (Value << i2)
+		.itemtypes	= (.itemtypes &~ (3 << i2))  |||  (Value << i2)
 	syntax access (|int|i, |fixeddict|)
 		return .items[i]|fixeddict|
 

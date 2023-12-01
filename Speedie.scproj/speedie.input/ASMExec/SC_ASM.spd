@@ -18,13 +18,13 @@ datatype ASM (JSM)
 		visible
 		cpp_name ASMPrint
 	function R1 (assigns:|uint|, |asm|)
-		return self (|) (value << 27) >> 7
+		return self ||| (value << 27) >> 7
 	function R2 (assigns:|uint|, |asm|)
-		return self (|) (value << 27) >> 12
+		return self ||| (value << 27) >> 12
 	function R3 (assigns:|uint|, |asm|)
-		return self (|) (value << 27) >> 17
+		return self ||| (value << 27) >> 17
 	function R4 (assigns:|uint|, |asm|)
-		return self (|) (value << 27) >> 22
+		return self ||| (value << 27) >> 22
 	function RestI (|int|)
 		return (self << 7)|int| >> 7
 	module

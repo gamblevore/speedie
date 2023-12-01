@@ -41,7 +41,7 @@ struct ASMFuncState
 		pragma inline
 		|| B = 1<<31
 		expect !(Bits&B) (err)
-		.RequestOp(asm.extended).rest = bits (|) B
+		.RequestOp(asm.extended).rest = bits ||| B
 		
 	
 	function RequestOp (|uint| Code, |&IR|)
@@ -146,7 +146,7 @@ struct ASMFuncState
 		.AddASM(prms.parent, asm.fnc, 0).rest = fn.TableId
 
 		|| OV     = .OpenVars
-		|| Bits   = Dest.reg<<25 (|) ov.log2<<20					// 6+5 bits, 20 left.
+		|| Bits   = Dest.reg<<25 ||| ov.log2<<20					// 6+5 bits, 20 left.
 		|| Remain = 20
 		|| p      = prms.first
 		while
@@ -166,7 +166,7 @@ struct ASMFuncState
 		|| mL = .µ2(L)			// µ2 stops mR breaking mL
 		|| mR = .µ(op.next)
 		.CloseVars(OV)			// allow overwriting either!
-		require ml.reg (|) mr.reg
+		require ml.reg ||| mr.reg
 		
 		.NeedSomewhere(op, dest, ml.atype)
 		|| scop = op.obj|scoperator|

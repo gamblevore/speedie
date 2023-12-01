@@ -291,4 +291,4 @@ datatype DeclMode (uint)
 	function Policy (|nilstate|)
 		if self == FuncParam or functionbody
 			return nilstate.either
-		return nilstate.realish
+		return nilstate.realish ||| NilState.Stated

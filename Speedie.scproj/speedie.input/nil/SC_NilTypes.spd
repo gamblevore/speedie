@@ -21,7 +21,7 @@ struct NilRecorder
 		if value &~ nilstate.either
 		item <<= 1
 		|| Mask = NilState.either << item
-		.value = (.value &~ Mask) (|) (value << item)
+		.value = (.value &~ Mask) ||| (value << item)
 	syntax Call (|nilrecord| v, |nilrecord|)
 		rz = .Value
 		.Value = v
@@ -46,7 +46,7 @@ datatype NilCheckMode (uint)
 	
 	function Activate (|NilCheckmode|) 
 		if (self isnt active)
-			return self (|) nilcheckmode.positive
+			return self ||| nilcheckmode.positive
 		return self
 	
 	function Negate (|NilCheckmode|)

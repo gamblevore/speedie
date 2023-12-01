@@ -125,7 +125,7 @@ struct HollyPotter
 		if Count == 1
 			.Types <~ Prev|byte|
 		  else
-			.types <~ (prev|byte| (|) 128|byte|)
+			.types <~ (prev|byte| ||| 128|byte|)
 			.types.noob(Count)
 
 	helper GoUp (|int| Depth)

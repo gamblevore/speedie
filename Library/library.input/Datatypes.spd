@@ -41,7 +41,7 @@ datatype int
 		return self&(1<<bit)
 	syntax access (|int| bit, assigns:|bool|, |int|)
 		|| mask = 1<<bit
-		return (self &~ mask) (|) (value << bit) 
+		return (self &~ mask) ||| (value << bit) 
 	function Clz (|int|)
 		cpp_inbuilt __builtin_clz
 	
@@ -310,11 +310,11 @@ datatype uint
 
 	operator rol (|uint| bits, |uint|)
 		bits &= 31
-		return ((self << bits) (|) (self >> (32 - bits)))
+		return ((self << bits) ||| (self >> (32 - bits)))
 
 	operator ror (|uint| bits, |uint|)
 		bits &= 31
-		return ((self >> bits) (|) (self << (32 - bits)))
+		return ((self >> bits) ||| (self << (32 - bits)))
 		
 		
 	iterator
@@ -337,11 +337,11 @@ datatype U24_8 (uint)
 	function Big (|uint|)
 		return self >> 8
 	function Big (assigns:|uint| v, |U24_8|)
-		return (self & 255) (|) (v << 8)
+		return (self & 255) ||| (v << 8)
 	function Small (|uint|)
 		return self & 255
 	function Small (assigns:|uint| v, |U24_8|)
-		return (self & ~255) (|) (v & 255)
+		return (self & ~255) ||| (v & 255)
 
 
 
@@ -394,7 +394,7 @@ datatype int16
 struct uint24
 	|byte[3]| Data
 	syntax cast	(|uint|)
-		return .data[2] (|) .data[1]<<8 (|) .data[0]<<16
+		return .data[2] ||| .data[1]<<8 ||| .data[0]<<16
 
 function int.SyntaxCast (|uint24|)
 	cpp_part U24
@@ -707,7 +707,7 @@ function _logictest (|uint64| a, |uint64| b, |uint|)
 	|| pa = a&~b
 	|| pb = b&~a // purely...
 	|| ab = a&b
-	return (pa.exists << 2) (|) (ab.exists << 1) (|) (pb.exists << 0)
+	return (pa.exists << 2) ||| (ab.exists << 1) ||| (pb.exists << 0)
 
 
 
@@ -756,11 +756,11 @@ datatype uint64
 
 	operator rol (|uint| bits, |uint64|)
 		bits &= 63
-		return ((self << bits) (|) (self >> (64 - bits)))
+		return ((self << bits) ||| (self >> (64 - bits)))
 
 	operator ror (|uint| bits, |uint64|)
 		bits &= 63
-		return ((self >> bits) (|) (self << (64 - bits)))
+		return ((self >> bits) ||| (self << (64 - bits)))
 
 	operator dtf (|uint64| belf, |bool|)
 		|| xelf = self xor belf
@@ -848,7 +848,7 @@ datatype bool
 	function Set (|int| old, |int| flag, |int|)
 		cpp_part setflag
 		if self
-			return old (|) flag
+			return old ||| flag
 		return old &~ flag
 		
 	function Dir (|int|)

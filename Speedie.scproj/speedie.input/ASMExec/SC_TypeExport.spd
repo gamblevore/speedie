@@ -15,7 +15,7 @@ datatype NilState (byte) // Exec.scproj needs this here
 	function Worst (|nilstate| o, |nilstate|)
 		// nil + real = nil
 		// nil + anything = nil
-		rz = self (|) o
+		rz = self ||| o
 		if rz is Nilish
 			rz = Nilish
 	
@@ -29,7 +29,7 @@ datatype NilState (byte) // Exec.scproj needs this here
 		if self == nilish
 			return "nil"
 		return "real"
-			
+		
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type
 	syntax isnt (|nilstate| type, |bool|)

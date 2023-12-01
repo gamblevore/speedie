@@ -134,5 +134,5 @@ function Message.TmpType (|ASMTmp|)
 	return .flags & 63
 
 function Message.TmpType (assigns:|ASMTmp| value)
-	.flags = (.flags &~ 63) (|) value
+	.flags = (.flags &~ 63) ||| value
 

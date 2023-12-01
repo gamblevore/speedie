@@ -159,9 +159,9 @@ SHRU  (U3)
 SHLS  (U3)
 	i1 = i2 >> (u3 + L3)
 BAND  (U3)
-	u1 = u2 &  (u3(|)L3)
+	u1 = u2 &  (u3|||L3)
 BOR   (U3)
-	u1  |= i3(|)L3
+	u1  |= i3|||L3
 BXOR  (U3)
 	u1 = u2 ^ u3
 BNOT  (U2)
