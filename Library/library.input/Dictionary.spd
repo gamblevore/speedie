@@ -122,7 +122,7 @@ class DictionaryReader
 
 
 
-function String.ReplaceAll (|dictionary of string| Dict, |ErrorList| Rec=StdErr, |string|)
+function String.ReplaceAll (|dictionary of string| Dict, |ErrorReceiver| Rec=StdErr, |string|)
 	cpp_wrapper JB_Str_MultiReplaceAll
 
 function SetDecodeEntities (|dictionary of string|Dict, |bool| Value)

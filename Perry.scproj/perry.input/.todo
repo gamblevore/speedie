@@ -3,10 +3,12 @@
 							Todo
 
 * nil-checking	
-	* Collectdecls (on function AndTest), makes params+locals with "x=nil" when its NOT NIL.
 * VM? 
 * Constants and globals don't autocomplete nicely
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
+* clearing colors (msg?) when editing.
+* macro spam error
+* main no longer is clickable if you use mainargs
 
 
 						 Perry Do later

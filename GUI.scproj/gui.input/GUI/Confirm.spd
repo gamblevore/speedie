@@ -6,7 +6,7 @@ module beep
 		app.beep(s)
 
 
-function errorlist.Beep (|bool|)
+function errorreceiver.Beep (|bool|)
 	if .ok
 		return true
 	|| err = .LastError()

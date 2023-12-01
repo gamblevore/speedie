@@ -4,7 +4,7 @@
 // jeebox from the library? To compile without jeebox. Maybe?
 
 
-extend ErrorList
+extend ErrorReceiver
 	function NewWarning (|Message| node=nil, |String| Desc=nil)
 		if .CanAddMore(errorseverity.Warning)
 			self <~ Error(node, desc, errorseverity.Warning)
@@ -52,8 +52,8 @@ function Message.OriginalParseData (|string|)
 extend_module Error
 	function CantParseNum (|Message| Where, |string| num, |int| Pos)
 		visible // for lib
-		|| msg = "Can’t parse number '${num[0,10]}' (found '${num[pos]}')."
-		stderr <~ error(where, msg) // we are done.
+		|| str = "Can’t parse number '${num.preview}' (found '${num[pos]}')."
+		stderr <~ error(where, str)
 
 	function From (|message| self, |error|)
 		opt norefcounts

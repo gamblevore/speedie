@@ -22,6 +22,8 @@ struct NilTracker
 	linkage: cpp_part nil
 	|&NilRecord| 		Line
 	|&NilRecord| 		RowEnd
+	target debug
+		|Scdecl--[32]| 		Dbg
 	|LoopInfo| 			Loops
 	|NilRecord[64]| 	Rows
 	
@@ -45,17 +47,18 @@ struct NilTracker
 		error (abc, "Branch depth too deep (over 63)")
 
 	
-	function BranchSwap (|NilRecord| OldState, |nilrecord|)
+	function BranchSwap (|NilRecord| Earlier, |nilrecord|)
 		rz = *.line
-		*.line = OldState
-
-
+		.set(Earlier, "swap") 
+	
+	
 	function BranchExit (|NilRecord| Earlier,  |nilstate|)
-		|| Dest = --.line
-		Dest[0] = Earlier (|) Dest[1]
+		|| src = .line
+		.line = src - 1
+		.set(Earlier (|) *src, "branchexit")
 
 			
-	function Declare (|scdecl| d, |nilstate| nd, |nilstate|)
+	function Declare (|scdecl| D, |nilstate| nd, |nilstate|)
 		nd &= nilstate.either
 		|| P = .place
 		|| N = p.value.Count
@@ -64,8 +67,10 @@ struct NilTracker
 		
 		if d.Suffers
 			d.NilSuffering = N
+		d.DRegister.Reg = n // right? might as well do this at the same time?
 		d.NilAllocDepth = .currDepth
 		d.NilPrint("add")
+		target debug: .dbg[n] = d
 		return nd
 	
 	function scdecl.NilCurr (|nilstate|)
@@ -90,6 +95,7 @@ struct NilTracker
 		for d in f.args
 			.Declare(d, d.nildeclared)
 		f.NilPrint
+		target debug: niltracker.ndb
 		return f.SourceArg
 
 	function Finish (|scfunction| f)
@@ -102,7 +108,8 @@ struct NilTracker
 		return (T.line)|&nilrecorder|
 
 	module
-		|NilTracker|	T
+		|| ThisLineFails = 0
+		|NilTracker| T
 
 		function Place (|&NilRecorder|)
 			return (T.line)|&nilrecorder|
@@ -125,8 +132,11 @@ struct NilTracker
 			opt norefcounts
 			require app["nil"].Yes
 			
-			for f in compiler.funclist
-				t.purify(f)
+			|| Rec = errorreceiver()
+			using rec
+				for f in compiler.funclist
+					t.purify(f)
+					rec.ReturnErrors
 
 			SCFunction.currfunc = nil
 			StdErr.PrintErrors

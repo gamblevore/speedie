@@ -236,7 +236,6 @@ class TextViewLine (ringtree)
 		|| X = parent.TextLeft
 		|| n = font.Width
 		x += n - 2
-		y -= !parent.isinline
 
 		|| sel = (x+start*N,  y,  x+finish*N,  y+parent.lineheight)
 		sel.x -= (Start == 0)

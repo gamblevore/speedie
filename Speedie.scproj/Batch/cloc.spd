@@ -107,7 +107,7 @@ main
 	
 	counts.Init(app..files)
 	for path in app.args
-		|| dir = path.ExistingFile
+		|| dir = path.filethatexists
 			dir.CountAll(true)
 	counts.report
 

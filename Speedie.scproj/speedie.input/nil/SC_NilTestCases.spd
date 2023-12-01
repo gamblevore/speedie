@@ -7,19 +7,31 @@ class NilTest
 	|?&byte|	V3
 	|&byte|		V4
 	
+	function Abc		
+		|| v = .v3
+		borks // 
+		*v = 'x'
+		
 	function AndTest (|string?| a, |string?| b, |string| cc)
-		StrPrintLine("nilcheck")
 		if (a and b)
-			|| v3 = .v3 // VariableSet failing here. why though? seems like good code!
-			|| v4 = .v4
+			|| p3 = .v3
+			|| p2 = .v3
+			|| p4 = .v4
 			|| x = a.Addr
 			|| y = b.Addr
-			if (v3 and v4?)
-				#!"nothing"
-			if (v3 and v4? and x? and y?)
-				#!"nothing also"
+			if (p2 and p3)
+				*p2 = 0
+
+			if (p3 and p2)
+				*p3 = 0
+
+			if (p3 and p4?)
+				*p4 = 0
+
+			if (p3 and p4? and x? and y?)
+				*x = *y
+				*p3 = *p4
 				
-			
 	
 	function TernTest
 		|| a = ("a",nil)(0.5[])
@@ -156,12 +168,12 @@ function scfunction.NilPrint
 	printline fs
 
 
-function scdecl.NilPrint (|string| reason)
+function scdecl.NilPrint (|string| reason="")
 	cpp_name ndb2
-	debugat 0
 	|| fs = FastString()
-	fs <~ reason
-	fs <~ ": "
+	if reason
+		fs <~ reason
+		fs <~ ": "
 	fs <~ .name ?? "?"
 	fs <~ " "
 	|| d = .NilDeclared
@@ -183,3 +195,35 @@ function nilstate.NilName (|faststring| fs, |bool| Expected)
 	fs <~ .Rawname
 	
 	
+
+target debug {
+function niltracker.Set (|NilRecord| Dest, |string| reason, |nilstate|)
+	pragma inline
+	|| diff = dest xor *.line
+	*.line = dest
+	for i in 32
+		if diff[i]
+			.dbg[i].nilprint(reason)
+	
+
+
+function @niltracker.ndb
+	cpp_name ndb4
+	visible
+	(*T.line).ndb5
+
+
+function nilrecord.ndb5
+	cpp_name ndb5
+	visible
+	for i in .count
+		|| D = niltracker.T.dbg[i]
+			|| Name = D.name
+			|| V = self[i].RawName
+			"$Name:  $V"
+
+} else {
+	function niltracker.Set (|NilRecord| Dest, |string| reason, |nilstate|)
+		pragma inline
+		*.line = dest
+}

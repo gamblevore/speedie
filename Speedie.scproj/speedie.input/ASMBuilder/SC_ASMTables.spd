@@ -126,6 +126,7 @@ datatype ASMtmp (MsgUIFlags)
 		kStatementExpression
 		kSetVar
 		kDebugger
+		kFail
 	
 
 

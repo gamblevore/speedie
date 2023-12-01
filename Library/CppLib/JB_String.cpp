@@ -1091,8 +1091,6 @@ int JB_Str_ByteValue(JB_String* self, int offset) {
 
 void JB_Err__CantParseNum(Message* Where, JB_String* self, int Pos);
 void ParseNumErr_( JB_String* self, uint8* BadPos, Message*& Where ) {
-    require0(Where);
-    
     int CharPos = (int)(BadPos - self->Addr - 1);
     JB_Err__CantParseNum(Where, self, CharPos);
     

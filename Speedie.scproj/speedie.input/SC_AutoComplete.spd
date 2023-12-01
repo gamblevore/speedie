@@ -672,7 +672,7 @@ function TmpAutoComplete (|message| f, |string| name, |string| type, |message|)
 				  else
 					|| arg = rz.msg(@arg, name)
 					|| n = ch.first.name
-					@tmp.msg(arg, n) <~ (@str, n)
+					arg.msg(@tmp, n) <~ (@str, n)
 				
 	if rz.hasany
 		0 //
@@ -707,7 +707,7 @@ function RootTmpComplete (|message| cmd, |message|)
 	for ch in .alltmps
 		|| found = ch.name 
 		if (ch.flags & flags) and (found starts req)
-			|| tmp = @tmp.msg(arg, found)
+			|| tmp = arg.msg(@tmp, found)
 			tmp <~ (@str, found.Before("<"))
 
 
@@ -748,7 +748,7 @@ function AutoComplete (|message| ff, |string| name, |string| Purpose, |message|)
 	|autoitem| Prev
 	for i in arr
 		if i.OKby(prev)
-			|| tmp = @tmp.msg(arg, i.insert)
+			|| tmp = arg.msg(@tmp, i.insert)
 			tmp <~ (@str, i.display)
 			prev = i
 
@@ -760,13 +760,13 @@ function ActualDefine (|message| rz, |message| s, |string| purpose)
 
 
 function scbase.DiissplayObj (|message| rz, |message|)
-	@emb.msg(rz, .autocompletename + " " + .name)
+	rz.msg(@emb, .autocompletename + " " + .name)
 	return rz
 
 
 function message.RenderTypeAndName (|string|)
 	|| d = .MsgDecl
-		return d.RenderTypeAndName(true)
+		return d.RenderTypeAndName(1)
 	return .render
 
 
@@ -787,7 +787,7 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 			return obj.diissplayobj(rz)
 	
 	if (s == @decl) and (!fn or msg.deepequals(s.DeclName))
-		@emb.msg(rz, s.RenderTypeAndName)
+		rz.msg(@emb, s.RenderTypeAndName)
 		return rz
 
 	if !fn
@@ -1055,7 +1055,7 @@ function LocateDefinitionSub (|message| msg, |scobject| already_defined, |scdecl
 	|| src = ty.source
 		if  DisplayOnly  and  ty is const
 			ty.name = msg.name		// unimprove it
-			return ty.WriteDeclFull("", true)
+			return ty.WriteDeclFull("", 1)
 		if src == @decl and src.last == @rel
 			src = src.copy
 			|| L = src.last

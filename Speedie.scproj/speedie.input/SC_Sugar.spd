@@ -146,19 +146,54 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 */
 
 
+function message.CollectUsage (|string|)
+	|| fs = FastString()
+	fs <~ "Usage: \$app "
+	for ch in self
+		if ch.expect(@decl)
+			if !ch.IsFirst
+				fs <~ "   "
+			|| name = ch.DeclName
+			|| optional = (ch.first == @rel)
+				fs <~ "["
+			|| ty = ch.first
+			fs <~ name
+			|| tyfn = ty.func
+			if tyfn == @arr
+				ty = ty.first
+			|| type = ty.name
+			if type contains "file"
+				type = "file-path" // clean up messy stuff like "filedata"
+			  elseif type ~!= "string"
+				fs <~ " ($type)"
+			if optional
+				fs <~ "]"
+			if tyfn == @arr
+				fs <~ " [...]"				// def (string),  abc (int)...
+	return fs
+
 
 function message.InsertMainArgs (|message| prms)
 	opt norefcounts
-	self <~ "|| __ArgCount = app.args.length".parse
+	|| usage = prms.CollectUsage
+	|| FirstArg = `
+if !app.usage
+	app.usage = "_0"
+|| __ArgCount = app.args.length
+if __ArgCount == 0
+	printline app.usage.replaceall("\$app", app.calledname.name)
+	return 0
+`
+
+	self <~ (firstarg.macro, [Usage.msg])
 	|| i = 0
 	|| Found = 0
 	for ch in prms
-		if ch.expect(@decl)
-			Found |= ch.MainOneArg(self, i++, Found)
+		Found |= ch.MainOneArg(self, i++, Found)
 
 	ifn found&1
 		macros.mainargfinal.clean
-		self <~ (macros.mainargfinal, [i.msg])
+		self <~ (macros.MainArgFinal, [i.msg])
 
 	self <~ "require stderr.ok".parse
 

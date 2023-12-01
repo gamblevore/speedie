@@ -62,7 +62,9 @@ function compiler.AppleBuildApp (|file| project, |file| product)
 
 
 
-|| codesign_native = "codesign_osx"
+constants
+	codesign_native = "codesign_osx"
+
 function compiler.CodeSign (|file| gui_exe)
 	|| sign = app.prefs(codesign_native)
 		gui_exe.codesign(sign)

@@ -47,7 +47,7 @@ class FastString {
 
 	function Size (|int|)				{ cpp_wrapper JB_FS_Size }
 	function Size (assigns:|int|)		{ cpp_wrapper JB_FS_SizeSet }
-	function AppendMultiReplace (|string|s, |dictionary of string| m, |ErrorList| Rec=stderr) { cpp_wrapper JB_FS_AppendMultiReplace }
+	function AppendMultiReplace (|string|s, |dictionary of string| m, |ErrorReceiver| Rec=stderr) { cpp_wrapper JB_FS_AppendMultiReplace }
 		
 	function AppendHex (|int64|Num, |int|RoundTo=2)
 		cpp_wrapper JB_FS_AppendHex

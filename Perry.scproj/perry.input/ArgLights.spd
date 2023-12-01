@@ -37,7 +37,7 @@ function textview.EnvValidation (|message| msg)
 
 
 function ArgValidation (guitextevent)
-	using ErrorList()	
+	using errorreceiver()	
 		|| msg = .text.parse // really we should be able to use textview.parse, but it seems one state behind for this.
 			.ArgValidationSub(msg)
 		while (|| err = StdErr.Pop)

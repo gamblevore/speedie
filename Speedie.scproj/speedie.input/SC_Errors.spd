@@ -238,4 +238,4 @@ extend Error
 
 
 
-|| ErrorDelayer = errorlist()
+|| ErrorDelayer = ErrorReceiver()

@@ -148,7 +148,7 @@ function AutoConstructor
 			if name ~= "super"
 				name = "sooper"
 			check (name != "__rz__") (prop.source, "Invalid name.")
-			prms <~ prop.WriteDeclTypeAndName(name, false)
+			prms <~ prop.WriteDeclTypeAndName(name, 0)
 			arg  <~ «rel
 				«sdot name »
 				«opp "=" »

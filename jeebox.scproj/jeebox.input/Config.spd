@@ -21,11 +21,9 @@ role config (message)
 		return .nyme
 	
 	function Save (|bool|)
-		|| f = .obj
-		if f isa file
+		|| f = .obj as file
 			|| p = .render
-			|error| err
-			if p.ParseWithError(Err)
+			if p.ParseWithError(nil)
 				return f.smartdata(p) 
 
 

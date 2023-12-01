@@ -1,20 +1,20 @@
 
 
-|ErrorList| StdErr = ErrorList.new
-|ErrorList| StdErrOriginal = stderr
+|ErrorReceiver| StdErr = ErrorReceiver.new
+|ErrorReceiver| StdErrOriginal = stderr
 
 // hmmm... what should I do?
 // how to remove log
 
-prototype fnErrorLogger (|errorlist| self, |string| Data)
+prototype fnErrorLogger (|ErrorReceiver| self, |string| Data)
 
-class ErrorList
+class ErrorReceiver
 	linkage
 		cpp_part Rec
 		cpp_class JB_ErrorReceiver
 		visible true
 
-	contains ErrorList
+	contains ErrorReceiver
 
 	|Error|					Errors
 	|fnErrorLogger| 		_LogFunc
@@ -190,7 +190,7 @@ class ErrorList
 		return .errorcount + .problemcount
 		
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
-		require !.BlockErrors and !ErrorList.OutOfMemory
+		require !.BlockErrors and !ErrorReceiver.OutOfMemory
 		if level == ErrorSeverity.problem
 			return (.problemcount < .maxproblems)
 		if level >= ErrorSeverity.error // a warning
@@ -203,15 +203,17 @@ class ErrorList
 		stderr = self
 
 		
-	Syntax Using (|ErrorList|)
+	Syntax Using (|ErrorReceiver|)
 		|| old = stderr
 		stderr = self
 		return old
+	
 	
 	function ReturnErrors
 		opt norefcounts
 		for e in self
 			stderr <~ e
+
 
 	function LastError (|error|)
 		visible

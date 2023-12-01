@@ -7,8 +7,8 @@ extend_module NilTracker {
 		@type:	First
 		@func:	Function
 		@tmp:   StatementJump
-		@dot:	Property
-		@acc:	UseChildAsReal
+		@dot:	PropertyOrAccess
+		@acc:	PropertyOrAccess
 		@brel:	brel
 		@rel:	Rel
 		@decl:	Declaration
@@ -26,6 +26,7 @@ extend_module NilTracker {
 		(asmtmp.kContinue):		Continue
 		(asmtmp.kExit):			Exit
 		(asmtmp.kReturn):		Return
+		(asmtmp.kFail):			Fail
 		63: // for size also
 
 	
@@ -50,7 +51,7 @@ macro Jump// (NilTrackerFn)
 	({|| abc = _1, (NilSyxes[abc.func])(abc, _2)})
 
 					
-function UseChildAsReal (NilTrackerFn) 	// a.b, *a, a[0], (a)()
+function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| ch = msg.first
 		|| actual = .Jump(ch, 0)
@@ -66,8 +67,8 @@ function Rel (NilTrackerFn)
 	return ProcessCondRel(msg, test)
 
 
-function Property (niltrackerfn)
-	return .UseChildAsReal(msg, test)
+function PropertyOrAccess (niltrackerfn)
+	return .UseChildAsReal(msg)
 
 	
 function Function (NilTrackerFn)
@@ -162,8 +163,9 @@ function WhileInner (|message| Cond)
 	
 
 function WhileExit (|message| Cond, |bool| WhileTrue)
-	// put the inverse of the condition, into the exit decls
 	if WhileTrue
+		// its not possible to detect whether or not it will end... HOWEVER
+		// we just do this for simple error detection. Useful for errors in macros. 
 		expect (t.Loops.ExitCount) (cond, "Loop never exits.")
 	  else
 		.jump(cond, NilCheckMode.softneg)
@@ -318,7 +320,17 @@ function Argument (Niltrackerfn)
 		|| T = test * s.islast  // easier debugging
 		debugger
 		rz = .jump(s, T)
+		.HandleFail(s)
 	.Decls = C
+
+
+function HandleFail (|message| msg)
+	pragma inline
+	require .ThisLineFails
+	.ThisLineFails--
+	if !.ThisLineFails
+		expect (!stderr.ok) (msg, "Nil-checker did not detect error here!")
+		stderr.clear
 
 	
 function Bracket (Niltrackerfn)
@@ -368,8 +380,10 @@ function SetRel (niltrackerfn)
 	|| Dest = L.nildecl
 	if Dest.NilSuffering
 		return .VariableSet(Dest, R.nildecl, L, R)
-	return nilstate.real
 
+
+function Fail (NilTrackerFn)
+	.ThisLineFails = 2
 
 function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|)
 	opt norefcounts

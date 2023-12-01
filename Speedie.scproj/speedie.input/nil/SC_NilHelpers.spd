@@ -88,4 +88,4 @@ function scfunction.LimitTests (|bool|)
 	opt norefcounts
 	|| c = .Lookup
 		if c.name contains "NilTest"
-			return .SourceArg contains "nilcheck"
+			return true

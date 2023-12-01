@@ -1,9 +1,19 @@
 #!/usr/local/bin/spd
 
+
+app.usage = "Usage: cloc path [...]
+--types=cpp/c/h               Only report these types
+--quiet=true/false            Makes less output
+-k                            Keeps errors
+-s                            Report parse speed
+-p                            Print parse Tree
+-m                            Report Memory Usage
+-h                            Histogram
+" // set this before getting into main
+
+
+
 main  (|[existingfile]| files)
-	if !app.args
-		return .Usage
-	
 	counts.Init(app["types"])
 	for dir in files
 		dir.CountAll(true)
@@ -127,19 +137,6 @@ function file.CountAll (|bool| force=false)
 		return
 	if force or counts.exts[.ext]
 		.cloc
-
-
-
-function app.Usage (|int|)
-	"Usage: cloc path
---types=cpp/c/h               Only report these types (defaults to ${counts.DefaultExt})
---quiet=true/false            Makes less output
--k                            Keeps errors
--s                            Report parse speed
--p                            Print parse Tree
--m                            Report Memory Usage
--h                            Histogram
-"
 
 
 function Counts.ReportHisto

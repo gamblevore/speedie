@@ -72,8 +72,7 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
 		.AddSelfToFunc(cls, AddToSpace)
 
 	for item in prms
-		// can remove some shit thats only applicable here... :D
-		require item.CollectOneParam(self, AddToSpace, cls)
+		item.CollectOneParam(self, AddToSpace, cls)
 
 
 function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)

@@ -22,9 +22,12 @@ class Message (RingTree)
 												// then we can do |object| or |uint64|
 	|Syntax|				Func
 	|Byte|					Indent
-	|MsgUIFlags|			Flags
 	|uint16|				RangeLength
-	|uint16|				Tag
+
+
+////////////////////////////////		
+	|MsgUIFlags|			Flags				// useful bits for you to set.
+	|uint16|				Tag					// Jeebox does not use these itself.
 ////////////////////////////////		
 			
 	constructor (|Message| other)
@@ -1019,11 +1022,11 @@ class Message (RingTree)
 	
 	Syntax Append (|syntax| Fn, |string| name="")
 		cpp_part AppendSyx
-		fn.msg(self, name)
+		.msg(fn, name)
 	
 	Syntax Append (|int64| Num)
 		cpp_part AppendNum
-		@num.msg(self, num.render)
+		.msg(@num, num.render)
 
 	setter Int (|int64|)
 		.Func = @num

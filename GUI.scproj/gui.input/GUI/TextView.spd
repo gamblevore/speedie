@@ -834,7 +834,7 @@ class TextView (GUIControl)
 	function ShowParseError
 		.errorat(.myerror)
 	
-	function FillErrors (|errorlist| err)
+	function FillErrors (|errorreceiver| err)
 		for e in err
 			.ErrorAt(e)
 	

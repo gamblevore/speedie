@@ -103,7 +103,7 @@ helper @string.MainArgSub (|int| Pos,  |string| name, |string| type,   |stringth
 	if str != nil
 		return str
 	if StdErr.ok
-		|| usage = app.conf(`usage`)
+		|| usage = app.Usage
 		error "Missing $name ($type).\n\n$usage"
 	return string.Error
 

@@ -43,6 +43,6 @@ class Anagrams
 
 main
 	using "total"
-		|| d = Anagrams.find(app[0] ?? "hedgehog")
+		|| d = Anagrams.find(app.args[0] ?? "hedgehog")
 		for (v in d) (k)
 			printline v + " <-- " + k

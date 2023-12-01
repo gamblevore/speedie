@@ -446,7 +446,7 @@ function Message.TernaryFix (|message| exp) {
 
 
 function Create_JeeboxTest (|Message| msg)
-	using (errorlist.new)
+	using (ErrorReceiver.new)
 		|| f = Compiler.InputFile( nil, "self_test.txt", nil )
 		expect (f!=nil) "self_test.txt can’t be found."
 		|| s = f.ReadAll

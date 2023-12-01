@@ -44,7 +44,6 @@ extend message
 
 
 	helper MacroSame (|message| prm, |message|)
-		require prm.expect(@thg)
 		rz = .copy
 		(prm is inserted)
 		rz.name = prm.name

@@ -297,7 +297,7 @@ class SCDecl (SCObject) {
 
 	render
 		if self
-			.WriteDeclFull.Render(fs)
+			.WriteDeclFull("", 2).Render(fs)
 	
 	
 	function SyntaxExpect
@@ -316,7 +316,7 @@ class SCDecl (SCObject) {
 		return fs
 
 
-	function WriteDeclFull (|String| DeclName = "", |bool| minimal = false, |Message|)
+	function WriteDeclFull (|String| DeclName = "", |int| minimal = 0, |Message|)
 		DeclName := .Name
 		expect DeclName or !.default
 		
@@ -325,19 +325,24 @@ class SCDecl (SCObject) {
 		return «decl, .WriteType(minimal) »
 	
 
-	function RenderTypeAndName (|bool|minimal,|string|)
+	function RenderTypeAndName (|int| minimal, |string|)
 		return .WriteDeclTypeAndName("", minimal).render
 	
 	
-	function WriteDeclTypeAndName (|String| Name, |bool| minimal, |Message|)
+	function WriteDeclTypeAndName (|String| Name, |int| minimal, |Message|)
 		name := .Name
 		return « decl,  .WriteType(minimal),  «Thg name » »
 	
 	
-	function WriteDeclSub (|String| Name, |bool|minimal, |Message|)
+	function WriteDeclSub (|String| Name, |int| minimal, |Message|)
 		|| dcl = «decl, .WriteType(minimal) »
-		|| def = .Default ?? .Type.defawlt
-		if !def or .pointercount
+		|| def = .Default
+		if !def and minimal >= 2
+			dcl.msg(@Thg, name)
+			return dcl
+		def := .Type.defawlt
+
+		if !def or (.pointercount and minimal < 2)
 			def = «thg "nil"»
 		  else
 			def = def.copy
@@ -352,11 +357,7 @@ class SCDecl (SCObject) {
 				»
 			»
 		
-		dcl <~ «rel
-			«Thg name »
-			«opp "="»
-			def
-		»
+		dcl <~ neweqrel(«Thg name », def)
 	
 		Return dcl
 	
@@ -614,7 +615,7 @@ class SCDecl (SCObject) {
 			return .contains.MiniMatch(ty)
 		
 		
-	function WriteType (|bool| minimal = false, |Message|)
+	function WriteType (|int| minimal = false, |Message|)
 		opt norefcounts
 		|| simple = .WriteSimpleType
 		if !.Contains or (minimal and .AlreadyContains)

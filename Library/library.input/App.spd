@@ -6,12 +6,12 @@
 
 module App {
 |[string]|					OldArgs = nil
+|string| 					Usage
 |message|					_Conf
 |config|					_Prefs
 |string| 					_Path
 |file|						_StdOut
 |file|						_stdin
-|string|					codesign_native = "codesign_osx"
 
 function Sleep (|float| Duration)
 	.sleep(duration.date)
