@@ -4,11 +4,11 @@ https://github.com/gamblevore/speedie/blob/main/Documentation/Message.md // docs
 file:///usr/local/speedie/Documentation/Messages.md						 // locally
 
 main (|existingfile| input)
-	|| jb = input.Parse						#require
+	|| jb = input.parse
 	if input isa "xml"
 		jb.XMLToJeebox
 		|| BoxFile = input.setext("box")
-		if BoxFile <~ jb.render		// write to disk
+		if BoxFile <~ jb		// write to disk
 			"Converted XML to Jeebox: $boxfile"
 
 	|| Found = BookSearch(jb, app.Switches)
@@ -16,19 +16,19 @@ main (|existingfile| input)
 		for bk in found
 			"$bk"
 	  else
-		"Can't find any books by: ${app.Switches}"
+		"Can't find any books using: ${app.Switches}"
 		
 		
 function BookSearch (|message| BookFile, |[string]| Queries, |[message]|)
-	for book in BookFile[@tmp, "catalog"][@arg]
-		if book.Expect(@tmp, "book") 
-			if book.TestBook(Queries)
-				rz <~ book
+	|| list = BookFile[@tmp, "catalog"][@arg]
+	for book in list
+		rz <~ book.TestBook(Queries)
 
 
-function message.TestBook (|[string]| queries, |bool|)
+function message.TestBook (|[string]| queries, |message|)
+	require .Expect(@tmp, "book") 
 	for row in .last(@arg)
 		for Q in queries
 			if row ~= q.ArgName		// ~= is like == but case-insensitive
 				require row.first.name contains q.ArgValue
-				rz = true
+				rz = self

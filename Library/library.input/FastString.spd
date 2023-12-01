@@ -130,6 +130,7 @@ class FastString {
 		self <~ '"'
 		.appendescape(s)
 		self <~ '"'
+	
 	function AppendEscape (|string| s)
 		.AppendMultiReplace( s, jeebox.EscapeStr )
 

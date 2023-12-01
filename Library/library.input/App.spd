@@ -26,9 +26,7 @@ function TrySleep (|float| Duration, |bool|)
 	return .trysleep(duration.date)
 	
 syntax access (|int| i, |string|)
-	if .args > i
-		return .args[i]
-	error "Missing shell argument: " + i.Render
+	disabled "use app.args[i]"
 
 function Yes (|string| name, |bool|)
 	return app[name].yes

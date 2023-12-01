@@ -96,6 +96,10 @@ class File (String)
 	Syntax Append (|string| data)
 		.write(Data)
 	
+	Syntax Append (|messageroot| msg)
+		cpp_Part WriteMsg
+		.msg.render(.out(false))
+	
 	function string.Visible (|bool|)
 		return *.name != '.'
 		
@@ -106,7 +110,7 @@ class File (String)
 		if (.size != nieu.length) or (.readall(true) != nieu)
 			return .data(Nieu)
 	
-	operator plus (|string|s, |file|)
+	operator plus (|string| s, |file|)
 		return (super+S).file
 	
 	
@@ -379,17 +383,17 @@ class File (String)
 		rz = FastString()
 		rz.file = f
 
-	function string.In (|string|Header="", |int| ChunkSize=4MB, |StringReader|)
+	function string.In (|string| Header="", |int| ChunkSize=4MB, |StringReader|)
 		|| f = .file
 		if f.mustexist("stream")
 			rz = StringReader(f, chunkSize)
 			if !rz.test(Header)
 				rz = nil
 	
-	function Copy (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
+	function Copy (|File| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		disabled "Use .Copyto"
 	
-	function CopyTo (|File| Dest, |bool|AttrOnly=false, |ErrorInt|)
+	function CopyTo (|File| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		cpp_wrapper JB_File_Copy
 	
 	function CopyAll (|string| Dest, |bool| AttrOnly=false, |ErrorInt|)
@@ -401,7 +405,7 @@ class File (String)
 			if !rz
 				exit
 	
-	function List (|bool|invis = false, |[string]|)
+	function List (|bool| invis = false, |[string]|)
 		flow off
 		for name in self
 			if (invis) or (*name != '.')
@@ -417,7 +421,7 @@ class File (String)
 		|| fp = f.pathdir
 		return super[0, fp.length] == fp
 			
-	function Read (|int| Length, |bool|AllowMissing=true, |string|)
+	function Read (|int| Length, |bool| AllowMissing=true, |string|)
 		cpp_wrapper JB_File_Read
 
 	function Skip (|int| n=1)

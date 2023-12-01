@@ -88,6 +88,14 @@ extend String
 	function SyntaxAppend (|string| s, |bool|)
 		return .write(s)
 
+
+	Syntax Append (|messageroot| msg, |bool|)
+		cpp_Part WriteMsg
+		|| fs = .out$
+		msg.render(fs)
+		return true
+
+
 	function Sibling (|string| name, |string|)
 		return .ReplacePathComponent(-1, Name)
 		
