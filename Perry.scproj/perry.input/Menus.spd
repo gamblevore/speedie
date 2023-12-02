@@ -2,7 +2,6 @@
 
 function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
 	|| p = .SubMenu
-	|| x = (1, 2, 3)
 	|| orig = l
 	p.listsource.clear
 	while l
