@@ -292,7 +292,7 @@ function Message.ParamNum (|int|)
 		if self == "self":			return 0
 		if *.name == '_'
 			if .length == 1:		return 1
-			if stderr.ok:			return .int
+			return .int
 	return -1
 
 
