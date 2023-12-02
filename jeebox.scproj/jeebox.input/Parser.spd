@@ -1041,13 +1041,15 @@ extend Parser
 				
 			  else
 				gotspaces = false
-					
 				n--
+				
 				if (c != '/')
 					exit
-				if (addr[n+1] == '*')
+				|| c2 = addr[n+1]
+				if (c2 == '*')
 					rz.lines++
 					rz.indent = 0
+					
 				.nextstart = n
 				|| line = .Process( kendofline, Parser.kAllow, parent )
 				n = .nextstart
