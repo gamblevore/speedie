@@ -135,10 +135,7 @@ helper StringReader.NextMsgInfo (|uint64|)
 
 	|| T = (info >> 1)|syntax|
 	if (t < @max and T > @nil) // 01 --> T=@nil
-		msg = msg.msg(t, .str(.hInt))
-		if t == @arg
-			(msg is style2)
-			
+		msg = msg.msg(t, .str(.hInt))			
 		if info & 1
 			.userobj = msg
 		return msg|uint64|

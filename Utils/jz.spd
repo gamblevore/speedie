@@ -55,7 +55,6 @@ datatype Type (int)
 
 function app.UseOne (|file| f)
 	conv.in = f
-	1
 	conv.out = conv.OutPath
 	conv.RealOut = conv.out
 	if conv.Dest is selfreplace

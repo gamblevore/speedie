@@ -642,13 +642,13 @@ extend Parser
 
 	function fArgOpen (ParseHandler)
 		rz = parser.new( nil, @Arg, start )
-		(rz is style2)
+//		(rz is style2)
 		parser.ParseLoopFlags( rz, "}", ktemporal )
 
 
 	function fArgColon (ParseHandler)
 		rz = parser.new( nil, @arg, start )
-		(rz is style2)
+//		(rz is style2)
 		rz.RangeLength = 1
 		while {
 			|| Item = .Process( kTemporal, rz ) ?? .ProcessThing
@@ -949,15 +949,17 @@ extend Parser
 			if last != @emb
 				return parser.UnexpectedSyntax(last)
 			last.func = @arg
+			(last is style2)
 			return last
 	
-		return parser.new( tmp, @Arg, tmp.position)
+		rz = parser.new( tmp, @Arg, tmp.position)
+		(rz is style2)
 
 
 	helper Message.InInvisArg (|bool|)
 		Opt NoRefCounts
 		|| p = .parent
-		return (p == @arg) and (p isnt style2)
+		return (p == @arg) and (p is style2)
 
 
 	helper Message.IndentScore (|int|)
@@ -984,7 +986,7 @@ extend Parser
 	
 		|| chin = curr.CleanIndent
 		while output.indentScore > chin
-			if  output == @arg  and  output is style2
+			if  output == @arg  and  output isnt style2
 				return parser.indentbug(curr)
 			output = output.parent
 			if !output
