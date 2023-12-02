@@ -114,8 +114,8 @@ extend Parser
 	
 	
 	function ErrorAdd (|String| s, |ind|Start = parser.NextStart, |Message|)
-		require .OK //  multiple errors... per parse gets STUPID.
-		return .ErrorAlwaysAdd(s, start)
+		if .OK //  multiple errors... per parse gets STUPID.
+			return .ErrorAlwaysAdd(s, start)
 	
 
 	function OK (|bool|)
