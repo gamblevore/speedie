@@ -13,6 +13,7 @@ class NilTest
 		*v = 'x'
 		
 	function AndTest (|string?| a, |string?| b, |string| cc)
+
 		if (a and b)
 			|| p3 = .v3
 			|| p2 = .v3
@@ -104,11 +105,9 @@ class NilTest
 		return .Exists3(nil)
 
 // pointers
-	function GoodPtr (|&niltest| p)
+	function GoodPtr (|&niltest| p, |&niltest| p2)
 		*p = self
-		
-	function DoubleGoodPtr (|&niltest| p)
-		(*p).v++
+		(*p).v
 
 	function BadGoodPtr (|&niltest| p)
 		if p
