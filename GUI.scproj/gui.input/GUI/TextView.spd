@@ -1156,6 +1156,8 @@ class TextView (GUIControl)
 
 
 	helper ValidateNewText (|message|)
+		if .MyError is parse
+			.MyError = nil
 		|| msg = .text.ParseWithError(.myerror)
 			msg.obj = .path
 
