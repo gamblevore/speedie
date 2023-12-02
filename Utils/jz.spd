@@ -1,6 +1,13 @@
 #!/usr/local/bin/speedie
 
 
+// bugs:
+// * -r doesnt report properly on my large-file.json
+// * doesnt realise that json.mz is a json file... when converting to jeebox
+// * how to specify that something is json?
+// * jz file.mz does not decompress it??
+
+
 app.Usage = "Usage: jz File1 [File2...]
 Convert files between jbin, box, xml formats. Additionally can compress or decompress.
 
@@ -22,14 +29,14 @@ examples:
 
 datatype Type (int)
 	flags
-		ReadOK, Compressed, PreComp, Plain, XML, actions=(Box, Jbin, Report), StdOut, SelfReplace, TestComp
+		ReadOK, Compressed, PreComp, Plain, XML, Json, actions=(Box, Jbin, Report), StdOut, SelfReplace, TestComp
 	
 	syntax is (|Type| test, |bool|)
 		return self & test 
 	syntax isnt (|Type| test, |bool|)
 		return !(self & test)
 	function Format (|Type|) 
-		return self & (Box (|) jbin (|) xml)
+		return self & (Box ||| jbin ||| xml ||| json)
 	
 	render
 		if self is Compressed
@@ -38,6 +45,8 @@ datatype Type (int)
 			fs <~ "jbin"
 		  elseif self is box
 			fs <~ "jeebox"
+		  elseif self is json
+			fs <~ "json"
 		  elseif self is xml
 			fs <~ "xml"
 		  else // speedie can't put this on a single line. C++ compile-error!
@@ -46,6 +55,7 @@ datatype Type (int)
 
 function app.UseOne (|file| f)
 	conv.in = f
+	1
 	conv.out = conv.OutPath
 	conv.RealOut = conv.out
 	if conv.Dest is selfreplace
@@ -287,6 +297,12 @@ module Conv
 			.detected |= type.plain
 		  elseif .data.IsJbin
 			.detected |= type.jbin
+		  elseif .in isa "json"
+			.detected |= type.json
+			if dest isnt report
+				.start = date.now
+				.AST.ConvertJSONToJB
+				.time("Convert JSON")
 		  elseif .AST.Find(@xml)
 			.detected |= type.xml
 			if dest isnt report
@@ -378,8 +394,8 @@ module Conv
 		|| str = .in.Section(0, 32) // can't just clip jbin like this. We just want a preview :(
 			if str == string.error
 				return str
-		// we'd have to make a new API that can read say 2 or 3 messages, with a small stream chunksize
-		// not doing that now!!
+		// we'd have to make a new API that can read say 2 or 3 messages, with
+		// a small stream chunksize not doing that now!!
 		
 		|| T = str.IsJbin #require
 		|| mz = str.parsejbin
