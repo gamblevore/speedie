@@ -18,7 +18,7 @@ struct NilRecorder
 	linkage:cpp_part NRC
 	|nilrecord| 	Value
 	syntax call (|int| item, assigns:|nilstate| value)
-		if value &~ nilstate.either
+		value &= nilstate.either
 		item <<= 1
 		|| Mask = NilState.either << item
 		.value = (.value &~ Mask) ||| (value << item)

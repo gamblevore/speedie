@@ -129,10 +129,8 @@ class NilTest
 		|niltest|  x2 = x1.exists7
 		|string|   x3				// defaults
 		
-		// assume can be nil
-
 		|niltest?| n0 
-		|niltest|  n1 // for sure can be nil
+		|niltest|  n1
 	
 
 

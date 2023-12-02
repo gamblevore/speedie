@@ -53,11 +53,15 @@ macro Jump// (NilTrackerFn)
 					
 function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
+	|| dcl = msg.nildecl
+	if dcl is onmodule
+		debugat
+		return dcl.nildeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch, 0)
 		if actual == nilstate.either
 			.BecomeReal(ch.nildecl, ch)
-	return msg.nildecl.nildeclared
+	return dcl.nildeclared
 
 
 function Rel (NilTrackerFn)
@@ -422,7 +426,6 @@ function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 	if curr == R
 		return curr
 	
-	debugat
 	if sent is param  and  Curr == nilstate.either
 		if !sent.NilStated
 			sent.NilDeclared = NilState.real

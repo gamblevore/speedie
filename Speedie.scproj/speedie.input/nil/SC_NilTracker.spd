@@ -79,8 +79,8 @@ struct NilTracker
 		return (niltracker.Decls)[.NilSuffering]
 	
 	function SetNilness (|SCDecl| d, |NilState| New, |nilstate|)
-		|| R = .place
-		(R)(d.nilsuffering) = new
+		pragma inline
+		(.place)(d.nilsuffering) = new
 		d.NilPrint("set")
 		return New
 
