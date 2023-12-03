@@ -9,8 +9,6 @@
 * clearing colors (msg?) when editing.
 * notifications kinda flicker when switching tabs. We want a "SOLID" feel. Not anxious. :) 
 * main no longer is clickable if you use mainargs
-* constructors and destructors are always real
-* Style2 should be invisargs
 
 
 						 Perry Do later

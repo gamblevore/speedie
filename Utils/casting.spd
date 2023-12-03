@@ -19,7 +19,8 @@ main
 
 class Vehicle
     |String| name
-  
+ 
+
 class Car (Vehicle)
     |string| brand
     constructor (|String| name, |String| brand)
@@ -27,7 +28,7 @@ class Car (Vehicle)
         .brand = brand
 
 function TestCasting
-	|| myVehicle = Car("My Car", "Tesla")
+	|Vehicle| myVehicle = Car("My Car", "Tesla")
 	|| myCar = myVehicle as Car
 	    "My car's brand is ${myCar.brand}"
 	  else

@@ -16,7 +16,7 @@ linkage
 |[SCDecl]|					Properties
 |SCDecl|					TypeNormal
 |SCDecl|					TypeOptional
-|SCDecl|					TypeVeryExists
+|SCDecl|					TypeReal
 |[SCFunction]|  			Casts
 |[SCClass]|					Children
 |SCDecl|					Contained
@@ -79,7 +79,7 @@ constructor (|Message| node, |SCBase| parent)
 		T.nildeclared = nilstate.Real
 	.TypeNormal = T
 	.TypeOptional = T.NilConstructor(NilState.optional * !IsDataType)
-	.TypeVeryExists = T.NilConstructor(NilState.Real * !IsDataType)
+	.TypeReal = T.NilConstructor(NilState.Real * !IsDataType)
 	
 	if node == "struct"
 		T = T.GetAddress

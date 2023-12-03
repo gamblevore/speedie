@@ -790,7 +790,7 @@ class SCDecl (SCObject) {
 		if .PointerCount
 			.NilDeclared = NilState.real
 			return self
-		return .MakeExistance(nilstate.real,  .type.TypeVeryExists)
+		return .MakeExistance(nilstate.real,  .type.TypeReal)
 
 
 	function BecomeReal

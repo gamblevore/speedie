@@ -830,6 +830,7 @@ function scfunction.CanDoRefs (|bool|)
 
 function RefConstructors
 	opt norefcounts
+	require stderr.ok
 	for f in .FuncList
 		if f.CanDoRefs
 			f.BuildConstructorDestructor
@@ -956,9 +957,9 @@ function AddGlobalConst (|string| name, |SCClass| c, |SCDecl|)
 
 
 function MakeMainFunc (|message|)
-	|| f = .GetMainSub
+	|| f = .GetMainSub 
 		// really... app.main shouldn't inherit from app, but from the user's project
-		// I mean... its a func that should always be there. But it is the user's
+		// I mean... its a func that should always be there. But it is the user's.
 		// fix that later.
 		f.blindcasts = errorseverity.error // this for now.
 		return f.sourcearg

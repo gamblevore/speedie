@@ -741,10 +741,11 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 
 
 function SCFunction.BuildConstructorDestructor
-	require (self is ConOrDes) and StdErr.OK				// require !.cls.IsRole
+	require self is ConOrDes
 	
 	|| root = .SourceArg
 	|| IsConstructor = self is Constructor
+	.args[0] = .args[0].makereal
 
 	|| TheCall = .CallParents( root, IsConstructor )
 	.FillInConstructorAndDestructor( root, IsConstructor, TheCall )

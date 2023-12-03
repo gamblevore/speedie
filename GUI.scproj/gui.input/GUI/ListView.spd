@@ -552,7 +552,7 @@ class ListView (GUIControl) {
 				return true
 
 
-	function scrollProtect
+	function ScrollProtect
 		opt norefcounts
 		|| s	= ._scroll
 		ifn .listsource contains s
@@ -1352,18 +1352,18 @@ class ListView (GUIControl) {
 		.ScrollProtect
 		
 		|| rect = .FilteredRect
-		|| L = .listsource
+		|| L = .ListSource
 		
 		.CalculateSkips
 		.DrawMarks(where, rect)
 		
 		rect.y2 += .ScrollSlide
-		|| End = .end
+		|| End = .End
 		
-		|| clip = where.controlclip
+		|| clip = where.ControlClip
 		for r.visible in self
-			rect.y = rect.y2 - .rowheight
-			|| D = (r.depth(self), 0)(.istree)
+			rect.y = rect.y2 - .RowHeight
+			|| D = (r.depth(self), 0)(.IsTree)
 			r.ListRowDraw(rect, Where, self, D)
 			rect.y2 = rect.y
 			.CanSeeAllLines = (r == end and .start == ._scroll)
@@ -1373,7 +1373,7 @@ class ListView (GUIControl) {
 		|| cmm = .cmm
 			.RowBorderDraw(._scroll, cmm.EditingRow, .RowHeight, where, ¥.border)
 
-		|| re = .rowbounds(._scroll, .draggingrowto, 1)
+		|| re = .RowBounds(._scroll, .DraggingRowTo, 1)
 			re = re up .rowheight
 			ifn .draggingrowto.prev
 				re = re down 2
@@ -1381,15 +1381,14 @@ class ListView (GUIControl) {
 		
 		.SetInlineSize
 		
+		where.RectOutlineOnly(.lastrect, .gnormal.edge, .gnormal.bg, .EdgeAllow)
+
 		if .CanSeeAllLines
-			.scrolldrawtimer = 0
+			.ScrollDrawTimer = 0
 		  else
 			if self isa menu
 				.ScrollDrawTimer = 1							// oooop
 			scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer_)
-		
-		where.RectOutlineOnly(.lastrect, .gnormal.edge, .gnormal.bg, .EdgeAllow)
-
 	
 	helper guicontrol.EdgeAllow	(|MoveCode|)
 		opt norefcounts
