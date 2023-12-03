@@ -58,7 +58,7 @@ datatype byte
 		return .IsInt  or  .in('a', 'f')  or  .in('A', 'F')
 
 	function IsInt (|bool|)
-		return .in('0', '9')
+		return (self|int| - '0')|uint| <= 9
 		
 	operator eq (|byte| b, |bool|)
 		self = .lowercase
