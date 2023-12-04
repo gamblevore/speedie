@@ -1769,9 +1769,8 @@ class TextView (GUIControl)
 		target debug
 			if (self ~= "Editme")
 				if keys.shift
-		d = d.ReclaimStart(._reclaim[0])
-		|| FUCKKKKK = .reclaimrestart(d)
-				
+		// d = d.ReclaimStart(._reclaim[0])
+		|| ARGH = 0		// .reclaimrestart(d) // disabled for now.
 		|| t = d.tline
 		|| p = d.position
 		
@@ -1782,22 +1781,19 @@ class TextView (GUIControl)
 				msg = d.colorise(msg, ParsedOK)
 			loop p >= 0
 			|| n = d.next
-			if  !n  or  n.position < ._reclaim[1]
+			if  true  or  !n  or  n.position < ._reclaim[1]
 				d = .nextvline(d, d)
-			  elseif p < FUCKKKKK
+			  elseif p < ARGH
 				d = .nextvline(d, nil)
 			  else
 				d = d.ReclaimEnd(t, ._reclaim[2])
 				exit
 
-		.EndPrepare(d, stayatend, pos)
+		.EndPrepare(d, StayAtEnd, pos)
 
 	
 	function ReclaimRestart (|textviewline| d, |int|)
-		return int.max // still can't solve this fucker.
-		// absolutely fucked on this.
-		// putting it away.
-		// i hate this.
+		return int.max // too hard to do right now.
 		opt norefcounts
 
 

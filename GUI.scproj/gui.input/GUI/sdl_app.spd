@@ -589,9 +589,6 @@ module SDLApp
 	
 	function DrawFrame
 		opt norefcounts
-//		.DebugDraw = app.Prefs("debugdraw")
-//		if .DebugDraw
-//			beep
 		|| CanBlur = !app.Prefs("noblur")
 		
 		if !.DialogIsOpen

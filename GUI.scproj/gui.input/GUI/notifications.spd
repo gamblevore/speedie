@@ -2,7 +2,6 @@
 module Notifications
 	linkage: cpp_part Note 
 	|ringtree of window|	Alerts = ringtree()
-	|textview|				Txt
 	
 	constants
 		hi = 60
@@ -54,7 +53,7 @@ module Notifications
 				return true
 
 
-	function Draw
+	function Draw // drawnotifications, drawnote
 		opt norefcounts
 		for w in .Alerts
 			w.drawwindow(sdlapp.DrawSpace)
@@ -74,28 +73,28 @@ module Notifications
 
 	syntax append (|error| note)
 		cpp_part Msg
-		|| w = .NewWindow
-		w.tag = note
 		|| s = note.name
 		if note.path
 			s += "\n\"" + note.path + "\""
-		.txt.text = s 
+		|| w = .NewWindow(s)
+		w.tag = note
 		if note.IsError
 			printerror s
 		  else
 			printline s
 
 
-	function NewWindow (|window|)
+	function NewWindow (|string| s, |window|)
 		opt norefcounts
 		rz = Window()
 		.Alerts <~ rz
 		(rz isnt visible)
 		rz.id = "note"
 		rz.size = (wd)~left by 0~up back (hi) 
-		.txt = TextView(rz)
-		.txt.id = "note"
-		.txt.size = the~area
+		|| txt = TextView(rz)
+		txt.id = "note"
+		txt.size = the~area
+		txt.text = s
 		|| W = 0.8~white
 		|| B = 0.8~black
 		rz.GNormal.Edge <~ W

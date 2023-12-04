@@ -344,7 +344,7 @@ class Process (ShellStream)
 		.writer.length = 0
 		.UpdatePipes
 
-
+ 
 	function Get (|Date| TimeOut = 2years, |message|)
 		opt norefcounts
 		require (self != nil)

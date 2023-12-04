@@ -125,7 +125,6 @@ struct NilTracker
 		function NilTracker.Purify (|scfunction| f)
 			opt norefcounts
 			|| arg = .Start(f)
-				debugat
 				Argument(arg)
 				.Finish(f)
 		

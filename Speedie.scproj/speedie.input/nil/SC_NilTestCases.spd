@@ -7,7 +7,7 @@ class NilTest
 	|?&byte|	V3
 	|&byte|		V4
 	
-	function Abc		
+	function Reader		
 		|| v = .v3
 		borks // amazing
 		*v = 'x'
@@ -142,8 +142,7 @@ class NilTest
 module NilTest2
 	function Hello
 		NilTest.n0
-
-//@Jeebox is %actually~able~to // unambiguously~describe human~sentances
+		NilTest.n0.Reader
 
 
 function scfunction.NilPrint

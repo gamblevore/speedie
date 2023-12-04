@@ -158,7 +158,8 @@ class Message (RingTree)
 			fs <~ .name
 		  else
 			fs <~ '+'
-			fs.AppendQuotedEscape(.name)
+			fs.AppendQuotedEscape(.name) // should really be +'' so that $ escapes don't slow us down.
+			// also visualy lighter.
 
 		require .hasany
 

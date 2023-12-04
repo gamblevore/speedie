@@ -82,6 +82,8 @@ function Function (NilTrackerFn)
 	|| fn = prms.obj|SCFunction|
 	fn.NilPrint
 
+	if fn.name contains "Reader"
+	
 	if msg.tmptype == ASMtmp.kTern
 		debugat
 		return tern(prms, test)
@@ -322,6 +324,7 @@ function Argument (Niltrackerfn)
 	|| C = .Decls					// noice
 	for s.fast in msg
 		|| T = test * s.islast		// easier debugging
+		s.DebugPrint
 		debugger
 		rz = .jump(s, T)
 		.HandleFail(s)

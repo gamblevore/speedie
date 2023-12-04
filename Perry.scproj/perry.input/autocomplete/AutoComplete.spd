@@ -156,7 +156,8 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 	if (f == @arg) and !f.hasany and (display starts "displayall")
 		.PopupHide
 	  else
-		.PopupDisplay.expectsparse = textview.probablyjeebox
+		.PopupDisplay.ExpectsParse = textview.probablyjeebox
+		(f is style2)
 		.DisplayInPopup(f.render, display.name contains "forced")
 
 
