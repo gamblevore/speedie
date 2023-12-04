@@ -65,7 +65,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/usr/local/speedie/examples/SpamLines.spd"
+            argument = "/usr/local/speedie/Utils/casting.spd"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument

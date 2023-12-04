@@ -745,7 +745,6 @@ function SCFunction.BuildConstructorDestructor
 	
 	|| root = .SourceArg
 	|| IsConstructor = self is Constructor
-	.args[0] = .args[0].makereal
 
 	|| TheCall = .CallParents( root, IsConstructor )
 	.FillInConstructorAndDestructor( root, IsConstructor, TheCall )

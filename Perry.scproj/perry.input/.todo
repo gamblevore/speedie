@@ -2,6 +2,8 @@
 	 
 							Todo
 
+* 0|&byte| and 1|&byte| should be understood as real or not... if its a const.
+	* Also p|&byte| should be optional.
 * VM? 
 * Constants and globals don't autocomplete nicely
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
@@ -37,6 +39,7 @@
 
 
 						 Perry additions
+
 * add image editor...
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order...  that can't just be commented out.

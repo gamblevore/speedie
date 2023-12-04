@@ -13,7 +13,6 @@ linkage
 |Message|					InitVarsArg
 |Message|					InitCodeArg
 |string|					CppPart
-|SCFunction|				DisposeFunc
 |CppRefs|					DefaultRefs
 |message|					InitAfter
 |string|					SubsFrom
@@ -98,13 +97,6 @@ function NewModuleFunc (|Message| src, |SCFunction|)
 function BaseDecls
 	.Use
 	CollectDeclsGlobals( .source, self ) // right?
-
-
-function FillDisposeFunc
-	|| Arg = .DisposeFunc$.SourceArg
-	for decl.vars in self
-		if decl and (decl Isnt Const) and (!decl.C_array)
-			arg <~ NeweqRel(decl.name, "nil")
 
 
 function AddModuleToFunc (|SCBase| space)

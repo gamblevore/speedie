@@ -59,7 +59,7 @@ function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
 		return dcl.nildeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch, 0)
-		if actual == nilstate.either
+		if actual is nilish // works e
 			.BecomeReal(ch.nildecl, ch)
 	return dcl.nildeclared
 
@@ -101,7 +101,7 @@ function Function (NilTrackerFn)
 		.Jump(p, test)
 		|| sent = p.NilDecl
 		HasAddrs := sent.PointerUpgrade
-		if recv.NilSuffering	
+		if recv.NilReg	
 			.NilParamPass(recv, sent, p)
 
 		test = 0
@@ -129,21 +129,18 @@ function Return (NilTrackerFn)
 	opt norefcounts
 
 	|| value = msg.first
-	|| vd = value.NilDecl
-	|| v = vd.NilCurr, .decls = 0 // get curr, then clear
+	if value == @func
+	|| v = jump(value, 0)
+	
 	t.Loops.ExitCount++
-	require vd.NilSuffering
-
+	.decls = 0 // get curr, then clear
 	|| ret = scfunction.currfunc.ReturnType
-	|| RD = ret.NilDeclared
-	|| rd2 = RD ||| v
-	if RD2 == rd
-		return v
-
-	expect (rd isnt Stated) (msg, "Nilness return mismatch: " + v.rawname)
-
+	|| RD = ret.nildeclared
+	expect  !(RD is real  and  v is nilish)   (msg, "Nil-returned unexpectedly: " + v.rawname)
+	
+	
 	// assume real, unless it becomes optional??
-	ret.nildeclared = rd2
+	ret.nildeclared = RD ||| v
 	ret.NilPrint("return")
 
 
@@ -300,8 +297,10 @@ function Thing (NilTrackerFn)
 function ThingSub (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.nildecl
-	if !dcl.NilSuffering
-		return NilState.Realish
+	if (dcl is local) != (dcl.NilReg > 0) // what?
+	ifn dcl is local
+		return dcl.nildeclared
+			
 
 	|| ND = dcl.nilcurr
 	if test isnt Active: return ND
@@ -325,7 +324,6 @@ function Argument (Niltrackerfn)
 	for s.fast in msg
 		|| T = test * s.islast		// easier debugging
 		s.DebugPrint
-		debugger
 		rz = .jump(s, T)
 		.HandleFail(s)
 	.Decls = C
@@ -383,11 +381,9 @@ function Declaration (niltrackerfn)
 
 function SetRel (niltrackerfn)
 	opt norefcounts
-	|| R = msg.last,	.Jump(R, 0)			// R is defined as coming first. (C++ compatibility)
+	|| R = msg.last,	.Jump(R, 0)			// R is defined as coming first
 	|| L = msg.first,	.Jump(L, 0)
-	|| Dest = L.nildecl
-	if Dest.NilSuffering
-		return .VariableSet(Dest, R.nildecl, L, R)
+	return .VariableSet(L.nildecl, R.nildecl, L, R)
 
 
 function Fail (NilTrackerFn)
@@ -408,18 +404,11 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 	opt norefcounts
 	|| SN = sent.NilCurr
 	if (recv.NilDeclared == nilstate.real)
-		expect (SN isnt nilish) (RecvMsg, "Nil is not allowded into this var can't be set to nil")
-			
-		// return here, as only sent can change
-		return .BecomeReal(sent, SentMsg)		// should x = nil, be allowed for local vars?
-
-//	if SN is Nilish // this prevents unstated parameters being set to nil/optional.
-//					// for locals, they should always be stated!! if not, change collectdecls :)
-//		expect (recv.NilStated) (SentMsg, "Unknown if this var is nillable.")
+		expect (SN isnt nilish) (RecvMsg, "Nil is not allowed here.")
+		return .BecomeReal(sent, SentMsg)
 		
-	if SN == recv.NilCurr
-		return SN
-	return T.SetNilness(recv, SN)
+	if recv.nilreg 
+		return T.SetNilness(recv, SN)
 
 
 function BecomeReal (|scdecl| sent, |message| where, |nilstate|)

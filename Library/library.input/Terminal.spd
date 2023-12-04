@@ -41,7 +41,7 @@ module Terminal
 				v.x++
 		
 	function DrawRect (|ivec4| Rect, |string| inside="", |terminalcolor| colors=0)
-		|| r2 = rect + (1,1,-2,-2)
+		|| r2 = rect + (1, 1, -2, -2)
 		for s.rect in rect
 			|| c = inside
 			|| X = r2.x1x2 contains s.x

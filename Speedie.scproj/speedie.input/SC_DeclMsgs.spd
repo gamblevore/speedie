@@ -87,18 +87,20 @@ function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cl
 				.next = .copy // fn x (|int|) --> fn x (|int| value, |int|)
 			.AddValue(func)
 		
-	if self == @Item and .first == "assigns"
+	if  self == @Item  and  .first == "assigns"
 		self = .Last
 		func.IsAssigns = 1
 		.addvalue(func)
 
 	require .Expect(@decl)
-	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, func.args, cls, func) #require
+	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, cls, func) #require
+	func.args <~ dcl
 	if dcl.name
 		(dcl is param)
 		(dcl isnt altered)
 	  else
 		(dcl is return)
+	
 	return true
 
 
@@ -112,7 +114,8 @@ function SCClass.CollectDeclsProperties (|bool|)
 
 function Message.CollectProp (|scclass| cls, |bool|)
 	opt norefcounts
-	|| dcl = .collectdecl( cls.modul, cls, declmode.properties, cls.properties, cls, nil)
+	|| dcl = .collectdecl( cls.modul, cls, declmode.properties, cls, nil)
+		cls.properties <~ dcl
 		(dcl is property)
 		dcl.becomereal
 		return true
@@ -129,7 +132,7 @@ function CollectDeclsGlobals (|Message| arg, |SCBase| scarg)
 
 function Message.CollectAGlobalDecl (|SCBase| scarg, |bool|)
 	opt norefcounts
-	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals, nil, nil, nil)	
+	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals, nil, nil)	
 		(dcl is property)
 		(dcl is onmodule)
 		return true
@@ -144,7 +147,7 @@ function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg)
 
 function Message.CollectFromBody (|SCBase| scarg, |bool|)
 	opt norefcounts
-	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody, nil, nil, nil)
+	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody, nil, nil)
 		(dcl is body)
 		|| def = dcl.Default
 			check (def != @thg or def.name ~!= dcl.name) (def, "Same name!")
@@ -162,7 +165,7 @@ function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
-function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| out, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
+function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
 	
 	|| Types = .first
 	|| Names = types.Next
@@ -201,16 +204,18 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 	if sdcl.NeedsContainedfix
 		sdcl = sdcl.Containedfix
 	
+	|| dcl = Sdcl.copy
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )
 		if funcprms
-			FuncPrms.ReturnType = sdcl
+			if FuncPrms.CollectReturnAsReal // allocs dont fail (assumed so)
+				dcl.nildeclared = nilstate.real
+			FuncPrms.ReturnType = dcl // we need the copy
 		return nil
 
 	if !Default
 		names.expectlast
 	
-	|| dcl = Sdcl.copy
 	nameitm.obj = dcl
 	
 	if (Mode & 8) and NoOriginalDcl // functionbody
@@ -226,12 +231,10 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |[SCDecl]| 
 	dcl.Source = self
 	(dcl Isnt Const) // on "|| bla = true", make "bla" editable.
 
-	if out != nil
-		out <~ dcl
 	if default and defaultdcl
 		dcl.ConstCheck(nil, default, DefaultDcl)
-	
-	if (Recv) // nil for prototypes
+
+	if Recv // nil for prototypes
 		Recv.TryAdd( self, dcl, dcl.Name )
 	return dcl
 

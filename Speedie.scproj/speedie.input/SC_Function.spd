@@ -648,9 +648,12 @@ function MakeParamsReal
 		if a.Suffers
 			.args[i] = a.DefaultToReal
 	|| r = .ReturnType
-		if r.suffers and r.AllocSource and Options.NilTestAllocNeverFails
+		if r.suffers
 			.returntype = r.DefaultToReal
 
+function CollectReturnAsReal (|bool|)
+	if .isallocornew and Options.NilTestAllocNeverFails
+		return true
 
 setter IsCppInBuilt (|int|)
 	if value and !.IsCppInBuilt

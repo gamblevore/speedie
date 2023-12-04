@@ -71,8 +71,6 @@ function SCModule.LoadInitFunc
 	arg = .initVarsArg
 	if arg
 		.LoadInitFuncSub(arg, "Init_")
-		|| Msg = "function Dispose () { visible false }".ParseClean
-		.DisposeFunc = .NewModuleFunc(Msg)
 	scbase.currmodule = nil
 
 

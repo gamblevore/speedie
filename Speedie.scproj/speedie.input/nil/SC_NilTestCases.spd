@@ -7,6 +7,10 @@ class NilTest
 	|?&byte|	V3
 	|&byte|		V4
 	
+	constructor
+		"ABCDEFG"
+		.v4 = 1|&byte|
+		
 	function Reader		
 		|| v = .v3
 		borks // amazing
@@ -97,7 +101,7 @@ class NilTest
 			return x
 		return .Exists3(nil)
 		
-	function Exists7 (|niltest|)
+	function Exists7 (|!niltest|)
 		for 100
 			|| x = .exists5
 				return x
@@ -105,7 +109,17 @@ class NilTest
 
 // pointers
 	function GoodPtr (|&niltest| p, |&niltest| p2)
-		*p = self
+		if p
+			*p = self
+		if p2
+			|| x = *p2
+				x.v
+
+	function BorkedPtr (|&niltest| p, |&niltest| p2)
+		if !p
+			borks
+			*p = self
+		borks	
 		(*p).v
 
 	function BadGoodPtr (|&niltest| p)
@@ -116,6 +130,9 @@ class NilTest
 		if p
 			|| v = *p
 				v.v++
+	
+	function NilGlobals
+		x2 = nil
 		
 	function GoodBadPtr (|&niltest| p)
 		|| v = *p
@@ -164,12 +181,18 @@ function scfunction.NilPrint
 		fs <~ " as "
 		.returntype.nildeclared.nilname(fs, true)
 	
+	fs <~ " //  "
+	for a in .args
+		fs <~ a.objectid
+		fs <~ ", "
+	
 	printline fs
 
 
 function scdecl.NilPrint (|string| reason="")
 	cpp_name ndb2
 	|| fs = FastString()
+	fs <~ "    "
 	if reason
 		fs <~ reason
 		fs <~ ": "

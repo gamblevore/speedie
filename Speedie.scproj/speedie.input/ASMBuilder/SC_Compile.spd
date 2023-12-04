@@ -122,8 +122,8 @@ struct ASMFuncState
 		cpp_Part AllocRegDecl
 // what if "@thg:" calling this is a global?
 // Also, do we need R?
-		.NeedSomewhere(exp, &decl.dregister, decl.RegType)
-		return decl.DRegister
+		.NeedSomewhere(exp, &decl.DReg, decl.RegType)
+		return decl.DReg
 	
 	
 	function FuncPrms (|message| pr, |int| Remain, |uint| Bits, |Message|)

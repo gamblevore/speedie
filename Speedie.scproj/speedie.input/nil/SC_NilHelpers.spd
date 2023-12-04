@@ -62,7 +62,7 @@ function LastInBlock (|blockage| Reason)
 function scdecl.PointerUpgrade (|scdecl|)
 	opt norefcounts
 	|| infernal = .internal
-	if (infernal Is Local) and infernal.NilSuffering
+	if (infernal Is Local) and infernal.NilReg
 		return infernal
 
 

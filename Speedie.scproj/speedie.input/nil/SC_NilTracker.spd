@@ -59,6 +59,10 @@ struct NilTracker
 
 			
 	function Declare (|scdecl| D, |nilstate| nd, |nilstate|)
+		rz = .declaresub(d, nd)
+		d.NilPrint("add")
+	
+	function DeclareSub (|scdecl| D, |nilstate| nd, |nilstate|)
 		nd &= nilstate.either
 		|| P = .place
 		|| N = p.value.Count
@@ -66,21 +70,21 @@ struct NilTracker
 		(p)(n) = nd
 		
 		if d.Suffers
-			d.NilSuffering = N
-		d.DRegister.Reg = n // right? might as well do this at the same time?
+			d.NilReg = N
+		d.DReg.Reg = n // right? might as well do this at the same time?
 		d.NilAllocDepth = .currDepth
-		d.NilPrint("add")
 		target debug: .dbg[n] = d
 		return nd
 	
 	function scdecl.NilCurr (|nilstate|)
 		if self Isnt Local
 			return .nildeclared &~ nilstate.stated
-		return (niltracker.Decls)[.NilSuffering]
+		return (niltracker.Decls)[.NilReg]
 	
 	function SetNilness (|SCDecl| d, |NilState| New, |nilstate|)
 		pragma inline
-		(.place)(d.nilsuffering) = new
+		if !d.nilreg // what?
+		(.place)(d.NilReg) = new
 		d.NilPrint("set")
 		return New
 
@@ -93,9 +97,14 @@ struct NilTracker
 		*.line = nilstate.either
 		.loops = nil
 		for d in f.args
-			.Declare(d, d.nildeclared)
+			.DeclareSub(d, d.nildeclared)
 		f.NilPrint
-		target debug: niltracker.ndb
+		
+		|| r = f.returntype
+			if !r.nilstated
+				if r.refcount > 2
+				r.nildeclared = 0 // build this up carefully.
+		target debug: if "": niltracker.ndb
 		return f.SourceArg
 
 	function Finish (|scfunction| f)
@@ -124,6 +133,7 @@ struct NilTracker
 
 		function NilTracker.Purify (|scfunction| f)
 			opt norefcounts
+			debugat 934
 			|| arg = .Start(f)
 				Argument(arg)
 				.Finish(f)
@@ -132,7 +142,16 @@ struct NilTracker
 		function SaveTheWorld
 			opt norefcounts
 			require app["nil"].Yes
-			
+
+/*			
+			|| fs = Faststring()
+			for f in compiler.funclist
+				fs <~ f.exportname
+				fs <~ "\n"
+			printline fs
+			debugger
+*/
+		
 			|| Rec = errorreceiver()
 			using rec
 				for f in compiler.funclist

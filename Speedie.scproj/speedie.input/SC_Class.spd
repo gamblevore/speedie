@@ -652,6 +652,8 @@ function scfunction.AddSelfToFunc (|scclass| cls, |SCBase| space)
 	|| sl = cls.SelfDecl		// for my nil-checker
 	if sl.Suffers				// refcounting will set MarkAsRefAltered
 		sl = sl.copy
+		if .isconstructorordestructor
+			sl = sl.makereal
 		(sl is selfimplicit)	// I shouldn't have to specify this, it should be copied!
 	space.TryAdd( space.FuncSrc, sl, "self" )
 	.args <~ sl

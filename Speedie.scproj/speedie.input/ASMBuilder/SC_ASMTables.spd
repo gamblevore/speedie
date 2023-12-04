@@ -27,7 +27,7 @@ dispatch fn_asm_table (fn_asm)
 		// what if this is a constant?
 		|| d = exp.AsDecl #debug_require
 		if d is const // we want a number, really
-		|| r = d.dregister
+		|| r = d.DReg
 		if r.reg
 			return r
 		return .AllocReg(exp, d, reg)
