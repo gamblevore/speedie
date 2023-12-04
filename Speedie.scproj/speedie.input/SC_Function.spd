@@ -1788,7 +1788,7 @@ function scfunction.Init_Sub (|message| node,  |scbase| name_space)
 		is DestructorNotFromLocalRefs
 	
 
-function NewFuncSub (CollectFunc)
+function NewFuncSub (|message| node, |scbase| name_space, |scfunction|)
 	|| fn = SCFunction(node)
 	fn.init_sub(node, name_space)
 	return fn
@@ -1799,7 +1799,7 @@ function NewFunc (CollectFunc)
 	|| name = node.first			   #expect (node, "No function name found.")
 	if name == @Dot
 		return SCClass.ExtendOneFunc(node, nil, ErrPlace)
-	return NewFuncSub(node, name_Space, errplace)	
+	return NewFuncSub(node, name_Space)	
 
 
 function SCFunction.ReadDisabled (|message| arg)
@@ -1852,9 +1852,10 @@ function NeuMain (CollectFunc)
 		inc_arg.TakeAllFrom( src_arg )
 
 		Compiler.HasMainFunc = true
-		rz = SCFunction.NewFunc( fn_Src, name_space, ErrPlace )
+		|| m = compiler.userproj.mod
+		rz = SCFunction.NewFunc( fn_Src, m, ErrPlace )
 		if rz isa scmodule // sigh. Not ideal.
-			scclass.ProcessExtend(fn_Src, false)
+			compiler.MainFunc = scclass.ProcessExtend(fn_Src, false, m)
 			fn_src.remove
 
 

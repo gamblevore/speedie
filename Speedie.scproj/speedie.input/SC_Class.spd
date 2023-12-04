@@ -963,19 +963,19 @@ module
 		return compiler.program
 
 
-	function ProcessExtend (|Message| c, |bool| PreferClass)
+	function ProcessExtend (|Message| c, |bool| PreferClass, |scmodule| m=nil, |scfunction|)
 		// OK now what?
 
 		if (c == @tmp and "extend_module" or "extend")
-			// can we remove this?
 			.ProcessExtendOld(c, preferclass)
-			return
+			return nil
 		
 		|| dot = c[@dot]
 		|| name = Dot[@nil, 0]						#require
 		expect (name == @thg or @name) (name)
 
-		|| M = Compiler.FindModuleMsg(name)			#require
+		M := Compiler.FindModuleMsg(name)
+		require m
 		dot.clear
 		dot.func = @thg
 		|SCBase| B = M
@@ -990,9 +990,9 @@ module
 		  else
 			B.project.use
 
-		|| fn = scfunction.NewFuncSub(c, b, c)
-		if fn != compiler.program and fn isa scfunction
-			fn.tryadd(b)
+		|| fn = scfunction.NewFuncSub(c, b)
+		fn.tryadd(b)
+		return fn
 	
 
 	function SCFunction.TryAdd (|scbase| b)

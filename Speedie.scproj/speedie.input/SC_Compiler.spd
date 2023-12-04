@@ -67,6 +67,7 @@ linkage
 |string|				ProjectName
 |string|				ReportedName
 |scimport|				UserProj
+|scfunction|			MainFunc
 |message|				DebugInsert
 |message|				ConfMsg
 |dictionary|			InsecureWords
@@ -139,14 +140,6 @@ function BuildFolder (|file|)
 	ifn ._BuildFolder.Exists
 		._BuildFolder.MakeDir
 	return ._buildfolder
-
-
-function GetMainSub (|ScFunction|)
-	opt norefcounts
-	|| mod = Compiler.FindModule("app", nil)
-		|| fn = mod["main"]
-		if fn isa SCFunction
-			return fn
 
 
 function PrepareInterpreter
@@ -890,7 +883,7 @@ function DeadStrip
 	Compiler.VisibleFuncs = scbase("Visible",	false)
 	Compiler.Interpreter = scbase("Interpreter", false)
 
-	.getmainSub().StripTest?
+	compiler.MainFunc.StripTest?
 	
 	for f in .FuncList
 		f.striptest
@@ -957,10 +950,7 @@ function AddGlobalConst (|string| name, |SCClass| c, |SCDecl|)
 
 
 function MakeMainFunc (|message|)
-	|| f = .GetMainSub 
-		// really... app.main shouldn't inherit from app, but from the user's project
-		// I mean... its a func that should always be there. But it is the user's.
-		// fix that later.
+	|| f = compiler.MainFunc 
 		f.blindcasts = errorseverity.error // this for now.
 		return f.sourcearg
 	"Compiling as library."
