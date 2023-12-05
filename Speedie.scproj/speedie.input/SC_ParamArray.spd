@@ -110,7 +110,7 @@ class SCParamArray
 						.IsSuper = true
 						exp0.name = "self"
 						// setting isself would change property setters.
-						return Curr.Lookup
+						return Curr.parent
 		return Curr
 
 

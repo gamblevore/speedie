@@ -8,7 +8,7 @@ class NilTest
 	|&byte|		V4
 	
 	constructor
-		"ABCDEFG"
+		|| ABCDEFG = 0
 		.v4 = 1|&byte|
 		
 	function Reader		

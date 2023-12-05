@@ -737,7 +737,7 @@ function CreateRoot
 
 	M.ExportName = "JB"
 	M.Name = "main"
-	M.Lookup = nil
+	M.parent = nil
 
 
 function LoadRefFunc (|String| name, |SCFunction|)

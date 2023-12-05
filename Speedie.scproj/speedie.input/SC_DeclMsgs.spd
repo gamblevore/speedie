@@ -67,7 +67,7 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
 	opt norefcounts
 	|| cls = .Cls
 	if !cls
-		cls = .lookup|SCModule|.Cls
+		cls = .parent|SCModule|.Cls
 	  elseif !prms.HasSelfAsFirst
 		.AddSelfToFunc(cls, AddToSpace)
 

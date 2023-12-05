@@ -230,7 +230,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 
 
 function LoadSuperClass
-	.Modul.LookUp = compiler.program 
+	.Modul.parent = compiler.program 
 	
 	|| p = .Source								#require
 	|| supc = p[ 1 ]
@@ -255,10 +255,10 @@ function LoadSuperClass
 		if Options.ListAllLib
 			s.Children <~ self
 		if .IsRole
-			.modul.lookup = s.modul
+			.modul.parent = s.modul
 		  else
 			s.HasSubClass = true
-		.LookUp = S
+		.parent = S
 		|| b = .behaviour
 		|| SB = S.behaviour
 		if (B and SB)

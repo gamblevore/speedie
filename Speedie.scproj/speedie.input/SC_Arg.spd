@@ -26,7 +26,7 @@ class SCArg (SCBase)
 		for (v in .access)
 			RZ += (v isa scdecl)
 
-		|| l = .lookup
+		|| l = .parent
 		if l isa scarg
 			RZ += l.count + 1		
 	
@@ -61,12 +61,12 @@ function Message.SCArg (|SCBase| p, |message| avoid=nil, |SCArg|)
 		if (p isa SCArg)
 			R.ParentFunc = p.ParentFunc
 			r.IsClassArg = p.IsClassArg
-			R.LookUp = p
+			R.parent = p
 
 		  elseif (p isa SCFunction)
 			R.ParentFunc = p
 			r.IsClassArg = p.cls
-			R.LookUp = p.lookup // skip the function entirely.
+			R.parent = p.parent // skip the function entirely.
 
 		.obj = R
 	r.project = p.project // right?

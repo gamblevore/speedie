@@ -697,7 +697,7 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 				// let's check for the others.
 
 	|| slf = @thg + "self"
-	slf.obj = .cls.SelfDecl
+	slf.obj = .self
 
 	|| PAF = NewFnc(fn.Name)
 	|| lst = paf.last
@@ -832,12 +832,12 @@ function SCFunction.RefsCheckPropertiesAltered
 					SCRefs.RefMarkAsDisturber( ch, self )
 
 
-function DeclToDot (|scdecl| d, |string| s, |Message|)
+function DeclToDot2 (|scdecl| d, |string| s, |Message|)
 	opt norefcounts
 	rz = @dot+s
 	|| slf = rz.msg(@thg, "self")
-	|| cls = scfunction.currfunc.cls
-		slf.obj = cls.SelfDecl
+	|| d2 = scfunction.currfunc.self
+		slf.obj = d2
 	rz.msg(@emb)
 	rz.obj = d // we need this, as it is a decl... but for locals... we don't need it!
 }
@@ -845,7 +845,7 @@ function DeclToDot (|scdecl| d, |string| s, |Message|)
 
 function scdecl.RefDestructor (|message|)
 	opt norefcounts
-	|| m = screfs.DeclToDot(self, .name)
+	|| m = screfs.DeclToDot2(self, .name)
 	if .c_array > 0
 		return screfs.DecrMulti(self, m)
 	  else

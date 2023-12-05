@@ -16,7 +16,7 @@ linkage
 |SCBaseInfo|						BaseInfo
 |Dictionary of scobject|			Access
 |String|							ExportName
-|SCBase--|							Lookup
+|SCBase--|							Parent
 |SCBase--|							CurrReacher
 |SCImport--|						Project
 
@@ -102,7 +102,7 @@ function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {
 		|| found = curr[name] 
 			return found
 		require lookup
-		curr = curr.lookup|scarg|
+		curr = curr.parent|scarg|
 }
 
 
@@ -251,12 +251,12 @@ function scfunction.ExportNameBuilder (|string|CppPart="", |string| )
 		if (self is constructor) and !(cpppart contains "Constructor")
 			cppPart = "Constructor" + cpppart
 	  else
-		|| L = .lookup
+		|| L = .parent
 		if (L isa SCModule) and L|scmodule|.CppPart
 			SubSection = L.CppPart
 			AfterSub = "__"
 
-	|| P = .project ?? .lookup.project
+	|| P = .project ?? .parent.project
 	|| wanted = p.mod.exportname
 	if wanted != subsection
 		rz = (wanted + "_")
@@ -388,7 +388,7 @@ function scbase.CodeCls (|Scclass|)
 		if s isa scmodule
 			if s.cls
 				return s.cls
-		s = s.lookup
+		s = s.parent
 
 
 function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCBase| arg_space, |SCDecl| contains, |Message| side, |int| Purpose, |SCObject|)
@@ -553,7 +553,7 @@ function RequireContained (|Message| exp, |SCDecl|)
 	|SCClass| cls
 	
 	if (self isa SCFunction)
-		cls = .Cls ?? (.lookup|SCModule|).Cls
+		cls = .Cls ?? (.parent|SCModule|).Cls
 		
 	  elseif (self isa SCClass)
 		cls = self
@@ -833,7 +833,7 @@ iterator ListLookup
 	|| Curr = self
 	while (Curr)
 		yield Curr
-		Curr = Curr.lookup
+		Curr = Curr.parent
 
 
 function SCModule.NonRoleModule (|SCBase|)

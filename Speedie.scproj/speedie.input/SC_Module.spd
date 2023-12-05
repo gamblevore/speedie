@@ -41,8 +41,8 @@ function SuperMod (|scmodule|)
 
 function IsProperModule (|bool|)
 // not "main" or any other auto-generated module that doesn't properly have a "module name {" thing going on...
-	require .Lookup
-	if (.Lookup == compiler.program) and (.source == nil)
+	require .parent
+	if (.parent == compiler.program) and (.source == nil)
 		return false
 	return true
 
@@ -157,12 +157,12 @@ module
 		m.Project = scimport.curr // hack?
 		
 		if (name_space isa SCClass)
-			m.LookUp = nil	// So Array.Byte, File.Byte, XXX.Byte... won't be found.
+			m.parent = nil	// So Array.Byte, File.Byte, XXX.Byte... won't be found.
 							// It's just for the looking up of functions ON the module... not in the module's code.
 			m.Cls = name_space
 			m.name = name_space.Name
 		  else
-			m.LookUp = name_space.ProjectFix
+			m.parent = name_space.ProjectFix
 		
 		if node
 			m.LoadModule( node )

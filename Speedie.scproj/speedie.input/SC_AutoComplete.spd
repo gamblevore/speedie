@@ -258,10 +258,10 @@ function scfunction.InsertIn (|scbase| parent, |string| name, |scobject|)
 	.name = name
 	if parent isa scclass
 		.cls = parent
-		.lookup = parent.modul
+		.parent = parent.modul
 	  else
 		.cls = nil
-		.lookup = parent // ooofffff
+		.parent = parent // ooofffff
 	return parent[name]
 		
 
@@ -713,7 +713,7 @@ function RootTmpComplete (|message| cmd, |message|)
 
 function scbase.UpClass (|message| f, |scbase|)
 	opt norefcounts
-	rz = .lookup
+	rz = .parent
 	if  f == @dot  and  rz isa scmodule
 		require !rz.isimport
 
@@ -809,8 +809,7 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 			rz <~ (@back, desc)
 			if fn.nextfunc
 				rz <~ @emb
-		|| l = fn.lookup
-		if l
+		|| l = fn.parent
 			if .CanUseName(l)
 				.IdentifyBetter(copy, l.name)
 		  else
@@ -940,7 +939,7 @@ function message.CutifyCopy (|message|)
 	|| fn = rz.MsgFunc			// what about modules?
 		|| cls = fn.cls
 		|| modname = ""
-		|| space = fn.lookup
+		|| space = fn.parent
 		if space isa scmodule
 			modname = space.name
 		if cls or modname // ok so...

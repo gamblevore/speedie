@@ -86,6 +86,6 @@ function scfunction.CanNil (|bool|)
 
 function scfunction.LimitTests (|bool|)
 	opt norefcounts
-	|| c = .Lookup
+	|| c = .parent
 		if c.name contains "NilTest"
 			return true

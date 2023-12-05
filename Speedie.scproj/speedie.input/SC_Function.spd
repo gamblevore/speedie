@@ -121,7 +121,7 @@ function Last (|SCFunction|)
 function ParentName (|string|)
 	if (.cls)
 		return .cls.name
-	|| Mod = .lookup
+	|| Mod = .parent
 	if mod isa SCModule
 		require !mod.isimport
 		return mod.name
@@ -233,7 +233,7 @@ function FuncDecls
 	FuncStats[.args.length min 11]++ 
 
 	if space and !.cls
-		|| L = .lookup|SCModule|
+		|| L = .parent|SCModule|
 		if  (L isa SCModule)  and  (L.IsProperModule)
 			L.AddModuleToFunc( space )
 
@@ -582,9 +582,9 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCPara
 function FLookup (assigns:|SCBase|)
 	if (Value isa SCClass)
 		.Cls = Value
-		.lookup = .Cls.Modul
+		.parent = .Cls.Modul
 	  else
-		.lookup = Value.ProjectFix
+		.parent = Value.ProjectFix
 	
 	if scimport.curr
 		.Project = scimport.curr
@@ -670,7 +670,7 @@ function DeclsProtoTypeAdd (|SCClass| fpType)
 	(dcl is onmodule) // not sure where this is found cos .cls is nil sometimes yet its still being found
 	.ProtoDecl = dcl
 	if (.Cls)
-		.lookup.TryAdd( .Source, Dcl, .Name )
+		.parent.TryAdd( .Source, Dcl, .Name )
 
 
 function DeclsProtoTypeRemove (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool|late=false)
@@ -1132,7 +1132,7 @@ function scdecl.MarkAsRefAltered
 
 function DeclToDot (|SCDecl| d, |Message|)
 	|| slf_msg = «thg "self"»
-	slf_msg.obj = .cls.SelfDecl
+	slf_msg.obj = .self
 	
 	rz = @dot + d.Name
 	rz <~ slf_msg
@@ -1140,6 +1140,11 @@ function DeclToDot (|SCDecl| d, |Message|)
 
 	rz.obj = d
 
+
+function Self (|scdecl|)
+	opt norefcounts
+	rz = .args[0]
+	if !rz or rz.name != "self" // what?
 
 function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
 	// .bla = X

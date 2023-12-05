@@ -13,12 +13,12 @@ class SCBehaviour (SCBase)
 	
 	constructor (|SCClass| parent)
 		.project = parent.project
-		.Lookup = parent
+		.parent = parent
 		.Interfaces = dictionary.new
 
 
 	function Cls (|SCClass|)
-		return .lookup|scclass|
+		return .parent|scclass|
 	
 	
 	function Add (|scbase| fn)
@@ -176,7 +176,7 @@ class SCBehaviour (SCBase)
 	function SCClass.ProcessInterfaces
 		require .IsInterface
 		|| fn = .funcproto					#require
-		|| L = fn.lookup
+		|| L = fn.parent
 		if (L isa scmodule)
 			|| cls = L.cls
 				fn.AddSelfPrm(cls)
