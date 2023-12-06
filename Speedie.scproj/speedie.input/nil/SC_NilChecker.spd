@@ -27,6 +27,7 @@ extend_module NilTracker {
 		(asmtmp.kContinue):		Continue
 		(asmtmp.kExit):			Exit
 		(asmtmp.kReturn):		Return
+		(asmtmp.kDebugger):		Debugger
 		(asmtmp.kFail):			Fail
 		63: // for size also
 
@@ -56,7 +57,6 @@ function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| dcl = msg.nildecl
 	if dcl is onmodule
-		debugat
 		return dcl.nildeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch, 0)
@@ -135,7 +135,7 @@ function Return (NilTrackerFn)
 	.decls = 0 // get curr, then clear
 	|| ret = scfunction.currfunc.ReturnType
 	|| RD = ret.nildeclared
-	expect  !(RD is real  and  v is nilish)   (msg, "Declaration does not allow returning " + v.rawname)
+	expect  !(RD == nilstate.real  and  v is nilish)   (msg, "Declaration does not allow returning " + v.rawname)
 	
 	
 	// assume real, unless it becomes optional??
@@ -236,7 +236,6 @@ function BooleanOr (|message| AA,  |message| BB,  |nilcheckmode| Test,  |nilstat
 	|| Orig = T.BranchEnter(AA)				#require
 	
 	#!"test A+"
-	debugat
 	.Jump(AA, test)
 	|| First = T.BranchSwap(Orig)
 
@@ -296,19 +295,20 @@ function Thing (NilTrackerFn)
 function ThingSub (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.nildecl
-	if (dcl is local) != (dcl.NilReg > 0) // what?
+	if (dcl is local) != (dcl.NilReg > 0)	// what?
 	|| ND = dcl.nildeclared
-	|| stated = dcl.nilstated
-		if test is active
-			return msg.Redundant(Test, dcl)
-		return dcl.nildeclared
-			
 	|| Y = dcl.nilcurr
+	if (!dcl.suffers) and (y is nilish)		// what?
+	if nd == nilstate.real
+		if test is active
+			return msg.Redundant(test, dcl)
+		return ND
+			
 	if test isnt Active
 		return Y
 
 	if (Y is Either)												// This is OK.
-		if (dcl is param) and !stated
+		if (dcl is param) and (nd isnt stated)
 			dcl.NilDeclared = NilState.optional
 		return T.SetNilness(dcl, Test)
 	
@@ -407,6 +407,10 @@ function Fail (NilTrackerFn)
 	.OldPrint = error.autoprint 
 	error.autoprint = 0
 	return nilstate.borked
+
+
+function Debugger (NilTrackerFn)
+	// do nothing :)
 
 
 function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|)

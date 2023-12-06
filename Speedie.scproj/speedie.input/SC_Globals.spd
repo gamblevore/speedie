@@ -763,7 +763,6 @@ function SameTypeSub (|message| first,  |message| second,  |scbase| name_space, 
 
 
 function TypeOfTernary (ExprResolver)
-// x = ("true", "false")(oof),		x = JB_Ternary(oof, "true", "false")
 	|| list		= exp.first
 	|| params	= list.next
 	expect  list.hasany and params.haschildcount(1)  (exp, "expected: (a,b)(cond)")

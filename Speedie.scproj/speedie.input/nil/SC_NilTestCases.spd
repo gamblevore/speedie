@@ -164,7 +164,8 @@ class NilTest
 module NilTest2
 	function Hello
 		NilTest.n0
-		NilTest.n0.Reader
+		|| x = NilTest.n0
+			x.Reader
 
 
 function scfunction.NilPrint

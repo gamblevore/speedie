@@ -1368,6 +1368,7 @@ function Tran_Debugger (TranFunc) {
 	|| ch = node.first
 	if !ch
 		node.name = "debugger"
+		node.tmptype = asmtmp.kdebugger
 		return
 	
 	expect ((node == "debugger") and (!ch.next)) (node)
@@ -1377,7 +1378,8 @@ function Tran_Debugger (TranFunc) {
 		// why cant I use negate?
 		node.first.Negate
 		node.Name = "if"
-		node.msg(@arg).msg(@tmp, "debugger")
+		|| dbg = node.msg(@arg).msg(@tmp, "debugger")
+		dbg.tmptype = asmtmp.kdebugger
 	
 	Tran_If(fn, node, name_space)
 

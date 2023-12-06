@@ -109,7 +109,7 @@ class SCDecl (SCObject) {
 	
 	
 	setter nildeclared (|nilstate|)
-		if .objectid == 33590300
+		if .objectid == 0
 		.nildeclare = value
 	
 	function nildeclared (|nilstate|)
