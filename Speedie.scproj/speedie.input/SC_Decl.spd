@@ -67,10 +67,9 @@ datatype SCDeclInfo (uint)
 		GameFlyingMem
 		Atomic
 		Self
-		Implicit		// self or other values that aren't declared explicitly
 		SetTo			// a var sets it... like: rz = obj
 		Local = Body + Param
-		SelfImplicit = Self + Implicit + local // local is set by CollectOneParam, anyhow?
+		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
 		
 		
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
@@ -98,7 +97,7 @@ class SCDecl (SCObject) {
 	|SCDeclInfo|		Info
 	|AsmReg|			DReg
 	|Byte|				PointerCount
-	|NilState|			NilDeclared
+	|NilState|			NilDeclare
 	|byte| 				NilReg
 	|byte| 				NilAllocDepth
 
@@ -108,9 +107,13 @@ class SCDecl (SCObject) {
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered
 	
-	setter NilDeclared (|nilstate|)
-//		if .name ~= "cc"
-		.NilDeclared = value
+	
+	setter nildeclared (|nilstate|)
+		if .objectid == 33590300
+		.nildeclare = value
+	
+	function nildeclared (|nilstate|)
+		return .nildeclare
 	
 	function Project (|scimport|)
 		opt norefcounts
@@ -264,9 +267,11 @@ class SCDecl (SCObject) {
 		rz = SCDecl.new
 		.CopyTypeInfoTo(rz)
 		rz.internal = self
-		
 		rz.PointerCount++
-		rz.NilDeclared = Purpose.Policy
+		if purpose is FuncParam or functionbody
+			rz.NilDeclared = nilstate.either
+		  else
+			rz.NilDeclared = nilstate.real
 		check (rz.pointercount < 8) (.source, "Too much abstraction")
 	
 	
@@ -780,6 +785,10 @@ class SCDecl (SCObject) {
 		return .MakeExistance(nilstate.optional, .type.TypeOptional)
 
 	
+	function MakeEither (|SCDecl|)
+		return .MakeExistance(nilstate.either, nil)
+
+	
 	function MakeContainedOptional (|scdecl|)
 		if .NilDeclared is Stated
 			return self
@@ -791,6 +800,11 @@ class SCDecl (SCObject) {
 			.NilDeclared = NilState.real
 			return self
 		return .MakeExistance(nilstate.real,  .type.TypeReal)
+	function MakeNil (|SCDecl|)
+		if .PointerCount
+			.NilDeclared = NilState.actuallynil
+			return self
+		return .MakeExistance(NilState.actuallynil,  nil)
 
 
 	function BecomeReal

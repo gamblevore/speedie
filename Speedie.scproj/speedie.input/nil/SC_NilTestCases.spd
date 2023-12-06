@@ -1,6 +1,6 @@
 
 
-
+|byte| NilTestByte
 class NilTest
 	|int|		V
 	|string|	V2
@@ -8,8 +8,8 @@ class NilTest
 	|&byte|		V4
 	
 	constructor
-		|| ABCDEFG = 0
-		.v4 = 1|&byte|
+		.v4 = (&NilTestByte)|&byte|
+		.v3 = 0|&byte|
 		
 	function Reader		
 		|| v = .v3
@@ -122,6 +122,11 @@ class NilTest
 		borks	
 		(*p).v
 
+		|| xx = &NilTestByte
+		borks
+		if xx
+			xx++
+
 	function BadGoodPtr (|&niltest| p)
 		if p
 			*p = self
@@ -180,11 +185,6 @@ function scfunction.NilPrint
 	if .returntype
 		fs <~ " as "
 		.returntype.nildeclared.nilname(fs, true)
-	
-	fs <~ " //  "
-	for a in .args
-		fs <~ a.objectid
-		fs <~ ", "
 	
 	printline fs
 

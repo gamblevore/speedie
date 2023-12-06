@@ -2,11 +2,14 @@
 
 extend Message {
 
-function Redundant (|nilstate| IsReal=nilstate.nilish, |nilcheckmode|)
-	if StdErr.CanAddMore(errorseverity.problem)
-		|| str = "Nil test is redundant on " + isreal.rawname
-		str += " object: " + .render 
-		StdErr.NewProblem(self, str)
+function Redundant (|nilcheckmode| State, |scdecl| dcl,  |nilstate|)
+	|| Realness = nilstate.either & state 
+	if (State is soft) or (dcl.NilAllocDepth < niltracker.t.loops.Depth)		// if a.length // allow redundant test
+		return Realness													// if a and a? // also!
+
+	|| str = "Nil test is redundant on " + Realness.rawname
+	str += " object: " + .render 
+	error (self, str)
 
 
 function NilDecl (|scdecl|)

@@ -1567,6 +1567,7 @@ function Tran_Fails (TranFunc)
 	// msg.Syntaxdeprecate((test), "error")
 	node.tmptype = asmtmp.kfail
 	fn.BorkedOnPurpose = true
+	expect (!node.islast) (node, "Put 'borks' before some code.") 
 
 
 

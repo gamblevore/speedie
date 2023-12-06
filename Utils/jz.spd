@@ -80,20 +80,20 @@ function app.UseAll (|file| start)
 	
 main {
 	if !app.args
-		print .usage
+		print app.usage
 		return 0
 
-	conv.Dest = .GetActions$
+	conv.Dest = app.GetActions$
 	expect (conv.Dest.Format.CountBits <= 1) ("Error: Multiple formats specified.")
 	
 	|| GotAll = false
 	for r in app.args
 		if r == "**"
 			expect (!GotAll) ("Can't use '**' twice.")
-			.useall(app.cwd.file)
+			app.useall(app.cwd.file)
 			GotAll = true
 		  else
-			.useone(r.file)
+			app.useone(r.file)
 	
 	if (stderr.ok) and (!conv.done) and (conv.dest isnt report)
 		"Nothing to do. All files already in destination format."

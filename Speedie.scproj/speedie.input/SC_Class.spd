@@ -488,7 +488,7 @@ function OverrideSyntax
 		.Casts <~ f
 		if f.returntype == typebool.typenormal
 			f.IsNilChecker = true
-			f.args[0] = f.args[0].makeoptional
+			f.args[0].nildeclared = nilstate.optional
 	
 	.HasCompareFunc = .FindSpecialFunc( "SyntaxCompare", true )
 	.HasEqualsFunc = .FindSpecialFunc( "SyntaxEquals", true )
@@ -654,6 +654,8 @@ function scfunction.AddSelfToFunc (|scclass| cls, |SCBase| space)
 		sl = sl.copy
 		if .isconstructorordestructor
 			sl = sl.makereal
+		  else
+			sl = sl.MakeEither
 		(sl is selfimplicit)	// I shouldn't have to specify this, it should be copied!
 	space.TryAdd( space.FuncSrc, sl, "self" )
 	.args <~ sl

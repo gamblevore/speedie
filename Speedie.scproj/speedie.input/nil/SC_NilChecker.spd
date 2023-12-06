@@ -4,12 +4,13 @@ extend_module NilTracker {
 	dispatch NilSyxes (NilTrackerFn)
 		@thg:	Thing
 		@bra:	Bracket
-		@type:	First
+		@type:	Type
 		@func:	Function
 		@tmp:   StatementJump
 		@dot:	PropertyOrAccess
 		@acc:	PropertyOrAccess
 		@brel:	brel
+		@arel:	arel
 		@rel:	Rel
 		@decl:	Declaration
 		@arg:	Argument
@@ -128,15 +129,13 @@ function Function (NilTrackerFn)
 function Return (NilTrackerFn)
 	opt norefcounts
 
-	|| value = msg.first
-	if value == @func
-	|| v = jump(value, 0)
+	|| v = jump(msg.first, 0) & nilstate.either
 	
 	t.Loops.ExitCount++
 	.decls = 0 // get curr, then clear
 	|| ret = scfunction.currfunc.ReturnType
 	|| RD = ret.nildeclared
-	expect  !(RD is real  and  v is nilish)   (msg, "Nil-returned unexpectedly: " + v.rawname)
+	expect  !(RD is real  and  v is nilish)   (msg, "Declaration does not allow returning " + v.rawname)
 	
 	
 	// assume real, unless it becomes optional??
@@ -257,7 +256,7 @@ function Compareable (|message| ll, |message| rr, |scoperator| scop, |nilcheckmo
 		return NilState.Real
 	
 	if (lnil and rnil)
-		return ll.Redundant
+		return ll.Redundant(test, ll.nildecl)
 	expect (scop.IsNilTest) (ll.next, "Nil can't accept this operator. Use != or ==.")
 
 	|| side = (rr, ll)(lnil)
@@ -298,23 +297,22 @@ function ThingSub (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.nildecl
 	if (dcl is local) != (dcl.NilReg > 0) // what?
-	ifn dcl is local
+	|| ND = dcl.nildeclared
+	|| stated = dcl.nilstated
+		if test is active
+			return msg.Redundant(Test, dcl)
 		return dcl.nildeclared
 			
+	|| Y = dcl.nilcurr
+	if test isnt Active
+		return Y
 
-	|| ND = dcl.nilcurr
-	if test isnt Active: return ND
-
-	|| Desired = nilstate.either & Test 
-	if (ND is Either)												// This is OK.
-		if (dcl is param) and !dcl.nilstated
+	if (Y is Either)												// This is OK.
+		if (dcl is param) and !stated
 			dcl.NilDeclared = NilState.optional
-		return T.SetNilness(dcl, Desired)
+		return T.SetNilness(dcl, Test)
 	
-	if (test is soft) or (dcl.NilAllocDepth < t.loops.Depth)		// if a.length // allow redundant test
-		return Desired												// if a and a? // also!
-
-	return msg.Redundant(ND)
+	return msg.Redundant(test, dcl)
 
 
 
@@ -322,32 +320,39 @@ function Argument (Niltrackerfn)
 	opt norefcounts
 	|| C = .Decls					// noice
 	for s.fast in msg
-		|| T = test * s.islast		// easier debugging
-		s.DebugPrint
-		rz = .jump(s, T)
-		.HandleFail(s)
+		rz = .ArgOne(s, test * s.islast, rz)
 	.Decls = C
 
 
-function HandleFail (|message| msg)
+function ArgOne (|message| s,  |nilcheckmode| t,  |nilstate| prev,  |nilstate|)
 	pragma inline
-	require .ThisLineFails
-	.ThisLineFails--
-	if !.ThisLineFails
+	s.DebugPrint
+	rz = .jump(s, T)
+	if prev is borked
 		error.autoprint = .oldprint
-		expect (!stderr.ok) (msg, "Nil-checker did not detect error here!")
+		expect (!stderr.ok) (s, "Nil-checker did not detect error here!")
 		stderr.clear
 
 	
 function Bracket (Niltrackerfn)
+	opt norefcounts
 	if msg.length // a? --> (a) // but the bra has a name
 		test |= NilCheckMode.Soft
-	return First(msg, test)
-
-
-function First (Niltrackerfn)
-	opt norefcounts
 	return .Jump(*msg, test)
+
+
+function Type (Niltrackerfn)
+	opt norefcounts
+	|| F = msg.first
+	|| ns = .Jump(F, test)
+	|| d = msg.nildecl
+	if !d.suffers
+		return nilstate.real
+	|| fd = f.nildecl
+	if fd.suffers // return inner suffering
+		return ns
+	
+	return d.nildeclared // we created new suffering, so lets pass that back.
 
 
 function JustReal (Niltrackerfn)
@@ -356,16 +361,28 @@ function JustReal (Niltrackerfn)
 
 function Brel (Niltrackerfn)
 	opt norefcounts
-	|| b = *msg.name
+	|| b = msg.name.first
 	if b == '*'
 		return .UseChildAsReal(msg)							// *abc
 
-	|| f = *msg
+	|| ch = *msg
+	if b == '+' or '-'
+		return jump(ch, test)
+		
 	if b == '!'
-		return .Jump(f, test.activate.Negate)
+		test = test.activate.Negate
 	
-	Jump(f, test)
-	return NilState.Real // & and ~ both return real
+	Jump(ch, test)
+	return NilState.Real // !, &, ~   all return real
+
+
+function arel (Niltrackerfn)
+	opt norefcounts
+	|| ch = *msg
+	|| b = msg.name.first
+	if b == '+' or '-'
+		return jump(ch, test)
+	debugger // what?
 
 
 function Declaration (niltrackerfn)
@@ -389,7 +406,7 @@ function SetRel (niltrackerfn)
 function Fail (NilTrackerFn)
 	.OldPrint = error.autoprint 
 	error.autoprint = 0
-	.ThisLineFails = 2
+	return nilstate.borked
 
 
 function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|)

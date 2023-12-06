@@ -102,7 +102,6 @@ struct NilTracker
 		
 		|| r = f.returntype
 			if !r.nilstated
-				if r.refcount > 2
 				r.nildeclared = 0 // build this up carefully.
 		target debug: if "": niltracker.ndb
 		return f.SourceArg
@@ -110,6 +109,7 @@ struct NilTracker
 	function Finish (|scfunction| f)
 		opt norefcounts
 		|| r = f.ReturnType
+			check (r.nildeclared) (f, "Return nilness unknown.")
 			r.nildeclared |= nilstate.stated
 		f.NilPrint
 	
@@ -118,7 +118,6 @@ struct NilTracker
 
 	module
 		|byte| OldPrint
-		|byte| ThisLineFails
 		|NilTracker| T
 
 		function Place (|&NilRecorder|)
@@ -133,7 +132,6 @@ struct NilTracker
 
 		function NilTracker.Purify (|scfunction| f)
 			opt norefcounts
-			debugat 934
 			|| arg = .Start(f)
 				Argument(arg)
 				.Finish(f)

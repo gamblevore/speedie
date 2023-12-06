@@ -11,6 +11,7 @@ datatype NilState (byte) // Exec.scproj needs this here
 		ActuallyNil = Nilish  + Stated				// nil|message|.position
 		Optional    = Either  + Stated				// || x = array[1000]
 		Real		= Realish + Stated				// || x = message(),  x.position
+		Borked		= 128
 	
 	function Worst (|nilstate| o, |nilstate|)
 		// nil + real = nil

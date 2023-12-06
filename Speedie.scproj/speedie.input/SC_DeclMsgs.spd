@@ -281,9 +281,9 @@ datatype DeclMode (uint)
 		Globals		= 1
 		FunctionBody = 8
 		Proto		= 16
+		TypeCast	= 32
 		ProtoParam	= FuncParam + Proto
-		TypeCast	= Properties
-		Always		= 32
+		Always		= 64
 	
 	syntax isnt (|DeclMode|o, |bool|)
 		return self != o
@@ -294,4 +294,6 @@ datatype DeclMode (uint)
 	function Policy (|nilstate|)
 		if self == FuncParam or functionbody
 			return nilstate.either
-		return nilstate.realish ||| NilState.Stated
+		if self == typecast
+			return nilstate.optional
+		return nilstate.real
