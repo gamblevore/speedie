@@ -551,7 +551,6 @@ function AfterFuncsDecled
 		expect (!f.ReturnType and (f.args.length == 1))   ( f.Source, "Destructor can’t have a return type or parameters." )
 	.CheckAllocVsWrapper( f, false )
 	
-	
 	.ClassType = TypeJBClass.TypeNormal.Copy // no difference
 	.ClassType.Name = .CStructName
 
@@ -621,9 +620,7 @@ function CanCompare (|SCDecl| Against, |bool| AsEquals, |bool|)
 
 
 function CheckAllocVsWrapper (|SCFunction| f, |bool| IsConstructor)
-	require .IsWrapper
-	require .IsObject
-	require .super
+	require .IsWrapper or .IsObject or .super
 	require (!f == isconstructor)
 
 	if !IsConstructor
@@ -647,17 +644,16 @@ function FirstDestructor (|SCFunction|)
 			return fn
 
 
-
 function scfunction.AddSelfToFunc (|scclass| cls, |SCBase| space)
 	opt norefcounts
 	|| sl = cls.SelfDecl		// for my nil-checker
 	if sl.Suffers				// refcounting will set MarkAsRefAltered
 		sl = sl.copy
-		if .isconstructorordestructor
-			sl = sl.makereal
+		if .IsConstructorOrDestructor
+			sl = sl.MakeReal
 		  else
 			sl = sl.MakeEither
-		(sl is selfimplicit)	// I shouldn't have to specify this, it should be copied!
+		(sl is SelfImplicit)	// I shouldn't have to specify this, it should be copied!
 	space.TryAdd( space.FuncSrc, sl, "self" )
 	.args <~ sl
 
@@ -1053,9 +1049,11 @@ module
 		if name_space isa scclass
 			name_space.false = node.NeedFirst
 	
+	
 	function GetDefault (CollectFunc)
 		if name_space isa scclass
 			name_space.defawlt = node.NeedFirst
+	
 	
 	function NamedPropertyFields (CollectFunc) // node, parent, errplace
 		// not a great feature???
@@ -1104,8 +1102,6 @@ module
 			name_space.Collectone(setter, false)
 
 			Found++
-
-		
 		expect (Count >= Found) (countmsg, "Too few fields specified")
 		
 		consts <~ «rel

@@ -86,8 +86,6 @@ class PerryIDE (Window)
 	|bool|						InConstructor
 	|bool|						ModifiedForCompile
 	|bool| 						IsGraphics
-	|bool| 						HideTop
-	|bool| 						HideSide
 
 		
 	function UpdateStatusErrors
@@ -351,19 +349,24 @@ class PerryIDE (Window)
 			HideSide = false
 			HideTop = false
 		
-		if .viewing == .viewfiles
-			.noneed
-			|| fl = .filelist.ListSource as filerow
-			fl.SmartName = "file".pluralize(fl.LastFileCount)
-
 		require !.CurrMouseDown 
-		if (hidetop != .hidetop)
-			.hidetop = hidetop
-			.tabs.declutter.fire(0.32, 0.5) = .hidetop
+		if (hidetop == vistop)
+			.tabs.declutter = hidetop
+			.StartScreen.declutter = hidetop
+			if HideTop
+				(.DebugArgsList isnt visible)			// better to declutter
+			|| ShowBuilders = !HideTop and (!.istextonly or .path.isSource)
+			.runbutton.declutter		= !ShowBuilders
+			.buildbutton.declutter		= !ShowBuilders
 		
-		if (hideside != .hideside)
-			.hideside = hideside
-			.filelist.declutter.fire(0.334, 0.5) = .hideside
+		if (hideside == visside)
+			.filelist.declutter = hideside
+			if hideside and .filelist.hasfocus
+				.editme.SetFocus
+			if .viewing == .viewfiles
+				.noneed
+				|| fl = .filelist.ListSource as filerow
+				fl.SmartName = "file".pluralize(fl.LastFileCount)
 
 
 	function TestCompilerAlive

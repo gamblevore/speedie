@@ -238,6 +238,7 @@ extend PerryIDE
 			.left = 0~right
 			
 		with .progress
+			isnt visible
 			.gnormal.edge = vec4(0.5)
 
 

@@ -221,7 +221,7 @@ class ButtonView (GUIControl)
 			strength += SDLApp.cycle(1s)*0.5
 			SDLApp.Touch
 		  else
-			fader = .declutter.strength					#require
+			fader = .declutterer.strength					#require
 			
 		if WillDrawFocus or MouseXInside
 			grow += r

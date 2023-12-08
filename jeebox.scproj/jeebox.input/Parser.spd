@@ -1039,12 +1039,14 @@ extend Parser
 
 			  elseif (c == '/')
 				|| c2 = d[n]
-				ifn (c2 == '/' or '*') or (state & 2)
+				if (c2 != '/' and '*')
+					if state&2 // not quite working yet! but soon!
+						rz.IsDebug = true
 					n--
 					exit
 				State = 2
 				if c2 != '*'
-					n = .gotoendofline(n+1)
+					n = .GotoEndOfLine(n+1)
 					continue
 
 				rz.lines++
@@ -1060,7 +1062,7 @@ extend Parser
 					n--
 					exit
 				rz.lines++
-				rz.isdebug=(c == '\r')|int|
+				rz.isdebug=false
 				rz.indent = 0
 				rz.commas = 0 // right?
 				rz.pos    = n-1 // sigh

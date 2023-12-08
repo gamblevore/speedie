@@ -13,7 +13,7 @@ class GUIControl (ringtree)
 	|Drawstyle|					GNormal
 	|GUIAction|					OnClicked
 	|GUIAction|					OnFocus
-	|TimeFader|					Declutter
+	|TimeFader|					Declutterer
 	|ControlSize|				Sizer
 	|uint16|					TabIndex
 	|ControlClipMode|			ClipMode
@@ -206,10 +206,13 @@ class GUIControl (ringtree)
 			sdlapp.resized(self)
 
 	function Decluttering (|bool|)
-		return .Declutter.final
+		return .Declutterer.final
+	
+	setter Declutter (|bool|) 
+		.declutterer.fire(0.334, 0.5) = value
 		
 	function Decluttered (|bool|)
-		return .Declutter.Finished
+		return .Declutterer.Finished
 	
 	function Touch (|int| Amount = 2)
 		opt norefcounts
