@@ -119,7 +119,7 @@ class Message (RingTree)
 		Opt NoRefCounts
 		|| Braces = (self isnt style2)  or  !.hasany  or .name or  (self in @arg)
 			fs <~ '{'
-		.FSListArg( fs ) // the name is already rendered by this!!
+		.FSListArg( fs, braces ) // the name is already rendered by this!!
 		if Braces
 			fs.IndentLine
 			fs <~ '}'
@@ -643,22 +643,22 @@ class Message (RingTree)
 			fs <~ ch
 	
 
-	function FSListArg (|FastString| fs)
+	function FSListArg (|FastString| fs, |bool| AddLine=false)
 		opt NoRefCounts
 		|| hasp = .parent!=nil
 		fs.indent += hasp
 		
-		|| doind = hasp
+		AddLine |= hasp
 		if .name
-			doind = true
+			AddLine = true
 			fs.IndentLine
 			fs <~ "^"
 			fs.AppendQuotedEscape(.name)
 		for ch in self
-			if doind
+			if AddLine
 				fs.IndentLine
 			fs <~ ch
-			doind = true
+			AddLine = true
 
 		fs.indent -= hasp
 		if hasp
