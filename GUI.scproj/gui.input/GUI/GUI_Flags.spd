@@ -76,7 +76,7 @@ struct TimeFader
 			if touch
 				sdlapp.touch
 			rz = str.clamp
-			if rz == 1.0
+			if rz == 0.0
 				.final = 0
 				.scale = 0
 	
@@ -86,8 +86,8 @@ struct TimeFader
 
 	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)
 		sdlapp.touch
-		if value // too tired to do the delay thing too. Sigh. just end it.
-			.final = date.now + (seconds+0).date
+		if value
+			.final = date.now + (seconds+delay).date
 			.scale = 1.0 / seconds
 		  else
 			.final = 0
