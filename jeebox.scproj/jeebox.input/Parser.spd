@@ -26,7 +26,7 @@ extend Parser
 		debugger @cnj|int| == 8 
 		debugger @max|int| <= 63  
 		
-		.Tokenz( "\r \n /\r /\n", kEndOfLine, fEndOfLine )
+		.Tokenz( "\r \n", kEndOfLine, fEndOfLine )
 		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine) 
 		.token(":") = .handler(kColon, fEndOfLine).link(kColonArg, fArgColon)
 
@@ -1040,6 +1040,7 @@ extend Parser
 			  elseif (c == '/')
 				|| c2 = d[n]
 				ifn (c2 == '/' or '*') or (state & 2)
+					n--
 					exit
 				State = 2
 				if c2 != '*'
