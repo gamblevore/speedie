@@ -1042,7 +1042,7 @@ extend Parser
 					gotspaces = false
 					n--
 
-					if (c != '/' or (c2 != '*' and '/')) // supposed to save us from / at end of line! please fix!
+					if (c != '/' or (c2 != '*' and '/')) // supposed to save us from '/' at end of line! please fix!
 						exit		// should be easy if I am too tired.
 								    // it's supposed to let "a /" parse just as well as "a +"
 									// but doesn't, somehow.
@@ -1064,7 +1064,7 @@ extend Parser
 					gotspaces = false
 					if parent == @list
 						(parent is style2)
-					if c2 == '/' // somehow this fails to save us from / at the start of the line, even though it used to work
+					if c2 == '/' // somehow fails to save us from '/' at the start of line, it used to work tho!!
 						|| c3 = d[n+1] // too tired to fix this now. fix later
 						if c3 != '*' and '#'
 							n = .gotoendofline(n+1)
