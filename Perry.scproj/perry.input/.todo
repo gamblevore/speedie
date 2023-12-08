@@ -4,7 +4,6 @@
 
 * VM? 
 * Constants and globals don't autocomplete nicely
-* undo/redo don't put the sel in the middle of the screen???
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
 	* Main no longer is clickable if you use mainargs
 * Notifications flicker when resizing compile-tabs. We want a "SOLID" feel. Not anxious. :) 

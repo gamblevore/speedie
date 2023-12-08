@@ -359,11 +359,11 @@ class PerryIDE (Window)
 		require !.CurrMouseDown 
 		if (hidetop != .hidetop)
 			.hidetop = hidetop
-			.tabs.declutter.fire(0.32) = .hidetop
+			.tabs.declutter.fire(0.32, 0.5) = .hidetop
 		
 		if (hideside != .hideside)
 			.hideside = hideside
-			.filelist.declutter.fire(0.334) = .hideside
+			.filelist.declutter.fire(0.334, 0.5) = .hideside
 
 
 	function TestCompilerAlive

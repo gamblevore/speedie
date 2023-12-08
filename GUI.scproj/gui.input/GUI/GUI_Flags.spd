@@ -84,10 +84,10 @@ struct TimeFader
 		|| f = .final
 			return now >= f
 
-	function Fire (|float| Seconds, assigns:|bool|)
+	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)
 		sdlapp.touch
-		if value
-			.final = date.now + seconds.date
+		if value // too tired to do the delay thing too. Sigh. just end it.
+			.final = date.now + (seconds+0).date
 			.scale = 1.0 / seconds
 		  else
 			.final = 0

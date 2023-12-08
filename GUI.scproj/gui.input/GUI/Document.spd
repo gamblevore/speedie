@@ -355,7 +355,7 @@ extend TextView
 		require .parent
 		.UndoChecker = -1
 		if reason == DocumentState.UndoOrRedo
-			.ViewPos(ty.x)
+			.ShowTypingplace(ty)
 		.Clear(l.text, reason < 0)
 		if (reason == 0) and (ty.x2 > 0  and  d.scrollpos <= 0)
 			d.scrollpos = ty.x2
