@@ -1042,8 +1042,10 @@ extend Parser
 					gotspaces = false
 					n--
 
-					if (c != '/' or (c2 != '*' and '/')) // same as below. supposed to save us, but doesnt. please fix!
-						exit		// should be easy if I am not tired.
+					if (c != '/' or (c2 != '*' and '/')) // supposed to save us from / at end of line! please fix!
+						exit		// should be easy if I am too tired.
+								    // it's supposed to let "a /" parse just as well as "a +"
+									// but doesn't, somehow.
 					if (c2 == '*')
 						rz.lines++
 						rz.indent = 0
