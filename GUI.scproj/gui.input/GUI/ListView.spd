@@ -1390,6 +1390,7 @@ class ListView (GUIControl) {
 				.ScrollDrawTimer = 1							// oooop
 			scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer_)
 	
+	
 	helper guicontrol.EdgeAllow	(|MoveCode|)
 		opt norefcounts
 		|| Hide = 0

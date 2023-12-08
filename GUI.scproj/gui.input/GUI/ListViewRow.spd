@@ -125,12 +125,12 @@ role ListViewRow (message)
 			f = f.next
 
 
-	function DrawSep (|ivec4| rect, |image| Where)
+	function DrawSep (|ivec4| rect, |image| Where, |float| Str=1)
 		opt norefcounts
 		|| y = (rect.y + rect.y2+1)/2
 		rect = (rect.x, y, rect.x2+1, y+1)
 		|ImagePixel| A
-		A <~ ((1.0, 1.0, 1.0, 0.25))
+		A <~ ((1.0, 1.0, 1.0, 0.25*str))
 		where.RectBasic(Rect, A) 
 	
 	
@@ -151,44 +151,48 @@ role ListViewRow (message)
 		|| w	= p.window	
 		|| z2	= rect
 		
+		|| str = p.Declutter.Strength
 		where.controlclip = rect.clip(p.lastrect)
 		for i in p.DrawCols
 			rect.horz	= p.col(i, z2, self)
 			rect.x	   += depth*font.width*2
-			.DrawRowColumn(rect, where,  p, depth, i) 
+			.DrawRowColumn(rect, where,  p, depth, i, str) 
 
 		if self is active
 			where.horz	= z2.h
 			where.drawcircle( z2 + (4,0,-4,0), ¥.WhiteStyle, 1)
 		
 		if self is Grayed
-			|| gr = colors.gray(0.4)
+			|| gr = colors.gray(0.4*str)
 			where.RectBasic(z2 + (0,0,0,-1), gr)
 			
 		if self is found
 			z2 += (0, 1, 0, 0)
 			z2.y2 = z2.y + 1
-			where.RectBasic(z2, ¥.textselection.edge)
+			|| edge = ¥.textselection.edge
+			edge.Alpha *= str
+			where.RectBasic(z2, edge)
 
 
-	function DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column)
+	function DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)
 		opt NoRefCounts
 		
 		|| g		= parent.gnormal // unecessary? drawsep doesnt even use gnormal!
 		|| na = .__text__(column)
 		if !na and (self is disabled)
-			.DrawSep(Rect, where)
+			.DrawSep(Rect, where, str)
 			return
 		
 		|| R		= Rect.TextCorner(g, na, .state)
 		|| sighy	= ((rect.y + rect.y2)/2) - 3
-		|| moved	= (parent.OnDrawRow)(self, Rect.y1, sighy, where, parent, column)?
+		|| moved	= (parent.OnDrawRow)(self, Rect.y1, sighy, where, parent, column, str)?
 
 		R.x += moved.x
 		if .vis(column)
 			if parent.MultiLineDraw
 				r.y = rect.y2-10
 			|| TextCol	= parent.colorrow(depth, column, moved.y)
+			textcol.alpha *= str
 			font.small.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
 		
 

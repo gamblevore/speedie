@@ -205,6 +205,9 @@ class GUIControl (ringtree)
 		if f & guicontrolflags.visible
 			sdlapp.resized(self)
 
+	function Decluttering (|bool|)
+		return .Declutter.final
+		
 	function Decluttered (|bool|)
 		return .Declutter.Finished
 	

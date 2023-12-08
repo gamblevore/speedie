@@ -85,10 +85,10 @@ struct TimeFader
 			return now >= f
 
 	function Fire (|float| Seconds, assigns:|bool|)
+		sdlapp.touch
 		if value
 			.final = date.now + seconds.date
 			.scale = 1.0 / seconds
-			sdlapp.touch
 		  else
 			.final = 0
 			.scale = 0 

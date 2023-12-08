@@ -534,16 +534,16 @@ class FileViewer (ListView)
 			opt norefcounts
 			if self isa filerow
 				|| z	= parent.lastrect
-				|| d	= ._Document
 				|| sh	= font.width*2
 				|| v	= (6 + .depth(parent)*sh, texty)
-				|| mod	= d.ismodified?
+				|| mod	= ._Document.ismodified?
 				|| ddd	= (Colors.black(0.5), Colors.clear)(mod)
+				ddd.alpha *= strength // sigh...
 				font.small.drawicon(.Modifier, where, V, ddd)
 
 				if .HasError
 					v.x = z.x2-sh
-					font.small.drawicon('\17', where, V) // not sure???
+					font.small.drawicon('\17', where, V, ddd) // not sure???
 				return (sh, 0)
 
 

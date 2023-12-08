@@ -358,10 +358,8 @@ extend PerryIDE
 			|| pf = perry.projects.first 
 				 (pf is selected)
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
-			target debug
-				.GNormal.Drawer = image.RoundRectDrawer
-			  else
-				.GNormal.Drawer = image.ClippedRectDrawer
+			.GNormal.Drawer = image.RoundRectDrawer
+//			.GNormal.Drawer = image.ClippedRectDrawer // bugged somehow
 			.GNormal.CornersCut = 12
 			.GNormal.CornerSize = 6
 

@@ -9,7 +9,7 @@ prototype GUIDrawEvent			(|Image|  self, |ivec4| Rect, |drawstyle| G, |bool| Edg
 prototype GUIListDragEvent		(|ListView|   self,	|ListViewrow| Before, |ListViewrow| Into, |bool|)
 prototype GUIListEvent			(|ListView|   self,	|ListViewrow| Row, |listviewselectmode| Mode=listviewselectmode.normal, |bool|)
 prototype GUIListEditEvent		(|ListView|   self,	|ListViewcell| Cell, |string| Value, |bool|)
-prototype ListViewRowDraw		(|ListViewrow| self, |int| rowy, |int| texty, |image| where, |ListView| Parent, |int| col, |ivec2|)
+prototype ListViewRowDraw		(|ListViewrow| self, |int| rowy, |int| texty, |image| where, |ListView| Parent, |int| col, |float| strength,   |ivec2|)
 
 prototype GUIAction				(|GUIControl| self, |int| State=0,	|ListViewrow| Row=nil, |ListViewrow| Prev=nil, |bool|)
 prototype GUIMenuEvent			(|GUIControl| self,	|menuitem| menu, |ListViewcell| Clicked)

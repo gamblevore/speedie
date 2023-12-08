@@ -26,7 +26,7 @@ extend Parser
 		debugger @cnj|int| == 8 
 		debugger @max|int| <= 63  
 		
-		.Tokenz( "\r \n", kEndOfLine, fEndOfLine )
+		.Tokenz( "\r \n /\r /\n", kEndOfLine, fEndOfLine )
 		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine) 
 		.token(":") = .handler(kColon, fEndOfLine).link(kColonArg, fArgColon)
 
@@ -1012,18 +1012,48 @@ extend Parser
 
 		while (n < end)
 			|| c = addr[n++]
+			|| c2 = addr[n]
 			if (c == '\t')
 				if !rz.commas
 					rz.indent += 4
 				if (gotspaces and rz.lines)
 					.erroradd("Can't have tabs after spaces.", n-1)
 
+			  elseif (c == ',')
+				rz.commas++
+				|| l = parent.last
+					rz.indent = l.indent
+				  else
+					rz.indent = 0									// int.min
+				gotspaces = false
+
 			  elseif (c == ' ')
 				gotspaces = true
 				if !rz.commas
 					rz.indent++
+				
+			  else
+				ifn (c == '\n' or '\r')
+					if (c == '/') and (c2 == '\n' or '\r')
+						n++
+						c = c2
+					  else
+						gotspaces = false
+						n--
+						
+						if (c != '/')
+							exit
+						if (c2 == '*')
+							rz.lines++
+							rz.indent = 0
+							
+						.nextstart = n
+						|| line = .Process( kendofline, Parser.kAllow, parent )
+						n = .nextstart
+						if line != parser.EndOfLineMarker
+							exit
+						continue
 
-			  elseif (c == '\n') or (c == '\r')
 				rz.lines++
 				rz.isdebug=(c == '\r')|int|
 				rz.indent = 0
@@ -1032,31 +1062,6 @@ extend Parser
 				gotspaces = false
 				if parent == @list
 					(parent is style2)
-				
-			  elseif (c == ',')
-				rz.commas++
-				|| l = parent.last
-					rz.indent = l.indent
-				  else
-					rz.indent = 0									// int.min
-				gotspaces = false
-				
-			  else
-				gotspaces = false
-				n--
-				
-				if (c != '/')
-					exit
-				|| c2 = addr[n+1]
-				if (c2 == '*')
-					rz.lines++
-					rz.indent = 0
-					
-				.nextstart = n
-				|| line = .Process( kendofline, Parser.kAllow, parent )
-				n = .nextstart
-				ifn line == parser.endoflinemarker
-					exit
 
 		rz.lines += rz.commas
 		.nextstart = n

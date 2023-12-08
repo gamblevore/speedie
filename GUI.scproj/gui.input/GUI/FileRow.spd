@@ -283,7 +283,7 @@ helper string.FindExistingPath (|string|)
 	return self
 
 
-helper ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int| max = 2K)
+helper ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int| max = 2K, |string|)
 	|| path = InPath.TrimSlashes.FindExistingPath
 	require .listfiles(path, types, save, max) and inpath // also calls clear
 	|| r = filerow(path.parent, "..", ".nothing")
@@ -291,10 +291,10 @@ helper ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int|
 	|| f = path.file
 	|| r2 = .listsource[path.name] as filerow
 	if f.exists and !f.isdir and r2
-		(r2 is selected)
 		.show(r2)
-	  else
-		(r is selected)
+		r = r2
+	.select(r)
+	return path
 			
 
 

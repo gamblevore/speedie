@@ -2123,7 +2123,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[155], (111545589044505)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[155], (111545940719483)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3458,7 +3458,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[242]);
-	JB_FS_AppendInt32(_fsf0, (2023120815));
+	JB_FS_AppendInt32(_fsf0, (2023120817));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7284,7 +7284,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[513]);
-	JB_FS_AppendInt32(_fsf0, (2023120815));
+	JB_FS_AppendInt32(_fsf0, (2023120817));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -14029,29 +14029,13 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* parent) {
 	bool GotSpaces = false;
 	while (n < end) {
 		byte c = addr[n++];
+		byte c2 = addr[n];
 		if (c == '\t') {
 			if ((!rz.Commas)) {
 				rz.Indent = (rz.Indent + 4);
 			}
 			if (GotSpaces and ((bool)rz.Lines)) {
 				JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[946], n - 1));
-			}
-		}
-		 else if (c == ' ') {
-			GotSpaces = true;
-			if ((!rz.Commas)) {
-				rz.Indent++;
-			}
-		}
-		 else if ((c == '\n') or (c == '\x0D')) {
-			rz.Lines++;
-			rz.IsDebug = ((bool)((int)(c == '\x0D')));
-			rz.Indent = 0;
-			rz.Commas = 0;
-			rz.Pos = (n - 1);
-			GotSpaces = false;
-			if (JB_Msg_EqualsSyx(parent, JB_SyxList, false)) {
-				(JB_Msg_SyntaxIsSet(parent, kJB__MsgUIFlags_Style2, true));
 			}
 		}
 		 else if (c == ',') {
@@ -14065,22 +14049,45 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* parent) {
 			}
 			GotSpaces = false;
 		}
+		 else if (c == ' ') {
+			GotSpaces = true;
+			if ((!rz.Commas)) {
+				rz.Indent++;
+			}
+		}
 		 else {
+			if ((!((c == '\n') or (c == '\x0D')))) {
+				if ((c == '/') and ((c2 == '\n') or (c2 == '\x0D'))) {
+					n++;
+					c = c2;
+				}
+				 else {
+					GotSpaces = false;
+					n--;
+					if (c != '/') {
+						break;
+					}
+					if (c2 == '*') {
+						rz.Lines++;
+						rz.Indent = 0;
+					}
+					(JB_Tk__NextStartSet(n));
+					Message* line = JB_Tk__Process(kJB__Tk_EndOfLine, kJB__Tk_Allow, parent);
+					n = JB_Tk__NextStart();
+					if (line != JB__Tk_EndOfLineMarker) {
+						break;
+					}
+					continue;
+				}
+			}
+			rz.Lines++;
+			rz.IsDebug = ((bool)((int)(c == '\x0D')));
+			rz.Indent = 0;
+			rz.Commas = 0;
+			rz.Pos = (n - 1);
 			GotSpaces = false;
-			n--;
-			if (c != '/') {
-				break;
-			}
-			byte c2 = addr[n + 1];
-			if (c2 == '*') {
-				rz.Lines++;
-				rz.Indent = 0;
-			}
-			(JB_Tk__NextStartSet(n));
-			Message* line = JB_Tk__Process(kJB__Tk_EndOfLine, kJB__Tk_Allow, parent);
-			n = JB_Tk__NextStart();
-			if ((!(line == JB__Tk_EndOfLineMarker))) {
-				break;
+			if (JB_Msg_EqualsSyx(parent, JB_SyxList, false)) {
+				(JB_Msg_SyntaxIsSet(parent, kJB__MsgUIFlags_Style2, true));
 			}
 		}
 	};
@@ -47282,4 +47289,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 8583614630343114997 7481933187338067798
+// 8583614630343114997 183142357324895448

@@ -216,12 +216,13 @@ class ButtonView (GUIControl)
 		|| strength = 1.0
 		
 		|| WillDrawFocus = clicked and i and .ClickedItem
-		|| fader = .declutter.strength
+		|| fader = 1.0
 		if i is Active
 			strength += SDLApp.cycle(1s)*0.5
 			SDLApp.Touch
 		  else
-			require fader
+			fader = .declutter.strength					#require
+			
 		if WillDrawFocus or MouseXInside
 			grow += r
 		  else

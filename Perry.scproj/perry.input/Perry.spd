@@ -314,8 +314,6 @@ function ViewAsVis (|bool| AsProject)
 	(.ViewButtons is visible) = AsProject
 	(.filesep.div is visible) = AsProject
 	(.StartScreen is visible) = .hidetop
-	.filelist.declutter.fire(0.334) = .hideside
-	.tabs.declutter.fire(0.334) = .hidetop
 	if .filelist.hasfocus and .filelist.decluttered
 		.editme.SetFocus
 		

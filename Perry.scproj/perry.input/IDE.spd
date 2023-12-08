@@ -340,12 +340,13 @@ class PerryIDE (Window)
 
 		|| HideTop  = (m.y < LB)
 		|| HideSide = (m.x > LF)
-		|| VisSide  = !.filelist.decluttered
-		|| VisTop   = !.tabs.decluttered
+		|| VisSide  = !.filelist.decluttering
+		|| VisTop   = !.tabs.decluttering
 
 		// OK... so .. if one is visible, we don't make the other invis
 		if .filelist.cmm == .openedmenu
 			hideside = false 
+
 		if VisSide and VisTop and (HideSide != HideTop) 
 			HideSide = false
 			HideTop = false
@@ -355,11 +356,14 @@ class PerryIDE (Window)
 			|| fl = .filelist.ListSource as filerow
 			fl.SmartName = "file".pluralize(fl.LastFileCount)
 
-		
-		if !.CurrMouseDown and (hidetop != .hidetop or hideside != .hideside)
+		require !.CurrMouseDown 
+		if (hidetop != .hidetop)
 			.hidetop = hidetop
+			.tabs.declutter.fire(0.32) = .hidetop
+		
+		if (hideside != .hideside)
 			.hideside = hideside
-			.ViewAsCurr
+			.filelist.declutter.fire(0.334) = .hideside
 
 
 	function TestCompilerAlive
