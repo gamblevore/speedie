@@ -1041,9 +1041,9 @@ extend Parser
 				ifn (c == '\n' or '\r')
 					gotspaces = false
 					n--
-					
-					if (c != '/' or (c2 != '*' and '/'))
-						exit
+
+					if (c != '/' or (c2 != '*' and '/')) // same as below. supposed to save us, but doesnt. please fix!
+						exit		// should be easy if I am not tired.
 					if (c2 == '*')
 						rz.lines++
 						rz.indent = 0
@@ -1062,8 +1062,8 @@ extend Parser
 					gotspaces = false
 					if parent == @list
 						(parent is style2)
-					if c2 == '/'
-						|| c3 = d[n+1]
+					if c2 == '/' // somehow this fails to save us from / at the start of the line, even though it used to work
+						|| c3 = d[n+1] // too tired to fix this now. fix later
 						if c3 != '*' and '#'
 							n = .gotoendofline(n+1)
 
