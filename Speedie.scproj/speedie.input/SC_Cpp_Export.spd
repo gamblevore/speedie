@@ -732,7 +732,7 @@ module
 	|uint64| 	LubHash
 	|string| 	FindGlobalsCpp = (`		
 
-extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
+extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	*src = JB_LUBSrc2;
 	*Hash = JB_LUBHash;
 	return JB_LUB;
@@ -746,7 +746,7 @@ extern "C" JB_String** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function GenLub (|faststring| fs)
-		fs <~ "JB_String* JB_LUB["
+		fs <~ "JB_StringC* JB_LUB["
 		fs <~ .StringCount + 1 // + 1 for the emptystring
 		fs <~ "];\n\n"
 

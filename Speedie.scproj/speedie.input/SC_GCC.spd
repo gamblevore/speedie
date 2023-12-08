@@ -211,7 +211,8 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	rz.AppendWords( Linkage[Platform.name] )
 	if platform.lin
 		rz.appendwords( " -lrt" )
-	rz.AppendWords("-lcurl")
+	if !options.ProjectIsMiniLib
+		rz.AppendWords("-lcurl")
 	
 	// Gaming64Bit
 	rz.AppendWords("-ffast-math -fno-math-errno")

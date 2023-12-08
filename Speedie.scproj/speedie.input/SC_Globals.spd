@@ -15,6 +15,34 @@ constants
 prototype ExprResolver (|Message| Exp, |SCBase| name_space, |Message| side, |SCObject|)
 
 dispatch ExprFuncs (ExprResolver)  {
+/* @decl is BAD!   dont add it*/
+	@Rel  : (TypeOfRel)
+	@BRel : (TypeOfBRel)
+	@ARel : (TypeOfARel)
+	@Adj  : (TypeOfAdj)
+	@Func : (TypeOfFunc)
+	@Acc  : (TypeOfAccess)
+	@msg  : (TypeOfMsg)
+	@sthg : (TypeOfSthg)
+	@Dot  : (TypeOfDot)
+	@Name : (TypeOfSyx)
+	@list : (TypeOflist)
+	@Arr  : (TypeOfArr)
+	@Arg  : (TypeOfArgArr)
+	@Char : (TypeOfChar)
+	@sstr : (TypeOfSString)
+	@Item : (TypeOfLast)
+	@Bra  : (TypeOfBra)
+	@Str  : (TypeOfStr)
+	@Back : (TypeOfStr)
+	@Num  : (TypeOfNum)
+	@unit : (Typeofunit)
+	@Thg  : (TypeOfThg)
+	@Ques : (TypeOfQues)
+	@SDot : (Typeofsdot)
+	@Type : (typeoftype)
+	@Emb  : (TypeOfNothing)
+	@Sheb : (TypeOfNothing)
 	63    : (TypeOfNothing)
 }
 
@@ -229,11 +257,11 @@ function TypeOfStr (ExprResolver)
 	opt norefcounts
 	// this is better than calling tran_strings, right?
 	scfunction.String_Expand(exp, exp.msgowningfunc)
-	Return TypeString.TypeReal
+	Return TypeStringzero.TypeReal
 
 
 function TypeOfSString (ExprResolver)
-	return typestring.TypeReal // should return stringzeroterminated!
+	return typestringzero.TypeReal // should return stringzeroterminated!
 
 
 function TypeOfChar (ExprResolver)

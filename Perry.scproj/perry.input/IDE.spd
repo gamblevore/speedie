@@ -351,11 +351,10 @@ class PerryIDE (Window)
 			HideTop = false
 		
 		if .viewing == .viewfiles
-			if HideSide
-				|| fl = .filelist.listsource as filerow
-					.noneed "file".pluralize(fl.LastFileCount)
-			  else
-				.noneed
+			.noneed
+			|| fl = .filelist.ListSource as filerow
+			fl.SmartName = "file".pluralize(fl.LastFileCount)
+
 		
 		if !.CurrMouseDown and (hidetop != .hidetop or hideside != .hideside)
 			.hidetop = hidetop

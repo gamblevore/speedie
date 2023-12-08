@@ -24,6 +24,10 @@ function message.GoodName (|bool| NeedName=false, |string|)
 		error (self, "No name found")
 		return string.Error
 	return name
+
+function message.smartname (assigns:|string|)
+	if .name != value
+		.name = value // save memory for often generated strings
 	
 	
 helper message.GoodNameSub (|bool| NeedName=false, |string|)

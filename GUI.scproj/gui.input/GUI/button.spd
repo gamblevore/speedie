@@ -222,8 +222,6 @@ class ButtonView (GUIControl)
 			SDLApp.Touch
 		  else
 			require fader
-		if self ~= "tabs"
-			printline fader
 		if WillDrawFocus or MouseXInside
 			grow += r
 		  else

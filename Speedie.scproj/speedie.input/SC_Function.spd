@@ -225,7 +225,7 @@ function FuncDecls
 		.DeclsProtoType( fc )
 	
 	|| A = .SourceArg
-	|| space = (A.scarg( self ), nil)(a)
+	|| space = a.scarg(self)
 	
 	if (P==@List or @Bra or @prm)
 		p.Func = @prm

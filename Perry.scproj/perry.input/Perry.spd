@@ -319,7 +319,7 @@ function ViewAsVis (|bool| AsProject)
 	if .filelist.hasfocus and .filelist.decluttered
 		.editme.SetFocus
 		
-	(.noneeder is visible)  = .noneeder.text and AsProject
+	(.noneeder is visible)  = .noneeder.text and AsProject and (.FileList isnt visible)
 	if .HideTop or !AsProject
 		(.DebugArgsList isnt visible)
 

@@ -4,7 +4,6 @@
 
 * buttons draw like a baka
 	* also they aren't hiding properly?
-* strings should be stringc, by default.
 * new empty files should be containing "main"
 * VM? 
 * Constants and globals don't autocomplete nicely
@@ -21,7 +20,6 @@
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
 * too long text in listview draw as much as we can
-* files shouldn't disappear immediately
 
 
 						 Speedie Do later

@@ -75,10 +75,14 @@ struct TimeFader
 			|float| str = remy.seconds * .Scale
 			if touch
 				sdlapp.touch
-			return str.clamp
+			rz = str.clamp
+			if rz == 1.0
+				.final = 0
+				.scale = 0
 	
 	function Finished (|date| now=date.now, |bool|)
-		return now >= .final
+		|| f = .final
+			return now >= f
 
 	function Fire (|float| Seconds, assigns:|bool|)
 		if value

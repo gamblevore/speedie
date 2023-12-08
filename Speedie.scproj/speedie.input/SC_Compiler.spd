@@ -16,6 +16,7 @@
 |SCClass|	TypeuInt
 |SCClass|	TypeuInt64
 |SCClass|	TypeString
+|SCClass|	TypeStringZero
 |SCClass|	TypeSyntax
 |SCClass|	TypeBool
 |SCClass|	TypeCharSet
@@ -240,6 +241,7 @@ function InitTypes
 	Typefloat			= Typef32 // whyyyyy... why I do dis. 
 	TypeBool			= compiler["bool"]
 	TypeString			= compiler["string"]
+	TypeStringZero		= compiler["stringzeroterminated"]	
 	TypeByte			= compiler["byte"]
 	TypeCharSet			= compiler["charset"]
 	Typevec2			= compiler["vec2"]
@@ -249,17 +251,18 @@ function InitTypes
 	Typeivec3			= compiler["ivec3"]
 	Typeivec4			= compiler["ivec4"]
 	Typedate			= compiler["date"]
-	TypeJBClass			= Compiler..classdata
-	TypeObject			= Compiler..object
-	TypeSyntax			= Compiler..syntax
-	TypeVoidPtr			= Compiler.._voidptr
-	TypeVoid_           = Compiler.._void
-	TypeWrapper			= Compiler..datatypewrapper
-	TypeDictionary		= Compiler..dictionary
-	TypeFastString		= Compiler..faststring
-	TypeArray			= Compiler..array
-	TypeSaveable		= Compiler..saveable
+	TypeJBClass			= Compiler["classdata"]
+	TypeObject			= Compiler["object"]
+	TypeSyntax			= Compiler["syntax"]
+	TypeVoidPtr			= Compiler["_voidptr"]
+	TypeVoid_           = Compiler["_void"]
+	TypeWrapper			= Compiler["datatypewrapper"]
+	TypeDictionary		= Compiler["dictionary"]
+	TypeFastString		= Compiler["faststring"]
+	TypeArray			= Compiler["array"]
+	TypeSaveable		= Compiler["saveable"]
 
+	TypeStringZero.DowngradeTo? = TypeString
 	typevoid            = typevoid_.TypeNormal
 	typestring.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
 
@@ -588,42 +591,10 @@ function PostInitCodeCall
 	.program.initvarsarg <~ "initcode_()".parseclean
 
 
-function ExprFuncsInit
-/* @decl is BAD!   dont add it*/
-	exprfuncs[@Rel ] = (TypeOfRel)
-	exprfuncs[@BRel] = (TypeOfBRel)
-	exprfuncs[@ARel] = (TypeOfARel)
-	exprfuncs[@Adj ] = (TypeOfAdj)
-	exprfuncs[@Func] = (TypeOfFunc)
-	exprfuncs[@Acc ] = (TypeOfAccess)
-	exprfuncs[@msg ] = (TypeOfMsg)
-	exprfuncs[@sthg] = (TypeOfSthg)
-	exprfuncs[@Dot ] = (TypeOfDot)
-	exprfuncs[@Name] = (TypeOfSyx)
-	exprfuncs[@list] = (TypeOflist)
-	exprfuncs[@Arr ] = (TypeOfArr)
-	exprfuncs[@Arg ] = (TypeOfArgArr)
-	exprfuncs[@Char] = (TypeOfChar)
-	exprfuncs[@sstr] = (TypeOfSString)
-	exprfuncs[@Item] = (TypeOfLast)
-	exprfuncs[@Bra ] = (TypeOfBra)
-	exprfuncs[@Str ] = (TypeOfStr)
-	exprfuncs[@Back] = (TypeOfStr)
-	exprfuncs[@Num ] = (TypeOfNum)
-	exprfuncs[@unit] = (Typeofunit)
-	exprfuncs[@Thg ] = (TypeOfThg)
-	exprfuncs[@Ques] = (TypeOfQues)
-	exprfuncs[@SDot] = (Typeofsdot)
-	exprfuncs[@Type] = (typeoftype)
-	exprfuncs[@Emb ] = (TypeOfNothing)
-	exprfuncs[@Sheb] = (TypeOfNothing)
-
-
 function InitCompiler
 	require (.Projects.fileCH("Library").mustexist)
 	require stderr.ok
 	scoperator.Init
-	.exprfuncsinit
 	Cpp_Export.Init
 
 	.files := Dictionary.new

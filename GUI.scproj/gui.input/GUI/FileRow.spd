@@ -277,8 +277,14 @@ class FileRow (ListViewRow)
 				rz = rz max r.name(nameonly).FileViewMatch(path)
 
 
+helper string.FindExistingPath (|string|)
+	while (self > 1) and !.fileexists
+		self = self.parent
+	return self
+
+
 helper ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int| max = 2K)
-	|| path = InPath.TrimSlashes
+	|| path = InPath.TrimSlashes.FindExistingPath
 	require .listfiles(path, types, save, max) and inpath // also calls clear
 	|| r = filerow(path.parent, "..", ".nothing")
 	.listsource.first = r
@@ -292,18 +298,16 @@ helper ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int|
 			
 
 
-function ListView.ListFiles (|string| path, |string|types, |bool| save, |int| max = 256, |bool|)
-	return .listsource.listfilespath(path, types, save, max)
-
-
-function ListViewRow.ListFilesPath (|string| InPath, |string| types, |bool| save, |int| max = 256, |bool|)
-	.clear
-	|| path = InPath.Resolve #require
-	|| allsight = (path.name == ".")
+function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int| max = 256, |bool|)
+	|| s = .listsource
+	s.clear
+	|| path = InPath.Resolve(true)			#require
+	|| AllSight = (path.name == ".")
 	|| AtRoot   = (path == "/")
 	|| pf		= path.file 
 	if !pf.exists or !pf.isdir
 		pf = pf.parent
+	
 	for f.files in pf // merge these two
 		|| p = f.path
 		|| n = p.name
@@ -331,7 +335,7 @@ function ListViewRow.ListFilesPath (|string| InPath, |string| types, |bool| save
 					isok = types.typecontains(ext)
 			(r is Grayed) = !ISOK 
 			
-	.filesort
+	s.filesort
 	return true
 
 

@@ -33,6 +33,7 @@ linkage
 |SCBehaviour|   			Behaviour
 |string|					SaveAs
 |SCClass|					ProcessAs
+|SCClass|					DowngradeTo
 |SCDecl|					DataTypeWrapper
 |uint16|					Size
 |uint16|					Depth

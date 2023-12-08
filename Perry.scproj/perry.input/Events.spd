@@ -23,13 +23,16 @@ function string.TrimProj (|string|)
 
 
 function Perry.CreateProj (|string| path)
+	|| proj = path.file
+	|| Main = defaultfiles.EmptyMainFile(proj.trimextandpath)
+		
 	ifn path isa "scproj"
 		require path.file.CreateEmpty
+		if path isa "spd"
+			proj.data = main
 	  else
 		expect (!path.fileexists) (path, "Can't create over existing project.")
 
-		|| proj = path.file
-		|| Main = defaultfiles.EmptyMainFile(proj.trimextandpath)
 		proj.child("input/main.spd").data(Main) #require
 
 		|| R = defaultfiles.Roots

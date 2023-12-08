@@ -2,6 +2,12 @@
 // Copyright, Theodore H. Smith 2023.
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
+#ifdef AS_LIBRARY
+	void JB_CurlStub();
+#else
+
+
+
 #include "JB_Umbrella.hpp"
 #include <curl/curl.h>
 
@@ -58,3 +64,5 @@ void JB_Curl_Cleanup () {
 }
 //*/
 }
+
+#endif

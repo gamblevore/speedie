@@ -69,6 +69,7 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
 	if !cls
 		cls = .parent|SCModule|.Cls
 	  elseif !prms.HasSelfAsFirst
+		expect (addtospace) (prms)
 		.AddSelfToFunc(cls, AddToSpace)
 
 	for item in prms
@@ -166,7 +167,6 @@ function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
 
 
 function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
-	
 	|| Types = .first
 	|| Names = types.Next
 
@@ -185,6 +185,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| c
 		0
 	  elseif (Default)
 		DefaultDcl = TypeOfExprNeeded( Default, P ) #require
+		DefaultDcl = DefaultDcl.Downgrade
 		if (sdcl)   // make sure it matches.
 			default = sdcl.ExpectMatch( DefaultDcl, kTypeCastTrue, default )
 		
@@ -265,6 +266,15 @@ function scdecl.Containedfix (|scdecl|)
 	rz.contains = t.SelfDecl.Contains
 
 
+function scdecl.DownGrade (|scdecl|)
+	opt norefcounts
+	if !.IsNormalObject
+		return self
+	|| y = .type.DowngradeTo
+		return y.TypeNormal
+	return self
+	
+	
 function message.AddValue (|scfunction| f)
 	opt norefcounts
 	pragma inline
