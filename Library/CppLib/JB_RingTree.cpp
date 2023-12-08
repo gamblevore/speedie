@@ -165,7 +165,7 @@ inline bool PrepareMove_( RingTree* place, RingTree* mover ) {
         }
     }
 
-    JB_ErrorHandleC("Error: moved a RingTree node to the wrong place", false);
+    JB_ErrorHandleC("Error: moved a RingTree node to the wrong place", 0, false);
 	JB_DoAt(1);
 
     return false;

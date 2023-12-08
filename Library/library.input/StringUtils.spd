@@ -276,3 +276,10 @@ function string.UnPrintable (|int|)
 function String.Spin (|int| f, |byte|)
 	return `|/-\`[f&3] // useful for printing "processing" things to stdout
 
+
+function string.download (|date| timeout=10s, |string|cookielist=nil, |string|)
+	rz = string.error
+	|| fs = faststring()
+	if fs.appendurl(self, cookielist)
+		rz = fs
+	

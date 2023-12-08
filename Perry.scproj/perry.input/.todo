@@ -4,6 +4,8 @@
 
 * buttons draw like a baka
 	* also they aren't hiding properly?
+* strings should be stringc, by default.
+* new empty files should be containing "main"
 * VM? 
 * Constants and globals don't autocomplete nicely
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)

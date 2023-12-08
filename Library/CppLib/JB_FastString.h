@@ -59,6 +59,7 @@ FastString* JB_FS__New();
 void JB_FS_ByteSet(FastString* self, int offset, byte Val);
 uint8*  JB_FS_WriteAlloc_(FastString* fs, int GrowBy);
 void JB_FS_AppendString(FastString* self, JB_String* u);
+int JB_FS_AppendURL(FastString* self, JB_StringC* URL, uint64 TimeoutSeconds, JB_StringC* Cookie );
 void JB_FS_AppendLine(FastString* self, JB_String* s);
 void JB_FS_AppendSection(FastString* self, JB_String* u, int srStart, int srLength);
 void JB_FS_AppendFastString(FastString* self, FastString* po);

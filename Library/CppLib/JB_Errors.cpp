@@ -107,8 +107,8 @@ int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errnum, const char
 }
 
 
-void JB_ErrorHandleC(const char* Desc, bool CanFreeDesc) {
-    JB_Error* Err = JB_Err__New(0, nil, 4, nil);
+void JB_ErrorHandleC(const char* Desc, JB_String* path, bool CanFreeDesc) {
+    JB_Error* Err = JB_Err__New(0, nil, 4, path);
     if (!Err) {
         return;
     }

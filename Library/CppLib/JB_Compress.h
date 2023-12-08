@@ -62,7 +62,7 @@ int ChunkLen_(int x) {
 inline bool DErr(bool Cond, const char* Err) {
 	if (Cond) return false;
 	puts(Err); debugger;
-	JB_ErrorHandleC(Err, false);
+	JB_ErrorHandleC(Err, 0, false);
 	return true;
 }
 

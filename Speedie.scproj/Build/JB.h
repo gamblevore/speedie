@@ -665,7 +665,6 @@ struct StructSaveTest {
 struct NilTracker {
 	NilRecord* Line;
 	NilRecord* RowEnd;
-	SCDecl* Dbg[32];
 	LoopInfo Loops;
 	NilRecord Rows[64];
 };
@@ -1536,7 +1535,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_AddressOfMatch (3 << 22)
 #define kJB_ASM (63)
 #define kJB_BitAnd (JB_LUB[355])
-#define kJB_BitNot (JB_LUB[608])
+#define kJB_BitNot (JB_LUB[609])
 #define kJB_BitOr (JB_LUB[1327])
 #define kJB_BitXor (JB_LUB[1921])
 #define kJB_CastedMatch (6 << 22)
@@ -4175,8 +4174,6 @@ bool SC_NilCheckMode_SyntaxIsnt(NilCheckMode self, NilCheckMode other);
 // NilRecord
 uint SC_NRD_Count(NilRecord self);
 
-void ndb5(NilRecord self);
-
 NilState SC_NRD_SyntaxAccess(NilRecord self, int item);
 
 
@@ -4759,8 +4756,6 @@ void SC_IR_FS(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
-void SC_IR_Print(IR* self);
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5008,8 +5003,6 @@ int SC_nil__Init_();
 int SC_nil__InitCode_();
 
 NilState SC_nil__JustReal(Message* msg, NilCheckMode Test);
-
-void ndb4();
 
 NilState SC_nil__NilParamPass(SCDecl* Recv, SCDecl* Sent, Message* where);
 
@@ -5557,8 +5550,6 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 
 // JB_ErrorReceiver
-int JB_Rec_BadCount(JB_ErrorReceiver* self);
-
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
 void JB_Rec_Clear(JB_ErrorReceiver* self);
@@ -9059,7 +9050,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
@@ -9089,18 +9079,7 @@ inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v) {
 }
 
 inline NilState SC_nil_Set(NilTracker* self, NilRecord Dest, JB_String* reason) {
-	NilRecord diff = Dest ^ (*self->Line);
 	(*self->Line) = Dest;
-	{
-		int i = 0;
-		while (i < 32) {
-			if (SC_NRD_SyntaxAccess(diff, i)) {
-				ndb2(self->Dbg[i], reason);
-			}
-			i++;
-		};
-	}
-	;
 	return 0;
 }
 

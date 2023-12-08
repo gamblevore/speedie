@@ -9,10 +9,9 @@
 
 
 extern "C" {
-int JB_ErrorHandleFileC(uint8* Path, int err, const char* Operation);
 static JB_String* jb_lib_file_err(const char* path, const char* op) {
-    JB_ErrorHandleFileC((uint8*)path, errno, op);
-    return 0;
+    JB_ErrorHandleFileC(path, errno, op);
+    return JB_Str__Empty();
 }
     
 
