@@ -295,44 +295,43 @@ function ViewAsSwap
 		.ViewAsText
 
 
-function ViewAsVis (|bool| vis)
+function ViewAsVis (|bool| AsProject)
 	opt norefcounts
-	.istextonly = !vis
+	.istextonly = !AsProject
 	|| AnyViews = false
 	for v in .ViewButtons
 		|| t = v.tag as guicontrol
 			(t is visible) = (v.gnormal.bg.hasany)
 			AnyViews := t is visible 
 	
-	if vis and !AnyViews
+	if AsProject and !AnyViews
 		.viewfiles.click(nil)
 
-	|| top = !(.noclutter&1) and vis
-	.filesep.Collapsed = !vis
-	(.gonext is visible)	= vis
-	(.goPrev is visible)	= vis
-	(.rborder is visible)	= vis
-	(.ViewButtons is visible) = vis
-	(.filesep.div is visible) = vis
-	(.StartScreen is visible) = (.noclutter & 1)==0
-	(.filelist is decluttered)  = (.noclutter & 2)!=0
-	if .filelist.hasfocus and .filelist is decluttered
+	.filesep.Collapsed = !AsProject
+	(.gonext is visible)	= AsProject
+	(.goPrev is visible)	= AsProject
+	(.rborder is visible)	= AsProject
+	(.ViewButtons is visible) = AsProject
+	(.filesep.div is visible) = AsProject
+	(.StartScreen is visible) = .hidetop
+	.filelist.declutter.fire(0.334) = .hideside
+	.tabs.declutter.fire(0.334) = .hidetop
+	if .filelist.hasfocus and .filelist.decluttered
 		.editme.SetFocus
 		
-	(.noneeder is visible)  = .noneeder.text and vis
-	if !top and !Platform.IsDebug
+	(.noneeder is visible)  = .noneeder.text and AsProject
+	if .HideTop or !AsProject
 		(.DebugArgsList isnt visible)
-	
-	|| StillRuns = top and (vis or .path.isSource)
-	|| srchvis   = vis and (.searcharea is visible) 
+
+	|| ShowBuilders = !.HideTop and (AsProject or .path.isSource)
+	|| srchvis   = AsProject and (.searcharea is visible) 
 	(.searcharea is visible)		= srchvis
 
-	(.runbutton is visible)			= StillRuns
-	(.buildbutton is visible)		= StillRuns
-	(.progress is visible)			= Stillruns and (.buildbutton isnt enabled)
-	(.tabs is decluttered)			= !top
+	(.runbutton is visible)			= ShowBuilders
+	(.buildbutton is visible)		= ShowBuilders
+	(.progress is visible)			= ShowBuilders and (.buildbutton isnt enabled)
 
-	if vis
+	if AsProject
 		.CurrFileName.size = 8 ~ after for 140 by 1~inside
 		.FileListersInside(.rborder)
 	  else

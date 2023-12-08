@@ -147,7 +147,7 @@ role ListViewRow (message)
 	
 	function ListRowDraw (|ivec4| Rect, |image| Where, |ListView| p, |int| depth)
 		opt NoRefCounts
-		require self and (p isnt decluttered)
+		require self and !p.decluttered
 		|| w	= p.window	
 		|| z2	= rect
 		

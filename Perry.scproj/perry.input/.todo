@@ -2,8 +2,8 @@
 	 
 							Todo
 
-* 0|&byte| and 1|&byte| should be understood as real or not... if its a const.
-	* Also p|&byte| should be optional.
+* buttons draw like a baka
+	* also they aren't hiding properly?
 * VM? 
 * Constants and globals don't autocomplete nicely
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
@@ -19,6 +19,7 @@
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
 * too long text in listview draw as much as we can
+* files shouldn't disappear immediately
 
 
 						 Speedie Do later

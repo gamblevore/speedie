@@ -13,6 +13,7 @@ class GUIControl (ringtree)
 	|Drawstyle|					GNormal
 	|GUIAction|					OnClicked
 	|GUIAction|					OnFocus
+	|TimeFader|					Declutter
 	|ControlSize|				Sizer
 	|uint16|					TabIndex
 	|ControlClipMode|			ClipMode
@@ -196,15 +197,16 @@ class GUIControl (ringtree)
 	
 	syntax is (|guicontrolflags|F, assigns:|bool|)
 		require ((.state&f)!=0) != value
-		|| test = guicontrolflags.visible (|) guicontrolflags.decluttered 
 		
 		if value
 			.state |= f
 		  else
 			.state &= ~F
-		if f & test
+		if f & guicontrolflags.visible
 			sdlapp.resized(self)
 
+	function Decluttered (|bool|)
+		return .Declutter.Finished
 	
 	function Touch (|int| Amount = 2)
 		opt norefcounts

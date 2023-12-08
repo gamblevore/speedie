@@ -268,10 +268,10 @@ module SDLApp
 		SDL_WINDOW_ALLOW_HIGHDPI =	0x00002000
 
 	helper InitWindow (|ivec2| s, |string|name)
-		SDL_Init(SDL_INIT_AUDIO (|) SDL_INIT_VIDEO (|) SDL_INIT_EVENTS (|) SDL_INIT_HAPTIC)
+		SDL_Init(SDL_INIT_AUDIO ||| SDL_INIT_VIDEO ||| SDL_INIT_EVENTS ||| SDL_INIT_HAPTIC)
 
 		.screenwindow = SDL_CreateWindow(name.cstr,
-			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.x, s.y, SDL_WINDOW_RESIZABLE (|) SDL_WINDOW_ALLOW_HIGHDPI)
+			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.x, s.y, SDL_WINDOW_RESIZABLE ||| SDL_WINDOW_ALLOW_HIGHDPI)
 
 		.SDL_SetWindowMaximumSize(.screenwindow, 2K, 2K)
 		.SDL_SetWindowMinimumSize(.screenwindow,  400,  200)
@@ -1189,7 +1189,7 @@ datatype SDLCloseReason (uint)
 	syntax is (|SDLCloseReason| act, assigns:|bool| value, |SDLCloseReason|)
 		cpp_Part Set
 		if value
-			return (self|int| (|) act|int|)|SDLCloseReason|
+			return (self|int| ||| act|int|)|SDLCloseReason|
 		  else
 			return (self|int| &~ act|int|)|SDLCloseReason|
 			

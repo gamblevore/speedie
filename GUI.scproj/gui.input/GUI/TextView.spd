@@ -73,7 +73,7 @@ class TextView (GUIControl)
 		.LineHeight = font.Height + 4 // whatever
 		.SetsDebugLines = 10
 		.ExpectsParse = TextView.allowjeebox
-		.CopyPaste = CopyPasteFlags.CopyText (|) CopyPasteFlags.PasteText
+		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
 		.init
 	
 	
@@ -1766,9 +1766,6 @@ class TextView (GUIControl)
 		if .SingleLine
 			charw = 4KB
 	
-		target debug
-			if (self ~= "Editme")
-				if keys.shift
 		// d = d.ReclaimStart(._reclaim[0])
 		|| ARGH = 0		// .reclaimrestart(d) // disabled for now.
 		|| t = d.tline

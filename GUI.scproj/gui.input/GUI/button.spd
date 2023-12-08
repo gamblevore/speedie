@@ -148,7 +148,7 @@ class ButtonView (GUIControl)
 		opt norefcounts
 		.clickcount = clicks
 		|| D = .itemat(P.x)
-			if d isnt active  and  self is decluttered
+			if (d isnt active)  and  .Decluttered
 				d = nil
 		
 		|| ret = MouseDragging.Ignored
@@ -210,16 +210,20 @@ class ButtonView (GUIControl)
 		if .MenuIsOpen
 			grow = nil
 		
-		|| MouseXInside = R.x1x2 contains sdlapp.MouseXY.x
+		|| M = SDLApp.MouseXY
+		|| MouseXInside = R.x1x2 contains M.x
 		|| clicked = .MouseIsDown and mouseXinside and !.NoDrawClicked
 		|| strength = 1.0
 		
 		|| WillDrawFocus = clicked and i and .ClickedItem
+		|| fader = .declutter.strength
 		if i is Active
 			strength += SDLApp.cycle(1s)*0.5
 			SDLApp.Touch
 		  else
-			require self isnt decluttered
+			require fader
+		if self ~= "tabs"
+			printline fader
 		if WillDrawFocus or MouseXInside
 			grow += r
 		  else
@@ -242,17 +246,21 @@ class ButtonView (GUIControl)
 			if WillDrawFocus
 				g.edge = .FocusBorderStyle.edge
 				g.edge.Alpha = 1.0
-			Where.RectStyled(Grow, .GNormal)
+			g.Strengthen(fader)
+			Where.RectStyled(Grow, G)
 		
 		if !i and .SubMenu
 			i = .SubMenu.ListSource // allow these text to be added.
 		|| t = i.ButtonText(.text)
-		|| Pn = R.TextCorner(.gnormal,  t,  .align) + (-1, 1)
-		|| White = (.align & listviewstate.DrawWhiteSpace)!=0
-		pn.x = font.small.DrawText(t,  Where,  Pn, White) + 2
-		if  .pressing  and  MouseXInside  and  r.Width > 19
+		|| Pn = R.TextCorner(g,  t,  .align) + (-1, 1)
+		|| DrawInvis = (.align & listviewstate.DrawWhiteSpace)!=0
+		|| TextCol = colors.white
+		textcol.alpha = fader
+		pn.x = font.small.DrawText(t,  Where,  Pn, TextCol, DrawInvis) + 2
+		|| MI = MouseXInside and  (R.y1y2 contains M.y)
+		if  .pressing  and MI  and  r.Width > 19  
 			(pn.x min= r.x2-(font.Width+2))
-			font.small.DrawText("\03", where, pn, white)
+			font.small.DrawText("\03", where, pn, TextCol, DrawInvis)
 		
 		
 	function ListViewRow.ButtonText (|string| Default, |string|)

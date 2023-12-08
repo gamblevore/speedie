@@ -1243,7 +1243,7 @@ class ListView (GUIControl) {
 
 
 	helper DrawBordersSub (|image| Where,  |ivec4| Rect)
-		require (self isnt decluttered)
+		require !.decluttered
 		|| z2 = rect
 		z2.y2 += .scrollshift
 		z2.y  = z2.y2 - .rowheight

@@ -60,7 +60,6 @@ extend PerryIDE
 	
 	function Init // perryide.init
 		.size      = the~area
-		.noclutter = 2
 		.CopyPaste = CopyPasteFlags.PasteFile
 		.onpaste   = &perryopendoc
 

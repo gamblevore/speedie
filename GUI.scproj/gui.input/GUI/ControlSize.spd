@@ -36,8 +36,8 @@ struct ControlSize
 		return .GSize[i]>>4
 
 	helper sett (|int|i, |ivec2| value, |int| mode) // remove?
-		.g(i)   = ((value.x << 4) (|) mode)|controlpoint|
-		.g(i+1) = ((value.y << 4) (|) mode)|controlpoint|
+		.g(i)   = ((value.x << 4) ||| mode)|controlpoint|
+		.g(i+1) = ((value.y << 4) ||| mode)|controlpoint|
 
 	setter guicontrol.FullScreen (|ivec2|) // for full-screen windows
 		.lastrect = (0,0,value)

@@ -75,7 +75,6 @@ class PerryIDE (Window)
 	|int|						EditMeTabRetryThing
 	|byte|						DuringLoad
 	|byte| 						DuringTempView
-	|byte|						NoClutter
 	|bool|						AlreadyExpandedCompileTab
 	|bool| 						StillJumping
 	|bool|						CanAskingAboutMissing
@@ -87,6 +86,8 @@ class PerryIDE (Window)
 	|bool|						InConstructor
 	|bool|						ModifiedForCompile
 	|bool| 						IsGraphics
+	|bool| 						HideTop
+	|bool| 						HideSide
 
 		
 	function UpdateStatusErrors
@@ -334,20 +335,21 @@ class PerryIDE (Window)
 
 	function HideStuff 
 		|| M  = .MouseXY
-		|| LB = .ViewButtons.lastrect
-		|| HideTop  = (m.y < LB.y1)
-		|| HideSide = (m.x > LB.x2-2) // sigh... even happens when mouse over the side invis
-		|| VisSide  = .filelist isnt decluttered // and .filelist.isviewable
-		|| VisTop   = .tabs isnt decluttered
+		|| LB = .ViewButtons.lastrect.y1
+		|| LF = .filelist.lastrect.x2-2
+
+		|| HideTop  = (m.y < LB)
+		|| HideSide = (m.x > LF)
+		|| VisSide  = !.filelist.decluttered
+		|| VisTop   = !.tabs.decluttered
 
 		// OK... so .. if one is visible, we don't make the other invis
+		if .filelist.cmm == .openedmenu
+			hideside = false 
 		if VisSide and VisTop and (HideSide != HideTop) 
 			HideSide = false
 			HideTop = false
-		if .filelist.cmm == .openedmenu
-			hideside = false 
 		
-		require HideTop == VisTop  or  HideSide == VisSide
 		if .viewing == .viewfiles
 			if HideSide
 				|| fl = .filelist.listsource as filerow
@@ -355,11 +357,10 @@ class PerryIDE (Window)
 			  else
 				.noneed
 		
-		if !.CurrMouseDown
-			|| h = HideTop + 2*hideside
-			if .noclutter!=h
-				.NoClutter = H
-				.ViewAsCurr
+		if !.CurrMouseDown and (hidetop != .hidetop or hideside != .hideside)
+			.hidetop = hidetop
+			.hideside = hideside
+			.ViewAsCurr
 
 
 	function TestCompilerAlive
