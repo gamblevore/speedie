@@ -65,7 +65,8 @@ extend Parser
 // Everything else
 		.Tokenz( "{",			kThingSyx,              fArgOpen			)
 		.Tokenz( "--> <-- <--> <≈", kTmpOpp,			fTemporalRelSyx		)
-		.Tokenz( "/#",			kTmpOpp,				fSyntacticComment	)
+//		.Tokenz( "/#",			kTmpOpp,				fSyntacticComment	)
+// i think better syntax that is less confusible with comments is better
 		.Tokenz( "%",			kThingSyx,				fOpAsThing			)
 		.Tokens( numb,			kThingSyx,              fNumber				)
 		.Tokenz( "#!",			kTemporalSyxNoBar,      fShebang			)
@@ -1013,14 +1014,14 @@ extend Parser
 		|| D			= .data
 		|| end			= D.length
 		|| addr			= D.addr
-		|| GotSpaces	= false
+		|| State		= 0		// 2 = line, 1 = space, 0 = neither, 3 = both
 
 		while (n < end)
 			|| c = addr[n++]
 			if (c == '\t')
 				if !rz.commas
 					rz.indent += 4
-				if (gotspaces and rz.lines)
+				if ((State&1) and rz.lines)
 					.erroradd("Can't have tabs after spaces.", n-1)
 
 			  elseif (c == ',')
@@ -1029,45 +1030,42 @@ extend Parser
 					rz.indent = l.indent
 				  else
 					rz.indent = 0									// int.min
-				gotspaces = false
+				State = 0
 
 			  elseif (c == ' ')
-				gotspaces = true
+				State |= 1
 				if !rz.commas
 					rz.indent++
-				
-			  else
-				|| c2 = d[n]
-				ifn (c == '\n' or '\r')
-					gotspaces = false
-					n--
 
-					if (c != '/' or (c2 != '*' and '/')) // supposed to save us from '/' at end of line! please fix!
-						exit		// should be easy if I am too tired.
-								    // it's supposed to let "a /" parse just as well as "a +"
-									// but doesn't, somehow.
-					if (c2 == '*')
-						rz.lines++
-						rz.indent = 0
-						
-					.nextstart = n
-					|| line = .Process( kendofline, Parser.kAllow, parent )
-					n = .nextstart
-					if line != parser.EndOfLineMarker
-						exit
-				  else
-					rz.lines++
-					rz.isdebug=(c == '\r')|int|
-					rz.indent = 0
-					rz.commas = 0 // right?
-					rz.pos    = n-1 // sigh
-					gotspaces = false
-					if parent == @list
-						(parent is style2)
-					if c2 == '/' // somehow fails to save us from '/' at the start of line, it used to work tho!!
-						|| c3 = d[n+1] // too tired to fix this now. fix later
-						if c3 != '*' and '#'
-							n = .gotoendofline(n+1)
+			  elseif (c == '/')
+				|| c2 = d[n]
+				ifn (c2 == '/' or '*') or (state & 2)
+					exit
+				State = 2
+				if c2 != '*'
+					n = .gotoendofline(n+1)
+					continue
+
+				rz.lines++
+				rz.indent = 0
+				.nextstart = n-1
+				|| line = .Process( kendofline, Parser.kAllow, parent )
+				n = .nextstart
+				if line != parser.EndOfLineMarker
+					exit
+
+			  else
+				ifn (c == '\n' or '\r')
+					n--
+					exit
+				rz.lines++
+				rz.isdebug=(c == '\r')|int|
+				rz.indent = 0
+				rz.commas = 0 // right?
+				rz.pos    = n-1 // sigh
+				State = 2
+				if parent.func == @list
+					(parent is style2)
 
 		rz.lines += rz.commas
 		.nextstart = n
