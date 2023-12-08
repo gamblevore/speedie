@@ -415,8 +415,13 @@ extend Parser
 			Return parser.ErrorAdd( "Char didn't close!" )
 
 
+	function GotoEndOfLine (|int| from, |int|)
+		parser.NextStart = parser.data.find( Jeebox.CSLine, from )
+		return parser.NextStart
+	
+	
 	function fCommentLine (ParseHandler)
-		parser.NextStart = parser.data.find( Jeebox.CSLine, parser.Nextstart )
+		.gotoendofline(parser.Nextstart)
 		return parser.EndOfLineMarker
 
 
@@ -1012,7 +1017,6 @@ extend Parser
 
 		while (n < end)
 			|| c = addr[n++]
-			|| c2 = addr[n]
 			if (c == '\t')
 				if !rz.commas
 					rz.indent += 4
@@ -1033,35 +1037,35 @@ extend Parser
 					rz.indent++
 				
 			  else
+				|| c2 = d[n]
 				ifn (c == '\n' or '\r')
-					if (c == '/') and (c2 == '\n' or '\r')
-						n++
-						c = c2
-					  else
-						gotspaces = false
-						n--
+					gotspaces = false
+					n--
+					
+					if (c != '/' or (c2 != '*' and '/'))
+						exit
+					if (c2 == '*')
+						rz.lines++
+						rz.indent = 0
 						
-						if (c != '/')
-							exit
-						if (c2 == '*')
-							rz.lines++
-							rz.indent = 0
-							
-						.nextstart = n
-						|| line = .Process( kendofline, Parser.kAllow, parent )
-						n = .nextstart
-						if line != parser.EndOfLineMarker
-							exit
-						continue
-
-				rz.lines++
-				rz.isdebug=(c == '\r')|int|
-				rz.indent = 0
-				rz.commas = 0 // right?
-				rz.pos    = n-1 // sigh
-				gotspaces = false
-				if parent == @list
-					(parent is style2)
+					.nextstart = n
+					|| line = .Process( kendofline, Parser.kAllow, parent )
+					n = .nextstart
+					if line != parser.EndOfLineMarker
+						exit
+				  else
+					rz.lines++
+					rz.isdebug=(c == '\r')|int|
+					rz.indent = 0
+					rz.commas = 0 // right?
+					rz.pos    = n-1 // sigh
+					gotspaces = false
+					if parent == @list
+						(parent is style2)
+					if c2 == '/'
+						|| c3 = d[n+1]
+						if c3 != '*' and '#'
+							n = .gotoendofline(n+1)
 
 		rz.lines += rz.commas
 		.nextstart = n
