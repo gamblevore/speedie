@@ -26,7 +26,6 @@ role ListViewRow (message)
 		if b
 			.state |= s
 		  else
-			if s is active // noooooo
 			.state &= ~s
 
 	syntax isnt (|ListViewState| s, assigns:|bool| b)

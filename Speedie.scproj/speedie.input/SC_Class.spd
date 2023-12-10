@@ -620,7 +620,7 @@ function CanCompare (|SCDecl| Against, |bool| AsEquals, |bool|)
 
 
 function CheckAllocVsWrapper (|SCFunction| f, |bool| IsConstructor)
-	require .IsWrapper or .IsObject or .super
+	require .IsWrapper and .IsObject and .super
 	require (!f == isconstructor)
 
 	if !IsConstructor
