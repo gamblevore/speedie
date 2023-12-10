@@ -315,6 +315,7 @@ function InitBasicFuncs (|bool|)
 	.fnmustbe		= .LoadTypeTest( "mustbe" )
 	.fnopmustbe		= .LoadTypeTest( "operatormustbe" )
 	.PrivateProperty = .CreateFuncFromSource("function Private () {disabled `This property is private.`}")
+
 	return StdErr.OK
 
 
@@ -688,13 +689,16 @@ function FindModuleMsg (|Message| where, |SCModule|)
 
 
 function FindModule (|String| name, |Message| where, |string| ErrMsg="Not a module.", |SCModule|)
+	opt norefcounts
 	|| Obj = compiler.program.access.valuelower( name )
+	if obj isa scclass
+		return obj.modul
 
 	if Obj isa SCModule
 		return Obj
 	
 	if where and !obj
-		error (where, "Can’t find: " + name) // OK
+		error (where, "Can’t find: " + name)
 	  elseif errmsg
 		error (where, ErrMsg)
 

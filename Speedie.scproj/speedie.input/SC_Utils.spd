@@ -163,6 +163,8 @@ function ListModules (|Dictionary| access, |[SCModule]|)
 	for o in access
 		if o isa SCModule
 			rz <~ o
+		  elseif o isa scclass
+			rz <~ o.modul
 
 
 function message.IsReffer (|bool|)

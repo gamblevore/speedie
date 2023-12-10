@@ -1215,7 +1215,7 @@ function NewProtoType (CollectFunc)
 	return NewProtoTypeSub(node, name_space, ErrPlace, nil)
 
 
-function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |SCModule|)
+function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |Scbase|)
 	if (ForInterface)
 		parent = parent|SCClass|.modul
 	  else
@@ -1229,14 +1229,13 @@ function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |
 	tmp.msg(@thg, f.Name)
 	tmp <~ node.last
 	
-	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface )
-		|| clss = modul.Cls
+	|| clss = SCClass.DataTypeSub( tmp, parent, node, ForInterface )
+	if clss isa scclass
 		clss.IsBuiltin = false // datatype sets it to true.
 		clss.FuncProto = f
 		f.ProtoType = clss
 		Compiler.ProtoTypes <~ f
-	
-	Return Modul
+		rz = clss
 
 
 

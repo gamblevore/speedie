@@ -18,6 +18,7 @@ module SC_Init
 
 	function SCModule.MoveToInitFunc (|Message| c)	
 		opt norefcounts
+		if c.first ~= "appargument"
 		if (c == @sheb or @url)
 			c.remove
 			return

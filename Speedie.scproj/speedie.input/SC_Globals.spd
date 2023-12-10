@@ -227,13 +227,16 @@ function TypeOfThgSub (|Message| Exp, |SCBase| name_space, |Message| side, |bool
 	
 	|| R = name_space.LookUpvar( exp.name, exp, side )
 	
-	if R isa SCModule
-		|| Cls = R.Cls						#expect (Exp, "Can’t refer to a module like that.")
+	if R isa SCClass
 		if !AllowAny
-			if Cls.ismodel
-				return Cls.GetFlyingMemory(exp)
-
-			expect cls.isobject (exp, "Can’t refer to type “${exp.name}” like that (it's not a class).")
+			if R.ismodel
+				return R.GetFlyingMemory(exp)
+			expect R.isobject (exp, "Can’t refer to type “${exp.name}” like that (it's not a class).")
+		return R
+	
+	if R isa scmodule
+		error (Exp, "Can’t refer to a module like that.")
+		return nil
 
 	if R isa scdecl
 		if side
@@ -998,10 +1001,12 @@ function TypeOfSyx (ExprResolver)
 function message.DotSpace (|scbase| name_space, |scobject|)
 	opt norefcounts
 	if self != @Thg
-		return TypeOfExprmodulesok( self, name_space ) 
+		return TypeOfExprModulesOk( self, name_space ) 
 	// module.func, module.var
 	rz = name_space.LookUpVar( .name, self, nil )
 	.obj = rz
+	if rz.class == scclass
+		rz = rz|scclass|.modul
 
 
 function TypeOfSwiz (|message| exp, |scbase| name_space, |message| side, |scdecl| class_Space, |scdecl|)
@@ -1076,6 +1081,7 @@ function message.ExpFunc (|scfunction|)
 function TypeOfExprNeeded ( |message| exp, |scbase| name_space, |SCDecl| )
 	debug_require exp // what?
 	|| OldCount = stderr.errorcount
+	debugat 836
 	|| result = typeofexpr(Exp, name_space)
 	if result and result.type != typevoid_
 		return result

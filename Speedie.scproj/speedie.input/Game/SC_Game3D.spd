@@ -23,10 +23,10 @@ module SCGame3D
 
 	function NeuModel (CollectFunc)
 		|| Inst = Node.TranModel			#expect (node, "Not a good model.")
-		|| M = SCClass.newStruct(node, name_space, ErrPlace)
-		if M isa SCModule
-			M.Cls.IsModel = Inst
-		return M
+		|| C = SCClass.newStruct(node, name_space, ErrPlace)
+		if C isa SCClass
+			C.IsModel = Inst
+		return C
 
 
 	function Love (CollectFunc)

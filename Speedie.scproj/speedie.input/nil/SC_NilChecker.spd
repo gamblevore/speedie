@@ -80,10 +80,9 @@ function Function (NilTrackerFn)
 	opt norefcounts
 	|| fp = msg.first
 	|| prms = fp.next
-	|| fn = prms.obj|SCFunction|
+	|| fn = prms.obj|SCFunction|	
 	fn.NilPrint
 
-	if fn.name contains "Reader"
 	
 	if msg.tmptype == ASMtmp.kTern
 		debugat

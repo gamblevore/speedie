@@ -205,13 +205,21 @@ class SCBehaviour (SCBase)
 		»
 		
 		.project.use
-		|| F = SCClass.newStruct(msg, compiler.program, ErrPlace)|SCModule| #require
-		F.cls.IsBehaviour = kBehaviourTable
-		f.cls.IsRole = .cls.IsRole						// sigh
-		compiler.program.TryAddBase( ErrPlace, F )
-		Compiler.ModuleList <~ F						// Sigh... should not have to do this!
-		.FuncTable = F
-		scimport.noproj
+		|| Fcls = SCClass.newStruct(msg, compiler.program, ErrPlace) #require
+		if fcls.mustbe(scclass)
+			Fcls.IsBehaviour = kBehaviourTable
+			fcls.IsRole = .cls.IsRole						// sigh
+			compiler.program.TryAddBase( ErrPlace, Fcls )
+			Compiler.ModuleList <~ Fcls.modul				// Sigh... should not have to do this!
+															// it is because... we don't automatically add all modules
+															// to the modulelist. I think we should? We do for classes?
+															// Perhaps classes/modules should also add themselves via
+															// tryadd. I mean... kinda makes sense?
+															// Also... modules should just be single-ton structs...
+															// So just classes, basically.
+			
+			.FuncTable = Fcls.modul
+			scimport.noproj
 	
 	
 	function String.UnderScoreAtAnyEnd (|bool|)
@@ -316,12 +324,13 @@ function $InterName (,$InterName)
 			Thg.name = "__" + s + "__"
 			
 			// node.normalisefunc
-			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s) #require
+			|| ModCls = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s)|scclass| #require
+			|| Mod = modcls.modul
 			Mod.IsRequiredInterface = required
 			cls.AddBehaviourOrInterface( Mod, ErrPlace )
-			mod.cls.IsBehaviour = kBehaviourProto
+			ModCls.IsBehaviour = kBehaviourProto
 			if required
-				mod.cls.IsBehaviour = kBehaviourProtoRequired
+				ModCls.IsBehaviour = kBehaviourProtoRequired
 			Return Mod
 		}
 	}

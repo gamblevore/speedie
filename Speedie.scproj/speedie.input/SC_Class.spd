@@ -10,31 +10,37 @@ linkage
 	cpp_part		Class
 
 |SCClass|					Super
+|[SCClass]|					Children
+|SCClass|					ProcessAs
+|SCClass|					DowngradeTo
+
 |Message|					Defawlt
 |Message|					False
+|Message|					IsModel
+
 |SCModule|					Modul
+
+|SCDecl|					SelfDecl
 |[SCDecl]|					Properties
 |SCDecl|					TypeNormal
 |SCDecl|					TypeOptional
 |SCDecl|					TypeReal
-|[SCFunction]|  			Casts
-|[SCClass]|					Children
 |SCDecl|					Contained
 |scdecl|					Signed								// int/uint
 |scdecl|					_NotConst
+|SCDecl|					DataTypeWrapper
+|SCDecl|					ClassType
+
+|string|					CppClass
+
+|[SCFunction]|  			Casts
 |SCFunction|				FuncProto
 |SCFunction|				TheIsFunc
 |SCFunction|				ConstructorFunc
 |SCFunction|				DestructorFunc
-|string|					CppClass
-|SCDecl|					ClassType
-|SCDecl|					SelfDecl
-|Message|					IsModel
+
 |SCBehaviour|   			Behaviour
 |string|					SaveAs
-|SCClass|					ProcessAs
-|SCClass|					DowngradeTo
-|SCDecl|					DataTypeWrapper
 |uint16|					Size
 |uint16|					Depth
 |uint16|					StructContainerDepth
@@ -73,10 +79,11 @@ constructor (|Message| node, |SCBase| parent)
 	.saveas = nil
 	.TypeInfo = DataTypeCode.UnusedType
 	.Banned = .TestBanned
+	.ClassType = TypeJBClass.TypeNormal.Copy
 	
 	|| IsDataType = node == "datatype"
 	|| T = SCDecl.new(self)
-	if isdatatype
+	if IsDataType
 		T.nildeclared = nilstate.Real
 	.TypeNormal = T
 	.TypeOptional = T.NilConstructor(NilState.optional * !IsDataType)
@@ -405,10 +412,10 @@ function NewClassNew (|SCFunction| con, |Message| src, |int| ExtraCode)
 	
 	|| result			= .Modul.NewModuleFunc( src )
 	result.counterpart	= con
-	con.counterpart    := []
-	con.counterpart|array| <~ result
+	con.CounterPart    := []
+	con.CounterPart|array| <~ result
 	result.AllocCode   |= functiontype.New ||| ExtraCode
-	(con.alloccode = functionType.Constructor)
+	(con.AllocCode = functionType.Constructor)
 	
 	|| NewParams		= src[ @prm, 1 ]
 	|| A				= con.Source.Second
@@ -550,8 +557,6 @@ function AfterFuncsDecled
 		expect (!f.NextFunc) ( f.Source, "Can’t have multiple destructors" )
 		expect (!f.ReturnType and (f.args.length == 1))   ( f.Source, "Destructor can’t have a return type or parameters." )
 	.CheckAllocVsWrapper( f, false )
-	
-	.ClassType = TypeJBClass.TypeNormal.Copy // no difference
 	.ClassType.Name = .CStructName
 
 
@@ -837,26 +842,27 @@ module
 	
 	
 	function NeuRole (CollectFunc)
-		|| mod = neuclass(node, name_Space, errplace)|scmodule| $
-		|| cls = mod.cls$
+		|| cls = neuclass(node, name_Space, errplace)|scclass| $
+		if cls isa scmodule
+			debugger//cls = cls.cls$
 		cls.IsRole = true
-		if !(cls.properties)
-			return mod
+		if !cls.properties
+			return cls.modul
 		
 	
 	function NeuClass (CollectFunc)
 		|| it = .NeuClassSub(node, name_space, ErrPlace, nil)
 			it.ClassCollect
-			return it.modul
+			return it//.modul
 
 	
 	function SCClass.ClassCollect
 		.Collect( .Sourcearg, .IsVisible )
 
 
-	function DataTypeSub (|Message| Node, |SCBase| Parent, |Message| ErrPlace, |string| ForInterface, |SCModule|)
-		if node.obj isa SCModule	// already processed.
-			Return Compiler.program // OK
+	function DataTypeSub (|Message| Node, |SCBase| Parent, |Message| ErrPlace, |string| ForInterface, |scbase|)
+		if node.obj isa SCModule		// already processd
+			Return Compiler.program		// ignore
 		
 		scbase.CurrVisibility = false
 		node.givearg
@@ -866,10 +872,8 @@ module
 			it.ClassCollect
 		
 			expect !(it.Properties) (it.Source, "Datatypes can’t have properties.")
-					
-			|| m = it.modul // to say it's already been processed...
-			node.obj = M
-			Return M
+			node.obj = it.modul // to say it's already been processed...
+			Return it
 	
 	
 	function DataType (CollectFunc)
@@ -880,7 +884,7 @@ module
 		|| it = .NeuClassSub(node, name_space, errplace, nil)
 			it.IsStruct = true
 			it.classcollect
-			return it.modul
+			return it//.modul
 
 
 	function NewCast (CollectFunc)

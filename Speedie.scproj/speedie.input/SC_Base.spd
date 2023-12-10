@@ -412,6 +412,8 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 			exit								// Stop SCFunction.Byte looking up Main.Byte...
 		
 		|| o = b[ name ]
+		if !o
+			continue
 		if o isa SCDecl
 			#!/struct question/
 			// what if this is a struct?
@@ -432,16 +434,19 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 				o = o.setter|scdecl|
 
 		
-		if paramshere and !paramsarray.isdot and (o isa scmodule)
+		if paramshere and !paramsarray.isdot and (o isa scclass)
+			|| m = o.modul
+			#!KLAJSDLAKSJD
 			while
-				|| o2 = o["new"]					// OK... but what if o isa module?
-					o = o2|scmodule|				// hack
+				o = m["new"]|scclass|
+				if o
 					exit
-				if o.cls and o.cls.isrole
-					o = o.supermod
-					if !o: exit
-				  else
+				if !m.cls.isrole
+					debugat
 					exit
+				debugat
+				m = m.supermod
+				loop m
 		
 		
 		if CanFunction and (o isa SCFunction)
