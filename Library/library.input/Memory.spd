@@ -302,6 +302,7 @@ class Memory
 		function Copy	 (|_voidptr| dest, |_voidptr|src, |int| N):		cpp_wrapper memcpy
 		function Copy	 (|object| dest, |object|src, |int| N)
 			.copy(dest|_voidptr|, src|_voidptr|, n)
-		function CopyObject (|object|src, |object| dest, |int| N)
-			Memory.copy(self|&byte|+4, src|&byte|+4, n-4)
+		function CopyObject (|object|src, |object| dest, |int| N) 
+			disabled "Copying object contents seems like a very bad thing"
+//			Memory.copy(self|&byte|+4, src|&byte|+4, n-4)
 		

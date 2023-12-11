@@ -1029,10 +1029,11 @@ class Message (RingTree)
 		cpp_part AppendNum
 		.msg(@num, num.render)
 
-//	setter obj (|object|)
+//	setter Obj (|object|)
+//		if (value isa  scmodule) and (self == @thg)
+//			if value.cls
 //		.obj = value
-//		if (value isa scmodule) and (.parent == @prm)
-//	
+
 	setter Int (|int64|)
 		.Func = @num
 		.name = Value.Render // later we can do this a different way. Like directly

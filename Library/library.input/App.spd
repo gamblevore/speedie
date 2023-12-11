@@ -73,8 +73,8 @@ syntax access (|string| name, |string|)
 	cpp_part ArgValue
 	opt norefcounts
 	for R in .rawargs
-		if R|AppArgument|.name ~= name
-			return R|AppArgument|.value
+		if R.argname ~= name
+			return R.argvalue
 
 function Switches (|[string]|)
 	opt norefcounts
@@ -85,7 +85,7 @@ function Switches (|[string]|)
 function args_ (|[string]|)
 	opt norefcounts
 	for R in .rawargs
-		if R|AppArgument|.name ~=""
+		if R.argname ~= ""
 			rz <~ r
 
 function Args (|[string]|)
