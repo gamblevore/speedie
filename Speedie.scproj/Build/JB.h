@@ -1023,6 +1023,7 @@ JBClass ( SCDecl , SCObject ,
 	NilState NilDeclare;
 	byte NilReg;
 	byte NilAllocDepth;
+	byte Special;
 );
 
 struct SCIterator_Behaviour: SCObject_Behaviour {
@@ -1351,13 +1352,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1916])
+#define kJB__ErrorColors_bold (JB_LUB[1911])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1917])
-#define kJB__ErrorColors_good (JB_LUB[1918])
-#define kJB__ErrorColors_normal (JB_LUB[1919])
-#define kJB__ErrorColors_underline (JB_LUB[1918])
-#define kJB__ErrorColors_warn (JB_LUB[1920])
+#define kJB__ErrorColors_error (JB_LUB[1912])
+#define kJB__ErrorColors_good (JB_LUB[1913])
+#define kJB__ErrorColors_normal (JB_LUB[1914])
+#define kJB__ErrorColors_underline (JB_LUB[1913])
+#define kJB__ErrorColors_warn (JB_LUB[1915])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1522,7 +1523,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1921])
+#define kJB_codesign_native (JB_LUB[1916])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1535,10 +1536,10 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_ActualTypecasts ((~(128 | 32)))
 #define kJB_AddressOfMatch (3 << 22)
 #define kJB_ASM (63)
-#define kJB_BitAnd (JB_LUB[356])
-#define kJB_BitNot (JB_LUB[610])
-#define kJB_BitOr (JB_LUB[1328])
-#define kJB_BitXor (JB_LUB[1922])
+#define kJB_BitAnd (JB_LUB[353])
+#define kJB_BitNot (JB_LUB[607])
+#define kJB_BitOr (JB_LUB[1323])
+#define kJB_BitXor (JB_LUB[1917])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_DontSaveProperty (0)
 #define kJB_LossyCastedMatch (7 << 22)
@@ -1553,7 +1554,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_SaveProperty (1)
 #define kJB_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1923])
+#define kJB_SaverStart1 (JB_LUB[1918])
 #define kJB_SelfDebug (2)
 #define kJB_SelfReplace (1)
 #define kJB_SimpleMatch (1 << 22)
@@ -2311,13 +2312,11 @@ void SC_Comp__FileTestsSub(JB_File* Dest, JB_File* Src, JB_String* A, JB_String*
 
 Macro* SC_Comp__FindAdj(Message* exp, Array* prms);
 
-SCClass* SC_Comp__FindClass(JB_String* name, Message* where);
-
-SCClass* SC_Comp__FindClassOK(JB_String* name);
+SCClass* SC_Comp__FindClass(JB_String* name, Message* where, bool err);
 
 SCFunction* SC_Comp__FindFunction(JB_String* Name);
 
-SCModule* SC_Comp__FindModule(JB_String* name, Message* where, JB_String* ErrMsg);
+SCModule* SC_Comp__FindModule(JB_String* name, Message* where, bool ErrMsg);
 
 SCModule* SC_Comp__FindModuleMsg(Message* where);
 
@@ -3496,7 +3495,7 @@ SCObject* SC_TypeOfTernary(Message* Exp, SCBase* name_space, Message* side);
 
 SCObject* SC_TypeOfThg(Message* Exp, SCBase* name_space, Message* side);
 
-SCObject* SC_TypeOfThgSub(Message* Exp, SCBase* name_space, Message* side, bool AllowAny);
+SCObject* SC_TypeOfThgSub(Message* Exp, SCBase* name_space, Message* side);
 
 SCObject* SC_TypeOfType(Message* Exp, SCBase* name_space, Message* side);
 
@@ -3530,8 +3529,6 @@ Message* JB_Tk__CloseXML(Message* XML, int i, JB_String* s);
 Message* JB_Tk__DecorateThing(Message* R, int Ops);
 
 Message* JB_Tk__DotSub(Syntax fn, int Start, Message* parent);
-
-int JB_Tk__EmbeddedArg(JB_String* close, Message* R, int Flags);
 
 int JB_Tk__EmbeddedCode(JB_String* close, Message* dest, int TmpoFlags);
 
@@ -3640,8 +3637,6 @@ Message* JB_Tk__fStatementColon(int Start, Message* Parent);
 Message* JB_Tk__fString(int Start, Message* Parent);
 
 Message* JB_Tk__fSuperStr(int Start, Message* Parent);
-
-Message* JB_Tk__fSyntacticComment(int Start, Message* Parent);
 
 Message* JB_Tk__fTemporalHashThing(int Start, Message* Parent);
 
@@ -6796,8 +6791,6 @@ bool SC_Base_FindVis(SCBase* self, Message* c);
 
 Message* SC_Base_FuncSrc(SCBase* self);
 
-SCModule* SC_Base_GetAsModule(SCBase* self, Message* errplace);
-
 void SC_Base_ImportFile(SCBase* self, SCFile* file);
 
 bool SC_Base_IsModuleFunc(SCBase* self);
@@ -6851,6 +6844,8 @@ void SC_Base_SetExportName(SCBase* self, JB_String* s, bool Explicit);
 SCClass* SC_Base_ShouldBeClass(SCBase* self, Message* errplace);
 
 Message* SC_Base_SourceArg(SCBase* self);
+
+SCModule* SC_Base_SpaceModule(SCBase* self, Message* errplace);
 
 void SC_Base_StoreLinkToMe(SCBase* self, Dictionary** dp);
 
@@ -7286,8 +7281,6 @@ uint64 SC_Msg_ASMConst(Message* self);
 
 fn_asm SC_Msg_ASMFunc(Message* self);
 
-SCModule* SC_Msg_AsModule(Message* self);
-
 void SC_Msg_AssignsFix(Message* self, SCFunction* f);
 
 int SC_Msg_Autocomplete_State(Message* self);
@@ -7528,7 +7521,7 @@ double JB_Msg_Float(Message* self);
 
 float JB_Msg_Float32(Message* self);
 
-void JB_Msg_FSListArg(Message* self, FastString* fs);
+void JB_Msg_FSListArg(Message* self, FastString* fs, bool AddLine);
 
 void JB_Msg_FSListSep(Message* self, FastString* fs, JB_String* sep);
 
@@ -9092,7 +9085,7 @@ inline NilState SC_nil_SetNilness(NilTracker* self, SCDecl* d, NilState New) {
 		debugger;
 	}
 	(SC_NRC_SyntaxCallSet((SC_nil_Place(self)), d->NilReg, New));
-	ndb2(d, JB_LUB[1024]);
+	ndb2(d, JB_LUB[1019]);
 	return New;
 }
 
@@ -9106,7 +9099,7 @@ inline NilState SC_nil__ArgOne(Message* s, NilCheckMode t, NilState prev) {
 	if (SC_NilState_SyntaxIs(prev, kSC__NilState_Borked)) {
 		JB__Err_AutoPrint = SC__nil_OldPrint;
 		if ((!(!JB_Rec_OK(JB_StdErr)))) {
-			JB_Msg_SyntaxExpect(s, JB_LUB[1025]);
+			JB_Msg_SyntaxExpect(s, JB_LUB[1020]);
 			return nil;
 		}
 		JB_Rec_Clear(JB_StdErr);
@@ -9175,7 +9168,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1502])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1497])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
