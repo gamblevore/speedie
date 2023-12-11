@@ -1,0 +1,114 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+module Macros {
+|| FS = "|| fs = faststring()".macro
+
+|| InitExpand = "({
+	|| _X = _0
+	if !_X
+		_X = _1
+		_0 = _X
+	rejoin _X
+})".macro
+
+|| WhileDecl = "if (!_0) {
+	exit
+}".macro
+
+
+|| MultiDecr = "JB_DecrMulti(_0, _1)".macro
+
+
+
+|| MainArgBasic   = `|| _0 =  _1.MainArg(_2, "_0"),`.macro
+|| MainArgDefault = `|| _0 = (_1.MainArg(_2, "_0"), _3)(__ArgCount > _1),`.macro
+|| MainArgArray = `
+	|[_1]| _0
+	|| __ArgCurr = _2
+	while __ArgCurr < __ArgCount
+		_0 <~ _1.MainArg(__ArgCurr++, "_0")
+`.macro
+
+|| MainArgFinal = `
+	check (__ArgCount <= _0) ("Unexpected argument (max=$_0): '${app.args[_0]}'")
+`.macro
+
+|| ASM_Datatype = "datatype _0 (ASM) 
+	module
+		function Encode (ASM_Encoder2,)
+			visible true
+			rz = .op << 25
+		
+ASM.Forms[_1] = &_0.Encode // for now
+".macro
+
+|macro|     ASMCopier  = "rz._0 = .r[_1]".macro
+|macro|     ASMCopier2 = "rz._0 = .rest".macro
+|macro|		ASMSetter = "function asm._0 (assigns:|uint|, |asm|): return self ||| ((value << _1) >> _2)".macro
+}
+
+
+
+function macro.clean (|macro|)
+	if !.Cleaned
+		.cleaned = true
+		.Source.clean
+	return self
+
+
+
+function message.TargetTest (|bool|) // target true, target false, 
+	.expect(@thg)
+	expect (self ~!= "mac")     (self, "Use OSX")
+	expect (self ~!= "linux")   (self, "Use lin")
+	expect (self ~!= "windows") (self, "Use win")
+	expect (self ~!= "import") (self, "Use imported")
+	if self ~= "debug"
+		return options.TargetDebug
+	if self ~= "release"
+		return !options.TargetDebug
+	if self ~= "perry"
+		return options.perry
+	if self ~= "minilib"
+		return options.ProjectIsMiniLib
+	if self ~= "imported"
+		return scimport.CurrIsManuallyImported
+	if self ~= "true"
+		return true
+	if self ~= "false"
+		return false
+	if self ~= "osx"
+		return Platform.osx
+	if self ~= "win"
+		return Platform.win
+	if self ~= "lin"
+		return Platform.lin
+	if self ~= "direct"
+		return options.IsDirectTest
+	return targets[.name]
+
+
+function message.Tran_Target (|message|)
+	.tran_targetsub
+	rz  = .next
+	rz := .flatafter
+	.Remove
+
+
+function message.Tran_TargetSub
+	opt norefcounts
+	|| value = self.needfirst
+	|| IsFalse = (value == @brel and "!")
+		value = value.first
+	
+	|| arg = self[@arg, 1]						#require
+	
+	if value.TargetTest == IsFalse
+		arg = self[2][@arg]
+
+// can't handle target false
+	while arg.hasany
+		.next = arg.pop

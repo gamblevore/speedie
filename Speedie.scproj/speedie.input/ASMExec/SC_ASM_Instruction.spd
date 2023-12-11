@@ -1,0 +1,84 @@
+
+
+// why is this needed by exec?
+// exec wants to be able to load stuff, so we need the ASM datatype?
+// or just fake one. We just wanna call the VM really.
+// perry, exec-vm, speedie
+// how should they coordinate?
+// perry displays stuff...
+// exec will run the stuff
+// but who or how does the debugging get done? Do we need speedie for this?
+// its just a bunch of types and ways to print those types, right?
+// exec can do that? We don't need speedie, for that?
+// not even for debugging? Again... types and methods of printing them.
+// that should do everything we need.
+// So speedie is just for compilation, then. And reporting errors back to perry about compiles.
+// So... what do I need the instruction for then?
+// Well... I guess to display the current instruction so we can step through it ASM at a time?
+// seems like something we'll need
+
+// the other idea is just to run speedie as a lib.
+// so... we won't need most of it?
+
+
+class Instruction // class instruction
+	initafter (µform)
+	
+	|byte|			aType
+	|byte|			PCount
+	|byte|			OpCode
+	|µForm|			Sizes
+	|string|		FormName
+	|string|		Name
+
+	
+	constants
+		kTypeConst		= 2
+		kTypeFunc		= 1
+
+	render
+		fs <~ .name
+	
+	constructor (|string| FormName, |string| name, |int| pos)
+		.formname = formname
+		.opcode = pos
+		.name = name
+		.sizes = µform.NeedForm(.FormName)
+		if .sizes
+			.PCount = .sizes.count
+	
+	syntax equals (|string| other, |bool| aware, |bool|)
+		return .name.syntaxequals(other, aware)
+	
+	function IsFunc (|bool|)
+		return .atype == kTypeFunc
+
+	syntax access (|int| i, |µParam|)
+		return .sizes.params[i]
+
+	function IsSetConst (|bool|)
+		return .atype == kTypeConst
+
+	function Const 
+		.atype = kTypeConst
+		//.NoExpect // shouldnt have removed this?
+
+	module
+		|dictionary of instruction|			TypeDict = dictionary()
+		|instruction[128]|					TypeList
+
+		syntax access (|message| m, |instruction|)
+			opt norefcounts
+			return TypeDict.valuelower(m.name)			#expect (m, "Isn't a valid instruction.")
+
+		syntax Access (|int| pos, |instruction|)
+			return .TypeList[pos]
+		
+		function Add (|string| FormName, |string| name, |int| pos)
+			|| ins = instruction(formname, name, pos)
+			.typelist[pos] = ins
+			.typedict[name] = ins
+	
+		function InstructionInit
+			__instructionlist__
+

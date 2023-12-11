@@ -1,0 +1,64 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+
+module SCThe
+/*
+	function linktest2
+		visible
+		|| abc = linktest
+		(abc)(nil, nil, nil)
+	function linktest (CollectFunc)
+*/
+	function NewInsertion (CollectFunc)
+		opt norefcounts
+		|| name = node[0]
+		if name == @arg
+			name = @thg + "general"
+			node.first = name
+		
+		require name.Expect(@thg)
+		expect (name == "the" or "general") (name)
+
+		|| d = compiler.AdjDicts[name.name] init dictionary.new
+
+		for line in name.Next(@arg)
+			line.expect(@tmp)
+			|| value = line.NeedFirst
+			value.expectlast
+			|| old = d[line.name] // old is a dict...
+				error (line, kNameConf)
+			  else
+				d[line.name] = macro(value) 
+		node.remove
+		return compiler.program
+
+
+function compiler.Adj (|message| f, |dictionary of macro|)
+	opt norefcounts
+	|| d = compiler.AdjDicts
+	if f == @thg
+		return d.expect(f)
+	return d..general
+	
+
+function TypeOfAdj (ExprResolver)
+	|[message]| args 
+	|| found = compiler.findadj(exp, args)
+		exp.BecomeMacro(found, Args)
+		return TypeOfExpr(exp, name_space, side)
+
+
+function compiler.FindAdj (|message| exp, |[message]| prms=nil, |macro|)
+	opt norefcounts
+	|| f = exp.NeedFirst				#require
+	|| d = compiler.Adj(f)				#require
+	|| name = exp[@thg, 1]				#require
+	name.name = name.name.lowercase
+	if prms!=nil and (f != @thg)
+		prms <~ f
+	return d.expect(name)

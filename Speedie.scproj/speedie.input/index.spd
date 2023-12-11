@@ -1,0 +1,21 @@
+// Jeebox internals. By Theodore H. Smith...
+
+linkage
+	cpp_part SC
+
+
+
+conf 
+	no_print_args	true
+	prefs			"klinkerhoppen.speedie"
+	fun_and_fashion "tasks_function_correctly"
+
+
+ignore // better append syntax?
+	WriteTo <~ { tmp "ello"
+		thg "you"
+		opp "are"
+		thg "awesome"
+	}
+
+// simpler... cleaner.

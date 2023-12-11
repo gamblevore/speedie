@@ -1,0 +1,13 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+module Targets
+	|dictionary of string| Items = dictionary()
+	syntax Access (|string| name, |bool|)
+		return .items.valuelower(name).yes
+
+	syntax Access (|string| name, assigns:|bool|)
+		.items.valuelower(name) = value.Render

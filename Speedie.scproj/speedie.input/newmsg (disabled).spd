@@ -1,0 +1,15 @@
+//we need a simpler message system... we have like 5 ways of doign things?
+
+msg <~ @thg+"fred"
+msg <~ (@thg,"fred")
+msg.msg(@thg,"fred")
+@thg.msg("fred", msg)
+msg <~ «thg "fred"»
+
+ideal ':)'
+msg <~ {
+	dot "append"
+		thg "thg"
+		prm 
+			thg "item"
+}

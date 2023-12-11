@@ -1,0 +1,86 @@
+
+
+class Macro 
+	|bool|				Cleaned
+	|string|  			input
+	|message| 			_Parsed
+	constructor (|string| s)
+		cpp_part ConstructorStr
+		.input = s
+	constructor (|message| s)
+		cpp_part ConstructorMsg
+		._parsed = s
+	function Source (|message|)
+		opt norefcounts
+		rz = ._parsed
+		if !rz
+			rz = .input.parse
+			rz.wipepositions
+			._parsed = rz
+	syntax call (|[message]| prms=nil, |message|)
+		rz = message()
+		rz.BecomeMacro(self, prms)
+	syntax call (|message| prm1=nil, |message| prm2=nil, |message|)
+		cpp_part CallFast
+		rz = message()
+		TmpPrms <~ prm1
+		TmpPrms <~ prm2
+		rz.BecomeMacro(self, TmpPrms)
+		TmpPrms.clear
+	
+	function string.Macro (|macro|)
+		return macro(self)
+		
+	module
+		|array of message| TmpPrms
+	
+
+extend message
+	helper MacroAvoidCopy (|message|)
+		if self isnt Inserted
+			is Inserted
+			return self
+		return  .copy
+
+
+	helper MacroSame (|message| prm, |message|)
+		rz = .copy
+		(prm is inserted)
+		rz.name = prm.name
+	
+	
+	helper MacroPrm (|message| root,  |array of message| prms,  |Message|)
+		opt norefcounts
+		|| n = .name
+		if (n.first == '_')
+			if (n == 1) or n.IsInt(1) 
+				|| oop = prms[n.int|int|]		#expect (root, "Not enough params.")
+				if self == @dot or @sdot or @str or @sstr or @char // anything except @thg?
+					return .MacroSame(oop)
+				return oop.MacroAvoidCopy
+			return message(self)
+		rz = Message(self)
+		.MacroCopy(root, prms, rz)
+
+
+	helper MacroCopy (|Message| root, |array of message| prms,  |Message| dest)
+		opt norefcounts
+		for v in self
+			dest <~ v.MacroPrm(root, prms)
+
+
+	function BecomeMacro (|Macro| M,  |array of message| prms=nil)
+		opt norefcounts
+		.clear
+		.belike(m.Source) // hmmm....
+		.Appendmacro(m, prms)
+
+	syntax append  (|Macro| M,  |array of message| prms)
+		.AppendMacro(m, prms)
+		
+	function AppendMacro (|Macro| M,  |array of message| prms=nil)
+		using self,  opt norefcounts
+		m.Source.MacroCopy(self, prms, self)
+		for r in prms
+			check (r is inserted)  (r, "Unused parameter to macro")
+

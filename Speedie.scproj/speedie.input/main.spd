@@ -1,0 +1,67 @@
+
+
+main // speedie main {
+	compiler.Main
+
+
+function Compiler.Main
+	.SetupEnv
+	if .EnterCompile
+		using FlowControl.allow("Speedie")
+			.CompileTime
+	.PrintResults
+
+
+function Compiler.EnterCompile (|bool|)
+	return  !.TryVariousStartModes  and  FeedBack.ParseArgs  and  !interact.Enter
+
+
+function Compiler.PrintResults
+	.PrintStats
+	if !stderr.ok
+		printline "Installation: " + .projects
+	.PrintCompileErrors
+	if interact.Perry != nil
+		printline "exiting speedie " + app.id.render
+
+
+function compiler.ClearEnvs
+	// osx freaks out sometimes otherwise
+	// it's only specific flag that needs clearing tho... better to just find and remove it
+	for (v in app.env) (k)
+		if k ~!= "HOME" and "LOGNAME" and "PATH" and "PWD" and "SUDO_USER"
+			app.childenv(k) = nil
+
+
+function compiler.SetupEnv
+	opt norefcounts
+
+	FlowControl.FlowMode = FlowControl.Off // can enable via "log"
+	.Clearenvs
+	if app.prefpath
+		app.PrefsInit
+	  else
+		"Conf missing prefpath"
+		debugger
+	
+	|| talk = app..talk
+	if talk.length and app.IsMainThread
+		app.IgnoreBreakPoints
+	  else
+		app.ThreadName = "SpeedieDebug"
+
+	|| NL = app.prefs("nil")
+		options.strnil = nl.int
+
+	errorcolors.DisableIfNoTerminal
+	error.autoprint = 1
+
+
+function app.IgnoreBreakPoints
+	cpp_wrapper JB_Pipe__IgnoreBreakPoints
+
+
+api Speedie_Main (|&cstring| args, |int| Mode, |ErrorInt|)
+	cpp_name Speedie_Main 
+	return app.sp_run(args, mode)
+

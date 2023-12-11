@@ -1,0 +1,38 @@
+
+
+datatype JSM (uint) // lol
+datatype ASM (JSM)
+	flags
+		Jump			= 32
+		Num				= 64
+		Signed			= 128
+		Remainder		= 256
+		NoExpect		= 512
+		PositionBits	= 1024  // no space left...
+		Extended		= 255
+	
+	function IsOK (|bool|)
+		 return self
+	
+	function Print
+		visible
+		cpp_name ASMPrint
+	function R1 (assigns:|uint|, |asm|)
+		return self ||| (value << 27) >> 7
+	function R2 (assigns:|uint|, |asm|)
+		return self ||| (value << 27) >> 12
+	function R3 (assigns:|uint|, |asm|)
+		return self ||| (value << 27) >> 17
+	function R4 (assigns:|uint|, |asm|)
+		return self ||| (value << 27) >> 22
+	function RestI (|int|)
+		return (self << 7)|int| >> 7
+	module
+		|byte|					NoisyASM = 1
+		|asm_encoder2[32]|		Forms
+		|asm_encoder2[128]| 	Encoders
+		|asm_decoder2[128]| 	Decoders
+
+
+prototype ASM_Decoder2  (|&IR| self, |asm| A)
+prototype ASM_Encoder2  (|&IR| self, |asm|)

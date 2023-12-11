@@ -1,0 +1,184 @@
+    
+
+    // So how do we do this?
+    a = maybe
+    c = maybe
+    if (a)				// we add A as new nilitem
+//		a.old/flip = maybe/nil
+        c = nil
+        c.old = maybe/nil
+        c.flip = ?
+      else	//  FLIP all the things we added.
+//		a.old/flip = maybe/real
+        x = 1
+        c.old = ?
+        c.flip = ?
+        
+// What if... we don't do the flip, but set he values correctly?
+// that is... if we are in branch A... we set the flip value, otherwise we just use the curr?
+// OK... so where do we do the flip?
+// like... if we are testing A...
+// then we will have 3 NilItems for A...
+// theres a few cases, though...
+
+a = real
+if	SomeInt
+    a = nil
+
+
+a = real
+if	SomeInt
+    a = nil
+  else
+    a = nil
+
+
+a = real
+if	SomeInt
+    0
+  else
+    a = nil
+
+
+a = maybe
+if	!a
+    return
+
+if !a
+    0
+  else
+    return
+
+do we NEED the flip var? Or can we just make use of the "old" or "various decl pieces" thingy?
+
+Just write the merger and flipper, I guess.
+
+
+
+
+
+todo:
+	debugging
+
+DONE?
+
+BOOLEAN LOGICS:
+	|| x = (a and b), if x: a.a(b.b) // only next ifbranch tho
+
+nil-checker funcs:
+
+can't tell what happened:
+	if (a or b) {nochangetoboth()} else {botharenil()}
+
+
+refills and relsetters:
+	if (!a) a = b(), a = &e
+
+multiple branches:
+	if !a { if b {return 1} else {return 2} }
+	a.b = 1
+
+return affecting future code:
+	if (!msg)
+		return
+	msg.prop
+
+ternaries:
+	|| x = (a.b, nil)(a)
+
+rel-sets to internal pointers:
+	|| obj = nil
+	|!&!object| x = &obj // error: Pointed-to can't be nil
+
+function calls:
+	function gg (|object|)
+		|| a = maybenil
+		|| x = ff(a) // error: ff does not take nil.
+		|| y = gg()  // error: unknown at this time if gg returns nil.
+
+update the params:
+	function abc (|message| o)
+		o.position // o is now "!"
+
+return values:
+	if x
+		return message()
+	  else
+		return nil // now this func returns optional values. 
+
+using ptrs:
+	if (*msg)
+
+nilstrength:
+	--nil=3
+
+can access prop:
+	if (msg)
+		msg.prop
+
+multiple tests:
+	if (a and b)
+
+redundant "m":
+	if (m and m.length)
+	if (!m or !m.length)
+
+pointless:
+	if nil == nil
+
+fail:
+	if msg >= nil, if msg <= nil
+
+nil within branch:
+	if msg == nil
+
+
+
+Init Vars Sweep?
+	We need to go through the entire program, and give each item found, a "timecode". That
+	is... it has an "earliest time" that it COULD occur.
+perhaps just do it on a per-module basis... If a module makes no sense in terms of itself thats the programmers fault.
+
+recursive funcs?
+	I think for them... we let the user simply specify their nilness!! makes sense, right?
+	I think, just assume NOT NIL unless we can prove that it is tested. It is implicit and we can't be that smart.
+
+
+
+// DISTURBANCE CHECKER WILL HELP
+// for global vars
+	// global.x = obj
+	// func()
+	// global.x.func2 // allowed or not? func() might have altered global.x
+
+
+
+/*
+    while def()
+        while abc()
+            || x = real()
+            if x
+                print "got x"
+            x = nil
+
+    while def()
+        || x = real()
+        while abc()
+            if x // not redundant even though we don't know it
+                 // very difficult to write code to understand this
+                print "got x"
+            x = nil
+
+    while def()
+        || x = real()
+        if x
+            print "got x"
+        x = nil
+
+*/
+/*
+    |type| x
+    while !x
+        x = maybe()
+    x.var
+*/

@@ -1,0 +1,54 @@
+
+
+datatype NilState (byte) // Exec.scproj needs this here
+	constants
+		|nilstate|
+		Failed		= 0
+		Nilish		= 1
+		Realish		= 2
+		Either		= 3
+		Stated		= 4
+		ActuallyNil = Nilish  + Stated				// nil|message|.position
+		Optional    = Either  + Stated				// || x = array[1000]
+		Real		= Realish + Stated				// || x = message(),  x.position
+		Borked		= 128
+	
+	function Worst (|nilstate| o, |nilstate|)
+		// nil + real = nil
+		// nil + anything = nil
+		rz = self ||| o
+		if rz is Nilish
+			rz = Nilish
+	
+	function RawName (|string|)
+		description "'Raw', cos does not include whether its stated or not." 
+		self &= either
+		if self == failed
+			return "contradiction"
+		if self == either
+			return "optional"
+		if self == nilish
+			return "nil"
+		return "real"
+		
+	syntax is (|nilstate| type, |bool|)
+		return (self & type) == type
+	syntax isnt (|nilstate| type, |bool|)
+		return !.SyntaxIs(type)
+	
+
+
+struct ASMVarType
+	contains object
+	|int|					Contains // also a class
+	|int|					ClassNum
+	|int|					C_Array
+	|byte|					PointerCount
+	|NilState|				Expected
+	|NilState|				Found
+
+// OK, so we wanna export this and import it.
+// can we make this all numbers? no pointers.
+// I could make a type-tree system...
+// so each type is based on another type.
+// |DataTypeCode|  			TypeInfo // belongs on the class

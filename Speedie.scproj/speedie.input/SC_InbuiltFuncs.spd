@@ -1,0 +1,82 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+function scclass.Falsify (|message| ques, |message|)
+	opt norefcounts
+	|| f = .false
+	if f.hasany
+		return f.copy
+	ques.func = f.func
+	if f == @thg and "nil"
+		ques.obj = typenil
+	  else
+		ques.name = f.name
+
+
+function Message.FalsifyNil (|message|)
+	opt norefcounts
+
+	|| ret = scfunction.currfunc.returntype
+		if ret.isnormal
+			return ret.type.falsify(self)
+	.func = @thg
+	.obj = typenil
+
+	
+function Message.ReplaceInbuiltSub (|scbase| name_space, |scdecl| self_decl, |message|)
+	opt norefcounts
+	if (self == "nil")
+		return .FalsifyNil
+
+	  elseif (self == "count")
+		expect (self_decl.c_array) (self, "This is not a c-array")
+		return «num self_decl.c_array »
+
+	  elseif (self == "digest")
+		|| f = self[@sstr]
+			f.name = f.name.digest
+		.become(@bra)
+
+	  elseif (self == "compress")
+		|| f = self[@sstr]
+			f.name = f.name.Compress
+		.become(@bra)
+		
+	  elseif (self == "sizeof")
+		return .InbuiltSizeOf(name_space, self_decl, self)
+
+	  elseif (self == "SELF_TEST_JBIN" or "SELF_TEST_NATURAL")
+		Create_JeeboxTest( self )
+
+	  else
+		error (self)
+
+
+function Message.InbuiltSizeOf (|scbase| name_space, |scdecl| sulf, |message| sulf_exp, |message|)
+	return NewDeclNum(scdecl.new, sulf.bytesize, "")
+
+
+function TypeOfQues (ExprResolver)
+	opt norefcounts
+	|| type
+	|| prm = exp.first
+	if !exp.name
+		prm++
+	if prm
+		type = TypeOfExprModulesOK(prm, name_space) // AsDeclAutoComplete isnt a good name
+	|| m = exp.ReplaceInbuiltSub(name_space, type.AsDeclAutoComplete)
+		exp.SafeReplaceWith(m)
+	if exp != @ques
+		return TypeOfExpr(exp, name_space)
+
+
+function Object.BaseAsDecl (|scdecl|)
+	if self
+		if self isa SCDecl
+			return self
+		if self isa scfunction
+			return .returntype

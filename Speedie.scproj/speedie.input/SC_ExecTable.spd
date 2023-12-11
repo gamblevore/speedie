@@ -1,0 +1,31 @@
+
+
+// some kinda function table... saved to a file
+
+module ExecTable
+	|[scfunction]|			Funcs
+	|[scbase]|				Globs
+	
+	function FuncFile (|file|)
+		return compiler.Library.child("funcs.jbin")
+	function GlobFile (|file|)
+		return compiler.Library.child("globals.jbin")
+		
+	function AddAll (|[scfunction]| fl, |bool| WantLib)
+		opt norefcounts
+		for f in Compiler.FuncList // this is already sorted
+			if f.CanLibLoad == WantLib
+				f.Addtotable(fl)
+	
+	function Run 
+		.AddAll(.funcs, true)
+		.funcfile.SmartData = .FuncStr
+		
+	function scbase.Addtotable (|[scbase]| r)
+		r <~ self
+		.tableid = r.length
+	
+	render FuncStr
+		for f in .funcs
+			fs <~ f.exportname
+			fs <~ '\n'

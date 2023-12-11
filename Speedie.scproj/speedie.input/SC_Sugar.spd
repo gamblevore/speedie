@@ -1,0 +1,200 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+    // wouldn't it be better as app properties? or jsut arg properties?
+    // args.f, args.s, args.n? like a module? to be accessable anywhere?
+    // also needs arrays to be useful... and existingfiles.
+
+function TypeOfDotDotDot (ExprResolver)
+	using (exp)
+		exp.become(@bra)
+		|| P = exp.parent
+		|| c = exp
+		while p != @prm and @arr
+			expect (p and p!=@arg) (exp, "Should be in a list.")
+			c = p
+			p = p.parent
+		
+		c.next = «dot "max", «thg "int"», «emb »»
+	return TypeOfExpr(exp.first, name_space)
+
+
+
+
+function message.QMarkRel (|message|)
+	opt norefcounts
+	|| x = self
+	while
+		|| p = x.parent
+		if (p.issetrel) and x.isfirst
+			expect !(p in @decl) (self)
+			return p
+		x = p
+		require x == @dot
+		
+
+	
+function message.Tran_QMark
+	|| thedot		= .first$
+	|| IsNormal		= (thedot == @dot or @sdot or @func) 
+	if !isnormal
+		expect (thedot == @thg) (thedot, "Question-mark not one of:  a.b?,  (a)(b)?,  a.b? = c")
+		.func = @bra
+		return
+
+	if thedot == @sdot
+		scfunction.Tran_Sdt(thedot)
+	|| inside = thedot.first
+	if thedot == @func
+		require inside.expect(@bra)
+		inside = inside.first
+	
+	using (self)
+	|| rel = .QMarkRel						// a().b? = c   -->   {|| t = a(),  if t: t.b = c}
+		.prev = thedot
+		rel.next = self
+		.become(@arg)
+		inside.replaceWith(@thg.msg("_t"))
+		|| decl = MakeDecl("",  "_t", inside) 
+		self <~ decl
+		decl.msg(@arg) <~ rel
+		return
+
+	|| tern = self
+	if self in @arg					//  {if a: a.b}   OR   {|| t = a(), if t: t.b}
+		.become(@arg)
+		is style2
+	  elseif (inside == @thg)		// (a.b, nil)(a))
+		.func = @func
+	  else							// ({ || t = a(), (t.b, nil)(t) })
+		.func = @bra
+		tern = .msg(@arg)
+		(tern is style2)
+		tern = tern.msg(@func)
+	
+	|| Cond = @thg + inside.name
+	if self in @arg
+		tern = .msg(@tmp, "if")
+		tern <~ cond
+		// add |()--| to thedot?
+		// is there an easier way? Just add... like a bit somewhere to the msg?
+		// maybe not?
+		// what if we do something like type with a name?
+		tern.msg(@arg) <~ thedot
+	  else
+		|| options = tern.msg(@list)
+		tern.msg(@prm) <~ cond
+		options <~ thedot
+		options.msg(@thg, "nil")	// TypeOfTern could "just give the default"!
+									// So I don't even need to enter "nil"! Just delete it!
+	if (inside != @thg)
+		cond.name = "_t"
+		inside.replaceWith(@thg.msg("_t"))
+		tern.prev = MakeDecl("",  "_t", inside)
+	
+
+function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
+	opt norefcounts
+	
+	|| type = self[@nil]
+	|| name = type.next
+	|| IsArray = type == @arr
+		.expectlast$
+		type = Type.first
+	type.expect(@thg)
+	
+		
+	|| prms = [name, type, i.msg]
+	require (prms == 3)
+	check !(found & 1) (arg, "Can't come after arrays")
+	if IsArray
+		arg <~ (macros.mainargArray.clean, prms)
+		return 1
+	if name != @rel
+		check !(found & 4) (arg, "Can't come after defaults")
+		arg <~ (macros.MainArgBasic.clean, prms)
+		return 2
+	name = name[@thg]					#require
+	prms[0] = name
+	|| opp = name.next(@opp, "=")
+	prms <~ opp.Next(@Nil)
+	require prms == 4
+	arg <~ (macros.MainArgDefault.clean, prms)
+	return 4
+	
+	
+/*
+	main (|file| f, |string| s, |int| n = 0)
+		-->
+	main
+		|file|   f = file.MainArg(0)
+		|string| s = string.MainArg(1)
+		|int|    n = (int.MainArg(2), 0)(__ArgCount > 2)
+
+
+	main (|file| a, |[file]| b)
+		-->
+	main
+		|file|   a = file.MainArg(0)
+		|[file]| b
+		|| __ArgCurr = 1
+		while __ArgCurr < __ArgCount
+			b <~ file.MainArg(__ArgCurr)
+*/
+
+
+function message.CollectUsage (|string|)
+	|| fs = FastString()
+	fs <~ "Usage: \$app "
+	for ch in self
+		if ch.expect(@decl)
+			if !ch.IsFirst
+				fs <~ "   "
+			|| name = ch.DeclName
+			|| optional = (ch.first == @rel)
+				fs <~ "["
+			|| ty = ch.first
+			fs <~ name
+			|| tyfn = ty.func
+			if tyfn == @arr
+				ty = ty.first
+			|| type = ty.name
+			if type contains "file"
+				type = "file-path" // clean up messy stuff like "filedata"
+			  elseif type ~!= "string"
+				fs <~ " ($type)"
+			if optional
+				fs <~ "]"
+			if tyfn == @arr
+				fs <~ " [...]"				// def (string),  abc (int)...
+	return fs
+
+
+function message.InsertMainArgs (|message| prms)
+	opt norefcounts
+	|| usage = prms.CollectUsage
+	|| FirstArg = `
+if !app.usage
+	app.usage = "_0"
+|| __ArgCount = app.args.length
+if __ArgCount == 0
+	printline app.usage.replaceall("\$app", app.calledname.name)
+	return 0
+`
+
+	self <~ (firstarg.macro, [Usage.msg])
+	|| i = 0
+	|| Found = 0
+	for ch in prms
+		Found |= ch.MainOneArg(self, i++, Found)
+
+	ifn found&1
+		macros.mainargfinal.clean
+		self <~ (macros.MainArgFinal, [i.msg])
+
+	self <~ "require stderr.ok".parse
+
+
