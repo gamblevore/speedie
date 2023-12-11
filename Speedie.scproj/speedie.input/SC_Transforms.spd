@@ -681,11 +681,11 @@ function Tran_Isa (|Message| S, |SCBase| p)
 	|[Message]| Isas
 	require compiler.CollectIsaTests( s.first, isas )
 	for isa_ in Isas
-		TranOneIsa( isa_, s.find(@arg), p )
+		Tran_OneIsa( isa_, s.find(@arg), p )
 
 
 
-function TranOneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
+function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
 	require (arg)
 	
 	|| List			= isa_f.Last
@@ -847,15 +847,24 @@ function compiler.CollectIsaTests (|Message| s, |[Message]| out, |bool|)
 	
 	|| L1 = List.First
 		|| R1 = L1.next
-			|| RObj = R1.obj
-			if Robj isa SCModule
+			|| cls = R1.NeedUglyCls
 				if f == .fnisa
-					if Robj.cls and !robj.cls.Hassubclass
+					if cls and !cls.Hassubclass
 						list.obj = .fnFastisa
 				if L1 == @Thg
 					out <~ s
 					Return true
  
+ 
+function message.NeedUglyCls (|scclass|)
+	opt norefcounts
+	|| o = .obj
+	if o isa scmodule
+		return o.cls
+	if (o isa scdecl)
+		if o.special == 1
+			debugat
+			return o.contains.type
 
 
 function Message.Next_Index (|sciterator| iter, |message| node2)

@@ -219,19 +219,15 @@ function TypeOfBlock (ExprResolver)
 
 
 function TypeOfThg (ExprResolver)
-	return TypeOfThgSub(Exp, name_space, side)
-
-
-function TypeOfThgSub (|Message| Exp, |SCBase| name_space, |Message| side, |SCObject|)
 	opt norefcounts
-	
 	|| R = name_space.LookUpvar( exp.name, exp, side )
 	
 	if R isa SCModule
 		|| Cls = R.Cls						#expect (Exp, "Can’t refer to a module like that.")
 		if Cls.ismodel
 			return Cls.GetFlyingMemory(exp)
-		expect cls.isobject (exp, "Can’t refer to type “${exp.name}” like that (it's not a class).")
+		expect cls.isobject (exp, "Expected an object here.")
+		
 
 	if R isa scdecl
 		if side
@@ -567,8 +563,7 @@ function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |
 			return obj
 		if obj isa SCModule
 			|| cls = obj.Cls				#expect ( exp, "Can’t use a module here." )
-			|| T = cls.ClassType
-				return T.GetAddress
+			return cls.ClassType
 
 
 function Message.SCFile (|SCFile|)

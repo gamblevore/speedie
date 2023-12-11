@@ -428,8 +428,11 @@ function ImportAll
 	for c in .ClassList
 		c.ProcessBehaviours
 	
+	// ProcessBehaviours generates classes
+	
 	require stderr.ok
 	for c in .ClassList
+		c.LoadClassType
 		c.ProcessInterfaces
 	
 	require .Stage( "Creating Class Allocators And Stuff" )

@@ -1063,10 +1063,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 			ch.Export( fs )
 			|| ch_decl = DeclOfObjForC( ch )
-			if (ch_decl) and NeedsDotForC( ch_decl )
-				fs <~ '.'
-			  else
-				fs <~ "->"
+				if NeedsDotForC( ch_decl )
+					fs <~ '.'
+				  else
+					fs <~ "->"
 
 			obj.name.safe(fs)
 			fs <~ CloseStr

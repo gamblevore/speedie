@@ -551,8 +551,8 @@ function AfterFuncsDecled
 		expect (!f.ReturnType and (f.args.length == 1))   ( f.Source, "Destructor can’t have a return type or parameters." )
 	.CheckAllocVsWrapper( f, false )
 	
-	.ClassType = TypeJBClass.TypeNormal.Copy // no difference
-	.ClassType.Name = .CStructName
+	if .ClassType
+		.ClassType.Name = .CStructName
 
 
 
@@ -793,11 +793,13 @@ function MakeClassType (|scdecl| d, |scdecl|)
 	c.Special = 1
 	C.nildeclared = nilstate.real
 	C.Contains = d
+	c.type = TypeJBClass
 	return c
 
 
 function LoadClassType
-	.ClassType.type = TypeJBClass
+	if .isobject
+		.ClassType = .MakeClassType(.typenormal)
 
 
 function TryAddToProject

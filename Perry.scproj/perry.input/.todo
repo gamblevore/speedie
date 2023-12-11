@@ -3,11 +3,11 @@
 							Todo
 
 * VM? 
+* speed up NeedUglyCls
 * move download to network lib
 * Constants and globals don't autocomplete nicely
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
 	* Main no longer is clickable if you use mainargs
-* test git works
 * Notifications flicker when resizing compile-tabs. We want a "SOLID" feel. Not anxious. :) 
 
 

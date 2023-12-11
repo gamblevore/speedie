@@ -445,6 +445,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 	if ((.IsAssigns!=0) != Incoming.IsAssigns)
 		require (TypeCast & kTypeCastassigns) and (!Incoming.IsAssigns)
 	
+	debugat 686
 	|| Pos = 0
 	|| Result = kSimpleMatch
 	|| SelfCast = Incoming.ignoreselfContain()
