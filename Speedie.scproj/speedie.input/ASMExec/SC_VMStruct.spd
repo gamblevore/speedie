@@ -1,1 +1,0 @@
-struct jb_vm	linkage:cpp_class jb_vm,wrapper	|byte| whatever // stop complaints	function Registers (|&int64|)		cpp_wrapper JB_ASM_Registers	function ClearRegisters (|int|keep=0, |&int64|)		cpp_wrapper JB_ASM_ClearRegisters	module		function VM (|&jb_vm|)			cpp_wrapper JB_ASM_VM		function Run (|&ASM| Code, |uint| CodeLength, |int64|)			cpp_wrapper JB_ASM_Run
