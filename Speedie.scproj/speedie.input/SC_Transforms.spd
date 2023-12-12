@@ -697,7 +697,7 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
 	|| List			= isa_f.Last
 	|| L			= List.First
 	|| R			= L.next
-	|| cls			= R.NeedUglyCls
+	|| cls			= R.ObjCls
 	expect (!cls.IsRole) (r, "This is not a real class. Test it's super-class instead.")
 	|| OldDecl		= space.LookupVarDecl( L.name )					#require
 	|| NewDecl		= OldDecl.Copy
@@ -867,7 +867,7 @@ function compiler.CollectIsaTests (|Message| s, |bool|)
 	
 	|| L1 = List.First
 		|| R1 = L1.next
-			|| cls = R1.NeedUglyCls
+			|| cls = R1.ObjCls
 				if f == .fnisa
 					if cls and !cls.Hassubclass
 						list.obj = .fnFastisa
@@ -876,14 +876,11 @@ function compiler.CollectIsaTests (|Message| s, |bool|)
 					Return true
  
  
-function message.NeedUglyCls (|scclass|)
+function message.ObjCls (|scclass|)
 	opt norefcounts
-	|| o = .obj
-	if (o isa scdecl)
+	|| o = .obj as scdecl // blindcast instead? its never NOT this.
 		if o.special == 1
 			return o.contains.type
-	if o isa scmodule
-		return o.cls
 
 
 function Message.Next_Index (|sciterator| iter, |message| node2)

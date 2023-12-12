@@ -342,7 +342,7 @@ function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCBase|name_space, |Me
 	
 	|| ty = TypeOfExpr( exp, name_space )$
 	if rn and (prm.obj == compiler.fnAs)
-		|| cls = rn.needuglycls
+		|| cls = rn.ObjCls
 			if !cls.Hassubclass
 				prm.obj = compiler.fnFastas // noice
 			return cls.typenormal

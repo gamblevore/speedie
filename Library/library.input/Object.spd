@@ -47,7 +47,6 @@ class Object
 	
 	operator MustBe (|&ClassData|x, |bool|)  // perhaps mustbe should just be isa.
 		return self.mustbe(x)
-		// if x isa (message, ErrPlace)
 	
 	helper MustBe (|&ClassData|x, |Message|ErrNode=nil, |bool|)
 		if self isa x
@@ -67,9 +66,9 @@ class Object
 		
 	operator fast_as (|&ClassData| x, |object|)
 		cpp_part FastAs
-		if self fast_isa x
-			return self
 		if self
+			if .class == x
+				return self
 			return .TypeFailed(x, nil)
 	
 	helper TypeFailed (|&ClassData| Cls, |message| where,  |object|)
