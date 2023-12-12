@@ -96,7 +96,7 @@ function file.CLOC
 	  elseif counts.loud
 		printline .path 
 
-	|| data = .ReadSafely(int.max) #require
+	|| data = .ReadAll(int.max, true) #require
 	if data.IsCompressed
 		data = data.Decompress(int.max) // might as well...
 	

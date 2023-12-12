@@ -84,7 +84,6 @@ function Function (NilTrackerFn)
 	fn.NilPrint
 	
 	if msg.tmptype == ASMtmp.kTern
-		debugat
 		return tern(prms, test)
 
 	if (fp.func == @bra)

@@ -394,17 +394,17 @@ module Conv
 			if str == string.error
 				return str
 		// we'd have to make a new API that can read say 2 or 3 messages, with
-		// a small stream chunksize not doing that now!!
+		// a small stream chunksize. Not doing that now!!
 		
 		|| T = str.IsJbin #require
-		|| mz = str.parsejbin
+		|| mz = str.ParseJbin
 		ifn mz == @tmp and "µz"
 			.Detected |= type.jbin
 			return ""
 		
 		|| arg = mz.last
 		if arg != @arg
-			return string.error
+			return string.Error
 
 		*size = arg.prev.int
 		if !*size
