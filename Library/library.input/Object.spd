@@ -170,7 +170,9 @@ cpp_wrapper JB_FindLeakedObject 	(|object| Obj,			|array| dest)
 cpp_wrapper JB_Mem_ClassLeakCounter ()
 cpp_wrapper JB_Str3					(|Object| Data,			|int| N, |string|)
 cpp_nothing JB_New					(|&ClassData|  Class,	|Object|)
+cpp_nothing JB_NewClass				(|&ClassData|  Class,	|Object|)
 cpp_nothing JB_LayerNew				(|MemoryLayer| L,		|&ClassData| Class, |Object|)
+cpp_nothing JB_LayerNewClass		(|MemoryLayer| L,		|&ClassData| Class, |Object|)
 
 
 

@@ -186,9 +186,6 @@ class FastString {
 		cpp_part AppendUint
 		self <~ data|int64|
 
-	function AppendURL (|stringzeroterminated| URL, |date| timeout = 10s, |stringzeroterminated| cookielist=nil, |errorint|)
-		cpp_wrapper JB_FS_AppendURL
-	
 	syntax Append (|int| data)
 		cpp_part AppendInt32
 		self <~ data|int64|

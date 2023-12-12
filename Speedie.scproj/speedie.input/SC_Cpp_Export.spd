@@ -1207,15 +1207,9 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		if o isa SCDecl
 			WriteThgMaybeTypeToo( self, o, fs )
 			Return
-			
-		if o isa SCModule
-			|| cls = o.Cls.realclass
-				|| NoAlloc = scfunction.CurrFunc isnt Alloc
-					fs <~ "JB_AsClass("
-				fs <~ cls.CStructName
-				if NoAlloc
-					fs <~ ')'
-				return
+		
+		printline "Found @thg with .obj=nil: " + .objectid
+		debugger
 		.safe(fs)
 
 

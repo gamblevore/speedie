@@ -379,10 +379,12 @@ function ExprNeedsTemping (|Message| child, |Message| name, |bool|)
 function Destructable (|Message| Blocker, |Message| arg, |Message| name)
 	|| type = TypeOfExpr(name, nil, nil)
 	require (type isa SCDecl)
-
+	
 	|| fn		= type.type.destructorfunc
 	|| FnMsg	= RefMsg0(fn.exportname, fn)
-	fnmsg.last <~ «brel "&", «Thg name.name »»
+	|| brel = fnmsg.last.msg(@brel, "&")
+	|| NewThg = brel.msg(@thg, name.name)
+	newthg.obj = name.obj // needed
 	if (Blocker)
 		Blocker.Prev = Fnmsg
 	  else
@@ -723,7 +725,7 @@ function scfunction.FillInDestructor
 			.SourceArg.AddBefore( first, d.RefDestructor )
 		  else
 			|| Destr = d.HasStructDestructor
-				|| dm = .DeclToDot(d)	// Im not sure we need the type for this, at least not for refcounting
+				|| dm = .DeclToDot(d)
 				|| Obj = «brel "&", dm »
 				.SourceArg.AddBefore( first, SCRefs.RefDestructorMsg( Obj, destr ) )
 
@@ -806,7 +808,7 @@ function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 	// calling a destructor is only allowed within a destructor.
 	if dot in @bra
 		|| p = dot.parent
-		if p in @bra
+		if p in @bra // allow
 			return 
 	
 	|| fn = dot.last.asfunc

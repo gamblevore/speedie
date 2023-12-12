@@ -372,7 +372,8 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
 	ret.tmptype = asmtmp.kreturn 
 	src <~ ret
 	if used
-		ret <~ «thg "rz"»
+		|| thg = ret.msg(@thg,"rz") 
+		thg.obj = d
 	  else
 		ret <~ f.ReturnType.CreateDefault(src)
 
@@ -678,10 +679,15 @@ function Tran_Syx (|Message| msg, |Message|)
 
 
 function Tran_Isa (|Message| S, |SCBase| p)
-	|[Message]| Isas
-	require compiler.CollectIsaTests( s.first, isas )
-	for isa_ in Isas
-		Tran_OneIsa( isa_, s.find(@arg), p )
+	expect (!isatester.t.inuse) (s, "Too many nested isas")
+	isatester.t.inuse = true
+	if compiler.CollectIsaTests( s.first )
+		|| n = isatester.t.count
+		for i in n
+			|| isa_ = isatester.t.items[i]
+			Tran_OneIsa( isa_, s.find(@arg), p )
+	isatester.t.inuse = false
+	isatester.t.count = 0
 
 
 
@@ -691,7 +697,7 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
 	|| List			= isa_f.Last
 	|| L			= List.First
 	|| R			= L.next
-	|| cls			= (R.obj as scmodule).Cls
+	|| cls			= R.NeedUglyCls
 	expect (!cls.IsRole) (r, "This is not a real class. Test it's super-class instead.")
 	|| OldDecl		= space.LookupVarDecl( L.name )					#require
 	|| NewDecl		= OldDecl.Copy
@@ -823,7 +829,21 @@ function message.MiniTran (|scbase| name_space, |string| On="app")
 	TypeOfExpr( self, name_space )
 
 
-function compiler.CollectIsaTests (|Message| s, |[Message]| out, |bool|)
+
+struct IsaTester // annoyed at creating arrays all over.
+	|Message--[4]|	Items
+	|int| 			Count
+	|bool|			InUse
+	
+	module
+		|IsaTester| T
+		syntax append (|message| o)
+			if t.count < 4
+				t.items[t.count++] = o
+
+
+function compiler.CollectIsaTests (|Message| s, |bool|)
+	// use a global array
 	opt norefcounts
 	s = s.unbra
 	if s == @rel
@@ -831,8 +851,8 @@ function compiler.CollectIsaTests (|Message| s, |[Message]| out, |bool|)
 		|| Op = L.Next
 		if op == "and" // append results...
 			|| R2 = s.Last
-			|| A2 = CollectIsaTests( L, out )
-			|| B2 = CollectIsaTests( R2, out )
+			|| A2 = CollectIsaTests( L )
+			|| B2 = CollectIsaTests( R2 )
 			Return A2 or B2
 		Return (op != "or")
 	
@@ -852,19 +872,18 @@ function compiler.CollectIsaTests (|Message| s, |[Message]| out, |bool|)
 					if cls and !cls.Hassubclass
 						list.obj = .fnFastisa
 				if L1 == @Thg
-					out <~ s
+					IsaTester <~ s
 					Return true
  
  
 function message.NeedUglyCls (|scclass|)
 	opt norefcounts
 	|| o = .obj
-	if o isa scmodule
-		return o.cls
 	if (o isa scdecl)
 		if o.special == 1
-			debugat
 			return o.contains.type
+	if o isa scmodule
+		return o.cls
 
 
 function Message.Next_Index (|sciterator| iter, |message| node2)

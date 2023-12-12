@@ -42,6 +42,7 @@ class Message (RingTree)
 		.flags		= other.flags
 		.RangeLength= other.RangeLength
 		.Tag		= other.Tag
+		.trace
 
 	constructor
 		cpp_part ConstructorEmpty
@@ -50,6 +51,7 @@ class Message (RingTree)
 		.flags		= parser.InsertedFlags
 		.RangeLength= parser.UsingLength
 		.tag		= parser.UsingTag // why not... 
+		.trace
 			
 	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
 		cpp_part ConstructorNormal
@@ -59,6 +61,7 @@ class Message (RingTree)
 		.flags		= parser.InsertedFlags
 		.RangeLength= parser.UsingLength
 		.tag		= parser.UsingTag // why not... 
+		.trace
 
 	
 	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength=0)
@@ -71,8 +74,12 @@ class Message (RingTree)
 		.RangeLength= RangeLength
 		.flags		= parser.InsertedFlags // speedie's .AppMainFix likes this, for msg is inserted
 		.tag		= parser.UsingTag // why not...
+		.trace
 
 
+	function Trace 
+		//if .objectid == 21031616
+	
 	function SyxId (|int|)
 		return .Func|int|
 ///////////////////////////////////////////////////////////////////////////////
@@ -1030,8 +1037,9 @@ class Message (RingTree)
 		.msg(@num, num.render)
 
 //	setter Obj (|object|)
-//		if (value isa  scmodule) and (self == @thg)
+//		if (value isa  scmodule) and (self == @thg) and (.parent == @prm)
 //			if value.cls
+//				
 //		.obj = value
 
 	setter Int (|int64|)

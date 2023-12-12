@@ -223,18 +223,22 @@ function TypeOfThg (ExprResolver)
 	|| R = name_space.LookUpvar( exp.name, exp, side )
 	
 	if R isa SCModule
-		|| Cls = R.Cls						#expect (Exp, "Can’t refer to a module like that.")
-		if Cls.ismodel
+		|| Cls = R.Cls								#expect (Exp, "Can’t refer to a module like that.")
+		if Cls.IsModel
 			return Cls.GetFlyingMemory(exp)
-		expect cls.isobject (exp, "Expected an object here.")
-		
-
-	if R isa scdecl
+		if cls.isobject					//
+			|| T = Cls.classtype
+			exp.name = t.name			// right?
+			return T
+		expect (false) (exp, "Expected an object here.")
+	
+	
+	if R isa SCDecl
 		if side
 			(r is setto)
 		|| O = R.islookuponly
 		if O isa message
-			exp.safereplacewith(o.copy(exp))
+			exp.SafeReplaceWith(o.copy(exp))
 	return R
 	
 
@@ -529,6 +533,8 @@ function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCBase| Name_S
 
 
 function TypeOfExprModulesOK (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCObject|)
+	// this function should be removed.
+	// classes now have .classtype which we can use!
 	if (Exp.obj)
 		return exp.obj|scobject|
 	if (exp == @thg)
@@ -563,6 +569,7 @@ function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |
 			return obj
 		if obj isa SCModule
 			|| cls = obj.Cls				#expect ( exp, "Can’t use a module here." )
+			if exp == @thg // remove this?
 			return cls.ClassType
 
 
@@ -629,7 +636,10 @@ function TypeOfAccess (ExprResolver)
 	|| Ty0 = TypeOfExprModulesOK( ch, name_space, nil )
 	|| arr = exp.last
 
-	if (Ty0 isa SCDecl) and (Arr.HasOneChild)
+	if (ty0 isa scmodule)
+		if ty0.IsMArray(arr) and arr.first.ExpectMatch(name_Space, typeint)
+			return LowlevelArrayTransform(exp, ty0.Cls)
+	  elseif (Ty0 isa SCDecl) and (Arr.HasOneChild)
 		|| Index = Arr.first
 		|| Access = TypeOfExpr(index, name_space)$
 		|| W = ty0.isnumeric
@@ -643,9 +653,6 @@ function TypeOfAccess (ExprResolver)
 			ifn (ch == @bra and ch.first == @bra) // should work now
 				require Index.ExpectInt(Access)
 				return ty0.Dereference(exp, name_space, true)
-	if (ty0 isa scmodule)
-		if ty0.IsMArray(arr) and arr.first.ExpectMatch(name_Space, typeint)
-			return LowlevelArrayTransform(exp, ty0.Cls)
 
 	arr.Func = @prm
 	exp.become(@dot, "SyntaxAccess")
@@ -1026,9 +1033,15 @@ function TypeOfDot (ExprResolver)
 	|| o = DotVar.LookUpDot( exp.name, exp, name_Space, contains, side )		#require
 	if (o isa SCModule)
 		// for __modules__.String   // one day namespace.myclass ?
-		if exp.first == @thg
+		|| f = exp.first
+		if f == @thg
 			exp.Func = @thg
-			exp.clear
+			f.remove
+			if f == "__classes__"
+				|| cls = o.cls
+					|| t = cls.classtype
+						exp.name = t.name
+						return t
 		return o
 	
 	|| decl = o.BaseAsDecl
@@ -1401,9 +1414,9 @@ function message.WrapFloatOrInt (|datatypecode| T, |int| N, |scdecl| D)
 	|| V = VecType(T.isfloat, N)
 	ifn d exact_isa v
 		using (self)
-		|| W = «type
-			«thg V.name »
-		»
+		|| W = @type.msg
+		|| thg = w.msg(@thg, V.name)
+		thg.obj = V.typenormal
 		.wrapwith(w)
 
 

@@ -523,7 +523,7 @@ function AllocStr (|string|)
 	|| s = (s0, .super.name)(!.IsRole)
 	return "
 	helper Alloc (|$s0|)
-		return JB_New(__classes__.$s)|$s0|
+		return JB_NewClass(__classes__.$s)|$s0|
 	"
 
 
@@ -533,7 +533,7 @@ function AllocStrLayer (|string|)
 	return "
 	helper LayerAlloc (|MemoryLayer| _L, |$s0|)
 		visible false
-		return JB_LayerNew(_L, __classes__.$s)|$s0|
+		return JB_LayerNewClass(_L, __classes__.$s)|$s0|
 	"
 
 
@@ -552,7 +552,7 @@ function AfterFuncsDecled
 	.CheckAllocVsWrapper( f, false )
 	
 	if .ClassType
-		.ClassType.Name = .CStructName
+		.ClassType.Name = "&" + .CStructName + "Data" // sigh. Not pleasant.
 
 
 
@@ -800,6 +800,7 @@ function MakeClassType (|scdecl| d, |scdecl|)
 function LoadClassType
 	if .isobject
 		.ClassType = .MakeClassType(.typenormal)
+		
 
 
 function TryAddToProject

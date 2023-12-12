@@ -97,10 +97,11 @@ struct JBObject_Behaviour;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define kObjMinSize 16 // safer.
 #define JB_MArray(type, num)    ((type*)(JB_MArray_(sizeof(type),num)))
-#define JB_NewClass(name)       (JB_Object*)(JB_AllocNew(name->DefaultBlock))
+#define JB_NewClass(Cls)        (JB_Object*)(JB_AllocNew((Cls)->DefaultBlock))
 #define JB_New(name)            (name*)(JB_AllocNew((name ## Data).DefaultBlock))
 #define JB_NewEmpty(name)       (name*)(ClearFor_(JB_New(name), sizeof(name)))
 #define JB_LayerNew(L, name)    (name*)(JB_AllocNew(L->CurrBlock))
+#define JB_LayerNewClass(L,X)   JB_AllocNew(L->CurrBlock)
 #define JB_Zero(name)           (ClearFor_((void*)(name), sizeof(__typeof__(*name))))
 #define JBStructData(a)         extern JB_Class a ## Data;
 #define JBClass(a, b, c)        struct a : b {c}; JBStructData(a);

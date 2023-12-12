@@ -445,7 +445,6 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 	if ((.IsAssigns!=0) != Incoming.IsAssigns)
 		require (TypeCast & kTypeCastassigns) and (!Incoming.IsAssigns)
 	
-	debugat 686
 	|| Pos = 0
 	|| Result = kSimpleMatch
 	|| SelfCast = Incoming.ignoreselfContain()
@@ -754,6 +753,7 @@ function EqualOrMoreSpecific (|SCFunction| f, |bool|)
 
 function CheckReturnValue (|Message| msg)
 	|| c = msg.first
+	if c.objectid == 40929992
 	
 	if (!c)
 		expect (!.ReturnType) (msg, "Need to specify a return value")
@@ -761,18 +761,17 @@ function CheckReturnValue (|Message| msg)
 
 	expect ( c.IsOnlyChild ) ( msg, "Can’t return multiple values" )
 	
-	if (!.ReturnType)
-		if c == "nil" and c==@thg or @ques // auto-generated in many places :)
+	if !.ReturnType
+		if c == "nil" and (c==@thg or @ques) // auto-generated in many places :)
 			c.Remove
 			return
-
 	
 	|| FoundReturnType = TypeOfExpr( c, msg.MsgArg )
 	if (FoundReturnType == TypeVoid)
 		FoundReturnType = nil
 
-	if (!.returnType)
-		expect ( !FoundReturnType ) ( msg, "This function has no return value." )
+	if !.returnType
+		expect (!FoundReturnType) ( msg, "This function has no return value." )
 		return
 
 	expect FoundReturnType (msg, "Can’t find return type.")
@@ -788,7 +787,6 @@ function FillInConstructorAndDestructor (|Message| root, |bool| IsConstructor, |
 	|Dictionary| Dict = nil
 	if IsConstructor
 		dict = Dictionary.new
-		
 	
 	for (curr.flat in root)
 		if curr IsThing "self"

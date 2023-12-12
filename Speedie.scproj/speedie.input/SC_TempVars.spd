@@ -117,9 +117,9 @@ function message.IntoVariable (|scbase| name_space, |nameandmsg|)
 	block.parent.obj = arg[name]	// Stop collectdecls being called twice! (name-conflict errors)
 									// it's called in typeofblock, unless we already have the type
 									// which we just set here.
-	|| last = «tmp "rejoin"
-		«thg name »
-	»
+	|| last = @tmp + "rejoin"
+	|| RetVal = last.msg(@thg, name)
+	RetVal.obj = .obj
 	 
 	block <~ last
 	rz.msg = last
