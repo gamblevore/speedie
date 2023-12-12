@@ -85,7 +85,7 @@ class SCFile (file)
 		FlowControl.input(.file, "AST")
 		
 		(Message).createLayer(self).use
-		|| str = .ReadSafely.decompress
+		|| str = .Readall(true).decompress
 			.fData = str
 			.origdate = .modified
 			StdErr.source = .path

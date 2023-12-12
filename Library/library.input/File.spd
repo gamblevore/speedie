@@ -118,15 +118,11 @@ class File (String)
 		cpp_wrapper JB_File_DataSet
 	
 	
-	function ReadSafely (|int| lim = 128MB, |bool| AllowMissing = false, |StringThatWasReadSafely|)
-		// normally allowmissing is good, but here it is bad.
-		return .readall(lim, allowmissing)
-	
-	
 	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |messageroot|)
+		// normally allowmissing is good, but here it is bad.
 		// file.parse keeps track of the source+path
 		|| f = .Resolve(allowmissing).file
-			|| S = f.readsafely(lim, allowmissing)
+			|| S = f.readall(lim, allowmissing)
 			if s.IsCompressed
 				s = s.Decompress(lim, nil)
 			if s

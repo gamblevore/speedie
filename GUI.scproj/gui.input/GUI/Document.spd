@@ -217,7 +217,7 @@ class Document (RingTree)
 	function LoadSub (|bool| ChangedExternal, |bool|)
 		|| f		= .Location.file
 		|| Lim      = document.AskLimit(f)
-		|| Data		= f.readsafely(lim, true)		#require
+		|| Data		= f.readall(lim)		#require
 		
 		.viewdate	= date()
 		.wascompressed = data.IsCompressed
