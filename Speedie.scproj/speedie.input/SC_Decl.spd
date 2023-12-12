@@ -780,7 +780,7 @@ class SCDecl (SCObject) {
 			(rz is StayBorrowed)
 
 
-	function MakeOptional (|SCDecl|)
+	function MakeNewOptional (|SCDecl|)
 		// this becomes declared optional...
 		// the default state is "either" (undeclared)
 		return .MakeExistance(nilstate.optional, .type.TypeOptional)
@@ -793,15 +793,20 @@ class SCDecl (SCObject) {
 	function MakeContainedOptional (|scdecl|)
 		if .NilDeclared is Stated
 			return self
-		return .MakeOptional
+		return .MakeNewOptional
 	
 	
-	function MakeReal (|SCDecl|)
+	function MakeNewReal (|SCDecl|)
 		if .PointerCount
 			.NilDeclared = NilState.real
 			return self
+		return .makereal
+	
+	function MakeReal (|scdecl|)
 		return .MakeExistance(nilstate.real,  .type.TypeReal)
-	function MakeNil (|SCDecl|)
+	
+	
+	function MakeNewNil (|SCDecl|)
 		if .PointerCount
 			.NilDeclared = NilState.actuallynil
 			return self

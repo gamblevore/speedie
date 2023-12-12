@@ -37,7 +37,7 @@ function message.QMarkRel (|message|)
 		
 
 	
-function message.Tran_QMark
+function message.Tran_QMark 
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func) 
 	if !isnormal

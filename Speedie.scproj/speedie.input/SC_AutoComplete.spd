@@ -576,14 +576,21 @@ function scobject.AutoCompleteType (|int|)
 
 
 
-
-function Object.AsDeclAutoComplete (|scdecl|)
+function Object.AsDecl (|scdecl|)
 	if self isa SCClass
 		return .typenormal
-	if self isa SCModule
+	  elseif self isa SCModule
 		if .cls
 			return .cls.typenormal
-	return .BaseAsDecl
+	  else
+		return .BaseAsDecl
+
+
+function Object.BaseAsDecl (|scdecl|)
+	if self isa SCDecl
+		return self
+	if self isa scfunction
+		return .returntype
 
 
 function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoitem]| found, |bool| exact, |int| Types, |scdecl| TypeLimiter)
@@ -593,7 +600,7 @@ function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoite
 			if types & value.AutoCompleteType
 				|| OK = true
 				if typelimiter
-					|| mine = value.AsDeclAutocomplete
+					|| mine = value.AsDecl
 						OK = mine.minimatch(typelimiter)
 				
 				if OK

@@ -82,8 +82,6 @@ function Function (NilTrackerFn)
 	|| prms = fp.next
 	|| fn = prms.obj|SCFunction|
 	fn.NilPrint
-
-	if fn.name contains "Reader"
 	
 	if msg.tmptype == ASMtmp.kTern
 		debugat

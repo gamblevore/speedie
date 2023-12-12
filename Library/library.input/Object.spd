@@ -34,7 +34,6 @@ class Object
 		cpp_wrapper JB_ObjDestroy
 
 
-
 	operator isa (|&ClassData| x, |bool|)
 		cpp_part Isa
 		if (self)

@@ -63,9 +63,9 @@ function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 		ifn exp0.isint and new.suffers
 			0 //
 		  elseif exp0.iszero or Old.IsNil
-			new = new.makenil
+			new = new.makenewnil
 		  else   // || x = 1234|&byte| // Its only used to force a crash, basically.
-			new = new.makereal
+			new = new.makenewreal
 		new.NoBlindCasts(old, exp, name_Space)
 	return New
 
@@ -448,11 +448,11 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 		if (C == "&")											// pointer
 			return r.GetAddress(purpose)
 		if (C == "?")
-			return R.MakeOptional
+			return R.MakeNewOptional
 		if (C == "!")
 			if R.nildeclared == nilstate.real
 				deprecate (c, "Already assumed real. Only '?' needs to be specified.")
-			return R.MakeReal
+			return R.MakenewReal
 		if (C.name)												// emptyname = compiler internal
 			error (c)
 		return r
@@ -567,10 +567,6 @@ function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |
 		|| obj = exp.obj|scobject| ?? TypeOfExprSub(Exp, name_Space, side)
 		if obj isa SCDecl
 			return obj
-		if obj isa SCModule
-			|| cls = obj.Cls				#expect ( exp, "Can’t use a module here." )
-			if exp == @thg // remove this?
-			return cls.ClassType
 
 
 function Message.SCFile (|SCFile|)
@@ -998,7 +994,9 @@ function TypeOfSyx (ExprResolver)
 function message.DotSpace (|scbase| name_space, |scobject|)
 	opt norefcounts
 	if self != @Thg
-		return TypeOfExprmodulesok( self, name_space ) 
+		// allow __modules__.abc.func
+		// what about namespace.jeebox.func?
+		return TypeOfExprModulesOK( self, name_space ) 
 	// module.func, module.var
 	rz = name_space.LookUpVar( .name, self, nil )
 	.obj = rz

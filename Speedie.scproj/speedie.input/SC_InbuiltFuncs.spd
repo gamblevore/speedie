@@ -67,16 +67,14 @@ function TypeOfQues (ExprResolver)
 	if !exp.name
 		prm++
 	if prm
+		// replacing with TypeOfExpr, requires being able to return a "Typeinfo" object
+		// which isn't even a class. like:   x = –sizeof MyStruct
+		// what is the 'MyStruct' here? Or should we do that explicitly in the sizeof operator?
+		// rather than collect it before, like I'm doing now.
 		type = TypeOfExprModulesOK(prm, name_space) // AsDeclAutoComplete isnt a good name
-	|| m = exp.ReplaceInbuiltSub(name_space, type.AsDeclAutoComplete)
+	|| m = exp.ReplaceInbuiltSub(name_space, type.AsDecl)
 		exp.SafeReplaceWith(m)
 	if exp != @ques
 		return TypeOfExpr(exp, name_space)
 
 
-function Object.BaseAsDecl (|scdecl|)
-	if self
-		if self isa SCDecl
-			return self
-		if self isa scfunction
-			return .returntype

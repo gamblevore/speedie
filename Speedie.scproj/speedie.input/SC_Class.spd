@@ -282,7 +282,7 @@ function LoadClassName (|message| node, |string|)
 ConstrNew = `function New () {
 	flow off
 	|| __rz__ = alloc()|type|
-	if __rz__|bool|
+	if __rz__?|bool|
 		__rz__.Constructor()
 	return __rz__
 }`.ParseClean
@@ -292,7 +292,7 @@ ConstrLayerNew2 = `function NewWithLayer (|MemoryLayer| _L) {
 	flow off
 	cpp_part NewWithLayer
 	|| __rz__ = LayerAlloc(_L)|type|
-	if __rz__|bool|
+	if __rz__?|bool|
 		__rz__.Constructor()
 	return __rz__
 }`.ParseClean
@@ -531,7 +531,7 @@ function AllocStrLayer (|string|)
 	|| s0 = .name
 	|| s = (s0, .super.name)(!.IsRole)
 	return "
-	helper LayerAlloc (|MemoryLayer| _L, |$s0|)
+	helper LayerAlloc (|MemoryLayer!| _L, |$s0|)
 		visible false
 		return JB_LayerNewClass(_L, __classes__.$s)|$s0|
 	"
@@ -650,7 +650,7 @@ function scfunction.AddSelfToFunc (|scclass| cls, |SCBase| space)
 	if sl.Suffers				// refcounting will set MarkAsRefAltered
 		sl = sl.copy
 		if .IsConstructorOrDestructor
-			sl = sl.MakeReal
+			sl = sl.MakeNewReal
 		  else
 			sl = sl.MakeEither
 		(sl is SelfImplicit)	// I shouldn't have to specify this, it should be copied!
