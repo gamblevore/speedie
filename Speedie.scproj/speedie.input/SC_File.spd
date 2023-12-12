@@ -103,14 +103,7 @@ class SCFile (file)
 			parser.DotInsertallow = false
 			StdErr.source = nil
 		(Message).restore
-		
 
-function message.DetectBadPosition
-	opt norefcounts
-	for msg.flat in self
-		if (msg != self) and !msg.position
-			printline msg.filelocation
-			debugat
 
 
 function app.CodeSign (|file|)

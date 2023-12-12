@@ -345,9 +345,6 @@ function SCBase.IsNormalObject (|SCClass|)
 	if (self isa SCClass)
 		if .isobject
 			return self
-	  elseif (self isa scdecl)
-		if (.type.isobject)
-			debugat(1) // wait... what about this case?
 
 
 extend SCClass

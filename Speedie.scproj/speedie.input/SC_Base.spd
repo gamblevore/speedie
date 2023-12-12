@@ -635,7 +635,6 @@ function TestExportName (|String| s, |bool| Explicit, |string|) {
 	  elseif o isnt ExplicitExport
 		if o.RehomeExport: return s
 	
-	debugat
 	|| Err = "Export-name conflict: " + s
 	error ( o.Source, Err )
 	error (  .Source, Err )

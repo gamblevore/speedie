@@ -979,7 +979,6 @@ extend Parser
 	
 	
 	function parser.IndentBug (|message| curr, |message|)
-		debugat()
 		return parser.ErrorAlwaysAdd("Indent too low.", curr.position)
 	
 	
