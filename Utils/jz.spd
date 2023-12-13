@@ -1,8 +1,6 @@
 #!/usr/local/bin/speedie
 
 
-// bugs:
-// * -r doesnt report properly on my large-file.json
 // * refering to the previous chunk could really make compression tighter.
 
 
