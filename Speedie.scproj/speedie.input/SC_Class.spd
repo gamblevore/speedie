@@ -217,13 +217,12 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		Count = .super.CalculateSizeRaw				#debug_require
 
 	for p in .properties
-		|| Mul = P.c_Array ?? 1
-		|| curr = 0
-		if (P.IsNormalObject) or (p.PointerCount)
-			Curr = platform.PointerBytes
-		  elseif (P)
+		|| curr = platform.PointerBytes
+		ifn P.Type.IsObject or p.PointerCount
 			Curr = P.type.calculatesize(depth+1)	#require
 		Count = Count Align Curr
+
+		|| Mul = P.c_Array ?? 1
 		Count += Curr * Mul 
 
 	.size = Count align 4
