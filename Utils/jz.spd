@@ -3,9 +3,7 @@
 
 // bugs:
 // * -r doesnt report properly on my large-file.json
-// * doesnt realise that json.mz is a json file... when converting to jeebox
-// * how to specify that something is json?
-// * jz file.mz does not decompress it??
+// * refering to the previous chunk could really make compression tighter.
 
 
 app.Usage = "Usage: jz File1 [File2...]
@@ -15,6 +13,7 @@ Convert files between jbin, box, xml formats. Additionally can compress or decom
     -bin            Convert to jbin
     -c              Compress (c=0 to c=6)
     -s              Replace file in-place
+    -json           Source is json
     -p              Print to stdout
     -r              Just report types, otherwise do nothing
     -o=name         Sets the output filename
@@ -129,6 +128,8 @@ function App.GetActions (|Type|)
 			if v!="true"
 				conv.DefaultStrength = v.int|int| max MZLab.Fastest
 				v="true"
+		  elseif name ~= "json"
+			conv.detected |= type.json
 		  elseif name ~= "o"
 			Conv.destpath = v
 			.SingleFile(name)
@@ -350,8 +351,10 @@ module Conv
 
 
 	function Process
-		if .in.MustExist and .Read and .Detect
-			.Transform
+		.in.MustExist$
+		.Read$
+		.Detect$
+		.Transform
 
 
 	function Ext (|string|)
@@ -390,25 +393,24 @@ module Conv
 	
 	
 	function FormatInfoSub (|&int| Size=0, |string|)
-		|| str = .in.Section(0, 32) // can't just clip jbin like this. We just want a preview :(
+		|| str = .in.Section(0, 64) // can't just clip jbin like this. We just want a preview :(
 			if str == string.error
 				return str
-		// we'd have to make a new API that can read say 2 or 3 messages, with
-		// a small stream chunksize. Not doing that now!!
 		
 		|| T = str.IsJbin #require
-		|| mz = str.ParseJbin
+		|| mz = str.ParseJbin(3)
+		if !mz
+			printline StdErr.pop
 		ifn mz == @tmp and "µz"
 			.Detected |= type.jbin
 			return ""
-		
-		|| arg = mz.last
-		if arg != @arg
-			return string.Error
 
-		*size = arg.prev.int
-		if !*size
-			return string.Error
-		.Detected |= type.compressed
-		return ("ro", "µz")(arg ~= "ro")
+		|| num = mz[@num]
+		|| arg = num.next(@arg)
+			arg.ExpectLast
+			*size = num.int
+			if *size
+				.Detected |= type.compressed
+				return "µz"
+		return string.error
 
