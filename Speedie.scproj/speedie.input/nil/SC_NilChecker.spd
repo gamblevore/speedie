@@ -60,7 +60,7 @@ function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
 		return dcl.nildeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch, 0)
-		if actual is nilish // works e
+		if actual is nilish								// works e
 			.BecomeReal(ch.nildecl, ch)
 	return dcl.nildeclared
 
@@ -417,11 +417,15 @@ function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|
 		return .BecomeReal(sent, where)
 	if (D isnt stated)
 		error (where, "Nilness receiver unstated")
-		error (recv.source, "Please state this parameters nilness.")	
+		error (recv.source, "Please state this parameter's nilness.")	
 
 
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message| SentMsg,  |nilstate|) // setrel, relset
 	opt norefcounts
+	
+	if (recv is param)
+		expect (recv.NilStated) (recvmsg, Recv.PrmStateMsg)
+		
 	|| SN = sent.NilCurr
 	if (recv.NilDeclared == nilstate.real)
 		expect (SN is realish) (RecvMsg, "Nil is not allowed here.")
@@ -434,8 +438,7 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 	opt norefcounts
 	|| Curr = sent.NilCurr
-	|| R = NilState.Realish
-	if curr == R
+	if curr == NilState.Realish
 		return curr
 	
 	if sent is param  and  Curr == nilstate.either
@@ -446,6 +449,4 @@ function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 	error (where, "Expected Real Object: " + where.render)
 
 }
-
-
 

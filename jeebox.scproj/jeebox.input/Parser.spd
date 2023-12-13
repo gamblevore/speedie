@@ -191,7 +191,7 @@ extend Parser
 		  else // I think this works!
 			self <~ Last.First
 			Last.First = self
-			self = Last
+			return Last
 		return self
 	
 

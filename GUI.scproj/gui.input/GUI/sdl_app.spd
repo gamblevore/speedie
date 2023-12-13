@@ -1194,27 +1194,5 @@ datatype SDLCloseReason (uint)
 			return (self|int| &~ act|int|)|SDLCloseReason|
 			
 
-|date| FirstTime
-function string.PrintTime
-// we got PrintTimeEnd fast enough... but we seem to be 1 frame behind??
-	require FirstTime
-	|| n = date.now
-	|| diff = n - firsttime
-	require diff < 1s
-	"$self  ${(n - FirstTime)}"
-
-
-function string.PrintTimeStart
-	|| n = date.now
-	FirstTime = n
-	""
-	"$self  0"
-
-
-function string.PrintTimeEnd
-	if FirstTime
-		.printtime
-		FirstTime = 0
-		beep
 
 

@@ -189,9 +189,10 @@ class Image (memory)
 		|| after = data.after$
 		|| w = ((strength)~gray).PreMul
 		|premultipliedcolor| c
+		|| Top = .ControlClip.y2 & 1
 		
 		for (p in self) (i)
-			if i.y & 1
+			if i.y & 1 == Top
 				p.overlay(w)
 			  else
 				ifn i.x & 1
@@ -479,7 +480,7 @@ class Image (memory)
 				*sigh = color
 
 
-	function RectOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| bg, |MoveCode| AllowEdge=MoveCode.all)
+	function RectOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| bg=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.all)
 		require Edge.a
 		// not sure why this is so complicated.
 		// did I do something wrong? is all my code off by 1 or something?

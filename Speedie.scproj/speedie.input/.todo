@@ -1,7 +1,6 @@
 
 
 bugs:
-	* collectIsaTests can be sped up easily
 	* don't use "syntax append", simply "function append". Same with "call". I mean *x --> x.first
 	* sdleventtype.mousedown() // compiles???
 		* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and struct

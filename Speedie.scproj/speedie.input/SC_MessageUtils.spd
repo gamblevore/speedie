@@ -156,7 +156,7 @@ function Message.WithinLoop (|Message| stop, |bool|)
 	while (self != stop) and self
 		if (self IsTmp "while" or "for")
 			return true // seems OK, its within a loop.
-		self = .parent
+		self = .parent // <<---
 
 
 function Message.UnBra (|Message|)

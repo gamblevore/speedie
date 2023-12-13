@@ -516,7 +516,7 @@ function Message.IsSettablePlace (|bool|)
 	opt norefcounts
 	|| p = .parent
 	while p == @bra
-		self = p
+		self = p // <<---
 		p = p.parent
 	return .IsFirstOfSetRel
 

@@ -23,7 +23,7 @@ function scfunction.MarkRecursive (|scfunction| EndAt)
 	while
 		is Recursive
 		require self != endat
-		self = .DepthFinder
+		self = .DepthFinder // <<---
 		require self != nil and EndAt
 
 

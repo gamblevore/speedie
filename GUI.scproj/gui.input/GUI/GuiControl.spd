@@ -65,7 +65,11 @@ class GUIControl (ringtree)
 	virtual KeyDown		(|keys| Key, |bool|)
 	virtual MouseUp		(|ivec2| P)
 	virtual Draw		(|image| Where)
-		Where.RectStyled(.lastrect, .gnormal)
+		opt norefcounts
+		|| G = .GNormal
+		using g
+			g.Strengthen(.declutterer.strength)
+			Where.RectStyled(.lastrect, g)
 	virtual PostLoad
 		0
 	virtual Copy

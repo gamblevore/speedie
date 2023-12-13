@@ -48,6 +48,10 @@ class NilTest
 		.v2 = path.ReadFile
 		return .v > .v2.Length
 	
+	function NilBorker
+		borks
+		self = nil // but was self nil?
+		
 	// a getter
 	function Get (|string|)
 		return .v2[3, 10+(.v mod 10)]
@@ -73,7 +77,7 @@ class NilTest
 	function CanNil (|niltest|)
 		if .v
 			return self
-	
+
 	// a few that cant
 	function Exists (|niltest|)
 		return self ?? niltest()
@@ -148,6 +152,7 @@ class NilTest
 	function GoodBadPtr (|&niltest| p)
 		|| v = *p
 			v.v++
+		.V
 
 // I think those are some good tests... for now. but what about modules? thats a tricky one.
 
