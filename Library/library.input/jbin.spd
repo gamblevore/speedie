@@ -148,7 +148,7 @@ function StringReader.IsJBin (|bool|)
 	return .str(4).IsJbin
 	
 	
-function StringReader.Parse_Jbin (|int64| Remain=int64.max, |MessageRoot|)	
+function StringReader.ParseJbin (|int64| Remain=int64.max, |MessageRoot|)	
 	expect .IsJBin (Self, _jBinNotJbin )
 	.UserObj = nil
 	rz = .NextMsg
@@ -160,7 +160,7 @@ function StringReader.Parse_Jbin (|int64| Remain=int64.max, |MessageRoot|)
 	
 
 function string.ParseJbin (|int64| max=int64.max, |messageroot|)
-	return .Stream.Parse_Jbin(max)
+	return .Stream.ParseJbin(max)
 
 function string.IsJbin (|bool|)
 	if self starts _JbinHeader
