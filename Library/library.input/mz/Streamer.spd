@@ -4,20 +4,15 @@ function StringReader.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 	expect (self!=nil) ("Nil object given to CompressInto")
 	|jbin| j = faststring.use(dest)				#require
 	st := CompressionStats.All
-	|| Mode = ("ro", "")(strength >= mzlab.strong)
-	|| ChunkSize = (4MB, 1MB)(mode)				// don't change these! compression will fail.
 	st.start
 	j <~ _JbinHeader
 	j.enter(@tmp, "µz")
 	j.addint(.length)
-	j.enter(@arg, Mode)
+	j.enter(@arg)
 	while .hasany
-		|| str = .str(Chunksize)
+		|| str = .str(1MB)
 		|| Place = j.OpenSection
-		if Mode
-			j.StrongCompressChunk(str, strength > mzlab.strong)
-		  else
-			j.CompressChunk(str)
+		j.CompressChunk(str)
 		
 		j.CloseSection(Place)
 		st.LiveUpdate(str.length, j.length - place)
@@ -57,16 +52,11 @@ helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 	  else
 		mz.name = nil
 		size.name = nil
-		|| Mode = arg.name
-		|| ChunkMax = (4MB, 1MB)(mode) 
 		while
 			|| c = .NextMsg(arg, @bin)			#loop
 			|| s = c.name
-			|| Expected = Remaining min ChunkMax
-			if Mode
-				loop fs.StrongDecompressChunk(c.name, Expected)
-			  else
-				loop fs.DecompressChunk(c.name, Expected)
+			|| Expected = Remaining min 1MB
+			loop fs.DecompressChunk(c.name, Expected)
 			Remaining -= Expected
 			fs.Flush
 			st.LiveUpdate(c.length, Expected)
@@ -80,11 +70,4 @@ helper faststring.CompressChunk (|string| str)
 
 helper faststring.DecompressChunk (|string| str, |int| Expected, |int|) 
 	cpp_wrapper JB_Str_DecompressChunk
-
-helper faststring.StrongCompressChunk (|string| str, |bool| Strong = false) 
-	cpp_wrapper JB_BALZ_CompressChunk
-
-helper faststring.StrongDecompressChunk (|string| str, |int| Expected, |int|) 
-	cpp_wrapper JB_BALZ_DecompressChunk
-
 
