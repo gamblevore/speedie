@@ -174,34 +174,31 @@ class Image (memory)
 		return .ptr|&imagepixel|
 	
 	
-	function imagepixel.Colorise (|byte| D)
+	function @Vec4.Colorise (|byte| D, |float| a=1.0,  |vec4|)
 		|| DB = (d>>2)&3				// too brown otherwise
 		|| DX = (d>>5)&3
-		.r = ((d>>0)&7)*36
-		.g = ((d>>3)&7)*36
-		.b = (DB xor DX)*85
-		.a = 255
+		rz.r = ((d>>0)&7)*7th
+		rz.g = ((d>>3)&7)*7th
+		rz.b = (DB xor DX)*3th
+		rz.a = a
 	
 	
-	function Colorise (|Memory| data, |int| px)
+	function Colorise (|Memory| data, |float| strength=1)
+		require strength > 0
 		|| in = data.ptr$
-		|| after = in + data.BytesUsed$
-		|| curr = ._controlclip.x1y1
-		|| end = ._controlclip.x2y2
-		|| w = Colors.gray(0.5)
-		while (curr.y < end.y)
-			while (curr.x < end.x)
-				|| p = self[curr]
-				p.Colorise(*in)
-				if ++in >= after
-					in = data.ptr
-				|| p2 = self[curr+(0,1)]
-				curr.x += 2
-				p[1] = p[0]
-				if p2
-					p2[0] = w //p[0]
-					p2[1] = w
-			curr = (._controlclip.x, curr.y+2)			
+		|| after = data.after$
+		|| w = ((strength)~gray).PreMul
+		|premultipliedcolor| c
+		
+		for (p in self) (i)
+			if i.y & 1
+				p.overlay(w)
+			  else
+				ifn i.x & 1
+					c = vec4.colorise(*in, strength).PreMul
+					if ++in >= after
+						in = data.ptr
+				p.overlay(c)
 		
 		
 	syntax access (|int| x, |int| y, |&imagePixel|)

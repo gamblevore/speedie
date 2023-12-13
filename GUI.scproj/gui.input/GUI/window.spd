@@ -269,11 +269,11 @@ class Window (GUIControl)
 		
 		where.ControlClip = self
 
-		i.drawfocus(where)?
+		i.DrawFocus(where)?
 
 		where.ResetBoundsToSize
 		if .AlphaFader and .FlashSelf
-			.drawfocusrect(Where, .lastrect, .FaintingEdgeSub)
+			.DrawFocusRect(Where, .lastrect, .FaintingEdgeSub)
 
 
 	helper FixFocus

@@ -110,12 +110,13 @@ function PerryIDE.ActualCompile (|message| msg)
 	|| dw = .datewrap(msg )
 	.logonecomm(dw, "\1C ")
 	c <~ dw
-	(.buildbutton isnt enabled)
+	(.buildbutton isnt visible)
 	(.runbutton isnt enabled)
+	(.progress is visible)
 
 	is active
 	if .name ~= "Speedie.scproj"
-		.showcompilecutely
+		.ShowCompileCutely
 		.CompileTabSelect(.speedietext, true)
 	.ViewAsCurr
 

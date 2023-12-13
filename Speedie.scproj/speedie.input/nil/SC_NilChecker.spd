@@ -120,7 +120,7 @@ function Function (NilTrackerFn)
 	
 	|| ret = fn.ReturnType
 		rz = ret.NilDeclared
-		check ((rz is stated) or !ret.Suffers) (msg, "Nilness of function return unknown.")
+		check ((rz is stated) or !ret.Suffers) (msg, "Nilness of function return needs stating.")
 
 
 function Return (NilTrackerFn)
@@ -175,6 +175,7 @@ function WhileExit (|message| Cond, |bool| WhileTrue)
 function While (NilTrackerFn)
 	opt norefcounts
 	|| cond = msg.first
+	if scfunction.currfunc ~= "exists6"
 	|| CondTest = cond.IsAlwaysBool
 	if !CondTest.IsFalse			// ignore "while false"
 		T.BranchEnter(msg)
@@ -216,7 +217,6 @@ function Tern (Niltrackerfn)
 	|| Orig = T.BranchEnter(msg)			#require
 	|| tC = msg.first,  || tA = tC.next,  || tB = tA.next
 
-	debugat
 	#!"First Branch"
 	.jump(tC, NilCheckMode.positive)
 	rz = .Jump(tA, test)
@@ -415,14 +415,16 @@ function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|
 	|| D = recv.NilDeclared
 	if (D == nilstate.real)
 		return .BecomeReal(sent, where)
-	expect (D is stated) (where, "Nilness of parameter unknown.")	
+	if (D isnt stated)
+		error (where, "Nilness receiver unstated")
+		error (recv.source, "Please state this parameters nilness.")	
 
 
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message| SentMsg,  |nilstate|) // setrel, relset
 	opt norefcounts
 	|| SN = sent.NilCurr
 	if (recv.NilDeclared == nilstate.real)
-		expect (SN isnt nilish) (RecvMsg, "Nil is not allowed here.")
+		expect (SN is realish) (RecvMsg, "Nil is not allowed here.")
 		return .BecomeReal(sent, SentMsg)
 		
 	if recv.nilreg 
@@ -438,7 +440,7 @@ function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 	
 	if sent is param  and  Curr == nilstate.either
 		if !sent.NilStated
-			sent.NilDeclared = NilState.real
+			T.DeclareReal(sent)
 			return T.SetNilness(sent, NilState.real)
 
 	error (where, "Expected Real Object: " + where.render)

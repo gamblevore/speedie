@@ -97,8 +97,11 @@ class NilTest
 		return .Exists4
 		
 	function Exists6 (|niltest|)
-		while (|| x = .exists5)
-			return x
+		while
+			|| x = .exists5
+			borks
+			if x
+				return x
 		return .Exists3(nil)
 		
 	function Exists7 (|!niltest|)
@@ -115,10 +118,13 @@ class NilTest
 			|| x = *p2
 				x.v
 
-	function BorkedPtr (|&niltest| p, |&niltest| p2)
+	function BorkedPtr (|&(niltest!)| p, |&niltest| p2)
 		if !p
 			borks
 			*p = self
+		  else
+			*p = self
+			
 		borks	
 		(*p).v
 
@@ -168,9 +174,10 @@ module NilTest2
 			x.Reader
 
 
-function scfunction.NilPrint
+function scfunction.NilPrint (|string| header="")
 	cpp_name ndb1
 	|| fs = FastString()
+	fs <~ header
 	if .cls
 		fs <~ .cls.name
 		fs <~ "."
@@ -186,6 +193,7 @@ function scfunction.NilPrint
 	if .returntype
 		fs <~ " as "
 		.returntype.nildeclared.nilname(fs, true)
+	fs <~ header
 	
 	printline fs
 

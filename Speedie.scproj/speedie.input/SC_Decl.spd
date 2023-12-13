@@ -97,7 +97,7 @@ class SCDecl (SCObject) {
 	|SCDeclInfo|		Info
 	|AsmReg|			DReg
 	|Byte|				PointerCount
-	|NilState|			NilDeclare
+	|NilState|			NilDeclared
 	|byte| 				NilReg
 	|byte| 				NilAllocDepth
 	|byte| 				Special
@@ -107,14 +107,12 @@ class SCDecl (SCObject) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered
-	
-	
-	setter nildeclared (|nilstate|)
-		if .objectid == 0
-		.nildeclare = value
-	
-	function nildeclared (|nilstate|)
-		return .nildeclare
+		
+//	setter NilDeclared (|nilstate|)
+//		.nildeclare = value
+//	
+//	function nildeclared (|nilstate|)
+//		return .nildeclare
 	
 	function Project (|scimport|)
 		opt norefcounts

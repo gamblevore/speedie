@@ -3,7 +3,7 @@
 class ProgressBar (GUIControl)
 	linkage
 		cpp_part Bar
-	|memory| Ughughugh
+	|memory| RandomData
 	|float| Progress
 	|bool|	Indefinite
 	|bool|	RandomStyle
@@ -14,21 +14,22 @@ class ProgressBar (GUIControl)
 		.indefinite = true
 	
 	behaviour Draw
+		|| s = .Declutterer.Strength
 		if .Indefinite
-			.Ughughugh := byte[128]
-			if !.Ughughugh[0] or (sdlapp.FrameCount isa 4)
+			|| Refresh = !.RandomData or (sdlapp.FrameCount isa 4)
+			.RandomData := byte[128]
+			if Refresh
 				sdlapp.touch
-				.Ughughugh.Temporal
-			where.Colorise(.Ughughugh, 2)
+				.RandomData.Temporal
+			where.Colorise(.RandomData, s)
 		  else
-			|| Dark  = (0.2, 0.2, 0.2, 1.0)
-			|| Light = (0.7, 0.7, 0.7, 1.0)
+			|| Dark  = vec4(0.2, s).PreMul
+			|| Light = vec4(0.7, s).PreMul
 			if !.RandomStyle
-				light = (0.4, 0.4, 0.4, 1.0)
+				light = vec4(0.4, s).PreMul
 				
 			for (p in where) (v)
-				p <~ (dark, light)(.StripeDark(v))
-		super.Draw(where)
+				p.overlay((dark, light)(.StripeDark(v)))
 	
 	setter Progress	(|float|)
 		if .progress != value
@@ -41,7 +42,6 @@ class ProgressBar (GUIControl)
 	
 	
 	function StripeDark (|ivec2| v, |bool|)
-		if .indefinite
-			if .RandomStyle
-				return 0.5[]
-			return ((v.sum - date.ticks/3) / 4) mod 2
+		if .RandomStyle
+			return 0.5[]
+		return ((v.sum - date.ticks/3) / 4) mod 2

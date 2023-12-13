@@ -123,6 +123,9 @@ class Memory
 	function Ptr (|&...|)
 		return ._ptr|&...|
 		
+	function After (|&...|)
+		return (._ptr + .BytesUsed)|&...|
+		
 	setter Length (|int|)
 		if Value > .Capacity
 			.Capacity = Value

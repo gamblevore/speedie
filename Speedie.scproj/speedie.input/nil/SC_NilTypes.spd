@@ -34,9 +34,9 @@ datatype NilCheckMode (uint)
 		Negative
 		Positive
 		Soft
-		SoftPos  = Positive + Soft  
+		SoftPos = Positive + Soft  
 		SoftNeg = Negative + Soft
-		Active = Positive + Negative
+		Active  = Positive + Negative
 
 	syntax is (|NilCheckMode| other, |bool|)
 		return self & other

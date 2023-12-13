@@ -358,6 +358,7 @@ class PerryIDE (Window)
 			|| ShowBuilders = !HideTop and (!.istextonly or .path.isSource)
 			.runbutton.declutter		= !ShowBuilders
 			.buildbutton.declutter		= !ShowBuilders
+			.Progress.Declutter			= !ShowBuilders
 		
 		if (hideside == visside)
 			.filelist.declutter = hideside

@@ -396,6 +396,7 @@ class GUIControl (ringtree)
 		
 	helper DrawFocusRect (|image| where, |ivec4| R, |float| Strength)
 		opt norefcounts
+		require strength > 0
 		|| oldclip = where._ControlClip // maybe outside
 		where.controlclip = (0, 0, 31K, 31K)
 		where.EdgeAlpha(R, .FocusBorderStyle, Strength, .EdgeAllow)

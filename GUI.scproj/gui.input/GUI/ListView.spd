@@ -1396,8 +1396,9 @@ class ListView (GUIControl) {
 		|| Hide = 0
 		if .AttachedToParent
 			|| p = .parent
-			Hide   |= (.abstop > p.abstop)       * movecode.bottom
-			Hide   |= (.absbottom < p.absbottom) * MoveCode.top
+			Hide   |=  movecode.bottom * (.abstop > p.abstop)
+			Hide   |=  MoveCode.top * (.absbottom < p.absbottom)
+			
 		return ~Hide
 		
 		

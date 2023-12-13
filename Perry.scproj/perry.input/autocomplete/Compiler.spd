@@ -149,7 +149,7 @@ extend PerryIDE
 		if .compilr
 			.compilr.KillButOK // frees memory
 			.compilr = nil
-		(.buildbutton is enabled)
+		(.buildbutton is visible)
 		(.runbutton is enabled)
 		(.progress isnt visible)
 		.JustReadlog

@@ -22,6 +22,7 @@ struct NilTracker
 	linkage: cpp_part nil
 	|&NilRecord| 		Line
 	|&NilRecord| 		RowEnd
+	|NilRecorder|		Redeclares
 	target debug
 		|Scdecl--[32]| 		Dbg
 	|LoopInfo| 			Loops
@@ -33,7 +34,7 @@ struct NilTracker
 		rz = *l
 		l.ExitCount = 1-WhileTrue
 		l.Cont = decls()
-		l.Exit = (l.Cont * !WhileTrue) ||| NilState.Either
+		l.Exit = (l.Cont * !WhileTrue) ||| NilState.either
 		l.Depth = .CurrDepth
 	
 	function CurrDepth (|int|)
@@ -46,10 +47,20 @@ struct NilTracker
 			return N
 		error (abc, "Branch depth too deep (over 63)")
 
+	function DeclareReal (|scdecl| V)
+		V.NilDeclared = NilState.real		// the other branches do not know about the decl being real!
+		.Redeclares.value |= nilstate.real << (V.NilReg<<1)
+	
+	function Redeclare (|nilrecord| V, |nilrecord|)
+//		|| R = .Redeclares.Value
+//		if !R
+		return V
+		
 	
 	function BranchSwap (|NilRecord| Earlier, |nilrecord|)
 		rz = *.line
-		.set(Earlier, "swap") 
+		Earlier = .Redeclare(earlier)
+		.Set(Earlier, "swap") 
 	
 	
 	function BranchExit (|NilRecord| Earlier,  |nilstate|)
@@ -88,17 +99,19 @@ struct NilTracker
 		d.NilPrint("set")
 		return New
 
-	function Start (|scfunction| f, |message|)
+	function Start (|SCFunction| f, |message|)
 		opt norefcounts
 		require f.CanNil
 		SCFunction.CurrFunc = f
+		.rows[0] = nilstate.either // so we know that we have 1 register, used already
 		.Line = .rows[0]
 		.rowend = .line + 63
-		*.line = nilstate.either
 		.loops = nil
+		.redeclares.value = 0
 		for d in f.args
 			.DeclareSub(d, d.nildeclared)
-		f.NilPrint
+		printline
+		f.NilPrint(" ****** ")
 		
 		|| r = f.returntype
 			if !r.nilstated
@@ -106,19 +119,20 @@ struct NilTracker
 		target debug: if "": niltracker.ndb
 		return f.SourceArg
 
-	function Finish (|scfunction| f)
+	function Finish (|SCFunction| f)
 		opt norefcounts
 		|| r = f.ReturnType
-			check (r.nildeclared) (f, "Return nilness unknown.")
 			r.nildeclared |= nilstate.stated
-		f.NilPrint
+		for a in f.Args
+			a.NilDeclared |= NilState.Stated
+		f.NilPrint(" !!!!! ")
 	
 	function Place (|&NilRecorder|)
 		return (T.line)|&nilrecorder|
 
 	module
-		|byte| OldPrint
-		|NilTracker| T
+		|byte|			OldPrint
+		|NilTracker|	T
 
 		function Place (|&NilRecorder|)
 			return (T.line)|&nilrecorder|
@@ -129,26 +143,20 @@ struct NilTracker
 		function Decls (assigns:|NilRecord|)
 			.place.Value = Value
 
-
 		function NilTracker.Purify (|scfunction| f)
 			opt norefcounts
 			|| arg = .Start(f)
 				Argument(arg)
 				.Finish(f)
 		
-		
 		function SaveTheWorld
 			opt norefcounts
 			require app["nil"].Yes
 
-/*			
 			|| fs = Faststring()
 			for f in compiler.funclist
-				fs <~ f.exportname
-				fs <~ "\n"
-			printline fs
-			debugger
-*/
+				if f.CanNil
+					printline f.exportname
 		
 			|| Rec = errorreceiver()
 			using rec
