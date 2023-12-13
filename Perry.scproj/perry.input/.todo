@@ -3,7 +3,7 @@
 							Todo
 
 * VM? 
-* remove balz... my mz is already nearly as tight!
+* progress button not showing?
 * Constants and globals don't autocomplete nicely
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
 	* Main no longer is clickable if you use mainargs
