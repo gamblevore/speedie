@@ -148,19 +148,19 @@ function StringReader.IsJBin (|bool|)
 	return .str(4).IsJbin
 	
 	
-function StringReader.Parse_Jbin (|MessageRoot|)	
+function StringReader.Parse_Jbin (|int64| Remain=int64.max, |MessageRoot|)	
 	expect .IsJBin (Self, _jBinNotJbin )
 	.UserObj = nil
 	rz = .NextMsg
-	while .NextMsginfo
-		#!Do_Nothing
+	while --Remain > 0
+		loop .NextMsginfo
 	
 	if .Data.ErrorReported
 		rz = nil // be consistant with .parse!
 	
 
-function string.ParseJbin (|messageroot|)
-	return .Stream.Parse_Jbin
+function string.ParseJbin (|int64| max=int64.max, |messageroot|)
+	return .Stream.Parse_Jbin(max)
 
 function string.IsJbin (|bool|)
 	if self starts _JbinHeader
