@@ -25,7 +25,7 @@ linkage
 |bool|		IsCompare
 |bool|		IsEquals
 |bool|		IsNilTest
-|bool|		HasEquals // == >= <=
+|bool|		IsExactlyEquals // == >= <=
 |bool|		IsSet
 |bool|		AsBit
 |bool|		IsCustom
@@ -86,11 +86,10 @@ function InitComp (|string| name_)
 		.CompParam = "1"
 		.CompOp = ">="
 	  elseif (s == "<=") or (s == ">=")
-		.HasEquals = true
 		.CompParam = "0"
 	  else
 		.IsEquals = true
-		.HasEquals = s == "=="
+		.IsExactlyEquals = s == "=="
 		.CompParam = "0"
 
 

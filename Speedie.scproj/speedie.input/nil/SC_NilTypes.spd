@@ -28,6 +28,7 @@ struct NilRecorder
 
 
 datatype NilCheckMode (uint)
+	linkage: cpp_part nilmo
 	flags
 		|NilCheckMode| 
 		Nothing = 0
@@ -53,13 +54,18 @@ datatype NilCheckMode (uint)
 		  else
 			return self & ~other
 	
-	function Normal (|NilCheckmode|) 
+	function Activate (|NilCheckmode|)
+		|| rev = (self is reversed)
+		return self ||| (positive + rev)
+
+	function Normal (|NilCheckmode|)
 		if self is reversed
-			return .Negate
+			return .Negate &~ reversed
 		return self
 	
 	function Negate (|NilCheckmode|)
-		|| part = active-(self & active)
-		return (self&~active) ||| part
+		|| p = (self & positive) >> 1
+		p   |= (self & negative) << 1
+		return  p ||| (self &~ active)
 
 

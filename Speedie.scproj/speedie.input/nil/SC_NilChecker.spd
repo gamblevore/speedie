@@ -231,14 +231,14 @@ function Tern (Niltrackerfn)
 
 
 function Activate (|NiltrackerFn| fn, |message| msg, |NilCheckMode| test, |NilState|)
-	|| t2 = test.normal
 	if test is Active
-		return (fn)(msg, t2)
+		return (fn)(msg, test.normal)
 
 	|| Orig = t.BranchEnter(msg)
-		(fn)(msg, t2)
+		Test = test.activate
+		(fn)(msg, test)
 		|| First = t.BranchSwap(Orig)
-		(fn)(msg, t2.negate)
+		(fn)(msg, test.negate)
 		return t.BranchExit(First)
 
 
@@ -246,7 +246,9 @@ function BooleanLogic (niltrackerfn)
 	opt norefcounts
 	|| AA = msg.first
 	|| BB = msg.last
-	if (test is and) == (test is positive)
+	|| IsAnd = test is AND
+	(test is AND) = false 
+	if IsAnd == (test is positive)
 		.Jump(AA, test)						// x = (!a or !a.y)
 		.Jump(BB, test)
 		return nilstate.real
@@ -264,25 +266,20 @@ function BooleanLogic (niltrackerfn)
 	return t.BranchExit(First)
 
 
-function NormalCompare (|message| ll, |message| rr, |nilcheckmode| test,   |NilState|)
-	.jump(ll, test)
-	.jump(rr, test)
-	return NilState.Real
-
-
 function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperator| scop,  |nilstate|)
 	|| LNil = ll.IsNowNil
 	|| RNil = rr.IsNowNil
 	if !lnil and !rnil			// if (a > b)
-		return .NormalCompare(ll, rr, test)
+		.jump(ll, test)
+		.jump(rr, test)
+		return nilstate.real
 	
 	if (lnil and rnil)
 		return ll.Redundant(test, ll.nildecl)
 	expect (scop.IsNilTest) (ll.next, "Nil can't accept this operator. Use != or ==.")
 	
 	debugat
-	if scop.IsEquals
-		(test is reversed)
+	(test is reversed) = scop.IsExactlyEquals
 		
 	|| side = (rr, ll)(lnil)
 	return .Activate(jump, side, test)  // can handle x = !(a == nil)
@@ -299,7 +296,7 @@ function ProcessCondRel (Niltrackerfn)
 		.CompareObjs(ll, rr, test, scop)
 
 	|| AndOr = scop.IsAndOr
-		debugat
+		(test is AND) = (andor == scoperator.AND)
 		return .Activate(booleanlogic, msg, test)
 
 	// (ptr+1) or (1+ptr) still needs nilness check
@@ -377,7 +374,7 @@ function Type (Niltrackerfn)
 
 
 function JustReal (Niltrackerfn)
-	return nilstate.realish
+	return nilstate.real
 
 
 function Brel (Niltrackerfn)
@@ -392,10 +389,10 @@ function Brel (Niltrackerfn)
 		
 	if b == '!'
 		(test is reversed)
-		return .Activate(jump, msg, test)
+		return .Activate(jump, ch, test)
 	
 	Jump(ch, test)
-	return NilState.Real // !, &, ~   all return real
+	return nilstate.real // !, &, ~   all return real
 
 
 function arel (Niltrackerfn)
