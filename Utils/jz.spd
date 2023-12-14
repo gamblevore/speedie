@@ -386,12 +386,7 @@ module Conv
 	
 	
 	function FormatInfo (|&int| Size=0, |string|)
-		using ErrorReceiver()
-			rz = .FormatInfoSub(size) // to protect against clipping errors
-	
-	
-	function FormatInfoSub (|&int| Size=0, |string|)
-		|| str = .in.Section(0, 64) // can't just clip jbin like this. We just want a preview :(
+		|| str = .in.Section(0, 64)
 			if str == string.error
 				return str
 		
