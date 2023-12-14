@@ -1053,8 +1053,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function C_RenderDot (fpMsgRenderCpp)
 		opt norefcounts
 		|| obj = .DotMustBeProperty						#require
-	
 		|| ch = .first
+
 		if (ch.obj isa SCModule)
 			obj.Name.safe(fs)
 
@@ -1073,11 +1073,12 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 
 	function message.BraDeclfind (|scdecl|)
-		opt norefcounts
+		opt norefcounts,  (self)~isreal
+		
 		while
 			|| d = .AsDecl
 				rz = d
-			self = .parent // <<---
+			self = .parent
 			loop self == @bra
 
 				

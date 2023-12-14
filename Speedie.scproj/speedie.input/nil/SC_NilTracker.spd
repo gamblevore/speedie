@@ -34,11 +34,18 @@ struct NilTracker
 		rz = *l
 		l.ExitCount = 1-WhileTrue
 		l.Cont = decls()
-		l.Exit = (l.Cont * !WhileTrue) ||| NilState.either
+		l.Exit = l.Cont * !WhileTrue
+		l.exit |= NilState.either
 		l.Depth = .CurrDepth
 	
 	function CurrDepth (|int|)
 		return (.line - &.rows[0])|int|
+	
+	function DeclareReal (|scdecl| V)
+		V.NilDeclared = NilState.real
+		if .CurrDepth > 0		
+			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
+	
 	
 	function BranchEnter (|message| abc, |NilRecord|)
 		if .line < .RowEnd
@@ -46,71 +53,18 @@ struct NilTracker
 			*.line = N
 			return N
 		error (abc, "Branch depth too deep (over 63)")
-
-	function DeclareReal (|scdecl| V)
-		V.NilDeclared = NilState.real
-		.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
-		
 	
-	function BranchSwap (|NilRecord| Earlier, |nilrecord|)
+	function BranchSwap (|NilRecord| A, |nilrecord|)
 		rz = *.line
-		Earlier = earlier & .Realnesses
-		.Set(Earlier, "swap")
-
-/* we need some real tests here... like how does merging work?
-	if we set a self to an object... during branches or whatever
+		.Set(A, "swap")
 	
-	if x
-		self = optional()
-	  else
-		self.abc
-	
-OK... so is self real or not?
-self.abc needs self to be real. So the param must be real
-so if we set the realnesses to REAL... well... its not real
-its optional. So we failed. I'm kind of... doubting if
-we should allow this.
-
-SOLUTION??		
-Disallow setting to param, that we don't know its realness!??
-
-seems to solve the problem?
-
-What about this, then?
-			
-	if x
-		if self
-			self.abc
-	  else
-		self.abc
-	
-Well... the second one... can't be done, because its an optional var. Makes sense?
-
-What about this?
-	
-	if x
-		self.abc
-	  else
-		self = nil
-
-// <<---
-// so is self nil or not? the nilness is just for passing IN. not for general fuckery.
-// do we disallow self setting to nil?
-// or is it... just within the same branch?
-// within the same branch as real makes sense?
-// param upgrades are hard :(
-// perhaps even a bad idea.
-// we could do param upgrades "if the param is never changed"??????
-// i mean... that solves the problem?
-// we'd have to disallow upgrades on that param though
-
-*/
-	
-	
-	function BranchExit (|NilRecord| Earlier,  |nilstate|)
-		|| src = .line
-		.line = src - 1
-		.set(Earlier ||| *src, "branchexit")
+	function BranchExit (|NilRecord| A=0,  |nilstate|)
+		|| B = *(.line--)
+		|| New = A ||| B
+		new &= .Realnesses
+		if .CurrDepth == 0
+			.Realnesses = -1
+		return .Set(New, "branchexit")
 
 			
 	function Declare (|scdecl| D, |nilstate| nd, |nilstate|)
@@ -119,7 +73,7 @@ What about this?
 	
 	function DeclareSub (|scdecl| D, |nilstate| nd, |nilstate|)
 		nd &= nilstate.either
-		|| P = .place
+		|| P = .Place
 		|| N = p.value.Count
 		expect (N < 31)								(D, "Too many declarations")
 		(p)(n) = nd
@@ -136,10 +90,15 @@ What about this?
 			return .nildeclared &~ nilstate.stated
 		return (niltracker.Decls)[.NilReg]
 	
-	function SetNilness (|SCDecl| d, |NilState| New, |nilstate|)
+	function SetNilness (|SCDecl| d,  |NilState| New, |nilstate|)
 		pragma inline
 		if !d.nilreg // what?
-		(.place)(d.NilReg) = new
+		|| P = .place
+		(P)(d.NilReg) = new
+		
+		if (p.Value & .Realnesses  !=  p.Value)
+			d.NilPrmFail
+			
 		d.NilPrint("set")
 		return New
 

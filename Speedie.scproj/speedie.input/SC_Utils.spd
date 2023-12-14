@@ -7,28 +7,13 @@
 
 //  //  //  //  //   //  // .Obj Conversion //  //  //  //  //  //  //  //  //
 
-function Message.NeedDecl (|SCDecl|)
-	opt norefcounts
-	|| obj = .obj
-	if (obj isa scdecl)
-		return obj
-	debugger
 
 function Message.AsDecl (|SCDecl|)
 	// .MsgDecl uses this
 	opt norefcounts
-	|| obj = .obj$
+	|| obj = .obj
 	if (obj isa scdecl)
 		return obj
-	debugger
-
-
-function Message.AsCls (|SCClass|)
-	opt norefcounts
-	|| obj = .obj$
-	if (obj isa SCClass)
-		return obj
-	debugger
 
 
 function Message.AsFunc (|SCFunction|)
@@ -38,16 +23,9 @@ function Message.AsFunc (|SCFunction|)
 		return obj
 
 
-function Message.AsBase (|SCBase|)
-	|| obj = .obj$
-	if (obj isa SCBase)
-		return obj
-	debugger
-
-
 function Message.AsArg (|SCArg|)
 	opt norefcounts
-	|| obj = .obj$
+	|| obj = .obj
 	if (obj isa SCArg)
 		return obj
 

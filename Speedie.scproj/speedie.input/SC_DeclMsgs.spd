@@ -78,6 +78,7 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
 
 function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
 	opt norefcounts
+	(self)~isreal
 	if (func.isassigns == 2) and .islast
 		if !cls
 			error (self, "Can’t use this here." )
@@ -89,7 +90,7 @@ function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cl
 			.AddValue(func)
 		
 	if  self == @Item  and  .first == "assigns"
-		self = .Last // <<---
+		self = .Last
 		func.IsAssigns = 1
 		.addvalue(func)
 

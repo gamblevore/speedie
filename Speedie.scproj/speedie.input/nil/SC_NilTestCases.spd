@@ -235,11 +235,13 @@ function nilstate.NilName (|faststring| fs, |bool| Expected)
 target debug {
 function niltracker.Set (|NilRecord| Dest, |string| reason, |nilstate|)
 	pragma inline
+	dest &= .Realnesses
 	|| diff = dest xor *.line
 	*.line = dest
 	for i in 32
 		if diff[i]
 			.dbg[i].nilprint(reason)
+	return nilstate.real
 	
 
 
@@ -261,5 +263,7 @@ function nilrecord.ndb5
 } else {
 	function niltracker.Set (|NilRecord| Dest, |string| reason, |nilstate|)
 		pragma inline
+		dest &= .Realnesses
 		*.line = dest
+		return nilstate.real
 }

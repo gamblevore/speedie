@@ -141,16 +141,16 @@ function Message.CanGetAddress (|scbase| name_space, |bool|)
 function Message.ParentForAddress (|Message|)
 	opt norefcounts
 	|| gotaddr = 0
-	self = .parent // <<---
-	while self
-		|| f = .func
+	|| p = .parent
+	while p
+		|| f = p.func
 		if (f != @Bra and @Type)
-			if (f == @brel and self == "&")
+			if (f == @brel and p == "&")
 				gotaddr++
 				require gotaddr <= 1
 			  else
-				return self
-		self = .parent
+				return p
+		p = p.parent
 
 
 function TypeOfBRel (ExprResolver)

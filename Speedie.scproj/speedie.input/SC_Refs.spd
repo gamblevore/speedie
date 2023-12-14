@@ -514,9 +514,10 @@ function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 
 function Message.IsSettablePlace (|bool|)
 	opt norefcounts
+	(self)~IsReal
 	|| p = .parent
 	while p == @bra
-		self = p // <<---
+		self = p
 		p = p.parent
 	return .IsFirstOfSetRel
 

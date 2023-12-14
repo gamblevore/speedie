@@ -48,9 +48,9 @@ function StatementJump (NilTrackerFn)
 	return (NilTmps[msg.TmpType])(msg, test)
 
 
-macro Jump// (NilTrackerFn)
-//	pragma inline
-	({|| abc = _1, (NilSyxes[abc.func])(abc, _2)})
+function Jump (NilTrackerFn)
+	pragma inline
+	return (NilSyxes[msg.func])(msg, test)
 
 					
 function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
@@ -158,7 +158,7 @@ function WhileInner (|message| Cond)
 		.Argument(arg)
 		.Decls = t.Loops.cont
 		if i == 1:    OldCont = .Decls
-		if i == 2: if OldCont != .Decls // Test the first two loops.
+		if i == 2: if OldCont !=.Decls // Test the first two loops.
 	
 
 function WhileExit (|message| Cond, |bool| WhileTrue)
@@ -177,16 +177,18 @@ function While (NilTrackerFn)
 	|| cond = msg.first
 	if scfunction.currfunc ~= "exists6"
 	|| CondTest = cond.IsAlwaysBool
-	if !CondTest.IsFalse			// ignore "while false"
-		T.BranchEnter(msg)
-		|| Tru = condtest.IsTrue
-		|| W = T.WhileEnter(cond, tru)
 
-		WhileInner(cond)
-		WhileExit(cond, tru)
-			
-		T.loops = W
-		return t.BranchExit(0)
+	require !CondTest.IsFalse			// ignore "while false"
+	require T.BranchEnter(msg)
+
+	|| Tru = condtest.IsTrue
+	|| W = T.WhileEnter(cond, tru)
+
+	WhileInner(cond)
+	WhileExit(cond, tru)
+		
+	T.loops = W
+	return t.BranchExit(0)
 
 
 function If (NilTrackerFn)
@@ -222,14 +224,33 @@ function Tern (Niltrackerfn)
 	rz = .Jump(tA, test)
 	|| First = T.BranchSwap(Orig)
 
-
 	#!"Second Branch"
 	.jump(tC, nilcheckmode.negative)
 	rz |= .Jump(tB, test)
 	t.BranchExit(First)
 
 
-function BooleanOr (|message| AA,  |message| BB,  |nilcheckmode| Test,  |nilstate|)
+function Activate (|NiltrackerFn| fn, |message| msg, |NilCheckMode| test, |NilState|)
+	|| t2 = test.normal
+	if test is Active
+		return (fn)(msg, t2)
+
+	|| Orig = t.BranchEnter(msg)
+		(fn)(msg, t2)
+		|| First = t.BranchSwap(Orig)
+		(fn)(msg, t2.negate)
+		return t.BranchExit(First)
+
+
+function BooleanLogic (niltrackerfn)
+	opt norefcounts
+	|| AA = msg.first
+	|| BB = msg.last
+	if (test is and) == (test is positive)
+		.Jump(AA, test)						// x = (!a or !a.y)
+		.Jump(BB, test)
+		return nilstate.real
+
 	|| Orig = T.BranchEnter(AA)				#require
 	
 	#!"test A+"
@@ -243,21 +264,28 @@ function BooleanOr (|message| AA,  |message| BB,  |nilcheckmode| Test,  |nilstat
 	return t.BranchExit(First)
 
 
-function Compareable (|message| ll, |message| rr, |scoperator| scop, |nilcheckmode| test,  |nilstate|)
+function NormalCompare (|message| ll, |message| rr, |nilcheckmode| test,   |NilState|)
+	.jump(ll, test)
+	.jump(rr, test)
+	return NilState.Real
+
+
+function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperator| scop,  |nilstate|)
 	|| LNil = ll.IsNowNil
 	|| RNil = rr.IsNowNil
 	if !lnil and !rnil			// if (a > b)
-		.jump(ll, test), require stderr.ok
-		.jump(rr, test)
-		return NilState.Real
+		return .NormalCompare(ll, rr, test)
 	
 	if (lnil and rnil)
 		return ll.Redundant(test, ll.nildecl)
 	expect (scop.IsNilTest) (ll.next, "Nil can't accept this operator. Use != or ==.")
-
+	
+	debugat
+	if scop.IsEquals
+		(test is reversed)
+		
 	|| side = (rr, ll)(lnil)
-	.jump(side, test) // can handle !(a == nil)
-	return NilState.real
+	return .Activate(jump, side, test)  // can handle x = !(a == nil)
 
 
 function ProcessCondRel (Niltrackerfn)
@@ -268,20 +296,16 @@ function ProcessCondRel (Niltrackerfn)
 	|| scop = op.obj|SCOperator|
 
 	if scop.IsCompare
-		.Compareable(ll, rr, scop, test)
+		.CompareObjs(ll, rr, test, scop)
 
 	|| AndOr = scop.IsAndOr
-	if !andor		// bit ops or math		// (ptr+1) or (1+ptr) still needs nilness check
-		|| L = .jump(ll, 0)
-		return L.Worst(.Jump(rr, 0))
+		debugat
+		return .Activate(booleanlogic, msg, test)
 
-	test = test.activate										// x = (!a or !a.y)
-	if (AndOr == SCOperator.AND) == (test is positive)
-		.Jump(ll, test)
-		.Jump(rr, test)
-		return NilState.real
-	
-	return .BooleanOr(ll, rr, test)
+	// (ptr+1) or (1+ptr) still needs nilness check
+	|| L = .jump(ll, 0)
+	return L.Worst(.Jump(rr, 0))
+
 
 
 function Thing (NilTrackerFn)
@@ -292,9 +316,9 @@ function Thing (NilTrackerFn)
 function ThingSub (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.nildecl
-	if (dcl is local) != (dcl.NilReg > 0)	// what?
 	|| ND = dcl.nildeclared
 	|| Y = dcl.nilcurr
+	if (dcl is local) != (dcl.NilReg > 0)	// what?
 	if (!dcl.suffers) and (y is nilish)		// what?
 	if nd == nilstate.real
 		if test is active
@@ -304,7 +328,7 @@ function ThingSub (NilTrackerFn)
 	if test isnt Active
 		return Y
 
-	if (Y is Either)												// This is OK.
+	if (Y is Either)
 		if (dcl is param) and (nd isnt stated)
 			dcl.NilDeclared = NilState.optional
 		return T.SetNilness(dcl, Test)
@@ -367,7 +391,8 @@ function Brel (Niltrackerfn)
 		return jump(ch, test)
 		
 	if b == '!'
-		test = test.activate.Negate
+		(test is reversed)
+		return .Activate(jump, msg, test)
 	
 	Jump(ch, test)
 	return NilState.Real // !, &, ~   all return real
@@ -417,7 +442,7 @@ function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|
 		return .BecomeReal(sent, where)
 	if (D isnt stated)
 		error (where, "Nilness receiver unstated")
-		error (recv.source, "Please state this parameter's nilness.")	
+		recv.NilPrmFail
 
 
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message| SentMsg,  |nilstate|) // setrel, relset
@@ -431,7 +456,7 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 		expect (SN is realish) (RecvMsg, "Nil is not allowed here.")
 		return .BecomeReal(sent, SentMsg)
 		
-	if recv.nilreg 
+	if recv.NilReg
 		return T.SetNilness(recv, SN)
 
 

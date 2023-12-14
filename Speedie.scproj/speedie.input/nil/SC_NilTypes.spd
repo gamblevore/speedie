@@ -34,23 +34,32 @@ datatype NilCheckMode (uint)
 		Negative
 		Positive
 		Soft
+		And
+		Reversed
 		SoftPos = Positive + Soft  
 		SoftNeg = Negative + Soft
 		Active  = Positive + Negative
+		Basic   = Active + Soft
 
 	syntax is (|NilCheckMode| other, |bool|)
 		return self & other
 
 	syntax isnt (|NilCheckMode| other, |bool|)
 		return !(self & other)
+
+	syntax is (|nilcheckmode| other, assigns:|bool|, |nilcheckmode|)
+		if value
+			return self ||| other
+		  else
+			return self & ~other
 	
-	function Activate (|NilCheckmode|) 
-		if (self isnt active)
-			return self ||| nilcheckmode.positive
+	function Normal (|NilCheckmode|) 
+		if self is reversed
+			return .Negate
 		return self
 	
 	function Negate (|NilCheckmode|)
-		rz  = (self & negative) << 1
-		rz |= (self & positive) >> 1
-		rz |= (self &~ active)  << 0
+		|| part = active-(self & active)
+		return (self&~active) ||| part
+
 

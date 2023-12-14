@@ -595,7 +595,7 @@ class SCDecl (SCObject) {
 
 		|| inside = .contains
 		if inside  and  inside != contains  and  inside Is UpgradeableContained
-			self = .Copy // <<---
+			self = .Copy
 			.Contains = contains
 		return self
 		

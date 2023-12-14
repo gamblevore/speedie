@@ -67,6 +67,9 @@ function scdecl.PointerUpgrade (|scdecl|)
 		return infernal
 
 
+function scdecl.NilPrmFail
+	error (.source, .PrmStateMsg)
+
 function scdecl.PrmStateMsg (|string|)
 	if self is self
 		return "Can't set self, if self's nilness is unstated."
