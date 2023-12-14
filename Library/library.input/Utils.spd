@@ -115,8 +115,9 @@ function bool.Msg (|message|)
 	return @thg + .Render
 
 
-ignore // seems not worth it
-		// we'd want a sum(_*2) macro!
+ignore	// seems not worth it
+		// we'd want a sum(_0, _1*2) macro!
+		// we'd need to be able to pass types
 	insertion
 		sum	({
 			|| Src = _0
@@ -125,4 +126,9 @@ ignore // seems not worth it
 				V += c
 			rejoin (V)
 		})
+
+
+insertion
+	IsReal   _.refcount
+	IsOptional   ({_ == nil})
 
