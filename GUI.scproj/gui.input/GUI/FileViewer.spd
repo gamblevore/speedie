@@ -595,19 +595,19 @@ function RightClickFileList (GUIListEvent)
 	opt NoRefCounts
 	if self isa fileviewer
 		|| m = .newcmm
+		m <~ ("Create File",		FileViewerCreateFile)
+		m <~ ("Copy File Path",		FileViewerCopyPath)
+		m <~ ("Rename File",		FileViewerRenameFile)
+		m.addsep
 		|| within = .FindSearchWithin
 			m <~ ("Search Within: " + within.name, FileViewerSearchWithin, within)
-			m.addsep
 		
 		|| rem = .FirstSelected as filerow
 			if rem and (.extra contains rem) and rem != .extra
 				m <~ ("Remove From Project",	FileViewerRemove)
 
-		m <~ ("Rename File",		FileViewerRenameFile)
-		m <~ ("Create File",		FileViewerCreateFile)
-		m <~ ("Copy File Path",		FileViewerCopyPath)
 		m <~ ("Show In Desktop",	FileViewerCMMShow)
-		m.addsep
+		m.AddSep
 		m <~ ("Move To Trash",		FileViewerTrash)
 	return true
 
