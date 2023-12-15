@@ -67,10 +67,10 @@ class FastString {
 	function AppendHex3 (|int|Num)
 		cpp_wrapper JB_FS_AppendHex3
 	
-	function AppendUTF8 (|int|Num)		{ cpp_wrapper JB_FS_AppendUTF8Char }
-	function IndentLine					{ cpp_wrapper JB_FS_AppendIndent }
-	function Flush	(|bool|)			{ cpp_wrapper JB_FS_Flush }
-	function Remove (|Byte| b)			{ cpp_wrapper JB_FS_RemoveByte }
+	function AppendUTF8 (|codepoint| Num)	{ cpp_wrapper JB_FS_AppendUTF8Char }
+	function IndentLine						{ cpp_wrapper JB_FS_AppendIndent }
+	function Flush	(|bool|)				{ cpp_wrapper JB_FS_Flush }
+	function Remove (|Byte| b)				{ cpp_wrapper JB_FS_RemoveByte }
 	function GetResult (|string|)
 		cpp_wrapper JB_FS_GetResult
 	function GetResult (|FastString| other, |string|)

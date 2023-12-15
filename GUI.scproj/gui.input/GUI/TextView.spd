@@ -1502,16 +1502,19 @@ class TextView (GUIControl)
 			
 	helper DrawPreparedText (|image| where)
 		opt norefcounts
-		|| d		= .StartLine
-		if !d
-			debugat
-			return
+		|| d		= .StartLine #debug_require
+
+//		|| g = .GNormal
+//		|int| New = .strength*255
+//		g.BG.a = New
+//		g.Text.a = New // seems the text is not... drawing using the .text.a
+//		if it is colorised.
+
 		|| N		= .MaxVisibleLines
 		|| lc		= .LineNumColor
 		|| y		= (.lineheight|int| - font.height) + .abstop
 		y -= 2
-//		if .Alignment is Centerv
-//			y -= .middleness
+
 		|| yend		= .absbottom
 		|| UseCol	= .UseColorAnyway
 		while (y > yend) and (d)

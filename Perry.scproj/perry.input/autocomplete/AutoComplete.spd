@@ -197,18 +197,16 @@ function PerryIDE.PopupDisplayFadeInSub (|bool|)
 	|| alpha = (.PopupDateOn.ago.seconds|float|*2.0).clamp
 	if (alpha < 0.5) and !keys.cmd
 		.PopupDateOn = 0
-	if !alpha
-		return false
+	require alpha
+
 	|| g = .PopupDisplay.GNormal
 	|int| New = alpha * 255
-	|int| old = g.BG.a
+	if g.BG.a != New
+		sdlapp.touch
 	g.BG.a = New
 	g.Text.a = New
-	if old != New
-		sdlapp.touch
 	return true
-	
-	
+
 
 function PerryIDE.PopupHide
 	.PopupDateOn = 0

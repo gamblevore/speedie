@@ -25,11 +25,13 @@ struct Random
 	function TimeSeed
 		.seed = date()
 	
-	function Text (|int| n, |byte|a, |byte|b, |string|)
-		rz = string(n)$
-		|| addr = rz.addr
+	function Text (|int| n, |codepoint| a, |codepoint| b, |string|)
+		|| fs = FastString()
+		if a.isascii and b.isascii
+			fs.size = n
 		for i in n
-			addr[i] = self[a,b]
+			fs.AppendUTF8(self[a,b])
+		return fs
 	
 	
 	function Texts (|int| array_len, |int| item_len, |[string]|)

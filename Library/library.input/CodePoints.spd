@@ -14,6 +14,8 @@ datatype Codepoint (uint)
 		cpp_part CP
 	function UTF8Size (|uint|)	
 		cpp_wrapper JB_Str_UTF8Size
+	function IsAscii (|bool|)
+		return self <= 127
 	function IsLower (|bool|)
 		return .in('a', 'z')
 	function IsUpper (|bool|)

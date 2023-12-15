@@ -1,5 +1,6 @@
 #!/usr/local/bin/spd
 
+
 main (|FileSizeInt| Amount) {
 	|| name = amount.strsize
 	|| xml = "${name}.xml".out							#require
@@ -8,7 +9,8 @@ main (|FileSizeInt| Amount) {
 <Catalog>`
 
 	|| Caps = ('A', 'Z')
-	|| Low  = ('a', 'z')
+	|| Low  = ('ᐇ', 'ᑈ'+1) // lets create unicode
+
     while xml < Amount
 		|| alive = ("yes", "no")(0.5[])
 
@@ -21,7 +23,6 @@ main (|FileSizeInt| Amount) {
 	xml <~ `
 </Catalog>`
 
-	xml.Flush
 	printline xml.file
 }
 
