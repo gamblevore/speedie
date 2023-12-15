@@ -4,7 +4,6 @@
 
 * VM? 
 * Constants and globals don't autocomplete nicely
-* Main no longer is clickable if you use mainargs
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
 * Notifications flicker when resizing compile-tabs. We want a "SOLID" feel. Not anxious. :) 
 
@@ -20,7 +19,6 @@
 
 						 Speedie Do later
 
-* main (|filedata| f) // f is a file?
 * (in perryide...)   ".tabs.somestruct()" compiles?
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
 	* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
