@@ -117,7 +117,7 @@ class Message (RingTree)
 	
 	syx Arg (Argument)
 		Opt NoRefCounts
-		|| Braces = (self isnt style2)  or  !.hasany  or .name or  (self in @arg)
+		|| Braces = (.parent and self isnt style2)  or  !.hasany  or .name or  (self in @arg)
 			fs <~ '{'
 		.FSListArg( fs, braces ) // the name is already rendered by this!!
 		if Braces

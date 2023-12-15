@@ -1,57 +1,29 @@
 #!/usr/local/bin/spd
 
-main (|FileSizeInt| Amount) {	
+main (|FileSizeInt| Amount) {
 	|| name = amount.strsize
-	"Starting to write $name XML file"
-	
-	|| Start = date.now
 	|| xml = "auto_generated_$name.xml".out							#require
+	using xml.file.name
 	xml <~ `<?xml version="1.0" encoding="utf-8"?>
 <Catalog>
 `
-	
-	|| Caps = 'A' to 'Z'
-	|| Low  = 'a' to 'z'
+	|| Caps = ('A', 'Z')
+	|| Low  = ('a', 'z')
     while xml < Amount
 		|| alive = ("yes", "no")(0.5[])
 
 	    xml <~ "
 	<Book>
-	    <Title>${caps*16}</Title>
-	    <Author alive=\"${alive}\">${low*8} ${low*12}</Author>
+	    <Title>${caps.text(16)}</Title>
+	    <Author alive=\"${alive}\">${low.text(8)} ${low.text(2)}</Author>
 	</Book>"
 	
 	xml <~ `
 </Catalog>`
 
 	xml.Flush
-	
-	"Finished writing ${xml.file} in ${start.ago.seconds} seconds"
 }
 
 
-struct ByteRange
-	|byte| A
-	|byte| B
-	operator Mul (|int| n, |string|)
-		return random.shared.Text(n, .a, .b)
-
-extend byte
-	operator to	(|byte| b, |byterange|)
-		rz.a = self
-		rz.b = b
-
-		
-datatype FileSizeInt (int)
-helper @FileSizeInt.MainArg (|int| Pos, |string| name,  |int|)
-	|| size = string.MainArgSub(Pos, name, "file-size")$
-	|| Mul = 1
-	if size endswith "kb"
-		mul = 1KB
-	  elseif size endswith "mb"
-		mul = 1MB
-	  elseif size endswith "gb"
-		mul = 1GB
-	  else
-		return size.int
-	return size[0, size.length - 2].int*mul
+function ivec2.text (|int| n, |string|)
+	return random.shared.Text(n, .x, .y)

@@ -375,3 +375,8 @@ role StringThatWasReadSafely (string)
 		|| o = self|object|
 		return o != string.error and nil
 
+
+datatype FileSizeInt (int64)
+	render
+		return .strsize(fs)
+

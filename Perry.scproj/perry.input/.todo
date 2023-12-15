@@ -3,10 +3,9 @@
 							Todo
 
 * VM? 
-* progress button not showing?
 * Constants and globals don't autocomplete nicely
+* Main no longer is clickable if you use mainargs
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
-	* Main no longer is clickable if you use mainargs
 * Notifications flicker when resizing compile-tabs. We want a "SOLID" feel. Not anxious. :) 
 
 

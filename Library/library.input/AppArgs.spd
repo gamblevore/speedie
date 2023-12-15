@@ -72,9 +72,8 @@ helper @file.MainArg		(|int| Pos, |string| name, |file|)
 helper @ExistingFile.MainArg (|int| Pos, |string| name, |file|)
 	return string.MainArgSub(Pos, name, "file-path")$.FileThatExists
 
-//helper @FileData.MainArg	(|int| Pos, |string| name, |string|)
-//	disabled "Bugged :O" // some compiler bug returning a file instead of a string
-//	return ExistingFile.MainArg(pos, name)$.ReadAll
+helper @FileData.MainArg	(|int| Pos, |string| name, |string|)
+	return ExistingFile.MainArg(pos, name)$.ReadAll
 
 helper @JeeboxFile.MainArg	(|int| Pos, |string| name, |messageroot|)
 	return ExistingFile.MainArg(pos, name)$.parse
@@ -91,7 +90,7 @@ helper @OutputFile.MainArg	(|int| Pos, |string| name, |faststring|)
 //			module file.Data: helper MainArg (...)
 
 role ExistingFile (file)
-//role FileData     (file)
+role FileData     (file)
 role JeeboxFile   (file)
 role OutputFile   (faststring)
 
@@ -108,3 +107,16 @@ helper @string.MainArgSub (|int| Pos,  |string| name, |string| type,   |stringth
 		error "Missing $name ($type).\n\n$usage"
 	return string.Error
 
+
+helper @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
+	|| size = string.MainArgSub(Pos, name, "file-size")$
+	|| Mul = 1
+	if size endswith "kb"
+		mul = 1KB
+	  elseif size endswith "mb"
+		mul = 1MB
+	  elseif size endswith "gb"
+		mul = 1GB
+	  else
+		return size.int
+	return size[0, size.length - 2].int*mul
