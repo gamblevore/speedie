@@ -117,6 +117,10 @@ struct Random
 			random.shared.float(...)
 
 
+
+function ivec2.syntaxcall (|int| n, |string|)
+	return random.shared.Text(n, .x, .y)
+
 function float.syntaxcall (|float|)
 	return random.shared.double * self
 
