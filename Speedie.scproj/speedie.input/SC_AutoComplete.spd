@@ -767,7 +767,7 @@ function ActualDefine (|message| rz, |message| s, |string| purpose)
 
 
 function scbase.DiissplayObj (|message| rz, |message|)
-	rz.msg(@emb, .autocompletename + " " + .name)
+	rz.msg(@emb, .AutoCompleteKind + " " + .name)
 	return rz
 
 

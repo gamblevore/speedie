@@ -1723,12 +1723,6 @@ function message.SlidePositions (|int| add)
 			s.position += add
 
 
-function message.AppMainFix
-	|| desired = "function app.Main (|ErrorInt|)".parse
-	|| arg = .last
-	.become(desired)
-	self <~ arg
-
 
 function scfunction.Cleanupfunc 
 	|| s = .source
@@ -1746,17 +1740,21 @@ function scfunction.Cleanupfunc
 		cls.FillInterFaceIn(self, true)
 
 
-function scfunction.UpdateSourceSub (|message| source, |bool|)
-	opt norefcounts
-	if source ~= @tmp and "main"
-		source.AppMainFix
+function message.mainfix2
+	.become(.MainFix)
 
-	|| f = source[0]$
+
+function scfunction.UpdateSourceSub (|message| src, |bool|)
+	opt norefcounts
+	if src ~= @tmp and "main"
+		src.mainfix2
+
+	|| f = src.first$
 	if f == @dot
 		f.func = @thg
 		f.clear
 	rz = stderr.ok				// awesome! dont delete this!
-	.init_sub(source, nil)
+	.init_sub(src, nil)
 	rz = stderr.ok 
 	if rz
 		.FuncDecls
@@ -1835,11 +1833,10 @@ function NewDestructor (CollectFunc)
 	return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 
-function NeuMain (CollectFunc)
-	expect  (name_space == compiler.program)  (node, "Can’t have main inside here.")
-	|| prms = node[@nil]$
+function message.MainFix (|message|)
+	|| prms = self[@nil]$
 
-	node.name = "function"
+	.name = "function"
 	|| fn_src = "function app.Main (|ErrorInt|,) {cpp_name JB_Main, visible true}".ParseClean
 	|| src_arg = fn_src.Last
 	
@@ -1849,7 +1846,7 @@ function NeuMain (CollectFunc)
 		inc_arg = prms.next(@arg)
 		fn = @prm
 	  else
-		inc_arg = node[@arg]
+		inc_arg = self[@arg]
 
 	if inc_arg
 		if fn == @prm
@@ -1860,7 +1857,12 @@ function NeuMain (CollectFunc)
 
 		src_arg.Remove
 		inc_arg.TakeAllFrom( src_arg )
+		return fn_Src
 
+
+function NeuMain (CollectFunc)
+	expect  (name_space == compiler.program)  (node, "Can’t have main inside here.")
+	|| fn_src = node.mainfix
 		Compiler.HasMainFunc = true
 		|| m = compiler.userproj.mod
 		rz = SCFunction.NewFunc( fn_Src, m, ErrPlace )

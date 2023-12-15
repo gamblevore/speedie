@@ -144,7 +144,7 @@ function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg)
 	opt norefcounts	// basically... the caller needs fixing.
 	for item in arg
 		if item == @decl
-			require item.CollectFromBody(scarg)
+			item.CollectFromBody(scarg) // keep on going even if one failed. good for autocomplete
 
 
 function Message.CollectFromBody (|SCBase| scarg, |bool|)

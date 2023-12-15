@@ -800,7 +800,7 @@ function ModuleType (|string|)
 	return "class"
 
 
-function AutoCompleteName (|string|)
+function AutoCompleteKind (|string|)
 	if self isa SCModule
 		return "module"
 	if self isa scclass
