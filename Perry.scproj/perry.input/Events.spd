@@ -5,7 +5,7 @@ function FileSepClicker (guiaction)
 	.ide.ViewAsSwap
 
 	
-function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE|)
+function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE|) // initide
 	|| old = perry.FindProj(path)
 		ClickedTabs(nil, old)
 		|| o = old.ide
@@ -16,8 +16,8 @@ function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE|)
 	return ide
 
 
-function string.TrimProj (|string|)
-	if .isproj
+function string.TrimCodeExt (|string|)
+	if .PathIsCode
 		return .TrimExtAndPath
 	return self
 
@@ -184,7 +184,7 @@ function ClickedCancel (GUIAction)
 	if !i.Isbuilding
 		return true
 	|| can = ConfirmCanceller(i, fnBuildIsDead)
-	|| name = i.project.trimproj
+	|| name = i.project.TrimCodeExt
 	|| q = "Currently building $name... Cancel Build of $name?"
 	if q.confirm(can)
 		i.CancelCompile

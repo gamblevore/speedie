@@ -31,17 +31,21 @@ module Perry
 		
 		
 	function LoadWindowsFromArgs
+		|| oldproj  = .projects
+		.Projects = Message()
+		.Terminal = true
 		for arg in app.args // load specified documents
 			|| ide = .LoadAppArg(arg)
-			if ide and !.Terminal
-				.Terminal = true
-				.Projects = Message()
 				ide.tabs.items = .projects
-				target !debug
-					NewStdOut = file.Logs.Child("PerryOut.log")
-					if NewStdOut.OpenEmpty
-						pipe.StdOut = NewStdOut.Descriptor
-	
+
+		target false //!debug
+			// just to make things quiter? we are quite spammy...
+			// shouldn't we just have a quiet-mode?
+			// its nice to print stuff to debug perry's behaviour
+			NewStdOut = file.Logs.Child("PerryOut.log")
+			if NewStdOut.OpenEmpty
+				pipe.StdOut = NewStdOut.Descriptor
+
 	
 	function LoadAppArg (|string| arg, |perryide|)
 		|| line = (0, 0)
@@ -100,7 +104,8 @@ module Perry
 		|| i = PerryIDE(false)
 		i.ViewAsText
 		
-		.LoadWindowsFromArgs
+		if app.args > 0
+			.LoadWindowsFromArgs
 		if !.Terminal and !.LoadWindowsSub(i)
 			startupwindow.show
 			return 0
@@ -155,7 +160,7 @@ module Perry
 		|| old	= .FindProj(path)
 		if !old
 			old = .projects.msg(@tmp, path)
-			old.msg(@str, path.TrimProj)
+			old.msg(@str, path.TrimCodeExt)
 			old["edit"] = ""
 			old["pos"] = ""
 		
