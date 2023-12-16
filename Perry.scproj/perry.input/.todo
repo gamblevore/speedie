@@ -5,7 +5,6 @@
 * VM? 
 * Constants and globals don't autocomplete nicely
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
-* Notifications flicker when resizing compile-tabs. We want a "SOLID" feel. Not anxious. :) 
 
 
 						 Perry Do later

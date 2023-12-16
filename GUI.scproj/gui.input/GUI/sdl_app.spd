@@ -424,14 +424,12 @@ module SDLApp
 		while .Event.Poll
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
-		//"B".PrintTime
 		if .WantsQuit
 			rz |= .TryQuit
 		if .NewSize
 			rz |= SDLActivity.activity
 
-		if .TouchCount // and .LastFramedate.ago >= .naptime // this isn't the problem...
-			//"C".PrintTime
+		if .TouchCount
 			.TouchCount--
 			rz |= SDLActivity.activity
 
