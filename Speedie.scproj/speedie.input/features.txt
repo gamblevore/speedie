@@ -99,6 +99,8 @@ Do when it's fun...
 
 							Actually already good:
 
+* obj.property().func --> obj.property.func... the () is superfluous, ignored.
+
 * "a:b" I need to change language?
 
 * syntactic comments... actually good! I know the code is a mess... bug that probably means it should be redesigned. It does exactly what it should do! There isn't a simpler way to do it. Just maybe a clearer way.
