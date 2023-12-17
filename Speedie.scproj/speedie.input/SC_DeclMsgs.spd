@@ -223,7 +223,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| c
 	if (Mode & 8) and NoOriginalDcl // functionbody
 		if sdcl isnt StayBorrowed
 			(Dcl Isnt Borrowed)
-		dcl.nildeclared = NilState.Either // can be freely changed!
+		dcl.nildeclared = NilState.Either // might as well state it as optional? change after basic niltests work.
 	
 	if (nameitm in @Rel)
 		nameitm.Parent.obj = dcl

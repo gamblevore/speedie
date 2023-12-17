@@ -11,7 +11,10 @@ class NilTest
 		.v4 = (&NilTestByte)|&byte|
 		.v3 = 0|&byte|
 		
-	function Reader		
+	function Reader
+		|| y = 1
+		if y
+			"hello"
 		|| v = .v3
 		borks // amazing
 		*v = 'x'
@@ -117,22 +120,22 @@ class NilTest
 		return .Exists3(nil)
 
 // pointers
-	function GoodPtr (|&niltest| p, |&niltest| p2)
-		if p
-			*p = self
-		if p2
-			|| x = *p2
+	function GoodPtr (|&niltest| xp, |&niltest| xp2)
+		if xp
+			*xp = self
+		if xp2
+			|| x = *xp2
 				x.v
 
-	function BorkedPtr (|&(niltest!)| p, |&niltest| p2)
-		if !p
+	function BorkedPtr (|&(niltest!)| xp, |&niltest| xp2, |niltest| xp3)
+		if !xp
 			borks
-			*p = self
+			*xp = self
 		  else
-			*p = self
+			*xp = self
 			
 		borks	
-		(*p).v
+		(*xp).v
 
 		|| xx = &NilTestByte
 		borks

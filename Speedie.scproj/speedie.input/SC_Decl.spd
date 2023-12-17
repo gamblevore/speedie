@@ -97,7 +97,7 @@ class SCDecl (SCObject) {
 	|SCDeclInfo|		Info
 	|AsmReg|			DReg
 	|Byte|				PointerCount
-	|NilState|			NilDeclared
+	|NilState|			NilDeclare
 	|byte| 				NilReg
 	|byte| 				NilAllocDepth
 	|byte| 				Special
@@ -108,11 +108,12 @@ class SCDecl (SCObject) {
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered
 		
-//	setter NilDeclared (|nilstate|)
-//		.nildeclare = value
-//	
-//	function nildeclared (|nilstate|)
-//		return .nildeclare
+	setter NilDeclared (|nilstate|)
+		.nildeclare = value
+		if .name[0, "xp"]
+	
+	function NilDeclared (|nilstate|)
+		return .nildeclare
 	
 	function Project (|scimport|)
 		opt norefcounts
@@ -268,7 +269,7 @@ class SCDecl (SCObject) {
 		rz.internal = self
 		rz.PointerCount++
 		if purpose is FuncParam or functionbody
-			rz.NilDeclared = nilstate.either
+			rz.NilDeclared = nilstate.realish
 		  else
 			rz.NilDeclared = nilstate.real
 		check (rz.pointercount < 8) (.source, "Too much abstraction")

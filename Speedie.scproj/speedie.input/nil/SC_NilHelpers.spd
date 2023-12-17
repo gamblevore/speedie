@@ -90,6 +90,14 @@ function scdecl.NilStated (|bool|)
 	return .NilDeclared is Stated
 
 
+function scdecl.NilStart (|nilstate|)
+	if .name[0, "xp"]
+	|| n = .nildeclared
+	if n is stated
+		return n
+	return nilstate.either
+
+
 function scfunction.CanNil (|bool|)
 	return !.IsMacro and !.IsWrapper and .isOK and .LimitTests
 

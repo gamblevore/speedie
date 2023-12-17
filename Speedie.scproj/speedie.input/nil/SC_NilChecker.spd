@@ -120,7 +120,7 @@ function Function (NilTrackerFn)
 	
 	|| ret = fn.ReturnType
 		rz = ret.NilDeclared
-		check ((rz is stated) or !ret.Suffers) (msg, "Nilness of function return needs stating.")
+		check ((rz is stated) or !ret.Suffers) (msg, "Nil-decoration needed on function return.")
 
 
 function Return (NilTrackerFn)
@@ -128,66 +128,58 @@ function Return (NilTrackerFn)
 
 	|| v = jump(msg.first, 0) & nilstate.either
 	
-	t.Loops.ExitCount++
-	.decls = 0 // get curr, then clear
+	t.Loops.ExitRecord |= nilstate.either		// mark as exitting safely.
+	.decls = 0
 	|| ret = scfunction.currfunc.ReturnType
 	|| RD = ret.nildeclared
 	expect  !(RD == nilstate.real  and  v is nilish)   (msg, "Declaration does not allow returning " + v.rawname)
 	
-	
-	// assume real, unless it becomes optional??
-	ret.nildeclared = RD ||| v
+	ret.nildeclared = RD ||| v	// assume real, unless it becomes optional??
 	ret.NilPrint("return")
 
 
 function Exit (NilTrackerFn)
-	t.Loops.ExitCount++
-	T.loops.Exit |= (.Place)(0)
+	T.loops.ExitRecord |= .EndBlock
 
 
 function Continue (NilTrackerFn)
-	T.loops.Cont |= (.Place)(0)
+	T.loops.ContRecord |= .EndBlock
 
 
 function WhileInner (|message| Cond)
 	opt norefcounts
 	|nilrecord| OldCont
 	|| arg = cond.next
-	for i in 3
+	for i in 3 // can remove the oldcont tests later.
 		.jump(cond, NilCheckMode.softpos)
 		.Argument(arg)
-		.Decls = t.Loops.cont
+		.Decls = t.Loops.contRecord
 		if i == 1:    OldCont = .Decls
 		if i == 2: if OldCont !=.Decls // Test the first two loops.
 	
 
-function WhileExit (|message| Cond, |bool| WhileTrue)
-	if WhileTrue
-		// its not possible to detect whether or not it will end... HOWEVER
-		// we just do this for simple error detection. Useful for errors in macros. 
-		expect (t.Loops.ExitCount) (cond, "Loop never exits.")
-	  else
-		.jump(cond, NilCheckMode.softneg)
-		T.loops.Exit |= (.Place)(0)
-	.decls = t.Loops.Exit
-
-
 function While (NilTrackerFn)
 	opt norefcounts
 	|| cond = msg.first
-	if scfunction.currfunc ~= "exists6"
 	|| CondTest = cond.IsAlwaysBool
 
-	require !CondTest.IsFalse			// ignore "while false"
+	require !CondTest.IsFalse			// ignore 'while false'
 	require T.BranchEnter(msg)
 
-	|| Tru = condtest.IsTrue
-	|| W = T.WhileEnter(cond, !tru)
+	if scfunction.currfunc ~= "exists6"
+	|| W = T.loops
+	T.loops.init(T)
 
+	if !condtest.IsTrue 
+		.exit(cond)
 	WhileInner(cond)
-	WhileExit(cond, tru)
-		
+	if !condtest.IsTrue		// This is just for simple error detection. like macro errors. 
+		.jump(cond, NilCheckMode.softneg)
+	
+	|| Ex = t.Loops.ExitRecord #check (cond, "Loop never exits.")
+	.decls = Ex ||| nilstate.either
 	T.loops = W
+
 	return t.BranchExit(0)
 
 
@@ -310,26 +302,25 @@ function Thing (NilTrackerFn)
 
 
 function ThingSub (NilTrackerFn)
-	opt norefcounts
+	opt norefcounts							// handles 5-6 different cases :O
 	|| dcl = msg.nildecl
-	|| ND = dcl.nildeclared
+	debugat 12
+	if !dcl.NilReg							// case 1
+		return dcl.nildeclared
+	ifn (dcl is local)						// internal bug!
+
 	|| Y = dcl.nilcurr
-	if (dcl is local) != (dcl.NilReg > 0)	// what?
-	if (!dcl.suffers) and (y is nilish)		// what?
-	if nd == nilstate.real
-		if test is active
-			return msg.Redundant(test, dcl)
-		return ND
-			
-	if test isnt Active
+	if test isnt Active						// case 2
 		return Y
 
-	if (Y is Either)
-		if (dcl is param) and (nd isnt stated)
-			dcl.NilDeclared = NilState.optional
+	|| ND = dcl.nildeclared
+	if (dcl is param) and (nd isnt stated)	// case 3
+		dcl.NilDeclared = nilstate.optional
+
+	if (Y is Either)						// case 4
 		return T.SetNilness(dcl, Test)
-	
-	return msg.Redundant(test, dcl)
+
+	return msg.Redundant(test, dcl) 		// case 5-6
 
 
 
@@ -347,7 +338,7 @@ function ArgOne (|message| s,  |nilcheckmode| t,  |nilstate| prev,  |nilstate|)
 	rz = .jump(s, T)
 	if prev is borked
 		error.autoprint = .oldprint
-		expect (!stderr.ok) (s, "Nil-checker did not detect error here!")
+		expect (!stderr.ok) (s, "Borking but no zerg-bugs found?")
 		stderr.clear
 
 	
@@ -437,7 +428,7 @@ function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|
 	if (D == nilstate.real)
 		return .BecomeReal(sent, where)
 	if (D isnt stated)
-		error (where, "Nilness receiver unstated")
+		error (where, "Please nil-decorate param")
 		recv.NilPrmFail
 
 

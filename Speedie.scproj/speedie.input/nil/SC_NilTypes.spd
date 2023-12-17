@@ -28,7 +28,7 @@ struct NilRecorder
 
 
 datatype NilCheckMode (uint)
-	linkage: cpp_part nilmo
+	linkage: cpp_part khalai
 	flags
 		|NilCheckMode| 
 		Nothing = 0

@@ -24,7 +24,7 @@ datatype NilState (byte) // Exec.scproj needs this here
 		description "'Raw', cos does not include whether its stated or not." 
 		self &= either
 		if self == failed
-			return "contradiction"
+			return "lost"
 		if self == either
 			return "optional"
 		if self == nilish

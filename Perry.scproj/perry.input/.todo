@@ -15,7 +15,7 @@
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
 * too long text in listview draw as much as we can
-
+* reflow should be per-window
 
 						 Speedie Do later
 

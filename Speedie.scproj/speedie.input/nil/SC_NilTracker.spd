@@ -12,11 +12,15 @@
 
 
 struct LoopInfo
+	|NilRecord| 		ExitRecord
+	|NilRecord| 		ContRecord
 	|int| 				Depth
-	|int| 				ExitCount
-	|NilRecord| 		Exit
-	|NilRecord| 		Cont
-
+	
+	function init (|&niltracker| T)
+		.ExitRecord = 0
+		.Contrecord = T.Place.value
+		.Depth = T.CurrDepth
+	
 
 struct NilTracker
 	linkage: cpp_part nil
@@ -28,16 +32,6 @@ struct NilTracker
 	|LoopInfo| 			Loops
 	|NilRecord[64]| 	Rows
 	
-		
-	function WhileEnter (|message| Where, |bool| HasCond,  |LoopInfo|)
-		|| l = &.Loops
-		rz = *l
-		l.ExitCount = HasCond|int|
-		l.Cont = decls()
-		l.Exit = l.Cont * HasCond
-		l.exit |= NilState.either
-		l.Depth = .CurrDepth
-	
 	function CurrDepth (|int|)
 		return (.line - &.rows[0])|int|
 	
@@ -45,7 +39,6 @@ struct NilTracker
 		V.NilDeclared = NilState.real
 		if .CurrDepth > 0		
 			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
-	
 	
 	function BranchEnter (|message| abc, |NilRecord|)
 		if .line < .RowEnd
@@ -112,7 +105,7 @@ struct NilTracker
 		.loops = nil
 		.Realnesses = -1
 		for d in f.args
-			.DeclareSub(d, d.nildeclared)
+			.DeclareSub(d, d.NilStart)
 		printline
 		f.NilPrint(" ****** ")
 		
@@ -127,7 +120,7 @@ struct NilTracker
 		|| r = f.ReturnType
 			r.nildeclared |= nilstate.stated
 		for a in f.Args
-			a.NilDeclared |= NilState.Stated
+			a.nildeclared |= nilstate.stated
 		f.NilPrint(" !!!!! ")
 	
 	function Place (|&NilRecorder|)
@@ -140,6 +133,9 @@ struct NilTracker
 		function Place (|&NilRecorder|)
 			return (T.line)|&nilrecorder|
 		
+		function EndBlock (|nilrecord|)
+			return (.place)(nilstate.either)
+	
 		function Decls (|NilRecord|)
 			return .place.Value
 		

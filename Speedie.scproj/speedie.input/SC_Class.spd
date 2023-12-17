@@ -76,8 +76,7 @@ constructor (|Message| node, |SCBase| parent)
 	
 	|| IsDataType = node == "datatype"
 	|| T = SCDecl.new(self)
-	if isdatatype
-		T.nildeclared = nilstate.Real
+	t.nildeclared = nilstate.realish + (nilstate.stated*isdatatype)
 	.TypeNormal = T
 	.TypeOptional = T.NilConstructor(NilState.optional * !IsDataType)
 	.TypeReal = T.NilConstructor(NilState.Real * !IsDataType)
@@ -650,8 +649,6 @@ function scfunction.AddSelfToFunc (|scclass| cls, |SCBase| space)
 		sl = sl.copy
 		if .IsConstructorOrDestructor
 			sl = sl.MakeNewReal
-		  else
-			sl = sl.MakeEither
 		(sl is SelfImplicit)	// I shouldn't have to specify this, it should be copied!
 	space.TryAdd( space.FuncSrc, sl, "self" )
 	.args <~ sl
