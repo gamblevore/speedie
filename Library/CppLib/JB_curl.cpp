@@ -35,8 +35,7 @@ int JB_FS_AppendURL (FastString* self, JB_StringC* URL, uint64 Timeout, JB_Strin
 		}
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlToJB);
 		curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-//		curl_easy_setopt(curl, CURLOPT_CA_CACHE_TIMEOUT, 86400);	// cache the CA cert bundle for a day
-// harder to compile with this.
+//		curl_easy_setopt(curl, CURLOPT_CA_CACHE_TIMEOUT, 86400); // harder to compile with this.
 	}
 
 	if (JB_Str_Length(Cookie))

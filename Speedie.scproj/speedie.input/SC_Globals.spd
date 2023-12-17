@@ -1445,7 +1445,7 @@ function TypeOfList (ExprResolver)
 			count += N
 			expect (count <= 4) (exp, "Over 4 items in vector.")
 
-	expect Numeric      (exp, "Expected numbers.")
+	expect Numeric      (exp, "Expected numbers in this vector.")
 	expect (count >= 2) (exp, "Under 2 items in vector.")
 
 

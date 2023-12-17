@@ -506,7 +506,7 @@ class SCDecl (SCObject) {
 
 		if (Matched == kNoMatch)
 			ErrNode := exp
-			error ( ErrNode, "Type mismatch, expected '${.RenderTypeName}' but found '${o.RenderTypeName}'." )
+			error ( ErrNode, "Type mismatch, expected '${.RenderTypeName}' but found '${o.RenderTypeNameNicer}'." )
 			.TypeMatch(O, TypeCast, exp)
 
 		return exp
@@ -982,6 +982,11 @@ class SCDecl (SCObject) {
 		TheType.Obj = self // Does InitRootDecl actually want this?
 		return TheType
 
+
+	render RenderTypeNameNicer
+		if .downgrade
+			return .downgrade.RenderTypeName(fs)
+		return .RenderTypeName(fs) 
 
 	render RenderTypeName 
 		if !self or !.type

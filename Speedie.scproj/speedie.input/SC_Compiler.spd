@@ -345,8 +345,8 @@ function ImportLibs
 function ImportProj
 	SCImport.STDLibTime = false
 	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath)(options.SingleFileInput)
-	compiler.UserProj = SCImport.Importpath( "",  ToUse,  0, false )
-	expect compiler.UserProj
+	compiler.UserProj = SCImport.ImportPath( "",  ToUse,  0, false )
+	expect compiler.UserProj ("No user-project found.")
 
 
 function ImportAST
