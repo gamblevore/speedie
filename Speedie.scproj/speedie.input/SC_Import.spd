@@ -246,7 +246,8 @@ class SCImport
 			require f.mustexist and path.IsOKForImport
 	
 			|| fpl = f.Path.lowercase
-			require (!Compiler.ImportedNames[fpl])
+			|| old = Compiler.ImportedNames[fpl]
+				return old
 			
 			rz = SCImport.new(f, builtin)
 			rz.Depth = ImportDepth

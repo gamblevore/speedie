@@ -346,6 +346,7 @@ function ImportProj
 	SCImport.STDLibTime = false
 	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath)(options.SingleFileInput)
 	compiler.UserProj = SCImport.Importpath( "",  ToUse,  0, false )
+	expect compiler.UserProj
 
 
 function ImportAST

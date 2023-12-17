@@ -55,7 +55,7 @@ function file.cloc
 	  elseif counts.loud
 		printline .path 
 
-	|| data = .ReadSafely(int.max) #require
+	|| data = .ReadAll(int.max) #require
 	if data.IsCompressed // decompress?
 		"Decompressing $self"
 		data = data.Decompress(int.max) // might as well...

@@ -166,7 +166,7 @@ class_api Message (msg)
 	
 	api create (|Syntax| Type, |string| Name, |message|)
 		type.nil$
-		return Type.msg(self,name)
+		return .msg(Type,name)
 		description "Creates a new node with the type and name provided.
 
 		The node is created as the last child of 'self'. If 'self' is nil... the node is created with no parent (this is fine)."

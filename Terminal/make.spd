@@ -5,8 +5,8 @@
 
 
 main 
-	.gen("osx", platform.OSX)
-	.gen("linux", platform.lin)
+	app.gen("osx", platform.OSX)
+	app.gen("linux", platform.lin)
 
 
 || Speedie = "/usr/local/speedie"
