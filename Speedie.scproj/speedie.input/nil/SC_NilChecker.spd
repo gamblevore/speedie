@@ -55,13 +55,13 @@ function Jump (NilTrackerFn)
 					
 function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
-	|| dcl = msg.nildecl
+	|| dcl = msg.MadDecl
 	if dcl is onmodule
 		return dcl.nildeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch, 0)
 		if actual is nilish								// works e
-			.BecomeReal(ch.nildecl, ch)
+			.BecomeReal(ch.MadDecl, ch)
 	return dcl.nildeclared
 
 
@@ -97,7 +97,7 @@ function Function (NilTrackerFn)
 	|| HasAddrs = false
 	for recv in fn.args
 		.Jump(p, test)
-		|| sent = p.NilDecl
+		|| sent = p.MadDecl
 		HasAddrs := sent.PointerUpgrade
 		if recv.NilReg	
 			.NilParamPass(recv, sent, p)
@@ -109,7 +109,7 @@ function Function (NilTrackerFn)
 		debugat
 		p = prms.first
 		for recv in fn.args
-			|| infernal = p.NilDecl.PointerUpgrade
+			|| infernal = p.MadDecl.PointerUpgrade
 				.VariableSet(recv.internal, infernal, recv.source, p)
 			p++
 
@@ -267,7 +267,7 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 		return nilstate.real
 	
 	if (lnil and rnil)
-		return ll.Redundant(test, ll.nildecl)
+		return ll.Redundant(ll.MadDecl, test)
 	expect (scop.IsNilTest) (ll.next, "Nil can't accept this operator. Use != or ==.")
 	
 	(test is reversed) = scop.IsExactlyEquals
@@ -303,7 +303,7 @@ function Thing (NilTrackerFn)
 
 function ThingSub (NilTrackerFn)
 	opt norefcounts							// handles 5-6 different cases :O
-	|| dcl = msg.nildecl
+	|| dcl = msg.MadDecl
 	debugat 12
 	if !dcl.NilReg							// case 1
 		return dcl.nildeclared
@@ -320,7 +320,7 @@ function ThingSub (NilTrackerFn)
 	if (Y is Either)						// case 4
 		return T.SetNilness(dcl, Test)
 
-	return msg.Redundant(test, dcl) 		// case 5-6
+	return msg.Redundant(dcl, test) 		// case 5-6
 
 
 
@@ -353,10 +353,10 @@ function Type (Niltrackerfn)
 	opt norefcounts
 	|| F = msg.first
 	|| ns = .Jump(F, test)
-	|| d = msg.nildecl
+	|| d = msg.MadDecl
 	if !d.suffers
 		return nilstate.real
-	|| fd = f.nildecl
+	|| fd = f.MadDecl
 	if fd.suffers // return inner suffering
 		return ns
 	
@@ -398,7 +398,7 @@ function Declaration (niltrackerfn)
 	opt norefcounts
 	|| rel = msg.last, || Value = rel.last, || Name = rel.first
 	|| J = .Jump(value, 0)
-	|| D = name.NilDecl
+	|| D = name.MadDecl
 	return T.Declare(D, J)
 
 	// its always a rel, right? so anyhow... we should just set the thing, dont call SetRel, its... ugly.
@@ -409,7 +409,7 @@ function SetRel (niltrackerfn)
 	opt norefcounts
 	|| R = msg.last,	.Jump(R, 0)			// R is defined as coming first
 	|| L = msg.first,	.Jump(L, 0)
-	return .VariableSet(L.nildecl, R.nildecl, L, R)
+	return .VariableSet(L.MadDecl, R.MadDecl, L, R)
 
 
 function Fail (NilTrackerFn)

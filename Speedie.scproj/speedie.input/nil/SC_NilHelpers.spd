@@ -2,7 +2,7 @@
 
 extend Message {
 
-function Redundant (|nilcheckmode| Test,  |scdecl| dcl,  |nilstate|)
+function Redundant (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 	ifn (Test is soft) or (dcl.NilAllocDepth < niltracker.t.loops.Depth)	// if a.length // allow redundant test
 		|| str = "Nil test is redundant on " + dcl.nilcurr.rawname
 		str += " object: " + .render 
@@ -10,16 +10,17 @@ function Redundant (|nilcheckmode| Test,  |scdecl| dcl,  |nilstate|)
 	return Test & nilstate.either
 
 
-function NilDecl (|scdecl|)
+function MadDecl (|scdecl|)
 	opt norefcounts
-	if self
-		|| obj = .obj as SCDecl // blindcast instead?
-			|| l = obj.IsLookupOnly
-			if !l
-				return obj // faster
-			if l isa scdecl
-				return l
-			return obj
+	|| obj = .obj|SCDecl|
+		target debug
+			obj.mustbe(scdecl)
+		|| l = obj.IsLookupOnly
+		if !l
+			return obj // faster
+		if l isa scdecl
+			return l
+		return obj
 	debugger 
 
 
