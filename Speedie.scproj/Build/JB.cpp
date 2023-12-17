@@ -2103,7 +2103,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (111595663464239)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (111595670929408)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -5270,8 +5270,10 @@ JB_String* SC_Linkage__SyntaxAccess(JB_String* name) {
 				JB_String* str = JB_Incr(JB_Msg_Nyme(_tmPf3));
 				JB_Decr(_tmPf3);
 				if (JB_Str_Exists(str)) {
+					if (fs->Length) {
+						JB_FS_AppendByte(fs, ' ');
+					}
 					JB_FS_AppendString(fs, str);
-					JB_FS_AppendByte(fs, ' ');
 				}
 				JB_Decr(str);
 			}
