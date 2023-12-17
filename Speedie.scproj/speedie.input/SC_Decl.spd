@@ -553,10 +553,10 @@ class SCDecl (SCObject) {
 	
 	function IsUintLike (|bool|)
 		|| t = .type.typeinfo
-		require .isnormal and .isdatatype and t.isint
-		return !t.IsSigned
+		if .isnormal and .isdatatype and t.isint
+			return !t.IsSigned
 
-	
+
 	function MakeSignedIfPossible (|SCDecl|)
 		if .type.signed
 			return .type.Signed

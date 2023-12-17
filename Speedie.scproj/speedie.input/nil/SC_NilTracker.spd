@@ -29,12 +29,12 @@ struct NilTracker
 	|NilRecord[64]| 	Rows
 	
 		
-	function WhileEnter (|message| Where, |bool| WhileTrue,  |LoopInfo|)
+	function WhileEnter (|message| Where, |bool| HasCond,  |LoopInfo|)
 		|| l = &.Loops
 		rz = *l
-		l.ExitCount = 1-WhileTrue
+		l.ExitCount = HasCond|int|
 		l.Cont = decls()
-		l.Exit = l.Cont * !WhileTrue
+		l.Exit = l.Cont * HasCond
 		l.exit |= NilState.either
 		l.Depth = .CurrDepth
 	
@@ -146,11 +146,14 @@ struct NilTracker
 		function Decls (assigns:|NilRecord|)
 			.place.Value = Value
 
-		function NilTracker.Purify (|scfunction| f)
+
+		function NilTracker.KhalaiPurification (|scfunction| f)
+			// it's like a protoss exterminating DA ZERGBUGZ 
 			opt norefcounts
 			|| arg = .Start(f)
 				Argument(arg)
 				.Finish(f)
+
 		
 		function SaveTheWorld
 			opt norefcounts
@@ -164,7 +167,7 @@ struct NilTracker
 			|| Rec = errorreceiver()
 			using rec
 				for f in compiler.funclist
-					t.purify(f)
+					t.KhalaiPurification(f)
 					rec.ReturnErrors
 
 			SCFunction.currfunc = nil

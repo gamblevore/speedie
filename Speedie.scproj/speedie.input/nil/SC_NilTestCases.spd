@@ -101,10 +101,12 @@ class NilTest
 		return .Exists4
 		
 	function Exists6 (|niltest|)
+		|| z = .exists5
+		borks
+		if z == nil
+			0
 		while
 			|| x = .exists5
-			borks
-			if x
 				return x
 		return .Exists3(nil)
 		

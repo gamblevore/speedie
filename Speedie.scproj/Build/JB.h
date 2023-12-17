@@ -73,6 +73,8 @@ typedef int FileMode;
 
 typedef bool FileResolveMode;
 
+typedef int64 FileSizeInt;
+
 typedef vec4 FloatRangeConverter;
 
 typedef vec2 FloatRangeConverterBasic;
@@ -673,7 +675,8 @@ struct StructSaveTest {
 struct NilTracker {
 	NilRecord* Line;
 	NilRecord* RowEnd;
-	NilRecorder Redeclares;
+	NilRecord Realnesses;
+	SCDecl* Dbg[32];
 	LoopInfo Loops;
 	NilRecord Rows[64];
 };
@@ -856,7 +859,7 @@ JBClass ( SCOperator , JB_Object ,
 	bool IsCompare;
 	bool IsEquals;
 	bool IsNilTest;
-	bool HasEquals;
+	bool IsExactlyEquals;
 	bool IsSet;
 	bool AsBit;
 	bool IsCustom;
@@ -1361,13 +1364,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1913])
+#define kJB__ErrorColors_bold (JB_LUB[1914])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1914])
-#define kJB__ErrorColors_good (JB_LUB[1915])
-#define kJB__ErrorColors_normal (JB_LUB[1916])
-#define kJB__ErrorColors_underline (JB_LUB[1915])
-#define kJB__ErrorColors_warn (JB_LUB[1917])
+#define kJB__ErrorColors_error (JB_LUB[1915])
+#define kJB__ErrorColors_good (JB_LUB[1916])
+#define kJB__ErrorColors_normal (JB_LUB[1917])
+#define kJB__ErrorColors_underline (JB_LUB[1916])
+#define kJB__ErrorColors_warn (JB_LUB[1918])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1532,7 +1535,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1918])
+#define kJB_codesign_native (JB_LUB[1919])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1548,7 +1551,7 @@ extern Dictionary* JB_FuncLinkageTable;
 #define kJB_BitAnd (JB_LUB[353])
 #define kJB_BitNot (JB_LUB[607])
 #define kJB_BitOr (JB_LUB[1323])
-#define kJB_BitXor (JB_LUB[1919])
+#define kJB_BitXor (JB_LUB[1920])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_DontSaveProperty (0)
 #define kJB_LossyCastedMatch (7 << 22)
@@ -1563,7 +1566,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_SaveProperty (1)
 #define kJB_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1920])
+#define kJB_SaverStart1 (JB_LUB[1921])
 #define kJB_SelfDebug (2)
 #define kJB_SelfReplace (1)
 #define kJB_SimpleMatch (1 << 22)
@@ -1888,14 +1891,17 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__MsgParseFlags_Inserted (8192)
 #define kJB__MsgParseFlags_LargestFlag (0)
 #define kJB__MsgParseFlags_Style2 (16384)
-#define kSC__NilCheckMode_Active (2 + 1)
-#define kSC__NilCheckMode_LargestFlag (7)
-#define kSC__NilCheckMode_negative (1)
-#define kSC__NilCheckMode_Nothing (0)
-#define kSC__NilCheckMode_positive (2)
-#define kSC__NilCheckMode_soft (4)
-#define kSC__NilCheckMode_SoftNeg (1 + 4)
-#define kSC__NilCheckMode_SoftPos (2 + 4)
+#define kSC__nilmo_Active (2 + 1)
+#define kSC__nilmo_and (8)
+#define kSC__nilmo_Basic ((2 + 1) + 4)
+#define kSC__nilmo_LargestFlag (31)
+#define kSC__nilmo_negative (1)
+#define kSC__nilmo_Nothing (0)
+#define kSC__nilmo_positive (2)
+#define kSC__nilmo_reversed (16)
+#define kSC__nilmo_soft (4)
+#define kSC__nilmo_SoftNeg (1 + 4)
+#define kSC__nilmo_SoftPos (2 + 4)
 #define kSC__NilState_ActuallyNil (1 + 4)
 #define kSC__NilState_Borked (128)
 #define kSC__NilState_Either (3)
@@ -4113,6 +4119,9 @@ Array* JB_ErrorSeverity__InitNames();
 // FileResolveMode
 
 
+// FileSizeInt
+
+
 // FloatRangeConverter
 
 
@@ -4166,18 +4175,24 @@ MaybeBool JB_MaybeBool__New(bool Default);
 
 
 // NilCheckMode
-NilCheckMode SC_NilCheckMode_Activate(NilCheckMode self);
+NilCheckMode SC_nilmo_Activate(NilCheckMode self);
 
-NilCheckMode SC_NilCheckMode_Negate(NilCheckMode self);
+NilCheckMode SC_nilmo_Negate(NilCheckMode self);
 
-bool SC_NilCheckMode_SyntaxIs(NilCheckMode self, NilCheckMode other);
+NilCheckMode SC_nilmo_Normal(NilCheckMode self);
 
-bool SC_NilCheckMode_SyntaxIsnt(NilCheckMode self, NilCheckMode other);
+bool SC_nilmo_SyntaxIs(NilCheckMode self, NilCheckMode other);
+
+NilCheckMode SC_nilmo_SyntaxIsSet(NilCheckMode self, NilCheckMode other, bool Value);
+
+bool SC_nilmo_SyntaxIsnt(NilCheckMode self, NilCheckMode other);
 
 
 
 // NilRecord
 uint SC_NRD_Count(NilRecord self);
+
+void ndb5(NilRecord self);
 
 NilState SC_NRD_SyntaxAccess(NilRecord self, int item);
 
@@ -4761,6 +4776,8 @@ void SC_IR_FS(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
+void SC_IR_Print(IR* self);
+
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -4950,9 +4967,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_NilTracker
 NilRecord SC_nil_BranchEnter(NilTracker* self, Message* abc);
 
-NilState SC_nil_BranchExit(NilTracker* self, NilRecord Earlier);
+NilState SC_nil_BranchExit(NilTracker* self, NilRecord A);
 
-NilRecord SC_nil_BranchSwap(NilTracker* self, NilRecord Earlier);
+NilRecord SC_nil_BranchSwap(NilTracker* self, NilRecord A);
 
 int SC_nil_CurrDepth(NilTracker* self);
 
@@ -4964,11 +4981,9 @@ NilState SC_nil_DeclareSub(NilTracker* self, SCDecl* D, NilState nd);
 
 void SC_nil_Finish(NilTracker* self, SCFunction* f);
 
+void SC_nil_KhalaiPurification(NilTracker* self, SCFunction* f);
+
 NilRecorder* SC_nil_Place(NilTracker* self);
-
-void SC_nil_Purify(NilTracker* self, SCFunction* f);
-
-NilRecord SC_nil_Redeclare(NilTracker* self, NilRecord V);
 
 inline NilState SC_nil_Set(NilTracker* self, NilRecord Dest, JB_String* reason);
 
@@ -4976,7 +4991,9 @@ inline NilState SC_nil_SetNilness(NilTracker* self, SCDecl* d, NilState New);
 
 Message* SC_nil_Start(NilTracker* self, SCFunction* f);
 
-LoopInfo SC_nil_WhileEnter(NilTracker* self, Message* Where, bool WhileTrue);
+LoopInfo SC_nil_WhileEnter(NilTracker* self, Message* Where, bool HasCond);
+
+NilState SC_nil__Activate(NilTrackerFn fn, Message* msg, NilCheckMode test);
 
 NilState SC_nil__arel(Message* msg, NilCheckMode Test);
 
@@ -4986,13 +5003,13 @@ NilState SC_nil__Argument(Message* msg, NilCheckMode Test);
 
 NilState SC_nil__BecomeReal(SCDecl* sent, Message* where);
 
-NilState SC_nil__BooleanOr(Message* AA, Message* BB, NilCheckMode Test);
+NilState SC_nil__BooleanLogic(Message* msg, NilCheckMode Test);
 
 NilState SC_nil__Bracket(Message* msg, NilCheckMode Test);
 
 NilState SC_nil__Brel(Message* msg, NilCheckMode Test);
 
-NilState SC_nil__Compareable(Message* ll, Message* rr, SCOperator* scop, NilCheckMode test);
+NilState SC_nil__CompareObjs(Message* ll, Message* rr, NilCheckMode test, SCOperator* scop);
 
 NilState SC_nil__Continue(Message* msg, NilCheckMode Test);
 
@@ -5020,7 +5037,11 @@ int SC_nil__Init_();
 
 int SC_nil__InitCode_();
 
+inline NilState SC_nil__Jump(Message* msg, NilCheckMode Test);
+
 NilState SC_nil__JustReal(Message* msg, NilCheckMode Test);
+
+void ndb4();
 
 NilState SC_nil__NilParamPass(SCDecl* Recv, SCDecl* Sent, Message* where);
 
@@ -5568,6 +5589,8 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 
 // JB_ErrorReceiver
+int JB_Rec_BadCount(JB_ErrorReceiver* self);
+
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
 void JB_Rec_Clear(JB_ErrorReceiver* self);
@@ -6402,7 +6425,7 @@ bool JB_SS_NoMoreChunks(StringReader* self);
 
 int JB_SS_NonZeroByte(StringReader* self);
 
-Message* JB_SS_Parse_Jbin(StringReader* self, int64 Remain);
+Message* JB_SS_ParseJbin(StringReader* self, int64 Remain);
 
 int64 JB_SS_Position(StringReader* self);
 
@@ -6774,7 +6797,7 @@ RingTree* JB_Ring__New0();
 // JB_SCBase
 void SC_Base_Addtotable(SCBase* self, Array* r);
 
-JB_String* SC_Base_AutoCompleteName(SCBase* self);
+JB_String* SC_Base_AutoCompleteKind(SCBase* self);
 
 SCClass* SC_Base_CodeCls(SCBase* self);
 
@@ -7061,6 +7084,8 @@ NilState SC_Decl_NilCurr(SCDecl* self);
 
 void ndb2(SCDecl* self, JB_String* reason);
 
+void SC_Decl_NilPrmFail(SCDecl* self);
+
 bool SC_Decl_NilStated(SCDecl* self);
 
 void SC_Decl_NoBlindCasts(SCDecl* self, SCDecl* old, Message* exp, SCBase* name_space);
@@ -7068,6 +7093,8 @@ void SC_Decl_NoBlindCasts(SCDecl* self, SCDecl* old, Message* exp, SCBase* name_
 bool SC_Decl_NoFloat(SCDecl* self, Message* exp);
 
 bool SC_Decl_OperatorExact_isa(SCDecl* self, SCClass* v);
+
+bool SC_Decl_IsaStr(SCDecl* self, JB_String* s);
 
 bool SC_Decl_MatchesDecl(SCDecl* self, SCDecl* O);
 
@@ -7080,6 +7107,8 @@ bool SC_Decl_PointeryMatch(SCDecl* self, SCDecl* O);
 uint SC_Decl_PointeryMatchSub(SCDecl* self, SCDecl* O, int TypeCast);
 
 JB_String* SC_Decl_PrefixedName(SCDecl* self, SCModule* M);
+
+JB_String* SC_Decl_PrmStateMsg(SCDecl* self);
 
 SCDecl* SC_Decl_ProcessAs(SCDecl* self, Message* msg);
 
@@ -7271,8 +7300,6 @@ JB_String* SC_Msg_APICppProject(Message* self);
 void SC_Msg_AppendAllInto(Message* self, Message* Dest);
 
 void SC_Msg_AppendMacro(Message* self, Macro* M, Array* prms);
-
-void SC_Msg_AppMainFix(Message* self);
 
 void JB_Msg_ARel__(Message* self, FastString* fs);
 
@@ -7691,6 +7718,10 @@ int SC_Msg_MacroFixCount(Message* self);
 Message* SC_Msg_MacroPrm(Message* self, Message* root, Array* prms);
 
 Message* SC_Msg_MacroSame(Message* self, Message* prm);
+
+Message* SC_Msg_MainFix(Message* self);
+
+void SC_Msg_mainfix2(Message* self);
 
 int SC_Msg_MainOneArg(Message* self, Message* arg, int i, int found);
 
@@ -8681,7 +8712,7 @@ SCFunction* SC_Func_TryKeepBetter(SCFunction* self, int OldMatch, SCFunction* f,
 
 bool SC_Func_Update_Source(SCFunction* self, int start, JB_String* text, SCFile* myfile, SCObject* orig);
 
-bool SC_Func_UpdateSourceSub(SCFunction* self, Message* source);
+bool SC_Func_UpdateSourceSub(SCFunction* self, Message* src);
 
 bool SC_Func_UseCppName(SCFunction* self, JB_String* CppName);
 
@@ -9070,6 +9101,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 
@@ -9099,35 +9131,52 @@ inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v) {
 }
 
 inline NilState SC_nil_Set(NilTracker* self, NilRecord Dest, JB_String* reason) {
+	Dest = (Dest & self->Realnesses);
+	NilRecord diff = Dest ^ (*self->Line);
 	(*self->Line) = Dest;
-	return 0;
+	{
+		int i = 0;
+		while (i < 32) {
+			if (SC_NRD_SyntaxAccess(diff, i)) {
+				ndb2(self->Dbg[i], reason);
+			}
+			i++;
+		};
+	}
+	;
+	return kSC__NilState_Real;
 }
 
 inline NilState SC_nil_SetNilness(NilTracker* self, SCDecl* d, NilState New) {
 	if ((!d->NilReg)) {
 		debugger;
 	}
-	(SC_NRC_SyntaxCallSet((SC_nil_Place(self)), d->NilReg, New));
-	ndb2(d, JB_LUB[1017]);
+	NilRecorder* P = SC_nil_Place(self);
+	(SC_NRC_SyntaxCallSet((P), d->NilReg, New));
+	if ((P->Value & self->Realnesses) != P->Value) {
+		SC_Decl_NilPrmFail(d);
+	}
+	ndb2(d, JB_LUB[1018]);
 	return New;
 }
 
 inline NilState SC_nil__ArgOne(Message* s, NilCheckMode t, NilState prev) {
 	NilState rz = 0;
 	jdb(s);
-	rz = (({
-		Message* abc = s;
-		 (SC__nil_NilSyxes[abc->Func])(abc, t);
-	}));
+	rz = SC_nil__Jump(s, t);
 	if (SC_NilState_SyntaxIs(prev, kSC__NilState_Borked)) {
 		JB__Err_AutoPrint = SC__nil_OldPrint;
 		if ((!(!JB_Rec_OK(JB_StdErr)))) {
-			JB_Msg_SyntaxExpect(s, JB_LUB[1019]);
+			JB_Msg_SyntaxExpect(s, JB_LUB[1020]);
 			return nil;
 		}
 		JB_Rec_Clear(JB_StdErr);
 	}
 	return rz;
+}
+
+inline NilState SC_nil__Jump(Message* msg, NilCheckMode Test) {
+	return (SC__nil_NilSyxes[msg->Func])(msg, Test);
 }
 
 inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in) {
@@ -9191,7 +9240,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1496])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1498])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}

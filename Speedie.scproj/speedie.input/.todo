@@ -5,7 +5,7 @@ bugs:
 	* sdleventtype.mousedown() // compiles???
 		* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and struct
 	* refcounter passing properties SHOULD NOT assume it won't be cleared... not without disturbance checker
-	* function finding fails with dictionary subclasses? DictSub["abc"]
+	* Function finding fails with dictionary subclasses? DictSub["abc"]
 	* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
 	* vector constants
 	* || s = "".Address.IsLower // won't compile...

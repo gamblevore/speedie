@@ -182,7 +182,7 @@ function While (NilTrackerFn)
 	require T.BranchEnter(msg)
 
 	|| Tru = condtest.IsTrue
-	|| W = T.WhileEnter(cond, tru)
+	|| W = T.WhileEnter(cond, !tru)
 
 	WhileInner(cond)
 	WhileExit(cond, tru)
@@ -278,7 +278,6 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 		return ll.Redundant(test, ll.nildecl)
 	expect (scop.IsNilTest) (ll.next, "Nil can't accept this operator. Use != or ==.")
 	
-	debugat
 	(test is reversed) = scop.IsExactlyEquals
 		
 	|| side = (rr, ll)(lnil)

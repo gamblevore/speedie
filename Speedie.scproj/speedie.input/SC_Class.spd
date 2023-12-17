@@ -486,7 +486,7 @@ function OverrideSyntax
 		expect (f.ReturnType)       (f.Source, "Need a return type.")
 		f.nextfunc.DontWantSameReturnType(f)
 		.Casts <~ f
-		if f.returntype == typebool.typenormal
+		if f.returntype isa "bool" // get rekt knoobs
 			f.IsNilChecker = true
 			f.args[0].nildeclared = nilstate.optional
 	
