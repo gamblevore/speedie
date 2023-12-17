@@ -67,14 +67,18 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "jeebox.scproj"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--x"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nocompile"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "Perry.scproj"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
