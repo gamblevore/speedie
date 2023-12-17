@@ -2,7 +2,7 @@
 // Copyright, Theodore H. Smith 2023.
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
-#ifdef AS_LIBRARY
+#if !defined(__JB_NETWORK__)
 	void JB_CurlStub();
 #else
 

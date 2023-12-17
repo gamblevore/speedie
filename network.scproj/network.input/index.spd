@@ -3,3 +3,9 @@
 linkage
 	cpp_part Net
 	type library
+	
+compile_linking
+	flags
+		osx "-lcurl -D__JB_NETWORK__"
+		lin "-lcurl -D__JB_NETWORK__"
+		win "-lcurl -D__JB_NETWORK__"
