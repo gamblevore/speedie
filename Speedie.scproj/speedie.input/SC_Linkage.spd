@@ -13,8 +13,9 @@ module Linkage
 		for ch in .flags
 			if ch ~= name
 				|| str = ch.first.nyme
+					if fs.length
+						fs <~ ' '
 					fs <~ str
-					fs <~ ' '
 		return fs
 
 
