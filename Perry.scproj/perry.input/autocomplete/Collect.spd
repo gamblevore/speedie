@@ -107,7 +107,7 @@ function PerryIDE.ActualCompile (|message| msg)
 	.compilr = c
 	.speedietext.text = ""
 	
-	|| dw = .datewrap(msg )
+	|| dw = .DateWrap(msg )
 	.logonecomm(dw, "\1C ")
 	c <~ dw
 	(.buildbutton isnt visible)

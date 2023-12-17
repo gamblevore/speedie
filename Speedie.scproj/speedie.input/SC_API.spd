@@ -67,10 +67,10 @@ module SC_API
 			.NewAPI(node, "", Compiler.program, proj)
 			return
 		
-		|| name		= node[@thg]								#require
+		|| name		= node[@thg]						#require
 		|| partname = name.Next(@bra)[@thg]				#require
-		|| arg		= node.last(@arg)							#require
-		|| cls		= compiler[name]							#require
+		|| arg		= node.last(@arg)					#require
+		|| cls		= compiler[name]					#require
 
 		partname.parent.remove
 		for ch in arg

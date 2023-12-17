@@ -3,6 +3,7 @@
 							Todo
 
 * VM? 
+* build output not showing???
 * Constants and globals don't autocomplete nicely
 * Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
 

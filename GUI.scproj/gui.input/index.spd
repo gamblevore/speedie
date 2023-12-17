@@ -9,7 +9,7 @@ targets
 
 
 import "Image"
-import "network" // for network.guidownload
+// don't import "network" or else perry won't compile easily.
 
 
 compile_linking
