@@ -73,16 +73,16 @@ datatype Syntax (Byte)
 	
 	
 	function Msg ( |string| name="", |Message| ) 
-		return Message( nil, self, parser.usingpos, name, name.length )
+		return Message( nil, self, parser.using.position, name, name.length )
 	
 	// remove this? node.msg seems better?
 	function Msg ( |message| parent, |string| name, |Message| )
 		disabled "Use node.msg(@syx, name) instead"
 		cpp_part ParentMsg
-		return Message( parent, self, parser.usingpos, name, name.length )
+		return Message( parent, self, parser.using.position, name, name.length )
 	
 	function message.Msg ( |syntax| fn, |string| name="", |Message| )
-		return Message( self, fn, parser.usingpos, name, name.length )
+		return Message( self, fn, parser.using.position, name, name.length )
 	
 	// replace with int64.msg? seems better.
 	function Msg ( |int64| name, |Message| ) 

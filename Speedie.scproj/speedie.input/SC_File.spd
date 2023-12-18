@@ -93,13 +93,13 @@ class SCFile (file)
 			
 			|| oldimp = scimport.CurrIsManuallyImported
 			scimport.CurrIsManuallyImported = .proj.depth
-			parser.UsingTag = .filenum  // I'd rather remove this dumb thing. Each scfunction has a file already
+			parser.Using.Tag = .filenum  // I'd rather remove this dumb thing. Each scfunction has a file already
 										// so only macros would need this. Its just used for to make vm-debug positions
 			rz = .fData.ParseClean
 			scimport.CurrIsManuallyImported = oldimp
 			.DetectInsecureWords
 			
-			parser.usingtag = 0
+			parser.using.tag = 0
 			parser.DotInsertallow = false
 			StdErr.source = nil
 		(Message).restore

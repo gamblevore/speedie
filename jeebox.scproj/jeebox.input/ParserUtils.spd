@@ -208,31 +208,31 @@ struct MessagePosition
 		cpp_part MsgPos
 		noauto
 	
-	|int|               OldPosition
-	|uint|              OldLength
-	|uint|              OldTag
-	|MemoryLayer--|     OldLayer
+	|MemoryLayer--|     Layer
+	|int|               Position
+	|uint|              Tag
+	|uint|              Length
+	|MsgUIFlags|		Flags
 	
 	destructor
-	    parser.UsingPos = .OldPosition 
-	    parser.UsingLength = .OldLength 
-	    parser.UsingTag = .OldTag 
-	    .OldLayer.use 
+		parser.using = *self
+	    .Layer.use 
 	
 	function SyntaxUsingComplete 
 
 
 function Message.SyntaxUsing (|MessagePosition|)
 	Opt NoRefCounts
-	rz.OldPosition = parser.UsingPos
-	rz.OldTag = parser.UsingTag
-	rz.OldLength = parser.UsingLength
-	rz.OldLayer = (message).Layer
-	if (self)
-	    parser.UsingPos = .position
-	    parser.UsingLength = .RangeLength
-		parser.UsingTag = .Tag
-	    .memorylayer.use
+	rz = parser.Using
+	rz.Layer = (Message).layer
+	
+	parser.Using.Position = .position
+	parser.Using.Length = .RangeLength
+	parser.Using.Tag = .Tag
+	parser.Using.Flags = MsgUIFlags.Inserted // right?
+	.MemoryLayer.use
+
+function Message.SyntaxUsingComplete { }
 
 
 api ringtree.JDB2
@@ -255,10 +255,6 @@ api ringtree.JDB3
 
 function byte.CanPrintAsNormalChar (|bool|)
 	return (self < 127 and self >= 32)
-
-
-function Message.SyntaxUsingComplete { }
-
 
 
 // remove tokenhandler_fp, its just parsehandler!

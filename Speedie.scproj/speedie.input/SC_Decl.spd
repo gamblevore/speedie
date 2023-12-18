@@ -110,7 +110,6 @@ class SCDecl (SCObject) {
 		
 	setter NilDeclared (|nilstate|)
 		.nildeclare = value
-		if .name[0, "xp"]
 	
 	function NilDeclared (|nilstate|)
 		return .nildeclare
@@ -268,8 +267,8 @@ class SCDecl (SCObject) {
 		.CopyTypeInfoTo(rz)
 		rz.internal = self
 		rz.PointerCount++
-		if purpose is FuncParam or functionbody
-			rz.NilDeclared = nilstate.realish
+		if purpose is FuncParam
+			rz.NilDeclared = nilstate.either
 		  else
 			rz.NilDeclared = nilstate.real
 		check (rz.pointercount < 8) (.source, "Too much abstraction")

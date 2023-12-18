@@ -74,12 +74,12 @@ constructor (|Message| node, |SCBase| parent)
 	.TypeInfo = DataTypeCode.UnusedType
 	.Banned = .TestBanned
 	
-	|| IsDataType = node == "datatype"
+	|| HasPtrs = node != "datatype"
 	|| T = SCDecl.new(self)
-	t.nildeclared = nilstate.realish + (nilstate.stated*isdatatype)
+	t.nildeclared = nilstate.realish + HasPtrs
 	.TypeNormal = T
-	.TypeOptional = T.NilConstructor(NilState.optional * !IsDataType)
-	.TypeReal = T.NilConstructor(NilState.Real * !IsDataType)
+	.TypeOptional = T.NilConstructor(NilState.optional * HasPtrs)
+	.TypeReal = T.NilConstructor(NilState.Real * HasPtrs)
 	
 	if node == "struct"
 		T = T.GetAddress
@@ -88,7 +88,7 @@ constructor (|Message| node, |SCBase| parent)
 	.SelfDecl = T
 	T.Name = "self"
 	(T is SelfImplicit)
-	(T.nildeclared = nilstate.realish) // unstated real
+	(T.nildeclared = nilstate.either)
 	(T isnt altered)
 
 

@@ -66,7 +66,7 @@ function Message.IsAssignable (|bool|)
 
 
 function message.IsInt (|bool|)
-	 return (self == @num) and !.name.find('.')
+	return (self == @num) and !.name.find('.')
 
 
 function Message.ParentPoint (|Message|)
@@ -464,3 +464,7 @@ function message.IsAlwaysTrue (|bool|)
 function message.IsAlwaysFalse (|bool|)
 	return .IsAlwaysBool.isfalse
 
+
+extend string
+	function debug
+		if scfunction.currfunc ~= self

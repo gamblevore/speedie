@@ -179,7 +179,7 @@ function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 // RefMsg/reffunc are almost the same... sigh.
 function scfunction.RefFunc (|message| prm, |message| after)
 	opt norefcounts
-	parser.usingpos = -1
+	parser.using.position = -1
 	|| rz = «func »
 	after.next = rz
 	rz.msg(@thg, .exportname)

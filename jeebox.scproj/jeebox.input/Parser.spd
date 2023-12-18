@@ -1237,12 +1237,12 @@ module parser
 	|message|				EndOfLineMarker
 	|dictionary of string|  ErrorNames = nil
 	|fnIDGenerator|			Splitter = &parser.range
-	|int|					UsingPos = -1
-	|uint16|				UsingTag = 0
-	|uint16|				UsingLength = 0
+	|MessagePosition|		Using
 	|uint16|                StopBars
-	|MsgUIFlags|			InsertedFlags
 	|bool|					DotInsertAllow
+
+	using.Position = -1
+
 
 	flags
 		kAdjectiveOp

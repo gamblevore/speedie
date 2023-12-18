@@ -93,6 +93,26 @@ class NilTest
 	function Exists3 (|niltest| p, |niltest|)
 		if p
 			return p
+		/*
+			so what should I do with this?
+			Should it be that the act of using something... "sets" it? like a quantum something???
+			
+			if self: abc()		// optional
+			|| x = self.abc		// real
+
+			// So what is self... in these cases??? could be either? unresolved?
+
+			return self ????
+			|| y = self ????
+			self = z
+		
+			The problem is that it can't be unresolved... we NEED IT. Or else things go wrong... all over!
+			
+			what if we set y to optional... then is self optional too? but later becomes real?
+			What if we just assume real? Eliminate unknownness? Real should be like the default anyhow.
+		*/
+		
+		
 		return self
 	
 	function Exists4 (|niltest|)
@@ -108,39 +128,40 @@ class NilTest
 		borks
 		if z == nil
 			0
+		using "abc"
 		while
 			|| x = .exists5
 				return x
-		return .Exists3(nil)
 		
 	function Exists7 (|!niltest|)
 		for 100
-			|| x = .exists5
+			|| x = .Exists5
 				return x
 		return .Exists3(nil)
 
 // pointers
-	function GoodPtr (|&niltest| xp, |&niltest| xp2)
-		if xp
-			*xp = self
-		if xp2
-			|| x = *xp2
-				x.v
-
-	function BorkedPtr (|&(niltest!)| xp, |&niltest| xp2, |niltest| xp3)
-		if !xp
+	function BorkedPtr (|&(niltest!)| xp0, |&niltest| xp2, |niltest| xp3)
+		if !xp0
 			borks
-			*xp = self
+			*xp0 = self
 		  else
-			*xp = self
+			*xp0 = self
 			
 		borks	
-		(*xp).v
+		(*xp0).v
 
 		|| xx = &NilTestByte
 		borks
 		if xx
 			xx++
+
+
+	function GoodPtr (|&niltest| xp0, |&niltest| xp2)
+		if xp0
+			*xp0 = self
+		if xp2
+			|| x = *xp2
+				x.v
 
 	function BadGoodPtr (|&niltest| p)
 		if p
@@ -245,21 +266,24 @@ function niltracker.Set (|NilRecord| Dest, |string| reason, |nilstate|)
 	*.line = dest
 	for i in 32
 		if diff[i]
-			.dbg[i].nilprint(reason)
+			|| d = .dbg[i]
+				d.nilprint(reason)
 	return nilstate.real
 	
 
 
-function @niltracker.ndb
+function @niltracker.ndb (|int| n=0)
 	cpp_name ndb4
 	visible
-	(*T.line).ndb5
+	(*T.line).ndb5(n)
 
 
-function nilrecord.ndb5
+function nilrecord.ndb5 (|int| n)
 	cpp_name ndb5
 	visible
-	for i in .count
+	n := .NextCount
+	for i in n
+		// item 0 is always nil... so whatever
 		|| D = niltracker.T.dbg[i]
 			|| Name = D.name
 			|| V = self[i].RawName

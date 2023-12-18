@@ -41,6 +41,8 @@ extend_module NilTracker {
 
 
 function Dummy (NilTrackerFn): debugger
+
+
 function Ignore (NilTrackerFn)
 
 		
@@ -59,7 +61,7 @@ function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
 	if dcl is onmodule
 		return dcl.nildeclared
 	|| ch = msg.first
-		|| actual = .Jump(ch, 0)
+		|| actual = .Jump(ch)
 		if actual is nilish								// works e
 			.BecomeReal(ch.MadDecl, ch)
 	return dcl.nildeclared
@@ -115,7 +117,7 @@ function Function (NilTrackerFn)
 
 	if fn.IsKiller
 		debugat
-		.Decls = 0
+		.DeclKill
 		return 0
 	
 	|| ret = fn.ReturnType
@@ -125,11 +127,10 @@ function Function (NilTrackerFn)
 
 function Return (NilTrackerFn)
 	opt norefcounts
-
 	|| v = jump(msg.first, 0) & nilstate.either
 	
 	t.Loops.ExitRecord |= nilstate.either		// mark as exitting safely.
-	.decls = 0
+	.DeclKill
 	|| ret = scfunction.currfunc.ReturnType
 	|| RD = ret.nildeclared
 	expect  !(RD == nilstate.real  and  v is nilish)   (msg, "Declaration does not allow returning " + v.rawname)
@@ -140,6 +141,7 @@ function Return (NilTrackerFn)
 
 function Exit (NilTrackerFn)
 	T.loops.ExitRecord |= .EndBlock
+	t.loops.hasEscape = true
 
 
 function Continue (NilTrackerFn)
@@ -153,9 +155,9 @@ function WhileInner (|message| Cond)
 	for i in 3 // can remove the oldcont tests later.
 		.jump(cond, NilCheckMode.softpos)
 		.Argument(arg)
-		.Decls = t.Loops.contRecord
-		if i == 1:    OldCont = .Decls
-		if i == 2: if OldCont !=.Decls // Test the first two loops.
+		.Decls(t.Loops.ContRecord, "continue")
+		if i == 1:    OldCont = .place.Value
+		if i == 2: if OldCont !=.place.Value // Test the first two loops.
 	
 
 function While (NilTrackerFn)
@@ -163,24 +165,18 @@ function While (NilTrackerFn)
 	|| cond = msg.first
 	|| CondTest = cond.IsAlwaysBool
 
-	require !CondTest.IsFalse			// ignore 'while false'
-	require T.BranchEnter(msg)
+	require !CondTest.IsFalse and T.BranchEnter(msg)
 
-	if scfunction.currfunc ~= "exists6"
-	|| W = T.loops
-	T.loops.init(T)
-
-	if !condtest.IsTrue 
-		.exit(cond)
+	debugat 0
+	|| W = T.loops.Begin(T, !condtest.IsTrue)
 	WhileInner(cond)
 	if !condtest.IsTrue		// This is just for simple error detection. like macro errors. 
 		.jump(cond, NilCheckMode.softneg)
 	
-	|| Ex = t.Loops.ExitRecord #check (cond, "Loop never exits.")
-	.decls = Ex ||| nilstate.either
-	T.loops = W
+	W.Finish(msg)
 
-	return t.BranchExit(0)
+	return t.BranchExit
+	
 
 
 function If (NilTrackerFn)
@@ -302,34 +298,36 @@ function Thing (NilTrackerFn)
 
 
 function ThingSub (NilTrackerFn)
-	opt norefcounts							// handles 5-6 different cases :O
+	opt norefcounts										// handles 5-6 different cases :O
 	|| dcl = msg.MadDecl
-	debugat 12
-	if !dcl.NilReg							// case 1
+	if !dcl.NilReg
 		return dcl.nildeclared
-	ifn (dcl is local)						// internal bug!
+	if dcl isnt local									// internal bug!
 
-	|| Y = dcl.nilcurr
-	if test isnt Active						// case 2
-		return Y
-
-	|| ND = dcl.nildeclared
-	if (dcl is param) and (nd isnt stated)	// case 3
+	if dcl.IsUnknownParam
+		if test isnt Active
+			return .becomereal(dcl, msg)
 		dcl.NilDeclared = nilstate.optional
-
-	if (Y is Either)						// case 4
 		return T.SetNilness(dcl, Test)
 
-	return msg.Redundant(dcl, test) 		// case 5-6
+	|| Y = dcl.nilcurr
+	if test isnt Active
+		return Y // when does this happen, even?
+
+	if Y is Either
+		return T.SetNilness(dcl, Test)
+
+	return msg.Redundant(dcl, test)
 
 
 
 function Argument (Niltrackerfn)
 	opt norefcounts
-	|| C = .Decls					// noice
 	for s.fast in msg
-		rz = .ArgOne(s, test * s.islast, rz)
-	.Decls = C
+		if s.islast
+			return .ArgOne(s, test, rz)
+		rz = .ArgOne(s, 0, rz)
+					 
 
 
 function ArgOne (|message| s,  |nilcheckmode| t,  |nilstate| prev,  |nilstate|)
@@ -422,14 +420,13 @@ function Debugger (NilTrackerFn)
 	// do nothing :)
 
 
-function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |nilstate|)
+function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where)
 	opt norefcounts
-	|| D = recv.NilDeclared
-	if (D == nilstate.real)
-		return .BecomeReal(sent, where)
-	if (D isnt stated)
-		error (where, "Please nil-decorate param")
-		recv.NilPrmFail
+	if (recv.NilDeclared == nilstate.real)
+		.BecomeReal(sent, where)
+	  else
+		recv.NeedsStated(where)
+	
 
 
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message| SentMsg,  |nilstate|) // setrel, relset
@@ -449,6 +446,7 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 
 function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 	opt norefcounts
+	"exists7".debug
 	|| Curr = sent.NilCurr
 	if curr == NilState.Realish
 		return curr
@@ -459,6 +457,16 @@ function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 			return T.SetNilness(sent, NilState.real)
 
 	error (where, "Expected Real Object: " + where.render)
-
+	return nilstate.real
 }
+
+
+function scdecl.NeedsStated (|message| where, |nilstate|)
+	pragma inline
+	if (.nildeclared isnt stated)
+		.NilPrmFail
+
+function scdecl.IsUnknownParam (|bool|)
+	pragma inline
+	return (!.nilstated) and (self is param)
 

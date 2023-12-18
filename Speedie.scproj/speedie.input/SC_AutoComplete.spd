@@ -62,7 +62,7 @@ function HandleRestartedCompile
 
 function ReInit ()
 	(message).Restore
-	parser.usingpos = -1 // sigh. I guess something slipped somewhere
+	parser.using.position = -1 // sigh. I guess something slipped somewhere
 
 
 function Log (|message|)
@@ -303,8 +303,8 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 
 function scfunction.Update_Source (|int| start, |string| text, |scfile| myfile, |scobject| orig, |bool|)
 	scfunction.currfunc = self
-	parser.usingpos = -1
-	parser.insertedflags = 0 // oop
+	parser.using.position = -1
+	parser.using.Flags = 0 // oop
 	|| source = text.parseclean
 	if source and source != @tmp
 		source = source[@tmp]
@@ -312,10 +312,10 @@ function scfunction.Update_Source (|int| start, |string| text, |scfile| myfile, 
 		source.SlidePositions(start)
 		.source = source
 		.Cleanupfunc
-		parser.insertedflags = MsgUIFlags.Inserted
+		parser.using.Flags = MsgUIFlags.Inserted
 		rz = .UpdateSourceSub(source)
 		source.obj = orig.disambiguate(source)
-	parser.insertedflags = 0 // oop
+	parser.using.Flags = 0 // oop
 
 
 function scobject.Disambiguate (|message| src, |scfunction|)

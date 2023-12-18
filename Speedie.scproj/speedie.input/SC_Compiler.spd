@@ -167,7 +167,7 @@ function CompileAll (|bool|)
 	.Timer( "NilChecking" )
 
 	using options.NilStrength
-		Niltracker.SaveTheWorld
+		Niltracker.EliminateArchons
 	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )
@@ -378,7 +378,7 @@ function ImportAll
 	require .AddMain(mark)
 		
 	
-	parser.insertedflags = MsgUIFlags.Inserted // noice
+	parser.using.Flags = MsgUIFlags.Inserted // noice
 	scimport.noproj
 	
 	for c in .classlist

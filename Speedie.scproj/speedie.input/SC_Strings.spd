@@ -36,7 +36,6 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 		msg.first = @thg + "Render"
 		if cls
 			msg.name = "behaviour"
-
 	|| arg = msg.NormaliseFunc
 	|| name = msg.first
 	|| params = name.next 
@@ -47,10 +46,8 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 		SCStrings.RenderNewParams.CopyAllInto(params)
 	
 	if msg.FindNested( @thg, "fs" )
-		using arg
-			SCStrings.RenderFinish.CopyAllBeforeInto( arg, nil )
-		using arg.flatlast
-			SCStrings.RenderFinish.CopyAllAfterInto( arg, nil )
+		SCStrings.RenderFinish.CopyAllBeforeInto( arg, nil )
+		SCStrings.RenderFinish.CopyAllAfterInto( arg, nil )
 	if msg.name == "behaviour"
 		msg.second.remove
 		return true
@@ -183,9 +180,9 @@ function String.ParseClean (|Message|)
 
 
 function Message.Clean (|bool| erl = false)
-	|| pos		= parser.usingpos
-	|| Len		= parser.UsingLength
-	|| Tag		= parser.UsingTag
+	|| pos		= parser.using.position
+	|| Len		= parser.Using.Length
+	|| Tag		= parser.Using.Tag
 
 	|message--| QEscape
 	|message| IgnoreArg 

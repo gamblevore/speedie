@@ -11,15 +11,30 @@
 */
 
 
-struct LoopInfo
-	|NilRecord| 		ExitRecord
+struct LoopInfo 
 	|NilRecord| 		ContRecord
+	|NilRecord| 		ExitRecord
+	|bool| 				HasEscape
 	|int| 				Depth
 	
-	function init (|&niltracker| T)
+	function Begin (|&niltracker| T, |bool| HasEscape, |Loopinfo|)
+		rz = *self
 		.ExitRecord = 0
+		.HasEscape = HasEscape
 		.Contrecord = T.Place.value
 		.Depth = T.CurrDepth
+
+		if HasEscape
+			.ExitRecord |= t.place.value
+	
+	function Finish (|message| msg)
+		|| src = &niltracker.T.loops
+		|| Ex = src.ExitRecord					#check (msg, "Loop never exits.")
+		if !src.HasEscape and !msg.islast
+			msg.KinderRemoveAfter
+
+		niltracker.decls(Ex ||| nilstate.either, "LoopEnd")
+		niltracker.T.loops = *self
 	
 
 struct NilTracker
@@ -52,7 +67,9 @@ struct NilTracker
 		.Set(A, "swap")
 	
 	function BranchExit (|NilRecord| A=0,  |nilstate|)
-		|| B = *(.line--)
+		|| B = *.line
+		*.line-- = 0 // cleanup
+		
 		|| New = A ||| B
 		new &= .Realnesses
 		if .CurrDepth == 0
@@ -67,7 +84,7 @@ struct NilTracker
 	function DeclareSub (|scdecl| D, |nilstate| nd, |nilstate|)
 		nd &= nilstate.either
 		|| P = .Place
-		|| N = p.value.Count
+		|| N = p.value.NextCount
 		expect (N < 31)								(D, "Too many declarations")
 		(p)(n) = nd
 		
@@ -75,13 +92,15 @@ struct NilTracker
 			d.NilReg = N
 		d.DReg.Reg = n // right? might as well do this at the same time?
 		d.NilAllocDepth = .currDepth
-		target debug: .dbg[n] = d
+		target debug
+			.dbg[n] = d
 		return nd
 	
 	function scdecl.NilCurr (|nilstate|)
 		if self Isnt Local
 			return .nildeclared &~ nilstate.stated
-		return (niltracker.Decls)[.NilReg]
+		return (niltracker.place.Value)[.NilReg]
+	
 	
 	function SetNilness (|SCDecl| d,  |NilState| New, |nilstate|)
 		pragma inline
@@ -89,7 +108,7 @@ struct NilTracker
 		|| P = .place
 		(P)(d.NilReg) = new
 		
-		if (p.Value & .Realnesses  !=  p.Value)
+		if (p.Value & .Realnesses)  !=  p.Value
 			d.NilPrmFail
 			
 		d.NilPrint("set")
@@ -105,14 +124,14 @@ struct NilTracker
 		.loops = nil
 		.Realnesses = -1
 		for d in f.args
-			.DeclareSub(d, d.NilStart)
+			.DeclareSub(d, d.nildeclared)
 		printline
 		f.NilPrint(" ****** ")
 		
 		|| r = f.returntype
 			if !r.nilstated
 				r.nildeclared = 0 // build this up carefully.
-		target debug: if "": niltracker.ndb
+		target debug: if "": niltracker.ndb(0)
 		return f.SourceArg
 
 	function Finish (|SCFunction| f)
@@ -126,9 +145,13 @@ struct NilTracker
 	function Place (|&NilRecorder|)
 		return (T.line)|&nilrecorder|
 
+	function Decls (|string|s, |NilRecord| R)
+		.place.Value = R
+
 	module
-		|byte|			OldPrint
 		|NilTracker|	T
+		|byte|			OldPrint
+		|uint|			Count
 
 		function Place (|&NilRecorder|)
 			return (T.line)|&nilrecorder|
@@ -136,34 +159,36 @@ struct NilTracker
 		function EndBlock (|nilrecord|)
 			return (.place)(nilstate.either)
 	
-		function Decls (|NilRecord|)
-			return .place.Value
+		function Decls (|NilRecord| R, |string|s)
+			.place.Value = R
+
+		function DeclKill
+			t.set(0, "kill")
 		
-		function Decls (assigns:|NilRecord|)
-			.place.Value = Value
 
-
-		function NilTracker.KhalaiPurification (|scfunction| f)
+		function @NilTracker.KhalaiPurification (|scfunction| f)
 			// it's like a protoss exterminating DA ZERGBUGZ 
 			opt norefcounts
-			|| arg = .Start(f)
+			|| arg = t.Start(f)
+				|| i = ++.Count
+				printline " ----  ($i:$i:$i:$i:$i:$i:$i)  ---- "
 				Argument(arg)
-				.Finish(f)
+				t.Finish(f)
 
 		
-		function SaveTheWorld
+		function EliminateArchons
 			opt norefcounts
 			require app["nil"].Yes
 
 			|| fs = Faststring()
 			for f in compiler.funclist
 				if f.CanNil
-					printline f.exportname
+					printline f.ExportName
 		
-			|| Rec = errorreceiver()
+			|| Rec = ErrorReceiver()
 			using rec
 				for f in compiler.funclist
-					t.KhalaiPurification(f)
+					.KhalaiPurification(f)
 					rec.ReturnErrors
 
 			SCFunction.currfunc = nil

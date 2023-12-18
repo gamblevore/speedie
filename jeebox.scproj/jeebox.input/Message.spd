@@ -37,7 +37,7 @@ class Message (RingTree)
 		.func		= other.func
 		.Obj		= other.obj
 		.indent		= other.indent
-		.flags		= other.flags
+		.flags		= other.flags ||| parser.using.flags // insertedness
 		.RangeLength= other.RangeLength
 		.Tag		= other.Tag
 
@@ -45,20 +45,20 @@ class Message (RingTree)
 	constructor
 		cpp_part ConstructorEmpty
 		.func = @arg
-		.Position	= parser.UsingPos
-		.flags		= parser.InsertedFlags
-		.RangeLength= parser.UsingLength
-		.tag		= parser.UsingTag // why not... 
+		.Position	= parser.Using.position
+		.flags		= parser.using.Flags
+		.RangeLength= parser.Using.Length
+		.tag		= parser.Using.Tag // why not... 
 
 			
 	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
 		cpp_part ConstructorNormal
 		.name		= name
 		.func		= func
-		.Position	= parser.UsingPos
-		.flags		= parser.InsertedFlags
-		.RangeLength= parser.UsingLength
-		.tag		= parser.UsingTag // why not... 
+		.Position	= parser.Using.Position
+		.flags		= parser.using.Flags
+		.RangeLength= parser.Using.Length
+		.tag		= parser.Using.Tag // why not... 
 
 	
 	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength=0)
@@ -69,8 +69,8 @@ class Message (RingTree)
 		.Position	= BytePos
 		.func		= func
 		.RangeLength= RangeLength
-		.flags		= parser.InsertedFlags // speedie's .AppMainFix likes this, for msg is inserted
-		.tag		= parser.UsingTag // why not...
+		.flags		= parser.using.Flags // speedie's .AppMainFix likes this, for msg is inserted
+		.tag		= parser.Using.Tag // why not...
 
 	
 	function SyxId (|int|)
@@ -100,7 +100,7 @@ class Message (RingTree)
 
 
 	function ClearPosition
-		.Position = parser.usingpos
+		.Position = parser.using.position
 
 
 ////////////////////////////////////////////////////////////////////////////////
