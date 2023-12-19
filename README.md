@@ -13,7 +13,7 @@
 # General Features #
 * Object-oriented programming model
 * Simple but powerful syntax.
-* A lot of syntactic sugar, while still being tasteful.
+* Modern simple language, slightly more expressive than Python.
 * Cross-platform. Create shell tools and GUI apps
 * Easy communication across multiple processes (IPC).
 * Has an awesome IDE, “Perry”.
