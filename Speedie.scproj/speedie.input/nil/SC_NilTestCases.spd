@@ -138,6 +138,17 @@ class NilTest
 			|| x = .Exists5
 				return x
 		return .Exists3(nil)
+		
+	function Exists8 (|bool|)
+		(self)~isreal
+		if 1
+			.v
+
+	function Fail8 (|bool|)
+		(self)~isoptional
+		if 1
+			borks
+			.v
 
 // pointers
 	function BorkedPtr (|&(niltest!)| xp0, |&niltest| xp2, |niltest| xp3)

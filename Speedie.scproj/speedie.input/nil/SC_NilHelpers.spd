@@ -99,11 +99,5 @@ function scdecl.NilStated (|bool|)
 
 
 function scfunction.CanNil (|bool|)
-	return !.IsMacro and !.IsWrapper and .isOK and .LimitTests
+	return !.IsMacro and !.IsWrapper and !.Badness
 
-
-function scfunction.LimitTests (|bool|)
-	opt norefcounts
-	|| c = .parent
-		if c.name contains "NilTest"
-			return true

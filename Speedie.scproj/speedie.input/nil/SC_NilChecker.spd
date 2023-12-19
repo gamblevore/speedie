@@ -29,6 +29,7 @@ extend_module NilTracker {
 		(asmtmp.kReturn):		Return
 		(asmtmp.kDebugger):		Debugger
 		(asmtmp.kFail):			Fail
+		(asmtmp.krejoin):		Rejoin
 		63: // for size also
 
 	
@@ -123,6 +124,10 @@ function Function (NilTrackerFn)
 	|| ret = fn.ReturnType
 		rz = ret.NilDeclared
 		check ((rz is stated) or !ret.Suffers) (msg, "Nil-decoration needed on function return.")
+
+
+function Rejoin (NilTrackerFn)
+	return jump(msg.first, Test) 
 
 
 function Return (NilTrackerFn)
@@ -336,7 +341,7 @@ function ArgOne (|message| s,  |nilcheckmode| t,  |nilstate| prev,  |nilstate|)
 	rz = .jump(s, T)
 	if prev is borked
 		error.autoprint = .oldprint
-		expect (!stderr.ok) (s, "Borking but no zerg-bugs found?")
+		expect (!stderr.ok) (s, "Borking but no zergs found?")
 		stderr.clear
 
 	
@@ -403,7 +408,7 @@ function Declaration (niltrackerfn)
 	// at least confusing to debug
 
 
-function SetRel (niltrackerfn)
+function SetRel (NilTrackerfn)
 	opt norefcounts
 	|| R = msg.last,	.Jump(R, 0)			// R is defined as coming first
 	|| L = msg.first,	.Jump(L, 0)
@@ -446,7 +451,6 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 
 function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 	opt norefcounts
-	"exists7".debug
 	|| Curr = sent.NilCurr
 	if curr == NilState.Realish
 		return curr
