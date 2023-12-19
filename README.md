@@ -7,12 +7,11 @@
 * `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 * `Released`: New Years Eve 2022  (31/12/2022)
 * `Platforms`: MacOSX Intel • Apple Silicon (ARM) • Linux (Ubuntu) • MS Windows (via [WSL](https://learn.microsoft.com/en-us/windows/wsl/install))
-* `Sponsor ❤️`: If you love my vision, [Please Sponsor Speedie](https://github.com/sponsors/gamblevore). I am struggling without sponsors. Its not going to be possible to complete without sponsors. I hate begging as I have pride, but there are so many people out there with money they could give. Donate however much you feel happy giving. ❤️
+* `Sponsor ❤️`: If you love my vision, [Please Sponsor Speedie](https://github.com/sponsors/gamblevore). Donate however much you feel happy giving. Or possibly... just hire me? ❤️
 
 
 # General Features #
 * Object-oriented programming model
-* Works natively with Jeebox... Probably the best way to learn how to use Jeebox.
 * Simple but powerful syntax.
 * A lot of syntactic sugar, while still being tasteful.
 * Cross-platform. Create shell tools and GUI apps
@@ -23,6 +22,7 @@
     * Making tools with few lines of code
     * Writing large well-structured programs
     * Create cross-platform GUI (or shell) apps
+* Works natively with Jeebox... Probably the best way to learn how to use Jeebox.
 * Not controlled by big-tech.
 
 Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D I did delete most of the rude comments before release, but still... dont expect "corporate behaviour".
