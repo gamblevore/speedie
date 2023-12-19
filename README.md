@@ -54,7 +54,8 @@ That said, there are challenges to overcome, that will probably mean a lot of pe
 
 * Adding a good debugger, VM and executable-format!
 
-Unfortunately I am one person who has created a very large piece of work. Extra developers are sorely wanted! Becoming a contributor could be a great way to add programming concepts to a new language.
+Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked.
+
 
 # Goals #
 I have a lot of long-term goals... Overall, I want to make programming a whole lot more fun. Here goes for a partial-list of goals!
