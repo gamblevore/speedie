@@ -525,7 +525,10 @@ class PerryIDE (Window)
 		if key is squote
 			return .ShowNextError
 		if key is r
-			ClickedDebug(.runButton)
+			if keys.Shift
+				PressingDebug(.runbutton)
+			  else
+				ClickedDebug(.runButton)
 			return true
 		if key is o
 			if keys.shift

@@ -118,5 +118,5 @@ helper @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
 	  elseif size endswith "gb"
 		mul = 1GB
 	  else
-		return size.int
-	return size[0, size.length - 2].int*mul
+		return size.float
+	return size[0, size.length - 2].float*mul
