@@ -210,9 +210,9 @@ struct MessagePosition
 	
 	|MemoryLayer--|     Layer
 	|int|               Position
-	|uint|              Tag
 	|uint|              Length
 	|MsgUIFlags|		Flags
+	|uint16|            Tag
 	
 	destructor
 		parser.using = *self
@@ -250,7 +250,7 @@ api ringtree.JDB3
 	if (Self)
 		printline self|message|.jdb_(3)
 	  else
-	    "(nil)"
+		"(nil)"
 
 
 function byte.CanPrintAsNormalChar (|bool|)
@@ -258,10 +258,10 @@ function byte.CanPrintAsNormalChar (|bool|)
 
 
 // remove tokenhandler_fp, its just parsehandler!
-prototype ParseHandler    (|int| Start, |message| Parent=nil, |Message|)
-prototype TokenHandler_fp (|int| Start, |message| parent=nil, |Object|)
-prototype fnIDGenerator   (|int| Start, |int| End, |syntax| f,   |String|)
-prototype SorterComparerMsg (|message| a, |message| b, |bool|)
+prototype ParseHandler			(|int| Start, |message| Parent=nil, |Message|)
+prototype TokenHandler_fp		(|int| Start, |message| parent=nil, |Object|)
+prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f,   |String|)
+prototype SorterComparerMsg		(|message| a, |message| b, |bool|)
 
 
 

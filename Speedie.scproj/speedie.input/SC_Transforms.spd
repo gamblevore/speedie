@@ -31,6 +31,7 @@ dispatch TemporalStatements (TranFunc)
 	doat					(Tran_DoAt)
 	visible					(Tran_Visible)
 	flow					(Tran_Flow)
+//	nil						(Tran_Nil)
 
 	print					(Tran_Print)
 	printline				(Tran_Print)

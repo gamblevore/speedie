@@ -34,7 +34,7 @@ struct LoopInfo
 		if !src.HasEscape and !msg.islast
 			msg.KinderRemoveAfter
 
-		ArchonPurger.decls(Ex ||| nilstate.either, "LoopEnd")
+		ArchonPurger.decls(Ex, "LoopEnd")
 		ArchonPurger.T.loops = *self
 	
 
@@ -88,18 +88,22 @@ struct ArchonPurger
 		|| N = p.value.NextCount
 		expect (N < 31)								(D, "Too many declarations")
 		(p)(n) = nd
+		target debug
+			ndb4()
 		
 		d.NilReg = N * d.Suffers
+		if !d.suffers and d.nildeclare != nilstate.real
+			
 		d.DReg.Reg = n // right? might as well do this at the same time?
 		d.NilAllocDepth = .currDepth
 		target debug
 			.dbg[n] = d
+		if !d.nilcurr // bug!
 		return nd
 	
 	function scdecl.NilCurr (|nilstate|)
 		if self Isnt Local
 			return .nildeclared &~ nilstate.stated
-		if !.nilreg
 		return (ArchonPurger.place.Value)[.NilReg]
 	
 	
@@ -119,7 +123,8 @@ struct ArchonPurger
 		opt norefcounts
 		require f.CanNil
 		SCFunction.CurrFunc = f
-		.rows[0] = nilstate.either // so we know that we have 1 register, used already
+		Phase = 1
+		.rows[0] = nilstate.Basic
 		.Line = .rows[0]
 		.rowend = .line + 63
 		.loops = nil
@@ -132,11 +137,13 @@ struct ArchonPurger
 		|| r = f.returntype
 			if !r.nilstated
 				r.nildeclared = 0 // build this up carefully.
-		target debug: if "": ArchonPurger.ndb(0)
+		target debug: if "": ArchonPurger.ndb4(0)
+		Phase = 2
 		return f.SourceArg
 
 	function Finish (|SCFunction| f)
 		opt norefcounts
+		phase = 3
 		|| r = f.ReturnType
 			r.nildeclared |= nilstate.stated
 		for a in f.Args
@@ -152,22 +159,22 @@ struct ArchonPurger
 	module
 		|ArchonPurger|	T
 		|byte|			OldPrint
-		|uint|			Count
+		|int|			Phase
 
 		function Place (|&NilRecorder|)
 			return (T.line)|&nilrecorder|
 		
 		function EndBlock (|nilrecord|)
-			return (.place)(nilstate.either)
+			return (.place)(nilstate.basic)
 	
-		function Decls (|NilRecord| R, |string|s)
-			.place.Value = R
+		function Decls (|NilRecord| R, |string| s)
+			.place.Value = R ||| nilstate.Basic
 
 		function DeclKill
 			t.set(0, "kill")
 		
 
-		function @ArchonPurger.KhalaiPurification (|scfunction| f, |int| a)
+		function KhalaiPurification (|scfunction| f, |int| a)
 			// it's like a protoss exterminating DA ZERGBUGZ 
 			opt norefcounts
 			require (a==1) == (f.cls ~= "niltest")
@@ -186,8 +193,9 @@ struct ArchonPurger
 				for f in compiler.funclist
 					.KhalaiPurification(f, 1)
 					rec.ReturnErrors
-				for f in compiler.funclist
+				for (f in compiler.funclist) (i)
 					.KhalaiPurification(f, 2)
+					"		Func: ${i+1} / ${compiler.funclist.length}"
 					rec.ReturnErrors
 
 			SCFunction.currfunc = nil

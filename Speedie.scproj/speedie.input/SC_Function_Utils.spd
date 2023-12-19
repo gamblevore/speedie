@@ -1,0 +1,144 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+
+prototype fnPreReader (|scfunction| self, |message| msg, |bool|)
+
+function scfunction.PreRead (|message| Arg)
+	opt norefcounts
+	for s in arg
+		if s == @tmp
+			|| fn = FuncPreReader[s.name]
+				(*fn)(self, s)
+				s.remove
+
+
+dispatch FuncPreReader (fnPreReader)
+	"disabled" : {
+		opt norefcounts
+		.isdisabled = true
+		.description = "Called a disabled function."
+		|| s = msg[@str, @nil]
+			.description = s.name
+	}
+	
+	"pragma" : {
+		opt norefcounts
+		|| f = msg[@thg]
+		if f ~= "inline"
+			.IsInline = true
+		  else
+			error f
+	}
+	
+	"opt" : {
+		opt norefcounts
+		|| f = msg[@thg]
+		if f ~= "NoRefCounts"
+			.NoRefCounts = true
+		  elseif f ~= "min"
+			|| Min = f.next(@num)
+				.minopt = min.int
+		  else
+			error f
+	}
+	
+	"nil" : {
+		opt norefcounts
+		|| f = msg[@thg]
+		if f ~= "self"
+			.IsNilSelf = true
+		  elseif f ~= "checker"
+			.isnilchecker = true
+		  else
+			error f
+	}
+	
+
+
+function SettingSelfProperty (|Message| Rel, |bool|)
+	// .bla = X
+	opt norefcounts
+	|| Dot = SettingAProperty(rel)
+		return (Dot.first IsThing "self")
+
+
+function SettingAProperty (|Message| Rel, |Message|)
+	// bla.bla = X
+	opt norefcounts
+	require (Rel.IssetRel)
+	|| it = Rel.first
+		if (it.DotType is Property)
+			return it
+
+
+function SettingMemory (|Message| Rel, |bool|)
+	// bla.bla = X
+	opt norefcounts
+	require Rel.IssetRel
+	|| f = Rel.first
+		|| d = f.DotType
+		if d // (d is Property or Memory) // only two that exist ?
+			return true
+
+
+function message.SelfKindaUse (|dotusetype|)
+	opt norefcounts
+	|| p = .parent
+	|| R = p.parent
+	if R.issetrel
+		return p.DotType
+
+
+function IsSelfOfSetter (|Message| curr, |Message|)
+	opt norefcounts
+	// .bla = X
+	|| dot = curr.Parent
+	if dot.IsFirst
+		|| P   = dot.Parent
+		if P.IsSetRel
+			Return P
+
+
+function string.UnicodeSafeName (|string|)
+	if .isascii
+		return self
+	
+	|| fs = faststring()
+	for s in self
+		if C_Letters[s]
+			fs <~ s
+		  else
+			fs <~ 'x'
+			fs.appendhex(s)
+	return fs
+
+
+
+constants
+	kASM			= 0x3F			// 1 to 0x3F is used by the ASM
+
+
+datatype Blockage (uint)
+	flags
+		Bits		= 0b111100000	// reserve 1 more bit
+	
+		Continue	= 0x0040
+		Exit		= 0x0080
+		Return		= 0x00C0
+	
+		Quit		= Return		// for now
+	
+	
+	syntax is (|blockage| b, |bool|)
+		return self == b
+
+	syntax isnt (|blockage| b, |bool|)
+		return self != b
+	
+	
+	

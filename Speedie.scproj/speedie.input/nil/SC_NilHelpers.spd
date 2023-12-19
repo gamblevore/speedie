@@ -101,3 +101,7 @@ function scdecl.NilStated (|bool|)
 function scfunction.CanNil (|bool|)
 	return !.IsMacro and !.IsWrapper and !.Badness
 
+function scdecl.WantOptional
+	if self and .Suffers
+		.nildeclared = nilstate.optional
+

@@ -75,7 +75,7 @@ constructor (|Message| node, |SCBase| parent, |bool| HasPtrs)
 	.Banned = .TestBanned
 	
 	|| T = SCDecl.new(self)
-	t.nildeclared = nilstate.realish + HasPtrs
+	t.nildeclared = (nilstate.real >> HasPtrs)
 	.TypeNormal = T
 	.TypeOptional = T.NilConstructor(NilState.optional * HasPtrs)
 	.TypeReal = T.NilConstructor(NilState.Real * HasPtrs)
@@ -87,9 +87,7 @@ constructor (|Message| node, |SCBase| parent, |bool| HasPtrs)
 	.SelfDecl = T
 	T.Name = "self"
 	(T is SelfImplicit)
-//	(T.nildeclared = nilstate.either) // wait? what if its not pointery?
 	(T isnt altered)
-	if ! .typenormal
 
 
 function IsSTDLib (|bool|)
@@ -485,11 +483,9 @@ function OverrideSyntax
 		expect (f.ReturnType)       (f.Source, "Need a return type.")
 		f.nextfunc.DontWantSameReturnType(f)
 		.Casts <~ f
-		if f.returntype isa "bool" // don't just compare to type-bool due to param decls copying.
+		if f.returntype.IsNormalBool
 			f.IsNilChecker = true
-			|| d = f.args.first
-				if d.suffers
-					d.nildeclared = nilstate.optional
+			f.args.first.WantOptional
 	
 	.HasCompareFunc = .FindSpecialFunc( "SyntaxCompare", true )
 	.HasEqualsFunc = .FindSpecialFunc( "SyntaxEquals", true )

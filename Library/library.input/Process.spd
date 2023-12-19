@@ -309,16 +309,16 @@ class Process (ShellStream)
 			0 //
 		  elseif .IsClosed
 			.other("sent something to a closed parent.")
-		  elseif (.ours.queued < 255) and .sendqueue
+		  elseif (.ours.queued < 255) and .SendQueue
 			.SendQueue.first(msg)
 			.ours.Queued++
 		  else
-			.other("hasnt read previous message. Cant send new!")
+			.Other("hasnt read previous message. Cant send new!")
 
 
 	function Flush
 		if (self != nil) and .sendqueue.hasany and .CanSend
-			.sendsub(nil)
+			.SendSub(nil)
 
 
 	syntax Compare (|date| Seconds, |bool| CompareDummy, |int|)

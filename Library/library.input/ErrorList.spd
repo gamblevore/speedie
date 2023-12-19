@@ -46,10 +46,10 @@ class ErrorReceiver
 		Return self and !.errorcount
 	
 	function HasProblems (|bool|) // totallyok
-		Return self and .errorcount or .problemcount
+		Return self and (.errorcount ||| .problemcount)
 	
 	function HasAnything (|bool|) // totallyok
-		Return self and .errorcount or .problemcount or .warncount		
+		Return self and (.errorcount ||| .problemcount ||| .warncount)
 	
 	syntax append (|Error| Err)
 		cpp_part NewItem

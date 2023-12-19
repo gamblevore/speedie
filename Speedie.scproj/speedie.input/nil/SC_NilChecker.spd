@@ -150,7 +150,7 @@ function Return (NilTrackerFn)
 	opt norefcounts
 	|| v = jump(msg.first, 0) & nilstate.either
 	
-	t.Loops.ExitRecord |= nilstate.either		// mark as exitting safely.
+	t.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
 	|| ret = scfunction.currfunc.ReturnType
 	|| RD = ret.nildeclared
@@ -414,10 +414,15 @@ function arel (Niltrackerfn)
 
 function Declaration (niltrackerfn)
 	opt norefcounts
-	|| rel = msg.last, || Value = rel.last, || Name = rel.first
-	|| J = .Jump(value, 0)
-	|| D = name.MadDecl
-	return T.Declare(D, J)
+	|| rel = msg.last
+	if rel == @thg
+		if rel.maddecl.isreg
+		return 0
+		
+	|| d = rel.first.MadDecl
+	if d.IsReg
+		|| J = .Jump(rel.last)
+		return T.Declare(D, J)
 
 	// its always a rel, right? so anyhow... we should just set the thing, dont call SetRel, its... ugly.
 	// at least confusing to debug
@@ -452,8 +457,7 @@ function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where)
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message| SentMsg,  |nilstate|) // setrel, relset
 	opt norefcounts
 	
-	if (recv is param)
-		expect (recv.NilStated) (recvmsg, Recv.PrmStateMsg)
+	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg)
 		
 	|| SN = sent.NilCurr
 	if (recv.NilDeclared == nilstate.real)
@@ -470,10 +474,9 @@ function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 	if curr == NilState.Realish
 		return curr
 	
-	if sent is param  and  Curr == nilstate.either
-		if !sent.NilStated
-			T.DeclareReal(sent)
-			return T.SetNilness(sent, NilState.real)
+	if (Curr == nilstate.either) and sent.IsUnknownParam
+		T.DeclareReal(sent)
+		return T.SetNilness(sent, NilState.real)
 
 	error (where, "Expected Real Object: " + where.render)
 	return nilstate.real
@@ -484,6 +487,7 @@ function scdecl.NeedsStated (|message| where, |nilstate|)
 	pragma inline
 	if (.nildeclared isnt stated)
 		.NilPrmFail
+
 
 function scdecl.IsUnknownParam (|bool|)
 	pragma inline

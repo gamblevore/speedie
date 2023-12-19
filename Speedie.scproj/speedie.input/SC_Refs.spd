@@ -97,8 +97,7 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 	
 	if type.hasstruct
 		|| fn = type.type.destructorfunc
-			if fn isnt DestructorNotFromLocalRefs
-				return kBasisDestructable
+			return kBasisDestructable
 		|| p = msg.niceparent
 		if p isbrel "&"
 			return kBasisTempStruct

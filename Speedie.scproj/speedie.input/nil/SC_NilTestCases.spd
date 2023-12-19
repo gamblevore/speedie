@@ -263,7 +263,7 @@ function ArchonPurger.Set (|NilRecord| Dest, |string| reason, |nilstate|)
 	
 
 
-function @ArchonPurger.ndb (|int| n=0)
+function @ArchonPurger.ndb4 (|int| n=0)
 	cpp_name ndb4
 	visible
 	(*T.line).ndb5(n)

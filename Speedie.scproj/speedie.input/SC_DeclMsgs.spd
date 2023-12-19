@@ -74,6 +74,8 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
 
 	for item in prms
 		item.CollectOneParam(self, AddToSpace, cls)
+	if .isnilself
+		.args.first.WantOptional
 
 
 function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
@@ -223,7 +225,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| c
 	if (Mode & 8) and NoOriginalDcl // functionbody
 		if sdcl isnt StayBorrowed
 			(Dcl Isnt Borrowed)
-		dcl.nildeclared = NilState.Either // might as well state it as optional? change after basic niltests work.
+		dcl.nildeclared = NilState.real >> dcl.suffers 
 	
 	if (nameitm in @Rel)
 		nameitm.Parent.obj = dcl

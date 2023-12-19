@@ -3,7 +3,6 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-
 datatype DotUseType (uint)
 	flags
 		|DotUseType|
@@ -27,7 +26,6 @@ datatype FunctionType (uint)
 		Alloc
 		NewStruct
 		TypeTest
-		DestructorNotFromLocalRefs
 		InitFunc
 		Recursive
 		EmptyConstructor
@@ -67,6 +65,7 @@ linkage
 |bool|					IsExternalLib
 |bool|					IsWrapper
 |bool|					IsNilChecker
+|bool|					IsNilSelf
 |bool|					IsInline
 |bool| 					IsKiller
 |bool|					IsDisabled
@@ -229,6 +228,7 @@ function FuncDecls
 	if (P==@List or @Bra or @prm)
 		p.Func = @prm
 		.CollectDeclsParams( P, space )
+			
 	FuncStats[.args.length min 11]++ 
 
 	if space and !.cls
@@ -1787,17 +1787,10 @@ function scfunction.Init_Sub (|message| node,  |scbase| name_space)
 	.ParseName( node )
 	using ErrorDelayer // not a terrible error but still an error 
 		.PreProcessExpects
-		.TranStrings 
-	.ReadDisabled(Arg)
-
-	// these should be collected using the main function dispatch table
-	.IsInline		= arg.DeprecatedClassOption("pragma", "inline")
-	.NoRefCounts	= arg.DeprecatedClassOption("opt",    "NoRefCounts")
-	.minopt			= arg.DeprecatedClassOption("opt",    "min")
+		.TranStrings
+	.PreRead(arg)
 	.SetBlindCasts(name_space)
-
-	if  Arg.DeprecatedClassOption("pragma", "DontDestructLocally")
-		is DestructorNotFromLocalRefs
+	
 	
 
 function NewFuncSub (|message| node, |scbase| name_space, |scfunction|)
@@ -1812,15 +1805,6 @@ function NewFunc (CollectFunc)
 	if name == @Dot
 		return SCClass.ExtendOneFunc(node, nil, ErrPlace)
 	return NewFuncSub(node, name_Space)	
-
-
-function SCFunction.ReadDisabled (|message| arg)
-	|| p = arg.find( @tmp, "disabled" )
-		p.Remove
-		.isdisabled = true
-		.description = "Called a disabled function."
-		|| s = p[@str, @nil]
-			.description = s.name
 
 
 function NewConstructor (CollectFunc)
@@ -1886,88 +1870,3 @@ function NeuLibrary (CollectFunc)
 }
 
 }
-
-
-
-function SettingSelfProperty (|Message| Rel, |bool|)
-	// .bla = X
-	opt norefcounts
-	|| Dot = SettingAProperty(rel)
-		return (Dot.first IsThing "self")
-
-
-function SettingAProperty (|Message| Rel, |Message|)
-	// bla.bla = X
-	opt norefcounts
-	require (Rel.IssetRel)
-	|| it = Rel.first
-		if (it.DotType is Property)
-			return it
-
-
-function SettingMemory (|Message| Rel, |bool|)
-	// bla.bla = X
-	opt norefcounts
-	require Rel.IssetRel
-	|| f = Rel.first
-		|| d = f.DotType
-		if d // (d is Property or Memory) // only two that exist ?
-			return true
-
-
-function message.SelfKindaUse (|dotusetype|)
-	opt norefcounts
-	|| p = .parent
-	|| R = p.parent
-	if R.issetrel
-		return p.DotType
-
-
-function IsSelfOfSetter (|Message| curr, |Message|)
-	opt norefcounts
-	// .bla = X
-	|| dot = curr.Parent
-	if dot.IsFirst
-		|| P   = dot.Parent
-		if P.IsSetRel
-			Return P
-
-
-function string.UnicodeSafeName (|string|)
-	if .isascii
-		return self
-	
-	|| fs = faststring()
-	for s in self
-		if C_Letters[s]
-			fs <~ s
-		  else
-			fs <~ 'x'
-			fs.appendhex(s)
-	return fs
-
-
-
-constants
-	kASM			= 0x3F			// 1 to 0x3F is used by the ASM
-
-
-datatype Blockage (uint)
-	flags
-		Bits		= 0b111100000	// reserve 1 more bit
-	
-		Continue	= 0x0040
-		Exit		= 0x0080
-		Return		= 0x00C0
-	
-		Quit		= Return		// for now
-	
-	
-	syntax is (|blockage| b, |bool|)
-		return self == b
-
-	syntax isnt (|blockage| b, |bool|)
-		return self != b
-	
-	
-	

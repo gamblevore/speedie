@@ -18,10 +18,10 @@ function FoundListKeys (GuiKeyEvent)
 
 function DebugArgsGotFocus (guiaction)
 	|| v = state == 1
-	require (self is visible) != v
-	(self is visible) = v
-	if self isa textview
-		.updatedebugargs(v)
+	if (self is visible) != v
+		(self is visible) = v
+		if self isa textview
+			.UpdateDebugArgs(v)
 
 
 function textview.UpdateDebugArgs (|bool| Visible=false)
@@ -31,7 +31,7 @@ function textview.UpdateDebugArgs (|bool| Visible=false)
 	if !.text
 		.text = defaultfiles.DebugArgs
 	if visible
-		.window.setinnerfocus(self)
+		.window.SetInnerFocus(self)
 	  else
 		.Save
 		

@@ -8,28 +8,26 @@ datatype NilState (byte) // Exec.scproj needs this here
 		Realish		= 2
 		Either		= 3
 		Stated		= 4
-		ActuallyNil = Nilish  + Stated				// nil|message|.position
-		Optional    = Either  + Stated				// || x = array[1000]
-		Real		= Realish + Stated				// || x = message(),  x.position
+		ActuallyNil = Nilish  + Stated
+		Optional    = Either  + Stated
+		Real		= Realish + Stated
+		Basic		= Realish
 		Borked		= 128
 	
 	function Worst (|nilstate| o, |nilstate|)
-		// nil + real = nil
-		// nil + anything = nil
 		rz = self ||| o
 		if rz is Nilish
 			rz = Nilish
 	
 	function RawName (|string|)
 		description "'Raw', cos does not include whether its stated or not." 
-		self &= either
-		if self == failed
-			return "lost"
-		if self == either
+		if self is either
 			return "optional"
-		if self == nilish
+		if self is nilish
 			return "nil"
-		return "real"
+		if self is realish
+			return "real"
+		return "lost"
 		
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type

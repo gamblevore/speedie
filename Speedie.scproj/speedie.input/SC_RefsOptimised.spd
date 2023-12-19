@@ -109,7 +109,7 @@ dispatch ClassLinkageTable (TranFunc)
 	visible				{} // (SCFunction.Tran_Visible)
 	ignore				{}
 	noearlyfree			{}
-	dontdestructlocally {}
+//	dontdestructlocally {}
 	wrapper				{} //if name_space.mustbe(scclass) : name_space.IsWrapper = true}
 	datatype
 		if name_space.mustbe(SCClass, node)

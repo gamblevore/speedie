@@ -109,8 +109,8 @@ class SCDecl (SCObject) {
 		.info = scdeclinfo.altered
 		
 	setter NilDeclared (|nilstate|)
-		//if .objectid == 14738290
-			//if value&1 != .nildeclare&1
+		//if .objectid == 48311576
+		//	if value&1 != .nildeclare&1
 		.nildeclare = value
 	
 	function NilDeclared (|nilstate|)
@@ -374,7 +374,7 @@ class SCDecl (SCObject) {
 	function IsStruct (|bool|)
 		disabled "Use .IsNormalStruct"
 
-	function IsSwappable (|bool|)
+	function IsReg (|bool|)
 		require !.C_Array
 		if .pointercount
 			return true
