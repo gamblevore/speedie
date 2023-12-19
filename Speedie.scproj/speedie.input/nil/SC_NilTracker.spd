@@ -17,7 +17,8 @@ struct LoopInfo
 	|bool| 				HasEscape
 	|int| 				Depth
 	
-	function Begin (|&niltracker| T, |bool| HasEscape, |Loopinfo|)
+	function Begin (|bool| HasEscape, |Loopinfo|)
+		|| T = &ArchonPurger.T
 		rz = *self
 		.ExitRecord = 0
 		.HasEscape = HasEscape
@@ -28,16 +29,16 @@ struct LoopInfo
 			.ExitRecord |= t.place.value
 	
 	function Finish (|message| msg)
-		|| src = &niltracker.T.loops
+		|| src = &ArchonPurger.T.loops
 		|| Ex = src.ExitRecord					#check (msg, "Loop never exits.")
 		if !src.HasEscape and !msg.islast
 			msg.KinderRemoveAfter
 
-		niltracker.decls(Ex ||| nilstate.either, "LoopEnd")
-		niltracker.T.loops = *self
+		ArchonPurger.decls(Ex ||| nilstate.either, "LoopEnd")
+		ArchonPurger.T.loops = *self
 	
 
-struct NilTracker
+struct ArchonPurger
 	linkage: cpp_part nil
 	|&NilRecord| 		Line
 	|&NilRecord| 		RowEnd
@@ -88,8 +89,7 @@ struct NilTracker
 		expect (N < 31)								(D, "Too many declarations")
 		(p)(n) = nd
 		
-		if d.Suffers
-			d.NilReg = N
+		d.NilReg = N * d.Suffers
 		d.DReg.Reg = n // right? might as well do this at the same time?
 		d.NilAllocDepth = .currDepth
 		target debug
@@ -99,12 +99,13 @@ struct NilTracker
 	function scdecl.NilCurr (|nilstate|)
 		if self Isnt Local
 			return .nildeclared &~ nilstate.stated
-		return (niltracker.place.Value)[.NilReg]
+		if !.nilreg
+		return (ArchonPurger.place.Value)[.NilReg]
 	
 	
 	function SetNilness (|SCDecl| d,  |NilState| New, |nilstate|)
 		pragma inline
-		if !d.nilreg // what?
+		if !d.nilreg or ((new&1) and (!d.suffers)) // WHA?
 		|| P = .place
 		(P)(d.NilReg) = new
 		
@@ -131,7 +132,7 @@ struct NilTracker
 		|| r = f.returntype
 			if !r.nilstated
 				r.nildeclared = 0 // build this up carefully.
-		target debug: if "": niltracker.ndb(0)
+		target debug: if "": ArchonPurger.ndb(0)
 		return f.SourceArg
 
 	function Finish (|SCFunction| f)
@@ -149,7 +150,7 @@ struct NilTracker
 		.place.Value = R
 
 	module
-		|NilTracker|	T
+		|ArchonPurger|	T
 		|byte|			OldPrint
 		|uint|			Count
 
@@ -166,29 +167,27 @@ struct NilTracker
 			t.set(0, "kill")
 		
 
-		function @NilTracker.KhalaiPurification (|scfunction| f)
+		function @ArchonPurger.KhalaiPurification (|scfunction| f, |int| a)
 			// it's like a protoss exterminating DA ZERGBUGZ 
 			opt norefcounts
+			require (a==1) == (f.cls ~= "niltest")
 			|| arg = t.Start(f)
-				|| i = ++.Count
-				printline " ----  ($i:$i:$i:$i:$i:$i:$i)  ---- "
 				Argument(arg)
 				t.Finish(f)
 
 		
-		function EliminateArchons
+		function PurgeArchons
 			opt norefcounts
 			require app["nil"].Yes
 
-			|| fs = Faststring()
-			for f in compiler.funclist
-				if f.CanNil
-					printline f.ExportName
-		
+			using options.NilStrength		
 			|| Rec = ErrorReceiver()
 			using rec
 				for f in compiler.funclist
-					.KhalaiPurification(f)
+					.KhalaiPurification(f, 1)
+					rec.ReturnErrors
+				for f in compiler.funclist
+					.KhalaiPurification(f, 2)
 					rec.ReturnErrors
 
 			SCFunction.currfunc = nil

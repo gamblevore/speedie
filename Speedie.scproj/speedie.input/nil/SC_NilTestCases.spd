@@ -1,6 +1,5 @@
 
 
-|byte| NilTestByte
 class NilTest
 	|int|		V
 	|string|	V2
@@ -93,26 +92,6 @@ class NilTest
 	function Exists3 (|niltest| p, |niltest|)
 		if p
 			return p
-		/*
-			so what should I do with this?
-			Should it be that the act of using something... "sets" it? like a quantum something???
-			
-			if self: abc()		// optional
-			|| x = self.abc		// real
-
-			// So what is self... in these cases??? could be either? unresolved?
-
-			return self ????
-			|| y = self ????
-			self = z
-		
-			The problem is that it can't be unresolved... we NEED IT. Or else things go wrong... all over!
-			
-			what if we set y to optional... then is self optional too? but later becomes real?
-			What if we just assume real? Eliminate unknownness? Real should be like the default anyhow.
-		*/
-		
-		
 		return self
 	
 	function Exists4 (|niltest|)
@@ -195,10 +174,10 @@ class NilTest
 
 	module
 		// assume can't be nil
+		|byte| NilTestByte
 		|niltest|  x1 = niltest()
 		|niltest|  x2 = x1.exists7
 		|string|   x3				// defaults
-		
 		|niltest?| n0 
 		|niltest|  n1
 	
@@ -207,7 +186,6 @@ class NilTest
 // the problem is init order... depends who gets to read it first...
 // can I solve this with initafter?
 // I COULD try to auto-solve it. Not sure, though.
-
 
 module NilTest2
 	function Hello
@@ -242,6 +220,8 @@ function scfunction.NilPrint (|string| header="")
 
 function scdecl.NilPrint (|string| reason="")
 	cpp_name ndb2
+	require .nilreg
+
 	|| fs = FastString()
 	fs <~ "    "
 	if reason
@@ -259,18 +239,18 @@ function scdecl.NilPrint (|string| reason="")
 	printline fs
 
 
-function nilstate.NilName (|faststring| fs, |bool| Expected)
+function NilState.NilName (|faststring| fs, |bool| Expected)
 	if (self is Stated) != Expected
-		if !Expected
-			fs <~ "stated "
-		  else
+		if Expected
 			fs <~ "unstated "
+		  else
+			fs <~ "stated "
 	fs <~ .Rawname
 	
 	
 
 target debug {
-function niltracker.Set (|NilRecord| Dest, |string| reason, |nilstate|)
+function ArchonPurger.Set (|NilRecord| Dest, |string| reason, |nilstate|)
 	pragma inline
 	dest &= .Realnesses
 	|| diff = dest xor *.line
@@ -283,27 +263,28 @@ function niltracker.Set (|NilRecord| Dest, |string| reason, |nilstate|)
 	
 
 
-function @niltracker.ndb (|int| n=0)
+function @ArchonPurger.ndb (|int| n=0)
 	cpp_name ndb4
 	visible
 	(*T.line).ndb5(n)
 
 
-function nilrecord.ndb5 (|int| n)
+function NilRecord.ndb5 (|int| n)
 	cpp_name ndb5
 	visible
 	n := .NextCount
 	for i in n
 		// item 0 is always nil... so whatever
-		|| D = niltracker.T.dbg[i]
+		|| D = ArchonPurger.T.dbg[i]
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"
 
 } else {
-	function niltracker.Set (|NilRecord| Dest, |string| reason, |nilstate|)
+	function ArchonPurger.Set (|NilRecord| Dest, |string| reason, |nilstate|)
 		pragma inline
 		dest &= .Realnesses
 		*.line = dest
 		return nilstate.real
 }
+

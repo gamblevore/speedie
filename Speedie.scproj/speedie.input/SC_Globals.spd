@@ -1305,10 +1305,10 @@ function TypeOfRel (ExprResolver) {
 		// check for dumb stuff like "func() = nil" or "abc|bool| = false"
 		require LC.ConstCheck(LN, RN, rc)
 	
-	if (comp == "or" or "and")
+	opch.obj = comp // shouldn't this be higher even?
+	
+	if (comp.isandor)
 		return Or_And_Expansion( LC, RC, exp, name_Space ) // expects both sides to be booleans, right?
-
-	opch.obj = comp
 
 
 	|| Custom = 0
@@ -1427,7 +1427,7 @@ function TypeOfList (ExprResolver)
 	
 	for (s in exp)
 		|| typ = typeofexpr(s, name_space) #require
-		|| N = typ.isnumeric
+		|| N = typ.IsNumeric
 		if !n
 			numeric = false
 		  elseif numeric
@@ -1445,9 +1445,9 @@ function TypeOfList (ExprResolver)
 			count += N
 			expect (count <= 4) (exp, "Over 4 items in vector.")
 
+
 	expect Numeric      (exp, "Expected numbers in this vector.")
 	expect (count >= 2) (exp, "Under 2 items in vector.")
-
 
 	FoundType := Allowtype
 	|| IsFloat = (Foundtype == 2)
@@ -1460,10 +1460,10 @@ function TypeOfList (ExprResolver)
 	|| name = ("vecmix", "ivecmix")(isfloat)
 	|| list = «prm »
 	exp.AppendAllInto(list)
-	exp <~ «thg name »
+	exp.msg(@thg,name)
 	exp <~ list
 	exp.func = @func
-	return typeofexpr(exp, name_space)
+	return TypeOfExpr(exp, name_space)
 
 
 function CopyDecl (|Message| CopyFrom, |string| name, |SCDecl|)

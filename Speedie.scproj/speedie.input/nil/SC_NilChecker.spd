@@ -1,6 +1,14 @@
 
 
-extend_module NilTracker {
+
+// "carray = {}" args get nilstate 0
+// "int" self-type seems shared all over. It gets altered somewhere. Shouldn't get altered anywhere!
+// seems declaring carrays/local-structs with registers/alloc-depths! They aren't register-based!
+// nilcurr being tested on int... which has no nilreg... so is it nil or not?
+	// perhaps the base-value should be real?
+
+
+extend_module ArchonPurger {
 	dispatch NilSyxes (NilTrackerFn)
 		@thg:	Thing
 		@bra:	Bracket
@@ -12,6 +20,7 @@ extend_module NilTracker {
 		@brel:	brel
 		@arel:	arel
 		@rel:	Rel
+		@list:	List
 		@decl:	Declaration
 		@arg:	Argument
 		@sheb:  Ignore
@@ -20,6 +29,7 @@ extend_module NilTracker {
 		@num:	JustReal
 		@char:	JustReal
 		63:     // for the size
+
 
 	dispatch NilTmps (niltrackerfn)
 		(asmtmp.kif):			If
@@ -56,11 +66,11 @@ function Jump (NilTrackerFn)
 	return (NilSyxes[msg.func])(msg, test)
 
 					
-function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
+function UseChildAsReal (|message| msg, |NilState|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| dcl = msg.MadDecl
-	if dcl is onmodule
-		return dcl.nildeclared
+	if dcl is OnModule
+		return dcl.NilDeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch)
 		if actual is nilish								// works e
@@ -69,13 +79,19 @@ function UseChildAsReal (|message| msg, |nilstate|) 	// a.b, *a, a[0], (a)()
 
 
 function Rel (NilTrackerFn)
-	opt norefcounts
 	if msg.TmpType is kSetVar							// x = y
 		return SetRel(msg, test)
 	return ProcessCondRel(msg, test)
 
 
-function PropertyOrAccess (niltrackerfn)
+function List (NilTrackerFn)
+	opt norefcounts
+	for s in msg
+		.jump(s)
+	return nilstate.Real
+
+
+function PropertyOrAccess (NilTrackerFn)
 	return .UseChildAsReal(msg)
 
 	
@@ -140,7 +156,7 @@ function Return (NilTrackerFn)
 	|| RD = ret.nildeclared
 	expect  !(RD == nilstate.real  and  v is nilish)   (msg, "Declaration does not allow returning " + v.rawname)
 	
-	ret.nildeclared = RD ||| v	// assume real, unless it becomes optional??
+	ret.NilDeclared = RD ||| v					// assume real, unless it becomes optional??
 	ret.NilPrint("return")
 
 
@@ -172,8 +188,7 @@ function While (NilTrackerFn)
 
 	require !CondTest.IsFalse and T.BranchEnter(msg)
 
-	debugat 0
-	|| W = T.loops.Begin(T, !condtest.IsTrue)
+	|| W = T.loops.Begin(!condtest.IsTrue)
 	WhileInner(cond)
 	if !condtest.IsTrue		// This is just for simple error detection. like macro errors. 
 		.jump(cond, NilCheckMode.softneg)

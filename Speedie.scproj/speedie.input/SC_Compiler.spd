@@ -165,9 +165,7 @@ function CompileAll (|bool|)
 	
 	require .Stage( "NilChecking" )
 	.Timer( "NilChecking" )
-
-	using options.NilStrength
-		Niltracker.EliminateArchons
+	ArchonPurger.PurgeArchons
 	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )

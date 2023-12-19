@@ -62,7 +62,7 @@ linkage
 |bool|						IsNotNumeric
 
 
-constructor (|Message| node, |SCBase| parent)
+constructor (|Message| node, |SCBase| parent, |bool| HasPtrs)
 	Compiler.stClasses++
 	
 	node.obj = self			// for autocomplete :)
@@ -74,7 +74,6 @@ constructor (|Message| node, |SCBase| parent)
 	.TypeInfo = DataTypeCode.UnusedType
 	.Banned = .TestBanned
 	
-	|| HasPtrs = node != "datatype"
 	|| T = SCDecl.new(self)
 	t.nildeclared = nilstate.realish + HasPtrs
 	.TypeNormal = T
@@ -88,8 +87,9 @@ constructor (|Message| node, |SCBase| parent)
 	.SelfDecl = T
 	T.Name = "self"
 	(T is SelfImplicit)
-	(T.nildeclared = nilstate.either)
+//	(T.nildeclared = nilstate.either) // wait? what if its not pointery?
 	(T isnt altered)
+	if ! .typenormal
 
 
 function IsSTDLib (|bool|)
@@ -485,9 +485,11 @@ function OverrideSyntax
 		expect (f.ReturnType)       (f.Source, "Need a return type.")
 		f.nextfunc.DontWantSameReturnType(f)
 		.Casts <~ f
-		if f.returntype isa "bool" // get rekt knoobs
+		if f.returntype isa "bool" // don't just compare to type-bool due to param decls copying.
 			f.IsNilChecker = true
-			f.args[0].nildeclared = nilstate.optional
+			|| d = f.args.first
+				if d.suffers
+					d.nildeclared = nilstate.optional
 	
 	.HasCompareFunc = .FindSpecialFunc( "SyntaxCompare", true )
 	.HasEqualsFunc = .FindSpecialFunc( "SyntaxEquals", true )
@@ -826,12 +828,12 @@ module
 
 
 
-	function NeuClassSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |SCClass|)
+	function NeuClassSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |bool| HasPtrs,  |SCClass|)
 		if !ForInterface
 			expect (parent==compiler.program) (errplace, "Internal Error")
 		
 		|| arg = node.GiveArg
-		|| cls = SCClass.new( node, parent )
+		|| cls = SCClass.new( node, parent, hasptrs )
 		
 		cls.IsRole = (node ~= "role")
 
@@ -860,7 +862,7 @@ module
 		
 	
 	function NeuClass (CollectFunc)
-		|| it = .NeuClassSub(node, name_space, ErrPlace, nil)
+		|| it = .NeuClassSub(node, name_space, ErrPlace, nil, true)
 			it.ClassCollect
 			return it.modul
 
@@ -876,7 +878,7 @@ module
 		scbase.CurrVisibility = false
 		node.givearg
 		
-		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface )
+		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface, false )
 			it.IsDataType = true
 			it.ClassCollect
 		
@@ -892,7 +894,7 @@ module
 	
 
 	function NewStruct (CollectFunc)
-		|| it = .NeuClassSub(node, name_space, errplace, nil)
+		|| it = .NeuClassSub(node, name_space, errplace, nil, false)
 			it.IsStruct = true
 			it.classcollect
 			return it.modul
