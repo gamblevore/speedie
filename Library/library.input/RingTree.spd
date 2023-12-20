@@ -98,7 +98,12 @@ class RingTree (Saveable)
 		  else
 			p <~ Value
 	
-	
+	function Across (||)
+		opt norefcounts
+		|| n = .next
+			return n
+		return .parent.next.first
+		
 	function FlatLast (||)
 		opt norefcounts
 		rz = self
