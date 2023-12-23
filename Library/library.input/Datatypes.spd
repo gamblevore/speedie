@@ -516,6 +516,11 @@ datatype float
 
 	operator pow (|float| other, |float|)
 		cpp_wrapper (powf)
+			
+	operator ↑↑ (|int| n, |float|)
+		rz = self
+		for n
+			rz = self pow rz
 
 	operator modf (|float| F, |float|)
 		cpp_wrapper (fmodf)

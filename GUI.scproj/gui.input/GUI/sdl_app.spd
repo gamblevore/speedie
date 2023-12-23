@@ -135,7 +135,7 @@ module SDLApp
 
 
 	function Title (|string|)
-		return SDL_GetWindowTitle(.screenwindow).render
+		return $SDL_GetWindowTitle(.screenwindow)
 
 
 	function Title (assigns:|string|)
@@ -345,7 +345,7 @@ module SDLApp
 			printline app.conf("version")
 			app.quit
 		if app.yes("created")
-			printline __now__|date|.render
+			printline $__now__|date|
 			app.quit
 	
 	function NiceAppName (|string|)
@@ -537,7 +537,7 @@ module SDLApp
 		img.drawcircle(sigh, ¥.DragAndDrop, 7.0)
 		
 		img.controlclip = sigh
-		|| t	= s.length.render 
+		|| t	= $s.length
 		|| x	= t.length*font.width
 		|| h	= font.height
 		|| P2	= (x, h)/2
@@ -1158,10 +1158,6 @@ module SDLApp
 
 function guicontrol.Description (|string|)
 	return .tooltip // :)
-
-
-//function timelog (|string| s)
-//	printline sdlapp.OpenedFirst.ago.render + ": " + s + "\n"
 	
 	
 	

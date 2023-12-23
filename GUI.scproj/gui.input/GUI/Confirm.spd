@@ -10,7 +10,7 @@ function errorreceiver.Beep (|bool|)
 	if .ok
 		return true
 	|| err = .LastError()
-	|| s = (err.render, "Unknown error occurred.")(err)
+	|| s = ($err, "Unknown error occurred.")(err)
 	app.beep(s)
 
 

@@ -88,11 +88,11 @@ class ColorScheme
 		fs.FieldEnter("syx")
 		for i in @max|int|
 			|| obj = i|syntax|.obj
-				fs.field( obj.name, .SyxCol[i].render ) 
+				fs.field( obj.name, $.SyxCol[i] ) 
 		fs.indent--
 		
-		fs.field( "root", .roottmp.render ) 
-		fs.field( "none", .none.render ) 
+		fs.field( "root", $.RootTmp ) 
+		fs.field( "none", $.None ) 
 
 
 	syntax access (|int| i, assigns: |vec3|)

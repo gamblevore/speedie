@@ -76,10 +76,11 @@ class File (String)
 		disabled "Do you mean the file's size or the file's path length?" 
 	
 	function Size (|int64|) // actually ints are less buggy. Like "|| NewSize = oldsize-1" with uint is bad.
+		description "Return the file-size."
 		cpp_wrapper JB_File_Size
 
 	function Length (assigns:|int|)	
-		disabled "Use file.size"
+		disabled "Use .size"
 
 	function Size (assigns:|int|N)
 		cpp_wrapper JB_File_SizeSet

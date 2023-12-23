@@ -491,7 +491,7 @@ function RightClickErrorList (GUIListEvent)
 function perry.FindElseWhere (|perryide| ignore, |string| find, |byte| FindID)
 	for w in perry.OpenProj
 		if (w != ignore) and w.BatchPhind(find, FindID)
-			if "$find not found here, but was found in '${w.name}'.\n\nTake a look?".confirm
+			if "\"$find\" not found here, but was found in '${w.name}'.\n\nTake a look?".confirm
 				w.showide
 				w.ShowFind
 			return

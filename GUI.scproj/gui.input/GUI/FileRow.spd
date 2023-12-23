@@ -318,7 +318,7 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 			|| ext = n.ext
 			if isdir
 				p = p.PathDir
-			|| icon = filerow.icon(p, types).render
+			|| icon = $filerow.icon(p, types)
 			n = icon + " " + n
 			|| r = filerow(p, n, (".nothing", "")(isdir))
 			self <~ r

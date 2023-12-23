@@ -1,6 +1,6 @@
 
 	
-main // main {
+main // main { 
 	target debug: "*** target debug ***"
 	SDLApp.init
 	Perry.Startup

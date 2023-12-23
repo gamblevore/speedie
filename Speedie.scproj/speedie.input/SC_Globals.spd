@@ -153,6 +153,25 @@ function Message.ParentForAddress (|Message|)
 		p = p.parent
 
 
+function TranRender (|message| exp, |scbase| name_space, |scobject|)
+	exp.become(@dot, "Render")
+	exp.msg(@prm)
+	return TypeOfExpr(exp, name_space)
+	// $i --> i.render
+
+
+function TranNegate (|message| f, |scbase| name_space, |scobject|)
+	|| cond = ExpandToBool( F, name_space )$
+	|| d = cond.obj
+	if (d isa scdecl)
+		if d.IsConstOf(Falsebool)
+			return truebool
+		if d.IsConstOf(Truebool)
+			return falsebool
+	
+	Return TypeBool.TypeNormal // it's a bool anyhow
+	
+
 function TypeOfBRel (ExprResolver)
 	|| name = exp.name
 	|| F = exp.first									#require
@@ -171,19 +190,14 @@ function TypeOfBRel (ExprResolver)
 		return Subtype.GetAddress
 		
 	  elseif name == "!"
-		|| cond = ExpandToBool( F, name_space )$
-		|| d = cond.obj
-		if (d isa scdecl)
-			if d.IsConstOf(Falsebool)
-				return truebool
-			if d.IsConstOf(Truebool)
-				return falsebool
-		
-		Return TypeBool.TypeNormal // it's a bool anyhow
+		return TranNegate(f, name_space)
 		
 	  elseif (name == kBitNot or "~")
 		expect (subtype.IsInteger) (exp, "Expected an integer.") 
 		Return subtype
+
+	  elseif (name == "$")
+		return TranRender(exp, name_space)
 		
 	SCFunction.Tran_AfterRel( exp, name_space, side )
 	Return SubType

@@ -116,9 +116,9 @@ struct ControlSize
 
 	function ExplainBound (|ivec4| rz, |ivec4| rz2)
 		if rz != rz2
-			print rz.render
+			print $rz
 			print " bounded to "
-			printline rz2.render
+			printline $rz2
 
 
 function @ivec4.EdgeName (|int| i, |string|)

@@ -1,0 +1,14 @@
+
+
+// Mathematical Power Towers
+// not sure they have any real use :)
+http://youtube.com/watch?v=elQVZLLiod4
+
+main
+	for j in 1 to 6
+		|| sq = (j/2.0).Sqrt
+		if sq != 1.0
+			for i in 9
+				"$sq ↑↑ $i --> ${sq ↑↑ i}"
+
+			

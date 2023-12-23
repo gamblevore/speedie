@@ -54,6 +54,6 @@ class ShaderToy (window)
 	behaviour FrameUpdate
 		|| m = .moved
 			.cam += m * 0.2
-			printline "cam: " + .cam.Render
+			printline "cam: " + $.cam
 		SDLApp.touch
 

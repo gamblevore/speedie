@@ -57,6 +57,15 @@ dispatch FuncPreReader (fnPreReader)
 		  else
 			error f
 	}
+
+	"description" : {
+		|| str = msg[@str]
+			if .isdisabled
+				error (msg, "Already disabled")
+			  else
+				check !.description (msg, "Can’t have multiple descriptions.")
+				.Description = str.name
+	}
 	
 
 
