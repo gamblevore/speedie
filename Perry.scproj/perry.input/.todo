@@ -11,6 +11,7 @@
 						 Perry Do later
 
 * "but was found elsewhere" could look outside of mini-search... before going to other projects
+* Move To Trash shouldn't be allowed for perry.input? Also for extras it should just be renamed to "Forget Folder"
 * Multiple fwd/back funcs per-file would be nice, at least from right-click jumps, cmd-L and other jumps
 	* having a func-name per-point is nice
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.

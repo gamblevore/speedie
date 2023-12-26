@@ -214,7 +214,6 @@ function CheckNotBadName
 		if (W > 1) and .name.isswizzle(w)
 			error (.source, "Can't use a swizzle-name (xyzw/rgba) on a vector-type!")
 
-
 function FuncDecls 
 	|| P = .Source.second		#require
 	|| fc = p.first
