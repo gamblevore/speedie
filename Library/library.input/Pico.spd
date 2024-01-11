@@ -1,0 +1,77 @@
+
+
+prototype PicoThreadFn (|&PicoComms| Comms, |_voidptr|)
+
+
+struct PicoMessage
+	linkage: wrapper, cpp_part Pico
+	|int|		Length
+	|&char|		Data
+	
+	syntax cast (|bool|)
+		return .data
+	
+	function @string.FromPico (|picomessage| M, |string|)
+		return string.own(m.data|&byte|, M.length)
+	
+	module
+		function From (|string| s, |PicoMessage|)
+			cpp_Part FromStr
+			rz.length = s.length
+			rz.data = s.addr|&char|
+		function From (|faststring| fs, |PicoMessage|)
+			cpp_Part FromFS
+			rz.length = fs.length
+			rz.data = fs.ResultPtr|&char|
+
+
+struct PicoComms
+	linkage: wrapper, cpp_part Pico
+
+	function CreateChild (|&picocomms|)
+		cpp_wrapper PicoMsgChild
+
+	function Destroy
+		cpp_wrapper PicoMsgDestroy
+
+	function StartFork (|PID_Int|)
+		cpp_wrapper PicoMsgFork
+
+	function StartThread (|PicoThreadFn| fn, |PID_Int|)
+		cpp_wrapper PicoMsgThread
+
+	function Send (|string| str, |bool| Wait=false, |bool|)
+		cpp_part SendString
+		return .send(picomessage.From(Str), wait)
+
+	function Send (|faststring| fs, |bool| Wait=false, |bool|)
+		cpp_part SendFS
+		return .send(picomessage.From(fs), wait)
+		
+	function Send (|PicoMessage| msg, |bool| Wait=false, |bool|)
+		cpp_wrapper PicoMsgSend
+
+	function LastRead (|Date|)
+		cpp_wrapper PicoMsgLastRead
+
+	helper __Get (|float| T=0.0, |PicoMessage|)
+		cpp_wrapper PicoMsgGet
+
+	function Get (|float| T=0.0, |string|)
+		return string.FromPico(.__get(T))
+			
+		
+
+	function Close 
+		cpp_wrapper PicoMsgClose
+
+	function Error (|ErrorInt|)
+		cpp_wrapper PicoMsgErr
+
+	function StillSending (|bool|)
+		cpp_wrapper PicoMsgStillSending
+
+	module
+		function New (|&picocomms|)
+			cpp_wrapper PicoMsgCreate
+	
