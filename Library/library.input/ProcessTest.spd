@@ -10,7 +10,7 @@ module ProcessTest
 		|bool|	TimeOut     = Variant&4
 		|bool|	Slow        = Variant&8
 		
-		if app.HasParent
+		if pico.HasParent
 			using "child process"
 				if DyingChild
 					.ChildDieTest(timeout)

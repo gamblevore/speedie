@@ -7,13 +7,11 @@ class SpdProcess (Process)
 	|jbin|						Writer
 	|&pico|						Pico					
 	|date|						LastSend
-	|SpdMainFn|				SubProcess
+	|SpdMainFn|					SubProcess
 	|[string]|					Params // move this to process?
 	|int| 						DeathLimit
 	|int|						DiedCount
 	|bool|						IsParent
-
-//	#define PicoDesiredThreadCount	2
 
 	constructor	(|string| path, |[string]| params=nil,  |SpdMainFn| fn=nil,  |bool| CaptureStdOut=false)
 		super.constructor(path)
@@ -30,11 +28,8 @@ class SpdProcess (Process)
 		if !.IsParent
 			.pico.Completeexec
 			app.BelongsToParent // should die if the parent dies!
-			if !pico.HasParent
-				"NoPicoParent!"
-				debugger
-			
 
+			
 	destructor
 		.pico.destroy
 
@@ -196,11 +191,11 @@ class SpdProcess (Process)
 
 	module
 		InitOwner()
-		|SpdProcess|					Parent = nil
+		|SpdProcess| Parent = nil
 		
 		function InitOwner
-			if pico.hasparent
-				.parent = SpdProcess("",  nil, nil, false)
+			if pico.HasParent
+				.parent = SpdProcess("", nil, nil, false)
 		
 		target !minilib {
 		helper TellParentIDied
@@ -255,7 +250,8 @@ prototype fn_pth_wrap (|SpdProcess| Proc, |int|)
 
 
 prototype SpdDeathActionFn
-prototype SpdMainFn	(|&cstring| args, |int| Mode, |errorint|)
+
+prototype SpdMainFn	(|&cstring| args, |int| Mode, |ErrorInt|)
 	function RunThreaded (|[string]| R = [],  |SpdProcess|)
 		debug_require r!=nil
 		rz = SpdProcess("", r, self)
@@ -276,9 +272,6 @@ extend_module app
 		cpp_wrapper JB_App__BelongsToParent		
 	helper SyntaxAppend (|SpdDeathActionFn| handler)
 		cpp_Wrapper JB_App__AtExit
-	
-	helper HasParent (|bool|)
-		debugger
 
 	function StartChild (|[string]| r, |SpdProcess|)
 		return SpdProcess.Child(.path, r)

@@ -83,8 +83,6 @@ typedef uint FlowControlStopper;
 
 typedef uint FunctionType;
 
-typedef u16 IPCState;
-
 typedef int Ind;
 
 typedef ivec2 IntRange;
@@ -188,8 +186,6 @@ struct FloatRange;
 struct HollyPlanter;
 
 struct HollyPotter;
-
-struct IPCMessage;
 
 struct IR;
 
@@ -319,6 +315,8 @@ struct MaterialsLol_Behaviour;
 
 struct FastString_Behaviour;
 
+struct Process_Behaviour;
+
 struct RingTree_Behaviour;
 
 struct SCBase_Behaviour;
@@ -328,8 +326,6 @@ struct SCDecl_Behaviour;
 struct SCIterator_Behaviour;
 
 struct SavingTest_Behaviour;
-
-struct ShellStream_Behaviour;
 
 struct StringShared_Behaviour;
 
@@ -349,8 +345,6 @@ struct MessageID_Behaviour;
 
 struct Message_Behaviour;
 
-struct Process_Behaviour;
-
 struct SCArg_Behaviour;
 
 struct SCBehaviour_Behaviour;
@@ -366,6 +360,8 @@ struct SCModule_Behaviour;
 struct SaverClassInfo_Behaviour;
 
 struct SimpleGraph_Behaviour;
+
+struct SpdProcess_Behaviour;
 
 struct Error_Behaviour;
 
@@ -457,8 +453,6 @@ struct Message;
 
 struct MessageID;
 
-struct Process;
-
 struct SCArg;
 
 struct SCBehaviour;
@@ -474,6 +468,8 @@ struct SCModule;
 struct SaverClassInfo;
 
 struct SimpleGraph;
+
+struct SpdProcess;
 
 struct JB_Error;
 
@@ -498,6 +494,8 @@ typedef void (*SaverLoadClass)(JB_Class* cls, char* Data);
 typedef bool (*ShellOption)(JB_String* Name, JB_String* Value, FastString* purpose);
 
 typedef bool (*SorterComparer)(JB_Object* a, JB_Object* b);
+
+typedef ErrorInt (*SpdMainFn)(_cstring* args, int Mode);
 
 typedef JB_Object* (*TokenHandler_fp)(int Start, Message* parent);
 
@@ -528,8 +526,6 @@ typedef bool (*fnPreReader)(SCFunction* self, Message* msg);
 typedef AsmReg (*fn_OpASM)(ASMFuncState* self, AsmReg dest, AsmReg L, AsmReg R, Message* dbg);
 
 typedef AsmReg (*fn_asm)(ASMFuncState* self, Message* exp, AsmReg Reg);
-
-typedef ErrorInt (*fn_subprocess)(_cstring* args, int Mode);
 
 typedef void (*fpDestructor)(JB_Object* self);
 
@@ -584,15 +580,6 @@ struct FastBuff {
 	byte* End;
 	JB_String* ReadFrom;
 	uint ErrorReported;
-};
-
-struct IPCMessage {
-	uint DataLength;
-	uint SendID;
-	uint ReadID;
-	IPCState State;
-	byte Queued;
-	byte Special;
 };
 
 struct IR {
@@ -1004,6 +991,9 @@ JBClass ( MaterialsLol , Selector ,
 	JB_String* oof;
 );
 
+struct Process_Behaviour: ProcessOwner_Behaviour {
+};
+
 struct RingTree_Behaviour: Saveable_Behaviour {
 };
 
@@ -1065,9 +1055,6 @@ JBClass ( SavingTest , Saveable ,
 	int ABC[1];
 );
 
-struct ShellStream_Behaviour: ProcessOwner_Behaviour {
-};
-
 struct StringZeroTerminated_Behaviour: String_Behaviour {
 };
 
@@ -1091,30 +1078,6 @@ JBClass ( Message , RingTree ,
 	u16 RangeLength;
 	MsgUIFlags Flags;
 	u16 Tag;
-);
-
-struct Process_Behaviour: ShellStream_Behaviour {
-};
-
-JBClass ( Process , ShellStream , 
-	JB_File* Talker;
-	FastString* Writer;
-	JB_String* Name;
-	byte* Orig;
-	IPCMessage* Ours;
-	IPCMessage* Theirs;
-	Date LastSend;
-	fn_subprocess SubProcess;
-	Array* Params;
-	JB_File* LogFile;
-	RingTree* SendQueue;
-	IPCMessage Dummy;
-	int SizeOfOrig;
-	int Offset;
-	int DeathLimit;
-	int DiedCount;
-	bool IsServer;
-	byte CanPrint;
 );
 
 struct SCArg_Behaviour: SCBase_Behaviour {
@@ -1270,6 +1233,20 @@ JBClass ( SaverClassInfo , Array ,
 	char* Data;
 );
 
+struct SpdProcess_Behaviour: Process_Behaviour {
+};
+
+JBClass ( SpdProcess , ShellStream , 
+	FastString* Writer;
+	PicoComms* Pico;
+	Date LastSend;
+	SpdMainFn SubProcess;
+	Array* Params;
+	int DeathLimit;
+	int DiedCount;
+	bool IsParent;
+);
+
 struct Error_Behaviour: Message_Behaviour {
 };
 
@@ -1366,13 +1343,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1914])
+#define kJB__ErrorColors_bold (JB_LUB[1883])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1915])
-#define kJB__ErrorColors_good (JB_LUB[1916])
-#define kJB__ErrorColors_normal (JB_LUB[1917])
-#define kJB__ErrorColors_underline (JB_LUB[1916])
-#define kJB__ErrorColors_warn (JB_LUB[1918])
+#define kJB__ErrorColors_error (JB_LUB[1884])
+#define kJB__ErrorColors_good (JB_LUB[1885])
+#define kJB__ErrorColors_normal (JB_LUB[1886])
+#define kJB__ErrorColors_underline (JB_LUB[1885])
+#define kJB__ErrorColors_warn (JB_LUB[1887])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1386,7 +1363,7 @@ extern JB_String* SC__AC_AnonText;
 extern bool SC__AC_CompileUpToDate;
 extern Macro* SC__AC_func_tmp_src;
 extern int SC__AC_max_total;
-extern Process* SC__AC_Perry;
+extern SpdProcess* SC__AC_Perry;
 extern byte SC__AC_ShouldEnter;
 extern int SC__AC_total;
 extern u16 JB__API_NilHappened;
@@ -1537,7 +1514,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1919])
+#define kJB_codesign_native (JB_LUB[1888])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1551,10 +1528,10 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_ActualTypecasts ((~(128 | 32)))
 #define kJB_AddressOfMatch (3 << 22)
 #define kJB_ASM (63)
-#define kJB_BitAnd (JB_LUB[353])
-#define kJB_BitNot (JB_LUB[607])
-#define kJB_BitOr (JB_LUB[1333])
-#define kJB_BitXor (JB_LUB[1920])
+#define kJB_BitAnd (JB_LUB[351])
+#define kJB_BitNot (JB_LUB[604])
+#define kJB_BitOr (JB_LUB[1330])
+#define kJB_BitXor (JB_LUB[1889])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_DontSaveProperty (0)
 #define kJB_LossyCastedMatch (7 << 22)
@@ -1569,7 +1546,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_SaveProperty (1)
 #define kJB_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1921])
+#define kJB_SaverStart1 (JB_LUB[1890])
 #define kJB_SelfDebug (2)
 #define kJB_SelfReplace (1)
 #define kJB_SimpleMatch (1 << 22)
@@ -1645,7 +1622,6 @@ extern Syntax JB_SyxXML;
 extern Syntax JB_SyxXPI;
 extern Syntax JB_SyxXTxt;
 extern Syntax JB_SyxYoda;
-extern Date JB_TimeDelayBug;
 extern SCDecl* JB_TrueBool;
 extern SCClass* JB_TypeArray;
 extern SCClass* JB_TypeBool;
@@ -1877,14 +1853,6 @@ extern Array* JB__ErrorSeverity_names;
 #define kSC__FunctionType_reffer (16)
 #define kSC__FunctionType_typetest (256)
 #define kSC__FunctionType_virtualcaller (4096)
-#define kJB__IPCState_closed (4664)
-#define kJB__IPCState_connected (4662)
-#define kJB__IPCState_connecting (4661)
-#define kJB__IPCState_crashed (4666)
-#define kJB__IPCState_dead (4665)
-#define kJB__IPCState_invalid (4667)
-#define kJB__IPCState_timedout (4663)
-#define kJB__IPCState_Waiting (4660)
 #define kJB__MsgParseFlags_BreakPoint (32768)
 #define kJB__MsgParseFlags_Inserted (8192)
 #define kJB__MsgParseFlags_LargestFlag (0)
@@ -2178,11 +2146,6 @@ extern bool SC__Base_CurrVisibility;
 #define kSC__Base_PurposeVarDecl (4)
 extern SCIterator* SC__Iter_c_array;
 extern SCIterator* SC__Iter_pointer;
-extern byte JB__Proc_ClosePipesInstalled;
-extern int JB__Proc_IncID;
-extern Process* JB__Proc_Owner_;
-#define kJB__Proc_PrintAfterSomeTime (2)
-extern byte JB__Proc_SpecialState;
 #define kSC__Beh_BehaviourProto (2)
 #define kSC__Beh_BehaviourProtoRequired (6)
 #define kSC__Beh_BehaviourTable (1)
@@ -2193,6 +2156,7 @@ extern int SC__Func_DisabledPoints;
 extern int SC__Func_FuncStats[12];
 extern int SC__Func_OnceCount;
 extern Dictionary* SC__Func_TemporalStatements;
+extern SpdProcess* JB__Proc_Parent;
 extern byte JB__Err_AutoPrint;
 extern Array* JB__Err_CurrSource;
 extern bool JB__Err_KeepStackTrace;
@@ -2202,10 +2166,6 @@ extern bool JB__Err_KeepStackTrace;
 
 
 // App
-JB_String* JB_App__AppName();
-
-JB_String* JB_App__AppPath();
-
 JB_String* JB_App__Conf(JB_String* name);
 
 void JB_App__ConfigureSet(JB_String* Value);
@@ -2588,8 +2548,6 @@ bool SC_FB__AppOptions_variant(JB_String* Name, JB_String* Value, FastString* pu
 
 bool SC_FB__AppOptions_warn(JB_String* Name, JB_String* Value, FastString* purpose);
 
-bool SC_FB__AppTalk(JB_String* Name, JB_String* Value, FastString* purpose);
-
 bool SC_FB__AppTransCompile(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppVersionNumber(JB_String* Name, JB_String* Value, FastString* purpose);
@@ -2815,10 +2773,6 @@ bool JB_Platform__CPU_Spd();
 int JB_Platform__Init_();
 
 int JB_Platform__InitCode_();
-
-void JB_Platform__Log(JB_String* s);
-
-void JB_Platform__OpenLog(JB_String* name);
 
 int JB_Platform__PointerBytes();
 
@@ -3814,8 +3768,6 @@ int JB_zalgo__InitCode_();
 
 
 // bool
-int JB_bool_OperatorSign(bool self, int i);
-
 JB_String* JB_bool_Render0(bool self);
 
 
@@ -4149,11 +4101,6 @@ void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper self);
 // FunctionType
 
 
-// IPCState
-inline bool JB_IPCState_SyntaxCast(IPCState self);
-
-
-
 // Ind
 inline bool JB_Ind_SyntaxCast(Ind self);
 
@@ -4221,8 +4168,6 @@ NilState SC_NilState_Worst(NilState self, NilState o);
 
 
 // PID_Int
-inline bool JB_PID_Int_SyntaxCast(PID_Int self);
-
 
 
 // SCBaseInfo
@@ -4517,6 +4462,9 @@ AsmReg SC_ASMtmp__While(ASMFuncState* self, Message* exp, AsmReg Reg);
 // ParseHandler
 
 
+// PicoThreadFn
+
+
 // SaverLoadClass
 
 
@@ -4530,6 +4478,12 @@ AsmReg SC_ASMtmp__While(ASMFuncState* self, Message* exp, AsmReg Reg);
 
 
 // SorterComparerMsg
+
+
+// SpdDeathActionFn
+
+
+// SpdMainFn
 
 
 // TokenHandler_fp
@@ -4574,9 +4528,6 @@ AsmReg SC_ASMtmp__While(ASMFuncState* self, Message* exp, AsmReg Reg);
 // fn_OpASM
 
 
-// fn_app_DeathAction
-
-
 // fn_asm
 AsmReg SC_fn_asm__Default(ASMFuncState* self, Message* exp, AsmReg Reg);
 
@@ -4585,9 +4536,6 @@ void SC_fn_asm__InitTable();
 
 
 // fn_pth_wrap
-
-
-// fn_subprocess
 
 
 // fpDestructor
@@ -4762,15 +4710,6 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* self);
 // JB_HollyPotter
 
 
-// JB_IPCMessage
-byte* JB_IPCM_Data(IPCMessage* self);
-
-bool JB_IPCM_IsClosed(IPCMessage* self);
-
-bool JB_IPCM_IsOpen(IPCMessage* self);
-
-
-
 // JB_IR
 void SC_IR_AddRegParam(IR* self, Message* src, uint write);
 
@@ -4925,6 +4864,21 @@ ObjectSaver JB_Saver__New();
 
 
 // JB_ParserLineAndIndent
+
+
+// JB_Pico
+JB_String* JB_Pico_Get(PicoComms* self, float T);
+
+bool JB_Pico_SendFS(PicoComms* self, FastString* fs, bool Wait);
+
+
+
+// JB_PicoConfig
+
+
+// JB_PicoMessage
+PicoMessage JB_Pico__FromFS(FastString* fs);
+
 
 
 // JB_Random
@@ -5226,6 +5180,9 @@ void SC_nil__WhileInner(Message* Cond);
 // JB_OutputFile_Behaviour
 
 
+// JB_Process_Behaviour
+
+
 // JB_RingTree_Behaviour
 
 
@@ -5239,9 +5196,6 @@ void SC_nil__WhileInner(Message* Cond);
 
 
 // JB_SavingTest_Behaviour
-
-
-// JB_ShellStream_Behaviour
 
 
 // JB_StringShared_Behaviour
@@ -5271,9 +5225,6 @@ void SC_nil__WhileInner(Message* Cond);
 // JB_Message_Behaviour
 
 
-// JB_Process_Behaviour
-
-
 // JB_SCArg_Behaviour
 
 
@@ -5296,6 +5247,9 @@ void SC_nil__WhileInner(Message* Cond);
 
 
 // JB_SimpleGraph_Behaviour
+
+
+// JB_SpdProcess_Behaviour
 
 
 // JB_Error_Behaviour
@@ -6143,8 +6097,6 @@ uint SC_Str_ASMint(JB_String* self);
 
 JB_String* SC_Str_ASMNormalise(JB_String* self);
 
-JB_String* JB_Str_BackToApp(JB_String* self);
-
 JB_String* JB_Str_Before(JB_String* self, JB_String* s);
 
 JB_String* JB_Str_BeforeLastByte(JB_String* self, byte b, int fudge);
@@ -6215,10 +6167,6 @@ JB_String* SC_Str_InterfaceToBehaviour(JB_String* self);
 
 Ind JB_Str_InWhite(JB_String* self, int Start, int After);
 
-JB_String* JB_Str_IPCName(JB_String* self);
-
-JB_String* JB_Str_IPCPath(JB_String* self);
-
 bool SC_Str_isCLike(JB_String* self);
 
 bool JB_Str_IsCompressed(JB_String* self);
@@ -6268,8 +6216,6 @@ Array* JB_Str_OperatorDivide(JB_String* self, byte sep);
 bool JB_Str_OperatorEndsWith(JB_String* self, JB_String* s);
 
 bool JB_Str_OperatorIsa(JB_String* self, JB_String* s);
-
-int JB_Str_OperatorMinus(JB_String* self, JB_String* s);
 
 JB_String* JB_Str_MulBool(JB_String* self, bool b);
 
@@ -6384,6 +6330,8 @@ bool JB_Str_WriteSet(JB_String* self, JB_String* Value);
 bool JB_Str_Yes(JB_String* self);
 
 JB_String* JB_Str__FromC(_cstring Addr);
+
+JB_String* JB_Str__FromPico(PicoMessage M);
 
 JB_String* JB_Str__Hex(int64 i);
 
@@ -6747,6 +6695,9 @@ MaterialsLol* SC_MaterialsLol__New(Selector* Next, Selector** Place, JB_String* 
 
 
 // JB_OutputFile
+
+
+// JB_Process
 
 
 // JB_RingTree
@@ -7252,9 +7203,6 @@ bool SC_SavingTest__IsEqual(JB_Object* A, JB_Object* B);
 
 SavingTest* SC_SavingTest__New(int n);
 
-
-
-// JB_ShellStream
 
 
 // JB_StringShared
@@ -8128,107 +8076,6 @@ void JB_Msg__TreeComparePrint(Message* orig);
 // JB_MessageID
 
 
-// JB_Process
-bool JB_Proc_Alive(Process* self);
-
-bool JB_Proc_CanSend(Process* self);
-
-bool JB_Proc_ChildAlive(Process* self);
-
-inline void JB_Proc_Constructor(Process* self, JB_String* path, JB_String* ID, int n, Array* params, fn_subprocess sub, bool CaptureStdOut);
-
-void JB_Proc_Destructor(Process* self);
-
-void JB_Proc_Disconnect(Process* self);
-
-byte* JB_Proc_DummyOrig(Process* self);
-
-void JB_Proc_Flush(Process* self);
-
-bool JB_Proc_Found(Process* self, bool send);
-
-Message* JB_Proc_Get(Process* self, Date TimeOut);
-
-Message* JB_Proc_GetSub(Process* self, Date TimeOut);
-
-void JB_Proc_IncrDiedCount(Process* self);
-
-bool JB_Proc_IsClosed(Process* self);
-
-bool JB_Proc_IsOpen(Process* self);
-
-void JB_Proc_Log(Process* self, JB_String* s);
-
-void JB_Proc_LogMsg(Process* self, JB_String* msg);
-
-void JB_Proc_LogUs(Process* self);
-
-void JB_Proc_OpenSharedMemory(Process* self, int n);
-
-void JB_Proc_Other(Process* self, JB_String* msg, bool strong);
-
-JB_String* JB_Proc_OurName(Process* self, bool us);
-
-bool JB_Proc_ParentAlive(Process* self);
-
-void JB_Proc_ProcessDied(Process* self);
-
-JB_String* JB_Proc_Render(Process* self, FastString* fs_in);
-
-JB_String* JB_Proc_ReportConnection(Process* self, JB_String* s, FastString* fs_in);
-
-void JB_Proc_Self(Process* self, JB_String* msg, bool strong);
-
-void JB_Proc_SendCrashed(Process* self);
-
-void JB_Proc_SendSub(Process* self, Message* msg);
-
-void JB_Proc_SetupAdjust(Process* self, int n);
-
-int JB_Proc_SetupAlloc(Process* self, int n);
-
-void JB_Proc_SetupServerState(Process* self);
-
-PID_Int JB_Proc_SideID(Process* self);
-
-bool JB_Proc_Send(Process* self, Message* msg, Date TimeOut);
-
-void JB_Proc_SyntaxExpect(Process* self, JB_String* err);
-
-void JB_Proc_SyntaxIsSet(Process* self, IPCState d, bool Value);
-
-bool JB_Proc_SyntaxIsnt(Process* self, IPCState d);
-
-JB_String* JB_Proc_TheirName(Process* self);
-
-void JB_Proc_Unlink(Process* self);
-
-void JB_Proc_Unmap(Process* self);
-
-void JB_Proc_UpgradeToClosed(Process* self);
-
-void JB_Proc_UseDummy(Process* self);
-
-bool JB_Proc_WaitFor(Process* self, Date TimeOut, bool ModeIsSend);
-
-void JB_Proc_WriteSub(Process* self);
-
-Process* JB_Proc__Alloc();
-
-int JB_Proc__Init_();
-
-int JB_Proc__InitCode_();
-
-Process* JB_Proc__New(JB_String* path, JB_String* ID, int n, Array* params, fn_subprocess sub, bool CaptureStdOut);
-
-Process* JB_Proc__Parent();
-
-void JB_Proc__StackTraceJbin(FastString* j, JB_String* reason, int skip);
-
-void JB_ProcessReportCrash();
-
-
-
 // JB_SCArg
 inline void SC_Arg_Constructor(SCArg* self, Message* node);
 
@@ -8985,6 +8832,45 @@ SaverClassInfo* JB_sci__New(JB_Class* Cls, char* Data);
 // JB_SimpleGraph
 
 
+// JB_SpdProcess
+bool JB_Proc_Alive(SpdProcess* self);
+
+bool JB_Proc_ChildAlive(SpdProcess* self);
+
+inline void JB_Proc_Constructor(SpdProcess* self, JB_String* path, Array* params, SpdMainFn fn, bool CaptureStdOut);
+
+void JB_Proc_Destructor(SpdProcess* self);
+
+void JB_Proc_Disconnect(SpdProcess* self);
+
+Message* JB_Proc_Get(SpdProcess* self, float T);
+
+bool JB_Proc_IsOpen(SpdProcess* self);
+
+bool JB_Proc_ParentAlive(SpdProcess* self);
+
+void JB_Proc_ProcessExited(SpdProcess* self);
+
+void JB_Proc_SendCrashed(SpdProcess* self);
+
+bool JB_Proc_SendStr(SpdProcess* self, JB_String* str);
+
+bool JB_Proc_Send(SpdProcess* self, Message* msg);
+
+SpdProcess* JB_Proc__Alloc();
+
+int JB_Proc__InitCode_();
+
+void JB_Proc__InitOwner();
+
+SpdProcess* JB_Proc__New(JB_String* path, Array* params, SpdMainFn fn, bool CaptureStdOut);
+
+void JB_Proc__StackTraceJbin(FastString* j, JB_String* reason, int skip);
+
+void JB_ProcessReportCrash();
+
+
+
 // JB_Error
 inline void JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path);
 
@@ -9109,16 +8995,8 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self) {
 	return JB_StdErr->ErrorCount == self;
 }
 
-inline bool JB_IPCState_SyntaxCast(IPCState self) {
-	return (self >= kJB__IPCState_Waiting) and (self < kJB__IPCState_closed);
-}
-
 inline bool JB_Ind_SyntaxCast(Ind self) {
 	return self >= 0;
-}
-
-inline bool JB_PID_Int_SyntaxCast(PID_Int self) {
-	return self > 0;
 }
 
 inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b, int c, int d) {
@@ -9172,7 +9050,7 @@ inline NilState SC_nil_SetNilness(ArchonPurger* self, SCDecl* d, NilState New) {
 	if ((P->Value & self->Realnesses) != P->Value) {
 		SC_Decl_NilPrmFail(d);
 	}
-	ndb2(d, JB_LUB[1027]);
+	ndb2(d, JB_LUB[1024]);
 	return New;
 }
 
@@ -9183,7 +9061,7 @@ inline NilState SC_nil__ArgOne(Message* s, NilCheckMode t, NilState prev) {
 	if (SC_NilState_SyntaxIs(prev, kSC__NilState_Borked)) {
 		JB__Err_AutoPrint = SC__nil_OldPrint;
 		if ((!(!JB_Rec_OK(JB_StdErr)))) {
-			JB_Msg_SyntaxExpect(s, JB_LUB[1029]);
+			JB_Msg_SyntaxExpect(s, JB_LUB[1026]);
 			return nil;
 		}
 		JB_Rec_Clear(JB_StdErr);
@@ -9401,7 +9279,7 @@ inline void SC_PA_Constructor(SCParamArray* self, Message* exp, Message* side) {
 	self->IsDot = ((JB_Msg_EqualsSyx(exp, JB_SyxDot, false)));
 	self->IsAddress = ((exp != nil) and (({
 		Message* _tmPf1 = JB_Incr(SC_Msg_NiceParent(exp));
-		bool _tmPf0 = SC_Msg_OperatorIsBRel(_tmPf1, JB_LUB[353]);
+		bool _tmPf0 = SC_Msg_OperatorIsBRel(_tmPf1, JB_LUB[351]);
 		JB_Decr(_tmPf1);
 		 _tmPf0;
 	})));
@@ -9659,7 +9537,7 @@ inline void SC_Iter_Constructor(SCIterator* self, SCClass* parent) {
 inline void SC_SavingTest_Constructor(SavingTest* self, int n) {
 	JB_Sav_Constructor(self);
 	JB_String* _tmPf0 = JB_Incr(JB_int_RenderFS(n, nil));
-	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1503], _tmPf0);
+	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1499], _tmPf0);
 	JB_Decr(_tmPf0);
 	self->Name = JB_Incr(_tmPf1);
 	self->Value = (1000 + n);
@@ -9678,7 +9556,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1508])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1504])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -9741,66 +9619,6 @@ inline void JB_Msg_ConstructorRange(Message* self, Message* Parent, Syntax Func,
 }
 
 inline void JB_Msg_Trap(Message* self) {
-}
-
-inline void JB_Proc_Constructor(Process* self, JB_String* path, JB_String* ID, int n, Array* params, fn_subprocess sub, bool CaptureStdOut) {
-	JB_Incr(params);
-	JB_Incr(ID);
-	JB_Sh_Constructor(self, path);
-	self->Ours = nil;
-	self->Theirs = nil;
-	self->LastSend = 0;
-	self->LogFile = nil;
-	self->Dummy = ((IPCMessage){});
-	self->SizeOfOrig = 0;
-	self->Offset = 0;
-	self->DiedCount = 0;
-	self->CanPrint = 0;
-	self->Orig = ((byte*)((&self->Dummy)));
-	self->DeathLimit = 12;
-	self->IsServer = (n != 0);
-	self->SubProcess = sub;
-	FastString* _tmPf6 = ((FastString*)JB_Ternary(CaptureStdOut, JB_FS__New(), nil));
-	self->Output = JB_Incr(_tmPf6);
-	RingTree* _tmPf5 = JB_Ring__New0();
-	self->SendQueue = JB_Incr(_tmPf5);
-	FastString* _tmPf4 = JB_FS__New();
-	self->Writer = JB_Incr(_tmPf4);
-	if ((!(JB_Str_Exists(ID)))) {
-		JB_SetRef(ID, JB_App__ArgValue(JB_LUB[172]));
-	}
-	if (JB_Str_Exists(ID) and (JB_Str_First(ID) != '/')) {
-		JB_SetRef(ID, JB_Str_IPCPath(ID));
-	}
-	JB_String* _tmPf3 = JB_Str_IPCName(ID);
-	self->Name = JB_Incr(_tmPf3);
-	JB_File* _tmPf2 = JB_Str_AsFile(ID);
-	self->Talker = JB_Incr(_tmPf2);
-	if (self->IsServer) {
-		if ((!(JB_Array_SyntaxCast(params)))) {
-			JB_SetRef(params, (JB_Array__New0()));
-		}
-		JB_SetRef(params, JB_Array_Copy(params));
-		JB_String* _tmPf1 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[1643], self->Talker));
-		JB_StringC* _tmPf0 = JB_Incr(JB_Str_MakeC((_tmPf1)));
-		JB_Decr(_tmPf1);
-		JB_Array_SyntaxAppend(params, _tmPf0);
-		JB_Decr(_tmPf0);
-	}
-	 else {
-		JB_App__BelongsToParent();
-	}
-	self->Params = JB_Incr(params);
-	JB_Decr(params);
-	if (JB_Str_Exists(ID)) {
-		JB_Proc_OpenSharedMemory(self, n);
-	}
-	 else {
-		if ((!false)) {
-			JB_Proc_SyntaxExpect(self, JB_LUB[1644]);
-		}
-	}
-	JB_Decr(ID);
 }
 
 inline void SC_Arg_Constructor(SCArg* self, Message* node) {
@@ -9887,14 +9705,14 @@ inline void SC_Class_Constructor(SCClass* self, Message* node, SCBase* parent, b
 	self->TypeOptional = JB_Incr(_tmPf1);
 	SCDecl* _tmPf0 = SC_Decl_NilConstructor(T, kSC__NilState_Real * HasPtrs);
 	self->TypeReal = JB_Incr(_tmPf0);
-	if (JB_Msg_SyntaxEquals(node, JB_LUB[737], false)) {
+	if (JB_Msg_SyntaxEquals(node, JB_LUB[734], false)) {
 		JB_SetRef(T, SC_Decl_GetAddress(T, kSC__DeclMode_Always));
 	}
 	 else {
 		JB_SetRef(T, SC_Decl_Copy(T, false));
 	}
 	self->SelfDecl = JB_Incr(T);
-	JB_SetRef(T->Name, JB_LUB[238]);
+	JB_SetRef(T->Name, JB_LUB[237]);
 	(SC_Decl_SyntaxIsSet(T, kSC__SCDeclInfo_SelfImplicit, true));
 	(SC_Decl_SyntaxIsntSet(T, kSC__SCDeclInfo_altered, true));
 	JB_Decr(T);
@@ -9988,6 +9806,26 @@ inline void JB_sci_Constructor(SaverClassInfo* self, JB_Class* Cls, char* Data) 
 	self->NextInfo = nil;
 	self->Cls = Cls;
 	self->Data = Data;
+}
+
+inline void JB_Proc_Constructor(SpdProcess* self, JB_String* path, Array* params, SpdMainFn fn, bool CaptureStdOut) {
+	JB_Sh_Constructor(self, path);
+	self->LastSend = 0;
+	self->DiedCount = 0;
+	self->DeathLimit = 12;
+	self->Pico = PicoCreate();
+	PicoConf(self->Pico)->Bits = 15;
+	self->IsParent = ((!JB_Str_Equals(path, JB_LUB[0], false)) or (fn != nil));
+	self->Params = JB_Incr(params);
+	self->SubProcess = fn;
+	FastString* _tmPf1 = ((FastString*)JB_Ternary(CaptureStdOut, JB_FS__New(), nil));
+	self->Output = JB_Incr(_tmPf1);
+	FastString* _tmPf0 = JB_FS__New();
+	self->Writer = JB_Incr(_tmPf0);
+	if ((!self->IsParent)) {
+		PicoCompleteExec(self->Pico);
+		JB_App__BelongsToParent();
+	}
 }
 
 inline void JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path) {
