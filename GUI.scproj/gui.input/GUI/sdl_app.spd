@@ -649,7 +649,7 @@ module SDLApp
 		require .SingleFrameNest <= 2
 		.SingleFrameNest++
 
-		process.CheckAllAlive
+		SpdProcess.CheckAllAlive
 		
 		|| occured = .PreFrame
 		.ClearAlerts

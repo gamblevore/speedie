@@ -8,7 +8,7 @@ cpp_part AC
 |scbase|			AnonParent
 |bool|				CompileUpToDate = true
 |byte|				ShouldEnter = 0
-|process|			Perry 
+|SpdProcess|		Perry 
  
 ||					func_tmp_src   = <(`return, require, "log <string>", while, linkage, for, if, else, elseif, expect, warn, error, disabled, cpp_refs, once, debugger, debugat, deprecate, `description "<describe this function>"`, print, printline, try, need, cant, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "visible", "exit", "opt norefcounts", "pragma inline"
  `)>.macro
@@ -73,7 +73,7 @@ function Log (|message|)
 function Enter (|bool|)
 	require stderr.ok and .ShouldEnter
 	app.clearcaches
-	.Perry = process.parent
+	.Perry = SpdProcess.parent
 	if .perry.isopen
 		.CompileAndGiveFeedBack
 	return true
@@ -135,9 +135,6 @@ function CmdCleanUp (|Message| arg, |message|)
 
 
 function CmdWrap (|Message| arg)
-	if .perry.canprint
-		printline arg
-
 	|| cmd = .CmdCleanUp(arg)
 	|| response = .cmdresponse(cmd, arg) 
 

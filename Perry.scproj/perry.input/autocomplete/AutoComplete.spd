@@ -217,11 +217,11 @@ function PerryIDE.PopupHide
 
 
 // SpeedieDidReceiveMsg, receivedmsg, maybedidgetmsg, gotmsg, msgreceived, receivefb, fbreceived
-function PerryIDE.SpeedieMsgReceive (|process| c, |bool|)
+function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	if (c == .compilr) and !c.alive
 		isnt active
 
-	|| msg = C.Get(0) 		#require
+	|| msg = C.Get 		#require
 	|message| date
 	if msg == @arg and "Perry"
 		date = msg[@num]

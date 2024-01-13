@@ -45,6 +45,10 @@
 		AC310BF32A5188FE00837DCB /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC61010E2798768C00278BEF /* libSpeedie.dylib */; };
 		AC310BF52A5188FE00837DCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC259FAD2660E1AC0026C303 /* Assets.xcassets */; };
 		AC310C072A518A1300837DCB /* bird.input in Resources */ = {isa = PBXBuildFile; fileRef = AC310C062A518A1300837DCB /* bird.input */; };
+		AC33F7BE2B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
+		AC33F7BF2B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
+		AC33F7C02B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
+		AC33F7C12B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC52897A2961F3FB005EFB9D /* JB_Umbrella.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */; };
 		AC528A5C2961F536005EFB9D /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528A5A2961F536005EFB9D /* JB_Globals.cpp */; };
 		AC528A5D2961F536005EFB9D /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528A5B2961F536005EFB9D /* JB.cpp */; };
@@ -239,6 +243,7 @@
 		AC28D04B2638AAE700635A66 /* perry.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perry.input; sourceTree = SOURCE_ROOT; };
 		AC310BFA2A5188FE00837DCB /* BirdDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BirdDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC310C062A518A1300837DCB /* bird.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = bird.input; path = ../Utils/birds.scproj/bird.input; sourceTree = "<group>"; };
+		AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
 		AC3A6A8D296082E700CE1E91 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		AC4A650125011C1600EF6E9A /* gui.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = gui.input; path = ../GUI.scproj/gui.input; sourceTree = "<group>"; };
 		AC52889E2961ED2B005EFB9D /* CppLib */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CppLib; path = ../Library/CppLib; sourceTree = SOURCE_ROOT; };
@@ -267,7 +272,6 @@
 		AC528E922961F99F005EFB9D /* JB_Main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Main.cpp; path = ../Library/CppLib/JB_Main.cpp; sourceTree = "<group>"; };
 		AC528E932961F99F005EFB9D /* JB_Pipe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pipe.cpp; path = ../Library/CppLib/JB_Pipe.cpp; sourceTree = "<group>"; };
 		AC528E942961F99F005EFB9D /* JB_VM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_VM.cpp; path = ../Library/CppLib/JB_VM.cpp; sourceTree = "<group>"; };
-		AC528E952961F99F005EFB9D /* JB_OSX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JB_OSX.m; path = ../Library/CppLib/JB_OSX.m; sourceTree = "<group>"; };
 		AC528E962961F99F005EFB9D /* JB_Alloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Alloc.cpp; path = ../Library/CppLib/JB_Alloc.cpp; sourceTree = "<group>"; };
 		AC528E972961F99F005EFB9D /* JB_Tokeniser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Tokeniser.cpp; path = ../Library/CppLib/JB_Tokeniser.cpp; sourceTree = "<group>"; };
 		AC528E982961F99F005EFB9D /* JB_Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Utils.cpp; path = ../Library/CppLib/JB_Utils.cpp; sourceTree = "<group>"; };
@@ -411,6 +415,7 @@
 				AC528E962961F99F005EFB9D /* JB_Alloc.cpp */,
 				AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */,
 				AC528E822961F99D005EFB9D /* JB_BasicIO.cpp */,
+				AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */,
 				AC528E892961F99E005EFB9D /* JB_ByteMap.cpp */,
 				AC528E902961F99E005EFB9D /* JB_Child.cpp */,
 				AC528E9A2961F99F005EFB9D /* JB_Compress.cpp */,
@@ -427,7 +432,6 @@
 				AC528E8B2961F99E005EFB9D /* JB_Math.cpp */,
 				AC528E9B2961F99F005EFB9D /* JB_MSR.cpp */,
 				AC528E842961F99E005EFB9D /* JB_ObjArray.cpp */,
-				AC528E952961F99F005EFB9D /* JB_OSX.m */,
 				AC528E932961F99F005EFB9D /* JB_Pipe.cpp */,
 				ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */,
 				AC528E852961F99E005EFB9D /* JB_PNG.cpp */,
@@ -734,6 +738,7 @@
 				AC310BE02A5188FE00837DCB /* JB_Child.cpp in Sources */,
 				AC310BE12A5188FE00837DCB /* JB_Alloc.cpp in Sources */,
 				AC310BE22A5188FE00837DCB /* JB_PNG.cpp in Sources */,
+				AC33F7BF2B4FA499009A1156 /* JB_Pico.cpp in Sources */,
 				AC310BE32A5188FE00837DCB /* JB_DivSufSort.cpp in Sources */,
 				AC310BE42A5188FE00837DCB /* JB_LibraryFile.cpp in Sources */,
 				AC310BE52A5188FE00837DCB /* JB_Compress.cpp in Sources */,
@@ -771,6 +776,7 @@
 				AC528EAA2961F99F005EFB9D /* JB_RingTree.cpp in Sources */,
 				AC528A5D2961F536005EFB9D /* JB.cpp in Sources */,
 				AC528EA82961F99F005EFB9D /* JB_Math.cpp in Sources */,
+				AC33F7C12B4FA499009A1156 /* JB_Pico.cpp in Sources */,
 				AC528EA62961F99F005EFB9D /* JB_ByteMap.cpp in Sources */,
 				AC528EB92961F9A0005EFB9D /* JB_List.cpp in Sources */,
 				AC528EAD2961F99F005EFB9D /* JB_Child.cpp in Sources */,
@@ -803,6 +809,7 @@
 				ACB2D25529BCCAB70070E60F /* JB_MSR.cpp in Sources */,
 				ACB2D25629BCCAB70070E60F /* JB_BasicIO.cpp in Sources */,
 				ACB2D25729BCCAB70070E60F /* JB_DirReaderUnix.cpp in Sources */,
+				AC33F7BE2B4FA499009A1156 /* JB_Pico.cpp in Sources */,
 				ACB2D25829BCCAB70070E60F /* JB_Math.cpp in Sources */,
 				ACB2D25929BCCAB70070E60F /* JB_Utils.cpp in Sources */,
 				ACB2D25A29BCCAB70070E60F /* JB_Saveable.cpp in Sources */,
@@ -843,6 +850,7 @@
 				AC528EF02961F9B4005EFB9D /* JB_MSR.cpp in Sources */,
 				AC528EFE2961F9B4005EFB9D /* JB_BasicIO.cpp in Sources */,
 				AC528F042961F9B4005EFB9D /* JB_DirReaderUnix.cpp in Sources */,
+				AC33F7C02B4FA499009A1156 /* JB_Pico.cpp in Sources */,
 				AC528EDA2961F9B4005EFB9D /* JB_Math.cpp in Sources */,
 				AC528F0C2961F9B4005EFB9D /* JB_Utils.cpp in Sources */,
 				AC528F0E2961F9B4005EFB9D /* JB_Saveable.cpp in Sources */,
@@ -926,7 +934,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -970,7 +977,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1014,7 +1020,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1046,7 +1051,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1094,7 +1098,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -1118,7 +1122,6 @@
 					"$(inherited)",
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
-				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1170,7 +1173,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -1194,7 +1197,6 @@
 					"$(inherited)",
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
-				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "TARGET_UNIX=1";
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
@@ -1247,7 +1249,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1291,7 +1292,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1336,7 +1336,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1379,7 +1378,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;

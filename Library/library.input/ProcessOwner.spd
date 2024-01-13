@@ -22,6 +22,8 @@ class ProcessOwner
 		cpp_wrapper JB_PID_TermSig
 	function Register
 		cpp_wrapper JB_PID_Register
+	function ClearErrors
+		cpp_wrapper JB_PID_ClearErrors
 
 	function UnRegister
 		cpp_wrapper JB_PID_UnRegister

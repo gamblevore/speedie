@@ -59,11 +59,11 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nil"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nocolor"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "jeebox.scproj"
@@ -75,7 +75,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nocompile"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "Perry.scproj"

@@ -5,7 +5,8 @@
 * VM? 
 * Build output not showing???
 * Constants and globals don't autocomplete nicely
-* Process class doesn't work on linux anymore. (and crashes on OSX a lot) (use pipes instead?)
+* Are function pointers considered... pointers? they should be? nilchecker needs to work on them!
+* building button does not have a sdltouched?
 
 
 						 Perry Do later

@@ -46,8 +46,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <dlfcn.h> // we aren't using this?
 #include "JB_Atomic.h"
+#include "PicoMsg/PicoMsg.h"
 
 #endif // __JB_UMBRELLA__
 

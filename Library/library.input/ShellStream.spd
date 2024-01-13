@@ -5,7 +5,7 @@
 */
 
 
-class ShellStream (processowner)
+class Process (processowner)
 	|string|		Path
 	|FastString|	Output
 	|FastString|	ErrorOutput
@@ -21,11 +21,14 @@ class ShellStream (processowner)
 	constructor (|string| path):		cpp_wrapper JB_Sh_Constructor
 	destructor:							cpp_wrapper JB_Sh_Destructor
 
+	function ClosePipes ()
+		cpp_wrapper JB_Sh_ClosePipes
+
 	function UpdatePipes (|bool|)
 		cpp_Wrapper JB_Sh_UpdatePipes
 	
 	function Step (|bool|)
-//		description `Returns false if the process has exited.`
+		description `Returns false if the process has exited.`
 		cpp_wrapper JB_Sh_Step
 
 	function Kill
@@ -33,5 +36,5 @@ class ShellStream (processowner)
 			pipe.KillPID(.pid)
 
 	module
-		function Stream (|String| app, |[string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |ShellStream|)
+		function Stream (|String| app, |[string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |Process|)
 			cpp_wrapper JB_Sh__Stream

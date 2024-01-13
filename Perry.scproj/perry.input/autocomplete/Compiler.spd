@@ -116,7 +116,7 @@ extend PerryIDE
 	function Say (|string| str)
 		target osx
 			if !.IsFront or SDLApp.IsBackground
-				.Talker = ShellStream.stream("/usr/bin/say", [.name.trimext + str])
+				.Talker = Process.stream("/usr/bin/say", [.name.trimext + str])
 	
 	function CompileFB (|message| msg, |bool|)
 		|| db = .DebugIsWaitingForCompile
@@ -147,7 +147,7 @@ extend PerryIDE
 	function CancelCompile 
 		.DebugIsWaitingForCompile = false
 		if .compilr
-			.compilr.KillButOK // frees memory
+			.compilr.Kill // frees memory
 			.compilr = nil
 		(.buildbutton is visible)
 		(.runbutton is enabled)

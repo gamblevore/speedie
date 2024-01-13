@@ -28,6 +28,8 @@ class ProgressBar (GUIControl)
 		where.ControlClip = where.ControlClip ± 1
 		if .Indefinite
 			where.Colorise(.RandomData, s)
+			sdlapp.touch
+			
 		  else
 			|| Dark  = vec4(0.2, s).PreMul
 			|| Light = vec4(0.7, s).PreMul

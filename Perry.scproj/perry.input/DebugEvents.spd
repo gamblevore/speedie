@@ -91,7 +91,7 @@ function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiled
 	|| out = .DebugActualStr(F, args)
 	.LogOneAction(@emb + out.Copy)
 	out <~ ("\n", 2)
-	.RunCompiledApp = ShellStream.stream(f, args, out)
+	.RunCompiledApp = Process.stream(f, args, out)
 	if .RunCompiledApp and .RunCompiledApp.PID
 		.RunButton.text = "\07"
 

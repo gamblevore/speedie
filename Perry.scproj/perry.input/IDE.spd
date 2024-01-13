@@ -3,10 +3,10 @@
 class PerryIDE (Window) 
 	linkage: cpp_part IDE
 
-	|Process|					Feedback
-	|Process|					compilr
+	|SpdProcess|				Feedback
+	|SpdProcess|				compilr
 	|string|					CompileOKString
-	|ShellStream|				RunCompiledApp
+	|Process|					RunCompiledApp
 	|[error]|					StartupErrors
 	|FileViewer|				FileList
 	|Guicontrol|				Debugger
@@ -61,7 +61,7 @@ class PerryIDE (Window)
 	|Buttonview|				StartScreen
 	|Buttonview|				BuildButton
 	|Buttonview|				RunButton
-	|shellstream| 				Talker
+	|Process| 					Talker
 	|message|					RecentFiles
 	|string|					OldJBCloser
 	|string| 					lastCmdStr
@@ -356,9 +356,10 @@ class PerryIDE (Window)
 			if HideTop
 				(.DebugArgsList isnt visible)			// better to declutter
 			|| ShowBuilders = !HideTop and (!.istextonly or .path.isSource)
-			.runbutton.declutter		= !ShowBuilders
-			.buildbutton.declutter		= !ShowBuilders
-			.Progress.Declutter			= !ShowBuilders
+			|| HideBuilders = !ShowBuilders
+			.runbutton.declutter		= HideBuilders
+			.buildbutton.declutter		= HideBuilders
+			.Progress.Declutter			= HideBuilders
 		
 		if (hideside == visside)
 			.filelist.declutter = hideside
@@ -373,17 +374,19 @@ class PerryIDE (Window)
 	function TestCompilerAlive
 		opt NoRefCounts
 		|| c = .compilr
-		if (c!=nil)
+		if (c != nil)
 			if !c.Alive
-				if c is dead
+				if c.isdead
 					.CrashedFB(c)
+					c.ClearErrors
 				c.Disconnect
-			  elseif (c.IsClosed)
+			  elseif (!c.Isopen)
 				.CancelCompile
 		c = .feedback
-		if c != nil and C is dead
-			(C is invalid)
+		if (c != nil) and (C.isdead)
+			C.Invalidate
 			.CrashedFB(c)
+			c.ClearErrors
 
 
 	function SaveMemory
@@ -397,7 +400,7 @@ class PerryIDE (Window)
 		if f.IsOpen and f.lastsend.ago > (30.0+.position).date
 			|| msg = "Released Speedie: " + .name
 			.LogOneAction(@emb + msg)
-			.feedback.KillButOK
+			.feedback.Kill
 		
 
 	behaviour FrameUpdate // perframe, eachframe, onframe
@@ -786,7 +789,7 @@ So anything not 0 means "its OK"`
 		
 		.popuphide
 		.AddToJumpHistory
-		if  !g  and  .IsEditingSource  and  .feedback.IsClosed
+		if  !g  and  .IsEditingSource  and  !.feedback.IsOpen
 			.Recheck
 		.DuringLoad--
 		

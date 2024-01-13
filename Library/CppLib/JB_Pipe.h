@@ -4,6 +4,7 @@
 #define __JB_PIPE__
 
 #include "JB_Umbrella.h"
+#include "PicoMsg/PicoMsg.h"
 
 extern "C" {
 
@@ -18,7 +19,7 @@ void JB_PID_Destructor(ProcessOwner* self);
 void JB_PID_Register(ProcessOwner* self);
 int JB_PID_Exit(ProcessOwner* self);
 int JB_PID_TermSig(ProcessOwner* self);
-void JB_PID_ClearExit(ProcessOwner* self);
+void JB_PID_ClearErrors(ProcessOwner* self);
 ProcessOwner* JB_PID_Next(ProcessOwner* self);
 ProcessOwner* JB_PID__First();
 
@@ -46,8 +47,9 @@ ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastStr
 bool JB_Sh_Step(ShellStream* self);
 ivec2 JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, bool StdOutFlowThru);
 bool JB_Proc__CreateArgs(JB_String** self, Array* R, const char** argv);
-bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, bool capture);
+bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool capture);
 bool JB_Sh_UpdatePipes(ShellStream* self);
+void JB_Sh_ClosePipes(ShellStream* self);
 void JB_App__TurnInto(JB_String* self, Array* R); 
 typedef void (*fn_app_deathaction)();
 void JB_App__AtExit (fn_app_deathaction b);
@@ -70,8 +72,8 @@ int JB_App__BelongsToParent();
 void JB__DefaultCrashHandler(int Signal);
 void JB__ErrorStackTrace(int Signal);
 void JB_Rec__CrashLog(const char* c);
-struct Process;
-typedef int	(*fn_pth_wrap)(Process* obj);
+struct SpdProcess;
+typedef int	(*fn_pth_wrap)(SpdProcess* obj);
 int JB_ThreadStart (fn_pth_wrap wrap, JB_Object* IPC, bool join);
 void JB_App__SetThreadName(JB_String* name);
 int JB_Pipe__IgnoreBreakPoints ();

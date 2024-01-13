@@ -47,8 +47,8 @@ function PerryIDE.SendFeedbackMsg (|message| msg)
 	.feedback = .CompilerInit(.feedback, false)			#require
 	
 	|| record = .DateWrap(msg)
-	if .feedback <~ (record, 0.004s)
-		.SpeedieMsgReceive(.feedback)
+	.feedback <~ record
+	.SpeedieMsgReceive(.feedback)
 	.LogOneComm(msg, "\1C ")
 
 
@@ -62,16 +62,15 @@ function PerryIDE.SubProcess (|bool| actual_compile, |fn_Subprocess|)
 		Speedie_Checker = nil
 
 
-function PerryIDE.CrashedFB (|process| c, |string| msg="")
+function PerryIDE.CrashedFB (|SpdProcess| c, |string| msg="")
 	|| s = ("crashed feedback ", "crashed compiler ")(c == .feedback)
 	(self is dead)
 	.notify(s, @emb + msg)
 	.CancelCompile
 
 
-function PerryIDE.CompilerInit (|process| C, |bool| actual_compile, |process|)   //InitCompiler
-	|| time = 5s
-	|| Active = C.Activate(time, actual_compile)
+function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProcess|)   //InitCompiler
+	|| Active = C.Activate(5s)
 	if active == -1
 		return nil
 	if Active
@@ -87,7 +86,7 @@ function PerryIDE.CompilerInit (|process| C, |bool| actual_compile, |process|)  
 		if !.UsingSpdLib
 			.UsingSpdLib = true
 			f.name = name.TrimExt + "()"
-		rz = (SubProcess).RunAsProcess(name, p, 128KB)
+		rz = (SubProcess).RunAsProcess(p, 128KB)
 	  else
 		target false // debug
 			|string| Proc = "/usr/local/speedie/Terminal/Debug/uwu"
@@ -95,7 +94,7 @@ function PerryIDE.CompilerInit (|process| C, |bool| actual_compile, |process|)  
 			|string| Proc = Speedie
 		proc = proc.resolve
 		if proc
-			rz = process.child(Proc, name, p, actual_compile, 128KB)
+			rz = SpdProcess.child(Proc, p, actual_compile, 128KB)
 
 
 function PerryIDE.ActualCompile (|message| msg)

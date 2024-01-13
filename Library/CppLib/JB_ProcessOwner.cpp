@@ -67,6 +67,10 @@ void JB_PID_Constructor(ProcessOwner* self) {
 }
 
 
+void JB_PID_ClearErrors(ProcessOwner* self) {
+	self->ExitCode = -1;
+}
+
 int JB_PID_Exit(ProcessOwner* self) {
 	int Code = self->ExitCode;
 	if (WIFEXITED(Code)) {				// called exit()

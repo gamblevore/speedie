@@ -10,7 +10,7 @@ module ProcessTest
 		|bool|	TimeOut     = Variant&4
 		|bool|	Slow        = Variant&8
 		
-		if app.hasipc
+		if app.HasParent
 			using "child process"
 				if DyingChild
 					.ChildDieTest(timeout)
@@ -26,29 +26,27 @@ module ProcessTest
 
 	function ParentTest (|bool| ChildDying, |bool| Slow)
 		|| chld = app.StartChild(app.rawargs)
-		chld.canprint = ChildDying|int|
 		for i in 1 to 10000
 			chld <~ "\n\n\nhello " + i.render
 			if slow
 				app.sleep(2s)
-			|| response = chld.get(5s)  #loop
+			|| response = chld.get(5.0)  #loop
 			if slow or i isa 256: printline response.name
 		chld.disconnect
 		app.sleep(0.01s)
 
 
 	function ChildTest (|bool| ParentDying, |bool| Slow)
-		|| p = process.Parent
-		p.canprint = ParentDying|int|
+		|| p = SpdProcess.Parent
 		while p.isopen
-			|| ch = p.get(5s)  #loop
+			|| ch = p.get(5.0)  #loop
 			if slow
-				app.sleep(2s)
+				app.sleep(2.0)
 			p <~ ch.name.uppercase.zalgo
 
 
-	function Process.DieOrTimeout (|bool| timeout)
-		.self ("will timeout", "will die")(timeout)
+	function SpdProcess.DieOrTimeout (|bool| timeout)
+		printline ("will timeout", "will die")(timeout)
 		self <~ "glittery"
 		if timeout
 			app.sleep(10s)
@@ -58,14 +56,12 @@ module ProcessTest
 		
 	function ParentDieTest (|bool| timeout)
 		|| chld = app.StartChild(app.rawargs)
-		chld.canprint = 1
 		chld.DieOrTimeout(timeout)
 		(chld)
 
 
 	function ChildDieTest (|bool| timeout)
-		|| srv = process.Parent
-		srv.canprint = 1
+		|| srv = SpdProcess.Parent
 		srv.DieOrTimeout(timeout)
 		(srv)
 

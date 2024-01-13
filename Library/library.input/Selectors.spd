@@ -47,7 +47,7 @@ class Selector
 
 /*
 // even better would be:
-	struct selector {
+	struct Selector {
 		|int|	   ID
 		|string|	Name
 	}

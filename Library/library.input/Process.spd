@@ -1,395 +1,125 @@
 
 
-datatype IPCState (uint16)
-	constants
-		|IPCState|
-		Waiting = 0x1234
-		Connecting
-		Connected
-		TimedOut
-		Closed
-		Dead
-		Crashed
-		Invalid
-	syntax cast (|bool|)
-		return  self >= Waiting  and  self < ipcstate.closed
-
-
-
-class Process (ShellStream)
+class SpdProcess (Process)
 	linkage
 		cpp_part Proc
-	contains Process
-	|file|						Talker
+	contains SpdProcess
 	|jbin|						Writer
-	|string|					Name
-	|&byte|						Orig
-	|&IPCMessage|				Ours
-	|&IPCMessage|				Theirs
+//	|string|					Name
+	|&PicoComms|				Pico					
 	|date|						LastSend
 	|fn_subprocess|				SubProcess
-	|[string]|					Params
-	|file|						LogFile
-	|ringtree of message|		SendQueue
-	|IPCMessage|				Dummy
-	|int|						SizeOfOrig
-	|int|						Offset
+	|[string]|					Params // move this to process?
 	|int| 						DeathLimit
 	|int|						DiedCount
-	|bool|						IsServer
-	|byte|						CanPrint
+	|bool|						IsParent
 
-	constructor	(|string| path, |string| ID,  |int| n,  |[string]| params=nil,  |fn_subprocess| sub=nil,  |bool| CaptureStdOut=false)
-		cpp_part Constructor
+
+	constructor	(|string| path, |[string]| params=nil,  |fn_subprocess| fn=nil,  |bool| CaptureStdOut=false)
 		super.constructor(path)
 		
-		.Orig = (&.Dummy)|&byte|
 		.deathlimit = 12
-		.isserver = n != 0
-		.subprocess = sub
-		.output = (faststring(), nil)(capturestdout)
-		.sendqueue	= ringtree()
-		.writer		= FastString()
-
-		ID := app..talk
-		if ID and *ID != '/'
-			ID = ID.ipcPath
-		.name = ID.ipcname
-		.talker		= ID.file
-		if .isserver
-			params := []
+		.pico = picocomms.new
+		.IsParent = (!params)
+		.SubProcess = fn
+		.output = (faststring(), nil)(CaptureStdOut)
+		.writer = FastString()
+		
+		if .IsParent
 			params = params.copy
-			params <~ ("--talk=" + .talker).cstr
 		  else
 			app.BelongsToParent // should die if the parent dies!
+			.pico.StartSocket
 		.params		= params
 
-		if ID
-			.OpenSharedMemory(n)
-		  else
-			error (Self, "No name given.")
-
-
-	render ReportConnection (|string| s)
-		fs <~ "-----------\n"
-		if s
-			fs <~ s
-			fs <~ '\n'
-		fs  <~  "talk: ${.talker.path}, name: ${.name}\n"
-		if .orig != .DummyOrig
-			fs <~ "ipc is open: ${.SizeOfOrig}\n"
-		  else
-			fs <~ "ipc not open.\n"
-
-
-	render
-		.reportconnection("", fs)
-
-
-	function PrintState (|string| s = "")
-		printline .reportstate(s)
-
-
-	render ReportState (|string| s = "")
-		.ReportConnection(s, fs)
-		|int| S1 = .ours.sendid
-		|int| R2 = .theirs.readid
-		
-		fs <~ "(Us == '"
-		fs <~ .OurName
-		fs <~ "')\nsent "
-		fs <~ s1 - r2
-		fs <~ " unread messages ("
-		fs <~ .ours.queued|int|
-		fs <~ " queued)\n"
-		
-		|| W2 = .theirs.queued
-			fs <~ w2|int|
-			fs <~ " in their queue\n"
-		
-		|| S2 = .theirs.sendid
-		|| R1 = .ours.readid
-		if s2 > r1
-			fs <~ "they sent unread message\n"
-		  elseif s2 == r1
-			if s2
-				fs <~ "all their sends are read\n"
-		  else
-			fs <~ "we bad read?\n"
-		fs <~ "-----------\n"
-
-
-	helper SetupAlloc (|int| n, |int|)
-		|| d = .dummyorig
-		if .orig and .orig != D
-			return .SizeOfOrig
-		.SizeOfOrig = n
-		.orig = .talker.ipc(.SizeOfOrig)|&byte|
-		if (.orig|uint64| & 31)
-			error (Self, "IPC-memory allocation not 32-aligned") // does it need to be?
-		if !.orig
-			error (self, "can't open ipc")
-			.orig = d
-			.SizeOfOrig = 0
-		return .SizeOfOrig
-
-
-	helper SetupAdjust (|int| n)
-		.writer.reserved = n - (–sizeof IPCMessage)
-		
-		|| b		= .isserver|int64|
-		.ours		= (.orig + n* b)|&IPCMessage|
-		.theirs		= (.orig + n*!b)|&IPCMessage|		
-		.writer.resultptr = .ours.data
-
-
-	helper OurName (|bool| us=true, |string|)
-		if .IsServer == us
-			return "Parent " + .name
-		  else 
-			return "Child  " + .name
-
-
-	helper TheirName (|string|)
-		return .OurName(false)
-
-
-	helper OpenSharedMemory (|int| n)
-		.UseDummy
-		n = .SetupAlloc(n) #require
-		.SetupAdjust(n/2)
-		.SetupServerState
-
-
-	helper SetupServerState
-		if .Output
-			.Output.Length = 0
-		if !.IsServer
-			expect (.theirs.state) (self, "MemorySharingFailed")
-			is Connected
-			return
-
-		memory.zero(.orig, .SizeOfOrig)
-		is Connecting
-		.ours.special = process.SpecialState
-
+	destructor
+		.pico.destroy
 
 	function IsOpen (|bool|)
-		return !.Isclosed
-
-
-	function IsClosed (|bool|)
-		if  (self == nil)  or  .ours.isclosed
-			return true
-		if .theirs.isclosed
-			is closed
-			return true
-
-	syntax is (|IPCState| d, |bool|)
-		return .ours.state == d
-	
-	syntax isnt (|IPCState| d, |bool|)
-		return .ours.state != d
-
-	syntax is (|IPCState| d, assigns:|bool|)
-		if value
-			.ours.state = d
-
-	helper Found (|bool| send, |bool|)
-		if send
-			return .theirs.readid == .ours.sendid
-		return .theirs.sendid != .ours.readid
-
-	function CanSend (|bool|)
-		return (self!=nil) and .found(true)  and .ours.isopen
-
-	function CanGet (|bool|)
-		return (self!=nil) and .found(false) and .ours.isopen
+		return self and !.pico.error
 
 	helper Alive (|bool|)
 		if self != nil
-			return (.ChildAlive, .ParentAlive)(.isserver)
+			return (.ChildAlive, .ParentAlive)(.IsParent)
 	
-
-	function WaitFor (|date| TimeOut, |bool| ModeIsSend, |bool|)
-		|| now			= date.now
-		|| FinalDate	= now + timeout
-		|| print_time	= now + 500_000years
-		if (.pid and .CanPrint >= PrintAfterSomeTime)
-			print_time = now + 5s
-		|| ModeIsGet = !ModeIsSend
-		|date| SleepAmount = -256
-		
-		while
-			if ModeIsGet // we are looping get, so lets also send backedup items
-				.flush
-			if .found(ModeIsSend)
-				if .theirs.IsOpen
-					is connected // refill
-				return true
-
-			if .theirs.isclosed
-				.other "closed connection"
-				exit
-
-			require  .Alive
-
-			now = date.now
-			if now > FinalDate
-				if timeout and ModeIsGet
-					is timedout
-					.other "timed out" 
-				return false
-
-			if  now > print_time
-				.self "waiting...",  print_time += 5s
-
-			if SleepAmount <= 0
-				SleepAmount++
-			  elseif SleepAmount < 1s/32
-				SleepAmount <<= 1
-
-			app.TrySleep(SleepAmount)
-			
-
-		.UpgradeToClosed
-		.self "WaitFor ended"
-	
-	
-	function UpgradeToClosed
-		if (.Ours.State < IPCState.closed)
-			is closed
-	
-		
 	helper ParentAlive (|bool|)
 		if app.ParentID > 1
 			return true
-		.other "died"
-
 
 	helper ChildAlive (|bool|)
 		if .SubProcess
 			return .IsOpen
 		if .exit < 0
 			return true
-		if .pid == 0
-			return false
-		.ProcessDied
+		if .pid > 0
+			.ProcessExited
 
 
-	syntax append (|string| str, |date| TimeOut=0, |bool|)
+	syntax append (|string| str, |bool|)
 		cpp_Part SendStr
-		return self <~ (@sstr.msg(str), TimeOut)
-			
-	
-	helper SendSub (|message| msg)
-		|| p = .SendQueue.pop
-			.ours.queued -= (msg==nil)
-			.SendQueue.first = msg
-			msg = p
-		require msg
-		|| t = date.now
-		
-		//printline "TDB: ${t-TimeDelayBug}"
-		msg.renderjbin(.writer)
-		
-		.WriteSub
+		return self <~ (@sstr.msg(str))
 
 
-	syntax append (|message| msg, |date| TimeOut=0, |bool|)
+	syntax append (|message| msg, |bool|)
 		cpp_part Send 
 		opt norefcounts
-
-		if .CanSend
-			.SendSub(msg)
-			return (timeout > 0) and .WaitFor(timeout, true)
+		debug_require msg
+		
+		debugat
+		if .IsOpen
+			msg.RenderJbin(.writer)
+			.pico.send(.writer)
+			.writer.length = 0
+			.LastSend = date.now
+			.UpdatePipes
+			
 		if !.alive
 			.Disconnect
-		  elseif !msg
-			0 //
-		  elseif .IsClosed
-			.other("sent something to a closed parent.")
-		  elseif (.ours.queued < 255) and .SendQueue
-			.SendQueue.first(msg)
-			.ours.Queued++
-		  else
-			.Other("hasnt read previous message. Cant send new!")
-
-
-	function Flush
-		if (self != nil) and .sendqueue.hasany and .CanSend
-			.SendSub(nil)
-
-
-	syntax Compare (|date| Seconds, |bool| CompareDummy, |int|)
-		cpp_part TimedOut
-		if (self == nil) or !.ours.state
-			return -1
-		if .Found(true) // sent
-			return -1
-		|| allowed = .lastsend + seconds 
-		if allowed < date.now // too old
-			return 1
-		return -1 // allowed
-
-
-	helper WriteSub
-		.self "sending"
-		expect (!.Writer.failed) (self, "Message too long")
-		|| sp = .ours
-		sp.datalength = .writer.length
-		sp.SendID++
-		//.SendSignal(ProcessOwner.SIGUSR1) // this is crashing speedie?
-		.LastSend = date.now
-		.writer.length = 0
-		.UpdatePipes
 
  
-	function Get (|Date| TimeOut = 2years, |message|)
+	function Get (|float| T=0, |message|)
 		opt norefcounts
-		require (self != nil)
-		rz = .getsub(timeout)
-		.UpdatePipes
+		if self
+			|| str = .pico.get(T)
+				rz = str.parse
+			.UpdatePipes
 	
 	
-	helper GetSub (|Date| TimeOut, |message|)
-		if timeout > 0: .self( "get")
-		require .WaitFor(timeout, false)
-		|| sp = .theirs
-		|| len = sp.datalength
-			expect (len <= .writer.reserved) (self, "Invalid message length")
-			|| str = string.copy(.theirs.data, len)
-			.ours.ReadID = sp.SendID
-			return str.parsejbin
-		.ours.readid = sp.SendID
-		.self "received nil"
+	function TimeWaitingForReply (|date|)
+		|| last = .lastsend
+		if .pico.config.lastread < last
+			return last.ago
 
 	
-	function ProcessDied
-		.theirs.state = IPCState.Dead // IS DEAD?
-		.Disconnect
-		if !.IsServer
-			app.quit(-1)
-		.IncrDiedCount
-        .self "died"
+	function CheckDied
+		if (.exit >= 0)
+			.ProcessExited
 
 
-	function IncrDiedCount
-		if .PID
+	function Invalidate
+		.Deathlimit = .diedcount
+		.Diedcount++
+
+
+	function CanActivate (|bool|)
+		if .Diedcount < .Deathlimit
+			return true
+		error (.path, "Too many disconnections, blocking reconnection.")
+	
+	
+	function ProcessExited
+		if (.TermSig != 0)
 			.DiedCount++
 	        .pid = 0
+		.Disconnect
+
+
+	function IsDead (|bool|)
+		return .termsig != 0
 
 	
-	function KillCosFailed
-		.KillButOK(false)
-
-
-	helper KillButOK (|bool| OK=true)
-		|| P = .pid
-			pipe.KillPID(P)
-            if !OK
-                .IncrDiedCount
-			.self("killed child", true)
+	helper Kill
+		super.kill
 		.Disconnect
 
 
@@ -398,132 +128,45 @@ class Process (ShellStream)
 			.UpdatePipes
 			return .Output
 		
-	
-	helper Self (|string| msg, |bool| strong=false)
-		if .CanPrint or strong
-			.LogUs
-			.LogMsg(msg)
-
-
-	helper Other (|string| msg, |bool| strong=false)
-		if .CanPrint or strong
-			.logus
-			.log .theirname
-			.log " "
-			.logmsg(msg)
-
 
 	helper SideID (|pid_int|)
-		return .isserver sign app.id
-
-		
-	helper LogUs
-		.log .ourname
-		.log .sideid.render
-		.log ": "
-	
-	
-	helper LogMsg (|string| msg)
-		.log msg
-		.log "\n"
-	
-	function Log (|string| s)
-		print s
-		log s
+		return .IsParent sign app.id
 
 
 	syntax expect (|string| err)
-		if self isnt invalid
-			.self(err, true)
-			is invalid
-			stderr.NewError(nil, err, .Talker.path)
-
-
-	syntax warn (|string| err)
-		.self err
-
-	
-	helper DummyOrig (|&byte|)
-		return (&.Dummy)|&byte|
-
-
-	helper Unmap
-		|| d = .Dummyorig
-		if .orig != d
-			memory.unmap(.orig, .SizeOfOrig)
-			.orig = d
-			.SizeOfOrig = 0
-			.usedummy
-
-
-	helper UseDummy
-		.theirs = .dummy
-		.ours = .dummy
-		.dummy.state = ipcstate.closed
+		if .IsOpen
+			printline err
+			stderr.NewError(nil, err, .path)
+		.Disconnect
 
 
 	function Disconnect 
-		.unregister
 		.UpdatePipes
-		if self isnt closed
-			.self "disconnect"
-			.ours.state = ipcstate.closed 
-		if .IsServer
-			.UseDummy
-		  else
-			.Unmap
-		|| s = .SendQueue // called after dispose?
-			s.clear
+		.UnRegister
+		.ClosePipes
+		.pico.destroy
+		.pico = nil
 
 
-	function FailedConnect (|bool|)
-		require (self!=nil)
-		if .theirs.state <= IPCState.Waiting
-			return true // never connected
-		if .theirs.state > IPCState.closed // timed out or crashed
-			return true
-
-
-	helper Unlink
-		.talker.delete
-
-
-	destructor
-		.disconnect
-		if .isserver
-			.unmap
-			.unlink
-
-
-	helper StartProcess (|string| path, |[string]| Args=nil, |bool| CaptureStdOut, |bool|)
+	helper StartProcess (|string| path, |[string]| Args=nil, |&picocomms| C = nil, |bool| CaptureStdOut, |bool|)
 		cpp_Wrapper JB_Sh_StartProcess
 
 	
 	function RunChild (|bool|)
 		debug_require .path
-		require (self isnt invalid)
-		if .Startprocess(.path, .params, .output!=nil)
-			return true
-		is closed
+		if .CanActivate
+			return .Startprocess(.path, .params, .pico /*nice!!*/, .output!=nil)
 
 
-	function CanActivate (|bool|)
-		if .diedcount < .deathlimit
-			return true
-		error (self, "Too many disconnections, blocking reconnection.")
-	
-	
 	function Activate (|bool|)
 		if .IsOpen
 			return true
-		debug_require .IsServer
+		debug_require .IsParent
 		if .pid
-			.KillButOK(false)
+			debugger					// it has a PID but the socket was closed?
+			.Kill						// just kill and restart it.
 		if .CanActivate
-			if !.path
-			expect (.path) (self, "Can't re-activate process ${.name} without a path.")
-			.OpenSharedMemory(.SizeOfOrig)
-			.self "reopen"
+			expect (.path) (self, "Can't re-activate process without a path.")
 			return .RunChild
 
 
@@ -538,21 +181,15 @@ class Process (ShellStream)
 	function Fill_CArgs (|fn_subprocess| fn, |errorint|)
 		|| space2 = cstring[256]
 		|| nothing = ""
-		if process.CreateArgs(nothing, .params, space2.ptr)
+		rz = -1
+		if SpdProcess.CreateArgs(nothing, .params, space2.ptr)
 			rz = (fn)(space2.ptr, 0)
-		  else
-			rz = -1
 
 
 	function SendCrashed
 		opt norefcounts
-		|| j = .writer
-		process.StackTraceJbin(j, "crashed", 4)
-		.WriteSub
-		if .WaitFor(5s, true) // wait for the thing to be sent!
-			"CrashSent"
-		  else
-			"CrashUnReceived"
+		SpdProcess.StackTraceJbin(.writer, "crashed", 4)
+		self <~ (.writer.getresult)
 
 
 	iterator
@@ -562,16 +199,19 @@ class Process (ShellStream)
 			yield s
 
 
-	constants
-		PrintAfterSomeTime = 2
-
 
 	module
-		|byte|							ClosePipesInstalled = 0
-		|byte|							SpecialState = 0
-		|Process|						Owner_ = nil
-		|int|							IncID
+		|SpdProcess|					Owner_ = nil
 
+		target !minilib {
+		helper TellParentIDied
+			opt norefcounts
+			visible
+			cpp_name JB_ProcessReportCrash
+			|| o = .owner_
+				o.SendCrashed
+				o.disconnect
+		}
 
 		function CheckAllAlive
 			opt norefcounts
@@ -579,8 +219,8 @@ class Process (ShellStream)
 			while m
 				|| ch = m
 				m++
-				if (ch.exit >= 0) and (ch isa process)
-					ch.ProcessDied
+				if ch isa SpdProcess
+					ch.Checkdied
 		
 
 		helper CreateArgs (|&string| path, |[string]| Args, |&cstring| Space, |bool|)
@@ -591,65 +231,42 @@ class Process (ShellStream)
 			cpp_wrapper JB_BackTrace
 		
 		
-		function StackTraceJbin (|jbin| j, |string| reason, |int|skip=4)
+		function StackTraceJbin (|jbin| j, |string| reason, |int| skip = 4)
 			|_voidptr[32]| arr
 			|| size = 32
 			|| strs = BackTrace(&arr[0], &size)
 			j <~ _JbinHeader
 			j.enter(@arg, reason)
-			for i in skip to size-1
-				j.addcstring(strs[i], @emb)
+			for i in skip to size - 1
+				j.AddCString(strs[i], @emb)
 			memory.free(strs)
 
 
-		function Parent (|Process|)
+		function Parent (|SpdProcess|)
 			opt norefcounts
-			return .owner_ init process("", "", 0, nil, nil)
+			return .owner_ init SpdProcess("",  nil, nil, false)
 			
 
-		function Child (|string| app_path, |string| ID, |[string]| params=nil, |bool| CaptureStdOut=false, |int|size=16KB, |Process|)
+		function Child (|string| app_path, |[string]| params=[], |bool| CaptureStdOut=false, |int|size=16KB, |SpdProcess|)
+			debug_require params!=nil
 			require app_path.file.mustexist
-			rz = process(app_path, ID, size, params, CaptureStdOut)
+			rz = SpdProcess(app_path, params, nil, CaptureStdOut)
 			if !rz.RunChild
 				rz = nil
-		
-
-		function string.IPCPath (|string|)
-			 return "/${self[0,8]}.${app.id}.${process.IncID++}"	
 
 
-		function string.IPCName (|string|)			//		/tmp/shm/1111PERRY9999
-			|| n  = .name
-			|| s  = n.find(jeebox.CSWordStart)
-			|| s2 = n.find(jeebox.CSWordStart, int.max, 0)
-			return n[s, s2+1]
-		
-		
-		target !minilib
-			helper TellParentIDied
-				opt norefcounts
-				visible
-				cpp_name JB_ProcessReportCrash
-				|| o = self.owner_
-					o.ours.state = o.ours.state|int| max ipcstate.Crashed
-					o.SendCrashed
-		
-
-function file.IPC (|&int| n, |_voidptr|)
-	cpp_Wrapper JB_File_IPC
-
-
-prototype fn_pth_wrap (|Process| ipc, |int|)
-	function Start (|Process| IPC, |bool| join, |errorint|)
+prototype fn_pth_wrap (|SpdProcess| ipc, |int|)
+	function Start (|SpdProcess| IPC, |bool| join, |errorint|)
 		cpp_wrapper JB_ThreadStart
 
 
 prototype fn_app_DeathAction
 prototype fn_subprocess	(|&cstring| args, |int| Mode, |errorint|)
-	function RunAsProcess (|string| ID, |[string]| R = nil,  |int| size = 16KB,  |bool| join = false,  |Process|)
-		rz = process("", ID, size, r, self)
+	function RunAsProcess (|[string]| R = [],  |bool| join = false,  |SpdProcess|)
+		debug_require r!=nil
+		rz = SpdProcess("", r, self)
 		|| bad = !rz.Fill_CArgs(self)
-		|| Err = (process.Run).Start(rz, join)
+		|| Err = (SpdProcess.Run).Start(rz, join)
 		bad := Err != 0
 		if bad
 			rz = nil
@@ -666,11 +283,11 @@ extend_module app
 	helper SyntaxAppend (|fn_app_deathaction| handler)
 		cpp_Wrapper JB_App__AtExit
 	
-	helper HasIPC (|bool|)
-		return app..talk.length
+	helper HasParent (|bool|)
+		debugger
 
-	function StartChild (|[string]| r, |process|)
-		return process.Child(.path, .path.name + .path.hash|int64|.render, r)
+	function StartChild (|[string]| r, |SpdProcess|)
+		return SpdProcess.Child(.path, r)
 		
 	helper ParentID (|pid_int|)
 		cpp_wrapper JB_App__ParentID
@@ -678,31 +295,4 @@ extend_module app
 	helper ID (|pid_int|)
 		cpp_wrapper JB_App__ID
 	
-
-
-struct IPCMessage
-	linkage
-		cpp_part IPCM
-	|uint|						DataLength
-	|uint|						SendID
-	|uint|						ReadID
-	|IPCState|					State
-	|byte|						Queued
-	|byte|						Special
-
-	function IsClosed (|bool|)
-		return !.isopen
-
-	function IsOpen (|bool|)
-		return .state < IPCState.closed
-
-	function Data (|&byte|)
-		return (self+1)|&byte|
-		
-	function DebugIPC (|string| msg)
-		disabled 
-		printline "${msg} state: ${.datalength|int|}, ${.sendid|int|}, ${.readid|int|}, ${.state|int|}, ${.queued|int|}, ${.Special|int|}" 
-
-
-|date| TimeDelayBug
 

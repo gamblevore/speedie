@@ -11,67 +11,80 @@ struct PicoMessage
 	syntax cast (|bool|)
 		return .data
 	
-	function @string.FromPico (|picomessage| M, |string|)
-		return string.own(m.data|&byte|, M.length)
-	
 	module
 		function From (|string| s, |PicoMessage|)
-			cpp_Part FromStr
 			rz.length = s.length
 			rz.data = s.addr|&char|
-		function From (|faststring| fs, |PicoMessage|)
-			cpp_Part FromFS
+		function FromFS (|faststring| fs, |PicoMessage|)
 			rz.length = fs.length
 			rz.data = fs.ResultPtr|&char|
+
+
+function @string.FromPico (|picomessage| M, |string|)
+	return string.own(m.data|&byte|, M.length)
 
 
 struct PicoComms
 	linkage: wrapper, cpp_part Pico
 
 	function CreateChild (|&picocomms|)
-		cpp_wrapper PicoMsgChild
+		cpp_wrapper PicoChild
 
 	function Destroy
-		cpp_wrapper PicoMsgDestroy
+		cpp_wrapper PicoDestroy
 
-	function StartFork (|PID_Int|)
-		cpp_wrapper PicoMsgFork
+	function StartFork (|int| fd=0,|PID_Int|)
+		cpp_wrapper PicoFork
 
 	function StartThread (|PicoThreadFn| fn, |PID_Int|)
-		cpp_wrapper PicoMsgThread
+		cpp_wrapper PicoThread
 
+	function StartSocket (|int| Socket=987, |bool|)
+		cpp_wrapper PicoStartSocket
+		
 	function Send (|string| str, |bool| Wait=false, |bool|)
 		cpp_part SendString
 		return .send(picomessage.From(Str), wait)
 
 	function Send (|faststring| fs, |bool| Wait=false, |bool|)
 		cpp_part SendFS
-		return .send(picomessage.From(fs), wait)
+		return .send(picomessage.Fromfs(fs), wait)
 		
 	function Send (|PicoMessage| msg, |bool| Wait=false, |bool|)
-		cpp_wrapper PicoMsgSend
+		cpp_wrapper PicoSend
 
-	function LastRead (|Date|)
-		cpp_wrapper PicoMsgLastRead
-
+	function Config (|&PicoConfig|)
+		cpp_wrapper PicoConf
+	
 	helper __Get (|float| T=0.0, |PicoMessage|)
-		cpp_wrapper PicoMsgGet
+		cpp_wrapper PicoGet
 
 	function Get (|float| T=0.0, |string|)
-		return string.FromPico(.__get(T))
-			
-		
+		return string.FromPico(.__get(T))		
 
 	function Close 
-		cpp_wrapper PicoMsgClose
+		cpp_wrapper PicoClose
 
 	function Error (|ErrorInt|)
-		cpp_wrapper PicoMsgErr
+		cpp_wrapper PicoErr
 
 	function StillSending (|bool|)
-		cpp_wrapper PicoMsgStillSending
+		cpp_wrapper PicoStillSending
 
 	module
 		function New (|&picocomms|)
-			cpp_wrapper PicoMsgCreate
+			cpp_wrapper PicoCreate
+	
+
+struct PicoConfig
+	linkage:wrapper
+	|cstring|	Name
+	|Date|		LastRead
+	|int|		Noise
+	|float|		SendTimeOut
+	|int|		SendFailed
+	|int|		ReadFailed
+	|int|		QueueBytesRemaining
+	|int|		Bits
+
 	

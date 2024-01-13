@@ -57,12 +57,9 @@ JB_String* JB_App__Readline() {
     return JB_Str__Error();
 }
 
-static bool pipe_close (int fd) {
-	if (fd <= 0) return true;
-	while (close(fd) == -1)
-		if (errno != EINTR)
-			return false;
-	return true;
+static void pipe_close (int fd) {
+	if (fd > 0)
+		close(fd);
 }
 
 
@@ -102,11 +99,11 @@ int JB_ThreadStart (fn_pth_wrap wrap, JB_Object* oof, bool join) {
 }
 
 
-static bool pipe_dup2(int to, int from) { // so this kinda does what dup2 should do.
+static bool pipe_dup2(int from, int to) { // so this kinda does what dup2 should do.
 	if (to <= 0)
 		return true;
 	while (true) {
-		int res = dup2(to, from);
+		int res = dup2(from, to);
 		if (res != -1)
 			return true;
 		int err = errno;
@@ -167,8 +164,8 @@ int JB_Kill(int PID) {
 }
 
 
-bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, bool CaptureStdOut) {
-// fnctrl,Fork,Exec,Pipe,Dup2,Waitid,Errno,Close,Eintr // unix simplicity :)
+bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
+// fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr // unix simplicity :)
 	auto& Sh = *self;
 	const char* argv[MaxArgs] = {};
 	bool OK = JB_Proc__CreateArgs(&path, Args, argv);
@@ -184,13 +181,14 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, bool Ca
 		fcntl(Sh.StdErrPipe[RD], F_SETFL, O_NONBLOCK);
 	}
 	JB_PID_Register(&Sh);
-	Sh.PID = fork();
+	Sh.PID = PicoStartFork(C, 987);
+	
 	if (Sh.PID == 0) {
-		pipe_dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
+		pipe_dup2( STDOUT_FILENO, Sh.CaptureOut[WR] );
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureOut[RD]);
 		
-		pipe_dup2( Sh.StdErrPipe[WR], STDERR_FILENO );
+		pipe_dup2( STDERR_FILENO, Sh.StdErrPipe[WR] );
 		pipe_close(Sh.StdErrPipe[WR]);
 		pipe_close(Sh.StdErrPipe[RD]);
 		execvp(argv[0], (char* const*)argv);
@@ -217,6 +215,15 @@ bool JB_Sh_UpdatePipes(ShellStream* self) {
 	return (ContinueOut or ContinueErr);
 }
 
+void JB_Sh_ClosePipes(ShellStream* self) {
+	for (int i = 0; i < 4; i++) {
+		pipe_close(self->CaptureOut[i]);
+		self->CaptureOut[i] = 0;
+	}
+	self->Mode = -1;
+}
+
+
 
 int JB_Str_System(JB_String* self) { // needz escape params manually...
     uint8 Buffer[PATH_MAX];
@@ -238,7 +245,7 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 	JB_Sh_Constructor(rz, self);
 	rz->Output = JB_Incr(FSOut);
 	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
-	bool OK = JB_Sh_StartProcess(rz, self, Args, !StdOutFlowThru);
+	bool OK = JB_Sh_StartProcess(rz, self, Args, 0, !StdOutFlowThru);
 	if (!OK) {
 		JB_SetRef(rz, 0);
 	}
@@ -253,14 +260,13 @@ ivec2 JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* F
 	JB_Sh_UpdatePipes(Sh);
 	while (Sh->ExitCode==-1) {
 		int Err = waitpid(Sh->PID,  &Sh->ExitCode,  0); // in case sigchld handler is overridden
-		if (!(Err == -1 and errno == EINTR)) {
+		if (!(Err == -1 and errno == EINTR))
 			break;
-		}
 		JB_Date__Sleep(1);
 		JB_Sh_UpdatePipes(Sh);
 	}
-	JB_Sh_UpdatePipes(Sh);
 
+	JB_Sh_UpdatePipes(Sh);
 	JB_FEPDWEE_Finish(*Sh);
 
 	auto ShErr = Sh->ErrorOutput;

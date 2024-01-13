@@ -116,7 +116,7 @@ function PrintStackTrace
 Function StackTraceArray (|string| StartAfter="", |[string]|)
 	|_voidptr[128]| arr
 	|| size = 128
-	|| strs = process.BackTrace(&arr[0], &size)
+	|| strs = SpdProcess.BackTrace(&arr[0], &size)
 	|| start = 0
 	for i in size
 		if strs[i].copy contains startafter

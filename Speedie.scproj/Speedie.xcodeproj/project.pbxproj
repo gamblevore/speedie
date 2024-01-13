@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AC33F7B92B4F9D18009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */; };
+		AC33F7BA2B4F9D18009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */; };
+		AC33F7BB2B4F9D18009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */; };
+		AC33F7BC2B4F9D18009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */; };
 		AC7D3C9A29A27C7700148ADB /* JB_Vectors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8C29A27C1D00148ADB /* JB_Vectors.cpp */; };
 		AC7D3C9B29A27C7700148ADB /* JB_VM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7F29A27C1D00148ADB /* JB_VM.cpp */; };
 		AC7D3C9D29A27C7700148ADB /* JB_DirReaderWin32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7E29A27C1D00148ADB /* JB_DirReaderWin32.cpp */; };
@@ -202,6 +206,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
 		AC4C95D629B7D78400B87345 /* jeebox.scproj */ = {isa = PBXFileReference; lastKnownFileType = folder; name = jeebox.scproj; path = ../jeebox.scproj; sourceTree = "<group>"; };
 		AC6ADAE729872AA8009CFFBB /* Speedie */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Speedie; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC7D3C7929A27C1D00148ADB /* JB_RingTree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_RingTree.cpp; path = ../Library/CppLib/JB_RingTree.cpp; sourceTree = "<group>"; };
@@ -363,6 +368,7 @@
 				AC7D3CB729A27C9900148ADB /* JB_Globals.cpp */,
 				AC7D3CB829A27C9900148ADB /* JB.cpp */,
 				AC7D3C9429A27C1D00148ADB /* JB_Alloc.cpp */,
+				AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */,
 				AC7D3C7D29A27C1D00148ADB /* JB_BasicIO.cpp */,
 				AC7D3C7C29A27C1D00148ADB /* JB_ByteMap.cpp */,
 				AC7D3C8429A27C1D00148ADB /* JB_Child.cpp */,
@@ -655,6 +661,7 @@
 				AC7D3CA429A27C7700148ADB /* JB_Errors.cpp in Sources */,
 				AC7D3CB129A27C7700148ADB /* JB_Alloc.cpp in Sources */,
 				AC7D3CB329A27C7700148ADB /* JB_File.cpp in Sources */,
+				AC33F7B92B4F9D18009A1156 /* JB_Pico.cpp in Sources */,
 				AC7D3CAD29A27C7700148ADB /* JB_DirReaderUnix.cpp in Sources */,
 				AC7D3C9D29A27C7700148ADB /* JB_DirReaderWin32.cpp in Sources */,
 				AC7D3CAA29A27C7700148ADB /* JB_Math.cpp in Sources */,
@@ -694,6 +701,7 @@
 				AC7D3D9229A280A700148ADB /* JB_Errors.cpp in Sources */,
 				AC7D3D9329A280A700148ADB /* JB_Alloc.cpp in Sources */,
 				AC7D3D9429A280A700148ADB /* JB_File.cpp in Sources */,
+				AC33F7BA2B4F9D18009A1156 /* JB_Pico.cpp in Sources */,
 				AC7D3D9529A280A700148ADB /* JB_DirReaderUnix.cpp in Sources */,
 				AC7D3D9729A280A700148ADB /* JB_DirReaderWin32.cpp in Sources */,
 				AC7D3D9829A280A700148ADB /* JB_Math.cpp in Sources */,
@@ -733,6 +741,7 @@
 				AC7D3DC329A2816600148ADB /* JB_Errors.cpp in Sources */,
 				AC7D3E0829A2822B00148ADB /* JB_Globals.cpp in Sources */,
 				AC7D3DC429A2816600148ADB /* JB_Alloc.cpp in Sources */,
+				AC33F7BB2B4F9D18009A1156 /* JB_Pico.cpp in Sources */,
 				AC7D3DC529A2816600148ADB /* JB_File.cpp in Sources */,
 				AC7D3DC629A2816600148ADB /* JB_DirReaderUnix.cpp in Sources */,
 				AC7D3DC829A2816600148ADB /* JB_DirReaderWin32.cpp in Sources */,
@@ -772,6 +781,7 @@
 				AC7D3DEC29A2816700148ADB /* JB_Errors.cpp in Sources */,
 				AC7D3E0929A2822B00148ADB /* JB_Globals.cpp in Sources */,
 				AC7D3DED29A2816700148ADB /* JB_Alloc.cpp in Sources */,
+				AC33F7BC2B4F9D18009A1156 /* JB_Pico.cpp in Sources */,
 				AC7D3DEE29A2816700148ADB /* JB_File.cpp in Sources */,
 				AC7D3DEF29A2816700148ADB /* JB_DirReaderUnix.cpp in Sources */,
 				AC7D3DF129A2816700148ADB /* JB_DirReaderWin32.cpp in Sources */,
@@ -859,6 +869,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -910,6 +921,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
