@@ -52,7 +52,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg)
 	.LogOneComm(msg, "\1C ")
 
 
-function PerryIDE.SubProcess (|bool| actual_compile, |fn_Subprocess|)
+function PerryIDE.SubProcess (|bool| actual_compile, |SpdMainFn|)
 	require platform.isdebug and !actual_compile
 	if actual_compile
 		rz = Speedie_Compiler
@@ -76,7 +76,7 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 	if Active
 		return C
 
-	|| p = [.project, "--perry=bin", "--quiet"]
+	|| p = [.project, "--perry=bin", "--quiet", "--nocolor"]
 	|| f = .projmsg.first 
 	|| name = .name
 	if !actual_compile
@@ -86,7 +86,7 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 		if !.UsingSpdLib
 			.UsingSpdLib = true
 			f.name = name.TrimExt + "()"
-		rz = (SubProcess).RunAsProcess(p, 128KB)
+		rz = SubProcess.RunThreaded(p)
 	  else
 		target false // debug
 			|string| Proc = "/usr/local/speedie/Terminal/Debug/uwu"
@@ -94,7 +94,7 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 			|string| Proc = Speedie
 		proc = proc.resolve
 		if proc
-			rz = SpdProcess.child(Proc, p, actual_compile, 128KB)
+			rz = SpdProcess.child(Proc, p, actual_compile)
 
 
 function PerryIDE.ActualCompile (|message| msg)
@@ -121,10 +121,10 @@ function PerryIDE.ActualCompile (|message| msg)
 
 
 target debug
-	cpp_libwrapper Speedie_Main (fn_subprocess)
-	|fn_subprocess| Speedie_Checker = Speedie_Main
-	|fn_subprocess| Speedie_Compiler = Speedie_Main
+	cpp_libwrapper Speedie_Main (SpdMainFn)
+	|SpdMainFn| Speedie_Checker = Speedie_Main
+	|SpdMainFn| Speedie_Compiler = Speedie_Main
   else
-	|fn_subprocess| Speedie_Checker = nil
-	|fn_subprocess| Speedie_Compiler = nil
+	|SpdMainFn| Speedie_Checker = nil
+	|SpdMainFn| Speedie_Compiler = nil
 

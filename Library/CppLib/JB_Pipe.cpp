@@ -47,8 +47,7 @@ JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),  
 
 
 void JB_Rec_NewErrorWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
-
-const int MaxArgs = 256;
+bool pico_dup2(int, int);
 
 JB_String* JB_App__Readline() {
     std::string L;
@@ -83,33 +82,12 @@ void JB_App__SetThreadName(JB_String* self) {
 
 typedef void* (*fn_pth_wrap2)(void* obj);
 
-int JB_ThreadStart (fn_pth_wrap wrap, JB_Object* oof, bool join) {
+int JB_ThreadStart (fn_pth_wrap wrap, JB_Object* oof) {
 	pthread_t thr = nil;
-	int Err = pthread_create(&thr, nil, (fn_pth_wrap2)wrap, oof);
-
-	if (!Err) {
-		void* rz = 0;
-		Err = join? pthread_join(thr, &rz) : pthread_detach(thr);
-		if (!Err)
-			return 0;
-	}
+	if (!pthread_create(&thr, nil, (fn_pth_wrap2)wrap, oof) and !pthread_detach(thr) )
+		return 0;
 	
-	JB_ErrorHandleFile(nil, nil, Err, nil, "run pthread");
-	return Err;
-}
-
-
-static bool pipe_dup2(int from, int to) { // so this kinda does what dup2 should do.
-	if (to <= 0)
-		return true;
-	while (true) {
-		int res = dup2(from, to);
-		if (res != -1)
-			return true;
-		int err = errno;
-		if (err != EINTR and err != EBUSY)	
-			return false;
-	}
+	return JB_ErrorHandleFile(nil, nil, errno, nil, "run pthread");
 }
 
 
@@ -119,7 +97,6 @@ int JB_Pipe__IgnoreBreakPoints() {
 	int rz = sigignore(SIGINT);
 	if (rz)
 		rz = errno;
-	debugger;
 	return rz;
 }
 
@@ -138,24 +115,36 @@ bool JB_Str__Terminate(Array* strs) {
 }
 
 
-bool JB_Proc__CreateArgs(JB_String** self, Array* R, const char** argv) {
-	auto last = argv + MaxArgs - 1;
+const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 	int N = JB_Array_Size(R);
-	if (argv+1+N >= last) {
-		JB_ErrorHandleFile(*self, nil, E2BIG, "Too many arguments", "Creating shell-arguments");
-		return false;
+	int Strs = JB_Str_Length(self) + 1;
+
+	for_(N) 
+		Strs += JB_Str_Length((JB_String*)JB_Array_Value(R, i)) + 1;
+
+	if (Strs >= ARG_MAX-1) {
+		JB_ErrorHandleFile(self, nil, E2BIG, "Arguments too long", "Creating shell-arguments");
+		return 0;
 	}
+
+	int Ptrs = sizeof(void*) * (N+2);
+	const char** PtrSpace = (const char**)calloc(Ptrs + Strs, 1);
+	char* ByteSpace = ((char*)PtrSpace) + Ptrs;
+	auto Orig = PtrSpace; char* Orig2 = ByteSpace;
 	
-	JB_String* self0 = JB_Str_MakeC(*self);
-	require(self0 and JB_Str__Terminate(R));
-	JB_SetRef(*self, self0);
-	
-	*argv++ = (const char*)JB_Str_Address(self0);
-	for_(N) {
-		*argv++ = ((const char*)JB_Str_Address((JB_StringC*)JB_Array_Value(R, i)));
+	for_(N+1) {
+		auto B = (const char*)JB_Str_Address(self);
+		auto N = (int)JB_Str_Length(self);
+		*PtrSpace++ = ByteSpace;
+		memcpy(ByteSpace, B, N);
+		ByteSpace += N+1;
+		self = (JB_String*)JB_Array_Value(R, i);
 	}
-	*argv++ = 0;
-    return true;
+	PtrSpace++;
+	
+	if ((char*)PtrSpace != Orig2) // ouch
+		debugger;
+    return Orig;
 }
 
 
@@ -167,9 +156,8 @@ int JB_Kill(int PID) {
 bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
 // fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr // unix simplicity :)
 	auto& Sh = *self;
-	const char* argv[MaxArgs] = {};
-	bool OK = JB_Proc__CreateArgs(&path, Args, argv);
-	if (!OK) return false;
+	auto argv = JB_Proc__CreateArgs(path, Args);
+	if (!argv) return false;
 	
 	Sh.ExitCode = -1;
 	if (CaptureStdOut or Sh.Output)
@@ -181,14 +169,14 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 		fcntl(Sh.StdErrPipe[RD], F_SETFL, O_NONBLOCK);
 	}
 	JB_PID_Register(&Sh);
-	Sh.PID = PicoStartFork(C, 987);
+	Sh.PID = PicoStartFork(C, true);
 	
 	if (Sh.PID == 0) {
-		pipe_dup2( STDOUT_FILENO, Sh.CaptureOut[WR] );
+		pico_dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureOut[RD]);
 		
-		pipe_dup2( STDERR_FILENO, Sh.StdErrPipe[WR] );
+		pico_dup2( Sh.StdErrPipe[WR], STDERR_FILENO );
 		pipe_close(Sh.StdErrPipe[WR]);
 		pipe_close(Sh.StdErrPipe[RD]);
 		execvp(argv[0], (char* const*)argv);
@@ -196,6 +184,7 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 		return false;
 	}
 	JB_FreeIfDead(path);
+	free(argv);
 	if (Sh.PID > 0) {
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.StdErrPipe[WR]);
@@ -346,8 +335,7 @@ bool JB_Sh_Step(ShellStream* self) {
 
 
 void JB_App__TurnInto(JB_String* self, Array* R) {
-	const char* argv[MaxArgs + 1];
-	JB_Proc__CreateArgs(&self, R, argv);
+	auto argv = JB_Proc__CreateArgs(JB_Str_MakeC(self), R);
 	execvp(argv[0], (char* const*)argv);
 	exit(-1);	// in case execvp fails
 }

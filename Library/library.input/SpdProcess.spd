@@ -5,38 +5,41 @@ class SpdProcess (Process)
 		cpp_part Proc
 	contains SpdProcess
 	|jbin|						Writer
-//	|string|					Name
-	|&PicoComms|				Pico					
+	|&pico|						Pico					
 	|date|						LastSend
-	|fn_subprocess|				SubProcess
+	|SpdMainFn|				SubProcess
 	|[string]|					Params // move this to process?
 	|int| 						DeathLimit
 	|int|						DiedCount
 	|bool|						IsParent
 
+//	#define PicoDesiredThreadCount	2
 
-	constructor	(|string| path, |[string]| params=nil,  |fn_subprocess| fn=nil,  |bool| CaptureStdOut=false)
+	constructor	(|string| path, |[string]| params=nil,  |SpdMainFn| fn=nil,  |bool| CaptureStdOut=false)
 		super.constructor(path)
 		
 		.deathlimit = 12
-		.pico = picocomms.new
-		.IsParent = (!params)
+		.pico = pico.new
+		.pico.config.bits = 15
+		.IsParent = path != "" or fn != nil
+		.params	= params
 		.SubProcess = fn
 		.output = (faststring(), nil)(CaptureStdOut)
 		.writer = FastString()
 		
-		if .IsParent
-			params = params.copy
-		  else
+		if !.IsParent
+			.pico.Completeexec
 			app.BelongsToParent // should die if the parent dies!
-			.pico.StartSocket
-		.params		= params
+			if !pico.HasParent
+				"NoPicoParent!"
+				debugger
+			
 
 	destructor
 		.pico.destroy
 
 	function IsOpen (|bool|)
-		return self and !.pico.error
+		return self and .pico.socket
 
 	helper Alive (|bool|)
 		if self != nil
@@ -65,12 +68,11 @@ class SpdProcess (Process)
 		opt norefcounts
 		debug_require msg
 		
-		debugat
-		if .IsOpen
+		if .pico.status
 			msg.RenderJbin(.writer)
-			.pico.send(.writer)
+			if .pico.send(.writer)
+				.LastSend = date.now
 			.writer.length = 0
-			.LastSend = date.now
 			.UpdatePipes
 			
 		if !.alive
@@ -129,10 +131,6 @@ class SpdProcess (Process)
 			return .Output
 		
 
-	helper SideID (|pid_int|)
-		return .IsParent sign app.id
-
-
 	syntax expect (|string| err)
 		if .IsOpen
 			printline err
@@ -144,18 +142,17 @@ class SpdProcess (Process)
 		.UpdatePipes
 		.UnRegister
 		.ClosePipes
-		.pico.destroy
-		.pico = nil
+		.pico.close
 
 
-	helper StartProcess (|string| path, |[string]| Args=nil, |&picocomms| C = nil, |bool| CaptureStdOut, |bool|)
+	helper StartProcess (|string| path, |[string]| Args=nil, |&pico| C = nil, |bool| CaptureStdOut, |bool|)
 		cpp_Wrapper JB_Sh_StartProcess
 
 	
 	function RunChild (|bool|)
 		debug_require .path
 		if .CanActivate
-			return .Startprocess(.path, .params, .pico /*nice!!*/, .output!=nil)
+			return .StartProcess(.path, .params, .pico /*!!nice!!*/, .output!=nil)
 
 
 	function Activate (|bool|)
@@ -178,12 +175,9 @@ class SpdProcess (Process)
 		return (.subprocess)(nil, 1)
 
 
-	function Fill_CArgs (|fn_subprocess| fn, |errorint|)
-		|| space2 = cstring[256]
-		|| nothing = ""
-		rz = -1
-		if SpdProcess.CreateArgs(nothing, .params, space2.ptr)
-			rz = (fn)(space2.ptr, 0)
+	function SpdMainFn.Fill_CArgs (|[string]| p, |errorint|)
+		|| sub_args = SpdProcess.CreateArgs("", p) #require
+		return (self)(sub_args, 0)
 
 
 	function SendCrashed
@@ -201,16 +195,21 @@ class SpdProcess (Process)
 
 
 	module
-		|SpdProcess|					Owner_ = nil
-
+		InitOwner()
+		|SpdProcess|					Parent = nil
+		
+		function InitOwner
+			if pico.hasparent
+				.parent = SpdProcess("",  nil, nil, false)
+		
 		target !minilib {
 		helper TellParentIDied
 			opt norefcounts
 			visible
 			cpp_name JB_ProcessReportCrash
-			|| o = .owner_
-				o.SendCrashed
-				o.disconnect
+			|| p = .parent
+				p.SendCrashed
+				p.disconnect
 		}
 
 		function CheckAllAlive
@@ -223,7 +222,7 @@ class SpdProcess (Process)
 					ch.Checkdied
 		
 
-		helper CreateArgs (|&string| path, |[string]| Args, |&cstring| Space, |bool|)
+		helper CreateArgs (|string| path, |[string]| Args, |&cstring|)
 			cpp_wrapper
 
 
@@ -242,12 +241,7 @@ class SpdProcess (Process)
 			memory.free(strs)
 
 
-		function Parent (|SpdProcess|)
-			opt norefcounts
-			return .owner_ init SpdProcess("",  nil, nil, false)
-			
-
-		function Child (|string| app_path, |[string]| params=[], |bool| CaptureStdOut=false, |int|size=16KB, |SpdProcess|)
+		function Child (|string| app_path, |[string]| params=[], |bool| CaptureStdOut=false, |SpdProcess|)
 			debug_require params!=nil
 			require app_path.file.mustexist
 			rz = SpdProcess(app_path, params, nil, CaptureStdOut)
@@ -255,20 +249,20 @@ class SpdProcess (Process)
 				rz = nil
 
 
-prototype fn_pth_wrap (|SpdProcess| ipc, |int|)
-	function Start (|SpdProcess| IPC, |bool| join, |errorint|)
+prototype fn_pth_wrap (|SpdProcess| Proc, |int|)
+	function Start (|SpdProcess| Proc, |errorint|)
 		cpp_wrapper JB_ThreadStart
 
 
-prototype fn_app_DeathAction
-prototype fn_subprocess	(|&cstring| args, |int| Mode, |errorint|)
-	function RunAsProcess (|[string]| R = [],  |bool| join = false,  |SpdProcess|)
+prototype SpdDeathActionFn
+prototype SpdMainFn	(|&cstring| args, |int| Mode, |errorint|)
+	function RunThreaded (|[string]| R = [],  |SpdProcess|)
 		debug_require r!=nil
 		rz = SpdProcess("", r, self)
-		|| bad = !rz.Fill_CArgs(self)
-		|| Err = (SpdProcess.Run).Start(rz, join)
-		bad := Err != 0
-		if bad
+		|| OK = .Fill_CArgs(rz.params) == 0
+		if (SpdProcess.Run).Start(rz) != 0
+			OK = false
+		if !OK
 			rz = nil
 
 
@@ -280,7 +274,7 @@ extend_module app
 		cpp_wrapper JB_LibIsThreaded
 	helper BelongsToParent (|int|)
 		cpp_wrapper JB_App__BelongsToParent		
-	helper SyntaxAppend (|fn_app_deathaction| handler)
+	helper SyntaxAppend (|SpdDeathActionFn| handler)
 		cpp_Wrapper JB_App__AtExit
 	
 	helper HasParent (|bool|)

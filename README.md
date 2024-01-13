@@ -74,12 +74,11 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 
 # Installation #
 
-1. Download/Clone repo, and place at `/usr/local/speedie`
-2. `cd /usr/local/speedie`
-3. Execute `sudo Terminal/makelinux.sh` ... OR `sudo Terminal/makeosx.sh`
+1. Run "`git clone https://github.com/gamblevore/speedie.git`" then move the folder to `/usr/local/speedie/` if it wasn't cloned there already.
+1. Run "`git clone https://github.com/gamblevore/PicoMsg.git`" then move the folder to `/usr/local/includes/PicoMsg/` if it wasn't cloned there already.
+3. `cd /usr/local/speedie`
+4. Execute `sudo Terminal/makelinux.sh` ... OR `sudo Terminal/makeosx.sh`
 
-You can install "Perry" (the IDE), on Ubuntu on Windows. You will need libsdl2-dev and `gedit`. (gedit will drag along some GUI libs that Perry needs.)
-
-LibSDL2 has [install instructions](https://wiki.libsdl.org/SDL2/Installation). Gedit can be installed simply: `sudo apt install gedit`
+My IDE Perry, will need libsdl2-dev to compile. LibSDL2 has [install instructions](https://wiki.libsdl.org/SDL2/Installation).
 
 

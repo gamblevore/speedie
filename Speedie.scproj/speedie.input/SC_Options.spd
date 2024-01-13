@@ -203,12 +203,6 @@ module Feedback
 		return CompilerInfo()
 
 
-	function AppTalk (ShellOption) 
-		Explain(Purpose, "")$
-		interact.ShouldEnter = 1
-		ErrorColors.enabled = false
-
-
 	dispatch AppOptions (ShellOption)
 		+"nocompile" // remove this later
 			Explain(Purpose, "Will not compile any .cpp generated.")$
@@ -353,10 +347,6 @@ module Feedback
 		+"crash"
 			explain(purpose, "Crashes speedie to test it's crash handlers.")$
 			app.crash
-		
-		+"__talk__" (AppTalk)
-			
-		+"talk" (AppTalk)
 		
 		+"asm" // nothing... for now.
 			options.MakeASM = value.optionbool

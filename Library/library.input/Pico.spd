@@ -1,6 +1,6 @@
 
 
-prototype PicoThreadFn (|&PicoComms| Comms, |_voidptr|)
+prototype PicoThreadFn (|&pico| Comms, |_voidptr|)
 
 
 struct PicoMessage
@@ -21,13 +21,15 @@ struct PicoMessage
 
 
 function @string.FromPico (|picomessage| M, |string|)
-	return string.own(m.data|&byte|, M.length)
+	|| x = m.data|&byte|
+		return string.own(x, M.length)
 
 
-struct PicoComms
-	linkage: wrapper, cpp_part Pico
+struct Pico
+	linkage: wrapper, cpp_part Pico, cpp_class PicoComms
+		
 
-	function CreateChild (|&picocomms|)
+	function CreateChild (|&pico|)
 		cpp_wrapper PicoChild
 
 	function Destroy
@@ -39,9 +41,9 @@ struct PicoComms
 	function StartThread (|PicoThreadFn| fn, |PID_Int|)
 		cpp_wrapper PicoThread
 
-	function StartSocket (|int| Socket=987, |bool|)
-		cpp_wrapper PicoStartSocket
-		
+	function CompleteExec (|bool|)
+		cpp_wrapper PicoCompleteExec
+	
 	function Send (|string| str, |bool| Wait=false, |bool|)
 		cpp_part SendString
 		return .send(picomessage.From(Str), wait)
@@ -64,16 +66,23 @@ struct PicoComms
 
 	function Close 
 		cpp_wrapper PicoClose
-
-	function Error (|ErrorInt|)
+	
+	function Socket (|int|)
+		cpp_wrapper PicoSocket
+	
+	function Status (|ErrorInt|)
 		cpp_wrapper PicoErr
 
 	function StillSending (|bool|)
 		cpp_wrapper PicoStillSending
 
 	module
-		function New (|&picocomms|)
+		function HasParent (|bool|)
+			cpp_wrapper PicoHasParent
+		function New (|&pico|)
 			cpp_wrapper PicoCreate
+		function DesiredThreadCount (assigns:|int| C, |bool|)
+			cpp_wrapper PicoDesiredThreadCount		
 	
 
 struct PicoConfig

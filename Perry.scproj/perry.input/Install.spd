@@ -193,7 +193,7 @@ extend_module perry
 				rz = "\n\nFailed to move $me to destination"
 		
 	function TestCompiler (|string|)
-		if !CppCompiler.file.exists
+		if !CppCompiler.fileexists
 			return "No c++ compiler exists at '$CppCompiler' ! Please make one available from that path."
 
 

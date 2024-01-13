@@ -44,17 +44,17 @@ function compiler.SetupEnv
 		"Conf missing prefpath"
 		debugger
 	
-	|| talk = app..talk
-	if talk.length and app.IsMainThread
-		app.IgnoreBreakPoints
-	  else
+	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"
-
-	|| NL = app.prefs("nil")
-		options.strnil = nl.int
 
 	errorcolors.DisableIfNoTerminal
 	error.autoprint = 1
+	pico.DesiredThreadCount = 1
+	
+	if pico.hasparent
+		debugger
+		interact.ShouldEnter = 1
+		ErrorColors.enabled = false
 
 
 function app.IgnoreBreakPoints
