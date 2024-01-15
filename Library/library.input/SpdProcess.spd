@@ -75,9 +75,9 @@ class SpdProcess (Process)
 	function Get (|float| T=0, |message|)
 		opt norefcounts
 		if self
+			.UpdatePipes
 			|| str = .pico.get(T)
 				rz = str.parse
-			.UpdatePipes
 	
 	
 	function TimeWaitingForReply (|date|)

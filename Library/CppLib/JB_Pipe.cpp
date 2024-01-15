@@ -56,9 +56,11 @@ JB_String* JB_App__Readline() {
     return JB_Str__Error();
 }
 
-static void pipe_close (int fd) {
-	if (fd > 0)
+static void pipe_close (int& fd) {
+	if (fd > 0) {
 		close(fd);
+		fd = -1;
+	}
 }
 
 
@@ -197,7 +199,6 @@ bool JB_Sh_UpdatePipes(ShellStream* self) {
 void JB_Sh_ClosePipes(ShellStream* self) {
 	for (int i = 0; i < 4; i++) {
 		pipe_close(self->CaptureOut[i]);
-		self->CaptureOut[i] = 0;
 	}
 	self->Mode = -1;
 }

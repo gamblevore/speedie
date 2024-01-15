@@ -40,9 +40,6 @@ function compiler.SetupEnv
 	.Clearenvs
 	if app.prefpath
 		app.PrefsInit
-	  else
-		"Conf missing prefpath"
-		debugger
 	
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"

@@ -510,7 +510,7 @@ bool JB_FS_AppendPipe(FastString* self, int fd, int Mode) {
 	//	0  means finished. we wanna close. Same with errors. So (>= 0) --> close
 	//  -1 means  call back later
 	//  -2 means we need more buffer
-    while (self) {
+    while (self and fd >= 0) {
 		int Error = InterPipe(self, 64 * 1024, fd, Mode);
 		if (Error >=  -1) return Error == -1; // true means call back later.
 											  // false  means we are finished.

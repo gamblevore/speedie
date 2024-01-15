@@ -458,7 +458,7 @@ extend PerryIDE
 		.logactions = .AddBaseLog("-- perry actions --")
 	
 	function AddBaseLog (|string| s, |listviewrow|)
-		rz = @thg + s
+		rz = @arg + s
 		.logarea.listsource <~ rz
 		(rz is expanded)
 		(rz is aligncenter)
@@ -474,10 +474,12 @@ extend PerryIDE
 	
 	
 	function LogOneComm (|message| msg, |string|type="")
+		opt norefcounts
 		.logonething(msg,type, .LogComms$)
 
 
 	function LogOneAction (|message| msg, |string|type="")
+		opt norefcounts
 		.logonething(msg,type, .LogActions$)
 
 
