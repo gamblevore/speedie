@@ -95,6 +95,7 @@ void JB_PID_Register(ProcessOwner* self) {
 	ChildFinder.Finish();
 }
 
+
 void JB_PID_Destructor(ProcessOwner* self) {
 	JB_PID_UnRegister(self);
 }
@@ -114,7 +115,7 @@ ProcessOwner* JB_PID_Next(ProcessOwner* self) {
 }
 
 ProcessOwner* JB_PID__First() {
-	return (ProcessOwner*)Root.Next;
+	return JB_PID_Next((ProcessOwner*)&Root);
 }
 
 int JB_PID_Signal(ProcessOwner* self, int sig) {

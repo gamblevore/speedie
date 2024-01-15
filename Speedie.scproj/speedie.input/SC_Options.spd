@@ -308,6 +308,11 @@ module Feedback
 		+"quiet" 
 			Explain(Purpose, "Prints less stuff")$
 			Options.PrintCompileString = false
+
+		+"silent"
+			Explain(Purpose, "Prints much less")$
+			Options.PrintCompileString = false
+			options.silent = true
 		
 		
 		+"stages"

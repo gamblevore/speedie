@@ -98,6 +98,16 @@ datatype cstring
 		cpp_wrapper puts // hehe
 	function Str (|string|)
 		return string.fromc(self)
+
+	function Name (|cstring|)
+		|| c = self|&byte|
+		|| b = c
+		
+		while *c
+			if *c++ == '/'
+				b = c
+		return b|cstring|
+	
 	syntax cast (|&byte|)
 		return self|&byte|
 	render

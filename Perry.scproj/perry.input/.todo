@@ -3,10 +3,13 @@
 							Todo
 
 * VM? 
-* Build output not showing???
 * Constants and globals don't autocomplete nicely
 * Are function pointers considered... pointers? they should be? nilchecker needs to work on them!
 * building button does not have a sdltouched?
+* expected x but found "" appearing
+* multiplay crashing.
+* c.name ?= "()" compiles badly! decr in wrong place
+
 
 
 						 Perry Do later

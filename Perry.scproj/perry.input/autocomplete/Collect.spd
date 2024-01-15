@@ -70,13 +70,15 @@ function PerryIDE.CrashedFB (|SpdProcess| c, |string| msg="")
 
 
 function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProcess|)   //InitCompiler
+	if .project.path != "/usr/local/speedie/Perry.scproj/"
+		return nil
 	|| Active = C.Activate(5s)
 	if active == -1
 		return nil
 	if Active
 		return C
 
-	|| p = [.project, "--perry=bin", "--quiet", "--nocolor"]
+	|| p = [.project, "--perry=bin", "--silent", "--nocolor"]
 	|| f = .projmsg.first 
 	|| name = .name
 	if !actual_compile
@@ -88,12 +90,8 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 			f.name = name.TrimExt + "()"
 		rz = SubProcess.RunThreaded(p)
 	  else
-		target false // debug
-			|string| Proc = "/usr/local/speedie/Terminal/Debug/uwu"
-		  else
-			|string| Proc = Speedie
-		proc = proc.resolve
-		if proc
+		return nil // for now
+		|| Proc = Speedie.resolve
 			rz = SpdProcess.child(Proc, p, actual_compile)
 
 

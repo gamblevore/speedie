@@ -3,6 +3,7 @@
 prototype PicoThreadFn (|&pico| Comms, |_voidptr| Obj, |&cstring| Args=nil, |bool|)
 
 
+
 struct PicoMessage
 	linkage: wrapper, cpp_part Pico
 	|int|		Length
@@ -35,7 +36,10 @@ struct Pico
 	function Destroy
 		cpp_wrapper PicoDestroy
 
-	function StartFork (|int| fd=0,|PID_Int|)
+	function IsParent (|bool|)
+		cpp_wrapper PicoIsParent
+		
+	helper StartFork (|bool| Exec=false, |PID_Int|)
 		cpp_wrapper PicoStartFork
 
 	function StartThread (|PicoThreadFn| fn, |_voidptr|Obj, |&cstring|Args=nil, |bool|)
@@ -44,11 +48,11 @@ struct Pico
 	function CompleteExec (|bool|)
 		cpp_wrapper PicoCompleteExec
 	
-	function Send (|string| str, |bool| Wait=false, |bool|)
+	syntax append (|string| str, |bool| Wait=false, |bool|)
 		cpp_part SendString
 		return .send(picomessage.From(Str), wait)
 
-	function Send (|faststring| fs, |bool| Wait=false, |bool|)
+	syntax append (|faststring| fs, |bool| Wait=false, |bool|)
 		cpp_part SendFS
 		return .send(picomessage.Fromfs(fs), wait)
 		
@@ -67,32 +71,48 @@ struct Pico
 	function Close 
 		cpp_wrapper PicoClose
 	
-	function Socket (|int|)
-		cpp_wrapper PicoSocket
-	
 	function Status (|ErrorInt|)
-		cpp_wrapper PicoErr
+		cpp_wrapper PicoError
 
-	function StillSending (|bool|)
+	function IsSending (|bool|)
 		cpp_wrapper PicoStillSending
+	
+	function Fork (|&pico|)
+		|| f = .startfork
+		if f >= 0
+			return self
+
+	function SleepForSend
+		while .issending
+			app.sleep(0.001s)
 
 	module
-		function HasParent (|bool|)
-			cpp_wrapper PicoHasParent
+		|&pico| Parent_
+		function HasParentSocket (|bool|)
+			cpp_wrapper PicoHasParentSocket
 		function DesiredThreadCount (assigns:|int| C, |bool|)
 			cpp_wrapper PicoDesiredThreadCount
-		function Parent (|&Pico|)
-			cpp_wrapper PicoParent
-		function New (|&pico|)
+		function Create (|&pico|)
 			cpp_wrapper PicoCreate
-		function New  (|bool| IAmParent, |int| bits, |&pico|)
-			rz = .parent
-			if !rz
-				rz = pico()
-				if !IAmParent
-					rz.CompleteExec
-			rz.config.bits = 15
-		
+
+		function New  (|bool| IAmParent=true, |int| bits=16, |&pico|)
+			if iamparent
+				rz = pico.Create
+			  else
+				rz = pico.parent
+			|| c = rz.config
+			c.noise = -1 // for now!
+			c.name = app.callpath.cstring.name
+			if !c.name: c.name = "()"
+			c.bits = bits
+			
+		function Parent (|&pico|)
+			|| p = Parent_
+				return p
+			require .HasParentSocket
+			rz = pico.new(false)
+			Parent_ = rz
+			rz.CompleteExec
 	
 
 struct PicoConfig

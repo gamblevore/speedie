@@ -291,7 +291,6 @@ class SCImport
 			
 			|| P = compiler.BuildFolder["Resources/Shaders"]		#expect
 			P.MakeAndGoInto
-			printline "S: " + app.cwd
 			
 			for (f in shaders) (sh_name)
 				if (f isa File)

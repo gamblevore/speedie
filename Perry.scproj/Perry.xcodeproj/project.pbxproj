@@ -245,6 +245,7 @@
 		AC310C062A518A1300837DCB /* bird.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = bird.input; path = ../Utils/birds.scproj/bird.input; sourceTree = "<group>"; };
 		AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
 		AC3A6A8D296082E700CE1E91 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		AC4365562B55911F00549D66 /* PicoMsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PicoMsg.h; path = ../../include/PicoMsg/PicoMsg.h; sourceTree = "<group>"; };
 		AC4A650125011C1600EF6E9A /* gui.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = gui.input; path = ../GUI.scproj/gui.input; sourceTree = "<group>"; };
 		AC52889E2961ED2B005EFB9D /* CppLib */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CppLib; path = ../Library/CppLib; sourceTree = SOURCE_ROOT; };
 		AC5288A12961EDC3005EFB9D /* Cpp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Cpp; sourceTree = "<group>"; };
@@ -372,6 +373,7 @@
 		AC528A5F2961F8D3005EFB9D /* Compiled Src Perry */ = {
 			isa = PBXGroup;
 			children = (
+				AC4365562B55911F00549D66 /* PicoMsg.h */,
 				AC528E7D2961F946005EFB9D /* JB_Globals.cpp */,
 				AC528E7C2961F946005EFB9D /* JB.cpp */,
 				AC528EBD2961F9B2005EFB9D /* JB_Alloc.cpp */,

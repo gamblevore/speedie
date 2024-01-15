@@ -664,12 +664,7 @@ datatype int64
 		return def[0]
 	
 	render Hex
-		if self < 0
-			fs <~ '-'
-		fs <~ "0x"
-		for 8
-			fs <~ (self >> 56)|byte|
-			self <<= 8
+		fs.appendhex(self)
 
 	helper RenderSizePart (|faststring| fs, |float| Size, |string| Suff)
 		|| f = (self|float|/size).DecimalPlaces(1)

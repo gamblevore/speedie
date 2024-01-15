@@ -164,12 +164,14 @@ class String
 			fs <~ '\n'
 
 	
-	function ReplaceAll (|string| from, |string| to, |bool|Lexer=false, |Faststring|fs_in=nil, |string|) { cpp_wrapper JB_Str_ReplaceAll }
+	function ReplaceAll (|string| from, |string| to, |bool|Lexer=false, |Faststring|fs_in=nil, |string|)
+		cpp_wrapper JB_Str_ReplaceAll
 
-	function Hex (|int|Spaces=0,|faststring| fs=nil,|string|)					{ cpp_wrapper JB_Str_Hex }
+	function Hex (|int|Spaces=0, |faststring| fs=nil, |string|)
+		cpp_wrapper JB_Str_Hex
 
-	function UnHex (|faststring| fs=nil,|string|)				{ cpp_wrapper JB_Str_UnHex }
-
+	function UnHex (|faststring| fs=nil,|string|)
+		cpp_wrapper JB_Str_UnHex
 
 	function ParseInt (|int| Start, |message| where, |int64|)
 		cpp_Wrapper JB_Str_TextIntegerSection
@@ -420,9 +422,7 @@ class String
 			cpp_wrapper JB_Str_CopyFromCString
 
 		function Hex (|int64| i, |string|)
-			|| fs = faststring()
-			fs.AppendHex(i)
-			return fs
+			return i.hex
 		
 		function FromPtr (|_voidptr| Addr, |int| N, |_voidptr|free=nil, |_voidptr| obj=nil, |string|)
 			cpp_wrapper JB_StrFromPtr

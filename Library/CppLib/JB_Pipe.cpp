@@ -47,7 +47,7 @@ JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),  
 
 
 void JB_Rec_NewErrorWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
-bool pico_dup2(int, int);
+bool PicoDup2(int, int);
 
 JB_String* JB_App__Readline() {
     std::string L;
@@ -162,11 +162,11 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 	Sh.PID = PicoStartFork(C, true);
 	
 	if (Sh.PID == 0) {
-		pico_dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
+		PicoDup2( Sh.CaptureOut[WR], STDOUT_FILENO );
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureOut[RD]);
 		
-		pico_dup2( Sh.StdErrPipe[WR], STDERR_FILENO );
+		PicoDup2( Sh.StdErrPipe[WR], STDERR_FILENO );
 		pipe_close(Sh.StdErrPipe[WR]);
 		pipe_close(Sh.StdErrPipe[RD]);
 		execvp(argv[0], (char* const*)argv);

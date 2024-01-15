@@ -6,6 +6,7 @@
 
 
 class Process (processowner)
+// merge this with processowner!
 	|string|		Path
 	|FastString|	Output
 	|FastString|	ErrorOutput
@@ -21,6 +22,9 @@ class Process (processowner)
 	constructor (|string| path):		cpp_wrapper JB_Sh_Constructor
 	destructor:							cpp_wrapper JB_Sh_Destructor
 
+	render
+		fs <~ "$.pid --> $.path"
+	
 	function ClosePipes ()
 		cpp_wrapper JB_Sh_ClosePipes
 

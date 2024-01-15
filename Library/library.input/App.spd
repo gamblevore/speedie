@@ -148,8 +148,8 @@ function AppPath (|string|)
 		return .path.backtoapp
 	return .path
 
-function CalledName (|string|)
-	cpp_wrapper JB_App__CalledBy
+function CallPath (|stringzeroterminated|)
+	cpp_wrapper JB_App__CallPath
 		
 function TurnInto (|string| s, |[string]| R=nil)
 	cpp_Wrapper JB_App__TurnInto

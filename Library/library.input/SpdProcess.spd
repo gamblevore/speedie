@@ -23,14 +23,14 @@ class SpdProcess (Process)
 		.output = (faststring(), nil)(CaptureStdOut)
 		.writer = FastString()
 
-		.pico = pico.new(.WeAreParent, 15)
+		.pico = pico.new(.WeAreParent)
 
 			
 	destructor
 		.pico.destroy
 
 	function IsOpen (|bool|)
-		return self and .pico.socket
+		return self and .pico.status == 0
 
 	helper Alive (|bool|)
 		if self != nil
@@ -61,12 +61,14 @@ class SpdProcess (Process)
 		
 		if .pico.status
 			msg.RenderJbin(.writer)
-			if .pico.send(.writer)
+			if (.pico <~ .writer)
 				.LastSend = date.now
 			.writer.length = 0
 			.UpdatePipes
 			
 		if !.alive
+			debugger
+			.alive
 			.Disconnect
 
  
@@ -79,13 +81,15 @@ class SpdProcess (Process)
 	
 	
 	function TimeWaitingForReply (|date|)
-		|| last = .lastsend
-		if .pico.config.lastread < last
-			return last.ago
+		|| p = .pico
+			|| last = .lastsend
+			if p.config.lastread < last
+				return last.ago
 
 	
 	function CheckDied
 		if (.exit >= 0)
+			"We '${app.callpath}' think that ${.path} has died, closing pico..."
 			.ProcessExited
 
 
@@ -133,7 +137,10 @@ class SpdProcess (Process)
 		.UpdatePipes
 		.UnRegister
 		.ClosePipes
-		.pico.close
+		if .pico
+			.pico.close
+			.pico = nil
+		if (.exit < 0) // hmmm
 
 
 	helper StartProcess (|string| path, |[string]| Args=nil, |&pico| C = nil, |bool| CaptureStdOut, |bool|)
@@ -143,7 +150,8 @@ class SpdProcess (Process)
 	function RunChild (|bool|)
 		debug_require .path
 		if .CanActivate
-			return .StartProcess(.path, .params, .pico /*!!nice!!*/, .output!=nil)
+			|| p = .pico init pico.new
+			return .StartProcess(.path, .params, p, .output!=nil)
 
 
 	function Activate (|bool|)
@@ -151,8 +159,9 @@ class SpdProcess (Process)
 			return true
 		if !.WeAreParent
 			return false
-		if .pid
-			debugger					// it has a PID but pico was closed?
+		if .pid and (.exit < 0)
+			if !.pico
+										// it has a PID but pico was closed?
 			.Kill						// just kill and restart it.
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")
@@ -164,13 +173,10 @@ class SpdProcess (Process)
 		SpdProcess.StackTraceJbin(.writer, "crashed", 4)
 		self <~ (.writer.getresult)
 
-//	function WrapSubProcess (SpdMainFn)
-//		return (.subprocess)(nil, 7) // 4 means thread, 1 + 2 = IDK.
-
 	iterator
-		while .isopen
-			|| s = .get
-			if (!s) : exit
+		while
+			|| s = .get(1000_000_000)
+			if !s : exit
 			yield s
 
 
@@ -180,7 +186,7 @@ class SpdProcess (Process)
 		|SpdProcess| Parent = nil
 		
 		function InitOwner
-			if pico.HasParent
+			if pico.parent
 				.parent = SpdProcess("", nil, nil, false)
 		
 		target !minilib {
@@ -208,7 +214,7 @@ class SpdProcess (Process)
 
 
 		function BackTrace (|&_voidptr| space, |&int| size, |&cstring|) 
-			cpp_wrapper JB_BackTrace
+			cpp_wrapper PicoBackTrace
 		
 		
 		function StackTraceJbin (|jbin| j, |string| reason, |int| skip = 4)

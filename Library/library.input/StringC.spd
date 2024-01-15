@@ -16,8 +16,8 @@ class StringZeroTerminated (string)
 	false			""
 	default			""
 	function CString (|cstring|)
-		if self != nil
-			return .addr|cstring|
+		return .addr|cstring|
+	
 	syntax cast (|cstring|)
 		return .cstring
 

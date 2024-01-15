@@ -79,7 +79,7 @@ byte				JB_Active = 0;
 extern char**		environ;
 extern uint			JB__Flow_Disabled;
 static Array*		App_Args;
-_cstring			App_CalledBy;
+_cstring			App_CallPath;
 
 
 Dictionary* JB_App__Env() {
@@ -166,7 +166,7 @@ void JB_FinalEvents() {
 }
 
 Array*	JB_App__Args()						{ return App_Args; }
-JB_StringC*	JB_App__CalledBy()				{ return JB_StrC(App_CalledBy); }
+JB_StringC*	JB_App__CallPath()				{ return JB_StrC(App_CallPath); }
 void	JB_LibShutdown()					{ JB_MemFree(JB_MemStandardWorld()); }
 bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
 bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
@@ -186,7 +186,7 @@ int JB_LibInit (_cstring* R, bool IsThread) {
     if (!(EmptyString_ = emptystr()))
         return ENOMEM;
 	if (R) {
-		App_CalledBy = *R;
+		App_CallPath = *R;
 		JB_DefaultSignals();
 		#ifndef AS_LIBRARY
 			if (!IsThread) {
