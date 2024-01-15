@@ -38,7 +38,7 @@ void JB_FinalEvents();
 void JB_CrashTracer() {
     int   size = 32;
     void* array[size];
-    auto  strings = PicoBackTrace(array, &size);
+    auto  strings = JB_App__BackTrace(array, &size);
 
     for_(size) {
         JB_Rec__CrashLog(strings[i]);

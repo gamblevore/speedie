@@ -138,7 +138,8 @@ struct JB_Object {
 
 
 struct JB_RingList : JB_Object { // a list that does not own its items... unlike ringtree
-	int						ExitCode; // dummy
+	s16						ExitStatus;
+	u16						ExitSignal;
     JB_RingList*			Next;
     JB_RingList*			Prev;
 };

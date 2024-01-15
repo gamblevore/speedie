@@ -63,6 +63,7 @@ void JB_SigChildUnLock ();
 int JB_App__Fork();
 //int JB_Str_StartProcess (JB_String* self, Array* Args, JB_File** StdOut);
 void JB_AtExit(void* func);
+const char** JB_App__BackTrace(void** space, int* size);
 bool JB_PipeIsClosed(int fd);
 bool JB_IsTerminal(int FD);
 void JB_CrashTracer();

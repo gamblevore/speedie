@@ -16,7 +16,7 @@ function compiler.PrintCompileTime (|date| durr)
 		"${Compiler.stTotalSourceSize/1024} KB\n".printcolor(errorcolors.good)
 
 
-function compiler.PrintStats
+function compiler.PrintStats 
 	require options.argstats
 	|| fs = faststring()
 	fs <~ "FuncStats: "

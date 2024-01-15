@@ -181,7 +181,7 @@ if !app.usage
 	app.usage = "_0"
 || __ArgCount = app.args.length
 if __ArgCount == 0
-	printline app.usage.replaceall("\$app", app.calledname.name)
+	printline app.usage.replaceall("\$app", app.callpath.name)
 	return 0
 `
 

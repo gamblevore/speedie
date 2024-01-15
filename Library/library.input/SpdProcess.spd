@@ -1,26 +1,27 @@
-
-
+		
 class SpdProcess (Process)
 	linkage
 		cpp_part Proc
 	contains SpdProcess
 	|jbin|						Writer
 	|&pico|						Pico					
-	|date|						LastSend
 	|SpdMainFn|					SubProcess
 	|[string]|					Params // move this to process?
 	|int| 						DeathLimit
 	|int|						DiedCount
 	|bool|						WeAreParent
+	|SpdProcessMode|			Mode
 
-	constructor	(|string| path, |[string]| params=nil,  |SpdMainFn| fn=nil,  |bool| CaptureStdOut=false)
+	constructor	(|string| path, |[string]| params=nil,  |SpdMainFn| fn=nil,  |SpdProcessMode| Mode=SpdProcessMode.PrintErrors)
 		super.constructor(path)
 		
 		.deathlimit = 12
 		.WeAreParent = path != "" or fn != nil
 		.params	= params
 		.SubProcess = fn
-		.output = (faststring(), nil)(CaptureStdOut)
+		.mode = mode
+		.output = (faststring(), nil)(.Mode is CaptureStdOut)
+		.erroroutput = (faststring(), nil)(.mode is CaptureOrPrintErrors)
 		.writer = FastString()
 
 		.pico = pico.new(.WeAreParent)
@@ -58,11 +59,10 @@ class SpdProcess (Process)
 		cpp_part Send 
 		opt norefcounts
 		debug_require msg
-		
+
 		if .pico.status
 			msg.RenderJbin(.writer)
-			if (.pico <~ .writer)
-				.LastSend = date.now
+			.pico <~ .writer
 			.writer.length = 0
 			.UpdatePipes
 			
@@ -79,17 +79,21 @@ class SpdProcess (Process)
 			|| str = .pico.get(T)
 				rz = str.parse
 	
+
+	function LastSend (|date|)
+		|| c = .pico.config
+			return c.lastsend
+		
 	
 	function TimeWaitingForReply (|date|)
-		|| p = .pico
-			|| last = .lastsend
-			if p.config.lastread < last
+		|| c = .pico.config
+			|| last = c.lastsend
+			if c.lastread < last
 				return last.ago
 
 	
 	function CheckDied
-		if (.exit >= 0)
-			"We '${app.callpath}' think that ${.path} has died, closing pico..."
+		if .exit >= 0
 			.ProcessExited
 
 
@@ -108,6 +112,8 @@ class SpdProcess (Process)
 		if (.TermSig != 0)
 			.DiedCount++
 	        .pid = 0
+		if (.erroroutput!=nil) and (.mode is PrintErrors)
+			printline .erroroutput
 		.Disconnect
 
 
@@ -187,7 +193,7 @@ class SpdProcess (Process)
 		
 		function InitOwner
 			if pico.parent
-				.parent = SpdProcess("", nil, nil, false)
+				.parent = SpdProcess("", nil, nil)
 		
 		target !minilib {
 		helper TellParentIDied
@@ -214,7 +220,7 @@ class SpdProcess (Process)
 
 
 		function BackTrace (|&_voidptr| space, |&int| size, |&cstring|) 
-			cpp_wrapper PicoBackTrace
+			cpp_wrapper JB_App__BackTrace
 		
 		
 		function StackTraceJbin (|jbin| j, |string| reason, |int| skip = 4)
@@ -228,15 +234,23 @@ class SpdProcess (Process)
 			memory.free(strs)
 
 
-		function Child (|string| app_path, |[string]| params=[], |bool| CaptureStdOut=false, |SpdProcess|)
+		function Child (|string| app_path, |[string]| params=[], |SpdProcessMode| Mode=0, |SpdProcess|)
 			debug_require params!=nil
 			require app_path.file.mustexist
-			rz = SpdProcess(app_path, params, nil, CaptureStdOut)
+			rz = SpdProcess(app_path, params, nil, Mode)
 			if !rz.RunChild
 				rz = nil
 
 
-prototype SpdDeathActionFn
+datatype SpdProcessMode (int)
+	flags
+		CaptureStdOut
+		CaptureOrPrintErrors = (CaptureErrors, PrintErrors)
+
+	syntax is (|SpdProcessMode| M, |bool|)
+		return self&M
+		
+
 
 prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)
 	function RunThreaded (|[string]| R = [],  |SpdProcess|)
@@ -246,6 +260,7 @@ prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)
 			rz = nil
 
 
+prototype SpdDeathActionFn
 
 extend_module app
 	function IsMainThread (|bool|)
@@ -253,6 +268,7 @@ extend_module app
 	helper IsntMainThread (|bool|)
 		cpp_wrapper JB_LibIsThreaded
 	helper SyntaxAppend (|SpdDeathActionFn| handler)
+		disabled "nothing uses this? Just remove this?"
 		cpp_Wrapper JB_App__AtExit
 
 	function StartChild (|[string]| r, |SpdProcess|)

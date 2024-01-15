@@ -15,13 +15,17 @@ JB_CriticalSection	ChildFinder;
 ProcessOwner		Root;
 
 
+void JB_FillProc (ProcessOwner* F, int C) {
+	F->ExitStatus = WEXITSTATUS(C);
+	F->ExitSignal = WTERMSIG(C);
+}
+
+
 static void AddLostChild_(int PID, int ExitCode) {
 	ProcessOwner* F = JB_PID_Next(&Root);
 	while (F) {
-		if (F->PID == PID) {
-			F->ExitCode = ExitCode;
-			return;
-		}
+		if (F->PID == PID)
+			return JB_FillProc(F, ExitCode);
 		F = JB_PID_Next(F);
 	}
 }
@@ -68,24 +72,17 @@ void JB_PID_Constructor(ProcessOwner* self) {
 
 
 void JB_PID_ClearErrors(ProcessOwner* self) {
-	self->ExitCode = -1;
+	self->ExitStatus = -1;
+	self->ExitSignal = -1;
 }
 
 int JB_PID_Exit(ProcessOwner* self) {
-	int Code = self->ExitCode;
-	if (WIFEXITED(Code)) {				// called exit()
-		return WEXITSTATUS(Code);
-	}
-	return -1;
+	return self->ExitStatus;
 }
 
 
 int JB_PID_TermSig(ProcessOwner* self) {
-	int Code = self->ExitCode;
-	if (WIFSIGNALED(Code)) {			// died from a signal
-		return WTERMSIG(Code);
-	}
-	return 0; 
+	return self->ExitSignal;
 }
 
 

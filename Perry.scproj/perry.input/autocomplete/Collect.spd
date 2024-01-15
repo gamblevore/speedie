@@ -89,7 +89,7 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 		rz = SubProcess.RunThreaded(p)
 	  else
 		|| Proc = Speedie.resolve
-			rz = SpdProcess.child(Proc, p, actual_compile)
+			rz = SpdProcess.child(Proc, p, actual_compile*spdprocessmode.CaptureStdout)
 
 
 function PerryIDE.ActualCompile (|message| msg)

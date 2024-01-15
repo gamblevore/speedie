@@ -62,12 +62,12 @@ struct Pico
 	function Config (|&PicoConfig|)
 		cpp_wrapper PicoConf
 	
-	helper __Get (|float| T=0.0, |PicoMessage|)
+	helper __Get (|float| T, |PicoMessage|)
 		cpp_wrapper PicoGet
 
-	function Get (|float| T=0.0, |string|)
-		return string.FromPico(.__get(T))		
-
+	function Get (|float| T, |string|)
+		return string.FromPico(.__get(T))
+		
 	function Close 
 		cpp_wrapper PicoClose
 	
@@ -101,7 +101,7 @@ struct Pico
 			  else
 				rz = pico.parent
 			|| c = rz.config
-			c.noise = -1 // for now!
+			c.noise = -1 // 
 			c.name = app.callpath.cstring.name
 			if !c.name: c.name = "()"
 			c.bits = bits
@@ -119,10 +119,11 @@ struct PicoConfig
 	linkage:wrapper
 	|cstring|	Name
 	|Date|		LastRead
+	|Date|		LastSend
 	|int|		Noise
 	|float|		SendTimeOut
-	|int|		SendFailed
-	|int|		ReadFailed
+	|int|		SendFailCount
+	|int|		ReadFailCount
 	|int|		QueueBytesRemaining
 	|int|		Bits
 

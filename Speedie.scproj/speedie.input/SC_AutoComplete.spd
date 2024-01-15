@@ -70,11 +70,11 @@ function Log (|message|)
 	rz <~ TransCompiler.LogName	
 
 
-function Enter (|bool|)
-	require stderr.ok and .ShouldEnter
-	app.clearcaches
+function EnterAutoComplete (|bool|)
+	require  stderr.ok  and  .ShouldEnter
+	app.ClearCaches
 	.Perry = SpdProcess.parent
-	if .perry.isopen
+	if .perry.IsOpen
 		.CompileAndGiveFeedBack
 	return true
 

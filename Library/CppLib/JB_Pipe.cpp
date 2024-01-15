@@ -46,8 +46,10 @@ JBClassPlace( ProcessOwner,   JB_PID_UnRegister,     JB_AsClass(JB_Object),     
 JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),   0 );
 
 
-void JB_Rec_NewErrorWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
-bool PicoDup2(int, int);
+void JB_Rec_NewErrorWithNode (JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
+bool PicoDup2 (int, int);
+void JB_FillProc (ProcessOwner* F, int C);
+
 
 JB_String* JB_App__Readline() {
     std::string L;
@@ -151,7 +153,8 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 	auto argv = JB_Proc__CreateArgs(path, Args);
 	if (!argv) return false;
 	
-	Sh.ExitCode = -1;
+	Sh.ExitStatus = -1;
+	Sh.ExitSignal = 0;
 	if (CaptureStdOut or Sh.Output)
 		pipe(Sh.CaptureOut);
 	pipe(Sh.StdErrPipe);
@@ -233,17 +236,22 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 }
 
 
-ivec2 JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru) {
+ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru) {
 	auto Sh = ShellStart(self, R, FSOut, FSErrIn, StdOutFlowThru);
-	if (!Sh) {return ivec2{1,0};}
+	if (!Sh) return ivec2{1, 0};
 	
-	JB_Sh_UpdatePipes(Sh);
-	while (Sh->ExitCode==-1) {
-		int Err = waitpid(Sh->PID,  &Sh->ExitCode,  0); // in case sigchld handler is overridden
-		if (!(Err == -1 and errno == EINTR))
+	while (true) {
+		JB_Sh_UpdatePipes(Sh);
+		int ExitCode = 0;
+		if (Sh->ExitStatus != -1) break;
+		int PID = waitpid(Sh->PID,  &ExitCode,  0);		// in case sigchld handler is overridden
+		if (PID != -1) {
+			JB_FillProc(Sh, ExitCode);
+			break;
+		}
+		if (errno != EINTR)
 			break;
 		JB_Date__Sleep(1);
-		JB_Sh_UpdatePipes(Sh);
 	}
 
 	JB_Sh_UpdatePipes(Sh);
@@ -254,17 +262,11 @@ ivec2 JB_Str_Execute(JB_String* self, Array* R, FastString* FSOut, FastString* F
 		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(ShErr), nil);
 	}
 	
-	int Code = Sh->ExitCode;
+	int Signal = Sh->ExitSignal;
+	int Exit = Sh->ExitStatus;
 	JB_FreeIfDead(Sh);
-	int Signal = 0;
-	int Exit = 0;
-	if (WIFEXITED(Code)) {				// called exit()
-		Exit = WEXITSTATUS(Code);
-	}
-	if (WIFSIGNALED(Code)) {			// died from a signal
-		Signal = WTERMSIG(Code);		// usually its what we want, despite being mixed up
+	if (Signal)			// died from a signal // usually its what we want, despite being mixed up
 		JB_ErrorHandleFile(self, nil, Signal, "crashed", "running");
-	} 
 	return ivec2{Exit, Signal}; // ivec2 specifier needed for linux
 }
 
@@ -279,6 +281,9 @@ ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastStr
 void JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
 	*self = {};
 	JB_PID_Constructor(self);
+	for (int i = 0; i < 4; i++)
+		self->CaptureOut[i] = -1;
+	
 	self->Mode = 1;
 	self->Path = JB_Incr(Path);
 }
