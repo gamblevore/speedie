@@ -1,0 +1,12 @@
+#!/usr/local/bin/spd
+
+main
+	|| p = pico()
+	|| f = p.Fork
+	require f >= 0
+	if (f)
+		"A"
+	  else
+		"B"
+		
+
