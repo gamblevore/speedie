@@ -61,7 +61,7 @@ function app.IgnoreBreakPoints
 	cpp_wrapper JB_Pipe__IgnoreBreakPoints
 
 
-api Speedie_Main (|&cstring| args, |int| Mode, |ErrorInt|)
+api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)
 	cpp_name Speedie_Main 
 	return app.sp_run(args, mode)
 

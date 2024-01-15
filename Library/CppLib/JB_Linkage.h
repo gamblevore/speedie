@@ -24,7 +24,7 @@ extern "C" {
 	JB_String* JB_App__LibClasses(); 
 
 // startup
-    int JB_LibInit (const char** R);
+    int JB_LibInit (const char** R, bool IsThread);
     void JB_LibShutdown();
     bool JB_LibIsThreaded();
 

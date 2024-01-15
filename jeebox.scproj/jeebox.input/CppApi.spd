@@ -335,7 +335,7 @@ module JB_API
 		cpp_part API
 
 	|uint16| NilHappened = 0 // save 2 bytes XD
-	cpp_wrapper JB_LibInit (|&cstring| Args=nil, |int|)
+	cpp_wrapper JB_LibInit (|&cstring| Args=nil, |bool| IsThread=false, |int|)
 	cpp_wrapper JB_LibShutdown ()
 
 

@@ -11,23 +11,19 @@ class SpdProcess (Process)
 	|[string]|					Params // move this to process?
 	|int| 						DeathLimit
 	|int|						DiedCount
-	|bool|						IsParent
+	|bool|						WeAreParent
 
 	constructor	(|string| path, |[string]| params=nil,  |SpdMainFn| fn=nil,  |bool| CaptureStdOut=false)
 		super.constructor(path)
 		
 		.deathlimit = 12
-		.pico = pico.new
-		.pico.config.bits = 15
-		.IsParent = path != "" or fn != nil
+		.WeAreParent = path != "" or fn != nil
 		.params	= params
 		.SubProcess = fn
 		.output = (faststring(), nil)(CaptureStdOut)
 		.writer = FastString()
-		
-		if !.IsParent
-			.pico.Completeexec
-			app.BelongsToParent // should die if the parent dies!
+
+		.pico = pico.new(.WeAreParent, 15)
 
 			
 	destructor
@@ -38,7 +34,7 @@ class SpdProcess (Process)
 
 	helper Alive (|bool|)
 		if self != nil
-			return (.ChildAlive, .ParentAlive)(.IsParent)
+			return (.ChildAlive, .ParentAlive)(.WeAreParent)
 	
 	helper ParentAlive (|bool|)
 		if app.ParentID > 1
@@ -153,26 +149,14 @@ class SpdProcess (Process)
 	function Activate (|bool|)
 		if .IsOpen
 			return true
-		debug_require .IsParent
+		if !.WeAreParent
+			return false
 		if .pid
-			debugger					// it has a PID but the socket was closed?
+			debugger					// it has a PID but pico was closed?
 			.Kill						// just kill and restart it.
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")
 			return .RunChild
-
-
-	function Run (fn_pth_wrap)
-		return (.subprocess)(nil, 7) // 4 means thread, 1 + 2 = IDK.
-
-
-	function RunMulti (fn_pth_wrap)
-		return (.subprocess)(nil, 1)
-
-
-	function SpdMainFn.Fill_CArgs (|[string]| p, |errorint|)
-		|| sub_args = SpdProcess.CreateArgs("", p) #require
-		return (self)(sub_args, 0)
 
 
 	function SendCrashed
@@ -180,6 +164,8 @@ class SpdProcess (Process)
 		SpdProcess.StackTraceJbin(.writer, "crashed", 4)
 		self <~ (.writer.getresult)
 
+//	function WrapSubProcess (SpdMainFn)
+//		return (.subprocess)(nil, 7) // 4 means thread, 1 + 2 = IDK.
 
 	iterator
 		while .isopen
@@ -244,21 +230,13 @@ class SpdProcess (Process)
 				rz = nil
 
 
-prototype fn_pth_wrap (|SpdProcess| Proc, |int|)
-	function Start (|SpdProcess| Proc, |errorint|)
-		cpp_wrapper JB_ThreadStart
-
-
 prototype SpdDeathActionFn
 
-prototype SpdMainFn	(|&cstring| args, |int| Mode, |ErrorInt|)
+prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)
 	function RunThreaded (|[string]| R = [],  |SpdProcess|)
-		debug_require r!=nil
+		|| c_args = SpdProcess.CreateArgs("", r) #require
 		rz = SpdProcess("", r, self)
-		|| OK = .Fill_CArgs(rz.params) == 0
-		if (SpdProcess.Run).Start(rz) != 0
-			OK = false
-		if !OK
+		if !rz.pico.startthread(self|picothreadfn|, 7|_voidptr|, c_args)
 			rz = nil
 
 
@@ -268,8 +246,6 @@ extend_module app
 		return !.IsntMainThread
 	helper IsntMainThread (|bool|)
 		cpp_wrapper JB_LibIsThreaded
-	helper BelongsToParent (|int|)
-		cpp_wrapper JB_App__BelongsToParent		
 	helper SyntaxAppend (|SpdDeathActionFn| handler)
 		cpp_Wrapper JB_App__AtExit
 

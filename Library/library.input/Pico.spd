@@ -1,6 +1,6 @@
 
 
-prototype PicoThreadFn (|&pico| Comms, |_voidptr|)
+prototype PicoThreadFn (|&pico| Comms, |_voidptr| Obj, |&cstring| Args=nil, |bool|)
 
 
 struct PicoMessage
@@ -36,10 +36,10 @@ struct Pico
 		cpp_wrapper PicoDestroy
 
 	function StartFork (|int| fd=0,|PID_Int|)
-		cpp_wrapper PicoFork
+		cpp_wrapper PicoStartFork
 
-	function StartThread (|PicoThreadFn| fn, |PID_Int|)
-		cpp_wrapper PicoThread
+	function StartThread (|PicoThreadFn| fn, |_voidptr|Obj, |&cstring|Args=nil, |bool|)
+		cpp_wrapper PicoStartThread
 
 	function CompleteExec (|bool|)
 		cpp_wrapper PicoCompleteExec
@@ -79,10 +79,20 @@ struct Pico
 	module
 		function HasParent (|bool|)
 			cpp_wrapper PicoHasParent
+		function DesiredThreadCount (assigns:|int| C, |bool|)
+			cpp_wrapper PicoDesiredThreadCount
+		function Parent (|&Pico|)
+			cpp_wrapper PicoParent
 		function New (|&pico|)
 			cpp_wrapper PicoCreate
-		function DesiredThreadCount (assigns:|int| C, |bool|)
-			cpp_wrapper PicoDesiredThreadCount		
+		function New  (|bool| IAmParent, |int| bits, |&pico|)
+			rz = .parent
+			if !rz
+				rz = pico()
+				if !IAmParent
+					rz.CompleteExec
+			rz.config.bits = 15
+		
 	
 
 struct PicoConfig

@@ -82,19 +82,18 @@ void JB_App__CrashInstall() {
 
 
 void* JB_SuicideChecker (void* obj) {
-	while (getppid() > 1)
-		JB_Date__Sleep(64*1024);
-	kill(0, SIGSEGV);
-	return 0;
+	while (getppid() > 1) {
+		timespec ts = {2,0}; // check every 2 seconds.
+		nanosleep(&ts, 0);
+	}
+	kill(0, SIGSEGV); return 0;
 }
 
 
-int JB_App__BelongsToParent () {
-	pthread_t thr = nil;
-	int Err = pthread_create(&thr, nil, JB_SuicideChecker, nil);
-	if (!Err)
-		Err = pthread_detach(thr);
-	return Err;
+static pthread_t JB_BelongsToParent;
+void JB_KillWithParent () {
+	if (!JB_BelongsToParent and !pthread_create(&JB_BelongsToParent, nil, JB_SuicideChecker, nil))
+		pthread_detach(JB_BelongsToParent);
 }
 
 

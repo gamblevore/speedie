@@ -80,16 +80,6 @@ void JB_App__SetThreadName(JB_String* self) {
 #endif
 }
 
-typedef void* (*fn_pth_wrap2)(void* obj);
-
-int JB_ThreadStart (fn_pth_wrap wrap, JB_Object* oof) {
-	pthread_t thr = nil;
-	if (!pthread_create(&thr, nil, (fn_pth_wrap2)wrap, oof) and !pthread_detach(thr) )
-		return 0;
-	
-	return JB_ErrorHandleFile(nil, nil, errno, nil, "run pthread");
-}
-
 
 bool CanASMBKPT = true;
 int JB_Pipe__IgnoreBreakPoints() {

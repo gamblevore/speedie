@@ -176,7 +176,7 @@ void	JB_SP_AtExit() {
 }
 
 
-int JB_LibInit (_cstring* R) {
+int JB_LibInit (_cstring* R, bool IsThread) {
 	JB_ErrorNumber = 0;
 	JB__Flow_Disabled = 0x7fffFFFF;
 
@@ -189,8 +189,11 @@ int JB_LibInit (_cstring* R) {
 		App_CalledBy = *R;
 		JB_DefaultSignals();
 		#ifndef AS_LIBRARY
-			void JB_App__CrashInstall();
-			JB_App__CrashInstall();
+			if (!IsThread) {
+				void JB_App__CrashInstall();
+				JB_App__CrashInstall();
+				JB_KillWithParent();
+			}
 		#endif
 	}
 	App_Args = JB_Incr(JB_Str_ArgV(R));	// allow caller to remove their c-string data.
@@ -213,7 +216,7 @@ int JB_LibInit (_cstring* R) {
 
 
 
-int		JB_SP_Run (_cstring* C, int Mode)	{
+int JB_SP_Run (_cstring* C, int Mode)	{
 	if (JB_Active)
 		return EALREADY;
 	JB_Active = 1 | (Mode&4);
@@ -221,7 +224,7 @@ int		JB_SP_Run (_cstring* C, int Mode)	{
 		AddError(EACCES, "jb.shutdown");
 	} else {
 		if (!App_Args and C)
-			AddError(JB_LibInit(C),		"jb.init");
+			AddError(JB_LibInit(C, Mode&4), "jb.init");
 		
 		if ((Mode & 1) and App_Args and !JB_ErrorNumber)
 			AddError(JB_Main(),			"occurred");
