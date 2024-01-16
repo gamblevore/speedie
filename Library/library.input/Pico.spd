@@ -95,11 +95,8 @@ struct Pico
 		function Create (|&pico|)
 			cpp_wrapper PicoCreate
 
-		function New  (|bool| IAmParent=true, |int| bits=16, |&pico|)
-			if iamparent
-				rz = pico.Create
-			  else
-				rz = pico.parent
+		function New  (|int| bits=16, |&pico|)
+			rz = pico.Create
 			|| c = rz.config
 			c.noise = -1 // 
 			c.name = app.callpath.cstring.name
@@ -107,11 +104,11 @@ struct Pico
 			c.bits = bits
 			
 		function Parent (|&pico|)
-			|| p = Parent_
+			|| p = .Parent_
 				return p
 			require .HasParentSocket
-			rz = pico.new(false)
-			Parent_ = rz
+			rz = pico.new
+			.Parent_ = rz
 			rz.CompleteExec
 	
 

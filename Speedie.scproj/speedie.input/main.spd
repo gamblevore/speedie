@@ -9,11 +9,6 @@ function Compiler.Main
 	if .EnterCompile
 		using FlowControl.allow("Speedie")
 			.CompileTime
-	if !stderr.ok
-		"error occurred, but what number are we returning:"
-	  else
-		"I guess its ok:"
-	printline compiler.projectname
 	.PrintResults
 
 
@@ -48,7 +43,7 @@ function compiler.SetupEnv
 		app.ThreadName = "SpeedieDebug"
 
 	errorcolors.DisableIfNoTerminal
-	error.autoprint = 1
+	error.AutoPrint = 1
 	pico.DesiredThreadCount = 1
 	
 	if pico.parent

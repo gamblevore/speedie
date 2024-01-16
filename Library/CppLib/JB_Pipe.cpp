@@ -47,7 +47,7 @@ JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),  
 
 
 void JB_Rec_NewErrorWithNode (JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
-bool PicoDup2 (int, int);
+bool JB_Dup2 (int, int);
 void JB_FillProc (ProcessOwner* F, int C);
 
 
@@ -147,6 +147,15 @@ int JB_Kill(int PID) {
 }
 
 
+extern "C" bool JB_Dup2(int from, int to) { // so this kinda does what dup2 should do.
+	while (from > 0 and dup2(from, to) == -1) {
+		int err = errno;
+		if (err != EINTR and err != EBUSY)	
+			return false;
+	}
+	return true;
+}
+
 bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
 // fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr // unix simplicity :)
 	auto& Sh = *self;
@@ -163,15 +172,17 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 			fcntl(Sh.CaptureOut[RD], F_SETFL, O_NONBLOCK);
 		fcntl(Sh.StdErrPipe[RD], F_SETFL, O_NONBLOCK);
 	}
+	
+	
 	JB_PID_Register(&Sh);
 	Sh.PID = PicoStartFork(C, true);
-	
+
 	if (Sh.PID == 0) {
-		PicoDup2( Sh.CaptureOut[WR], STDOUT_FILENO );
+		JB_Dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureOut[RD]);
 		
-		PicoDup2( Sh.StdErrPipe[WR], STDERR_FILENO );
+		JB_Dup2( Sh.StdErrPipe[WR], STDERR_FILENO );
 		pipe_close(Sh.StdErrPipe[WR]);
 		pipe_close(Sh.StdErrPipe[RD]);
 		execvp(argv[0], (char* const*)argv);

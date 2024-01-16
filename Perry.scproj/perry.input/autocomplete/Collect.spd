@@ -88,7 +88,13 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 			f.name = name.TrimExt + "()"
 		rz = SubProcess.RunThreaded(p)
 	  else
-		|| Proc = Speedie.resolve
+		target debug
+			|| proc = "/usr/local/speedie/Speedie.scproj/Build/Products/Debug/Speedie"
+		  else
+			|| proc = speedie.Path
+		
+		Proc = proc.resolve
+		if proc
 			rz = SpdProcess.child(Proc, p, actual_compile*spdprocessmode.CaptureStdout)
 
 

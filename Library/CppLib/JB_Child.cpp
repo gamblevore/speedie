@@ -13,6 +13,8 @@ void JB_Child_Stub() {}
 #include <errno.h>
 #include <signal.h>
 #include <pthread.h>
+#include <execinfo.h>
+
 
 extern "C" {
 
@@ -23,6 +25,11 @@ int JB_App__ParentID() {
 
 int JB_App__ID() {
 	return getpid();
+}
+
+const char** JB_App__BackTrace(void** space, int* size) {
+    *size = backtrace( space, *size );
+    return (const char**)backtrace_symbols( space, *size );
 }
 
 static void SafePrint (const char* c) {

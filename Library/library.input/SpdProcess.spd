@@ -24,7 +24,7 @@ class SpdProcess (Process)
 		.erroroutput = (faststring(), nil)(.mode is CaptureOrPrintErrors)
 		.writer = FastString()
 
-		.pico = pico.new(.WeAreParent)
+		.pico = (pico.new, pico.parent)(.WeAreParent)
 
 			
 	destructor
@@ -146,7 +146,6 @@ class SpdProcess (Process)
 		if .pico
 			.pico.close
 			.pico = nil
-		if (.exit < 0) // hmmm
 
 
 	helper StartProcess (|string| path, |[string]| Args=nil, |&pico| C = nil, |bool| CaptureStdOut, |bool|)

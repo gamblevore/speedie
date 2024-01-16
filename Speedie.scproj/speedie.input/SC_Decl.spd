@@ -501,6 +501,16 @@ class SCDecl (SCObject) {
 		return slf.expectmatch(cls.typenormal, 0, self, self) 
 	
 
+	function ExpectFail (|SCDecl| O, |string|)
+		|| fs = faststring()
+		fs <~ "Type mismatch, expected '"
+		.RenderTypeName(fs)
+		fs <~ "' but found '"
+		o.RenderTypeNameNicer(fs)
+		fs <~ "'."
+		return fs
+
+		
 	function ExpectMatch (|SCDecl| O, |int| TypeCast, |Message| exp, |Message| ErrNode = nil, |Message|)
 		|| Matched = .TypeMatch(O, TypeCast, exp)
 		if (Matched == kCastedMatch or kLossyCastedMatch)
@@ -508,7 +518,7 @@ class SCDecl (SCObject) {
 
 		if (Matched == kNoMatch)
 			ErrNode := exp
-			error ( ErrNode, "Type mismatch, expected '${.RenderTypeName}' but found '${o.RenderTypeNameNicer}'." )
+			error ( ErrNode, .ExpectFail(o) )
 			.TypeMatch(O, TypeCast, exp)
 
 		return exp
@@ -986,9 +996,10 @@ class SCDecl (SCObject) {
 
 
 	render RenderTypeNameNicer
+		opt norefcounts
 		if .downgrade
-			return .downgrade.RenderTypeName(fs)
-		return .RenderTypeName(fs) 
+			return .downgrade.RenderTypeName(fs_in)
+		return .RenderTypeName(fs_in) 
 
 	render RenderTypeName 
 		if !self or !.type
