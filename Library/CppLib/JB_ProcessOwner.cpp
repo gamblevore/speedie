@@ -19,8 +19,8 @@ void JB_FillProc (ProcessOwner* F, int C) {
 	int Ex = 255; 	int Sig = 0;
 	if (WIFEXITED(C))   Ex = WEXITSTATUS(C);
 	if (WIFSIGNALED(C)) Sig = WTERMSIG(C);
-	F->ExitStatus = Ex;
-	F->ExitSignal = Sig;
+	F->Exit = Ex;
+	F->Status = Sig;
 }
 
 
@@ -63,25 +63,15 @@ void JB_PID_Constructor(ProcessOwner* self) {
 		self = &Root;
 	}
 	JB_Helper_SelfLink((JB_RingList*)self);
-	self->PID = 0;
+	self->Status = 0;
+	self->Exit = -1;
 }
 
-
-void JB_PID_ClearErrors(ProcessOwner* self) {
-	self->ExitStatus = -1;
-	self->ExitSignal = 0;
-}
-
-int JB_PID_Exit(ProcessOwner* self) {
-	return self->ExitStatus;
-}
-
-int JB_PID_TermSig (ProcessOwner* self) {
-	if (self) return self->ExitSignal; return 0;
-}
 
 JB_StringC* JB_Err_SignalName (int Sig) {
-	return JB_StrC(strsignal(Sig));
+	const char* S = "NormalExit";
+	if (Sig) S = strsignal(Sig);
+	return JB_StrC(S);
 }
 
 JB_StringC* JB_Err_Name (int Err) {

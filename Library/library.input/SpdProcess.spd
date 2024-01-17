@@ -11,10 +11,10 @@ class SpdProcess (Process)
 	|int|						DiedCount
 	|bool|						WeAreParent
 	|bool|						AlreadyWarnedDied
-	|SpdProcessMode|			Mode
+	|ProcessMode|				Mode
 
-	constructor	(|string| path, |stringzeroterminated| DebugName, |[string]| params=nil,  |SpdMainFn| fn=nil,  |SpdProcessMode| Mode=SpdProcessMode.PrintErrors)
-		super.constructor(path)
+	constructor	(|string| path, |stringzeroterminated| DebugName, |[string]| params=nil,  |SpdMainFn| fn=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
+		super.constructor(path) // <-- mode should be passed here
 		
 		.deathlimit = 12
 		.WeAreParent = path != "" or fn != nil
@@ -47,8 +47,6 @@ class SpdProcess (Process)
 			return .IsOpen
 		if .exit < 0
 			return true
-		if .pid > 0
-			.ProcessExited
 
 
 	syntax append (|string| str, |bool|)
@@ -60,14 +58,11 @@ class SpdProcess (Process)
 		cpp_part Send 
 		opt norefcounts
 		debug_require msg
-
+			
 		if .pico.status
 			msg.RenderJbin(.writer)
 			.pico <~ .writer
 			.UpdatePipes
-			
-		if !.alive
-			.Disconnect
 
  
 	function Get (|float| T=0, |message|)
@@ -90,9 +85,12 @@ class SpdProcess (Process)
 				return last.ago
 
 	
-	function CheckDied
-		if .exit >= 0
-			.ProcessExited
+	helper HandledDied
+		|| OK = .status
+		.DiedCount += !OK
+		if (.ErrorOutput!=nil) and (.mode is AutoPrintErrors)
+			printline .ErrorOutput
+		.Disconnect(OK.signalname) // removes us from the check-list
 
 
 	function CanActivate (|bool|)
@@ -103,15 +101,6 @@ class SpdProcess (Process)
 			.AlreadyWarnedDied = true
 			error (.path, "Too many disconnections, blocking reconnection.")
 	
-	
-	function ProcessExited
-		if !.Status
-			.DiedCount++
-	        .pid = 0
-		if (.erroroutput!=nil) and (.mode is PrintErrors)
-			printline .erroroutput
-		.Disconnect
-
 	
 	helper Kill
 		disabled "Explain why"
@@ -194,8 +183,8 @@ class SpdProcess (Process)
 			while m
 				|| ch = m
 				m++
-				if ch isa SpdProcess
-					ch.Checkdied
+				if ch.exit >= 0 and (ch isa SpdProcess)
+					ch.HandledDied
 		
 
 		helper CreateArgs (|string| path, |[string]| Args, |&cstring|)
@@ -206,9 +195,7 @@ class SpdProcess (Process)
 			cpp_wrapper JB_App__BackTrace
 		
 		
-
-
-		function Child (|string| app_path, |string| DebugName="", |[string]| params=[], |SpdProcessMode| Mode=0, |SpdProcess|)
+		function RunChild (|string| app_path, |string| DebugName="", |[string]| params=[], |ProcessMode| Mode=0, |SpdProcess|)
 			debug_require params!=nil
 			require app_path.file.mustexist
 			rz = SpdProcess(app_path, debugname, params, nil, Mode)
@@ -216,12 +203,12 @@ class SpdProcess (Process)
 				rz = nil
 
 
-datatype SpdProcessMode (int)
+datatype ProcessMode (int)
 	flags
 		CaptureStdOut
-		CaptureOrPrintErrors = (CaptureErrors, PrintErrors)
+		CaptureOrPrintErrors = (CaptureErrors, AutoPrintErrors)
 
-	syntax is (|SpdProcessMode| M, |bool|)
+	syntax is (|ProcessMode| M, |bool|)
 		return self&M
 		
 
@@ -238,5 +225,5 @@ prototype SpdDeathActionFn
 
 
 function app.StartChild (|[string]| r, |SpdProcess|)
-	return SpdProcess.Child(.path, r)
+	return SpdProcess.RunChild(.path, r)
 

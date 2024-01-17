@@ -432,8 +432,7 @@ void JB_Mem_Destructor( JB_MemoryLayer* self ) {
 
 
 void JB_Helper_SelfLink(JB_RingList* New) {
-	New->ExitStatus = -1;
-	New->ExitSignal = 0;
+	New->PID = 0;
     New->Prev = New;
     New->Next = New;
 }

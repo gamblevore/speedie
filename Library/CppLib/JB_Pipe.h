@@ -10,7 +10,8 @@ extern "C" {
 
 
 JBClass( ProcessOwner, JB_RingList,
-	uint PID;
+	int		Exit; // turn these into an ErrorInt2?
+	int		Status;
 );
 
 void JB_PID_Constructor(ProcessOwner* self);
@@ -21,7 +22,6 @@ int JB_PID_Exit(ProcessOwner* self);
 int JB_PID_TermSig(ProcessOwner* self);
 JB_StringC* JB_Err_SignalName (int Sig);
 JB_StringC* JB_Err_Name (int Sig);
-void JB_PID_ClearErrors(ProcessOwner* self);
 ProcessOwner* JB_PID_Next(ProcessOwner* self);
 ProcessOwner* JB_PID__First();
 
@@ -30,15 +30,15 @@ ProcessOwner* JB_PID__First();
 
 
 JBClass( ShellStream, ProcessOwner,
-	int Mode;
+	int			StreamMode;
 	JB_String*  Path;
 	Array*  	Params;
 	FastString* Output;
 	FastString* ErrorOutput;
-    int CaptureOut[2];
-    int StdErrPipe[2];
-    Date LastRead;
-    int64 UserFlags;
+    int			CaptureOut[2];
+    int			CaptureErr[2];
+    Date		LastRead;
+    int64		UserFlags;
     JB_Object* UserObj; // just like jeebox!
 );
 

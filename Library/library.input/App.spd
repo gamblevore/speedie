@@ -59,12 +59,16 @@ function Prefs (|string| s, assigns:|message|)
 	cpp_part SetPrefMsg
 	._prefs[s] = Value
 
+
 function Crash (|string| reason="")
 	opt norefcounts
 	if reason
 		printline reason
 	.CrashLog "AboutToCrash".cstr
 	*(-1|&byte|) = 0
+	"Crash Failed!"
+	app.quit(-1)
+
 
 function CrashLog (|cstring| value)
 	cpp_wrapper JB_Rec__CrashLog

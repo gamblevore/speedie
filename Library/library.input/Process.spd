@@ -26,7 +26,7 @@ class Process (processowner)
 	render
 		fs <~ "PID: $.pid,  ${.path.name} $.params"
 	
-	function ClosePipes ()
+	function ClosePipes
 		cpp_wrapper JB_Sh_ClosePipes
 
 	function UpdatePipes (|bool|)

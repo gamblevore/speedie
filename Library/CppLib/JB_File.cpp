@@ -392,8 +392,16 @@ int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
 }
 
 
+// this is what the write() function should do.
+// well kinda. It could write some of the bytes and STILL get an error. so the interface is just bad.
 int JB_Write(int fd, uint8* buffer, int N) {
     int TotalCount = 0;
+    if (strcmp("/usr/local/speedie/Speedie.scproj/Build/Products/Debug/Speedie", (const char*)buffer) == 0) {
+		void JB_PrintStackTrace();
+		JB_PrintStackTrace();
+		debugger;
+    }
+    
     while (N > TotalCount) {
         int written = (int)write(fd, buffer+TotalCount, N-TotalCount);
         if (written == -1) {
@@ -1195,10 +1203,10 @@ JB_File* JB_Str_File( JB_String* Path ) {
 }
 
 
-long JB_File__chdir( JB_String* Path ) {
+int JB_File__chdir( JB_String* Path ) {
     uint8 Buffer1[PATH_MAX];
-	long err = trchdir( (NativeFileChar2*)JB_FastFileString( Path, Buffer1 ) );
-	return ErrorHandle_(err, Path, nil, "calling chdir"); 
+	int err = trchdir( (NativeFileChar2*)JB_FastFileString( Path, Buffer1 ) );
+	return (int)ErrorHandle_(err, Path, nil, "calling chdir"); 
 }
 
 

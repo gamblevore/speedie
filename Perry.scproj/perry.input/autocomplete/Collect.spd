@@ -92,8 +92,9 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 		target debug
 			proc = "/usr/local/speedie/Speedie.scproj/Build/Products/Debug/Speedie"
 		if proc
-			|| mode = actual_compile*spdprocessmode.CaptureStdout
-			rz = SpdProcess.child(Proc, .project.name, p, mode)
+			|| mode = actual_compile*ProcessMode.CaptureStdout
+			mode |= ProcessMode.CaptureErrors
+			rz = SpdProcess.Runchild(Proc, .project.name, p, mode)
 
 
 function PerryIDE.ActualCompile (|message| msg)

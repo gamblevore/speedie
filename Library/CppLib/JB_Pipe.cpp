@@ -156,22 +156,30 @@ extern "C" bool JB_Dup2(int from, int to) { // so this kinda does what dup2 shou
 	return true;
 }
 
+
+static void Unblock (int fd) {
+	if (fd < 0) return;
+	int FL = fcntl(fd, F_GETFL, 0);
+	if (FL!=-1)
+		fcntl(fd, F_SETFL, FL | O_NONBLOCK);
+}
+
+
 bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
-// fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr // unix simplicity :)
+// fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr,_exit // unix simplicity :)
 	auto& Sh = *self;
 	auto argv = JB_Proc__CreateArgs(path, Args);
 	if (!argv) return false;
 	
-	Sh.ExitStatus = -1;
-	Sh.ExitSignal = 0;
+	Sh.Exit = -1;
+	Sh.Status = 0;
+	
 	if (CaptureStdOut or Sh.Output)
 		pipe(Sh.CaptureOut);
-	pipe(Sh.StdErrPipe);
-	if (Sh.Mode == 1) {	// 1 means... no block. So we wanna restore it.
-		if (Sh.CaptureOut[RD])
-			fcntl(Sh.CaptureOut[RD], F_SETFL, O_NONBLOCK);
-		fcntl(Sh.StdErrPipe[RD], F_SETFL, O_NONBLOCK);
-	}
+	pipe(Sh.CaptureErr);
+	Unblock(Sh.CaptureErr[RD]); // should never block
+	if (Sh.StreamMode == 1)
+		Unblock(Sh.CaptureOut[RD]); // even this blocking at all is kinda sus...
 	
 	
 	JB_PID_Register(&Sh);
@@ -182,9 +190,9 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureOut[RD]);
 		
-		JB_Dup2( Sh.StdErrPipe[WR], STDERR_FILENO );
-		pipe_close(Sh.StdErrPipe[WR]);
-		pipe_close(Sh.StdErrPipe[RD]);
+		JB_Dup2( Sh.CaptureErr[WR], STDERR_FILENO );
+		pipe_close(Sh.CaptureErr[WR]);
+		pipe_close(Sh.CaptureErr[RD]);
 		execvp(argv[0], (char* const*)argv);
 		_exit(errno); // in case execvp fails
 		return false;
@@ -193,7 +201,7 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 	free(argv);
 	if (Sh.PID > 0) {
 		pipe_close(Sh.CaptureOut[WR]);
-		pipe_close(Sh.StdErrPipe[WR]);
+		pipe_close(Sh.CaptureErr[WR]);
 		return true;
 	}
 	JB_ErrorHandleFile(path, nil, errno, nil, "run");
@@ -203,10 +211,10 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 
 bool JB_Sh_UpdatePipes(ShellStream* self) {
 	auto& Sh = *self;
-	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], Sh.Mode);
+	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], Sh.StreamMode);
 	// this will only return, once the app has finished... unless we are Streaming.
 	// either way, if both return false, we can finish.
-	bool ContinueErr = JB_FS_AppendPipe(Sh.ErrorOutput, Sh.StdErrPipe[RD], Sh.Mode);
+	bool ContinueErr = JB_FS_AppendPipe(Sh.ErrorOutput, Sh.CaptureErr[RD], Sh.StreamMode);
 	return (ContinueOut or ContinueErr);
 }
 
@@ -214,7 +222,7 @@ void JB_Sh_ClosePipes(ShellStream* self) {
 	for (int i = 0; i < 4; i++) {
 		pipe_close(self->CaptureOut[i]);
 	}
-	self->Mode = -1;
+	self->StreamMode = -1;
 }
 
 
@@ -229,8 +237,8 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 
 void JB_FEPDWEE_Finish(ShellStream& Sh) {
 	pipe_close(Sh.CaptureOut[RD]);
-	pipe_close(Sh.StdErrPipe[RD]);
-	Sh.Mode = -1;
+	pipe_close(Sh.CaptureErr[RD]);
+	Sh.StreamMode = -1;
 }
 
 
@@ -255,7 +263,7 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 	while (true) {
 		JB_Sh_UpdatePipes(Sh);
 		int ExitCode = 0;
-		if (Sh->ExitStatus != -1) break;
+		if (Sh->Exit != -1) break;
 		int PID = waitpid(Sh->PID,  &ExitCode,  0);		// in case sigchld handler is overridden
 		if (PID != -1) {
 			JB_FillProc(Sh, ExitCode);
@@ -274,8 +282,8 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(ShErr), nil);
 	}
 	
-	int Signal = Sh->ExitSignal;
-	int Exit = Sh->ExitStatus;
+	int Signal = Sh->Status;
+	int Exit = Sh->Exit;
 	JB_FreeIfDead(Sh);
 	if (Signal)			// died from a signal // usually its what we want, despite being mixed up
 		JB_ErrorHandleFile(self, nil, Signal, "crashed", "running");
@@ -296,7 +304,7 @@ void JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
 	for (int i = 0; i < 4; i++)
 		self->CaptureOut[i] = -1;
 	
-	self->Mode = 1;
+	self->StreamMode = 1;
 	self->Path = JB_Incr(Path);
 }
 
@@ -332,7 +340,7 @@ static void Smooth_(ShellStream& Sh) {
 bool JB_Sh_Step(ShellStream* self) {
 	require (self);
 	ShellStream& Sh = *self;
-	if (Sh.Mode >= 0) {
+	if (Sh.StreamMode >= 0) {
 		Smooth_(Sh);
 		if (JB_Sh_UpdatePipes(self))
 			return true;

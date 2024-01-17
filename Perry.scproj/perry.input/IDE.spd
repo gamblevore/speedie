@@ -384,14 +384,25 @@ class PerryIDE (Window)
 
 
 	function CheckCrashes (|SpdProcess| p, |string| what, |bool|)
-		|| St = p.Status
-		require st!=0
-		|| s = "Crashed " + St.SignalName + " : " + p.render
-		p.ClearErrors
-//		(self is dead) // seems bad
-		.notify(s, @emb + what)
+		|| Stats = p.Status
+		require Stats!=0
+		|| fs = faststring()
+		fs <~ "Crashed ${Stats.SignalName} : ${p.render}\n"
+		p.status = 0
+		fs <~ p.erroroutput.getresult.FindStacktrace
+		.notify(fs, @emb + what)
 		.CancelCompile("crashed")
 
+
+	function string.FindStacktrace (|string|)
+		|| f = "\n****** CRASHED ******\n"
+		|| where = .find(f) #require
+		where += f.length
+		|| After = .find("\n-----------------------\n", where)
+		if !after: after = int.max
+		
+		return self[where, after] 
+		
 
 	function SaveMemory
 		if .IsFront

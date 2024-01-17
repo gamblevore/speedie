@@ -72,7 +72,7 @@ function EnterAutoComplete (|bool|)
 	app.ClearCaches
 	.Perry = SpdProcess.parent
 	if .perry.IsOpen
-		.CompileAndGiveFeedBack
+		.PerryTalk
 	return true
 
 
@@ -81,13 +81,17 @@ function InitedOK (|bool|)
 		return true
 	if stderr.OK
 		error "Compiler did not initialise"
+	|| __CrashSpd__ = 0
 
 
-function CompileAndGiveFeedBack // ReturnsWhenPerryClosesUs
+function PerryTalk // ReturnsWhenPerryClosesUs
 	Compiler.CompileAll
 	.reinit
 	.HandleRestartedCompile
+	|| testcrash = "__CrashSpd_" + "_"
 	for cmd in .Perry // .get(
+		if cmd contains testcrash
+			app.crash("whoop")
 		.CmdWrap(cmd)
 
 

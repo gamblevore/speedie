@@ -68,7 +68,7 @@ void JB_File_ModifiedSet( JB_File* self, Date when );
 Date JB_File_Created( JB_File* self );
 JB_String* JB_cPath_ReadAll (const char* path, bool AllowMissingFile, int MaxFile);
 
-long JB_File__chdir( JB_String* Path );
+int JB_File__chdir( JB_String* Path );
 JB_String* JB_File__CWD( );
 long JB_File_Remaining( JB_File* self );
 int JB_File_Write( JB_File* self, JB_String* Data );

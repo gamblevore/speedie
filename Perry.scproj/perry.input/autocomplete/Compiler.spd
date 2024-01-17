@@ -144,7 +144,7 @@ extend PerryIDE
 		notifications <~ (what, response)
 	
 	
-	function CancelCompile (|string| why="")
+	function CancelCompile (|string| why="CompiledOK")
 		.DebugIsWaitingForCompile = false
 		if .compilr
 			.compilr.Kill(Why) // frees memory
