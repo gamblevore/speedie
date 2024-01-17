@@ -382,7 +382,7 @@ class PerryIDE (Window)
 					c.ClearErrors
 				c.Disconnect("not alive")
 			  elseif (!c.Isopen)
-				.CancelCompile
+				.CancelCompile("not alive")
 		|| f = .feedback
 		if !f.Status
 			.CrashedFB(f, "feedback")

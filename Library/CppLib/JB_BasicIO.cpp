@@ -31,7 +31,7 @@ void JB_Pipe__StdOutSet(int F) {
 static void PrintTo(JB_String* s, int Num) {
     int N = JB_Str_Length( s );
     if ( N )
-        JB_Write( Num, s->Addr, N ); // very important to use JB_Wrrrite!
+        JB_Write( Num, s->Addr, N ); // very important to use JB_Write!
 }
 
 void JB_Str_PrintError(JB_String* s) {

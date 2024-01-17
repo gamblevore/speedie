@@ -120,7 +120,7 @@ extend PerryIDE
 	
 	function CompileFB (|message| msg, |bool|)
 		|| db = .DebugIsWaitingForCompile
-		.CancelCompile
+		.CancelCompile("complete")
 		|| first = msg.first						#require
 		if first == @arg // an error-list
 			return .ErrorListFB(msg)
@@ -144,10 +144,10 @@ extend PerryIDE
 		notifications <~ (what, response)
 	
 	
-	function CancelCompile 
+	function CancelCompile (|string| why)
 		.DebugIsWaitingForCompile = false
 		if .compilr
-			.compilr.Kill("CancelCompile") // frees memory
+			.compilr.Kill(Why) // frees memory
 			.compilr = nil
 		(.buildbutton is visible)
 		(.runbutton is enabled)

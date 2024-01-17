@@ -12,6 +12,7 @@
 * Errors should be sent back via stderr, and just mark it like plain text *****CRASHLOG***** text ------------
 	* otherside can parse stderr on exit.
 * c.name ?= "()" compiles badly! decr in wrong place
+* check linux works
 
 
 

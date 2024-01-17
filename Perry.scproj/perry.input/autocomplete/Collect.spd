@@ -74,7 +74,7 @@ function PerryIDE.CrashedFB (|SpdProcess| c, |string| msg)
 	(self is dead)
 	.notify(s, @emb + msg)
 	printline
-	.CancelCompile
+	.CancelCompile("crashed")
 
 
 function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProcess|)   // InitCompiler

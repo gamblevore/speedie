@@ -171,7 +171,7 @@ function fnBuildIsDead (fnConfirmCanceller)
 	if self mustbe perryide
 		.SpeedieMsgReceive(.compilr)
 		if !.IsBuilding
-			.CancelCompile
+			.CancelCompile("complete")
 			return true
 
 
@@ -187,7 +187,7 @@ function ClickedCancel (GUIAction)
 	|| name = i.project.TrimCodeExt
 	|| q = "Currently building $name... Cancel Build of $name?"
 	if q.confirm(can)
-		i.CancelCompile
+		i.CancelCompile("UserCancel")
 		return true
 		
 
