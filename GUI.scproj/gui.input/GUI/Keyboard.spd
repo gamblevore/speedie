@@ -170,6 +170,15 @@ dataType Keys (int) {
 				return true
 			target osx
 				return keymod.cmd
+			
+			
+		function CmdAgo (|date| ago, |bool|)
+			require .cmd
+			if keys.LCTRL.HeldKey(ago) or keys.RCTRL.HeldKey(ago)
+				return true
+			target osx
+				return keys.LGUI.HeldKey(ago) or keys.RGUI.HeldKey(ago)
+
 
 		function RealCmd (|bool|)
 			return keymod.cmd

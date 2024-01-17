@@ -183,7 +183,7 @@ function PerryIDE.DisplayInPopup (|string| s, |bool| instant)
 
 function PerryIDE.StartPopupVis (|bool| instant)
 	if !.PopupDateOn
-		|| add = (-10.0s, 0.5s)(instant)
+		|| add = (-10.0s, 0.5s)(instant or keys.CmdAgo(2s))
 		.PopupDateOn = date.now + add
 	.PopupDisplayFadeIn
 
