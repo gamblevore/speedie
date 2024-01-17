@@ -384,6 +384,7 @@ class PerryIDE (Window)
 
 
 	function CheckCrashes (|SpdProcess| p, |string| what, |bool|)
+		require p
 		|| Stats = p.Status
 		require Stats!=0
 		|| fs = faststring()

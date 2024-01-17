@@ -7,8 +7,8 @@
 * Are function pointers considered... pointers? they should be? nilchecker needs to work on them!
 * multiplay crashing.
 * holding cmd-down shouldn't need popup to reappear... if it appeared already as long as the cmd-key is down for long enough.
-* ****** CRASHED ******  and   -----------------------
-	* just send everything inbtween
+* nothing in compile-logs (Cmd-9)?
+* no longer can compile from perry?
 * c.name ?= "()" compiles badly! decr in wrong place
 * check linux works
 * error-reporting losing first param even with functions!
