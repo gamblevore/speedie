@@ -47,6 +47,7 @@ function compiler.SetupEnv
 	pico.DesiredThreadCount = 1
 	
 	if pico.parent
+		error.AutoPrint = 0
 		interact.ShouldEnter = 1
 		ErrorColors.enabled = false
 

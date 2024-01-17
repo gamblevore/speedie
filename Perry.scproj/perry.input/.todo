@@ -7,10 +7,8 @@
 * Are function pointers considered... pointers? they should be? nilchecker needs to work on them!
 * multiplay crashing.
 * holding cmd-down shouldn't need popup to reappear... if it appeared already as long as the cmd-key is down for long enough.
-	* speedie is kinda noisy with it's error printing.
-	* can't find "Return"????
-* Errors should be sent back via stderr, and just mark it like plain text *****CRASHLOG***** text ------------
-	* otherside can parse stderr on exit.
+* otherside can parse stderr on exit. ****** CRASHED ******  and   -----------------------
+	* just send everything inbtween
 * c.name ?= "()" compiles badly! decr in wrong place
 * check linux works
 

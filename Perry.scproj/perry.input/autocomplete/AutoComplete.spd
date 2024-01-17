@@ -255,8 +255,6 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 		.CompileFB(msg)
 	  elseif msg starts "log"
 		.LogFB(msg)
-	  elseif msg starts "crashed"
-		.CrashedFB(c, msg.render)
 	  elseif msg starts "callfrom"
 		.CallFromFB(msg)
 	  elseif msg starts "check"
@@ -381,6 +379,8 @@ function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  
 		|| thg = where.first
 		if thg == @dot or @thg
 			where = thg
+	  else
+		require where != @tmp // annoy speedie less. it will only generate errors and slow communication down
 	|| pp = where.parent$
 	|| ppp = pp.parent
 	|| Jump = 0

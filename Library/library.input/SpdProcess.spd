@@ -67,9 +67,7 @@ class SpdProcess (Process)
 			.UpdatePipes
 			
 		if !.alive
-			debugger
-			.alive
-			.Disconnect("not alive")
+			.Disconnect
 
  
 	function Get (|float| T=0, |message|)
@@ -112,7 +110,7 @@ class SpdProcess (Process)
 	        .pid = 0
 		if (.erroroutput!=nil) and (.mode is PrintErrors)
 			printline .erroroutput
-		.Disconnect("exited")
+		.Disconnect
 
 	
 	helper Kill
@@ -136,11 +134,15 @@ class SpdProcess (Process)
 		.Disconnect(err)
 
 
-	function Disconnect (|stringzeroterminated| Why)
+	function Disconnect (|stringzeroterminated| Why="")
+		opt norefcounts
 		.UpdatePipes
 		.UnRegister
 		.ClosePipes
 		if .pico
+			if .alive and !why and .isopen
+				why = "UnknownReason"
+				debugger
 			.pico.close(Why)
 			.pico = nil
 
@@ -162,18 +164,12 @@ class SpdProcess (Process)
 		if !.WeAreParent
 			return false
 		if .pid and (.exit < 0)
-			if !.pico
-										// it has a PID but pico was closed?
-			.Kill("PicoWasClosed?")		// just kill and restart it.
+											// it has a PID but pico was closed?
+			.Kill("lost connection")		// just kill and restart it.
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")
 			return .RunChild
 
-
-	function SendCrashed (|cstring| signal)
-		if .pico.status
-			SpdProcess.StackTraceJbin(.writer, "crashed", signal, 4)
-			.pico <~ .writer
 
 	iterator
 		while
@@ -191,13 +187,6 @@ class SpdProcess (Process)
 			target !minilib
 				if pico.parent
 					.parent = SpdProcess("", "")
-		
-		target !minilib {
-		helper TellParentIDied (|cstring| s)
-			opt norefcounts
-			visible
-			.parent.SendCrashed(s)?
-		}
 
 		function CheckAllAlive
 			opt norefcounts
@@ -217,19 +206,6 @@ class SpdProcess (Process)
 			cpp_wrapper JB_App__BackTrace
 		
 		
-		function StackTraceJbin (|jbin| j, |string| type, |cstring| signal, |int| skip = 4)
-			|_voidptr[32]| arr
-			|| size = 32
-			|| strs = BackTrace(&arr[0], &size)
-			j <~ _JbinHeader
-			j.enter(@tmp, type)
-			if signal.length
-				j.addcstring(@char, signal)
-			j.enter(@arg)
-			for i in skip to size - 1
-				j.AddCString(@emb, strs[i])
-			j.up(2)
-			memory.free(strs)
 
 
 		function Child (|string| app_path, |string| DebugName="", |[string]| params=[], |SpdProcessMode| Mode=0, |SpdProcess|)

@@ -141,7 +141,6 @@ helper StringReader.NextMsgInfo (|uint64|)
 		return msg|uint64|
 	
 	expect (T > @nil) (self, "StringReader.IsJBin was not called.")
-	debugger
 	error (self, "Corrupted jbin")
 
 
@@ -161,8 +160,6 @@ function StringReader.ParseJbin (|int64| Remain=int64.max, |MessageRoot|)
 	
 
 function string.ParseJbin (|int64| max=int64.max, |messageroot|)
-	.Stream.ParseJbin(max)
-	
 	return .Stream.ParseJbin(max)
 
 function string.IsJbin (|bool|)

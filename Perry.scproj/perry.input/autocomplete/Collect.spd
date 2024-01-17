@@ -69,14 +69,6 @@ function PerryIDE.SubProcess (|bool| actual_compile, |SpdMainFn|)
 		Speedie_Checker = nil
 
 
-function PerryIDE.CrashedFB (|SpdProcess| c, |string| msg)
-	|| s = "Crashed " + c.Status.SignalName + " : " + c.render
-	(self is dead)
-	.notify(s, @emb + msg)
-	printline
-	.CancelCompile("crashed")
-
-
 function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProcess|)   // InitCompiler
 	|| Active = C.Activate(5s)
 	if active == -1

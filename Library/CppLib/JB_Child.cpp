@@ -77,12 +77,11 @@ void JB_CrashHandler(int Sig) {
 	snprintf(ErrorBuff, 64, "%s Signal: %s\n", App_CallPath, strsignal(Sig));
 	puts(ErrorBuff);
 	
-				// report to spdprocess parent
-	JB_Proc__TellParentIDied(strsignal(Sig));
-
 				// log to file
+	JB_Rec__CrashLog("\n\n****** CRASHED ******");
 	JB_Rec__CrashLog(ErrorBuff);
 	JB_CrashTracer();
+	JB_Rec__CrashLog("-----------------------\n");
 
 				// print normal-errors
 	JB_Rec_ShellPrintErrors(nil);

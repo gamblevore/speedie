@@ -376,17 +376,21 @@ class PerryIDE (Window)
 		opt NoRefCounts
 		|| c = .compilr
 		if (c != nil)
-			if !c.Alive
-				if !c.Status
-					.CrashedFB(c, "compile")
-					c.ClearErrors
-				c.Disconnect("not alive")
-			  elseif (!c.Isopen)
-				.CancelCompile("not alive")
-		|| f = .feedback
-		if !f.Status
-			.CrashedFB(f, "feedback")
-			f.ClearErrors
+			if !.CheckCrashes(c, "compiler")
+				.compilr = nil
+			  elseif !c.IsOpen
+				.CancelCompile("lost connection")
+		.CheckCrashes(.feedback, "feedback")
+
+
+	function CheckCrashes (|SpdProcess| p, |string| what, |bool|)
+		|| St = p.Status
+		require st!=0
+		|| s = "Crashed " + St.SignalName + " : " + p.render
+		p.ClearErrors
+//		(self is dead) // seems bad
+		.notify(s, @emb + what)
+		.CancelCompile("crashed")
 
 
 	function SaveMemory

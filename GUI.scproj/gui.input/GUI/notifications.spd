@@ -77,8 +77,7 @@ module Notifications
 		w.tag = note
 		if note.IsError
 			printerror s
-		  else
-			printline s
+			printerror "\n"
 
 
 	function NewWindow (|string| s, |window|)

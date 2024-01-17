@@ -171,7 +171,7 @@ function fnBuildIsDead (fnConfirmCanceller)
 	if self mustbe perryide
 		.SpeedieMsgReceive(.compilr)
 		if !.IsBuilding
-			.CancelCompile("complete")
+			.CancelCompile
 			return true
 
 
