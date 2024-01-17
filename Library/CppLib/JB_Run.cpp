@@ -105,6 +105,7 @@ static JB_StringC* emptystr() {
 
 CharSet* JB_CS__New(JB_String* charset, bool Ranges);
 JB_String** JB_Str__FindGlobals(u8** src, uint64* Hash);
+void JB_RemoveHandlers();
 
 
 static uint DecodeLength(u8*& p) {
@@ -163,6 +164,7 @@ void JB_Str__LoadGlobals() {
 void JB_FinalEvents() {
 	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
 	JB_LibShutdown();
+	JB_RemoveHandlers(); // some stupid systems call signals after we exit??
 }
 
 Array*	JB_App__Args()						{ return App_Args; }

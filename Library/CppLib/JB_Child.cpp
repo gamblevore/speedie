@@ -63,14 +63,19 @@ extern _cstring			App_CallPath;
 
 void JB_Wake(int Sig) { ; /* do nothing! This will wake up the process hopefully? */ }
 
+
+void JB_RemoveHandlers() {
+	for_(32)
+		if (CrashList & (1<<i))
+			signal(i, SIG_DFL);
+}
+
 void JB_CrashHandler(int Sig) {
 	if (Sig <= 0)
 		return; // some unixes/shells can do this?
 
 				// deregister
-	for_(32)
-		if (CrashList & (1<<i))
-			signal(i, SIG_DFL);
+	JB_RemoveHandlers();
 
 				// report to stdout
 	char ErrorBuff[128];
