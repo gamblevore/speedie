@@ -90,7 +90,7 @@ void JB_CrashHandler(int Sig) {
 }
 
 
-// for some reason... once we have set the sigint to ignore, setting it to the crashhandler
+// For some reason... once we have set the sigint to ignore, setting it to the crashhandler
 // now does not exit. So lets crash.
 
 static void TerminalInterupt(int Sig) {

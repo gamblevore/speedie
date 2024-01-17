@@ -643,6 +643,13 @@ class String
 			yield (c) (pos)
 
 
+function array.remove (|array of string| self, |string| item, |bool| CaseAware=false,  |string|)
+	opt norefcounts
+	for (s.backwards in self) (ind)
+		if s.SyntaxCompare(item, CaseAware) // very annoying xcode behaviour
+			.remove(ind)
+
+
 function array.join (|array of string| self, |string| sep = "", |string|)
 	|| sl = sep.Length
 	|| n = -sl
