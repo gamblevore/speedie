@@ -59,6 +59,8 @@ function Prefs (|string| s, assigns:|message|)
 	cpp_part SetPrefMsg
 	._prefs[s] = Value
 
+function AllowInteruptCrash (assigns:|bool|)
+	cpp_wrapper JB_App__CrashOnInterupt
 
 function Crash (|string| reason="")
 	opt norefcounts

@@ -89,6 +89,20 @@ void JB_CrashHandler(int Sig) {
 				// we should crash now... that we removed this crash handler.
 }
 
+
+// for some reason... once we have set the sigint to ignore, setting it to the crashhandler
+// now does not exit. So lets crash.
+
+static void TerminalInterupt(int Sig) {
+	signal(Sig, SIG_IGN);
+	JB_Rec_ShellPrintErrors(nil);
+	_exit(0);
+}
+
+void JB_App__CrashOnInterupt (bool b) { // useful for command-line tools
+	signal(SIGINT, b?TerminalInterupt:SIG_IGN);
+}
+
 void JB_App__CrashInstall() {
 	for_(32) {
 		if (IgnoreList & (1<<i))

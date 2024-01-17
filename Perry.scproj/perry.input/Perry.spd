@@ -29,15 +29,14 @@ module Perry
 			"/usr/local/speedie didn't resolve?"
 		return ._SpeedieDir
 		
-		
 	function LoadWindowsFromArgs
 		|| OldProj = .projects
 		.Projects = Message()
 		.Terminal = true
+		app.AllowInteruptCrash = true
 		for arg in app.args // load specified documents
-			ifn arg == "YES" and app.cwd == "/" // very annoying xcode behaviour
-				|| ide = .LoadAppArg(arg)
-					ide.tabs.items = .projects
+			|| ide = .LoadAppArg(arg)
+				ide.tabs.items = .projects
 
 	
 	function LoadAppArg (|string| arg, |perryide|)
@@ -97,6 +96,10 @@ module Perry
 		|| i = PerryIDE(false)
 		i.ViewAsText
 		
+		for (s.backwards in app.args) (ind)
+			if s == "YES" and app.cwd == "/" // very annoying xcode behaviour
+				app.args.remove(ind)
+
 		if app.args > 0
 			.LoadWindowsFromArgs
 		if !.Terminal and !.LoadWindowsSub(i)

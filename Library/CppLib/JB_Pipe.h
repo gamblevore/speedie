@@ -59,6 +59,7 @@ typedef void (*fn_app_deathaction)();
 int JB_Str_System(JB_String* self);
 int JB_Kill(int PID);
 int JB_PID_Signal(int pid, int sig);
+void JB_App__CrashOnInterupt (bool b);
 void JB_SigChild (int signum);
 void JB_SigMsgReceived(int signum);
 void JB_SigChildLock ();
