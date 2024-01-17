@@ -10,7 +10,6 @@
 
 
 #include "JB_Alloc.h"
-#include "JB_Log.h"
 
 
 

@@ -283,6 +283,7 @@ function IsQuarantined (|bool|)
 
 
 function Say (|string| s, |errorint2|)
+	visible
 	return "/usr/bin/say".execute([s])
 	
 function AppleScript (|string| str, |ErrorInt2|)

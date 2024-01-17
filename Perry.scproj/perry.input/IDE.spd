@@ -380,7 +380,7 @@ class PerryIDE (Window)
 				if !c.Status
 					.CrashedFB(c, "compile")
 					c.ClearErrors
-				c.Disconnect
+				c.Disconnect("not alive")
 			  elseif (!c.Isopen)
 				.CancelCompile
 		|| f = .feedback
@@ -400,7 +400,7 @@ class PerryIDE (Window)
 		if f.IsOpen and f.lastsend.ago > (30.0+.position).date
 			|| msg = "Released Speedie: " + .name
 			.LogOneAction(@emb + msg)
-			.feedback.Kill
+			.feedback.Kill("SaveMemory")
 		
 
 	behaviour FrameUpdate // perframe, eachframe, onframe

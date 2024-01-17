@@ -120,7 +120,7 @@ extend_module perry
 		return paths[0, found+srch.length]
 
 
-	function MakeSpeedieDir (|bool| Print, |string|)
+	function MakeSpeedieDir (|string|)
 // over complex? it just returns (speedie.file)?
 // i mean testing is important... but what if it fails? does it do anything special to help with that?
 		|| where = speedie.file
@@ -129,12 +129,10 @@ extend_module perry
 			|| result = dest_path.executestr(["--alive"]).trim
 			if result contains "seems alive"
 				rz = .FindSpeedieRoot(dest_path)
-				if print
-					"Speedie Found At: $rz"
 
 
 	function TestShell (|string|)
-		if !.makespeediedir(false)
+		if !.makespeediedir
 			return " * Link $speedie\n\n"
 		
 		

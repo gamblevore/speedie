@@ -5,7 +5,6 @@
 
 
 #include "JB_Umbrella.hpp"
-#include "JB_Log.h"
 #include <stdio.h>
 #ifndef AS_LIBRARY
 #include <unistd.h>
@@ -31,9 +30,8 @@ void JB_Pipe__StdOutSet(int F) {
 #ifndef AS_LIBRARY
 static void PrintTo(JB_String* s, int Num) {
     int N = JB_Str_Length( s );
-    if ( N ) {
-        write( Num, (const char*)s->Addr, N );
-    }
+    if ( N )
+        JB_Write( Num, s->Addr, N ); // very important to use JB_Wrrrite!
 }
 
 void JB_Str_PrintError(JB_String* s) {

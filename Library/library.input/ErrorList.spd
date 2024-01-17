@@ -91,7 +91,7 @@ class ErrorReceiver
 		ifn Value contains "/"
 			value = file.Logs[value]
 		|| f = value.file
-		printline "Logging to: " + f
+		printline "Errors Store: " + f
 		._LogObj = f
 		._LogFunc = LogFileWriter
 	

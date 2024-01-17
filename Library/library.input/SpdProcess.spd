@@ -5,7 +5,7 @@ class SpdProcess (Process)
 	contains SpdProcess
 	|jbin|						Writer
 	|&pico|						Pico
-	|stringzeroterminated|		Name				
+	|stringzeroterminated|		_DebugName
 	|SpdMainFn|					SubProcess
 	|int| 						DeathLimit
 	|int|						DiedCount
@@ -13,7 +13,7 @@ class SpdProcess (Process)
 	|bool|						AlreadyWarnedDied
 	|SpdProcessMode|			Mode
 
-	constructor	(|string| path, |[string]| params=nil,  |SpdMainFn| fn=nil,  |SpdProcessMode| Mode=SpdProcessMode.PrintErrors)
+	constructor	(|string| path, |stringzeroterminated| DebugName, |[string]| params=nil,  |SpdMainFn| fn=nil,  |SpdProcessMode| Mode=SpdProcessMode.PrintErrors)
 		super.constructor(path)
 		
 		.deathlimit = 12
@@ -24,16 +24,12 @@ class SpdProcess (Process)
 		.output = (faststring(), nil)(.Mode is CaptureStdOut)
 		.erroroutput = (faststring(), nil)(.mode is CaptureOrPrintErrors)
 		.writer = FastString()
-
-		.pico = (pico.new, pico.parent)(.WeAreParent)
+		.pico = (pico.new(debugname), pico.parent)(.WeAreParent)
+		._DebugName = DebugName
 
 			
 	destructor
-		.pico.destroy
-
-	setter Name (|string|)
-		.name = value.cstr
-		.pico.config.name = .name
+		.pico.destroy("destructor")
 			
 	function IsOpen (|bool|)
 		return self and .pico.status == 0
@@ -73,7 +69,7 @@ class SpdProcess (Process)
 		if !.alive
 			debugger
 			.alive
-			.Disconnect
+			.Disconnect("not alive")
 
  
 	function Get (|float| T=0, |message|)
@@ -116,12 +112,15 @@ class SpdProcess (Process)
 	        .pid = 0
 		if (.erroroutput!=nil) and (.mode is PrintErrors)
 			printline .erroroutput
-		.Disconnect
+		.Disconnect("exited")
 
 	
 	helper Kill
+		disabled "Explain why"
+		
+	helper Kill (|stringzeroterminated| why)
 		super.kill
-		.Disconnect
+		.Disconnect(why)
 
 
 	function ReadStdOut (|string|)
@@ -134,15 +133,15 @@ class SpdProcess (Process)
 		if .IsOpen
 			printline err
 			stderr.NewError(nil, err, .path)
-		.Disconnect
+		.Disconnect(err)
 
 
-	function Disconnect 
+	function Disconnect (|stringzeroterminated| Why)
 		.UpdatePipes
 		.UnRegister
 		.ClosePipes
 		if .pico
-			.pico.close
+			.pico.close(Why)
 			.pico = nil
 
 
@@ -165,7 +164,7 @@ class SpdProcess (Process)
 		if .pid and (.exit < 0)
 			if !.pico
 										// it has a PID but pico was closed?
-			.Kill						// just kill and restart it.
+			.Kill("PicoWasClosed?")		// just kill and restart it.
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")
 			return .RunChild
@@ -189,8 +188,9 @@ class SpdProcess (Process)
 		|SpdProcess| Parent = nil
 		
 		function InitOwner
-			if pico.parent
-				.parent = SpdProcess("", nil, nil)
+			target !minilib
+				if pico.parent
+					.parent = SpdProcess("", "")
 		
 		target !minilib {
 		helper TellParentIDied (|cstring| s)
@@ -232,10 +232,10 @@ class SpdProcess (Process)
 			memory.free(strs)
 
 
-		function Child (|string| app_path, |[string]| params=[], |SpdProcessMode| Mode=0, |SpdProcess|)
+		function Child (|string| app_path, |string| DebugName="", |[string]| params=[], |SpdProcessMode| Mode=0, |SpdProcess|)
 			debug_require params!=nil
 			require app_path.file.mustexist
-			rz = SpdProcess(app_path, params, nil, Mode)
+			rz = SpdProcess(app_path, debugname, params, nil, Mode)
 			if !rz.RunChild
 				rz = nil
 
@@ -253,7 +253,7 @@ datatype SpdProcessMode (int)
 prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)
 	function RunThreaded (|[string]| R = [],  |SpdProcess|)
 		|| c_args = SpdProcess.CreateArgs("", r) #require
-		rz = SpdProcess("", r, self)
+		rz = SpdProcess("", "SpdMainFn()", r, self)
 		if !rz.pico.startthread(self|picothreadfn|, 7|_voidptr|, c_args)
 			rz = nil
 

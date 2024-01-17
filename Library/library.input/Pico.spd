@@ -33,7 +33,7 @@ struct Pico
 	function CreateChild (|&pico|)
 		cpp_wrapper PicoChild
 
-	function Destroy
+	function Destroy (|Cstring| Why)
 		cpp_wrapper PicoDestroy
 
 	function IsParent (|bool|)
@@ -69,7 +69,7 @@ struct Pico
 	function Get (|float| T, |string|)
 		return string.FromPico(.__get(T))
 		
-	function Close 
+	function Close (|cstring| Why)
 		cpp_wrapper PicoClose
 	
 	function Status (|ErrorInt|)
@@ -96,11 +96,10 @@ struct Pico
 		function Create (|&pico|)
 			cpp_wrapper PicoCreate
 
-		function New  (|int| bits=16, |&pico|)
+		function New  (|stringzeroterminated| name="", |int| bits=16, |&pico|)
 			rz = pico.Create
 			|| c = rz.config
-			c.name = app.callpath.cstring.name
-			if !c.name: c.name = "()"
+			c.name = name
 			c.bits = bits
 			
 		function Parent (|&pico|)

@@ -138,6 +138,7 @@ int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation);
 extern uint JB__Flow_Disabled;
 
 void JB_Flow__ReportAddr(u8* Addr, int Length, u8* Name, int NameLen) {
+#ifndef AS_LIBRARY
 	if (!JB__Flow_Disabled) {
 		uint64 Hash = JB_CRC(Addr, Length, 0);
 		JB_String A;
@@ -149,11 +150,14 @@ void JB_Flow__ReportAddr(u8* Addr, int Length, u8* Name, int NameLen) {
 		void JB_Flow__Input(JB_String* data, JB_String* name);
 		JB_Flow__Input(&A, &B);
 	}
+#endif
 }
 
 inline void JB_Flow__Report(JB_String* data, JB_String* name) {
+#ifndef AS_LIBRARY
 	if (!JB__Flow_Disabled)
 		JB_Flow__ReportAddr(data->Addr, data->Length, name->Addr, name->Length);
+#endif
 }
 
 
@@ -388,7 +392,7 @@ int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
 }
 
 
-static int InterWrite(int fd, uint8* buffer, int N) {
+int JB_Write(int fd, uint8* buffer, int N) {
     int TotalCount = 0;
     while (N > TotalCount) {
         int written = (int)write(fd, buffer+TotalCount, N-TotalCount);
@@ -482,7 +486,9 @@ static int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 		N = InterRead(fd, Buffer, Desired, 0, Error, Mode);
 		JB_FS_AdjustLength_(self, Desired, N);
 	}
+#ifndef AS_LIBRARY
 	JB_Flow__ReportAddr(Buffer, N, (u8*)"pipe", 4);
+#endif
 	return Error;
 }
 
@@ -500,8 +506,8 @@ void JB_Rec__CrashLog(const char* c) {
 	}
 	if (!CrashLogFile) return;
 
-    InterWrite( CrashLogFile, (u8*)c, (int)strlen(c) );
-    InterWrite( CrashLogFile, (u8*)"\n", 1 );
+    JB_Write( CrashLogFile, (u8*)c, (int)strlen(c) );
+    JB_Write( CrashLogFile, (u8*)"\n", 1 );
 }
 
 
@@ -542,8 +548,6 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 	return Result;
 }
 
-
-char* realpath(const char* file_name, char* resolved_name);
 
 static int CaseComparisonsAllowed = 1024*2;
 int* JB_File__Compar() {
@@ -593,11 +597,22 @@ static int CaseCompare_(JB_String* self, const char* Resolved, bool Owned) {
 #endif
 }
 
+
+static void LogPut (const char* a) {
+	static int Log = open("/tmp/logs/spd.txt", O_RDWR | O_CREAT | O_TRUNC, 0775);
+	if (Log > 0)
+		write(Log, a, strlen(a));
+		write(Log, "\n", 1);
+}
+
+
 static void CaseTest_(JB_String* self) {
 	require0 (JB_Str_Length(self));
 	char Resolved[PATH_MAX];
-	realpath((const char*)(self->Addr), Resolved);
-	CaseCompare_(self, Resolved, false);
+	const char* s = (const char*)(self->Addr);
+//	LogPut(s);
+	if (realpath(s, Resolved))
+		CaseCompare_(self, Resolved, false);
 }
 
 
@@ -708,7 +723,7 @@ bool JB_File_EOF( JB_File* self ) {
 
 
 int64 JB_File_WriteRaw_( JB_File* self, uint8* Data, int N ) {
-    N = InterWrite( self->Descriptor, Data, N );
+    N = JB_Write( self->Descriptor, Data, N );
     return ErrorHandle_(N, self, nil, "write to");
 }
 
