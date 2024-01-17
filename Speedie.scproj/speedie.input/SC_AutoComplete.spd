@@ -50,14 +50,11 @@ noauto
 
 
 function HandleRestartedCompile
-	"handling restart"
 	|| args = app.rawargs
 	|| last = args.last
 	if last.isjbin
-		"restart grabbing a command"
 		args.pop
 		.CmdWrap(last.parsejbin)
-	"reading commands"
 
 
 function ReInit ()
@@ -82,7 +79,7 @@ function EnterAutoComplete (|bool|)
 function InitedOK (|bool|)
 	if compiler.InitedOK
 		return true
-	if stderr.ok
+	if stderr.OK
 		error "Compiler did not initialise"
 
 

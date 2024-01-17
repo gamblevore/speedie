@@ -32,14 +32,10 @@ const char** JB_App__BackTrace(void** space, int* size) {
     return (const char**)backtrace_symbols( space, *size );
 }
 
-static void SafePrint (const char* c) {
-	write(STDOUT_FILENO, c, strlen(c) );
-}
-
 
 void JB_Rec__CrashLog(const char* c);
-void JB_ProcessReportCrash();
-void JB_FinalEvents();
+void JB_Proc__TellParentIDied(const char* signal);
+int JB_Rec_ShellPrintErrors(void* self);
 
 
 void JB_CrashTracer() {
@@ -55,55 +51,58 @@ void JB_CrashTracer() {
     free( strings );
 }
 
-void JB_CrashPrinter(int Sig) {
-	char ErrorBuff[64];
-	snprintf(ErrorBuff, 64, "Crash: %s", strsignal(Sig));
-	JB_Rec__CrashLog(ErrorBuff);
-	JB_CrashTracer();
-}
+#define x(v) (1<<v) |
+static const unsigned int CrashList = x(SIGTRAP) x(SIGHUP) x(SIGQUIT) x(SIGILL) x(SIGSEGV) x(SIGBUS)  x(SIGFPE) x(SIGSYS) x(SIGTERM) x(SIGEMT) x(SIGABRT) x(SIGXCPU) x(SIGXFSZ) 0;
+static const unsigned int IgnoreList = x(SIGPIPE) x(SIGPROF) x(SIGWINCH) x(SIGINT)   0;
+static const unsigned int WakeList = x(SIGURG) x(SIGVTALRM) x(SIGALRM) x(SIGINFO) x(SIGUSR1) x(SIGUSR2) 0;
+#undef x
 
 
 
-int SigList[] = {SIGSEGV, SIGBUS, SIGILL, SIGFPE, SIGSYS, SIGTERM, SIGQUIT};
+extern _cstring			App_CallPath;
+
+void JB_Wake(int Sig) { ; /* do nothing! This will wake up the process hopefully? */ }
 
 void JB_CrashHandler(int Sig) {
-	for_ (sizeof(SigList)/sizeof(int)) {
-		signal(Sig, SIG_DFL);
-	}
-    if (Sig != SIGTERM and Sig != SIGQUIT) {
-		JB_ProcessReportCrash();
-	} else if (getppid() > 1) {
-		SafePrint("Child process got signal...\n" );
-	} else { 
-		SafePrint("Process got signal...\n" );
-	}
-	JB_FinalEvents();
+	if (Sig <= 0)
+		return; // some unixes/shells can do this?
+
+				// deregister
+	for_(32)
+		if (CrashList & (1<<i))
+			signal(i, SIG_DFL);
+
+				// report to stdout
+	char ErrorBuff[128];
+	snprintf(ErrorBuff, 64, "%s Signal: %s\n", App_CallPath, strsignal(Sig));
+	puts(ErrorBuff);
+	
+				// report to spdprocess parent
+	JB_Proc__TellParentIDied(strsignal(Sig));
+
+				// log to file
+	JB_Rec__CrashLog(ErrorBuff);
+	JB_CrashTracer();
+
+				// print normal-errors
+	JB_Rec_ShellPrintErrors(nil);
+
+				// exit
+	_exit(Sig);
 }
 
 void JB_App__CrashInstall() {
-	for_ (sizeof(SigList)/sizeof(int)) {
-		if (signal(SigList[i], JB_CrashHandler) == SIG_IGN)
-			signal(SigList[i], SIG_IGN); // restore the old ignore signal... make speedie more unix-friendly.
+	for_(32) {
+		if (IgnoreList & (1<<i))
+			signal(i, SIG_IGN);
+		if (CrashList & (1<<i) and signal(i, JB_CrashHandler) == SIG_IGN)
+			signal(i, SIG_IGN); // restore the old ignore signal... make speedie more unix-friendly.
+		if (WakeList & (1<<i))
+			signal(i, JB_Wake);
 	}
+
+	signal(SIGCHLD, JB_SigChild);
 }
-
-
-void* JB_SuicideChecker (void* obj) {
-	while (getppid() > 1) {
-		timespec ts = {2,0}; // check every 2 seconds.
-		nanosleep(&ts, 0);
-	}
-	kill(0, SIGSEGV); return 0;
-}
-
-
-static pthread_t JB_BelongsToParent;
-void JB_KillWithParent () {
-	if (!JB_BelongsToParent and !pthread_create(&JB_BelongsToParent, nil, JB_SuicideChecker, nil))
-		pthread_detach(JB_BelongsToParent);
-}
-
-
 }
 #endif
 

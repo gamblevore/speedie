@@ -18,7 +18,7 @@ class ProcessOwner
 	
 	function Exit (|int|)
 		cpp_wrapper JB_PID_Exit
-	function TermSig (|int|)
+	function Status (|ErrorInt|)
 		cpp_wrapper JB_PID_TermSig
 	function Register
 		cpp_wrapper JB_PID_Register
@@ -27,9 +27,6 @@ class ProcessOwner
 
 	function UnRegister
 		cpp_wrapper JB_PID_UnRegister
-		
-	function SendSignal (|int| sig, |errorint|)
-		cpp_wrapper JB_PID_Signal
 	
 	function Next (|ProcessOwner|)
 		cpp_wrapper JB_PID_Next

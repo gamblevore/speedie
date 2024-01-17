@@ -64,7 +64,8 @@ class PerryIDE (Window)
 	|Process| 					Talker
 	|message|					RecentFiles
 	|string|					OldJBCloser
-	|string| 					lastCmdStr
+	|string| 					LastCmdStr
+	|date|						LastSendTime
 	|string|					AttachedProgram
 	|ProgressBar|				Progress
 	|Faststring|				Stats
@@ -376,17 +377,16 @@ class PerryIDE (Window)
 		|| c = .compilr
 		if (c != nil)
 			if !c.Alive
-				if c.isdead
-					.CrashedFB(c)
+				if !c.Status
+					.CrashedFB(c, "compile")
 					c.ClearErrors
 				c.Disconnect
 			  elseif (!c.Isopen)
 				.CancelCompile
-		c = .feedback
-		if (c != nil) and (C.isdead)
-			C.Invalidate
-			.CrashedFB(c)
-			c.ClearErrors
+		|| f = .feedback
+		if !f.Status
+			.CrashedFB(f, "feedback")
+			f.ClearErrors
 
 
 	function SaveMemory

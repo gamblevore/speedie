@@ -194,6 +194,12 @@ datatype ErrorInt (int) // useful for unix-functions which has 0 == success
 	syntax cast (|bool|)
 		return self == 0
 
+	function SignalName (|stringzeroterminated|)
+		cpp_wrapper JB_Err_SignalName
+
+	function Name (|stringzeroterminated|)
+		cpp_wrapper JB_Err_Name
+
 
 
 struct RetroFloat

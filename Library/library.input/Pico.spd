@@ -54,7 +54,8 @@ struct Pico
 
 	syntax append (|faststring| fs, |bool| Wait=false, |bool|)
 		cpp_part SendFS
-		return .send(picomessage.Fromfs(fs), wait)
+		rz = .send(picomessage.Fromfs(fs), wait)
+		fs.length = 0
 		
 	function Send (|PicoMessage| msg, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
@@ -98,7 +99,6 @@ struct Pico
 		function New  (|int| bits=16, |&pico|)
 			rz = pico.Create
 			|| c = rz.config
-			c.noise = -1 // 
 			c.name = app.callpath.cstring.name
 			if !c.name: c.name = "()"
 			c.bits = bits

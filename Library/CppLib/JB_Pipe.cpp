@@ -66,9 +66,9 @@ static void pipe_close (int& fd) {
 }
 
 
-void JB_App__AtExit (fn_app_deathaction b) {
-	atexit(b);
-}
+//void JB_App__AtExit (fn_app_deathaction b) {
+//	atexit(b);
+//}
 
 
 void JB_App__SetThreadName(JB_String* self) {
@@ -239,6 +239,7 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 	JB_Sh_Constructor(rz, self);
 	rz->Output = JB_Incr(FSOut);
 	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
+	rz->Params = JB_Incr(Args);
 	bool OK = JB_Sh_StartProcess(rz, self, Args, 0, !StdOutFlowThru);
 	if (!OK) {
 		JB_SetRef(rz, 0);
@@ -306,6 +307,7 @@ void JB_Sh_Destructor(ShellStream* self) {
 	JB_Decr(Sh.ErrorOutput);
 	JB_Decr(Sh.Path);
 	JB_Decr(Sh.Output);
+	JB_Decr(Sh.Params);
 	JB_PID_Destructor(self);
 }
 

@@ -8,6 +8,7 @@
 class Process (processowner)
 // merge this with processowner!
 	|string|		Path
+	|[string]|		Params
 	|FastString|	Output
 	|FastString|	ErrorOutput
     |Date|			LastRead
@@ -23,7 +24,7 @@ class Process (processowner)
 	destructor:							cpp_wrapper JB_Sh_Destructor
 
 	render
-		fs <~ "$.pid --> $.path"
+		fs <~ "PID: $.pid,  ${.path.name} $.params"
 	
 	function ClosePipes ()
 		cpp_wrapper JB_Sh_ClosePipes
@@ -37,7 +38,7 @@ class Process (processowner)
 
 	function Kill
 		if self  and  .pid > 0
-			pipe.KillPID(.pid)
+			.pid.kill
 
 	module
 		function Stream (|String| app, |[string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |Process|)

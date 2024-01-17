@@ -25,24 +25,26 @@ module Pipe
 	function ErrorIsTerminal (|bool|)
 		.IsTerminal(.StdErr_)
 		
-	function KillPID (|int| pid, |int|)
-		cpp_wrapper JB_Kill
 
 
 
 datatype PID_Int (int)
 	syntax cast (|bool|)
 		return self > 0
+	function Kill (|ErrorInt|)
+		cpp_wrapper JB_Kill
+	function Signal (|int| Sig, |errorint|)
+		cpp_wrapper JB_PID_Signal
 
 
 
 datatype ErrorInt2 (ivec2)
-	// just a clever class to deal with the fact that many many things really want TWO error ints, not just one.
-	// or else we'd need to wrap the one int, in a struct, cos unix ExitCodes are not ints, they are bitfield...
-	// and we'd accidentally treat the exit-code as an int when its really not, its a bitfield.
-	
-	// basically processes can exit with two different kinds of error codes... one being a crash
-	// the other being that it completed normally but the program itself said something is wrong.
+// just a clever class to deal with the fact that many many things really want TWO error ints, not just one.
+// or else we'd need to wrap the one int, in a struct, cos unix ExitCodes are not ints, they are bitfield...
+// and we'd accidentally treat the exit-code as an int when its really not, its a bitfield.
+// basically processes can exit with two different kinds of error codes... one being a crash
+// the other being that it completed normally but the program itself said something is wrong.
+
 	linkage
 		cpp_part Err2
 	function Exit (|errorint|)

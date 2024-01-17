@@ -211,6 +211,18 @@ function ChildEnv (|StringZeroTerminated| s, assigns:|StringZeroTerminated| valu
 function Input (|string|)
 	cpp_Wrapper JB_App__Readline
 
+function IsMainThread (|bool|)
+	return !.IsntMainThread
+
+helper IsntMainThread (|bool|)
+	cpp_wrapper JB_LibIsThreaded
+	
+helper ParentID (|pid_int|)
+	cpp_wrapper JB_App__ParentID
+	
+helper ID (|pid_int|)
+	cpp_wrapper JB_App__ID
+
 
 function sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
 	cpp_Wrapper JB_SP_Run

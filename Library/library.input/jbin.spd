@@ -78,10 +78,10 @@ role JBin (Faststring)
 			self    <~ B|byte|
 			amount  -= (B-add)
 
-	function AddCstring	(|cstring| data, |syntax| type=@str)
+	function AddCstring (|syntax| type=@str, |cstring| data)
 		.addmemory(type, data|&byte|, false, data.length)
 	
-	function AddMemory	(|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
+	function AddMemory (|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
 		|uint| T = (type|uint|<<1) ||| (goin)
 		self <~ T|byte|
 		.hint(L)
@@ -141,7 +141,8 @@ helper StringReader.NextMsgInfo (|uint64|)
 		return msg|uint64|
 	
 	expect (T > @nil) (self, "StringReader.IsJBin was not called.")
-	expect (false)	  (self, "Corrupted jbin")
+	debugger
+	error (self, "Corrupted jbin")
 
 
 function StringReader.IsJBin (|bool|)
@@ -160,6 +161,8 @@ function StringReader.ParseJbin (|int64| Remain=int64.max, |MessageRoot|)
 	
 
 function string.ParseJbin (|int64| max=int64.max, |messageroot|)
+	.Stream.ParseJbin(max)
+	
 	return .Stream.ParseJbin(max)
 
 function string.IsJbin (|bool|)

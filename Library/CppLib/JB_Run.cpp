@@ -170,10 +170,7 @@ JB_StringC*	JB_App__CallPath()				{ return JB_StrC(App_CallPath); }
 void	JB_LibShutdown()					{ JB_MemFree(JB_MemStandardWorld()); }
 bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
 bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
-void    JB_DefaultSignals();
-void	JB_SP_AtExit() {
-	JB_FinalEvents();
-}
+void	JB_App__CrashInstall();
 
 
 int JB_LibInit (_cstring* R, bool IsThread) {
@@ -187,12 +184,10 @@ int JB_LibInit (_cstring* R, bool IsThread) {
         return ENOMEM;
 	if (R) {
 		App_CallPath = *R;
-		JB_DefaultSignals();
 		#ifndef AS_LIBRARY
 			if (!IsThread) {
-				void JB_App__CrashInstall();
 				JB_App__CrashInstall();
-				JB_KillWithParent();
+				PicoStart(true);
 			}
 		#endif
 	}

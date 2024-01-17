@@ -73,7 +73,7 @@ function app.UseAll (|file| start)
 		  elseif c.IsLink
 			printline "Can't recursively enter link: " + c
 		  elseif c.visible
-			.useall(c) 
+			.UseAll(c) 
 	
 main {
 	if !app.args

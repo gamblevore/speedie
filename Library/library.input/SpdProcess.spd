@@ -4,12 +4,13 @@ class SpdProcess (Process)
 		cpp_part Proc
 	contains SpdProcess
 	|jbin|						Writer
-	|&pico|						Pico					
+	|&pico|						Pico
+	|stringzeroterminated|		Name				
 	|SpdMainFn|					SubProcess
-	|[string]|					Params // move this to process?
 	|int| 						DeathLimit
 	|int|						DiedCount
 	|bool|						WeAreParent
+	|bool|						AlreadyWarnedDied
 	|SpdProcessMode|			Mode
 
 	constructor	(|string| path, |[string]| params=nil,  |SpdMainFn| fn=nil,  |SpdProcessMode| Mode=SpdProcessMode.PrintErrors)
@@ -30,6 +31,10 @@ class SpdProcess (Process)
 	destructor
 		.pico.destroy
 
+	setter Name (|string|)
+		.name = value.cstr
+		.pico.config.name = .name
+			
 	function IsOpen (|bool|)
 		return self and .pico.status == 0
 
@@ -63,7 +68,6 @@ class SpdProcess (Process)
 		if .pico.status
 			msg.RenderJbin(.writer)
 			.pico <~ .writer
-			.writer.length = 0
 			.UpdatePipes
 			
 		if !.alive
@@ -97,28 +101,22 @@ class SpdProcess (Process)
 			.ProcessExited
 
 
-	function Invalidate
-		.Deathlimit = .diedcount
-		.Diedcount++
-
-
 	function CanActivate (|bool|)
 		if .Diedcount < .Deathlimit
+			.alreadywarneddied = false
 			return true
-		error (.path, "Too many disconnections, blocking reconnection.")
+		if !.AlreadyWarnedDied
+			.AlreadyWarnedDied = true
+			error (.path, "Too many disconnections, blocking reconnection.")
 	
 	
 	function ProcessExited
-		if (.TermSig != 0)
+		if !.Status
 			.DiedCount++
 	        .pid = 0
 		if (.erroroutput!=nil) and (.mode is PrintErrors)
 			printline .erroroutput
 		.Disconnect
-
-
-	function IsDead (|bool|)
-		return .termsig != 0
 
 	
 	helper Kill
@@ -173,10 +171,10 @@ class SpdProcess (Process)
 			return .RunChild
 
 
-	function SendCrashed
-		opt norefcounts
-		SpdProcess.StackTraceJbin(.writer, "crashed", 4)
-		self <~ (.writer.getresult)
+	function SendCrashed (|cstring| signal)
+		if .pico.status
+			SpdProcess.StackTraceJbin(.writer, "crashed", signal, 4)
+			.pico <~ .writer
 
 	iterator
 		while
@@ -195,13 +193,10 @@ class SpdProcess (Process)
 				.parent = SpdProcess("", nil, nil)
 		
 		target !minilib {
-		helper TellParentIDied
+		helper TellParentIDied (|cstring| s)
 			opt norefcounts
 			visible
-			cpp_name JB_ProcessReportCrash
-			|| p = .parent
-				p.SendCrashed
-				p.disconnect
+			.parent.SendCrashed(s)?
 		}
 
 		function CheckAllAlive
@@ -222,14 +217,18 @@ class SpdProcess (Process)
 			cpp_wrapper JB_App__BackTrace
 		
 		
-		function StackTraceJbin (|jbin| j, |string| reason, |int| skip = 4)
+		function StackTraceJbin (|jbin| j, |string| type, |cstring| signal, |int| skip = 4)
 			|_voidptr[32]| arr
 			|| size = 32
 			|| strs = BackTrace(&arr[0], &size)
 			j <~ _JbinHeader
-			j.enter(@arg, reason)
+			j.enter(@tmp, type)
+			if signal.length
+				j.addcstring(@char, signal)
+			j.enter(@arg)
 			for i in skip to size - 1
-				j.AddCString(strs[i], @emb)
+				j.AddCString(@emb, strs[i])
+			j.up(2)
 			memory.free(strs)
 
 
@@ -261,22 +260,7 @@ prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)
 
 prototype SpdDeathActionFn
 
-extend_module app
-	function IsMainThread (|bool|)
-		return !.IsntMainThread
-	helper IsntMainThread (|bool|)
-		cpp_wrapper JB_LibIsThreaded
-	helper SyntaxAppend (|SpdDeathActionFn| handler)
-		disabled "nothing uses this? Just remove this?"
-		cpp_Wrapper JB_App__AtExit
 
-	function StartChild (|[string]| r, |SpdProcess|)
-		return SpdProcess.Child(.path, r)
-		
-	helper ParentID (|pid_int|)
-		cpp_wrapper JB_App__ParentID
-		
-	helper ID (|pid_int|)
-		cpp_wrapper JB_App__ID
-	
+function app.StartChild (|[string]| r, |SpdProcess|)
+	return SpdProcess.Child(.path, r)
 

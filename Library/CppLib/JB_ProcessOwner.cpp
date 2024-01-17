@@ -16,8 +16,11 @@ ProcessOwner		Root;
 
 
 void JB_FillProc (ProcessOwner* F, int C) {
-	F->ExitStatus = WEXITSTATUS(C);
-	F->ExitSignal = WTERMSIG(C);
+	int Ex = 255; 	int Sig = 0;
+	if (WIFEXITED(C))   Ex = WEXITSTATUS(C);
+	if (WIFSIGNALED(C)) Sig = WTERMSIG(C);
+	F->ExitStatus = Ex;
+	F->ExitSignal = Sig;
 }
 
 
@@ -30,13 +33,6 @@ static void AddLostChild_(int PID, int ExitCode) {
 	}
 }
 
-
-uint SignalsReceived;
-void JB_SigMsgReceived(int signum) {
-	uint X = SignalsReceived + 1;
-	if (!X) X = 1;
-	SignalsReceived = X;
-};
 
 void JB_SigChild (int signum) {
 	if (!JB_PID_Next(&Root)) return;
@@ -73,16 +69,23 @@ void JB_PID_Constructor(ProcessOwner* self) {
 
 void JB_PID_ClearErrors(ProcessOwner* self) {
 	self->ExitStatus = -1;
-	self->ExitSignal = -1;
+	self->ExitSignal = 0;
 }
 
 int JB_PID_Exit(ProcessOwner* self) {
 	return self->ExitStatus;
 }
 
+int JB_PID_TermSig (ProcessOwner* self) {
+	if (self) return self->ExitSignal; return 0;
+}
 
-int JB_PID_TermSig(ProcessOwner* self) {
-	return self->ExitSignal;
+JB_StringC* JB_Err_SignalName (int Sig) {
+	return JB_StrC(strsignal(Sig));
+}
+
+JB_StringC* JB_Err_Name (int Err) {
+	return JB_StrC(strerror(Err));
 }
 
 
@@ -115,28 +118,8 @@ ProcessOwner* JB_PID__First() {
 	return JB_PID_Next((ProcessOwner*)&Root);
 }
 
-int JB_PID_Signal(ProcessOwner* self, int sig) {
-	int PID = self->PID;
-	if (!PID) PID = getpid();
+int JB_PID_Signal(int PID, int sig) {
 	return kill(PID, sig);
 }
-
-
-typedef void (*SignalHandler)(int Sig);
-
-static void TrySetSig(int S, SignalHandler H) {
-	struct sigaction Found;
-	int Err = sigaction(S, 0, &Found);
-	if (!Found.sa_handler) {
-		signal(S, H);
-	}
-}
-
-void JB_DefaultSignals() {
-	TrySetSig(SIGUSR1, JB_SigMsgReceived);
-	TrySetSig(SIGCHLD, JB_SigChild); // this might be a problem when used as a lib.
-									 // better to find THEIR existing lib func and call it after we are done!
-}
-
 
 }

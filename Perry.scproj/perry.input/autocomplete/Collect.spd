@@ -2,15 +2,15 @@
 
 function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| name="", |string| reason="", |bool|)
 	#!sendmsg, msgsend
-	|| fn = where.func
+	|| fn = where.Func
 	if fn == @char or @num
-		.popuphide
+		.PopupHide
 		return false
 	if (fn == @name) and cmd[0, "autocomplete"]
 		return false
 	if (fn == @thg) and (where in @decl) and !where.isfirst
 		return false
-	.SetAutoPoint(where.position)
+	.SetAutoPoint(where.Position)
 	|| isString = (fn == @str or @sstr or @back or @bin)
 		ifn cmd starts "autocomplete_sel"
 			return .DisplayStr(where)
@@ -18,14 +18,21 @@ function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| na
 		return .SendFeedbackRequest(cmd, where, name, reason)
 
 
+function PerryIDE.CanSend (|string| cmd, |bool|)
+	if .LastCmdStr != cmd
+		return true
+	if !.LastSendTime or .LastSendTime.ago > 0.66s
+		return true
+
+	
 function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string| name,  |string| reason, |bool|)
 	|| msg = .BuildCmd(cmd, where, name, reason)		#require
 
-	if (.PopupDisplay is visible) or .PopupDateOn
-		|| cmdstr = msg.renderjbin
-		require .lastCmdStr != cmdstr
-		.lastCmdStr = cmdstr
-	.SendFeedbackMsg(msg)
+	|| CmdStr = msg.RenderJbin
+	if .CanSend(Cmdstr)
+		.SendFeedbackMsg(msg)
+	.LastCmdStr = CmdStr
+	.LastSendTime = date.now
 	return true
 
 
@@ -62,10 +69,11 @@ function PerryIDE.SubProcess (|bool| actual_compile, |SpdMainFn|)
 		Speedie_Checker = nil
 
 
-function PerryIDE.CrashedFB (|SpdProcess| c, |string| msg="")
-	|| s = ("crashed feedback ", "crashed compiler ")(c == .feedback)
+function PerryIDE.CrashedFB (|SpdProcess| c, |string| msg)
+	|| s = "Crashed " + c.Status.SignalName + " : " + c.render
 	(self is dead)
 	.notify(s, @emb + msg)
+	printline
 	.CancelCompile
 
 
@@ -96,6 +104,7 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 		Proc = proc.resolve
 		if proc
 			rz = SpdProcess.child(Proc, p, actual_compile*spdprocessmode.CaptureStdout)
+			rz.name = .project.name
 
 
 function PerryIDE.ActualCompile (|message| msg)
