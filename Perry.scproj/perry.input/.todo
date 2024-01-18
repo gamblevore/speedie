@@ -4,14 +4,13 @@
 
 * VM? 
 * Constants and globals don't autocomplete nicely
-* Are function pointers considered... pointers? they should be? nilchecker needs to work on them!
 * multiplay crashing.
 * nothing in compile-logs (Cmd-9)?
 * no longer can compile from perry?
 	* Saving doesnt update errors instantly
 * c.name ?= "()" compiles badly! decr in wrong place
 * check linux works
-* error-reporting losing first param even with functions!
+* error-reporting losing first param even with class functions!
 
 
 

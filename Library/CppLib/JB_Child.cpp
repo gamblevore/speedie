@@ -51,6 +51,13 @@ void JB_CrashTracer() {
     free( strings );
 }
 
+#ifndef SIGEMT
+	#define SIGEMT 0
+#endif
+#ifndef SIGINFO
+	#define SIGINFO 0
+#endif
+
 #define x(v) (1<<v) |
 static const unsigned int CrashList = x(SIGTRAP) x(SIGHUP) x(SIGQUIT) x(SIGILL) x(SIGSEGV) x(SIGBUS)  x(SIGFPE) x(SIGSYS) x(SIGTERM) x(SIGEMT) x(SIGABRT) x(SIGXCPU) x(SIGXFSZ) 0;
 static const unsigned int IgnoreList = x(SIGPIPE) x(SIGPROF) x(SIGWINCH) x(SIGINT)   0;
@@ -80,7 +87,7 @@ void JB_CrashHandler(int Sig) {
 				// report to stdout
 	char ErrorBuff[128];
 	snprintf(ErrorBuff, 64, "%s Signal: %s\n", App_CallPath, strsignal(Sig));
-	puts(ErrorBuff);
+	fputs(ErrorBuff, stderr);
 	
 				// log to file
 	JB_Rec__CrashLog("\n\n****** CRASHED ******");

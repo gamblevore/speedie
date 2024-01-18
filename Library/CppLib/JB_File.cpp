@@ -503,17 +503,20 @@ static int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 
 void JB_Rec__CrashLog(const char* c) {
 	if (!c) return;
-	fputs(c, stderr);
-	fputc('\n', stderr);
 
 	if (!CrashLogFile) {
 		mkdir("/tmp/logs", kDefaultMode);
 		int flags = O_RDWR | O_CREAT | O_TRUNC;
 		CrashLogFile = open(JB_CrashLogFileName, flags, kDefaultMode);
 		chmod(JB_CrashLogFileName, 777);
+		if (CrashLogFile)
+			fprintf(stderr, "CrashLogAt: %s\n", JB_CrashLogFileName);
 	}
-	if (!CrashLogFile) return;
 
+	fputs(c, stderr);
+	fputc('\n', stderr);
+
+	if (!CrashLogFile) return;
     JB_Write( CrashLogFile, (u8*)c, (int)strlen(c) );
     JB_Write( CrashLogFile, (u8*)"\n", 1 );
 }

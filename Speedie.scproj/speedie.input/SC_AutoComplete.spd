@@ -91,7 +91,7 @@ function PerryTalk // ReturnsWhenPerryClosesUs
 	|| testcrash = "__CrashSpd_" + "_"
 	for cmd in .Perry // .get(
 		if cmd contains testcrash
-			app.crash("whoop")
+			app.crash
 		.CmdWrap(cmd)
 
 
