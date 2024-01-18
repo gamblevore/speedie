@@ -85,9 +85,9 @@ typedef u16 MsgParseFlags;
 
 typedef int PID_Int;
 
-typedef int SizeInt;
+typedef int ProcessMode;
 
-typedef int SpdProcessMode;
+typedef int SizeInt;
 
 typedef byte Syntax;
 
@@ -548,13 +548,13 @@ extern JB_File* JB__App__stdin;
 extern JB_File* JB__App__StdOut;
 extern Array* JB__App_OldArgs;
 extern JB_String* JB__App_Usage;
-#define kJB__ErrorColors_bold (JB_LUB[371])
+#define kJB__ErrorColors_bold (JB_LUB[370])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[372])
-#define kJB__ErrorColors_good (JB_LUB[373])
-#define kJB__ErrorColors_normal (JB_LUB[374])
-#define kJB__ErrorColors_underline (JB_LUB[373])
-#define kJB__ErrorColors_warn (JB_LUB[375])
+#define kJB__ErrorColors_error (JB_LUB[371])
+#define kJB__ErrorColors_good (JB_LUB[372])
+#define kJB__ErrorColors_normal (JB_LUB[373])
+#define kJB__ErrorColors_underline (JB_LUB[372])
+#define kJB__ErrorColors_warn (JB_LUB[374])
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -603,7 +603,7 @@ extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
 extern Dictionary* JB__SyxDict_;
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[376])
+#define kJB_SaverStart1 (JB_LUB[375])
 extern JB_ErrorReceiver* JB_StdErr;
 extern JB_ErrorReceiver* JB_StdErrOriginal;
 extern Syntax JB_SyxAcc;
@@ -826,11 +826,11 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__MsgParseFlags_Inserted (8192)
 #define kJB__MsgParseFlags_LargestFlag (0)
 #define kJB__MsgParseFlags_Style2 (16384)
-#define kJB__SpdProcessMode_CaptureErrors (2)
-#define kJB__SpdProcessMode_CaptureOrPrintErrors (2 | 4)
-#define kJB__SpdProcessMode_capturestdout (1)
-#define kJB__SpdProcessMode_LargestFlag (7)
-#define kJB__SpdProcessMode_PrintErrors (4)
+#define kJB__ProcessMode_AutoPrintErrors (4)
+#define kJB__ProcessMode_CaptureErrors (2)
+#define kJB__ProcessMode_CaptureOrPrintErrors (2 | 4)
+#define kJB__ProcessMode_capturestdout (1)
+#define kJB__ProcessMode_LargestFlag (7)
 extern int JB__Syx_CurrFuncID;
 extern int JB__Syx_MaxFuncID;
 #define kJB__MsgUIFlags_BreakPoint (32768)
@@ -865,38 +865,6 @@ extern byte JB__Flow_FlowMode;
 extern CompressionStats JB__Flow_Stats;
 #define kJB__Flow_Validate (2)
 extern uint64 JB__Mrap_MDummy[2];
-#define kJB__PID_ABRT (6)
-#define kJB__PID_ALRM (14)
-#define kJB__PID_BUS (10)
-#define kJB__PID_CHLD (20)
-#define kJB__PID_CONT (19)
-#define kJB__PID_EMT (7)
-#define kJB__PID_FPE (8)
-#define kJB__PID_HUP (1)
-#define kJB__PID_ILL (4)
-#define kJB__PID_INFO (29)
-#define kJB__PID_INT (2)
-#define kJB__PID_IO (23)
-#define kJB__PID_KILL (9)
-#define kJB__PID_PIPE (13)
-#define kJB__PID_POLL (7)
-#define kJB__PID_PROF (27)
-#define kJB__PID_QUIT (3)
-#define kJB__PID_SEGV (11)
-#define kJB__PID_STOP (17)
-#define kJB__PID_SYS (12)
-#define kJB__PID_TERM (15)
-#define kJB__PID_TRAP (5)
-#define kJB__PID_TSTP (18)
-#define kJB__PID_TTIN (21)
-#define kJB__PID_TTOU (22)
-#define kJB__PID_URG (16)
-#define kJB__PID_USR1 (30)
-#define kJB__PID_USR2 (31)
-#define kJB__PID_VTALRM (26)
-#define kJB__PID_WINCH (28)
-#define kJB__PID_XCPU (24)
-#define kJB__PID_XFSZ (25)
 extern bool JB__File_DebugExecute;
 #define kJB__File_IgnoreErrors (true)
 #define kJB__File_O_APPEND (8)
@@ -929,9 +897,7 @@ void JB_PrintStackTrace();
 
 ErrorInt2 JB_App__Say(JB_String* s);
 
-JB_String* JB_App__StackTrace(JB_String* StartAfter, FastString* fs_in);
-
-Array* JB_App__StackTraceArray(JB_String* StartAfter);
+JB_String* JB_App__StackTrace(int skip, FastString* fs_in);
 
 
 
@@ -1328,8 +1294,6 @@ JB_String* JB_byte_Render(byte self, FastString* fs_in);
 
 
 // cstring
-JB_String* JB_cstring_Copy(_cstring self);
-
 
 
 // f64
@@ -1507,10 +1471,10 @@ int JB_Rg_Width(IntRange self);
 // PID_Int
 
 
+// ProcessMode
+
+
 // SizeInt
-
-
-// SpdProcessMode
 
 
 // Syntax

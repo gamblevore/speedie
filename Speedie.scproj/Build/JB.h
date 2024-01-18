@@ -668,7 +668,6 @@ struct ArchonPurger {
 	NilRecord* Line;
 	NilRecord* RowEnd;
 	NilRecord Realnesses;
-	SCDecl* Dbg[32];
 	LoopInfo Loops;
 	NilRecord Rows[64];
 };
@@ -1347,13 +1346,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1885])
+#define kJB__ErrorColors_bold (JB_LUB[1884])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1886])
-#define kJB__ErrorColors_good (JB_LUB[1887])
-#define kJB__ErrorColors_normal (JB_LUB[1888])
-#define kJB__ErrorColors_underline (JB_LUB[1887])
-#define kJB__ErrorColors_warn (JB_LUB[1889])
+#define kJB__ErrorColors_error (JB_LUB[1885])
+#define kJB__ErrorColors_good (JB_LUB[1886])
+#define kJB__ErrorColors_normal (JB_LUB[1887])
+#define kJB__ErrorColors_underline (JB_LUB[1886])
+#define kJB__ErrorColors_warn (JB_LUB[1888])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1518,7 +1517,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1890])
+#define kJB_codesign_native (JB_LUB[1889])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1534,8 +1533,8 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_ASM (63)
 #define kJB_BitAnd (JB_LUB[353])
 #define kJB_BitNot (JB_LUB[606])
-#define kJB_BitOr (JB_LUB[1331])
-#define kJB_BitXor (JB_LUB[1891])
+#define kJB_BitOr (JB_LUB[1330])
+#define kJB_BitXor (JB_LUB[1890])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_DontSaveProperty (0)
 #define kJB_LossyCastedMatch (7 << 22)
@@ -1550,7 +1549,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_SaveProperty (1)
 #define kJB_SavePropertyAndGoIn (2)
 #define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[1892])
+#define kJB_SaverStart1 (JB_LUB[1891])
 #define kJB_SelfDebug (2)
 #define kJB_SelfReplace (1)
 #define kJB_SimpleMatch (1 << 22)
@@ -4131,8 +4130,6 @@ bool SC_khalai_SyntaxIsnt(NilCheckMode self, NilCheckMode other);
 
 
 // NilRecord
-void ndb5(NilRecord self, int n);
-
 uint SC_NRD_NextCount(NilRecord self);
 
 NilState SC_NRD_SyntaxAccess(NilRecord self, int item);
@@ -4714,8 +4711,6 @@ void SC_IR_FS(IR* self, FastString* fs);
 
 bool SC_IR_OperatorIsa(IR* self, int m);
 
-void SC_IR_Print(IR* self);
-
 JB_String* SC_IR_Render(IR* self, FastString* fs_in);
 
 void SC_IR_SyntaxExpect(IR* self, JB_String* Error);
@@ -5004,8 +4999,6 @@ NilState SC_nil__JustReal(Message* msg, NilCheckMode Test);
 void SC_nil__KhalaiPurification(SCFunction* f, int a);
 
 NilState SC_nil__List(Message* msg, NilCheckMode Test);
-
-void ndb4(int n);
 
 void SC_nil__NilParamPass(SCDecl* Recv, SCDecl* Sent, Message* where);
 
@@ -5556,8 +5549,6 @@ SCDecl* SC_DictionaryReader_ValueDecl(DictionaryReader* self);
 
 
 // JB_ErrorReceiver
-int JB_Rec_BadCount(JB_ErrorReceiver* self);
-
 bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
 void JB_Rec_Clear(JB_ErrorReceiver* self);
@@ -8998,7 +8989,6 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
 	return rz;
 }
 
@@ -9029,22 +9019,7 @@ inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v) {
 
 inline NilState SC_nil_Set(ArchonPurger* self, NilRecord Dest, JB_String* reason) {
 	Dest = (Dest & self->Realnesses);
-	NilRecord diff = Dest ^ (*self->Line);
 	(*self->Line) = Dest;
-	{
-		int i = 0;
-		while (i < 32) {
-			if (SC_NRD_SyntaxAccess(diff, i)) {
-				SCDecl* d = JB_Incr(self->Dbg[i]);
-				if (d) {
-					ndb2(d, reason);
-				}
-				JB_Decr(d);
-			}
-			i++;
-		};
-	}
-	;
 	return kSC__NilState_Real;
 }
 
@@ -9057,7 +9032,7 @@ inline NilState SC_nil_SetNilness(ArchonPurger* self, SCDecl* d, NilState New) {
 	if ((P->Value & self->Realnesses) != P->Value) {
 		SC_Decl_NilPrmFail(d);
 	}
-	ndb2(d, JB_LUB[1027]);
+	ndb2(d, JB_LUB[1026]);
 	return New;
 }
 
@@ -9068,7 +9043,7 @@ inline NilState SC_nil__ArgOne(Message* s, NilCheckMode t, NilState prev) {
 	if (SC_NilState_SyntaxIs(prev, kSC__NilState_Borked)) {
 		JB__Err_AutoPrint = SC__nil_OldPrint;
 		if ((!(!JB_Rec_OK(JB_StdErr)))) {
-			JB_Msg_SyntaxExpect(s, JB_LUB[1029]);
+			JB_Msg_SyntaxExpect(s, JB_LUB[1028]);
 			return nil;
 		}
 		JB_Rec_Clear(JB_StdErr);
@@ -9544,7 +9519,7 @@ inline void SC_Iter_Constructor(SCIterator* self, SCClass* parent) {
 inline void SC_SavingTest_Constructor(SavingTest* self, int n) {
 	JB_Sav_Constructor(self);
 	JB_String* _tmPf0 = JB_Incr(JB_int_RenderFS(n, nil));
-	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1502], _tmPf0);
+	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1501], _tmPf0);
 	JB_Decr(_tmPf0);
 	self->Name = JB_Incr(_tmPf1);
 	self->Value = (1000 + n);
@@ -9563,7 +9538,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1507])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1506])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}

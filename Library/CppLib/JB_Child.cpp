@@ -4,7 +4,11 @@
 
 #ifdef AS_LIBRARY
 
-void JB_Child_Stub() {}
+extern "C" {
+	void JB_Child_Stub() {}
+	void JB_RemoveHandlers() {};
+}
+
 
 #else
 

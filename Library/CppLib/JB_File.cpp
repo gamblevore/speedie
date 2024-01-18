@@ -396,12 +396,7 @@ int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
 // well kinda. It could write some of the bytes and STILL get an error. so the interface is just bad.
 int JB_Write(int fd, uint8* buffer, int N) {
     int TotalCount = 0;
-    if (strcmp("/usr/local/speedie/Speedie.scproj/Build/Products/Debug/Speedie", (const char*)buffer) == 0) {
-		void JB_PrintStackTrace();
-		JB_PrintStackTrace();
-		debugger;
-    }
-    
+
     while (N > TotalCount) {
         int written = (int)write(fd, buffer+TotalCount, N-TotalCount);
         if (written == -1) {
