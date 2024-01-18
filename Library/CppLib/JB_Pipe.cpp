@@ -28,11 +28,6 @@
 #endif
 
 
-extern "C" const char** JB_BackTrace(void** space, int* size) {
-    *size = backtrace( space, *size );
-    return (const char**)backtrace_symbols( space, *size );
-}
-
 
 
 #ifndef AS_LIBRARY
@@ -367,14 +362,12 @@ bool JB_IsTerminal(int FD) {
 
 #else
 
-// stop linker errors.
-extern "C" void Stub_JBPipe () {
-    
-}
-
-extern "C" void JB_CrashTracer() {
-}
+extern "C" void JB_CrashTracer() {}
 
 #endif
 
+extern "C" const char** JB_App__BackTrace(void** space, int* size) {
+    *size = backtrace( space, *size );
+    return (const char**)backtrace_symbols( space, *size );
+}
 

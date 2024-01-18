@@ -177,13 +177,3 @@ struct CompressionStats
 			rz.live = true
 }
 
-
-helper BTWSorter_64K (|string| text, |&int| ap, |&int| bp, |int|)
-	|| a		= *ap
-	|| b		= *bp
-	|| txt		= text.addr
-	for text.length
-		|int| ac = txt[64KB&a++]
-		|int| bc = txt[64KB&b++]
-		|| d = ac - bc
-			return d.SignBit
