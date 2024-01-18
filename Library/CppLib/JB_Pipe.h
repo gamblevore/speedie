@@ -18,8 +18,6 @@ void JB_PID_Constructor(ProcessOwner* self);
 void JB_PID_UnRegister(ProcessOwner* self);
 void JB_PID_Destructor(ProcessOwner* self);
 void JB_PID_Register(ProcessOwner* self);
-int JB_PID_Exit(ProcessOwner* self);
-int JB_PID_TermSig(ProcessOwner* self);
 JB_StringC* JB_Err_SignalName (int Sig);
 JB_StringC* JB_Err_Name (int Sig);
 ProcessOwner* JB_PID_Next(ProcessOwner* self);
