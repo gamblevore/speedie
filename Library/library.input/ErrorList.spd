@@ -209,10 +209,10 @@ class ErrorReceiver
 		return old
 	
 	
-	function ReturnErrors
+	function ReturnErrors (|errorreceiver| To=stderr)
 		opt norefcounts
 		for e in self
-			stderr <~ e
+			To <~ e
 
 
 	function LastError (|error|)

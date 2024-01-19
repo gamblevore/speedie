@@ -380,13 +380,14 @@ class PerryIDE (Window)
 				.compilr = nil
 			  elseif !c.IsOpen
 				.CancelCompile("lost connection")
-		.CheckCrashes(.feedback, "feedback")
+		|| f = .feedback
+			.CheckCrashes(f, "feedback")
 
 
 	function CheckCrashes (|SpdProcess| p, |string| what, |bool|)
-		require p
 		|| Stats = p.Status
-		require Stats!=0
+		if Stats==0
+			return true
 		|| fs = faststring()
 		fs <~ "Crashed ${Stats.SignalName} : ${p.render}\n"
 		p.status = 0
@@ -511,11 +512,6 @@ class PerryIDE (Window)
 		.MassSearchField.SelectAll
 		.MassSearchField.SetFocus
 		return true
-
-
-	function SendCrash
-		"Trying to crash"
-		.SendFeedbackmsg(@tmp+"crash")
 
 	
 	helper CmdKey (|keys| key, |bool|)

@@ -39,6 +39,9 @@ struct Pico
 	function IsParent (|bool|)
 		cpp_wrapper PicoIsParent
 		
+	function CanRead (|bool|)
+		cpp_wrapper PicoCanRead
+		
 	helper StartFork (|bool| Exec=false, |PID_Int|)
 		cpp_wrapper PicoStartFork
 
@@ -83,9 +86,16 @@ struct Pico
 		if f >= 0
 			return self
 
-	function SleepForSend
+	function SleepForSend (|date| MaxTime=2.5s, |bool|)
+		if !self
+			return true
+		|| Sub = 0.001s
 		while .issending
-			app.sleep(0.001s)
+			require MaxTime > 0
+			app.sleep(Sub)
+			MaxTime -= Sub
+		return true
+		
 
 	module
 		|&pico| Parent_

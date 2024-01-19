@@ -1363,12 +1363,15 @@ extern Macro* SC__AC_all_tmp_src;
 extern SCFunction* SC__AC_AnonFn;
 extern SCBase* SC__AC_AnonParent;
 extern JB_String* SC__AC_AnonText;
-extern bool SC__AC_CompileUpToDate;
+extern bool SC__AC_Cleaned;
+extern JB_ErrorReceiver* SC__AC_Errors;
 extern Macro* SC__AC_func_tmp_src;
 extern int SC__AC_max_total;
 extern SpdProcess* SC__AC_Perry;
 extern byte SC__AC_ShouldEnter;
+extern JB_String* SC__AC_TestCrash;
 extern int SC__AC_total;
+extern bool SC__AC_WillExit;
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -1531,9 +1534,9 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_ActualTypecasts ((~(128 | 32)))
 #define kJB_AddressOfMatch (3 << 22)
 #define kJB_ASM (63)
-#define kJB_BitAnd (JB_LUB[353])
-#define kJB_BitNot (JB_LUB[606])
-#define kJB_BitOr (JB_LUB[1330])
+#define kJB_BitAnd (JB_LUB[354])
+#define kJB_BitNot (JB_LUB[607])
+#define kJB_BitOr (JB_LUB[1331])
 #define kJB_BitXor (JB_LUB[1890])
 #define kJB_CastedMatch (6 << 22)
 #define kJB_DontSaveProperty (0)
@@ -2177,8 +2180,6 @@ bool JB_App__PrefsInit(Date when);
 
 void JB_PrintStackTrace();
 
-void JB_App__Restart();
-
 void JB_App__SavePrefs();
 
 ErrorInt2 JB_App__Say(JB_String* s);
@@ -2228,8 +2229,6 @@ void SC_Comp__AppleBuildApp(JB_File* project, JB_File* product);
 
 bool SC_Comp__Banned(JB_String* name);
 
-JB_String* SC_Comp__BuildErrors(ErrorSeverity MinSev);
-
 JB_File* SC_Comp__BuildFolder();
 
 void SC_Comp__CheckIsGoodLibrary();
@@ -2261,8 +2260,6 @@ void SC_Comp__DoRefAnalysis();
 void SC_Comp__DoSavers(int Stage);
 
 bool SC_Comp__EnterCompile();
-
-Message* SC_Comp__ErrorsToPerry();
 
 void SC_Comp__FileSanityTests();
 
@@ -2340,8 +2337,6 @@ void SC_Comp__PostInitCodeCall();
 
 void SC_Comp__PrepareInterpreter();
 
-void SC_Comp__PrePrintErrors();
-
 void SC_Comp__PrintCompileErrors();
 
 void SC_Comp__PrintCompileTime(Date durr);
@@ -2361,6 +2356,8 @@ int SC_Comp__ReachedClassCount();
 int SC_Comp__Reachedfuncs();
 
 void SC_Comp__RefConstructors();
+
+JB_String* SC_Comp__RenderErrors(JB_ErrorReceiver* stderr, ErrorSeverity MinSev);
 
 bool SC_Comp__ScriptRecompile(JB_File* f, JB_File* script_build);
 
@@ -2593,11 +2590,13 @@ void SC_AC__CallFromSub(Message* arg, SCFunction* fn);
 
 bool SC_AC__CanUseName(SCBase* l);
 
+Message* SC_AC__Check(Message* cmd);
+
 Message* SC_AC__CmdCleanUp(Message* arg);
 
 Message* SC_AC__CmdResponse(Message* cmd, Message* arg);
 
-void SC_AC__CmdWrap(Message* arg);
+bool SC_AC__CmdWrap(Message* arg);
 
 Message* SC_AC__Define(Message* msg, JB_String* purpose, JB_Object* found);
 
@@ -2611,7 +2610,7 @@ Message* SC_AC__DoCmd(Message* cmd, Message* arg);
 
 bool SC_AC__EnterAutoComplete();
 
-JB_String* SC_AC__ErrName();
+Message* SC_AC__ErrorsToPerry();
 
 Message* SC_AC__FindAdj(Message* msg, bool DisplayOnly);
 
@@ -2622,8 +2621,6 @@ SCFunction* SC_AC__GetFunc(Message* cmd, SCFile* myfile, int ff, int n);
 SCFunction* SC_AC__GetFunc2(Message* cmd, SCFile* myfile, int f, int n);
 
 SCBase* SC_AC__GetScope(Message* orig, int* types);
-
-void SC_AC__HandleRestartedCompile();
 
 void SC_AC__IdentifyBetter(Message* node, JB_String* name);
 
@@ -2647,19 +2644,15 @@ Message* SC_AC__MainAct(Message* cmd, SCFile* my_file);
 
 Message* SC_AC__MainActAutoComplete(Message* thg, JB_String* str, Message* cmd);
 
+void SC_AC__ParserRestore();
+
 void SC_AC__PerryTalk();
 
-void SC_AC__ReInit();
-
-Message* SC_AC__ReportBuild(Message* cmd);
-
-Message* SC_AC__ReportBuildOrRestart(Message* cmd, Message* arg);
+Message* SC_AC__ReportBuildOrRestart(Message* cmd);
 
 Message* SC_AC__ReportMemory(Message* cmd);
 
 Message* SC_AC__RespondDefine(Message* msg, Message* s, JB_String* purpose);
-
-void SC_AC__Restart(Message* arg);
 
 Message* SC_AC__RootTmpComplete(Message* cmd);
 
@@ -4853,6 +4846,8 @@ ObjectSaver JB_Saver__New();
 // JB_Pico
 JB_String* JB_Pico_Get(PicoComms* self, float T);
 
+bool JB_Pico_SleepForSend(PicoComms* self, Date MaxTime);
+
 bool JB_Pico_SendFS(PicoComms* self, FastString* fs, bool Wait);
 
 int JB_Pico__Init_();
@@ -5581,6 +5576,8 @@ bool JB_Rec_OK(JB_ErrorReceiver* self);
 
 JB_Error* JB_Rec_Pop(JB_ErrorReceiver* self);
 
+void SC_Rec_PrePrintErrors(JB_ErrorReceiver* self);
+
 int JB_Rec_PrintErrors(JB_ErrorReceiver* self);
 
 int JB_Rec_PrintErrorsMain(JB_ErrorReceiver* self, ErrorSeverity Level, bool PrintCount, bool shell);
@@ -5589,7 +5586,7 @@ JB_String* JB_Rec_Render(JB_ErrorReceiver* self, FastString* fs_in);
 
 int JB_Rec_RenderErrors(JB_ErrorReceiver* self, FastString* fs, ErrorSeverity Level, bool shell);
 
-void JB_Rec_ReturnErrors(JB_ErrorReceiver* self);
+void JB_Rec_ReturnErrors(JB_ErrorReceiver* self, JB_ErrorReceiver* To);
 
 int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self);
 
@@ -7395,8 +7392,6 @@ bool SC_Msg_CollectProp(Message* self, SCClass* cls);
 
 JB_String* SC_Msg_CollectUsage(Message* self);
 
-bool SC_Msg_Compiles(Message* self);
-
 Message* JB_Msg_ConfArg(Message* self);
 
 void SC_Msg_ConfTake(Message* self, Message* dest, JB_String* name);
@@ -9032,7 +9027,7 @@ inline NilState SC_nil_SetNilness(ArchonPurger* self, SCDecl* d, NilState New) {
 	if ((P->Value & self->Realnesses) != P->Value) {
 		SC_Decl_NilPrmFail(d);
 	}
-	ndb2(d, JB_LUB[1026]);
+	ndb2(d, JB_LUB[1027]);
 	return New;
 }
 
@@ -9043,7 +9038,7 @@ inline NilState SC_nil__ArgOne(Message* s, NilCheckMode t, NilState prev) {
 	if (SC_NilState_SyntaxIs(prev, kSC__NilState_Borked)) {
 		JB__Err_AutoPrint = SC__nil_OldPrint;
 		if ((!(!JB_Rec_OK(JB_StdErr)))) {
-			JB_Msg_SyntaxExpect(s, JB_LUB[1028]);
+			JB_Msg_SyntaxExpect(s, JB_LUB[1029]);
 			return nil;
 		}
 		JB_Rec_Clear(JB_StdErr);
@@ -9261,7 +9256,7 @@ inline void SC_PA_Constructor(SCParamArray* self, Message* exp, Message* side) {
 	self->IsDot = ((JB_Msg_EqualsSyx(exp, JB_SyxDot, false)));
 	self->IsAddress = ((exp != nil) and (({
 		Message* _tmPf1 = JB_Incr(SC_Msg_NiceParent(exp));
-		bool _tmPf0 = SC_Msg_OperatorIsBRel(_tmPf1, JB_LUB[353]);
+		bool _tmPf0 = SC_Msg_OperatorIsBRel(_tmPf1, JB_LUB[354]);
 		JB_Decr(_tmPf1);
 		 _tmPf0;
 	})));
@@ -9519,7 +9514,7 @@ inline void SC_Iter_Constructor(SCIterator* self, SCClass* parent) {
 inline void SC_SavingTest_Constructor(SavingTest* self, int n) {
 	JB_Sav_Constructor(self);
 	JB_String* _tmPf0 = JB_Incr(JB_int_RenderFS(n, nil));
-	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1501], _tmPf0);
+	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1502], _tmPf0);
 	JB_Decr(_tmPf0);
 	self->Name = JB_Incr(_tmPf1);
 	self->Value = (1000 + n);
@@ -9538,7 +9533,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1506])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1507])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -9687,7 +9682,7 @@ inline void SC_Class_Constructor(SCClass* self, Message* node, SCBase* parent, b
 	self->TypeOptional = JB_Incr(_tmPf1);
 	SCDecl* _tmPf0 = SC_Decl_NilConstructor(T, kSC__NilState_Real * HasPtrs);
 	self->TypeReal = JB_Incr(_tmPf0);
-	if (JB_Msg_SyntaxEquals(node, JB_LUB[736], false)) {
+	if (JB_Msg_SyntaxEquals(node, JB_LUB[737], false)) {
 		JB_SetRef(T, SC_Decl_GetAddress(T, kSC__DeclMode_Always));
 	}
 	 else {

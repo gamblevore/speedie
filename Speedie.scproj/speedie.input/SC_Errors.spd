@@ -43,18 +43,18 @@ module SC_Errors
 		return true
 
  
-function Compiler.PrePrintErrors
-	for err in stderr.errors
+function errorreceiver.PrePrintErrors 
+	for err in .errors
 		err.improve
 	ifn options.KeepAllErrors
-		for err in stderr.errors
+		for err in .errors
 			ifn SC_Errors[err]
 				err.remove
 
 
 function Compiler.PrintErrors (|errorseverity| MinSev)
 	stderr.BlockErrors = true
-	|| s = .builderrors(minsev)
+	|| s = .RenderErrors(stderr, minsev)
 	stderr.BlockErrors = false
 	if options.perry == 2
 		s = s.digest
@@ -64,7 +64,7 @@ function Compiler.PrintErrors (|errorseverity| MinSev)
 		print s
 
 
-function Compiler.BuildErrors (|errorseverity| MinSev, |string|)
+function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, |string|)
 	|| Printable = stderr.problemcount+stderr.errorcount 
 	if (Printable and minsev < errorseverity.problem)
 		minsev = errorseverity.problem

@@ -161,11 +161,8 @@ class SpdProcess (Process)
 
 
 	iterator
-		while
-			|| s = .get(1000_000_000)
-			if !s : exit
-			yield s
-
+		while .pico.CanRead
+			yield .get(1000)
 
 
 	module

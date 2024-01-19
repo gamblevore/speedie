@@ -6,7 +6,9 @@ cpp_part AC
 |scfunction|		AnonFn
 |string|			AnonText
 |scbase|			AnonParent
-|bool|				CompileUpToDate = true
+|errorreceiver|		Errors
+|bool|				Cleaned
+|bool|				WillExit
 |byte|				ShouldEnter = 0
 |SpdProcess|		Perry 
  
@@ -49,22 +51,16 @@ noauto
 `)>.macro
 
 
-function HandleRestartedCompile
-	|| args = app.rawargs
-	|| last = args.last
-	if last.isjbin
-		args.pop
-		.CmdWrap(last.parsejbin)
-
-
-function ReInit ()
+function ParserRestore
+	.errors = stderr
+	stderr = errorreceiver()
 	(message).Restore
 	parser.using.position = -1 // sigh. I guess something slipped somewhere
 
 
 function Log (|message|)
 	rz = @tmp + "log"
-	rz <~ TransCompiler.LogName	
+	rz <~ TransCompiler.LogName
 
 
 function EnterAutoComplete (|bool|)
@@ -79,31 +75,31 @@ function EnterAutoComplete (|bool|)
 function InitedOK (|bool|)
 	if compiler.InitedOK
 		return true
-	if stderr.OK
+	if .Errors.OK
 		error "Compiler did not initialise"
+	
+
+function CrashTester
 	|| __CrashSpd__ = 0
+
 
 
 function PerryTalk // ReturnsWhenPerryClosesUs
 	Compiler.CompileAll
-	.reinit
-	.HandleRestartedCompile
-	|| testcrash = "__CrashSpd_" + "_"
-	for cmd in .Perry // .get(
-		if cmd contains testcrash
-			app.crash
-		.CmdWrap(cmd)
+	.ParserRestore
+	.perry <~ .check(@tmp + "check")
+	
+	for cmd in .Perry
+		if cmd and !.CmdWrap(cmd)
+			exit
 
-
-function ErrName (|string|)
-	opt norefcounts
-	|| err = StdErr.pop
-	return (err.name, "error")(err)
+	.perry.pico.SleepForSend
 
 
 function BuildError (|string| name, |message|)
 	rz = @tmp + "error"
-	rz <~ .ErrName
+	|| err = StdErr.pop
+	rz <~ (err.name, "error")(err)
 	rz <~ name
 
 
@@ -135,7 +131,12 @@ function CmdCleanUp (|Message| arg, |message|)
 	return cmd
 
 
-function CmdWrap (|Message| arg)
+|| TestCrash = "__CrashSpd_" + "_" // for crash-testing
+
+function CmdWrap (|Message| arg, |bool|)
+	if arg contains TestCrash
+		app.crash
+	
 	|| cmd = .CmdCleanUp(arg)
 	|| response = .cmdresponse(cmd, arg) 
 
@@ -143,6 +144,8 @@ function CmdWrap (|Message| arg)
 		cmd.replacewith(response)
 	.perry <~ arg
 	stderr.clear						// super-important!!!
+	
+	return !.willexit
 
 
 function Debug (|Message| cmd, |message|)
@@ -154,40 +157,38 @@ function Restart (|message| arg)
 	app.restart
 
 
-function Compiler.ErrorsToPerry (|message|)
-	compiler.PrePrintErrors
-	return .BuildErrors(errorseverity.warning).parse
+function ErrorsToPerry (|message|)
+	if !.Cleaned
+		.errors.PrePrintErrors
+		.Cleaned = true
+	return compiler.RenderErrors(.errors, errorseverity.warning).parse
 
 
-function message.Compiles (|bool|)
-	return self ~= "compile" or "debug"
-
-
-function ReportBuild (|message| cmd, |message|)
-	if stderr.ok and cmd.compiles
+function ReportBuildOrRestart (|message| cmd, |message|)
+	.WillExit = true
+	if .errors.ok
 		.Perry <~ .Log
 		TransCompiler.ExportAndInstall(true)
-	if stderr.HasProblems
-		// how can I say its OK and that it has warnings?
-		// seems there will always be warnings.
+		stderr.ReturnErrors(.errors)
+		
+	if .errors.HasProblems
 		return cmd.SendPerryErrors
-	if cmd.compiles
-		cmd <~ TransCompiler.productpath(true)
-	  else
-		cmd <~ (@thg, "ok")
+	cmd <~ TransCompiler.productpath(true)
 	return cmd
 
 
-function ReportBuildOrRestart (|message| cmd, |message| arg, |message|)
-	if !.CompileUpToDate
-		.restart(arg)		// arg, or else we complain about bad cmds
-	.CompileUpToDate = false
-	return .ReportBuild(cmd)
+function Check (|message| cmd, |message|)
+	if .errors.HasProblems
+		return cmd.SendPerryErrors
+	cmd.name = "check"
+	cmd <~ (@thg, "ok")
+	return cmd
 
 
 function Message.SendPerryErrors (|message|)
+// how can I say its OK and that it has warnings? just append to a different section of the errorlog?
 	.clear
-	self <~ compiler.ErrorsToPerry
+	self <~ Interact.ErrorsToPerry
 	return self
 	
 
@@ -201,20 +202,12 @@ function ReportMemory (|Message| cmd, |message|)
 
 function DoCmd (|Message| cmd, |message| arg, |message|)
 	require cmd == @tmp
-	if cmd == "crash"
-		app.crash
 	
-	if cmd.compiles or cmd == "check"
-		return .ReportBuildOrRestart(cmd, arg)
-	
-	if cmd == "mem"
-		return .ReportMemory(cmd)
-		
-	if !.InitedOK
-		return cmd.SendPerryErrors
-
-	if cmd == 1
-		return .Jump(cmd)
+	if !.InitedOK:		return cmd.SendPerryErrors
+	if cmd ~= "compile" or "debug":	return .ReportBuildOrRestart(cmd)
+	if cmd == "check":	return .Check(cmd)
+	if cmd == "mem":	return .ReportMemory(cmd)
+	if cmd == 1:		return .Jump(cmd)
 
 	|| req = cmd[@str].nyme.lowercase
 	|| my_file = compiler.files[req]

@@ -33,7 +33,7 @@ function compiler.PrintCompileErrors
 		require stderr.hasanything
 	  else
 		require StdErr.hasproblems
-	.PrePrintErrors
+	stderr.PrePrintErrors
 
 	if (SCFunction.DisabledPoints)
 		"Disabled functions called ${scfunction.DisabledPoints}x!".printlinecolor(errorcolors.error)
