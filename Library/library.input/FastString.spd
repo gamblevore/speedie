@@ -4,14 +4,6 @@
 */
 
 
-// possible improvement?
-// then make .smartresult do .bla-- and fastnew do .bla++
-// once it reaches 0, we call .flush. so we can stream using a singular faststring.
-// like giantfile.render(app.stdout)
-// possibly: remove faststring.printline (From the c++). printing a line has nothing to do with actually
-// rendering...
-
-
 class FastString {
 	linkage
 		wrapper

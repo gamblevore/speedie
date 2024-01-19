@@ -146,7 +146,7 @@ function perryide.AddProductErr (|string| err)
 function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
 	// so what if we have a shellstream? then what?
-	if !r.userflags and r.output.length
+	if !(r.userflags&1) and r.output.length
 		.ShowCompileTab(.productout)
 		r.userflags |= 1
 	

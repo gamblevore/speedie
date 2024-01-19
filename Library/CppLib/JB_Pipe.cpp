@@ -176,7 +176,8 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 	if (Sh.StreamMode == 1)
 		Unblock(Sh.CaptureOut[RD]); // even this blocking at all is kinda sus...
 	
-	
+//	if (Sh.CaptureErr[0]==-1 and Sh.CaptureErr[1]==-1)
+//		debugger; // wait what?
 	JB_PID_Register(&Sh);
 	Sh.PID = PicoStartFork(C, true);
 
@@ -189,7 +190,7 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 		pipe_close(Sh.CaptureErr[WR]);
 		pipe_close(Sh.CaptureErr[RD]);
 		execvp(argv[0], (char* const*)argv);
-		_exit(errno); // in case execvp fails
+		_exit(errno-!errno); // in case execvp fails
 		return false;
 	}
 	JB_FreeIfDead(path);
@@ -205,6 +206,8 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 
 
 bool JB_Sh_UpdatePipes(ShellStream* self) {
+//	if (self->UserFlags & 8)
+//		debugger;
 	auto& Sh = *self;
 	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], Sh.StreamMode);
 	// this will only return, once the app has finished... unless we are Streaming.

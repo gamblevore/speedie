@@ -76,7 +76,7 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 	if Active
 		return C
 
-	|| p = [.project, "--perry=bin", "--silent", "--nocolor"]
+	|| p = [.project, "--perry=bin", "--nocolor"]
 	|| f = .projmsg.first 
 	|| name = .name
 	if !actual_compile
@@ -104,11 +104,15 @@ function PerryIDE.ActualCompile (|message| msg)
 		isnt active
 		return
 	.compilr = c
+
+	if !c.SubProcess
+		c.UserFlags |= 8 // just to debug my pipes. delete this later.
 	.SpeedieText.text = ""
 	
 	|| dw = .DateWrap(msg )
 	.logonecomm(dw, "\1C ")
 	c <~ dw
+	(.buildbutton isnt enabled)
 	(.buildbutton isnt visible)
 	(.runbutton isnt enabled)
 	(.progress is visible)
