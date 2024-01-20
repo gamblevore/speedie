@@ -26,7 +26,7 @@ class ButtonView (GUIControl)
 		super.constructor(p)
 		.onclicked = act
 		.pressing = pressing
-		.itemgap = 4
+		.ItemGap = 4
 		.OnRightClick = OnRightClick
 		.StepDuration = 0.75s
 		.align = ListViewState.aligncenter 
@@ -76,6 +76,7 @@ class ButtonView (GUIControl)
 		opt norefcounts
 		for i in .items
 			(i is Selected) = (i == value)
+
 
 	function Selected (|listviewrow|)
 		opt norefcounts
@@ -305,9 +306,11 @@ class ButtonView (GUIControl)
 		if .openmenu(row)
 			return .submenu.typedstring("")
 
+
 	function MenuIsOpen (|bool|)
 		opt norefcounts
 		return .SubControl isa menu and .subcontrol is visible
+
 
 	function OpenMenu (|listviewrow| row=nil, |bool|)
 		|| m = .submenu						#require

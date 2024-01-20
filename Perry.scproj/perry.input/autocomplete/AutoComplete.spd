@@ -218,6 +218,7 @@ function PerryIDE.PopupHide
 
 // SpeedieDidReceiveMsg, receivedmsg, maybedidgetmsg, gotmsg, msgreceived, receivefb, fbreceived
 function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
+	debug_require c
 	if (c == .compilr) and !c.alive
 		isnt active
 

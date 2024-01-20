@@ -4,10 +4,6 @@
 
 * VM? 
 * Constants and globals don't autocomplete nicely
-
-* doesnt capture stdout reliably on builds
-	* compile just disappears sometimes. doesnt warn about failiures.
-* builds also unreliable
 * c.name ?= "()" compiles badly! decr in wrong place
 * error-reporting losing first param even with class functions!
 

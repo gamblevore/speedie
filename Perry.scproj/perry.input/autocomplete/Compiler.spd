@@ -43,8 +43,7 @@ extend PerryIDE
 		.RelistStartupErrors
 	
 	
-	function CompiledOK (|string| kind, |bool|)
-		isnt active
+	function CheckedOK (|string| kind, |bool|)
 		.ClearErrors(kind=="compile")
 		if .viewing == .ViewErrors
 			.NoNeed(.CompileOKString, .viewfiles)
@@ -55,7 +54,7 @@ extend PerryIDE
 		|| MaybeOK = msg.first
 		if (MaybeOK == "ok")
 			.ErrorList.clear
-			return .CompiledOK(msg.name)
+			return .CheckedOK(msg.name)
 
 		is Broken
 		.NoNeed
@@ -129,7 +128,7 @@ extend PerryIDE
 		|| first = msg.first						#require
 		if first == @arg // an error-list
 			return .ErrorListFB(msg)
-		.CompiledOK(msg.name)
+		.CheckedOK(msg.name)
 		
 		require self isnt broken
 		|| file = @url + "file"

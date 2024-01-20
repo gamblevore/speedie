@@ -429,8 +429,10 @@ class PerryIDE (Window)
 				.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
 		.UpdateDebuggedApp(false)
 		.TestCompilerAlive
-		.SpeedieMsgReceive(.feedback)
-		.SpeedieMsgReceive(.compilr)
+		|| f = .feedback
+			.SpeedieMsgReceive(f)
+		|| c = .compilr
+			.SpeedieMsgReceive(c)
 		.UpdateSearchText
 		.UpdateStatusErrors
 		.ReadLog
