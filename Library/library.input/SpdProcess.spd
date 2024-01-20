@@ -190,9 +190,9 @@ class SpdProcess (Process)
 
 		function BackTrace (|&_voidptr| space, |&int| size, |&cstring|) 
 			cpp_wrapper JB_App__BackTrace
-		
-		
-		function RunChild (|string| app_path, |string| DebugName="", |[string]| params=[], |ProcessMode| Mode=0, |SpdProcess|)
+
+
+		function RunChild (|string| app_path, |string| DebugName="", |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
 			debug_require params!=nil
 			require app_path.file.mustexist
 			rz = SpdProcess(app_path, debugname, params, nil, Mode)
@@ -204,6 +204,7 @@ datatype ProcessMode (int)
 	flags
 		CaptureStdOut
 		CaptureOrPrintErrors = (CaptureErrors, AutoPrintErrors)
+		CaptureAll = CaptureStdOut ||| AutoPrintErrors
 
 	syntax is (|ProcessMode| M, |bool|)
 		return self&M
@@ -221,6 +222,6 @@ prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)
 prototype SpdDeathActionFn
 
 
-function app.StartChild (|[string]| r, |SpdProcess|)
+function app.Fork (|[string]| r, |SpdProcess|)
 	return SpdProcess.RunChild(.path, r)
 

@@ -43,9 +43,9 @@ extend PerryIDE
 		.RelistStartupErrors
 	
 	
-	function CompiledOK (|message| msg, |bool|)
+	function CompiledOK (|string| kind, |bool|)
 		isnt active
-		.ClearErrors(msg=="compile")
+		.ClearErrors(kind=="compile")
 		if .viewing == .ViewErrors
 			.NoNeed(.CompileOKString, .viewfiles)
 		return true
@@ -55,7 +55,7 @@ extend PerryIDE
 		|| MaybeOK = msg.first
 		if (MaybeOK == "ok")
 			.ErrorList.clear
-			return .CompiledOK(msg)
+			return .CompiledOK(msg.name)
 
 		is Broken
 		.NoNeed
@@ -106,18 +106,22 @@ extend PerryIDE
 	function LogFB (|message| msg)
 		// ignore.
 	
+	
 	function Readlog
 		if .isBuilding
 			.justreadlog
+
 
 	function JustReadLog
 		opt norefcounts
 		.speedietext <~ .Compilr.ReadStdOut
 	
+	
 	function Say (|string| str)
 		target osx
 			if !.IsFront or SDLApp.IsBackground
 				.Talker = Process.stream("/usr/bin/say", [.name.trimext + str])
+	
 	
 	function CompileFB (|message| msg, |bool|)
 		|| db = .DebugIsWaitingForCompile
@@ -125,7 +129,7 @@ extend PerryIDE
 		|| first = msg.first						#require
 		if first == @arg // an error-list
 			return .ErrorListFB(msg)
-		.CompiledOK(msg)
+		.CompiledOK(msg.name)
 		
 		require self isnt broken
 		|| file = @url + "file"
@@ -134,7 +138,7 @@ extend PerryIDE
 		.notify(.name + str, file)
 		.say(str)
 		if db
-			.StartDebugging(msg.first.name.file)
+			.StartDebugging(first.name.file)
 				
 				
 	function Notify (|string| What, |message| response=nil)

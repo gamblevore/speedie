@@ -63,7 +63,7 @@ function guicontrol.VisText (assigns:|string|s)
 
 
 function ConfirmWindow_.Resize (|string| s)
-	|| desired = .question.TextSize(s) + (4, 34)
+	|| desired = .question.TextSize(s) + (12, 34)
 	|| actual = desired max (200, 100)
 	actual = actual min (350, 450)
 	actual = actual min (SDLApp.Screen.x2y2 - 8)
@@ -96,7 +96,8 @@ function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| 
 			|| b  = .buttons[i]
 			|| bw = b.textwidth+8 max 40
 			b.vistext = answers[i]
-			b.size    = 3~after for bW  by 3~up  for 17
+			|| l = (3,7)(i > 0)
+			b.size    = (l)~after for bW  by 5~up  for 17
 		.SetResponse(response)
 		
 		|| p = (W)(Cancel)
@@ -157,7 +158,7 @@ class ConfirmWindow_ (Window)
 		with .question
 			 is AlwaysScrollable // why isnt
 			.id			= "question"
-			.size 		= 2~inside  by  1~above to the~top-2
+			.size 		= 6~inside  by  2~above to the~top-6
 			.takesfocus = 0
 			.gnormal.edge<~ (0,0,0,0)
 			.gnormal.bg  <~ ((0.11,0.11,0.11,1.0))
@@ -168,7 +169,7 @@ class ConfirmWindow_ (Window)
 			.id			= "response"
 			.singleline = true
 			.gnormal	= self.question.gnormal
-			.size		= 2~inside  by  2~above for 15
+			.size		= 6~inside  by  2~above for 15
 
 		
 	behaviour KeyDown

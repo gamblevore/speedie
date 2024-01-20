@@ -397,8 +397,9 @@ class PerryIDE (Window)
 
 
 	function string.FindStacktrace (|string|)
-		|| f = "\n****** CRASHED ******\n"
+		|| f = "\n****** CRASH"
 		|| where = .find(f) #require
+		where = .find("\n", where) #require
 		where += f.length
 		|| After = .find("\n-----------------------\n", where)
 		if !after: after = int.max

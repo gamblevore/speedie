@@ -1,7 +1,13 @@
 
 	
 main // main { 
-	target debug: "*** target debug ***"
+/*
+	|| sh = process.Stream("/usr/local/bin/spd")
+	app.sleep(1s)
+	sh.updatepipes
+	printline sh.output.getresult
+	debugger
+*/
 	SDLApp.init
 	Perry.Startup
 	return SDLApp.Run

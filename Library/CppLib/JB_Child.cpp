@@ -86,7 +86,7 @@ void JB_CrashHandler(int Sig) {
 
 				// report to stdout
 	char ErrorBuff[128];
-	snprintf(ErrorBuff, 64, "%s Signal: %s\n", App_CallPath, strsignal(Sig));
+	snprintf(ErrorBuff, sizeof(ErrorBuff), "%s Signal: %s\n", App_CallPath, strsignal(Sig));
 	fputs(ErrorBuff, stderr);
 	
 				// log to file
