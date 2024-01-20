@@ -24,7 +24,7 @@ function PerryIDE.CanSend (|string| cmd, |bool|)
 	if !.LastSendTime or .LastSendTime.ago > 0.66s
 		return true
 
-	
+
 function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string| name,  |string| reason, |bool|)
 	|| msg = .BuildCmd(cmd, where, name, reason)		#require
 
@@ -60,7 +60,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg)
 
 
 function PerryIDE.SubProcess (|bool| actual_compile, |SpdMainFn|)
-	require platform.isdebug and actual_compile
+	require false// platform.isdebug and !actual_compile
 	if actual_compile
 		rz = Speedie_Compiler
 		Speedie_Compiler = nil

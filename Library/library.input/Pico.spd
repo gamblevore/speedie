@@ -94,6 +94,7 @@ struct Pico
 			require MaxTime > 0
 			app.sleep(Sub)
 			MaxTime -= Sub
+		app.sleep(0.5) // allow OS to send even though pico is done
 		return true
 		
 

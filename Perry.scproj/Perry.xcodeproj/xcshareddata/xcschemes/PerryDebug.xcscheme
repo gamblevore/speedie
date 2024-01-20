@@ -60,6 +60,10 @@
             argument = "inferno.spd"
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "SpamLines.spd"
+            isEnabled = "YES">
+         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
          <AdditionalOption

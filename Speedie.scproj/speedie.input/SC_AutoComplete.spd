@@ -89,6 +89,7 @@ function PerryTalk // ReturnsWhenPerryClosesUs
 			exit
 
 	.perry.pico.SleepForSend
+	.perry = nil // calls close, which uses SO_LINGER, to allow sending.
 
 
 function BuildError (|string| name, |message|)
