@@ -88,7 +88,7 @@ function PerryTalk // ReturnsWhenPerryClosesUs
 		if cmd and !.CmdWrap(cmd)
 			exit
 
-	.perry.pico.SleepForSend
+	pico.SleepForSend
 	.perry = nil // calls close, which uses SO_LINGER, to allow sending.
 
 

@@ -80,26 +80,18 @@ struct Pico
 
 	function IsSending (|bool|)
 		cpp_wrapper PicoStillSending
+		
 	
 	function Fork (|&pico|)
 		|| f = .startfork
 		if f >= 0
 			return self
 
-	function SleepForSend (|date| MaxTime=2.5s, |bool|)
-		if !self
-			return true
-		|| Sub = 0.001s
-		while .issending
-			require MaxTime > 0
-			app.sleep(Sub)
-			MaxTime -= Sub
-		app.sleep(0.5) // allow OS to send even though pico is done
-		return true
-		
-
 	module
 		|&pico| Parent_
+		function SleepForSend (|float| During=5.0, |float| After = 0.5)
+			cpp_wrapper PicoSleepForSend
+		
 		function HasParentSocket (|bool|)
 			cpp_wrapper PicoHasParentSocket
 		function DesiredThreadCount (assigns:|int| C, |bool|)

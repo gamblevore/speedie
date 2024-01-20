@@ -827,6 +827,7 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__MsgParseFlags_LargestFlag (0)
 #define kJB__MsgParseFlags_Style2 (16384)
 #define kJB__ProcessMode_AutoPrintErrors (4)
+#define kJB__ProcessMode_CaptureAll (1 | 4)
 #define kJB__ProcessMode_CaptureErrors (2)
 #define kJB__ProcessMode_CaptureOrPrintErrors (2 | 4)
 #define kJB__ProcessMode_capturestdout (1)
