@@ -375,13 +375,14 @@ function message.CommandIsOK (|bool|)
 	
 	
 function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
-	|| spd_func = where.owningfunc
-	if spd_Func == where
+	|| spd_func = where.OwningFunc
+	if spd_func == where
 		|| thg = where.first
 		if thg == @dot or @thg
 			where = thg
 	  else
-		require where != @tmp // annoy speedie less. it will only generate errors and slow communication down
+		if  (where == @tmp)  and  !(cmd starts "autocomplete")
+			return nil // annoy speedie less. it will only generate errors and slow communication down
 	|| pp = where.parent$
 	|| ppp = pp.parent
 	|| Jump = 0
