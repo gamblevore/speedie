@@ -107,14 +107,10 @@ extend PerryIDE
 	
 	
 	function Readlog
-		if .isBuilding
-			.justreadlog
-
-
-	function JustReadLog
 		opt norefcounts
-		.speedietext <~ .Compilr.ReadStdOut
-	
+		|| c = .Compilr
+			.speedietext <~ c.ReadStdOut
+
 	
 	function Say (|string| str)
 		target osx
@@ -151,13 +147,14 @@ extend PerryIDE
 	function CancelCompile (|string| why="CompiledOK")
 		.DebugIsWaitingForCompile = false
 		if .compilr
+			.Readlog
 			.compilr.Kill(Why) // frees memory
+			.Readlog
 			.compilr = nil
 		(.buildbutton is enabled)
 		(.buildbutton is visible)
 		(.runbutton is enabled)
 		(.progress isnt visible)
-		.JustReadlog
 		.HideStuff
 		isnt active
 

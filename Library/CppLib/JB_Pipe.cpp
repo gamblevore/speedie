@@ -160,28 +160,33 @@ static void Unblock (int fd) {
 }
 
 
+static void CheckStillAlive (ShellStream* Sh) {
+	// check twice cos of signals happening during kill.
+	if (Sh->Exit == -1 and kill(Sh->PID, 0) and Sh->Exit == -1) {
+		Sh->Exit = ESRCH; // awkward case where it closed already but we missed the signal
+		Sh->Status = 0;
+//		JB_PID_UnRegister(Sh); // actually the spdprocess checker does a lot more work than this.
+	}
+}
+
+
 bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
 // fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr,_exit // unix simplicity :)
-	auto& Sh = *self;
+	auto& Sh = *self; auto sh = self;
 	auto argv = JB_Proc__CreateArgs(path, Args);
 	if (!argv) return false;
-	
-	Sh.Exit = -1;
-	Sh.Status = 0;
 	
 	if (CaptureStdOut or Sh.Output)
 		pipe(Sh.CaptureOut);
 	pipe(Sh.CaptureErr);
 	Unblock(Sh.CaptureErr[RD]); // should never block
-	if (Sh.StreamMode == 1)
-		Unblock(Sh.CaptureOut[RD]); // even this blocking at all is kinda sus...
+	Unblock(Sh.CaptureOut[RD]); // even this blocking at all is kinda sus...
 	
-//	if (Sh.CaptureErr[0]==-1 and Sh.CaptureErr[1]==-1)
-//		debugger; // wait what?
 	JB_PID_Register(&Sh);
-	Sh.PID = PicoStartFork(C, true);
+	int PID = PicoStartFork(C, true);
+	bool OK = true;
 
-	if (Sh.PID == 0) {
+	if (PID == 0) {
 		JB_Dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureOut[RD]);
@@ -192,37 +197,41 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 		execvp(argv[0], (char* const*)argv);
 		_exit(errno-!errno); // in case execvp fails
 		return false;
-	}
-	JB_FreeIfDead(path);
-	free(argv);
-	if (Sh.PID > 0) {
+	} else if (PID > 0) {
+		sh->Exit = -1;
+		sh->Status = 0;
+		Sh.PID = PID;
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureErr[WR]);
-		return true;
+		CheckStillAlive(sh);
+	} else {
+		OK = false;
+		JB_ErrorHandleFile(path, nil, errno, nil, "run");
 	}
-	JB_ErrorHandleFile(path, nil, errno, nil, "run");
-	return false;
+
+	JB_FreeIfDead(path);
+	free(argv);
+	return OK;
 }
 
 
 bool JB_Sh_UpdatePipes(ShellStream* self) {
-//	if (self->UserFlags & 8)
-//		debugger;
 	auto& Sh = *self;
-	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], Sh.StreamMode);
+	CheckStillAlive(self);
+	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], 1);
 	// this will only return, once the app has finished... unless we are Streaming.
 	// either way, if both return false, we can finish.
-	bool ContinueErr = JB_FS_AppendPipe(Sh.ErrorOutput, Sh.CaptureErr[RD], Sh.StreamMode);
+	bool ContinueErr = JB_FS_AppendPipe(Sh.ErrorOutput, Sh.CaptureErr[RD], 1);
 	return (ContinueOut or ContinueErr);
 }
+
 
 void JB_Sh_ClosePipes(ShellStream* self) {
 	for (int i = 0; i < 4; i++) {
 		pipe_close(self->CaptureOut[i]);
 	}
-	self->StreamMode = -1;
+	self->IsClosed = true;
 }
-
 
 
 int JB_Str_System(JB_String* self) { // needz escape params manually...
@@ -236,7 +245,7 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 void JB_FEPDWEE_Finish(ShellStream& Sh) {
 	pipe_close(Sh.CaptureOut[RD]);
 	pipe_close(Sh.CaptureErr[RD]);
-	Sh.StreamMode = -1;
+	Sh.IsClosed = true;
 }
 
 
@@ -261,7 +270,7 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 	while (true) {
 		JB_Sh_UpdatePipes(Sh);
 		int ExitCode = 0;
-		if (Sh->Exit != -1) break;
+		if (Sh->Exit >= 0) break;
 		int PID = waitpid(Sh->PID,  &ExitCode,  0);		// in case sigchld handler is overridden
 		if (PID != -1) {
 			JB_FillProc(Sh, ExitCode);
@@ -302,7 +311,7 @@ void JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
 	for (int i = 0; i < 4; i++)
 		self->CaptureOut[i] = -1;
 	
-	self->StreamMode = 1;
+	self->IsClosed = false;
 	self->Path = JB_Incr(Path);
 }
 
@@ -338,7 +347,7 @@ static void Smooth_(ShellStream& Sh) {
 bool JB_Sh_Step(ShellStream* self) {
 	require (self);
 	ShellStream& Sh = *self;
-	if (Sh.StreamMode >= 0) {
+	if (!Sh.IsClosed) {
 		Smooth_(Sh);
 		if (JB_Sh_UpdatePipes(self))
 			return true;

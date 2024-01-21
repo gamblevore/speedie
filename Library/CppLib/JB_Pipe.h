@@ -10,8 +10,8 @@ extern "C" {
 
 
 JBClass( ProcessOwner, JB_RingList,
-	int		Exit; // turn these into an ErrorInt2?
-	int		Status;
+	volatile int		Exit; // turn these into an ErrorInt2?
+	volatile int		Status;
 );
 
 void JB_PID_Constructor(ProcessOwner* self);
@@ -28,7 +28,7 @@ ProcessOwner* JB_PID__First();
 
 
 JBClass( ShellStream, ProcessOwner,
-	int			StreamMode;
+	bool		IsClosed;
 	JB_String*  Path;
 	Array*  	Params;
 	FastString* Output;

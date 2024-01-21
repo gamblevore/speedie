@@ -64,7 +64,7 @@ void JB_PID_Constructor(ProcessOwner* self) {
 	}
 	JB_Helper_SelfLink((JB_RingList*)self);
 	self->Status = 0;
-	self->Exit = -1;
+	self->Exit = -2;
 }
 
 
