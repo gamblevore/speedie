@@ -7,10 +7,11 @@ helper message.list_desired (|int| common, |string|)
 
 
 function message.PrependHeader (|string| name, |int| pos)
-	|listviewrow| Header = @str + name
+	|ListViewRow| Header = @str + name
 	header.Position = pos
 	.first = Header
 	(header is Disabled)
+	
 
 
 function PerryIDE.CallFromFB (|message| list, |bool|)

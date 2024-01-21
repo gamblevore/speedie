@@ -978,7 +978,7 @@ function FixCnjSub (|Message| exp) {
 	|| CreatesError = (name == "expect" or "check")
 	|| DoesReturn =   (name != "loop" and "check")
 	
-	ifn (CreatesError or (name == "debug_require" or "require" or "continue" or "loop" or "need"))
+	ifn (CreatesError or (name == "debug_require" or "require" or "continue" or "loop"))
 		error (exp, "Must be: 'require/expect/continue/loop' .")
 		ch.name = "require"
 		name = "require"		// just make autocomplete more reliable.

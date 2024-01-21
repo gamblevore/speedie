@@ -315,7 +315,7 @@ function ExportAndInstall (|bool| CanInstall)
 
 
 // copy this... by hard-linking. this is because xcode goes around fucking up all my files
-// I can't just hard-link it myself... xcode UNHARD-LINKS IT!! Now i get separate versions
+// I can't just hard-link it myself... xcode UNHARD-LINKS IT!! Now I get separate versions
 // cos xcode fucks up my shit for me. So I have to do this to work around it's stupidity.
 function CollectPico
 	|| OfficialLocation = "/usr/local/include/PicoMsg/PicoMsg.h".file
