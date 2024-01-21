@@ -75,10 +75,10 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 # Installation #
 
 1. Run "`git clone https://github.com/gamblevore/speedie.git`" then move the folder to `/usr/local/speedie/` if it wasn't cloned there already.
-1. Run "`git clone https://github.com/gamblevore/PicoMsg.git`" then move the folder to `/usr/local/includes/PicoMsg/` if it wasn't cloned there already.
-3. `cd /usr/local/speedie`
-4. Execute `sudo Terminal/makelinux.sh` ... OR `sudo Terminal/makeosx.sh`
+2. `cd /usr/local/speedie`
+3. Execute `sudo Terminal/makelinux.sh` ... OR `sudo Terminal/makeosx.sh`
 
 My IDE Perry, will need libsdl2-dev to compile. LibSDL2 has [install instructions](https://wiki.libsdl.org/SDL2/Installation).
+
 
 
