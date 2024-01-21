@@ -2185,8 +2185,6 @@ void JB_App__SavePrefs();
 
 ErrorInt2 JB_App__Say(JB_String* s);
 
-void JB_App__Sleep(float Duration);
-
 JB_String* JB_App__StackTrace(int skip, FastString* fs_in);
 
 int64 JB_App__StringMemory();
@@ -3793,8 +3791,6 @@ JB_String* JB_dbl_Render(double self, int dp, FastString* fs_in);
 
 
 // float
-Date JB_f_Date(float self);
-
 float JB_f_RoundTo(float self, float to);
 
 float JB_f_Fract(float self);
@@ -4846,8 +4842,6 @@ ObjectSaver JB_Saver__New();
 
 // JB_Pico
 JB_String* JB_Pico_Get(PicoComms* self, float T);
-
-bool JB_Pico_SleepForSend(PicoComms* self, Date MaxTime);
 
 bool JB_Pico_SendFS(PicoComms* self, FastString* fs, bool Wait);
 

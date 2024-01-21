@@ -216,10 +216,6 @@ ErrorInt2 JB_App__Say(JB_String* s) {
 	return _tmPf1;
 }
 
-void JB_App__Sleep(float Duration) {
-	JB_Date__Sleep(JB_f_Date(Duration));
-}
-
 JB_String* JB_App__StackTrace(int skip, FastString* fs_in) {
 	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
 	_voidptr arr[128] = {
@@ -2013,7 +2009,7 @@ void SC_Comp__Main() {
 	SC_Comp__SetupEnv();
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[154], (111788020195755)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[154], (111793452655020)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3348,7 +3344,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[239]);
-	JB_FS_AppendInt32(_fsf0, (2024012011));
+	JB_FS_AppendInt32(_fsf0, (2024012110));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -4735,7 +4731,7 @@ void SC_AC__PerryTalk() {
 		JB_Decr(_tmPf2);
 	}
 	;
-	JB_Pico_SleepForSend(SC__AC_Perry->Pico, 163840);
+	PicoSleepForSend(5.0f, 0.5f);
 	JB_SetRef(SC__AC_Perry, nil);
 }
 
@@ -7169,7 +7165,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS__New());
 	JB_FS_AppendString(_fsf0, JB_LUB[510]);
-	JB_FS_AppendInt32(_fsf0, (2024012011));
+	JB_FS_AppendInt32(_fsf0, (2024012110));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -14590,10 +14586,6 @@ JB_String* JB_dbl_Render(double self, int dp, FastString* fs_in) {
 }
 
 
-Date JB_f_Date(float self) {
-	return ((Date)(self * kJB__Date_OneSecond));
-}
-
 float JB_f_RoundTo(float self, float to) {
 	int v = JB_int_OperatorPow(10, to);
 	return roundf((self * v)) / v;
@@ -17201,22 +17193,6 @@ ObjectSaver JB_Saver__New() {
 
 JB_String* JB_Pico_Get(PicoComms* self, float T) {
 	return JB_Str__FromPico(PicoGet(self, T));
-}
-
-bool JB_Pico_SleepForSend(PicoComms* self, Date MaxTime) {
-	if ((!self)) {
-		return true;
-	}
-	Date Sub = 65;
-	while (PicoStillSending(self)) {
-		if ((!(MaxTime > 0))) {
-			return nil;
-		}
-		JB_Date__Sleep(Sub);
-		MaxTime = (MaxTime - Sub);
-	};
-	JB_App__Sleep(0.5f);
-	return true;
 }
 
 bool JB_Pico_SendFS(PicoComms* self, FastString* fs, bool Wait) {
@@ -46112,4 +46088,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -6972394276883713307 -7181242605706739382
+// 8423294757552850426 -7181242605706739382
