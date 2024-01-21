@@ -278,6 +278,7 @@ class Document (RingTree)
 			if path
 				rz = .Cache.DocumentCached(path)
 			rz := document(path, true)
+			
 		function AskLimit (|file| f, |int|)
 			|| n = f.size
 			if n <= 128MB or n >= int.max
@@ -285,6 +286,7 @@ class Document (RingTree)
 			if "The file ${f.name} is ${n|int|.strsize} big. Do you still want to load it?\n\nText-editor performance may suffer.".confirm
 				return n+1
 			return 128MB
+
 
 
 

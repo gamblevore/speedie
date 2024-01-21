@@ -497,15 +497,16 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 function DescribeParamFail (|SCParamArray| params, |int| bad)
 	opt norefcounts
 	require !params.madeerror
-	|| P = params[bad]
-		|| str = ("Wrong self: ",  "Wrong param: ")(!bad and params.isdot)
+	bad++
+	|| P = params[bad-1]
+		|| str = ("Wrong self: ",  "Wrong param ($bad): ")((bad==1) and params.isdot and params.IsNotModule)
 		|| Type = TypeOfExpr(P, nil)
 			str += Type.RenderTypeName
 		  else
 			str += "(Unknown Type)"
 		error ( P, str )
 	  else
-		error ( params.exp, "Missing param " + bad.render )
+		error ( params.exp, "Missing param $bad: $p" )
 	error ( .Source, "to " + .RenderTitle )
 
 

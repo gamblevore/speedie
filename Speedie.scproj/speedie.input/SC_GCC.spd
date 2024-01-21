@@ -314,12 +314,25 @@ function ExportAndInstall (|bool| CanInstall)
 		compiler.Package
 
 
+// copy this... by hard-linking. this is because xcode goes around fucking up all my files
+// I can't just hard-link it myself... xcode UNHARD-LINKS IT!! Now i get separate versions
+// cos xcode fucks up my shit for me. So I have to do this to work around it's stupidity.
+function CollectPico
+	|| OfficialLocation = "/usr/local/include/PicoMsg/PicoMsg.h".file
+	require OfficialLocation.exists
+	|| SpdLocation = "/usr/local/speedie/Library/CppLib/PicoMsg.h".file
+	if SpdLocation.exists // remove it.
+		SpdLocation.delete
+	OfficialLocation.HardLinkTo(SpdLocation)
+
+
 function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
 		"\nCompiling c++ to: \"${.ProductPath}\""
 	
+	.CollectPico
 	.CompilingLibFiles++
 	.CollectAndCompile(	.CppLib,						.LibTmpPath )$
 	.CompilingLibFiles--
@@ -534,9 +547,6 @@ function File.TestSpeedie (|string| v, |bool|)
 	if !testprod.file.mustexist("Compile Speedie")
 		debugger
 		p.execute(cmd_args, result)
-		
-	//|| err = stderr.LastError			// didnt seem to help
-		//err.Reformulate(" subspd")	// need to test this on actual crashing subspd
 	
 	printline Result
 	print TransCompiler.TmpOut(Variant).ReadFile

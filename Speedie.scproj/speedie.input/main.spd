@@ -1,15 +1,15 @@
 
 
 main // speedie main {
+	compiler.SetupEnv
 	compiler.Main
+	compiler.PrintResults
 
 
 function Compiler.Main
-	.SetupEnv
 	if .EnterCompile
 		using FlowControl.allow("Speedie")
 			.CompileTime
-	.PrintResults
 
 
 function Compiler.EnterCompile (|bool|)

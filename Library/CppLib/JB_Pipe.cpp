@@ -61,11 +61,6 @@ static void pipe_close (int& fd) {
 }
 
 
-//void JB_App__AtExit (fn_app_deathaction b) {
-//	atexit(b);
-//}
-
-
 void JB_App__SetThreadName(JB_String* self) {
 	require0(self);
 	u8 CName[32];
