@@ -70,11 +70,12 @@ function PerryIDE.SubProcess (|bool| actual_compile, |SpdMainFn|)
 
 
 function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProcess|)   // InitCompiler
-	|| Active = C.Activate(5s)
-	if active == -1
-		return nil
-	if Active
-		return C
+	if c
+		if C.TimedOut(5s)
+			c.Deactivate
+		if c.IsOpen or c.ActivateChild
+			return c
+		return nil // ded?
 
 	|| p = [.project, "--perry=bin", "--nocolor"]
 	|| f = .projmsg.first 

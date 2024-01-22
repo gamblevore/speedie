@@ -378,7 +378,7 @@ class PerryIDE (Window)
 		if (c != nil)
 			if !.CheckCrashes(c, "compiler")
 				.compilr = nil
-			  elseif !c.IsOpen
+			  elseif !c.CommsOpen
 				.CancelCompile("lost connection")
 		|| f = .feedback
 			.CheckCrashes(f, "feedback")
@@ -415,7 +415,7 @@ class PerryIDE (Window)
 			return 
 		require !.UsingSpdLib
 		|| f = .Feedback
-		if f.IsOpen and f.lastsend.ago > (30.0+.position).date
+		if f.CommsOpen and f.lastsend.ago > (30.0+.position).date
 			|| msg = "Released Speedie: " + .name
 			.LogOneAction(@emb + msg)
 			.feedback.Kill("SaveMemory")
@@ -804,7 +804,7 @@ So anything not 0 means "its OK"`
 		
 		.popuphide
 		.AddToJumpHistory
-		if  !g  and  .IsEditingSource  and  !.feedback.IsOpen
+		if  !g  and  .IsEditingSource  and  !.feedback.CommsOpen
 			.Recheck
 		.DuringLoad--
 		

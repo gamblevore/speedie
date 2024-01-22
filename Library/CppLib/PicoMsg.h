@@ -806,6 +806,8 @@ extern "C" bool PicoStart (int Suicide) _pico_code_ (
 
 	if (Suicide)
 		pico_suicide = Suicide > 0 and getppid() > 1;
+	if (Suicide > 1 or Suicide < -1) return true; // set suicide-only.
+	
 	pthread_t T = 0;   ;;;/*_*/;;;   // creeping downwards!!
 	for (int i = pico_thread_count; i < pico_desired_thread_count; i++)
 		if (pthread_create(&T, nullptr, (void*(*)(void*))pico_worker, nullptr) or pthread_detach(T))

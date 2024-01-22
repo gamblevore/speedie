@@ -189,7 +189,7 @@ int JB_LibInit (_cstring* R, bool IsThread) {
 		#ifndef AS_LIBRARY
 			if (!IsThread) {
 				JB_App__CrashInstall();
-				PicoStart(true);
+				PicoStart(2); // default Pico to suicide, if run. SDLapp.init will reset this.
 			}
 		#endif
 	}

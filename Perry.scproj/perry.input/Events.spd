@@ -358,7 +358,7 @@ function EditMeSelChange (GUITextEvent)
 	i.popuphide
 	i.ShowRightStats
 	i.EditMeTabRetryThing = 0
-	require !TextWasAltered and i.feedback.isopen
+	require !TextWasAltered and i.feedback.CommsOpen
 	|| e = self|textview|
 	|| s = e.selrange
 	if s.width

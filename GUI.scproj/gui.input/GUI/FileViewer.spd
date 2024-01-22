@@ -29,8 +29,6 @@ class FileViewer (ListView)
 	
 	
 	destructor
-//		.quickopen.tag = nil
-//		.listopen.tag = nil // causes crashes if set here
 		.quickopen.disposeall
 		.listopen.disposeall
 
@@ -386,18 +384,36 @@ class FileViewer (ListView)
 		if path < 2
 			.listopen.clear
 			return
-		if path[0, "/"] or path[0, "~/"]
-			.OpenQuickRelistDir(path.file)
+		
+		ifn path[0, "/"] or path[0, "~/"]
+			|| r = .FindPaths(path, nil, true)
+			.ListOpen.QuickOpenFill(r)
 			return
-			
-		|| r = .FindPaths(path, nil, true)
-		.listopen.QuickOpenFill(r)
+		
+		|| f = path.file
+		|| filter = ""
+		if !f.Exists
+			f = f.Parent
+			if !f.exists
+				Notifications <~ f + " doesn't exist"
+				beep
+				return 
+			filter = path.name
+		.OpenQuickRelistDir(f, filter)
 
 
 	helper ListView.QuickOpenFill (|[filerow]| Items)
+		|| HasSel = .FirstSelected != nil
 		.clear
 		for p in items
-			|| m = message(@str, p.name) 
+			|| m = message(@str, p.name)
+			|| dir = p.Location.file.isdir
+			m.name = ("\10 ", "\11 ")(dir) + m.name
+			
+			if HasSel and p isnt disabled
+				(p is selected)
+				HasSel = false
+			m.flags = p.flags
 			self <~ m
 			m.obj = p
 		(self is visible) = items.length > 0
@@ -406,16 +422,19 @@ class FileViewer (ListView)
 		.size = the~same by 0~before back d2
 
 
-	helper OpenQuickRelistDir (|file| path)
-		require path.exists
-		|| invis = path endswith "/."
+	helper OpenQuickRelistDir (|file| path, |string| filter)
+		|| invis = filter starts "."
 		|[filerow]| items
 		for ch in path
 			if invis or ch.visible
 				|| s = path[ch]
 				if s.IsDir
 					ch += "/"
-				items <~ filerow(s, ch)
+				|| ffr = filerow(s, ch)
+				if filter and !(ch.name starts filter)
+					(ffr is Grayed)
+					(ffr is Disabled)
+				items <~ ffr
 		items.sort(FileRowScoreSorter)
 		.listopen.QuickOpenFill(items)
 	
@@ -573,13 +592,15 @@ extend_module filerow
 		|| ext = n.ext
 		if (.last == '/') and !notdir
 			if types and types.TypeContains(ext + "/")
-				return '\19'
-			if expanded
-				return '\1A'
-			return '\10'
+				rz = '\19'
+			  elseif expanded
+				rz = '\1A'
+			  else
+				rz = '\10'
 		  elseif (ext == "app" or "scproj" or "uwuz")
-			return '\19'
-		return '\11'
+			rz = '\19'
+		  else
+			rz = '\11'
 
 
 

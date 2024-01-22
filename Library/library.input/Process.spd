@@ -37,8 +37,11 @@ class Process (processowner)
 		cpp_wrapper JB_Sh_Step
 
 	function Kill
-		if self  and  .pid > 0
-			.pid.kill
+		if self
+			if .Exit == -1
+				.Exit = 1
+			if .pid > 0
+				.pid.kill
 
 	module
 		function Stream (|String| app, |[string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |Process|)

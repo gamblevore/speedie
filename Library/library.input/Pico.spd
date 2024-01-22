@@ -92,6 +92,9 @@ struct Pico
 		function SleepForSend (|float| During=5.0, |float| After = 0.5)
 			cpp_wrapper PicoSleepForSend
 		
+		function Start (|int| DieWithParent=0)
+			cpp_wrapper PicoStart
+			
 		function HasParentSocket (|bool|)
 			cpp_wrapper PicoHasParentSocket
 		function DesiredThreadCount (assigns:|int| C, |bool|)

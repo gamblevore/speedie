@@ -31,7 +31,7 @@ class SpdProcess (Process)
 	destructor
 		.pico.destroy("destructor")
 			
-	function IsOpen (|bool|)
+	function CommsOpen (|bool|)
 		return self and .pico.status == 0
 
 	helper Alive (|bool|)
@@ -44,7 +44,7 @@ class SpdProcess (Process)
 
 	helper ChildAlive (|bool|)
 		if .SubProcess
-			return .IsOpen
+			return .CommsOpen
 		if .exit == -1
 			return true
 
@@ -117,7 +117,7 @@ class SpdProcess (Process)
 		
 
 	syntax expect (|string| err)
-		if .IsOpen
+		if .CommsOpen
 			printline err
 			stderr.NewError(nil, err, .path)
 		.Disconnect(err)
@@ -129,7 +129,7 @@ class SpdProcess (Process)
 		.UnRegister
 		.ClosePipes
 		if .pico
-			if .alive and !why and .isopen
+			if .alive and !why and .CommsOpen
 				why = "UnknownReason"
 				debugger
 			.pico.close(Why)
@@ -147,14 +147,29 @@ class SpdProcess (Process)
 			return .StartProcess(.path, .params, p, .output!=nil)
 
 
-	function Activate (|bool|)
-		if .IsOpen
+	function TimedOut (|date| Durr, |bool|)
+		if (.TimeWaitingForReply < durr)
+			error (self, "child timed out.")
 			return true
-		if !.WeAreParent
-			return false
-		if .pid and (.exit == -1)
-											// it has a PID but pico was closed?
-			.Kill("lost connection")		// just kill and restart it.
+	
+	function IsOpen (|bool|)
+		return self and .CommsOpen and .exit == -1
+			
+	function Deactivate
+		|| ChAlive = .Exit == -1
+		if .CommsOpen and !ChAlive	// inconsistant...
+			.handledied				// disconnect comms
+		if ChAlive
+			.Kill("lost comms")		// kill child
+	
+	
+	function ActivateChild (|bool|)
+		if (.CommsOpen and .Exit == -1)
+			return true
+
+		.Deactivate
+		
+		// hopefully by now, we are in a rational state
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")
 			return .RunChild

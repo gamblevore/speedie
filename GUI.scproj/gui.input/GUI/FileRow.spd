@@ -27,6 +27,7 @@ class FileRow (ListViewRow)
 		.asdir		= r.asdir
 		.name		= r.name
 		.lastsize	= r.lastsize
+		.rangelength = r.rangelength // for the sorter
 		.lastfilecount = r.lastfilecount
 		.DoesntExist = r.DoesntExist
 		.InMainProj = r.InMainProj
@@ -34,12 +35,11 @@ class FileRow (ListViewRow)
 	
 	constructor (|string| path, |string| name, |string| DirFile="")
 		.func		= @file
-		if path == nil
-			debugger 
-			path = "" // crash bug?
+		.rangelength = 0 // for the sorter
+
 		.Location	= (path.PathDir, path)(DirFile)
 		.dirfile	= DirFile
-		if path and dirfile == "."
+
 		.asdir		= dirfile
 		.name		= name
 		.lastsize	= (path.File.Size, 0)(!.asdir)

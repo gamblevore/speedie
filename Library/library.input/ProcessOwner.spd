@@ -22,6 +22,7 @@ class ProcessOwner
 		cpp_wrapper JB_PID_Register
 
 	function UnRegister
+		description "Removes from the list. Doesnt change the exit, pid, or status codes" 
 		cpp_wrapper JB_PID_UnRegister
 	
 	function Next (|ProcessOwner|)
