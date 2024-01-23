@@ -153,7 +153,7 @@ class SpdProcess (Process)
 	
 	function IsOpen (|bool|)
 		require self and .CommsOpen
-		if .weareparent
+		if .WeAreParent
 			return .exit == -1
 		return app.ParentID > 1
 			
@@ -171,7 +171,6 @@ class SpdProcess (Process)
 
 		.Deactivate
 		
-		// hopefully by now, we are in a rational state
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")
 			return .RunChild
@@ -219,7 +218,7 @@ class SpdProcess (Process)
 				rz = nil
 
 
-datatype ProcessMode (int)
+datatype ProcessMode (byte)
 	flags
 		CaptureStdOut
 		CaptureOrPrintErrors = (CaptureErrors, AutoPrintErrors)
@@ -227,7 +226,6 @@ datatype ProcessMode (int)
 
 	syntax is (|ProcessMode| M, |bool|)
 		return self&M
-		
 
 
 prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)

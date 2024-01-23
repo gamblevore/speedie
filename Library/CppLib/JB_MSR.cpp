@@ -103,7 +103,7 @@ JB_String* JB_MSR_ReplaceAll( Dictionary* Dict, JB_String* Data, FastString* fs_
             if ( !Found ) {
                 return Data;
             }
-            fs = JB_FS__FastNew(fs_in);
+            fs = JB_FS__InternalNew();
         }
 
 		JB_FS_AppendMem_( fs, SearchStart, (int)(FoundStr.Addr - SearchStart) );
@@ -117,7 +117,10 @@ JB_String* JB_MSR_ReplaceAll( Dictionary* Dict, JB_String* Data, FastString* fs_
 		}
 	} while ( true );
 
-	return JB_FS_SmartResult( fs, fs_in );
+	auto Str = JB_FS_SmartResult( fs, fs_in );
+	if (fs != fs_in)
+		JB_FreeIfDead(fs);
+	return Str;
 }
 	//	>>>		>>>		>>>		>>>
 

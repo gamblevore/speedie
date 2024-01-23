@@ -5,7 +5,6 @@
 * VM? 
 * Do nil checker!
 * Constants and globals don't autocomplete nicely
-* perry sometimes looses communication to the compiler? shouldn't we have a timeout?
 
 
 						 Perry Do later
