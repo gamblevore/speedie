@@ -71,29 +71,40 @@ function PerryIDE.SubProcess (|bool| actual_compile, |SpdMainFn|)
 
 function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProcess|)   // InitCompiler
 	if c
-		if C.TimedOut(5s)
+		if !actual_compile and !c.subprocess and C.TimedOut(5s)
 			c.Deactivate
-		if c.IsOpen or c.ActivateChild
+		if c.IsOpen
+			return c
+		if c.ActivateChild
 			return c
 		return nil // ded?
 
+	|| Noisy = false
 	|| p = [.project, "--perry=bin", "--nocolor"]
 	|| f = .projmsg.first 
 	|| name = .name
+	if noisy
+		p <~ "--noisy"		
 	if !actual_compile
 		p <~ "--check"
 	
+	// 
+	|SpdProcess| spd 
 	|| SubProcess = .SubProcess(actual_compile)
 		if !.UsingSpdLib
 			.UsingSpdLib = true
 			f.name = name.TrimExt + "()"
-		rz = SubProcess.RunThreaded(p)
+		spd = SubProcess.RunThreaded(p)
 	  else
 		|| proc = speedie.Path.resolve
 		target debug
 			proc = "/usr/local/speedie/Speedie.scproj/Build/Products/Debug/Speedie"
 		if proc
-			rz = SpdProcess.RunChild(Proc, .project.name, p)
+			|| Mode = ProcessMode.CaptureAll * !noisy
+			spd = SpdProcess.RunChild(Proc, .project.name, p, mode)
+	if noisy
+		spd.pico.config.noise = -1
+	return spd
 
 
 function PerryIDE.ActualCompile (|message| msg)

@@ -142,18 +142,20 @@ class SpdProcess (Process)
 	
 	function RunChild (|bool|)
 		debug_require .path
-		if .CanActivate
-			|| p = .pico init pico.new
-			return .StartProcess(.path, .params, p, .output!=nil)
+		|| p = .pico init pico.new
+		return .StartProcess(.path, .params, p, .output!=nil)
 
 
 	function TimedOut (|date| Durr, |bool|)
-		if (.TimeWaitingForReply < durr)
+		if (.TimeWaitingForReply > durr)
 			error (self, "child timed out.")
 			return true
 	
 	function IsOpen (|bool|)
-		return self and .CommsOpen and .exit == -1
+		require self and .CommsOpen
+		if .weareparent
+			return .exit == -1
+		return app.ParentID > 1
 			
 	function Deactivate
 		|| ChAlive = .Exit == -1
@@ -164,7 +166,7 @@ class SpdProcess (Process)
 	
 	
 	function ActivateChild (|bool|)
-		if (.CommsOpen and .Exit == -1)
+		if .isopen
 			return true
 
 		.Deactivate
