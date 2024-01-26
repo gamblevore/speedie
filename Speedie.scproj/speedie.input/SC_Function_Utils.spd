@@ -132,7 +132,7 @@ constants
 	kASM			= 0x3F			// 1 to 0x3F is used by the ASM
 
 
-datatype Blockage (uint)
+datatype SCBlockage (uint)
 	flags
 		Bits		= 0b111100000	// reserve 1 more bit
 	
@@ -143,10 +143,10 @@ datatype Blockage (uint)
 		Quit		= Return		// for now
 	
 	
-	syntax is (|blockage| b, |bool|)
+	syntax is (|SCBlockage| b, |bool|)
 		return self == b
 
-	syntax isnt (|blockage| b, |bool|)
+	syntax isnt (|SCBlockage| b, |bool|)
 		return self != b
 	
 	

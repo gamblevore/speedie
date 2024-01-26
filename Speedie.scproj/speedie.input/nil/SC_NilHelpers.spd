@@ -9,7 +9,7 @@ function Redundant (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 	return Test & nilstate.either
 
 
-function MadDecl (|scdecl|)
+function FastDecl (|scdecl|)
 	opt norefcounts
 	|| obj = .obj|SCDecl|
 		target debug
@@ -23,7 +23,7 @@ function MadDecl (|scdecl|)
 	debugger 
 
 
-function blockage.BlockCombine (|blockage| B, |int|)
+function SCBlockage.BlockCombine (|SCBlockage| B, |int|)
 	if B == self
 		return self
 	if self is Return
@@ -31,11 +31,11 @@ function blockage.BlockCombine (|blockage| B, |int|)
 	if B is Return
 		return self
 	debugger,	#!would this even happen ever???
-	return Blockage.Continue 	// continue is weaker than exit, so return continue?
+	return SCBlockage.Continue 	// continue is weaker than exit, so return continue?
 
 
 
-function LastInBlock (|blockage| Reason)
+function LastInBlock (|SCBlockage| Reason)
 	opt norefcounts
 	.RemoveAfter
 
@@ -99,7 +99,7 @@ function scdecl.NilStated (|bool|)
 
 
 function scfunction.CanNil (|bool|)
-	return !.IsMacro and !.IsWrapper and !.Badness
+	return !.IsMacro and !.IsWrapper and !.Badness and !.isdisabled
 
 function scdecl.WantOptional
 	if self and .Suffers

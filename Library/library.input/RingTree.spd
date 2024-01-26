@@ -30,18 +30,17 @@ class RingTree (Saveable)
 	destructor							{ cpp_wrapper JB_Ring_Destructor }
 	
 
-	function Next (||)					{ cpp_wrapper JB_Ring_NextSib }
+	function Next (||)					{ cpp_wrapper JB_Ring_NextSib, nil checker }
 	function Next (assigns:||)			{ cpp_wrapper JB_Ring_NextSibSet }
 
-	function Prev (||)					{ cpp_wrapper JB_Ring_PrevSib  }
+	function Prev (||)					{ cpp_wrapper JB_Ring_PrevSib, nil checker  }
 	function Prev (assigns:||)			{ cpp_wrapper JB_Ring_PrevSibSet }
 
-	function First (||)					{ cpp_wrapper JB_Ring_First }
-	function First (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_FirstSet }
-	function MakeFirst (||)				{ disabled "Seems buggy", cpp_wrapper JB_Ring_MakeFirst }
+	function First (||)					{ cpp_wrapper JB_Ring_First, nil checker }
+	function First (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_FirstSet, nil checker }
 	
-	function Last (||)					{ cpp_wrapper JB_Ring_Last }
-	function Last (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_LastSet }
+	function Last (||)					{ cpp_wrapper JB_Ring_Last, nil checker }
+	function Last (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_LastSet, nil checker }
 
 	function Second (||)
 		opt norefcounts
@@ -49,14 +48,14 @@ class RingTree (Saveable)
 			return x.next
 
 
-	function Root (||)					{ cpp_wrapper JB_Ring_Root }
-	function IsRoot (|bool|)			{ cpp_wrapper JB_Ring_IsRoot }
+	function Root (||)					{ cpp_wrapper JB_Ring_Root, nil checker }
+	function IsRoot (|bool|)			{ cpp_wrapper JB_Ring_IsRoot, nil checker }
 	function IsFirst (|bool|)			{ opt norefcounts, return .prev == nil }
 	function IsLast (|bool|)			{ opt norefcounts, return .next == nil}
 
-	function HasAny (|bool|)			{ cpp_wrapper JB_Ring_HasChildren }
+	function HasAny (|bool|)			{ cpp_wrapper JB_Ring_HasChildren, nil checker }
 	function HasChildren (|bool|)		{ Disabled ".hasany" }
-	function HasChildCount (|int|Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount }
+	function HasChildCount (|int|Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount, nil checker }
 		
 
 	function TakeAllFrom (|| src)
@@ -111,7 +110,7 @@ class RingTree (Saveable)
 			rz = rz.last#loop
 	
 	function FlatNext  (||)	
-		cpp_wrapper JB_Ring_FlatNext0
+		cpp_wrapper JB_Ring_FlatNext0 // doesnt nil check
 
 	function FlatPrev (||)
 		opt norefcounts
@@ -126,10 +125,10 @@ class RingTree (Saveable)
 		// D
 	
 	function FlatNextDepth  (|&int|Depth, |bool|Down=true, ||)
-		cpp_wrapper JB_Ring_FlatNextDepth
+		cpp_wrapper JB_Ring_FlatNextDepth, nil checker
 	
 	function FlatAfter (||)
-		cpp_wrapper JB_Ring_FlatAfter
+		cpp_wrapper JB_Ring_FlatAfter, nil checker
 			
 	function IsAncestor (|| root, |bool|)
 		disabled "Use inside or contains operator"
@@ -384,6 +383,7 @@ class RingTree (Saveable)
 		opt norefcounts
 		for c.flat in self
 			rz <~ c
+	
 	
 	function Array (|[...]|)
 		opt norefcounts

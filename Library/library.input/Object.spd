@@ -16,30 +16,33 @@ class Object
 		cpp_wrapper JB_Obj_GenericRender
 
 	function Class (|&ClassData|)
+		nil checker
 		cpp_wrapper JB_ObjClass
 
 	helper ClassBehaviours (|&byte|)
 		cpp_wrapper JB_ObjClassBehaviours
 
 	helper MemoryLayer (|MemoryLayer|)
+		nil checker
 		cpp_wrapper JB_ObjLayer
 	
 	helper RefCount (|int|)
 		cpp_Wrapper JB_ObjRefCount
 	
 	helper ObjectID (|uint|)			// stable across Runs!
+		nil checker
 		cpp_wrapper JB_ObjectID		// uses pos within the superblock :)
 	
 	function Dispose				// Safely clears out all the properties...
 		cpp_wrapper JB_ObjDestroy
 
 
-	operator isa (|&ClassData| x, |bool|)
+	operator isa (|&ClassData| cls, |bool|)
 		cpp_part Isa
 		if (self)
 			|| P = .Class
 			while (P|bool|)
-				if (P == x)
+				if (P == cls)
 					return true
 				P = P.Parent
 	

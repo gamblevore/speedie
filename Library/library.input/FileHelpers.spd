@@ -240,11 +240,9 @@ extend String
 		return .trimext.AddExt(ext)
 	
 	function Ext (|string|)
-		|| i = .find( '.', int.max, 0 )
-		|| n = .outbyte('/', int.max, 0)
-		n := .length
-		if i
-			return self[i + 1, n+1]
+		|| i = .find( '.', int.max, 0 ) #require
+		|| n = .outbyte('/', int.max, 0) ?? .length
+		return self[i + 1, n+1]
 
 	function BackToApp (|string|)
 		|| s = .TrimSlashes

@@ -22,15 +22,21 @@ class String
 
 
 // accessing
-	function Length (|int|)					{ cpp_wrapper JB_Str_Length }
-	function Address (|&byte|)				{ cpp_wrapper JB_Str_Address }
-	function LengthUTF8 (|int|)				{ cpp_wrapper JB_Str_LengthUTF8 }
+	function Length (|int|)
+		nil checker
+		cpp_wrapper JB_Str_Length
+	function Address (|&byte|)		// actually not a nil-checker, cos it can return "" hmmmmm.
+		cpp_wrapper JB_Str_Address	// change this?
+	function LengthUTF8 (|int|)
+		nil checker
+		cpp_wrapper JB_Str_LengthUTF8
 
 // (need to reorder these func params to put find first)
-	helper InByte_ ( |int| Start, |int| After=int.max, |Byte| find, |int| )
+	helper InByte_ ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
+		nil checker
 		cpp_wrapper JB_Str_InByte
 
-	function OutByte_ ( |int| Start, |int| After=int.max, |Byte| find, |int| )
+	function OutByte_ ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
 		cpp_wrapper JB_Str_OutByte
 
 	helper CharSet_ (|int|Start=0, |int|After=int.max, |CharSet| cs, |bool|IsIn, |ind|)
@@ -47,6 +53,7 @@ class String
 
 // searching
 	function Find ( |string| find, |int|Start=0, |int|After=int.max, |bool|CaseAware=false, |ind|)
+		nil checker
 		cpp_wrapper JB_Str_InStr
 
 	function Find ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| )
@@ -67,7 +74,7 @@ class String
 	function First (|Byte|)
 		cpp_wrapper JB_Str_First
 	
-	operator minus (|int|n, |int|)
+	operator minus (|int| n, |int|)
 		disabled 
 		return .length - n
 		
@@ -123,10 +130,13 @@ class String
 		cpp_wrapper JB_Str_MapBytes
 
 
-	function Compare (|string| other, |bool| Insensitive, |int|) { cpp_wrapper JB_Str_Compare }
+	function Compare (|string| other, |bool| Insensitive, |int|)
+		nil checker
+		cpp_wrapper JB_Str_Compare
 
 	function IsInt (|bool|)
 		return .isint(0)
+	
 	function IsInt (|int|i, |bool|)
 		cpp_part IsIntFrom
 		require self
@@ -174,24 +184,30 @@ class String
 		cpp_wrapper JB_Str_UnHex
 
 	function ParseInt (|int| Start, |message| where, |int64|)
+		nil checker
 		cpp_Wrapper JB_Str_TextIntegerSection
 	
 	function ParseHex (|int| Start=0, |message| where=nil, |int64|)
+		nil checker
 		cpp_Wrapper JB_Str_HexIntegerSection
 	
 	function ParseInt (|Message| Where=nil, |int64|) 
+		nil checker
 		cpp_Wrapper JB_Str_TextIntegerValid
 	
 	function Int (|int64|)
 		return .parseint
 	
 	function Float (|f64|)
+		nil checker
 		return .parsefloat(nil)
 	
 	function ParseFloat (|Message| Where=nil, |f64|)
+		nil checker
 		cpp_Wrapper JB_Str_TextDouble
 	
 	function ParseHexInt (|message|where=nil,|int|) 
+		nil checker
 		cpp_Wrapper JB_Str_HexInteger
 
 	function UnicodeSync (|string|)
@@ -271,11 +287,11 @@ class String
 
 
 	function FirstLine (|string|)
-		return .before("\n")
+		return .Before("\n")
 		
-	function Before (|string|s, |string|)
-		|| it = .find(s)
-			return self[0, it]
+	function Before (|string| s, |string|)
+		|| f = .find(s)
+			return self[0, f]
 		return self
 	
 	function ByteSplit (|[string]|)
@@ -469,10 +485,11 @@ class String
 		cpp_wrapper JB_Str_ByteValue2
 		
 	syntax Access (|int| index, |Byte|)
+		nil checker
 		cpp_wrapper JB_Str_ByteValue
 		
 	syntax Access (|int| start, |int| after, |string|)
-		cpp_wrapper JB_Str_Range
+		cpp_wrapper JB_Str_Range // technically it does nil check but its in a slow-path doesnt like it
 		
 	function Codepoint (|codepoint|)
 		cpp_wrapper JB_Str_UTF8Value
@@ -482,6 +499,7 @@ class String
 		return self[r.x, r.x2]
 
 	syntax Access (|int| index, |string| Compare, |bool| Aware=false, |bool|)
+		nil checker
 		cpp_wrapper JB_Str_MidEquals
 
 	syntax Compare (|string| Other, |bool|Aware, |int|)
@@ -494,6 +512,7 @@ class String
 	
 	syntax Equals (|string| Other, |bool|Aware, |bool|)
 		cpp_wrapper JB_Str_Equals
+	
 	syntax Equals (|int| Other, |bool|Aware, |bool|)
 		cpp_part EqualsInt
 		return .length == other

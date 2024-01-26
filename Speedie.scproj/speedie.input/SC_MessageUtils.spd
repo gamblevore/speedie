@@ -453,9 +453,9 @@ function message.IsAlwaysBool (|maybebool|)
 	opt norefcounts
 	|| d = .obj as SCDecl
 		if d.IsConstOf(falsebool)
-			return false|MaybeBool|
+			return false
 		if d.IsConstOf(truebool)
-			return true|MaybeBool|
+			return true
 
 
 function message.IsAlwaysTrue (|bool|)

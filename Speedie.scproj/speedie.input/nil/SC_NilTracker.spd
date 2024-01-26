@@ -45,16 +45,22 @@ struct ArchonPurger
 	|Nilrecord| 		Realnesses
 	target debug
 		|Scdecl--[32]| 		Dbg
+	|scdecl|			Return
+	|bool|				CanNilCheck
 	|LoopInfo| 			Loops
 	|NilRecord[64]| 	Rows
 	
 	function CurrDepth (|int|)
 		return (.line - &.rows[0])|int|
 	
+	
 	function DeclareReal (|scdecl| V)
 		V.NilDeclared = NilState.real
+		if v is self
+			.cannilcheck = false
 		if .CurrDepth > 0		
 			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
+	
 	
 	function BranchEnter (|message| abc, |NilRecord|)
 		if .line < .RowEnd
@@ -63,9 +69,11 @@ struct ArchonPurger
 			return N
 		error (abc, "Branch depth too deep (over 63)")
 	
+	
 	function BranchSwap (|NilRecord| A, |nilrecord|)
 		rz = *.line
 		.Set(A, "swap")
+	
 	
 	function BranchExit (|NilRecord| A=0,  |nilstate|)
 		|| B = *.line
@@ -81,6 +89,7 @@ struct ArchonPurger
 	function Declare (|scdecl| D, |nilstate| nd, |nilstate|)
 		rz = .declaresub(d, nd)
 		d.NilPrint("add")
+	
 	
 	function DeclareSub (|scdecl| D, |nilstate| nd, |nilstate|)
 		nd &= nilstate.either
@@ -101,13 +110,14 @@ struct ArchonPurger
 		if !d.nilcurr // bug!
 		return nd
 	
+	
 	function scdecl.NilCurr (|nilstate|)
 		if self Isnt Local
 			return .nildeclared &~ nilstate.stated
 		return (ArchonPurger.place.Value)[.NilReg]
 	
 	
-	function SetNilness (|SCDecl| d,  |NilState| New, |nilstate|)
+	function SetNilness (|SCDecl| d, |NilState| New, |NilState|)
 		pragma inline
 		if !d.nilreg or ((new&1) and (!d.suffers)) // WHA?
 		|| P = .place
@@ -119,39 +129,55 @@ struct ArchonPurger
 		d.NilPrint("set")
 		return New
 
-	function Start (|SCFunction| f, |message|)
+
+	function StartNil (|SCFunction| f, |message|)
 		opt norefcounts
 		require f.CanNil
 		SCFunction.CurrFunc = f
-		Phase = 1
 		.rows[0] = nilstate.Basic
 		.Line = .rows[0]
 		.rowend = .line + 63
 		.loops = nil
 		.Realnesses = -1
+		.CheckNilCheck(F)
+		
 		for d in f.args
 			.DeclareSub(d, d.nildeclared)
 		printline
-		f.NilPrint(" ****** ")
+		f.NilPrint(" ****** ", false)
+
 		
 		|| r = f.returntype
 			if !r.nilstated
 				r.nildeclared = 0 // build this up carefully.
 		target debug: if "": ArchonPurger.ndb4(0)
-		Phase = 2
 		return f.SourceArg
+
 
 	function Finish (|SCFunction| f)
 		opt norefcounts
-		phase = 3
+		if .cannilcheck
+			f.isnilchecker = true
 		|| r = f.ReturnType
 			r.nildeclared |= nilstate.stated
 		for a in f.Args
 			a.nildeclared |= nilstate.stated
-		f.NilPrint(" !!!!! ")
+		f.NilPrint(" !!!!! ", true)
+	
+
+	function CheckNilCheck (|SCFunction| f)
+		.CanNilCheck = false
+		.return = f.returntype
+		|| s = f.args.first
+			if s.suffers and .return.CanNilCheck
+				.cannilcheck = true
+	
 	
 	function Place (|&NilRecorder|)
 		return (T.line)|&nilrecorder|
+
+	function Self (|nilstate|)
+		return (*t.line)[0]
 
 	function Decls (|string|s, |NilRecord| R)
 		.place.Value = R
@@ -159,7 +185,6 @@ struct ArchonPurger
 	module
 		|ArchonPurger|	T
 		|byte|			OldPrint
-		|int|			Phase
 
 		function Place (|&NilRecorder|)
 			return (T.line)|&nilrecorder|
@@ -178,7 +203,7 @@ struct ArchonPurger
 			// it's like a protoss exterminating DA ZERGBUGZ 
 			opt norefcounts
 			require (a==1) == (f.cls ~= "niltest")
-			|| arg = t.Start(f)
+			|| arg = t.Startnil(f)
 				Argument(arg)
 				t.Finish(f)
 
@@ -192,6 +217,7 @@ struct ArchonPurger
 			using rec
 				for f in compiler.funclist
 					.KhalaiPurification(f, 1)
+					printline f.rendername
 					rec.ReturnErrors
 				for (f in compiler.funclist) (i)
 					.KhalaiPurification(f, 2)

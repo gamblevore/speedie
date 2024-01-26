@@ -903,14 +903,14 @@ function message.CheckContinuesAndExits
 
 
 function message.LoopExit
-	.LoopExitter(ASMtmp.kExit, Blockage.Exit)
+	.LoopExitter(ASMtmp.kExit, SCBlockage.Exit)
 
 
 function message.LoopContinue
-	.LoopExitter(ASMtmp.kContinue, Blockage.Continue)
+	.LoopExitter(ASMtmp.kContinue, SCBlockage.Continue)
 
 
-function message.LoopExitter (|int| ASMType, |blockage| ExitCode)
+function message.LoopExitter (|int| ASMType, |SCBlockage| ExitCode)
 	.ExpectEmpty
 	.TmpType = ASMType
 	.LastInBlock(ExitCode)

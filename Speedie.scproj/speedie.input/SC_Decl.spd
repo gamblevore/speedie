@@ -214,8 +214,7 @@ class SCDecl (SCObject) {
 
 	function PointeryMatch (|scdecl| O, |bool|)
 		require (o.PointerCount == .PointerCount)
-		require (o.C_array|bool| == .C_array|bool|)
-		return true
+		return (o.C_array|bool| == .C_array|bool|)
 
 
 	function PointeryMatchSub (|SCDecl| O, |int| TypeCast, |uint|)
@@ -844,12 +843,23 @@ class SCDecl (SCObject) {
 		rz.NilDeclared = type
 
 
+	function CanNilCheck (|bool|)
+		opt norefcounts
+		require self
+		if .PointerCount
+			return true
+		if .C_Array
+			return false
+		return .type.HasNilChecker
+	
+
 	function NilConstructor (|nilstate| type,  |scdecl|)
 		opt norefcounts
 		if Type == 0
 			return self
 		rz = .copy
 		rz.NilDeclared = type
+
 
 	function RefineDecl (|message| list, |SCDecl|)
 		rz = .Copy
@@ -905,14 +915,12 @@ class SCDecl (SCObject) {
 			// aren't casted.
 			Return kNeedsTypeCast ||| loss
 
-
 		if (name_Space)
 			TypeOfExpr(self, name_space)
 		  elseif (.obj)
 			|| FoundType = TypeOfExpr(self, name_Space)
 			if FoundType and FoundType.type.isstruct
 				expect FoundType.PointerCount (self, "Can't typecast a struct!")
-
 
 		|| cst = «type ":)" »
 		.prev = cst

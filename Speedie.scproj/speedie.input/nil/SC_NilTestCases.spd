@@ -194,7 +194,7 @@ module NilTest2
 			x.Reader
 
 
-function scfunction.NilPrint (|string| header="")
+function scfunction.NilPrint (|string| header="", |bool| nilch)
 	cpp_name ndb1
 	|| fs = FastString()
 	fs <~ header
@@ -213,6 +213,8 @@ function scfunction.NilPrint (|string| header="")
 	if .returntype
 		fs <~ " as "
 		.returntype.nildeclared.nilname(fs, true)
+	if nilch and archonpurger.t.CanNilCheck
+		fs <~ " (nilch)"
 	fs <~ header
 	
 	printline fs

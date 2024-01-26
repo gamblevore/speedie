@@ -1,11 +1,11 @@
 
 
+// .Exists2			// nilch'ing without really being a nilchecker
+// .Exists4
+// .Exists5
+// uint24.SyntaxCast <-- CheckStillChecksNil is getting a result of 38 (known somehow)
+						// but its not known!
 
-// "carray = {}" args get nilstate 0
-// "int" self-type seems shared all over. It gets altered somewhere. Shouldn't get altered anywhere!
-// seems declaring carrays/local-structs with registers/alloc-depths! They aren't register-based!
-// nilcurr being tested on int... which has no nilreg... so is it nil or not?
-	// perhaps the base-value should be real?
 
 
 extend_module ArchonPurger {
@@ -24,10 +24,10 @@ extend_module ArchonPurger {
 		@decl:	Declaration
 		@arg:	Argument
 		@sheb:  Ignore
-		@sstr:	JustReal
-		@str:	JustReal
-		@num:	JustReal
-		@char:	JustReal
+		@sstr:	String
+		@str:	String
+		@num:	Number
+		@char:	Char
 		63:     // for the size
 
 
@@ -68,13 +68,13 @@ function Jump (NilTrackerFn)
 					
 function UseChildAsReal (|message| msg, |NilState|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
-	|| dcl = msg.MadDecl
+	|| dcl = msg.FastDecl
 	if dcl is OnModule
 		return dcl.NilDeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch)
 		if actual is nilish								// works e
-			.BecomeReal(ch.MadDecl, ch)
+			.BecomeReal(ch.FastDecl, ch)
 	return dcl.nildeclared
 
 
@@ -94,13 +94,31 @@ function List (NilTrackerFn)
 function PropertyOrAccess (NilTrackerFn)
 	return .UseChildAsReal(msg)
 
-	
+
+function RealBool (|bool| b, |nilstate|)
+	rz = nilstate.real
+	rz |= nilstate.truevalue >> b
+
+
+function Number (niltrackerfn)
+	return .RealBool(msg.name.iszero)
+
+
+function Char (niltrackerfn)
+	return .RealBool(msg.name.isnull)
+
+
+function String (niltrackerfn)
+	return .RealBool(!msg.length)
+
+
 function Function (NilTrackerFn)
 	opt norefcounts
+	debugat 81
 	|| fp = msg.first
 	|| prms = fp.next
 	|| fn = prms.obj|SCFunction|
-	fn.NilPrint
+	fn.NilPrint(false)
 	
 	if msg.tmptype == ASMtmp.kTern
 		return tern(prms, test)
@@ -110,25 +128,31 @@ function Function (NilTrackerFn)
 		.UseChildAsReal(fp.first)						// (abc)()
 
 	if (test is active) and fn.IsNilChecker
-		test |= NilCheckMode.Soft
+		Test |= NilCheckMode.Soft
+		if t.cannilcheck
+			rz = nilstate.FnBecomesNilCh
+	  else
+		Test = 0
 	
 	|| P = prms.first
 	|| HasAddrs = false
 	for recv in fn.args
-		.Jump(p, test)
-		|| sent = p.MadDecl
+		|| v = .Jump(p, test)
+		if test and rz and !(v is FnBecomesNilCh)
+			rz = 0 // can't work
+		|| sent = p.FastDecl
 		HasAddrs := sent.PointerUpgrade
 		if recv.NilReg	
 			.NilParamPass(recv, sent, p)
 
-		test = 0
+		Test = 0
 		p++
 	
 	if HasAddrs
 		debugat
 		p = prms.first
 		for recv in fn.args
-			|| infernal = p.MadDecl.PointerUpgrade
+			|| infernal = p.FastDecl.PointerUpgrade
 				.VariableSet(recv.internal, infernal, recv.source, p)
 			p++
 
@@ -138,25 +162,76 @@ function Function (NilTrackerFn)
 		return 0
 	
 	|| ret = fn.ReturnType
-		rz = ret.NilDeclared
+		rz |= ret.NilDeclared
 		check ((rz is stated) or !ret.Suffers) (msg, "Nil-decoration needed on function return.")
 
 
 function Rejoin (NilTrackerFn)
-	return jump(msg.first, Test) 
+	return .jump(msg.first, Test) 
+
+
+function CheckStillChecksNil (|message| first, |nilstate|)
+	rz = .jump(first)
+	if !t.CanNilCheck or (rz is FnBecomesNilCh)
+		return rz
+
+	|| F = first.TrueNess(rz)
+	|| SelfNil = t.self is nilish 
+	if f.isfalse
+		if !SelfNil
+			t.CanNilCheck = false		// also require that false returns ALWAYS have self nil!
+		// optional is allowed to return false
+	  elseif rz is FnBecomesNilCh		// its ok
+		0
+	  elseif SelfNil
+		t.CanNilCheck = false			// Nilcheckers require only return true if self is not nil!
+
+
+/* SHOULD handle: 
+
+	* .OriginalParseLayer, .filepath, msgroot isa // all nilcheckers
+
+	* returns -1 (errrorint), check if -1 is equal to errorint.false?
+		* "nil false", says this returns "false"... useful
+
+	* if self ~= "true"					// 
+		return true
+		
+	* if self: if (P == cls)
+		return true						// just tests self
+
+	* if !str return ""
+	  return 1
+	
+	* if o and self						// just tests self
+		return O.TypeNormal.matchC(self)
+
+	* string.operatorcontains // returns nilchecker.
+	
+	* return .FilePath isa s		// relies on "isa" being a NilChecker, and .filepath() returns false
+
+	* return .ext ~= s				// same
+
+	* Return (self) and (self == @arg) and (.name == name)
+*/
+
+
+// I think the only problem is in ... .tern and .type
+// I think type-casting should lose it anyhow... so thats OK
+// tern needs to be handled anyhow.
 
 
 function Return (NilTrackerFn)
 	opt norefcounts
-	|| v = jump(msg.first, 0) & nilstate.either
-	
+	|| v = .CheckStillChecksNil(msg.first)
+		
 	t.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
-	|| ret = scfunction.currfunc.ReturnType
+	|| ret = t.return
 	|| RD = ret.nildeclared
 	expect  !(RD == nilstate.real  and  v is nilish)   (msg, "Declaration does not allow returning " + v.rawname)
 	
-	ret.NilDeclared = RD ||| v					// assume real, unless it becomes optional??
+	ret.NilDeclared = RD ||| (v&nilstate.either)					// assume real, unless it becomes optional??
 	ret.NilPrint("return")
 
 
@@ -242,12 +317,21 @@ function Activate (|NiltrackerFn| fn, |message| msg, |NilCheckMode| test, |NilSt
 	if test is Active
 		return (fn)(msg, test.normal)
 
-	|| Orig = t.BranchEnter(msg)
-		Test = test.activate
-		(fn)(msg, test)
-		|| First = t.BranchSwap(Orig)
-		(fn)(msg, test.negate)
-		return t.BranchExit(First)
+	//|| Orig = t.BranchEnter(msg) // I think we don't need this!
+	// Test = test.activate
+	return (fn)(msg, test.activate)
+		// don't run this in the negative?
+		// seems so? why... even?
+
+		// return !self
+		// return self != nil
+		// return y or  self
+		// return x and self
+		// well... then what?
+		
+		//|| First = t.BranchSwap(Orig)
+		//|| B = (fn)(msg, test.negate)
+		//return t.BranchExit(First) ||| (A & B & nilstate.FnBecomesNilCh)
 
 
 function BooleanLogic (niltrackerfn)
@@ -257,9 +341,9 @@ function BooleanLogic (niltrackerfn)
 	|| IsAnd = test is AND
 	(test is AND) = false 
 	if IsAnd == (test is positive)
-		.Jump(AA, test)						// x = (!a or !a.y)
-		.Jump(BB, test)
-		return nilstate.real
+		|| NC = .Jump(AA, test)						// x = (!a or !a.y)
+		NC   |= .Jump(BB, test)
+		return nilstate.real ||| (NC & nilstate.FnBecomesNilCh)
 
 	|| Orig = T.BranchEnter(AA)				#require
 	
@@ -283,7 +367,7 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 		return nilstate.real
 	
 	if (lnil and rnil)
-		return ll.Redundant(ll.MadDecl, test)
+		return ll.Redundant(ll.FastDecl, test)
 	expect (scop.IsNilTest) (ll.next, "Nil can't accept this operator. Use != or ==.")
 	
 	(test is reversed) = scop.IsExactlyEquals
@@ -300,8 +384,8 @@ function ProcessCondRel (Niltrackerfn)
 	|| scop = op.obj|SCOperator|
 
 	if scop.IsCompare
-		.CompareObjs(ll, rr, test, scop)
-
+		return .CompareObjs(ll, rr, test, scop)
+	
 	|| AndOr = scop.IsAndOr
 		(test is AND) = (andor == scoperator.AND)
 		return .Activate(booleanlogic, msg, test)
@@ -313,13 +397,16 @@ function ProcessCondRel (Niltrackerfn)
 
 
 function Thing (NilTrackerFn)
-	rz = .ThingSub(msg, test)
+	opt norefcounts
+	|| dcl = msg.FastDecl
+	rz = .ThingSub(msg, test, dcl)
+	if t.cannilcheck and dcl is self
+		rz |= nilstate.FnBecomesNilCh
 	msg.Indent = rz				// The msg now knows the current state! Nice!
 
 
-function ThingSub (NilTrackerFn)
+function ThingSub (|message| msg, |nilcheckmode| test, |scdecl| dcl, |nilstate|)
 	opt norefcounts										// handles 5-6 different cases :O
-	|| dcl = msg.MadDecl
 	if !dcl.NilReg
 		return dcl.nildeclared
 	if dcl isnt local									// internal bug!
@@ -370,19 +457,15 @@ function Bracket (Niltrackerfn)
 function Type (Niltrackerfn)
 	opt norefcounts
 	|| F = msg.first
-	|| ns = .Jump(F, test)
-	|| d = msg.MadDecl
+	|| ns = .Jump(F, test) &~ nilstate.FnBecomesNilCh
+	|| d = msg.FastDecl
 	if !d.suffers
 		return nilstate.real
-	|| fd = f.MadDecl
+	|| fd = f.FastDecl
 	if fd.suffers // return inner suffering
 		return ns
 	
 	return d.nildeclared // we created new suffering, so lets pass that back.
-
-
-function JustReal (Niltrackerfn)
-	return nilstate.real
 
 
 function Brel (Niltrackerfn)
@@ -393,13 +476,13 @@ function Brel (Niltrackerfn)
 
 	|| ch = *msg
 	if b == '+' or '-'
-		return jump(ch, test)
+		return .jump(ch, test)
 		
 	if b == '!'
 		(test is reversed)
 		return .Activate(jump, ch, test)
 	
-	Jump(ch, test)
+	.Jump(ch, test)
 	return nilstate.real // !, &, ~   all return real
 
 
@@ -408,7 +491,7 @@ function arel (Niltrackerfn)
 	|| ch = *msg
 	|| b = msg.name.first
 	if b == '+' or '-'
-		return jump(ch, test)
+		return .jump(ch, test)
 	debugger // what?
 
 
@@ -416,10 +499,10 @@ function Declaration (niltrackerfn)
 	opt norefcounts
 	|| rel = msg.last
 	if rel == @thg
-		if rel.maddecl.isreg
+		if rel.FastDecl.isreg
 		return 0
 		
-	|| d = rel.first.MadDecl
+	|| d = rel.first.FastDecl
 	if d.IsReg
 		|| J = .Jump(rel.last)
 		return T.Declare(D, J)
@@ -432,7 +515,7 @@ function SetRel (NilTrackerfn)
 	opt norefcounts
 	|| R = msg.last,	.Jump(R, 0)			// R is defined as coming first
 	|| L = msg.first,	.Jump(L, 0)
-	return .VariableSet(L.MadDecl, R.MadDecl, L, R)
+	return .VariableSet(L.FastDecl, R.FastDecl, L, R)
 
 
 function Fail (NilTrackerFn)
@@ -492,4 +575,24 @@ function scdecl.NeedsStated (|message| where, |nilstate|)
 function scdecl.IsUnknownParam (|bool|)
 	pragma inline
 	return (!.nilstated) and (self is param)
+
+
+function message.Trueness (|nilstate| found, |maybebool|)
+	opt norefcounts
+	|| d = .FastDecl
+	|| ret = ArchonPurger.t.return
+	if d.FastMatch(ret)
+		|| n = d.nildeclare
+		if n is KnownValue
+			debugat
+			return n is TrueValue
+		if found is knownValue
+			debugat
+			return found is TrueValue
+	  elseif Ret.isdatatype and d.isdatatype // nothing special
+		debugat
+		while self == @arg or @bra
+			self = self.last
+		if self matches ret.type.false
+			return false
 

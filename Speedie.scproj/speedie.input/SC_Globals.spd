@@ -113,8 +113,8 @@ function TypeOfFunc (ExprResolver)
 		|| obj = fn.ReturnType
 		if !obj
 			exp.obj = typevoid
-		if fn.iskiller
-			exp.lastinblock(Blockage.Quit)
+		if fn.IsKiller
+			exp.LastInBlock(SCBlockage.Quit)
 		return obj // voids are so annoying.
 	return fn
 
@@ -246,13 +246,13 @@ function TypeOfThg (ExprResolver)
 			return T
 		expect (false) (exp, "Expected an object here.")
 	
-	
-	if R isa SCDecl
+	  elseif R isa SCDecl
 		if side
 			(r is setto)
 		|| O = R.islookuponly
 		if O isa message
 			exp.SafeReplaceWith(o.copy(exp))
+			
 	return R
 	
 
@@ -282,7 +282,6 @@ function TypeOfChar (ExprResolver)
 	|ind| cp = exp.name.codepoint
 	expect (cp) (exp, "Invalid codepoint")
 	
-	|| x = 'ø'
 	exp.Func = @num
 	exp.name = cp.render
 	return compiler.findclass("codepoint", exp).typenormal
@@ -1416,6 +1415,11 @@ function string.IsZero (|bool|)
 		require  (c == '.')  or  (c == '0')
 	return true
 
+function string.Isnull (|bool|)
+	for c in self
+		require c == '\0'
+	return true
+
 
 function message.IsZero (|bool|)
 	return  (self == @num)  and  (.name.iszero)
@@ -1670,7 +1674,7 @@ function DotFuncToNormalFunc (|Message|dot, |SCFunction|fn)
 	using (dot)
 		dot.First = «thg fn.ExportName »
 	if fn.IsKiller
-		dot.LastInBlock(Blockage.Quit)
+		dot.LastInBlock(SCBlockage.Quit)
 
 
 function SCDecl.ProcessAs (|Message| msg, |SCDecl|)

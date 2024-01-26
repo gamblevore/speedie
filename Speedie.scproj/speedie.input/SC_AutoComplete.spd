@@ -886,7 +886,7 @@ function CallFromSub (|message| arg, |scfunction| fn)
 				item <~ s.FuncPos(fn)
 
 
-helper Message.FuncPos (|scfunction|fn, |int|)				
+helper Message.FuncPos (|scfunction| fn, |int|)				
 	opt norefcounts
 	for ss.flat in self
 		if ss.obj == fn

@@ -4,6 +4,7 @@
 
 * VM? 
 * Do nil checker!
+	* recursion is actually a blocker! should check for recursion...
 * Constants and globals don't autocomplete nicely
 
 

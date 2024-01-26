@@ -850,6 +850,9 @@ datatype bool
 		disabled "use operator sign"
 	function Sign
 		disabled "use .dir"
+	
+	syntax cast (|maybebool|)
+		return self|maybebool|
 
 	function Set (|int| old, |int| flag, |int|)
 		cpp_part setflag

@@ -32,7 +32,7 @@ class SCFile (file)
 		.LiveAST.memoryLayer.Use
 
 
-	function Decls (|SCBase| p)
+	function CollectGlobals (|SCBase| p)
 		.Proj.use // should be inside use?
 		CollectDeclsGlobals( .LiveAST, p )
 

@@ -8,7 +8,11 @@ datatype NilState (byte) // Exec.scproj needs this here
 		Realish		= 2
 		Either		= 3
 		Stated		= 4
-		ActuallyNil = Nilish  + Stated
+		FnBecomesNilCh= 8
+		FalseValue	= 16
+		TrueValue	= 32
+		KnownValue	= FalseValue + TrueValue
+		ActuallyNil = Nilish  + Stated + FalseValue
 		Optional    = Either  + Stated
 		Real		= Realish + Stated
 		Basic		= Realish

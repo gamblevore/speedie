@@ -276,10 +276,9 @@ function InitBasicStuff (|int|) // compiler.init
 	options.ListAllLib = linkage.interpreter
 	
 	.InitTypes
-	TypeNil = .AddGlobalConst( "nil", TypeObject )
-	TypeNil.NilDeclared = NilState.ActuallyNil
-	TrueBool = .AddGlobalConst( "true", TypeBool )
-	FalseBool = .AddGlobalConst( "false", TypeBool )
+	TypeNil = .AddGlobalConst( "nil", TypeObject,   NilState.ActuallyNil )
+	TrueBool = .AddGlobalConst( "true", TypeBool,   NilState.real ||| NilState.trueValue )
+	FalseBool = .AddGlobalConst( "false", TypeBool, NilState.real ||| NilState.falseValue )
 	
 	.AddGlobalConst( "__time_id__", typeint ).islookuponly = «num scimport.recent.timeid »
 	.AddGlobalConst( "__now__", typedate ).islookuponly = «num date.now »
@@ -526,7 +525,7 @@ function ImportAll
 	for m in .ModuleList
 		m.InitDecls
 	for F in SCImport.AllFiles
-		F.Decls Compiler.Program
+		F.CollectGlobals Compiler.Program
 
 	scimport.noproj
 	(Message).Restore
@@ -579,6 +578,7 @@ function ImportAll
 	.Stage( "Building Function Link Map" )
 	for f in .FuncList
 		f.PostTransform
+	scfunction.currfunc = nil
 		
 
 
@@ -834,11 +834,10 @@ function scfunction.StripTest
 	|| Base = Compiler.VisibleFuncs
 	
 	if !.IsVisible	
-		require options.ListAllLib and !.isdisabled
+		require options.ListAllLib and !.IsDisabled
 		base = Compiler.Interpreter
 	
-	if !.FindReached(base)
-		.depth = 1
+	.FindReached(base)
 
 
 function DeadStrip
@@ -901,11 +900,11 @@ function OrderClassList
 			.ClassList <~ cls
 
 
-function AddGlobalConst (|string| name, |SCClass| c, |SCDecl|)
+function AddGlobalConst (|string| name, |SCClass| c, |nilstate| dcl = NilState.real, |SCDecl|)
 	|| d = SCDecl.new
 	d.Type = c
 	(d Is Const)
-	d.NilDeclared = NilState.real
+	d.NilDeclared = dcl
 	d.IsLookupOnly = "" // it is lookuponly... but what for? "" i guess... whatever.
 	d.Name = name
 	d.default = «thg name »

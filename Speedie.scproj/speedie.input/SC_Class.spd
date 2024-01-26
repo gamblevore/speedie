@@ -53,6 +53,7 @@ linkage
 |bool|						SavingCanSkip
 |bool|						TreatAsBaseType
 |bool| 						Banned
+|byte|						HasNilChecker
 |bool|						IsRole
 |bool|						IsBuiltin
 |bool|						IsDataTypeLike
@@ -476,16 +477,21 @@ function OverrideSyntax
 	require stderr.OK
 	|| cast = .FindSpecialFunc( "SyntaxCast", false )
 	.casts = array.new
+
+	if .isobject or .isdatatype
+		.HasNilChecker = 1 // default to true
 	
 	for f in cast
 		f.IsInline = true
 		check  (f.args == 1)		(f.Source, "No params allowed." )
 		expect (f.ReturnType)       (f.Source, "Need a return type.")
-		f.nextfunc.DontWantSameReturnType(f)
+		f.NextFunc.DontWantSameReturnType(f)
 		.Casts <~ f
 		if f.returntype.IsNormalBool
-			f.IsNilChecker = true
-			f.args.first.WantOptional
+			|| OK = !f.isdisabled
+				f.args.first.WantOptional
+			f.IsNilChecker = 2*OK
+			.HasNilChecker = 2*OK
 	
 	.HasCompareFunc = .FindSpecialFunc( "SyntaxCompare", true )
 	.HasEqualsFunc = .FindSpecialFunc( "SyntaxEquals", true )
@@ -1132,6 +1138,5 @@ extend SCClass
 		while (Curr_)
 			yield Curr_
 			Curr_ = Curr_.super
-
 
 

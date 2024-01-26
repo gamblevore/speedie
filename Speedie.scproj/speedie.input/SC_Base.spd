@@ -365,8 +365,8 @@ function LookUpAddress (|string| name, |Message| exp, |Object|)
 	return .LookUpSub( name, exp, nil, self, nil, nil, kPurposeAddress )
 
 
-function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scobject|)
-	return .LookUpSub( name, exp, ParamsHere, self, nil, nil, kPurposeFunc ) // right? we use "me" for both the receiver and the argspace?
+function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scfunction|)
+	return .LookUpSub( name, exp, ParamsHere, self, nil, nil, kPurposeFunc )|scfunction| // right? we use "me" for both the receiver and the argspace?
 
 
 

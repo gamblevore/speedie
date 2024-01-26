@@ -106,7 +106,7 @@ module Feedback
 			"".debugprint // stop from being stripped
 			nil|message|.jdb2
 			nil|message|.LocateAll
-			nil|scfunction|.NilPrint
+			nil|scfunction|.NilPrint(False)
 			nil|scdecl|.NilPrint("")
 	
 	

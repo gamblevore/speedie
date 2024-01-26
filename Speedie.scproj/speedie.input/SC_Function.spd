@@ -54,7 +54,7 @@ linkage
 |SCClass|				ProtoType
 |SCDecl|				ReturnType
 |scfunction--|			DepthFinder
-|uint16|				Depth
+|uint16|				LinkDepth
 |uint16|				TmpCounter
 |uint|					AllocCode // some flags above 255!
 |Byte|					MinOpt
@@ -1104,7 +1104,7 @@ function FixCnjSub (|Message| exp) {
 }
 
 	
-function PostTransform
+function PostTransform 
 	opt norefcounts
 	scfunction.currfunc = self
 
@@ -1116,8 +1116,8 @@ function PostTransform
 	for d in .args
 		.CollectLinks( d )
 
-	.CollectLinks( .ReturnType )
-	scfunction.currfunc = self
+	|| r = .returntype
+		.CollectLinks( r )
 
 
 function RegType (|datatypecode|)
@@ -1476,14 +1476,14 @@ function Tran_If (TranFunc)
 	Tran_IfSub(node, name_space)
 
 
-function message.Blocks (|blockage|)
+function message.Blocks (|SCBlockage|)
 	if self
-		return .flags & Blockage.Bits
+		return .flags & SCBlockage.Bits
 
 
 function message.Blocks (assigns:|int|)
-	if .flags&Blockage.bits // what?
-	.flags = (.flags & ~Blockage.bits) ||| Value
+	if .flags&SCBlockage.bits // what?
+	.flags = (.flags & ~SCBlockage.bits) ||| Value
 
 
 function Tran_IfSub (|message| node, |scbase| name_space) 
@@ -1535,7 +1535,7 @@ function message.ElseNeverFires // self == cond
 		return
 	if arg == @arg
 		arg.clear
-		arg.flags |= Blockage.Return // blocks!
+		arg.flags |= SCBlockage.Return // blocks!
 	.NeedBra
 
 
@@ -1591,7 +1591,7 @@ function Tran_Return (TranFunc)  // exitter
 	node.tmptype = asmtmp.kreturn
 	expect (! fn.IsConstructorOrDestructor)   (node, "You can’t return in a constructor or destructor")
 	fn.CheckReturnValue( node )
-	node.LastInBlock(Blockage.Return)
+	node.LastInBlock(SCBlockage.Return)
 	node.CheckNotInStateExpr(fn.SourceArg)
 
 

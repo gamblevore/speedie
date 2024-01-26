@@ -126,6 +126,7 @@ class Array (saveable)
 		return self[.length.now]
 	
 	syntax Access (|bool| pos, ||)
+		cpp_part Bug // just left here to test my nilchecker... it should check for recursion bugs
 		return self[!pos]
 	
 	function Reserve (|int| Needed)
