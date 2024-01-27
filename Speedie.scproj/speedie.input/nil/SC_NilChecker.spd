@@ -129,7 +129,7 @@ function Function (NilTrackerFn)
 
 	if (test is active) and fn.IsNilChecker
 		Test |= NilCheckMode.Soft
-		if t.cannilcheck
+		if t.FnAbleToNilCheck
 			rz = nilstate.FnBecomesNilCh
 	  else
 		Test = 0
@@ -138,7 +138,7 @@ function Function (NilTrackerFn)
 	|| HasAddrs = false
 	for recv in fn.args
 		|| v = .Jump(p, test)
-		if test and rz and !(v is FnBecomesNilCh)
+		if rz and !(v is FnBecomesNilCh) and p.isfirst
 			rz = 0 // can't work
 		|| sent = p.FastDecl
 		HasAddrs := sent.PointerUpgrade
@@ -170,21 +170,21 @@ function Rejoin (NilTrackerFn)
 	return .jump(msg.first, Test) 
 
 
-function CheckStillChecksNil (|message| first, |nilstate|)
+function DetectStillChecks (|message| first, |nilstate|)
 	rz = .jump(first)
-	if !t.CanNilCheck or (rz is FnBecomesNilCh)
+	if !t.FnAbleToNilCheck or (rz is FnBecomesNilCh)
 		return rz
 
 	|| F = first.TrueNess(rz)
 	|| SelfNil = t.self is nilish 
 	if f.isfalse
 		if !SelfNil
-			t.CanNilCheck = false		// also require that false returns ALWAYS have self nil!
+			t.FnAbleToNilCheck = false		// also require that false returns ALWAYS have self nil!
 		// optional is allowed to return false
-	  elseif rz is FnBecomesNilCh		// its ok
+	  elseif rz is FnBecomesNilCh			// its ok
 		0
 	  elseif SelfNil
-		t.CanNilCheck = false			// Nilcheckers require only return true if self is not nil!
+		t.FnAbleToNilCheck = false			// Nilcheckers require only return true if self is not nil!
 
 
 /* SHOULD handle: 
@@ -223,7 +223,7 @@ function CheckStillChecksNil (|message| first, |nilstate|)
 
 function Return (NilTrackerFn)
 	opt norefcounts
-	|| v = .CheckStillChecksNil(msg.first)
+	|| v = .DetectStillChecks(msg.first)
 		
 	t.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
@@ -299,6 +299,7 @@ function If (NilTrackerFn)
 
 function Tern (Niltrackerfn)
 	opt norefcounts
+	if scfunction.currfunc ~= "Exists4"
 	|| Orig = T.BranchEnter(msg)			#require
 	|| tC = msg.first,  || tA = tC.next,  || tB = tA.next
 
@@ -316,10 +317,10 @@ function Tern (Niltrackerfn)
 function Activate (|NiltrackerFn| fn, |message| msg, |NilCheckMode| test, |NilState|)
 	if test is Active
 		return (fn)(msg, test.normal)
+	return (fn)(msg, test.activate)
 
 	//|| Orig = t.BranchEnter(msg) // I think we don't need this!
 	// Test = test.activate
-	return (fn)(msg, test.activate)
 		// don't run this in the negative?
 		// seems so? why... even?
 
@@ -400,21 +401,23 @@ function Thing (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.FastDecl
 	rz = .ThingSub(msg, test, dcl)
-	if t.cannilcheck and dcl is self
-		rz |= nilstate.FnBecomesNilCh
 	msg.Indent = rz				// The msg now knows the current state! Nice!
+	if t.FnAbleToNilCheck and dcl is self
+		rz |= nilstate.FnBecomesNilCh
 
 
 function ThingSub (|message| msg, |nilcheckmode| test, |scdecl| dcl, |nilstate|)
-	opt norefcounts										// handles 5-6 different cases :O
+	opt norefcounts										// Handles 5-6 different cases :O
 	if !dcl.NilReg
 		return dcl.nildeclared
-	if dcl isnt local									// internal bug!
-
+	if dcl isnt local									// Internal bug!
+	
 	if dcl.IsUnknownParam
 		if test isnt Active
 			return .becomereal(dcl, msg)
 		dcl.NilDeclared = nilstate.optional
+		if test is soft and negative
+			return nilstate.optional
 		return T.SetNilness(dcl, Test)
 
 	|| Y = dcl.nilcurr
@@ -441,10 +444,11 @@ function ArgOne (|message| s,  |nilcheckmode| t,  |nilstate| prev,  |nilstate|)
 	pragma inline
 	s.DebugPrint
 	rz = .jump(s, T)
-	if prev is borked
-		error.autoprint = .oldprint
-		expect (!stderr.ok) (s, "Borking but no zergs found?")
-		stderr.clear
+	if prev isnt borked
+		return rz
+	error.autoprint = .oldprint
+	expect (!stderr.ok) (s, "Borking but no zergs found?")
+	stderr.clear
 
 	
 function Bracket (Niltrackerfn)
@@ -477,13 +481,16 @@ function Brel (Niltrackerfn)
 	|| ch = *msg
 	if b == '+' or '-'
 		return .jump(ch, test)
-		
 	if b == '!'
-		(test is reversed)
-		return .Activate(jump, ch, test)
+		return .Not(ch, test)
 	
 	.Jump(ch, test)
-	return nilstate.real // !, &, ~   all return real
+	return nilstate.real // & ~ both return real
+
+
+function Not (niltrackerfn)
+	|| a = .Activate(jump, msg, test ||| nilcheckmode.reversed)
+	return a &~ nilstate.FnBecomesNilCh
 
 
 function arel (Niltrackerfn)

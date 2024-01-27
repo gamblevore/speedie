@@ -213,7 +213,7 @@ function scfunction.NilPrint (|string| header="", |bool| nilch)
 	if .returntype
 		fs <~ " as "
 		.returntype.nildeclared.nilname(fs, true)
-	if nilch and archonpurger.t.CanNilCheck
+	if nilch and archonpurger.t.FnAbleToNilCheck
 		fs <~ " (nilch)"
 	fs <~ header
 	
@@ -265,16 +265,16 @@ function ArchonPurger.Set (|NilRecord| Dest, |string| reason, |nilstate|)
 	
 
 
-function @ArchonPurger.ndb4 (|int| n=0)
+function @ArchonPurger.ndb4
 	cpp_name ndb4
 	visible
-	(*T.line).ndb5(n)
+	(*T.line).ndb5
 
 
-function NilRecord.ndb5 (|int| n)
+function NilRecord.ndb5
 	cpp_name ndb5
 	visible
-	n := .NextCount
+	|| n = .NextCount // sigh
 	for i in n
 		// item 0 is always nil... so whatever
 		|| D = ArchonPurger.T.dbg[i]

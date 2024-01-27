@@ -11,7 +11,7 @@ datatype NilRecord (Uint64)
 		return (self >> item) & NilState.either
 		
 	function NextCount (|uint|)
-		return (.log2|uint|+1)>>1
+		return 1 + (.log2|uint|>>1)
 
 
 struct NilRecorder
@@ -22,6 +22,7 @@ struct NilRecorder
 		item <<= 1
 		|| Mask = NilState.either << item
 		.value = (.value &~ Mask) ||| (value << item)
+		target debug:archonpurger.ndb4
 	syntax Call (|nilrecord| v, |nilrecord|)
 		rz = .Value
 		.Value = v

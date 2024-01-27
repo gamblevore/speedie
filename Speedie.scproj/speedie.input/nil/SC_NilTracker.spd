@@ -40,15 +40,15 @@ struct LoopInfo
 
 struct ArchonPurger
 	linkage: cpp_part nil
-	|&NilRecord| 		Line
-	|&NilRecord| 		RowEnd
-	|Nilrecord| 		Realnesses
+	|&NilRecord| 			Line
+	|&NilRecord| 			RowEnd
+	|Nilrecord| 			Realnesses
 	target debug
 		|Scdecl--[32]| 		Dbg
-	|scdecl|			Return
-	|bool|				CanNilCheck
-	|LoopInfo| 			Loops
-	|NilRecord[64]| 	Rows
+	|scdecl|				Return
+	|bool|					FnAbleToNilCheck
+	|LoopInfo| 				Loops
+	|NilRecord[64]| 		Rows
 	
 	function CurrDepth (|int|)
 		return (.line - &.rows[0])|int|
@@ -57,7 +57,7 @@ struct ArchonPurger
 	function DeclareReal (|scdecl| V)
 		V.NilDeclared = NilState.real
 		if v is self
-			.cannilcheck = false
+			.FnAbleToNilCheck = false
 		if .CurrDepth > 0		
 			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
 	
@@ -150,13 +150,13 @@ struct ArchonPurger
 		|| r = f.returntype
 			if !r.nilstated
 				r.nildeclared = 0 // build this up carefully.
-		target debug: if "": ArchonPurger.ndb4(0)
+		target debug: if "": ArchonPurger.ndb4
 		return f.SourceArg
 
 
 	function Finish (|SCFunction| f)
 		opt norefcounts
-		if .cannilcheck
+		if .FnAbleToNilCheck
 			f.isnilchecker = true
 		|| r = f.ReturnType
 			r.nildeclared |= nilstate.stated
@@ -166,18 +166,18 @@ struct ArchonPurger
 	
 
 	function CheckNilCheck (|SCFunction| f)
-		.CanNilCheck = false
+		.FnAbleToNilCheck = false
 		.return = f.returntype
 		|| s = f.args.first
 			if s.suffers and .return.CanNilCheck
-				.cannilcheck = true
+				.FnAbleToNilCheck = true
 	
 	
 	function Place (|&NilRecorder|)
 		return (T.line)|&nilrecorder|
 
 	function Self (|nilstate|)
-		return (*t.line)[0]
+		return (*t.line)[1]
 
 	function Decls (|string|s, |NilRecord| R)
 		.place.Value = R
@@ -196,7 +196,7 @@ struct ArchonPurger
 			.place.Value = R ||| nilstate.Basic
 
 		function DeclKill
-			t.set(0, "kill")
+			t.set(nilstate.Basic, "kill")
 		
 
 		function KhalaiPurification (|scfunction| f, |int| a)
@@ -217,7 +217,6 @@ struct ArchonPurger
 			using rec
 				for f in compiler.funclist
 					.KhalaiPurification(f, 1)
-					printline f.rendername
 					rec.ReturnErrors
 				for (f in compiler.funclist) (i)
 					.KhalaiPurification(f, 2)
