@@ -90,7 +90,7 @@ function message.IsNowNil (|bool|)
 		return (d == TypeNil) or (d.NilCurr == nilstate.nilish)
 
 
-function scdecl.Suffers (|bool|)
+function scdecl.TypeSuffers (|bool|)
 	return .IsObject or .PointerCount
 
 
@@ -102,6 +102,6 @@ function scfunction.CanNil (|bool|)
 	return !.IsMacro and !.IsWrapper and !.Badness and !.isdisabled
 
 function scdecl.WantOptional
-	if self and .Suffers
+	if self and .TypeSuffers
 		.nildeclared = nilstate.optional
 

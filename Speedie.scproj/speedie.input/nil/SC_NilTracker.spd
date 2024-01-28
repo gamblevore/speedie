@@ -100,8 +100,8 @@ struct ArchonPurger
 		target debug
 			ndb4()
 		
-		d.NilReg = N * d.Suffers
-		if !d.suffers and d.nildeclare != nilstate.real
+		d.NilReg = N * d.TypeSuffers
+		if !d.TypeSuffers and d.nildeclare != nilstate.real
 			
 		d.DReg.Reg = n // right? might as well do this at the same time?
 		d.NilAllocDepth = .currDepth
@@ -119,7 +119,7 @@ struct ArchonPurger
 	
 	function SetNilness (|SCDecl| d, |NilState| New, |NilState|)
 		pragma inline
-		if !d.nilreg or ((new&1) and (!d.suffers)) // WHA?
+		if !d.nilreg or ((new&1) and (!d.TypeSuffers)) // WHA?
 		|| P = .place
 		(P)(d.NilReg) = new
 		
@@ -145,7 +145,6 @@ struct ArchonPurger
 			.DeclareSub(d, d.nildeclared)
 		printline
 		f.NilPrint(" ****** ", false)
-
 		
 		|| r = f.returntype
 			if !r.nilstated
@@ -166,21 +165,25 @@ struct ArchonPurger
 	
 
 	function CheckNilCheck (|SCFunction| f)
+		opt norefcounts
 		.FnAbleToNilCheck = false
 		.return = f.returntype
 		|| s = f.args.first
-			if s.suffers and .return.CanNilCheck
+			if (s.nildeclared is nilish) and s.TypeSuffers and .return.CanNilCheck
 				.FnAbleToNilCheck = true
 	
 	
 	function Place (|&NilRecorder|)
 		return (T.line)|&nilrecorder|
 
+
 	function Self (|nilstate|)
 		return (*t.line)[1]
 
+
 	function Decls (|string|s, |NilRecord| R)
 		.place.Value = R
+
 
 	module
 		|ArchonPurger|	T

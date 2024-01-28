@@ -60,7 +60,7 @@ function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
 		error (exp, "Can’t cast between structs/carrays")
 	  else
-		ifn exp0.isint and new.suffers
+		ifn exp0.isint and new.TypeSuffers
 			0 //
 		  elseif exp0.iszero or Old.IsNil
 			new = new.makenewnil

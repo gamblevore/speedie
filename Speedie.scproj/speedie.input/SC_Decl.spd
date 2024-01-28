@@ -660,7 +660,7 @@ class SCDecl (SCObject) {
 			»
 		if self is borrowed
 			rz = «arel "--", rz »
-		if (.Suffers)
+		if (.TypeSuffers)
 			|| ND = .nildeclared
 			if (ND == nilstate.Optional) /// pointers are already optional
 				rz = «brel "?", rz »	// depends if this is for debug?
@@ -800,7 +800,7 @@ class SCDecl (SCObject) {
 
 	
 	function MakeContainedOptional (|scdecl|)
-		if .NilDeclared is Stated
+		if .nilstated
 			return self
 		return .MakeNewOptional
 	
@@ -969,7 +969,7 @@ class SCDecl (SCObject) {
 			Cast |= kTypeCastBothWays
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
-		require (exp and exp.IsSetIntoPlace and .suffers)
+		require (exp and exp.IsSetIntoPlace and .TypeSuffers)
 		
 		if (self is self) and (scfunction.currfunc is constructor or Destructor) 
 			error (exp, "You can’t modify 'self' in a constructor or destructor.")

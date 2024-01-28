@@ -225,7 +225,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| c
 	if (Mode & 8) and NoOriginalDcl // functionbody
 		if sdcl isnt StayBorrowed
 			(Dcl Isnt Borrowed)
-		dcl.nildeclared = NilState.real >> dcl.suffers 
+		dcl.nildeclared = NilState.real >> dcl.TypeSuffers 
 	
 	if (nameitm in @Rel)
 		nameitm.Parent.obj = dcl

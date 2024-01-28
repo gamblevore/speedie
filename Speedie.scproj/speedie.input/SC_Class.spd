@@ -448,12 +448,16 @@ function ContainedTypeLoad
 		.Contained = sup.Contained
 		.SelfDecl.Contains = sup.SelfDecl.Contains
 		
-		.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
-		.NeedsDefaultValue(sup.false, .false, "false")
+		if .IsNotNumeric == sup.IsNotNumeric
+			.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
+			.NeedsDefaultValue(sup.false, .false, "false")
 		.IgnoreContainedSelf |= sup.IgnoreContainedSelf // bad assumption. we shouldn't swap objects and datatypes
 	
 	.defawlt := «thg "nil"»
-	.false := «thg "nil"»
+	if .NumericCount == 1 // what if its a vec4? (0,0,0,0)? sigh.
+		.false := «num "0"»
+	  else
+		.false := «thg "nil"»
 
 	|| ContainedMsg = .Sourcearg.find(@Tmp, "contains")[@thg]			#require
 	|| cls = compiler[ ContainedMsg.name, ContainedMsg ]				#require
@@ -649,7 +653,7 @@ function FirstDestructor (|SCFunction|)
 function scfunction.AddSelfToFunc (|scclass| cls, |SCBase| space)
 	opt norefcounts
 	|| sl = cls.SelfDecl		// for my nil-checker
-	if sl.Suffers				// refcounting will set MarkAsRefAltered
+	if sl.TypeSuffers				// refcounting will set MarkAsRefAltered
 		sl = sl.copy
 		if .IsConstructorOrDestructor
 			sl = sl.MakeNewReal

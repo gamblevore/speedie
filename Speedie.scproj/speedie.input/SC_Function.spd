@@ -646,10 +646,10 @@ function DeclsProtoType (|Message| ch0, |SCClass| fpType=nil, |bool| late=false)
 function MakeParamsReal
 	opt norefcounts
 	for (a in .args) (i)
-		if a.Suffers
+		if a.TypeSuffers
 			.args[i] = a.DefaultToReal
 	|| r = .ReturnType
-		if r.suffers
+		if r.TypeSuffers
 			.returntype = r.DefaultToReal
 
 function CollectReturnAsReal (|bool|)
