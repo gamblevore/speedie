@@ -163,6 +163,7 @@ class NilTest
 				v.v++
 	
 	function NilGlobals
+		borks
 		x2 = nil
 		
 	function GoodBadPtr (|&niltest| p)

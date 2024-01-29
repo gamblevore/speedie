@@ -518,10 +518,15 @@ function ImportAll
 	require .Stage( "A Bit More Stuff On Classes" )
 	for c in .ClassList
 		c.ExportName = c.JSStructName // minifier...
-		c.AfterFuncsDecled
+		c.AfterFuncsDecled //
 	  
 
-	require .Stage( "Collecting File Variables" )
+	require .Stage( "Even More Stuff On Classes" )
+	for c in .ClassList
+		c.AfterAfterFuncs
+
+
+	require .Stage( "Collecting Globals" )
 	for m in .ModuleList
 		m.InitDecls
 	for F in SCImport.AllFiles
@@ -530,21 +535,10 @@ function ImportAll
 	scimport.noproj
 	(Message).Restore
 
-
-	require .Stage( "Even More Stuff On Classes" )
-	for c in .ClassList
-		c.AfterAfterFuncs
-	
-
-	.Stage( "Collecting Module Variables" )
 	for m in .ModuleList
 		if m != Compiler.program
 			m.BaseDecls
-	
-
-	.Stage( "Renaming Module Variables" )
-	for m in .ModuleList
-		m.RenameVars
+		m.GlobalsFix
 		if m.cls
 			m.cls.RenameInterfaces
 
@@ -569,11 +563,10 @@ function ImportAll
 	.Stage( "Transforming Functions" )
 
 	for f in .FuncList
-		require !TooManyErrors()
-		f.CheckNotBadName
-		f.Transform
-		
-		.stFunctionProgress++	
+		if !TooManyErrors()
+			f.CheckNotBadName
+			f.Transform			
+			.stFunctionProgress++	
 
 	.Stage( "Building Function Link Map" )
 	for f in .FuncList

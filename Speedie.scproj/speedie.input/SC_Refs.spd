@@ -150,7 +150,9 @@ function RefDecr (|Message| msg, |Message| place, |int| Basis)
 
 function DecrMulti (|scdecl| d, |message| m, |message|)
 	opt norefcounts
-	rz = (macros.MultiDecr)(m, d.c_array.msg)
+	|| Int = d.c_array.msg
+	int.obj = typeint.typenormal // nice
+	rz = (macros.MultiDecr)(m, Int)
 	|| prm = rz.second
 		prm.obj = Compiler.RefDecrmulti
 		prm.parent.obj = typevoid

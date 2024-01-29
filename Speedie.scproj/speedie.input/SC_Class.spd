@@ -54,6 +54,7 @@ linkage
 |bool|						TreatAsBaseType
 |bool| 						Banned
 |byte|						HasNilChecker
+|bool|						DefaultsToReal
 |bool|						IsRole
 |bool|						IsBuiltin
 |bool|						IsDataTypeLike
@@ -82,7 +83,7 @@ constructor (|Message| node, |SCBase| parent, |bool| HasPtrs)
 	.TypeReal = T.NilConstructor(NilState.Real * HasPtrs)
 	
 	if node == "struct"
-		T = T.GetAddress
+		T = T.GetAddress(declmode.funcparam)
 	  else
 		T = T.Copy
 	.SelfDecl = T
@@ -177,6 +178,12 @@ function GetDepth
 		.depth = 1
 		for c.Upwards in self
 			.depth++
+			
+	|| msg = .defawlt
+	if msg and .isobject and !(msg isthing "nil")
+		.DefaultsToReal = true // what if this defaults to optional? // fuck them :D
+		.TypeNormal.NilDeclare = NilState.realish
+		.TypeOptional.NilDeclare = NilState.realish // do this early as possible.
 	
 
 
@@ -763,15 +770,15 @@ function IsBuiltinChain (|bool|)
 			Return true
 
 
-function AfterAfterFuncs
+function AfterAfterFuncs 
 	if .super
 		.HasCompareFunc := .super.HasCompareFunc
-	
-	if .super
 		.HasEqualsFunc := .super.HasEqualsFunc
 	
 	if .defawlt
-		TypeOfExpr( .defawlt, .Modul )
+		|| D = TypeOfExpr( .defawlt, .Modul )
+		if .DefaultsToReal
+			check (d.isreal) (.defawlt, "Object default must be real (non-nil)")
 	
 	if .IsModel
 		.DeclModel
@@ -780,7 +787,6 @@ function AfterAfterFuncs
 function JSStructName (|String|)
 	if .IsDataType
 		Return .Name
-	
 	return .SubProjName + "_" + .name
 
 
@@ -1072,8 +1078,8 @@ module
 	
 	
 	function GetDefault (CollectFunc)
-		if name_space isa scclass
-			name_space.defawlt = node.NeedFirst
+		|| cls = name_space as scclass
+			cls.defawlt = node.NeedFirst
 	
 	
 	function NamedPropertyFields (CollectFunc) // node, parent, errplace

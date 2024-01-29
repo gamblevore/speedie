@@ -10,7 +10,8 @@ struct PicoMessage
 	|&char|		Data
 	
 	syntax cast (|bool|)
-		return .data
+		if self
+			return .data
 	
 	module
 		function From (|string| s, |PicoMessage|)

@@ -223,16 +223,17 @@ function DetectStillChecks (|message| first, |nilstate|)
 
 function Return (NilTrackerFn)
 	opt norefcounts
+	|| ret = t.return	#require
 	|| v = .DetectStillChecks(msg.first)
 		
 	t.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
-	|| ret = t.return
-	|| RD = ret.nildeclared
-	expect  !(RD == nilstate.real  and  v is nilish)   (msg, "Declaration does not allow returning " + v.rawname)
-	
-	ret.NilDeclared = RD ||| (v&nilstate.either)					// assume real, unless it becomes optional??
-	ret.NilPrint("return")
+	if ret.typesuffers
+		if ret.isreal
+			expect  (v isnt nilish)   (msg, "Declaration does not allow returning " + v.rawname)
+		
+		ret.NilDeclared = ret.nildeclared ||| (v&nilstate.either)					// assume real, unless it becomes optional??
+		ret.NilPrint("return")
 
 
 function Exit (NilTrackerFn)
@@ -520,7 +521,7 @@ function Debugger (NilTrackerFn)
 
 function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where)
 	opt norefcounts
-	if (recv.NilDeclared == nilstate.real)
+	if (recv.isreal)
 		.BecomeReal(sent, where)
 	  elseif !recv.nilstated
 		recv.NilPrmFail
@@ -530,10 +531,12 @@ function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where)
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message| SentMsg,  |nilstate|) // setrel, relset
 	opt norefcounts
 	
+	if !recv.typesuffers
+		return nilstate.real
 	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg)
 		
 	|| SN = sent.NilCurr
-	if (recv.NilDeclared == nilstate.real)
+	if (recv.isreal) // upgrade sent
 		expect (SN is realish) (RecvMsg, "Nil is not allowed here.")
 		return .BecomeReal(sent, SentMsg)
 		
@@ -551,7 +554,7 @@ function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 		T.DeclareReal(sent)
 		return T.SetNilness(sent, NilState.real)
 
-	error (where, "Expected Real Object: " + where.render)
+	error (where, "NilObjectError accessing optional: " + where.render)
 	return nilstate.real
 }
 
@@ -573,16 +576,15 @@ function message.Trueness (|nilstate| found, |maybebool|)
 	|| ret = ArchonPurger.t.return
 	if d.FastMatch(ret)
 		|| n = d.nildeclare
-		if n is KnownValue
-			debugat
+		if n & nilstate.KnownValue
 			return n is TrueValue
-		if found is knownValue
-			debugat
+		if found & nilstate.knownValue
 			return found is TrueValue
+
 	  elseif Ret.isdatatype and d.isdatatype // nothing special
-		debugat
 		while self == @arg or @bra
 			self = self.last
 		if self matches ret.type.false
 			return false
+	// return maybe
 

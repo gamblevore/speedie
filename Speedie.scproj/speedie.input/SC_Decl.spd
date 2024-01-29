@@ -272,7 +272,7 @@ class SCDecl (SCObject) {
 			rz.NilDeclared = nilstate.either
 		  else
 			rz.NilDeclared = nilstate.real
-		check (rz.pointercount < 8) (.source, "Too much abstraction")
+		check (rz.pointercount <= 4) (.source, "Too much abstraction")
 	
 	
 	function DeReference (|message| brel, |scbase|name_space,  |bool| IsAccess,  |scdecl|)
@@ -660,10 +660,8 @@ class SCDecl (SCObject) {
 			»
 		if self is borrowed
 			rz = «arel "--", rz »
-		if (.TypeSuffers)
-			|| ND = .nildeclared
-			if (ND == nilstate.Optional) /// pointers are already optional
-				rz = «brel "?", rz »	// depends if this is for debug?
+		if .TypeSuffers and .isoptional	/// pointers are already optional
+			rz = «brel "?", rz »		// depends if this is for debug?
 										// for debug I'd rther not see ! all over
 										// for code use... we need the "!" ?
 				
@@ -860,6 +858,13 @@ class SCDecl (SCObject) {
 		rz = .copy
 		rz.NilDeclared = type
 
+	function IsReal (|nilstate|)
+		if .NilDeclare&nilstate.optional == NilState.Real
+			return NilState.real
+
+	function IsOptional (|nilstate|)
+		if .NilDeclare&nilstate.optional == NilState.optional
+			return NilState.optional
 
 	function RefineDecl (|message| list, |SCDecl|)
 		rz = .Copy

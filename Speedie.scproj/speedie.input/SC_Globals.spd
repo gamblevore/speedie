@@ -463,7 +463,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 		if (C == "?")
 			return R.MakeNewOptional
 		if (C == "!")
-			if R.nildeclared == nilstate.real
+			if R.IsReal
 				deprecate (c, "Already assumed real. Only '?' needs to be specified.")
 			return R.MakenewReal
 		if (C.name)												// emptyname = compiler internal

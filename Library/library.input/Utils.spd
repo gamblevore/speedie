@@ -60,10 +60,10 @@ function @file.Dictionary (|file|)
 function @file.Words (|file|)
 	return "/usr/share/dict/words".file
 		
-function string.Dict (|byte|zep='\n', |dictionary|)
+function string.Dict (|byte| sep='\n', |!dictionary|)
 	rz = Dictionary()
 	if self
-		for l in StringFields( self, zep )
+		for l in StringFields( self, sep )
 			rz[l] = "x"
 
 function string.Sort (|byte| sep = '\n', |string|)

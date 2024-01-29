@@ -101,56 +101,9 @@ function scdecl.NilStated (|bool|)
 function scfunction.CanNil (|bool|)
 	return !.IsMacro and !.IsWrapper and !.Badness and !.isdisabled
 
+
 function scdecl.WantOptional
 	if self and .TypeSuffers
 		.nildeclared = nilstate.Optional
-
-
-/*
-
-This code has a problem:
-
-	return: stderr.errorcount == self
-
-The problem is, we don't know if stderr is nil.  Let's assume it is NOT nil. Its an init-order problem. Theres no easy solution.
-
-Ideas...
-
-	* Go through all funcs to define the order? And because ErrorMarker.syntaxcast comes after the error... its OK?
-		* Order could be discovered during the findreached thingy.
-		* Just keep a global of the current position... if it has a pos just don't go into it again.
-		* Really start with the init func
-		* order isn't so obvious...
-		
-		func (a)
-			if a
-				x()
-			  else
-				y()
-		
-		who comes first? Do we just have a "Time range"? this is the earliest it COULD be?
-		
-		
-	* Simple inits like: x = class() should be considered always not nil?
-		* unless:
-			* does error-handling in constructor
-			* reads from suffering globals (write is OK?)
-				* Can't do refcount opts.
-	
-	* Error-system should always come first anyhow?
-		* That might factor into a general init-order tester anyways.
-	
-	* init-order file... per-project
-		* auto-generated... if an error occurs during init
-			* you can edit it to fix the init order
-			* auto-adds missing inits to the file
-		* We still want to order stuff first
-			* datatypes and nil objs
-			* objs that that don't use the error-system or globals
-			* objs that do
-			* objs from funcs
-
-*/
-
 
 

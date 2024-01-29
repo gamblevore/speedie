@@ -24,7 +24,7 @@ linkage
 
 constructor
 	.defaultrefs = cpprefs.new
-	if .isvisible
+	if .IsVisible
 
 
 render
@@ -34,10 +34,12 @@ render
 	  else
 		super.render(fs)
 
+
 function SuperMod (|scmodule|)
 	opt norefcounts
 	|| c = .cls
 		return c.super.modul
+
 
 function IsProperModule (|bool|)
 // not "main" or any other auto-generated module that doesn't properly have a "module name {" thing going on...
@@ -63,7 +65,7 @@ function SCDecl.PrefixedName (|SCModule| M, |string|)
 	return M.GetPrefix(self) + s.unicodesafename
 
 
-function RenameVars // decl.name, .declfix, .fixname, .declname
+function GlobalsFix
 	// Goes through our properties/constants and renames them!
 	for decl.vars in self
 		if Decl
@@ -77,10 +79,10 @@ iterator Vars
 		yield d.ValueDecl
 
 
-function dictionaryreader.ValueDecl (|scdecl|)
+function DictionaryReader.ValueDecl (|scdecl|)
 	opt norefcounts
 	|| t = .value
-	if t isa scdecl
+	if t isa SCDecl
 		if !t.IsLookupOnly
 			return t
 
@@ -94,7 +96,7 @@ function NewModuleFunc (|Message| src, |SCFunction|)
 	.TryAddBase( src, rz )
 
 
-function BaseDecls
+function BaseDecls 
 	.Use
 	CollectDeclsGlobals( .source, self ) // right?
 
@@ -118,11 +120,9 @@ function SafeName (|string|)
 
 function LoadModule (|Message| node)
 	node.obj = self
-	|| namemsg = node.first
+	|| NameMsg = node.first
 	if !.cls
 		namemsg.expect(@thg)
-	  //else//if namemsg // fix later...
-		//namemsg.expect(@arg)
 
 	|| arg = namemsg
 	if namemsg == @thg

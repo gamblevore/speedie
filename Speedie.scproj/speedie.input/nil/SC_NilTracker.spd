@@ -113,7 +113,7 @@ struct ArchonPurger
 	
 	function scdecl.NilCurr (|nilstate|)
 		if self Isnt Local
-			return .nildeclared &~ nilstate.stated
+			return .nildeclared & nilstate.either
 		return (ArchonPurger.place.Value)[.NilReg]
 	
 	
@@ -133,6 +133,7 @@ struct ArchonPurger
 	function StartNil (|SCFunction| f, |message|)
 		opt norefcounts
 		require f.CanNil
+
 		SCFunction.CurrFunc = f
 		.rows[0] = nilstate.Basic
 		.Line = .rows[0]
