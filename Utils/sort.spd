@@ -6,14 +6,18 @@
 
 main (|[existingfile]| files)
 	|| t = app["types"]
-		types = t.Dict('/')
+		if t == "*"
+			types = nil
+		  else
+			types = t.Dict('/')
 		
 	for f in files
 		app.Collect(f)
 	found.sort(MySorter, true)
 	|| remover = app.Findremover
-	for f in found
-		"${f.trimstart(remover)} --> ${f.size.strsize}"
+	if app.No("quiet")
+		for f in found
+			"${f.trimstart(remover)} --> ${f.size.strsize}"
 	"Total: ${Total.strsize}"
 
 
@@ -29,7 +33,7 @@ function app.Collect (|file| f)
 		for c.files in f
 			if c.visible
 				.collect(c)
-	  elseif types[f.ext]
+	  elseif !types or types[f.ext]
 		total += f.size
 		found <~ f
 

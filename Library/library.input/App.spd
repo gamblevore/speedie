@@ -28,6 +28,9 @@ function TrySleep (|float| Duration, |bool|)
 syntax access (|int| i, |string|)
 	disabled "use app.args[i]"
 
+function Option (|string| name, |bool|)
+	disabled "Use app.yes()"
+
 function Yes (|string| name, |bool|)
 	return app[name].yes
 
@@ -81,6 +84,10 @@ syntax access (|string| name, |string|)
 	for R in .rawargs
 		if R.argname ~= name
 			return R.argvalue
+
+
+function Options (|[string]|)
+	disabled "Use switches"
 
 function Switches (|[string]|)
 	opt norefcounts
