@@ -398,7 +398,7 @@ function CanKeepAsSource (|Message| list, |Message| arg, |scdecl| d, |bool|)
 		return true
 	if list == @num
 		return true
-	if d.c_array	// hmmmmm
+	if d.IsCArray	// hmmmmm
 		return true
 
 
@@ -406,7 +406,7 @@ function CanKeepAsValue (|sciterator| iter, |Message| arg, |scdecl| dcl, |Messag
 	require (iter.Value == @thg)
 	require value
 	require (!arg.IsVarUseableInLoop( value.name ))
-	require !dcl.c_array
+	require !dcl.IsCArray
 	return true
 
 
@@ -491,7 +491,7 @@ function Tran_ForSub (TranFunc)					// :3
 		ListName = «Thg UniqueTmpVar( name_space, "LoopSrc" )»
 		// what? listname.name? why not pass the thing itself?
 		MakeDeclOrRel( node, listname, list )
-	  elseif  dcl.c_Array
+	  elseif  dcl.IsCArray
 		listname = «ques "."» // not my best code ever
 
 	iter.RenameSelf( ListName )
@@ -531,7 +531,7 @@ function Tran_ForSub (TranFunc)					// :3
 		iter.Yield.CopyAllBeforeInto( arg, node )
 
 
-	if (dcl.c_array)
+	if (dcl.IsCArray)
 		for c.flat in node
 			if (c == @ques and ".")
 				c.replacewith(list.copy)

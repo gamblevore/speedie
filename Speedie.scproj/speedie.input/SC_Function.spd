@@ -1152,7 +1152,7 @@ function Self (|scdecl|)
 
 function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
 	// .bla = X
-	require !d.C_array				// we actually need to clear it!
+	require !d.IsCArray				// we actually need to clear it!
 	
 	|| def = d.CreateDefault(place)
 	return NeweqRel( .DeclToDot(d), def )

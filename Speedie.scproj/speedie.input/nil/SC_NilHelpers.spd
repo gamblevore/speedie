@@ -91,8 +91,10 @@ function message.IsNowNil (|bool|)
 
 
 function scdecl.TypeSuffers (|bool|)
-	return .IsObject or .PointerCount
+	return (.IsObject or .PointerCount) and !.IsCArray
 
+function SCdecl.IsCArray (|bool|)
+	return .c_array > 0 // change this later to allow carrays of 0.
 
 function scdecl.NilStated (|bool|)
 	return .NilDeclared is Stated

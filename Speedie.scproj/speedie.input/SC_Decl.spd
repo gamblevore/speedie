@@ -214,7 +214,7 @@ class SCDecl (SCObject) {
 
 	function PointeryMatch (|scdecl| O, |bool|)
 		require (o.PointerCount == .PointerCount)
-		return (o.C_array|bool| == .C_array|bool|)
+		return (o.IsCArray == .IsCArray)
 
 
 	function PointeryMatchSub (|SCDecl| O, |int| TypeCast, |uint|)
@@ -284,7 +284,7 @@ class SCDecl (SCObject) {
 	
 	function DeReferenceSub (|message| brel, |scbase|name_space,  |bool| IsAccess, |scdecl|)
 		opt norefcounts
-		if (.C_Array)
+		if .IsCArray
 			require IsAccess
 			|| c = .Copy // should keep borrowedness...
 			c.C_Array = 0
@@ -368,13 +368,13 @@ class SCDecl (SCObject) {
 	
 
 	function IsNormalStruct (|bool|)
-		return .Type.IsStruct and !.PointerCount and !.C_Array
+		return .Type.IsStruct and !.PointerCount and !.IsCArray
 
 	function IsStruct (|bool|)
 		disabled "Use .IsNormalStruct"
 
 	function IsReg (|bool|)
-		require !.C_Array
+		require !.IsCArray
 		if .pointercount
 			return true
 		return !.Type.IsStruct
@@ -385,13 +385,13 @@ class SCDecl (SCObject) {
 
 
 	function IsDataType (|bool|)
-		return .Type.Isdatatype and !.PointerCount and !.C_Array
+		return .Type.Isdatatype and !.PointerCount and !.IsCArray
 
 	function IsProto (|bool|)
 		return .Type.FuncProto
 
 	function IsObject (|bool|)
-		return (.Type.IsObject) and (!.C_Array)
+		return .Type.IsObject and !.IsCArray
 		
 		
 	function IsNormalObject (|bool|)
@@ -399,22 +399,22 @@ class SCDecl (SCObject) {
 
 
 	function IsNormalNumber (|bool|)
-		return (!.C_Array) and (!.PointerCount) and (.Type.NumericCount == 1) 
+		return (!.IsCArray) and (!.PointerCount) and (.Type.NumericCount == 1) 
 	
 	
 	function IsNormalBool (|bool|)
-		return (!.C_Array) and (!.PointerCount) and (.Type == typebool) 
+		return (!.IsCArray) and (!.PointerCount) and (.Type == typebool) 
 
 
 	function IsNumeric (|int|)
 		opt norefcounts
-		if (!.C_Array) and (!.PointerCount)
+		if (!.IsCArray) and (!.PointerCount)
 			return .Type.NumericCount
 
 
 	function TypeInfo (|DataTypeCode|)
 		opt norefcounts
-		if (!.C_Array) and (!.PointerCount)
+		if (!.IsCArray) and (!.PointerCount)
 			return .Type.typeinfo
 
 
@@ -427,7 +427,7 @@ class SCDecl (SCObject) {
 			return true
 
 		require !.IsNormalStruct
-		require !.C_Array
+		require !.IsCArray
 		require .type.TypeInfo!=DataTypeCode.UnusedType
 		return true
 
@@ -615,13 +615,12 @@ class SCDecl (SCObject) {
 	function SameForReplace (|SCDecl| c, |bool|)
 		require (c is borrowed) == (self is borrowed) 
 		require c.PointerCount == .PointerCount 
-		require c.C_array      == .C_array
-		return true 
+		return c.C_array      == .C_array
 
 
 	function IsNormal (|bool|)
 		debugger .Type
-		return (!.PointerCount) and (!.IsNil) and !.C_Array
+		return (!.PointerCount) and (!.IsNil) and !.IsCArray
 
 
 	function AlreadyContains (|bool|)
@@ -651,7 +650,7 @@ class SCDecl (SCObject) {
 		for (.pointercount|int|)
 			rz = «Brel "&", rz »
 
-		if (.c_Array)
+		if (.IsCArray)
 			rz = «acc 
 				rz
 				«arr
@@ -687,14 +686,14 @@ class SCDecl (SCObject) {
 
 	function CantBeNilInCpp (|bool|)
 		require !.pointercount
-		return (.C_array) or (.type.IsStruct) or (.isnumeric > 1) 
+		return (.IsCArray) or (.type.IsStruct) or (.isnumeric > 1) 
 
 
 	function CreateStructNil (|message| errs, |Message|)
 		using (errs)
 		|| Arg = «arg »
 		Arg.obj = self
-		if (.C_Array)
+		if (.IsCArray)
 			return Arg
 		
 		rz = «type ":)"
@@ -846,7 +845,7 @@ class SCDecl (SCObject) {
 		require self
 		if .PointerCount
 			return true
-		if .C_Array
+		if .IsCArray
 			return false
 		return .type.HasNilChecker
 	
@@ -1024,7 +1023,7 @@ class SCDecl (SCObject) {
 				fs <~ ( '&', .PointerCount )
 				fs <~ .Type.Name
 			
-			if (.c_array) 
+			if .IsCArray
 				fs <~ '['
 				fs <~ .c_Array|int|
 				fs <~ ']'
@@ -1066,7 +1065,7 @@ function scdecl.ByteSize (|int|)
 	if .PointerCount
 		return platform.PointerBytes
 	|| n = .type.CalculateSize
-	if .C_Array
+	if .IsCArray
 		n *= .C_Array
 	return N
 

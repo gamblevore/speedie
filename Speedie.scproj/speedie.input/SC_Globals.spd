@@ -75,7 +75,7 @@ function TypeOfNothing (ExprResolver)
 
 
 function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
-	require (.type.IsStruct or .c_Array) and (!.pointercount)
+	require (.type.IsStruct or .IsCArray) and (!.pointercount)
 	return  (side.RemoveTypeCasts != @arg)
 
 
@@ -131,7 +131,7 @@ function Message.CanGetAddress (|scbase| name_space, |bool|)
 	expect (curr == @thg or @dot) (curr, "Can't get address of this.")
 	expect (T2 isnt const)        (curr, "Can't get the address of a const.")
 	
-	if (curr == @thg) and (t2 is local) and !(t2.IsNormalStruct or t2.C_array)
+	if (curr == @thg) and (t2 is local) and !(t2.IsNormalStruct or t2.IsCArray)
 		|| p = .ParentForAddress
 		expect (p == @prm) (curr, "Can't store the address of register based variables.")
 			
@@ -655,7 +655,7 @@ function TypeOfAccess (ExprResolver)
 		if (W > 1)
 			require Index.ExpectInt(Access)
 			return TypeOfVecAccess(index, ty0, w)
-		if Ty0.C_Array
+		if Ty0.IsCArray
 			require Index.ExpectInt(Access)
 			return ty0.Dereference(exp, name_space, true)// TypeOfPointerAccess(ty0)
 		if (Ty0.PointerCount and Access matches typeint)

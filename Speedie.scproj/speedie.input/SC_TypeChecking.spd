@@ -139,7 +139,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 		|| found = .TryTypeCastPointer(o, exp, typecast, false)
 			return found
 
-	if (o.c_array) and (.pointercount == 1)
+	if (o.IsCArray) and (.pointercount == 1)
 		|| found = .TryTypeCastPointer(o, exp, typecast, true)
 			return found
 	

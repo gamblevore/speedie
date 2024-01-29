@@ -91,7 +91,7 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 		type = TypeOfExpr( msg, nil )$
 	
 	if type.IsReffable(setonly)
-		if type.c_array > 0
+		if type.IsCArray
 			return kBasisCArray ||| kBasisObj
 		Return kBasisObj
 	
@@ -850,7 +850,7 @@ function DeclToDot2 (|scdecl| d, |string| s, |Message|)
 function scdecl.RefDestructor (|message|)
 	opt norefcounts
 	|| m = screfs.DeclToDot2(self, .name)
-	if .c_array > 0
+	if .IsCArray
 		return screfs.DecrMulti(self, m)
 	  else
 		return SCRefs.RefClearMsg( m )

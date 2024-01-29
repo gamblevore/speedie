@@ -838,7 +838,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		if (d.Name)
 			T <~ ' '
 			d.Name.safe(t)
-			if (d.C_Array)
+			if d.IsCArray
 				T <~ '['
 				T <~ d.C_Array|int|
 				T <~ ']'

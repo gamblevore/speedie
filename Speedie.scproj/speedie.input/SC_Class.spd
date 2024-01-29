@@ -126,14 +126,11 @@ function message.AlreadySets (|string| name, |bool|)
 			return true
 
 
-function scdecl.IsPassable (|bool|)
-	return .c_array == 0
-
 
 function PassableCount (|int|)
 	opt norefcounts
 	for p in .properties
-		rz += p.ispassable
+		rz += !p.IsCArray
 
 
 function AutoConstructor
@@ -143,7 +140,7 @@ function AutoConstructor
 	|| prms = node.Second
 	|| arg	= prms.next
 	for prop in .properties
-		if prop.ispassable
+		if !prop.IsCArray
 			|| name = prop.name
 			if name ~= "super"
 				name = "sooper"

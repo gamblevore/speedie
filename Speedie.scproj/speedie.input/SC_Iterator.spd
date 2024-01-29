@@ -117,7 +117,7 @@ class SCIterator (SCObject)
 
 
 	module
-		|sciterator| c_array
+		|sciterator| carray
 		|sciterator| pointer
 		
 		function SimpleIter (|string| src, |sciterator|)
@@ -126,7 +126,7 @@ class SCIterator (SCObject)
 				rz = it
 
 		
-		c_array = SimpleIter(
+		carray = SimpleIter(
 "iterator	// eyyy mammi, i aint doin this
 	|| first = &self[0]
 	|| i = 0
@@ -177,8 +177,8 @@ function SCClass.CheckIterator
 
 
 function scdecl.GetIteratorAny (|String| name, |message| node, |SCIterator|)
-	if .c_Array
-		return sciterator.c_array
+	if .IsCArray
+		return sciterator.carray
 	|| cls = .type								#expect ( node, "No class found." )
 	if .PointerCount and !cls.isstruct
 		return sciterator.pointer
