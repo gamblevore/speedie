@@ -783,11 +783,12 @@ extend Parser
 		return fTmp(parser.nextstart, kOpp & ~kOppBra, kthing, parent )
 
 
-	function ProcessThingOrTmp (|int| opps = kopp, |message|)
+	function ProcessThingOrTmp (|int| opps = kopp, |message?|)
 		return parser.ProcessThingSub(nil, opps, kthingsyx(|)kthingword(|)ktemporalsyx, false)
 
-	// ive been~running #since morning
-	// #since (morning) (ive been~running)
+/*
+ive been~running #since morning
+#since (morning) (ive been~running) */
  
 	function fTemporalHashThing (ParseHandler)
 		|| Result = .New( parent, @tril, start )
@@ -1159,7 +1160,7 @@ extend Parser
 		return .ProcessThingSub(nil, ops, kThing, expect)
 
 	
-	function ProcessThingSub (|message| Parent, |int| Ops, |int| KindOfThing, |bool| Expect, |Message|)
+	function ProcessThingSub (|message| Parent, |int| Ops, |int| KindOfThing, |bool| Expect, |Message?|)
 		|| result = .Process( KindOfThing, Expect, parent ) #require
 		if .WillEnd
 			return result

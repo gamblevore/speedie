@@ -12,7 +12,7 @@ constants
 
 
 
-prototype ExprResolver (|Message| Exp, |SCBase| name_space, |Message| side, |SCObject|)
+prototype ExprResolver (|Message| Exp, |SCBase| name_space, |Message| side=nil, |SCObject|)
 
 dispatch ExprFuncs (ExprResolver)  {
 /* @decl is BAD!   dont add it*/
@@ -90,15 +90,23 @@ function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |scbase| name_space)
 
 function scdecl.Exists (|bool|)
 	return self and self != typevoid and TypeNil
-			
+
+
+function TypeOfReal (ExprResolver)
+	opt	norefcounts
+	exp.become(@bra)
+	// so... make this real
+	|| f = exp.first
+	|| t = TypeOfExpr(f, name_space)
+		t = t.MakeReal // i hope this works
+	return t
 
 
 function TypeOfARel (ExprResolver)
 	if exp == "!"
-		exp.become(@bra)
-		return TypeOfExpr(exp.first, name_space)
+		return TypeOfReal(exp, name_space, side)
 	if Exp == "..."
-		return TypeOfDotDotDot(exp, name_Space,nil)
+		return TypeOfDotDotDot(exp, name_Space)
 	return SCFunction.Tran_AfterRel(exp, name_space, side)
 
 
@@ -204,7 +212,7 @@ function TypeOfBRel (ExprResolver)
 
 
 function TypeOfLast (ExprResolver)
-	return TypeOfExpr( exp.Last, name_space, nil )
+	return TypeOfExpr( exp.Last, name_space )
 
 
 function TypeOfBlock (ExprResolver)
@@ -229,7 +237,7 @@ function TypeOfBlock (ExprResolver)
 	
 	|| val = last.NeedFirst
 	if val.expectlast
-		return TypeOfExpr(val, p, nil)
+		return TypeOfExpr(val, p)
 
 
 function TypeOfThg (ExprResolver)
@@ -273,7 +281,7 @@ function TypeOfStr (ExprResolver)
 
 
 function TypeOfSString (ExprResolver)
-	return typestringzero.TypeReal // should return stringzeroterminated!
+	return typestringzero!.TypeReal // should return stringzeroterminated!
 
 
 function TypeOfChar (ExprResolver)
@@ -410,6 +418,14 @@ function ExtractAmount (|Message| Prms, |SCBase| name_space, |SCDecl| R, |bool|)
 
 
 function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCDecl|)
+	opt norefcounts
+	|| d = ExtractDeclSub(c, name_space, Purpose)
+	if d and d.NilStated
+		d.NilDeclare |= nilstate.Syntactic
+	return d
+
+
+function ExtractDeclSub (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCDecl|)
 	// a bit recursive!
 	|| f = c.func
 	
@@ -466,7 +482,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 		if (C == "!")
 			if R.IsReal
 				deprecate (c, "Already assumed real. Only '?' needs to be specified.")
-			return R.MakenewReal
+			return R.MakeNewReal
 		if (C.name)												// emptyname = compiler internal
 			error (c)
 		return r
@@ -643,7 +659,7 @@ function Message.ExpectInt (|scdecl| type, |bool|)
 
 function TypeOfAccess (ExprResolver)
 	|| ch = exp.first
-	|| Ty0 = TypeOfExprModulesOK( ch, name_space, nil )
+	|| Ty0 = TypeOfExprModulesOK( ch, name_space )
 	|| arr = exp.last
 
 	if (ty0 isa scmodule)
@@ -1434,6 +1450,7 @@ function message.WrapFloatOrInt (|datatypecode| T, |int| N, |scdecl| D)
 		|| W = @type.msg
 		|| thg = w.msg(@thg, V.name)
 		thg.obj = V.typenormal
+		w.obj = V.typenormal
 		.wrapwith(w)
 
 

@@ -85,14 +85,14 @@ class SCDecl (SCObject) {
 
 	|int|				C_Array
 	
-	|SCFunction--|		Setter		// todo: replace the .stringdata/hider thing with this.
-	|Object|			IsLookupOnly
+	|SCFunction--?|		Setter		// todo: replace the .stringdata/hider thing with this.
+	|Object?|			IsLookupOnly
 	|string|			StringData	// 3 special objects. Aren't they exclusive? Write some code to see if they are.
-	|SCDecl|			Internal	// only for pointers :)
+	|SCDecl?|			Internal	// only for pointers :)
 	
 	//|SCDecl|			NextContains // for multiple contains
-	|SCDecl|			Contains
-	|Message|			Default
+	|SCDecl?|			Contains
+	|Message?|			Default
 	|SCClass|			Type
 	|SCDeclInfo|		Info
 	|AsmReg|			DReg
@@ -387,12 +387,19 @@ class SCDecl (SCObject) {
 	function IsDataType (|bool|)
 		return .Type.Isdatatype and !.PointerCount and !.IsCArray
 
-	function IsProto (|bool|)
-		return .Type.FuncProto
+
+	function message.GetFunctionPointer (|scfunction|)
+		opt norefcounts
+		|| d = .obj as scdecl		#require
+		if d.isnormal
+			|| t = d.type
+			return t.funcproto
+
+	
 
 	function IsObject (|bool|)
 		return .Type.IsObject and !.IsCArray
-		
+	
 		
 	function IsNormalObject (|bool|)
 		return (!.PointerCount) and (!.IsNil) and .IsObject
@@ -619,7 +626,6 @@ class SCDecl (SCObject) {
 
 
 	function IsNormal (|bool|)
-		debugger .Type
 		return (!.PointerCount) and (!.IsNil) and !.IsCArray
 
 
@@ -739,20 +745,21 @@ class SCDecl (SCObject) {
 
 
 	function IsReffable (|bool| SetOnly, |bool|)
+		opt norefcounts
 		require (!.PointerCount)
-		require (.Type)
-		require (.Type.IsObject)
 		require (self is altered)
 		require (!(SetOnly and (self Is Borrowed)))
-
-		Return true
+		|| t = .type
+		return  t  and  .Type.IsObject
 
 
 	function HasStruct (|bool|)
 		opt norefcounts
-		require (!.PointerCount)
+		require !.PointerCount
 		|| T = .type
-		debug_require (T)
+//		debug_require (T)
+		// OK... it is complaining about this. because... it SHOULD exist.
+		// we are gonna hit this bug later... but I guess just remove it here.
 		return T.isstruct
 	
 	
@@ -773,8 +780,8 @@ class SCDecl (SCObject) {
 		if (TypeCast & kTypeCastIgnoreContained)
 			return true
 
-		|| oc = o.reallycontains
-		|| sc =  .reallycontains
+		|| oc = o.ReallyContains
+		|| sc =  .ReallyContains
 		if (oc == sc) or !(sc and oc) or !o.contains
 			return true
 		Return sc.TypeMatch( oc, 0 ).IsNormalMatch

@@ -839,7 +839,7 @@ module
 
 	function NeuClassSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |bool| HasPtrs,  |SCClass|)
 		if !ForInterface
-			expect (parent==compiler.program) (errplace, "Internal Error")
+			expect (parent==compiler.program) (errplace, errorreceiver.NonFatal)
 		
 		|| arg = node.GiveArg
 		|| cls = SCClass.new( node, parent, hasptrs )

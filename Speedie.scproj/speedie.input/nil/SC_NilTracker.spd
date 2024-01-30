@@ -100,9 +100,7 @@ struct ArchonPurger
 		target debug
 			ndb4()
 		
-		d.NilReg = N * d.TypeSuffers
-		if !d.TypeSuffers and d.nildeclare != nilstate.real
-			
+		d.NilReg = N * d.TypeSuffers			
 		d.DReg.Reg = n // right? might as well do this at the same time?
 		d.NilAllocDepth = .currDepth
 		target debug

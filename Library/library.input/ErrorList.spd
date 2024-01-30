@@ -224,6 +224,7 @@ class ErrorReceiver
 
 
 	module
+		|String|	NonFatal = "Non-Fatal Internal Error"
 		function OutOfMemory (|bool|)
 			cpp_Wrapper JB_OutOfMemoryOccurred
 			
@@ -239,10 +240,10 @@ class ErrorReceiver
 
 extend Object
 	syntax expect
-		"Non-Fatal Internal Error"
+		printline errorreceiver.NonFatal
 		app.CrashPrint
 		"${app.ObjMemory.strsize} memory used"
-		stderr.NewError(nil, "Non-Fatal Internal Error")
+		stderr.NewError(nil, errorreceiver.NonFatal)
 
 
 extend string

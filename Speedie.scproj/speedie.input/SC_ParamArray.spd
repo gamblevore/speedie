@@ -9,9 +9,9 @@ class SCParamArray
 		cpp_part		PA
 	contains message
 
-	|Message[11]--|		Items
+	|Message--?[11]|	Items
 	|Message--|			Exp
-	|SCClass--|			Cls
+	|SCClass--?|		Cls
 	|int16|				Size
 	|int16|				ErrCount
 	|bool|				IsAssigns
@@ -115,7 +115,7 @@ class SCParamArray
 
 
 	syntax cast (|bool|)
-		return .HasProperParams
+		return (self != nil) and .HasProperParams
 
 
 	function AddParam (|message| item)
@@ -131,9 +131,9 @@ class SCParamArray
 
 
 	function Range (|IntRange|)
-		|| y = .size
+		|| yyy = .size
 		|| x = (.isdot and .IsNotModule)|int|
-		return (x,y)|intrange|
+		return (x,yyy)|intrange|
 
 
 	function MacroSize (|int|)

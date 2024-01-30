@@ -116,19 +116,21 @@ function String (niltrackerfn)
 
 function Function (NilTrackerFn)
 	opt norefcounts
-	debugat 81
 	|| fp = msg.first
 	|| prms = fp.next
-	|| fn = prms.obj|SCFunction|
-	fn.NilPrint(false)
-	
 	if msg.tmptype == ASMtmp.kTern
 		return tern(prms, test)
 
-	if (fp.func == @bra)
+	|| fn = prms.obj|SCFunction|
+	if !fn
+		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
 		debugat
 		.UseChildAsReal(fp.first)						// (abc)()
-
+		fn = fp.GetFunctionPointer		#require
+	
+	
+	fn.NilPrint(false)
+	
 	if (test is active) and fn.IsNilChecker
 		Test |= NilCheckMode.Soft
 		if t.FnAbleToNilCheck
@@ -165,7 +167,7 @@ function Function (NilTrackerFn)
 	
 	|| ret = fn.ReturnType
 		rz |= ret.NilDeclared
-		check ((rz is stated) or !ret.TypeSuffers) (msg, "Nil-decoration needed on function return.")
+		check ((rz is stated) or !ret.TypeSuffers) (msg, "Nil-decoration needed on return type of function: " + fn.RenderName)
 
 
 function Rejoin (NilTrackerFn)
@@ -344,11 +346,12 @@ function BooleanLogic (niltrackerfn)
 
 
 function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperator| scop,  |nilstate|)
+	opt norefcounts
 	|| LNil = ll.IsNowNil
 	|| RNil = rr.IsNowNil
 	if !lnil and !rnil			// if (a > b)
-		.jump(ll, test)
-		.jump(rr, test)
+		.jump(ll)
+		.jump(rr)
 		return nilstate.real
 	
 	if (lnil and rnil)

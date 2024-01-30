@@ -1039,11 +1039,6 @@ helper FindProjectSub (|string| base, |string| Path, |File|)
 }
 
 
-function ProjName (|String|)
-	return Compiler.Program.ExportName // OK
-
-
-
 // recursive is a bit akward...
 	// x --> a
 	// a --> b

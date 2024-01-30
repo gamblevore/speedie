@@ -178,7 +178,9 @@ function SubProjName (|string|)
 // so... how to do this? basically... we want... different names per project.
 // so if SC includes JB... all the JB files get JB, and SC keeps SC.
 // first we need different projects to have different names!
-	return ProjName()
+	opt norefcounts
+	|| p = Compiler.Program
+		return p.ExportName
 
 
 function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|)

@@ -55,10 +55,11 @@ function PreRun
 
 
 function CanOpt (|bool| force, |bool|)
+	opt norefcounts
 	if force
 		return true
-	if currclass
-		return !currclass.minopt
+	|| c = CurrClass
+		return !c.minopt
 
 
 function OptStart (|FastStringCpp| fs, |int| m, |bool| force = 0)
@@ -152,11 +153,11 @@ function SetupFlow (|SCFunction| f)
 	if Options.GenFlowControlCode and !f.FlowDisabled
 		Cpp_Export.IfName = "iif"
 		Cpp_Export.WhileName = "wwhile"
-		compiler.TernaryFunc.exportname = "JB_Ternaryy"
+		compiler.TernaryFunc!.exportname = "JB_Ternaryy"
 	  else
 		Cpp_Export.IfName = "if"
 		Cpp_Export.WhileName = "while"
-		compiler.TernaryFunc.exportname = "JB_Ternary"
+		compiler.TernaryFunc!.exportname = "JB_Ternary"
 
 
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)

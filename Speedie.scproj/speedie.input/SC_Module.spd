@@ -9,12 +9,12 @@ class SCModule (SCBase) {
 linkage
 	cpp_part		Mod
 
-|SCClass|					Cls
-|Message|					InitVarsArg
-|Message|					InitCodeArg
+|SCClass?|					Cls
+|Message?|					InitVarsArg
+|Message?|					InitCodeArg
 |string|					CppPart
-|CppRefs|					DefaultRefs
-|message|					InitAfter
+|CppRefs?|					DefaultRefs
+|message?|					InitAfter
 |string|					SubsFrom
 |bool|						Grabbed
 |bool|						IsImport
@@ -38,7 +38,8 @@ render
 function SuperMod (|scmodule|)
 	opt norefcounts
 	|| c = .cls
-		return c.super.modul
+		|| s = c.Super
+			return s.modul
 
 
 function IsProperModule (|bool|)

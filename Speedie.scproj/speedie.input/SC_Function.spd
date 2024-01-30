@@ -48,7 +48,7 @@ linkage
 |CppRefs|				Refs
 |dictionary of SCBase|	LinkTo
 |object|				CounterPart
-|SCFunction|			NextFunc
+|SCFunction?|			NextFunc
 |µFunc|					ASM
 |SCDecl|				ProtoDecl
 |SCClass|				ProtoType
