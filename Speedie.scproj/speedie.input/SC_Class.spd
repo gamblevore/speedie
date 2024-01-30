@@ -9,9 +9,9 @@ class SCClass (SCBase) {
 linkage
 	cpp_part		Class
 
-|SCClass|					Super
-|Message|					Defawlt
-|Message|					False
+|SCClass?|					Super
+|Message?|					Defawlt
+|Message?|					False
 |SCModule|					Modul
 |[SCDecl]|					Properties
 |SCDecl|					TypeNormal
@@ -19,22 +19,22 @@ linkage
 |SCDecl|					TypeReal
 |[SCFunction]|  			Casts
 |[SCClass]|					Children
-|SCDecl|					Contained
-|scdecl|					Signed								// int/uint
-|scdecl|					_NotConst
-|SCFunction|				FuncProto
-|SCFunction|				TheIsFunc
-|SCFunction|				ConstructorFunc
-|SCFunction|				DestructorFunc
+|SCDecl?|					Contained
+|scdecl?|					Signed								// int/uint
+|scdecl?|					_NotConst
+|SCFunction?|				FuncProto
+|SCFunction?|				TheIsFunc
+|SCFunction?|				ConstructorFunc
+|SCFunction?|				DestructorFunc
 |string|					CppClass
-|SCDecl|					ClassType
+|SCDecl?|					ClassType
 |SCDecl|					SelfDecl
-|Message|					IsModel
-|SCBehaviour|   			Behaviour
+|Message?|					IsModel
+|SCBehaviour?|   			Behaviour
 |string|					SaveAs
-|SCClass|					ProcessAs
-|SCClass|					DowngradeTo
-|SCDecl|					DataTypeWrapper
+|SCClass?|					ProcessAs
+|SCClass?|					DowngradeTo
+|SCDecl?|					DataTypeWrapper
 |uint16|					Size
 |uint16|					Depth
 |uint16|					StructContainerDepth
