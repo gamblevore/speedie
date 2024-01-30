@@ -404,6 +404,7 @@ function ExtractAmount (|Message| Prms, |SCBase| name_space, |SCDecl| R, |bool|)
 		typeofunit(num, nil, nil)
 	require num.expect(@num) and num.expectlast
 	R.C_Array = Num.Name.ParseInt
+	r.nildeclared = nilstate.real // very real!
 	R.Default = «arg »
 	return true
 

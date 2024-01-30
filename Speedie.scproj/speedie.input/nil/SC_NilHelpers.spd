@@ -91,7 +91,9 @@ function message.IsNowNil (|bool|)
 
 
 function scdecl.TypeSuffers (|bool|)
-	return (.IsObject or .PointerCount) and !.IsCArray
+	if .name ~= "_FuncArray_" or "JB__FuncArray_"
+		debugat
+	return .IsObject or (.PointerCount and !.IsCArray)
 
 function SCdecl.IsCArray (|bool|)
 	return .c_array > 0 // change this later to allow carrays of 0.

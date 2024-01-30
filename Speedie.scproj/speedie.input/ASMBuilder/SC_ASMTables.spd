@@ -85,6 +85,7 @@ dispatch fn_asm_table (fn_asm)
 		debugger
 	
 	63:
+		0
 
 
 datatype ASMtmp (MsgUIFlags)

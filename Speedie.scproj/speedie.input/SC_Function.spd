@@ -1125,7 +1125,7 @@ function RegType (|datatypecode|)
 		return .returntype.regtype
 
 
-function scdecl.MarkAsRefAltered
+function scdecl.MarkAsRefAltered 
 	opt norefcounts
 	(self is altered)
 	if self is typeimprove

@@ -3,7 +3,7 @@
 class Macro 
 	|bool|				Cleaned
 	|string|  			input
-	|message| 			_Parsed
+	|message?| 			_Parsed
 	constructor (|string| s)
 		cpp_part ConstructorStr
 		.input = s

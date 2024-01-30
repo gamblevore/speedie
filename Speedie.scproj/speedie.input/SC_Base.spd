@@ -375,8 +375,10 @@ function MyProj (|SCBase|)
 
 
 function ProjectFix (|SCBase|)
-	if (self == compiler.program) and (scimport.curr)
-		return scimport.curr.Mod
+	opt norefcounts
+	if (self == compiler.program)
+		|| c = scimport.curr
+			return c.Mod
 	return self
 
 

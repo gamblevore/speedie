@@ -781,6 +781,7 @@ function Tran_FuncTable (|Message| msg, |bool|)
 					arel = arel.copy
 				item_value = item_value.unbra.WrapWith( ARel )
 			  else
+				check (item_value != @emb) (item_value, "Use an argument instead.")
 				if (item_value != @arg)
 					item_value = item_value.wrapwith(@arg.msg)
 			

@@ -629,7 +629,7 @@ class SCDecl (SCObject) {
 			return .contains.MiniMatch(ty)
 		
 		
-	function WriteType (|int| minimal = false, |Message|)
+	function WriteType (|int| minimal = 0, |Message|)
 		opt norefcounts
 		|| simple = .WriteSimpleType
 		if !.Contains or (minimal and .AlreadyContains)
@@ -659,10 +659,14 @@ class SCDecl (SCObject) {
 			»
 		if self is borrowed
 			rz = «arel "--", rz »
-		if .TypeSuffers and .isoptional	/// pointers are already optional
-			rz = «brel "?", rz »		// depends if this is for debug?
-										// for debug I'd rther not see ! all over
-										// for code use... we need the "!" ?
+		if .TypeSuffers and .nilstated
+			if .isoptional
+				rz = «brel "?", rz »
+			  elseif .isreal and platform.isdebug
+				rz = «brel "!", rz »
+
+//		if .TypeSuffers and .isoptional
+//			rz = «brel "?", rz »
 				
 	
 	
@@ -973,11 +977,11 @@ class SCDecl (SCObject) {
 			Cast |= kTypeCastBothWays
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
-		require (exp and exp.IsSetIntoPlace and .TypeSuffers)
+		//require (exp and exp.IsSetIntoPlace and .TypeSuffers)
 		
 		if (self is self) and (scfunction.currfunc is constructor or Destructor) 
 			error (exp, "You can’t modify 'self' in a constructor or destructor.")
-		  elseif self is local
+		  elseif (self is local) and .isobject
 			.MarkAsRefAltered
 						
 

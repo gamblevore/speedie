@@ -28,7 +28,8 @@ extend_module ArchonPurger {
 		@str:	String
 		@num:	Number
 		@char:	Char
-		63:     // for the size
+		63:
+			0     // for the size
 
 
 	dispatch NilTmps (niltrackerfn)
@@ -40,7 +41,8 @@ extend_module ArchonPurger {
 		(asmtmp.kDebugger):		Debugger
 		(asmtmp.kFail):			Fail
 		(asmtmp.krejoin):		Rejoin
-		63: // for size also
+		63:
+			0 // for size also
 
 	
 	TrackerDummies()

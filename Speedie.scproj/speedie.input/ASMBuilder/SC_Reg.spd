@@ -13,7 +13,7 @@ struct AsmReg
 
 	
 	syntax cast (|bool|)
-		return .AType != Datatypecode.UnusedType
+		return self and (.AType != Datatypecode.UnusedType)
 	
 	
 	syntax cast (|int|)

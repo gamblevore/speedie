@@ -8,13 +8,15 @@ class SCArg (SCBase)
 	linkage
 		cpp_part		Arg
 
-	|SCFunction|	ParentFunc
-	|Message|		TmpMovedOutFor
+	|SCFunction?|	ParentFunc
+	|Message?|		TmpMovedOutFor
 	|bool|			IsClassArg
 	|bool|			IsStatementExpr
 
 	function Cls (|SCClass|)
-		Return .ParentFunc$.Cls
+		opt norefcounts
+		|| p = .ParentFunc
+			Return p.Cls
 	
 	constructor (|Message| node)
 	// shouldn't be necessary!
