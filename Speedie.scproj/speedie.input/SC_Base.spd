@@ -14,10 +14,10 @@ linkage
 	cpp_part		Base
 
 |SCBaseInfo|						BaseInfo
-|Dictionary of scobject|			Access
+|(Dictionary of scobject)?|			Access
 |String|							ExportName
-|SCBase--|							Parent
-|SCBase--|							CurrReacher
+|SCBase--?|							Parent
+|SCBase--?|							CurrReacher
 |SCImport--|						Project
 
 
@@ -167,8 +167,8 @@ constructor (|Message| node)
 
 
 function Use
-	if (.Source)
-		.Source.memoryLayer.Use
+	|| s = .source
+		s.memoryLayer.Use
 	.Project.use
 
 
@@ -900,7 +900,7 @@ dispatch RootCollectTable (CollectFunc)
 	insertion			SCThe.NewInsertion
 	conf				compiler.WrongConf
 	crash				{app.crash(node.first.nyme)}
-	module				SCModule.Neu
+	module				SCModule.NeuModule
 	static				{error (node, "static is called 'module' in speedie.")}
 	selector			SCSelector.neu
 	class				SCClass.neuClass

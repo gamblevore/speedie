@@ -153,7 +153,7 @@ module
 		error (errplace, "This should go into a module or class.")
 	
 		
-	function Neu (CollectFunc)
+	function NeuModule (CollectFunc)
 		|| m = SCModule.new
 		m.Project = scimport.curr // hack?
 		

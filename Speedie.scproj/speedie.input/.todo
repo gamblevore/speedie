@@ -1,10 +1,11 @@
 
 
 bugs:
+	* scmodule.NeuModule seems to refcount name_space unnecessarily?
 	* don't use "syntax append", simply "function append". Same with "call". I mean *x --> x.first
 	* sdleventtype.mousedown() // compiles???
 		* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and struct
-	* refcounter passing properties SHOULD NOT assume it won't be cleared... not without disturbance checker
+	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
 	* Function finding fails with dictionary subclasses? DictSub["abc"]
 	* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
 	* vector constants

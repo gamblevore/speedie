@@ -92,10 +92,6 @@ constructor (|Message| node, |SCBase| parent, |bool| HasPtrs)
 	(T isnt altered)
 
 
-function IsSTDLib (|bool|)
-	return .Project.IsSTDLib
-
-
 function SourceClass (|message|)
 	return super.source
 
@@ -675,9 +671,8 @@ function message.HasSelfAsFirst (|bool|)
 
 function scdecl.TypeReach (|scbase| from, |message| src)
 	opt norefcounts, flow off
-	require self
-	|| t = .type
-		t.reach(from, src)
+	if self
+		return .type.reach(from, src)
 
 
 function SCBase.ReachedName (|string|)
@@ -854,7 +849,7 @@ module
 		MoveFutureStaticsIn(Module)				// bad work around
 												// makes impossible to extend a static section...
 
-		cls.Modul = SCModule.Neu( Module, cls, ErrPlace )|SCModule|
+		cls.Modul = SCModule.NeuModule( Module, cls, ErrPlace )|SCModule|
 
 		if (ForInterface and parent isa scmodule)
 			cls.CppClass = "__${parent.cls.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"

@@ -287,7 +287,10 @@ class SCDecl (SCObject) {
 		if .IsCArray
 			require IsAccess
 			|| c = .Copy // should keep borrowedness...
+					     // what about the nildeclare? c-arrays exist, but do their items exist?
 			c.C_Array = 0
+			if c.typesuffers
+				c.nildeclared |= nilstate.optional // 
 			return c
 		
 		if .PointerCount > 0
@@ -967,14 +970,6 @@ class SCDecl (SCObject) {
 		Return kAddressOfMatch
 	
 	
-	function Message.GetAddressOf2
-		|| sigh = .func + .name
-		sigh.takeallfrom(self)
-		.name = "&"
-		.func = @brel
-		self <~ sigh
-
-
 	function ExpectRelMatch (|SCDecl| O,  |Message| exp,  |Message| side,  |Message| ErrNode = nil)
 		opt norefcounts
 		// Just like ExpectMatch, except always does type-casting. and returns nothing.

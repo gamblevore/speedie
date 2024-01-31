@@ -24,7 +24,7 @@ class SCImport
 		.Resources = Dictionary()
 		.BlindCast = (0, errorseverity.error)(builtin)
 		.DeclLayer = (scdecl).CreateLayer(self)
-		|| M = SCModule.Neu( nil, compiler.program, nil )|SCModule|
+		|| M = SCModule.NeuModule( nil, compiler.program, nil )|SCModule|
 		.Mod = M
 		M.Project = self
 		M.IsImport = true
@@ -214,8 +214,8 @@ class SCImport
 	module
 		|[SCFile]|			AllFiles
 		|dictionary|		Shaders // name per shader, storing file or string
+		|scimport--?|		Curr
 		|date|				Recent
-		|scimport--|		Curr
 		|bool|				STDLibTime
 		|byte|				CurrIsManuallyImported
 		

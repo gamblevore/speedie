@@ -77,7 +77,8 @@ function UseChildAsReal (|message| msg, |NilState|) 	// a.b, *a, a[0], (a)()
 		|| actual = .Jump(ch)
 		if actual is nilish								// works e
 			.BecomeReal(ch.FastDecl, ch)
-	return dcl.nildeclared
+		return dcl.nildeclared
+	debugger // what?
 
 
 function Rel (NilTrackerFn)
@@ -124,9 +125,8 @@ function Function (NilTrackerFn)
 	|| fn = prms.obj|SCFunction|
 	if !fn
 		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
-		debugat
-		.UseChildAsReal(fp.first)						// (abc)()
-		fn = fp.GetFunctionPointer		#require
+		fn = fp.GetFunctionPointer
+		require fn and .UseChildAsReal(fp.first)						// (abc)()
 	
 	
 	fn.NilPrint(false)
@@ -175,6 +175,7 @@ function Rejoin (NilTrackerFn)
 
 
 function DetectStillChecks (|message| first, |nilstate|)
+	require first
 	rz = .jump(first)
 	if !t.FnAbleToNilCheck or (rz is FnBecomesNilCh)
 		return rz
@@ -227,12 +228,11 @@ function DetectStillChecks (|message| first, |nilstate|)
 
 function Return (NilTrackerFn)
 	opt norefcounts
-	|| ret = t.return	#require
 	|| v = .DetectStillChecks(msg.first)
-		
 	t.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
-	if ret.typesuffers
+	|| ret = t.return
+	if ret and ret.typesuffers
 		if ret.isreal
 			expect  (v isnt nilish)   (msg, "Declaration does not allow returning " + v.rawname)
 		
@@ -560,7 +560,6 @@ function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 		return T.SetNilness(sent, NilState.real)
 
 	error (where, "NilObjectError accessing optional: " + where.render)
-	return nilstate.real
 }
 
 

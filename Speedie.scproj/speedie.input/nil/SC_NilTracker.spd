@@ -96,15 +96,12 @@ struct ArchonPurger
 		|| P = .Place
 		|| N = p.value.NextCount
 		expect (N < 31)								(D, "Too many declarations")
-		(p)(n) = nd
 		target debug
-			ndb4()
-		
+			.dbg[n] = d
 		d.NilReg = N * d.TypeSuffers			
 		d.DReg.Reg = n // right? might as well do this at the same time?
 		d.NilAllocDepth = .currDepth
-		target debug
-			.dbg[n] = d
+		(p)(n) = nd
 		if !d.nilcurr // bug!
 		return nd
 	
@@ -210,7 +207,7 @@ struct ArchonPurger
 				t.Finish(f)
 
 		
-		function PurgeArchons
+		function FixArchons
 			opt norefcounts
 			require app["nil"].Yes
 
@@ -221,6 +218,7 @@ struct ArchonPurger
 					.KhalaiPurification(f, 1)
 					rec.ReturnErrors
 				for (f in compiler.funclist) (i)
+					//if i == 1104
 					.KhalaiPurification(f, 2)
 					"		Func: ${i+1} / ${compiler.funclist.length}"
 					rec.ReturnErrors

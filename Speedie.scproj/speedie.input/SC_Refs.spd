@@ -171,9 +171,9 @@ function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 	using (msg)
 	rz = NewFnc( name )
 	|| lst = rz.Last
-	lst <~ msg.Copy
+	lst <~ msg.Copy // shouldn't copy always... sometimes we want it directly, like .FillInDestructor!
 	lst.obj = func
-	rz.position = -1 // why not. its not real.
+	rz.position = -1
 	rz.obj = func.returntype ?? typevoid
 
 
@@ -719,6 +719,7 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 	return PAF
 
 
+	
 function scfunction.FillInDestructor
 	|| first = .SourceArg.FindDestructor
 	Using .sourcearg
@@ -727,9 +728,8 @@ function scfunction.FillInDestructor
 			.SourceArg.AddBefore( first, d.RefDestructor )
 		  else
 			|| Destr = d.HasStructDestructor
-				|| dm = .DeclToDot(d)
-				|| Obj = «brel "&", dm »
-				.SourceArg.AddBefore( first, SCRefs.RefDestructorMsg( Obj, destr ) )
+				|| Addr = d.DeclToAddr(.self)
+				.SourceArg.AddBefore( first, SCRefs.RefDestructorMsg( Addr, destr ) )
 
 
 function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|)
@@ -836,20 +836,29 @@ function SCFunction.RefsCheckPropertiesAltered
 					SCRefs.RefMarkAsDisturber( ch, self )
 
 
-function DeclToDot2 (|scdecl| d, |string| s, |Message|)
-	opt norefcounts
-	rz = @dot+s
-	|| slf = rz.msg(@thg, "self")
-	|| d2 = scfunction.currfunc.self
-		slf.obj = d2
+
+function scdecl.DeclToAddr (|SCDecl| P0, |Message|)
+	|| Acc = .DeclToDot(p0)
+	rz = «brel "&", Acc »
+	rz.obj = .GetAddress
+
+
+function scdecl.DeclToDot (|SCDecl| P0, |Message|)
+	|| slf_msg = «thg "self"»
+	slf_msg.obj = p0
+	
+	rz = @dot + .Name
+	rz <~ slf_msg
 	rz.msg(@emb)
-	rz.obj = d // we need this, as it is a decl... but for locals... we don't need it!
+
+	rz.obj = self
+
 }
 
 
 function scdecl.RefDestructor (|message|)
 	opt norefcounts
-	|| m = screfs.DeclToDot2(self, .name)
+	|| m = .DeclToDot(scfunction.currfunc.self)
 	if .IsCArray
 		return screfs.DecrMulti(self, m)
 	  else

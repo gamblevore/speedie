@@ -220,10 +220,6 @@ class SCBehaviour (SCBase)
 
 	function SCBase.ShouldBeClass (|message|errplace, |SCClass|)
 		return .IsNormalObject #expect (errplace, "Can only use this in a class.")
-	
-
-	function SCModule.InterfaceFunc (|SCFunction|)
-		return .Cls.FuncProto
 
 	
 	function SCFunction.AddSelfPrm (|SCClass| cls)

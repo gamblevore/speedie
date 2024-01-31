@@ -28,7 +28,7 @@ class StringReader
 		.length = file.size
 		.ReadChunk
 
-//	constructor (|stringstream| Compressed)
+//	constructor (|stringreader| Compressed)
 //		cpp_part ConstructorDecomp
 //		.Decomp = Compressed
 //		.length = file.size
@@ -61,7 +61,8 @@ class StringReader
 		if .data has 1
 			return true
 		return .NextChunk
-	
+
+
 	helper NextChunk (|bool|)
 		opt norefcounts
 		if .file

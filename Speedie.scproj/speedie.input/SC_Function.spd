@@ -43,17 +43,17 @@ linkage
 	cpp_part		Func
 
 |[SCDecl]|				Args
-|SCClass|				Cls
+|SCClass?|				Cls
 |String|				Description
-|CppRefs|				Refs
+|CppRefs?|				Refs
 |dictionary of SCBase|	LinkTo
-|object|				CounterPart
+|object?|				CounterPart
 |SCFunction?|			NextFunc
-|µFunc|					ASM
-|SCDecl|				ProtoDecl
-|SCClass|				ProtoType
-|SCDecl|				ReturnType
-|scfunction--|			DepthFinder
+|µFunc?|				ASM
+|SCDecl?|				ProtoDecl
+|SCClass?|				ProtoType
+|SCDecl?|				ReturnType
+|scfunction--?|			DepthFinder
 |uint16|				LinkDepth
 |uint16|				TmpCounter
 |uint|					AllocCode // some flags above 255!
@@ -1134,16 +1134,6 @@ function scdecl.MarkAsRefAltered
 			(orig is altered)
 
 
-function DeclToDot (|SCDecl| d, |Message|)
-	|| slf_msg = «thg "self"»
-	slf_msg.obj = .self
-	
-	rz = @dot + d.Name
-	rz <~ slf_msg
-	rz.msg(@emb)
-
-	rz.obj = d
-
 
 function Self (|scdecl|)
 	opt norefcounts
@@ -1155,7 +1145,7 @@ function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
 	require !d.IsCArray				// we actually need to clear it!
 	
 	|| def = d.CreateDefault(place)
-	return NeweqRel( .DeclToDot(d), def )
+	return NeweqRel( d.DeclToDot(.self), def )
 
 
 function DoLinkTo (|SCBase| B)
@@ -1170,7 +1160,7 @@ function NewNilRel (|SCDecl| d, |Message|)
 	// .bla = nil
 	|| def = «thg "nil"»
 	def.Obj = TypeNil
-	return NeweqRel( .DeclToDot(d), def )
+	return NeweqRel( d.DeclToDot(.self), def )
 
 
 
@@ -1769,10 +1759,13 @@ function scfunction.UpdateSourceSub (|message| src, |bool|)
 
 
 function scfunction.SetBlindCasts (|scbase| name_space)
-	if name_space and name_Space.project
-		.BlindCasts		= name_space.project.blindcast
-	  elseif scimport.curr
-		.BlindCasts		= scimport.curr.blindcast
+	opt norefcounts
+	if name_space
+		|| p = name_Space.project?
+			.BlindCasts	= p.blindcast
+	  else
+		|| c = scimport.curr
+			.BlindCasts	= c.blindcast
 
 
 function scfunction.Init_Sub (|message| node,  |scbase| name_space)

@@ -165,7 +165,7 @@ function CompileAll (|bool|)
 	
 	require .Stage( "NilChecking" )
 	.Timer( "NilChecking" )
-	ArchonPurger.PurgeArchons
+	ArchonPurger.FixArchons
 	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )

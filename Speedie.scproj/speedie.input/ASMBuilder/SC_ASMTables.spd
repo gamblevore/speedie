@@ -7,7 +7,7 @@ dispatch fn_asm_table (fn_asm)
 		for ch.fast in exp
 			.µ(ch, garb)
 		.closevars(OV)
-			
+
 
 	@decl: // yay
 		debugger
@@ -15,6 +15,8 @@ dispatch fn_asm_table (fn_asm)
 
 	@num:
 		debugger
+
+
 	@rel:
 		opt norefcounts
 		|| OV = .openvars
@@ -31,8 +33,8 @@ dispatch fn_asm_table (fn_asm)
 		if r.reg
 			return r
 		return .AllocReg(exp, d, reg)
-	
-	
+
+
 	@bra:
 		opt norefcounts
 		|| f = exp.first

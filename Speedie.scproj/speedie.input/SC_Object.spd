@@ -5,9 +5,9 @@
 
 
 class SCObject
-	|dictionary of SCBase|		LinkFrom
+	|(dictionary of SCBase)?|	LinkFrom
 	|string|					Name
-	|Message|					Source
+	|Message?|					Source
 	|uint16|					TableId
 	|byte|						NoAutoComplete
 	|Byte|						AllocSource
