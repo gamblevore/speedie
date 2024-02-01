@@ -56,17 +56,18 @@ datatype Syntax (Byte)
 	
 	function Name (|string|) 
 		Opt NoRefCounts
-		if (!self)
-			return "child"
-		return .obj.name
+		if self
+			|| o = .obj
+				return o.name
+		return "child"
 	
 	
 	function LongName (|string|) 
 		Opt NoRefCounts
-		if (!self)
-			return "child"
-		return .obj.longname
-	
+		if self
+			|| o = .obj
+				return o.longname
+		return "child"
 	
 	function Obj (|syntaxobj|) 
 		return _FuncArray_[self|int|]
@@ -91,19 +92,19 @@ datatype Syntax (Byte)
 		
 	function ExportAddr (assigns:|fpMsgRender|) 
 		Opt NoRefCounts
-		.obj.exportaddr = Value
+		.obj!.exportaddr = Value
 	
 	function ExportAddr (|fpMsgRender|) 
 		Opt NoRefCounts
-		return .obj.exportaddr
+		return .obj!.exportaddr
 	
 	function RenderAddr (assigns:|fpMsgRender|) 
 		Opt NoRefCounts
-		.obj.renderaddr = Value
+		.obj!.renderaddr = Value
 	
 	function RenderAddr (|fpMsgRender|) 
 		Opt NoRefCounts
-		return .obj.renderaddr
+		return .obj!.renderaddr
 	
 	
 	module 

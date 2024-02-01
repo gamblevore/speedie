@@ -17,6 +17,10 @@ class GraphicsEditor (GuiControl)
 	|file| 					Backing
 	|int| 					BG
 	
+	constructor (|guicontrol| parent)
+		super.Constructor(parent)
+	
+	
 	function Load (|bool|)
 		require .Backing
 		|| d = .backing.Read(64MB)
@@ -78,9 +82,11 @@ class GraphicsEditor (GuiControl)
 		j.up 5
 		j.Flush
 	
+	
 	function image.RawData (|string|)
 		return string.FromPtr(.ptr, .ByteCapacity)
-			
+	
+					
 	function jbin.AddImage	(|image| img, |string| name)
 		.enter(@tmp, name)
 		.addint(img.Width)
@@ -97,7 +103,7 @@ class GraphicsEditor (GuiControl)
 							  // everytime a single pixel is altered! Of course... we'd need cells...
 							  // just get it working for now!
 
-	behaviour mousedown
+	behaviour MouseDown
 		if Clicks >= 1
 			.Rotate(keys.shift)
 			return MouseDragging.Handled

@@ -126,7 +126,7 @@ function Function (NilTrackerFn)
 	if !fn
 		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
 		fn = fp.GetFunctionPointer
-		require fn and .UseChildAsReal(fp.first)						// (abc)()
+		require fn and .UseChildAsReal(fp)						// (abc)()
 	
 	
 	fn.NilPrint(false)
@@ -491,20 +491,18 @@ function arel (Niltrackerfn)
 	debugger // what?
 
 
-function Declaration (niltrackerfn)
+// 
+function Declaration (niltrackerfn) // function decl 
 	opt norefcounts
 	|| rel = msg.last
 	if rel == @thg
 		if rel.FastDecl.isreg
 		return 0
-		
+	
 	|| d = rel.first.FastDecl
 	if d.IsReg
 		|| J = .Jump(rel.last)
 		return T.Declare(D, J)
-
-	// its always a rel, right? so anyhow... we should just set the thing, dont call SetRel, its... ugly.
-	// at least confusing to debug
 
 
 function SetRel (NilTrackerfn)

@@ -17,7 +17,7 @@ class Message (RingTree)
 ////////////////////////////////
 	contains Message
 	|string|				Name
-	|Object(tag)|			Obj					// Allow users to attach interesting information.
+	|Object(tag)?|			Obj					// Allow users to attach interesting information.
 	|Syntax|				Func
 	|Byte|					Indent
 	|uint16|				RangeLength
@@ -558,7 +558,8 @@ class Message (RingTree)
 	syx url (URL)
 		fs <~ .Name
 		fs <~ "://"
-		fs <~ .First.name
+		|| f = .first
+			fs <~ f.name
 	
 	function RenderPrm (|FastString| fs, |Byte| b1, |Byte| b2)
 		fs <~ b1
@@ -1139,12 +1140,10 @@ class Message (RingTree)
 	operator In (|message| f, |bool|)
 		cpp_Part InMsg
 		opt norefcounts
-		if self
-			return .parent == f
+		return .parent == f
 		
 	operator In (|syntax| f, |bool|)
 		opt norefcounts
-		require self
 		|| p = .parent
 			return p.func == f
 

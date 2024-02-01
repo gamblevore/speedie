@@ -411,8 +411,7 @@ function ExtractAmount (|Message| Prms, |SCBase| name_space, |SCDecl| R, |bool|)
 	if num == @unit
 		typeofunit(Num, nil, nil)
 	require num.expect(@num) and num.expectlast
-	R.c_array = Num.Name.ParseInt
-	r.nildeclared = nilstate.real // very real!
+	R.CArraySize = Num.Name.ParseInt
 	R.Default = «arg »
 	return true
 
@@ -897,8 +896,7 @@ function TypeOfArr (ExprResolver)
 		if isdispatch and result.type != typedictionary // dispatches use function pointers... 
 			result.type = c.type
 			result.contains = nil
-			result.c_array = IsDispatch-1
-			result.nildeclared = nilstate.real
+			result.CArraySize = IsDispatch-1
 			exp.func = @arg
 			tran_argarray(exp, name_space)
 		  elseif  !c.type.isobject
@@ -1719,6 +1717,7 @@ function Message.FindDestructor (|Message|)
 
 function TypeOfArgArr (ExprResolver)
 	|| result = SCDecl.new
+	|| Count = 0
 	for itm in exp
 		if itm == @tmp
 			itm.func = @thg
@@ -1729,7 +1728,9 @@ function TypeOfArgArr (ExprResolver)
 					result.type = oof.type
 			  else
 				result.type = contained.type
-			result.c_Array++
+			Count++
+
+	result.Carraysize = Count
 	
 	expect result.type (exp, "Can't get the type of this.")
 	exp.obj = result
@@ -1779,8 +1780,7 @@ function Tran_ArgArray (|Message| Exp, |SCBase| name_space)
 	if counter.isitem and already.mustbe(scdecl)
 		|| c = counter.max+1
 		check (c < 16K) (exp, "Too many items in C-array.")
-		already.c_array = c
-		already.nildeclared = nilstate.real
+		already.CArraySize = c
 		
 		
 

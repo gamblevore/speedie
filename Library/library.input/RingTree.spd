@@ -20,16 +20,15 @@ class RingTree (Saveable)
 	contains		RingTree
 
 	
-	function Parent (||)				{ cpp_wrapper JB_Ring_Parent }
-	function Parent (assigns:||)
-		cpp_wrapper JB_Ring_ParentSet // allows set parent to nil, also self can be nil if parent is nil 
-		cpp_refs {disturbs self} 
-	
 	constructor							{ cpp_wrapper JB_Ring_Constructor0 }
 	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor }
 	destructor							{ cpp_wrapper JB_Ring_Destructor }
 	
-
+	function Parent (||)				{ cpp_wrapper JB_Ring_Parent, nil checker }
+	function Parent (assigns:|...?|)
+		cpp_wrapper JB_Ring_ParentSet // allows set parent to nil, also self can be nil if parent is nil 
+		cpp_refs {disturbs self} 
+	
 	function Next (||)					{ cpp_wrapper JB_Ring_NextSib, nil checker }
 	function Next (assigns:||)			{ cpp_wrapper JB_Ring_NextSibSet }
 
@@ -48,10 +47,10 @@ class RingTree (Saveable)
 			return x.next
 
 
-	function Root (||)					{ cpp_wrapper JB_Ring_Root, nil checker }
-	function IsRoot (|bool|)			{ cpp_wrapper JB_Ring_IsRoot, nil checker }
+	function Root	 (||)				{ cpp_wrapper JB_Ring_Root, nil checker }
+	function IsRoot  (|bool|)			{ cpp_wrapper JB_Ring_IsRoot, nil checker }
 	function IsFirst (|bool|)			{ opt norefcounts, return .prev == nil }
-	function IsLast (|bool|)			{ opt norefcounts, return .next == nil}
+	function IsLast  (|bool|)			{ opt norefcounts, return .next == nil}
 
 	function HasAny (|bool|)			{ cpp_wrapper JB_Ring_HasChildren, nil checker }
 	function HasChildren (|bool|)		{ Disabled ".hasany" }

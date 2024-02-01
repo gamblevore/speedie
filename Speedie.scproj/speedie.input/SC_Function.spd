@@ -642,14 +642,16 @@ function DeclsProtoType (|Message| ch0, |SCClass| fpType=nil, |bool| late=false)
 		if !late
 			.DeclsProtoTypeAdd(fpType)
 
+function scdecl.CouldUpgradeToReal (|bool|)
+	return .typesuffers and !.nilstated
 
-function MakeParamsReal
+function MakeParamsReal // for cpp funcs...
 	opt norefcounts
 	for (a in .args) (i)
-		if a.TypeSuffers
+		if a.CouldUpgradeToReal
 			.args[i] = a.DefaultToReal
 	|| r = .ReturnType
-		if r.TypeSuffers
+		if r.CouldUpgradeToReal
 			.returntype = r.DefaultToReal
 
 function CollectReturnAsReal (|bool|)

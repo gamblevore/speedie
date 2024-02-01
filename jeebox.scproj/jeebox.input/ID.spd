@@ -83,9 +83,9 @@ function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)
 
 struct MessageDecompressor
 	linkage:cpp_part Mxpd
-	|&Message--|					End
-	|&Message--|					Curr
-	|&Message--|					Table
+	|(&Message--)?|					End
+	|(&Message--)?|					Curr
+	|(&Message--)?|					Table
 
 	helper Allocate (|bool|)
 		require StdErr.ok

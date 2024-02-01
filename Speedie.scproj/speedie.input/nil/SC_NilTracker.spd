@@ -218,7 +218,6 @@ struct ArchonPurger
 					.KhalaiPurification(f, 1)
 					rec.ReturnErrors
 				for (f in compiler.funclist) (i)
-					//if i == 1104
 					.KhalaiPurification(f, 2)
 					"		Func: ${i+1} / ${compiler.funclist.length}"
 					rec.ReturnErrors
