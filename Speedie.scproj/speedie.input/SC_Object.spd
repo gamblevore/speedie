@@ -11,7 +11,7 @@ class SCObject
 	|uint16|					TableId
 	|byte|						NoAutoComplete
 	|Byte|						AllocSource
-	
+		
 	render
 		|| cname = ((.class.name|uint64|)+2)|cstring|
 		fs <~ cname

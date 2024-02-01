@@ -80,9 +80,9 @@ function SettingAProperty (|Message| Rel, |Message|)
 	// bla.bla = X
 	opt norefcounts
 	require (Rel.IssetRel)
-	|| it = Rel.first
-		if (it.DotType is Property)
-			return it
+	|| f = Rel.first
+	if f and f.DotType
+		return f
 
 
 function SettingMemory (|Message| Rel, |bool|)
@@ -90,17 +90,8 @@ function SettingMemory (|Message| Rel, |bool|)
 	opt norefcounts
 	require Rel.IssetRel
 	|| f = Rel.first
-		|| d = f.DotType
-		if d // (d is Property or Memory) // only two that exist ?
+		|| d = f.SetType
 			return true
-
-
-function message.SelfKindaUse (|dotusetype|)
-	opt norefcounts
-	|| p = .parent
-	|| R = p.parent
-	if R.issetrel
-		return p.DotType
 
 
 function IsSelfOfSetter (|Message| curr, |Message|)

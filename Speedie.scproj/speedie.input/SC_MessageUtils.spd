@@ -247,11 +247,11 @@ function Message.InsertBefore (|Message| j, |Message| ch)
 		.Last = j
 
 
-function Message.InsertAfter (|Message| j, |Message| ch)
-	if ch
-		ch.next = j
+function Message.InsertAfter (|Message| ins, |Message| after)
+	if after
+		after.next = ins
 	  else
-		.first = j
+		.first = ins
 
 
 function Message.Move (|Message| last, |Message| into)

@@ -1075,7 +1075,7 @@ class autoitem
 	|string|		Display
 	|bool|			Exact
 	|int|			type
-
+	
 	function OKBy (|autoitem| prev, |bool|)
 		if !prev
 			return true
@@ -1092,10 +1092,8 @@ function message.IsClassType (|bool|)
 function message.IsLinkageType (|bool|)
 	return self ~= "linkage"
 
-
 function message.IsExtender (|bool|)
-	return self ~= "extend" or "extend_module"
-	
+	return self ~= "extend" or "extend_module"	
 
 function message.IsModuleType (|bool|)
 	return self ~= "module" or "extend_module" // don't need root. flags:=1 does it
@@ -1110,7 +1108,7 @@ function message.MsgIsProperModule (|bool|)
 
 	
 function message.FindPos (|int| fr, |int| len, |message|)
-	return  .FindPossub(fr, len, true)  ??  .FindPossub(fr, len, false)
+	return  .FindPosSub(fr, len, true)  ??  .FindPossub(fr, len, false)
 
 function message.FindPosSub (|int| fr, |int| len, |bool| Exact, |message|)
 	opt norefcounts

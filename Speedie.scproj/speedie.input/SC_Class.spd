@@ -129,12 +129,13 @@ function PassableCount (|int|)
 		rz += !p.IsCArray
 
 
-function AutoConstructor
+function CreateAutoConstructor (|scfunction|)
 	opt norefcounts
-	|| fn = .CreateEmptyFunc( "Constructor", "ConstructorAuto" )
-	|| node = fn.source
+	rz = .CreateEmptyFunc( "Constructor", "ConstructorAuto" )
+	|| node = rz.source
 	|| prms = node.Second
 	|| arg	= prms.next
+
 	for prop in .properties
 		if !prop.IsCArray
 			|| name = prop.name
@@ -142,12 +143,10 @@ function AutoConstructor
 				name = "sooper"
 			check (name != "__rz__") (prop.source, "Invalid name.")
 			prms <~ prop.WriteDeclTypeAndName(name, 0)
-			arg  <~ «rel
-				«sdot name »
-				«opp "=" »
-				«thg  name »
-			»
-	(fn)
+			|| rel = arg.msg(@rel)
+			rel.msg(@sdot, name)
+			rel.msg(@opp,  "=")
+			rel.msg(@thg,  name)
 
 
 function LoadProperties
@@ -325,20 +324,35 @@ function scfunction.Prms (|message|)
 	return .source.find(@prm)
 
 
+function CanHaveEmptyConstructor (|bool|)
+// just having this function is evidence that automatically
+// creating an empty constructor, is a bad idea. We should
+// explicitly create it... like:
+// 			class abc: constructor empty, constructor auto, function def:printline "def"
+
+	opt norefcounts
+	for p in .properties
+		if p.typesuffers and p.isreal
+			require p.type.DefaultsToReal
+	return true
+
+
 function CreateEmptyConstructors (|scfunction|)
-	|| f = .CreateEmptyFunc( "Constructor" )
+	if .CanHaveEmptyConstructor
+		rz = .CreateEmptyFunc( "Constructor" )
+		(rz is EmptyConstructor)
+
 	|| pc = .PassableCount
-	(f is EmptyConstructor)
 	|| s = .super
-	if s and s != TypeObject // object has no constructor-func
-		|| l = s.constructorfunc.Prms 
-		if l.hasany
-			f.CopyParams(l)
-			pc = 0 // i guess?
+		if rz and s != TypeObject // object has no constructor-func
+			|| l = s.constructorfunc.Prms 
+			if l.hasany
+				rz.CopyParams(l)
+				pc = 0 // i guess?
 	
 	if pc >= 1 and pc <= 8
-		.AutoConstructor
-	return f
+		|| f2 = .CreateAutoConstructor
+		rz := f2
 
 
 function CreateConstructors 

@@ -329,8 +329,10 @@ function RelNeedsRef (|Message| msg, |Message| first, |bool|)
 	Return first.VarOptFlag(kSufferedNoise)
 
 
-function Message.DotType (|DotUseType|)
+function Message.SetType (|DotUseType|)
 	opt norefcounts
+	|| d = .dottype
+		return d
 	|| f = .func
 	if f == @brel
 		if self == "*"
@@ -338,9 +340,15 @@ function Message.DotType (|DotUseType|)
 		return 0
 	if f == @acc
 		return DotUseType.memory
+
+
+function Message.DotType (|DotUseType|)
+	opt norefcounts
+	|| f = .func
 	if f == @Dot
-		if !(.obj isa SCDecl) or (!.last.obj)
-			Return DotUseType.Property
+		|| d = .obj
+		if d isa scdecl
+			Return (d is property) * DotUseType.Property 
 
 
 function RelChangesDisowned (|Message| msg, |String| name, |bool|)
@@ -751,7 +759,9 @@ function SCFunction.BuildConstructorDestructor
 	|| IsConstructor = self is Constructor
 
 	|| TheCall = .CallParents( root, IsConstructor )
-	.FillInConstructorAndDestructor( root, IsConstructor, TheCall )
+	.FillInConstructorAndDestructor( root, IsConstructor )
+	if isconstructor
+		.FillInMissingConstructorDefaults( root, TheCall )
 	require StdErr.OK and !IsConstructor
 	
 	ifn .cls.HasStuffToHandleInDestructor

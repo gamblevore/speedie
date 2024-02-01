@@ -783,49 +783,51 @@ function CheckReturnValue (|Message| msg)
 		.ReturnType.ExpectMatch( FoundReturnType, kTypeCastTrue, c )
 
 
+function Message.SelfUsedForProperty (|int|)
+	opt norefcounts
+	|| R = .parent
+	require r and .func == @dot  and  r.func == @rel
+	if .first IsThing "self"
+		if .DotType
+			return 1 + (r.second.name != "=")
 
-function FillInConstructorAndDestructor (|Message| root, |bool| IsConstructor, |Message| SuperDot)
-	|Dictionary| Dict = nil
-	if IsConstructor
-		dict = Dictionary.new
-	
-	for (curr.flat in root)
-		if curr IsThing "self"
-			|| P = curr.Parent
-			|| KindaUse = curr.SelfKindaUse
-			if (KindaUse isnt Property)
-				|| PObj = P.Obj
-				if (Pobj isa SCFunction) and (P == @prm)
-					if (Pobj.AllocCode == .AllocCode)
-						continue
-				  elseif (KindaUse == functiontype.Comparison)
-					Continue
 
-				warn !(IsConstructor) ( curr, "Don't use self before the constructor is complete." )
+
+function FillInConstructorAndDestructor (|Message| root, |bool| IsConstructor)
+	opt norefcounts
+	require !.Badness
+	for dot.flat in root
+		|| UsedAtAll = dot.SelfUsedForProperty
+			|| t = TypeOfExpr(dot, nil) // won't be nil because the function is OK.
+			|| IsSet = UsedAtAll == 1
+			if !t.IsNormalObject
+				0
+			  elseif (IsConstructor)
+				check (dot.isfirst and IsSet)  (dot, "Can’t read object properties during a constructor.")
+				check (t isnt PropertyWasConstructed)  (dot, "Can’t set object property twice during a constructor.")
+				check (dot.parent in root)   (dot, "Object property set must be at the root. (not nested).")
 			  else
-				|| TheSetter = IsSelfOfSetter( curr )
-				|| t = TypeOfExpr(p, nil)
-					|| tester = TheSetter ?? p
-					if (t.IsNormalObject)
-						(!(IsConstructor and !TheSetter) #check (tester, "Can’t read object properties during a constructor."))
-						(!(!IsConstructor and TheSetter) #check (tester, "Can’t set object properties during a destructor."))
-					
-					if (IsConstructor)
-						|| s = p.name.Lowercase
-						
-						if (t.isNormalObject)
-							(!dict[ s ]					#check (tester, "Can’t set object property twice during a constructor."))
-							(TheSetter.Parent == root	#check (tester, "Object property set must be at the root. (not nested)."))
-						dict[ s ] = "x"
+				check (dot.islast or !IsSet)  (dot, "Can’t set object properties during a destructor.")
+			if (IsConstructor)
+				(t is PropertyWasConstructed)
+	
+
+function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
+	opt norefcounts
+	|| cls = .cls
+	|| oof = .ConstructorLinePlace
+	using (oof)
+	
+	for (d.backwards in .cls.Properties)
+		if d isnt PropertyWasConstructed
+			root.InsertAfter( .NewDefaultRel( oof, d ), AfterHere )
 	
 	
-	// should come AFTER super.constructor
-	if (IsConstructor)
-		|| oof = .ConstructorLinePlace
-		using (oof)
-			for (d.backwards in .cls.Properties)
-				if (!dict[ d.name.lowercase ])
-					root.InsertAfter( .NewDefaultRel( oof, d ), SuperDot )
+	while cls
+		for (d in cls.Properties)
+			(d isnt PropertyWasConstructed)
+		cls = cls.super
+				
 
 
 function ConstructorLinePlace (|message|)

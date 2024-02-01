@@ -46,38 +46,38 @@ extend Message {
 	// case aware....
 	// if I had my... "nil.fnc always returns nil"... then I could
 	// remove the self-check! :D So beautiful code.
-		Return (self) and (self == @Thg) and (.name ~= name)
+		Return (self) and (.func == @Thg) and (.name ~= name)
 
 	operator IsOpp (|string|name, |bool|)
-		Return (self) and (self == @Opp) and (.name ~= name)
+		Return (self) and (.func == @Opp) and (.name ~= name)
 
 
 	operator IsArg (|string|name, |bool|)
-		Return (self) and (self == @arg) and (.name == name)
+		Return (self) and (.func == @arg) and (.name == name)
 
 
 	operator IsTmp (|String| name, |bool|)
 	// case blind...
-		Return (self) and (self == @Tmp) and (.name == name)
+		Return (self) and (.func == @Tmp) and (.name == name)
 
 
 	operator IsARel (|String| name, |bool|)
 	// case blind...
-		Return (self) and (self == @Arel) and (.name == name)
+		Return (self) and (.func == @Arel) and (.name == name)
 
 
 	operator IsBRel (|String| name, |bool|)
 	// case blind...
-		Return (self) and (self == @Brel) and (.name == name)
+		Return (self) and (.func == @Brel) and (.name == name)
 
 	operator IsRel (|String| name, |bool|)
 		opt norefcounts
 	// case blind...
-		Return (self) and (self == @Rel) and (.second.name == name)
+		Return (self) and (.func == @Rel) and (.second.name == name)
 
 
 	operator IsDot (|string| name, |bool|)
-		Return (self) and (self == @dot) and (.name ~= name)
+		Return (self) and (.func == @dot) and (.name ~= name)
 
 	
 	syntax access (|message|)
