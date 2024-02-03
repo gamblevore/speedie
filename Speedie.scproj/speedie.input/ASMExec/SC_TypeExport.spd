@@ -11,7 +11,7 @@ datatype NilState (byte) // Exec.scproj needs this here
 		FnBecomesNilCh= 8
 		FalseValue	= 16
 		TrueValue	= 32
-		Syntactic	= 64		// user stated this, not figured out.
+		Solved		= 64		// compiler figured this out during niltest
 		KnownValue	= FalseValue + TrueValue
 		ActuallyNil = Nilish  + Stated + FalseValue
 		Optional    = Either  + Stated

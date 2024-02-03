@@ -128,6 +128,7 @@ function Function (NilTrackerFn)
 		fn = fp.GetFunctionPointer
 		require fn and .UseChildAsReal(fp)						// (abc)()
 	
+	if fn ~= "hasany"
 	
 	fn.NilPrint(false)
 	
@@ -229,7 +230,7 @@ function DetectStillChecks (|message| first, |nilstate|)
 function Return (NilTrackerFn)
 	opt norefcounts
 	|| v = .DetectStillChecks(msg.first)
-	t.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
+	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
 	|| ret = t.return
 	if ret and ret.typesuffers
@@ -241,24 +242,25 @@ function Return (NilTrackerFn)
 
 
 function Exit (NilTrackerFn)
-	T.loops.ExitRecord |= .EndBlock
-	t.loops.hasEscape = true
+	.loops.ExitRecord |= .EndBlock
+	.loops.hasEscape = true
 
 
 function Continue (NilTrackerFn)
-	T.loops.ContRecord |= .EndBlock
+	.loops.ContRecord |= .EndBlock
 
 
 function WhileInner (|message| Cond)
 	opt norefcounts
-	|nilrecord| OldCont
+	|nilrecord| OldCont // remove oldcont later, and lower loop count to 2
 	|| arg = cond.next
-	for i in 3 // can remove the oldcont tests later.
+
+	for i in 3
 		.jump(cond, NilCheckMode.softpos)
 		.Argument(arg)
-		.Decls(t.Loops.ContRecord, "continue")
-		if i == 1:    OldCont = .place.Value
-		if i == 2: if OldCont !=.place.Value // Test the first two loops.
+		.Loops.NextLoop
+		if i == 1:    OldCont =  .Value
+		if i == 2: if OldCont != .Value // Test the first two loops.
 	
 
 function While (NilTrackerFn)
@@ -268,12 +270,13 @@ function While (NilTrackerFn)
 
 	require !CondTest.IsFalse and T.BranchEnter(msg)
 
-	|| W = T.loops.Begin(!condtest.IsTrue)
+	|| W = .loops.BeginLoop(!condtest.IsTrue)
 	WhileInner(cond)
 	if !condtest.IsTrue		// This is just for simple error detection. like macro errors. 
 		.jump(cond, NilCheckMode.softneg)
 	
-	W.Finish(msg)
+	.loops.FinishLoop(msg)
+	ArchonPurger.loops = W
 
 	return t.BranchExit
 	
@@ -401,8 +404,8 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	if dcl isnt local									// Internal bug!
 	
 	if dcl.IsUnknownParam
-		if test isnt Active
-			return .becomereal(dcl, msg)
+		if test isnt Active // can't use unknown param, so lets just default to real.
+			return .BecomeReal(dcl, msg)
 		dcl.NilDeclared = nilstate.optional
 		if test is soft and negative
 			return nilstate.optional
@@ -525,7 +528,7 @@ function Debugger (NilTrackerFn)
 function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where)
 	opt norefcounts
 	if (recv.isreal)
-		.BecomeReal(sent, where)
+		.BecomeReal(sent, where, "NilObjectError, passed an non-real param: ")
 	  elseif !recv.nilstated
 		recv.NilPrmFail
 	
@@ -547,7 +550,7 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 		return T.SetNilness(recv, SN)
 
 
-function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
+function BecomeReal (|scdecl| sent, |message| where, |string| errmsg="NilObjectError accessing optional: ", |nilstate|)
 	opt norefcounts
 	|| Curr = sent.NilCurr
 	if curr == NilState.Realish
@@ -557,7 +560,7 @@ function BecomeReal (|scdecl| sent, |message| where, |nilstate|)
 		T.DeclareReal(sent)
 		return T.SetNilness(sent, NilState.real)
 
-	error (where, "NilObjectError accessing optional: " + where.render)
+	error (where, errmsg + where.render)
 }
 
 

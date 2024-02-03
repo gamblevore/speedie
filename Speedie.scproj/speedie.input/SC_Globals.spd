@@ -60,12 +60,11 @@ function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
 		error (exp, "Can’t cast between structs/carrays")
 	  else
-		ifn exp0.isint and new.TypeSuffers
-			0 //
-		  elseif exp0.iszero or Old.IsNil
-			new = new.makenewnil
-		  else   // || x = 1234|&byte| // Its only used to force a crash, basically.
-			new = new.makenewreal
+		if exp0.isint and new.TypeSuffers
+			if exp0.iszero or Old.IsNil
+				new = new.MakeNewNil
+			  else   // || x = 1234|&byte| // Its only used to force a crash, basically.
+				new = new.MakeNewReal
 		new.NoBlindCasts(old, exp, name_Space)
 	return New
 
@@ -417,14 +416,6 @@ function ExtractAmount (|Message| Prms, |SCBase| name_space, |SCDecl| R, |bool|)
 
 
 function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCDecl|)
-	opt norefcounts
-	|| d = ExtractDeclSub(c, name_space, Purpose)
-	if d and d.NilStated
-		d.NilDeclare |= nilstate.Syntactic
-	return d
-
-
-function ExtractDeclSub (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCDecl|)
 	// a bit recursive!
 	|| f = c.func
 	
@@ -619,6 +610,7 @@ function SCModule.IsMArray (|message| arr, |bool|)
 
 function message.ExpectMatch (|scbase| name_space, |scclass| With, |bool|)
 	return .ExpectClass(TypeOfExprNeeded( self, name_space ), With)
+
 
 function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
 	// Vector[N] --> memory.object(N, itemsize)

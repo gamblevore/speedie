@@ -10,7 +10,7 @@ datatype NilRecord (Uint64)
 		item <<= 1
 		return (self >> item) & NilState.either
 		
-	function NextCount (|uint|)
+	function DepthOfVars (|uint|)
 		return 1 + (.log2|uint|>>1)
 
 

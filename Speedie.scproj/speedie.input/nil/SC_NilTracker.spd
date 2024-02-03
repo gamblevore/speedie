@@ -14,74 +14,80 @@
 struct LoopInfo 
 	|NilRecord| 		ContRecord
 	|NilRecord| 		ExitRecord
+	|uint16| 			VarDepth
 	|bool| 				HasEscape
-	|int| 				Depth
 	
-	function Begin (|bool| HasEscape, |Loopinfo|)
-		|| T = &ArchonPurger.T
+	function BeginLoop (|bool| HasExitCond, |Loopinfo|)
 		rz = *self
-		.ExitRecord = 0
-		.HasEscape = HasEscape
-		.Contrecord = T.Place.value
-		.Depth = T.CurrDepth
-
-		if HasEscape
-			.ExitRecord |= t.place.value
+		|| v = ArchonPurger.value
+		.ExitRecord = HasExitCond * V		// .Finish will check for non-zero
+		.HasEscape = HasExitCond
+		.ContRecord = V						// in case loop fails the first condition
+		debugat
+		.VarDepth = V.DepthOfVars
 	
-	function Finish (|message| msg)
-		|| src = &ArchonPurger.T.loops
-		|| Ex = src.ExitRecord					#check (msg, "Loop never exits.")
-		if !src.HasEscape and !msg.islast
+	
+	function FinishLoop (|message| msg)
+		|| Ex = .ExitRecord						#check (msg, "Loop never exits.")
+		if !.HasEscape and !msg.islast
 			msg.KinderRemoveAfter
-
-		ArchonPurger.decls(Ex, "LoopEnd")
-		ArchonPurger.T.loops = *self
+		ArchonPurger.SetDirect(Ex, "LoopEnd")
+	
+	
+	function NextLoop
+		if scfunction.currfunc ~= "Exists7"
+		|| Possi = (1|uint64| << (.VarDepth<<1)) - 1|uint64|
+		Possi = (.ContRecord ||| ArchonPurger.value) & Possi
+		.ContRecord = Possi
+		archonpurger.SetDirect(Possi, "continue")
+	
 	
 
 struct ArchonPurger
 	linkage: cpp_part nil
-	|&NilRecord| 			Line
+	|&NilRecord| 			Neel
 	|&NilRecord| 			RowEnd
 	|Nilrecord| 			Realnesses
 	target debug
 		|Scdecl--[32]| 		Dbg
+		|int|				MinDepth
 	|scdecl|				Return
 	|bool|					FnAbleToNilCheck
-	|LoopInfo| 				Loops
 	|NilRecord[64]| 		Rows
 	
-	function CurrDepth (|int|)
-		return (.line - &.rows[0])|int|
+	function NestDepth (|int|)
+		return (.Neel - &.rows[0])|int|
 	
 	
 	function DeclareReal (|scdecl| V)
 		V.NilDeclared = NilState.real
 		if v is self
 			.FnAbleToNilCheck = false
-		if .CurrDepth > 0		
+		if .NestDepth > 0
+			// The branch merger is not enough here. We need to affect the other branches.
 			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
 	
 	
 	function BranchEnter (|message| abc, |NilRecord|)
-		if .line < .RowEnd
-			|| N = *(.line++)
-			*.line = N
+		if .Neel < .RowEnd
+			|| N = *(.Neel++)
+			*.Neel = N
 			return N
 		error (abc, "Branch depth too deep (over 63)")
 	
 	
 	function BranchSwap (|NilRecord| A, |nilrecord|)
-		rz = *.line
+		rz = *.Neel
 		.Set(A, "swap")
 	
 	
 	function BranchExit (|NilRecord| A=0,  |nilstate|)
-		|| B = *.line
-		*.line-- = 0 // cleanup
+		|| B = *.Neel
+		*.Neel-- = 0 // cleanup
 		
 		|| New = A ||| B
 		new &= .Realnesses
-		if .CurrDepth == 0
+		if .NestDepth == 0
 			.Realnesses = -1
 		return .Set(New, "branchexit")
 
@@ -93,14 +99,14 @@ struct ArchonPurger
 	
 	function DeclareSub (|scdecl| D, |nilstate| nd, |nilstate|)
 		nd &= nilstate.either
-		|| P = .Place
-		|| N = p.value.NextCount
+		|| P = (.Neel)|&nilrecorder|
+		|| N = p.value.DepthOfVars
 		expect (N < 31)								(D, "Too many declarations")
 		target debug
 			.dbg[n] = d
 		d.NilReg = N * d.TypeSuffers			
 		d.DReg.Reg = n // right? might as well do this at the same time?
-		d.NilAllocDepth = .currDepth
+		d.NilAllocDepth = .NestDepth
 		(p)(n) = nd
 		if !d.nilcurr // bug!
 		return nd
@@ -109,17 +115,17 @@ struct ArchonPurger
 	function scdecl.NilCurr (|nilstate|)
 		if self Isnt Local
 			return .nildeclared & nilstate.either
-		return (ArchonPurger.place.Value)[.NilReg]
+		return (ArchonPurger.Value)[.NilReg]
 	
 	
 	function SetNilness (|SCDecl| d, |NilState| New, |NilState|)
 		pragma inline
-		if !d.nilreg or ((new&1) and (!d.TypeSuffers)) // WHA?
-		|| P = .place
+		if !d.nilreg or ((new&1) and (!d.TypeSuffers))  or  !New // WHA?
+		|| P = (.Neel)|&nilrecorder|
 		(P)(d.NilReg) = new
 		
 		if (p.Value & .Realnesses)  !=  p.Value
-			d.NilPrmFail
+			// this might not be a param fail... it could just be an internal fail??
 			
 		d.NilPrint("set")
 		return New
@@ -131,14 +137,16 @@ struct ArchonPurger
 
 		SCFunction.CurrFunc = f
 		.rows[0] = nilstate.Basic
-		.Line = .rows[0]
-		.rowend = .line + 63
-		.loops = nil
+		.Neel = .rows[0]
+		.rowend = .Neel + 63
+		archonpurger.loops = nil
 		.Realnesses = -1
 		.CheckNilCheck(F)
 		
 		for d in f.args
 			.DeclareSub(d, d.nildeclared)
+		target debug
+			.MinDepth = value().DepthOfVars
 		printline
 		f.NilPrint(" ****** ", false)
 		
@@ -167,32 +175,27 @@ struct ArchonPurger
 		|| s = f.args.first
 			if (s.nildeclared is nilish) and s.TypeSuffers and .return.CanNilCheck
 				.FnAbleToNilCheck = true
-	
-	
-	function Place (|&NilRecorder|)
-		return (T.line)|&nilrecorder|
 
 
 	function Self (|nilstate|)
-		return (*t.line)[1]
-
-
-	function Decls (|string|s, |NilRecord| R)
-		.place.Value = R
+		return (*t.Neel)[1]
 
 
 	module
+		|LoopInfo| 				Loops
 		|ArchonPurger|	T
 		|byte|			OldPrint
 
-		function Place (|&NilRecorder|)
-			return (T.line)|&nilrecorder|
-		
+		function Value (|NilRecord|)
+			return *T.Neel
+			
 		function EndBlock (|nilrecord|)
-			return (.place)(nilstate.basic)
+			return .SetDirect(nilstate.basic, "blockend")
 	
-		function Decls (|NilRecord| R, |string| s)
-			.place.Value = R ||| nilstate.Basic
+		function SetDirect (|NilRecord| R, |string| s, |nilrecord|)
+			rz = (T.Neel|&nilrecorder|)(R)
+			target debug
+				if t.mindepth > rz.DepthOfVars
 
 		function DeclKill
 			t.set(nilstate.Basic, "kill")
