@@ -127,6 +127,8 @@ function Function (NilTrackerFn)
 		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
 		fn = fp.GetFunctionPointer
 		require fn and .UseChildAsReal(fp)						// (abc)()
+	
+	expect ((fn != scfunction.currfunc) or t.RootReturned or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
 		
 	fn.NilPrint(false)
 	
@@ -422,11 +424,12 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 
 function Argument (Niltrackerfn)
 	opt norefcounts
+	|| v = .value.depthofvars + 1
 	for s.fast in msg
-		if s.islast
-			return .ArgOne(s, test, rz)
-		rz = .ArgOne(s, 0, rz)
-					 
+		rz = .ArgOne(s, test&-s.islast, rz)
+
+	|| Allowed = (1|uint64| << (v<<1)) - 1|uint64|
+	t.setallnil(ArchonPurger.value & Allowed, "Argument")
 
 
 function ArgOne (|message| s,  |nilcheckmode| t,  |nilstate| prev,  |nilstate|)
@@ -540,7 +543,9 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg)
 		
 	|| SN = sent.NilCurr
-	if (recv.isreal) // upgrade sent
+	if recv.isreal and recv isnt local
+		// can't work if recv is a local?? what should we do? just set the damn thing?
+		// wht about being declared? well only locals are undeclared.
 		expect (SN is realish) (RecvMsg, "Nil is not allowed here on: " + recvmsg.render)
 		return .BecomeReal(sent, SentMsg)
 		

@@ -24,9 +24,7 @@ struct LoopInfo
 		target debug
 			if  ArchonPurger.t.mindepth > v.DepthOfVars
 		
-		if (scfunction.currfunc ~= "DisposeAll") and (.ExitRecord == 6)
 		.ExitRecord = HasExitCond|nilrecord| * V	// .Finish will check for non-zero
-		if (scfunction.currfunc ~= "DisposeAll") and (.ExitRecord == 6)
 		.HasEscape = HasExitCond
 		.ContRecord = V								// in case loop fails the first condition
 		.VarCount = V.DepthOfVars
@@ -41,11 +39,10 @@ struct LoopInfo
 	
 	
 	function NextLoop 
-		|| Possi = (1|uint64| << ((.VarCount+1)<<1)) - 1|uint64|
-		|| ble = (.ContRecord ||| ArchonPurger.value) & Possi
-		.ContRecord = ble
-		ArchonPurger.t.SetAllNil(ble, "continue")
-	
+		.ContRecord |= ArchonPurger.value
+		ArchonPurger.t.SetAllNil(.contrecord, "continue")
+
+
 	
 
 struct ArchonPurger
@@ -58,6 +55,7 @@ struct ArchonPurger
 		|int|				MinDepth
 	|scdecl|				Return
 	|bool|					FnAbleToNilCheck
+	|bool| 					RootReturned // for recursive funcs
 	|NilRecord[64]| 		Rows
 	
 	
@@ -69,8 +67,7 @@ struct ArchonPurger
 		V.NilDeclared = NilState.real
 		if v is self
 			.FnAbleToNilCheck = false
-		if .NestDepth > 0
-			// The branch merger is not enough here. We need to affect the other branches.
+		if .NestDepth > 0 // We need to affect the other branches.
 			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
 	
 	
@@ -111,7 +108,6 @@ struct ArchonPurger
 		d.NilAllocDepth = .NestDepth
 		|| P = (.Neel)|&nilrecorder| // setset
 		(p)(n) = nd
-		if !d.nilcurr // bug!
 		return nd
 	
 	
@@ -126,10 +122,6 @@ struct ArchonPurger
 		if !d.nilreg or ((new&1) and (!d.TypeSuffers))  or  !New // WHA?
 		|| P = (.Neel)|&nilrecorder| // setset
 		(P)(d.NilReg) = new
-		
-		if (p.Value & .Realnesses)  !=  p.Value
-			// this might not be a param fail... it could just be an internal fail??
-			
 		d.NilPrint("set")
 		return New
 
@@ -144,6 +136,7 @@ struct ArchonPurger
 		.rowend = .Neel + 63
 		archonpurger.loops = nil
 		.Realnesses = -1
+		.RootReturned = false
 		.CheckNilCheck(F)
 		
 		for d in f.args
@@ -229,6 +222,7 @@ struct ArchonPurger
 
 		function DeclKill
 			pragma inline
+			t.RootReturned = true
 			t.SetAllNil(nilstate.Basic, "kill")
 		
 

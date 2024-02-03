@@ -37,6 +37,13 @@ class NilTest
 			if (p3 and p4? and x? and y?)
 				*x = *y
 				*p3 = *p4
+
+
+	function recurse (|bool| pos, |bool|)
+		cpp_part Bug // just left here to test my nilchecker... it should check for recursion bugs
+		borks
+		return .recurse(!pos)
+	
 				
 	
 	function TernTest

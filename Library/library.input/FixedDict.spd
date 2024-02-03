@@ -6,8 +6,8 @@ class FixedDict
 	|uint|					ItemTypes
 	|Byte|					ValueType
 	|Byte|					Letter
-	|_voidptr|				Value
-	|FixedDict--|			Parent
+	|_voidptr?|				Value
+	|FixedDict--?|			Parent
 	|_voidptr[16]|			Items
 	
 	constants
@@ -52,10 +52,14 @@ class FixedDict
 	
 	function TypeOf (|int| i, |int|)
 		return 3 & .itemtypes >> (i<<1)
+
+
 	function TypeOf (|int| i2, assigns:|uint|)
 		i2 <<= 1
 		.itemtypes	= (.itemtypes &~ (3 << i2))  |||  (Value << i2)
-	syntax access (|int|i, |fixeddict|)
+
+
+	syntax access (|int| i, |fixeddict|)
 		return .items[i]|fixeddict|
 
 
@@ -68,11 +72,11 @@ class FixedDict
 		|| place = &.items[b]
 		|| obj = (*place)|fixeddict|		// verbose but faster
 		if BT >= typestem
-			if obj.valuetype
-				jb_decr( obj.value|...| )
-			obj.valuetype = type
-			obj.value = val|_voidptr|
-		else
+			if obj!.valuetype
+				jb_decr( obj!.value|object| )
+			obj!.valuetype = type
+			obj!.value = val|_voidptr|
+		  else
 			.typeof(b) = type
 			*place = val|_voidptr|
 			if bt

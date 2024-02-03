@@ -5,7 +5,6 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 * Do nil checker!
-	* containers... returns default to optional... params default to real.
 	* recursion is actually a blocker! should check for recursion...
 
 * change allocator to use unified allocator?
