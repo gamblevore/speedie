@@ -124,12 +124,6 @@ class SCBehaviour (SCBase)
 		|| Using = fn.source.syntaxusing
 		|| CopyFrom = fn.source.Second
 		WriteTo.msg(@thg, "self")
-		/*
-			WriteTo <~ (@rel, "oop"):
-				(@thg,"you")
-				(@opp,"are")
-				(@thg,"awesome")
-		*/
 
 		for C in CopyFrom
 			if C == @decl
@@ -188,6 +182,7 @@ class SCBehaviour (SCBase)
 	function SCModule.AddInterfaceToTable (|SCClass| TableCls)
 		|| d = SCDecl.new
 		d.TypeContained = .cls
+		d.nildeclared = nilstate.real
 		d.Name = .name.InterfaceToBehaviour
 		tablecls.properties <~ d
 		tablecls.tryadd(.source, d, d.name)
@@ -208,7 +203,7 @@ class SCBehaviour (SCBase)
 		»
 		
 		.project.use
-		|| F = SCClass.newStruct(msg, compiler.program, ErrPlace)|SCModule| #require
+		|| F = SCClass.NewStruct(msg, compiler.program, ErrPlace)|SCModule| #require
 		F.cls.IsBehaviour = kBehaviourTable
 		f.cls.IsRole = .cls.IsRole						// sigh
 		compiler.program.TryAddBase( ErrPlace, F )
@@ -238,7 +233,7 @@ class SCBehaviour (SCBase)
 	
 	module {
 		function Tran_Behaviour (|message| node, |scclass| cls, |bool|)
-			require cls and node
+			require node
 			expect !cls.IsRole (node, "roles can't specify behaviours (roles aren't real classes!)")
 			|| name = node[@thg]$
 			|| lst = name.next
@@ -257,13 +252,8 @@ class SCBehaviour (SCBase)
 		
 		function NewBehaviour (CollectFunc)
 			|| cls = name_space.ShouldBeClass(errplace)
-			if Tran_Behaviour(node, cls)
+			if cls and Tran_Behaviour(node, cls)
 				|| fn = SCFunction.NewFunc(node, cls, node)|scfunction|
-					//fn.isvisible = true
-					// fn.visible causes problems
-					// then all classes basically become visible
-					// because all classes have render funcs! at least render!
-					// we need a better way.
 					cls.AddBehaviourOrInterface( fn, ErrPlace )
 					(fn is Behaviour)
 					(fn is ExpectsRealVars)

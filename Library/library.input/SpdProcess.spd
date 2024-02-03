@@ -4,7 +4,7 @@ class SpdProcess (Process)
 		cpp_part Proc
 	contains SpdProcess
 	|jbin|						Writer
-	|&pico|						Pico
+	|&pico?|					Pico
 	|stringzeroterminated|		_DebugName
 	|SpdMainFn|					SubProcess
 	|int| 						DeathLimit

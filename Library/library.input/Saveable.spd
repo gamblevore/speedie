@@ -50,19 +50,19 @@ class Saveable
 		cpp_part Sav
 
 	
-	virtual   SaveWrite (|&ObjectSaver| Saver)
+	constructor
+		cpp_wrapper
+
+	virtual SaveWrite (|&ObjectSaver| Saver)
 		Saver.CantSaveThis = self
 		saver.dest <~ "nil,"
 	
-	virtual   LoadProperties (|&ObjectLoader| Loader,)
+	virtual LoadProperties (|&ObjectLoader| Loader,)
 		Loader.CouldntLoad = self
 
-	virtual   SaveCollect (|&ObjectSaver| Saver)
-	Behaviour SaveCollect { /* not all objects need to collect anything... */ }
+	virtual SaveCollect (|&ObjectSaver| Saver)
 
-	constructor
-		cpp_wrapper
-	
+	behaviour SaveCollect { /* not all objects need to collect anything... */ }	
 	
 	helper IsSaveMarked (|bool|)
 		|| p = self|&int|
@@ -239,7 +239,7 @@ class SaverClassInfo (array)
 	saveas				nil
 	
 	|&ClassData|		Cls
-	|SaverClassInfo|	NextInfo
+	|SaverClassInfo?|	NextInfo
 	|&char|				Data
 	
 

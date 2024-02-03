@@ -9,15 +9,15 @@ class SCIterator (SCObject)
 		cpp_part			Iter
 
 	|[SCNodeRenamer]|	Names
-	|SCNodeRenamer|		selfs
-	|SCNodeRenamer|		ValueRenamer
-	|message|			Index
-	|message|			LoopCond
-	|message|			LoopEndCond
-	|message|			Value
-	|message|			WhileLoop
-	|message|			Yield
-	|scclass|			parent
+	|SCNodeRenamer?|	selfs
+	|SCNodeRenamer?|	ValueRenamer
+	|message?|			Index
+	|message?|			LoopCond
+	|message?|			LoopEndCond
+	|message?|			Value
+	|message?|			WhileLoop
+	|message?|			Yield
+	|scclass|			Parent
 	
 	constructor (|scclass| parent)
 		.parent = parent

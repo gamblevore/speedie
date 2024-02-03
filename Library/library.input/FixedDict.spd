@@ -2,7 +2,7 @@
 
 class FixedDict
 	contains object
-	linkage: cpp_part dict
+	linkage: cpp_part fix
 	|uint|					ItemTypes
 	|Byte|					ValueType
 	|Byte|					Letter

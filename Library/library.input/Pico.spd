@@ -64,7 +64,8 @@ struct Pico
 	function Send (|PicoMessage| msg, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
 
-	function Config (|&PicoConfig|)
+	function Config (|?&PicoConfig|)
+		nil checker
 		cpp_wrapper PicoConf
 	
 	helper __Get (|float| T, |PicoMessage|)

@@ -558,7 +558,7 @@ function BecomeReal (|scdecl| sent, |message| where, |string| errmsg="NilObjectE
 		T.DeclareReal(sent)
 		return T.SetNilness(sent, NilState.real)
 
-	error (where, errmsg)
+	error (where, errmsg + Where.render)
 }
 
 

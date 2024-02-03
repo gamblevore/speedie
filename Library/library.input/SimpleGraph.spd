@@ -3,7 +3,7 @@
 
 class SimpleGraph (dictionary)
 	saveas nil
-	|object| Owner
+	|object?| Owner
 	|string| Name
 	contains SimpleGraph
 	
@@ -19,7 +19,7 @@ class SimpleGraph (dictionary)
 		  else
 			B >>= 32
 		|| Data = A ||| B
-		|| str = string.Copy((&Data)|&byte|, 8)
+		|| str = string.Copy((&Data)|&byte|, platform.PointerBytes)
 		other[str] = (self, nil)(value)
 		self[str] = (other, nil)(value)
 	
