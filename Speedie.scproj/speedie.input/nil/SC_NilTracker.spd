@@ -14,32 +14,32 @@
 struct LoopInfo 
 	|NilRecord| 		ContRecord
 	|NilRecord| 		ExitRecord
-	|uint16| 			VarDepth
+	|byte| 				VarCount
+	|byte| 				NestDepth
 	|bool| 				HasEscape
 	
 	function BeginLoop (|bool| HasExitCond, |Loopinfo|)
 		rz = *self
 		|| v = ArchonPurger.value
-		.ExitRecord = HasExitCond * V		// .Finish will check for non-zero
+		.ExitRecord = HasExitCond|nilrecord| * V	// .Finish will check for non-zero
 		.HasEscape = HasExitCond
-		.ContRecord = V						// in case loop fails the first condition
-		debugat
-		.VarDepth = V.DepthOfVars
+		.ContRecord = V								// in case loop fails the first condition
+		.VarCount = V.DepthOfVars
+		.NestDepth = ArchonPurger.t.nestdepth
 	
 	
 	function FinishLoop (|message| msg)
 		|| Ex = .ExitRecord						#check (msg, "Loop never exits.")
 		if !.HasEscape and !msg.islast
 			msg.KinderRemoveAfter
-		ArchonPurger.SetDirect(Ex, "LoopEnd")
+		ArchonPurger.t.SetAllNil(Ex, "LoopEnd")
 	
 	
-	function NextLoop
-		if scfunction.currfunc ~= "Exists7"
-		|| Possi = (1|uint64| << (.VarDepth<<1)) - 1|uint64|
-		Possi = (.ContRecord ||| ArchonPurger.value) & Possi
-		.ContRecord = Possi
-		archonpurger.SetDirect(Possi, "continue")
+	function NextLoop 
+		|| Possi = (1|uint64| << ((.VarCount+1)<<1)) - 1|uint64|
+		|| ble = (.ContRecord ||| ArchonPurger.value) & Possi
+		.ContRecord = ble
+		ArchonPurger.t.SetAllNil(ble, "continue")
 	
 	
 
@@ -55,6 +55,7 @@ struct ArchonPurger
 	|bool|					FnAbleToNilCheck
 	|NilRecord[64]| 		Rows
 	
+	
 	function NestDepth (|int|)
 		return (.Neel - &.rows[0])|int|
 	
@@ -68,28 +69,24 @@ struct ArchonPurger
 			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
 	
 	
-	function BranchEnter (|message| abc, |NilRecord|)
-		if .Neel < .RowEnd
-			|| N = *(.Neel++)
-			*.Neel = N
-			return N
-		error (abc, "Branch depth too deep (over 63)")
+	function BranchEnter (|message| where, |NilRecord|)
+		expect (.Neel < .RowEnd) (where, "Branch depth too deep (over 63)")
+		rz = *(.Neel++)
+		.setallnil(rz, "BranchEnter")
 	
 	
 	function BranchSwap (|NilRecord| A, |nilrecord|)
-		rz = *.Neel
-		.Set(A, "swap")
+		rz = value()
+		.SetAllNil(A, "swap")
 	
 	
 	function BranchExit (|NilRecord| A=0,  |nilstate|)
-		|| B = *.Neel
+		|| B = value()
 		*.Neel-- = 0 // cleanup
 		
-		|| New = A ||| B
-		new &= .Realnesses
+		rz = .SetAllNil(A ||| B, "BranchExit")
 		if .NestDepth == 0
 			.Realnesses = -1
-		return .Set(New, "branchexit")
 
 			
 	function Declare (|scdecl| D, |nilstate| nd, |nilstate|)
@@ -99,14 +96,14 @@ struct ArchonPurger
 	
 	function DeclareSub (|scdecl| D, |nilstate| nd, |nilstate|)
 		nd &= nilstate.either
-		|| P = (.Neel)|&nilrecorder|
-		|| N = p.value.DepthOfVars
+		|| N = .value.DepthOfVars + 1
 		expect (N < 31)								(D, "Too many declarations")
 		target debug
 			.dbg[n] = d
 		d.NilReg = N * d.TypeSuffers			
 		d.DReg.Reg = n // right? might as well do this at the same time?
 		d.NilAllocDepth = .NestDepth
+		|| P = (.Neel)|&nilrecorder| // setset
 		(p)(n) = nd
 		if !d.nilcurr // bug!
 		return nd
@@ -121,7 +118,7 @@ struct ArchonPurger
 	function SetNilness (|SCDecl| d, |NilState| New, |NilState|)
 		pragma inline
 		if !d.nilreg or ((new&1) and (!d.TypeSuffers))  or  !New // WHA?
-		|| P = (.Neel)|&nilrecorder|
+		|| P = (.Neel)|&nilrecorder| // setset
 		(P)(d.NilReg) = new
 		
 		if (p.Value & .Realnesses)  !=  p.Value
@@ -177,28 +174,56 @@ struct ArchonPurger
 				.FnAbleToNilCheck = true
 
 
+	function Value (|nilrecord|)
+		pragma inline
+		return *.Neel
+	
+	
 	function Self (|nilstate|)
-		return (*t.Neel)[1]
+		return (.value)[1]
+
+
+	function SetAllNil (|NilRecord| Dest, |string| reason, |nilstate|)
+		dest &= .Realnesses
+		
+		target debug {
+			if  t.mindepth > dest.DepthOfVars  and  dest != nilstate.basic
+			|| diff = dest xor value()
+		} else {
+			pragma inline
+		}
+
+		*.neel = dest // setset
+		
+		target debug {
+			for i in 32
+				|| d = .dbg[i]
+				if d and diff[i]
+					d.nilprint(reason)
+		}
+
+		return nilstate.real
 
 
 	module
 		|LoopInfo| 				Loops
-		|ArchonPurger|	T
-		|byte|			OldPrint
+		|ArchonPurger|			T
+		|byte|					OldPrint
+
 
 		function Value (|NilRecord|)
-			return *T.Neel
-			
+			pragma inline
+			return *T.neel
+
+
 		function EndBlock (|nilrecord|)
-			return .SetDirect(nilstate.basic, "blockend")
-	
-		function SetDirect (|NilRecord| R, |string| s, |nilrecord|)
-			rz = (T.Neel|&nilrecorder|)(R)
-			target debug
-				if t.mindepth > rz.DepthOfVars
+			pragma inline
+			return t.SetAllNil(nilstate.basic, "blockend")
+
 
 		function DeclKill
-			t.set(nilstate.Basic, "kill")
+			pragma inline
+			t.SetAllNil(nilstate.Basic, "kill")
 		
 
 		function KhalaiPurification (|scfunction| f, |int| a)

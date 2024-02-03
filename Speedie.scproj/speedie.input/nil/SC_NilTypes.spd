@@ -11,7 +11,7 @@ datatype NilRecord (Uint64)
 		return (self >> item) & NilState.either
 		
 	function DepthOfVars (|uint|)
-		return 1 + (.log2|uint|>>1)
+		return .log2|uint|>>1
 
 
 struct NilRecorder
@@ -23,9 +23,6 @@ struct NilRecorder
 		|| Mask = NilState.either << item
 		.value = (.value &~ Mask) ||| (value << item)
 		target debug:archonpurger.ndb4
-	syntax Call (|nilrecord| v, |nilrecord|)
-		rz = .Value
-		.Value = v
 
 
 datatype NilCheckMode (uint)

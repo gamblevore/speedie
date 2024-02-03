@@ -881,7 +881,7 @@ function scclass.RealSuper (|scclass|)
 function scclass.RealClass (|scclass|)
 	opt norefcounts
 	rz = self
-	while rz.IsRole
+	while rz and rz.IsRole
 		rz = rz.super
 
 

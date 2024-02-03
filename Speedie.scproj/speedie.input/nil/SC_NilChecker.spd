@@ -127,9 +127,7 @@ function Function (NilTrackerFn)
 		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
 		fn = fp.GetFunctionPointer
 		require fn and .UseChildAsReal(fp)						// (abc)()
-	
-	if fn ~= "hasany"
-	
+		
 	fn.NilPrint(false)
 	
 	if (test is active) and fn.IsNilChecker

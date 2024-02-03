@@ -249,47 +249,23 @@ function NilState.NilName (|faststring| fs, |bool| Expected)
 		  else
 			fs <~ "stated "
 	fs <~ .Rawname
-	
-	
+
 
 target debug {
-function ArchonPurger.Set (|NilRecord| Dest, |string| reason, |nilstate|)
-	pragma inline
-	dest &= .Realnesses
-	target debug
-		if t.mindepth > dest.DepthOfVars
-	|| diff = dest xor *.Neel
-	*.Neel = dest
-	for i in 32
-		if diff[i]
-			|| d = .dbg[i]
-				d.nilprint(reason)
-	return nilstate.real
-	
-
-
 function @ArchonPurger.ndb4
 	cpp_name ndb4
 	visible
-	(*T.Neel).ndb5
-
+	.value.ndb5
 
 function NilRecord.ndb5
 	cpp_name ndb5
 	visible
-	|| n = .DepthOfVars // sigh
+	|| n = .DepthOfVars + 1 // sigh
 	for i in n
 		// item 0 is always nil... so whatever
 		|| D = ArchonPurger.T.dbg[i]
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"
-
-} else {
-	function ArchonPurger.Set (|NilRecord| Dest, |string| reason, |nilstate|)
-		pragma inline
-		dest &= .Realnesses
-		*.neel = dest
-		return nilstate.real
 }
 

@@ -176,17 +176,17 @@ class FastString {
 		.AppendIntegerAsText(data, 1)
 	syntax Append (|uint| data)
 		cpp_part AppendUint
-		self <~ data|int64|
+		.AppendIntegerAsText(data, 1)
 
 	syntax Append (|int| data)
 		cpp_part AppendInt32
-		self <~ data|int64|
+		.AppendIntegerAsText(data, 1)
 		
 	function AppendFile (|File| f, |bool|)
 		if f.opened
 			return .appendpipe(f.descriptor, 0)
 		
-	function appendpipe (|int|fd, |int| mode, |bool|)
+	helper AppendPipe (|int|fd, |int| mode, |bool|)
 		cpp_wrapper JB_FS_AppendPipe // (FastString* self, int fd, int Mode)
 	
 	syntax cast (|string|)

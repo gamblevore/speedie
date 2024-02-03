@@ -110,7 +110,7 @@ class SCDecl (SCObject) {
 		.info = scdeclinfo.altered
 		
 	setter NilDeclared (|nilstate|)
-		if .objectid == 25271464
+		// if .objectid == 25271464
 		//	if value&1 != .nildeclare&1
 		.nildeclare = value
 	

@@ -369,7 +369,7 @@ module Feedback
 			
 		+"m64"
 			Explain(Purpose, "64-bit compile")$
-			options.Compile32Bit = 0
+			options.Compile32Bit = false
 		
 		+"funccount"
 			Explain(Purpose, "Spams each func with a static int, to count the number of times it's called. Useful debugging feature.")$
@@ -378,7 +378,7 @@ module Feedback
 
 		+"m32"
 			Explain(Purpose, "32-bit compile")$
-			options.Compile32Bit = 1
+			options.Compile32Bit = true
 
 		
 		+"warn"
