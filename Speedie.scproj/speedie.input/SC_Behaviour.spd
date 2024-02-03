@@ -32,7 +32,10 @@ class SCBehaviour (SCBase)
 	
 	
 	function Upwards (|SCBehaviour|)
-		return .cls.super$.behaviour
+		opt norefcounts
+		|| c = .cls
+			|| s = c.Super
+				return s.behaviour
 	
 	
 	function SCClass.AddBehaviourOrInterface (|SCBase| M, |Message| ErrPlace)

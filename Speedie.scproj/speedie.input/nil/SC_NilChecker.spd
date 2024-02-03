@@ -526,7 +526,7 @@ function Debugger (NilTrackerFn)
 function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where)
 	opt norefcounts
 	if (recv.isreal)
-		.BecomeReal(sent, where, "NilObjectError, passed an non-real param: ")
+		.BecomeReal(sent, where, "NilObjectError, passed non-real param: ")
 	  elseif !recv.nilstated
 		recv.NilPrmFail
 	
@@ -541,7 +541,7 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 		
 	|| SN = sent.NilCurr
 	if (recv.isreal) // upgrade sent
-		expect (SN is realish) (RecvMsg, "Nil is not allowed here.")
+		expect (SN is realish) (RecvMsg, "Nil is not allowed here on: " + recvmsg.render)
 		return .BecomeReal(sent, SentMsg)
 		
 	if recv.NilReg
@@ -558,7 +558,7 @@ function BecomeReal (|scdecl| sent, |message| where, |string| errmsg="NilObjectE
 		T.DeclareReal(sent)
 		return T.SetNilness(sent, NilState.real)
 
-	error (where, errmsg + where.render)
+	error (where, errmsg)
 }
 
 

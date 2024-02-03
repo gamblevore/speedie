@@ -21,7 +21,12 @@ struct LoopInfo
 	function BeginLoop (|bool| HasExitCond, |Loopinfo|)
 		rz = *self
 		|| v = ArchonPurger.value
+		target debug
+			if  ArchonPurger.t.mindepth > v.DepthOfVars
+		
+		if (scfunction.currfunc ~= "DisposeAll") and (.ExitRecord == 6)
 		.ExitRecord = HasExitCond|nilrecord| * V	// .Finish will check for non-zero
+		if (scfunction.currfunc ~= "DisposeAll") and (.ExitRecord == 6)
 		.HasEscape = HasExitCond
 		.ContRecord = V								// in case loop fails the first condition
 		.VarCount = V.DepthOfVars
@@ -84,9 +89,10 @@ struct ArchonPurger
 		|| B = value()
 		*.Neel-- = 0 // cleanup
 		
-		rz = .SetAllNil(A ||| B, "BranchExit")
+		.SetAllNil(A ||| B, "BranchExit")
 		if .NestDepth == 0
 			.Realnesses = -1
+		return nilstate.real
 
 			
 	function Declare (|scdecl| D, |nilstate| nd, |nilstate|)
@@ -202,7 +208,7 @@ struct ArchonPurger
 					d.nilprint(reason)
 		}
 
-		return nilstate.real
+		return dest
 
 
 	module

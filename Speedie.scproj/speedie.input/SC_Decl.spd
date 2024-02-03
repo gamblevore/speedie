@@ -504,9 +504,10 @@ class SCDecl (SCObject) {
 		  elseif (o.depth < m.depth)
 			m = m.GoUpTo(o.depth)
 
-		while (o != m) and (o.super)
-			o = o.super
-			m = m.super
+		while (o != m)
+			|| o2 = o.super		#loop
+			o = o2
+			m = m.super			#require
 		return o.typenormal
 
 
@@ -753,11 +754,9 @@ class SCDecl (SCObject) {
 
 	function IsReffable (|bool| SetOnly, |bool|)
 		opt norefcounts
-		require (!.PointerCount)
-		require (self is altered)
-		require (!(SetOnly and (self Is Borrowed)))
-		|| t = .type
-		return  t  and  .Type.IsObject
+		require (!.PointerCount) and (self is altered)
+		require !(SetOnly and (self Is Borrowed))
+		return .type.IsObject
 
 
 	function HasStruct (|bool|)

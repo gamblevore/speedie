@@ -89,7 +89,8 @@ function DictionaryReader.ValueDecl (|scdecl|)
 
 
 function IsProject (|bool|)
-	return .Project.Mod == self
+	opt norefcounts
+	return .Project.Mod? == self
 
 
 function NewModuleFunc (|Message| src, |SCFunction|)

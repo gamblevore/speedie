@@ -84,9 +84,7 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 	fs <~ FuncHeader
 	.T.Length = 0
 	
-	fs.currfunc = f
-	fs.srcend = f.sourcearg
-	fs.ExtraAfter = fs.srcend.flatafter
+//	fs.currfunc = f
 	fs <~ ' ' // space between arg.
 
 
@@ -1500,12 +1498,8 @@ function string.Safe (|faststring| fs)
 
 prototype fpMsgRenderCpp (|Message|self, |FastStringCpp| fs)
 class FastStringCpp (FastString)
-	|message|		ExtraAfter
-	|scfile|		OrigFile
-	|string|		OrigSrc
 	|string|		Cpp_Name
-	|message|		SrcEnd
-	|scfunction|	CurrFunc
+//	|scfunction|	CurrFunc
 
 
 	constructor (|string| name = "")

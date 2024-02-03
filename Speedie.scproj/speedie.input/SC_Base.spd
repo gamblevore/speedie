@@ -18,26 +18,26 @@ linkage
 |String|							ExportName
 |SCBase--?|							Parent
 |SCBase--?|							CurrReacher
-|SCImport--|						Project
+|SCImport--?|						Project
 
 
 function IsSTDLib (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isntlib
 	opt norefcounts
-	return .project.isstdlib?
+	return .Project.IsSTDLib?
 
 syntax is (|SCBaseInfo| i, |bool|)
-	return .baseinfo[i]
+	return .BaseInfo[i]
 syntax isnt (|SCBaseInfo| i, |bool|)
-	return !.baseinfo[i]
+	return !.BaseInfo[i]
 
 syntax is (|SCBaseInfo| i, assigns:|bool|)
-	|int| x = .baseinfo
+	|int| x = .BaseInfo
 	x[i] = value
-	.baseinfo = x
+	.BaseInfo = x
 	
 
 syntax isnt (|SCBaseInfo| i, assigns:|bool|)
-	.syntaxis(i, !value)
+	.SyntaxIs(i, !value)
 
 function IsVisible (|bool|)
 	return self is visible
@@ -156,7 +156,6 @@ constructor
 constructor (|string| Name, |bool| Dummy)
 	cpp_part ConstructorStr
 	.name = name
-	
 
 
 constructor (|Message| node)
@@ -373,7 +372,7 @@ function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scfunc
 
 
 function MyProj (|SCBase|)
-	return Compiler.Program.ProjectFix
+	return Compiler.Program!.ProjectFix
 
 
 function ProjectFix (|SCBase|)
