@@ -218,7 +218,7 @@ function TypeOfBlock (ExprResolver)
 	|| last = exp[@nil, -1]
 	ifn last istmp "rejoin"
 		using last
-			last = last.wrapwith(@tmp + "rejoin")
+			last = last.wrapwith(NewRejoin())
 	
 	|| p = exp.scarg( name_space )
 	exp.Parent.statementexpr = p
@@ -470,7 +470,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 		if (C == "?")
 			return R.MakeNewOptional
 		if (C == "!")
-			if R.IsReal
+			if R.IsReal and c isnt inserted
 				deprecate (c, "Already assumed real. Only '?' needs to be specified.")
 			return R.MakeNewReal
 		if (C.name)												// emptyname = compiler internal

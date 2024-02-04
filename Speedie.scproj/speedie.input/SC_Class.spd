@@ -174,8 +174,7 @@ function GetDepth
 	|| msg = .defawlt
 	if msg and .isobject and !(msg isthing "nil")
 		.DefaultsToReal = true // what if this defaults to optional? // fuck them :D
-		.TypeNormal.NilDeclare = NilState.realish
-		.TypeOptional.NilDeclare = NilState.realish // do this early as possible.
+		.TypeNormal.NilDeclare = NilState.real
 	
 
 
@@ -328,7 +327,7 @@ function CanHaveEmptyConstructor (|bool|)
 // just having this function is evidence that automatically
 // creating an empty constructor, is a bad idea. We should
 // explicitly create it... like:
-// 			class abc: constructor empty, constructor auto, function def:printline "def"
+// 			class abc: constructor empty, constructor auto
 
 	opt norefcounts
 	for p in .properties

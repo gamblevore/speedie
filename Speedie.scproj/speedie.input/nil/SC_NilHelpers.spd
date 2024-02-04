@@ -68,7 +68,7 @@ function message.KinderRemoveAfter
 	
 
 
-function scdecl.PointerUpgrade (|scdecl|)
+function scdecl.CanUpgradeInternalPointer (|scdecl|)
 	opt norefcounts
 	|| infernal = .internal
 	if (infernal Is Local) and infernal.NilReg

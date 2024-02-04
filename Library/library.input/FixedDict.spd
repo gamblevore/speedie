@@ -72,10 +72,13 @@ class FixedDict
 		|| place = &.items[b]
 		|| obj = (*place)|fixeddict|		// verbose but faster
 		if BT >= typestem
-			if obj!.valuetype
-				jb_decr( obj!.value|object| )
-			obj!.valuetype = type
-			obj!.value = val|_voidptr|
+			if obj
+				if obj.valuetype
+					jb_decr( obj.value|object| )
+				obj.valuetype = type
+				obj.value = val|_voidptr|
+			  else
+				debugger // obj will never be nil here
 		  else
 			.typeof(b) = type
 			*place = val|_voidptr|

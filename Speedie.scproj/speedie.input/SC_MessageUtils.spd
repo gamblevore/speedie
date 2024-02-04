@@ -380,8 +380,13 @@ function NewEqRel (|string| L, |String| R, |Message|)
 
 function NewDecl (|string| type, |string| name="", |message|)
 	opt norefcounts
-	|| msg = («thg name », nil)(name)
+	|| msg = (@thg+name, nil)(name)
 	return newdecl(type, msg)
+
+
+function NewRejoin (|message|)
+	rz = @tmp + "rejoin"
+	rz.tmptype = asmtmp.kRejoin
 
 
 function NewDecl (|string| type, |message| RelOrName, |message|)

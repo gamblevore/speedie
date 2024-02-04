@@ -91,12 +91,12 @@ extend ObjectLoader {
 struct ObjectLoader {
 	linkage
 		cpp_part LD
-	|dictionary--|				Dict
-	|Message--|					CurrItem
-	|object--|					CouldntLoad
-	|Saveable|					Result
-	|Message--|					DataError
-	|Message--|					NoClass
+	|dictionary--?|				Dict
+	|Message--?|				CurrItem
+	|object--?|					CouldntLoad
+	|Saveable?|					Result
+	|Message--?|				DataError
+	|Message--?|				NoClass
 	
 	function VerifyFormat (|message|root, |bool|)
 		opt norefcounts
@@ -128,8 +128,8 @@ struct ObjectLoader {
 	function LoadObject (|message| msg, |Dictionary| dict, |&ClassData| Cls)
 		opt norefcounts
 		require (msg == @item)
-		|| name = msg.first
-		|| Result = Cls.AllocZeroed|saveable|
+		|| name = msg.first $
+		|| Result = Cls.AllocZeroed?|saveable|
 			dict[name.name] = result
 
 

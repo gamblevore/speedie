@@ -82,7 +82,9 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 		TmpFuncThg = .TheTmpVarOf(TmpFuncVar)
 		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg )		    // || t2 = func(t1, c.d)
 		arg <~ TmpFuncDecl
-		arg <~ «tmp "rejoin", TmpFuncThg »							// t2
+		|| rej = NewRejoin()
+		rej <~ tmpfuncthg
+		arg <~ rej													// t2
 
 	|| TmpParamName = UniqueTmpVar()								// "t1"
 	rz = funcmsg.TheTmpVarOf(TmpParamName)							// t1
@@ -117,7 +119,7 @@ function message.IntoVariable (|scbase| name_space, |nameandmsg|)
 	block.parent.obj = arg[name]	// Stop collectdecls being called twice! (name-conflict errors)
 									// it's called in typeofblock, unless we already have the type
 									// which we just set here.
-	|| last = @tmp + "rejoin"
+	|| last = NewRejoin()
 	|| RetVal = last.msg(@thg, name)
 	RetVal.obj = .obj
 	 

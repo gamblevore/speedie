@@ -6,8 +6,8 @@ prototype PicoThreadFn (|&pico| Comms, |_voidptr| Obj, |&cstring| Args=nil, |boo
 
 struct PicoMessage
 	linkage: wrapper, cpp_part Pico
-	|int|		Length
-	|&char|		Data
+	|int|			Length
+	|?&char|		Data
 	
 	syntax cast (|bool|)
 		if self

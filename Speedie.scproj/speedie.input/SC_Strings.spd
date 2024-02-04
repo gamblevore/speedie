@@ -19,9 +19,9 @@ SCStrings.RenderInsides = "
 
 SCStrings.RenderNewParams = "
 	|?FastString| fs_in = nil
-	|!string|
+	|?string|
 ".ParseCleanWipe
-		
+
 SCStrings.RenderFinish = SCStrings.RenderInsides.find( @tmp, "finish" )
 
 

@@ -146,7 +146,7 @@ function Function (NilTrackerFn)
 		if rz and !(v is FnBecomesNilCh) and p.isfirst
 			rz = 0 // can't work
 		|| sent = p.FastDecl
-		HasAddrs := sent.PointerUpgrade
+		HasAddrs := sent.CanUpgradeInternalPointer
 		if recv.NilReg	
 			.NilParamPass(recv, sent, p)
 
@@ -154,11 +154,10 @@ function Function (NilTrackerFn)
 		p++
 	
 	if HasAddrs
-		debugat
 		p = prms.first
 		for recv in fn.args
-			|| infernal = p.FastDecl.PointerUpgrade
-				.VariableSet(recv.internal, infernal, recv.source, p)
+			|| infernal = p.FastDecl.CanUpgradeInternalPointer
+				.VariableSet(infernal, recv.internal, recv.source, p)
 			p++
 
 	if fn.IsKiller
@@ -439,7 +438,7 @@ function ArgOne (|message| s,  |nilcheckmode| t,  |nilstate| prev,  |nilstate|)
 	if prev isnt borked
 		return rz
 	error.autoprint = .oldprint
-	expect (!stderr.ok) (s, "Borking but no zergs found?")
+	expect !(stderr.ok) (s, "Borking but no zergs found?")
 	stderr.clear
 
 	
@@ -567,9 +566,9 @@ function BecomeReal (|scdecl| sent, |message| where, |string| errmsg="NilObjectE
 }
 
 
-function scdecl.NeedsStated (|message| where, |nilstate|)
+function SCDecl.NeedsStated (|message| where, |nilstate|)
 	pragma inline
-	if !.nilstated
+	if !.NilStated
 		.NilPrmFail
 
 
