@@ -170,7 +170,7 @@ class Array (saveable)
 		|| i = 0
 		while
 			|| Item = self[i]
-			if item == nil:exit 
+			if item == nil: exit 
 			yield Item (i)
 			i++
 

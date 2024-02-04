@@ -27,7 +27,7 @@ extend_module Message
 		return true
 
 
-function message.TreeCompare (|Message| reparse, |message|)
+function message.TreeCompare (|Message!| reparse, |message?|)
 	opt norefcounts
 	ifn (.func == reparse.func) and (.name == reparse.name)
 		return reparse

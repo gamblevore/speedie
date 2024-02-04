@@ -348,7 +348,8 @@ extend SCClass
 
 
 function SCClass.RenameInterfaces
-	for (f in .behaviour$.interfaces)
+	|| b = .Behaviour$
+	for (f in b.interfaces)
 		|| it = f.cls
 			it.name = it.CppClass + it.name
 

@@ -550,12 +550,11 @@ extend Parser
 	
 	function OppChain (|Message| opp, |Message|)
 		|| result = parser.Process( kAdjectiveOp, opp )
-		if !result
-			return opp
+			if !opp.parent
+				result.First = opp
+			return result
+		return opp
 	
-		ifn opp.parent
-			result.First = opp
-		return result
 	
 	
 	function fOppWord (ParseHandler)

@@ -76,8 +76,10 @@ class Dictionary (saveable)
 	
 	iterator
 		|| nav = .Navigate
-		while (nav.MoveNext)
-			yield nav.Value (nav.Name)
+		while
+			|| v = nav.NextValue
+			if v == nil: exit
+			yield v (nav.Name)
 			
 	module
 		function Reverse (|dictionary of string|Dict, |dictionary of string|)
@@ -110,6 +112,10 @@ class DictionaryReader
 	
 	function MoveNext (|bool|)
 		cpp_wrapper JB_Nav_MoveNext
+		
+	function NextValue (|...|)
+		if .MoveNext
+			return .value
 	
 	constructor (|dictionary| dict)
 		cpp_wrapper JB_Nav_Constructor

@@ -406,13 +406,12 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 		if test isnt Active // can't use unknown param, so lets just default to real.
 			return .BecomeReal(dcl, msg)
 		dcl.NilDeclared = nilstate.optional
-		if test is soft and negative
-			return nilstate.optional
-		return T.SetNilness(dcl, Test)
+	  elseif test isnt Active
+		return dcl.nilcurr // merge with test below?
 
 	|| Y = dcl.nilcurr
-	if test isnt Active
-		return Y // when does this happen, even?
+	if test is soft and Negative		// I think so?
+		return Y
 
 	if Y is Either
 		return T.SetNilness(dcl, Test)

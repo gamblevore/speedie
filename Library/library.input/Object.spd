@@ -22,7 +22,7 @@ class Object
 	helper ClassBehaviours (|&byte|)
 		cpp_wrapper JB_ObjClassBehaviours
 
-	helper MemoryLayer (|MemoryLayer|)
+	helper MemoryLayer (|MemoryLayer?|)
 		nil checker
 		cpp_wrapper JB_ObjLayer
 	

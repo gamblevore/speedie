@@ -234,7 +234,7 @@ function message.Cpp_Wrapper (|string|)
 	opt norefcounts
 	if self
 		if self == @bra
-			return .first.name
+			return .first.nyme
 		return .name
 
 

@@ -267,7 +267,6 @@ function @ArchonPurger.ndb4
 function NilRecord.ndb5
 	cpp_name ndb5
 	visible
-	if scfunction.currfunc ~= "confarg"
 	
 	|| n = .DepthOfVars + 1 // sigh
 	for i in n
