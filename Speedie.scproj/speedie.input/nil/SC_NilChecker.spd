@@ -60,7 +60,7 @@ function Ignore (NilTrackerFn)
 
 		
 function StatementJump (NilTrackerFn)
-	return (NilTmps[msg.TmpType])(msg, test)
+	return (NilTmps[msg.TmpType])(msg)
 
 
 function Jump (NilTrackerFn)
@@ -117,6 +117,7 @@ function String (niltrackerfn)
 
 function Function (NilTrackerFn)
 	opt norefcounts
+	test &=~ NilCheckMode.Disappears
 	|| fp = msg.first
 	|| prms = fp.next
 	if msg.tmptype == ASMtmp.kTern
@@ -408,7 +409,7 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 		return dcl.nildeclared
 	
 	|| Y = dcl.nilcurr
-	if dcl.IsUnknownParam and test isnt soft
+	if dcl.IsUnknownParam and (test isnt soft and disappears)
 		if test isnt Active								// set var A to unknown prm B, so default to real
 			return .BecomeReal(dcl, msg)
 		dcl.NilDeclared = nilstate.optional
@@ -436,7 +437,7 @@ function Argument (Niltrackerfn)
 function ArgOne (|message| s,  |nilcheckmode| t,  |nilstate| prev,  |nilstate|)
 	pragma inline
 	s.DebugPrint
-	rz = .jump(s, T)
+	rz = .jump(s, T ||| nilcheckmode.Disappears)
 	if prev isnt borked
 		return rz
 	error.autoprint = .oldprint
@@ -472,7 +473,7 @@ function Brel (Niltrackerfn)
 		return .UseChildAsReal(msg)							// *abc
 
 	|| ch = *msg
-	if b == '+' or '-'
+	if b == '-' or '+' // for ++ or --
 		return .jump(ch, test)
 	if b == '!'
 		return .Not(ch, test)
@@ -509,14 +510,14 @@ function Declaration (niltrackerfn) // function decl
 
 function SetRel (NilTrackerfn)
 	opt norefcounts
-	|| R = msg.last,	.Jump(R, 0)			// R is defined as coming first
-	|| L = msg.first,	.Jump(L, 0)
+	|| R = msg.last!,	.Jump(R)			// R is defined as coming first
+	|| L = msg.first!,	.Jump(L)
 	return .VariableSet(L.FastDecl, R.FastDecl, L, R)
 
 
 function Fail (NilTrackerFn)
 	.OldPrint = error.autoprint 
-	error.autoprint = 0
+	error.AutoPrint = 0
 	return nilstate.borked
 
 

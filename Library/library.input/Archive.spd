@@ -90,7 +90,7 @@ role FileArchive (message)
 
 	function Base (|string|)
 		opt norefcounts
-		|| o = .last.obj
+		|| o = .last$.obj
 		if o isa string
 			return o
 

@@ -140,10 +140,10 @@ struct ObjectLoader {
 			if (cls == @tmp)
 				for (line in cls.last)
 					|| name = line.first
-					|| result = d[name.name]
-					if (result)
-						.CurrItem = line.last.first
-						result.__loadproperties__(self)
+						|| result = d[name.name]
+						if (result)
+							.CurrItem = line.last.first
+							result.__loadproperties__(self)
 			  elseif (cls == @name)
 				.result = d[cls.name]
 	
@@ -157,10 +157,9 @@ struct ObjectLoader {
 	
 	function GetClassOf (|message| msg, |&ClassData|)
 		opt norefcounts
-		|| Data = ObjectLoader.ClassList[msg.name] 
-		if (!Data)
-			.Noclass = msg
-		return (*data)|&classdata|
+		|| Data = ObjectLoader.ClassList![msg.name] 
+			return (*data)|&classdata|
+		.Noclass = msg
 	
 	
 	module

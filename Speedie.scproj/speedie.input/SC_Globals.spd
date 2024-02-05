@@ -98,6 +98,7 @@ function TypeOfReal (ExprResolver)
 	|| f = exp.first
 	|| t = TypeOfExpr(f, name_space)
 		t = t.MakeReal // i hope this works
+		exp.obj = t // seems not being set?
 	return t
 
 

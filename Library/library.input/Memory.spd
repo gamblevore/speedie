@@ -127,6 +127,7 @@ class Memory
 
 
 	function DiffAt (|memory| other, |ind|) // seems unused
+		disabled  "Unused? Also seems bad design."
 		|| n = other.length
 		if .length != n
 			return .length min n
@@ -143,9 +144,9 @@ class Memory
 		|| A1 = .ByteCapacity
 		|| A2 = other.ByteCapacity
 		|| A3 = A1 min A2
-		if A3
 			memory.copy(other.ptr, .ptr, A3)
 		return A3 == A1
+		
 		
 	function AppendPlace (|&...|)
 		|| L = .length
@@ -187,11 +188,11 @@ class Memory
 
 	
 	function ByteCapacity (|int|)
-		return .itemsize|int|*.Capacity|int|
+		return .ItemSize|int|*.Capacity|int|
 	
 	
 	function BytesUsed (|int|)
-		return .itemsize|int|*.length|int|
+		return .ItemSize|int|*.Length|int|
 	
 	
 	function Clear

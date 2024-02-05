@@ -438,7 +438,7 @@ class String
 			cpp_wrapper JB_Str_CopyFromCString
 
 		function Hex (|int64| i, |string|)
-			return i.hex
+			return i.hex!
 		
 		function FromPtr (|_voidptr| Addr, |int| N, |_voidptr|free=nil, |_voidptr| obj=nil, |string|)
 			cpp_wrapper JB_StrFromPtr

@@ -1,20 +1,18 @@
 
 
 class StringReader
-	|int|					Length
-	|FastBuff|				Data
-	|file|					File
-	|object--|				UserObj				// for jbin
-	|&MessageDecompressor| 	Decomp				// also
-	|int|					ChunkSize
-	|int| 					StartFrom
-	|bool| 					_NoMoreChunks
+	|int|						Length
+	|FastBuff|					Data
+	|file?|						File
+	|object--?|					UserObj				// for jbin
+//	|?&MessageDecompressor| 	Decomp				// also
+	|int|						ChunkSize
+	|int| 						StartFrom
+	|bool| 						_NoMoreChunks
 
 	linkage:cpp_Part SS
 	
 	constructor (|string| Data)
-		if Data == nil
-			Data = ""
 		.data.readfrom = Data
 		.length = Data.length
 		._NoMoreChunks = true
