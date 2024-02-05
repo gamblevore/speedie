@@ -40,10 +40,10 @@ extend ObjectLoader {
 		opt norefcounts
 		return .Next$.float
 	
-	function ObjectSub (|message|c, |object|)
+	function ObjectSub (|message| c, |object|)
 		opt norefcounts
 		if (c == @thg)
-			return .dict[c.name]
+			return .dict![c.name]
 		  elseif (C == @str)
 			return c.name.unshare
 	

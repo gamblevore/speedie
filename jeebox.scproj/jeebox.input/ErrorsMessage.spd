@@ -38,7 +38,7 @@ function Message.OriginalParseLayer (|memorylayer|)
 	Opt NoRefCounts
 	require self
 	|| L = .memorylayer
-	if (L and L != (Message).defaultlayer)
+	if (L != (Message).defaultlayer)
 		return L
 
 

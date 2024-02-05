@@ -38,9 +38,9 @@ dispatch fn_asm_table (fn_asm)
 	@bra:
 		opt norefcounts
 		|| f = exp.first
-		if f != @arg
-			return .µ(f, reg)
-		return ASMtmp.StateExpr(self, f)
+			if f.func != @arg
+				return .µ(f, reg)
+			return ASMtmp.StateExpr(self, f)
 
 
 	@list: // vectors

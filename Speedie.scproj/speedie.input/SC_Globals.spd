@@ -415,7 +415,7 @@ function ExtractAmount (|Message| Prms, |SCBase| name_space, |SCDecl| R, |bool|)
 	return true
 
 
-function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCDecl|)
+function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCDecl?|)
 	// a bit recursive!
 	|| f = c.func
 	

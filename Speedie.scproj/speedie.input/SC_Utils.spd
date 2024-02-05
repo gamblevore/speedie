@@ -73,7 +73,7 @@ extend Message {
 	operator IsRel (|String| name, |bool|)
 		opt norefcounts
 	// case blind...
-		Return (self) and (.func == @Rel) and (.second.name == name)
+		Return (self) and (.func == @Rel) and (.second == name)
 
 
 	operator IsDot (|string| name, |bool|)

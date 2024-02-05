@@ -83,7 +83,7 @@ class Saveable
 	function SaveTo (|File| f)
 		cpp_part SaveToFile
 		|| it = f.out
-			.saveto(it)
+			.SaveTo(it)
 	
 	function ObjectSaver.Finish (|saveable| first)
 		opt norefcounts
@@ -94,10 +94,10 @@ class Saveable
 		fs <~ '\n'
 		fs <~ kSaverEnd
 
-	// textview uses "Saveto" as a property.
+	// textview uses "SaveTo" as a property.
 	function SaveTo (|FastString| fs_in = nil, |string|)
 		cpp_part SaveTo
-		|| fs = FastString(fs_in) #require
+		|| fs = FastString(fs_in)		#require
 		|| Saver = objectsaver.new
 		saver.dest = fs
 		saver.root = self

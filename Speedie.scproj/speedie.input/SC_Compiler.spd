@@ -795,8 +795,8 @@ function ModulesSorter (SorterComparer)
 			return cb
 		// could use initafter?
 	  else
-		|| tt = aa.cls.basetype
-		|| D = tt|int| - bb.cls.basetype|int|
+		|| tt = ca.basetype
+		|| D = tt|int| - cb.basetype|int|
 			return D < 0
 		
 		D = ca.depth|int| - cb.depth|int|

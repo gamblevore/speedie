@@ -63,7 +63,8 @@ struct ArchonPurger
 		return (.Neel - &.rows[0])|int|
 	
 	
-	function DeclareReal (|scdecl| V)
+	function BecomeRealSub (|scdecl| V)
+//		if scfunction.currfunc ~= "JB_Tree_Second"
 		V.NilDeclared = NilState.real
 		if v is self
 			.FnAbleToNilCheck = false
@@ -182,7 +183,7 @@ struct ArchonPurger
 		return (.value)[1]
 
 
-	function SetAllNil (|NilRecord| Dest, |string| reason, |nilstate|)
+	function SetAllNil (|NilRecord| Dest, |string| reason)
 		dest &= .Realnesses
 		
 		target debug {
@@ -201,8 +202,6 @@ struct ArchonPurger
 					d.nilprint(reason)
 		}
 
-		return dest
-
 
 	module
 		|LoopInfo| 				Loops
@@ -217,7 +216,8 @@ struct ArchonPurger
 
 		function EndBlock (|nilrecord|)
 			pragma inline
-			return t.SetAllNil(nilstate.basic, "blockend")
+			rz = .value
+			t.SetAllNil(nilstate.basic, "blockend")
 
 
 		function DeclKill

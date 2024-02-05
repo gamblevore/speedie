@@ -22,8 +22,7 @@ class Object
 	helper ClassBehaviours (|&byte|)
 		cpp_wrapper JB_ObjClassBehaviours
 
-	helper MemoryLayer (|MemoryLayer?|)
-		nil checker
+	helper MemoryLayer (|MemoryLayer|)
 		cpp_wrapper JB_ObjLayer
 	
 	helper RefCount (|int|)

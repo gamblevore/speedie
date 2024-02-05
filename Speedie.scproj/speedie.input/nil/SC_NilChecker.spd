@@ -142,13 +142,16 @@ function Function (NilTrackerFn)
 	|| P = prms.first
 	|| HasAddrs = false
 	for recv in fn.args
+		if recv.nildeclare is optional
+			test |= nilcheckmode.Soft
+			
 		|| v = .Jump(p, test)
 		if rz and !(v is FnBecomesNilCh) and p.isfirst
 			rz = 0 // can't work
 		|| sent = p.FastDecl
 		HasAddrs := sent.CanUpgradeInternalPointer
 		if recv.NilReg	
-			.NilParamPass(recv, sent, p)
+			.NilParamPass(recv, sent, p, fn)
 
 		Test = 0
 		p++
@@ -251,15 +254,14 @@ function Continue (NilTrackerFn)
 
 function WhileInner (|message| Cond)
 	opt norefcounts
-	|nilrecord| OldCont // remove oldcont later, and lower loop count to 2
-	|| arg = cond.next
+	//|nilrecord| OldCont // remove oldcont later, and lower loop count to 2
 
 	for i in 3
 		.jump(cond, NilCheckMode.whilepos)
-		.Argument(arg)
+		.Argument(cond.next)
 		.Loops.NextLoop
-		if i == 1:    OldCont =  .Value
-		if i == 2: if OldCont != .Value // Test the first two loops.
+		//if i == 1:    OldCont =  .Value // seems to change even after the second time?
+		//if i == 2 and OldCont != .Value : debugat // Test the first two loops.
 	
 
 function While (NilTrackerFn)
@@ -404,18 +406,14 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 
 	if !dcl.NilReg
 		return dcl.nildeclared
-	if dcl isnt local									// Internal bug!
 	
-	if dcl.IsUnknownParam
-		if test isnt Active // can't use unknown param, so lets just default to real.
-			return .BecomeReal(dcl, msg)
-		if test isnt soft
-			dcl.NilDeclared = nilstate.optional
-	  elseif test isnt Active
-		return dcl.nilcurr				// merge with test below?
-
 	|| Y = dcl.nilcurr
-	if test is soft and Negative		// I think so?
+	if dcl.IsUnknownParam and test isnt soft
+		if test isnt Active								// set var A to unknown prm B, so default to real
+			return .BecomeReal(dcl, msg)
+		dcl.NilDeclared = nilstate.optional
+
+	if test isnt active  or  test is soft and Negative
 		return Y
 
 	if Y is Either
@@ -450,7 +448,7 @@ function Bracket (Niltrackerfn)
 	opt norefcounts
 	if msg.length // a? --> (a) // but the bra has a name
 		test |= NilCheckMode.Soft
-	return .Jump(*msg, test)
+	return .Jump((*msg)!, test)
 
 
 function Type (Niltrackerfn)
@@ -526,14 +524,13 @@ function Debugger (NilTrackerFn)
 	// do nothing :)
 
 
-function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where)
+function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |scfunction| f)
 	opt norefcounts
-	if (recv.isreal)
-		.BecomeReal(sent, where, "NilObjectError, passed non-real param: ")
+	if recv.isreal
+		.BecomeReal(sent, where, f)
 	  elseif !recv.nilstated
-		recv.NilPrmFail
+		recv.NilPrmFail(where, f)
 	
-
 
 function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message| SentMsg,  |nilstate|) // setrel, relset
 	opt norefcounts
@@ -544,8 +541,6 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 
 	|| SN = sent.NilCurr
 	if recv.isreal and recv isnt local
-		// can't work if recv is a local?? what should we do? just set the damn thing?
-		// wht about being declared? well only locals are undeclared.
 		expect (SN is realish) (RecvMsg, "Nil is not allowed here on: " + recvmsg.render)
 		return .BecomeReal(sent, SentMsg)
 		
@@ -553,24 +548,29 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 		return T.SetNilness(recv, SN)
 
 
-function BecomeReal (|scdecl| sent, |message| where, |string| errmsg="NilObjectError accessing optional: ", |nilstate|)
+function BecomeReal (|scdecl| sent, |message| where, |scfunction| To=nil,  |nilstate|)
 	opt norefcounts
 	|| Curr = sent.NilCurr
 	if curr == NilState.Realish
 		return curr
 	
 	if (Curr == nilstate.either) and sent.IsUnknownParam
-		T.DeclareReal(sent)
+		T.BecomeRealSub(sent)
 		return T.SetNilness(sent, NilState.real)
 
-	error (where, errmsg + Where.render)
+	return .FailedReal(to, where)
+
+
+function FailedReal (|scfunction| To, |message| where, |nilstate|)
+	|| fs = faststring()
+	fs <~ "NilObjectError "
+	fs <~ ("passing non-real param: ", "accessing optional: ")(to)
+	where.render(fs)
+	if To
+		fs <~ " to "
+		to.rendertitle(fs)
+	error (where, fs)
 }
-
-
-function SCDecl.NeedsStated (|message| where, |nilstate|)
-	pragma inline
-	if !.NilStated
-		.NilPrmFail
 
 
 function scdecl.IsUnknownParam (|bool|)

@@ -60,8 +60,9 @@ class SCIterator (SCObject)
 		Return true
 
 
-	function message.Deepest (|syntax| Tmp, |string| name, |message|)
+	function message.Deepest (|syntax| Tmp, |string| name, |message?|)
 		opt norefcounts
+		.func
 		for ch in self
 			|| best = ch.deepest(tmp, name)
 				return best

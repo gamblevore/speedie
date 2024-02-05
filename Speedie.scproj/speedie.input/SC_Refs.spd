@@ -30,7 +30,7 @@ function Message.FindRef (|SCFunction| fn, |string| name, |Message|)
 	for (curr.forward in self)
 		if (curr == @func)
 			|| prms = curr.last
-			if (prms.obj == fn) and (prms.first isthing name)
+			if (prms) and (prms.obj == fn) and (prms.first isthing name)
 				return Curr
 
 

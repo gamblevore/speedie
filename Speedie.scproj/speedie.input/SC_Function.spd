@@ -117,12 +117,13 @@ function Last (|SCFunction|)
 
 
 function ParentName (|string|)
-	if (.cls)
-		return .cls.name
+	opt norefcounts
+	|| c = .cls
+		return c.name
 	|| Mod = .parent
 	if mod isa SCModule
-		require !mod.isimport
-		return mod.name
+		if !mod.isimport
+			return mod.name
 
 
 render RenderParams (|bool| ForErrors=true)
@@ -745,18 +746,17 @@ function EqualOrMoreSpecific (|SCFunction| f, |bool|)
 	require ((f.ReturnType)|bool| == (.ReturnType)|bool|)
 	require (f.args.length == .args.length)
 
-	if (f.ReturnType)
-		require f.ReturnType matches .ReturnType
+	|| r = f.ReturnType
+		require r matches .ReturnType
 	
 	for (a in .args) (i)
-		require (f.args[i] matches a)
+		require (f.args[i]! matches a)
 	
 	Return true
 
 
 function CheckReturnValue (|Message| msg)
 	|| c = msg.first
-	if c.objectid == 40929992
 	
 	if (!c)
 		expect (!.ReturnType) (msg, "Need to specify a return value")

@@ -589,7 +589,7 @@ class SCDecl (SCObject) {
 		return self
 		
 	
-	function MatchC (|SCDecl| O, |bool|)
+	function MatchC (|SCDecl?| O, |bool|)
 		Return .TypeMatch( o, kTypeCastTrue, nil )
 
 

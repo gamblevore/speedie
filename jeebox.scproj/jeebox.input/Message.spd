@@ -587,6 +587,7 @@ class Message (RingTree)
 
 
 	render
+		opt norefcounts
 		fs <~ self
 
 	

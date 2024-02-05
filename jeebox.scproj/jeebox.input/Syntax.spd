@@ -41,8 +41,9 @@ datatype Syntax (Byte)
 		return .Func.Translateable
 
 	render 
-		if Self
-			.obj.render(fs)
+		opt norefcounts
+		|| o = .Obj
+			o.render(fs)
 	
 	operator plus (|string| m, |message|)
 		return self.msg(m)
