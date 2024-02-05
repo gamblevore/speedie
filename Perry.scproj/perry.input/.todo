@@ -5,7 +5,8 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 * Do nil checker!
-	* Strings/arrays should be declared real in params... unless specified ?
+
+* constructors should allow code before it... just not property setting.
 
 * change allocator to use unified allocator?
 	* s = message.new(void* layer, a, b, c) // can be 0x1 or memlayer+0x1, or an object

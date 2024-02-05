@@ -93,30 +93,11 @@ class Memory
 	|byte|				DeathAction
 	contains byte // should be byte?
 	
-	
-	constructor (|int| ItemCount, |uint| ItemSize, |bool| DummyParam)
-		cpp_part ConstructorDummy // these two are the same?
-		|| Request = ItemCount * ItemSize
-		.ItemSize = ItemSize
-		.length = 0
-		._ptr = byte(Request)
-		.Capacity = (itemcount, 0)(._ptr)
-		.deathAction = datatypewrapper.kFree
-	
-	
-	constructor (|int| ItemCount, |uint| ItemSize)
-		|| Request = ItemCount * ItemSize
-		.ItemSize = ItemSize
-		.length = 0
-		._ptr = byte(Request)
-		.Capacity = (itemcount, 0)(._ptr)
-		.deathaction = datatypewrapper.kFree
-	
 
-	constructor (|int| ItemCount, |uint| ItemSize, |&byte| ptr)
+	constructor (|int| ItemCount, |uint| ItemSize, |&byte| ptr, |byte| DeathAction=datatypewrapper.kfree)
 		cpp_part ConstructorPtr
 		.ItemSize = ItemSize
-		.length = itemcount
+		.length = 0
 		.Capacity = itemcount
 		._ptr = ptr
 	
@@ -145,15 +126,15 @@ class Memory
 			return cap
 
 
-	function DiffAt (|memory|other, |ind|)
+	function DiffAt (|memory| other, |ind|) // seems unused
 		|| n = other.length
 		if .length != n
 			return .length min n
 		|| p1 = ._ptr
-		|| p2 = p1 + n
+		|| pz = p1 + n
 		|| pc = other._ptr
 		
-		while p1 < p2
+		while p1 < pz
 			if *pc++ != *p1++
 				return (p1-1) - ._ptr
 		
@@ -212,14 +193,6 @@ class Memory
 	function BytesUsed (|int|)
 		return .itemsize|int|*.length|int|
 	
-
-	function Free
-		if (.deathaction == datatypewrapper.kfree)
-			Memory.free(._ptr)
-		._ptr = nil
-		.Capacity = 0
-		.Length = 0
-	
 	
 	function Clear
 		disabled "Do you mean .Free or .Zero?"
@@ -246,12 +219,11 @@ class Memory
 			  elseif ++com >= cn
 				com = 0
 				fs <~ ", "
-			
-			
-	
+
 	
 	destructor
-		.free
+		if (.deathaction == datatypewrapper.kfree)
+			Memory.free(._ptr)
 		
 
 	iterator safe
@@ -283,10 +255,10 @@ class Memory
 
 	module
 		|uint64[2]| MDummy
-		function Object (|int| ItemCount, |int| ItemSize, |Memory|)
+		function Object (|int| Count, |int| ItemSize, |Memory|)
 			visible 
-			rz = .new(ItemCount, ItemSize, false)
-			require rz._ptr
+			|| p = byte.zalloc(Count * ItemSize)
+				return .new(Count, ItemSize, p)
 
 		function Random  (|int| n, |memory|)
 			rz = byte[n]
@@ -296,16 +268,16 @@ class Memory
 		function Unmap	 (|_voidptr| p, |int| n):						cpp_wrapper JB_munmap
 		function UsedString	 (|int64|):									cpp_wrapper JB_MemUsedString
 		function UsedOther	 (|int64|):									cpp_wrapper JB_MemUsedOther
-		function _Alloc  (|int| n, |&byte|):							cpp_wrapper JB_malloc
-		function Zalloc  (|int| n, |&byte|)
-			return byte(n)
-		function Realloc (|_voidptr| b, |int| n, |&byte|):				cpp_wrapper JB_realloc
+		function _Alloc  (|int| n, |?&byte|):							cpp_wrapper JB_malloc
+		function Zalloc  (|int| n, |?&byte|)
+			return byte.zalloc(n)
+		function Realloc (|_voidptr| b, |int| n, |?&byte|):				cpp_wrapper JB_realloc
 		function Free	 (|_voidptr| b):								cpp_wrapper JB_free
 		function Zero	 (|_voidptr| addr, |int| n):					cpp_wrapper memzero
 		function Copy	 (|_voidptr| dest, |_voidptr|src, |int| N):		cpp_wrapper memcpy
 		function Copy	 (|object| dest, |object|src, |int| N)
 			.copy(dest|_voidptr|, src|_voidptr|, n)
+		
 		function CopyObject (|object|src, |object| dest, |int| N) 
 			disabled "Copying object contents seems like a very bad thing"
-//			Memory.copy(self|&byte|+4, src|&byte|+4, n-4)
 		

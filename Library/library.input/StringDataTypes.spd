@@ -84,7 +84,7 @@ datatype byte
 		return  self >= a  and  self <= b
 	
 	module
-		function New (|int| n, |&byte|)
+		function ZAlloc (|int| n, |?&byte|)
 			cpp_wrapper JB_zalloc
 
 
@@ -115,12 +115,3 @@ datatype cstring
 			fs_in <~ self
 		  else
 			return .copy
-	module
-		function New (|[string]| r, |cstring[]|)
-			|| n = r.length
-			rz = memory(n, platform.PointerBytes)
-			for i in n
-				|| s = r[i].cstr
-				r[i] = s
-				rz <~ s.addr|cstring|
-

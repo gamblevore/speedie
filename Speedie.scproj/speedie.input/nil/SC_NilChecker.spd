@@ -171,7 +171,7 @@ function Function (NilTrackerFn)
 
 
 function Rejoin (NilTrackerFn)
-	return .jump(msg.first, Test) 
+	return .jump(msg.first!, Test) 
 
 
 function DetectStillChecks (|message| first, |nilstate|)
@@ -255,7 +255,7 @@ function WhileInner (|message| Cond)
 	|| arg = cond.next
 
 	for i in 3
-		.jump(cond, NilCheckMode.softpos)
+		.jump(cond, NilCheckMode.whilepos)
 		.Argument(arg)
 		.Loops.NextLoop
 		if i == 1:    OldCont =  .Value
@@ -272,7 +272,7 @@ function While (NilTrackerFn)
 	|| W = .loops.BeginLoop(!condtest.IsTrue)
 	WhileInner(cond)
 	if !condtest.IsTrue		// This is just for simple error detection. like macro errors. 
-		.jump(cond, NilCheckMode.softneg)
+		.jump(cond, NilCheckMode.whileneg)
 	
 	.loops.FinishLoop(msg)
 	ArchonPurger.loops = W
@@ -366,7 +366,7 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 	return .jump(side, test.activate)  // can handle x = !(a == nil)
 
 
-function ProcessCondRel (Niltrackerfn)
+function ProcessCondRel (NilTrackerfn)
 	opt norefcounts
 	|| ll = msg.first
 	|| op = ll.next
@@ -378,11 +378,15 @@ function ProcessCondRel (Niltrackerfn)
 	
 	|| AndOr = scop.IsAndOr
 		(test is AND) = (andor == scoperator.AND)
-		return .booleanlogic(msg, test.activate)
+		return .BooleanLogic(msg, test.activate)
 
-	// (ptr+1) or (1+ptr) still needs nilness check
-	|| L = .jump(ll, 0)
-	return L.Worst(.Jump(rr, 0))
+	|| L = .Jump(ll) & NilState.Either		// (ptr+1) or (1+ptr) still needs nilness check
+	|| R = .Jump(rr) & NilState.Either
+	if !msg.fastdecl.TypeSuffers			// (ptr-ptr) is actually a number... so thats OK.
+		return nilstate.real
+	if NilState.Nilish == l or r
+		return nilstate.nilish
+	return l ||| r
 
 
 
@@ -405,9 +409,10 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	if dcl.IsUnknownParam
 		if test isnt Active // can't use unknown param, so lets just default to real.
 			return .BecomeReal(dcl, msg)
-		dcl.NilDeclared = nilstate.optional
+		if test isnt soft
+			dcl.NilDeclared = nilstate.optional
 	  elseif test isnt Active
-		return dcl.nilcurr // merge with test below?
+		return dcl.nilcurr				// merge with test below?
 
 	|| Y = dcl.nilcurr
 	if test is soft and Negative		// I think so?
@@ -488,7 +493,7 @@ function arel (Niltrackerfn)
 	opt norefcounts
 	|| ch = *msg
 	|| b = msg.name.first
-	if b == '+' or '-'
+	if ch and b == '+' or '-'
 		return .jump(ch, test)
 	debugger // what?
 
@@ -497,14 +502,11 @@ function arel (Niltrackerfn)
 function Declaration (niltrackerfn) // function decl 
 	opt norefcounts
 	|| rel = msg.last
-	if rel == @thg
-		if rel.FastDecl.isreg
-		return 0
-	
-	|| d = rel.first.FastDecl
-	if d.IsReg
-		|| J = .Jump(rel.last)
-		return T.Declare(D, J)
+	if rel != @thg
+		|| d = rel.first.FastDecl
+		if d.IsReg
+			|| J = .Jump(rel.last)
+			return T.Declare(D, J)
 
 
 function SetRel (NilTrackerfn)
@@ -539,7 +541,7 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 	if !recv.typesuffers
 		return nilstate.real
 	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg)
-		
+
 	|| SN = sent.NilCurr
 	if recv.isreal and recv isnt local
 		// can't work if recv is a local?? what should we do? just set the damn thing?

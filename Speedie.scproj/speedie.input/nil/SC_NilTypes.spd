@@ -35,8 +35,9 @@ datatype NilCheckMode (uint)
 		Soft
 		And
 		Reversed
-		SoftPos = Positive + Soft  
-		SoftNeg = Negative + Soft
+		While
+		WhilePos = Positive + While 
+		WhileNeg = Negative + While
 		Active  = Positive + Negative
 		Basic   = Active + Soft
 

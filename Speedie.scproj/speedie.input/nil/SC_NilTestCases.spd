@@ -259,12 +259,12 @@ function NilState.NilName (|faststring| fs, |bool| Expected)
 
 
 target debug {
-function @ArchonPurger.ndb4
+function @ArchonPurger.ndb4 (|bool| brk = true)
 	cpp_name ndb4
 	visible
-	.value.ndb5
+	.value.ndb5(brk)
 
-function NilRecord.ndb5
+function NilRecord.ndb5 (|bool| brk)
 	cpp_name ndb5
 	visible
 	
@@ -275,5 +275,6 @@ function NilRecord.ndb5
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"
+			// if brk and SCFunction.CurrFunc ~= "JB_sci_Clear"
 }
 

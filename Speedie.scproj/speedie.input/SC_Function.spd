@@ -875,7 +875,8 @@ function message.IsParentConCall (|scfunction|)
 
 function scclass.RealSuper (|scclass|)
 	opt norefcounts
-	return .super.realclass
+	|| s = .super
+		return s.realclass
 
 
 function scclass.RealClass (|scclass|)
@@ -1765,7 +1766,7 @@ function scfunction.UpdateSourceSub (|message| src, |bool|)
 function scfunction.SetBlindCasts (|scbase| name_space)
 	opt norefcounts
 	if name_space
-		|| p = name_Space.project?
+		|| p = name_space.project
 			.BlindCasts	= p.blindcast
 	  else
 		|| c = scimport.curr

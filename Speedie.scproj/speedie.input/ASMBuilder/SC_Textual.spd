@@ -96,7 +96,8 @@ extend AsmFuncState
 	
 	
 	function IR.File (|string|)
-		return IR.Resources[.filepos]
+		|| s = IR.Resources[.filepos]
+			return s
 	
 	
 	function IR.SyntaxExpect (|string| Error)

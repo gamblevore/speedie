@@ -729,6 +729,7 @@ class Message (RingTree)
 
 	function Find (|Syntax| s, |Message|)
 		cpp_part FindSyx
+		nil self // why is this necessary? nil-checker should realise the loop tests for self?
 		Opt NoRefCounts
 		for ch in self
 			if ch == s

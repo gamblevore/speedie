@@ -235,7 +235,7 @@ class String
 		cpp_wrapper JB_Str_Trim
 	
 
-	function TrimStart (|string| s, |bool| All=false,   |string|)
+	function TrimStart (|string| s, |bool| All=false,  |string|)
 		ifn self starts s
 			return self
 		while self starts s
@@ -267,7 +267,7 @@ class String
 		error ("Not a boolean value: '" + self + "'")
 
 
-	function CharSet (|bool| Range = true, |CharSet|)
+	function CharSet (|bool| Range = true, |!CharSet|)
 		return CharSet.new(self, range)
 
 

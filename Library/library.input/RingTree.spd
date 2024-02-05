@@ -52,8 +52,8 @@ class RingTree (Saveable)
 	function IsFirst (|bool|)			{ opt norefcounts, return .prev == nil }
 	function IsLast  (|bool|)			{ opt norefcounts, return .next == nil}
 
-	function HasAny (|bool|)			{ cpp_wrapper JB_Ring_HasChildren, nil checker }
-	function HasChildren (|bool|)		{ Disabled ".hasany" }
+	function HasAny	 (|bool|)			{ cpp_wrapper JB_Ring_HasChildren, nil checker }
+	function HasChildren   (|bool|)		{ Disabled ".hasany" }
 	function HasChildCount (|int|Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount, nil checker }
 		
 
@@ -70,10 +70,10 @@ class RingTree (Saveable)
 
 	
 	syntax Compare (|int| n, |bool|Aware, |int|)
-		return .slowcount - n
+		return .SlowCount - n
 	
 	syntax Equals (|int| n, |bool|Aware, |bool|)
-		return .haschildcount( n )
+		return .HasChildCount( n )
 	
 	operator More (|int| N, |bool|)
 		disabled ">" // has more children than N	
@@ -96,20 +96,24 @@ class RingTree (Saveable)
 		  else
 			p <~ Value
 	
+	
 	function Across (||)
 		opt norefcounts
 		|| n = .next
 			return n
 		return .parent.next.first
-		
+
+			
 	function FlatLast (||)
 		opt norefcounts
 		rz = self
 		while
-			rz = rz.last#loop
-	
+			rz = rz.last	#loop
+
+
 	function FlatNext  (||)	
 		cpp_wrapper JB_Ring_FlatNext0 // doesnt nil check
+
 
 	function FlatPrev (||)
 		opt norefcounts
@@ -135,6 +139,7 @@ class RingTree (Saveable)
 
 	operator inside (|| s, |bool|)
 		return s contains self
+
 
 	operator contains (|| r, |bool|)
 		opt norefcounts

@@ -75,7 +75,7 @@ linkage
 
 |Dictionary of SCFile|		Files = nil
 |[SCImport]|				ImportedList
-|Dictionary of SCImport|	ImportedNames = nil
+|Dictionary of SCImport|	ImportedNames = Dictionary.new
 
 
 |SCModule|				program
@@ -85,7 +85,7 @@ linkage
 |[SCFunction]|			FuncList
 |[SCFunction]|			ProtoTypes
 
-|Dictionary of SCBase|		ExportNames = nil
+|Dictionary of SCBase|		ExportNames = Dictionary()
 |dictionary of dictionary of macro|	AdjDicts = dictionary()
 
 |SCFunction|			PrivateProperty
@@ -587,28 +587,17 @@ function PostInitCodeCall
 
 
 function InitCompiler
-	require (.Projects.fileCH("Library").mustexist)
-	require stderr.ok
+	require (.Projects.fileCH("Library").mustexist) and stderr.ok
 	scoperator.Init
 	Cpp_Export.Init
 
 	.files := Dictionary.new
 	
 	////////////////////////////////////////////////
-	.ExportNames = Dictionary.new
-	.TimerOutput = FastString.new
 	.TimerOutput <~ "\n"
 
-	.ImportedNames = Dictionary.new      // stop projects imported twice.
 	.CurrStage = 1
-
-	.stReachedClass = 0
-	.stParseTimeTotal = 0
-	.stReachedFunc = 0
 	SCGlobals.UniqueNum = 100
-	.stClasses = 0
-	.stFuncs = 0
-	.stFunctionProgress = 0
 	////////////////////////////////////////////////
 	
 	if options.SingleFileInput
@@ -949,7 +938,7 @@ syntax access (|Message| name, |SCClass|)
 
 |Date|			LastTime
 |string|		LastTimeName
-|FastString|	TimerOutput
+|FastString|	TimerOutput = FastString.new
 
 function AppendCompilerTime (|string| s, |int| Durr)
 	compiler.TimerOutput.appendwidth(s, compiler.kTimeWidth)

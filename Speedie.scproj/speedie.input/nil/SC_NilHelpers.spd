@@ -3,7 +3,10 @@
 extend Message {
 
 function Redundant (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
-	ifn (Test is soft) or (dcl.NilAllocDepth < ArchonPurger.loops.NestDepth)	// if a.length // allow redundant test
+	if (Test is soft or while) // allow redundant
+		return Test & nilstate.either
+
+	if dcl.NilAllocDepth >= ArchonPurger.loops.NestDepth
 		|| str = .render + " redundantly tested. Currently is: " + dcl.nilcurr.rawname 
 		error (self, str)
 	return Test & nilstate.either
