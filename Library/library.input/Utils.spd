@@ -72,6 +72,14 @@ function string.Sort (|byte| sep = '\n', |string|)
 	return x.Join(string.byte(sep))
 
 
+function Message.FindNotInserted (|message|)
+	opt norefcounts
+	for c.up in self
+		if c isnt inserted
+			return c
+	return self
+
+	
 function message.LOC (|ivec2|)
 	description "Calculate Lines of content" 
 	opt norefcounts

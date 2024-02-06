@@ -128,7 +128,6 @@ function Function (NilTrackerFn)
 		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
 		fn = fp.GetFunctionPointer
 		require fn and .UseChildAsReal(fp)						// (abc)()
-	if fn ~= "JB_Array__New0" and scfunction.currfunc ~= "JB_Str_OpenFile"
 	
 	expect ((fn != scfunction.currfunc) or t.RootReturned or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
 		
@@ -568,7 +567,7 @@ function FailedReal (|scfunction| To, |message| where, |nilstate|)
 	if To
 		fs <~ " to "
 		to.rendertitle(fs)
-	error (where, fs)
+	error (where.FindNotInserted, fs)
 }
 
 

@@ -6,6 +6,8 @@
 	* use 256 VM codes? Only a few need all 25 bits.
 * Do nil checker!
 	* selector constructor shouldn't need ?
+	* also... what about global struct pointers? pointers are assumed not nil... but if its not initialised it will be nil?
+		* compiler should know this
 	
 * constructors should allow code before it... just not property setting.
 
