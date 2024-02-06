@@ -500,6 +500,7 @@ function Declaration (niltrackerfn) // function decl
 	|| rel = msg.last
 	if rel != @thg
 		|| d = rel.first.FastDecl
+		if d isnt body // what?
 		if d.IsReg
 			|| J = .Jump(rel.last)
 			return T.Declare(D, J)

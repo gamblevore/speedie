@@ -7,7 +7,7 @@ function DeclsDefault (|Message| def, |Message|)
 		return def.Last
 
 
-function MakeDecl (|string| Type, |string| Name, |Message| Value, |Message|)
+function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose=0, |Message|)
 	rz = «decl »
 	if (Type)
 		|| arg = rz.msg(@arg)
@@ -16,19 +16,26 @@ function MakeDecl (|string| Type, |string| Name, |Message| Value, |Message|)
 	  else 
 		rz <~ @emb
 	
-	|| NameMsg = «thg name »
-	if value
-		|| Rel = «rel
-			NameMsg
-			@opp+"="
-			value
-		»
-		NameMsg.obj = CopyDecl( value, name )
-		Rel.obj = NameMsg.obj
-		NameMsg = Rel
+	if !Value
+		if purpose
+		rz <~ (@thg, name)
+		return rz
 	
-	rz <~ NameMsg
-
+	|| Rel = rz.msg(@rel)
+	|| NameMsg = rel.msg(@thg, name)
+	rel <~ (@opp, "=")
+	rel <~ value
+	
+	|| o = value.obj as scdecl
+		|| dcl = o.Copy(true)
+		dcl.info |= purpose
+		dcl.Name = name
+		dcl.Default = value
+		NameMsg.obj = dcl		
+		Rel.obj = dcl
+	else
+		if purpose
+	
 
 function MakeDeclOrRel (|Message| Into, |message| namemsg, |Message| value, |Message|)
 	require into

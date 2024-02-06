@@ -86,7 +86,7 @@ class SCDecl (SCObject) {
 
 	|int|				C_Array
 	
-	|SCFunction--?|		Setter		// todo: replace the .stringdata/hider thing with this.
+	|SCFunction--?|		Setter		// todo: replace the .StringData/hider thing with this.
 	|Object?|			IsLookupOnly
 	|string|			StringData	// 3 special objects. Aren't they exclusive? Write some code to see if they are.
 	|SCDecl?|			Internal	// only for pointers :)
@@ -108,9 +108,9 @@ class SCDecl (SCObject) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered
+		target debug: if .objectid == 0
 		
 	setter NilDeclared (|nilstate|)
-		// if .objectid == 25271464
 		//	if value&1 != .nildeclare&1
 		.nildeclare = value
 	
@@ -563,7 +563,7 @@ class SCDecl (SCObject) {
 
 
 	operator exact_isa (|scclass| v, |bool|)
-		Return .isnormal and (.type == v)
+		Return .IsNormal and (.type == v)
 
 
 	operator isa (|string| s, |bool|)
@@ -626,7 +626,6 @@ class SCDecl (SCObject) {
 		return self
 		
 	
-
 	function SameForReplace (|SCDecl| c, |bool|)
 		require (c is borrowed) == (self is borrowed) 
 		require c.PointerCount == .PointerCount 
@@ -983,7 +982,6 @@ class SCDecl (SCObject) {
 			Cast |= kTypeCastBothWays
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
-		//require (exp and exp.IsSetIntoPlace and .TypeSuffers)
 		
 		if (self is self) and (scfunction.currfunc is constructor or Destructor) 
 			error (exp, "You can’t modify 'self' in a constructor or destructor.")

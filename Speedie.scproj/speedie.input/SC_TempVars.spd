@@ -80,7 +80,7 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 		arg = FuncMsg.createownblock #require
 		|| TmpFuncVar = UniqueTmpVar()								// "t2"
 		TmpFuncThg = .TheTmpVarOf(TmpFuncVar)
-		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg )		    // || t2 = func(t1, c.d)
+		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg, scdeclinfo.body )		    // || t2 = func(t1, c.d)
 		arg <~ TmpFuncDecl
 		|| rej = NewRejoin()
 		rej <~ tmpfuncthg
@@ -90,7 +90,7 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 	rz = funcmsg.TheTmpVarOf(TmpParamName)							// t1
 	.ReplaceWith( rz )										// func(a.b.b2, c.d) --> func(t1, c.d)
 // || t1 = a.b.b2
-	|| TmpParamDecl = MakeDecl( "", TmpParamName, self )
+	|| TmpParamDecl = MakeDecl( "", TmpParamName, self, scdeclinfo.body )
 	TmpFuncDecl.prev = TmpParamDecl
 
 
@@ -182,6 +182,7 @@ extend_module scfunction
 		|| OldDcl = msg.AsDecl
 			insert.obj = OldDcl
 			OldDcl = OldDcl.Copy // no difference, its a temp
+			if olddcl isnt body 
 			OldDcl.Name = name
 			repl.obj = OldDcl
 			dcl.obj = OldDcl
@@ -202,12 +203,13 @@ extend_module scfunction
 		|| Name = UniqueTmpVar(msg.msgowningfunc)
 		|| d = OldDecl.Copy // no difference? This ACTUALLY may or may NOT be borrowed, BUT surely the temp should have the SAME borrowedness? Or else why are we temping it?
 		d.Name = ""
+		(d is body)
 		
 		// a.b.c -> || tmp1 = a.b, tmp1.c
 		|| NameThing = «Thg name »
 		NameThing.obj = d
 		msg.ReplaceWith( NameThing )
 		
-		(parent, namething)(parent).prev = MakeDecl( "", name, msg )		
+		(parent, namething)(parent).prev = MakeDecl( "", name, msg, scdeclinfo.body )		
 		Return NameThing
 

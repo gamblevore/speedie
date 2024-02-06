@@ -1487,15 +1487,6 @@ function TypeOfList (ExprResolver)
 	return TypeOfExpr(exp, name_space)
 
 
-function CopyDecl (|Message| CopyFrom, |string| name, |SCDecl|)
-	|| o = CopyFrom.obj
-	if o isa SCDecl
-		|| dcl = o.Copy(true) // only called from MakeDecl, but MakeDecl is used from all over... i'm not sure why. Or what for. I guess just clear it... even if the original was borrowed, the new one shouldn't be... makes sense. 
-		dcl.Name = name
-		dcl.Default = CopyFrom
-		Return dcl
-
-
 function ClassOfObjForC (|Message| curr, |SCClass|) {
 	if curr == @Func
 		|| fnc = curr.MsgFunc

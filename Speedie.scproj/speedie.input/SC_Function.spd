@@ -1422,7 +1422,7 @@ function Tran_Ifn (TranFunc)
 function scbase.LateAddTempory (|string| type, |string| name1, |message| Value, |message| err, |string|)
 	|| name = UniqueTmpVar(compiler.program, name1)
 	TypeOfExpr(Value, self)
-	|| msg = MakeDecl(type, name, Value)
+	|| msg = MakeDecl(type, name, Value, scdeclinfo.body)
 	|| D = TypeOfExpr(msg, self)$
 	(D is const) = false
 	.Source <~ msg

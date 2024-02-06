@@ -106,9 +106,9 @@ function Tran_Temporal (|SCFunction| fn, |Message| s, |SCBase| name_space)
 function Tran_Using (TranFunc)
 	// using (Exp) { f() } --> if (true) { || X = f().startusing, ..., x.stopusing }
 	
-	|| With		= node.needfirst					#require
-	|| Start	= node
-	|| Arg		= With.next
+	|| With     = node.needfirst					#require
+	|| Start    = node
+	|| Arg      = With.next
 		require arg.expect(@arg) and arg.ExpectLast
 		start = nil
 	  else
@@ -597,7 +597,7 @@ function Tran_Sdt (|Message| exp)
 
 
 function Tran_ForStart (|Message| arg, |Message| index, |SCBase| p)
-	|| start = arg.GetMarker( "start" )			#require
+	|| start = arg.GetMarker( "start" )				#require
 	
 	expect (index) (arg, "No index found for the iterator for this loop." ) 
 	
