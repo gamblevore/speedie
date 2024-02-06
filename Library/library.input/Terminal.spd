@@ -57,18 +57,18 @@ module Terminal
 
 	function Flat (|string|)
 		opt norefcounts
-		.fs := FastString()
+		|| f = .fs init FastString()
 		|| PrevCol = 0
 		for line in .Screen
 			for cell in line|array of terminalcell|
 				|| CCol = cell.color
 				if PrevCol != CCol
 					PrevCol = CCol
-					.fs <~ "\1b[1;${CCol}m"
-				.fs <~ cell.Text
+					f <~ "\1b[1;${CCol}m"
+				f <~ cell.Text
 				cell.text = " "
-			.fs <~ '\n'
-		return .fs.GetResult
+			f <~ '\n'
+		return f.GetResult
 
 
 	function Display

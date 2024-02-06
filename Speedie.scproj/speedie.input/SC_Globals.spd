@@ -93,13 +93,7 @@ function scdecl.Exists (|bool|)
 
 function TypeOfReal (ExprResolver)
 	opt	norefcounts
-	exp.become(@bra)
-	// so... make this real
-	|| f = exp.first
-	|| t = TypeOfExpr(f, name_space)
-		t = t.MakeReal // i hope this works
-		exp.obj = t // seems not being set?
-	return t
+	return TypeOfExpr(exp.first, name_space)$.makereal
 
 
 function TypeOfARel (ExprResolver)

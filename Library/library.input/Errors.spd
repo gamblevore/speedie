@@ -14,7 +14,7 @@ class Error (Message)
 	|String|				Path
 	|String|				OriginalData
 	|String|				StackTrace
-	|message|				Node
+	|message?|				Node
 	|date|					When
 	|ErrorSeverity|			Severity
 	|ErrorFlags|			ErrorFlags

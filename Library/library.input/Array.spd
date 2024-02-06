@@ -24,7 +24,6 @@ class Array (saveable)
 		visible
 		cpp_wrapper JB_Array_Constructor0
 		
-	
 	destructor
 		cpp_wrapper JB_Array_Destructor
 
@@ -40,14 +39,17 @@ class Array (saveable)
 	function Next (||)
 		if .marker < .length
 			return self[.marker++]
+	
 	setter Next (||)
 		self[.marker++] = value
 
 	function Prev (||)
 		if .marker > 0
 			return self[--.marker]
+
 	function Active (|bool|)
 		return .marker < .length
+
 	function Reset
 		.marker = 0
 	
@@ -137,7 +139,7 @@ class Array (saveable)
 		return .length > 0
 	
 	syntax Append (|| item)
-		.syntaxappend(item, 1)
+		.SyntaxAppend(item, 1)
 	
 	syntax Append (|| item, |int64| Count)
 		cpp_wrapper JB_Array_AppendCount
@@ -191,18 +193,3 @@ function StringSorter (SorterComparer)
 	return a|string|  <  b|string|
 	
 
-
-function SorterComparer.testsort
-	|random| rnd
-	rnd.seed = 123
-	.TestArr(("aaa,bbb,ccc,ddd,fff,eee" / ','))
-	.TestArr(rnd.texts(10000, 10))
-
-	
-function SorterComparer.testarr (|[string]| r)
-	r.sort(self)
-	for i in 0 to r.length-2
-		if r[i] > r[i+1]
-			"${r[i]} > ${r[i+1]}"
-			debugger
-	printline r

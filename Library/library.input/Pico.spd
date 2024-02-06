@@ -64,8 +64,8 @@ struct Pico
 	function Send (|PicoMessage| msg, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
 
-	function Config (|?&PicoConfig|)
-		nil checker
+	function Config (|&PicoConfig|)
+		// this should not allow a nil-self. why does it?
 		cpp_wrapper PicoConf
 	
 	helper __Get (|float| T, |PicoMessage|)

@@ -128,6 +128,7 @@ function Function (NilTrackerFn)
 		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
 		fn = fp.GetFunctionPointer
 		require fn and .UseChildAsReal(fp)						// (abc)()
+	if fn ~= "JB_Array__New0" and scfunction.currfunc ~= "JB_Str_OpenFile"
 	
 	expect ((fn != scfunction.currfunc) or t.RootReturned or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
 		
@@ -165,7 +166,6 @@ function Function (NilTrackerFn)
 			p++
 
 	if fn.IsKiller
-		debugat
 		.DeclKill
 		return 0
 	
@@ -355,8 +355,8 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 	|| LNil = ll.IsNowNil
 	|| RNil = rr.IsNowNil
 	if !lnil and !rnil			// if (a > b)
-		.jump(ll)
-		.jump(rr)
+		.jump(ll, nilcheckmode.soft)
+		.jump(rr, nilcheckmode.soft)
 		return nilstate.real
 	
 	if (lnil and rnil)
@@ -403,7 +403,7 @@ function Thing (NilTrackerFn)
 
 
 function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstate|)
-	opt norefcounts										// Handles 5-6 different cases :O
+	opt norefcounts										// Handles 10 different cases :O
 
 	if !dcl.NilReg
 		return dcl.nildeclared
@@ -428,21 +428,17 @@ function Argument (Niltrackerfn)
 	opt norefcounts
 	|| v = .value.depthofvars + 1
 	for s.fast in msg
-		rz = .ArgOne(s, test&-s.islast, rz)
-
+		s.DebugPrint
+		|| t = test&-s.islast
+		|| prev = rz
+		rz = .jump(s, T ||| nilcheckmode.Disappears)
+		if prev is borked
+			error.autoprint = .oldprint
+			expect !(stderr.ok) (s, "Borking but no zergs found?")
+			stderr.clear
+	
 	|| Allowed = (1|uint64| << (v<<1)) - 1|uint64|
 	t.setallnil(ArchonPurger.value & Allowed, "Argument")
-
-
-function ArgOne (|message| s,  |nilcheckmode| t,  |nilstate| prev,  |nilstate|)
-	pragma inline
-	s.DebugPrint
-	rz = .jump(s, T ||| nilcheckmode.Disappears)
-	if prev isnt borked
-		return rz
-	error.autoprint = .oldprint
-	expect !(stderr.ok) (s, "Borking but no zergs found?")
-	stderr.clear
 
 	
 function Bracket (Niltrackerfn)
@@ -491,10 +487,11 @@ function Not (niltrackerfn)
 function arel (Niltrackerfn)
 	opt norefcounts
 	|| ch = *msg
-	|| b = msg.name.first
-	if ch and b == '+' or '-'
-		return .jump(ch, test)
-	debugger // what?
+		rz = .jump(ch, test)
+		|| b = msg.name.first
+		if b == '!'
+			rz &=~ nilstate.nilish
+			rz |=  nilstate.realish
 
 
 // 
@@ -538,11 +535,11 @@ function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message|
 	
 	if !recv.typesuffers
 		return nilstate.real
-	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg)
+	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg("Need to set it into another var."))
 
 	|| SN = sent.NilCurr
 	if recv.isreal and recv isnt local
-		expect (SN is realish) (RecvMsg, "Nil is not allowed here on: " + recvmsg.render)
+		expect (SN is realish) (RecvMsg, "Nil is not allowed on: " + recvmsg.render)
 		return .BecomeReal(sent, SentMsg)
 		
 	if recv.NilReg
@@ -565,7 +562,7 @@ function BecomeReal (|scdecl| sent, |message| where, |scfunction| To=nil,  |nils
 function FailedReal (|scfunction| To, |message| where, |nilstate|)
 	|| fs = faststring()
 	fs <~ "NilObjectError "
-	fs <~ ("passing non-real param: ", "accessing optional: ")(to)
+	fs <~ ("passing optional param: ", "accessing optional: ")(to)
 	where.render(fs)
 	if To
 		fs <~ " to "

@@ -227,10 +227,10 @@ class SCDecl (SCObject) {
 			//
 		  elseif tica
 			while t.IsRole
-				t = t.super
+				t = t.super$
 		  else
 			while otype.IsRole
-				otype = otype.super
+				otype = otype.super$
 		
 		|| dist = 0
 		for (CurrSuper.Upwards in OType)

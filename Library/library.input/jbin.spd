@@ -85,7 +85,7 @@ role JBin (Faststring)
 		|uint| T = (type|uint|<<1) ||| (goin)
 		self <~ T|byte|
 		.hint(L)
-		if L
+		if data
 			.AppendMemory(data, L|int|)
 
 

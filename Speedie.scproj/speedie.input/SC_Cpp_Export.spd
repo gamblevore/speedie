@@ -973,14 +973,14 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		@Type.ExportAddr = C_RenderTyp
 		@Tmp.ExportAddr  = C_RenderTmp
 		@opp.ExportAddr  = C_RenderOpp
-		@brel.ExportAddr = C_RenderBrl
+		@brel.ExportAddr = C_RenderBrel
 		
 		@Rel.ExportAddr  = C_RenderRel
 		
 		@Num.ExportAddr  = C_RenderNum
 		@unit.ExportAddr = C_RenderUnt
 		@Bra.ExportAddr  = C_RenderBra
-		@ARel.ExportAddr = C_RenderArl
+		@ARel.ExportAddr = C_RenderArel
 
 		@Char.ExportAddr = C_RenderChr
 		@Str.ExportAddr  = C_RenderStr
@@ -1168,7 +1168,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ s
 
 
-	function C_RenderBrl (fpMsgRenderCpp)
+	function C_RenderBrel (fpMsgRenderCpp)
 		fs <~ '('
 		|| s = .name
 		if (s == kBitNot)
@@ -1363,17 +1363,20 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderBra (fpMsgRenderCpp)
-		ifn self in @arg and .first == @thg
+		opt norefcounts
+		|| f = .first
+		ifn self in @arg and f == @thg
 			fs <~ '('
-			.first.Export( fs )
+			f.Export( fs )
 			fs <~ ')'
 
 
-	function C_RenderArl (fpMsgRenderCpp)
+	function C_RenderArel (fpMsgRenderCpp)
+		opt norefcounts
 		// ("arl" @x "++" )							x++
-		
 		.first.Export( fs )
-		if (.name != "&")
+		|| s = .name.first
+		if (s != '&' and '!')
 			fs <~ .name
 
 

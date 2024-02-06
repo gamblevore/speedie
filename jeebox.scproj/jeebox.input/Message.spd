@@ -575,13 +575,13 @@ class Message (RingTree)
 		Opt NoRefCounts
 		for (m in self)
 			if (m == @item)
-				|| Tmp = m.first // a string
-				m.prev = Tmp
-				Tmp.Func = @tmp
-				|| value = m.first
-				Tmp <~ value
-				m.remove
-				value.ConvertJSONToJB
+				|| Tmp = m[@nil] // a string
+					m.prev = Tmp
+					Tmp.Func = @tmp
+					|| value = m.first
+					Tmp <~ value
+					m.remove
+					value.ConvertJSONToJB
 			  else
 				m.ConvertJSONToJB
 
@@ -689,7 +689,7 @@ class Message (RingTree)
 		|| A = self
 		|| A2 = .FlatAfter
 		|| B2 = b.FlatAfter
-		while
+		while a and b
 			|| ADone = A==A2
 			|| BDone = B==B2
 			if ADone And BDone
@@ -700,6 +700,7 @@ class Message (RingTree)
 				
 			A = A.flatnext
 			b = b.flatnext
+
 		
 	function Find (|message| match, |message|)
 		cpp_part FindMatch
@@ -882,10 +883,10 @@ class Message (RingTree)
 	syntax access (|Syntax| s, |Message|)
 		cpp_Part NeedSyx
 		Opt NoRefCounts
+		|| found = .first
+			if s == nil or found == s
+				return found
 		if self
-			|| found = .first
-				if s == nil or found == s
-					return found
 			.accesserr(s, nil, found)
 
 

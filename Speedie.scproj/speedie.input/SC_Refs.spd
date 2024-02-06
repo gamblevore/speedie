@@ -359,13 +359,10 @@ function RelChangesDisowned (|Message| msg, |String| name, |bool|)
 		Return first.VarOptFlag(kHoldsDisowned)
 
 
-function Message.VarOptFlag (|int| i, |bool|) {
-	
-}
-
 
 function RefMarkAsDisturber (|Message| msg, |SCFunction| fn)
-	fn.Refs.Disturbs <~ "object"
+	|| r = fn.refs
+		r.Disturbs <~ "object"
 
 
 function RefSafeDecr (|Message| msg, |Message| place)

@@ -26,7 +26,7 @@ class SCObject
 	syntax equals (|string| s, |bool| aware, |bool|)
 		return .name ~= s
 
-	function File (|SCFile|)
+	function File (|SCFile?|)
 		opt norefcounts
 		|| src = .Source
 			return src.SCFile

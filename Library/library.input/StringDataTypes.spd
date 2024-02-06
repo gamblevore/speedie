@@ -39,7 +39,7 @@ datatype byte
 		if (!fs_in)
 			return string.byte(self)
 		fs_in <~ self|Byte|
-		return nil
+		return ""
 
 	function UTF8Size (|int|)
 		cpp_wrapper JB_u8_Size

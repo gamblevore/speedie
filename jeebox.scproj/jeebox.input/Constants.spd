@@ -61,19 +61,22 @@ Module Jeebox
 
 	.InitConstants
 
-	function string.UniCS (|charset|)
+
+	function string.UniCS (|charset!|)
 		// all valid unicode-ranges
 		return (self + #(80BFC2F4)#).charset 	
-	
+
+
 	function AddEscape (|byte| i, |faststring| fs)
 		opt norefcounts
 		|| f = string.byte(i)
-		require  !.EscapeStr[f]  or  !.Escapechr[f]
+		require  !.EscapeStr![f]  or  !.EscapeChr![f]
 		fs <~ '\\'
 		fs.appendhex(i, 2)
 		|| t = fs.getresult
-		.EscapeStr[f] := t 
-		.Escapechr[f] := t
+		.EscapeStr![f] := t 
+		.Escapechr![f] := t
+
 
 	function InitConstants
 		array.new // needed by argv
@@ -90,7 +93,6 @@ Module Jeebox
 		//.JS_UnEscapeStr[`\n`]	= ""						// c/js compat
 		.Unescapestr[`\`]	= ""
 		.EscapeStr["'"]		= nil|string|
-		
 		
 		|| tfs = faststring()
 		for i in 256

@@ -13,7 +13,7 @@ class $name (selector)
 	module $name
 		function __LoadSel (|&$type| Place, |string| Name)
 			visible
-			$name.__First = $type.new($name.__First, place|&selector|, name)
+			$name.__First = $type.new($name.__First!, place|&selector|, name)
 
 		|$type| __First
 		...

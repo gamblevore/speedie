@@ -9,7 +9,7 @@ module VM_Builder {
 |[message]| 	NameList
 |message|   	ModuleArg
 |file|			vm_file
-|faststring|	form_h
+|faststring|	form_h = faststring()
 |message|		dt_prm
 |string|		parent
 |byte|			NormalPos = 0
@@ -148,7 +148,6 @@ function BuildFiles (|bool|)
 
 	|| code = faststring()
 	|| jump = faststring()
-	.form_h = faststring()
 
 	.Clean(x)
 	.DataTypeModule

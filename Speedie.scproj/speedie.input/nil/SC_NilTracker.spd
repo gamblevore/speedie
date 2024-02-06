@@ -53,7 +53,7 @@ struct ArchonPurger
 	target debug
 		|Scdecl--[32]| 		Dbg
 		|int|				MinDepth
-	|scdecl|				Return
+	|scdecl?|				Return
 	|bool|					FnAbleToNilCheck
 	|bool| 					RootReturned // for recursive funcs
 	|NilRecord[64]| 		Rows
@@ -64,7 +64,6 @@ struct ArchonPurger
 	
 	
 	function BecomeRealSub (|scdecl| V)
-//		if scfunction.currfunc ~= "JB_Tree_Second"
 		V.NilDeclared = NilState.real
 		if v is self
 			.FnAbleToNilCheck = false

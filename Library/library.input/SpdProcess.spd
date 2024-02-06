@@ -4,7 +4,7 @@ class SpdProcess (Process)
 		cpp_part Proc
 	contains SpdProcess
 	|jbin|						Writer
-	|&pico?|					Pico
+	|?&pico|					Pico
 	|stringzeroterminated|		_DebugName
 	|SpdMainFn|					SubProcess
 	|int| 						DeathLimit
@@ -74,12 +74,13 @@ class SpdProcess (Process)
 	
 
 	function LastSend (|date|)
-		|| c = .pico.config
-			return c.lastsend
+		|| p = .pico
+			return p.config.lastsend
 		
 	
 	function TimeWaitingForReply (|date|)
-		|| c = .pico.config
+		|| p = .pico
+			|| c = p.config
 			|| last = c.lastsend
 			if c.lastread < last
 				return last.ago
