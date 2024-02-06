@@ -83,7 +83,7 @@ class Message (RingTree)
 
 	function Trap
 		pragma inline
-		//if .objectid == 1052552	
+		// if .objectid == 3244984	
 	
 	
 	function Copy (|message| pos_msg=nil, |Message|)
@@ -796,13 +796,13 @@ class Message (RingTree)
 			fs.MsgErrorName(name)
 			found = self
 
-		StdErr.NewError( found, fs.getresult )
+		errorreceiver.NewError( found, fs.getresult )
 	
 
 	function AccessErr (|int| i)
 		cpp_part CantFindAt
 		|| errnum = (" at item " + i.render, "")(i)
-		StdErr.NewError( self, "Incomplete syntax" + errnum )
+		errorreceiver.NewError( self, "Incomplete syntax" + errnum )
 
 
 	function ExpectLast (|string| err="", |bool|)
@@ -1015,23 +1015,17 @@ class Message (RingTree)
 		|| fn = (.Func.ExportAddr)
 		(fn)( self, fs )
 
-	function MiniName (|string|)
-		return "$.FuncName “${.name[0,64].UnicodeSync}”"
+	function MiniName (|string|prefix="", |string|)
+		return "prefix$.FuncName “${.name[0,64].UnicodeSync}”"
 
-	Syntax Expect ( |string| Error = nil )
-		if !Error
-			if !self
-				nil.syntaxexpect
-				return
-			Error = "Unexpected " + .MiniName
-		StdErr.NewError( self, Error )
+	Syntax Expect (|string?| Error = nil)
+		errorreceiver.NewError( self, Error )
 
 	Syntax Deprecate ( |string| Error = "Deprecated." )
-		StdErr.NewProblem( self, Error )
+		errorreceiver.NewProblem( self, Error )
 	
 	Syntax Warn ( |string| Error = nil )
-		Error := "Unexpected " + .mininame
-		StdErr.NewWarning( self, Error )
+		errorreceiver.NewWarning( self, Error )
 	
 	Syntax Append (|syntax| Fn, |string| name="")
 		cpp_part AppendSyx
@@ -1041,7 +1035,19 @@ class Message (RingTree)
 		cpp_part AppendNum
 		.msg(@num, num.render)
 
+	Syntax Using (|MessagePosition|)
+		Opt NoRefCounts
+		rz = parser.Using
+		rz.Layer = (Message).layer
+		
+		parser.Using.Position = .position
+		parser.Using.Length = .RangeLength
+		parser.Using.Tag = .Tag
+		parser.Using.Flags = MsgUIFlags.Inserted // right?
+		.MemoryLayer.use
 
+	Syntax UsingComplete { }
+	
 	setter Int (|int64|)
 		.Func = @num
 		.name = Value.Render // later we can do this a different way. Like directly

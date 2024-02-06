@@ -221,20 +221,6 @@ struct MessagePosition
 	function SyntaxUsingComplete 
 
 
-function Message.SyntaxUsing (|MessagePosition|)
-	Opt NoRefCounts
-	rz = parser.Using
-	rz.Layer = (Message).layer
-	
-	parser.Using.Position = .position
-	parser.Using.Length = .RangeLength
-	parser.Using.Tag = .Tag
-	parser.Using.Flags = MsgUIFlags.Inserted // right?
-	.MemoryLayer.use
-
-function Message.SyntaxUsingComplete { }
-
-
 api ringtree.JDB2
 	cpp_name jdb2
 	visible

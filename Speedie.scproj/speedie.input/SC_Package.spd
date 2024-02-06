@@ -68,4 +68,4 @@ function compiler.CodeSign (|file| gui_exe)
 	|| sign = app.prefs(codesign_native)
 		gui_exe.codesign(sign)
 	  else
-		StdErr.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_exe.path )
+		errorreceiver.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_exe.path )

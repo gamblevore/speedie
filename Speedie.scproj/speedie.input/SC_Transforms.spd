@@ -93,8 +93,7 @@ function Tran_Expect (TranFunc)
 		if n == "loop"
 			arg.msg(@tmp, "exit")
 		  else
-			|| ret = arg.msg(@tmp, "return")
-			|| q = ret.msg(@ques, "nil")
+			arg.msg(@tmp, "return").msg(@ques, "nil")
 
 
 function Tran_Temporal (|SCFunction| fn, |Message| s, |SCBase| name_space)
@@ -361,22 +360,20 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
 	|| Src = f.SourceArg
 	|| d = r_z.MsgDecl
 	|| Used = (d and d is usedbycode)
-	ifn used
+	src.StartUsingAfter
+	if !used
 		r_z.Remove
-	  elseif !(d is setto)
+	  elseif d isnt setto
 		r_z.NotNilRZ(f.ReturnType, space)
 
-	if src.last istmp "return"
-		return
-	
-	|| ret = «tmp "return"»
-	ret.tmptype = asmtmp.kreturn 
-	src <~ ret
-	if used
-		|| thg = ret.msg(@thg,"rz") 
-		thg.obj = d
-	  else
-		ret <~ f.ReturnType.CreateDefault(src)
+	ifn src.last istmp "return"
+		|| ret = src.msg(@tmp, "return")
+		ret.flags &=~ msguiflags.inserted
+		ret.tmptype = asmtmp.kreturn 
+		if used
+			ret.msg(@thg, "rz").obj = d 
+		  else
+			ret <~ f.ReturnType.CreateDefault(src)
 
 
 function Tran_Result (|SCFunction| f, |message|)

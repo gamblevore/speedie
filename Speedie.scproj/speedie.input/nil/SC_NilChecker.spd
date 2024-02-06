@@ -567,7 +567,7 @@ function FailedReal (|scfunction| To, |message| where, |nilstate|)
 	if To
 		fs <~ " to "
 		to.rendertitle(fs)
-	error (where.FindNotInserted, fs)
+	error (where, fs)
 }
 
 

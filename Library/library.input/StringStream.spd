@@ -208,7 +208,7 @@ class StringReader
 			  else
 				error = "Error decoding data."
 				
-		stderr.NewError(nil, error, .file)
+		errorreceiver.NewError(nil, error, .file)
 
 
 	

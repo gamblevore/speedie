@@ -1,23 +1,23 @@
 
 
-// Put all the message-specific stuff in here, in case I want to remove
-// jeebox from the library? To compile without jeebox. Maybe?
-
-
-extend ErrorReceiver
-	function NewWarning (|Message| node=nil, |String| Desc=nil)
-		if .CanAddMore(errorseverity.Warning)
-			self <~ Error(node, desc, errorseverity.Warning)
+extend_module ErrorReceiver
+	function NewWarning (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+		.NewErrorSub(node, desc, path, errorseverity.warning)
 	
-	function NewProblem (|Message| node=nil, |String| Desc=nil)
-		if .CanAddMore(errorseverity.problem)
-			self <~ Error(node, desc, errorseverity.problem)
-	
-	function NewError (|Message| node=nil, |string| Desc=nil, |string| path=nil)
+	function NewProblem (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+		.NewErrorSub(node, desc, path, errorseverity.problem)
+
+	function NewError (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
 		cpp_part NewErrorWithNode
-		|| sev = .LowerErrorsTo ?? ErrorSeverity.Error
-		if .CanAddMore(sev)
-			self <~ Error(node, desc, sev, path)
+		|| sev = stderr.LowerErrorsTo ?? ErrorSeverity.Error
+		.NewErrorSub(node, desc, path, sev)
+
+	helper NewErrorSub (|Message| node, |string?| Desc, |string?| path, |int| sev)
+		opt norefcounts
+		if stderr.CanAddMore(sev)
+			if (node != nil) and (Desc == nil)
+				desc = node.MiniName("Unexpected ")
+			stderr <~ Error(node.FindNotInserted, desc, sev, path)
 
 
 function Message.ErrorLocation (|string| desc = "", |string|)

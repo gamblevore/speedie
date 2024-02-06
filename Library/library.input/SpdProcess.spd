@@ -120,7 +120,7 @@ class SpdProcess (Process)
 	syntax expect (|string| err)
 		if .CommsOpen
 			printline err
-			stderr.NewError(nil, err, .path)
+			errorreceiver.NewError(nil, err, .path)
 		.Disconnect(err)
 
 

@@ -122,9 +122,9 @@ module Feedback
 			.ParseOption(S)
 		
 		if options.OperationCount <= 0
-			StdErr.newerror( "\nError: No operations requested.\n" )
+			errorreceiver.newerror( "\nError: No operations requested.\n" )
 		  elseif options.OperationCount >= 2
-			StdErr.newerror( "\nToo many operations requested.\n" )
+			errorreceiver.newerror( "\nToo many operations requested.\n" )
 
 		return StdErr.OK and Compiler.BaseProjectPath.Exists
 

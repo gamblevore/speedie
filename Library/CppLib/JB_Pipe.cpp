@@ -41,7 +41,7 @@ JBClassPlace( ProcessOwner,   JB_PID_UnRegister,     JB_AsClass(JB_Object),     
 JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),   0 );
 
 
-void JB_Rec_NewErrorWithNode (JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_Object* Source);
+void JB_Rec__NewErrorWithNode (Message* node, JB_String* Desc, JB_Object* Source);
 bool JB_Dup2 (int, int);
 void JB_FillProc (ProcessOwner* F, int C);
 
@@ -281,7 +281,7 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 
 	auto ShErr = Sh->ErrorOutput;
 	if (!FSErrIn and JB_FS_Length(ShErr)) {
-		JB_Rec_NewErrorWithNode(JB_StdErr, nil, JB_FS_GetResult(ShErr), nil);
+		JB_Rec__NewErrorWithNode(nil, JB_FS_GetResult(ShErr), nil);
 	}
 	
 	int Signal = Sh->Status;

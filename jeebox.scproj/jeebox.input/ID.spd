@@ -60,7 +60,7 @@ class MessageID (stringshared)				// now is usefully used! :D
 
 
 
-function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)
+/*function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)
 	opt NoRefCounts
 	|| s = self
 	|| Count = 0
@@ -140,3 +140,4 @@ struct MessageCompressor
 		
 	destructor
 
+*/

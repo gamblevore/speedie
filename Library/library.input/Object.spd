@@ -91,14 +91,14 @@ class Object
 		cpp_part Fail
 		
 		if self isa message
-			StdErr.NewError( self, Error )
+			errorreceiver.NewError( self, Error )
 		  else
-			StdErr.NewError( Error )
+			errorreceiver.NewError( Error )
 
 
 	helper string.SyntaxWarn
 		cpp_part Warn
-		StdErr.Newwarning( self )
+		errorreceiver.Newwarning( self )
 	
 
 	module
@@ -129,8 +129,13 @@ struct ClassData
 	function AllocZeroed (|Object|)
 		cpp_Wrapper JB_Class_AllocZeroed
 
-	function CreateLayer (|Object| obj, |MemoryLayer|)
+	function CreateLayer (|Object| obj, |MemoryLayer!|)
 		cpp_Wrapper JB_Mem_CreateLayer
+
+	function CreateUseLayer (|Object| obj, |object| obj2, |MemoryLayer!|)
+		rz = .createlayer(obj)
+		rz.use
+		rz.obj2 = obj2
 
 	function Layer (|MemoryLayer|)
 		cpp_Wrapper JB_Class_Layer

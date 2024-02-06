@@ -52,7 +52,7 @@ class ErrorReceiver
 		Return self and (.errorcount ||| .problemcount ||| .warncount)
 	
 	syntax append (|Error| Err)
-		cpp_part NewItem
+		cpp_part AppendErr
 		target debug
 			|| CanPrint = !.BadCount and error.autoprint
 		  else
@@ -61,7 +61,6 @@ class ErrorReceiver
 			#!"Speedie" // useful marker for debugging...
 		
 		.incr(err)
-		require .CanAddMore(err.severity)
 		
 		err.path := .source
 		if Error.KeepStackTrace
@@ -243,13 +242,13 @@ extend Object
 		printline errorreceiver.NonFatal
 		app.CrashPrint
 		"${app.ObjMemory.strsize} memory used"
-		stderr.NewError(nil, errorreceiver.NonFatal)
+		errorreceiver.NewError(nil, errorreceiver.NonFatal)
 
 
 extend string
 	syntax expect
 		visible
-		stderr.NewError(nil, self)
+		errorreceiver.NewError(nil, self)
 
 
 function bool.OperatorPlus (|string| s, |bool|)

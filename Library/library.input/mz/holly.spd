@@ -2,7 +2,7 @@
 // merging compressor. NOT FINISHED. WORK IN PROGRESS.
 // GOAL
 // Just... share strings, and IDs, the rest can be chucked.
-
+/*
 struct HollyPlanter
 	linkage
 		cpp_part HRV
@@ -85,7 +85,6 @@ struct HollyPlanter
 		sq.input = self
 		return sq.decode
 
-	
 	
 struct HollyPotter
 	linkage: cpp_part HR
@@ -200,3 +199,7 @@ helper message.DecompressStream (|StringReader|)
 		return .name.decompress(int.max).Stream
 	  else
 		return .name.stream
+*/
+
+helper message.DecompressStream (|StringReader|)
+	return .name.stream

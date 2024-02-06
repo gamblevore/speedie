@@ -127,9 +127,7 @@ class File (String)
 			if s.IsCompressed
 				s = s.Decompress(lim, nil)
 			if s
-				|memorylayer--| L = (Message).CreateLayer(f) // these 3 lines should be one
-				L.use      // 2
-				L.obj2 = S // 3 // data set here, path set in createlayer 
+				|memorylayer--| L = (Message).CreateUseLayer(f, s) 
 				rz = S.parse(@arg, false) // already decompressed.
 				(message).restore
 
@@ -440,7 +438,7 @@ class File (String)
 	function SyntaxExpect (|string| Error)
 		opt norefcounts
 		cpp_part Fail
-		StdErr.NewError( nil, Error, (.path, "")(self) )
+		errorreceiver.NewError( nil, Error, (.path, "")(self) )
 
 	module
 		|| DebugExecute = false

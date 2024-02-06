@@ -341,9 +341,7 @@ module JB_API
 
 	function Parse (|string| s, |string| path="", |message|)
 		require s != nil // out of memory
-		|| L = (Message).CreateLayer(path) #require
-		L.use
-		L.obj2 = s        // now layer contains data+path? 
+		|| L = (Message).CreateUseLayer(path, s) #require
 		|| Result = s.parse
 		(message).restore
 		return result

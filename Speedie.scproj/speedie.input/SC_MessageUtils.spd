@@ -470,6 +470,22 @@ function message.IsAlwaysFalse (|bool|)
 	return .IsAlwaysBool.isfalse
 
 
+function Message.StartUsingAfter // for "return" debugging.
+	opt norefcounts
+	|| biggest = -1
+	|| L = .OriginalParseLayer
+	|| d = .originalparsedata
+		for s.flat in self
+			if s.position >= 0 and s.OriginalParseLayer == l 
+				(biggest max= s.after)
+		|| b2 = d.find("\n", biggest)
+			biggest = b2
+		biggest++
+	parser.Using.Position = biggest
+	parser.Using.Flags = MsgUIFlags.Inserted // right?
+	.MemoryLayer.use
+
+
 extend string
 	function debug
 		if scfunction.currfunc ~= self
