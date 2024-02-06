@@ -301,7 +301,7 @@ function scfunction.Update_Source (|int| start, |string| text, |scfile| myfile, 
 		source.SlidePositions(start)
 		.source = source
 		.Cleanupfunc
-		parser.using.Flags = MsgUIFlags.Inserted
+		parser.using.Flags = MsgParseFlags.Inserted
 		rz = .UpdateSourceSub(source)
 		source.obj = orig.disambiguate(source)
 	parser.using.Flags = 0 // oop

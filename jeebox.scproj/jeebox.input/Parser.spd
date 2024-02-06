@@ -1125,7 +1125,7 @@ ive been~running #since morning
 			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.indent) #loop				
 			RZ += (ch == @item)
 			if info.isdebug
-				ch.flags |= msguiflags.breakpoint
+				ch.flags |= MsgParseFlags.breakpoint
 			output = .addToOutput(output, ch, prev, info.pos)
 			prev = ch
 
@@ -1293,17 +1293,17 @@ extend Message
 	function Type (|syntax|)
 		disabled "Use .func instead"
 
-	syntax isnt (|msguiflags| F, |bool|)
+	syntax isnt (|MsgParseFlags| F, |bool|)
 		return !.syntaxis(F)
 			
-	syntax is (|msguiflags| F, |bool|)
+	syntax is (|MsgParseFlags| F, |bool|)
 		if self
 			return .flags & F
 
-	syntax isnt (|msguiflags|F, assigns:|bool|)
+	syntax isnt (|MsgParseFlags|F, assigns:|bool|)
 		.syntaxis(f) = !Value
 
-	syntax is (|msguiflags|F, assigns:|bool|)
+	syntax is (|MsgParseFlags|F, assigns:|bool|)
 		if self
 			if Value
 				.flags |= f
@@ -1323,24 +1323,14 @@ extend Message
 */
 
 datatype MsgParseFlags (uint16)
-	syntax is (|msguiflags| v, |bool|)
+	syntax is (|MsgParseFlags| v, |bool|)
 		return self & v
-	syntax isnt (|msguiflags| v, |bool|)
+	syntax isnt (|MsgParseFlags| v, |bool|)
 		return !(self & v)
 	flags
-		// speedie uses the ranges 0x01000 down to 1! 13 bits
+		Reranged		= 0x8000
+		Editable		= 0x1000
 		Inserted		= 0x2000
 		Style2			= 0x4000
 		BreakPoint		= 0x8000
 
-datatype MsgUIFlags (MsgParseFlags)
-	flags
-		Editable		= 0x0700 // 0x100, 0x200, 0x400
-		EditableString	= 0x0100
-		EditableNum		= 0x0200
-		EditableThing	= 0x0300
-		EditableSyx		= 0x0400
-		EditableAny		= 0x0700
-		Inserted		= 0x2000
-		Style2			= 0x4000
-		BreakPoint		= 0x8000

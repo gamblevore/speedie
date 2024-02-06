@@ -90,7 +90,7 @@ dispatch fn_asm_table (fn_asm)
 		0
 
 
-datatype ASMtmp (MsgUIFlags)
+datatype ASMtmp (MsgParseFlags)
 	module {
 	function StateExpr	(fn_asm)
 	function Debugger	(fn_asm)

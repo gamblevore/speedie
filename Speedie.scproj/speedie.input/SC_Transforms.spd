@@ -368,7 +368,7 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
 
 	ifn src.last istmp "return"
 		|| ret = src.msg(@tmp, "return")
-		ret.flags &=~ msguiflags.inserted
+//		ret.flags |= MsgParseFlags.Reranged // fix later
 		ret.tmptype = asmtmp.kreturn 
 		if used
 			ret.msg(@thg, "rz").obj = d 

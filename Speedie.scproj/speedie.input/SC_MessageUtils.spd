@@ -482,7 +482,7 @@ function Message.StartUsingAfter // for "return" debugging.
 			biggest = b2
 		biggest++
 	parser.Using.Position = biggest
-	parser.Using.Flags = MsgUIFlags.Inserted // right?
+	parser.Using.Flags = MsgParseFlags.Inserted // right?
 	.MemoryLayer.use
 
 

@@ -24,7 +24,7 @@ class Message (RingTree)
 
 
 ////////////////////////////////		
-	|MsgUIFlags|			Flags				// useful bits for you to set.
+	|MsgParseFlags|			Flags				// useful bits for you to set.
 	|uint16|				Tag					// Jeebox does not use these itself.
 ////////////////////////////////		
 			
@@ -1043,7 +1043,7 @@ class Message (RingTree)
 		parser.Using.Position = .position
 		parser.Using.Length = .RangeLength
 		parser.Using.Tag = .Tag
-		parser.Using.Flags = MsgUIFlags.Inserted // right?
+		parser.Using.Flags = MsgParseFlags.Inserted // right?
 		.MemoryLayer.use
 
 	Syntax UsingComplete { }

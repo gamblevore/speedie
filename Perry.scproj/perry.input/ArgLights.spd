@@ -1,22 +1,19 @@
 
 
 /*
-"Why have a GUI when you can turn a textView INTO a GUI?"
-	
-	Deleted this idea... basically we want something like a DTD instead... just for jeebox.
-	
-	So... something like this:
-	
+"Why have a GUI when you can turn a textView INTO a GUI?"  !!Deleted this idea!!
+
+Instead we want a jeebox DTD, that auto-generates a GUI. Like:	
  	{
 		(unordered)
-		flags	{any_any}
-		args	{"any"++}
-		notes	{"any"}++
-		env		{(a="")++}
-		pwd		{"any"}
+		args	{"*"++}
+		notes	{"*"}++
+		env		{(@thg="*")++}
+		pwd		{"*"}
 	}
 	
 	so would be validating Jeebox for data-files only... not the generalised jeebox.
+
 */
 
 
@@ -25,13 +22,13 @@ function textview.EnvValidation (|message| msg)
 	for rel in msg
 		if rel == @rel
 			|| ch1 = rel[@thg, 0]
-				(ch1 is EditableThing)
+				(ch1 is Editable)
 			|| opp = rel[@opp, 1]
 				opp.expect(@opp, "=")
-				(opp is EditableSyx)
+				(opp is Editable)
 			|| ch2 = rel[@nil, 2]
 				ch2.goodname
-				(ch2 is EditableAny)
+				(ch2 is Editable)
 		  else
 			rel.expect(@rel)
 
@@ -55,18 +52,18 @@ function textview.ArgValidationSub (|message| msg)
 		  elseif s == "args"
 			for a in s.Arg
 				a.GoodName(true)
-				(a is EditableAny)
+				(a is Editable)
 		  elseif s == "notes"
 			for f.flat in s
 				if f != s and @arg
-					(f is EditableAny)
+					(f is Editable)
 		  elseif s == "env"
 			|| arg = s.first
 				.EnvValidation(arg)
 		  elseif s == "pwd"
 			|| ch = s[@nil]
 				ch.ExpectString
-				(ch is EditableString)
+				(ch is Editable)
 		  else
 			error s
 	

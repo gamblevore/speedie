@@ -211,7 +211,7 @@ struct MessagePosition
 	|MemoryLayer--|     Layer
 	|int|               Position
 	|uint|              Length
-	|MsgUIFlags|		Flags
+	|MsgParseFlags|		Flags
 	|uint16|            Tag
 	
 	destructor
