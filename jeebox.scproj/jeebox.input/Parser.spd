@@ -1124,9 +1124,9 @@ ive been~running #since morning
 			
 			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.indent) #loop				
 			RZ += (ch == @item)
-			if info.isdebug
+			if info.IsDebug
 				ch.flags |= MsgParseFlags.breakpoint
-			output = .addToOutput(output, ch, prev, info.pos)
+			output = .AddToOutput(output, ch, prev, info.pos)
 			prev = ch
 
 	

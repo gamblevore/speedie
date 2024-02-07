@@ -180,7 +180,7 @@ struct ASMFuncState
 		
 
 function message.ASMFunc (|fn_asm|)
-	|| ASM = .flags & 63
+	|| ASM = .tmptype
 	asm := .func|int|
 	return fn_asm_table[asm]
 

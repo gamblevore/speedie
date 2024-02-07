@@ -3,14 +3,14 @@
 
 module Linkage
 	|| OSXFrameworks = message()
-	|| Flags = message()		// for the linker i guess...
+	|| Flagz = message()		// for the linker i guess...
 	
 	function Interpreter (|bool|)
 		return linkage["interpreter"].yes
 	
 	syntax access (|string| name, |string|)
 		|| fs = faststring()
-		for ch in .flags
+		for ch in .Flagz
 			if ch ~= name
 				|| str = ch.first.nyme
 					if fs.length
@@ -29,7 +29,7 @@ module Linkage
 	function LinkerSub (CollectFunc) // linkagesub
 		opt norefcounts
 		|| arg = node[@arg]
-			arg.ConfTake(.flags, "flags")
+			arg.ConfTake(.Flagz, "flags")
 			arg.ConfTake(.osxframeworks, "frameworks")
 			for ch in arg
 				error (ch)

@@ -135,9 +135,9 @@ datatype ASMtmp (uint16)
 
 function Message.TmpType (|ASMTmp|)
 	//return .tag
-	return .flags & 63
+	return .FLAGS & 63
 
 function Message.TmpType (assigns:|ASMTmp|)
 	// .tag = value
-	.flags = (.flags &~ 63) ||| value
+	.FLAGS = (.FLAGS &~ 63) ||| value
 

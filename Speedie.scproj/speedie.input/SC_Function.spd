@@ -1473,20 +1473,18 @@ function Tran_If (TranFunc)
 
 function message.Blocks (|SCBlockage|)
 	if self
-		return .flags & SCBlockage.Bits
+		return .TAG & SCBlockage.Bits
 
 
 function message.Blocks (assigns:|int|)
-	if .flags&SCBlockage.bits // what?
-	.flags = (.flags & ~SCBlockage.bits) ||| Value
+	if .TAG&SCBlockage.bits // what?
+	.TAG = (.TAG & ~SCBlockage.bits) ||| Value
 
 
 function Tran_IfSub (|message| node, |scbase| name_space) 
 	opt norefcounts
 	|| cond = node.needfirst						#require
 	|| arg = cond.next
-
-	if arg
 		require arg.expect(@arg)
 	  else
 		arg = @arg.msg
@@ -1530,7 +1528,7 @@ function message.ElseNeverFires // self == cond
 		return
 	if arg == @arg
 		arg.clear
-		arg.flags |= SCBlockage.Return // blocks!
+		arg.TAG |= SCBlockage.Return // blocks!
 	.NeedBra
 
 

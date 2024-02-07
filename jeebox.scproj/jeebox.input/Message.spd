@@ -72,7 +72,7 @@ class Message (RingTree)
 		.Position	= BytePos
 		.func		= func
 		.RangeLength= RangeLength
-		.flags		= parser.using.Flags // speedie's .AppMainFix likes this, for msg is inserted
+		.flags		= parser.using.Flags
 		.tag		= parser.Using.Tag // why not...
 		.trap
 
