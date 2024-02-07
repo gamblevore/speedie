@@ -477,7 +477,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 		(d is compilercreated)
 		return d
 
-	rz = SCDecl.new
+	rz = SCDecl(TypeVoidPtr)
 	|| ErrCount = stderr.errorCount
 
 	if (f == @item)
@@ -531,6 +531,7 @@ function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Nam
 
 function SCDecl.MakeDataTypeWrapper (|SCBase| Name_Space, |declmode| Purpose, |scdecl|)
 	|| wrapp = «thg "datatypewrapper"»
+	rz = SCDecl(.type)
 	rz.LoadContainedSub(self, wrapp, name_space, purpose)
 
 	
@@ -836,7 +837,7 @@ function ArrayInOrderCheck (|int| InOrder, |message| msg, |int|)
 function TypeOfArr (ExprResolver)
 	|int| IsDispatch = (exp ~= "dispatch")|int|
 	|| InOrder = 0
-	|| result = SCDecl.new
+	|| result = SCDecl(TypeVoidPtr)
 	exp.obj = result
 		
 	for (itm in exp)
@@ -873,15 +874,15 @@ function TypeOfArr (ExprResolver)
 				  else
 					result.Contains = Contained
 				
-				if (result.Type)  			// don't use "isa"! not here.
-					expect (result.Type == NewArrCls) ( exp, "Array indexes mismatch." )
-				  else
+				if (result.Type == TypeVoidPtr)
 					result.type = NewArrCls
+				  else
+					expect (result.Type == NewArrCls) ( exp, "Array indexes mismatch." )
 	
 	
 	|| c = result.contains
 		if isdispatch and result.type != typedictionary // dispatches use function pointers... 
-			result.type = c.type
+			result.type = c.type						// so we might as well make a c-array
 			result.contains = nil
 			result.CArraySize = IsDispatch-1
 			exp.func = @arg
@@ -891,8 +892,9 @@ function TypeOfArr (ExprResolver)
 		  else
 			result.Contains = c.MakeContainedOptional
 
-		
-	result.Type := typearray
+	
+	if result.type == TypeVoidPtr
+		result.Type = typearray
 	return result
 
 
@@ -1694,24 +1696,23 @@ function Message.FindDestructor (|Message|)
 
 
 function TypeOfArgArr (ExprResolver)
-	|| result = SCDecl.new
+	|scdecl| result
 	|| Count = 0
 	for itm in exp
 		if itm == @tmp
 			itm.func = @thg
 		|| Contained = TypeOfExpr( itm, name_space )
 			check (Contained.type.isdatatype or contained.PointerCount) (itm, "Must be a datatype.")
-			if (result.type)
+			if (result)
 				|| oof = contained.HighestArrayContainMatch( result.type.TypeNormal, itm )
 					result.type = oof.type
 			  else
-				result.type = contained.type
+				result = SCDecl(contained.type)
 			Count++
 
 	result.Carraysize = Count
 	
-	expect result.type (exp, "Can't get the type of this.")
-	exp.obj = result
+	exp.obj = result						#expect (exp, "Can't get the type of this.")
 	Tran_ArgArray(exp, name_space)
 	return result
 

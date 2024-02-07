@@ -57,7 +57,7 @@ function Message.ReplaceInbuiltSub (|scbase| name_space, |scdecl| self_decl, |me
 
 
 function Message.InbuiltSizeOf (|scbase| name_space, |scdecl| sulf, |message| sulf_exp, |message|)
-	return NewDeclNum(scdecl.new, sulf.bytesize, "")
+	return NewDeclNum(scdecl(TypeInt), sulf.bytesize, "")
 
 
 function TypeOfQues (ExprResolver)

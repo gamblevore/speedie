@@ -1328,9 +1328,9 @@ datatype MsgParseFlags (uint16)
 	syntax isnt (|MsgParseFlags| v, |bool|)
 		return !(self & v)
 	flags
-		Reranged		= 0x8000
-		Editable		= 0x1000
-		Inserted		= 0x2000
-		Style2			= 0x4000
-		BreakPoint		= 0x8000
+		NicelyPositioned	= 0x8000
+		Editable			= 0x1000
+		Inserted			= 0x2000
+		Style2				= 0x4000
+		BreakPoint			= 0x8000
 

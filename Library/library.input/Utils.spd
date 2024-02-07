@@ -75,7 +75,7 @@ function string.Sort (|byte| sep = '\n', |string|)
 function Message.FindNotInserted (|message|)
 	opt norefcounts
 	for c.up in self
-		if c isnt inserted
+		if c isnt inserted or c is NicelyPositioned
 			return c
 	return self
 

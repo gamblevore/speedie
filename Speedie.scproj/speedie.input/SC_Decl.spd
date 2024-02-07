@@ -104,7 +104,7 @@ class SCDecl (SCObject) {
 	|byte| 				Special
 
 	
-	constructor (|scclass| type=nil)
+	constructor (|scclass| type)
 		.type = type
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered
@@ -156,7 +156,7 @@ class SCDecl (SCObject) {
 
 	
 	function Copy (|bool| ForNewVariable = false, |SCDecl|)
-		|| dcl = SCDecl.new
+		|| dcl = SCDecl(.type)
 		
 		.CopyTypeInfoTo( dcl )
 		(dcl Is Const)  = self Is Const
@@ -268,7 +268,7 @@ class SCDecl (SCObject) {
 			
 
 	function GetAddress (|declmode| Purpose=declmode.always, |SCDecl|)
-		rz = SCDecl.new
+		rz = SCDecl(.type)
 		.CopyTypeInfoTo(rz)
 		rz.internal = self
 		rz.PointerCount++
@@ -457,9 +457,8 @@ class SCDecl (SCObject) {
 		|| IsNormal = castto and castto.isnormal
 			|| it = .type.DataTypeWrapper
 				return it
-		|| dcl = scdecl.new
+		|| dcl = scdecl(typewrapper)
 		dcl.contains = castto
-		dcl.Type = typewrapper
 		if isnormal
 			.type.DataTypeWrapper = dcl
 		return dcl

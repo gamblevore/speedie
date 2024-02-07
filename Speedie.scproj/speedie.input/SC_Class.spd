@@ -76,7 +76,7 @@ constructor (|Message| node, |SCBase| parent, |bool| HasPtrs)
 	.TypeInfo = DataTypeCode.UnusedType
 	.Banned = .TestBanned
 	
-	|| T = SCDecl.new(self)
+	|| T = SCDecl(self)
 	t.nildeclared = (nilstate.real >> HasPtrs)
 	.TypeNormal = T
 	.TypeOptional = T.NilConstructor(NilState.optional * HasPtrs)
@@ -802,14 +802,13 @@ function IsAtomic (|bool|)
 
 function MakeClassType (|scdecl| d, |scdecl|)
 	opt norefcounts
-	|| c = scdecl()
+	|| c = scdecl(TypeJBClass)
 	c.name = .name.lowercase
 	c.source = .source
 	C.pointercount = 1
 	c.Special = 1
 	C.nildeclared = nilstate.real
 	C.Contains = d
-	c.type = TypeJBClass
 	return c
 
 

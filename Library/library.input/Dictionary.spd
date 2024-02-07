@@ -24,6 +24,7 @@ class Dictionary (saveable)
 		cpp_part ValueStr
 		return self[key,nil]
 	syntax Access (|string| Key, |...| Default, ||)
+		nil checker
 		cpp_wrapper JB_Dict_Value
 		
 	function MakePlace (|string| key, |&...|)

@@ -666,7 +666,7 @@ setter IsCppInBuilt (|int|)
 
 
 function DeclsProtoTypeAdd (|SCClass| fpType)
-	|| Dcl = SCDecl.new		 // make a lookuponly decl... to allow this func to be "found".
+	|| Dcl = SCDecl(TypeVoidPtr)	// not sure why we need TypeVoidPtr :(
 	dcl.IsLookupOnly = self
 	dcl.TypeContained = fpType
 	dcl.Name = .Name
@@ -791,7 +791,7 @@ function Message.SelfUsedForProperty (|int|)
 	require r and .func == @dot  and  r.func == @rel
 	if .first IsThing "self"
 		if .DotType
-			return 1 + (r.second.name != "=")
+			return 1 + (r.second.nyme != "=")
 
 
 

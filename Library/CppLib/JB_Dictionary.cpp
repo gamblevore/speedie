@@ -518,7 +518,7 @@ void MiniByte_(FindResult& F, int i) {
 }
 
 bool CanSet_(Dictionary* self, JB_String* key, FindResult* F) {
-    if (key and self) {
+    if (key) {
         *F = BeginFind_( self,  Mini(key, 0) );
         JB_Dict_Value_(*F);
         return TrySet_(*F, key);

@@ -46,16 +46,15 @@ function scbase.CollectConstantsSub (|Message| ch)
 			CurrType = ExtractDecl( line.first, self, declmode.Globals )		#expect line
 			line.remove
 			continue
-		
-		|| NewItem = SCDecl.new
-		NewItem <~ scdeclinfo.Const ||| scdeclinfo.onmodule
-
 		if (line == "...")
 			NextNum = StartNum
 			Continue
+		
+		|scdecl| NewItem
 			
-		  elseif (line == @Thg) // default numeric constant
+		if (line == @Thg) // default numeric constant
 			using (line)
+			NewItem = SCDecl(typeint)
 			|| NewNum = NewDeclNum( NewItem, NextNum, line.name )
 			newitem.source = line
 			if (ch == "flags")
@@ -74,6 +73,7 @@ function scbase.CollectConstantsSub (|Message| ch)
 			|| thg = line[ @Thg ]							#require
 			|| OMGType = TypeOfExpr( ValueNode, self )		#require // can’t seem to remove this.
 			|| NewType = CurrType ?? OMGType
+			NewItem = SCDecl(newtype.type)
 			expect (NewType) (line)
 
 			if (ValueNode == @Str)
@@ -89,13 +89,14 @@ function scbase.CollectConstantsSub (|Message| ch)
 			NewItem.name = thg.name
 			NewItem.Default = ValueNode
 			newitem.source = thg
-		
+
+		NewItem <~ scdeclinfo.Const ||| scdeclinfo.onmodule
 		NameList <~ NewItem.source // crappy work around for now...
 		.TryAdd( line, NewItem, NewItem.Name )
 	
 	
 	if (ch == "flags")
-		|| NewItem = SCDecl.new
+		|| NewItem = SCDecl(TypeInt)
 		NewItem <~ scdeclinfo.Const ||| scdeclinfo.onmodule
 		|| s = (FuncName.Name, "Flag")(FuncName)
 		NewDeclNum( NewItem, lastflag|int|.bits, "Largest" + s )

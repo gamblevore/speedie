@@ -161,7 +161,8 @@ function Function (NilTrackerFn)
 		p = prms.first
 		for recv in fn.args
 			|| infernal = p.FastDecl.CanUpgradeInternalPointer
-				.VariableSet(infernal, recv.internal, recv.source, p)
+				|| ri = recv.internal
+				.VariableSet(infernal, recv.source, ri, p, ri.nilcurr)
 			p++
 
 	if fn.IsKiller
@@ -507,9 +508,10 @@ function Declaration (niltrackerfn) // function decl
 
 function SetRel (NilTrackerfn)
 	opt norefcounts
-	|| R = msg.last!,	.Jump(R)			// R is defined as coming first
+	|| R = msg.last!
+	|| RN = .Jump(R)			// R is defined as coming first
 	|| L = msg.first!,	.Jump(L)
-	return .VariableSet(L.FastDecl, R.FastDecl, L, R)
+	return .VariableSet(L.FastDecl, L, R.FastDecl, R, RN)
 
 
 function Fail (NilTrackerFn)
@@ -526,24 +528,23 @@ function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |scfunctio
 	opt norefcounts
 	if recv.isreal
 		.BecomeReal(sent, where, f)
-	  elseif !recv.nilstated
+	  elseif !recv.nilstated and f != scfunction.currfunc  // haha
 		recv.NilPrmFail(where, f)
 	
 
-function VariableSet (|scdecl| Recv, |scdecl| Sent, |message| RecvMsg, |message| SentMsg,  |nilstate|) // setrel, relset
+function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message| SentMsg, |nilstate| SentState, |nilstate|) // setrel, relset
 	opt norefcounts
 	
 	if !recv.typesuffers
 		return nilstate.real
 	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg("Need to set it into another var."))
 
-	|| SN = sent.NilCurr
 	if recv.isreal and recv isnt local
-		expect (SN is realish) (RecvMsg, "Nil is not allowed on: " + recvmsg.render)
+		expect (SentState is realish) (RecvMsg, "Nil is not allowed on: " + recvmsg.render)
 		return .BecomeReal(sent, SentMsg)
 		
 	if recv.NilReg
-		return T.SetNilness(recv, SN)
+		return T.SetNilness(recv, SentState)
 
 
 function BecomeReal (|scdecl| sent, |message| where, |scfunction| To=nil,  |nilstate|)

@@ -113,12 +113,11 @@ function scdecl.PrmStateMsg (|string| Needed, |scfunction| f=nil, |string|)
 
 function scdecl.NilPrmFail (|message| where, |scfunction| f)
 	error (where, .PrmStateMsg("", f))
-
-	|| fs = faststring()
+/*	|| fs = faststring()
 	fs <~ .PrmStateMsg("", f)
 	if f is recursive
 		fs <~ ", on recursive function."
-
+*/
 
 function message.IsNowNil (|bool|)
 	opt norefcounts
