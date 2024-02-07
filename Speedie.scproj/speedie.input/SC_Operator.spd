@@ -263,8 +263,8 @@ or
 
 function Message.OpScore (|int|)
 	opt norefcounts
-	if .obj
-		return .obj|scoperator|.score
+	|| o = .obj
+		return o|scoperator|.score
 	|| op = scoperator.dict.ValueLower(.name)
 		.obj = op
 		return op.score

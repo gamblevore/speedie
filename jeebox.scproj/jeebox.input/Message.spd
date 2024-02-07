@@ -28,7 +28,7 @@ class Message (RingTree)
 	|uint16|				Tag					// Jeebox does not use these itself.
 ////////////////////////////////		
 			
-	constructor (|Message| other)
+	constructor (|Message!| other)
 		cpp_part ConstructorCopy
 		super.constructor
 		

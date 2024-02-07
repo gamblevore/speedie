@@ -666,7 +666,7 @@ setter IsCppInBuilt (|int|)
 
 
 function DeclsProtoTypeAdd (|SCClass| fpType)
-	|| Dcl = SCDecl(TypeVoidPtr)	// not sure why we need TypeVoidPtr :(
+	|| Dcl = SCDecl(TypeVoidPtr!)	// not sure why we need TypeVoidPtr :(
 	dcl.IsLookupOnly = self
 	dcl.TypeContained = fpType
 	dcl.Name = .Name

@@ -116,7 +116,8 @@ function Message.DclExp (|Message|)
 
 function Message.MsgDecl (|SCDecl|)
 	opt norefcounts
-	return .DclExp.AsDecl
+	|| d = .DclExp
+		return d.AsDecl
 
 
 function Message.DeclName (|Message|)
@@ -298,7 +299,7 @@ function message.WipeCopy (|message| oof, |Message|)
 		rz <~ v.WipeCopy(oof)
 
 	
-function message.WipeCopy (|Message|)
+function message.WipeCopy (|Message!|)
 	opt norefcounts
 	rz = Message(self)
 	rz.position = -1

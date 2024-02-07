@@ -275,7 +275,7 @@ function Message.UnReachable (|Message|)
 	return .CausesUnReachable(self)
 
 
-function Message.CausesUnReachable (|Message| arg, |Message| Dcl=nil, |Message| LastPlace=nil, |Message|)
+function Message.CausesUnReachable (|Message| arg, |Message?| Dcl=nil, |Message?| LastPlace=nil, |Message|)
 	opt norefcounts
 	|| Curr = dcl ?? .First
 
@@ -301,7 +301,7 @@ function Message.CausesUnReachable (|Message| arg, |Message| Dcl=nil, |Message| 
 //		// this was a bad idea
 
 
-function ExitHitsOrGoesPast (|Message| msg, |Message| arg, |bool|)
+function ExitHitsOrGoesPast (|Message!| msg, |Message!| arg, |bool|)
 	opt norefcounts
 	// while {||A, exit}			 // true
 	// while {||A, if(true){exit}}   // true
@@ -502,7 +502,7 @@ function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 	
 	while
 		curr = curr.parent
-		ifn curr : return last
+		if !curr : return last
 
 		|| f = curr.func
 		if (f == @Bra)
@@ -511,8 +511,8 @@ function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 			return (curr,Last)(parent)
 		  else 
 			|| D = Curr.Obj
-			if (D isa SCDecl) and (!(D|scdecl|).IsNormalObject)
-				return (curr,Last)(parent)
+			if (D isa SCDecl) and !(D|scdecl|).IsNormalObject
+				return (curr, Last)(parent)
 		
 		Last = Curr // Make sure it's not a (bracket) or obj|typecast|
 

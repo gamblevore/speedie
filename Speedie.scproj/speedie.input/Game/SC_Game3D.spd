@@ -38,7 +38,7 @@ module SCGame3D
 
 extend SCClass
 	function NewDeclInClassModule (|string| S, |SCClass| T)
-		|| Dcl = SCDecl(TypeVoidPtr) // not sure why this had no type before. TypeVoidPtr cant be right either.
+		|| Dcl = SCDecl(TypeVoidPtr!) // not sure why this had no type before. TypeVoidPtr cant be right either.
 		dcl.TypeContained = T 
 		dcl.Name = S
 		.Modul.TryAdd( .IsModel, Dcl, S )

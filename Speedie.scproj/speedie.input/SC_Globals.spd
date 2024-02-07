@@ -477,7 +477,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 		(d is compilercreated)
 		return d
 
-	rz = SCDecl(TypeVoidPtr)
+	rz = SCDecl(TypeVoidPtr!)
 	|| ErrCount = stderr.errorCount
 
 	if (f == @item)
@@ -837,7 +837,7 @@ function ArrayInOrderCheck (|int| InOrder, |message| msg, |int|)
 function TypeOfArr (ExprResolver)
 	|int| IsDispatch = (exp ~= "dispatch")|int|
 	|| InOrder = 0
-	|| result = SCDecl(TypeVoidPtr)
+	|| result = SCDecl(TypeVoidPtr!)
 	exp.obj = result
 		
 	for (itm in exp)
@@ -1690,9 +1690,10 @@ function Message.FindDestructor (|Message|)
 	opt norefcounts
 	for c in self
 		if c == @Func // i guess its a dot?
-			|| fn = c.last.asfunc
-				if fn is Destructor
-					Return c
+			|| cl = c.Last
+				|| fn = cl.asfunc
+					if fn is Destructor
+						Return c
 
 
 function TypeOfArgArr (ExprResolver)

@@ -180,7 +180,7 @@ class SCBehaviour (SCBase)
 	
 	
 	function SCModule.AddInterfaceToTable (|SCClass| TableCls)
-		|| d = SCDecl(TypeVoidPtr)
+		|| d = SCDecl(TypeVoidPtr!)
 		d.TypeContained = .cls
 		d.nildeclared = nilstate.real
 		d.Name = .name.InterfaceToBehaviour

@@ -457,7 +457,7 @@ class SCDecl (SCObject) {
 		|| IsNormal = castto and castto.isnormal
 			|| it = .type.DataTypeWrapper
 				return it
-		|| dcl = scdecl(typewrapper)
+		|| dcl = scdecl(TypeWrapper!)
 		dcl.contains = castto
 		if isnormal
 			.type.DataTypeWrapper = dcl

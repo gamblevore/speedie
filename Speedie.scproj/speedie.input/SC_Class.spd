@@ -802,7 +802,7 @@ function IsAtomic (|bool|)
 
 function MakeClassType (|scdecl| d, |scdecl|)
 	opt norefcounts
-	|| c = scdecl(TypeJBClass)
+	|| c = scdecl(TypeJBClass!)
 	c.name = .name.lowercase
 	c.source = .source
 	C.pointercount = 1
