@@ -450,13 +450,13 @@ function Bracket (Niltrackerfn)
 
 function Type (Niltrackerfn)
 	opt norefcounts
-	|| F = msg.first
+	|| F = msg.first!
 	|| ns = .Jump(F, test) &~ nilstate.FnBecomesNilCh
-	|| d = msg.FastDecl
+	|| d = msg.FastDecl$
 	if !d.TypeSuffers
 		return nilstate.real
 	|| fd = f.FastDecl
-	if fd.TypeSuffers // return inner suffering
+	if fd and fd.TypeSuffers // return inner suffering
 		return ns
 	
 	return d.nildeclared // we created new suffering, so lets pass that back.
@@ -581,6 +581,7 @@ function message.Trueness (|nilstate| found, |maybebool|)
 	opt norefcounts
 	|| d = .FastDecl
 	|| ret = ArchonPurger.t.return
+	require d and ret // they are already real but the compiler will complain :[
 	if d.FastMatch(ret)
 		|| n = d.nildeclare
 		if n & nilstate.KnownValue
@@ -591,7 +592,8 @@ function message.Trueness (|nilstate| found, |maybebool|)
 	  elseif Ret.isdatatype and d.isdatatype // nothing special
 		while self == @arg or @bra
 			self = self.last
-		if self matches ret.type.false
+		|| rtf = ret.type.false
+		if rtf and self matches rtf
 			return false
 	// return maybe
 

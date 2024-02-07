@@ -697,8 +697,9 @@ function SCBase.ReachedName (|string|)
 
 
 function Compiler.Banned (|string| name, |bool|)
+	opt norefcounts
 	|| b = Options.BannedClasses
-		rz = b.valuelower(name)
+		return b.valuelower(name)
 
 
 function TestBanned (|bool|)

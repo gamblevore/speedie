@@ -17,7 +17,7 @@ class $name (selector)
 
 		|$type| __First
 		...
-		$name.__first.GiveIDs
+		$name.__first!.GiveIDs
 
 		").parse.first
 		

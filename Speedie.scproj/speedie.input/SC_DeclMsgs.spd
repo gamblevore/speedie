@@ -148,7 +148,7 @@ function Message.CollectAGlobalDecl (|SCBase| scarg, |bool|)
 	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals, nil, nil)
 		|| def = dcl.Default
 		if def and !dcl.nilstated
-			|| d = def.fastdecl
+			|| d = def.msgdecl
 			if d and d.isreal
 				dcl.nildeclared = nilstate.real // in case of something like |object| x = real()
 		(dcl is property)

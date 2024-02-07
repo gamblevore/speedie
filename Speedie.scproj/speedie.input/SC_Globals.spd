@@ -435,7 +435,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 		return Compiler[ c.name, c ]$.typenormal
 	
 	if (c == @Acc)		// |Byte[10]| TenBytes
-		|| Prms = c[1]
+		|| Prms = c.second
 		if prms.HasAny
 			|| R = ExtractDecl( c.first, name_space, purpose )			#require
 			R = R.copy
@@ -698,7 +698,7 @@ function message.TypeOfArrItem (|message|)
 	// x = [("",n)] // an array of "", for n items. 
 	if self == @list
 		return .first
-	if (self == @rel) and (self[1] isthing "for")
+	if (self == @rel) and (.second isthing "for")
 		return .first
 	return self
 
@@ -1111,8 +1111,8 @@ function message.NiceIsFlagSyntax (|message| list,  |message| RN,  |scbase| name
 	require cls and cls.isnormal
 
 	|| ty = cls.type
-	|| fn = ty.TheIsFunc		#expect (list, "${ty.name} doesn‘t have 'syntax is' specified.")
-	|| arg1 = fn.args[1]		#expect (fn.source, "This func needs a parameter!")
+	|| fn = ty.TheIsFunc			#expect (list, "${ty.name} doesn‘t have 'syntax is' specified.")
+	|| arg1 = fn.args[1]			#expect (fn.source, "This func needs a parameter!")
 	|| LookupType = arg1.type			// OK so... we have the arg. it's a decl, with a type
 	require rn.expect(@thg)
 	
@@ -1371,19 +1371,17 @@ function TypeOfRel (ExprResolver) {
 }
 
 
-function VecType (|bool|isfloat, |int|count, |SCClass|) {
+function VecType (|bool| isfloat, |int| count, |SCClass|) {
 	if (isfloat)
-		if (count==2): return typevec2	// we need non-const versions of these! normally created by extractdecl
-		if (count==3): return typevec3
-		if (count==4): return typevec4
-		if (count==1): return typefloat
+		if (count==2): return typevec2!
+		if (count==3): return typevec3!
+		if (count==4): return typevec4!
+		return typefloat!
 
-	if (count==2): return typeivec2
-	if (count==3): return typeivec3
-	if (count==4): return typeivec4
-	if (count==1): return typeint
-
-// I dont even know anymore
+	if (count==2): return typeivec2!
+	if (count==3): return typeivec3!
+	if (count==4): return typeivec4!
+	return typeint!
 }
 
 

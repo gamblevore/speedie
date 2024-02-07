@@ -49,8 +49,8 @@ function FS (|Message| exp, |Message| getresult)
 function String (|Message| exp, |Message| str)
 	opt norefcounts
 	require (str == @str or @sstr or @back) and str.name == 1
-	str.obj = typebyte.typenormal
-	str.parent.obj = .bytefunc
+	str.obj = typebyte!.typenormal
+	str.parent!.obj = .bytefunc
 	str.func = @char
 	.StrRemoved++
 }

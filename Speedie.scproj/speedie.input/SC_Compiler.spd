@@ -289,7 +289,7 @@ function InitBasicStuff (|int|) // compiler.init
 
 function LoadTypeTest (|string| s, |scfunction|)
 	opt norefcounts
-	|| f = typeobject[ s ]
+	|| f = TypeObject![ s ]
 	if f isa scfunction
 		(f is TypeTest)
 		return f

@@ -86,10 +86,10 @@ class Message (RingTree)
 		// if .objectid == 3244984	
 	
 	
-	function Copy (|message| pos_msg=nil, |Message|)
+	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
-		require self
-		|| L = (pos_msg.memorylayer, .memorylayer)(pos_msg)
+//		require self
+		|| L = (pos_msg.memorylayer, .MemoryLayer)(pos_msg)
 				
 		rz = message.NewWithLayer(L, self)				// looks better
 		if pos_msg

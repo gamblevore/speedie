@@ -119,10 +119,10 @@ struct ArchonPurger
 	
 	function SetNilness (|SCDecl| d, |NilState| New, |NilState|)
 		pragma inline
-		if !d.nilreg or ((new&1) and (!d.TypeSuffers))  or  !New // WHA?
 		|| P = (.Neel)|&nilrecorder| // setset
 		(P)(d.NilReg) = new
 		d.NilPrint("set")
+		if d ~= "debug"
 		return New
 
 

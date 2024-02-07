@@ -97,18 +97,18 @@ function Error.Improve
 	opt norefcounts
 	|| node = FindBytePos( .node )		#require
 	
-	ifn .HasPosition
+	if !.HasPosition
 		.position = node.position
 
 	if !.path
-		|| SC = node.SCfile$
-		ifn sc == .node.scfile
+		|| SC = node.SCFile$
+		if sc != .node.scfile
 			.node = node // wrong file!!
 		if sc.exists
 			.path = sc.path
 
 
-function FindBytePos (|Message|Node, |bool| EndInside=false, |Message|)
+function FindBytePosSub (|Message| Node, |Message|)
 	opt norefcounts
 	if !node or node.HasPosition
 		Return node
@@ -118,14 +118,16 @@ function FindBytePos (|Message|Node, |bool| EndInside=false, |Message|)
 		if m.HasPosition
 			Return m
 
-	require !EndInside
-	|| msg = FindBytePos( node.parent, true )
+
+function FindBytePos (|Message| Node, |Message|)
+	|| first = FindBytePosSub( node )
+		return first
+	|| msg = FindBytePosSub( node.parent )
 		Return msg
 
-
-	// last try...
+	// Last try...
 	|| fn = node.MsgOwningFunc
-		return FindBytePos( fn.Source, true )
+		return FindBytePosSub( fn.Source )
 
 
 

@@ -138,8 +138,9 @@ function ListModules (|Dictionary| access, |[SCModule]|)
 function message.IsReffer (|bool|)
 	opt norefcounts
 	if self == @func
-		|| fn = .last.asfunc
-			return fn is reffer
+		|| l = .last
+			|| fn = l.asfunc
+				return fn is reffer
 
 
 

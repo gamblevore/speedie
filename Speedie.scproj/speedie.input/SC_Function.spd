@@ -160,7 +160,7 @@ render Describe
 	fs <~ "function "
 	fs <~ .Name
 	fs <~ " "
-	fs <~ .Source[1]
+	fs <~ .Source.second
 
 
 Render
@@ -584,14 +584,16 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCPara
 function FLookup (assigns:|SCBase|)
 	if (Value isa SCClass)
 		.Cls = Value
-		.parent = .Cls.Modul
+		.parent = value.Modul
 	  else
 		.parent = Value.ProjectFix
 	
 	if scimport.curr
-		.Project = scimport.curr
-	  elseif (.Source)
-		|| f = .Source.SCFile
+		.Project = SCImport.Curr
+		return 
+
+	|| S = .Source
+		|| f = S.SCFile
 			.Project = f.Proj
 
 
@@ -833,10 +835,12 @@ function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
 
 
 function ConstructorLinePlace (|message|)
-	if .sourcearg.hasposition
-		return .sourcearg
-	if .cls
-		return .cls.sourcearg
+	opt norefcounts
+	|| s = .SourceArg
+		if s.HasPosition
+			return s
+	|| c = .cls
+		return c.sourcearg
 
 
 function CanCompare (|SCDecl|Against, |bool|)
@@ -992,7 +996,7 @@ function FixCnjSub (|Message| exp) {
 	// lets fix it, if its in a rel, (it shouldn't be)
 	// || x = a #require   -->   || x = (a #require)
 	|| nxt = ch.next
-	if (ch == @Rel) and (exp in @arg or @Decl) and (ch[1].name == "=")
+	if (ch == @Rel) and (exp in @arg or @Decl) and (ch.second.name == "=")
 		expect  (ch.first.IsAssignable)   (exp, "Use brackets here, like this: “($ch) #${name}”")
 		
 		exp.ReplaceWith( ch )

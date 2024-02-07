@@ -180,7 +180,7 @@ class SCDecl (SCObject) {
 		|| T = o.type.typeinfo 
 		if (s &~ datatypecode.sign) == (t &~ datatypecode.sign)
 			return self
-		|| cls = s.better_numeric_sub(t)
+		|| cls = s.better_numeric_sub(t)!
 		if cls.typeinfo == s
 			return self // in case of: || x = (date(), 0)(test)
 		if cls.typeinfo == t

@@ -179,6 +179,7 @@ module SC_Saver {
 	
 	
 	function SCClass.LoadSaverSub (|string|)
+		opt norefcounts
 		if (self == TypeBool)
 			return "bool"
 		  elseif .NumericCount == 1
@@ -202,8 +203,8 @@ module SC_Saver {
 				return "string"
 			  elseif (self == TypeSaveable)
 				return "object"
-		if (.super)
-			return .super.saveas // Makes sense?
+		|| s = .Super
+			return s.saveas // Makes sense?
 	
 	
 	function SCClass.StartupSaver (|String| Name)
