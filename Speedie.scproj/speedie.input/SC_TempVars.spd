@@ -182,7 +182,7 @@ extend_module scfunction
 		|| OldDcl = msg.AsDecl
 			insert.obj = OldDcl
 			OldDcl = OldDcl.Copy // no difference, its a temp
-			if olddcl isnt body 
+			//(olddcl is body) 
 			OldDcl.Name = name
 			repl.obj = OldDcl
 			dcl.obj = OldDcl

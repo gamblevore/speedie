@@ -90,7 +90,7 @@ dispatch fn_asm_table (fn_asm)
 		0
 
 
-datatype ASMtmp (MsgParseFlags)
+datatype ASMtmp (uint16)
 	module {
 	function StateExpr	(fn_asm)
 	function Debugger	(fn_asm)
@@ -134,8 +134,10 @@ datatype ASMtmp (MsgParseFlags)
 
 
 function Message.TmpType (|ASMTmp|)
+	//return .tag
 	return .flags & 63
 
-function Message.TmpType (assigns:|ASMTmp| value)
+function Message.TmpType (assigns:|ASMTmp|)
+	// .tag = value
 	.flags = (.flags &~ 63) ||| value
 

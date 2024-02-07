@@ -59,7 +59,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nil"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nocolor"

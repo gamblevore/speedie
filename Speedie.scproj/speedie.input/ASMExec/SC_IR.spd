@@ -16,8 +16,8 @@ struct IR // µfunc uses this. // "class IR"
 		
 	setter Debug (|message|)
 		|| FilePos  = value.position & MsgDebugPosShift.bits
-		|| FileInfo = value.tag << MsgDebugPosShift
-		.debug = FileInfo ||| FilePos
+//		|| FileInfo = value. tag << MsgDebugPosShift
+		.debug = CurrFileNum ||| FilePos
 		
 	function BytePos (|ind|)
 		return .debug & MsgDebugPosShift.bits
@@ -55,7 +55,8 @@ struct IR // µfunc uses this. // "class IR"
 		.fs(fs)
 	
 	module
-		|[string]| Resources
+		|[string]|	Resources
+		|int|		CurrFileNum
 	constants
 		MsgDebugPosShift = 19
 

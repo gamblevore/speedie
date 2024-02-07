@@ -110,7 +110,7 @@ struct HollyPotter
 		
 		for i in table.length
 			|messageid--| ID = table[i]
-			id.tag = i
+			id.mtag = i
 			.strings <~ id
 			.Lengths.noob(id.Length)
 			if id.func != PrevType
@@ -150,7 +150,7 @@ struct HollyPotter
 
 	helper Encode (|message| curr, |bool| Depth, |int| highest,  |uint64|)
 		#!"this is pingponging!"
-		|| ID = curr.name|MessageID|.tag
+		|| ID = curr.name|MessageID|.mtag
 		|| Code = Depth|uint|
 		if ID > highest
 			highest = ID + 1 // 

@@ -46,7 +46,7 @@ linkage
 |SCClass?|				Cls
 |String|				Description
 |CppRefs?|				Refs
-|dictionary of SCBase|	LinkTo
+|?dictionary of SCBase|	LinkTo
 |object?|				CounterPart
 |SCFunction?|			NextFunc
 |µFunc?|				ASM
