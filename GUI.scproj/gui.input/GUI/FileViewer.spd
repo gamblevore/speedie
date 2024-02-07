@@ -390,7 +390,7 @@ class FileViewer (ListView)
 			.ListOpen.QuickOpenFill(r)
 			return
 		
-		|| f = path.file
+		|| f = path.before(":").file
 		|| filter = ""
 		if !f.Exists
 			f = f.Parent

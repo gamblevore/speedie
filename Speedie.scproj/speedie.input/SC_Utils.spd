@@ -157,3 +157,29 @@ function Message.Op (|message|)
 	if self == @rel
 		return .Second
 
+
+
+// seems kinda useless
+class FileComparer
+	|?faststring| 	out
+	|?stringreader| in
+	constructor (|string| s)
+		|| f = s.file
+		|| x = f.exists
+		.in = (f.in, nil)(x)
+		.out = (nil, f.out)(x)
+		
+	function close
+		.out = nil
+		.in = nil
+		
+	function check (|int| v)
+		if .out
+			.out <~ v
+			.out <~ '\n'
+		  elseif .in != nil
+			|| str = .in.DString('\n')
+			if str.int != v
+				"found $v expected $str"
+				debugger
+

@@ -5,7 +5,6 @@ class StringReader
 	|FastBuff|					Data
 	|file?|						File
 	|object--?|					UserObj				// for jbin
-//	|?&MessageDecompressor| 	Decomp				// also
 	|int|						ChunkSize
 	|int| 						StartFrom
 	|bool| 						_NoMoreChunks
@@ -25,12 +24,6 @@ class StringReader
 		.ChunkSize = chunksize
 		.length = file.size
 		.ReadChunk
-
-//	constructor (|stringreader| Compressed)
-//		cpp_part ConstructorDecomp
-//		.Decomp = Compressed
-//		.length = file.size
-//		.ReadChunk
 
 	function ReadAll (|string|)
 		return .str(.length - .startfrom)
@@ -127,14 +120,17 @@ class StringReader
 			sh += 7
 			expect (sh <= 57) (self, "Corrupted hInt")
 	
-	function CString (|string|)
+	function DString (|byte| split, |string|)
 		// this function doesn't work with streaming...
 		// its not ideal. but none of my code needs this streamed!
 		// they just read the entire file in. So I don't need it!
 		|| p = .position
-		|| zpos = .data.find(0|byte|, p, int.max)
+		|| zpos = .data.find(split, p, int.max)
 			.position = zpos+1
-			return .data[p, zpos] // don't call .section, seeing as its not streaming anyhow
+			return .data[p, zpos] // don't call .section, seeing as its not streaming.
+
+	function CString (|string|)
+		return .dstring(0)
 	
 	function UpTo (|int| end, |int|)
 		return end - .position

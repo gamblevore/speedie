@@ -26,27 +26,18 @@ function Message.ErrorLocation (|string| desc = "", |string|)
 
 function Message.FilePath (|string|)
 	Opt NoRefCounts
-	|| L = .OriginalParseLayer$
-	|| O = L.obj
+	|| O = .memorylayer.obj
 	if !__IS_LIBRARY__ and (O isa File)
 		return O.path
 	if O isa String
 		return O
 
 
-function Message.OriginalParseLayer (|memorylayer|)
-	Opt NoRefCounts
-	require self
-	|| L = .memorylayer
-	if (L != (Message).defaultlayer)
-		return L
-
-
 function Message.OriginalParseData (|string|)
 	Opt NoRefCounts
-	|| L = .OriginalParseLayer
-	if (L and L.obj2 isa string)
-		return L.obj2|string|
+	|| D = .memorylayer.obj2
+	if D isa string
+		return D
 
 
 extend_module Error

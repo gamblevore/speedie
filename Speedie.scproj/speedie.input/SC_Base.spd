@@ -83,8 +83,9 @@ function CollectSub (|Message| c, |SCBase|)
 
 
 syntax access (|string| s, |scobject|)
-	if (.access)
-		return .access.valuelower(s)
+	opt norefcounts
+	|| a = .Access
+		return a.valuelower(s)
 
 
 function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {

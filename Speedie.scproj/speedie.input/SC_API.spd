@@ -5,12 +5,12 @@ module SC_API
 	function Message.APICppProject (|string|)
 		opt norefcounts
 		|| f = .scfile
-		|| it = f.exportname
-			return it.lowercase
-		|| a = f.proj
+			|| it = f.exportname
+				return it.lowercase
+			|| a = f.proj
 			|| b = a.mod
-				|| c = b.exportname
-					return c.lowercase
+			|| c = b.exportname
+				return c.lowercase
 		return "app"
 
 

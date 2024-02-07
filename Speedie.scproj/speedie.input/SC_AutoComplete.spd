@@ -294,6 +294,7 @@ function scfunction.Update_Source (|int| start, |string| text, |scfile| myfile, 
 	scfunction.currfunc = self
 	parser.using.position = -1
 	parser.using.Flags = 0 // oop
+	parser.using.Tag = 0 // right?
 	|| source = text.parseclean
 	if source and source != @tmp
 		source = source[@tmp]
@@ -304,7 +305,8 @@ function scfunction.Update_Source (|int| start, |string| text, |scfile| myfile, 
 		parser.using.Flags = MsgParseFlags.Inserted
 		rz = .UpdateSourceSub(source)
 		source.obj = orig.disambiguate(source)
-	parser.using.Flags = 0 // oop
+	parser.using.Flags = 0
+	parser.using.Tag = 0
 
 
 function scobject.Disambiguate (|message| src, |scfunction|)
@@ -321,11 +323,12 @@ function SCFunction.Disambiguate (|message| src, |scfunction|)
 	if !self or !.nextfunc
 		return self
 	for curr in self
-		|| s = curr.source
+		|| s = curr.source!
 		if s.deepequals(Src)
 			return curr
-		if s.second.deepequals(Src.second)
-			return curr
+		|| ss = s.second
+			if ss.deepequals(Src.second)
+				return curr
 	return self // better than nothing?
 
 
@@ -566,11 +569,12 @@ function scobject.AutoCompleteType (|int|)
 
 
 function Object.AsDecl (|scdecl|)
+	opt norefcounts
 	if self isa SCClass
 		return .typenormal
 	  elseif self isa SCModule
-		if .cls
-			return .cls.typenormal
+		|| c = .cls
+			return c.typenormal
 	  else
 		return .BaseAsDecl
 

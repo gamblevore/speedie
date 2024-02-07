@@ -14,6 +14,7 @@ class Error (Message)
 	|String|				Path
 	|String|				OriginalData
 	|String|				StackTrace
+	|int64|					Progress // for long operations where you want to know how far you have gone before getting an error.
 	|message?|				Node
 	|date|					When
 	|ErrorSeverity|			Severity
@@ -24,6 +25,7 @@ class Error (Message)
 		.position = -1
 		.node = node
 		.severity = level
+		.progress = errorreceiver.progress
 		.name = desc // sigh
 		.path = path
 		.when = date()
@@ -169,6 +171,8 @@ class Error (Message)
 			fs.field( "pos", .position )
 		fs.field( "file", .path )
 		fs.field( "severity", .severity )
+		if .progress >= 0
+			fs.field( "progress", .progress )
 		if .StackTrace
 			fs.field( "stack", "" )
 			fs.indent++

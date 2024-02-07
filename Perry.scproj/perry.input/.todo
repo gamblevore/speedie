@@ -8,7 +8,6 @@
 	* selector constructor shouldn't need "?"
 	* also... what about global struct pointers? pointers are assumed not nil... but if its not initialised it will be nil?
 		* compiler should know this
-	* speedie should use the tag instad of the flags! Let jeebox use the flags!!
 	
 * constructors should allow code before it... just not property setting.
 

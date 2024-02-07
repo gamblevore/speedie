@@ -545,6 +545,8 @@ extend PerryIDE
 	
 	function RelistStartupErrors
 		for err in .startuperrors
+			ifn err isa error
+				log "RelistStartupErrors bug"
 			.errorlist <~ err
 			is broken
 

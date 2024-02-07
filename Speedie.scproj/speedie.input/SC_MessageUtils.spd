@@ -473,16 +473,16 @@ function message.IsAlwaysFalse (|bool|)
 function Message.StartUsingAfter // for "return" debugging.
 	opt norefcounts
 	|| biggest = -1
-	|| L = .OriginalParseLayer
+	|| L = .memorylayer
 	|| d = .originalparsedata
 		for s.flat in self
-			if s.position >= 0 and s.OriginalParseLayer == l 
+			if s.position >= 0 and s.memorylayer == l 
 				(biggest max= s.after)
 		|| b2 = d.find("\n", biggest)
 			biggest = b2
 		biggest++
 	parser.Using.Position = biggest
-	parser.Using.Flags = MsgParseFlags.Inserted // right?
+	parser.Using.Flags = MsgParseFlags.Inserted ||| MsgParseFlags.Reranged // right?
 	.MemoryLayer.use
 
 

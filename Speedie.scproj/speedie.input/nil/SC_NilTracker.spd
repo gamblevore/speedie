@@ -245,8 +245,9 @@ struct ArchonPurger
 					.KhalaiPurification(f, 1)
 					rec.ReturnErrors
 				for (f in compiler.funclist) (i)
+					errorreceiver.progress = i+1
 					.KhalaiPurification(f, 2)
-					"		Func: ${i+1} / ${compiler.funclist.length}"
+					"		Func: ${errorreceiver.progress} / ${compiler.funclist.length}"
 					rec.ReturnErrors
 
 			SCFunction.currfunc = nil

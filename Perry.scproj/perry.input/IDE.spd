@@ -136,6 +136,7 @@ class PerryIDE (Window)
 
 
 	function JeeboxEffects (|image| where, |message| bg)
+		return
 		effects.dest = where
 		if Effects.StartJeebox(bg, 0.5)
 			Effects.Backup
@@ -877,6 +878,8 @@ So anything not 0 means "its OK"`
 		
 		if .IsEditingSource	
 			|| err = .editme.MyError
+				ifn err isa error
+					log "ParseErrorDetect bug"
 				.errorlist <~ err // right?
 
 	

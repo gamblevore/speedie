@@ -174,21 +174,23 @@ extend Parser
 
 
 	function MessageErrorSub (|FastString| fs, |int| num, |int| ButFound, |int|)
-		if (!ErrorNames)
-			ErrorNames = dictionary.new
-	        ErrorNames[kTemporal]           = "temporal"
-	        ErrorNames[kTemporalSyx]        = "declaration"
-	        ErrorNames[kTemporalWord]       = "statement"
-	        ErrorNames[kEndOfLine]          = "end-of-line"
-	        ErrorNames[kColon]              = "':'"
-	        ErrorNames[kOppSyx]             = "operator"
-	        ErrorNames[kOppWord]            = "operator"
-	        ErrorNames[kOpp]                = "operator"
-	        ErrorNames[kOppTemporal]        = "temporal-operator"
-	        ErrorNames[kThing]              = "a name"
-	        ErrorNames[kThingWord]          = "a name"
-	        ErrorNames[kThingSyx]           = "something"
-	        ErrorNames[kIllegalChar]        = "illegal-character"
+		|| e = .ErrorNames
+		if !e
+			e = Dictionary()
+			.ErrorNames = e
+	        e[kTemporal]           = "temporal"
+	        e[kTemporalSyx]        = "declaration"
+	        e[kTemporalWord]       = "statement"
+	        e[kEndOfLine]          = "end-of-line"
+	        E[kColon]              = "':'"
+	        E[kOppSyx]             = "operator"
+	        E[kOppWord]            = "operator"
+	        E[kOpp]                = "operator"
+	        E[kOppTemporal]        = "temporal-operator"
+	        E[kThing]              = "a name"
+	        E[kThingWord]          = "a name"
+	        E[kThingSyx]           = "something"
+	        E[kIllegalChar]        = "illegal-character"
 	    
 		if fs.length
 			fs <~ " / "
@@ -196,7 +198,7 @@ extend Parser
 			fs <~ "Expected "
 		
 		|| BestValue = FindError(num)
-			fs <~ ErrorNames[ BestValue ]
+			fs <~ e[ BestValue ]
 			return num &~ BestValue
 		
 		fs <~ "something else"

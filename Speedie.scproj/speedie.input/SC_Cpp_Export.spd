@@ -1073,7 +1073,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 
 	function message.BraDeclfind (|scdecl|)
-		opt norefcounts,  (self)~isreal
+		opt norefcounts
 		
 		while
 			|| d = .AsDecl

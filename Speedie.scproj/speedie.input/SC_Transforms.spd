@@ -355,7 +355,6 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 							      // altering the tree isn't cool really... makes things too tricky. 
 
 
-		
 function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
 	|| Src = f.SourceArg
 	|| d = r_z.MsgDecl
@@ -368,12 +367,13 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
 
 	ifn src.last istmp "return"
 		|| ret = src.msg(@tmp, "return")
-//		ret.flagS |= MsgParseFlags.Reranged // fix later
 		ret.tmptype = asmtmp.kreturn 
 		if used
 			ret.msg(@thg, "rz").obj = d 
 		  else
 			ret <~ f.ReturnType.CreateDefault(src)
+
+	parser.Using.Flags = 0
 
 
 function Tran_Result (|SCFunction| f, |message|)

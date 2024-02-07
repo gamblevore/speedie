@@ -74,7 +74,9 @@ class Object
 	
 	helper TypeFailed (|&ClassData| Cls, |message| where,  |object|)
 		|| name = .Class.name?.str  ?? "nil"
-		error (where, "object of '" + name + "' is not a: " + cls.name ) 
+		error (where, "object of '" + name + "' is not a: " + cls.name )
+		platform.log "TypeFail"
+		platform.log app.stacktrace
 		debugger
 
 	api DebugPrint  // more for use in XCode, than anything else.

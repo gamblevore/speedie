@@ -539,7 +539,7 @@ function LoadConstructorsAndAllocators
 
 function AllocStr (|string|)
 	|| s0 = .name
-	|| s = (s0, .super.name)(!.IsRole)
+	|| s = (s0, .super!.name)(!.IsRole)
 	return "
 	helper Alloc (|$s0|)
 		return JB_NewClass(__classes__.$s)|$s0|
@@ -548,7 +548,7 @@ function AllocStr (|string|)
 
 function AllocStrLayer (|string|)
 	|| s0 = .name
-	|| s = (s0, .super.name)(!.IsRole)
+	|| s = (s0, .super!.name)(!.IsRole)
 	return "
 	helper LayerAlloc (|MemoryLayer!| _L, |$s0|)
 		visible false
@@ -697,7 +697,8 @@ function SCBase.ReachedName (|string|)
 
 
 function Compiler.Banned (|string| name, |bool|)
-	return Options.BannedClasses.valuelower(name)
+	|| b = Options.BannedClasses
+		rz = b.valuelower(name)
 
 
 function TestBanned (|bool|)
