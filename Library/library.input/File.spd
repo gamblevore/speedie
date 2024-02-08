@@ -34,6 +34,7 @@ class File (String)
 		cpp_Wrapper JB_File_Mode
 	
 	function Path (|string|)
+		nil checker
 		cpp_Wrapper JB_File_Path
 
 	function Mode (assigns:|FileMode|)

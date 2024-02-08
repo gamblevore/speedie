@@ -71,7 +71,7 @@ class SCIterator (SCObject)
 
 
 	function MakeWhile (|message| arg, |message| postcond, |message|)
-		|| result = .whileloop.copy(arg)				 // hmmm... this position thing doesn't work.
+		|| result = .WhileLoop!.copy(arg)				 // hmmm... this position thing doesn't work.
 		|| Loop = result.Deepest(@tmp, "while") #require // for (x,y) loops...
 		|| larg = Loop.find(@arg)				#require
 		|| it = larg.next // postcond

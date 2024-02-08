@@ -77,8 +77,9 @@ class SCImport
 	function CanBan (|scfile| scf, |bool|)
 		if !SCImport.STDLibTime
 			return true
-		require options.ProjectIsMiniLib
-		return compiler.BaseProjectPath.DirectoryContains(scf.path)
+		if options.ProjectIsMiniLib
+			|| p = compiler.BaseProjectPath
+				rz = p.DirectoryContains(scf.path)
 		// we also need something else to be the same.
 		// scf needs to be inside the thing...
 	

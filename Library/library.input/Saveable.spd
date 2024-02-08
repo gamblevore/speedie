@@ -7,9 +7,9 @@ struct ObjectSaver
 	linkage
 		cpp_Part Saver
 
-	|FastString|				Dest
-	|object--|					CantSaveThis
-	|object--|					Root
+	|?FastString|				Dest
+	|?object--|					CantSaveThis
+	|?object--|					Root
 		
 	destructor
 		check !.CantSaveThis (.CantSaveThis, "This class has no saving function for it.")

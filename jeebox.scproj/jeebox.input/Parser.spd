@@ -888,7 +888,7 @@ ive been~running #since morning
 			Bits |= koppWord
 
 		Rel <~ .ProcessThing( Bits, Mode )
-		rel.after = rel.last.after
+		rel.after = rel.last!.after
 		return Rel
 	
 
@@ -1130,7 +1130,7 @@ ive been~running #since morning
 			prev = ch
 
 	
-	function DecorateThing (|message| R, |int| Ops, |Message|)
+	function DecorateThing (|message| R, |int| Ops, |Message!|)
 		R = .GetFuncAfter( R )
 		if .WillEnd: Return R
 		
@@ -1155,7 +1155,7 @@ ive been~running #since morning
 		return parser.ProcessThingSub(nil, ops, kthingsyx(|)kthingword, expect)
 
 	
-	function ProcessThing (|int| Ops = kOpp, |bool| Expect=false, |Message|)
+	function ProcessThing (|int| Ops = kOpp, |bool| Expect=false, |Message?|)
 		return .ProcessThingSub(nil, ops, kThing, expect)
 
 	

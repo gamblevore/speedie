@@ -601,7 +601,7 @@ function RC_DeclArg (|scdecl| AR, |scfunction| fn)
 
 function Message.RefDisappears (|bool|)
 	opt norefcounts
-	if self == @func
+	if .func == @func
 		self = .parent // sigh
 	for (P.up in self)
 		|| f = p.func
@@ -731,7 +731,7 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 function scfunction.FillInDestructor
 	|| first = .SourceArg.FindDestructor
 	Using .sourcearg
-	for d in .cls.Properties
+	for d in .cls!.Properties
 		if d.IsReffable(true)
 			.SourceArg.AddBefore( first, d.RefDestructor )
 		  else
@@ -744,7 +744,7 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 	|| TheCall = .CountCallsToParentAlloc( root )
 		return Thecall
 
-	|| parent = .Cls.super
+	|| parent = .Cls!.super
 	if (parent and parent != TypeObject)
 		if IsConstructor
 			rz = .AddParentAllocFunc( root, parent.ConstructorFunc.Paramless )
@@ -760,12 +760,12 @@ function SCFunction.BuildConstructorDestructor
 
 	|| TheCall = .CallParents( root, IsConstructor )
 	.FillInConstructorAndDestructor( root, IsConstructor )
-	if isconstructor
+	if IsConstructor
 		.FillInMissingConstructorDefaults( root, TheCall )
 	require StdErr.OK and !IsConstructor
 	
-	ifn .cls.HasStuffToHandleInDestructor
-		ifn Root.hasany
+	if !.cls.HasStuffToHandleInDestructor
+		if !Root.hasany
 			.cls.DestructorFunc = nil
 	  elseif !.cls.IsWrapper
 		.FillInDestructor
@@ -778,7 +778,6 @@ function SCFunction.AnalyseRefs (|[message]| list)
 	for (msg.flat in root)
 		|| it = msg.RC_HasTemporary  // need to always do this?
 			if .dorefs or (it != screfs.kbasisobj)
-//				if msg in @type and msg.next contains "bool"
 				SCRefs.RC_HandleDisappearing( self, msg, it )
 	
 		
@@ -841,7 +840,7 @@ function SCFunction.RefsCheckPropertiesAltered
 	for (curr.ScanArg in .SourceArg)
 		if (curr == @Rel)
 			|| ch = curr.first	 // a.b = x
-			if ch.IsProperty				
+			if ch and ch.IsProperty				
 				// (not on self, within constructor)
 				ifn  (self is Constructor) and ( ch.first IsThing "self" )				
 					SCRefs.RefMarkAsDisturber( ch, self )

@@ -107,10 +107,10 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message| exp = nil, |ui
 function scdecl.SafelyWrappable (|bool|)
 	opt norefcounts
 	|| n = .isnumeric
-	if (n <= 1) or (self == typebool.typenormal)
+	if (n <= 1) or (self == typebool!.typenormal)
 		return true
 	
-	|| fns = TypeWrapper.modul["new"]|scfunction|
+	|| fns = TypeWrapper!.modul["new"]|scfunction|
 	require fns isa scfunction
 
 	for f in fns

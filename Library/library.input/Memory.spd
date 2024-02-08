@@ -263,7 +263,8 @@ class Memory
 
 		function Random  (|int| n, |memory|)
 			rz = byte[n]
-			random.shared.temporal(rz)
+			if rz
+				random.shared.temporal(rz)
 		
 		function FillInt (|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
 		function Unmap	 (|_voidptr| p, |int| n):						cpp_wrapper JB_munmap

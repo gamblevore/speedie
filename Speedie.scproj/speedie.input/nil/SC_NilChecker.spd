@@ -417,7 +417,7 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	if test isnt active  or  test is soft and Negative
 		return Y
 
-	if Y is Either
+	if Y != test
 		return T.SetNilness(dcl, Test)
 
 	return msg.Redundant(dcl, test)

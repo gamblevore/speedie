@@ -27,7 +27,8 @@ extend String
 		for ch in .file
 			if p globs ch
 				.child(ch).fileglobsub2(parts, result, i)
-			
+	
+	
 	operator globs (|string| txt, |bool|)
 		|&byte| text_backup
 		|&byte| wild_backup
@@ -35,6 +36,7 @@ extend String
 		|| textEnd = text + txt.length
 		|| wild = .address
 		|| wildEnd = wild + .length
+		
 		while text < textEnd
 			|| w = (*wild).lowercase
 			if w == '*'
@@ -44,11 +46,14 @@ extend String
 				text++
 				wild++
 			  else
-				wild = wild_backup #require
-				text = ++text_backup 
+				wild = wild_backup
+				text = ++text_backup
+				require wild and text
+		
 		while (wild < wildEnd and *wild == '*')
 			wild++  // ignore trailing stars
 		return wild == wildEnd
+	
 	
 	helper FileGlobSub2 (|[string]| parts, |[file]| result, |int| i=0)
 		if parts > i
@@ -67,9 +72,11 @@ extend String
 		|| f = .file
 		return f.exists
 	
+	
 	function FileSize (|int64|)
 		|| f = .file
 		return f.size
+	
 	
 	function MakeEntirePath (|bool|Last=true, |ErrorInt|)
 		visible class~file
@@ -79,12 +86,14 @@ extend String
 			|| err = S.MakeDir|int|
 				rz = err
 				exit		
-		
+	
+	
 	function PathDir (|string|) // asdir, todir
 		if self and .last != '/'
 			return self + "/"
 		return self
-		
+	
+	
 	function SyntaxAppend (|string| s, |bool|)
 		return .write(s)
 

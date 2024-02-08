@@ -42,10 +42,11 @@ function message.StatementExpr (assigns:|scarg| arg)
 
 
 function message.TheTmpVarOf (|string| tmpname, |message|)
-	|| d = .AsDecl.Copy
-	d.Name = ""
 	rz = «Thg tmpname »
-	rz.obj = d
+	|| ad = .AsDecl
+		|| d = ad.Copy
+		d.Name = ""
+		rz.obj = d
 
 
 

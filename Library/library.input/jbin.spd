@@ -20,12 +20,13 @@ extend message
 			js.sheb(shell_path)
 		js <~ _JbinHeader
 		.render_jbin_sub(js)
-			
+	
+	
 	helper render_jbin_sub (|jbin| js)
 		opt norefcounts
 		|| ch	 = self
 		|| after = .FlatAfter
-		while ch != after
+		while ch and ch != after
 			|| Depth	= 0
 			|| curr		= ch
 			ch			= curr.FlatNextDepth(depth)
