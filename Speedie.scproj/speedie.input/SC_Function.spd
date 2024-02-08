@@ -265,7 +265,6 @@ function TranDebugInsert
 
 function Transform ()
 	opt norefcounts
-
 	require !.isMacro
 	CurrFunc = self
 	.Badness = 0

@@ -434,7 +434,6 @@ function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| B
 		return // no need?
 
 	if (!Blocker)
-		if !arg
 		RefDecr( name, arg, basis )
 		Return
 
@@ -508,11 +507,11 @@ function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 		if (f == @Bra)
 			// lame
 		  elseif (f != @Type)
-			return (curr,Last)(parent)
+			return (curr, Last)(parent)
 		  else 
 			|| D = Curr.Obj
 			if (D isa SCDecl)
-				if D.IsNormalObject
+				if !D.IsNormalObject
 					return (curr, last)(parent)
 		
 		Last = Curr // Make sure it's not a (bracket) or obj|typecast|
@@ -602,14 +601,21 @@ function RC_DeclArg (|scdecl| AR, |scfunction| fn)
 
 function Message.RefDisappears (|bool|)
 	opt norefcounts
-	for (P.up in .parent)
-		if (P == @bra)
+	if self == @func
+		self = .parent // sigh
+	for (P.up in self)
+		|| f = p.func
+		if (f == @bra)
 			0 // go up
-		  elseif (P == @Type)
-			|| D = P.AsDecl
-			if d and !D.IsNormalObject
+		  elseif (f == @Type)
+			|| D = P.AsDecl #debug_require
+			if !D.IsNormalObject
 				return true
-		  elseif (P == @rel)
+		  elseif f == @prm
+			return false
+		  elseif (F == @arg)
+			return true // right?
+		  elseif (f == @rel)
 			|| comp = P.second!.obj
 			if (comp isa SCOperator)
 				return (comp.IsCompare and !comp.iscustom)
@@ -683,15 +689,11 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 		  else
 			scfunction.TempMoveOut(Msg)
 	  else
-		// I'm not sure this ever should be done?
-		// definitely not for soemthing we are about to return!!!
-		// actually BOTH sides are wrong! whatever2 will leak! it DOES need freeifdead!
 		using (msg)
 		|| fnc = NewFnc( "JB_FreeIfDead" )
 		fnc.last.obj = Compiler.RefFreeIfDead
 		fnc.obj = Compiler.RefFreeIfDead.returntype
 		msg.ReplaceWith( fnc )
-		if msg == @func and msg.first == "JB_FreeIfDead"
 		fnc.Last <~ msg
 
 
@@ -776,6 +778,7 @@ function SCFunction.AnalyseRefs (|[message]| list)
 	for (msg.flat in root)
 		|| it = msg.RC_HasTemporary  // need to always do this?
 			if .dorefs or (it != screfs.kbasisobj)
+//				if msg in @type and msg.next contains "bool"
 				SCRefs.RC_HandleDisappearing( self, msg, it )
 	
 		

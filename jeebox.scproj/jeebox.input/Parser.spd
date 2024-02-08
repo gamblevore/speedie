@@ -705,7 +705,7 @@ extend Parser
 		
 		parser.NextStart = ++After
 		result.RangeLength = after - start
-		result.UnEmbed
+		result.UnEmbedStr
 		return result
 	}
 	

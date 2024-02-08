@@ -98,11 +98,19 @@ helper int.__junktest_9__ (|int| X, |int| Y, |int| Z=0, |int|)
 function __JunkTest_10__
 	// dictionary of int... works?
 	// but i had a bug like this? sigh...
-	//	dict[str] = intgr // fails
+	// dict[str] = intgr // fails
 
 	|dictionary of int| d = dictionary.new
 	|| i = 1
 	d["abc"] = i
+
+
+helper __junktest_11__
+	visible
+	|| sss = "abc"
+	|| y = (sss.decompress(int.max), sss)(0.5[]) // make sure .decomp doesnt get extracted
+	printline y
+
 
 
 struct ContainerStruct2

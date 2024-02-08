@@ -9,6 +9,9 @@
 	* selector constructor shouldn't need "?"
 	* also... what about global struct pointers? pointers are assumed not nil... but if its not initialised it will be nil?
 		* compiler should know this
+
+* || data = (.decompress(int.max), self)(Allowdecomp and .iscompressed)
+	* speedie is temping the .decompress out of the list! bad!
 	
 * constructors should allow code before it... just not property setting.
 

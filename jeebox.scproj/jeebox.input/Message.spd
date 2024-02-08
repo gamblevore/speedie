@@ -638,11 +638,11 @@ class Message (RingTree)
 				rz <~ ch.ParseAST
 	
 	
-	function UnEmbed
+	function UnEmbedStr
 		|| s1 = .First
-		require (s1 == @Emb) and (!s1.Next)
-		s1.Remove
-		.Name = s1.Name
+		if (s1 == @Emb) and !s1.Next
+			s1.Remove
+			.Name = s1.Name
 
 
 	function FSListSep (|FastString| fs, |String| sep)

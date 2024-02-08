@@ -28,9 +28,9 @@ constructor
 
 
 render
-	if (.cls)
+	|| c = .cls
 		fs <~ "module of "
-		.cls.render(fs)
+		c.render(fs)
 	  else
 		super.render(fs)
 

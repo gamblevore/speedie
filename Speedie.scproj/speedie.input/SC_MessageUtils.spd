@@ -51,11 +51,11 @@ function SC_MakeComment (|Message| msg) // ignorenode
 
 function Message.Negate (|Message|)
 	if self == @bra
-		.become(@brel, "!") // the negator!
+		.Become(@brel, "!") // the negator!
 		return self
-	|| ch = .unbra
+	|| ch = .UnBra
 	if ch IsBRel "!"
-		return .ReplaceWith(ch.first)
+		return .ReplaceWith(ch.first!)
 
 	using self
 		rz = .WrapWith(«BRel "!"») // also the negator!
@@ -287,7 +287,7 @@ function Message.NeedMarker (|String| s, |bool| b, |Message|)
 		.First = rz
 
 
-function message.WipeCopy (|message| oof, |Message|)
+function message.WipeCopy (|message| oof, |Message!|)
 	opt norefcounts
 	cpp_part LayerWipeCopy
 	if !oof

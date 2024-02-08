@@ -66,7 +66,9 @@ helper String.ExecuteableJBin (|ind|)
 
 function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |MessageRoot|)
 	// language2.scproj uses owner
-	|| data = (.decompress(int.max), self)(Allowdecomp and .iscompressed)
+	|| data = self
+	if allowdecomp and .iscompressed
+		data = data.decompress(int.max)
 	|| j = data.ExecuteableJBin
 		return data[j, int.max].parsejbin
 	if !Parser.CppInited

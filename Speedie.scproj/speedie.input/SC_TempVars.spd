@@ -58,7 +58,11 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 	if (funcmsg == @dot) and (funcmsg.first == self)
 		0 // || x = R.pop().Property
 	  else
-		debug_require (FuncMsg==@prm)
+		if FuncMsg!=@prm
+			printline funcmsg
+			debugger
+			.RefDisappears
+			return nil
 		FuncMsg = FuncMsg.parent
 
 	|| fn = FuncMsg.MsgFunc
@@ -182,7 +186,6 @@ extend_module scfunction
 		|| OldDcl = msg.AsDecl
 			insert.obj = OldDcl
 			OldDcl = OldDcl.Copy // no difference, its a temp
-			//(olddcl is body) 
 			OldDcl.Name = name
 			repl.obj = OldDcl
 			dcl.obj = OldDcl
@@ -195,7 +198,7 @@ extend_module scfunction
 		expect (msg != @str)
 		
 		|| OldDecl = msg.AsDecl
-		ifn olddecl
+		if !olddecl
 			parent.prev = msg
 			return msg // right?
 	

@@ -7,7 +7,7 @@
 
 function scclass.Falsify (|message| ques, |message|)
 	opt norefcounts
-	|| f = .false
+	|| f = .false		#debug_require // not sure if this is possible to be nil
 	if f.hasany
 		return f.copy
 	ques.func = f.func
@@ -21,8 +21,8 @@ function Message.FalsifyNil (|message|)
 	opt norefcounts
 
 	|| ret = scfunction.currfunc.returntype
-		if ret.isnormal
-			return ret.type.falsify(self)
+	if ret and ret.IsNormal
+		return ret.type.Falsify(self)
 	.func = @thg
 	.obj = typenil
 
