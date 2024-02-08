@@ -10,8 +10,6 @@
 	* also... what about global struct pointers? pointers are assumed not nil... but if its not initialised it will be nil?
 		* compiler should know this
 
-* || data = (.decompress(int.max), self)(Allowdecomp and .iscompressed)
-	* speedie is temping the .decompress out of the list! bad!
 	
 * constructors should allow code before it... just not property setting.
 
@@ -23,6 +21,7 @@
 
 						 Perry Do later
 
+* moving arrow in unseen lines, should jump to 1/3 of visibility... as expected
 * fix pico crash bug :[
 * colormark unused funcs in editor
 * "but was found elsewhere" could look outside of mini-search... before going to other projects

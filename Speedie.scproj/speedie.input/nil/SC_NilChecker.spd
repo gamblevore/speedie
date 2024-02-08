@@ -175,6 +175,7 @@ function Function (NilTrackerFn)
 
 
 function Rejoin (NilTrackerFn)
+	opt norefcounts
 	return .jump(msg.first!, Test) 
 
 
@@ -408,13 +409,13 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	if !dcl.NilReg
 		return dcl.nildeclared
 	
-	|| Y = dcl.nilcurr
+	|| Y = dcl.NilCurr
 	if dcl.IsUnknownParam and (test isnt soft and disappears)
 		if test isnt Active								// set var A to unknown prm B, so default to real
 			return .BecomeReal(dcl, msg)
 		dcl.NilDeclared = nilstate.optional
 
-	if test isnt active  or  test is soft and Negative
+	if  test isnt active  or  test is soft and Negative
 		return Y
 
 	if Y != test
@@ -490,6 +491,8 @@ function arel (Niltrackerfn)
 		rz = .jump(ch, test)
 		|| b = msg.name.first
 		if b == '!'
+//			expect (rz&nilstate.either != NilState.Nilish) (ch, "This value is known to be nil")
+// what if it's later optional? or real? due to a loop... sigh.
 			rz &=~ nilstate.nilish
 			rz |=  nilstate.realish
 
@@ -540,6 +543,8 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg("Need to set it into another var."))
 
 	if recv.isreal and recv isnt local
+		if sentstate isnt nilish
+			return sentstate
 		expect (SentState is realish) (RecvMsg, "Nil is not allowed on: " + recvmsg.render)
 		return .BecomeReal(sent, SentMsg)
 		

@@ -2,7 +2,7 @@
 
 // ADDC? optimise stages... OR special-case it specifically.
 
-struct ASMFuncState 
+struct ASMFuncState // why not just be a subclass of memory?
 	linkage: cpp_part flat
 	|SCFunction--|				fn       
 	|µFunc|						Out      
@@ -176,7 +176,7 @@ struct ASMFuncState
 
 	module
 		|IR|					Dummy
-		|IR[]|					JSMSpace
+		|IR[]|					JSMSpace = IR[0]
 		
 
 function message.ASMFunc (|fn_asm|)
@@ -187,7 +187,8 @@ function message.ASMFunc (|fn_asm|)
 
 function ASMFuncState.TotalInit
 	opt norefcounts
-	|| j = ASMFuncState.JSMSpace init IR[1MB] #require
+	|| j = ASMFuncState.JSMSpace
+	j.Capacity = 1MB
 	.maxlength = j.Capacity
 	.start = j.ptr
 	.Written = 0

@@ -181,10 +181,10 @@ class Memory
 		|| Mem = Memory.realloc(._ptr, New)
 			._ptr = mem
 			.Capacity = Value 
-			|| extra = New-Old
-			if extra > 0
-				memory.zero(mem+old, extra)
+			if New > Old
+				memory.Zero(mem+old, New-Old)
 			return true
+		error (self, "Can't allocate enough bytes: " + new.render)
 
 	
 	function ByteCapacity (|int|)

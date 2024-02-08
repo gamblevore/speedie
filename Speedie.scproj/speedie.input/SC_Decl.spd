@@ -638,25 +638,26 @@ class SCDecl (SCObject) {
 	function AlreadyContains (|bool|)
 		opt norefcounts
 		|| ty = .type.contained
-			return .contains.MiniMatch(ty)
+		|| c = .Contains
+		if ty and c
+			return c.MiniMatch(ty)
 		
 		
-	function WriteType (|int| minimal = 0, |Message|)
+	function WriteType (|int| minimal = 0, |Message!|)
 		opt norefcounts
 		|| simple = .WriteSimpleType
-		if !.Contains or (minimal and .AlreadyContains)
+		|| c = .Contains
+		if !c or (minimal and .AlreadyContains)
 			return simple
 		
 		return «rel
 			simple
 			«opp "of"»
-			«thg .Contains.Type.Name »
+			«thg c.Type.Name »
 		»
 		
 
 	function WriteSimpleType (|Message|)
-		require self
-
 		|| name = (.type.Name, "(nil!)")(.type)
 		rz = «Thg name »
 		for (.pointercount|int|)
@@ -1016,9 +1017,8 @@ class SCDecl (SCObject) {
 
 	render RenderTypeNameNicer
 		opt norefcounts
-		if .downgrade
-			return .downgrade.RenderTypeName(fs_in)
-		return .RenderTypeName(fs_in) 
+		|| d = .DownGrade ?? self
+		return d.RenderTypeName(fs_in)
 
 	render RenderTypeName 
 		if !self or !.type
@@ -1035,9 +1035,10 @@ class SCDecl (SCObject) {
 				fs <~ .c_Array|int|
 				fs <~ ']'
 			
-			if .contains and !.contains.minimatch(.type.contained, 0) 
+			|| c = .Contains
+			if c and !c.minimatch(.type.contained, 0) 
 				fs <~ " of "
-				fs <~ .contains.type.name
+				fs <~ c.type.name
 
 }
 

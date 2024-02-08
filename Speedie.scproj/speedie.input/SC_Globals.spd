@@ -1490,12 +1490,14 @@ function TypeOfList (ExprResolver)
 function ClassOfObjForC (|Message| curr, |SCClass|) {
 	if curr == @Func
 		|| fnc = curr.MsgFunc
-		if fnc: Return fnc.ReturnType.Type
+			|| rt = fnc.ReturnType
+				Return rt.Type
+		return nil
 	
 	|| obj = curr.obj
 	if obj isa SCDecl:		return obj.Type
 	if obj isa SCClass:		return obj
-	if obj isa SCFunction:	return obj.ReturnType.Type
+//	if obj isa SCFunction:	return obj.ReturnType.Type // never happens?
 	
 	if obj isa SCModule
 		if obj.Cls: Return TypeJBClass
@@ -1651,13 +1653,13 @@ function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
 	Return NewNum
 
 
-function DotFuncToNormalFunc (|Message|dot, |SCFunction|fn)
+function DotFuncToNormalFunc (|Message| dot, |SCFunction| fn)
 	// a.b( c )
 	// b(a, c)
 	dot.become(@Func)
 
-	|| first = dot.First
-	|| L = dot.Last
+	|| first = dot.First!
+	|| L = dot.Last!
 	L.obj = fn
 	L.Func = @prm
 	if first.obj isa SCModule

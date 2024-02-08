@@ -87,7 +87,7 @@ class Saveable
 	
 	function ObjectSaver.Finish (|saveable| first)
 		opt norefcounts
-		|| fs = .dest
+		|| fs = .dest!
 		fs <~ '\n'
 		fs <~ '@'
 		fs.AppendObjectID(first)
@@ -128,25 +128,25 @@ class Saveable
 
 extend ObjectSaver
 	function AppendBool (|bool| b)
-		.dest <~ b|int|
-		.dest <~ ','
+		.dest! <~ b|int|
+		.dest! <~ ','
 
 	function AppendString (|string| s)
 		// seems fine, to be honest.
-		.dest <~ '`'
+		.dest! <~ '`'
 		s.replaceall("`","``", .dest)
-		.dest <~ '`'
-		.dest <~ ','
+		.dest! <~ '`'
+		.dest! <~ ','
 	
 	function AppendInt (|int64| i)
-		.dest <~ i
-		.dest <~ ','
+		.dest! <~ i
+		.dest! <~ ','
 	function AppendRaw (|&byte| f, |int| n)
-		.dest.AppendHexData(f, n)
-		.dest <~ ','
+		.dest!.AppendHexData(f, n)
+		.dest! <~ ','
 	function AppendObject (|object| o)
-		.dest.AppendObjectOrNil(o)
-		.dest <~ ','
+		.dest!.AppendObjectOrNil(o)
+		.dest! <~ ','
 
 
 helper FastString.AppendObjectID (|saveable| o)
@@ -177,12 +177,12 @@ extend Array
 		opt NoRefCounts
 
 	Behaviour SaveWrite
-		|| D = saver.dest
+		opt NoRefCounts
+		|| D = saver.dest!
 		for (v in self)
 			D <~ ", "
 			start
 			D.AppendObjectOrNil(v)
-		opt NoRefCounts
 
 
 extend Dictionary
@@ -193,7 +193,7 @@ extend Dictionary
 	
 	behaviour SaveWrite
 		opt NoRefCounts
-		|| D = saver.dest
+		|| D = saver.dest!
 		|| L = .navigate
 		
 		while (l)
@@ -262,7 +262,7 @@ class SaverClassInfo (array)
 	
 	function Saveable.SaverInfo (|SaverClassInfo|)
 		opt norefcounts
-		return .class.saveinfo|Saverclassinfo|
+		return .Class.saveinfo|Saverclassinfo|
 
 
 	function Clear
@@ -274,12 +274,11 @@ class SaverClassInfo (array)
 
 	
 	function Output (|&ObjectSaver| Saver)
-		opt norefcounts
-		require self
-		
+		opt norefcounts		
 		|| D = saver.dest
+		require d and self
 		D <~ '\n'
-		D <~ string.fromc(.cls.name).lowercase // lol.
+		D <~ string.fromc(.cls!.name).lowercase // lol.
 		D <~ ' '
 		
 		if (.HasData)
@@ -307,21 +306,18 @@ class SaverClassInfo (array)
 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 
 
 
-struct StructSaveTest {
+struct StructSaveTest
 	saveas struct
-	|saveable|	Sav
+	|saveable?|	Sav
 	|int64|		Intt
 	|string|	Str
 	
-	function RunTest {
+	function RunTest
 		.test("")
-	}
-	function Test (|string| s) {
+		
+	function Test (|string| s)
 		cpp_part TestStr
-	}
-	function Test (|object| s) {
-		cpp_part TestObj
 
-	}
-}
+	function Test (|object| s)
+		cpp_part TestObj
 

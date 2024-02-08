@@ -29,7 +29,7 @@ class µFunc {
 
 	iterator
 		|| CurrInst = 0
-		|| Addr = ASMFuncState.JSMSpace.ptr + .start
+		|| Addr = ASMFuncState.JSMSpace!.ptr + .start
 		while currinst < .length
 			yield Addr+currinst
 			currinst++

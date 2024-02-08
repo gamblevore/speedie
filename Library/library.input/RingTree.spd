@@ -47,7 +47,7 @@ class RingTree (Saveable)
 			return x.next
 
 
-	function Root	 (||)				{ cpp_wrapper JB_Ring_Root, nil checker }
+	function Root	 (|...!|)			{ cpp_wrapper JB_Ring_Root }
 	function IsRoot  (|bool|)			{ cpp_wrapper JB_Ring_IsRoot, nil checker }
 	function IsFirst (|bool|)			{ opt norefcounts, return .prev == nil }
 	function IsLast  (|bool|)			{ opt norefcounts, return .next == nil}
