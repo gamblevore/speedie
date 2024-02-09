@@ -151,7 +151,7 @@ extend Parser
 
 
 	function PostInnerAdj (|Message| Rel, |Message| opp, |Message|)
-		|| f = rel.first
+		|| f = rel.first!
 		if !(rel == @rel) and !(rel==@bra and f==@rel)
 			return .ErrorAdd("Expected a rel.", rel.position)
 		if rel == @bra
@@ -303,7 +303,7 @@ extend Parser
 	
 		
 	function fURL (ParseHandler)
-		require  .needname(parent)
+		require .NeedName(parent!)
 		.NextStart = .data.inwhite(start)
 		parent.Func = @url
 		parent.RangeLength += 3
@@ -951,7 +951,7 @@ ive been~running #since morning
 	function MakeInvisArg (|message| tmp, |int| indent, |message|)
 		Opt NoRefCounts
 		if (tmp == @item)
-			|| last = tmp.last
+			|| last = tmp.last!
 			if last != @emb
 				return parser.UnexpectedSyntax(last)
 			last.func = @arg
@@ -1130,7 +1130,7 @@ ive been~running #since morning
 			prev = ch
 
 	
-	function DecorateThing (|message| R, |int| Ops, |Message!|)
+	function DecorateThing (|message| R, |int| Ops, |Message?|)
 		R = .GetFuncAfter( R )
 		if .WillEnd: Return R
 		
@@ -1141,7 +1141,7 @@ ive been~running #since morning
 		if ops & kOppTemporal
 			|| opp = .Process( kOppTemporal )
 				if opp == "<≈"
-					|| A = .PostInnerAdj( R, opp )
+					|| A = .PostInnerAdj( R, opp )$
 					return .DecorateThing( A, ops ) // recursive? 
 				return .ChainTemporalRels( R, opp )
 		return R

@@ -193,18 +193,19 @@ extend Error
 ///.../Speedie.scproj/BuildTest/JB.cpp:2679:10: error: conflicting types for 'JB__Comp_InputFile'
 
 		if options.color: fs <~ errorcolors.Bold
-
+		
+		|| node = .node
 		|| data = .SCOriginalData
 			|| p = .SCOriginalPath ?? "(string)"
 			fs <~ p
 			fs <~ ':'
 			.SCLineIdentifiers(fs, data)
 			
-		  elseif (.node)
-			.node.render(fs)
-			|| fn = .node.msgowningfunc // could be an error in a variable outside of a func! (module/global)
+		  elseif node
+			node.render(fs)
+			|| fn = node.msgowningfunc // could be an error in a variable outside of a func! (module/global)
 				fs <~ " in:\n"
-				.node.msgowningfunc.render(fs)
+				fn.render(fs)
 		
 		fs <~ ' '
 		if options.color

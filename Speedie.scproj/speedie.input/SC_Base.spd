@@ -551,7 +551,10 @@ function RequireContained (|Message| exp, |SCDecl|)
 	|SCClass| cls
 	
 	if (self isa SCFunction)
-		cls = .Cls ?? (.parent|SCModule|).Cls
+		cls = .Cls
+		if !cls
+			|| p = .parent as SCModule
+				cls = p.Cls
 		
 	  elseif (self isa SCClass)
 		cls = self

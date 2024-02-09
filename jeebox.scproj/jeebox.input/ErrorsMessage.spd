@@ -15,9 +15,9 @@ extend_module ErrorReceiver
 	helper NewErrorSub (|Message| node, |string?| Desc, |string?| path, |int| sev)
 		opt norefcounts
 		if stderr.CanAddMore(sev)
-			if (node != nil) and (Desc == nil)
+			if desc == nil
 				desc = node.MiniName("Unexpected ")
-			stderr <~ Error(node.FindNotInserted, desc, sev, path)
+			stderr <~ Error(node.FindNotInserted, desc, sev, path??"")
 
 
 function Message.ErrorLocation (|string| desc = "", |string|)

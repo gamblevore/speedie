@@ -31,7 +31,7 @@ function Message.CreateOwnBlock (|Message|)
 	rz = bra.msg(@arg)
 	.ReplaceWith(bra)
 	
-	|| NewObj = rz.scarg(nil)
+	|| NewObj = rz.scarg(nil) #debug_require
 	NewObj.TmpMovedOutFor = self
 	bra.statementexpr = newobj
 

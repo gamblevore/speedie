@@ -175,7 +175,7 @@ extend SCDecl
 		expect !(.PointerCount) (.source, "Can’t be a pointer")
 
 		|| T = .type
-		expect (T and T.HasGameType) ( .source, "SC_GameTypes.box doesn't contain type '${.Type.Name}'." )
+		expect (T.HasGameType) ( .source, "SC_GameTypes.box doesn't contain type '${.Type.Name}'." )
 		return T.TypeInfo
 
 

@@ -355,18 +355,18 @@ class SCDecl (SCObject) {
 			def = «thg "nil"»
 		  else
 			def = def.copy
-
-		if (.Contains)
+		
+		|| c = .Contains
 			def = «type ":)"
 				def
 				«rel // seems OK :P
 					«Thg .Type.Name »
 					«opp "of"»
-					«Thg .Contains.Type.Name »
+					«Thg c.Type.Name »
 				»
 			»
 		
-		dcl <~ neweqrel(«Thg name », def)
+		dcl <~ NewEqRel(«Thg name », def)
 	
 		Return dcl
 	
@@ -987,13 +987,14 @@ class SCDecl (SCObject) {
 	
 	function WriteNilDecl (|Message|)
 		opt norefcounts
+		|| l = .WriteNilRel
 		|| dcl = «decl
 			.WriteType
-			.WriteNilRel
+			l
 		»
 		dcl.obj = self
-		dcl.Last.obj = self
-		dcl.Last.First.Obj = self
+		l.obj = self
+		l.First!.Obj = self
 		Return dcl
 
 

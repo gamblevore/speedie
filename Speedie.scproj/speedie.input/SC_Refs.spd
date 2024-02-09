@@ -589,7 +589,7 @@ function LastUsedRefPlace (|Message| name, |Message| arg, |Message|)
 
 
 function SafeDecrMsg (|Message| msg, |Message|)
-	return RefMsg( msg, "JB_SafeDecr", Compiler.RefSafeDecr )
+	return RefMsg( msg, "JB_SafeDecr", Compiler.RefSafeDecr! )
 
 
 function RC_DeclArg (|scdecl| AR, |scfunction| fn)
@@ -700,7 +700,8 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 
 function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |message|)
 	if !fn and (self is Constructor)
-		expect (.cls == typeobject) or (.cls.super == typeobject) (self, "Need call to superclass's constructor, but can’t auto-create one.")
+		|| c = .cls!
+		expect (c == typeobject) or (c.super == typeobject) (self, "Need call to superclass's constructor, but can’t auto-create one.")
 		// a problem?
 		return nil
 	require fn  // can happen in this case!	//	class B (A) --> class A --> class object
@@ -712,7 +713,7 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 	slf.obj = .self
 
 	|| PAF = NewFnc(fn.Name)
-	|| lst = paf.last
+	|| lst = paf.last!
 	lst <~ slf
 	lst.obj = fn
 	paf.obj = typevoid
@@ -818,12 +819,10 @@ function SCFunction.AnalyseRefs (|[message]| list)
 function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 	// calling a constructor is only allowed... within a constructor.
 	// calling a destructor is only allowed within a destructor.
-	if dot in @bra
-		|| p = dot.parent
-		if p in @bra // allow
-			return 
+	if dot in @bra and dot.parent in @bra // allow
+		return 
 	
-	|| fn = dot.last.asfunc
+	|| fn = dot.last!.asfunc
 		if (fn is Constructor)
 			if self isnt ConOrNew
 				error (dot, "Can only call constructors from within a constructor.")

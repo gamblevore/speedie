@@ -85,7 +85,8 @@ module Feedback
 	function CheckSelfModifying2 (|int|)
 		require !options.singlefileinput
 		
-		|| p = compiler.BaseProjectPath.TrimSlashes(true)
+		|| bpp = compiler.BaseProjectPath$
+		|| p = bpp.TrimSlashes(true)
 		|| spd = compiler.speedie.TrimSlashes(true)
 		|| jb = compiler.jeebox.TrimSlashes(true)
 		if p ~= spd

@@ -765,14 +765,14 @@ class Message (RingTree)
 			.accesserr(fn, name, nil)
 	
 	
-	function FastString.MsgErrorName (|string| name)
+	function FastString.MsgErrorName (|string?| name)
 		if (name)
 			self <~ " '"
 			self <~ name
 			self <~ "' "
 
 
-	function AccessErr (|syntax|s, |string| name, |message| found)
+	function AccessErr (|syntax|s, |string?| name, |message?| found)
 		cpp_part CantFind
 		if !self
 			jb_api.NilHandler
@@ -817,7 +817,7 @@ class Message (RingTree)
 		return true
 		
 
-	function Expect (|syntax| type, |string| name=nil, |bool|)
+	function Expect (|syntax| type, |string?| name=nil, |bool|)
 		require self
 		if (!type or (.Func == type))
 			if (name == nil) or (.name ~= name)
@@ -885,16 +885,16 @@ class Message (RingTree)
 			if s == nil or found == s
 				return found
 		if self
-			.accesserr(s, nil, found)
+			.accesserr(s, "", found)
 
 
 	Syntax Access (|syntax| s, |int| n, |message|)
 		cpp_Part NeedSyxInt
 		Opt NoRefCounts
 		|| Ch = self[n]
-		if (ch) and ((ch.func==s) or !s)
-			return ch
-		.accesserr(s, nil, ch)
+			if !s or ch.func==s
+				return ch
+		.accesserr(s, Nil, ch)
 	
 	
 	syntax access (|Syntax| s, |string| name, |Message|)
@@ -1014,6 +1014,7 @@ class Message (RingTree)
 		(fn)( self, fs )
 
 	function MiniName (|string|prefix="", |string|)
+		require self
 		return "prefix$.FuncName “${.name[0,64].UnicodeSync}”"
 
 	Syntax Expect (|string?| Error = nil)
@@ -1053,9 +1054,9 @@ class Message (RingTree)
 	function Int (|int|i = 0, |int64|)
 		opt norefcounts
 		if self
-			if self != @unit
+			|| f = .First
+			if !f or self != @unit
 				return .name.ParseInt(i, self)
-			|| f = .first
 			if self == "x"
 				return F.name.ParseHex(i, F)
 			|| mul = f.name.ParseFloat

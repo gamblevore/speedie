@@ -102,8 +102,8 @@ extend AsmFuncState
 	
 	function IR.SyntaxExpect (|string| Error)
 		|| err = Error(nil, error, ErrorSeverity.Error, .file)
-			err.position = .BytePos
-			stderr <~ err
+		err.position = .BytePos
+		stderr <~ err
 
 
 	function FindLabel (|&IR| dbg, |&IR|)

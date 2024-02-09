@@ -167,7 +167,9 @@ class ErrorReceiver
 	
 	function PrintErrors (|errorseverity| Level, |bool| PrintCount, |bool| shell, |int|)
 		cpp_part PrintErrorsMain
-		|| rec = self ?? stderr
+		|| rec = StdErr
+		if self
+			rec = self
 
 		|| fs    = faststring()
 		|| Count = rec.rendererrors(fs, level, shell)$

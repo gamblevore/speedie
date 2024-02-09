@@ -167,7 +167,7 @@ function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
 
 
 function StreamChild (|String| s, |FastStringCpp|)			// zero amy dokh doomed...
-	rz = FastStringCpp(s.trimextandpath) #expect
+	rz = FastStringCpp(s.TrimExtAndPath)
 	if s isa "h"
 		.Outputs_h <~ rz
 		rz <~ "//// HEADER "
@@ -600,8 +600,10 @@ extern \"C\" JB_String* JB_App__LibFuncs(void*** Funcs) {
 "
 
 
-function ExportModuleProperties (|SCModule| modl, |FastStringCpp| IntoModule)
-	|| fs = IntoModule ?? .TypesProj
+function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
+	|| fs = IntoModule
+	if !fs
+		fs = .TypesProj
 
 	for prop.vars in modl
 		if !prop
@@ -1084,8 +1086,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 				
 	function C_RenderFnc (fpMsgRenderCpp)
 		opt norefcounts
-		|| F = .first
-		|| ch1 = f.next
+		|| F = .first!
+		|| ch1 = f.next!
 		|| fn = ch1.obj|scfunction|
 		|| PostBracket = false
 		
@@ -1189,7 +1191,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_RenderUnt (fpMsgRenderCpp)
 		expect (self == "x")
-		|| num = .first
+		|| num = .first!
 		|| s = num.name.ReplaceAll( "_", "" )
 
 		fs <~ "0x"
@@ -1256,6 +1258,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_OneParamType (|FastStringCpp| fs, |Message| Curr, |SCDecl| D, |bool|)
 		// because C doesn't do type-inferencing
+		require d // sigh
 		|| ActualType = ClassOfObjForC( Curr )$
 		if ActualType != D.type
 			fs <~ '('							//  wrapper calls ')' after
@@ -1294,7 +1297,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_RenderTyp (fpMsgRenderCpp)
 		|| Saveness = DontNeedMoreBrackets(self)
-		|| fc		= .first
+		|| fc		= .first!
 		if (Saveness == kNeedsNoBrackets)
 			fc.Export(fs)
 			return
@@ -1452,10 +1455,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function WriteDeclBrackets (fpMsgRenderCpp)
 		fs <~ '('
 		
-		if (.obj isa SCDecl) // it should be?
-			WriteDeclNoName( .AsDecl, fs )
+		|| d = .AsDecl // it should be?
+			WriteDeclNoName( d, fs )
 		  else
-			.second.Export( fs )
+			.second!.Export( fs )
 		
 		fs <~ ')'
 

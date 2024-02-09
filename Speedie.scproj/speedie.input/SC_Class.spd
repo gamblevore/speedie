@@ -198,8 +198,8 @@ function CalculateSize (|int| Depth=0, |int|)
 
 
 function CalculateSizeRaw (|int| Depth=0, |int|)
-	if (.size)
-		return .size
+	|| si = .size
+		return si
 
 	if .isdatatype
 		.size = .typeinfo.bytesize
@@ -209,8 +209,8 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 	|| Count = 0
 	if self == typeobject
 		count = 4 // refcount? depends if we are "owned" or "shared".
-	if .super
-		Count = .super.CalculateSizeRaw				#debug_require
+	|| s = .super
+		Count = s.CalculateSizeRaw				#debug_require
 
 	for p in .properties
 		|| curr = platform.PointerBytes
@@ -485,7 +485,8 @@ function ContainedTypeLoad
 
 function scfunction.DontWantSameReturnType (|scfunction| f)
 	require self
-	if f.ReturnType.MiniMatch(.returntype, 0)
+	|| r = f.ReturnType					#debug_require
+	if r.MiniMatch(.returntype, 0)
 		error (.source,  "Multiple casts found [1]")
 		error (f.source, "Multiple casts found [2]")
 	
@@ -991,9 +992,9 @@ module
 		|| dot = node.first
 		|| name = dot.first
 		check (name == @thg or @name or @bra) (name)
-		|| emb = name.next
-		check (emb != @prm) (emb, "Need space between bracket and name.")
-		emb.remove
+		|| emb = name.next // its never not nil...
+			check (emb != @prm) (emb, "Need space between bracket and name.")
+			emb.remove
 		return compiler.program
 
 

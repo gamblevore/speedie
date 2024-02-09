@@ -368,7 +368,7 @@ function message.BunchFixSub (|message| subject, |message| stuff)
 			stuff.replaceinto(Test)
 			exit
 		|| R = stuff[2]							#expect (stuff, "Rel missing right side.")
-		stuff.first.ReplaceInto(test)
+		stuff.first!.ReplaceInto(test)
 		stuff = R
 		subject = subject.copy
 

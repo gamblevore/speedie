@@ -248,8 +248,8 @@ function byte.CanPrintAsNormalChar (|bool|)
 
 
 // remove tokenhandler_fp, its just parsehandler!
-prototype ParseHandler			(|int| Start, |message| Parent=nil, |Message|)
-prototype TokenHandler_fp		(|int| Start, |message| parent=nil, |Object|)
+prototype ParseHandler			(|int| Start, |message?| Parent=nil, |Message?|)
+prototype TokenHandler_fp		(|int| Start, |message?| parent=nil, |Object?|)
 prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f,   |String|)
 prototype SorterComparerMsg		(|message| a, |message| b, |bool|)
 

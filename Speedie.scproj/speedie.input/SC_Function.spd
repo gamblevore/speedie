@@ -814,11 +814,11 @@ function FillInConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 
 function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
 	opt norefcounts
-	|| cls = .cls
+	|| cls = .cls$
 	|| oof = .ConstructorLinePlace
 	using (oof)
 	
-	for (d.backwards in .cls.Properties)
+	for (d.backwards in cls.Properties)
 		if d isnt PropertyWasConstructed
 			root.InsertAfter( .NewDefaultRel( oof, d ), AfterHere )
 	
@@ -890,7 +890,7 @@ function CountCallsToParentAlloc (|Message| root, |message|)
 	|| FoundCount = 0
 	for (curr in root)
 		|| f = curr.IsParentConCall
-			expect  (f.cls == .cls.realsuper)   (curr, "Function should belong to parent class, but doesn't.")
+			expect  (f.cls == .cls!.realsuper)   (curr, "Function should belong to parent class, but doesn't.")
 			rz := curr
 			FoundCount++
 			expect  (FoundCount < 2)   (curr, "Multiple calls to parent constructor/destructor not allowed.")
@@ -1591,7 +1591,7 @@ function Tran_Return (TranFunc)  // exitter
 function message.CheckNotInStateExpr (|message| top)
 	opt norefcounts
 	|| node = self
-	while node != top
+	while node and node != top
 		check (!node.IsStatementExpr) (self, "Statement expressions don't allow: " + .name)
 		node = node.parent
 

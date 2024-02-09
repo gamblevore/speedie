@@ -883,7 +883,10 @@ function message.ObjCls (|scclass|)
 
 
 function Message.Next_Index (|sciterator| iter, |message| node2)
-	.prev = NewEqRel( iter.index.copy(node2), .last )
+	|| i = iter.index
+		.prev = NewEqRel( i.copy(node2), .last )
+	  else
+		debugger 
 
 
 function message.CheckContinuesAndExits

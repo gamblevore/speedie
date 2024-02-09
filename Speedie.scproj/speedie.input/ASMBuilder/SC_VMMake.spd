@@ -239,7 +239,7 @@ function VMDecl (|message| tmp, |[message]| msgs)
 	opt norefcounts
 	|| arg = tmp.last
 	|| prms = tmp.first
-	|| name = prms.first.name.asmnormalise
+	|| name = prms.first.nyme.asmnormalise
 	|| form = µform.forms.valuelower(name)			#require
 	|| id = (.highpos++, .normalpos++)(form.varies)
 	asm.Encoders[id] = asm.Forms[form.Index]

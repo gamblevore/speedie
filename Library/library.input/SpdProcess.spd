@@ -59,9 +59,10 @@ class SpdProcess (Process)
 		opt norefcounts
 		debug_require msg
 			
-		if .pico.status
+		|| p = .pico
+		if p.status
 			msg.RenderJbin(.writer)
-			.pico <~ .writer
+			p <~ .writer
 			.UpdatePipes
 
  

@@ -275,6 +275,6 @@ function NilRecord.ndb5
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"
-	if scfunction.currfunc ~= "JB_Proc__CreateArgs" // 
+//	if scfunction.currfunc ~= "PrintErrors" // 
 }
 
