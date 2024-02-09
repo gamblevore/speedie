@@ -159,7 +159,7 @@ constructor (|string| Name, |bool| Dummy)
 	.name = name
 
 
-constructor (|Message| node)
+constructor (|Message?| node)
 	cpp_part ConstructorMsg
 	.source = node
 	.IsVisible = CurrVisibility
@@ -174,13 +174,7 @@ function Use
 
 
 function SubProjName (|string|)
-// well... hmm.... it's source has an SCFile? Unless it was auto-generated...
-// so... how to do this? basically... we want... different names per project.
-// so if SC includes JB... all the JB files get JB, and SC keeps SC.
-// first we need different projects to have different names!
-	opt norefcounts
-	|| p = Compiler.Program
-		return p.ExportName
+	return Compiler.Program.ExportName
 
 
 function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|)
@@ -247,23 +241,22 @@ function scfunction.ExportNameBuilder (|string|CppPart="", |string| )
 
 	|| SubSection = ""
 	|| AfterSub = ""
-	if (.Cls)
-		SubSection = .Cls.Modul.CppPart
+	|| c = .cls
+		SubSection = c.Modul.CppPart
 		AfterSub = "_"
-		if (self is constructor) and !(cpppart contains "Constructor")
-			cppPart = "Constructor" + cpppart
+		if (self is constructor) and !(CppPart contains "Constructor")
+			cppPart = "Constructor" + CppPart
 	  else
 		|| L = .parent
 		if (L isa SCModule) and L|scmodule|.CppPart
 			SubSection = L.CppPart
 			AfterSub = "__"
 
-	|| P = .project ?? .parent.project
-	|| wanted = p.mod.exportname
-	if wanted != subsection
-		rz = (wanted + "_")
-	rz += (Subsection + aftersub + CppPart)
-	// OK so... with the exportname?
+	|| P = .project // never nil but whatever
+		|| wanted = p.mod.exportname
+		if wanted != subsection
+			rz = (wanted + "_")
+	rz += (Subsection + AfterSub + CppPart)
 
 
 function FindCppWrapper (|message| place, |bool|isclass, |message|)
@@ -601,7 +594,8 @@ function scfunction.ParamUniquer (|string| s, |string|)
 		fs <~ '0'
 	  else
 		for (i in first to last)
-			fs <~ .args[i].type.modul.CppPart.Titlecase
+			|| a = .args[i]
+				fs <~ a.type.modul.CppPart.Titlecase
 	
 	return fs
 
@@ -744,9 +738,10 @@ function $name (|dictionary of $AllSameType|)
 	|| FuncSrc = fs.GetResult
 	.CollectSub( FuncSrc.ParseClean[0] #expect )
 
-	|| DclSrc = "|dictionary of $AllSameType| ${Name}_Dict = nil,"
+	|| DclSrc = "|dictionary of $AllSameType| ${Name}_Dict = nil"
 	|| DclMsg = DclSrc.ParseClean
-	CollectDeclsFuncBodyJustWhatWeNewlyMade( DclMsg, self )
+	DclMsg.CollectFromBody(self)
+//	CollectDeclsFuncBodyJustWhatWeNewlyMade( DclMsg, self )
 }
 
 

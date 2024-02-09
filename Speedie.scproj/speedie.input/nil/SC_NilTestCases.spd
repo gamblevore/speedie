@@ -264,7 +264,7 @@ function @ArchonPurger.ndb4
 	visible
 	.value.ndb5()
 
-function NilRecord.ndb5
+function NilRecord.ndb5 
 	cpp_name ndb5
 	visible
 	
@@ -275,6 +275,6 @@ function NilRecord.ndb5
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"
-	if scfunction.currfunc ~= "CreateStructNil" // 
+	if scfunction.currfunc ~= "JB_Proc__CreateArgs" // 
 }
 

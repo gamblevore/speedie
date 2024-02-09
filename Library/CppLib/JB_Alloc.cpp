@@ -1164,10 +1164,9 @@ void JB_Mem_ClassLeakCounter () {
 }
 
 
-static inline JB_Object* Trap_(FreeObject* Obj, AllocationBlock* B) {
-//	if (JB_ObjID((JB_Object*)Obj)==123456)
+static inline JB_Object* Trap_ (FreeObject* Obj) {
+//	if (JB_ObjectID((JB_Object*)Obj)==26227894)
 //		debugger;
-	ObjInBlock(Obj, B);
 	Obj->FakeRefCount = 0;
     return (JB_Object*)Obj;
 }
@@ -1179,12 +1178,12 @@ __hot JB_Object* JB_AllocNew( AllocationBlock* CurrBlock ) {
     if_usual (Obj) {
         CurrBlock->ObjCount++;
         CurrBlock->FirstFree = Obj->Next;
-        Obj->FakeRefCount = 0;
+//        Obj->FakeRefCount = 0;
 		Sanity(CurrBlock);
-        return (JB_Object*)Obj;
+        return Trap_(Obj);
     }
 	
-	return Trap_(NewBlock( CurrBlock ), CurrBlock->Owner->CurrBlock);
+	return Trap_(NewBlock( CurrBlock ));
 }
 
 

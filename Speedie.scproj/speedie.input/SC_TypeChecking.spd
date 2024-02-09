@@ -19,7 +19,7 @@ function RelSetOrExpansion (|Message| exp)
 	using (exp)
 	exp.clear
 	l.AppendAllInto(exp)
-	|| cond = r.first.copy
+	|| cond = r.first!.copy
 	|| tmp = «tmp "if"
 		cond.Negate
 		«arg, R »

@@ -1,13 +1,5 @@
 
 
-// .Exists2			// nilch'ing without really being a nilchecker
-// .Exists4
-// .Exists5
-// uint24.SyntaxCast <-- CheckStillChecksNil is getting a result of 38 (known somehow)
-						// but its not known!
-
-
-
 extend_module ArchonPurger {
 	dispatch NilSyxes (NilTrackerFn)
 		@thg:	Thing
@@ -197,40 +189,6 @@ function DetectStillChecks (|message| first, |nilstate|)
 		t.FnAbleToNilCheck = false			// Nilcheckers require only return true if self is not nil!
 
 
-/* SHOULD handle: 
-
-	* .OriginalParseLayer, .filepath, msgroot isa // all nilcheckers
-
-	* returns -1 (errrorint), check if -1 is equal to errorint.false?
-		* "nil false", says this returns "false"... useful
-
-	* if self ~= "true"					// 
-		return true
-		
-	* if self: if (P == cls)
-		return true						// just tests self
-
-	* if !str return ""
-	  return 1
-	
-	* if o and self						// just tests self
-		return O.TypeNormal.matchC(self)
-
-	* string.operatorcontains // returns nilchecker.
-	
-	* return .FilePath isa s		// relies on "isa" being a NilChecker, and .filepath() returns false
-
-	* return .ext ~= s				// same
-
-	* Return (self) and (self == @arg) and (.name == name)
-*/
-
-
-// I think the only problem is in ... .tern and .type
-// I think type-casting should lose it anyhow... so thats OK
-// tern needs to be handled anyhow.
-
-
 function Return (NilTrackerFn)
 	opt norefcounts
 	|| v = .DetectStillChecks(msg.first)
@@ -410,7 +368,8 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 		return dcl.nildeclared
 	
 	|| Y = dcl.NilCurr
-	if dcl.IsUnknownParam and (test isnt soft and disappears)
+	|| Unknown = dcl.IsUnknownParam 
+	if Unknown and (test isnt soft and disappears)
 		if test isnt Active								// set var A to unknown prm B, so default to real
 			return .BecomeReal(dcl, msg)
 		dcl.NilDeclared = nilstate.optional
@@ -418,7 +377,7 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	if  test isnt active  or  test is soft and Negative
 		return Y
 
-	if Y != test
+	if Unknown or Y != test
 		return T.SetNilness(dcl, Test)
 
 	return msg.Redundant(dcl, test)

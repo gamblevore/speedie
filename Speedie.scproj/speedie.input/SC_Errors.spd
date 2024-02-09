@@ -102,13 +102,14 @@ function Error.Improve
 
 	if !.path
 		|| SC = node.SCFile$
+		
 		if sc != .node.scfile
 			.node = node // wrong file!!
 		if sc.exists
 			.path = sc.path
 
 
-function FindBytePosSub (|Message| Node, |Message|)
+function FindBytePosSub (|Message?| Node, |Message?|)
 	opt norefcounts
 	if !node or node.HasPosition
 		Return node
@@ -119,7 +120,7 @@ function FindBytePosSub (|Message| Node, |Message|)
 			Return m
 
 
-function FindBytePos (|Message| Node, |Message|)
+function FindBytePos (|Message?| Node, |Message?|)
 	|| first = FindBytePosSub( node )
 		return first
 	|| msg = FindBytePosSub( node.parent )

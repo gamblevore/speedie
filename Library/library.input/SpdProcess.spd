@@ -90,7 +90,7 @@ class SpdProcess (Process)
 		|| OK = .status
 		.DiedCount += !OK
 		if (.ErrorOutput!=nil) and (.mode is AutoPrintErrors)
-			printline .ErrorOutput
+			printline .ErrorOutput.GetResult
 		.Disconnect(OK.signalname) // removes us from the check-list
 
 
@@ -231,7 +231,7 @@ datatype ProcessMode (byte)
 
 prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)
 	function RunThreaded (|[string]| R = [],  |SpdProcess|)
-		|| c_args = SpdProcess.CreateArgs("", r) #require
+		|| c_args = SpdProcess.CreateArgs("", r)
 		rz = SpdProcess("", "SpdMainFn()", r, self)
 		if !rz.pico.startthread(self|picothreadfn|, 7|_voidptr|, c_args)
 			rz = nil

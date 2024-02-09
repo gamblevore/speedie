@@ -63,8 +63,10 @@ class FastString {
 	function Flush	(|bool|)				{ cpp_wrapper JB_FS_Flush }
 	function Remove (|Byte| b)				{ cpp_wrapper JB_FS_RemoveByte }
 	function GetResult (|string|)
+		nil self
 		cpp_wrapper JB_FS_GetResult
 	function GetResult (|FastString?| other, |string|)
+		nil self
 		cpp_wrapper JB_FS_SmartResult
 	function Copy (|string|)
 		cpp_wrapper JB_FS_Copy

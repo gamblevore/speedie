@@ -587,6 +587,7 @@ function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |
 
 function Message.SCFile (|SCFile|)
 	opt norefcounts
+	nil self
 	for S.up in self
 		|| r = S.memoryLayer.obj
 		if r isa SCFile

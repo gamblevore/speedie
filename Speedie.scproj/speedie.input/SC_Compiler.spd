@@ -49,7 +49,7 @@ extend_module compiler
 function Compiler.FindSpeedieRoot (|string|)
 	|| paths = app.exepath.resolve.parent
 	|| srch = "/Speedie/"
-	|| found = paths.find(srch,0,int.max,true)
+	|| found = paths.find(srch, 0, int.max,true)
 		return paths[0, found + srch.length]
 	return "/usr/local/speedie"
 	
@@ -64,7 +64,7 @@ linkage
 |File|					TempFolder
 |String|				_Projects
 |String|				_SpeedieProj
-|SCFile|				InternalFile = SCFile.new(nil)
+|SCFile|				InternalFile = SCFile.new(nil, SCImport.new(nil, true))
 |string|				ProjectName
 |string|				ReportedName
 |scimport|				UserProj
@@ -78,7 +78,7 @@ linkage
 |Dictionary of SCImport|	ImportedNames = Dictionary.new
 
 
-|SCModule|				program
+|SCModule|				program = InternalFile.Proj.Mod
 
 |[SCClass]|				ClassList
 |[SCModule]|			ModuleList
@@ -539,8 +539,8 @@ function ImportAll
 		if m != Compiler.program
 			m.BaseDecls
 		m.GlobalsFix
-		if m.cls
-			m.cls.RenameInterfaces
+		|| c = m.cls
+			c.RenameInterfaces
 
 
 	for m in SortInitOrder(.ModuleList)
@@ -550,8 +550,8 @@ function ImportAll
 
 	.Stage( "Creating Exportnames For Function Prototypes" )
 	for f in .FuncList
-		if f.ProtoDecl
-			f.ProtoDecl.Name = f.ExportName
+		|| p = f.ProtoDecl
+			p.Name = f.ExportName
 	
 	
 	.Stage( "Checking Iterators" )
@@ -675,10 +675,7 @@ function FindModule (|String| name, |Message| where, |bool| ErrMsg=true, |SCModu
 
 
 function CreateRoot
-	|| Prj = SCImport.new(nil, true)
-	.InternalFile.Proj = Prj
-
-	|| M = Prj.Mod
+	|| M = .InternalFile.Proj.Mod
 	.program = M
 
 	M.ExportName = "JB"

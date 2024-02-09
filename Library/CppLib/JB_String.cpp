@@ -1322,7 +1322,7 @@ JB_String* JB_FS_SmartResult( FastString* fs, FastString* Orig ) {
 	if ( !Orig ) {
 		return JB_FS_GetResult( fs );
 	}
-	return EmptyString_; // why wasn't it always this way?
+	return EmptyString_;
 }
 
 

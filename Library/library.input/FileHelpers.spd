@@ -19,7 +19,7 @@ extend String
 			"".FileGlobSub(fixed / '/', rz)
 
 	helper FileGlobSub (|[string]| parts, |[file]| result, |int| i=0)
-		|| p = parts[i++]
+		|| p = parts[i++] ?? ""
 		ifn p contains '*'
 			|| newpath = (.child(p), "/")(self or p) 
 			newpath.fileglobsub2(parts, result, i)

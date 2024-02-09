@@ -113,20 +113,18 @@ function message.IntoVariable (|scbase| name_space, |nameandmsg|)
 	|| Block = .CreateOwnBlock
 	|| name = uniquetmpvar(name_space, "_imP")
 	
-	P = NeweqRel( @thg.msg(name), self )
+	P = NewEqRel( @thg.msg(name), self )
 	|| arg = block.asarg
-	Block <~ «decl
-		@emb
-		P
-	»
-	
-	CollectDeclsFuncBodyJustWhatWeNewlyMade(block, arg) // we only have one decl that needs collecting...
+	|| decl = block.msg(@decl)
+	decl <~ @emb
+	decl <~ P
+	decl.CollectFromBody(arg)
 	block.parent.obj = arg[name]	// Stop collectdecls being called twice! (name-conflict errors)
 									// it's called in typeofblock, unless we already have the type
 									// which we just set here.
 	|| last = NewRejoin()
 	|| RetVal = last.msg(@thg, name)
-	RetVal.obj = .obj
+	RetVal.obj = P.obj
 	 
 	block <~ last
 	rz.msg = last

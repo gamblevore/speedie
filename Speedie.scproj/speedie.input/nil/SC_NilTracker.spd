@@ -134,7 +134,7 @@ struct ArchonPurger
 		.rows[0] = nilstate.Basic
 		.Neel = .rows[0]
 		.rowend = .Neel + 63
-		archonpurger.loops = nil
+		ArchonPurger.loops = nil
 		.Realnesses = -1
 		.RootReturned = false
 		.CheckNilCheck(F)
@@ -146,17 +146,15 @@ struct ArchonPurger
 		printline
 		f.NilPrint(" ****** ", false)
 		
-		|| r = f.returntype
+		|| r = f.ReturnType
 			if !r.nilstated
 				r.nildeclared = 0 // build this up carefully.
 		target debug: if "": ArchonPurger.ndb4
 		return f.SourceArg
 
 
-	function Finish (|SCFunction| f)
+	function FinishNil (|SCFunction| f)
 		opt norefcounts
-		if .FnAbleToNilCheck
-			f.isnilchecker = true
 		|| r = f.ReturnType
 			r.nildeclared |= nilstate.stated
 		for a in f.Args
@@ -231,7 +229,9 @@ struct ArchonPurger
 			require (a==1) == (f.cls ~= "niltest")
 			|| arg = t.Startnil(f)
 				Argument(arg)
-				t.Finish(f)
+				if t.FnAbleToNilCheck
+					f.isnilchecker = true
+			t.FinishNil(f)
 
 		
 		function FixArchons

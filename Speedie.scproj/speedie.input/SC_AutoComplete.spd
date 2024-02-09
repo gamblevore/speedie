@@ -926,13 +926,16 @@ function Define_Behaviour (|SCFunction| fn,  |string| purpose,  |message|)
 		return .DefineOrCall(found.source, purpose, found)
 
 
-function message.CutifyCopy (|message|)
+function message.CutifyCopy (|message!|)
 	rz = message(self)
 	for v in self
 		if v == @arg
 			0 //
 		  elseif v.isreffer
-			rz <~ v.last.last.CutifyCopy
+			|| vll = v.last.last
+				rz <~ vll.CutifyCopy
+			  else
+				debugger // what?
 		  else
 			rz <~ v.CutifyCopy
 
@@ -945,7 +948,7 @@ function message.CutifyCopy (|message|)
 		if cls or modname // ok so...
 			|| name = rz.first
 			if name == @thg
-				|| prm = name.next
+				|| prm = name.next!
 				rz.become( @dot, fn.name )
 				if cls
 					rz.first = prm.first
@@ -969,20 +972,21 @@ function message.IdentifyFunc (|scfunction|)
 
 
 function message.IsClassOrExtOrModule (|bool|)
-	return (self == @tmp) and (.IsClassType or .isextender or .MsgIsProperModule)
+	return (self == @tmp) and (.IsClassType or .IsExtender or .MsgIsProperModule)
 
 
 function object.ClassOrModule (|scbase|)
+	opt norefcounts
 	if self isa scmodule
-		if .cls
-			return .cls
+		|| c = .cls
+			return c
 		return self
 
 
 function IdentifyBetter (|message| node, |string| name) // p.first.name
 	opt NoRefCounts
 	node.become( @emb )
-	node = node.first
+	node = node.first!
 	node.func = @dot
 	node <~ (@thg, name)
 	node <~ @emb
@@ -1006,7 +1010,7 @@ function FindAdj (|message| msg, |bool| DisplayOnly, |message|)
 	if msg in @adj
 		adj = msg.parent
 	ifn adj in @decl
-		|| found = compiler.findadj(adj)
+		|| found = compiler.FindAdj(adj)
 			return found._parsed // why not .source?
 	 
 

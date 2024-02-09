@@ -526,7 +526,7 @@ function DoInterpreter
 function SCClass.LibExport (|jbin| j)
 	j.enter(@tmp, .name)
 	if .isobject
-		|| b = .behaviour
+		|| b = .behaviour!
 		j.enter(@arr)
 		for fn in b.WrapperFuncs
 			j.add(@tmp, fn.exportname)

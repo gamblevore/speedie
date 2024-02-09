@@ -251,8 +251,8 @@ or
 					fake.name = s2
 					.lookup(fake).score = i
 
-		dict["="].score = 100
-		CustomOperatorScore = dict["custom"].score
+		dict["="]!.score = 100
+		CustomOperatorScore = dict["custom"]!.score
 
 }
 

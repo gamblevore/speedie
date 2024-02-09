@@ -6,7 +6,7 @@
 
 
 class SCBehaviour (SCBase)
-	|SCModule|							FuncTable
+	|SCModule?|							FuncTable
 	|dictionary of SCModule|			Interfaces
 	|[SCFunction]|						WrapperFuncs	
 	
@@ -143,6 +143,7 @@ class SCBehaviour (SCBase)
 	
 	
 	function SCFunction.IsBehaviour (|bool|)
+		opt norefcounts
 		return .protodecl$.Type.IsInterface
 	
 	

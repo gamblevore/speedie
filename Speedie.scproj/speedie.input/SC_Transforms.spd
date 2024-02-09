@@ -80,7 +80,7 @@ function Tran_Expect (TranFunc)
 		ch1.prev = ch
 
 	if (name_space)
-		typeofexpr(ch, name_space) // use this pre-transform or during transform... :)
+		TypeOfExpr(ch, name_space) // use this pre-transform or during transform... :)
 
 	ch = ch.Negate
 	

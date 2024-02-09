@@ -102,12 +102,9 @@ module Feedback
 
 
 	function StopStripping
-		if ("".length == 1)
+		if ""
 			"".debugprint // stop from being stripped
 			nil|message|.jdb2
-			nil|message|.LocateAll
-			nil|scfunction|.NilPrint(False)
-			nil|scdecl|.NilPrint("")
 	
 	
 	function ParseArgsSub (|[]| args, |bool|) 

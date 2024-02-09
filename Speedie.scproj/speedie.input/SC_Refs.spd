@@ -159,18 +159,18 @@ function DecrMulti (|scdecl| d, |message| m, |message|)
 
 
 function RefDecrMsg (|Message| msg, |Message|)
-	return RefMsg( msg, "JB_Decr", Compiler.RefDecr )
+	return RefMsg( msg, "JB_Decr", Compiler.RefDecr! )
 
 
 function RefClearMsg (|Message| msg, |Message|)
 	// return refdecrmsg(msg) // for now
-	return RefMsg( msg, "JB_Clear", Compiler.RefClear )
+	return RefMsg( msg, "JB_Clear", Compiler.RefClear! )
 
 
 function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 	using (msg)
 	rz = NewFnc( name )
-	|| lst = rz.Last
+	|| lst = rz.Last!
 	lst <~ msg.Copy // shouldn't copy always... sometimes we want it directly, like .FillInDestructor!
 	lst.obj = func
 	rz.position = -1
@@ -205,7 +205,7 @@ function RefIncr (|Message| msg, |Message| Place, |bool| IsJustAnArg=false)
 		require !(msg.unbra isthing "nil")
 		Place = msg
 
-	Compiler.RefIncr.RefFunc(msg, place)
+	Compiler.RefIncr!.RefFunc(msg, place)
 
 
 function Message.AvoidSafeDecr
@@ -477,7 +477,7 @@ function Message.FuncWrap (|Message| fnc)
 function RefMsg0 (|String| name, |SCFunction| func, |Message|)
 	rz = NewFnc( name )
 	rz.position = -1
-	rz.second.obj = func
+	rz.second!.obj = func
 
 
 function Message.IsProperty (|bool|)

@@ -46,7 +46,7 @@ linkage
 |SCClass?|				Cls
 |String|				Description
 |CppRefs?|				Refs
-|?dictionary of SCBase|	LinkTo
+|?(dictionary of SCBase)|	LinkTo
 |object?|				CounterPart
 |SCFunction?|			NextFunc
 |µFunc?|				ASM
@@ -78,7 +78,7 @@ linkage
 
 
 
-constructor (|Message| msg = nil)
+constructor (|Message?| msg = nil)
 	Super.Constructor( msg )
 	if (msg)
 		Compiler.stFuncs++
@@ -632,20 +632,18 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 
 
 function DeclsProtoType (|Message| ch0, |SCClass| fpType=nil, |bool| late=false)
-	// prototype syx (|Message| self, |FastString| fs)
-	// + function Name (Syx) { }
-	// = function Name (|Message| self, |FastString| fs) { }
-	// try re-use this for behaviours?
-	
+	opt norefcounts
 	|| IsClass = fpType != nil
-	fpType := Compiler[ ch0.name, .Source ]
-	if fptype
-		.DeclsProtoTypeRemove(fpType, ch0, IsClass, late)
-		if !late
-			.DeclsProtoTypeAdd(fpType)
+	if !IsClass
+		fpType = Compiler[ ch0.name, .Source ]$
+	.DeclsProtoTypeRemove(fpType, ch0, IsClass, late)
+	if !late
+		.DeclsProtoTypeAdd(fpType)
+
 
 function scdecl.CouldUpgradeToReal (|bool|)
 	return .typesuffers and !.nilstated
+
 
 function MakeParamsReal // for cpp funcs...
 	opt norefcounts
@@ -675,29 +673,28 @@ function DeclsProtoTypeAdd (|SCClass| fpType)
 	(dcl is onmodule) // not sure where this is found cos .cls is nil sometimes yet its still being found
 	.ProtoDecl = dcl
 	if (.Cls)
-		.parent.TryAdd( .Source, Dcl, .Name )
+		.parent!.TryAdd( .Source, Dcl, .Name )
 
 
 function DeclsProtoTypeRemove (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool|late=false)
 	|| p = ch0.Parent
 	|| Proto = fpType.FuncProto						#expect (ch0, "This isn't a prototype!")
-	
-	|| fProtoParams = Proto.Source[ 1 ]
-	expect (fprotoParams == @prm) (proto, "Expected function parameters here.")
+	|| fProtoParams = Proto.Source[ @prm, 1 ]		#require
 
 	using (ch0)
 		fProtoParams.CopyAllInto( p )
-		p.Func = @prm
-		ch0.Remove
-	
-	require .cls
+	p.Func = @prm
+	ch0.Remove
+
+	|| c = .cls$
 	if late
 		p.first.remove // ooof
 	if (!AssumeSelf)
-		ch0 = p[@Decl][@thg]						#require
-		|| decl = ExtractDecl( ch0, nil, declmode.ProtoParam )			#expect p
-		expect (decl matches .cls.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
-		ch0.parent.Remove
+		|| d = p[@decl]
+		|| ch = D[@thg]													#require
+		|| decl = ExtractDecl( ch, nil, declmode.ProtoParam )			#expect p
+		expect (decl matches c.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
+		d.Remove
 
 
 
@@ -906,10 +903,8 @@ function CollectLinks (|object| obj)
 		obj.DoLinkFrom( self )
 		
 	  elseif obj isa SCDecl
-		|| t1 = obj.type
-			.DoLinkTo( t1 )
-		|| t2 = obj.IsLookupOnly
-			.CollectLinks( t2 )
+		.DoLinkTo( obj.type )
+		.CollectLinks( obj.IsLookupOnly )
 		
 	  elseif obj isa SCClass
 		.DoLinkTo( obj )
@@ -944,6 +939,7 @@ function FindReached (|scbase| from, |bool|)
 	
 function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Type = nil, |Message|)
 	using (errnode)
+	nil self
 	|| L = self
 	|| On = L
 	if Type != "warn"
@@ -1226,7 +1222,7 @@ function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |
 	|| f = SCFunction.NewFunc( node, parent, ErrPlace )|SCFunction|
 	expect (Compiler.FuncList.Pop == f)
 	
-	|| Using = node.syntaxusing
+	|| Using = node.SyntaxUsing
 	|| tmp = @tmp + "datatype"
 	tmp.msg(@thg, f.Name)
 	tmp <~ node.last
@@ -1302,11 +1298,11 @@ function message.FixMultiArr
 		|| kkey = item.first			//   [(a,b,c):x]  -->  [a:x, b:x, c:x]
 		if kkey == @list
 			|| val = kkey.next
-			while (|| c = kkey.first)
-				|| i2 = @item.msg
-				i2 <~ c
-				i2 <~ val.copy
-				item.prev = i2
+				while (|| c = kkey.first)
+					|| i2 = @item.msg
+					i2 <~ c
+					i2 <~ val.copy
+					item.prev = i2
 			item.remove
 
 
@@ -1317,13 +1313,13 @@ function Tran_Log (TranFunc)
 		platform.log(abc)
 	using (node)
 		|| f = node.first
-		node.msg(@Thg, "platform")		// this seems better... than tran_print
-		node.msg(@prm) <~ f				// probably tranprint should use this instead.
-		node.func=@dot					// like Platform.print, Platform.printline, Platform.printerror
-	TypeOfExpr( node, name_space )		// Platform.log
+		node.msg(@Thg, "platform")			// this seems better... than tran_print
+		node.msg(@prm) <~ f					// probably tranprint should use this instead.
+		node.func = @dot					// like Platform.print, Platform.printline, Platform.printerror
+	TypeOfExpr( node, name_space )			// Platform.log
 
 
-function AlterPostCond (|Message| PostCond, |Message| IterPostCond, |message| NodeSrc, |Message|)
+function AlterPostCond (|Message?| PostCond, |Message?| IterPostCond, |message| NodeSrc, |Message|)
 	opt norefcounts
 	if !IterPostCond
 		Return PostCond
@@ -1527,7 +1523,8 @@ function message.ElseNeverFires // self == cond
 	|| after = arg.next
 		
 	if !after
-		.parent.saferemove
+		|| p = .parent
+			p.saferemove
 		return
 	if arg == @arg
 		arg.clear

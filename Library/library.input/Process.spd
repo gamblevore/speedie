@@ -5,15 +5,15 @@
 */
 
 
-class Process (processowner)
+class Process (ProcessOwner)
 // merge this with processowner!
-	|string|		Path
-	|[string]|		Params
-	|FastString|	Output
-	|FastString|	ErrorOutput
-    |Date|			LastRead
-    |int64|			UserFlags
-    |object|		UserObj
+	|string|				Path
+	|[string]?|				Params
+	|FastString?|			Output
+	|FastString?|			ErrorOutput
+    |Date|					LastRead
+    |int64|					UserFlags
+    |object|				UserObj
     
 	linkage
 		wrapper

@@ -28,7 +28,7 @@ class Object
 	helper RefCount (|int|)
 		cpp_Wrapper JB_ObjRefCount
 	
-	helper ObjectID (|uint|)			// stable across Runs!
+	helper ObjectID (|int|)			// stable across Runs!
 		nil checker
 		cpp_wrapper JB_ObjectID		// uses pos within the superblock :)
 	

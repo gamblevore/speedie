@@ -126,15 +126,19 @@ void JB_Array_SizeSet( Array* self, int64 NewLength ) {
 
 JB_String* JB_Array_Render(Array* self, FastString* fs_in) {
 	FastString* fs = JB_FS__FastNew(fs_in);
-	JB_FS_AppendByte(fs, '[');
-	int n = JB_Array_Size(self);
-    for_(n) {
-        JB_Object* obj = JB_Array_Value(self, i);
-        if (i)
-            JB_FS_AppendCString(fs, ", ");
-        JB_ObjRender(obj, fs);
-    }
-	JB_FS_AppendByte(fs, ']');
+	if (!self) {
+		JB_FS_AppendCString(fs, "nil");
+	} else {
+		JB_FS_AppendByte(fs, '[');
+		int n = JB_Array_Size(self);
+		for_(n) {
+			JB_Object* obj = JB_Array_Value(self, i);
+			if (i)
+				JB_FS_AppendCString(fs, ", ");
+			JB_ObjRender(obj, fs);
+		}
+		JB_FS_AppendByte(fs, ']');
+	}
 	return JB_FS_SmartResult(fs, fs_in);
 }
 

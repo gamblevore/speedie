@@ -18,7 +18,7 @@ class ErrorReceiver
 
 	|Error|					Errors
 	|fnErrorLogger| 		_LogFunc
-	|object| 				_LogObj
+	|object?| 				_LogObj
 	|int|					MaxErrors
 	|int|					MaxProblems
 	|int|					ErrorCount

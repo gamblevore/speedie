@@ -231,7 +231,9 @@ datatype ErrorSeverity (Byte)
 		if (self < MaxError)
 			|| name = errorseverity.InitNames[self|int|]
 			if !fs_in
-				return name
+				if name != nil
+					return name
+				return ""
 			fs_in <~ name
 	
 	syntax is (|errorseverity| e, |bool|)

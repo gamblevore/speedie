@@ -272,10 +272,7 @@ class SCDecl (SCObject) {
 		.CopyTypeInfoTo(rz)
 		rz.internal = self
 		rz.PointerCount++
-		if purpose is FuncParam
-			rz.NilDeclared = nilstate.either
-		  else
-			rz.NilDeclared = nilstate.real
+		rz.NilDeclared = nilstate.realish ||| (nilstate.stated &- (purpose isnt FuncParam))
 		check (rz.pointercount <= 4) (.source, "Too much abstraction")
 	
 	
@@ -734,10 +731,11 @@ class SCDecl (SCObject) {
 
 		if (.PointerCount)
 			if isfunc
-				return errs.createnil
+				return errs.CreateNil
 			return nil
-
-		return .Type.defawlt.copy(errs)
+	
+		|| d = .type.Defawlt
+			return d.copy(errs)
 
 
 	function CanUseDefault (|bool|)
@@ -745,7 +743,6 @@ class SCDecl (SCObject) {
 			debugger
 			return false
 
-		debugger .type
 		if (.Type.IsStruct and !.PointerCount)
 			return (.IsNormalStruct)
 		return true
@@ -760,12 +757,7 @@ class SCDecl (SCObject) {
 
 	function HasStruct (|bool|)
 		opt norefcounts
-		require !.PointerCount
-		|| T = .type
-//		debug_require (T)
-		// OK... it is complaining about this. because... it SHOULD exist.
-		// we are gonna hit this bug later... but I guess just remove it here.
-		return T.isstruct
+		return !.PointerCount and .type.isstruct
 	
 	
 	function HasStructDestructor (|SCFunction|)
@@ -1017,8 +1009,7 @@ class SCDecl (SCObject) {
 
 	render RenderTypeNameNicer
 		opt norefcounts
-		|| d = .DownGrade ?? self
-		return d.RenderTypeName(fs_in)
+		return .DownGrade.RenderTypeName(fs_in)
 
 	render RenderTypeName 
 		if !self or !.type

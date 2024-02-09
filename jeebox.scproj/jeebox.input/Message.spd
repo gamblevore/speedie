@@ -238,8 +238,7 @@ class Message (RingTree)
 			fs <~ '`'
 	
 	
-	syx Char (Character)
-//									'x'
+	syx Char (Character)			//  'x'
 		fs <~ '\''
 		fs <~ .Name.EscapeChr
 		fs <~ '\''
@@ -265,9 +264,9 @@ class Message (RingTree)
 		fs <~ '"'
 
 
-	syx Unit
-		|| num = .first.name
-		fs <~ num // 20cm
+	syx Unit						// 20cm
+		|| num = .first.Nyme
+		fs <~ num
 		if (num.ishexlike) and (num.last != '_')       // 0xFF
 			fs <~ '_'
 		fs <~ .name  // 20cm, 0xFF_cm
@@ -289,8 +288,7 @@ class Message (RingTree)
 			fs <~ .Name
 
 
-	syx Dot (Dot)
-//										x.fn(a)
+	syx Dot (Dot)					// x.fn(a)
 		|| ch = .First					#require
 		fs <~ ch
 		fs <~ '.'

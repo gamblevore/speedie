@@ -20,9 +20,9 @@ class CppRefs
 
 
 	function AddOne (|message| C)
-		if (C ~= "nil")
+		if (C ~= "nil") // typeofnil
 			// 
-		  elseif (C ~= "self")
+		  elseif (C ~= "self") // dcl is self
 			.DisturbParams |= 1
 		  elseif (C == @num)
 			.DisturbParams |= (C.int << 1)

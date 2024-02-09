@@ -20,7 +20,7 @@ function scclass.Falsify (|message| ques, |message|)
 function Message.FalsifyNil (|message|)
 	opt norefcounts
 
-	|| ret = scfunction.currfunc.returntype
+	|| ret = scfunction.currfunc!.returntype
 	if ret and ret.IsNormal
 		return ret.type.Falsify(self)
 	.func = @thg

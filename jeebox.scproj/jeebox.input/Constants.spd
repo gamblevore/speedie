@@ -81,11 +81,11 @@ Module Jeebox
 	function InitConstants
 		array.new // needed by argv
 
-		.EscapeChr = dictionary.Copy(.EscapeStr)
+		.EscapeChr = dictionary.Copy(.EscapeStr!)
 		.EscapeStr[`$`] = `\$`
-		.UnEscapeStr		= dictionary.Reverse(.EscapeStr)			// unify data
-		.JS_UnEscapeStr		= dictionary.Reverse(.JS_EscapeStr)			// unify data 
-		.XML_UnEscapeStr	= dictionary.Reverse(.XML_EscapeStr)		// unify data 
+		.UnEscapeStr		= dictionary.Reverse(.EscapeStr!)			// unify data
+		.JS_UnEscapeStr		= dictionary.Reverse(.JS_EscapeStr!)		// unify data 
+		.XML_UnEscapeStr	= dictionary.Reverse(.XML_EscapeStr!)		// unify data 
 		.EscapeChr[`"`]		= nil|string|
 		.EscapeChr[`$`] 	= nil|string|
 
@@ -100,11 +100,11 @@ Module Jeebox
 			if i <= 31 or (i == 127 or 0xc0 or 0xc1) or i >= 0xf5
 				.addescape(i, tfs)
 		
-		SetEscapeCode(.UnEscapeStr, true)
-		SetDecodeEntities(.UnEscapeStr, true)
-		SetDecodeEntities(.XML_UnEscapeStr, true)
+		SetEscapeCode(.UnEscapeStr!, true)
+		SetDecodeEntities(.UnEscapeStr!, true)
+		SetDecodeEntities(.XML_UnEscapeStr!, true)
 
-		.EscapeStr[`${`] = `$\{`
+		.EscapeStr![`${`] = `$\{`
 	
 
 	function string.UnBackTick (|string|)

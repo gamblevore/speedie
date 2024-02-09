@@ -13,12 +13,10 @@ function Message.DeprecatedClassOption (|String| name,  |string| Kind=nil,  |int
 	// this is a wasteful way to do stuff.
 	// better to find them as we go through the code... not search for each at the start.
 	|| place = .find( @Tmp, name )		#require
-
 	|| num = 1
 	if Kind != nil
 		|| ch = place.first
-		require ch and ch.expect(@thg)
-		require ch ~= Kind
+		require ch and ch.expect(@thg) and ch ~= Kind
 		|| num_msg = ch.next 
 			num_msg.expect(@num)
 			num = num_msg.int
@@ -33,11 +31,12 @@ function Message.DeprecatedClassOption (|String| name,  |string| Kind=nil,  |int
 
 function Message.MsgOwningFunc (|SCFunction|)
 	opt norefcounts
+	nil self
 	for ch.up in self
 		|| O = ch.obj
 		if O isa SCArg
-			if O.ParentFunc
-				Return O.ParentFunc
+			|| pf = o.ParentFunc
+				Return pf
 		  elseif (O isa SCFunction) and (ch != @prm)
 			// could be a func associated with the lst on "obj.func".
 			Return o
@@ -370,24 +369,24 @@ function Message.GetMarker (|String| s, |Message|)
 
 function NewEqRel (|string| L, |String| R, |Message|)
 	opt norefcounts
-	cpp_part NewEqRelStr
 	rz = «Rel
 		«Thg L »
 		«Opp "=" »
 		«Thg R »
 	»
-	rz.tmptype = asmtmp.ksetvar
+	rz.TmpType = asmtmp.ksetvar
+
+
+
+function NewRejoin (|message|)
+	rz = @tmp + "rejoin"
+	rz.tmptype = asmtmp.kRejoin
 
 
 function NewDecl (|string| type, |string| name="", |message|)
 	opt norefcounts
 	|| msg = (@thg+name, nil)(name)
 	return newdecl(type, msg)
-
-
-function NewRejoin (|message|)
-	rz = @tmp + "rejoin"
-	rz.tmptype = asmtmp.kRejoin
 
 
 function NewDecl (|string| type, |message| RelOrName, |message|)
@@ -437,11 +436,6 @@ function NewFnc (|string| name, |Message|)
 		«Thg name »
 		«prm »
 	»
-
-
-function Message.LocateAll
-	for ch.flat in self
-		printline ch.locate
 
 
 function Message.Hash (|uint64| Pos, |Uint64|)

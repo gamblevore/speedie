@@ -8,16 +8,17 @@ class SCFile (file)
 	|string|		ExportName
 	|SCImport|		Proj
 	|string|		FData
-	|Message|		LiveAST
-	|Message|		OrigAST
+	|Message?|		LiveAST
+	|Message?|		OrigAST
 	|date|			OrigDate
 	|uint16|		filenum
 	|bool|			IsInternal
 
 
-	constructor (|File| f)
+	constructor (|File| f, |scimport| p)
 		super.constructor((f.path, "")(f != nil))
 		flow off
+		.Proj = p
 		.isinternal = f == nil
 		.liveast = .start_ast
 		Compiler.stTotalFileCount += .isinternal

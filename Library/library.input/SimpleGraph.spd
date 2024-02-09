@@ -38,11 +38,10 @@ function @SimpleGraph.Test
 	for i in n
 		items <~ SimpleGraph( string.byte('A'+i) )
 	
-	for i in n
-		|| ii = items[i]
+	for (ii in items) (i)
 		for j in (i + 1 to n-1)
 			if (0.1)[]
-				ii <~ items[j]
+				ii <~ items[j]!
 	
 	for t in items
 		"${t.name} is connected to:"

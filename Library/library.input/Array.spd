@@ -145,6 +145,7 @@ class Array (saveable)
 		cpp_wrapper JB_Array_AppendCount
 	
 	render
+		nil self
 		cpp_wrapper
 	
 	function Find (|| f, |ind|)
