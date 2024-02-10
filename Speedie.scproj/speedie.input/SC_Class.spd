@@ -174,7 +174,8 @@ function GetDepth
 			
 	|| msg = .defawlt
 	if msg and .isobject and !(msg isthing "nil")
-		.DefaultsToReal = true // what if this defaults to optional? // fuck them :D
+		.DefaultsToReal = true // what if .defawlt is optional? // fuck them :D
+		.selfdecl.NilDeclare = NilState.real
 		.TypeNormal.NilDeclare = NilState.real
 	
 

@@ -550,8 +550,8 @@ function Message.IsSetIntoPlace (|message|)
 function Message.IsSetIntoVar (|message|)
 	opt norefcounts
 	|| thg = .IsSetIntoPlace
-	require (thg == @thg)
-	return thg
+	if (thg == @thg)
+		return thg
 
 
 function message.IsInDeclInBlock (|message|)

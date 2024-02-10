@@ -191,7 +191,6 @@ function DetectStillChecks (|message| first, |nilstate|)
 
 function Return (NilTrackerFn)
 	opt norefcounts
-	if scfunction.currfunc ~= "CountCallsToParentAlloc" // 
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
@@ -234,9 +233,11 @@ function While (NilTrackerFn)
 
 	|| W = .loops.BeginLoop(!condtest.IsTrue)
 	WhileInner(cond)
-	if !condtest.IsTrue		// This is just for simple error detection. like macro errors. 
+	if !condtest.IsTrue
 		.jump(cond, NilCheckMode.whileneg)
+		.loops.exitrecord |= .value // merge this
 	
+	if scfunction.currfunc ~= "CountCallsToParentAlloc" // 
 	.loops.FinishLoop(msg)
 	ArchonPurger.loops = W
 
@@ -310,14 +311,39 @@ function BooleanLogic (niltrackerfn)
 	return t.BranchExit(First)
 
 
+
+function SuperSmartMagicCompare (|message| ll, |message| rr, |nilcheckmode| test, |nilstate|)
+	opt norefcounts
+	|| todo = 3
+	if test is positive  and  ll.func == @thg and rr.func == @thg
+	//	if real == x
+	//		x becomes real
+		|| ld = ll.FastDecl!
+		|| rd = rr.FastDecl!
+		|| ldl = ld is local
+		|| rdl = rd is Local
+		if ldl or rdl
+			if rdl and ld.NilCurr == NilState.Realish
+				T.SetNilness(rd, NilState.real)
+				todo &= ~2
+			if ldl and rd.NilCurr == NilState.Realish
+				T.SetNilness(ld, NilState.real)
+				todo &= ~1
+	
+	if todo & 1
+		.jump(ll, NilCheckMode.soft)
+	if todo & 2	
+		.jump(rr, NilCheckMode.soft)
+	return nilstate.real
+
+
 function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperator| scop,  |nilstate|)
 	opt norefcounts
+		
 	|| LNil = ll.IsNowNil
 	|| RNil = rr.IsNowNil
 	if !lnil and !rnil			// if (a > b)
-		.jump(ll, nilcheckmode.soft)
-		.jump(rr, nilcheckmode.soft)
-		return nilstate.real
+		return SuperSmartMagicCompare(ll, rr, test)
 	
 	if (lnil and rnil)
 		return ll.Redundant(ll.FastDecl, test)
@@ -562,7 +588,7 @@ function message.Trueness (|nilstate| found, |maybebool|)
 		while self == @arg or @bra
 			self = self.last
 		|| rtf = ret.type.false
-		if rtf and self matches rtf
+		if rtf and self and self matches rtf
 			return false
 	// return maybe
 

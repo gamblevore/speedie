@@ -637,7 +637,7 @@ class String
 
 	iterator Lines
 		|| Prev = 0
-		while (self != nil) {
+		while (self) {
 			|| Curr_ = .find( jeebox.CSLine, Prev )
 			yield  self[prev,curr_] (curr_)
 			Prev = Curr_ + 1

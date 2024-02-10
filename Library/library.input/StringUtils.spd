@@ -206,7 +206,6 @@ helper String.TabbifySub (|faststring| fs)
 	
 
 function String.Tabbify (|bool| Tabs=true, |string|)
-	(self)~isreal
 	|| fs = faststring()
 	|| n = 0
 	for t.lines in self
@@ -218,7 +217,7 @@ function String.Tabbify (|bool| Tabs=true, |string|)
 			t.UntabbifySub(fs)
 	rz = fs.GetResult
 	if rz == self // nice opt
-		rz = self	
+		rz = self
 
 
 function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| BytesOut, |string| Name)

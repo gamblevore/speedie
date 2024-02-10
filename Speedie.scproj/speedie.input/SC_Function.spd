@@ -882,9 +882,11 @@ function scclass.RealSuper (|scclass|)
 
 function scclass.RealClass (|scclass|)
 	opt norefcounts
-	rz = self
-	while rz and rz.IsRole
-		rz = rz.super
+	(self)~isreal
+	|| s = self
+	while s and s.IsRole
+		s = s.super
+	return s! // roles always come from real classes
 
 
 function CountCallsToParentAlloc (|Message| root, |message|)
