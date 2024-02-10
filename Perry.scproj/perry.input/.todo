@@ -5,6 +5,7 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 * Do nil checker!
+	* some function is leaking nil decls! We get to 31 vars!! but only 8 really exist.
 	* obj and name should be "safe"
 	* function pointers not being tested!
 	* selector constructor shouldn't need "?"

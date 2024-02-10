@@ -39,7 +39,7 @@ extend PerryIDE
 		.SpeedieText		= TextView(self,		nil,					nil)
 		.ProductOut			= TextView(self,		nil,					nil)
 		.ProductErrors		= TextView(self,		nil,					nil)
-		.CompileTabs		= ButtonView(.stdoutborder,		ClickedCompileTabs) 
+		.CompileTabs		= ButtonView(.StdOutBorder,		ClickedCompileTabs) 
 		.NoNeeder			= TextView(self,		ClickedNoNeed,			nil)
 		.AutoComplete		= menu(self, 			nil,					AutoCompleteInsertText)
 		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
@@ -349,7 +349,7 @@ extend PerryIDE
 		with .StdOutBorder
 			.ID				= "OutBorder"
 			.size 			= the~width  by  18~down
-			.gnormal.solid	= (0.0, 0.0, 0.0, 0.75)
+			.gnormal.solid	= vec4(0.087, 0.95)
 
 		with .tabs
 			.id = "Tabs"
@@ -417,10 +417,10 @@ extend PerryIDE
 		with .FunctionMenu.submenu
 			isnt drawsfocus
 			.ID = "AllFuncsMenu"
-			.onselected = PerryFuncMenuSelected
-			.ontypingfilter = PerryFuncListFilter
+			.OnSelected = PerryFuncMenuSelected
+			.OnTypingFilter = PerryFuncListFilter
 
-		with .currfilename.submenu
+		with .CurrFileName.submenu
 			isnt drawsfocus
 			.ID				= "PathMenu"
 		
@@ -439,7 +439,7 @@ extend PerryIDE
 		.ID				= name
 		.size 			= the~width by the~bottom to 0~under
 		.takesfocus		= takesfocusflag.On
-		.gnormal.solid	= (0.0, 0.0, 0.0, 0.85)
+		.gnormal.solid	= vec4(0.077, 0.95)
 		.expectsparse	= TextView.probablyjeebox
 		.PreferStayAtEnd= true
 		.ide.EditSep.addlow(self)

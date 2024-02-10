@@ -397,7 +397,7 @@ class File (String)
 			return .copyto(dest.file, AttrOnly)
 
 		for f in self
-			rz = .child(f).copyall(dest[f]) 
+			rz = .child(f)!.copyall(dest[f]) 
 			if !rz
 				exit
 	
@@ -511,13 +511,6 @@ class File (String)
 
 		function Logs (|file|)
 			return "/tmp/logs/".file
-
-	function AppDate (|date|)
-		if self
-			ifn self isa "app"
-				return .anydate
-			|| n = "/Contents/MacOS/" + .trimextandpath
-			return .child(n).anydate
 
 	function AnyDate (|date|)
 		return .created ?? .modified

@@ -23,7 +23,7 @@ module Linkage
 		opt norefcounts
 		|| F = self[name]
 			dest.takeallfrom(F)
-			F.parent.remove
+			F.parent!.remove
 
 	
 	function LinkerSub (CollectFunc) // linkagesub

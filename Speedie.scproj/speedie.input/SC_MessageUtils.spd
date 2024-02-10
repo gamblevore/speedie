@@ -9,12 +9,12 @@ function Message.FindAndRemove (|String| name,  |bool| NothingOK,  |bool| IsClas
 
 
 
-function Message.DeprecatedClassOption (|String| name,  |string| Kind=nil,  |int|)
+function Message.DeprecatedClassOption (|String| name,  |string| Kind="!",  |int|)
 	// this is a wasteful way to do stuff.
 	// better to find them as we go through the code... not search for each at the start.
 	|| place = .find( @Tmp, name )		#require
 	|| num = 1
-	if Kind != nil
+	if Kind != "!"
 		|| ch = place.first
 		require ch and ch.expect(@thg) and ch ~= Kind
 		|| num_msg = ch.next 

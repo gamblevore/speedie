@@ -351,11 +351,11 @@ function message.Tran_With
 function message.WithDeclTransform (|message| decl, |message| rel, |message| arg)
 	require rel.expect(@rel)
 	|| name = rel[@thg]
-	using arg
-	|| IF = @tmp + "if"
-	decl.next = if
-	if <~ (@thg, name.name)
-	if <~ arg
+		using arg
+		|| IF = @tmp + "if"
+		decl.next = if
+		if <~ (@thg, name.name)
+		if <~ arg
 
 
 function message.BunchFixSub (|message| subject, |message| stuff)
@@ -414,7 +414,7 @@ function Message.BunchlessFix
 	// multi_opp	is the opp (=)
 	.become(c)
 	using (self)
-	multi_opp.BunchFixSub(subject, self)
+	multi_opp.BunchFixSub(subject!, self)
 
 
 function Message.TernaryFix (|message| exp) {

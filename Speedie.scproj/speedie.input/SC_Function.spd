@@ -385,19 +385,20 @@ function message.FailOrCopy (|message| p, |message|)
 function message.AssignsFix (|scfunction| f)
 	|| RP   = .NiceParent
 	debug_Require (RP == @Rel)
-	|| RightSide = rp.Last // in case of syntax_cast
+	|| RightSide = rp.Last! // in case of syntax_cast
 	debug_Require (RightSide.obj)
-	|| List = .last
-	|| Upon = .first
+	|| List = .last!
+	|| Upon = .first!
 	List <~ RightSide
 	// a.b(c) = c
 
 	list.func = @prm
 	
 	// what if... its a datatype? vec.width = 1 --> vec = vec.width(1)
-	|| L = rp.last
+	|| L = rp.last!
 	L.remove
-	if f.returntype and f.cls and f.Cls.isdatatype 
+	|| c = f.cls
+	if f.returntype and c and c.isdatatype 
 		using (self)
 		rp.first = L // put it back
 		rp.first = upon.FailOrCopy(rp)
@@ -887,6 +888,7 @@ function scclass.RealClass (|scclass|)
 
 
 function CountCallsToParentAlloc (|Message| root, |message|)
+	opt norefcounts
 	|| FoundCount = 0
 	for (curr in root)
 		|| f = curr.IsParentConCall

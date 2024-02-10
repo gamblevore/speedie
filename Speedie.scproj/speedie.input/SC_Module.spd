@@ -154,18 +154,22 @@ module
 		error (errplace, "This should go into a module or class.")
 	
 		
+	function scmodule.LoadModuleForCls (|message| node, |scclass| cls)
+		.Project = SCImport.curr
+		
+		.parent = nil	// So Array.Byte, File.Byte, XXX.Byte... won't be found.
+		.Cls = cls
+		.name = cls.Name
+		
+		if node
+			MoveFutureStaticsIn(node) // fix this? Current this makes impossible to extend a static section...
+			.LoadModule( node )
+	
+	
 	function NeuModule (CollectFunc)
 		|| m = SCModule.new
-		m.Project = scimport.curr // hack?
-		
-		if (name_space isa SCClass)
-			m.parent = nil	// So Array.Byte, File.Byte, XXX.Byte... won't be found.
-							// It's just for the looking up of functions ON the module... not in the module's code.
-			m.Cls = name_space
-			m.name = name_space.Name
-		  else
-			m.parent = name_space.ProjectFix
-		
+		m.Project = scimport.curr
+		m.parent = name_space.ProjectFix
 		if node
 			m.LoadModule( node )
 		Return m

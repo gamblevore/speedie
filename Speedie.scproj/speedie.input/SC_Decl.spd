@@ -839,7 +839,7 @@ class SCDecl (SCObject) {
 
 	function MakeExistance (|nilstate| type, |scdecl| Default=nil, |scdecl|)
 		opt norefcounts
-		if !self or .nildeclared == type
+		if .nildeclared == type
 			Return self
 		
 		if (Default and self == .type.typenormal)

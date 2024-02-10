@@ -191,6 +191,7 @@ function DetectStillChecks (|message| first, |nilstate|)
 
 function Return (NilTrackerFn)
 	opt norefcounts
+	if scfunction.currfunc ~= "CountCallsToParentAlloc" // 
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
@@ -269,7 +270,7 @@ function If (NilTrackerFn)
 function Tern (Niltrackerfn)
 	opt norefcounts
 	|| Orig = T.BranchEnter(msg)			#require
-	|| tC = msg.first,  || tA = tC.next,  || tB = tA.next
+	|| tC = msg.first!,  || tA = tC.next!,  || tB = tA.next!
 
 	#!"First Branch"
 	.jump(tC, NilCheckMode.positive)
@@ -280,15 +281,15 @@ function Tern (Niltrackerfn)
 	.jump(tC, nilcheckmode.negative)
 	rz |= .Jump(tB, test)
 	t.BranchExit(First)
-	rz &= ~nilstate.fnbecomesnilch	// in theory if BOTH were nil-testers... its OK
+	rz &= ~nilstate.FnBecomesNilCh	// in theory if BOTH were nil-testers... its OK
 									// but thats sooo awkward to even think of a real-case
 									// where I want this! Just don't do it!
 
 
 function BooleanLogic (niltrackerfn)
 	opt norefcounts
-	|| AA = msg.first
-	|| BB = msg.last
+	|| AA = msg.first!
+	|| BB = msg.last!
 	|| IsAnd = test is AND
 	(test is AND) = false 
 	if IsAnd == (test is positive)
@@ -387,6 +388,7 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 function Argument (Niltrackerfn)
 	opt norefcounts
 	|| v = .value.depthofvars + 1
+	if v > 31 // hmm?
 	for s.fast in msg
 		s.DebugPrint
 		|| t = test&-s.islast

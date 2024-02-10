@@ -714,7 +714,6 @@ class Message (RingTree)
 
 
 	function Nyme (|string|)
-		// this function won't be necessary in the future!
 		if self
 			return .Name 
 
@@ -729,7 +728,7 @@ class Message (RingTree)
 
 	function Find (|Syntax| s, |Message|)
 		cpp_part FindSyx
-		nil self // why is this necessary? nil-checker should realise the loop tests for self?
+		nil self // remove once we improve the nil-checker to "link" variables
 		Opt NoRefCounts
 		for ch in self
 			if ch == s
@@ -1116,8 +1115,7 @@ class Message (RingTree)
 
 
 	function Yes (|bool|)
-		if self
-			return .name.yes
+		return .nyme.yes
 			
 
 	function After (|int|)

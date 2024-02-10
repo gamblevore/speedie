@@ -12,7 +12,7 @@ constants
 
 
 
-prototype ExprResolver (|Message| Exp, |SCBase| name_space, |Message| side=nil, |SCObject|)
+prototype ExprResolver (|Message| Exp, |SCBase| name_space, |Message?| side=nil, |SCObject?|)
 
 dispatch ExprFuncs (ExprResolver)  {
 /* @decl is BAD!   dont add it*/
@@ -562,7 +562,7 @@ function TypeOfExprModulesOK (|Message| Exp, |SCBase| name_space, |Message| side
 function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message| side = nil, |scobject|)
 	opt norefcounts
 	if exp == @Decl
-		|| d = exp.last.obj
+		|| d = exp.last!.obj
 		if d isa SCDecl
 			Return d
 

@@ -357,3 +357,11 @@ function faststring.FileDiff (|string| name, |string| Title)
 	self <~ name
 	self <~ "\n"
 
+
+function file.AppDate (|date|)
+	if self
+		ifn self isa "app"
+			return .anydate
+		|| n = "/Contents/MacOS/" + .TrimExtAndPath
+		|| c = .child(n, true)
+			return c.anydate

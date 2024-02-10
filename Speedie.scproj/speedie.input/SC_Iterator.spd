@@ -82,7 +82,7 @@ class SCIterator (SCObject)
 	
 	
 	function RenameSelf (|Message| Name)
-		.selfs.Rename( Name )
+		.selfs!.Rename( Name )
 
 
 	function Check (|SCClass| cls)

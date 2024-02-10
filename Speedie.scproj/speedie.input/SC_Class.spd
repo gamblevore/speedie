@@ -64,15 +64,16 @@ linkage
 |bool|						IsNotNumeric
 
 
-constructor (|Message| node, |SCBase| parent, |bool| HasPtrs)
+constructor (|Message| node, |SCBase| parent, |bool| HasPtrs, |scmodule| m)
 	Compiler.stClasses++
 	
 	node.obj = self			// for autocomplete :)
 	.name = LoadClassName(node)
 	.Source = node
+	.Modul = m
 	.project = parent.project
 	.IsVisible = scbase.CurrVisibility
-	.saveas = nil
+	.saveas = ""
 	.TypeInfo = DataTypeCode.UnusedType
 	.Banned = .TestBanned
 	
@@ -726,24 +727,23 @@ function BannedCheck (|message| src)
 function Reach (|scbase| from, |message| src=nil)
 	opt norefcounts
 	flow off
-	require !.currreacher
-	if !from
+	require !.CurrReacher
 	.CurrReacher = from
 	Compiler.stReachedClass++
 	
 	if Options.BannedClasses
 		.BannedCheck(src)
-	if .super
-		.super.Reach(self)
-	if .behaviour
-		.behaviour.FuncTable.cls.reach(self)
+	|| s = .super
+		s.Reach(self)
+	|| b = .Behaviour
+		b.FuncTable!.cls!.reach(self)
 	
-	if .DestructorFunc
-		.DestructorFunc.findReached(self)
+	|| df = .DestructorFunc
+		df.findReached(self)
 	
 	for d in .Properties
-		d.TypeReach(self, d.source)
-		d.contains.TypeReach(self, d.source)
+		d.TypeReach(self, d.source!)
+		d.contains!.TypeReach(self, d.source!)
 
 
 function ReachBehaviours
@@ -837,7 +837,7 @@ module
 		|| Arg = .LinkagePlace 				#require
 		if arg.DeprecatedClassOption("wrapper", "union") // for SDL2
 			.iswrapper = 2
-		  elseif arg.DeprecatedClassOption("wrapper", nil)
+		  elseif arg.DeprecatedClassOption("wrapper")
 			.iswrapper = 1
 		.NoAutoComplete = arg.DeprecatedClassOption("noauto")
 		  
@@ -852,8 +852,7 @@ module
 			expect (parent==compiler.program) (errplace, errorreceiver.NonFatal)
 		
 		|| arg = node.GiveArg
-		|| cls = SCClass.new( node, parent, hasptrs )
-		
+		|| cls = SCClass.new( node, parent, hasptrs, SCModule.new )
 		cls.IsRole = (node ~= "role")
 
 		|| SA = cls.SourceArg
@@ -861,10 +860,7 @@ module
 		Compiler.ClassList <~ cls
 
 		|| Module = arg.find( @tmp, "module" )
-		MoveFutureStaticsIn(Module)				// bad work around
-												// makes impossible to extend a static section...
-
-		cls.Modul = SCModule.NeuModule( Module, cls, ErrPlace )|SCModule|
+		cls.modul.loadModuleForCls( Module, cls )
 
 		if (ForInterface and parent isa scmodule)
 			cls.CppClass = "__${parent.cls.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"

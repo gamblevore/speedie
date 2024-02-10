@@ -714,12 +714,12 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
 
 function Tran_FuncTable (|Message| msg, |bool|)
 	|| nameMsg		= msg[@thg]$
-	|| protoMsg		= namemsg.next
+	|| protoMsg		= namemsg.next$
     expect (protomsg == @bra or @prm or @list) (protomsg)
 	|| items		= protoMsg.Next(@arg)$
-	|| ProtoFirst	= protomsg.first
+	|| ProtoFirst	= protomsg.first!
 	|| name			= namemsg.name
-	|| protoName	= protofirst.name
+	|| protoName	= ProtoFirst.name
 	if (protofirst != @thg)								// seems to work???
 		protomsg.replacewith( «thg protoname » )
 		protoname = "Fn_" + name
@@ -738,13 +738,13 @@ function Tran_FuncTable (|Message| msg, |bool|)
 	msg <~ neweqrel( «thg name », items )
 	
 	for I in items
-		|| item_value	= I.Last
-		|| item_name	= I.First
+		|| item_value	= I.Last!
+		|| item_name	= I.First!
 		|| table_name	= item_name // load (a,b,c): arg
 		|| sigh			= item_name // lol... needed
 
 		|| ListOK = (item_name == @prm) and (i == @item) 
-			i.become(@tmp, item_name.first.name) // too awkward otherwise
+			i.become(@tmp, item_name.first.nyme) // too awkward otherwise
 
 		if (i == @tmp)
 			// tmp (asdasdasdas)

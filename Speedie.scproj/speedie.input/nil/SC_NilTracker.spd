@@ -173,7 +173,8 @@ struct ArchonPurger
 
 	function Value (|nilrecord|)
 		pragma inline
-		return *.Neel
+		rz = *.Neel
+		if rz.depthofvars > 24
 	
 	
 	function Self (|nilstate|)
@@ -208,7 +209,8 @@ struct ArchonPurger
 
 		function Value (|NilRecord|)
 			pragma inline
-			return *T.neel
+			rz = *T.neel
+			if rz.depthofvars > 24
 
 
 		function EndBlock (|nilrecord|)

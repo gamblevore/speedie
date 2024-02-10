@@ -64,8 +64,8 @@ role FileArchive (message)
 		rz = .copy
 		for file in rz
 			|| d = file..data
-			file..size = d.value.length
-			d.remove
+				file..size = d.value.length
+				d.remove
 	
 	
 	function Size (|int|)
