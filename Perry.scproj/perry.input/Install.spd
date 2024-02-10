@@ -363,5 +363,5 @@ function file.AppDate (|date|)
 		ifn self isa "app"
 			return .anydate
 		|| n = "/Contents/MacOS/" + .TrimExtAndPath
-		|| c = .child(n, true)
+		|| c = .childexisting(n)
 			return c.anydate

@@ -155,7 +155,7 @@ function message.ConstIntValueSub (|scbase| name_space, |&int64| v, |bool|)
 	opt norefcounts
 	|| s = self
 	while s == @bra
-		s = s.first
+		s = s.first!
 	if s == @num
 		*v = s.int
 		return true

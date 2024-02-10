@@ -168,13 +168,15 @@ class File (String)
 		cpp_wrapper
 
 
-	function Child (|string| name, |bool| errs=false, |File|)
-		if name
-			|| f = File( .PathDir + Name.trimstart("/", true) )
-			if (!errs or f.exists)
-				return f
-			error (Self, "Can't find file/folder: '$name' in '${super}'." )
+	function Child (|string| name, |File|)
+		|| name2 = Name.trimstart("/", true)
+			return File( .PathDir + name )
 		error (Self, "No name specified for sub-file of directory: " + self)
+	
+	function ChildExisting (|string| name, |File|)
+		rz = .child(name)
+		if rz
+			expect (rz.exists) (Self, "Can't find file/folder: " + rz)
 	
 	
 	function Parent (|File|)
@@ -257,8 +259,8 @@ class File (String)
 	function Exists (|bool|TestLinkExists=false, |bool|)
 		cpp_wrapper JB_File_Exists
 	
-	syntax access (|string| name, |bool| Errs=false, |File|)
-		return .Child(name, errs)
+	syntax access (|string| name, |File|)
+		return .Child(name)
 
 	function ListStart (|bool|)
 		cpp_wrapper
@@ -432,7 +434,7 @@ class File (String)
 	iterator Files
 		.ListStart
 		while ( .MoveNext )
-			yield self.child(.CurrChild)
+			yield self.child(.CurrChild)!
 		.listend
 	
 

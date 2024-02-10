@@ -73,17 +73,18 @@ helper message.PoorAnt (|message|)
 		return .parent
 
 
-helper CompareError (|Message|expected, |Message| found, |bool|)
+helper CompareError (|Message?| expected, |Message?| found, |bool|)
 // I want to see it printed, for my use. Must think about my needs first!
 	
-	"Expected ${expected.locate} but found ${found.locate}"
-	"parent of expected is ${expected.PoorAnt.locate}"
+	|| fs = FastString()
+	fs <~ "Expected ${expected.locate} but found ${found.locate}\n"
+	fs <~ "parent of expected is ${expected.PoorAnt.locate}\n"
 
 	if (found)
-		"parent of found is ${found.PoorAnt.locate}"
+		fs <~ "parent of found is ${found.PoorAnt.locate}\n"
 	  else
 		found = expected
-
+	printline fs
 	found.SyntaxExpect
 
 

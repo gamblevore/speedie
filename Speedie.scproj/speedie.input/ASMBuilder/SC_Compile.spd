@@ -161,10 +161,10 @@ struct ASMFuncState // why not just be a subclass of memory?
 	function DoRels (|message| L, |asmreg| dest, |asmreg|)
 		opt norefcounts
 
-		|| op = L.next
+		|| op = L.next!
 		|| OV = .OpenVars
 		|| mL = .µ2(L)			// µ2 stops mR breaking mL
-		|| mR = .µ(op.next)
+		|| mR = .µ(op.next!)
 		.CloseVars(OV)			// allow overwriting either!
 		require ml.reg ||| mr.reg
 		

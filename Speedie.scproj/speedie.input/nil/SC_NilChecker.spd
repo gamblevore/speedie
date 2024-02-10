@@ -237,7 +237,6 @@ function While (NilTrackerFn)
 		.jump(cond, NilCheckMode.whileneg)
 		.loops.exitrecord |= .value // merge this
 	
-	if scfunction.currfunc ~= "CountCallsToParentAlloc" // 
 	.loops.FinishLoop(msg)
 	ArchonPurger.loops = W
 

@@ -1675,10 +1675,10 @@ function DotFuncToNormalFunc (|Message| dot, |SCFunction| fn)
 
 
 function SCDecl.ProcessAs (|Message| msg, |SCDecl|)
-	|| P = msg.parent.unbra #require
+	|| P = msg.parent!.unbra #require
 	if (P isBrel "&")					 // :)
 		return self
-	|| T = .type.processas.typenormal
+	|| T = .type.processas!.typenormal
 	T.CreateSimpleTypeCast(msg)
 	|| L = msg.last
 		L.obj = self					 // fix bug?

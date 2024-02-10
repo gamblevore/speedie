@@ -621,19 +621,19 @@ class Message (RingTree)
 			.jdb2_(flags, fs)
 	
 	
-	function ParseAST (|message|)
+	function ParseAST (|message?|)
 		if self == @arg
-			|| f = .first
+			|| f = .first$
 			f.ExpectLast
 			return f.ParseAST
 		|| fn = Syntax.Func(.name, self)		#require
 		|| name = .first
-		|| isStr = name==@str
-		rz = Message(fn, (name.name, "")(isstr))
-		|| arg = (name.next, name)(isstr)
-		if arg == @arg
-			for ch in arg
-				rz <~ ch.ParseAST
+			|| isStr = name==@str
+			rz = Message(fn, (name.name, "")(isstr))
+			|| arg = (name.next, name)(isstr)
+			if arg == @arg
+				for ch in arg
+					rz <~ ch.ParseAST
 	
 	
 	function UnEmbedStr
@@ -754,7 +754,7 @@ class Message (RingTree)
 				return ch
 	
 
-	function FindNested (|Syntax| fn, |string| name = nil, |bool| Err=false, |Message|)
+	function FindNested (|Syntax| fn, |string?| name = nil, |bool| Err=false, |Message|)
 		Opt NoRefCounts
 		
 		for curr.flat in self
