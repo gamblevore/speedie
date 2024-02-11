@@ -88,7 +88,7 @@ class Message (RingTree)
 	
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
-//		require self
+		require self
 		|| L = (pos_msg.memorylayer, .MemoryLayer)(pos_msg)
 				
 		rz = message.NewWithLayer(L, self)				// looks better
@@ -933,6 +933,11 @@ class Message (RingTree)
 				return tmp  
 		return l.msg(@tmp, key)
 
+	
+	function BecomeEmpty (|syntax| fn, |string| name="")
+		.func = fn
+		.name = name
+		.clear
 	
 	function Become (|syntax| fn, |string| name="")
 		cpp_part BecomeStr
