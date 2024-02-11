@@ -113,7 +113,13 @@ function PerryIDE.StartDebugging (|file| f)
 
 	.DebugArgsList.UpdateDebugArgs
 	|| debugargs = .DebugArgsFile.parse				#require
-	|| ArgMsg = DebugArgs["args"]
+	|| ArgMsg = DebugArgs["args"].Copy
+	for a in ArgMsg
+		if a == @arel
+			expect (a == "?") (a)
+			|| str = a.first.nyme.Ask				#require
+			a.Becomeempty(@str, str)
+				
 	|| args = argmsg.AllNames
 	if debugargs["flags"]["open"].yes
 		check (!args) (ArgMsg, "You can't pass arguments, when using open-flags")
