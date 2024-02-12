@@ -29,7 +29,7 @@ class SpdProcess (Process)
 
 			
 	destructor
-		.pico.destroy("destructor")
+		pico.destroy(.pico, "destructor")
 			
 	function CommsOpen (|bool|)
 		return self and .pico.status == 0
@@ -179,7 +179,7 @@ class SpdProcess (Process)
 
 
 	iterator
-		while .pico.CanRead
+		while .pico.Canget
 			yield .get(1000)
 
 

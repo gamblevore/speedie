@@ -681,7 +681,6 @@ struct PicoComms {
 	}
 	
 	void io () {
-//		Say("IO");
 		if (!Socket) return;
 		InUse++;
 		do_reading();
