@@ -34,14 +34,11 @@ struct Pico
 	function CreateChild (|&pico|)
 		cpp_wrapper PicoChild
 
-	function Destroy (|Cstring| Why)
-		cpp_wrapper PicoDestroy
-
 	function IsParent (|bool|)
 		cpp_wrapper PicoIsParent
 		
-	function CanRead (|bool|)
-		cpp_wrapper PicoCanRead
+	function CanGet (|bool|)
+		cpp_wrapper PicoCanGet
 		
 	helper StartFork (|bool| Exec=false, |PID_Int|)
 		cpp_wrapper PicoStartFork
@@ -97,6 +94,10 @@ struct Pico
 		
 		function Start (|int| DieWithParent=0)
 			cpp_wrapper PicoStart
+
+		function Destroy (|&&pico| Where, |Cstring| Why)
+			cpp_wrapper PicoDestroy
+
 			
 		function HasParentSocket (|bool|)
 			cpp_wrapper PicoHasParentSocket
