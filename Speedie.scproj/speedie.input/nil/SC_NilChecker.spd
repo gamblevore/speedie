@@ -311,23 +311,28 @@ function BooleanLogic (niltrackerfn)
 
 
 
-function SuperSmartMagicCompare (|message| ll, |message| rr, |nilcheckmode| test, |nilstate|)
+function SuperSmartMagicCompare (|message| ll, |message| rr, |nilcheckmode| test, |scoperator| scop,   |nilstate|)
 	opt norefcounts
 	|| todo = 3
-	if test is positive  and  ll.func == @thg and rr.func == @thg
-	//	if real == x
-	//		x becomes real
-		|| ld = ll.FastDecl!
-		|| rd = rr.FastDecl!
-		|| ldl = ld is local
-		|| rdl = rd is Local
-		if ldl or rdl
-			if rdl and ld.NilCurr == NilState.Realish
-				T.SetNilness(rd, NilState.real)
-				todo &= ~2
-			if ldl and rd.NilCurr == NilState.Realish
-				T.SetNilness(ld, NilState.real)
-				todo &= ~1
+	if  ll.func == @thg and rr.func == @thg and test is Active
+		if scop.IsEquals and (test is positive) == scop.IsExactlyEquals
+		//	if real == x
+		//		x becomes real
+		// if real != x
+		//     0
+		//   else
+		// 		x becomes real
+			|| ld = ll.obj|scdecl|!
+			|| rd = rr.obj|scdecl|!
+			|| ldl = ld is local
+			|| rdl = rd is Local
+			if ldl or rdl
+				if rdl and ld.NilCurr == NilState.Realish
+					T.SetNilness(rd, NilState.real)
+					todo &= ~2
+				if ldl and rd.NilCurr == NilState.Realish
+					T.SetNilness(ld, NilState.real)
+					todo &= ~1
 	
 	if todo & 1
 		.jump(ll, NilCheckMode.soft)
@@ -342,7 +347,7 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 	|| LNil = ll.IsNowNil
 	|| RNil = rr.IsNowNil
 	if !lnil and !rnil			// if (a > b)
-		return SuperSmartMagicCompare(ll, rr, test)
+		return SuperSmartMagicCompare(ll, rr, test, scop)
 	
 	if (lnil and rnil)
 		return ll.Redundant(ll.FastDecl, test)

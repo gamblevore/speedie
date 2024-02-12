@@ -480,12 +480,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 	rz = SCDecl(TypeVoidPtr!)
 	|| ErrCount = stderr.errorCount
 
-	if (f == @item)
-		|| R = ExtractDecl( c.first, name_space, purpose )				#require
-		expect R.isnumeric and (c.last == @num) (c, "Must be numeric")
-		rz.TypeContained = R.Type		// use CopyTypeInfoTo? what does this do even?
-		
-	  elseif (f == @Arr)
+	if (f == @Arr)
 		|| ch = c.first
 		if !ch										// |[]|
 			Return TypeArray.TypeNormal
@@ -493,7 +488,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 		expect (ch != @Item) (c)
 		|| dcl = ExtractDecl( ch, name_space, purpose )
 			rz.Contains = dcl.MakeContainedOptional
-			rz.TypeContained = TypeArray
+			rz.Type = TypeArray
 		
 	  elseif (f == @Adj)
 		deprecate (c, "Use 'of' instead.")

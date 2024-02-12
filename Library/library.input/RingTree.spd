@@ -26,6 +26,7 @@ class RingTree (Saveable)
 	
 	function Parent (||)				{ cpp_wrapper JB_Ring_Parent, nil checker }
 	function Parent (assigns:|...?|)
+		nil self // for .remove
 		cpp_wrapper JB_Ring_ParentSet // allows set parent to nil, also self can be nil if parent is nil 
 		cpp_refs {disturbs self} 
 	

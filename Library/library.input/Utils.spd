@@ -76,7 +76,7 @@ function Message.FindNotInserted (|message|)
 	opt norefcounts
 	nil self
 	for c.up in self
-		if c isnt inserted or c is NicelyPositioned
+		if c.position > -1// or c is NicelyPositioned
 			return c
 	return self
 

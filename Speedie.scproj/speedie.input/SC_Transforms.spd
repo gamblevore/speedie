@@ -738,8 +738,8 @@ function Tran_FuncTable (|Message| msg, |bool|)
 	msg <~ neweqrel( «thg name », items )
 	
 	for I in items
-		|| item_value	= I.Last!
-		|| item_name	= I.First!
+		|| item_value	= I.Last
+		|| item_name	= I.First
 		|| table_name	= item_name // load (a,b,c): arg
 		|| sigh			= item_name // lol... needed
 

@@ -88,7 +88,7 @@ class Message (RingTree)
 	
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
-		require self
+//		require self
 		|| L = (pos_msg.memorylayer, .MemoryLayer)(pos_msg)
 				
 		rz = message.NewWithLayer(L, self)				// looks better

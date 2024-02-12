@@ -173,8 +173,11 @@ struct ArchonPurger
 
 	function Value (|nilrecord|)
 		pragma inline
+		opt norefcounts
 		rz = *.Neel
-		if rz.depthofvars > 24
+		|| d = rz.depthofvars
+			target debug
+				if (d > 24) or !.dbg[d]
 	
 	
 	function Self (|nilstate|)
@@ -182,6 +185,7 @@ struct ArchonPurger
 
 
 	function SetAllNil (|NilRecord| Dest, |string| reason)
+		|| DDDD = Dest
 		dest &= .Realnesses
 		
 		target debug {
@@ -191,7 +195,10 @@ struct ArchonPurger
 			pragma inline
 		}
 
+		.value
 		*.neel = dest // setset
+		if Dest & (3|uint64| << 62|uint64|)
+		.value
 		
 		target debug {
 			for i in 32
@@ -209,8 +216,7 @@ struct ArchonPurger
 
 		function Value (|NilRecord|)
 			pragma inline
-			rz = *T.neel
-			if rz.depthofvars > 24
+			return t.value
 
 
 		function EndBlock (|nilrecord|)

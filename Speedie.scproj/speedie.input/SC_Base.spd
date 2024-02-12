@@ -5,7 +5,7 @@
 
 
 
-prototype CollectFunc (|Message| node, |SCBase| name_space, |Message| ErrPlace, |SCBase|)
+prototype CollectFunc (|Message| node, |SCBase| name_space, |Message?| ErrPlace, |SCBase?|)
 
 
 

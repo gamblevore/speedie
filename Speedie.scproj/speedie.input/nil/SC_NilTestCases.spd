@@ -262,15 +262,15 @@ target debug {
 function @ArchonPurger.ndb4
 	cpp_name ndb4
 	visible
-	.value.ndb5()
+	(*t.Neel).ndb5()
 
 function NilRecord.ndb5 
 	cpp_name ndb5
 	visible
 	
-	|| n = .DepthOfVars + 1 // sigh
+	|| n = .DepthOfVars + 1
 	for i in n
-		// item 0 is always nil... so whatever
+		// item 0 is nil
 		|| D = ArchonPurger.T.dbg[i]
 			|| Name = D.name
 			|| V = self[i].RawName

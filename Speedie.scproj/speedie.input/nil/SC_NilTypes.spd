@@ -15,15 +15,17 @@ datatype NilRecord (Uint64)
 			return .log2|uint|>>1
 
 
-struct NilRecorder
+struct NilRecorder 
 	linkage:cpp_part NRC
 	|nilrecord| 	Value
-	syntax call (|int| item, assigns:|nilstate| value)
+	syntax call (|uint64| item, assigns:|uint64| value)
 		value &= nilstate.either
 		target debug: if !value or item < 0 or item > 31
 		item <<= 1
-		|| Mask = NilState.either << item
-		.value = (.value &~ Mask) ||| (value << item)
+		|| Mask = NilState.either|uint64| << item
+		|| Prev = .value
+		.value = (Prev &~ Mask) ||| (value << item)
+		if Prev & (3|uint64| << 62|uint64|)
 		target debug: archonpurger.ndb4
 
 

@@ -668,10 +668,10 @@ setter IsCppInBuilt (|int|)
 function DeclsProtoTypeAdd (|SCClass| fpType)
 	|| Dcl = SCDecl(TypeVoidPtr!)	// not sure why we need TypeVoidPtr :(
 	dcl.IsLookupOnly = self
-	dcl.TypeContained = fpType
+	dcl.Type = fpType
 	dcl.Name = .Name
-	(dcl is const) // right?
-	(dcl is onmodule) // not sure where this is found cos .cls is nil sometimes yet its still being found
+	(dcl is const)			// right?
+	(dcl is onmodule)		// not sure where this is found cos .cls is nil sometimes yet its still being found
 	.ProtoDecl = dcl
 	if (.Cls)
 		.parent!.TryAdd( .Source, Dcl, .Name )

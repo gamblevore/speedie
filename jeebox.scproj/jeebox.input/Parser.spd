@@ -906,7 +906,7 @@ ive been~running #since morning
 		if (!f)
 			return .ErrorAdd("Can’t use temporals like this.")
 		
-		rz = .ChainTemporalRels( f, cnj )				#require
+		rz = .ChainTemporalRels( f, cnj )
 		if rz.HasChildCount(2) and .Allow(kEndOfLine) // good
 			rz <~ .ProcessThing
 		
