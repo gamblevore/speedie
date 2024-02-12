@@ -180,7 +180,7 @@ function Message.TestFuncName (|bool|)
 function ParseName (|Message| node, |bool|)
 	opt norefcounts
 	|| fType = node.name
-	|| cname = node.first
+	|| cname = node.first	#require
 	cname.func = @thg
 	.Name = cname.name
 	
@@ -354,7 +354,7 @@ function Message.MacroFixCount (|int|)
 	opt norefcounts
 	|| Found = 0
 	for (s.flat in self)
-		if (s == @sthg) and (s.parent.IsContainer) // oop
+		if (s == @sthg) and (s.parent!.IsContainer) // oop
 			return -111111
 		|| Num = s.ParamNum
 		if (num >= 0)

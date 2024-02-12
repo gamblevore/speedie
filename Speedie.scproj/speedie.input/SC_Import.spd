@@ -289,7 +289,7 @@ class SCImport
 			Compiler.stage( "Copying Shaders" )
 			compiler.Timer( "Copying Shaders" )
 			
-			|| P = compiler.BuildFolder["Resources/Shaders"]		#expect
+			|| P = compiler.BuildFolder!["Resources/Shaders"]		#expect
 			P.MakeAndGoInto
 			
 			for (f in shaders) (sh_name)

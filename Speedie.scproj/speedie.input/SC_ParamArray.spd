@@ -28,7 +28,7 @@ class SCParamArray
 		.Exp = exp
 		.side = side
 		.IsDot = (exp == @dot)
-		.IsAddress = (exp != nil) and (exp.niceparent Isbrel "&")
+		.IsAddress = (exp.niceparent Isbrel "&")
 		.ErrCount = stderr.errorcount
 
 

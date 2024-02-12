@@ -308,10 +308,10 @@ function TypeOfUnit (ExprResolver)
 		using (exp)
 		exp.become(@type)
 		exp <~ (@thg, "l")
-		return typeint64.TypeNormal
+		return typeint64!.TypeNormal
 
 	|f64| Mul = 0.0
-	|| Type = TypeInt.typenormal
+	|| Type = TypeInt!.typenormal
 	|| unit = exp.name
 	if unit == "KB" or "K"
 		Mul = 1<<10
@@ -324,17 +324,17 @@ function TypeOfUnit (ExprResolver)
 	  elseif unit == "th"
 		Mul = 0
 	  else
-		type = typedate.typenormal
+		type = typedate!.typenormal
 		if unit == "s"
 			mul = 64KB
 		  elseif unit == "ms"
 			mul = 64
 		  elseif unit == "π"
 			mul = π
-			type = typef64.typenormal
+			type = typef64!.typenormal
 		  elseif unit == "τ"
 			mul = τ
-			type = typef64.typenormal
+			type = typef64!.typenormal
 		  elseif exp.unitmatch("days", "day")
 			mul = 86400.0 * 64KB
 		  elseif exp.unitmatch("weeks", "week")
@@ -353,14 +353,14 @@ function TypeOfUnit (ExprResolver)
 		|| val = it.float
 		if !mul
 			str = (1.0 / val).render
-			Type = Typefloat.typenormal
+			Type = Typefloat!.typenormal
 		  else
 			val *= mul
 			if type.typeinfo.isint
 				str = val|int64|.render
 				|f64| big = 1|int64| << 31|int64|
 				if val >= big  or val < -big
-					type = TypeInt64.TypeNormal
+					type = TypeInt64!.TypeNormal
 			  else
 				str = val.render
 		exp.become(@num, str)
@@ -379,14 +379,14 @@ function String.IsBinaryConstant (|bool|)
 function TypeOfNum (ExprResolver)
 	if (exp.name contains ".")
 		exp.float
-		Return typefloat.TypeNormal
+		Return typefloat!.TypeNormal
 
 	|| Val = exp.int
 	exp.become Val
 
 	if ((Val << 32) >> 32) != Val
-		return typeint64.typenormal
-	return typeint.typenormal
+		return typeint64!.typenormal
+	return typeint!.typenormal
 
 
 function Message.CollectionPlace (|Message|)
@@ -554,7 +554,7 @@ function TypeOfExprModulesOK (|Message| Exp, |SCBase| name_space, |Message| side
 	return TypeOfExprSub(exp, name_space, side)
 
 
-function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message| side = nil, |scobject|)
+function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message?| side = nil, |scobject|)
 	opt norefcounts
 	if exp == @Decl
 		|| d = exp.last!.obj
@@ -572,9 +572,9 @@ function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message| side = nil
 
 
 
-function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCDecl|)
+function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message?| side = nil, |SCDecl|)
 	opt norefcounts
-	if exp
+	if exp // remove this check??? once the nil checker is done
 		|| obj = exp.obj|scobject| ?? TypeOfExprSub(Exp, name_Space, side)
 		if obj isa SCDecl
 			return obj
@@ -1670,7 +1670,7 @@ function DotFuncToNormalFunc (|Message| dot, |SCFunction| fn)
 
 
 function SCDecl.ProcessAs (|Message| msg, |SCDecl|)
-	|| P = msg.parent!.unbra #require
+	|| P = msg.parent.unbra
 	if (P isBrel "&")					 // :)
 		return self
 	|| T = .type.processas!.typenormal

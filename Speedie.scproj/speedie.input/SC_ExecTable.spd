@@ -19,7 +19,8 @@ module ExecTable
 	
 	function Run 
 		.AddAll(.funcs, true)
-		.funcfile.SmartData = .FuncStr
+		|| f = .FuncFile
+			f.SmartData = .FuncStr
 		
 	function scbase.Addtotable (|[scbase]| r)
 		r <~ self

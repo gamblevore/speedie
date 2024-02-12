@@ -735,7 +735,7 @@ function Tran_FuncTable (|Message| msg, |bool|)
 	msg.clear
 	msg.func = @decl
 	msg <~ «emb »
-	msg <~ neweqrel( «thg name », items )
+	msg <~ NewEqRel( «thg name », items )
 	
 	for I in items
 		|| item_value	= I.Last
@@ -772,29 +772,28 @@ function Tran_FuncTable (|Message| msg, |bool|)
 
 		while item_value
 			if (item_value == @Thg or @dot or @bra)
-				ifn ARel
+				if !ARel
 					ARel = «brel "&"»
 				  else
 					arel = arel.copy
-				item_value = item_value.unbra.WrapWith( ARel )
+				item_value = item_value.unbra!.WrapWith( ARel )
 			  else
 				check (item_value != @emb) (item_value, "Use an argument instead.")
 				if (item_value != @arg)
 					item_value = item_value.wrapwith(@arg.msg)
 			
 				// create a function...
-				ifn newname
+				if !newname
 					NewName = name + "_" + item_name.CollectFuncTableName
 					msg.CollectionPlace <~ ArgToFunc( NewName, «Thg protoName », item_value )
 				I <~ «brel "&", «Thg NewName »»
 			
 			|| iname = i.name
-			if  i == @tmp
+			if  (i == @tmp) and table_name // why would this be nil?
 				i.first = «str table_name.name »
 				i.become(@item)
 			
-			table_name = table_name.next
-			if (sigh != @prm) or !table_name
+			if (sigh != @prm) or table_name.IsLast
 				exit
 			|| newi = «tmp iname »
 			i.prev = newi

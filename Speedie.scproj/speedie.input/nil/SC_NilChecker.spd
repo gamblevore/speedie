@@ -350,7 +350,7 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 		return SuperSmartMagicCompare(ll, rr, test, scop)
 	
 	if (lnil and rnil)
-		return ll.Redundant(ll.FastDecl, test)
+		return ll.Redundant(ll.FastDecl!, test)
 	expect (scop.IsNilTest) (ll.next, "Nil can't accept this operator. Use != or ==.")
 	
 	(test is reversed) = scop.IsExactlyEquals
@@ -361,10 +361,10 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 
 function ProcessCondRel (NilTrackerfn)
 	opt norefcounts
-	|| ll = msg.first
-	|| op = ll.next
-	|| rr = op.next
-	|| scop = op.obj|SCOperator|
+	|| ll = msg.first!
+	|| op = ll.next!
+	|| rr = op.next!
+	|| scop = op.obj!|SCOperator|
 
 	if scop.IsCompare
 		return .CompareObjs(ll, rr, test, scop)
@@ -375,7 +375,8 @@ function ProcessCondRel (NilTrackerfn)
 
 	|| L = .Jump(ll) & NilState.Either		// (ptr+1) or (1+ptr) still needs nilness check
 	|| R = .Jump(rr) & NilState.Either
-	if !msg.fastdecl.TypeSuffers			// (ptr-ptr) is actually a number... so thats OK.
+	|| D = msg.FastDecl!
+	if !D.TypeSuffers			// (ptr-ptr) is actually a number... so thats OK.
 		return nilstate.real
 	if NilState.Nilish == l or r
 		return nilstate.nilish
@@ -493,10 +494,9 @@ function Declaration (niltrackerfn) // function decl
 	opt norefcounts
 	|| rel = msg.last
 	if rel != @thg
-		|| d = rel.first.FastDecl
-		if d isnt body // what?
+		|| d = rel.first!.FastDecl!
 		if d.IsReg
-			|| J = .Jump(rel.last)
+			|| J = .Jump(rel.last!)
 			return T.Declare(D, J)
 
 

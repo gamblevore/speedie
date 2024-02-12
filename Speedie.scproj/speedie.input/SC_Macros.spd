@@ -62,7 +62,7 @@ function macro.clean (|macro|)
 
 function message.TargetTest (|bool|) // target true, target false, 
 	.expect(@thg)
-	expect (self ~!= "mac")     (self, "Use OSX")
+	expect (self ~!= "mac" or "macos")     (self, "Use OSX")
 	expect (self ~!= "linux")   (self, "Use lin")
 	expect (self ~!= "windows") (self, "Use win")
 	expect (self ~!= "import") (self, "Use imported")

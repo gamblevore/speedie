@@ -508,7 +508,7 @@ class File (String)
 			return "~/Documents/".file			// .file calls pathfix already
 
 		function PrefsFolder (|file|)
-			if platform.osx
+			target osx
 				return "~/Library/Preferences".file
 
 		function Logs (|file|)

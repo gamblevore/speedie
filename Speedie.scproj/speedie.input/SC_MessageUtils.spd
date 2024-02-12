@@ -161,16 +161,16 @@ function Message.WithinLoop (|Message| stop, |bool|)
 
 function Message.UnBra (|Message|)
 	opt norefcounts
-	rz = self
+	rz = self$
 	While rz == @bra and rz.first != @arg
-		rz = rz.first
+		rz = rz.first!
 
 
 function Message.UnBraType (|Message|)
 	opt norefcounts
 	rz = self
 	While (rz == @type) or (rz == @bra and rz.first != @arg)
-		rz = rz.first
+		rz = rz.first!
 
 
 function Message.UpToType (|Message|) // updecl, finddecl
@@ -216,10 +216,11 @@ function Message.ReplaceWithChild (||)
 
 
 function Message.SafeRemove (|syntax| T=@sheb)
-	.become(T)
-	is inserted // stop issues with autocomplete :)
-	for (c in self)
-		c.remove
+	if self
+		.become(T)
+		is inserted // stop issues with autocomplete :)
+		for (c in self)
+			c.remove
 
 
 function Message.SafeReplaceWith (|message| Incoming)

@@ -386,7 +386,7 @@ function Destructable (|Message| Blocker, |Message| arg, |Message| name)
 	|| type = TypeOfExpr(name, nil, nil)
 	require (type isa SCDecl)
 	
-	|| fn		= type.type.destructorfunc
+	|| fn		= type.type.destructorfunc!
 	|| FnMsg	= RefMsg0(fn.exportname, fn)
 	|| brel = fnmsg.last.msg(@brel, "&")
 	|| NewThg = brel.msg(@thg, name.name)

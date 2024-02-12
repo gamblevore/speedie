@@ -633,7 +633,7 @@ function GeneratedCppsFolder (|File|)
 		return .TempFolder
 	if  Options.SelfReplacement
 		return .BuildFolder
-	return .BaseProjectPath["Cpp"]
+	return .BaseProjectPath!["Cpp"]
 
 
 

@@ -339,7 +339,7 @@ function AppendCppField (|string|prop, |FastStringCpp| fs)
 	fs <~ ';'
 
 
-function ExportProperties (|SCClass| cls, |FastStringCpp|fs, |string| Ignore=nil)
+function ExportProperties (|SCClass| cls, |FastStringCpp|fs, |string?| Ignore=nil)
 	for prop in cls.Properties
 		if prop.name != Ignore
 			.AppendPropField(prop, fs)

@@ -443,10 +443,10 @@ class SCDecl (SCObject) {
 		return true
 
 
-	function MakeContainedObject (|message| errplace)
+	function MakeContainedObject (|message| ErrPlace)
 		opt norefcounts
-		if (.contains)
-			.contains = .contains.MakeAsObject(self, errplace)
+		|| c = .Contains
+			.contains = c.MakeAsObject(self, ErrPlace)
 
 	
 	function NewWrapper (|scdecl| CastTo, |scdecl|)
@@ -454,9 +454,9 @@ class SCDecl (SCObject) {
 		|| IsNormal = castto and castto.isnormal
 			|| it = .type.DataTypeWrapper
 				return it
-		|| dcl = scdecl(TypeWrapper!)
+		|| dcl = SCDecl(TypeWrapper!)
 		dcl.contains = castto
-		if isnormal
+		if IsNormal
 			.type.DataTypeWrapper = dcl
 		return dcl
 	
