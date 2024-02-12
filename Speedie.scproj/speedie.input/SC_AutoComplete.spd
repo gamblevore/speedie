@@ -1035,13 +1035,13 @@ function LocateDefinition (|message| msg, |scobject| already_defined, |bool| Dis
 			return fn.Source
 
 
-function LocateDefinitionSub (|message| msg, |scobject| already_defined, |scdecl| ty, |bool| DisplayOnly, |message|)
+function LocateDefinitionSub (|message!| msg, |scobject| already_defined, |scdecl| ty, |bool| DisplayOnly, |message|)
 	opt norefcounts
 	if already_defined
 		return already_defined.source
 	
 	if  msg == @thg  and  msg in @func
-		msg = msg.parent // :)
+		msg = msg.parent! // :)
 	|| fn = msg.msgfunc
 		|| it = fn.source
 			return it
@@ -1061,8 +1061,8 @@ function LocateDefinitionSub (|message| msg, |scobject| already_defined, |scdecl
 			return ty.WriteDeclFull("", 1)
 		if src == @decl and src.last == @rel
 			src = src.copy
-			|| L = src.last
-			L.replacewith(l.first)
+			|| L = src.last!
+			L.replacewith(l.first!)
 		return src
 	
 	if DisplayOnly
