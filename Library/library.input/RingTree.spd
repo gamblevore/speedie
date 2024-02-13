@@ -461,9 +461,9 @@ class RingTree (Saveable)
 	
 	function Upward (|int| n, ||)
 		opt norefcounts
-		rz = self
-		while rz and n-- >= 1
-			rz = rz.parent
+		while self and n-- >= 1
+			self = .parent
+		return self
 
 	iterator
 		|| ch_ = .First

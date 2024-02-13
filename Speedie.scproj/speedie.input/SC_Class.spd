@@ -93,10 +93,6 @@ constructor (|Message| node, |SCBase| parent, |bool| HasPtrs, |scmodule| m)
 	(T isnt altered)
 
 
-function SourceClass (|message|)
-	return super.source
-
-
 function NumericCount (|int|)
 	if self
 		return .TypeInfo.NumericCount
@@ -231,7 +227,7 @@ function LoadSuperClass
 	.Modul.parent = compiler.program 
 	
 	|| p = .Source								#require
-	|| supc = p[ 1 ]
+	|| supc = p.Second
 	|SCClass| S
 	if (supc != @bra)
 		if supc: expect (supc == @arg) (supc)
@@ -260,7 +256,7 @@ function LoadSuperClass
 		|| b = .behaviour
 		|| SB = S.behaviour
 		if (B and SB)
-			b.FuncTable.cls.super = SB.FuncTable.cls
+			b.FuncTable!.cls!.super = SB.FuncTable!.cls
 
 
 module {
@@ -315,10 +311,8 @@ function SCFunction.CopyParams (|message| list)
 	
 	for s in list
 		p <~ s.copy
-		subprms <~ s.DeclName.copy
-		
-	
-	
+		|| c = s.DeclName
+			subprms <~ c.copy
 
 
 function scfunction.Prms (|message|)
@@ -332,8 +326,8 @@ function CanHaveEmptyConstructor (|bool|)
 // 			class abc: constructor empty, constructor auto
 
 	opt norefcounts
-	for p in .properties
-		if p.typesuffers and p.isreal
+	for p in .Properties
+		if p.TypeSuffers and p.IsReal
 			require p.type.DefaultsToReal
 	return true
 
@@ -365,7 +359,7 @@ function CreateConstructors
 			.destructorfunc = .super.DestructorFunc
 			require con
 		
-		using .SourceClass
+		using .Source
 		if !con and !.IsWrapper		// some wrapper classes cant be newed.
 			con = .CreateEmptyConstructors
 		.ConstructorFunc = con
@@ -406,7 +400,7 @@ function FindFunc (|string| keyword, |bool| CheckParents, |bool|DoError, |SCFunc
 				Return o // prefer improved #expect
 			  else
 				if .IsObject
-					expect (!DoError) (b.sourceclass, "'$keyword' keyword only usable with functions.")
+					expect (!DoError) (b.source, "'$keyword' keyword only usable with functions.")
 		
 		require (CheckParents)
 
@@ -465,7 +459,7 @@ function ContainedTypeLoad
 		
 		if .IsNotNumeric == sup.IsNotNumeric
 			.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
-			.NeedsDefaultValue(sup.false, .false, "false")
+			.NeedsDefaultValue(sup.false,   .false,   "false")
 		.IgnoreContainedSelf |= sup.IgnoreContainedSelf // bad assumption. we shouldn't swap objects and datatypes
 	
 	.defawlt := «thg "nil"»
@@ -477,9 +471,10 @@ function ContainedTypeLoad
 	|| ContainedMsg = .Sourcearg.find(@Tmp, "contains")[@thg]			#require
 	|| cls = compiler[ ContainedMsg.name, ContainedMsg ]				#require
 	|| TN = Cls.TypeOptional
-	.Contained = TN.Copy
+	|| cont = TN.Copy
+	(cont Is UpgradeableContained)
+	.Contained = cont
 	.IgnoreContainedSelf |= tn.isdatatype
-	(.Contained Is UpgradeableContained)
 	.SelfDecl.Contains = TN // shouldn't we be setting this to .contained? but when I do... my GUI lib doesn't compile
 							// which is strange cos speedie itself compiles OK. and all the errors generated seem garbage.
 							// so we need to fix this. sighs... more work.
@@ -509,7 +504,7 @@ function OverrideSyntax
 		.Casts <~ f
 		if f.returntype.IsNormalBool
 			|| OK = !f.isdisabled
-				f.args.first.WantOptional
+				f.args.first.nildeclared = nilstate.Optional
 			f.IsNilChecker = 2*OK
 			.HasNilChecker = 2*OK
 	
@@ -591,7 +586,7 @@ function CreateEmptyFunc (|String| fname, |string| cpp_name="", |SCFunction|)
 	cpp_name := fname
 	|| e	= "function $fname { cpp_part $cpp_name }"
 	|| msg	= e.ParseClean
-	rz		= SCFunction.NewFunc( msg, self, .sourceclass )|SCFunction|
+	rz		= SCFunction.NewFunc( msg, self, .source )|SCFunction|
 	.TryAdd( msg, rz, fname )
 	rz.IsVisible = false
 
@@ -648,8 +643,8 @@ function CheckAllocVsWrapper (|SCFunction| f, |bool| IsConstructor)
 	if !IsConstructor
 		require .FirstDestructor
 	
-	require !f.IsWrapper
-	error (.Sourceclass, "Wrapper classes must have a constructor that is a wrapper function.")
+	if !f.IsWrapper
+		error (.Source, "Wrapper classes must have a constructor that is a wrapper function.")
 
 
 function FirstDestructor (|SCFunction|)
@@ -780,17 +775,16 @@ function IsBuiltinChain (|bool|)
 
 
 function AfterAfterFuncs 
-	if .super
-		.HasCompareFunc := .super.HasCompareFunc
-		.HasEqualsFunc := .super.HasEqualsFunc
+	|| s = .Super
+		.HasCompareFunc := s.HasCompareFunc
+		.HasEqualsFunc := s.HasEqualsFunc
 	
-	if .defawlt
-		|| D = TypeOfExpr( .defawlt, .Modul )
-		if .DefaultsToReal
-			check (d.isreal) (.defawlt, "Object default must be real (non-nil)")
+	|| def = .Defawlt
+		|| D = TypeOfExpr( def, .Modul )
+		if d and .DefaultsToReal
+			check (d.isreal) (def, "Object default must be real (non-nil)")
 	
-	if .IsModel
-		.DeclModel
+	.DeclModel
 
 
 function JSStructName (|String|)
@@ -823,10 +817,10 @@ function LoadClassType
 
 function TryAddToProject
 	require !.funcproto
-	|| NameNode = .SourceClass.first
-	|| mod = Compiler.DisamClasses
+	|| NameNode = .Source.first!
+	|| mod = Compiler.DisamClasses!
 	if NameNode == @dot		// load the modules first.
-		mod = compiler.FindModulemsg(namenode.first)	#require
+		mod = compiler.FindModuleMsg(namenode.first!)	#require
 
 	mod.TryAdd( .sourcearg, .modul, .name )
 
@@ -928,7 +922,7 @@ module
 
 	function SCClass.DataTypePostLoad
 		require .IsDataType and !.IsFunc
-		|| node = .SourceClass
+		|| node = .Source
 		|| sup = .super
 			.Size = sup.Size
 			if !.IsNotNumeric

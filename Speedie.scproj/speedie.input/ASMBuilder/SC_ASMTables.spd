@@ -51,7 +51,7 @@ dispatch fn_asm_table (fn_asm)
 		opt norefcounts
 		// 0, a, b, fn(), b*b, a*a
 		// 0, a, b, b*b, a*a, fn()
-		rz = .DoFunc(exp.last, reg)
+		rz = .DoFunc(exp.last!, reg)
 
 
 	@acc: // pointers?

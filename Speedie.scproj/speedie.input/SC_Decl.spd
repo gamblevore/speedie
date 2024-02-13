@@ -704,11 +704,11 @@ class SCDecl (SCObject) {
 		return (.IsCArray) or (.type.IsStruct) or (.isnumeric > 1) 
 
 
-	function CreateStructNil (|message| errs, |Message|)
+	function CreateStructNil (|message| errs, |Message!|)
 		using (errs)
 		|| Arg = «arg »
 		Arg.obj = self
-		if (.IsCArray)
+		if .IsCArray
 			return Arg
 		
 		rz = «type ":)"
@@ -908,16 +908,16 @@ class SCDecl (SCObject) {
 		
 	
 	function Message.CastToBool (|SCBase|name_space=nil, |int|)
-		return .castToType("bool", TypeBool, name_space, kLossycastedmatch)
+		return .castToType("bool", TypeBool!, name_space, kLossycastedmatch)
 
 	function Message.CastToInt (|SCBase|name_space=nil, |int|)
-		return .CastToType("int", TypeInt, name_space)
+		return .CastToType("int", TypeInt!, name_space)
 
 	function Message.CastToVoidPtr (|SCBase|name_space=nil, |int|)
-		return .CastToType("_voidptr", compiler.._voidptr, name_space)
+		return .CastToType("_voidptr", typevoidptr!, name_space)
 
-	function Message.CastTo (|string|type, |SCBase|name_space=nil, |int|)
-		return .CastToType(type, compiler[type], name_space)
+//	function Message.CastTo (|string|type, |SCBase|name_space=nil, |int|)
+//		return .CastToType(type, compiler[type], name_space)
 
 	function Message.CastToClass (|scclass|type, |SCBase|name_space=nil, |int|)
 		return .CastToType(type.name, type, name_space)

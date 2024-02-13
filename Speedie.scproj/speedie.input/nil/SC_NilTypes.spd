@@ -75,3 +75,10 @@ datatype NilCheckMode (uint)
 		return  p ||| (self &~ active)
 
 
+datatype nilreason (byte)
+	constants
+		Accessing
+		Property
+		Reading 
+		Using
+		Passing

@@ -469,6 +469,8 @@ module Feedback
 
 	function string.OptionBool (|bool|)
 		return (self ~= "" or "true" or "yes")
+	
+	
 	function string.OptionInt (|int|)
 		if .optionbool
 			return 1
@@ -490,7 +492,7 @@ module Feedback
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
 		fs <~ "  SelfFlow: ",  fs <~ app.prefs["self_flow"]
 		fs <~ "  @max: ${@max|int|}"
-		for (v in appoptions) (k) 
+		for (v in AppOptions) (k) 
 			(*v)("", "", fs_tester)
 			if (fs_tester.length) 
 				fs_tester.length = 0

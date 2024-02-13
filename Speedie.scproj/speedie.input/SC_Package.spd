@@ -50,7 +50,7 @@ function compiler.AppleBuildApp (|file| project, |file| product)
 	|| prefered_app	= product.sibling(prefered_name)
 	|| xcode_place	= prefered_app.sibling("Release/"+prefered_name)
 	|| final_app	= (xcode_place, prefered_app)(xcode_place.fileexists)
-	|| inner		= final_app["Contents/MacOS/"+name]
+	|| inner		= final_app["Contents/MacOS/"+name]!
 	if product.moveto( inner )
 		.AppBuildLibs(inner)
 		.CodeSign(final_app)

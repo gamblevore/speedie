@@ -194,24 +194,35 @@ extend_module scfunction
 
 
 	function TempMoveOut (|Message| msg, |Message| parent, |Message|)
-		expect (msg != @str)
-		
 		|| OldDecl = msg.AsDecl
-		if !olddecl
+		if !OldDecl
 			parent.prev = msg
 			return msg // right?
 	
 		|| Using = msg.syntaxusing
 		|| Name = UniqueTmpVar(msg.msgowningfunc)
-		|| d = OldDecl.Copy // no difference? This ACTUALLY may or may NOT be borrowed, BUT surely the temp should have the SAME borrowedness? Or else why are we temping it?
-		d.Name = ""
-		(d is body)
 		
 		// a.b.c -> || tmp1 = a.b, tmp1.c
 		|| NameThing = «Thg name »
-		NameThing.obj = d
 		msg.ReplaceWith( NameThing )
 		
-		(parent, namething)(parent).prev = MakeDecl( "", name, msg, scdeclinfo.body )		
+		msg.obj = nil
+		|| declmsg = MakeDecl( "", name, msg, scdeclinfo.body )
+		(parent, namething)(parent).prev = declmsg
+
+		// so... what am i doing now? why not collect it normally?
+		// we need a scarg?
+		
+		//|| abc = msg.MsgArg
+		if false // and abc and declmsg.CollectFromBody(abc)
+			0 //|| abcd = declmsg.last.asdecl
+			//debugger
+		  else
+			// remove this branch??
+			|| d = OldDecl.Copy
+			d.Name = ""
+			(d is body)
+			NameThing.obj = d
+			
 		Return NameThing
 

@@ -35,6 +35,7 @@ function Message.FindRef (|SCFunction| fn, |string| name, |Message|)
 
 
 function Message.LastUsedFix (|Message|)
+	opt norefcounts
 	if (self == @Decl)
 		|| Ch = .second.first
 		expect (Ch == @thg)
@@ -106,12 +107,12 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 function RC_Rel (|Message| rel)
 	// a = b.c   ->   || tmp = b.c, jb_incr(tmp), jb_decr(a), a = tmp
 	
-	|| First = rel.first
+	|| First = rel.first!
 	require RelNeedsRef( rel, first )
 	
 	using (rel)
 	|| result = NewFnc( "JB_SetRef" )
-	|| lst = result.Last
+	|| lst = result.Last!
 	lst <~ first
 	lst <~ rel.Last
 	lst.obj = Compiler.RefSetRef
@@ -403,9 +404,9 @@ function ReturnTempMoveOut (|Message| Child, |Message| blocker)
 
 
 function ReturnTempMoveOutSub (|Message| Child, |Message| blocker, |message| temp)
-	require (RefBasis(child, false) == kBasisObj)
-	RefIncr( child, temp.ParentPoint )
-	RefSafeDecr( temp, blocker )
+	if RefBasis(child, false) == kBasisObj
+		RefIncr( child, temp.ParentPoint! )
+		RefSafeDecr( temp, blocker )
 
 
 function message.DoesAnything (|bool|)
@@ -520,7 +521,7 @@ function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 
 function Message.IsSettablePlace (|bool|)
 	opt norefcounts
-	(self)~IsReal
+	real self
 	|| p = .parent
 	while p == @bra
 		self = p
@@ -566,8 +567,10 @@ function LastUsedRefPlace (|Message| name, |Message| arg, |Message|)
 	// This function has good and bad sides to it.
 	// Good: It makes dealing with tempvars very simple. user created or compiler created
 	// Bad: Possible obscure destructor bug, fired before you expect.
-	// Maybe ordering issues with writing to stdout, files, etc.	debugger
-	|| Type = name.asdecl.Type #expect
+	// Maybe ordering issues with writing to stdout, files, etc.
+	opt norefcounts
+	|| d = name.AsDecl #expect
+	|| Type = d.Type
 	require !Type.NoEarlyFree 
 	
 	|| s = name.name
@@ -576,8 +579,6 @@ function LastUsedRefPlace (|Message| name, |Message| arg, |Message|)
 	for c.Flat in arg
 		if c IsThing s
 			found = c
-	
-	found := name
 	
 	// scan up until we hit the arg. return item's position in the arg.
 	|| curr = found

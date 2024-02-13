@@ -356,14 +356,14 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 
 
 function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
-	|| Src = f.SourceArg
+	|| Src = f.SourceArg!
 	|| d = r_z.MsgDecl
 	|| Used = (d and d is usedbycode)
 	src.StartUsingAfter
 	if !used
 		r_z.Remove
 	  elseif d isnt setto
-		r_z.NotNilRZ(f.ReturnType, space)
+		r_z.NotNilRZ(f.ReturnType!, space)
 
 	ifn src.last istmp "return"
 		|| ret = src.msg(@tmp, "return")
@@ -371,7 +371,7 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
 		if used
 			ret.msg(@thg, "rz").obj = d 
 		  else
-			ret <~ f.ReturnType.CreateDefault(src)
+			ret <~ f.ReturnType!.CreateDefault(src)
 
 	parser.Using.Flags = 0
 
@@ -572,12 +572,12 @@ function Tran_ForSub (TranFunc)					// :3
 	// what about nested args
 	|| p2 = arg.SCArgNested( node, name_space )    // :) Allow variable capture to work!! :D
 	if (index)
-		FirstInLoop.Prev = MakeDeclOrRel( arg, index, iter.Index.copy )
+		FirstInLoop.Prev = MakeDeclOrRel( arg, index, iter.Index.copy(index) )
 
 
 	if (value and !CanKeepValue)
 		// for (x,y) in oof
-		FirstInLoop.Prev = MakeDeclOrRel( arg, Value, iter.Value.copy )
+		FirstInLoop.Prev = MakeDeclOrRel( arg, Value, iter.Value.copy(value) )
 
 				//////////// finish off...
 	CollectDeclsFuncBodyJustWhatWeNewlyMade( node, name_space ) // now an arg. Treat as an arg, as above!

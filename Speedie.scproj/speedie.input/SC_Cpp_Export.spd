@@ -105,7 +105,7 @@ function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
 	
 	
 	.funcStart(fs, f, funcheader)
-	f.Sourcearg.Export( fs )
+	f.Sourcearg!.Export( fs )
 
 	.OptEnd(fs, f.minopt)
 	fs <~ "\n\n"
@@ -166,7 +166,7 @@ function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
 			scfunction.CurrFunc = nil
 
 
-function StreamChild (|String| s, |FastStringCpp|)			// zero amy dokh doomed...
+function StreamChild (|String| s, |FastStringCpp|)
 	rz = FastStringCpp(s.TrimExtAndPath)
 	if s isa "h"
 		.Outputs_h <~ rz
@@ -257,7 +257,7 @@ struct jbobject {int RefCount;};
 		fs <~ "\n\n\t\t// Jeebox Syntax\n\n"
 		for (s in Compiler.SyxArray)
 			|| slower = s.lowercase
-			|| id = _syxdict_[slower].id|int|
+			|| id = _syxdict_[slower]!.id|int|
 			fs <~ "#define JB_Syx$s $id;\n"
 			fs <~ "#define \$$slower $id\n"
 	
@@ -386,8 +386,8 @@ function ExportStruct (|SCClass| cls, |bool| IsBehaviour=false)
 
 function ExportBehaviourHeader (|SCClass| cls)
 	require !cls.IsRole
-	|| b = cls.Behaviour							#require
-	.ExportStruct( B.FuncTable.cls, true )
+	|| b = cls.Behaviour
+		.ExportStruct( B.FuncTable!.cls!, true )
 
 
 function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass| Type)
@@ -398,7 +398,7 @@ function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass
 		self <~ "__destructor__"
 
 	self <~ " = "
-	ifn fn
+	if !fn
 		self <~ "nil"
 	  else
 		self <~ '('
@@ -413,7 +413,7 @@ function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass
 
 function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 	|| b		= cls.behaviour									#require
-	|| TableCls = b.FuncTable.cls
+	|| TableCls = b.FuncTable!.cls
 	|| N		= TableCls.CstructName
 	|| CN		= cls.CStructName
 
@@ -424,17 +424,17 @@ function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 	fs <~ N
 	fs <~ " Result;\n"
 	
-	fs.AppendBehaviour(nil, cls.destructorfunc, nil)
+	fs.AppendBehaviour("", cls.destructorfunc, nil)
 	
 	while (b)
 		for (M in b.interfaces)
 			|| s = m.name.InterfaceToBehaviour
-			|| fn = cls.BestBehaviourFor(s)					#expect (cls.sourceclass, "Cant find behaviour '$s' on class ${cls.name}")
+			|| fn = cls.BestBehaviourFor(s)					#expect (cls.source, "Cant find behaviour '$s' on class ${cls.name}")
 			|| BaseClass = cls.InterfaceForBehaviour(fn)	#require
-			if (M.IsRequiredInterface and !cls.Behaviour[s])
-				|| msg = "Missing behaviour on class: ${cls.name}" 
-				error (cls.sourceclass, msg)
-				error (baseclass.funcproto.source, msg)
+			if (M.IsRequiredInterface and !cls.Behaviour![s])
+				|| msg = "Missing behaviour on class: " + cls.name
+				error (cls.source, msg)
+				error (baseclass.funcproto!.source, msg)
 			fs.AppendBehaviour(s, fn, Baseclass)
 		b = b.upwards
 	
@@ -662,7 +662,7 @@ extern "C" {
 	Cpp_Export.GenLub(fs)
 
 	
-	fs <~ "extern ${TypeObject.Behaviour.FuncTable.cls.cstructname} JB_Object_FuncTable_;\n"
+	fs <~ "extern ${TypeObject!.Behaviour.FuncTable.cls.cstructname} JB_Object_FuncTable_;\n"
 	if Cpp_Export.DoSavers
 		Cpp_Export.CreateClassListHeader(fs, ";\n")
 
@@ -794,24 +794,25 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function CppProduct (|File|)
-		return Compiler.GeneratedCppsFolder[ "JB.cpp" ]
+		return Compiler.GeneratedCppsFolder![ "JB.cpp" ]!
 
 
 	function HProduct (|File|)
-		return Compiler.GeneratedCppsFolder[ "JB.h" ]
+		return Compiler.GeneratedCppsFolder![ "JB.h" ]!
 
 
 	function Product (|string| name, |File|)
-		return Compiler.GeneratedCppsFolder[ name ]
+		return Compiler.GeneratedCppsFolder![ name ]!
 
 
 	function APIHeader (|File|)
 		|| arg = compiler.api_place.last(@arg)
-		|| ForLib = arg.find(@tmp, "libraryname")[@str]#require
-		|| FolName = arg.find(@tmp, "exportplace")[@str]#require
-		|| Fol = Compiler.BaseProjectPath[ FolName.name ]
-		require fol.mustexist("Create API-Header for API: ${arg.filelocation}")
-		return Fol[compiler.ProjectName + "_api.h"]
+		|| ForLib = arg.find(@tmp, "libraryname")[@str]
+		|| FolName = arg.find(@tmp, "exportplace")[@str]
+		if FolName and ForLib
+			|| Fol = Compiler.BaseProjectPath![ FolName.name ]
+				if fol.mustexist("Create API-Header for API: ${arg.filelocation}")
+					rz = Fol[compiler.ProjectName + "_api.h"]
 	
 	
 	function WriteFuncSub (|SCFunction| F, |string| E, |FastStringCpp| T)

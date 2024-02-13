@@ -156,12 +156,12 @@ function message.CollectUsage (|string|)
 			|| name = ch.DeclName
 			|| optional = (ch.first == @rel)
 				fs <~ "["
-			|| ty = ch.first
+			|| ty = ch.first!
 			fs <~ name
 			|| tyfn = ty.func
 			if tyfn == @arr
 				ty = ty.first
-			|| type = ty.name
+			|| type = ty.nyme
 			if type contains "file"
 				type = "file-path" // clean up messy stuff like "filedata"
 			  elseif type ~!= "string"

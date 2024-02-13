@@ -52,7 +52,7 @@ function Message.CastToObject (|Message|)
 	if (d.Type.IsObject)
 		 Return self
 	
-	|| Match = TypeObject.TypeNormal.TryTypeCast( d, self, kTypeCastTrue )
+	|| Match = TypeObject!.TypeNormal.TryTypeCast( d, self, kTypeCastTrue )
 	expect (Match >= kSimpleMatch) (self)
 	Return .CastedParent
 
@@ -161,7 +161,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 		// we do bool casting after, as its usually a sign of a bug.
 		for (b.Upwards in Ot)
 			for (C in b.Casts)
-				ifn NoBools and (C.returnType == typebool.typenormal)
+				ifn NoBools and (C.returnType == typebool!.typenormal)
 					if .TypeMatch( C.ReturnType, 0 ).IsNormalMatch
 						return C.CreateTypeCast( O, exp )
 		
@@ -174,14 +174,14 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 		// use better_numeric
 		// try datatype conversion here...
 		if (!isabool or !NoBools) and O.canwrap
-			if (Typewrapper.typenormal.TypeMatch( self, 0 ).IsNormalMatch)
+			if (Typewrapper!.typenormal.TypeMatch( self, 0 ).IsNormalMatch)
 				// Already have all the type info! So check the contained type is correct!
 				|| it = .contains
 					require it.TypeMatch(O, kTypeCastNumbers)
 					return exp.WrapExpr(O)
 
 			// self == object/datatype-wrapper
-			if .TypeMatch( Typewrapper.typenormal, 0 ).isNormalMatch and O.SafelyWrappable 
+			if .TypeMatch( Typewrapper!.typenormal, 0 ).isNormalMatch and O.SafelyWrappable 
 				return exp.WrapExpr(o)  // only OK to turn to a bool if O is a bool.
 
 	

@@ -143,7 +143,7 @@ struct ASMFuncState // why not just be a subclass of memory?
 		|| fn = prms.asfunc					#debug_require
 
 		.NeedSomeWhere(prms, &dest, fn.RegType)
-		.AddASM(prms.parent, asm.fnc, 0).rest = fn.TableId
+		.AddASM(prms.parent!, asm.fnc, 0).rest = fn.TableId
 
 		|| OV     = .OpenVars
 		|| Bits   = Dest.reg<<25 ||| ov.log2<<20					// 6+5 bits, 20 left.
@@ -176,7 +176,7 @@ struct ASMFuncState // why not just be a subclass of memory?
 
 	module
 		|IR|					Dummy
-		|IR[]|					JSMSpace = IR[0]
+		|IR[]|					JSMSpace = IR[0]!
 		
 
 function message.ASMFunc (|fn_asm|)
@@ -210,7 +210,7 @@ function ASMFuncState.FinishASM
 	opt norefcounts
 	.out.length += .written
 	ifn .last isa asm.ret
-		.AddASM(.fn.source, asm.RET, 0)
+		.AddASM(.fn.source!, asm.RET, 0)
 
 
 function @fn_asm.Default (fn_asm)

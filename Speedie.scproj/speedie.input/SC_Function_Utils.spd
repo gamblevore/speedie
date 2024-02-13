@@ -49,12 +49,21 @@ dispatch FuncPreReader (fnPreReader)
 	
 	+"nil" {
 		opt norefcounts
-		|| f = msg[@thg]
+		|| f = msg[@thg]$
 		if f ~= "self"
-			.IsNilSelf = true
+			.NilSelff(msg, nilstate.optional)
 		  elseif f ~= "checker"
-			.isnilself = true
+			.NilSelff(msg, nilstate.optional)
 			.isnilchecker = true
+		  else
+			error f
+	}
+	
+	+"real" {
+		opt norefcounts
+		|| f = msg[@thg]$
+		if f ~= "self"
+			.NilSelff(msg, nilstate.real)
 		  else
 			error f
 	}
@@ -104,6 +113,10 @@ function IsSelfOfSetter (|Message| curr, |Message|)
 		if P.IsSetRel
 			Return P
 
+
+function scfunction.NilSelff (|message| where, |nilstate| v)
+	expect (!.nilself) (where, "Already stated")
+	.nilself = v
 
 function string.UnicodeSafeName (|string|)
 	if .isascii

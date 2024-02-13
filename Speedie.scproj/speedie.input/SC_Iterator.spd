@@ -28,7 +28,8 @@ class SCIterator (SCObject)
 		.Name = x
 		
 		|| M = StdErr.mark
-		.source = msg.last(@arg)								#check msg
+		|| src = msg.last(@arg)									#check msg
+		.source = src
 		
 		
 		.WhileLoop  = .source.find( @tmp, "while" )				#check (msg, "missing while")
@@ -39,11 +40,14 @@ class SCIterator (SCObject)
 		|| Cond = .WhileLoop.first
 		if (Cond == WhileArg)
 			Cond = «thg "true"»
-		  else
+		  elseif cond
 			Cond = Cond.NeedBra
 		.LoopCond = Cond
 		
-		.yield = WhileArg.FindNested( @Tmp, "yield" )			#check (WhileArg, "Missing yield statement.")
+		|message| w
+		if whilearg
+			w = WhileArg.FindNested( @Tmp, "yield" )			#check (WhileArg, "Missing yield statement.")		
+		.yield = w
 		.Value = .yield.first									#check (.yield, "Missing value")
 
 		|| i = .yield.second
@@ -51,15 +55,17 @@ class SCIterator (SCObject)
 			i = i.first
 		.Index = i
 		
-		.selfs = SCNodeRenamer.new
-		.selfs.CollectSelfs( .source )
-		.Names = .Uniqueify( .source )
+		|| sn = SCNodeRenamer.new
+		.selfs = sn
+		if src
+			sn.CollectSelfs( src )
+		.Names = .Uniqueify( src )
 		.OK = M
 
 
 	function message.Deepest (|syntax| Tmp, |string| name, |message?|)
 		opt norefcounts
-		(Self)~isreal // unneeded?
+		real self // unneeded?
 		for ch in self
 			|| best = ch.deepest(tmp, name)
 				return best
@@ -96,7 +102,7 @@ class SCIterator (SCObject)
 		if !v
 			v = SCNodeRenamer.new
 			.ValueRenamer = v
-			v.Collect(  .source,  .value.name,  .source.FlatAfter )
+			v.Collect(  .source,  .value!.name,  .source.FlatAfter )
 		v.Rename( s )
 
 
@@ -106,7 +112,7 @@ class SCIterator (SCObject)
 			n.Uniqueify( p )
 
 
-	function Uniqueify (|Message| msg, |[SCNodeRenamer]|)
+	function Uniqueify (|Message?| msg, |[SCNodeRenamer]|)
 		opt norefcounts
 		for dcl.flat in msg
 			if dcl == @Decl

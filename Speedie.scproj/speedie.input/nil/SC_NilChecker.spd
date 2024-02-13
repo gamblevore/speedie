@@ -7,8 +7,8 @@ extend_module ArchonPurger {
 		@type:	Type
 		@func:	Function
 		@tmp:   StatementJump
-		@dot:	PropertyOrAccess
-		@acc:	PropertyOrAccess
+		@dot:	Property
+		@acc:	Access
 		@brel:	brel
 		@arel:	arel
 		@rel:	Rel
@@ -60,7 +60,7 @@ function Jump (NilTrackerFn)
 	return (NilSyxes[msg.func])(msg, test)
 
 					
-function UseChildAsReal (|message| msg, |NilState|) 	// a.b, *a, a[0], (a)()
+function UseChildAsReal (|message| msg, |nilreason| reason=nilreason.accessing, |NilState|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 	|| dcl = msg.FastDecl
 	if dcl is OnModule
@@ -68,7 +68,7 @@ function UseChildAsReal (|message| msg, |NilState|) 	// a.b, *a, a[0], (a)()
 	|| ch = msg.first
 		|| actual = .Jump(ch)
 		if actual is nilish								// works e
-			.BecomeReal(ch.FastDecl, ch)
+			.BecomeReal(ch.FastDecl, ch, reason)
 		return dcl.nildeclared
 	debugger // what?
 
@@ -86,8 +86,11 @@ function List (NilTrackerFn)
 	return nilstate.Real
 
 
-function PropertyOrAccess (NilTrackerFn)
+function Access (NilTrackerFn)
 	return .UseChildAsReal(msg)
+
+function Property (NilTrackerFn)
+	return .UseChildAsReal(msg, nilreason.property)
 
 
 function RealBool (|bool| b, |nilstate|)
@@ -191,6 +194,7 @@ function DetectStillChecks (|message| first, |nilstate|)
 
 function Return (NilTrackerFn)
 	opt norefcounts
+	if scfunction.currfunc ~= "ListFunctions"
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
@@ -403,7 +407,7 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	|| Unknown = dcl.IsUnknownParam 
 	if Unknown and (test isnt soft and disappears)
 		if test isnt Active								// set var A to unknown prm B, so default to real
-			return .BecomeReal(dcl, msg)
+			return .BecomeReal(dcl, msg, NilReason.Reading)
 		dcl.NilDeclared = nilstate.optional
 
 	if  test isnt active  or  test is soft and Negative
@@ -524,7 +528,7 @@ function Debugger (NilTrackerFn)
 function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |scfunction| f)
 	opt norefcounts
 	if recv.isreal
-		.BecomeReal(sent, where, f)
+		.BecomeReal(sent, where, nilreason.passing, f)
 	  elseif !recv.nilstated and f != scfunction.currfunc  // haha
 		recv.NilPrmFail(where, f)
 	
@@ -540,13 +544,13 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 		if sentstate isnt nilish
 			return sentstate
 		expect (SentState is realish) (RecvMsg, "Nil is not allowed on: " + recvmsg.render)
-		return .BecomeReal(sent, SentMsg)
+		return .BecomeReal(sent, SentMsg, nilreason.using)
 		
 	if recv.NilReg
 		return T.SetNilness(recv, SentState)
 
 
-function BecomeReal (|scdecl| sent, |message| where, |scfunction| To=nil,  |nilstate|)
+function BecomeReal (|scdecl| sent, |message| where,  |nilreason| reason, |scfunction| To=nil, |nilstate|)
 	opt norefcounts
 	|| Curr = sent.NilCurr
 	if curr == NilState.Realish
@@ -556,10 +560,10 @@ function BecomeReal (|scdecl| sent, |message| where, |scfunction| To=nil,  |nils
 		T.BecomeRealSub(sent)
 		return T.SetNilness(sent, NilState.real)
 
-	return .FailedReal(to, where)
+	return .FailedReal(to, where, reason)
 
 
-function FailedReal (|scfunction| To, |message| where, |nilstate|)
+function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nilstate|)
 	|| fs = faststring()
 	fs <~ "NilObjectError "
 	fs <~ ("passing optional param: ", "accessing optional: ")(to)

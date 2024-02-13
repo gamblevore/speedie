@@ -86,9 +86,9 @@ class ErrorReceiver
 
 	setter LogFile (|string|)
 		opt norefcounts
-		visible class~file
+//		visible class~file
 		ifn Value contains "/"
-			value = file.Logs[value]
+			value = file.Logs[value]!
 		|| f = value.file
 		printline "Errors Store: " + f
 		._LogObj = f

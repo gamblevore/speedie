@@ -13,7 +13,7 @@ linkage
 |Message?|					InitVarsArg
 |Message?|					InitCodeArg
 |string|					CppPart
-|CppRefs?|					DefaultRefs
+|CppRefs|					DefaultRefs
 |message?|					InitAfter
 |string|					SubsFrom
 |bool|						Grabbed

@@ -1,26 +1,26 @@
 
 
 extend string
-	function Compress (|int|Strength=mzlab.default, |&compressionstats| st = nil, |string|) 
+	function Compress (|int|Strength=mzlab.default, |?&compressionstats| st = nil, |string|) 
 		|| j = jbin(0)
 		.CompressInto(j, Strength, st)
 		return j
 		
-	function CompressInto (|object| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil) 
+	function CompressInto (|object| fs, |int| Strength = mzlab.default, |?&compressionstats| st=nil) 
 		.Stream.CompressInto(fs, strength, st)
 	
 	function IsCompressed (|bool|)
 		return .isjbin and self[_jbinheader.length, "\0B\03µz"]
 	
-	function DecompressInto (|object| fs, |int| lim=256MB,  |&compressionstats| st=nil, |bool|)
+	function DecompressInto (|object| fs, |int| lim=256MB,  |?&compressionstats| st=nil, |bool|)
 		cpp_part DecompressInto
 		return .stream.Decompressinto(fs, lim, st)
 	
-	function Decompress (|int|lim=256MB, |&compressionstats| st=nil,  |StringThatWasReadSafely|)
+	function Decompress (|int|lim=256MB, |?&compressionstats| st=nil,  |StringThatWasReadSafely|)
 		return .stream.Decompress(lim, st)
 
 
-function StringReader.Decompress (|int|lim=256MB, |&compressionstats| st=nil, |bool| Multi=true,  |StringThatWasReadSafely|)
+function StringReader.Decompress (|int|lim=256MB, |?&compressionstats| st=nil, |bool| Multi=true,  |StringThatWasReadSafely|)
 	|| fs = faststring()
 	while .hasany
 		if !.Decompressinto(fs, lim, st)
@@ -34,7 +34,7 @@ function StringReader.IsCompressed (|bool|)
 	return str.IsCompressed	
 
 
-function FastString.CompressInto (|object| fs, |int|Strength=mzlab.default, |&compressionstats| st=nil)
+function FastString.CompressInto (|object| fs, |int|Strength=mzlab.default, |?&compressionstats| st=nil)
 	|| str = string.fromptr(.resultptr, .length)
 	str.CompressInto(fs, Strength, st)
 

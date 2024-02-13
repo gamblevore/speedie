@@ -270,8 +270,8 @@ function TypeOfBra (ExprResolver)
 function TypeOfStr (ExprResolver)
 	opt norefcounts
 	// this is better than calling tran_strings, right?
-	scfunction.String_Expand(exp, exp.msgowningfunc)
-	Return TypeStringzero.TypeReal
+	scfunction.String_Expand(exp, exp.MsgOwningFunc)
+	Return TypeStringzero!.TypeReal
 
 
 function TypeOfSString (ExprResolver)
@@ -280,13 +280,13 @@ function TypeOfSString (ExprResolver)
 
 function TypeOfChar (ExprResolver)
 	if exp.length == 1
-		return TypeByte.typenormal
-	|ind| cp = exp.name.codepoint
-	expect (cp) (exp, "Invalid codepoint")
+		return TypeByte!.typenormal
+	|ind| cp = exp.name.codepoint|ind| 		#expect (exp, "Invalid codepoint")
 	
 	exp.Func = @num
 	exp.name = cp.render
-	return compiler.findclass("codepoint", exp).typenormal
+	|| cls = compiler.findclass("codepoint", exp)
+		return cls.typenormal
 
 
 
@@ -607,8 +607,8 @@ function message.ExpectMatch (|scbase| name_space, |scclass| With, |bool|)
 function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
 	// Vector[N] --> memory.object(N, itemsize)
 
-	|| ty = exp.first
-	|| prms = ty.next
+	|| ty = exp.first!
+	|| prms = ty.next!
 	if prms == @opp
 		prms <~ prms.next
 		prms.name = ""
@@ -631,8 +631,8 @@ function TypeOfVecAccess (|message| index, |scdecl| ty0, |int| w, |scdecl|)
 	if index == @num // ok!
 		expect (index.int inrange w) (index, "Vector access is too large.")
 	if ty0.type.typeinfo.isfloat
-		return typefloat.NotConst
-	return typeint.NotConst
+		return typefloat!.NotConst
+	return typeint!.NotConst
 
 
 function Message.ExpectInt (|scdecl| type, |bool|)
@@ -705,15 +705,15 @@ function TypeOfSthg (ExprResolver)
 
 
 function TypeOfMsg (ExprResolver)
-	|| type = exp.first
+	|| type = exp.first!
 	require message.GetFunc(type)
 	|| name = type.first
-	if name
 		TypeOfExpr( name, name_space )
 	for ch.forward in type.next
 		TypeOfExpr( ch, name_space )
 
-	return compiler..message.typenormal
+	|| msg = compiler["message"]
+		rz = msg.typenormal
 
 
 function SpellOutMsg (|message| type, |message| Exp, |message| namemsg, |message|)
@@ -1120,9 +1120,9 @@ function message.NiceIsFlagSyntax (|message| list,  |message| RN,  |scbase| name
 	// if a is b      --> if a.syntaxis(s.b)
 	// if a is s.b.c  --> if a.syntaxis(s.b.c)	// need special handling, not done yet.
 	// if a is b(d).c --> if a.syntaxis(s.b(d).c)
-	|| exp = .parent
+	|| exp = .parent!
 	exp.func = @dot
-	ifn side
+	if !side
 		|| bra = exp.parent
 		if bra != @bra
 			bra = exp
@@ -1131,7 +1131,7 @@ function message.NiceIsFlagSyntax (|message| list,  |message| RN,  |scbase| name
 				// bra is exp? so its not a bra?
 				// so... we wrap exp in a bra? just try?
 				// debugger
-				bra = exp.wrapwith(@bra.msg)
+				bra = exp.WrapWith(@bra.msg)
 
 			bra.func = @rel
 			bra <~ (@opp, "=")
@@ -1152,7 +1152,7 @@ function message.NiceIsFlagSyntax (|message| list,  |message| RN,  |scbase| name
 	rn  <~ list
 	exp <~ «prm, rn »
 	
-	return typeofexpr(exp, name_Space, side)
+	return TypeOfExpr(exp, name_Space, side)
 }
 
 

@@ -142,8 +142,9 @@ function scfunction.CanNil (|bool|)
 	return !.IsMacro and !.IsWrapper and !.Badness and !.isdisabled
 
 
-function scdecl.WantOptional
-	if self and .TypeSuffers
-		.nildeclared = nilstate.Optional
-
+function scfunction.WantAs (|nilstate| NS)
+	opt norefcounts
+	|| dcl = .args.first
+	expect dcl and dcl.typesuffers and .cls (.source, `This function should not specify nilness of self.`)
+	dcl.nildeclared = NS
 

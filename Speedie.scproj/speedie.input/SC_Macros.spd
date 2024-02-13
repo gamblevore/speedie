@@ -100,9 +100,9 @@ function message.Tran_Target (|message|)
 
 function message.Tran_TargetSub
 	opt norefcounts
-	|| value = self.needfirst
+	|| value = self.needfirst					#require
 	|| IsFalse = (value == @brel and "!")
-		value = value.first
+		value = value.first!
 	
 	|| arg = self[@arg, 1]						#require
 	

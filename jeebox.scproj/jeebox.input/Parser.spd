@@ -167,7 +167,7 @@ extend Parser
 		return rel
 	
 	
-	function ChainTemporalRels (|Message| FirstThing, |Message| opp, |Message|)
+	function ChainTemporalRels (|Message!| FirstThing, |Message!| opp, |Message!|)
 		if opp == @scom
 			opp <~ firstthing
 			return opp
@@ -472,7 +472,7 @@ extend Parser
 	function fDotAccess (ParseHandler)
 		opt norefcounts
 		|| n = .nextstart
-		|| name = parser.NewWord(nil, @str, n, n) #require
+		|| name = parser.NewWord(nil, @str, n, n)
 		|| after = parser.nextstart
 		name.name = name.name.replaceall("–", " ")
 		rz = parser.NewEmpty(nil, @acc, start, after) 
@@ -739,7 +739,7 @@ extend Parser
 	function CanStatement (|bool|)
 		return  Jeebox.CSAfterStatement[parser.NextByte]
 	
-	function fTmpSub (|message| result, |int| OpFlags, |int| ThingFlags, |message|)
+	function fTmpSub (|message!| result, |int| OpFlags, |int| ThingFlags, |message|)
 		if .WillEnd
 			return result
 		if parser.CanStatement
@@ -760,8 +760,8 @@ extend Parser
 		result.func = @thg
 		if result.hasany						// a is b = true		// rare
 			return result						// oops
-		result = decoratething(result, kOpp)
-		return parseitem(result, ktemporalsyx, kopp)
+		result = DecorateThing(result, kOpp)
+		return ParseItem(result, kTemporalSyx, kopp)
 	
 	
 	function fStatementColon (ParseHandler)
@@ -840,7 +840,7 @@ ive been~running #since morning
 		return  b  ==  '\t' or ' ' or '\\'
 
 
-	function GetFuncAfter (|Message| result, |Message|)
+	function GetFuncAfter (|Message!| result, |Message!|)
 		while
 			|| ThisAfter = kFuncAfterAny &~ StopBars
 			if NoFuncAfter(.NextByte)
@@ -869,10 +869,10 @@ ive been~running #since morning
 		return rel
 	
 	
-	function MakeRel (|Message| first, |int| Bits, |Message|)
+	function MakeRel (|Message!| first, |int| Bits, |Message!|)
 		opt norefcounts
 		|| opp = .Process( Bits )              					 // kOpp
-		ifn Opp
+		if !Opp
 			return first
 		
 		|| Rel = parser( nil, @Rel, first.position )
@@ -1084,7 +1084,7 @@ ive been~running #since morning
 														// a:b, (a):b ... will parse differently!
 		  elseif (ch ==@Cnj or @SCnj)
 			ch = .ReRoute(Output, ch, prev)				#require
-			indent = ch.first.indent
+			indent = ch.first!.indent
 		
 		ch.indent = indent
 		return ch
@@ -1130,7 +1130,7 @@ ive been~running #since morning
 			prev = ch
 
 	
-	function DecorateThing (|message| R, |int| Ops, |Message?|)
+	function DecorateThing (|message!| R, |int| Ops, |Message!|)
 		R = .GetFuncAfter( R )
 		if .WillEnd: Return R
 		
@@ -1141,7 +1141,9 @@ ive been~running #since morning
 		if ops & kOppTemporal
 			|| opp = .Process( kOppTemporal )
 				if opp == "<≈"
-					|| A = .PostInnerAdj( R, opp )$
+					|| A = .PostInnerAdj( R, opp )
+					if !A
+						return R
 					return .DecorateThing( A, ops ) // recursive? 
 				return .ChainTemporalRels( R, opp )
 		return R

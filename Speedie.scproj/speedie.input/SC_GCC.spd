@@ -462,7 +462,7 @@ function BackupCompiler (|bool|)
 	|| B = .BackupPath.File
 	B.MakeEntirePath
 
-	|| backup1 = B["LatestBackup"] 
+	|| backup1 = B["LatestBackup"]!
 	if backup1.CompareFile( Product)
 		return true
 
@@ -507,7 +507,7 @@ function String.LastLine (|string|)
 
 
 function file.TestBatch (|bool|)
-	|| batch = compiler.BaseProjectPath!["Batch"]
+	|| batch = compiler.BaseProjectPath!["Batch"]!
 	|| sep = ""
 	print "Tested: " 
 	for c.files in batch
@@ -528,8 +528,8 @@ function file.TestBatch (|bool|)
 
 
 function File.TestSpeedie (|string| v, |bool|)
-	require (.mustexist)
-	expect !(.path contains " ") ("Path: ${.path} contains a space! :(")
+	require (.MustExist)
+	expect !(.path contains " ") ("Path contains a space: " + .path)
 
 	|| variant = "--variant=" + v
 	|| cmd_args = ["--self",  "--nocolor",  Variant]

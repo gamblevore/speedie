@@ -132,7 +132,8 @@ helper StringReader.NextMsgInfo (|uint64|)
 	while 
 		info = .NonZeroByte
 		loop info > 239
-		msg = Msg.upward(info - 239), .userobj = msg, require msg
+		msg = Msg.upward(info - 239)
+		.userobj = msg, require msg
 
 	|| T = (info >> 1)|syntax|
 	if (t < @max and T > @nil) // 01 --> T=@nil

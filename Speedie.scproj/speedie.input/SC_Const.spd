@@ -119,16 +119,16 @@ function scbase.Tran_Const (|SCDecl| D, |SCBase| base)
 			require TypeOfExpr(curr, base)
 			|| actual = base[curr.name]
 			if actual isa SCDecl
-				|| BetterVersion = actual.Default.Copy(curr)
+				|| BetterVersion = actual.Default!.Copy(curr)
 				curr.ReplaceWith( BetterVersion )				
 			  else
-				expect ((curr.obj == TypeString.typenormal) or (curr ~= "true") or (curr ~= "false")) (curr, "This type isn't allowed for a constant.")
+				expect ((curr.obj == TypeString!.typenormal) or (curr ~= "true") or (curr ~= "false")) (curr, "This type isn't allowed for a constant.")
 			
 		  elseif curr == @unit
-			require typeofexpr(curr, base)
+			require TypeOfExpr(curr, base)
 			
 		  elseif (curr == @str) or ((curr==@num) and curr.parent!=@unit)
-			require typeofexpr(curr, base)
+			require TypeOfExpr(curr, base)
 
 
 
@@ -194,12 +194,12 @@ struct ArgArrayCounter
 		|| value = item
 		if value == @item
 			.IsItem = true
-			|| key = item.first
-			|int64| v
-			if key.ConstIntValue(name_space, v) #check (item, "Can't load constant.")
-				(.max max= v)
-			arr <~ key
-			value = item.first
+			|| key = item[@nil]
+				|int64| v
+				if key.ConstIntValue(name_space, v) #check (item, "Can't load constant.")
+					(.max max= v)
+				arr <~ key
+				value = item.first
 		  else
 			.IsNotItem = true
 			arr <~ (.i)++

@@ -17,7 +17,6 @@ function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| P
 		rz <~ @emb
 	
 	if !Value
-		if purpose
 		rz <~ (@thg, name)
 		return rz
 	
@@ -33,8 +32,6 @@ function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| P
 		dcl.Default = value
 		NameMsg.obj = dcl		
 		Rel.obj = dcl
-	else
-		if purpose
 	
 
 function MakeDeclOrRel (|Message| Into, |message| namemsg, |Message| value, |Message|)
@@ -82,13 +79,14 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
 	for item in prms
 		item.CollectOneParam(self, AddToSpace, cls)
 
-	if .IsNilSelf
-		.args.first.WantOptional
+	|| ns = .nilself
+		.WantAs(ns)
+			
 
 
 function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
 	opt norefcounts
-	(self)~isreal
+	real self
 	if (func.isassigns == 2) and .islast
 		if !cls
 			error (self, "Can’t use this here." )
@@ -106,6 +104,8 @@ function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cl
 
 	require .Expect(@decl)
 	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, cls, func) #require
+	if dcl.default isthing "nil"
+		dcl.nildeclared = nilstate.optional
 	func.args <~ dcl
 	if dcl.name
 		(dcl is param)

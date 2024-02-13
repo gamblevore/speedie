@@ -259,10 +259,11 @@ function InitTypes
 	TypeFastString		= Compiler["faststring"]
 	TypeArray			= Compiler["array"]
 	TypeSaveable		= Compiler["saveable"]
-
-	TypeStringZero.DowngradeTo? = TypeString
-	typevoid            = typevoid_.TypeNormal
-	typestring.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
+		
+	require StdErr.ok
+	TypeStringZero!.DowngradeTo = TypeString
+	typevoid            = typevoid_!.TypeNormal
+	typestring!.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
 
 
 function InitBasicStuff (|int|) // compiler.init
@@ -276,15 +277,15 @@ function InitBasicStuff (|int|) // compiler.init
 	options.ListAllLib = linkage.interpreter
 	
 	.InitTypes
-	TypeNil = .AddGlobalConst( "nil", TypeObject,   NilState.ActuallyNil )
-	TrueBool = .AddGlobalConst( "true", TypeBool,   NilState.real ||| NilState.trueValue )
-	FalseBool = .AddGlobalConst( "false", TypeBool, NilState.real ||| NilState.falseValue )
+	TypeNil = .AddGlobalConst( "nil", TypeObject!,   NilState.ActuallyNil )
+	TrueBool = .AddGlobalConst( "true", TypeBool!,   NilState.real ||| NilState.trueValue )
+	FalseBool = .AddGlobalConst( "false", TypeBool!, NilState.real ||| NilState.falseValue )
 	
-	.AddGlobalConst( "__time_id__", typeint ).islookuponly = «num scimport.recent.timeid »
-	.AddGlobalConst( "__now__", typedate ).islookuponly = «num date.now »
-	.AddGlobalConst( "__modified__", typedate ).islookuponly = «num scimport.recent »
-	.AddGlobalConst( "π", typef64 ).islookuponly = «num "3.1415926535897932" »
-	.AddGlobalConst( "τ", typef64 ).islookuponly = «num "6.2831853071795864" »
+	.AddGlobalConst( "__time_id__", typeint! ).islookuponly = «num scimport.recent.timeid »
+	.AddGlobalConst( "__now__", typedate! ).islookuponly = «num date.now »
+	.AddGlobalConst( "__modified__", typedate! ).islookuponly = «num scimport.recent »
+	.AddGlobalConst( "π", typef64! ).islookuponly = «num "3.1415926535897932" »
+	.AddGlobalConst( "τ", typef64! ).islookuponly = «num "6.2831853071795864" »
 
 
 function LoadTypeTest (|string| s, |scfunction|)
@@ -810,11 +811,11 @@ function ModulesSorter (SorterComparer)
 
 function scfunction.StripTest
 	opt norefcounts
-	|| Base = Compiler.VisibleFuncs
+	|| Base = Compiler.VisibleFuncs!
 	
 	if !.IsVisible	
 		require options.ListAllLib and !.IsDisabled
-		base = Compiler.Interpreter
+		base = Compiler.Interpreter!
 	
 	.FindReached(base)
 
@@ -999,7 +1000,7 @@ function FindProjNoSuffix (|string| Path, |string|)
 
 
 function FindProject (|string| Path, |bool| error, |File|)
-	|| p = .BaseProjectPath.parent
+	|| p = .BaseProjectPath!.parent
 	|| B = .FindProjectSub(p, path)
 		return B
 	|| A = .FindProjectSub(.projects, path)

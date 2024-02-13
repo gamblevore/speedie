@@ -40,7 +40,6 @@ class Message (RingTree)
 		.flags		= other.flags ||| parser.using.flags // insertedness
 		.RangeLength= other.RangeLength
 		.Tag		= other.Tag
-		.trap
 
 
 	constructor
@@ -50,7 +49,6 @@ class Message (RingTree)
 		.flags		= parser.using.Flags
 		.RangeLength= parser.Using.Length
 		.tag		= parser.Using.Tag // why not... 
-		.trap
 
 			
 	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
@@ -61,7 +59,6 @@ class Message (RingTree)
 		.flags		= parser.using.Flags
 		.RangeLength= parser.Using.Length
 		.tag		= parser.Using.Tag // why not... 
-		.trap
 
 	
 	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength=0)
@@ -74,16 +71,11 @@ class Message (RingTree)
 		.RangeLength= RangeLength
 		.flags		= parser.using.Flags
 		.tag		= parser.Using.Tag // why not...
-		.trap
 
 	
 	function SyxId (|int|)
 		return .Func|int|
 ///////////////////////////////////////////////////////////////////////////////
-
-	function Trap
-		pragma inline
-		// if .objectid == 3244984	
 	
 	
 	function Copy (|message| pos_msg=nil, |Message!|)

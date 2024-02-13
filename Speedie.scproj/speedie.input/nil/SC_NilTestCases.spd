@@ -126,12 +126,12 @@ class NilTest
 		return .Exists3(nil)
 		
 	function Exists8 (|bool|)
-		(self)~isreal
+		real self
 		if 1
 			.v
 
 	function Fail8 (|bool|)
-		(self)~isoptional
+		nil self 
 		if 1
 			borks
 			.v
@@ -275,6 +275,6 @@ function NilRecord.ndb5
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"
-	//if scfunction.currfunc ~= "CompareError"
+//	if scfunction.currfunc ~= "ListFunctions"
 }
 

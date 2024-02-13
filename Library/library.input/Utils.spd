@@ -137,7 +137,3 @@ ignore	// seems not worth it
 		})
 
 
-insertion
-	IsReal   _.refcount
-	IsOptional   ({_ == nil})
-

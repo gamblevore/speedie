@@ -113,7 +113,8 @@ extend Message		// scanning
 
 
 function scbase.ListFunctions (|[SCFunction]|)
-	require .access
+	if !.Access
+		return []
 	for o in .access
 		ListFunctionsSub(o, rz)
 
@@ -160,10 +161,10 @@ function Message.Op (|message|)
 
 
 
-// seems kinda useless
+// Was only used for a short time
 class FileComparer
-	|?faststring| 	out
-	|?stringreader| in
+	|?faststring| 			out
+	|?stringreader| 		in
 	constructor (|string| s)
 		|| f = s.file
 		|| x = f.exists
@@ -175,11 +176,12 @@ class FileComparer
 		.in = nil
 		
 	function check (|int| v)
-		if .out
-			.out <~ v
-			.out <~ '\n'
-		  elseif .in != nil
-			|| str = .in.DString('\n')
+		|| i = .in
+		|| o = .out
+			o <~ v
+			o <~ '\n'
+		  elseif i != nil
+			|| str = i.DString('\n')
 			if str.int != v
 				"found $v expected $str"
 				debugger

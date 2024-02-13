@@ -65,7 +65,7 @@ linkage
 |bool|					IsExternalLib
 |bool|					IsWrapper
 |bool|					IsNilChecker
-|bool|					IsNilSelf
+|nilstate|				NilSelf
 |bool|					IsInline
 |bool| 					IsKiller
 |bool|					IsDisabled
@@ -366,7 +366,8 @@ function Message.MacroFixCount (|int|)
 
 function scfunction.MacroGet (|scparamarray| paramsarray, |scfunction| prev, |bool|)
 	opt norefcounts
-	|| M = .sourcearg.MacroFixCount
+	|| A = .SourceArg				#debug_require
+	|| M = A.MacroFixCount
 	if m != -111111	and  paramsarray.macrosize != M
 		return false
 	if prev
@@ -604,12 +605,12 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 
 	while (exp == @bra)
 		exp.obj = .ReturnType
-		exp = exp.first
+		exp = exp.first!
 		if exp == @arg // unbra fail.
-			exp = exp.parent
+			exp = exp.parent!
 			exit // we really want args to be statement-exprs by themself
 
-	|| Using = exp.syntaxusing 
+	|| Using = exp.SyntaxUsing
 	|| cst = .IsSimpleCast
 		// if (s)
 		// ->
@@ -617,15 +618,15 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 		
 		cst = cst.Copy
 		exp.ReplaceWith( cst )
-		cst.First.ReplaceWith( exp )
+		cst.First!.ReplaceWith( exp )
 
 	  else
 		cst = «func, «thg .ExportName »»  // JB_Str_Exists(obj)
 		exp.Next = cst
 		cst.msg(@prm) <~ exp
-		if (Mytype.IsNormalStruct)
+		if MyType.IsNormalStruct
 			exp.GetAddressOf(MyType)
-		cst.Last.Obj = self
+		cst.Last!.Obj = self
 
 	cst.obj = .ReturnType
 
@@ -799,18 +800,18 @@ function FillInConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	require !.Badness
 	for dot.flat in root
 		|| UsedAtAll = dot.SelfUsedForProperty
-			|| t = TypeOfExpr(dot, nil) // won't be nil because the function is OK.
-			|| IsSet = UsedAtAll == 1
-			if !t.IsNormalObject
-				0
-			  elseif (IsConstructor)
-				check (dot.isfirst and IsSet)  (dot, "Can’t read object properties during a constructor.")
-				check (t isnt PropertyWasConstructed)  (dot, "Can’t set object property twice during a constructor.")
-				check (dot.parent in root)   (dot, "Object property set must be at the root. (not nested).")
-			  else
-				check (dot.islast or !IsSet)  (dot, "Can’t set object properties during a destructor.")
-			if (IsConstructor)
-				(t is PropertyWasConstructed)
+			|| t = TypeOfExpr(dot, nil)
+				|| IsSet = UsedAtAll == 1
+				if !t.IsNormalObject
+					0
+				  elseif (IsConstructor)
+					check (dot.isfirst and IsSet)			(dot, "Can’t read object properties during a constructor.")
+					check (t isnt PropertyWasConstructed)	(dot, "Can’t set object property twice during a constructor.")
+					check (dot.parent in root)				(dot, "Object property set must be at the root. (not nested).")
+				  else
+					check (dot.islast or !IsSet)			(dot, "Can’t set object properties during a destructor.")
+				if (IsConstructor)
+					(t is PropertyWasConstructed)
 	
 
 function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
@@ -882,7 +883,7 @@ function scclass.RealSuper (|scclass|)
 
 function scclass.RealClass (|scclass|)
 	opt norefcounts
-	(self)~isreal
+	real self
 	|| s = self
 	while s and s.IsRole
 		s = s.super
@@ -1250,10 +1251,10 @@ function NeuSyx (CollectFunc)
 
 
 function Tran_AfterRel (|Message| msg, |SCBase| name_space, |message| side, |SCDecl|)
-	|| exp = msg.first
+	|| exp = msg.first!
 	if msg == "!"
 		|| ty = TypeOfExpr( exp, name_space ) #require
-		return ty.makereal
+		return ty.MakeReal
 
 	expect (msg == "--" or "++") (msg, "Unrecognised operator.")
 	
@@ -1267,7 +1268,7 @@ function Tran_AfterRel (|Message| msg, |SCBase| name_space, |message| side, |SCD
 
 	|| Type = TypeOfExpr( exp, name_space )		#require
 	|| numc = Type.type.NumericCount
-	if (!Type.type.IsObject and !type.setter and numc <= 1) or type.pointercount > 0
+	if (!Type.type.IsObject and !type.setter and numc <= 1)  or  type.pointercount > 0
 		return type											// gui.scproj won't compile :(
 
 	|message| R

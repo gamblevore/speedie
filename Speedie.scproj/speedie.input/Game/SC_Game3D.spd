@@ -45,13 +45,14 @@ extend SCClass
 	
 	
 	function DeclModel
-		expect (.properties)  (.sourceclass, "Need properties for a Game3D Type.")
-			
-		|| Inst = .properties.last
+		opt norefcounts
+		|| m = .IsModel			#require
+		expect (.properties)  (.source, "Need properties for a Game3D Type.")
+		
 		|| Dcl = .modul[ "_AllocDraw" ]
 		
 		if (Dcl isa SCDecl)
-			dcl.MakeGameFlying(self)
+			dcl.MakeGameFlying(self, m)
 		  else
 			debugger
 
@@ -179,9 +180,7 @@ extend SCDecl
 		return T.TypeInfo
 
 
-	function MakeGameFlying (|scclass| oof)
-		require oof
-		|| M = oof.IsModel			#require
+	function MakeGameFlying (|scclass| oof, |message| m)
 		|| fs = faststring()
 		fs <~ "const char $(N)_Init[] = {"
 
