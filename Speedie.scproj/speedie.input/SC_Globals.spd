@@ -1184,11 +1184,11 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 			exp.become(@bra) // don't break the AST...
 	  else
 		dot.name = "SyntaxCompare"
-		exp.Last.name = comp.compOp
+		exp.Last!.name = comp.compOp
 		exp <~ «Num comp.compparam »
 
 	TypeOfExpr( dot, name_space )
-	Return TypeBool.TypeNormal
+	Return TypeBool!.TypeNormal
 }
 
 

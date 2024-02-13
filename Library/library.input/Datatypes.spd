@@ -871,10 +871,9 @@ datatype bool
 
 	function Render (|faststring| fs_in, |string|)
 		opt norefcounts
-		|| s = .render
 		if !fs_in
-			return s
-		fs_in <~ s
+			return .render
+		fs_in <~ .render
 	
 	iterator
 		|| num = 1

@@ -1112,7 +1112,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderDcl (fpMsgRenderCpp)
-		|| name = .GetDclName
+		|| name = .GetDclName!
 		|| d = name.AsDecl				#expect
 		WriteDecl( d, fs, DeclsDefault(.last) )
 			

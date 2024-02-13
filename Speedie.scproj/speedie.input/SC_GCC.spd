@@ -507,7 +507,7 @@ function String.LastLine (|string|)
 
 
 function file.TestBatch (|bool|)
-	|| batch = compiler.BaseProjectPath["Batch"]
+	|| batch = compiler.BaseProjectPath!["Batch"]
 	|| sep = ""
 	print "Tested: " 
 	for c.files in batch

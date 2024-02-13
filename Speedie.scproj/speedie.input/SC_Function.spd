@@ -1252,7 +1252,8 @@ function NeuSyx (CollectFunc)
 function Tran_AfterRel (|Message| msg, |SCBase| name_space, |message| side, |SCDecl|)
 	|| exp = msg.first
 	if msg == "!"
-		return TypeOfExpr( exp, name_space ).makereal
+		|| ty = TypeOfExpr( exp, name_space ) #require
+		return ty.makereal
 
 	expect (msg == "--" or "++") (msg, "Unrecognised operator.")
 	

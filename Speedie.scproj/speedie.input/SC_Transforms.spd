@@ -458,7 +458,9 @@ function Tran_ForSub (TranFunc)					// :3
 	|scdecl| dcl
 	if !bad
 		dcl = TypeOfExpr( list, name_space )
-	if dcl
+	if !dcl
+		error ( list, "No class found." )
+	  else
 		iter = dcl.GetIteratorAny( itername, node )
 		if iter
 			iter.Renuqify( name_space )
@@ -494,9 +496,9 @@ function Tran_ForSub (TranFunc)					// :3
 	iter.RenameSelf( ListName )
 
 	if (CanKeepValue)
-		iter.RenameValue( value.name )
+		iter.RenameValue( value )
 	  else
-		iter.RenameValue( UniqueTmpVar(name_space, "Value") )
+		iter.RenameValue( @thg + UniqueTmpVar(name_space, "Value") )
 			
 	
 				////////  CONSTRUCT "WHILE" STRUCTURE
