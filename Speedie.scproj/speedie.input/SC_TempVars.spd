@@ -206,7 +206,7 @@ extend_module scfunction
 		|| NameThing = «Thg name »
 		msg.ReplaceWith( NameThing )
 		
-		msg.obj = nil
+		//msg.obj = nil
 		|| declmsg = MakeDecl( "", name, msg, scdeclinfo.body )
 		(parent, namething)(parent).prev = declmsg
 

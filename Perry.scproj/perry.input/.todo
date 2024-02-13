@@ -6,6 +6,8 @@
 	* use 256 VM codes? Only a few need all 25 bits.
 * Do nil checker!
 	* collectdecls should leave the decl on the decl itself also! Not just on the last. its too awkward!
+	* TempMoveOut is kinda broken...
+	* picomsg is now crashing or failing on constructor
 	* obj and name should be "safe"
 	* function pointers not being tested!
 	* selector constructor shouldn't need "?"
