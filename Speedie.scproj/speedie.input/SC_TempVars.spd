@@ -206,23 +206,12 @@ extend_module scfunction
 		|| NameThing = «Thg name »
 		msg.ReplaceWith( NameThing )
 		
-		//msg.obj = nil
 		|| declmsg = MakeDecl( "", name, msg, scdeclinfo.body )
 		(parent, namething)(parent).prev = declmsg
 
-		// so... what am i doing now? why not collect it normally?
-		// we need a scarg?
-		
-		//|| abc = msg.MsgArg
-		if false // and abc and declmsg.CollectFromBody(abc)
-			0 //|| abcd = declmsg.last.asdecl
-			//debugger
-		  else
-			// remove this branch??
-			|| d = OldDecl.Copy
-			d.Name = ""
-			(d is body)
-			NameThing.obj = d
-			
+		|| d = OldDecl.Copy
+		NameThing.obj = d
+		d.Name = ""
+		(d is body)
 		Return NameThing
 

@@ -834,6 +834,7 @@ function TypeOfArr (ExprResolver)
 	|int| IsDispatch = (exp ~= "dispatch")|int|
 	|| InOrder = 0
 	|| result = SCDecl(TypeVoidPtr!)
+	result.nildeclare = nilstate.real
 	exp.obj = result
 		
 	for (itm in exp)

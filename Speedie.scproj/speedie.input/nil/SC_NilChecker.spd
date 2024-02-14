@@ -194,7 +194,6 @@ function DetectStillChecks (|message| first, |nilstate|)
 
 function Return (NilTrackerFn)
 	opt norefcounts
-	if scfunction.currfunc ~= "ListFunctions"
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
