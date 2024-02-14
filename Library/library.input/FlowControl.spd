@@ -154,7 +154,7 @@ class FlowControl
 			require !.disabled
 
 			.disabled = 1
-			|flowcontrol--| f = .flow
+			|flowcontrol--| f = .flow!
 			|StringReader--| r = f.ReadInput
 			if r != nil
 				|| str = r.str(data.length)

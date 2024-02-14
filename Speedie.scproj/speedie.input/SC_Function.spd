@@ -1488,7 +1488,7 @@ function message.Blocks (assigns:|int|)
 
 function Tran_IfSub (|message| node, |scbase| name_space) 
 	opt norefcounts
-	|| cond = node.needfirst						#require
+	|| cond = node.NeedFirst						#require
 	|| arg = cond.next
 		require arg.expect(@arg)
 	  else
@@ -1508,7 +1508,7 @@ function Tran_IfSub (|message| node, |scbase| name_space)
 			|| ElseArg = SubTest.first
 				check (ElseArg ~!= "if")    (ElseArg, "Use 'elseif' instead.")
 			SubTest[@arg]
-			
+	
 	using (node)	
 	name_space = arg.scarg(name_space)
 	

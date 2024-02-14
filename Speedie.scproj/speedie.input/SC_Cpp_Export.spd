@@ -662,7 +662,7 @@ extern "C" {
 	Cpp_Export.GenLub(fs)
 
 	
-	fs <~ "extern ${TypeObject!.Behaviour.FuncTable.cls.cstructname} JB_Object_FuncTable_;\n"
+	fs <~ "extern ${TypeObject!.Behaviour!.FuncTable!.cls!.cstructname} JB_Object_FuncTable_;\n"
 	if Cpp_Export.DoSavers
 		Cpp_Export.CreateClassListHeader(fs, ";\n")
 

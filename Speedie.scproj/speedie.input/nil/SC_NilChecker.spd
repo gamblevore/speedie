@@ -229,7 +229,7 @@ function WhileInner (|message| Cond)
 
 function While (NilTrackerFn)
 	opt norefcounts
-	|| cond = msg.first
+	|| cond = msg.first!
 	|| CondTest = cond.IsAlwaysBool
 
 	require !CondTest.IsFalse and T.BranchEnter(msg)
@@ -249,24 +249,32 @@ function While (NilTrackerFn)
 
 function If (NilTrackerFn)
 	opt norefcounts
-	|| Orig = T.BranchEnter(msg)				#require
-	|| cond = msg.first,  || arg1 = cond.next
-	|| Else = arg1.next,  || arg2 = else.first
-	|| CondTrue = cond.IsAlwaysBool
+	|| cond = msg.first!,  || arg1 = cond.next!
+	|| Else = arg1.next!,  || arg2 = else.first!
+	|| Always = cond.IsAlwaysBool
+	if always.istrue
+		// what about something like   (x.func(&obj) or true)
+		// it is always true. I think we just don't need this.
+		return .Argument(arg1)
+	  elseif always.isfalse
+		return .Argument(arg2)
+	
+		
 
+	|| Orig = T.BranchEnter(msg)				#require
 	#!"First Branch"
-	if !CondTrue.IsFalse		// ignore "if false: exit", for while-loops
-		.Jump(Cond, NilCheckMode.positive)
-		.Argument(arg1)
+	.Jump(Cond, NilCheckMode.positive)
+	.Argument(arg1)
 	
 	|| First = T.BranchSwap(Orig)
 
 	#!"Second Branch"
-	if !CondTrue.istrue
-		.jump(cond, NilCheckMode.negative) // we need the negative, for the merging.
-		if arg2.HasAny
-			( .Argument(arg2), .if(else) )(arg2.islast)
-	
+	.jump(cond, NilCheckMode.negative) // we need the negative, for the merging.
+	if arg2.HasAny
+		if arg2.islast
+			.Argument(arg2)
+		  else
+			.if(else)
 	return t.BranchExit(First)
 
 

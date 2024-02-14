@@ -117,10 +117,9 @@ class SCDecl (SCObject) {
 	function NilDeclared (|nilstate|)
 		return .nildeclare
 	
-	function Project (|scimport|)
+	function Project (|scimport!|)
 		opt norefcounts
-		|| m = .MemoryLayer
-			return m.obj as SCImport
+		return (.MemoryLayer.obj as SCImport)!
 			
 	syntax append (|SCDeclInfo| d)
 		.info |= d

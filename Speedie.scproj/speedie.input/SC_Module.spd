@@ -139,7 +139,7 @@ function LoadModule (|Message| node)
 	arg.expectlast$
 	.Source = arg
 	
-	compiler.disammodules.TryAdd(nil, self, .safename)
+	compiler.disammodules!.TryAdd(nil, self, .safename)
 	.Collect( .source, scbase.CurrVisibility )
 
 

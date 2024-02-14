@@ -87,7 +87,7 @@ module TreeAssembler
 		.StampAll(list)
 		scfunction.linkall(list)
 		|| args = {8725l, 275l}
-		|| mu   = list[0].asm
+		|| mu   = list[0]!.asm
 			|| Result = mu.finish.run( &args[0], –count args )
 			if result != 9000
 			

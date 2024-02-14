@@ -153,10 +153,10 @@ function string.DebugExecute (|[string]| Args=nil, |faststring|Out=nil, |faststr
 	
 
 module image
-	function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |&byte|)
+	function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |?&byte|)
 		cpp_wrapper JB_Img__LoadPNG
 
-	function WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |&byte|)
+	function WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |?&byte|)
 		cpp_wrapper JB_Img__WriteQOI
 
 	function ConvertPNGToVOI (|string| p, |string|)

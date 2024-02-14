@@ -163,8 +163,13 @@ function TranRender (|message| exp, |scbase| name_space, |scobject|)
 
 
 function TranNegate (|message| f, |scbase| name_space, |scobject|)
-	|| cond = ExpandToBool( F, name_space )$
-	|| d = cond.obj
+// if this is @thg... do we really NEED to expand this to a bool?
+	opt norefcounts
+	if true // f != @thg // this seems to fail somehow.
+		f = ExpandToBool( F, name_space )$
+//	  else
+//		typeofexpr(f, name_space)
+	|| d = f.obj
 	if (d isa scdecl)
 		if d.IsConstOf(Falsebool)
 			return truebool
@@ -260,11 +265,12 @@ function TypeOfThg (ExprResolver)
 
 
 function TypeOfBra (ExprResolver)
+	opt norefcounts
 	|| c0 = exp.first
 	if (c0 == @arg)
-		rz = typeofBlock(c0, name_space, side)
+		return typeofBlock(c0, name_space, side)
 	  else
-		rz = TypeOfExpr(c0, name_space, side)
+		return TypeOfExpr(c0, name_space, side)
 
 
 function TypeOfStr (ExprResolver)
@@ -572,7 +578,7 @@ function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message?| side = ni
 
 
 
-function TypeOfExpr (|Message| Exp, |SCBase| name_space, |Message?| side = nil, |SCDecl|)
+function TypeOfExpr (|Message?| Exp, |SCBase| name_space, |Message?| side = nil, |SCDecl|)
 	opt norefcounts
 	if exp // remove this check??? once the nil checker is done
 		|| obj = exp.obj|scobject| ?? TypeOfExprSub(Exp, name_Space, side)
@@ -1582,7 +1588,7 @@ function AddToStaticSection (|Message| arg, |Message| ToAdd)
 	arg <~ ToAdd
 
 
-function TypeOfExprAsObj (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCDecl|)
+function TypeOfExprAsObj (|Message!| Exp, |SCBase| name_space, |Message?| side = nil, |SCDecl|)
 	|| result = TypeOfExpr( exp, name_space, side )	#require
 
 	if !result.type.IsObject

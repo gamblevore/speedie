@@ -48,20 +48,45 @@ function SC_MakeComment (|Message| msg) // ignorenode
 	msg.clear
 
 
+function Message.NegateThg (|Message|)
+	opt norefcounts
+	if .name == "true"
+		.name = "false"
+		.obj = FalseBool
+		return self
+	if .name == "false"
+		.name = "true"
+		.obj = TrueBool
+		return self
+	return .WrapWith(«BRel "!"»)
+
+
 function Message.Negate (|Message|)
-	if self == @bra
+	opt norefcounts
+	real self
+	|| f = .func
+	if f == @thg
+		return .negatethg
+	
+	if f == @bra
+		|| ch = .unbra
+		if ch.func == @thg
+			ch.negatethg
+			.obj = ch.obj
+			return self
 		.Become(@brel, "!") // the negator!
 		return self
-	|| ch = .UnBra
-	if ch IsBRel "!"
-		return .ReplaceWith(ch.first!)
+	
+	if self IsBRel "!"
+		return .ReplaceWith(.first!)
 
 	using self
 		rz = .WrapWith(«BRel "!"») // also the negator!
 
 
 function Message.IsAssignable (|bool|)
-	return self != @Func and @type and @num // unless... its an assigns func?
+	|| f = .func
+	return f != @Func and @type and @num // unless... its an assigns func?
 
 
 function message.IsInt (|bool|)
@@ -161,16 +186,18 @@ function Message.WithinLoop (|Message| stop, |bool|)
 
 function Message.UnBra (|Message|)
 	opt norefcounts
-	rz = self$
-	While rz == @bra and rz.first != @arg
-		rz = rz.first!
+	real self
+	While self == @bra and .first != @arg
+		self = .first!
+	return self
 
 
 function Message.UnBraType (|Message|)
 	opt norefcounts
-	rz = self
-	While (rz == @type) or (rz == @bra and rz.first != @arg)
-		rz = rz.first!
+	real self
+	While (self == @type) or (self == @bra and .first != @arg)
+		self = .first!
+	return self
 
 
 function Message.UpToType (|Message|) // updecl, finddecl

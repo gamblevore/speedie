@@ -34,11 +34,12 @@ helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 	|| OK = StdErr.Mark
 	check (.isjbin) (self, _jBinNotJbin)
 	
-	|| mz = .NextMsg							#require
+	|| mz = .NextMsg
 	if mz == @arg // remove this later
 		mz = .NextMsg(@tmp)
-	  else
-		require mz.expect(@tmp)
+	  elseif !mz.expect(@tmp)
+		mz = nil
+	require mz
 	st.start
 
 	|| size = .NextMsg(mz, @num)
@@ -50,8 +51,8 @@ helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 		  else
 			error (self, "Invalid mz header")
 	  else
-		mz.name = nil
-		size.name = nil
+		mz.name = ""
+		size.name = ""
 		while
 			|| c = .NextMsg(arg, @bin)			#loop
 			|| s = c.name

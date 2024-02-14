@@ -1026,21 +1026,22 @@ module
 	
 
 	function ProcessExtendOld (|Message| c, |bool| PreferClass)
-		|| name = c[@thg]							#require
-		|| arg  = c.last(@arg)						#require
-		|| M = Compiler.FindModulemsg(name)			#require
+		|| name = c[@thg]
+			|| arg  = c.last(@arg)
+			|| M = Compiler.FindModulemsg(name)
+			if m and arg
+				|SCBase| B = M
+				|| cls = m.cls
+				if (PreferClass and cls)
+					B = cls
 		
-		|SCBase| B = M
-		if (PreferClass and M.Cls)
-			B = M.Cls
+				|| imp = c.obj as scimport
+					imp.use
+				  else
+					B.project.use
+		
+				B.Collect(arg, scbase.CurrVisibility, m.SourceArg)
 
-		|| imp = c.obj as scimport
-			imp.use
-		  else
-			B.project.use
-
-		B.Collect(arg, scbase.CurrVisibility, m.sourcearg)
-	
 	
 	function DoOneNamedField (|message| c,  |string| name,  |string| datatype,  |int| n,  |message|)
 		using c 

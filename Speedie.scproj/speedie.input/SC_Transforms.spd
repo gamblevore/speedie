@@ -880,7 +880,7 @@ function message.ObjCls (|scclass|)
 	opt norefcounts
 	|| o = .obj as scdecl // blindcast instead? its never NOT this.
 		if o.special == 1
-			return o.contains.type
+			return o.contains!.type
 
 
 function Message.Next_Index (|sciterator| iter, |message| node2)
