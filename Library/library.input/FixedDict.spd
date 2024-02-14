@@ -59,8 +59,8 @@ class FixedDict
 		.itemtypes	= (.itemtypes &~ (3 << i2))  |||  (Value << i2)
 
 
-	syntax access (|int| i, |fixeddict|)
-		return .items[i]|fixeddict|
+	syntax access (|int| i, |fixeddict?|)
+		return .items[i]|fixeddict?|
 
 
 	function SetPart (|int| B, || Val, |int| type)

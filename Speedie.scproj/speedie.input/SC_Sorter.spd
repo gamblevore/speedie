@@ -17,7 +17,12 @@ module CodeSorter
 
 	function LeafFunctionsSorter (SorterComparerFn)
 		opt norefcounts
-		return a.LinkDepth < b.LinkDepth
+		|| x = a.LinkDepth|int| - b.LinkDepth|int|
+		if x < 0
+			return true
+		if x == 0
+			return a.exportname < b.exportname
+		return false
 	
 	
 function scfunction.MarkRecursive (|scfunction| EndAt)

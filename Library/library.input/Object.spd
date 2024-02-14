@@ -10,6 +10,7 @@ class Object
 		cpp_class JB_Object
 	
 	virtual Render (|FastString|fs_in=nil, |string|)
+		nil self
 		cpp_wrapper JB_ObjRender
 
 	helper GenericRender (|FastString| fs_in=nil)
@@ -47,9 +48,11 @@ class Object
 	
 	
 	operator MustBe (|&ClassData| x, |bool|)  // perhaps mustbe should just be isa.
+		nil checker
 		return self.mustbe(x)
 	
 	helper MustBe (|&ClassData| x, |Message|ErrNode=nil, |bool|)
+		nil checker
 		if self isa x
 			return true
 		if self

@@ -82,3 +82,12 @@ datatype nilreason (byte)
 		Reading 
 		Using
 		Passing
+	module
+		|| values = [
+			"accessing"
+			"accessing property"
+			"reading" 
+			"using"
+			"passing"
+		]
+

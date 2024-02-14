@@ -42,9 +42,9 @@ module TreeAssembler
 	function InitAll
 		instruction.instructionInit
 		fn_asm.InitTable
-		Instruction[asm.SET1].Const
-		Instruction[asm.SETK].Const
-		Instruction[asm.SETN].Const
+		Instruction[asm.SET1]!.Const
+		Instruction[asm.SETK]!.Const
+		Instruction[asm.SETN]!.Const
 		return 
 		TextAssembler.Requests		:= dictionary()
 		TextAssembler.RequestTable	:= array()

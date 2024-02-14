@@ -12,8 +12,10 @@
 	* selector constructor shouldn't need "?"
 	* also... what about global struct pointers? pointers are assumed not nil... but if its not initialised it will be nil?
 		* compiler should know this
+	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!
 
-	
+* SC_Imp_Constructor reffing unnecesarily
+
 * constructors should allow code before it... just not property setting.
 
 * change allocator to use unified allocator?

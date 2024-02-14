@@ -1047,7 +1047,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		if obj mustbe SCDecl
 			if obj.name
 				return obj
-			|| Backup = .Last.obj as scdecl
+			|| Backup = .Last!.obj as scdecl
 				if backup.name
 					return Backup
 			error (self, "Missing property name")
@@ -1056,7 +1056,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function C_RenderDot (fpMsgRenderCpp)
 		opt norefcounts
 		|| obj = .DotMustBeProperty						#require
-		|| ch = .first
+		|| ch = .first!
 
 		if (ch.obj isa SCModule)
 			obj.Name.safe(fs)

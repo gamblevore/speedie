@@ -47,10 +47,10 @@ function message.Tran_QMark
 
 	if thedot == @sdot
 		scfunction.Tran_Sdt(thedot)
-	|| inside = thedot.first
+	|| inside = thedot.first!
 	if thedot == @func
 		require inside.expect(@bra)
-		inside = inside.first
+		inside = inside.first!
 	
 	using (self)
 	|| rel = .QMarkRel						// a().b? = c   -->   {|| t = a(),  if t: t.b = c}

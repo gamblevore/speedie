@@ -573,7 +573,8 @@ function BecomeReal (|scdecl| sent, |message| where,  |nilreason| reason, |scfun
 function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nilstate|)
 	|| fs = faststring()
 	fs <~ "NilObjectError "
-	fs <~ ("passing optional param: ", "accessing optional: ")(to)
+	fs <~ nilreason.values[reason]
+	fs <~ " optional: "
 	where.render(fs)
 	if To
 		fs <~ " to "

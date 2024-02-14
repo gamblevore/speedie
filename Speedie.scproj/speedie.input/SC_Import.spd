@@ -13,24 +13,24 @@ class SCImport
 	|errorseverity|			BlindCast
 	|int|					Depth
 	|[SCFile]|				Files
-	|File|					Proj
+//	|File|					PROJ
 	|MemoryLayer|			DeclLayer
 	|SCModule|				Mod
 	|dictionary of file| 	Resources
 	
 
-	constructor ( |File| F, |bool| Builtin )
-		.Proj = F
+	constructor ( |File?| F, |bool| Builtin )
+//		.Proj = F
 		.Resources = Dictionary()
 		.BlindCast = (0, errorseverity.error)(builtin)
 		.DeclLayer = (scdecl).CreateLayer(self)
-		|| M = SCModule.NeuModule( nil, compiler.program, nil )|SCModule|
+		|| M = SCModule.NeuModule( nil, compiler.program, nil )|SCModule|!
 		.Mod = M
 		M.Project = self
 		M.IsImport = true
 		if (F != nil)
 			M.name = f.name
-			(SCImport.Recent max= f.modified) 
+			(SCImport.Recent max= f.modified)
 	
 	
 	render

@@ -844,19 +844,19 @@ function TypeOfArr (ExprResolver)
 	exp.obj = result
 		
 	for (itm in exp)
-		|| NewArrCls = TypeArray
+		|| NewArrCls = TypeArray!
 		
 		if (itm == @Item)
 			|| IdxType = TypeOfExpr( itm.first, name_space )
-			if (IdxType matches TypeString)
-				NewArrCls = TypeDictionary
-			  elseif (IdxType matches TypeInt)
+			if (IdxType matches TypeString!)
+				NewArrCls = TypeDictionary!
+			  elseif (IdxType matches TypeInt!)
 				// remove this! arrays never are specified like [0:item, 1:item] // !!!
 				// items should always be dictionaries unless a dispatch.
 				if !IsDispatch
 					InOrder = ArrayInOrderCheck(InOrder, itm.first)
 					if (InOrder <= 0)
-						NewArrCls = TypeDictionary
+						NewArrCls = TypeDictionary!
 			  elseif !(IdxType matches TypeSyntax)
 				error ( exp, "Array index is wrong type." )
 				itm = nil
@@ -877,14 +877,14 @@ function TypeOfArr (ExprResolver)
 				  else
 					result.Contains = Contained
 				
-				if (result.Type == TypeVoidPtr)
+				if (result.Type == TypeVoidPtr!)
 					result.type = NewArrCls
 				  else
 					expect (result.Type == NewArrCls) ( exp, "Array indexes mismatch." )
 	
 	
 	|| c = result.contains
-		if isdispatch and result.type != typedictionary // dispatches use function pointers... 
+		if isdispatch and result.type != typedictionary! // dispatches use function pointers... 
 			result.type = c.type						// so we might as well make a c-array
 			result.contains = nil
 			result.CArraySize = IsDispatch-1
@@ -896,8 +896,8 @@ function TypeOfArr (ExprResolver)
 			result.Contains = c.MakeContainedOptional
 
 	
-	if result.type == TypeVoidPtr
-		result.Type = typearray
+	if result.type == TypeVoidPtr!
+		result.Type = typearray!
 	return result
 
 
@@ -1709,14 +1709,13 @@ function TypeOfArgArr (ExprResolver)
 			check (Contained.type.isdatatype or contained.PointerCount) (itm, "Must be a datatype.")
 			if (result)
 				|| oof = contained.HighestArrayContainMatch( result.type.TypeNormal, itm )
-					result.type = oof.type
+				result.type = oof.type
 			  else
 				result = SCDecl(contained.type)
 			Count++
-
-	result.Carraysize = Count
 	
 	exp.obj = result						#expect (exp, "Can't get the type of this.")
+	result.Carraysize = Count
 	Tran_ArgArray(exp, name_space)
 	return result
 

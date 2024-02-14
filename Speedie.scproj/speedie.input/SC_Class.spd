@@ -498,13 +498,13 @@ function OverrideSyntax
 	
 	for f in cast
 		f.IsInline = true
-		check  (f.args == 1)		(f.Source, "No params allowed." )
-		expect (f.ReturnType)       (f.Source, "Need a return type.")
+		check  (f.args == 1)		  (f.Source, "No params allowed." )
+		|| ret = f.ReturnType #expect (f.Source, "Need a return type.")
 		f.NextFunc.DontWantSameReturnType(f)
 		.Casts <~ f
-		if f.returntype.IsNormalBool
+		if ret.IsNormalBool
 			|| OK = !f.isdisabled
-				f.args.first.nildeclared = nilstate.Optional
+				f.args.first!.nildeclared = nilstate.Optional
 			f.IsNilChecker = 2*OK
 			.HasNilChecker = 2*OK
 	
@@ -858,7 +858,7 @@ module
 		cls.modul.loadModuleForCls( Module, cls )
 
 		if (ForInterface and parent isa scmodule)
-			cls.CppClass = "__${parent.cls.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"
+			cls.CppClass = "__${parent.cls!.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"
 				
 		Return cls
 	

@@ -55,7 +55,7 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 // Will make it harder if we use tempintoblock from multiple places...
 // cos then "How it is used" becomes important.
 
-	|| FuncMsg = .parent
+	|| FuncMsg = .parent!
 	if (funcmsg == @dot) and (funcmsg.first == self)
 		0 // || x = R.pop().Property
 	  else

@@ -139,7 +139,7 @@ class FlowControl
 			if .disabled
 				return value
 			.disabled = 1
-			.flow.cond(('T', 'F')(value))
+			.flow!.cond(('T', 'F')(value))
 			.disabled = 0
 			return value
 

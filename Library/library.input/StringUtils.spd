@@ -1,6 +1,6 @@
 
 
-function Print (|string| data) // macro this too?
+function Print (|string?| data) // macro this too?
 	cpp_wrapper JB_Str_Print
 
 
@@ -12,11 +12,11 @@ macro PrintLine
 	StrPrintline(_.render) // not self-referential anymore.
 
 
-function StrPrintLine (|string| data)
+function StrPrintLine (|string?| data)
 	cpp_wrapper JB_Str_PrintLine
 
 
-function PrintLine (|object| o)
+function PrintLine (|object?| o)
 	cpp_name JB_Obj_PrintLine
 	printline o.render
 
