@@ -326,8 +326,10 @@ function $InterName (,$InterName)
 	
 	iterator
 		|| FnList = .access.navigate
-		while FnList.movenext
-			yield FnList.value|scfunction|
+		while
+			|| value = fnlist.NextValue
+			if (!value): exit
+			yield value|scfunction|
 	linkage
 		cpp_part Beh
 

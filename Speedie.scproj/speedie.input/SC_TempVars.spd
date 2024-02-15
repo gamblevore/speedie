@@ -21,7 +21,7 @@ function Message.HasOwnBlock (|Message|)
 		return arg
 
 
-function Message.CreateOwnBlock (|Message|)
+function Message.CreateOwnBlock (|Message?|)
 	//  adds new ({}),  marks it as temp-exprblock for parent,  and puts in the right place
 
 	using (self)
@@ -103,23 +103,23 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 function message.IntoVariable (|scbase| name_space, |nameandmsg|)
 	|| P = .NiceParent
 	|| Place = P.IsInDeclInBlock
-		|| NameMsg = P.first.usenonrefchangers
+		|| NameMsg = P.first!.usenonrefchangers
 		if (NameMsg == @thg)
 			rz.name = NameMsg.name
-			rz.arg = place.Ancestor(@arg)
+			rz.arg = place.Ancestor(@arg)!
 			rz.msg = place.next // result uses .arg as backup if !.msg
 			return rz
 	
-	|| Block = .CreateOwnBlock
+	|| Block = .CreateOwnBlock #require
 	|| name = uniquetmpvar(name_space, "_imP")
 	
 	P = NewEqRel( @thg.msg(name), self )
-	|| arg = block.asarg
+	|| arg = block.asarg!
 	|| decl = block.msg(@decl)
 	decl <~ @emb
 	decl <~ P
 	decl.CollectFromBody(arg)
-	block.parent.obj = arg[name]	// Stop collectdecls being called twice! (name-conflict errors)
+	block.parent!.obj = arg[name]	// Stop collectdecls being called twice! (name-conflict errors)
 									// it's called in typeofblock, unless we already have the type
 									// which we just set here.
 	|| last = NewRejoin()
@@ -134,7 +134,7 @@ function message.IntoVariable (|scbase| name_space, |nameandmsg|)
 
 
 struct NameAndMsg
-	|message|   Msg
+	|message?|   Msg
 	|string|	Name
 	|message|   Arg
 	

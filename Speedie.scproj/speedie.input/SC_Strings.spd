@@ -378,9 +378,9 @@ function Message.BunchFixPrepare (|Message|)
 	// if a == b or c
 	
 	|| P = .NiceParent
-	if (P == @rel)
+	if P == @rel
 		return p
-	return scfunction.tempmoveout(self).last
+	return scfunction.tempmoveout(self).last!
 
 
 
@@ -396,12 +396,12 @@ function Message.BunchFixPrepare (|Message|)
 // only has 1 caller. why not fix this to use the above macro?
 function Message.BunchFix 
 	using (self)
-	|| P		= .BunchFixPrepare
-	|| subject	= P.first
-	|| multi_opp= subject.Next$
-	.RelFix(false)
-	P.ReplaceWith(self)
-	multi_opp.BunchFixSub(subject, self)
+	|| P			= .BunchFixPrepare
+	|| subject		= P.first!
+	|| multi_opp	= subject.Next
+		.RelFix(false)
+		P.ReplaceWith(self)
+		multi_opp.BunchFixSub(subject, self)
 
 	
 function Message.BunchlessFix

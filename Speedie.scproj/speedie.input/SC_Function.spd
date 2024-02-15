@@ -578,9 +578,11 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCPara
 
 	if (NeedsAlter)
 		Incoming.Exp.Last!.Func = @prm
-		Result.Argsmatch3( TypeCast, base, true, name_space, Incoming )
+		Result!.Argsmatch3( TypeCast, base, true, name_space, Incoming )
 
-	return result ?? missing
+	if Result
+		return Result
+	return missing
 
 
 function FLookup (assigns:|SCBase|)
@@ -1726,11 +1728,10 @@ function message.SlidePositions (|int| add)
 
 
 
-function scfunction.Cleanupfunc 
-	|| s = .source
+function scfunction.Cleanupfunc (|message| s)
 	|| n = s.name
 	using s
-	|| cls = .cls.isnormalobject
+	|| cls = .cls!.isnormalobject
 	if s ~= "constructor" or "destructor"
 		s.name = "function"
 		s.first = «thg n »

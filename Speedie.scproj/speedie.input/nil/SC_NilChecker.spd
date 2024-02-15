@@ -123,8 +123,8 @@ function Function (NilTrackerFn)
 		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
 		fn = fp.GetFunctionPointer
 		require fn and .UseChildAsReal(fp)						// (abc)()
-	
-	expect ((fn != scfunction.currfunc) or t.RootReturned or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
+
+	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
 		
 	fn.NilPrint(false)
 	
@@ -162,7 +162,9 @@ function Function (NilTrackerFn)
 
 	if fn.IsKiller
 		.DeclKill
-		return 0
+		if (t.nestdepth == 0)  and  !t.AnyReturns // also if no returns happened...
+			scfunction.currfunc.iskiller = true
+		return nilstate.Killer
 	
 	|| ret = fn.ReturnType
 		rz |= ret.NilDeclared
@@ -197,6 +199,7 @@ function Return (NilTrackerFn)
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
+	t.anyreturns = true
 	|| ret = t.return
 	if ret and ret.typesuffers
 		if ret.isreal
@@ -361,7 +364,7 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 		return SuperSmartMagicCompare(ll, rr, test, scop)
 	
 	if (lnil and rnil)
-		return ll.Redundant(ll.FastDecl!, test)
+		return ll.Redundant(ll.FastDecl, test)
 	expect (scop.IsNilTest) (ll.next, "Nil can't accept this operator. Use != or ==.")
 	
 	(test is reversed) = scop.IsExactlyEquals
@@ -386,7 +389,7 @@ function ProcessCondRel (NilTrackerfn)
 
 	|| L = .Jump(ll) & NilState.Either		// (ptr+1) or (1+ptr) still needs nilness check
 	|| R = .Jump(rr) & NilState.Either
-	|| D = msg.FastDecl!
+	|| D = msg.FastDecl
 	if !D.TypeSuffers			// (ptr-ptr) is actually a number... so thats OK.
 		return nilstate.real
 	if NilState.Nilish == l or r
@@ -440,6 +443,8 @@ function Argument (Niltrackerfn)
 			error.autoprint = .oldprint
 			expect !(stderr.ok) (s, "Borking but no zergs found?")
 			stderr.clear
+		if rz is Killer
+			exit
 	
 	|| Allowed = (1|uint64| << (v<<1)) - 1|uint64|
 	t.setallnil(ArchonPurger.value & Allowed, "Argument")
@@ -456,11 +461,11 @@ function Type (Niltrackerfn)
 	opt norefcounts
 	|| F = msg.first!
 	|| ns = .Jump(F, test) &~ nilstate.FnBecomesNilCh
-	|| d = msg.FastDecl$
+	|| d = msg.FastDecl
 	if !d.TypeSuffers
 		return nilstate.real
 	|| fd = f.FastDecl
-	if fd and fd.TypeSuffers // return inner suffering
+	if fd.TypeSuffers // return inner suffering
 		return ns
 	
 	return d.nildeclared // we created new suffering, so lets pass that back.
@@ -505,7 +510,7 @@ function Declaration (niltrackerfn) // function decl
 	opt norefcounts
 	|| rel = msg.last
 	if rel != @thg
-		|| d = rel.first!.FastDecl!
+		|| d = rel.first!.FastDecl
 		if d.IsReg
 			|| J = .Jump(rel.last!)
 			return T.Declare(D, J)
@@ -593,8 +598,7 @@ function scdecl.IsUnknownParam (|bool|)
 function message.Trueness (|nilstate| found, |maybebool|)
 	opt norefcounts
 	|| d = .FastDecl
-	|| ret = ArchonPurger.t.return
-	require d and ret // they are already real but the compiler will complain :[
+	|| ret = ArchonPurger.t.return$
 	if d.FastMatch(ret)
 		|| n = d.nildeclare
 		if n & nilstate.KnownValue

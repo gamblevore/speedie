@@ -71,7 +71,7 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
 	opt norefcounts
 	|| cls = .Cls
 	if !cls
-		cls = .parent|SCModule|.Cls
+		cls = .parent|SCModule|!.Cls
 	  elseif !prms.HasSelfAsFirst
 		expect (addtospace) (prms)
 		.AddSelfToFunc(cls, AddToSpace)

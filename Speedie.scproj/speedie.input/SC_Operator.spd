@@ -289,7 +289,8 @@ function Message.OppExpand (|bool|)
 
 
 function Message.InitExpand (|bool|)
-	|| rel = .parent
+	opt norefcounts
+	|| rel = .parent!
 	.name = ":="
 	using self
 	rel.FixErl
@@ -303,8 +304,8 @@ function Message.RelFix (|bool| force, |bool|)
 	// 1 + $
 	//     2 < $
 	//         4 + 5
-	|| One =  .first
-	|| Plus = One.Next
+	|| One =  .first!
+	|| Plus = One.Next!
 	if force or !plus.obj
 		|| PlusScore = plus.opscore // just do it now
 		|| SubRel = Plus.next
@@ -313,8 +314,8 @@ function Message.RelFix (|bool| force, |bool|)
 		  elseif SubRel == @Rel
 			rz = subrel.relfix(true)
 			ifn self in @decl or @arg
-				|| Two = SubRel.First
-				|| LessThan = Two.Next
+				|| Two = SubRel.First!
+				|| LessThan = Two.Next!
 				|| Last = lessthan.next
 				if LessThan.OpScore > PlusScore
 					self <~ lessthan

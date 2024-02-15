@@ -56,6 +56,7 @@ struct ArchonPurger
 	|scdecl?|				Return
 	|bool|					FnAbleToNilCheck
 	|bool| 					RootReturned // for recursive funcs
+	|bool|					AnyReturns
 	|NilRecord[64]| 		Rows
 	
 	
@@ -134,8 +135,9 @@ struct ArchonPurger
 		.rows[0] = nilstate.Basic
 		.Neel = .rows[0]
 		.rowend = .Neel + 63
-		ArchonPurger.loops = nil
 		.Realnesses = -1
+		ArchonPurger.loops = nil
+		.AnyReturns = false
 		.RootReturned = false
 		.CheckNilCheck(F)
 		
@@ -227,7 +229,8 @@ struct ArchonPurger
 
 		function DeclKill
 			pragma inline
-			t.RootReturned = true
+			if !t.nestdepth
+				t.RootReturned = true
 			t.SetAllNil(nilstate.Basic, "kill")
 		
 

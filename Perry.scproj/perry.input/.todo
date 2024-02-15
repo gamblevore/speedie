@@ -8,6 +8,7 @@
 	* collectdecls should leave the decl on the decl itself also! Not just on the last. its too awkward!
 	* picomsg is now crashing or failing on constructor
 	* obj and name should be "safe"
+	* upgrade optional returns to real? (if possible)
 	* function pointers not being tested!
 	* selector constructor shouldn't need "?"
 	* |message| x = nil, // should be optional

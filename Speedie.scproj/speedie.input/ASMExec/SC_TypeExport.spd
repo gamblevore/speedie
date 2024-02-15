@@ -18,6 +18,7 @@ datatype NilState (byte) // Exec.scproj needs this here
 		Real		= Realish + Stated
 		Basic		= Realish
 		Borked		= 128
+		Killer		= 255
 	
 	function RawName (|string|)
 		description "'Raw', cos does not include whether its stated or not." 

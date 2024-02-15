@@ -995,7 +995,7 @@ module
 			.ProcessExtendOld(c, preferclass)
 			return nil
 		
-		|| dot = c[@dot]
+		|| dot = c[@dot]							#require
 		|| name = Dot[@nil, 0]						#require
 		expect (name == @thg or @name) (name)
 
@@ -1006,8 +1006,9 @@ module
 		|SCBase| B = M
 		if name == @name		// it's a module
 			PreferClass = false // whatever
-		if (PreferClass and M.Cls)
-			B = M.Cls
+		|| mcls = m.cls
+		if (PreferClass and MCls)
+			B = MCls
 		name.func = @thg
 
 		|| imp = c.obj as scimport
