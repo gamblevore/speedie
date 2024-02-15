@@ -10,6 +10,7 @@
 	* obj and name should be "safe"
 	* function pointers not being tested!
 	* selector constructor shouldn't need "?"
+	* |message| x = nil, // should be optional
 	* also... what about global struct pointers? pointers are assumed not nil... but if its not initialised it will be nil?
 		* compiler should know this
 	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!

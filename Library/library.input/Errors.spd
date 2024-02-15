@@ -112,8 +112,7 @@ class Error (Message)
 	
 	function Reformulate (|string| suffix="")
 		|| list = error.from(.name.parse)
-		while list.hasany
-			|| err = list.first
+		while (|| err = list.first)
 			if suffix
 				err.name += suffix
 			stderr <~ err

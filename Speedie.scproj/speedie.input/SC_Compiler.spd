@@ -58,78 +58,78 @@ module Compiler {
 linkage
 	cpp_part Comp
 
-|File|					BaseProjectPath
-|string|				OriginalInputPath
-|File|					_BuildFolder
-|File|					TempFolder
-|String|				_Projects
-|String|				_SpeedieProj
-|SCFile|				InternalFile = SCFile.new(nil, SCImport.new(nil, true))
-|string|				ProjectName
-|string|				ReportedName
-|scimport|				UserProj
-|scfunction|			MainFunc
-|message|				DebugInsert
-|message|				ConfMsg
-|dictionary|			InsecureWords
+|File|						BaseProjectPath
+|string|					OriginalInputPath
+|File|						_BuildFolder
+|File|						TempFolder
+|String|					_Projects
+|String|					_SpeedieProj
+|SCFile|					InternalFile = SCFile.new(nil, SCImport.new(nil, true))
+|string|					ProjectName
+|string|					ReportedName
+|scimport|					UserProj
+|scfunction|				MainFunc
+|message|					DebugInsert
+|message|					ConfMsg
+|dictionary|				InsecureWords
 
 |Dictionary of SCFile|		Files = nil
 |[SCImport]|				ImportedList
 |Dictionary of SCImport|	ImportedNames = Dictionary.new
 
 
-|SCModule|				program = InternalFile.Proj.Mod
+|SCModule|					program = InternalFile.Proj.Mod
 
-|[SCClass]|				ClassList
-|[SCModule]|			ModuleList
-|[SCFunction]|			FuncList
-|[SCFunction]|			ProtoTypes
+|[SCClass]|					ClassList
+|[SCModule]|				ModuleList
+|[SCFunction]|				FuncList
+|[SCFunction]|				ProtoTypes
 
 |Dictionary of SCBase|		ExportNames = Dictionary()
 |dictionary of dictionary of macro|	AdjDicts = dictionary()
 
-|SCFunction|			PrivateProperty
-|SCFunction|			RefIncr
-|SCFunction|			RefDecr
-|SCFunction|			RefClear
-|SCFunction|			RefDecrMulti
-|SCFunction|			RefFreeIfDead
-|SCFunction|			RefSafeDecr
-|SCFunction|			RefSetRef
+|SCFunction|				PrivateProperty
+|SCFunction|				RefIncr
+|SCFunction|				RefDecr
+|SCFunction|				RefClear
+|SCFunction|				RefDecrMulti
+|SCFunction|				RefFreeIfDead
+|SCFunction|				RefSafeDecr
+|SCFunction|				RefSetRef
 
-|SCFunction|			TernaryFunc
-|SCFunction|			TernaryFunc2
-|SCFunction|			fnFastIsa
-|SCFunction|			fnFastAs
-|SCFunction|			fnAs
-|SCFunction|			fnIsa
-|SCFunction|			fnMustbe
-|SCFunction|			fnOpMustBe
+|SCFunction|				TernaryFunc
+|SCFunction|				TernaryFunc2
+|SCFunction|				fnFastIsa
+|SCFunction|				fnFastAs
+|SCFunction|				fnAs
+|SCFunction|				fnIsa
+|SCFunction|				fnMustbe
+|SCFunction|				fnOpMustBe
 
-|[String]|				SyxArray
-|Message|				ExtendList = message()
-|Message|				ConstantsList = message()
-|[Message]|				ExtendModuleList
-|[Message]|				API_List
-|[SCFunction]|			API_Funcs
-|Message|				API_Place
+|[String]|					SyxArray
+|Message|					ExtendList = message()
+|Message|					ConstantsList = message()
+|[Message]|					ExtendModuleList
+|[Message]|					API_List
+|[SCFunction]|				API_Funcs
+|Message|					API_Place
 
-|SCModule|				DisamClasses
-|SCModule|				DisamModules
+|SCModule|					DisamClasses
+|SCModule|					DisamModules
 
-|bool|					HasMainFunc
-|bool| 					InitedOK = true
-|int|					stClasses
-|int|					stFuncs
-|int|					stReachedFunc
-|int|					stReachedClass
-|int|					stFunctionProgress
-|int|					stParseTime
-|int|					stTotalSourceSize
-|int|					stTotalFileCount
-|int|					stParseTimeTotal
-|int|					CurrStage
-|SCFunction|			ClassListInitFunc
+|bool|						HasMainFunc
+|bool| 						InitedOK = true
+|int|						stClasses
+|int|						stFuncs
+|int|						stReachedFunc
+|int|						stReachedClass
+|int|						stFunctionProgress
+|int|						stParseTime
+|int|						stTotalSourceSize
+|int|						stTotalFileCount
+|int|						stParseTimeTotal
+|int|						CurrStage
+|SCFunction|				ClassListInitFunc
 
 
 
@@ -607,10 +607,11 @@ function InitCompiler
 		  else
 			._BuildFolder = .BaseProjectPath
 	  else
-		._BuildFolder = .BaseProjectPath[ "Build" + Compiler.VariantSuffix ]
+		._BuildFolder = .BaseProjectPath![ "Build" + Compiler.VariantSuffix ]
 
-	.TempFolder = TransCompiler.ProjTmpPath.file  ///Tmp/Speedie/Proj
-	.TempFolder.MakeEntirePath
+	|| t = TransCompiler.ProjTmpPath.file!  /// Tmp/Speedie/Proj
+	.TempFolder = t
+	t.MakeEntirePath
 	.GeneratedCppsFolder.makeEntirePath
 	
 	.CreateRoot
@@ -631,10 +632,10 @@ function GeneratedCppsFolder (|File|)
 	// I guess it's considered "self-replacement". It's OK.
 
 	if !Options.ExternalCompile
-		return .TempFolder
+		return .TempFolder!
 	if  Options.SelfReplacement
-		return .BuildFolder
-	return .BaseProjectPath!["Cpp"]
+		return .BuildFolder!
+	return .BaseProjectPath!["Cpp"]!
 
 
 

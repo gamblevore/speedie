@@ -566,10 +566,10 @@ function AfterFuncsDecled
 	if (f)
 		expect (!f.NextFunc) ( f.Source, "Can’t have multiple destructors" )
 		expect (!f.ReturnType and (f.args.length == 1))   ( f.Source, "Destructor can’t have a return type or parameters." )
-	.CheckAllocVsWrapper( f, false )
+		.CheckAllocVsWrapper( f, false )
 	
-	if .ClassType
-		.ClassType.Name = "&" + .CStructName + "Data" // sigh. Not pleasant.
+	|| cls = .ClassType
+		cls.Name = "&" + .CStructName + "Data" // sigh. Not pleasant.
 
 
 
@@ -872,7 +872,7 @@ module
 		
 	
 	function NeuClass (CollectFunc)
-		|| it = .NeuClassSub(node, name_space, ErrPlace, nil, true)
+		|| it = .NeuClassSub(node, name_space, ErrPlace, "", true)
 			it.ClassCollect
 			return it.modul
 
@@ -900,11 +900,11 @@ module
 	
 	
 	function DataType (CollectFunc)
-		return .datatypesub(node, name_space, errplace, nil)
+		return .DataTypeSub(node, name_space, errplace, "")
 	
 
 	function NewStruct (CollectFunc)
-		|| it = .NeuClassSub(node, name_space, errplace, nil, false)
+		|| it = .NeuClassSub(node, name_space, errplace, "", false)
 			it.IsStruct = true
 			it.classcollect
 			return it.modul
@@ -913,9 +913,8 @@ module
 	function NewCast (CollectFunc)
 		expect (name_space isa SCClass)  (node, "'cast' only goes inside classes." )
 		
-		node[0].name = "function"
-		|| NameNode = «Thg "operator_cast"»
-		node[0].Next = NameNode
+		node.first!.name = "function"
+		node.first.Next = «Thg "operator_cast"»
 		
 		return SCFunction.NewFunc( node, name_space, ErrPlace )
 	

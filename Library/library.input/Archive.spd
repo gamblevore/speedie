@@ -15,6 +15,7 @@ role FileArchive (message)
 
 
 	function Validate (|FileArchive|)
+		require self
 		|| arc = (.first, self)(self == @arg)
 		require .expect(@tmp, "archive")
 		for p in arc.last(@arg)
@@ -90,9 +91,10 @@ role FileArchive (message)
 
 	function Base (|string|)
 		opt norefcounts
-		|| o = .last$.obj
-		if o isa string
-			return o
+		|| l = .last
+			|| o = l.obj
+			if o isa string
+				return o
 
 
 function string.GetArchive (|int|lim, |FileArchive|)

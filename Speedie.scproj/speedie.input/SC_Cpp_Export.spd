@@ -11,29 +11,34 @@ linkage
 	cpp_part		Cpp
 
 
-|FastStringCpp|						T
 |[FastStringCpp]|					Outputs_cpp
 |[FastStringCpp]|					Outputs_h
-|FastStringCpp|						Inlines
+
+|FastStringCpp|						T
+|FastStringCpp|						AllTypes
 |FastStringCpp|						TypesProj
 |FastStringCpp|						HeaderProj
-|FastStringCpp|						AllTypes
+|FastStringCpp|						Inlines
 |FastStringCpp|						ModuleProperties
 
 constructor
-	Init()
-
-function PreRun
-	Cpp_Export.StringBlob		= FastStringCpp.new
-	Cpp_Export.StringLengths2	= FastStringCpp.new
-	Cpp_Export.StringDict		= dictionary()
-
+	.Outputs_cpp = []
+	.Outputs_h = []
+	.T = FastStringCpp.new
 	.AllTypes   = .StreamChild( "AllTypes.h"  )
 	.TypesProj  = .StreamChild( "Proj.h" )
 	
 	.HeaderProj = .StreamChild( "JB.h" )
 	.Inlines	= .StreamChild( "Inlines.h" )
 	.ModuleProperties = .StreamChild( "ModuleProperties.cpp" )
+	Init()
+
+
+function PreRun
+	Cpp_Export.StringBlob		= FastStringCpp.new
+	Cpp_Export.StringLengths2	= FastStringCpp.new
+	Cpp_Export.StringDict		= dictionary()
+
 	
 	.AllTypes <~ "
 #ifndef ObjCID
@@ -42,7 +47,6 @@ function PreRun
 "
 
 	.Headerproj <~ '\n'
-	.T = FastStringCpp.new
 	
 	.ModuleProperties <~ `// Globals put into a separate file to make things faster.
 #include "JB_Umbrella.hpp"

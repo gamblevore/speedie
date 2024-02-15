@@ -486,7 +486,7 @@ extend Parser
 
 
 	function fFuncCall (ParseHandler)
-		rz = parser.new(nil, @Func, parent.position)
+		rz = parser.new(nil, @Func, parent!.position)
 		parser.Params( rz, start )
 
 

@@ -157,9 +157,9 @@ function Restart (|message| arg)
 
 function ErrorsToPerry (|message|)
 	if !.Cleaned
-		.errors.PrePrintErrors
+		.errors!.PrePrintErrors
 		.Cleaned = true
-	return compiler.RenderErrors(.errors, errorseverity.warning).parse
+	return compiler.RenderErrors(.errors!, errorseverity.warning).parse
 
 
 function ReportBuildOrRestart (|message| cmd, |message|)
@@ -796,13 +796,13 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 			return obj.diissplayobj(rz)
 	
 	if purpose ~= "displayall"
-		if !fn.nextfunc and !fn.args
+		if fn and !fn.nextfunc and !fn.args
 			return rz // I guess we want empty result.
 	if !fn
 		return s.copy
 	
 	while fn
-		|| copy = fn.source.cutifycopy 
+		|| copy = fn.source!.cutifycopy 
 		rz <~ copy
 		|| desc = fn.description
 			rz <~ @emb

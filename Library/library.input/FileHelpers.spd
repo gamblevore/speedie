@@ -5,7 +5,9 @@
 
 extend String
 	function IsOK (|bool|)
-		return self != string.error
+		opt norefcounts
+		nil checker
+		return self != nil and self != string.error
 	
 	function FileThatExists (|string| operation="access",  |File|)
 		|| f = .file
@@ -378,9 +380,7 @@ role StringThatWasReadSafely (string)
 		cpp_part Safe
 	false string.error
 	syntax cast (|bool|)
-		opt norefcounts
-		|| o = self|object|
-		return o != string.error and nil
+		return .isok
 
 
 datatype FileSizeInt (int64)

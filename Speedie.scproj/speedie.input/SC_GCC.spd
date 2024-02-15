@@ -121,14 +121,14 @@ function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
 	|| name		= cpp.name
 	|| Prefix	= name.trimextandpath
 	|| h		= cpp.Sibling(Prefix + ".h").file
-	|| o		= Objects[Prefix + ".o"]
+	|| o		= Objects[Prefix + ".o"]!
 	.FoundObjects <~ o
 
 	return .NoGoodObject(Cpp, h, o)
 
 
 
-function FilterCppsIfAlreadyDone (|[string]| Cpps,  |File| Objects,  |&int| stdafx,  |[File]|)
+function FilterCppsIfAlreadyDone (|[string]| Cpps,  |File| Objects,  |?&int| stdafx,  |[File]|)
 	|| wierd = cpp_export.CppProduct
 	for Cpp in Cpps
 		|| reason = .NeedNewObjForSrc(cpp, objects) 
@@ -137,7 +137,7 @@ function FilterCppsIfAlreadyDone (|[string]| Cpps,  |File| Objects,  |&int| stda
 				*stdafx = 1
 
 
-function CollectCppsInto ( |File| Fol,  |File| Objects, |&int| stdafx, |[File]| )
+function CollectCppsInto ( |File| Fol,  |File| Objects, |?&int| stdafx, |[File]| )
 	|[string]| Cpps
 	for name in Fol.list
 		if .CanCompile(name)

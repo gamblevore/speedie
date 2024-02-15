@@ -175,8 +175,9 @@ class FlowControl
 			flow off
 			require FlowMode
 			.Disabled = int.max			// in case its set badly
-			.flow = FlowControl()
-			.flow.init("/tmp/FlowControl/" + name + ".txt.mz", StartCode|int64|.Hex)
+			|| f = FlowControl()
+			.flow = f
+			f.init("/tmp/FlowControl/" + name + ".txt.mz", StartCode|int64|.Hex)
 
 		function New (|string| name, |uint64| StartCode = __modified__,  |FlowControlStopper|)
 			cpp_part FlowStarter

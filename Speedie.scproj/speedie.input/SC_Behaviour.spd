@@ -83,10 +83,10 @@ class SCBehaviour (SCBase)
 	function SCClass.CreateBehaviour
 		require .isobject
 		.Behaviour := SCBehaviour.new(self)
-		.Behaviour.CreateFuncTable( .sourcearg )
+		.Behaviour!.CreateFuncTable( .sourcearg )
 	
 	
-	function SCClass.BestBehaviourFor (|string|name, |SCFunction|)
+	function SCClass.BestBehaviourFor (|string| name, |SCFunction|)
 		// Erm... we need to go through our behaviours, not our functions.
 		// or else... its bad.
 		
@@ -196,7 +196,7 @@ class SCBehaviour (SCBase)
 	function CreateFuncTable (|Message| ErrPlace)
 		expect !.FuncTable
 
-		|| name = .cls.behaviourname
+		|| name = .cls!.behaviourname
 		|| Using = errplace.syntaxusing 
 		|| msg = «tmp "struct"
 			«Thg name »
@@ -205,10 +205,10 @@ class SCBehaviour (SCBase)
 		
 		.project.use
 		|| F = SCClass.NewStruct(msg, compiler.program, ErrPlace)|SCModule| #require
-		F.cls.IsBehaviour = kBehaviourTable
-		f.cls.IsRole = .cls.IsRole						// sigh
+		F.cls!.IsBehaviour = kBehaviourTable
+		f.cls!.IsRole = .cls!.IsRole						// sigh
 		compiler.program.TryAddBase( ErrPlace, F )
-		Compiler.ModuleList <~ F						// Sigh... should not have to do this!
+		Compiler.ModuleList <~ F							// Sigh... should not have to do this!
 		.FuncTable = F
 		scimport.noproj
 	

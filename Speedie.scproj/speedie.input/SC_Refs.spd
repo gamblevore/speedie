@@ -457,10 +457,10 @@ function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| B
 function RC_RelConstructor (|Message| rel)
 	// a = b.c   -->   || a = b.c, jb_incr(a)
 	
-	|| First = rel.first
+	|| First = rel.first!
 	require RelNeedsRef( rel, first )
 	
-	|| Last = rel[ 2 ]
+	|| Last = rel[ 2 ]!
 	require !(last IsThing "nil")
 	
 	if Last != @Thg
@@ -684,7 +684,7 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 			if (parent.obj == Compiler.RefFreeIfDead)
 				return nil // already done!!!
 		
-		|| pp = ch.parentpoint
+		|| pp = ch.parentpoint!
 		if RC_NeedsOwnBlock(ch, pp)
 			ch.TempIntoBlock(pp)
 		  else
@@ -692,8 +692,8 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 	  else
 		using (msg)
 		|| fnc = NewFnc( "JB_FreeIfDead" )
-		fnc.last.obj = Compiler.RefFreeIfDead
-		fnc.obj = Compiler.RefFreeIfDead.returntype
+		fnc.last!.obj = Compiler.RefFreeIfDead
+		fnc.obj = Compiler.RefFreeIfDead!.returntype
 		msg.ReplaceWith( fnc )
 		fnc.Last <~ msg
 

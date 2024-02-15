@@ -339,12 +339,13 @@ module JB_API
 	cpp_wrapper JB_LibShutdown ()
 
 
-	function Parse (|string| s, |string| path="", |message|)
-		require s != nil // out of memory
-		|| L = (Message).CreateUseLayer(path, s) #require
-		|| Result = s.parse
-		(message).restore
-		return result
+	function Parse (|stringthatwasreadsafely?| s, |string| path="", |message|)
+		require s // out of memory
+		|| L = (Message).CreateUseLayer(path, s)
+		if (L?)
+			|| Result = s.parse
+			(message).restore
+			return result
 
 	
 	function Errors (|Message|)

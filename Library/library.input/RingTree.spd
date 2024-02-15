@@ -34,7 +34,7 @@ class RingTree (Saveable)
 	function Next (assigns:||)			{ cpp_wrapper JB_Ring_NextSibSet }
 
 	function Prev (||)					{ cpp_wrapper JB_Ring_PrevSib, nil checker  }
-	function Prev (assigns:||)			{ cpp_wrapper JB_Ring_PrevSibSet }
+	function Prev (assigns:|...?|)		{ cpp_wrapper JB_Ring_PrevSibSet }
 
 	function First (||)					{ cpp_wrapper JB_Ring_First, nil checker }
 	function First (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_FirstSet, nil checker }

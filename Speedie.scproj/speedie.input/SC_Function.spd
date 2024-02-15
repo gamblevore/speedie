@@ -300,7 +300,8 @@ function MacroFix (|SCDecl| contains, |SCBase| name_space, |SCParamArray| Incomi
 	debugger .IsMacro
 	|| msg		= incoming.exp
 	|| Using	= msg.syntaxusing 
-	|| cpy		= .SourceArg.first.copy(msg)
+	|| f		= .SourceArg[@nil]			#require
+	|| cpy		= f.copy(msg)
 	|| oof		= cpy.flatten
 	|| SizeShift= (0, 1)(.cls)
 
@@ -320,7 +321,7 @@ function MacroFix (|SCDecl| contains, |SCBase| name_space, |SCParamArray| Incomi
 			exit
 
 		  elseif (Num >= 0)
-			s.replacewith(incoming[num].copy)
+			s.replacewith(incoming[num]!.copy)
 
 		  elseif (s == @sdot)
 			s.Func = @dot
@@ -330,11 +331,11 @@ function MacroFix (|SCDecl| contains, |SCBase| name_space, |SCParamArray| Incomi
 		  elseif (s == @sthg and "...")
 			if s.istype
 				s.replacewith(contains.writetype)			// cast to contained type!
-			  elseif s.parent.IsContainer
+			  elseif s.parent!.IsContainer
 				for i in incoming.size|int|
 					if IncomingParams[i]
 						IncomingParams[i] = false
-						s.prev = incoming[i].copy
+						s.prev = incoming[i]!.copy
 				s.remove
 		  elseif contains and (s == @type)
 			|| dest = s.last
@@ -347,7 +348,7 @@ function MacroFix (|SCDecl| contains, |SCBase| name_space, |SCParamArray| Incomi
 	  else 
 		msg.SafeReplaceWith(Cpy)
 		rz = TypeOfExpr(cpy, name_space) 
-		rz := typevoid
+		rz := typevoid!
 
 	
 function Message.MacroFixCount (|int|)
@@ -705,8 +706,8 @@ function IsSimpleCast (|Message|)
 	// return |whatever|self
 	expect .Source
 	
-	|| found = .Source.last(@arg)[ 0 ]
-	require (found and found.IsLast) and (found IsTmp "return")
+	|| found = .Source.last(@arg).first
+	require found and found.IsLast and (found IsTmp "return")
 
 
 	found = found.first
@@ -715,7 +716,8 @@ function IsSimpleCast (|Message|)
 	Return found
 
 
-function CreateProtoCastTo (|SCFunction| f)
+/*function CreateProtoCastTo (|SCFunction| f)
+	disabled 
 	|| P  = f.prototype
 	|| sP =  .Prototype
 	
@@ -737,7 +739,7 @@ function CreateProtoCastTo (|SCFunction| f)
 	type.msg(@thg, "self")
 	type <~ p1.first.Copy
 
-	sp.CollectSub( func )
+	sp.CollectSub( func )*/
 
 
 function EqualOrMoreSpecific (|SCFunction| f, |bool|)
@@ -759,30 +761,28 @@ function CheckReturnValue (|Message| msg)
 	|| c = msg.first
 	
 	if (!c)
-		expect (!.ReturnType) (msg, "Need to specify a return value")
+		check (!.ReturnType) (msg, "Need to specify a return value")
 		return
 
 	expect ( c.IsOnlyChild ) ( msg, "Can’t return multiple values" )
 	
-	if !.ReturnType
-		if c == "nil" and (c==@thg or @ques) // auto-generated in many places :)
-			c.Remove
-			return
+	if !.ReturnType and (c == "nil") and (c==@thg or @ques) // auto-generated in many places :)
+		c.Remove
+		return
 	
 	|| FoundReturnType = TypeOfExpr( c, msg.MsgArg )
 	if (FoundReturnType == TypeVoid)
 		FoundReturnType = nil
 
-	if !.returnType
-		expect (!FoundReturnType) ( msg, "This function has no return value." )
-		return
-
-	expect FoundReturnType (msg, "Can’t find return type.")
-	
-	if (FoundReturnType == TypeNil) and (.ReturnType.CantBeNilInCpp)  // OK so what if we can’t return nil?
-		c.ReplaceWith(.ReturnType.CreateDefault(c))
+	|| r = .ReturnType
+		expect FoundReturnType (msg, "Can’t find return type.")
+		
+		if (FoundReturnType == TypeNil) and (r.CantBeNilInCpp)  // OK so what if we can’t return nil?
+			c.ReplaceWith(r.CreateDefault(c))
+		  else
+			r.ExpectMatch( FoundReturnType, kTypeCastTrue, c )
 	  else
-		.ReturnType.ExpectMatch( FoundReturnType, kTypeCastTrue, c )
+		check (!FoundReturnType) ( msg, "This function has no return value." )
 
 
 function Message.SelfUsedForProperty (|int|)
@@ -982,8 +982,8 @@ function FixCnjSub (|Message| exp) {
 		exp.msg(@opp, "require")
 	
 	// get the name (it's important)
-	|| ch = exp.first
-	|| name = ch.Next.Name
+	|| ch = exp.first!
+	|| name = ch.Next!.Name
 	|| CreatesError = (name == "expect" or "check")
 	|| DoesReturn =   (name != "loop" and "check")
 	
@@ -995,25 +995,25 @@ function FixCnjSub (|Message| exp) {
 	
 	// lets fix it, if its in a rel, (it shouldn't be)
 	// || x = a #require   -->   || x = (a #require)
-	|| nxt = ch.next
-	if (ch == @Rel) and (exp in @arg or @Decl) and (ch.second.name == "=")
-		expect  (ch.first.IsAssignable)   (exp, "Use brackets here, like this: “($ch) #${name}”")
+	|| nxt = ch.next!
+	if (ch == @Rel) and (exp in @arg or @Decl) and (ch.second!.name == "=")
+		expect  (ch.first!.IsAssignable)   (exp, "Use brackets here, like this: “($ch) #${name}”")
 		
 		exp.ReplaceWith( ch )
 		
-		|| RightSide = ch.Last
+		|| RightSide = ch.Last!
 		|| bra = «bra »
 		RightSide.ReplaceWith( bra )
 		bra <~ RightSide
 		bra.WrapWith( exp )
-		bra.ReplaceWith( bra.first )
+		bra.ReplaceWith( bra.first! )
 	
 	if name == "require" // unneeded? "cant" doesnt seem to need it?
 		nxt.Name = "return"
 		name = "return"
 		
 	// helpfully replace the exp.
-	ch = exp.first
+	ch = exp.first!
 	ch.Remove
 	exp.ReplaceWith( ch )
 	
@@ -1034,17 +1034,17 @@ function FixCnjSub (|Message| exp) {
 	if (ch isbrel "++") and (ch in @arg) and (ch.first == @thg) {
 		// ++ch #require // just an opt.
 		// Actually I didn't implement the general case yet :) haha.
-		Thg = «thg ch.first.name »
+		Thg = «thg ch.first!.name »
 		pp = ch
 		
 	} else {
-		pp = ch.NiceParent
+		pp = ch.NiceParent!
 		|| Done = false
 		if ((ch.UnBra == @thg)) or ((pp == @arg) and !CreatesError)
-			thg = ch.copy
+			thg = ch.copy!
 			if (pp == @arg)
 				RemoveMe = ch // i think so...
-			pp = ch.ParentPoint
+			pp = ch.ParentPoint!
 			UsePrev = true
 			Done = 1
 		  elseif (pp.IsSetRel and pp.first == @thg)			
@@ -1052,7 +1052,7 @@ function FixCnjSub (|Message| exp) {
 			|| IsDecl = (pp in @Decl)
 			if isdecl or (name != "loop")
 				Done = 1
-				Thg = «Thg pp.first.name »
+				Thg = «Thg pp.first!.name »
 				if IsDecl
 					pp = pp.Parent
 			
@@ -1063,7 +1063,7 @@ function FixCnjSub (|Message| exp) {
 			// func( tmp_318 )
 			
 			pp = SCFunction.TempMoveOut( ch )
-			Thg = «thg pp.DeclName.Name »
+			Thg = «thg pp.DeclName!.Name »
 	}
 	
 	
@@ -1078,7 +1078,7 @@ function FixCnjSub (|Message| exp) {
 	
 	|| arg = «arg »
 	if (CreatesError)
-		|| L = exp.first.Next
+		|| L = exp.first.Next!
 		if (name != "expected")
 			L = L.ExpectParamsTransform( exp.Position, exp )
 		  else
@@ -1098,7 +1098,7 @@ function FixCnjSub (|Message| exp) {
 	  elseif (DoesReturn)
 		arg.msg(@tmp, "return").msg(@ques,"nil")
 	
-	thg = thg.Negate	
+	thg = thg!.Negate	
 	|| if_ = «tmp "if"
 		thg
 		arg
@@ -1108,8 +1108,8 @@ function FixCnjSub (|Message| exp) {
 	  else
 		pp.Next = if_
 	
-	if (RemoveMe)
-		RemoveMe.Remove
+
+	RemoveMe.Remove
 }
 
 	
@@ -1673,10 +1673,10 @@ function SCFunction.PreProcessExpects
 	|[Message]| list = nil
 	
 	for ch.flat in .SourceArg
-		if ch.needspreprocess
+		if ch.NeedsPreprocess
 			list := array.new
 			list <~ ch
-	require list
+	require list!=nil
 	
 	for ch in list
 		if ch == @Trel or @Arel
@@ -1690,9 +1690,7 @@ function SCFunction.PreProcessExpects
 		if ch == "timetest"
 			ch.name = "using"
 			|| w = ch.first
-			if !w
-				ch <~ (@str, "Time")
-				w = ch.first
+			w := ch.msg(@str, "Time")
 			w.needbra
 		  elseif ch=="using"
 			tran_using(self, ch, nil)

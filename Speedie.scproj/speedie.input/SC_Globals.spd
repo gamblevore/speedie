@@ -176,7 +176,7 @@ function TranNegate (|message| f, |scbase| name_space, |scobject|)
 		if d.IsConstOf(Truebool)
 			return falsebool
 	
-	Return TypeBool.TypeNormal // it's a bool anyhow
+	Return TypeBool!.TypeNormal // it's a bool anyhow
 	
 
 function TypeOfBRel (ExprResolver)
@@ -189,21 +189,21 @@ function TypeOfBRel (ExprResolver)
 	if name == "*"
 		return SubType.Dereference(exp, name_space, false)
 		
-	  elseif name == "-" // minus
+	if name == "-" // minus
 		Return subtype
 		
-	  elseif name == "&"
+	if name == "&"
 		require F.CanGetAddress(name_Space)
 		return Subtype.GetAddress
 		
-	  elseif name == "!"
+	if name == "!"
 		return TranNegate(f, name_space)
 		
-	  elseif (name == kBitNot or "~")
-		expect (subtype.IsInteger) (exp, "Expected an integer.") 
+	if (name == kBitNot or "~")
+		check (subtype.IsInteger) (exp, "Expected an integer.") 
 		Return subtype
 
-	  elseif (name == "$")
+	if (name == "$")
 		return TranRender(exp, name_space)
 		
 	SCFunction.Tran_AfterRel( exp, name_space, side )
@@ -540,7 +540,7 @@ function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCBase| Name_S
 	|| R = ExtractDecl( wrap, name_space, purpose )				#require
 	.type = R.Type
 	.contains = cont.MakeContainedOptional
-	if TypeWrapper.typenormal.TypeMatch(R, ktypecastfalse).IsNormalMatch
+	if TypeWrapper!.typenormal.TypeMatch(R, ktypecastfalse).IsNormalMatch
 		check (!Cont.isnormalobject)  ( wrap, "Datatype-wrappers can't contain this." )
 	  else
 		|| RCont = R.Type.Contained				#expect ( wrap, "Not a container class." )
@@ -607,7 +607,9 @@ function SCModule.IsMArray (|message| arr, |bool|)
 
 
 function message.ExpectMatch (|scbase| name_space, |scclass| With, |bool|)
-	return .ExpectClass(TypeOfExprNeeded( self, name_space ), With)
+	opt norefcounts
+	|| T = TypeOfExprNeeded( self, name_space )
+		return .ExpectClass(T, With)
 
 
 function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
@@ -811,14 +813,14 @@ function TypeOfTernary (ExprResolver)
 	expect  list.hasany and params.haschildcount(1)  (exp, "expected: (a,b)(cond)")
 	
 	
-	|| first	= list.first
+	|| first	= list.first!
 	|| second	= first.next
 		require second.expectlast
 	  else
 		second = exp.createnil
 		first.next = second
 
-	|| Test = params.first
+	|| Test = params[@nil]$
 	|| result = SameTypeSub(first, second, name_space)	
 	if result and ExpandToBool( test, name_space )
 		params <~ list.first
@@ -1677,7 +1679,7 @@ function DotFuncToNormalFunc (|Message| dot, |SCFunction| fn)
 
 
 function SCDecl.ProcessAs (|Message| msg, |SCDecl|)
-	|| P = msg.parent.unbra
+	|| P = msg.parent!.unbra
 	if (P isBrel "&")					 // :)
 		return self
 	|| T = .type.processas!.typenormal

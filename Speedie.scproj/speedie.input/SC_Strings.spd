@@ -320,7 +320,7 @@ function message.BecomeAppend (|string| s)
 
 function message.WithDirectName (|message| p, |string|)
 	expect (self!=@rel and self != @bra) (self)
-	return scfunction.tempmoveout(self).DeclName.name
+	return scfunction.tempmoveout(self).DeclName!.name
 
 
 function message.Tran_With 

@@ -66,9 +66,11 @@ struct Pico
 		cpp_wrapper PicoConf
 	
 	helper __Get (|float| T, |PicoMessage|)
+		nil checker
 		cpp_wrapper PicoGet
 
 	function Get (|float| T, |string|)
+		nil checker
 		return string.FromPico(.__get(T))
 		
 	function Close (|cstring| Why)

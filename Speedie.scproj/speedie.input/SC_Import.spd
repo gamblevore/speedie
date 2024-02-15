@@ -175,16 +175,16 @@ class SCImport
 		scimport.allfiles <~ rz
 	
 	
-	function ImportDir (|File| f,  |SCFile|)
+	function ImportDir (|File| f,  |SCFile?|)
 		for cName in f.list
-			|| c		= f[cName]
+			|| c		= f[cName]!
 			|| ext		= cName.ext
 
 			if cname contains "(disabled)"
 				0 //
 			  elseif (c.IsDir)
 				.ImportDir( c )
-			  elseif (cname.isspeediesrc)
+			  elseif (cname.IsSpeedieSrc)
 				|| B = .ImportSpd(c)
 				if cName ~= "index.spd"
 					rz = B
