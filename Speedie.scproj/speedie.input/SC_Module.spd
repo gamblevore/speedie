@@ -95,7 +95,8 @@ function IsProject (|bool|)
 
 function NewModuleFunc (|Message| src, |SCFunction|)
 	rz = SCFunction.NewFunc( src, self, src )|SCFunction|
-	.TryAddBase( src, rz )
+	if rz
+		.TryAddBase( src, rz )
 
 
 function BaseDecls 

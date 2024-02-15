@@ -921,10 +921,10 @@ function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |
 function Define_Behaviour (|SCFunction| fn,  |string| purpose,  |message|)
 	// behaviour abc --> .__abc__
 	|| cls = fn.cls #require
-	|| name = "__" + fn.name + "__"
+	|| name = fn.name.moat
 	|| found = cls.UpCheck(name)
 	if found isa SCFunction
-		return .DefineOrCall(found.source, purpose, found)
+		rz = .DefineOrCall(found.source!, purpose, found)
 
 
 function message.CutifyCopy (|message!|)

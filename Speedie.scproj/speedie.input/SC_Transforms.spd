@@ -291,7 +291,7 @@ function Tran_Print (TranFunc)
 	TypeOfExpr( node, name_space )
 
 
-function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
+function Tran_All (|SCFunction| fn, |Message| s, |SCBase!| p) // transform ()
 	require !TooManyErrors()
 	|| f = s.func
 	
@@ -314,7 +314,7 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 		SCFunction.Tran_Array( s, p )
 		
 	  elseif (f == @Type)
-		Tran_All( Fn, s.first, p )
+		Tran_All( Fn, s.first!, p )
 		Return
 		
 	  elseif (f == @Tmp)
@@ -338,13 +338,13 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase| p) // transform ()
 		return  // units have internal structure that can be damaged
 	
 	if (s == @arg) and (f != @arg)
-		p = s.scarg(p) // Resync
+		p = s.scarg(p)! // Resync
 	
 	|| ch = s.first
 	while (ch)
 		|| n = ch.next
 		if (ch == @Arg)
-			Tran_All( fn, ch, ch.scarg(p, s) )
+			Tran_All( fn, ch, ch.scarg(p, s)! )
 		  else
 			Tran_All( fn, ch, p )		
 		ch = ch.next

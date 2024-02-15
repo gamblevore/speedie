@@ -744,8 +744,8 @@ function SpellOutMsg (|message| type, |message| Exp, |message| namemsg, |message
 
 
 function Tran_Msg (|SCFunction| fn,  |message| Exp,  |scbase| name_space)
-	|| Type		= exp.first
-	|| NameMsg	= Type.first
+	|| Type		= exp.first!
+	|| NameMsg	= Type.first!
 	if exp LessOrEqual 1
 		|| Mini	= SpellOutMsg(type, exp, namemsg)
 		TypeOfExpr( Mini, name_space )
@@ -919,7 +919,7 @@ function TypeOfSwizzle (|message| Exp, |scdecl| Type, |scbase| name_space, |mess
 	if w == 3 // vec3 is a secret vec4
 		w = 4
 	
-	|| prms = exp.last
+	|| prms = exp.last!
 	|| T = VecType(!type.IsInteger, count).notconst
 	if (count == 1)
 		swiz &= 7
@@ -931,17 +931,17 @@ function TypeOfSwizzle (|message| Exp, |scdecl| Type, |scbase| name_space, |mess
 	  else
 		prms.remove
 
-		|| oof = exp.first
+		|| oof = exp.first!
 		|| tmp = oof.name
 		if (oof == @thg)
 			oof.remove
 		  else
 			|| what = oof.intovariable(name_space)
 			oof = what.arg 
-			oof.parent.obj = T
+			oof.parent!.obj = T
 			name_space = oof.asarg
 			exp.become(@bra)
-			exp = oof.last.last
+			exp = oof.last.last!
 			tmp = exp.name
 			exp.obj = T
 			

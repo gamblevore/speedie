@@ -1226,7 +1226,7 @@ function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |
 	  else
 		expect (parent isa SCModule) (node, "Function prototypes must be in a module." )
 		
-	|| f = SCFunction.NewFunc( node, parent, ErrPlace )|SCFunction|
+	|| f = SCFunction.NewFunc( node, parent, ErrPlace )|SCFunction|		#require
 	expect (Compiler.FuncList.Pop == f)
 	
 	|| Using = node.SyntaxUsing
@@ -1235,7 +1235,7 @@ function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |
 	tmp <~ node.last
 	
 	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface )
-		|| clss = modul.Cls
+		|| clss = modul.Cls!
 		clss.IsBuiltin = false // datatype sets it to true.
 		clss.FuncProto = f
 		f.ProtoType = clss
@@ -1621,7 +1621,7 @@ function NewCppWrapper (CollectFunc)
 	expect (prm.islast) (prm)
 	
 	using name
-	|| thg = «thg name.name »
+	|| thg = «thg name!.name »
 	if node == "cpp_inbuilt"
 		thg = «bra, thg »
 	|| IsNothing = node == "cpp_nothing"
@@ -1630,13 +1630,14 @@ function NewCppWrapper (CollectFunc)
 	node.msg(@Arg).msg(@Tmp, "cpp_wrapper") <~ thg
 
 	rz = SCFunction.NewFunc( node, name_space, ErrPlace )
-	rz.noautocomplete = 1
-	if isnothing
-		rz|scfunction|.IsCppInBuilt = 2
-	  elseif node == "cpp_inbuilt"
-		rz|scfunction|.IsCppInBuilt = 1
-	rz|scfunction|.IsExternalLib = islib
-	rz|scfunction|.MakeParamsReal
+	if rz isa SCFunction
+		rz.noautocomplete = 1
+		if isnothing
+			rz.IsCppInBuilt = 2
+		  elseif node == "cpp_inbuilt"
+			rz.IsCppInBuilt = 1
+		rz.IsExternalLib = islib
+		rz.MakeParamsReal
 
 
 function NewSetter (CollectFunc)

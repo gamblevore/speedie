@@ -54,8 +54,8 @@ function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 	  else
 		require basis & kBasisDestructable
 	
-	|| arg = Dcl.Parent
-	|| name = Dcl.DeclName
+	|| arg = Dcl.Parent!
+	|| name = Dcl.DeclName!
 	|Message| LastPlace
 	if (Basis & kBasisObj)	// could be a struct?
 		LastPlace = LastUsedRefPlace( name, arg )
@@ -417,18 +417,18 @@ function message.DoesAnything (|bool|)
 
 function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| Basis)
 	if (Basis & kBasisDestructable)
-		|message| NeedsMoreTemping
-		|message| Ch
-		if (Blocker)
-			Ch = Blocker.first
-			if (Blocker.isReturnOrRejoin  and  ch isThing name.name) or (blocker isthing name.name)
-				return
-			if (blocker == "return") and (ch.DoesAnything)
-				NeedsMoreTemping = SCFunction.TempMoveOut( ch, blocker ) // still need to ref it.
-
-		.DeStructable(Blocker, arg, name)
-		if NeedsMoreTemping
-			ReturnTempMoveOutSub(ch, blocker, NeedsMoreTemping)
+		if (!Blocker)
+			return .DeStructable(Blocker, arg, name)
+		
+		|| ch = Blocker.first
+		if (Blocker.isReturnOrRejoin  and  ch isThing name.name) or (blocker isthing name.name)
+			return
+		if (blocker == "return") and (ch.DoesAnything)
+			|| NeedsMoreTemping = SCFunction.TempMoveOut( ch, blocker ) // still need to ref it.
+			.DeStructable(Blocker, arg, name)
+			ReturnTempMoveOutSub(ch!, blocker, NeedsMoreTemping)
+		  else
+			.DeStructable(Blocker, arg, name)
 		return
 
 	if (basis & kBasisTempStruct)
@@ -439,19 +439,13 @@ function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| B
 		Return
 
 	|| IsReturn = Blocker.IsReturnOrRejoin
-	|| Child = Blocker.first.unbratype
-
-	if (!Child)
-		RefDecr( name, blocker, basis )
-		
-	  elseif (IsReturn and (child isThing name.name) )
-		RefSafeDecr( name, blocker ) // needs to come after any decr!
-		
-	  else
+	|| Child = Blocker.first
+		if IsReturn and (child.unbratype isThing name.name)
+			RefSafeDecr( name, blocker ) // needs to come after any decr!
+			return
 		if IsReturn and ExprNeedsTemping( Child, name )
 			ReturnTempMoveOut(Child, blocker)
-		RefDecr( name, blocker, basis )
-
+	RefDecr( name, blocker, basis )
 
 
 function RC_RelConstructor (|Message| rel)
@@ -757,7 +751,7 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 function SCFunction.BuildConstructorDestructor
 	require self is ConOrDes
 	
-	|| root = .SourceArg
+	|| root = .SourceArg!
 	|| IsConstructor = self is Constructor
 
 	|| TheCall = .CallParents( root, IsConstructor )
@@ -766,10 +760,11 @@ function SCFunction.BuildConstructorDestructor
 		.FillInMissingConstructorDefaults( root, TheCall )
 	require StdErr.OK and !IsConstructor
 	
-	if !.cls.HasStuffToHandleInDestructor
+	|| c = .cls!
+	if !c.HasStuffToHandleInDestructor
 		if !Root.hasany
-			.cls.DestructorFunc = nil
-	  elseif !.cls.IsWrapper
+			c.DestructorFunc = nil
+	  elseif !c.IsWrapper
 		.FillInDestructor
 
 

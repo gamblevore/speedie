@@ -51,12 +51,21 @@ function int.OperatorPC (|int| x, |string|)
 	return (self|float| / x|float|).pc
 
 
-function string.pluralize (|int| amount, |string| nothing="", |string|)
+function string.Pluralize (|int| amount, |string| nothing="", |string|)
 	if !amount and nothing
 		return nothing
 	|| s = "s" * (amount != 1)
 	return "$amount $self$s"
-	
+
+
+function string.Moat (|string|)
+	|| fs = faststring()
+	fs.size = .length + 4
+	fs <~ "__"
+	fs <~ self
+	fs <~ "__"
+	return fs
+
 
 function string.IsFileLike (|bool|)
 	|| c = *self

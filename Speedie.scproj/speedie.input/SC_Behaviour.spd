@@ -65,7 +65,7 @@ class SCBehaviour (SCBase)
 		if (name.last == '0')
 			name = name[0, name.length-1]
 		if (!name.UnderScoreAtAnyEnd)
-			name = "__" + name + "__"
+			name = name.moat
 		return .InterfaceFor(name, fn.source)
 	
 	
@@ -247,7 +247,7 @@ class SCBehaviour (SCBase)
 					node <~ «arg »
 
 				name.next = «prm
-					«thg "__" + name.name + "__"»
+					«thg name.name.moat »
 				»
 			return true
 		
@@ -304,7 +304,7 @@ function $InterName (,$InterName)
 			|| s = Thg.name
 			expect (!s.UnderScoreAtAnyEnd) (thg, "Interfaces can’t start or end with underscore.")
 			expect (s~!="destructor")      (thg, "Bad name.")
-			Thg.name = "__" + s + "__"
+			Thg.name = s.moat
 			
 			// node.normalisefunc
 			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s) #require

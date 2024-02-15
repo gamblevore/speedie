@@ -139,8 +139,9 @@ struct NameAndMsg
 	|message|   Arg
 	
 	syntax append (|message| m)
-		if (.msg)
-			.msg.prev = m
+		opt norefcounts
+		|| msg = .msg
+			msg.prev = m
 		  else
 			.arg <~ m
 

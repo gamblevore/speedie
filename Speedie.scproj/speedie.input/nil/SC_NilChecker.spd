@@ -113,8 +113,8 @@ function String (niltrackerfn)
 function Function (NilTrackerFn)
 	opt norefcounts
 	test &=~ NilCheckMode.Disappears
-	|| fp = msg.first
-	|| prms = fp.next
+	|| fp = msg.first!
+	|| prms = fp.next!
 	if msg.tmptype == ASMtmp.kTern
 		return tern(prms, test)
 	
@@ -141,13 +141,13 @@ function Function (NilTrackerFn)
 		if recv.nildeclare is optional
 			test |= nilcheckmode.Soft
 			
-		|| v = .Jump(p, test)
-		if rz and !(v is FnBecomesNilCh) and p.isfirst
+		|| v = .Jump(p!, test)
+		if rz and !(v is FnBecomesNilCh) and p!.isfirst
 			rz = 0 // can't work
-		|| sent = p.FastDecl
+		|| sent = p!.FastDecl
 		HasAddrs := sent.CanUpgradeInternalPointer
 		if (v is nilish) and recv.NilReg	
-			.NilParamPass(recv, sent, p, fn)
+			.NilParamPass(recv, sent, p!, fn)
 
 		Test = 0
 		p++
@@ -155,15 +155,15 @@ function Function (NilTrackerFn)
 	if HasAddrs
 		p = prms.first
 		for recv in fn.args
-			|| infernal = p.FastDecl.CanUpgradeInternalPointer
-				|| ri = recv.internal
-				.VariableSet(infernal, recv.source, ri, p, ri.nilcurr)
+			|| infernal = p!.FastDecl.CanUpgradeInternalPointer
+				|| ri = recv.internal!
+				.VariableSet(infernal, recv.source, ri, p!, ri.nilcurr)
 			p++
 
 	if fn.IsKiller
 		.DeclKill
 		if (t.nestdepth == 0)  and  !t.AnyReturns // also if no returns happened...
-			scfunction.currfunc.iskiller = true
+			scfunction.currfunc!.iskiller = true
 		return nilstate.Killer
 	
 	|| ret = fn.ReturnType
@@ -477,7 +477,7 @@ function Brel (Niltrackerfn)
 	if b == '*'
 		return .UseChildAsReal(msg)							// *abc
 
-	|| ch = *msg
+	|| ch = (*msg)!
 	if b == '-' or '+' // for ++ or --
 		return .jump(ch, test)
 	if b == '!'
