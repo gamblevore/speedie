@@ -680,7 +680,7 @@ function DeclsProtoTypeAdd (|SCClass| fpType)
 
 
 function DeclsProtoTypeRemove (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool|late=false)
-	|| p = ch0.Parent
+	|| p = ch0.Parent!
 	|| Proto = fpType.FuncProto						#expect (ch0, "This isn't a prototype!")
 	|| fProtoParams = Proto.Source[ @prm, 1 ]		#require
 

@@ -29,11 +29,11 @@ class Macro
 		rz.BecomeMacro(self, TmpPrms)
 		TmpPrms.clear
 	
-	function string.Macro (|macro|)
-		return macro(self)
-		
 	module
 		|array of message| TmpPrms
+
+function string.Macro (|macro!|)
+	return macro(self)
 	
 
 extend message
@@ -50,13 +50,14 @@ extend message
 		rz.name = prm.name
 	
 	
-	helper MacroPrm (|message| root,  |array of message| prms,  |Message|)
+	helper MacroPrm (|message| root,  |(array of message)?| prms,  |Message|)
 		opt norefcounts
 		|| n = .name
 		if (n.first == '_')
 			if (n == 1) or n.IsInt(1) 
 				|| oop = prms[n.int|int|]		#expect (root, "Not enough params.")
-				if self == @dot or @sdot or @str or @sstr or @char // anything except @thg?
+				|| f = .func
+				if f == @dot or @sdot or @str or @sstr or @char // anything except @thg?
 					return .MacroSame(oop)
 				return oop.MacroAvoidCopy
 			return message(self)
@@ -64,7 +65,7 @@ extend message
 		.MacroCopy(root, prms, rz)
 
 
-	helper MacroCopy (|Message| root, |array of message| prms,  |Message| dest)
+	helper MacroCopy (|Message| root, |(array of message)?| prms,  |Message| dest)
 		opt norefcounts
 		for v in self
 			dest <~ v.MacroPrm(root, prms)
@@ -73,7 +74,7 @@ extend message
 		.func = belikeme.func
 		.name = belikeme.name	
 
-	function BecomeMacro (|Macro| M,  |array of message| prms=nil)
+	function BecomeMacro (|Macro| M,  |(array of message)?| prms=nil)
 		opt norefcounts
 		.clear
 		.func = m.Source.func

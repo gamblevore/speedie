@@ -938,7 +938,6 @@ dispatch ClsCollectTable (CollectFunc)
 	api					SCFunction.NewFunc
 	macro				SCFunction.NewMissingFunc
 	helper				SCFunction.NewHelper
-	fields				SCClass.NamedPropertyFields
 	behaviour			SCBehaviour.NewBehaviour
 	virtual				SCBehaviour.NewVirtual
 	iterator			SCIterator.NeuIter

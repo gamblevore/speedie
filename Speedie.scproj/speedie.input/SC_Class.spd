@@ -1079,64 +1079,6 @@ module
 		|| cls = name_space as scclass
 			cls.defawlt = node.NeedFirst
 	
-	
-	function NamedPropertyFields (CollectFunc) // node, parent, errplace
-		// not a great feature???
-		// only galaxxies used this. we should remove
-	/*
-		|float[5]| Stats
-		Fields (Stats) {
-			Speed
-			Jump
-			Health
-		}
-		// creates
-		function Speed (|float|) {
-			return .fields[Speed]
-		}
-		function Speed (assigns:|float|) {
-			.fields[Speed] = Value
-		}
-	*/
-			
-		|| Name 	= node[@bra][@thg]									#require
-		|| decl 	= name_space|scclass|.FindDecl(name.name)			#require
-		|| Type		= decl[@acc]										#require
-		|| Arg		= node[@arg, 1]										#require
-		|| DataType = Type[@Thg]										#require
-		|| Cls		= compiler[datatype]								#require
-		|| CountMsg = Type[@arr, 1][@num]								#require
-		|| Consts	= «Arg »
-		|int| Count = CountMsg.int
-		|| Found	= 0
-		
-		
-		for (c in arg)
-			expect (!c.hasany and (c == @tmp)) (C)
-			|| src = .DoOneNamedField(c, name.name, Cls.name, found)	#require
-			|| getter = src.first
-			|| setter = getter.next
-			(src)
-			
-			consts <~ «rel
-				«thg name.name + c.name »
-				«opp "="»
-				found
-			»
-			name_space.Collectone(getter, false)
-			name_space.Collectone(setter, false)
-
-			Found++
-		expect (Count >= Found) (countmsg, "Too few fields specified")
-		
-		consts <~ «rel
-			«Thg "kCount"»
-			«opp "="»
-			found
-		»
-		name_space.sourcearg <~ «tmp "constants", consts »
-		node.remove
-		return compiler.program
 }
 
 

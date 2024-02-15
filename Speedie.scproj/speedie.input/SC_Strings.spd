@@ -101,7 +101,7 @@ function InBuiltFunc (|message| self, |string| name, |bool|)
 
 
 function String_Expand (|Message| msg, |SCFunction| fn) {
-	|| P = msg.parent 
+	|| P = msg.parent !
 	if (P istmp "disabled" or "description")
 		msg.Func = @str					// in case of description ''
 		return

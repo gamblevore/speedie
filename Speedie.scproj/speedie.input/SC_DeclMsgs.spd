@@ -184,7 +184,7 @@ function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
 
 
 function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
-	|| Types = .first
+	|| Types = .first!
 	|| Names = types.Next
 
 	expect (FuncPrms or Names)  (self, "No name found.")
@@ -193,7 +193,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| c
 
 	|| Default = DeclsDefault( names )
 	|| Sdcl = ExtractDecl( Types, P, mode )
-	if (!sdcl and !default and (P isa SCArg))
+	if !sdcl  and  !default  and  (P isa SCArg)
 		sdcl = P.ParentFunc.ReturnType
 
 	|| NameItm = names.CollectDclName
