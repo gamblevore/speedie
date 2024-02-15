@@ -421,14 +421,14 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 	|| f = c.func
 	
 	if (f == @Decl)
-		Return ExtractDecl( c.first, name_space, purpose )
+		Return ExtractDecl( c.first!, name_space, purpose )
 	
 	if (f == @Emb)
 		check (!c.first) (c)
 		return nil
 	
 	if (f == @Bra)
-		return extractdecl(c.first, name_space, purpose)
+		return extractdecl(c.first!, name_space, purpose)
 		
 	if (f == @sthg) and (c == "...")
 		return name_space.RequireContained( c )
@@ -443,7 +443,7 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 	if (c == @Acc)		// |Byte[10]| TenBytes
 		|| Prms = c.second
 		if prms.HasAny
-			|| R = ExtractDecl( c.first, name_space, purpose )			#require
+			|| R = ExtractDecl( c.first!, name_space, purpose )			#require
 			R = R.copy
 			expect  ExtractAmount( Prms, name_space, R )   ( c, "Expected something like: |Type[10]|" )
 			return R
@@ -457,11 +457,11 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 		c <~ fi
 	
 	if (f == @func)
-		|| R = ExtractDecl( c.first, name_space, purpose )				#require
+		|| R = ExtractDecl( c.first!, name_space, purpose )				#require
 		return R.RefineDecl(c.last)
 	
 	if (f == @Arel or @brel)
-		|| R = ExtractDecl( c.first, name_space, purpose )				#require
+		|| R = ExtractDecl( c.first!, name_space, purpose )				#require
 		if (C == "--")
 			return R.MakeBorrowed(c.uptotype!=nil)
 		if C == "~"
@@ -478,8 +478,14 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 			error (c)
 		return r
 
+	if (F == @name)												// use instead of below!
+		c.func = @thg
+		|| d = ExtractDecl(c, name_Space, purpose)$
+		(d is compilercreated)
+		return d
+
 	if (F == @arg)												// a bit ugly... |{\n\tfaststring\n}|
-		|| d = ExtractDecl(c.first, name_Space, purpose)$
+		|| d = ExtractDecl(c.first!, name_Space, purpose)$
 		(d is compilercreated)
 		return d
 
@@ -489,30 +495,30 @@ function ExtractDecl (|Message| c, |SCBase| name_space, |declmode| Purpose, |SCD
 	if (f == @Arr)
 		|| ch = c.first
 		if !ch										// |[]|
-			Return TypeArray.TypeNormal
+			Return TypeArray!.TypeNormal
 		
 		expect (ch != @Item) (c)
 		|| dcl = ExtractDecl( ch, name_space, purpose )
 			rz.Contains = dcl.MakeContainedOptional
-			rz.Type = TypeArray
+			rz.Type = TypeArray!
 		
 	  elseif (f == @Adj)
 		deprecate (c, "Use 'of' instead.")
-		rz.LoadContained(c.first, c.last, name_Space, purpose)			#require
+		rz.LoadContained(c.first!, c.last!, name_Space, purpose)		#require
 		
 	  elseif (f == @rel)
 		|| op = c[@opp, 1]												#require
 		op.expect(@opp, "of")
 		|| contained = c[nil, 2]										#require
-		rz.loadContained(contained, c.first, name_Space, purpose)		#require
+		rz.loadContained(contained, c.first!, name_Space, purpose)		#require
 		
 	  elseif (ErrCount == StdErr.errorCount)
 		error ( c ) // no spam
 	
-	if rz
-		rz.MakeContainedObject(c)	
-		if (ErrCount != StdErr.errorCount)
-			rz = nil
+
+	rz.MakeContainedObject(c)	
+	if (ErrCount != StdErr.errorCount)
+		rz = nil
 
 
 
@@ -1280,27 +1286,26 @@ function message.AndOrExpansionTest (|uint|)
 
 
 function TypeOfRel (ExprResolver) {
-	|| LN = exp.first
-	|| opch = ln.Next
+	|| LN = exp.first!
+	|| opch = ln.Next!
 	|| Comp = SCOperator.Lookup( opch )
-	|| RN = opch.Next
+	|| RN = opch.Next #expect	(exp, "Missing right hand side")
 	if opch == "is" or "isnt"
 		return LN.NiceIsFlagSyntax(opch, RN, name_space, side)
 	
-	expect  (RN or Comp.isCustom)  ( exp, "Invalid expression." )
 
 	side = nil
 	|| P = exp.niceParent
-		|| ParentFunc = P.func
-		|| ShouldBeSet = (ParentFunc == @Arg or @Decl) 
-		if (comp != "=")
-			if (Shouldbeset)
-				error (opch, "Can't use this operator here.")
-		  elseif (ShouldBeSet)
-			side = rn
-			exp.tmptype = asmtmp.ksetvar // for the ASM
-		  else
-			error (opch, "Did you mean '=='?")
+	|| ParentFunc = P.func
+	|| ShouldBeSet = (ParentFunc == @Arg or @Decl) 
+	if (comp != "=")
+		if (ShouldBeSet)
+			error (opch, "Can't use this operator here.")
+	  elseif (ShouldBeSet)
+		side = rn
+		exp.tmptype = asmtmp.ksetvar // for the ASM
+	  else
+		error (opch, "Did you mean '=='?")
 
 	
 	|SCDecl| RC
@@ -1313,15 +1318,11 @@ function TypeOfRel (ExprResolver) {
 			return TypeOfRel(Exp, name_space, side) // lol.
 	  else 
 		LC = TypeOfExpr( LN, name_space )
-		if (RN)
-			RC = TypeOfExprNeeded( RN, name_space ) #require 
+		RC = TypeOfExprNeeded( RN, name_space ) #require 
 
 
 	require (exp == @rel) // has exp changed?
 	expect  (LC)  (LN, "Can’t find the type of this.")
-	
-	if (!RN)
-		return CustomFuncOp( exp, comp, name_space, RN )
 	
 	if (side)
 		// check for dumb stuff like "func() = nil" or "abc|bool| = false"
@@ -1348,8 +1349,8 @@ function TypeOfRel (ExprResolver) {
 	  elseif (comp.AsBit)
 		require RC.NoFloat(RN) and LC.NoFloat(LN)
 	
-	if (custom & CustomOps.TypeCastFromBool) and !side and rn
-		lc = typeint.typenormal
+	if (custom & CustomOps.TypeCastFromBool) and !side
+		lc = typeint!.typenormal
 		rc = lc
 	
 	if Custom <= CustomOps.needed
@@ -1363,7 +1364,7 @@ function TypeOfRel (ExprResolver) {
 		lc = lc.better_numeric(rc)
 	
 	if (comp.IsCompare and !side)
-		Return TypeBool.TypeNormal
+		Return TypeBool!.TypeNormal
 
 	if (comp.MakesSigned and lc.isuintlike)
 		return lc.MakeSignedIfPossible // should explicitly type-cast?

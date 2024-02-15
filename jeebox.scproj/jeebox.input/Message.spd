@@ -763,7 +763,7 @@ class Message (RingTree)
 			self <~ "' "
 
 
-	function AccessErr (|syntax|s, |string?| name, |message?| found)
+	function AccessErr (|syntax|s, |string?| name=nil, |message?| found=nil)
 		cpp_part CantFind
 		if !self
 			jb_api.NilHandler

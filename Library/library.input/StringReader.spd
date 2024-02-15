@@ -49,7 +49,7 @@ class StringReader
 		
 	function HasAny (|bool|)
 		require (self != nil)
-		if .data has 1
+		if .data.hasany
 			return true
 		return .NextChunk
 
@@ -69,7 +69,7 @@ class StringReader
 				return b
 	
 	function Byte (|int|)
-		if .data has
+		if .data.HasAny()
 			return .data.byte
 		if .NextChunk
 			return .data.byte
@@ -162,7 +162,7 @@ class StringReader
 	 function Str (|int| n, |int| skip = 0, |string|)
 		ifn n > 0 and skip < n
 			return ""
-		if (.data has n) or (.NoMoreChunks)
+		if (.data.has(n)) or (.NoMoreChunks)
 			(n min= .remaining)
 			|| pos = .data.position		// no need use the .startfrom
 			.data.position = n + pos

@@ -148,7 +148,7 @@ extend Message {
 
 
 	function ParseShaderSub (|Message|)
-		|| Name = .parent[0].name #expect (.parent, "Expected a name")
+		|| Name = .parent.first!.name #expect (.parent, "Expected a name")
 		rz = .FindShader(Name) #require
 		
 		|| StaticAdditions = "function New (|&$name|) {

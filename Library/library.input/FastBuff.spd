@@ -96,10 +96,10 @@ struct FastBuff
 				return pos - .Start
 			Pos++
 		
-	operator has (|int| n, |bool|)
+	function Has (|int| n, |bool|)
 		return .end - .curr >= n
 	
-	operator has (|bool|)
+	function HasAny (|bool|)
 		cpp_Part HasAny
 		return .end > .curr
 	

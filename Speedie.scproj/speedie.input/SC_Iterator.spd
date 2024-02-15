@@ -17,10 +17,10 @@ class SCIterator (SCObject)
 	|message?|			Value
 	|message?|			WhileLoop
 	|message?|			Yield
-	|scclass|			Parent
+	|scclass?|			Parent
 	|bool| 				OK
 	
-	constructor (|scclass| parent, |Message| msg)
+	constructor (|scclass?| parent, |Message!| msg)
 		.parent = parent
 		
 		|| thg = msg.first
@@ -127,7 +127,7 @@ class SCIterator (SCObject)
 		|sciterator| pointer
 		
 		function SimpleIter (|string| src, |sciterator|)
-			|| s = src.parse.first
+			|| s = src.parse.first!
 			|| it = SCIterator.new(nil, s)
 			if it.OK
 				rz = it

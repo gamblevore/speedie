@@ -567,14 +567,16 @@ function BecomeReal (|scdecl| sent, |message| where,  |nilreason| reason, |scfun
 		T.BecomeRealSub(sent)
 		return T.SetNilness(sent, NilState.real)
 
-	return .FailedReal(to, where, reason)
+	return .FailedReal(to, where, reason, curr)
 
 
-function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nilstate|)
+function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nilstate| state, |nilstate|)
 	|| fs = faststring()
 	fs <~ "NilObjectError "
 	fs <~ nilreason.values[reason]
-	fs <~ " optional: "
+	fs <~ ' '
+	fs <~ state.RawName
+	fs <~ ' '
 	where.render(fs)
 	if To
 		fs <~ " to "

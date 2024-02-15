@@ -15,8 +15,9 @@ class Macro
 		rz = ._parsed
 		if !rz
 			rz = .input.parse
-			rz.wipepositions
-			._parsed = rz
+			if rz
+				rz.wipepositions
+				._parsed = rz
 	syntax call (|[message]| prms=nil, |message|)
 		rz = message()
 		rz.BecomeMacro(self, prms)
