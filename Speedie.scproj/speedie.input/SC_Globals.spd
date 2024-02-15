@@ -215,14 +215,14 @@ function TypeOfLast (ExprResolver)
 
 
 function TypeOfBlock (ExprResolver)
-	|| last = exp[@nil, -1]
+	|| last = exp[@nil, -1]$
 	ifn last istmp "rejoin"
 		using last
 			last = last.wrapwith(NewRejoin())
 	
-	|| p = exp.scarg( name_space )
-	exp.Parent.statementexpr = p
-	|| fn = p.owningfunc
+	|| p = exp.scarg( name_space )!
+	exp.Parent!.statementexpr = p
+	|| fn = p.owningfunc! // isnt this the same as scfunction.currfunc
 	
 	CollectDeclsFuncBodyUnsureHowToRemove( exp, p ) // hard to remove these. might take an hour or 2 just on removing this.
 	
@@ -230,7 +230,7 @@ function TypeOfBlock (ExprResolver)
 
 	for ch in exp			// copied from tran_all... shouldn't be necessary... 
 		if ch == @Arg
-			SCFunction.Tran_All( fn, ch, ch.scArg( p ) )
+			SCFunction.Tran_All( fn, ch, ch.scArg( p )! )
 		  else
 			SCFunction.Tran_All( fn, ch, p )
 	
@@ -1680,6 +1680,7 @@ function DotFuncToNormalFunc (|Message| dot, |SCFunction| fn)
 
 
 function SCDecl.ProcessAs (|Message| msg, |SCDecl|)
+	expect (msg)		
 	|| P = msg.parent!.unbra
 	if (P isBrel "&")					 // :)
 		return self

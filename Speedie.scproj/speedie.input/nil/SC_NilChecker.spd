@@ -579,8 +579,10 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 	|| fs = faststring()
 	fs <~ "NilObjectError "
 	fs <~ nilreason.values[reason]
-	fs <~ ' '
-	fs <~ state.RawName
+	|| raw = state.RawName
+	ifn where isthing raw
+		fs <~ ' '
+		fs <~ raw
 	fs <~ ' '
 	where.render(fs)
 	if To

@@ -225,7 +225,7 @@ class ErrorReceiver
 
 
 	module
-		|int64|		Progress
+		|f64|		Progress
 		|String|	NonFatal = "Non-Fatal Internal Error"
 		function OutOfMemory (|bool|)
 			cpp_Wrapper JB_OutOfMemoryOccurred

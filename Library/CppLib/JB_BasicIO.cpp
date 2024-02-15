@@ -45,6 +45,10 @@ void JB_Str_PrintError(JB_String* s) {
 }
 
 void JB_Str_Print(JB_String* s) {
+	auto ms = Mini(s);
+	auto mf = Mini2("JB_Tree_Second(ch)!");
+	if (StrEquals(ms, mf))
+		debugger;
     PrintTo(s, StdOutFD_);
 }
 void JB_Str_PrintLine(JB_String* s) {

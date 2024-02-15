@@ -220,19 +220,17 @@ class FastString {
 		.fieldstart(name)
 		.indent++
 
-	function Field (|string| name, |int64| data)
-		cpp_part AppendInfoNum
-		if data
-			.fieldstart(name)
-			self <~ data
-			
-	
-	function FieldF (|string| name, |f64| data)
+	function FieldFloat (|string| name, |f64| data)
 		cpp_part AppendInfoFloat
 		if data
 			.fieldstart(name)
 			self <~ data
 
+	function Field (|string| name, |int64| data)
+		cpp_part AppendInfoNum
+		if data
+			.fieldstart(name)
+			self <~ data
 
 	function AppendMemory (|&byte| Str, |uint| N)
 		cpp_wrapper JB_FS_AppendMem_

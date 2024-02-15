@@ -351,17 +351,8 @@ function TryAddBase (|Message| c, |scbase| neu)
 	.TryAdd( c, neu, neu.Name )
 
 
-function LookUpAddress (|string| name, |Message| exp, |Object|)
-	opt norefcounts
-	if (exp == @dot)
-		if (exp.second == @prm)
-			error ( exp,  "No parameters allowed here..."  )
-
-	return .LookUpSub( name, exp, nil, self, nil, nil, kPurposeAddress )
-
-
 function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scfunction|)
-	return .LookUpSub( name, exp, ParamsHere, self, nil, nil, kPurposeFunc )|scfunction| // right? we use "me" for both the receiver and the argspace?
+	return .LookUpSub( name, exp, ParamsHere, self, NIL, niL, kPurposeFunc )|scfunction| // right? we use "me" for both the receiver and the argspace?
 
 
 
@@ -387,7 +378,7 @@ function scbase.CodeCls (|Scclass|)
 		s = s.parent
 
 
-function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCBase| arg_space, |SCDecl| contains, |Message| side, |int| Purpose, |SCObject|)
+function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |SCBase| arg_space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
 // could be cleaned up so that exp is NEVER nil... "AddMain", "InitRootDecl", lookupvar etc would need altering...
 	
@@ -435,7 +426,8 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 				|| o2 = o["new"]					// OK... but what if o isa module?
 					o = o2|scmodule|				// hack
 					exit
-				if o.cls and o.cls.isrole
+				|| cls = o.cls
+				if cls and cls.isrole
 					o = o.supermod
 					if !o: exit
 				  else
@@ -455,7 +447,8 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 						error (exp,     o.description)
 						error (o.source, "Disabled here.")
 	
-					ParamsHere.obj = o // multiple return :3
+					if ParamsHere
+						ParamsHere.obj = o // multiple return :3
 					Return o
 		
 		if o
@@ -483,7 +476,8 @@ function LookUpSub (|String| OrigName, |Message| Exp, |Message| ParamsHere, |SCB
 			error (exp, f.description)
 		  elseif !paramsarray.MadeError
 			f.ArgsMatch( contains, arg_space, ParamsArray, kTypeCastDescribeErrors )
-		ParamsHere.obj = f // for auto-complete
+		if ParamsHere
+			ParamsHere.obj = f // for auto-complete
 		Return f
 
 	|| ErrMsg = "" // can't find "" on something "".

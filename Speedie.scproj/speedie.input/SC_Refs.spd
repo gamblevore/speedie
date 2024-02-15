@@ -71,9 +71,8 @@ function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 	|| After = arg.FlatAfter
 	while  (Curr != After)  and  (Curr != LastPlace) 
 		if (Curr == @Arg)
-			Blocker = Curr.CausesUnReachable( arg )
-			if (Blocker)
-				ReturnHandle( Blocker, nil, name, basis )
+			|| Block2 = Curr.CausesUnReachable( arg )
+				ReturnHandle( Block2, nil, name, basis )
 		Curr = Curr.FlatNext
 
 
@@ -415,7 +414,7 @@ function message.DoesAnything (|bool|)
 		return true
 
 
-function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| Basis)
+function ReturnHandle (|Message| Blocker, |Message?| arg, |Message| name, |int| Basis)
 	if (Basis & kBasisDestructable)
 		if (!Blocker)
 			return .DeStructable(Blocker, arg, name)
@@ -435,7 +434,7 @@ function ReturnHandle (|Message| Blocker, |Message| arg, |Message| name, |int| B
 		return // no need?
 
 	if (!Blocker)
-		RefDecr( name, arg, basis )
+		RefDecr( name, arg!, basis )
 		Return
 
 	|| IsReturn = Blocker.IsReturnOrRejoin
@@ -491,6 +490,7 @@ function Message.RemoveTypeCasts (|Message|)
 
 function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 	opt norefcounts
+	real self
 	|| Last = self
 	|| Curr = self
 	

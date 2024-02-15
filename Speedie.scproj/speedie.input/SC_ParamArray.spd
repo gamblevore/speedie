@@ -10,7 +10,7 @@ class SCParamArray
 	contains message
 
 	|Message--?[11]|	Items
-	|Message--|			Exp
+	|Message--?|		Exp
 	|SCClass--?|		Cls
 	|int16|				Size
 	|int16|				ErrCount
@@ -24,12 +24,13 @@ class SCParamArray
 	|bool|				Found
 	
 
-	constructor (|Message| exp, |message|side=nil)
+	constructor (|Message?| exp)
+		opt norefcounts
 		.Exp = exp
-		.side = side
 		.IsDot = (exp == @dot)
-		.IsAddress = (exp.niceparent Isbrel "&")
+		.IsAddress = (exp and exp.niceparent Isbrel "&")
 		.ErrCount = stderr.errorcount
+//		.side = nil
 
 
 	function addsub (|| m)
@@ -75,14 +76,16 @@ class SCParamArray
 		return "module"
 	
 	function ModuleName (|string|)
+		opt norefcounts
 		if (.IsNotModule)
 			return Self[0].RenderType
 		return .exp.first.RenderType
 
 
 
-	function PreReadTypes (|SCBase| Name_Space, |Message| P, |message|side, |bool|)
-		.exp := p
+	function PreReadTypes (|SCBase| Name_Space, |Message?| P, |message?| side, |bool|)
+		if p and !.exp
+			.exp = p
 		for  Item.fast in P  // in case '...' adds a param
 			require  .AddTestedParam(item, name_space)
 		.side = side

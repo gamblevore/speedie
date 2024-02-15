@@ -296,7 +296,7 @@ function $InterName (,$InterName)
 		
 		
 		function NewVirtualSub (|Message| node, |SCClass| cls, |Message| ErrPlace, |scmodule|) {
-			|| Thg = node.first
+			|| Thg = node.first!
 			|| required = (thg isarel "++")
 				thg = thg.replacewith(thg.first)
 
@@ -310,9 +310,9 @@ function $InterName (,$InterName)
 			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s) #require
 			Mod.IsRequiredInterface = required
 			cls.AddBehaviourOrInterface( Mod, ErrPlace )
-			mod.cls.IsBehaviour = kBehaviourProto
+			mod.cls!.IsBehaviour = kBehaviourProto
 			if required
-				mod.cls.IsBehaviour = kBehaviourProtoRequired
+				mod.cls!.IsBehaviour = kBehaviourProtoRequired
 			Return Mod
 		}
 	}

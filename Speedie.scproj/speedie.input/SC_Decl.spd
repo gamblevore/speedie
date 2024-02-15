@@ -680,7 +680,7 @@ class SCDecl (SCObject) {
 				
 	
 	
-	function CreateSimpleTypeCast (|Message| exp, |Message|)
+	function CreateSimpleTypeCast (|Message!| exp, |Message|)
 		|| Curr = exp
 		While (curr == @bra)
 			Curr.obj = self

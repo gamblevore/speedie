@@ -270,8 +270,8 @@ function Transform ()
 	.Badness = 0
 	|| StillOK = StdErr.Mark
 
-	|| n = .SourceArg
-	|| Space = n.SCArg( self )
+	|| n = .SourceArg!
+	|| Space = n.SCArg( self )!
 
 	if (.IsWrapper)
 		space.ProcessLinkage( n, FuncLinkageTable )
@@ -296,7 +296,7 @@ function Message.ParamNum (|int|)
 	return -1
 
 
-function MacroFix (|SCDecl| contains, |SCBase| name_space, |SCParamArray| Incoming, |scdecl|)
+function MacroFix (|SCDecl?| contains, |SCBase| name_space, |SCParamArray| Incoming, |scdecl|)
 	debugger .IsMacro
 	|| msg		= incoming.exp
 	|| Using	= msg.syntaxusing 
@@ -313,7 +313,7 @@ function MacroFix (|SCDecl| contains, |SCBase| name_space, |SCParamArray| Incomi
 	for s in oof
 		|| Num = s.ParamNum - SizeShift
 		if num < incoming.size and num >= 0
-			incomingparams[num]=false // wow!
+			incomingparams[num] = false // wow!
 		
 		if (Num >= incoming.size)
 			error (.sourcearg.first,	"This missing-function:")
@@ -330,6 +330,7 @@ function MacroFix (|SCDecl| contains, |SCBase| name_space, |SCParamArray| Incomi
 
 		  elseif (s == @sthg and "...")
 			if s.istype
+				expect (contains) (incoming.exp, "Container type needed for macro")
 				s.replacewith(contains.writetype)			// cast to contained type!
 			  elseif s.parent!.IsContainer
 				for i in incoming.size|int|
@@ -434,7 +435,7 @@ function ArgsMatch1 (|SCDecl| base, |SCBase| name_space, |SCParamArray| Incoming
 			f = .ArgsMatch2( base, kTypeCastTrue ||| Cast, name_space, Incoming )
 
 	if (f.IsReal and Incoming.IsAssigns)		// a.b = c --> (a.b(c))
-		incoming.exp.AssignsFix(f)
+		incoming.exp!.AssignsFix(f)
 	if f
 		Return f
 	return macro

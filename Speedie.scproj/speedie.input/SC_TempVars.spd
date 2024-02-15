@@ -60,9 +60,7 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 		0 // || x = R.pop().Property
 	  else
 		if FuncMsg!=@prm
-			printline funcmsg
-			debugger
-			.RefDisappears
+			.RefDisappears // still not sure what this is doing
 			return nil
 		FuncMsg = FuncMsg.parent
 
