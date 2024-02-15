@@ -274,7 +274,7 @@ module SC_Saver {
 				|| Second = c.DoSaver("LoadProperties", stage)
 				if First|bool| != Second|bool|
 					First := Second
-					error (first.source, "Can’t make one save/load function but not the other. Either make both or neither.")
+					error (first!.source, "Can’t make one save/load function but not the other. Either make both or neither.")
 	
 	
 	function SCClass.IsSaveableObject (|bool|)

@@ -76,10 +76,11 @@ extend message
 
 	function BecomeMacro (|Macro| M,  |(array of message)?| prms=nil)
 		opt norefcounts
-		.clear
-		.func = m.Source.func
-		.name = m.Source.name
-		.Appendmacro(m, prms)
+		|| s = m.source
+			.clear
+			.func = s.func
+			.name = s.name
+			.AppendMacro(m, prms)
 
 	syntax append  (|Macro| M,  |array of message| prms)
 		.AppendMacro(m, prms)

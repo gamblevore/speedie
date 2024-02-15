@@ -482,7 +482,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 			Return kNoMatch
 			
 		  elseif (ThisAlter)	// we need to put something in exp
-			|| def = FuncArg.Default.Copy
+			|| def = FuncArg.Default!.Copy
 			Incoming.exp.last.InsertBefore( def, PArg_Ch )
 			TypeOfExpr( def, Name_Space )
 
@@ -577,7 +577,7 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCPara
 			OldMatch = Match
 
 	if (NeedsAlter)
-		Incoming.Exp.Last.Func = @prm
+		Incoming.Exp.Last!.Func = @prm
 		Result.Argsmatch3( TypeCast, base, true, name_space, Incoming )
 
 	return result ?? missing
@@ -860,7 +860,7 @@ function Paramless (|SCFunction|)
 function TranStrings
 	|| S = .SourceArg
 	if (S and !.IsWrapper)
-		SCFunction.Tran_Strings( S.parent, self )
+		SCFunction.Tran_Strings( S.parent!, self )
 
 
 function IsConstructorOrDestructor (|bool|)

@@ -25,7 +25,7 @@ module SCGame3D
 		|| Inst = Node.TranModel			#expect (node, "Not a good model.")
 		|| M = SCClass.newStruct(node, name_space, ErrPlace)
 		if M isa SCModule
-			M.Cls.IsModel = Inst
+			M.Cls!.IsModel = Inst
 		return M
 
 

@@ -368,7 +368,8 @@ module JB_API
 				printline msg
 		
 		if !stderr.ok
-			print stderr.errors.first.name
+			|| f = stderr.errors.first
+				print f.name
 			stderr.clear
 			return -1000
 	

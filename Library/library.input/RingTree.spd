@@ -113,7 +113,8 @@ class RingTree (Saveable)
 
 
 	function FlatNext  (||)	
-		cpp_wrapper JB_Ring_FlatNext0 // doesnt nil check
+		nil checker
+		cpp_wrapper JB_Ring_FlatNext0
 
 
 	function FlatPrev (||)

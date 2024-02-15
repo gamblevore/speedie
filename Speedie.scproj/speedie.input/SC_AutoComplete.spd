@@ -166,7 +166,7 @@ function ReportBuildOrRestart (|message| cmd, |message|)
 	.WillExit = true
 	if .errors.ok
 		TransCompiler.ExportAndInstall(true)
-		stderr.ReturnErrors(.errors)
+		stderr.ReturnErrors(.errors!)
 		
 	if .errors.HasProblems
 		return cmd.SendPerryErrors

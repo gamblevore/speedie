@@ -104,7 +104,8 @@ class SCBehaviour (SCBase)
 		|| Interface = .InterfaceForBehaviour(fn)					#require
 		|| prm = fn.source.find(@prm)								#expect (fn.source, "No parameters found")
 		
-		fn.DeclsProtoType(prm.first, interface, late)
+		|| f = prm.first
+			fn.DeclsProtoType(f, interface, late)
 
 
 	function SCClass.FillInterFaceWrapper  (|SCFunction| fn)
@@ -114,10 +115,10 @@ class SCBehaviour (SCBase)
 		fn.DeclsProtoTypeRemove(interface, prm.first, true)
 
 		require stderr.ok
-		|| prms = fn.source.findnested(@sthg, "...")				#expect
+		|| prms = fn.source!.findnested(@sthg, "...")				#expect
 		// so... now we have prms? fill them in?
 	
-		|| WriteTo = prms.parent
+		|| WriteTo = prms.parent!
 		WriteTo.func = @prm
 		prms.Remove
 

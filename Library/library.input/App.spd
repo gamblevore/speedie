@@ -194,8 +194,7 @@ function PrefsInit (|date| when=date.now, |bool|)
 
 
 function SavePrefs
-	if ._prefs
-		._prefs.save
+	._prefs.save?
 	
 
 function Expired (|date| period, |date|From=__now__, |date|)

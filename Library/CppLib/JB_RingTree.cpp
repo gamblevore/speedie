@@ -360,7 +360,9 @@ DepthNode FlatNext( RingTree* self, bool AllowDown ) {
 
 // very cool
 RingTree* JB_Ring_FlatNext0( RingTree* self ) {
-	return FlatNext( self, true ).Node;
+	if (self)
+		return FlatNext( self, true ).Node;
+	return 0;
 }
 
 

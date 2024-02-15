@@ -53,9 +53,9 @@ function TypeOfSDot (ExprResolver)
 
 
 function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
-	|| exp0 = exp.first.unbra
+	|| exp0 = exp.first!.unbra
 	|| Old = TypeOfExpr( exp0, name_space, side )									#require
-	|| New = ExtractDecl( exp.last, name_space, declmode.TypeCast )					#require
+	|| New = ExtractDecl( exp.last!, name_space, declmode.TypeCast )					#require
 	// allow MOST typecasts, but NOT typecasts between struct instances...
 	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
 		error (exp, "Can’t cast between structs/carrays")
@@ -1541,8 +1541,8 @@ function message.PrepareAST (|string| path="")
 
 function Message.FixErl 
 	// just do a syntactic expand...
-	|| ch = .first
-	|| opp = ch.Next
+	|| ch = .first!
+	|| opp = ch.Next!
 	|| last = opp.Next
 	|| name = opp.Name
 	
@@ -1552,7 +1552,7 @@ function Message.FixErl
 		using opp
 		
 		while self in @bra
-			.parent.ReplaceWith( self )
+			.parent!.ReplaceWith( self )
 		
 		|| IsBitOr = (name == ":=") 
 		.Func = @rel
