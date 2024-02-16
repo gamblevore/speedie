@@ -238,7 +238,8 @@ function Tran_While (TranFunc)
 			cond.func = @bra
 			cond = Cond.msg(@Thg, "true")
 			arg.first = decl
-			decl.next = (macros.WhileDecl)(decl.declname.copy)
+			|| dname = decl.declname
+				decl.next = (macros.WhileDecl)(dname.copy)
 		  else
 			cond = ExpandToBool( Cond, name_Space ) #require
 
@@ -677,7 +678,7 @@ function Tran_Syx (|Message| msg, |Message|)
 
 
 
-function Tran_Isa (|Message| S, |SCBase| p)
+function Tran_Isa (|Message| S, |SCBase!| p)
 	expect (!IsaTester.t.inuse) (s, "Too many nested isas")
 	isatester.t.inuse = true
 	if compiler.CollectIsaTests( s.first! )
@@ -690,7 +691,7 @@ function Tran_Isa (|Message| S, |SCBase| p)
 
 
 
-function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
+function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCBase!| space)
 	require (arg)
 	
 	|| List			= isa_f.Last!
@@ -893,6 +894,7 @@ function Message.Next_Index (|sciterator| iter, |message| node2)
 
 function message.CheckContinuesAndExits
 	opt norefcounts
+	nil self
 	
 	for msg.flat in self
 		if (msg == @tmp)

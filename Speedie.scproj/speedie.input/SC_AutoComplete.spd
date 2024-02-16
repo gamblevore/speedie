@@ -670,9 +670,9 @@ function TmpAutoComplete (|message| f, |string| name, |string| type, |message|)
 				if ch.name > 2  and  ch.name ~= name
 					finished = true
 				  else
-					|| arg = rz.msg(@arg, name)
-					|| n = ch.first.name
-					arg.msg(@tmp, n) <~ (@str, n)
+					|| cf = ch.first
+						|| arg = rz.msg(@arg, name)
+						arg.msg(@tmp, cf.name) <~ (@str, cf.name)
 				
 	if rz.hasany
 		0 //

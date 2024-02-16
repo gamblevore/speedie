@@ -102,7 +102,7 @@ class SCFile (file)
 			
 			parser.using.tag = 0
 			parser.DotInsertallow = false
-			StdErr.source = nil
+			StdErr.source = ""
 		(Message).restore
 
 

@@ -318,8 +318,9 @@ function InitBasicFuncs (|bool|)
 
 function CreateFuncFromSource (|String| Src, |SCFunction|)
 	|| msg	= src.ParseClean
-	rz		= SCFunction.NewFunc( msg, nil, msg )|SCFunction|
-	rz.IsVisible = false
+		rz		= SCFunction.NewFunc( msg, nil, msg )|SCFunction|
+		if rz
+			rz.IsVisible = false
 
 
 function Library (|file|)

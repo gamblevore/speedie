@@ -299,7 +299,7 @@ function $InterName (,$InterName)
 		function NewVirtualSub (|Message| node, |SCClass| cls, |Message| ErrPlace, |scmodule|) {
 			|| Thg = node.first!
 			|| required = (thg isarel "++")
-				thg = thg.replacewith(thg.first)
+				thg = thg.replacewith(thg.first!)
 
 			expect (thg==@thg) (node, "Interface has no name.")
 			|| s = Thg.name

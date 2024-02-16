@@ -141,8 +141,9 @@ function CppLibFile (|string| ch, |file|)
 	
 
 function BuildFiles (|bool|)
-	.vm_file = Compiler.InputFile( nil, "vm.box", nil )	#require
-	|| x = .vm_file.parse								#require
+	|| v = Compiler.InputFile( nil, "vm.box", nil )	#require
+	|| x = v.parse									#require
+	.vm_file = v
 	|| forms = x.find("forms")
 	forms.remove
 
@@ -155,10 +156,10 @@ function BuildFiles (|bool|)
 	.NameList = .VMSpd(x)
 	.VMCpp(code, jump)
 
-	.CppLibFile("InstructionGetters.h").SmartData = form_h
-	.CppLibFile("Instructions.i").SmartData = code
-	.CppLibFile("InstructionList.h").SmartData = jump
-	.form_h = nil
+	.CppLibFile("InstructionGetters.h")!.SmartData = form_h
+	.CppLibFile("Instructions.i")!.SmartData = code
+	.CppLibFile("InstructionList.h")!.SmartData = jump
+	.form_h.size = 0
 	return true
 
 	

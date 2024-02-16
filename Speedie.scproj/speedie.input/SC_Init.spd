@@ -55,11 +55,11 @@ function SCModule.LoadInitFuncSub (|message| init, |string| name)
 	|| msg = "function $Name (|int|)".ParseClean
 	msg <~ init
 	|| fn = .NewModuleFunc( msg )
-	(fn is InitFunc)
-	
-	|| L = init.Last
-	ifn L.hasany
-		L.Remove // never called anymore?
+		(fn is InitFunc)
+		
+		|| L = init.Last
+		if !L.hasany
+			L.Remove // never called anymore?
 
 
 function SCModule.LoadInitFunc

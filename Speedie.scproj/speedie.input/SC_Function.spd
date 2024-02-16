@@ -781,7 +781,10 @@ function CheckReturnValue (|Message| msg)
 		expect FoundReturnType (msg, "Can’t find return type.")
 		
 		if (FoundReturnType == TypeNil) and (r.CantBeNilInCpp)  // OK so what if we can’t return nil?
-			c.ReplaceWith(r.CreateDefault(c))
+			|| def = r.CreateDefault(c)
+				c.ReplaceWith(def)
+			  else
+				error (msg, "Can't return this")
 		  else
 			r.ExpectMatch( FoundReturnType, kTypeCastTrue, c )
 	  else
@@ -1512,18 +1515,18 @@ function Tran_IfSub (|message| node, |scbase| name_space)
 				check (ElseArg ~!= "if")    (ElseArg, "Use 'elseif' instead.")
 			SubTest[@arg]
 	
+	name_space = arg.scarg(name_space) #require
 	using (node)	
-	name_space = arg.scarg(name_space)
-	
-	cond = ExpandToBool( cond, name_space )			#require
-	if cond.IsAlwaysFalse
+	cond = ExpandToBool( cond, name_space )
+	if !cond
+		0 //
+	  elseif cond.IsAlwaysFalse
 		cond.ElseNeverFires
-		return
-	
-	cond.NeedBra
-	if cond.first == @arg // if a.b? --> if ({||x=a.b, rejoin x}), fails in c cos if ({}) is bad
-		cond.wrapwith(@bra.msg).obj = cond.obj 
-	Tran_Isa(node, name_space)
+	  else
+		cond.NeedBra
+		if cond.first == @arg // if a.b? --> if ({||x=a.b, rejoin x}), fails in c cos if ({}) is bad
+			cond.wrapwith(@bra.msg).obj = cond.obj 
+		Tran_Isa(node, name_space)
 
 
 function message.ElseNeverFires // self == cond

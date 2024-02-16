@@ -809,6 +809,7 @@ class Message (RingTree)
 		
 
 	function Expect (|syntax| type, |string?| name=nil, |bool|)
+		nil checker
 		require self
 		if (!type or (.Func == type))
 			if (name == nil) or (.name ~= name)
