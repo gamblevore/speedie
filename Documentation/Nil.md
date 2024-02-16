@@ -1,12 +1,13 @@
 ## Nil Safety In Speedie
+*(aka "The billion dollar problem")*
 
-Nil-safety is perhaps the most important issue in making code reliable. Unfortunately it can also be the most difficult problem to fix.
+Nil-safety is perhaps the most important issue in making code reliable. Unfortunately it can also be the most difficult problem to fix. Nil-safety is such a huge problem for programming, that it caught a popular catch-phrase "The billion dollar problem".
 
-Nil-bugs can hide themselves for weeks, months or even years. And after release, you can be left embarassed in front of your users, as to why your code crashes.
+Nil-bugs can hide themselves for weeks, months or even years. And after release, you can be left embarassed in front of your users, as to why your code crashes. That... or the consequences can be deadly if the code handles machinery.
 
-Modern languages tend to have a good nil (null) safety mechanism built in, and Speedie is no exception. Speedie's nil-checker is fast and smart. It will probably catch all potential issues.
+Some modern languages are catching up, and adding nil-safety mechanisms in. Speedie is one of those! Speedie's nil-checker is fast and smart. It will probably catch all potential issues.
 
-The nil-checker should make coding more fun, by removing the pain... Its no fun having to spend hours trying to backtrack some nil-crash bug, back through several subsystems... down to the original point where something was set to `nil`, which silently left a trap for future functions to run.
+Speedie's nil-checker should make coding more fun, by removing the pain... Its no fun having to spend hours trying to backtrack some nil-crash bug, back through several subsystems... down to the original point where something was set to `nil`, which silently left a trap for future functions to run.
 
 But when you know that can't happen... things are a lot more fun.
 
