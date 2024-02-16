@@ -237,10 +237,6 @@ Strings and arrays have a "real default" value, so don't need explicitly settng 
 
 That means that the two examples above, (`TheGlobalArr`/`AnotherGlobalString`) can't later be set to `nil`.
 
-
-
-### Limitations
-
 The nil-checkers "intelligence" spans one variable. Testing if a variable is `nil`, then storing that in a separate variable, is something we will miss:
 
     function lost_track (|message?| m)
