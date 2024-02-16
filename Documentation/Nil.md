@@ -15,7 +15,7 @@ Unlike other languages, the nil-checker in speedie has zero-overhead. We dont ha
 
 Speedie's nil-checker is fast. Probably under 0.025 of a second to test your entire project.
 
-If you are wondering how, well to be honest, I think programmers are used to inefficient compilers. And they shouldn't be. Because computers are super-fast these days.
+If you are wondering how its that fast, well to be honest, I think programmers are used to inefficient compilers. And they shouldn't be.
 
 
 ### Abilities
