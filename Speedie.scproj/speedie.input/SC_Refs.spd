@@ -361,8 +361,10 @@ function RelChangesDisowned (|Message| msg, |String| name, |bool|)
 
 
 function RefMarkAsDisturber (|Message| msg, |SCFunction| fn)
+	opt norefcounts
 	|| r = fn.refs
-		r.Disturbs <~ "object"
+		|| ds = r.DisturbsGet
+			ds <~ "object"
 
 
 function RefSafeDecr (|Message| msg, |Message| place)

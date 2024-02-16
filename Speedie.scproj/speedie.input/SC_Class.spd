@@ -439,11 +439,12 @@ function CreateAlloc (|string| ParseThing, |int| Extra)
 	
 	|| src = ParseThing.ParseClean.first
 	|| fn = .modul.NewModuleFunc( src )
-	fn.refs = cpprefs.new
-	fn.refs.disturbs = nil
-	fn.AllocCode = FunctionType.Alloc ||| extra
-	if extra
-		fn.IsVisible = false
+		|| r = CppRefs.new
+		fn.refs = r
+		r.disturbs = nil
+		fn.AllocCode = FunctionType.Alloc ||| extra
+		if extra
+			fn.IsVisible = false
 
 
 function NeedsDefaultValue (|message| def, |&message| place, |string| name)
@@ -590,8 +591,9 @@ function CreateEmptyFunc (|String| fname, |string| cpp_name="", |SCFunction|)
 	|| e	= "function $fname { cpp_part $cpp_name }"
 	|| msg	= e.ParseClean
 	rz		= SCFunction.NewFunc( msg, self, .source )|SCFunction|
-	.TryAdd( msg, rz, fname )
-	rz.IsVisible = false
+	if rz
+		.TryAdd( msg, rz, fname )
+		rz.IsVisible = false
 
 
 function FindAllocFunc (|String| fname, |bool| DontCreate = true, |SCFunction|)

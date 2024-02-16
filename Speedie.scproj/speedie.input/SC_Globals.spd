@@ -248,7 +248,7 @@ function TypeOfThg (ExprResolver)
 		if Cls.IsModel
 			return Cls.GetFlyingMemory(exp)
 		if cls.isobject					//
-			|| T = Cls.classtype
+			|| T = Cls.classtype!
 			exp.name = t.name			// right?
 			return T
 		expect (false) (exp, "Expected an object here.")

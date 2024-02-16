@@ -37,12 +37,15 @@ class String
 		cpp_wrapper JB_Str_InByte
 
 	function OutByte_ ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
+		nil checker
 		cpp_wrapper JB_Str_OutByte
 
 	helper CharSet_ (|int|Start=0, |int|After=int.max, |CharSet| cs, |bool|IsIn, |ind|)
+		nil checker
 		cpp_wrapper JB_Str_CharSet
 
 	helper White_ (|int|Start=0, |int|After=int.max, |bool| IsIn, |ind|)
+		nil checker
 		cpp_wrapper JB_Str_WhiteSpace
 	
 	function InWhite (|int|Start=0, |int|After=int.max, |ind|) { return .white_(Start, After, true) }

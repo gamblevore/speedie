@@ -128,10 +128,12 @@ function SCModule.AddDelayedInit (|message| src, |message|dest, |string| fn_name
 
 function SCModule.DelayedInitFuncTransform
 	|| v = .initvarsarg
-	|| it = v[0]
+	|| it = v.first
 		for (msg in it)
-			if (msg == @Decl) and msg.GetDclName.InitRootDecl( msg, self )
-				msg.Remove
+			if (msg == @Decl)
+				|| name = msg.GetDclName
+					if name.InitRootDecl( msg, self )
+						msg.Remove
 		.AddDelayedInit(v, Compiler.program.initvarsarg, "Init_")
 
 	.AddDelayedInit(.initcodearg, Compiler.program.initcodearg, "InitCode_")

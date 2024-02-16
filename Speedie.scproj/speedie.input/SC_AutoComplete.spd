@@ -403,16 +403,15 @@ function GetScope (|message| orig, |&int| types, |scbase|)
 	|| f	= orig.CutifyCopy
 	|| arg	= orig.MsgArg
 	|| fn	= f.func
-	if fn == @dot
-		|| decl = TypeOfExprModulesOK(f.first, arg)
+	if arg and fn == @dot
+		|| decl = TypeOfExprModulesOK(f.first!, arg)
 		if !decl
 			error "notype"
 			return nil
 		if decl isa scbase
 			return decl
 		if decl isa scdecl
-			|| type = decl.type
-				return type
+			return decl.type
 	
 	if orig.acInIsa
 		* types = 1

@@ -276,9 +276,10 @@ function $InterName (,$InterName)
 			using Errplace
 			|| FNSrc = FNStr.ParseClean
 				rz = SCFunction.NewFunc( fnsrc.first, Cls, ErrPlace )|SCFunction|
-				(rz is Behaviour)
-				(rz is ExpectsRealVars)
-				cls.behaviour.WrapperFuncs <~ rz
+				if rz
+					(rz is Behaviour)
+					(rz is ExpectsRealVars)
+					cls.behaviour!.WrapperFuncs <~ rz
 		
 		
 
@@ -306,7 +307,6 @@ function $InterName (,$InterName)
 			expect (s~!="destructor")      (thg, "Bad name.")
 			Thg.name = s.moat
 			
-			// node.normalisefunc
 			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s) #require
 			Mod.IsRequiredInterface = required
 			cls.AddBehaviourOrInterface( Mod, ErrPlace )

@@ -360,17 +360,23 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 		
 	|| LNil = ll.IsNowNil
 	|| RNil = rr.IsNowNil
-	if !lnil and !rnil			// if (a > b)
+	if lnil and rnil
+		return ll.Redundant(ll.FastDecl, test)
+
+	if !lnil and !rnil
 		return SuperSmartMagicCompare(ll, rr, test, scop)
 	
-	if (lnil and rnil)
-		return ll.Redundant(ll.FastDecl, test)
-	expect (scop.IsNilTest) (ll.next, "Nil can't accept this operator. Use != or ==.")
-	
-	(test is reversed) = scop.IsExactlyEquals
+	if 2 == lnil or rnil // just currently nil... not properly nil.
+		.jump(ll)
+		.jump(rr)
+		return nilstate.real
 		
-	|| side = (rr, ll)(lnil)
-	return .jump(side, test.activate)  // can handle x = !(a == nil)
+	if scop.IsNilTest
+		|| side = (rr, ll)(lnil)
+		(test is reversed) = scop.IsExactlyEquals
+		return .jump(side, test.activate)  // can handle x = !(a == nil)
+	
+	error (ll.next, "Nil can't accept this operator. Use != or ==.")
 
 
 function ProcessCondRel (NilTrackerfn)
@@ -416,7 +422,7 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	|| Y = dcl.NilCurr
 	|| Unknown = dcl.IsUnknownParam 
 	if Unknown and (test isnt soft and disappears)
-		if test isnt Active								// set var A to unknown prm B, so default to real
+		if test isnt Active							// set var A to unknown prm B, so default to real
 			return .BecomeReal(dcl, msg, NilReason.Reading)
 		dcl.NilDeclared = nilstate.optional
 

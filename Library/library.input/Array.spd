@@ -70,7 +70,9 @@ class Array (saveable)
 			self[i] = c
 		
 	function Clear
-		.length = 0
+		nil self
+		if self!=nil
+			.length = 0
 	
 	function Wipe (|int|)
 		// returns .size

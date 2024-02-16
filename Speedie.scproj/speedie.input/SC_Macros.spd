@@ -55,7 +55,8 @@ ASM.Forms[_1] = &_0.Encode // for now
 function macro.clean (|macro|)
 	if !.Cleaned
 		.cleaned = true
-		.Source.clean
+		|| s = .source
+			s.clean
 	return self
 
 
@@ -65,7 +66,7 @@ function message.TargetTest (|bool|) // target true, target false,
 	expect (self ~!= "mac" or "macos")     (self, "Use OSX")
 	expect (self ~!= "linux")   (self, "Use lin")
 	expect (self ~!= "windows") (self, "Use win")
-	expect (self ~!= "import") (self, "Use imported")
+	expect (self ~!= "import")  (self, "Use imported")
 	if self ~= "debug"
 		return options.TargetDebug
 	if self ~= "release"

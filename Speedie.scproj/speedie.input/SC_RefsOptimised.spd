@@ -4,7 +4,7 @@
 class CppRefs
 	|uint16|			DisturbParams
 	|bool|				Owned
-	|[string]|			Disturbs		// cant be a class cos this is called BEFORE the classes are inited.
+	|[string]?|			Disturbs		// cant be a class cos this is called BEFORE the classes are inited.
 										// awkward.
 	
 	constructor (|message| s=nil)
@@ -16,10 +16,17 @@ class CppRefs
 		.Owned			= false
 		.Disturbs		= array.new
 		.disturbparams	= -1
-		.disturbs		<~ "object"
+		.disturbsget	<~ "object"
 
 
+	function DisturbsGet (|[string]|)
+		|| ds = .disturbs
+			return ds
+		rz = array()
+		.Disturbs = ds
+		
 	function AddOne (|message| C)
+		opt norefcounts
 		if (C ~= "nil") // typeofnil
 			// 
 		  elseif (C ~= "self") // dcl is self
@@ -27,7 +34,7 @@ class CppRefs
 		  elseif (C == @num)
 			.DisturbParams |= (C.int << 1)
 		  else
-			.Disturbs <~ C.name
+			.Disturbsget <~ C.name
 	
 
 	function Read (|message| node)

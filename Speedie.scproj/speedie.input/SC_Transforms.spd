@@ -678,9 +678,9 @@ function Tran_Syx (|Message| msg, |Message|)
 
 
 function Tran_Isa (|Message| S, |SCBase| p)
-	expect (!isatester.t.inuse) (s, "Too many nested isas")
+	expect (!IsaTester.t.inuse) (s, "Too many nested isas")
 	isatester.t.inuse = true
-	if compiler.CollectIsaTests( s.first )
+	if compiler.CollectIsaTests( s.first! )
 		|| n = isatester.t.count
 		for i in n
 			|| isa_ = isatester.t.items[i]
@@ -693,10 +693,11 @@ function Tran_Isa (|Message| S, |SCBase| p)
 function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCBase| space)
 	require (arg)
 	
-	|| List			= isa_f.Last
-	|| L			= List.First
-	|| R			= L.next
+	|| List			= isa_f.Last!
+	|| L			= List.First!
+	|| R			= L.next!
 	|| cls			= R.ObjCls
+	expect (cls) (r, "This is not a real class.")
 	expect (!cls.IsRole) (r, "This is not a real class. Test it's super-class instead.")
 	|| OldDecl		= space.LookupVarDecl( L.name )					#require
 	|| NewDecl		= OldDecl.Copy

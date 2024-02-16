@@ -270,8 +270,8 @@ function Transform ()
 	.Badness = 0
 	|| StillOK = StdErr.Mark
 
-	|| n = .SourceArg!
-	|| Space = n.SCArg( self )!
+	|| n = .SourceArg						#expect		(self, "Function can't be compiled")
+	|| Space = n.SCArg( self )				#require
 
 	if (.IsWrapper)
 		space.ProcessLinkage( n, FuncLinkageTable )
@@ -1218,10 +1218,10 @@ function NewMissingFunc (CollectFunc)
 
 
 function NewProtoType (CollectFunc)
-	return NewProtoTypeSub(node, name_space, ErrPlace, nil)
+	return NewProtoTypeSub(node, name_space, ErrPlace)
 
 
-function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |SCModule|)
+function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface="", |SCModule|)
 	if (ForInterface)
 		parent = parent|SCClass|.modul
 	  else
@@ -1249,7 +1249,7 @@ function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |
 function NeuSyx (CollectFunc)
 	|| Using = node.syntaxusing 
 	|| NewNode = Tran_Syx( node )
-	return SCFunction.NewHelper( NewNode, name_space, ErrPlace )
+		rz = SCFunction.NewHelper( NewNode, name_space, ErrPlace )
 
 
 

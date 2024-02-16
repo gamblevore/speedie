@@ -120,11 +120,14 @@ function scdecl.NilPrmFail (|message| where, |scfunction| f)
 */
 
 
-function message.IsNowNil (|bool|)
+function message.IsNowNil (|int|)
 	opt norefcounts
 	|| d = .obj|scdecl|
 		Target debug: if !(d as scdecl)
-		return (d == TypeNil) or (d.NilCurr == nilstate.nilish)
+		if (d == TypeNil)
+			return 1
+		if d.NilCurr == nilstate.nilish
+			return 2
 
 
 function scdecl.TypeSuffers (|bool|)
