@@ -80,19 +80,7 @@ Actually, some of this can be omitted, it will still come back to the same:
     |message| MyOptionalMsg
 
 
-Those are the same as above! But what if you want to set a global to a `real` value initially, but later set them to `nil`?
-
-    |string?|  MyGlobalStr = "nil me later"   // can be nil later
-    
-Strings and arrays have a "real default" value, so don't need explicitly settng to a `real` value... they are assumed `real`.
-
-    |string| AnotherGlobalString          // starts off with the value "", which is real.
-    |array|  TheGlobalArr                 // Starts off with [], also real.
-
-That means that the two examples above, (`TheGlobalArr`/`AnotherGlobalString`) can't later be set to `nil`.
-
-
-Lets look at how global variables can be set via functions:
+Those are the same as above! Lets look at how global variables can be set via functions:
 
     function NoNils (|message!| abc, |message!|)
         if abc.name == "abc"
@@ -233,6 +221,21 @@ It also complains about redundant tests... But they can re-enabled with "`?`" if
         || m = message()
         if m?                 // Testing with ? is OK.
             "m was allocated successfully"
+
+
+
+### Smaller Details
+
+But what if you want to set a global to a `real` value initially, but later set them to `nil`?
+
+    |string?|  MyGlobalStr = "nil me later"   // can be nil later
+    
+Strings and arrays have a "real default" value, so don't need explicitly settng to a `real` value... they are assumed `real`.
+
+    |string| AnotherGlobalString          // starts off with the value "", which is real.
+    |array|  TheGlobalArr                 // Starts off with [], also real.
+
+That means that the two examples above, (`TheGlobalArr`/`AnotherGlobalString`) can't later be set to `nil`.
 
 
 
