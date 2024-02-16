@@ -6,7 +6,7 @@
 	* use 256 VM codes? Only a few need all 25 bits.
 * Do nil checker!
 	* why is "if !(NewType?)" necessary??? "|| ListName = list!" too
-	* error accessing JB_haha(obj).Property instead of obj.haha.property
+	* display obj.haha.property instead of JB_haha(obj).Property
 	* collectdecls should leave the decl on the decl itself also! Not just on the last. its too awkward!
 	* picomsg is now crashing or failing on constructor
 		* speedie stops compiling sometimes, from perry
@@ -14,7 +14,7 @@
 	* upgrade optional returns to real? (if possible)
 	* function pointers not being tested!
 	* selector constructor shouldn't need "?"
-	* |message| x = nil, // should be optional
+	* (|message| x = nil), // should be optional
 	* also... what about global struct pointers? pointers are assumed not nil... but if its not initialised it will be nil?
 		* compiler should know this
 	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!
