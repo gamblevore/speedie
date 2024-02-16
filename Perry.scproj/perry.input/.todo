@@ -5,9 +5,11 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 * Do nil checker!
+	* why is "if !(NewType?)" necessary??? "|| ListName = list!" too
 	* error accessing JB_haha(obj).Property instead of obj.haha.property
 	* collectdecls should leave the decl on the decl itself also! Not just on the last. its too awkward!
 	* picomsg is now crashing or failing on constructor
+		* speedie stops compiling sometimes, from perry
 	* obj and name should be "safe"
 	* upgrade optional returns to real? (if possible)
 	* function pointers not being tested!

@@ -128,7 +128,7 @@ function PassableCount (|int|)
 
 function CreateAutoConstructor (|scfunction|)
 	opt norefcounts
-	rz = .CreateEmptyFunc( "Constructor", "ConstructorAuto" )
+	rz = .CreateEmptyFunc( "Constructor", "ConstructorAuto" )		#require
 	|| node = rz.source
 	|| prms = node.Second
 	|| arg	= prms.next
@@ -263,7 +263,7 @@ module {
 function LoadClassName (|message| node, |string|)
 	|| S = node.first
 	if (s == @thg or @dot)
-		return s.name
+		return s.name 
 	if (node istmp "class")
 		error (node, "Can't find class name.")
 
@@ -334,13 +334,13 @@ function CanHaveEmptyConstructor (|bool|)
 
 function CreateEmptyConstructors (|scfunction|)
 	if .CanHaveEmptyConstructor
-		rz = .CreateEmptyFunc( "Constructor" )
+		rz = .CreateEmptyFunc( "Constructor" )		#require
 		(rz is EmptyConstructor)
 
 	|| pc = .PassableCount
 	|| s = .super
 		if rz and s != TypeObject // object has no constructor-func
-			|| l = s.constructorfunc.Prms 
+			|| l = s.constructorfunc!.Prms 
 			if l.hasany
 				rz.CopyParams(l)
 				pc = 0 // i guess?
@@ -354,9 +354,10 @@ function CreateConstructors
 	if .IsObject
 		|| Con = .FindAllocFunc( "Constructor" )
 		if .IsRole
-			check (!con or .super.ConstructorFunc) (con.source, "Role's super lacks a constructor.")
-			con := .super.ConstructorFunc
-			.destructorfunc = .super.DestructorFunc
+			|| s = .super! // roles always have supers
+			check (!con or s.ConstructorFunc) (con.source, "Role's super lacks a constructor.")
+			con := s.ConstructorFunc
+			.destructorfunc = s.DestructorFunc
 			require con
 		
 		using .Source
@@ -366,8 +367,8 @@ function CreateConstructors
 		
 		for f in con
 			if f.cls == self // role messageroot doesnt need an allocator
-				.NewClassNew( f, ConstrNew.copy(f.source)      , 0        )
-				.NewClassNew( f, ConstrLayerNew2.copy(f.source), functionType.Layer )
+				.NewClassNew( f, ConstrNew!.copy(f.source)      , 0        )
+				.NewClassNew( f, ConstrLayerNew2!.copy(f.source), functionType.Layer )
 	
 	if !.IsRole
 		|| NeedsDestructor = .IsObject or (.IsStruct and .HasObjectProperties)
@@ -519,6 +520,7 @@ function OverrideSyntax
 
 
 function HasObjectProperties (|bool|)
+	opt norefcounts
 	for p in .properties
 		if p.isnormalobject
 			return true
@@ -533,8 +535,8 @@ function LoadConstructorsAndAllocators
 		.CreateAlloc( .AllocStr, 0 )
 		.CreateAlloc( .AllocStrLayer, FunctionType.Layer )
 
-	if .super
-		.NoEarlyFree := .Super.NoEarlyFree
+	|| s = .super
+		.NoEarlyFree := s.NoEarlyFree
 
 	(Message).Restore // restore message parsing to general
 

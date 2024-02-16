@@ -457,10 +457,8 @@ function Tran_ForSub (TranFunc)					// :3
 	|sciterator| iter
 	|scdecl| dcl
 	if !bad
-		dcl = TypeOfExpr( list, name_space )
-	if !dcl
-		error ( list, "No class found." )
-	  else
+		dcl = TypeOfExpr( list, name_space ) #check ( list, "No class found.")
+	if dcl
 		iter = dcl.GetIteratorAny( itername, node )
 		if iter
 			iter.Renuqify( name_space )
@@ -470,7 +468,7 @@ function Tran_ForSub (TranFunc)					// :3
 			  elseif index
 				bad +=! index[@thg]
 	
-	require dcl and !bad and iter
+	require dcl and !bad and iter and list
 
 	if index // remove nodes AFTER the error tests
 		index.Remove
@@ -496,7 +494,7 @@ function Tran_ForSub (TranFunc)					// :3
 	iter.RenameSelf( ListName )
 
 	if (CanKeepValue)
-		iter.RenameValue( value )
+		iter.RenameValue( value! )
 	  else
 		iter.RenameValue( @thg + UniqueTmpVar(name_space, "Value") )
 			
@@ -504,7 +502,7 @@ function Tran_ForSub (TranFunc)					// :3
 				////////  CONSTRUCT "WHILE" STRUCTURE
 	|| PostCond = AlterPostCond( arg.Next, iter.LoopEndCond, node )
 		postcond = postcond.needbra
-	|| node2 = iter.MakeWhile(arg, PostCond)
+	|| node2 = iter.MakeWhile(arg, PostCond)				#require // sigh
 	node <~ node2
 	
 	
@@ -552,8 +550,8 @@ function Tran_ForSub (TranFunc)					// :3
 				continue_with msg.FlatAfter
 		
 		  elseif (msg == @thg)
-			if CanKeepValue==1  and  msg == value.name
-				msg.ReplaceWith(value)
+			if CanKeepValue==1  and  msg == value!.name
+				msg.ReplaceWith(value!)
 				CanKeepValue = 2
 			
 		  elseif (msg == @type)
@@ -564,26 +562,32 @@ function Tran_ForSub (TranFunc)					// :3
 					msg.obj = dcl.contains
 					ty.remove
 				  else
-					msg.ReplaceWith(msg.first)
+					msg.ReplaceWith(msg.first!)
 			
 
 
 				////////  COPY VARIABLES, IF USED
 	// what about nested args
 	|| p2 = arg.SCArgNested( node, name_space )    // :) Allow variable capture to work!! :D
-	if (index)
-		FirstInLoop.Prev = MakeDeclOrRel( arg, index, iter.Index.copy(index) )
-
-
-	if (value and !CanKeepValue)
-		// for (x,y) in oof
-		FirstInLoop.Prev = MakeDeclOrRel( arg, Value, iter.Value.copy(value) )
-
-				//////////// finish off...
-	CollectDeclsFuncBodyJustWhatWeNewlyMade( node, name_space ) // now an arg. Treat as an arg, as above!
-	// what if we just collect only the decls we added?
-
-	Tran_While( fn, node2, p2 )
+	if !p2
+		error (arg, "Can't create argument") // should never happen
+	  else
+		if (index)
+			|| it_ind = iter.Index
+				FirstInLoop.Prev = MakeDeclOrRel( arg, index, it_ind.copy(index) )
+			  else
+				error (index, "This iterator has no index")
+	
+	
+		if (value and !CanKeepValue)
+			// for (x,y) in oof
+			FirstInLoop.Prev = MakeDeclOrRel( arg, Value, iter.Value!.copy(value) )
+	
+					//////////// finish off...
+		CollectDeclsFuncBodyJustWhatWeNewlyMade( node, name_space ) // now an arg. Treat as an arg, as above!
+		// what if we just collect only the decls we added?
+	
+		Tran_While( fn, node2, p2 )
 	EndLoopMarker.Remove
 
 

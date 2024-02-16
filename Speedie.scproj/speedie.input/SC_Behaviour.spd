@@ -288,7 +288,7 @@ function $InterName (,$InterName)
 			|| cls = name_space.ShouldBeClass(errplace)
 				|| arg = node.find(@arg)
 					|| Beh = «tmp "behaviour"
-						node.first.copy, arg »
+						node.first!.copy, arg »
 					node.next = beh
 					name_Space.CollectOne( beh, true ) // cos we collect from a list... sigh
 

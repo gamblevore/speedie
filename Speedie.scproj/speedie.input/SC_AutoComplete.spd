@@ -8,10 +8,7 @@ cpp_part AC
 |scbase|			AnonParent
 |errorreceiver|		Errors
 |bool|				Cleaned
-|bool|				WillExit
-|byte|				ShouldEnter = 0
-|SpdProcess|		Perry 
- 
+|bool|				WillExit 
 ||					func_tmp_src   = <(`return, require, "log <string>", while, linkage, for, if, else, elseif, expect, warn, error, disabled, cpp_refs, debugger, debugat, deprecate, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "visible", "exit", "opt norefcounts", "pragma inline"
  `)>.macro
  
@@ -59,13 +56,13 @@ function ParserRestore
 
 
 function EnterAutoComplete (|bool|)
-	require  stderr.ok  and  .ShouldEnter
+	require  stderr.ok
+	|| perry = spdprocess.parent$
 	app.ClearCaches
-	.Perry = SpdProcess.parent
 	if options.PrintLibraries
-		.perry.pico.config.noise = -1
-	if .perry.IsOpen
-		.PerryTalk
+		perry.pico.config.noise = -1
+	if perry.IsOpen
+		.PerryTalk(perry)
 	return true
 
 
@@ -81,23 +78,25 @@ function CrashTester
 
 
 
-function PerryTalk // ReturnsWhenPerryClosesUs
+function PerryTalk (|spdprocess| perry) // ReturnsWhenPerryClosesUs
 	Compiler.CompileAll
 	.ParserRestore
-	.perry <~ .check(@tmp + "check")
+	perry <~ .check(@tmp + "check")
 	
-	for cmd in .Perry
+	for cmd in perry
 		if cmd and !.CmdWrap(cmd)
 			exit
 
 	pico.SleepForSend
-	.perry.disconnect // calls close, which uses SO_LINGER, to allow sending.
+	perry.disconnect // calls close, which uses SO_LINGER, to allow sending.
 
 
 function BuildError (|string| name, |message|)
 	rz = @tmp + "error"
 	|| err = StdErr.pop
-	rz <~ (err.name, "error")(err)
+		rz <~ err.name
+	  else
+		rz <~ "error"
 	rz <~ name
 
 
@@ -140,7 +139,7 @@ function CmdWrap (|Message| arg, |bool|)
 
 	if cmd != response
 		cmd.replacewith(response)
-	.perry <~ arg
+	SpdProcess.parent! <~ arg
 	stderr.clear						// super-important!!!
 	
 	return !.willexit
@@ -272,7 +271,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	|| str  = prm.second
 	expect (mpos and str) "badinput"
 
-	|| f = src.first
+	|| f = src.first!
 	|| parent = compiler.FindModuleOrClass(f, false)
 	if !parent
 		f.func = @name
@@ -362,7 +361,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 	(message).restore
 	require fn
 	
-	|| thg = fn.source.findpos(f, n)
+	|| thg = fn.source!.findpos(f, n)
 	if !thg and cmd == "callfrom"
 		thg = fn.source // sigh
 	if  thg == @thg  and  fn.source == "behaviour"  and  thg.parent == fn.source

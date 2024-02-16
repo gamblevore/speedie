@@ -265,8 +265,8 @@ class SCImport
 				conf = rz.ImportDir( f )
 			
 			rz.LoadConf(conf)
-			rz.IncludeCHeaders( f["c_includes"],	 Cpp_Export.H_Input )
-			rz.IncludeCHeaders( f["c_postincludes"], Cpp_Export.H_PostInput )
+			rz.IncludeCHeaders( f["c_includes"]!,	  Cpp_Export.H_Input )
+			rz.IncludeCHeaders( f["c_postincludes"]!, Cpp_Export.H_PostInput )
 						
 			if conf
 				rz.ReloadImports(conf)

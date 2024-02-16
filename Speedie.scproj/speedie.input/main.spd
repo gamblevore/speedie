@@ -19,7 +19,7 @@ function Compiler.EnterCompile (|bool|)
 function Compiler.PrintResults
 	.PrintStats
 	.PrintCompileErrors
-	if interact.Perry != nil
+	if SpdProcess.parent != nil
 		printline "Exiting Speedie " + app.id.render
 
 
@@ -48,7 +48,6 @@ function compiler.SetupEnv
 	
 	if pico.parent
 		error.AutoPrint = 0
-		interact.ShouldEnter = 1
 		ErrorColors.enabled = false
 
 

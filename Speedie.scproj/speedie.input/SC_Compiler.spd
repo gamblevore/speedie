@@ -343,7 +343,7 @@ function ImportLibs
 
 function ImportProj
 	SCImport.STDLibTime = false
-	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath)(options.SingleFileInput)
+	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
 	compiler.UserProj = SCImport.ImportPath( "",  ToUse,  0, false )
 	expect compiler.UserProj ("No user-project found.")
 
@@ -392,7 +392,7 @@ function ImportAll
 
 	require .initbasicfuncs
 	
-	.ModuleList = ListModules( .program.access )
+	.ModuleList = ListModules( .program.access! )
 	.AddSubProjects(.ModuleList)
 	.ModuleList <~ .program
 	
@@ -471,8 +471,8 @@ function ImportAll
 	// can we move decls earlier?
 	if .API_Place
 		|| Proj = .API_Place[@thg]
-		for m in .api_list
-			sc_api.DelayedClassAPI(m, proj.name)
+			for m in .api_list
+				sc_api.DelayedClassAPI(m, proj.name)
 
 	.DoSavers(1)
 
@@ -603,7 +603,7 @@ function InitCompiler
 	////////////////////////////////////////////////
 	
 	if options.SingleFileInput
-		if Interact.Perry
+		if SpdProcess.parent
 			._BuildFolder = compiler.originalinputpath.ScriptContainer.file
 		  else
 			._BuildFolder = .BaseProjectPath

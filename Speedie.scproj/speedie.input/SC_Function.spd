@@ -1386,7 +1386,7 @@ function Tran_Debugger (TranFunc) {
 	using (node)
 		ExpandToBool(ch, name_space)
 		// why cant I use negate?
-		node.first.Negate
+		node.first!.Negate
 		node.Name = "if"
 		|| dbg = node.msg(@arg).msg(@tmp, "debugger")
 		dbg.tmptype = asmtmp.kdebugger
@@ -1749,7 +1749,8 @@ function scfunction.Cleanupfunc (|message| s)
 
 
 function message.mainfix2
-	.become(.MainFix)
+	|| m = .MainFix
+		.become(m)
 
 
 function scfunction.UpdateSourceSub (|message| src, |bool|)
@@ -1833,7 +1834,7 @@ function message.MainFix (|message|)
 
 	.name = "function"
 	|| fn_src = "function app.Main (|ErrorInt|,) {cpp_name JB_Main, visible true}".ParseClean
-	|| src_arg = fn_src.Last
+	|| src_arg = fn_src.Last!
 	
 	|| fn = prms.func
 	|message| inc_arg
@@ -1845,7 +1846,7 @@ function message.MainFix (|message|)
 
 	if inc_arg
 		if fn == @prm
-			src_Arg.InsertMainArgs(prms)
+			src_arg.InsertMainArgs(prms)
 
 		fn_src <~ inc_arg
 		inc_Arg.expectlast
@@ -1859,7 +1860,7 @@ function NeuMain (CollectFunc)
 	expect  (name_space == compiler.program)  (node, "Can’t have main inside here.")
 	|| fn_src = node.mainfix
 		Compiler.HasMainFunc = true
-		|| m = compiler.userproj.mod
+		|| m = compiler.userproj!.mod
 		rz = SCFunction.NewFunc( fn_Src, m, ErrPlace )
 		if rz isa scmodule // sigh. Not ideal.
 			compiler.MainFunc = scclass.ProcessExtend(fn_Src, false, m)

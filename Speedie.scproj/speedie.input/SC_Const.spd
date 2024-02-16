@@ -72,13 +72,14 @@ function scbase.CollectConstantsSub (|Message| ch)
 			|| ValueNode = Line[2]							#expect Line
 			|| thg = line[ @Thg ]							#require
 			|| OMGType = TypeOfExpr( ValueNode, self )		#require // can’t seem to remove this.
-			|| NewType = CurrType ?? OMGType
+			|| NewType = CurrType
+			if !(NewType?)
+				newtype = OMGType
 			NewItem = SCDecl(newtype.type)
-			expect (NewType) (line)
 
 			if (ValueNode == @Str)
 				SCFunction.ObjectifyString(ValueNode)
-				ValueNode.obj = TypeString.typenormal
+				ValueNode.obj = TypeString!.typenormal
 			  elseif (valuenode.isint) or (valuenode == @unit)
 				NewType.constcheck(nil, ValueNode, OMGType)  
 				nextnum = valuenode.int + 1
@@ -219,4 +220,5 @@ function @scmodule.ConstantCollector (collectfunc)
 function compiler.CollectConstants
 	opt norefcounts
 	for ch in .constantslist
-		(ch.obj|scbase|).CollectOneConstants(ch)
+		|| b = ch.obj as SCBase
+			b.CollectOneConstants(ch)
