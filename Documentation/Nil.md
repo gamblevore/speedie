@@ -90,7 +90,7 @@ Those are the same as above! Lets look at how global variables can be set via fu
     || MyRealGlobalMsg  = NoNils(message(@str, "abc"))    // compiles just fine.
     || MyRealGlobalMsg2 = NoNils(nil)                     // won't compile.
 
-So if a global var is initialised to a function result, it uses that function's declared nilness. So make sure those functions have their return declared!! (class `XYZ.new` aka `XYZ()` is always declared `real`.)
+So if a global var is initialised to a function result, it uses that function's declared nilness. So make sure those functions have their return declared!! (class `XYZ.new` / `XYZ()` is always declared `real`.)
 
 
 Properties of classes/structs that are nillable, are assumed `real`, unless specified.
