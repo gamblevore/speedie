@@ -1,7 +1,7 @@
 ## Nil Safety In Speedie
-*(aka "The billion dollar problem")*
+*(aka "The billion dollar mistake")*
 
-Nil-safety is perhaps the most important issue in making code reliable. Unfortunately it can also be the most difficult problem to fix. Nil-safety is such a huge problem for programming, that it caught a popular catch-phrase "The billion dollar problem".
+Nil-safety is perhaps the most important issue in making code reliable. Unfortunately it can also be the most difficult problem to fix. Nil-safety is such a huge problem for programming, that it caught a popular catch-phrase "The billion dollar mistake".
 
 Nil-bugs can hide themselves for weeks, months or even years. And after release, you can be left embarassed in front of your users, as to why your code crashes. That... or the consequences can be deadly if the code handles machinery.
 
