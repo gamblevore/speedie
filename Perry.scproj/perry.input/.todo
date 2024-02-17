@@ -5,6 +5,8 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 * Do nil checker!
+	* crashing on perry
+	* MainArgBasic fucked with basodpias;kldjalskjdnasm,dnas booASLKDalksdalksdjm
 	* why is "if !(NewType?)" necessary??? "|| ListName = list!" too
 	* display obj.haha.property instead of JB_haha(obj).Property
 	* collectdecls should leave the decl on the decl itself also! Not just on the last. its too awkward!
