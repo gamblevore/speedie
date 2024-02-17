@@ -17,7 +17,7 @@ class Anagrams
 		
 	
 	helper Find (|string| progress, |string| inside, |int| depth)
-		for i in progress.Length+1
+		for i in progress.Length + 1
 			|| Variant = progress.insert(inside, i)
 			if depth < .orig
 				.find(Variant, string.byte(.orig[depth]), depth+1)
