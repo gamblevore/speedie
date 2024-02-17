@@ -130,15 +130,15 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	main (|file| f, |string| s, |int| n = 0)
 		-->
 	main
-		|file|   f = file.MainArg(0)
-		|string| s = string.MainArg(1)
+		|file|   f = file.MainArg(0)		#require
+		|string| s = string.MainArg(1)		#require
 		|int|    n = (int.MainArg(2), 0)(__ArgCount > 2)
 
 
 	main (|file| a, |[file]| b)
 		-->
 	main
-		|file|   a = file.MainArg(0)
+		|file|   a = file.MainArg(0)		#require
 		|[file]| b
 		|| __ArgCurr = 1
 		while __ArgCurr < __ArgCount
