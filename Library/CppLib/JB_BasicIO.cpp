@@ -28,10 +28,10 @@ void JB_Pipe__StdOutSet(int F) {
 }
 
 #ifndef AS_LIBRARY
-static void PrintTo(JB_String* s, int Num) {
+static void PrintTo(JB_String* s, int FD) {
     int N = JB_Str_Length( s );
     if ( N )
-        JB_Write( Num, s->Addr, N ); // very important to use JB_Write!
+        JB_Write( FD, s->Addr, N ); // very important to use JB_Write!
 }
 
 void JB_Str_PrintError(JB_String* s) {
@@ -45,15 +45,16 @@ void JB_Str_PrintError(JB_String* s) {
 }
 
 void JB_Str_Print(JB_String* s) {
-	auto ms = Mini(s);
-	auto mf = Mini2("JB_Tree_Second(ch)!");
-	if (StrEquals(ms, mf))
-		debugger;
+//	auto ms = Mini(s);
+//	auto mf = Mini2("JB_Tree_Second(ch)!");
+//	if (StrEquals(ms, mf))
+//		debugger;
     PrintTo(s, StdOutFD_);
 }
+
 void JB_Str_PrintLine(JB_String* s) {
-	JB_Str_Print(s);
-	PrintTo(JB_Str__Byte('\n'), StdOutFD_);
+    PrintTo(s, StdOutFD_);
+	JB_Write( StdOutFD_, (uint8*)"\n", 1 );
 }
 
 #else
