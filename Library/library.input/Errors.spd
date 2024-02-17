@@ -20,7 +20,7 @@ class Error (Message)
 	|ErrorSeverity|			Severity
 	|ErrorFlags|			ErrorFlags
 
-	constructor (|message| node, |string| desc = "", |errorseverity| level=errorseverity.error, |string| path="" )
+	constructor (|message?| node, |string| desc = "", |errorseverity| level=errorseverity.error, |string| path="" )
 		super.constructor
 		.position = -1
 		.node = node

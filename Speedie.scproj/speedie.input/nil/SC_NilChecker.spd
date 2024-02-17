@@ -384,8 +384,8 @@ function ProcessCondRel (NilTrackerfn)
 	opt norefcounts
 	|| ll = msg.first!
 	|| op = ll.next!
-	|| rr = op.next!
 	|| scop = op.obj!|SCOperator|
+	|| rr = op.next!
 
 	if scop.IsCompare
 		return .CompareObjs(ll, rr, test, scop)
@@ -589,6 +589,7 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 	ifn where isthing raw
 		fs <~ ' '
 		fs <~ raw
+	fs <~ ':'
 	fs <~ ' '
 	where.render(fs)
 	if To

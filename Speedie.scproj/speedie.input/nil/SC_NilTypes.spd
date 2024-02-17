@@ -83,7 +83,7 @@ datatype nilreason (byte)
 	module
 		|| values = [
 			"Accessing"
-			"Accessing property"
+			"Accessing property on"
 			"Reading" 
 			"Using"
 			"Passing"

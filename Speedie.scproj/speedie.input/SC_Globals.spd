@@ -1117,12 +1117,12 @@ function TypeOfExprNeeded ( |message| exp, |scbase| name_space, |SCDecl| )
 			error (it.source, "(Using this function.)")
 			
 
-function message.NiceIsFlagSyntax (|message| list,  |message| RN,  |scbase| name_space, |message| side, |scdecl|) {
+function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |scbase| name_space, |message| side, |scdecl|) {
 	|| cls = typeofexpr(self, name_space)
 	require cls and cls.isnormal
 
 	|| ty = cls.type
-	|| fn = ty.TheIsFunc			#expect (list, "${ty.name} doesn‘t have 'syntax is' specified.")
+	|| fn = ty.TheIsFunc			#expect (opch, "${ty.name} doesn‘t have 'syntax is' specified.")
 	|| arg1 = fn.args[1]			#expect (fn.source, "This func needs a parameter!")
 	|| LookupType = arg1.type			// OK so... we have the arg. it's a decl, with a type
 	require rn.expect(@thg)
@@ -1131,7 +1131,7 @@ function message.NiceIsFlagSyntax (|message| list,  |message| RN,  |scbase| name
 		
 	using (rn)
 
-	// a is b = true  --> a.syntaxis(s.b) = true
+	// (a is b) = true  --> a.syntaxis(s.b) = true
 	// if a is b      --> if a.syntaxis(s.b)
 	// if a is s.b.c  --> if a.syntaxis(s.b.c)	// need special handling, not done yet.
 	// if a is b(d).c --> if a.syntaxis(s.b(d).c)
@@ -1143,28 +1143,26 @@ function message.NiceIsFlagSyntax (|message| list,  |message| RN,  |scbase| name
 			bra = exp
 		if (bra in @arg)
 			if bra == exp // a is b = c --> (a is b)=c
-				// bra is exp? so its not a bra?
-				// so... we wrap exp in a bra? just try?
-				// debugger
 				bra = exp.WrapWith(@bra.msg)
 
 			bra.func = @rel
-			bra <~ (@opp, "=")
+			|| eq = bra.msg(@opp, "=")
+			eq.obj = opch.obj
 			bra <~ (@thg, "true")
 			side = bra.last
 			
-	if list == "isnt"
+	if opch == "isnt"
 		exp.name = "syntaxisnt"
 	  else
 		exp.name = "syntaxis"
-	list.become(@prm)
-	list.obj = nil // heh
+	opch.become(@prm)
+	opch.obj = nil // heh
 	rn.func = @dot
 
 	while rn.first		// not used yet. rn == @thg, not @func/@dot
-		list <~ rn.first
+		opch <~ rn.first
 	rn  <~ (@thg, LookupType.name) 
-	rn  <~ list
+	rn  <~ opch
 	exp <~ «prm, rn »
 	
 	return TypeOfExpr(exp, name_Space, side)
