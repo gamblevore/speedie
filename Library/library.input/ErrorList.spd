@@ -212,6 +212,7 @@ class ErrorReceiver
 	
 	function ReturnErrors (|errorreceiver| To=stderr)
 		opt norefcounts
+		debug_require to!=self
 		for e in self
 			To <~ e
 
