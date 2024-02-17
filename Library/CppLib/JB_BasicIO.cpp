@@ -36,8 +36,7 @@ void JB_Str_Print(JB_String* s) {
 }
 
 void JB_Str_PrintLine(JB_String* s) {
-	if (s)
-		SendToStdOut(s->Addr, s->Length);
+	JB_Str_Print(s);
 	SendToStdOut( (uint8*)"\n", 1 );
 }
 
