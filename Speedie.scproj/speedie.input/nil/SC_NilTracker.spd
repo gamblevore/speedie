@@ -242,12 +242,12 @@ struct ArchonPurger
 			using options.NilStrength	
 			|| Old = stderr	
 			|| Rec = ErrorReceiver()
+			|| Failed = 0
 			using rec
-				// what about... the number that failed?
 				for (f in compiler.funclist) (i)
 					.ExterminateZergBugs(f)
-					rec.ReturnErrors(old)
-
-			if rec.ErrorCount // in case theres too many
-				StdErr.errors.first = Error(nil, "functions failed nil-checking".pluralize(rec.errorcount) )
+					Failed += rec.ReturnErrors(old) > 0
+			
+			if Failed // in case theres too many to list all
+				StdErr.errors.first = Error(nil, "function".pluralize(Failed) + " failed nil-checking" )
 			SCFunction.currfunc = nil
