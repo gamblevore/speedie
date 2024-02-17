@@ -10,12 +10,6 @@ module Pipe
 		StdOut_ = 1 // i guess it should be a getter func
 		StdErr_ = 2 // considering we have setter funcs
 
-	function StdError (assigns:|int|)
-		cpp_wrapper
-
-	function StdOut (assigns:|int|)
-		cpp_wrapper
-
 	function StdOutIsTerminal (|bool|)
 		return .IsTerminal(.StdOut_)
 	

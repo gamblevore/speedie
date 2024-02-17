@@ -52,10 +52,11 @@ datatype Type (int)
 
 function app.UseOne (|file| f)
 	conv.in = f
-	conv.out = conv.OutPath
-	conv.RealOut = conv.out
+	|| op = conv.OutPath
+	conv.out = op
+	conv.RealOut = op
 	if conv.Dest is selfreplace
-		conv.realout = conv.realout.AddExt("jztmp").file
+		conv.realout = op.AddExt("jztmp").file
 	if conv.in.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
@@ -161,7 +162,7 @@ module Conv
 		|| s = .speed.GetResult
 			printline s
 		.in = nil
-		.data = nil
+		.data = ""
 		.start = nil
 		.ast = nil
 		.Detected = nil
@@ -169,10 +170,10 @@ module Conv
 	
 
 	function TestOne
-		require .in.MustExist("test compression")
-		.done++
 		|| OrigIn = .in
 		|| OrigOut = .out
+		require OrigIn and origout and OrigIn.MustExist("test compression")
+		.done++
 		.DefaultStrength = MZLab.Fast
 
 		.TestSub(origIn)
@@ -182,7 +183,7 @@ module Conv
 		.DefaultStrength = MZLab.Strong
 		.TestSub(origIn)
 
-		.del(.out, origin)		
+		.del(.out!, origin)		
 		.del(origout, origin)
 
 	
@@ -200,12 +201,12 @@ module Conv
 		require stderr.ok
 
 		.in = .out
-		.out = (.in + ".back").file
+		.out = (.in! + ".back").file
 
 		.CompressOnly(true)
 		require stderr.ok
 		
-		.out.CompareFile(Orig, Orig)
+		.out!.CompareFile(Orig, Orig)
 
 
 	function Time (|string| Name, |bool| compress=false)
@@ -225,8 +226,8 @@ module Conv
 		
 	function CompressOnly (|bool| Decomp)
 		printline .out|string|
-		|| d = .realout.out
-		|| src = .in.in
+		|| d = .realout!.out
+		|| src = .in!.in
 		require src!=nil and d != nil
 		.start = date() 
 		if Decomp
@@ -286,7 +287,8 @@ module Conv
 		if .AST
 			.time("Parse")
 		  elseif (dest is box or jbin) or  .data.IsJbin
-			StdErr.Errors.Last.name += "\nUnable to parse input file for conversion to jeebox"
+			|| err = StdErr.Errors.Last
+				err.name += "\nUnable to parse input file for conversion to jeebox"
 		  else
 			stderr.pop				// otherwise no.
 		.done++
@@ -330,7 +332,7 @@ module Conv
 			"Nothing to do for: $.out"
 			return
 		
-		|| fs = .realout.Out							#require
+		|| fs = .realout!.Out							#require
 		if dest isnt compressed 
 			.ConvertDataFormat(fs)
 		  else
@@ -368,8 +370,8 @@ module Conv
 		if DestPath
 			return destpath.file
 		if dest is selfreplace
-			return .in
-		|| str = .in.path
+			return .in!
+		|| str = .in!.path
 		if str isa "mz"
 			str = str.trimext
 		
@@ -386,7 +388,7 @@ module Conv
 	
 	
 	function FormatInfo (|&int| Size=0, |string|)
-		|| str = .in.Section(0, 64)
+		|| str = .in!.Section(0, 64)
 			if str == string.error
 				return str
 		

@@ -75,14 +75,16 @@ class Array (saveable)
 			.length = 0
 	
 	function Wipe (|int|)
-		// returns .size
+		description "Clears entire array, then returns the previous size."
 		cpp_wrapper JB_Array_Wipe
 	
 	function Size (|int|)
 		disabled "use length"
 	
 	function Length (|int|)
+		nil checker
 		cpp_wrapper JB_Array_Size
+	
 	function FastShrink (|int| to=0)
 		cpp_Wrapper JB_Array_FastShrink
 	
@@ -120,9 +122,9 @@ class Array (saveable)
 	
 	syntax Access (|int| pos, assigns:||)
 		cpp_wrapper JB_Array_ValueSet
-		
 	
 	syntax Access (|int| pos, ||)
+		nil checker
 		cpp_wrapper JB_Array_Value
 	
 	syntax Access (||)
@@ -158,9 +160,11 @@ class Array (saveable)
 
 
 	syntax Compare (|int| n, |bool|Aware, |int|)
+		nil self
 		return .length - n
 	
 	syntax Equals (|int| n, |bool|Aware, |bool|)
+		nil self
 		return .length == n
 	
 	operator contains (|object| o, |bool|)

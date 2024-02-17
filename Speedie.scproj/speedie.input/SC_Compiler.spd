@@ -153,7 +153,7 @@ function CompileAll (|bool|)
 	.testdate
 	.ImportAll
 
-	errordelayer.ReturnErrors
+	ErrorDelayer.ReturnErrors
 
 	.PrepareInterpreter
 	require .Stage( "More constructors" )
@@ -163,9 +163,10 @@ function CompileAll (|bool|)
 	require .Stage( "Stripping dead code" )
 	.DeadStrip
 	
-	require .Stage( "NilChecking" )
-	.Timer( "NilChecking" )
-	ArchonPurger.FixArchons
+	if options.NilStrength > 0
+		require .Stage( "NilChecking" )
+		.Timer( "NilChecking" )
+		ArchonPurger.FixArchons
 	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )

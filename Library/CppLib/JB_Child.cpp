@@ -117,8 +117,10 @@ void JB_App__CrashOnInterupt (bool b) { // useful for command-line tools
 
 void JB_App__CrashInstall() {
 	for_(32) {
-		if (IgnoreList & (1<<i))
-			signal(i, SIG_IGN);
+		if (IgnoreList & (1<<i)) {
+			if (i != SIGINT or !isatty(STDIN_FILENO)) // allow ^C to kill speedie from terminal
+				signal(i, SIG_IGN);					  // but don't allow breakpoints to kill it!!
+		}
 		if (CrashList & (1<<i) and signal(i, JB_CrashHandler) == SIG_IGN)
 			signal(i, SIG_IGN); // restore the old ignore signal... make speedie more unix-friendly.
 		if (WakeList & (1<<i))

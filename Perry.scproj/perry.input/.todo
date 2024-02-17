@@ -10,8 +10,13 @@
 	* collectdecls should leave the decl on the decl itself also! Not just on the last. its too awkward!
 	* picomsg is now crashing or failing on constructor
 		* speedie stops compiling sometimes, from perry
+		* pico needs a massive bloat bastard constructor/destructor test!!! like 8 threads bastardly creating/destroying picos!
 	* obj and name should be "safe"
+	* spdprocess.isopen shouldn't need "nil checker"
 	* upgrade optional returns to real? (if possible)
+		* started optional returns must return both values!!
+		
+		
 	* function pointers not being tested!
 	* selector constructor shouldn't need "?"
 	* (|message| x = nil), // should be optional
@@ -19,7 +24,6 @@
 		* compiler should know this
 	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!
 	*	con.counterpart|array| <~ result // should be rejected!
-* pico needs a massive bloat bastard constructor/destructor test!!! like 8 threads bastardly creating/destroying picos!
 * SC_Imp_Constructor reffing unnecesarily
 * constructors should allow code before it... just not property setting.
 

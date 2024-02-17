@@ -143,8 +143,7 @@ struct ArchonPurger
 			.DeclareSub(d, d.nildeclared)
 
 		target debugnil
-			printline
-			f.NilPrint(" ****** ", false)
+			f.NilPrint("\n ****** ", false)
 		
 		|| r = f.ReturnType
 			if !r.nilstated
@@ -197,7 +196,7 @@ struct ArchonPurger
 			for i in 32
 				|| d = .dbg[i]
 				if d and diff[i]
-					d.nilprint(reason)
+					d.nilprint("change")
 	} else {
 		function SetAllNil (|NilRecord| Dest)
 			pragma inline
@@ -240,16 +239,14 @@ struct ArchonPurger
 		
 		function FixArchons
 			opt norefcounts
-			require app["nil"].Yes
-
-			using options.NilStrength		
+			using options.NilStrength	
+			|| Old = stderr	
 			|| Rec = ErrorReceiver()
 			using rec
 				for (f in compiler.funclist) (i)
 					|| ratio = (i+1)|f64| / compiler.funclist.length|f64|
 					errorreceiver.progress = ratio*100
 					.ExterminateZergBugs(f)
-					rec.ReturnErrors
+					rec.ReturnErrors(old)
 
 			SCFunction.currfunc = nil
-			StdErr.PrintErrors

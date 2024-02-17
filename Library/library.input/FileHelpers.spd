@@ -298,7 +298,8 @@ extend String
 /// ACTUAL FILE STUFF
 
 	operator isa (|string| s, |bool|)
-		return .ext ~= s
+		if self
+			return .ext ~= s
 		
 	function File (|File|)
 		cpp_part AsFile

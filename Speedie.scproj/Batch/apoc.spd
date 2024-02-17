@@ -38,7 +38,7 @@ main
 	
 	while Europe
 		for (cun.backwards in Europe) (i)
-			cun.Attack Europe[]
+			cun.Attack Europe[]!
 			if !cun.alive
 				Europe.remove(i)
 			""

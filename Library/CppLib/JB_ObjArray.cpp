@@ -110,7 +110,7 @@ bool JB_Array_FastShrink( Array* self, int64 NewLength ) {
     int Length = self->Length;	
     if (NewLength < Length) {
 		Decr_(self, NewLength);
-		self->Length = NewLength;
+		self->Length = (int)NewLength;
 		return true;
 	}
 	return false;

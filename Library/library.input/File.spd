@@ -257,6 +257,7 @@ class File (String)
 
 	
 	function Exists (|bool|TestLinkExists=false, |bool|)
+		nil checker
 		cpp_wrapper JB_File_Exists
 	
 	syntax access (|string| name, |File|)

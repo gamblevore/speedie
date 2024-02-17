@@ -55,7 +55,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--self"
-            isEnabled = "NO">
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--target=debugnil"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nocolor"
@@ -79,7 +83,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Speedie.scproj/Batch/apoc.spd"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/examples/casting.spd"

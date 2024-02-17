@@ -154,7 +154,8 @@ class SpdProcess (Process)
 			return true
 	
 	function IsOpen (|bool|)
-		require self and .CommsOpen
+		nil checker // shouldn't be necessary
+		require .CommsOpen
 		if .WeAreParent
 			return .exit == -1
 		return app.ParentID > 1

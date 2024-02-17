@@ -239,12 +239,12 @@ class String
 	
 
 	function TrimStart (|string| s, |bool| All=false,  |string|)
-		ifn self starts s
-			return self
-		while self starts s
-			self = self[s.length...]
-			loop all
-		return self
+		|| i = 0
+		while self[i, s]
+			i += s.length
+			if !all
+				exit
+		return self[i, int.max]
 
 
 	function Squeeze (|string|)

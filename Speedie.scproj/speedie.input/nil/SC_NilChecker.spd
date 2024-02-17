@@ -128,7 +128,7 @@ function Function (NilTrackerFn)
 	
 	target debugnil	
 		fn.NilPrint(false)
-	
+		
 	if (test is active) and fn.IsNilChecker
 		Test |= NilCheckMode.Soft
 		if t.FnAbleToNilCheck
@@ -584,7 +584,6 @@ function BecomeReal (|scdecl| sent, |message| where,  |nilreason| reason, |scfun
 
 function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nilstate| state, |nilstate|)
 	|| fs = faststring()
-	fs <~ "NilObjectError "
 	fs <~ nilreason.values[reason]
 	|| raw = state.RawName
 	ifn where isthing raw
