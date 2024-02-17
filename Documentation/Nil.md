@@ -35,18 +35,23 @@ We want you to write code as naturally as possible. We want people coming from a
 
 To help with writing code naturally, we do "inference" on the parameters. That means we try to logically figure out, how these parameters are used. To figure out if they should be `real` or `optional`.
 
-    function guessable (|message| X, |message| Y)
+    function guessable (|message| X, |message| Y, |message|)
         if X.position == -1               // X is now a "real" parameter.
             "X has a pos of -1"           // Because I used X directly.
 
         if (Y and Y.position == -1)       // Y is now a "optional" parameter
             "Y has a pos of -1"           // because I tested if Y exists.
+        if random()
+            return message()
     
     function test_guessable
         || m = message()
-        guessable(m, m)                   // OK
-        guessable(m, nil)                 // OK
-        guessable(nil, m)                 // won't compile. X can't accept nil
+        || a = guessable(m, m)            // OK
+        || b = guessable(m, nil)          // OK
+        || c = guessable(nil, m)          // won't compile. X can't accept nil
+        if (b)
+            b.name = "fred"               // OK
+        b.name = "fred"                   // wont compile
 
 We want to make coding more "fluid", so you "flow" better. For example if you wanted `guessable()` to require `X` and `Y` to be `real`, you should remove the test `if (Y)`, and just directly work on the params.
 
