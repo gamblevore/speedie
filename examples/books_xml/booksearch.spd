@@ -28,7 +28,9 @@ function BookSearch (|message| BookFile, |[string]| Queries, |[message]|)
 function message.TestBook (|[string]| queries, |message|)
 	require .Expect(@tmp, "book") 
 	for row in .last(@arg)
+		require row.Expect(@tmp)
 		for Q in queries
 			if row ~= q.ArgName		// ~= is like == but case-insensitive
-				require row.first.name contains q.ArgValue
-				rz = self
+				|| Value = Row[@nil]
+					require Value.name contains q.ArgValue
+					rz = self
