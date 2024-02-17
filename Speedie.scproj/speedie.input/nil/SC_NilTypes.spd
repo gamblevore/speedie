@@ -20,13 +20,11 @@ struct NilRecorder
 	|nilrecord| 	Value
 	syntax call (|uint64| item, assigns:|uint64| value)
 		value &= nilstate.either
-		target debug: if !value or item < 0 or item > 31
 		item <<= 1
 		|| Mask = NilState.either|uint64| << item
 		|| Prev = .value
 		.value = (Prev &~ Mask) ||| (value << item)
-		if Prev & (3|uint64| << 62|uint64|)
-		target debug: archonpurger.ndb4
+		target debugnil: archonpurger.ndb4
 
 
 datatype NilCheckMode (uint)

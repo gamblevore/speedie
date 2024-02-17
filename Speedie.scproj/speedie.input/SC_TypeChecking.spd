@@ -120,14 +120,14 @@ function scdecl.SafelyWrappable (|bool|)
  
 
 function scdecl.TryTypeCastPointer (|SCDecl| O, |Message| exp, |int| TypeCast, |bool| CArray, |int|)
-	require .internal.MiniMatch(O)
+	|| i = .Internal
+	if i and i.MiniMatch(O)	
+		|| OAddr = O.GetAddress
+		if carray
+			oaddr.C_Array = 0
 		
-	|| OAddr = O.GetAddress
-	if carray
-		oaddr.C_Array = 0
-	
-	if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
-		rz = exp.GetAddressOf(OAddr, CArray)
+		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
+			rz = exp.GetAddressOf(OAddr, CArray)
 
 
 function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)

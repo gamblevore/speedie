@@ -21,8 +21,6 @@ struct LoopInfo
 	function BeginLoop (|bool| HasExitCond, |Loopinfo|)
 		rz = *self
 		|| v = ArchonPurger.value
-		target debug
-			if  ArchonPurger.t.mindepth > v.DepthOfVars
 		
 		.ExitRecord = HasExitCond|nilrecord| * V	// .Finish will check for non-zero
 		.HasEscape = HasExitCond
@@ -35,12 +33,12 @@ struct LoopInfo
 		|| Ex = .ExitRecord						#check (msg, "Loop never exits.")
 		if !.HasEscape and !msg.islast
 			msg.KinderRemoveAfter
-		ArchonPurger.t.SetAllNil(Ex, "LoopEnd")
+		ArchonPurger.t.SetAllNil(Ex)
 	
 	
 	function NextLoop 
 		.ContRecord |= ArchonPurger.value
-		ArchonPurger.t.SetAllNil(.contrecord, "continue")
+		ArchonPurger.t.SetAllNil(.contrecord)
 
 
 	
@@ -50,9 +48,8 @@ struct ArchonPurger
 	|&NilRecord| 			Neel
 	|&NilRecord| 			RowEnd
 	|Nilrecord| 			Realnesses
-	target debug
+	target debugnil
 		|Scdecl--[32]| 		Dbg
-		|int|				MinDepth
 	|scdecl?|				Return
 	|bool|					FnAbleToNilCheck
 	|bool| 					RootReturned // for recursive funcs
@@ -68,62 +65,63 @@ struct ArchonPurger
 		V.NilDeclared = NilState.real
 		if v is self
 			.FnAbleToNilCheck = false
-		if .NestDepth > 0 // We need to affect the other branches.
+		if .NestDepth > 0				// We need to affect the other branches.
 			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
 	
 	
 	function BranchEnter (|message| where, |NilRecord|)
 		expect (.Neel < .RowEnd) (where, "Branch depth too deep (over 63)")
 		rz = *(.Neel++)
-		.setallnil(rz, "BranchEnter")
+		.SetAllNil(rz)
 	
 	
 	function BranchSwap (|NilRecord| A, |nilrecord|)
 		rz = value()
-		.SetAllNil(A, "swap")
+		.SetAllNil(A)
 	
 	
 	function BranchExit (|NilRecord| A=0,  |nilstate|)
 		|| B = value()
 		*.Neel-- = 0 // cleanup
 		
-		.SetAllNil(A ||| B, "BranchExit")
+		.SetAllNil(A ||| B)
 		if .NestDepth == 0
 			.Realnesses = -1
 		return nilstate.real
 
 			
 	function Declare (|scdecl| D, |nilstate| nd, |nilstate|)
-		rz = .declaresub(d, nd)
-		d.NilPrint("add")
+		rz = .DeclareSub(d, nd)
+		target debugnil	
+			d.NilPrint("add")
 	
 	
 	function DeclareSub (|scdecl| D, |nilstate| nd, |nilstate|)
 		nd &= nilstate.either
 		|| N = .value.DepthOfVars + 1
 		expect (N < 31)								(D, "Too many declarations")
-		target debug
+		target debugnil
 			.dbg[n] = d
 		d.NilReg = N * d.TypeSuffers			
 		d.DReg.Reg = n // right? might as well do this at the same time?
 		d.NilAllocDepth = .NestDepth
-		|| P = (.Neel)|&nilrecorder| // setset
+		|| P = (.Neel)|&nilrecorder|
 		(p)(n) = nd
 		return nd
 	
 	
 	function scdecl.NilCurr (|nilstate|)
 		if self Isnt Local
-			return .nildeclared & nilstate.either
+			return .NilDeclared & nilstate.either
 		return (ArchonPurger.Value)[.NilReg]
 	
 	
 	function SetNilness (|SCDecl| d, |NilState| New, |NilState|)
 		pragma inline
-		|| P = (.Neel)|&nilrecorder| // setset
+		|| P = (.Neel)|&nilrecorder|
 		(P)(d.NilReg) = new
-		d.NilPrint("set")
-		if d ~= "debug"
+		target debugnil
+			d.NilPrint("set")
 		return New
 
 
@@ -143,15 +141,17 @@ struct ArchonPurger
 		
 		for d in f.args
 			.DeclareSub(d, d.nildeclared)
-		target debug
-			.MinDepth = value().DepthOfVars
-		printline
-		f.NilPrint(" ****** ", false)
+
+		target debugnil
+			printline
+			f.NilPrint(" ****** ", false)
 		
 		|| r = f.ReturnType
 			if !r.nilstated
 				r.nildeclared = 0 // build this up carefully.
-		target debug: if "": ArchonPurger.ndb4
+		target debugnil
+			if "": ArchonPurger.ndb4
+
 		return f.SourceArg
 
 
@@ -161,7 +161,8 @@ struct ArchonPurger
 			r.nildeclared |= nilstate.stated
 		for a in f.Args
 			a.nildeclared |= nilstate.stated
-		f.NilPrint(" !!!!! ", true)
+		target debugnil
+			f.NilPrint(" !!!!! ", true)
 	
 
 	function CheckNilCheck (|SCFunction| f)
@@ -177,8 +178,8 @@ struct ArchonPurger
 		pragma inline
 		opt norefcounts
 		rz = *.Neel
-		|| d = rz.depthofvars
-			target debug
+		target debugnil
+			|| d = rz.depthofvars
 				if (d > 29) or !.dbg[d]
 	
 	
@@ -186,28 +187,22 @@ struct ArchonPurger
 		return (.value)[1]
 
 
-	function SetAllNil (|NilRecord| Dest, |string| reason)
-		|| DDDD = Dest
-		dest &= .Realnesses
-		
-		target debug {
-			if  t.mindepth > dest.DepthOfVars  and  dest != nilstate.basic
-			|| diff = dest xor value()
-		} else {
-			pragma inline
-		}
+	target debugnil {
+		function SetAllNil (|NilRecord| Dest)
+			dest &= .Realnesses
 
-		.value
-		*.neel = dest // setset
-		if Dest & (3|uint64| << 62|uint64|)
-		.value
-		
-		target debug {
+			|| diff = dest xor value()
+			*.neel = dest
+			
 			for i in 32
 				|| d = .dbg[i]
 				if d and diff[i]
 					d.nilprint(reason)
-		}
+	} else {
+		function SetAllNil (|NilRecord| Dest)
+			pragma inline
+			*.neel = dest & .Realnesses
+	}
 
 
 	module
@@ -224,20 +219,18 @@ struct ArchonPurger
 		function EndBlock (|nilrecord|)
 			pragma inline
 			rz = .value
-			t.SetAllNil(nilstate.basic, "blockend")
+			t.SetAllNil(nilstate.basic)
 
 
 		function DeclKill
 			pragma inline
 			if !t.nestdepth
 				t.RootReturned = true
-			t.SetAllNil(nilstate.Basic, "kill")
+			t.SetAllNil(nilstate.Basic)
 		
 
-		function KhalaiPurification (|scfunction| f, |int| a)
-			// it's like a protoss exterminating DA ZERGBUGZ 
+		function ExterminateZergBugs (|scfunction| f)
 			opt norefcounts
-			require (a==1) == (f.cls ~= "niltest")
 			|| arg = t.Startnil(f)
 				Argument(arg)
 				if t.FnAbleToNilCheck
@@ -252,13 +245,10 @@ struct ArchonPurger
 			using options.NilStrength		
 			|| Rec = ErrorReceiver()
 			using rec
-				for f in compiler.funclist
-					.KhalaiPurification(f, 1)
-					rec.ReturnErrors
 				for (f in compiler.funclist) (i)
 					|| ratio = (i+1)|f64| / compiler.funclist.length|f64|
 					errorreceiver.progress = ratio*100
-					.KhalaiPurification(f, 2)
+					.ExterminateZergBugs(f)
 					rec.ReturnErrors
 
 			SCFunction.currfunc = nil

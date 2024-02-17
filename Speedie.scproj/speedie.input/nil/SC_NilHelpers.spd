@@ -15,7 +15,7 @@ function Redundant (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 function FastDecl (|SCDecl|)
 	opt norefcounts
 	|| obj = .obj|SCDecl|
-		target debug
+		target debugnil
 			obj.mustbe(SCDecl)
 		|| l = obj.IsLookupOnly
 		if !l
@@ -123,7 +123,7 @@ function scdecl.NilPrmFail (|message| where, |scfunction| f)
 function message.IsNowNil (|int|)
 	opt norefcounts
 	|| d = .obj|scdecl|
-		Target debug: if !(d as scdecl)
+		Target debugnil: if !(d as scdecl)
 		if (d == TypeNil)
 			return 1
 		if d.NilCurr == nilstate.nilish

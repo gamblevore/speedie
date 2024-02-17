@@ -89,7 +89,7 @@ function message.TargetTest (|bool|) // target true, target false,
 		return Platform.lin
 	if self ~= "direct"
 		return options.IsDirectTest
-	return targets[.name]
+	return SC_Targets[.name]
 
 
 function message.Tran_Target (|message|)

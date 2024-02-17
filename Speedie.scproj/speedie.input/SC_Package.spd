@@ -5,7 +5,7 @@
 
 function compiler.Package 
 	require !Compiler.IsTest and !Options.ExternalCompile
-	require targets..gui
+	require SC_Targets..gui
 	|| Pd = TransCompiler.productpath
 	|| Pj = .BaseProjectPath.path
 	if platform.osx

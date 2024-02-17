@@ -125,8 +125,9 @@ function Function (NilTrackerFn)
 		require fn and .UseChildAsReal(fp)						// (abc)()
 
 	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
-		
-	fn.NilPrint(false)
+	
+	target debugnil	
+		fn.NilPrint(false)
 	
 	if (test is active) and fn.IsNilChecker
 		Test |= NilCheckMode.Soft
@@ -138,7 +139,7 @@ function Function (NilTrackerFn)
 	|| P = prms.first
 	|| HasAddrs = false
 	for recv in fn.args
-		if recv.nildeclare is optional
+		if recv.nildeclared is optional
 			test |= nilcheckmode.Soft
 			
 		|| v = .Jump(p!, test)
@@ -439,9 +440,9 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 function Argument (Niltrackerfn)
 	opt norefcounts
 	|| v = .value.depthofvars + 1
-	if v > 31 // hmm?
+//	if v > 31 // hmm?
 	for s.fast in msg
-		s.DebugPrint
+//		s.DebugPrint
 		|| t = test&-s.islast
 		|| prev = rz
 		rz = .jump(s, T ||| nilcheckmode.Disappears)
@@ -453,7 +454,7 @@ function Argument (Niltrackerfn)
 			exit
 	
 	|| Allowed = (1|uint64| << (v<<1)) - 1|uint64|
-	t.setallnil(ArchonPurger.value & Allowed, "Argument")
+	t.SetAllNil(ArchonPurger.value & Allowed)
 
 	
 function Bracket (Niltrackerfn)
@@ -608,7 +609,7 @@ function message.Trueness (|nilstate| found, |maybebool|)
 	|| d = .FastDecl
 	|| ret = ArchonPurger.t.return$
 	if d.FastMatch(ret)
-		|| n = d.nildeclare
+		|| n = d.nildeclared
 		if n & nilstate.KnownValue
 			return n is TrueValue
 		if found & nilstate.knownValue

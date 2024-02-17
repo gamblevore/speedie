@@ -98,7 +98,7 @@ class SCDecl (SCObject) {
 	|SCDeclInfo|		Info
 	|AsmReg|			DReg
 	|Byte|				PointerCount
-	|NilState|			NilDeclare
+	|NilState|			NilDeclared
 	|byte| 				NilReg
 	|byte| 				NilAllocDepth
 	|byte| 				Special
@@ -108,15 +108,8 @@ class SCDecl (SCObject) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered
-		target debug: if .objectid == 0
-		
-	setter NilDeclared (|nilstate|)
-		//	if value&1 != .nildeclare&1
-		.nildeclare = value
-	
-	function NilDeclared (|nilstate|)
-		return .nildeclare
-	
+		target debugnil: if .objectid == 0
+
 	function Project (|scimport!|)
 		opt norefcounts
 		return (.MemoryLayer.obj as SCImport)!
@@ -867,11 +860,11 @@ class SCDecl (SCObject) {
 		rz.NilDeclared = type
 
 	function IsReal (|nilstate|)
-		if .NilDeclare&nilstate.optional == NilState.Real
+		if .NilDeclared&nilstate.optional == NilState.Real
 			return NilState.real
 
 	function IsOptional (|nilstate|)
-		if .NilDeclare&nilstate.optional == NilState.optional
+		if .NilDeclared&nilstate.optional == NilState.optional
 			return NilState.optional
 
 	function RefineDecl (|message| list, |SCDecl|)

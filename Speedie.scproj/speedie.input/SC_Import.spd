@@ -106,7 +106,7 @@ class SCImport
 				|| ch = t.first
 					error ch
 				  else
-					targets[t.name] = true
+					SC_Targets[t.name] = true
 		tar.remove
 		
 	
