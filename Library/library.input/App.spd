@@ -194,6 +194,7 @@ function PrefsInit (|date| when=date.now, |bool|)
 
 
 function SavePrefs
+	opt norefcounts
 	._prefs.save?
 	
 
