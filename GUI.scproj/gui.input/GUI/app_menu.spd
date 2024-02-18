@@ -52,20 +52,22 @@ class AppMenu (Window)
 	module
 		|AppMenu|	Menu
 		function SyntaxAppend (|string| name, |guimenuevent| ev)
-			.menu.Choices.listsource.second.next = menuitem(name, ev)
+			.GetAppMenu.Choices.listsource.second.next = menuitem(name, ev)
 
 		function AddSep
 			self <~ ("", nil)
 
-		function InitAppMenu
-			if !.menu
-				.menu = appmenu()
-				.menu.hide
+		function GetAppMenu (|appmenu|)
+			rz = .menu
+			if !rz
+				rz = appmenu()
+				.menu = rz
+				rz.hide
 
 		function Show (|int|)
-			.InitAppMenu
-			.menu.choices.setfocus
-			.menu.ShowAsDialog
+			|| m = .GetAppMenu
+			m.choices.setfocus
+			m.ShowAsDialog
 			return SDLActivity.activity
 
 

@@ -232,10 +232,10 @@ extend PerryIDE
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
 
 
-		with .tester
-			.gnormal.solid	= ((0.0, 0.0, 0.1, 1.0))
-			.size = 10~wide by 10~high
-			.left = 0~right
+//		with .tester
+//			.gnormal.solid	= ((0.0, 0.0, 0.1, 1.0))
+//			.size = 10~wide by 10~high
+//			.left = 0~right
 			
 		with .progress
 			isnt visible

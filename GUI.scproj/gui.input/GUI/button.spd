@@ -4,15 +4,15 @@ class ButtonView (GUIControl)
 	linkage
 		cpp_part Btn
 		
-	|GUIAction|					Pressing
-	|GUIAction|					OnOver
-	|guiaction|					OnRightClick
+	|GUIAction?|				Pressing
+	|GUIAction?|				OnOver
+	|guiaction?|				OnRightClick
 	|date|						StepDuration
 	|date|						DelayTill
-	|guicontrol|				SubControl
-	|listviewrow|				CurrOverItem
-	|listviewrow|				Items
-	|listviewrow|				ClickedItem
+	|guicontrol?|				SubControl
+	|listviewrow?|				CurrOverItem
+	|listviewrow?|				Items
+	|listviewrow?|				ClickedItem
 	|int|						ItemWidth
 	|int| 						ItemGap
 	|byte|						ClickCount
@@ -315,8 +315,9 @@ class ButtonView (GUIControl)
 	function OpenMenu (|listviewrow| row=nil, |bool|)
 		|| m = .submenu						#require
 		expect m.listsource.hasany (beep)
-		if .MouseIsDown
-			.window.CurrMouseDown = m // right?
+		|| w = .window
+		if w and .MouseIsDown
+			w.CurrMouseDown = m // right?
 		|| x = .XOfItem(row)
 		m.stopfilter
 		m.ShowCmm(self, 0, x)

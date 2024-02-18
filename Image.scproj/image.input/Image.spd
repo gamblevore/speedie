@@ -9,7 +9,7 @@ class Image (memory)
 	|ivec2|			WindowBase
 	|ivec4|			_ControlClip
 	|string|		Name
-	|image|			Temp
+	|image?|		Temp
 	contains byte
 	
 /*
@@ -48,7 +48,7 @@ class Image (memory)
 		.SizeInfo = wh
 
 	
-	constructor
+	constructor (|string| name="")
 		super.constructor(0, 4, byte.ZAlloc(4)!)
 		.SizeInfo = (0,0)
 
@@ -204,8 +204,8 @@ class Image (memory)
 	
 	function Colorise (|Memory| data, |float| strength=1)
 		require strength > 0
-		|| in = data.ptr$
-		|| after = data.after$
+		|| in = data.ptr
+		|| after = data.after
 		|| w = ((strength)~gray).PreMul
 		|premultipliedcolor| c
 		|| Top = .ControlClip.y2 & 1
@@ -362,10 +362,10 @@ class Image (memory)
 
 	
 	module
-		function LoadQOI (|&byte| data, |int| len, |&int| Size, |&byte|)
+		function LoadQOI (|&byte| data, |int| len, |&int| Size, |?&byte|)
 			cpp_wrapper JB_Img__LoadQOI
 
-		function WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |&byte|)
+		function WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |?&byte|)
 			cpp_wrapper JB_Img__WriteQOI
 
 		function string.LoadQOI (|string| name="", |image|)
@@ -383,7 +383,7 @@ class Image (memory)
 			|| qoi = image.WriteQOI(.ptr, .Width, .Height, l)
 				return string.FromPtr(qoi, l)
 
-		function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |&byte|)
+		function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |?&byte|)
 			cpp_wrapper JB_Img__LoadPNG
 
 		function ConvertPNGToVOI (|string| p, |string|)
@@ -461,7 +461,7 @@ class Image (memory)
 	function Rotate (|image| Dest, |bool| Right=true)
 		|| into = dest
 		if dest == self
-			into = .ImageOfSameSize
+			into = .ImageOfSameSize$
 		
 		|| W = .Width,       || H = .Height
 		|| DH = into.Height, || DW = into.Width
@@ -524,7 +524,7 @@ class Image (memory)
 		.DrawLineH(P,  r.width,  C)
 
 
-	function RectOutlined (|ivec4| Rect, |drawstyle| g, |MoveCode| AllowEdge=movecode.all)
+	function RectOutlined (|ivec4| Rect, |drawstyle?| g, |MoveCode| AllowEdge=movecode.all)
 		|| Outline = g.SafeEdge
 		|| BG = g.safebg
 
@@ -546,7 +546,7 @@ class Image (memory)
 			p+=4
 	
 
-	function DrawCircle (|ivec4| R, |DrawStyle| G=nil, |float| fade=0.0)
+	function DrawCircle (|ivec4| R, |DrawStyle| G, |float| fade=0.0)
 		|| Back		= .Clip(R)$
 		
 		R -= (0,0,1,1)

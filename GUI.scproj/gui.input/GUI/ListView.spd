@@ -22,29 +22,29 @@ class ListView (GUIControl) {
 	|bool|							Skips
 	|byte|							CommandSelectRow
 
-	|ListViewRow|					DraggingRowTo
-	|ListViewrow|					_Scroll
-	|ListViewCell|					EditDelayed
-	|ListViewCell|					MouseDownCell
-	|ListViewrow|					DraggingRowFrom
+	|ListViewRow?|					DraggingRowTo
+	|ListViewrow?|					_Scroll
+	|ListViewCell?|					EditDelayed
+	|ListViewCell?|					MouseDownCell
+	|ListViewrow?|					DraggingRowFrom
 	|ListViewrow|					ListSource
 	|string|						ColumnInfo
 	|menu|							CMM
 	|DrawStyle|						gRowSel 
 	
-	|GUIListEditEvent|				TryEditCell
-	|GUIListEvent|					WasEdited
-	|GUIListEvent|					OnSelected
-	|GUIKeyEvent|					OnKeyDown
-	|GUIListEvent|					OnReturn
-	|GUIListEvent|					CalculateColumnWidths
-	|GUIListEvent|					OnRightClick
-	|GUIPasteEvent|					OnPaste
-	|GUICopyEvent|					OnCopy
-	|GUIListDragEvent|				OnDragRow
-	|ListViewRowDraw|				OnDrawRow
-	|textview| 						TypingFilter
-	|GUIListEditEvent| 				OnTypingFilter
+	|GUIListEditEvent?|				TryEditCell
+	|GUIListEvent?|					WasEdited
+	|GUIListEvent?|					OnSelected
+	|GUIKeyEvent?|					OnKeyDown
+	|GUIListEvent?|					OnReturn
+	|GUIListEvent?|					CalculateColumnWidths
+	|GUIListEvent?|					OnRightClick
+	|GUIPasteEvent?|				OnPaste
+	|GUICopyEvent?|					OnCopy
+	|GUIListDragEvent?|				OnDragRow
+	|ListViewRowDraw?|				OnDrawRow
+	|textview?| 					TypingFilter
+	|GUIListEditEvent?| 			OnTypingFilter
 
 
 	constructor (|guicontrol| p,  |GUIListEvent| sel,  |GUIListEvent| ret)
@@ -1122,20 +1122,21 @@ class ListView (GUIControl) {
 	
 	
 	function StopFilter
-		if .typingfilter
-			.typingfilter.remove
+		|| t = .typingfilter
+			t.remove
 			.typingfilter = nil
 		
 
 	function FilterText (|string|)
-		if .TypingFilter
-			return .TypingFilter.text
+		|| t = .TypingFilter
+			rz = t.text
 
 
 	helper FilteredRect (|ivec4|)
 		rz = .lastrect
-		if .typingfilter and (._Scroll isnt Disabled)
-			rz.y2 = rz.y2 - (.typingfilter.height)
+		|| t = .typingfilter
+		if t and (._Scroll isnt Disabled)
+			rz.y2 = rz.y2 - (t.height)
 	
 	
 	helper FindClickedCell (|ivec2| Search, |ListViewCell|)
@@ -1394,8 +1395,8 @@ class ListView (GUIControl) {
 	helper guicontrol.EdgeAllow	(|MoveCode|)
 		opt norefcounts
 		|| Hide = 0
-		if .AttachedToParent
-			|| p = .parent
+		|| p = .parent
+		if p and .AttachedToParent
 			Hide   |=  movecode.bottom * (.abstop > p.abstop)
 			Hide   |=  MoveCode.top * (.absbottom < p.absbottom)
 			

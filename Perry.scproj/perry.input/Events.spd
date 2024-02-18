@@ -5,7 +5,7 @@ function FileSepClicker (guiaction)
 	.ide.ViewAsSwap
 
 	
-function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE|) // initide
+function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE!|) // initide
 	|| old = perry.FindProj(path)
 		ClickedTabs(nil, old)
 		|| o = old.ide
@@ -180,7 +180,7 @@ function Perryide.IsBuilding (|bool|) // .isbuilding, .iscompiling, .compiling
 
 
 function ClickedCancel (GUIAction)
-	|| i = .ide
+	|| i = .ide!
 	if !i.Isbuilding
 		return true
 	|| can = ConfirmCanceller(i, fnBuildIsDead)
@@ -192,11 +192,11 @@ function ClickedCancel (GUIAction)
 		
 
 function ClickedCompile (GUIaction)
-	.ide.compile("compile")
+	.ide!.compile("compile")
 
 		
 function PerryRecheckEvent (guilistevent)
-	.ide.ForceRecheck
+	.ide!.ForceRecheck
 
 
 function ReturnProjectPath (GUIListEvent)
@@ -206,24 +206,24 @@ function ReturnProjectPath (GUIListEvent)
 
 
 function ReturnAllFuncs (GUIListEvent)
-	|| e = .ide.EditMe
+	|| e = .ide!.EditMe
 	e.ShowAndSel(row.position)
 	e.SetFocus
 	return true
 
 	
 function OpenProjectPath (GUIaction)
-	|| f = .ide.filelist.FirstSelected as FileRow
-	if (self isa buttonview)
-		.FillMenuPath(f.location)
+	|| f = .ide!.filelist.FirstSelected as FileRow
+		if (self isa buttonview)
+			.FillMenuPath(f.location)
 
 
 function ClickedStatus (GUIaction)
-	.ide.editme.ShowParseError
+	.ide!.editme.ShowParseError
 
 
 function ClickedStats (GUIaction)
-	.ide.clickedstats
+	.ide!.clickedstats
 
 
 function PerryIDE.ShowErrors (|bool| FromKeys, |bool|)
@@ -247,7 +247,7 @@ function PerryIDE.ShowErrors (|bool| FromKeys, |bool|)
 function ClickedAView (GUIaction)
 	opt norefcounts
 	if self isa ButtonView
-		|| i = .ide
+		|| i = .ide!
 		if (i.errorlist is visible) and .tag == i.errorlist
 			i.ShowNextError(0)
 		i.view(self)
@@ -256,7 +256,7 @@ function ClickedAView (GUIaction)
 function ClickedNoNeed (GUIaction)
 	opt norefcounts
 	|| t = .tag as buttonview
-		.ide.view(t)	
+		.ide!.view(t)	
 
 
 function PerryIDE.ShowText (|textview| field, |string| Text, |bool| Always)
@@ -314,14 +314,14 @@ function PerryIDE.BatchPhind (|string| text, |uint| ID, |bool|)
 
 function PressedSelInfo (GUIaction)
 	opt norefcounts
-	|| i = .ide
+	|| i = .ide!
 	|| q = i.filelist.quickopen
 	q.text = "line " + i.editme.CurrLine.Render
 	i.filelist.showquickopen
 
 
 function PressedSearchWithin (Guiaction)
-	|| i = .ide
+	|| i = .ide!
 	|| f = i.FileList
 	|| r = f.SearchWithin
 		f.SearchWithin = nil
@@ -332,7 +332,7 @@ function PressedSearchWithin (Guiaction)
 	
 function PressedSearchKeys (GUIKeyEvent)
 	opt norefcounts
-	|| w = .ide
+	|| w = .ide!
 	if key.isaccept
 		w.ViewAsProject
 		|| ID = ((perry.findID+1)&255) max 1
@@ -354,7 +354,7 @@ function PressedSearchKeys (GUIKeyEvent)
 
 function EditMeSelChange (GUITextEvent)
 	opt norefcounts
-	|| i = .ide
+	|| i = .ide!
 	i.popuphide
 	i.ShowRightStats
 	i.EditMeTabRetryThing = 0
@@ -387,7 +387,7 @@ function PressedEditKeys (GUIKeyEvent)
 		
 		|| tabkind = .PerryInsertSyntax(key)
 			if tabkind == 1
-				.ide.EditMeTabRetryThing = 0
+				.ide!.EditMeTabRetryThing = 0
 			return true
 
 
@@ -437,7 +437,7 @@ function PerryIDE.ClickedFind (|error| row)
 
 	
 function ClickedError (GUIListEvent)
-	|| ide = .ide
+	|| ide = .ide!
 	if row isa error
 		if self == ide.errorlist
 			ide.ClickedError(row)
@@ -451,8 +451,8 @@ function ClickedError (GUIListEvent)
 
 function LogAreaKeys (GuiKeyEvent)
 	if key iscmd keys.k
-		|| s1 = .ide.LogComms
-		|| s2 = .ide.LogActions
+		|| s1 = .ide!.LogComms
+		|| s2 = .ide!.LogActions
 		|| c = s1.slowcount + s2.SlowCount
 			if "Clear log?\n\nContains $c items.".confirm
 				s1.clear
@@ -462,7 +462,7 @@ function LogAreaKeys (GuiKeyEvent)
 
 function ReturnErrorList (GuiListEvent)
 	.select(row)
-	.ide.editme.setfocus
+	.ide!.editme.setfocus
 	return true
 
 
@@ -475,7 +475,7 @@ function perryide.ReTextSubFind
 
 function SelectedFile (GuiListevent)
 	if row isa FileRow
-		return .ide.EditFile(row)
+		return .ide!.EditFile(row)
 
 
 function RightClickErrorList (GUIListEvent)

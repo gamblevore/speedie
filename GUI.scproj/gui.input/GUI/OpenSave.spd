@@ -12,7 +12,7 @@ function app.AskSave (|string| SingleType, |string| base="", |string|question=""
 	require sdlapp.StartedProperly
 	if SingleType contains ','
 		error "Can't save with multiple extensions"
-		return nil
+		return string.error
 	return OpenSaveRequest(SingleType, base, accept, true, question, restore)
 	
 
@@ -204,13 +204,13 @@ class OpenSaveDialog (Window)
 		function RelistKey (guitextevent)
 			opt NoRefCounts
 			|| w = .window as OpenSaveDialog
-			|| p = w.path
-			|| t = p.text
-			if (t[0] != '/' and '~')
-				beep
-				p.text = w.LastGoodPath init "/"
-			  else
-				w.RelistFiles(t, false)
+				|| p = w.path
+				|| t = p.text
+				if (t[0] != '/' and '~')
+					beep
+					p.text = w.LastGoodPath init "/"
+				  else
+					w.RelistFiles(t, false)
 
 
 

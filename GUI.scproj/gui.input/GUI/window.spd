@@ -9,18 +9,18 @@ class Window (GUIControl)
 	|bool|							FlashSelf
 	|bool|							BlockRecurseKeyDown
 	|bool| 							IsLiveAction
-	|GUIControl|					Focus
-	|Guicontrol|					InnerFocus
-	|GUIControl|					CurrMouseDown
-	|GuiControl|					SelBeforeMouseDown
-	|guicontrol|					ToolTipControl // probably better to remove this
-	|guicontrol|					DroppingInto
-	|guicontrol|					MouseIsOver
+	|GUIControl?|					Focus
+	|Guicontrol?|					InnerFocus
+	|GUIControl?|					CurrMouseDown
+	|GuiControl?|					SelBeforeMouseDown
+	|guicontrol?|					ToolTipControl // probably better to remove this
+	|guicontrol?|					DroppingInto
+	|guicontrol?|					MouseIsOver
 	|InlineEditor|					InlineEditorPlace
-	|GUIPasteEvent|					OnPaste
-	|GUICopyEvent|					OnCopy
-	|GUIMouseMoveEvent|				OnMouseMove
-	|object|						ReturnValue
+	|GUIPasteEvent?|				OnPaste
+	|GUICopyEvent?|					OnCopy
+	|GUIMouseMoveEvent?|			OnMouseMove
+	|object?|						ReturnValue
 	|date|							AlphaFader
 	|date|							CreatedDate
 	
@@ -172,7 +172,7 @@ class Window (GUIControl)
 		opt norefcounts
 		|| f = .realFocus
 			if (f isa menu) and (f != .focus) and (f is typethrough)
-				f = .focus|_voidptr||menu|
+				f = .focus as menu					#require
 			if f.__TypedString__(input)
 				return true
 		if (Input == 1) and Input.IsASCII			// like a space basically?
@@ -209,12 +209,13 @@ class Window (GUIControl)
 			return true
 		
 		if key is tab
-			f := .first
+			f := .first!
 			f = f.NextFocus(!keys.shift, keys.option)
-			if f isnt opensmenu
-				f.setfocus
-			  else
-				(f.onclicked)(f)?
+			if f
+				if f isnt opensmenu
+					f.setfocus
+				  else
+					(f.onclicked)(f)?
 			return true
 		if (key is escape) and .IsDialog
 			if !.returnvalue and !.__cancelclose__
@@ -344,7 +345,7 @@ class Window (GUIControl)
 		return .controlat(p,  0)
 
 
-	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| clicks=false, |Guicontrol|)
+	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| clicks=false, |Guicontrol?|)
 		opt norefcounts
 		for R.reverse in self
 			if r is visible and enabled
@@ -512,7 +513,8 @@ function window.MouseXY (|ivec2|)
 
 function guicontrol.MouseXY (|ivec2|)
 	opt norefcounts
-	return sdlapp.mousexy - .window.lastrect.xy
+	|| w = .window
+		return sdlapp.mousexy - w.lastrect.xy
 
 
 

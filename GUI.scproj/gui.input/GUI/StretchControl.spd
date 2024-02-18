@@ -8,7 +8,6 @@ role StretchControl (GuiControl)
 	helper Add (|string| name)
 		|| rz = guicontrol(self)
 		rz.ID = name
-		self <~ rz
 
 	function Expand
 		.Collapsed = false
@@ -40,8 +39,8 @@ role StretchControl (GuiControl)
 		opt norefcounts
 		.div.low <~ g
 
-	helper div (|stretchdivider|)
-		return .last|stretchdivider|
+	helper div (|stretchdivider!|)
+		return .last|stretchdivider|!
 	
 	function Show
 		opt norefcounts
@@ -92,8 +91,8 @@ class StretchDivider (GuiControl)
 		opt norefcounts
 		cpp_part SSST
 		.id = "stretch"
-		|| A = .low
-		|| C = .high
+		|| A = .low!
+		|| C = .high!
 		|| s = .start
 		if A == "left" // noice
 			|| H = the~height
@@ -153,7 +152,8 @@ class StretchDivider (GuiControl)
 
 	function Show 
 		opt norefcounts
-		|| pr = .parent.lastrect
+		|| p = .parent$
+		|| pr = p.lastrect
 		if .ActiveEnd.length < 10
 			|| s = .start.length
 			if s < 10
@@ -164,17 +164,18 @@ class StretchDivider (GuiControl)
 	function High (|guicontrol|)
 		opt norefcounts
 		return .parent.second
+
 	function Low (|guicontrol|)
 		opt norefcounts
 		return .parent.first
 
 	function ActiveEnd (|controlpoint|)
 		opt NoRefCounts
-		return .low.sizer[2+.d]
+		return .low$.sizer[2+.d]
 	
 	setter ActiveEnd (|controlpoint|)
 		opt NoRefCounts
-		.low.sizer.g(2+.d) = value
+		.low$.sizer.g(2+.d) = value
 		.InitDiv
 		
 	behaviour MouseDown
@@ -182,7 +183,7 @@ class StretchDivider (GuiControl)
 		if keys.cmd or (clicks == 2)
 			.Flip
 			return mousedragging.handled
-		|| pr = .parent.lastrect ± 1
+		|| pr = .parent!.lastrect ± 1
 		|| x  = p[.d] - pr[.d]
 		(x max= .min)
 		(x min= pr.size[.d]-.max) 
@@ -250,5 +251,6 @@ class StretchDivider (GuiControl)
 
 function GuiControl.MouseNotDownOverOther (|bool|)
 	opt norefcounts
-	|| c = .window.CurrMouseDown
-	return (c == self or nil)
+	|| w = .window
+		|| c = w.CurrMouseDown
+		return (c == self or nil)

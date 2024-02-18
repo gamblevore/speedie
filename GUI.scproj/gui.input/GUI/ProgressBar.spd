@@ -3,10 +3,10 @@
 class ProgressBar (GUIControl)
 	linkage
 		cpp_part Bar
-	|memory| OldRandomData
-	|float| Progress
-	|bool|	Indefinite
-	|bool|	RandomStyle
+	|memory?|	OldRandomData
+	|float|		Progress
+	|bool|		Indefinite
+	|bool|		RandomStyle
 
 	constructor (|guicontrol| p, |guiaction| onclicked=nil)
 		super.constructor(p)
@@ -15,7 +15,10 @@ class ProgressBar (GUIControl)
 
 	helper RandomData (|memory|)
 		|| Refresh = !.oldrandomdata or (sdlapp.FrameCount isa 4)
-		rz = .OldRandomData init byte[128]
+		rz = .OldRandomData
+		if !rz
+			rz = byte[128]$
+			.OldRandomData = rz
 		if Refresh
 			sdlapp.touch
 			rz.Temporal

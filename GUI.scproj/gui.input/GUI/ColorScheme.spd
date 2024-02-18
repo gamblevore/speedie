@@ -1,6 +1,6 @@
 
 
-|colorscheme| ¥
+|colorscheme| ¥ // = colorscheme() // just create a default obj on init... init the defaults later
 
 class ColorScheme
 	linkage
@@ -169,7 +169,7 @@ function FixupColor (|message| self, |ind| pos, |message|)
 	opt norefcounts						// need to fixup container colors...
 	require self
 	if self == @emb
-		self = .Parent
+		self = .Parent$
 
 	if .Position <= pos					// if we are after, its too far
 		while .After <= pos

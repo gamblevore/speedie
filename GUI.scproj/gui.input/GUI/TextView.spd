@@ -24,7 +24,7 @@ class TextView (GUIControl)
 	|int|						ClickedPos
 	|int|						AutoCompleteBack
 	|string|					AutoCompleteString
-	|Error|						MyError
+	|Error?|					MyError
 	|TextViewLine|				_Start
 	|TextViewLine|				Lines
 	|ivec3|						_Reclaim		
@@ -36,29 +36,31 @@ class TextView (GUIControl)
 	|GUITextErrorSelected|		OnSelError
 //	|GUITextValidate|			OnValidate
 	|GUITextShowEvent|			OnShowExtraInfo
-	|dictionary|				ColoriseAsRoot
-	|Document|					_Viewing
+	|dictionary?|				ColoriseAsRoot // a callback would be better
+	|Document?|					_Viewing
 
 	function Document (|document|)
 		return ._Viewing
 	
-	function Document (assigns:|document|)
+	function Document (assigns:|document?|)
 		opt norefcounts
 		require value != ._viewing
-		if ._viewing
-			._viewing.removeviewer(self)
+		|| old = ._viewing
+			old.removeviewer(self)
 		._viewing = value
 		if value
 			value.addviewer(self)
 	
 
-	function Undoer (|Document|)
+	function Undoer (|Document?|)
 		opt norefcounts
-		if ._viewing or self isnt editable
-			return ._viewing
-		._viewing = document("")
-		._viewing.addviewer(self)
-		return ._Viewing // why??????
+		|| v = ._viewing
+		if v or self isnt editable
+			return v
+		._Viewing = v
+		v = document("")
+		v.addviewer(self)
+		return v
 
 	destructor
 		.document = nil		
@@ -67,6 +69,7 @@ class TextView (GUIControl)
 		super.Constructor(p)
 		._reclaim = (0, 1GB, 0)
 		.Lines = TextViewLine(nil)
+		._Start = TextViewLine(nil) // make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
@@ -117,7 +120,7 @@ class TextView (GUIControl)
 
 	behaviour MouseWheel
 		if (self is editable or AlwaysScrollable) and !.singleline
-			.StartLine = .StartLine.move(-p.y)
+			.StartLine = .StartLine.movecapped(-p.y)
 			return true
 
 
@@ -173,7 +176,7 @@ class TextView (GUIControl)
 			return p.x - (.absleft+.LineNumWidth*font.width+5)			
 		
 		
-	helper ByteAtXY (|ivec2| p, |&textviewline| d_, |ivec2|)
+	helper ByteAtXY (|ivec2| p, |&(textviewline?)| d_, |ivec2|)
 		opt norefcounts
 		|| d = .LineAtY(p.y)
 		if d_
@@ -291,7 +294,7 @@ class TextView (GUIControl)
 		
 	helper FindEnd (|ind| x,  |int| i,  |int|)
 		opt norefcounts
-		|| f = csAntiWords
+		|| f = csAntiWords!
 		|| avoid = false
 		|| s = .text
 		if i > 0
@@ -345,16 +348,16 @@ class TextView (GUIControl)
 		|| orig = pos
 		if dir < 0
 			if pos > 0
-				pos = s.OutCharSet(textview.csantiWords, pos-1, 0)
+				pos = s.OutCharSet(textview.csantiWords!, pos-1, 0)
 				if pos
-					pos = s.find(textview.csantiWords, pos, 0)
+					pos = s.find(textview.csantiWords!, pos, 0)
 					if pos
 						pos = pos max .FindLine(orig-1, pos)
 						return pos + 1
 		  else
-			pos = s.OutCharSet(textview.csantiWords, pos...)
+			pos = s.OutCharSet(textview.csantiWords!, pos...)
 			if pos
-				pos = s.find(textview.csantiWords, pos...)
+				pos = s.find(textview.csantiWords!, pos...)
 				|| t2 = .FindLine(pos, orig+1)
 					pos = pos min t2
 			pos := s.length
@@ -394,7 +397,7 @@ class TextView (GUIControl)
 		  else
 			t = (x, x)
 		|| d = .ViewPos(x)
-			.preferprevline = fwd and (!d.emptyline or !d.EndsWithLine) 
+		.preferprevline = fwd and (!d.emptyline or !d.EndsWithLine) 
 		.sel2(t,d)
 		return true
 	
@@ -457,8 +460,7 @@ class TextView (GUIControl)
 		|| d	= .FindDrawInfo(x, i)
 		if !exact and (i inrange (1+.MaxVisibleLines - back))
 			return d
-		|| bef = before.abs
-		.StartLine = d.move(-bef)
+		.StartLine = d.movecapped(-before.abs) 
 		sdlapp.touch(self)
 		return d
 
@@ -469,9 +471,9 @@ class TextView (GUIControl)
 		disabled "unused?"
 		|| vis = .MaxVisibleLines
 		|| d   = .FindDrawInfo(x)
-			|| d2 = d.move(vis).move(-vis) // not too far
+			|| d2 = d.movecapped(vis).movecapped(-vis) // not too far
 			if d2 != d
-				d2 = d2.move(2) // looks lil nicer
+				d2 = d2.movecapped(2) // looks lil nicer
 			if ._Start != d2
 				.StartLine = d2
 				.ScrollDrawTimer = scroller.timer 
@@ -761,7 +763,7 @@ class TextView (GUIControl)
 		|| ins = .sel0
 		|| old = self[ins-.autocompleteback, ins]
 		if old != c2
-			c2 = c2.insertFix(trim)
+			c2 = c2.DeleteTwoBytes(trim)
 			|| r = .selrange - (.autocompleteback, 0)
 			if (c2 endswith "()") and self[r.x2] == '('
 				c2 = c2[0, c2.length-2]
@@ -871,7 +873,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		require ForceParse or !.NeedsPrepare
 		|| p = .clamp(e.position)
-		|| r = .FindDrawInfo(p)							#require
+		|| r = .FindDrawInfo(p)
 
 		if r.TrySetError(e) or !.MyError
 			.MyError := e
@@ -881,7 +883,7 @@ class TextView (GUIControl)
 	function MarkAsFound (|error| Where, |bool| IsCurr)
 		opt norefcounts
 		
-		|| r = .FindDrawInfo(Where.Position)				#require
+		|| r = .FindDrawInfo(Where.Position)
 		require (r isnt found) or ((r is currfound) != iscurr)
 
 		where.obj = r
@@ -892,6 +894,7 @@ class TextView (GUIControl)
 
 	helper message.LastAfter (|int|ignoreafter, |ind|)
 		opt norefcounts
+		nil self
 		for a.flat in self
 			|| af = a.after
 			if af < ignoreafter
@@ -908,13 +911,13 @@ class TextView (GUIControl)
 	
 	function ClickedMsg (|message|)
 		cpp_Part ClickedMsg0
-		return .clickedmsg(.sel0)
+		return .ClickedMsg(.sel0)
 	
 	
 	function ClickedMsg (|int| pos, |bool| named=false, |message|)
 		opt NoRefCounts
 		|| d   = .findDrawInfo(pos)
-		require d and d isnt fakemsg
+		require d isnt fakemsg
 		|| msg = d.message						#require
 		|| after = d.after_with_msg
 		if pos > after
@@ -936,11 +939,13 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| size = int.max
 		for ch.flat in self
-			if (ch.contains(pos, true)) and (!named or ch.name or ch == @dot or @sdot)
-				|| r = ch.rangelength
-					if (r < size) or (rz!=nil and pos == rz.position and ch.after) // smallest
-						rz = ch
-						size = r
+			|| r = ch.rangelength
+			if !r
+				0
+			  elseif (ch.contains(pos, true)) and (!named or ch.name or (ch == @dot or @sdot))
+				if (r < size) or ((rz!=nil) and (pos == rz.position and pos == ch.after)) // smallest
+					rz = ch
+					size = r
 
 
 	helper CommentableRange	(|intrange|)
@@ -1030,7 +1035,8 @@ class TextView (GUIControl)
 	
 	helper AcceptEditing (|bool|hide, |bool|)
 		opt norefcounts
-		.IsInline.Accept(.text, hide)
+		|| i = .isinline #debug_require
+		i.Accept(.text, hide)
 		return true
 	
 	
@@ -1218,8 +1224,9 @@ class TextView (GUIControl)
 	helper AlphaFade
 		opt norefcounts
 		require .hasfocus
-		.window.alphafader = date()
-		.window.alphasubtle = true
+		|| w = .Window
+			w.alphafader = date()
+			w.alphasubtle = true
 
 	
 	helper WasEverAltered (|bool|)
@@ -1242,7 +1249,10 @@ class TextView (GUIControl)
 	
 	
 	function File (assigns:|file|)
-		.undoer.Location = value.path
+		|| u = .Undoer
+			u.Location = value.path
+		  else
+			debugger 
 	
 	
 	function Path (|string|)
@@ -1351,7 +1361,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| i	= 0
 		|| d	= .StartLine
-		|| End	= d.move(.maxvisiblelines + 1)
+		|| End	= d.movecapped(.maxvisiblelines + 1)
 		if end is last
 			end = nil
 		while d and d != End
@@ -1389,7 +1399,8 @@ class TextView (GUIControl)
 		if .hasfocus
 			return true
 		|| p = .parent
-		if p == .window.InnerFocus
+		|| w = .Window
+		if w and p == w.InnerFocus
 			return true
 	
 	
@@ -1406,21 +1417,21 @@ class TextView (GUIControl)
 			return true
 
 	
-	helper FindDrawInfo (|int| Char, |&int| VLine=nil, |TextViewLine|)
+	helper FindDrawInfo (|int| Char, |?&int| VLine=nil, |TextViewLine!|)
 		return .FindDrawInfoSub(char, vline, !.PreferPrevLine)
 		 
 		
-	helper FindDrawInfoSub (|int| Char, |&int| VLine,  |bool| sec, |TextViewLine|)
+	helper FindDrawInfoSub (|int| Char, |?&int| VLine,  |bool| sec, |TextViewLine!|)
 		.PrepareLinesOfText
 		return .FindDrawInfoSub2(char, vline, sec)
 
 		
-	helper FindDrawInfoSub2 (|int| Char, |&int| VLine,  |bool| sec, |TextViewLine|)
+	helper FindDrawInfoSub2 (|int| Char, |?&int| VLine,  |bool| sec, |TextViewLine!|)
 		opt norefcounts
 		char = .clamp(char)
 		|| c = -int.max
 		|| s = .StartLine
-		|| d = .lines.first
+		|| d = .needfirst
 		
 		while
 			|| n = d.next
@@ -1438,7 +1449,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| VLine = 0
 		|| d = .FindDrawInfo(pos, VLine)
-		require  d  and  vline >= 0  and  vline <= .maxvisiblelines
+		require  vline >= 0  and  vline <= .maxvisiblelines
 		
 		|| y = .abstop - (VLine+1) * .lineheight|int|
 		|| x = d.XOfChar(pos) + font.width + .textleft // sigh
@@ -1450,7 +1461,7 @@ class TextView (GUIControl)
 		if (i > 0) and (keys.shift) and (self[x2].IsTextLine)
 			x2++
 		
-		|| d = .FindDrawInfo(x2)									#debug_require
+		|| d = .FindDrawInfo(x2)
 		|| r = d.drawrange
 		x2 = r.x2
 		if (i > 0) and (keys.shift) and (d is avoidlastchar) and !d.endswithline
@@ -1478,7 +1489,7 @@ class TextView (GUIControl)
 		  else
 			x = d.xofchar(t.lower)
 		|| movedCount = 0
-		d = d.move(i, movedCount, true) 
+		d = d.movecapped(i, movedCount) 
 		if MovedCount
 			return .lastlinefix(d, x)
 		if i > 0
@@ -1502,7 +1513,7 @@ class TextView (GUIControl)
 			
 	helper DrawPreparedText (|image| where)
 		opt norefcounts
-		|| d		= .StartLine #debug_require
+		|| d		= .StartLine
 
 //		|| g = .GNormal
 //		|int| New = .strength*255
@@ -1575,18 +1586,25 @@ class TextView (GUIControl)
 
 	function StartLine (assigns:|int| v)
 		cpp_part StartAtInt
-		.StartLine = .lines.first.move(V)
+		.StartLine = .needfirst.movecapped(V)!
+		
+	function NeedFirst (|textviewline|)
+		opt norefcounts
+		|| f = .lines.first
+			return f
+		rz = TextViewLine(0)
+		.lines <~ rz
 		
 
-	helper StartWithoutScrollDraw (assigns:|TextViewLine| d)
+	helper StartWithoutScrollDraw (assigns:|TextViewLine!| d)
 		opt norefcounts
-		|| last = .lines.last.move(3 - .maxvisiblelines)
+		|| last = .lines.last!.movecapped(3 - .maxvisiblelines)!
 		if d gt last
 			d = last
 		.ReallySetStart(d)
 	
 	
-	helper ReallySetStart (|textviewline| d)
+	helper ReallySetStart (|textviewline!| d)
 		opt norefcounts
 		._Start = d
 		.ShowNoExtra
@@ -1639,7 +1657,7 @@ class TextView (GUIControl)
 		|| CW	= .MaxWidthInChars
 		|| ldw	= .LastDrawWidth
 		.LastDrawWidth = CW
-		if (!.lines.first) or (.TextAlteredForDraw & 2)
+		if (!.lines.hasany) or (.TextAlteredForDraw & 2)
 			return 2
 		if (CW != ldw)
 			return 1
@@ -1675,8 +1693,9 @@ class TextView (GUIControl)
 
 
 	function ParsedMessage (|message|)
-		if ._viewing
-			return ._viewing.DocParsed
+		opt norefcounts
+		|| v = ._viewing
+			return v.DocParsed
 						
 
 	function Parse (|message|)
@@ -1750,7 +1769,7 @@ class TextView (GUIControl)
 		
 	helper FindStayAtEnd (|textviewline|) // findend
 		opt norefcounts
-		return .lines.last.move(1 - .MaxVisibleLines, nil, true)
+		return .lines.last!.movecapped(1 - .MaxVisibleLines, nil)
 
 
 	helper PrepareLinesOfText
@@ -1761,7 +1780,7 @@ class TextView (GUIControl)
 		|| msg   	  = .Parse(changed >= 2, expect)
 		|| ParsedOK   = msg!=nil
 		|| Pos	 	  = .StartPos
-		|| d	 	  = .lines.first
+		|| d		  = .NeedFirst
 		|| StayAtEnd  = .EndGap
 		.LineNumWidth = (.text.TextLineCount.LineNumWidth, 0)(.ShowLineNumbers or Expect >= 3)
 		
@@ -1802,7 +1821,7 @@ class TextView (GUIControl)
 		.PreferPrevLine = false
 		if StayAtEnd
 			d = .FindStayAtEnd
-		if !StayAtEnd or !d
+		if !StayAtEnd// or !d
 			d = .FindDrawInfoSub2(pos, nil, false)
 		.StartWithoutScrollDraw = d
 		.ClearReclaim
@@ -1825,7 +1844,8 @@ class TextView (GUIControl)
 		
 	function ScrollToEnd
 		opt norefcounts
-		.window.reflow
+		|| w = .Window
+			w.reflow
 		.preparelinesoftext // sigh
 		.StartWithoutScrollDraw = .FindStayAtEnd
 	
@@ -1841,7 +1861,7 @@ class TextView (GUIControl)
 
 	
 	function ScrollPos (|int|)
-		return ._Start.position?
+		return ._Start.position
 
 	
 	function ScrollPos (assigns:|int|)
@@ -1951,7 +1971,7 @@ helper string.InsertTrim (|ivec2|)
 	return (i, i)
 
 
-helper string.InsertFix (|ivec2|r, |string|)
+helper string.DeleteTwoBytes (|ivec2|r, |string|)
 	|| fs = faststring()
 	fs <~ self[0,       r.x]
 	fs <~ self[r.x+1,   r.x2+1]
@@ -1966,7 +1986,7 @@ helper string.InsertFix (|ivec2|r, |string|)
 //
 //extend int
 //	operator minus (|string| s, |int|) // seeems risky...
-//		return s.move(self, -1)
+//		return s.movecapped(self, -1)
 //
 //	operator plus (|string| s, |int|)
 //		return s.move(self, 1)

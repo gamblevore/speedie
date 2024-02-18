@@ -10,7 +10,7 @@ class DrawStyle
 	|imagePixel|			Text
 	|imagePixel|			_BG
 	|imagePixel|			_Edge
-	|GUIDrawEvent|			Drawer
+	|GUIDrawEvent?|			Drawer
 	|Byte|					CornerSize
 	|byte| 					CornersCut
 	|Byte|					LineWidth

@@ -24,6 +24,6 @@ class GlyphString
 		return .text[p, .pos]
 
 	syntax cast (|bool|)
-		return .Pos < .Length
+		return self!=nil and .Pos < .Length
 
 

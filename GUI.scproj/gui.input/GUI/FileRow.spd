@@ -4,7 +4,7 @@ class FileRow (ListViewRow)
 	linkage
 		cpp_part FR
 	|string|						Location
-	|Document|						_Document
+	|Document?|						_Document
 	|date|							ReloadedAt
 	|string|						DirFile
 	|int|							LastSize

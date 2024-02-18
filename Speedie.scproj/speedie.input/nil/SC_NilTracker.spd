@@ -179,7 +179,7 @@ struct ArchonPurger
 		rz = *.Neel
 		target debugnil
 			|| d = rz.depthofvars
-				if (d > 29) or !.dbg[d]
+				if !.dbg[d]
 	
 	
 	function Self (|nilstate|)

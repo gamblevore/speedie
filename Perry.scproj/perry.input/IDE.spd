@@ -3,20 +3,20 @@
 class PerryIDE (Window) 
 	linkage: cpp_part IDE
 
-	|SpdProcess|				Feedback
-	|SpdProcess|				compilr
+	|SpdProcess?|				Feedback
+	|SpdProcess?|				compilr
 	|string|					CompileOKString
-	|Process|					RunCompiledApp
+	|Process?|					RunCompiledApp
 	|[error]|					StartupErrors
 	|FileViewer|				FileList
 	|Guicontrol|				Debugger
-	|Guicontrol|				Tester
+//	|Guicontrol|				Tester
 	|Guicontrol|				SearchArea
 	|Guicontrol|				rborder
 	|guicontrol| 				StdOutBorder
 	
-	|FileRow|					NotTodo
-	|message|					ProjMsg
+	|FileRow?|					NotTodo
+	|message?|					ProjMsg
 	|[guicontrol]|				Views
 	|File|						Project
 	|ivec2|						AutoPoint
@@ -32,7 +32,7 @@ class PerryIDE (Window)
 	|TextView|					SelInfo
 	|TextView|					NoNeeder
 	|TextView|					PopupDisplay
-	|message|					LastExtraInfo
+	|message?|					LastExtraInfo
 	|StretchControl|			EditSep
 	|StretchControl|			FileSep
 	|listviewrow|				LogComms
@@ -44,7 +44,7 @@ class PerryIDE (Window)
 	|ListView|					FoundList
 	|textview| 					DebugArgsList
 	|Guicontrol of buttonview|	ViewButtons
-	|buttonview|				PrevView
+	|buttonview?|				PrevView
 	|ButtonView|				CurrFileName
 	|ButtonView|				FunctionMenu
 	|buttonview|				Toolbar
@@ -419,7 +419,7 @@ class PerryIDE (Window)
 		if f.CommsOpen and f.lastsend.ago > (30.0+.position).date
 			|| msg = "Released Speedie: " + .name
 			.LogOneAction(@emb + msg)
-			.feedback.Kill("SaveMemory")
+			f.Kill("SaveMemory")
 		
 
 	behaviour FrameUpdate // perframe, eachframe, onframe
@@ -521,8 +521,7 @@ class PerryIDE (Window)
 	helper CmdKey (|keys| key, |bool|)
 		if key is f
 			if .masssearchfield.hasfocus
-				if .PrevView
-					.PrevView.Click
+				.PrevView.Click?
 				return .editme.OpenSearch
 			return .ShowFind
 		if key is k
@@ -691,9 +690,8 @@ class PerryIDE (Window)
 		
 		function New (|string| path, |perryide|)
 			rz = perryide(false)
-			if rz
-				rz.LoadProject(path.file)
-				rz.EditMe.SetFocus
+			rz.LoadProject(path.file)
+			rz.EditMe.SetFocus
 		
 		
 		function EmptyBase (|perryide|)
@@ -706,8 +704,10 @@ class PerryIDE (Window)
 	
 		function PerryOpenDoc (GUIPasteEvent)
 			|| i = .ide
+			if !i?
 				require data.fileexists
 			  else
+				debugger // what?
 				i = perry.ProjContaining(data)
 				i := IdeAddProj(data, nil)
 			return i.OpenDoc(after, data, purpose)
@@ -766,7 +766,7 @@ So anything not 0 means "its OK"`
 
 	function Path (|string|)
 		opt norefcounts
-		return .editme$.document$.location
+		return .editme.document$.location
 	
 
 	function EditPath (|string| s, |bool|)

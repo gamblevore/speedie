@@ -9,10 +9,10 @@ class GUIControl (ringtree)
 	|string|					ID
 	|string|					Text
 	|string|					Tooltip
-	|object|					Tag
-	|Drawstyle|					GNormal
-	|GUIAction|					OnClicked
-	|GUIAction|					OnFocus
+	|object?|					Tag
+	|Drawstyle|  				GNormal
+	|GUIAction?|				OnClicked
+	|GUIAction?|				OnFocus
 	|TimeFader|					Declutterer
 	|ControlSize|				Sizer
 	|uint16|					TabIndex
@@ -103,11 +103,12 @@ class GUIControl (ringtree)
 	function MiniSizeSet (|ivec4| Rect)
 		opt norefcounts
 		|| p = .parent
-		|| l = p.lastrect
-		if p isa window
-			l = l.soothe
-		rect += l.xyxy
-		.LastRect = rect // right?
+		// not sure this should happen? its going to be set later, anyhow, right?
+			|| l = p.lastrect
+			if p isa window
+				l = l.soothe
+			rect += l.xyxy
+			.LastRect = rect // right?
 
 
 	helper Reflow (|ivec4| mine, |ivec4| Hard) 
@@ -141,7 +142,7 @@ class GUIControl (ringtree)
 		.Reflow(mine, hard)
 
 
-	helper nextfocus (|bool| dir, |bool| force, |guicontrol|)
+	helper NextFocus (|bool| dir, |bool| force, |guicontrol|)
 		opt NoRefCounts
 		|| c = self
 		|| w = .window
@@ -238,7 +239,7 @@ class GUIControl (ringtree)
 		opt norefcounts
 		|| w = .window
 		if w.IsFront
-			return self contains w.MouseIsOver
+			return self contains w!.MouseIsOver
 	
 	
 	helper DrawChildren (|image| where,  |ivec4| Lim,  |guicontrol| avoid=nil)
@@ -334,6 +335,7 @@ class GUIControl (ringtree)
 	
 	function Window (|Window|)
 		opt norefcounts
+		nil checker
 		for p.up in self
 			if p isa Window
 				return p
@@ -416,7 +418,7 @@ class GUIControl (ringtree)
 	
 	helper FaintingEdgeSub (|float|)
 		opt norefcounts
-		|| w = .window
+		|| w = .window!
 		|| f = w.AlphaFader				#require
 		|| delay = date() - f
 		|| remain = 1s - delay
@@ -441,12 +443,13 @@ class GUIControl (ringtree)
 	function ClearFocus
 		opt norefcounts
 		if .hasfocus
-			.window.clearfocus
+			.window!.clearfocus
 
 
 	helper MouseIsDown (|bool|)
 		opt norefcounts
-		return .Window.CurrMouseDown == self
+		|| w = .window
+			return w.CurrMouseDown == self
 	
 	setter Text (|string|)
 		.textset(value)

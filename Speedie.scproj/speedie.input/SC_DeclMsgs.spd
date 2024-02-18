@@ -246,6 +246,8 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| c
 	if (nameitm in @Rel)
 		nameitm.Parent!.obj = dcl
 	
+	.obj = dcl
+	types.obj = dcl // might as well set it everywhere.
 	dcl.Default = Default
 	dcl.Name = nameitm.name
 	dcl.Source = self

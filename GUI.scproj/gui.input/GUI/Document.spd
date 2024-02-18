@@ -19,9 +19,9 @@ class Document (RingTree)
 	|bool| 					CompareTreesOnSave
 	|bool|					LoadedFromFile
 	|bool|					ShouldntSave	
-	|DocumentState|			Current
-	|DocumentState|			Original
-	|message|				DocParsed
+	|DocumentState?|		Current
+	|DocumentState?|		Original
+	|message?|				DocParsed
 	|string|				Location
 	|date|					FileDate
 	|date|					ViewDate
@@ -59,7 +59,8 @@ class Document (RingTree)
 	
 	function Text (|string|)
 		opt norefcounts
-		return .Current.text?
+		|| c = .Current
+			return c.text
 
 	function ExpectCurr (||)
 		opt NoRefCounts

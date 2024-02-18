@@ -2,7 +2,7 @@
 
 
 class Menu (ListView)
-	|ListViewrow|						EditingRow // 
+	|ListViewrow?|						EditingRow // 
 	|bool|								DelayedOpen
 	|bool|								NoCloseOnClick
 	
@@ -97,7 +97,7 @@ class Menu (ListView)
 	function IsOpenedMenu (|bool|)
 		opt norefcounts
 		|| w = .window
-		return w.openedmenu == self
+			return w.openedmenu == self
 	
 	
 	function CloseMenu 

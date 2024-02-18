@@ -68,7 +68,7 @@ function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |ImagePixe
 
 
 helper string.FontLoad (|image|)
-	rz = .Loadqoi$
+	rz = .LoadQOI$
 	|| blank = colors.clear
 	for v in rz
 		if !v.hascolor or !v.a
@@ -195,7 +195,7 @@ extend FastString
 			|| B = 0
 			for y in 8
 				|| rz = f[x0 + x,  y]
-				if (rz != nil) and rz.hascolor
+				if rz.hascolor
 					b |= (1<<y)
 			self <~ b|byte|
 

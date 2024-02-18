@@ -3,9 +3,9 @@
 struct InlineEditor
 	linkage
 		cpp_part inl
-	|ListViewCell|		Cell
-	|Textview|			Editor
-	|Guicontrol|		EditingFor
+	|ListViewCell?|		Cell
+	|Textview?|			Editor
+	|Guicontrol?|		EditingFor
 	|bool|				NeedsHide
 	  
 	
@@ -16,7 +16,7 @@ struct InlineEditor
 			.id				= "inline_editor"
 			.visible		= false
 			.SingleLine		= true
-			(self.editor is editable)
+			(self.editor! is editable)
 			.gnormal.bg		<~ (0, 0, 0, 255)
 	
 	

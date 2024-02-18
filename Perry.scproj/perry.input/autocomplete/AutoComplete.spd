@@ -1,7 +1,7 @@
 
 
 helper message.list_desired (|int| common, |string|)
-	rz = .first.name[0, Common]
+	rz = .first.nyme[0, Common]
 	if self == rz
 		rz = "" // oof
 
@@ -17,6 +17,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	.ClearAutoComplete
 	list = list.last
 	|| define = list.first
+	require define and list
 	define.remove
 	define.DefineToLine(list.SlowCount)
 	define.name = "line"
@@ -26,7 +27,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	list.prependheader("", 1)
 	list.first = define
 
-	.autocomplete.listsource = list
+	.autocomplete.listsource = list!
 	.SetAutoPoint(.editme.sel0)
 	.showauto
 	(.AutoComplete isnt typethrough)
@@ -124,10 +125,10 @@ function PerryIDE.ShowAuto (|bool|)
 
 function AutoCompleteInsertText (GuiListEvent)
 	opt norefcounts
-	|| i = .ide
+	|| i = .ide!
 	|| e = i.editme
 	if row >= 3
-		|| file = row.first.name
+		|| file = row.first.nyme
 		|| num = row.last.int
 		i.DefineSub(file, num|int|)
 	  else
@@ -226,7 +227,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	|message| date
 	if msg == @arg and "Perry"
 		date = msg[@num]
-		msg = date.next
+		msg = date.Next
 
 	if msg == "error"
 		if msg.last == "define"
@@ -238,41 +239,41 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	|| reason = ""
 	if msg ~= "result"
 		reason = msg.first.nyme
-		msg = msg.second
+		msg = msg[@nil, 1]$ // in case of garbled result?
 		if msg.name[0, "autocomplete"] and .LastAutoCompleteDate != date.int
 			msg.name = "" // returns
 	
 	.logonecomm(msg, "\1b ")
 	|| f = msg.first
-	if msg ~= "autocomplete"
-		.AutoCompleteFB(f, AutoCompleteMode.default, reason)
-	  elseif msg ~= "autocomplete_edit"
-		.AutoCompleteFB(f, AutoCompleteMode.edit, reason)
-	  elseif msg ~= "autocomplete_sel"
-		.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
-	  elseif msg starts "display"
-		.DisplayFB(msg)
-	  elseif msg starts "compile" or "debug"
-		.CompileFB(msg)
-	  elseif msg starts "log"
-		.LogFB(msg)
-	  elseif msg starts "callfrom"
-		.CallFromFB(msg)
-	  elseif msg starts "check"
-		.ErrorListFB(msg)
-	  elseif msg starts "define"
-		.DefineFB(msg)
+		if msg ~= "autocomplete"
+			.AutoCompleteFB(f, AutoCompleteMode.default, reason)
+		  elseif msg ~= "autocomplete_edit"
+			.AutoCompleteFB(f, AutoCompleteMode.edit, reason)
+		  elseif msg ~= "autocomplete_sel"
+			.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
+		  elseif msg starts "display"
+			.DisplayFB(msg)
+		  elseif msg starts "compile" or "debug"
+			.CompileFB(msg)
+		  elseif msg starts "log"
+			.LogFB(msg)
+		  elseif msg starts "callfrom"
+			.CallFromFB(msg)
+		  elseif msg starts "check"
+			.ErrorListFB(msg)
+		  elseif msg starts "define"
+			.DefineFB(msg)
 	.DuringMsgFB = false
 
 
 function EditMeKeyDown (guitextevent)
 	opt norefcounts 
-	.ide.EditMeTabRetryThing = 0
-	.ide.ShowStats
+	.ide!.EditMeTabRetryThing = 0
+	.ide!.ShowStats
 
 
 function EditMeModified (guitextevent)
-	|| i = .ide
+	|| i = .ide!
 	i.lastsendtime = 0
 	require i.project and i.projmsg
 	EditMeKeyDown(self, 0, false)
@@ -288,11 +289,10 @@ function EditMeModified (guitextevent)
 	
 	(i is modified) = (self is modified)
 	|listviewrow| msg = i.ProjMsg
-	|| Mod = (self is modified)
-	(msg is modified) = Mod
-	|| sub = i.CurrFileName.SubMenu
-		|| src = sub.ListSource
-			(src is modified) = Mod
+		|| Mod = (self is modified)
+		(msg is modified) = Mod
+		|| sub = i.CurrFileName.SubMenu
+			(sub.ListSource is modified) = Mod
 
 
 function PerryIDE.ShowStats
@@ -332,7 +332,7 @@ function JumpToDefinition (GUIAction)
 	|| rightclick = state == -1
 	|| cmd = state == -2
 	require (cmd or rightclick)
-	|| ide = .ide
+	|| ide = .ide!
 	|| msg = ide.EditMe.ClickedMsg
 		if msg in @url
 			msg = msg.parent

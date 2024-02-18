@@ -14,11 +14,12 @@ class GraphicsEditor (GuiControl)
 		cpp_part Draw
 	|[image]|				Layers
 	|image| 				Merged
-	|file| 					Backing
+	|file?| 				Backing
 	|int| 					BG
 	
 	constructor (|guicontrol| parent)
 		super.Constructor(parent)
+		.Merged = image()
 	
 	
 	function Load (|bool|)
@@ -28,13 +29,13 @@ class GraphicsEditor (GuiControl)
 			rz = .LoadNative(d)
 		  else
 			rz = .LoadImage(d, .backing)
-		.Merged = nil
+		.Merged.ResizeTo((0,0))
 		.Merged = image(.size)
 	
 	
 	function Size (|ivec2|)
 		opt norefcounts
-		return .merged.size?
+		return .merged.size
 	
 	behaviour Draw
 		where.RectBasic(self, .gnormal.bg)
@@ -69,7 +70,8 @@ class GraphicsEditor (GuiControl)
 /*jdraw 1
 	layers
 		oof (#data#)*/
-		|jbin| j = .backing.out
+		|| b = .backing		#expect ("This image has no file to save to.")
+		|jbin| j = b.out	#require
 		j <~ _JbinHeader
 		j.enter @arg
 		j.enter(@tmp, "jdraw")

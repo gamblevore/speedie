@@ -51,7 +51,7 @@ struct ImagePixel
 			
 	syntax cast (|bool|)
 		cpp_part Exists
-		return .a
+		return self and .a
 
 	syntax cast (|vec4|)
 		cpp_part CastVec4

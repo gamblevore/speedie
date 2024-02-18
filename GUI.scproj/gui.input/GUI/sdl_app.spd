@@ -7,8 +7,8 @@ module SDLApp
 	|KeyMod|					KeyMod
 	|GUIPasteEvent|				AppDocumentOpen
 	|[string]|					PendingAlerts
-	|array|						DrawDrag = nil
-	|image|						DrawSpace
+	|array?|					DrawDrag = nil
+	|image|						DrawSpace = image("read")
 	|&SDL_Window|				ScreenWindow
 	|&SDL_Renderer|				Renderer
 	|&SDL_Texture|				Raw
@@ -334,7 +334,7 @@ module SDLApp
 	
 	function Scaling (assigns:|float| scale)
 		|| bigPx = (.SizeOrig.vec2/scale).ivec2
-		.DrawSpace = image(bigPx, 0|&byte|, "read")
+		.DrawSpace.sizeinfo = bigPx
 		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)
 		.scale = Scale
 		window.all.lastrect = bigPx.rect
@@ -382,7 +382,7 @@ module SDLApp
 		.CheckQuarantine
 		¥ = colorscheme()
 
-		appmenu.InitAppMenu
+		appmenu.GetAppMenu
 		.InitDelegates
 		if !PrevSize
 			.JB_SDL_FullScreen(.nativewindow)		

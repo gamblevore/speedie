@@ -53,7 +53,7 @@ module Perry
 		app.prefs("colors") = ¥.savecolors.parse
 
 		
-	function LoadWindowsSub (|PerryIDE| r, |bool|)
+	function LoadWindowsSub (|PerryIDE?| r, |bool|)
 		|| Found = false
 		for proj_item in .projects
 			if proj_item.name.fileExists

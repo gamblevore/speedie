@@ -31,7 +31,7 @@ function textview.UpdateDebugArgs (|bool| Visible=false)
 	if !.text
 		.text = defaultfiles.DebugArgs
 	if visible
-		.window.SetInnerFocus(self)
+		.window.SetInnerFocus(self)?
 	  else
 		.Save
 		
@@ -50,12 +50,13 @@ function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
 	
 
 function ClickedDebug (GUIAction)
-	|| i = .ide	
+	|| i = .ide!
 	if .text == "\02"		// play
 		i.DebugIsWaitingForCompile = true
 		i.compile("debug")
 		i.ShowText(i.ProductOut, "", false)
-		(i.CompileTabs.items[3] is hidden)
+		|| itm = i.CompileTabs.items[3]
+			(itm is hidden)
 		i.ProductErrors.text = ""
 	  elseif .text == "\07" // stop
 		if i.RunCompiledApp and i.confirm("Kill running product " + i.Name + "?", fnStillRunning)
@@ -64,7 +65,7 @@ function ClickedDebug (GUIAction)
 
 
 function PressingDebug (GUIAction)
-	|| d = .ide.DebugArgsList
+	|| d = .ide!.DebugArgsList
 	DebugArgsGotFocus(d, 1)
 
 
@@ -73,7 +74,7 @@ function perryide.DebugEnvs (|message| env)
 	for rel in env
 		|| ch2 = rel[2]
 		if ch2 and rel[1] == "="
-			app.ChildEnv(rel[0].name) = ch2.name
+			app.ChildEnv(rel.first!.name) = ch2.name
 
 
 function PerryIDE.DebugActualStr (|file| f, |[string]| args, |faststring|)
@@ -91,8 +92,9 @@ function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiled
 	|| out = .DebugActualStr(F, args)
 	.LogOneAction(@emb + out.Copy)
 	out <~ ("\n", 2)
-	.RunCompiledApp = Process.stream(f, args, out)
-	if .RunCompiledApp and .RunCompiledApp.PID
+	|| r = Process.stream(f, args, out)
+	.RunCompiledApp = r
+	if r.PID
 		.RunButton.text = "\07"
 
 

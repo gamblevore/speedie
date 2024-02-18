@@ -70,14 +70,14 @@ function PerryAutoCompleteSelected (GUIListEvent)
 	opt norefcounts
 	require mode isnt initialselection
 
-	|| i = .ide
+	|| i = .ide!
 	i.DuringTempView++
 
 	|| e = i.EditMe
 	|| p = row.first.nyme
 	if !row
 		p = .ListSource.obj as string
-	if i.EditPath(p)
+	if p and i.EditPath(p)
 		e.ClearFound
 		|| rl = row[2]
 			e.ShowAndSel(rl.int) is found
@@ -101,6 +101,8 @@ function FuncListSorter (SorterComparerMsg)
 	opt norefcounts
 	|| aa = *a
 	|| bb = *b
+	if (!aa or !bb)
+		return aa < bb
 	if aa.func != bb.func
 		return aa.func|int| < bb.func|int|
 	
@@ -109,6 +111,8 @@ function FuncListSorter (SorterComparerMsg)
 	
 	|| af = *aa
 	|| bf = *bb
+	if (!af or !bf)
+		return af < bf
 	|| an = af.name
 	|| bn = bf.name
 	|| cmp = bn.SyntaxCompare(an, true)

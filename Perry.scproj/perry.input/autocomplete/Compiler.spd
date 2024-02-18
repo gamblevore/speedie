@@ -26,8 +26,7 @@ extend PerryIDE
 		
 		if (s == listviewstate.modified)
 			|| sub = .CurrFileName.SubMenu
-				|| src = sub.ListSource
-					(src is modified) = Mod
+				(sub.ListSource is modified) = Mod
 
 
 	syntax isnt (|ListViewState| s, assigns:|bool| b)

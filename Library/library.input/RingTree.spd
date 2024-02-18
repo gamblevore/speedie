@@ -169,7 +169,7 @@ class RingTree (Saveable)
 			return .fwddist(R) ?? .backdist(r)
 			
 
-	function FwdDist (|ringtree| F, |int|)
+	function FwdDist (|ringtree!| F, |int|)
 		opt norefcounts
 		|| c = 0
 		while F
@@ -179,7 +179,7 @@ class RingTree (Saveable)
 			c++
 			
 
-	function BackDist (|ringtree| B, |int|)
+	function BackDist (|ringtree!| B, |int|)
 		opt norefcounts
 		|| c = 0
 		while B
@@ -210,23 +210,35 @@ class RingTree (Saveable)
 	
 	function Move (|int| n, ||)
 		cpp_part MoveN
-		return .move(n, nil, true)
+		return .movesub(n, nil)
 
 	function Step (|bool| dir, ||)
 		cpp_Part stepbool
 		if dir
 			return .next
 		return .prev
+	
 	function Step (|int| i, ||)
 		disabled "use .move(int) or .step(bool)"
 		if i
 			return .step(i>0)
 		return self
 
-	function Move (|int| n, |&int| r, |bool| cap, ||)
+	
+	function MoveCapped (|int| n, |?&int| r=nil, |...!|)
 		cpp_part StepN
 		opt NoRefCounts
-		if !self or !n
+		real self
+		|| p = .parent
+			|| c = .movesub(n, r)
+				return c
+			return (p.first!, p.last!)(n < 0)
+		return self
+
+	helper MoveSub (|int| n, |&int| r, ||)
+		opt NoRefCounts
+		real self
+		if !n
 			return self
 		|| m = 0
 		|| c = self
@@ -238,10 +250,7 @@ class RingTree (Saveable)
 
 		if r
 			*r = m
-		if c or !cap
-			return c
-		c = .parent
-		return (C.first, c.last)(n < 0)
+		return c
 
 
 	function Pop (||)
@@ -274,7 +283,7 @@ class RingTree (Saveable)
 		opt norefcounts
 		|| n = .slowcount
 		for n
-			.first = .last.move(-n.now)
+			.first = .last!.move(-n.now)
 
 
 	function IsOnlyChild (|bool|)

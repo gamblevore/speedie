@@ -3,13 +3,13 @@
 class FileViewer (ListView)
 	linkage
 		cpp_part FV
-    |dictionary|					Excludes
-    |dictionary|					NoFind
+    |dictionary?|					Excludes
+    |dictionary?|					NoFind
     |TextView|						QuickOpen
     |ListView|						ListOpen
     |textView|						Editme
-    |filerow| 						Extra
-    |filerow| 						SearchWithin
+    |filerow?| 						Extra
+    |filerow?| 						SearchWithin
     |[string]|						SizeCheckers
     |GUIListEvent|					OnSearchWithin
     
@@ -228,13 +228,13 @@ class FileViewer (ListView)
 		|| m = .modified 
 		if !m
 			return true
-		.focuson(m[0])
+		.focuson(m.first!)
 
 		|| fs = faststring()
 		|| n = m.Length
 		|| fstr = "file".pluralize(n)
 		fs <~ "Save $fstr in project "
-		fs <~ .start.name
+		fs <~ .start!.name
 		fs <~ "?"
 		fs <~ "\n"
 		for m0 in m

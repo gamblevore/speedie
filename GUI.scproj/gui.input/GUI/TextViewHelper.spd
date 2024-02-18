@@ -18,8 +18,8 @@ class TextViewLine (ringtree)
 	contains TextViewLine
 
 	|string|				Text
-	|message|				Message
-	|Error|					DrawError
+	|message?|				Message
+	|Error?|				DrawError
 	|int|					MsgPos
 	|int|					vline
 	|int|					tline
@@ -308,7 +308,7 @@ class TextViewLine (ringtree)
 
 helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 	opt norefcounts
-	|| e = d.drawerror
+	|| e = d.drawerror$
 	if (e is parse) and .ParsedMessage			// obviously it parsed ok.
 		d.drawerror = nil
 		return
@@ -352,7 +352,7 @@ helper textview.DrawLighter (|image| Where, |int| y)
 	where.RectBasic(r, col)
 
 
-helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D, |int| y, |imagepixel|lc, |int|)
+helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |imagepixel| lc,  |int|)
 	opt norefcounts
 	|| x = .DrawOneStartLine(d.text) 
 	|| big		    = .LineNumWidth
@@ -369,7 +369,7 @@ helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D, |int| y, |imag
 				if c != '0'
 					draw = true
 				if draw
-					p.x = font.small.DrawChar(c, Where, p, lc)
+					p.x = font.small!.DrawChar(c, Where, p, lc)
 		x += big * font.width
 	if .Alignment is right and .Alignment isnt left
 		|| m = d.text.Bounds.x*font.width+8
@@ -466,7 +466,8 @@ helper TextView.FakeAutoComplete (|int|)
 helper TextView.DrawAuto (|image| where, |textviewline| d, |int| x, |int| y)
 	|| n = .FakeAutoComplete
 	|| str = (.autocompletestring[n, int.max], "...")(n>=0)
-	font.small.drawtext(str, where, (x,y), colors.white(0.3))
+	|| fs = font.small
+		fs.drawtext(str, where, (x,y), colors.white(0.3))
 	
 
 
@@ -475,21 +476,22 @@ struct MsgTextDrawState
 	|int|					i
 	|int|					x
 	|int|					Adder
-	|message--|				msg
+	|message--?|			msg
 	|string--|				t
 	|image--|				font
 	
 	function Next (|&codepoint| pc, |&int| ppos, |int|)
+		opt norefcounts
 		|| c = *pc
 		|| w = (1, .i.tabsWidth)(c != '\t')
 		rz   = .x
 		.x   = rz + w*font.width
 		.i  += w
-		if (.msg)
+		|| m = .msg
 			|| pos	= *ppos
 			*pc		= c.ImproveDraw(.t, pos)
 			pos	   += .adder, *ppos = pos
-			.msg	= .msg.NextColor(pos)
+			.msg	= m.NextColor(pos)
 			
 		
 	module
@@ -499,7 +501,7 @@ struct MsgTextDrawState
 			rz.adder = d.msgpos
 			rz.msg = d.message
 			rz.t = d.text
-			rz.font = font.small
+			rz.font = font.small!
 
 
 helper codepoint.ImproveDraw (|string| t, |int|pos, |codepoint|)

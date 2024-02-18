@@ -12,8 +12,8 @@ class CachedPath
 	linkage
 		cpp_part CaP
 	|string|				Path
-	|document--|			Value
-	|dictionary--|			Cache
+	|document--?|			Value
+	|dictionary--?|			Cache
 
 	constructor (|string| p, |dictionary| c, |document| v)
 		c.valuelower(p) = self
@@ -24,15 +24,16 @@ class CachedPath
 
 	function Clear
 		require self
-		.cache.valuelower(.path) = nil
-		.path = nil
+		|| c = .Cache
+			c.valuelower(.path) = nil
+		.path = ""
 		.value = nil
 		.cache = nil
 
 
 class DocumentViewer (ringtree)
 	linkage: cpp_part docview
-	contains documentviewer
+	contains DocumentViewer
 	|GUIControl--|				Viewer
 
 	constructor (|GUIControl| V)
