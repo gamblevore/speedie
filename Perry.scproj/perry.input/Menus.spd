@@ -1,7 +1,7 @@
 
 
 function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
-	|| p = .SubMenu
+	|| p = .SubMenu		#require
 	|| orig = l
 	p.listsource.clear
 	while l
@@ -110,6 +110,7 @@ function PressingTabs (guiaction)
 	if self isa ButtonView
 		|| p = .submenu|listview|
 		|| ide = row.ide
+		if p and ide
 			p.ListSource.clear
 			|| name = ide.name
 			p <~ ( "Copy " + name, MenuCopyProject, ide)
@@ -151,5 +152,6 @@ function MenuShowProject (guimenuevent)
 
 function RightClickedTabs (GUIAction)
 	if row and self isa ButtonView
-		.FillMenuPath(row.ide.Project, row)
+		|| i = row.ide
+			.FillMenuPath(i.Project, row)
 

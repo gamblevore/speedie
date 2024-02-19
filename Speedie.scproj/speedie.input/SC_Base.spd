@@ -390,10 +390,6 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 	|SCFunction| Missing
 	|SCFunction| f
 
-	if paramsarray.issuper  and  name == "constructor"
-		|| Prev = exp.prev 
-		expect (!Prev) (Prev, "Can't come before super.constructor")
-
 	for (b.ListLookup in Curr)
 		|| o = b[ name ]
 		if (!o)

@@ -282,7 +282,7 @@ function OnAskSaveReveal (GUIAction)
 
 
 function OnAskSaveEntered (GuiListEvent)
-	return (.parent as OpenSaveDialog).GoIntoFolder
+	return (.parent as OpenSaveDialog)!.GoIntoFolder
 
 
 function window.CancelReturn

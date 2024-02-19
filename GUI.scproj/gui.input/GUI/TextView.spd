@@ -937,6 +937,7 @@ class TextView (GUIControl)
 	
 	helper message.FindTightest (|int| pos, |bool| named=false, |message|) // findpos, findat
 		opt norefcounts
+		nil checker
 		|| size = int.max
 		for ch.flat in self
 			|| r = ch.rangelength

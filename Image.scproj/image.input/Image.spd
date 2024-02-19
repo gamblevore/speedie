@@ -39,18 +39,6 @@ class Image (memory)
 		.length = .capacity 
 		.SizeInfo = s
 	
-	
-	constructor (|ivec2| wh, |string| name="")
-		cpp_Part ConstructorSizeVec2
-		super.constructor(wh.area, 4, byte.ZAlloc(wh.area*4)!)
-		.length = .capacity 
-		.name = name
-		.SizeInfo = wh
-
-	
-	constructor (|string| name="")
-		super.constructor(0, 4, byte.ZAlloc(4)!)
-		.SizeInfo = (0,0)
 
 	
 	destructor
@@ -67,9 +55,7 @@ class Image (memory)
 
 
 	function ImageOfSameSize (|string| name="", |image|)
-		rz = image(.size, name)
-		if !rz.ptr
-			rz = nil
+		return image(.size, name)
 	
 	function CopyImage (|string| name="", |Image|)
 		rz = .ImageOfSameSize(name)
@@ -362,6 +348,16 @@ class Image (memory)
 
 	
 	module
+		function New (|ivec2| wh, |string| name="", |image?|)
+			cpp_part NewWithSize
+			|| alloc = byte.ZAlloc(wh.area*4 min 4)
+				return image(wh, alloc, name)
+				
+		function New (|string| name="", |image!|)
+			cpp_part NewWithName
+			|| alloc = byte.ZAlloc(4)!
+			return image((0,0), alloc, name)
+
 		function LoadQOI (|&byte| data, |int| len, |&int| Size, |?&byte|)
 			cpp_wrapper JB_Img__LoadQOI
 

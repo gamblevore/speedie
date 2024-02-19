@@ -46,7 +46,7 @@ extend_module Error
 		|| str = "Can’t parse number '${num.preview}' (found '${num[pos]}')."
 		stderr <~ error(where, str)
 
-	function From (|message| self, |error|)
+	function From (|message?| self, |error|)
 		opt norefcounts
 		require self
 		if self != @arg

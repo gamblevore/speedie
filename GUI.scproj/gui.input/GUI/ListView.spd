@@ -252,7 +252,7 @@ class ListView (GUIControl) {
 		.InlineCell.FinishAndClear(false)?
 	
 	
-	function Replaced (|ListViewrow| gone, |ListViewrow| orig, |ListViewrow|)
+	function Replaced (|ListViewrow| gone, |ListViewrow?| orig, |ListViewrow|)
 		opt norefcounts
 		if orig == gone
 			return .sib(orig)
@@ -369,7 +369,7 @@ class ListView (GUIControl) {
 			.editdelayed = nil
 			return true
 		if (keys.cmd and !key.iscmd) and .typingfilter
-			return .typingfilter.__keydown__(key)
+			return .typingfilter!.__keydown__(key)
 			
 			
 			
@@ -426,11 +426,11 @@ class ListView (GUIControl) {
 		if .IsTree and (key is left or right)
 			return .openorclose(key)
 
-		if (.typingfilter)
+		|| t = .TypingFilter
 			if key.iscancel
 				.StopFilter
 			  else
-				.typingfilter.__keydown__(key) // delete too
+				t.__keydown__(key) // delete too
 			return .UpdateFilter
 
 	
@@ -884,7 +884,7 @@ class ListView (GUIControl) {
 		|| Expand	= (k is right)
 		|| Force	= keys.option 
 		if (!Expand and (!sel.hasany or sel isnt expanded))
-			sel = sel.parent
+			sel = sel.parent!
 			.Select(sel)
 			Force = true
 		if sel != .listsource
@@ -948,7 +948,7 @@ class ListView (GUIControl) {
 		for n
 			if (l isnt disabled)
 				modified += l.ChangeSel(true)
-			 l = .hierstep(l, i > 0)
+			 l = .hierstep(l, i > 0)#loop
 
 		if modified
 			|| mode = listviewselectmode.normal
@@ -1229,14 +1229,14 @@ class ListView (GUIControl) {
 		|| cell = inl.cell									#require
 		|| cb = .CellBounds(._scroll, cell)
 			if (cb.y2 <= .height+1) and (cb.y1 >= -1)
-				inl.editor.size = cb.layout
+				inl.editor!.size = cb.layout
 				return
 		inl.FinishAndClear
 
 
 	helper CellBounds (|ListViewRow| curr,  |ListViewCell| cell,  |ivec4|)
 		opt norefcounts
-		|| sc = cell.row
+		|| sc = cell.row!
 		|| B = .RowBounds(._scroll, sc, .rowheight)			#require
 		B.horz = .col(cell.column, B, sc)
 		B.x += sc.depth(self) * font.width*2

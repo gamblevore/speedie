@@ -115,13 +115,10 @@ class GraphicsEditor (GuiControl)
 	
 	function Rotate (|bool| right)
 		|| s = .size$
-		|| img = .Merged
 		|| img2 = image(s.yx)
+			.Merged.Rotate(img2, right)
 			.Merged = img2
-			img.Rotate(img2, right)
 			SDLApp.Touch
-		  else
-			beep
 	
 		
 	function DoBG (|int| size=3)

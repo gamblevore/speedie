@@ -123,7 +123,7 @@ class FileRow (ListViewRow)
 		.addfilesub(f,  o.excludes,  o.folfile,  Count)
 
 
-	helper AddFileSub (|file| f, |dictionary| excl, |string| folfile, |&int| Count, |bool|)
+	helper AddFileSub (|file| f, |dictionary?| excl, |string| folfile, |&int| Count, |bool|)
 		|| C = (*Count)--
 		require C > 0
 		|| r = filerow(f.path, f.name)
@@ -131,7 +131,6 @@ class FileRow (ListViewRow)
 		if f.isdir
 			r.location = r.location.pathdir
 			r.dirfile = folfile
-			if folfile == "."
 
 		if f.isdirlike and !f.islink
 			r.asdir = true
@@ -170,7 +169,7 @@ class FileRow (ListViewRow)
 		.filesort
 
 
-	function FillFilesSub (|file| fol, |dictionary| excl, |string| folfile, |&int| Count)
+	function FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |&int| Count)
 		.ReloadedAt = fol.modified
 		for f.files in fol // merge these two
 			|| name = f.path.name

@@ -83,8 +83,7 @@ function ClickedTabs (GUIAction)
 
 function ClickedCompileTabs (Guiaction)
 	opt norefcounts
-	|| i = .ide
-		i.CompileTabSelect(row)
+	.ide.CompileTabSelect(row)
 
 
 function PerryIDE.CompileTabSelect (|object| Desired, |bool| select=false)	
@@ -100,10 +99,9 @@ function PerryIDE.CompileTabSelect (|object| Desired, |bool| select=false)
 
 function ClickedToolbar (GUIAction)
 	opt norefcounts
-	|| w = .ide
 	if self isa ButtonView
-		if w and (.clickcount == 2)
-			w.ViewAsSwap
+		if (.clickcount == 2)
+			.ide.ViewAsSwap
 
 
 function file.InputFol (|file|)
@@ -113,7 +111,7 @@ function file.InputFol (|file|)
 
 
 function file.FindProjectMain (|file|)
-	|| inp = .inputfol
+	|| inp = .inputfol$
 	|| best = inp.child("main.spd")
 	if best.exists
 		return best
@@ -141,7 +139,7 @@ function PerryIDE.FindNotTodo (|bool|)
 
 
 function PerryIDE.ClickedTodo
-	|| fl	= .filelist #require
+	|| fl	= .filelist
 	|| todo	= .MainProjFol ?? fl[0]
 	require .FindNotTodo // what? fl is nil? it happened tho?
 	if !todo
@@ -207,7 +205,7 @@ function ReturnProjectPath (GUIListEvent)
 
 function ReturnAllFuncs (GUIListEvent)
 	|| e = .ide!.EditMe
-	e.ShowAndSel(row.position)
+	e.ShowAndSel(row!.position)
 	e.SetFocus
 	return true
 
@@ -279,7 +277,7 @@ function PerryIDE.SelTextParse (|bool|)
 	.OldJBCloser = s
 	|error| where
 	|| msg = s.parsewitherror(where)
-	.ShowText(.JeeboxText, (msg.renderast(0), where.render)(!where), true )
+		.ShowText(.JeeboxText, (msg.renderast(0), where.render)(!where), true )
 	
 	// could put some tabs into that area? QT creator does the same???
 	// one for jeebox... one for stdout from shellstreamer...

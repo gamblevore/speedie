@@ -5,8 +5,6 @@
 	* use 256 VM codes? Only a few need all 25 bits.
 
 
-* constructors should allow code before it... just not property setting.!!!!!! FOR THE NIL FIXES
-
 * Do nil checker!
 	* MainArgBasic fucked with basodpias;kldjalskjdnasm,dnas booASLKDalksdalksdjm 
 	* display obj.haha.property instead of JB_haha(obj).Property
@@ -47,7 +45,8 @@
 						 Perry Do later
 
 * error count should be listed in GUI
-* errors should bubble up the folders
+	* errors should bubble up the folders
+	* and display in scroll
 * return in the cmd-d should disappear the thing!
 * moving arrow in unseen lines, should jump to 1/3 of visibility... as expected
 * colormark unused funcs in editor

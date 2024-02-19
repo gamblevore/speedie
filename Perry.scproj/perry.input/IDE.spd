@@ -329,11 +329,12 @@ class PerryIDE (Window)
 	function UpdateSearchText
 		opt norefcounts
 		|| other = .UpdateSearchSwap #require 
-		|| t = .realfocus.text // sigh
-		sdlapp.LastSearch = t
-		if other.text != t
-			other.text = t
-			other.Sel = 0
+		|| rf = .realfocus // what if they just used the same document??
+			|| t = rf.text // sigh
+			sdlapp.LastSearch = t
+			if other.text != t
+				other.text = t
+				other.Sel = 0
 
 
 	function HideStuff 
@@ -373,7 +374,7 @@ class PerryIDE (Window)
 			if .viewing == .viewfiles
 				.noneed
 				|| fl = .filelist.ListSource as filerow
-				fl.SmartName = "file".pluralize(fl.LastFileCount)
+					fl.SmartName = "file".pluralize(fl.LastFileCount)
 
 
 	function TestCompilerAlive
@@ -888,8 +889,7 @@ So anything not 0 means "its OK"`
 
 	
 	function LoadStartupErrors
-		while stderr.HasAnything
-			|| err = stderr.pop
+		while (|| err = stderr.pop)
 			notifications <~ err
 			if err.IsBad
 				.StartupErrors <~ err.copy

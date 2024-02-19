@@ -14,7 +14,8 @@ function MenuAllFuncs (GUIaction)
 
 
 function perryide.ListAllFuncs (|bool| sel=false, |string| filter="")
-	|| result = .FunctionMenu.submenu.listsource
+	|| submenu = .FunctionMenu.submenu!
+	|| result = submenu.listsource
 	result.clear
 	.ListAllFuncsMsg(.editme.Parse, result, filter)
 	if sel
@@ -38,7 +39,7 @@ function PerryIDE.FindSelectedMenuItem (|message| result)
 	opt norefcounts
 	require result.hasany
 	|| fn = result.FuncAtPos(.editme.sel0 )
-	.FunctionMenu.submenu.select(result)
+	.FunctionMenu.submenu!.select(result)
 	
 	
 function PerryIDE.ImproveFuncList (|message| result)

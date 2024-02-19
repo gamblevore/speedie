@@ -194,8 +194,7 @@ class Array (saveable)
 
 
 prototype SorterComparer (|object| a, |object| b, |bool|)
-prototype SorterComparer2 (|object| a, |object| b, |int|) // this is better than SorterComparer
-														  // want to use only this, eventually.
+prototype SorterComparer2 (|object| a, |object| b, |int|) // we have two ringtree sort funcs... need to remove one
 //function MySorter (SorterComparer) // should be: sortercomparer of message
 	// sortercomparer should be (|| a, || b, |bool|)... so a contained type, basically!
 	

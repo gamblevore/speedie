@@ -595,7 +595,10 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 	where.render(fs)
 	if To
 		fs <~ " to "
-		to.rendertitle(fs)
+		if where.isfirst and to.cls
+			fs <~ to.Name
+		  else
+			to.rendertitle(fs)
 	error (where, fs)
 }
 

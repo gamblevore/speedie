@@ -283,7 +283,7 @@ function textview.PerryDeclKey (|bool|)
 	|| s = .selrange
 	require !s.width
 
-	|| d = .FindDrawInfo(s.x)					#require
+	|| d = .FindDrawInfo(s.x)
 	|| m = d.message
 		|| com = .InPrmsAndBetweenDecls(m, s.x)
 			return PerryInsert6(self, (com,com)+1)
@@ -295,7 +295,8 @@ function textview.PerryDeclKey (|bool|)
 	|| inclass = .IsInClass(d) 
 	if clearback and !inclass
 		return .insert("|| ")
-	  elseif endofline or inclass
+	
+	if endofline or inclass
 		if d.BackHasIgnoringSpaces("||", s.x)
 			.insert(" ") // whatever
 			return true

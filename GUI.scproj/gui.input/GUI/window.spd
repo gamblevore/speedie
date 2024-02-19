@@ -101,7 +101,7 @@ class Window (GUIControl)
 	syntax cast (|ErrorInt|)
 		return .RunAsMain
 		
-	syntax call (|ConfirmCanceller| Cancel=nil, |object|)
+	syntax call (|ConfirmCanceller| Cancel=nil, |object?|)
 		require !(Cancel)() and self isnt visible // recursive... sigh
 		.OpenDialog
 		.returnvalue = nil

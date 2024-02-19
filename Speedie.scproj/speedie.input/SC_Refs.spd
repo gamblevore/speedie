@@ -757,7 +757,7 @@ function SCFunction.BuildConstructorDestructor
 	|| IsConstructor = self is Constructor
 
 	|| TheCall = .CallParents( root, IsConstructor )
-	.FillInConstructorAndDestructor( root, IsConstructor )
+	.CheckConstructorAndDestructor( root, IsConstructor )
 	if IsConstructor
 		.FillInMissingConstructorDefaults( root, TheCall )
 	require StdErr.OK and !IsConstructor

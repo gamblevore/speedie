@@ -146,10 +146,11 @@ module Perry
 		opt norefcounts
 		.tabs.selected = old
 
-		|| f = old.first
-		f.name = f.name.ProjCleanName
-		.id = "IDE: " + f.name
-		.CompileTabs.items[2].name = f.name + "[]"
+		|| f = old[@nil]
+			f.name = f.name.ProjCleanName
+			.id = "IDE: " + f.name
+			|| ii = .CompileTabs.items[@nil, 2]
+				ii.name = f.name + "[]"
 		
 		
 	function AddProj (|string| path, |PerryIDE| i)

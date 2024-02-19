@@ -422,7 +422,7 @@ class RingTree (Saveable)
 			p--
 
 
-	function Sort (|SorterComparer| fnc)
+	function Sort (|SorterComparer| fnc) // remove this func????
 		opt NoRefCounts
 		|| c = .second
 		while c

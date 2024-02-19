@@ -132,7 +132,7 @@ function AutoCompleteInsertText (GuiListEvent)
 		|| num = row.last.int
 		i.DefineSub(file, num|int|)
 	  else
-		e.autocompletestring = row.name
+		e.autocompletestring = row.Nyme
 		e.insertautocomplete
 
 

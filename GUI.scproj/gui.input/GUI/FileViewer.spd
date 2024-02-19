@@ -427,7 +427,7 @@ class FileViewer (ListView)
 		|[filerow]| items
 		for ch in path
 			if invis or ch.visible
-				|| s = path[ch]
+				|| s = path[ch]!
 				if s.IsDir
 					ch += "/"
 				|| ffr = filerow(s, ch)
@@ -537,7 +537,7 @@ class FileViewer (ListView)
 
 		function ClickedOpenList (GuiListevent)
 			|| V = .tag as FileViewer
-			|| r = row.obj as filerow
+			|| r = row!.obj as filerow
 			require r and v
 
 			|| loc = r.location
@@ -624,7 +624,7 @@ function RightClickFileList (GUIListEvent)
 			m <~ ("Search Within: " + within.name, FileViewerSearchWithin, within)
 		
 		|| rem = .FirstSelected as filerow
-			if rem and (.extra contains rem) and rem != .extra
+			if (.extra contains rem) and rem != .extra
 				m <~ ("Remove From Project",	FileViewerRemove)
 
 		m <~ ("Show In Desktop",	FileViewerCMMShow)
@@ -646,9 +646,9 @@ function FileViewerRenameFile (GuiMenuEvent)
 	
 
 function FileViewerCreateFile (GuiMenuEvent)
-	|| row = clicked.row as filerow
+	|| row = clicked.row as filerow		#require
 	if !row.asdir
-		row = row.parent
+		row = row.parent!
 	|| l = row.location
 	|| f = l.file.UniqueChild("untitled")
 	if f and f.CreateEmpty and self isa FileViewer
@@ -660,7 +660,7 @@ function FileViewerCreateFile (GuiMenuEvent)
 		.SomethingChanged(row)
 
 
-function FileViewer.SomethingChanged (|filerow| row)
+function FileViewer.SomethingChanged (|filerow?| row)
 	.TryReloadPath
 	(.WasEdited)(self, row)?
 

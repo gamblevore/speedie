@@ -54,7 +54,7 @@ function string.Ask_Named (|string| Answers,  |int|)
 function string.Ask (|string| response="",  |string| Title="",  |stringthatwasreadsafely|)
 	|| Answers = ["OK", "Cancel"]
 	if ConfirmIt(self, title, Answers, response) == 1
-		return ConfirmWindow_.asker.response.text
+		return ConfirmWindow_.asker!.response.text
 	return String.Error
 
 

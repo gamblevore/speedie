@@ -3,15 +3,15 @@
 // prototypes
 
 prototype GUIDrawBackground		(|object| self, |image| where)
-prototype GUIApplicationInit    (|Object| Anything = nil, |errorint|)
+prototype GUIApplicationInit    (|Object?| Anything = nil, |errorint|)
 prototype GUIDrawEvent			(|Image|  self, |ivec4| Rect, |drawstyle| G, |bool| EdgeOnly)
 
-prototype GUIListDragEvent		(|ListView|   self,	|ListViewrow| Before, |ListViewrow| Into, |bool|)
-prototype GUIListEvent			(|ListView|   self,	|ListViewrow| Row, |listviewselectmode| Mode=listviewselectmode.normal, |bool|)
+prototype GUIListDragEvent		(|ListView|   self,	|ListViewrow?| Before, |ListViewrow| Into, |bool|)
+prototype GUIListEvent			(|ListView|   self,	|ListViewrow?| Row, |listviewselectmode| Mode=listviewselectmode.normal, |bool|)
 prototype GUIListEditEvent		(|ListView|   self,	|ListViewcell| Cell, |string| Value, |bool|)
 prototype ListViewRowDraw		(|ListViewrow| self, |int| rowy, |int| texty, |image| where, |ListView| Parent, |int| col, |float| strength,   |ivec2|)
 
-prototype GUIAction				(|GUIControl| self, |int| State=0,	|ListViewrow| Row=nil, |ListViewrow| Prev=nil, |bool|)
+prototype GUIAction				(|GUIControl| self, |int| State=0,	|ListViewrow?| Row=nil, |ListViewrow?| Prev=nil, |bool|)
 prototype GUIMenuEvent			(|GUIControl| self,	|menuitem| menu, |ListViewcell| Clicked)
 prototype GUIKeyEvent			(|GUIControl| self, |keys| Key, |bool|)
 prototype GUIPasteEvent			(|GUIControl| self, |ListViewrow| After, |string| Data, |copypasteflags| purpose, |object|)

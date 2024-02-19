@@ -57,7 +57,7 @@ class AppMenu (Window)
 		function AddSep
 			self <~ ("", nil)
 
-		function GetAppMenu (|appmenu|)
+		function GetAppMenu (|appmenu!|)
 			rz = .menu
 			if !rz
 				rz = appmenu()
@@ -93,6 +93,6 @@ function AppMenuAbout (GuiMenuEvent)
 
 
 function AppMenuReturnkey (GuiListEvent)
-	(.window as appmenu).ReturnValue = .FirstSelected
+	(.window as appmenu)!.ReturnValue = .FirstSelected
 	return true
 

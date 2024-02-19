@@ -801,19 +801,38 @@ function Message.SelfUsedForProperty (|int|)
 
 
 
-function FillInConstructorAndDestructor (|Message| root, |bool| IsConstructor)
+/*
+	if paramsarray.issuper  and  name == "constructor"
+		|| Prev = exp.prev 
+		expect (!Prev) (Prev, "Can't come before super.constructor")
+*/
+
+function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	opt norefcounts
 	require !.Badness
+	
+	|| GotSuperConstructor = .cls!.super == typeobject
+	|| NoNesting = "This should be at the function root. (not nested)."
+	
 	for dot.flat in root
+		if dot == @func
+			|| prms = dot.last!
+			|| fn = (prms.obj as scfunction)!
+			if fn is constructor and prms.first!.obj|scdecl| is self // super.constructor...
+				GotSuperConstructor = true
+				check (dot in root) (dot, NoNesting)
+				
 		|| UsedAtAll = dot.SelfUsedForProperty
 			|| t = TypeOfExpr(dot, nil)
 				|| IsSet = UsedAtAll == 1
 				if !t.IsNormalObject
 					0
 				  elseif (IsConstructor)
-					check (dot.isfirst and IsSet)			(dot, "Can’t read object properties during a constructor.")
+					check (GotSuperConstructor)				(dot, "Can't access properties before calling super.constructor")
+					ifn dot.isfirst and IsSet				// failed:  .obj = value
+						check (t is PropertyWasConstructed)	(dot, "Object property was read before set")
 					check (t isnt PropertyWasConstructed)	(dot, "Can’t set object property twice during a constructor.")
-					check (dot.parent in root)				(dot, "Object property set must be at the root. (not nested).")
+					check (dot.parent in root)				(dot, NoNesting)
 				  else
 					check (dot.islast or !IsSet)			(dot, "Can’t set object properties during a destructor.")
 				if (IsConstructor)

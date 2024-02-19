@@ -35,8 +35,7 @@ class ButtonView (GUIControl)
 	helper InitMenu (|GUIListEvent| ret,  |menu|)
 		require ret
 		rz = menu(self, nil, ret)
-		if rz
-			rz.AttachedToParent = true
+		rz.AttachedToParent = true
 
 	function SubMenu (|menu|)
 		opt norefcounts
@@ -153,9 +152,10 @@ class ButtonView (GUIControl)
 				d = nil
 		
 		|| ret = MouseDragging.Ignored
-		if .clickeditem and clicks == -1		// drag
-			if D and D != .ClickedItem
-				.ClickedItem.moveto(D)
+		|| cl = .ClickedItem
+		if cl and clicks == -1		// drag
+			if D and D != cl
+				cl.moveto(D)
 				.PressingDone = true
 			if !.pressing or .PressingDone
 				return mousedragging.beyond
@@ -250,17 +250,17 @@ class ButtonView (GUIControl)
 			Where.RectStyled(Grow, G)
 		
 		if !i and .SubMenu
-			i = .SubMenu.ListSource // allow these text to be added.
+			i = .SubMenu!.ListSource // allow these text to be added.
 		|| t = i.ButtonText(.text)
 		|| Pn = R.TextCorner(g,  t,  .align) + (-1, 1)
 		|| DrawInvis = (.align & listviewstate.DrawWhiteSpace)!=0
 		|| TextCol = colors.white
 		textcol.alpha = fader
-		pn.x = font.small.DrawText(t,  Where,  Pn, TextCol, DrawInvis) + 2
+		pn.x = font.small!.DrawText(t,  Where,  Pn, TextCol, DrawInvis) + 2
 		|| MI = MouseXInside and  (R.y1y2 contains M.y)
 		if  .pressing  and MI  and  r.Width > 19  
 			(pn.x min= r.x2-(font.Width+2))
-			font.small.DrawText("\03", where, pn, TextCol, DrawInvis)
+			font.small!.DrawText("\03", where, pn, TextCol, DrawInvis)
 		
 		
 	function ListViewRow.ButtonText (|string| Default, |string|)

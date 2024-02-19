@@ -5,7 +5,7 @@
 
 
 module App {
-|[string]|					OldArgs = nil
+|[string]?|					OldArgs = nil
 |string| 					Usage
 |message|					_Conf
 |config|					_Prefs

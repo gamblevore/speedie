@@ -254,9 +254,9 @@ class GUIControl (ringtree)
 
 	
 	helper DoPaste (|Object| Data, |copypasteflags| Type = CopyPasteFlags.pastetext, |bool|)
-		if self and (data isa string)
+		|| w = .window
+		if w and (data isa string)
 			|| c = self
-			|| w = c.window
 			if !c.PasteEvent
 				c = w
 			  elseif !(c.CopyPaste & Type) and (w.copypaste & type)

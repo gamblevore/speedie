@@ -748,7 +748,7 @@ class Message (RingTree)
 
 	function FindNested (|Syntax| fn, |string?| name = nil, |bool| Err=false, |Message|)
 		Opt NoRefCounts
-		
+		nil self
 		for curr.flat in self
 			if curr == fn or fn == nil
 				if name == nil  or  curr ~= name: Return curr

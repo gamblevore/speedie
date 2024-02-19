@@ -34,7 +34,7 @@ class CachedPath
 class DocumentViewer (ringtree)
 	linkage: cpp_part docview
 	contains DocumentViewer
-	|GUIControl--|				Viewer
+	|GUIControl--?|				Viewer
 
 	constructor (|GUIControl| V)
 		.viewer = V

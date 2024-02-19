@@ -3,7 +3,7 @@
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
 	if key.IsCancel
-		.window.ClearFocus
+		.window!.ClearFocus
 		return true
 	
 	
@@ -148,13 +148,15 @@ function perryide.CompileTab (|int| i, |listviewrow|) // for autocomplete
 function perryide.AddProductErr (|string| err)
 	if err
 		.ProductErrors <~ err
-		(.CompileTab(3) isnt hidden)
+		|| t = .CompileTab(3)
+			(t isnt hidden)
 
 
 function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
 	// so what if we have a shellstream? then what?
-	if !(r.userflags&1) and r.output.length
+	|| rout = r.Output
+	if !(r.userflags&1) and rout and rout.length
 		.ShowCompileTab(.productout)
 		r.userflags |= 1
 	
@@ -162,8 +164,9 @@ function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	if kill or r.Exit >= 0
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
-		
-	.ProductOut <~ r.output
+	
+	if rout
+		.ProductOut <~ rout
 	.AddProductErr(r.ErrorOutput)
 	
 	if kill

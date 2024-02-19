@@ -57,7 +57,9 @@ extend PerryIDE
 
 		is Broken
 		.NoNeed
-		.errorlist.listsource = error.from(MaybeOK)
+		|| newlist = error.from(MaybeOK)
+		newlist := Error()
+		.errorlist.listsource = newlist
 
 
 	function Compile (|string| operation)
@@ -145,9 +147,9 @@ extend PerryIDE
 	
 	function CancelCompile (|string| why="CompiledOK")
 		.DebugIsWaitingForCompile = false
-		if .compilr
+		|| c = .Compilr
 			.Readlog
-			.compilr.Kill(Why) // frees memory
+			c.Kill(Why) // frees memory
 			.Readlog
 			.compilr = nil
 		(.buildbutton is enabled)
