@@ -3,7 +3,6 @@
 class ProgressBar (GUIControl)
 	linkage
 		cpp_part Bar
-	|memory?|	OldRandomData
 	|float|		Progress
 	|bool|		Indefinite
 	|bool|		RandomStyle
@@ -14,14 +13,10 @@ class ProgressBar (GUIControl)
 		.indefinite = true
 
 	helper RandomData (|memory|)
-		|| Refresh = !.oldrandomdata or (sdlapp.FrameCount isa 4)
-		rz = .OldRandomData
-		if !rz
-			rz = byte[128]$
-			.OldRandomData = rz
-		if Refresh
+		if sdlapp.FrameCount isa 4
 			sdlapp.touch
-			rz.Temporal
+			RandomData.Temporal
+		return RandomData
 		
 	behaviour Draw
 		|| s = .Declutterer.Strength
@@ -51,6 +46,8 @@ class ProgressBar (GUIControl)
 		if .lastrect contains p
 			(.onclicked)(self, nil,  nil)?
 	
+	module
+		|| RandomData = byte[128]!
 	
 	function StripeDark (|ivec2| v, |bool|)
 		if .RandomStyle

@@ -143,11 +143,9 @@ function perryide.ListAllFuncsMsg (|message| items, |message| result, |string| f
 
 function message.IDEAddfunc (|message| line, |string| filter)
 	opt norefcounts
-	if line == @decl
-		0 // fn.msg(@emb, line.render)
-	  else
+	if line != @decl
 		|| name = line.OwningFullName(@emb) 
-		if filter.filter(name.name)
+		if name and filter.filter(name.name)
 			|| fn = .msg(@str)
 			fn.position = line.position
 			fn <~ name

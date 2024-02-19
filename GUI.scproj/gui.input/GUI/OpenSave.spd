@@ -53,11 +53,13 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 	f.setfocus
 	
 	rz = (w)() as string
+	if rz == nil
+		rz = ""
 	|| p = w.path.text
 	if p.FileExists
 		OpenSaveDialog.LastDir[restoredir??types] = p
 		sdlapp.Saveprefs // nicer
-
+	
 
 
 class OpenSaveDialog (Window)

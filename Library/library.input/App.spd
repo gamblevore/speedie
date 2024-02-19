@@ -104,9 +104,10 @@ function args_ (|[string]|)
 function Args (|[string]|)
 	cpp_part ArgsArray
 	opt norefcounts
-	if .OldArgs == nil // == nil important here
-		.oldargs = .args_
-	return .oldargs
+	rz = .OldArgs
+	if rz == nil // == nil important here
+		rz = .args_
+		.OldArgs = rz
 
 function CrashPrint
 	cpp_wrapper JB_CrashTracer

@@ -58,7 +58,7 @@ struct JeeboxEffects
 		require sigma > 0
 			
 		if !tmp
-			tmp = .NeedTemp
+			tmp = .NeedTemp$
 		require Tmp.resizeto(.size.yx)
 
 		|ImageBlurrer| blur

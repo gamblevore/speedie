@@ -192,7 +192,7 @@ role ListViewRow (message)
 				r.y = rect.y2-10
 			|| TextCol	= parent.colorrow(depth, column, moved.y)
 			textcol.alpha *= str
-			font.small.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
+			font.small!.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
 		
 
 	function Cell (|int| i=0, |ListViewCell|)
@@ -250,9 +250,8 @@ role ListViewCell (message)
 	function Column (|int|)
 		if self
 			return .position
-	function Row (|ListViewrow|)
-		if self
-			return (.obj as Message)|listviewrow|
+	function Row (|ListViewrow!|)
+		return (.obj as Message)|listviewrow|!
 	syntax cast (|string|)
 		return self$.value
 	function Step (|int|i, |ListViewcell|)	

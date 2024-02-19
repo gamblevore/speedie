@@ -162,12 +162,12 @@ function UniqueTmpVar (|SCBase| base=scfunction.currfunc, |string| name = "tmP",
 
 
 extend_module scfunction
-	function TempMoveOut (|Message| msg, |string|name="", |Message|)
+	function TempMoveOut (|Message| msg, |string| name="", |Message|)
 		cpp_part TypedTempMoveOut
 		// a.b.c -> || tmp1 = a.b.c
 	
-		|| Using = msg.syntaxusing
-		name := UniqueTmpVar(msg.msgowningfunc)
+		|| Using = msg.SyntaxUsing
+		name := UniqueTmpVar(msg.MsgOwningFunc)
 		|| repl = «thg name »
 		msg.ReplaceWith( repl )
 		

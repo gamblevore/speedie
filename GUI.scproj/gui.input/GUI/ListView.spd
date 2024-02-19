@@ -79,7 +79,7 @@ class ListView (GUIControl) {
 		return the~left for width
 
 	
-	function TryRenameCellTo (|listviewcell| cell, |string| value, |bool|)
+	function TryRenameCellTo (|listviewcell!| cell, |string| value, |bool|)
 		opt NoRefCounts
 		if self and .TryRenameCellSub(cell, value)
 			|| o = cell.row
@@ -90,10 +90,10 @@ class ListView (GUIControl) {
 			return true
 
 
-	function TryRenameCellSub (|listviewcell| cell, |string| value, |bool|)
+	function TryRenameCellSub (|listviewcell!| cell, |string| value, |bool|)
 		opt norefcounts
 		if !.TryEditCell
-			|| orig = cell.row				#require 
+			|| orig = cell.row
 			orig.__textset__(cell.column, value)
 			return true
 		return (.TryEditCell)(self, cell, value)
@@ -205,13 +205,13 @@ class ListView (GUIControl) {
 		.EditDelayed = nil
 		delayEditTill = nil
 		.MouseDownCell = .FindClickedCell(P)
-		|| y = p.y
-		|| r = .MouseDownCell.row
-			require (r isnt disabled)
-			y = .DrawYRow(r)
+		|| mdc = .MouseDownCell$
+		|| r = mdc.row
+		require (r isnt disabled)
+		|| y = .DrawYRow(r)
 		
 		if (.RightClickSelects or .OnRightClick)
-			ifn r and r is selected
+			if r isnt selected
 				.Select(r)
 			|| c = .onrightclick 
 			if c and (c)(self, r)
@@ -316,15 +316,15 @@ class ListView (GUIControl) {
 		return .StartRenameCell( r.cell(col) )
 	
 		
-	function StartRenameCell (|ListViewcell| rc, |bool|)  //  .editcell
+	function StartRenameCell (|ListViewcell!| rc, |bool|)  //  .editcell
 		opt norefcounts
-		|| r = rc.row						#require
+		|| r = rc.row
 		.SelectAdd(r)
 		.Show(r)
-		|| inl = .InlineCell(true) 
-		expect inl.edit(rc, self)			(beep)
-		if .istree
-			inl.Editor.selectall
+		|| inl = .InlineCell(true)
+			expect inl.edit(rc, self)			(beep)
+			if .istree
+				inl.Editor!.selectall
 		return true
 	
 	
@@ -664,12 +664,12 @@ class ListView (GUIControl) {
 			
 		  elseif !sl
 			|| LC = .FindClickedCell(P)
-			|| L = LC.row
-			require (L isnt disabled)
-			if (L is selected) and (.SelCount > 1)
-				.Select(l)
-			  elseif !keys.Cmd and (.window.SelBeforeMouseDown == self)
-				.DelayedRename(Lc)
+				|| L = LC.row
+				require (L isnt disabled)
+				if (L is selected) and (.SelCount > 1)
+					.Select(l)
+				  elseif !keys.Cmd and (.window!.SelBeforeMouseDown == self)
+					.DelayedRename(Lc)
 			
 
 	function SelCount (|int|)
@@ -723,7 +723,7 @@ class ListView (GUIControl) {
 			return MouseDragging.handled
 		
 		|| AdjustScroll = (clicks == -1) and (.draggingrowFrom)
-		if (clicks == -1) and (.window.droppinginto == self) // I guess the filter is already done...
+		if (clicks == -1) and (.window!.droppinginto == self) // I guess the filter is already done...
 			|| i = .FindClicked(p)
 			if (i isnt disabled)
 				.Select(i)
@@ -744,13 +744,14 @@ class ListView (GUIControl) {
 				WantsTo = .listsource
 				|| top = .abstop
 				if (p.y+p2.y > .abstop)
-					WantsTo = .bmove(._scroll, -1)
+					|| s = ._Scroll
+						WantsTo = .bmove(s, -1)
 					.ScrollByRows(-1)
 					
 				  elseif (p.y-p2.y < .absbottom)
 					.ScrollByRows(1)
 			
-			if .draggingrowFrom and (WantsTo and .CanDrawDrag(Wantsto))
+			if .draggingrowFrom and (.CanDrawDrag(Wantsto))
 				.draggingrowto = wantsto
 			return MouseDragging.EvenIfNoMovement
 		
@@ -760,16 +761,16 @@ class ListView (GUIControl) {
 		|| FirstSel = .FirstSelected
 		|| LC = .FindClickedCell(P)
 		if (Clicks > 1) and (firstsel) and !(keys.Cmd)
-			if lc.row == firstsel
+			if lc and lc.row == firstsel
 				(.OnReturn)(self, firstsel)?
 			return MouseDragging.handled
 		
 		.MouseDownCell = LC
-		|| l = lc.row 
-		if !l
+		if !lc
 			if !Keys.Cmd
 				.selectnone
 			return MouseDragging.handled
+		|| l = lc.row 
 		if L is disabled
 			return MouseDragging.handled
 			
@@ -836,7 +837,7 @@ class ListView (GUIControl) {
 		return .hierprev(l)
 	function BMove (|ListViewrow| l, |int| i, |ListViewrow|)
 		opt norefcounts
-		require l
+//		require l
 		for i.abs
 			l = .hierstep(l, i > 0) #loop
 		return l
@@ -1041,14 +1042,16 @@ class ListView (GUIControl) {
 
 
 	function ScrollByRows (|int| Rows)
-		.scrollset( .bmove(._scroll, rows) )
-		.ScrollDrawTimer = scroller.timer // where should this go?
+		|| s = ._Scroll
+			.scrollset( .bmove(s, rows) )
+			.ScrollDrawTimer = scroller.timer // where should this go?
 		// in scrollset or the caller of this func?
 
 	
 	function ScrollMoveTo (|int| v)
-		.scrollset(.bmove(.start, v))
-		.ScrollJump
+		|| s = .start
+			.scrollset(.bmove(s, v))
+			.ScrollJump
 	
 
 	function ScrollJump						// sigh...
@@ -1109,16 +1112,18 @@ class ListView (GUIControl) {
 
 
 	helper FindClicked (|ivec2| Search, |ListViewRow|)
-		return .FindClickedCell((0, search.y)).row
+		|| c = .FindClickedCell((0, search.y))
+			return c.row
 	
 	
 	helper FindClickedMenu (|int| y, |ListViewRow|)
 		opt norefcounts
 		if y <= .absbottom
-			return .bmove(.LastVisible, 1)
+			return .bmove(.LastVisible$, 1)
 		if y > .abstop
-			return .bmove(._scroll, -1)
-		return .FindClickedCell((0,y)).row
+			return .bmove(._scroll$, -1)
+		|| c = .FindClickedCell((0,y))
+			return c.row
 	
 	
 	function StopFilter

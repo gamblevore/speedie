@@ -149,6 +149,6 @@ function scfunction.CanNil (|bool|)
 function scfunction.WantAs (|nilstate| NS)
 	opt norefcounts
 	|| dcl = .args.first
-	expect dcl and dcl.typesuffers and .cls (.source, `This function should not specify nilness of self.`)
+	expect (dcl and dcl.typesuffers and .cls) (.source, `This function should not specify nilness of self.`)
 	dcl.nildeclared = NS
 

@@ -20,7 +20,9 @@ class SCObject
 	
 	function SyntaxExpect ( |string| Error )
 		cpp_part Fail
-		printline .objectid
+//		print "Object Failed Expect: "
+//		printline .objectid
+//		app.printstacktrace
 		errorreceiver.NewError( .source, Error )
 
 	syntax equals (|string| s, |bool| aware, |bool|)

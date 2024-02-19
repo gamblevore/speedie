@@ -267,6 +267,7 @@ module SDLApp
 		SDL_WINDOW_RESIZABLE =		0x20
 		SDL_WINDOW_ALLOW_HIGHDPI =	0x00002000
 
+
 	helper InitWindow (|ivec2| s, |string|name)
 		SDL_Init(SDL_INIT_AUDIO ||| SDL_INIT_VIDEO ||| SDL_INIT_EVENTS ||| SDL_INIT_HAPTIC)
 
@@ -277,6 +278,8 @@ module SDLApp
 		.SDL_SetWindowMinimumSize(.screenwindow,  400,  200)
 		.vsync = true
 		.renderer = SDL_CreateRenderer(.screenwindow, -1, 0)
+		if !.Renderer
+			app.Quit("Can't init renderer", -1)
 
 		|| scr = .CurrDisplaySize
 		if (s.x >= scr.x) and (s.y >= scr.y)
@@ -542,18 +545,18 @@ module SDLApp
 		|| x	= t.length*font.width
 		|| h	= font.height
 		|| P2	= (x, h)/2
-		font.small.drawtext(t, img, P-P2, true)
+		font.small!.drawtext(t, img, P-P2, true)
 
 
-	function DialogSorter (SorterComparer2)
+	function DialogSorter (SorterComparerWindow)
 		opt norefcounts
 		if a and b
-			return (a as window).isdialog|int| - (b as window).isdialog|int|
+			return a.isdialog|int| - b.isdialog|int|
 
 
 	function PutDialogsInFront
 		opt norefcounts
-		window.all.sort(DialogSorter)
+		window.all.sort(DialogSorter|sortercomparer2|)
 
 
 	function DrawWinFrom (|window|)
@@ -607,7 +610,7 @@ module SDLApp
 		
 		notifications.Draw
 
-		.DoDrawDrag(window.front)
+		.DoDrawDrag(window.front!)
 		.EndFrame(.Raw)
 
 	function BGBlurAmount (|float|)

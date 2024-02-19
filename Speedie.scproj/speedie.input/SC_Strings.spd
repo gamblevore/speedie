@@ -318,20 +318,30 @@ function message.BecomeAppend (|string| s)
 		.last = n
 
 
-function message.WithDirectName (|message| p, |string|)
-	expect (self!=@rel and self != @bra) (self)
-	return scfunction.tempmoveout(self).DeclName!.name
-
-
 function message.Tran_With 
-	|| obj = self.needfirst$
-	|| arg = obj.Next(@arg)$	
+	|| obj = .needfirst$
+	|| arg = obj.Next(@arg)	
+	if obj == @rel
+		error obj
 	
-	.name = "if"
-	|| name = obj.WithDirectName(self)$	
-
+	require arg and obj != @rel
 	
 	using (obj)
+	|| name = obj.name
+	|| If = self
+	if obj.func == @thg
+		.name = "if"
+	  else
+		.become(@arg)
+		If = @tmp + "if"
+		.first = If
+		if <~ obj
+		if <~ arg
+		|| dcl  = scfunction.tempmoveout(obj)
+		name = dcl.DeclName!.name
+
+	if.first!.wrapwith(@bra + "?")
+	
 	for ch.flat in arg
 		if ch == @tmp
 			if ch == "is" or "isnt"
@@ -345,7 +355,8 @@ function message.Tran_With
 		  elseif ch == @thg
 			if ch == "it"
 				ch.name = name
-
+	
+	debugger
 
 
 function message.WithDeclTransform (|message| decl, |message| rel, |message| arg)

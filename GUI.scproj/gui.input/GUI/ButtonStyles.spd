@@ -69,6 +69,7 @@ extend_module Image
 			return c
 		c = ( img://curlieque.png ).LoadQOI #require
 		c.Rotate(c)
+		._Curlieque = c
 		return c
 
 
@@ -88,7 +89,7 @@ function image.CurlieQueDrawer (GUIDrawEvent)
 		for X in rect.Horz
 			|| D = rect.DistToCorner((X,Y)).abs
 			if 16 > d.x and d.y			
-				if Q[D].r > 128 // white
+				if q and Q[D].r > 128 // white
 					w.overlay(edge)
 				  elseif EdgeOnly
 					0

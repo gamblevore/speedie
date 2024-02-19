@@ -28,9 +28,7 @@ class GraphicsEditor (GuiControl)
 		if d.IsJbin
 			rz = .LoadNative(d)
 		  else
-			rz = .LoadImage(d, .backing)
-		.Merged.ResizeTo((0,0))
-		.Merged = image(.size)
+			rz = .LoadImage(d, .backing!)
 	
 	
 	function Size (|ivec2|)

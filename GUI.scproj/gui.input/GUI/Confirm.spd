@@ -94,7 +94,7 @@ function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| 
 		.Resize(q)
 		.question.text = q
 		for i in 3
-			|| b  = .buttons[i]
+			|| b  = .buttons[i]!
 			|| bw = b.textwidth+8 max 40
 			b.vistext = answers[i]
 			|| l = (3,7)(i > 0)
@@ -105,8 +105,8 @@ function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| 
 		ifn (.response isnt visible) or (p != .yes) or (.response.text)
 			beep
 			
-		.text = nil
-		.question.text = nil // clear memory :)
+		.text = ""
+		.question.text = "" // clear memory :)
 
 		if p == .yes
 			return 1

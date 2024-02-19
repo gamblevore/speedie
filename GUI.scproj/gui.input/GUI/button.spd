@@ -304,7 +304,7 @@ class ButtonView (GUIControl)
 
 	function SearchMenu (|listviewrow| row=nil, |bool|)
 		if .openmenu(row)
-			return .submenu.typedstring("")
+			return .submenu!.typedstring("")
 
 
 	function MenuIsOpen (|bool|)

@@ -155,7 +155,7 @@ class FileRow (ListViewRow)
 			found[s.name] = s
 
 		for name in dir
-			|| ch = dir[name]
+			|| ch = dir[name]!
 			ifn (name[0] == '.') or (excl[name.ext])
 				|| f = found[name]
 				if f and f.IsAlsoDir(ch)

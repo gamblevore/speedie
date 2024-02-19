@@ -49,10 +49,10 @@ class MessageView (ListView)
 				|| mod	= d.ismodified?
 				|| ddd	= (Colors.black(0.5), Colors.clear)(mod)
 				ddd.Alpha *= strength
-				font.small.drawicon(.Modifier, where, V, ddd)
+				font.small!.drawicon(.Modifier, where, V, ddd)
 
 				if .HasError
 					v.x = z.x2-sh
-					font.small.drawicon('\17', where, V, ddd) // not sure???
+					font.small!.drawicon('\17', where, V, ddd) // not sure???
 				return (sh, 0)
 

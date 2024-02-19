@@ -204,7 +204,7 @@ function Return (NilTrackerFn)
 	|| ret = t.return
 	if ret and ret.typesuffers
 		if ret.isreal
-			expect  (v isnt nilish)   (msg, "Declaration does not allow returning " + v.rawname)
+			expect (v isnt nilish) (msg, "Declaration does not allow returning " + v.rawname)
 		
 		ret.NilDeclared = ret.nildeclared ||| (v&nilstate.either)					// assume real, unless it becomes optional??
 		target debugnil

@@ -373,14 +373,14 @@ extend PerryIDE
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
 			|| items = "Speedie, Jeebox, '', Errors".parse|listviewrow|
 			.items = items
-			items = items.first
+			items = items.first!
 			(items is selected)
 			items.Obj = self.SpeedieText
-			items++
+			items = items.next!
 			items.obj = self.JeeboxText
-			items++
+			items = items.next!
 			items.obj = self.ProductOut
-			items++
+			items = items.next!
 			items.obj = self.ProductErrors
 			(items is hidden)
 			
@@ -570,7 +570,7 @@ extend PerryIDE
 			f.Excludes[ex.value] = "x"
 
 		f.addroot(.project, true)
-		f.FocusOn( .root )
+		f.FocusOn( .root! )
 		
 		if !IsDir and .IsSpeedieCode
 			conf = defaultfiles.Roots.parse
@@ -616,8 +616,8 @@ extend PerryIDE
 		.close
 
 
-	function PerryFile (|file|)
-		return .project.child(".perry")
+	function PerryFile (|file!|)
+		return .project.child(".perry")!
 	
 	
 	function LoadConfSub (|file| proj)

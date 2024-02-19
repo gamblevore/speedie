@@ -25,14 +25,31 @@ helper __junktest_3__ (|intrange| data, |bool|)
 			return true
 
 
-
 helper __junktest_2__
 	visible
 	|| r1 = ringtree()
+	if (0.5)
+		r1 = nil
 	|| r2 = ringtree()
-	|| i2 = 0
-	i2 = r1.dist(r2)
+	with r1.first
+		|| i2 = 0
+		i2 = .dist(r2)
 
+/*
+helper message.__junktest_18__ (|bool| named=false) // findpos, findat
+	opt norefcounts
+	|message| rz 
+	for ch in self
+		if ((rz!=nil) and !rz.position) // smallest
+			rz = ch
+*/
+
+
+helper __junktest_19__
+	|| w = message()
+	with w
+		.name = ""
+	
 
 
 module __junktest_5__

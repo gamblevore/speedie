@@ -108,7 +108,7 @@ class Menu (ListView)
 		isnt visible
 		.EditingRow = nil
 		if .isopenedmenu
-			.window.openedmenu = nil
+			.window.openedmenu ?= nil
 		|| p = .parent
 		if p isa ButtonView
 			p.__MouseUp__((-1,-1))
