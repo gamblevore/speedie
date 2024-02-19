@@ -207,7 +207,8 @@ function Return (NilTrackerFn)
 			expect  (v isnt nilish)   (msg, "Declaration does not allow returning " + v.rawname)
 		
 		ret.NilDeclared = ret.nildeclared ||| (v&nilstate.either)					// assume real, unless it becomes optional??
-		ret.NilPrint("return")
+		target debugnil
+			ret.NilPrint("return")
 
 
 function Exit (NilTrackerFn)
@@ -440,9 +441,9 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 function Argument (Niltrackerfn)
 	opt norefcounts
 	|| v = .value.depthofvars + 1
-//	if v > 31 // hmm?
 	for s.fast in msg
-//		s.DebugPrint
+		target debugnil
+			s.DebugPrint
 		|| t = test&-s.islast
 		|| prev = rz
 		rz = .jump(s, T ||| nilcheckmode.Disappears)

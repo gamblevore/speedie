@@ -53,7 +53,7 @@ module Perry
 		app.prefs("colors") = ¥.savecolors.parse
 
 		
-	function LoadWindowsSub (|PerryIDE?| r, |bool|)
+	function LoadWindowsSub (|bool|)
 		|| Found = false
 		for proj_item in .projects
 			if proj_item.name.fileExists
@@ -64,10 +64,12 @@ module Perry
 		require Found
 		for proj_item in .projects
 			|| proj = proj_item.name.file
-			|| r2 = R ?? PerryIDE(false)
+			|| r2 = PerryIDE(proj)
 			r2.Loadproject(proj)
 			startupwindow.hide
-			r = nil
+//		|| i = PerryIDE(l)
+//		i.ViewAsText
+		
 		return true
 
 
@@ -92,9 +94,6 @@ module Perry
 		|| old = app.Prefs("currproj")
 		.Projects = (app.prefs)("lastproj")
 		
-		|| i = PerryIDE(false)
-		i.ViewAsText
-		
 		if app.CWD == "/"
 			app.args.remove("YES")
 
@@ -104,7 +103,7 @@ module Perry
 		if app.args > 0
 			.LoadWindowsFromArgs
 
-		if !.LoadOnlyTerminalSpecified and !.LoadWindowsSub(i)
+		if !.LoadOnlyTerminalSpecified and !.LoadWindowsSub()
 			startupwindow.show
 			return 0
 		|| oof = (.FindProj(old),  .Projects.First)(old)

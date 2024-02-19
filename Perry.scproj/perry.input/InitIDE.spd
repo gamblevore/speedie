@@ -1,10 +1,11 @@
 
 
 extend PerryIDE 
-    constructor (|bool| ignore)
+    constructor (|file| project)
 		super.constructor 
 		
 		sdlapp.AppDocumentOpen = PerryOpenDoc // move to a different startup place
+		.Project			= project
 		.InConstructor		= true
 		.CanAskingAboutMissing = true
 		.RecentFiles		= message()
@@ -475,7 +476,7 @@ extend PerryIDE
 	
 	function LogOneComm (|message| msg, |string|type="")
 		opt norefcounts
-		.logonething(msg,type, .LogComms$)
+		.logonething(msg,type, .LogComms!)
 
 
 	function LogOneAction (|message| msg, |string|type="")

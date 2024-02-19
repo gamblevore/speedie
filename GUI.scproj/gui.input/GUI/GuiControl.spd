@@ -301,7 +301,7 @@ class GUIControl (ringtree)
 			return .copylist
 		if self isa textview
 			return [.seltext]
-		return nil
+		return []
 
 
 	function Width (|int|)

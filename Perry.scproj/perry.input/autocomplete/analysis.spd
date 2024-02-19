@@ -45,17 +45,17 @@ function PerryIDE.ImproveFuncList (|message| result)
 	opt NoRefCounts
 	|message| p0
 	for s.fast in result
-		|| p = s[0][0]
-		if !p0 or !p.ShallowEquals(p0, true)
-			|| d = listviewrow()
-			d.name = "------<" + p.name + ">------"
-			(d is disabled)
-			s.prev = d
-		|| n = s[0].name
-		if p != @name
-			n = "." + n 
-		s.name = n
-		p0 = p
+		|| p = s[@nil][@nil]
+			if !p0 or !p.ShallowEquals(p0, true)
+				|| d = listviewrow()
+				d.name = "------<" + p.name + ">------"
+				(d is disabled)
+				s.prev = d
+			|| n = s.first!.name
+			if p != @name
+				n = "." + n 
+			s.name = n
+			p0 = p
 
 
 

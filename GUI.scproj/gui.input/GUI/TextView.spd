@@ -1732,13 +1732,6 @@ class TextView (GUIControl)
 			if (m == @tmp) and .coloriseasroot.ValueLower(m.name)
 				m.flags |= textview.NotRoot
 
-	
-	helper TryColorise (|bool|)
-		opt norefcounts
-		if .ParsedMessage // and app.needreg("(To alter your syntax text-color.)")
-			return ¥.randomise(self)
-		return true
-
 
 	helper IsCleared (|bool|)
 		opt norefcounts

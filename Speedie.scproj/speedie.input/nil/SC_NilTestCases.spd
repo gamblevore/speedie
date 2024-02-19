@@ -1,4 +1,5 @@
 
+target debugnil {
 
 class NilTest
 	|int|		V
@@ -17,6 +18,19 @@ class NilTest
 		|| v = .v3
 		borks // amazing
 		*v = 'x'
+
+
+/*
+	function abcd (|message| msg)
+		|| f = msg.first
+		if f
+		// ideally... the nil-ness knowledge of msg.first should transfer
+		// back to msg. that is, if f is real, then so is msg. 
+		// we'd need a way to "link" variables. bools too... should be linked
+		// like || x = msg != nil
+			if msg starts "display"
+				"oof"
+*/
 		
 	function AndTest (|string?| a, |string?| b, |string| cc)
 		if (a and b)
@@ -275,6 +289,7 @@ function NilRecord.ndb5
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"
-	// if scfunction.currfunc ~= "JB_Str_OperatorIsa"
+	if scfunction.currfunc ~= "abcd"
 }
 
+}

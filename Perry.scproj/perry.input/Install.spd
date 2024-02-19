@@ -121,11 +121,8 @@ extend_module perry
 
 
 	function MakeSpeedieDir (|string|)
-// over complex? it just returns (speedie.file)?
-// i mean testing is important... but what if it fails? does it do anything special to help with that?
-		|| where = speedie.file
-		|| dest_path = where.LinksTo
-		if where.exists and dest_path
+		|| dest_path = speedie.LinksTo
+		if speedie.exists and dest_path
 			|| result = dest_path.executestr(["--alive"]).trim
 			if result contains "seems alive"
 				rz = .FindSpeedieRoot(dest_path)
@@ -275,14 +272,13 @@ extend_module perry
 	function SetupLinks (|file|f, |string|)
 		|| term = f["Terminal/Speedie"]
 		require term.mustexist
-		|| at = speedie.file
-		|| dest = at.linksto
+		|| dest = speedie.linksto
 		if Dest == term.path
 			//
-		  elseif at.linkto(term)
-			rz = "\n\nInstalled speedie at: " + at.path
+		  elseif speedie.linkto(term)
+			rz = "\n\nInstalled speedie at: " + speedie
 		  else
-			rz = "\n\nFailed to install speedie at: " + at.path
+			rz = "\n\nFailed to install speedie at: " + speedie
 
 
 	function Install_Files (|file| f, |string|)
@@ -320,11 +316,10 @@ extend_module perry
 			
 	function UnInstall
 		|| fs = FastString()
-		|| spd = speedie.file
 		|| per = app.Idealpath
 		|| fol = .SpeedieDir
-		if spd.exists and spd.delete
-			fs <~ "Deleted Link at: $spd"
+		if speedie.exists and speedie.delete
+			fs <~ "Deleted Link at: $speedie"
 		if per.FileExists and per.MoveToTrash
 			fs <~ "\nDeleted Perry at: $per"
 		fs <~ "\n\nTo fully uninstall, remove folder at:\n$Fol"

@@ -1,6 +1,6 @@
 
 
-|colorscheme| ¥ // = colorscheme() // just create a default obj on init... init the defaults later
+|| ¥ = colorscheme()
 
 class ColorScheme
 	linkage
@@ -11,7 +11,7 @@ class ColorScheme
 	|ImagePixel[8]|			History
 	|vec4[4]|				BGCorners
 	|int|					HistoryIndex
-	|&ImagePixel|			Altered
+	|int|					Altered
 
 	|drawstyle| 			TextSelection
 	|drawstyle|				TextCopy
@@ -36,10 +36,6 @@ class ColorScheme
 
 	
 	constructor
-		.InitColors
-	
-	
-	function InitColors
 		.TextSelection.bg		<~ ((1.0, 0.25, 0.75, 0.5))
 		.TextCopy.bg			<~ ((0.6, 0.6, 0.1, 0.2))
 		.TextCopy.edge			<~ ((0.6, 0.6, 0.1, 0.2))
@@ -65,7 +61,6 @@ class ColorScheme
 		.menus.bg			= (0.0, 0.0, 0.0, 1.0).px
 		.menus.seps			= nil
 		.MenuRowSel.solid	= (0.5, 0.5, 0.5, 0.65)
-		.LoadDefaults
 
 	
 	setter BG (|vec3|)
@@ -97,48 +92,7 @@ class ColorScheme
 
 	syntax access (|int| i, assigns: |vec3|)
 		.BGCorners[i] = (value, 1.0)
-
-
-	function RndMove (|&imagepixel| px)
-		|| i = .HistoryIndex
-		if .Altered|_voidptr| != px|_voidptr|
-			.altered = px
-			i = 0
-		.history[i] = *px
-		.HistoryIndex = (i+1)&7
-		|uint| rnd = random.shared.int
-		px.r = (rnd>>0 )&0xff
-		px.g = (rnd>>8 )&0xff
-		px.b = (rnd>>16)&0xff
-		px.a = 0xff
 		
-		
-	function RndUndo (|&imagepixel| px)
-		expect (.altered.uint == px.uint) (beep)
-		|| i = (.historyindex-1)&7
-		*px = .history[i]
-		.historyindex = i
-		
-	
-	function RandomiseWhich (|textview| txt, |&imagepixel|)
-		if !txt.selrange or !txt.ParsedMessage
-			return .none
-		|| m = txt.ClickedMsg
-			if m.UseRootTmpColor
-				return .roottmp
-			return .syxcol[m.syxid]
-
-
-	function Randomise (|textview| txt, |bool|)
-		|| it = .RandomiseWhich(txt)
-			if keys.shift
-				.RndUndo(it)
-			  else
-				.rndmove(it)
-			sdlapp.saveprefs // nice
-		return true
-	
-	
 	function FadeV (|vec4| top, |vec4| bottom)
 		.BGCorners[0] = top
 		.BGCorners[1] = top

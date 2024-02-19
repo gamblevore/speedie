@@ -191,11 +191,6 @@ class Window (GUIControl)
 
 	helper KeyDownWin (|keys| key, |bool|)
 		opt norefcounts
-		if (key iscmd keys.U) and keys.option
-			|| t = .focus 
-			if t isa textview
-				return t.TryColorise
-
 		|| F = .realfocus
 		|| menu = .openedmenu
 			if menu isnt typethrough

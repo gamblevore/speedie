@@ -301,7 +301,7 @@ extend String
 		if self
 			return .ext ~= s
 		
-	function File (|File|)
+	function File (|File!|)
 		cpp_part AsFile
 		if self isa file
 			return self

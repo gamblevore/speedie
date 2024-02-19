@@ -189,7 +189,8 @@ class Document (RingTree)
 
 
 	function Length (|int|)
-		return .current.text.length
+		|| c = .current
+			return c.text.length
 
 
 	function ShowParseErrorInViewers

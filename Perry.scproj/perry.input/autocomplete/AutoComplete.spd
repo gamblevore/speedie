@@ -227,7 +227,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	|message| date
 	if msg == @arg and "Perry"
 		date = msg[@num]
-		msg = date.Next
+		msg = date.Next$
 
 	if msg == "error"
 		if msg.last == "define"
@@ -335,7 +335,7 @@ function JumpToDefinition (GUIAction)
 	|| ide = .ide!
 	|| msg = ide.EditMe.ClickedMsg
 		if msg in @url
-			msg = msg.parent
+			msg = msg.parent!
 		if msg == @url
 			app.ShowURL(msg.render)
 		  elseif msg == @sheb

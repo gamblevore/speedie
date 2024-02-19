@@ -51,11 +51,11 @@ function PerryIDE.DateWrap (|message| msg, |message|)
 
 function PerryIDE.SendFeedbackMsg (|message| msg)
 	require msg
-	.feedback = .CompilerInit(.feedback, false)			#require
-	
+	|| fb = .CompilerInit(.feedback, false)			#require
+	.feedback = fb
 	|| record = .DateWrap(msg)
-	.feedback <~ record
-	.SpeedieMsgReceive(.feedback)
+	fb <~ record
+	.SpeedieMsgReceive(fb)
 	.LogOneComm(msg, "\1C ")
 
 

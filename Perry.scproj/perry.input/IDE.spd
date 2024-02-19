@@ -35,10 +35,10 @@ class PerryIDE (Window)
 	|message?|					LastExtraInfo
 	|StretchControl|			EditSep
 	|StretchControl|			FileSep
-	|listviewrow|				LogComms
-	|listviewrow|				LogActions
+	|listviewrow?|				LogComms
+	|listviewrow?|				LogActions
 	|menu|						AutoComplete	// ... todo
-	|ListView|					Variables		// ... todo
+//	|ListView|					Variables		// ... todo
 	|ListView|					ErrorList
 	|listview|					LogArea
 	|ListView|					FoundList
@@ -61,14 +61,14 @@ class PerryIDE (Window)
 	|Buttonview|				StartScreen
 	|Buttonview|				BuildButton
 	|Buttonview|				RunButton
-	|Process| 					Talker
+	|Process?| 					Talker
 	|message|					RecentFiles
 	|string|					OldJBCloser
 	|string| 					LastCmdStr
 	|date|						LastSendTime
 	|string|					AttachedProgram
 	|ProgressBar|				Progress
-	|Faststring|				Stats
+	|Faststring?|				Stats
 	|ivec2|						PopupDisplayCorner
 	|date|						LastAutoCompleteDate
 	|date|						PopupDateOn
@@ -182,15 +182,14 @@ class PerryIDE (Window)
 
 	function FindPath (|string| path, |filerow|)
 		opt norefcounts
-		|| it = .FileList
-			return it.FindAPath(Path) 
+		return .FileList.FindAPath(Path) 
 
 		
 	function MainProjFol (|filerow|)
 		opt norefcounts
 		|| it = .FileList
-			|| r = it[0]
-			return it.findapath("./input/", r)  ??  it.findapath("./*.input/", r) 
+		|| r = it[0]
+		return it.findapath("./input/", r)  ??  it.findapath("./*.input/", r) 
 
 
 	behaviour AppForeGroundChanged
@@ -227,16 +226,20 @@ class PerryIDE (Window)
 			
 		  elseif i == 2
 			|| f = .filelist.FirstSelected as filerow
-			if f.asdir
+			if !f
+				0
+			  elseif f.asdir
 				fs <~ f.Name + "/"
 			  else
 				fs <~ "proj"
 				f = (.filelist.listsource as filerow)
-			|| s = f.lastsize
-				fs <~ " ${s.strsize} in (${f.lastfilecount} \11)"
-			  else
-				fs.Length = 0
-				fs <~ "no source found"
+			
+			if f
+				|| s = f.lastsize
+					fs <~ " ${s.strsize} in (${f.lastfilecount} \11)"
+				  else
+					fs.Length = 0
+					fs <~ "no source found"
 		
 		  elseif i == 3
 			fs <~ "Obj ${app.ObjMemory.strsize}   Str ${app.stringmemory.strsize}   Img ${app.OtherMemory.strsize}"
@@ -598,7 +601,8 @@ class PerryIDE (Window)
 			return .FileList.ShowQuickOpen
 			
 		  else
-			.FunctionMenu.SubMenu.CloseMenu
+			|| sub = .FunctionMenu.SubMenu
+				sub.CloseMenu
 			if .FileList.ShowQuickOpen
 				return true
 			return .FunctionMenu.SearchMenu
@@ -689,7 +693,7 @@ class PerryIDE (Window)
 		
 		
 		function New (|string| path, |perryide|)
-			rz = perryide(false)
+			rz = perryide(path.file)
 			rz.LoadProject(path.file)
 			rz.EditMe.SetFocus
 		

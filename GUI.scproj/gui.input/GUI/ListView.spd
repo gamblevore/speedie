@@ -29,7 +29,7 @@ class ListView (GUIControl) {
 	|ListViewrow?|					DraggingRowFrom
 	|ListViewrow|					ListSource
 	|string|						ColumnInfo
-	|menu|							CMM
+	|menu?|							CMM
 	|DrawStyle|						gRowSel 
 	
 	|GUIListEditEvent?|				TryEditCell
@@ -191,14 +191,14 @@ class ListView (GUIControl) {
 	
 
 	function NewCmm (|menu|)
-		if .cmm
-			.cmm.listsource.clear
-			return .cmm
-		|| m = menu(self, nil, nil)
-		m.clipmode = ControlClipMode.SlideBackInWindow
-		.cmm = m
-		m.id = "cmm"
-		return m
+		rz = .cmm
+		if rz
+			rz.listsource.clear
+			return rz
+		rz = menu(self, nil, nil)
+		rz.clipmode = ControlClipMode.SlideBackInWindow
+		.cmm = rz
+		rz.id = "cmm"
 	
 	
 	behaviour RightClick
@@ -263,7 +263,7 @@ class ListView (GUIControl) {
 		return .HierNext(r) ?? .hierPrev(r)
 	
 	
-	function CheckRemoved (|ListViewrow|r)
+	function CheckRemoved (|ListViewrow| r)
 		._Scroll		= .replaced(r, ._Scroll)
 		.DraggingRowTo	= .replaced(r, .DraggingRowTo)
 		.DraggingRowFrom= .replaced(r, .DraggingRowFrom)

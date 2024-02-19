@@ -209,8 +209,9 @@ class FileRow (ListViewRow)
 
 
 	function VisibleText (|bool|ignore=true, |string|)
-		if ._document and ._document.current
-			return ._document.text
+		|| d = ._Document
+			if d.current
+				return d.text
 		|| f = .readfrom.file
 		require !f.isdir
 		return f.readfile(ignore).utf8

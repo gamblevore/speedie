@@ -342,8 +342,8 @@ class FileViewer (ListView)
 			require f.findid != id
 		f.findID = ID
 		
-		if .SearchWithin
-			|| Restrict = .searchwithin.location
+		|| s = .SearchWithin
+			|| Restrict = s.location
 			if !f.location[0,Restrict]
 				return false
 		
