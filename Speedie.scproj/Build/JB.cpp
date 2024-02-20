@@ -2028,7 +2028,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[153], (111964915433472)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[153], (111964963012608)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -34354,7 +34354,13 @@ int SC_Msg_MainOneArg(Message* self, Message* arg, int i, int found) {
 		}
 		type = ((Message*)JB_Ring_First(type));
 	}
-	JB_Msg_Expect(type, JB_SyxThg, nil);
+	bool MaybeNil = SC_Msg_OperatorIsARel(type, JB_LUB[611]);
+	if (MaybeNil) {
+		type = ((Message*)JB_Ring_First(type));
+	}
+	if ((!JB_Msg_Expect(type, JB_SyxThg, nil))) {
+		return 0;
+	}
 	Array* prms = (JB_Array__New0());
 	JB_Array_SyntaxAppend(prms, name);
 	JB_Array_SyntaxAppend(prms, type);
@@ -34373,7 +34379,12 @@ int SC_Msg_MainOneArg(Message* self, Message* arg, int i, int found) {
 		if (((bool)(found & 4))) {
 			JB_Msg_SyntaxExpect(arg, JB_LUB[1564]);
 		}
-		SC_Msg_SyntaxAppend(arg, SC_Macro_clean(SC__Macros_MainArgBasic), prms);
+		if (MaybeNil) {
+			SC_Msg_SyntaxAppend(arg, SC_Macro_clean(SC__Macros_MainArgBasic), prms);
+		}
+		 else {
+			SC_Msg_SyntaxAppend(arg, SC_Macro_clean(SC__Macros_MainArgBasicReq), prms);
+		}
 		return 2;
 	}
 	name = JB_Msg_NeedSyx(name, JB_SyxThg);

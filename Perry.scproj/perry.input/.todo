@@ -6,7 +6,10 @@
 
 
 * Do nil checker!
-	* MainArgBasic fucked with basodpias;kldjalskjdnasm,dnas booASLKDalksdalksdjm
+	* function pointers not being tested!
+	* global struct pointers not assumed nil rn?
+
+	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!
 	* display obj.haha.property instead of JB_haha(obj).Property
 
 	* picomsg is now crashing or failing on constructor
@@ -16,14 +19,11 @@
 
 	* name should be "safe" (needs a "getter" func that works like a setter)
 
-	* function pointers not being tested!
-	* global struct pointers not assumed nil rn?
 
 	* selector constructor shouldn't need "?"
 	*	con.counterpart|array| <~ result // should be rejected!
 	* helper message.LastAfter (|int|ignoreafter, |ind|) shouldn't need nil self
 
-	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!
 
 
 

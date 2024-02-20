@@ -100,7 +100,7 @@ extend String
 		return .write(s)
 
 
-	Syntax Append (|messageroot| msg, |bool|)
+	Syntax Append (|messageroot!| msg, |bool|)
 		cpp_Part WriteMsg
 		|| fs = .out$
 		msg.render(fs)

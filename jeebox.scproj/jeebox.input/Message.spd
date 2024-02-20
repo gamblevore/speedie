@@ -123,6 +123,9 @@ class Message (RingTree)
 		if Braces
 			fs.IndentLine
 			fs <~ '}'
+		if !.parent
+			fs <~ "\n" // make sure it will reparse as an arg
+		
 
 	syx Emb (Embedded_Value)
 		fs <~ .Name

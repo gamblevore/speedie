@@ -4,7 +4,7 @@ https://github.com/gamblevore/speedie/blob/main/Documentation/Message.md // docs
 file:///usr/local/speedie/Documentation/Messages.md						 // locally
 
 main (|existingfile| input)
-	|| jb = input.parse
+	|| jb = input.parse$
 	if input isa "xml"
 		jb.XMLToJeebox
 		|| BoxFile = input.setext("box")

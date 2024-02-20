@@ -102,11 +102,14 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	|| type = self[@nil]
 	|| name = type.next
 	|| IsArray = type == @arr
-		.expectlast$
+		.ExpectLast$
 		type = Type.first
-	type.expect(@thg)
 	
-		
+	|| MaybeNil = Type isarel "?"
+		Type = Type.first
+	require type.expect(@thg)
+	
+	
 	|| prms = [name, type, i.msg]
 	require (prms == 3)
 	check !(found & 1) (arg, "Can't come after arrays")
@@ -115,7 +118,10 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 		return 1
 	if name != @rel
 		check !(found & 4) (arg, "Can't come after defaults")
-		arg <~ (macros.MainArgBasic.clean, prms)
+		if MaybeNil
+			arg <~ (macros.MainArgBasic.clean, prms)
+		  else
+			arg <~ (macros.MainArgbasicreq.clean, prms)
 		return 2
 	name = name[@thg]					#require
 	prms[0] = name
@@ -126,25 +132,6 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	return 4
 	
 	
-/*
-	main (|file| f, |string| s, |int| n = 0)
-		-->
-	main
-		|file|   f = file.MainArg(0)		#require
-		|string| s = string.MainArg(1)		#require
-		|int|    n = (int.MainArg(2), 0)(__ArgCount > 2)
-
-
-	main (|file| a, |[file]| b)
-		-->
-	main
-		|file|   a = file.MainArg(0)		#require
-		|[file]| b
-		|| __ArgCurr = 1
-		while __ArgCurr < __ArgCount
-			b <~ file.MainArg(__ArgCurr)
-*/
-
 
 function message.CollectUsage (|string|)
 	|| fs = FastString()
