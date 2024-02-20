@@ -81,9 +81,7 @@ struct ASMFuncState // why not just be a subclass of memory?
 	function µ (|message| exp,  |AsmReg| reg = 0.reg, |AsmReg|)
 		opt norefcounts
 		cpp_part Reg
-		|| fn = exp.ASMFunc
-			return (fn)(self, exp, reg)
-		debugger
+		return (exp.ASMFunc)(self, exp, reg)
 
 
 	function µ2 (|message| exp, |AsmReg|)
@@ -182,7 +180,10 @@ struct ASMFuncState // why not just be a subclass of memory?
 function message.ASMFunc (|fn_asm|)
 	|| ASM = .tmptype
 	asm := .func|int|
-	return fn_asm_table[asm]
+	rz = fn_asm_table[asm]!
+	target debug
+		if !rz?
+			return rz!
 
 
 function ASMFuncState.TotalInit

@@ -70,11 +70,7 @@ class NilTest
 	function Read (|string| path, |bool|)
 		.v2 = path.ReadFile
 		return .v > .v2.Length
-	
-	function NilBorker
-		borks
-		self = nil // but was self nil?
-		
+			
 	// a getter
 	function Get (|string|)
 		return .v2[3, 10+(.v mod 10)]
@@ -202,10 +198,12 @@ class NilTest
 		|string|	x3				// defaults
 		|niltest?|	n0 
 		|niltest|	n1
-	
+
+
+
 
 module NilTest2
-	function Hello
+	function HelloTest
 		NilTest.n0
 		|| x = NilTest.n0
 			x.Reader
@@ -215,18 +213,12 @@ module NilTest2
 		if (0.5[])
 			s = nil
 		|| b = s != nil
-//		if s
-//			"hello"
-	
-	function WhileTest (|object|)
-		opt norefcounts
-		|| r = ringtree()
-		while r
-			|| r2 = r.next
-			if (r2 isa message)
-				if r2.position
-					return r2
-			r = r2
+		if s
+			"hello"
+
+	function fpTest (|fpMsgRender?| f)
+		|| fs = faststring()
+		(f)(message(), fs)
 
 
 function scfunction.NilPrint (|string| header="", |bool| nilch)

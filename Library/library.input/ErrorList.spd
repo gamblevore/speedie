@@ -17,7 +17,7 @@ class ErrorReceiver
 	contains ErrorReceiver
 
 	|Error|					Errors
-	|fnErrorLogger| 		_LogFunc
+	|fnErrorLogger?| 		_LogFunc
 	|object?| 				_LogObj
 	|int|					MaxErrors
 	|int|					MaxProblems
@@ -90,7 +90,8 @@ class ErrorReceiver
 		ifn Value contains "/"
 			value = file.Logs[value]!
 		|| f = value.file
-		printline "Errors Store: " + f
+		print "Errors Stored at: "
+		printline f
 		._LogObj = f
 		._LogFunc = LogFileWriter
 	

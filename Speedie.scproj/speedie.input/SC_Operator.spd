@@ -20,7 +20,7 @@ linkage
 |string|	CompOp
 |string|	CompParam
 |string|	FuncName
-|fn_OpASM|	ASM
+|fn_OpASM?|	ASM
 |bool|		IsCaseAware
 |bool|		IsCompare
 |bool|		IsEquals
@@ -38,7 +38,7 @@ constants
 	AND = 3
 	OR = 2
 	
-constructor (|fn_opasm| ASM)
+constructor (|fn_opasm?| ASM)
 	.asm = asm
 
 function CaseAwareStr (|String|)
@@ -204,7 +204,7 @@ module {
 		dict[ s ] = opp
 
 
-	function AddBit (|string| s, |String| FuncName, |fn_opasm| ASM)
+	function AddBit (|string| s, |String| FuncName, |fn_opasm?| ASM)
 		|| opp = SCOperator.new(asm)
 		opp.InitBit( s, "Operator" + FuncName )
 		dict[ s ] = opp

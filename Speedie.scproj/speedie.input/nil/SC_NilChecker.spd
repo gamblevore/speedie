@@ -52,12 +52,12 @@ function Ignore (NilTrackerFn)
 
 		
 function StatementJump (NilTrackerFn)
-	return (NilTmps[msg.TmpType])(msg)
+	return (NilTmps[msg.TmpType]!)(msg)
 
 
 function Jump (NilTrackerFn)
 	pragma inline
-	return (NilSyxes[msg.func])(msg, test)
+	return (NilSyxes[msg.func]!)(msg, test)
 
 					
 function UseChildAsReal (|message| msg, |nilreason| reason=nilreason.accessing, |NilState|) 	// a.b, *a, a[0], (a)()
@@ -117,7 +117,7 @@ function Function (NilTrackerFn)
 	|| prms = fp.next!
 	if msg.tmptype == ASMtmp.kTern
 		return tern(prms, test)
-	
+		
 	|| fn = prms.obj|SCFunction|
 	if !fn
 		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)

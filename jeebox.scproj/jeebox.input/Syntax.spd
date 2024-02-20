@@ -150,7 +150,7 @@ class SyntaxObj
 		.RenderAddr = msg
 		.Name		= Name
 		.ID			= ID|syntax|
-		.ExportAddr = Message.Dummy
+		.ExportAddr = Message.Dummy!
 	
 	
 	render 

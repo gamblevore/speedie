@@ -50,7 +50,7 @@ extend_module SCFunction
 
 
 function IR.Encode (|ASM|)
-	return (ASM.encoders[.op])(self)		
+	return (ASM.encoders[.op]!)(self)		
 
 	
 function @asm.Enc1

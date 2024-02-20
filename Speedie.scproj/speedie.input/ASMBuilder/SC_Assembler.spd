@@ -105,7 +105,7 @@ module TreeAssembler
 
 
 	function scfunction.Flatten
-		|| fp = fn_asm_table[@arg]
+		|| fp = fn_asm_table[@arg]!
 		(fp)(TreeAssembler.StdState, .SourceArg)
 
 
