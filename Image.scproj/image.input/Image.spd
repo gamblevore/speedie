@@ -145,10 +145,14 @@ class Image (memory)
 	
 	function ResizeTo (|ivec2| value, |bool|)
 		|| N = value.area
-		// !.deathaction means our memory is externally managed
-		// (not via malloc) so we assume its already been resized.
-		if (.size.area == N)  or  !.deathaction  or .setcap(N)
-			.capacity = n // setcp might not be called if !.deathaction
+		if .capacity == n // same already
+			.length = n
+			.sizeinfo = value
+			return true
+		
+		// !.deathaction means our memory is externally managed, so we assume its already been resized.
+		if !.deathaction  or .setcap(N)
+			.capacity = n // setcap might not be called if !.deathaction
 			.length = n
 			.SizeInfo = value
 			return true
@@ -347,12 +351,18 @@ class Image (memory)
 			curr = (xstart, curr.y+1)
 
 	
+	function TestCanWrite
+		|| a = .ptr|&byte|
+		for i in .bytecapacity
+			a[i] = 0
+	
+	
 	module
 		function New (|ivec2| wh, |string| name="", |image?|)
 			cpp_part NewWithSize
-			|| alloc = byte.ZAlloc(wh.area*4 min 4)
+			|| alloc = memory._Alloc(wh.area*4 max 4)
 				return image(wh, alloc, name)
-				
+		
 		function New (|string| name="", |image!|)
 			cpp_part NewWithName
 			|| alloc = byte.ZAlloc(4)!

@@ -6,32 +6,24 @@
 
 
 * Do nil checker!
-	* MainArgBasic fucked with basodpias;kldjalskjdnasm,dnas booASLKDalksdalksdjm 
+	* MainArgBasic fucked with basodpias;kldjalskjdnasm,dnas booASLKDalksdalksdjm
 	* display obj.haha.property instead of JB_haha(obj).Property
 
 	* picomsg is now crashing or failing on constructor
 		* speedie stops compiling sometimes, from perry
 		* pico needs a massive bloat bastard constructor/destructor test!!! like 8 threads bastardly creating/destroying picos!
+		* logging huge files super slow (parsing/recolorising each line?)
 
 	* name should be "safe" (needs a "getter" func that works like a setter)
 
-	* upgrade optional returns to real? (if possible)
-		* started optional returns must return both values!!
-
 	* function pointers not being tested!
-	* also... what about global struct pointers? pointers are assumed not nil... but if its not initialised it will be nil?
-		* compiler should know this
+	* global struct pointers not assumed nil rn?
 
-	* why is "if !(NewType?)" necessary??? "|| ListName = list!" too
 	* selector constructor shouldn't need "?"
 	*	con.counterpart|array| <~ result // should be rejected!
-	* function SafeEdge (|imagepixel|) should be a nil-tester!
 	* helper message.LastAfter (|int|ignoreafter, |ind|) shouldn't need nil self
-	* helper message.FindTightest (|int| pos, |bool| named=false, |message|) failing
-		if (r < size) or ((rz!=nil) and (pos == rz.position and pos == ch.after)) // smallest
 
 	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!
-* speedie not listing all the constructors on Error()
 
 
 
@@ -61,6 +53,12 @@
 
 
 						 Speedie Do later
+
+* speedie not listing all the constructors on Error()
+* params should be assumed real!
+	* upgrade optional returns to real? (if possible)
+	* started optional returns must return both values!!
+
 
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
 	* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.

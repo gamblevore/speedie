@@ -248,6 +248,6 @@ struct ArchonPurger
 					.ExterminateZergBugs(f)
 					Failed += rec.ReturnErrors(old) > 0
 			
-			if Failed // in case theres too many to list all
-				StdErr.errors.first = Error(nil, "function".pluralize(Failed) + " failed nil-checking" )
+			//if Failed // in case theres too many to list all
+			//	StdErr.errors.first = Error(nil, "function".pluralize(Failed) + " failed nil-checking" )
 			SCFunction.currfunc = nil

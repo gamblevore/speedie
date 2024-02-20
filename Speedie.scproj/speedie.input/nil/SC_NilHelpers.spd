@@ -6,7 +6,7 @@ function Redundant (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 	if (Test is soft or while) // allow redundant
 		return Test & nilstate.either
 
-	if dcl.NilAllocDepth >= ArchonPurger.loops.NestDepth
+	if ArchonPurger.loops.NestDepth == 0
 		|| str = .render + " redundantly tested. Currently is: " + dcl.nilcurr.rawname 
 		error (self, str)
 	return Test & nilstate.either

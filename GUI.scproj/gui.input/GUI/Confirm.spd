@@ -18,7 +18,7 @@ extend_module app
 	function BeepSub
 		cpp_Wrapper JB_App__Beep
 	
-	function Beep (|string| q="")
+	function Beep (|string?| q="")
 		if beep.OK.fired
 			.beepsub
 			beep.OK = date() + (1s/12)

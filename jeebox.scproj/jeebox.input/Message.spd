@@ -523,6 +523,10 @@ class Message (RingTree)
 	
 	syx SCom (Syntactic_Comment)
 		|| ch = .first
+		if !ch
+			fs <~ " /# "
+			return 
+		
 
 		fs <~ ch.next
 		fs <~ " /# "
@@ -983,7 +987,7 @@ class Message (RingTree)
 		return .name.Compare(other, Aware)
 
 
-	syntax equals (|string| name, |bool|Aware, |bool|)
+	syntax equals (|string?| name, |bool|Aware, |bool|)
 		return self and .name.SyntaxEquals( name, aware )
 
 

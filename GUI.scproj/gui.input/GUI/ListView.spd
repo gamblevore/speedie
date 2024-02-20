@@ -905,6 +905,7 @@ class ListView (GUIControl) {
 	function Selected (|ListViewRow|)
 		disabled "Do you mean .FirstSelected or .LastSelected?"
 	
+	
 	function FirstSelected (|ListViewRow|)
 		opt NoRefCounts
 		|| l = .start 		
@@ -912,7 +913,7 @@ class ListView (GUIControl) {
 			if l is selected
 				return l
 			l = .HierNext(l)
-		return .onealways
+		return .OneAlways
 
 
 	function OneAlways (|ListViewRow|)

@@ -35,14 +35,14 @@ helper __junktest_2__
 		|| i2 = 0
 		i2 = .dist(r2)
 
-/*
+
 helper message.__junktest_18__ (|bool| named=false) // findpos, findat
 	opt norefcounts
 	|message| rz 
 	for ch in self
 		if ((rz!=nil) and !rz.position) // smallest
 			rz = ch
-*/
+
 
 
 helper __junktest_19__

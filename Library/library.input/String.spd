@@ -129,11 +129,11 @@ class String
 			return 5
 
 
-	function Map (|bytemap|b, |int|clear=-1, |string|)
+	function Map (|bytemap| b, |int| clear = -1, |string|)
 		cpp_wrapper JB_Str_MapBytes
 
 
-	function Compare (|string| other, |bool| Insensitive, |int|)
+	function Compare (|string?| other, |bool| Insensitive, |int|)
 		nil checker
 		cpp_wrapper JB_Str_Compare
 
@@ -513,7 +513,7 @@ class String
 		cpp_part CompareInt
 		return .length - other
 	
-	syntax Equals (|string| Other, |bool|Aware, |bool|)
+	syntax Equals (|string?| Other, |bool|Aware, |bool|)
 		cpp_wrapper JB_Str_Equals
 	
 	syntax Equals (|int| Other, |bool|Aware, |bool|)

@@ -196,24 +196,37 @@ class NilTest
 
 	module
 		// assume can't be nil
-		|byte| NilTestByte
-		|niltest|  x1 = niltest()
-		|niltest|  x2 = x1.exists7
-		|string|   x3				// defaults
-		|niltest?| n0 
-		|niltest|  n1
+		|byte|		NilTestByte
+		|niltest|	x1 = niltest()
+		|niltest|	x2 = x1.exists7
+		|string|	x3				// defaults
+		|niltest?|	n0 
+		|niltest|	n1
 	
-
-
-// the problem is init order... depends who gets to read it first...
-// can I solve this with initafter?
-// I COULD try to auto-solve it. Not sure, though.
 
 module NilTest2
 	function Hello
 		NilTest.n0
 		|| x = NilTest.n0
 			x.Reader
+
+	function CompareTest
+		|| s = message()
+		if (0.5[])
+			s = nil
+		|| b = s != nil
+//		if s
+//			"hello"
+	
+	function WhileTest (|object|)
+		opt norefcounts
+		|| r = ringtree()
+		while r
+			|| r2 = r.next
+			if (r2 isa message)
+				if r2.position
+					return r2
+			r = r2
 
 
 function scfunction.NilPrint (|string| header="", |bool| nilch)
@@ -272,7 +285,6 @@ function NilState.NilName (|faststring| fs, |bool| Expected)
 	fs <~ .Rawname
 
 
-target debugnil {
 function @ArchonPurger.ndb4
 	cpp_name ndb4
 	visible
@@ -289,7 +301,6 @@ function NilRecord.ndb5
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"
-	if scfunction.currfunc ~= "abcd"
-}
+//	if scfunction.currfunc ~= "__junktest_18__"
 
 }

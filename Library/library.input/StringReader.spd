@@ -48,6 +48,7 @@ class StringReader
 		disabled "Do you mean self != nil, or self.HasAny"
 		
 	function HasAny (|bool|)
+		nil checker
 		require (self != nil)
 		if .data.hasany
 			return true

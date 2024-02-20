@@ -710,18 +710,11 @@ module SDLApp
 		|| stride = 0
 		|| bytes = &(.DrawSpace._ptr)
 		t.lockThatZerosEventhoughItShouldnt(nil, bytes|&_voidptr|, &stride)
+		
 
 	
 	function EndFrame (|&SDL_Texture| T)
 		.Drawcount++
-//		target release
-//			|| stride = 0
-//			|| Img = &.DrawSpace._ptr
-//			if .ResizedCounter
-//				t.UnlockThatCopiesEvenThoughItShouldnt // force refresh of confused window
-//				t.LockThatZerosEventhoughItShouldnt(nil, img|&_voidptr|, &Stride)
-//		using SDL_UpdateTexture would be better. Lock/unlock actually copies data, so we aren't saving anything anyhow.
-
 		t.UnlockThatCopiesEvenThoughItShouldnt // seems like we are double doing this?
 		|SDL_Rect| dstrect
 		SDL_GL_GetDrawableSize( .screenwindow,  &dstrect.w,  &dstrect.h )

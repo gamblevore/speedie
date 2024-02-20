@@ -640,7 +640,7 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 function DeclsProtoType (|Message| ch0, |SCClass| fpType=nil, |bool| late=false)
 	opt norefcounts
 	|| IsClass = fpType != nil
-	if !IsClass
+	if !fpType
 		fpType = Compiler[ ch0.name, .Source ]$
 	.DeclsProtoTypeRemove(fpType, ch0, IsClass, late)
 	if !late

@@ -54,12 +54,12 @@ struct JeeboxEffects
 			img.RectBasic(t, col[i])
 		
 	
-	function image.Blur (|float| sigma, |image| tmp=nil)
-		require sigma > 0
-			
-		if !tmp
-			tmp = .NeedTemp$
-		require Tmp.resizeto(.size.yx)
+	function image.blur (|float| sigma)
+		|| tmp = .NeedTemp
+			.blur(sigma, tmp)
+	
+	helper image.Blur (|float| sigma, |image| tmp)
+		require (sigma > 0) and Tmp.resizeto(.size.yx)
 
 		|ImageBlurrer| blur
 		blur.Create(sigma)
@@ -76,6 +76,7 @@ struct JeeboxEffects
 		|| wd     = rd.Width
 		|| Start  = rd.Pixels + row*wd
 		|| wrp    = wr.pixels + row
+		|| wrMax  = wr.pixels + wr.size.area
 		|| wrend  = 1 + wrp + (wd-1) * stride
 		|| v0 = .Weights[0]
 		|| x0 = .Extent
@@ -93,6 +94,9 @@ struct JeeboxEffects
 				total += (r1 + r2) * w
 				
 			total = (total + 32K) >> 16
+//			if wrp >= wrMax
+//				debugger
+//				exit
 			wrp.raw = total, wrp += stride
 
 
