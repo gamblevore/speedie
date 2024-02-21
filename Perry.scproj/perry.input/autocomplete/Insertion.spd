@@ -407,4 +407,5 @@ function string.isSource (|bool|)
 
 
 function guicontrol.IDE (|perryide!|)
+	opt norefcounts
 	return (.window as perryide)!

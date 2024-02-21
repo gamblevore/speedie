@@ -58,7 +58,7 @@ function ParserRestore
 function EnterAutoComplete (|bool|)
 	|| perry = spdprocess.parent
 	require stderr.ok and perry.isopen
-	"AutoCompleteMode" // don't delete this... too annoying to miss
+	"RespondingToCommands" // don't delete this... too annoying to miss
 	app.ClearCaches
 	if options.PrintLibraries
 		perry.pico.config.noise = -1

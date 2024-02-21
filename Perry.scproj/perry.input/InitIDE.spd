@@ -4,8 +4,6 @@ extend PerryIDE
     constructor (|file| project)
 		|| i = 0
 		super.constructor 
-		
-		sdlapp.AppDocumentOpen = PerryOpenDoc // move to a different startup place
 		.Project			= project
 		.InConstructor		= true
 		.CanAskingAboutMissing = true

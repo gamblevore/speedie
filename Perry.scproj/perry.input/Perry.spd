@@ -9,7 +9,6 @@ module Perry
     |ListViewRow|					Projects
     |string|						_SpeedieDir
     |bool|							Checked	
-    |bool| 							LoadOnlyTerminalSpecified
     |byte| 							FindID
 	|Dictionary of String|			PathDict
 	
@@ -29,13 +28,14 @@ module Perry
 			"/usr/local/speedie didn't resolve?"
 		return ._SpeedieDir
 		
-	function LoadWindowsFromArgs
+	function LoadWindowsFromArgs (|bool|)
+		require app.args > 0
 		|| OldProj = .projects
 		.Projects = Message()
-		.LoadOnlyTerminalSpecified = true
 		for arg in app.args // load specified documents
 			|| ide = .LoadAppArg(arg)
 				ide.tabs.items = .projects
+				rz = true
 
 	
 	function LoadAppArg (|string| arg, |perryide|)
@@ -86,6 +86,7 @@ module Perry
 
 	function Startup (GUIApplicationInit)
 		target lin: sdlapp.removeborder // doesnt seem to work in Windows WSL?
+		sdlapp.AppDocumentOpen = &perryide.PerryOpenDoc
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
 		¥.LoadDefaults
@@ -100,10 +101,7 @@ module Perry
 		if pipe.StdOutIsTerminal
 			app.AllowInteruptCrash = true // fails with 0 params... sigh whatever
 
-		if app.args > 0
-			.LoadWindowsFromArgs
-
-		if !.LoadOnlyTerminalSpecified and !.LoadWindowsSub()
+		if !.LoadWindowsFromArgs and !.LoadWindowsSub()
 			startupwindow.show
 			return 0
 		|| oof = (.FindProj(old),  .Projects.First)(old)

@@ -709,10 +709,9 @@ class PerryIDE (Window)
 	
 		function PerryOpenDoc (GUIPasteEvent)
 			|| i = .ide
-			if !i?
+			if i?
 				require data.fileexists
 			  else
-				debugger // what?
 				i = perry.ProjContaining(data)
 				i := IdeAddProj(data, nil)
 			return i.OpenDoc(after, data, purpose)
