@@ -240,8 +240,6 @@ function SwitchedToErrors
 
 function NoNeed (|string| s = "", |buttonview| old = nil)
 	|| n = .noneeder
-	if n.text and !s
-		""
 	n.text = s
 	|bool| Vis = s
 	(n is visible) = vis 
