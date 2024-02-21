@@ -141,7 +141,7 @@ class ButtonView (GUIControl)
 		
 	helper DoPressing (|listviewrow| D, |bool|)
 		.ClearMouse
-		return (.Pressing)(self, 0, D)
+		return (.Pressing!)(self, 0, D)
 
 	
 	behaviour MouseDown

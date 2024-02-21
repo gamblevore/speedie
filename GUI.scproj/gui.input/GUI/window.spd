@@ -238,8 +238,8 @@ class Window (GUIControl)
 		.__drawbackground__(where)
 		.DrawContents(where)
 		.__draw__(where)
-		if .GNormal.Drawer
-			(.GNormal.Drawer)(where, .LastRect, .GNormal, true)
+		|| gd = .GNormal.Drawer
+			(gd)(where, .LastRect, .GNormal, true)
 
 
 	behaviour Draw

@@ -11,7 +11,7 @@ class FileViewer (ListView)
     |filerow?| 						Extra
     |filerow?| 						SearchWithin
     |[string]|						SizeCheckers
-    |GUIListEvent|					OnSearchWithin
+    |GUIListEvent?|					OnSearchWithin
     
 	constructor (|window| p, |GUIListEvent| sel, |GUIListEvent| ret, |textview| editme)
 		super.constructor(p, sel, ret)
@@ -708,4 +708,4 @@ function FileViewerSearchWithin (GuiMenuEvent)
 	
 
 prototype SorterComparerFileRow (|filerow| a, |filerow| b, |bool|)
-prototype SorterComparerError (|error| a, |error| b, |bool|)
+prototype SorterComparerError   (|error| a, |error| b, |bool|)

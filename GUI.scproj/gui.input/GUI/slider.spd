@@ -3,7 +3,7 @@
 class Slider (GuiControl)
 	linkage
 		cpp_part Sl
-	|guiaction|			OnSlide 
+	|guiaction?|		OnSlide 
 	|int|				LastDrawPos
 	|int|				LastMouseY
 	|byte|				YShrink
@@ -44,8 +44,7 @@ class Slider (GuiControl)
 		.InitialValue = false
 		if diff
 			sdlapp.touch(Self)
-		if (.onslide)
-			(.onslide)(self)
+		(.onslide)(self)?
 	
 		
 	function Init
@@ -54,8 +53,8 @@ class Slider (GuiControl)
 	
 	behaviour MouseUp
 		.lastmousey = -int.max
-		if (.onclicked)
-			(.onclicked)(self)
+		|| c = .OnClicked
+			(c)(self)
 
 	function Down
 		.setvalue(.value - .valuestep)

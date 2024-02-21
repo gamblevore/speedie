@@ -69,9 +69,9 @@ role StretchControl (GuiControl)
 
 class StretchDivider (GuiControl)
 	linkage:cpp_part Div
-	|guiAction|					OnHide 
-	|guiAction|					OnShow
-	|guiAction|					OnStretch
+	|guiAction?|				OnHide 
+	|guiAction?|				OnShow
+	|guiAction?|				OnStretch
 	|int|						Min
 	|int|						Max
 	|controlpoint|				Start

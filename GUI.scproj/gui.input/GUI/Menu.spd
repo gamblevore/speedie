@@ -53,7 +53,7 @@ class Menu (ListView)
 			return
 		if (L isa menuitem)
 			if (L.MenuEvent)
-				(L.MenuEvent)(.parent,  l,  e.cell)
+				(L.MenuEvent!)(.parent,  l,  e.cell)
 				return
 		(.onreturn)(self, L)?
 			
@@ -157,9 +157,9 @@ class Menu (ListView)
 
 
 class MenuItem (ListViewrow)
-	|GUIMenuEvent|		MenuEvent
+	|GUIMenuEvent?|		MenuEvent
 	
-	constructor (|string| name, |GUIMenuEvent| ev, |object| obj=nil)
+	constructor (|string| name, |GUIMenuEvent?| ev, |object| obj=nil)
 		.name = name
 		.MenuEvent = ev
 		.obj = obj

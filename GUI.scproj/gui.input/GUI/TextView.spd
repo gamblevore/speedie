@@ -30,14 +30,28 @@ class TextView (GUIControl)
 	|ivec3|						_Reclaim		
 	|IntRange|					_TypingPlace
 	|IntRange|					UncorrectedSel
-	|GUIKeyEvent|				OnKeyDown
-	|GUITextEvent|				OnTextChanged
-	|GUITextEvent|				OnSelChanged
-	|GUITextErrorSelected|		OnSelError
+	|GUIKeyEvent?|				OnKeyDown
+	|GUITextEvent?|				OnTextChanged
+	|GUITextEvent?|				OnSelChanged
+	|GUITextErrorSelected?|		OnSelError
 //	|GUITextValidate|			OnValidate
-	|GUITextShowEvent|			OnShowExtraInfo
+	|GUITextShowEvent?|			OnShowExtraInfo
 	|dictionary?|				ColoriseAsRoot // a callback would be better
 	|Document?|					_Viewing
+
+	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
+		super.Constructor(p)
+		._reclaim = (0, 1GB, 0)
+		.Lines = TextViewLine(nil)
+		._Start = TextViewLine(nil) // make nilchecker happy
+		.TakesFocus = TakesFocusFlag.On
+		.OnClicked	= Clicked
+		.OnKeyDown	= keys
+		.LineHeight = font.Height + 4 // whatever
+		.SetsDebugLines = 10
+		.ExpectsParse = TextView.allowjeebox
+		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
+		.init
 
 	function Document (|document|)
 		return ._Viewing
@@ -65,20 +79,6 @@ class TextView (GUIControl)
 	destructor
 		.document = nil		
 	
-	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
-		super.Constructor(p)
-		._reclaim = (0, 1GB, 0)
-		.Lines = TextViewLine(nil)
-		._Start = TextViewLine(nil) // make nilchecker happy
-		.TakesFocus = TakesFocusFlag.On
-		.OnClicked	= Clicked
-		.OnKeyDown	= keys
-		.LineHeight = font.Height + 4 // whatever
-		.SetsDebugLines = 10
-		.ExpectsParse = TextView.allowjeebox
-		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
-		.init
-	
 	
 	behaviour MouseDown
 		.clickedpos = p.x // for selectin text
@@ -91,8 +91,9 @@ class TextView (GUIControl)
 			if clicks >= 1
 				.ClicksDown = clicks
 			.EditClick(p, clicks, false)
-		if (.onclicked) and clicks >= 0				// -1 = drag
-			(.onclicked)(self, clicks)
+		|| onc = .onclicked
+		if (onc) and clicks >= 0				// -1 = drag
+			(onc)(self, clicks)
 		if self is editable or AlwaysScrollable
 			return MouseDragging.Within // used to be 4, now 2?
 		return MouseDragging.handled
@@ -564,8 +565,9 @@ class TextView (GUIControl)
 				return true
 		if .KeyDownTest(key) // to be called by other funcs
 			return true
-		if (self isnt editable) and (key.isaccept or key.IsCmm) and (.onclicked)
-			(.onclicked)(self)
+		|| oncl = .onclicked
+		if oncl and (self isnt editable) and (key.isaccept or key.IsCmm)
+			(oncl)(self)
 			return true			
 		if (key is RGUI or LGUI) and sdlapp.CursorVisible
 			.ShowExtraInfo(.mousexy)
@@ -1568,11 +1570,11 @@ class TextView (GUIControl)
 	
 	helper ShowExtraInfoAtPos (|int| B, |string| reason)
 		opt NoRefCounts
-		require .OnShowExtraInfo
+		|| fp = .OnShowExtraInfo$
 		|| xy = (0,0)
 		|| M = .ClickedMsg(B)
 			xy = .XYOfChar(M.position)
-		(.OnShowExtraInfo)(self, XY, M, reason)
+		(fp)(self, XY, M, reason)
 
 
 	helper StartLine (|TextViewLine|)

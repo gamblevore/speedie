@@ -92,11 +92,12 @@ class ListView (GUIControl) {
 
 	function TryRenameCellSub (|listviewcell!| cell, |string| value, |bool|)
 		opt norefcounts
-		if !.TryEditCell
+		|| tec = .TryEditCell
+		if !tec
 			|| orig = cell.row
 			orig.__textset__(cell.column, value)
 			return true
-		return (.TryEditCell)(self, cell, value)
+		return (tec)(self, cell, value)
 
 
 	function ViewableRowCount (|int|)
@@ -222,13 +223,14 @@ class ListView (GUIControl) {
 		|| sels = .FirstSelected$
 		.showfast(sels)
 		|| y = .DrawYRow(sels)
-		if .onrightclick and (.onrightclick)(self, sels)
+		|| fp = .onrightclick
+		if fp and (fp)(self, sels)
 			.openmenu(sels, y - .absbottom, sels)
 		
 	
 	function DoReturn (|bool|)
-		require .onreturn
-		(.onreturn)(self, .FirstSelected)
+		|| r = .OnReturn$
+		(r)(self, .FirstSelected)
 		return true
 		
 	
@@ -352,8 +354,8 @@ class ListView (GUIControl) {
 
 	helper UpdateFilter (|bool|)
 		opt norefcounts
-		require .OnTypingFilter
-		(.OnTypingFilter)(self, nil, .typingfilter.text?)
+		|| t = .OnTypingFilter$
+		(t)(self, nil, .typingfilter.text?)
 		.touch
 		if .TypingFilter
 			if self isa menu
@@ -656,11 +658,11 @@ class ListView (GUIControl) {
 		.ClearInternalDrops
 
 		if f and t
-			debug_require .OnDragRow
+			|| dr = .OnDragRow 	#debug_require
 			if t == .listsource
-				(.OnDragRow)(self, nil, t) 
+				(dr)(self, nil, t) 
 			  else
-				(.OnDragRow)(self, t, nil) 
+				(dr)(self, t, nil) 
 			
 		  elseif !sl
 			|| LC = .FindClickedCell(P)

@@ -1,5 +1,5 @@
 
-target debugnil {
+target !debugnil {
 
 class NilTest
 	|int|		V
@@ -205,15 +205,16 @@ module NilTest2
 
 	function fpTest (|fpMsgRender?| f)
 		|| fs = faststring()
-		(f)(message(), fs)
+		if f
+			(f)(message(), fs)
 
 	function fpTest2
 		|fpMsgRender| x
-		(x)(nil, nil)
+		if x?
+			(x)(nil, nil)
+		(StartSound).Test
 
 	function StartSound (fpMsgRender)
-	function fpTest3 (fpMsgRender)
-		(StartSound).Test
 
 
 
