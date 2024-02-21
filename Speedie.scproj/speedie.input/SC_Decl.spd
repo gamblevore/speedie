@@ -89,7 +89,7 @@ class SCDecl (SCObject) {
 
 	|int|				C_Array
 	
-	|SCFunction--?|		Setter		// todo: replace the .StringData/hider thing with this.
+	|SCFunction--?|		Hider		// todo: replace the .StringData/hider thing with this.
 	|Object?|			IsLookupOnly
 	|string|			StringData	// 3 special objects. Aren't they exclusive? Write some code to see if they are.
 	|SCDecl?|			Internal	// only for pointers :)

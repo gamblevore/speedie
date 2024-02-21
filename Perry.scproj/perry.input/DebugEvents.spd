@@ -120,7 +120,7 @@ function PerryIDE.StartDebugging (|file!| f)
 	for a in ArgMsg
 		if a == @arel
 			expect (a == "?") (a)
-			|| str = a.first.nyme.Ask				#require
+			|| str = a.firstname.Ask				#require
 			a.Becomeempty(@str, str)
 				
 	|| args = argmsg.AllNames

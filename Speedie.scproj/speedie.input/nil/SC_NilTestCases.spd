@@ -1,5 +1,4 @@
 
-target !debugnil {
 
 class NilTest
 	|int|		V
@@ -134,7 +133,7 @@ class NilTest
 			.v
 
 // pointers
-	function BorkedPtr (|&(niltest!)| xp0, |&niltest| xp2, |niltest| xp3)
+	function BorkedPtr (|?&(niltest!)| xp0, |&niltest| xp2, |niltest| xp3)
 		if !xp0
 			borks
 			*xp0 = self
@@ -148,7 +147,6 @@ class NilTest
 		borks
 		if xx
 			xx++
-
 
 	function GoodPtr (|&niltest| xp0, |&niltest| xp2)
 		if xp0
@@ -186,6 +184,26 @@ class NilTest
 		|niltest?|	n0 
 		|niltest|	n1
 
+
+/*
+class NilFile
+	|file|		P
+	|message|	M
+
+	function TestFile
+		|| p2 = .P
+		|| m2 = .M
+		if nil
+		if !p2
+			p2.Addr
+		if .p
+			"sigh"
+		if m2
+			"sigh"
+		borks
+		if !m2
+			m2.func
+*/		
 
 
 
@@ -292,4 +310,4 @@ function NilRecord.ndb5
 			"$Name:  $V"
 //	if scfunction.currfunc ~= "__junktest_18__"
 
-}
+

@@ -37,7 +37,7 @@ module Notifications
 			if n == @str
 				app.alert(n.name)
 			  elseif n == @url and "file"
-				n.first.nyme.Reveal
+				n.firstname.Reveal
 		w.tag = nil
 		w.CreatedDate = date.now
 	

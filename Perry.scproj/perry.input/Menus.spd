@@ -29,7 +29,7 @@ function PerryIDE.EnablePrevNext
 function perryide.FindInHistory (|string| p, |message|)
 	opt norefcounts
 	for s in .RecentFiles
-		if s.first.nyme ~= p
+		if s.firstname ~= p
 			return s
 
 
@@ -61,7 +61,7 @@ function RightClickNext (GUIaction)
 
 function ChosePrevItem (GUIListEvent)
 	|| i = .ide
-	|| old = i.FindInHistory(row.first.nyme)
+	|| old = i.FindInHistory(row.firstname)
 	i.GoToMarker(old ?? row, 1)
 	return true
 
@@ -86,14 +86,14 @@ function PerryIDE.GoToMarker (|message| m, |int| dir)
 	|| l = m.first
 	.duringNextPrev = dir
 	using self
-		.GoToAnyFile(m.first.nyme)
+		.GoToAnyFile(m.firstname)
 	.duringNextPrev = 0
 
 
 function perryide.SortedPrevious (|string| StrFilter = "", |message|)
 	rz = Message()
 	for ch in .RecentFiles
-		if StrFilter.filter(ch.nyme)
+		if StrFilter.filter(ch.name)
 			|| cpy = ch.copy
 			rz <~ cpy
 

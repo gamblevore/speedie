@@ -234,7 +234,7 @@ function LoadSuperClass
 		if (.IsObject) and (self != TypeObject)
 			S = TypeObject
 	  else
-		|| SupName = supc[@Thg].Nyme				#require
+		|| SupName = supc[@Thg].Name				#require
 		S = Compiler[ SupName, supc ]				#require
 		
 		if (.FuncProto)

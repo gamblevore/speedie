@@ -4,17 +4,17 @@
 datatype SCBaseType (byte)
 	constants (
 		|SCBaseType|
-		Module = 0 // not actually a type
-		Nil
+		Module = 0	// not actually a type
+		Nil			// hasptr
 		DataType
-		FuncProto
+		FuncProto	// hasptr
 		Struct
-		Object
+		Object		// hasptr
 	)
 	syntax is (|scbasetype| d, |bool|)
 		return self == d
 	function HasPtrs (|bool|)
-		return self == funcproto or object
+		return self & 1
 
 
 extend scclass

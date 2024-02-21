@@ -525,11 +525,10 @@ extend PerryIDE
 			btn.gnormal.solid = (f, f, f, opacity)
 	
 
-	function LoadProject (|file| proj, |bool|)
-		require proj.mustexist("load project")
-		.project = proj
+	function LoadProject (|bool|)
+		require .project.mustexist("load project")
 		.DuringLoad++
-		.LoadConfSub(proj)
+		.LoadConfSub
 		.DuringLoad--
 		require .StartProj
 
@@ -591,7 +590,7 @@ extend PerryIDE
 		opt norefcounts
 		|| edit = .ProjMsg["edit"]
 			*pos = .ProjMsg["pos"].int
-			|| n = edit.nyme
+			|| n = edit.name
 				return self.filelist[n]
 		|| tod = .nottodo
 			return tod
@@ -618,8 +617,8 @@ extend PerryIDE
 		return .project.child(".perry")!
 	
 	
-	function LoadConfSub (|file| proj)
-		perry.AddProj(proj.path, self)
+	function LoadConfSub
+		perry.AddProj(.project.path, self)
 		|| r = .root
 			.id = r.location
 		.nottodo = nil

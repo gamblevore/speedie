@@ -1,7 +1,7 @@
 
 
 helper message.list_desired (|int| common, |string|)
-	rz = .first.nyme[0, Common]
+	rz = .firstname[0, Common]
 	if self == rz
 		rz = "" // oof
 
@@ -128,11 +128,11 @@ function AutoCompleteInsertText (GuiListEvent)
 	|| i = .ide!
 	|| e = i.editme
 	if row >= 3
-		|| file = row.first.nyme
+		|| file = row.firstname
 		|| num = row.last.int
 		i.DefineSub(file, num|int|)
 	  else
-		e.autocompletestring = row.Nyme
+		e.autocompletestring = row.Name
 		e.insertautocomplete
 
 
@@ -148,7 +148,7 @@ function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
 
 
 function PerryIDE.DefineFB (|message| msg, |bool|)
-	.DefineSub(msg.first.nyme, msg.second.int|int|)
+	.DefineSub(msg.firstname, msg.second.int|int|)
 
 
 function PerryIDE.DisplayFB (|message| display, |bool|)
@@ -238,7 +238,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	.DuringMsgFB = true
 	|| reason = ""
 	if msg ~= "result"
-		reason = msg.first.nyme
+		reason = msg.firstname
 		msg = msg[@nil, 1]$ // in case of garbled result?
 		if msg.name[0, "autocomplete"] and .LastAutoCompleteDate != date.int
 			msg.name = "" // returns
@@ -433,7 +433,7 @@ function message.SimpleComplete (|message| pp, |message| where, |bool|)
 	opt norefcounts
 	if where == "import"
 		|| imp = .msg(@arg, "import")
-		imp <~ where.first.nyme
+		imp <~ where.firstname
 		return true
 	|| cls = pp.OwningModClass // seems adding this info is bad?
 								// especially if we already filled it in?
@@ -484,7 +484,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 		f.first.RemoveAfter
 		f <~ prm
 		return f
-	|| name = f.nyme
+	|| name = f.name_
 	if self ~= "syntax" or "operator"
 		name = .name.lowercase + name
 	if self ~= "behaviour" or "virtual"
@@ -504,7 +504,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 			mod_class = sub
 	
 	rz = @dot.msg(name)
-	|| modname = mod_class[0].nyme
+	|| modname = mod_class[0].name_
 	modname := "main"
 	rz.msg(fn, modname)
 	rz <~ prm

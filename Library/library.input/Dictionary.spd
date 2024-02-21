@@ -166,7 +166,7 @@ extend dictionary
 		self[m.name.idcase] = Value
 	
 	function Expect (|message| m, ||)
-		return self[m.name]		#expect (m, "Unrecognised name: " + m.name)
+		return self[m.name]		#expect (m)
 
 
 

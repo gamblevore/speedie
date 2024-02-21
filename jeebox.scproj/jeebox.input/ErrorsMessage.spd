@@ -63,7 +63,7 @@ function message.AsError (|error|)
 		rz.position		= arg..pos.int|int|
 		rz.path			= arg..file.value
 		rz.severity		= arg..severity.int|errorseverity|
-		rz.name	= arg[@str].nyme
+		rz.name	= arg[@str].name_
 	  else
 		rz.name = .name
 		rz.path = ""

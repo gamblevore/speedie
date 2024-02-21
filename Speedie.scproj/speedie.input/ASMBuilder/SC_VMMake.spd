@@ -176,7 +176,7 @@ function BuildInstructions (TranFunc) // __instructionlist__
 
 	|| after = node
 	for (tmp in .namelist) (pos)
-		|| form = tmp[0][0].nyme
+		|| form = tmp[0][0].name
 			|| fnc = @sdot + "add" 
 			|| list = fnc.msg(@list)
 			list.msg(@str, form.lowercase)
@@ -240,7 +240,7 @@ function VMDecl (|message| tmp, |[message]| msgs)
 	opt norefcounts
 	|| arg = tmp.last
 	|| prms = tmp.first
-	|| name = prms.first.nyme.asmnormalise
+	|| name = prms.firstname.asmnormalise
 	|| form = µform.forms.valuelower(name)			#require
 	|| id = (.highpos++, .normalpos++)(form.varies)
 	asm.Encoders[id] = asm.Forms[form.Index]

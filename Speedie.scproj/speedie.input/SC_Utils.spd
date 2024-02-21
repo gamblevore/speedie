@@ -122,7 +122,7 @@ function scbase.ListFunctions (|[SCFunction]|)
 function ListFunctionsSub (|object!| o, |[SCFunction]| rz)
 	opt norefcounts
 	if o isa SCDecl
-		o = o.Setter|scdecl|
+		o = o.hider|scdecl|
 	if o isa SCFunction
 		for f in o
 			rz <~ f

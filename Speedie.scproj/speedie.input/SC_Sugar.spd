@@ -148,7 +148,7 @@ function message.CollectUsage (|string|)
 			|| tyfn = ty.func
 			if tyfn == @arr
 				ty = ty.first
-			|| type = ty.nyme
+			|| type = ty.name_
 			if type contains "file"
 				type = "file-path" // clean up messy stuff like "filedata"
 			  elseif type ~!= "string"

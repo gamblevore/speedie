@@ -31,8 +31,6 @@ dispatch TemporalStatements (TranFunc)
 	doat					(Tran_DoAt)
 	visible					(Tran_Visible)
 	flow					(Tran_Flow)
-//	nil						(Tran_Nil)
-
 	print					(Tran_Print)
 	printline				(Tran_Print)
 	zalgoline				(Tran_Print)
@@ -98,7 +96,7 @@ function Tran_Expect (TranFunc)
 
 function Tran_Temporal (|SCFunction| fn, |Message| s, |SCBase| name_space)
 	opt norefcounts
-	|| TmpInt = TemporalStatements[s.name]		#expect (s, "Unrecognised statement")
+	|| TmpInt = TemporalStatements[s.name]		#expect (s)
 	(*TmpInt)( FN, s, name_space )
 
 
@@ -751,7 +749,7 @@ function Tran_FuncTable (|Message| msg, |bool|)
 		|| sigh			= item_name // lol... needed
 
 		|| ListOK = (item_name == @prm) and (i == @item) 
-			i.become(@tmp, item_name.first.nyme) // too awkward otherwise
+			i.become(@tmp, item_name.firstname) // too awkward otherwise
 
 		if (i == @tmp)
 			// tmp (asdasdasdas)

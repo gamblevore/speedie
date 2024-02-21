@@ -273,7 +273,7 @@ function Message.CollectFuncTableName (|string|)
 	if .name and self != @dot
 		Return .Name
 
-	Return .First.Nyme 
+	Return .Firstname 
 	
 
 function scdecl.NeedsContainedfix (|bool|)

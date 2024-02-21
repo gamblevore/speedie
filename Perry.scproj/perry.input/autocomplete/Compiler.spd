@@ -48,13 +48,27 @@ extend PerryIDE
 			.NoNeed(.CompileOKString, .viewfiles)
 		return true
 
+	function message.ActualReplaceError (|string| src)
+		|| SubError = src.parse.first
+			.ReplaceWith(suberror)
+	
+	function message.CleanErrors
+		opt norefcounts
+		for e in .Arg
+			|| a = e.arg
+				|| f = a["file"]
+				|| str = a.firstName
+				if (f ~= "(string)") and (str[0, "error\n"])
+					e.ActualReplaceError(str)
+
 
 	function ShowCompileErrors (|message| msg, |bool|)
 		|| MaybeOK = msg.last
 		if (MaybeOK == @thg and "ok")
 			.ErrorList.clear
 			return .CheckedOK(msg.name)
-
+	
+		msg.cleanErrors
 		is Broken
 		.NoNeed
 		|| newlist = error.from(MaybeOK)

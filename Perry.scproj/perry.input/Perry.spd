@@ -27,7 +27,8 @@ module Perry
 		if !._SpeedieDir.resolve
 			"/usr/local/speedie didn't resolve?"
 		return ._SpeedieDir
-		
+	
+	
 	function LoadWindowsFromArgs (|bool|)
 		require app.args > 0
 		|| OldProj = .projects
@@ -36,7 +37,7 @@ module Perry
 			|| ide = .LoadAppArg(arg)
 				ide.tabs.items = .projects
 				rz = true
-
+	
 	
 	function LoadAppArg (|string| arg, |perryide|)
 		|| line = (0, 0)
@@ -46,7 +47,7 @@ module Perry
 		if ide isa PerryIDE
 			ide.editme.ViewLineAndSel(line.x)
 			return ide
-		
+	
 	
 	function Save
 		visible
@@ -65,10 +66,8 @@ module Perry
 		for proj_item in .projects
 			|| proj = proj_item.name.file
 			|| r2 = PerryIDE(proj)
-			r2.Loadproject(proj)
+			r2.Loadproject
 			startupwindow.hide
-//		|| i = PerryIDE(l)
-//		i.ViewAsText
 		
 		return true
 
@@ -78,7 +77,6 @@ module Perry
 		|| extra = platform.isdebug or app.prefs("dev").Yes
 			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
 			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
-			//appmenu <~ ("Birds",			ClickedBirdsMenu)
 		appmenu <~ ("Edit Preferences", ClickedEditPrefs)
 //		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
 		appmenu <~ ("Install",  		ClickedInstallMenu)

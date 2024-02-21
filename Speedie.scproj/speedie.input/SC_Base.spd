@@ -130,14 +130,13 @@ function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
 			if (old.cls == IncObj.cls)
 				old.Last.NextFunc = IncObj
 				Return
-		  elseif incobj isa scdecl and old.isassigns==2	
-			expect (!IncObj.setter) (errplace, "Multiple setters found.")
-			incobj.setter = old
-			.access[ name ] = IncObj
-			return
+		  elseif incobj isa scdecl
+			if old.HidesProperties
+				expect (!IncObj.hider) (errplace, "Multiple property-hiders found.")
+				incobj.hider = old
+				.access[ name ] = IncObj
+				return
 
-	// the problem is that we need to add self... then probably remove it
-	// so lets... just do that? add self and remove it.
 	if name == "self"
 		error ( ErrPlace, "Can't use 'self' here." )
 	  else
@@ -229,7 +228,7 @@ function message.Cpp_Wrapper (|string|)
 	opt norefcounts
 	if self
 		if self == @bra
-			return .first.nyme
+			return .firstname
 		return .name
 
 
@@ -368,17 +367,7 @@ function ProjectFix (|SCBase|)
 	return self
 
 
-function scbase.CodeCls (|Scclass|)
-	opt norefcounts
-	|| s = self
-	while s
-		if s isa scmodule
-			if s.cls
-				return s.cls
-		s = s.parent
-
-
-function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |SCBase| arg_space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
+function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |SCBase| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
 // could be cleaned up so that exp is NEVER nil... "AddMain", "InitRootDecl", lookupvar etc would need altering...
 	
@@ -389,6 +378,9 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 	|| CanFunction	= (ParamsHere) and  (!ParamsArray.IsAddress)
 	|SCFunction| Missing
 	|SCFunction| f
+	|scclass| owning_cls
+	if scfunction.currfunc
+		owning_cls = scfunction.currfunc!.cls
 
 	for (b.ListLookup in Curr)
 		|| o = b[ name ]
@@ -398,54 +390,38 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 			exit								// Stop SCFunction.Byte looking up Main.Byte...
 		
 		if o isa SCDecl
-			#!/struct question/
-			// what if this is a struct?
-			// we should be more specific? or just assume we mean the struct's actual address?
-			
-			ifn paramsarray.isassigns and (o.setter) and (arg_space.CodeCls != curr)
-				|| dcl = o
-				ifn dcl.Type
-					return (dcl, nil)(dcl.isnil)
-
-				if dcl.Type.FuncProto
+			if o.hider.matches(paramsarray.isassigns) and (owning_cls != curr)
+				if !paramsarray.isassigns
+				o = o.hider|scdecl|
+			  else
+				if o.Type.FuncProto
 					expect ((ParamsArray.IsDot or !ParamsHere) and (!ParamsArray))  ( exp, "Wrap this in a bracket, before calling it as a function." )
 					Return o
 
-				if (!side and paramsarray.isdot and dcl.type.processas)
-					return dcl.ProcessAs(exp)
-			  else
-				o = o.setter|scdecl|
+				if (!side and paramsarray.isdot and o.type.processas)
+					return o.ProcessAs(exp)
 
 		
 		if paramshere and !paramsarray.isdot and (o isa scmodule)
-			while
-				|| o2 = o["new"]					// OK... but what if o isa module?
-					o = o2|scmodule|				// hack
-					exit
-				|| cls = o.cls
-				if cls and cls.isrole
-					o = o.supermod
-					if !o: exit
-				  else
-					exit
+			o = o.GetTheNewer|scmodule|
 		
 		
 		if CanFunction and (o isa SCFunction)
 			f = o								// store for later return? not needed?
 			o = f.ArgsMatch( contains, arg_space, ParamsArray )
-			if o
-				if o.ismacro
-					if o.MacroGet(paramsarray, missing)
-						Missing = o
-					o = nil
-				  else
-					if o.isdisabled
-						error (exp,     o.description)
-						error (o.source, "Disabled here.")
-	
-					if ParamsHere
-						ParamsHere.obj = o // multiple return :3
-					Return o
+			if !o
+				0
+			  elseif o.ismacro
+				if o.MacroGet(paramsarray, missing)
+					Missing = o
+				o = nil
+			  else
+				if o.isdisabled
+					error (exp,     o.description)
+					error (o.source, "Disabled here.")
+
+				ParamsHere.obj ?= o // multiple return :3
+				Return o
 		
 		if o
 			paramsarray.found = true
@@ -773,7 +749,7 @@ function FindVis (|Message| c, |bool|)
 	if c == @adj
 		|| first = c[@thg]
 		first.expect(@thg, "class")
-		|| name  = c[@thg, 1].nyme
+		|| name  = c[@thg, 1].name
 		|| cls   = compiler.FindClass(name)
 		return cls and !cls.banned
 	error c
@@ -886,7 +862,7 @@ dispatch RootCollectTable (CollectFunc)
 	macro				SCFunction.NewMissingFunc
 	insertion			SCThe.NewInsertion
 	conf				compiler.WrongConf
-	crash				{app.crash(node.first.nyme)}
+	crash				{app.crash(node.firstname)}
 	module				SCModule.NeuModule
 	static				{error (node, "static is called 'module' in speedie.")}
 	selector			SCSelector.neu
@@ -923,7 +899,8 @@ dispatch ClsCollectTable (CollectFunc)
 	render				SCFunction.NewRender			// ??
 	function			SCFunction.NewFunc
 	extend_function		SCFunction.NewFunc // user shouldn't write these
-	setter				SCFunction.NewSetter
+	setter				SCFunction.NewHider
+	getter				SCFunction.NewHider
 	api					SCFunction.NewFunc
 	macro				SCFunction.NewMissingFunc
 	helper				SCFunction.NewHelper
@@ -939,7 +916,7 @@ dispatch ClsCollectTable (CollectFunc)
 	processas			SCClass.ProcessAs
 	cpp_refs			cpprefs.ReadIntoCppRefs
 	linkage				CppRefs.Linkage
-	pragma				{ error (node,  "Unrecognised pragma." ) }
+	pragma				{ error (node) }
 
 	initafter			(SCModule.DoInitAfter)
 	ignore				(DontRemove)

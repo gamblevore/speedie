@@ -24,7 +24,7 @@ class SCIterator (SCObject)
 		.parent = parent
 		
 		|| thg = msg.first
-		|| x = (thg.nyme ?? "DefaultIterator")
+		|| x = (thg.name ?? "DefaultIterator")
 		.Name = x
 		
 		|| M = StdErr.mark

@@ -12,7 +12,7 @@ module Linkage
 		|| fs = faststring()
 		for ch in .Flagz
 			if ch ~= name
-				|| str = ch.first.nyme
+				|| str = ch.firstname
 					if fs.length
 						fs <~ ' '
 					fs <~ str

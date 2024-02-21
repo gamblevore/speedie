@@ -12,7 +12,7 @@ function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE!|) // initid
 			return o
 	ide := PerryIDE.EmptyBase
 	ide := PerryIDE(path.file)
-	ide.LoadProject(path.file)
+	ide.LoadProject
 	return ide
 
 

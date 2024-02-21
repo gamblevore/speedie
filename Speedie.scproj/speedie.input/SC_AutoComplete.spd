@@ -104,7 +104,7 @@ function CmdResponse (|Message| cmd, |message| arg, |message|)
 	if cmd != "error"
 		rz = .docmd(cmd, arg)
 	
-	rz := .BuildError(cmd.nyme)
+	rz := .BuildError(cmd.name)
 
 
 function CmdCleanUp (|Message| arg, |message|) 
@@ -206,7 +206,7 @@ function DoCmd (|Message| cmd, |message| arg, |message|)
 	if cmd == "mem":	return .ReportMemory(cmd)
 	if cmd == 1:		return .Jump(cmd)
 
-	|| req = cmd[@str].nyme.lowercase
+	|| req = cmd[@str].name.lowercase
 	|| my_file = compiler.files[req]
 		rz = .MainAct(cmd, my_file)
 	  else
@@ -311,7 +311,7 @@ function scfunction.Update_Source (|int| start, |string| text, |scfile| myfile, 
 function scobject.Disambiguate (|message| src, |scfunction|)
 	opt norefcounts
 	if self isa scdecl
-		rz = .Setter
+		rz = .hider
 	if self isa scfunction
 		rz = self
 	rz = rz.disambiguate(src)
@@ -372,7 +372,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 	expect (thg)                       ("nomsg")
 	expect (cmd starts "autocomplete") ("badcmd")
 	|| stuff = cmd[@str, 3]
-	|| Auto = MainActAutoComplete(thg, stuff.nyme, cmd)
+	|| Auto = MainActAutoComplete(thg, stuff.name, cmd)
 		rz = @arg + "result"
 		rz <~ stuff[0] // meta
 		rz <~ auto
@@ -474,7 +474,7 @@ function SCDecl.RealName (|string|)
 	if s == @thg and s in @rel
 		s = s.parent
 	if s == @rel or @decl
-		return s.DeclName.nyme
+		return s.DeclName.name
 	return .name // sigh... 
 
 
@@ -542,7 +542,7 @@ function SCObject.NextDisplay (|bool| exact, |scobject|)
 		if self isa scfunction
 			return .nextfunc
 		if self isa scdecl
-			return .setter
+			return .hider
 			
 	
 
@@ -695,7 +695,7 @@ function JumpImport (|message| cmd, |message|)
 function RootTmpComplete (|message| cmd, |message|)
 	opt norefcounts
 	|| f = cmd[0][0]
-	|| req = f.next.nyme
+	|| req = f.next.name
 	|| flags = 0 // for now
 	flags += f.IsModuleType  <<1
 	flags += f.IsClassType   <<2
@@ -982,7 +982,7 @@ function object.ClassOrModule (|scbase|)
 		return self
 
 
-function IdentifyBetter (|message| node, |string| name) // p.first.name
+function IdentifyBetter (|message| node, |string| name) // p.firstname
 	opt NoRefCounts
 	node.become( @emb )
 	node = node.first!

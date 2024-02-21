@@ -23,7 +23,7 @@ class µForm
 		.name = tmp.name
 		for line in tmp.last(@arg)
 			|| f = line.needfirst
-			.loadparam(f.nyme, f)
+			.loadparam(f.name, f)
 		.Finish
 		.index = ++µform.count
 

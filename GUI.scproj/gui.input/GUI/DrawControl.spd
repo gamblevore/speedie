@@ -58,7 +58,7 @@ class GraphicsEditor (GuiControl)
 		disabled
 		|| w = l[@num, 0].int
 		|| h = l[@num, 1].int
-		|| d = l[2].nyme.decompress
+		|| d = l[2].name.decompress
 		require (w > 0) and (h > 0) and d
 		|| img = image((w,h), l.name)
 			img.Copy(d)

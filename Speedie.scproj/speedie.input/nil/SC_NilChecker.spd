@@ -457,7 +457,7 @@ function Argument (Niltrackerfn)
 		if prev is borked
 			error.autoprint = .oldprint
 			expect !(stderr.ok) (s, "Borking but no zergs found?")
-			stderr.clear
+			stderr.pop
 		if rz is Killer
 			exit
 	

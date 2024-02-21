@@ -144,6 +144,15 @@ function LoadModule (|Message| node)
 	.Collect( .source, scbase.CurrVisibility )
 
 
+function GetTheNewer (|scobject|)
+	opt norefcounts
+	while self
+		|| o2 = self["new"]
+			return o2
+		|| cls = .cls
+		require cls and cls.isrole
+		self = .supermod
+
 
 
 module

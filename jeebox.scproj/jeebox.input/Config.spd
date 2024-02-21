@@ -18,7 +18,7 @@ role config (message)
 			return l|message|.first
 			
 	syntax cast (|string|)
-		return .nyme
+		return .name
 	
 	function Save (|bool|)
 		|| f = .obj as file
@@ -58,9 +58,9 @@ extend message
 		
 	function Value (|string|)
 		if self == @tmp and self in @arg
-			return .first.nyme
+			return .firstname
 		if self != @arg
-			return .nyme
+			return .name_
 
 // move these to utils?
 	function IsTypeOfDecl (|bool|)

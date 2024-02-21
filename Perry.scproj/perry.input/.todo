@@ -7,6 +7,12 @@
 
 * Do nil checker!
 	* global struct pointers not assumed nil rn?
+	* nilfile.TestFile not testing properly
+	* params to fps not tested properly
+
+	* selector constructor shouldn't need "?"
+	* optional|array| <~ result // should be rejected!
+	* helper message.LastAfter (|int|ignoreafter, |ind|) shouldn't need nil self
 
 	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!
 	* display obj.haha.property instead of JB_haha(obj).Property
@@ -15,14 +21,7 @@
 		* speedie stops compiling sometimes, from perry
 		* pico needs a massive bloat bastard constructor/destructor test!!! like 8 threads bastardly creating/destroying picos!
 		* logging huge stdout super slow (parsing/recolorising each line?)
-
-	* name should be "safe" (needs a "getter" func that works like a setter)
-	
-	* params to fps not tested properly
 	* spamlines failing
-	* selector constructor shouldn't need "?"
-	* optional|array| <~ result // should be rejected!
-	* helper message.LastAfter (|int|ignoreafter, |ind|) shouldn't need nil self
 
 
 

@@ -35,7 +35,7 @@ role FileArchive (message)
 			if chld.Data(data)
 				|| it = item..mode
 					chld.mode = it.int
-				return data.length
+				rz = data.length
 	
 	
 	iterator

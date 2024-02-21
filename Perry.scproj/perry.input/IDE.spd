@@ -123,7 +123,7 @@ class PerryIDE (Window)
 	
 	function PerryStatus (|string|)
 		opt norefcounts
-		return .PerryError.nyme
+		return .PerryError.name
 
 
 	function RemoveProjFromList
@@ -647,9 +647,6 @@ class PerryIDE (Window)
 
 	function OpenDoc (GUIPasteEvent)
 		require self
-		if !.project
-			.Loadproject(data.file)
-			return self
 		|| p   = data
 		|| ext = p.ext
 		|| f   = p.file
@@ -694,8 +691,8 @@ class PerryIDE (Window)
 		
 		
 		function New (|string| path, |perryide|)
-			rz = perryide(path.file)
-			rz.LoadProject(path.file)
+			rz = PerryIDE(path.file)
+			rz.LoadProject
 			rz.EditMe.SetFocus
 		
 		

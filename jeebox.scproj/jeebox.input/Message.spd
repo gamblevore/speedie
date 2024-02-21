@@ -260,7 +260,7 @@ class Message (RingTree)
 
 
 	syx Unit						// 20cm
-		|| num = .first.Nyme
+		|| num = .FirstName
 		fs <~ num
 		if (num.ishexlike) and (num.last != '_')       // 0xFF
 			fs <~ '_'
@@ -712,10 +712,22 @@ class Message (RingTree)
 		return "${.funcname} ‘${.name}’"
 
 
-	function Nyme (|string|)
+	getter Name (|string|)
+		pragma inline
+		return .name_
+
+
+	function Name_ (|string|) // for use within the message class!
+		description "For use when the 'name' getter function can't be used directly"
+		nil checker
 		if self
 			return .Name 
 
+	function FirstName (|string|)
+		nil checker
+		opt norefcounts
+		|| f = .first
+			return f.name
 
 	function Ancestor (|Syntax| f, |Message|)
 		Opt NoRefCounts
@@ -1019,7 +1031,7 @@ class Message (RingTree)
 
 	function MiniName (|string|prefix="", |string|)
 		require self
-		return "prefix$.FuncName “${.name[0,64].UnicodeSync}”"
+		return "$prefix$.FuncName “${.name[0,64].UnicodeSync}”"
 
 	Syntax Expect (|string?| Error = nil)
 		errorreceiver.NewError( self, Error )
@@ -1120,7 +1132,8 @@ class Message (RingTree)
 
 
 	function Yes (|bool|)
-		return .nyme.yes
+		if self
+			return .name.yes
 			
 
 	function After (|int|)

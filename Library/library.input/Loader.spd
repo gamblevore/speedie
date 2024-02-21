@@ -59,7 +59,7 @@ extend ObjectLoader {
 	function ItemName (|string|)
 		opt norefcounts
 		|| c = .curritem
-		return c.first.nyme.unshare
+		return c.firstname.unshare
 
 	function ItemIsInt (|bool|)
 		opt norefcounts
@@ -81,7 +81,7 @@ extend ObjectLoader {
 
 	function LoadRaw (|&byte| f, |int| n)
 		opt norefcounts
-		|| Raw = .next.nyme.unhex // write zero if can’t find? makes sense...
+		|| Raw = .next.name.unhex // write zero if can’t find? makes sense...
 		memory.copy(f, raw.addr, n min raw.length)
 		
 	
