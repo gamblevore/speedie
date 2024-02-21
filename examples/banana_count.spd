@@ -2,6 +2,8 @@
 
 main (|int| Amount)
 	for i in 0 to Amount
-		printline i
-		app.say "banana".Pluralize(i)
-		app.sleep(0.5s)
+		|| msg = "banana".Pluralize(i)
+		printline msg
+		app.say msg
+		if i < amount
+			app.sleep(0.5s)
