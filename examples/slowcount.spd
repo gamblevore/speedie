@@ -1,7 +1,7 @@
 #!/usr/local/bin/spd
 
 main (|int| Amount)
-	for i in 1 to Amount
+	for i in 0 to Amount
 		printline i
-		app.say i.render
+		app.say "banana".Pluralize(i)
 		app.sleep(0.5s)

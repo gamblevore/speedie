@@ -54,8 +54,17 @@ function int.OperatorPC (|int| x, |string|)
 function string.Pluralize (|int| amount, |string| nothing="", |string|)
 	if !amount and nothing
 		return nothing
-	|| s = "s" * (amount != 1)
-	return "$amount $self$s"
+		
+	|| fs = FastString()
+	if amount
+		fs <~ amount
+	  else
+		fs <~ "no"
+	fs <~ " "
+	fs <~ self
+	if amount != 1
+		fs <~ "s"
+	return fs
 
 
 function string.Moat (|string|)
