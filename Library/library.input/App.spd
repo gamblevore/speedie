@@ -287,8 +287,10 @@ function IsQuarantined (|bool|)
 	return .path contains "/AppTranslocation/"
 
 
-function Say (|string| s, |errorint2|)
+function Say (|string| s, |bool| print=false,  |errorint2|)
 	visible
+	if print
+		printline s
 	return "/usr/bin/say".execute([s])
 	
 function AppleScript (|string| str, |ErrorInt2|)

@@ -1,9 +1,5 @@
 #!/usr/local/bin/spd
 
-main (|int| Amount)
+main (|int| amount)
 	for i in 0 to Amount
-		|| msg = "banana".Pluralize(i)
-		printline msg
-		app.say msg
-		if i < amount
-			app.sleep(0.5s)
+		app.say("banana".Pluralize(i), true)

@@ -7,7 +7,7 @@ extend String
 	function IsOK (|bool|)
 		opt norefcounts
 		nil checker
-		return self != nil and self != string.error
+		return self != nil and self|object| != string.error|object|
 	
 	function FileThatExists (|string| operation="access",  |File|)
 		|| f = .file
