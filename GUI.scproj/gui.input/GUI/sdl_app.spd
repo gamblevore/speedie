@@ -605,7 +605,7 @@ module SDLApp
 				if w1.IsDialog
 					if CanBlur: .DrawSpace.Blur(.BGBlurAmount)
 					CanBlur = false
-				w1.drawwindow(.DrawSpace)
+				w1.DrawWindow(.DrawSpace)
 			w1 = w1.next as window // :O
 		
 		notifications.Draw

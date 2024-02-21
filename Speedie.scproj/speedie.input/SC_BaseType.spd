@@ -1,7 +1,7 @@
 
 
 
-datatype SCBaseType (int)
+datatype SCBaseType (byte)
 	constants (
 		|SCBaseType|
 		Module = 0 // not actually a type
@@ -16,28 +16,29 @@ datatype SCBaseType (int)
 
 
 extend scclass
-	function BaseType (|scbasetype|)
-		if .isobject
+	function IsStruct (|bool|)
+		return .BaseType2 == SCBaseType.struct
+	
+	function IsDataType (|bool|)
+		disabled "IsDataTypeOnly or IsDataTypeOrFP"
+		return .BaseType2 == SCBaseType.datatype
+	
+	function IsDataTypeOnly (|bool|)
+		return !.FuncProto and .BaseType2 == SCBaseType.datatype
+	
+	function IsDataTypeOrFP (|bool|)
+		return .BaseType2 == SCBaseType.datatype or SCBaseType.funcproto
+	
+	function BaseType (|SCBaseType|)
+		if .IsObject
 			return SCBaseType.object
-		if .isdatatype
-			if .funcproto
-				return SCBaseType.funcproto
-			  else
-				return SCBaseType.datatype
-		if .isstruct
-			return SCBaseType.struct
-		debugger
-			
-		
-	syntax equals (|scbasetype| d, |bool| aware, |bool|)
+		if .IsFunc
+			return SCBaseType.funcproto
+		if .IsDataTypeOnly
+			return SCBaseType.datatype
+		return SCBaseType.struct
+
+	syntax equals (|SCBaseType| d, |bool| aware, |bool|)
 		cpp_part EqualsType
 		if self and d > scbasetype.nil
-			// use .basetype instead...
-			if d is object
-				return .isobject
-			if d is datatype
-				return .isdatatype and !.funcproto
-			if d is struct
-				return .isstruct
-			if d is funcproto
-				return .funcproto
+			return .BaseType == d

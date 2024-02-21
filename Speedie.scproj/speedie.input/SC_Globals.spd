@@ -606,8 +606,8 @@ function scclass.IsMArray (|message| arr, |bool|)
 	// || X = MyStruct[N]
 	// allocates N of MyStruct
 	
-	if (!arr or arr.hasonechild)
-		return .IsDataType or .IsStruct
+	if (!arr or arr.HasOneChild)
+		return .IsDataTypeOrFP or .IsStruct
 
 
 
@@ -1708,7 +1708,7 @@ function TypeOfArgArr (ExprResolver)
 		if itm == @tmp
 			itm.func = @thg
 		|| Contained = TypeOfExpr( itm, name_space )
-			check (Contained.type.isdatatype or contained.PointerCount) (itm, "Must be a datatype.")
+			check (Contained.type.isdatatypeOrFP or contained.PointerCount) (itm, "Must be a datatype.")
 			if (result)
 				|| oof = contained.HighestArrayContainMatch( result.type.TypeNormal, itm )
 				result.type = oof.type

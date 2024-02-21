@@ -267,6 +267,7 @@ function Transform ()
 	opt norefcounts
 	require !.isMacro
 	CurrFunc = self
+	if self ~= "GUI_Toy_SilentRun"
 	.Badness = 0
 	|| StillOK = StdErr.Mark
 
@@ -401,7 +402,7 @@ function message.AssignsFix (|scfunction| f)
 	|| L = rp.last!
 	L.remove
 	|| c = f.cls
-	if f.returntype and c and c.isdatatype 
+	if f.returntype and c and c.IsDataTypeOrFP
 		using (self)
 		rp.first = L // put it back
 		rp.first = upon.FailOrCopy(rp)
@@ -671,7 +672,7 @@ function DeclsPrototypeInterface (|Message| ch0, |SCClass| fpType, |bool| late)
 	opt norefcounts
 	.DeclsProtoCleanup(fpType, ch0, true, late)
 	if !late
-		.DeclsProtoTypeAdd(fpType).PointerCount = 1 // right??
+		.DeclsProtoTypeAdd(fpType)//.PointerCount = 1 // right??
 
 
 function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
@@ -1232,7 +1233,7 @@ function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |
 	Compiler.FuncList.Pop
 	
 	|| Using = node.SyntaxUsing
-	|| tmp = @tmp + "struct"		// perhaps it really is a struct?
+	|| tmp = @tmp + "datatype"		// fffffffuuuu
 	tmp.msg(@thg, f.Name)
 	tmp <~ node.last
 	
@@ -1242,7 +1243,6 @@ function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |
 		clss.FuncProto = f
 		f.ProtoType = clss
 		Compiler.ProtoTypes <~ f
-		// clss.TypeNormal.PointerCount = 1
 	
 	Return Modul
 

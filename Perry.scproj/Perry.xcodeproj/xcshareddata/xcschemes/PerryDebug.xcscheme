@@ -58,11 +58,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "inferno.spd"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "SpamLines.spd"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>

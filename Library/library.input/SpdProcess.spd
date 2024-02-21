@@ -6,14 +6,14 @@ class SpdProcess (Process)
 	|jbin|						Writer
 	|?&pico|					Pico
 	|stringzeroterminated|		_DebugName
-	|?&SpdMainFn|				SubProcess
+	|?SpdMainFn|				SubProcess
 	|int| 						DeathLimit
 	|int|						DiedCount
 	|bool|						WeAreParent
 	|bool|						AlreadyWarnedDied
 	|ProcessMode|				Mode
 
-	constructor	(|string| path, |?&SpdMainFn| fn, |stringzeroterminated| DebugName, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
+	constructor	(|string| path, |?SpdMainFn| fn, |stringzeroterminated| DebugName, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
 		super.constructor(path) // <-- mode should be passed here
 		
 		.deathlimit = 12

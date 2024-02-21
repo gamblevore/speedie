@@ -123,11 +123,10 @@ dispatch ClassLinkageTable (TranFunc)
 			expect (name_space.isstruct) (node, "Expected this for a struct")
 			|| value = node[@thg]
 				value.expectlast
-				name_space.IsDataTypeLike = value.trueorfalse
 
 	numeric
 		if name_space.mustbe(SCClass, node)
-			expect (name_space.isdatatype) (node, "Expected this for a datatype")
+			expect (name_space.isdatatypeOnly) (node, "Expected this for a datatype")
 			if node[@thg] == "false"
 				name_space.typeinfo = datatypecode.unusedtype
 				name_space.IsNotNumeric = true

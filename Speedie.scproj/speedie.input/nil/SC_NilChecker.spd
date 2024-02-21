@@ -626,7 +626,7 @@ function message.Trueness (|nilstate| found, |maybebool|)
 		if found & nilstate.knownValue
 			return found is TrueValue
 
-	  elseif Ret.isdatatype and d.isdatatype // nothing special
+	  elseif Ret.isdatatypeonly and d.isdatatypeonly // nothing special
 		while self == @arg or @bra
 			self = self.last
 		|| rtf = ret.type.false

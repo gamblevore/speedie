@@ -520,7 +520,7 @@ function ImportAll
 	/// Then declarations "|| x = message[0]"	
 	require .Stage( "A Bit More Stuff On Classes" )
 	for c in .ClassList
-		c.ExportName = c.JSStructName // minifier...
+		c.ExportName = c.StructName // minifier...
 		c.AfterFuncsDecled //
 	  
 
@@ -778,10 +778,6 @@ function RefConstructors
 
 function SortModules
 	.ModuleList.sort(ModulesSorter)
-
-
-function SCClass.IsDataTypeOrStruct (|bool|)
-	return .IsDataType or .IsStruct
 
 
 function ModulesSorter (SorterComparer)

@@ -38,9 +38,9 @@ main
 	printline
 	
 	while Europe
-		for (cun.backwards in Europe) (i)
-			cun.Attack Europe[]
-			if !cun.alive
+		for (cu.backwards in Europe) (i)
+			cu.Attack Europe[]!
+			if !cu.alive
 				Europe.remove(i)
 			printline
             app.sleep(0.2s)

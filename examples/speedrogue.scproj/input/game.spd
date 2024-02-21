@@ -24,7 +24,7 @@ role RogueObject (Message)
 		return true
 		
 	function DescribeAttack (|rogueobject| mon, |int| dmg)
-		|| w = .weapon
+		|| w = .weapon!
 		|| fs = map.FrameText
 		fs <~ "You ${w.verb(mon)} the ${mon.name} with your ${w.name} for $dmg DMG."
 	
@@ -36,7 +36,7 @@ role RogueObject (Message)
 	function Verb (|rogueobject| mon, |string|)
 		if mon.hp <= 0
 			return "kill"
-		return (self[0].name, "hit")(self)
+		return (self[0]!.name, "hit")(self)
 	function Gain (|int| Amount)
 		require amount > 0
 		.hp = (.hp + amount) min .max
@@ -64,7 +64,7 @@ role RogueObject (Message)
 		require .ismonster
 		// now what?
 		|| IsPlayer = self == map.Player
-		|| c = .cell
+		|| c = .cell!
 		|| pos = c.Pos
 		|| r = 7
 		for V.rect in (-r, -r, r, r)
@@ -137,7 +137,7 @@ role RogueCell	(message)
 	setter Type (|message|)
 		.Name = Value.name	
 	function Pos (|ivec2|) 
-		return (.position, .parent.position)
+		return (.position, .parent!.position)
 	syntax Append (|rogueobject| value)
 		.arg <~ value
 	function Walkable (|bool|)
@@ -176,18 +176,18 @@ role RogueCell	(message)
 
 || Map = Rogue()
 Class Rogue {
-|dictionary of message| types
+|(dictionary of message)?| types
 |[RogueCell]|	Data
 |ivec2|			Size
 |date|			FlickerAfter
 |int64| 		Seed
 |FastString|	FrameText
-|message|		MapState
-|message| 		Level
-|rogueobject|	Player
+|message?|		MapState
+|message?| 		Level
+|rogueobject?|	Player
 |retrofloat| 	Healing
-|message| door, |message| floor,    |message| corriwall
-|message| rock, |message| corridor, |message| wall
+|message?| door, |message?| floor,    |message?| corriwall
+|message?| rock, |message?| corridor, |message?| wall
 
 constructor
 	.flickerafter = 1
@@ -209,7 +209,7 @@ function Init (|ivec2| size)
 			|| row = rowlist.msg(@tmp, "row").msg(@arg)
 			row.Position = y
 			for x in size.x
-				RogueCell(row, x, .rock)
+				RogueCell(row, x, .rock!)
 
 function CanDrawPlayer (|bool|)
 	return !.FlickerAfter.fired or ((date.now / 0.8s)|int| isa 2)
@@ -220,15 +220,15 @@ function LoadLevel (|int| i)
 	for row in .level.arg
 		for cell in row.arg
 			.data <~ cell
-	.player = info.GameBank..classes[].copy
-	.Player..max = .Player..health.copy
+	.player = info.GameBank..classes[]!.copy
+	.Player..max = .Player..health!.copy
 	|| Wep = info.GameBank..weapons.filter(.player.strength)[]
 		.Player..weapon = wep.copy
 	
 
 function IsRoomOK (|ivec4| i, |bool|)
 	for p.rect in i
-		require self[p].Type != .Floor
+		require self[p]!.Type! != .Floor
 	return true
 
 function OKSize (|ivec4|)
@@ -288,22 +288,22 @@ function Connect (|ivec2| p, |ivec2| d)
 			exit
 		last = c
 		Length++
-		c.Type = .Corridor
+		c.Type = .Corridor!
 		with self[p+d2]
 			if .type == map.Rock
-				.type = map.corriwall
+				.type = map.corriwall!
 		with self[p-d2]
 			if .type == map.Rock
-				.type = map.corriwall
+				.type = map.corriwall!
 	
 	if last
-		last.Room.Connect(first.room)
+		last.Room!.Connect(first.room!)
+		if length > 2
+			last.Type = .door!
+		  elseif length == 2
+			last.Type = .Floor!
 	if Length >= 2
-		first.Type = .door
-	if length > 2
-		last.Type = .door
-	  elseif length == 2
-		last.Type = .Floor
+		first.Type = .door!
 
 
 function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| AllowCoridoors=false,  |bool|)
@@ -364,19 +364,19 @@ function RoomPurpose (|[rogueroom]| rooms, |message|)
 	
 function GenRoom (|[rogueroom]| rooms)
 	|| RoomSize = .oksize #require
-	|| room = RogueRoom(roomsize, .roompurpose(rooms), rooms.length)
+	|| room = RogueRoom(roomsize, .roompurpose(rooms)!, rooms.length)
 	rooms <~ room
 	for P.rect in RoomSize
 		|| cell = self[p]
-		if RoomSize.contains(P, 1)
-			cell.type = .floor
-		  elseif cell.type != .wall
-			cell.Type = .wall
-		  elseif p.IsCornerOf(Roomsize)
-			0
-		  elseif !cell.InSpawn and !room.IsSpawn
-			cell.Type = .floor
-		cell.obj = room
+			if RoomSize.contains(P, 1)
+				cell.type = .floor!
+			  elseif cell.type != .wall!
+				cell.Type = .wall!
+			  elseif p.IsCornerOf(Roomsize)
+				0
+			  elseif !cell.InSpawn and !room.IsSpawn
+				cell.Type = .floor!
+			cell.obj = room
 
 	if room.isspawn
 		.PositionPlayer(room)
@@ -386,9 +386,9 @@ function PositionPlayer (|rogueroom| Room)
 	for 100
 		for P.rect in room.Size
 			|| cell = self[p]
-			if (cell.type == .floor) and 100th[]
-				cell <~ .Player
-				return 
+				if (cell.type == .floor) and 100th[]
+					cell <~ .Player
+					return 
 
 	
 function GenMap
@@ -405,7 +405,7 @@ function GenMonster
 	for 1000
 		for c in .data // all cells
 			if !c.inspawn and c.walkable and 100th[]
-				c <~ Mon[].copy
+				c <~ Mon[]!.copy
 				require --lim> 0
 
 
@@ -438,7 +438,7 @@ function message.Filter (|int| L, |bool| IsMonster=false,  |[rogueobject]|)
 function info.LoadColors (|Message| msg, |TerminalColor| Default=0)
 	for s in msg
 		|| col = s..color
-		|| f = s.first
+		|| f = s.first!
 		|| c = default
 		if col ~= "white"
 			c = Terminal.white
@@ -487,7 +487,7 @@ function Search (|roguecell| where, |bool|)
 
 		
 function Move (|int| x, |int| y)
-	|| p0 = .Player.cell.Pos
+	|| p0 = .Player.cell!.Pos
 	|| cell = self[p0 + (x,y)]      #require
 	if !cell.Walkable
 		.search(cell)
@@ -503,7 +503,7 @@ function Move (|int| x, |int| y)
 function Input (|bool|)
 	|| c = Terminal[] 
 	if c == ' '
-		return .Search(.player.cell)
+		return .Search(.player.cell!)
 	|| up    = "123qwe"  contains c
 	|| down  = "789zxcs" contains c
 	|| left  = "147qaz"  contains c
@@ -521,7 +521,7 @@ function Run (|bool| Splash)
 	if Splash 
 		.splash
 	|| modified = true
-	while
+	while "forever"
 		if modified
 			.FrameStep
 			.DrawMap
@@ -545,8 +545,8 @@ function Heal
 	
 function DrawMap
 	for i in .size
-		self[i].draw
-	terminal <~ ( "${.player.name}: ${.player.HP}/${.player.Max}",  (30,  0) )
+		self[i]!.draw
+	terminal <~ ( "${.player!.name}: ${.player!.HP}/${.player.Max}",  (30,  0) )
 	|| str = .FrameText.GetResult
 		|| s = Terminal.Size
 		Terminal.FrameText(str, (s-(30, 10), s))

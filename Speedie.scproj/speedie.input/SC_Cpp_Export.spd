@@ -232,7 +232,7 @@ struct jbobject {int RefCount;};
 			|| cls = compiler[f]#require
 			if (cls.isobject)
 				fs <~ "struct ${cls.APIStructName} : jbobject {};\n"
-			  elseif (cls.isdatatype)
+			  elseif (cls.isdatatypeOrFP)
 				fs <~ "typedef ${cls.super.CStructName} ${cls.APIStructName};\n"
 			  else
 				error (m, "Can't export this.")
@@ -448,8 +448,7 @@ function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 
 
 function ExportClass (|SCClass| cls, |FastStringCpp| CppFile)
-	require !cls.IsDataType
-	require !cls.IsFunc
+	require !cls.IsDataTypeOrFP
 	require !cls.isbehaviourTable
 	require !cls.IsRole
 	if cls.iswrapper
@@ -933,16 +932,15 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function WriteType (|SCClass| c, |FastStringCpp| fs, |bool| always)
 		require !c.IsBuiltin
-		ifn always
+		if !always
 			require c.NeedsExport
-		//iswrapper
 		|| f = c.FuncProto
 			fs <~ "\ntypedef "
 			.WriteDecl( f.ReturnType, fs )
 			fs <~ " (*${c.CStructName})"
 			.WriteFuncArgs( f, fs )
 		  else
-			if c.IsDatatype
+			if c.IsDataTypeOrFP
 				|| name = c.super.CStructName #require // can be nil!
 				fs <~ "\ntypedef $name "
 			  else

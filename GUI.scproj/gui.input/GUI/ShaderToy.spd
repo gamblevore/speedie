@@ -3,7 +3,8 @@
 prototype ShaderToyFunc (|ShaderToy| self,  |vec2| Resolution,  |vec2| Pos,  |vec2| Coord,  |vec4|)
 	linkage: cpp_Part ToyFn
 	syntax cast (|ErrorInt|)
-		|| win = ShaderToy(*self)
+		cpp_name GUI_Toy_SilentRun
+		|| win = ShaderToy(self)
 		return win.RunAsMain
 
 

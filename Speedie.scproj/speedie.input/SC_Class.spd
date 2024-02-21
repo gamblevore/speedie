@@ -56,10 +56,8 @@ linkage
 |byte|						HasNilChecker
 |bool|						DefaultsToReal
 |bool|						IsRole
-|bool|						IsBuiltin
-|bool|						IsDataTypeLike
-|bool|						IsStruct
-|bool|						IsDataType
+|bool|						IsBuiltin // SCBaseType
+|scbasetype| 				BaseType2
 |bool|						IsASM
 |bool|						IsNotNumeric
 
@@ -106,7 +104,7 @@ render
 		fs <~ " numeric"
 	if (.funcProto)
 		fs <~ " prototype"
-	  elseif (.isdatatype)
+	  elseif (.isdatatypeonly)
 		fs <~ " datatype"
 	if .ismodel
 		fs <~ " model"
@@ -171,7 +169,6 @@ function GetDepth
 	|| msg = .defawlt
 	if msg and .isobject and !(msg isthing "nil")
 		.DefaultsToReal = true // what if .defawlt is optional? // fuck them :D
-		//.selfdecl.NilDeclared = NilState.realish
 		.TypeNormal.NilDeclared = NilState.real
 	
 
@@ -199,7 +196,10 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 	|| si = .size
 		return si
 
-	if .isdatatype
+	if .IsFunc
+		.size = Platform.PointerBytes
+		return .size
+	if .IsDataTypeOnly
 		.size = .typeinfo.bytesize
 		return .size
 
@@ -237,12 +237,14 @@ function LoadSuperClass
 		|| SupName = supc[@Thg].Nyme				#require
 		S = Compiler[ SupName, supc ]				#require
 		
-		if (.isDataType)
-			check (S.IsDataType)	(supc, "Datatypes can only subclass datatypes.")
+		if (.FuncProto)
+			error						(supc, "Can't subclass this.")
+		  elseif (.isDataTypeonly)
+			check (S.isDataTypeonly)	(supc, "Datatypes can only subclass datatypes.")
 		  elseif (.IsStruct)
-			check (S.IsStruct)		(supc, "Structs can only subclass structs.")
+			check (S.IsStruct)			(supc, "Structs can only subclass structs.")
 		  else
-			check (S.IsObject)		(supc, "Classes can only subclass classes.")
+			check (S.IsObject)			(supc, "Classes can only subclass classes.")
 	
 	if (S)
 		.Super = S
@@ -479,7 +481,7 @@ function ContainedTypeLoad
 	|| cont = TN.CopyDecl
 	(cont Is UpgradeableContained)
 	.Contained = cont
-	.IgnoreContainedSelf |= tn.isdatatype
+	.IgnoreContainedSelf |= cls.IsDataTypeOrFP
 	.SelfDecl.Contains = TN // shouldn't we be setting this to .contained? but when I do... my GUI lib doesn't compile
 							// which is strange cos speedie itself compiles OK. and all the errors generated seem garbage.
 							// so we need to fix this. sighs... more work.
@@ -498,7 +500,7 @@ function OverrideSyntax
 	|| cast = .FindSpecialFunc( "SyntaxCast", false )
 	.casts = array.new
 
-	if .isobject or .isdatatype
+	if !.IsStruct
 		.HasNilChecker = 1 // default to true
 	
 	for f in cast
@@ -584,7 +586,7 @@ function IsFunc (|bool|)
 
 
 function IsObject (|bool|)
-	Return (!.IsDataType) and (!.IsStruct)
+	Return (!.IsDataTypeOrFP) and (!.IsStruct)
 
 
 function CreateEmptyFunc (|String| fname, |string| cpp_name="", |SCFunction|)
@@ -661,7 +663,7 @@ function FirstDestructor (|SCFunction|)
 		
 		if !fn
 			|| a = 1
-		  elseif (p.IsWrapper and p.super) // don't count "object" as having properties!
+		  elseif (p.IsWrapper and p.super)	// don't count "object" as having properties!
 			Return fn
 			
 		  elseif (p.HasStuffToHandleInDestructor or fn.SourceArg.Hasany)
@@ -670,12 +672,12 @@ function FirstDestructor (|SCFunction|)
 
 function scfunction.AddSelfToFunc (|scclass| cls, |SCBase| space)
 	opt norefcounts
-	|| sl = cls.SelfDecl		// for my nil-checker
-	if sl.TypeSuffers				// refcounting will set MarkAsRefAltered
+	|| sl = cls.SelfDecl					// for my nil-checker
+	if sl.TypeSuffers						// refcounting will set MarkAsRefAltered
 		sl = sl.copydecl
 		if .IsConstructorOrDestructor
 			sl = sl.MakeNewReal
-		(sl is SelfImplicit)	// I shouldn't have to specify this, it should be copied!
+		(sl is SelfImplicit)				// I shouldn't have to specify this, it should be copied!
 	space.TryAdd( space.FuncSrc, sl, "self" )
 	.args <~ sl
 
@@ -794,8 +796,8 @@ function AfterAfterFuncs
 	.DeclModel
 
 
-function JSStructName (|String|)
-	if .IsDataType
+function StructName (|String|)
+	if .IsDataTypeOrFP
 		Return .Name
 	return .SubProjName + "_" + .name
 
@@ -896,7 +898,7 @@ module
 		node.givearg
 		
 		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface, false )
-			it.IsDataType = true
+			it.basetype2 = SCBaseType.datatype
 			it.ClassCollect
 		
 			expect !(it.Properties) (it.Source, "Datatypes can’t have properties.")
@@ -912,7 +914,7 @@ module
 
 	function NewStruct (CollectFunc)
 		|| it = .NeuClassSub(node, name_space, errplace, "", false)
-			it.IsStruct = true
+			it.basetype2 = SCBaseType.struct
 			it.classcollect
 			return it.modul
 
@@ -927,7 +929,7 @@ module
 	
 
 	function SCClass.DataTypePostLoad
-		require .IsDataType and !.IsFunc
+		require .IsDataTypeOnly
 		|| node = .Source
 		|| sup = .super
 			.Size = sup.Size

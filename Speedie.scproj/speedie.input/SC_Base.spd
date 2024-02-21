@@ -795,14 +795,14 @@ function AutoCompleteKind (|string|)
 	if self isa SCModule
 		return "module"
 	if self isa scclass
-		if .isdatatype
-			return "datatype"
-		if .isstruct
-			return "struct"
-		if .isobject
-			return "class"
-		if .funcproto
+		if .FuncProto
 			return "function prototype"
+		if .IsDataTypeOnly
+			return "datatype"
+		if .IsStruct
+			return "struct"
+		if .IsObject
+			return "class"
 	return "unknown"
 
 

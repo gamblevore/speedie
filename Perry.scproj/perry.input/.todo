@@ -18,7 +18,7 @@
 
 	* name should be "safe" (needs a "getter" func that works like a setter)
 	
-	* check OK shouldn't disappear
+	* spamlines failing
 	* selector constructor shouldn't need "?"
 	* optional|array| <~ result // should be rejected!
 	* helper message.LastAfter (|int|ignoreafter, |ind|) shouldn't need nil self

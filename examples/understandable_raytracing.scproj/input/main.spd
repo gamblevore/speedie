@@ -10,7 +10,7 @@ main
 struct RayHit
 	|vec4|  Color
 	|float| Dist
-	syntax cast (|bool|)
+	function ok (|bool|)
 		return .dist < float.max
 	
 
@@ -63,7 +63,7 @@ class RayScene (window)
 			found.Dist = float.max
 			for sp in .Shapes
 				sp.color(.cam, xyz, ixyz, Found)
-			if (Found)
+			if (Found.ok)
 				C <~ Found.Color
 	
 	

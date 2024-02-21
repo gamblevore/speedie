@@ -93,7 +93,7 @@ function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cl
 		  else
 			// setter x (|int|) --> fn x (|int| value)
 			func.IsAssigns = 3
-			if cls.IsDataType
+			if cls.IsDataTypeOrFP
 				.next = .copy // fn x (|int|) --> fn x (|int| value, |int|)
 			.AddValue(func)
 		

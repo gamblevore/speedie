@@ -373,11 +373,13 @@ class SCDecl (SCObject) {
 
 
 	function IsInteger (|bool|)
-		return .IsDataType and .type.TypeInfo.isint
+		return .isnormal and .type.TypeInfo.isint
 
+	function IsDataTypeOrFP (|bool|)
+		return .Type.IsDataTypeOrFP and !.PointerCount and !.IsCArray
 
-	function IsDataType (|bool|)
-		return .Type.Isdatatype and !.PointerCount and !.IsCArray
+	function IsDataTypeOnly (|bool|)
+		return .Type.IsdatatypeOnly and !.PointerCount and !.IsCArray
 
 
 	function message.GetFunctionPointer (|scfunction|)
@@ -564,7 +566,7 @@ class SCDecl (SCObject) {
 	
 	function IsUintLike (|bool|)
 		|| t = .type.typeinfo
-		if .isnormal and .isdatatype and t.isint
+		if .isnormal and t.isint
 			return !t.IsSigned
 
 
@@ -618,7 +620,7 @@ class SCDecl (SCObject) {
 
 
 	function IsNormal (|bool|)
-		return (!.PointerCount) and (!.IsNil) and !.IsCArray
+		return !.PointerCount and !.IsNil and !.IsCArray
 
 
 	function AlreadyContains (|bool|)
@@ -852,7 +854,7 @@ class SCDecl (SCObject) {
 		opt norefcounts
 		if Type == 0
 			return self
-		rz = .copydecl
+		rz = .CopyDecl
 		rz.NilDeclared = type
 
 	function IsReal (|nilstate|)
@@ -1036,6 +1038,7 @@ function IsPointerMath (|SCDecl|L, |SCDecl|R, |SCOperator| opp, |Message|exp, |S
 
 
 function Message.RenderType (|string|)
+	opt norefcounts
 	debug_require self
 	|| D = .obj
 	if (D isa SCDecl)

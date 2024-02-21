@@ -59,8 +59,8 @@ function PerryIDE.SendFeedbackMsg (|message| msg)
 	.LogOneComm(msg, "\1C ")
 
 
-function PerryIDE.SubProcess (|bool| actual_compile, |&SpdMainFn|)
-	require false// platform.isdebug and !actual_compile
+function PerryIDE.SubProcess (|bool| actual_compile, |SpdMainFn|)
+	require false						// platform.isdebug and !actual_compile
 	if actual_compile
 		rz = Speedie_Compiler
 		Speedie_Compiler = nil
