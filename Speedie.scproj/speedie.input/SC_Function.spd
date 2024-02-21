@@ -221,7 +221,7 @@ function FuncDecls
 	|| fc = p.first
 	
 	if (fc == @thg)
-		.DeclsProtoType( fc )
+		.DeclsProtoTypeClass( fc )
 	
 	|| A = .SourceArg
 	|| space = a.scarg(self)
@@ -240,7 +240,7 @@ function FuncDecls
 	if .AllocCode
 		|| r = .ReturnType$
 		if r == r.Type.TypeNormal
-			r = r.Copy
+			r = r.copydecl
 			.ReturnType = r
 		r.AllocSource = .AllocCode
 
@@ -637,13 +637,10 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 	Return loss
 
 
-function DeclsProtoType (|Message| ch0, |SCClass| fpType=nil, |bool| late=false)
+function DeclsPrototypeClass (|Message| ch0)
 	opt norefcounts
-	|| IsClass = fpType != nil
-	if !fpType
-		fpType = Compiler[ ch0.name, .Source ]$
-	.DeclsProtoTypeRemove(fpType, ch0, IsClass, late)
-	if !late
+	|| fpType = Compiler[ ch0.name, .Source ]
+		.DeclsProtoCleanup(fpType, ch0, false, false)
 		.DeclsProtoTypeAdd(fpType)
 
 
@@ -670,19 +667,27 @@ setter IsCppInBuilt (|int|)
 	.IsCppInBuilt = Value
 
 
-function DeclsProtoTypeAdd (|SCClass| fpType)
-	|| Dcl = SCDecl(TypeVoidPtr!)	// not sure why we need TypeVoidPtr :(
+function DeclsPrototypeInterface (|Message| ch0, |SCClass| fpType, |bool| late)
+	opt norefcounts
+	.DeclsProtoCleanup(fpType, ch0, true, late)
+	if !late
+		.DeclsProtoTypeAdd(fpType).PointerCount = 1 // right??
+
+
+function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
+	|| Dcl = SCDecl(fpType)
 	dcl.IsLookupOnly = self
-	dcl.Type = fpType
 	dcl.Name = .Name
-	(dcl is const)			// right?
-	(dcl is onmodule)		// not sure where this is found cos .cls is nil sometimes yet its still being found
+	(dcl is const)					// lets kill da hoe
+	(dcl is onmodule)				// kill! kill!
+	dcl.NilDeclared = nilstate.real
 	.ProtoDecl = dcl
 	if (.Cls)
 		.parent!.TryAdd( .Source, Dcl, .Name )
+	return dcl
 
 
-function DeclsProtoTypeRemove (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool|late=false)
+function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool| late=false)
 	|| p = ch0.Parent!
 	|| Proto = fpType.FuncProto						#expect (ch0, "This isn't a prototype!")
 	|| fProtoParams = Proto.Source[ @prm, 1 ]		#require
@@ -717,32 +722,6 @@ function IsSimpleCast (|Message|)
 	require (found.IsLast) and (found == @Type) and (found.first isThing "self")
 
 	Return found
-
-
-/*function CreateProtoCastTo (|SCFunction| f)
-	disabled 
-	|| P  = f.prototype
-	|| sP =  .Prototype
-	
-	require !P.isinterface and !sp.isinterface
-	
-	|| Using = f.source.syntaxusing 
-	|| P1 = P.TypeNormal.WriteDeclFull
-	
-	// take whatever we are?
-
-	|| arg = «arg » 
-	|| func = @tmp + "function"
-	func.msg(@thg, "SyntaxCast")
-	func.msg(@prm) <~ p1
-	func <~ arg
-
-	arg.msg(@tmp, "cpp_part").msg(@thg, "cast")
-	|| type = arg.msg(@tmp, "return").msg(@type, ":)")
-	type.msg(@thg, "self")
-	type <~ p1.first.Copy
-
-	sp.CollectSub( func )*/
 
 
 function EqualOrMoreSpecific (|SCFunction| f, |bool|)
@@ -1250,19 +1229,20 @@ function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |
 		expect (parent isa SCModule) (node, "Function prototypes must be in a module." )
 		
 	|| f = SCFunction.NewFunc( node, parent, ErrPlace )|SCFunction|		#require
-	expect (Compiler.FuncList.Pop == f)
+	Compiler.FuncList.Pop
 	
 	|| Using = node.SyntaxUsing
-	|| tmp = @tmp + "datatype"
+	|| tmp = @tmp + "struct"		// perhaps it really is a struct?
 	tmp.msg(@thg, f.Name)
 	tmp <~ node.last
 	
 	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface )
 		|| clss = modul.Cls!
-		clss.IsBuiltin = false // datatype sets it to true.
+		clss.IsBuiltin = false		// datatype sets it to true.
 		clss.FuncProto = f
 		f.ProtoType = clss
 		Compiler.ProtoTypes <~ f
+		// clss.TypeNormal.PointerCount = 1
 	
 	Return Modul
 
@@ -1454,7 +1434,7 @@ function scbase.LateAddTempory (|string| type, |string| name1, |message| Value, 
 	TypeOfExpr(Value, self)
 	|| msg = MakeDecl(type, name, Value, scdeclinfo.body)
 	|| D = TypeOfExpr(msg, self)$
-	(D is const) = false
+	(d is dataconst) = false
 	.Source <~ msg
 	.TryAdd( err, D, name )
 	return name

@@ -408,7 +408,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 					return (dcl, nil)(dcl.isnil)
 
 				if dcl.Type.FuncProto
-					expect ((ParamsArray.IsDot or !ParamsHere) and (!ParamsArray))  ( exp, "Wrap this expression in a bracket before calling a function on it." )
+					expect ((ParamsArray.IsDot or !ParamsHere) and (!ParamsArray))  ( exp, "Wrap this in a bracket, before calling it as a function." )
 					Return o
 
 				if (!side and paramsarray.isdot and dcl.type.processas)

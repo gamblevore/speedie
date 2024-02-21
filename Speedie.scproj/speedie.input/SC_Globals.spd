@@ -131,7 +131,7 @@ function Message.CanGetAddress (|scbase| name_space, |bool|)
 
 	|| T2 = TypeOfExpr(curr, name_space)				#require // might transform it
 	expect (curr == @thg or @dot) (curr, "Can't get address of this.")
-	expect (T2 isnt const)        (curr, "Can't get the address of a const.")
+	expect (T2 isnt dataonlyconst)        (curr, "Can't get the address of a const.")
 	
 	if (curr == @thg) and (t2 is local) and !(t2.IsNormalStruct or t2.IsCArray)
 		|| p = .ParentForAddress
@@ -444,7 +444,7 @@ function ExtractDecl (|Message!| c, |SCBase?| name_space, |declmode| Purpose, |S
 		|| Prms = c.second
 		if prms.HasAny
 			|| R = ExtractDecl( c.first!, name_space, purpose )			#require
-			R = R.copy
+			R = R.copydecl
 			expect  ExtractAmount( Prms, name_space, R )   ( c, "Expected something like: |Type[10]|" )
 			return R
 			
@@ -633,7 +633,7 @@ function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
 	prms <~ cls.calculatesize
 	
 	|| MemWrapper = TypeOfExpr(exp, compiler.program)	#require
-	MemWrapper = MemWrapper.copy // cos we gonna alter it.
+	MemWrapper = MemWrapper.copydecl // cos we gonna alter it.
 	(memwrapper is newlycreated)
 	memwrapper.contains = cls.TypeOptional
 	
@@ -1237,7 +1237,7 @@ function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
 		if rn.isint 
 			return .cirsub(rn.int)
 	
-	  elseif (rn == @thg) and (rt is const) and rt.isnormalnumber and rt.isinteger
+	  elseif (rn == @thg) and (rt is DataOnlyConst) and rt.isnormalnumber and rt.isinteger
 		|| def = rt.default
 			return .cirsub(def.int)
 
@@ -1399,9 +1399,9 @@ function scclass.NotConst (|scdecl|)
 	|| d = ._NotConst
 		return d
 	d = .typenormal
-	if (d is const)
-		D = D.copy	// erase IsConst, like collectdecls does...
-		(D Isnt Const)
+	if (d is dataOnlyconst)
+		D = D.copydecl	// erase IsConst, like collectdecls does...
+		(D Isnt DataOnlyConst)
 		// future opts could speed this up! like all da magic eggs... transform into a new space!!!
 	._NotConst = d			// a space of new eggs!!!
 	return D

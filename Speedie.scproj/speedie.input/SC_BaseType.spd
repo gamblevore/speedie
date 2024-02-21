@@ -20,10 +20,10 @@ extend scclass
 		if .isobject
 			return SCBaseType.object
 		if .isdatatype
-			if !.funcproto
-				return SCBaseType.datatype
-			  else
+			if .funcproto
 				return SCBaseType.funcproto
+			  else
+				return SCBaseType.datatype
 		if .isstruct
 			return SCBaseType.struct
 		debugger

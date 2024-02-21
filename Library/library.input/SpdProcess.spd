@@ -6,14 +6,14 @@ class SpdProcess (Process)
 	|jbin|						Writer
 	|?&pico|					Pico
 	|stringzeroterminated|		_DebugName
-	|SpdMainFn?|				SubProcess
+	|?&SpdMainFn|				SubProcess
 	|int| 						DeathLimit
 	|int|						DiedCount
 	|bool|						WeAreParent
 	|bool|						AlreadyWarnedDied
 	|ProcessMode|				Mode
 
-	constructor	(|string| path, |stringzeroterminated| DebugName, |[string]| params=nil,  |SpdMainFn?| fn=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
+	constructor	(|string| path, |?&SpdMainFn| fn, |stringzeroterminated| DebugName, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
 		super.constructor(path) // <-- mode should be passed here
 		
 		.deathlimit = 12
@@ -191,7 +191,7 @@ class SpdProcess (Process)
 		function InitOwner
 			target !minilib
 				if pico.parent
-					.parent = SpdProcess("", "")
+					.parent = SpdProcess("", nil, "")
 
 		function CheckAllAlive
 			opt norefcounts
@@ -216,7 +216,7 @@ class SpdProcess (Process)
 		function RunChild (|string| app_path, |string| DebugName="", |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
 			debug_require params!=nil
 			require app_path.file.mustexist
-			rz = SpdProcess(app_path, debugname, params, nil, Mode)
+			rz = SpdProcess(app_path, nil, debugname, params, Mode)
 			if !rz.RunChild
 				rz = nil
 
@@ -234,7 +234,7 @@ datatype ProcessMode (byte)
 prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)
 	function RunThreaded (|[string]| R = [],  |SpdProcess|)
 		|| c_args = SpdProcess.CreateArgs("", r)
-		rz = SpdProcess("", "SpdMainFn()", r, self)
+		rz = SpdProcess("", self, "SpdMainFn()", r)
 		if !rz.pico.startthread(self|picothreadfn|, 7|_voidptr|, c_args)
 			rz = nil
 

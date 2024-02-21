@@ -26,7 +26,7 @@ function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| P
 	rel <~ value
 	
 	|| o = value.obj as scdecl
-		|| dcl = o.Copy(true)
+		|| dcl = o.copydecl(true)
 		dcl.info |= purpose
 		dcl.Name = name
 		dcl.Default = value
@@ -107,6 +107,7 @@ function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cl
 	if dcl.default isthing "nil"
 		dcl.nildeclared = nilstate.optional
 	func.args <~ dcl
+	(dcl isnt dataconst)
 	if dcl.name
 		(dcl is param)
 		(dcl isnt altered)
@@ -167,6 +168,7 @@ function Message.CollectFromBody (|SCBase| scarg, |bool|)
 	opt norefcounts
 	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody, nil, nil)
 		(dcl is body)
+		(dcl isnt dataconst)
 		|| def = dcl.Default
 			check (def != @thg or def.name ~!= dcl.name) (def, "Same name!")
 		return true
@@ -224,7 +226,7 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| c
 	if sdcl.NeedsContainedfix
 		sdcl = sdcl.Containedfix
 	
-	|| dcl = Sdcl.copy
+	|| dcl = Sdcl.copydecl
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )
 		if funcprms
@@ -283,7 +285,7 @@ function scdecl.NeedsContainedfix (|bool|)
 function scdecl.Containedfix (|scdecl|)
 	opt norefcounts
 	|| t = .type
-	rz = (.copy, self)(T.typenormal == self)
+	rz = (.copydecl, self)(T.typenormal == self)
 	rz.contains = t.SelfDecl.Contains
 
 
@@ -311,6 +313,7 @@ datatype DeclMode (uint)
 		Properties	= 3
 		Globals		= 1
 		FunctionBody = 8
+		Local = FuncParam+FunctionBody
 		Proto		= 16
 		TypeCast	= 32
 		ProtoParam	= FuncParam + Proto

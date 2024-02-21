@@ -86,7 +86,7 @@ constructor (|Message| node, |SCBase| parent, |bool| HasPtrs, |scmodule| m)
 	if node == "struct"
 		T = T.GetAddress(declmode.funcparam)
 	  else
-		T = T.Copy
+		T = T.CopyDecl
 	.SelfDecl = T
 	T.Name = "self"
 	(T is SelfImplicit)
@@ -476,7 +476,7 @@ function ContainedTypeLoad
 	|| ContainedMsg = .Sourcearg.find(@Tmp, "contains")[@thg]			#require
 	|| cls = compiler[ ContainedMsg.name, ContainedMsg ]				#require
 	|| TN = Cls.TypeOptional
-	|| cont = TN.Copy
+	|| cont = TN.CopyDecl
 	(cont Is UpgradeableContained)
 	.Contained = cont
 	.IgnoreContainedSelf |= tn.isdatatype
@@ -672,7 +672,7 @@ function scfunction.AddSelfToFunc (|scclass| cls, |SCBase| space)
 	opt norefcounts
 	|| sl = cls.SelfDecl		// for my nil-checker
 	if sl.TypeSuffers				// refcounting will set MarkAsRefAltered
-		sl = sl.copy
+		sl = sl.copydecl
 		if .IsConstructorOrDestructor
 			sl = sl.MakeNewReal
 		(sl is SelfImplicit)	// I shouldn't have to specify this, it should be copied!

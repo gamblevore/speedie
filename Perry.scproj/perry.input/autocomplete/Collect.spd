@@ -59,7 +59,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg)
 	.LogOneComm(msg, "\1C ")
 
 
-function PerryIDE.SubProcess (|bool| actual_compile, |SpdMainFn|)
+function PerryIDE.SubProcess (|bool| actual_compile, |&SpdMainFn|)
 	require false// platform.isdebug and !actual_compile
 	if actual_compile
 		rz = Speedie_Compiler
@@ -91,6 +91,7 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 	// 
 	|SpdProcess| spd 
 	|| SubProcess = .SubProcess(actual_compile)
+	if SubProcess?
 		if !.UsingSpdLib
 			.UsingSpdLib = true
 			f.name = name.TrimExt + "()"

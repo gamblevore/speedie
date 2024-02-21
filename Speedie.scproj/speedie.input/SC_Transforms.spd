@@ -705,7 +705,7 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCBase!| space)
 	expect (cls) (r, "This is not a real class.")
 	expect (!cls.IsRole) (r, "This is not a real class. Test it's super-class instead.")
 	|| OldDecl		= space.LookupVarDecl( L.name )					#require
-	|| NewDecl		= OldDecl.Copy
+	|| NewDecl		= OldDecl.copydecl
 	NewDecl.IsTypeImprove = true
 	NewDecl.IsLookupOnly = OldDecl
 	

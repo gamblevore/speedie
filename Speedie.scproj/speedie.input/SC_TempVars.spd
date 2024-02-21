@@ -44,7 +44,7 @@ function message.StatementExpr (assigns:|scarg| arg)
 function message.TheTmpVarOf (|string| tmpname, |message|)
 	rz = «Thg tmpname »
 	|| ad = .AsDecl
-		|| d = ad.Copy
+		|| d = ad.copydecl
 		d.Name = ""
 		rz.obj = d
 
@@ -183,7 +183,7 @@ extend_module scfunction
 		
 		|| OldDcl = msg.AsDecl
 			insert.obj = OldDcl
-			OldDcl = OldDcl.Copy // no difference, its a temp
+			OldDcl = OldDcl.copydecl // no difference, its a temp
 			OldDcl.Name = name
 			repl.obj = OldDcl
 			dcl.obj = OldDcl
@@ -208,7 +208,7 @@ extend_module scfunction
 		|| declmsg = MakeDecl( "", name, msg, scdeclinfo.body )
 		parent.prev = declmsg
 
-		|| d = OldDecl.Copy
+		|| d = OldDecl.copydecl
 		NameThing.obj = d
 		d.Name = ""
 		(d is body)

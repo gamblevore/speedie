@@ -6,7 +6,6 @@
 
 
 * Do nil checker!
-	* function pointers not being tested!
 	* global struct pointers not assumed nil rn?
 
 	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!
@@ -15,13 +14,13 @@
 	* picomsg is now crashing or failing on constructor
 		* speedie stops compiling sometimes, from perry
 		* pico needs a massive bloat bastard constructor/destructor test!!! like 8 threads bastardly creating/destroying picos!
-		* logging huge files super slow (parsing/recolorising each line?)
+		* logging huge stdout super slow (parsing/recolorising each line?)
 
 	* name should be "safe" (needs a "getter" func that works like a setter)
-
-
+	
+	* check OK shouldn't disappear
 	* selector constructor shouldn't need "?"
-	*	con.counterpart|array| <~ result // should be rejected!
+	* optional|array| <~ result // should be rejected!
 	* helper message.LastAfter (|int|ignoreafter, |ind|) shouldn't need nil self
 
 

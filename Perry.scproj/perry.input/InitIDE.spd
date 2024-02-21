@@ -327,7 +327,7 @@ extend PerryIDE
 
 		.JeeboxText.SetupOut("jeebox")
 		.SpeedieText.SetupOut("speedie")
-		.ProductOut.SetupOut("product")
+		.ProductOut.SetupOut("product", TextView.AllowJeebox)
 		.ProductErrors.SetupOut("errors")
 				
 		.runbutton.SubControl = self.DebugArgsList
@@ -371,18 +371,14 @@ extend PerryIDE
 			.size = the~area
 			.itemwidth = 75
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
-			|| items = "Speedie, Jeebox, '', Errors".parse|listviewrow|
-			.items = items
-			items = items.first!
-			(items is selected)
-			items.Obj = self.SpeedieText
-			items = items.next!
-			items.obj = self.JeeboxText
-			items = items.next!
-			items.obj = self.ProductOut
-			items = items.next!
-			items.obj = self.ProductErrors
-			(items is hidden)
+			.items = "Speedie, Jeebox, '', Errors".parse|listviewrow|
+			|| C = .items.first!
+			(C is selected)
+			C.Obj = self.SpeedieText
+			c = c.next(self.JeeboxText)
+			c = c.next(self.ProductOut)
+			c = c.next(self.ProductErrors)
+			(c is hidden)
 			
 
 		.AddIDEButton(.StartScreen,	"\1a", "Startup screen", "startup")
@@ -430,9 +426,13 @@ extend PerryIDE
 		.SetupLogArea
 		.ReTextSubFind
 		.CompileTabSelect(.SpeedieText)
-		
+	
+	function listviewrow.Next (|guicontrol| obj, |Message!|)
+		pragma inline
+		rz = .next!
+		rz.obj = obj
 
-	function textview.SetupOut (|string| name)
+	function textview.SetupOut (|string| name, |int| Parse=TextView.probablyjeebox)
 		opt norefcounts
 		is enabled
 		is alwaysscrollable
@@ -442,7 +442,7 @@ extend PerryIDE
 		.size 			= the~width by the~bottom to 0~under
 		.takesfocus		= takesfocusflag.On
 		.gnormal.solid	= vec4(0.077, 0.95)
-		.expectsparse	= TextView.probablyjeebox
+		.expectsparse	= Parse
 		.PreferStayAtEnd= true
 		.ide.EditSep.addlow(self)
 		

@@ -5,7 +5,8 @@
 
 
 prototype fpMsgRender (|Message| self, |FastString| fs)
-
+	function Test
+		
 
 datatype Syntax (Byte)
 	default nil

@@ -47,12 +47,11 @@ struct ArchonPurger
 	linkage: cpp_part nil
 	|&NilRecord| 			Neel
 	|&NilRecord| 			RowEnd
-	|Nilrecord| 			Realnesses
-	target debugnil
-		|Scdecl--[32]| 		Dbg
+	|Nilrecord| 			Realnesses		// could be removed after we remove the param upgrader!
+	|Scdecl--[32]| 			Decls
 	|scdecl?|				Return
 	|bool|					FnAbleToNilCheck
-	|bool| 					RootReturned // for recursive funcs
+	|bool| 					RootReturned	// for recursive funcs
 	|bool|					AnyReturns
 	|NilRecord[64]| 		Rows
 	
@@ -100,8 +99,7 @@ struct ArchonPurger
 		nd &= nilstate.either
 		|| N = .value.DepthOfVars + 1
 		expect (N < 31)								(D, "Too many declarations")
-		target debugnil
-			.dbg[n] = d
+		.decls[n] = d
 		d.NilReg = N * d.TypeSuffers			
 		d.DReg.Reg = n								// right? might as well do this at the same time?
 		d.NilAllocDepth = .NestDepth
@@ -175,11 +173,7 @@ struct ArchonPurger
 
 	function Value (|nilrecord|)
 		pragma inline
-		opt norefcounts
-		rz = *.Neel
-		target debugnil
-			|| d = rz.depthofvars
-				if !.dbg[d]
+		return *.Neel
 	
 	
 	function Self (|nilstate|)
@@ -194,7 +188,7 @@ struct ArchonPurger
 			*.neel = dest
 			
 			for i in 32
-				|| d = .dbg[i]
+				|| d = .decls[i]
 				if d and diff[i]
 					d.nilprint("change")
 	} else {

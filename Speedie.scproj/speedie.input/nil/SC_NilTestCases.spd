@@ -18,19 +18,6 @@ class NilTest
 		|| v = .v3
 		borks // amazing
 		*v = 'x'
-
-
-/*
-	function abcd (|message| msg)
-		|| f = msg.first
-		if f
-		// ideally... the nil-ness knowledge of msg.first should transfer
-		// back to msg. that is, if f is real, then so is msg. 
-		// we'd need a way to "link" variables. bools too... should be linked
-		// like || x = msg != nil
-			if msg starts "display"
-				"oof"
-*/
 		
 	function AndTest (|string?| a, |string?| b, |string| cc)
 		if (a and b)
@@ -220,6 +207,15 @@ module NilTest2
 		|| fs = faststring()
 		(f)(message(), fs)
 
+	function fpTest2
+		|fpMsgRender| x
+		(x)(nil, nil)
+
+	function StartSound (fpMsgRender)
+	function fpTest3 (fpMsgRender)
+		(StartSound).Test
+
+
 
 function scfunction.NilPrint (|string| header="", |bool| nilch)
 	cpp_name ndb1
@@ -289,7 +285,7 @@ function NilRecord.ndb5
 	|| n = .DepthOfVars + 1
 	for i in n
 		// item 0 is nil
-		|| D = ArchonPurger.T.dbg[i]
+		|| D = ArchonPurger.T.decls[i]
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"

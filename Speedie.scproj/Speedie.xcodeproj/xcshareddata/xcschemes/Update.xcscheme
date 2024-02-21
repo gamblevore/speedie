@@ -59,7 +59,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--target=debugnil"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nocolor"

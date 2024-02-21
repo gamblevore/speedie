@@ -135,7 +135,11 @@ function perryide.ListAllFuncsMsg (|message| items, |message| result, |string| f
 		if line == @decl
 			0 // result.IDEAddfunc(line, filter)
 		  elseif line == @tmp
-			if AutoComplete.owner.valuelower(line.name)						// class/module/etc
+			if line ~= "target"
+				|| arg = line.last
+				if arg == @arg
+					.ListAllFuncsMsg(arg, result, filter)
+			  elseif AutoComplete.owner.valuelower(line.name)						// class/module/etc
 				.ListAllFuncsMsg(line.funcarg, result, filter)
 			  elseif AutoComplete.isafunc(line)
 				result.IDEAddfunc(line, filter)

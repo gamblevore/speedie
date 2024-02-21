@@ -61,7 +61,7 @@ function GetPrefix (|SCDecl| D, |string|)
 
 function SCDecl.PrefixedName (|SCModule| M, |string|)
 	|| s = .name
-	if (self is Const) and (*s == 'k')
+	if (self is DataOnlyConst) and (*s == 'k')
 		s = s[1...]
 	return M.GetPrefix(self) + s.unicodesafename
 

@@ -50,8 +50,8 @@ extend PerryIDE
 
 
 	function ShowCompileErrors (|message| msg, |bool|)
-		|| MaybeOK = msg.first
-		if (MaybeOK == "ok")
+		|| MaybeOK = msg.last
+		if (MaybeOK == @thg and "ok")
 			.ErrorList.clear
 			return .CheckedOK(msg.name)
 

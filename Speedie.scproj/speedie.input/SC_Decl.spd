@@ -48,7 +48,9 @@ datatype SCDeclInfo (uint)
 		|SCDeclInfo|
 		Borrowed
 		StayBorrowed
+		DataOnlyConst
 		Const
+		DataConst = DataOnlyConst + Const
 		Static
 		UpgradeableContained
 		NewlyCreated
@@ -71,7 +73,8 @@ datatype SCDeclInfo (uint)
 		SetTo			// a var sets it... like: rz = obj
 		Local = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
-		
+		DclCopied    = altered + stayborrowed + static + api + UpgradeableContained + compilercreated // need more too? do later
+
 		
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
 		if b
@@ -147,19 +150,14 @@ class SCDecl (SCObject) {
 		return datatypecode.double
 
 	
-	function Copy (|bool| ForNewVariable = false, |SCDecl|)
+	function CopyDecl (|bool| ForNewVariable = false, |SCDecl|)
 		|| dcl = SCDecl(.type)
 		
 		.CopyTypeInfoTo( dcl )
-		(dcl Is Const)  = self Is Const
-
+		
 		// why not copy the whole info?
-		(dcl is api) = self is api
 		dcl.Name     = .Name
 		dcl.Default  = .Default
-		(dcl is altered) = self is altered
-		(dcl is stayborrowed) = self is stayborrowed
-		(dcl is static) = self is static
 		(dcl Is Borrowed) = !ForNewVariable and (self Is Borrowed)
 		Return dcl
 
@@ -242,9 +240,7 @@ class SCDecl (SCObject) {
 		dcl.PointerCount= .PointerCount
 		dcl.Contains	= .Contains
 		dcl.internal	= .Internal
-		|| cpyflags		= scdeclinfo.UpgradeableContained + scdeclinfo.compilercreated
-		// why not copy all flags?
-		// or split them into two properties?
+		|| cpyflags		= scdeclinfo.DclCopied
 		dcl.info &= ~cpyflags
 		dcl.Info |= .info & cpyflags
 		dcl.C_array		= .C_array
@@ -279,8 +275,8 @@ class SCDecl (SCObject) {
 		opt norefcounts
 		if .IsCArray
 			require IsAccess
-			|| c = .Copy // should keep borrowedness...
-					     // what about the nildeclare? c-arrays exist, but do their items exist?
+			|| c = .CopyDecl // should keep borrowedness...
+							 // what about the nildeclare? c-arrays exist, but do their items exist?
 			c.C_Array = 0
 			if c.typesuffers
 				c.nildeclared |= nilstate.optional // 
@@ -602,7 +598,7 @@ class SCDecl (SCObject) {
 				if .SameForReplace(contains) 
 					return self
 			
-			|| C = .copy
+			|| C = .copydecl
 			c.type = ctype
 			(C is UpgradeableContained) = !sameType
 			
@@ -610,7 +606,7 @@ class SCDecl (SCObject) {
 
 		|| inside = .contains
 		if inside  and  inside != contains  and  inside Is UpgradeableContained
-			self = .Copy
+			self = .copydecl
 			.Contains = contains
 		return self
 		
@@ -781,7 +777,7 @@ class SCDecl (SCObject) {
 		if self Is Borrowed
 			Return self
 		
-		rz = .Copy				// only used in extractdecl. Avoids modifying original.
+		rz = .copydecl				// only used in extractdecl. Avoids modifying original.
 		(rz Is Borrowed)
 		if stayborrowed
 			(rz is StayBorrowed)
@@ -838,7 +834,7 @@ class SCDecl (SCObject) {
 		if (Default and self == .type.typenormal)
 			return Default
 		
-		rz = .Copy
+		rz = .copydecl
 		rz.NilDeclared = type
 
 
@@ -856,7 +852,7 @@ class SCDecl (SCObject) {
 		opt norefcounts
 		if Type == 0
 			return self
-		rz = .copy
+		rz = .copydecl
 		rz.NilDeclared = type
 
 	function IsReal (|nilstate|)
@@ -868,7 +864,7 @@ class SCDecl (SCObject) {
 			return NilState.optional
 
 	function RefineDecl (|message| list, |SCDecl|)
-		rz = .Copy
+		rz = .copydecl
 		for p in list
 			if (p isthing "tag")
 				(rz is borrowed) = options.ProjectIsLibrary
