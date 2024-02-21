@@ -13,6 +13,8 @@ datatype SCBaseType (byte)
 	)
 	syntax is (|scbasetype| d, |bool|)
 		return self == d
+	function HasPtrs (|bool|)
+		return self == funcproto or object
 
 
 extend scclass

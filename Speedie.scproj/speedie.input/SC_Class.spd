@@ -851,13 +851,13 @@ module
 
 
 
-	function NeuClassSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |bool| HasPtrs,  |SCClass|)
+	function NeuClassSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |scbasetype| base,  |SCClass|)
 		if !ForInterface
 			expect (parent==compiler.program) (errplace, errorreceiver.NonFatal)
 		
 		|| arg = node.GiveArg
-		|| cls = SCClass.new( node, parent, HasPtrs, SCModule.new )
-		cls.BaseType = SCBaseType.object
+		|| cls = SCClass.new( node, parent, base.hasptrs, SCModule.new )
+		cls.BaseType = base
 		cls.IsRole = (node ~= "role")
 
 		|| SA = cls.SourceArg
@@ -882,24 +882,23 @@ module
 		
 	
 	function NeuClass (CollectFunc)
-		|| it = .NeuClassSub(node, name_space, ErrPlace, "", true)
-			it.ClassCollect
-			return it.modul
+		|| cls = .NeuClassSub(node, name_space, ErrPlace, "", scbasetype.object)
+			cls.ClassCollect
+			return cls.modul
 
 	
 	function SCClass.ClassCollect
 		.Collect( .Sourcearg, .IsVisible )
 
 
-	function DataTypeSub (|Message| Node, |SCBase| Parent, |Message| ErrPlace, |string| ForInterface, |SCModule|)
+	function DataTypeSub (|Message| Node, |SCBase| Parent, |Message| ErrPlace, |string| ForInterface, |scbasetype| BaseType, |SCModule|)
 		if node.obj
-			Return Compiler.program //already done
+			Return Compiler.program						// already done
 		
 		scbase.CurrVisibility = false
-		node.givearg
+		node.GiveArg
 		
-		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface, false )
-			it.basetype = SCBaseType.datatype
+		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface, BaseType )
 			it.ClassCollect
 		
 			expect !(it.Properties) (it.Source, "Datatypes can’t have properties.")
@@ -910,11 +909,11 @@ module
 	
 	
 	function DataType (CollectFunc)
-		return .DataTypeSub(node, name_space, errplace, "")
+		return .DataTypeSub(node, name_space, errplace, "", scbasetype.datatype)
 	
 
 	function NewStruct (CollectFunc)
-		|| it = .NeuClassSub(node, name_space, errplace, "", false)
+		|| it = .NeuClassSub(node, name_space, errplace, "", scbasetype.struct)
 			it.basetype = SCBaseType.struct
 			it.classcollect
 			return it.modul

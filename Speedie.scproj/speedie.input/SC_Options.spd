@@ -490,12 +490,13 @@ module Feedback
 		fs <~ "  @max: ${@max|int|}"
 		for (v in AppOptions) (k) 
 			(*v)("", "", fs_tester)
-			if (fs_tester.length) 
+			|| val = v.Value|shelloption|
+			if (val and fs_tester.length) 
 				fs_tester.length = 0
 				fs <~ "\n--"
 				fs <~ k
 				fs <~ (' ', 17-k.length)
-				(v.value|shelloption|)("", "", fs)
+				(val)("", "", fs)
 		printline fs.getresult
 
 
