@@ -57,7 +57,7 @@ linkage
 |bool|						DefaultsToReal
 |bool|						IsRole
 |bool|						IsBuiltin // SCBaseType
-|scbasetype| 				BaseType2
+|scbasetype| 				BaseType
 |bool|						IsASM
 |bool|						IsNotNumeric
 
@@ -856,7 +856,8 @@ module
 			expect (parent==compiler.program) (errplace, errorreceiver.NonFatal)
 		
 		|| arg = node.GiveArg
-		|| cls = SCClass.new( node, parent, hasptrs, SCModule.new )
+		|| cls = SCClass.new( node, parent, HasPtrs, SCModule.new )
+		cls.BaseType = SCBaseType.object
 		cls.IsRole = (node ~= "role")
 
 		|| SA = cls.SourceArg
@@ -868,7 +869,7 @@ module
 
 		if (ForInterface and parent isa scmodule)
 			cls.CppClass = "__${parent.cls!.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"
-				
+		
 		Return cls
 	
 	
@@ -898,7 +899,7 @@ module
 		node.givearg
 		
 		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface, false )
-			it.basetype2 = SCBaseType.datatype
+			it.basetype = SCBaseType.datatype
 			it.ClassCollect
 		
 			expect !(it.Properties) (it.Source, "Datatypes can’t have properties.")
@@ -914,7 +915,7 @@ module
 
 	function NewStruct (CollectFunc)
 		|| it = .NeuClassSub(node, name_space, errplace, "", false)
-			it.basetype2 = SCBaseType.struct
+			it.basetype = SCBaseType.struct
 			it.classcollect
 			return it.modul
 

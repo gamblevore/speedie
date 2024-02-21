@@ -35,10 +35,12 @@
 
 						 Perry Do later
 
+* GUI should have a "current list" listview that can be stepped through using <> keys... and its just the visible front one.
 * error count should be listed in GUI
+	* listview should have a "header"
 	* errors should bubble up the folders
 	* and display in scroll
-* return in the cmd-d should disappear the thing!
+* return in the cmd-d should disappear the thing! (when lines are involved)
 * moving arrow in unseen lines, should jump to 1/3 of visibility... as expected
 * colormark unused funcs in editor
 	* mouseover errors in editor, should put them in a popup

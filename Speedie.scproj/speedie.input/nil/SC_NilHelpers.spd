@@ -139,11 +139,12 @@ function message.IsNowNil (|int|)
 
 
 function scdecl.TypeSuffers (|bool|)
-	if .isobject
-		return true
 	if .iscarray
 		return false
-	return .PointerCount
+	if .PointerCount
+		return true
+	|| d = .type.BaseType
+	return d == scbasetype.FuncProto or scbasetype.Object
 
 
 function SCdecl.IsCArray (|bool|)

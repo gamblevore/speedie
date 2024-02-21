@@ -17,28 +17,16 @@ datatype SCBaseType (byte)
 
 extend scclass
 	function IsStruct (|bool|)
-		return .BaseType2 == SCBaseType.struct
-	
-	function IsDataType (|bool|)
-		disabled "IsDataTypeOnly or IsDataTypeOrFP"
-		return .BaseType2 == SCBaseType.datatype
+		return .BaseType == SCBaseType.struct
 	
 	function IsDataTypeOnly (|bool|)
-		return !.FuncProto and .BaseType2 == SCBaseType.datatype
+		return .BaseType == SCBaseType.datatype
 	
 	function IsDataTypeOrFP (|bool|)
-		return .BaseType2 == SCBaseType.datatype or SCBaseType.funcproto
+		return .BaseType == SCBaseType.datatype or SCBaseType.funcproto
 	
-	function BaseType (|SCBaseType|)
-		if .IsObject
-			return SCBaseType.object
-		if .IsFunc
-			return SCBaseType.funcproto
-		if .IsDataTypeOnly
-			return SCBaseType.datatype
-		return SCBaseType.struct
 
 	syntax equals (|SCBaseType| d, |bool| aware, |bool|)
 		cpp_part EqualsType
-		if self and d > scbasetype.nil
+		if self and d > SCBaseType.nil
 			return .BaseType == d
