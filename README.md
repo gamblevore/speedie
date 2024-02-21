@@ -11,9 +11,10 @@
 
 
 # General Features #
-* Object-oriented programming model
-* Simple but powerful syntax.
 * Modern simple language, slightly more expressive than Python.
+* Compiled apps run faster than apps made in idiomatic C++.
+* Compiles fast too.
+* Object-oriented programming model
 * Cross-platform. Create shell tools and GUI apps
 * Easy communication across multiple processes (IPC).
 * Has an awesome IDE, “Perry”.
@@ -43,6 +44,7 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 
 
 # Power Features #
+* Has an awesome nil-checker and type-safety system! Write safe code while having an easy time of doing it!
 * Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE*/ifstreams/fread and do everything using low-level Unix APIs.)
 * Doesn't infantilise you like Javascript or java does. Allows you to mess around with pointers or structs if you need... although its usually a buggier approach. 
 * Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
