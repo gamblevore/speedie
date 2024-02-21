@@ -712,22 +712,24 @@ class Message (RingTree)
 		return "${.funcname} ‘${.name}’"
 
 
-	getter Name (|string|)
-		pragma inline
+	function Name (|string|)
+		nil safe
 		return .name_
 
 
 	function Name_ (|string|) // for use within the message class!
-		description "For use when the 'name' getter function can't be used directly"
-		nil checker
+		description "For use within the message class, which can't use the 'name' function directly."
+		nil safe
 		if self
-			return .Name 
+			return .Name
+
 
 	function FirstName (|string|)
 		nil checker
 		opt norefcounts
 		|| f = .first
 			return f.name
+
 
 	function Ancestor (|Syntax| f, |Message|)
 		Opt NoRefCounts

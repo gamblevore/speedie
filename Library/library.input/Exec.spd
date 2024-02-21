@@ -7,8 +7,8 @@
 module Pipe
 	constants
 		StdIn_  = 0
-		StdOut_ = 1 // i guess it should be a getter func
-		StdErr_ = 2 // considering we have setter funcs
+		StdOut_ = 1
+		StdErr_ = 2
 
 	function StdOutIsTerminal (|bool|)
 		return .IsTerminal(.StdOut_)

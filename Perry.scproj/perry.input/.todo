@@ -8,7 +8,8 @@
 * Do nil checker!
 	* global struct pointers not assumed nil rn?
 	* nilfile.TestFile not testing properly
-	* params to fps not tested properly
+	* replace getter with actual property... if we can prove it is real.
+	* params to FPs not tested properly
 
 	* selector constructor shouldn't need "?"
 	* optional|array| <~ result // should be rejected!
@@ -22,6 +23,7 @@
 		* pico needs a massive bloat bastard constructor/destructor test!!! like 8 threads bastardly creating/destroying picos!
 		* logging huge stdout super slow (parsing/recolorising each line?)
 	* spamlines failing
+	* galaxxies crashing
 
 
 

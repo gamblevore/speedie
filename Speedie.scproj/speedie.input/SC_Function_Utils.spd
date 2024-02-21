@@ -53,31 +53,39 @@ dispatch FuncPreReader (fnPreReader)
 		if f ~= "self"
 			.NilSelff(msg, nilstate.optional)
 		  elseif f ~= "checker"
-			.NilSelff(msg, nilstate.optional)
-			.isnilchecker = true
+			.MakeNilChecker(msg)
+		  elseif f ~= "safe"
+			.MakeNilChecker(msg)
+			.HidesProperties = true 
+			.isinline = true
+			
 		  else
 			error f
 	}
 	
-	+"real" {
+	+"real"
 		opt norefcounts
 		|| f = msg[@thg]$
 		if f ~= "self"
 			.NilSelff(msg, nilstate.real)
 		  else
 			error f
-	}
+	
 
 	+"description" {
 		|| str = msg[@str]
-			if .isdisabled
+			if .IsDisabled
 				error (msg, "Already disabled")
 			  else
 				check !.description (msg, "Can’t have multiple descriptions.")
 				.Description = str.name
 	}
-	
 
+
+function scfunction.MakeNilChecker (|message| msg)
+	.NilSelff(msg, nilstate.optional)
+	.isnilchecker = true
+	
 
 function SettingSelfProperty (|Message| Rel, |bool|)
 	// .bla = X

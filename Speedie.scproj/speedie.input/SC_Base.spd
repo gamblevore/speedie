@@ -391,7 +391,6 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 		
 		if o isa SCDecl
 			if o.hider.matches(paramsarray.isassigns) and (owning_cls != curr)
-				if !paramsarray.isassigns
 				o = o.hider|scdecl|
 			  else
 				if o.Type.FuncProto
@@ -900,7 +899,6 @@ dispatch ClsCollectTable (CollectFunc)
 	function			SCFunction.NewFunc
 	extend_function		SCFunction.NewFunc // user shouldn't write these
 	setter				SCFunction.NewHider
-	getter				SCFunction.NewHider
 	api					SCFunction.NewFunc
 	macro				SCFunction.NewMissingFunc
 	helper				SCFunction.NewHelper

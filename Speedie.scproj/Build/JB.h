@@ -1338,13 +1338,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1877])
+#define kJB__ErrorColors_bold (JB_LUB[1878])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1878])
-#define kJB__ErrorColors_good (JB_LUB[1879])
-#define kJB__ErrorColors_normal (JB_LUB[1880])
-#define kJB__ErrorColors_underline (JB_LUB[1879])
-#define kJB__ErrorColors_warn (JB_LUB[1881])
+#define kJB__ErrorColors_error (JB_LUB[1879])
+#define kJB__ErrorColors_good (JB_LUB[1880])
+#define kJB__ErrorColors_normal (JB_LUB[1881])
+#define kJB__ErrorColors_underline (JB_LUB[1880])
+#define kJB__ErrorColors_warn (JB_LUB[1882])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1511,7 +1511,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1882])
+#define kJB_codesign_native (JB_LUB[1883])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1528,7 +1528,7 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kBitAnd (JB_LUB[354])
 #define kJB_kBitNot (JB_LUB[609])
 #define kJB_kBitOr (JB_LUB[1328])
-#define kJB_kBitXor (JB_LUB[1883])
+#define kJB_kBitXor (JB_LUB[1884])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1543,7 +1543,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[1884])
+#define kJB_kSaverStart1 (JB_LUB[1885])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -7552,6 +7552,8 @@ Message* SC_Msg_FindRef(Message* self, SCFunction* fn, JB_String* name);
 
 Message* SC_Msg_FindShader(Message* self, JB_String* TypeName);
 
+JB_String* JB_Msg_FirstName(Message* self);
+
 void SC_Msg_FixElseif(Message* self);
 
 void SC_Msg_FixErl(Message* self);
@@ -7754,6 +7756,10 @@ SCFunction* SC_Msg_MsgFunc(Message* self);
 
 SCFunction* SC_Msg_MsgOwningFunc(Message* self);
 
+JB_String* JB_Msg_Name(Message* self);
+
+JB_String* JB_Msg_Name_(Message* self);
+
 void JB_Msg_Name__(Message* self, FastString* fs);
 
 Message* SC_Msg_NeedBra(Message* self);
@@ -7785,8 +7791,6 @@ Message* SC_Msg_NormaliseFunc(Message* self);
 void SC_Msg_NotNilRZ(Message* self, SCDecl* type, SCBase* space);
 
 void JB_Msg_Num__(Message* self, FastString* fs);
-
-JB_String* JB_Msg_Nyme(Message* self);
 
 bool SC_Msg_OarExpand(Message* self);
 
@@ -8550,6 +8554,8 @@ SCDecl* SC_Func_MacroFix(SCFunction* self, SCDecl* contains, SCBase* name_space,
 
 bool SC_Func_MacroGet(SCFunction* self, SCParamArray* paramsarray, SCFunction* prev);
 
+void SC_Func_MakeNilChecker(SCFunction* self, Message* msg);
+
 void SC_Func_MakeParamsReal(SCFunction* self);
 
 void SC_Func_MarkRecursive(SCFunction* self, SCFunction* EndAt);
@@ -8985,7 +8991,7 @@ bool JB_config_Save(Message* self);
 inline SCDecl* SC_TypeOfSwiz(Message* exp, SCBase* name_space, Message* side, SCDecl* class_Space) {
 	int W = SC_Class_NumericCount(class_Space->Type);
 	if ((W > 1) and (!JB_Ring_HasChildren(((Message*)JB_Ring_Last(exp))))) {
-		int swz = SC_Str_IsSwizzle(exp->Name, W);
+		int swz = SC_Str_IsSwizzle(JB_Msg_Name(exp), W);
 		if (swz) {
 			return SC_TypeOfSwizzle(exp, class_Space, name_space, side, swz);
 		}
@@ -9408,7 +9414,7 @@ inline void SC_xC2xB5Form_ConstructorWithStr(xC2xB5Form* self, JB_String* data) 
 inline void SC_xC2xB5Form_ConstructorWithMsg(xC2xB5Form* self, Message* tmp) {
 	self->Count = 0;
 	self->Varies = false;
-	JB_String* _tmPf3 = tmp->Name;
+	JB_String* _tmPf3 = JB_Msg_Name(tmp);
 	self->Name = JB_Incr(_tmPf3);
 	{
 		Message* _LoopSrcf2 = JB_Msg_Last(tmp, JB_SyxArg);
@@ -9416,7 +9422,7 @@ inline void SC_xC2xB5Form_ConstructorWithMsg(xC2xB5Form* self, Message* tmp) {
 		while (line) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(line));
 			Message* f = JB_Msg_NeedFirst(line);
-			SC_xC2xB5Form_LoadParam(self, JB_Msg_Nyme(f), f);
+			SC_xC2xB5Form_LoadParam(self, JB_Msg_Name(f), f);
 			line = _Nf1;
 		};
 		;
@@ -9535,7 +9541,7 @@ inline void SC_Iter_Constructor(SCIterator* self, SCClass* parent, Message* msg)
 	self->ValueRenamer = nil;
 	self->Parent = JB_Incr(parent);
 	Message* thg = JB_Incr(((Message*)JB_Ring_First(msg)));
-	JB_String* x = JB_Incr(JB_Msg_Nyme(thg));
+	JB_String* x = JB_Incr(JB_Msg_Name(thg));
 	JB_Decr(thg);
 	if ((!JB_Str_Exists(x))) {
 		JB_SetRef(x, JB_LUB[1486]);
@@ -9770,7 +9776,7 @@ inline void SC_Class_Constructor(SCClass* self, Message* node, SCBase* parent, b
 	self->TypeOptional = JB_Incr(_tmPf1);
 	SCDecl* _tmPf0 = SC_Decl_NilConstructor(T, kSC__NilState_Real * HasPtrs);
 	self->TypeReal = JB_Incr(_tmPf0);
-	if (JB_Msg_SyntaxEquals(node, JB_LUB[738], false)) {
+	if (JB_Msg_SyntaxEquals(node, JB_LUB[739], false)) {
 		JB_SetRef(T, SC_Decl_GetAddress(T, kSC__DeclMode_FuncParam));
 	}
 	 else {
