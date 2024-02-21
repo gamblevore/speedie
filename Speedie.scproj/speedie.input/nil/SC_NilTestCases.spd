@@ -209,10 +209,10 @@ module NilTest2
 			(f)(message(), fs)
 
 	function fpTest2
-		|fpMsgRender| x
-		if x?
-			(x)(nil, nil)
 		(StartSound).Test
+		|fpMsgRender| x
+		borks
+		(x)(nil, nil)
 
 	function StartSound (fpMsgRender)
 
