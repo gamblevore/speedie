@@ -39,6 +39,7 @@ class SCArg (SCBase)
 
 
 function Message.SCArgNested (|message| base, |SCBase| p, |SCArg?|)
+	opt norefcounts
 	while 
 		|| cp = .Ancestor(@arg)
 		if cp == base

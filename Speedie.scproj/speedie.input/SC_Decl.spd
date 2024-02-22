@@ -965,10 +965,10 @@ class SCDecl (SCObject) {
 			Cast |= kTypeCastBothWays
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
-		
+				
 		if (self is self) and (scfunction.currfunc! is constructor or Destructor) 
 			error (exp, "You can’t modify 'self' in a constructor or destructor.")
-		  elseif (self is local) and .isobject
+		  elseif side and (self is local) and .isobject
 			.MarkAsRefAltered
 						
 

@@ -100,8 +100,6 @@ extend Message		// scanning
 	iterator ScanArg
 // Just go through all the arg-level children! Will return temporal
 // statements. but also go into the arguments within a temporal statement.
-		debugger (self == @Arg)
-		
 		|| Curr_  = .First
 		|| After_ = .FlatAfter
 		

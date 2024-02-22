@@ -3,7 +3,7 @@
 function compiler.usingScript (|file| f, |file|)
 	require !f.isdir
 	require f.Read(16) starts "#!/"
-	rz = feedback.TryUseProject(f.path, true).scriptlocation.file #require
+	rz = feedback.TryUseProject(f.path, true).scriptlocation.filethatexists #require
 	if error.autoprint == errorflags.printandkeep
 		error.AutoPrint = 0
 	options.scripting = true

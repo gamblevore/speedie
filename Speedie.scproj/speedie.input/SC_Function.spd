@@ -64,7 +64,7 @@ linkage
 |bool| 					FlowDisabled
 |bool|					IsExternalLib
 |bool|					IsWrapper
-|bool|					IsNilChecker
+|byte|					IsNilChecker
 |nilstate|				NilSelf
 |bool|					IsInline
 |bool| 					IsKiller

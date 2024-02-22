@@ -681,18 +681,19 @@ class Message (RingTree)
 	function ShallowEquals (|message| B, |bool| Aware=false, |bool|)
 		return (.func == b.func) and .name.syntaxequals(b.name, aware)
 	
-	function DeepEquals (|message| B, |bool| Aware=false, |bool|)
+	function DeepEquals (|message?| B, |bool| Aware=false, |bool|)
 		opt norefcounts
+		nil self
 		|| A = self
 		|| A2 = .FlatAfter
 		|| B2 = b.FlatAfter
-		while a and b
+		while
 			|| ADone = A==A2
 			|| BDone = B==B2
 			if ADone And BDone
 				return true
 
-			if (ADone!=BDone) or (!a.ShallowEquals(b, aware))
+			if (ADone!=BDone) or (!a!.ShallowEquals(b!, aware))
 				return false
 				
 			A = A.flatnext

@@ -161,7 +161,8 @@ function Function (NilTrackerFn)
 		fn.NilPrint(false)
 		
 	if (test is active) and fn.IsNilChecker
-		Test |= NilCheckMode.Soft
+		if fn.isnilchecker != 3
+			Test |= NilCheckMode.Soft
 		if t.FnAbleToNilCheck
 			rz = nilstate.FnBecomesNilCh
 	  else
@@ -170,7 +171,7 @@ function Function (NilTrackerFn)
 	|| P = prms.first
 	|| HasAddrs = false
 	for recv in fn.args
-		if recv.nildeclared is optional
+		if (recv.nildeclared is optional) and (fn.IsNilChecker != 3)
 			test |= nilcheckmode.Soft
 			
 		|| v = .Jump(p!, test)

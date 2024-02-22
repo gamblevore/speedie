@@ -185,25 +185,22 @@ class NilTest
 		|niltest|	n1
 
 
-/*
+
 class NilFile
 	|file|		P
 	|message|	M
 
 	function TestFile
 		|| p2 = .P
-		|| m2 = .M
-		if nil
-		if !p2
-			p2.Addr
+		
 		if .p
-			"sigh"
-		if m2
-			"sigh"
+			""
+
+		|| m2 = .M
 		borks
-		if !m2
-			m2.func
-*/		
+		if m2
+			""
+
 
 
 
@@ -308,6 +305,6 @@ function NilRecord.ndb5
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"
-//	if scfunction.currfunc ~= "__junktest_18__"
+	//if scfunction.currfunc ~= "TestFile"
 
 

@@ -300,7 +300,7 @@ class PerryIDE (Window)
 	function ShowIDE (|bool| FromClick=false)
 		debug_require self // what?
 		|| p = .Project
-			app.prefs("currproj") = p.path
+		app.prefs("currproj") = p
 		if FromClick
 			if .islast
 				.ClickedTodo
@@ -479,7 +479,7 @@ class PerryIDE (Window)
 		opt norefcounts
 		require .CanAskingAboutMissing
 		|| f = .project
-		require f and !f.exists
+		require !f.exists
 		.CanAskingAboutMissing = false
 		
 		if "This project can't be found on the file-system anymore.\n\nWould you like to close it?".confirm

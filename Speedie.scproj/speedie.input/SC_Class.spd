@@ -53,7 +53,7 @@ linkage
 |bool|						SavingCanSkip
 |bool|						TreatAsBaseType
 |bool| 						Banned
-|byte|						HasNilChecker
+|bool|						HasNilChecker
 |bool|						DefaultsToReal
 |bool|						IsRole
 |bool|						IsBuiltin // SCBaseType
@@ -501,7 +501,7 @@ function OverrideSyntax
 	.casts = array.new
 
 	if !.IsStruct
-		.HasNilChecker = 1 // default to true
+		.HasNilChecker = true // default to true
 	
 	for f in cast
 		f.IsInline = true
@@ -512,13 +512,13 @@ function OverrideSyntax
 		if ret.IsNormalBool
 			|| OK = !f.isdisabled
 				f.args.first!.nildeclared = nilstate.Optional
-			f.IsNilChecker = 2*OK
-			.HasNilChecker = 2*OK
+			|| Mode = f.sourcearg!.nilcheckmode(ok)
+			f.IsNilChecker = Mode
+			.HasNilChecker = true
 	
 	.HasCompareFunc = .FindSpecialFunc( "SyntaxCompare", true )
 	.HasEqualsFunc = .FindSpecialFunc( "SyntaxEquals", true )
 	.TheIsFunc = .FindSpecialFunc( "SyntaxIs", true )
-
 
 
 function HasObjectProperties (|bool|)

@@ -162,7 +162,7 @@ extend Error
 	function SCOriginalData (|string|)
 		|| p = .SCOriginalpath
 			|| f = p.file
-			if f and f.exists and !f.isdir
+			if f.exists and !f.isdir
 				return f.readall
 		return .originaldata
 

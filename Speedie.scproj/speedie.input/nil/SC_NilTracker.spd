@@ -226,8 +226,8 @@ struct ArchonPurger
 			opt norefcounts
 			|| arg = t.Startnil(f)
 				Argument(arg)
-				if t.FnAbleToNilCheck
-					f.isnilchecker = true
+				if t.FnAbleToNilCheck and !f.isnilchecker
+					f.isnilchecker = 1
 			t.FinishNil(f)
 
 		

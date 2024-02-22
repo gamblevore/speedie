@@ -864,7 +864,7 @@ function InputFile (|File| Default, |String| s, |message| where, |File|)
 	if rz
 		return rz
 
-	rz := Compiler.BaseProjectPath![s]
+	rz = Compiler.BaseProjectPath![s]
 	if (Default != nil)
 		rz := default[s]
 	if !rz.exists

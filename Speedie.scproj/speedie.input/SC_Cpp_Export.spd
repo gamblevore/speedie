@@ -111,10 +111,8 @@ function Func (|FastStringCpp| fs, |SCFunction| F)
 	opt norefcounts
 	require .CanExportFunc(f)
 	|| funcheader = .FuncHeader(fs, f)$
+	.SetupFlow(F)
 
-	if (f.IsInline)
-		fs = .Inlines // one inline can inlcude another so we still need the header first.
-	
 	.funcStart(fs, f, funcheader)
 	f.Sourcearg!.Export( fs )
 
@@ -169,20 +167,18 @@ function SetupFlow (|SCFunction| f)
 		compiler.TernaryFunc!.exportname = "JB_Ternary"
 
 
-//function CodifyHeader
-//	opt norefcounts
-//	for (f in compiler.funclist)
-//		if f.NeedsExport and .CanExportFunc(f)
-//			WriteFunctionHeader( F, .HeaderProj )
-//			.HeaderProj <~ ";\n\n"
-//	scfunction.CurrFunc = nil
+function CodifyInlines
+	opt norefcounts
+	for (f in compiler.funclist)
+		if f.NeedsExport and .CanExportFunc(f) and f.IsInline
+			.func( .Inlines, f )
+	scfunction.CurrFunc = nil
 
 
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
 	opt norefcounts
 	for (f in list)
-		if f.NeedsExport
-			.SetupFlow(F)
+		if f.NeedsExport and !f.IsInline
 			.func( file, f )
 	scfunction.CurrFunc = nil
 
@@ -322,7 +318,8 @@ function Run
 	for c in Compiler.ModuleList
 		.ExportModuleProperties( c, nil )
 	
-
+	.CodifyInlines
+	
 	if options.ProjectIsLibrary
 		|| WriteTo = Cpp_Export.APIHeader
 			|| File = .StreamChild( "API.cpp" )

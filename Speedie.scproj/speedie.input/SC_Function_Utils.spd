@@ -57,7 +57,7 @@ dispatch FuncPreReader (fnPreReader)
 		  elseif f ~= "safe"
 			.MakeNilChecker(msg)
 			.HidesProperties = true 
-			//.isinline = true
+			.isinline = true
 			.isvisible = true
 			
 		  else
@@ -85,7 +85,7 @@ dispatch FuncPreReader (fnPreReader)
 
 function scfunction.MakeNilChecker (|message| msg)
 	.NilSelff(msg, nilstate.optional)
-	.IsNilChecker = true
+	.IsNilChecker = 1
 	
 
 function SettingSelfProperty (|Message| Rel, |bool|)

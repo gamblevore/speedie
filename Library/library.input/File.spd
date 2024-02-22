@@ -63,7 +63,8 @@ class File (String)
 		return .MoveTo( super.Parent[Name] )
 	
 	syntax cast (|bool|)
-		return self!=nil
+		opt norefcounts // what? why is this necessary?
+		RETURN self != nil
 
 	syntax cast (|faststring|)
 		cpp_part CastToStream
@@ -124,13 +125,13 @@ class File (String)
 		// normally allowmissing is good, but here it is bad.
 		// file.parse keeps track of the source+path
 		|| f = .Resolve(allowmissing).file
-			|| S = f.readall(lim, allowmissing)
-			if s.IsCompressed
-				s = s.Decompress(lim, nil)
-			if s
-				|memorylayer--| L = (Message).CreateUseLayer(f, s) 
-				rz = S.parse(@arg, false) // already decompressed.
-				(message).restore
+		|| S = f.readall(lim, allowmissing)
+		if s.IsCompressed
+			s = s.Decompress(lim, nil)
+		if s
+			|memorylayer--| L = (Message).CreateUseLayer(f, s) 
+			rz = S.parse(@arg, false) // already decompressed.
+			(message).restore
 
 	
 	function Modified (|Date|)
@@ -374,7 +375,7 @@ class File (String)
 		disabled "Use .out"
 	
 	function string.Out (|bool| Clear=true, |Faststring|)
-		|| f = .file						#require
+		|| f = .file
 		if Clear and !f.ispipe // we don't close pipes!
 			f.close
 			require f.openempty
