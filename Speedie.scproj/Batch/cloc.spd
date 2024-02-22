@@ -75,7 +75,7 @@ function file.cloc
 		msg.RenderAST(app.stdout.out)
 		""
 	  elseif counts.ParseSpeed
-		|| fs = app.stdout.out
+		|| fs = app.stdout.out!
 		fs.RenderSpeed(durr.seconds, data.length, 0, "Parsed")
 		fs <~ "\n"
 	(msg)

@@ -714,7 +714,8 @@ class Message (RingTree)
 
 	function Name (|string|)
 		nil safe
-		return .name_
+		if self
+			return .Name
 
 
 	function Name_ (|string|) // for use within the message class!

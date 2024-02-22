@@ -502,12 +502,12 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase
 		error (self.source,  "Function here:")
 
 
-function Matches (|bool| IsAssigns, |bool|)
+function HiderMatch (|bool| IsAssigns, |bool|)
 	if self
 		if .IsAssigns
 			return IsAssigns
-		  elseif .HidesProperties
-			return !IsAssigns
+		 // elseif .HidesProperties
+		//	return !IsAssigns
 
 
 function DescribeParamFail (|SCParamArray| params, |int| bad)
@@ -1285,11 +1285,11 @@ function Tran_AfterRel (|Message| msg, |SCBase| name_space, |message| side, |SCD
 
 	|| Type = TypeOfExpr( exp, name_space )		#require
 	|| numc = Type.type.NumericCount
-	if (!Type.type.IsObject and !type.hider and numc <= 1)  or  (type.pointercount > 0)
+	if (!Type.type.IsObject and !type.hiderfunc and numc <= 1)  or  (type.pointercount > 0)
 		return type											// gui.scproj won't compile :(
 
 	|message| R
-	if numc or type.hider
+	if numc or type.hiderfunc
 		R = NewRel(exp, «num "1"», msg.name[0, 1])
 	  else
 		|| name = ("next", "prev")(msg == "++")

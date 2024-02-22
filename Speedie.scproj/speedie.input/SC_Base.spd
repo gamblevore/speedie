@@ -132,8 +132,8 @@ function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
 				Return
 		  elseif incobj isa scdecl
 			if old.HidesProperties
-				expect (!IncObj.hider) (errplace, "Multiple property-hiders found.")
-				incobj.hider = old
+				expect (!IncObj.hiderfunc) (errplace, "Multiple property-hiders found.")
+				incobj.hiderfunc = old
 				.access[ name ] = IncObj
 				return
 
@@ -390,8 +390,8 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 			exit								// Stop SCFunction.Byte looking up Main.Byte...
 		
 		if o isa SCDecl
-			if o.hider.matches(paramsarray.isassigns) and (owning_cls != curr)
-				o = o.hider|scdecl|
+			if o.Hiderfunc.Hidermatch(paramsarray.isassigns) and (owning_cls != curr)
+				o = o.hiderfunc|scdecl|
 			  else
 				if o.Type.FuncProto
 					expect ((ParamsArray.IsDot or !ParamsHere) and (!ParamsArray))  ( exp, "Wrap this in a bracket, before calling it as a function." )

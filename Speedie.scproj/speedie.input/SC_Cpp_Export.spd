@@ -88,25 +88,32 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 	fs <~ FuncHeader
 	.T.Length = 0
 	
-//	fs.currfunc = f
 	fs <~ ' ' // space between arg.
 
 
-function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
+
+function CanExportFunc (|SCFunction| F, |bool|)
 	if !f.IsExternalLib
 		require !f.IsWrapper and !f.isMacro
-	require f isnt NewStruct
-	
-	
-	WriteFunctionHeader( F, .T )
+	return f isnt NewStruct
+
+
+function FuncHeader (|FastStringCpp| fs, |SCFunction| F, |string|)
+	WriteFunctionHeader( F, .T )	
+	rz = .T.GetResult
+	.HeaderProj <~ rz
+	.HeaderProj <~ ";\n\n"
+	if f.IsExternalLib
+		rz = ""
+
+
+function Func (|FastStringCpp| fs, |SCFunction| F)
+	opt norefcounts
+	require .CanExportFunc(f)
+	|| funcheader = .FuncHeader(fs, f)$
+
 	if (f.IsInline)
 		fs = .Inlines // one inline can inlcude another so we still need the header first.
-	
-	|| FuncHeader = .T.GetResult
-	H <~ FuncHeader
-	H <~ ";\n\n"
-	require !f.isexternallib
-	
 	
 	.funcStart(fs, f, funcheader)
 	f.Sourcearg!.Export( fs )
@@ -116,7 +123,7 @@ function Func (|FastStringCpp| fs, |SCFunction| F, |FastStringCpp| H)
 
 
 function SCClass.NeedsExport (|bool|)
-	return super.needsexport or .isbehaviourTable
+	return super.NeedsExport or .IsBehaviourTable
 
 
 function Codify (|SCModule| scb, |string| fName)
@@ -162,12 +169,22 @@ function SetupFlow (|SCFunction| f)
 		compiler.TernaryFunc!.exportname = "JB_Ternary"
 
 
+//function CodifyHeader
+//	opt norefcounts
+//	for (f in compiler.funclist)
+//		if f.NeedsExport and .CanExportFunc(f)
+//			WriteFunctionHeader( F, .HeaderProj )
+//			.HeaderProj <~ ";\n\n"
+//	scfunction.CurrFunc = nil
+
+
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
+	opt norefcounts
 	for (f in list)
 		if f.NeedsExport
 			.SetupFlow(F)
-			.func( file, f, .HeaderProj )
-			scfunction.CurrFunc = nil
+			.func( file, f )
+	scfunction.CurrFunc = nil
 
 
 function StreamChild (|String| s, |FastStringCpp|)

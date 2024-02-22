@@ -59,15 +59,46 @@ function Jump (NilTrackerFn)
 	pragma inline
 	return (NilSyxes[msg.func]!)(msg, test)
 
-					
+/*
+dot "b"
+	thg "a"
+	emb 
+func 
+	thg "a"
+	prm 
+		thg "b"
+*/
+
+function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
+	opt norefcounts
+	// a.b( c )
+	// b(a, c)
+	
+	dot.func = @func
+	|| upon = dot.First!
+	|| Prms = dot.Last!
+	Prms.obj = fn
+	Prms.Func = @prm
+	Prms.First = upon
+
+	dot.First = message.newwithlayer(dot.memorylayer, nil, @thg, dot.position, fn.exportname, 0)
+	return nilstate.real
+	
+	
 function UseChildAsReal (|message| msg, |nilreason| reason=nilreason.accessing, |NilState|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
+
+	// So... UseChildAsReal... well... if its a property, we can still do this?
 	|| dcl = msg.FastDecl
 	if dcl is OnModule
 		return dcl.NilDeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch)
-		if actual is nilish								// works e
+		if actual is nilish
+			|| ddd = dcl.hiderfunc
+			if (reason is property) and ddd // OK... 
+				return .PropertyToFunc(msg, ddd)
+				
 			.BecomeReal(ch.FastDecl, ch, reason)
 		return dcl.nildeclared
 	debugger // what?

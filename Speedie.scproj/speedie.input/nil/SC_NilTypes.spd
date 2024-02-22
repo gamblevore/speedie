@@ -75,6 +75,7 @@ datatype NilCheckMode (uint)
 
 datatype nilreason (byte)
 	constants
+		|nilreason|
 		Accessing
 		Property
 		Reading 
@@ -88,4 +89,5 @@ datatype nilreason (byte)
 			"Using"
 			"Passing"
 		]
-
+	syntax is (|nilreason| x, |bool|)
+		return x == self

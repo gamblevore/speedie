@@ -57,7 +57,8 @@ dispatch FuncPreReader (fnPreReader)
 		  elseif f ~= "safe"
 			.MakeNilChecker(msg)
 			.HidesProperties = true 
-			.isinline = true
+			//.isinline = true
+			.isvisible = true
 			
 		  else
 			error f
@@ -84,7 +85,7 @@ dispatch FuncPreReader (fnPreReader)
 
 function scfunction.MakeNilChecker (|message| msg)
 	.NilSelff(msg, nilstate.optional)
-	.isnilchecker = true
+	.IsNilChecker = true
 	
 
 function SettingSelfProperty (|Message| Rel, |bool|)
@@ -106,7 +107,7 @@ function SettingAProperty (|Message| Rel, |Message|)
 function SettingMemory (|Message| Rel, |bool|)
 	// bla.bla = X
 	opt norefcounts
-	require Rel.IssetRel
+	require Rel.IsSetRel
 	|| f = Rel.first
 		|| d = f.SetType
 			return true
@@ -125,6 +126,7 @@ function IsSelfOfSetter (|Message| curr, |Message|)
 function scfunction.NilSelff (|message| where, |nilstate| v)
 	expect (!.nilself) (where, "Already stated")
 	.nilself = v
+
 
 function string.UnicodeSafeName (|string|)
 	if .isascii

@@ -4,11 +4,12 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 
-
 * Do nil checker!
+	* inline c++ headers use orders of inlined functions... meaning we get stuff fucked.
+		* breaks nil-safe.
+		* order by depth?
 	* global struct pointers not assumed nil rn?
 	* nilfile.TestFile not testing properly
-	* replace getter with actual property... if we can prove it is real.
 	* params to FPs not tested properly
 
 	* selector constructor shouldn't need "?"

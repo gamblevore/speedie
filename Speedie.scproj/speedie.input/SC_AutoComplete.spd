@@ -311,7 +311,7 @@ function scfunction.Update_Source (|int| start, |string| text, |scfile| myfile, 
 function scobject.Disambiguate (|message| src, |scfunction|)
 	opt norefcounts
 	if self isa scdecl
-		rz = .hider
+		rz = .hiderfunc
 	if self isa scfunction
 		rz = self
 	rz = rz.disambiguate(src)
@@ -542,7 +542,7 @@ function SCObject.NextDisplay (|bool| exact, |scobject|)
 		if self isa scfunction
 			return .nextfunc
 		if self isa scdecl
-			return .hider
+			return .hiderfunc
 			
 	
 
