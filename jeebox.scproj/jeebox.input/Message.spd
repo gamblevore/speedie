@@ -987,7 +987,7 @@ class Message (RingTree)
 	function Last (|syntax| Need, |Message|)
 		Opt NoRefCounts
 		|| ch = .last
-		if  (ch==Need)
+		if ch and (!need or ch==Need)
 			return ch
 		.accesserr(Need, nil, ch)
 
@@ -997,7 +997,7 @@ class Message (RingTree)
 		cpp_part NextOf
 		if (self)
 			|| ch = .next
-			if (ch==Need)
+			if ch and (!need or ch==Need)
 				return ch
 			.accesserr(Need, nil, ch)
 

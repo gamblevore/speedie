@@ -182,6 +182,7 @@ class SCDecl (SCObject) {
 
 
 	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |SCClass|)
+		if scfunction.currfunc ~= "UpgradeIntsTest"
 		|| bits	= .ItemBitCount max t.ItemBitCount
 		// what about a float + an int? f64 right?
 		if .isfloat or t.isfloat
@@ -574,9 +575,9 @@ class SCDecl (SCObject) {
 			return !t.IsSigned
 
 
-	function MakeSignedIfPossible (|SCDecl|)
-		if .type.signed
-			return .type.Signed
+	function MakeSignedIfPossible (|SCDecl!|)
+		|| t = .Type.Signed
+			return t
 		return self
 		
 	

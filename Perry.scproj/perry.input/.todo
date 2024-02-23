@@ -7,12 +7,9 @@
 
 
 * Do nil checker!
-	* optional|array| <~ result // should be rejected!
-	* helper message.LastAfter (|int| IgnoreAfter, |ind|) shouldn't need nil self
-
-	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!
 	* display obj.haha.property instead of JB_haha(obj).Property
-
+	* int upgrading needs fix
+	
 	* picomsg is now crashing or failing on constructor
 		* speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 		* speedie stops compiling sometimes, from perry

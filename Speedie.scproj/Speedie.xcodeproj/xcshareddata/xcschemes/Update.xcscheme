@@ -55,7 +55,7 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--self"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--perry"
@@ -67,6 +67,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nocolor"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/usr/local/speedie/examples/banana_count.spd"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

@@ -1358,6 +1358,8 @@ function TypeOfRel (ExprResolver) {
 	  else
 		return RC		// RC is bigger (float vs vec3)
 
+	
+	if scfunction.currfunc ~= "UpgradeIntsTest"
 	if custom & CustomOps.TypeCastToBigger
 		lc = lc.better_numeric(rc)
 	

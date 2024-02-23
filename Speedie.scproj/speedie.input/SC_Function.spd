@@ -792,12 +792,6 @@ function Message.SelfUsedForProperty (|int|)
 
 
 
-/*
-	if paramsarray.issuper  and  name == "constructor"
-		|| Prev = exp.prev 
-		expect (!Prev) (Prev, "Can't come before super.constructor")
-*/
-
 function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	opt norefcounts
 	require !.Badness

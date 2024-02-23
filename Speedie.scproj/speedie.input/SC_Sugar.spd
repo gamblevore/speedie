@@ -173,6 +173,7 @@ if __ArgCount == 0
 	return 0
 `
 
+	using prms
 	self <~ (firstarg.macro, [Usage.msg])
 	|| i = 0
 	|| Found = 0
@@ -180,8 +181,8 @@ if __ArgCount == 0
 		Found |= ch.MainOneArg(self, i++, Found)
 
 	ifn found&1
-		macros.mainargfinal.clean
-		self <~ (macros.MainArgFinal, [i.msg])
+		macros.mainargNone.clean
+		self <~ (macros.mainargNone, [i.msg])
 
 	self <~ "require stderr.ok".parse
 

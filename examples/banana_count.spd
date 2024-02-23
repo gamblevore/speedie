@@ -2,4 +2,4 @@
 
 main (|int| amount)
 	for i in 0 to Amount
-		app.say("banana".Pluralize(i), true)
+		app.say "banana".Pluralize(i)

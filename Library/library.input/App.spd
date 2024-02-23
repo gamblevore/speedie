@@ -287,7 +287,7 @@ function IsQuarantined (|bool|)
 	return .path contains "/AppTranslocation/"
 
 
-function Say (|string| s, |bool| print=false,  |errorint2|)
+function Say (|string| s, |bool| print=true,  |errorint2|)
 	visible
 	if print
 		printline s

@@ -894,7 +894,7 @@ class TextView (GUIControl)
 		sdlapp.touch(Self)
 
 
-	helper message.LastAfter (|int|ignoreafter, |ind|)
+	helper message.LastAfter (|int| IgnoreAfter, |ind|)
 		opt norefcounts
 		nil self
 		for a.flat in self
