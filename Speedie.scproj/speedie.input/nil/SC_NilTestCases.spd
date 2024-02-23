@@ -186,23 +186,6 @@ class NilTest
 
 
 
-class NilFile
-	|file|		P
-	|message|	M
-
-	function TestFile
-		|| p2 = .P
-		
-		if .p
-			""
-
-		|| m2 = .M
-		borks
-		if m2
-			""
-
-
-
 /*
 	* prototype GUIPasteEvent (|GUIControl| self)
 */

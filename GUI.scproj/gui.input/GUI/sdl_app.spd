@@ -52,7 +52,7 @@ module SDLApp
 	cpp_wrapper SDL_Init				(|uint| c)
 	cpp_wrapper SDL_Quit				()
 
-	cpp_wrapper SDL_CreateWindow		(|cstring| title, |int| x, |int| y, |int| w, |int| h, |uint| flags, |&SDL_Window|) 
+	cpp_wrapper SDL_CreateWindow		(|cstring| title, |int| x, |int| y, |int| w, |int| h, |uint| flags, |?&SDL_Window|) 
 	cpp_wrapper SDL_SetWindowTitle		(|&SDL_Window| win, |cstring| title) 
 	cpp_wrapper SDL_GetWindowTitle		(|&SDL_Window| win, |cstring|) 
 	cpp_wrapper SDL_CaptureMouse		(|bool| state, |int|) 
@@ -102,8 +102,9 @@ module SDLApp
 
 	function NativeWindow (|_voidptr|)
 		|SDL_SysWMinfo| data
-		.screenwindow.SDL_GetWindowWMInfo(data)
-		return data.window|_Voidptr|
+		|| s = .ScreenWindow
+			s.SDL_GetWindowWMInfo(data)
+			return data.window|_Voidptr|
 
 
 	function Alert (|string| msg, |string| title="")
@@ -124,8 +125,9 @@ module SDLApp
 
 	function SizeOrig (|ivec2|)
 		|int[2]| place
-		.SDL_GetWindowSize(.ScreenWindow,  &place[0],  place[1])
-		return (place[0], place[1])
+		|| s = .ScreenWindow
+			.SDL_GetWindowSize(s,  &place[0],  place[1])
+			return (place[0], place[1])
 
 
 	function SizeOrig (assigns:|ivec2|)
@@ -135,17 +137,20 @@ module SDLApp
 
 
 	function Title (|string|)
-		return $SDL_GetWindowTitle(.screenwindow)
+		|| s = .ScreenWindow
+			return $SDL_GetWindowTitle(s)
 
 
 	function Title (assigns:|string|)
-		SDL_SetWindowTitle(.screenwindow, value.cstr)
+		|| s = .ScreenWindow
+			SDL_SetWindowTitle(s, value.cstr)
 
 
 	function ScreenPosOrig (|ivec2|)
 		|int[2]| place
-		.SDL_GetWindowPosition(.ScreenWindow,  place[0],  place[1])
-		return (place[0], place[1])
+		|| s = .ScreenWindow
+			.SDL_GetWindowPosition(s,  place[0],  place[1])
+			return (place[0], place[1])
 
 		
 	function ShowCursor (|bool| v = true)
@@ -172,11 +177,11 @@ module SDLApp
 		|| wh = result.size-1
 		if aligned > 1
 			 wh = wh align aligned
-		.SDL_SetWindowSize(.screenwindow, wh.x, wh.y)
+		.SDL_SetWindowSize(.screenwindow!, wh.x, wh.y)
 		if .SizeOrig != wh
 			.TryResizeLater = wh
 		if result.xy
-			.SDL_SetWindowPosition(.ScreenWindow, result.x, result.y)
+			.SDL_SetWindowPosition(.ScreenWindow!, result.x, result.y)
 
 		if old != .SizeOrig
 			.NewSize = .SizeOrig
@@ -273,11 +278,13 @@ module SDLApp
 
 		.screenwindow = SDL_CreateWindow(name.cstr,
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.x, s.y, SDL_WINDOW_RESIZABLE ||| SDL_WINDOW_ALLOW_HIGHDPI)
+		if !.ScreenWindow
+			app.quit("Can't init window", -1)
 
-		.SDL_SetWindowMaximumSize(.screenwindow, 2K, 2K)
-		.SDL_SetWindowMinimumSize(.screenwindow,  400,  200)
+		.SDL_SetWindowMaximumSize(.screenwindow!, 2K, 2K)
+		.SDL_SetWindowMinimumSize(.screenwindow!,  400,  200)
 		.vsync = true
-		.renderer = SDL_CreateRenderer(.screenwindow, -1, 0)
+		.renderer = SDL_CreateRenderer(.screenwindow!, -1, 0)
 		if !.Renderer
 			app.Quit("Can't init renderer", -1)
 
@@ -313,8 +320,8 @@ module SDLApp
 	helper IsHighDPI (|bool|)
 		|int[2]| SmallPx
 		|int[2]| BigPx
-		SDL_GetWindowSize(.ScreenWindow,  &BigPx[0],  &BigPx[1] )
-		SDL_GL_GetDrawableSize( .screenwindow,  &SmallPx[0],  &SmallPx[1] )
+		SDL_GetWindowSize(.ScreenWindow!,  &BigPx[0],  &BigPx[1] )
+		SDL_GL_GetDrawableSize( .screenwindow!,  &SmallPx[0],  &SmallPx[1] )
 		|| s = SmallPx[0]
 		|| b = BigPx[0]
 		if s and b
@@ -338,9 +345,10 @@ module SDLApp
 	function Scaling (assigns:|float| scale)
 		|| bigPx = (.SizeOrig.vec2/scale).ivec2
 		.DrawSpace.sizeinfo = bigPx
-		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)
-		.scale = Scale
-		window.all.lastrect = bigPx.rect
+		|| r = .Renderer
+			.Raw = SDL_CreateTexture(r, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)
+			.scale = Scale
+			window.all.lastrect = bigPx.rect
 		
 
 	function GUICheck
@@ -598,7 +606,7 @@ module SDLApp
 			
 		.LastFrameDate = date.now
 		|| w1 = .DrawWinFrom		#require
-		.StartFrame(.Raw)
+		.StartFrame(.Raw!)
 		|| D = .DialogIsOpen
 		while w1
 			if w1.IsViewable
@@ -611,7 +619,7 @@ module SDLApp
 		notifications.Draw
 
 		.DoDrawDrag(window.front!)
-		.EndFrame(.Raw)
+		.EndFrame(.Raw!)
 
 	function BGBlurAmount (|float|)
 		.BlurBackgroundStart := date.now
@@ -695,11 +703,12 @@ module SDLApp
 			return
 		.ResizedCounter = 4
 		
-		.raw.dispose
+		|| r = .raw
+			r.dispose
 		|| v = (.NewSize.vec2/.Scale).ivec2
 		.newsize = nil										// phew
 		.DrawSpace.size = v
-		.Raw = SDL_CreateTexture(.renderer, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, v.x, v.y)
+		.Raw = SDL_CreateTexture(.renderer!, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, v.x, v.y)
 
 		window.all.FullScreen = v
 		.StartResize
@@ -717,9 +726,9 @@ module SDLApp
 		.Drawcount++
 		t.UnlockThatCopiesEvenThoughItShouldnt // seems like we are double doing this?
 		|SDL_Rect| dstrect
-		SDL_GL_GetDrawableSize( .screenwindow,  &dstrect.w,  &dstrect.h )
-		SDL_RenderCopy(.renderer, T, nil, &dstrect)
-		SDL_RenderPresent(.renderer)
+		SDL_GL_GetDrawableSize( .screenwindow!,  &dstrect.w,  &dstrect.h )
+		SDL_RenderCopy(.renderer!, T, nil, &dstrect)
+		SDL_RenderPresent(.renderer!)
 
 
 	function Delay (|int| ms)
