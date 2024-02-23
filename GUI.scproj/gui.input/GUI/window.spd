@@ -495,7 +495,7 @@ struct SDL_Texture
 	function UnlockThatCopiesEvenThoughItShouldnt
 		cpp_wrapper SDL_UnlockTexture
 	
-	function LockThatZerosEvenThoughItShouldnt (|&ivec4| b, |&_voidptr| p, |&int| n)
+	function LockThatZerosEvenThoughItShouldnt (|?&ivec4| b, |&_voidptr| p, |&int| n)
 		cpp_wrapper SDL_LockTexture
 		
 	destructor

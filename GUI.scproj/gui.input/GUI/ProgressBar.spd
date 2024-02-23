@@ -44,7 +44,7 @@ class ProgressBar (GUIControl)
 	
 	behaviour Mouseup
 		if .lastrect contains p
-			(.onclicked)(self, nil,  nil)?
+			(.onclicked)(self)?
 	
 	module
 		|| RandomData = byte[128]!

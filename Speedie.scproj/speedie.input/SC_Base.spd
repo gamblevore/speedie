@@ -120,7 +120,7 @@ function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
 	name = name.Lowercase
 	|| Old = .Upcheck( name, !(IncObj isa SCFunction) )
 	if (!Old)
-		.access[ name ] = IncObj
+		.access![ name ] = IncObj
 		return
 	
 	require (Old != IncObj) // possible?
@@ -134,7 +134,7 @@ function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
 			if old.HidesProperties
 				expect (!IncObj.hiderfunc) (errplace, "Multiple property-hiders found.")
 				incobj.hiderfunc = old
-				.access[ name ] = IncObj
+				.access![ name ] = IncObj
 				return
 
 	if name == "self"

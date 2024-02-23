@@ -7,7 +7,7 @@ function DeclsDefault (|Message| def, |Message|)
 		return def.Last
 
 
-function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose=0, |Message|)
+function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose=0, |Message!|)
 	rz = «decl »
 	if (Type)
 		|| arg = rz.msg(@arg)
@@ -153,7 +153,7 @@ function Message.CollectAGlobalDecl (|SCBase| scarg, |bool|)
 		|| def = dcl.Default
 		if def and !dcl.nilstated
 			|| d = def.msgdecl
-			if d and d.isreal
+			if d and d.StatedReal
 				dcl.nildeclared = nilstate.real // in case of something like |object| x = real()
 		(dcl is property)
 		(dcl is onmodule)

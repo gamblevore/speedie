@@ -90,6 +90,7 @@ dispatch CppRefTable (TranFunc)
 
 extend_module SCFunction	
 	function Tran_CppRefs (TranFunc)
+		expect (fn) (node, "Only use this on functions")
 		fn.refs = cpprefs.new(node)
 		node.remove
 
@@ -133,6 +134,7 @@ dispatch ClassLinkageTable (TranFunc)
 
 
 function SCBase.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, |scbase|)
+	opt norefcounts
 	|| fn = .owningfunc
 	for ch in node
 		require ch.expect(@tmp)

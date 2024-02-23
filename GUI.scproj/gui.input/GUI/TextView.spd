@@ -42,8 +42,8 @@ class TextView (GUIControl)
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
 		super.Constructor(p)
 		._reclaim = (0, 1GB, 0)
-		.Lines = TextViewLine(nil)
-		._Start = TextViewLine(nil) // make nilchecker happy
+		.Lines = TextViewLine(0)
+		._Start = TextViewLine(0) // make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
@@ -1031,7 +1031,8 @@ class TextView (GUIControl)
 			it.FinishAndClear(focus)
 			if focus and c and lv isa listview // try next tab
 				c = c.tab(!keys.shift, lv)
-				lv.startRenameCell(c)
+				if c
+					lv.startRenameCell(c)
 					
 		return true
 	

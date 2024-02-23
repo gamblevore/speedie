@@ -30,7 +30,7 @@ extend Parser
 		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine) 
 		.token(":") = .handler(kColon, fEndOfLine).link(kColonArg, fArgColon)
 
-		.EndOfLineMarker = message(nil, "\n")
+		.EndOfLineMarker = message(@nil, "\n")
 
 
 		|| numb     =   "0123456789".bytesplit
@@ -156,7 +156,7 @@ extend Parser
 			return .ErrorAdd("Expected a rel.", rel.position)
 		if rel == @bra
 			rel = f
-			f = f.first
+			f = f.first!
 		
 		|| Adverb = .Process( kOppWord (|) kOppBra, Parser.kExpect ) #require
 		|| adj = @adj.msg
@@ -1161,7 +1161,7 @@ ive been~running #since morning
 		return .ProcessThingSub(nil, ops, kThing, expect)
 
 	
-	function ProcessThingSub (|message| Parent, |int| Ops, |int| KindOfThing, |bool| Expect, |Message?|)
+	function ProcessThingSub (|message?| Parent, |int| Ops, |int| KindOfThing, |bool| Expect, |Message?|)
 		|| result = .Process( KindOfThing, Expect, parent ) #require
 		if .WillEnd
 			return result

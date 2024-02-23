@@ -1,21 +1,24 @@
 
 							Todo
 
+
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 
-* Do nil checker!
-	* global struct pointers not assumed nil rn?
-	* params to FPs not tested properly
 
+* Do nil checker!
+	* prototype GUIPasteEvent (|GUIControl| self)
+	
+	
 	* selector constructor shouldn't need "?"
 	* optional|array| <~ result // should be rejected!
-	* helper message.LastAfter (|int|ignoreafter, |ind|) shouldn't need nil self
+	* helper message.LastAfter (|int| IgnoreAfter, |ind|) shouldn't need nil self
 
 	* a.LinkDepth - b.LinkDepth // didn't get upgraded to int!
 	* display obj.haha.property instead of JB_haha(obj).Property
 
 	* picomsg is now crashing or failing on constructor
+		* speedie is just hanging around... sometimes.
 		* speedie stops compiling sometimes, from perry
 		* pico needs a massive bloat bastard constructor/destructor test!!! like 8 threads bastardly creating/destroying picos!
 		* logging huge stdout super slow (parsing/recolorising each line?)
@@ -24,8 +27,6 @@
 
 
 
-
-* SC_Imp_Constructor reffing unnecesarily
 * change allocator to use unified allocator?
 	* s = message.new(void* layer, a, b, c) // can be 0x1 or memlayer+0x1, or an object
 * Constants and globals don't autocomplete nicely
@@ -34,6 +35,7 @@
 
 						 Perry Do later
 
+* can copy/paste errors into the errorfield 
 * GUI should have a "current list" listview that can be stepped through using <> keys... and its just the visible front one.
 * error count should be listed in GUI
 	* listview should have a "header"

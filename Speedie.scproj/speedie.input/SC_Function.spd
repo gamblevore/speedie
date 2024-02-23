@@ -220,6 +220,7 @@ function CheckNotBadName
 
 
 function FuncDecls 
+	scfunction.currfunc = self
 	|| P = .Source.second		#require
 	|| fc = p.first
 	
@@ -958,7 +959,7 @@ function FindReached (|scbase| from, |bool|)
 			o.Reach(self)
 		
 	
-function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Type = nil, |Message|)
+function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Type = "", |Message|)
 	using (errnode)
 	nil self
 	|| L = self
@@ -1070,7 +1071,7 @@ function FixCnjSub (|Message| exp) {
 				Done = 1
 				Thg = «Thg pp.first!.name »
 				if IsDecl
-					pp = pp.Parent
+					pp = pp.Parent!
 			
 		if !Done
 			// func( item isa SyxItem #require ) -->
@@ -1078,10 +1079,9 @@ function FixCnjSub (|Message| exp) {
 			// if !tmp_318 { return }
 			// func( tmp_318 )
 			
-			pp = SCFunction.TempMoveOut( ch )
+			pp = SCFunction.TempMoveOut( ch )!
 			Thg = «thg pp.DeclName!.Name »
 	}
-	
 	
 	// || tmp = func()
 	//	  -->
@@ -1584,6 +1584,7 @@ function Tran_Deprecate (TranFunc)
 
 
 function Tran_Fails (TranFunc)
+	expect (fn) (node, "Only use this on functions")
 	node.TmpType = asmtmp.kfail
 	fn.Badness |= 128
 	expect (!node.islast) (node, "Put 'borks' before some code.") 
@@ -1595,10 +1596,12 @@ function TranFuncDummy (TranFunc) {
 }
 
 function Tran_Visible (TranFunc)
+	expect (fn) (node, "Only use this on functions")
 	fn.LoadVisibility( node )
 
 
 function Tran_Return (TranFunc)  // exitter
+	expect (fn) (node, "Only use this on functions")
 	if node.tmptype == asmtmp.kreturn
 		debugat
 	node.tmptype = asmtmp.kreturn

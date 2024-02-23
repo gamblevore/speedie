@@ -24,7 +24,7 @@ class GraphicsEditor (GuiControl)
 	
 	function Load (|bool|)
 		require .Backing
-		|| d = .backing.Read(64MB)
+		|| d = .backing!.Read(64MB)
 		if d.IsJbin
 			rz = .LoadNative(d)
 		  else

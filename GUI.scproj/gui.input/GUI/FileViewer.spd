@@ -471,7 +471,7 @@ class FileViewer (ListView)
 
 	module
 		function FileRowRenamer (guilisteditevent)
-			|| o = cell.row
+			|| o = cell!.row
 			if o isa filerow
 				if o.moveto(value)
 					return true
@@ -634,19 +634,19 @@ function RightClickFileList (GUIListEvent)
 
 
 function FileViewerCMMShow (GuiMenuEvent)
-	|| row = clicked.row
+	|| row = clicked!.row
 	if row isa FileRow
 		row.location.Reveal
 
 
 function FileViewerRenameFile (GuiMenuEvent)
-	|| row = clicked.row as filerow
+	|| row = clicked!.row as filerow
 	if self isa FileViewer
 		.rename(row)
 	
 
 function FileViewerCreateFile (GuiMenuEvent)
-	|| row = clicked.row as filerow		#require
+	|| row = clicked!.row as filerow		#require
 	if !row.asdir
 		row = row.parent!
 	|| l = row.location
@@ -673,7 +673,7 @@ function File.CreateEmpty (|bool|)
 function FileViewerCopyPath (GuiMenuEvent)
 	opt norefcounts
 	|GuiMenuEvent| test
-	|| row = clicked.row
+	|| row = clicked!.row
 	if row isa FileRow
 		clipboard.text = row.location
 				
@@ -682,14 +682,14 @@ function FileViewerCopyPath (GuiMenuEvent)
 
 //FileListSearchWithin
 function FileViewerTrash (GuiMenuEvent)
-	|| row = clicked.row
+	|| row = clicked!.row
 	if  row isa FileRow  and  self isa fileviewer
 		row.AskDelete(self)
 		.SomethingChanged(nil)
 
 
 function FileViewerRemove (GuiMenuEvent) // just removes knowledge of the item
-	|| row = clicked.row
+	|| row = clicked!.row
 	if row isa FileRow and self isa FileViewer
 		row.remove
 		.SomethingChanged(nil)

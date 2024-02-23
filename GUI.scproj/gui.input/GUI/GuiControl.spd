@@ -323,7 +323,7 @@ class GUIControl (ringtree)
 		return S
 	
 	
-	helper GetCopy (|object| item=nil, |string|)
+	helper GetCopy (|object?| item=nil, |string|)
 		return (.CopyEvent$)(self, item)
 	
 	syntax equals (|string| s, |bool| aware, |bool|)

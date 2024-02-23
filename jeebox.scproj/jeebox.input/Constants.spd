@@ -86,13 +86,13 @@ Module Jeebox
 		.UnEscapeStr		= dictionary.Reverse(.EscapeStr!)			// unify data
 		.JS_UnEscapeStr		= dictionary.Reverse(.JS_EscapeStr!)		// unify data 
 		.XML_UnEscapeStr	= dictionary.Reverse(.XML_EscapeStr!)		// unify data 
-		.EscapeChr[`"`]		= nil|string|
-		.EscapeChr[`$`] 	= nil|string|
+		.EscapeChr![`"`]	= nil|string|
+		.EscapeChr![`$`] 	= nil|string|
 
-		.UnEscapeStr[`\0`]	= nil|string|					// handle normally
+		.UnEscapeStr![`\0`]	= nil|string|					// handle normally
 		//.JS_UnEscapeStr[`\n`]	= ""						// c/js compat
-		.Unescapestr[`\`]	= ""
-		.EscapeStr["'"]		= nil|string|
+		.Unescapestr![`\`]	= ""
+		.EscapeStr!["'"]		= nil|string|
 		
 		|| tfs = faststring()
 		for i in 256
@@ -137,11 +137,11 @@ Module Jeebox
 
 
 function String.Unescape (|string|)
-	return .ReplaceAll( Jeebox.UnEscapeStr )
+	return .ReplaceAll( Jeebox.UnEscapeStr! )
 
 function String.Escape (|string|)
-	return .ReplaceAll( jeebox.EscapeStr )
+	return .ReplaceAll( jeebox.EscapeStr! )
 
 function String.EscapeChr (|string|)
-	return .ReplaceAll( jeebox.EscapeChr )
+	return .ReplaceAll( jeebox.EscapeChr! )
 

@@ -153,7 +153,7 @@ class FastString {
 
 	syntax Access (|int| off, |Byte|):				cpp_wrapper JB_FS_Byte
 	syntax Access (|int| off, assigns:|Byte|)		{ cpp_wrapper JB_FS_ByteSet }
-	syntax Append (|string| data)
+	syntax Append (|string?| data)
 		cpp_wrapper JB_FS_AppendString
 	syntax Append (|FastString| fs)
 		cpp_part AppendFastString

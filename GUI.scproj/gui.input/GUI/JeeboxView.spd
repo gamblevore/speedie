@@ -24,7 +24,7 @@ class MessageView (ListView)
 	
 	module
 		function JeeboxViewRenamer (guilisteditevent)
-			|| o = cell.row
+			|| o = cell!.row
 			if o isa filerow
 				if o.moveto(value)
 					return true

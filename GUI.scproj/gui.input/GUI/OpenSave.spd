@@ -111,7 +111,7 @@ class OpenSaveDialog (Window)
 	
 	function DragPathEvent (GUIPasteEvent)
 		.path.text = data
-		relistkey(.path, nil, true)
+		relistkey(.path, 0, true)
 		return true
 
 	

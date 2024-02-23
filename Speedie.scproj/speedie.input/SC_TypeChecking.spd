@@ -66,6 +66,7 @@ function scdecl.FastMatch (|SCDecl| O, |bool|)
 
 function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |uint|)
 // Make TypeCast = true able to deal with... pointers to structs!
+	real self
 	if (o == nil)
 		require .default
 		Return kUseDefaultParams
@@ -115,7 +116,7 @@ function scdecl.SafelyWrappable (|bool|)
 
 	for f in fns
 		|| p = f.args
-		if (p.length == 1) and p[0].TypeMatch(self, 0)
+		if (p.length == 1) and p[0]!.TypeMatch(self, 0)
 			return true
  
 

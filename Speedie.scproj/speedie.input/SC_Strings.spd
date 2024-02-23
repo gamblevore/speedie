@@ -120,7 +120,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 		Return
 	
 	require fn
-	|| Point = msg.ParentPoint
+	|| Point = msg.ParentPoint!
 	using (msg)
 	|| FSName = UniqueTmpVar( fn, "fs" )
 	|| StrName = fsName + "_str"
@@ -152,12 +152,9 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 		if fnc ~= @dot and "SyntaxAppend"
 			WeAreAppending = true
 	// wrong approach.
-	if false
-		msg.become(@thg, fsname)
-	  else
-		msg.become(@dot, "getresult") // keep the reference the same so it doesn't whoop up.
-		msg <~ «thg fsname » 
-		msg <~ «emb »
+	msg.become(@dot, "getresult") // keep the reference the same so it doesn't whoop up.
+	msg <~ «thg fsname » 
+	msg <~ «emb »
 	(decl)
 }
 }

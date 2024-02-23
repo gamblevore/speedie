@@ -248,6 +248,7 @@ class Memory
 		
 	macro SyntaxAccess
 		(.ptr|&...|)[_]
+	
 	macro SyntaxAppend
 		(.appendplace|&...|)[0] = _
 
@@ -274,7 +275,7 @@ class Memory
 		function Zalloc  (|int| n, |?&byte|)
 			return byte.zalloc(n)
 		function Realloc (|_voidptr| b, |int| n, |?&byte|):				cpp_wrapper JB_realloc
-		function Free	 (|_voidptr| b):								cpp_wrapper JB_free
+		function Free	 (|?_voidptr| b):								cpp_wrapper JB_free
 		function Zero	 (|_voidptr| addr, |int| n):					cpp_wrapper memzero
 		function Copy	 (|_voidptr| dest, |_voidptr|src, |int| N):		cpp_wrapper memcpy
 		function Copy	 (|object| dest, |object|src, |int| N)

@@ -166,8 +166,8 @@ struct ObjectLoader {
 		|dictionary of int64| ClassList = nil		// _voidptr is better
 		
 		function LoadOne (SaverLoadClass)
-			|| naem = string.fromc(cls.name).lowercase
-			objectloader.classlist[naem] = cls|int64|
+			|| name = string.fromc(cls.name).lowercase
+			objectloader.classlist![name] = cls|int64|
 
 		function Init
 			require !.ClassList

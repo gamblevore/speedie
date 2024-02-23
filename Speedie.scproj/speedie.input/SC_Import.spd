@@ -146,7 +146,7 @@ class SCImport
 
 	function IncludeCHeaders (|file| f, |[string]| output)
 		for cName in f
-			|| c = f[cName]
+			|| c = f[cName]!
 			if (!c.isDir) and (cName isa "h")
 				output <~ c.path
 	
@@ -163,9 +163,9 @@ class SCImport
 	
 	function ImportSpd (|File| c, |SCFile|)
 		|| path = c.lowercase
-		check (!compiler.files[ path ]) (c, "File included twice")
+		check !(compiler.files![ path ]) (c, "File included twice")
 		rz = SCFile( c, self )
-		compiler.files[ path ] = rz
+		compiler.files![ path ] = rz
 		.files <~ rz
 		|| n = scimport.allfiles.length
 		check (n < 64K) (c, "Too many files included")
@@ -190,7 +190,7 @@ class SCImport
 					rz = B
 			  elseif ext == "vert" or "frag" or "shad" or "sdf"
 				Shaders := dictionary.new
-				shaders[ cName ] = c
+				shaders![ cName ] = c
 
 			  elseif (ext.isclike)
 				Cpp_Export.Cpp_Input <~ c.path
@@ -295,10 +295,10 @@ class SCImport
 			for (f in shaders) (sh_name)
 				if (f isa File)
 					|| name = f.name
-					|| Dest = P[name]
+					|| Dest = P[name]!
 					dest.data = "\n// (Copy of original)\n" + f.readall
 				  elseif (f isa string)
-					|| Dest = P[sh_name]
+					|| Dest = P[sh_name]!
 					debugger /// what?
 					Dest.Data = f
 

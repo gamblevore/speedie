@@ -43,7 +43,7 @@ struct Pico
 	helper StartFork (|bool| Exec=false, |PID_Int|)
 		cpp_wrapper PicoStartFork
 
-	function StartThread (|PicoThreadFn| fn, |_voidptr|Obj, |&cstring|Args=nil, |bool|)
+	function StartThread (|PicoThreadFn| fn, |_voidptr| Obj, |?&cstring| Args = nil, |bool|)
 		cpp_wrapper PicoStartThread
 
 	function CompleteExec (|bool|)

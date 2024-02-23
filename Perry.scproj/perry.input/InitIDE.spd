@@ -564,7 +564,7 @@ extend PerryIDE
 		f.clear
 		f.Excludes = dictionary()
 		for ex in conf..excludes
-			f.Excludes[ex.value] = "x"
+			f.Excludes![ex.value] = "x"
 
 		f.addroot(.project, true)
 		f.FocusOn( .root! )

@@ -28,7 +28,7 @@ function compiler.AppBuildOneLib (|file| inner, |message| lib)
 	|| ldest = inner.parent.sibling("Frameworks/" + lib.name)
 	if !ldest.exists
 		|| dir = "/usr/local/lib/".file
-		Dir[lib.name].hardlinkto(ldest)
+		Dir[lib.name]!.hardlinkto(ldest)
 
 
 function compiler.AppBuildLibs (|file| inner)

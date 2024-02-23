@@ -91,6 +91,7 @@ function scbase.CollectConstantsSub (|Message| ch)
 			NewItem.Default = ValueNode
 			newitem.source = thg
 
+		newitem.nildeclared = nilstate.real // no point in having a nil constant.
 		NewItem <~ scdeclinfo.Const ||| scdeclinfo.onmodule
 		NameList <~ NewItem.source // crappy work around for now...
 		.TryAdd( line, NewItem, NewItem.Name )

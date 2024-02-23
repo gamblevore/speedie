@@ -36,7 +36,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 function message.DefineToLine (|int| count)
 	|| l = self[-1]			#require
 	if self ~= "define"  and  l == @str  and  self > 1 // is that all?
-		.first.next = l
+		.first!.next = l
 		// count can't be 0 here	
 		l.name += " has " + "caller".pluralize(count)
 	  else

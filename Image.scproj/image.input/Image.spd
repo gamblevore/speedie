@@ -401,7 +401,7 @@ class Image (memory)
 				|| n = 0
 				|| qoi = .writeqoi(img, x, y, n)
 					rz = string.Own(qoi, n).compress(mzlab.Fast)
-			memory.free(img)
+			memory.free(img!)
 
 
 // move over to the other file.
@@ -457,9 +457,9 @@ class Image (memory)
 			.RectOutlined(r, G, AllowEdge)
 
 
-	function RectStyled (|ivec4| R, |DrawStyle| G=nil, |uint| Side=3)
+	function RectStyled (|ivec4| R, |DrawStyle?| G=nil, |uint| Side=3)
 		|| D = g.Drawer?
-			(D)(self, r, G, side == 2)
+			(D)(self, r, G!, side == 2)
 		  else
 			.RectOutlined(r, g)
 

@@ -29,7 +29,7 @@ extend Parser {
 	function ErrorStart (assigns:|ind|)
 		cpp_wrapper
 
-	function StartParse (|string| result)
+	function StartParse (|string?| result)
 		cpp_wrapper
 
 	function StopParse

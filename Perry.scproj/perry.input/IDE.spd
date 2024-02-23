@@ -102,7 +102,7 @@ class PerryIDE (Window)
 
 	function GetBuildFile (|file|) 
 		|| inside = .filelist.listsource.first
-		|| found = inside.findnested(nil, "build.spd") as filerow
+		|| found = inside.findnested(@nil, "build.spd") as filerow
 			return found.location.file
 
 	

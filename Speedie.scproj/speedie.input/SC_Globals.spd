@@ -424,7 +424,7 @@ function ExtractDecl (|Message!| c, |SCBase?| name_space, |declmode| Purpose, |S
 		Return ExtractDecl( c.first!, name_space, purpose )
 	
 	if (f == @Emb)
-		check (!c.first) (c)
+		c.Expectempty
 		return nil
 	
 	if (f == @Bra)
@@ -452,8 +452,8 @@ function ExtractDecl (|Message!| c, |SCBase?| name_space, |declmode| Purpose, |S
 		c.func = f
 		|| fi = c.first
 		c.clear
-		c <~ «thg "memory"»
-		c <~ «opp "of"»
+		c <~ (@thg, "memory")
+		c <~ (@opp, "of")
 		c <~ fi
 	
 	if (f == @func)
@@ -463,7 +463,7 @@ function ExtractDecl (|Message!| c, |SCBase?| name_space, |declmode| Purpose, |S
 	if (f == @Arel or @brel)
 		|| R = ExtractDecl( c.first!, name_space, purpose )				#require
 		if (C == "--")
-			return R.MakeBorrowed(c.uptotype!=nil)
+			return R.MakeBorrowed(c.uptotype != nil)
 		if C == "~"
 			return R.MakeDataTypeWrapper(name_space, purpose)
 		if (C == "&")											// pointer
@@ -471,7 +471,7 @@ function ExtractDecl (|Message!| c, |SCBase?| name_space, |declmode| Purpose, |S
 		if (C == "?")
 			return R.MakeNewOptional
 		if (C == "!")
-			if R.IsReal and c isnt inserted
+			if R.StatedReal and c isnt inserted
 				deprecate (c, "Already assumed real. Only '?' needs to be specified.")
 			return R.MakeNewReal
 		if (C.name)												// emptyname = compiler internal
@@ -480,7 +480,7 @@ function ExtractDecl (|Message!| c, |SCBase?| name_space, |declmode| Purpose, |S
 
 	if (F == @name)												// use instead of below!
 		c.func = @thg
-		|| d = ExtractDecl(c, name_Space, purpose)$
+		|| d = ExtractDecl(c, name_Space, purpose)						#require
 		(d is compilercreated)
 		return d
 
@@ -494,7 +494,7 @@ function ExtractDecl (|Message!| c, |SCBase?| name_space, |declmode| Purpose, |S
 
 	if (f == @Arr)
 		|| ch = c.first
-		if !ch										// |[]|
+		if !ch													// |[]|
 			Return TypeArray!.TypeNormal
 		
 		expect (ch != @Item) (c)
@@ -509,7 +509,7 @@ function ExtractDecl (|Message!| c, |SCBase?| name_space, |declmode| Purpose, |S
 	  elseif (f == @rel)
 		|| op = c[@opp, 1]												#require
 		op.expect(@opp, "of")
-		|| contained = c[nil, 2]										#require
+		|| contained = c[@nil, 2]										#require
 		rz.loadContained(contained, c.first!, name_Space, purpose)		#require
 		
 	  elseif (ErrCount == StdErr.errorCount)
@@ -743,7 +743,7 @@ function SpellOutMsg (|message| type, |message| Exp, |message| namemsg, |message
 	return result
 
 
-function Tran_Msg (|SCFunction| fn,  |message| Exp,  |scbase| name_space)
+function Tran_Msg (|SCFunction| fn,  |message| Exp,  |scbase!| name_space)
 	|| Type		= exp.first!
 	|| NameMsg	= Type.first!
 	if exp LessOrEqual 1
@@ -754,24 +754,24 @@ function Tran_Msg (|SCFunction| fn,  |message| Exp,  |scbase| name_space)
 	|| itm		= type.next
 	|| P		= exp.parent
 	|| Place	= exp.IntoVariable(name_space)
-	
-	require place.arg
-	name_space = place.arg.SCArg(name_space)
-	|| Result	= SpellOutMsg(type, exp, namemsg)
-
-	while (itm)
-		|| NextItm = itm.next
-		using (itm)
-		|| Line = «dot "SyntaxAppend"
-			«thg place.name »
-			«prm, itm »
-		»
-		place <~ Line
-		TypeOfExpr( Line, name_space )
-		scfunction.Tran_all(fn, line, name_space)
-		itm = nextitm
-	
-	TypeOfExpr( Result, name_space )
+	if place.arg
+		name_space = place.arg.SCArg(name_space) 
+		if name_space
+			|| Result = SpellOutMsg(type, exp, namemsg)
+		
+			while (itm)
+				|| NextItm = itm.next
+				using (itm)
+				|| Line = «dot "SyntaxAppend"
+					«thg place.name »
+					«prm, itm »
+				»
+				place <~ Line
+				TypeOfExpr( Line, name_space )
+				scfunction.Tran_all(fn, line, name_space)
+				itm = nextitm
+			
+			TypeOfExpr( Result, name_space )
 
 
 function Tran_MsgList (|scfunction| fn, |message| Exp, |scbase| name_space)
@@ -937,7 +937,7 @@ function TypeOfSwizzle (|message| Exp, |scdecl| Type, |scbase| name_space, |mess
 			oof.remove
 		  else
 			|| what = oof.intovariable(name_space)
-			oof = what.arg 
+			oof = what.arg #require
 			oof.parent!.obj = T
 			name_space = oof.asarg
 			exp.become(@bra)
@@ -1739,7 +1739,7 @@ function Tran_ArgArray (|Message| Exp, |SCBase| name_space)
 
 	|| rel = exp.NiceParent
 	rel.expect(@rel)
-	|| Place = rel.ParentPoint
+	|| Place = rel.ParentPoint!
 	|| d = thg.asdecl
 		d.default = nil
 

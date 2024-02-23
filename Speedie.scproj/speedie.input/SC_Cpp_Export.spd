@@ -654,7 +654,7 @@ function ExportSyx
 
 
 function ExportOneSyx (|int| i, |FastStringCpp| fs)
-	|| syx = Compiler.SyxArray[ i ]
+	|| syx = Compiler.SyxArray[ i ]!
 	fs <~ "#define kSyx$syx $i\n"
 
 
@@ -801,11 +801,11 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| obj = Cpp_Export.StringDict[name]
 			return *obj
 		rz = ++Cpp_Export.StringCount
-		Cpp_Export.StringDict[name] = rz
+		Cpp_Export.StringDict![name] = rz
 
 // add string
-		.StringBlob <~ name
-		.StringBlob <~ 0|byte|
+		.StringBlob! <~ name
+		.StringBlob! <~ 0|byte|
 
 		StringLengths2!.EncodeLength(name.length)
 
@@ -885,7 +885,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function CppLicence (|string|)
 		if !.CppLicenceStr
 			|| f = compiler.inputfile(nil, "licence.txt", nil)
-			.Cpplicencestr = f.readall(16KB, true)
+				.Cpplicencestr = f.readall(16KB, true)
 			.CppLicenceStr := " "
 		return .CppLicenceStr
 

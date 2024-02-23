@@ -4,7 +4,7 @@ class SpdProcess (Process)
 		cpp_part Proc
 	contains SpdProcess
 	|jbin|						Writer
-	|?&pico|					Pico
+	|&pico|						Pico
 	|stringzeroterminated|		_DebugName
 	|?SpdMainFn|				SubProcess
 	|int| 						DeathLimit
@@ -76,15 +76,15 @@ class SpdProcess (Process)
 
 	function LastSend (|date|)
 		|| p = .pico
-			return p.config.lastsend
+		return p.config.lastsend
 		
 	
 	function TimeWaitingForReply (|date|)
 		|| p = .pico
-			|| c = p.config
-			|| last = c.lastsend
-			if c.lastread < last
-				return last.ago
+		|| c = p.config
+		|| last = c.lastsend
+		if c.lastread < last
+			return last.ago
 
 	
 	helper HandleDied
@@ -134,8 +134,7 @@ class SpdProcess (Process)
 			if .alive and !why and .CommsOpen
 				why = "UnknownReason"
 				debugger
-			.pico.close(Why)
-			.pico = nil
+			.pico!.close(Why)
 
 
 	helper StartProcess (|string| path, |[string]| Args=nil, |&pico| C = nil, |bool| CaptureStdOut, |bool|)
@@ -144,8 +143,9 @@ class SpdProcess (Process)
 	
 	function RunChild (|bool|)
 		debug_require .path
-		|| p = .pico init pico.new
-		return .StartProcess(.path, .params, p, .output!=nil)
+		if !.pico.Status
+			.pico = pico.new
+		return .StartProcess(.path, .params, .pico, .output!=nil)
 
 
 	function TimedOut (|date| Durr, |bool|)

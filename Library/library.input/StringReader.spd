@@ -17,13 +17,13 @@ class StringReader
 		._NoMoreChunks = true
 	
 	
-	constructor (|file| file, |int| ChunkSize=4MB)
+	constructor (|file!| file, |int| ChunkSize=4MB)
 		cpp_part ConstructorFile
 		file.close
 		.file = file
 		.ChunkSize = chunksize
 		.length = file.size
-		.ReadChunk
+		.ReadChunk(file)
 
 	function ReadAll (|string|)
 		return .str(.length - .startfrom)
@@ -32,8 +32,8 @@ class StringReader
 		return .ReadAll.parse(owner, allowdecomp)
 
 	
-	helper ReadChunk (|bool|)
-		.data.readfrom = .file.read(.chunksize)		// for now
+	helper ReadChunk (|file| f, |bool|)
+		.data.readfrom = f.read(.chunksize)		// for now
 		if .data.readfrom.length < .chunksize
 			._NoMoreChunks = true // not technically true for pipes... but this will do for now!
 		return .data.readfrom
@@ -57,9 +57,9 @@ class StringReader
 
 	helper NextChunk (|bool|)
 		opt norefcounts
-		if .file
+		|| f = .file
 			.startfrom += .data.size
-			if .ReadChunk
+			if .ReadChunk(f)
 				return true
 			.file = nil // why not
 		

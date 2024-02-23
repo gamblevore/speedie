@@ -107,7 +107,7 @@ function InitNormal (|string| name_, |String| FuncName_)
 
 
 module {
-	|Dictionary of SCOperator|			Dict = nil
+	|Dictionary of SCOperator|			Dict = dictionary()
 	|int|								CustomOperatorScore
 
 	function Lookup ( |Message| opch, |SCOperator| )
@@ -139,8 +139,6 @@ module {
 
 
 	function Init
-		dict = Dictionary.new
-
 // "=" -> "set", and "==" --> "equals"
 // fix this... can't fix the // * if first > 0 and !rz.lines		// compares first to a BOOL!
 // bug without it.

@@ -238,8 +238,8 @@ struct ArchonPurger
 			|| Rec = ErrorReceiver()
 			|| Failed = 0
 			using rec
-				for (f in compiler.funclist) (i)
-					.ExterminateZergBugs(f)
+				for (ƒü in compiler.funclist) (i)
+					.ExterminateZergBugs(ƒü)
 					Failed += rec.ReturnErrors(old) > 0
 			
 			//if Failed // in case theres too many to list all

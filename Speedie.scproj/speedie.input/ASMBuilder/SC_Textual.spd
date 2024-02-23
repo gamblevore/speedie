@@ -137,7 +137,7 @@ extend AsmFuncState
 function message.ASMConst (|uint64|) 
 	opt norefcounts
 	if (self == @unit)
-		.expect(nil, "d")$
+		.expect(@nil, "d")$
 		return .first.float.AsInt
 	.expect(@num)$
 	if (.name contains '.')

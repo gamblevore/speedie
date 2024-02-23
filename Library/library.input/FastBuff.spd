@@ -40,9 +40,11 @@ struct FastBuff
 		return .start[pos]
 	
 	syntax access (|int| pos, |int| after,  |string|)
+		opt norefcounts
 		cpp_part AccessStr
-		if .readfrom != nil
-			return .readfrom[pos, after] // better
+		|| r = .ReadFrom
+		if r != nil
+			return r[pos, after] // better
 		|| A = .clip(pos)
 		|| B = .clip(after, 0)
 		if B >= A

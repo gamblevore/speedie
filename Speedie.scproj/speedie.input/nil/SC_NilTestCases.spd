@@ -203,6 +203,9 @@ class NilFile
 
 
 
+/*
+	* prototype GUIPasteEvent (|GUIControl| self)
+*/
 
 module NilTest2
 	function HelloTest
@@ -210,27 +213,23 @@ module NilTest2
 		|| x = NilTest.n0
 			x.Reader
 
-	function CompareTest
-		|| s = message()
-		if (0.5[])
-			s = nil
-		|| b = s != nil
-		if s
-			"hello"
-
 	function fpTest (|fpMsgRender?| f)
 		|| fs = faststring()
-		if f
-			(f)(message(), fs)
-
-	function fpTest2
-		(StartSound).Test
-		|fpMsgRender| x
+		(f$)(message(), fs)
+		
+	target debugnil2 {
+	function BrokenStruct
 		borks
-		(x)(nil, nil)
-
-	function StartSound (fpMsgRender)
-
+		*abc = nil							// global struct pointers not assumed nil rn?
+	
+	function TestFree (|int| i)
+		memory.free(nil)
+	
+	function NilDataType
+		.TestFree(nil)
+			
+	|&RetroFloat| abc
+	}
 
 
 function scfunction.NilPrint (|string| header="", |bool| nilch)
@@ -278,6 +277,7 @@ function scdecl.NilPrint (|string| reason="")
 		.nilcurr.nilname(fs, false)
 		fs <~ ")"
 	printline fs
+	// if scfunction.currfunc!.name contains "Broken"
 
 
 function NilState.NilName (|faststring| fs, |bool| Expected)
@@ -294,6 +294,7 @@ function @ArchonPurger.ndb4
 	visible
 	(*t.Neel).ndb5()
 
+
 function NilRecord.ndb5 
 	cpp_name ndb5
 	visible
@@ -305,6 +306,6 @@ function NilRecord.ndb5
 			|| Name = D.name
 			|| V = self[i].RawName
 			"$Name:  $V"
-	//if scfunction.currfunc ~= "TestFile"
+	// if scfunction.currfunc!.name contains "Broken"
 
 

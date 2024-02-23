@@ -135,6 +135,7 @@ class File (String)
 
 	
 	function Modified (|Date|)
+		nil checker
 		cpp_wrapper JB_File_Modified
 	
 	function Modified (assigns:|Date|)
@@ -336,6 +337,7 @@ class File (String)
 			if !ch.exists
 				return ch
 			test = name + (0xFFFFFF()).render
+		error (self, "Unable to find unique child name.")
 			
 	function Relax (|bool| NeedsMode=true, |errorint|)
 		cpp_Wrapper JB_File_RelaxPath

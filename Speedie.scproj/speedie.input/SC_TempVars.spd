@@ -76,9 +76,9 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 	|message| TmpFuncThg
 	|message| TmpFuncDecl
 	if (Arg)
-		|| rel = FuncMsg.parent
-		TmpFuncDecl = rel.parent
-		TmpFuncThg = rel.first
+		|| rel = FuncMsg.parent!
+		TmpFuncDecl = rel.parent!
+		TmpFuncThg = rel.first!
 	  else
 		arg = FuncMsg.createownblock #require
 		|| TmpFuncVar = UniqueTmpVar()								// "t2"
@@ -133,8 +133,8 @@ function message.IntoVariable (|scbase| name_space, |nameandmsg|)
 
 struct NameAndMsg
 	|message?|   Msg
-	|string|	Name
-	|message|   Arg
+	|string|	 Name
+	|message?|   Arg
 	
 	syntax append (|message| m)
 		opt norefcounts
@@ -162,7 +162,7 @@ function UniqueTmpVar (|SCBase| base=scfunction.currfunc, |string| name = "tmP",
 
 
 extend_module scfunction
-	function TempMoveOut (|Message| msg, |string| name="", |Message|)
+	function TempMoveOut (|Message| msg, |string| name="", |Message!|)
 		cpp_part TypedTempMoveOut
 		// a.b.c -> || tmp1 = a.b.c
 	
@@ -171,7 +171,7 @@ extend_module scfunction
 		|| repl = «thg name »
 		msg.ReplaceWith( repl )
 		
-		|| p = repl.ParentPoint
+		|| p = repl.ParentPoint!
 		|| insert = msg
 		if (msg == @rel)
 			insert = «bra, (msg)»

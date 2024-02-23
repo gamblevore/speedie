@@ -111,7 +111,6 @@ class SCDecl (SCObject) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered
-		target debugnil: if .objectid == 0
 
 	function Project (|scimport!|)
 		opt norefcounts
@@ -260,7 +259,12 @@ class SCDecl (SCObject) {
 		.CopyTypeInfoTo(rz)
 		rz.internal = self
 		rz.PointerCount++
-		rz.NilDeclared = nilstate.realish ||| (nilstate.stated &- (purpose isnt FuncParam))
+		|| ns = nilstate.realish
+		if purpose == declmode.globals
+			ns = nilstate.optional
+		  else
+			ns |= nilstate.stated &- (purpose isnt FuncParam)
+		rz.NilDeclared = ns
 		check (rz.pointercount <= 4) (.source, "Too much abstraction")
 	
 	
@@ -661,9 +665,9 @@ class SCDecl (SCObject) {
 		if self is borrowed
 			rz = «arel "--", rz »
 		if .TypeSuffers and .nilstated
-			if .isoptional
+			if .Statedoptional
 				rz = «brel "?", rz »
-			  elseif .isreal and platform.isdebug
+			  elseif .StatedReal and platform.isdebug
 				rz = «brel "!", rz »
 
 //		if .TypeSuffers and .isoptional
@@ -857,11 +861,11 @@ class SCDecl (SCObject) {
 		rz = .CopyDecl
 		rz.NilDeclared = type
 
-	function IsReal (|nilstate|)
+	function StatedReal (|nilstate|)
 		if .NilDeclared&nilstate.optional == NilState.Real
 			return NilState.real
 
-	function IsOptional (|nilstate|)
+	function StatedOptional (|nilstate|)
 		if .NilDeclared&nilstate.optional == NilState.optional
 			return NilState.optional
 

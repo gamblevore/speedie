@@ -527,7 +527,7 @@ class ListView (GUIControl) {
 					  // in terms of the nodes and mousewheel.
 
 
-	function ScrollSet (|ListViewrow| s)
+	function ScrollSet (|ListViewrow?| s)
 		s := .start
 		.scrollshift = 0
 		.ScrollRealigner = 0
@@ -535,7 +535,7 @@ class ListView (GUIControl) {
 		._scroll = s
 		.ExpandParents(s)
 		.checkdrawupdate
-		if .isediting and !.VisFullyContains(s)
+		if .isediting and (s and !.VisFullyContains(s))
 			.ClearEdits
 
 
@@ -547,7 +547,7 @@ class ListView (GUIControl) {
 				return true
 
 
-	function VisFullyContains (|ListViewRow| s, |bool|)
+	function VisFullyContains (|ListViewRow!| s, |bool|)
 		opt norefcounts
 		for r.fullyvisible in self
 			if r == s

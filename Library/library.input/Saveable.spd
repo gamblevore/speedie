@@ -55,7 +55,7 @@ class Saveable
 
 	virtual SaveWrite (|&ObjectSaver| Saver)
 		Saver.CantSaveThis = self
-		saver.dest <~ "nil,"
+		saver.dest! <~ "nil,"
 	
 	virtual LoadProperties (|&ObjectLoader| Loader,)
 		Loader.CouldntLoad = self
@@ -196,7 +196,7 @@ extend Dictionary
 		|| D = saver.dest!
 		|| L = .navigate
 		
-		while (l)
+		while (l.movenext)
 			D <~ l.name // what if it's an int?
 			D <~ ": "
 			D.AppendObjectOrNil(l.value)

@@ -271,7 +271,7 @@ class RingTree (Saveable)
 		.Parent = nil
 
 
-	function MoveTo (|| dest)
+	function MoveTo (|...!| dest)
 		require self != dest
 		if Dest gt self
 			dest.next = self

@@ -148,7 +148,7 @@ function Function (NilTrackerFn)
 	|| prms = fp.next!
 	if msg.tmptype == ASMtmp.kTern
 		return tern(prms, test)
-		
+	
 	|| fn = prms.obj|SCFunction|
 	if !fn
 		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
@@ -156,10 +156,7 @@ function Function (NilTrackerFn)
 		require fn and .UseChildAsReal(fp)						// (abc)()
 
 	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
-	
-	target debugnil	
-		fn.NilPrint(false)
-		
+			
 	if (test is active) and fn.IsNilChecker
 		if fn.isnilchecker != 3
 			Test |= NilCheckMode.Soft
@@ -179,7 +176,7 @@ function Function (NilTrackerFn)
 			rz = 0 // can't work
 		|| sent = p!.FastDecl
 		HasAddrs := sent.CanUpgradeInternalPointer
-		if (v is nilish) and recv.NilReg	
+		if (v is nilish) // and recv.NilReg	
 			.NilParamPass(recv, sent, p!, fn)
 
 		Test = 0
@@ -235,7 +232,7 @@ function Return (NilTrackerFn)
 	t.anyreturns = true
 	|| ret = t.return
 	if ret and ret.typesuffers
-		if ret.isreal
+		if ret.StatedReal
 			expect (v isnt nilish) (msg, "Declaration does not allow returning " + v.rawname)
 		
 		ret.NilDeclared = ret.nildeclared ||| (v&nilstate.either)					// assume real, unless it becomes optional??
@@ -586,8 +583,8 @@ function Debugger (NilTrackerFn)
 
 function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |scfunction| f)
 	opt norefcounts
-	if recv.isreal
-		.BecomeReal(sent, where, nilreason.passing, f)
+	if recv.StatedReal
+		.BecomeReal(sent, where, nilreason.passing, recv, f)
 	  elseif !recv.nilstated and f != scfunction.currfunc  // haha
 		recv.NilPrmFail(where, f)
 	
@@ -599,7 +596,7 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 		return nilstate.real
 	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg("Need to set it into another var."))
 
-	if recv.isreal and recv isnt local
+	if recv.StatedReal and recv isnt local
 		if sentstate isnt nilish
 			return sentstate
 		expect (SentState is realish) (RecvMsg, "Nil is not allowed on: " + recvmsg.render)
@@ -609,7 +606,7 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 		return T.SetNilness(recv, SentState)
 
 
-function BecomeReal (|scdecl| sent, |message| where,  |nilreason| reason, |scfunction| To=nil, |nilstate|)
+function BecomeReal (|scdecl| sent,  |message| where,  |nilreason| reason,  |scdecl?| recv = nil,  |scfunction?| To = nil, |nilstate|)
 	opt norefcounts
 	|| Curr = sent.NilCurr
 	if curr == NilState.Realish
@@ -618,6 +615,9 @@ function BecomeReal (|scdecl| sent, |message| where,  |nilreason| reason, |scfun
 	if (Curr == nilstate.either) and sent.IsUnknownParam
 		T.BecomeRealSub(sent)
 		return T.SetNilness(sent, NilState.real)
+
+	if recv and !recv.typesuffers		// passing nil to int
+		return nilstate.real
 
 	return .FailedReal(to, where, reason, curr)
 

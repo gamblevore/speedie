@@ -106,7 +106,7 @@ module TreeAssembler
 
 	function scfunction.Flatten
 		|| fp = fn_asm_table[@arg]!
-		(fp)(TreeAssembler.StdState, .SourceArg)
+		(fp)(TreeAssembler.StdState, .SourceArg!)
 
 
 	function Stamp (|SCFunction| fn)

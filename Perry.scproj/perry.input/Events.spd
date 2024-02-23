@@ -33,12 +33,12 @@ function Perry.CreateProj (|string| path)
 	  else
 		expect (!path.fileexists) (path, "Can't create over existing project.")
 
-		proj.child("input/main.spd").data(Main) #require
+		proj.child("input/main.spd")!.data(Main) #require
 
 		|| R = defaultfiles.Roots
 		|| T = defaultfiles.Todo
-		proj.child(".perry").data = R
-		proj.child("input/.todo").data = T
+		proj.child(".perry")!.data = R
+		proj.child("input/.todo")!.data = T
 	IdeAddProj(path)
 
 
@@ -512,12 +512,13 @@ function PerryFileViewRightClick (GuiListEvent)
 	if row isa filerow
 		|| m = .CMM	#require
 		|| menu = menuitem("Count Lines Of Code", FileViewerCountCode)
-		m.listsource.Last.prev.prev = menu
+		|| where = m.listsource.Last.prev
+			where.prev = menu
 	return true
 
 
 function FileViewerCountCode (GuiMenuEvent)
-	|| row = clicked.row as filerow		#require
+	|| row = clicked!.row as filerow		#require
 	|| CLOC = (0,0)
 	|| FileCount = 0
 	|| Size = 0

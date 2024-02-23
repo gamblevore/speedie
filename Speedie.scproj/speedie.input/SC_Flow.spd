@@ -1,6 +1,7 @@
 
 
 function Tran_Flow (TranFunc)
+	expect (fn) (node, "Only use this on functions")
 	|| msg = node[@thg] #require
 	msg.ExpectLast
 	node.SafeRemove

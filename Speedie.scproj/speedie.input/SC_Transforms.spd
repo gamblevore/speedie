@@ -4,7 +4,7 @@
 */
 
 
-prototype TranFunc (|SCFunction| fn, |Message| node, |SCBase| name_space)
+prototype TranFunc (|SCFunction?| fn, |Message| node, |SCBase| name_space)
 
 extend_module SCFunction {
 
@@ -147,8 +147,8 @@ function Tran_Array (|Message| S, |SCBase| name_space) {
 		thg = scfunction.tempmoveout(s, s.parentpoint!)
 		name_Space.tryadd(thg, thg.asdecl, thg.name)
 	
-	|| P = S.NiceParent
-	|| Place = P.ParentPoint
+	|| P = S.NiceParent!
+	|| Place = P.ParentPoint!
 	
 	using (S)
 	// type.type contains the class to create
@@ -194,6 +194,7 @@ function Tran_Array (|Message| S, |SCBase| name_space) {
 
 
 function Tran_Description (TranFunc)
+	expect (fn) (node, "Only use this on functions")
 	|| str = node[@str]
 		if !fn.isdisabled
 			check !fn.description (node, "Can’t have multiple descriptions.")
@@ -202,6 +203,7 @@ function Tran_Description (TranFunc)
 
 
 function Tran_BlindCasts (tranfunc)
+	expect (fn) (node, "Only use this on functions")
 	|| thg = node[@thg]
 		node.remove
 		fn.blindcasts = thg.blind
@@ -604,7 +606,7 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCBase| p)
 	
 	using (arg)
 	|| CondName = UniqueTmpVar(p, "first")			// copy the index
-	Arg.parent.Prev = MakeDecl( "", CondName, index.copy(arg) )
+	Arg.parent!.Prev = MakeDecl( "", CondName, index.copy(arg) )
 
 	|| IfTest = «tmp "if"
 		«bra
@@ -713,7 +715,7 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCBase!| space)
 		if !oldcont or it.type.real_isa(oldcont.type)
 			newdecl.contains = it // oop
 	Space.access := Dictionary.new
-	Space.access[ L.name.lowercase ] = NewDecl // I think?
+	Space.access![ L.name.lowercase ] = NewDecl // I think?
 
 
 

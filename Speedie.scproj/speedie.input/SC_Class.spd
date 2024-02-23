@@ -329,7 +329,7 @@ function CanHaveEmptyConstructor (|bool|)
 
 	opt norefcounts
 	for p in .Properties
-		if p.TypeSuffers and p.IsReal
+		if p.TypeSuffers and p.StatedReal
 			require p.type.DefaultsToReal
 	return true
 
@@ -791,7 +791,7 @@ function AfterAfterFuncs
 	|| def = .Defawlt
 		|| D = TypeOfExpr( def, .Modul )
 		if d and .DefaultsToReal
-			check (d.isreal) (def, "Object default must be real (non-nil)")
+			check (d.StatedReal) (def, "Object default must be real (non-nil)")
 	
 	.DeclModel
 
@@ -922,8 +922,9 @@ module
 	function NewCast (CollectFunc)
 		expect (name_space isa SCClass)  (node, "'cast' only goes inside classes." )
 		
-		node.first!.name = "function"
-		node.first.Next = «Thg "operator_cast"»
+		|| f = node.first
+			f.name = "function"
+			f.Next = «Thg "operator_cast"»
 		
 		return SCFunction.NewFunc( node, name_space, ErrPlace )
 	

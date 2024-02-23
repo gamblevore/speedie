@@ -99,7 +99,7 @@ function perryide.SortedPrevious (|string| StrFilter = "", |message|)
 
 
 function ProjectCMMShow (GuiMenuEvent)
-	|| row = clicked.row as error
+	|| row = clicked!.row as error
 		|| i = .ide
 		i.clickederror(row)
 		i.view(i.viewfiles)

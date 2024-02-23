@@ -66,7 +66,8 @@ helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 	return OK
 
 		
-helper faststring.CompressChunk (|string| str) 
+helper faststring.CompressChunk (|string?| str) 
+	description "Passing nil will free the internal buffers" 
 	cpp_wrapper JB_Str_CompressChunk
 
 helper faststring.DecompressChunk (|string| str, |int| Expected, |int|) 

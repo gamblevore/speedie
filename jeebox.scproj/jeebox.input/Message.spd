@@ -1150,7 +1150,7 @@ class Message (RingTree)
 	operator Contains (|string| s, |bool|)
 		opt norefcounts
 		cpp_part ContainsStr
-		return .FindNested(nil, s, false)
+		return .FindNested(@nil, s, false)
 
 	operator Contains (|syntax| s, |bool|)
 		opt norefcounts

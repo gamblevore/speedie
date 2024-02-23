@@ -37,18 +37,18 @@ module SC_Errors
 			return true // why not
 		
 		|| A = Err.node.Ancestor(@arg)
-		if Options.HideMultipleErrors
-			require !.AlreadyIgnored(A)
-		.IgnoredBranches[A._DictName] = A
+			if Options.HideMultipleErrors
+				require !.AlreadyIgnored(A)
+			.IgnoredBranches[A._DictName] = A
 		return true
 
  
 function errorreceiver.PrePrintErrors 
 	for err in .errors
 		err.improve
-	ifn options.KeepAllErrors
+	if !options.KeepAllErrors
 		for err in .errors
-			ifn SC_Errors[err]
+			if !SC_Errors[err]
 				err.remove
 
 

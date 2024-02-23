@@ -197,8 +197,8 @@ class SCBehaviour (SCBase)
 	function CreateFuncTable (|Message| ErrPlace)
 		expect !.FuncTable
 
-		|| name = .cls!.behaviourname
-		|| Using = errplace.syntaxusing 
+		|| name = .cls!.BehaviourName
+		|| Using = errplace.SyntaxUsing 
 		|| msg = «tmp "struct"
 			«Thg name »
 			«Arg »
