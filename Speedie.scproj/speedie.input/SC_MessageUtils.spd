@@ -255,12 +255,6 @@ function Message.SafeReplaceWith (|message| Incoming)
 	self <~ incoming
 
 
-function Message.WrapWith (|Message| W, |Message|)
-	.Prev = W
-	W.first = self
-	return W
-
-
 function Message.AddBefore (|Message| before, |Message| NewItem)
 	if before
 		before.Prev = NewItem

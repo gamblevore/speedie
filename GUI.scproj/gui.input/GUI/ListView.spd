@@ -355,7 +355,10 @@ class ListView (GUIControl) {
 	helper UpdateFilter (|bool|)
 		opt norefcounts
 		|| t = .OnTypingFilter$
-		(t)(self, nil, .typingfilter.text?)
+		|| str = ""
+		|| tf = .typingfilter
+			str = tf.text
+		(t)(self, nil, str)
 		.touch
 		if .TypingFilter
 			if self isa menu

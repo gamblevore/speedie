@@ -92,7 +92,7 @@ Module Jeebox
 		.UnEscapeStr![`\0`]	= nil|string|					// handle normally
 		//.JS_UnEscapeStr[`\n`]	= ""						// c/js compat
 		.Unescapestr![`\`]	= ""
-		.EscapeStr!["'"]		= nil|string|
+		.EscapeStr!["'"]		= nil|stringzeroterminated|
 		
 		|| tfs = faststring()
 		for i in 256

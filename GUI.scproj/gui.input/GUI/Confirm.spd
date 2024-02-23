@@ -60,7 +60,7 @@ function string.Ask (|string| response="",  |string| Title="",  |stringthatwasre
 
 function guicontrol.VisText (assigns:|string|s)
 	.textset(s)
-	(self is visible) = s != ""
+	(self is visible) = s.Length > 0
 
 
 function ConfirmWindow_.Resize (|string| s)
@@ -96,7 +96,9 @@ function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| 
 		for i in 3
 			|| b  = .buttons[i]!
 			|| bw = b.textwidth+8 max 40
-			b.vistext = answers[i]
+			|| a = answers[i]
+			a := ""
+			b.vistext = a
 			|| l = (3,7)(i > 0)
 			b.size    = (l)~after for bW  by 5~up  for 17
 		.SetResponse(response)

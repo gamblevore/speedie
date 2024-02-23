@@ -7,10 +7,6 @@
 
 
 * Do nil checker!
-	* prototype GUIPasteEvent (|GUIControl| self)
-	
-	
-	* selector constructor shouldn't need "?"
 	* optional|array| <~ result // should be rejected!
 	* helper message.LastAfter (|int| IgnoreAfter, |ind|) shouldn't need nil self
 
@@ -18,7 +14,7 @@
 	* display obj.haha.property instead of JB_haha(obj).Property
 
 	* picomsg is now crashing or failing on constructor
-		* speedie is just hanging around... sometimes.
+		* speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 		* speedie stops compiling sometimes, from perry
 		* pico needs a massive bloat bastard constructor/destructor test!!! like 8 threads bastardly creating/destroying picos!
 		* logging huge stdout super slow (parsing/recolorising each line?)

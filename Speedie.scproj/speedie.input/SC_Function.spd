@@ -271,7 +271,6 @@ function Transform ()
 	opt norefcounts
 	require !.isMacro
 	CurrFunc = self
-	if self ~= "GUI_Toy_SilentRun"
 	.Badness = 0
 	|| StillOK = StdErr.Mark
 
@@ -702,21 +701,21 @@ function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 
 function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool| late=false)
 	|| p = ch0.Parent!
-	|| Proto = fpType.FuncProto						#expect (ch0, "This isn't a prototype!")
-	|| fProtoParams = Proto.Source[ @prm, 1 ]		#require
+	|| Proto = fpType.FuncProto										#expect (ch0, "This isn't a prototype!")
+	|| fProtoParams = Proto.Source[ @prm, 1 ]						#require
 
 	using (ch0)
 		fProtoParams.CopyAllInto( p )
 	p.Func = @prm
 	ch0.Remove
 
-	|| c = .cls$
+	|| c = .cls														#require
 	if late
 		p.first.remove // ooof
 	if (!AssumeSelf)
 		|| d = p[@decl]
-		|| ch = D[@thg]													#require
-		|| decl = ExtractDecl( ch, nil, declmode.ProtoParam )			#expect p
+		|| ch = D[@nil]												#require
+		|| decl = ExtractDecl( ch, nil, declmode.ProtoParam )		#expect p
 		expect (decl matches c.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
 		d.Remove
 

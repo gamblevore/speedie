@@ -240,7 +240,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	if msg ~= "result"
 		reason = msg.firstname
 		msg = msg[@nil, 1]$ // in case of garbled result?
-		if msg.name[0, "autocomplete"] and .LastAutoCompleteDate != date.int
+		if msg.name[0, "autocomplete"] and (.LastAutoCompleteDate != date.int)
 			msg.name = "" // returns
 	
 	.logonecomm(msg, "\1b ")

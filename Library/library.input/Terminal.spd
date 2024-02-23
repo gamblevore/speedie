@@ -17,6 +17,7 @@ module Terminal
 		|TerminalColor|
 		Black = 30, Red,Green,Yellow,Blue,Magenta,Cyan,White
 	
+	
 	helper init
 		require !.Screen
 		for h
@@ -24,7 +25,8 @@ module Terminal
 			.Screen <~ s
 			for w
 				s <~ TerminalCell(0, " ")
-		
+	
+	
 	syntax append (|string| text, |ivec2| V, |TerminalColor| Colors = 0)
 		.init
 		|| x0 = v.x
@@ -37,9 +39,11 @@ module Terminal
 			  elseif v inrange .size  and  c != ' '
 				if c == 127
 					c = ' ' // lol
-				.Screen[v.y][v.x] = TerminalCell(colors, c)
+				|| row = .Screen[v.y]
+					row[v.x] = TerminalCell(colors, c)
 				v.x++
-		
+	
+	
 	function DrawRect (|ivec4| Rect, |string| inside="", |terminalcolor| colors=0)
 		|| r2 = rect + (1, 1, -2, -2)
 		for s.rect in rect
@@ -87,7 +91,8 @@ module Terminal
 		s = s.wrap(frame.width-2)
 		|| p = frame.xy+1
 		for i.rect in frame ± 1
-			.Screen[i.y][i.x] = terminalcell(0," ")
+			|| row = .Screen[i.y]
+				row[i.x] = terminalcell(0," ")
 		for l.lines in s
 			self <~ (l, p, textcol)
 			p.y++

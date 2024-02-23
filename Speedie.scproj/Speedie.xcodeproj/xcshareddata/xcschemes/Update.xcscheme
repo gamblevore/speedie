@@ -55,7 +55,7 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--self"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--perry"
@@ -95,7 +95,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Perry.scproj"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Utils/jz.spd"

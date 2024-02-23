@@ -46,7 +46,7 @@ class AppMenu (Window)
 		|| p = (self)()
 		if p isa menuitem
 			.Choices.selectnone
-			(p.MenuEvent)(nil, p, nil)?
+			(p.MenuEvent)(self, p, nil)?
 
 
 	module

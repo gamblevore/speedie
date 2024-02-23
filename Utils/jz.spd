@@ -57,7 +57,7 @@ function app.UseOne (|file| f)
 	conv.RealOut = op
 	if conv.Dest is selfreplace
 		conv.realout = op.AddExt("jztmp").file
-	if conv.in.IsDir
+	if conv.in!.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
 	  elseif (conv.dest is TestComp)
@@ -225,7 +225,7 @@ module Conv
 
 		
 	function CompressOnly (|bool| Decomp)
-		printline .out|string|
+		printline .out!|string|
 		|| d = .realout!.out
 		|| src = .in!.in
 		require src!=nil and d != nil
@@ -236,11 +236,11 @@ module Conv
 			.time("Decompress(streamed )", true)
 		  else 
 			|| typ = ("µz", "ro")(.defaultstrength < mzlab.strong)
-			.size = .in.size
+			.size = .in!.size
 			src.CompressInto(d, DefaultStrength) 
 			.time("Compress(streamed $typ)", true)
 		if dest is selfreplace
-			.RealOut.MoveTo(.out)
+			.RealOut!.MoveTo(.out!)
 	
 
 	function Read (|bool|)
@@ -255,11 +255,11 @@ module Conv
 		.done++
 		
 		if (Dest is report) and CmpFormat
-			"$.in is: ${OrigSize.strsize} compressed to ${.in.size.strsize} ($CmpFormat)"
+			"$.in! is: ${OrigSize.strsize} compressed to ${.in!.size.strsize} ($CmpFormat)"
 			return 0
 				
 		.start = date()
-		.data = .in.ReadAll(int.max, false)
+		.data = .in!.ReadAll(int.max, false)
 		if .data != string.error
 			.Detected |= type.ReadOK
 		if (Dest is report) and (.data == "")
@@ -344,7 +344,7 @@ module Conv
 		fs = nil
 		
 		if dest is selfreplace
-			.RealOut.moveto(.out)
+			.RealOut!.moveto(.out!)
 		
 		if .dest isnt stdout
 			printline .out.path

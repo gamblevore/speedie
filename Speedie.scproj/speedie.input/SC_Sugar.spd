@@ -100,7 +100,7 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	opt norefcounts
 	
 	|| type = self[@nil]
-	|| name = type.next
+	|| name = type.next(@nil)$
 	|| IsArray = type == @arr
 		.ExpectLast$
 		type = Type.first
@@ -126,7 +126,8 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	name = name[@thg]					#require
 	prms[0] = name
 	|| opp = name.next(@opp, "=")
-	prms <~ opp.Next(@Nil)
+	|| l = opp.Next(@Nil)
+		prms <~ l
 	require prms == 4
 	arg <~ (macros.MainArgDefault.clean, prms)
 	return 4

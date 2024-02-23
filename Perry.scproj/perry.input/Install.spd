@@ -37,7 +37,8 @@ extend_module perry
 		fol.MakeEntirePath
 		|| items = fol.list
 		while items.length > allowed
-			|| s = fol[items.pop] #loop
+			|| i = items.pop #loop
+			|| s = fol[i]!
 			if keep_first
 				keep_first = false
 				rz = s

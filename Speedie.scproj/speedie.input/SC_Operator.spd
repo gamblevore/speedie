@@ -243,8 +243,8 @@ or
 
 		|| order = strs.split
 		|| fake = «opp ""» 
-		for i in order.length
-			for s2 in order[i].words
+		for (wi in order) (i)
+			for s2 in wi.words
 				if s2
 					fake.name = s2
 					.lookup(fake).score = i

@@ -235,6 +235,7 @@ class String
 	
 
 	function Trim (|charset| cs = nil, |string|)
+		nil self
 		cpp_wrapper JB_Str_Trim
 	
 
@@ -265,6 +266,8 @@ class String
 
 
 	function Yes (|bool|) // ispositive, isaffirmative, istrue
+		if !self
+			return false
 		if self ~= "no"  or "false" or "off" or "0" or "":	return false
 		if self ~= "yes" or "true"  or "on"  or "1": return true
 		error ("Not a boolean value: '" + self + "'")
@@ -514,6 +517,7 @@ class String
 		return .length - other
 	
 	syntax Equals (|string?| Other, |bool|Aware, |bool|)
+		nil self
 		cpp_wrapper JB_Str_Equals
 	
 	syntax Equals (|int| Other, |bool|Aware, |bool|)

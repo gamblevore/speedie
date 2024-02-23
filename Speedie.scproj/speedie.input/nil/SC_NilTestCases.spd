@@ -210,9 +210,14 @@ module NilTest2
 	
 	function NilDataType
 		.TestFree(nil)
-			
+	
 	|&RetroFloat| abc
+
 	}
+	
+	function ArrayTest
+//		borks
+//		nil|array| <~ ""
 
 
 function scfunction.NilPrint (|string| header="", |bool| nilch)

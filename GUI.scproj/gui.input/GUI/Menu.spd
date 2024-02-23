@@ -48,12 +48,13 @@ class Menu (ListView)
 		|| e = .EditingRow
 		if !.NoCloseOnClick
 			.closemenu
-		require l
-		if .DelayedOpen
-			return
+
+		require l and .DelayedOpen
+
 		if (L isa menuitem)
 			if (L.MenuEvent)
-				(L.MenuEvent!)(.parent,  l,  e.cell)
+				|| p = .parent
+					(L.MenuEvent!)(p,  l,  e.cell)
 				return
 		(.onreturn)(self, L)?
 			

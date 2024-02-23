@@ -1545,7 +1545,7 @@ function Message.FixErl
 	|| name = opp.Name
 	
 	if (name == ":=") and (.niceparent != @arg)
-		.BecomeMacro(Macros.InitExpand, [.first, .last])
+		.BecomeMacro(Macros.InitExpand, [ch, .last!])
 	  else
 		using opp
 		

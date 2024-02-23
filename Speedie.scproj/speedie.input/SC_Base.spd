@@ -686,25 +686,27 @@ function CreateNameDict (|Message| FuncName, |[message]| NameList) {
 	fs <~ "
 function $name (|dictionary of $AllSameType|)
 	visible false
-	ifn ${name}_Dict
-		${name}_Dict = dictionary.new
+	|| _T = ${name}_Dict 
+	if _T
+		return _T
+	_T = dictionary.new
+	${name}_Dict = _T
 "
 
 	for s in NameList
-		fs <~ ('\t', 2)
-		fs <~ name
-		fs <~ `_Dict.Set("`
+		fs <~ `	_T.Set("`
 		fs <~ s.name.Lowercase
 		fs <~ `", `
 		fs <~ s
 		fs <~ ")\n"
 		
 	fs <~ "
-	return ${name}_Dict
+	return _T
 "
 
 	|| FuncSrc = fs.GetResult
-	.CollectSub( FuncSrc.ParseClean[0] #expect )
+	|| msg = FuncSrc.ParseClean[0]
+	.CollectSub( msg #expect )
 
 	|| DclSrc = "|dictionary of $AllSameType| ${Name}_Dict = nil"
 	|| DclMsg = DclSrc.ParseClean

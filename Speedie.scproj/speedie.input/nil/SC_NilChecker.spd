@@ -177,7 +177,7 @@ function Function (NilTrackerFn)
 		|| sent = p!.FastDecl
 		HasAddrs := sent.CanUpgradeInternalPointer
 		if (v is nilish) // and recv.NilReg	
-			.NilParamPass(recv, sent, p!, fn)
+			.NilParamPass(recv, sent, p!, fn, v)
 
 		Test = 0
 		p++
@@ -581,10 +581,10 @@ function Debugger (NilTrackerFn)
 	// do nothing :)
 
 
-function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |scfunction| f)
+function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |scfunction| f, |nilstate| v)
 	opt norefcounts
 	if recv.StatedReal
-		.BecomeReal(sent, where, nilreason.passing, recv, f)
+		.BecomeRealSub(sent, where, nilreason.passing, recv, f, v)
 	  elseif !recv.nilstated and f != scfunction.currfunc  // haha
 		recv.NilPrmFail(where, f)
 	
@@ -612,6 +612,10 @@ function BecomeReal (|scdecl| sent,  |message| where,  |nilreason| reason,  |scd
 	if curr == NilState.Realish
 		return curr
 	
+	return .BecomeRealSub(sent, where, reason, recv, to, curr)
+
+
+function BecomeRealSub (|scdecl| sent,  |message| where,  |nilreason| reason,  |scdecl?| recv,  |scfunction?| To, |nilstate| curr, |nilstate|)
 	if (Curr == nilstate.either) and sent.IsUnknownParam
 		T.BecomeRealSub(sent)
 		return T.SetNilness(sent, NilState.real)

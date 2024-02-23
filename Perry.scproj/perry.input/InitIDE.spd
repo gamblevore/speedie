@@ -149,6 +149,11 @@ extend PerryIDE
 		with .errorlist
 			.tooltip = "Displays Compile Errors. Press \1f< or \1f> to step in list."
 			.GNormal.Solid = LeftBG
+			.onpaste = ErrorListPaste
+			.listsource = error()
+			.copypaste	   |= copypasteflags.pastetext
+			.copypaste	   |= copypasteflags.CopyText
+			
 		
 		with .logArea
 			.GNormal.Solid = LeftBG
@@ -475,7 +480,7 @@ extend PerryIDE
 	
 	function LogOneComm (|message| msg, |string|type="")
 		opt norefcounts
-		.logonething(msg,type, .LogComms!)
+		.logonething(msg, type, .LogComms!)
 
 
 	function LogOneAction (|message| msg, |string|type="")

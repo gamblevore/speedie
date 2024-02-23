@@ -62,7 +62,7 @@ class Array (saveable)
 		rz = self[n]
 		.length = n
 
-	function SetAt (|| c, |int| i)
+	function SetAt (|...!| c, |int| i)
 		|| n = .length
 		if n == i
 			self <~ c
@@ -142,10 +142,10 @@ class Array (saveable)
 	syntax cast (|bool|)
 		return .length > 0
 	
-	syntax Append (|| item)
+	syntax Append (|...?| item)
 		.SyntaxAppend(item, 1)
 	
-	syntax Append (|| item, |int64| Count)
+	syntax Append (|...?| item, |int64| Count)
 		cpp_wrapper JB_Array_AppendCount
 	
 	render

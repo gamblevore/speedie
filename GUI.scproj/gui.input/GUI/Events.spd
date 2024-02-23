@@ -14,6 +14,7 @@ struct SDL_Event
 			return (nil|&SDL_Event|).poll
 	
 	function Poll (|bool|)
+		nil self
 		cpp_wrapper SDL_PollEvent
 
 	function Window (|&SDL_WindowEvent|)

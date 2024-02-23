@@ -106,24 +106,23 @@ class PerryIDE (Window)
 			return found.location.file
 
 	
-	function PerryError (|error|) 
+	function PerryError (|error?|) 
 		opt norefcounts
 		if keys.shift
 			|| u = sdlapp.tooltip.useable
 				return u
 		|| e = .editme.myerror.useable(0)
-		if .editme.ParsedMessage and e				// don't show simple parse errors
-			return e
-		//|| it = sdlapp.CompileStatus.Useable
-			//return it
-		if e and .editme.expectsparse >= textview.probablyjeebox
-			return e
+			if .editme.ParsedMessage				// don't show simple parse errors
+				return e
+			if .editme.expectsparse >= textview.probablyjeebox
+				return e
 		return sdlapp.tooltip.useable
 	
 	
 	function PerryStatus (|string|)
 		opt norefcounts
-		return .PerryError.name
+		|| p = .PerryError
+			return p.name
 
 
 	function RemoveProjFromList

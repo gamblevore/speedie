@@ -414,8 +414,11 @@ function NewClassNew (|SCFunction| con, |Message| src, |int| ExtraCode)
 	
 	|| result			= .Modul.NewModuleFunc( src )$
 	result.counterpart	= con
-	con.counterpart    := []
-	con.counterpart|array| <~ result
+	|| c = con.CounterPart|array|
+	if !c
+		c = []
+		con.CounterPart = c
+	c <~ result
 	result.AllocCode   |= functiontype.New ||| ExtraCode
 	(con.alloccode = functionType.Constructor)
 	

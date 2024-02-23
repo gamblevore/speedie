@@ -116,6 +116,10 @@ class RingTree (Saveable)
 		nil checker
 		cpp_wrapper JB_Ring_FlatNext0
 
+	function WrapWith (|...!| W, |...!|)
+		.Prev = W
+		W.first = self
+		return W
 
 	function FlatPrev (||)
 		opt norefcounts
