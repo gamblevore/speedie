@@ -83,9 +83,10 @@ Actually, some of this can be omitted, it will still come back to the same:
     ||        MyGlobalStr = "abc"
     ||        MyGlobalMsg = message()
     |message| MyOptionalMsg
+    
 
-
-Those are the same as above! Lets look at how global variables can be set via functions:
+Those are the same as above! _(This might change as I feel that having "|type| name" meaning "optional"... can be confusing.)_
+ Lets look at how global variables can be set via functions:
 
     function NoNils (|message!| abc, |message!|)
         if abc.name == "abc"
@@ -102,16 +103,15 @@ Properties of classes/structs that are nillable, are assumed `real`, unless spec
     
     class MyClass
         |object | x                 // x assumed real.
-        |object!| y                 // Redundant "!" found!
         |object?| z                 // could be nil?
 
         constructor (|object?| o)
-            .x = o                  // can't set .x to optional value.
-            .y = o                  // same
+            .z = o                  // OK
+            .x = o                  // fails: Can't set .x to optional value.
 
-        constructor (|object!| o)   // will compile
-            .x = o
-            .y = o
+        constructor (|object!| o)
+            .z = o                  // OK
+            .x = o                  // OK
 
 Your class constructors need to be designed around how you defined your properties. You can't set a `real` property to `nil` during the constructor, and delay setting it to the actual `real` value later! Even if you know it will never be used as `nil`.
 
@@ -194,6 +194,10 @@ The inference only works on function local vars, params and returns. Not globals
         if g
             "GlobalMsg ${g.name} exists!"
 
+        // or use the short-hand
+        || sh = GlobalMsg
+            "GlobalMsg ${sh.name} exists!"
+
 The nil-checker is also very smart with boolean logic.
 
     function smart (|message| A, |message| B)
@@ -201,8 +205,8 @@ The nil-checker is also very smart with boolean logic.
             "something was nil"
           else
             // well... both A and B must be real now!
-            printline A.render // this compiles just fine
-            printline B.render
+            A.name = "good" // this compiles just fine
+            B.name = "nice"
         
         if !A or A.name != "good" // it knows the test on A.name is nil-safe
             "Something is not good"
@@ -212,8 +216,8 @@ The nil-checker is also very smart with boolean logic.
         if !A or !B
             return
         // smart enough to realise that A and B are real now.
-        printline A
-        printline B
+        printline A.render
+        printline B.render
 
 It also complains about redundant tests... But they can re-enabled with "`?`" if you want. Perhaps to test for out-of-memory bugs.
 
@@ -247,10 +251,10 @@ The nil-checkers "intelligence" spans one variable. Testing if a variable is `ni
     function lost_track (|message?| m)
         || IsReal = m != nil
         if IsReal
-            printline m.name // this code is correct, but speedie doesn't realise and flags it as incorrect.
+            printline m.render // this code is correct, but speedie doesn't realise and flags it as incorrect.
         
         if m != nil
-            printline m.name // speedie understands this!
+            printline m.render // speedie understands this!
             
                 
     
