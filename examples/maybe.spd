@@ -63,7 +63,7 @@ function app.Stuff
     (*DoAction["jump"])(G, "hes scared")
 
 
-prototype SayerFunction (|string| input)
+prototype SayerFunction (|string?| input)
 
 function MeSayer (SayerFunction)
     "Me says: $input"

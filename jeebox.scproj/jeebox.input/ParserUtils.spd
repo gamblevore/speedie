@@ -200,7 +200,10 @@ extend Parser
 			fs <~ "Expected "
 		
 		|| BestValue = FindError(num)
-			fs <~ e[ BestValue ]
+			|| s = e[ BestValue ]
+				fs <~ s
+			else
+				fs <~ "something"
 			return num &~ BestValue
 		
 		fs <~ "something else"

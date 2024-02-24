@@ -81,7 +81,7 @@ Module MZLab
 	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
 		for j in 4 
 			if i & (1<<j)
-				fs <~ items[j]
+				fs <~ items[j]!
 
 	helper ManyTests (|bool|) // mztest
 		|| Items = "abcd efgh ijkl mnop".words

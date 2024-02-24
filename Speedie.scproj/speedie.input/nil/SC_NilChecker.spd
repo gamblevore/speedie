@@ -628,7 +628,7 @@ function BecomeRealSub (|scdecl| sent,  |message| where,  |nilreason| reason,  |
 
 function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nilstate| state, |nilstate|)
 	|| fs = faststring()					// "Passing optional: S.pop to RefCount"
-	fs <~ nilreason.values[reason]
+	fs <~ nilreason.values[reason]!
 	|| raw = state.RawName
 	ifn where isthing raw
 		fs <~ ' '

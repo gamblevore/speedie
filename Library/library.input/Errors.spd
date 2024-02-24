@@ -233,7 +233,8 @@ datatype ErrorSeverity (Byte)
 				if name != nil
 					return name
 				return ""
-			fs_in <~ name
+			if name
+				fs_in <~ name
 	
 	syntax is (|errorseverity| e, |bool|)
 		return self == e
