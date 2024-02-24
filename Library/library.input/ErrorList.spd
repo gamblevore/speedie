@@ -87,9 +87,10 @@ class ErrorReceiver
 	setter LogFile (|string|)
 		opt norefcounts
 		ifn Value contains "/"
-			value = file.Logs[value]!
-		._LogObj = value.file
-		._LogFunc = LogFileWriter
+			value = file.Logs[value]
+		if value
+			._LogObj = value.file
+			._LogFunc = LogFileWriter
 	
 	
 	helper LogFileWriter (fnErrorLogger)

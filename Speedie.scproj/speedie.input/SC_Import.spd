@@ -145,10 +145,9 @@ class SCImport
 		return ErrorSeverity.find(.name, self)
 
 	function IncludeCHeaders (|file| f, |[string]| output)
-		for cName in f
-			|| c = f[cName]!
-			if (!c.isDir) and (cName isa "h")
-				output <~ c.path
+		for c.files in f
+			if (!c.isDir) and (c isa "h")
+				output <~ c
 	
 	
 	function LoadBanned (|Message| list)

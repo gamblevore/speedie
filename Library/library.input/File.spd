@@ -277,7 +277,7 @@ class File (String)
 	helper MoveNext (|bool|)
 		cpp_wrapper JB_File_MoveNext
 
-	function CurrChild (|String|)
+	helper CurrChild (|String|)
 		cpp_wrapper
 	
 	function Open (|int| Flags = File.O_RDWR ||| File.O_CREAT, |bool|AllowMissing=false, |int|)
