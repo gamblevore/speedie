@@ -49,8 +49,8 @@ class Menu (ListView)
 		if !.NoCloseOnClick
 			.closemenu
 
-		require l and .DelayedOpen
-
+		require l and !.DelayedOpen
+		
 		if (L isa menuitem)
 			if (L.MenuEvent)
 				|| p = .parent
