@@ -23,54 +23,56 @@ class SCFile (file)
 		.liveast = .start_ast
 		Compiler.stTotalFileCount += .isinternal
 		(SCImport.Recent max= f.modified) 
-		
+	
+	
 	function Start_AST (|message|)
 		if .IsInternal
 			return message.newwithlayer((Message).createLayer(self), @arg, "")
-
+	
+	
 	function Use
 		|| l = .LiveAst // if parse fails...
 			l.memoryLayer.Use
-
-
+	
+	
 	function CollectGlobals (|SCBase| p)
 		.Proj.use // should be inside use?
 		CollectDeclsGlobals( .LiveAST, p )
-
-
+	
+	
 	function scmodule.InitDecls // same as scfile.decls just different
 		|| a = .initvarsarg.First
 		if a.hasany
 			.Project.use
 			CollectDeclsGlobals( a, self )
-
-
-	function GetMsg (|int| pos, |bool| needname, |message|)
+	
+	
+	function GetMsg (|int| pos, |bool| NeedName, |message|)
 		opt norefcounts
 		for f.flat in .orig
-			if !needname or f.name
+			if !NeedName or f.name
 				if f.range contains pos
 					return f
-
-
+	
+	
 	function SavedData (|string|)
 		if .origdate < .modified
 			.fData = .ReadAll.decompress // why not.
 		return .fdata
-
-			
+	
+	
 	function Orig (|message|)
 		if !.OrigAST or .OrigDate < .Modified
 			.OrigDate = .Modified
 			.OrigAST = .ASTSub
 		return .OrigAST
-
-
+	
+	
 	function AST (|Message|)
 		opt norefcounts
 		return .LiveAST init .ASTSub
-
-
+	
+	
 	function DetectInsecureWords
 		opt norefcounts
 		require options.perry

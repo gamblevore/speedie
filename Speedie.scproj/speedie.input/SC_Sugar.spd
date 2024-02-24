@@ -165,12 +165,14 @@ function message.InsertMainArgs (|message| prms)
 	opt norefcounts
 	|| usage = prms.CollectUsage
 	|| FirstArg = `
+
 if !app.usage
 	app.usage = "_0"
 || __ArgCount = app.args.length
 if __ArgCount == 0
 	printline app.usage.replaceall("\$app", app.callpath.name)
 	return 0
+
 `
 
 	using prms

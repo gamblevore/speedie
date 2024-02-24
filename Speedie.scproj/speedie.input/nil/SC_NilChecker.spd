@@ -120,6 +120,7 @@ function List (NilTrackerFn)
 function Access (NilTrackerFn)
 	return .UseChildAsReal(msg)
 
+
 function Property (NilTrackerFn)
 	return .UseChildAsReal(msg, nilreason.property)
 
@@ -290,11 +291,10 @@ function If (NilTrackerFn)
 		// what about something like   (x.func(&obj) or true)
 		// it is always true. I think we just don't need this.
 		return .Argument(arg1)
-	  elseif always.isfalse
+	
+	if always.isfalse
 		return .Argument(arg2)
 	
-		
-
 	|| Orig = T.BranchEnter(msg)				#require
 	#!"First Branch"
 	.Jump(Cond, NilCheckMode.positive)

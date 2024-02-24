@@ -208,14 +208,6 @@ class ErrorReceiver
 		return old
 	
 	
-	function ReturnErrors (|errorreceiver| To=stderr, |int|)
-		opt norefcounts
-		debug_require to!=self
-		for e in self
-			To <~ e
-			rz ++
-
-
 	function LastError (|error|)
 		visible
 		opt norefcounts

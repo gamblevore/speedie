@@ -1056,6 +1056,7 @@ function TypeOfDot (ExprResolver)
 	  else
 		expect  (DotVar isa SCClass or scmodule)  ( exp, "Not a class or module." )
 	
+	debugat 5606
 	|| o = DotVar.LookUpDot( exp.name, exp, name_Space, contains, side )		#require
 	if (o isa SCModule)
 		// for __modules__.String   // one day namespace.myclass ?
@@ -1654,7 +1655,7 @@ function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
 	if  n < int.min  or  n > int.max
 		d.type = typeint64!
 	d.name = varname
-	if varname // setvarname later?
+	if varname								// SetVarName later?
 		D.Default = NewNum
 	Return NewNum
 
@@ -1679,8 +1680,8 @@ function DotFuncToNormalFunc (|Message| dot, |SCFunction| fn)
 		dot.LastInBlock(SCBlockage.Quit)
 
 
-function SCDecl.ProcessAs (|Message| msg, |SCDecl|)
-	expect (msg)		
+function SCDecl.ProcessAs (|Message!| msg, |SCDecl|)
+	debugat 17
 	|| P = msg.parent!.unbra
 	if (P isBrel "&")					 // :)
 		return self

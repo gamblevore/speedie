@@ -118,9 +118,16 @@ function exepath (|string|)
 function Path (|string|)
 	cpp_part OrigPath
 	visible class~file
-	._Path := .env["OrigScriptPath"]
-	._Path := .exepath
-	return ._path
+	|| p = ._Path
+		return p
+	p = .env["OrigScriptPath"]
+	if p
+		._Path = p
+		return p
+	p = .exepath
+	if p
+		._Path = p
+		return p
 
 function PrintStackTrace
 	visible

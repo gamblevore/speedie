@@ -435,16 +435,12 @@ function PerryIDE.ClickedFind (|error| row)
 
 
 function ErrorListPaste (guipasteevent)
-	|| Errs = data.ParseWithError(nil)$
+	|| errs = error.from(data.ParseWithError(nil))$
 	|| i = .ide
 	|| L = i.errorlist.listsource
-	if Errs == @tmp
-		L <~ error.from(Errs)
-	
-	  elseif errs == @arg
-		for e in errs
-			if e == @tmp
-				L <~ error.from(e)
+	for e in errs
+		if e == @tmp
+			L <~ error.from(e)
 	i.noneed
 
 /*

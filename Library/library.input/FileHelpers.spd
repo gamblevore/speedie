@@ -7,7 +7,7 @@ extend String
 	function IsOK (|bool|)
 		opt norefcounts
 		nil checker
-		return self != nil and self|object| != string.error|object|
+		return self != nil  and  self|object| != string.error|object|
 	
 	function FileThatExists (|string| operation="access",  |File|)
 		|| f = .file
@@ -102,9 +102,9 @@ extend String
 
 	Syntax Append (|messageroot!| msg, |bool|)
 		cpp_Part WriteMsg
-		|| fs = .out$
-		msg.render(fs)
-		return true
+		|| fs = .out
+			msg.render(fs)
+			return true
 
 
 	function Sibling (|string| name, |string|)
@@ -211,7 +211,7 @@ extend String
 	function MakeDir (|ErrorInt|)
 		cpp_wrapper JB_Str_MakeDir
 
-	function TrimLastSub (|Byte| b, |int|)
+	helper TrimLastSub (|Byte| b, |int|)
 		// replace with .outbyte(-1,0,b)?
 		|| N = .Length
 		while (self[N - 1] == b)

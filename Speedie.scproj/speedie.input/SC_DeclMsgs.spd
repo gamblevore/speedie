@@ -66,7 +66,6 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 	rz <~ Default
 
 
-// these can remain...
 function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
 	opt norefcounts
 	|| cls = .Cls

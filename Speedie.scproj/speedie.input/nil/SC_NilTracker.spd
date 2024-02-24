@@ -234,14 +234,30 @@ struct ArchonPurger
 		function FixArchons
 			opt norefcounts
 			using options.NilStrength	
-			|| Old = stderr	
+			|| Old = stderr
 			|| Rec = ErrorReceiver()
 			|| Failed = 0
 			using rec
 				for (ƒü in compiler.funclist) (i)
 					.ExterminateZergBugs(ƒü)
 					Failed += rec.ReturnErrors(old) > 0
-			
-			//if Failed // in case theres too many to list all
-			//	StdErr.errors.first = Error(nil, "function".pluralize(Failed) + " failed nil-checking" )
+
 			SCFunction.currfunc = nil
+
+
+			
+function error.NilImprove
+	|| n = .node    $
+	|| f = n.SCFile	$
+	|| orig = f.GetMsg(n.position, true)
+		.node = orig
+		debugat
+
+
+function errorreceiver.ReturnErrors (|errorreceiver| To = StdErr, |int|)
+	opt norefcounts
+	for e in self
+		e.NilImprove
+		To <~ e
+		rz ++
+

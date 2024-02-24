@@ -351,7 +351,7 @@ function TryAddBase (|Message| c, |scbase| neu)
 
 
 function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scfunction|)
-	return .LookUpSub( name, exp, ParamsHere, self, NIL, niL, kPurposeFunc )|scfunction| // right? we use "me" for both the receiver and the argspace?
+	return .LookUpSub( name, exp, ParamsHere, self, nil, nil, kPurposeFunc )|scfunction|
 
 
 
@@ -398,6 +398,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 					Return o
 
 				if (!side and paramsarray.isdot and o.type.processas)
+					debug_require exp
 					return o.ProcessAs(exp)
 
 		
