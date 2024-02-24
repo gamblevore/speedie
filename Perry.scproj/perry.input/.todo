@@ -7,7 +7,6 @@
 
 
 * Do nil checker!
-	* display obj.haha.property instead of JB_haha(obj).Property
 	* int upgrading needs fix
 	
 	* picomsg is now crashing or failing on constructor

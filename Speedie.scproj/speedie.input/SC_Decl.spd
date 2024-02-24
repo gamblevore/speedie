@@ -623,7 +623,6 @@ class SCDecl (SCObject) {
 		require (c is borrowed) == (self is borrowed) 
 		require c.PointerCount == .PointerCount
 		if .nildeclared != c.nildeclared
-			// if "datatypewrapper" ~= .type.name or c.type.name
 			return false
 		return c.C_array      == .C_array
 

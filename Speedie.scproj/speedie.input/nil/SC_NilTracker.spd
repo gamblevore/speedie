@@ -246,18 +246,20 @@ struct ArchonPurger
 
 
 			
-function error.NilImprove
-	|| n = .node    $
-	|| f = n.SCFile	$
-	|| orig = f.GetMsg(n.position, true)
-		.node = orig
-		debugat
+function message.OrigRender	(|faststring| fs=nil, |string|)
+	|| n = .OrigMsg
+		return n.Render(fs)
+	return .Render(fs)
+
+
+function message.OrigMsg (|message|)
+	|| f = .SCFile
+		return f.GetMsg(.position)
 
 
 function errorreceiver.ReturnErrors (|errorreceiver| To = StdErr, |int|)
 	opt norefcounts
 	for e in self
-		e.NilImprove
 		To <~ e
 		rz ++
 

@@ -65,7 +65,7 @@ class Document (RingTree)
 	function ExpectCurr (||)
 		opt NoRefCounts
 		|| o = .original
-		|| c = .current
+		|| c = .Current
 		if c and (c.parent|object| != self|object|)
 			debugger //!!??
 			c = nil
@@ -79,7 +79,7 @@ class Document (RingTree)
 
 
 	function UpdateState (|string| nt, |ivec2| ns)
-		|| c = .current
+		|| c = .Current
 			if c != .original
 				c.text = nt
 				c.typingplace = ns

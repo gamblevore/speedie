@@ -188,7 +188,7 @@ function Function (NilTrackerFn)
 		for recv in fn.args
 			|| infernal = p!.FastDecl.CanUpgradeInternalPointer
 				|| ri = recv.internal!
-				.VariableSet(infernal, recv.source, ri, p!, ri.nilcurr)
+				.VariableSet(infernal, recv.source!, ri, p!, ri.nilcurr)
 			p++
 
 	if fn.IsKiller
@@ -599,7 +599,7 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 	if recv.StatedReal and recv isnt local
 		if sentstate isnt nilish
 			return sentstate
-		expect (SentState is realish) (RecvMsg, "Nil is not allowed on: " + recvmsg.render)
+		expect (SentState is realish) (RecvMsg, "Nil is not allowed on: " + recvmsg.origrender)
 		return .BecomeReal(sent, SentMsg, nilreason.using)
 		
 	if recv.NilReg
@@ -627,7 +627,7 @@ function BecomeRealSub (|scdecl| sent,  |message| where,  |nilreason| reason,  |
 
 
 function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nilstate| state, |nilstate|)
-	|| fs = faststring()
+	|| fs = faststring()					// "Passing optional: S.pop to RefCount"
 	fs <~ nilreason.values[reason]
 	|| raw = state.RawName
 	ifn where isthing raw
@@ -635,7 +635,7 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 		fs <~ raw
 	fs <~ ':'
 	fs <~ ' '
-	where.render(fs)
+	where.origrender(fs)
 	if To
 		fs <~ " to "
 		if where.isfirst and to.cls
