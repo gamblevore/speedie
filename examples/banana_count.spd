@@ -1,8 +1,5 @@
 #!/usr/local/bin/spd
 
-main (|int| amount)
-	|array of string| s = []
-	s.pop.Addr
-	
+main (|int| amount)	
 	for i in 0 to Amount
 		app.say "banana".Pluralize(i)
