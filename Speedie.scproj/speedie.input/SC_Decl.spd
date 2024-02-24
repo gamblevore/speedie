@@ -620,9 +620,10 @@ class SCDecl (SCObject) {
 	
 	function SameForReplace (|SCDecl| c, |bool|)
 		require (c is borrowed) == (self is borrowed) 
-		require c.PointerCount == .PointerCount 
+		require c.PointerCount == .PointerCount
+		if .type.basetype != c.type.basetype
+			return false
 		return c.C_array      == .C_array
-
 
 	function IsNormal (|bool|)
 		return !.PointerCount and !.IsNil and !.IsCArray

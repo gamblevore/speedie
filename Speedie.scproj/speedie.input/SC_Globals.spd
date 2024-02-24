@@ -1056,7 +1056,6 @@ function TypeOfDot (ExprResolver)
 	  else
 		expect  (DotVar isa SCClass or scmodule)  ( exp, "Not a class or module." )
 	
-	debugat 5606
 	|| o = DotVar.LookUpDot( exp.name, exp, name_Space, contains, side )		#require
 	if (o isa SCModule)
 		// for __modules__.String   // one day namespace.myclass ?
