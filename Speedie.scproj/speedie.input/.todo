@@ -1,11 +1,9 @@
 
 
 bugs:
-	* scmodule.NeuModule seems to refcount name_space unnecessarily?
 	* don't use "syntax append", simply "function append". Same with "call". I mean *x --> x.first
 	* sdleventtype.mousedown() // compiles???
 		* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and struct
-	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
 	* Function finding fails with dictionary subclasses? DictSub["abc"]
 	* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
 	* vector constants
@@ -22,9 +20,13 @@ bugs:
 		x = a ?? x // sets x to x! should disallow? if a: x=a thats what we want.
 	*	status(.CurrMousePixelColor.render) // tmp struct.
 	* The "function case affects visibility" (from GoLang) thing needs deletion.
-
+	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
 
 additions:
+	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
+		* first byte (if float) can also store the sign of the exponent.
+		* could be an interesting type to have generally... like perhaps as a string subclass?
+	* refcount optimiser
 	* nil-checker could eliminate scope-escape... of local vars addresses. Its an error regardless.
 	* CollectDecls needs to not return early!! or break it up into pieces
 	* –container @ques ability... for macros. This returns the syntax that contained us. Useful for (all~files).delete
@@ -39,6 +41,7 @@ additions:
 		// could be done better with ast-spawner?
 	* (node, err) = .text.parse --> |error| err, || node = .text.parse(err) // noice
 	* any object can be created with an virtual-function override table, just store before the refcount?
+
 	* could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
 	* || x = .SomeCArray // should just get the address... :)
 	

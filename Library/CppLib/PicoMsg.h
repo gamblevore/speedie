@@ -759,7 +759,7 @@ extern "C" PicoComms* PicoCreate ()  _pico_code_ (
 	return new PicoComms(PicoNoiseEvents, true, PicoDefaultInitSize);
 )
 
-extern "C" void PicoDestroy (PicoComms** Ref, const char* Why) _pico_code_ (
+extern "C" void PicoDestroy (PicoComms** Ref, const char* Why=0) _pico_code_ (
 /// Destroys the PicoComms object, and reclaims memory. Also closes the other side.
 /// Sets Ref to nullptr, which to indicate that you really should not use that Object!
 /// Accepts refs to nullptr.

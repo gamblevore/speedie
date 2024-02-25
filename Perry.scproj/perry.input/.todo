@@ -8,6 +8,7 @@
 
 * Do nil checker!
 	* int upgrading needs fix
+	* |dictionary! of abc| should be considered real!
 	
 	* picomsg is now crashing or failing on constructor
 		* speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
@@ -44,10 +45,11 @@
 
 						 Speedie Do later
 
+* doc examples should all (or mostly) come with "main" :) so be runnable!
 * speedie not listing all the constructors on Error()
 * params should be assumed real!
 	* upgrade optional returns to real? (if possible)
-	* started optional returns must return both values!!
+	* started optional returns must return both values!! (unless a prototype)
 
 
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.

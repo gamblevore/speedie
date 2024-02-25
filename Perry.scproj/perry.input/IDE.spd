@@ -63,7 +63,6 @@ class PerryIDE (Window)
 	|Buttonview|				RunButton
 	|Process?| 					Talker
 	|message|					RecentFiles
-	|string|					OldJBCloser
 	|string| 					LastCmdStr
 	|date|						LastSendTime
 	|string|					AttachedProgram
@@ -533,7 +532,7 @@ class PerryIDE (Window)
 				t.text = ""
 			return true
 		if key is j
-			return .SelTextParse
+			return .Command_J
 		if key is e
 			return .ShowErrors(true)
 		if key is i

@@ -208,7 +208,7 @@ function View (|ButtonView| btn)
 
 
 function ShowCompileCutely (|bool| Always=false)
-	require .editsep.collapsed
+	require .editsep.iscollapsed
 	if !always
 		if .AlreadyExpandedCompileTab
 			return
@@ -306,7 +306,7 @@ function ViewAsVis (|bool| AsProject)
 	if AsProject and !AnyViews
 		.viewfiles.click(nil)
 
-	.filesep.Collapsed = !AsProject
+	.filesep.isCollapsed = !AsProject
 	(.gonext is visible)	= AsProject
 	(.goPrev is visible)	= AsProject
 	(.rborder is visible)	= AsProject

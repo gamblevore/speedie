@@ -257,39 +257,37 @@ function ClickedNoNeed (GUIaction)
 		.ide!.view(t)	
 
 
-function PerryIDE.ShowText (|textview| field, |string| Text, |bool| Always)
+function PerryIDE.ShowText (|textview| field, |string| Text, |bool| Always, |bool|)
 	field.text = text
 	.CompileTabSelect(field)
 	.ShowCompileCutely(Always)
+	return true
 	
 	
-function PerryIDE.SelTextParse (|bool|)
-	opt norefcounts
-	|| e = .editme
-	if !e.selrange.width
-		e.DoSelectLine
-	|| s = e.seltext
-	if s == .OldJBCloser
-		.OldJBCloser = ""
-		.editsep.Collapse
-		.jeeboxtext.text = "" 
+function PerryIDE.Command_J (|bool|)
+	opt NoRefCounts
+	if !.EditSep.isCollapsed
+		.EditSep.Collapse
+		.JeeboxText.Text = ""
 		return true
-	.OldJBCloser = s
-	|error| where
-	|| msg = s.parsewitherror(where)
-		.ShowText(.JeeboxText, (msg.renderast(0), where.render)(!where), true )
+	return .UpdateJeeboxField
+
+
+function perryIDE.UpdateJeeboxField (|bool|)
+	|| e = .editme
+	|| sr = e.SelRange
+	|| txt = e.SelText
+	if !sr.width
+		txt = e.FindDrawInfo(sr.x).text
 	
-	// could put some tabs into that area? QT creator does the same???
-	// one for jeebox... one for stdout from shellstreamer...
-	// then we can opt the shellstreamer to NOT copy the streaminfo if its not onscreen?
-	// or atleast we can opt it somehow... like doing getresult and appending it
-	// and having the textview able to stitch together stuff... via the textviewlines 
-	// of course... the .text won't be legit anymore. Which would be bad.
-	// we would like to append stuff without needing the whole file in RAM as one string!!
-	// as long as that is possible... it should be ok?
-	// Perhaps  .text  can come from a function that wraps a virtual func???
-	// then it can stitch it together, if called for.
-	// but the internal drawing/scrolling funcs wouldn't need it, right? Right??? RIGHT?
+	|error| Err
+	|| str = ""
+	|| msg = txt.ParseWithError(Err)
+		str = msg.RenderAST(0)
+	  else
+		str = Err!.render
+	// OK... so... what about resel from drag?
+	.ShowText(.JeeboxText, str, true)
 	
 	return true
 
@@ -353,6 +351,8 @@ function PressedSearchKeys (GUIKeyEvent)
 function EditMeSelChange (GUITextEvent)
 	opt norefcounts
 	|| i = .ide!
+	if i.EditSep.IsOpen
+		i.UpdateJeeboxField
 	i.popuphide
 	i.ShowRightStats
 	i.EditMeTabRetryThing = 0

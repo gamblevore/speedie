@@ -9,16 +9,20 @@ role StretchControl (GuiControl)
 		|| rz = guicontrol(self)
 		rz.ID = name
 
-	function Expand
-		.Collapsed = false
+	function Open
+		.isCollapsed = false
 		
-	setter Collapsed (|bool|)
+	setter IsCollapsed (|bool|)
 		opt norefcounts
 		.div.setcollapsed(false, value)
 	
-	function Collapsed (|bool|)
+	function IsCollapsed (|bool|)
 		opt norefcounts
 		return !.div.ActiveEnd.length
+		
+	function IsOpen (|bool|)
+		opt norefcounts
+		return !.IsCollapsed()
 		
 	function Reset
 		opt norefcounts
