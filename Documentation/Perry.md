@@ -43,6 +43,7 @@ Each of these features was designed expertly and to a high degree of care. For e
 * The quick file-finding feature, is accessed via Cmd-D (control-D on Linux). This brings up a list of files that contain the name. You can also paste file-paths in there, to see all the files in that folder.
 
 
+![](bananas.mov)
 
 ## Speed And Efficiency
 
