@@ -22,15 +22,15 @@ main (|existingfile| input)
 function BookSearch (|message| BookFile, |[string]| Queries, |[message]|)
 	|| list = BookFile[@tmp, "catalog"][@arg]
 	for book in list
-		rz <~ book.TestBook(Queries)
+		if book.Expect(@tmp, "book") 
+			rz <~ book.TestBook(Queries)
 
 
 function message.TestBook (|[string]| queries, |message|)
-	require .Expect(@tmp, "book") 
 	for row in .last(@arg)
 		require row.Expect(@tmp)
 		for Q in queries
-			if row ~= q.ArgName		// ~= is like == but case-insensitive
+			if row ~= q.ArgName
 				|| Value = Row[@nil]
 					require Value.name contains q.ArgValue
 					rz = self

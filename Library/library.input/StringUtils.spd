@@ -50,6 +50,8 @@ function byte.IsVowel (|bool|)
 function int.OperatorPC (|int| x, |string|) 
 	return (self|float| / x|float|).pc
 
+function int.operatorof (|string| type, |string| nothing="", |string|)
+	return type.Pluralize(self, nothing)
 
 function string.Pluralize (|int| amount, |string| nothing="", |string|)
 	if !amount and nothing
