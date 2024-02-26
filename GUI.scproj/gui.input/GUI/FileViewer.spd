@@ -522,6 +522,7 @@ class FileViewer (ListView)
 					ClickedOpenList(l, row)
 				  else
 					fv.OpenQuick(.text)
+					fv.HideOpenList
 				rz = true
 			  elseif (key is escape)
 				rz = fv.HideOpenList

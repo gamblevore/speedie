@@ -59,7 +59,6 @@ additions:
 	
 
 class-changes
-	* delete fastappender
 	* Make objectset from FixedDict?
 	* replace dictionary with fixeddict
 		* remove the datatype wrapper? it was only used for dicts+arrays anyhow...

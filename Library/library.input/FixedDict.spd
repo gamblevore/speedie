@@ -222,7 +222,6 @@ class FixedDict
 	Could replace:
 		* Array			(arrays suck in every language. we only wanna go forward/backward!)
 		* Dictionary	(kinda bloated, and slower!! and takes more memory!)
-		* FastAppender	(looked ugly)
 		* Hashes		(Assuming we got good removal)
 */
 

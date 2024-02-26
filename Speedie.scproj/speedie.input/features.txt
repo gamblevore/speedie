@@ -55,7 +55,6 @@
 			c : 9
 		}
 
-* Remove FastAppender, use fixeddict instead.
 * Replace with string param adder if so few into faststring
 * Allow constants for array sizes!
 * "||" parsing... requries an "inside |" boolean. What if... instead we use the same func that parses stuff inside of strings? Like... distance based :)
