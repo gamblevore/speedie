@@ -1,4 +1,3 @@
- 
 
 extend_module perry
 	function FTP_Path (|string|)  ////////
@@ -272,7 +271,7 @@ extend_module perry
 
 
 	function SetupLinks (|file|f, |string|)
-		|| term = f["Terminal/Speedie"]
+		|| term = f["Terminal/Speedie"]!
 		require term.mustexist
 		|| dest = speedie.linksto
 		if Dest == term.path
