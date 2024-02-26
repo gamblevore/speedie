@@ -1,10 +1,12 @@
 #!/usr/local/bin/speedie
 
 |[file]|				Found
-|dictionary|			Types = ["spd":"x"]
+|dictionary?|			Types
 |int|					Total
 
 main (|[existingfile]| files)
+	types = dictionary.new
+	types!["spd"] = "x"
 	|| t = app["types"]
 		if t == "*"
 			types = nil

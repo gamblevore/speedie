@@ -72,7 +72,7 @@ helper @file.MainArg		(|int| Pos, |string| name, |file|)
 helper @ExistingFile.MainArg (|int| Pos, |string| name, |file|)
 	return string.MainArgSub(Pos, name, "file-path")$.FileThatExists
 
-helper @FileData.MainArg	(|int| Pos, |string| name, |string|)
+helper @FileData.MainArg	(|int| Pos, |string| name, |stringthatwasreadsafely|)
 	return ExistingFile.MainArg(pos, name)$.ReadAll
 
 helper @JeeboxFile.MainArg	(|int| Pos, |string| name, |messageroot|)
