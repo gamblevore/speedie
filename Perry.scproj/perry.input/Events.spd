@@ -257,20 +257,12 @@ function ClickedNoNeed (GUIaction)
 		.ide!.view(t)	
 
 
-function PerryIDE.ShowText (|textview| field, |string| Text, |bool| Always, |bool|)
-	field.text = text
+function PerryIDE.ShowText (|textview| field, |string?| Text, |bool| Always, |bool|)
+	if text != nil
+		field.text = text
 	.CompileTabSelect(field)
 	.ShowCompileCutely(Always)
 	return true
-	
-	
-function PerryIDE.Command_J (|bool|)
-	opt NoRefCounts
-	if !.EditSep.isCollapsed
-		.EditSep.Collapse
-		.JeeboxText.Text = ""
-		return true
-	return .UpdateJeeboxField
 
 
 function perryIDE.UpdateJeeboxField (|bool|)

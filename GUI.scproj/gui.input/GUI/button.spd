@@ -71,6 +71,10 @@ class ButtonView (GUIControl)
 			(.onrightclick)(self, C, prev)?
 
 
+	function Select (|listviewrow| r)
+		disabled "just set .selected"
+		
+	
 	setter Selected (|ListViewRow|)
 		opt norefcounts
 		for i in .items
@@ -185,7 +189,7 @@ class ButtonView (GUIControl)
 		  elseif (D == .clickeditem) and (n >= .DelayTill)
 			.DelayTill = n + .StepDuration
 			.PressingDone = true
-			ifn .DoPressing(D)
+			if !.DoPressing(D)
 				.delaytill = 0
 				return MouseDragging.handled
 		return mousedragging.EvenIfNoMovement

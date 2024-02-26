@@ -21,28 +21,8 @@ function Int   (|&byte| p, |int| n,  |int64|)
 	// now we have just bits to get
 	// so we have a thing that could be an int or not
 	
-	
-function Float (|&byte| p, |int| n,  |f64|)
-	|int| b = *p++
-	ifn b & 2
-		return 0 // int
-	|| int_part = b >> 4
-	|| exp_part = (b & 8) >> 3
-	//       bytes, float_exp, float_sign, type, sign
-	while --n >= 1
-		|| c = *p++
-		int_part <<= 6
-		exp_part <<= 2
-		int_part |= c & 63
-		exp_part |= c >> 6
-	
-	if b & 4
-		exp_part = -exp_part
-	if b & 1
-		int_part = -int_part
-	|| f = 2.0|f64| pow exp_part
-	return f * int_part
-		
+	// floats will be stored directly... no point encoding, we want this to be fast.
+	// however... ints as fast enough
 }
 	
 }

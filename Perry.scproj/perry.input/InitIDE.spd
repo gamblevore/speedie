@@ -378,6 +378,7 @@ extend PerryIDE
 			|| C = .items.first!
 			(C is selected)
 			C.Obj = self.SpeedieText
+			self.SpeedieText.tag = c.obj
 			c = c.next(self.JeeboxText)
 			c = c.next(self.ProductOut)
 			c = c.next(self.ProductErrors)
@@ -434,6 +435,7 @@ extend PerryIDE
 		pragma inline
 		rz = .next!
 		rz.obj = obj
+		obj.tag = rz
 
 	function textview.SetupOut (|string| name, |int| Parse=TextView.probablyjeebox)
 		opt norefcounts

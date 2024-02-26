@@ -7,6 +7,9 @@
 
 
 * Do nil checker!
+	* return in the cmd-d should disappear the thing! (when lines are involved)
+	* errors on run should show the error-pane, always
+	* cmd-1 should open the run-args... and 987 the other stuff.
 	* int upgrading needs fix
 	* |dictionary! of abc| should be considered real!
 	
@@ -32,7 +35,6 @@
 	* listview should have a "header"
 	* errors should bubble up the folders
 	* and display in scroll
-* return in the cmd-d should disappear the thing! (when lines are involved)
 * moving arrow in unseen lines, should jump to 1/3 of visibility... as expected
 * colormark unused funcs in editor
 	* mouseover errors in editor, should put them in a popup
@@ -75,4 +77,5 @@
 * double clicking |abc| on the || should sel the entire thing, doing on the inside should sel the inside
 * Find-replace?
 	* syntactic-mode also
+
 
