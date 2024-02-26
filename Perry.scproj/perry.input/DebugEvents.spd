@@ -150,8 +150,10 @@ function perryide.CompileTab (|int| i, |listviewrow|) // for autocomplete
 function perryide.AddProductErr (|string| err)
 	if err
 		.ProductErrors <~ err
-		|| t = .CompileTab(3)
-			(t isnt hidden)
+		|| t = .CompileTab(3)$
+		if .ProductSep.iscollapsed or t is hidden
+			.ShowText(.ProductErrors, nil, true)
+		(t isnt hidden)
 
 
 function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)

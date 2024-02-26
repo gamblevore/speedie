@@ -7,13 +7,14 @@
 
 
 * Do nil checker!
-	* return in the cmd-d should disappear the thing! (when lines are involved)
-	* errors on run should show the error-pane, always
 	* int upgrading needs fix
 
 	* |dictionary! of abc| should be considered real!
 		* main (|filedata| a) not compiling OK
 		* |dictionary|			Types = ["spd":"x"] // doesnt compile.
+		* if !(r.userflags&1) and rout.length // shouldn't compile!
+			* r.output.length also
+
 	
 	* picomsg is now crashing or failing on constructor
 		* speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.

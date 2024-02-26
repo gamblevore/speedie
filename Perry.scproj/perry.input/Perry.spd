@@ -208,12 +208,12 @@ function View (|ButtonView| btn)
 
 
 function ShowCompileCutely (|bool| Always=false)
-	require .editsep.iscollapsed
+	require .ProductSep.iscollapsed
 	if !always
 		if .AlreadyExpandedCompileTab
 			return
 		.AlreadyExpandedCompileTab = true
-	.EditSep.Show
+	.ProductSep.Show
 
 	
 function ShowCompileTab (|object| tab)

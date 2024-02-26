@@ -33,7 +33,7 @@ class PerryIDE (Window)
 	|TextView|					NoNeeder
 	|TextView|					PopupDisplay
 	|message?|					LastExtraInfo
-	|StretchControl|			EditSep
+	|StretchControl|			ProductSep
 	|StretchControl|			FileSep
 	|listviewrow?|				LogComms
 	|listviewrow?|				LogActions
@@ -593,10 +593,10 @@ class PerryIDE (Window)
 
 	function flip (|textview| s)
 		|| Item = .compiletabs.selected
-		if item and .editsep.isopen 
+		if item and .ProductSep.isopen 
 			|| tv = item.obj as textview
 			if tv == s
-				.editsep.collapse
+				.ProductSep.collapse
 				return
 		.ShowText(s, nil, true)
 
@@ -815,7 +815,7 @@ So anything not 0 means "its OK"`
 			.editme.ClearErrors
 			.LoadErrors(true, false)
 			if .editme.FindExpectsParse < 2
-				.editsep.Collapse
+				.ProductSep.Collapse
 		
 		.popuphide
 		.AddToJumpHistory

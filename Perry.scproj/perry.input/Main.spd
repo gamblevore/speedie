@@ -1,6 +1,8 @@
 
 
 main // main { 
+	if app["crash"]
+		app.crash
 	SDLApp.init
 	Perry.Startup
 	return SDLApp.Run

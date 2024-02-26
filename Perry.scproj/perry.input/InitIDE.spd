@@ -49,7 +49,7 @@ extend PerryIDE
 		.viewlog			= ButtonView(.ViewButtons,		clickedaview)
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .logarea]
 		.filesep			= StretchControl.horz(self, 175~right, 110, 110)
-		.editsep			= StretchControl.vert(self, 0~right,     0,   100)
+		.ProductSep			= StretchControl.vert(self, 0~right,     0,   100)
 		.PopupDisplay		= textview(self)
 		.DebugArgsList		= textview(self	)
 		.AttachedProgram	= ""
@@ -304,7 +304,7 @@ extend PerryIDE
 			.ID	= "filesep"
 			.size = the~width by 14~up to 20~down
 			.addHigh self.Rborder
-			.addHigh self.editsep
+			.addHigh self.ProductSep
 			.addlow  self.ViewButtons
 			.addlow  self.ErrorList
 			.addlow  self.LogArea
@@ -318,7 +318,7 @@ extend PerryIDE
 			.onshow = FileSepClicker
 			.onstretch = HideSomeStuffOnResize
 
-		with .editsep
+		with .ProductSep
 			is enabled
 			.size = the~area
 			.ID	= "edit+stdout"
@@ -449,7 +449,7 @@ extend PerryIDE
 		.gnormal.solid	= vec4(0.077, 0.95)
 		.expectsparse	= Parse
 		.PreferStayAtEnd= true
-		.ide.EditSep.addlow(self)
+		.ide.ProductSep.addlow(self)
 		
 		
 	function SetupLogArea

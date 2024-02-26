@@ -78,7 +78,7 @@ extend PerryIDE
 
 	function Compile (|string| operation)
 		if .isBuilding
-			if .editsep.div.Collapsed
+			if .ProductSep.div.Collapsed
 				return .ShowCompileTab(.SpeedieText)
 			require ClickedCancel(.BuildButton)
 		.ActualCompile(.CompileMsg(operation, true))
