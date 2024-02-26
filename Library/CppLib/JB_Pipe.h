@@ -4,7 +4,7 @@
 #define __JB_PIPE__
 
 #include "JB_Umbrella.h"
-#include "PicoMsg/PicoMsg.h"
+#include "PicoMsg.h"
 
 extern "C" {
 
