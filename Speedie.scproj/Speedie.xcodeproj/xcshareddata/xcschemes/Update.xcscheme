@@ -55,7 +55,7 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--self"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/Speedie.scproj/Batch/ana.spd"
@@ -67,18 +67,18 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--perry"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--target=debugnil2"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--nocolor"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/usr/local/speedie/examples/banana_count.spd"
+            argument = "/usr/local/speedie/Terminal/make.spd"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -104,6 +104,18 @@
          <CommandLineArgument
             argument = "--asm"
             isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/usr/local/speedie/jeebox.scproj"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-x"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--nocompile"
+            isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
       <EnvironmentVariables>

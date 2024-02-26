@@ -174,7 +174,7 @@ class_api Message (msg)
 
 	api error (|string| ErrorMsg)
 		.nil$
-		StdErr.NewError( self, ErrorMsg )
+		errorreceiver.NewError( self, ErrorMsg )
 		description "Lets you add your own error messages to the tree."
 	
 	api expect (|syntax| Type, |string| name, |message| ErrPlace, |message|)
@@ -301,7 +301,6 @@ api debug (|object|o)
 
 
 api init (|int| Flags, |int|)
-	"a"
 	return jb_api.Init(flags)
 	description "Inits Jeebox. Call this before any other Jeebox functions. Pass 1 to succeed silently, or else a message is printed. Returns zero for success.
 	
@@ -309,7 +308,7 @@ If jb_init fails it will try print a debug message. If jb_init returns 0x10000 t
 
 
 api shutdown (|int|)
-	stderr = nil
+	stderr.clear
 	jb_api.JB_LibShutdown
 	description "Frees all memory used by jeebox!"
 

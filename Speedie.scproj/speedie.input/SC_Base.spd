@@ -436,7 +436,8 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 					|| err = "Function must have a prototype."		// what about the side thing?
 					if side and !paramsarray.MacroSize
 						err = "Not assignable"
-					Return o|scfunction|.ProtoDecl #expect (exp, err)
+					check (o|scfunction|.ProtoDecl) (exp, err)
+					Return o|scfunction|.ProtoDecl
 
 	if missing	// the missing stuff should ENTIRELY go within argsmatch? cos its called in two places.
 		return Missing.MacroFix( contains, arg_space, paramsarray )

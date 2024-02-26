@@ -131,7 +131,7 @@ struct CompressionStats
 	function Clear
 	function Print
 	module
-		function all (|&compressionstats|)
+		|CompressionStats| all
 		function New (|compressionstats|)
 
 } else {
@@ -172,7 +172,7 @@ struct CompressionStats
 		fs.RenderSpeed(.durr, .in, .out, "")
 	
 	module
-		|compressionstats| All // noice
+		|CompressionStats| All // noice
 		function New (|compressionstats|)
 			rz.live = true
 }

@@ -80,7 +80,21 @@ function Message.FindNotInserted (|message|)
 			return c
 	return self
 
-	
+
+helper message.FindTightest (|int| pos, |bool| named=false, |message|) // findpos, findat
+	opt norefcounts
+	nil checker
+	|| size = int.max
+	for ch.flat in self
+		|| r = ch.rangelength
+		if !r
+			0
+		  elseif (ch.contains(pos, true)) and (!named or ch.name or (ch == @dot or @sdot))
+			if (r < size) or ((rz!=nil) and (pos == rz.position and pos == ch.after)) // smallest
+				rz = ch
+				size = r
+
+
 function message.LOC (|ivec2|)
 	description "Calculate Lines of content" 
 	opt norefcounts

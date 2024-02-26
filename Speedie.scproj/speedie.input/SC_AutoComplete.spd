@@ -226,7 +226,7 @@ function compiler.FindModuleOrClass (|message| mod, |bool| retry, |scbase|)
 
 function Backup_Define (|SCFile| myfile,  |int| f,  |message| thg,  |string| purpose,  |message|)
 	opt norefcounts
-	thg := myfile.GetMsg(f, true)
+	thg := myfile.GetMsg(f)
 	expect thg "nomsg"
 	thg = thg.CmdImprove
 	return .DefineOrCall(thg, purpose, myfile)

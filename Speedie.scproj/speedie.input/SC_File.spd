@@ -47,10 +47,10 @@ class SCFile (file)
 			CollectDeclsGlobals( a, self )
 	
 	
-	function GetMsg (|int| pos, |bool| NeedName=false, |message|)
+	function GetMsg (|int| pos, |message|)
 		opt norefcounts
 		for f.flat in .orig
-			if !NeedName or f.name
+			if f.name
 				if f.range contains pos
 					return f
 	

@@ -247,14 +247,17 @@ struct ArchonPurger
 
 			
 function message.OrigRender	(|faststring| fs=nil, |string|)
+	opt norefcounts
 	|| n = .OrigMsg
 		return n.Render(fs)
 	return .Render(fs)
 
 
 function message.OrigMsg (|message|)
-	|| f = .SCFile
-		return f.GetMsg(.position)
+	opt norefcounts
+	|| f = .SCFile$
+	|| o = f.orig
+	return o.findtightest(.position)
 
 
 function errorreceiver.ReturnErrors (|errorreceiver| To = StdErr, |int|)

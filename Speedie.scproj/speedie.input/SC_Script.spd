@@ -4,7 +4,7 @@ function compiler.UsingScript (|file| f, |file|)
 	require options.compile
 	require !f.isdir
 	require f.Read(16) starts "#!/"
-	rz = feedback.TryUseProject(f.path, true).scriptlocation.filethatexists #require
+	rz = feedback.TryUseProject(f.path, true).scriptlocation.file
 	if error.autoprint == errorflags.printandkeep
 		error.AutoPrint = 0
 	options.scripting = true

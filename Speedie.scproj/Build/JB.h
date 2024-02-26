@@ -2722,10 +2722,6 @@ int SC_Macros__InitCode_();
 
 
 // NilTest2
-int SC_NilTest2__Init_();
-
-int SC_NilTest2__InitCode_();
-
 
 
 // Options
@@ -7318,6 +7314,8 @@ bool SC_Msg_ConstIntValue(Message* self, SCBase* name_space, int64* v);
 
 bool SC_Msg_ConstIntValueSub(Message* self, SCBase* name_space, int64* v);
 
+bool JB_Msg_ContainsInd(Message* self, Ind p, bool AllowJustAfter);
+
 Message* JB_Msg_Copy(Message* self, Message* pos_msg);
 
 void SC_Msg_CopyAllAfter(Message* self, Message* after, Message* copylayer);
@@ -7429,6 +7427,8 @@ Message* SC_Msg_FindPosSub(Message* self, int fr, int len, bool Exact);
 Message* SC_Msg_FindRef(Message* self, SCFunction* fn, JB_String* name);
 
 Message* SC_Msg_FindShader(Message* self, JB_String* TypeName);
+
+Message* JB_Msg_FindTightest(Message* self, int pos, bool named);
 
 JB_String* JB_Msg_FirstName(Message* self);
 
@@ -8285,7 +8285,7 @@ void JB_SCFile_Destructor(SCFile* self);
 
 void SC_SCFile_DetectInsecureWords(SCFile* self);
 
-Message* SC_SCFile_GetMsg(SCFile* self, int pos, bool NeedName);
+Message* SC_SCFile_GetMsg(SCFile* self, int pos);
 
 Message* SC_SCFile_Orig(SCFile* self);
 

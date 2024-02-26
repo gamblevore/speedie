@@ -85,7 +85,7 @@ typedef u16 MsgParseFlags;
 
 typedef int PID_Int;
 
-typedef int ProcessMode;
+typedef byte ProcessMode;
 
 typedef int SizeInt;
 
@@ -97,8 +97,6 @@ typedef uint U24_8;
 
 typedef vec4 mat2;
 
-typedef MsgParseFlags MsgUIFlags;
-
 struct CharProps;
 
 struct CompressionStats;
@@ -109,17 +107,9 @@ struct FastBuff;
 
 struct FloatRange;
 
-struct HollyPlanter;
-
-struct HollyPotter;
-
 struct IntDownRange;
 
 struct Mat4;
-
-struct MessageCompressor;
-
-struct MessageDecompressor;
 
 struct MessagePosition;
 
@@ -189,6 +179,8 @@ struct TokenHandler_Behaviour;
 
 struct Array_Behaviour;
 
+struct String_Behaviour;
+
 struct Dictionary_Behaviour;
 
 struct File_Behaviour;
@@ -254,6 +246,8 @@ struct StringReader;
 struct SyntaxObj;
 
 struct TerminalCell;
+
+struct JB_String;
 
 struct FastString;
 
@@ -324,17 +318,11 @@ struct FastBuff {
 	uint ErrorReported;
 };
 
-struct MessageDecompressor {
-	Message** End;
-	Message** Curr;
-	Message** Table;
-};
-
 struct MessagePosition {
 	JB_MemoryLayer* Layer;
 	int Position;
 	uint Length;
-	MsgUIFlags Flags;
+	MsgParseFlags Flags;
 	u16 Tag;
 };
 
@@ -470,7 +458,6 @@ JBClass ( StringReader , JB_Object ,
 	FastBuff Data;
 	JB_File* File;
 	JB_Object* UserObj;
-	MessageDecompressor* Decomp;
 	int ChunkSize;
 	int StartFrom;
 	bool _NoMoreChunks;
@@ -517,7 +504,7 @@ JBClass ( Message , RingTree ,
 	Syntax Func;
 	byte Indent;
 	u16 RangeLength;
-	MsgUIFlags Flags;
+	MsgParseFlags Flags;
 	u16 Tag;
 );
 
@@ -537,6 +524,7 @@ JBClass ( JB_Error , Message ,
 	JB_String* Path;
 	JB_String* OriginalData;
 	JB_String* StackTrace;
+	double Progress;
 	Message* Node;
 	Date When;
 	ErrorSeverity Severity;
@@ -548,13 +536,13 @@ extern JB_File* JB__App__stdin;
 extern JB_File* JB__App__StdOut;
 extern Array* JB__App_OldArgs;
 extern JB_String* JB__App_Usage;
-#define kJB__ErrorColors_bold (JB_LUB[370])
+#define kJB__ErrorColors_bold (JB_LUB[367])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[371])
-#define kJB__ErrorColors_good (JB_LUB[372])
-#define kJB__ErrorColors_normal (JB_LUB[373])
-#define kJB__ErrorColors_underline (JB_LUB[372])
-#define kJB__ErrorColors_warn (JB_LUB[374])
+#define kJB__ErrorColors_error (JB_LUB[368])
+#define kJB__ErrorColors_good (JB_LUB[369])
+#define kJB__ErrorColors_normal (JB_LUB[370])
+#define kJB__ErrorColors_underline (JB_LUB[369])
+#define kJB__ErrorColors_warn (JB_LUB[371])
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -602,8 +590,8 @@ extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
 extern Dictionary* JB__SyxDict_;
-#define kJB_SaverEnd (JB_LUB[0])
-#define kJB_SaverStart1 (JB_LUB[375])
+#define kJB_kSaverEnd (JB_LUB[0])
+#define kJB_kSaverStart1 (JB_LUB[372])
 extern JB_ErrorReceiver* JB_StdErr;
 extern JB_ErrorReceiver* JB_StdErrOriginal;
 extern Syntax JB_SyxAcc;
@@ -666,42 +654,42 @@ extern JB_String* JB__Tk_Data;
 extern bool JB__Tk_DotInsertAllow;
 extern Message* JB__Tk_EndOfLineMarker;
 extern Dictionary* JB__Tk_ErrorNames;
-#define kJB__Tk_adjectiveop (1)
-#define kJB__Tk_Allow (false)
-#define kJB__Tk_colon (2)
-#define kJB__Tk_colonarg (4)
-#define kJB__Tk_Comma (128)
-#define kJB__Tk_End ((64 | 128) | 256)
-#define kJB__Tk_EndContainer (256)
-#define kJB__Tk_EndOfLine (64)
-#define kJB__Tk_Expect (true)
-#define kJB__Tk_FuncAfterAny ((512 | 1024) | 2048)
-#define kJB__Tk_FuncAfterBar (2048)
-#define kJB__Tk_FuncAfterNormal (512)
-#define kJB__Tk_FuncAfterNoSpace (1024)
-#define kJB__Tk_illegalchar (4194304)
-#define kJB__Tk_LameTemporal (8 | (16 | 32))
-#define kJB__Tk_Opp (((((4096 | 8192) | 16384) | 32768) | 65536) | 131072)
-#define kJB__Tk_OppBar (16384)
-#define kJB__Tk_OppBra (4096)
-#define kJB__Tk_OppChain (65536 | (4096 | (8192 | 16384)))
-#define kJB__Tk_OppNoBar ((((((4096 | 8192) | 16384) | 32768) | 65536) | 131072) & (~16384))
-#define kJB__Tk_OppSNB (8192)
-#define kJB__Tk_OppSyx (8192 | 16384)
-#define kJB__Tk_OppTemporal (32768)
-#define kJB__Tk_OppWord (65536)
-#define kJB__Tk_OppYoda (131072)
-#define kJB__Tk_Temporal ((8 | 16) | 32)
-#define kJB__Tk_TemporalBar (32)
-#define kJB__Tk_TemporalSyx (16 | 32)
-#define kJB__Tk_TemporalSyxNoBar (16)
-#define kJB__Tk_TemporalWord (8)
-#define kJB__Tk_temporalwordcolon (262144)
-#define kJB__Tk_Thing ((524288 | 1048576) | 2097152)
-#define kJB__Tk_ThingBar (1048576)
-#define kJB__Tk_ThingSyx (524288)
-#define kJB__Tk_ThingWord (2097152)
-#define kJB__Tk_TmpOpp (32768 | 16)
+#define kJB__Tk_kadjectiveop (1)
+#define kJB__Tk_kAllow (false)
+#define kJB__Tk_kcolon (2)
+#define kJB__Tk_kcolonarg (4)
+#define kJB__Tk_kComma (128)
+#define kJB__Tk_kEnd ((64 | 128) | 256)
+#define kJB__Tk_kEndContainer (256)
+#define kJB__Tk_kEndOfLine (64)
+#define kJB__Tk_kExpect (true)
+#define kJB__Tk_kFuncAfterAny ((512 | 1024) | 2048)
+#define kJB__Tk_kFuncAfterBar (2048)
+#define kJB__Tk_kFuncAfterNormal (512)
+#define kJB__Tk_kFuncAfterNoSpace (1024)
+#define kJB__Tk_killegalchar (4194304)
+#define kJB__Tk_kLameTemporal (8 | (16 | 32))
+#define kJB__Tk_kOpp (((((4096 | 8192) | 16384) | 32768) | 65536) | 131072)
+#define kJB__Tk_kOppBar (16384)
+#define kJB__Tk_kOppBra (4096)
+#define kJB__Tk_kOppChain (65536 | (4096 | (8192 | 16384)))
+#define kJB__Tk_kOppNoBar ((((((4096 | 8192) | 16384) | 32768) | 65536) | 131072) & (~16384))
+#define kJB__Tk_kOppSNB (8192)
+#define kJB__Tk_kOppSyx (8192 | 16384)
+#define kJB__Tk_kOppTemporal (32768)
+#define kJB__Tk_kOppWord (65536)
+#define kJB__Tk_kOppYoda (131072)
+#define kJB__Tk_kTemporal ((8 | 16) | 32)
+#define kJB__Tk_kTemporalBar (32)
+#define kJB__Tk_kTemporalSyx (16 | 32)
+#define kJB__Tk_kTemporalSyxNoBar (16)
+#define kJB__Tk_kTemporalWord (8)
+#define kJB__Tk_ktemporalwordcolon (262144)
+#define kJB__Tk_kThing ((524288 | 1048576) | 2097152)
+#define kJB__Tk_kThingBar (1048576)
+#define kJB__Tk_kThingSyx (524288)
+#define kJB__Tk_kThingWord (2097152)
+#define kJB__Tk_kTmpOpp (32768 | 16)
 #define kJB__Tk_LargestFlag (8388607)
 extern fnIDGenerator JB__Tk_Splitter;
 extern u16 JB__Tk_StopBars;
@@ -793,13 +781,13 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__TC_Vec2 (1 + (32 + (64 + (128 + 8))))
 #define kJB__TC_Vec3 (2 + (32 + (64 + (128 + 8))))
 #define kJB__TC_Vec4 (3 + (32 + (64 + (128 + 8))))
-#define kJB__Date_ClocksPerSecond (1000000)
-#define kJB__Date_OneSecond (65536)
-#define kJB__Date_OneStep (0.000015258789f)
-#define kJB__Date_SecondsPerDay (86400)
-#define kJB__Date_SecondsPerMonthApprox (2628000)
-#define kJB__Date_SecondsPerWeek (604800)
-#define kJB__Date_TickBits (16)
+#define kJB__Date_kClocksPerSecond (1000000)
+#define kJB__Date_kOneSecond (65536)
+#define kJB__Date_kOneStep (0.000015258789f)
+#define kJB__Date_kSecondsPerDay (86400)
+#define kJB__Date_kSecondsPerMonthApprox (2628000)
+#define kJB__Date_kSecondsPerWeek (604800)
+#define kJB__Date_kTickBits (16)
 #define kJB__ErrorFlags_dontstrip (1)
 #define kJB__ErrorFlags_Keep (0)
 #define kJB__ErrorFlags_LargestFlag (7)
@@ -823,8 +811,10 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__FileMode_Process (((7 << 6) + 5) << ((3 + 5) << 0))
 #define kJB__FileResolveMode_AllowMissing (true)
 #define kJB__MsgParseFlags_BreakPoint (32768)
+#define kJB__MsgParseFlags_Editable (4096)
 #define kJB__MsgParseFlags_Inserted (8192)
 #define kJB__MsgParseFlags_LargestFlag (0)
+#define kJB__MsgParseFlags_NicelyPositioned (32768)
 #define kJB__MsgParseFlags_Style2 (16384)
 #define kJB__ProcessMode_AutoPrintErrors (4)
 #define kJB__ProcessMode_CaptureAll (1 | 4)
@@ -834,28 +824,20 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__ProcessMode_LargestFlag (7)
 extern int JB__Syx_CurrFuncID;
 extern int JB__Syx_MaxFuncID;
-#define kJB__MsgUIFlags_BreakPoint (32768)
-#define kJB__MsgUIFlags_Editable (1792)
-#define kJB__MsgUIFlags_EditableAny (1792)
-#define kJB__MsgUIFlags_EditableNum (512)
-#define kJB__MsgUIFlags_EditableString (256)
-#define kJB__MsgUIFlags_EditableSyx (1024)
-#define kJB__MsgUIFlags_EditableThing (768)
-#define kJB__MsgUIFlags_Inserted (8192)
-#define kJB__MsgUIFlags_LargestFlag (0)
-#define kJB__MsgUIFlags_Style2 (16384)
-#define kJB__HRV_MaxOneByte (255 - (32 + 16))
+extern CompressionStats JB__MzSt_all;
 extern Dictionary* JB__LD_ClassList;
 #define kJB__Saver_RefMark (1073741824)
 extern SaverClassInfo* JB__Saver_SaveableList;
 extern Random JB__Rnd_Shared;
-#define kJB__Wrap_Delete (2)
-#define kJB__Wrap_Free (1)
-#define kJB__Wrap_Nothing (0)
-#define kJB__dict_TypeDict (3)
-#define kJB__dict_TypeObj (1)
-#define kJB__dict_TypeStem (2)
-#define kJB__dict_TypeValue (0)
+#define kJB__Wrap_kDelete (2)
+#define kJB__Wrap_kFree (1)
+#define kJB__Wrap_kNothing (0)
+extern JB_String* JB__Rec_NonFatal;
+extern double JB__Rec_Progress;
+#define kJB__fix_TypeDict (3)
+#define kJB__fix_TypeObj (1)
+#define kJB__fix_TypeStem (2)
+#define kJB__fix_TypeValue (0)
 extern bool JB__Flow_AlwaysMove;
 extern bool JB__Flow_BreakOnFail;
 extern uint JB__Flow_Disabled;
@@ -896,7 +878,7 @@ JB_String* JB_App__OrigPath();
 
 void JB_PrintStackTrace();
 
-ErrorInt2 JB_App__Say(JB_String* s);
+ErrorInt2 JB_App__Say(JB_String* s, bool print);
 
 JB_String* JB_App__StackTrace(int skip, FastString* fs_in);
 
@@ -957,7 +939,7 @@ int JB_Platform__InitCode_();
 
 void JB_Platform__Log(JB_String* s);
 
-void JB_Platform__OpenLog(JB_String* name);
+JB_File* JB_Platform__OpenLog();
 
 
 
@@ -989,6 +971,8 @@ int JB_Init_();
 int JB_InitCode_();
 
 void JB_PrintLine(JB_String* data);
+
+void JB_Obj_PrintLine(JB_Object* o);
 
 
 
@@ -1219,8 +1203,6 @@ Message* JB_Tk__ReRoute(Message* output, Message* cnj, Message* f);
 
 void JB_Tk__StopParse();
 
-inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f);
-
 Message* JB_Tk__ThingXMLAtt(int start, Message* Parent);
 
 void JB_Tk__TokensFn(Array* arr, int bits, ParseHandler func);
@@ -1420,8 +1402,6 @@ Date JB_Date__New0();
 
 
 // ErrorMarker
-inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self);
-
 
 
 // ErrorSeverity
@@ -1454,8 +1434,6 @@ Array* JB_ErrorSeverity__InitNames();
 
 
 // Ind
-inline bool JB_Ind_SyntaxCast(Ind self);
-
 
 
 // IntRange
@@ -1489,8 +1467,6 @@ Message* JB_Syx_Msg(Syntax self, JB_String* name);
 
 JB_String* JB_Syx_Name(Syntax self);
 
-inline bool JB_Syx_NilCheck(Syntax self);
-
 bool JB_Syx_NoChildren(Syntax self);
 
 SyntaxObj* JB_Syx_Obj(Syntax self);
@@ -1519,9 +1495,6 @@ Syntax JB_Syx__StdNew(fpMsgRender msg, JB_String* name, JB_String* LongName);
 
 
 // mat2
-
-
-// MsgUIFlags
 
 
 // ParseHandler
@@ -1588,6 +1561,8 @@ Syntax JB_Syx__StdNew(fpMsgRender msg, JB_String* name, JB_String* LongName);
 
 
 // JB_ClassData
+JB_MemoryLayer* JB_ClassData_CreateUseLayer(JB_Class* self, JB_Object* obj, JB_Object* obj2);
+
 void JB_ClassData_Restore(JB_Class* self);
 
 
@@ -1603,7 +1578,9 @@ void JB_MzSt_Print(CompressionStats* self);
 
 void JB_MzSt_start(CompressionStats* self);
 
-CompressionStats* JB_MzSt__all();
+int JB_MzSt__Init_();
+
+int JB_MzSt__InitCode_();
 
 
 
@@ -1619,11 +1596,11 @@ uint JB_FastBuff_CopyTo(FastBuff* self, byte* Dest, int Length);
 
 void JB_FastBuff_Destructor(FastBuff* self);
 
-int JB_FastBuff_Length(FastBuff* self);
-
-bool JB_FastBuff_OperatorHas(FastBuff* self, int n);
+bool JB_FastBuff_Has(FastBuff* self, int n);
 
 bool JB_FastBuff_HasAny(FastBuff* self);
+
+int JB_FastBuff_Length(FastBuff* self);
 
 int64 JB_FastBuff_Position(FastBuff* self);
 
@@ -1637,8 +1614,6 @@ int JB_FastBuff_Size(FastBuff* self);
 
 JB_String* JB_FastBuff_AccessStr(FastBuff* self, int pos, int after);
 
-inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v);
-
 void JB_FastBuff_SyntaxExpect(FastBuff* self, JB_String* s);
 
 JB_String* JB_FastBuff_TmpStr(FastBuff* self);
@@ -1648,12 +1623,6 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* self);
 // JB_FloatRange
 
 
-// JB_HollyPlanter
-
-
-// JB_HollyPotter
-
-
 // JB_IntDownRange
 
 
@@ -1661,14 +1630,6 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* self);
 
 
 // JB_MemoryWorld
-
-
-// JB_MessageCompressor
-
-
-// JB_MessageDecompressor
-void JB_Mxpd_Destructor(MessageDecompressor* self);
-
 
 
 // JB_MessagePosition
@@ -1840,6 +1801,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_Array_Behaviour
 
 
+// JB_BigNum_Behaviour
+
+
 // JB_Dictionary_Behaviour
 
 
@@ -1904,13 +1868,11 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_Object
-inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in);
-
 void jdb(JB_Object* self);
 
 bool JB_Object_FastIsa(JB_Object* self, JB_Class* x);
 
-bool JB_Object_Isa(JB_Object* self, JB_Class* x);
+bool JB_Object_Isa(JB_Object* self, JB_Class* cls);
 
 void JB_Object_SaveTryCollect(JB_Object* self, ObjectSaver* Saver);
 
@@ -1940,8 +1902,6 @@ CharSet* JB_CS__New(JB_String* Chars, bool UseRange);
 
 
 // JB_DataTypeWrapper
-inline void JB_Wrap_ConstructorInt(DTWrap* self, int64 v);
-
 void JB_Wrap_Destructor(DTWrap* self);
 
 double JB_Wrap_FloatValue(DTWrap* self);
@@ -1957,7 +1917,7 @@ DTWrap* JB_Wrap__NewInt(int64 v);
 
 
 // JB_DictionaryReader
-inline bool JB_DictionaryReader_SyntaxCast(DictionaryReader* self);
+JB_Object* JB_DictionaryReader_NextValue(DictionaryReader* self);
 
 
 
@@ -1966,21 +1926,15 @@ bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
 
 void JB_Rec_Clear(JB_ErrorReceiver* self);
 
-inline void JB_Rec_Constructor(JB_ErrorReceiver* self);
-
 void JB_Rec_Destructor(JB_ErrorReceiver* self);
 
 void JB_Rec_Incr(JB_ErrorReceiver* self, JB_Error* err, bool add);
 
 JB_Error* JB_Rec_LastError(JB_ErrorReceiver* self);
 
-void JB_Rec_LogFileSet(JB_ErrorReceiver* self, JB_String* Value);
-
 void JB_Rec_LogFileWriter(JB_ErrorReceiver* self, JB_String* Data);
 
 ErrorMarker JB_Rec_Mark(JB_ErrorReceiver* self);
-
-void JB_Rec_NewErrorWithNode(JB_ErrorReceiver* self, Message* node, JB_String* Desc, JB_String* path);
 
 bool JB_Rec_OK(JB_ErrorReceiver* self);
 
@@ -1992,11 +1946,19 @@ int JB_Rec_RenderErrors(JB_ErrorReceiver* self, FastString* fs, ErrorSeverity Le
 
 int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self);
 
-void JB_Rec_NewItem(JB_ErrorReceiver* self, JB_Error* Err);
+void JB_Rec_AppendErr(JB_ErrorReceiver* self, JB_Error* Err);
 
 JB_ErrorReceiver* JB_Rec__Alloc();
 
+int JB_Rec__Init_();
+
+int JB_Rec__InitCode_();
+
 JB_ErrorReceiver* JB_Rec__New();
+
+void JB_Rec__NewErrorWithNode(Message* node, JB_String* Desc, JB_String* path);
+
+void JB_Rec__NewErrorSub(Message* node, JB_String* Desc, JB_String* path, int sev);
 
 
 
@@ -2014,6 +1976,8 @@ void JB_FS_AppendQuotedEscape(FastString* self, JB_String* s);
 void JB_FS_AppendInfo(FastString* self, JB_String* name, JB_String* data);
 
 void JB_FS_AppendInfoNum(FastString* self, JB_String* name, int64 data);
+
+void JB_FS_AppendInfoFloat(FastString* self, JB_String* name, double data);
 
 void JB_FS_FieldStart(FastString* self, JB_String* name);
 
@@ -2034,8 +1998,6 @@ void JB_FS_AppendInt64(FastString* self, int64 data);
 void JB_FS_AppendInt32(FastString* self, int data);
 
 void JB_FS_SyntaxAppend(FastString* self, Message* msg);
-
-inline JB_String* JB_FS_SyntaxCast(FastString* self);
 
 FastString* JB_FS__Alloc();
 
@@ -2070,8 +2032,6 @@ bool JB_Flow__Cond(bool value);
 
 
 // JB_LeakTester
-inline void JB_Lk_Constructor(LeakTester* self, JB_String* name);
-
 void JB_Lk_Destructor(LeakTester* self);
 
 void JB_Lk_FinalTest(LeakTester* self);
@@ -2085,11 +2045,7 @@ LeakTester* JB_Lk__New(JB_String* name);
 
 
 // JB_Memory
-inline void JB_Mrap_ConstructorDummy(MWrap* self, int ItemCount, uint ItemSize, bool DummyParam);
-
 void JB_Mrap_Destructor(MWrap* self);
-
-void JB_Mrap_Free(MWrap* self);
 
 MWrap* JB_Mrap__Alloc();
 
@@ -2099,9 +2055,9 @@ int JB_Mrap__Init_();
 
 int JB_Mrap__InitCode_();
 
-MWrap* JB_Mrap__NewDummy(int ItemCount, uint ItemSize, bool DummyParam);
+MWrap* JB_Mrap__NewPtr(int ItemCount, uint ItemSize, byte* ptr, byte DeathAction);
 
-MWrap* JB_Mrap__Object(int ItemCount, int ItemSize);
+MWrap* JB_Mrap__Object(int Count, int ItemSize);
 
 void jbl(JB_Object* self);
 
@@ -2114,8 +2070,6 @@ void jbl(JB_Object* self);
 
 
 // JB_Saveable
-inline void JB_Sav___SaveCollect__(Saveable* self, ObjectSaver* Saver);
-
 bool JB_Sav_IsSaveMarked(Saveable* self);
 
 void JB_Sav_LoadProperties(Saveable* self, ObjectLoader* Loader);
@@ -2178,6 +2132,8 @@ int JB_Str_IsHexLike(JB_String* self, int N);
 
 bool JB_Str_IsJbin(JB_String* self);
 
+bool JB_Str_IsOK(JB_String* self);
+
 bool JB_Str_IsStatementName(JB_String* self);
 
 Ind JB_Str_JBFind(JB_String* self, byte find, int Off, int After);
@@ -2220,8 +2176,6 @@ JB_String* JB_Str_Squeeze(JB_String* self);
 
 StringReader* JB_Str_Stream(JB_String* self);
 
-inline JB_StringC* JB_Str_CastZero(JB_String* self);
-
 void JB_Str_SyntaxExpect(JB_String* self);
 
 int JB_Str_TrimLastSub(JB_String* self, byte b);
@@ -2243,8 +2197,6 @@ JB_String* JB_Str__FromC(_cstring Addr);
 
 
 // JB_StringFields
-inline void JB_FI_Constructor(StringFields* self, JB_String* Source, byte Sep);
-
 void JB_FI_Destructor(StringFields* self);
 
 JB_String* JB_FI_Field(StringFields* self, Ind Prev, Ind Curr);
@@ -2261,8 +2213,6 @@ StringFields* JB_FI__New(JB_String* Source, byte Sep);
 int JB_SS_Byte(StringReader* self);
 
 void JB_SS_CompressInto(StringReader* self, JB_Object* dest, int Strength, CompressionStats* st);
-
-inline void JB_SS_Constructor(StringReader* self, JB_String* Data);
 
 JB_String* JB_SS_Decompress(StringReader* self, int lim, CompressionStats* st, bool Multi);
 
@@ -2298,7 +2248,7 @@ void JB_SS_PositionSet(StringReader* self, int64 Value);
 
 JB_String* JB_SS_ReadAll(StringReader* self);
 
-bool JB_SS_ReadChunk(StringReader* self);
+bool JB_SS_ReadChunk(StringReader* self, JB_File* f);
 
 int JB_SS_Remaining(StringReader* self);
 
@@ -2315,8 +2265,6 @@ StringReader* JB_SS__New(JB_String* Data);
 
 
 // JB_SyntaxObj
-inline void JB_Fn_Constructor(SyntaxObj* self, fpMsgRender msg, JB_String* name, int ID);
-
 void JB_Fn_Destructor(SyntaxObj* self);
 
 JB_String* JB_Fn_Render(SyntaxObj* self, FastString* fs_in);
@@ -2344,12 +2292,13 @@ void JB_Array_SaveWrite(Array* self, ObjectSaver* Saver);
 
 void JB_Array_SyntaxAppend(Array* self, JB_Object* item);
 
-inline bool JB_Array_SyntaxCast(Array* self);
-
 Array* JB_Array__Alloc();
 
 Array* JB_Array__New0();
 
+
+
+// JB_BigNum
 
 
 // JB_Dictionary
@@ -2378,15 +2327,13 @@ Dictionary* JB_Dict__Reverse(Dictionary* Dict);
 
 
 // JB_File
-JB_File* JB_File_Child(JB_File* self, JB_String* name, bool errs);
+JB_File* JB_File_Child(JB_File* self, JB_String* name);
 
 bool JB_File_Opened(JB_File* self);
 
-JB_File* JB_File_SyntaxAccess(JB_File* self, JB_String* name, bool Errs);
+JB_File* JB_File_SyntaxAccess(JB_File* self, JB_String* name);
 
 void JB_File_SyntaxAppend(JB_File* self, JB_String* data);
-
-inline bool JB_File_SyntaxCast(JB_File* self);
 
 void JB_File_Fail(JB_File* self, JB_String* Error);
 
@@ -2410,8 +2357,6 @@ void JB_bin_AddInt(FastString* self, int64 data);
 void JB_bin_AddMemory(FastString* self, Syntax type, byte* data, bool GoIn, uint64 L);
 
 void JB_bin_CloseSection(FastString* self, uint c);
-
-inline void JB_bin_Constructor0(FastString* self, int n);
 
 void JB_bin_Enter(FastString* self, Syntax type, JB_String* data);
 
@@ -2511,14 +2456,6 @@ int JB_Msg_CleanIndent(Message* self);
 
 void JB_Msg_Cnj__(Message* self, FastString* fs);
 
-inline void JB_Msg_ConstructorCopy(Message* self, Message* other);
-
-inline void JB_Msg_ConstructorEmpty(Message* self);
-
-inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name);
-
-inline void JB_Msg_ConstructorRange(Message* self, Message* Parent, Syntax Func, int BytePos, JB_String* name, int RangeLength);
-
 Message* JB_Msg_Copy(Message* self, Message* pos_msg);
 
 JB_String* JB_Msg_CopyID(Message* self);
@@ -2544,6 +2481,10 @@ void JB_Msg_File__(Message* self, FastString* fs);
 JB_String* JB_Msg_FilePath(Message* self);
 
 Message* JB_Msg_FindSyxName(Message* self, Syntax s, JB_String* name, bool Err);
+
+Message* JB_Msg_FindNotInserted(Message* self);
+
+JB_String* JB_Msg_FirstName(Message* self);
 
 void JB_Msg_FSListArg(Message* self, FastString* fs, bool AddLine);
 
@@ -2579,7 +2520,7 @@ JB_String* JB_Msg_Locate(Message* self);
 
 void JB_Msg_max__(Message* self, FastString* fs);
 
-JB_String* JB_Msg_MiniName(Message* self);
+JB_String* JB_Msg_MiniName(Message* self, JB_String* prefix);
 
 Message* JB_Msg_Msg(Message* self, Syntax fn, JB_String* name);
 
@@ -2587,13 +2528,9 @@ void JB_Msg_Msg__(Message* self, FastString* fs);
 
 void JB_Msg_Name__(Message* self, FastString* fs);
 
-inline bool JB_Msg_NilCheck(Message* self);
-
 void JB_Msg_Nil__(Message* self, FastString* fs);
 
 void JB_Msg_Num__(Message* self, FastString* fs);
-
-JB_String* JB_Msg_Nyme(Message* self);
 
 void JB_Msg_Oat__(Message* self, FastString* fs);
 
@@ -2602,8 +2539,6 @@ bool JB_Msg_OperatorIn(Message* self, Syntax f);
 void JB_Msg_Opp__(Message* self, FastString* fs);
 
 JB_String* JB_Msg_OriginalParseData(Message* self);
-
-JB_MemoryLayer* JB_Msg_OriginalParseLayer(Message* self);
 
 Message* JB_Msg_ParseAST(Message* self);
 
@@ -2655,11 +2590,11 @@ bool JB_Msg_EqualsSyx(Message* self, Syntax X, bool Aware);
 
 void JB_Msg_SyntaxExpect(Message* self, JB_String* Error);
 
-bool JB_Msg_SyntaxIs(Message* self, MsgUIFlags F);
+bool JB_Msg_SyntaxIs(Message* self, MsgParseFlags F);
 
-void JB_Msg_SyntaxIsSet(Message* self, MsgUIFlags F, bool Value);
+void JB_Msg_SyntaxIsSet(Message* self, MsgParseFlags F, bool Value);
 
-bool JB_Msg_SyntaxIsnt(Message* self, MsgUIFlags F);
+bool JB_Msg_SyntaxIsnt(Message* self, MsgParseFlags F);
 
 void JB_Msg_Test(Message* self, JB_String* new_render, JB_String* name);
 
@@ -2677,8 +2612,6 @@ void JB_Msg_Tmp__(Message* self, FastString* fs);
 
 void JB_Msg_Todo__(Message* self, FastString* fs);
 
-inline void JB_Msg_Trap(Message* self);
-
 void JB_Msg_TRel__(Message* self, FastString* fs);
 
 void JB_Msg_Tril__(Message* self, FastString* fs);
@@ -2687,7 +2620,7 @@ Message* JB_Msg_TViewCH(Message* self);
 
 void JB_Msg_Type__(Message* self, FastString* fs);
 
-void JB_Msg_UnEmbed(Message* self);
+void JB_Msg_UnEmbedStr(Message* self);
 
 void JB_Msg_Unit__(Message* self, FastString* fs);
 
@@ -2744,10 +2677,6 @@ void JB_Proc__InitOwner();
 
 
 // JB_Error
-inline void JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path);
-
-inline void JB_Err_ConstructorNothing(JB_Error* self);
-
 void JB_Err_Destructor(JB_Error* self);
 
 void JB_Err_Fill(JB_Error* self, JB_String* path, JB_String* desc);
@@ -2799,6 +2728,64 @@ JB_Error* JB_Err__NewNothing();
 
 
 // JB_config
+inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self);
+
+inline void JB_FI_Constructor(StringFields* self, JB_String* Source, byte Sep);
+
+inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v);
+
+inline bool JB_File_SyntaxCast(JB_File* self);
+
+inline bool JB_Ind_SyntaxCast(Ind self);
+
+inline void JB_Mrap_ConstructorPtr(MWrap* self, int ItemCount, uint ItemSize, byte* ptr, byte DeathAction);
+
+inline JB_String* JB_Msg_Name(Message* self);
+
+inline JB_String* JB_Msg_Name_(Message* self);
+
+inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f);
+
+inline void JB_Wrap_ConstructorInt(DTWrap* self, int64 v);
+
+inline bool JB_Array_SyntaxCast(Array* self);
+
+inline JB_String* JB_FS_SyntaxCast(FastString* self);
+
+inline void JB_Fn_Constructor(SyntaxObj* self, fpMsgRender msg, JB_String* name, int ID);
+
+inline void JB_Lk_Constructor(LeakTester* self, JB_String* name);
+
+inline void JB_Msg_ConstructorCopy(Message* self, Message* other);
+
+inline void JB_Msg_ConstructorEmpty(Message* self);
+
+inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name);
+
+inline void JB_Msg_ConstructorRange(Message* self, Message* Parent, Syntax Func, int BytePos, JB_String* name, int RangeLength);
+
+inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in);
+
+inline void JB_Sav___SaveCollect__(Saveable* self, ObjectSaver* Saver);
+
+inline JB_StringC* JB_Str_CastZero(JB_String* self);
+
+inline void JB_bin_Constructor0(FastString* self, int n);
+
+inline void JB_Err_ConstructorNothing(JB_Error* self);
+
+inline void JB_SS_Constructor(StringReader* self, JB_String* Data);
+
+inline bool JB_Safe_SyntaxCast(JB_String* self);
+
+inline void JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path);
+
+inline bool JB_Msg_NilCheck(Message* self);
+
+inline void JB_Rec_Constructor(JB_ErrorReceiver* self);
+
+inline bool JB_Syx_NilCheck(Syntax self);
+
 JB_String* jb_msg_name(Message* self);
 
 Syntax jb_msg_func(Message* self);
@@ -2907,20 +2894,13 @@ JB_String* jb_readfile(_cstring path, bool AllowMissingFile);
 
 
 //// HEADER Inlines.h
-inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f) {
-	return (JB__Tk_Splitter)(s, e, f);
-}
-
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self) {
 	return JB_StdErr->ErrorCount == self;
 }
 
-inline bool JB_Ind_SyntaxCast(Ind self) {
-	return self >= 0;
-}
-
-inline bool JB_Syx_NilCheck(Syntax self) {
-	return ((bool)self) or JB_API__NilHandler();
+inline void JB_FI_Constructor(StringFields* self, JB_String* Source, byte Sep) {
+	self->Data = JB_Incr(Source);
+	self->Sep = Sep;
 }
 
 inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v) {
@@ -2928,9 +2908,39 @@ inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v) {
 	return self->Curr >= self->End;
 }
 
-inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in) {
-	Object_Behaviour* Table = ((Object_Behaviour*)JB_ObjClassBehaviours(self));
-	return (Table->render)(self, fs_in);
+inline bool JB_File_SyntaxCast(JB_File* self) {
+	return self != nil;
+}
+
+inline bool JB_Ind_SyntaxCast(Ind self) {
+	return self >= 0;
+}
+
+inline void JB_Mrap_ConstructorPtr(MWrap* self, int ItemCount, uint ItemSize, byte* ptr, byte DeathAction) {
+	self->DataType = kJB__TC_UnusedType;
+	self->DeathAction = 0;
+	self->ItemSize = ItemSize;
+	self->Length = 0;
+	self->Capacity = ItemCount;
+	self->_Ptr = ptr;
+}
+
+inline JB_String* JB_Msg_Name(Message* self) {
+	if (self) {
+		return self->Name;
+	}
+	return JB_LUB[0];
+}
+
+inline JB_String* JB_Msg_Name_(Message* self) {
+	if (self) {
+		return self->Name;
+	}
+	return JB_LUB[0];
+}
+
+inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f) {
+	return (JB__Tk_Splitter)(s, e, f);
 }
 
 inline void JB_Wrap_ConstructorInt(DTWrap* self, int64 v) {
@@ -2939,8 +2949,152 @@ inline void JB_Wrap_ConstructorInt(DTWrap* self, int64 v) {
 	self->PrivValue = v;
 }
 
-inline bool JB_DictionaryReader_SyntaxCast(DictionaryReader* self) {
-	return JB_Nav_MoveNext(self);
+inline bool JB_Array_SyntaxCast(Array* self) {
+	return JB_Array_Size(self) > 0;
+}
+
+inline JB_String* JB_FS_SyntaxCast(FastString* self) {
+	return JB_FS_GetResult(self);
+}
+
+inline void JB_Fn_Constructor(SyntaxObj* self, fpMsgRender msg, JB_String* name, int ID) {
+	JB_StringC* _tmPf0 = JB_LUB[0];
+	self->LongName = JB_Incr(_tmPf0);
+	self->RenderAddr = msg;
+	self->Name = JB_Incr(name);
+	self->ID = ((Syntax)ID);
+	self->ExportAddr = JB_Msg_Dummy;
+}
+
+inline void JB_Lk_Constructor(LeakTester* self, JB_String* name) {
+	self->MemUsedStart = JB_MemCount();
+	self->Name = JB_Incr(name);
+	JB_Mem_Mark();
+}
+
+inline void JB_Msg_ConstructorCopy(Message* self, Message* other) {
+	JB_Ring_Constructor0(self);
+	self->Position = other->Position;
+	JB_String* _tmPf0 = other->Name;
+	self->Name = JB_Incr(_tmPf0);
+	self->Func = other->Func;
+	self->Obj = other->Obj;
+	self->Indent = other->Indent;
+	self->Flags = (other->Flags | JB__Tk_Using.Flags);
+	self->RangeLength = other->RangeLength;
+	self->Tag = other->Tag;
+}
+
+inline void JB_Msg_ConstructorEmpty(Message* self) {
+	JB_Ring_Constructor0(self);
+	JB_StringC* _tmPf0 = JB_LUB[0];
+	self->Name = JB_Incr(_tmPf0);
+	self->Obj = nil;
+	self->Indent = 0;
+	self->Func = JB_SyxArg;
+	self->Position = JB__Tk_Using.Position;
+	self->Flags = JB__Tk_Using.Flags;
+	self->RangeLength = JB__Tk_Using.Length;
+	self->Tag = JB__Tk_Using.Tag;
+}
+
+inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name) {
+	JB_Ring_Constructor0(self);
+	self->Obj = nil;
+	self->Indent = 0;
+	self->Name = JB_Incr(Name);
+	self->Func = Func;
+	self->Position = JB__Tk_Using.Position;
+	self->Flags = JB__Tk_Using.Flags;
+	self->RangeLength = JB__Tk_Using.Length;
+	self->Tag = JB__Tk_Using.Tag;
+}
+
+inline void JB_Msg_ConstructorRange(Message* self, Message* Parent, Syntax Func, int BytePos, JB_String* name, int RangeLength) {
+	JB_Ring_Constructor(self, Parent);
+	self->Obj = nil;
+	self->Indent = 0;
+	self->Name = JB_Incr(name);
+	self->Position = BytePos;
+	self->Func = Func;
+	self->RangeLength = RangeLength;
+	self->Flags = JB__Tk_Using.Flags;
+	self->Tag = JB__Tk_Using.Tag;
+}
+
+inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in) {
+	Object_Behaviour* Table = ((Object_Behaviour*)JB_ObjClassBehaviours(self));
+	return (Table->render)(self, fs_in);
+}
+
+inline void JB_Sav___SaveCollect__(Saveable* self, ObjectSaver* Saver) {
+	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(self));
+	return (Table->savecollect)(self, Saver);
+}
+
+inline JB_StringC* JB_Str_CastZero(JB_String* self) {
+	return JB_Str_MakeC(self);
+}
+
+inline void JB_bin_Constructor0(FastString* self, int n) {
+	JB_FS_Constructor(self);
+	if (n) {
+		debugger;
+	}
+}
+
+inline void JB_Err_ConstructorNothing(JB_Error* self) {
+	JB_Msg_ConstructorEmpty(self);
+	JB_StringC* _tmPf2 = JB_LUB[0];
+	self->Path = JB_Incr(_tmPf2);
+	JB_StringC* _tmPf1 = JB_LUB[0];
+	self->OriginalData = JB_Incr(_tmPf1);
+	JB_StringC* _tmPf0 = JB_LUB[0];
+	self->StackTrace = JB_Incr(_tmPf0);
+	self->Progress = 0;
+	self->Node = nil;
+	self->ErrorFlags = 0;
+	self->Position = -1;
+	self->Severity = kJB__ErrorSeverity_OK;
+	self->When = JB_Date__New0();
+	self->Func = JB_SyxArg;
+}
+
+inline void JB_SS_Constructor(StringReader* self, JB_String* Data) {
+	self->Data = ((FastBuff){});
+	self->File = nil;
+	self->UserObj = nil;
+	self->ChunkSize = 0;
+	self->StartFrom = 0;
+	(JB_FastBuff_ReadFromSet((&self->Data), Data));
+	self->Length = JB_Str_Length(Data);
+	self->_NoMoreChunks = true;
+}
+
+inline bool JB_Safe_SyntaxCast(JB_String* self) {
+	return JB_Str_IsOK(self);
+}
+
+inline void JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path) {
+	JB_Msg_ConstructorEmpty(self);
+	JB_StringC* _tmPf1 = JB_LUB[0];
+	self->OriginalData = JB_Incr(_tmPf1);
+	JB_StringC* _tmPf0 = JB_LUB[0];
+	self->StackTrace = JB_Incr(_tmPf0);
+	self->ErrorFlags = 0;
+	self->Position = -1;
+	self->Node = JB_Incr(node);
+	self->Severity = level;
+	self->Progress = JB__Rec_Progress;
+	self->Name = JB_Incr(desc);
+	self->Path = JB_Incr(path);
+	self->When = JB_Date__New0();
+	self->Func = JB_SyxSStr;
+	JB_Err_UpgradeWithNode(self);
+}
+
+inline bool JB_Msg_NilCheck(Message* self) {
+	return ((bool)self) or JB_API__NilHandler();
 }
 
 inline void JB_Rec_Constructor(JB_ErrorReceiver* self) {
@@ -2960,173 +3114,8 @@ inline void JB_Rec_Constructor(JB_ErrorReceiver* self) {
 	JB__API_NilHappened = nil;
 }
 
-inline JB_String* JB_FS_SyntaxCast(FastString* self) {
-	return JB_FS_GetResult(self);
-}
-
-inline void JB_Lk_Constructor(LeakTester* self, JB_String* name) {
-	self->MemUsedStart = JB_MemCount();
-	self->Name = JB_Incr(name);
-	JB_Mem_Mark();
-}
-
-inline void JB_Mrap_ConstructorDummy(MWrap* self, int ItemCount, uint ItemSize, bool DummyParam) {
-	self->DataType = kJB__TC_UnusedType;
-	int Request = ItemCount * ItemSize;
-	self->ItemSize = ItemSize;
-	self->Length = 0;
-	self->_Ptr = JB_zalloc(Request);
-	self->Capacity = JB_Ternary(((bool)self->_Ptr), ItemCount, ((int)0));
-	self->DeathAction = kJB__Wrap_Free;
-}
-
-inline void JB_Sav___SaveCollect__(Saveable* self, ObjectSaver* Saver) {
-	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(self));
-	return (Table->savecollect)(self, Saver);
-}
-
-inline JB_StringC* JB_Str_CastZero(JB_String* self) {
-	return JB_Str_MakeC(self);
-}
-
-inline void JB_FI_Constructor(StringFields* self, JB_String* Source, byte Sep) {
-	self->Data = JB_Incr(Source);
-	self->Sep = Sep;
-}
-
-inline void JB_SS_Constructor(StringReader* self, JB_String* Data) {
-	JB_Incr(Data);
-	self->Data = ((FastBuff){});
-	self->File = nil;
-	self->UserObj = nil;
-	self->Decomp = nil;
-	self->ChunkSize = 0;
-	self->StartFrom = 0;
-	if (Data == nil) {
-		JB_SetRef(Data, JB_LUB[0]);
-	}
-	(JB_FastBuff_ReadFromSet((&self->Data), Data));
-	self->Length = JB_Str_Length(Data);
-	JB_Decr(Data);
-	self->_NoMoreChunks = true;
-}
-
-inline void JB_Fn_Constructor(SyntaxObj* self, fpMsgRender msg, JB_String* name, int ID) {
-	JB_StringC* _tmPf0 = JB_LUB[0];
-	self->LongName = JB_Incr(_tmPf0);
-	self->RenderAddr = msg;
-	self->Name = JB_Incr(name);
-	self->ID = ((Syntax)ID);
-	self->ExportAddr = JB_Msg_Dummy;
-}
-
-inline bool JB_Array_SyntaxCast(Array* self) {
-	return JB_Array_Size(self) > 0;
-}
-
-inline bool JB_File_SyntaxCast(JB_File* self) {
-	return self != nil;
-}
-
-inline void JB_bin_Constructor0(FastString* self, int n) {
-	JB_FS_Constructor(self);
-	if (n) {
-		debugger;
-	}
-}
-
-inline void JB_Msg_ConstructorCopy(Message* self, Message* other) {
-	JB_Ring_Constructor0(self);
-	self->Position = other->Position;
-	JB_String* _tmPf0 = other->Name;
-	self->Name = JB_Incr(_tmPf0);
-	self->Func = other->Func;
-	self->Obj = other->Obj;
-	self->Indent = other->Indent;
-	self->Flags = (other->Flags | JB__Tk_Using.Flags);
-	self->RangeLength = other->RangeLength;
-	self->Tag = other->Tag;
-	JB_Msg_Trap(self);
-}
-
-inline void JB_Msg_ConstructorEmpty(Message* self) {
-	JB_Ring_Constructor0(self);
-	JB_StringC* _tmPf0 = JB_LUB[0];
-	self->Name = JB_Incr(_tmPf0);
-	self->Obj = nil;
-	self->Indent = 0;
-	self->Func = JB_SyxArg;
-	self->Position = JB__Tk_Using.Position;
-	self->Flags = JB__Tk_Using.Flags;
-	self->RangeLength = JB__Tk_Using.Length;
-	self->Tag = JB__Tk_Using.Tag;
-	JB_Msg_Trap(self);
-}
-
-inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name) {
-	JB_Ring_Constructor0(self);
-	self->Obj = nil;
-	self->Indent = 0;
-	self->Name = JB_Incr(Name);
-	self->Func = Func;
-	self->Position = JB__Tk_Using.Position;
-	self->Flags = JB__Tk_Using.Flags;
-	self->RangeLength = JB__Tk_Using.Length;
-	self->Tag = JB__Tk_Using.Tag;
-	JB_Msg_Trap(self);
-}
-
-inline void JB_Msg_ConstructorRange(Message* self, Message* Parent, Syntax Func, int BytePos, JB_String* name, int RangeLength) {
-	JB_Ring_Constructor(self, Parent);
-	self->Obj = nil;
-	self->Indent = 0;
-	self->Name = JB_Incr(name);
-	self->Position = BytePos;
-	self->Func = Func;
-	self->RangeLength = RangeLength;
-	self->Flags = JB__Tk_Using.Flags;
-	self->Tag = JB__Tk_Using.Tag;
-	JB_Msg_Trap(self);
-}
-
-inline bool JB_Msg_NilCheck(Message* self) {
+inline bool JB_Syx_NilCheck(Syntax self) {
 	return ((bool)self) or JB_API__NilHandler();
-}
-
-inline void JB_Msg_Trap(Message* self) {
-}
-
-inline void JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path) {
-	JB_Msg_ConstructorEmpty(self);
-	JB_StringC* _tmPf1 = JB_LUB[0];
-	self->OriginalData = JB_Incr(_tmPf1);
-	JB_StringC* _tmPf0 = JB_LUB[0];
-	self->StackTrace = JB_Incr(_tmPf0);
-	self->ErrorFlags = 0;
-	self->Position = -1;
-	self->Node = JB_Incr(node);
-	self->Severity = level;
-	self->Name = JB_Incr(desc);
-	self->Path = JB_Incr(path);
-	self->When = JB_Date__New0();
-	self->Func = JB_SyxSStr;
-	JB_Err_UpgradeWithNode(self);
-}
-
-inline void JB_Err_ConstructorNothing(JB_Error* self) {
-	JB_Msg_ConstructorEmpty(self);
-	JB_StringC* _tmPf2 = JB_LUB[0];
-	self->Path = JB_Incr(_tmPf2);
-	JB_StringC* _tmPf1 = JB_LUB[0];
-	self->OriginalData = JB_Incr(_tmPf1);
-	JB_StringC* _tmPf0 = JB_LUB[0];
-	self->StackTrace = JB_Incr(_tmPf0);
-	self->Node = nil;
-	self->ErrorFlags = 0;
-	self->Position = -1;
-	self->Severity = kJB__ErrorSeverity_OK;
-	self->When = JB_Date__New0();
-	self->Func = JB_SyxArg;
 }
 
 
