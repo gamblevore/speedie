@@ -58,6 +58,14 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "/usr/local/speedie/Speedie.scproj/Batch/ana.spd"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--nocompile"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "--perry"
             isEnabled = "YES">
          </CommandLineArgument>
@@ -71,22 +79,6 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/usr/local/speedie/examples/banana_count.spd"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "jeebox.scproj"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--x"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--nocompile"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "Perry.scproj"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -107,10 +99,6 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/theodore/Code/Galaxxies.scproj"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "Speedie"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument

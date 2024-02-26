@@ -3,10 +3,7 @@
 // about 1.2K songs... for 253K
 // 1230 songs in 39.7KB (253KB) at 33.1 chars / song
 
-main
-	if  !app.args
-		return 0
-	|| f = app.args[0].file
+main (|file| f)
 	|| size = f.size
 	|| size2 = f.readall.decompress.length
 	|| count = 0

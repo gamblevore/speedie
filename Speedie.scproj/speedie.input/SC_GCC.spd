@@ -520,7 +520,8 @@ function file.TestBatch (|bool|)
 	
 	for c.files in batch
 		if c isa "cpp" or "h"
-			printline "This file should really not be here: " + c
+			print "This file should really not be here: "
+			printline c
 			debugger
 	return stderr.ok
 	// we want to test each file... how? we need to call the new speedie!
