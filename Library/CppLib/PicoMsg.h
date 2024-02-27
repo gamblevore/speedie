@@ -161,6 +161,7 @@ static	int						pico_desired_thread_count = 1;
 static	const char*				pico_fail_actions[4] = {"Failed", "Reading", "Sending", 0};
 static  bool					pico_suicide;
 static  bool					pico_at_exit_done;
+static  std::atomic_int         pico_sock_open_count;
 
 
 struct PicoLister {
@@ -376,6 +377,7 @@ struct PicoComms {
 
 		IsParent = pid!=0; // 🕷️_🕷️
 		close(Socks[!IsParent]);
+		pico_sock_open_count--;
 		int S = Socks[IsParent];
 		if (!IsParent) {
 			pico_thread_count = 0; // Unix doesn't let us keep threads.
@@ -587,7 +589,14 @@ struct PicoComms {
 	}
 	
 	bool get_pair_of (int* Socks) {
+		int i = pico_sock_open_count;
+		if (i > 60) {
+//			raise(SIGINT);			// what?
+			return false; 			// seems fair?
+		}
+
 		if (socketpair(PF_LOCAL, SOCK_STREAM, 0, Socks)) return failed();
+		pico_sock_open_count+=2;
 		struct linger so_linger = {1, 5};
 		for (int i = 0; i < 2; i++)
 			if (setsockopt(Socks[i], SOL_SOCKET, SO_LINGER, &so_linger, sizeof so_linger)) return failed();
@@ -665,15 +674,20 @@ struct PicoComms {
 		int S = Socket; if (!S) return false;
 		if (!Reading->WorkerThread.enter()) return false;
 
-		if (S > 0) close(S);
+		if (S > 0) {
+			close(S);
+			pico_sock_open_count--;
+		}
 		report_closed_buffers();
 		Socket = 0; 
-		return CanSayDebug() and Say("Closing");
+		if (CanSayDebug()) Say("Closing");
+		Reading->WorkerThread.unlock();
+		return true;
 	}
 
 	void cleanup () {
 		if (!Socket and !InUse and DestroyMe) {
-			Say("Bye");
+			if (CanSayDebug()) Say("Bye");
 			int I = ID;
 			delete this;
 			pico_list.Remove(I);
@@ -681,7 +695,7 @@ struct PicoComms {
 	}
 	
 	void io () {
-		if (!Socket) return;
+		if (!Socket or !guard_ok()) return;
 		InUse++;
 		do_reading();
 		do_sending();
@@ -761,15 +775,15 @@ extern "C" PicoComms* PicoCreate ()  _pico_code_ (
 
 extern "C" void PicoDestroy (PicoComms** Ref, const char* Why=0) _pico_code_ (
 /// Destroys the PicoComms object, and reclaims memory. Also closes the other side.
-/// Sets Ref to nullptr, which to indicate that you really should not use that Object!
-/// Accepts refs to nullptr.
+/// Sets Ref to nullptr, to indicate that you really should not use that object!
+/// Accepts *Ref == nullptr
 	PicoComms* M = *Ref;
 	if (M) M->Destroy(Why);
 	*Ref = nullptr;
 )
 
 extern "C" PicoComms* PicoStartChild (PicoComms* M) _pico_code_ (
-// Creates a new child comm and links them together. This is accomplished using sockets.
+// Creates a new child comm and links them together, using sockets.
 	return M->InitPair(PicoNoiseEvents);
 )
 

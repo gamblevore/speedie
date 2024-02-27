@@ -8,11 +8,7 @@
 
 * Do nil checker!
 	* int upgrading needs fix
-	* logging huge stdout super slow (parsing/recolorising each line?)
-
-	* |dictionary|			Types = ["spd":"x"] // doesnt compile.
-
-	
+	* |dictionary|			Types = ["spd":"x"]					// doesnt compile.	
 	* picomsg is now crashing or failing on constructor
 		* speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 		* speedie stops compiling sometimes, from perry
