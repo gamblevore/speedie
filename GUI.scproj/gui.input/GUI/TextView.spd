@@ -10,6 +10,7 @@ class TextView (GUIControl)
 	|bool| 						ShowLineNumbers
 	|bool|						CanSeeAllLines
 	|bool|						GroupSaveAll
+	|bool| 						FastAppend
 	|bool|						CopyPlaceActive
 	|bool|						CanAutoComplete
 	|byte|						ClicksDown
@@ -26,7 +27,7 @@ class TextView (GUIControl)
 	|string|					AutoCompleteString
 	|Error?|					MyError
 	|TextViewLine|				_Start
-	|TextViewLine|				Lines
+	|TextViewLine|				_Lines
 	|ivec3|						_Reclaim		
 	|IntRange|					_TypingPlace
 	|IntRange|					UncorrectedSel
@@ -42,7 +43,7 @@ class TextView (GUIControl)
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
 		super.Constructor(p)
 		._reclaim = (0, 1GB, 0)
-		.Lines = TextViewLine(0)
+		._Lines = TextViewLine(0)
 		._Start = TextViewLine(0) // make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
@@ -435,10 +436,10 @@ class TextView (GUIControl)
 	helper DrawInfoAtLine (|int| L, |textviewline|)
 		opt norefcounts
 		.PrepareLinesOfText
-		for r in .lines
+		for r in ._lines
 			if r.tline >= l
 				return r
-		return .lines.last
+		return ._lines.last
 	
 	function ViewLineAndSel (|int| L)
 		|| d	= .DrawInfoAtLine(L)
@@ -696,10 +697,29 @@ class TextView (GUIControl)
 	
 	
 	syntax append (|string| s)
-		if s
-			.text += s	// ideally we can optimise this. to not create a whole new string
-						// useful for large log files.
-						// by NOT doing string appends to create .text
+		require s
+//		if !.FastAppend
+		.text += s
+//			return 
+	
+//		|| L = 0
+		// use d.FindWhereLineBreaks(.text,  CharW,  .singleline,  p) isntead
+//		for line.lines in s
+//			._AddLine(line, L++)
+	
+	
+//	helper _AddLine (|string| s, |int| i)
+//		|| last = ._lines.Last!
+//		if !last.EndsWithLine
+//			last.Text += s
+//			return 
+//		(last isnt last)
+//		|| d = TextViewLine(last.after)
+//		d.vline = last.vline + 1
+//		d.tline = last.tline + 1
+//		last.next = d
+			
+		
 
 	syntax access (|int| i, |string| s, |bool|)
 		cpp_Part Match
@@ -857,13 +877,13 @@ class TextView (GUIControl)
 	function ClearErrors
 		opt norefcounts
 		.myerror = nil
-		for d in .lines
+		for d in ._lines
 			d.drawerror = nil
 
 
 	function ClearFound (|bool|)
 		opt norefcounts
-		for d in .lines
+		for d in ._lines
 			if d is found
 				(d isnt found)
 				(d isnt currfound)
@@ -1580,15 +1600,15 @@ class TextView (GUIControl)
 		
 	function NeedFirst (|textviewline|)
 		opt norefcounts
-		|| f = .lines.first
+		|| f = ._lines.first
 			return f
 		rz = TextViewLine(0)
-		.lines <~ rz
+		._lines <~ rz
 		
 
 	helper StartWithoutScrollDraw (assigns:|TextViewLine!| d)
 		opt norefcounts
-		|| last = .lines.last!.movecapped(3 - .maxvisiblelines)!
+		|| last = ._lines.last!.movecapped(3 - .maxvisiblelines)!
 		if d gt last
 			d = last
 		.ReallySetStart(d)
@@ -1607,7 +1627,7 @@ class TextView (GUIControl)
 		if super.textset(NewText)
 			.ClearSub(NewText, keepstart)
 			return true
-		if !.lines.hasany // in case we need to anyhow... usually for ""
+		if !._lines.hasany // in case we need to anyhow... usually for ""
 			.ClearSub(NewText, keepstart)
 
 
@@ -1620,10 +1640,10 @@ class TextView (GUIControl)
 		.TextAlteredForDraw |= 2 // this might not clear text?
 
 		require !Keepstart
-		.lines.clear
+		._lines.clear
 
 		|| d = textviewline(0)
-		.lines <~ d
+		._lines <~ d
 		.ClearReclaim
 		d.tline = 1
 		d.position = -1
@@ -1638,8 +1658,6 @@ class TextView (GUIControl)
 			rz = textviewline(0)
 			place.next = rz
 
-		//if ._reclaim[1] == int.max
-			//rz.drawerror = nil
 		rz.vline = place.vline + 1
 
 
@@ -1647,7 +1665,7 @@ class TextView (GUIControl)
 		|| CW	= .MaxWidthInChars
 		|| ldw	= .LastDrawWidth
 		.LastDrawWidth = CW
-		if (!.lines.hasany) or (.TextAlteredForDraw & 2)
+		if (!._lines.hasany) or (.TextAlteredForDraw & 2)
 			return 2
 		if (CW != ldw)
 			return 1
@@ -1725,7 +1743,7 @@ class TextView (GUIControl)
 
 	helper IsCleared (|bool|)
 		opt norefcounts
-		|| d = .lines.first
+		|| d = ._lines.first
 		return !d or d.position < 0
 
 
@@ -1740,7 +1758,7 @@ class TextView (GUIControl)
 	helper EndGap (|bool|)
 		opt norefcounts
 		require .PreferStayAtEnd
-		|| curr = .lines.last
+		|| curr = ._lines.last
 		|| lim = .MaxVisibleLines
 		|| rz = 0
 		while curr != ._start
@@ -1752,7 +1770,7 @@ class TextView (GUIControl)
 		
 	helper FindStayAtEnd (|textviewline|) // findend
 		opt norefcounts
-		return .lines.last!.movecapped(1 - .MaxVisibleLines, nil)
+		return ._lines.last!.movecapped(1 - .MaxVisibleLines, nil)
 
 
 	helper PrepareLinesOfText
@@ -1849,7 +1867,7 @@ class TextView (GUIControl)
 	
 	function ScrollPos (assigns:|int|)
 		opt norefcounts
-		for c in .lines
+		for c in ._lines
 			if c.after > value
 				.StartWithoutScrollDraw(c)
 				return

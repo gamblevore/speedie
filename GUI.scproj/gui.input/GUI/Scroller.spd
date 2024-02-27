@@ -56,7 +56,7 @@ function textview.SLH (|vec3|)
 	opt norefcounts
 	// whats the total number of lines? sigh... seems like we always need the entire thing?
 	|| s = .StartLine
-	|| ll = .lines.last!
+	|| ll = ._lines.last!
 	|| n = ll.vline - (.maxvisiblelines - 2)
 	return (s.vline,  n max 1,  .lineheight).vec3
 

@@ -321,20 +321,25 @@ function PressedSearchWithin (Guiaction)
 function PressedSearchKeys (GUIKeyEvent)
 	opt norefcounts
 	|| w = .ide!
+	|| t = self as textview #require
+	
 	if key.isaccept
 		w.ViewAsProject
 		|| ID = ((perry.findID+1)&255) max 1
 		perry.findID = ID
-		w.BatchPhind(.text, ID)
-		if w.foundlist.isempty and .text
-			w.noneed("The search text “${.text}” wasn't found", nil)
-			perry.FindElseWhere(w, .text, ID)
+		w.BatchPhind(t.text, ID)
+		if w.foundlist.isempty and t.text
+			w.noneed("The search text “${t.text}” wasn't found", nil)
+			perry.FindElseWhere(w, t.text, ID)
 		  else
 			w.noneed
 		return true
+	if (key is down) and (t.selrange == t.text.length)
+		w.FoundList.setfocus
+		return true
 	require key.iscancel
-	if .text
-		.text = ""
+	if t.text
+		t.text = ""
 	  else
 		w.view(W.viewfiles)
 	return true

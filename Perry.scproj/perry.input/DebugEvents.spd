@@ -158,7 +158,7 @@ function perryide.AddProductErr (|string| err)
 
 function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
-	// so what if we have a shellstream? then what?
+
 	|| rout = r.Output
 	if !(r.userflags&1) and rout and rout.length
 		.ShowCompileTab(.productout)
@@ -169,8 +169,7 @@ function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
 	
-	if rout
-		.ProductOut <~ rout
+	.ProductOut <~ rout
 	.AddProductErr(r.ErrorOutput)
 	
 	if kill
