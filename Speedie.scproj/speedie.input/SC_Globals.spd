@@ -543,13 +543,13 @@ function SCDecl.MakeDataTypeWrapper (|SCBase| Name_Space, |declmode| Purpose, |s
 
 	
 function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCBase| Name_Space, |declmode| Purpose, |bool|)
-	|| R = ExtractDecl( wrap, name_space, purpose )				#require
-	.type = R.Type
+	|| R = ExtractDecl( wrap, name_space, purpose )			#require
+	R.Copytypeinfoto(self)
 	.contains = cont.MakeContainedOptional
 	if TypeWrapper!.typenormal.TypeMatch(R, ktypecastfalse).IsNormalMatch
 		check (!Cont.isnormalobject)  ( wrap, "Datatype-wrappers can't contain this." )
 	  else
-		|| RCont = R.Type.Contained				#expect ( wrap, "Not a container class." )
+		|| RCont = R.Type.Contained							#expect ( wrap, "Not a container class." )
 		if (RCont.type != typeobject) and RCont.IsNormalObject
 			RCont.ExpectMatch(cont, 0, nil, wrap)
 	return true
@@ -1359,7 +1359,7 @@ function TypeOfRel (ExprResolver) {
 		return RC		// RC is bigger (float vs vec3)
 
 	
-	// if scfunction.currfunc ~= "UpgradeIntsTest"
+	// "UpgradeIntsTest".debug
 	if custom & CustomOps.TypeCastToBigger
 		lc = lc.better_numeric(rc)
 	

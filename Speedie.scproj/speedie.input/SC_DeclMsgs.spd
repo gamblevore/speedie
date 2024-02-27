@@ -228,6 +228,8 @@ function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| c
 	if sdcl.NeedsContainedfix
 		sdcl = sdcl.Containedfix
 	
+	// TODO: if sdcl's refcount is 1... just keep it? its obviously just been created.
+	// like: |dictionary of string| x
 	|| dcl = Sdcl.copydecl
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )

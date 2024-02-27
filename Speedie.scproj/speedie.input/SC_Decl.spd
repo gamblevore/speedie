@@ -182,7 +182,7 @@ class SCDecl (SCObject) {
 
 
 	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |SCClass|)
-		if scfunction.currfunc ~= "UpgradeIntsTest"
+		"UpgradeIntsTest".debug
 		|| bits	= .ItemBitCount max t.ItemBitCount
 		// what about a float + an int? f64 right?
 		if .isfloat or t.isfloat

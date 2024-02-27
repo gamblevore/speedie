@@ -96,7 +96,7 @@ function UseChildAsReal (|message| msg, |nilreason| reason=nilreason.accessing, 
 		|| actual = .Jump(ch)
 		if actual is nilish
 			|| ddd = dcl.hiderfunc
-			if (reason is property) and ddd // OK... 
+			if ddd and (reason is property) and !ddd.isassigns				// OK... 
 				return .PropertyToFunc(msg, ddd)
 				
 			.BecomeReal(ch.FastDecl, ch, reason)
@@ -157,7 +157,7 @@ function Function (NilTrackerFn)
 		require fn and .UseChildAsReal(fp)						// (abc)()
 
 	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
-			
+	
 	if (test is active) and fn.IsNilChecker
 		if fn.isnilchecker != 3
 			Test |= NilCheckMode.Soft

@@ -44,8 +44,6 @@ class NilTest
 		borks
 		return .recurse(!pos)
 	
-				
-	
 	function TernTest
 		|| a = ("a",nil)(0.5[])
 		|| b = ("b",nil)(0.5[])
@@ -200,6 +198,11 @@ module NilTest2
 		|| fs = faststring()
 		(f$)(message(), fs)
 		
+	
+	function Dictionary (|dictionary? of string| d)
+		borks
+		d["abc"] = "x"
+
 	target debugnil2 {
 	function BrokenStruct
 		borks
@@ -216,8 +219,8 @@ module NilTest2
 	}
 	
 	function ArrayTest
-//		borks
-//		nil|array| <~ ""
+		borks
+		nil|array| <~ ""
 
 
 function scfunction.NilPrint (|string| header="", |bool| nilch)
