@@ -335,7 +335,7 @@ struct xC2xB5Func1_Behaviour;
 
 struct File_Behaviour;
 
-struct File_Behaviour;
+struct String_Behaviour;
 
 struct File_Behaviour;
 
@@ -447,7 +447,7 @@ struct ASMFunc2;
 
 struct JB_File;
 
-struct JB_File;
+struct JB_String;
 
 struct JB_File;
 
@@ -1341,13 +1341,13 @@ extern SCBase* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBigger (32)
-#define kJB__ErrorColors_bold (JB_LUB[1869])
+#define kJB__ErrorColors_bold (JB_LUB[1870])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1870])
-#define kJB__ErrorColors_good (JB_LUB[1871])
-#define kJB__ErrorColors_normal (JB_LUB[1872])
-#define kJB__ErrorColors_underline (JB_LUB[1871])
-#define kJB__ErrorColors_warn (JB_LUB[1873])
+#define kJB__ErrorColors_error (JB_LUB[1871])
+#define kJB__ErrorColors_good (JB_LUB[1872])
+#define kJB__ErrorColors_normal (JB_LUB[1873])
+#define kJB__ErrorColors_underline (JB_LUB[1872])
+#define kJB__ErrorColors_warn (JB_LUB[1874])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1514,7 +1514,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1874])
+#define kJB_codesign_native (JB_LUB[1875])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1528,10 +1528,10 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitAnd (JB_LUB[354])
-#define kJB_kBitNot (JB_LUB[609])
-#define kJB_kBitOr (JB_LUB[1326])
-#define kJB_kBitXor (JB_LUB[1875])
+#define kJB_kBitAnd (JB_LUB[355])
+#define kJB_kBitNot (JB_LUB[610])
+#define kJB_kBitOr (JB_LUB[1327])
+#define kJB_kBitXor (JB_LUB[1876])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1546,7 +1546,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[1876])
+#define kJB_kSaverStart1 (JB_LUB[1877])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -4655,6 +4655,8 @@ int SC_nil__Init_();
 
 int SC_nil__InitCode_();
 
+NilState SC_nil__Item(Message* msg, NilCheckMode Test);
+
 NilState SC_nil__List(Message* msg, NilCheckMode Test);
 
 void ndb4();
@@ -6064,6 +6066,8 @@ JB_String* SC_Str_ContainerName(JB_String* self, JB_String* ext);
 ErrorInt JB_Str_CopyFileTo(JB_String* self, JB_String* Dest, bool AttrOnly);
 
 int JB_Str_Count(JB_String* self, byte b);
+
+void SC_Str_debug(JB_String* self);
 
 ErrorInt2 SC_Str_DebugExecute(JB_String* self, Array* Args, FastString* Out, FastString* Errs);
 
@@ -9463,7 +9467,7 @@ inline void SC_Base_ConstructorMsg(SCBase* self, Message* node) {
 inline void SC_SavingTest_Constructor(SavingTest* self, int n) {
 	JB_Sav_Constructor(self);
 	JB_String* _tmPf0 = JB_Incr(JB_int_RenderFS(n, nil));
-	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1877], _tmPf0);
+	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1878], _tmPf0);
 	JB_Decr(_tmPf0);
 	self->Name = JB_Incr(_tmPf1);
 	self->Value = (1000 + n);
@@ -9588,7 +9592,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1824])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1825])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -9631,7 +9635,7 @@ inline void SC_PA_Constructor(SCParamArray* self, Message* exp) {
 	self->Found = false;
 	self->Exp = exp;
 	self->IsDot = ((JB_Msg_EqualsSyx(exp, JB_SyxDot, false)));
-	self->IsAddress = (((bool)exp) and SC_Msg_OperatorIsBRel(SC_Msg_NiceParent(exp), JB_LUB[354]));
+	self->IsAddress = (((bool)exp) and SC_Msg_OperatorIsBRel(SC_Msg_NiceParent(exp), JB_LUB[355]));
 	self->ErrCount = JB_StdErr->ErrorCount;
 }
 
@@ -9711,7 +9715,7 @@ inline void SC_Class_Constructor(SCClass* self, Message* node, SCBase* parent, b
 	self->TypeOptional = JB_Incr(_tmPf1);
 	SCDecl* _tmPf0 = SC_Decl_NilConstructor(T, kSC__NilState_Real * HasPtrs);
 	self->TypeReal = JB_Incr(_tmPf0);
-	if (JB_Msg_SyntaxEquals(node, JB_LUB[739], false)) {
+	if (JB_Msg_SyntaxEquals(node, JB_LUB[740], false)) {
 		JB_SetRef(T, SC_Decl_GetAddress(T, kSC__DeclMode_FuncParam));
 	}
 	 else {
@@ -9808,7 +9812,7 @@ inline void SC_Iter_Constructor(SCIterator* self, SCClass* parent, Message* msg)
 	JB_String* x = JB_Incr(JB_Msg_Name(thg));
 	JB_Decr(thg);
 	if ((!JB_Str_Exists(x))) {
-		JB_SetRef(x, JB_LUB[1672]);
+		JB_SetRef(x, JB_LUB[1673]);
 	}
 	self->Name = JB_Incr(x);
 	JB_Decr(x);
@@ -9818,15 +9822,15 @@ inline void SC_Iter_Constructor(SCIterator* self, SCClass* parent, Message* msg)
 		JB_Msg_SyntaxExpect(msg, nil);
 	}
 	self->Source = JB_Incr(src);
-	Message* _tmPf0 = JB_Incr(JB_Msg_FindSyxName(self->Source, JB_SyxTmp, JB_LUB[428], false));
+	Message* _tmPf0 = JB_Incr(JB_Msg_FindSyxName(self->Source, JB_SyxTmp, JB_LUB[429], false));
 	if ((!_tmPf0)) {
-		JB_Msg_SyntaxExpect(msg, JB_LUB[1878]);
+		JB_Msg_SyntaxExpect(msg, JB_LUB[1879]);
 	}
 	self->WhileLoop = JB_Incr(_tmPf0);
 	JB_Decr(_tmPf0);
 	Message* WhileArg = JB_Incr(JB_Msg_FindSyx(self->WhileLoop, JB_SyxArg));
 	if ((!WhileArg)) {
-		JB_Msg_SyntaxExpect(self->WhileLoop, JB_LUB[1879]);
+		JB_Msg_SyntaxExpect(self->WhileLoop, JB_LUB[1880]);
 	}
 	Message* _tmPf2 = JB_Incr(((Message*)JB_Ring_NextSib(WhileArg)));
 	Message* _tmPf4 = ((Message*)JB_Ring_First(_tmPf2));
@@ -9843,9 +9847,9 @@ inline void SC_Iter_Constructor(SCIterator* self, SCClass* parent, Message* msg)
 	JB_Decr(Cond);
 	Message* w = nil;
 	if (WhileArg) {
-		JB_SetRef(w, JB_Msg_FindNested(WhileArg, JB_SyxTmp, JB_LUB[1880], false));
+		JB_SetRef(w, JB_Msg_FindNested(WhileArg, JB_SyxTmp, JB_LUB[1881], false));
 		if ((!w)) {
-			JB_Msg_SyntaxExpect(WhileArg, JB_LUB[1881]);
+			JB_Msg_SyntaxExpect(WhileArg, JB_LUB[1882]);
 		}
 	}
 	JB_Decr(WhileArg);
@@ -9853,7 +9857,7 @@ inline void SC_Iter_Constructor(SCIterator* self, SCClass* parent, Message* msg)
 	JB_Decr(w);
 	Message* _tmPf1 = JB_Incr(((Message*)JB_Ring_First(self->Yield)));
 	if ((!_tmPf1)) {
-		JB_Msg_SyntaxExpect(self->Yield, JB_LUB[1882]);
+		JB_Msg_SyntaxExpect(self->Yield, JB_LUB[1883]);
 	}
 	self->Value = JB_Incr(_tmPf1);
 	JB_Decr(_tmPf1);
@@ -9941,15 +9945,15 @@ inline void SC_Cpp_Constructor(Cpp_Export* self) {
 	JB_Decr(_tmPf1);
 	FastStringCpp* _tmPf7 = SC_FastStringCpp__New(JB_LUB[0]);
 	self->T = JB_Incr(_tmPf7);
-	FastStringCpp* _tmPf6 = SC_Cpp_StreamChild(self, JB_LUB[1883]);
+	FastStringCpp* _tmPf6 = SC_Cpp_StreamChild(self, JB_LUB[1884]);
 	self->AllTypes = JB_Incr(_tmPf6);
-	FastStringCpp* _tmPf5 = SC_Cpp_StreamChild(self, JB_LUB[1884]);
+	FastStringCpp* _tmPf5 = SC_Cpp_StreamChild(self, JB_LUB[1885]);
 	self->TypesProj = JB_Incr(_tmPf5);
-	FastStringCpp* _tmPf4 = SC_Cpp_StreamChild(self, JB_LUB[1071]);
+	FastStringCpp* _tmPf4 = SC_Cpp_StreamChild(self, JB_LUB[1072]);
 	self->HeaderProj = JB_Incr(_tmPf4);
-	FastStringCpp* _tmPf3 = SC_Cpp_StreamChild(self, JB_LUB[1885]);
+	FastStringCpp* _tmPf3 = SC_Cpp_StreamChild(self, JB_LUB[1886]);
 	self->Inlines = JB_Incr(_tmPf3);
-	FastStringCpp* _tmPf2 = SC_Cpp_StreamChild(self, JB_LUB[1886]);
+	FastStringCpp* _tmPf2 = SC_Cpp_StreamChild(self, JB_LUB[1887]);
 	self->ModuleProperties = JB_Incr(_tmPf2);
 	SC_Cpp__Init();
 }
