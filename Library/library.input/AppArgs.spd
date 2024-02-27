@@ -51,19 +51,19 @@ function Message.ArgValue (|string|)
 
 
 
-helper @int.MainArg			(|int| Pos, |string| name,  |int|)
+helper @int.MainArg         (|int| Pos, |string| name,  |int|)
 	return string.MainArgSub(Pos, name, "integer")$.int
 
-helper @bool.MainArg		(|int| Pos, |string| name,  |bool|)
+helper @bool.MainArg        (|int| Pos, |string| name,  |bool|)
 	return string.MainArgSub(Pos, name, "boolean")$.Yes
 
-helper @string.MainArg		(|int| Pos, |string| name, |string|)
+helper @string.MainArg      (|int| Pos, |string| name, |string|)
 	return string.MainArgSub(Pos, name, "string")
 
-helper @message.MainArg		(|int| Pos, |string| name, |message|)
+helper @message.MainArg     (|int| Pos, |string| name, |message|)
 	return string.MainArgSub(Pos, name, "jeebox")$.parse
 
-helper @float.MainArg		(|int| Pos, |string| name, |f64|)
+helper @float.MainArg       (|int| Pos, |string| name, |f64|)
 	return string.MainArgSub(Pos, name, "float")$.float
 
 helper @file.MainArg		(|int| Pos, |string| name, |file|)
@@ -72,13 +72,13 @@ helper @file.MainArg		(|int| Pos, |string| name, |file|)
 helper @ExistingFile.MainArg (|int| Pos, |string| name, |file|)
 	return string.MainArgSub(Pos, name, "file-path")$.FileThatExists
 
-helper @FileData.MainArg	(|int| Pos, |string| name, |stringthatwasreadsafely|)
+helper @FileData.MainArg     (|int| Pos, |string| name, |stringthatwasreadsafely|)
 	return ExistingFile.MainArg(pos, name)$.ReadAll
 
-helper @JeeboxFile.MainArg	(|int| Pos, |string| name, |messageroot|)
+helper @JeeboxFile.MainArg   (|int| Pos, |string| name, |messageroot|)
 	return ExistingFile.MainArg(pos, name)$.parse
 
-helper @OutputFile.MainArg	(|int| Pos, |string| name, |faststring|)
+helper @OutputFile.MainArg   (|int| Pos, |string| name, |faststring|)
 	return file.MainArg(pos, name)$.Out
 
 
@@ -90,8 +90,8 @@ helper @OutputFile.MainArg	(|int| Pos, |string| name, |faststring|)
 //			module file.Data: helper MainArg (...)
 
 role ExistingFile (file)
-role FileData     (file)
 role JeeboxFile   (file)
+role FileData     (stringthatwasreadsafely)
 role OutputFile   (faststring)
 
 

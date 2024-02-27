@@ -10,8 +10,7 @@
 	* int upgrading needs fix
 	* logging huge stdout super slow (parsing/recolorising each line?)
 
-	* main (|filedata| a) not compiling OK
-		* |dictionary|			Types = ["spd":"x"] // doesnt compile.
+	* |dictionary|			Types = ["spd":"x"] // doesnt compile.
 
 	
 	* picomsg is now crashing or failing on constructor
