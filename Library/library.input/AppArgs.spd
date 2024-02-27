@@ -40,11 +40,13 @@ role AppArgument (object)
 
 
 function Message.ArgName (|string|)
+	opt norefcounts
 	require self == @item
 	return .firstname.lowercase
 
 
 function Message.ArgValue (|string|)
+	opt norefcounts
 	if (self == @item)
 		return .second.name_ ?? "true"
 	return .name
