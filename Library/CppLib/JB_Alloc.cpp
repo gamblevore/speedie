@@ -26,7 +26,7 @@
 extern "C" {
 
 int RefTrap = 0;
-bool DoTotalMemoryTest=true;
+bool DoTotalMemoryTest=false;
 
 inline void failed(const char* c) {
 	printf("jbmem error: %s\n", c);
@@ -565,11 +565,11 @@ Sanity(NewBlock);
 }
 
 
-void JB_TotalMemorySet(bool b)  {
+void JB_DebugAllMemory(bool b)  {
 	DoTotalMemoryTest = b;
 }
 
-bool JB_TotalMemorySanity(bool Force) {
+bool JB_TotalSanity(bool Force) {
 	if (!Force and !DoTotalMemoryTest)
 		return true;
 	auto cls = AllClasses;

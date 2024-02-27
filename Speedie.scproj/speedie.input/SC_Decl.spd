@@ -686,8 +686,9 @@ class SCDecl (SCObject) {
 
 		rz = @type.msg(":)")
 		// (s) --> (s|bool|)
-
-		exp.ReplaceWith( rz )
+		
+		exp.prev = rz
+		
 		rz <~ exp
 		rz <~ .WriteType
 		rz.obj = self

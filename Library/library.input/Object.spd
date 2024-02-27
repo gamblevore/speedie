@@ -106,14 +106,19 @@ class Object
 		cpp_part Warn
 		errorreceiver.Newwarning( self )
 	
-
+	
+	function MemorySanity
+		|| r = .refcount
+		if r < 0 or r > 100000 // sigh
+		
 	module
 		function DebugAllMemory (assigns:|bool|)
-			cpp_wrapper JB_TotalMemorySet
-		function TotalSanity (|bool| Force=true, |bool|)
+			cpp_wrapper JB_DebugAllMemory
+		function TotalSanity (|bool| Force=false, |bool|)
 			target debug
-				cpp_wrapper JB_TotalMemorySanity
+				cpp_wrapper JB_TotalSanity
 			// something like that?
+
 
 struct ClassData
 	linkage

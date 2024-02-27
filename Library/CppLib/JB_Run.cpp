@@ -206,7 +206,7 @@ int JB_LibInit (_cstring* R, bool IsThread) {
 	if (Err)
 		return Err;
     #if DEBUG
-	JB_TotalMemorySanity(true);
+	JB_TotalSanity(true);
 	#endif
 	return 0;
 }

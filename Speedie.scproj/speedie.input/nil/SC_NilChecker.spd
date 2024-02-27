@@ -9,6 +9,7 @@ extend_module ArchonPurger {
 		@tmp:   StatementJump
 		@dot:	Property
 		@acc:	Access
+		@item:	Item
 		@brel:	brel
 		@arel:	arel
 		@rel:	Rel
@@ -115,6 +116,10 @@ function List (NilTrackerFn)
 	for s in msg
 		.jump(s)
 	return nilstate.Real
+
+
+function Item (NilTrackerFn)
+	return .jump(msg.last!, test)
 
 
 function Access (NilTrackerFn)

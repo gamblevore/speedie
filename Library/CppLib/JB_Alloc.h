@@ -283,7 +283,7 @@ void JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls );
 void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size);
 void JB_Class_SetIndex(JB_Class* cls, int i);
 int JB_Class_Index(JB_Class* cls);
-void JB_TotalMemorySet(bool b);
+void JB_DebugAllMemory(bool b);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -336,13 +336,14 @@ u32 JB_ObjCount();
     #define JBTestSanityOK 0
 #endif
 
-bool JB_TotalMemorySanity(bool Force);
+bool JB_TotalSanity(bool Force);
 extern JB_Class ProcessData;
 
 
 inline JB_Object* JB_Incr_(JB_Object* self) {
     if (self) {
 		JBObjRefTest(self);
+		JB_TotalSanity(false);
         self->RefCount++;
     }
     return self;
@@ -351,6 +352,7 @@ inline JB_Object* JB_Incr_(JB_Object* self) {
 inline void JB_Decr(JB_Object* self) {
     if ( self ) {
 		JBObjRefTest(self);
+		JB_TotalSanity(false);
         int N = --self->RefCount; 
         if (!N)
             JB_Delete( (FreeObject*)self );

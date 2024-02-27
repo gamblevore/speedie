@@ -265,7 +265,7 @@ function TypeOfThg (ExprResolver)
 
 
 function TypeOfBra (ExprResolver)
-	opt norefcounts
+//	opt norefcounts // needs to stay. typeofdot can destroy nodes???
 	|| c0 = exp.first
 	if (c0 == @arg)
 		return typeofBlock(c0, name_space, side)
@@ -1680,7 +1680,6 @@ function DotFuncToNormalFunc (|Message| dot, |SCFunction| fn)
 
 
 function SCDecl.ProcessAs (|Message!| msg, |SCDecl|)
-	debugat 17
 	|| P = msg.parent!.unbra
 	if (P isBrel "&")					 // :)
 		return self
