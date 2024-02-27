@@ -8,11 +8,9 @@
 
 * Do nil checker!
 	* int upgrading needs fix
-	* |dictionary|			Types = ["spd":"x"]					// doesnt compile.	
-	* picomsg is now crashing or failing on constructor
-		* speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
-		* speedie stops compiling sometimes, from perry
-		* pico needs a massive bloat bastard constructor/destructor test!!! like 8 threads bastardly creating/destroying picos!
+	* pico needs more testing
+		* Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
+		* Speedie stops compiling sometimes, from perry
 	* galaxxies crashing
 
 

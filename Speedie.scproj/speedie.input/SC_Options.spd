@@ -174,8 +174,8 @@ module Feedback
 				app.quit("Unknown switch '$Name'\n")
 		  elseif value.isjbin // ignore it
 			0 // probably a restart compile option
-		  elseif (options.OperationCount == 1) and !options.output_path
-			feedback.AppOptions_output_path("output_path", value) // change to output_path
+		  elseif (options.OperationCount == 1)
+			error ("Too many input projects: " + value)
 		  else
 			.TryUseProject(Value)
 			options.OperationCount++
