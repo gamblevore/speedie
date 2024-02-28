@@ -111,6 +111,7 @@ class Image (memory)
 		.WindowBase   = (0, 0)
 		._ControlClip = (0, 0, .size)
 	
+	function No
 	
 	function Horz (assigns:|ivec2|r)
 		._controlclip.x = r.x
@@ -505,7 +506,7 @@ class Image (memory)
 				*sigh = color
 
 
-	function RectOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| bg=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.all)
+	function RectOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.all)
 		require Edge.a
 		// not sure why this is so complicated.
 		// did I do something wrong? is all my code off by 1 or something?
@@ -514,19 +515,19 @@ class Image (memory)
 		// sigh.
 
 		|| P = r.x2y1+(-1,1)
-		|| C = (edge, bg)(AllowEdge is right)
+		|| C = (edge, attached_edge)(AllowEdge is right)
 		.DrawLineV(P, r.height-2, C)
 		
 		P = r.x1y1+(0,1)
-		C = (edge, bg)(AllowEdge is left)
+		C = (edge, attached_edge)(AllowEdge is left)
 		.DrawLineV(P,  r.height-2, C)
 		
 		P = r.x1y2+(0,-1)
-		C = (edge, bg)(AllowEdge is top)
+		C = (edge, attached_edge)(AllowEdge is top)
 		.DrawLineH(P,  r.width,  C)
 		
 		P = r.x1y1
-		C = (edge, bg)(AllowEdge is bottom)
+		C = (edge, attached_edge)(AllowEdge is bottom)
 		.DrawLineH(P,  r.width,  C)
 
 

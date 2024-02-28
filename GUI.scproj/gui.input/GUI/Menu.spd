@@ -5,6 +5,7 @@ class Menu (ListView)
 	|ListViewrow?|						EditingRow // 
 	|bool|								DelayedOpen
 	|bool|								NoCloseOnClick
+	|bool|								IsSearchMenu
 	
 	
 	constructor (|guicontrol| p, |GUIKeyEvent| keys, |GUIListEvent| ret)
@@ -104,7 +105,8 @@ class Menu (ListView)
 	function CloseMenu 
 		opt norefcounts
 		.selectNone
-		.StopFilter
+		if !.IsSearchMenu
+			.StopFilter
 		.UpdateFilter
 		isnt visible
 		.EditingRow = nil

@@ -170,8 +170,10 @@ class FileViewer (ListView)
 
 
 	function ErrorAt (|error| e)
-		with self[e.path]
-			.HasError = true
+		|| f = self[e.path]
+		while f and f != .ListSource
+			f.HasError = true
+			f = f.Parent
 
 			
 	function ClearErrors

@@ -1517,9 +1517,29 @@ class TextView (GUIControl)
 			.DrawSel(where)
 		where.ControlClip = c			/// restore!
 		if !.CanSeeAllLines and sel
+			if .myerror
+				.drawscrollerrors(where)
 			scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer)
 	
-			
+	
+	helper DrawScrollErrors (|image| where)
+		opt norefcounts
+		|float| N = ._lines.last!.vline
+		for s in ._lines
+			|| E = s.drawerror
+				|float| v = s.vline
+				|| Y = 1.0 - (v/n)
+				Y *= .height
+				|| p = ivec2(.right - 9, .lastrect.y + Y)
+				|| C = colors.red(0.8)
+				if !E.isbad
+					C = colors.yellow(0.8)
+				for 2
+					where.drawlineH(p, 8, C)
+					C.a *= 0.5
+					p.y--
+	
+		
 	helper DrawPreparedText (|image| where)
 		opt norefcounts
 		|| d		= .StartLine

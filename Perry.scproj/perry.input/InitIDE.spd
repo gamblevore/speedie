@@ -99,6 +99,7 @@ extend PerryIDE
 			.size 			= the~width  by  15~down
 			.gnormal.solid	= vec4(0.077, 0.95)
 
+
 		with .FileList
 			.IsMainListView = true
 			.tooltip		= "Displays files in project"
@@ -122,6 +123,7 @@ extend PerryIDE
 			.OneAlwaysSelected = true
 			.SetFocus
 			.Init
+	
 	
 		with .EditMe
 			is   enabled
@@ -147,7 +149,9 @@ extend PerryIDE
 			is TypeThrough
 			isnt visible
 
+
 		with .errorlist
+			.Headers = ListViewRow("", listviewstate.aligncenter)
 			.IsMainListView = true
 			.tooltip = "Displays Compile Errors. Press \1f< or \1f> to step in list."
 			.GNormal.Solid = LeftBG
@@ -223,7 +227,7 @@ extend PerryIDE
 			is   UnSearchable
 			isnt DrawsFocus
 			.IsMainListView = true
-			.RowHeight += 3
+			.RowHeight		= .rowheight + 3
 			.IsTree	= true
 			.NoSeps	= true
 			.tooltip		= self.SearchArea.Tooltip			
@@ -505,7 +509,7 @@ extend PerryIDE
 			.AlwaysSendChangeEvent = true
 			.copypaste	   |= copypasteflags.copytext
 			.gnormal.edge	= .gnormal.bg
-			.rowheight	   *= 2
+			.rowheight	    = .rowheight * 2
 
 
 	function AddViewButton (|ButtonView| BTN, |string| Oof, |guicontrol| tag)

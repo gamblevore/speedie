@@ -21,7 +21,8 @@ class Selector
 	syntax cast (|uint16|)
 		cpp_part U16Cast
 		return .ID
-	function Idee (|int|)
+	function ID (|int|)
+		nil safe
 		if (self)
 			return .id
 	

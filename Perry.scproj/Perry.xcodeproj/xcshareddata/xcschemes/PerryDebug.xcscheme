@@ -58,6 +58,10 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "inferno.spd"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/usr/local/speedie/Perry.scproj/"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

@@ -29,6 +29,7 @@ class ListView (GUIControl) {
 	|ListViewCell?|					MouseDownCell
 	|ListViewrow?|					DraggingRowFrom
 	|ListViewrow|					ListSource
+	|listviewrow?| 					Headers
 	|string|						ColumnInfo
 	|menu?|							CMM
 	|DrawStyle|						gRowSel 
@@ -148,7 +149,10 @@ class ListView (GUIControl) {
 
 
 	function DesiredHeight (|int|)
-		return 2 + ((.ListSource.SlowCount max 2) * .RowHeight) 
+		opt norefcounts
+		rz = 2 + ((.ListSource.SlowCount max 2) * .RowHeight)
+		|| t = .typingfilter
+			rz += t.height - 1 
 
 
 	function Col (|int| col,  |ivec4| z2, |ListViewrow| sc, |intrange|)
@@ -331,7 +335,7 @@ class ListView (GUIControl) {
 		return true
 	
 	
-	helper NeedShrinker (|textview|)
+	helper NeedFilter (|textview|)
 		opt norefcounts
 		rz = .TypingFilter
 		if rz
@@ -342,13 +346,13 @@ class ListView (GUIControl) {
 		rz.gnormal.bg = (0.1,0.1,0.1,1.0)
 		rz.gnormal.edge = .gnormal.edge
 		(rz is editable)
-		rz.size = the~width by (.rowheight+2)~down
+		rz.size = the~width by (15)~down
 	
 	
 	behaviour TypedString
 		opt norefcounts
 		if .OnTypingFilter
-			|| t = .NeedShrinker
+			|| t = .NeedFilter
 			t.TypedString(input)
 			return .UpdateFilter
 
@@ -361,9 +365,8 @@ class ListView (GUIControl) {
 			str = tf.text
 		(t)(self, nil, str)
 		.touch
-		if .TypingFilter
-			if self isa menu
-				.Sizer.g(1) = .DesiredHeight~long
+		if tf and self isa menu
+			.Sizer.g(1) = .DesiredHeight~long
 		if .selectablecount == 1
 			.SelectFirst
 		return true
@@ -374,8 +377,9 @@ class ListView (GUIControl) {
 		if .KeyDownTest(key) or (.OnKeydown)(self, key)?
 			.editdelayed = nil
 			return true
-		if (keys.cmd and !key.iscmd) and .typingfilter
-			return .typingfilter!.__keydown__(key)
+		|| tf = .TypingFilter
+			if (keys.cmd and !key.iscmd)
+				return tf.__keydown__(key)
 			
 			
 			
@@ -1129,9 +1133,9 @@ class ListView (GUIControl) {
 	
 	helper FindClickedMenu (|int| y, |ListViewRow|)
 		opt norefcounts
-		if y <= .absbottom
+		if y <= .AbsBottom
 			return .bmove(.LastVisible$, 1)
-		if y > .abstop
+		if y > .AbsTop
 			return .bmove(._scroll$, -1)
 		|| c = .FindClickedCell((0,y))
 			return c.row
@@ -1144,20 +1148,26 @@ class ListView (GUIControl) {
 		
 
 	function FilterText (|string|)
+		opt norefcounts
 		|| t = .TypingFilter
 			rz = t.text
 
 
-	helper FilteredRect (|ivec4|)
+	helper ActualRect (|ivec4|)
+		opt norefcounts
 		rz = .lastrect
 		|| t = .typingfilter
-		if t and (._Scroll isnt Disabled)
-			rz.y2 = rz.y2 - (t.height)
+			rz.y2 -= t.height-1
+		if .Headers
+			rz.y2 -= .HeaderHeight
+			
+	helper HeaderHeight (|int|)
+		return 19
 	
 	
 	helper FindClickedCell (|ivec2| Search, |ListViewCell|)
 		opt NoRefCounts
-		|| r = .FilteredRect
+		|| r = .ActualRect
 		|| x = search.x - r.x
 		
 		for sc.visible in self
@@ -1229,7 +1239,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		require find
 		
-		|| s	= .FilteredRect
+		|| s	= .ActualRect
 		|| low	= s.y1
 		|| top	= s.y2 + .scrollshift - .rowheight
 		while curr != find
@@ -1285,7 +1295,7 @@ class ListView (GUIControl) {
 
 
 	function DrawMarks (|image| Where,  |ivec4| Rect)
-		where.clearmarks(rect)
+		where.clearmarks(.lastrect)
 		.DrawBordersSub(where, rect)
 		|| bg		= .gnormal.bg
 		|| focus	= .gRowSel.bg
@@ -1297,7 +1307,7 @@ class ListView (GUIControl) {
 		unfoc.a		= focuscol.a
 		unfoc		= mix(focuscol, unfoc, 0.667)
 		unfoc.a += 0.2
-		where.fillmarks(rect ± 1, bgcol, .gnormal.seps, focuscol, unfoc)
+		where.fillmarks(.lastrect ± 1, bgcol, .gnormal.seps, focuscol, unfoc)
 
 			
 	behaviour MouseWheel
@@ -1362,26 +1372,36 @@ class ListView (GUIControl) {
 		return !rem
 
 
+	function DrawHeaders (|image| where, |ivec4| rect)
+		opt NoRefCounts
+		|| l = .headers
+			rect.y = rect.y2
+			rect.y2 = .lastrect.y2
+			l.ListRowDraw(Where, rect, self, 0)
+
+
 	behaviour Draw
 		opt NoRefCounts
 		|| c = (.CalculateColumnWidths) ?? (DefaultColumnWidths)
 		(c)(self, nil) // allow the thing to calculate the column widths before draw
 		.ScrollProtect
 		
-		|| rect = .FilteredRect
+		|| clip = where.ControlClip
+		|| rect = .ActualRect
 		|| L = .ListSource
 		
 		.CalculateSkips
 		.DrawMarks(where, rect)
+		.drawheaders(where, rect)
 		
 		rect.y2 += .ScrollSlide
 		|| End = .End
 		
-		|| clip = where.ControlClip
+		
 		for r.visible in self
 			rect.y = rect.y2 - .RowHeight
 			|| D = (r.depth(self), 0)(.IsTree)
-			r.ListRowDraw(rect, Where, self, D)
+			r.ListRowDraw(Where, rect, self, D)
 			rect.y2 = rect.y
 			.CanSeeAllLines = (r == end and .start == ._scroll)
 
@@ -1392,7 +1412,7 @@ class ListView (GUIControl) {
 
 		|| re = .RowBounds(._scroll, .DraggingRowTo, 1)
 			re = re up .rowheight
-			ifn .draggingrowto.prev
+			if !.draggingrowto.prev
 				re = re down 2
 			where.RectStyled(re, ¥.border)
 		

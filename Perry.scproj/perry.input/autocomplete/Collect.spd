@@ -137,9 +137,9 @@ function PerryIDE.ActualCompile (|message| msg)
 
 target debug
 	cpp_libwrapper Speedie_Main (SpdMainFn)
-	|SpdMainFn| Speedie_Checker = Speedie_Main
-	|SpdMainFn| Speedie_Compiler = Speedie_Main
+	|SpdMainFn?| Speedie_Checker = Speedie_Main
+	|SpdMainFn?| Speedie_Compiler = Speedie_Main
   else
-	|SpdMainFn| Speedie_Checker = nil
-	|SpdMainFn| Speedie_Compiler = nil
+	|SpdMainFn?| Speedie_Checker = nil
+	|SpdMainFn?| Speedie_Compiler = nil
 

@@ -186,14 +186,14 @@ class Window (GUIControl)
 		|| l = .MainlistView
 		if !l
 			return true
-		// OK... so the mainlistview... now what?
+
 		|| Item = l.FirstSelected
 		if keys.shift
 			fwd = !fwd
 		if !Item
 			item = (L.start, l.end)(fwd)
 		  else
-			item = item.loop(fwd, nil)
+			item = l.HierStep(item, fwd)
 		L.select(item)
 		
 		return true

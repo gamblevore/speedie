@@ -45,12 +45,6 @@ function perryide.AddToJumpHistory
 	.EnablePrevNext
 	
 
-function perryide.DebugPop (|string| s)
-	printline s
-	.DisplayInPopup(s, true)
-	.PopupDisplay.size = 300~left by 20~inside
-
-
 function RightClickNext (GUIaction)
 	if self isa ButtonView
 		|| s = .SubMenu

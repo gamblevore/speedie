@@ -439,6 +439,7 @@ function ErrorListPaste (guipasteevent)
 	for e in errs
 		if e == @tmp
 			L <~ error.from(e)
+	i.updateerrorcount
 	i.noneed
 
 /*

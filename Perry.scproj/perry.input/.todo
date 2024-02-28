@@ -7,6 +7,7 @@
 
 
 * Do nil checker!
+	* nil reporting way off sometimes, especially on constructors
 	* int upgrading needs fix
 	* Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 		* Speedie stops compiling sometimes, from perry
@@ -21,11 +22,7 @@
 
 						 Perry Do later
 
-* listview should have a "header"
-	* error count should be listed in GUI
-* errors should bubble up the folders
-	* and display in scroll
-* colormark unused funcs in editor
+* mark unused funcs in editor colored
 	* mouseover errors in editor, should put them in a popup
 * Multiple fwd/back funcs per-file would be nice, at least from right-click jumps, cmd-L and other jumps
 	* having a func-name per-point is nice
