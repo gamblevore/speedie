@@ -460,24 +460,29 @@ class RingTree (Saveable)
 		parent.first = self // smallest
 
 
-	function Loop (|bool| dir, || flat=nil, ||)
+	function Loop (|bool| dir, || Owner=nil, |...!|)
+		description "Owner must be nil... or contain us. Otherwise this function will break."
 		opt norefcounts
-		if !flat
-			|| p = .parent
+		real self
+		if Owner
 			if dir
-				return .next ?? p.first
-			return .prev ?? p.last
-		  else
-			if dir
-				return .FlatNext ?? flat.first
-			return .flatPrev ?? flat.FlatLast
-
+				return .FlatNext ?? Owner.first!
+			return .flatPrev ?? Owner.FlatLast!
+		
+		|| p = .parent
+		if !p
+			return self
+		if dir
+			return .next ?? p.first!
+		return .prev ?? p.last!
 	
-	function Upward (|int| n, ||)
+	
+	function Upward (|int| n, |...?|)
 		opt norefcounts
 		while self and n-- >= 1
 			self = .parent
 		return self
+
 
 	iterator
 		|| ch_ = .First

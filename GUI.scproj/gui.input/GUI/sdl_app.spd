@@ -782,19 +782,19 @@ module SDLApp
 
 
 	function StandardKeys (|keys| key, |bool|)
-		|| w = __modules__.window.front	#require
-		|| g = w.realfocus
+		|| w = __modules__.window.front						#require
+		|| rf = w.realfocus
 			if keys.cmd
 				if (key is g)
-					if !g.__Search__(sdlapp.lastsearch, false)
+					if !rf.__Search__(sdlapp.lastsearch, false)
 						beep
 					return true
 				if (key is f) and !(keys.shift or keys.option)
-					return g.OpenSearch
+					return rf.OpenSearch
 			  elseif (key is find or AC_SEARCH)
-				return g.OpenSearch
+				return rf.OpenSearch
 
-		|| gw = g ?? w
+		|| gw = rf ?? w
 		if keys.cmd
 			if (key is PLUS or EQUALS)
 				return .Rescale(.scale+0.5)
@@ -805,6 +805,10 @@ module SDLApp
 				return true
 			if (key is l) and keys.shift
 				JB_Mem_ClassLeakCounter()
+			if (key is squote)
+				return w.DoListViewNext(true)
+			if (key is semicolon)
+				return w.DoListViewNext(false)
 			if (key is c)
 				return gw.DoCopy
 			if (key is v)

@@ -235,7 +235,7 @@ function PerryIDE.ShowErrors (|bool| FromKeys, |bool|)
 	if !.isviewing(.errorlist)
 		ClickedAView(.ViewErrors)
 	  elseif .errorlist.hasany
-		.ShowNextError
+		.errorlist.selectatleastfirst
 	  else
 		ClickedAView(.Viewfiles)
 	
@@ -246,8 +246,9 @@ function ClickedAView (GUIaction)
 	opt norefcounts
 	if self isa ButtonView
 		|| i = .ide!
-		if (i.errorlist is visible) and .tag == i.errorlist
-			i.ShowNextError(0)
+		|| el = i.errorlist
+		if (el is visible) and .tag == el
+			el.SelectAtleastFirst
 		i.view(self)
 
 

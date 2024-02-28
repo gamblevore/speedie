@@ -219,7 +219,7 @@ class TextView (GUIControl)
 			return
 		
 		ifn .lastrect.vert contains p.y
-			.ViewPos(b)
+			.show(b)
 		
 		|| t = .UncorrectedSel
 		if keys.shift or (clicks == -1)
@@ -398,7 +398,7 @@ class TextView (GUIControl)
 				x--
 		  else
 			t = (x, x)
-		|| d = .ViewPos(x)
+		|| d = .show(x)
 		.preferprevline = fwd and (!d.emptyline or !d.EndsWithLine) 
 		.sel2(t,d)
 		return true
@@ -423,10 +423,9 @@ class TextView (GUIControl)
 
 
 	function ShowTypingPlace (|ivec2| r)
-		|| n = .MaxVisibleLines/2
 		if r.width
-			.ViewPos(r.x, n)
-		.ViewPos(r.x2, n)
+			.show(r.x)
+		.show(r.x2)
 
 
 	function CurrLine (|int|)

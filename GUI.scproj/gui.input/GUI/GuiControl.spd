@@ -144,6 +144,7 @@ class GUIControl (ringtree)
 
 	helper NextFocus (|bool| dir, |bool| force, |guicontrol|)
 		opt NoRefCounts
+		real self
 		|| c = self
 		|| w = .window
 		

@@ -40,7 +40,7 @@ class PerryIDE (Window)
 	|menu|						AutoComplete	// ... todo
 //	|ListView|					Variables		// ... todo
 	|ListView|					ErrorList
-	|listview|					LogArea
+	|listview|					CommsLogList
 	|ListView|					FoundList
 	|textview| 					DebugArgsList
 	|Guicontrol of buttonview|	ViewButtons
@@ -486,30 +486,6 @@ class PerryIDE (Window)
 		if .IsSingleFileProject
 			f.write("")
 				
-			
-		
-	function ShowNextError (|int| dir=1, |bool|)
-		opt norefcounts
-		|| L = .ErrorList
-		if !dir and !L.listsource.hasany
-			return true
-		
-		|| Err = l.FirstSelected
-		if keys.shift
-			dir = -dir
-		if err and dir
-			err = err.loop(dir>0, nil)
-		if !err
-			err = (L.start, l.end)(dir>0)
-		if err
-			L.select(err)
-		  else
-			err = .editme.myerror
-			if err isa error
-				.ClickedError(err)
-		
-		return true
-
 
 	function ShowFind (|bool|)
 		.retextsubfind
@@ -540,8 +516,6 @@ class PerryIDE (Window)
 			return ClickedPrevNext(.goprev)
 		if key is period
 			return ClickedPrevNext(.gonext)
-		if key is squote
-			return .ShowNextError
 		if key is r
 			if keys.Shift
 				PressingDebug(.runbutton)
@@ -747,7 +721,7 @@ class PerryIDE (Window)
 					if jump and (!jumpto or err == lst.FirstSelected)
 						jumpto = err
 				if actual_compile
-					.logarea <~ err.copy
+					.CommsLogList <~ err.copy
 				.filelist.ErrorAt(err)
 				
 		if jumpto
@@ -758,7 +732,7 @@ class PerryIDE (Window)
 				lst.select(src.first)
 		(self is broken) = ActualErrors > 0
 		.RelistStartupErrors
-		.logarea.listsource.keep(144)
+		.CommsLogList.listsource.keep(144)
 
 
 	function EditRow (|listviewrow| r, |int|)

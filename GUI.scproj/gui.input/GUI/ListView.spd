@@ -8,6 +8,7 @@ class ListView (GUIControl) {
 	|byte|							ColumnCount
 	|byte|							ScrollRealigner
 	|bool|							IsEditing
+	|bool|							IsMainListView
 	|bool|							SelJustChanged
 	|bool|							RightClickSelects
 	|bool|							MultiSelection
@@ -906,6 +907,10 @@ class ListView (GUIControl) {
 		(sel is expanded) = Expand
 		return true
 
+
+	function SelectAtleastFirst	
+		if !.firstselected
+			.select(.start)
 
 	function Selected (|ListViewRow|)
 		disabled "Do you mean .FirstSelected or .LastSelected?"

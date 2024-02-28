@@ -8,8 +8,7 @@
 
 * Do nil checker!
 	* int upgrading needs fix
-	* pico needs more testing
-		* Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
+	* Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 		* Speedie stops compiling sometimes, from perry
 
 
@@ -22,19 +21,16 @@
 
 						 Perry Do later
 
-* GUI should have a "current list" listview that can be stepped through using <> keys... and its just the visible front one.
-* error count should be listed in GUI
-	* listview should have a "header"
-	* errors should bubble up the folders
+* listview should have a "header"
+	* error count should be listed in GUI
+* errors should bubble up the folders
 	* and display in scroll
-* moving arrow in unseen lines, should jump to 1/3 of visibility... as expected
 * colormark unused funcs in editor
 	* mouseover errors in editor, should put them in a popup
 * Multiple fwd/back funcs per-file would be nice, at least from right-click jumps, cmd-L and other jumps
 	* having a func-name per-point is nice
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
 	* What about decls? perhaps just relative to a node?
-* too long text in listview draw as much as we can
 
 
 						 Speedie Do later
@@ -44,6 +40,7 @@
 * params should be assumed real!
 	* upgrade optional returns to real? (if possible)
 	* started optional returns must return both values!! (unless a prototype)
+* pico needs more testing
 
 
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
@@ -52,7 +49,6 @@
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
 * To make "dispatch" clickable, we need to alter MoveToInitFunc, so we have an init func per module per file.
-* galaxxies C++ compile issues
 * RefOpts. Do it bit by bit
 	* get property but only did math
 	* mark a few string funcs as not-modifier/disowner/capturer
@@ -62,6 +58,7 @@
 
 						 Perry additions
 
+* too long text in listview draw as much as we can
 * add image editor...
 * skinning support? .HelloKitty or .emo file endings could reskin the IDE dynamically.
 	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order...  that can't just be commented out.

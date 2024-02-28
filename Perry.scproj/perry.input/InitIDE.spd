@@ -28,7 +28,7 @@ extend PerryIDE
 		.SubFindCheckBox	= ButtonView(.searcharea, PressedSearchWithin   	)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList) 
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
-		.LogArea			= ListView(self,		nil,					nil)
+		.CommsLogList		= ListView(self,		nil,					nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
 		.DrawMe				= GraphicsEditor(self)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
@@ -47,7 +47,7 @@ extend PerryIDE
 		.ViewDebugger		= ButtonView(.ViewButtons,		ClickedAView)
 		.ViewErrors			= ButtonView(.ViewButtons,		ClickedAView)
 		.viewlog			= ButtonView(.ViewButtons,		clickedaview)
-		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .logarea]
+		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .CommsLogList]
 		.filesep			= StretchControl.horz(self, 175~right, 110, 110)
 		.ProductSep			= StretchControl.vert(self, 0~right,     0,   100)
 		.PopupDisplay		= textview(self)
@@ -100,6 +100,7 @@ extend PerryIDE
 			.gnormal.solid	= vec4(0.077, 0.95)
 
 		with .FileList
+			.IsMainListView = true
 			.tooltip		= "Displays files in project"
 			.folfile		= ".perry"
 			.takesfocus 	= takesfocusflag.CanFocus
@@ -147,6 +148,7 @@ extend PerryIDE
 			isnt visible
 
 		with .errorlist
+			.IsMainListView = true
 			.tooltip = "Displays Compile Errors. Press \1f< or \1f> to step in list."
 			.GNormal.Solid = LeftBG
 			.onpaste = ErrorListPaste
@@ -155,12 +157,13 @@ extend PerryIDE
 			.copypaste	   |= copypasteflags.CopyText
 			
 		
-		with .logArea
+		with .CommsLogList
+			.IsMainListView = true
 			.GNormal.Solid = LeftBG
 		
 		
 		.ErrorLogInit(.Errorlist, "ErrorList" )
-		.ErrorLogInit(.LogArea,   "LogArea" )
+		.ErrorLogInit(.CommsLogList,   "LogArea" )
 
 		with .NoNeeder 
 			.takesfocus 	= 0
@@ -219,8 +222,8 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
+			.IsMainListView = true
 			.RowHeight += 3
-//			.RowAscendHeight += 2
 			.IsTree	= true
 			.NoSeps	= true
 			.tooltip		= self.SearchArea.Tooltip			
@@ -307,7 +310,7 @@ extend PerryIDE
 			.addHigh self.ProductSep
 			.addlow  self.ViewButtons
 			.addlow  self.ErrorList
-			.addlow  self.LogArea
+			.addlow  self.CommsLogList
 			.addlow  self.debugger
 			.addlow  self.SearchArea
 			.addlow  self.FileList
@@ -393,7 +396,7 @@ extend PerryIDE
 		.AddViewButton(.viewerrors,		"\17",	.errorlist)
 		.AddViewButton(.viewdebugger,	"\18",	.debugger)
 		if app.Prefs["dev"]
-			.AddViewButton(.viewlog,		"\0D",	.logarea)
+			.AddViewButton(.viewlog,		"\0D",	.CommsLogList)
 
 		.viewfiles.left = 5 ~ right
 		.view(.Viewfiles)
@@ -453,7 +456,7 @@ extend PerryIDE
 		
 		
 	function SetupLogArea
-		|| g = .LogArea
+		|| g = .CommsLogList
 		g.istree = true
 		g.id = "log"
 		require !app.prefs["nolog"]
@@ -466,7 +469,7 @@ extend PerryIDE
 	
 	function AddBaseLog (|string| s, |listviewrow|)
 		rz = @arg + s
-		.logarea.listsource <~ rz
+		.CommsLogList.listsource <~ rz
 		(rz is expanded)
 		(rz is aligncenter)
 

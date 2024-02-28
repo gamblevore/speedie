@@ -181,7 +181,39 @@ class Window (GUIControl)
 													// probably would make more sense to do it the other way!
 													// missing keydown events send typedstring events
 	
+	helper DoListViewNext (|bool| fwd, |bool|)
+		opt norefcounts
+		|| l = .MainlistView
+		if !l
+			return true
+		// OK... so the mainlistview... now what?
+		|| Item = l.FirstSelected
+		if keys.shift
+			fwd = !fwd
+		if !Item
+			item = (L.start, l.end)(fwd)
+		  else
+			item = item.loop(fwd, nil)
+		L.select(item)
 		
+		return true
+	
+	
+	function MainlistView (|listview|)
+		opt norefcounts
+		|| s = .flatnext
+		|| e = .flatafter
+		while s and s != e
+			if !s.isviewable
+				s = s.flatafter
+				continue
+			if (s isa listview) and !(s isa menu)
+				if s.IsMainListView
+					rz = s
+				
+			s = s.flatnext
+			
+	
 	behaviour KeyDown
 		debug_require !.BlockRecurseKeyDown
 		.BlockRecurseKeyDown = true
