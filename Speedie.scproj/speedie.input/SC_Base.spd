@@ -17,7 +17,7 @@ linkage
 |(Dictionary of scobject)?|			Access
 |String|							ExportName
 |SCBase--?|							Parent
-|SCBase--?|							CurrReacher
+|SCBase--?|							MyReacher
 |SCImport--?|						Project
 
 
@@ -627,11 +627,11 @@ function SetExportName (|String| s, |bool| Explicit)
 
 
 function SCFunction.NeedsExport (|bool|)
-	Return  (.currreacher) or .isapi
+	Return  (.MyReacher) or .isapi
 
 
 function NeedsExport (|bool|)
-	Return  (.currreacher)
+	Return  (.MyReacher)
 
 
 function message.InsideFunc (|SCFunction|) //owningfunc, infunc

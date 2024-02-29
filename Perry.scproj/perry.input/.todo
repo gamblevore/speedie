@@ -6,12 +6,18 @@
 	* use 256 VM codes? Only a few need all 25 bits.
 
 
-* Do nil checker!
-	* nil reporting way off sometimes, especially on constructors
-	* int upgrading needs fix
-	* Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
-		* Speedie stops compiling sometimes, from perry
+* mouseover errors in editor, should put them in a popup
+* typing in function-list doesnt shrink it.
+	* typethrough also disabled
+* can't right-click on functions?? but cntrl/section works?
+* mark unused funcs in editor colored
+* Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
+	* Speedie stops compiling sometimes, from perry
 
+* nil reporting way off sometimes, especially on constructors
+	* function Loop (|bool| dir, || Owner=nil, |...!|) checked wrongly
+
+* int upgrading needs fix
 
 
 * change allocator to use unified allocator?
@@ -22,8 +28,6 @@
 
 						 Perry Do later
 
-* mark unused funcs in editor colored
-	* mouseover errors in editor, should put them in a popup
 * Multiple fwd/back funcs per-file would be nice, at least from right-click jumps, cmd-L and other jumps
 	* having a func-name per-point is nice
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
@@ -33,7 +37,6 @@
 						 Speedie Do later
 
 * doc examples should all (or mostly) come with "main" :) so be runnable!
-* speedie not listing all the constructors on Error()
 * params should be assumed real!
 	* upgrade optional returns to real? (if possible)
 	* started optional returns must return both values!! (unless a prototype)
@@ -41,17 +44,13 @@
 
 
 * nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
-	* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
+	* just set a global var... somewhere, and set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
 * "calledfrom" autocomplete needs to include references to funcs
 	* calledfrom datatypes too
 	* @dot completes to @dotAnyGlobalfunc
 * To make "dispatch" clickable, we need to alter MoveToInitFunc, so we have an init func per module per file.
-* RefOpts. Do it bit by bit
-	* get property but only did math
-	* mark a few string funcs as not-modifier/disowner/capturer
-	* mark entire class
-	* fast capture of disowned things. like: r1 <~ r2.pop
-
+	* or work on a copy of the original?
+* RefOpts
 
 						 Perry additions
 

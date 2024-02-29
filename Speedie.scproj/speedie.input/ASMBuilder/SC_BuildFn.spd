@@ -39,7 +39,7 @@ extend_module SCFunction
 	function LinkAll (|[scfunction]| Funcs)
 		opt norefcounts
 		for fn in funcs
-			if fn.CurrReacher
+			if fn.MyReacher
 				.Link(fn)
 
 	function Link (|SCFunction| fn)

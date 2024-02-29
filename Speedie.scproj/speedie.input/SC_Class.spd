@@ -700,7 +700,7 @@ function scdecl.TypeReach (|scbase| from, |message| src)
 
 function SCBase.ReachedName (|string|)
 	opt norefcounts
-	|| c = .CurrReacher
+	|| c = .MyReacher
 	rz = "    via: " + .name
 	if c.class == scbase
 		rz += " (visible func)"
@@ -720,7 +720,7 @@ function BannedCheck (|message| src)
 	opt norefcounts
 	require .TestBanned
 	error (self, "Banned class reached: " + .name)
-	|| curr = .CurrReacher
+	|| curr = .MyReacher
 	for 100
 		if !curr or curr.class == SCBase
 			exit
@@ -729,14 +729,14 @@ function BannedCheck (|message| src)
 			src = nil
 		  else
 			error (curr, curr.ReachedName)
-		curr = curr.CurrReacher
+		curr = curr.MyReacher
 
 
 function Reach (|scbase| from, |message| src=nil)
 	opt norefcounts
 	flow off
-	require !.CurrReacher
-	.CurrReacher = from
+	require !.MyReacher
+	.MyReacher = from
 	Compiler.stReachedClass++
 	
 	if Options.BannedClasses

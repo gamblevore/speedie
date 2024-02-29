@@ -1517,8 +1517,8 @@ class TextView (GUIControl)
 			.DrawSel(where)
 		where.ControlClip = c			/// restore!
 		if !.CanSeeAllLines and sel
-			if .myerror
-				.drawscrollerrors(where)
+			if (.ScrollDrawTimer > 1) and .myerror
+				.DrawScrollErrors(where)
 			scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer)
 	
 	

@@ -4,8 +4,14 @@
 	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
 	* can fold the refcount optimiser into the nilchecker... mostly in .function and .variableset
 	* can just store each class disturbance as one bit? just use 128 bits per... function?
-		* however... if ringtree is disturbed, everything is disturbed... because ringtree could be a message, and message could have an obj... which could be anything.
+		* if ringtree is disturbed, everything is disturbed... because ringtree could be a message, and message could have an obj... which could be anything.
 	* look into how things like "Disowner checking" would work within the nil-checker.
+
+* Approach: Do bit by bit
+	* get property but only did math
+	* mark a few string funcs as not-modifier/disowner/capturer
+	* mark entire class
+	* fast capture of disowned things. like: r1 <~ r2.pop
 */	
 
 

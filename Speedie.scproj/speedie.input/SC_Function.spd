@@ -936,14 +936,14 @@ function FindReached (|scbase| from, |bool|)
 		error (.source,    "Borked function reached!")
 		error (from.source, from.ReachedName)
 	
-	require !.CurrReacher
-	.CurrReacher = from
+	require !.MyReacher
+	.MyReacher = from
 	Compiler.stReachedFunc++
 
 	.cls.Reach(self)?
 		
 	for o in .LinkTo
-		if (o.CurrReacher)
+		if (o.MyReacher)
 			//
 		  elseif (o isa SCFunction)
 			o.FindReached(self)

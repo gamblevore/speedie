@@ -791,7 +791,7 @@ So anything not 0 means "its OK"`
 			if .editme.FindExpectsParse < 2
 				.ProductSep.Collapse
 		
-		.popuphide
+		.PopupHide
 		.AddToJumpHistory
 		if  !g  and  .IsEditingSource  and  !.feedback.CommsOpen
 			.Recheck

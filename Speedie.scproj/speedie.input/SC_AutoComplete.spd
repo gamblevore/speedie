@@ -161,6 +161,20 @@ function ErrorsToPerry (|message|)
 	return compiler.RenderErrors(.errors!, errorseverity.warning).parse
 
 
+function UnusedFuncs (|message| cmd, |message|)
+	opt norefcounts
+	|| path = cmd[@str]$
+	|| scf = compiler.files[path.name] #expect ("No file at: " + path.name)
+	cmd.Clear
+	|| arg = cmd.GiveArg
+	for fn in Compiler.FuncList
+		if fn.File == scf
+			|| src = fn.source
+			if src and !fn.MyReacher
+				arg <~ src.position
+	return cmd
+	
+
 function ReportBuildOrRestart (|message| cmd, |message|)
 	.WillExit = true
 	if .errors.ok
@@ -200,11 +214,12 @@ function ReportMemory (|Message| cmd, |message|)
 function DoCmd (|Message| cmd, |message| arg, |message|)
 	require cmd == @tmp
 	
-	if !.InitedOK:		return cmd.SendPerryErrors
+	if !.InitedOK:					return cmd.SendPerryErrors
+	if cmd ~= "unused_funcs":		return .UnusedFuncs(cmd)
 	if cmd ~= "compile" or "debug":	return .ReportBuildOrRestart(cmd)
-	if cmd == "check":	return .Check(cmd)
-	if cmd == "mem":	return .ReportMemory(cmd)
-	if cmd == 1:		return .Jump(cmd)
+	if cmd ~= "check":				return .Check(cmd)
+	if cmd ~= "mem":				return .ReportMemory(cmd)
+	if cmd == 1:					return .Jump(cmd)
 
 	|| req = cmd[@str].name.lowercase
 	|| my_file = compiler.files[req]

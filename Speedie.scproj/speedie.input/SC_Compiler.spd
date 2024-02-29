@@ -210,7 +210,7 @@ function TestDate
 function compiler.ReachedClassCount (|int|)
 	opt norefcounts
 	for C in compiler.classlist
-		RZ += ((C.currreacher) and c.isobject)
+		RZ += ((C.MyReacher) and c.isobject)
 
 
 function AddSubProjects (|[SCModule]| Modules)
@@ -226,7 +226,7 @@ function FastString.AppendWidth (|string| s, |int| Width)
 function Reached (|string| s, |bool|)
 	flow off
 	|| obj = self[s]
-		return (obj.currreacher)
+		return (obj.MyReacher)
 
 
 function InitTypes
@@ -839,7 +839,7 @@ function DeadStrip
 			c.reach(Compiler.Interpreter)
 	
 	for c in .classlist
-		if c.CurrReacher // shorten-discovery-chains, 
+		if c.MyReacher // shorten-discovery-chains, 
 			c.ReachBehaviours // behaviour chains tend to be long.
 
 	CodeSorter.LeafsFirst		// super-refcounter wants this

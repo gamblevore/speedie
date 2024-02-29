@@ -61,13 +61,6 @@ function PerryIDE.ImproveFuncList (|message| result)
 
 
 function PerryAutoCompleteSelected (GUIListEvent)
-/*
-	«tmp "line"
-		«sstr "/usr/local/speedie/Utils/birds.scproj/bird.input/birdwindow.spd"»
-		«str "BirdWindow.Constructor"»
-		«num "550"»
-	»
-*/
 	opt norefcounts
 	require mode isnt initialselection
 
@@ -97,7 +90,6 @@ function PerryFuncMenuSelected (GUIListEvent)
 		e._Start = obj
 
 
-// Can we... like do this more neatly? Maybe not huh? what if we wanna sort using two sortfuncs?
 function FuncListSorter (SorterComparerMsg)
 	opt norefcounts
 	|| aa = *a
