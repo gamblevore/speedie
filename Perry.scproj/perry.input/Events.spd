@@ -551,7 +551,4 @@ function FileViewerCountCode (GuiMenuEvent)
 	|| fstr = "file".pluralize(FileCount)
 	app.alert "${Cloc[0]} lines of code and ${Cloc[1]} nodes in ${size.strsize} text\n\n$fstr at: ${row.location}"
 
-//	10 lines of code and 50 nodes in 30KB text.
-//  2 files at: /abc/bd/e
-
 

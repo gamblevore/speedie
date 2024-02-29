@@ -16,6 +16,7 @@ class Window (GUIControl)
 	|guicontrol?|					ToolTipControl // probably better to remove this
 	|guicontrol?|					DroppingInto
 	|guicontrol?|					MouseIsOver
+	|guicontrol?|					FocusAttempt
 	|InlineEditor|					InlineEditorPlace
 	|GUIPasteEvent?|				OnPaste
 	|GUICopyEvent?|					OnCopy
@@ -142,6 +143,7 @@ class Window (GUIControl)
 
 
 	helper SetFocus (|guicontrol| Focus)
+		.FocusAttempt = Focus
 		if focus
 			require focus.Takesfocus.able and (focus is visible)
 

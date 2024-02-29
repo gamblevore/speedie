@@ -778,10 +778,11 @@ module SDLApp
 	
 	function Window.ControlOrMenuAt (|ivec2| xy, |bool| Test = true, |guicontrol|)
 		opt norefcounts
-		return .menuat(xy, test) ?? self[xy]
+		return .MenuAt(xy, test) ?? self[xy]
 
 
 	function StandardKeys (|keys| key, |bool|)
+		opt norefcounts
 		|| w = __modules__.window.front						#require
 		|| rf = w.realfocus
 			if keys.cmd
@@ -798,7 +799,7 @@ module SDLApp
 		if keys.cmd
 			if (key is PLUS or EQUALS)
 				return .Rescale(.scale+0.5)
-			  elseif (key is minus)
+			if (key is minus)
 				return .Rescale(.scale-0.5)
 			if (key is f) and keys.option
 				.JB_SDL_FullScreen(.nativewindow, false)
@@ -809,14 +810,14 @@ module SDLApp
 				return w.DoListViewNext(true)
 			if (key is semicolon)
 				return w.DoListViewNext(false)
-			if (key is c)
-				return gw.DoCopy
-			if (key is v)
-				return gw.DoPaste(clipboard.text)
-		  elseif (key is paste)
-			return gw.DoPaste(clipboard.text)
-		  elseif (key is copy)
+		  
+		if (key is copy) or (key iscmd keys.c)
+			|| wf = w.focusattempt
+			if !rf and wf isa textview
+				return wf.docopy
 			return gw.DoCopy
+		if (key is paste) or (key iscmd keys.v)
+			return gw.DoPaste(clipboard.text)
 
 
 	function TryQuit (|SDLCloseReason| reason = SDLCloseReason.Terminating, |SDLActivity|)

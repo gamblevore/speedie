@@ -548,10 +548,10 @@ datatype ivec2
 	module
 		function New (|int| x, |ivec2|)
 			cpp_Part New1
-			return (x,x)
+			return (x, x)
 		function New (|int| x, |int| y, |ivec2|)
 			cpp_Part New2
-			return (x,y)
+			return (x, y)
 
 
 

@@ -5,12 +5,9 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 
-
-* mouseover errors in editor, should put them in a popup
-* typing in function-list doesnt shrink it.
-	* typethrough also disabled
-* can't right-click on functions?? but cntrl/section works?
-* mark unused funcs in editor colored
+* typethrough in function-list disabled
+* MouseOver errors in editor, should put them in a popup
+* Mark unused funcs in editor colored
 * Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 	* Speedie stops compiling sometimes, from perry
 
