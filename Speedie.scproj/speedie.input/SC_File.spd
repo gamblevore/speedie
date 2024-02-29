@@ -55,11 +55,11 @@ class SCFile (file)
 					return f
 	
 	
-	function SavedData (|string|)
-		if !.fdata
-//		if .origdate < .modified
-			.fData = .ReadAll.decompress // why not.
-		return .fdata
+//	function SavedData (|string|)
+//		if !.fdata
+////	if .origdate < .modified
+//			.fData = .ReadAll.decompress // why not.
+//		return .fdata
 	
 	
 	function Orig (|message|)
@@ -113,13 +113,13 @@ class SCFile (file)
 
 
 
-function app.CodeSign (|file|)
-	|| sign = app.prefs[codesign_native] // code
-		|| me = app.apppath.file
-		me.codesign(sign.value)
-		return me
-
-	errorreceiver.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign self." )
+//function app.CodeSign (|file|)
+//	|| sign = app.prefs[codesign_native] // code
+//		|| me = app.apppath.file
+//		me.codesign(sign.value)
+//		return me
+//
+//	errorreceiver.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign self." )
 
 
 function file.CodeSign (|string| sign, |errorint2|)

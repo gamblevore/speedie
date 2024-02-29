@@ -8,9 +8,9 @@ module SC_Errors
 	linkage
 		cpp_part Errors
 	
-	function Color (|string| Col)
-		if Pipe.ErrorIsTerminal
-			PrintError( Col )
+//	function Color (|string| Col)
+//		if Pipe.ErrorIsTerminal
+//			PrintError( Col )
 	
 /*	
 0: reset colors/style

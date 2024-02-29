@@ -47,14 +47,14 @@ function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCBase| nam
 	Return TypeBool!.TypeNormal
 
 
-function Message.CastToObject (|Message|)
-	|| d = .AsDecl #expect
-	if (d.Type.IsObject)
-		 Return self
-	
-	|| Match = TypeObject!.TypeNormal.TryTypeCast( d, self, kTypeCastTrue )
-	expect (Match >= kSimpleMatch) (self)
-	Return .CastedParent
+//function Message.CastToObject (|Message|)
+//	|| d = .AsDecl #expect
+//	if (d.Type.IsObject)
+//		 Return self
+//	
+//	|| Match = TypeObject!.TypeNormal.TryTypeCast( d, self, kTypeCastTrue )
+//	expect (Match >= kSimpleMatch) (self)
+//	Return .CastedParent
 
 
 

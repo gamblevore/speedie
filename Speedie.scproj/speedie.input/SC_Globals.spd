@@ -87,8 +87,8 @@ function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |scbase| name_space)
 				stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", fn.blindcasts)
 
 
-function scdecl.Exists (|bool|)
-	return self and self != typevoid and TypeNil
+//function scdecl.Exists (|bool|)
+//	return self and self != typevoid and TypeNil
 
 
 function TypeOfReal (ExprResolver)
@@ -374,12 +374,12 @@ function TypeOfUnit (ExprResolver)
 	return type
 
 
-function String.IsHexConstant (|bool|)
-	return  (*self=='0')  and  (self[1] == 'x')
-
-
-function String.IsBinaryConstant (|bool|)
-	return  (*self=='0')  and  (self[1] == 'b')
+//function String.IsHexConstant (|bool|)
+//	return  (*self=='0')  and  (self[1] == 'x')
+//
+//
+//function String.IsBinaryConstant (|bool|)
+//	return  (*self=='0')  and  (self[1] == 'b')
 
 
 function TypeOfNum (ExprResolver)
@@ -1591,22 +1591,22 @@ function AddToStaticSection (|Message| arg, |Message| ToAdd)
 	arg <~ ToAdd
 
 
-function TypeOfExprAsObj (|Message!| Exp, |SCBase| name_space, |Message?| side = nil, |SCDecl|)
-	|| result = TypeOfExpr( exp, name_space, side )	#require
+//function TypeOfExprAsObj (|Message!| Exp, |SCBase| name_space, |Message?| side = nil, |SCDecl|)
+//	|| result = TypeOfExpr( exp, name_space, side )	#require
+//
+//	if !result.type.IsObject
+//		exp = exp.CastToObject #require
+//		|| obj = exp.obj
+//		if obj isa SCDecl
+//			Return obj
+//	return result
 
-	if !result.type.IsObject
-		exp = exp.CastToObject #require
-		|| obj = exp.obj
-		if obj isa SCDecl
-			Return obj
-	return result
 
 
-
-function Message.ChildrenHaveDecls (|bool|)
-	for (c in self)
-		require (c.Obj isa SCDecl)
-	return true
+//function Message.ChildrenHaveDecls (|bool|)
+//	for (c in self)
+//		require (c.Obj isa SCDecl)
+//	return true
 
 
 function Message.Resync (|Message| parent, |Message|)

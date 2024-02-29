@@ -332,12 +332,12 @@ function Run
 
 
 
-function SCClass.ExportDestructor (|string|)
-	|| it = .FirstDestructor
-		return it.ExportName
-	return "0"
-
-
+//function SCClass.ExportDestructor (|string|)
+//	|| it = .FirstDestructor
+//		return it.ExportName
+//	return "0"
+//
+//
 function SCClass.CSuperStructName (|string|)
 	|| sup = .realSuper
 	if (!sup)

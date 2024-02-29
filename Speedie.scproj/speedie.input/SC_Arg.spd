@@ -23,14 +23,14 @@ class SCArg (SCBase)
 		super.Constructor(node)
 	 
 	 
-	function Count (|int|)
-		opt norefcounts
-		for (v in .access)
-			RZ += (v isa scdecl)
-
-		|| l = .parent
-		if l isa scarg
-			RZ += l.count + 1		
+//	function Count (|int|)
+//		opt norefcounts
+//		for (v in .access)
+//			RZ += (v isa scdecl)
+//
+//		|| l = .parent
+//		if l isa scarg
+//			RZ += l.count + 1		
 	
 	render
 		fs <~ "SCArg: (\n"

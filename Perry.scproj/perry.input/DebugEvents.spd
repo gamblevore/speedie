@@ -6,7 +6,7 @@ function DebugArgsKeyDown (GUIKeyEvent)
 		.window!.ClearFocus
 		return true
 	
-	
+
 function FoundListKeys (GuiKeyEvent)
 	opt norefcounts
 	if key.IsDelete

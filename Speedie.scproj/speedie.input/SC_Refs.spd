@@ -227,12 +227,12 @@ function RefDestructorMsg (|Message| msg, |SCFunction| fn, |Message|)
 	return RefMsg( msg, fn.exportname, fn )
 
 
-function SCFunction.MaxVars (|int|)
-	opt norefcounts
-	for ch.flat in .source
-		if ch == @arg
-			|| a = ch.asarg
-				(rz max= a.count)
+//function SCFunction.MaxVars (|int|)
+//	opt norefcounts
+//	for ch.flat in .source
+//		if ch == @arg
+//			|| a = ch.asarg
+//				(rz max= a.count)
 
 
 function RefCheckDisturbance (|Message| dcl, |int|)

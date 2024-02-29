@@ -77,8 +77,8 @@ function ProjTmpPath (|string|)
 function LibTmpPath (|string|)
 	return .tmpbase("Lib") + .LibSuff
 
-function LogName (|string|)
-	return .ProjTmpPath.child("build.txt")
+//function LogName (|string|)
+//	return .ProjTmpPath.child("build.txt")
 
 
 
@@ -502,8 +502,8 @@ function InstallCompiler
 }
 
 
-function String.LastLine (|string|)
-	return .AfterByte('\n')
+//function String.LastLine (|string|)
+//	return .AfterByte('\n')
 
 
 function file.TestBatch (|bool|)
@@ -570,9 +570,9 @@ function array.AppendWords (|array of string| self, |string| R)
 		.AddCStr(s)
 
 
-function array.testadd (|array of string| self, |string| s)
-	opt norefcounts
-	self <~ s
+//function array.testadd (|array of string| self, |string| s)
+//	opt norefcounts
+//	self <~ s
 
 
 function string.MakeAndGoInto (|File|)

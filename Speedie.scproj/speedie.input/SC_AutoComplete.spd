@@ -147,13 +147,13 @@ function CmdWrap (|Message| arg, |bool|)
 	return !.willexit
 
 
-function Debug (|Message| cmd, |message|)
-	error "Not implemented"
+//function Debug (|Message| cmd, |message|)
+//	error "Not implemented"
 
 
-function Restart (|message| arg)
-	app.RawArgs <~ arg.renderjbin
-	app.restart
+//function Restart (|message| arg)
+//	app.RawArgs <~ arg.renderjbin
+//	app.restart
 
 
 function ErrorsToPerry (|message|)
@@ -165,15 +165,17 @@ function ErrorsToPerry (|message|)
 
 function UnusedFuncs (|message| cmd, |message|)
 	opt norefcounts
-	|| path = cmd[@str]									#require
-	|| scf = compiler.files.valuelower(path.name)		#expect ("No file at: " + path.name)
-	cmd.Clear
-	if .CompiledOK
+	|| path = cmd[@str]										#require
+	|| scf = compiler.files.valuelower(path.name)			#expect ("No file at: " + path.name)
+	cmd.Clear												// so... now what?
+	
+	if .CompiledOK and options.UnusedFunctionLevel
 		|| arg = cmd.GiveArg
 		for fn in Compiler.FuncList
 			|| src = fn.source
-			if src and fn.isunused and fn.File == scf
-				arg <~ src.position
+			if src and fn.File == scf
+				if fn.isunused 
+					arg.msg(@tmp, "Unused function: " + fn.name) <~ src.position
 	return cmd
 	
 
@@ -987,8 +989,8 @@ function message.IdentifyFunc (|scfunction|)
 		return obj
 
 
-function message.IsClassOrExtOrModule (|bool|)
-	return (self == @tmp) and (.IsClassType or .IsExtender or .MsgIsProperModule)
+//function message.IsClassOrExtOrModule (|bool|)
+//	return (self == @tmp) and (.IsClassType or .IsExtender or .MsgIsProperModule)
 
 
 function object.ClassOrModule (|scbase|)
@@ -1116,19 +1118,19 @@ function message.IsClassType (|bool|)
 function message.IsLinkageType (|bool|)
 	return self ~= "linkage"
 
-function message.IsExtender (|bool|)
-	return self ~= "extend" or "extend_module"	
+//function message.IsExtender (|bool|)
+//	return self ~= "extend" or "extend_module"	
 
 function message.IsModuleType (|bool|)
 	return self ~= "module" or "extend_module" // don't need root. flags:=1 does it
 	
 	
-function message.MsgIsProperModule (|bool|)
-	opt norefcounts
-	require self ~= "module"
-	|| p = .parent
-	require p == @arg
-	return p.parent == nil
+//function message.MsgIsProperModule (|bool|)
+//	opt norefcounts
+//	require self ~= "module"
+//	|| p = .parent
+//	require p == @arg
+//	return p.parent == nil
 
 	
 function message.FindPos (|int| fr, |int| len, |message|)

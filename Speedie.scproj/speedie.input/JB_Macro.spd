@@ -70,9 +70,9 @@ extend message
 		for v in self
 			dest <~ v.MacroPrm(root, prms)
 
-	function BeLike (|Message| belikeme)
-		.func = belikeme.func
-		.name = belikeme.name	
+//	function BeLike (|Message| belikeme)
+//		.func = belikeme.func
+//		.name = belikeme.name	
 
 	function BecomeMacro (|Macro| M,  |(array of message)?| prms=nil)
 		opt norefcounts

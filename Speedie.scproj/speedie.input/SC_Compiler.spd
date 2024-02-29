@@ -656,12 +656,12 @@ function CreateDisambiguation
 
 
 
-function ModuleFunction (|String| module_name, |string| fn_name, |scfunction|)
-	opt norefcounts
-	|| mod = compiler.findmodule(module_name, nil)
-		|| fn = mod[fn_name]
-		if fn isa scfunction
-			return fn
+//function ModuleFunction (|String| module_name, |string| fn_name, |scfunction|)
+//	opt norefcounts
+//	|| mod = compiler.findmodule(module_name, nil)
+//		|| fn = mod[fn_name]
+//		if fn isa scfunction
+//			return fn
 	
 			
 function FindClass (|String| name, |Message| where=nil, |bool| err=true,  |SCClass|)
@@ -713,7 +713,7 @@ function scfunction.IsAllocOrNew (|bool|)
 	return self is AllocOrNew
 
 
-function scfunction.HasFloatparams (|int|)
+/*function scfunction.HasFloatparams (|int|)
 	opt norefcounts
 	for arg in .args
 		|| d = arg.type.TypeInfo
@@ -726,7 +726,7 @@ function scfunction.HasFloatReturn (|int|)
 		return f.isfloat|int|
 
 
-/*function CheckMaxVars
+function CheckMaxVars
 	require options.CheckMaxVars
 	|| V    = 0
 	|| Used = 0
@@ -1029,25 +1029,3 @@ helper FindProjectSub (|string| base, |string| Path, |File|)
 		rz = nil
 }
 
-
-// recursive is a bit akward...
-	// x --> a
-	// a --> b
-	// b --> c
-	// b --> a
-// a and b should be recursive
-// x and c should NOT be.
-
-
-module depthtest
-	function X				// 2 or 4?
-		.a3
-		.a1
-		.r1
-		
-		
-	function A1: .a2			// 3
-	function A2: .a3			// 2
-	function A3:				// 1
-	function R1: .r2			// r
-	function R2 {.r1, .a1, .a3}	// r

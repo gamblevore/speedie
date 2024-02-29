@@ -51,8 +51,8 @@ function compiler.SetupEnv
 		ErrorColors.enabled = false
 
 
-function app.IgnoreBreakPoints
-	cpp_wrapper JB_Pipe__IgnoreBreakPoints
+//function app.IgnoreBreakPoints
+//	cpp_wrapper JB_Pipe__IgnoreBreakPoints
 
 
 api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)

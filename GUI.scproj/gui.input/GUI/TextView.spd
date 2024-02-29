@@ -518,7 +518,7 @@ class TextView (GUIControl)
 				page = (keys.Option)|int|
 			
 		|| x  = (.text.length, 0)(i > 0)
-		|| t  = .SelRange
+		|| t  = ._TypingPlace // .FindDrawSelMove resolves it? and yet its not workign properly
 		|| bs = .FindDrawSelMove(t, i, page>0)
 		if .singleline and (t == bs.x)
 			return .MoveListLine(i)
@@ -1260,18 +1260,7 @@ class TextView (GUIControl)
 			.AlphaFade
 			return true
 	
-	
-	function File (|file|)
-		opt norefcounts
-		return .path$.file
-	
-	
-	function File (assigns:|file|)
-		|| u = .Undoer
-			u.Location = value.path
-		  else
-			debugger 
-	
+		
 	
 	function Path (|string|)
 		|| u = .document
@@ -1494,7 +1483,7 @@ class TextView (GUIControl)
 		opt norefcounts		
 		debug_require i.abs == 1
 		|| pos = t.x2
-		ifn keys.shift
+		if !keys.shift
 			t = t.resolve
 			pos = (t.x, t.x2)(i < 0)
 			if (t.width) and (pos > 0) and (i > 0) and (self[pos-1].IsTextLine)
@@ -1604,14 +1593,18 @@ class TextView (GUIControl)
 
 		if !keys.cmd
 			if d and d.DrawError
-				|| P2 = .XYOfchar(b)
-				P2.x = .lastrect.x
-				(fp)(self, P2, nil, d.drawerror, "error")
+				.ShowErrorInfo(b, d.drawerror)
 			  else
 				.ShowNoExtra
 		  else
 			.ShowExtraInfoAtPos(B, "", nil)
 	
+
+	helper ShowErrorInfo (|int| b, |error| err)
+		|| P2 = .XYOfchar(b)
+		P2.x = -1
+		(.OnShowExtraInfo!)(self, P2, nil, err, "error")
+
 	
 	helper ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)
 		opt NoRefCounts

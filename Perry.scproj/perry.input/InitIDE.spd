@@ -1,8 +1,7 @@
 
 
-extend PerryIDE 
+extend PerryIDE  
     constructor (|file| project)
-		|| i = 0
 		super.constructor 
 		.Project			= project
 		.InConstructor		= true

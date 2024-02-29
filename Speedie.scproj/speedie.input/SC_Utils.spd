@@ -52,8 +52,8 @@ extend Message {
 		Return (self) and (.func == @Opp) and (.name ~= name)
 
 
-	operator IsArg (|string|name, |bool|)
-		Return (self) and (.func == @arg) and (.name == name)
+//	operator IsArg (|string|name, |bool|)
+//		Return (self) and (.func == @arg) and (.name == name)
 
 
 	operator IsTmp (|String| name, |bool|)
@@ -70,19 +70,19 @@ extend Message {
 	// case blind...
 		Return (self) and (.func == @Brel) and (.name == name)
 
-	operator IsRel (|String| name, |bool|)
-		opt norefcounts
-	// case blind...
-		Return (self) and (.func == @Rel) and (.second == name)
+//	operator IsRel (|String| name, |bool|)
+//		opt norefcounts
+//	// case blind...
+//		Return (self) and (.func == @Rel) and (.second == name)
 
 
 	operator IsDot (|string| name, |bool|)
 		Return (self) and (.func == @dot) and (.name ~= name)
 
 	
-	syntax access (|message|)
-		if (self)
-			return .Parent
+//	syntax access (|message|)
+//		if (self)
+//			return .Parent
 
 	
 	function TrueOrFalse (|bool|)
@@ -149,13 +149,13 @@ module SCGlobals
 	|int| UniqueNum
 
 
-function message.OperatorInFunc (|string| s, |bool|)
-	return .msgowningfunc ~= s
-
-
-function Message.Op (|message|)
-	if self == @rel
-		return .Second
+//function message.OperatorInFunc (|string| s, |bool|)
+//	return .msgowningfunc ~= s
+//
+//
+//function Message.Op (|message|)
+//	if self == @rel
+//		return .Second
 
 
 

@@ -10,13 +10,13 @@ function perryide.UnusedFuncsFB (|message| stuff)
 	|| arg = stuff.last
 	require arg == @arg
 	|| where = stuff.firstname
-	for pos in arg
-		.unused_hoe(pos.int, where)
+	for tmp in arg
+		.unused_hoe(tmp, where)
 
 
-function perryide.unused_hoe (|int| pos, |string| where)
-	|| err = error(nil, "Unused function", ErrorSeverity.warning, where )
-	err.position = pos
+function perryide.unused_hoe (|message| tmp, |string| where)
+	|| err = error(nil, tmp.name, ErrorSeverity.warning, where )
+	err.position = tmp.first.int
 	.editme.LineErrorAdd(err)
 
 

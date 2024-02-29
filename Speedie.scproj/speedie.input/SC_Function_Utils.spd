@@ -113,14 +113,14 @@ function SettingMemory (|Message| Rel, |bool|)
 			return true
 
 
-function IsSelfOfSetter (|Message| curr, |Message|)
-	opt norefcounts
-	// .bla = X
-	|| dot = curr.Parent
-	if dot.IsFirst
-		|| P   = dot.Parent
-		if P.IsSetRel
-			Return P
+//function IsSelfOfSetter (|Message| curr, |Message|)
+//	opt norefcounts
+//	// .bla = X
+//	|| dot = curr.Parent
+//	if dot.IsFirst
+//		|| P   = dot.Parent
+//		if P.IsSetRel
+//			Return P
 
 
 function scfunction.NilSelff (|message| where, |nilstate| v)
@@ -161,8 +161,8 @@ datatype SCBlockage (uint)
 	syntax is (|SCBlockage| b, |bool|)
 		return self == b
 
-	syntax isnt (|SCBlockage| b, |bool|)
-		return self != b
+//	syntax isnt (|SCBlockage| b, |bool|)
+//		return self != b
 	
 	
 	

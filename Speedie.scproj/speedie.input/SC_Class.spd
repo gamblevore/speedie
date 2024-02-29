@@ -110,11 +110,11 @@ render
 		fs <~ " model"
 
 
-function message.AlreadySets (|string| name, |bool|)
-	opt norefcounts
-	for ch in self
-		if SettingSelfProperty(ch) and (ch.first == name)
-			return true
+//function message.AlreadySets (|string| name, |bool|)
+//	opt norefcounts
+//	for ch in self
+//		if SettingSelfProperty(ch) and (ch.first == name)
+//			return true
 
 
 
@@ -377,14 +377,14 @@ function CreateConstructors
 		.DestructorFunc = .FindAllocFunc( "Destructor", !NeedsDestructor )
 
 
-function RootName (|string|)
-	opt norefcounts
-	|| c = self
-	while
-		|| s = c.super
-		if !s or s == typeobject: exit
-		c = s
-	return c.name
+//function RootName (|string|)
+//	opt norefcounts
+//	|| c = self
+//	while
+//		|| s = c.super
+//		if !s or s == typeobject: exit
+//		c = s
+//	return c.name
 
 
 function FindSpecialFunc (|string| keyword, |bool| CheckParents, |SCFunction|)
@@ -779,11 +779,11 @@ function Real_Isa (|SCClass| cls, |bool|)
 	return .realclass.isa(cls)
 
 
-function IsBuiltinChain (|bool|)
-	opt norefcounts
-	for p.upwards in self
-		if (p.IsBuiltin)
-			Return true
+//function IsBuiltinChain (|bool|)
+//	opt norefcounts
+//	for p.upwards in self
+//		if (p.IsBuiltin)
+//			Return true
 
 
 function AfterAfterFuncs 
@@ -805,8 +805,8 @@ function StructName (|String|)
 	return .SubProjName + "_" + .name
 
 
-function IsAtomic (|bool|)
-	return .typeinfo.isatomic
+//function IsAtomic (|bool|)
+//	return .typeinfo.isatomic
 
 
 function MakeClassType (|scdecl| d, |scdecl|)
@@ -922,14 +922,14 @@ module
 			return it.modul
 
 
-	function NewCast (CollectFunc)
-		expect (name_space isa SCClass)  (node, "'cast' only goes inside classes." )
-		
-		|| f = node.first
-			f.name = "function"
-			f.Next = «Thg "operator_cast"»
-		
-		return SCFunction.NewFunc( node, name_space, ErrPlace )
+//	function NewCast (CollectFunc)
+//		expect (name_space isa SCClass)  (node, "'cast' only goes inside classes." )
+//		
+//		|| f = node.first
+//			f.name = "function"
+//			f.Next = «Thg "operator_cast"»
+//		
+//		return SCFunction.NewFunc( node, name_space, ErrPlace )
 	
 
 	function SCClass.DataTypePostLoad
@@ -1056,23 +1056,23 @@ module
 				B.Collect(arg, scbase.CurrVisibility, m.SourceArg)
 
 	
-	function DoOneNamedField (|message| c,  |string| name,  |string| datatype,  |int| n,  |message|)
-		using c 
-		|| src = "
-		function ${c.name} (|$Datatype|)
-			return .$name[$n]
-		function ${c.name} (assigns:|$Datatype|)
-			.$name[$n] = value
-		".parse
-		return src
-	
-	
-	function SCClass.FindDecl (|string| name, |message|)
-		opt norefcounts
-		for l in .sourcearg
-			if l == @decl
-				if l.declname ~= name
-					return l
+//	function DoOneNamedField (|message| c,  |string| name,  |string| datatype,  |int| n,  |message|)
+//		using c 
+//		|| src = "
+//		function ${c.name} (|$Datatype|)
+//			return .$name[$n]
+//		function ${c.name} (assigns:|$Datatype|)
+//			.$name[$n] = value
+//		".parse
+//		return src
+//	
+//	
+//	function SCClass.FindDecl (|string| name, |message|)
+//		opt norefcounts
+//		for l in .sourcearg
+//			if l == @decl
+//				if l.declname ~= name
+//					return l
 	
 	
 	function ProcessAs (CollectFunc) // node, parent, errplace

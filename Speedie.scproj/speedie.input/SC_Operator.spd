@@ -209,8 +209,8 @@ module {
 		dict[ FuncName.Lowercase ] = opp
 
 
-	function AddBadComp (|string| s, |string|err)
-		dict[ s ] = SCOperator.new(nil)
+//	function AddBadComp (|string| s, |string|err)
+//		dict[ s ] = SCOperator.new(nil)
 	
 	
 	function BuildOrder // reordering here

@@ -25,8 +25,8 @@ class SCObject
 //		app.printstacktrace
 		errorreceiver.NewError( .source, Error )
 
-	syntax equals (|string| s, |bool| aware, |bool|)
-		return .name ~= s
+//	syntax equals (|string| s, |bool| aware, |bool|)
+//		return .name ~= s
 
 	function File (|SCFile?|)
 		opt norefcounts

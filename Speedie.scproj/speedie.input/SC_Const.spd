@@ -134,24 +134,6 @@ function scbase.Tran_Const (|SCDecl| D, |SCBase| base)
 
 
 
-function ConstantExpand (|Message| ch)
-	|| L = ch.first
-	|| op = L.Next
-	|| R = op.Next
-	
-	expect ((op == "=") and (L ==@thg))  ( op, "Expected 'd=(a,b,c...)' ." )
-	
-	|| Rel = «rel
-		L
-		«opp "="»
-		R.ConstantExpandSub
-	»
-
-	ch.Next = rel
-	R.MoveAllAfter(ch)
-	ch.remove
-
-
 
 function message.ConstIntValueSub (|scbase| name_space, |&int64| v, |bool|)
 	opt norefcounts

@@ -1,9 +1,9 @@
 
 
-function message.EmbToString
-	if (self == @emb) and !.name
-		.func = @str
-		scfunction.ObjectifyString(self)
+//function message.EmbToString
+//	if (self == @emb) and !.name
+//		.func = @str
+//		scfunction.ObjectifyString(self)
 
 
 function Message.HasOwnBlock (|Message|)

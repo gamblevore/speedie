@@ -96,13 +96,6 @@ function vec4.FontPixelCleanup (|vec4|)
 		rz.a = total/full				// anything else... is white, but less opaque
 
 
-function CodePoint.DrawCharfix (|codepoint|)
-	if self == 171 // sigh
-		return 128
-	  elseif self == 187 // we need a proper unicode drawing code
-		return 129
-	return ' '
-
 
 function image.DrawIcon (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| Col=colors.white)
 	.drawchar(c, where, xy, col, 0) 

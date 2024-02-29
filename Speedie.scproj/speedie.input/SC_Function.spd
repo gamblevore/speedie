@@ -10,8 +10,8 @@ datatype DotUseType (uint)
 		Memory
 	syntax is (|DotUseType| d, |bool|)
 		return self == d
-	syntax isnt (|DotUseType| d, |bool|)
-		return self != d
+//	syntax isnt (|DotUseType| d, |bool|)
+//		return self != d
 
 
 datatype FunctionType (uint)
@@ -92,9 +92,6 @@ syntax equals (|string| name, |bool| Aware, |bool|)
 		return true
 	return .Name.syntaxequals( name, true )		// never needs !aware.
 
-
-operator isa (|int| Code, |bool|)
-	return .AllocCode & Code
 
 syntax is (|FunctionType| k, |bool|) // assumes ANY match. Asking "x is a+b", then a or b is enuf
 	return .alloccode & k
@@ -249,12 +246,12 @@ function FuncDecls
 		r.AllocSource = .AllocCode
 
 
-function AfterGotClasses
-	|| S = .Source
-	|| ClassName = (**S).Name					#expect S
-	|| ClassObj = Compiler[ ClassName, S ]
-		.FLookup = ClassObj
-		ClassObj.TryAddBase( S, self )
+//function AfterGotClasses
+//	|| S = .Source
+//	|| ClassName = (**S).Name					#expect S
+//	|| ClassObj = Compiler[ ClassName, S ]
+//		.FLookup = ClassObj
+//		ClassObj.TryAddBase( S, self )
 
 
 function TranDebugInsert
@@ -954,8 +951,9 @@ function FindReached (|scbase| from, |bool|)
 	
 	
 function IsUnused (|bool|)
-	return !.MyReacher and !.IsDisabled and !.IsExternalLib
-	
+	if options.UnusedFunctionLevel == 1
+		require !.IsSTDLib  // dont check stdlibs for :LHAJWKDN><AMSND< FU HATERS
+	return !.MyReacher and !.IsDisabled and !.isvisible
 
 
 function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Type = "", |Message|)
@@ -1180,11 +1178,11 @@ function scobject.DoLinkFrom (|SCBase| B)
 	B.StoreLinkToMe(.linkfrom)
 
 
-function NewNilRel (|SCDecl| d, |Message|)
-	// .bla = nil
-	|| def = «thg "nil"»
-	def.Obj = TypeNil
-	return NeweqRel( d.DeclToDot(.self), def )
+//function NewNilRel (|SCDecl| d, |Message|)
+//	// .bla = nil
+//	|| def = «thg "nil"»
+//	def.Obj = TypeNil
+//	return NeweqRel( d.DeclToDot(.self), def )
 
 
 
@@ -1203,17 +1201,17 @@ module {
 
 		
 	
-function ringtree.TreeSanity
-	opt norefcounts
-	for s in self
-		if s.parent != self
-			.debugprint
-			debugger
-		s.TreeSanity
-
-
-syntax equals (|string| s, |bool| aware, |bool|)
-	return currfunc.SyntaxEquals(s, aware)
+//function ringtree.TreeSanity
+//	opt norefcounts
+//	for s in self
+//		if s.parent != self
+//			.debugprint
+//			debugger
+//		s.TreeSanity
+//
+//
+//syntax equals (|string| s, |bool| aware, |bool|)
+//	return currfunc.SyntaxEquals(s, aware)
 
 
 function NewMissingFunc (CollectFunc)
@@ -1370,12 +1368,12 @@ function ArgToFunc (|string| NewName, |Message| Params, |Message| arg,  |Message
 	rz.position = arg.position
 
 
-function Message.FindOwningLoop (|message| top, |Message|)
-	opt norefcounts // using the new try syntax would be good here.
-	for P.up in self
-		require (P != top)
-		if (P == @tmp) and (P == "while" or "for")
-			return P
+//function Message.FindOwningLoop (|message| top, |Message|)
+//	opt norefcounts // using the new try syntax would be good here.
+//	for P.up in self
+//		require (P != top)
+//		if (P == @tmp) and (P == "while" or "for")
+//			return P
 
 
 function Tran_NotAllowed (TranFunc) // "continue"
@@ -1428,9 +1426,9 @@ decl
 */
 
  
-function message.Tran_FS
-	macros.fs.clean
-	.BecomeMacro(macros.FS)
+//function message.Tran_FS
+//	macros.fs.clean
+//	.BecomeMacro(macros.FS)
 
 
 function Tran_Ifn (TranFunc)
@@ -1590,9 +1588,9 @@ function Tran_Fails (TranFunc)
 
 
 
-function TranFuncDummy (TranFunc) {
-	// nothing
-}
+//function TranFuncDummy (TranFunc) {
+//	// nothing
+//}
 
 function Tran_Visible (TranFunc)
 	expect (fn) (node, "Only use this on functions")

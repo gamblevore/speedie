@@ -36,8 +36,8 @@ syntax is (|SCBaseInfo| i, assigns:|bool|)
 	.BaseInfo = x
 	
 
-syntax isnt (|SCBaseInfo| i, assigns:|bool|)
-	.SyntaxIs(i, !value)
+//syntax isnt (|SCBaseInfo| i, assigns:|bool|)
+//	.SyntaxIs(i, !value)
 
 function IsVisible (|bool|)
 	return self is visible
@@ -355,8 +355,8 @@ function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scfunc
 
 
 
-function MyProj (|SCBase|)
-	return Compiler.Program!.ProjectFix
+//function MyProj (|SCBase|)
+//	return Compiler.Program!.ProjectFix
 
 
 function ProjectFix (|SCBase|)
@@ -764,10 +764,10 @@ function LoadVisibility (|Message| p)
 	SC_MakeComment( p )
 
 
-function ModuleType (|string|)
-	if self isa SCModule
-		return "module"
-	return "class"
+//function ModuleType (|string|)
+//	if self isa SCModule
+//		return "module"
+//	return "class"
 
 
 function AutoCompleteKind (|string|)
@@ -785,18 +785,18 @@ function AutoCompleteKind (|string|)
 	return "unknown"
 
 
-render DescribeStored
-	for (B.ListLookup in self)
-		fs <~ '\n'
-		fs <~ B.ModuleType
-		fs <~ ": "
-		fs <~ B.name
-
-		for (b.access) (name)
-			fs <~ '\n'
-			fs <~ name
-
-		fs <~ '\n'
+//render DescribeStored
+//	for (B.ListLookup in self)
+//		fs <~ '\n'
+//		fs <~ B.ModuleType
+//		fs <~ ": "
+//		fs <~ B.name
+//
+//		for (b.access) (name)
+//			fs <~ '\n'
+//			fs <~ name
+//
+//		fs <~ '\n'
 
 
 iterator ListLookup
@@ -806,15 +806,15 @@ iterator ListLookup
 		Curr = Curr.parent
 
 
-function SCModule.NonRoleModule (|SCBase|)
-	opt norefcounts
-	|| s = self
-	while s
-		|| cls = s.cls
-		ifn cls and cls.isrole
-			exit
-		s = s.SuperMod
-	return s
+//function SCModule.NonRoleModule (|SCBase|)
+//	opt norefcounts
+//	|| s = self
+//	while s
+//		|| cls = s.cls
+//		ifn cls and cls.isrole
+//			exit
+//		s = s.SuperMod
+//	return s
 
 
 

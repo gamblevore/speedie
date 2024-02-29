@@ -172,11 +172,12 @@ function PerryIDE.DisplayStr (|message| f, |bool|)
 		.DisplayInPopup(f.name, false)
 
 
-function PerryIDE.DisplayInPopup (|string| s, |bool| instant)
+function PerryIDE.DisplayInPopup (|string| s, |ivec2| C=.PopupDisplayCorner, |bool| instant)
 	|| sizer_str = s.wrap(80)
 	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 3)
 	(size.x max= 40)
-	|| c = .PopupDisplayCorner				// set the top above it
+	if c.x < 0
+		c.x = .editme.lastrect.x2 - (size.x + 10)
 	.PopupDisplay.size =   c.x~right for size.x   by   c.y~up back size.y
 	.PopupDisplay.text = s 
 	.StartPopupVis(instant)
@@ -314,8 +315,9 @@ function PerryIDE.InteractUpdate
 function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err,  |string| reason)
 	opt norefcounts
 	if err
-		.PopupDisplayCorner = P
 		.lastextrainfo = nil
+		.PopupDisplay.ExpectsParse = 0
+		.DisplayInPopup(err.name, P, true)
 		return 
 	
 	if !M
@@ -474,6 +476,11 @@ function message.owningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
 		if EndAtArg and p == @arg
 			Willend = true
 		s = p
+
+
+function autocomplete.IsAFunc (|message| m, |bool|)
+	opt norefcounts
+	return .functions.valueLower(m.name) != nil
 
 
 function message.OwningFullName (|syntax| prm, |message|)

@@ -133,10 +133,10 @@ class SCParamArray
 		return true
 
 
-	function Range (|IntRange|)
-		|| yyy = .size
-		|| x = (.isdot and .IsNotModule)|int|
-		return (x,yyy)|intrange|
+//	function Range (|IntRange|)
+//		|| yyy = .size
+//		|| x = (.isdot and .IsNotModule)|int|
+//		return (x,yyy)|intrange|
 
 
 	function MacroSize (|int|)

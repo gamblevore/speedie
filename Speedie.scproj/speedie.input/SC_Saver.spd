@@ -121,10 +121,10 @@ module SC_Saver {
 	}
 	
 	
-	function SCDecl.CanSaveDespiteBeingBorrowed (|bool|)
-		require (.type.isobject)
-		require !.IsCArray
-		return (.type.isa(compiler..linkedlist))
+//	function SCDecl.CanSaveDespiteBeingBorrowed (|bool|)
+//		require (.type.isobject)
+//		require !.IsCArray
+//		return (.type.isa(compiler..linkedlist))
 
 
 // shouldn't be an issue with borrowed properties?

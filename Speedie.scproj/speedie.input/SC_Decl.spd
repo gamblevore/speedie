@@ -136,8 +136,8 @@ class SCDecl (SCObject) {
 	function IsNil (|bool|)
 		return self == typenil
 	
-	function NilEither (|nilstate|)
-		return .nilDeclared&nilstate.either
+//	function NilEither (|nilstate|)
+//		return .nilDeclared&nilstate.either
 
 	function RegType (|datatypecode|)
 		require self
@@ -250,9 +250,9 @@ class SCDecl (SCObject) {
 		.C_Array = value
 		.NilDeclared = nilstate.real
 		
-	function TypeContained (assigns:|scclass|)
-		.type = Value
-		.contains := Value.contained
+//	function TypeContained (assigns:|scclass|)
+//		.type = Value
+//		.contains := Value.contained
 			
 
 	function GetAddress (|declmode| Purpose=declmode.always, |SCDecl|)
@@ -302,9 +302,9 @@ class SCDecl (SCObject) {
 			.WriteDeclFull("", 2).Render(fs)
 	
 	
-	function SyntaxExpect
-		printline "Decl failed"
-		super.syntaxexpect("Decl failed")
+//	function SyntaxExpect
+//		printline "Decl failed"
+//		super.syntaxexpect("Decl failed")
 
 	
 	function AutoCompleteName (|string|)
@@ -380,8 +380,8 @@ class SCDecl (SCObject) {
 	function IsInteger (|bool|)
 		return .isnormal and .type.TypeInfo.isint
 
-	function IsDataTypeOrFP (|bool|)
-		return .Type.IsDataTypeOrFP and !.PointerCount and !.IsCArray
+//	function IsDataTypeOrFP (|bool|)
+//		return .Type.IsDataTypeOrFP and !.PointerCount and !.IsCArray
 
 	function IsDataTypeOnly (|bool|)
 		return .Type.IsdatatypeOnly and !.PointerCount and !.IsCArray
@@ -530,21 +530,21 @@ class SCDecl (SCObject) {
 		return exp
 
 
-	function SCClass.MatchType (|SCDecl|Other, |message| exp, |bool|)
-		return .typenormal.ExpectMatch(other, ktypecastfalse, exp, exp)
-
-
-	operator isobj (|SCClass| type, |bool|)
-		return self and (.type == type) and (.isnormalobject)
-
-
-	function IsPtr (|scclass|type, |bool|)
-		return self and (.type == type) and (.pointercount == 1)
-
-		
-	operator isa_not_stupid (|SCClass| O, |bool|)
-		if o and self
-			return O.TypeNormal.matchC(self)
+//	function SCClass.MatchType (|SCDecl|Other, |message| exp, |bool|)
+//		return .typenormal.ExpectMatch(other, ktypecastfalse, exp, exp)
+//
+//
+//	operator isobj (|SCClass| type, |bool|)
+//		return self and (.type == type) and (.isnormalobject)
+//
+//
+//	function IsPtr (|scclass|type, |bool|)
+//		return self and (.type == type) and (.pointercount == 1)
+//
+//		
+//	operator isa_not_stupid (|SCClass| O, |bool|)
+//		if o and self
+//			return O.TypeNormal.matchC(self)
 		// same as operator isa but not backwards :(
 
 	
@@ -558,10 +558,10 @@ class SCDecl (SCObject) {
 		Return .IsNormal and (.type == v)
 
 
-	operator isa (|string| s, |bool|)
-		cpp_Part IsaStr
-		if self
-			return .isnormal and .type.name ~= s
+//	operator isa (|string| s, |bool|)
+//		cpp_Part IsaStr
+//		if self
+//			return .isnormal and .type.name ~= s
 	
 
 	operator matches (|SCClass| O, |bool|)
@@ -694,8 +694,8 @@ class SCDecl (SCObject) {
 		rz.obj = self
 
 
-	function RenderType (|string|)
-		return .WriteType.render
+//	function RenderType (|string|)
+//		return .WriteType.render
 
 	function CantBeNilInCpp (|bool|)
 		require !.pointercount
@@ -799,8 +799,8 @@ class SCDecl (SCObject) {
 		return .MakeExistance(nilstate.optional, .type.typeOptional)
 
 	
-	function MakeEither (|SCDecl|)
-		return .MakeExistance(nilstate.either, nil)
+//	function MakeEither (|SCDecl|)
+//		return .MakeExistance(nilstate.either, nil)
 
 	
 	function MakeContainedOptional (|scdecl|)

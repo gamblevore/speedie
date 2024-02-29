@@ -224,10 +224,10 @@ function Message.CastedParent (|Message|)
 
 
 
-function Message.ReplaceIntoFirst (|message| With, |message|)
-	.prev = with
-	with.first
-	return with
+//function Message.ReplaceIntoFirst (|message| With, |message|)
+//	.prev = with
+//	with.first
+//	return with
 
 
 function Message.ReplaceWith (|message!| j, |Message!|)
@@ -436,13 +436,13 @@ function NewEqRel (|Message| L, |Message| R, |Message|)
 	rz.tmptype = ASMtmp.kSetVar
 
 
-function NewSetter (|string| L, |Message| R, |Message|)
-	opt norefcounts
-	return «rel
-		«thg L »
-		«Opp "="»
-		R
-	»
+//function NewSetter (|string| L, |Message| R, |Message|)
+//	opt norefcounts
+//	return «rel
+//		«thg L »
+//		«Opp "="»
+//		R
+//	»
 
 
 function Message.NeedBra (|Message|)
@@ -460,9 +460,9 @@ function NewFnc (|string| name, |Message|)
 	»
 
 
-function Message.Hash (|uint64| Pos, |Uint64|)
-	Pos = (pos << 8) ||| .Func|uint64|
-	return .Name.Hash(pos)
+//function Message.Hash (|uint64| Pos, |Uint64|)
+//	Pos = (pos << 8) ||| .Func|uint64|
+//	return .Name.Hash(pos)
 	
 	
 function message.ExpectEmpty

@@ -99,10 +99,10 @@ class PerryIDE (Window)
 		rz = rz.resolve(fileResolveMode.allowmissing)
 
 
-	function GetBuildFile (|file|) 
-		|| inside = .filelist.listsource.first
-		|| found = inside.findnested(@nil, "build.spd") as filerow
-			return found.location.file
+//	function GetBuildFile (|file|) 
+//		|| inside = .filelist.listsource.first
+//		|| found = inside.findnested(@nil, "build.spd") as filerow
+//			return found.location.file
 
 	
 	function PerryError (|error?|) 
@@ -668,13 +668,13 @@ class PerryIDE (Window)
 		
 		Effects.Init()
 
-		syntax access (|int| i, |perryide|)
-			opt norefcounts
-			for w in window.all
-				if w isa perryide
-					if i <= 0
-						return w
-					i--
+//		syntax access (|int| i, |perryide|)
+//			opt norefcounts
+//			for w in window.all
+//				if w isa perryide
+//					if i <= 0
+//						return w
+//					i--
 		
 		
 		function New (|string| path, |perryide|)
