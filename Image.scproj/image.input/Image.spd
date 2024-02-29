@@ -553,7 +553,11 @@ class Image (memory)
 			p+=4
 	
 
-	function DrawCircle (|ivec4| R, |DrawStyle| G, |float| fade=0.0)
+	function DrawCircle (|ivec4| R, |drawstyle| G, |float| fade=0.0)
+		cpp_part DrawCircleG // sigh. remove this
+		.DrawCircle(r,g.bg.color, fade)
+		
+	function DrawCircle (|ivec4| R, |vec4| C, |float| fade=0.0)
 		|| Back		= .Clip(R)$
 		
 		R -= (0,0,1,1)
@@ -564,8 +568,6 @@ class Image (memory)
 		|| Dim		= area_over.RangeConvertClamped(2000, 0.15, 8000, 0.26)
 		
 		// OK so... jsut fade? 
-		|| C		= G.Bg.color
-		c.a = 1.0
 		|| cm = c.PreMul // why tho? the a is just 1? Do we clear c.a later?
 		|| c2		= c * fade
 

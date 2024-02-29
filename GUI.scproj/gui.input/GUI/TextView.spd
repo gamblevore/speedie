@@ -1515,13 +1515,14 @@ class TextView (GUIControl)
 		|| Sel = self is editable or alwaysscrollable
 			.DrawSel(where)
 		where.ControlClip = c			/// restore!
-		if !.CanSeeAllLines and sel
-			if (.ScrollDrawTimer > 1) and .myerror
+		if  !.CanSeeAllLines and scroller.CanDrawScroll(self, .scrolldrawtimer)
+			if .myerror
 				.DrawScrollErrors(where)
-			scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer)
+			if sel
+				scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer)
 	
 	
-	helper DrawScrollErrors (|image| where)
+	helper DrawScrollErrors (|image| where, |float| strength=1.0) // fix later. FADE this b.itch
 		opt norefcounts
 		|float| N = ._lines.last!.vline
 		for s in ._lines
@@ -1530,12 +1531,17 @@ class TextView (GUIControl)
 				|| Y = 1.0 - (v/n)
 				Y *= .height
 				|| p = ivec2(.right - 9, .lastrect.y + Y)
-				|| C = colors.red(0.8)
+				|| C = colors.red
 				if !E.isbad
-					C = colors.yellow(0.8)
-				for 2
+					C = colors.yellow
+//				p.x-=1
+//				p.y-=3
+//				where.DrawCircle((p, p+(9, 4)), C, 3.0)
+				for i in -1 to 1
+					C.alpha = 0.4 * Strength
+					if i == 0
+						C.alpha = 0.8 * Strength
 					where.drawlineH(p, 8, C)
-					C.a *= 0.5
 					p.y--
 	
 		

@@ -11,12 +11,17 @@ module Scroller
 	function Timer (|uint|)
 		return date.ticks
 	
+	function CanDrawScroll (|guicontrol| self,  |&uint| timer, |bool|)
+		opt NoRefCounts
+		return (*timer > 1) or (!sdlapp.MouseButtons and .InScrollArea(.mousexy))
+	
+	
 	function DrawScroll (|guicontrol| self, |image| where, |vec3| slh, |&uint| timer)
 		opt NoRefCounts
+		require CanDrawScroll(self, timer)
+		
 		|| t = (*timer)
-		|| t0 = t
 		|| mb	= sdlapp.MouseButtons
-		require (t > 1) or (!mb and .InScrollArea(.mousexy))
 		if !.MouseNotDownOverOther
 			*timer = 0
 			return

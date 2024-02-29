@@ -13,6 +13,7 @@ function perryide.UnusedFuncsFB (|message| stuff)
 	for tmp in arg
 		.unused_hoe(tmp, where)
 
+function unused1
 
 function perryide.unused_hoe (|message| tmp, |string| where)
 	|| err = error(nil, tmp.name, ErrorSeverity.warning, where )
@@ -542,15 +543,16 @@ function PerrySearchWithin (GUIListEvent)
 function PerryFileViewRightClick (GuiListEvent)
 	require RightClickFileList(self, row, mode)
 	if row isa filerow
-		|| m = .CMM	#require
+		|| m = .CMM									#require
 		|| menu = menuitem("Count Lines Of Code", FileViewerCountCode)
 		|| where = m.listsource.Last.prev
 			where.prev = menu
 	return true
 
+function unused2
 
 function FileViewerCountCode (GuiMenuEvent)
-	|| row = clicked!.row as filerow		#require
+	|| row = clicked!.row as filerow			#require
 	|| CLOC = (0,0)
 	|| FileCount = 0
 	|| Size = 0
