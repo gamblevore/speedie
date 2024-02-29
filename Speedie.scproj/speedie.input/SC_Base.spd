@@ -897,42 +897,43 @@ dispatch RootCollectTable (CollectFunc)
 
 
 dispatch ClsCollectTable (CollectFunc)
-	constructor			SCFunction.NewConstructor		// ??
-	destructor			SCFunction.NewDestructor		// ??
-	render				SCFunction.NewRender			// ??
-	function			SCFunction.NewFunc
-	extend_function		SCFunction.NewFunc // user shouldn't write these
-	setter				SCFunction.NewHider
-	api					SCFunction.NewFunc
-	macro				SCFunction.NewMissingFunc
-	helper				SCFunction.NewHelper
-	behaviour			SCBehaviour.NewBehaviour
-	virtual				SCBehaviour.NewVirtual
-	iterator			SCIterator.NeuIter
-	syx					SCFunction.NeuSyx			   // jeebox specific
-	cpp_wrapper			SCFunction.NewCppWrapper
-	cpp_libwrapper		SCFunction.NewCppWrapper
-	prototype			SCFunction.NewProtoType
-	syntax				SCClass.LoadSyntax
-	operator			SCClass.LoadSyntax
-	processas			SCClass.ProcessAs
-	cpp_refs			cpprefs.ReadIntoCppRefs
-	linkage				CppRefs.Linkage
-	pragma				{ error (node) }
+	+"constructor"			SCFunction.NewConstructor		// ??
+	+"destructor"			SCFunction.NewDestructor		// ??
+	+"render"				SCFunction.NewRender			// ??
+	+"function"				SCFunction.NewFunc
+	+"extend_function"		SCFunction.NewFunc // user shouldn't write these
+	+"setter"				SCFunction.NewHider
+	+"api"					SCFunction.NewFunc
+	+"macro"				SCFunction.NewMissingFunc
+	+"helper"				SCFunction.NewHelper
+	+"behaviour"			SCBehaviour.NewActual
+	+"actual"				SCBehaviour.NewActual
+	+"virtual"				SCBehaviour.NewVirtual
+	+"iterator"				SCIterator.NeuIter
+	+"syx"					SCFunction.NeuSyx			   // jeebox specific
+	+"cpp_wrapper"			SCFunction.NewCppWrapper
+	+"cpp_libwrapper"		SCFunction.NewCppWrapper
+	+"prototype"			SCFunction.NewProtoType
+	+"syntax"				SCClass.LoadSyntax
+	+"operator"				SCClass.LoadSyntax
+	+"processas"			SCClass.ProcessAs
+	+"cpp_refs"				cpprefs.ReadIntoCppRefs
+	+"linkage"				CppRefs.Linkage
+	+"pragma"				{ error (node) }
 
-	initafter			(SCModule.DoInitAfter)
-	ignore				(DontRemove)
-	saveas				(DontRemove)
-	cpp_part			(DontRemove)
-	cpp_class			(DontRemove)
-	cpp_name			(DontRemove)
-	contains			(DontRemove)
-	default				(SCClass.GetDefault)
-	false				(SCClass.GetFalse)
-	size				(DontRemove)
-	module				(DontRemove)
-	constants			(SCModule.ConstantCollector)
-	flags				(SCModule.ConstantCollector)
+	+"initafter"			(SCModule.DoInitAfter)
+	+"ignore"				(DontRemove)
+	+"saveas"				(DontRemove)
+	+"cpp_part"				(DontRemove)
+	+"cpp_class"			(DontRemove)
+	+"cpp_name"				(DontRemove)
+	+"contains"				(DontRemove)
+	+"default"				(SCClass.GetDefault)
+	+"false"				(SCClass.GetFalse)
+	+"size"					(DontRemove)
+	+"module"				(DontRemove)
+	+"constants"			(SCModule.ConstantCollector)
+	+"flags"				(SCModule.ConstantCollector)
 
 
 

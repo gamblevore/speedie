@@ -1747,7 +1747,7 @@ function scfunction.Cleanupfunc (|message| s)
 	  elseif s ~= "render"
 		if Tran_Render(s, cls)
 			s.name = "behaviour"
-	if (s ~= "behaviour") and cls
+	if s.isbehaviour and cls
 		scbehaviour.Tran_Behaviour(s, cls)
 		cls.FillInterFaceIn(self, true)
 

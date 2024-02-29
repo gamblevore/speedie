@@ -252,7 +252,7 @@ class SCBehaviour (SCBase)
 			return true
 		
 		
-		function NewBehaviour (CollectFunc)
+		function NewActual (CollectFunc)
 			|| cls = name_space.ShouldBeClass(errplace)
 			if cls and Tran_Behaviour(node, cls)
 				|| fn = SCFunction.NewFunc(node, cls, node)|scfunction|
@@ -338,6 +338,11 @@ function SCBase.IsNormalObject (|SCClass|)
 	if (self isa SCClass)
 		if .isobject
 			return self
+
+
+function message.IsBehaviour (|bool|)
+	return .name == "behaviour" or "actual"
+// .isbehaviour // name == "behaviour"
 
 
 extend SCClass

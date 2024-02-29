@@ -40,7 +40,7 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 	|| name = msg.first
 	|| params = name.next 
 
-	if msg.name == "behaviour"
+	if msg.isbehaviour
 		params <~ (@thg, "render")
 	  else
 		SCStrings.RenderNewParams.CopyAllInto(params)
@@ -48,7 +48,7 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 	if msg.FindNested( @thg, "fs" )
 		SCStrings.RenderFinish.CopyAllBeforeInto( arg, nil )
 		SCStrings.RenderFinish.CopyAllAfterInto( arg, nil )
-	if msg.name == "behaviour"
+	if msg.isbehaviour
 		msg.second.remove
 		return true
 
@@ -56,9 +56,8 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 function NewRender (CollectFunc)
 	|| cls = name_space.isnormalobject 
 	if Tran_Render( node, cls )
-		return SCBehaviour.NewBehaviour( node, name_space, ErrPlace )
+		return SCBehaviour.NewActual( node, name_space, ErrPlace )
 	return SCFunction.NewFunc( node, name_space, ErrPlace )
-
 
 
 function ObjectifyString (|Message| msg)
