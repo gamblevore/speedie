@@ -250,6 +250,9 @@ class TextView (GUIControl)
 
 	function SelRange (|intrange|)
 		return ._typingplace.resolve
+	helper SelRangeRaw (|intrange|)
+		return ._typingplace
+		
 	function Sel0 (|int|)
 		return .selrange.x
 	function Sel1 (|int|)
@@ -370,11 +373,11 @@ class TextView (GUIControl)
 		debug_require i
 		sdlapp.showcursor(false)
 
-		|| t = .SelRange
+		|| t = ._TypingPlace
 		|| x = t.x2
 		|| LineEnd = false
 		|| fwd = false
-		ifn keys.shift
+		if !keys.shift
 			|| r = t.resolve
 			x = (r.x2, r.x)(i > 0)
 		if keys.platCmd									// line-end
@@ -1381,7 +1384,7 @@ class TextView (GUIControl)
 		if end is last
 			end = nil
 		while d and d != End
-			d.DrawSel(where, r, self, i++, g)
+			d.DrawSelSub(where, r, self, i++, g)
 			if d.after > r.x2
 				exit
 			d++
@@ -1467,9 +1470,9 @@ class TextView (GUIControl)
 		|| d = .FindDrawInfo(pos, VLine)
 		require  vline >= 0  and  vline <= .maxvisiblelines
 		
-		|| y = .abstop - (VLine+1) * .lineheight|int|
+		|| y = (.abstop - (vline+1) * .lineheight|int|) - 2
 		|| x = d.XOfChar(pos) + font.width + .textleft // sigh
-		return (x-2, y-2)
+		return (x-2, y)
 	
 
 	helper FindDrawLineEdge (|intrange| t, |int| i, |bool| CanAvoid=true, |int|)
@@ -1587,27 +1590,36 @@ class TextView (GUIControl)
 	
 	
 	helper ShowNoExtra
-		(.OnShowExtraInfo)(self, (0,0), nil, "")?
+		(.OnShowExtraInfo)(self, (0,0), nil, nil, "")?
 	
 
 	helper ShowExtraInfo (|ivec2| P)
 		opt NoRefCounts
-		require .isjeeboxmode and .OnShowExtraInfo
-		if !keys.cmd
-			return .ShowNoExtra
-		// +(0,2) cos its too easy to slip down to lower line
+		|| fp = .OnShowExtraInfo
+		require fp and .isjeeboxmode
+
 		|textviewline| d
+		// +(0,2) cos its too easy to slip down to lower line
 		|| B = .ByteAtXY(P+(0,2), d).x
-		.ShowExtraInfoAtPos(B, "")
+
+		if !keys.cmd
+			if d and d.DrawError
+				|| P2 = .XYOfchar(b)
+				P2.x = .lastrect.x
+				(fp)(self, P2, nil, d.drawerror, "error")
+			  else
+				.ShowNoExtra
+		  else
+			.ShowExtraInfoAtPos(B, "", nil)
 	
 	
-	helper ShowExtraInfoAtPos (|int| B, |string| reason)
+	helper ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)
 		opt NoRefCounts
 		|| fp = .OnShowExtraInfo$
-		|| xy = (0,0)
+		|| xy = (0, 0)
 		|| M = .ClickedMsg(B)
 			xy = .XYOfChar(M.position)
-		(fp)(self, XY, M, reason)
+		(fp)(self, XY, M, err, reason)
 
 
 	helper StartLine (|TextViewLine|)

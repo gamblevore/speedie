@@ -130,7 +130,7 @@ function TextView.DoTheParamDisplayThing (|int| x, |bool| Force, |bool|) // para
 		// say that it is "forced" here? (by sending "displayallforced" to showextrainfoatpos)?
 		// and if it IS forced... we need to send that across to maybesendmessage
 		// and react to that by instantly showing the popup.
-		.ShowExtraInfoAtPos(x, type)
+		.ShowExtraInfoAtPos(x, type, nil)
 	return true
 	// we now have a place for params but what func?
 

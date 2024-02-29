@@ -311,8 +311,13 @@ function PerryIDE.InteractUpdate
 	.popuphide
 
 
-function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |string| reason)
+function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err,  |string| reason)
 	opt norefcounts
+	if err
+		.PopupDisplayCorner = P
+		.lastextrainfo = nil
+		return 
+	
 	if !M
 		.popuphide
 		.lastextrainfo = nil
@@ -327,7 +332,7 @@ function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |string| reason)
 
 function OnShowExtraInfo (GUITextShowEvent)
 	opt NoRefCounts
-	.ide.ShowExtraInfo(LeftCorner, msg, reason)
+	.ide.ShowExtraInfo(LeftCorner, msg, err, reason)
 	
 
 function JumpToDefinition (GUIAction)

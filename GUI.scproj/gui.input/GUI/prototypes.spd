@@ -19,7 +19,7 @@ prototype GUICopyEvent		   (|GUIControl|  self,  |object?| item, |string|)
 
 prototype GUITextEvent		   (|textview|    self,  |int| Reason, |bool| TextWasAltered)
 prototype GUITextErrorSelected (|textview|    self,  |textviewline| Error)
-prototype GUITextShowEvent	   (|TextView|    self,  |ivec2| LeftCorner, |message?| Msg, |string| reason)
+prototype GUITextShowEvent	   (|TextView|    self,  |ivec2| LeftCorner, |message?| Msg, |error?| err, |string| reason)
 prototype SorterComparerWindow (|window|      a,     |window| b, |int|)
 
 

@@ -10,7 +10,7 @@
 	* and fps!
 	* shouldn't report unused lib funcs
 	* we need some way to look for unused lib funcs anyhow...
-* pulsate a diff color when compiling. (white?)
+	* remove file from textview? we have .document? cant they set it that way?
 * Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 	* Speedie stops compiling sometimes, from perry
 

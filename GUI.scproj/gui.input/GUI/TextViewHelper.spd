@@ -224,7 +224,7 @@ class TextViewLine (ringtree)
 		return .text.EndsWithLine
 
 
-	function DrawSel (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| g)
+	function DrawSelSub (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| g)
 		opt min 3
 		|| M = .DrawRange
 		require (r.x <= m.x2) and (r.x2 >= m.x)
