@@ -4,8 +4,9 @@ extend PerryIDE
 	function Recheck 
 		if .ModifiedForCompile
 			.ForceRecheck
+		|| p = .path					#debug_require
 		|| unused = @tmp + "unused_funcs"
-		unused <~ .path
+		unused <~ p
 		.SendFeedbackMsg(unused)
 		
 	function ForceRecheck

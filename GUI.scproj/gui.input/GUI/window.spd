@@ -173,9 +173,10 @@ class Window (GUIControl)
 	behaviour TypedString
 		opt norefcounts
 		|| f = .realFocus
+			|| o = f
 			if (f isa menu) and (f != .focus) and (f is typethrough)
-				f = .focus as menu					#require
-			if f.__TypedString__(input)
+				o = .focus$
+			if o.__TypedString__(input)
 				return true
 		if (Input == 1) and Input.IsASCII			// like a space basically?
 			return .__KeyDown__(input.codepoint)	// i think the ascii codes are the same?

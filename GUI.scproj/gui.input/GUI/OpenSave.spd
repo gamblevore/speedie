@@ -49,7 +49,7 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 		f.select(OpenSaveDialog.FindFileName(f, last.name))
 	
 	if save and w.name.text contains '.'
-		w.name.sel = (0, 8) // only works on the second time we run this func? annoying.
+		w.name.selrange = (0, 8) // only works on the second time we run this func? annoying.
 	f.setfocus
 	
 	rz = (w)() as string

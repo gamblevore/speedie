@@ -32,8 +32,8 @@ extend PerryIDE
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
 		.DrawMe				= GraphicsEditor(self)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
-		.Status				= TextView(self,		ClickedStatus,			nil)
-		.StatsInfo			= TextView(self,		ClickedStats,			nil)
+		.EditStatus			= TextView(self,		ClickedStatus,			nil)
+		.ProjectInfo		= TextView(self,		ClickedProjectInfo,		nil)
 		.SelInfo			= TextView(self,		PressedSelInfo,			nil)
 		.JeeboxText			= TextView(self,		nil,					nil)
 		.SpeedieText		= TextView(self,		nil,					nil)
@@ -278,8 +278,8 @@ extend PerryIDE
 			.gnormal.seps	= vec4(0.4, 1.0)
 
 
-		with .status 
-			.ID				= "Status"
+		with .EditStatus 
+			.ID				= "Status And Errors"
 			.alignment		= MoveCode.Center
 			isnt editable
 			.takesfocus		= 0
@@ -287,13 +287,13 @@ extend PerryIDE
 			.gnormal.solid  = vec4(0.125, 0.94)
 
 
-		with .StatsInfo 
-			.ID				= "StatsInfo"
+		with .ProjectInfo 
+			.ID				= "ProjectInfo"
 			.alignment		= MoveCode.MiddleLeft
 			.SingleLine		= true
 			isnt editable 
 			.takesfocus		= 0
-			.size 			= the~left to the~middle+100  by  0 to 13
+			.size 			= the~left for 300  by  0 to 13
 			.gnormal.clear
 
 

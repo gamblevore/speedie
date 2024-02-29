@@ -255,6 +255,8 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 			.DisplayFB(msg)
 		  elseif msg starts "compile" or "debug"
 			.CompileFB(msg)
+		  elseif msg starts "unused_funcs"
+			.UnusedFuncsFB(msg)
 		  elseif msg starts "log"
 			.LogFB(msg)
 		  elseif msg starts "callfrom"

@@ -231,7 +231,7 @@ function SwitchedToErrors
 	if e.listsource.hasany and !e.FirstSelected
 		e.selectfirst
 	  else
-		.editme.ShowParseError
+		.editme.ShowNextParseError
 
 
 function NoNeed (|string| s = "", |buttonview| old = nil)

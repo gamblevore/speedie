@@ -7,6 +7,7 @@ cpp_part AC
 |string|			AnonText
 |scbase|			AnonParent
 |errorreceiver|		Errors
+|bool|				CompiledOK
 |bool|				Cleaned
 |bool|				WillExit 
 ||					func_tmp_src   = <(`return, require, "log <string>", while, linkage, for, if, else, elseif, expect, warn, error, disabled, cpp_refs, debugger, debugat, deprecate, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "visible", "exit", "opt norefcounts", "pragma inline"
@@ -62,6 +63,7 @@ function EnterAutoComplete (|bool|)
 	app.ClearCaches
 	if options.PrintLibraries
 		perry.pico.config.noise = -1
+	compiler.InPerry = true
 	.PerryTalk(perry)
 	return true
 
@@ -79,7 +81,7 @@ function CrashTester
 
 
 function PerryTalk (|spdprocess| perry) // ReturnsWhenPerryClosesUs
-	Compiler.CompileAll
+	.CompiledOK = Compiler.CompileAll
 	.ParserRestore
 	perry <~ .check(@tmp + "check")
 	
@@ -163,14 +165,14 @@ function ErrorsToPerry (|message|)
 
 function UnusedFuncs (|message| cmd, |message|)
 	opt norefcounts
-	|| path = cmd[@str]$
-	|| scf = compiler.files[path.name] #expect ("No file at: " + path.name)
+	|| path = cmd[@str]									#require
+	|| scf = compiler.files.valuelower(path.name)		#expect ("No file at: " + path.name)
 	cmd.Clear
-	|| arg = cmd.GiveArg
-	for fn in Compiler.FuncList
-		if fn.File == scf
+	if .CompiledOK
+		|| arg = cmd.GiveArg
+		for fn in Compiler.FuncList
 			|| src = fn.source
-			if src and !fn.MyReacher
+			if src and fn.isunused and fn.File == scf
 				arg <~ src.position
 	return cmd
 	
@@ -221,8 +223,8 @@ function DoCmd (|Message| cmd, |message| arg, |message|)
 	if cmd ~= "mem":				return .ReportMemory(cmd)
 	if cmd == 1:					return .Jump(cmd)
 
-	|| req = cmd[@str].name.lowercase
-	|| my_file = compiler.files[req]
+	|| req = cmd[@str].name
+	|| my_file = compiler.files.valuelower(req)
 		rz = .MainAct(cmd, my_file)
 	  else
 		error "nofile"
@@ -304,7 +306,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 		return fn
 
 
-function scfunction.Update_Source (|int| start, |string| text, |scfile| myfile, |scobject| orig, |bool|)
+function SCFunction.Update_Source (|int| start, |string| text, |scfile| myfile, |scobject| orig, |bool|)
 	scfunction.currfunc = self
 	parser.using.position = -1
 	parser.using.Flags = 0 // oop
@@ -712,9 +714,9 @@ function RootTmpComplete (|message| cmd, |message|)
 	|| f = cmd[0][0]
 	|| req = f.next.name
 	|| flags = 0 // for now
-	flags += f.IsModuleType  <<1
-	flags += f.IsClassType   <<2
-	flags += f.IsLinkageType <<3
+	flags += f.IsModuleType  <<  1
+	flags += f.IsClassType   <<  2
+	flags += f.IsLinkageType <<  3
 	flags := 1
 	rz = @tmp.msg(cmd.name)
 	|| arg = rz.msg(@arg, req)
@@ -768,7 +770,7 @@ function AutoComplete (|message| ff, |string| name, |string| Purpose, |message|)
 
 
 function ActualDefine (|message| rz, |message| s, |string| purpose)
-	|| f = s.filepath #expect "nopath"
+	|| f = s.filepath			#expect "nopath"
 	rz.msg(@sstr, f)
 	rz <~ s.position
 

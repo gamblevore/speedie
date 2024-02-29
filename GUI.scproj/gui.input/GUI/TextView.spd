@@ -67,7 +67,7 @@ class TextView (GUIControl)
 			value.addviewer(self)
 	
 
-	function Undoer (|Document?|)
+	helper Undoer (|Document?|)
 		opt norefcounts
 		|| v = ._viewing
 		if v or self isnt editable
@@ -228,9 +228,9 @@ class TextView (GUIControl)
 			t = (b, b)
 
 		if !CmdKey
-			.sel2(.ExpandSel(t, .clicksdown), d)
+			.SelDirect(.ExpandSel(t, .clicksdown), d)
 		  else
-			.sel2(t, d)
+			.SelDirect(t, d)
 		.PreferPrevLine = bs.x2
 		.uncorrectedsel = t
 
@@ -255,20 +255,19 @@ class TextView (GUIControl)
 	function Sel1 (|int|)
 		return .selrange.y
 
-	function Sel (|intrange|)
-		return ._typingplace
-
-
-	function Sel (assigns:|intrange|)
+	function SelRange (assigns:|intrange|)
 		.TypingPlaceTry(value, false, nil)
 
-	helper Sel2 (|intrange| value, |textviewline| d)
+	helper SelDirect (|intrange| value, |textviewline| d)
 		.TypingPlaceTry(value, false, d)
 
 	function Sel (assigns: |int| r)
 		cpp_part TypingPlaceInt
-		.sel = (r, r)
+		.selrange = (r, r)
 		
+	helper SelectedLine (|textviewline|)
+		return .FindDrawInfo(.sel0)
+
 	helper TypingPlaceDirect (|intrange| result, |bool|)
 		opt norefcounts
 		require result != ._TypingPlace
@@ -371,7 +370,7 @@ class TextView (GUIControl)
 		debug_require i
 		sdlapp.showcursor(false)
 
-		|| t = .sel
+		|| t = .SelRange
 		|| x = t.x2
 		|| LineEnd = false
 		|| fwd = false
@@ -400,10 +399,10 @@ class TextView (GUIControl)
 			t = (x, x)
 		|| d = .show(x)
 		.preferprevline = fwd and (!d.emptyline or !d.EndsWithLine) 
-		.sel2(t,d)
+		.SelDirect(t,d)
 		return true
 	
-	
+	target false {
 	helper textviewline.InSane (|textviewline|s, |bool|)
 		if (.position < 0)
 			return true
@@ -413,14 +412,13 @@ class TextView (GUIControl)
 
 	helper Sanity
 		opt norefcounts
-		target false
-			for p in .lines
-				|| s = p.next
-				if p.insane(s)
-					debugat
-					return
-				p = s
-
+		for p in ._lines
+			|| s = p.next
+			if p.insane(s)
+				debugat
+				return
+			p = s
+	}
 
 	function ShowTypingPlace (|ivec2| r)
 		if r.width
@@ -452,7 +450,7 @@ class TextView (GUIControl)
 	function ShowAndSel (|int| x, |int| length=0, |textviewline|)
 		opt NoRefCounts
 		rz = .show(x)
-		.sel2((x, x + length), rz)
+		.SelDirect((x, x + length), rz)
 
 
 	function ViewPos (|int| x,  |int|before=0, |int| back=0, |bool| Exact=false, |TextViewLine|)
@@ -483,7 +481,7 @@ class TextView (GUIControl)
 	function Jump (|int| x, |int| Before=0, |bool|)
 		// views X, and sets new typing place.
 		opt norefcounts		
-		|| t = .sel
+		|| t = .SelRange
 		x = .clamp(x)
 		|| d = .ViewPos(x, before, 2) //idk
 			
@@ -491,7 +489,7 @@ class TextView (GUIControl)
 			t.x2 = x
 		  else
 			t = (x, x)
-		.sel2(t,d)
+		.SelDirect(t,d)
 		return true	
 
 
@@ -517,7 +515,7 @@ class TextView (GUIControl)
 				page = (keys.Option)|int|
 			
 		|| x  = (.text.length, 0)(i > 0)
-		|| t  = .sel
+		|| t  = .SelRange
 		|| bs = .FindDrawSelMove(t, i, page>0)
 		if .singleline and (t == bs.x)
 			return .MoveListLine(i)
@@ -553,7 +551,7 @@ class TextView (GUIControl)
 			range = .text.stretchyfind(s, range.x, range.x2)
 			require range.x >= 0
 		
-		.sel2(range, nil)
+		.SelDirect(range, nil)
 		.ViewPos(range.x, .MaxVisibleLines/2, 2)
 		return true
 			
@@ -612,7 +610,7 @@ class TextView (GUIControl)
 	
 	
 	helper DoSelectAll (|bool|)
-		.sel = (0, .text.length)
+		.selrange = (0, .text.length)
 		return true
 	
 	
@@ -790,7 +788,7 @@ class TextView (GUIControl)
 				c2 = c2[0, c2.length-2]
 			.undochecker = -1
 			.insertsub(c2, r, false)
-			.sel += (trim - c2.length)
+			.selrange += (trim - c2.length)
 			rz = true
 
 
@@ -804,10 +802,11 @@ class TextView (GUIControl)
 				
 		
 	helper TypeTab (|bool|)
-		if !.sel.width and .isjeeboxmode
-			|| i = .sel.x
+		|| sr = .SelRange
+		if !sr.width and .isjeeboxmode
+			|| i = sr.x
 			|| bs = .backspaces(i)
-				.sel = (bs, i)
+				.selrange = (bs, i)
 		return .typed("\t")
 
 
@@ -853,9 +852,16 @@ class TextView (GUIControl)
 		return (A+1, b) // don't include the line.
 
 	
-	// don't call these internally...
-	function ShowParseError
-		.errorat(.myerror)
+	function ShowNextParseError
+		opt norefcounts
+		|| start = .selectedline
+		|| d = start.Loop()
+		while d != start
+			if d.DrawError
+				.ErrorAt(d.drawerror)
+				return 
+			d = d.loop
+	
 	
 	function FillErrors (|errorreceiver| err)
 		for e in err
@@ -1050,7 +1056,7 @@ class TextView (GUIControl)
 	
 	
 	function SelectAll
-		.sel = (0, .text.length)
+		.selrange = (0, .text.length)
 			
 
 	helper init
@@ -1087,13 +1093,13 @@ class TextView (GUIControl)
 		
 	helper CounterPartType (|string| s, |bool| Force=false, |bool|)
 		require (!.singleline and s.length == 1)
-		|| sel  = .sel
+		|| sel  = .SelRange
 		|| sel2 = sel.x2
 		|| t    = .seltext
 
 		if (!sel.width and s == "=")			//   a |=| b   -->   a |= b
 			if  self[sel2] == '|'  and  self[sel2-1] == '|'
-				.sel = (sel2, sel2+1)
+				.selrange = (sel2, sel2+1)
 			return false
 
 		require t or (.ExpectsParse >= probablyjeebox)
@@ -1122,15 +1128,15 @@ class TextView (GUIControl)
 		
 		.undochecker = -1
 		|| x = .insert(s + t + other)
-		.sel = (x+1, x+t.length+1)
+		.selrange = (x+1, x+t.length+1)
 		return true
 
 
 	function SelText (|string|)
 		return self[.selrange]
 
-	function SelLine (|string|)
-		return self[.SelectCurrLine]
+//	function SelLine (|string|)
+//		return self[.SelectCurrLine]
 
 	
 	behaviour TypedString
@@ -1277,12 +1283,16 @@ class TextView (GUIControl)
 		return true
 	
 		
-	function SelectCurrLine (|intrange|)
-		rz = .lineexpand(.selrange, true)
-		if rz.x > 0
-			rz.x--
-		  else
-			rz.x2++ // i guess?
+//	function SelectCurrLine (|intrange|)
+//		rz = .lineexpand(.selrange, true)
+//		if rz.x > 0
+//			rz.x--
+//		  else
+//			rz.x2++ // i guess?
+
+
+//	function DoSelectLine
+//		.selrange = .ProperSelectLine
 
 
 	function ExtendToLineEnd (|ind| i, |ind|)
@@ -1293,18 +1303,15 @@ class TextView (GUIControl)
 		return .text.length
 
 
-	helper InsertLoss (|string|s, |ivec2| loss, |int|)
-		|| n = .length
-		.insertsub(s, loss, false)
-		return n - .length
-		
+//	helper InsertLoss (|string|s, |ivec2| loss, |int|)
+//		|| n = .length
+//		.insertsub(s, loss, false)
+//		return n - .length
+//		
 	
 	function FindLine (|int|start=0, |int|end=int.max, |ind|)
 		return .text.find(jeebox.CSLine, start, End )
 
-
-	function DoSelectLine
-		.sel = .ProperSelectLine
 
 
 	helper ProperSelectLine (|intrange|)
@@ -1739,7 +1746,7 @@ class TextView (GUIControl)
 		|| p = .ParsedMessage
 		if p and !changed
 			return p
-		|| sel = .sel
+		|| sel = .SelRange
 		if !sel.width and sel.x > 0
 			parser.DotInsertAllow = true
 
@@ -1831,9 +1838,6 @@ class TextView (GUIControl)
 		.EndPrepare(d, StayAtEnd, pos)
 
 	
-	function ReclaimRestart (|textviewline| d, |int|)
-		return int.max // too hard to do right now.
-		opt norefcounts
 
 
 	function EndPrepare (|TextViewLine| d, |bool| StayAtEnd, |int| pos)
@@ -1844,7 +1848,16 @@ class TextView (GUIControl)
 		if !StayAtEnd// or !d
 			d = .FindDrawInfoSub2(pos, nil, false)
 		.StartWithoutScrollDraw = d
-		.ClearReclaim
+		.ClearReclaim	
+	
+	helper textview.ClearReclaim
+		._reclaim  = (0, 1GB, 0)
+	
+
+	target ReclaimAttempt {
+	function ReclaimRestart (|textviewline| d, |int|)
+		return int.max // too hard to do right now.
+		opt norefcounts
 
 	
 	helper MapToOld (|int| P, |int|)
@@ -1856,12 +1869,8 @@ class TextView (GUIControl)
 		if p - add > R1
 			return p - add
 		return R1
-		
+	}
 	
-	helper textview.ClearReclaim
-		._reclaim  = (0, 1GB, 0)
-		
-		
 	function ScrollToEnd
 		opt norefcounts
 		|| w = .Window
@@ -1884,13 +1893,13 @@ class TextView (GUIControl)
 		return ._Start.position
 
 	
-	function ScrollPos (assigns:|int|)
-		opt norefcounts
-		for c in ._lines
-			if c.after > value
-				.StartWithoutScrollDraw(c)
-				return
-		.scrolltoend
+//	function ScrollPos (assigns:|int|)
+//		opt norefcounts
+//		for c in ._lines
+//			if c.after > value
+//				.StartWithoutScrollDraw(c)
+//				return
+//		.scrolltoend
 
 
 	helper UnloadDoc (|document| old)

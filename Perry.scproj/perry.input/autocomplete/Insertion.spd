@@ -257,7 +257,7 @@ function PerryInsert2 (|textview| self, |message| where, |intrange| A, |bool|)
 function PerryInsert1 (|textview| self, |message| where, |intrange| a, |bool|)
 	.undochecker = -1
 	.InsertSub(" name ", a)
-	.sel = (a.x2+1, a.x2+5)
+	.selrange = (a.x2+1, a.x2+5)
 	return true								// f* --> fn *
 
 
@@ -340,7 +340,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 			// we wanna sel the actual text
 			while .text.CharMode(s.x2) == '_'
 				s.x2++
-			.Sel = s
+			.Selrange = s
 			return 1
 			
 
@@ -364,7 +364,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 			return (s.x <= i2)|int|
 		if (state == 2)
 			if s.width
-				.sel = s.x2x2
+				.selrange = s.x2x2
 			return 1 // why not
 		return 0 // i think?
 	

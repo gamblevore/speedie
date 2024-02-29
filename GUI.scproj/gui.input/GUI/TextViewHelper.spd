@@ -257,7 +257,6 @@ class TextViewLine (ringtree)
 	
 	function TrySetError (|error| e, |bool|)
 		opt norefcounts
-		require self
 		|| old = .drawerror
 			e.when = old.when
 		.drawerror = e
@@ -322,7 +321,9 @@ helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 		v = (1.0, 0.15, 0.1, 0.35)
 	 
 	if e.severity == errorseverity.ok
-		v = (0.6, 0.5, 0.1, 0.2)
+		v = (0.6, 0.6, 0.6, 0.25)
+	  elseif e.severity < errorseverity.problem
+		v = (0.6, 0.6, 0.1, 0.25)
 
 	if d contains .sel1
 		.myerror = e

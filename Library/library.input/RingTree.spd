@@ -460,7 +460,7 @@ class RingTree (Saveable)
 		parent.first = self // smallest
 
 
-	function Loop (|bool| dir, || Owner=nil, |...!|)
+	function Loop (|bool| dir=true, |ringtree| Owner=nil, |...!|)
 		description "Owner must be nil... or contain us. Otherwise this function will break."
 		opt norefcounts
 		real self

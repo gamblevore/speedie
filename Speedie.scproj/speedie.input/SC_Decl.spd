@@ -548,7 +548,7 @@ class SCDecl (SCObject) {
 		// same as operator isa but not backwards :(
 
 	
-	operator matches (|SCDecl| O, |bool|)
+	operator matches (|SCDecl!| O, |bool|)
 		cpp_part MatchesDecl
 		// should disable/deprecate this
 		return .matchC(O)

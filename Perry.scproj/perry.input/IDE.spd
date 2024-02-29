@@ -27,8 +27,8 @@ class PerryIDE (Window)
 	|TextView|					MassSearchField
 	|TextView|					EditMe
 	|GraphicsEditor| 			DrawMe
-	|TextView|					Status
-	|TextView|					StatsInfo
+	|TextView|					EditStatus
+	|TextView|					ProjectInfo
 	|TextView|					SelInfo
 	|TextView|					NoNeeder
 	|TextView|					PopupDisplay
@@ -89,7 +89,7 @@ class PerryIDE (Window)
 
 		
 	function UpdateStatusErrors
-		.status.text = .PerryStatus
+		.EditStatus.text = .PerryStatus
 
 
 	function ExpandStr (|string| path, |string|)
@@ -245,14 +245,14 @@ class PerryIDE (Window)
 		return fs
 
 
-	function ClickedStats
+	function NextProjInfo
 		.ShowLeftStats(perryide.StatsMode+1)
 
 
 	function ShowLeftStats (|int| i = -1)
 		if i >= 0
 			perryide.StatsMode = i
-		.StatsInfo.text = .InfoStatus	
+		.ProjectInfo.text = .InfoStatus	
 
 
 	function ShowRightStats

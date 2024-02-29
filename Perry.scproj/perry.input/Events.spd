@@ -4,7 +4,22 @@ function FileSepClicker (guiaction)
 	opt norefcounts
 	.ide.ViewAsSwap
 
-	
+
+function perryide.UnusedFuncsFB (|message| stuff)
+	opt norefcounts
+	|| arg = stuff.last
+	require arg == @arg
+	|| where = stuff.firstname
+	for pos in arg
+		.unused_hoe(pos.int, where)
+
+
+function perryide.unused_hoe (|int| pos, |string| where)
+	|| err = error(nil, "Unused function", ErrorSeverity.warning, where )
+	err.position = pos
+	.editme.LineErrorAdd(err)
+
+
 function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE!|) // initide
 	|| old = perry.FindProj(path)
 		ClickedTabs(nil, old)
@@ -217,11 +232,11 @@ function OpenProjectPath (GUIaction)
 
 
 function ClickedStatus (GUIaction)
-	.ide!.editme.ShowParseError
+	.ide!.editme.ShowNextParseError
 
 
-function ClickedStats (GUIaction)
-	.ide!.clickedstats
+function ClickedProjectInfo (GUIaction)
+	.ide!.NextProjInfo
 
 
 function PerryIDE.ShowErrors (|bool| FromKeys, |bool|)

@@ -743,7 +743,7 @@ function EqualOrMoreSpecific (|SCFunction| f, |bool|)
 	require (f.args.length == .args.length)
 
 	|| r = f.ReturnType
-		require r matches .ReturnType
+		require r matches .ReturnType!
 	
 	for (a in .args) (i)
 		require (f.args[i]! matches a)
@@ -854,7 +854,8 @@ function ConstructorLinePlace (|message|)
 function CanCompare (|SCDecl|Against, |bool|)
 	opt norefcounts
 	for (f in self)
-		if (against matches f.args[ 1 ])
+		|| arg = f.args[ 1 ]!
+		if (against matches arg)
 			return true
 
 
@@ -950,8 +951,13 @@ function FindReached (|scbase| from, |bool|)
 			rz = true
 		  elseif (o isa SCClass)
 			o.Reach(self)
-		
 	
+	
+function IsUnused (|bool|)
+	return !.MyReacher and !.IsDisabled and !.IsExternalLib
+	
+
+
 function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Type = "", |Message|)
 	using (errnode)
 	nil self

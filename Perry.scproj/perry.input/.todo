@@ -5,12 +5,11 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 
-* typethrough in function-list disabled
-* MouseOver errors in editor, should put them in a popup
-* Mark unused funcs in editor colored
+* pulsate a diff color when compiling. (white?)
 * Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 	* Speedie stops compiling sometimes, from perry
 
+* MouseOver errors in editor, should put them in a popup
 * nil reporting way off sometimes, especially on constructors
 	* function Loop (|bool| dir, || Owner=nil, |...!|) checked wrongly
 
