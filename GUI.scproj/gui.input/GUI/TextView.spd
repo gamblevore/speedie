@@ -863,7 +863,7 @@ class TextView (GUIControl)
 			d = d.loop
 	
 	
-	function FillErrors (|errorreceiver| err)
+	function FillErrors (|ErrorReceiver| err)
 		for e in err
 			.ErrorAt(e)
 	

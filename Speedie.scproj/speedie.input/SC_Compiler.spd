@@ -171,10 +171,6 @@ function CompileAll (|bool|)
 		.Timer( "NilChecking" )
 		ArchonPurger.FixArchons
 	
-	if compiler.inperry
-		SCImport.ExportShaders // just in case of shader errors
-		return stderr.ok
-	
 	require .Stage( "RefCounting" )
 	.Timer( "RefCounting" )
 	.DoRefAnalysis				// do actual refcounts.

@@ -93,7 +93,7 @@ function PerryTalk (|spdprocess| perry) // ReturnsWhenPerryClosesUs
 	perry.disconnect // calls close, which uses SO_LINGER, to allow sending.
 
 
-function BuildError (|string| name, |message|)
+function WriteError (|string| name, |message|)
 	rz = @tmp + "error"
 	|| err = StdErr.pop
 		rz <~ err.name
@@ -106,7 +106,7 @@ function CmdResponse (|Message| cmd, |message| arg, |message|)
 	if cmd != "error"
 		rz = .docmd(cmd, arg)
 	
-	rz := .BuildError(cmd.name)
+	rz := .WriteError(cmd.name)
 
 
 function CmdCleanUp (|Message| arg, |message|) 
@@ -177,7 +177,7 @@ function UnusedFuncs (|message| cmd, |message|)
 	return cmd
 	
 
-function ReportBuildOrRestart (|message| cmd, |message|)
+function BuildOrRestart (|message| cmd, |message|)
 	.WillExit = true
 	if .errors.ok
 		TransCompiler.ExportAndInstall(true)
@@ -218,7 +218,7 @@ function DoCmd (|Message| cmd, |message| arg, |message|)
 	
 	if !.InitedOK:					return cmd.SendPerryErrors
 	if cmd ~= "unused_funcs":		return .UnusedFuncs(cmd)
-	if cmd ~= "compile" or "debug":	return .ReportBuildOrRestart(cmd)
+	if cmd ~= "compile" or "debug":	return .BuildOrRestart(cmd)
 	if cmd ~= "check":				return .Check(cmd)
 	if cmd ~= "mem":				return .ReportMemory(cmd)
 	if cmd == 1:					return .Jump(cmd)

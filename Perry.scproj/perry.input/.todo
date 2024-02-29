@@ -5,6 +5,11 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 
+* unused func finder can't find LoadOneError? but IS being used!
+	* constructors too!
+	* and fps!
+	* shouldn't report unused lib funcs
+	* we need some way to look for unused lib funcs anyhow...
 * pulsate a diff color when compiling. (white?)
 * Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 	* Speedie stops compiling sometimes, from perry

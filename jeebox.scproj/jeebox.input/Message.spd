@@ -99,8 +99,8 @@ class Message (RingTree)
 		return .name[0, s, true]
 
 
-	function ClearPosition
-		.Position = parser.using.position
+//	function ClearPosition
+//		.Position = parser.using.position
 
 
 ////////////////////////////////////////////////////////////////////////////////

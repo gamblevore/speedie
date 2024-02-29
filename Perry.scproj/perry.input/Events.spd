@@ -168,16 +168,16 @@ function PerryIDE.ClickedTodo
 	fl.SelectNoShow(todo)
 
 
-function HeldReleaseButton (GUIaction)
-	if self isa buttonview
-		if !.OpenMenu
-			.ide.notify("No build-tasks exist.")
+//function HeldReleaseButton (GUIaction)
+//	if self isa buttonview
+//		if !.OpenMenu
+//			.ide.notify("No build-tasks exist.")
 
 
-function ClickedRelease (GUIaction)
-	return false
-	|| name = .tag as string
-		.ide.compile("compile", name)
+//function ClickedRelease (GUIaction)
+//	return false
+//	|| name = .tag as string
+//		.ide.compile("compile", name)
 
 
 function fnBuildIsDead (fnConfirmCanceller)
@@ -300,13 +300,13 @@ function perryIDE.UpdateJeeboxField (|bool|)
 	return true
 
 
-function PerryIDE.ClickedFile (|bool|)
-	|| t = .editme.seltext.trim
-	if t[0] == '/'
-		|| it = t.inwhite
-			t = t[0, it]
-		if t.reveal
-			return true
+//function PerryIDE.ClickedFile (|bool|)
+//	|| t = .editme.seltext.trim
+//	if t[0] == '/'
+//		|| it = t.inwhite
+//			t = t[0, it]
+//		if t.reveal
+//			return true
 
 
 function PerryIDE.BatchPhind (|string| text, |uint| ID, |bool|)
@@ -508,14 +508,14 @@ function SelectedFile (GuiListevent)
 		return .ide!.EditFile(row)
 
 
-function RightClickErrorList (GUIListEvent)
-	opt NoRefCounts
-	if self isa FileViewer
-		|| m = .newcmm
-		m <~ ("Copy File Path",			FileViewerCopyPath)
-		m <~ ("Show In Finder",			FileViewerCMMShow)
-		m <~ ("Show In Project",		ProjectCMMShow)
-	return true
+//function RightClickErrorList (GUIListEvent)
+//	opt NoRefCounts
+//	if self isa FileViewer
+//		|| m = .newcmm
+//		m <~ ("Copy File Path",			FileViewerCopyPath)
+//		m <~ ("Show In Finder",			FileViewerCMMShow)
+//		m <~ ("Show In Project",		ProjectCMMShow)
+//	return true
 
 
 function perry.FindElseWhere (|perryide| ignore, |string| find, |byte| FindID)
