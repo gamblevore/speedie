@@ -740,23 +740,24 @@ class TextView (GUIControl)
 		.insertsub(s, r, true)
 		return true
 
-
-	helper string.HasSlashComment (|ind|)
+	helper string.IsSlashComment (|bool|)
 		for s.lines in self
 			|| i = s.OutWhite
-				if s[i, "//"]
-					return i
+				require s[i, "//"]
+		return true
+		
 
 	helper string.DeslashComment (|string|)
-		|| i = .HasSlashComment
-			return .insert("", i, 2)
+		|| i = .OutWhite
+			if self[i, "//"]
+				return .insert("", i, 2)
 		return self
 		
 	
 	helper DeslashComment (|bool|)
 		|| r = .CommentableRange
 		|| t = self[r]
-		require t.HasSlashComment
+		require t.IsSlashComment
 		|| fs = FastString()
 		for (s.lines in t) (p)
 			fs <~ s.DeSlashComment

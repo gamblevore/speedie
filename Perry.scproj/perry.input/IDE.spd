@@ -557,6 +557,7 @@ class PerryIDE (Window)
 			return true
 		if key is num8
 			.flip(.JeeboxText)
+			.UpdateJeeboxField
 			return true
 		if key is num7
 			.flip(.SpeedieText)
