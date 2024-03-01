@@ -267,11 +267,11 @@ class FileRow (ListViewRow)
 		super.syntaxappend(r)
 		r.inmainproj = .InMainProj
 
-	syntax access (|string| name, |filerow|)
-		opt norefcounts
-		for r in self
-			if r.location.name ~= name
-				return r
+//	syntax access (|string| name, |filerow|)
+//		opt norefcounts
+//		for r in self
+//			if r.location.name ~= name
+//				return r
 
 
 	helper Match (|string| path, |bool| NameOnly, |int|)

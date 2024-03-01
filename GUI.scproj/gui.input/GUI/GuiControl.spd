@@ -367,8 +367,6 @@ class GUIControl (ringtree)
 		return .sizer.GSize[0]|controlpoint|
 	function Bottom (|controlpoint|)
 		return .sizer.GSize[1]|controlpoint|
-	setter After (|int|)
-		.sizer.g(0) = (value)~after
 
 	function Horz (|intrange|)
 		return .lastrect.x1x2
@@ -376,8 +374,6 @@ class GUIControl (ringtree)
 	function Vert (|intrange|)
 		return .lastrect.xx2
 
-	setter Under (|int|)
-		.sizer.g(3) = (value)~under
 
 	function HasFocus (|bool|)
 		opt norefcounts
@@ -469,6 +465,8 @@ class GUIControl (ringtree)
 
 	
 	helper RefSanity
+		visible
+		opt norefcounts
 		|| c	= .class		// Cls->Memory
 		|| m	= c.layer
 		|| rc	= m.refcount

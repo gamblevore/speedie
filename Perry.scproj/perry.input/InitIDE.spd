@@ -16,7 +16,7 @@ extend PerryIDE
 		.Toolbar			= buttonview(self,		ClickedToolBar,			nil)
 		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile,			nil)
-		.Tabs				= ButtonView(.Toolbar,	ClickedTabs,    PressingTabs,  ReturnProjectPath,  RightClickedTabs) 
+		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,    PressingTabs,  ReturnProjectPath,  RightClickedTabs) 
 		.StartScreen		= ButtonView(.Toolbar,	&StartupWindow.open)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
@@ -356,7 +356,7 @@ extend PerryIDE
 		.progress.ExpandOnMouseOver = 1
 		.currfilename.ExpandOnMouseOver = 1
 		.FunctionMenu.ExpandOnMouseOver = 1
-		.tabs.ExpandOnMouseOver = 2
+		.ProjectTabs.ExpandOnMouseOver = 2
 
 		
 		with .StdOutBorder
@@ -364,7 +364,7 @@ extend PerryIDE
 			.size 			= the~width  by  18~down
 			.gnormal.solid	= vec4(0.087, 0.95)
 
-		with .tabs
+		with .ProjectTabs
 			.id = "Tabs"
 			.size = 10~after to the~right  by  3~inside
 			.itemwidth = 75

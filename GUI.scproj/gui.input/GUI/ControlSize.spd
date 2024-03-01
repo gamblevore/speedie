@@ -25,9 +25,9 @@ struct ControlSize
 	syntax access (|int| i, |ControlPoint|)
 		return .GSize[i]|controlpoint|
 		
-	setter TrySetLength (|int| i, |int|)
-		if .mode(i) == ControlPoint.Length
-			.g(i) = (value)~long
+//	setter TrySetLength (|int| i, |int|)
+//		if .mode(i) == ControlPoint.Length
+//			.g(i) = (value)~long
 				
 	function Mode (|int|i, |int|)
 		return .GSize[i]&15

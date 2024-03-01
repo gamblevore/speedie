@@ -241,9 +241,10 @@ class ButtonView (GUIControl)
 			|| darker = (!i and clicked)
 			if (i is Selected) or darker
 				if darker != .PressMakesLighter
-					G.overlay(0.4~black, 0.25)
+					G.overlay(0.3~black, 0.25)
 				  else
-					G.overlay(0.4~white, 0.25)
+					|| amount = (0.66, 0.3)(i is active)
+					G.overlay((1.0, 1.0, 0.5, amount).premul, 0.25)
 				
 			if disabled
 				G.overlay(0.6~gray, 0.4)

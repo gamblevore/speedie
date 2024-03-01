@@ -93,11 +93,11 @@ class ColorScheme
 	syntax access (|int| i, assigns: |vec3|)
 		.BGCorners[i] = (value, 1.0)
 		
-	function FadeV (|vec4| top, |vec4| bottom)
-		.BGCorners[0] = top
-		.BGCorners[1] = top
-		.BGCorners[2] = bottom
-		.BGCorners[3] = bottom
+//	function FadeV (|vec4| top, |vec4| bottom)
+//		.BGCorners[0] = top
+//		.BGCorners[1] = top
+//		.BGCorners[2] = bottom
+//		.BGCorners[3] = bottom
 		
 		
 	function DrawBackground (GUIDrawBackground)

@@ -6,12 +6,12 @@ module beep
 		app.beep(s)
 
 
-function errorreceiver.Beep (|bool|)
-	if .ok
-		return true
-	|| err = .LastError()
-	|| s = ($err, "Unknown error occurred.")(err)
-	app.beep(s)
+//function errorreceiver.Beep (|bool|)
+//	if .ok
+//		return true
+//	|| err = .LastError()
+//	|| s = ($err, "Unknown error occurred.")(err)
+//	app.beep(s)
 
 
 extend_module app

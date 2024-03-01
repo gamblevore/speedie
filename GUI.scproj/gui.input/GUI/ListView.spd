@@ -102,10 +102,10 @@ class ListView (GUIControl) {
 		return (tec)(self, cell, value)
 
 
-	function ViewableRowCount (|int|)
-		opt norefcounts
-		for r.all in self
-			rz++
+//	function ViewableRowCount (|int|)
+//		opt norefcounts
+//		for r.all in self
+//			rz++
 
 
 	function DistTo (|ListViewRow| a, |ivec2|)
@@ -306,8 +306,8 @@ class ListView (GUIControl) {
 			.Select(f)
 		return true
 		
-	function AddRow (|string| name = "", |listviewrow|)
-		return .ListSource.msg(@str, name)
+//	function AddRow (|string| name = "", |listviewrow|)
+//		return .ListSource.msg(@str, name)
 		
 	function Rename (|bool|)
 		cpp_part RenameCurr
@@ -319,7 +319,7 @@ class ListView (GUIControl) {
 		return .startRenameCell(r.cell)
 	
 	
-	function RenameCol (|ListViewRow| r, |int|col, |bool|)
+	function RenameCol (|ListViewRow| r, |int| col, |bool|)
 		return .StartRenameCell( r.cell(col) )
 	
 		
@@ -465,10 +465,10 @@ class ListView (GUIControl) {
 				rz <~ it
 
 
-	function SelList (|array of ListViewrow|)
-		opt norefcounts
-		for s.listsel in self
-			rz <~ s
+//	function SelList (|array of ListViewrow|)
+//		opt norefcounts
+//		for s.listsel in self
+//			rz <~ s
 	
 	
 	function IsEmpty (|bool|) // similar: hasany, rowcount
@@ -547,12 +547,12 @@ class ListView (GUIControl) {
 			.ClearEdits
 
 
-	function VisContains (|ListViewRow| s, |bool|)
-		opt norefcounts
-		require s
-		for r.visible in self
-			if r == s
-				return true
+//	function VisContains (|ListViewRow| s, |bool|)
+//		opt norefcounts
+//		require s
+//		for r.visible in self
+//			if r == s
+//				return true
 
 
 	function VisFullyContains (|ListViewRow!| s, |bool|)
@@ -851,10 +851,11 @@ class ListView (GUIControl) {
 		for i.abs
 			l = .hierstep(l, i > 0) #loop
 		return l
-	function Loop (|ListViewrow| l, |bool| fwd, |ListViewrow|)
-		opt norefcounts
-		rz = .hierstep(l, fwd)
-		rz := (.start, .end)(fwd)
+	
+//	function Loop (|ListViewrow| l, |bool| fwd, |ListViewrow|)
+//		opt norefcounts
+//		rz = .hierstep(l, fwd)
+//		rz := (.start, .end)(fwd)
 
 
 	function NextSearch (|ListViewRow| curr, |ListViewRow|)
@@ -1101,9 +1102,9 @@ class ListView (GUIControl) {
 		.scrollset(.bmove(i, -n))
 	
 		
-	function Contains (|int| Y,  |ivec2| Search,  |bool|)
-		|| Srch = (.absleft,  y - .RowHeight,  .right,  y)
-		return Srch.contains(Search)
+//	function Contains (|int| Y,  |ivec2| Search,  |bool|)
+//		|| Srch = (.absleft,  y - .RowHeight,  .right,  y)
+//		return Srch.contains(Search)
 	
 	
 	function Use (|ListViewrow| PL, |bool| SendClickEvent=false)
@@ -1147,10 +1148,10 @@ class ListView (GUIControl) {
 			.typingfilter = nil
 		
 
-	function FilterText (|string|)
-		opt norefcounts
-		|| t = .TypingFilter
-			rz = t.text
+//	function FilterText (|string|)
+//		opt norefcounts
+//		|| t = .TypingFilter
+//			rz = t.text
 
 
 	helper ActualRect (|ivec4|)
@@ -1451,12 +1452,12 @@ class ListView (GUIControl) {
 		return true
 
 
-	helper LastNamed (|string| s, |ListViewrow|)
-		opt norefcounts
-		rz = .listsource.last
-		while rz
-			if rz.name ~= s
-				return rz
+//	helper LastNamed (|string| s, |ListViewrow|)
+//		opt norefcounts
+//		rz = .listsource.last
+//		while rz
+//			if rz.name ~= s
+//				return rz
 	
 	
 	syntax Append (|string| name, |GUIMenuEvent| ev, |object| obj=nil)

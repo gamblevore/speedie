@@ -28,8 +28,8 @@ role StretchControl (GuiControl)
 		opt norefcounts
 		.div.ActiveEnd = .div.start
 	
-	function Flip
-		.div.flip
+//	function Flip
+//		.div.flip
 	
 	function Collapse (|bool| soft = false)
 		opt norefcounts

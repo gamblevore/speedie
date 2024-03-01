@@ -48,7 +48,7 @@ class PerryIDE (Window)
 	|ButtonView|				CurrFileName
 	|ButtonView|				FunctionMenu
 	|buttonview|				Toolbar
-	|Buttonview|				Tabs
+	|Buttonview|				ProjectTabs
 	|buttonview| 				CompileTabs // compilertabs
 	|buttonview|				SubFindCheckBox    
 	|Buttonview|				ViewErrors
@@ -129,7 +129,7 @@ class PerryIDE (Window)
 			.projmsg = message() // for now
 			|| n = r.next
 			n := r.prev
-			.tabs.selected = n
+			.ProjectTabs.selected = n
 			r.remove
 
 
@@ -305,7 +305,7 @@ class PerryIDE (Window)
 			  else
 				.recheck
 		if !.isfront
-			.tabs.selected = .projmsg
+			.ProjectTabs.selected = .projmsg
 			.editme.SetFocus // make it simple
 			super.show
 		.id = .name
@@ -339,11 +339,13 @@ class PerryIDE (Window)
 		|| M  = .MouseXY
 		|| LB = .ViewButtons.lastrect.y1
 		|| LF = .filelist.lastrect.x2-2
-
+		
 		|| HideTop  = (m.y < LB)
 		|| HideSide = (m.x > LF)
+		|| HideTabs = HideTop or .IsTextOnly
 		|| VisSide  = !.filelist.decluttering
-		|| VisTop   = !.tabs.decluttering
+		|| VisTop   = !.StartScreen.decluttering
+		|| VisTabs  = !.ProjectTabs.Decluttering
 
 		// OK... so .. if one is visible, we don't make the other invis
 		if .filelist.cmm == .openedmenu
@@ -352,10 +354,13 @@ class PerryIDE (Window)
 		if VisSide and VisTop and (HideSide != HideTop) 
 			HideSide = false
 			HideTop = false
+			HideTabs = false
 		
 		require !.CurrMouseDown 
+		if HideTabs == VisTabs
+			.ProjectTabs.declutter = HideTabs
+			
 		if (hidetop == vistop)
-			.tabs.declutter = hidetop
 			.StartScreen.declutter = hidetop
 			if HideTop
 				(.DebugArgsList isnt visible)			// better to declutter
@@ -425,7 +430,7 @@ class PerryIDE (Window)
 		
 
 	behaviour FrameUpdate // perframe, eachframe, onframe
-		.tabs.TrimWidth
+		.ProjectTabs.TrimWidth
 		if !ShouldNotDisturbGUI
 			.SaveMemory
 			if !.focus

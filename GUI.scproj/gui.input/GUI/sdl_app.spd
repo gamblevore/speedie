@@ -161,10 +161,10 @@ module SDLApp
 		return SDL_ShowCursor()
 	
 	
-	function Size (assigns:|ivec2| S)
-		|| pos	= .ScreenPosOrig
-		|| s2	= (s.vec2*.scale).ivec2
-		.ScreenOrig((pos, s2)) // shouldn't i be adding pos to s2? 
+//	function Size (assigns:|ivec2| S)
+//		|| pos	= .ScreenPosOrig
+//		|| s2	= (s.vec2*.scale).ivec2
+//		.ScreenOrig((pos, s2)) // shouldn't i be adding pos to s2? 
 
 
 	function ScreenOrig (assigns:|ivec4| result, |bool|)
@@ -198,8 +198,8 @@ module SDLApp
 		.Touch(modified)
 
 
-	function DropEnable
-		SDL_EventState(SDLEventType.DROPFILE, 1)
+//	function DropEnable
+//		SDL_EventState(SDLEventType.DROPFILE, 1)
 	
 	
 	helper IsTyping (|bool|)
@@ -731,8 +731,8 @@ module SDLApp
 		SDL_RenderPresent(.renderer!)
 
 
-	function Delay (|int| ms)
-		cpp_Wrapper SDL_Delay
+//	function Delay (|int| ms)
+//		cpp_Wrapper SDL_Delay
 
 
 	function Quit
@@ -1120,7 +1120,7 @@ module SDLApp
 	function DoAppResize (|ivec2| M, |int|)
 		|| P = .FindResizeCorner(M)
 		|| D = .AppResizingXY - p
-		|| L = window.all.lastrect.size
+		|| L = window.all.size
 		|| R = ((0, 0, l + D).vec4*.scale).ivec4
 		.ScreenOrig = R
 		return SDLActivity.activity

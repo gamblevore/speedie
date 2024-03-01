@@ -13,7 +13,6 @@ function perryide.UnusedFuncsFB (|message| stuff)
 	for tmp in arg
 		.unused_hoe(tmp, where)
 
-function unused1
 
 function perryide.unused_hoe (|message| tmp, |string| where)
 	|| err = error(nil, tmp.name, ErrorSeverity.warning, where )
@@ -549,7 +548,6 @@ function PerryFileViewRightClick (GuiListEvent)
 			where.prev = menu
 	return true
 
-function unused2
 
 function FileViewerCountCode (GuiMenuEvent)
 	|| row = clicked!.row as filerow			#require

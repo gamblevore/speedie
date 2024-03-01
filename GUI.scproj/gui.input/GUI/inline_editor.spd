@@ -58,8 +58,8 @@ struct InlineEditor
 		.Clear(focus)
 	
 	
-	function Hide
-		.NeedsHide = true
+//	function Hide
+//		.NeedsHide = true
 		
 	
 	function Clear (|bool| Focus = true)

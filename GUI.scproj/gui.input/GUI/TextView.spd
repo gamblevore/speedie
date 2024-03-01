@@ -250,8 +250,6 @@ class TextView (GUIControl)
 
 	function SelRange (|intrange|)
 		return ._typingplace.resolve
-	helper SelRangeRaw (|intrange|)
-		return ._typingplace
 		
 	function Sel0 (|int|)
 		return .selrange.x
@@ -1174,10 +1172,10 @@ class TextView (GUIControl)
 		return .InsertSub(s, .selrange, selnew)
 
 
-	helper LoadOneError (|error| err)
-		.LineErrorAdd(err, false)
-		.MyError = err
-		Notifications <~ err
+//	helper LoadOneError (|error| err)
+//		.LineErrorAdd(err, false)
+//		.MyError = err
+//		Notifications <~ err
 
 
 	helper ValidateNewText (|message|)
