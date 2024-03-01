@@ -174,7 +174,7 @@ function PerryIDE.DisplayStr (|message| f, |bool|)
 
 function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec4(),  |ivec2| Corner=.PopupDisplayCorner)
 	|| sizer_str = s.wrap(80)
-	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 3)
+	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 2)
 	(size.x max= 40)
 	if Corner.x < 0
 		Corner.x = .editme.lastrect.x2 - (size.x + 10)
