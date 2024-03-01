@@ -484,7 +484,7 @@ class TextView (GUIControl)
 	function Jump (|int| x, |int| Before=0, |bool|)
 		// views X, and sets new typing place.
 		opt norefcounts		
-		|| t = .SelRange
+		|| t = ._typingplace
 		x = .clamp(x)
 		|| d = .ViewPos(x, before, 2) //idk
 			
@@ -1523,7 +1523,7 @@ class TextView (GUIControl)
 				scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer)
 	
 	
-	helper DrawScrollErrors (|image| where, |float| strength=1.0) // fix later. FADE this b.itch
+	helper DrawScrollErrors (|image| where, |float| strength=1.0)
 		opt norefcounts
 		|float| N = ._lines.last!.vline
 		for s in ._lines
@@ -1531,20 +1531,19 @@ class TextView (GUIControl)
 				|float| v = s.vline
 				|| Y = 1.0 - (v/n)
 				Y *= .height
-				|| p = ivec2(.right - 9, .lastrect.y + Y)
-				|| C = colors.red
-				if !E.isbad
-					C = colors.yellow
-//				p.x-=1
-//				p.y-=3
-//				where.DrawCircle((p, p+(9, 4)), C, 3.0)
+				|| p = ivec2(.right - 5, .lastrect.y + Y)
+				|| C = E.Severity.color
 				for i in -1 to 1
-					C.alpha = 0.4 * Strength
+					C.a = 0.4 * Strength
 					if i == 0
-						C.alpha = 0.8 * Strength
-					where.drawlineH(p, 8, C)
-					p.y--
-	
+						C.a = 0.8 * Strength
+					for xx in p.x+4 downto p.x-4		// in 5
+						//|| xx = p.x + j*((B*2)-1)
+						|| px = where[xx,p.y+i]
+						px.overlay(C.premul)
+						C.a -= 0.04
+
+
 		
 	helper DrawPreparedText (|image| where)
 		opt norefcounts

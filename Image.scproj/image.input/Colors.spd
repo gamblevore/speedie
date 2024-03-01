@@ -34,8 +34,10 @@ insertion
 
 datatype PreMultipliedColor (ivec4)
 
+
 function imagepixel.PreMul (|PreMultipliedColor|)
 	return .Color.PreMul
+
 
 function imagepixel.PreMul (|imagepixel| self, |PreMultipliedColor|)
 	cpp_part PreMul2 // shouldn't have to write this... dont do this!
@@ -49,3 +51,11 @@ function vec4.PreMul (|PreMultipliedColor|)
 	m.a = (1.0-A) * 64K
 	return m.ivec4|PreMultipliedColor|
 
+
+function errorseverity.color (|vec4|)
+	if self == ErrorSeverity.Warning
+		return colors.yellow
+	if self < ErrorSeverity.Warning
+		return colors.White
+	return colors.red
+	

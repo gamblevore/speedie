@@ -10,7 +10,6 @@ class PerryIDE (Window)
 	|[error]|					StartupErrors
 	|FileViewer|				FileList
 	|Guicontrol|				Debugger
-//	|Guicontrol|				Tester
 	|Guicontrol|				SearchArea
 	|Guicontrol|				rborder
 	|guicontrol| 				StdOutBorder
@@ -37,8 +36,9 @@ class PerryIDE (Window)
 	|StretchControl|			FileSep
 	|listviewrow?|				LogComms
 	|listviewrow?|				LogActions
-	|menu|						AutoComplete	// ... todo
+	|menu|						AutoComplete
 //	|ListView|					Variables		// ... todo
+//	|ListView|					Stack			// ... todo
 	|ListView|					ErrorList
 	|listview|					CommsLogList
 	|ListView|					FoundList
@@ -556,8 +556,8 @@ class PerryIDE (Window)
 			.flip(.ProductOut)
 			return true
 		if key is num8
-			.flip(.JeeboxText)
-			.UpdateJeeboxField
+			if .flip(.JeeboxText)
+				.UpdateJeeboxField
 			return true
 		if key is num7
 			.flip(.SpeedieText)
@@ -566,14 +566,15 @@ class PerryIDE (Window)
 			.RunButton.dopressing(nil)
 			return true
 
-	function flip (|textview| s)
+	function flip (|textview| s, |bool|)
 		|| Item = .compiletabs.selected
 		if item and .ProductSep.isopen 
 			|| tv = item.obj as textview
 			if tv == s
 				.ProductSep.collapse
-				return
+				return false
 		.ShowText(s, nil, true)
+		return true
 
 	function ShowQuickStuff (|bool| FuncMenu, |bool|)
 		if FuncMenu

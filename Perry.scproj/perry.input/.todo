@@ -13,17 +13,11 @@
 	* and fps!
 	* need strong_import for speedie/perry... which warn of unused functions in the imports
 	* remove file from textview? we have .document? cant they set it that way?
-	* rounded coloring does look nicer
-		* popuperror should take the fileviewers color... for default, otherwise take the error's color
-		* funcmenu also
 
 * Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 	* Speedie stops compiling sometimes, from perry
 
 * int upgrading needs fix
-* saving the root file makes it disappear
-* Shift up arrow isnt selecting properly cos of selrange
-
 * change allocator to use unified allocator?
 	* s = message.new(void* layer, a, b, c) // can be 0x1 or memlayer+0x1, or an object
 * Constants and globals don't autocomplete nicely
@@ -32,6 +26,7 @@
 
 						 Perry Do later
 
+* saving the root file makes it disappear
 * awesome particle effects on jumping to a new error/find
 * Multiple fwd/back funcs per-file would be nice, at least from right-click jumps, cmd-L and other jumps
 	* having a func-name per-point is nice

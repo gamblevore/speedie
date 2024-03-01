@@ -61,6 +61,13 @@ class FileRow (ListViewRow)
 
 	operator isa (|string|s, |bool|)
 		return .location isa s
+	
+//	function Location (|string|)
+//		return ._location
+	
+//	function Location (assigns:|string|)
+//		if keys.shift
+//		._Location = value
 
 	function AskDelete (|fileviewer| fv)
 		|| ex = fv.extra
@@ -93,12 +100,12 @@ class FileRow (ListViewRow)
 	function IsDir (|bool|)
 		disabled "use .Asdir. Not quite the same, but usually close enough"
 		
-	function SavedFileData (|string|)
-		opt norefcounts
-		|| d = ._document
-		if d and !d.ismodified and d.current
-			return d.text
-		return .readfrom.ReadFile
+//	function SavedFileData (|string|)
+//		opt norefcounts
+//		|| d = ._document
+//		if d and !d.ismodified and d.current
+//			return d.text
+//		return .readfrom.ReadFile
 	
 	
 	function ReadFrom (|string|)

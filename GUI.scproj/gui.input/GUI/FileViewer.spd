@@ -13,7 +13,7 @@ class FileViewer (ListView)
     |[string]|						SizeCheckers
     |GUIListEvent?|					OnSearchWithin
     
-	constructor (|window| p, |GUIListEvent| sel, |GUIListEvent| ret, |textview| editme)
+	constructor (|window| p, |GUIListEvent| sel, |GUIListEvent| ret, |TextView| EditMe)
 		super.constructor(p, sel, ret)
 		.MultiSelection 	= true
 		.editme				= editme
@@ -60,7 +60,7 @@ class FileViewer (ListView)
 			isnt editable
 			isnt visible
 			.clipmode		= ControlClipMode.SlideBackInWindow
-			.onealwaysselected = true
+			.OneAlwaysSelected = true
 			.ID				= "listopen"
 			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)
 			.takesfocus 	= 0
@@ -132,10 +132,10 @@ class FileViewer (ListView)
 		return true
 
 
-	function SavedFileData (|string| path, |string|)
-		opt norefcounts
-		|| f = self[path]
-			return f.savedfiledata
+//	function SavedFileData (|string| path, |string|)
+//		opt norefcounts
+//		|| f = self[path]
+//			return f.savedfiledata
 
 			
 	function AddRoot (|file| fol, |bool| IsMainProj = false, |filerow|)
@@ -156,9 +156,9 @@ class FileViewer (ListView)
 		return f
 
 
-	function Conf (|string|)
-		opt NoRefCounts
-		return (.start as filerow)$.location.child(.folfile)
+//	function Conf (|string|)
+//		opt NoRefCounts
+//		return (.start as filerow)$.location.child(.folfile)
 	
 	
 	function FolFile (|string|)
@@ -179,7 +179,7 @@ class FileViewer (ListView)
 	function ClearErrors
 		opt norefcounts
 		for s in self
-			s.haserror = false
+			s.HasError = false
 
 
 	iterator
@@ -517,7 +517,7 @@ class FileViewer (ListView)
 				fv.OpenQuickRelist(.text)
 
 		function QuickOpenKey (guikeyevent)
-			|| fv = .tag as fileviewer #require
+			|| fv = .tag as fileviewer				#require
 			|| l = fv.listopen
 			if key.IsAccept
 				|| row = l.FirstSelected
@@ -711,4 +711,4 @@ function FileViewerSearchWithin (GuiMenuEvent)
 	
 
 prototype SorterComparerFileRow (|filerow| a, |filerow| b, |bool|)
-prototype SorterComparerError   (|error| a, |error| b, |bool|)
+prototype SorterComparerError   (|error|   a, |error|   b, |bool|)

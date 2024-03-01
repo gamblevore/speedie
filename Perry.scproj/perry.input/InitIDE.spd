@@ -145,6 +145,10 @@ extend PerryIDE
 			.onselected		= PerryAutocompleteSelected
 			.ID				= "AutoComplete"
 			.takesfocus 	= takesfocusflag.CanFocus
+			|| dark			= self.filelist.GNormal.bg.color
+			.GNormal.bg = mix(  dark, vec4(0.5, 1.0, 0.0, 1.0), 0.05)  // mostly dark
+			.GNormal.edge = mix(dark, colors.green, 0.1 )  // less dark
+			// now what?
 			is TypeThrough
 			isnt visible
 
@@ -261,8 +265,6 @@ extend PerryIDE
 			.size 			= the~area
 			.takesfocus		= 0
 			.expectsparse	= TextView.probablyjeebox
-			.gnormal.bg		<~ ((0.1, 0.3, 0.1, 1.0))
-			.gnormal.edge	<~ ((0.1, 0.3, 0.1, 0.5))
 
 
 		with .DrawMe
@@ -437,11 +439,13 @@ extend PerryIDE
 		.ReTextSubFind
 		.CompileTabSelect(.SpeedieText)
 	
+	
 	function listviewrow.Next (|guicontrol| obj, |Message!|)
 		pragma inline
 		rz = .next!
 		rz.obj = obj
 		obj.tag = rz
+
 
 	function textview.SetupOut (|string| name, |int| Parse=TextView.probablyjeebox)
 		opt norefcounts
@@ -469,6 +473,7 @@ extend PerryIDE
 		g.OnKeyDown = LogAreaKeys
 		.logcomms = .AddBaseLog("-- speedie comms --")
 		.logactions = .AddBaseLog("-- perry actions --")
+	
 	
 	function AddBaseLog (|string| s, |listviewrow|)
 		rz = @arg + s

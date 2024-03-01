@@ -38,7 +38,7 @@ function message.DefineToLine (|int| count)
 	if self ~= "define"  and  l == @str  and  self > 1 // is that all?
 		.first!.next = l
 		// count can't be 0 here	
-		l.name += " has " + "caller".pluralize(count)
+		l.name += " has " + (count of "caller")
 	  else
 		|| s = "place".pluralize(count, "Nowhere")
 		l.name = " - Called From " + s + " - "
@@ -172,14 +172,23 @@ function PerryIDE.DisplayStr (|message| f, |bool|)
 		.DisplayInPopup(f.name, false)
 
 
-function PerryIDE.DisplayInPopup (|string| s, |ivec2| C=.PopupDisplayCorner, |bool| instant)
+function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec4(),  |ivec2| Corner=.PopupDisplayCorner)
 	|| sizer_str = s.wrap(80)
 	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 3)
 	(size.x max= 40)
-	if c.x < 0
-		c.x = .editme.lastrect.x2 - (size.x + 10)
-	.PopupDisplay.size =   c.x~right for size.x   by   c.y~up back size.y
-	.PopupDisplay.text = s 
+	if Corner.x < 0
+		Corner.x = .editme.lastrect.x2 - (size.x + 10)
+	.PopupDisplay.size = Corner.x~right for size.x   by   Corner.y~up back size.y
+	.PopupDisplay.text = s
+	|| pg = .PopupDisplay.GNormal
+	
+	|| def = .FileList.GNormal.bg.color
+	if color
+		color = mix(def, color, 0.3)
+	  else
+		color = def
+	pg.bg = color
+	pg.edge	= color * vec4(1.0, 0.5)
 	.StartPopupVis(instant)
 
 
@@ -317,7 +326,7 @@ function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err,  |string| 
 	if err
 		.lastextrainfo = nil
 		.PopupDisplay.ExpectsParse = 0
-		.DisplayInPopup(err.name, P, true)
+		.DisplayInPopup(err.name, true, err.severity.color, P)
 		return 
 	
 	if !M
