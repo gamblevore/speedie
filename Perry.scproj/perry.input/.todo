@@ -5,16 +5,17 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 
-* need strong_import for speedie/perry... which warn of unused functions in the imports
 
+* Constants and globals don't autocomplete nicely
 * remove syntax isnt!!!! AAARRHHH!!
 * Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 	* Speedie stops compiling sometimes, from perry
 
+* Control move fwd WithWordCase
+* need strong_import for speedie/perry... which warn of unused functions in the imports
 * int upgrading needs fix
 * change allocator to use unified allocator?
 	* s = message.new(void* layer, a, b, c) // can be 0x1 or memlayer+0x1, or an object
-* Constants and globals don't autocomplete nicely
 
 
 
@@ -22,7 +23,6 @@
 
 * saving the root file makes it disappear
 * awesome particle effects on jumping to a new error/find
-* Control move fwd WithWordCase
 * Multiple fwd/back funcs per-file would be nice, at least from right-click jumps, cmd-L and other jumps
 	* having a func-name per-point is nice
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
@@ -31,7 +31,6 @@
 
 						 Speedie Do later
 
-* nil reporting way off sometimes
 * perry should build via stdargs, not ipc... less complication and more reliable. We can still collect stderr!
 * params should be assumed real!
 	* upgrade optional returns to real? (if possible)
