@@ -174,8 +174,11 @@ function UnusedFuncs (|message| cmd, |message|)
 		for fn in Compiler.FuncList
 			|| src = fn.source
 			if src and fn.File == scf
-				if fn.isunused 
-					arg.msg(@tmp, "Unused function: " + fn.name) <~ src.position
+				if fn.isunused
+					|| str = "Unused function: "
+					if fn.linkfrom != nil
+						str = "Function's callers are unused: "
+					arg.msg(@tmp, str + fn.name) <~ src.position
 	return cmd
 	
 

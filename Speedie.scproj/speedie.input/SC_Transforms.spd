@@ -366,7 +366,7 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
 	  elseif d isnt setto
 		r_z.NotNilRZ(f.ReturnType!, space)
 
-	if (src.blocks isnt return) and !(src.last istmp "return") 
+	ifn (src.blocks is return) or (src.last istmp "return") 
 		|| ret = src.msg(@tmp, "return")
 		ret.tmptype = asmtmp.kreturn 
 		if used

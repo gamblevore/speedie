@@ -18,24 +18,24 @@ function scfunction.PreRead (|message| Arg)
 
 
 dispatch FuncPreReader (fnPreReader)
-	+"disabled" {
+	+"disabled"
 		opt norefcounts
 		.isdisabled = true
 		.description = "Called a disabled function."
 		|| s = msg[@str, @nil]
 			.description = s.name
-	}
 	
-	+"pragma" {
+	
+	+"pragma"
 		opt norefcounts
 		|| f = msg[@thg]
 		if f ~= "inline"
 			.IsInline = true
 		  else
 			error f
-	}
 	
-	+"opt" {
+	
+	+"opt"
 		opt norefcounts
 		|| f = msg[@thg]
 		if f ~= "NoRefCounts"
@@ -45,9 +45,9 @@ dispatch FuncPreReader (fnPreReader)
 				.minopt = min.int
 		  else
 			error f
-	}
 	
-	+"nil" {
+	
+	+"nil"
 		opt norefcounts
 		|| f = msg[@thg]$
 		if f ~= "self"
@@ -62,7 +62,7 @@ dispatch FuncPreReader (fnPreReader)
 			
 		  else
 			error f
-	}
+	
 	
 	+"real"
 		opt norefcounts
@@ -73,14 +73,14 @@ dispatch FuncPreReader (fnPreReader)
 			error f
 	
 
-	+"description" {
+	+"description"
 		|| str = msg[@str]
 			if .IsDisabled
 				error (msg, "Already disabled")
 			  else
 				check !.description (msg, "Can’t have multiple descriptions.")
 				.Description = str.name
-	}
+	
 
 
 function scfunction.MakeNilChecker (|message| msg)

@@ -604,8 +604,15 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 	if recv.StatedReal and recv isnt local
 		if sentstate isnt nilish
 			return sentstate
-		expect (SentState is realish) (RecvMsg, "Nil is not allowed on: " + recvmsg.origrender)
-		return .BecomeReal(sent, SentMsg, nilreason.using)
+		if (SentState is realish) 
+			return .BecomeReal(sent, SentMsg, nilreason.using)
+		if (recv is property) and recvmsg.func == @dot
+			if (scfunction.currfunc! is constructor) and (recvmsg.first!.fastdecl is self)
+				error (RecvMsg, "Property should be non-nil in constructor: " + recv.name)
+				return nilstate.real
+		
+		error (RecvMsg, "Nil is not allowed on: " + recvmsg.origrender)
+		return nilstate.real
 		
 	if recv.NilReg
 		return T.SetNilness(recv, SentState)

@@ -841,11 +841,11 @@ function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
 
 function ConstructorLinePlace (|message|)
 	opt norefcounts
-	|| s = .SourceArg
+	|| s = .Source
 		if s.HasPosition
 			return s
 	|| c = .cls
-		return c.sourcearg
+		return c.source
 
 
 function CanCompare (|SCDecl|Against, |bool|)
@@ -953,7 +953,7 @@ function FindReached (|scbase| from, |bool|)
 function IsUnused (|bool|)
 	if options.UnusedFunctionLevel == 1
 		require !.IsSTDLib  // dont check stdlibs for :LHAJWKDN><AMSND< FU HATERS
-	return !.MyReacher and !.IsDisabled and !.isvisible
+	return !.MyReacher and !.IsDisabled and !.isvisible and !.IsConstructorOrDestructor and !.IsAllocOrNew
 
 
 function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Type = "", |Message|)
