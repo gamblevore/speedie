@@ -772,7 +772,9 @@ class TextView (GUIControl)
 			if !.DeSlashcomment
 				.tabindent(1, "//", true)
 		  elseif !.decomment
-			.Insert("/*" + .seltext + "*/", true)
+			|| s = .SelText
+			s := "\n\n"
+			.Insert("/*" + s + "*/", true)
 		return true
 	
 	 
