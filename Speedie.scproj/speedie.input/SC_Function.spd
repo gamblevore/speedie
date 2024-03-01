@@ -1496,7 +1496,6 @@ function message.Blocks (|SCBlockage|)
 
 
 function message.Blocks (assigns:|int|)
-	if .TAG&SCBlockage.bits // what?
 	.TAG = (.TAG & ~SCBlockage.bits) ||| Value
 
 

@@ -392,7 +392,7 @@ module Conv
 			if str == string.error
 				return str
 		
-		|| T = str.IsJbin #require
+		|| T = str.IsJbin						#require
 		|| mz = str.ParseJbin(3)
 		if !mz
 			printline StdErr.pop

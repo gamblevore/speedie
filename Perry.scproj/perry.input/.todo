@@ -6,7 +6,6 @@
 	* use 256 VM codes? Only a few need all 25 bits.
 
 * nil reporting way off sometimes, especially on constructors
-	* function Loop (|bool| dir, || Owner=nil, |...!|) checked wrongly
 
 * unused func finder can't find LoadOneError? but IS being used!
 	* constructors too!
@@ -37,7 +36,6 @@
 						 Speedie Do later
 
 * perry should build via stdargs, not ipc... less complication and more reliable. We can still collect stderr!
-* doc examples should all (or mostly) come with "main" :) so be runnable!
 * params should be assumed real!
 	* upgrade optional returns to real? (if possible)
 	* started optional returns must return both values!! (unless a prototype)

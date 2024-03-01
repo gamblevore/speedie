@@ -356,6 +356,7 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase!| p) // transform ()
 
 
 function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
+	opt norefcounts
 	|| Src = f.SourceArg!
 	|| d = r_z.MsgDecl
 	|| Used = (d and d is usedbycode)
@@ -365,7 +366,7 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
 	  elseif d isnt setto
 		r_z.NotNilRZ(f.ReturnType!, space)
 
-	ifn src.last istmp "return"
+	if (src.blocks isnt return) and !(src.last istmp "return") 
 		|| ret = src.msg(@tmp, "return")
 		ret.tmptype = asmtmp.kreturn 
 		if used
