@@ -33,6 +33,7 @@ function scfunction.MarkRecursive (|scfunction| EndAt)
 
 
 function scfunction.FindDepths (|int|)
+	opt norefcounts
 	flow off
 	// Orders the functions in terms of which ones need others.
 	// So we can process leaf functions first. Maybe easier to optimise

@@ -692,11 +692,6 @@ function message.HasSelfAsFirst (|bool|)
 			return msg.name ~= "self"
 	
 
-function scdecl.TypeReach (|scbase| from, |message| src)
-	opt norefcounts, flow off
-	if self
-		return .type.reach(from, src)
-
 
 function SCBase.ReachedName (|string|)
 	opt norefcounts
@@ -731,35 +726,6 @@ function BannedCheck (|message| src)
 			error (curr, curr.ReachedName)
 		curr = curr.MyReacher
 
-
-function Reach (|scbase| from, |message| src=nil)
-	opt norefcounts
-	flow off
-	require !.MyReacher
-	.MyReacher = from
-	Compiler.stReachedClass++
-	
-	if Options.BannedClasses
-		.BannedCheck(src)
-	|| s = .super
-		s.Reach(self)
-	|| b = .Behaviour
-		b.FuncTable!.cls!.reach(self)
-	
-	|| df = .DestructorFunc
-		df.findReached(self)
-	
-	for d in .Properties
-		d.TypeReach(self, d.source!)
-		d.contains!.TypeReach(self, d.source!)
-
-
-function ReachBehaviours
-	flow off
-	for f in .Access
-		if f isa SCFunction
-			if f.IsBehaviour
-				f.FindReached(self)
 
 
 function IsA (|SCClass| S, |bool|) // hassuper, issuper, issubclass

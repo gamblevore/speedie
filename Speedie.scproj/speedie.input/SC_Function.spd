@@ -46,7 +46,7 @@ linkage
 |SCClass?|				Cls
 |String|				Description
 |CppRefs?|				Refs
-|?(dictionary of SCBase)|	LinkTo
+|array? of SCBase|		LinkTo
 |object?|				CounterPart
 |SCFunction?|			NextFunc
 |µFunc?|				ASM
@@ -56,6 +56,7 @@ linkage
 |scfunction--?|			DepthFinder
 |uint16|				LinkDepth
 |uint16|				TmpCounter
+|uint16|				TableId
 |uint|					AllocCode // some flags above 255!
 |Byte|					MinOpt
 |Byte|					IsAssigns
@@ -908,52 +909,12 @@ function CountCallsToParentAlloc (|Message| root, |message|)
 			FoundCount++
 			expect  (FoundCount < 2)   (curr, "Multiple calls to parent constructor/destructor not allowed.")
 
-
-function CollectLinks (|object| obj)
-	opt norefcounts
-	if obj isa SCFunction
-		.DoLinkTo( obj )
-		obj.DoLinkFrom( self )
 		
-	  elseif obj isa SCDecl
-		.DoLinkTo( obj.type )
-		.CollectLinks( obj.IsLookupOnly )
-		
-	  elseif obj isa SCClass
-		.DoLinkTo( obj )
 
 
 function Borked (|bool|)
 	return .Badness & 128
 
-
-function FindReached (|scbase| from, |bool|)
-	flow off // memory order dependant!
-	
-	if .borked
-		error (.source,    "Borked function reached!")
-		error (from.source, from.ReachedName)
-	
-	require !.MyReacher
-	.MyReacher = from
-	Compiler.stReachedFunc++
-
-	.cls.Reach(self)?
-		
-	for o in .LinkTo
-		if (o.MyReacher)
-			//
-		  elseif (o isa SCFunction)
-			o.FindReached(self)
-			rz = true
-		  elseif (o isa SCClass)
-			o.Reach(self)
-	
-	
-function IsUnused (|bool|)
-	if options.UnusedFunctionLevel == 1
-		require !.IsSTDLib  // dont check stdlibs for :LHAJWKDN><AMSND< FU HATERS
-	return !.MyReacher and !.IsDisabled and !.isvisible and !.IsConstructorOrDestructor and !.IsAllocOrNew
 
 
 function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Type = "", |Message|)
@@ -1126,22 +1087,6 @@ function FixCnjSub (|Message| exp) {
 }
 
 	
-function PostTransform 
-	opt norefcounts
-	scfunction.currfunc = self
-
-	|| arg = .SourceArg
-	for msg.flat in arg
-		|| o = msg.obj
-			.CollectLinks( o )
-
-	for d in .args
-		.CollectLinks( d )
-
-	|| r = .returntype
-		.CollectLinks( r )
-
-
 function RegType (|datatypecode|)
 	if self
 		return .returntype.regtype
@@ -1159,8 +1104,9 @@ function scdecl.MarkAsRefAltered
 
 function Self (|scdecl|)
 	opt norefcounts
-	rz = .args[0]
-	if !rz or rz.name != "self" // what?
+	return .args[0]
+
+
 
 function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
 	// .bla = X
@@ -1168,22 +1114,6 @@ function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
 	
 	|| def = d.CreateDefault(place)
 	return NeweqRel( d.DeclToDot(.self), def )
-
-
-function DoLinkTo (|SCBase| B)
-	b.StoreLinkToMe(.linkto)
-
-
-function scobject.DoLinkFrom (|SCBase| B)
-	B.StoreLinkToMe(.linkfrom)
-
-
-//function NewNilRel (|SCDecl| d, |Message|)
-//	// .bla = nil
-//	|| def = «thg "nil"»
-//	def.Obj = TypeNil
-//	return NeweqRel( d.DeclToDot(.self), def )
-
 
 
 iterator
@@ -1662,13 +1592,6 @@ function NewHelper (CollectFunc)
 	return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 
-function SCBase.StoreLinkToMe (|&(dictionary of SCBase)| dp)
-	opt norefcounts
-	require self != typevoid_
-	|| d = *dp init dictionary.new
-	d[._dictname] = self
-
-
 function message.NeedsPreprocess (|bool|)
 	opt norefcounts
 	if self == @TRel or self IsARel "$"
@@ -1885,3 +1808,5 @@ function NeuLibrary (CollectFunc)
 }
 
 }
+
+

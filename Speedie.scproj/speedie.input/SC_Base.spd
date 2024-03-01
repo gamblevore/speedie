@@ -14,7 +14,7 @@ linkage
 	cpp_part		Base
 
 |SCBaseInfo|						BaseInfo
-|(Dictionary of scobject)?|			Access
+|Dictionary? of scobject|			Access
 |String|							ExportName
 |SCBase--?|							Parent
 |SCBase--?|							MyReacher

@@ -22,7 +22,7 @@ module ExecTable
 		|| f = .FuncFile
 			f.SmartData = .FuncStr
 		
-	function scbase.Addtotable (|[scbase]| r)
+	function scfunction.Addtotable (|[scbase]| r)
 		r <~ self
 		.tableid = r.length
 	

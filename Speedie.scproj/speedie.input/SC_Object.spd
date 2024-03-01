@@ -5,13 +5,14 @@
 
 
 class SCObject
-	|(dictionary of SCBase)?|	LinkFrom
+	|array? of SCBase|			LinkFrom
 	|string|					Name
 	|Message?|					Source
-	|uint16|					TableId
 	|byte|						NoAutoComplete
 	|Byte|						AllocSource
-		
+	|uint| 						LinkedFrom
+	
+
 	render
 		|| cname = ((.class.name|uint64|)+2)|cstring|
 		fs <~ cname

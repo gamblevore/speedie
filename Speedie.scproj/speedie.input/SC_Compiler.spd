@@ -265,6 +265,7 @@ function InitTypes
 	TypeSaveable		= Compiler["saveable"]
 		
 	require StdErr.ok
+	TypeVoid_!.LinkedFrom = int.max //noice
 	TypeStringZero!.DowngradeTo = TypeString
 	typevoid = typevoid_!.TypeNormal
 	|| VP = TypeVoidPtr!.typenormal
@@ -579,7 +580,7 @@ function ImportAll
 
 	.Stage( "Building Function Link Map" )
 	for f in .FuncList
-		f.PostTransform
+		LinkMap.Collect(f)
 	scfunction.currfunc = nil
 		
 
@@ -824,27 +825,6 @@ function scfunction.StripTest
 	
 	.FindReached(base)
 
-
-function DeadStrip
-	opt norefcounts
-	Compiler.VisibleFuncs = scbase("Visible",	false)
-	Compiler.Interpreter = scbase("Interpreter", false)
-
-	compiler.MainFunc.StripTest?
-	
-	for f in .FuncList
-		f.striptest
-
-	if options.ListAllLib // must come before the next loop
-		for c in .classlist
-			c.reach(Compiler.Interpreter)
-	
-	for c in .classlist
-		if c.MyReacher // shorten-discovery-chains, 
-			c.ReachBehaviours // behaviour chains tend to be long.
-
-	CodeSorter.LeafsFirst		// super-refcounter wants this
-		
 	
 			
 

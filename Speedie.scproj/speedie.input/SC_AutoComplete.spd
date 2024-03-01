@@ -902,6 +902,7 @@ function CallFrom (|message| msg,  |string| purpose,  |object| found=nil,  |mess
 
 
 function CallFromSub (|message| arg, |scfunction| fn)
+	opt norefcounts
 	for call_point in fn.linkfrom
 		|| s = call_point.source
 			|| f = s.filepath

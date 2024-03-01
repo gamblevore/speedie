@@ -50,7 +50,7 @@ extend message
 		rz.name = prm.name
 	
 	
-	helper MacroPrm (|message| root,  |(array of message)?| prms,  |Message|)
+	helper MacroPrm (|message| root,  |array? of message| prms,  |Message|)
 		opt norefcounts
 		|| n = .name
 		if (n.first == '_')
@@ -65,7 +65,7 @@ extend message
 		.MacroCopy(root, prms, rz)
 
 
-	helper MacroCopy (|Message| root, |(array of message)?| prms,  |Message| dest)
+	helper MacroCopy (|Message| root, |array? of message| prms,  |Message| dest)
 		opt norefcounts
 		for v in self
 			dest <~ v.MacroPrm(root, prms)
@@ -74,7 +74,7 @@ extend message
 //		.func = belikeme.func
 //		.name = belikeme.name	
 
-	function BecomeMacro (|Macro| M,  |(array of message)?| prms=nil)
+	function BecomeMacro (|Macro| M,  |array? of message| prms=nil)
 		opt norefcounts
 		|| s = m.source
 			.clear

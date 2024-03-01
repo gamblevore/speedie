@@ -5,11 +5,9 @@
 * VM? 
 	* use 256 VM codes? Only a few need all 25 bits.
 
+* need strong_import for speedie/perry... which warn of unused functions in the imports
 
-* unused func finder can't find LoadOneError? but IS being used!
-	* and fps!
-	* need strong_import for speedie/perry... which warn of unused functions in the imports
-
+* remove syntax isnt!!!! AAARRHHH!!
 * Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 	* Speedie stops compiling sometimes, from perry
 
@@ -24,6 +22,7 @@
 
 * saving the root file makes it disappear
 * awesome particle effects on jumping to a new error/find
+* Control move fwd WithWordCase
 * Multiple fwd/back funcs per-file would be nice, at least from right-click jumps, cmd-L and other jumps
 	* having a func-name per-point is nice
 * function jumping should be to a function + a relative line... not bytepos... due to editing of files making things messy.
@@ -32,7 +31,6 @@
 
 						 Speedie Do later
 
-* Replace linkfrmo/to with arrays! each func can just have a "currlinkfrom" property... so it doesnt get double-added!!! :D
 * nil reporting way off sometimes
 * perry should build via stdargs, not ipc... less complication and more reliable. We can still collect stderr!
 * params should be assumed real!

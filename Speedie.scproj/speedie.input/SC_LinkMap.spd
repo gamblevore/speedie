@@ -1,0 +1,158 @@
+
+
+module LinkMap 
+	|uint| 			CurrID
+
+	function scfunction.DoLinkTo (|SCBase| To)
+		linkmap.Store(.linkto, To)
+	
+	function scobject.DoLinkFrom (|SCBase| From)
+		if !compiler.InPerry
+			linkmap.store(from.linkfrom, self)
+	
+	function Store (|&(array? of scobject)| darr, |scobject| obj)
+		opt norefcounts
+		|| ID = obj.LinkedFrom
+		if ID < LinkMap.CurrID
+			obj.LinkedFrom = LinkMap.CurrID
+			|| arr = *darr
+			if arr == nil
+				arr = []
+				*darr = arr
+			arr <~ obj
+
+/*
+	main							// self
+		printline "abc"				// from
+		
+*/
+
+
+	function Collect (|scfunction| self)
+		opt norefcounts
+		scfunction.currfunc = self
+		CurrID++
+	
+		|| arg = .SourceArg
+		for msg.flat in arg
+			|| o = msg.obj
+				.CollectLinks( o )
+	
+		for d in .args
+			.CollectLinks( d )
+	
+		|| r = .returntype
+			.CollectLinks( r )
+	
+
+
+
+extend scfunction {
+
+function CollectLinks (|object!| obj)
+	opt norefcounts
+	
+	while 
+		if obj isa SCFunction
+			.DoLinkTo( obj )
+			return .DoLinkFrom( obj )
+	
+		if obj isa SCClass
+			return .DoLinkTo( obj )
+		
+		if obj isa SCDecl
+			.DoLinkTo( obj.type )
+			obj = obj.IsLookupOnly|scdecl| #require
+
+
+function FindReached (|scbase| from, |bool|)
+	opt norefcounts
+	flow off // memory order dependant!
+	
+	if .borked
+		error (.source,    "Borked function reached!")
+		error (from.source, from.ReachedName)
+	
+	require !.MyReacher
+	.MyReacher = from
+	Compiler.stReachedFunc++
+
+	.cls.Reach(self)?
+		
+	for o in .LinkTo
+		if (o.MyReacher)
+			//
+		  elseif (o isa SCFunction)
+			o.FindReached(self)
+			rz = true
+		  elseif (o isa SCClass)
+			o.Reach(self)
+	
+	
+function IsUnused (|bool|)
+	if options.UnusedFunctionLevel == 1
+		require !.IsSTDLib  // dont check stdlibs for :LHAJWKDN><AMSND< FU HATERS
+	return !.MyReacher and !.IsDisabled and !.isvisible and !.IsConstructorOrDestructor and !.IsAllocOrNew
+
+}
+
+
+
+function scclass.Reach (|scbase| from, |message| src=nil)
+	opt norefcounts
+	flow off
+	require !.MyReacher
+	.MyReacher = from
+	Compiler.stReachedClass++
+	
+	if Options.BannedClasses
+		.BannedCheck(src)
+	|| s = .super
+		s.Reach(self)
+	|| b = .Behaviour
+		b.FuncTable!.cls!.reach(self)
+	
+	|| df = .DestructorFunc
+		df.findReached(self)
+	
+	for d in .Properties
+		d.TypeReach(self, d.source!)
+		d.contains!.TypeReach(self, d.source!)
+
+
+function scclass.ReachBehaviours
+	flow off
+	for f in .Access
+		if f isa SCFunction
+			if f.IsBehaviour
+				f.FindReached(self)
+
+
+
+function compiler.DeadStrip
+	opt norefcounts
+	Compiler.VisibleFuncs = scbase("Visible",	false)
+	Compiler.Interpreter = scbase("Interpreter", false)
+
+	compiler.MainFunc.StripTest?
+	
+	for f in .FuncList
+		f.striptest
+
+	if options.ListAllLib // must come before the next loop
+		for c in .classlist
+			c.reach(Compiler.Interpreter)
+	
+	for c in .classlist
+		if c.MyReacher // shorten-discovery-chains, 
+			c.ReachBehaviours // behaviour chains tend to be long.
+
+	CodeSorter.LeafsFirst		// super-refcounter wants this
+	
+
+function scdecl.TypeReach (|scbase| from, |message| src)
+	opt norefcounts, flow off
+	if self
+		return .type.reach(from, src)
+
+	
