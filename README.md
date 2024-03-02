@@ -1,6 +1,6 @@
 
 # Speedie - Fun is the main goal #
-## Beautiful, Object Oriented, Simple, Fast, Expressive, Non-Infantilising ##
+## Beautiful, Modern, Fast, Expressive, Non-Infantilising ##
 
 * `Creator:` [@gamblevore](http://github.com/gamblevore/)
 * `Contact:` [theo@jeebox.org](mailto:theo@jeebox.org)
@@ -11,24 +11,24 @@
 
 
 # General Features #
-* Modern simple language, slightly more expressive than Python.
+* Modern language, slightly more expressive than Python.
 * Compiled apps run faster than apps made in idiomatic C++.
-* Compiles fast too.
+* Fast compilation.
 * Object-oriented programming model
 * Cross-platform. Create shell tools and GUI apps
-* Easy communication across multiple processes (IPC).
+* Message-passing-interface lets your multiple-processes talk.
 * Has an awesome IDE, “Perry”.
-* Use one language, thats great at multiple areas:
-    * Fast at heavy-duty data-processing
-    * Making tools with few lines of code
-    * Writing large well-structured programs
-    * Create cross-platform GUI (or shell) apps
-* Works natively with Jeebox... Probably the best way to learn how to use Jeebox.
+* Stick with one language, when your needs change:
+    * Fast: When you are doing heavy-duty data-processing
+    * Expressive: When making tools with few lines of code
+    * Type-safe and modern: Allows writing large complex programs
+    * The GUI and everything else is cross-platform.
+* Works natively with Jeebox... Learn how to use Jeebox!
 * Not controlled by big-tech.
 
-Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D I did delete most of the rude comments before release, but still... dont expect "corporate behaviour".
+Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D Dont expect "corporate behaviour". But do expect love for the project and the community.
 
-If you'd like to financially support the ongoing development of Speedie, consider [sponsoring through GitHub](https://github.com/sponsors/gamblevore).
+If you'd like to support the ongoing development of Speedie, consider [sponsoring through GitHub](https://github.com/sponsors/gamblevore).
 
 Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't NEED C++, but being able to is a great property to have, so that property will remain.
 
@@ -46,8 +46,8 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 
 # Power Features #
 * Has an awesome nil-checker and type-safety system! Write safe code while having an easy time of doing it!
-* Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE*/ifstreams/fread and do everything using low-level Unix APIs.)
-* Doesn't infantilise you like Javascript or java does. Allows you to mess around with pointers or structs if you need... although its usually a buggier approach. 
+* Generally runs faster than most other languages. Even basic things like reading/writing to files runs faster than the "obvious" way to do it in C++. (Not because C++ is slow, but because the fast way to read files in C++, requires you to avoid FILE*/fread/etc and do everything using low-level Unix APIs.)
+* Doesn't infantilise you like Javascript or Java. Allows you to mess around with pointers if you need... (but try to avoid pointers anyhow).
 * Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
 	
 
