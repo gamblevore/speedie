@@ -14,6 +14,7 @@ class GUIControl (ringtree)
 	|GUIAction?|				OnClicked
 	|GUIAction?|				OnFocus
 	|TimeFader|					Declutterer
+	|uint|						_ScrollDrawTimer
 	|ControlSize|				Sizer
 	|uint16|					TabIndex
 	|ControlClipMode|			ClipMode
@@ -225,6 +226,11 @@ class GUIControl (ringtree)
 		if sdlapp.TouchCount < amount
 			sdlapp.touchcount = Amount
 		(.window is modified)
+
+	setter ScrollDrawTimer (|uint|)
+		if ._ScrollDrawTimer != value
+			._ScrollDrawTimer = value
+			sdlapp.touch(self)
 
 	
 	setter Visible (|bool|)

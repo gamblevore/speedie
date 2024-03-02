@@ -970,9 +970,9 @@ module SDLApp
 		w.ClearDrops
 		if !(di and dd) and (button == 3) and (dow != F) and f and (f contains xy)
 			f.__rightclick__(xy)
-		  elseif dow and (button!=3) and !Scroller.JustClicked
+		  elseif dow and (button!=3) and !ScrollInfo.JustClicked
 			dow.__MouseUp__(xy)
-		Scroller.JustClicked = false
+		ScrollInfo.JustClicked = false
 		return SDLActivity.activity
 
 

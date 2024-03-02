@@ -4,7 +4,6 @@ class ListView (GUIControl) {
 		cpp_part LV
 	|int|							RowHeight
 	|int|							ScrollShift
-	|uint|							ScrollDrawTimer_
 	|byte|							ColumnCount
 	|byte|							ScrollRealigner
 	|bool|							IsEditing
@@ -163,12 +162,6 @@ class ListView (GUIControl) {
 		rz.x2	= rz.x2 min z2.x2
 
 
-	function ScrollDrawTimer (|uint|)
-		return .ScrollDrawTimer_ 
-	setter ScrollDrawTimer (|uint|)
-		if .ScrollDrawTimer_ != value
-			.ScrollDrawTimer_ = value
-			sdlapp.touch(self)
 		
 	function Columns (|int| i, |int|)
 		require i > 0
@@ -508,7 +501,7 @@ class ListView (GUIControl) {
 		
 	
 	function CheckDrawUpdate
-		if .ScrollDrawTimer and !.inscrollarea(.mousexy)
+		if ._ScrollDrawTimer and !.inscrollarea(.mousexy)
 			sdlapp.Touch(self)
 
 
@@ -521,7 +514,7 @@ class ListView (GUIControl) {
 			.ScrollDrawTimer = 0
 			return .HasFocus
 		
-		return .MouseMovedScroll(p, .ScrollDrawTimer_)
+		return .MouseMovedScroll(p, ._ScrollDrawTimer)
 	
 	
 	behaviour LostFocus
@@ -644,7 +637,7 @@ class ListView (GUIControl) {
 			  elseif before
 				before.prev = p
 		
-		.scrolldrawtimer = scroller.timer
+		.scrolldrawtimer = ScrollInfo.timer
 		.touch
 		return true
 	
@@ -657,7 +650,7 @@ class ListView (GUIControl) {
 		
 
 	behaviour MouseUp
-		scroller.endDrag(.scrolldrawtimer_)
+		ScrollInfo.endDrag
 
 		|| f = .DraggingRowFrom
 		|| t = .DraggingRowTo
@@ -1060,7 +1053,7 @@ class ListView (GUIControl) {
 	function ScrollByRows (|int| Rows)
 		|| s = ._Scroll
 			.scrollset( .bmove(s, rows) )
-			.ScrollDrawTimer = scroller.timer // where should this go?
+			.ScrollDrawTimer = ScrollInfo.timer // where should this go?
 		// in scrollset or the caller of this func?
 
 	
@@ -1119,12 +1112,12 @@ class ListView (GUIControl) {
 			.SelectFirst
 		  else
 			.SelectNone
-		.ScrollDrawTimer = scroller.timer
+		.ScrollDrawTimer = ScrollInfo.timer
 		._BlockedDuringUse = false
 
 	
 	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
-		return .ClickedScrollbar(P, Clicks, .slh, .ScrollDrawTimer_)
+		return .ClickedScrollbar(P, Clicks, .slh, ._ScrollDrawTimer)
 
 
 	helper FindClicked (|ivec2| Search, |ListViewRow|)
@@ -1345,7 +1338,7 @@ class ListView (GUIControl) {
 	function ScrollPixels (|int| rem)
 		if rem
 			.ScrollPixelsSub(rem)
-			.scrolldrawtimer = scroller.timer
+			.scrolldrawtimer = ScrollInfo.timer
 			.ScrollRealigner = (48, 0)(.scrollshift)
 			sdlapp.touch(self)
 
@@ -1426,7 +1419,7 @@ class ListView (GUIControl) {
 		  else
 			if self isa menu
 				.ScrollDrawTimer = 1							// oooop
-			scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer_)
+			.DrawScroll(.slh, where)
 	
 	
 	helper guicontrol.EdgeAllow	(|MoveCode|)

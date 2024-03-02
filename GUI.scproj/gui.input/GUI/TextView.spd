@@ -21,7 +21,6 @@ class TextView (GUIControl)
 	|byte|						ExpectsParse
 	|MoveCode|					Alignment
 	|uint16|					LastDrawWidth
-	|uint|						ScrollDrawTimer
 	|int|						ClickedPos
 	|int|						AutoCompleteBack
 	|string|					AutoCompleteString
@@ -101,7 +100,7 @@ class TextView (GUIControl)
 
 		
 	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
-		return .ClickedScrollbar(P, Clicks, .slh, .ScrollDrawTimer)
+		return .ClickedScrollbar(P, Clicks, .slh, ._ScrollDrawTimer)
 			
 		
 	behaviour LostFocus
@@ -476,7 +475,7 @@ class TextView (GUIControl)
 				d2 = d2.movecapped(2) // looks lil nicer
 			if ._Start != d2
 				.StartLine = d2
-				.ScrollDrawTimer = scroller.timer 
+				.ScrollDrawTimer = ScrollInfo.timer 
 		
 		
 	function Jump (|int| x, |int| Before=0, |bool|)
@@ -1516,15 +1515,16 @@ class TextView (GUIControl)
 		|| Sel = self is editable or alwaysscrollable
 			.DrawSel(where)
 		where.ControlClip = c			/// restore!
-		if  !.CanSeeAllLines and scroller.CanDrawScroll(self, .scrolldrawtimer)
+		if  !.CanSeeAllLines and .CanDrawScroll
 			if .myerror
 				.DrawScrollErrors(where)
 			if sel
-				scroller.DrawScroll(self, where, .slh, .ScrollDrawTimer)
+				.DrawScroll(.slh, where)
 	
 	
-	helper DrawScrollErrors (|image| where, |float| strength=1.0)
+	helper DrawScrollErrors (|image| where)
 		opt norefcounts
+		|| strength = .DrawScroll(.slh)				#require
 		|float| N = ._lines.last!.vline
 		for s in ._lines
 			|| E = s.drawerror
@@ -1538,7 +1538,7 @@ class TextView (GUIControl)
 					if i == 0
 						C.a = 0.8 * Strength
 					for xx in p.x+4 downto p.x-4		// in 5
-						//|| xx = p.x + j*((B*2)-1)
+						// || xx = p.x + j*((B*2)-1)
 						|| px = where[xx,p.y+i]
 						px.overlay(C.premul)
 						C.a -= 0.04
@@ -1581,7 +1581,7 @@ class TextView (GUIControl)
 	
 	behaviour MouseMove
 		.ShowExtraInfo(p)
-		return .MouseMovedScroll(p, .ScrollDrawTimer)
+		return .MouseMovedScroll(p, ._ScrollDrawTimer)
 	
 	
 	helper ShowNoExtra
@@ -1628,7 +1628,7 @@ class TextView (GUIControl)
 	helper StartLine (assigns:|TextViewLine| d)
 		cpp_part StartAtLine
 		.StartWithoutScrollDraw = d
-		.ScrollDrawTimer = scroller.timer
+		.ScrollDrawTimer = ScrollInfo.timer
 
 
 	function StartLine (assigns:|int| v)
