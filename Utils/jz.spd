@@ -30,8 +30,7 @@ datatype Type (int)
 	
 	syntax is (|Type| test, |bool|)
 		return self & test 
-	syntax isnt (|Type| test, |bool|)
-		return !(self & test)
+
 	function Format (|Type|) 
 		return self & (Box ||| jbin ||| xml ||| json)
 	

@@ -7,7 +7,6 @@
 
 
 * Constants and globals don't autocomplete nicely
-* remove syntax isnt!!!! AAARRHHH!!
 * Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 	* Speedie stops compiling sometimes, from perry
 

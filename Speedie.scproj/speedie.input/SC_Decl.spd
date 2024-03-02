@@ -125,12 +125,9 @@ class SCDecl (SCObject) {
 	syntax is (|SCDeclInfo| d, |bool|)
 		if self
 			return .info & d
-	syntax isnt (|SCDeclInfo| d, |bool|)
-		return !.syntaxis(d)
+
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
 		.info = .info.set(d, Value)
-	syntax isnt (|SCDeclInfo| d, assigns:|bool|)
-		.info = .info.set(d, !Value)
 
 
 	function IsNil (|bool|)

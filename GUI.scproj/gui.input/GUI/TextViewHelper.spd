@@ -60,23 +60,17 @@ class TextViewLine (ringtree)
 			d.x2 -= 1 
 		return d contains b
 
-
-	syntax isnt (|TextLineFlags|F, |bool|)
-		return !.syntaxis(F)
-	syntax isnt (|TextLineFlags|F, assigns:|bool|)
-		.syntaxis(f) = !value
 	syntax is (|TextLineFlags| F, |bool|)
 		return .state&F
+	
 	syntax is (|TextLineFlags|F, assigns:|bool|)
 		if value
 			.state |= f
 		  else
 			.state &= ~F
 
-
 	function Contains (|int| x, |bool|)
 		return x >= .position and x < .after
-
 
 	function NotReallyContains (|int| x, |bool|)
 		if x < .position

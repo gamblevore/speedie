@@ -20,10 +20,6 @@ extend PerryIDE
 		return .projmsg.syntaxis(s)
 		
 
-	syntax isnt (|ListViewState| s, |bool|)
-		return !.syntaxis(s)
-		
-
 	syntax is (|ListViewState| s, assigns:|bool| mod)
 		opt norefcounts
 		.projmsg.syntaxis(s) = mod
@@ -31,10 +27,6 @@ extend PerryIDE
 		if (s == listviewstate.modified)
 			|| sub = .CurrFileName.SubMenu
 				(sub.ListSource is modified) = Mod
-
-
-	syntax isnt (|ListViewState| s, assigns:|bool| b)
-		.syntaxis(s)=!b
 
 
 	function ClearErrors (|bool| Compiled)

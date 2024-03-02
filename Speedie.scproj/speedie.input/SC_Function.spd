@@ -10,8 +10,6 @@ datatype DotUseType (uint)
 		Memory
 	syntax is (|DotUseType| d, |bool|)
 		return self == d
-//	syntax isnt (|DotUseType| d, |bool|)
-//		return self != d
 
 
 datatype FunctionType (uint)
@@ -97,12 +95,12 @@ syntax equals (|string| name, |bool| Aware, |bool|)
 
 syntax is (|FunctionType| k, |bool|) // assumes ANY match. Asking "x is a+b", then a or b is enuf
 	return .alloccode & k
-syntax isnt (|FunctionType| k, |bool|)
-	return !(.alloccode & k)
+
 syntax is (|FunctionType| k, assigns:|bool|)
-	.alloccode |= k
-syntax isnt (|FunctionType| k, assigns:|bool|)
-	.alloccode &= ~k
+	if value
+		.alloccode |= k
+	  else
+		.alloccode &= ~k
 
 function IsReal (|bool|)
 	return (self != nil) and !.isMacro 

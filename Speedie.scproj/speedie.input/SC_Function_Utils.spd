@@ -160,9 +160,6 @@ datatype SCBlockage (uint)
 	
 	syntax is (|SCBlockage| b, |bool|)
 		return self == b
-
-	syntax isnt (|SCBlockage| b, |bool|)
-		return self != b
 	
 	
 	

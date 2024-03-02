@@ -24,17 +24,12 @@ role ListViewRow (message)
 		if self
 			return .state & s
 
-	syntax isnt (|ListViewState| s, |bool|)
-		return !.syntaxis(s)
 
 	syntax is (|ListViewState| s, assigns:|bool| b)
 		if b
 			.state |= s
 		  else
 			.state &= ~s
-
-	syntax isnt (|ListViewState| s, assigns:|bool| b)
-		.syntaxis(s) = !b
 
 
 	function Vis (|int|i, |bool|)
@@ -242,9 +237,6 @@ datatype ListViewSelectMode (uint)
 	
 	syntax is (|ListViewSelectMode| s, |bool|)
 		return (self|uint| & s|uint|) == s
-
-	syntax isnt (|ListViewSelectMode| s, |bool|)
-		return !.syntaxis(s)
 
 
 role ListViewCell (message)

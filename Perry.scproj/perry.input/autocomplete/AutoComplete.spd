@@ -540,7 +540,5 @@ datatype AutoCompleteMode (int)
 		Edit	= 1
 	syntax is (|AutoCompleteMode| i, |bool|)
 		return self == i
-	syntax isnt (|AutoCompleteMode| i, |bool|)
-		return self != i
 
 

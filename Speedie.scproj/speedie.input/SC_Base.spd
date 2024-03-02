@@ -27,17 +27,12 @@ function IsSTDLib (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isn
 
 syntax is (|SCBaseInfo| i, |bool|)
 	return .BaseInfo[i]
-syntax isnt (|SCBaseInfo| i, |bool|)
-	return !.BaseInfo[i]
 
 syntax is (|SCBaseInfo| i, assigns:|bool|)
 	|int| x = .BaseInfo
 	x[i] = value
 	.BaseInfo = x
-	
 
-//syntax isnt (|SCBaseInfo| i, assigns:|bool|)
-//	.SyntaxIs(i, !value)
 
 function IsVisible (|bool|)
 	return self is visible

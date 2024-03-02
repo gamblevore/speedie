@@ -1294,16 +1294,10 @@ extend Message
 
 	function Type (|syntax|)
 		disabled "Use .func instead"
-
-	syntax isnt (|MsgParseFlags| F, |bool|)
-		return !.syntaxis(F)
 			
 	syntax is (|MsgParseFlags| F, |bool|)
 		if self
 			return .flags & F
-
-	syntax isnt (|MsgParseFlags|F, assigns:|bool|)
-		.syntaxis(f) = !Value
 
 	syntax is (|MsgParseFlags|F, assigns:|bool|)
 		if self
@@ -1327,8 +1321,6 @@ extend Message
 datatype MsgParseFlags (uint16)
 	syntax is (|MsgParseFlags| v, |bool|)
 		return self & v
-	syntax isnt (|MsgParseFlags| v, |bool|)
-		return !(self & v)
 	flags
 		NicelyPositioned	= 0x8000
 		Editable			= 0x1000

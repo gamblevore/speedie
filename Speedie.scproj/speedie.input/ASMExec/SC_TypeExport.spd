@@ -32,8 +32,7 @@ datatype NilState (byte) // Exec.scproj needs this here
 		
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type
-	syntax isnt (|nilstate| type, |bool|)
-		return !.SyntaxIs(type)
+
 	
 
 

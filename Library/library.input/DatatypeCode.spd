@@ -62,9 +62,6 @@ datatype DataTypeCode (uint16)
 	syntax is (|datatypecode| M, |bool|)
 		return self == M
 
-	syntax isnt (|datatypecode| M, |bool|)
-		return self != M
-
 	function ExistsButBadlyNamedOrDesigned (|bool|)
 		// not sure what this is meant to do. Only used in one place anyhow.
 		// used to be called "Exists", but all of them exist even bytes?

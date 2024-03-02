@@ -47,9 +47,6 @@ datatype NilCheckMode (uint)
 	syntax is (|NilCheckMode| other, |bool|)
 		return self & other
 
-	syntax isnt (|NilCheckMode| other, |bool|)
-		return !(self & other)
-
 	syntax is (|nilcheckmode| other, assigns:|bool|, |nilcheckmode|)
 		if value
 			return self ||| other

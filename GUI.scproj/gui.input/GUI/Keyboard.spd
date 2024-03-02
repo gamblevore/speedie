@@ -121,9 +121,6 @@ dataType Keys (int) {
 
 	syntax is (|keys| x, |bool|)
 		return self == x
-
-	syntax isnt (|keys| x, |bool|)
-		return self != x
 	
 	module
 		|keys[8]|				DownKeys

@@ -187,21 +187,11 @@ class GUIControl (ringtree)
 		return .lastrect
 	syntax append (|guicontrol| g)
 		super <~ g
-
-
-	syntax isnt (|guicontrolflags|F, |bool|)
-		return !.syntaxis(F)
-	
-	
-	syntax isnt (|guicontrolflags| F, assigns:|bool|)
-		.syntaxis(f) = !value
-		
 		
 	syntax is (|guicontrolflags| F, |bool|)
 		if self
 			return .state&F
-	
-	
+		
 	syntax is (|guicontrolflags|F, assigns:|bool|)
 		require ((.state&f)!=0) != value
 		

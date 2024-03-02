@@ -71,9 +71,6 @@ class Error (Message)
 	function Copy (|error|)
 		return error(self, false)
 
-	syntax isnt (|ErrorFlags|F, |bool|)
-		return !.syntaxis(F)
-
 	syntax is (|ErrorFlags| F, |bool|)
 		return self and .ErrorFlags&F
 		

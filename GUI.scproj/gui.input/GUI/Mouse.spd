@@ -36,7 +36,4 @@ datatype MoveCode (byte)
 
 	syntax is (|movecode| m, |bool|)
 		return (self & m) == m
-	
-	syntax isnt (|movecode| m, |bool|)
-		return !.SyntaxIs(m)
 

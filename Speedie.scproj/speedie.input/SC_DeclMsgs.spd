@@ -322,9 +322,6 @@ datatype DeclMode (uint)
 		TypeCast	= 32
 		ProtoParam	= FuncParam + Proto
 		Always		= 64
-	
-	syntax isnt (|DeclMode|o, |bool|)
-		return self != o
 
 	syntax is (|DeclMode|o, |bool|)
 		return self == o
