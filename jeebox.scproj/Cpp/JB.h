@@ -201,7 +201,7 @@ struct StringZeroTerminated_Behaviour;
 
 struct File_Behaviour;
 
-struct File_Behaviour;
+struct String_Behaviour;
 
 struct File_Behaviour;
 
@@ -257,7 +257,7 @@ struct JB_String;
 
 struct JB_File;
 
-struct JB_File;
+struct JB_String;
 
 struct JB_File;
 
@@ -438,6 +438,15 @@ struct Saveable_Behaviour: Object_Behaviour {
 	__Saveable_SaveCollect__ savecollect;
 	__Saveable_SaveWrite__ savewrite;
 };
+
+struct Selector_Behaviour: Object_Behaviour {
+};
+
+JBClass ( Selector , JB_Object , 
+	int ID;
+	JB_String* Name;
+	Selector* Next;
+);
 
 struct String_Behaviour: Object_Behaviour {
 };
@@ -2085,6 +2094,8 @@ void JB_Sav_SaveWrite(Saveable* self, ObjectSaver* Saver);
 
 
 // JB_Selector
+void JB_Sel_Destructor(Selector* self);
+
 
 
 // JB_String
@@ -2594,8 +2605,6 @@ bool JB_Msg_SyntaxIs(Message* self, MsgParseFlags F);
 
 void JB_Msg_SyntaxIsSet(Message* self, MsgParseFlags F, bool Value);
 
-bool JB_Msg_SyntaxIsnt(Message* self, MsgParseFlags F);
-
 void JB_Msg_Test(Message* self, JB_String* new_render, JB_String* name);
 
 void JB_Msg_test_style(Message* self);
@@ -2703,8 +2712,6 @@ bool JB_Err_SyntaxIs(JB_Error* self, ErrorFlags F);
 
 void JB_Err_SyntaxIsSet(JB_Error* self, ErrorFlags F, bool Value);
 
-bool JB_Err_SyntaxIsnt(JB_Error* self, ErrorFlags F);
-
 void JB_Err_UpgradeWithNode(JB_Error* self);
 
 JB_Error* JB_Err__Alloc();
@@ -2740,13 +2747,19 @@ inline bool JB_Ind_SyntaxCast(Ind self);
 
 inline void JB_Mrap_ConstructorPtr(MWrap* self, int ItemCount, uint ItemSize, byte* ptr, byte DeathAction);
 
+inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name);
+
 inline JB_String* JB_Msg_Name(Message* self);
 
 inline JB_String* JB_Msg_Name_(Message* self);
 
+inline int JB_Sel_ID(Selector* self);
+
 inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f);
 
 inline void JB_Wrap_ConstructorInt(DTWrap* self, int64 v);
+
+inline void JB_bin_Constructor0(FastString* self, int n);
 
 inline bool JB_Array_SyntaxCast(Array* self);
 
@@ -2760,8 +2773,6 @@ inline void JB_Msg_ConstructorCopy(Message* self, Message* other);
 
 inline void JB_Msg_ConstructorEmpty(Message* self);
 
-inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name);
-
 inline void JB_Msg_ConstructorRange(Message* self, Message* Parent, Syntax Func, int BytePos, JB_String* name, int RangeLength);
 
 inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in);
@@ -2769,8 +2780,6 @@ inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in);
 inline void JB_Sav___SaveCollect__(Saveable* self, ObjectSaver* Saver);
 
 inline JB_StringC* JB_Str_CastZero(JB_String* self);
-
-inline void JB_bin_Constructor0(FastString* self, int n);
 
 inline void JB_Err_ConstructorNothing(JB_Error* self);
 
@@ -2925,6 +2934,18 @@ inline void JB_Mrap_ConstructorPtr(MWrap* self, int ItemCount, uint ItemSize, by
 	self->_Ptr = ptr;
 }
 
+inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name) {
+	JB_Ring_Constructor0(self);
+	self->Obj = nil;
+	self->Indent = 0;
+	self->Name = JB_Incr(Name);
+	self->Func = Func;
+	self->Position = JB__Tk_Using.Position;
+	self->Flags = JB__Tk_Using.Flags;
+	self->RangeLength = JB__Tk_Using.Length;
+	self->Tag = JB__Tk_Using.Tag;
+}
+
 inline JB_String* JB_Msg_Name(Message* self) {
 	if (self) {
 		return self->Name;
@@ -2939,6 +2960,13 @@ inline JB_String* JB_Msg_Name_(Message* self) {
 	return JB_LUB[0];
 }
 
+inline int JB_Sel_ID(Selector* self) {
+	if (self) {
+		return self->ID;
+	}
+	return 0;
+}
+
 inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f) {
 	return (JB__Tk_Splitter)(s, e, f);
 }
@@ -2947,6 +2975,13 @@ inline void JB_Wrap_ConstructorInt(DTWrap* self, int64 v) {
 	self->DeathAction = 0;
 	self->DataType = kJB__TC_s64;
 	self->PrivValue = v;
+}
+
+inline void JB_bin_Constructor0(FastString* self, int n) {
+	JB_FS_Constructor(self);
+	if (n) {
+		debugger;
+	}
 }
 
 inline bool JB_Array_SyntaxCast(Array* self) {
@@ -2998,18 +3033,6 @@ inline void JB_Msg_ConstructorEmpty(Message* self) {
 	self->Tag = JB__Tk_Using.Tag;
 }
 
-inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name) {
-	JB_Ring_Constructor0(self);
-	self->Obj = nil;
-	self->Indent = 0;
-	self->Name = JB_Incr(Name);
-	self->Func = Func;
-	self->Position = JB__Tk_Using.Position;
-	self->Flags = JB__Tk_Using.Flags;
-	self->RangeLength = JB__Tk_Using.Length;
-	self->Tag = JB__Tk_Using.Tag;
-}
-
 inline void JB_Msg_ConstructorRange(Message* self, Message* Parent, Syntax Func, int BytePos, JB_String* name, int RangeLength) {
 	JB_Ring_Constructor(self, Parent);
 	self->Obj = nil;
@@ -3034,13 +3057,6 @@ inline void JB_Sav___SaveCollect__(Saveable* self, ObjectSaver* Saver) {
 
 inline JB_StringC* JB_Str_CastZero(JB_String* self) {
 	return JB_Str_MakeC(self);
-}
-
-inline void JB_bin_Constructor0(FastString* self, int n) {
-	JB_FS_Constructor(self);
-	if (n) {
-		debugger;
-	}
 }
 
 inline void JB_Err_ConstructorNothing(JB_Error* self) {

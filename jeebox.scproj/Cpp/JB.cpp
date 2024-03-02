@@ -2091,7 +2091,7 @@ int JB_Tk__InitCode_() {
 Message* JB_Tk__LoweredIndent(Message* output, Message* curr) {
 	int chin = JB_Msg_CleanIndent(curr);
 	while (JB_Msg_IndentScore(output) > chin) {
-		if ((JB_Msg_EqualsSyx(output, JB_SyxArg, false)) and JB_Msg_SyntaxIsnt(output, kJB__MsgParseFlags_Style2)) {
+		if ((JB_Msg_EqualsSyx(output, JB_SyxArg, false)) and (!JB_Msg_SyntaxIs(output, kJB__MsgParseFlags_Style2))) {
 			return JB_Tk__IndentBug(curr);
 		}
 		output = ((Message*)JB_Ring_Parent(output));
@@ -3084,17 +3084,20 @@ bool JB_Syx_Translateable(Syntax self) {
 }
 
 Syntax JB_Syx__Func(JB_String* name, Message* where) {
-	SyntaxObj* obj = JB_Incr(((SyntaxObj*)JB_Dict_ValueLower(JB__SyxDict_, name)));
-	if ((!obj)) {
-		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[281], name));
-		JB_Msg_SyntaxExpect(where, _tmPf0);
-		JB_Decr(_tmPf0);
+	if (name != nil) {
+		SyntaxObj* obj = JB_Incr(((SyntaxObj*)JB_Dict_ValueLower(JB__SyxDict_, name)));
+		if ((!obj)) {
+			JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[281], name));
+			JB_Msg_SyntaxExpect(where, _tmPf0);
+			JB_Decr(_tmPf0);
+			JB_Decr(obj);
+			return nil;
+		}
+		Syntax _tmPf1 = obj->ID;
 		JB_Decr(obj);
-		return nil;
+		return _tmPf1;
 	}
-	Syntax _tmPf1 = obj->ID;
-	JB_Decr(obj);
-	return _tmPf1;
+	return nil;
 }
 
 int JB_Syx__Init_() {
@@ -4412,6 +4415,11 @@ void JB_Sav_SaveWrite(Saveable* self, ObjectSaver* Saver) {
 	JB_FS_AppendString(Saver->Dest, JB_LUB[304]);
 }
 
+
+void JB_Sel_Destructor(Selector* self) {
+	JB_Clear(self->Name);
+	JB_Clear(self->Next);
+}
 
 
 JB_String* JB_Str_AfterByte(JB_String* self, byte b, int Last) {
@@ -5916,7 +5924,7 @@ void JB_Msg_ARel__(Message* self, FastString* fs) {
 }
 
 void JB_Msg_Arg__(Message* self, FastString* fs) {
-	bool Braces = (((bool)((Message*)JB_Ring_Parent(self))) and JB_Msg_SyntaxIsnt(self, kJB__MsgParseFlags_Style2)) or ((!JB_Ring_HasChildren(self)) or (JB_Str_Exists(self->Name) or (JB_Msg_OperatorIn(self, JB_SyxArg))));
+	bool Braces = (((bool)((Message*)JB_Ring_Parent(self))) and (!JB_Msg_SyntaxIs(self, kJB__MsgParseFlags_Style2))) or ((!JB_Ring_HasChildren(self)) or (JB_Str_Exists(self->Name) or (JB_Msg_OperatorIn(self, JB_SyxArg))));
 	if (Braces) {
 		JB_FS_AppendByte(fs, '{');
 	}
@@ -6952,10 +6960,6 @@ void JB_Msg_SyntaxIsSet(Message* self, MsgParseFlags F, bool Value) {
 	}
 }
 
-bool JB_Msg_SyntaxIsnt(Message* self, MsgParseFlags F) {
-	return (!JB_Msg_SyntaxIs(self, F));
-}
-
 void JB_Msg_Test(Message* self, JB_String* new_render, JB_String* name) {
 	if ((!JB_Msg_TestSub(self, new_render, name))) {
 		FastString* _fsf0 = JB_Incr(JB_FS__New());
@@ -7515,7 +7519,7 @@ JB_String* JB_Err_RenderClang(JB_Error* self, FastString* fs_in) {
 	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
 	int M = JB_FS_Mark(fs);
 	JB_String* p = JB_Incr(self->Path);
-	if ((JB_Err_SyntaxIsnt(self, kJB__ErrorFlags_prefernorenderpath)) and JB_Str_Exists(p)) {
+	if (((!JB_Err_SyntaxIs(self, kJB__ErrorFlags_prefernorenderpath))) and JB_Str_Exists(p)) {
 		JB_FS_AppendString(fs, self->Path);
 		JB_FS_AppendByte(fs, ':');
 	}
@@ -7547,10 +7551,6 @@ void JB_Err_SyntaxIsSet(JB_Error* self, ErrorFlags F, bool Value) {
 	 else {
 		self->ErrorFlags = (self->ErrorFlags & (~F));
 	}
-}
-
-bool JB_Err_SyntaxIsnt(JB_Error* self, ErrorFlags F) {
-	return (!JB_Err_SyntaxIs(self, F));
 }
 
 void JB_Err_UpgradeWithNode(JB_Error* self) {
@@ -7959,7 +7959,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024022615);
+	return (2024030216);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
@@ -7971,4 +7971,4 @@ __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 4985208835935446142 2972471241771942337 3677537010155630804
+// 4985208835935446142 -8846645329946533394 -997022384048999761

@@ -828,12 +828,12 @@ struct SCObject_Behaviour: Object_Behaviour {
 };
 
 JBClass ( SCObject , JB_Object , 
-	Dictionary* LinkFrom;
+	Array* LinkFrom;
 	JB_String* Name;
 	Message* Source;
-	u16 TableId;
 	byte NoAutoComplete;
 	byte AllocSource;
+	uint LinkedFrom;
 );
 
 struct SCOperator_Behaviour: Object_Behaviour {
@@ -1168,11 +1168,11 @@ struct SCFunction_Behaviour: SCBase_Behaviour {
 };
 
 JBClass ( SCFunction , SCBase , 
+	Array* LinkTo;
 	Array* Args;
 	SCClass* Cls;
 	JB_String* Description;
 	CppRefs* Refs;
-	Dictionary* LinkTo;
 	JB_Object* CounterPart;
 	SCFunction* NextFunc;
 	ASMFunc* ASM;
@@ -1182,6 +1182,7 @@ JBClass ( SCFunction , SCBase ,
 	SCFunction* DepthFinder;
 	u16 LinkDepth;
 	u16 TmpCounter;
+	u16 TableId;
 	uint AllocCode;
 	byte MinOpt;
 	byte IsAssigns;
@@ -1385,6 +1386,7 @@ extern Dictionary* JB__Constants_UnEscapeStr;
 extern Dictionary* JB__Constants_XML_EscapeStr;
 extern Dictionary* JB__Constants_XML_UnEscapeStr;
 extern CharSet* JB__Constants_XMLWordMiddle;
+extern uint SC__LinkMap_CurrID;
 extern Message* SC__Linkage_Flagz;
 extern Message* SC__Linkage_OSXFrameworks;
 #define kJB__MZLab_Default (kJB__MZLab_Strong)
@@ -2697,6 +2699,17 @@ bool JB_Constants__TestCasting();
 
 
 
+// LinkMap
+void SC_LinkMap__Collect(SCFunction* self);
+
+int SC_LinkMap__Init_();
+
+int SC_LinkMap__InitCode_();
+
+void SC_LinkMap__Store(Array** darr, SCObject* obj);
+
+
+
 // Linkage
 SCBase* SC_Linkage__Collect(Message* node, SCBase* name_space, Message* ErrPlace);
 
@@ -3985,7 +3998,7 @@ bool JB_TC_SameBasicType(DataTypeCode self, DataTypeCode b);
 
 DataTypeCode JB_TC_SetSigned(DataTypeCode self, bool b);
 
-bool JB_TC_SyntaxIsnt(DataTypeCode self, DataTypeCode M);
+bool JB_TC_SyntaxIs(DataTypeCode self, DataTypeCode M);
 
 Dictionary* JB_TC__Types();
 
@@ -4011,7 +4024,7 @@ Date JB_Date__New0();
 
 
 // DeclMode
-bool SC_DeclMode_SyntaxIsnt(DeclMode self, DeclMode o);
+bool SC_DeclMode_SyntaxIs(DeclMode self, DeclMode o);
 
 
 
@@ -4116,8 +4129,6 @@ bool SC_khalai_SyntaxIs(NilCheckMode self, NilCheckMode other);
 
 NilCheckMode SC_khalai_SyntaxIsSet(NilCheckMode self, NilCheckMode other, bool Value);
 
-bool SC_khalai_SyntaxIsnt(NilCheckMode self, NilCheckMode other);
-
 
 
 // NilRecord
@@ -4133,8 +4144,6 @@ NilState SC_NRD_SyntaxAccess(NilRecord self, int item);
 JB_String* SC_NilState_RawName(NilState self);
 
 bool SC_NilState_SyntaxIs(NilState self, NilState type);
-
-bool SC_NilState_SyntaxIsnt(NilState self, NilState type);
 
 
 
@@ -5907,8 +5916,6 @@ SCFunction* SC_SCObject_Disambiguate(SCObject* self, Message* src);
 
 JB_String* SC_SCObject_Display(SCObject* self, bool exact);
 
-void SC_SCObject_DoLinkFrom(SCObject* self, SCBase* B);
-
 SCFile* SC_SCObject_File(SCObject* self);
 
 SCObject* SC_SCObject_NextDisplay(SCObject* self, bool exact);
@@ -6690,8 +6697,6 @@ RingTree* JB_Ring__New0();
 
 
 // JB_SCBase
-void SC_Base_Addtotable(SCBase* self, Array* r);
-
 JB_String* SC_Base_AutoCompleteKind(SCBase* self);
 
 void SC_Base_Collect(SCBase* self, Message* AST, bool Visible, Message* dest);
@@ -6776,8 +6781,6 @@ Message* SC_Base_SourceArg(SCBase* self);
 
 SCModule* SC_Base_SpaceModule(SCBase* self, Message* errplace);
 
-void SC_Base_StoreLinkToMe(SCBase* self, Dictionary** dp);
-
 JB_String* SC_Base_SubProjName(SCBase* self);
 
 SCObject* SC_Base_SyntaxAccess(SCBase* self, JB_String* s);
@@ -6785,8 +6788,6 @@ SCObject* SC_Base_SyntaxAccess(SCBase* self, JB_String* s);
 bool SC_Base_SyntaxIs(SCBase* self, SCBaseInfo i);
 
 void SC_Base_SyntaxIsSet(SCBase* self, SCBaseInfo i, bool Value);
-
-bool SC_Base_SyntaxIsnt(SCBase* self, SCBaseInfo i);
 
 JB_String* SC_Base_TestExportName(SCBase* self, JB_String* s, bool Explicit);
 
@@ -7040,10 +7041,6 @@ void SC_Decl_SyntaxAppend(SCDecl* self, SCDeclInfo d);
 bool SC_Decl_SyntaxIs(SCDecl* self, SCDeclInfo d);
 
 void SC_Decl_SyntaxIsSet(SCDecl* self, SCDeclInfo d, bool Value);
-
-bool SC_Decl_SyntaxIsnt(SCDecl* self, SCDeclInfo d);
-
-void SC_Decl_SyntaxIsntSet(SCDecl* self, SCDeclInfo d, bool Value);
 
 int SC_Decl_TryTypeCast(SCDecl* self, SCDecl* O, Message* exp, int TypeCast);
 
@@ -7863,8 +7860,6 @@ bool JB_Msg_SyntaxIs(Message* self, MsgParseFlags F);
 
 void JB_Msg_SyntaxIsSet(Message* self, MsgParseFlags F, bool Value);
 
-bool JB_Msg_SyntaxIsnt(Message* self, MsgParseFlags F);
-
 MessagePosition JB_Msg_SyntaxUsing(Message* self);
 
 void JB_Msg_SyntaxWarn(Message* self, JB_String* Error);
@@ -8315,6 +8310,8 @@ void SC_Func_AddSelfPrm(SCFunction* self, SCClass* cls);
 
 void SC_Func_AddSelfToFunc(SCFunction* self, SCClass* cls, SCBase* space);
 
+void SC_Func_Addtotable(SCFunction* self, Array* r);
+
 void SC_Func_AnalyseRefs(SCFunction* self, Array* list);
 
 int SC_Func_ApparantArgCount(SCFunction* self);
@@ -8338,6 +8335,8 @@ bool SC_Func_CanCompare(SCFunction* self, SCDecl* Against);
 bool SC_Func_CanDoRefs(SCFunction* self);
 
 bool SC_Func_CanLibLoad(SCFunction* self);
+
+bool SC_Func_CanLinkTo(SCFunction* self, SCBase* To);
 
 bool SC_Func_CanNil(SCFunction* self);
 
@@ -8379,7 +8378,9 @@ void JB_Func_Destructor(SCFunction* self);
 
 SCFunction* SC_Func_Disambiguate(SCFunction* self, Message* src);
 
-void SC_Func_DoLinkTo(SCFunction* self, SCBase* B);
+void SC_Func_DoLinkBoth(SCFunction* self, SCBase* To);
+
+void SC_Func_DoLinkTo(SCFunction* self, SCBase* To);
 
 void SC_Func_DontWantSameReturnType(SCFunction* self, SCFunction* f);
 
@@ -8461,8 +8462,6 @@ JB_String* SC_Func_ParentName(SCFunction* self);
 
 bool SC_Func_ParseName(SCFunction* self, Message* node);
 
-void SC_Func_PostTransform(SCFunction* self);
-
 void SC_Func_PreProcessExpects(SCFunction* self);
 
 void SC_Func_PreRead(SCFunction* self, Message* Arg);
@@ -8494,8 +8493,6 @@ bool SC_Func_SyntaxEquals(SCFunction* self, JB_String* name, bool Aware);
 bool SC_Func_SyntaxIs(SCFunction* self, FunctionType k);
 
 void SC_Func_SyntaxIsSet(SCFunction* self, FunctionType k, bool Value);
-
-bool SC_Func_SyntaxIsnt(SCFunction* self, FunctionType k);
 
 void SC_Func_TranDebugInsert(SCFunction* self);
 
@@ -8826,8 +8823,6 @@ bool JB_Err_SyntaxIs(JB_Error* self, ErrorFlags F);
 
 void JB_Err_SyntaxIsSet(JB_Error* self, ErrorFlags F, bool Value);
 
-bool JB_Err_SyntaxIsnt(JB_Error* self, ErrorFlags F);
-
 void JB_Err_UpgradeWithNode(JB_Error* self);
 
 JB_Error* JB_Err__Alloc();
@@ -8873,13 +8868,13 @@ inline bool JB_Ind_SyntaxCast(Ind self);
 
 inline void JB_Mrap_ConstructorPtr(MWrap* self, int ItemCount, uint ItemSize, byte* ptr, byte DeathAction);
 
+inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name);
+
 inline JB_String* JB_Msg_Name(Message* self);
 
 inline JB_String* JB_Msg_Name_(Message* self);
 
 inline void JB_NR_Constructor(SCNodeRenamer* self);
-
-inline void JB_SCObject_Constructor(SCObject* self);
 
 inline void JB_Sel_Constructor(Selector* self, Selector* Next, Selector** Place, JB_String* name);
 
@@ -8893,11 +8888,19 @@ inline void JB_Wrap_ConstructorInt(DTWrap* self, int64 v);
 
 inline void JB_autoitem_ConstructorAuto(autoitem* self, JB_String* Sort, JB_String* Insert, SCObject* Value, JB_String* Display, bool Exact, int type);
 
+inline void JB_bin_Constructor0(FastString* self, int n);
+
 inline bool JB_int64_OperatorInRange(int64 self, int64 d);
 
 inline bool JB_int_OperatorInRange(int self, int d);
 
 inline void SC_ASMFunc_Constructor(ASMFunc* self, SCFunction* fn);
+
+inline void SC_Base_ConstructorStr(SCBase* self, JB_String* Name, bool Dummy);
+
+inline void SC_Decl_Constructor(SCDecl* self, SCClass* type);
+
+inline void SC_FastStringCpp_Constructor(FastStringCpp* self, JB_String* name);
 
 inline void SC_Macro_ConstructorMsg(Macro* self, Message* s);
 
@@ -8910,6 +8913,8 @@ inline void SC_Opp_Constructor(SCOperator* self, fn_OpASM ASM);
 inline bool SC_PA_SyntaxCast(SCParamArray* self);
 
 inline int SC_Reg_ToInt(AsmReg* self);
+
+inline void SC_SCObject_Constructor(SCObject* self);
 
 inline void SC_nil_SetAllNil(ArchonPurger* self, NilRecord Dest);
 
@@ -8931,8 +8936,6 @@ inline void JB_Msg_ConstructorCopy(Message* self, Message* other);
 
 inline void JB_Msg_ConstructorEmpty(Message* self);
 
-inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name);
-
 inline void JB_Msg_ConstructorRange(Message* self, Message* Parent, Syntax Func, int BytePos, JB_String* name, int RangeLength);
 
 inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in);
@@ -8947,17 +8950,9 @@ inline JB_StringC* JB_Str_CastZero(JB_String* self);
 
 inline _cstring JB_Str_SyntaxCast(JB_StringC* self);
 
-inline void JB_bin_Constructor0(FastString* self, int n);
-
 inline void JB_sci_Constructor(SaverClassInfo* self, JB_Class* Cls, char* Data);
 
 inline int JB_uint64_LELength(uint64 self);
-
-inline void SC_Base_ConstructorStr(SCBase* self, JB_String* Name, bool Dummy);
-
-inline void SC_Decl_Constructor(SCDecl* self, SCClass* type);
-
-inline void SC_FastStringCpp_Constructor(FastStringCpp* self, JB_String* name);
 
 inline void SC_MaterialsLol_Constructor(MaterialsLol* self, Selector* Next, Selector** Place, JB_String* name1);
 
@@ -9070,6 +9065,18 @@ inline void JB_Mrap_ConstructorPtr(MWrap* self, int ItemCount, uint ItemSize, by
 	self->_Ptr = ptr;
 }
 
+inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name) {
+	JB_Ring_Constructor0(self);
+	self->Obj = nil;
+	self->Indent = 0;
+	self->Name = JB_Incr(Name);
+	self->Func = Func;
+	self->Position = JB__Tk_Using.Position;
+	self->Flags = JB__Tk_Using.Flags;
+	self->RangeLength = JB__Tk_Using.Length;
+	self->Tag = JB__Tk_Using.Tag;
+}
+
 inline JB_String* JB_Msg_Name(Message* self) {
 	if (self) {
 		return self->Name;
@@ -9089,16 +9096,6 @@ inline void JB_NR_Constructor(SCNodeRenamer* self) {
 	self->Name = JB_Incr(_tmPf1);
 	Array* _tmPf0 = JB_Array__New0();
 	self->Nodes = JB_Incr(_tmPf0);
-}
-
-inline void JB_SCObject_Constructor(SCObject* self) {
-	self->LinkFrom = nil;
-	JB_StringC* _tmPf0 = JB_LUB[0];
-	self->Name = JB_Incr(_tmPf0);
-	self->Source = nil;
-	self->TableId = 0;
-	self->NoAutoComplete = 0;
-	self->AllocSource = 0;
 }
 
 inline void JB_Sel_Constructor(Selector* self, Selector* Next, Selector** Place, JB_String* name) {
@@ -9140,6 +9137,13 @@ inline void JB_autoitem_ConstructorAuto(autoitem* self, JB_String* Sort, JB_Stri
 	self->type = type;
 }
 
+inline void JB_bin_Constructor0(FastString* self, int n) {
+	JB_FS_Constructor(self);
+	if (n) {
+		debugger;
+	}
+}
+
 inline bool JB_int64_OperatorInRange(int64 self, int64 d) {
 	return (((uint64)self) < ((uint64)d));
 }
@@ -9157,6 +9161,43 @@ inline void SC_ASMFunc_Constructor(ASMFunc* self, SCFunction* fn) {
 	self->OK = false;
 	self->Fn = JB_Incr(fn);
 	JB_SetRef(fn->ASM, self);
+}
+
+inline void SC_Base_ConstructorStr(SCBase* self, JB_String* Name, bool Dummy) {
+	SC_SCObject_Constructor(self);
+	self->BaseInfo = 0;
+	self->Access = nil;
+	JB_StringC* _tmPf0 = JB_LUB[0];
+	self->ExportName = JB_Incr(_tmPf0);
+	self->Parent = nil;
+	self->MyReacher = nil;
+	self->Project = nil;
+	self->Name = JB_Incr(Name);
+}
+
+inline void SC_Decl_Constructor(SCDecl* self, SCClass* type) {
+	SC_SCObject_Constructor(self);
+	self->C_Array = 0;
+	self->HiderFunc = nil;
+	self->IsLookupOnly = nil;
+	JB_StringC* _tmPf0 = JB_LUB[0];
+	self->StringData = JB_Incr(_tmPf0);
+	self->Internal = nil;
+	self->Contains = nil;
+	self->Default = nil;
+	self->DReg = ((AsmReg){});
+	self->PointerCount = 0;
+	self->NilReg = 0;
+	self->NilAllocDepth = 0;
+	self->Special = 0;
+	self->Type = JB_Incr(type);
+	self->NilDeclared = kSC__NilState_Either;
+	self->Info = kSC__SCDeclInfo_altered;
+}
+
+inline void SC_FastStringCpp_Constructor(FastStringCpp* self, JB_String* name) {
+	JB_FS_Constructor(self);
+	self->Cpp_Name = JB_Incr(name);
 }
 
 inline void SC_Macro_ConstructorMsg(Macro* self, Message* s) {
@@ -9210,6 +9251,16 @@ inline bool SC_PA_SyntaxCast(SCParamArray* self) {
 
 inline int SC_Reg_ToInt(AsmReg* self) {
 	return self->Reg;
+}
+
+inline void SC_SCObject_Constructor(SCObject* self) {
+	JB_StringC* _tmPf0 = JB_LUB[0];
+	self->Name = JB_Incr(_tmPf0);
+	self->Source = nil;
+	self->NoAutoComplete = 0;
+	self->AllocSource = 0;
+	self->LinkedFrom = 0;
+	self->LinkFrom = nil;
 }
 
 inline void SC_nil_SetAllNil(ArchonPurger* self, NilRecord Dest) {
@@ -9278,18 +9329,6 @@ inline void JB_Msg_ConstructorEmpty(Message* self) {
 	self->Tag = JB__Tk_Using.Tag;
 }
 
-inline void JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name) {
-	JB_Ring_Constructor0(self);
-	self->Obj = nil;
-	self->Indent = 0;
-	self->Name = JB_Incr(Name);
-	self->Func = Func;
-	self->Position = JB__Tk_Using.Position;
-	self->Flags = JB__Tk_Using.Flags;
-	self->RangeLength = JB__Tk_Using.Length;
-	self->Tag = JB__Tk_Using.Tag;
-}
-
 inline void JB_Msg_ConstructorRange(Message* self, Message* Parent, Syntax Func, int BytePos, JB_String* name, int RangeLength) {
 	JB_Ring_Constructor(self, Parent);
 	self->Obj = nil;
@@ -9330,13 +9369,6 @@ inline _cstring JB_Str_SyntaxCast(JB_StringC* self) {
 	return JB_Str_CString(self);
 }
 
-inline void JB_bin_Constructor0(FastString* self, int n) {
-	JB_FS_Constructor(self);
-	if (n) {
-		debugger;
-	}
-}
-
 inline void JB_sci_Constructor(SaverClassInfo* self, JB_Class* Cls, char* Data) {
 	JB_Array_Constructor0(self);
 	self->NextInfo = nil;
@@ -9346,43 +9378,6 @@ inline void JB_sci_Constructor(SaverClassInfo* self, JB_Class* Cls, char* Data) 
 
 inline int JB_uint64_LELength(uint64 self) {
 	return (JB_int_OperatorMax(JB_Int_Log2(((int)self)), 0)) >> 3;
-}
-
-inline void SC_Base_ConstructorStr(SCBase* self, JB_String* Name, bool Dummy) {
-	JB_SCObject_Constructor(self);
-	self->BaseInfo = 0;
-	self->Access = nil;
-	JB_StringC* _tmPf0 = JB_LUB[0];
-	self->ExportName = JB_Incr(_tmPf0);
-	self->Parent = nil;
-	self->MyReacher = nil;
-	self->Project = nil;
-	self->Name = JB_Incr(Name);
-}
-
-inline void SC_Decl_Constructor(SCDecl* self, SCClass* type) {
-	JB_SCObject_Constructor(self);
-	self->C_Array = 0;
-	self->HiderFunc = nil;
-	self->IsLookupOnly = nil;
-	JB_StringC* _tmPf0 = JB_LUB[0];
-	self->StringData = JB_Incr(_tmPf0);
-	self->Internal = nil;
-	self->Contains = nil;
-	self->Default = nil;
-	self->DReg = ((AsmReg){});
-	self->PointerCount = 0;
-	self->NilReg = 0;
-	self->NilAllocDepth = 0;
-	self->Special = 0;
-	self->Type = JB_Incr(type);
-	self->NilDeclared = kSC__NilState_Either;
-	self->Info = kSC__SCDeclInfo_altered;
-}
-
-inline void SC_FastStringCpp_Constructor(FastStringCpp* self, JB_String* name) {
-	JB_FS_Constructor(self);
-	self->Cpp_Name = JB_Incr(name);
 }
 
 inline void SC_MaterialsLol_Constructor(MaterialsLol* self, Selector* Next, Selector** Place, JB_String* name1) {
@@ -9456,7 +9451,7 @@ inline NilRecord SC_nil__EndBlock() {
 }
 
 inline void SC_Base_Constructor0(SCBase* self) {
-	JB_SCObject_Constructor(self);
+	SC_SCObject_Constructor(self);
 	self->BaseInfo = 0;
 	self->Access = nil;
 	JB_StringC* _tmPf0 = JB_LUB[0];
@@ -9468,7 +9463,7 @@ inline void SC_Base_Constructor0(SCBase* self) {
 }
 
 inline void SC_Base_ConstructorMsg(SCBase* self, Message* node) {
-	JB_SCObject_Constructor(self);
+	SC_SCObject_Constructor(self);
 	self->BaseInfo = 0;
 	self->Access = nil;
 	JB_StringC* _tmPf0 = JB_LUB[0];
@@ -9570,7 +9565,6 @@ inline void SC_Func_Constructor(SCFunction* self, Message* msg) {
 	JB_StringC* _tmPf0 = JB_LUB[0];
 	self->Description = JB_Incr(_tmPf0);
 	self->Refs = nil;
-	self->LinkTo = nil;
 	self->CounterPart = nil;
 	self->NextFunc = nil;
 	self->ASM = nil;
@@ -9580,6 +9574,7 @@ inline void SC_Func_Constructor(SCFunction* self, Message* msg) {
 	self->DepthFinder = nil;
 	self->LinkDepth = 0;
 	self->TmpCounter = 0;
+	self->TableId = 0;
 	self->AllocCode = 0;
 	self->MinOpt = 0;
 	self->IsAssigns = 0;
@@ -9599,6 +9594,7 @@ inline void SC_Func_Constructor(SCFunction* self, Message* msg) {
 	self->IsMacro = false;
 	self->HidesProperties = false;
 	self->Badness = 0;
+	self->LinkTo = nil;
 	if (msg) {
 		SC__Comp_stFuncs++;
 	}
@@ -9740,7 +9736,7 @@ inline void SC_Class_Constructor(SCClass* self, Message* node, SCBase* parent, b
 	self->SelfDecl = JB_Incr(T);
 	JB_SetRef(T->Name, JB_LUB[238]);
 	(SC_Decl_SyntaxIsSet(T, kSC__SCDeclInfo_SelfImplicit, true));
-	(SC_Decl_SyntaxIsntSet(T, kSC__SCDeclInfo_altered, true));
+	(SC_Decl_SyntaxIsSet(T, kSC__SCDeclInfo_altered, (!true)));
 	JB_Decr(T);
 }
 
@@ -9821,7 +9817,7 @@ inline void SC_CppRefs_Constructor(CppRefs* self, Message* s) {
 }
 
 inline void SC_Iter_Constructor(SCIterator* self, SCClass* parent, Message* msg) {
-	JB_SCObject_Constructor(self);
+	SC_SCObject_Constructor(self);
 	self->ValueRenamer = nil;
 	self->Parent = JB_Incr(parent);
 	Message* thg = JB_Incr(((Message*)JB_Ring_First(msg)));

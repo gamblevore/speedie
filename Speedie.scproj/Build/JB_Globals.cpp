@@ -121,6 +121,7 @@ Dictionary* JB__Constants_UnEscapeStr;
 Dictionary* JB__Constants_XML_EscapeStr;
 Dictionary* JB__Constants_XML_UnEscapeStr;
 CharSet* JB__Constants_XMLWordMiddle;
+uint SC__LinkMap_CurrID;
 Message* SC__Linkage_Flagz;
 Message* SC__Linkage_OSXFrameworks;
 Macro* SC__Macros_ASM_Datatype;

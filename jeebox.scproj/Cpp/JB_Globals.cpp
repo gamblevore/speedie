@@ -175,6 +175,16 @@ Memory_Behaviour InitTableMWrap_() { // Behaviour
 Memory_Behaviour MWrap_FuncTable_ = InitTableMWrap_();
 JBClassPlace4(MWrap, JB_AsClass(JB_Object), MWrap_FuncTable_);
 
+Selector_Behaviour InitTableSelector_() { // Behaviour 
+	Selector_Behaviour Result;
+	Result.__destructor__ = (void*)JB_Sel_Destructor;
+	Result.render = (__Object_Render__)JB_ObjRender;
+	return Result;
+}
+
+Selector_Behaviour Selector_FuncTable_ = InitTableSelector_();
+JBClassPlace4(Selector, JB_AsClass(JB_Object), Selector_FuncTable_);
+
 StringFields_Behaviour InitTableStringFields_() { // Behaviour 
 	StringFields_Behaviour Result;
 	Result.__destructor__ = (void*)JB_FI_Destructor;
