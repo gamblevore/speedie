@@ -10,7 +10,6 @@
 * Speedie is just hanging around... sometimes. Should exit after 30 seconds of no responses.
 	* Speedie stops compiling sometimes, from perry
 
-* Control move fwd WithWordCase
 * need strong_import for speedie/perry... which warn of unused functions in the imports
 * int upgrading needs fix
 * change allocator to use unified allocator?

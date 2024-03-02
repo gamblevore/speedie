@@ -56,7 +56,7 @@ function Compiler.PrintErrors (|errorseverity| MinSev)
 	stderr.BlockErrors = true
 	|| s = .RenderErrors(stderr, minsev)
 	stderr.BlockErrors = false
-	if options.perry == 2
+	if options.perryoutput == 2
 		s = s.digest
 	if stderr.errorcount
 		printerror s
@@ -82,7 +82,7 @@ function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, 
 			if (err.severity == errorseverity.problem)
 				if ++problems <= 10
 					err.scrender(msg)
-	  elseif !options.perry
+	  elseif !options.perryoutput
 		msg.problemsfound(count)
 	
 	return msg
@@ -235,7 +235,7 @@ extend Error
 	render SCRender
 		// probably not needed, but whatever leave it for now.
 		.path := .SCOriginalPath ?? "(string)"
-		if options.perry
+		if options.perryoutput
 			.render(fs)
 		  else
 			.render_unix(fs)

@@ -49,7 +49,7 @@ module Options
 	|byte|	Optimise				= 1
 	|byte|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
-	|byte|	Perry					= 0
+	|byte|	PerryOutput				= 0
 	
 	function Color (assigns:|bool|)
 		ErrorColors.enabled = Value
@@ -237,9 +237,9 @@ module Feedback
 				
 		+"perry"
 			Explain(Purpose, "")$
-			options.perry = 1
+			options.perryoutput = 1
 			|| RealPerry = value~="bin"
-			options.perry += RealPerry // argvalue not needed? jsut value, right?
+			options.perryoutput += RealPerry // argvalue not needed? jsut value, right?
 			compiler.insecurewords = file.PrefsFolder["klinkerhoppen.banned"]!.readall.dict
 		
 		+"check"
@@ -419,7 +419,7 @@ module Feedback
 		+"variant"
 			Explain(Purpose)$
 			Options.Variant = (Value.ParseInt|int|).Render
-			options.perry = 1
+			options.perryoutput = 1
 			Options.Color = false
 			if options.optimise < 0
 				options.optimise = 1

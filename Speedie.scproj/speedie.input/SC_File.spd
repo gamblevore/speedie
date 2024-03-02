@@ -76,7 +76,7 @@ class SCFile (file)
 	
 	function DetectInsecureWords
 		opt norefcounts
-		require options.perry
+		require options.perryoutput
 		|| words = compiler.InsecureWords$
 		|| where = (0,0)
 		|| found = words.Find(.fdata, where)

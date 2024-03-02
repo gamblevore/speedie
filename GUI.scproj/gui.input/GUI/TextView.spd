@@ -326,11 +326,24 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| s = .text
 		|| x = .WordMoveSub(pos, dir)
-		ifn (x!=pos) and keys.platcmd(false)
+		|| Control = keys.platcmd(false)
+		ifn (x!=pos) and control
 			return .clamp(x)
 		//
 		|| shift = (dir==1)-1
 		|| G = s.group(pos+shift)
+		if  dir == 1  and  g == 1
+			while
+				if pos >= x
+					return pos
+				|| g2 = s.group(pos+shift)
+				if g2 != g
+					g = g2
+					exit
+				pos++
+				
+ 
+			
 		while x != pos // move pos
 			|| ng = s.group(pos+shift)
 			if ng!=G

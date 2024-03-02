@@ -73,7 +73,7 @@ function message.TargetTest (|bool|) // target true, target false,
 	if self ~= "release"
 		return !options.TargetDebug
 	if self ~= "perry"
-		return options.perry
+		return options.perryoutput
 	if self ~= "minilib"
 		return options.ProjectIsMiniLib
 	if self ~= "imported"
