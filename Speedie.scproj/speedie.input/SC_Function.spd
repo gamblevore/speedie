@@ -42,11 +42,11 @@ class SCFunction (SCBase) {
 linkage
 	cpp_part		Func
 
+|array? of SCBase|		LinkTo
 |[SCDecl]|				Args
 |SCClass?|				Cls
 |String|				Description
 |CppRefs?|				Refs
-|array? of SCBase|		LinkTo
 |object?|				CounterPart
 |SCFunction?|			NextFunc
 |µFunc?|				ASM
@@ -81,6 +81,7 @@ linkage
 
 constructor (|Message?| msg = nil)
 	Super.Constructor( msg )
+	.linkto = nil
 	if (msg)
 		Compiler.stFuncs++
 			

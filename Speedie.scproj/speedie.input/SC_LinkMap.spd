@@ -15,7 +15,7 @@ module LinkMap
 	function scfunction.DoLinkBoth (|SCBase| To)
 		if .canlinkto(to)
 			linkmap.Store(.linkto, to)
-			if !compiler.InPerry
+			if compiler.InPerry
 				linkmap.store(To.linkfrom, self)
 	
 	function Store (|&(array? of scobject)| darr, |scobject| obj)
@@ -67,6 +67,8 @@ function CollectLinks (|object!| obj)
 		if obj isa SCDecl
 			.DoLinkTo( obj.type )
 			obj = obj.IsLookupOnly|scdecl| #require
+		  else
+			return
 
 
 function FindReached (|scbase| from, |bool|)

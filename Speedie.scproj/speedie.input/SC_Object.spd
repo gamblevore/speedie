@@ -12,7 +12,9 @@ class SCObject
 	|Byte|						AllocSource
 	|uint| 						LinkedFrom
 	
-
+	constructor
+		.linkfrom = nil
+		
 	render
 		|| cname = ((.class.name|uint64|)+2)|cstring|
 		fs <~ cname
