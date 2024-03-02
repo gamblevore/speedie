@@ -35,8 +35,6 @@ function textview.SLH (|vec3|)
 extend guicontrol {
 function CanDrawScroll (|bool|)
 	opt NoRefCounts
-	if (self isa textview) and keys.shift
-		if self ~= "Editme"
 	return (._ScrollDrawTimer > 1) or (!sdlapp.MouseButtons and .InScrollArea(.mousexy))
 
 

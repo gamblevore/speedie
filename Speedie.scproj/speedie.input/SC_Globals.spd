@@ -1131,12 +1131,12 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |scbase| name
 		
 	using (rn)
 
-	// (a is b) = true  --> a.syntaxis(s.b) = true
-	// if a is b      --> if a.syntaxis(s.b)
-	// if a is s.b.c  --> if a.syntaxis(s.b.c)	// need special handling, not done yet.
-	// if a is b(d).c --> if a.syntaxis(s.b(d).c)
+	// (a is b) = true		-->		a.syntaxis(s.b) = true
+	// if a is b			-->		if a.syntaxis(s.b)
+	// (a isnt b) = true	-->		a.syntaxis(s.b) = !true
+	// if a isnt b			-->		if !a.syntaxis(s.b)
+	
 	|| exp = .parent!
-	exp.func = @dot
 	if !side
 		|| bra = exp.parent
 		if bra != @bra
@@ -1150,21 +1150,38 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |scbase| name
 			eq.obj = opch.obj
 			bra <~ (@thg, "true")
 			side = bra.last
-			
-	if opch == "isnt"
+	
+	exp.func = @dot
+	|| OpchIsnt = opch == "isnt"
 		exp.name = "syntaxisnt"
 	  else
 		exp.name = "syntaxis"
 	opch.become(@prm)
-	opch.obj = nil // heh
+	opch.obj = nil		// needed
 	rn.func = @dot
 
-	while rn.first		// not used yet. rn == @thg, not @func/@dot
+	while rn.hasany
 		opch <~ rn.first
 	rn  <~ (@thg, LookupType.name) 
 	rn  <~ opch
-	exp <~ «prm, rn »
+	exp.msg(@prm) <~ rn
 	
+	// if a is b   --> if  a.is(B)
+	// if a isnt b --> if !a.is(B)
+	
+	if OpchIsnt
+		|| NOT = @brel + "!"
+		exp.name = "syntaxis"
+		if !side
+			exp.next = not // replacewith
+			not <~ exp
+			exp = not
+		  else
+			side.next = not
+			not <~ side
+			side = not
+			TypeOfExpr(side, name_space)
+			
 	return TypeOfExpr(exp, name_Space, side)
 }
 
@@ -1198,7 +1215,7 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 	  else
 		dot.name = "SyntaxCompare"
 		exp.Last!.name = comp.compOp
-		exp <~ «Num comp.compparam »
+		exp.msg(@Num, comp.compparam )
 
 	TypeOfExpr( dot, name_space )
 	Return TypeBool!.TypeNormal
@@ -1564,7 +1581,7 @@ function Message.FixErl
 				«brel "!", ch.NeedBra »
 			»
 			.Prev = new_if
-			new_if <~ «arg, self »
+			new_if.msg(@arg) <~ self
 
 		  else								// a += 1 --> a = a + 1
 			if last == @rel

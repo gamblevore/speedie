@@ -42,7 +42,6 @@ class $name (selector)
 		
 		if prms
 			if prms != @prm
-				if prms == @list
 				prms = «prm, prms »
 			// should be SelectorInit
 			|| Line2 = «dot "selector_init"

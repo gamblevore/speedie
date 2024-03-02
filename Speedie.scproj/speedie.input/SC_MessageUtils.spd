@@ -58,7 +58,7 @@ function Message.NegateThg (|Message|)
 		.name = "true"
 		.obj = TrueBool
 		return self
-	return .WrapWith(«BRel "!"»)
+	return .WrapWith(@BRel + "!")
 
 
 function Message.Negate (|Message|)
@@ -74,14 +74,14 @@ function Message.Negate (|Message|)
 			ch.negatethg
 			.obj = ch.obj
 			return self
-		.Become(@brel, "!") // the negator!
+		.Become(@brel, "!")					// the negator!
 		return self
 	
 	if self IsBRel "!"
 		return .ReplaceWith(.first!)
 
 	using self
-		rz = .WrapWith(«BRel "!"») // also the negator!
+		rz = .WrapWith(@BRel + "!")			// also the negator!
 
 
 function Message.IsAssignable (|bool|)
@@ -444,6 +444,11 @@ function NewEqRel (|Message| L, |Message| R, |Message|)
 //		R
 //	»
 
+
+function message.wrapwith (|syntax| f, |string| s, |message|)
+	opt norefcounts
+	rz = f + s
+	rz <~ self
 
 function Message.NeedBra (|Message|)
 	if (self == @Bra)
