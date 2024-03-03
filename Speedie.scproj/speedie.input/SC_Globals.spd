@@ -1222,7 +1222,7 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 }
 
 
-function scdecl.CirSub (|int64| Value, |bool|)
+function scdecl.ConstInRangeSub (|int64| Value, |bool|)
 	|| T = .type.typeinfo
 	|| S = t.bytesize
 	if S == 8
@@ -1252,11 +1252,11 @@ function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
 	opt norefcounts
 	if RN == @num	
 		if rn.isint 
-			return .cirsub(rn.int)
+			return .ConstInRangeSub(rn.int)
 	
 	  elseif (rn == @thg) and (rt is DataOnlyConst) and rt.isnormalnumber and rt.isinteger
 		|| def = rt.default
-			return .cirsub(def.int)
+			return .ConstInRangeSub(def.int)
 
 	// if RN == @num... check the type of self big enough
 	// if RN == @thg and is a const... check the type of self big enough
@@ -1376,7 +1376,6 @@ function TypeOfRel (ExprResolver) {
 		return RC		// RC is bigger (float vs vec3)
 
 	
-	// "UpgradeIntsTest".debug
 	if custom & CustomOps.TypeCastToBigger
 		lc = lc.better_numeric(rc)
 	
@@ -1384,7 +1383,7 @@ function TypeOfRel (ExprResolver) {
 		Return TypeBool!.TypeNormal
 
 	if (comp.MakesSigned and lc.isuintlike)
-		return lc.MakeSignedIfPossible // should explicitly type-cast?
+		return lc.Better_Numeric(rc, true) // should add type-cast?
 	
 	Return LC
 	

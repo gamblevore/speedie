@@ -176,10 +176,10 @@ function UnusedFuncs (|message| cmd, |message|)
 			|| src = fn.source
 			if src and fn.File == scf
 				if fn.isunused
-					|| str = "Unused function: "
+					|| str = "() is unused."
 					if fn.linkfrom != nil
-						str = "Function's callers are unused: "
-					arg.msg(@tmp, str + fn.name) <~ src.position
+						str = "()'s callers are unused."
+					arg.msg(@tmp, fn.name + str) <~ src.position
 	return cmd
 	
 

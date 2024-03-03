@@ -158,17 +158,18 @@ class SCDecl (SCObject) {
 		Return dcl
 
 	
-	function Better_Numeric (|scdecl| o, |scdecl|)
+	function Better_Numeric (|scdecl| o, |bool| Subtract=false, |scdecl|)
 		opt norefcounts
 										// int+float-->float
 										// int+double-->double
 		|| S =  .type.typeinfo
-		|| T = o.type.typeinfo 
-		if (s &~ datatypecode.sign) == (t &~ datatypecode.sign)
-			return self
-		|| cls = s.better_numeric_sub(t)!
+		|| T = o.type.typeinfo
+		if !subtract
+			if (s &~ datatypecode.sign) == (t &~ datatypecode.sign)
+				return self
+		|| cls = s.better_numeric_sub(t, Subtract)!
 		if cls.typeinfo == s
-			return self // in case of: || x = (date(), 0)(test)
+			return self					// in case of: || x = (date(), 0)(test)
 		if cls.typeinfo == t
 			return o
 		return cls.typenormal
@@ -178,24 +179,29 @@ class SCDecl (SCObject) {
 		return .type.typeinfo.isfloat
 
 
-	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |SCClass|)
-		"UpgradeIntsTest".debug
+	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |bool| ForSubtract, |SCClass|)
 		|| bits	= .ItemBitCount max t.ItemBitCount
 		// what about a float + an int? f64 right?
 		if .isfloat or t.isfloat
 			// in here?
 			if bits > 32
 				return typef64
-			if bits > 16
+			if bits >= 16
 				return typefloat
 			return typehfloat
 		
+		if ForSubtract
+			|| UnSigned = !.issigned or !t.issigned
+			if bits+UnSigned > 32
+				return typeint64
+			return typeint
+			
 		|| Signed = .issigned or t.issigned
 		if bits > 32
 			return (typeint64, typeuint64)(signed)
 		if bits > 16
-			return (typeint, typeuint)(signed)
-		if bits > 8
+			return (typeint  , typeuint  )(signed)
+		if bits >  8
 			return (typeint16, typeuint16)(signed)
 		return typebyte
 
@@ -572,7 +578,8 @@ class SCDecl (SCObject) {
 			return !t.IsSigned
 
 
-	function MakeSignedIfPossible (|SCDecl!|)
+	function HandleSubtraction (|SCDecl!|)
+		opt norefcounts
 		|| t = .Type.Signed
 			return t
 		return self
