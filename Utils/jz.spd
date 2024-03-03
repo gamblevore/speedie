@@ -200,7 +200,7 @@ module Conv
 		require stderr.ok
 
 		.in = .out
-		.out = (.in! + ".back").file
+		.out = (.in! + ".back")
 
 		.CompressOnly(true)
 		require stderr.ok

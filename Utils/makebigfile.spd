@@ -4,5 +4,7 @@ main (|file| output, |int| reps, |filedata| input) // useful for testing speed o
 	require output.OpenEmpty
 	for reps
 		output <~ input
-	printline output
+	output.Close
+	
+	"$output is ${output.Size.strsize}"
 

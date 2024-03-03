@@ -86,7 +86,7 @@ class SCFile (file)
 		
 		
 	function ASTSub (|bool| Orig, |Message|)
-		FlowControl.input(.file, "AST")
+		FlowControl.input(self, "AST")
 		
 		|| str = .Readall(true).decompress
 			|| Layer = (Message).CreateUseLayer(self, str)

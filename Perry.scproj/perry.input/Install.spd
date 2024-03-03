@@ -205,7 +205,7 @@ extend_module perry
 		for f in list
 			fs <~ f
 			fs <~ " "
-			fs <~ f.file.Size|int|.strsize
+			fs <~ f.Size|int|.strsize
 			fs <~ "\n"
 		return fs.render.confirm
 			

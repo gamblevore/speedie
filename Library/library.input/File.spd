@@ -116,6 +116,8 @@ class File (String)
 	operator plus (|string| s, |file|)
 		return (super+S).file
 	
+	function File (|file|)
+		disabled "This is already a file."
 	
 	function Data (assigns:|String|Data, |bool|)
 		cpp_wrapper JB_File_DataSet
