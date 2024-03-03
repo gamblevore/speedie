@@ -1,7 +1,7 @@
 
 
 extend_module scfunction
-	function FastStringOpt (|message| s, |scbase| name_space)
+	function FastStringOpt (|message| s, |SCNode| name_space)
 		opt norefcounts
 		|| fn = s.msgfunc
 		|| prms = s.second

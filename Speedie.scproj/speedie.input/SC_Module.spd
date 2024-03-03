@@ -5,7 +5,7 @@
 
 
 
-class SCModule (SCBase) {
+class SCModule (SCNode) {
 linkage
 	cpp_part		Mod
 
@@ -50,27 +50,26 @@ function IsProperModule (|bool|)
 	return true
 
 
-function GetPrefix (|SCDecl| D, |string|)
+function SCDecl.PrefixedName (|faststring| fs, |SCModule| M, |string|)
 	opt norefcounts
-	rz = d.project.Mod.ExportName + "_"
-	if .CppPart
-		rz += "_" + .CppPart + "_"
-	if D Is Const
-		rz = "k" + rz
-
-
-function SCDecl.PrefixedName (|SCModule| M, |string|)
-	|| s = .name
-	if (self is DataOnlyConst) and (*s == 'k')
-		s = s[1...]
-	return M.GetPrefix(self) + s.unicodesafename
+	if self Is Const
+		fs <~ "k"
+	fs <~ .project.Mod.ExportName
+	fs <~ "_"
+	if m.CppPart
+		fs <~ "_"
+		fs <~ m.CppPart
+		fs <~ "_"
+	.name.unicodesafename(fs)
+	return fs
 
 
 function GlobalsFix
 	// Goes through our properties/constants and renames them!
+	|| fs = faststring()
 	for decl.vars in self
 		if Decl
-			decl.name = decl.PrefixedName(self)	
+			decl.name = decl.PrefixedName(fs, self)
 
 
 
@@ -104,7 +103,7 @@ function BaseDecls
 	CollectDeclsGlobals( .source, self ) // right?
 
 
-function AddModuleToFunc (|SCBase| space)
+function AddModuleToFunc (|SCNode| space)
 // so we have an issue... we can’t even really add "self" in a module...
 // because we can’t return a module from an expression, yet.
 // sigh. Try?
@@ -141,10 +140,10 @@ function LoadModule (|Message| node)
 	.Source = arg
 	
 	compiler.disammodules!.TryAdd(nil, self, .safename)
-	.Collect( .source, scbase.CurrVisibility )
+	.Collect( .source, SCNode.CurrVisibility )
 
 
-function GetTheNewer (|scobject|)
+function GetTheNewer (|SCObject|)
 	opt norefcounts
 	while self
 		|| o2 = self["new"]
@@ -156,7 +155,7 @@ function GetTheNewer (|scobject|)
 
 
 module
-	function SCBase.SpaceModule (|message| errplace = nil, |scmodule|)
+	function SCNode.SpaceModule (|message| errplace = nil, |scmodule|)
 		if (self isa scmodule)
 			return self
 		if (self isa scclass)

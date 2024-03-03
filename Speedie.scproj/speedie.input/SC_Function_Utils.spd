@@ -128,18 +128,20 @@ function scfunction.NilSelff (|message| where, |nilstate| v)
 	.nilself = v
 
 
-function string.UnicodeSafeName (|string|)
+function string.UnicodeSafeName (|faststring| fs_in=nil, |string|)
 	if .isascii
+		if fs_in
+			fs_in <~ self
 		return self
 	
-	|| fs = faststring()
+	|| fs = faststring(fs_in)
 	for s in self
 		if C_Letters[s]
 			fs <~ s
 		  else
 			fs <~ 'x'
 			fs.appendhex(s)
-	return fs
+	return fs.getresult(fs_in)
 
 
 

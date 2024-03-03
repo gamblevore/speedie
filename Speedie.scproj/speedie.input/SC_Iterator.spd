@@ -106,7 +106,7 @@ class SCIterator (SCObject)
 		v.Rename( s )
 
 
-	function Renuqify (|SCBase| p)
+	function Renuqify (|SCNode| p)
 		opt norefcounts
 		for n in .names
 			n.Uniqueify( p )

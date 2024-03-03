@@ -27,7 +27,7 @@ function Message.FalsifyNil (|message|)
 	.obj = typenil
 
 	
-function Message.ReplaceInbuiltSub (|scbase| name_space, |scdecl?| self_decl, |message|)
+function Message.ReplaceInbuiltSub (|SCNode| name_space, |scdecl?| self_decl, |message|)
 	opt norefcounts
 	if (self == "nil")
 		return .FalsifyNil
@@ -57,7 +57,7 @@ function Message.ReplaceInbuiltSub (|scbase| name_space, |scdecl?| self_decl, |m
 		error (self)
 
 
-function Message.InBuiltSizeOf (|scbase| name_space, |scdecl| sulf, |message| sulf_exp, |message|)
+function Message.InBuiltSizeOf (|SCNode| name_space, |scdecl| sulf, |message| sulf_exp, |message|)
 	return NewDeclNum(scdecl(TypeInt!), sulf.bytesize, "")
 
 

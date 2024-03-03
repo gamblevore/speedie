@@ -4,7 +4,7 @@
 */
 
 
-prototype TranFunc (|SCFunction?| fn, |Message| node, |SCBase| name_space)
+prototype TranFunc (|SCFunction?| fn, |Message| node, |SCNode| name_space)
 
 extend_module SCFunction {
 
@@ -94,7 +94,7 @@ function Tran_Expect (TranFunc)
 			arg.msg(@tmp, "return").msg(@ques, "nil")
 
 
-function Tran_Temporal (|SCFunction| fn, |Message| s, |SCBase| name_space)
+function Tran_Temporal (|SCFunction| fn, |Message| s, |SCNode| name_space)
 	opt norefcounts
 	|| TmpInt = TemporalStatements[s.name]		#expect (s)
 	(*TmpInt)( FN, s, name_space )
@@ -137,7 +137,7 @@ function Tran_Using (TranFunc)
 		SC_MakeComment(node)
 
 
-function Tran_Array (|Message| S, |SCBase| name_space) {
+function Tran_Array (|Message| S, |SCNode| name_space) {
 	// || x = [("a", "b", "c"):d()] 	// wouldve been better? than my 'dispatch' thing...
 	// || tmp = d(), || x = ["a":tmp, "b":tmp, "c":tmp] 	// wouldve been better? than my 'dispatch' thing...
 	|| Type = S.AsDecl #require
@@ -292,7 +292,7 @@ function Tran_Print (TranFunc)
 	TypeOfExpr( node, name_space )
 
 
-function Tran_All (|SCFunction| fn, |Message| s, |SCBase!| p) // transform ()
+function Tran_All (|SCFunction| fn, |Message| s, |SCNode!| p) // transform ()
 	require !TooManyErrors()
 	|| f = s.func
 	
@@ -355,7 +355,7 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCBase!| p) // transform ()
 							      // altering the tree isn't cool really... makes things too tricky. 
 
 
-function Tran_ResultFinish (|SCFunction| f, |message| r_z, |scbase| space)
+function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 	opt norefcounts
 	|| Src = f.SourceArg!
 	|| d = r_z.MsgDecl
@@ -600,7 +600,7 @@ function Tran_Sdt (|Message| exp)
 	exp.Func = @dot
 
 
-function Tran_ForStart (|Message| arg, |Message| index, |SCBase| p)
+function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 	|| start = arg.GetMarker( "start" )				#require
 	
 	expect (index) (arg, "No index found for the iterator for this loop." ) 
@@ -683,7 +683,7 @@ function Tran_Syx (|Message| msg, |Message|)
 
 
 
-function Tran_Isa (|Message| S, |SCBase!| p)
+function Tran_Isa (|Message| S, |SCNode!| p)
 	expect (!IsaTester.t.inuse) (s, "Too many nested isas")
 	isatester.t.inuse = true
 	if compiler.CollectIsaTests( s.first! )
@@ -696,7 +696,7 @@ function Tran_Isa (|Message| S, |SCBase!| p)
 
 
 
-function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCBase!| space)
+function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCNode!| space)
 	require (arg)
 	
 	|| List			= isa_f.Last!
@@ -813,7 +813,7 @@ function Tran_FuncTable (|Message| msg, |bool|)
 
 
 
-function message.NotNilRZ (|scdecl| type,  |scbase|space)
+function message.NotNilRZ (|scdecl| type,  |SCNode|space)
 	opt norefcounts
 	|| rel = .last$
 	|| Nel = rel.last$
@@ -827,7 +827,7 @@ function message.NotNilRZ (|scdecl| type,  |scbase|space)
 		typeofexpr(nel, space)
 
 
-function message.MiniTran (|scbase| name_space, |string| On="app")
+function message.MiniTran (|SCNode| name_space, |string| On="app")
 	using (self)
 		self <~ «prm, .first »
 		.first = «thg on »

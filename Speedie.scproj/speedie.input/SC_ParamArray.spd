@@ -83,7 +83,7 @@ class SCParamArray
 
 
 
-	function PreReadTypes (|SCBase| Name_Space, |Message?| P, |message?| side, |bool|)
+	function PreReadTypes (|SCNode| Name_Space, |Message?| P, |message?| side, |bool|)
 		if p and !.exp
 			.exp = p
 		for  Item.fast in P  // in case '...' adds a param
@@ -92,14 +92,14 @@ class SCParamArray
 		return true
 
 
-	function scbase.IsModuleFunc (|bool|)
+	function SCNode.IsModuleFunc (|bool|)
 		opt norefcounts
 		if (self isa scarg)
 			return !.IsClassArg
 		return (self isa SCModule)
 
 
-	function DetectDotSuper (|SCBase| curr, |scbase| arg_space, |SCBase|)
+	function DetectDotSuper (|SCNode| curr, |SCNode| arg_space, |SCNode|)
 		opt norefcounts
 		.IsNotModule = !Curr.IsModuleFunc
 		if .IsDot
@@ -126,7 +126,7 @@ class SCParamArray
 		.HasProperParams = true
 
 
-	function AddTestedParam (|message| item, |scbase| name_space, |bool|)
+	function AddTestedParam (|message| item, |SCNode| name_space, |bool|)
 		opt norefcounts
 		expect TypeOfExpr( item, name_space ) ( item, "Can’t find type." )
 		.AddParam(Item)

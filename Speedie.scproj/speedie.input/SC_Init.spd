@@ -63,15 +63,15 @@ function SCModule.LoadInitFuncSub (|message| init, |string| name)
 
 
 function SCModule.LoadInitFunc
-	scbase.CurrVisibility = true
-	scbase.currmodule = self
+	SCNode.CurrVisibility = true
+	SCNode.currmodule = self
 	|| arg = .initcodeArg
 		.LoadInitFuncSub(arg, "InitCode_")
 	
 	arg = .initVarsArg
 	if arg
 		.LoadInitFuncSub(arg, "Init_")
-	scbase.currmodule = nil
+	SCNode.currmodule = nil
 
 
 
@@ -148,7 +148,7 @@ function SCModule.HasActualCode (|message|arg, |bool|)
 			return true // found something!
 
 
-function Message.InitRootDecl (|Message| before, |SCBase| name_space, |bool|) {
+function Message.InitRootDecl (|Message| before, |SCNode| name_space, |bool|) {
 	// this code just seems wrong... it finds an SCDecl and puts it into "Decl" :)
 	// have an SCDecl... that should always already have a default! So why we are creating a default?
 

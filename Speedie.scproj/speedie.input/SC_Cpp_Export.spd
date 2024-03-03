@@ -331,13 +331,6 @@ function Run
 			.WriteAPIHeader(WriteTo)
 
 
-
-//function SCClass.ExportDestructor (|string|)
-//	|| it = .FirstDestructor
-//		return it.ExportName
-//	return "0"
-//
-//
 function SCClass.CSuperStructName (|string|)
 	|| sup = .realSuper
 	if (!sup)
@@ -854,9 +847,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 		.WriteDeclNoName( d, T )
 		
-		if (d.Name)
+		if d.name and !d.ExportName
+		if (d.exportName)
 			T <~ ' '
-			d.Name.safe(t)
+			d.exportName.safe(t)
 			if d.IsCArray
 				T <~ '['
 				T <~ d.C_Array|int|
@@ -1200,7 +1194,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function WriteConst (|SCDecl| D, |FastStringCpp| T)
 		T <~ "#define "
-		D.Name.safe(T)
+		if !d.exportName
+		D.exportName.safe(T)
 		t <~ " ("
 		D.Default!.Export( T )
 		t <~ ')'
@@ -1376,6 +1371,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderNum (fpMsgRenderCpp)
+		opt norefcounts
 		fs <~ .name
 		|| d = .asdecl
 			if d.type.typeinfo == datatypecode.float
@@ -1486,20 +1482,26 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function WriteThgMaybeTypeToo (|Message| msg, |SCDecl| d, |FastStringCpp| fs)
-		if !d.Name
+		// ADD MORE ❤️‍🔥FIRE❤️‍🔥
+//		if !(d.exportname contains "_") and d is global
+//		"JB_Msg_ConstructorNormal".debugfunc
+		
+		if d.name and !d.ExportName
+		if !d.exportName
 			msg.safe(fs)
 
 		  elseif (d is TypeImprove) and (MsgOKToImprove(msg))
 			fs <~ '('
 			WriteDeclBrackets( msg, fs )
-			d.name.safe(fs)
+			d.exportname.safe(fs)
 			fs <~ ')'
 
 		  else
-			d.name.safe(fs)
+			d.exportname.safe(fs)
 		// plink plink plonk
 		// plantasy star is so beautiful.
-		// and i was... too.
+		// and i was... too. 
+		// ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥
 }
 
 function message.Safe (|faststring| fs)

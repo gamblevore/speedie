@@ -66,7 +66,7 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 	rz <~ Default
 
 
-function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
+function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 	opt norefcounts
 	|| cls = .Cls
 	if !cls
@@ -86,7 +86,7 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCBase| AddToSpace)
 			
 
 
-function Message.CollectOneParam (|scfunction| func, |SCBase| Recv, |scclass| cls, |bool|)
+function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cls, |bool|)
 	opt norefcounts
 	real self
 	if (func.isassigns == 2) and .islast
@@ -138,14 +138,14 @@ function Message.CollectProp (|scclass| cls, |bool|)
 
 
 // remove these... but later.
-function CollectDeclsGlobals (|Message| arg, |SCBase| scarg)
+function CollectDeclsGlobals (|Message| arg, |SCNode| scarg)
 	opt norefcounts
 	for item in arg
 		if item == @decl
 			require item.CollectAGlobalDecl(scarg)
 
 
-function Message.CollectAGlobalDecl (|SCBase| scarg, |bool|)
+function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	opt norefcounts
 	
 	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals, nil, nil)
@@ -155,18 +155,18 @@ function Message.CollectAGlobalDecl (|SCBase| scarg, |bool|)
 			if d and d.StatedReal
 				dcl.nildeclared = nilstate.real // in case of something like |object| x = real()
 		(dcl is property)
-		(dcl is onmodule)
+		(dcl is Global)
 		return true
 
 
-function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCBase| scarg) 	// remove later... :)
+function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCNode| scarg) 	// remove later... :)
 	opt norefcounts	// basically... the caller needs fixing.
 	for item in arg
 		if item == @decl
 			item.CollectFromBody(scarg) // keep on going even if one failed. good for autocomplete
 
 
-function Message.CollectFromBody (|SCBase| scarg, |bool|)
+function Message.CollectFromBody (|SCNode| scarg, |bool|)
 	opt norefcounts
 	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody, nil, nil)
 		(dcl is body)
@@ -177,17 +177,17 @@ function Message.CollectFromBody (|SCBase| scarg, |bool|)
 
 
 
-function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCBase| scarg)
+function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCNode| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
 
 // definitely remove this!
-function CollectDeclsFuncBody (|Message| arg, |SCBase| scarg)
+function CollectDeclsFuncBody (|Message| arg, |SCNode| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
-function Message.CollectDecl (|SCBase| P, |SCBase| Recv, |int| Mode, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
+function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
 	|| Types = .first!
 	|| Names = types.Next
 

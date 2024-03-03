@@ -17,7 +17,7 @@ linkage
 
 function Rename (|message| name)
 	opt norefcounts
-	expect !(name.hasany) (name, "We can't do that yet")
+	expect !(name.HasAny) (name, "We can't do that yet")
 	for n in .nodes
 		n.func = name.func
 		n.name = name.name
@@ -52,7 +52,7 @@ function CollectDclThg (|Message| DclThg)
 	.Collect( DclThg,  DclThg.name,  dcl.FullAfter )
 
 
-function Uniqueify (|SCBase| p)
+function Uniqueify (|SCNode| p)
 	.Rename( @thg + UniqueTmpVar(p, .Name) )
 
 

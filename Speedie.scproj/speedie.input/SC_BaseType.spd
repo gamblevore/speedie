@@ -1,9 +1,9 @@
 
 
 
-datatype SCBaseType (byte)
+datatype SCNodeType (byte)
 	constants (
-		|SCBaseType|
+		|SCNodeType|
 		Module = 0	// not actually a type
 		Nil			// hasptr
 		DataType
@@ -11,7 +11,7 @@ datatype SCBaseType (byte)
 		Struct
 		Object		// hasptr
 	)
-	syntax is (|scbasetype| d, |bool|)
+	syntax is (|SCNodetype| d, |bool|)
 		return self == d
 	function HasPtrs (|bool|)
 		return self & 1
@@ -19,16 +19,16 @@ datatype SCBaseType (byte)
 
 extend scclass
 	function IsStruct (|bool|)
-		return .BaseType == SCBaseType.struct
+		return .BaseType == SCNodeType.struct
 	
 	function IsDataTypeOnly (|bool|)
-		return .BaseType == SCBaseType.datatype
+		return .BaseType == SCNodeType.datatype
 	
 	function IsDataTypeOrFP (|bool|)
-		return .BaseType == SCBaseType.datatype or SCBaseType.funcproto
+		return .BaseType == SCNodeType.datatype or SCNodeType.funcproto
 	
 
-	syntax equals (|SCBaseType| d, |bool| aware, |bool|)
+	syntax equals (|SCNodeType| d, |bool| aware, |bool|)
 		cpp_part EqualsType
-		if self and d > SCBaseType.nil
+		if self and d > SCNodeType.nil
 			return .BaseType == d

@@ -5,7 +5,7 @@
 
 
 class SCObject
-	|array? of SCBase|			LinkFrom
+	|array? of SCNode|			LinkFrom
 	|string|					Name
 	|Message?|					Source
 	|byte|						NoAutoComplete

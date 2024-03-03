@@ -5,41 +5,47 @@
 
 
 
-prototype CollectFunc (|Message| node, |SCBase| name_space, |Message?| ErrPlace, |SCBase?|)
+prototype CollectFunc (|Message| node, |SCNode| name_space, |Message?| ErrPlace, |SCNode?|)
 
 
 
-class SCBase (SCObject) {
+class SCNamed (SCObject)
+	linkage
+		cpp_part		Named
+	|SCNodeInfo|						NodeInfo
+	|String|							ExportName
+
+	syntax is (|SCNodeInfo| i, |bool|)
+		return .NodeInfo[i]
+	
+	syntax is (|SCNodeInfo| i, assigns:|bool|)
+		|int| x = .NodeInfo
+		x[i] = value
+		.NodeInfo = x
+
+
+	function IsVisible (|bool|)
+		return self is visible
+	
+	
+	function IsVisible (assigns:|bool|)
+		(self is visible) = value
+
+
+
+class SCNode (SCNamed) {
 linkage
 	cpp_part		Base
 
-|SCBaseInfo|						BaseInfo
-|Dictionary? of scobject|			Access
-|String|							ExportName
-|SCBase--?|							Parent
-|SCBase--?|							MyReacher
+|Dictionary? of SCObject|			Access
+|SCNode--?|							Parent
+|SCNode--?|							MyReacher
 |SCImport--?|						Project
 
 
 function IsSTDLib (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isntlib
 	opt norefcounts
 	return .Project.IsSTDLib?
-
-syntax is (|SCBaseInfo| i, |bool|)
-	return .BaseInfo[i]
-
-syntax is (|SCBaseInfo| i, assigns:|bool|)
-	|int| x = .BaseInfo
-	x[i] = value
-	.BaseInfo = x
-
-
-function IsVisible (|bool|)
-	return self is visible
-
-
-function IsVisible (assigns:|bool|)
-	(self is visible) = value
 
 
 function Collect (|Message| AST, |bool| Visible, |message| dest=nil)
@@ -59,7 +65,7 @@ function FuncSrc (|Message|)
 	return .Owningfunc$.Source
 
 
-function CollectSub (|Message| c, |SCBase|)
+function CollectSub (|Message| c, |SCNode|)
 	|| T = ClsCollectTable
 	if self == compiler.program  or  self isa scmodule
 		T = RootCollectTable
@@ -77,13 +83,13 @@ function CollectSub (|Message| c, |SCBase|)
 	Return base
 
 
-syntax access (|string| s, |scobject|)
+syntax access (|string| s, |SCObject|)
 	opt norefcounts
 	|| a = .Access
-		return a.valuelower(s)
+		return a.ValueLower(s)
 
 
-function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {
+function UpCheck (|string| name, |bool| LookUp=true, |SCObject|) {
 	opt norefcounts
 	if LookUp and (self isa SCClass)
 		for (c.upwards in self)
@@ -106,7 +112,7 @@ function UpCheck (|string| name, |bool| LookUp=true, |scobject|) {
 // OK so.. i guess functions can hide stuff below it, right?
 // so upcheck shouldn't work, if we are on a function, right?
 
-function TryAdd (|Message| ErrPlace, |scobject| IncObj, |String| name)
+function TryAdd (|Message| ErrPlace, |SCObject| IncObj, |String| name)
 	require (IncObj)
 	expect (name.length inrange 64) ( ErrPlace, "Name should be 1-64 bytes long." )
 
@@ -194,7 +200,7 @@ function SCFunction.UseExportNameConstructor (|string| CppPart, |string| CppWrap
 			fn.LoadExportName
 
 		|| s = .NameOfClassAllocator(fn.ExportName, CppPart)
-		.SetExportName( s, fn|scbase| is ExplicitExport )
+		.SetExportName( s, fn|SCNode| is ExplicitExport )
 		Return true
 
 
@@ -341,7 +347,7 @@ function LoadExportName
 
 
 
-function TryAddBase (|Message| c, |scbase| neu) 
+function TryAddBase (|Message| c, |SCNode| neu) 
 	.TryAdd( c, neu, neu.Name )
 
 
@@ -350,11 +356,11 @@ function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scfunc
 
 
 
-//function MyProj (|SCBase|)
+//function MyProj (|SCNode|)
 //	return Compiler.Program!.ProjectFix
 
 
-function ProjectFix (|SCBase|)
+function ProjectFix (|SCNode|)
 	opt norefcounts
 	if (self == compiler.program)
 		|| c = scimport.curr
@@ -362,7 +368,7 @@ function ProjectFix (|SCBase|)
 	return self
 
 
-function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |SCBase| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
+function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
 // could be cleaned up so that exp is NEVER nil... "AddMain", "InitRootDecl", lookupvar etc would need altering...
 	
@@ -475,7 +481,7 @@ constants (
 )
 
 
-function LookUpDot (|String| name, |Message| exp, |SCBase| arg_space, |SCDecl| contains, |Message| side, |Object|)
+function LookUpDot (|String| name, |Message| exp, |SCNode| arg_space, |SCDecl| contains, |Message| side, |Object|)
 	opt norefcounts
 	return .LookUpSub( name, exp, exp.Last, arg_space, contains, side, kPurposeDot )
 
@@ -801,7 +807,7 @@ iterator ListLookup
 		Curr = Curr.parent
 
 
-//function SCModule.NonRoleModule (|SCBase|)
+//function SCModule.NonRoleModule (|SCNode|)
 //	opt norefcounts
 //	|| s = self
 //	while s
@@ -883,7 +889,7 @@ dispatch RootCollectTable (CollectFunc)
 	main				SCFunction.NeuMain
 	library				SCFunction.NeuLibrary
 	ignore				(DontRemove)
-	cpp_part			(scbase.LoadCppPart)
+	cpp_part			(SCNode.LoadCppPart)
 	constants			(SCModule.ConstantCollector)
 	flags				(SCModule.ConstantCollector)
 	debuginsert			(scfunction.DebugInsert)
@@ -932,7 +938,7 @@ dispatch ClsCollectTable (CollectFunc)
 
 
 
-datatype SCBaseInfo (int)
+datatype SCNodeInfo (int)
 	constants
 		ExplicitExport
 		Visible

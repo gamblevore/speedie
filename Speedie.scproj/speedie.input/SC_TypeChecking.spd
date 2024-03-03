@@ -1,7 +1,7 @@
 
 
 
-function ExpandToBool (|Message| inside, |SCBase| name_space, |Message|)
+function ExpandToBool (|Message| inside, |SCNode| name_space, |Message|)
 	opt norefcounts
 	|| decl = TypeOfExpr( inside, name_space )$
 
@@ -29,7 +29,7 @@ function RelSetOrExpansion (|Message| exp)
 	((p, exp)(P == @decl)).next = tmp
 
 
-function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCBase| name_space, |SCDecl|)
+function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCNode| name_space, |SCDecl|)
 	|| LBool = LC.Minimatch( TypeBool!.TypeNormal, kTypecastFalse )
 	|| RBool = RC.Minimatch( TypeBool!.TypeNormal, kTypecastFalse )
 		

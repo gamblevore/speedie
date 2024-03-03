@@ -9,7 +9,7 @@ constants
 
 
 
-prototype ExprResolver (|Message| Exp, |SCBase| name_space, |Message?| side=nil, |SCObject?|)
+prototype ExprResolver (|Message| Exp, |SCNode| name_space, |Message?| side=nil, |SCObject?|)
 
 dispatch ExprFuncs (ExprResolver)  {
 /* @decl is BAD!   dont add it*/
@@ -75,7 +75,7 @@ function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 	return  (side.RemoveTypeCasts != @arg)
 
 
-function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |scbase| name_space)
+function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |SCNode| name_space)
 	opt norefcounts
 	|| fn = scfunction.CurrFunc 
 	if fn and (fn isnt Alloc) and fn.blindcasts
@@ -118,7 +118,7 @@ function TypeOfFunc (ExprResolver)
 	return fn
 
 
-function Message.CanGetAddress (|scbase| name_space, |bool|)
+function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	opt norefcounts
 	|| curr = .unbra
 	if (curr == @acc)
@@ -152,14 +152,14 @@ function Message.ParentForAddress (|Message|)
 		p = p.parent
 
 
-function TranRender (|message| exp, |scbase| name_space, |scobject|)
+function TranRender (|message| exp, |SCNode| name_space, |SCObject|)
 	exp.become(@dot, "Render")
 	exp.msg(@prm)
 	return TypeOfExpr(exp, name_space)
 	// $i --> i.render
 
 
-function TranNegate (|message| f, |scbase| name_space, |scobject|)
+function TranNegate (|message| f, |SCNode| name_space, |SCObject|)
 // if this is @thg... do we really NEED to expand this to a bool?
 	opt norefcounts
 	if true // f != @thg // this seems to fail somehow.
@@ -403,7 +403,7 @@ function Message.CollectionPlace (|Message|)
 		msg = p
 
 
-function ExtractAmount (|Message| Prms, |SCBase| name_space, |SCDecl| R, |bool|)
+function ExtractAmount (|Message| Prms, |SCNode| name_space, |SCDecl| R, |bool|)
 	|| num = prms.first
 	if num == @unit
 		typeofunit(Num, nil, nil)
@@ -413,7 +413,7 @@ function ExtractAmount (|Message| Prms, |SCBase| name_space, |SCDecl| R, |bool|)
 	return true
 
 
-function ExtractDecl (|Message!| c, |SCBase?| name_space, |declmode| Purpose, |SCDecl?|)
+function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |SCDecl?|)
 	// a bit recursive!
 	|| f = c.func
 	
@@ -519,27 +519,27 @@ function ExtractDecl (|Message!| c, |SCBase?| name_space, |declmode| Purpose, |S
 
 
 
-function SCDecl.MakeStatic (|Message| wrap, |SCBase| Name_Space, |declmode| Purpose, |bool|)
+function SCDecl.MakeStatic (|Message| wrap, |SCNode| Name_Space, |declmode| Purpose, |bool|)
 	|| R = ExtractDecl( wrap, name_space, purpose )
 		R.CopyTypeInfoTo(self)
 		is static
 		return true
 
 
-function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCBase| Name_Space, |declmode| Purpose, |bool|)
+function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCNode| Name_Space, |declmode| Purpose, |bool|)
 	if contained == @thg and "static"
 		return .MakeStatic(wrap, name_space, purpose )
 	|| Cont = ExtractDecl( Contained, Name_Space, purpose )
 		return .LoadContainedSub(cont, wrap, Name_Space, purpose)
 
 
-function SCDecl.MakeDataTypeWrapper (|SCBase| Name_Space, |declmode| Purpose, |scdecl|)
+function SCDecl.MakeDataTypeWrapper (|SCNode| Name_Space, |declmode| Purpose, |scdecl|)
 	|| wrapp = «thg "datatypewrapper"»
 	rz = SCDecl(.type)
 	rz.LoadContainedSub(self, wrapp, name_space, purpose)
 
 	
-function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCBase| Name_Space, |declmode| Purpose, |bool|)
+function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCNode| Name_Space, |declmode| Purpose, |bool|)
 	|| R = ExtractDecl( wrap, name_space, purpose )			#require
 	R.Copytypeinfoto(self)
 	.contains = cont.MakeContainedOptional
@@ -552,18 +552,18 @@ function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCBase| Name_S
 	return true
 
 
-function TypeOfExprModulesOK (|Message| Exp, |SCBase| name_space, |Message| side = nil, |SCObject|)
+function TypeOfExprModulesOK (|Message| Exp, |SCNode| name_space, |Message| side = nil, |SCObject|)
 	// this function should be removed.
 	// classes now have .classtype which we can use!
 	if (Exp.obj)
-		return exp.obj|scobject|
+		return exp.obj|SCObject|
 	if (exp == @thg)
 		exp.Obj = name_space.LookUpVar( exp.name, exp, side )
-		return exp.Obj|scobject|
+		return exp.Obj|SCObject|
 	return TypeOfExprSub(exp, name_space, side)
 
 
-function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message?| side = nil, |scobject|)
+function TypeOfExprSub (|Message| Exp, |SCNode| name_space, |Message?| side = nil, |SCObject|)
 	opt norefcounts
 	if exp == @Decl
 		|| d = exp.last!.obj
@@ -574,17 +574,17 @@ function TypeOfExprSub (|Message| Exp, |SCBase| name_space, |Message?| side = ni
 		|| f = ExprFuncs[Exp.func|int|]					#expect ( exp )
 		|| obj = (f)(Exp, name_space, side)
 			exp.obj = obj
-		return obj|scobject|
+		return obj|SCObject|
 
 	if !SpdProcess.parent
 		error (Exp, "Failed to get type of this.")
 
 
 
-function TypeOfExpr (|Message?| Exp, |SCBase| name_space, |Message?| side = nil, |SCDecl|)
+function TypeOfExpr (|Message?| Exp, |SCNode| name_space, |Message?| side = nil, |SCDecl|)
 	opt norefcounts
 	if exp // remove this check??? once the nil checker is done
-		|| obj = exp.obj|scobject| ?? TypeOfExprSub(Exp, name_Space, side)
+		|| obj = exp.obj|SCObject| ?? TypeOfExprSub(Exp, name_Space, side)
 		if obj isa SCDecl
 			return obj
 
@@ -608,7 +608,7 @@ function scclass.IsMArray (|message| arr, |bool|)
 
 
 
-function message.ExpectMatch (|scbase| name_space, |scclass| With, |bool|)
+function message.ExpectMatch (|SCNode| name_space, |scclass| With, |bool|)
 	opt norefcounts
 	|| T = TypeOfExprNeeded( self, name_space )
 		return .ExpectClass(T, With)
@@ -681,7 +681,7 @@ function TypeOfAccess (ExprResolver)
 	Return TypeOfDot( exp, name_space, side )
 
 
-function TypeOfFuncPointer (|Message| Exp, |SCBase| name_space, |message| side, |SCObject|)
+function TypeOfFuncPointer (|Message| Exp, |SCNode| name_space, |message| side, |SCObject|)
 	|| ch = exp.unbra
 	if ch == @dot
 		rz = TypeOfDot( ch, name_space, side )
@@ -740,7 +740,7 @@ function SpellOutMsg (|message| type, |message| Exp, |message| namemsg, |message
 	return result
 
 
-function Tran_Msg (|SCFunction| fn,  |message| Exp,  |scbase!| name_space)
+function Tran_Msg (|SCFunction| fn,  |message| Exp,  |SCNode!| name_space)
 	|| Type		= exp.first!
 	|| NameMsg	= Type.first!
 	if exp LessOrEqual 1
@@ -771,12 +771,12 @@ function Tran_Msg (|SCFunction| fn,  |message| Exp,  |scbase!| name_space)
 			TypeOfExpr( Result, name_space )
 
 
-function Tran_MsgList (|scfunction| fn, |message| Exp, |scbase| name_space)
+function Tran_MsgList (|scfunction| fn, |message| Exp, |SCNode| name_space)
 	error (Exp, `Use «thg "name"» syntax instead!`)
 	scfunction.disabledpoints++
 
 
-function SameTypeSub (|message| first,  |message| second,  |scbase| name_space,  |scdecl|)
+function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space,  |scdecl|)
 	|| T1 = TypeOfExpr( first, name_space )
 	|| T2 = TypeOfExpr( second, name_space )
 	require t1 and t2
@@ -907,7 +907,7 @@ function TypeOfArr (ExprResolver)
 
 
 
-function TypeOfSwizzle (|message| Exp, |scdecl| Type, |scbase| name_space, |message| side, |int| swiz, |scdecl|)
+function TypeOfSwizzle (|message| Exp, |scdecl| Type, |SCNode| name_space, |message| side, |int| swiz, |scdecl|)
 	// So... we are getting like: v.z --> v[2]	
 	|| Count = swiz >> 16
 	|| W = type.type.NumericCount
@@ -1016,7 +1016,7 @@ function TypeOfSyx (ExprResolver)
 	return typeofthg(exp, name_space, side)
 
 
-function message.DotSpace (|scbase| name_space, |scobject|)
+function message.DotSpace (|SCNode| name_space, |SCObject|)
 	opt norefcounts
 	if self != @Thg
 		// allow __modules__.abc.func
@@ -1027,7 +1027,7 @@ function message.DotSpace (|scbase| name_space, |scobject|)
 	.obj = rz
 
 
-function TypeOfSwiz (|message| exp, |scbase| name_space, |message| side, |scdecl| class_Space, |scdecl|)
+function TypeOfSwiz (|message| exp, |SCNode| name_space, |message| side, |scdecl| class_Space, |scdecl|)
 	pragma inline
 	opt norefcounts
 	|| W = Class_Space.type.NumericCount 
@@ -1039,7 +1039,7 @@ function TypeOfSwiz (|message| exp, |scbase| name_space, |message| side, |scdecl
 function TypeOfDot (ExprResolver)
 	require !(exp.Last!.obj) // it's a func that returns nothing. we already got it, don't get again.
 
-	|| DotVar = exp.first!.DotSpace(name_space)|SCbase| #expect (exp, "This expression can’t be used here.") // DotVar is the type of the thing that the dot is on.
+	|| DotVar = exp.first!.DotSpace(name_space)|SCNode| #expect (exp, "This expression can’t be used here.") // DotVar is the type of the thing that the dot is on.
 
 	|SCDecl| contains
 	|| DotVarIsaDecl = (DotVar isa SCDecl) 
@@ -1102,7 +1102,7 @@ function message.ExpFunc (|scfunction|)
 			return fn
 
 
-function TypeOfExprNeeded ( |message| exp, |scbase| name_space, |SCDecl| )
+function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
 	debug_require exp // what?
 	|| OldCount = stderr.errorcount
 	|| result = typeofexpr(Exp, name_space)
@@ -1114,7 +1114,7 @@ function TypeOfExprNeeded ( |message| exp, |scbase| name_space, |SCDecl| )
 			error (it.source, "(Using this function.)")
 			
 
-function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |scbase| name_space, |message| side, |scdecl|) {
+function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
 	|| cls = typeofexpr(self, name_space)
 	require cls and cls.isnormal
 
@@ -1190,7 +1190,7 @@ function CanOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| 
 	return (exp.Parent != @Arg) and (LC.Type.CanCompare(RC, Comp.IsEqualOrNot))
 
 
-function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |scbase|name_space, |scdecl| ) {
+function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode|name_space, |scdecl| ) {
 	using (exp)
 	|| dot = «dot
 		exp.first
@@ -1604,7 +1604,7 @@ function AddToStaticSection (|Message| arg, |Message| ToAdd)
 	arg <~ ToAdd
 
 
-//function TypeOfExprAsObj (|Message!| Exp, |SCBase| name_space, |Message?| side = nil, |SCDecl|)
+//function TypeOfExprAsObj (|Message!| Exp, |SCNode| name_space, |Message?| side = nil, |SCDecl|)
 //	|| result = TypeOfExpr( exp, name_space, side )	#require
 //
 //	if !result.type.IsObject
@@ -1629,12 +1629,12 @@ function Message.Resync (|Message| parent, |Message|)
 	Return curr
 
 
-function TypeOfSyntaxCall (|Message| exp, |SCBase| name_space, |Message| side, |scdecl|)
+function TypeOfSyntaxCall (|Message| exp, |SCNode| name_space, |Message| side, |scdecl|)
 	exp.become( @dot, "SyntaxCall" )
 	return typeofexpr(exp, name_space, side)
 
 
-function TypeOfFuncSub (|Message| exp, |SCBase| name_space, |Message| side, |scobject|)
+function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCObject|)
 	|| fn = exp.MsgFunc
 		return fn
 	|| ch = exp.first
@@ -1736,7 +1736,7 @@ function TypeOfArgArr (ExprResolver)
 	return result
 
 
-function Tran_ArgArray (|Message| Exp, |SCBase| name_space)
+function Tran_ArgArray (|Message| Exp, |SCNode| name_space)
 	visible
 	// needs cleaning up. we are getting this called a few times!
 	|| thg = exp.IsSetIntoVar

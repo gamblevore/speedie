@@ -4,7 +4,7 @@
 */
  
 //
-class SCArg (SCBase)
+class SCArg (SCNode)
 	linkage
 		cpp_part		Arg
 
@@ -38,7 +38,7 @@ class SCArg (SCBase)
 		fs <~ ")\n"
 
 
-function Message.SCArgNested (|message| base, |SCBase| p, |SCArg?|)
+function Message.SCArgNested (|message| base, |SCNode| p, |SCArg?|)
 	opt norefcounts
 	while 
 		|| cp = .Ancestor(@arg)
@@ -47,7 +47,7 @@ function Message.SCArgNested (|message| base, |SCBase| p, |SCArg?|)
 		self = cp$
 
 
-function Message.SCArg (|SCBase| p, |message| avoid=nil, |SCArg?|)
+function Message.SCArg (|SCNode| p, |message| avoid=nil, |SCArg?|)
 	opt norefcounts
 	require self
 	debug_require (self == @arg)

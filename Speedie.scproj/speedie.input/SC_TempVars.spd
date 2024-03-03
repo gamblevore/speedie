@@ -98,7 +98,7 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 
 
 
-function message.IntoVariable (|scbase| name_space, |nameandmsg|)
+function message.IntoVariable (|SCNode| name_space, |nameandmsg|)
 	|| P = .NiceParent
 	|| Place = P.IsInDeclInBlock
 		|| NameMsg = P.first!.usenonrefchangers
@@ -146,7 +146,7 @@ struct NameAndMsg
 
 
 || fs_tmp_num = FastString()
-function UniqueTmpVar (|SCBase| base=scfunction.currfunc, |string| name = "tmP", |string|)
+function UniqueTmpVar (|SCNode| base=scfunction.currfunc, |string| name = "tmP", |string|)
 	opt norefcounts
 	fs_tmp_num <~ '_'
 	fs_tmp_num <~ name

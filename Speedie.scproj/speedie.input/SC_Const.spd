@@ -4,7 +4,7 @@
 */
 
 
-function scbase.CollectOneConstants (|Message| ch)
+function SCNode.CollectOneConstants (|Message| ch)
 	constantsloadingoverride = true
 	.project.use
 	using ch
@@ -12,7 +12,7 @@ function scbase.CollectOneConstants (|Message| ch)
 	constantsloadingoverride = false
 
 
-function scbase.CollectConstantsSub (|Message| ch)
+function SCNode.CollectConstantsSub (|Message| ch)
 	|| FuncName = ch.first									#require
 	|| arg = ch[-1]
 	|| vs = funcname
@@ -92,14 +92,14 @@ function scbase.CollectConstantsSub (|Message| ch)
 			newitem.source = thg
 
 		newitem.nildeclared = nilstate.real // no point in having a nil constant.
-		NewItem <~ scdeclinfo.Const ||| scdeclinfo.onmodule
+		NewItem <~ scdeclinfo.Const ||| scdeclinfo.Global
 		NameList <~ NewItem.source! // crappy work around for now...
 		.TryAdd( line, NewItem, NewItem.Name )
 	
 	
 	if (ch == "flags")
 		|| NewItem = SCDecl(TypeInt!)
-		NewItem <~ scdeclinfo.Const ||| scdeclinfo.onmodule
+		NewItem <~ scdeclinfo.Const ||| scdeclinfo.Global
 		|| s = (FuncName.Name, "Flag")(FuncName)
 		NewDeclNum( NewItem, lastflag|int|.bits, "Largest" + s )
 		.TryAdd( ch, NewItem, NewItem.Name )
@@ -112,7 +112,7 @@ function scbase.CollectConstantsSub (|Message| ch)
 
 
 
-function scbase.Tran_Const (|SCDecl| D, |SCBase| base)
+function SCNode.Tran_Const (|SCDecl| D, |SCNode| base)
 	|| root = D.default
 	|| Using = root.SyntaxUsing
 
@@ -135,7 +135,7 @@ function scbase.Tran_Const (|SCDecl| D, |SCBase| base)
 
 
 
-function message.ConstIntValueSub (|scbase| name_space, |&int64| v, |bool|)
+function message.ConstIntValueSub (|SCNode| name_space, |&int64| v, |bool|)
 	opt norefcounts
 	|| s = self
 	while s == @bra
@@ -150,7 +150,7 @@ function message.ConstIntValueSub (|scbase| name_space, |&int64| v, |bool|)
 			return true
 
 
-function message.ConstIntValue (|scbase| name_space, |&int64| v, |bool|)
+function message.ConstIntValue (|SCNode| name_space, |&int64| v, |bool|)
 	opt norefcounts
 	if .ConstIntValueSub(name_space, v)
 		return true
@@ -171,7 +171,7 @@ struct ArgArrayCounter
 		if (.isitem and .isnotitem)
 			error (exp, "Mixed indexes found. (Some have ':' and some don't)")
 
-	function Do (|string| name, |message| item, |scbase| name_space, |message|)
+	function Do (|string| name, |message| item, |SCNode| name_space, |message|)
 		opt norefcounts
 		|| acc = «acc, «thg name » »
 		|| arr = acc.msg(@arr)
@@ -203,5 +203,5 @@ function @scmodule.ConstantCollector (collectfunc)
 function compiler.CollectConstants
 	opt norefcounts
 	for ch in .constantslist
-		|| b = ch.obj as SCBase
+		|| b = ch.obj as SCNode
 			b.CollectOneConstants(ch)

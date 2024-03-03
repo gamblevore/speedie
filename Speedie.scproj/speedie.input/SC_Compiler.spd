@@ -41,8 +41,8 @@
 |SCDecl|	FalseBool
 
 extend_module compiler
-	|SCBase|	VisibleFuncs
-	|SCBase|	Interpreter
+	|SCNode|	VisibleFuncs
+	|SCNode|	Interpreter
 
 
 
@@ -85,7 +85,7 @@ linkage
 |[SCFunction]|				FuncList
 |[SCFunction]|				ProtoTypes
 
-|Dictionary of SCBase|		ExportNames = Dictionary()
+|Dictionary of SCNode|		ExportNames = Dictionary()
 |dictionary of dictionary of macro|	AdjDicts = dictionary()
 
 |SCFunction|				PrivateProperty
@@ -807,7 +807,7 @@ function ModulesSorter (SorterComparer)
 		if D
 			return D < 0
 
-		if tt == scbasetype.struct 
+		if tt == SCNodetype.struct 
 			D = ca.StructContainerDepth|int| - cb.StructContainerDepth|int|
 			if D
 				return D < 0

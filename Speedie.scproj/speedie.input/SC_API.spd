@@ -14,7 +14,7 @@ module SC_API
 		return "app"
 
 
-	function NewAPI (|message| api, |string| part, |SCBase| parent, |string| proj)
+	function NewAPI (|message| api, |string| part, |SCNode| parent, |string| proj)
 		proj += "_"
 		|| name = api[@thg]					#require
 		|| arg = api.last(@arg)				#require
@@ -42,7 +42,7 @@ module SC_API
 		return compiler.program
 
 
-	function NewExportAPISub (|message| node, |scobject| parent)
+	function NewExportAPISub (|message| node, |SCObject| parent)
 		|| name = node[@thg]										#require
 		|| arg = name.Next(@arg)								#require
 		

@@ -63,7 +63,7 @@ datatype SCDeclInfo (uint)
 		Param
 		Body
 		Property
-		OnModule
+		Global
 		Return
 		AlteredViaPointer
 		Altered
@@ -83,7 +83,7 @@ datatype SCDeclInfo (uint)
 		
 	
 
-class SCDecl (SCObject) {
+class SCDecl (SCNamed) {
 	linkage
 		cpp_part			Decl
 
@@ -112,6 +112,10 @@ class SCDecl (SCObject) {
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered
 
+	setter Name (|string|)
+		super.exportname = value
+		super.name = value
+	
 	function Project (|scimport!|)
 		opt norefcounts
 		return (.MemoryLayer.obj as SCImport)!
@@ -272,14 +276,14 @@ class SCDecl (SCObject) {
 		check (rz.pointercount <= 4) (.source, "Too much abstraction")
 	
 	
-	function DeReference (|message| brel, |scbase|name_space,  |bool| IsAccess,  |scdecl|)
+	function DeReference (|message| brel, |SCNode|name_space,  |bool| IsAccess,  |scdecl|)
 		opt norefcounts
 		|| c = .DeReferenceSub(brel, name_space, isaccess)
 			return c
 		error (brel.first, "Can't dereference this.")
 		
 	
-	function DeReferenceSub (|message| brel, |scbase|name_space,  |bool| IsAccess, |scdecl|)
+	function DeReferenceSub (|message| brel, |SCNode|name_space,  |bool| IsAccess, |scdecl|)
 		opt norefcounts
 		if .IsCArray
 			require IsAccess
@@ -909,23 +913,23 @@ class SCDecl (SCObject) {
 		return kCastedmatch
 		
 	
-	function Message.CastToBool (|SCBase|name_space=nil, |int|)
+	function Message.CastToBool (|SCNode|name_space=nil, |int|)
 		return .castToType("bool", TypeBool!, name_space, kLossycastedmatch)
 
-	function Message.CastToInt (|SCBase|name_space=nil, |int|)
+	function Message.CastToInt (|SCNode|name_space=nil, |int|)
 		return .CastToType("int", TypeInt!, name_space)
 
-	function Message.CastToVoidPtr (|SCBase|name_space=nil, |int|)
+	function Message.CastToVoidPtr (|SCNode|name_space=nil, |int|)
 		return .CastToType("_voidptr", typevoidptr!, name_space)
 
-//	function Message.CastTo (|string|type, |SCBase|name_space=nil, |int|)
+//	function Message.CastTo (|string|type, |SCNode|name_space=nil, |int|)
 //		return .CastToType(type, compiler[type], name_space)
 
-	function Message.CastToClass (|scclass|type, |SCBase|name_space=nil, |int|)
+	function Message.CastToClass (|scclass|type, |SCNode|name_space=nil, |int|)
 		return .CastToType(type.name, type, name_space)
 
 
-	function Message.CastToType (|string| TypeName, |SCClass| type, |SCBase| name_space, |int| loss = kCastedMatch, |int|)
+	function Message.CastToType (|string| TypeName, |SCClass| type, |SCNode| name_space, |int| loss = kCastedMatch, |int|)
 		if (!self)
 			// its not "loss" here? or else we get kcastedmatch on things that
 			// aren't casted.

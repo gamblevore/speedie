@@ -91,7 +91,7 @@ function UseChildAsReal (|message| msg, |nilreason| reason=nilreason.accessing, 
 
 	// So... UseChildAsReal... well... if its a property, we can still do this?
 	|| dcl = msg.FastDecl
-	if dcl is OnModule
+	if dcl is Global
 		return dcl.NilDeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch)

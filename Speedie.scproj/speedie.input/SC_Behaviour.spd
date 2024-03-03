@@ -5,7 +5,7 @@
 */
 
 
-class SCBehaviour (SCBase)
+class SCBehaviour (SCNode)
 	|SCModule?|							FuncTable
 	|dictionary of SCModule|			Interfaces
 	|[SCFunction]|						WrapperFuncs	
@@ -21,10 +21,10 @@ class SCBehaviour (SCBase)
 		return .parent|scclass|
 	
 	
-	function Add (|scbase| fn)
+	function Add (|SCNode| fn)
 		opt norefcounts
 		require (fn)
-		|| Old = self[fn.name]|scbase|
+		|| Old = self[fn.name]|SCNode|
 			error (fn.source,	kNameConf) 
 			error (old.source,	kNameConf)
 		  else
@@ -38,7 +38,7 @@ class SCBehaviour (SCBase)
 				return s.behaviour
 	
 	
-	function SCClass.AddBehaviourOrInterface (|SCBase| M, |Message| ErrPlace)
+	function SCClass.AddBehaviourOrInterface (|SCNode| M, |Message| ErrPlace)
 		|| b = .behaviour
 		if (!b)
 			b = SCBehaviour.new(Self)
@@ -218,7 +218,7 @@ class SCBehaviour (SCBase)
 		return (*Self == '_') or (self[-1] == '_')
 	
 
-	function SCBase.ShouldBeClass (|message|errplace, |SCClass|)
+	function SCNode.ShouldBeClass (|message|errplace, |SCClass|)
 		return .IsNormalObject #expect (errplace, "Can only use this in a class.")
 
 	
@@ -334,7 +334,7 @@ function $InterName (,$InterName)
 		cpp_part Beh
 
 
-function SCBase.IsNormalObject (|SCClass|)
+function SCNode.IsNormalObject (|SCClass|)
 	if (self isa SCClass)
 		if .isobject
 			return self

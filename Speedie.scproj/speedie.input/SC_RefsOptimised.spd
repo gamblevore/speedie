@@ -98,7 +98,7 @@ class CppRefs
 
 dispatch CppRefTable (TranFunc)
 	disowns				{} //(SCFunction.NewCppWrapper)
-	disturbs			{} //(SCBase.LoadCppPart)
+	disturbs			{} //(SCNode.LoadCppPart)
 	paramsafe			scfunction.tran_cpprefs
 
 
@@ -113,7 +113,7 @@ extend_module SCFunction
 dispatch FuncLinkageTable (TranFunc)
 	cpp_wrapper			{}
 	cpp_part			{
-		SCBase.LoadCppPart(node, name_space, node)
+		SCNode.LoadCppPart(node, name_space, node)
 	}
 	cpp_refs			scfunction.tran_cpprefs
 	visible				{} // (SCFunction.Tran_Visible)
@@ -126,7 +126,7 @@ dispatch ClassLinkageTable (TranFunc)
 	// it would have been better to process them all here. but I wrote this after
 	// So the older code still needs removing and using this instead.
 	cpp_wrapper			{}
-	cpp_part			{SCBase.LoadCppPart(node, name_space, node)}
+	cpp_part			{SCNode.LoadCppPart(node, name_space, node)}
 	cpp_refs			scfunction.tran_cpprefs
 	cpp_class			{}
 	visible				{} // (SCFunction.Tran_Visible)
@@ -148,7 +148,7 @@ dispatch ClassLinkageTable (TranFunc)
 				name_space.IsNotNumeric = true
 
 
-function SCBase.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, |scbase|)
+function SCNode.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, |SCNode|)
 	opt norefcounts
 	|| fn = .owningfunc
 	for ch in node

@@ -110,7 +110,7 @@ extend Message		// scanning
 			Curr_ = Curr_.FlatNext
 
 
-function scbase.ListFunctions (|[SCFunction]|)
+function SCNode.ListFunctions (|[SCFunction]|)
 	if !.Access
 		return []
 	for o in .access

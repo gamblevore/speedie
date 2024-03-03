@@ -5,7 +5,7 @@ cpp_part AC
 
 |scfunction|		AnonFn
 |string|			AnonText
-|scbase|			AnonParent
+|SCNode|			AnonParent
 |errorreceiver|		Errors
 |bool|				CompiledOK
 |bool|				Cleaned
@@ -236,7 +236,7 @@ function DoCmd (|Message| cmd, |message| arg, |message|)
 		error "nofile"
 
 
-function compiler.FindModuleOrClass (|message| mod, |bool| retry, |scbase|)
+function compiler.FindModuleOrClass (|message| mod, |bool| retry, |SCNode|)
 	opt norefcounts
 	if mod == @name and "main"
 		return compiler.program
@@ -265,7 +265,7 @@ function message.CmdImprove (|message|)
 	return self
 
 
-function scfunction.InsertIn (|scbase| parent, |string| name, |scobject|)
+function scfunction.InsertIn (|SCNode| parent, |string| name, |SCObject|)
 	.name = name
 	if parent isa scclass
 		.cls = parent
@@ -312,7 +312,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 		return fn
 
 
-function SCFunction.Update_Source (|int| start, |string| text, |scfile| myfile, |scobject| orig, |bool|)
+function SCFunction.Update_Source (|int| start, |string| text, |scfile| myfile, |SCObject| orig, |bool|)
 	scfunction.currfunc = self
 	parser.using.position = -1
 	parser.using.Flags = 0 // oop
@@ -331,7 +331,7 @@ function SCFunction.Update_Source (|int| start, |string| text, |scfile| myfile, 
 	parser.using.Tag = 0
 
 
-function scobject.Disambiguate (|message| src, |scfunction|)
+function SCObject.Disambiguate (|message| src, |scfunction|)
 	opt norefcounts
 	if self isa scdecl
 		rz = .hiderfunc
@@ -416,7 +416,7 @@ function Message.ACInIsa (|bool|)
 			return true
 
 
-function GetScope (|message| orig, |&int| types, |scbase|)
+function GetScope (|message| orig, |&int| types, |SCNode|)
 	if !orig
 		return compiler.program
 	if orig == @ask
@@ -430,7 +430,7 @@ function GetScope (|message| orig, |&int| types, |scbase|)
 		if !decl
 			error "notype"
 			return nil
-		if decl isa scbase
+		if decl isa SCNode
 			return decl
 		if decl isa scdecl
 			return decl.type
@@ -560,7 +560,7 @@ function SCObject.Display (|bool| exact, |string|)
 	return .name
 
 
-function SCObject.NextDisplay (|bool| exact, |scobject|)
+function SCObject.NextDisplay (|bool| exact, |SCObject|)
 	if exact
 		if self isa scfunction
 			return .nextfunc
@@ -576,12 +576,12 @@ function Active (|bool|)
 	return .total < .max_total
 
 
-function scobject.AutoCompleteType (|int|)
+function SCObject.AutoCompleteType (|int|)
 	if self isa scmodule
 		if .cls
 			|| r = 1
 			// probably better to copy the actual basetype-info over... but whatever.
-			if .cls == scbasetype.FuncProto
+			if .cls == SCNodetype.FuncProto
 				r |= 8
 			return r
 		return 2
@@ -607,7 +607,7 @@ function Object.BaseAsDecl (|scdecl|)
 		return .returntype
 
 
-function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoitem]| found, |bool| exact, |int| Types, |scdecl| TypeLimiter)
+function AutoSub2 (|SCObject| value, |string| key,  |string| src_name, |[autoitem]| found, |bool| exact, |int| Types, |scdecl| TypeLimiter)
 	
 	while value and .active
 		ifn (key ~= "self") and (value isa scmodule)
@@ -626,7 +626,7 @@ function AutoSub2 (|scobject| value, |string| key,  |string| src_name, |[autoite
 		value = value.nextdisplay(exact)
 
 			
-function AutoSub (|scbase| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit) // autocompletesub
+function AutoSub (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit) // autocompletesub
 	|scdecl| TypeLimiter = nil
 	if NeedTypeLimit
 		TypeLimiter = TypeOfExpr(needtypelimit, scope) // >:P
@@ -733,7 +733,7 @@ function RootTmpComplete (|message| cmd, |message|)
 			tmp <~ (@str, found.Before("<"))
 
 
-function scbase.UpClass (|message| f, |scbase|)
+function SCNode.UpClass (|message| f, |SCNode|)
 	opt norefcounts
 	rz = .parent
 	if  f == @dot  and  rz isa scmodule
@@ -781,7 +781,7 @@ function ActualDefine (|message| rz, |message| s, |string| purpose)
 	rz <~ s.position
 
 
-function scbase.DiissplayObj (|message| rz, |message|)
+function SCNode.DiissplayObj (|message| rz, |message|)
 	rz.msg(@emb, .AutoCompleteKind + " " + .name)
 	return rz
 
@@ -792,7 +792,7 @@ function message.RenderTypeAndName (|string|)
 	return .render
 
 
-function CanUseName (|scbase| l, |bool|)
+function CanUseName (|SCNode| l, |bool|)
 	if l isa scmodule
 		return !l.isimport
 	return true
@@ -814,7 +814,7 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 
 	if !fn
 		|| obj = s.obj
-		if obj isa scbase
+		if obj isa SCNode
 			return obj.diissplayobj(rz)
 	
 	if purpose ~= "displayall"
@@ -925,12 +925,12 @@ function Define (|message| msg,  |string| purpose,  |object| found=nil,  |messag
 	|| IsDisplay = purpose starts "display"
 	|| IsDefine  = purpose starts "define"
 	expect (IsDisplay or IsDefine) ("badcmd")
-	ifn found isa scobject
+	ifn found isa SCObject
 		found = nil
-	|| s = .LocateDefinition(msg, found|scobject|, IsDisplay)	
+	|| s = .LocateDefinition(msg, found|SCObject|, IsDisplay)	
 		return .RespondDefine(msg, s, purpose)
 	if platform.isdebug
-		.LocateDefinition(msg, found|scobject|, IsDisplay)
+		.LocateDefinition(msg, found|SCObject|, IsDisplay)
 	error "nosource"
 
 
@@ -998,7 +998,7 @@ function message.IdentifyFunc (|scfunction|)
 //	return (self == @tmp) and (.IsClassType or .IsExtender or .MsgIsProperModule)
 
 
-function object.ClassOrModule (|scbase|)
+function object.ClassOrModule (|SCNode|)
 	opt norefcounts
 	if self isa scmodule
 		|| c = .cls
@@ -1037,7 +1037,7 @@ function FindAdj (|message| msg, |bool| DisplayOnly, |message|)
 			return found._parsed // why not .source?
 	 
 
-function LocateDefinition (|message| msg, |scobject| already_defined, |bool| DisplayOnly, |message|)
+function LocateDefinition (|message| msg, |SCObject| already_defined, |bool| DisplayOnly, |message|)
 	opt norefcounts
 	if (msg in @adj) or (msg == @adj)
 		rz = .FindAdj(msg, displayonly)
@@ -1058,7 +1058,7 @@ function LocateDefinition (|message| msg, |scobject| already_defined, |bool| Dis
 			return fn.Source
 
 
-function LocateDefinitionSub (|message!| msg, |scobject| already_defined, |scdecl| ty, |bool| DisplayOnly, |message|)
+function LocateDefinitionSub (|message!| msg, |SCObject| already_defined, |scdecl| ty, |bool| DisplayOnly, |message|)
 	opt norefcounts
 	if already_defined
 		return already_defined.source
@@ -1071,7 +1071,7 @@ function LocateDefinitionSub (|message!| msg, |scobject| already_defined, |scdec
 
 	if !ty
 		return msg.ModuleSrc
-	if ty.type == scbasetype.funcproto
+	if ty.type == SCNodetype.funcproto
 		|| l = ty.IsLookupOnly 
 		if l isa scfunction
 			return l.source
@@ -1102,7 +1102,7 @@ prototype autosort_fn (|autoitem| a, |autoitem| b, |bool|)
 class autoitem
 	|string|		Sort
 	|string|		Insert
-	|scobject|		Value
+	|SCObject|		Value
 	|string|		Display
 	|bool|			Exact
 	|int|			type

@@ -36,11 +36,11 @@ datatype FunctionType (uint)
 
 
 
-class SCFunction (SCBase) {
+class SCFunction (SCNode) {
 linkage
 	cpp_part		Func
 
-|array? of SCBase|		LinkTo
+|array? of SCNode|		LinkTo
 |[SCDecl]|				Args
 |SCClass?|				Cls
 |String|				Description
@@ -297,7 +297,7 @@ function Message.ParamNum (|int|)
 	return -1
 
 
-function MacroFix (|SCDecl?| contains, |SCBase| name_space, |SCParamArray| Incoming, |scdecl|)
+function MacroFix (|SCDecl?| contains, |SCNode| name_space, |SCParamArray| Incoming, |scdecl|)
 	debugger .IsMacro
 	|| msg		= incoming.exp
 	|| Using	= msg.syntaxusing 
@@ -410,7 +410,7 @@ function message.AssignsFix (|scfunction| f)
 		RP.Func = @Bra	
 
 
-function ArgsMatch (|SCDecl| base, |SCBase| name_space, |SCParamArray| Incoming, |int| DescribeFail=0, |SCFunction|)
+function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| DescribeFail=0, |SCFunction|)
 	opt norefcounts
 	if !describefail
 		rz = .argsmatch1(base, name_Space, incoming, 0)
@@ -424,7 +424,7 @@ function ArgsMatch (|SCDecl| base, |SCBase| name_space, |SCParamArray| Incoming,
 			error ( incoming.exp, "Wrong params to " + .RenderTitle )
 
 
-function ArgsMatch1 (|SCDecl| base, |SCBase| name_space, |SCParamArray| Incoming, |int| Cast, |SCFunction|)
+function ArgsMatch1 (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Cast, |SCFunction|)
 	opt norefcounts
 	|| f = .ArgsMatch2( base, kTypeCastFalse ||| Cast, name_space, Incoming )
 	|| macro = f			
@@ -446,7 +446,7 @@ function uint.IsNormalMatch (|bool|)
 	return (self == kSimpleMatch or kNumericMatch or kSuperClassMatch)
 
 
-function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCBase| name_space,  |SCParamArray| Incoming,  |int|)
+function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode| name_space,  |SCParamArray| Incoming,  |int|)
 	if ((.IsAssigns!=0) != Incoming.IsAssigns)
 		require (TypeCast & kTypeCastassigns) and (!Incoming.IsAssigns)
 	
@@ -562,7 +562,7 @@ function TryKeepBetter (|int|OldMatch, |SCFunction| f, |int| Match, |SCFunction|
 		return f
 
 
-function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCParamArray| Incoming, |SCFunction|)
+function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCParamArray| Incoming, |SCFunction|)
 	|| NeedsAlter = false
 	|| OldMatch = 0
 	|| Result
@@ -595,7 +595,7 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCBase| name_space, |SCPara
 	return missing
 
 
-function FLookup (assigns:|SCBase|)
+function FLookup (assigns:|SCNode|)
 	if (Value isa SCClass)
 		.Cls = Value
 		.parent = value.Modul
@@ -688,7 +688,7 @@ function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 	dcl.IsLookupOnly = self
 	dcl.Name = .Name
 	(dcl is const)					// lets kill da hoe
-	(dcl is onmodule)				// kill! kill!
+	(dcl is Global)				// kill! kill!
 	dcl.NilDeclared = nilstate.real
 	.ProtoDecl = dcl
 	if (.Cls)
@@ -1160,7 +1160,7 @@ function NewProtoType (CollectFunc)
 	return NewProtoTypeSub(node, name_space, ErrPlace)
 
 
-function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface="", |SCModule|)
+function NewProtoTypeSub (|Message| node, |SCNode| parent, |Message| ErrPlace, |string| ForInterface="", |SCModule|)
 	if (ForInterface)
 		parent = parent|SCClass|.modul
 	  else
@@ -1174,9 +1174,9 @@ function NewProtoTypeSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |
 	tmp.msg(@thg, f.Name)
 	tmp <~ node.last
 	
-	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface, scbasetype.funcproto )
+	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface, SCNodetype.funcproto )
 		|| clss = modul.Cls!
-		clss.BaseType = SCBaseType.funcproto
+		clss.BaseType = SCNodeType.funcproto
 		clss.IsBuiltin = false		// datatype sets it to true.
 		clss.FuncProto = f
 		f.ProtoType = clss
@@ -1193,7 +1193,7 @@ function NeuSyx (CollectFunc)
 
 
 
-function Tran_AfterRel (|Message| msg, |SCBase| name_space, |message| side, |SCDecl|)
+function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |SCDecl|)
 	|| exp = msg.first!
 	if msg == "!"
 		|| ty = TypeOfExpr( exp, name_space ) #require
@@ -1367,7 +1367,7 @@ function Tran_Ifn (TranFunc)
 		tran_if(fn, node, name_space)
 
 
-function scbase.LateAddTempory (|string| type, |string| name1, |message| Value, |message| err, |string|)
+function SCNode.LateAddTempory (|string| type, |string| name1, |message| Value, |message| err, |string|)
 	|| name = UniqueTmpVar(compiler.program, name1)
 	TypeOfExpr(Value, self)
 	|| msg = MakeDecl(type, name, Value, scdeclinfo.body)
@@ -1428,7 +1428,7 @@ function message.Blocks (assigns:|int|)
 	.TAG = (.TAG & ~SCBlockage.bits) ||| Value
 
 
-function Tran_IfSub (|message| node, |scbase| name_space) 
+function Tran_IfSub (|message| node, |SCNode| name_space) 
 	opt norefcounts
 	|| cond = node.NeedFirst						#require
 	|| arg = cond.next
@@ -1701,7 +1701,7 @@ function scfunction.UpdateSourceSub (|message| src, |bool|)
 		stderr.clear			// lol
 
 
-function scfunction.SetBlindCasts (|scbase| name_space)
+function scfunction.SetBlindCasts (|SCNode| name_space)
 	opt norefcounts
 	if name_space
 		|| p = name_space.project
@@ -1711,7 +1711,7 @@ function scfunction.SetBlindCasts (|scbase| name_space)
 			.BlindCasts	= c.blindcast
 
 
-function scfunction.Init_Sub (|message| node,  |scbase| name_space)
+function scfunction.Init_Sub (|message| node,  |SCNode| name_space)
 	|| arg = node.NormaliseFunc
 	node.obj = self
 	if name_space
@@ -1730,7 +1730,7 @@ function scfunction.Init_Sub (|message| node,  |scbase| name_space)
 	
 	
 
-function NewFuncSub (|message| node, |scbase| name_space, |scfunction|)
+function NewFuncSub (|message| node, |SCNode| name_space, |scfunction|)
 	|| fn = SCFunction(node)
 	fn.init_sub(node, name_space)
 	return fn

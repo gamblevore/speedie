@@ -9,26 +9,25 @@
 // or maybe not
 
 
-datatype OperatorModes (uint16)
+datatype OpMode (uint16)
 	flags
-		|OperatorModes|
+		|OpMode|
 		Compare
-		Bit
+		MathLike = (Bit, Math)
 		Assigns
-		Math
 		MakesSigned
 		ExactlyEquals
-		EqualOrNot
+		EqualOrNot // same as niltest!
 		NilTest
-		NoExtraBits
-		AND
-		OR
+		SameOrLessBits = (NoExtraBits, LoseBits)
+		AndOr = (AND, OR)
 		Custom
+		CaseAware
 		ExactEquals = niltest + exactlyequals + equalornot + compare
 		ExactNotEquals = niltest + equalornot + compare
 
 		
-	syntax is (|OperatorModes| x, |bool|)
+	syntax is (|OpMode| x, |bool|)
 		return (self & x) == x
 
 
@@ -53,22 +52,25 @@ linkage
 |bool|			MakesSigned
 |byte|			IsAndOr
 
-|OperatorModes| Kind
+|OpMode| Kind
 |bool|			IsCompare		// >  <  ==  >=  <=  !=
 |bool|			AsBit			// & ~ | ^
 							// if both are false... it is + - * /
 
 
+constructor (|string| name, |fn_opasm?| ASM, |OpMode| mode)
+	.name = name
+	.kind = mode
+	.asm = asm
+	dict[name] = self
 
-syntax is (|OperatorModes| x, |bool|)
+syntax is (|OpMode| x, |bool|)
 	return (.kind & x) == x
 
 constants
 	AND = 3
 	OR  = 2
 	
-constructor (|fn_opasm?| ASM)
-	.asm = asm
 
 function CaseAwareStr (|String|)
 	return .IsCaseAware.render
@@ -79,18 +81,23 @@ syntax equals (|string| s, |bool| aware, |bool|)
 
 
 function SimpleName (|String|)
+	opt norefcounts
 	|| n = .name
 	if (.IsCaseAware)
 		Return n[1...]
 	Return n
 
 
+function SetFuncName (assigns:|string| s)
+	.funcname = "Operator" + s.UpperFirst
+	dict[ s.Lowercase ] = self
+	
+
 function IsCompSet (|bool|)
 	return .IsCompare or .isset
 
 
 function InitComp (|string| name_)
-	.Name = name_
 	.IsCaseAware = ( *name_ == '~' )
 	.IsCompare = true
 	.FuncName = "OperatorCompare"
@@ -122,19 +129,6 @@ function InitComp (|string| name_)
 		.CompParam = "0"
 
 
-function InitBit (|string| name_, |String| FuncName_)
-	.Name = name_
-	.FuncName = FuncName_
-	.AsBit = true
-
-
-function InitNormal (|string| name_, |String| FuncName_)
-	.Name = name_
-	.FuncName = FuncName_
-
-
-
-
 module {
 	|Dictionary of SCOperator|			Dict = dictionary()
 	|int|								CustomOperatorScore
@@ -150,9 +144,7 @@ module {
 		Result = dict[ op ]
 		
 		if (!Result)
-			result = AddNormal( op, op.UpperFirst, nil, operatormodes.custom )
-			result.IsCustom = true
-			result.score = CustomOperatorScore
+			result = AddCustom( op )
 
 		  elseif (op != result.name)
 			if (!result.iscustom)
@@ -167,79 +159,70 @@ module {
 		return Result
 
 
-	function Init
-// "=" -> "set", and "==" --> "equals"
-// fix this... can't fix the // * if first > 0 and !rz.lines		// compares first to a BOOL!
-// bug without it.
-		
-		.AddCompSub( "~=",				&asmops.Equals, operatormodes.custom) // sigh
-		.AddCompSub("==",				&asmops.Equals, operatormodes.ExactEquals)
+	function Init		
+		.AddComp("==",					&asmops.Equals, OpMode.ExactEquals)
 		.AddComp( "<",					&asmops.Less)
 		.AddComp( ">",					&asmops.More)
 		.AddComp( "<=",					&asmops.LessEq)
 		.AddComp( ">=",					&asmops.MoreEq)
-		.AddComp( "!=",					&asmops.NotEq,  operatormodes.ExactNotEquals)
-		.AddComp2( "=",					&asmops.Assign)
+		.AddComp( "!=",					&asmops.NotEq,  OpMode.ExactNotEquals)
 
-		.AddNormal( "mod",	"mod",		&asmops.Mod)
-		.AddNormal( "+",	"Plus",		&asmops.Plus)
-		.AddNormal( "-",	"Minus",	&asmops.Minus).MakesSigned = true
-		.AddNormal( "*",	"Mul",		&asmops.Mul)
-		.AddNormal( "/",	"Divide",	&asmops.Div)
+		.AddAssign( "=" )
 
-		.AddBit( "&",	"BitAnd",		&asmops.BitAnd)
-		.AddBit( "(|)",	"BitOr",		&asmops.BitOr)
+		.AddMath( "mod",	"mod",		&asmops.Mod)
+		.AddMath( "+",		"Plus",		&asmops.Plus)
+		.AddMath( "-",		"Minus",	&asmops.Minus, opmode.makessigned).MakesSigned = true
+		.AddMath( "*",		"Mul",		&asmops.Mul)
+		.AddMath( "/",		"Divide",	&asmops.Div)
+
+		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL)
+		.AddBit( ">>>",	"RotateRight",	&asmops.ROR)
+		.addbit( ">>",	"ShiftRight",	&asmops.SHR, opmode.noextrabits)
+		.addbit( "<<",	"ShiftLeft",	&asmops.SHL)
+		.AddBit( "&",	"BitAnd",		&asmops.BitAnd, opmode.SameOrLessBits)
 		.AddBit( "^",	"Xor",			&asmops.bitxor)
+		.AddBit( "(|)",	"BitOr",		&asmops.BitOr)
 		|| BitOr = dict[ "(|)" ]
 		dict["|"]         = bitor // for: a |= b
 		dict["|||"]       = bitor
-		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL)
-		.AddBit( ">>>",	"RotateRight",	&asmops.ROR)
-		.addbit( ">>",	"ShiftRight",	&asmops.SHR)
-		.addbit( "<<",	"ShiftLeft",	&asmops.SHL)
 		
-		.AddBit( "is",		"is",		nil )           		// if obj is flag
-		.AddBit( "isnt",	"isnt",		nil )           		// if obj isnt flag
+		.AddBit( "is",		"is" )					// if obj is flag
+		.AddBit( "isnt",	"isnt" )           		// if obj isnt flag
 
 		.BuildOrder
 
 
-	function AddComp (|string| s, |fn_opasm| ASM, |operatormodes| Mode=0)
-		AddCompSub( s, asm, mode )
-		AddCompSub( "~" + s, asm, mode )
+	function AddComp (|string| s, |fn_opasm| ASM, |OpMode| Mode=0)
+		|| opp = SCOperator.new(s, ASM, mode ||| opmode.compare)
+		opp.InitComp( s )
+
+		|| newname = ("~" + s, "~=")(s != "==")
+		SCOperator.new(newname, nil, OpMode.custom).InitComp( newname )
 	
 		
-	function AddComp2 (|string| s, |fn_opasm| ASM, |operatormodes| Mode=0)
-		|| it = SCOperator.new(asm)
-		it.InitComp( s )
-		dict[ s ] = it
-		it.IsCompare = false
+	function AddAssign (|string| s)
+		|| it = SCOperator.new(s, &asmops.Assign, OpMode.assigns)
 		it.IsSet = true
 
+		
+	function AddMath (|string| s, |string| FuncName, |fn_opasm| ASM, |OpMode| Mode=0, |SCOperator|)
+		|| opp = SCOperator.new(s, asm, mode ||| opmode.math)
+		opp.SetFuncName = funcname
+		return opp
+	
 
-	function AddNormal (|string| s, |string| FuncName, |fn_opasm| ASM, |operatormodes| Mode=0, |SCOperator|)
-		|| opp = SCOperator.new(asm)
-		opp.InitNormal( s, "Operator" + FuncName )
-		dict[ s ] = opp
-		dict[ FuncName.Lowercase ] = opp
+	function AddCustom (|string| s, |SCOperator|)
+		|| opp = SCOperator.new(s, nil, OpMode.custom)
+		opp.IsCustom = true
+		opp.score = CustomOperatorScore
+		opp.SetFuncName = s
 		return opp
 
 
-	function AddCompSub (|string| s, |fn_OpASM| fn, |operatormodes| Mode)
-		|| opp = SCOperator.new(fn)
-		opp.InitComp( s )
-		dict[ s ] = opp
-
-
-	function AddBit (|string| s, |String| FuncName, |fn_opasm?| ASM, |operatormodes| Mode=0)
-		|| opp = SCOperator.new(asm)
-		opp.InitBit( s, "Operator" + FuncName )
-		dict[ s ] = opp
-		dict[ FuncName.Lowercase ] = opp
-
-
-//	function AddBadComp (|string| s, |string|err)
-//		dict[ s ] = SCOperator.new(nil)
+	function AddBit (|string| s, |String| FuncName, |fn_opasm?| ASM=nil, |OpMode| Mode=0)
+		|| opp = SCOperator.new(s, asm, mode ||| opmode.Bit)
+		opp.AsBit = true
+		opp.SetFuncName = FuncName
 	
 	
 	function BuildOrder // reordering here
@@ -358,7 +341,7 @@ function Message.RelFix (|bool| force, |bool|)
 
 
 
-function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCBase|name_space, |Message|RN, |SCDecl|)
+function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCNode|name_space, |Message|RN, |SCDecl|)
 	// a + b   --> a.operator_plus(b)
 	// a ?? b  --> a.operator_oar(b,syntaxcast?)
 	opt norefcounts
@@ -421,7 +404,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		  elseif GotABool and !comp.IsCompare
 			extra = CustomOps.TypeCastFromBool
 
-	if (!SCBase.ConstantsLoadingOverride and LC.Type.TreatAsBaseType)
+	if (!SCNode.ConstantsLoadingOverride and LC.Type.TreatAsBaseType)
 		return CustomOps.Needed ||| extra
 	
 	if ((LN > 1) and CompOrSet)					// can't compare vectors directly in C++

@@ -5,7 +5,7 @@
 
 
 
-class SCClass (SCBase) {
+class SCClass (SCNode) {
 linkage
 	cpp_part		Class
 
@@ -56,13 +56,13 @@ linkage
 |bool|						HasNilChecker
 |bool|						DefaultsToReal
 |bool|						IsRole
-|bool|						IsBuiltin // SCBaseType
-|scbasetype| 				BaseType
+|bool|						IsBuiltin // SCNodeType
+|SCNodetype| 				BaseType
 |bool|						IsASM
 |bool|						IsNotNumeric
 
 
-constructor (|Message| node, |SCBase| parent, |bool| HasPtrs, |scmodule| m)
+constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
 	Compiler.stClasses++
 	
 	node.obj = self			// for autocomplete :)
@@ -70,7 +70,7 @@ constructor (|Message| node, |SCBase| parent, |bool| HasPtrs, |scmodule| m)
 	.Source = node
 	.Modul = m
 	.project = parent.project
-	.IsVisible = scbase.CurrVisibility
+	.IsVisible = SCNode.CurrVisibility
 	.saveas = ""
 	.TypeInfo = DataTypeCode.UnusedType
 	.Banned = .TestBanned
@@ -297,7 +297,7 @@ ConstrLayerNew2 = `function NewWithLayer (|MemoryLayer| _L) {
 
 // CreateConstructors is so we don't HAVE to call the parent's constructor
 // For example, SCModule doesn't have a constructor set, so it creates one
-// however, the parent SCBase.Constructor has a param, so the empty constructor
+// however, the parent SCNode.Constructor has a param, so the empty constructor
 // doesn't know how to call it. So we create one for EVERY class... then the
 // problem goes away.
 
@@ -533,7 +533,7 @@ function HasObjectProperties (|bool|)
 
 function LoadConstructorsAndAllocators
 	.Use									// parsed messages come from our source's file
-	scbase.CurrVisibility = false			// for allocators that we generate
+	SCNode.CurrVisibility = false			// for allocators that we generate
 	
 	.CreateConstructors
 	if .IsObject and .constructorfunc
@@ -593,7 +593,7 @@ function IsObject (|bool|)
 
 
 function CreateEmptyFunc (|String| fname, |string| cpp_name="", |SCFunction|)
-	scbase.CurrVisibility = .IsVisible
+	SCNode.CurrVisibility = .IsVisible
 	cpp_name := fname
 	|| e	= "function $fname { cpp_part $cpp_name }"
 	|| msg	= e.ParseClean
@@ -673,7 +673,7 @@ function FirstDestructor (|SCFunction|)
 			return fn
 
 
-function scfunction.AddSelfToFunc (|scclass| cls, |SCBase| space)
+function scfunction.AddSelfToFunc (|scclass| cls, |SCNode| space)
 	opt norefcounts
 	|| sl = cls.SelfDecl					// for my nil-checker
 	if sl.TypeSuffers						// refcounting will set MarkAsRefAltered
@@ -693,11 +693,11 @@ function message.HasSelfAsFirst (|bool|)
 	
 
 
-function SCBase.ReachedName (|string|)
+function SCNode.ReachedName (|string|)
 	opt norefcounts
 	|| c = .MyReacher
 	rz = "    via: " + .name
-	if c.class == scbase
+	if c.class == SCNode
 		rz += " (visible func)"
 
 
@@ -717,7 +717,7 @@ function BannedCheck (|message| src)
 	error (self, "Banned class reached: " + .name)
 	|| curr = .MyReacher
 	for 100
-		if !curr or curr.class == SCBase
+		if !curr or curr.class == SCNode
 			exit
 		if src
 			error (src, curr.ReachedName)
@@ -820,7 +820,7 @@ module
 
 
 
-	function NeuClassSub (|Message| node, |SCBase| parent, |Message| ErrPlace, |string| ForInterface, |scbasetype| base,  |SCClass|)
+	function NeuClassSub (|Message| node, |SCNode| parent, |Message| ErrPlace, |string| ForInterface, |SCNodetype| base,  |SCClass|)
 		if !ForInterface
 			expect (parent==compiler.program) (errplace, errorreceiver.NonFatal)
 		
@@ -851,7 +851,7 @@ module
 		
 	
 	function NeuClass (CollectFunc)
-		|| cls = .NeuClassSub(node, name_space, ErrPlace, "", scbasetype.object)
+		|| cls = .NeuClassSub(node, name_space, ErrPlace, "", SCNodetype.object)
 			cls.ClassCollect
 			return cls.modul
 
@@ -860,11 +860,11 @@ module
 		.Collect( .Sourcearg, .IsVisible )
 
 
-	function DataTypeSub (|Message| Node, |SCBase| Parent, |Message| ErrPlace, |string| ForInterface, |scbasetype| BaseType, |SCModule|)
+	function DataTypeSub (|Message| Node, |SCNode| Parent, |Message| ErrPlace, |string| ForInterface, |SCNodetype| BaseType, |SCModule|)
 		if node.obj
 			Return Compiler.program						// already done
 		
-		scbase.CurrVisibility = false
+		SCNode.CurrVisibility = false
 		node.GiveArg
 		
 		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface, BaseType )
@@ -878,12 +878,12 @@ module
 	
 	
 	function DataType (CollectFunc)
-		return .DataTypeSub(node, name_space, errplace, "", scbasetype.datatype)
+		return .DataTypeSub(node, name_space, errplace, "", SCNodetype.datatype)
 	
 
 	function NewStruct (CollectFunc)
-		|| it = .NeuClassSub(node, name_space, errplace, "", scbasetype.struct)
-			it.basetype = SCBaseType.struct
+		|| it = .NeuClassSub(node, name_space, errplace, "", SCNodetype.struct)
+			it.basetype = SCNodeType.struct
 			it.classcollect
 			return it.modul
 
@@ -982,7 +982,7 @@ module
 		require m
 		dot.clear
 		dot.func = @thg
-		|SCBase| B = M
+		|SCNode| B = M
 		if name == @name		// it's a module
 			PreferClass = false // whatever
 		|| mcls = m.cls
@@ -1000,7 +1000,7 @@ module
 		return fn
 	
 
-	function SCFunction.TryAdd (|scbase| b)
+	function SCFunction.TryAdd (|SCNode| b)
 		b.tryadd(.source, self, .name)
 	
 
@@ -1009,7 +1009,7 @@ module
 			|| arg  = c.last(@arg)
 			|| M = Compiler.FindModulemsg(name)
 			if m and arg
-				|SCBase| B = M
+				|SCNode| B = M
 				|| cls = m.cls
 				if (PreferClass and cls)
 					B = cls
@@ -1019,7 +1019,7 @@ module
 				  else
 					B.project.use
 		
-				B.Collect(arg, scbase.CurrVisibility, m.SourceArg)
+				B.Collect(arg, SCNode.CurrVisibility, m.SourceArg)
 
 	
 //	function DoOneNamedField (|message| c,  |string| name,  |string| datatype,  |int| n,  |message|)

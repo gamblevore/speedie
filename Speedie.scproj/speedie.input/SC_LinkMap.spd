@@ -3,22 +3,22 @@
 module LinkMap 
 	|uint| 			CurrID
 
-	function scfunction.CanLinkTo (|SCBase| To, |bool|)
+	function scfunction.CanLinkTo (|SCNode| To, |bool|)
 		if to.LinkedFrom < LinkMap.CurrID
 			to.LinkedFrom = LinkMap.CurrID
 			return true
 			
-	function scfunction.DoLinkTo (|SCBase| To)
+	function scfunction.DoLinkTo (|SCNode| To)
 		if .canlinkto(to)
 			linkmap.Store(.linkto, To)
 	
-	function scfunction.DoLinkBoth (|SCBase| To)
+	function scfunction.DoLinkBoth (|SCNode| To)
 		if .canlinkto(to)
 			linkmap.Store(.linkto, to)
 			if compiler.InPerry
 				linkmap.store(To.linkfrom, self)
 	
-	function Store (|&(array? of scobject)| darr, |scobject| obj)
+	function Store (|&(array? of SCObject)| darr, |SCObject| obj)
 		opt norefcounts
 		|| arr = *darr
 		if arr == nil
@@ -71,7 +71,7 @@ function CollectLinks (|object!| obj)
 			return
 
 
-function FindReached (|scbase| from, |bool|)
+function FindReached (|SCNode| from, |bool|)
 	opt norefcounts
 	flow off // memory order dependant!
 	
@@ -104,7 +104,7 @@ function IsUnused (|bool|)
 
 
 
-function scclass.Reach (|scbase| from, |message| src=nil)
+function scclass.Reach (|SCNode| from, |message| src=nil)
 	opt norefcounts
 	flow off
 	require !.MyReacher
@@ -137,8 +137,8 @@ function scclass.ReachBehaviours
 
 function compiler.DeadStrip
 	opt norefcounts
-	Compiler.VisibleFuncs = scbase("Visible",	false)
-	Compiler.Interpreter = scbase("Interpreter", false)
+	Compiler.VisibleFuncs = SCNode("Visible",	false)
+	Compiler.Interpreter = SCNode("Interpreter", false)
 
 	compiler.MainFunc.StripTest?
 	
@@ -156,7 +156,7 @@ function compiler.DeadStrip
 	CodeSorter.LeafsFirst		// super-refcounter wants this
 	
 
-function scdecl.TypeReach (|scbase| from, |message| src)
+function scdecl.TypeReach (|SCNode| from, |message| src)
 	opt norefcounts, flow off
 	if self
 		return .type.reach(from, src)
