@@ -12,13 +12,12 @@
 datatype OpMode (uint16)
 	flags
 		|OpMode|
-		Compare
+		CompSet = (Compare, Assigns)
 		MathLike = (Bit, Math)
-		Assigns
 		MakesSigned
 		ExactlyEquals
-		EqualOrNot // same as niltest!
-		NilTest
+		EqualOrNot
+		NilTest		// not the same as equalornot... because those include customops
 		SameOrLessBits = (NoExtraBits, LoseBits)
 		AndOr = (OR, AND)
 		Custom
@@ -42,20 +41,7 @@ linkage
 |string|		CompParam
 |string|		FuncName
 |fn_OpASM?|		ASM
-//|bool|			IsCaseAware
-//|bool|			IsEqualOrNot
-|bool|			IsNilTest
-//|bool|			IsExactlyEquals		// "=="
-//|bool|			IsSet
-//|bool|			IsCustom
-//|bool|			DoesntNeedExtraBits
-//|bool|			MakesSigned
-//|byte|			IsAndOr
-
 |OpMode|		Kind
-|bool|			IsCompare		// >  <  ==  >=  <=  !=
-//|bool|			AsBit			// & ~ | ^
-							// if both are false... it is + - * /
 
 
 constructor (|string| name, |fn_opasm?| ASM, |OpMode| mode)
@@ -90,15 +76,14 @@ function SetFuncName (assigns:|string| s)
 	
 
 function IsCompSet (|bool|)
-	return .IsCompare or (self is assigns)
+	return self Is CompSet
 
 
 function InitComp (|string| name_)
 	if *name_ == '~'
 		.kind |= opmode.CaseAware
-	.IsCompare = true
+	.kind |= opmode.Compare
 	.FuncName = "OperatorCompare"
-	.IsNilTest = name_ == "!=" or "=="
 	
 	// (a==b) =   0
 	// (a<b)  =  -1
@@ -121,8 +106,6 @@ function InitComp (|string| name_)
 	  elseif (s == "<=") or (s == ">=")
 		.CompParam = "0"
 	  else
-//		.IsEqualOrNot = true
-//		.IsExactlyEquals = s == "=="
 		.CompParam = "0"
 
 
@@ -152,7 +135,6 @@ module {
 		  elseif op == "and"
 			result.kind |= opmode.and
 		// why aren't 'if "" > nil' here? I think... cos no one would do that?
-//		result.DoesntNeedExtraBits = (op == "&" or ">>" or "xor")
 		return Result
 
 
@@ -194,7 +176,7 @@ module {
 		opp.InitComp( s )
 
 		|| newname = ("~" + s, "~=")(s != "==")
-//		Mode = mode&opmode.EqualOrNot				// keep all!?
+		Mode = mode &~ opmode.NilTest
 		SCOperator.new(newname, nil, mode ||| OpMode.custom).InitComp( newname )
 	
 		
@@ -210,7 +192,6 @@ module {
 
 	function AddCustom (|string| s, |SCOperator|)
 		|| opp = SCOperator.new(s, nil, OpMode.custom)
-//		opp.IsCustom = true
 		opp.score = CustomOperatorScore
 		opp.SetFuncName = s
 		return opp
@@ -218,7 +199,6 @@ module {
 
 	function AddBit (|string| s, |String| FuncName, |fn_opasm?| ASM=nil, |OpMode| Mode=0)
 		|| opp = SCOperator.new(s, asm, mode ||| opmode.Bit)
-//		opp.AsBit = true
 		opp.SetFuncName = FuncName
 	
 	
@@ -373,7 +353,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	if (comp is Custom or CaseAware)
 		return CustomOps.Needed
 	
-	|| CompOrSet= (comp.IsCompare or comp is assigns)
+	|| CompOrSet= comp.IsCompSet
 	|| LNT		= LC.TypeInfo
 	|| RNT		= RC.TypeInfo
 	|| LN		= LNT.NumericCountBoolsToo
@@ -395,10 +375,10 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	if LN and RN
 		|| GotABool = (DataTypeCode.bool == lnt or rnt)
 		if lnt != rnt
-			expect !(gotabool and comp.iscompare) (errplace, "Cant compare bools to non-bools")
+			expect !(gotabool and comp is compare) (errplace, "Cant compare bools to non-bools")
 			if !CompOrSet and comp isnt NoExtraBits
 				extra = CustomOps.TypeCastToBigger
-		  elseif GotABool and !comp.IsCompare
+		  elseif GotABool and comp isnt Compare
 			extra = CustomOps.TypeCastFromBool
 
 	if (!SCNode.ConstantsLoadingOverride and LC.Type.TreatAsBaseType)
