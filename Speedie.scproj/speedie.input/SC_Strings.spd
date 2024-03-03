@@ -253,7 +253,7 @@ function Message.Clean (|bool| erl = false)
 					curr.Tran_Isnt("self")
 				  elseif SCGlobals.UniqueNum and AutoComplete.isafunc(s)
 					SCGlobals.UniqueNum = 0 // why not? make for smaller/more-predictable numbers
-				  elseif s == "dispatch" or "functiontable"
+				  elseif s == "dispatch" or "functiontable" or "flags" or "constants"
 					IgnoreArg = curr.last
 				  elseif s == "with"
 					curr.tran_with

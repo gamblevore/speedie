@@ -1492,7 +1492,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 		if !d.exportName
 			msg.safe(fs)
-			debugat
+			"@thg has no declname! 😭"
 
 		  elseif (d is TypeImprove) and (MsgOKToImprove(msg))
 			fs <~ '('
