@@ -1175,11 +1175,11 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| s = .name
 		if s == kBitOr
 			fs <~ "|"
-		  elseif s == kBitAnd
+		  elseif s == "&"
 			fs <~ "&"
-		  elseif s == kBitXor
+		  elseif s == "^"
 			fs <~ "^"
-		  elseif s == kBitNot
+		  elseif s == "~"
 			fs <~ "~"
 		  elseif s == "mod"
 			fs <~ "%"
@@ -1190,7 +1190,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function C_RenderBrel (fpMsgRenderCpp)
 		fs <~ '('
 		|| s = .name
-		if (s == kBitNot)
+		if (s == "~")
 			s = "~"
 		
 		fs <~ s

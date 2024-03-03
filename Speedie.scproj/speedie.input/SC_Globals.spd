@@ -5,10 +5,7 @@
 
 
 constants
-	kBitXor = "^"
 	kBitOr = "(|)"
-	kBitNot = "~"
-	kBitAnd = "&"
 
 
 
@@ -199,7 +196,7 @@ function TypeOfBRel (ExprResolver)
 	if name == "!"
 		return TranNegate(f, name_space)
 		
-	if (name == kBitNot or "~")
+	if (name == "~")
 		check (subtype.IsInteger) (exp, "Expected an integer.") 
 		Return subtype
 
@@ -1190,7 +1187,7 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |scbase| name
 
 function CanOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |bool| )
 	opt norefcounts
-	return (exp.Parent != @Arg) and (LC.Type.CanCompare(RC, Comp.IsEquals))
+	return (exp.Parent != @Arg) and (LC.Type.CanCompare(RC, Comp.IsEqualOrNot))
 
 
 function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |scbase|name_space, |scdecl| ) {
@@ -1204,7 +1201,7 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 	»
 	exp.First = dot
 
-	if (comp.isEquals)
+	if (comp.IsEqualOrNot)
 		exp.Last.Remove
 		dot.name = "SyntaxEquals"
 		if (comp.CompOp == "!=")

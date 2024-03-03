@@ -9,6 +9,28 @@
 // or maybe not
 
 
+datatype OperatorModes (uint16)
+	flags
+		|OperatorModes|
+		Compare
+		Bit
+		Assigns
+		Math
+		MakesSigned
+		ExactlyEquals
+		EqualOrNot
+		NilTest
+		NoExtraBits
+		AND
+		OR
+		Custom
+		ExactEquals = niltest + exactlyequals + equalornot + compare
+		ExactNotEquals = niltest + equalornot + compare
+
+		
+	syntax is (|OperatorModes| x, |bool|)
+		return (self & x) == x
+
 
 class SCOperator {
 linkage
@@ -16,27 +38,34 @@ linkage
 
 |int|		Score
 
-|string|	Name
-|string|	CompOp
-|string|	CompParam
-|string|	FuncName
-|fn_OpASM?|	ASM
-|bool|		IsCaseAware
-|bool|		IsCompare
-|bool|		IsEquals
-|bool|		IsNilTest
-|bool|		IsExactlyEquals // "=="
-|bool|		IsSet
-|bool|		AsBit
-|bool|		IsCustom
-|bool|		DoesntNeedExtraBits
-|bool|		MakesSigned
-|byte|		IsAndOr
+|string|		Name
+|string|		CompOp
+|string|		CompParam
+|string|		FuncName
+|fn_OpASM?|		ASM
+|bool|			IsCaseAware
+|bool|			IsEqualOrNot
+|bool|			IsNilTest
+|bool|			IsExactlyEquals		// "=="
+|bool|			IsSet
+|bool|			IsCustom
+|bool|			DoesntNeedExtraBits
+|bool|			MakesSigned
+|byte|			IsAndOr
 
+|OperatorModes| Kind
+|bool|			IsCompare		// >  <  ==  >=  <=  !=
+|bool|			AsBit			// & ~ | ^
+							// if both are false... it is + - * /
+
+
+
+syntax is (|OperatorModes| x, |bool|)
+	return (.kind & x) == x
 
 constants
 	AND = 3
-	OR = 2
+	OR  = 2
 	
 constructor (|fn_opasm?| ASM)
 	.asm = asm
@@ -88,7 +117,7 @@ function InitComp (|string| name_)
 	  elseif (s == "<=") or (s == ">=")
 		.CompParam = "0"
 	  else
-		.IsEquals = true
+		.IsEqualOrNot = true
 		.IsExactlyEquals = s == "=="
 		.CompParam = "0"
 
@@ -121,7 +150,7 @@ module {
 		Result = dict[ op ]
 		
 		if (!Result)
-			result = AddNormal( op, op.UpperFirst, nil )
+			result = AddNormal( op, op.UpperFirst, nil, operatormodes.custom )
 			result.IsCustom = true
 			result.score = CustomOperatorScore
 
@@ -134,7 +163,7 @@ module {
 		  elseif op == "and"
 			result.IsAndOr = SCOperator.And
 		// why aren't 'if "" > nil' here? I think... cos no one would do that?
-		result.DoesntNeedExtraBits = (op == "&" or ">>")// or "|")
+		result.DoesntNeedExtraBits = (op == "&" or ">>" or "xor")
 		return Result
 
 
@@ -143,23 +172,24 @@ module {
 // fix this... can't fix the // * if first > 0 and !rz.lines		// compares first to a BOOL!
 // bug without it.
 		
-		.AddCompSub( "~=",				&asmops.Equals) // sigh
-		.AddCompSub("==",				&asmops.Equals)
+		.AddCompSub( "~=",				&asmops.Equals, operatormodes.custom) // sigh
+		.AddCompSub("==",				&asmops.Equals, operatormodes.ExactEquals)
 		.AddComp( "<",					&asmops.Less)
 		.AddComp( ">",					&asmops.More)
 		.AddComp( "<=",					&asmops.LessEq)
 		.AddComp( ">=",					&asmops.MoreEq)
-		.AddComp( "!=",					&asmops.NotEq)
+		.AddComp( "!=",					&asmops.NotEq,  operatormodes.ExactNotEquals)
+		.AddComp2( "=",					&asmops.Assign)
 
-		.AddNormal( "mod",	"Mod",		&asmops.Mod)
+		.AddNormal( "mod",	"mod",		&asmops.Mod)
 		.AddNormal( "+",	"Plus",		&asmops.Plus)
 		.AddNormal( "-",	"Minus",	&asmops.Minus).MakesSigned = true
 		.AddNormal( "*",	"Mul",		&asmops.Mul)
 		.AddNormal( "/",	"Divide",	&asmops.Div)
 
-		.AddBit( kBitAnd,	"BitAnd",	&asmops.BitAnd)
-		.AddBit( kBitOr,	"BitOr",	&asmops.BitOr)
-		.AddBit( kBitXor,	"Xor",		&asmops.bitxor)
+		.AddBit( "&",	"BitAnd",		&asmops.BitAnd)
+		.AddBit( "(|)",	"BitOr",		&asmops.BitOr)
+		.AddBit( "^",	"Xor",			&asmops.bitxor)
 		|| BitOr = dict[ "(|)" ]
 		dict["|"]         = bitor // for: a |= b
 		dict["|||"]       = bitor
@@ -168,19 +198,18 @@ module {
 		.addbit( ">>",	"ShiftRight",	&asmops.SHR)
 		.addbit( "<<",	"ShiftLeft",	&asmops.SHL)
 		
-		.AddComp2( "=",					&asmops.Assign)
 		.AddBit( "is",		"is",		nil )           		// if obj is flag
 		.AddBit( "isnt",	"isnt",		nil )           		// if obj isnt flag
 
 		.BuildOrder
 
 
-	function AddComp (|string| s, |fn_opasm| ASM)
-		AddCompSub( s, asm )
-		AddCompSub( "~" + s, asm )
+	function AddComp (|string| s, |fn_opasm| ASM, |operatormodes| Mode=0)
+		AddCompSub( s, asm, mode )
+		AddCompSub( "~" + s, asm, mode )
 	
 		
-	function AddComp2 (|string| s, |fn_opasm| ASM)
+	function AddComp2 (|string| s, |fn_opasm| ASM, |operatormodes| Mode=0)
 		|| it = SCOperator.new(asm)
 		it.InitComp( s )
 		dict[ s ] = it
@@ -188,7 +217,7 @@ module {
 		it.IsSet = true
 
 
-	function AddNormal (|string| s, |string| FuncName, |fn_opasm| ASM, |SCOperator|)
+	function AddNormal (|string| s, |string| FuncName, |fn_opasm| ASM, |operatormodes| Mode=0, |SCOperator|)
 		|| opp = SCOperator.new(asm)
 		opp.InitNormal( s, "Operator" + FuncName )
 		dict[ s ] = opp
@@ -196,13 +225,13 @@ module {
 		return opp
 
 
-	function AddCompSub (|string| s, |fn_OpASM| fn)
+	function AddCompSub (|string| s, |fn_OpASM| fn, |operatormodes| Mode)
 		|| opp = SCOperator.new(fn)
 		opp.InitComp( s )
 		dict[ s ] = opp
 
 
-	function AddBit (|string| s, |String| FuncName, |fn_opasm?| ASM)
+	function AddBit (|string| s, |String| FuncName, |fn_opasm?| ASM, |operatormodes| Mode=0)
 		|| opp = SCOperator.new(asm)
 		opp.InitBit( s, "Operator" + FuncName )
 		dict[ s ] = opp

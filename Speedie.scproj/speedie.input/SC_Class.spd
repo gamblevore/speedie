@@ -922,7 +922,7 @@ module
 					.Signed		= s2.typenormal
 					s2.Signed	= .typenormal
 
-		expect (sup or .HasGameType) (node, "Datatypes have to subclass off another type")
+		expect (sup or .HasGameType) (node, "Datatypes must subclass off another type")
 	
 	
 	function datatypecode.CreateSignedStuff (|scclass|)

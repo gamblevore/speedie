@@ -176,9 +176,9 @@ function UnusedFuncs (|message| cmd, |message|)
 			|| src = fn.source
 			if src and fn.File == scf
 				if fn.isunused
-					|| str = "() is unused."
+					|| str = "() is unused"
 					if fn.linkfrom != nil
-						str = "()'s callers are unused."
+						str = "()'s callers are unused"
 					arg.msg(@tmp, fn.name + str) <~ src.position
 	return cmd
 	

@@ -366,7 +366,7 @@ function SuperSmartMagicCompare (|message| ll, |message| rr, |nilcheckmode| test
 	|| todo = 3
 	
 	if  ll.func == @thg and rr.func == @thg and test is Active
-		if scop.IsEquals and (test is positive) == scop.IsExactlyEquals
+		if scop.IsEqualOrNot and (test is positive) == scop.IsExactlyEquals
 		//	if real == x
 		//		x becomes real
 		// if real != x
