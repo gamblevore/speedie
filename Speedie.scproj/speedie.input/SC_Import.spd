@@ -10,8 +10,10 @@ class SCImport
 		cpp_part		Imp
 	
 	|bool|					IsSTDLib
+	|bool|					WarnUnusedFuncs
 	|errorseverity|			BlindCast
 	|int|					Depth
+	|file?|					Where
 	|[SCFile]|				Files
 	|MemoryLayer|			DeclLayer
 	|SCModule|				Mod
@@ -19,6 +21,8 @@ class SCImport
 	
 
 	constructor ( |File?| F, |bool| Builtin )
+		.IsSTDLib = SCImport.STDLibTime
+		.WarnUnusedFuncs = !.IsSTDLib 
 		.Resources = Dictionary()
 		.BlindCast = (0, errorseverity.error)(builtin)
 		.DeclLayer = (scdecl).CreateLayer(self)
@@ -26,6 +30,7 @@ class SCImport
 		.Mod = M
 		M.Project = self
 		M.IsImport = true
+		.Where = f
 		if (F != nil)
 			M.name = f.name
 			(SCImport.Recent max= f.modified)
@@ -120,7 +125,9 @@ class SCImport
 
 	
 	function  IndexLinkage (|message| link, |scfile| scf)
-		.IsSTDLib = SCImport.STDLibTime or link["type"] ~= "library"
+		if link["type"] ~= "library"
+			.IsSTDLib = true
+			.WarnUnusedFuncs = false 
 		if .canBan(scf)
 			.LoadBanned(link["bannedclasses"])
 		|| arg = link[@arg]
@@ -221,6 +228,13 @@ class SCImport
 		|byte|				CurrIsManuallyImported
 		
 			
+		
+		function FindImport (|string| s, |scimport|)
+			opt norefcounts
+			for imp in compiler.importedlist
+				if s ~= imp.where
+					return imp
+		
 		function IsInputName (|string| name, |bool|)
 			if  name ~= "input"  or  name isa "input"
 				return true
@@ -251,6 +265,7 @@ class SCImport
 				return old
 			
 			rz = SCImport.new(f, builtin)
+			Compiler.ImportedList <~ rz
 			rz.Depth = ImportDepth
 			Compiler.ImportedNames[fpl] = rz
 			
@@ -271,7 +286,6 @@ class SCImport
 						
 			if conf
 				rz.ReloadImports(conf)
-			Compiler.ImportedList <~ rz
 
 // desired
 // per proj

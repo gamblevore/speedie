@@ -72,9 +72,7 @@ class Message (RingTree)
 		.flags		= parser.using.Flags
 		.tag		= parser.Using.Tag // why not...
 
-	
-	function SyxId (|int|)
-		return .Func|int|
+
 ///////////////////////////////////////////////////////////////////////////////
 	
 	
@@ -700,17 +698,12 @@ class Message (RingTree)
 			b = b.flatnext
 
 		
-	function Find (|message| match, |message|)
-		cpp_part FindMatch
-		opt norefcounts
-		for old in self
-			if old.DeepEquals(match)
-				return old
-			
-	function ShortDesc (|string|)
-		if !.name
-			return .funcname
-		return "${.funcname} ‘${.name}’"
+//	function Find (|message| match, |message|)
+//		cpp_part FindMatch
+//		opt norefcounts
+//		for old in self
+//			if old.DeepEquals(match)
+//				return old
 
 
 	function Name (|string|)
@@ -811,10 +804,10 @@ class Message (RingTree)
 		errorreceiver.NewError( found, fs.getresult )
 	
 
-	function AccessErr (|int| i)
-		cpp_part CantFindAt
-		|| errnum = (" at item " + i.render, "")(i)
-		errorreceiver.NewError( self, "Incomplete syntax" + errnum )
+//	function AccessErr (|int| i)
+//		cpp_part CantFindAt
+//		|| errnum = (" at item " + i.render, "")(i)
+//		errorreceiver.NewError( self, "Incomplete syntax" + errnum )
 
 
 	function ExpectLast (|string| err="", |bool|)
@@ -827,8 +820,9 @@ class Message (RingTree)
 
 
 	function ExpectString (|bool|)
-		check .IsString (self, "Not a string")
-		return true
+		if .IsString
+			return true
+		error (self, "Not a string")
 		
 
 	function Expect (|syntax| type, |string?| name=nil, |bool|)
@@ -950,11 +944,6 @@ class Message (RingTree)
 		return l.msg(@tmp, key)
 
 	
-	function BecomeEmpty (|syntax| fn, |string| name="")
-		.func = fn
-		.name = name
-		.clear
-	
 	function Become (|syntax| fn, |string| name="")
 		cpp_part BecomeStr
 		.func = fn
@@ -1002,8 +991,8 @@ class Message (RingTree)
 			.accesserr(Need, nil, ch)
 
 	
-	syntax Compare (|string| Other, |bool|Aware, |int|)
-		return .name.Compare(other, Aware)
+//	syntax Compare (|string| Other, |bool|Aware, |int|)
+//		return .name.Compare(other, Aware)
 
 
 	syntax equals (|string?| name, |bool|Aware, |bool|)
@@ -1014,11 +1003,6 @@ class Message (RingTree)
 		cpp_part EqualsSyx
 		return self and (.Func == X)
 	
-	function List (|[Message]|)
-		opt norefcounts
-		for s in self
-			rz <~ s
-
 	function HasPosition (|bool|)
 		return .Position >= 0
 
@@ -1067,9 +1051,9 @@ class Message (RingTree)
 
 	Syntax UsingComplete { }
 	
-	setter Int (|int64|)
-		.Func = @num
-		.name = Value.Render // later we can do this a different way. Like directly
+//	setter Int (|int64|)
+//		.Func = @num
+//		.name = Value.Render // later we can do this a different way. Like directly
 	
 	function Int (|int|i = 0, |int64|)
 		opt norefcounts
@@ -1096,9 +1080,9 @@ class Message (RingTree)
 		if self
 			return .name.ParseFloat(self)
 
-	function Hex (|int64|)
-		if self
-			return .name.ParseInt(self)
+//	function Hex (|int64|)
+//		if self
+//			return .name.ParseInt(self)
 
 	function Float32 (|float|)
 		|| d = .float
@@ -1110,29 +1094,6 @@ class Message (RingTree)
 	function Range (assigns:|intrange|r)
 		.position = r.x
 		.RangeLength = r.width
-
-	function RangeTrim (|ivec2|)
-		if self == @sstr
-			return (3,-3)
-		if .isstring
-			return (1,-1)
-
-	function FlatRange (|intrange|)
-		opt norefcounts
-		rz = (int.max, 0)
-		for ch.flat in self
-			|| ss = ch.range
-			if ss.x >= 0
-				rz.x = rz.x min ss.x
-				rz.x2 = rz.x2 max ss.x2
-		
-	function iVec4 (|ivec4|)
-		opt norefcounts
-		if self
-			|| c = .first
-			for i in 4
-				rz[i] = (C #loop).int|int|
-				c++
 
 
 	function Yes (|bool|)
@@ -1152,10 +1113,10 @@ class Message (RingTree)
 		cpp_part ContainsStr
 		return .FindNested(@nil, s, false)
 
-	operator Contains (|syntax| s, |bool|)
-		opt norefcounts
-		cpp_part ContainsSyx
-		return .FindNested(s, nil, false)
+//	operator Contains (|syntax| s, |bool|)
+//		opt norefcounts
+//		cpp_part ContainsSyx
+//		return .FindNested(s, nil, false)
 
 	function Contains (|ind| p, |bool| AllowJustAfter=false, |bool|)
 		cpp_part ContainsInd

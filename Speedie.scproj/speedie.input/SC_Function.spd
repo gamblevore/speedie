@@ -1788,7 +1788,7 @@ function NeuMain (CollectFunc)
 	expect  (name_space == compiler.program)  (node, "Can’t have main inside here.")
 	|| fn_src = node.mainfix
 		Compiler.HasMainFunc = true
-		|| m = compiler.userproj!.mod
+		|| m = compiler.Project!.mod
 		rz = SCFunction.NewFunc( fn_Src, m, ErrPlace )
 		if rz isa scmodule // sigh. Not ideal.
 			compiler.MainFunc = scclass.ProcessExtend(fn_Src, false, m)

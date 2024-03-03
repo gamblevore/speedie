@@ -107,8 +107,8 @@ Module Jeebox
 		.EscapeStr![`${`] = `$\{`
 	
 
-	function string.UnBackTick (|string|)
-		return .replaceall("``", "`")
+//	function string.UnBackTick (|string|)
+//		return .replaceall("``", "`")
 
 
 	Function string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)

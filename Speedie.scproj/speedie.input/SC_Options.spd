@@ -20,7 +20,6 @@ module Options
 	|| 		NilTestAllocNeverFails	= true
 	||		Cpp						= true
 	||		Compile					= true
-	|| 		UnusedFunctionLevel		= 2
 	||		MakeASM					= false
 	||		TargetDebug				= false
 	||		PrintLibraries			= false

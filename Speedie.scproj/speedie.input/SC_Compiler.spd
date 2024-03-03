@@ -67,7 +67,7 @@ linkage
 |SCFile|					InternalFile = SCFile.new(nil, SCImport.new(nil, true))
 |string|					ProjectName
 |string|					ReportedName
-|scimport|					UserProj
+|scimport|					Project
 |scfunction|				MainFunc
 |message|					DebugInsert
 |message|					ConfMsg
@@ -355,8 +355,8 @@ function ImportLibs
 function ImportProj
 	SCImport.STDLibTime = false
 	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
-	compiler.UserProj = SCImport.ImportPath( "",  ToUse,  0, false )
-	expect compiler.UserProj ("No user-project found.")
+	compiler.Project = SCImport.ImportPath( "",  ToUse,  0, false )
+	expect compiler.Project ("No user-project found.")
 
 
 function ImportAST

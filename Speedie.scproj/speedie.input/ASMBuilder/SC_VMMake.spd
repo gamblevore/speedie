@@ -164,7 +164,7 @@ function BuildFiles (|bool|)
 
 	
 function MakeTheVM
-	compiler.UserProj.use
+	compiler.Project.use
 	require .BuildFiles	
 	treeassembler.InitAll
 	asm.TestASM

@@ -16,6 +16,12 @@ function message.AllNames (|[string]|)
 			rz <~ i
 
 
+function message.List (|[Message]|)
+	opt norefcounts
+	for s in self
+		rz <~ s
+
+
  // we want something that looks like it could have a name
 function message.GoodName (|bool| NeedName=false, |string|)
 	|| name = .GoodNamesub

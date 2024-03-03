@@ -176,7 +176,6 @@ dataType Keys (int) {
 			target osx
 				return keys.LGUI.HeldKey(ago) or keys.RGUI.HeldKey(ago)
 
-
 		function RealCmd (|bool|)
 			return keymod.cmd
 

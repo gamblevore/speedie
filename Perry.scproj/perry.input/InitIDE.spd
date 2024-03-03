@@ -587,8 +587,12 @@ extend PerryIDE
 		f.addroot(.project, true)
 		f.FocusOn( .root! )
 		
-		if !IsDir and .IsSpeedieCode
+		if !conf and .IsSpeedieCode
 			conf = defaultfiles.Roots.parse
+		
+		.LostFunks = conf["unused_lib_funcs"]
+		for lib in .LostFunks
+			lib.name = .expandstr(lib.name)
 		
 		for ro in conf..roots
 			error.SourceAdd(ro)

@@ -69,14 +69,14 @@ class TextViewLine (ringtree)
 		  else
 			.state &= ~F
 
-	function Contains (|int| x, |bool|)
-		return x >= .position and x < .after
-
-	function NotReallyContains (|int| x, |bool|)
-		if x < .position
-			return true
-		if x+1 > .after
-			return true // what about being on the last byte?
+//	function Contains (|int| x, |bool|)
+//		return x >= .position and x < .after
+//
+//	function NotReallyContains (|int| x, |bool|)
+//		if x < .position
+//			return true
+//		if x+1 > .after
+//			return true // what about being on the last byte?
 
 
 	function XOfChar (|ind| Pos, |int|)
@@ -593,4 +593,20 @@ function Textviewline.ReclaimEnd (|int| T, |int| dp, |textviewline|)
 		T = .setlinenum(T)
 		.vline = ++v
 	return self
+
+
+//function message.RangeTrim (|ivec2|)
+//	if self == @sstr
+//		return (3,-3)
+//	if .isstring
+//		return (1,-1)
+
+function message.FlatRange (|intrange|)
+	opt norefcounts
+	rz = (int.max, 0)
+	for ch.flat in self
+		|| ss = ch.range
+		if ss.x >= 0
+			rz.x = rz.x min ss.x
+			rz.x2 = rz.x2 max ss.x2
 

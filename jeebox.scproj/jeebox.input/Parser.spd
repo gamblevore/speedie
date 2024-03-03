@@ -48,8 +48,6 @@ extend Parser
 		.Token( ".." ) = .Handler( kFuncAfterNoSpace, fDotAccess )
 		.Token("://")  = .Handler( kFuncAfterNoSpace, fURL)
 		.Token( "|" )  = .handler( kTemporalBar, fDecl ).link(kFuncAfterBar, fTypeCast).link( kThingBar, fdecl )
-//		.Token( "/" )  = .Handler( kThingSyx, fPath )
-						// fpath clashes with /=
 //		.Token( `^"` ) = .Handler( kThingSyx, fArgName )
 		.Token( `+` )  = .Handler( kTemporalSyx, fTmpPlus )
 		.Token( "@" )  = .Handler( kThingSyx, fAtName ).Link( kFuncAfterNormal, fAtNamedExp )
@@ -65,7 +63,7 @@ extend Parser
 // Everything else
 		.Tokenz( "{",			kThingSyx,              fArgOpen			)
 		.Tokenz( "--> <-- <--> <≈", kTmpOpp,			fTemporalRelSyx		)
-//		.Tokenz( "/#",			kTmpOpp,				fSyntacticComment	)
+		.Tokenz( "/#",			kTmpOpp,				fSyntacticComment	)
 // i think better syntax that is less confusible with comments is better
 		.Tokenz( "%",			kThingSyx,				fOpAsThing			)
 		.Tokens( numb,			kThingSyx,              fNumber				)
@@ -288,10 +286,6 @@ extend Parser
 		return Result
 
 
-	function fTodoList (ParseHandler)
-		0 // maybe actually a todo-list, is a kind of markdown thing
-
-
 	function fAtName (ParseHandler)
 		opt norefcounts
 		return parser.newWord( nil,  @name,  Start,  Parser.NextStart )
@@ -443,11 +437,6 @@ extend Parser
 		
 		parser.NextStart = i + 1
 		return parser.endoflinemarker
-
-
-	function fPath (ParseHandler)
-		.NextStart = .data.inwhite(start)
-		return parser.new( nil, @str, start, .NextStart )
 
 
 	function fDecl (ParseHandler)
@@ -778,10 +767,6 @@ extend Parser
 		return .processthing
 	
 	
-	function fTemporalThing (ParseHandler)
-		return fTmp(parser.nextstart, kOpp & ~kOppBra, kthing, parent )
-
-
 	function ProcessThingOrTmp (|int| opps = kopp, |message?|)
 		return parser.ProcessThingSub(nil, opps, kthingsyx(|)kthingword(|)ktemporalsyx, false)
 
@@ -855,19 +840,6 @@ ive been~running #since morning
 		return result
 
 
-	function MakePostOpp (|Message| first, |int| Bits, |Message| Rel, |Message| Name, |Message|)
-		|| thg = .ProcessThing( bits&~kopp, Parser.kExpect )		#require 
-		Bits = (Bits&~koppyoda) (|) kOppBra							// why remove koppyoda? OR even use kopp yoda?
-																	// could be better as a normal opp?
-
-		rel <~ thg
-		|| opp = .Process( bits, Parser.kExpect )					#require
-
-		rel.func = @yoda // nice
-		rel <~ opp
-		rel <~ first
-		return rel
-	
 	
 	function MakeRel (|Message!| first, |int| Bits, |Message!|)
 		opt norefcounts
@@ -1186,11 +1158,6 @@ ive been~running #since morning
 		  else
 			.Token( s ) = .Handler( bits, func )
 
-
-	function Tokenz (|string| s, |TokenHandler| H)
-		cpp_part TokenzHan
-		.Tokens( s.words, H )
-	
 
 	function WillEnd (|bool|)
 		return .CheckEnded(kEnd)

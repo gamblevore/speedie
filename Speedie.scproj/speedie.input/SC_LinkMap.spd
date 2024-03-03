@@ -96,12 +96,22 @@ function FindReached (|SCNode| from, |bool|)
 	
 	
 function IsUnused (|bool|)
-	if options.UnusedFunctionLevel == 1
-		require !.IsSTDLib  // dont check stdlibs for :LHAJWKDN><AMSND< FU HATERS
+	opt norefcounts
+	|| p = .project
+		require p.WarnUnusedFuncs
 	return !.MyReacher and !.IsDisabled and !.isvisible and !.IsConstructorOrDestructor and !.IsAllocOrNew
 
 }
 
+
+function message.HateUnusedFuncs
+	opt norefcounts
+	|| imp = scimport.findimport(.name)
+		imp.warnunusedfuncs = true
+	  else
+		.expect(.func, "Can't find project")
+
+			
 
 
 function scclass.Reach (|SCNode| from, |message| src=nil)

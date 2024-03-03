@@ -165,8 +165,7 @@ class Document (RingTree)
 			|error| err
 			|| jold = old.ParseWithError(err)
 				|| tp = t.parse
-					|| bad = jold.TreeCompare(tp)
-					rz = !bad  
+					rz = jold.deepequals(tp)  
 
 
 	helper CheckModified (|bool|)

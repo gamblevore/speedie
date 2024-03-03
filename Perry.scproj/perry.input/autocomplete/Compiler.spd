@@ -7,6 +7,8 @@ extend PerryIDE
 		|| p = .path					#debug_require
 		|| unused = @tmp + "unused_funcs"
 		unused <~ p
+		|| lf = .LostFunks
+			unused <~ lf.copy
 		.SendFeedbackMsg(unused)
 		
 	function ForceRecheck

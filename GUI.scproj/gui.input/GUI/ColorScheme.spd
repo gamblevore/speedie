@@ -143,6 +143,13 @@ function FixupColor (|message| self, |ind| pos, |message|)
 helper message.UseRootTmpColor (|bool|)
 	return (self == @tmp)  and  !(.flags & TextView.NotRoot)  and  .atroot
 
+function message.iVec4 (|ivec4|)
+	opt norefcounts
+	if self
+		|| c = .first
+		for i in 4
+			rz[i] = (C #loop).int|int|
+			c++
 
 function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagepixel|)
 	opt NoRefCounts
@@ -152,7 +159,7 @@ function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagep
 		|| col = FixupColor(msg, pos)
 			if col.UseRootTmpColor
 				return .RootTmp
-			return .SyxCol[col.syxid & 63]
+			return .SyxCol[col.func|uint| & 63]
 	if HasColor == 3
 		return .None
 	return .SyxCol[0]

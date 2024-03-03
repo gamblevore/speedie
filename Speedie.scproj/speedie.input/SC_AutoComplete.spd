@@ -168,9 +168,14 @@ function UnusedFuncs (|message| cmd, |message|)
 	opt norefcounts
 	|| path = cmd[@str]										#require
 	|| scf = compiler.files.valuelower(path.name)			#expect ("No file at: " + path.name)
+	|| unused_libs = path.next
+		for lib in unused_libs
+			if lib.ExpectString
+				lib.HateUnusedFuncs
+			
 	cmd.Clear												// so... now what?
 	
-	if .CompiledOK and options.UnusedFunctionLevel
+	if .CompiledOK
 		|| arg = cmd.GiveArg
 		for fn in Compiler.FuncList
 			|| src = fn.source

@@ -5,6 +5,10 @@ roots
 	"@spd/GUI.scproj/gui.input/"
 	"@spd/Image.scproj/image.input/"
 	"@spd/network.scproj/network.input/"
+	
+unused_lib_funcs
+	"@spd/GUI.scproj"
+	"@spd/Image.scproj/"
 
 /*
 Bloat fix plan:
