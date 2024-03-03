@@ -201,9 +201,9 @@ class SCDecl (SCNamed) {
 				return typeint
 			if Op is LoseBits				// &
 				bits = .ItemBitCount min t.ItemBitCount
-			  elseif Op is LeftOnly		// >>
+			  elseif Op is LeftOnly			// >>, rotr, rotl
 				bits = .ItemBitCount
-			  elseif Op is NoExtraBits	// xor
+			  elseif Op is NoExtraBits		// xor
 				0
 			  elseif (Op is mathlike) and bits < 32
 				bits = 32
@@ -589,12 +589,6 @@ class SCDecl (SCNamed) {
 		if .isnormal and t.isint
 			return !t.IsSigned
 
-
-	function HandleSubtraction (|SCDecl!|)
-		opt norefcounts
-		|| t = .Type.Signed
-			return t
-		return self
 		
 	
 	function MatchC (|SCDecl?| O, |bool|)
@@ -670,7 +664,7 @@ class SCDecl (SCNamed) {
 
 	function WriteSimpleType (|Message|)
 		|| name = (.type.Name, "(nil!)")(.type)
-		rz = «Thg name »
+		rz = @Thg + name
 		for (.pointercount|int|)
 			rz = «Brel "&", rz »
 
@@ -688,9 +682,6 @@ class SCDecl (SCNamed) {
 				rz = «brel "?", rz »
 			  elseif .StatedReal and platform.isdebug
 				rz = «brel "!", rz »
-
-//		if .TypeSuffers and .isoptional
-//			rz = «brel "?", rz »
 				
 	
 	
@@ -709,9 +700,6 @@ class SCDecl (SCNamed) {
 		rz <~ .WriteType
 		rz.obj = self
 
-
-//	function RenderType (|string|)
-//		return .WriteType.render
 
 	function CantBeNilInCpp (|bool|)
 		require !.pointercount
@@ -924,11 +912,9 @@ class SCDecl (SCNamed) {
 	function Message.CastToBool (|SCNode|name_space=nil, |int|)
 		return .castToType("bool", TypeBool!, name_space, kLossycastedmatch)
 
-	function Message.CastToInt (|SCNode|name_space=nil, |int|)
-		return .CastToType("int", TypeInt!, name_space)
 
-	function Message.CastToVoidPtr (|SCNode|name_space=nil, |int|)
-		return .CastToType("_voidptr", typevoidptr!, name_space)
+	function Message.CastToVoidPtr (|int|)
+		return .CastToType("_voidptr", typevoidptr!, nil)
 
 //	function Message.CastTo (|string|type, |SCNode|name_space=nil, |int|)
 //		return .CastToType(type, compiler[type], name_space)
