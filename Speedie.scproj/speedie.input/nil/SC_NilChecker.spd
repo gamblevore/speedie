@@ -366,7 +366,7 @@ function SuperSmartMagicCompare (|message| ll, |message| rr, |nilcheckmode| test
 	|| todo = 3
 	
 	if  ll.func == @thg and rr.func == @thg and test is Active
-		if scop.IsEqualOrNot and (test is positive) == scop.IsExactlyEquals
+		if (scop Is EqualOrNot) and (test is positive) == (scop is ExactlyEquals)|bool|
 		//	if real == x
 		//		x becomes real
 		// if real != x
@@ -415,7 +415,7 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 	if scop.IsNilTest
 		|| side = (rr, ll)(lnil == 1)
 		if test is active
-			(test is reversed) = scop.IsExactlyEquals
+			(test is reversed) = scop Is ExactlyEquals
 			test = test.activate
 		return .jump(side, test)
 	
@@ -429,11 +429,11 @@ function ProcessCondRel (NilTrackerfn)
 	|| scop = op.obj!|SCOperator|
 	|| rr = op.next!
 
-	if scop.IsCompare
+	if scop Is Compare
 		return .CompareObjs(ll, rr, test, scop)
 	
-	|| AndOr = scop.IsAndOr
-		(test is AND) = (andor == scoperator.AND)
+	|| AndOr = scop is AndOr
+		(test is AND) = (andor == opmode.AND)
 		return .BooleanLogic(msg, test.activate)
 
 	|| L = .Jump(ll) & NilState.Either		// (ptr+1) or (1+ptr) still needs nilness check

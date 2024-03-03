@@ -615,7 +615,7 @@ function Message.RefDisappears (|bool|)
 		  elseif (f == @rel)
 			|| comp = P.second!.obj
 			if (comp isa SCOperator)
-				return (comp.IsCompare and !comp.iscustom)
+				return (comp Is Compare and comp isnt custom)
 			return false
 		  else
 			return false

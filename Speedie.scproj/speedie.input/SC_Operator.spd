@@ -20,7 +20,7 @@ datatype OpMode (uint16)
 		EqualOrNot // same as niltest!
 		NilTest
 		SameOrLessBits = (NoExtraBits, LoseBits)
-		AndOr = (AND, OR)
+		AndOr = (OR, AND)
 		Custom
 		CaseAware
 		ExactEquals = niltest + exactlyequals + equalornot + compare
@@ -35,26 +35,26 @@ class SCOperator {
 linkage
 	cpp_part		Opp
 
-|int|		Score
+|int|			Score
 
 |string|		Name
 |string|		CompOp
 |string|		CompParam
 |string|		FuncName
 |fn_OpASM?|		ASM
-|bool|			IsCaseAware
-|bool|			IsEqualOrNot
+//|bool|			IsCaseAware
+//|bool|			IsEqualOrNot
 |bool|			IsNilTest
-|bool|			IsExactlyEquals		// "=="
-|bool|			IsSet
-|bool|			IsCustom
-|bool|			DoesntNeedExtraBits
-|bool|			MakesSigned
-|byte|			IsAndOr
+//|bool|			IsExactlyEquals		// "=="
+//|bool|			IsSet
+//|bool|			IsCustom
+//|bool|			DoesntNeedExtraBits
+//|bool|			MakesSigned
+//|byte|			IsAndOr
 
-|OpMode| Kind
+|OpMode|		Kind
 |bool|			IsCompare		// >  <  ==  >=  <=  !=
-|bool|			AsBit			// & ~ | ^
+//|bool|			AsBit			// & ~ | ^
 							// if both are false... it is + - * /
 
 
@@ -64,16 +64,12 @@ constructor (|string| name, |fn_opasm?| ASM, |OpMode| mode)
 	.asm = asm
 	dict[name] = self
 
-syntax is (|OpMode| x, |bool|)
-	return (.kind & x) == x
-
-constants
-	AND = 3
-	OR  = 2
+syntax is (|OpMode| x, |opmode|)
+	return .kind & x
 	
 
 function CaseAwareStr (|String|)
-	return .IsCaseAware.render
+	return (self is caseaware)|bool|.render
 
 
 syntax equals (|string| s, |bool| aware, |bool|)
@@ -83,7 +79,7 @@ syntax equals (|string| s, |bool| aware, |bool|)
 function SimpleName (|String|)
 	opt norefcounts
 	|| n = .name
-	if (.IsCaseAware)
+	if (self Is CaseAware)
 		Return n[1...]
 	Return n
 
@@ -94,11 +90,12 @@ function SetFuncName (assigns:|string| s)
 	
 
 function IsCompSet (|bool|)
-	return .IsCompare or .isset
+	return .IsCompare or (self is assigns)
 
 
 function InitComp (|string| name_)
-	.IsCaseAware = ( *name_ == '~' )
+	if *name_ == '~'
+		.kind |= opmode.CaseAware
 	.IsCompare = true
 	.FuncName = "OperatorCompare"
 	.IsNilTest = name_ == "!=" or "=="
@@ -124,8 +121,8 @@ function InitComp (|string| name_)
 	  elseif (s == "<=") or (s == ">=")
 		.CompParam = "0"
 	  else
-		.IsEqualOrNot = true
-		.IsExactlyEquals = s == "=="
+//		.IsEqualOrNot = true
+//		.IsExactlyEquals = s == "=="
 		.CompParam = "0"
 
 
@@ -136,7 +133,7 @@ module {
 	function Lookup ( |Message| opch, |SCOperator| )
 		opt norefcounts
 		|| result = opch.obj|SCOperator|
-			if (!result.iscustom)
+			if (result isnt custom)
 				opch.name = result.name
 			return result
 		
@@ -147,15 +144,15 @@ module {
 			result = AddCustom( op )
 
 		  elseif (op != result.name)
-			if (!result.iscustom)
+			if (result isnt custom)
 				opch.name = result.name
 		
 		if op == "or"
-			result.IsAndOr = SCOperator.OR
+			result.kind |= opmode.OR
 		  elseif op == "and"
-			result.IsAndOr = SCOperator.And
+			result.kind |= opmode.and
 		// why aren't 'if "" > nil' here? I think... cos no one would do that?
-		result.DoesntNeedExtraBits = (op == "&" or ">>" or "xor")
+//		result.DoesntNeedExtraBits = (op == "&" or ">>" or "xor")
 		return Result
 
 
@@ -171,7 +168,7 @@ module {
 
 		.AddMath( "mod",	"mod",		&asmops.Mod)
 		.AddMath( "+",		"Plus",		&asmops.Plus)
-		.AddMath( "-",		"Minus",	&asmops.Minus, opmode.makessigned).MakesSigned = true
+		.AddMath( "-",		"Minus",	&asmops.Minus, opmode.makessigned)//.MakesSigned = true
 		.AddMath( "*",		"Mul",		&asmops.Mul)
 		.AddMath( "/",		"Divide",	&asmops.Div)
 
@@ -180,7 +177,7 @@ module {
 		.addbit( ">>",	"ShiftRight",	&asmops.SHR, opmode.noextrabits)
 		.addbit( "<<",	"ShiftLeft",	&asmops.SHL)
 		.AddBit( "&",	"BitAnd",		&asmops.BitAnd, opmode.SameOrLessBits)
-		.AddBit( "^",	"Xor",			&asmops.bitxor)
+		.AddBit( "^",	"Xor",			&asmops.bitxor, opmode.noextrabits)
 		.AddBit( "(|)",	"BitOr",		&asmops.BitOr)
 		|| BitOr = dict[ "(|)" ]
 		dict["|"]         = bitor // for: a |= b
@@ -197,12 +194,12 @@ module {
 		opp.InitComp( s )
 
 		|| newname = ("~" + s, "~=")(s != "==")
-		SCOperator.new(newname, nil, OpMode.custom).InitComp( newname )
+//		Mode = mode&opmode.EqualOrNot				// keep all!?
+		SCOperator.new(newname, nil, mode ||| OpMode.custom).InitComp( newname )
 	
 		
 	function AddAssign (|string| s)
-		|| it = SCOperator.new(s, &asmops.Assign, OpMode.assigns)
-		it.IsSet = true
+		SCOperator.new(s, &asmops.Assign, OpMode.assigns)
 
 		
 	function AddMath (|string| s, |string| FuncName, |fn_opasm| ASM, |OpMode| Mode=0, |SCOperator|)
@@ -213,7 +210,7 @@ module {
 
 	function AddCustom (|string| s, |SCOperator|)
 		|| opp = SCOperator.new(s, nil, OpMode.custom)
-		opp.IsCustom = true
+//		opp.IsCustom = true
 		opp.score = CustomOperatorScore
 		opp.SetFuncName = s
 		return opp
@@ -221,7 +218,7 @@ module {
 
 	function AddBit (|string| s, |String| FuncName, |fn_opasm?| ASM=nil, |OpMode| Mode=0)
 		|| opp = SCOperator.new(s, asm, mode ||| opmode.Bit)
-		opp.AsBit = true
+//		opp.AsBit = true
 		opp.SetFuncName = FuncName
 	
 	
@@ -373,10 +370,10 @@ module CustomOps
 
 function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| ErrPlace, |int|)
 	opt norefcounts
-	if (comp.isCustom or comp.IsCaseAware)
+	if (comp is Custom or CaseAware)
 		return CustomOps.Needed
 	
-	|| CompOrSet= (comp.IsCompare or comp.isset)
+	|| CompOrSet= (comp.IsCompare or comp is assigns)
 	|| LNT		= LC.TypeInfo
 	|| RNT		= RC.TypeInfo
 	|| LN		= LNT.NumericCountBoolsToo
@@ -399,7 +396,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		|| GotABool = (DataTypeCode.bool == lnt or rnt)
 		if lnt != rnt
 			expect !(gotabool and comp.iscompare) (errplace, "Cant compare bools to non-bools")
-			if !CompOrSet and !comp.DoesntNeedExtraBits
+			if !CompOrSet and comp isnt NoExtraBits
 				extra = CustomOps.TypeCastToBigger
 		  elseif GotABool and !comp.IsCompare
 			extra = CustomOps.TypeCastFromBool

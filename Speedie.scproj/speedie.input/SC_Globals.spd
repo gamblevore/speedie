@@ -1187,10 +1187,10 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 
 function CanOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |bool| )
 	opt norefcounts
-	return (exp.Parent != @Arg) and (LC.Type.CanCompare(RC, Comp.IsEqualOrNot))
+	return (exp.Parent != @Arg) and (LC.Type.CanCompare(RC, Comp Is EqualOrNot))
 
 
-function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode|name_space, |scdecl| ) {
+function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |scdecl|) {
 	using (exp)
 	|| dot = «dot
 		exp.first
@@ -1201,7 +1201,7 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 	»
 	exp.First = dot
 
-	if (comp.IsEqualOrNot)
+	if (comp Is EqualOrNot)
 		exp.Last.Remove
 		dot.name = "SyntaxEquals"
 		if (comp.CompOp == "!=")
@@ -1342,7 +1342,7 @@ function TypeOfRel (ExprResolver) {
 	
 	opch.obj = comp // shouldn't this be higher even?
 	
-	if (comp.isandor)
+	if (comp.kind & opmode.andor) // either
 		return Or_And_Expansion( LC, RC, exp, name_Space ) // expects both sides to be booleans, right?
 
 
@@ -1356,9 +1356,9 @@ function TypeOfRel (ExprResolver) {
 			return CustomFuncOp( exp, comp, name_space, RN )
 		  elseif RC == TypeNil
 			0 //
-		  elseif comp.iscaseaware or CanOpCompare(exp, lc, rc, comp)
+		  elseif (comp is caseaware) or CanOpCompare(exp, lc, rc, comp)
 			return DoOpCompare(exp, lc, rc, comp, name_space)
-	  elseif (comp.AsBit)
+	  elseif (comp is Bit)
 		require RC.NoFloat(RN) and LC.NoFloat(LN)
 	
 	if (custom & CustomOps.TypeCastFromBool) and !side
@@ -1376,10 +1376,10 @@ function TypeOfRel (ExprResolver) {
 	if custom & CustomOps.TypeCastToBigger
 		lc = lc.better_numeric(rc)
 	
-	if (comp.IsCompare and !side)
+	if ((comp Is Compare) and !side)
 		Return TypeBool!.TypeNormal
 
-	if (comp.MakesSigned and lc.isuintlike)
+	if ((comp is MakesSigned) and lc.isuintlike)
 		return lc.Better_Numeric(rc, true) // should add type-cast?
 	
 	Return LC
