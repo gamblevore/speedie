@@ -881,3 +881,26 @@ datatype bool
 			yield (num == 1)
 			num--
 
+
+datatype MoveCode (byte)
+	Flags
+		Right
+		Left
+		Up
+		Down
+		Forward
+		Backward
+		Top = Up
+		Bottom = Down
+		Front = Forward
+		Back = Backward
+		CenterV = Up + Down
+		CenterH = Right + Left
+		MiddleLeft = Left + CenterV
+		MiddleRight = Right + CenterV
+		All = 63
+		Center = 63
+
+	syntax is (|movecode| m, |bool|)
+		return (self & m) == m
+
