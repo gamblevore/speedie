@@ -1460,7 +1460,7 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 	  else
 		cond.NeedBra
 		if cond.first == @arg // if a.b? --> if ({||x=a.b, rejoin x}), fails in c cos if ({}) is bad
-			cond.wrapwith(@bra.msg).obj = cond.obj 
+			cond.wrapwith(@bra).obj = cond.obj 
 		Tran_Isa(node, name_space)
 
 
@@ -1495,7 +1495,7 @@ function Tran_Deprecate (TranFunc)
 	require stuff.expectlast
 
 	if stuff != @list and @bra
-		stuff = stuff.wrapwith(@list.msg)
+		stuff = stuff.wrapwith(@list)
 
 	using (node)
 		stuff.func = @prm

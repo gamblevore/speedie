@@ -1137,7 +1137,7 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 			bra = exp
 		if (bra in @arg)
 			if bra == exp // a is b = c --> (a is b)=c
-				bra = exp.WrapWith(@bra.msg)
+				bra = exp.WrapWith(@bra)
 
 			bra.func = @rel
 			|| eq = bra.msg(@opp, "=")
@@ -1374,10 +1374,7 @@ function TypeOfRel (ExprResolver) {
 		Return TypeBool!.TypeNormal
 
 	if custom & CustomOps.TypeCastToBetter
-		lc = lc.better_numeric(rc)
-
-	if ((comp is MakesSigned) and lc.isuintlike)
-		return lc.Better_Numeric(rc, true) // should add type-cast?
+		return lc.better_numeric(rc, comp.Kind)
 	
 	Return LC
 	

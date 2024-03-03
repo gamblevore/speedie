@@ -112,7 +112,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	if InbuiltFunc(msg, "digest")
 		msg.name = msg.name.digest
 	  elseif P == @arg
-		msg.wrapwith(@tmp + "printline")
+		msg.wrapwith(@tmp, "printline")
 		
 	if !msg.first
 		ObjectifyString( msg )
@@ -336,7 +336,7 @@ function message.Tran_With
 		|| dcl  = scfunction.tempmoveout(obj)
 		name = dcl.DeclName!.name
 
-	if.first!.wrapwith(@bra + "?")
+	if.first!.wrapwith(@bra, "?")
 	
 	for ch.flat in arg
 		if ch == @tmp

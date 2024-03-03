@@ -162,16 +162,16 @@ class SCDecl (SCNamed) {
 		Return dcl
 
 	
-	function Better_Numeric (|scdecl| o, |bool| Subtract=false, |scdecl|)
+	function Better_Numeric (|scdecl| o, |opmode| Mode=0, |scdecl|)
 		opt norefcounts
 										// int+float-->float
 										// int+double-->double
 		|| S =  .type.typeinfo
 		|| T = o.type.typeinfo
-		if !subtract
+		if mode isnt MakesSigned
 			if (s &~ datatypecode.sign) == (t &~ datatypecode.sign)
 				return self
-		|| cls = s.better_numeric_sub(t, Subtract)!
+		|| cls = s.better_numeric_sub(t, Mode)!
 		if cls.typeinfo == s
 			return self					// in case of: || x = (date(), 0)(test)
 		if cls.typeinfo == t
@@ -183,23 +183,31 @@ class SCDecl (SCNamed) {
 		return .type.typeinfo.isfloat
 
 
-	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |bool| ForSubtract, |SCClass|)
+	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |opmode| Op, |SCClass|)
 		|| bits	= .ItemBitCount max t.ItemBitCount
 		// what about a float + an int? f64 right?
 		if .isfloat or t.isfloat
-			// in here?
 			if bits > 32
 				return typef64
 			if bits >= 16
 				return typefloat
 			return typehfloat
 		
-		if ForSubtract
-			|| UnSigned = !.issigned or !t.issigned
-			if bits+UnSigned > 32
-				return typeint64
-			return typeint
-			
+		if Op
+			if Op is MakesSigned			// -
+				|| UnSigned = !.issigned or !t.issigned
+				if bits+UnSigned > 32
+					return typeint64
+				return typeint
+			if Op is LoseBits				// &
+				bits = .ItemBitCount min t.ItemBitCount
+			  elseif Op is LeftOnly		// >>
+				bits = .ItemBitCount
+			  elseif Op is NoExtraBits	// xor
+				0
+			  elseif (Op is mathlike) and bits < 32
+				bits = 32
+		
 		|| Signed = .issigned or t.issigned
 		if bits > 32
 			return (typeint64, typeuint64)(signed)
@@ -211,8 +219,8 @@ class SCDecl (SCNamed) {
 
 
 	function PointeryMatch (|scdecl| O, |bool|)
-		require (o.PointerCount == .PointerCount)
-		return (o.IsCArray == .IsCArray)
+		if (o.PointerCount == .PointerCount)
+			return (o.IsCArray == .IsCArray)
 
 
 	function PointeryMatchSub (|SCDecl| O, |int| TypeCast, |uint|)

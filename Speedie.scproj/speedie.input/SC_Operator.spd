@@ -11,11 +11,13 @@ datatype OpMode (uint16)
 		|OpMode|
 		CompSet = (Compare, Assigns)
 		MathLike = (Bit, Math)
+		LeftOnly
 		MakesSigned
 		ExactlyEquals
 		EqualOrNot
 		NilTest		// not the same as equalornot... because those include customops
 		SameOrLessBits = (NoExtraBits, LoseBits)
+		Left = LeftOnly + NoExtraBits
 		AndOr = (OR, AND)
 		Custom
 		CaseAware
@@ -151,17 +153,17 @@ module {
 
 		.AddMath( "mod",	"mod",		&asmops.Mod)
 		.AddMath( "+",		"Plus",		&asmops.Plus)
-		.AddMath( "-",		"Minus",	&asmops.Minus, opmode.makessigned)//.MakesSigned = true
+		.AddMath( "-",		"Minus",	&asmops.Minus, opmode.makessigned)
 		.AddMath( "*",		"Mul",		&asmops.Mul)
 		.AddMath( "/",		"Divide",	&asmops.Div)
 
-		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL)
-		.AddBit( ">>>",	"RotateRight",	&asmops.ROR)
-		.addbit( ">>",	"ShiftRight",	&asmops.SHR, opmode.noextrabits)
+		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL, opmode.Left)
+		.AddBit( ">>>",	"RotateRight",	&asmops.ROR, opmode.Left)
+		.addbit( ">>",	"ShiftRight",	&asmops.SHR, opmode.Left)
 		.addbit( "<<",	"ShiftLeft",	&asmops.SHL)
+		.AddBit( "(|)",	"BitOr",		&asmops.BitOr)
 		.AddBit( "&",	"BitAnd",		&asmops.BitAnd, opmode.SameOrLessBits)
 		.AddBit( "^",	"Xor",			&asmops.bitxor, opmode.noextrabits)
-		.AddBit( "(|)",	"BitOr",		&asmops.BitOr)
 		|| BitOr = dict[ "(|)" ]
 		dict["|"]         = bitor // for: a |= b
 		dict["|||"]       = bitor
@@ -386,8 +388,12 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 			expect !(gotabool and comp is compare) (errplace, "Cant compare bools to non-bools")
 			if (comp is mathlike) and comp isnt NoExtraBits
 				extra = CustomOps.TypeCastToBetter
-		  elseif GotABool and comp isnt Compare
-			extra = CustomOps.TypeCastFromBool
+				
+		  else
+			if GotABool and comp isnt Compare
+				extra = CustomOps.TypeCastFromBool
+			  elseif (comp is MakesSigned) and lc.isuintlike
+				extra = CustomOps.TypeCastToBetter
 
 	if (!SCNode.ConstantsLoadingOverride and LC.Type.TreatAsBaseType)
 		return CustomOps.Needed ||| extra
