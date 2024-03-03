@@ -81,19 +81,20 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 		TmpFuncThg = rel.first!
 	  else
 		arg = FuncMsg.createownblock #require
-		|| TmpFuncVar = UniqueTmpVar()								// "t2"
-		TmpFuncThg = .TheTmpVarOf(TmpFuncVar)
-		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg, scdeclinfo.body )		    // || t2 = func(t1, c.d)
+		|| TmpFuncVar = UniqueTmpVar()
+		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg, scdeclinfo.body )
+		TmpFuncThg = «Thg TmpFuncVar »
+		TmpFuncThg.obj = TmpFuncDecl.obj
 		arg <~ TmpFuncDecl
 		|| rej = NewRejoin()
 		rej <~ tmpfuncthg
-		arg <~ rej													// t2
+		arg <~ rej
 
-	|| TmpParamName = UniqueTmpVar()								// "t1"
-	rz = funcmsg.TheTmpVarOf(TmpParamName)							// t1
-	.ReplaceWith( rz )										// func(a.b.b2, c.d) --> func(t1, c.d)
-// || t1 = a.b.b2
+	|| TmpParamName = UniqueTmpVar()
+	rz = @thg + TmpParamName 
+	.ReplaceWith( rz )
 	|| TmpParamDecl = MakeDecl( "", TmpParamName, self, scdeclinfo.body )
+	rz.obj = TmpParamDecl.obj 
 	TmpFuncDecl.prev = TmpParamDecl
 
 
@@ -202,15 +203,14 @@ extend_module scfunction
 		|| Name = UniqueTmpVar(msg.msgowningfunc)
 		
 		// a.b.c -> || tmp1 = a.b, tmp1.c
-		|| NameThing = «Thg name »
+		|| NameThing = @Thg + name
 		msg.ReplaceWith( NameThing )
 		
+		// here
 		|| declmsg = MakeDecl( "", name, msg, scdeclinfo.body )
 		parent.prev = declmsg
-
-		|| d = OldDecl.copydecl
+		
+		|| d = declmsg.Obj!|scdecl|
 		NameThing.obj = d
-		d.Name = ""
-		(d is body)
 		Return NameThing
 

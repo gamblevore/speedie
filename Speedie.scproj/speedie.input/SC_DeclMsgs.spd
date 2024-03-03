@@ -8,13 +8,15 @@ function DeclsDefault (|Message| def, |Message|)
 
 
 function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose=0, |Message!|)
+	opt norefcounts
 	rz = «decl »
+	|| f = rz.msg(@arg),    todo "this should change... I don't like @arg types."
+	
 	if (Type)
-		|| arg = rz.msg(@arg)
-		(arg is style2)
-		arg <~ (@thg, type)
-	  else 
-		rz <~ @emb
+		(f is style2)
+		f <~ (@thg, type)
+	  else
+		f.func = @emb
 	
 	if !Value
 		rz <~ (@thg, name)
@@ -32,6 +34,8 @@ function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| P
 		dcl.Default = value
 		NameMsg.obj = dcl		
 		Rel.obj = dcl
+		rz.obj = dcl
+		f.obj = dcl
 	
 
 function MakeDeclOrRel (|Message| Into, |message| namemsg, |Message| value, |Message|)

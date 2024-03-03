@@ -50,7 +50,7 @@ function IsProperModule (|bool|)
 	return true
 
 
-function SCDecl.PrefixedName (|faststring| fs, |SCModule| M, |string|)
+function SCDecl.PrefixedName (|faststring| fs, |SCModule| M)
 	opt norefcounts
 	if self Is Const
 		fs <~ "k"
@@ -61,7 +61,7 @@ function SCDecl.PrefixedName (|faststring| fs, |SCModule| M, |string|)
 		fs <~ m.CppPart
 		fs <~ "_"
 	.name.unicodesafename(fs)
-	return fs
+	.ExportName = fs
 
 
 function GlobalsFix
@@ -69,7 +69,7 @@ function GlobalsFix
 	|| fs = faststring()
 	for decl.vars in self
 		if Decl
-			decl.name = decl.PrefixedName(fs, self)
+			decl.PrefixedName(fs, self)
 
 
 

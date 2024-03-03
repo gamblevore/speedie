@@ -24,6 +24,11 @@ dispatch FuncPreReader (fnPreReader)
 		.description = "Called a disabled function."
 		|| s = msg[@str, @nil]
 			.description = s.name
+			
+	+"todo"
+		opt norefcounts
+		msg[@nil].expectlast
+		compiler.TodoList <~ msg
 	
 	
 	+"pragma"

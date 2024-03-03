@@ -6,30 +6,18 @@
 
 class SCObject
 	|array? of SCNode|			LinkFrom
-	|string|					Name
 	|Message?|					Source
 	|byte|						NoAutoComplete
 	|Byte|						AllocSource
 	|uint| 						LinkedFrom
+	|SCNodeInfo|				NodeInfo
 	
 	constructor
 		.linkfrom = nil
-		
-	render
-		|| cname = ((.class.name|uint64|)+2)|cstring|
-		fs <~ cname
-		fs <~ ": "
-		fs <~ .name
 	
 	function SyntaxExpect ( |string| Error )
 		cpp_part Fail
-//		print "Object Failed Expect: "
-//		printline .objectid
-//		app.printstacktrace
 		errorreceiver.NewError( .source, Error )
-
-//	syntax equals (|string| s, |bool| aware, |bool|)
-//		return .name ~= s
 
 	function File (|SCFile?|)
 		opt norefcounts
@@ -45,3 +33,36 @@ class SCObject
 		if self isa scmodule
 			|| c = .cls
 				return c.sourcearg
+
+	syntax is (|SCNodeInfo| i, |bool|)
+		return .NodeInfo[i]
+	
+	syntax is (|SCNodeInfo| i, assigns:|bool|)
+		|int| x = .NodeInfo
+		x[i] = value
+		.NodeInfo = x
+
+
+	function IsVisible (|bool|)
+		return self is visible
+	
+	
+	function IsVisible (assigns:|bool|)
+		(self is visible) = value
+
+
+
+
+
+class SCNamed (SCObject)	// move back into scobject? we can't remove it from scarg...
+							// not easily!
+	linkage
+		cpp_part		Named
+	|string|					Name
+	|String|					ExportName
+
+	render
+		|| cname = ((.class.name|uint64|)+2)|cstring|
+		fs <~ cname
+		fs <~ ": "
+		fs <~ .name

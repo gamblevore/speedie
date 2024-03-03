@@ -8,31 +8,6 @@
 prototype CollectFunc (|Message| node, |SCNode| name_space, |Message?| ErrPlace, |SCNode?|)
 
 
-
-class SCNamed (SCObject)
-	linkage
-		cpp_part		Named
-	|SCNodeInfo|						NodeInfo
-	|String|							ExportName
-
-	syntax is (|SCNodeInfo| i, |bool|)
-		return .NodeInfo[i]
-	
-	syntax is (|SCNodeInfo| i, assigns:|bool|)
-		|int| x = .NodeInfo
-		x[i] = value
-		.NodeInfo = x
-
-
-	function IsVisible (|bool|)
-		return self is visible
-	
-	
-	function IsVisible (assigns:|bool|)
-		(self is visible) = value
-
-
-
 class SCNode (SCNamed) {
 linkage
 	cpp_part		Base

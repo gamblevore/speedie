@@ -74,7 +74,7 @@ function Tran_Expect (TranFunc)
 	|| NewStyle = (N == "check" or "warn")
 	if (NewStyle and !ch1) // work around for now.... for: error where
 		ch1 = ch
-		ch = «thg "false"»
+		ch = @thg + "false"
 		ch1.prev = ch
 
 	if (name_space)
@@ -116,7 +116,7 @@ function Tran_Using (TranFunc)
 	|| WithFirst= with.first
 	if with != @bra
 		withfirst = with
-		node.first = «bra ""»
+		node.first = @bra.msg
 	|| UsingObj	= «dot "SyntaxUsing"
 		withfirst
 		«emb »

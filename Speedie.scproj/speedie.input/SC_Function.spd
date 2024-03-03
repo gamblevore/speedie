@@ -688,7 +688,7 @@ function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 	dcl.IsLookupOnly = self
 	dcl.Name = .Name
 	(dcl is const)					// lets kill da hoe
-	(dcl is Global)				// kill! kill!
+	(dcl is Global)					// kill! kill!
 	dcl.NilDeclared = nilstate.real
 	.ProtoDecl = dcl
 	if (.Cls)
@@ -720,7 +720,6 @@ function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, 
 
 function IsSimpleCast (|Message|)
 	opt norefcounts
-	// return |whatever|self
 	expect .Source
 	
 	|| found = .Source.last(@arg).first

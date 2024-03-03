@@ -72,6 +72,7 @@ linkage
 |message|					DebugInsert
 |message|					ConfMsg
 |dictionary|				InsecureWords
+|[message]| 				TodoList
 
 |Dictionary of SCFile|		Files = nil
 |[SCImport]|				ImportedList

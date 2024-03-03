@@ -485,7 +485,8 @@ function SCObject.CanAutoSub (|string| search, |string|)
 	  elseif self isa scmodule
 		|| cls = .cls
 			require !(cls.NoAutoComplete or cls.IsBehaviourTable)
-	return .name
+	if self isa scnamed
+		return .name
 
 
 function SCDecl.RealName (|string|)
@@ -545,7 +546,8 @@ function SCObject.CallFromName (|string|)
 		return .RenderName
 	if self isa scdecl
 		return .AutoCompleteName
-	return .Name
+	if self isa scnamed
+		return .Name
 
 
 function SCObject.Display (|bool| exact, |string|)
@@ -557,7 +559,8 @@ function SCObject.Display (|bool| exact, |string|)
 		return .AutoCompleteName
 	if self isa sciterator
 		return ""
-	return .name
+	if self isa scnamed
+		return .name
 
 
 function SCObject.NextDisplay (|bool| exact, |SCObject|)
