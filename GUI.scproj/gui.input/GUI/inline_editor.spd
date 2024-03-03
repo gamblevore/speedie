@@ -49,17 +49,13 @@ struct InlineEditor
 	
 	function FinishAndClear (|bool|focus=true)
 		opt norefcounts
-		|| e = .editor$
-		|| s = e.text
-		if s != .cell
+		|| e = .editor
+		|| c = .cell
+		if e and c and e.text != c.__Text__
 			|| l = .editingfor
 			if l isa listview
-				l.TryRenameCellTo(.cell!, s)
+				l.TryRenameCellTo(c, e.text)
 		.Clear(focus)
-	
-	
-//	function Hide
-//		.NeedsHide = true
 		
 	
 	function Clear (|bool| Focus = true)

@@ -82,23 +82,23 @@ class ListView (GUIControl) {
 	
 	function TryRenameCellTo (|listviewcell!| cell, |string| value, |bool|)
 		opt NoRefCounts
-		if self and .TryRenameCellSub(cell, value)
-			|| o = cell.row
-			.touch
-			.show(o)
-			(.WasEdited)(self, o)?
-			(.onselected)(self, o)?
-			return true
+		require .TryRenameCellSub(cell, value)
+		|| o = cell.row
+		.touch
+		.show(o)
+		(.WasEdited)(self, o)?
+		(.onselected)(self, o)?
+		return true
 
 
 	function TryRenameCellSub (|listviewcell!| cell, |string| value, |bool|)
 		opt norefcounts
 		|| tec = .TryEditCell
-		if !tec
-			|| orig = cell.row
-			orig.__textset__(cell.column, value)
-			return true
-		return (tec)(self, cell, value)
+			return (tec)(self, cell, value)
+
+		|| orig = cell.row
+		orig.__textset__(cell.column, value)
+		return true
 
 
 //	function ViewableRowCount (|int|)
