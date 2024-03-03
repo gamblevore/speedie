@@ -162,10 +162,7 @@ function TranRender (|message| exp, |SCNode| name_space, |SCObject|)
 function TranNegate (|message| f, |SCNode| name_space, |SCObject|)
 // if this is @thg... do we really NEED to expand this to a bool?
 	opt norefcounts
-	if true // f != @thg // this seems to fail somehow.
-		f = ExpandToBool( F, name_space )$
-//	  else
-//		typeofexpr(f, name_space)
+	f = ExpandToBool( F, name_space )$
 	|| d = f.obj
 	if (d isa scdecl)
 		if d.IsConstOf(Falsebool)
@@ -1373,11 +1370,11 @@ function TypeOfRel (ExprResolver) {
 		return RC		// RC is bigger (float vs vec3)
 
 	
-	if custom & CustomOps.TypeCastToBigger
-		lc = lc.better_numeric(rc)
-	
-	if ((comp Is Compare) and !side)
+	if !side and (comp Is Compare)
 		Return TypeBool!.TypeNormal
+
+	if custom & CustomOps.TypeCastToBetter
+		lc = lc.better_numeric(rc)
 
 	if ((comp is MakesSigned) and lc.isuintlike)
 		return lc.Better_Numeric(rc, true) // should add type-cast?

@@ -3,10 +3,7 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-
-// give each comparator, an opposite "<" --> ">="
-// useful for stuff like (!(a<b)) --> (a >= b)
-// or maybe not
+// we have opposites... perhaps the negate operator could use it.
 
 
 datatype OpMode (uint16)
@@ -42,6 +39,7 @@ linkage
 |string|		FuncName
 |fn_OpASM?|		ASM
 |OpMode|		Kind
+|SCOperator--?|	Opposite 
 
 
 constructor (|string| name, |fn_opasm?| ASM, |OpMode| mode)
@@ -145,6 +143,9 @@ module {
 		.AddComp( "<=",					&asmops.LessEq)
 		.AddComp( ">=",					&asmops.MoreEq)
 		.AddComp( "!=",					&asmops.NotEq,  OpMode.ExactNotEquals)
+		.OppositeComp("==", "!=")
+		.OppositeComp("<", ">=")
+		.OppositeComp(">", "<=")
 
 		.AddAssign( "=" )
 
@@ -170,6 +171,13 @@ module {
 
 		.BuildOrder
 
+	function OppositeComp (|string| A, |string| B)
+		opt norefcounts
+		|| pA = dict[A]
+		|| pB = dict[B]
+		if pa and pb
+			pa.Opposite = pB
+			pb.Opposite = pa
 
 	function AddComp (|string| s, |fn_opasm| ASM, |OpMode| Mode=0)
 		|| opp = SCOperator.new(s, ASM, mode ||| opmode.compare)
@@ -341,7 +349,7 @@ module CustomOps
 	constants
 		NotCustom = 0
 		TypeCastFromBool = 16
-		TypeCastToBigger = 32
+		TypeCastToBetter = 32
 		Needed = 64
 		LeftOnlyIsVector = 65
 		RightOnlyIsVector = 66
@@ -376,16 +384,16 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		|| GotABool = (DataTypeCode.bool == lnt or rnt)
 		if lnt != rnt
 			expect !(gotabool and comp is compare) (errplace, "Cant compare bools to non-bools")
-			if !CompOrSet and comp isnt NoExtraBits
-				extra = CustomOps.TypeCastToBigger
+			if (comp is mathlike) and comp isnt NoExtraBits
+				extra = CustomOps.TypeCastToBetter
 		  elseif GotABool and comp isnt Compare
 			extra = CustomOps.TypeCastFromBool
 
 	if (!SCNode.ConstantsLoadingOverride and LC.Type.TreatAsBaseType)
 		return CustomOps.Needed ||| extra
-	
 	if ((LN > 1) and CompOrSet)					// can't compare vectors directly in C++
 		return CustomOps.Needed ||| extra
+
 	if !extra
 		|| t = lc.type
 		if t.super and t.hasOperator(comp.funcname)
@@ -399,3 +407,11 @@ function scclass.HasOperator (|string| op, |bool|)
 	|| obj = self[op]
 	if obj isa scfunction
 		return true
+
+
+function message.Become (|scoperator| op)
+	.obj = op
+	.name = op.name
+	
+	
+	

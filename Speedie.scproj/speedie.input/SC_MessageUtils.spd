@@ -64,21 +64,32 @@ function Message.NegateThg (|Message|)
 function Message.Negate (|Message|)
 	opt norefcounts
 	real self
+	|| upon = self
 	|| f = .func
 	if f == @thg
 		return .negatethg
 	
 	if f == @bra
-		|| ch = .unbra
-		if ch.func == @thg
-			ch.negatethg
-			.obj = ch.obj
+		upon = .unbra
+		if upon.func == @thg
+			upon.negatethg
+			.obj = upon.obj
 			return self
-		.Become(@brel, "!")					// the negator!
+	
+	if upon isbrel "!"
+		upon.become(@bra)
 		return self
 	
-	if self IsBRel "!"
-		return .ReplaceWith(.first!)
+	if upon.func == @rel
+		|| opmsg = upon.second!
+		|| op = scoperator.dict[opmsg.name]
+			|| nega = op.opposite
+				opmsg.become(nega)
+				return self
+
+	if f == @bra
+		.Become(@brel, "!")					// the negator!
+		return self
 
 	using self
 		rz = .WrapWith(@BRel + "!")			// also the negator!
@@ -510,4 +521,5 @@ function Message.StartUsingAfter // for "return" debugging.
 
 extend string
 	function debugfunc
+		visible
 		if scfunction.currfunc ~= self
