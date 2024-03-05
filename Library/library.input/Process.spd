@@ -36,6 +36,11 @@ class Process (ProcessOwner)
 		description `Returns false if the process has exited.`
 		cpp_wrapper JB_Sh_Step
 
+	function ReadStdOut (|string|)
+		if self
+			.UpdatePipes
+			return .Output
+		
 	function Kill
 		if self
 			if .Exit == -1

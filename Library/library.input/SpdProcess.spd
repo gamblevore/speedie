@@ -111,13 +111,6 @@ class SpdProcess (Process)
 		super.kill
 		.Disconnect(why)
 
-
-	function ReadStdOut (|string|)
-		if self
-			.UpdatePipes
-			return .Output
-		
-
 	syntax expect (|string| err)
 		if .CommsOpen
 			printline err
@@ -199,7 +192,7 @@ class SpdProcess (Process)
 			while m
 				|| ch = m
 				m++
-				if ch.exit >= 0
+				if ch.IsRunning
 					if (ch isa SpdProcess)
 						ch.HandleDied
 					ch.UnRegister

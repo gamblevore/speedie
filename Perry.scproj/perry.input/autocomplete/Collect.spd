@@ -51,7 +51,7 @@ function PerryIDE.DateWrap (|message| msg, |message|)
 
 function PerryIDE.SendFeedbackMsg (|message| msg)
 	require msg
-	|| fb = .CompilerInit(.feedback, false)			#require
+	|| fb = .CompilerInit(.feedback)			#require
 	.feedback = fb
 	|| record = .DateWrap(msg)
 	fb <~ record
@@ -59,16 +59,9 @@ function PerryIDE.SendFeedbackMsg (|message| msg)
 	.LogOneComm(msg, "\1C ")
 
 
-function PerryIDE.SubProcess (|SpdMainFn|)
-	require platform.isdebug
-	rz = Speedie_Checker
-	Speedie_Checker = nil
-
-
-
-function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProcess|)   // InitCompiler
+function PerryIDE.CompilerInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler
 	if c
-		if !actual_compile and !c.subprocess and C.TimedOut(5s)
+		if !c.subprocess and C.TimedOut(5s)
 			c.Deactivate
 		if c.IsOpen
 			return c
@@ -76,25 +69,30 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 			return c
 		return nil // ded?
 
-	|| Noisy = false
 	|| p = [.project, "--perry=bin", "--nocolor"]
 	|| f = .projmsg[@nil]$
 	|| name = .name
+	|| Noisy = false
 	if noisy
 		p <~ "--noisy"		
-	if !actual_compile
-		p <~ "--check"
+
+	p <~ "--check"
 	
 	// 
 	|SpdProcess| spd 
-	|| SubProcess = .SubProcess()
-	if SubProcess?
-		if !.UsingSpdLib
-			.UsingSpdLib = true
-			f.name = name.TrimExt + "()"
-		spd = SubProcess.RunThreaded(p)
-	  else
-		|| proc = speedie.Path.resolve
+	
+	target debug
+		|| SubProcess = Speedie_Checker
+		Speedie_Checker = nil
+		
+		if SubProcess?
+			if !.UsingSpdLib
+				.UsingSpdLib = true
+				f.name = name.TrimExt + "()"
+			spd = SubProcess.RunThreaded(p)
+
+	if !spd?
+		|| proc = speedie.resolve
 		target debug
 			proc = "/usr/local/speedie/Speedie.scproj/Build/Products/Debug/Speedie"
 		if proc
@@ -107,19 +105,18 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |bool| actual_compile, |SpdProce
 
 function PerryIDE.ActualCompile (|message| msg)
 	require msg
-	|| c = .CompilerInit(.compilr, true)
+	debugger 
+	beep "oof"
+	return 
+	|| c = .compilr//.CompilerInit(.compilr, true)
 	if c == nil
 		isnt active
 		return
 	.compilr = c
 
-	if !c.SubProcess
-		c.UserFlags |= 8 // just to debug my pipes. delete this later.
 	.SpeedieText.text = ""
 	
-	|| dw = .DateWrap(msg )
-	.logonecomm(dw, "\1C ")
-	c <~ dw
+	//c <~ dw
 	(.buildbutton isnt enabled)
 	(.buildbutton isnt visible)
 	(.runbutton isnt enabled)
@@ -134,7 +131,3 @@ function PerryIDE.ActualCompile (|message| msg)
 
 target debug
 	cpp_libwrapper Speedie_Main (SpdMainFn)
-	|SpdMainFn?| Speedie_Checker = Speedie_Main
-  else
-	|SpdMainFn?| Speedie_Checker = nil
-

@@ -4,7 +4,7 @@ class PerryIDE (Window)
 	linkage: cpp_part IDE
 
 	|SpdProcess?|				Feedback
-	|SpdProcess?|				compilr
+	|Process?|					compilr
 	|string|					CompileOKString
 	|Process?|					RunCompiledApp
 	|[error]|					StartupErrors
@@ -382,27 +382,24 @@ class PerryIDE (Window)
 
 
 	function TestCompilerAlive
-		opt NoRefCounts
-		|| c = .compilr
-		if (c != nil)
-			if !.CheckCrashes(c, "compiler")
-				.compilr = nil
-			  elseif !c.CommsOpen
-				.CancelCompile("lost connection")
-		|| f = .feedback
-			.CheckCrashes(f, "feedback")
+		.CheckAlive(.compilr,  "compiler")
+		.CheckAlive(.feedback, "feedback")
 
 
-	function CheckCrashes (|SpdProcess| p, |string| what, |bool|)
+//	|| p = [.project, "--perry=bin", "--nocolor"]
+
+	function CheckAlive (|&Process| pp, |string| what)
+		|| p = *pp			#require
 		|| Stats = p.Status
 		if Stats==0
-			return true
+			return
 		|| fs = faststring()
 		fs <~ "Crashed ${Stats.SignalName} : ${p.render}\n"
 		p.status = 0
 		fs <~ p.erroroutput.getresult.FindStacktrace
 		.notify(fs, @emb + what)
 		.CancelCompile("crashed")
+		*pp = nil
 
 
 	function string.FindStacktrace (|string|)
@@ -440,8 +437,6 @@ class PerryIDE (Window)
 		.TestCompilerAlive
 		|| f = .feedback
 			.SpeedieMsgReceive(f)
-		|| c = .compilr
-			.SpeedieMsgReceive(c)
 		.UpdateSearchText
 		.UpdateStatusErrors
 		.ReadLog

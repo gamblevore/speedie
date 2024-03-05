@@ -62,7 +62,7 @@ extend PerryIDE
 					e.ActualReplaceError(str)
 
 
-	function ShowCompileErrors (|message| msg, |bool|)
+	function ShowCompileErrors (|message!| msg, |bool|)
 		|| MaybeOK = msg.last
 		if (MaybeOK == @thg and "ok")
 			.ErrorList.clear
@@ -131,12 +131,21 @@ extend PerryIDE
 		// ignore.
 	
 	
-	function Readlog
-		opt norefcounts
-		|| c = .Compilr
-			.speedietext <~ c.ReadStdOut
+	function Readlog (|bool| Killed=false)
+		|| c = .Compilr $
+		.speedietext <~ c.ReadStdOut
+		require !c.IsRunning or Killed
+		|| errs = c.ErrorOutput.GetResult
+			|| p = errs.parse
+				.ShowCompileErrors(p)
+			// notifications will pick up the err otherwise!
+		  else
+			|| msg = @tmp + "compile"
+			msg <~ (@thg, "ok")
+			.ShowCompileErrors(msg)
+		.compilr = nil
 
-	
+
 	function Say (|string| str)
 		target osx
 			if !.IsFront or SDLApp.IsBackground
@@ -170,12 +179,14 @@ extend PerryIDE
 	
 	
 	function CancelCompile (|string| why="CompiledOK")
-		.DebugIsWaitingForCompile = false
 		|| c = .Compilr
-			.Readlog
-			c.Kill(Why) // frees memory
-			.Readlog
-			.compilr = nil
+			c.Kill
+			app.Sleep(0.025) // allow pipes to work
+			.Readlog(true)
+		.RenableAfterCompile
+	
+	function RenableAfterCompile
+		.DebugIsWaitingForCompile = false
 		(.buildbutton is enabled)
 		(.buildbutton is visible)
 		(.runbutton is enabled)

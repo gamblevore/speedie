@@ -17,7 +17,10 @@ class ProcessOwner
 		
 	destructor
 		cpp_Wrapper JB_PID_Destructor
-			
+	
+	function IsRunning (|bool|)
+		return .exit >= 0
+		
 	function Register
 		cpp_wrapper JB_PID_Register
 

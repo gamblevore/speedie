@@ -182,7 +182,6 @@ function PerryIDE.ClickedTodo
 
 function fnBuildIsDead (fnConfirmCanceller)
 	if self mustbe perryide
-		.SpeedieMsgReceive(.compilr)
 		if !.IsBuilding
 			.CancelCompile
 			return true

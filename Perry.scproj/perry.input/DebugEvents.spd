@@ -166,7 +166,7 @@ function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 		r.userflags |= 1
 	
 	r.step
-	if kill or r.Exit >= 0
+	if kill or r.IsRunning
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
 	
@@ -175,7 +175,7 @@ function perryide.UpdateDebuggedApp (|bool| Kill, |bool|)
 	
 	if kill
 		.ProductOut <~ "\n(--Process Killed--)"
-	  elseif r.Exit >= 0
+	  elseif r.IsRunning
 		|| exitcode = "\n(--Exit OK--)"
 		if r.exit > 0
 			exitcode = "\n(--Exit Error: ${r.Exit}--)"
