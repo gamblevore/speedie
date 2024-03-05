@@ -44,7 +44,7 @@ function compiler.SetupEnv
 
 	errorcolors.DisableIfNoTerminal
 	error.AutoPrint = 1
-	pico.DesiredThreadCount = 1
+	pico.conf.DesiredThreadCount = 1
 	
 	if pico.parent
 		error.AutoPrint = 0

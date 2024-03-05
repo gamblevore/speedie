@@ -7964,7 +7964,7 @@ __lib__ int jb_version() {
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
 	JB_API__Init(0);
-	return JB_cPath_ReadAll(path, AllowMissingFile, 100000000);
+	return JB_CPath_ReadAll(path, AllowMissingFile, 100000000);
 }
 
 #pragma GCC visibility pop

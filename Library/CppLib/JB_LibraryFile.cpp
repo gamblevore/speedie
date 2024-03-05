@@ -22,7 +22,7 @@ static int GetFileSize(const char* filename) {
 }
 
 
-JB_String* JB_cPath_ReadAll (const char* path, bool AllowMissingFile, int MaxFile) {
+JB_String* JB_CPath_ReadAll (const char* path, bool AllowMissingFile, int MaxFile) {
     FILE* fp = fopen(path, "rb");
     if (!fp) {
         if (AllowMissingFile and errno == ENOENT) {

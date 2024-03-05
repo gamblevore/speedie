@@ -512,7 +512,7 @@ class File (String)
 				rz = rz.uniquechild(name)
 
 		function ReadCPath (|cstring| path, |bool| AllowMissingFile, |int| MaxSize = 100000000, |string|)
-			cpp_wrapper JB_cPath_ReadAll
+			cpp_wrapper JB_CPath_ReadAll
 
 		function DocumentsFolder (|file|)
 			return "~/Documents/".file			// .file calls pathfix already

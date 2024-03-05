@@ -66,7 +66,7 @@ bool JB_File_Exists( JB_String* self, bool LinkExists );
 Date JB_File_Modified( JB_File* self );
 void JB_File_ModifiedSet( JB_File* self, Date when );
 Date JB_File_Created( JB_File* self );
-JB_String* JB_cPath_ReadAll (const char* path, bool AllowMissingFile, int MaxFile);
+JB_String* JB_CPath_ReadAll (const char* path, bool AllowMissingFile, int MaxFile);
 
 int JB_File__chdir( JB_String* Path );
 JB_String* JB_File__CWD( );

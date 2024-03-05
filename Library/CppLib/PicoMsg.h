@@ -46,6 +46,33 @@ struct 			PicoConfig  {
 	int			Bits;			// The buffer-size in 1<<Bits. must be set before calling `PicoStart...()`
 };
 
+
+struct PicoGlobalConfig {
+///
+	PicoDate				TimeOut;
+/// Quits the app, if the app doesn't receive a "keep alive" signal for too long.
+/// Set TimeOut to zero, to remove the self-quit ability.
+
+///
+	bool					SuicideIfParentDies;
+/// Name is self-explanatory. Pico will exit your app with exit()... if the parent dies.
+
+///
+	int						ExitCode;
+/// This is the exit code that will be used... if the we time out, or the parent dies.
+
+///
+	int						DesiredThreadCount;
+/// Can be increased, by setting this before calling PicoStart()
+/// A value of 0 is assumed to mean 1.
+
+///
+	PicoDate				LastActivity;
+/// Useful data to check when the last activity was. Don't set this value yourself. Just read it.
+};
+
+
+
 typedef bool (*PicoThreadFn)(PicoComms* M, void* self, const char** Args);
 
 #ifndef PICO_IMPLEMENTATION
@@ -70,12 +97,11 @@ typedef bool (*PicoThreadFn)(PicoComms* M, void* self, const char** Args);
 	#include <signal.h>
 
 
-extern "C" bool				PicoStart (int Suicide);
+extern "C" bool				PicoStart ();
 
 static PicoMessage pico_next_msg (PicoMessage M) {
 	return *((PicoMessage*)(M.Data + M.Length));
 }
-
 
 struct PicoTrousers { // only one person can wear them at a time.
 	std::atomic_bool Value;
@@ -155,13 +181,13 @@ struct PicoCommList {
 
 
 static	PicoCommList			pico_list;
-static	PicoDate				pico_last_activity;
-static	std::atomic_int			pico_thread_count;
-static	int						pico_desired_thread_count = 1;
 static	const char*				pico_fail_actions[4] = {"Failed", "Reading", "Sending", 0};
-static  bool					pico_suicide;
+static	std::atomic_int			pico_thread_count;
 static  bool					pico_at_exit_done;
+static	int						pico_timeout_count;
 static  std::atomic_int         pico_sock_open_count;
+static  PicoGlobalConfig		pico_global_conf;
+static  PicoDate				pico_last_read;
 
 
 struct PicoLister {
@@ -226,12 +252,12 @@ struct PicoBuff {
 	}
 
 	void lost (int N) {
-		pico_last_activity = PicoGetDate();
+		pico_global_conf.LastActivity = PicoGetDate();
 		Tail += N;
 	}
 
 	void gained (int N) { 
-		pico_last_activity = PicoGetDate();
+		pico_global_conf.LastActivity = PicoGetDate();
 		Head += N;
 	}
 	
@@ -563,9 +589,10 @@ struct PicoComms {
 			Reading->Get((char*)&LengthBuff, 4);
 			L = LengthBuff = ntohl(LengthBuff); 
 		}
-			
+		
+		pico_last_read = PicoDate();
 		if (L <= 0)
-			return failed(EILSEQ);
+			return L < 0 and failed(EILSEQ);
 
 		if (Reading->Length() < L) return false;
 		int QS = L + sizeof(PicoMessage)*2;
@@ -609,7 +636,7 @@ struct PicoComms {
 		if (!Reading)
 			Reading = PicoBuff::New(Conf.Bits, "Read", this);
 
-		if (Reading and Sending and PicoStart(0)) return true;
+		if (Reading and Sending and PicoStart()) return true;
 		
 		return failed(ENOBUFS);
 	}
@@ -712,17 +739,33 @@ static void pico_cleanup () {
 }
 
 
+static bool pico_try_exit () {
+	if (pico_global_conf.SuicideIfParentDies and getppid() <= 1)
+		return true;
+
+	if (!pico_global_conf.TimeOut or !pico_last_read)
+		return false;
+
+	PicoDate MaxTime = pico_global_conf.TimeOut + pico_last_read;
+	auto D = PicoDate();
+	if (MaxTime >= D)
+		return false;
+
+	// let's fail a number of times, first. in case of computer-suspend
+	if (pico_timeout_count++ > 12)
+		return true;
+	
+	pico_last_read = D - (pico_global_conf.TimeOut + 64*1024);
+	return false;
+}
+
+
 static void pico_work_comms () {
 	PicoLister Items;
 	while (auto M = Items.Next())
 		M->io();
-
-	if (pico_suicide and getppid() <= 1) {
-		pico_suicide = false;
-		kill(0, SIGQUIT);
-	}
 	
-	float S = (PicoGetDate() - pico_last_activity) * (0.000015258789f * 0.005f);
+	float S = (PicoGetDate() - pico_global_conf.LastActivity) * (0.000015258789f * 0.005f);
 	pico_sleep(std::clamp(S*S, 0.001f, 0.5f));
 }
 
@@ -737,7 +780,7 @@ static int pico_any_still_sending () {
 
 
 static float PicoRemainDefault = 5.0;
-static void pico_keep_alive () {
+static void pico_keep_sending () {
 	auto Remain = PicoRemainDefault;
 	while (pico_any_still_sending() and Remain > 0) {
 		pico_sleep(0.001);
@@ -747,17 +790,15 @@ static void pico_keep_alive () {
 
 
 static void* pico_worker (void* Dummy) {
-	if (!pico_at_exit_done) {
-		pico_at_exit_done = true;
-		atexit(pico_keep_alive);
-	}
-
 	int p = pico_thread_count++;
-	pico_last_activity = PicoGetDate(); // get to work!
+	pico_global_conf.LastActivity = PicoGetDate(); // get to work!
 	while (true) {
 		pico_work_comms(); pico_work_comms(); pico_work_comms();
-		if (!p) 
+		if (!p) {
+			if (pico_try_exit())
+				exit(pico_global_conf.ExitCode);
 			pico_cleanup();
+		}
 	}
 }
 
@@ -840,10 +881,15 @@ extern "C" int PicoError (PicoComms* M) _pico_code_ (
 	return M?M->Status:-1;
 )
 
-extern "C" PicoConfig* PicoConf (PicoComms* M) _pico_code_ (
+extern "C" PicoConfig* PicoCommsConf (PicoComms* M) _pico_code_ (
 /// Gets the config struct. You can configure "noise", "timeout", "name", and the maximum unread-message queue size.
 
 	return M?&M->Conf:0;
+)
+
+extern "C" PicoGlobalConfig* PicoGlobalConf() _pico_code_ (
+// Returns the global conf struct, which allows you to set important values.
+	return &pico_global_conf;
 )
 
 extern "C" bool PicoStillSending (PicoComms* M) _pico_code_ (
@@ -854,7 +900,7 @@ extern "C" bool PicoStillSending (PicoComms* M) _pico_code_ (
 extern "C" void PicoSleepForSend (float During, float After) _pico_code_ (
 ///  Sleeps while sends occur. Useful to call last in your app.
 	PicoRemainDefault = During;
-	pico_keep_alive();
+	pico_keep_sending();
 	pico_sleep(After);
 )
 
@@ -873,20 +919,18 @@ extern "C" bool PicoHasParentSocket () _pico_code_ (
 	return getenv("__PicoSock__");
 )
 
-extern "C" void PicoDesiredThreadCount (int C) _pico_code_ (
-// Allows to choose the desired amount of threads.
-	pico_desired_thread_count = C;
-)
 
-extern "C" bool PicoStart (int Suicide) _pico_code_ (
-/// Starts the PicoMsg worker threads. The number of threads created is set via PicoDesiredThreadCount. You can pass 1 to `Suicide` param, to make the worker threads kill the app if it's parent dies. Or pass -1 to set it to false even if it was previously set. Passing 0 will leave it unchanged (defaults to not suiciding).
+extern "C" bool PicoStart () _pico_code_ (
+/// Starts the PicoMsg worker threads. The number of threads created is set via PicoDesiredThreadCount.
 
-	if (Suicide)
-		pico_suicide = Suicide > 0 and getppid() > 1;
-	if (Suicide > 1 or Suicide < -1) return true; // set suicide-only.
-	
+	if (!pico_at_exit_done) {
+		pico_at_exit_done = true;
+		atexit(pico_keep_sending);
+	}
+
+	int N = std::clamp(pico_global_conf.DesiredThreadCount, 1, 6);
 	pthread_t T = 0;   ;;;/*_*/;;;   // creeping downwards!!
-	for (int i = pico_thread_count; i < pico_desired_thread_count; i++)
+	for (int i = pico_thread_count; i < N; i++)
 		if (pthread_create(&T, nullptr, (void*(*)(void*))pico_worker, nullptr) or pthread_detach(T))
 			return false;
 

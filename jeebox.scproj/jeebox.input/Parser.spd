@@ -704,8 +704,11 @@ extend Parser
 	
 	
 	function fSyntacticComment (ParseHandler)
-		rz = parser.new( nil, @SCom, start )
-		parser.EmbeddedArg( "#/", rz, ktemporalsyx )
+//		rz = parser.new( nil, @SCom, start )
+//		parser.EmbeddedArg( "#/", rz, ktemporalsyx )
+		rz = parser.new(nil, @list, start)
+		|| Lines = parser.ParseLoopFlags( rz, "#/", kTemporalSyxNoBar )
+		rz.Func = @scom
 
 
 	function fTemporalRelSyx (ParseHandler)
@@ -804,7 +807,7 @@ ive been~running #since morning
 		// should this... make sure we get at least one?
 		
 		|| result = .Data.find( close, parser.NextStart )
-		ifn result
+		if !result
 			parser.ErrorAdd( "Missing close $close" )
 			return result
 		

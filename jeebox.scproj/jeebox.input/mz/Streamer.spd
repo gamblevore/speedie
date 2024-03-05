@@ -4,7 +4,7 @@ function StringReader.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 	expect (self!=nil) ("Nil object given to CompressInto")
 	|jbin| j = faststring.use(dest)				#require
 	if !st
-		st = &CompressionStats.All
+		st = CompressionStats.All
 	st.start
 	j <~ _JbinHeader
 	j.enter(@tmp, "µz")

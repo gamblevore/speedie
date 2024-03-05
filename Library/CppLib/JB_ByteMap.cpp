@@ -36,7 +36,7 @@ void JB_BM_Clear( ByteMap* cs, int F ) {
 	for ( int i = 0; i < 256; i++ ) {
 		if (F < 0)
 			Cache[i] = i;
-		else
+		  else
 			Cache[i] = F;
 	}
 }

@@ -60,7 +60,7 @@ extend PerryIDE
 	function Init // perryide.init
 		.size      = the~area
 		.CopyPaste = CopyPasteFlags.PasteFile
-		.onpaste   = &perryopendoc
+		.onpaste   = perryopendoc
 
 		|| LeftBG = vec4(0.125, 0.975)
 		with .toolbar 
@@ -108,7 +108,7 @@ extend PerryIDE
 			.size 			= the~width by the~bottom to 15~down
 			.copypaste	   |= copypasteflags.pastefile
 			.OnSearchWithin = PerrySearchWithin
-			.onpaste		= &PerryOpenDoc
+			.onpaste		= PerryOpenDoc
 			.newcmm				// for the hideside test
 			.sizecheckers	= "spd,txt,frag,vert,sdf" / ','
 			.NoFind			= "jb.cpp,jb.h,jb_globals.cpp".dict(',')

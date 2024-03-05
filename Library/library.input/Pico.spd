@@ -63,7 +63,7 @@ struct Pico
 
 	function Config (|&PicoConfig|)
 		// this should not allow a nil-self. why does it?
-		cpp_wrapper PicoConf
+		cpp_wrapper PicoCommsConf
 	
 	helper __Get (|float| T, |PicoMessage|)
 		nil checker
@@ -91,6 +91,9 @@ struct Pico
 
 	module
 		|?&pico| Parent_
+		function Conf (|&PicoGlobalConfig|)
+			cpp_wrapper PicoGlobalConf
+			
 		function SleepForSend (|float| During=5.0, |float| After = 0.5)
 			cpp_wrapper PicoSleepForSend
 		
@@ -100,11 +103,9 @@ struct Pico
 		function Destroy (|&&pico| Where, |Cstring| Why)
 			cpp_wrapper PicoDestroy
 
-			
 		function HasParentSocket (|bool|)
 			cpp_wrapper PicoHasParentSocket
-		function DesiredThreadCount (assigns:|int| C, |bool|)
-			cpp_wrapper PicoDesiredThreadCount
+			
 		function Create (|&pico|)
 			cpp_wrapper PicoCreate
 
@@ -124,15 +125,23 @@ struct Pico
 	
 
 struct PicoConfig
-	linkage:wrapper
-	|cstring|	Name
-	|Date|		LastRead
-	|Date|		LastSend
-	|int|		Noise
-	|float|		SendTimeOut
-	|int|		SendFailCount
-	|int|		ReadFailCount
-	|int|		QueueBytesRemaining
-	|int|		Bits
+	linkage: wrapper
+	|cstring|					Name
+	|Date|						LastRead
+	|Date|						LastSend
+	|int|						Noise
+	|float|						SendTimeOut
+	|int|						SendFailCount
+	|int|						ReadFailCount
+	|int|						QueueBytesRemaining
+	|int|						Bits
 
+
+struct PicoGlobalConfig
+	linkage: wrapper
+	|Date|						LastActivity
+	|Date|						TimeOut
+	|int|						TimeOutExitCode
+	|int|						DesiredThreadCount
+	|bool|						SuicideIfParentDies
 	
