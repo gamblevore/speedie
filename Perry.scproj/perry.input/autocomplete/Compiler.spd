@@ -146,6 +146,7 @@ extend PerryIDE
 			|| msg = @tmp + "compile"
 			msg <~ (@thg, "ok")
 			.ShowCompileErrors(msg)
+			.CompiledOK
 		.compilr = nil
 		.RenableAfterCompile
 
@@ -156,22 +157,23 @@ extend PerryIDE
 				.Talker = Process.stream("/usr/bin/say", [.name.trimext + str])
 	
 	
-	function CompileFB (|message| msg, |bool|)
+	function CompiledOK
 		|| db = .DebugIsWaitingForCompile
-		.CancelCompile
-		|| first = msg.first						#require
-		if first == @arg // an error-list
-			return .ErrorListFB(msg)
-		.CheckedOK(msg.name)
+		.CheckedOK("compile")
+		|| msg = .speedietext.text.parse
 		
-		require self isnt broken
-		|| file = @url + "file"
-		file <~ first
-		|| str = "\n\nCompiled OK!"
-		.notify(.name + str, file)
-		.say(str)
-		if db
-			.StartDebugging(first.name.file)
+		|| last = msg[@tmp, -1]
+		if last.expect(@tmp, "Product")
+			|| path = last[@nil]
+			require path.ExpectString
+			
+			|| file = @url + "file"
+			file <~ path
+			|| str = "\n\nCompiled OK!"
+			.notify(.name + str, file)
+			.say(str)
+			if db
+				.StartDebugging(path.name.file)
 				
 				
 	function Notify (|string| What, |message| response=nil)

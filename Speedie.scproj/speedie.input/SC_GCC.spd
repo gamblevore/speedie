@@ -301,17 +301,19 @@ function IsCompilerAndNeedsInstall (|bool|)
 
 
 function ExportAndInstall (|bool| CanInstall)
-	require .ShouldTransComp
-	if options.products
-		if options.products & options.pack
-			TreeAssembler.BuildPack
-		if options.products & options.native
-			.RunCppCompile~quietly
-			if CanInstall and .IsCompilerAndNeedsInstall
-				.InstallCompiler
-	.ClearThis~quietly
+	if .ShouldTransComp
+		if options.products
+			if options.products & options.pack
+				TreeAssembler.BuildPack
+			if options.products & options.native
+				.RunCppCompile~quietly
+				if CanInstall and .IsCompilerAndNeedsInstall
+					.InstallCompiler
+		.ClearThis~quietly
+		if stderr.ok
+			compiler.Package
 	if stderr.ok
-		compiler.Package
+		 printline "Product `" +.ProductPath + "`"
 
 
 // copy this... by hard-linking. this is because xcode goes around fucking up all my files
@@ -330,7 +332,7 @@ function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
-		"\nCompiling c++ to: \"${.ProductPath}\""
+		printline "\nCompiling c++ to: " + .productpath
 	
 	.CollectPico
 	.CompilingLibFiles++
@@ -377,7 +379,8 @@ function ShouldTransComp (|bool|)
 	|| p = .linkOK(.ProductPath.file)
 	if   !p   or   p.modified < scimport.recent
 		return true
-	printline p.path + " already up to date"
+	if !options.silent
+		"Already up to date"
 
 
 

@@ -275,8 +275,6 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 			.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
 		  elseif msg starts "display"
 			.DisplayFB(msg)
-		  elseif msg starts "compile" or "debug"
-			.CompileFB(msg)
 		  elseif msg starts "unused_funcs"
 			.UnusedFuncsFB(msg)
 		  elseif msg starts "log"
