@@ -43,7 +43,6 @@ JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),  
 
 void JB_Rec__NewErrorWithNode (Message* node, JB_String* Desc, JB_Object* Source);
 bool JB_Dup2 (int, int);
-void JB_FillProc (ProcessOwner* F, int C);
 
 
 JB_String* JB_App__Readline() {
@@ -155,12 +154,24 @@ static void Unblock (int fd) {
 }
 
 
+static bool PIDDied_ (ShellStream* Sh) {
+	return kill(Sh->PID, 0) != 0; // this kill function actually doesnt fucking work. FUCK UNIX!
+								  // it is breaking it's own guidelines! As usual!
+}
+
+
 static void CheckStillAlive (ShellStream* Sh) {
-	// check twice cos of signals happening during kill.
-	if (Sh->Exit == -1 and kill(Sh->PID, 0) and Sh->Exit == -1) {
-		Sh->Exit = ESRCH; // awkward case where it closed already but we missed the signal
-		Sh->Status = 0;
-//		JB_PID_UnRegister(Sh); // actually the spdprocess checker does a lot more work than this.
+	if (Sh->_Exit == -1 and PIDDied_(Sh)) {
+		int Exit = 0;
+		int PID = waitpid(-1, &Exit, WNOHANG);
+		if (PID>0) {
+			Sh->_Exit = Exit;
+		} else {
+			Sh->_Exit = 0;
+		}
+		
+		Sh->_Status = 0;
+		JB_PID_UnRegister(Sh); // actually the spdprocess checker does a lot more work than this.
 	}
 }
 
@@ -193,8 +204,8 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 		_exit(errno-!errno); // in case execvp fails
 		return false;
 	} else if (PID > 0) {
-		sh->Exit = -1;
-		sh->Status = 0;
+		sh->_Exit = -1;
+		sh->_Status = 0;
 		Sh.PID = PID;
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureErr[WR]);
@@ -264,14 +275,7 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 	
 	while (true) {
 		JB_Sh_UpdatePipes(Sh);
-		int ExitCode = 0;
-		if (Sh->Exit >= 0) break;
-		int PID = waitpid(Sh->PID,  &ExitCode,  0);		// in case sigchld handler is overridden
-		if (PID != -1) {
-			JB_FillProc(Sh, ExitCode);
-			break;
-		}
-		if (errno != EINTR)
+		if (JB_PID_Exit(Sh) != -1  or  JB_PID_Status(Sh) != 0)
 			break;
 		JB_Date__Sleep(1);
 	}
@@ -284,8 +288,8 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 		JB_Rec__NewErrorWithNode(nil, JB_FS_GetResult(ShErr), nil);
 	}
 	
-	int Signal = Sh->Status;
-	int Exit = Sh->Exit;
+	int Signal = Sh->_Status;
+	int Exit = Sh->_Exit;
 	JB_FreeIfDead(Sh);
 	if (Signal)			// died from a signal // usually its what we want, despite being mixed up
 		JB_ErrorHandleFile(self, nil, Signal, "crashed", "running");

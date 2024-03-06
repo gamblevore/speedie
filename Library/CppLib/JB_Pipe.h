@@ -10,14 +10,17 @@ extern "C" {
 
 
 JBClass( ProcessOwner, JB_RingList,
-	volatile int		Exit; // turn these into an ErrorInt2?
-	volatile int		Status;
+	volatile int		_Exit; // turn these into an ErrorInt2?
+	volatile int		_Status;
 );
 
 void JB_PID_Constructor(ProcessOwner* self);
 void JB_PID_UnRegister(ProcessOwner* self);
 void JB_PID_Destructor(ProcessOwner* self);
 void JB_PID_Register(ProcessOwner* self);
+void JB_PID_Kill (ProcessOwner* F);
+int JB_PID_Exit (ProcessOwner* F);
+int JB_PID_Status (ProcessOwner* F);
 JB_StringC* JB_Err_SignalName (int Sig);
 JB_StringC* JB_Err_Name (int Sig);
 ProcessOwner* JB_PID_Next(ProcessOwner* self);

@@ -11,48 +11,61 @@
 
 extern "C" {
 
-JB_CriticalSection	ChildFinder;
 ProcessOwner		Root;
 
 
-void JB_FillProc (ProcessOwner* F, int C) {
-	int Ex = 255; 	int Sig = 0;
-	if (WIFEXITED(C))   Ex = WEXITSTATUS(C);
-	if (WIFSIGNALED(C)) Sig = WTERMSIG(C);
-	F->Exit = Ex;
-	F->Status = Sig;
-}
-
-
-static void AddLostChild_(int PID, int ExitCode) {
+static void AddLostChild_(int PID, int C) {
 	ProcessOwner* F = JB_PID_Next(&Root);
 	while (F) {
-		if (F->PID == PID)
-			return JB_FillProc(F, ExitCode);
+		if (F->PID == PID) {
+			int Ex = 255; 	int Sig = 0;
+			if (WIFEXITED(C))   Ex = WEXITSTATUS(C);
+			if (WIFSIGNALED(C)) Sig = WTERMSIG(C);
+			if (!Ex) // in case unix is being dumb. Which happens a lot.
+				Ex = -1;
+			F->_Exit = Ex;
+			F->_Status = Sig;
+			return;
+		}
+
 		F = JB_PID_Next(F);
 	}
 }
 
 
+std::atomic_int SigChildOutStanding = 0x0000000 + 0000 -1*0; // FUCK UNIX
 void JB_SigChild (int signum) {
-	if (!JB_PID_Next(&Root)) return;
-	ChildFinder.Lock();
-
-	while (true) {
-		int ExitCode = 0;
-		int PID = waitpid(-1, &ExitCode, WNOHANG);
-		if (PID > 0) {
-			AddLostChild_(PID, ExitCode);
-		} else if (PID == 0 or errno != EINTR) {
-			break;
-		}
-	}
-
-	ChildFinder.Finish();
+	SigChildOutStanding++;
 }
 
+int JB_PID_Status (ProcessOwner* F) {
+	return F->_Status;
+}
 
+int JB_PID_Exit (ProcessOwner* F) {
+	while (SigChildOutStanding) {
+		while (true) {
+			int ExitCode = 0;
+			int PID = waitpid(-1, &ExitCode, WNOHANG);
+			if (PID > 0) {
+				AddLostChild_(PID, ExitCode);
+			} else if (PID == 0) {
+				break;
+			} else if (errno != EINTR) {
+				return -3; // error
+			}
+		}
+		SigChildOutStanding--;
+	}
+	return F->_Exit;
+}
 
+void JB_PID_Kill (ProcessOwner* F) {
+	if (F->_Exit == -1)
+		F->_Exit = 1;
+	if (F->PID > 0)
+		kill(F->PID, SIGKILL);
+}
 
 
 ////*&(^!@^*& ^^^^^^^ PiD ^^^^^^^^
@@ -63,8 +76,8 @@ void JB_PID_Constructor(ProcessOwner* self) {
 		self = &Root;
 	}
 	JB_Helper_SelfLink((JB_RingList*)self);
-	self->Status = 0;
-	self->Exit = -2;
+	self->_Status = 0;
+	self->_Exit = -2;
 }
 
 
@@ -80,9 +93,7 @@ JB_StringC* JB_Err_Name (int Err) {
 
 
 void JB_PID_Register(ProcessOwner* self) {
-	ChildFinder.Lock();
 	JB_Helper_PutAfter((JB_RingList*)(&Root), (JB_RingList*)self);
-	ChildFinder.Finish();
 }
 
 
@@ -91,9 +102,7 @@ void JB_PID_Destructor(ProcessOwner* self) {
 }
 
 void JB_PID_UnRegister(ProcessOwner* self) {
-	ChildFinder.Lock();
 	JB_Helper_Unlink((JB_RingList*)self);
-	ChildFinder.Finish();
 }
 
 ProcessOwner* JB_PID_Next(ProcessOwner* self) {

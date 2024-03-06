@@ -103,12 +103,11 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler
 
 
 function PerryIDE.ActualCompile (|string| operation)
-	if .compilr, return app.beep // wah?
+	if .compilr: return app.beep // wah?
 	
 	require .filelist.SaveAll(documentstate.saving)
 	.compilr = process.Stream(speedie, [.project, "--perry=bin", "--nocolor"])
 	require .compilr
-
 	.SpeedieText.text = ""
 	
 	(.buildbutton isnt enabled)
@@ -117,9 +116,7 @@ function PerryIDE.ActualCompile (|string| operation)
 	(.progress is visible)
 
 	is active
-	if .name ~= "Speedie.scproj"
-		.ShowCompileCutely
-		.CompileTabSelect(.speedietext, true)
+	.ShowCompileTab(.speedietext, .name ~= "Speedie.scproj")
 	.ViewAsCurr
 
 

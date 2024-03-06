@@ -216,9 +216,9 @@ function ShowCompileCutely (|bool| Always=false)
 	.ProductSep.Show
 
 	
-function ShowCompileTab (|object| tab)
+function ShowCompileTab (|object| tab, |bool| always) // showtab
 	.ShowCompileCutely
-	.CompileTabSelect(tab, true)
+	.CompileTabSelect(tab, always)
 
 
 function OutText (|textview|)

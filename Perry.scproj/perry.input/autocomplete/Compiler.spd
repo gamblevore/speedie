@@ -87,9 +87,9 @@ extend PerryIDE
 				h.name = ""
 
 	function Compile (|string| operation)
-		if .isBuilding
+		if .isBuilding // they pressed it twice
 			if .ProductSep.div.Collapsed
-				return .ShowCompileTab(.SpeedieText)
+				return .ShowCompileTab(.SpeedieText, true)
 			require ClickedCancel(.BuildButton)
 		.ActualCompile(operation)
 			
@@ -147,6 +147,7 @@ extend PerryIDE
 			msg <~ (@thg, "ok")
 			.ShowCompileErrors(msg)
 		.compilr = nil
+		.RenableAfterCompile
 
 
 	function Say (|string| str)
@@ -186,7 +187,8 @@ extend PerryIDE
 			c.Kill
 			app.Sleep(0.025) // allow pipes to work
 			.Readlog(true)
-		.RenableAfterCompile
+		  else
+			.RenableAfterCompile
 	
 	function RenableAfterCompile
 		.DebugIsWaitingForCompile = false
