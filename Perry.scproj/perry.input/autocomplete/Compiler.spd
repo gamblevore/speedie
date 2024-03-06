@@ -165,16 +165,15 @@ extend PerryIDE
 		|| last = msg[@tmp, -1]
 		if last.expect(@tmp, "Product")
 			|| path = last[@nil]
-			require path.ExpectString
-			
-			|| file = @url + "file"
-			file <~ path
-			|| str = "\n\nCompiled OK!"
-			.notify(.name + str, file)
-			.say(str)
-			if db
-				.StartDebugging(path.name.file)
-				
+			if path.ExpectString
+				|| file = @url + "file"
+				file <~ path
+				|| str = "\n\nCompiled OK!"
+				.notify(.name + str, file)
+				.say(str)
+				if db
+					.StartDebugging(path.name.file)
+					
 				
 	function Notify (|string| What, |message| response=nil)
 		|| c = what
