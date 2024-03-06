@@ -45,7 +45,7 @@ class SpdProcess (Process)
 	helper ChildAlive (|bool|)
 		if .SubProcess
 			return .CommsOpen
-		if .exit == -1
+		if .isrunning
 			return true
 
 
@@ -152,11 +152,11 @@ class SpdProcess (Process)
 		nil checker // shouldn't be necessary
 		require .CommsOpen
 		if .WeAreParent
-			return .exit == -1
+			return .isrunning
 		return app.ParentID > 1
 			
 	function Deactivate
-		|| ChAlive = .Exit == -1
+		|| ChAlive = .isrunning
 		if .CommsOpen and !ChAlive	// inconsistant...
 			.handledied				// disconnect comms
 		if ChAlive

@@ -491,8 +491,9 @@ function InstallOne (|file| test)
 function InstallCompiler
 	"Installing Speedie: $__time_id__"
 
-	|| dest = Compiler.Projects.child("Terminal/Speedie")
-	.ProductPath.File.MoveTo( dest )
+	// so that the (product `bla`) prints properly =)
+	options.output_path = Compiler.Projects.child("Terminal/Speedie")
+	.ProductPath.File.MoveTo( options.output_path )
 
 	FlowControl.Disabled++
 	.InstallOne Cpp_Export.CppProduct
