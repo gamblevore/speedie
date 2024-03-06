@@ -313,7 +313,7 @@ function ExportAndInstall (|bool| CanInstall)
 		if stderr.ok
 			compiler.Package
 	if stderr.ok
-		 printline "Product `" +.ProductPath + "`"
+		 .PrintProduct("Product")
 
 
 // copy this... by hard-linking. this is because xcode goes around fucking up all my files
@@ -332,7 +332,7 @@ function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
-		printline "\nCompiling c++ to: " + .productpath
+		.PrintProduct("\nCompiling c++ to")
 	
 	.CollectPico
 	.CompilingLibFiles++

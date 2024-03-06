@@ -961,6 +961,10 @@ function Stage (|string| name, |bool|)
 	return true
 
 
+function @transcompiler.PrintProduct (|string| s)
+	printline (s + " `") + (transcompiler.ProductPath + "`")
+
+
 function IsTest (|bool|)
 	return (App.fileName contains "Test")
 

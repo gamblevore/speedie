@@ -600,31 +600,32 @@ class TextView (GUIControl)
 			if key.IsAccept:			return .NewLine
 			if .ClickOutsideCloses and key.IsCancel
 				return .CancelEditing
-			if key is left:				return .MoveSel(-1)
-			if key is section:			return .SectionKey
-			if key is right:			return .MoveSel(1)
 			if key is LEFTBRACKET:		return .tabIndent(-1, "\t")
 			if key is RIGHTBRACKET:		return .TabIndent(1, "\t")
 			if (key is tab) and !keys.option
 				return .trytab
 			if key iscmd keys.SLASH:	return .CommentSlash(false)
 			if key iscmd keys.Num8:		return .CommentSlash(true)
-			if key is pageup:			return .MoveSelLine(-1, 1)
-			if key is pagedown:			return .MoveSelLine( 1, 1)
-			if key is up:				return .MoveSelLine(-1, 0)
-			if key is down:				return .MoveSelLine( 1, 0)
-			if key is home:				return .jump(0)
-			if key is end:				return .jump(.text.length)
 			if key is delete:			return .DeleteKey(keys.shift)
 			if key is ForwardDELETE:	return .DeleteKey(!keys.shift)
-			if (key iscmd keys.x) or (key is cut)				// select all
+			if (key iscmd keys.x) or (key is cut)					// select all
 				return .DoCut
-			if (key iscmd keys.z) or (key is undo or again) 	// select all
+			if (key iscmd keys.z) or (key is undo or again) 		// select all
 				return .DoUndo(!keys.shift)
 
-		if (key iscmd keys.c) or (key is copy)					// copy
+		if key is left:				return .MoveSel(-1)
+		if key is section:			return .SectionKey
+		if key is right:			return .MoveSel(1)
+		if key is pageup:			return .MoveSelLine(-1, 1)
+		if key is pagedown:			return .MoveSelLine( 1, 1)
+		if key is up:				return .MoveSelLine(-1, 0)
+		if key is down:				return .MoveSelLine( 1, 0)
+		if key is home:				return .jump(0)
+		if key is end:				return .jump(.text.length)
+
+		if (key iscmd keys.c or keys.x) or (key is copy or cut)		// copy
 			return .DoCopy
-		if (key iscmd keys.a) or (key is select)				// select all
+		if (key iscmd keys.a) or (key is select)					// select all
 			return .DoSelectAll
 	
 	
