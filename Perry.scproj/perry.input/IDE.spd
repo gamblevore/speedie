@@ -242,8 +242,11 @@ class PerryIDE (Window)
 					fs <~ "no source found"
 		
 		  elseif i == 3
-			fs <~ "Obj ${app.ObjMemory.strsize}   Str ${app.stringmemory.strsize}   Img ${app.OtherMemory.strsize}"
-			
+			|| PS = PicoGlobalStats.Read 
+			fs <~ "Obj ${app.ObjMemory.strsize}   "
+			fs <~ "Str ${app.stringmemory.strsize}   "
+			fs <~ "Img ${app.OtherMemory.strsize}   "
+			fs <~ "Pico ${PS.OpenPicos}/${PS.OpenSockets}"
 		return fs
 
 

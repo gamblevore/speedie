@@ -72,6 +72,12 @@ struct PicoGlobalConfig {
 };
 
 
+struct PicoGlobalStats {
+	int			TimeOutCount;
+	int         OpenSockets;
+	int			OpenPicos;
+};
+
 
 typedef bool (*PicoThreadFn)(PicoComms* M, void* self, const char** Args);
 
@@ -907,6 +913,12 @@ extern "C" void PicoSleepForSend (float During, float After) _pico_code_ (
 extern "C" bool PicoCanGet (PicoComms* M) _pico_code_ (
 /// Returns if we either HAVE unread messages, or MIGHT get them in the future (That is, it is not closed)
 	return M?M->CanGet():false;
+)
+
+extern "C" void PicoStats (PicoGlobalStats* F) _pico_code_ (
+	F->TimeOutCount = pico_timeout_count;
+	F->OpenSockets  = pico_sock_open_count;
+	F->OpenPicos    = __builtin_popcountll(pico_list.Map); 
 )
 
 extern "C" bool PicoIsParent (PicoComms* M) _pico_code_ (
