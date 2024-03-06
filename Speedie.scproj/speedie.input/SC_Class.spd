@@ -272,7 +272,6 @@ function LoadClassName (|message| node, |string|)
 
 // maybe better to make an init func for this...
 |Message| ConstrNew
-|Message| ConstrLayerNew2
 
 ConstrNew = `function New () {
 	flow off
@@ -282,15 +281,6 @@ ConstrNew = `function New () {
 	return __rz__
 }`.ParseClean
 
-ConstrLayerNew2 = `function NewWithLayer (|MemoryLayer| _L) {
-	visible false
-	flow off
-	cpp_part NewWithLayer
-	|| __rz__ = LayerAlloc(_L)|type|
-	if __rz__?|bool|
-		__rz__.Constructor()
-	return __rz__
-}`.ParseClean
 }
 
 
@@ -370,21 +360,10 @@ function CreateConstructors
 		for f in con
 			if f.cls == self // role messageroot doesnt need an allocator
 				.NewClassNew( f, ConstrNew!.copy(f.source)      , 0        )
-				.NewClassNew( f, ConstrLayerNew2!.copy(f.source), functionType.Layer )
 	
 	if !.IsRole
 		|| NeedsDestructor = .IsObject or (.IsStruct and .HasObjectProperties)
 		.DestructorFunc = .FindAllocFunc( "Destructor", !NeedsDestructor )
-
-
-//function RootName (|string|)
-//	opt norefcounts
-//	|| c = self
-//	while
-//		|| s = c.super
-//		if !s or s == typeobject: exit
-//		c = s
-//	return c.name
 
 
 function FindSpecialFunc (|string| keyword, |bool| CheckParents, |SCFunction|)
