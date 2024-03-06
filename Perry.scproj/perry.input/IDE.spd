@@ -87,6 +87,7 @@ class PerryIDE (Window)
 	|bool|						InConstructor
 	|bool|						ModifiedForCompile
 	|bool| 						IsGraphics
+	|byte|						PopupReason
 
 		
 	function UpdateStatusErrors
@@ -381,18 +382,16 @@ class PerryIDE (Window)
 					fl.SmartName = "file".pluralize(fl.LastFileCount)
 
 
-	function TestCompilerAlive
-		.CheckAlive(.compilr,  "compiler")
-		.CheckAlive(.feedback, "feedback")
+	function TestCompilerAlive (|bool|)
+		.CheckNotCrashed((&.feedback)|&process|, "feedback")
+		return .CheckNotCrashed(.compilr,  "compiler")
 
 
-//	|| p = [.project, "--perry=bin", "--nocolor"]
-
-	function CheckAlive (|&Process| pp, |string| what)
+	function CheckNotCrashed (|&Process| pp, |string| what, |bool|)
 		|| p = *pp			#require
 		|| Stats = p.Status
 		if Stats==0
-			return
+			return true
 		|| fs = faststring()
 		fs <~ "Crashed ${Stats.SignalName} : ${p.render}\n"
 		p.status = 0

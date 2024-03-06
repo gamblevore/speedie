@@ -368,7 +368,8 @@ module SDLApp
 	
 	
 	function Init (|ivec2| s=(414,256)) // startup
-		pico.start(-1) // erase speedy setting pico to suicide...
+		pico.conf.suicideifparentdies = false
+		pico.start
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
 		require !.framelength
@@ -432,7 +433,7 @@ module SDLApp
 				return w
 	
 	
-	helper FrameAndEvents (|sdlactivity|)	
+	helper FrameAndEvents (|sdlactivity|) // frameevents
 		while .Event.Poll
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
@@ -634,8 +635,10 @@ module SDLApp
 		notifications.CheckForDisappear
 		.StartResize
 		|| Dlg = .DialogIsOpen
+		|| Now = date()
 		for w  in  window.all
 			w.FixFocus
+			w.RunTasks(now)
 			if !dlg or w.IsLiveAction // stop needless updates
 				w.__FrameUpdate__(dlg or w.openedmenu or .IsBackground)
 		.StartResize

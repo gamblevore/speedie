@@ -40,7 +40,7 @@ class Array (saveable)
 		if .marker < .length
 			return self[.marker++]
 	
-	setter Next (||)
+	setter Next (|...!|)
 		self[.marker++] = value
 
 	function Prev (||)
@@ -57,10 +57,7 @@ class Array (saveable)
 		.length = .length - 1
 	
 	function Pop (||)
-		|| n = .length$
-		n--
-		rz = self[n]
-		.length = n
+		cpp_wrapper JB_Array_Pop
 
 	function SetAt (|...!| c, |int| i)
 		|| n = .length
@@ -97,7 +94,8 @@ class Array (saveable)
 	function Remove (|int| Pos)
 		cpp_wrapper JB_Array_Remove
 
-	function SmartRemove (|int| Pos)
+	function FastRemove (|int| Pos)
+		opt norefcounts
 		|| p = .pop
 			self[pos] = P
 
@@ -120,8 +118,8 @@ class Array (saveable)
 	function Swap (|int| i, |int| j)
 		cpp_wrapper JB_Array_Swap
 	
-	syntax Access (|int| pos, assigns:||)
-		cpp_wrapper JB_Array_ValueSet
+	syntax Access (|int| pos, assigns:|...!|)
+		cpp_wrapper JB_Array_ValueSet // disable set nil? makes internals simpler/faster!
 	
 	syntax Access (|int| pos, ||)
 		nil checker
@@ -130,14 +128,6 @@ class Array (saveable)
 	syntax Access (||)
 		cpp_part Rand
 		return self[.length.now]
-	
-	function Reserve (|int| Needed)
-		if .length < Needed
-			.length = Needed
-		
-	syntax Access (|syntax| pos, assigns:||)
-		.reserve(1 + pos|int|)
-		self[pos|int|] = Value
 	
 	syntax cast (|bool|)
 		return .length > 0

@@ -91,10 +91,10 @@ extend PerryIDE
 			if .ProductSep.div.Collapsed
 				return .ShowCompileTab(.SpeedieText)
 			require ClickedCancel(.BuildButton)
-		.ActualCompile(.CompileMsg(operation, true))
+		.ActualCompile(operation)
 			
 	
-	function CompileMsg (|string| operation, |bool| SaveAll, |message|)
+	function CheckMsg (|string| operation, |bool| SaveAll, |message|)
 		if SaveAll
 			require .filelist.SaveAll(documentstate.saving)
 		|| cmd = @tmp + operation
@@ -135,11 +135,14 @@ extend PerryIDE
 		|| c = .Compilr $
 		.speedietext <~ c.ReadStdOut
 		require !c.IsRunning or Killed
+
+		|| OK = .TestCompilerAlive
+
 		|| errs = c.ErrorOutput.GetResult
 			|| p = errs.parse
 				.ShowCompileErrors(p)
 			// notifications will pick up the err otherwise!
-		  else
+		  elseif OK
 			|| msg = @tmp + "compile"
 			msg <~ (@thg, "ok")
 			.ShowCompileErrors(msg)

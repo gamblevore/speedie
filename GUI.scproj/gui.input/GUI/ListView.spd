@@ -514,7 +514,7 @@ class ListView (GUIControl) {
 			.ScrollDrawTimer = 0
 			return .HasFocus
 		
-		return .MouseMovedScroll(p, ._ScrollDrawTimer)
+		return .HandleMouseInScrollArea(p, ._ScrollDrawTimer)
 	
 	
 	behaviour LostFocus

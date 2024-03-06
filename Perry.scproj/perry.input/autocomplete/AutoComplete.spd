@@ -159,6 +159,8 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 	  else
 		.PopupDisplay.ExpectsParse = textview.probablyjeebox
 		(f is style2)
+		.popupreason = 1
+		// using guitask would be better... sigh.
 		.DisplayInPopup(f.render, display.name contains "forced")
 
 
@@ -169,10 +171,13 @@ function PerryIDE.DisplayStr (|message| f, |bool|)
 	|| orig = .EditMe[r]
 	if f.name != orig
 		.PopupDisplay.expectsparse = 0
+		.popupreason = 1
+		// using guitask would be better... sigh.
 		.DisplayInPopup(f.name, false)
 
 
 function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec4(),  |ivec2| Corner=.PopupDisplayCorner)
+	// using guitask would be better... sigh.
 	|| sizer_str = s.wrap(80)
 	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 2)
 	(size.x max= 40)
@@ -188,26 +193,32 @@ function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec
 	  else
 		color = def
 	pg.bg = color
-	pg.edge	= color * vec4(1.0, 0.5)
+	color = mix(colors.white(0.5), color, 0.8)
+	pg.edge	= color
 	.StartPopupVis(instant)
 
 
 function PerryIDE.StartPopupVis (|bool| instant)
 	if !.PopupDateOn
+		// using guitask would be better... sigh.
 		|| add = (-10.0s, 0.5s)(instant or keys.CmdAgo(2s))
 		.PopupDateOn = date.now + add
 	.PopupDisplayFadeIn
 
 
 function PerryIDE.PopupDisplayFadeIn
+	// using guitask would be better... sigh.
 	(.PopupDisplay is visible) = .PopupDisplayFadeInSub
 
 
 function PerryIDE.PopupDisplayFadeInSub (|bool|)
 	require .PopupDisplay.text
-	|| alpha = (.PopupDateOn.ago.seconds|float|*2.0).clamp
-	if (alpha < 0.5) and !keys.cmd
+	|| ago = .PopupDateOn.ago.seconds|float|
+	|| alpha = (ago*2.0).clamp
+	if (alpha < 0.5) and !keys.cmd and .PopupReason == 1
 		.PopupDateOn = 0
+	if keys.shift
+		return true
 	require alpha
 
 	|| g = .PopupDisplay.GNormal
@@ -221,9 +232,10 @@ function PerryIDE.PopupDisplayFadeInSub (|bool|)
 
 function PerryIDE.PopupHide
 	.PopupDateOn = 0
-	.PopupDisplay.text = ""
-	.lastextrainfo = nil
-	.PopupDisplay.visible = false
+	if .popupdisplay is visible
+		.PopupDisplay.text = ""
+		.lastextrainfo = nil
+		.PopupDisplay.visible = false
 	
 
 
@@ -321,18 +333,19 @@ function PerryIDE.InteractUpdate
 	.popuphide
 
 
-function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err,  |string| reason)
+function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err, |string| reason, |bool| Instant)
 	opt norefcounts
 	if err
+		// using guitask would be better... sigh.
 		.lastextrainfo = nil
 		.PopupDisplay.ExpectsParse = 0
-		.DisplayInPopup(err.name, true, err.severity.color, P)
+		.PopupDisplayCorner = p
+		.popupreason = 2
+		.DisplayInPopup(err.name, Instant, err.severity.color, P)
 		return 
 	
 	if !M
-		.popuphide
-		.lastextrainfo = nil
-		return
+		return .popuphide
 
 	require (M != .lastextrainfo) or (.popupdisplay isnt visible)
 	|| s = .feedback
@@ -343,7 +356,7 @@ function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err,  |string| 
 
 function OnShowExtraInfo (GUITextShowEvent)
 	opt NoRefCounts
-	.ide.ShowExtraInfo(LeftCorner, msg, err, reason)
+	.ide.ShowExtraInfo(LeftCorner, msg, err, reason, !WasDelayed)
 	
 
 function JumpToDefinition (GUIAction)

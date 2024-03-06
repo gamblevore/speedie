@@ -24,7 +24,6 @@ class TextView (GUIControl)
 	|int|						ClickedPos
 	|int|						AutoCompleteBack
 	|string|					AutoCompleteString
-	|Error?|					MyError
 	|TextViewLine|				_Start
 	|TextViewLine|				_Lines
 	|ivec3|						_Reclaim		
@@ -33,11 +32,14 @@ class TextView (GUIControl)
 	|GUIKeyEvent?|				OnKeyDown
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
-	|GUITextErrorSelected?|		OnSelError
 //	|GUITextValidate|			OnValidate
-	|GUITextShowEvent?|			OnShowExtraInfo
 	|dictionary?|				ColoriseAsRoot // a callback would be better
 	|Document?|					_Viewing
+
+	|Error?|					MyError
+	|Error?| 					_ErrorExtraInfo
+	|GUITextShowEvent?|			OnShowExtraInfo
+	|GUITextErrorSelected?|		OnSelError
 
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
 		super.Constructor(p)
@@ -281,18 +283,22 @@ class TextView (GUIControl)
 	helper TypingPlaceTry (|intrange| result, |bool|insert, |textviewline| d)
 		opt norefcounts
 		if .TypingPlaceDirect(result)
-			.TypingPlaceSucceed(insert, d)
+			.TypingPlaceChanged(insert, d)
 
 
-	helper TypingPlaceSucceed (|bool| insert, |textviewline| d)
+	helper TypingPlaceChanged (|bool| insert, |textviewline| d)
 		if .hasfocus
 			sdlapp.selchanged
 		if !.IsCleared
 			(.OnSelChanged)(self, 0, insert)?
-		if d and d.drawerror
+		require d
+		|| err = d.DrawError
 			(.OnSelError)(self, d)?
-
-		
+			if .OnShowExtraInfo
+				.ShowErrorInfo(d.position, err, false)
+				._ErrorExtraInfo = nil
+	
+	
 	helper FindEnd (|ind| x,  |int| i,  |int|)
 		opt norefcounts
 		|| f = csAntiWords!
@@ -1593,47 +1599,61 @@ class TextView (GUIControl)
 	
 	
 	behaviour MouseMove
-		.ShowExtraInfo(p)
-		return .MouseMovedScroll(p, ._ScrollDrawTimer)
+		.ShowExtraInfo(p, true)
+		return .HandleMouseInScrollArea(p, ._ScrollDrawTimer)
 	
 	
 	helper ShowNoExtra
-		(.OnShowExtraInfo)(self, (0,0), nil, nil, "")?
+		(.OnShowExtraInfo)(self, (0,0), nil, nil, "", false)?
 	
 
-	helper ShowExtraInfo (|ivec2| P)
+	helper ShowExtraInfo (|ivec2| P, |bool| MouseMove=false)
 		opt NoRefCounts
-		|| fp = .OnShowExtraInfo
-		require fp and .isjeeboxmode
+		require .OnShowExtraInfo and .isjeeboxmode
 
 		|textviewline| d
 		// +(0,2) cos its too easy to slip down to lower line
 		|| B = .ByteAtXY(P+(0,2), d).x
 
-		if !keys.cmd
-			if d and d.DrawError
-				.ShowErrorInfo(b, d.drawerror)
-			  else
-				.ShowNoExtra
-		  else
+		if keys.cmd
 			.ShowExtraInfoAtPos(B, "", nil)
-	
+		  elseif d and d.DrawError
+			.ShowErrorInfo(b, d.drawerror, mousemove)
+		  else
+			._ErrorExtraInfo = nil
+			.ShowNoExtra
+		
 
-	helper ShowErrorInfo (|int| b, |error| err)
-		|| P2 = .XYOfchar(b)
+	helper ShowErrorInfo (|int| b, |error| err, |bool| Later)
+		opt norefcounts
+		// Show this ... a few seconds later.
+		// Either we make all func pointers delayable... making a generic system via the compiler
+		// Or we squeeze this in somehow. I'd prefer a generic system. but thats like 2 full days work.
+		// not sure which is less painful :[
+		
+		// OK... So... somehow... something isnt firing. is that it? lets see.
+		|| P2 = .XYOfChar(B)
 		P2.x = -1
-		(.OnShowExtraInfo!)(self, P2, nil, err, "error")
+		if !later
+			(.OnShowExtraInfo!)(self, P2, nil, err, "error", false)
+			return
+			
+		require ._ErrorExtraInfo != err
+		|| T = .StartTask(DelayedShowError, 0.33s)
+			t.param = err
+			T.Rect = (P2, P2)
+			._ErrorExtraInfo = err
 
 	
 	helper ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)
 		opt NoRefCounts
-		|| fp = .OnShowExtraInfo$
-		|| xy = (0, 0)
-		|| M = .ClickedMsg(B)
-			xy = .XYOfChar(M.position)
-		(fp)(self, XY, M, err, reason)
-
-
+		|| fp = .OnShowExtraInfo
+			|| xy = (0, 0)
+			|| M = .ClickedMsg(B)
+				xy = .XYOfChar(M.position)
+			(fp)(self, XY, M, err, reason, false)
+	
+	
 	helper StartLine (|TextViewLine|)
 		return ._Start
 	
@@ -1642,20 +1662,21 @@ class TextView (GUIControl)
 		cpp_part StartAtLine
 		.StartWithoutScrollDraw = d
 		.ScrollDrawTimer = ScrollInfo.timer
-
-
+	
+	
 	function StartLine (assigns:|int| v)
 		cpp_part StartAtInt
-		.StartLine = .needfirst.movecapped(V)!
-		
+		.StartLine = .needfirst.MoveCapped(V)!
+	
+	
 	function NeedFirst (|textviewline|)
 		opt norefcounts
 		|| f = ._lines.first
 			return f
 		rz = TextViewLine(0)
 		._lines <~ rz
-		
-
+	
+	
 	helper StartWithoutScrollDraw (assigns:|TextViewLine!| d)
 		opt norefcounts
 		|| last = ._lines.last!.movecapped(3 - .maxvisiblelines)!
@@ -1667,7 +1688,7 @@ class TextView (GUIControl)
 	helper ReallySetStart (|textviewline!| d)
 		opt norefcounts
 		._Start = d
-		.ShowNoExtra
+		.ShowExtraInfo(sdlapp.mousexy, false)
 		if d.position >= 0
 			|| doc = .document
 				doc.scrollpos = d.position
@@ -1747,7 +1768,7 @@ class TextView (GUIControl)
 		require (expect >= 2)
 		require !.singleline
 // Just segment for longer files. No one needs 10000KB file word-wrapped.
-		return .text.length < 1MB	// my largest jb file is 60k! 
+		return .text.length < 0.5MB	// my largest jb file is 60k! 
 
 
 	function ParsedMessage (|message|)
@@ -1860,8 +1881,6 @@ class TextView (GUIControl)
 				exit
 
 		.EndPrepare(d, StayAtEnd, pos)
-
-	
 
 
 	function EndPrepare (|TextViewLine| d, |bool| StayAtEnd, |int| pos)
@@ -2014,6 +2033,13 @@ class TextView (GUIControl)
 		
 		function MakeAnti (|charset|)
 			return jeebox.CSWordMiddle.Invert
+
+		helper DelayedShowError (GUITaskFunc)
+			opt NoRefCounts
+			if self isa textview
+				|| err = task.Param as error
+					|| P = task.Rect.xy
+					(.OnShowExtraInfo!)(self, P, nil, err, "error", true)
 
 
 helper string.InsertTrim (|ivec2|)

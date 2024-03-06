@@ -37,7 +37,7 @@ function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string|
 
 
 function PerryIDE.SendFeedbackStr (|string| op)
-	.SendFeedbackMsg(.compilemsg(op, false))
+	.SendFeedbackMsg(.checkmsg(op, false))
 	
 
 function PerryIDE.DateWrap (|message| msg, |message|)
@@ -81,15 +81,14 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler
 	// 
 	|SpdProcess| spd 
 	
-	target debug
-		|| SubProcess = Speedie_Checker
-		Speedie_Checker = nil
-		
-		if SubProcess?
-			if !.UsingSpdLib
-				.UsingSpdLib = true
-				f.name = name.TrimExt + "()"
-			spd = SubProcess.RunThreaded(p)
+	if !SpdLibAlreadyInUse
+		SpdLibAlreadyInUse = true
+		target debug {
+		if !.UsingSpdLib
+			.UsingSpdLib = true
+			f.name = name.TrimExt + "()"
+		spd = (Speedie_Main).RunThreaded(p)
+		}
 
 	if !spd?
 		|| proc = speedie.resolve
@@ -103,20 +102,15 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler
 	return spd
 
 
-function PerryIDE.ActualCompile (|message| msg)
-	require msg
-	debugger 
-	beep "oof"
-	return 
-	|| c = .compilr//.CompilerInit(.compilr, true)
-	if c == nil
-		isnt active
-		return
-	.compilr = c
+function PerryIDE.ActualCompile (|string| operation)
+	if .compilr, return app.beep // wah?
+	
+	require .filelist.SaveAll(documentstate.saving)
+	.compilr = process.Stream(speedie, [.project, "--perry=bin", "--nocolor"])
+	require .compilr
 
 	.SpeedieText.text = ""
 	
-	//c <~ dw
 	(.buildbutton isnt enabled)
 	(.buildbutton isnt visible)
 	(.runbutton isnt enabled)
@@ -131,3 +125,4 @@ function PerryIDE.ActualCompile (|message| msg)
 
 target debug
 	cpp_libwrapper Speedie_Main (SpdMainFn)
+|| SpdLibAlreadyInUse = false

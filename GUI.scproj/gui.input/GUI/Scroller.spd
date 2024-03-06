@@ -86,7 +86,7 @@ function InScrollArea (|ivec2| p, |bool|)
 	return (xr contains p.x) and (self contains p)
 
 
-function MouseMovedScroll (|ivec2| p, |&uint| timer, |bool|)
+function HandleMouseInScrollArea (|ivec2| p, |&uint| timer, |bool|)
 	if .HasFocus or *timer
 		if .InScrollArea(p)
 			*timer = ScrollInfo.TimerStart + date.ticks

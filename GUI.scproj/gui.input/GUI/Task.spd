@@ -1,0 +1,59 @@
+
+
+
+datatype GuiTaskState (byte)
+	flags
+		|GuiTaskState| 
+		Started
+		Finished
+	syntax is (|GuiTaskState| t, |bool|)
+		return self & t
+
+
+prototype GUITaskFunc (|GUIControl| self,  |GUITask| Task,  |GUITaskState| State,  |bool|)
+function Guicontrol.StartTask (|GUITaskFunc| fn,  |date| Delay,  |date| Durr=0,  |GUITask|)
+	opt	norefcounts
+	|| w = .Window$
+	|| DS = date()
+	|| D = DS + delay
+	rz = GUITask(fn, self, D, D + Durr)
+	w.Tasks <~ rz
+
+
+class GUITask
+	|GuiTaskState| 		State
+	|GUITaskFunc|		Func
+	|GUIControl| 		Upon
+	|object?| 			Param
+	|Date|				StartTime
+	|Date| 				EndTime
+	|ivec4| 			Rect
+	
+	constructor	(|GUITaskFunc| Func, |GUIControl| Upon, |date| Start,  |Date| End)
+		.func = func
+		.Upon = Upon
+		.EndTime = End
+		.StartTime = Start
+	
+	
+	function RunTask (|bool|)
+		opt NoRefCounts
+		if .upon.parent
+			|| d = date()
+			if d >= .EndTime
+				require .state isnt finished
+				.State |= GuiTaskState.Finished
+			rz = (.func)(.upon, self, .state)
+			.State |= GuiTaskState.Started
+			if .state is Finished
+				rz = false
+	
+	
+	function Window.RunTasks (|date| now)
+		opt norefcounts
+		|| i = 0
+		while (|| p = .Tasks[i])
+			if (p.starttime < now) and !p.runtask
+				.Tasks.FastRemove(i)
+			  else
+				i++
