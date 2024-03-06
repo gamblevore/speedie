@@ -227,6 +227,9 @@ class MemoryLayer
 
 	function Use
 		cpp_wrapper JB_Mem_Use
+	
+//	syntax Using (|memorylayer|) // need the default for this class... sigh
+		
 
 
 

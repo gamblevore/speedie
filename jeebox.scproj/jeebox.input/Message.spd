@@ -78,15 +78,20 @@ class Message (RingTree)
 	
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
-//		require self
-		|| L = (pos_msg.memorylayer, .MemoryLayer)(pos_msg)
-				
-		rz = message.NewWithLayer(L, self)				// looks better
-		if pos_msg
-			rz.position = pos_msg.position
-			rz.rangelength = pos_msg.rangelength
+		|| Using = pos_msg
+		using := self
+		using Using
+			rz = .copysub(pos_msg)
+	
+	
+	helper CopySub (|message?| P = nil, |Message!|)
+		opt norefcounts
+		rz = message(self)
+		if P
+			rz.position = P.position
+			rz.rangelength = P.rangelength
 		for v in self
-			rz <~ v.Copy(pos_msg)
+			rz <~ v.CopySub(P)
 
 
 	operator matches (|message| m, |bool|)
@@ -1150,12 +1155,6 @@ class Message (RingTree)
 			v.position = -1
 
 	module
-/*		function SuperNew (|memorylayer| m, |message|)
-	// new design... for simpler constructors
-			if m == nil
-				return message()
-			return message.newwithlayer(m)
-*/
 		function Dictionary.Syntax (|string| Key, ||)
 			return self[key.SyntaxLower] 
 		

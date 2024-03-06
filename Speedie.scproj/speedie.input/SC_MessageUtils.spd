@@ -319,16 +319,14 @@ function Message.NeedMarker (|String| s, |bool| b, |Message|)
 		.First = rz
 
 
-function message.WipeCopy (|message| oof, |Message!|)
-	opt norefcounts
+function message.WipeCopy (|message?| oof, |Message!|)
 	cpp_part LayerWipeCopy
 	if !oof
-		return .WipeCopy
-	|| L = oof.memorylayer
-	rz = Message.NewWithLayer(L, self) // looks better
-	rz.position = -1
-	for v in self
-		rz <~ v.WipeCopy(oof)
+		return .wipecopy
+	|| old = (message).layer
+	oof.memorylayer.use
+	rz = .wipecopy
+	old.use
 
 	
 function message.WipeCopy (|Message!|)

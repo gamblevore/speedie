@@ -106,14 +106,15 @@ struct Pico
 		function HasParentSocket (|bool|)
 			cpp_wrapper PicoHasParentSocket
 			
-		function Create (|&pico|)
+		function Create (|?&pico|)
 			cpp_wrapper PicoCreate
 
 		function New  (|stringzeroterminated| name="", |int| bits=16, |&pico|)
-			rz = pico.Create
+			rz = pico.Create #expect ("Couldn't create a pico object. Too many picos.")
 			|| c = rz.config
 			c.name = name
 			c.bits = bits
+				
 			
 		function Parent (|&pico|)
 			|| p = .Parent_
@@ -121,7 +122,8 @@ struct Pico
 			require .HasParentSocket
 			rz = pico.new
 			.Parent_ = rz
-			rz.CompleteExec
+			if rz
+				rz.CompleteExec
 	
 
 struct PicoConfig

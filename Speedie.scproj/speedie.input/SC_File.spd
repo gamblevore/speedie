@@ -27,7 +27,9 @@ class SCFile (file)
 	
 	function Start_AST (|message|)
 		if .IsInternal
-			return message.newwithlayer((Message).createLayer(self), @arg, "")
+			(Message).createLayer(self).use
+			rz = message(@arg, "")
+			(message).restore
 	
 	
 	function Use

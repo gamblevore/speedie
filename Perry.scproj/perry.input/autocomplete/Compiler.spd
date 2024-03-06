@@ -169,10 +169,13 @@ extend PerryIDE
 				|| file = @url + "file"
 				file <~ path
 				|| str = "\n\nCompiled OK!"
+				|| f = path.name.file
+				if !f.exists
+					str += " But it doesn't exist :("
 				.notify(.name + str, file)
 				.say(str)
 				if db
-					.StartDebugging(path.name.file)
+					.StartDebugging(f)
 					
 				
 	function Notify (|string| What, |message| response=nil)

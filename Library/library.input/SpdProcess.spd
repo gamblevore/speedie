@@ -13,10 +13,11 @@ class SpdProcess (Process)
 	|bool|						AlreadyWarnedDied
 	|ProcessMode|				Mode
 
-	constructor	(|string| path, |?SpdMainFn| fn, |stringzeroterminated| DebugName, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
+	constructor	(|string| path, |?SpdMainFn| fn, |&pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
 		super.constructor(path) // <-- mode should be passed here
 		
 		.deathlimit = 12
+		._DebugName = path
 		.WeAreParent = path != "" or fn != nil
 		.params	= params
 		.SubProcess = fn
@@ -24,8 +25,7 @@ class SpdProcess (Process)
 		.output = (faststring(), nil)(.Mode is CaptureStdOut)
 		.erroroutput = (faststring(), nil)(.mode is CaptureOrPrintErrors)
 		.writer = FastString()
-		.pico = (pico.new(debugname), pico.parent)(.WeAreParent)
-		._DebugName = DebugName
+		.pico = pico // (pico.new(path), pico.parent)(.WeAreParent)
 
 			
 	destructor
@@ -137,7 +137,9 @@ class SpdProcess (Process)
 	function RunChild (|bool|)
 		debug_require .path
 		if !.pico.Status
-			.pico = pico.new
+			|| p = pico.new #require
+			.pico = p
+			
 		return .StartProcess(.path, .params, .pico, .output!=nil)
 
 
@@ -183,8 +185,8 @@ class SpdProcess (Process)
 		
 		function InitOwner
 			target !minilib
-				if pico.parent
-					.parent = SpdProcess("", nil, "")
+				|| p = pico.parent 
+					.parent = SpdProcess("", nil, p)
 
 		function CheckAllAlive
 			opt norefcounts
@@ -209,9 +211,11 @@ class SpdProcess (Process)
 		function RunChild (|string| app_path, |string| DebugName="", |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
 			debug_require params!=nil
 			require app_path.file.mustexist
-			rz = SpdProcess(app_path, nil, debugname, params, Mode)
-			if !rz.RunChild
-				rz = nil
+			|| pico = pico.new(app_path)
+				 // (pico.new(path), pico.parent)(.WeAreParent)
+				rz = SpdProcess(app_path, nil, pico, params, Mode)
+				if !rz.RunChild
+					rz = nil
 
 
 datatype ProcessMode (byte)
@@ -227,9 +231,10 @@ datatype ProcessMode (byte)
 prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)
 	function RunThreaded (|[string]| R = [],  |SpdProcess|)
 		|| c_args = SpdProcess.CreateArgs("", r)
-		rz = SpdProcess("", self, "SpdMainFn()", r)
-		if !rz.pico.startthread(self|picothreadfn|, 7|_voidptr|, c_args)
-			rz = nil
+		|| pico_fn = pico.new("SpdMainFn()")
+			rz = SpdProcess("SpdMainFn()", self, pico_fn, r)
+			if !rz.pico.startthread(self|picothreadfn|, 7|_voidptr|, c_args)
+				rz = nil
 
 
 prototype SpdDeathActionFn
