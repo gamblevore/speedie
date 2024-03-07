@@ -749,7 +749,10 @@ static bool pico_try_exit () {
 	if (pico_global_conf.SuicideIfParentDies and getppid() <= 1)
 		return true;
 
-	if (!pico_global_conf.TimeOut or !pico_last_read)
+	if (!pico_global_conf.TimeOut)
+		return false;
+
+	if (!pico_last_read)
 		return false;
 
 	PicoDate MaxTime = pico_global_conf.TimeOut + pico_last_read;
@@ -758,8 +761,9 @@ static bool pico_try_exit () {
 		return false;
 
 	// let's fail a number of times, first. in case of computer-suspend
-	if (pico_timeout_count++ > 12)
+	if (pico_timeout_count++ > 12) {
 		return true;
+	}
 	
 	pico_last_read = D - (pico_global_conf.TimeOut + 64*1024);
 	return false;
@@ -934,7 +938,6 @@ extern "C" bool PicoHasParentSocket () _pico_code_ (
 
 extern "C" bool PicoStart () _pico_code_ (
 /// Starts the PicoMsg worker threads. The number of threads created is set via PicoDesiredThreadCount.
-
 	if (!pico_at_exit_done) {
 		pico_at_exit_done = true;
 		atexit(pico_keep_sending);

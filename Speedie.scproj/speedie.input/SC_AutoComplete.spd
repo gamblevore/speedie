@@ -61,12 +61,15 @@ function EnterAutoComplete (|bool|)
 	require stderr.ok and perry.isopen
 	app.AllowInteruptCrash = false			// to debug perry, which runs debug speedie
 	"RespondingToCommands"					// Don't delete this... too annoying to miss.
+	if !app.ismainthread
+		"(AsLib)"
 	app.ClearCaches
 	if options.PrintLibraries
 		perry.pico.config.noise = -1
 	pico.Conf.TimeOut = 30s
 	compiler.InPerry = true
 	.PerryTalk(perry)
+	"ExitingCommands"						// this also
 	return true
 
 

@@ -136,10 +136,9 @@ class SpdProcess (Process)
 	
 	function RunChild (|bool|)
 		debug_require .path
-		if !.pico.Status
-			|| p = pico.new #require
-			.pico = p
-			
+		if !.pico.isok
+			require pico.replace(.pico)
+
 		return .StartProcess(.path, .params, .pico, .output!=nil)
 
 
@@ -194,7 +193,7 @@ class SpdProcess (Process)
 			while m
 				|| ch = m
 				m++
-				if ch.IsRunning
+				if !ch.IsRunning
 					if (ch isa SpdProcess)
 						ch.HandleDied
 					ch.UnRegister

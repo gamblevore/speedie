@@ -61,10 +61,6 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/usr/local/speedie/Perry.scproj/"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
             argument = "SpamLines.spd"
             isEnabled = "YES">
          </CommandLineArgument>

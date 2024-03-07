@@ -271,7 +271,6 @@ class Memory
 		function Unmap	 (|_voidptr| p, |int| n):						cpp_wrapper JB_munmap
 		function UsedString	 (|int64|):									cpp_wrapper JB_MemUsedString
 		function UsedOther	 (|int64|):									cpp_wrapper JB_MemUsedOther
-		function _Alloc  (|int| n, |?&byte|):							cpp_wrapper JB_malloc
 		function Zalloc  (|int| n, |?&byte|)
 			return byte.zalloc(n)
 		function Realloc (|_voidptr| b, |int| n, |?&byte|):				cpp_wrapper JB_realloc

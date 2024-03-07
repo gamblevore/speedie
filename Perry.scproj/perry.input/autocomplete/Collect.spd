@@ -51,7 +51,7 @@ function PerryIDE.DateWrap (|message| msg, |message|)
 
 function PerryIDE.SendFeedbackMsg (|message| msg)
 	require msg
-	|| fb = .CompilerInit(.feedback)			#require
+	|| fb = .FeedbackInit(.feedback)			#require
 	.feedback = fb
 	|| record = .DateWrap(msg)
 	fb <~ record
@@ -59,7 +59,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg)
 	.LogOneComm(msg, "\1C ")
 
 
-function PerryIDE.CompilerInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler
+function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler, initfeedback
 	if c
 		if !c.subprocess and C.TimedOut(5s)
 			c.Deactivate
@@ -72,7 +72,7 @@ function PerryIDE.CompilerInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler
 	|| p = [.project, "--perry=bin", "--nocolor"]
 	|| f = .projmsg[@nil]$
 	|| name = .name
-	|| Noisy = false
+	|| Noisy = false//SpdLibAlreadyInUse
 	if noisy
 		p <~ "--noisy"		
 
@@ -122,4 +122,4 @@ function PerryIDE.ActualCompile (|string| operation)
 
 target debug
 	cpp_libwrapper Speedie_Main (SpdMainFn)
-|| SpdLibAlreadyInUse = false
+|| SpdLibAlreadyInUse = true

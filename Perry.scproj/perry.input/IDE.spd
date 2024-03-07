@@ -242,10 +242,11 @@ class PerryIDE (Window)
 					fs <~ "no source found"
 		
 		  elseif i == 3
+			|| img = sdlapp.drawspace.size.area*4*2
 			|| PS = PicoGlobalStats.Read 
 			fs <~ "Obj ${app.ObjMemory.strsize}   "
 			fs <~ "Str ${app.stringmemory.strsize}   "
-			fs <~ "Img ${app.OtherMemory.strsize}   "
+			fs <~ "Img ${(app.OtherMemory+img).strsize}   "
 			fs <~ "Pico ${PS.OpenPicos}/${PS.OpenSockets}"
 		return fs
 

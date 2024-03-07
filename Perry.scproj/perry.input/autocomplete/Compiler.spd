@@ -15,8 +15,10 @@ extend PerryIDE
 		.ModifiedForCompile = false
 		.Feedback = nil
 		if .IsSpeedieCode and !.UsingSpdLib
-			.SendFeedbackStr "check"
-
+			.AskCheck
+	
+	function AskCheck
+		.SendFeedbackStr "check"
 
 	syntax is (|ListViewState| s, |bool|)
 		return .projmsg.syntaxis(s)

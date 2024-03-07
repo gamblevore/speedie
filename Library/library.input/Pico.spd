@@ -79,6 +79,11 @@ struct Pico
 	function Status (|ErrorInt|)
 		nil checker
 		cpp_wrapper PicoError
+	
+	function IsOK (|bool|)
+		nil checker
+		|| s = .status
+		return s == 0 or 255
 
 	function IsSending (|bool|)
 		cpp_wrapper PicoStillSending
@@ -100,8 +105,15 @@ struct Pico
 		function Start
 			cpp_wrapper PicoStart
 
-		function Destroy (|&&pico| Where, |Cstring| Why)
+		function Destroy (|&(?&pico)| Where, |Cstring| Why)
 			cpp_wrapper PicoDestroy
+			
+		function Replace (|&&pico| Where, |bool|)
+			|| New = pico.new #require
+			.destroy(where, "replace")
+			*where = new
+			return true
+
 
 		function HasParentSocket (|bool|)
 			cpp_wrapper PicoHasParentSocket

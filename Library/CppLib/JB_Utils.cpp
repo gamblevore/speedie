@@ -28,7 +28,6 @@ int JB_PointerSize() {
 
 
 int OutOfMemoryHappenedAlready;
-static uint  TotalAllocations;  // malloc stats get confused with OUR stats...
 static uint  TotalOtherBytes; // malloc-zones could do this, or WE COULD OURSELVES
 static uint  TotalStringBytes;
 
@@ -49,7 +48,7 @@ static allocate_result AllocateSub (int N, const void* Arr, uint* Where) {
 		Diff = -JB_msize(Arr);
 		Result = (uint8*)realloc((void*)Arr, N);
 	} else {
-		TotalAllocations++;
+		Diff+=16;
 		Result = (uint8*)calloc(1, N); // zeroed
 	}
 	if (Result) {
@@ -100,22 +99,20 @@ u64 JB_MemUsedString() {
 }
 
 u64 JB_MemUsedOther() {
-	return TotalOtherBytes + TotalAllocations*16;
+	return TotalOtherBytes;
 }
 
 
 void JB_free(const void* Arr) {
 	if (Arr) {
-		TotalAllocations--;
-		TotalOtherBytes -= JB_msize(Arr);
+		TotalOtherBytes -= (JB_msize(Arr)+16);
 		free((void*)Arr);
     }
 }
 
 void JB_FreeString(const void* Arr) {
 	if (Arr) {
-		TotalAllocations--;
-		TotalStringBytes -= JB_msize(Arr);
+		TotalStringBytes -= (JB_msize(Arr)+16);
 		free((void*)Arr);
     }
 }

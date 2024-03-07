@@ -552,7 +552,7 @@ extend PerryIDE
 
 		startupwindow.hide
 		.viewasproject
-		.ForceRecheck
+		.AskCheck
 		sdlapp.saveprefs // for pref-file editing
 		.showide
 		.ViewAsbetter

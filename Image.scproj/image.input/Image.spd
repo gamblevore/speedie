@@ -361,7 +361,7 @@ class Image (memory)
 	module
 		function New (|ivec2| wh, |string| name="", |image?|)
 			cpp_part NewWithSize
-			|| alloc = memory._Alloc(wh.area*4 max 4)
+			|| alloc = memory.zalloc(wh.area*4 max 4)
 				return image(wh, alloc, name)
 		
 		function New (|string| name="", |image!|)
