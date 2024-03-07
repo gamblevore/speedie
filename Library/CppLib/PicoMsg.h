@@ -886,22 +886,6 @@ extern "C" void* PicoSay (PicoComms* M, const char* A, const char* B="", int Ite
 	return M->Say(A, B, Iter);
 )
 
-extern "C" int PicoError (PicoComms* M) _pico_code_ (
-/// Returns an error that forced comms to close. If the comms is still open, the error is 0.
-	return M?M->Status:-1;
-)
-
-extern "C" PicoConfig* PicoCommsConf (PicoComms* M) _pico_code_ (
-/// Gets the config struct. You can configure "noise", "timeout", "name", and the maximum unread-message queue size.
-
-	return M?&M->Conf:0;
-)
-
-extern "C" PicoGlobalConfig* PicoGlobalConf() _pico_code_ (
-// Returns the global conf struct, which allows you to set important values.
-	return &pico_global_conf;
-)
-
 extern "C" bool PicoStillSending (PicoComms* M) _pico_code_ (
 ///  Returns if the comms object is still in the business of sending. This is to let you keep your app open while busy sending. Pass nil to see if any are sending.
 	return M?M->StillSending():pico_any_still_sending();
@@ -917,12 +901,6 @@ extern "C" void PicoSleepForSend (float During, float After) _pico_code_ (
 extern "C" bool PicoCanGet (PicoComms* M) _pico_code_ (
 /// Returns if we either HAVE unread messages, or MIGHT get them in the future (That is, it is not closed)
 	return M?M->CanGet():false;
-)
-
-extern "C" void PicoStats (PicoGlobalStats* F) _pico_code_ (
-	F->TimeOutCount = pico_timeout_count;
-	F->OpenSockets  = pico_sock_open_count;
-	F->OpenPicos    = __builtin_popcountll(pico_list.Map); 
 )
 
 extern "C" bool PicoIsParent (PicoComms* M) _pico_code_ (
@@ -951,6 +929,32 @@ extern "C" bool PicoStart () _pico_code_ (
 
 	return true;
 )    ;;;/*_*/;;;  ;;;/*_*/;;;     ;;;/*_*/;;;   // the final spiders
+
+
+
+/// **Configuration and Statistics** ///
+
+extern "C" int PicoError (PicoComms* M) _pico_code_ (
+/// Returns an error that forced comms to close. If the comms is still open, the error is 0.
+	return M?M->Status:-1;
+)
+
+extern "C" PicoConfig* PicoCommsConf (PicoComms* M) _pico_code_ (
+/// Gets the config struct. You can configure "noise", "timeout", "name", and the maximum unread-message queue size.
+
+	return M?&M->Conf:0;
+)
+
+extern "C" PicoGlobalConfig* PicoGlobalConf() _pico_code_ (
+// Returns the global conf struct, which allows you to set important values.
+	return &pico_global_conf;
+)
+
+extern "C" void PicoStats (PicoGlobalStats* F) _pico_code_ (
+	F->TimeOutCount = pico_timeout_count;
+	F->OpenSockets  = pico_sock_open_count;
+	F->OpenPicos    = __builtin_popcountll(pico_list.Map); 
+)
 
 #endif
 
