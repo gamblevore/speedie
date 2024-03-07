@@ -81,6 +81,8 @@ typedef ivec2 IntRange;
 
 typedef byte MaybeBool;
 
+typedef byte MoveCode;
+
 typedef u16 MsgParseFlags;
 
 typedef int PID_Int;
@@ -545,13 +547,13 @@ extern JB_File* JB__App__stdin;
 extern JB_File* JB__App__StdOut;
 extern Array* JB__App_OldArgs;
 extern JB_String* JB__App_Usage;
-#define kJB__ErrorColors_bold (JB_LUB[367])
+#define kJB__ErrorColors_bold (JB_LUB[369])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[368])
-#define kJB__ErrorColors_good (JB_LUB[369])
-#define kJB__ErrorColors_normal (JB_LUB[370])
-#define kJB__ErrorColors_underline (JB_LUB[369])
-#define kJB__ErrorColors_warn (JB_LUB[371])
+#define kJB__ErrorColors_error (JB_LUB[370])
+#define kJB__ErrorColors_good (JB_LUB[371])
+#define kJB__ErrorColors_normal (JB_LUB[372])
+#define kJB__ErrorColors_underline (JB_LUB[371])
+#define kJB__ErrorColors_warn (JB_LUB[373])
 extern u16 JB__API_NilHappened;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -583,24 +585,24 @@ extern CharSet* JB__Constants_XMLWordMiddle;
 #define kJB__Pipe_StdOut_ (1)
 extern JB_File* JB__Platform_Logger;
 #define kJB__Terminal_Black (30)
-#define kJB__Terminal_blue (34)
-#define kJB__Terminal_cyan (36)
+#define kJB__Terminal_Blue (34)
+#define kJB__Terminal_Cyan (36)
 extern FastString* JB__Terminal_fs;
-#define kJB__Terminal_green (32)
+#define kJB__Terminal_Green (32)
 #define kJB__Terminal_h (35)
 extern Date JB__Terminal_LastDisplay;
-#define kJB__Terminal_magenta (35)
-#define kJB__Terminal_red (31)
+#define kJB__Terminal_Magenta (35)
+#define kJB__Terminal_Red (31)
 extern Array* JB__Terminal_Screen;
 #define kJB__Terminal_w (80)
-#define kJB__Terminal_white (37)
-#define kJB__Terminal_yellow (33)
+#define kJB__Terminal_White (37)
+#define kJB__Terminal_Yellow (33)
 extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
 extern Dictionary* JB__SyxDict_;
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[372])
+#define kJB_kSaverStart1 (JB_LUB[374])
 extern JB_ErrorReceiver* JB_StdErr;
 extern JB_ErrorReceiver* JB_StdErrOriginal;
 extern Syntax JB_SyxAcc;
@@ -663,10 +665,10 @@ extern JB_String* JB__Tk_Data;
 extern bool JB__Tk_DotInsertAllow;
 extern Message* JB__Tk_EndOfLineMarker;
 extern Dictionary* JB__Tk_ErrorNames;
-#define kJB__Tk_kadjectiveop (1)
+#define kJB__Tk_kAdjectiveOp (1)
 #define kJB__Tk_kAllow (false)
-#define kJB__Tk_kcolon (2)
-#define kJB__Tk_kcolonarg (4)
+#define kJB__Tk_kColon (2)
+#define kJB__Tk_kColonArg (4)
 #define kJB__Tk_kComma (128)
 #define kJB__Tk_kEnd ((64 | 128) | 256)
 #define kJB__Tk_kEndContainer (256)
@@ -676,7 +678,7 @@ extern Dictionary* JB__Tk_ErrorNames;
 #define kJB__Tk_kFuncAfterBar (2048)
 #define kJB__Tk_kFuncAfterNormal (512)
 #define kJB__Tk_kFuncAfterNoSpace (1024)
-#define kJB__Tk_killegalchar (4194304)
+#define kJB__Tk_kIllegalChar (4194304)
 #define kJB__Tk_kLameTemporal (8 | (16 | 32))
 #define kJB__Tk_kOpp (((((4096 | 8192) | 16384) | 32768) | 65536) | 131072)
 #define kJB__Tk_kOppBar (16384)
@@ -693,7 +695,7 @@ extern Dictionary* JB__Tk_ErrorNames;
 #define kJB__Tk_kTemporalSyx (16 | 32)
 #define kJB__Tk_kTemporalSyxNoBar (16)
 #define kJB__Tk_kTemporalWord (8)
-#define kJB__Tk_ktemporalwordcolon (262144)
+#define kJB__Tk_kTemporalWordColon (262144)
 #define kJB__Tk_kThing ((524288 | 1048576) | 2097152)
 #define kJB__Tk_kThingBar (1048576)
 #define kJB__Tk_kThingSyx (524288)
@@ -720,21 +722,21 @@ extern JB_String* JB__zalgo_up;
 #define kJB__uint16_max (65535)
 #define kJB__uint16_min (0)
 #define kJB__uint64_max (-1)
-#define kJB__CharProp_almostletter (6)
-#define kJB__CharProp_letters (7)
-#define kJB__CharProp_lower (9)
-#define kJB__CharProp_nothing (0)
-#define kJB__CharProp_number (5)
-#define kJB__CharProp_punct (2)
-#define kJB__CharProp_unicode (10)
-#define kJB__CharProp_upper (8)
-#define kJB__CharProp_varnames (4)
-#define kJB__CharProp_white (1)
-#define kJB__CharProp_xmlpunct (3)
-#define kJB__ControlClipMode_debug (4)
+#define kJB__CharProp_AlmostLetter (6)
+#define kJB__CharProp_Letters (7)
+#define kJB__CharProp_Lower (9)
+#define kJB__CharProp_Nothing (0)
+#define kJB__CharProp_Number (5)
+#define kJB__CharProp_Punct (2)
+#define kJB__CharProp_Unicode (10)
+#define kJB__CharProp_Upper (8)
+#define kJB__CharProp_VarNames (4)
+#define kJB__CharProp_White (1)
+#define kJB__CharProp_XMLPunct (3)
+#define kJB__ControlClipMode_Debug (4)
 #define kJB__ControlClipMode_LargestFlag (7)
-#define kJB__ControlClipMode_slidebackinparent (1)
-#define kJB__ControlClipMode_slidebackinwindow (2)
+#define kJB__ControlClipMode_SlideBackInParent (1)
+#define kJB__ControlClipMode_SlideBackInWindow (2)
 #define kJB__CL1_After (6)
 #define kJB__CL1_Before (4)
 #define kJB__CL1_Centered (7)
@@ -797,11 +799,11 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__Date_kSecondsPerMonthApprox (2628000)
 #define kJB__Date_kSecondsPerWeek (604800)
 #define kJB__Date_kTickBits (16)
-#define kJB__ErrorFlags_dontstrip (1)
+#define kJB__ErrorFlags_DontStrip (1)
 #define kJB__ErrorFlags_Keep (0)
 #define kJB__ErrorFlags_LargestFlag (7)
-#define kJB__ErrorFlags_parse (4)
-#define kJB__ErrorFlags_prefernorenderpath (2)
+#define kJB__ErrorFlags_Parse (4)
+#define kJB__ErrorFlags_PreferNoRenderPath (2)
 #define kJB__ErrorFlags_PrintAndKeep (1)
 #define kJB__ErrorFlags_PrintAndRemove (2)
 #define kJB__ErrorSeverity_Critical (5)
@@ -819,6 +821,23 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__FileMode_Owner (7 << 6)
 #define kJB__FileMode_Process (((7 << 6) + 5) << ((3 + 5) << 0))
 #define kJB__FileResolveMode_AllowMissing (true)
+#define kJB__MoveCode_All (63)
+#define kJB__MoveCode_Back (kJB__MoveCode_Backward)
+#define kJB__MoveCode_Backward (32)
+#define kJB__MoveCode_Bottom (kJB__MoveCode_Down)
+#define kJB__MoveCode_Center (63)
+#define kJB__MoveCode_CenterH (1 + 2)
+#define kJB__MoveCode_CenterV (4 + 8)
+#define kJB__MoveCode_Down (8)
+#define kJB__MoveCode_Forward (16)
+#define kJB__MoveCode_Front (kJB__MoveCode_Forward)
+#define kJB__MoveCode_LargestFlag (63)
+#define kJB__MoveCode_Left (2)
+#define kJB__MoveCode_MiddleLeft (2 + (4 + 8))
+#define kJB__MoveCode_MiddleRight (1 + (4 + 8))
+#define kJB__MoveCode_Right (1)
+#define kJB__MoveCode_Top (kJB__MoveCode_Up)
+#define kJB__MoveCode_Up (4)
 #define kJB__MsgParseFlags_BreakPoint (32768)
 #define kJB__MsgParseFlags_Editable (4096)
 #define kJB__MsgParseFlags_Inserted (8192)
@@ -829,7 +848,7 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__ProcessMode_CaptureAll (1 | 4)
 #define kJB__ProcessMode_CaptureErrors (2)
 #define kJB__ProcessMode_CaptureOrPrintErrors (2 | 4)
-#define kJB__ProcessMode_capturestdout (1)
+#define kJB__ProcessMode_CaptureStdOut (1)
 #define kJB__ProcessMode_LargestFlag (7)
 extern int JB__Syx_CurrFuncID;
 extern int JB__Syx_MaxFuncID;
@@ -1111,6 +1130,8 @@ Message* JB_Tk__fStatementColon(int Start, Message* Parent);
 Message* JB_Tk__fString(int Start, Message* Parent);
 
 Message* JB_Tk__fSuperStr(int Start, Message* Parent);
+
+Message* JB_Tk__fSyntacticComment(int Start, Message* Parent);
 
 Message* JB_Tk__fTemporalHashThing(int Start, Message* Parent);
 
@@ -1453,6 +1474,9 @@ int JB_Rg_Width(IntRange self);
 // MaybeBool
 
 
+// MoveCode
+
+
 // MsgParseFlags
 
 
@@ -1644,6 +1668,8 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* self);
 // JB_MessagePosition
 void JB_MsgPos_Destructor(MessagePosition* self);
 
+void JB_MsgPos_SyntaxUsingComplete(MessagePosition* self);
+
 
 
 // JB_ObjectLoader
@@ -1700,6 +1726,12 @@ int JB_Pico__InitCode_();
 
 
 // JB_PicoConfig
+
+
+// JB_PicoGlobalConfig
+
+
+// JB_PicoGlobalStats
 
 
 // JB_PicoMessage
@@ -2471,6 +2503,8 @@ Message* JB_Msg_Copy(Message* self, Message* pos_msg);
 
 JB_String* JB_Msg_CopyID(Message* self);
 
+Message* JB_Msg_CopySub(Message* self, Message* P);
+
 void JB_Msg_Decl__(Message* self, FastString* fs);
 
 void JB_Msg_Destructor(Message* self);
@@ -2605,6 +2639,8 @@ bool JB_Msg_SyntaxIs(Message* self, MsgParseFlags F);
 
 void JB_Msg_SyntaxIsSet(Message* self, MsgParseFlags F, bool Value);
 
+MessagePosition JB_Msg_SyntaxUsing(Message* self);
+
 void JB_Msg_Test(Message* self, JB_String* new_render, JB_String* name);
 
 void JB_Msg_test_style(Message* self);
@@ -2651,15 +2687,13 @@ void JB_Msg_Yoda__(Message* self, FastString* fs);
 
 Message* JB_Msg__Alloc();
 
-Message* JB_Msg__LayerAlloc(JB_MemoryLayer* _L);
+Message* JB_Msg__NewCopy(Message* other);
 
 Message* JB_Msg__NewEmpty();
 
 Message* JB_Msg__NewNormal(Syntax Func, JB_String* Name);
 
 Message* JB_Msg__NewRange(Message* Parent, Syntax Func, int BytePos, JB_String* name, int RangeLength);
-
-Message* JB_Msg__NewWithLayerCopy(JB_MemoryLayer* _L, Message* other);
 
 bool JB_Msg__TreeCompare(Message* orig, Message* reparse, bool PrintIfSame);
 
