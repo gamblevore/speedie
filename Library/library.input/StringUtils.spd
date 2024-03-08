@@ -227,7 +227,7 @@ helper String.TabbifySub (|faststring| fs)
 		fs.AppendSection(self, sp, int.max)
 	
 
-function String.Tabbify (|bool| Tabs=true, |string|)
+function String.AddTabs (|bool| Tabs=true, |string|)
 	|| fs = faststring()
 	|| n = 0
 	for t.lines in self
@@ -242,6 +242,22 @@ function String.Tabbify (|bool| Tabs=true, |string|)
 		rz = self
 
 
+helper String.TabsToSpacesSub (|faststring| fs)
+	for (c in self) (i)
+		if c == '\t'
+			
+		else
+			fs <~ c
+		
+
+function String.TabsToSpaces (|string|)
+	|| fs = FastString()
+	for l.lines in self
+		.TabsToSpacesSub(fs)
+		fs <~ "\n"
+	return fs
+		
+		
 function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| BytesOut, |string| Name)
 	if name
 		self <~ Name

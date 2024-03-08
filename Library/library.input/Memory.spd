@@ -37,8 +37,10 @@ class DataTypeWrapper
 		.datatype = datatypecode.unusedtype
 		.PrivValue = p|int64|
 
+
 	function First (||) // for floats... perhaps use this?    macro first: .privvalue|...(samebits)|
 		return .privvalue
+
 	
 	function Value (|int64|)
 		if (self) {return .privvalue}

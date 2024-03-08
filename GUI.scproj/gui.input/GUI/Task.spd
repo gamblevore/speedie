@@ -1,5 +1,16 @@
 
 
+ignore {
+// should have a start and endtime, by default, and a state
+task DelayedShowError (|bool|)
+	|textview| self
+	|error|    err 
+	|ivec2|    P
+	run
+		(.OnShowExtraInfo)(self, P, nil, err, "error", true)?
+
+}
+
 
 datatype GuiTaskState (byte)
 	flags
@@ -10,8 +21,8 @@ datatype GuiTaskState (byte)
 		return self & t
 
 
-prototype GUITaskFunc (|GUIControl| self,  |GUITask| Task,  |GUITaskState| State,  |bool|)
-function Guicontrol.StartTask (|GUITaskFunc| fn,  |date| Delay,  |date| Durr=0,  |GUITask|)
+prototype GUITaskFunc         (|GUIControl| self,  |GUITask| Task,  |GUITaskState| State,  |bool|)
+function Guicontrol.StartTask (|GUITaskFunc|  fn,  |date|   Delay,  |date|         Durr=0, |GUITask|)
 	opt	norefcounts
 	|| w = .Window$
 	|| DS = date()

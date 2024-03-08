@@ -393,7 +393,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 	if d is found
 		.drawfound(where, y+GoUp, d)
 	if .CanDrawLight(d)				// linelight
-		lc.addint(80)				// need to use .PreferPrevLine
+		lc.addint(80)				// need to use ._PreferPrevLine
 		.DrawLighter(where, y+goup)
 
 	|| x	 = .DrawLineNumber(where, d, y, lc)-1

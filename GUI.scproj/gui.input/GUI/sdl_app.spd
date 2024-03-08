@@ -799,7 +799,7 @@ module SDLApp
 				return rf.OpenSearch
 
 		|| gw = rf ?? w
-		if keys.cmd
+		|| cmd = keys.cmd
 			if (key is PLUS or EQUALS)
 				return .Rescale(.scale+0.5)
 			if (key is minus)
@@ -814,12 +814,12 @@ module SDLApp
 			if (key is semicolon)
 				return w.DoListViewNext(false)
 		  
-		if (key is copy) or (key iscmd keys.c)
+		if (key is copy) or (cmd and key is c)
 			|| wf = w.focusattempt
 			if !rf and wf isa textview
 				return wf.docopy
 			return gw.DoCopy
-		if (key is paste) or (key iscmd keys.v)
+		if (key is paste) or (cmd and key is v)
 			return gw.DoPaste(clipboard.text)
 
 
@@ -1039,7 +1039,8 @@ module SDLApp
 		#!keydown!
 		|| kev = ev.keysym
 		|| key = kev.sym
-
+		if key is a
+			if keys.cmd
 		if key.IsCancelled or .CanDrag >= mousedragging.Within
 			return SDLActivity.nothing
 		beep.OK = 1

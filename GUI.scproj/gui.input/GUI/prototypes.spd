@@ -5,6 +5,7 @@
 prototype GUIDrawBackground	   (|object|      self,  |image| where)
 prototype GUIApplicationInit   (|Object?| Anything = nil, |errorint|)
 prototype GUIDrawEvent		   (|Image|       self,  |ivec4| Rect, |drawstyle| G, |bool| EdgeOnly)
+prototype GUIParticleEffect    (|image|       self,  |ivec4| Rect, |vec2| V)
 
 prototype GUIListDragEvent	   (|ListView|    self,  |ListViewrow?| Before, |ListViewrow?| Into, |bool|)
 prototype GUIListEvent		   (|ListView|    self,  |ListViewrow?| Row, |listviewselectmode| Mode = ListViewSelectMode.normal, |bool|)

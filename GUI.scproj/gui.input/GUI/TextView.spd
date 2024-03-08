@@ -5,15 +5,12 @@ class TextView (GUIControl)
 	linkage
 		cpp_part Text
 	|bool|						SingleLine
-	|bool|						PreferPrevLine
 	|bool|						PreferStayAtEnd
 	|bool| 						ShowLineNumbers
 	|bool|						CanSeeAllLines
 	|bool|						GroupSaveAll
 	|bool| 						FastAppend
-	|bool|						CopyPlaceActive
 	|bool|						CanAutoComplete
-	|byte|						ClicksDown
 	|byte|						CodeInsertionState
 	|byte|						SetsDebugLines
 	|byte|						LineNumWidth
@@ -24,11 +21,14 @@ class TextView (GUIControl)
 	|int|						ClickedPos
 	|int|						AutoCompleteBack
 	|string|					AutoCompleteString
+	|byte|						_ClicksDown
+	|bool|						_PreferPrevLine
 	|TextViewLine|				_Start
 	|TextViewLine|				_Lines
 	|ivec3|						_Reclaim		
 	|IntRange|					_TypingPlace
-	|IntRange|					UncorrectedSel
+	|IntRange|					_UncorrectedSel
+	|GUIParticleEffect?|		LineEffect
 	|GUIKeyEvent?|				OnKeyDown
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
@@ -91,7 +91,7 @@ class TextView (GUIControl)
 			return MouseDragging.Within
 		if self is editable or AlwaysScrollable
 			if clicks >= 1
-				.ClicksDown = clicks
+				._ClicksDown = clicks
 			.EditClick(p, clicks, false)
 		|| onc = .onclicked
 		if (onc) and clicks >= 0				// -1 = drag
@@ -222,18 +222,18 @@ class TextView (GUIControl)
 		ifn .lastrect.vert contains p.y
 			.show(b)
 		
-		|| t = .UncorrectedSel
+		|| t = ._UncorrectedSel
 		if keys.shift or (clicks == -1)
 			t.x2 = b
 		  else
 			t = (b, b)
 
 		if !CmdKey
-			.SelDirect(.ExpandSel(t, .clicksdown), d)
+			.SelDirect(.ExpandSel(t, ._clicksdown), d)
 		  else
 			.SelDirect(t, d)
-		.PreferPrevLine = bs.x2
-		.uncorrectedsel = t
+		._PreferPrevLine = bs.x2
+		._UncorrectedSel = t
 
 
 	function SendSpecialClick (|ivec2| p, |bool| IsRightClick)
@@ -274,10 +274,10 @@ class TextView (GUIControl)
 		opt norefcounts
 		require result != ._TypingPlace
 		._TypingPlace = result
-		.PreferPrevLine = false
+		._PreferPrevLine = false
 		.CanAutoComplete = false
 		.autocompletestring = ""
-		.UncorrectedSel = result
+		._UncorrectedSel = result
 		return true
 
 	helper TypingPlaceTry (|intrange| result, |bool|insert, |textviewline| d)
@@ -417,7 +417,7 @@ class TextView (GUIControl)
 		  else
 			t = (x, x)
 		|| d = .show(x)
-		.preferprevline = fwd and (!d.emptyline or !d.EndsWithLine) 
+		._PreferPrevLine = fwd and (!d.emptyline or !d.EndsWithLine) 
 		.SelDirect(t,d)
 		return true
 	
@@ -489,9 +489,9 @@ class TextView (GUIControl)
 		disabled "unused?"
 		|| vis = .MaxVisibleLines
 		|| d   = .FindDrawInfo(x)
-			|| d2 = d.movecapped(vis).movecapped(-vis) // not too far
+			|| d2 = d.MoveCapped(vis).MoveCapped(-vis) // not too far
 			if d2 != d
-				d2 = d2.movecapped(2) // looks lil nicer
+				d2 = d2.MoveCapped(2) // looks lil nicer
 			if ._Start != d2
 				.StartLine = d2
 				.ScrollDrawTimer = ScrollInfo.timer 
@@ -501,14 +501,14 @@ class TextView (GUIControl)
 		// views X, and sets new typing place.
 		opt norefcounts		
 		|| t = ._typingplace
-		x = .clamp(x)
-		|| d = .ViewPos(x, before, 2) //idk
+		x = .Clamp(x)
+		|| d = .ViewPos(x, before, 2) // idk
 			
 		if keys.shift
 			t.x2 = x
 		  else
 			t = (x, x)
-		.SelDirect(t,d)
+		.SelDirect(t, d)
 		return true	
 
 
@@ -526,27 +526,25 @@ class TextView (GUIControl)
 		opt norefcounts
 		debug_require i
 		sdlapp.showcursor(false)
- 
 		if !page
+			page = (keys.Option)|int|
 			target osx
-				page = (keys.option or keys.Control)|int|
-			  else
-				page = (keys.Option)|int|
+				page |= (keys.Control)|int|
 			
 		|| x  = (.text.length, 0)(i > 0)
-		|| t  = ._TypingPlace // .FindDrawSelMove resolves it? and yet its not workign properly
+		|| t  = ._TypingPlace
 		|| bs = .FindDrawSelMove(t, i, page>0)
-		if .singleline and (t == bs.x)
+		if .SingleLine and (t == bs.x)
 			return .MoveListLine(i)
 
 		if !page and Keys.Cmd
-			.PreferPrevLine = i < 0
+			._PreferPrevLine = i < 0
 			.jump(x)
-			.PreferPrevLine = i < 0
+			._PreferPrevLine = i < 0
 			return true
 
 		.jump(bs.x)
-		.PreferPrevLine = bs.x2
+		._PreferPrevLine = bs.x2
 		return true
 	
 	
@@ -608,9 +606,9 @@ class TextView (GUIControl)
 			if key iscmd keys.Num8:		return .CommentSlash(true)
 			if key is delete:			return .DeleteKey(keys.shift)
 			if key is ForwardDELETE:	return .DeleteKey(!keys.shift)
-			if (key iscmd keys.x) or (key is cut)					// select all
+			if (key iscmd keys.x) or (key is cut)
 				return .DoCut
-			if (key iscmd keys.z) or (key is undo or again) 		// select all
+			if (key iscmd keys.z) or (key is undo or again)
 				return .DoUndo(!keys.shift)
 
 		if key is left:				return .MoveSel(-1)
@@ -1440,13 +1438,13 @@ class TextView (GUIControl)
 
 	helper FoundInfo (|ivec2|m, |int| Pos, |bool|sec, |bool|)
 		if M contains Pos
-			if (m.x2 == Pos) and !.PreferPrevLine
+			if (m.x2 == Pos) and !._PreferPrevLine
 				return false
 			return true
 
 	
 	helper FindDrawInfo (|int| Char, |?&int| VLine=nil, |TextViewLine!|)
-		return .FindDrawInfoSub(char, vline, !.PreferPrevLine)
+		return .FindDrawInfoSub(char, vline, !._PreferPrevLine)
 		 
 		
 	helper FindDrawInfoSub (|int| Char, |?&int| VLine,  |bool| sec, |TextViewLine!|)
@@ -1886,7 +1884,7 @@ class TextView (GUIControl)
 
 	function EndPrepare (|TextViewLine| d, |bool| StayAtEnd, |int| pos)
 		d.RemoveAfter
-		.PreferPrevLine = false
+		._PreferPrevLine = false
 		if StayAtEnd
 			d = .FindStayAtEnd
 		if !StayAtEnd// or !d
@@ -1926,7 +1924,7 @@ class TextView (GUIControl)
 	helper TextCopy (GUICopyEvent)
 		rz = self[.selrange]
 		if keys.shift //(.ExpectsParse >= CurrentlyJeebox)
-			rz = rz.tabbify(false) // tabbifying WITHIN our GUI is actually bad.
+			rz = rz.AddTabs(false) // tabbifying WITHIN our GUI is actually bad.
 								   // i could paste it from one part of our gui to another.
 								   // and it will totally SUCK.
 								   // It should only tabbify for external... so we'd need two versions??
@@ -1975,7 +1973,7 @@ class TextView (GUIControl)
 			if data > 1
 				.UndoChecker = -1
 			if .ExpectsParse >= textview.currentlyjeebox
-				data = data.Tabbify
+				data = data.AddTabs
 				if (data contains ";") and !data.parse
 					|| Q = "The text below contains ';'. Would you like me to strip it?\n\n" + data.Preview(200)
 					if Q.Confirm
