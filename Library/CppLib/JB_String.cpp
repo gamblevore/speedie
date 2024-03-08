@@ -88,9 +88,11 @@ void JB_BA_Destructor( JB_String* self ) {
 }
 
 
-void JB_Str_Constructor( JB_String* self ) {
-    * self = {};
-}
+//JB_String* JB_Str_Constructor( JB_String* self ) {
+//	JB_New2(JB_String);
+//    * self = {};
+//    return self;
+//}
 
 
 JB_String* JB_Str_CopyFromPtr( uint8* Addr, int N ) {
@@ -1444,7 +1446,8 @@ JB_String* JB_Str_FastLower (JB_String* self) {
 ByteMap* JB_BM__Lower() {
     static ByteMap* LowerMap_ = 0;
     if (!LowerMap_) {
-        LowerMap_ = JB_BM_( JB_Upper(), JB_Lower() );
+        LowerMap_ = JB_BM_Constructor( 0, JB_Upper(), JB_Lower() );
+        JB_Incr(LowerMap_);
     }
     return LowerMap_;
 }
@@ -1456,7 +1459,8 @@ JB_String* JB_Str_LowerCase(JB_String* self) {
 JB_String* JB_Str_UpperCase(JB_String* self) {
     static ByteMap* UpperMap_ = 0;
     if (!UpperMap_) {
-        UpperMap_ = JB_BM_( JB_Lower(), JB_Upper() );
+        UpperMap_ = JB_BM_Constructor( 0, JB_Lower(), JB_Upper() );
+        JB_Incr(UpperMap_);
     }
 	return JB_Str_MapBytes( self, UpperMap_, -1 );
 }

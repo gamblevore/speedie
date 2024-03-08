@@ -71,13 +71,17 @@ void JB_PID_Kill (ProcessOwner* F) {
 ////*&(^!@^*& ^^^^^^^ PiD ^^^^^^^^
 //// BATCHES LOST CONTROL
 
-void JB_PID_Constructor(ProcessOwner* self) {
-	if (!self and !Root.Next) {
-		self = &Root;
-	}
+
+void JB_PID_Start() {
+	JB_PID_Constructor(&Root);
+}
+
+ProcessOwner* JB_PID_Constructor(ProcessOwner* self) {
+	JB_New2(ProcessOwner);
 	JB_Helper_SelfLink((JB_RingList*)self);
 	self->_Status = 0;
 	self->_Exit = -2;
+	return self;
 }
 
 

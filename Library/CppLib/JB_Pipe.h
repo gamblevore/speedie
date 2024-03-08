@@ -14,7 +14,8 @@ JBClass( ProcessOwner, JB_RingList,
 	volatile int		_Status;
 );
 
-void JB_PID_Constructor(ProcessOwner* self);
+void JB_PID_Start();
+ProcessOwner* JB_PID_Constructor(ProcessOwner* self);
 void JB_PID_UnRegister(ProcessOwner* self);
 void JB_PID_Destructor(ProcessOwner* self);
 void JB_PID_Register(ProcessOwner* self);
@@ -40,13 +41,13 @@ JBClass( ShellStream, ProcessOwner,
     int			CaptureErr[2];
     Date		LastRead;
     int64		UserFlags;
-    JB_Object* UserObj; // just like jeebox!
+    JB_Object*	UserObj; // just like jeebox!
 );
 
 
 
 void JB_Sh_Destructor(ShellStream* self);
-void JB_Sh_Constructor(ShellStream* self, JB_String* Path);
+ShellStream* JB_Sh_Constructor(ShellStream* self, JB_String* Path);
 ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn);
 bool JB_Sh_Step(ShellStream* self);
 ivec2 JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, bool StdOutFlowThru);

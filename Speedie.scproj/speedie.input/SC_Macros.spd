@@ -20,7 +20,7 @@ module Macros {
 
 
 || MultiDecr = "JB_DecrMulti(_0, _1)".macro
-
+|| ConstructorNew = "if !self: self = JB_New(_0)|_0|".macro
 
 
 || MainArgBasic      = `|| _0 =  _1.MainArg(_2, "_0"),           `.macro

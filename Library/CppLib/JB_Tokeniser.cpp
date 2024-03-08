@@ -63,8 +63,7 @@ bool JB_Tk__CppInited() {
     }
     
     self->RefCount = 1000;
-    Dictionary* Dict = JB_NewEmpty( Dictionary );
-    JB_Dict_Constructor(Dict);
+    Dictionary* Dict = JB_Dict_Constructor(0);
 	self->WordDict = Dict;
     JB_Dict_ValueSet(Dict, JB_Str__Empty(), JB_NewEmpty(TokHan));
     return false;

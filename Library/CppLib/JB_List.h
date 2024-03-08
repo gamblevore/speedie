@@ -28,8 +28,9 @@ JBClass( JB_LinkedList, Saveable,
 	JB_LinkedList**    _BackRef;
 );
 
+// garbage class... remove this!
 
-void JB_LinkedList_Constructor(JB_LinkedList* self);
+JB_LinkedList* JB_LinkedList_Constructor(JB_LinkedList* self);
 void JB_LinkedList_NextSet(JB_LinkedList* self, JB_LinkedList* B);
 JB_LinkedList* JB_LinkedList_Next(JB_LinkedList* self);
 JB_LinkedList* JB_LinkedList_PrepareMoveTo_(JB_LinkedList* self, JB_LinkedList** Where, JB_LinkedList* OldNext);

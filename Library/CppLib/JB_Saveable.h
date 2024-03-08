@@ -7,7 +7,7 @@ extern "C" {
 JBClass( Saveable, JB_Object,	);
 #endif	
 
-void JB_Sav_Constructor(Saveable* self);
+Saveable* JB_Sav_Constructor(Saveable* self);
 
 } // ExternCEnd
 

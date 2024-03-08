@@ -828,7 +828,6 @@ function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
 		if d isnt PropertyWasConstructed
 			root.InsertAfter( .NewDefaultRel( oof, d ), AfterHere )
 	
-	
 	while cls
 		for (d in cls.Properties)
 			(d isnt PropertyWasConstructed)
@@ -1798,7 +1797,7 @@ function NeuLibrary (CollectFunc)
 	error (node, "Can’t use this")
 	Options.ProjectisLibrary = true // better than omitting main. more... specific.
 									// but what if someone includes a library?
-	return neumain(node, name_space, errplace)
+	return NeuMain(node, name_space, errplace)
 	// library {} -->
 
 }

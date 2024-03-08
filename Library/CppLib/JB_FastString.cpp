@@ -529,16 +529,20 @@ void JB_FS_FileSet(FastString* fs, JB_File* F) {
 
             /* Constructors */
 
-void JB_FS_ConstructorSize(FastString* self, int Size) {
+FastString* JB_FS_ConstructorSize(FastString* self, int Size) {
+	JB_New2(FastString);
     JB_FS_Constructor(self);
 	if ( Size ) {
 		JB_FS_SizeSet( self, Size );
 	}
+	return self;
 }
 
-void JB_FS_Constructor(FastString* self) {
+FastString* JB_FS_Constructor(FastString* self) {
+	JB_New2(FastString);
     JB_Zero(self);
     self->IndentChar = '\t';
+	return self;
 }
 
 void JB_FS_Destructor(FastString* self) {
@@ -573,9 +577,7 @@ JB_String* JB_FS_GetResult(FastString* self) {
 
 
 FastString* JB_FS__InternalNew() {
-    FastString* fs = JB_New(FastString);
-    JB_FS_Constructor( fs );
-    return fs;
+    return JB_FS_Constructor( 0 );
 }
 
 FastString* JB_FS__FileFlush(JB_File* f, bool b) {

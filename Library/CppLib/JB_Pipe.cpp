@@ -256,8 +256,7 @@ void JB_FEPDWEE_Finish(ShellStream& Sh) {
 
 
 ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru) {
-	auto rz = JB_New(ShellStream);
-	JB_Sh_Constructor(rz, self);
+	auto rz = JB_Sh_Constructor(0, self);
 	rz->Output = JB_Incr(FSOut);
 	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
 	rz->Params = JB_Incr(Args);
@@ -304,7 +303,8 @@ ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastStr
 
 ///*(^&£^/ Shellstream vvvvv >>>>>>>
 
-void JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
+ShellStream* JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
+	JB_New2(ShellStream);
 	*self = {};
 	JB_PID_Constructor(self);
 	for (int i = 0; i < 4; i++)
@@ -312,6 +312,7 @@ void JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
 	
 	self->IsClosed = false;
 	self->Path = JB_Incr(Path);
+	return self;
 }
 
 

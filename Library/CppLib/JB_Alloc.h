@@ -99,9 +99,8 @@ struct JBObject_Behaviour;
 #define JB_MArray(type, num)    ((type*)(JB_MArray_(sizeof(type),num)))
 #define JB_NewClass(Cls)        (JB_Object*)(JB_AllocNew((Cls)->DefaultBlock))
 #define JB_New(name)            (name*)(JB_AllocNew((name ## Data).DefaultBlock))
+#define JB_New2(T)				{if (!self) self = JB_New(T);}
 #define JB_NewEmpty(name)       (name*)(ClearFor_(JB_New(name), sizeof(name)))
-#define JB_LayerNew(L, name)    (name*)(JB_AllocNew(L->CurrBlock))
-#define JB_LayerNewClass(L,X)   JB_AllocNew(L->CurrBlock)
 #define JB_Zero(name)           (ClearFor_((void*)(name), sizeof(__typeof__(*name))))
 #define JBStructData(a)         extern JB_Class a ## Data;
 #define JBClass(a, b, c)        struct a : b {c}; JBStructData(a);
@@ -279,7 +278,7 @@ void JB_Class_Add( JB_Class* Cls, const char* s );
 JB_Class* JB_Class__First();
 JB_MemoryLayer* JB_Mem_CreateLayer(JB_Class* Cls, JB_Object* Obj);
 void JB_Mem_InitAndUse(JB_MemoryLayer* Mem, JB_Class* Cls);
-void JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls );
+JB_MemoryLayer* JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls );
 void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size);
 void JB_Class_SetIndex(JB_Class* cls, int i);
 int JB_Class_Index(JB_Class* cls);

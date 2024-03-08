@@ -283,15 +283,6 @@ ConstrNew = `function New () {
 
 }
 
-
-
-// CreateConstructors is so we don't HAVE to call the parent's constructor
-// For example, SCModule doesn't have a constructor set, so it creates one
-// however, the parent SCNode.Constructor has a param, so the empty constructor
-// doesn't know how to call it. So we create one for EVERY class... then the
-// problem goes away.
-
-
 function SCFunction.CopyParams (|message| list)
 	|| p = .prms
 	using list
@@ -331,15 +322,28 @@ function CreateEmptyConstructors (|scfunction|)
 
 	|| pc = .PassableCount
 	|| s = .super
-		if rz and s != TypeObject // object has no constructor-func
-			|| l = s.constructorfunc!.Prms 
-			if l.hasany
-				rz.CopyParams(l)
-				pc = 0 // i guess?
+	if s and rz and s != TypeObject // object has no constructor-func
+		|| l = s.constructorfunc!.Prms 
+		if l.HasAny
+			rz.CopyParams(l)
+			pc = 0 // i guess?
 	
 	if pc >= 1 and pc <= 8
 		|| f2 = .CreateAutoConstructor
 		rz := f2
+
+
+function Message.AddConstructorReturn (|scclass| cls)
+	|| prms = .second
+	debug_require prms == @prm and prms.position != -123
+	using self
+	|| dcl = prms.msg(@decl)
+	dcl.msg(@thg, cls.name)
+	prms.position = -123		// remove
+	|| args = prms.next
+	|| type = message(@thg, cls.name)
+	args.first = (macros.ConstructorNew)(type)
+	args.msg(@tmp, "return")<~(@thg, "self")
 
 
 function CreateConstructors 
@@ -594,8 +598,8 @@ function CStructName (|String|)
 	opt norefcounts
 	if self
 		if !.IsRole
-			return .CppClass init .name.unicodesafename
-		return .RealClass.cstructname
+			return .CppClass init .name.UnicodeSafeName
+		return .RealClass.CStructName
 
 
 function HasStuffToHandleInDestructor (|bool|)
@@ -603,7 +607,7 @@ function HasStuffToHandleInDestructor (|bool|)
 	for p.upwards in self
 		for d in p.Properties
 			if d.HasStructDestructor: return true
-			if d.IsReffable(true): Return true
+			if d.IsReffable(true):    return true
 
 
 function CanCompareSub (|string|s, |scdecl|against, |bool|)

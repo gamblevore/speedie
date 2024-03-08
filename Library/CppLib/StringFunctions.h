@@ -31,7 +31,7 @@ JB_String* JB_Str_CopyFromCString( const char* C );
 JB_String* JB_Str_Copy( JB_String* self );
 void JB_Str_Destructor(JB_StringShared* self);
 void JB_XStr_Destructor(JB_StringExternal* self);
-void JB_Str_Constructor( JB_String* self );
+//JB_String* JB_Str_Constructor( JB_String* self );
 void JB_Str_Print( JB_String* s );
 void JB_Str_PrintLine( JB_String* s );
 void JB_Str_PrintError(JB_String* s);

@@ -106,7 +106,6 @@ module SC_Saver {
 						fs <~ it.name // probably OK? won't get here if it's a pointer anyhow...
 						fs <~ '|'
 				
-			
 			if (!AppendAsData and Count)
 				fs <~ "\n}\n"
 		}

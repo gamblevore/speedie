@@ -463,23 +463,26 @@ RingTree* JB_Ring_MakeFirst( RingTree* self ) {
 }
 
 
-void JB_Ring_Constructor0( RingTree* self ) {
+RingTree* JB_Ring_Constructor0( RingTree* self ) {
+	JB_New2(RingTree);
     self->Position = 0;
     self->Parent = 0;
     self->Next = 0;
     self->Prev = 0;
     self->Child = 0;
+    return self;
 }
     
     
-void JB_Ring_Constructor( RingTree* self, RingTree* Parent ) {
+RingTree* JB_Ring_Constructor( RingTree* self, RingTree* Parent ) {
+	JB_New2(RingTree);
     self->Position = 0;
     self->Next = 0;
     self->Child = 0;
     self->Parent = Parent;
     if (!Parent) {
         self->Prev = 0;
-        return;
+        return self;
     }
 
     Sanity(Parent);
@@ -498,6 +501,7 @@ void JB_Ring_Constructor( RingTree* self, RingTree* Parent ) {
     }
     Sanity(self);
     Sanity(Parent);
+    return self;
 }
     
 

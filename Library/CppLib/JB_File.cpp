@@ -834,7 +834,8 @@ JB_String* JB_File_PathFix_(JB_String* P) {
 }
 
 
-void JB_File_Constructor( JB_File* self, JB_String* Path ) {
+JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
+	JB_New2(JB_File);
 	if (!Path)
 		Path = JB_Str__Empty();
 	Path = JB_File_PathFix_(Path);
@@ -848,6 +849,7 @@ void JB_File_Constructor( JB_File* self, JB_String* Path ) {
     self->DirEnt = 0;
 	if (WorthTestingCase())
 		CaseTest_(self);
+	return self;
 }
 
 
@@ -1177,8 +1179,7 @@ JB_File* JB_File__NewPipe(int Pipe) {
 	if (Pipe < 0) {
 		return nil;
 	}
-	JB_File* F = JB_New( JB_File );
-	JB_File_Constructor( F, 0 );
+	JB_File* F = JB_File_Constructor( 0, 0 );
 	F->Descriptor = Pipe;
 	F->MyFlags |= 2;
 	return F;
@@ -1192,12 +1193,10 @@ bool JB_File_IsPipe(JB_File* f) {
 
 
 JB_File* JB_Str_File( JB_String* Path ) {
-	if (Path != JB_Str__Error()) {
-		JB_File* F = JB_New( JB_File );
-		JB_File_Constructor( F, Path );
-		return F;
-	}
-	return 0;
+//	if (Path != JB_Str__Error()) {
+	return JB_File_Constructor( 0, Path );
+//	}
+//	return 0;
 }
 
 

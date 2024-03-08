@@ -22,7 +22,7 @@ JBClass( CharSet, JB_Object,
 
         // function Declarations
 
-void JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);
+CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);
 bool JB_CS_HasChar( CharSet* self, int Value );
 void JB_CS_HasCharSet( CharSet* self, int Value, bool Set );
 
@@ -32,7 +32,7 @@ JB_String* JB_CS_Render(CharSet* self, FastString* Orig);
 CharSet* JB_CS_Invert( CharSet* self );
 void JB_BM_Clear( ByteMap* cs, int F );
 ByteMap* JB_BM_Invert( ByteMap* self, int Unfound );
-void JB_BM_Constructor(ByteMap* self, JB_String* From, JB_String* To);
+ByteMap* JB_BM_Constructor(ByteMap* self, JB_String* From, JB_String* To);
 ByteMap* JB_BM_( JB_String* a, JB_String* b );
 
 

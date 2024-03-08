@@ -38,8 +38,8 @@ JB_Object* JB_Array_Value( Array* self, int Pos );
 JB_Object* JB_Array_Pop(Array* self);
 int JB_Array_Find( Array* self, JB_Object* Obj );
 void JB_FillInts(int* Start, int N, int Value);
-void JB_Array_Constructor0( Array* self );
-inline void JB_Array_Constructor( Array* self, int n ) {JB_Array_Constructor0(self); if (n) debugger;}
+Array* JB_Array_Constructor0( Array* self );
+//inline Array* JB_Array_Constructor( Array* self, int n ) {JB_Array_Constructor0(self); if (n) debugger;}
 int JB_Array_Wipe(Array* self);
     
 } // ExternCEnd

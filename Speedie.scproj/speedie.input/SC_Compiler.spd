@@ -98,8 +98,8 @@ linkage
 |SCFunction|				RefSafeDecr
 |SCFunction|				RefSetRef
 
+|SCFunction|				NewFunc
 |SCFunction|				TernaryFunc
-|SCFunction|				TernaryFunc2
 |SCFunction|				fnFastIsa
 |SCFunction|				fnFastAs
 |SCFunction|				fnAs
@@ -316,6 +316,7 @@ function InitBasicFuncs (|bool|)
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	
+	.NewFunc		= .FindFunction( "JB_New" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
 	.fnAs			= .LoadTypeTest( "operatoras" )
 	.fnFastAs		= .LoadTypeTest( "operatorfast_as" )

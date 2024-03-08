@@ -201,11 +201,13 @@ void JB_Array_Swap(Array* self, uint i, uint j) {
 	}
 }
 
-void JB_Array_Constructor0( Array* self ) {
+Array* JB_Array_Constructor0( Array* self ) {
+	JB_New2(Array);
 	self->Length = 0;
 	self->Capacity = 0;
 	self->_Ptr = 0;
 	self->Marker = 0;
+	return self;
 }
 
 

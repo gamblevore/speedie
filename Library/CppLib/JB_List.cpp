@@ -24,9 +24,11 @@ extern "C" {
 JBClassPlace( JB_LinkedList,     JB_LinkedList_Destructor,     JB_AsClass(Saveable), 0 );
 
 
-void JB_LinkedList_Constructor(JB_LinkedList* self) {
+JB_LinkedList* JB_LinkedList_Constructor(JB_LinkedList* self) {
+	JB_New2(JB_LinkedList);
 	self->_BackRef = nil;
 	self->_Next = nil;
+	return self;
 }
 
 

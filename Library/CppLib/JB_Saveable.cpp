@@ -7,13 +7,15 @@
 */
 
 
-#include "math.h"
+#include "JB_Umbrella.h"
 #include <stdio.h>
 
 extern "C" {
 
-struct Saveable;
-void JB_Sav_Constructor(Saveable* self) {
+//struct Saveable;
+Saveable* JB_Sav_Constructor(Saveable* self) {
+//	JB_New2(Saveable); // doesnt need to do anything
+	return self;
 }
 
 }

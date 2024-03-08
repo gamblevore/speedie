@@ -80,7 +80,7 @@ int JB_File_Open(JB_File* self, int OpenFlags, bool ignore);
 int JB_Str_Open(JB_String* Path, int Flags, bool Ignore);
 int JB_App__GetChar();
 void ErrorHandleSub_(JB_String* self, const char* Operation);
-void JB_File_Constructor(JB_File* self, JB_String* Path);
+JB_File* JB_File_Constructor(JB_File* self, JB_String* Path);
 int JB_File_OffsetSet( JB_File* self, s64 NewValue );
 int JB_Write(int fd, uint8* buffer, int N);
 s64 JB_File_Offset( JB_File* self );

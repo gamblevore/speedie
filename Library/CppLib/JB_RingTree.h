@@ -45,8 +45,8 @@ int JB_Ring_Count( RingTree* self );
 bool JB_Ring_HasChildren( RingTree* self );
 void JB_Ring_Destructor( RingTree* self );
 void JB_Ring_Dispose( RingTree* self );
-void JB_Ring_Constructor0( RingTree* self );
-void JB_Ring_Constructor( RingTree* self, RingTree* Parent );
+RingTree* JB_Ring_Constructor0( RingTree* self );
+RingTree* JB_Ring_Constructor( RingTree* self, RingTree* Parent );
 
 void JB_Ring_ParentSet( RingTree* self, RingTree* NewParent );
 void JB_Ring_NextSibSet( RingTree* self, RingTree* NewParent );
