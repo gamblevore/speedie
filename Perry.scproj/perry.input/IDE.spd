@@ -556,11 +556,11 @@ class PerryIDE (Window)
 		if key is num9
 			.flip(.ProductOut)
 			return true
-		if key is num8
+		if key is num8 or j
 			if .flip(.JeeboxText)
 				.UpdateJeeboxField
 			return true
-		if key is num7 or j
+		if key is num7
 			.flip(.SpeedieText)
 			return true
 		if key is num1
