@@ -156,8 +156,6 @@ function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|
 	rz = Cpppart
 	if rz
 		rz = "_" + rz
-	  elseif self is Layer
-		rz = "_LayerNew"
 	  else
 		rz = "_New"
 	
@@ -289,8 +287,8 @@ function LoadExportName
 	
 	|| place	= .LinkagePlace
 	|| IsClass	= (self isa SCClass)
-	// probably should use some kinda... callback, right?
-	// we want to check so many things, wrapper, name, part, inbuilt, library?
+	// probably should use a dispatch table
+	// we want to check so many things, wrapper, name, part, inbuilt, library...
 	|| CW		= .FindCppWrapper(place, isclass)
 	|| CppName	= place.FindAndRemove( "cpp_name",	false,  IsClass )
 	|| CppPart	= place.FindAndRemove( "cpp_part",	false,  IsClass )
@@ -315,7 +313,7 @@ function LoadExportName
 		  elseif self isa scclass
 			.Modul.CppPart = CppPart
 			|| e = place.FindAndRemove( "cpp_class", false, true )
-			if e: .CppClass = e.unicodesafename
+				.CppClass = e.unicodesafename
 			.Modul.SetExportName( CppPart + "_", false ) // remove this? just try... once everything is working.
 
 	.SetExportName( CppName, false )

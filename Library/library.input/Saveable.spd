@@ -245,12 +245,12 @@ class SaverClassInfo (array)
 	|&char|				Data
 	
 
-	function AdFub (|faststring| fs)
-		// adfub????
-		// nothing uses this?
-		opt norefcounts
-		for (Obj in self)
-			fs.AppendObjectID(obj)
+//	function AdFub (|faststring| fs)
+//		// adfub????
+//		// nothing uses this?
+//		opt norefcounts
+//		for (Obj in self)
+//			fs.AppendObjectID(obj)
 
 
 	constructor ( |&ClassData| Cls, |&char| Data )

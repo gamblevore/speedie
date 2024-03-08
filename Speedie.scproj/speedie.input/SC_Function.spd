@@ -20,7 +20,7 @@ datatype FunctionType (uint)
 		New
 		Comparison
 		Reffer
-		Layer
+//		Layer
 		Alloc
 		NewStruct
 		TypeTest
@@ -29,11 +29,13 @@ datatype FunctionType (uint)
 		EmptyConstructor
 		VirtualCaller
 		Behaviour
+		NewNew
 		ExpectsRealVars
 		ConOrDes = Constructor + Destructor
 		ConOrNew = Constructor + New
 		AllocOrNew = Alloc + New
-
+	syntax is (|functiontype| t, |bool|)
+		return self & t
 
 
 class SCFunction (SCNode) {
@@ -218,7 +220,10 @@ function CheckNotBadName
 
 function FuncDecls 
 	scfunction.currfunc = self
-	|| P = .Source.second		#require
+	|| P = .Source.second!
+	if 0 and self is constructor
+		.AddConstructorReturn(p)
+	
 	|| fc = p.first
 	
 	if (fc == @thg)
@@ -852,13 +857,15 @@ function CanCompare (|SCDecl|Against, |bool|)
 			return true
 
 
-function Paramless (|SCFunction|)
+function ParamlessConstructor (|SCFunction|)
 	opt norefcounts
 	for (f in self)
-		|| s = f.Source
-		|| lst = s.find(@prm)
-		ifn lst and lst.hasany
-			Return f
+		|| prm = f.source[@prm, 1]
+		|| last = prm.last
+		if !last
+			return f
+		if last == @decl and last == 1
+			return f
 
 
 function TranStrings
@@ -1526,7 +1533,9 @@ function Tran_Return (TranFunc)  // exitter
 	if node.tmptype == asmtmp.kreturn
 		debugat
 	node.tmptype = asmtmp.kreturn
-	expect (! fn.IsConstructorOrDestructor)   (node, "You can’t return in a constructor or destructor")
+	
+	if !node.islast
+		expect (!fn.IsConstructorOrDestructor)   (node, "You can’t return in a constructor or destructor")
 	fn.CheckReturnValue( node )
 	node.LastInBlock(SCBlockage.Return)
 	node.CheckNotInStateExpr(fn.SourceArg)

@@ -143,8 +143,6 @@ function CreateAutoConstructor (|scfunction|)
 			rel <~ (@opp,  "=")
 			rel <~ (@thg,  name)
 
-	rz.AddConstructorReturn
-
 
 
 function LoadProperties
@@ -322,7 +320,6 @@ function CreateEmptyConstructors (|scfunction|)
 	if .CanHaveEmptyConstructor
 		rz = .CreateEmptyFunc( "Constructor" )		#require
 		(rz is EmptyConstructor)
-		rz.AddConstructorReturn
 
 	|| pc = .PassableCount
 	|| s = .super
@@ -337,24 +334,23 @@ function CreateEmptyConstructors (|scfunction|)
 		rz := f2
 
 
-function Message.AddConstructorReturn (|scclass| cls)
-	/*
-	|| prms = .second
-	debug_require prms == @prm and prms.position != -123
-	using self
-	|| dcl = prms.msg(@decl)
-	dcl <~ (@thg, cls.name)
-	prms.position = -123		// remove
-	|| args = prms.next
-	|| type = message(@thg, cls.name)
+function scfunction.AddConstructorReturn2
+	require !.IsWrapper and self is newnew
+	|| args = .source[@arg,2]
+	using .source
+	|| type = message(@thg, .cls!.name)
 	args.first = (macros.ConstructorNew)(type)
 	args.msg(@tmp, "return") <~ (@thg, "self")
-	*/
 
-function scfunction.AddConstructorReturn
+
+function scfunction.AddConstructorReturn (|message| prms)
 	opt norefcounts
-	|| c = .cls
-		.source.AddConstructorReturn(c)
+	require !(.cls!.isstruct)
+	is newnew
+	using prms
+	|| dcl = prms.msg(@decl)
+	dcl.msg(@arel, "!") <~ (@thg, .cls!.name)
+
 
 
 function CreateConstructors 
@@ -366,7 +362,6 @@ function CreateConstructors
 			con := s.ConstructorFunc
 			.DestructorFunc = s.DestructorFunc
 			require con
-			con.AddConstructorReturn
 		
 		using .Source
 		if !con and !.IsWrapper		// some wrapper classes cant be newed.
@@ -375,7 +370,7 @@ function CreateConstructors
 		
 		for f in con
 			if f.cls == self // role messageroot doesnt need an allocator
-				.NewClassNew( f, ConstrNew!.copy(f.source)      , 0        )
+				.NewClassNew( f, ConstrNew!.copy(f.source) )
 	
 	if !.IsRole
 		|| NeedsDestructor = .IsObject or (.IsStruct and .HasObjectProperties)
@@ -383,28 +378,29 @@ function CreateConstructors
 
 
 function FindSpecialFunc (|string| keyword, |bool| CheckParents, |SCFunction|)
-	return .FindFunc(keyword, CheckParents, true)
+	return .FindFunc(keyword.lowercase, CheckParents, true)
 
 
-function FindFunc (|string| keyword, |bool| CheckParents, |bool|DoError, |SCFunction|)
-	keyword = keyword.Lowercase
-	
+function FindFunc (|string| keyword, |bool| CheckParents, |bool| DoError, |SCFunction|)
+	opt norefcounts
 	for (b.upwards in self)
-		if (b.access)
-			|| o = b.access[ keyword ]
-			if (!o)
-				|| a = 1
-			  elseif (o isa SCFunction)
-				Return o // prefer improved #expect
-			  else
-				if .IsObject
-					expect (!DoError) (b.source, "'$keyword' keyword only usable with functions.")
+		|| o = b.access[ keyword ]
+			if o isa SCFunction
+				return o
+			expect (!.IsObject or !doerror) (b.source, keyword + " keyword only usable with functions.")
 		
-		require (CheckParents)
+		loop CheckParents
 
 
 
-function NewClassNew (|SCFunction| con, |Message| src, |int| ExtraCode)
+function NewClassNew (|SCFunction| con, |Message| src)
+	|| IsOK = stderr.mark
+	.NewClassNewSub(con, src)
+	if !IsOK
+		con.badness |= 1
+
+
+function NewClassNewSub (|SCFunction| con, |Message| src)
 	src.Position = con.Source!.Position
 	
 	|| result			= .Modul.NewModuleFunc( src )$
@@ -414,28 +410,27 @@ function NewClassNew (|SCFunction| con, |Message| src, |int| ExtraCode)
 		c = []
 		con.CounterPart = c
 	c <~ result
-	result.AllocCode   |= functiontype.New ||| ExtraCode
+	(result is New)
 	(con.alloccode = functionType.Constructor)
 	
 	|| NewParams		= src[ @prm, 1 ]
 	|| A				= con.Source!.Second
 	|| rsrc				= result.source!
 	|| TypeNode			= rsrc.FindNested(@thg, "type", true)
-	require TypeNode and NewParams
-	
-	if A == @prm or @list
-		|| CallParams = rsrc.FindNested(@dot).last
-		for dcl in A
-			|| dcpy = dcl.Copy(Src)
-			NewParams  <~ dcpy
-			|| dn = dcpy.GetDclName
-				CallParams <~ dn.Copy
-	
-	TypeNode.ReplaceWith(.TypeNormal.writetype)
-	NewParams <~ .TypeNormal.WriteDeclFull
+	if TypeNode and NewParams
+		if A == @prm or @list
+			|| CallParams = rsrc.FindNested(@dot).last
+			for dcl in A
+				|| dcpy = dcl.Copy(Src)
+				NewParams  <~ dcpy
+				|| dn = dcpy.GetDclName(true)
+					CallParams <~ dn.Copy
+		
+		TypeNode.ReplaceWith(.TypeNormal.writetype)
+		NewParams <~ .TypeNormal.WriteDeclFull
 
 
-function CreateAlloc (|string| ParseThing, |int| Extra)
+function CreateAlloc (|string| ParseThing, |functiontype| Extra)
 	require .IsObject and !.IsRole
 	
 	|| src = ParseThing.ParseClean.first
@@ -443,9 +438,10 @@ function CreateAlloc (|string| ParseThing, |int| Extra)
 		|| r = CppRefs.new
 		fn.refs = r
 		r.disturbs = nil
-		fn.AllocCode = FunctionType.Alloc ||| extra
 		if extra
 			fn.IsVisible = false
+		extra |= FunctionType.Alloc
+		fn.AllocCode |= extra
 
 
 function NeedsDefaultValue (|message| def, |&message| place, |string| name)
@@ -533,7 +529,6 @@ function LoadConstructorsAndAllocators
 	.CreateConstructors
 	if .IsObject and .constructorfunc
 		.CreateAlloc( .AllocStr, 0 )
-		.CreateAlloc( .AllocStrLayer, FunctionType.Layer )
 
 	|| s = .super
 		.NoEarlyFree := s.NoEarlyFree
@@ -550,23 +545,12 @@ function AllocStr (|string|)
 	"
 
 
-function AllocStrLayer (|string|)
-	|| s0 = .name
-	|| s = (s0, .super!.name)(!.IsRole)
-	return "
-	helper LayerAlloc (|MemoryLayer!| _L, |$s0|)
-		visible false
-		return JB_LayerNewClass(_L, __classes__.$s)|$s0|
-	"
-
-
 function AfterFuncsDecled
 	.OverrideSyntax
 		
 	|| f = .ConstructorFunc
-		expect (!f.ReturnType)  ( f.Source, "Constructors can’t return things." )
+//		expect (!f.ReturnType)  ( f.Source, "Constructors can’t return things." )
 		.CheckAllocVsWrapper( f, true )
-	
 	
 	f = .DestructorFunc
 	if (f)

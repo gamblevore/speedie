@@ -74,9 +74,6 @@ helper @file.MainArg		(|int| Pos, |string| name, |file|)
 helper @ExistingFile.MainArg (|int| Pos, |string| name, |file|)
 	return string.MainArgSub(Pos, name, "file-path")$.FileThatExists
 
-helper @FileData.MainArg     (|int| Pos, |string| name, |stringthatwasreadsafely|)
-	return ExistingFile.MainArg(pos, name)$.ReadAll
-
 helper @JeeboxFile.MainArg   (|int| Pos, |string| name, |messageroot|)
 	return ExistingFile.MainArg(pos, name)$.parse
 
@@ -93,7 +90,6 @@ helper @OutputFile.MainArg   (|int| Pos, |string| name, |faststring|)
 
 role ExistingFile (file)
 role JeeboxFile   (file)
-role FileData     (stringthatwasreadsafely)
 role OutputFile   (faststring)
 
 

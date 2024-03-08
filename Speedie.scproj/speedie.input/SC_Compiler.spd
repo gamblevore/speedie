@@ -471,8 +471,7 @@ function ImportAll
 	for c in .ClassList
 		c.Project.use
 		c.LoadConstructorsAndAllocators
-		
-
+	
 	require .Stage( "Collecting Constants" )
 	.CollectConstants
 	(Message).Restore
@@ -526,7 +525,6 @@ function ImportAll
 		fn.iskiller = true
 	
 
-	/// Then declarations "|| x = message[0]"	
 	require .Stage( "A Bit More Stuff On Classes" )
 	for c in .ClassList
 		c.ExportName = c.StructName // minifier...
@@ -564,6 +562,8 @@ function ImportAll
 	for f in .FuncList
 		|| p = f.ProtoDecl
 			p.Name = f.ExportName
+		  else
+			f.AddConstructorReturn2
 	
 	
 	.Stage( "Checking Iterators" )
