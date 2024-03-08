@@ -259,7 +259,7 @@ class SaverClassInfo (array)
 
 	
 	function HasData (|bool|)
-		return (.data != nil) and (.data[0])
+		return .data[0]
 
 	
 	function Saveable.SaverInfo (|SaverClassInfo|)

@@ -25,7 +25,7 @@ class StringFields
 
 	iterator
 		|| Prev = 0
-		while (.Data != nil) {
+		while {
 			|| Curr_ = .NextSep(Prev)
 			yield  .Field( Prev, Curr_ )
 			Prev = Curr_ + 1

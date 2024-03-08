@@ -70,7 +70,7 @@ datatype NilCheckMode (uint)
 		return  p ||| (self &~ active)
 
 
-datatype nilreason (byte)
+datatype NilReason (byte)
 	constants
 		|nilreason|
 		Accessing

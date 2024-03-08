@@ -87,7 +87,7 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	return nilstate.real
 	
 	
-function UseChildAsReal (|message| msg, |nilreason| reason=nilreason.accessing, |NilState|) 	// a.b, *a, a[0], (a)()
+function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |NilState|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 
 	// So... UseChildAsReal... well... if its a property, we can still do this?
@@ -102,7 +102,12 @@ function UseChildAsReal (|message| msg, |nilreason| reason=nilreason.accessing, 
 				return .PropertyToFunc(msg, ddd)
 				
 			.BecomeReal(ch.FastDecl, ch, reason)
-		return dcl.nildeclared
+		|| nd = dcl.nildeclared
+		if test isnt active or test is soft
+			return nd
+		if nd.statedreal and dcl.typesuffers
+			return msg.RedundantDeclare(nd)
+		return nd
 	debugger // what?
 
 
@@ -124,11 +129,12 @@ function Item (NilTrackerFn)
 
 
 function Access (NilTrackerFn)
-	return .UseChildAsReal(msg)
+	return .UseChildAsReal(msg, test, nilreason.accessing)
 
 
 function Property (NilTrackerFn)
-	return .UseChildAsReal(msg, nilreason.property)
+	"Broken".debugfunc
+	return .UseChildAsReal(msg, test, nilreason.property)
 
 
 function RealBool (|bool| b, |nilstate|)
@@ -160,7 +166,7 @@ function Function (NilTrackerFn)
 	if !fn
 		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
 		fn = fp.GetFunctionPointer
-		require fn and .UseChildAsReal(fp)						// (abc)()
+		require fn and .UseChildAsReal(fp, 0, nilreason.accessing)					// (abc)()
 
 	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
 	
@@ -404,7 +410,7 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 	if lnil and rnil
 		|| lld = ll.FastDecl
 		if lld.NilAllocDepth >= .Loops.NestDepth
-			return ll.Redundant(lld, test)
+			return ll.Redundantvar(lld, test)
 		if lnil + rnil != 3				// how super-fiddly is this?
 			return nilstate.real		// "if nil1 == nil2"... who gives a damn.
 	
@@ -476,7 +482,7 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	if Unknown or Y != test
 		return T.SetNilness(dcl, Test)
 
-	return msg.Redundant(dcl, test)
+	return msg.Redundantvar(dcl, test)
 
 
 
@@ -525,7 +531,7 @@ function Brel (Niltrackerfn)
 	opt norefcounts
 	|| b = msg.name.first
 	if b == '*'
-		return .UseChildAsReal(msg)							// *abc
+		return .UseChildAsReal(msg, test, nilreason.accessing)				// *abc
 
 	|| ch = (*msg)!
 	if b == '-' or '+' // for ++ or --

@@ -117,9 +117,10 @@ struct FastBuff
 		error ("Can't allocate memory.")
 	
 	function Alloc (|int| n, |bool|)
-		.start = Memory.Zalloc(n)!
-		.curr = .start
-		.end = (.start+n, nil)(.start)
+		|| mem = Memory.Zalloc(n)$
+		.start = mem
+		.curr = mem
+		.end = mem+n
 		.ReadFrom = nil
 		return .start
 	
@@ -131,9 +132,9 @@ struct FastBuff
 		if self
 			return .end - .start
 	
-	function jbin.Add		(|syntax| type, |&FastBuff| data, |bool|into = false)
-		cpp_part AddBuff
-		|| L = data.length
-		|| addr = (data.start, nil)(L)
-		.addmemory(type, addr, into, L)
+function jbin.Add		(|syntax| type, |&FastBuff| data, |bool|into = false)
+	cpp_part AddBuff
+	|| L = data.length
+	|| addr = (data.start, nil)(L)
+	.addmemory(type, addr, into, L)
 

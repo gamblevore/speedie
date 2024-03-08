@@ -1039,8 +1039,6 @@ module SDLApp
 		#!keydown!
 		|| kev = ev.keysym
 		|| key = kev.sym
-		if key is a
-			if keys.cmd
 		if key.IsCancelled or .CanDrag >= mousedragging.Within
 			return SDLActivity.nothing
 		beep.OK = 1

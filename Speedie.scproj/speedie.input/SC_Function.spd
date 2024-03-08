@@ -458,8 +458,6 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	for (FuncArg in .Args) (fi)
 		|| PArg_Ch   = Incoming[Pos]
 		|| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
-		expect (FuncArg.type) (.Source)
-
 		if Base
 			FuncArg = FuncArg.ContainedReplace(base, false)
 

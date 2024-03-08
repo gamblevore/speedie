@@ -8,8 +8,8 @@ task DelayedShowError (|bool|)
 	|ivec2|    P
 	run
 		(.OnShowExtraInfo)(self, P, nil, err, "error", true)?
-
 }
+
 
 
 datatype GuiTaskState (byte)
@@ -68,3 +68,14 @@ class GUITask
 				.Tasks.FastRemove(i)
 			  else
 				i++
+
+
+
+class Task (ringtree)
+	|Date|				StartTime
+	|Date| 				EndTime
+//	|GuiTaskState| 		State // use position for state
+	|_voidptr|			_Func
+	|int64[8]| 			_Local
+
+

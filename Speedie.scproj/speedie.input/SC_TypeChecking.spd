@@ -72,9 +72,7 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |u
 		Return kUseDefaultParams
 
 	if (o == self)
-		Return kSimpleMatch
-	require o.type and .type
-		
+		Return kSimpleMatch		
 
 	if (o.IsNil and (TypeCast & kTypeCastTrue))		// nil cast
 		if .CantBeNilInCpp							// |mystruct| x = nil

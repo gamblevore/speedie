@@ -257,7 +257,7 @@ function message.OrigMsg (|message|)
 	opt norefcounts
 	|| f = .SCFile$
 	|| o = f.orig
-	return o.findtightest(.position)
+	return o.findtightest(.position, false, true)
 
 
 function errorreceiver.ReturnErrors (|errorreceiver| To = StdErr, |int|)

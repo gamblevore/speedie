@@ -123,11 +123,10 @@ class SpdProcess (Process)
 		.UpdatePipes
 		.UnRegister
 		.ClosePipes
-		if .pico
-			if .alive and !why and .CommsOpen
-				why = "UnknownReason"
-				debugger
-			.pico!.close(Why)
+		if .alive and !why and .CommsOpen
+			why = "UnknownReason"
+			debugger
+		.pico!.close(Why)
 
 
 	helper StartProcess (|string| path, |[string]| Args=nil, |&pico| C = nil, |bool| CaptureStdOut, |bool|)

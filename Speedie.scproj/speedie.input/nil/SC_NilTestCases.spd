@@ -17,6 +17,11 @@ class NilTest
 		|| v = .v3
 		borks // amazing
 		*v = 'x'
+	
+	function Broken
+//		borks
+//		if .v4
+//			""
 		
 	function AndTest (|string?| a, |string?| b, |string| cc)
 		if (a and b)
@@ -202,21 +207,6 @@ module NilTest2
 	function Dictionary (|dictionary? of string| d)
 		borks
 		d["abc"] = "x"
-
-	target debugnil2 {
-	function BrokenStruct
-		borks
-		*abc = nil							// global struct pointers not assumed nil rn?
-	
-	function TestFree (|int| i)
-		memory.free(nil)
-	
-	function NilDataType
-		.TestFree(nil)
-	
-	|&RetroFloat| abc
-
-	}
 	
 	function ArrayTest
 		borks

@@ -32,6 +32,14 @@ datatype NilState (byte) // Exec.scproj needs this here
 		
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type
+	
+	function StatedReal (|nilstate|)
+		if self & nilstate.optional == NilState.Real
+			return NilState.real
+			
+//	function StatedOptional (|nilstate|)
+//		if self & nilstate.optional == NilState.Optional
+//			return NilState.real
 
 	
 

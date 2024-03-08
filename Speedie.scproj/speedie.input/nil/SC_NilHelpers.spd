@@ -10,12 +10,18 @@
 
 extend Message {
 
-function Redundant (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
+function RedundantDeclare (|nilstate| D,  |nilstate|)
+	|| str = .origrender + " redundantly tested. Declared as real." 
+	error (self, str)
+	return D
+
+
+function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 	if (Test is soft or while) // allow redundant
 		return Test & nilstate.either
 
 	if ArchonPurger.loops.NestDepth == 0
-		|| str = .render + " redundantly tested. Currently is: " + dcl.nilcurr.rawname 
+		|| str = .origrender + " redundantly tested. Currently is: " + dcl.nilcurr.rawname 
 		error (self, str)
 	return Test & nilstate.either
 

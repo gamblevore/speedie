@@ -663,7 +663,7 @@ class SCDecl (SCNamed) {
 		
 
 	function WriteSimpleType (|Message|)
-		|| name = (.type.Name, "(nil!)")(.type)
+		|| name = .type.Name
 		rz = @Thg + name
 		for (.pointercount|int|)
 			rz = «Brel "&", rz »
@@ -870,8 +870,7 @@ class SCDecl (SCNamed) {
 		rz.NilDeclared = type
 
 	function StatedReal (|nilstate|)
-		if .NilDeclared&nilstate.optional == NilState.Real
-			return NilState.real
+		return .NilDeclared.statedreal
 
 	function StatedOptional (|nilstate|)
 		if .NilDeclared&nilstate.optional == NilState.optional
@@ -1014,7 +1013,7 @@ class SCDecl (SCNamed) {
 		return .DownGrade.RenderTypeName(fs_in)
 
 	render RenderTypeName 
-		if !self or !.type
+		if !self
 			fs <~ "(nil!)"
 		  else 
 			if (.IsNil) 

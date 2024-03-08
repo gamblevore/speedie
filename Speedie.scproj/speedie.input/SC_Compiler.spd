@@ -160,15 +160,15 @@ function CompileAll (|bool|)
 	ErrorDelayer.ReturnErrors
 
 	.PrepareInterpreter
-	require .Stage( "More constructors" )
-	.RefConstructors // constructors
+	if .Stage( "More constructors" )
+		.RefConstructors // constructors
 	.CheckIsGoodLibrary
 
-	require .Stage( "Stripping dead code" )
-	.DeadStrip
+	if .Stage( "Stripping dead code" )
+		.DeadStrip
 	
 	if options.NilStrength > 0
-		require .Stage( "NilChecking" )
+		.Stage( "NilChecking" )
 		.Timer( "NilChecking" )
 		ArchonPurger.FixArchons
 	
