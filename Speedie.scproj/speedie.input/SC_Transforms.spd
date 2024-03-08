@@ -86,12 +86,12 @@ function Tran_Expect (TranFunc)
 	if (N == "expect") or (NewStyle)
 		arg <~ ch1.ExpectParamsTransform( node.Position, ch, N )
 	  elseif (N == "debug_require")
-		arg.msg(@tmp, "debugger")
+		arg <~ (@tmp, "debugger")
 	if (!NewStyle)
 		if n == "loop"
-			arg.msg(@tmp, "exit")
+			arg <~ (@tmp, "exit")
 		  else
-			arg.msg(@tmp, "return").msg(@ques, "nil")
+			arg.msg(@tmp, "return") <~ (@ques, "nil")
 
 
 function Tran_Temporal (|SCFunction| fn, |Message| s, |SCNode| name_space)

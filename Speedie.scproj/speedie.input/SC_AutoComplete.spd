@@ -789,12 +789,12 @@ function AutoComplete (|message| ff, |string| name, |string| Purpose, |message|)
 
 function ActualDefine (|message| rz, |message| s, |string| purpose)
 	|| f = s.filepath			#expect "nopath"
-	rz.msg(@sstr, f)
+	rz <~ (@sstr, f)
 	rz <~ s.position
 
 
 function SCNode.DiissplayObj (|message| rz, |message|)
-	rz.msg(@emb, .AutoCompleteKind + " " + .name)
+	rz <~ (@emb, .AutoCompleteKind + " " + .name)
 	return rz
 
 
@@ -821,7 +821,7 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 			return obj.diissplayobj(rz)
 	
 	if (s == @decl) and (!fn or msg.deepequals(s.DeclName))
-		rz.msg(@emb, s.RenderTypeAndName)
+		rz <~ (@emb, s.RenderTypeAndName)
 		return rz
 
 	if !fn

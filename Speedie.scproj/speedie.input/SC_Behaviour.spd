@@ -124,12 +124,12 @@ class SCBehaviour (SCNode)
 
 		|| Using = fn.source.syntaxusing
 		|| CopyFrom = fn.source.Second
-		WriteTo.msg(@thg, "self")
+		WriteTo <~ (@thg, "self")
 
 		for C in CopyFrom
 			if C == @decl
 				|| it = c.declname
-					WriteTo.msg(@thg, it.name)
+					WriteTo <~ (@thg, it.name)
 
 	
 	function SCClass.AddInterfacesTo (|[SCModule]| List)

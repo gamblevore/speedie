@@ -1209,7 +1209,7 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 	  else
 		dot.name = "SyntaxCompare"
 		exp.Last!.name = comp.compOp
-		exp.msg(@Num, comp.compparam )
+		exp <~ (@num, comp.compparam)
 
 	TypeOfExpr( dot, name_space )
 	Return TypeBool!.TypeNormal
@@ -1494,7 +1494,7 @@ function TypeOfList (ExprResolver)
 	|| name = ("vecmix", "ivecmix")(isfloat)
 	|| list = «prm »
 	exp.AppendAllInto(list)
-	exp.msg(@thg,name)
+	exp <~ (@thg, name)
 	exp <~ list
 	exp.func = @func
 	return TypeOfExpr(exp, name_space)

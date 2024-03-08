@@ -179,9 +179,9 @@ function BuildInstructions (TranFunc) // __instructionlist__
 		|| form = tmp[0][0].name
 			|| fnc = @sdot + "add" 
 			|| list = fnc.msg(@list)
-			list.msg(@str, form.lowercase)
-			list.msg(@str, tmp.name)
-			list.msg(@num, pos.render)
+			list <~ (@str, form.lowercase)
+			list <~ (@str, tmp.name)
+			list <~ pos
 			after.next = fnc
 			after = fnc
 

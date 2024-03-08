@@ -66,7 +66,7 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 	using (dcl)
 	rz = dcl.msg(@rel)
 	rz <~ dcl.second
-	rz.msg(@Opp, "=")
+	rz <~ (@Opp, "=")
 	rz <~ Default
 
 

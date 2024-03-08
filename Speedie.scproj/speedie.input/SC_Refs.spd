@@ -183,7 +183,7 @@ function scfunction.RefFunc (|message| prm, |message| after)
 	parser.using.position = -1
 	|| rz = «func »
 	after.next = rz
-	rz.msg(@thg, .exportname)
+	rz <~ (@thg, .exportname)
 	rz.obj = prm.obj
 
 	|| lst = rz.msg(@prm) 
@@ -857,7 +857,7 @@ function scdecl.DeclToDot (|SCDecl| P0, |Message|)
 	
 	rz = @dot + .Name
 	rz <~ slf_msg
-	rz.msg(@emb)
+	rz <~ @emb
 
 	rz.obj = self
 

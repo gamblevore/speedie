@@ -949,7 +949,7 @@ function FixCnj (|Message| exp)
 function FixCnjSub (|Message| exp) {
 	if exp == @ARel					// x$ --> x#require
 		exp.become(@TRel)
-		exp.msg(@opp, "require")
+		exp <~ (@opp, "require")
 	
 	// get the name (it's important)
 	|| ch = exp.first!
@@ -1056,16 +1056,16 @@ function FixCnjSub (|Message| exp) {
 
 	
 	if (name == "debug_require")
-		arg.msg(@tmp, "debugger")
+		arg <~ (@tmp, "debugger")
 
 	if (name == "continue") and pp.WithinLoop( .SourceArg )
-		arg.msg(@tmp, "continue")
+		arg <~ (@tmp, "continue")
 		
 	  elseif (name == "loop") and pp.WithinLoop( .SourceArg )
-		arg.msg(@tmp, "exit")
+		arg <~ (@tmp, "exit")
 		
 	  elseif (DoesReturn)
-		arg.msg(@tmp, "return").msg(@ques,"nil")
+		arg.msg(@tmp, "return") <~ (@ques,"nil")
 	
 	thg = thg!.Negate	
 	|| if_ = «tmp "if"
@@ -1167,7 +1167,7 @@ function NewProtoTypeSub (|Message| node, |SCNode| parent, |Message| ErrPlace, |
 	
 	|| Using = node.SyntaxUsing
 	|| tmp = @tmp + "datatype"		// fffffffuuuu
-	tmp.msg(@thg, f.Name)
+	tmp <~ (@thg, f.Name)
 	tmp <~ node.last
 	
 	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface, SCNodetype.funcproto )
@@ -1226,7 +1226,7 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |SCD
 		exp_copy = exp.copy
 	msg.become(@rel)
 	msg <~ exp_copy
-	msg.msg(@opp, "=")
+	msg <~ (@opp, "=")
 	msg <~ R
 	msg.obj = nil
 	
@@ -1258,7 +1258,7 @@ function Tran_Log (TranFunc)
 		platform.log(abc)
 	using (node)
 		|| f = node.first
-		node.msg(@Thg, "platform")			// this seems better... than tran_print
+		node <~ (@Thg, "platform")			// this seems better... than tran_print
 		node.msg(@prm) <~ f					// probably tranprint should use this instead.
 		node.func = @dot					// like Platform.print, Platform.printline, Platform.printerror
 	TypeOfExpr( node, name_space )			// Platform.log
@@ -1278,7 +1278,7 @@ function AlterPostCond (|Message?| PostCond, |Message?| IterPostCond, |message| 
 
 function ArgToFunc (|string| NewName, |Message| Params, |Message| arg,  |Message|)
 	rz = @tmp + "function"
-	rz.msg(@thg, newname)
+	rz <~ (@thg, newname)
 
 	if (params == @prm)
 		rz <~ params

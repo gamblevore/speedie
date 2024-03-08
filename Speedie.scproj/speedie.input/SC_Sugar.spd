@@ -88,7 +88,7 @@ function message.Tran_QMark
 		|| options = tern.msg(@list)
 		tern.msg(@prm) <~ cond
 		options <~ thedot
-		options.msg(@thg, "nil")	// TypeOfTern could "just give the default"!
+		options <~ (@thg, "nil")	// TypeOfTern could "just give the default"!
 									// So I don't even need to enter "nil"! Just delete it!
 	if (inside != @thg)
 		cond.name = "_t"

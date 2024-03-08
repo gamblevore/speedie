@@ -139,9 +139,12 @@ function CreateAutoConstructor (|scfunction|)
 			check (name != "__rz__") (prop.source, "Invalid name.")
 			prms <~ prop.WriteDeclTypeAndName(name, 0)
 			|| rel = arg.msg(@rel)
-			rel.msg(@sdot, name)
-			rel.msg(@opp,  "=")
-			rel.msg(@thg,  name)
+			rel <~ (@sdot, name)
+			rel <~ (@opp,  "=")
+			rel <~ (@thg,  name)
+
+	rz.AddConstructorReturn
+
 
 
 function LoadProperties
@@ -319,6 +322,7 @@ function CreateEmptyConstructors (|scfunction|)
 	if .CanHaveEmptyConstructor
 		rz = .CreateEmptyFunc( "Constructor" )		#require
 		(rz is EmptyConstructor)
+		rz.AddConstructorReturn
 
 	|| pc = .PassableCount
 	|| s = .super
@@ -334,16 +338,23 @@ function CreateEmptyConstructors (|scfunction|)
 
 
 function Message.AddConstructorReturn (|scclass| cls)
+	/*
 	|| prms = .second
 	debug_require prms == @prm and prms.position != -123
 	using self
 	|| dcl = prms.msg(@decl)
-	dcl.msg(@thg, cls.name)
+	dcl <~ (@thg, cls.name)
 	prms.position = -123		// remove
 	|| args = prms.next
 	|| type = message(@thg, cls.name)
 	args.first = (macros.ConstructorNew)(type)
-	args.msg(@tmp, "return")<~(@thg, "self")
+	args.msg(@tmp, "return") <~ (@thg, "self")
+	*/
+
+function scfunction.AddConstructorReturn
+	opt norefcounts
+	|| c = .cls
+		.source.AddConstructorReturn(c)
 
 
 function CreateConstructors 
@@ -353,8 +364,9 @@ function CreateConstructors
 			|| s = .super! // roles always have supers
 			check (!con or s.ConstructorFunc) (con.source, "Role's super lacks a constructor.")
 			con := s.ConstructorFunc
-			.destructorfunc = s.DestructorFunc
+			.DestructorFunc = s.DestructorFunc
 			require con
+			con.AddConstructorReturn
 		
 		using .Source
 		if !con and !.IsWrapper		// some wrapper classes cant be newed.

@@ -1036,12 +1036,13 @@ class Message (RingTree)
 		errorreceiver.NewWarning( self, Error )
 	
 	Syntax Append (|syntax| Fn, |string| name="")
+		opt norefcounts
 		cpp_part AppendSyx
 		.msg(fn, name)
 	
 	Syntax Append (|int64| Num)
 		cpp_part AppendNum
-		.msg(@num, num.render)
+		self <~ (@num, num.render)
 
 	Syntax Using (|MessagePosition|)
 		Opt NoRefCounts
