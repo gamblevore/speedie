@@ -7,21 +7,22 @@
 app.Usage = "Usage: jz File1 [File2...]
 Convert files between jbin, box, xml formats. Additionally can compress or decompress.
 
-    -box            Convert to jeebox
-    -bin            Convert to jbin
-    -c              Compress (c=0 to c=6)
-    -s              Replace file in-place
-    -json           Source is json
-    -p              Print to stdout
-    -r              Just report types, otherwise do nothing
-    -o=name         Sets the output filename
+	-box -b			Convert to jeebox
+	-bin -n			Convert to jbin
+	-c				Compress (c=0 to c=6)
+	-s				Replace file in-place
+	-json			Source is json
+	-p				Print to stdout
+	-r				Just report types, otherwise do nothing
+	-o=name			Sets the output filename
 
 examples:
-    jz -b A.xml   					// xml to jeebox
-    jz -c A.xml   					// compress A.xml into A.xml.mz
-    jz    A.txt.mz   				// decompress A.txt.mz to A.txt
-    jz -n A.box   					// jeebox to jbin
-"
+	jz -box A.xml						// xml to jeebox
+	jz -b   A.xml						// same
+	jz -c   A.xml						// compress A.xml into A.xml.mz
+	jz      A.txt.mz					// decompress A.txt.mz to A.txt
+	jz -bin A.box						// jeebox to jbin
+".tabstospaces
 
 
 datatype Type (int)

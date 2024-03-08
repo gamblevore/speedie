@@ -243,18 +243,23 @@ function String.AddTabs (|bool| Tabs=true, |string|)
 
 
 helper String.TabsToSpacesSub (|faststring| fs)
-	for (c in self) (i)
+	|| i = 0 
+	for (c in self)
 		if c == '\t'
-			
-		else
+			|| remain = 4 - (i mod 4)
+			fs <~ (' ', remain)
+			i += remain
+		  else
 			fs <~ c
+			i++
 		
 
 function String.TabsToSpaces (|string|)
 	|| fs = FastString()
-	for l.lines in self
-		.TabsToSpacesSub(fs)
-		fs <~ "\n"
+	for (l.lines in self) (p)
+		l.TabsToSpacesSub(fs)
+		if p
+			fs <~ self[p] // match line-ending
 	return fs
 		
 		
