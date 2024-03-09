@@ -58,10 +58,12 @@ Speedie checks the first param, and assumes we want a constant within `ListViewS
             ...
     
 
-So these two lines are equivalent:
+So these two versions are equivalent:
 
-    require row isnt Disabled
-    require !row.syntaxis(listviewstate.disabled)
+    require row isnt Disabled                    // version one
+    if row.syntaxis(listviewstate.disabled)      // version two
+        return nil
+    
 
 Obviously, the first looks better, but they both do the same thing, and the second is how people normally would be testing for flags on states in classes, in other languages. You can also do things like this:
 
