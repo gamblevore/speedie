@@ -111,8 +111,6 @@ class Image (memory)
 		.WindowBase   = (0, 0)
 		._ControlClip = (0, 0, .size)
 	
-	function No
-	
 	function Horz (assigns:|ivec2|r)
 		._controlclip.x = r.x
 		._controlclip.x2 = r.x2

@@ -170,43 +170,44 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 		y++
 
 
-extend FastString
-	function message.Now (||)
-		|| a = .slowcount #require
-		|int| b = date.now mod a
-		return self[b]
+function message.Now (||)
+	|| a = .slowcount #require
+	|int| b = date.now mod a
+	return self[b]
 
-	function Picture (|int| c, |image| f)
-		cpp_part ram_test_encode
-		if c > 127 // unicode...
-			c = 32
-		elseif c == 32
-			c = 0
-		
-		|| X0 = C * font.Width
-		for x in font.Width
-			|| B = 0
-			for y in 8
-				|| rz = f[x0 + x,  y]
-				if rz.hascolor
-					b |= (1<<y)
-			self <~ b|byte|
-
-
-extend string
-	render Picture (|image| font=font.small)
-		cpp_part ram_test_encode
-		for c in self
-			fs.Picture(c, font)
+//extend FastString
+//
+//	function Picture (|int| c, |image| f)
+//		cpp_part ram_test_encode
+//		if c > 127 // unicode...
+//			c = 32
+//		elseif c == 32
+//			c = 0
+//		
+//		|| X0 = C * font.Width
+//		for x in font.Width
+//			|| B = 0
+//			for y in 8
+//				|| rz = f[x0 + x,  y]
+//				if rz.hascolor
+//					b |= (1<<y)
+//			self <~ b|byte|
 
 
-	render Depicture
-		cpp_part ram_test_decode
-		for row in (7 downto 0)
-			for c in self
-				|| bit = c & (1 << row)
-				fs <~ ('*', ' ')(bit)
-			fs <~ '\n'
+//extend string
+//	render Picture (|image| font=font.small)
+//		cpp_part ram_test_encode
+//		for c in self
+//			fs.Picture(c, font)
+//
+//
+//	render Depicture
+//		cpp_part ram_test_decode
+//		for row in (7 downto 0)
+//			for c in self
+//				|| bit = c & (1 << row)
+//				fs <~ ('*', ' ')(bit)
+//			fs <~ '\n'
 
 		
 function string.EndsWithLine (|bool|)

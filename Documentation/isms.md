@@ -21,13 +21,13 @@ These are special functions. They work like any other function, but are called v
         printline x[2] // "l"
     
 
-+ `syntax append` - Useful if your class can have things appended into it.
-+ `syntax equals` - Used for comparing if two objects are equal.
++ `syntax append`  - Useful if your class can have things appended into it.
++ `syntax equals`  - Used for comparing if two objects are equal.
 + `syntax compare` - Used for comparing if one object is more or less than the other.
-+ `syntax access` - Used for accessing an object as if it were an array. Can take params of any kind, strings or messages even. Can even take multiple parameters.
-+ `syntax expect` - Used for error-handling.
-+ `syntax cast` - Decides how an object gets turned into a bool. Useful for `"if"` tests. Also used so you can return a `faststring` object from a function that expects a `string`... because the `faststring` has a cast to a `string`.
-+ `syntax is/isnt` - See below.
++ `syntax access`  - Used for accessing an object as if it were an array. Can take params of any kind, strings or messages even. Can even take multiple parameters.
++ `syntax expect`  - Used for error-handling.
++ `syntax cast`    - Decides how an object gets turned into a bool. Useful for `"if"` tests. Also used so you can return a `faststring` object from a function that expects a `string`... because the `faststring` has a cast to a `string`.
++ `syntax is`      - See below.
 
 ---
 ### 'is' and 'isnt'
@@ -46,6 +46,8 @@ Where are the names ("modified/disabled") defined? How are they found? They are 
         if self
             return .state & s
 
+the `isnt` operator is automatically defined as being the opposite of `is`. So as long as you define `syntax is`...  then both the `is` and `isnt` operators are enabled for you!
+
 Speedie checks the first param, and assumes we want a constant within `ListViewState`. And the `ListViewState` datatype, has some flags defined:
     
     datatype ListViewState (uint16)
@@ -59,7 +61,7 @@ Speedie checks the first param, and assumes we want a constant within `ListViewS
 So these two lines are equivalent:
 
     require row isnt Disabled
-    require row.syntaxisnt(listviewstate.disabled)
+    require !row.syntaxis(listviewstate.disabled)
 
 Obviously, the first looks better, but they both do the same thing, and the second is how people normally would be testing for flags on states in classes, in other languages. You can also do things like this:
 
