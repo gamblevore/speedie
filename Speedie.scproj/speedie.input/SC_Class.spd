@@ -270,16 +270,11 @@ function LoadClassName (|message| node, |string|)
 	if (node istmp "class")
 		error (node, "Can't find class name.")
 
-
-// maybe better to make an init func for this...
 |Message| ConstrNew
 
 ConstrNew = `function New () {
 	flow off
-	|| __rz__ = alloc()|type|
-	if __rz__?|bool|
-		__rz__.Constructor()
-	return __rz__
+	return (nil|type|).Constructor()
 }`.ParseClean
 
 }
@@ -370,6 +365,7 @@ function CreateConstructors
 		
 		for f in con
 			if f.cls == self // role messageroot doesnt need an allocator
+				(f is new)
 				.NewClassNew( f, ConstrNew!.copy(f.source) )
 	
 	if !.IsRole

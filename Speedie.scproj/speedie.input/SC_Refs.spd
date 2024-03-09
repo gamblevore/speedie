@@ -332,19 +332,15 @@ function Message.SetType (|DotUseType|)
 	opt norefcounts
 	|| d = .dottype
 		return d
-	|| f = .func
-	if f == @brel
-		if self == "*"
-			return DotUseType.memory
-		return 0
-	if f == @acc
+	if .func == @acc
+		return DotUseType.memory
+	if self isbrel "*"
 		return DotUseType.memory
 
 
 function Message.DotType (|DotUseType|)
 	opt norefcounts
-	|| f = .func
-	if f == @Dot
+	if .func == @Dot
 		|| d = .obj
 		if d isa scdecl
 			Return (d is property) * DotUseType.Property 
@@ -844,20 +840,16 @@ function SCFunction.RefsCheckPropertiesAltered
 
 function scdecl.DeclToAddr (|SCDecl| P0, |Message|)
 	opt norefcounts
-	|| Acc = .DeclToDot(p0)
-	rz = «brel "&", Acc »
+	rz = @brel + "&"
+	rz <~ .DeclToDot(p0)
 	rz.obj = .GetAddress
 
 
 function scdecl.DeclToDot (|SCDecl| P0, |Message|)
 	opt norefcounts
-	|| slf_msg = «thg "self"»
-	slf_msg.obj = p0
-	
 	rz = @dot + .Name
-	rz <~ slf_msg
+	rz.msg(@thg, "self").obj = p0
 	rz <~ @emb
-
 	rz.obj = self
 
 }
@@ -868,7 +860,6 @@ function scdecl.RefDestructor (|message|)
 	|| m = .DeclToDot(scfunction.currfunc!.self)
 	if .IsCArray
 		return screfs.DecrMulti(self, m)
-	  else
-		return SCRefs.RefClearMsg( m )
+	return SCRefs.RefClearMsg( m )
 
 
