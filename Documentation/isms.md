@@ -46,8 +46,6 @@ Where are the names ("modified/disabled") defined? How are they found? They are 
         if self
             return .state & s
 
-the `isnt` operator is automatically defined as being the opposite of `is`. So as long as you define `syntax is`...  then both the `is` and `isnt` operators are enabled for you!
-
 Speedie checks the first param, and assumes we want a constant within `ListViewState`. And the `ListViewState` datatype, has some flags defined:
     
     datatype ListViewState (uint16)
@@ -55,8 +53,9 @@ Speedie checks the first param, and assumes we want a constant within `ListViewS
             Selected 
             Modified
             Disabled
-            ...
-    
+            ...    
+
+The `isnt` operator is automatically defined as being the opposite of `is`. So as long as you define `syntax is`...  then both the `is` and `isnt` operators are enabled for you!
 
 So these two versions are equivalent:
 
