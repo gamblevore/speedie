@@ -345,7 +345,7 @@ function scfunction.AddConstructorReturn2
 
 function scfunction.AddConstructorReturn (|message| prms)
 	opt norefcounts
-	require !(.cls!.isstruct)
+	require (.cls!.isobject)
 	is newnew
 	using prms
 	|| dcl = prms.msg(@decl)
@@ -657,8 +657,10 @@ function scfunction.AddSelfToFunc (|scclass| cls, |SCNode| space)
 	|| sl = cls.SelfDecl					// for my nil-checker
 	if sl.TypeSuffers						// refcounting will set MarkAsRefAltered
 		sl = sl.copydecl
-		if .IsConstructorOrDestructor
+		if self is destructor
 			sl = sl.MakeNewReal
+		  elseif (self is constructor) and cls.isobject
+			sl = sl.makenewoptional // nice
 		(sl is SelfImplicit)				// I shouldn't have to specify this, it should be copied!
 	space.TryAdd( space.FuncSrc, sl, "self" )
 	.args <~ sl

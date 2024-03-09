@@ -13,8 +13,8 @@ datatype Syntax (Byte)
 		cpp_Part Syx
 		numeric false // disallow implicit (syntax <--> int) conversion
 
-	function ID (|int|) 
-		return self|int|
+//	function ID (|int|) 
+//		return self|int|
 
 	function Translateable (|bool|) 
 		return self <= @Thg and self >= @tmp
@@ -40,10 +40,10 @@ datatype Syntax (Byte)
 	function Message.Translateable (|bool|) 
 		return .Func.Translateable
 
-	render 
-		opt norefcounts
-		|| o = .Obj
-			o.render(fs)
+//	render 
+//		opt norefcounts
+//		|| o = .Obj
+//			o.render(fs)
 	
 	operator plus (|string| m, |message|)
 		return self.msg(m)
@@ -52,8 +52,8 @@ datatype Syntax (Byte)
 		cpp_Part PlusNum
 		return self.msg(m.render)
 	
-	syntax access (|string| m, |message|)
-		return .msg(m)
+//	syntax access (|string| m, |message|)
+//		return .msg(m)
 	
 	function Name (|string|) 
 		Opt NoRefCounts
@@ -112,6 +112,7 @@ datatype Syntax (Byte)
 		|int|		MaxFuncID  
 		
 		function Func (|string?| name, |message| where=nil, |syntax|)
+			visible
 			if name!=nil
 				|| obj = _syxdict_.valuelower(name) #expect (where, "Unknown syntax " + name)
 				return obj.id
@@ -154,8 +155,9 @@ class SyntaxObj
 	
 	
 	render 
-		ifn fs_in 
+		if !fs_in 
 			return .LongName.lowercase
 		fs_in <~ .LongName.LowerCase
 	
+
 

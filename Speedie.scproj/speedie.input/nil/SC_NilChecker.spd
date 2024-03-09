@@ -133,7 +133,6 @@ function Access (NilTrackerFn)
 
 
 function Property (NilTrackerFn)
-	"Broken".debugfunc
 	return .UseChildAsReal(msg, test, nilreason.property)
 
 

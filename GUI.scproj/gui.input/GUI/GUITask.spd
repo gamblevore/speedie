@@ -1,17 +1,5 @@
 
 
-ignore {
-// should have a start and endtime, by default, and a state
-task DelayedShowError (|bool|)
-	|textview| self
-	|error|    err 
-	|ivec2|    P
-	run
-		(.OnShowExtraInfo)(self, P, nil, err, "error", true)?
-}
-
-
-
 datatype GuiTaskState (byte)
 	flags
 		|GuiTaskState| 
@@ -68,14 +56,4 @@ class GUITask
 				.Tasks.FastRemove(i)
 			  else
 				i++
-
-
-
-class Task (ringtree)
-	|Date|				StartTime
-	|Date| 				EndTime
-//	|GuiTaskState| 		State // use position for state
-	|_voidptr|			_Func
-	|int64[8]| 			_Local
-
 

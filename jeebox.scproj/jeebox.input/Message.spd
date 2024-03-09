@@ -78,9 +78,8 @@ class Message (RingTree)
 	
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
-		|| Using = pos_msg
-		using := self
-		using Using
+		rz = pos_msg ?? self
+		using rz
 			rz = .copysub(pos_msg)
 	
 	

@@ -48,6 +48,7 @@ struct IR // µfunc uses this. // "class IR"
 				remain += bs
 
 	function Print
+		visible
 		if asm.NoisyASM >= 3
 			printline .render
 	

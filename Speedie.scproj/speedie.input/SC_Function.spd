@@ -221,7 +221,7 @@ function CheckNotBadName
 function FuncDecls 
 	scfunction.currfunc = self
 	|| P = .Source.second!
-	if 0 and self is constructor
+	if self is constructor
 		.AddConstructorReturn(p)
 	
 	|| fc = p.first
@@ -831,7 +831,8 @@ function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
 	
 	for (d.backwards in cls.Properties)
 		if d isnt PropertyWasConstructed
-			root.InsertAfter( .NewDefaultRel( oof, d ), AfterHere )
+			|| Made = .NewDefaultRel( oof, d )
+			root.InsertAfter( made, AfterHere )
 	
 	while cls
 		for (d in cls.Properties)
@@ -874,15 +875,11 @@ function TranStrings
 		SCFunction.Tran_Strings( S.parent!, self )
 
 
-function IsConstructorOrDestructor (|bool|)
-	return self is ConOrDes
-
-
 function message.IsParentConCall (|scfunction|)
 	opt norefcounts
 	require (self == @func)
 	|| f = .MsgFunc
-	if f and f.IsConstructorOrDestructor
+	if f and f is ConOrDes
 		return f
 
 
@@ -1535,7 +1532,7 @@ function Tran_Return (TranFunc)  // exitter
 	node.tmptype = asmtmp.kreturn
 	
 	if !node.islast
-		expect (!fn.IsConstructorOrDestructor)   (node, "You can’t return in a constructor or destructor")
+		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")
 	fn.CheckReturnValue( node )
 	node.LastInBlock(SCBlockage.Return)
 	node.CheckNotInStateExpr(fn.SourceArg)

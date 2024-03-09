@@ -1,0 +1,36 @@
+
+
+class Task (ringtree)
+//	|GuiTaskState| 		State // use position for state
+	|_voidptr|			_Func
+	|int64[8]| 			_Local
+
+// should be "subclassable"
+
+
+
+ignore {
+// should have a start and endtime, by default, and a state
+task DelayedShowError (|bool|)
+	|textview| self
+	|error|    err 
+	|ivec2|    P
+	run
+		(.OnShowExtraInfo)(self, P, nil, err, "error", true)?
+
+
+task LessThanTest (|int| i, |bool|)
+	|int| LessThan
+	run: return i < lessthan
+
+}
+
+/*
+// C#
+int lessThan = 100;
+Func<int, bool> lessThanTest = delegate(int i) {
+	return i < lessThan;
+};
+
+
+*/

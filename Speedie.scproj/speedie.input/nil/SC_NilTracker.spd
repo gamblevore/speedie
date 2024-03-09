@@ -236,17 +236,16 @@ struct ArchonPurger
 			using options.NilStrength	
 			|| Old = stderr
 			|| Rec = ErrorReceiver()
-			|| Failed = 0
 			using rec
-				for (ƒü in compiler.funclist) (i)
-					.ExterminateZergBugs(ƒü)
-					Failed += rec.ReturnErrors(old) > 0
+				for (xoxo in compiler.funclist) (i)
+					.ExterminateZergBugs(xoxo)
+					rec.ReturnErrors(old)
 
 			SCFunction.currfunc = nil
 
 
 			
-function message.OrigRender	(|faststring| fs=nil, |string|)
+function message.OrigRender	(|faststring| fs = nil, |string|)
 	opt norefcounts
 	|| n = .OrigMsg
 		return n.Render(fs)
@@ -255,9 +254,8 @@ function message.OrigRender	(|faststring| fs=nil, |string|)
 
 function message.OrigMsg (|message|)
 	opt norefcounts
-	|| f = .SCFile$
-	|| o = f.orig
-	return o.findtightest(.position, false, true)
+	|| f = .SCFile
+		return f.orig.findtightest(.position, false, true)
 
 
 function errorreceiver.ReturnErrors (|errorreceiver| To = StdErr, |int|)

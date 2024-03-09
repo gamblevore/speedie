@@ -48,6 +48,7 @@ function Message.LastUsedFix (|Message|)
  
 
 function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
+	opt norefcounts
 	|| Basis = RefBasis( dcl, true )
 	if fn.dorefs
 		require basis
@@ -81,7 +82,7 @@ function scfunction.doRefs (|bool|)
 
 
 function RefBasis (|Message| msg, |bool| SetOnly, |int|)
-	return RefBasisStruct(msg, setonly) &~ kBasisTempStruct 
+	return RefBasisStruct(msg, SetOnly) &~ kBasisTempStruct 
 
 
 function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
@@ -90,12 +91,14 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 	ifn type isa SCDecl
 		type = TypeOfExpr( msg, nil )$
 	
-	if type.IsReffable(setonly)
+	if type.IsReffable(SetOnly)
 		if type.IsCArray
 			return kBasisCArray ||| kBasisObj
+		if  type is self  and  scfunction.CurrFunc! is Constructor
+			return 0
 		Return kBasisObj
 	
-	if type.hasstruct
+	if type.HasStruct
 		|| fn = type.type.destructorfunc
 			return kBasisDestructable
 		|| p = msg.niceparent
@@ -105,11 +108,11 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 
 function RC_Rel (|Message| rel)
 	// a = b.c   ->   || tmp = b.c, jb_incr(tmp), jb_decr(a), a = tmp
+	opt norefcounts
 	
 	|| First = rel.first!
 	require RelNeedsRef( rel, first )
 	
-	using (rel)
 	|| result = NewFnc( "JB_SetRef" )
 	|| lst = result.Last!
 	lst <~ first
@@ -120,11 +123,14 @@ function RC_Rel (|Message| rel)
 
 
 function RC_IgnoreReturn (|Message| msg, |bool| DoRefs)
-// just deal with it
+	opt norefcounts
 	require RefBasis( msg, false ) == kBasisObj
-	// Func(a,b,c) -> || tmp = Func(a,b,c),  JB_FreeIfDead(tmp)
+	if msg.func == @func
+		|| dcl = msg.last!
+		if dcl.func == @prm
+			|| fn = dcl.obj!|scfunction|
+			require fn isnt constructor
 	
-	using (msg)
 	|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead )
 	msg.FuncWrap( free_if_dead )
 
@@ -168,7 +174,7 @@ function RefClearMsg (|Message| msg, |Message|)
 
 
 function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
-	using (msg)
+	opt norefcounts
 	rz = NewFnc( name )
 	|| lst = rz.Last!
 	lst <~ msg.Copy // shouldn't copy always... sometimes we want it directly, like .FillInDestructor!
@@ -261,12 +267,6 @@ function RefCheckDisturbance (|Message| dcl, |int|)
 	Return kNotDisturbed
 
 
-function Message.CollectFuncsUsed (|Message| Last=nil, |[SCFunction]|)
-	for (curr.flat in self)
-		if curr == last: exit
-		|| fn = curr.MsgFunc
-			rz <~ fn
-
 function message.IsReturnOrRejoin (|bool|)
 	return (self == @tmp) and (self == "return" or "rejoin")
 
@@ -301,13 +301,12 @@ function Message.CausesUnReachable (|Message| arg, |Message?| Dcl=nil, |Message?
 //		// this was a bad idea
 
 
-function ExitHitsOrGoesPast (|Message!| msg, |Message!| arg, |bool|)
+function ExitHitsOrGoesPast (|Message!| curr, |Message!| arg, |bool|)
 	opt norefcounts
 	// while {||A, exit}			 // true
 	// while {||A, if(true){exit}}   // true
 	// while {if(true){||A, exit}}   // true
 	// while {while {||A, exit}}	 // false
-	|| curr = msg
 	while
 		curr = curr.Parent
 		if curr == arg
@@ -385,6 +384,7 @@ function ExprNeedsTemping (|Message| child, |Message| name, |bool|)
 
 
 function Destructable (|Message| Blocker, |Message| arg, |Message| name)
+	opt norefcounts
 	|| type = TypeOfExpr(name, nil, nil)
 	require (type isa SCDecl)
 	
@@ -466,11 +466,13 @@ function RC_RelConstructor (|Message| rel)
 
 
 function Message.FuncWrap (|Message| fnc)
+	opt norefcounts
 	.Prev = fnc
 	fnc.Last <~ self
 
 
 function RefMsg0 (|String| name, |SCFunction| func, |Message|)
+	opt norefcounts
 	rz = NewFnc( name )
 	rz.position = -1
 	rz.second!.obj = func
@@ -590,6 +592,7 @@ function SafeDecrMsg (|Message| msg, |Message|)
 
 
 function RC_DeclArg (|scdecl| AR, |scfunction| fn)
+	opt norefcounts
 	|| dcl = AR.WriteNilDecl
 	fn.SourceArg.First = dcl
 	.DeclInit( dcl, fn, true )
@@ -649,62 +652,48 @@ function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
 				return true
 		if ch == pp
 			exit
-	
-	return false // works OK?
-
-
-	// Test if params contain obj-funcs
-	if msg == @func
-		for prm.flat in msg.last
-			if prm == @func
-				|| fn = prm.last.asfunc
-					if (fn.returnType.isnormalobject) // and its disowned or whatever
-						return true
 
 	
 function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 	|| ch = msg.UseNonRefChangers
-	if Basis & kBasisDestructable or basis & kBasisTempStruct
-		if (!msg.IsSetIntoPlace and !ch.parent.IsReturnOrRejoin)
+	if Basis & kBasisDestructable or kBasisTempStruct
+		ifn msg.IsSetIntoPlace or ch.parent.IsReturnOrRejoin
 			scfunction.TempMoveOut(Msg)
 		return 
 	
 	require (Basis == kBasisObj) and (!msg.IsProperty)
-	|| parent = ch.niceparent
+	|| parent = ch.NiceParent
 	require  (Parent != @Arg)  and  !(parent.IsReturnOrRejoin and ch.IsOnlyChild)  and  !ch.IsSetIntoPlace
 	
-	if !ch.RefDisappears
-		if (parent == @prm) 
-			if (parent.obj == compiler.TernaryFunc)
-				require ch.UseNonRefChangers == parent.first    //    (a,b)(c)-->(c,a,b)
-			if (parent.obj == Compiler.RefFreeIfDead)
-				return nil // already done!!!
-		
-		|| pp = ch.parentpoint!
-		if RC_NeedsOwnBlock(ch, pp)
-			ch.TempIntoBlock(pp)
-		  else
-			scfunction.TempMoveOut(Msg)
-	  else
-		using (msg)
+	if ch.RefDisappears
 		|| fnc = NewFnc( "JB_FreeIfDead" )
 		fnc.last!.obj = Compiler.RefFreeIfDead
 		fnc.obj = Compiler.RefFreeIfDead!.returntype
 		msg.ReplaceWith( fnc )
 		fnc.Last <~ msg
+		return
+	
+	if (parent == @prm) 
+		if (parent.obj == compiler.TernaryFunc)
+			require ch.UseNonRefChangers == parent.first    //    (a,b)(c)-->(c,a,b)
+		if (parent.obj == Compiler.RefFreeIfDead)
+			return nil										// already done!!!
+	
+	|| pp = ch.ParentPoint!
+	if RC_NeedsOwnBlock(ch, pp)
+		ch.TempIntoBlock(pp)
+	  else
+		scfunction.TempMoveOut(Msg)
 
 
 
 function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |message|)
-	if !fn and (self is Constructor)
-		|| c = .cls!
-		expect (c == typeobject) or (c.super == typeobject) (self, "Need call to superclass's constructor, but can’t auto-create one.")
-		// a problem?
-		return nil
-	require fn  // can happen in this case!	//	class B (A) --> class A --> class object
-				// but none has a destructor.
-				// however... this isn't the ONLY case... it can happen in.
-				// let's check for the others.
+	opt norefcounts
+	if !fn
+		if self is Constructor
+			expect (.cls == TypeObject) or (.cls!.super == TypeObject) (self, "Need call to superclass's constructor, but can't auto-create one.")
+		return nil	// can happen in this case!	//	class B (A) --> class A --> class object
+					// but none has a destructor.
 
 	|| slf = @thg + "self"
 	slf.obj = .self
@@ -713,10 +702,13 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 	|| lst = paf.last!
 	lst <~ slf
 	lst.obj = fn
-	paf.obj = typevoid
+	if fn is constructor
+		paf.obj = fn.ReturnType
+	  else
+		paf.obj = typevoid
 
 	if (self is Constructor)
-		root.First = PAF
+		root.First!.next = PAF
 	  else 
 		root <~ PAF
 	
@@ -727,6 +719,7 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 
 	
 function scfunction.FillInDestructor
+	opt norefcounts
 	|| first = .SourceArg.FindDestructor
 	Using .sourcearg
 	for d in .cls!.Properties
@@ -739,6 +732,7 @@ function scfunction.FillInDestructor
 
 
 function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|)
+	opt norefcounts
 	|| TheCall = .CountCallsToParentAlloc( root )
 		return Thecall
 
@@ -751,6 +745,7 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 
 
 function SCFunction.BuildConstructorDestructor
+	opt norefcounts
 	require self is ConOrDes
 	
 	|| root = .SourceArg!
@@ -759,12 +754,14 @@ function SCFunction.BuildConstructorDestructor
 	|| TheCall = .CallParents( root, IsConstructor )
 	.CheckConstructorAndDestructor( root, IsConstructor )
 	if IsConstructor
+		if !thecall
+			thecall = root.first
 		.FillInMissingConstructorDefaults( root, TheCall )
 	require StdErr.OK and !IsConstructor
 	
 	|| c = .cls!
 	if !c.HasStuffToHandleInDestructor
-		if !Root.hasany
+		if !Root.HasAny
 			c.DestructorFunc = nil
 	  elseif !c.IsWrapper
 		.FillInDestructor
@@ -776,7 +773,7 @@ function SCFunction.AnalyseRefs (|[message]| list)
 	|| IsConstructor	= self is Constructor
 	for (msg.flat in root)
 		|| it = msg.RC_HasTemporary  // need to always do this?
-			if .dorefs or (it != screfs.kbasisobj)
+			if .dorefs or (it != screfs.kBasisObj)
 				SCRefs.RC_HandleDisappearing( self, msg, it )
 	
 		
@@ -830,6 +827,7 @@ function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 
 
 function SCFunction.RefsCheckPropertiesAltered
+	opt norefcounts
 	// Really... only if the variable we return, is disowned,
 	// then this function is a disowner!
 	// then I could remove .ReturnsDisowned = true
@@ -845,6 +843,7 @@ function SCFunction.RefsCheckPropertiesAltered
 
 
 function scdecl.DeclToAddr (|SCDecl| P0, |Message|)
+	opt norefcounts
 	|| Acc = .DeclToDot(p0)
 	rz = «brel "&", Acc »
 	rz.obj = .GetAddress
