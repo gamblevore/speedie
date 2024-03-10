@@ -22,6 +22,7 @@ class SCParamArray
 	|bool|				IsSelf
 	|bool|				IsSuper
 	|bool|				Found
+	|bool|				ConstructorAsNew
 	
 
 	constructor (|Message?| exp)

@@ -192,19 +192,6 @@ function UnusedFuncs (|message| cmd, |message|)
 	return cmd
 	
 
-function BuildOrRestart (|message| cmd, |message|)
-	.WillExit = true
-	if .errors.ok
-		TransCompiler.ExportAndInstall(true)
-		stderr.ReturnErrors(.errors!)
-		
-	if .errors.HasProblems
-		return cmd.SendPerryErrors
-	cmd.clear
-	cmd <~ TransCompiler.productpath(true)
-	return cmd
-
-
 function Check (|message| cmd, |message|)
 	if .errors.HasProblems
 		return cmd.SendPerryErrors
@@ -233,7 +220,6 @@ function DoCmd (|Message| cmd, |message| arg, |message|)
 	
 	if !.InitedOK:					return cmd.SendPerryErrors
 	if cmd ~= "unused_funcs":		return .UnusedFuncs(cmd)
-	if cmd ~= "compile" or "debug":	return .BuildOrRestart(cmd)
 	if cmd ~= "check":				return .Check(cmd)
 	if cmd ~= "mem":				return .ReportMemory(cmd)
 	if cmd == 1:					return .Jump(cmd)

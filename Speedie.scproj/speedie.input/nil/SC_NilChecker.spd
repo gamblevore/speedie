@@ -613,7 +613,7 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 		if (SentState is realish) 
 			return .BecomeReal(sent, SentMsg, nilreason.using)
 		if (recv is property) and recvmsg.func == @dot
-			if (scfunction.currfunc! is constructor) and (recvmsg.first!.fastdecl is self)
+			if (scfunction.currfunc is constructor) and (recvmsg.first!.fastdecl is self)
 				error (RecvMsg, "Property should be non-nil in constructor: " + recv.name)
 				return nilstate.real
 		

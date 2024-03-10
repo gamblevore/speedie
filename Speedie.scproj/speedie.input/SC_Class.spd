@@ -363,10 +363,13 @@ function CreateConstructors
 			con = .CreateEmptyConstructors
 		.ConstructorFunc = con
 		
+		if con
+			.modul.tryadd(con.source, con, "new") // maybe?
+			
 		for f in con
 			if f.cls == self // role messageroot doesnt need an allocator
 				(f is new)
-				.NewClassNew( f, ConstrNew!.copy(f.source) )
+				//.NewClassNew( f, ConstrNew!.copy(f.source) )
 	
 	if !.IsRole
 		|| NeedsDestructor = .IsObject or (.IsStruct and .HasObjectProperties)
@@ -436,7 +439,8 @@ function CreateAlloc (|string| ParseThing, |functiontype| Extra)
 		r.disturbs = nil
 		if extra
 			fn.IsVisible = false
-		extra |= FunctionType.Alloc
+		debugger
+		//extra |= FunctionType.Alloc
 		fn.AllocCode |= extra
 
 
@@ -523,8 +527,8 @@ function LoadConstructorsAndAllocators
 	SCNode.CurrVisibility = false			// for allocators that we generate
 	
 	.CreateConstructors
-	if .IsObject and .constructorfunc
-		.CreateAlloc( .AllocStr, 0 )
+	//if .IsObject and .constructorfunc
+	//	.CreateAlloc( .AllocStr, 0 )
 
 	|| s = .super
 		.NoEarlyFree := s.NoEarlyFree

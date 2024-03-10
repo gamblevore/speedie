@@ -1,9 +1,8 @@
 
 
 |ErrorReceiver| StdErr = ErrorReceiver.new
-|ErrorReceiver| StdErrOriginal = stderr
+|ErrorReceiver| StdErrOriginal = stderr // remove?
 
-// hmmm... what should I do?
 // how to remove log
 
 prototype fnErrorLogger (|ErrorReceiver| self, |string| Data)

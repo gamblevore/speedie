@@ -41,6 +41,7 @@ additions:
 		// could be done better with ast-spawner?
 	* (node, err) = .text.parse --> |error| err, || node = .text.parse(err) // noice
 	* any object can be created with an virtual-function override table, just store before the refcount?
+		* if refcounts come in multiple of 2 (or even 4), we could store if we have a override table... per object
 
 	* could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
 	* || x = .SomeCArray // should just get the address... :)

@@ -161,7 +161,7 @@ function CompileAll (|bool|)
 
 	.PrepareInterpreter
 	if .Stage( "More constructors" )
-		.RefConstructors // constructors
+		.BuildConstructors // constructors
 	.CheckIsGoodLibrary
 
 	if .Stage( "Stripping dead code" )
@@ -766,22 +766,27 @@ function DoRefAnalysis
 			list.clear
 			f.AnalyseRefs(list)
 	scfunction.currfunc = nil
-	//.CheckMaxVars
 
 
 function scfunction.CanDoRefs (|bool|)
-	if .IsWrapper or .IsAllocOrNew or .IsMacro
+	if .IsWrapper or .IsMacro
 		return false
 	scfunction.currfunc = self
 	return true
 
 
-function RefConstructors
+function scfunction.CanBuildConstructor (|bool|)
+	if (self is ConOrDes) and .CanDoRefs
+		return true
+
+
+function BuildConstructors 
 	opt norefcounts
 	require stderr.ok
 	for f in .FuncList
-		if f.CanDoRefs
+		if f.CanBuildConstructor
 			f.BuildConstructorDestructor
+		
 	scfunction.currfunc = nil
 
 

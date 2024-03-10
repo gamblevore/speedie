@@ -103,7 +103,7 @@ static JB_StringC* emptystr() {
 }
 
 
-CharSet* JB_CS__New(JB_String* charset, bool Ranges);
+CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);
 JB_String** JB_Str__FindGlobals(u8** src, uint64* Hash);
 void JB_RemoveHandlers();
 
@@ -196,9 +196,9 @@ int JB_LibInit (_cstring* R, bool IsThread) {
 		#endif
 	}
 	App_Args = JB_Incr(JB_Str_ArgV(R));	// allow caller to remove their c-string data.
-
+    
     ErrorString_ = emptystr();
-    WhiteSpace_ = JB_CS__New( JB_StrC("\x9\xA\xD\x20"), false );
+    WhiteSpace_ = JB_CS_Constructor( nil, JB_StrC("\x9\xA\xD\x20"), false );
     JB_FS__FastNew( 0 );		// stop leak tests catching this.
     JB_Dict__Init();
     JB_Str__LoadGlobals();

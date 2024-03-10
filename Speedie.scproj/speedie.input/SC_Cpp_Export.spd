@@ -95,7 +95,7 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 function CanExportFunc (|SCFunction| F, |bool|)
 	if !f.IsExternalLib
 		require !f.IsWrapper and !f.isMacro
-	return f isnt NewStruct
+	return f isnt NewStruct and f isnt alreadyexported
 
 
 function FuncHeader (|FastStringCpp| fs, |SCFunction| F, |string|)
@@ -110,22 +110,16 @@ function FuncHeader (|FastStringCpp| fs, |SCFunction| F, |string|)
 function CppFunc (|FastStringCpp| fs, |SCFunction| F)
 	opt norefcounts
 	require .CanExportFunc(f)
+	(f is AlreadyExported)
 	|| funcheader = .FuncHeader(fs, f)$
 	.SetupFlow(F)
 
 	.funcStart(fs, f, funcheader)
 	f.Sourcearg!.Export( fs )
-/*
-	if f ~= "JB_Msg_ConstructorNormal"
-		|| fs2 = faststringcpp()
-		.funcStart(fs2, f, funcheader)
-		f.Sourcearg!.Export( fs2 )
-		|| AKSLJDN = fs2.getresult
-		printline AKSLJDN
-		debugger
-*/
+
 	.OptEnd(fs, f.minopt)
 	fs <~ "\n\n"
+
 
 function SCClass.NeedsExport (|bool|)
 	return super.NeedsExport or .IsBehaviourTable

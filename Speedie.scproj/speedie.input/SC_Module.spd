@@ -148,10 +148,9 @@ function GetTheNewer (|SCObject|)
 	while self
 		|| o2 = self["new"]
 			return o2
-		|| cls = .cls
-		require cls and cls.isrole
+		|| cls = .cls #require
+		require cls.isrole
 		self = .supermod
-
 
 
 module

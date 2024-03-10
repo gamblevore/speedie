@@ -94,7 +94,7 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 	if type.IsReffable(SetOnly)
 		if type.IsCArray
 			return kBasisCArray ||| kBasisObj
-		if  type is self  and  scfunction.CurrFunc! is Constructor
+		if  type is self  and  scfunction.CurrFunc is Constructor
 			return 0
 		Return kBasisObj
 	
@@ -742,8 +742,6 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 
 function SCFunction.BuildConstructorDestructor
 	opt norefcounts
-	require self is ConOrDes
-	
 	|| root = .SourceArg!
 	|| IsConstructor = self is Constructor
 
@@ -810,15 +808,10 @@ function SCFunction.AnalyseRefs (|[message]| list)
 function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 	// calling a constructor is only allowed... within a constructor.
 	// calling a destructor is only allowed within a destructor.
-	if dot in @bra and dot.parent in @bra // allow
-		return 
-	
-	|| fn = dot.last!.asfunc
-		if (fn is Constructor)
-			if self isnt ConOrNew
-				error (dot, "Can only call constructors from within a constructor.")
-		  elseif (fn is Destructor)
-			if self isnt Destructor
+	opt norefcounts
+	ifn dot in @bra and dot.parent in @bra // allow
+		|| fn = dot.last!.asfunc
+			if (fn is Destructor) and self isnt Destructor
 				error (dot, "Can only call destructors from within a destructor.")
 
 

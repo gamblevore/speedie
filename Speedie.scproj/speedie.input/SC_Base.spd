@@ -87,13 +87,15 @@ function UpCheck (|string| name, |bool| LookUp=true, |SCObject|) {
 // OK so.. i guess functions can hide stuff below it, right?
 // so upcheck shouldn't work, if we are on a function, right?
 
-function TryAdd (|Message| ErrPlace, |SCObject| IncObj, |String| name)
-	require (IncObj)
-	expect (name.length inrange 64) ( ErrPlace, "Name should be 1-64 bytes long." )
+function TryAdd (|Message?| ErrPlace, |SCObject?| IncObj, |String| name)
+	if IncObj
+		expect (name.length inrange 64) ( ErrPlace, "Name should be 1-64 bytes long." )
+		.access := Dictionary.new
+		.tryaddsub(errplace, incobj, name.Lowercase)
 
-	.access := Dictionary.new
-
-	name = name.Lowercase
+	
+function TryAddSub (|Message| ErrPlace, |SCObject| IncObj, |String| name)
+	opt norefcounts
 	|| Old = .Upcheck( name, !(IncObj isa SCFunction) )
 	if (!Old)
 		.access![ name ] = IncObj
@@ -103,7 +105,7 @@ function TryAdd (|Message| ErrPlace, |SCObject| IncObj, |String| name)
 	
 	if (Old isa SCFunction)
 		if (IncObj isa SCFunction)		// link
-			if (old.cls == IncObj.cls)
+			if (old.cls == IncObj.cls) or incobj.IsConstructorOnModule(old)
 				old.Last.NextFunc = IncObj
 				Return
 		  elseif incobj isa scdecl
@@ -122,6 +124,12 @@ function TryAdd (|Message| ErrPlace, |SCObject| IncObj, |String| name)
 		  else
 			error (old.render, kNameConf)
 
+
+function scfunction.IsConstructorOnModule (|scfunction| old, |bool|)
+	opt norefcounts
+	if self is constructor
+		|| p = old.parent
+		return p == .cls!.modul
 
 constructor
 	cpp_part Constructor0
@@ -166,6 +174,8 @@ function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|
 
 
 function SCFunction.UseExportNameConstructor (|string| CppPart, |string| CppWrapper, |bool|)
+	// REMOVE THIS
+	// return true
 	require !CppWrapper and (self is new)  
 	|| fn = .CounterPart
 	if fn isa scfunction
@@ -206,7 +216,7 @@ function message.Cpp_Wrapper (|string|)
 		return .name
 
 
-function scfunction.ExportNameBuilder (|string|CppPart="", |string| )
+function SCFunction.ExportNameBuilder (|string|CppPart="", |string| )
 	if !CppPart
 		CppPart = .Name
 		if .IsAssigns and !(cpppart endswith "Hider")
@@ -350,6 +360,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
 	ParamsArray.PreReadTypes(Arg_Space, ParamsHere, side)
 	|| CanFunction	= (ParamsHere) and  (!ParamsArray.IsAddress)
+	|| ConstructorAsNew = (purpose == kPurposeDot) and (name == "new") and (self isa scmodule)
 	|SCFunction| Missing
 	|SCFunction| f
 	|scclass| owning_cls
@@ -376,8 +387,10 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 					return o.ProcessAs(exp)
 
 		
+		paramsarray.ConstructorAsNew = ConstructorAsNew
 		if paramshere and !paramsarray.isdot and (o isa scmodule)
 			o = o.GetTheNewer|scmodule|
+			paramsarray.ConstructorAsNew = true
 		
 		
 		if CanFunction and (o isa SCFunction)
@@ -395,6 +408,8 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 					error (o.source, "Disabled here.")
 
 				ParamsHere.obj ?= o // multiple return :3
+				if paramsarray.ConstructorAsNew and o is constructor
+					ParamsHere.first = paramshere.CreateNil
 				Return o
 		
 		if o

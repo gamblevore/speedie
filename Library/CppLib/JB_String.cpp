@@ -1492,12 +1492,12 @@ bool JB_Byte_IsWhite(byte self) {
 }
 
 
-CharSet* JB_CS__New(JB_String* charset, bool Ranges);
+CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);
 CharSet* TrimCS_() {
 	static CharSet* cs;
 	if (!cs) {
 		JB_String Dummy;  Dummy.Addr = (uint8*)" \t\n\r\0";  Dummy.Length = 5;
-		cs = JB_CS__New(&Dummy, false);
+		cs = JB_CS_Constructor(nil, &Dummy, false);
 	}
 	return cs;
 }
@@ -1818,9 +1818,9 @@ uint64 JB_Str_CRC (JB_String* S, uint64 crc) {
 }
 
 
-Array* JB_Array__New0();
+Array* JB_Array_Constructor0( Array* self );
 Array* JB_Str_ArgV(const char** ArgV) {
-    Array* Result = JB_Array__New0();
+    Array* Result = JB_Array_Constructor0(nil);
     while (ArgV) {
         const char* c = *++ArgV;
         if (!c) {break;}
@@ -1831,7 +1831,7 @@ Array* JB_Str_ArgV(const char** ArgV) {
 
 
 Dictionary* JB_EnvC(const char** self) {
-    Dictionary* D = JB_Dict__New();
+    Dictionary* D = JB_Dict_Constructor(nil);
     
 	if (self) for (int i = 0; const char* C = self[i]; i++) {
         JB_String* S = JB_StrC(C);

@@ -975,7 +975,7 @@ class SCDecl (SCNamed) {
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
 				
-		if (self is self) and (scfunction.currfunc! is Destructor) 
+		if (self is self) and (scfunction.currfunc is Destructor) 
 			error (exp, "You can’t modify 'self' in a constructor or destructor.")
 		  elseif side and (self is local) and .isobject
 			.MarkAsRefAltered

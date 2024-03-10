@@ -31,6 +31,7 @@ datatype FunctionType (uint)
 		Behaviour
 		NewNew
 		ExpectsRealVars
+		AlreadyExported
 		ConOrDes = Constructor + Destructor
 		ConOrNew = Constructor + New
 		AllocOrNew = Alloc + New
@@ -96,7 +97,8 @@ syntax equals (|string| name, |bool| Aware, |bool|)
 
 
 syntax is (|FunctionType| k, |bool|) // assumes ANY match. Asking "x is a+b", then a or b is enuf
-	return .alloccode & k
+	if self
+		return .alloccode & k
 
 syntax is (|FunctionType| k, assigns:|bool|)
 	if value
@@ -197,7 +199,6 @@ function ParseName (|Message| node, |bool|)
 		0	
 	  elseif cname ~= "constructor"
 		is Constructor
-		.IsInline = true
 	  elseif cname ~= "destructor"
 		is Destructor
 	
@@ -415,16 +416,16 @@ function message.AssignsFix (|scfunction| f)
 		RP.Func = @Bra	
 
 
-function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| DescribeFail=0, |SCFunction|)
+function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Options=0, |SCFunction|)
 	opt norefcounts
-	if !describefail
+	if !Options
 		rz = .argsmatch1(base, name_Space, incoming, 0)
 		if !rz
 			rz = .argsmatch1(base, name_Space, incoming, kTypeCastAssigns)
 	  else
 		// just merge these two branches. Dont think we need opposite order really...
-		.argsmatch1(base, name_Space, incoming, kTypeCastAssigns ||| Describefail)
-		.argsmatch1(base, name_Space, incoming, Describefail)
+		.argsmatch1(base, name_Space, incoming, kTypeCastAssigns ||| Options)
+		.argsmatch1(base, name_Space, incoming, Options)
 		if !incoming.madeerror // backup
 			error ( incoming.exp, "Wrong params to " + .RenderTitle )
 
@@ -459,9 +460,15 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	|| Result = kSimpleMatch
 	|| SelfCast = Incoming.ignoreselfContain()
 	TypeCast |= kNoBoolTypeCast ||| kTypeCastWantSuperDistance
-		
-	for (FuncArg in .Args) (fi)
-		|| PArg_Ch   = Incoming[Pos]
+	
+	|| fin = .args.length
+	|| fi = 0
+	if  (self is constructor)  and  Incoming.ConstructorAsNew
+		fi = 1
+			
+	while fi < fin
+		|| FuncArg = .Args[fi]!
+		|| PArg_Ch = Incoming[Pos]
 		|| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
 		if Base
 			FuncArg = FuncArg.ContainedReplace(base, false)
@@ -493,6 +500,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 
 		  else
 			Result = kUseDefaultParams
+		fi++
 	
 	if Pos >= Incoming.Size
 		Return result
@@ -511,18 +519,19 @@ function HiderMatch (|bool| IsAssigns, |bool|)
 
 
 function DescribeParamFail (|SCParamArray| params, |int| bad)
-	opt norefcounts
-	require !params.madeerror
-	bad++
-	|| P = params[bad-1]
-		|| str = ("Wrong self: ",  "Wrong param ($bad): ")((bad==1) and params.isdot and params.IsNotModule)
+	require !params.MadeError
+	|| IsSelf = (bad==0) and params.isdot and params.IsNotModule
+	|| P = params[bad]
+		bad++
+		|| str = ("Wrong self: ",  "Wrong param ($bad): ")(IsSelf)
 		|| Type = TypeOfExpr(P, nil)
 			str += Type.RenderTypeName
 		  else
 			str += "(Unknown Type)"
 		error ( P, str )
 	  else
-		error ( params.exp, "Missing param $bad: $p" )
+		|| Num = bad - isself
+		error ( params.exp, "Missing param $num: ${.args[bad]}" )
 	error ( .Source, "to " + .RenderTitle )
 
 
@@ -794,9 +803,9 @@ function Message.SelfUsedForProperty (|int|)
 function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	opt norefcounts
 	require !.Badness
-	
 	|| GotSuperConstructor = .cls!.super == typeobject
 	|| NoNesting = "This should be at the function root. (not nested)."
+	
 	
 	for dot.flat in root
 		if dot == @func

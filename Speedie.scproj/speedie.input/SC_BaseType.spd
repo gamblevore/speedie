@@ -28,6 +28,12 @@ extend scclass
 		return .BaseType == SCNodeType.datatype or SCNodeType.funcproto
 	
 
+	syntax equals (|string| name, |bool| aware, |bool|)
+		cpp_part EqualsName
+		if self
+			return .name ~= name
+
+
 	syntax equals (|SCNodeType| d, |bool| aware, |bool|)
 		cpp_part EqualsType
 		if self and d > SCNodeType.nil
