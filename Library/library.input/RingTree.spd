@@ -5,6 +5,7 @@
 
 class RingTree (Saveable)
 	size 40
+	|ind| 	Position
 	linkage
 		wrapper
 		cpp_part		Tree
@@ -533,9 +534,9 @@ class RingTree (Saveable)
 
 
 
-struct RingTreePosition
-	|int| RefCount
-	|ind| Position // this is to hide the position property... so that no code edits it
-				   // not without going out of it's way. This is to make Tasks more reliable.
-				   // which use the position as refcount state.
-	
+//struct RingTreePosition
+//	|int| RefCount
+//	|ind| Position // this is to hide the position property... so that no code edits it
+//				   // not without going out of it's way. This is to make Tasks more reliable.
+//				   // which use the position as refcount state.
+//	
