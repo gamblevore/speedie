@@ -75,6 +75,11 @@ class Message (RingTree)
 
 ///////////////////////////////////////////////////////////////////////////////
 	
+	function Position (|ind|)
+		return self|&RingTreePosition|.position
+	
+	setter Position (|ind|)
+		self|&RingTreePosition|.position = value
 	
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts

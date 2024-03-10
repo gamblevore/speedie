@@ -3,10 +3,7 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-
 class RingTree (Saveable)
-	|ind|			Position // should this be an ind?
-
 	size 40
 	linkage
 		wrapper
@@ -535,3 +532,10 @@ class RingTree (Saveable)
 		(self)
 
 
+
+struct RingTreePosition
+	|int| RefCount
+	|ind| Position // this is to hide the position property... so that no code edits it
+				   // not without going out of it's way. This is to make Tasks more reliable.
+				   // which use the position as refcount state.
+	
