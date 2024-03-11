@@ -13,48 +13,57 @@ function @SCClass.NewTask (CollectFunc)
 		name.next = prms
 	
 	|| arg = prms.next(@arg)
-	|| run = arg.FindTaskRun		#require
-	
 	using node
-		|| bra = @bra.msg
-		name.next = bra
-		bra <~ (@thg, "task")
-		bra.obj = prms				// hehe
-		|| con = @tmp + "constructor"
-		arg.first = con
-		con <~ @prm
-		con <~ @arg
-		|| des = arg.msg(@tmp, "destructor")
-		des <~ @arg
-		
-	using run
-		run.name = "syntax"
-		run.first = prms
-		run.first = @thg + "call"
-	
-	
-	
+	|| bra = @bra.msg
+	name.next = bra
+	bra <~ (@thg, "task")
+	bra.obj = prms				// hehe
+	|| con = "constructor () {
+		._Objects = –taskvars
+	}".parse
+	arg.first = con
+
+	|| conprm = con.first
+	|| conarg = conprm.next
+	arg.FindTaskRun(conprm, conarg, prms)
+
 	|| task = SCClass.NeuRole(node, name_space, ErrPlace)|scmodule|
 		task.cls!.IsRole = 2
 	return task
 		
 
 
-function Message.FindTaskRun (|message|)
+function Message.MakeTaskVar (|message| prm, |message| arg, |message|)
+	is editable // whatever
+	|| name = .VarName
+
+	using self
+		arg <~ NewEqRel(@sdot+name, @thg + name)
+		prm <~ .copy // :)
+	
+	
+function Message.FindTaskRun (|message| prm, |message| arg, |message| FnPrms)
 	opt norefcounts
+	|| found = 0
 	for ch in self
 		if ch == @decl
-			(ch is editable) // whatever
+			ch.MakeTaskVar(prm, arg)
 		  elseif ch istmp "run"
-			if rz
+			if found
 				error (ch, "Duplicate run statements")
 			  elseif ch[@arg].ExpectLast
-				rz = ch
+				ch.name = "syntax"
+				ch.first = fnprms
+				ch.first = @thg + "call"
+			found++
+
 
 target debug2
 	task LessThanTest (|int| i, |bool|)
-		|int| Vs
-		run: visible, return i < .Vs
+		|string|	a
+		|int| 		b
+		|string|	c
+		run: visible, return i < .b
 
 	function testtest
 		visible

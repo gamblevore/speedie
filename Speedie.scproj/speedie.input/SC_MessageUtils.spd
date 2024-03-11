@@ -165,6 +165,11 @@ function Message.DeclName (|Message|)
 	expect !(dcl == @Emb) (self)
 
 
+function Message.VarName (|string|)
+	opt norefcounts
+	return self[@thg, 1].name
+
+
 
 // same as above?
 function Message.GetDclName (|bool| IsConstructor=false, |Message|)

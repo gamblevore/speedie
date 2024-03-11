@@ -45,6 +45,9 @@ function Message.ReplaceInbuiltSub (|SCNode| name_space, |scdecl?| self_decl, |m
 		|| f = self[@sstr]
 			f.name = f.name.Compress
 		.become(@bra)
+	  elseif (self == "taskvars")
+		|| cls = scfunction.currfunc!.cls #expect (self)
+		.become(cls.taskobjectcount)
 		
 	  elseif (self == "sizeof")
 		expect (self_decl) (self, "Unable to get size")

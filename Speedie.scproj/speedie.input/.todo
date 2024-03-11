@@ -1,6 +1,7 @@
 
 
 bugs:
+	* unify numeric types a lot. Many functions want to work on uint, int, etc... and one func is good enough for all!
 	* recursion blocker. We block any func from being recursive unless explicitly stated it could be. (can mark entire file as recursive though... like for my parser)
 	* don't use "syntax append", simply "function append". Same with "call". I mean *x --> x.first
 	* sdleventtype.mousedown() // compiles???

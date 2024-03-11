@@ -1,11 +1,14 @@
 
 
-class Task (ringtree)
-//	|GuiTaskState| 		State // use position for state
-	|_voidptr|			_Func
-	|int64[8]| 			_Local
 
-// should be "subclassable"
+class Task (ringtree)
+	|_voidptr|			_Func
+	|byte|				_Objects
+	|int64[9]| 			_Local
+	
+	destructor
+		for (i in ._objects|int|)
+			jb_decr(._Local[i]|object|) // noice
 
 
 

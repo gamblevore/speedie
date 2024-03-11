@@ -795,7 +795,7 @@ function TaskPropertySorter (SorterComparer)
 	opt norefcounts
 	|| aa = a|scdecl|
 	|| bb = b|scdecl|
-	return aa.isobject < bb.isobject
+	return aa.isobject >= bb.isobject
 	
 
 function ModulesSorter (SorterComparer)

@@ -56,6 +56,7 @@ linkage
 |bool|						HasNilChecker
 |bool|						DefaultsToReal
 |byte|						IsRole
+|byte|						TaskObjectCount
 |bool|						IsBuiltin // SCNodeType
 |SCNodetype| 				BaseType
 |bool|						IsASM
@@ -149,23 +150,15 @@ function IsTask (|bool|)
 
 
 
-function CreateTaskConstructors
+function TaskProperties 
+	opt norefcounts
 	.properties.sort(&compiler.TaskPropertySorter)
-	|| con = .SourceArg.find(@tmp, "constructor")
-	debugger 
-	|| conarg = con.Last(@arg)						#require
-	|| n = 0
 	check (.Properties <= 8) (.properties.last!.source, "Too many properties on task")
 
-	for p in .Properties
-		n += p.IsObject
-		using p.source
-			conarg <~ NeweqRel(@sdot+p.name, @thg + p.name)
+	for (p in .Properties) (i)
+		p.source!.indent = i
+		.TaskObjectCount += p.IsObject
 		check (p.IsTaskable) (p, "Task properties can't have that")
-
-	conarg.RangeLength = n
-	n |= n << 16
-	conarg.first = NewEqRel(@sdot+"position", n.msg)
 
 
 function ClassLoadProperties 
@@ -177,10 +170,11 @@ function ClassLoadProperties
 			.CollectProp(item)
 			
 	if .IsTask
-		.CreateTaskConstructors
-	
-	|| it = .properties.first
-		expect (!.IsRole) (it.source, "Roles can't have properties!")
+		.TaskProperties
+	  else
+		|| it = .properties.first
+			expect (!.IsRole) (it.source, "Roles can't have properties!")
+
 	for (p in .properties)
 		expect (!p.default) (p.source, "Class properties can’t have default values.")
 

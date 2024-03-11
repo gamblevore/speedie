@@ -1662,7 +1662,11 @@ function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
 
 
 function scclass.DotTaskProperty (|Message| dot, |scdecl| decl)
-
+	expect (decl.type.size <= 8) (dot, "Too big, sorry. Will fix later.")
+	// x.v --> *((&x._items[1])|&type|) = v
+	// x.v --> *x_v(x) = v
+	// could do this in C++
+	
 
 function SCFunction.DotFuncToNormalFunc (|Message| dot)
 	// a.b( c )
