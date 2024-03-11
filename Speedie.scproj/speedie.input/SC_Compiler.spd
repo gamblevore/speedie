@@ -454,7 +454,7 @@ function ImportAll
 
 	require .Stage( "Parsing Class Properties" ) // just moved this... used to come after
 	for c in .ClassList					  // handling function prototypes.
-		c.LoadProperties
+		c.ClassLoadProperties
 		require !TooManyErrors()
 
 
@@ -469,9 +469,7 @@ function ImportAll
 		c.CalculateSize
 
 
-	for c in .ClassList
-		c.Project.use
-		c.LoadConstructorsAndAllocators
+	for c in .ClassList: c.LoadConstructorsAndAllocators
 	
 	require .Stage( "Collecting Constants" )
 	.CollectConstants
@@ -490,9 +488,7 @@ function ImportAll
 
 
 	require .Stage( "Creating Class Exportnames" )
-	for c in .ClassList
-		c.Use
-		c.LoadExportName
+	for c in .ClassList: c.LoadExportName
 
 	
 	require .Stage( "Initialising Modules And More" )
@@ -794,6 +790,13 @@ function BuildConstructors
 function SortModules
 	.ModuleList.sort(ModulesSorter)
 
+
+function TaskPropertySorter (SorterComparer)
+	opt norefcounts
+	|| aa = a|scdecl|
+	|| bb = b|scdecl|
+	return aa.isobject < bb.isobject
+	
 
 function ModulesSorter (SorterComparer)
 	opt norefcounts

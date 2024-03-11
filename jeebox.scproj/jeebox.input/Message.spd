@@ -75,11 +75,6 @@ class Message (RingTree)
 
 ///////////////////////////////////////////////////////////////////////////////
 	
-//	function Position (|ind|)
-//		return self|&RingTreePosition|.position
-//	
-//	setter Position (|ind|)
-//		self|&RingTreePosition|.position = value
 	
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
@@ -930,7 +925,7 @@ class Message (RingTree)
 
 	syntax access (|string| key, assigns:|int64|)
 		cpp_part SetInt
-		self[key] = @num.msg(Value.render)
+		self[key] = value.msg//@num.msg(Value.render)
 
 	
 	syntax access (|string| key, assigns:|message|)

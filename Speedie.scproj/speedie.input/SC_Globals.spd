@@ -1046,8 +1046,7 @@ function TypeOfDot (ExprResolver)
 			
 		contains = DotVar|scdecl|.Contains
 		DotVar = DotVar|scdecl|.Type
-		if (!contains)
-			contains = DotVar|scclass|.Contained
+		contains := DotVar|scclass|.Contained
 	  else
 		expect  (DotVar isa SCClass or scmodule)  ( exp, "Not a class or module." )
 	
@@ -1070,26 +1069,21 @@ function TypeOfDot (ExprResolver)
 			if (DotVar isa scclass) and !exp.IsSettablePlace
 				decl = decl.ContainedReplace( Contains, true )
 				
-		  elseif DotVar isa scmodule
+		  elseif DotVar isa SCModule
 			|| cls = DotVar.cls
 				if cls.IsRole
 					decl = decl.ClassActReplace(cls)		
+		if (DotVar isa scclass)
+			if dotvar.IsTask
+				dotvar.DotTaskProperty( exp, decl )
 	
 	|| fn = exp.last!.asfunc
 		decl := typevoid
 		exp.obj = decl
-		DotFuncToNormalFunc( exp, fn )
+		fn.DotFuncToNormalFunc( exp )
 	
 	return decl
 
-
-/*
-try
-	asdasdasdas
-success
-
-fail
-*/
 
 
 function message.ExpFunc (|scfunction|)
@@ -1667,14 +1661,17 @@ function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
 	Return NewNum
 
 
-function DotFuncToNormalFunc (|Message| dot, |SCFunction| fn)
+function scclass.DotTaskProperty (|Message| dot, |scdecl| decl)
+
+
+function SCFunction.DotFuncToNormalFunc (|Message| dot)
 	// a.b( c )
 	// b(a, c)
 	dot.become(@Func)
 
 	|| first = dot.First!
 	|| L = dot.Last!
-	L.obj = fn
+	L.obj = self
 	L.Func = @prm
 	if first.obj isa SCModule
 		first.Remove
@@ -1682,8 +1679,8 @@ function DotFuncToNormalFunc (|Message| dot, |SCFunction| fn)
 		L.First = first
 
 	using (dot)
-		dot.First = «thg fn.ExportName »
-	if fn.IsKiller
+		dot.First = «thg .ExportName »
+	if .IsKiller
 		dot.LastInBlock(SCBlockage.Quit)
 
 

@@ -407,7 +407,8 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 					error (exp,     o.description)
 					error (o.source, "Disabled here.")
 
-				ParamsHere.obj ?= o // multiple return :3
+				if Paramshere
+					ParamsHere.obj = o // multiple return :3
 				if paramsarray.ConstructorAsNew and o is constructor
 					ParamsHere.first = paramshere.CreateNil
 				Return o

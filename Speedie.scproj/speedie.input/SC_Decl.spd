@@ -639,6 +639,8 @@ class SCDecl (SCNamed) {
 	function IsNormal (|bool|)
 		return !.PointerCount and !.IsNil and !.IsCArray
 
+	function IsTaskable (|bool|)
+		return !.iscarray and !.Type.IsStruct
 
 	function AlreadyContains (|bool|)
 		opt norefcounts

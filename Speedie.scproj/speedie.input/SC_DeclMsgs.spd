@@ -123,22 +123,13 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	return true
 
 
-function SCClass.CollectDeclsProperties (|bool|)
-	opt norefcounts
-	for item in .SourceArg
-		if item == @decl
-			require item.CollectProp( self)
-	return true
 
-
-function Message.CollectProp (|scclass| cls, |bool|)
+function scclass.CollectProp (|Message| msg, |bool|)
 	opt norefcounts
-	|| dcl = .CollectDecl( cls.modul, cls, declmode.properties, cls, nil)
-		// OK so... 	
-		if self isnt Editable
-			cls.properties <~ dcl
-			(dcl is property)
-			dcl.becomereal
+	|| dcl = msg.CollectDecl( .modul, self, declmode.properties, self, nil)
+		.properties <~ dcl
+		(dcl is property)
+		dcl.becomereal
 		return true
 
 

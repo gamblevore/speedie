@@ -25,12 +25,3 @@ task LessThanTest (|int| i, |bool|)
 
 }
 
-/*
-// C#
-int lessThan = 100;
-Func<int, bool> lessThanTest = delegate(int i) {
-	return i < lessThan;
-};
-
-
-*/

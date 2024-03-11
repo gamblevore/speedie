@@ -28,8 +28,8 @@ function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |[messa
 		.DefineGetSub(fname, up, down, 'i', ' ')
 	.DefineGetSub(fname, up, down, 'u', 'u')
 	rz <~ @thg + fname
-	rz <~ @num + up
-	rz <~ @num + down
+	rz <~ up.msg
+	rz <~ down.msg
 
 
 // we need to create an array of forms...
@@ -38,7 +38,7 @@ function FillTypePrm (|string| fname, |int| pname)
 	if pname >= 4
 		.dt_prm <~ (macros.ASMcopier2)(prop)	
 	  else
-		.dt_prm <~ (macros.ASMcopier)(prop, @num + pname)
+		.dt_prm <~ (macros.ASMcopier)(prop, pname.msg)
 
 
 function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
@@ -100,7 +100,7 @@ function DataTypeCreate (|message| form,  |int| fnum,  |message|)
 	|| name = "ASM_" + form.name
 	|| sigh = (Macros.ASM_Datatype)(
 		@thg + name
-		@num + fnum
+		fnum.msg
 	)
 	rz = sigh.findnested(@list)
 	rz++
@@ -247,7 +247,7 @@ function VMDecl (|message| tmp, |[message]| msgs)
 	msgs[id] = tmp
 	name = "ASM_" + name
 	.ModuleArg <~ NewDecl(name)
-	.ModuleArg <~ NeweqRel(@thg+tmp.name, @num + id)
+	.ModuleArg <~ NeweqRel(@thg+tmp.name, id|int|.msg)
 // TypeList
 
 

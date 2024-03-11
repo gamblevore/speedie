@@ -4,7 +4,7 @@
 function @SCClass.NewTask (CollectFunc)
 //	node.Name = "role"
 	|| name = node[@thg]
-	|| prms = node.Next(@nil)
+	|| prms = name.Next(@nil)
 	require name and prms
 	if prms == @bra or @list
 		prms.func = @prm
@@ -19,13 +19,24 @@ function @SCClass.NewTask (CollectFunc)
 		|| bra = @bra.msg
 		name.next = bra
 		bra <~ (@thg, "task")
-		bra.obj = prms // hehe
+		bra.obj = prms				// hehe
+		|| con = @tmp + "constructor"
+		arg.first = con
+		con <~ @prm
+		con <~ @arg
+		|| des = arg.msg(@tmp, "destructor")
+		des <~ @arg
+		
 	using run
 		run.name = "syntax"
 		run.first = prms
 		run.first = @thg + "call"
 	
-	return SCClass.NeuRole(node, name_space, errplace)
+	
+	
+	|| task = SCClass.NeuRole(node, name_space, ErrPlace)|scmodule|
+		task.cls!.IsRole = 2
+	return task
 		
 
 
@@ -33,19 +44,24 @@ function Message.FindTaskRun (|message|)
 	opt norefcounts
 	for ch in self
 		if ch == @decl
-			// do something
+			(ch is editable) // whatever
 		  elseif ch istmp "run"
 			if rz
 				error (ch, "Duplicate run statements")
 			  elseif ch[@arg].ExpectLast
 				rz = ch
 
+target debug2
+	task LessThanTest (|int| i, |bool|)
+		|int| Vs
+		run: visible, return i < .Vs
+
+	function testtest
+		visible
+		|LessThanTest| xxx
 
 
 ignore {
-task LessThanTest (|int| i, |bool|)
-	|int| Vs
-	run: return i < .Vs
 
 // roles can't define properties.
 // So... then what?
@@ -54,34 +70,17 @@ task LessThanTest (|int| i, |bool|)
 // or ints or floats... they need different treatment. We could DELAY that treatment???
 
 role LessThanTest (task)
-	|fake~int| Vs
+	|int| Vs
 	syntax call (|int| i, |bool|)
 		return i < .Vs
-
+	constructor () {
 	
-role LessThanTest (task)
-	syntax call (|int| i, |bool|)
-		return i < .Vs
-
+	}
+	destructor {
+	
+	}
 
 function caller (|lessthantest| abc)
-	abc.Vs = 3
 	abc.Items[0] = 3
-	abc_vsset(abc, 3)
-	
-
-role LessThanTest (task)
-	getter lessthan	(|int|)
-	setter lessthan	(|int|)
-	syntax call (|int| i, |bool|)
-		return i < .Vs
-	
-
-role LessThanTest (task)
-	access lessthan	(|int|)
-	syntax call (|int| i, |bool|)
-		return i < .Vs
-	
-
 }
 
