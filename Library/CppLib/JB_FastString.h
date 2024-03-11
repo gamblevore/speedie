@@ -82,7 +82,7 @@ void JB_FS_AppendIntegerAsText(FastString* self, s64 LeftOver, int RoundTo);
 void JB_FS_AppendIndent( FastString* self );
 int JB_int_Render(int Self, byte* Addr, int N);
 void JB_FS_AppendDurr(FastString* self, Date D);
-void JB_FS_AppendDMY(FastString* self, Date D);
+void JB_FS_AppendLocalTime(FastString* self, Date D);
 void JB_FS_AppendShort(FastString* self, int s);
 void JB_FS_AppendInteger(FastString* self, int l);
 void JB_FS_AppendSingle(FastString* self, float f);

@@ -356,7 +356,7 @@ module SDLApp
 			printline app.conf("version")
 			app.quit
 		if app.yes("created")
-			printline $__now__|date|
+			printline __now__|date|.LocalTime
 			app.quit
 	
 	function NiceAppName (|string|)

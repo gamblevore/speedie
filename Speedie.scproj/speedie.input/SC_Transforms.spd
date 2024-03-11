@@ -22,7 +22,7 @@ dispatch TemporalStatements (TranFunc)
 	once					(Tran_Once)
 	ifn						(Tran_Ifn)
 	debugger				(Tran_Debugger)
-	crash					{app.crash("crashtest")}
+	crash					{app.crash(node.firstname)}
 	deprecate				(Tran_Deprecate)
 	borks					(Tran_Fails)
 	

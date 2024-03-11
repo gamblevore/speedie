@@ -156,9 +156,10 @@ function CompileAll (|bool|)
 	.InitCompiler
 	.testdate
 	.ImportAll
-
+	
 	ErrorDelayer.ReturnErrors
-
+	require .InitedOK
+	
 	.PrepareInterpreter
 	if .Stage( "More constructors" )
 		.BuildConstructors // constructors
@@ -167,8 +168,7 @@ function CompileAll (|bool|)
 	if .Stage( "Stripping dead code" )
 		.DeadStrip
 	
-	if options.NilStrength > 0
-		.Stage( "NilChecking" )
+	if (options.NilStrength > 0) and .Stage( "NilChecking" )
 		.Timer( "NilChecking" )
 		ArchonPurger.FixArchons
 	
@@ -270,7 +270,6 @@ function InitTypes
 	TypeStringZero!.DowngradeTo = TypeString
 	typevoid = typevoid_!.TypeNormal
 	|| VP = TypeVoidPtr!.typenormal
-	//VP.nildeclared = nilstate.either
 	TypeVoidPtr!.TypeOptional = VP.NilConstructor(NilState.optional)
 	TypeVoidPtr!.TypeReal = VP.NilConstructor(NilState.Real)
 	TypeString!.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
@@ -287,15 +286,18 @@ function InitBasicStuff (|int|) // compiler.init
 	options.ListAllLib = linkage.interpreter
 	
 	.InitTypes
-	TypeNil = .AddGlobalConst( "nil", TypeObject!,   NilState.ActuallyNil )
-	TrueBool = .AddGlobalConst( "true", TypeBool!,   NilState.real ||| NilState.trueValue )
-	FalseBool = .AddGlobalConst( "false", TypeBool!, NilState.real ||| NilState.falseValue )
+	TypeNil   = .AddGlobalConst( "nil",   TypeObject!,   NilState.ActuallyNil )
+	TrueBool  = .AddGlobalConst( "true",  TypeBool!,     NilState.real ||| NilState.trueValue )
+	FalseBool = .AddGlobalConst( "false", TypeBool!,     NilState.real ||| NilState.falseValue )
 	
-	.AddGlobalConst( "__time_id__", typeint! ).islookuponly = «num scimport.recent.timeid »
-	.AddGlobalConst( "__now__", typedate! ).islookuponly = «num date.now »
-	.AddGlobalConst( "__modified__", typedate! ).islookuponly = «num scimport.recent »
-	.AddGlobalConst( "π", typef64! ).islookuponly = «num "3.1415926535897932" »
-	.AddGlobalConst( "τ", typef64! ).islookuponly = «num "6.2831853071795864" »
+	.AddGlobalConstNum( "__time_id__",  typeint!,  scimport.recent.timeid )
+	.AddGlobalConstNum( "__now__",      typedate!, date.now )
+	.AddGlobalConstNum( "__modified__", typedate!, scimport.recent)
+	.AddGlobalConstNum( "π",            typef64! , "3.1415926535897932")
+	.AddGlobalConstNum( "τ",            typef64! , "6.2831853071795864")
+	if stderr.ErrorCount > rz
+		compiler.InitedOK = false
+		
 
 
 function LoadTypeTest (|string| s, |scfunction|)
@@ -870,6 +872,12 @@ function OrderClassList
 		|| cls = m.cls
 			.ClassList <~ cls
 
+
+function AddGlobalConstNum (|string| name, |SCClass| c, |int64| value)
+	.AddGlobalConstNum(name, c, value.render)
+
+function AddGlobalConstNum (|string| name, |SCClass| c, |string| value)
+	.AddGlobalConst(name, c).IsLookupOnly = @num + value
 
 function AddGlobalConst (|string| name, |SCClass| c, |nilstate| dcl = NilState.real, |SCDecl|)
 	|| d = SCDecl(c)

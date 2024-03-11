@@ -26,7 +26,7 @@ function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 	return Test & nilstate.either
 
 
-function FastDecl (|SCDecl|)
+function FastDecl (|SCDecl!|)
 	opt norefcounts
 	|| obj = .obj|SCDecl|
 		target debugnil
@@ -37,7 +37,6 @@ function FastDecl (|SCDecl|)
 		if l isa scdecl
 			return l
 		return obj
-	debugger 
 	app.Crash 
 
 

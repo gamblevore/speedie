@@ -239,8 +239,8 @@ class FastString {
 	function AppendDurr (|Date| D)
 		cpp_wrapper JB_FS_AppendDurr
 
-	function AppendDMY (|Date| D)
-		cpp_wrapper JB_FS_AppendDMY
+	function AppendLocalTime (|Date| D)
+		cpp_wrapper JB_FS_AppendLocalTime
 
 
 	syntax Append (|f64| D)

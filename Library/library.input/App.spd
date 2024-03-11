@@ -198,7 +198,7 @@ function PrefsInit (|date| when=date.now, |bool|)
 		if ._prefs
 			rz = true
 			if when
-				app.prefs("first") := when.render
+				app.prefs("first") := when.renderint
 
 
 function SavePrefs

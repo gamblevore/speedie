@@ -63,14 +63,14 @@ uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { //JB_FS_FreeSizeSet
 }
 
 
-void JB_FS_AppendDMY (FastString* fs, Date self) {
+void JB_FS_AppendLocalTime (FastString* fs, Date self) {
     time_t t = self >> 16; // lol
     tm TimeSpec;
     if (localtime_r( &t, &TimeSpec )) {
-		char* write = (char*)JB_FS_WriteAlloc_(fs,26);
+		char* write = (char*)JB_FS_WriteAlloc_(fs, 26);
 		if (write) {
 			asctime_r(&TimeSpec, write);
-			fs->Length-=2; // sigh
+			fs->Length -= 2; // sigh
 		}
     }
 }

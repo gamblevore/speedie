@@ -113,10 +113,10 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	if dcl.default isthing "nil"
 		dcl.nildeclared = nilstate.optional
 	func.args <~ dcl
-	(dcl isnt dataconst)
+	(dcl isnt DataConst)
 	if dcl.name
-		(dcl is param)
-		(dcl isnt altered)
+		(dcl is Param)
+		(dcl isnt Altered)
 	  else
 		(dcl is return)
 	
@@ -133,10 +133,12 @@ function SCClass.CollectDeclsProperties (|bool|)
 
 function Message.CollectProp (|scclass| cls, |bool|)
 	opt norefcounts
-	|| dcl = .collectdecl( cls.modul, cls, declmode.properties, cls, nil)
-		cls.properties <~ dcl
-		(dcl is property)
-		dcl.becomereal
+	|| dcl = .CollectDecl( cls.modul, cls, declmode.properties, cls, nil)
+		// OK so... 	
+		if self isnt Editable
+			cls.properties <~ dcl
+			(dcl is property)
+			dcl.becomereal
 		return true
 
 
