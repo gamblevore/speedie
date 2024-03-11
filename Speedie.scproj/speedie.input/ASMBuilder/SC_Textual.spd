@@ -121,7 +121,7 @@ extend AsmFuncState
 		.last.label = ++.labelcount			#expect (ch, "Too many labels")
 		expect (!T.valuelower(ch.name))		        (ch, "Label already used" )
 		#!debugger
-		T.valuelower(ch.name) = datatypewrapper(.out.length)
+		T.valuelower(ch.name) = dataobject(.out.length)
 
 
 	function TextFuncSub (|message| m, |bool|)

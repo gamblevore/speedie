@@ -459,7 +459,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 		if (C == "--")
 			return R.MakeBorrowed(c.uptotype != nil)
 		if C == "~"
-			return R.MakeDataTypeWrapper(name_space, purpose)
+			return R.MakeDataObject(name_space, purpose)
 		if (C == "&")											// pointer
 			return r.GetAddress(purpose)
 		if (C == "?")
@@ -530,8 +530,8 @@ function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCNode| Nam
 		return .LoadContainedSub(cont, wrap, Name_Space, purpose)
 
 
-function SCDecl.MakeDataTypeWrapper (|SCNode| Name_Space, |declmode| Purpose, |scdecl|)
-	|| wrapp = «thg "datatypewrapper"»
+function SCDecl.MakeDataObject (|SCNode| Name_Space, |declmode| Purpose, |scdecl|)
+	|| wrapp = «thg "dataobject"»
 	rz = SCDecl(.type)
 	rz.LoadContainedSub(self, wrapp, name_space, purpose)
 

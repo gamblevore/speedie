@@ -259,7 +259,7 @@ function InitTypes
 	TypeSyntax			= Compiler["syntax"]
 	TypeVoidPtr			= Compiler["_voidptr"]
 	TypeVoid_           = Compiler["_void"]
-	TypeWrapper			= Compiler["datatypewrapper"]
+	TypeWrapper			= Compiler["dataobject"]
 	TypeDictionary		= Compiler["dictionary"]
 	TypeFastString		= Compiler["faststring"]
 	TypeArray			= Compiler["array"]
@@ -273,8 +273,7 @@ function InitTypes
 	//VP.nildeclared = nilstate.either
 	TypeVoidPtr!.TypeOptional = VP.NilConstructor(NilState.optional)
 	TypeVoidPtr!.TypeReal = VP.NilConstructor(NilState.Real)
-	
-	typestring!.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
+	TypeString!.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
 
 
 function InitBasicStuff (|int|) // compiler.init
@@ -684,7 +683,8 @@ function FindModule (|String| name, |Message| where, |bool| ErrMsg=true, |SCModu
 		return Obj
 	
 	if (where or errmsg) and !obj
-		error (where, "Can’t find: " + name)
+		app.printstacktrace
+		error (where, "Can’t find module: " + name)
 
 
 function CreateRoot

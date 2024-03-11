@@ -462,12 +462,12 @@ class SCDecl (SCNamed) {
 	function NewWrapper (|scdecl| CastTo, |scdecl|)
 		opt norefcounts
 		|| IsNormal = castto and castto.isnormal
-			|| it = .type.DataTypeWrapper
+			|| it = .type.DataObject
 				return it
 		|| dcl = SCDecl(TypeWrapper!)
 		dcl.contains = castto
 		if IsNormal
-			.type.DataTypeWrapper = dcl
+			.type.DataObject = dcl
 		return dcl
 	
 	
@@ -892,7 +892,7 @@ class SCDecl (SCNamed) {
 			Return kNeedsTypeCast
 
 		|| W = «dot "new"
-			«thg "datatypewrapper"»
+			«thg "dataobject"»
 			«emb »
 		»
 		if src.isfloat

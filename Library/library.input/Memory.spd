@@ -6,6 +6,13 @@
 
 
 
+role DataObject (DataTypeWrapper)
+	constants
+		kNothing = 0
+		kFree = 1
+		kDelete = 2
+
+
 class DataTypeWrapper
 	linkage
 		cpp_part Wrap
@@ -14,10 +21,10 @@ class DataTypeWrapper
 	
 	|DataTypeCode|		DataType
 	|byte|				DeathAction
-	|int64|				PrivValue		//()
+	|int64|				PrivValue
 	
 	destructor
-		if .deathaction == kfree
+		if .deathaction == DataObject.kfree
 			Memory.free(.privvalue|_voidptr|)
 
 	
@@ -67,15 +74,10 @@ class DataTypeWrapper
 			fs <~ .PrivValue
 
 	module
-		function NewFloat (|f64| v, |DataTypeWrapper|)
-			rz = DataTypeWrapper(true) 
+		function NewFloat (|f64| v, |Dataobject|)
+			rz = Dataobject(true) 
 			rz.datatype = datatypecode.f64
 			rz.PrivValue = v.AsInt
-	
-	constants
-		kNothing = 0
-		kFree = 1
-		kDelete = 2
 
 
 
@@ -96,7 +98,7 @@ class Memory
 	contains byte // should be byte?
 	
 
-	constructor (|int| ItemCount, |uint| ItemSize, |&byte| ptr, |byte| DeathAction=datatypewrapper.kfree)
+	constructor (|int| ItemCount, |uint| ItemSize, |&byte| ptr, |byte| DeathAction=DataObject.kfree)
 		cpp_part ConstructorPtr
 		.ItemSize = ItemSize
 		.length = 0
@@ -176,7 +178,7 @@ class Memory
 
 	
 	function SetCap (|int| value, |bool|)
-		require .deathaction == datatypewrapper.kfree
+		require .deathaction == DataObject.kfree
 		|| S = .itemsize|int|
 		|| old = S * .capacity
 		|| New = S * value
@@ -225,7 +227,7 @@ class Memory
 
 	
 	destructor
-		if (.deathaction == datatypewrapper.kfree)
+		if (.deathaction == DataObject.kfree)
 			Memory.free(._ptr)
 		
 
