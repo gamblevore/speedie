@@ -6,18 +6,18 @@
 
 
 
-role DataObject (DataTypeWrapper)
-	constants
-		kNothing = 0
-		kFree = 1
-		kDelete = 2
+//role DataObject (DataTypeWrapper)
 
 
-class DataTypeWrapper
+class DataObject
 	linkage
 		cpp_part Wrap
 		cpp_class DTWrap
 	contains int64
+	constants
+		kNothing = 0
+		kFree    = 1
+		kDelete  = 2
 	
 	|DataTypeCode|		DataType
 	|byte|				DeathAction
