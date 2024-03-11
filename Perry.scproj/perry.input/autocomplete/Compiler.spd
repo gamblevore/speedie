@@ -138,7 +138,7 @@ extend PerryIDE
 		.speedietext <~ c.ReadStdOut
 		require !c.IsRunning or Killed
 
-		|| OK = .TestCompilerAlive
+		|| OK = !killed and .TestCompilerAlive
 
 		|| errs = c.ErrorOutput.GetResult
 			|| p = errs.parse
