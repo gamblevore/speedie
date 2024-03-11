@@ -11,27 +11,7 @@ class Image (memory)
 	|string|		Name
 	|image?|		Temp
 	contains byte
-	
-/*
-	constructor (|int| ItemCount, |uint| ItemSize, |bool| DummyParam)
-		cpp_part ConstructorDummy // these two are the same?
-		|| Request = ItemCount * ItemSize
-		.ItemSize = ItemSize
-		.length = 0
-		._ptr = byte(Request)
-		.Capacity = (itemcount, 0)(._ptr)
-		.deathAction = datatypewrapper.kFree
-	
-	
-	constructor (|int| ItemCount, |uint| ItemSize)
-		|| Request = ItemCount * ItemSize
-		.ItemSize = ItemSize
-		.length = 0
-		._ptr = byte(Request)
-		.Capacity = (itemcount, 0)(._ptr)
-		.deathaction = datatypewrapper.kFree
-*/
-	
+
 	constructor (|ivec2| S, |&byte| P, |string| name="")
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
