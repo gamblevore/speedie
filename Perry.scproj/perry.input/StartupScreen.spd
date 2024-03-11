@@ -29,7 +29,7 @@ class StartupWindow (window) // splashscreen, startupscreen, startwindow
 			opt norefcounts
 			if !vis
 				|| i = perry.ide
-				require (.Vis and i and i.project)
+				require (.Vis and i)
 			with .create
 				if !vis
 					.hide

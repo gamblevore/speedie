@@ -264,11 +264,9 @@ function IsViewing (|guicontrol| g, |bool|)
 
 
 function IsSingleFileProject (|bool|)// IsProj
-	if .project
-		return !.project.isdir
+	return !.project.isdir
 	
 function ViewAsBetter
-	require .project
 	if .IsSingleFileProject
 		.viewasproject
 	  else

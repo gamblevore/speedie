@@ -297,7 +297,7 @@ function EditMeKeyDown (guitextevent)
 function EditMeModified (guitextevent)
 	|| i = .ide!
 	i.lastsendtime = 0
-	require i.project and i.projmsg
+	require i.projmsg
 	EditMeKeyDown(self, 0, false)
 	
 	if (reason != documentstate.saving) and !i.DuringTempView
