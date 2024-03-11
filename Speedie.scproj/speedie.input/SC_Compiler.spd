@@ -683,7 +683,6 @@ function FindModule (|String| name, |Message| where, |bool| ErrMsg=true, |SCModu
 		return Obj
 	
 	if (where or errmsg) and !obj
-		app.printstacktrace
 		error (where, "Can’t find module: " + name)
 
 

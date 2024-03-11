@@ -1,6 +1,7 @@
 
 
 bugs:
+	* recursion blocker. We block any func from being recursive unless explicitly stated it could be. (can mark entire file as recursive though... like for my parser)
 	* don't use "syntax append", simply "function append". Same with "call". I mean *x --> x.first
 	* sdleventtype.mousedown() // compiles???
 		* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and struct

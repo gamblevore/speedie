@@ -492,8 +492,9 @@ function InstallCompiler
 	"Installing Speedie: $__time_id__"
 
 	// so that the (product `bla`) prints properly =)
+	|| OldProd = .ProductPath 
 	options.output_path = Compiler.Projects.child("Terminal/Speedie")
-	.ProductPath.File.MoveTo( options.output_path )
+	OldProd.File.MoveTo( options.output_path )
 
 	FlowControl.Disabled++
 	.InstallOne Cpp_Export.CppProduct
