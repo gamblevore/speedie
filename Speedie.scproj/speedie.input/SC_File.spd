@@ -93,7 +93,6 @@ class SCFile (file)
 		|| str = .Readall(true).decompress
 			|| Layer = (Message).CreateUseLayer(self, str)
 			.fData = str
-//			.origdate = .modified
 			StdErr.source = .path
 			parser.DotInsertallow = true	// more consistant with IDE
 			

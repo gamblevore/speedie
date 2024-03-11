@@ -1,0 +1,87 @@
+
+// new task system
+
+function @SCClass.NewTask (CollectFunc)
+//	node.Name = "role"
+	|| name = node[@thg]
+	|| prms = node.Next(@nil)
+	require name and prms
+	if prms == @bra or @list
+		prms.func = @prm
+	  else
+		prms = @prm.msg
+		name.next = prms
+	
+	|| arg = prms.next(@arg)
+	|| run = arg.FindTaskRun		#require
+	
+	using node
+		|| bra = @bra.msg
+		name.next = bra
+		bra <~ (@thg, "task")
+		bra.obj = prms // hehe
+	using run
+		run.name = "syntax"
+		run.first = prms
+		run.first = @thg + "call"
+	
+	return SCClass.NeuRole(node, name_space, errplace)
+		
+
+
+function Message.FindTaskRun (|message|)
+	opt norefcounts
+	for ch in self
+		if ch == @decl
+			// do something
+		  elseif ch istmp "run"
+			if rz
+				error (ch, "Duplicate run statements")
+			  elseif ch[@arg].ExpectLast
+				rz = ch
+
+
+
+ignore {
+task LessThanTest (|int| i, |bool|)
+	|int| Vs
+	run: return i < .Vs
+
+// roles can't define properties.
+// So... then what?
+// we want to turn the decls into functions, right? but which are objects or not?
+// we could just scatter them? the thing is... we STILL don't know which are objects
+// or ints or floats... they need different treatment. We could DELAY that treatment???
+
+role LessThanTest (task)
+	|fake~int| Vs
+	syntax call (|int| i, |bool|)
+		return i < .Vs
+
+	
+role LessThanTest (task)
+	syntax call (|int| i, |bool|)
+		return i < .Vs
+
+
+function caller (|lessthantest| abc)
+	abc.Vs = 3
+	abc.Items[0] = 3
+	abc_vsset(abc, 3)
+	
+
+role LessThanTest (task)
+	getter lessthan	(|int|)
+	setter lessthan	(|int|)
+	syntax call (|int| i, |bool|)
+		return i < .Vs
+	
+
+role LessThanTest (task)
+	access lessthan	(|int|)
+	syntax call (|int| i, |bool|)
+		return i < .Vs
+	
+
+}
+

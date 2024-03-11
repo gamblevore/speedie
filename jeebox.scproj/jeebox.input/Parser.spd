@@ -1292,7 +1292,7 @@ datatype MsgParseFlags (uint16)
 	syntax is (|MsgParseFlags| v, |bool|)
 		return self & v
 	flags
-		NicelyPositioned	= 0x8000
+		NicelyPositioned	= 0x0800
 		Editable			= 0x1000
 		Inserted			= 0x2000
 		Style2				= 0x4000

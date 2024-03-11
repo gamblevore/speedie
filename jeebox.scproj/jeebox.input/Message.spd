@@ -48,7 +48,7 @@ class Message (RingTree)
 		.Position	= parser.Using.position
 		.flags		= parser.using.Flags
 		.RangeLength= parser.Using.Length
-		.tag		= parser.Using.Tag // why not... 
+		.tag		= parser.Using.Tag
 
 			
 	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
@@ -58,7 +58,7 @@ class Message (RingTree)
 		.Position	= parser.Using.Position
 		.flags		= parser.using.Flags
 		.RangeLength= parser.Using.Length
-		.tag		= parser.Using.Tag // why not... 
+		.tag		= parser.Using.Tag
 
 	
 	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength=0)
@@ -70,7 +70,7 @@ class Message (RingTree)
 		.func		= func
 		.RangeLength= RangeLength
 		.flags		= parser.using.Flags
-		.tag		= parser.Using.Tag // why not...
+		.tag		= parser.Using.Tag
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -328,13 +328,6 @@ class RingTree (Saveable)
 		rz.parent = nil
 
 
-	function NextPrev (||)
-		opt norefcounts
-		|| n = .next
-			return n
-		return .prev
-
-
 	syntax access (||)
 		return .rand
 

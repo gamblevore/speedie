@@ -232,7 +232,7 @@ function Message.Clean (|bool| erl = false)
 			  elseif curr == "~<>"
 				deprecate (curr, "Use ~!=")
 				curr.name = "~!="
-			  elseif curr == "<~" or (curr == "<" and curr in @arg)
+			  elseif curr == "<~"
 				curr.BecomeAppend("SyntaxAppend")
 			  elseif curr == "~>" // noice
 				curr.BecomeAppend("SyntaxSendTo")
