@@ -619,8 +619,8 @@ function RightClickFileList (GUIListEvent)
 	opt NoRefCounts
 	if self isa fileviewer
 		|| m = .newcmm
-		m <~ ("Create File",		FileViewerCreateFile)
 		m <~ ("Copy File Path",		FileViewerCopyPath)
+		m <~ ("Create File",		FileViewerCreateFile)
 		m <~ ("Rename File",		FileViewerRenameFile)
 		m.addsep
 		|| within = .FindSearchWithin

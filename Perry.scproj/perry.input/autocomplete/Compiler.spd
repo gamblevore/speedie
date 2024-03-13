@@ -56,7 +56,7 @@ extend PerryIDE
 	
 	function message.CleanErrors
 		opt norefcounts
-		for e in .Arg
+		for e in self
 			|| a = e.arg
 				|| f = a["file"]
 				|| str = a.firstName
@@ -65,13 +65,21 @@ extend PerryIDE
 
 
 	function ShowCompileErrors (|message!| msg, |bool|)
+		debugger
 		|| MaybeOK = msg.last
 		if (MaybeOK == @thg and "ok")
 			.ErrorList.clear
 			.UpdateErrorCount
 			return .CheckedOK(msg.name)
 	
-		msg.cleanErrors
+		// inconsistant input...
+		|| arg = msg
+		if arg != @arg
+			arg = msg.arg
+		  else
+			maybeok = msg
+		arg.cleanErrors
+		
 		is Broken
 		.NoNeed
 		|| newlist = error.from(MaybeOK)

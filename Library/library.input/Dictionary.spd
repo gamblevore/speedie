@@ -48,6 +48,8 @@ class Dictionary (saveable)
 		self[m.name] = m
 	
 	function ValueLower (|string| s, ||)
+		if s.islower
+			return self[s]
 		return self[s.lowercase]
 	function ValueLower (|string| s, assigns:||)
 		self[s.lowercase] = value
