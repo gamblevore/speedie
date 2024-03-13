@@ -238,7 +238,7 @@ function ClickedProjectInfo (GUIaction)
 	.ide!.NextProjInfo
 
 
-function PerryIDE.ShowErrors (|bool| FromKeys, |bool|)
+function PerryIDE.SaveAndShowErrors (|bool| FromKeys, |bool|)
 	opt norefcounts
 	.SaveEditing(documentstate.ErrorChecking)
 	.Recheck
@@ -246,6 +246,11 @@ function PerryIDE.ShowErrors (|bool| FromKeys, |bool|)
 	.viewasproject
 	if t and .isviewing(.errorlist)
 		return true
+	return .ShowErrors
+
+
+function PerryIDE.ShowErrors (|bool|)
+	opt norefcounts
 	if !.isviewing(.errorlist)
 		ClickedAView(.ViewErrors)
 	  elseif .errorlist.hasany

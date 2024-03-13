@@ -510,7 +510,7 @@ class PerryIDE (Window)
 				t.text = ""
 			return true
 		if key is e
-			return .ShowErrors(true)
+			return .SaveAndShowErrors(true)
 		if key is i
 			FileViewerCountCode(.filelist, nil, .filelist.LastSelected.cell)
 			return true

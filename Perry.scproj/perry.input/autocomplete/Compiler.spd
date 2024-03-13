@@ -65,7 +65,6 @@ extend PerryIDE
 
 
 	function ShowCompileErrors (|message!| msg, |bool|)
-		debugger
 		|| MaybeOK = msg.last
 		if (MaybeOK == @thg and "ok")
 			.ErrorList.clear
@@ -86,6 +85,8 @@ extend PerryIDE
 		newlist := Error()
 		.errorlist.listsource = newlist
 		.UpdateErrorCount
+		beep
+		.ShowErrors
 
 
 	function UpdateErrorCount
