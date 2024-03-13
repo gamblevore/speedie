@@ -41,6 +41,7 @@ class RingTree (Saveable)
 	function Last (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_LastSet, nil checker }
 
 	function Second (||)
+		nil checker
 		opt norefcounts
 		|| x = .first
 			return x.next

@@ -156,7 +156,14 @@ function TaskProperties
 	check (.Properties <= 8) (.properties.last!.source, "Too many properties on task")
 
 	for (p in .Properties) (i)
-		p.source!.indent = i
+		|| src = p.source
+		debugger
+		|| ss = src.second
+			|| fn = ss.obj as message
+			|| index = fn.findnested(@num, "0")
+				index.name = i.render
+		
+			src!.indent = i
 		.TaskObjectCount += p.IsObject
 		check (p.IsTaskable) (p, "Task properties can't have that")
 

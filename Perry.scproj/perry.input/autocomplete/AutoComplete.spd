@@ -507,7 +507,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 	if self != @tmp // it's always a tmp?
 		return nil
 	if self == @tmp and self ~= "main"
-		return "@app.main".parse
+		return "@app.main"~digest
 	|| f = .first
 	if (f == @dot) and autocomplete.isafunc(self)
 		// OK... so heres the problem... we don't know if we are module or not.

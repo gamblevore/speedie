@@ -2,7 +2,6 @@
 // new task system
 
 function @SCClass.NewTask (CollectFunc)
-//	node.Name = "role"
 	|| name = node[@thg]
 	|| prms = name.Next(@nil)
 	require name and prms
@@ -18,14 +17,12 @@ function @SCClass.NewTask (CollectFunc)
 	name.next = bra
 	bra <~ (@thg, "task")
 	bra.obj = prms				// hehe
-	|| con = "constructor () {
-		._Objects = –taskvars
-	}".parse
+	|| con = "constructor () {._Objects = –taskvars}"~digest
 	arg.first = con
-
-	|| conprm = con.first
-	|| conarg = conprm.next
-	arg.FindTaskRun(conprm, conarg, prms)
+	
+	|| conprm = con.first!
+	|| conarg = conprm.next!
+	arg.BuildTask(conprm, conarg, prms)
 
 	|| task = SCClass.NeuRole(node, name_space, ErrPlace)|scmodule|
 		task.cls!.IsRole = 2
@@ -33,16 +30,19 @@ function @SCClass.NewTask (CollectFunc)
 		
 
 
-function Message.MakeTaskVar (|message| prm, |message| arg, |message|)
+function Message.MakeTaskVar  (|message!| prm,  |message!| arg,  |message|)
 	is editable // whatever
-	|| name = .VarName
+	|| name = .VarName										#require
+	|| type = .first
+	expect (type and type!=@emb) (type, "Missing type")
 
 	using self
-		arg <~ NewEqRel(@sdot+name, @thg + name)
+		arg <~ NewEqRel(@sdot + name, @thg + name)
 		prm <~ .copy // :)
+
 	
 	
-function Message.FindTaskRun (|message| prm, |message| arg, |message| FnPrms)
+function Message.BuildTask (|message| prm, |message| arg, |message| FnPrms)
 	opt norefcounts
 	|| found = 0
 	for ch in self
@@ -57,6 +57,11 @@ function Message.FindTaskRun (|message| prm, |message| arg, |message| FnPrms)
 				ch.first = @thg + "call"
 			found++
 
+/*
+function SyntaxCall (|int| i, |bool|) {
+	return (._func|FPLessThanTest|)(self, i)
+}
+*/
 
 target debug2
 	task LessThanTest (|int| i, |bool|)

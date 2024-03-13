@@ -78,14 +78,13 @@ function LastInBlock (|SCBlockage| Reason)
 |message| ReturnSelfEqNil
 
 function @message.NilchCompare (|message|)
-	if (ReturnSelfEqNil)
+	if ReturnSelfEqNil
 		return ReturnSelfEqNil
-	|| m = "return self!=nil".parse
-	ReturnSelfEqNil = m
-	return m
+	ReturnSelfEqNil = "return self!=nil"~digest
+	return ReturnSelfEqNil
 
 
-function message.nilcheckmode (|bool| ok, |int|)
+function message.NilCheckMode (|bool| ok, |int|)
 	opt norefcounts
 	rz = 2*OK
 	if rz

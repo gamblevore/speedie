@@ -51,7 +51,7 @@ noauto
 
 function ParserRestore
 	.errors = stderr
-	stderr = errorreceiver()
+	stderr = ErrorReceiver()
 	(message).Restore
 	parser.using.position = -1 // sigh. I guess something slipped somewhere
 
@@ -95,7 +95,7 @@ function PerryTalk (|spdprocess| perry) // ReturnsWhenPerryClosesUs
 			exit
 
 	pico.SleepForSend
-	perry.disconnect // calls close, which uses SO_LINGER, to allow sending.
+	perry.Disconnect					// calls close, which uses SO_LINGER, to allow sending.
 
 
 function WriteError (|string| name, |message|)
@@ -135,7 +135,7 @@ function CmdCleanUp (|Message| arg, |message|)
 	return cmd
 
 
-|| TestCrash = "__CrashSpd_" + "_" // for crash-testing
+|| TestCrash = "__CrashSpd_" + "_"		// for crash-testing
 
 function CmdWrap (|Message| arg, |bool|)
 	if arg contains TestCrash
@@ -179,17 +179,16 @@ function UnusedFuncs (|message| cmd, |message|)
 			
 	cmd.Clear												// so... now what?
 	
-	if .CompiledOK
-		|| arg = cmd.GiveArg
-		for fn in Compiler.FuncList
-			|| src = fn.source
-			if src and fn.File == scf
-				if fn.isunused
-					|| str = "() is unused"
-					if fn.linkfrom != nil
-						str = "()'s callers are unused"
-					arg.msg(@tmp, fn.name + str) <~ src.position
-	return cmd
+	if !.CompiledOK
+		return cmd
+	|| arg = cmd.GiveArg
+	for fn in Compiler.FuncList
+		|| src = fn.source
+		if src and (fn.File == scf) and fn.isunused
+			|| str = "() is unused"
+			if fn.linkfrom != nil
+				str = "()'s callers are unused"
+			arg.msg(@tmp, fn.name + str) <~ src.position
 	
 
 function Check (|message| cmd, |message|)

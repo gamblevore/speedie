@@ -71,7 +71,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
 
 function DataTypeModule
 	opt norefcounts
-	|| module = "extend_module ASM:constants:".parse
+	|| module = "extend_module ASM:constants:"~digest
 	compiler <~ module
 	.modulearg = module.last.last.last
 

@@ -592,7 +592,7 @@ function LoadInitsAndMore
 
 
 function PostInitCodeCall
-	.program.initvarsarg <~ "initcode_()".parseclean
+	.program.initvarsarg <~ "initcode_()"~digest
 
 
 function InitCompiler
@@ -908,7 +908,7 @@ function AddMain (|int| mark, |bool|)
 	|| b = (Truebool, falsebool)(Options.ProjectisLibrary) 
 	
 	if m and .ConfMsg
-		m.first = "app.configure = __AppConfString".parse
+		m.first = "app.configure = __AppConfString"~digest
 	
 	.program.TryAdd( nil, b, "__IS_LIBRARY__" )
 

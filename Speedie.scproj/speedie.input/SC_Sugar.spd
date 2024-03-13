@@ -186,6 +186,6 @@ if __ArgCount == 0
 		macros.mainargNone.clean
 		self <~ (macros.mainargNone, [i.msg])
 
-	self <~ "require stderr.ok".parse
+	self <~ "require stderr.ok"~digest
 
 

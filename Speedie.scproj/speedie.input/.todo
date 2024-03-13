@@ -32,6 +32,7 @@ additions:
 	* nil-checker could eliminate scope-escape... of local vars addresses. Its an error regardless.
 	* CollectDecls needs to not return early!! or break it up into pieces
 	* –container @ques ability... for macros. This returns the syntax that contained us. Useful for (all~files).delete
+	* unify macros? or just modernise. Why pass an array? why not a message~list? Arrays suck. RingTree sexy.
 	* do we need lowercase in lookupsub??? all dots/funcs got lowered in parseclean?
 		* perhaps parseclean should use an ID system...
 	*  msg <~ {

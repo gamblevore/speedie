@@ -147,16 +147,19 @@ function bool.Msg (|message|)
 	return @thg + .Render
 
 
-ignore	// seems not worth it
-		// we'd want a sum(_0, _1*2) macro!
-		// we'd need to be able to pass types
-	insertion
-		sum	({
-			|| Src = _0
-			|| V = Src.ZeroValue
-			for (c in Src)
-				V += c
-			rejoin (V)
-		})
+insertion
+	digest (–digest _0).ParseJbin
 
+
+// seems not worth it
+// we'd want a sum(_0, _1*2) macro!
+// we'd need to be able to pass types
+//insertion
+//	sum	({
+//		|| Src = _0
+//		|| V = Src.ZeroValue
+//		for (c in Src)
+//			V += c
+//		rejoin (V)
+//	})
 
