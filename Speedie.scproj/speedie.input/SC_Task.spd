@@ -11,18 +11,15 @@ function @SCClass.NewTask (CollectFunc)
 		prms = @prm.msg
 		name.next = prms
 	
-	|| arg = prms.next(@arg)
+	|| arg = prms.next(@arg)		#require
 	using node
 	|| bra = @bra.msg
 	name.next = bra
 	bra <~ (@thg, "task")
 	bra.obj = prms				// hehe
-	|| con = "constructor () {._Objects = –taskvars}"~digest
-	arg.first = con
-	
-	|| conprm = con.first!
-	|| conarg = conprm.next!
-	arg.BuildTask(conprm, conarg, prms)
+	|| con = "constructor () {._Objects = –taskvars, ._Func = (&run)|_voidptr|}"~digest
+	|| fpName = "FP" + name.name
+	arg.BuildTask(con!, prms, fpName)
 
 	|| task = SCClass.NeuRole(node, name_space, ErrPlace)|scmodule|
 		task.cls!.IsRole = 2
@@ -30,8 +27,10 @@ function @SCClass.NewTask (CollectFunc)
 		
 
 
-function Message.MakeTaskVar  (|message!| prm,  |message!| arg,  |message|)
+function Message.MakeTaskVar  (|message!| con, |message|)
 	is editable // whatever
+	|| prm = con.first!
+	|| arg = prm.next!
 	|| name = .VarName										#require
 	|| type = .first
 	expect (type and type!=@emb) (type, "Missing type")
@@ -42,26 +41,56 @@ function Message.MakeTaskVar  (|message!| prm,  |message!| arg,  |message|)
 
 	
 	
-function Message.BuildTask (|message| prm, |message| arg, |message| FnPrms)
+function Message.BuildTask (|message| con, |message| prms, |string| fpName)
 	opt norefcounts
 	|| found = 0
 	for ch in self
 		if ch == @decl
-			ch.MakeTaskVar(prm, arg)
+			ch.MakeTaskVar(con)
 		  elseif ch istmp "run"
 			if found
 				error (ch, "Duplicate run statements")
 			  elseif ch[@arg].ExpectLast
-				ch.name = "syntax"
-				ch.first = fnprms
-				ch.first = @thg + "call"
+				ch.prev = con
+				ch.name = "function"
+				|| brah = @bra.msg
+				brah <~ (@thg, fpName)
+				ch.first = brah
+				ch.first = @thg + "run"
 			found++
+	
+	debugger
+	|| Caller = (macros.TaskCaller)(prms, @thg + fpName)
+	|| CallPrms = Caller.FlatLast.parent
+	for p in prms
+		|| ty = p.second
+			callprms <~ ty.copy
+
+	debugger
+	self <~ Caller
+	
+	debugger
+/*	arg.msg(@tmp, "syntax")
+	caller <~ (@thg, "call")
+	caller <~ prms
+	|| callarg = caller.msg(@arg)
+	|| ret = callarg.msg(@tmp, "return")
+	|| fn = ret.msg(@func)
+	|| brah
+*/
+	
 
 /*
-function SyntaxCall (|int| i, |bool|) {
+function SyntaxCall (|int| i, |bool|)
 	return (._func|FPLessThanTest|)(self, i)
-}
+
+prototype FPLessThanTest (|LessThanTest| self, |int| i, |bool|)
+
+function Run (FPLessThanTest)
+	visible
+	return i < .b
 */
+
 
 target debug2
 	task LessThanTest (|int| i, |bool|)

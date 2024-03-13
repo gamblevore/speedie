@@ -2,7 +2,6 @@
 
 || Speedie		= "/usr/local/bin/speedie".file
 || CppCompiler	= "/usr/bin/g++"
-|file| NewStdOut // should just take a file really... shouldn't need to set it to an int
 
 
 module Perry
@@ -11,6 +10,7 @@ module Perry
     |bool|							Checked	
     |byte| 							FindID
 	|Dictionary of String|			PathDict
+	prototype abc (|int| i, |bool|)
 	
 	constants
 		arc_newer	= 2

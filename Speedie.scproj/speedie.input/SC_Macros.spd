@@ -21,7 +21,8 @@ module Macros {
 
 || MultiDecr = "JB_DecrMulti(_0, _1)".macro
 || ConstructorNew = "if self == nil: self = JB_NewClass(_0)|_0|".macro
-|| TaskAccessor = `helper _0 (|&_1|) {pragma inline, return (&._items[0])|&_1|}`.macro
+//|| TaskAccessor = `helper _0 (|&_1|) {pragma inline, return (&._items[0])|&_1|}`.macro
+|| TaskCaller = "syntax call _0 {return (._func|_1|)(self, )}".macro
 
 || MainArgBasic      = `|| _0 =  _1.MainArg(_2, "_0"),           `.macro
 || MainArgBasicReq   = `|| _0 =  _1.MainArg(_2, "_0") #require,  `.macro

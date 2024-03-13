@@ -157,6 +157,7 @@ function TaskProperties
 
 	for (p in .Properties) (i)
 		|| src = p.source
+		(p is task)
 		debugger
 		|| ss = src.second
 			|| fn = ss.obj as message
@@ -168,7 +169,7 @@ function TaskProperties
 		check (p.IsTaskable) (p, "Task properties can't have that")
 
 
-function ClassLoadProperties 
+function CollectProperties 
 	opt norefcounts
 	require !.IsBehaviourTable
 
