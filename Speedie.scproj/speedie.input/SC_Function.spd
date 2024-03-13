@@ -1166,6 +1166,29 @@ function NewMissingFunc (CollectFunc)
 	return f
 
 
+function scfunction.MakeProtoClassName (|string| start, |string|)
+	|| name = start
+	
+	|scnode--| p = .parent
+	while p
+		if p isa scmodule
+			|scclass--| currcls = p.cls #loop
+			name = currcls.name + "_" + name
+		p = p.parent
+	
+	if !name.find('_')
+		name = "FP_" + name
+	return name
+
+
+function scfunction.ProtoExportName
+	opt norefcounts
+	|| cls = .prototype
+	
+	if cls and !cls.cppclass
+		cls.cppclass = .MakeProtoClassName(cls.name)
+
+	
 function NewProtoType (CollectFunc)
 	return NewProtoTypeSub(node, name_space, ErrPlace)
 
@@ -1175,7 +1198,6 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 	if parent isa scclass
 		if !ForInterface
 			node.NormaliseFunc(parent)
-			debugger
 		parent = parent.modul|scclass|
 	  else
 		require parent.ExpectModule(node)

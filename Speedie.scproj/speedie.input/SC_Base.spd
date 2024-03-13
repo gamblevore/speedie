@@ -310,7 +310,7 @@ function scfunction.FoundOneCpp (|string| n, |bool|)
 		return true
 
 
-function LoadExportName
+function LoadExportName 
 	// Project_Class_Func
 	// Project_Module__Func	
 	require !.ExportName

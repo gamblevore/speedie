@@ -428,8 +428,7 @@ function ImportAll
 	
 	require stderr.ok
 	
-	.SortModules
-	.OrderClassList
+	.SortModulesAndClasses
 
 	for c in .ClassList
 		c.DataTypePostLoad
@@ -464,7 +463,7 @@ function ImportAll
 		if c.isstruct
 			c.GetStructDepth
 
-	.sortmodules	// need to re-sort array by depth
+	.SortModulesAndClasses	// need to re-sort array by depth
 
 
 	for c in .ClassList
@@ -502,6 +501,7 @@ function ImportAll
 
 	require .Stage( "Handling Function Prototypes" )
 	for f in .ProtoTypes
+		f.ProtoExportName
 		f.FuncDecls
 		f.MakeParamsReal
 	scfunction.currfunc = nil // set in funcdecls
@@ -783,8 +783,9 @@ function BuildConstructors
 	scfunction.currfunc = nil
 
 
-function SortModules
+function SortModulesAndClasses 
 	.ModuleList.sort(ModulesSorter)
+	.ClassList.sort(ClassSorter)
 
 
 function TaskPropertySorter (SorterComparer)
@@ -793,6 +794,10 @@ function TaskPropertySorter (SorterComparer)
 	|| bb = b|scdecl|
 	return aa.isobject >= bb.isobject
 	
+
+function ClassSorter (SorterComparer)
+	return ModulesSorter(a|scclass|.modul, b|scclass|.modul)
+
 
 function ModulesSorter (SorterComparer)
 	opt norefcounts
@@ -862,14 +867,6 @@ function InputFile (|File| Default, |String| s, |message| where, |File|)
 		rz := default[s]
 	if !rz.exists
 		rz = nil
-
-
-function OrderClassList
-	// put the .ClassList in the same order as the ModuleList
-	.ClassList.Clear
-	for m in .ModuleList
-		|| cls = m.cls
-			.ClassList <~ cls
 
 
 function AddGlobalConstNum (|string| name, |SCClass| c, |int64| value)
