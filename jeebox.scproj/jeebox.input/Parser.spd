@@ -48,7 +48,7 @@ extend Parser
 		.Token( ".." ) = .Handler( kFuncAfterNoSpace, fDotAccess )
 		.Token("://")  = .Handler( kFuncAfterNoSpace, fURL)
 		.Token( "|" )  = .handler( kTemporalBar, fDecl ).link(kFuncAfterBar, fTypeCast).link( kThingBar, fdecl )
-//		.Token( `^"` ) = .Handler( kThingSyx, fArgName )
+		.Token( `^"` ) = .Handler( kthingsyx, fArgName )
 		.Token( `+` )  = .Handler( kTemporalSyx, fTmpPlus )
 		.Token( "@" )  = .Handler( kThingSyx, fAtName ).Link( kFuncAfterNormal, fAtNamedExp )
 		.Token( "~" )  = .Handler( kFuncAfterNormal, fAdjectiveThing ).Link( kAdjectiveOp, fAdjectiveOp )
@@ -307,8 +307,9 @@ extend Parser
 		
 	function fTmpPlus (ParseHandler)
 		opt norefcounts
-		if .nextbyte == '"'
-			|| tmp = fCharSub(start, start+1, '"')
+		|| c = .nextbyte
+		if c == '"' or '\''  // I prefer '' // deprecate "" later?
+			|| tmp = fCharSub(start, start+1, c)
 				tmp.func = @tmp
 				tmp = ftmpsub(tmp, kOpp & ~kOppBra, kthing )
 				if tmp != @thg
@@ -397,16 +398,21 @@ extend Parser
 		.ParseLoopFlags(result, ")", kTemporalSyxNoBar)
 
 
+	function CharName (|int| start, |byte| find, |string?|)
+		|| After = parser.data.jbfind( find, start+1, int.max )
+			parser.NextStart = After + 1
+			return parser[ start + 1, After, @char ].unescape
+		return nil
+	
 	function fCharSub (|int| pos, |int| start, |byte| find, |message|)
-		|| After = parser.data.jbfind( find, start+1, int.max )$
-		parser.NextStart = After + 1
-		|| name = parser[ start + 1, After, @char ].unescape
-		rz = parser.new( nil, @char, pos, name )
+		|| name = .CharName(start, find)
+		if name != nil
+			rz = parser.new( nil, @char, pos, name )
 
 
 	function fChar (ParseHandler)
 		rz = fcharsub(start, start, '\'')
-		ifn rz
+		if !rz
 			Return parser.ErrorAdd( "Char didn't close!" )
 
 
@@ -634,15 +640,23 @@ extend Parser
 		return parser.NewSkip( parent, @Sheb, start, S, S2 )
 
 
+	function fArgName (ParseHandler)
+		if parent
+			|| f = parent.func
+			if f == @arg or @list or @bra or @arr
+				|| name = .CharName(start+1, '"')
+				if name != nil
+					parent.name = name 
+					return parent
+	
+	
 	function fArgOpen (ParseHandler)
 		rz = parser.new( nil, @Arg, start )
-//		(rz is style2)
 		parser.ParseLoopFlags( rz, "}", ktemporal )
 
 
 	function fArgColon (ParseHandler)
 		rz = parser.new( nil, @arg, start )
-//		(rz is style2)
 		rz.RangeLength = 1
 		while {
 			|| Item = .Process( kTemporal, rz ) ?? .ProcessThing
@@ -1053,7 +1067,9 @@ ive been~running #since morning
 	function ParseLoopItem (|Message| Output, |int| TmpoFlags, |message| Prev, |int| Indent, |message|)
 		|| ch = .Process( kTemporal&TmpoFlags, output)
 		if (!ch)
-			|| item = .ProcessThingparent(output)						#require
+			|| item = .ProcessThingparent(output)
+			if !item or item == Output
+				return item // {^"oof"}
 			TmpoFlags &= kTemporal&~kTemporalWord		// for consistancy with ftmp
 			ch = .ParseItem(Item, TmpoFlags, kopp)		// or else...
 														// a:b, (a):b ... will parse differently!
@@ -1097,12 +1113,13 @@ ive been~running #since morning
 			if .WillEnd or (prev and !info.lines)
 				exit
 			
-			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.indent) #loop				
-			RZ += (ch == @item)
-			if info.IsDebug
-				ch.flags |= MsgParseFlags.breakpoint
-			output = .AddToOutput(output, ch, prev, info.pos)
-			prev = ch
+			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.indent)		#loop
+			if ch != output // haha
+				RZ += (ch == @item)
+				if info.IsDebug
+					ch.flags |= MsgParseFlags.breakpoint
+				output = .AddToOutput(output, ch, prev, info.pos)
+				prev = ch
 
 	
 	function DecorateThing (|message!| R, |int| Ops, |Message!|)
@@ -1137,8 +1154,8 @@ ive been~running #since morning
 
 	
 	function ProcessThingSub (|message?| Parent, |int| Ops, |int| KindOfThing, |bool| Expect, |Message?|)
-		|| result = .Process( KindOfThing, Expect, parent ) #require
-		if .WillEnd
+		|| result = .Process( KindOfThing, Expect, parent )
+		if !result or (result == parent) or .WillEnd
 			return result
 		return .DecorateThing(result, ops)
 
