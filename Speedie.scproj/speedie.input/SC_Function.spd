@@ -658,9 +658,14 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 	Return loss
 
 
+function scmodule.FindClass (|message| name, |scclass|)
+	return Compiler[ name.name, name ]
+
+
 function DeclsPrototypeClass (|Message| ch0)
 	opt norefcounts
-	|| fpType = Compiler[ ch0.name, .Source ]
+	|| p = .parent as scmodule #require
+	|| fpType = p.findclass(ch0)
 		.DeclsProtoCleanup(fpType, ch0, false, false)
 		.DeclsProtoTypeAdd(fpType)
 
@@ -1169,17 +1174,20 @@ function NewProtoType (CollectFunc)
 	return NewProtoTypeSub(node, name_space, ErrPlace)
 
 
-function NewProtoTypeSub (|Message| node, |SCNode| parent, |Message| ErrPlace, |string| ForInterface="", |SCModule|)
-	if (ForInterface)
-		parent = parent|SCClass|.modul
+function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, |string| ForInterface="", |SCModule|)
+
+	if parent isa scclass
+		if !ForInterface
+			node.NormaliseFunc(parent)
+		parent = parent.modul|scclass|
 	  else
-		expect (parent isa SCModule) (node, "Function prototypes must be in a module." )
+		require parent.ExpectModule(node)
 		
 	|| f = SCFunction.NewFunc( node, parent, ErrPlace )|SCFunction|		#require
 	Compiler.FuncList.Pop
 	
 	|| Using = node.SyntaxUsing
-	|| tmp = @tmp + "datatype"		// fffffffuuuu
+	|| tmp = @tmp + "datatype"
 	tmp <~ (@thg, f.Name)
 	tmp <~ node.last
 	
@@ -1644,7 +1652,7 @@ function SCFunction.PreProcessExpects
 
 
 
-function message.NormaliseFunc (|message|)
+function message.NormaliseFunc (|scclass| AddSelf = nil, |message|)
 	opt norefcounts
 	|| name = self[@thg]$
 	using (name)
@@ -1658,6 +1666,11 @@ function message.NormaliseFunc (|message|)
 		|| fn = prm.func
 		expect (fn == @bra or @list or @prm) (prm)
 		prm.Func = @prm
+	if (addself)
+		|| d = @decl.msg
+		d <~ (@thg, addself.name)
+		d <~ (@thg, "self")
+		prm.first = d
 	rz = prm.next
 	if rz
 		rz.expect(@arg)

@@ -104,9 +104,6 @@ function BaseDecls
 
 
 function AddModuleToFunc (|SCNode| space)
-// so we have an issue... we can’t even really add "self" in a module...
-// because we can’t return a module from an expression, yet.
-// sigh. Try?
 	if !space["self"]
 		space.TryAdd( space.FuncSrc, self, "self" )
 

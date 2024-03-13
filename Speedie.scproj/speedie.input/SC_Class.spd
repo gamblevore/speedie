@@ -811,7 +811,7 @@ function TryAddToProject
 	|| NameNode = .Source.first!
 	|| mod = Compiler.DisamClasses!
 	if NameNode == @dot		// load the modules first.
-		mod = compiler.FindModuleMsg(namenode.first!)	#require
+		mod = compiler.FindModule(namenode.first!)	#require
 
 	mod.TryAdd( .sourcearg, .modul, .name )
 
@@ -832,10 +832,14 @@ module
 		.minopt = arg.DeprecatedClassOption("opt", "min")
 
 
+	function scnode.ExpectModule (|message| errplace, |bool|)
+		expect (self isa scmodule) (errplace, "Must be in a module." )
+		return true
+
 
 	function NeuClassSub (|Message| node, |SCNode| parent, |Message| ErrPlace, |string| ForInterface, |SCNodetype| base,  |SCClass|)
 		if !ForInterface
-			expect (parent==compiler.program) (errplace, errorreceiver.NonFatal)
+			require parent.ExpectModule(errplace)
 		
 		|| arg = node.GiveArg
 		|| cls = SCClass.new( node, parent, base.hasptrs, SCModule.new )
@@ -988,10 +992,10 @@ module
 			return nil
 		
 		|| dot = c[@dot]							#require
-		|| name = Dot[@nil, 0]						#require
+		|| name = Dot[@nil]							#require
 		expect (name == @thg or @name) (name)
 
-		M := Compiler.FindModuleMsg(name)
+		M := Compiler.FindModule(name)
 		require m
 		dot.clear
 		dot.func = @thg
@@ -1020,7 +1024,7 @@ module
 	function ProcessExtendOld (|Message| c, |bool| PreferClass)
 		|| name = c[@thg]
 			|| arg  = c.last(@arg)
-			|| M = Compiler.FindModulemsg(name)
+			|| M = Compiler.FindModule(name)
 			if m and arg
 				|SCNode| B = M
 				|| cls = m.cls

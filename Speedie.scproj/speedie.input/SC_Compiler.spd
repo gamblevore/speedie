@@ -21,6 +21,7 @@
 |SCClass|	TypeBool
 |SCClass|	TypeCharSet
 |SCClass|	TypeByte
+|scclass|	TypeCodePoint
 |SCClass|	TypeObject
 |SCClass|	TypeVoidPtr
 |SCClass|	TypeWrapper
@@ -246,6 +247,7 @@ function InitTypes
 	TypeString			= compiler["string"]
 	TypeStringZero		= compiler["stringzeroterminated"]	
 	TypeByte			= compiler["byte"]
+	TypeCodePoint		= compiler["codepoint"]
 	TypeCharSet			= compiler["charset"]
 	Typevec2			= compiler["vec2"]
 	Typevec3			= compiler["vec3"]
@@ -655,32 +657,38 @@ function CreateDisambiguation
 	.DisamModules = SCModule.newContainer("__modules__")
 
 
+syntax access (|string| name, |Message| where=nil, |SCClass|)
+	cpp_part FindClassName
+	return .FindClass( name, where, true )
 
-//function ModuleFunction (|String| module_name, |string| fn_name, |scfunction|)
-//	opt norefcounts
-//	|| mod = compiler.findmodule(module_name, nil)
-//		|| fn = mod[fn_name]
-//		if fn isa scfunction
-//			return fn
-	
-			
-function FindClass (|String| name, |Message| where=nil, |bool| err=true,  |SCClass|)
+
+syntax access (|Message| name, |SCClass|)
+	if name
+		return .FindClass( name.name, name, true )
+
+
+function FindClass (|String| name, |Message| where, |bool| errs=true,  |SCClass|)
 	opt norefcounts
-	|| Mod = .FindModule(name, where, err)
-		return Mod.cls			#expect (where, "Expected a class but found module.")
+	|| Mod = .FindModule(name, where, errs)
+		if mod.cls
+			return mod.cls
+		if errs
+			error (where, "Expected a class but found module.")
 
 
-function FindModuleMsg (|Message| where, |SCModule|)
-	return .FindModule(where.name, where)
+function FindModule (|string| name, |Message| where=nil, |bool| errs=true, |SCModule|)
+	return compiler.program.FindModule(name, where, errs)
+
+function FindModule (|Message| where, |bool| errs=true, |SCModule|)
+	return compiler.program.FindModule(where.name, where, errs)
 
 
-function FindModule (|String| name, |Message| where, |bool| ErrMsg=true, |SCModule|)
+function scnode.FindModule (|String| name, |Message| where, |bool| DoErrors=true, |SCModule|)
 	opt norefcounts
-	|| Obj = compiler.program.access.valuelower( name )
-	if Obj isa SCModule
-		return Obj
-	
-	if (where or errmsg) and !obj
+	|| Obj = .access.valuelower( name )
+		if Obj isa SCModule
+			return Obj
+	  elseif where and DoErrors
 		error (where, "Can’t find module: " + name)
 
 
@@ -922,15 +930,6 @@ function Collect (|Message| m, |bool| visible)
 
 syntax append (|message| m)
 	.InternalFile.LiveAST <~ m
-
-syntax access (|string| name, |Message| where=nil, |SCClass|)
-	cpp_part AccessStr
-	return .FindClass( name, where )
-
-
-syntax access (|Message| name, |SCClass|)
-	if name
-		return .FindClass( name.name, name )
 
 
 ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  

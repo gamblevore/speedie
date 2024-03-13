@@ -58,7 +58,7 @@ extend SCClass
 
 
 	function GetFlyingMemClassFor (|SCClass|)
-		return Compiler.FindClass("GameFlyingMem", .IsModel)
+		return Compiler["GameFlyingMem", .IsModel]
 
 	
 	function ModelDecls

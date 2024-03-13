@@ -743,7 +743,7 @@ function FindVis (|Message| c, |bool|)
 		|| first = c[@thg]
 		first.expect(@thg, "class")
 		|| name  = c[@thg, 1].name
-		|| cls   = compiler.FindClass(name)
+		|| cls   = compiler[name]
 		return cls and !cls.banned
 	error c
 

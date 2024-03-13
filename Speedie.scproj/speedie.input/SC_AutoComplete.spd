@@ -234,7 +234,7 @@ function compiler.FindModuleOrClass (|message| mod, |bool| retry, |SCNode|)
 	opt norefcounts
 	if mod == @name and "main"
 		return compiler.program
-	|| Module = .FindModule(mod.name, nil)		#require
+	|| Module = .FindModule(mod, false)		#require
 	if (mod == @thg)
 		rz = module.cls
 		require rz or retry
@@ -1015,7 +1015,7 @@ function IdentifyBetter (|message| node, |string| name) // p.firstname
 function Message.ModuleSrc (|message|)
 	opt norefcounts
 	|| name = .name
-		|| found = compiler.FindModule(name, nil)
+		|| found = compiler.program.FindModule(name, nil)
 			|| c = found.cls
 				|| fp = c.funcproto
 					return fp.source

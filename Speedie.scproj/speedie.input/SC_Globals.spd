@@ -276,7 +276,7 @@ function TypeOfStr (ExprResolver)
 
 
 function TypeOfSString (ExprResolver)
-	return typestringzero!.TypeReal // should return stringzeroterminated!
+	return typestringzero!.TypeReal
 
 
 function TypeOfChar (ExprResolver)
@@ -286,8 +286,7 @@ function TypeOfChar (ExprResolver)
 	
 	exp.Func = @num
 	exp.name = cp.render
-	|| cls = compiler.findclass("codepoint", exp)
-		return cls.typenormal
+	return typecodepoint!.typenormal
 
 
 
@@ -295,7 +294,7 @@ function TypeOfChar (ExprResolver)
 || CSNum			= "09..".charset
 
 
-function message.UnitMatch (|string| a, |string|b, |bool|)
+function message.UnitMatch (|string| a, |string| b, |bool|)
 	opt norefcounts
 	|| unit = .name
 	if unit == a: return true
