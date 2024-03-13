@@ -1138,20 +1138,6 @@ module {
 |SCFunction|	CurrFunc
 |int[12]|		FuncStats
 
-		
-	
-//function ringtree.TreeSanity
-//	opt norefcounts
-//	for s in self
-//		if s.parent != self
-//			.debugprint
-//			debugger
-//		s.TreeSanity
-//
-//
-//syntax equals (|string| s, |bool| aware, |bool|)
-//	return currfunc.SyntaxEquals(s, aware)
-
 
 function NewMissingFunc (CollectFunc)
 	|| f = SCFunction.NewFunc( node, name_space, errplace )
@@ -1160,7 +1146,7 @@ function NewMissingFunc (CollectFunc)
 		|| C = arg.first
 		expect (C and !C.next) (F, "Missing functions must be one line!")
 		|| prm = arg.prev
-		expect (!prm.hasany) ("Missing functions don't directly state arguments.")
+		expect (!prm.HasAny) ("Missing functions don't directly state arguments.")
 		f.isMacro = true
 		node.name = "function"
 	return f
@@ -1171,8 +1157,8 @@ function scfunction.MakeProtoClassName (|string| start, |string|)
 	
 	|scnode--| p = .parent
 	while p
-		if p isa scmodule
-			|scclass--| currcls = p.cls #loop
+		if p isa SCModule
+			|scclass--| CurrCls = p.cls #loop
 			name = currcls.name + "_" + name
 		p = p.parent
 	
@@ -1194,7 +1180,6 @@ function NewProtoType (CollectFunc)
 
 
 function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, |string| ForInterface="", |SCModule|)
-
 	if parent isa scclass
 		if !ForInterface
 			node.NormaliseFunc(parent)
@@ -1202,7 +1187,7 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 	  else
 		require parent.ExpectModule(node)
 		
-	|| f = SCFunction.NewFunc( node, parent, ErrPlace )|SCFunction|		#require
+	|| f = NewFunc( node, parent, ErrPlace )|SCFunction|		#require
 	Compiler.FuncList.Pop
 	
 	|| Using = node.SyntaxUsing
@@ -1800,10 +1785,12 @@ function NewConstructor (CollectFunc)
 
 
 function NewDestructor (CollectFunc)
-	node.name = "function"
-	using node
-		node.first = «Thg "Destructor"»
-	return SCFunction.NewFunc( node, name_space, ErrPlace )
+	if name_space isa scclass
+		expect !(name_space.IsRole) (node, "destructors aren't allowed on roles")
+		node.name = "function"
+		using node
+			node.first = «Thg "Destructor"»
+		return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 
 function message.MainFix (|message|)

@@ -157,14 +157,8 @@ function TaskProperties
 
 	for (p in .Properties) (i)
 		|| src = p.source
+			src.indent = i
 		(p is task)
-		debugger
-		|| ss = src.second
-			|| fn = ss.obj as message
-			|| index = fn.findnested(@num, "0")
-				index.name = i.render
-		
-			src!.indent = i
 		.TaskObjectCount += p.IsObject
 		check (p.IsTaskable) (p, "Task properties can't have that")
 
