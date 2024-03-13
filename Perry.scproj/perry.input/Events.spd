@@ -246,19 +246,21 @@ function PerryIDE.SaveAndShowErrors (|bool| FromKeys, |bool|)
 	.viewasproject
 	if t and .isviewing(.errorlist)
 		return true
-	return .ShowErrors
+	if .ShowErrors
+		return true
+	ClickedAView(.Viewfiles)
+	return true
+		
 
 
 function PerryIDE.ShowErrors (|bool|)
 	opt norefcounts
 	if !.isviewing(.errorlist)
 		ClickedAView(.ViewErrors)
-	  elseif .errorlist.hasany
+		return true
+	if .errorlist.hasany
 		.errorlist.selectatleastfirst
-	  else
-		ClickedAView(.Viewfiles)
-	
-	return true
+		return true
 
 
 function ClickedAView (GUIaction)

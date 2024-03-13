@@ -30,3 +30,5 @@ Utils/jz
 Speedie.scproj/Speedie.xcodeproj/xcshareddata/xcschemes/Update.xcscheme
 *.xcscheme
 Perry.scproj/perry.input/.todo
+examples/prototest.spd
+examples/prototest
