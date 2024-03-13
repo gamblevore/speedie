@@ -658,10 +658,6 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 	Return loss
 
 
-function scmodule.FindClass (|message| name, |scclass|)
-	return Compiler[ name.name, name ]
-
-
 function DeclsPrototypeClass (|Message| ch0)
 	opt norefcounts
 	|| p = .parent as scmodule #require
@@ -1179,6 +1175,7 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 	if parent isa scclass
 		if !ForInterface
 			node.NormaliseFunc(parent)
+			debugger
 		parent = parent.modul|scclass|
 	  else
 		require parent.ExpectModule(node)
@@ -1199,7 +1196,12 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 		f.ProtoType = clss
 		Compiler.ProtoTypes <~ f
 	
-	Return Modul
+		parent.TryAdd(node, modul, modul.Name)		
+	
+		if !ForInterface
+			modul = compiler.program
+	
+	Return modul
 
 
 

@@ -666,30 +666,18 @@ syntax access (|Message| name, |SCClass|)
 	if name
 		return .FindClass( name.name, name, true )
 
-
-function FindClass (|String| name, |Message| where, |bool| errs=true,  |SCClass|)
-	opt norefcounts
-	|| Mod = .FindModule(name, where, errs)
-		if mod.cls
-			return mod.cls
-		if errs
-			error (where, "Expected a class but found module.")
-
+function FindClass (|string| name, |message| where, |bool| DoErrors=true, |scclass|)
+	return compiler.program.Findclass(name, where, DoErrors)
 
 function FindModule (|string| name, |Message| where=nil, |bool| errs=true, |SCModule|)
 	return compiler.program.FindModule(name, where, errs)
 
+
 function FindModule (|Message| where, |bool| errs=true, |SCModule|)
 	return compiler.program.FindModule(where.name, where, errs)
 
-
-function scnode.FindModule (|String| name, |Message| where, |bool| DoErrors=true, |SCModule|)
-	opt norefcounts
-	|| Obj = .access.valuelower( name )
-		if Obj isa SCModule
-			return Obj
-	  elseif where and DoErrors
-		error (where, "Can’t find module: " + name)
+function scnode.FindClass (|Message| where, |bool| errs=true,  |SCClass|)
+	return .findclass(where.name, where, errs)
 
 
 function CreateRoot

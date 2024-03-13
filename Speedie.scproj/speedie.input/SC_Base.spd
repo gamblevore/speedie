@@ -64,6 +64,26 @@ syntax access (|string| s, |SCObject|)
 		return a.ValueLower(s)
 
 
+function FindClass (|String| name, |Message| where, |bool| errs=true,  |SCClass|)
+	opt norefcounts
+	|| Mod = .FindModule(name, where, errs)
+		if mod.cls
+			return mod.cls
+		if errs
+			error (where, "Expected a class but found module.")
+
+
+function FindModule (|String| name, |Message| where, |bool| DoErrors=true, |SCModule|)
+	opt norefcounts
+	while self
+		|| Obj = self[ name ]
+		if Obj isa SCModule
+			return Obj
+		self = .parent
+	if where and DoErrors
+		error (where, "Can’t find module: " + name)
+
+
 function UpCheck (|string| name, |bool| LookUp=true, |SCObject|) {
 	opt norefcounts
 	if LookUp and (self isa SCClass)
