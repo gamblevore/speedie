@@ -1,4 +1,5 @@
 
+
 // new task system
 
 function @SCClass.NewTask (CollectFunc)
@@ -17,7 +18,7 @@ function @SCClass.NewTask (CollectFunc)
 	name.next = bra
 	bra <~ (@thg, "task")
 	bra.obj = prms				// hehe
-	|| con = "constructor () {._Objects = –taskvars, ._Func = (&run)|_voidptr|}"~digest
+	|| con = "constructor () {super.constructor((&run)|_voidptr|), ._Objects = –taskvars}"~digest
 	arg.BuildTask(con!, prms)
 
 	|| task = SCClass.NeuRole(node, name_space, ErrPlace)|scmodule|
@@ -56,8 +57,7 @@ function Message.BuildTask (|message| con, |message| prms)
 				brah <~ (@thg, "task_prototype")
 				ch.first = brah
 				ch.first = @thg + "run"
-			found++
-	
+			found++	
 	
 	|| Caller = (macros.TaskCaller)(prms, @thg + "task_prototype")
 	|| CallPrms = Caller.FlatLast.parent
@@ -65,12 +65,12 @@ function Message.BuildTask (|message| con, |message| prms)
 		|| ty = p.second
 			callprms <~ ty.copy
 	
-	
 	|| proto = .msg(@tmp, "prototype")
 	proto <~ (@thg, "task_prototype")
 	proto <~ prms.copy
 	
 	self <~ Caller
+
 
 
 target debug2
@@ -85,14 +85,8 @@ target debug2
 		|LessThanTest| xxx
 
 
+
 ignore {
-
-// roles can't define properties.
-// So... then what?
-// we want to turn the decls into functions, right? but which are objects or not?
-// we could just scatter them? the thing is... we STILL don't know which are objects
-// or ints or floats... they need different treatment. We could DELAY that treatment???
-
 role LessThanTest (task)
 	|int| Vs
 	syntax call (|int| i, |bool|)

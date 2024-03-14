@@ -576,7 +576,7 @@ function ImportAll
 	for f in .FuncList
 		if !TooManyErrors()
 			f.CheckNotBadName
-			f.Transform			
+			f.Transform
 			.stFunctionProgress++	
 
 	.Stage( "Building Function Link Map" )
@@ -665,6 +665,15 @@ syntax access (|string| name, |Message| where=nil, |SCClass|)
 syntax access (|Message| name, |SCClass|)
 	if name
 		return .FindClass( name.name, name, true )
+
+
+function FindClassCurr (|message| n, |scclass|)
+	opt norefcounts
+	|| m = SCModule.curr
+	if !m
+		m = compiler.program
+	return m.findclass(n.name, n)
+
 
 function FindClass (|string| name, |message| where, |bool| DoErrors=true, |scclass|)
 	return compiler.program.Findclass(name, where, DoErrors)

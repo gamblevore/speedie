@@ -273,7 +273,8 @@ function TranDebugInsert
 function Transform ()
 	opt norefcounts
 	require !.isMacro
-	CurrFunc = self
+	scfunction.CurrFunc = self
+	scmodule.curr = .parent as scmodule
 	.Badness = 0
 	|| StillOK = StdErr.Mark
 
@@ -292,6 +293,7 @@ function Transform ()
 	if !StillOK
 		.Badness |= 1
 	CurrFunc = nil
+	scmodule.curr = nil
 
 
 function Message.ParamNum (|int|)
@@ -778,7 +780,7 @@ function CheckReturnValue (|Message| msg)
 		FoundReturnType = nil
 
 	|| r = .ReturnType
-		expect FoundReturnType (msg, "Can’t find return type.")
+		expect FoundReturnType (msg, "Has no return type.")
 		
 		if (FoundReturnType == TypeNil) and (r.CantBeNilInCpp)  // OK so what if we can’t return nil?
 			|| def = r.CreateDefault(c)
@@ -834,6 +836,7 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	
 
 function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
+	// fillindefaultconstructor, fillconstructordefaults, defaultconstructors
 	opt norefcounts
 	|| cls = .cls$
 	|| oof = .ConstructorLinePlace

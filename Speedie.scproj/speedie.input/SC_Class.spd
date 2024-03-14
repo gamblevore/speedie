@@ -159,6 +159,7 @@ function TaskProperties
 		|| src = p.source
 			src.indent = i
 		(p is task)
+		(p is PropertyWasConstructed)
 		.TaskObjectCount += p.IsObject
 		check (p.IsTaskable) (p, "Task properties can't have that")
 

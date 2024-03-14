@@ -185,6 +185,7 @@ class ErrorReceiver
 		self <~ " found.\n" // found."
 	
 	function BadCount (|int|)
+		visible
 		return .errorcount + .problemcount
 		
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)

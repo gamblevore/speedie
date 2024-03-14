@@ -831,7 +831,6 @@ iterator ListLookup
 module {
 	|bool|			CurrVisibility
 	|bool|			ConstantsLoadingOverride
-	|scmodule--|	CurrModule
 
 	function LoadCppPart (CollectFunc)
 		require (name_space isa scclass) or (name_space isa scmodule)

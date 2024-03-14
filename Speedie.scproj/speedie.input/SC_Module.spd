@@ -151,6 +151,8 @@ function GetTheNewer (|SCObject|)
 
 
 module
+	|scmodule--|	Curr
+
 	function SCNode.SpaceModule (|message| errplace = nil, |scmodule|)
 		if (self isa scmodule)
 			return self

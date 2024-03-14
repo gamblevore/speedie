@@ -64,14 +64,14 @@ function SCModule.LoadInitFuncSub (|message| init, |string| name)
 
 function SCModule.LoadInitFunc
 	SCNode.CurrVisibility = true
-	SCNode.currmodule = self
+	scmodule.curr = self
 	|| arg = .initcodeArg
 		.LoadInitFuncSub(arg, "InitCode_")
 	
 	arg = .initVarsArg
 	if arg
 		.LoadInitFuncSub(arg, "Init_")
-	SCNode.currmodule = nil
+	scmodule.curr = nil
 
 
 

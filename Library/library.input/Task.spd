@@ -6,6 +6,9 @@ class Task (ringtree)
 	|byte|				_Objects
 	|int64[9]| 			_Local
 	
+	constructor (|_voidptr| fn)
+		._Func = fn
+	
 	destructor
 		for (i in ._objects|int|)
 			jb_decr(._Local[i]|object|) // noice
