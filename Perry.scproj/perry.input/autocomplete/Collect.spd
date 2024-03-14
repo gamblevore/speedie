@@ -37,7 +37,8 @@ function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string|
 
 
 function PerryIDE.SendFeedbackStr (|string| op)
-	.SendFeedbackMsg(.checkmsg(op, false))
+	if .IsSpeedieCode
+		.SendFeedbackMsg(.checkmsg(op, false))
 	
 
 function PerryIDE.DateWrap (|message| msg, |message|)
@@ -50,7 +51,7 @@ function PerryIDE.DateWrap (|message| msg, |message|)
 
 
 function PerryIDE.SendFeedbackMsg (|message| msg)
-	require msg
+	require msg and .IsSpeedieCode
 	|| fb = .FeedbackInit(.feedback)			#require
 	.feedback = fb
 	|| record = .DateWrap(msg)
