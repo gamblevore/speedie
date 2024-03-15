@@ -777,7 +777,7 @@ class Message (RingTree)
 	
 	
 	function FastString.MsgErrorName (|string?| name)
-		if (name)
+		if name
 			self <~ " '"
 			self <~ name
 			self <~ "' "
@@ -807,11 +807,6 @@ class Message (RingTree)
 
 		errorreceiver.NewError( found, fs.getresult )
 	
-
-//	function AccessErr (|int| i)
-//		cpp_part CantFindAt
-//		|| errnum = (" at item " + i.render, "")(i)
-//		errorreceiver.NewError( self, "Incomplete syntax" + errnum )
 
 
 	function ExpectLast (|string| err="", |bool|)

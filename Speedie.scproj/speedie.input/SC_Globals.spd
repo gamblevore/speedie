@@ -397,15 +397,19 @@ function Message.CollectionPlace (|Message|)
 		msg = p
 
 
-function ExtractAmount (|Message| Prms, |SCNode| name_space, |SCDecl| R, |bool|)
+function scdecl.ExtractAmount (|Message| Prms, |SCNode| name_space, |scdecl|)
+	rz = .extractamountsub(prms, name_space)
+	check (rz) ( prms, "Expected something like: |Type[10]|" )
+
+
+function scdecl.ExtractAmountSub (|Message| Prms, |SCNode| name_space, |scdecl|)
 	|| num = prms.first
 	if num == @unit
 		typeofunit(Num, nil, nil)
-	require num.expect(@num) and num.expectlast
-	if r.pointercount
-	R.CArraySize = Num.Int
-	R.Default = «arg »
-	return true
+	if num.expect(@num) and num.ExpectLast
+		rz = .copydecl
+		rz.IsCArray(Num.Int, self)
+		rz.Default = @arg.msg
 
 
 function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |SCDecl?|)
@@ -435,9 +439,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 		|| Prms = c.second
 		if prms.HasAny
 			|| R = ExtractDecl( c.first!, name_space, purpose )			#require
-			R = R.copydecl
-			expect  ExtractAmount( Prms, name_space, R )   ( c, "Expected something like: |Type[10]|" )
-			return R
+			return R.ExtractAmount( Prms, name_space )
 			
 		f = @rel
 		c.func = f
@@ -886,7 +888,7 @@ function TypeOfArr (ExprResolver)
 		if isdispatch and result.type != typedictionary! // dispatches use function pointers... 
 			result.type = c.type						// so we might as well make a c-array
 			result.contains = nil
-			result.CArraySize = IsDispatch-1
+			result.IsCArray(IsDispatch-1, c)
 			exp.func = @arg
 			tran_argarray(exp, name_space)
 		  elseif  !c.type.isobject
@@ -1736,7 +1738,7 @@ function TypeOfArgArr (ExprResolver)
 			Count++
 	
 	exp.obj = result						#expect (exp, "Can't get the type of this.")
-	result.Carraysize = Count
+	result = result.getcarray(Count)
 	Tran_ArgArray(exp, name_space)
 	return result
 
@@ -1783,7 +1785,7 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space)
 	if counter.isitem and already.mustbe(scdecl)
 		|| c = counter.max+1
 		check (c < 16K) (exp, "Too many items in C-array.")
-		already.CArraySize = c
+		exp.obj = already.getcarray(c)
 		
 		
 

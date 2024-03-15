@@ -171,9 +171,10 @@ struct ArgArrayCounter
 		if (.isitem and .isnotitem)
 			error (exp, "Mixed indexes found. (Some have ':' and some don't)")
 
+
 	function Do (|string| name, |message| item, |SCNode| name_space, |message|)
 		opt norefcounts
-		|| acc = «acc, «thg name » »
+		|| acc = (@thg + name).WrapWith(@acc)
 		|| arr = acc.msg(@arr)
 		|| value = item
 		if value == @item

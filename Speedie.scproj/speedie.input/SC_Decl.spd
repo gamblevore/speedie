@@ -274,10 +274,6 @@ class SCDecl (SCNamed) {
 		dcl.Info |= .info & cpyflags
 		dcl.C_array		= .C_array
 		dcl.NilDeclared = .NilDeclared
-
-	function CArraySize (assigns:|int|)
-		.C_Array = value
-		.NilDeclared = nilstate.real
 		
 //	function TypeContained (assigns:|scclass|)
 //		.type = Value
@@ -289,6 +285,7 @@ class SCDecl (SCNamed) {
 		.CopyTypeInfoTo(rz)
 		rz.internal = self
 		rz.PointerCount++
+		rz.c_array = 0
 		|| ns = nilstate.realish
 		if purpose == declmode.globals
 			ns = nilstate.optional
@@ -296,25 +293,46 @@ class SCDecl (SCNamed) {
 			ns |= nilstate.stated
 		rz.NilDeclared = ns
 		check (rz.pointercount <= 4) (.source, "Too much abstraction")
+
+
+	function GetCArray (|int| Amount, |SCDecl|)
+		rz = SCDecl(.type)
+		.CopyTypeInfoTo(rz)
+		rz.iscarray(amount, self)
 	
 	
 	function DeReference (|message| brel, |SCNode|name_space,  |bool| IsAccess,  |scdecl|)
 		opt norefcounts
 		|| c = .DeReferenceSub(brel, name_space, isaccess)
 			return c
+		debugger
+		.DeReferenceSub(brel, name_space, isaccess)
 		error (brel.first, "Can't dereference this.")
 		
-	
+		
+	function IsCarray (|int| Size, |scdecl| Of)
+		.pointercount = 0
+		.C_Array = size
+		.NilDeclared = nilstate.real
+		.Internal = of
+		.nildeclared = nilstate.realish
+		
 	function DeReferenceSub (|message| brel, |SCNode|name_space,  |bool| IsAccess, |scdecl|)
 		opt norefcounts
 		if .IsCArray
-			require IsAccess
+			check (IsAccess) ("Use [0] instead.")
+			|| i = .Internal					
+				if i.TypeSuffers
+					return i.MakeNewOptional
+				return i
 			|| c = .CopyDecl // should keep borrowedness...
 							 // what about the nildeclare? c-arrays exist, but do their items exist?
 			c.C_Array = 0
 			if c.typesuffers
-				c.nildeclared |= nilstate.optional // 
+				return c.MakeNewOptional
 			return c
+
+
 		
 		if .PointerCount > 0
 			if !.internal // should always exist.
@@ -671,33 +689,28 @@ class SCDecl (SCNamed) {
 		if !c or (minimal and .AlreadyContains)
 			return simple
 		
-		return «rel
-			simple
-			«opp "of"»
-			«thg c.Type.Name »
-		»
+		rz = @rel.msg
+		rz <~ simple
+		rz <~ (@opp, "of")
+		rz <~ (@thg, c.Type.Name)
 		
 
 	function WriteSimpleType (|Message|)
 		|| name = .type.Name
 		rz = @Thg + name
 		for (.pointercount|int|)
-			rz = «Brel "&", rz »
+			rz = rz.wrapwith(@brel, "&")
 
 		if (.IsCArray)
-			rz = «acc 
-				rz
-				«arr
-					«num .c_array »
-				»
-			»
+			rz = rz.WrapWith(@acc)
+			rz.msg(@arr) <~ (@num, .c_array.render)
 		if self is borrowed
-			rz = «arel "--", rz »
+			rz = rz.wrapwith(@arel, "--")
 		if .TypeSuffers and .nilstated
 			if .Statedoptional
-				rz = «brel "?", rz »
+				rz = rz.wrapwith(@brel, "?")
 			  elseif .StatedReal and platform.isdebug
-				rz = «brel "!", rz »
+				rz = rz.wrapwith(@brel, "!")
 				
 	
 	
@@ -722,18 +735,19 @@ class SCDecl (SCNamed) {
 		return (.IsCArray) or (.type.IsStruct) or (.isnumeric > 1) 
 
 
-	function CreateStructNil (|message| errs, |Message!|)
-		using (errs)
-		|| Arg = «arg »
-		Arg.obj = self
-		if .IsCArray
-			return Arg
-		
-		rz = «type ":)"
-			Arg
-			.WriteType
-		»
+	function CreateStructNil (|message| where, |Message!|)
+		using where
+		rz = .CreateStructNilsub()
 		rz.obj = self
+	
+		
+	function CreateStructNilSub (|Message!|)
+		if .IsCArray
+			return @arg.msg
+		
+		rz = @type + ":)"
+		rz <~ @Arg
+		rz <~ .WriteType
 	
 
 	function message.CreateNil (|message|)
@@ -1044,7 +1058,7 @@ class SCDecl (SCNamed) {
 			
 			if .IsCArray
 				fs <~ '['
-				fs <~ .c_Array|int|
+				fs <~ .c_array
 				fs <~ ']'
 			
 			|| c = .Contains

@@ -854,7 +854,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			d.exportName.safe(t)
 			if d.IsCArray
 				T <~ '['
-				T <~ d.C_Array|int|
+				T <~ d.C_Array
 				T <~ ']'
 		
 		if (equality)
