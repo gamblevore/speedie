@@ -95,7 +95,7 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |u
 		if (!exp)
 			return kNeedsTypeCast ||| kVoidPtrMatch
 		if (o.type.funcproto)
-			return exp.CastToVoidPtr // actually do it.
+			return exp.CastFPToVoidPtr // actually do it.
 		return kCastedMatch
 
 	if TypeCast & kActualTypecasts
