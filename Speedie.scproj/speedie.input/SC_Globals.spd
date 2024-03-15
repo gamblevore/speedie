@@ -407,7 +407,7 @@ function scdecl.ExtractAmountSub (|Message| Prms, |SCNode| name_space, |scdecl|)
 	if num == @unit
 		typeofunit(Num, nil, nil)
 	if num.expect(@num) and num.ExpectLast
-		rz = .copydecl
+		rz = .CopyDecl
 		rz.IsCArray(Num.Int, self)
 		rz.Default = @arg.msg
 
@@ -890,7 +890,7 @@ function TypeOfArr (ExprResolver)
 			result.contains = nil
 			result.IsCArray(IsDispatch-1, c)
 			exp.func = @arg
-			tran_argarray(exp, name_space)
+			tran_argarray(exp, name_space, result)
 		  elseif  !c.type.isobject
 			result.Contains = c.newwrapper(c)
 		  else
@@ -1739,18 +1739,18 @@ function TypeOfArgArr (ExprResolver)
 	
 	exp.obj = result						#expect (exp, "Can't get the type of this.")
 	result = result.getcarray(Count)
-	Tran_ArgArray(exp, name_space)
+	Tran_ArgArray(exp, name_space, result)
 	return result
 
 
-function Tran_ArgArray (|Message| Exp, |SCNode| name_space)
+function Tran_ArgArray (|Message| Exp, |SCNode| name_space, |scdecl| decl)
 	visible
 	// needs cleaning up. we are getting this called a few times!
 	|| thg = exp.IsSetIntoVar	
 	if (!thg)
-		if exp in @sheb
-			return // shouldn't come here anyhow. set a breakpoint to fix this!
-		expect (false) (exp) 
+		// shouldn't come here anyhow. set a breakpoint to fix this!
+		check (exp in @sheb) (exp)
+		return nil 
 
 	|| rel = exp.NiceParent
 	rel.expect(@rel)
@@ -1775,11 +1775,10 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space)
 		place = rel2
 
 	counter.check(exp)
-	|| Already = exp.obj
-	if counter.isitem and already.mustbe(scdecl)
+	if counter.isitem
 		|| c = counter.max+1
 		check (c < 16K) (exp, "Too many items in C-array.")
-		already.CArraySize = c
+		decl.C_Array = c
 		
 		
 

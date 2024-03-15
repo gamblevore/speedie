@@ -274,14 +274,6 @@ class SCDecl (SCNamed) {
 		dcl.Info |= .info & cpyflags
 		dcl.C_array		= .C_array
 		dcl.NilDeclared = .NilDeclared
-
-	function CArraySize (assigns:|int|)
-		.C_Array = value
-		.NilDeclared = nilstate.real
-		
-//	function TypeContained (assigns:|scclass|)
-//		.type = Value
-//		.contains := Value.contained
 			
 
 	function GetAddress (|declmode| Purpose=declmode.always, |SCDecl|)
