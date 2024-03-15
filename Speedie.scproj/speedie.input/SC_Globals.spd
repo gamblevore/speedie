@@ -897,7 +897,7 @@ function TypeOfArr (ExprResolver)
 			result.Contains = c.MakeContainedOptional
 
 	
-	if result.type == TypeVoid_!
+	if result.type == TypeVoid_
 		result.Type = typearray!
 	return result
 

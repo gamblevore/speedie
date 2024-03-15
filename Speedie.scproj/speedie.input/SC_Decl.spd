@@ -290,10 +290,12 @@ class SCDecl (SCNamed) {
 		rz.NilDeclared = ns
 		check (rz.pointercount <= 4) (.source, "Too much abstraction")
 	
+	
 	function GetCArray (|int| Amount, |SCDecl|)
 		rz = SCDecl(.type)
 		.CopyTypeInfoTo(rz)
 		rz.iscarray(amount, self)
+	
 	
 	function IsCarray (|int| Size, |scdecl| Of)
 		.pointercount = 0
