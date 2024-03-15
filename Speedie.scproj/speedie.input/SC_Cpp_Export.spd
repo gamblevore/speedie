@@ -110,6 +110,7 @@ function FuncHeader (|FastStringCpp| fs, |SCFunction| F, |string|)
 function CppFunc (|FastStringCpp| fs, |SCFunction| F)
 	opt norefcounts
 	require .CanExportFunc(f)
+	scfunction.currfunc = f
 	(f is AlreadyExported)
 	|| funcheader = .FuncHeader(fs, f)$
 	.SetupFlow(F)
@@ -843,11 +844,15 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function WriteDecl (|SCDecl| D, |FastStringCpp| T, |Message| equality = nil) 
+		opt norefcounts
 		if (!d)
 			t <~ "void"
 			Return
 		
-		.WriteDeclNoName( d, T )
+		if d.iscarray
+			.WriteDeclNoName( d.internal!, T )
+		  else
+			.WriteDeclNoName( d, T )
 		
 		if (d.exportName)
 			T <~ ' '

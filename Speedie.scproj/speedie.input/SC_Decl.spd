@@ -308,28 +308,19 @@ class SCDecl (SCNamed) {
 		opt norefcounts
 		|| c = .DeReferenceSub(brel, name_space, isaccess)
 			return c
-		debugger
-		.DeReferenceSub(brel, name_space, isaccess)
 		error (brel.first, "Can't dereference this.")
 		
 	
-	function DeReferenceSub (|message| brel, |SCNode|name_space,  |bool| IsAccess, |scdecl|)
+	function DeReferenceSub (|message| brel, |SCNode| name_space,  |bool| IsAccess, |scdecl|)
 		opt norefcounts
 		if .IsCArray
-			check (IsAccess) ("Use [0] instead.")
-			|| i = .Internal					
-				if i.TypeSuffers
-					return i.MakeNewOptional
-				return i
-			|| c = .CopyDecl // should keep borrowedness...
-							 // what about the nildeclare? c-arrays exist, but do their items exist?
-			c.C_Array = 0
-			if c.typesuffers
-				c.nildeclared |= nilstate.optional // 
-			return c
+			check (IsAccess) (brel, "Use [0] instead.")
+			|| i = .Internal$				
+			if i.TypeSuffers
+				return i.MakeNewOptional
+			return i
 		
 		if .PointerCount > 0
-			if !.internal // should always exist.
 			return .internal
 		
 		if !isaccess and .isnormalobject
