@@ -151,11 +151,10 @@ extend Error
 		// mark where in the line the error occurs?
 
 		|| Spaces = (.Position - Start)
-		debug_require (Spaces < 100) // it happened once, due to bugs. Another bug could cause this to be off and ruin things.
 		fs <~ '\n'
 		if Usecolor
 			fs <~ ErrorColors.Underline
-		fs <~ (' ', Spaces)
+		fs <~ (' ', spaces min 100) // it happened once, due to bugs. Another bug could cause this to be off and ruin things.
 		fs <~ '^'
 
 

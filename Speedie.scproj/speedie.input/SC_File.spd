@@ -175,5 +175,5 @@ module image
 			|| n = 0
 			|| qoi = .writeqoi(img, x, y, n)
 				rz = string.Own(qoi, n).compress(mzlab.Fast)
-		memory.free(img!)
+		memory.free(img)
 

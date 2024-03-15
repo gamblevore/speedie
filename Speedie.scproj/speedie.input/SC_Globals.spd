@@ -84,10 +84,6 @@ function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |SCNode| name_space)
 				stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", fn.blindcasts)
 
 
-//function scdecl.Exists (|bool|)
-//	return self and self != typevoid and TypeNil
-
-
 function TypeOfReal (ExprResolver)
 	opt	norefcounts
 	return TypeOfExpr(exp.first, name_space)$.makereal
@@ -177,27 +173,28 @@ function TypeOfBRel (ExprResolver)
 	|| name = exp.name
 	|| F = exp.first									#require
 	|| SubType = TypeOfExpr( F, name_space )			#require
-	if (Subtype.type.funcproto) and (name == "&")
-		return TypeOfFuncPointer(F, name_space, side)
+	|| n = name.first
 	
-	if name == "*"
+	if n == '*'
 		return SubType.Dereference(exp, name_space, false)
-		
-	if name == "-" // minus
+	
+	if n == '-' and name == 1 // minus
 		Return subtype
 		
-	if name == "&"
+	if n == '&'
+		if Subtype.type.funcproto
+			return TypeOfFuncPointer(F, name_space, side)
 		require F.CanGetAddress(name_Space)
 		return Subtype.GetAddress
 		
-	if name == "!"
+	if n == '!'
 		return TranNegate(f, name_space)
 		
-	if (name == "~")
+	if n == '~'
 		check (subtype.IsInteger) (exp, "Expected an integer.") 
 		Return subtype
 
-	if (name == "$")
+	if n == '$'
 		return TranRender(exp, name_space)
 		
 	SCFunction.Tran_AfterRel( exp, name_space, side )
@@ -654,7 +651,7 @@ function TypeOfAccess (ExprResolver)
 
 	if (ty0 isa scmodule)
 		|| cls = ty0.Cls
-		if cls and cls.IsMArray(arr) and arr.first.ExpectMatch(name_Space, typeint!)
+		if cls and cls.IsMArray(arr) and arr.first!.ExpectMatch(name_Space, typeint!)
 			return LowlevelArrayTransform(exp, Cls)
 	  elseif (Ty0 isa SCDecl) and (Arr.HasOneChild)
 		|| Index = Arr.first!
@@ -1093,10 +1090,10 @@ function message.ExpFunc (|scfunction|)
 
 
 function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
-	debug_require exp // what?
+	opt norefcounts
 	|| OldCount = stderr.errorcount
-	|| result = typeofexpr(Exp, name_space)
-	if result and result.type != typevoid_
+	|| result = TypeOfExpr(Exp, name_space)
+	if result.Found
 		return result
 	if (oldcount == stderr.errorcount)
 		error (exp, "This expression doesn't return anything.")
@@ -1339,7 +1336,7 @@ function TypeOfRel (ExprResolver) {
 	|| Custom = 0
 	if (RC != TypeNil)
 		|| IPM = IsPointerMath(LC, RC, comp, exp)
-			return IPM
+			return ipm.CheckMath(exp)
 	Custom = UseCustomOperators(LC, RC, comp, exp) 
 	if Custom == CustomOps.needed
 		if (!comp.IsCompset)

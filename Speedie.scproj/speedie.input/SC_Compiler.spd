@@ -41,30 +41,29 @@
 |SCDecl|	TrueBool
 |SCDecl|	FalseBool
 
-extend_module compiler
-	|SCNode|	VisibleFuncs
-	|SCNode|	Interpreter
-
-
 
 function Compiler.FindSpeedieRoot (|string|)
 	|| paths = app.exepath.resolve.parent
 	|| srch = "/Speedie/"
-	|| found = paths.find(srch, 0, int.max,true)
+	|| found = paths.find(srch, 0, int.max, true)
 		return paths[0, found + srch.length]
 	return "/usr/local/speedie"
 	
+
 
 module Compiler {
 linkage
 	cpp_part Comp
 
+|SCNode|					VisibleFuncs
+|SCNode|					Interpreter
+
 |File|						BaseProjectPath
 |string|					OriginalInputPath
 |File|						_BuildFolder
-|File|						TempFolder
 |String|					_Projects
 |String|					_SpeedieProj
+|File|						TempFolder
 |SCFile|					InternalFile = SCFile.new(nil, SCImport.new(nil, true))
 |string|					ProjectName
 |string|					ReportedName
@@ -270,7 +269,7 @@ function InitTypes
 	require StdErr.ok
 	TypeVoid_!.LinkedFrom = int.max //noice
 	TypeStringZero!.DowngradeTo = TypeString
-	typevoid = typevoid_!.TypeNormal
+	typevoid = TypeVoid_!.TypeNormal
 	|| VP = TypeVoidPtr!.typenormal
 	TypeVoidPtr!.TypeOptional = VP.NilConstructor(NilState.optional)
 	TypeVoidPtr!.TypeReal = VP.NilConstructor(NilState.Real)

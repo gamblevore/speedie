@@ -115,9 +115,7 @@ struct ObjectLoader {
 
 	function LoadClass (|message| msg, |Dictionary| dict)
 		opt norefcounts
-		|| Cls = .GetClassOf(msg) #require
-		debug_require cls.name // what?
-		
+		|| Cls = .GetClassOf(msg) #require		
 		|| items = msg.last
 		expect (items == @list) (items)
 		

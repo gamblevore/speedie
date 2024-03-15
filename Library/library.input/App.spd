@@ -57,10 +57,16 @@ function TimeID (|uint64|)
 	return __time_id__
 
 function Prefs (|string| s, assigns:|string|)
-	._prefs[s] = Value
+	|| p = ._prefs
+		p[s] = Value
+	  else
+		debugger
 function Prefs (|string| s, assigns:|message|)
 	cpp_part SetPrefMsg
-	._prefs[s] = Value
+	|| p = ._prefs
+		p[s] = Value
+	  else
+		debugger
 
 function AllowInteruptCrash (assigns:|bool|)
 	cpp_wrapper JB_App__CrashOnInterupt

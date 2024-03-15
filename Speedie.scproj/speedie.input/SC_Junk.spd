@@ -129,6 +129,14 @@ helper __junktest_11__
 	printline y
 
 
+helper voidtest  (|&_void| abc, |&_void|)
+	visible
+	return abc
+
+helper voidtest2 (|&_void| abc, |&_void|)
+	|| abc2 = voidtest(abc)
+	visible
+
 
 struct ContainerStruct2
 	|int|				A

@@ -49,9 +49,7 @@ function Message.SCArgNested (|message| base, |SCNode| p, |SCArg?|)
 
 function Message.SCArg (|SCNode| p, |message| avoid=nil, |SCArg?|)
 	opt norefcounts
-	require self
-	debug_require (self == @arg)
-	
+	require self	
 	if avoid and (avoid != @arg and @tmp)
 		if p isa scarg
 			return p

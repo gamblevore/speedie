@@ -925,14 +925,14 @@ class Message (RingTree)
 
 	syntax access (|string| key, assigns:|int64|)
 		cpp_part SetInt
-		self[key] = value.msg//@num.msg(Value.render)
+		self[key] = value.msg
 
 	
 	syntax access (|string| key, assigns:|message|)
 		cpp_part SetMsg
 		opt norefcounts
-		debug_require self
 		.AccessAdd(key) <~ Value		
+	
 	
 	function AccessAdd (|string| key, |message|)
 		opt norefcounts

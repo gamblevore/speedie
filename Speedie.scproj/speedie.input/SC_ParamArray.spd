@@ -78,9 +78,12 @@ class SCParamArray
 	
 	function ModuleName (|string|)
 		opt norefcounts
-		if (.IsNotModule)
-			return Self[0].RenderType
-		return .exp.first.RenderType
+		|| p = self[0] 
+		if !.IsNotModule
+			p = .exp.first
+		
+		if p
+			return p.RenderType
 
 
 

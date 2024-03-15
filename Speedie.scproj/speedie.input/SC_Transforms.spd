@@ -886,7 +886,7 @@ function compiler.CollectIsaTests (|Message| s, |bool|)
 function message.ObjCls (|scclass|)
 	opt norefcounts
 	|| o = .obj as scdecl // blindcast instead? its never NOT this.
-		if o.special == 1
+		if o is ClassObj
 			return o.contains!.type
 
 

@@ -11,7 +11,7 @@ function scclass.Falsify (|message| ques, |message|)
 	if f.hasany
 		return f.copy
 	ques.func = f.func
-	if f == @thg and "nil"
+	if f isthing "nil"
 		ques.obj = typenil
 	  else
 		ques.name = f.name

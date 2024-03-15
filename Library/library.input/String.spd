@@ -446,7 +446,7 @@ class String
 		function Hex (|int64| i, |string|)
 			return i.hex!
 		
-		function FromPtr (|_voidptr| Addr, |int| N, |_voidptr|free=nil, |_voidptr| obj=nil, |string|)
+		function FromPtr (|&_void| Addr,  |int| N,  |&_void| free = nil,  |&_void| obj = nil,  |string|)
 			cpp_wrapper JB_StrFromPtr
 		
 		function FromC (|cstring| Addr, |string|)

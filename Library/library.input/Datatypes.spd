@@ -358,7 +358,8 @@ datatype _voidptr:
 
 datatype _void
 	linkage
-		noauto // this doesnt exist...
+		cpp_class void
+		noauto				// dont want them to see this.
 	size 0
 	syntax cast (|bool|)
 		disabled "Can't cast void to a bool."

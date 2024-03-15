@@ -527,6 +527,6 @@ function Message.StartUsingAfter // for "return" debugging.
 
 
 extend string
-	function debugfunc
+	function DebugFunc
 		visible
 		if scfunction.currfunc ~= self

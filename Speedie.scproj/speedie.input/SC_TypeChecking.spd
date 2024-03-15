@@ -91,7 +91,7 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |u
 		if (ooop)
 			return ooop
 
-	if (TypeCast & kTypeCastTrue) and (.type == typevoidptr) and (o.pointercount or o.type.funcproto)
+	if (TypeCast & kTypeCastTrue) and (.IsvoidPtr) and (o.pointercount or o.type.funcproto)
 		if (!exp)
 			return kNeedsTypeCast ||| kVoidPtrMatch
 		if (o.type.funcproto)

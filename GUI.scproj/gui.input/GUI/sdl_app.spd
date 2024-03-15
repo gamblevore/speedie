@@ -304,7 +304,7 @@ module SDLApp
 
 	function SavePrefs
 		if app.prefs
-			app.prefs["screen"] = sdlapp.ScreenOrig.List
+			app.prefs!["screen"] = sdlapp.ScreenOrig.List
 			app.SavePrefs
 
 

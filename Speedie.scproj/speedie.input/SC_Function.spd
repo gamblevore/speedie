@@ -396,9 +396,7 @@ function message.FailOrCopy (|message| p, |message|)
 
 function message.AssignsFix (|scfunction| f)
 	|| RP   = .NiceParent
-	debug_Require (RP == @Rel)
 	|| RightSide = rp.Last! // in case of syntax_cast
-	debug_Require (RightSide.obj)
 	|| List = .last!
 	|| Upon = .first!
 	List <~ RightSide
@@ -1225,7 +1223,7 @@ function NeuSyx (CollectFunc)
 function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |SCDecl|)
 	|| exp = msg.first!
 	if msg == "!"
-		|| ty = TypeOfExpr( exp, name_space ) #require
+		|| ty = TypeOfExpr( exp, name_space )				#require
 		return ty.MakeReal
 
 	expect (msg == "--" or "++") (msg)
@@ -1238,10 +1236,13 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |SCD
 		exp_copy = exp.copy			// needed before get type :(
 									// or else we can't do array.size++
 
-	|| Type = TypeOfExpr( exp, name_space )		#require
+	|| Type = TypeOfExpr( exp, name_space )					#require
+	if type.PointerCount > 0
+		return type.CheckMath(msg)
+
 	|| numc = Type.type.NumericCount
-	if (!Type.type.IsObject and !type.hiderfunc and numc <= 1)  or  (type.pointercount > 0)
-		return type											// gui.scproj won't compile :(
+	if !Type.type.IsObject  and  !type.hiderfunc  and  numc <= 1
+		return type
 
 	|message| R
 	if numc or type.hiderfunc

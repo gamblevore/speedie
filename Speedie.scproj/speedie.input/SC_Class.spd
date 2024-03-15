@@ -724,7 +724,7 @@ function BannedCheck (|message| src)
 	require .TestBanned
 	error (self, "Banned class reached: " + .name)
 	|| curr = .MyReacher
-	for 100
+	for 16
 		if !curr or curr.class == SCNode
 			exit
 		if src
@@ -753,13 +753,6 @@ function Real_Isa (|SCClass| cls, |bool|)
 	return .realclass.isa(cls)
 
 
-//function IsBuiltinChain (|bool|)
-//	opt norefcounts
-//	for p.upwards in self
-//		if (p.IsBuiltin)
-//			Return true
-
-
 function AfterAfterFuncs 
 	|| s = .Super
 		.HasCompareFunc := s.HasCompareFunc
@@ -779,17 +772,13 @@ function StructName (|String|)
 	return .SubProjName + "_" + .name
 
 
-//function IsAtomic (|bool|)
-//	return .typeinfo.isatomic
-
-
 function MakeClassType (|scdecl| d, |scdecl|)
 	opt norefcounts
 	|| c = scdecl(TypeJBClass!)
 	c.name = .name.lowercase
 	c.source = .source
 	C.pointercount = 1
-	c.Special = 1
+	(c is ClassObj)
 	C.nildeclared = nilstate.real
 	C.Contains = d
 	return c
@@ -802,13 +791,13 @@ function LoadClassType
 
 
 function TryAddToProject
-	require !.funcproto
+	require !.FuncProto
 	|| NameNode = .Source.first!
 	|| mod = Compiler.DisamClasses!
 	if NameNode == @dot		// load the modules first.
 		mod = compiler.FindModule(namenode.first!)	#require
 
-	mod.TryAdd( .sourcearg, .modul, .name )
+	mod.TryAdd( .SourceArg, .Modul, .Name )
 
 
 

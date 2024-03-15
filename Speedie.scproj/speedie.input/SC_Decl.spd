@@ -57,6 +57,7 @@ datatype SCDeclInfo (uint)
 		TypeImprove
 		UsedByCode
 		API
+		ClassObj
 		CompilerCreated
 		PropertyWasConstructed
 		Disabled
@@ -105,7 +106,6 @@ class SCDecl (SCNamed) {
 	|NilState|			NilDeclared
 	|byte| 				NilReg
 	|byte| 				NilAllocDepth
-	|byte| 				Special
 
 	
 	constructor (|scclass| type)
@@ -150,6 +150,19 @@ class SCDecl (SCNamed) {
 			return datatypecode.float
 		return datatypecode.double
 
+
+	function Found (|bool|)
+		opt	norefcounts
+		if self
+			if .type != TypeVoid_
+				return true
+			if .PointerCount
+				return true
+
+
+	function IsVoidPtr (|bool|) 
+		return (.type == typevoidptr) or (.pointercount == 1 and .type == typevoid_)
+	
 	
 	function CopyDecl (|bool| ForNewVariable = false, |SCDecl|)
 		|| dcl = SCDecl(.type)
@@ -1049,9 +1062,13 @@ function IsPointerMath (|SCDecl|L, |SCDecl|R, |SCOperator| opp, |Message|exp, |S
 		return TypeInt!.TypeNormal
 
 
+function scdecl.CheckMath (|message| exp, |scdecl|)
+	check (.type != TypeVoid_) (exp, "Can't do math on void pointers")
+	return self
+
+
 function Message.RenderType (|string|)
 	opt norefcounts
-	debug_require self
 	|| D = .obj
 	if (D isa SCDecl)
 		return D.WriteSimpleType.Render

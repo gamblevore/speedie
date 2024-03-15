@@ -56,9 +56,7 @@ class SpdProcess (Process)
 
 	syntax append (|message| msg, |bool|)
 		cpp_part Send 
-		opt norefcounts
-		debug_require msg
-			
+		opt norefcounts			
 		|| p = .pico
 		if p.status
 			msg.RenderJbin(.writer)
@@ -134,7 +132,6 @@ class SpdProcess (Process)
 
 	
 	function RunChild (|bool|)
-		debug_require .path
 		if !.pico.isok
 			require pico.replace(.pico)
 
@@ -207,7 +204,6 @@ class SpdProcess (Process)
 
 
 		function RunChild (|string| app_path, |string| DebugName="", |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
-			debug_require params!=nil
 			require app_path.file.mustexist
 			|| pico = pico.new(app_path)
 				 // (pico.new(path), pico.parent)(.WeAreParent)
@@ -226,12 +222,12 @@ datatype ProcessMode (byte)
 		return self&M
 
 
-prototype SpdMainFn	(|_voidptr| Obj, |&cstring| args, |&pico| Comms, |bool|)
+prototype SpdMainFn	(|&_void| Obj, |&cstring| args, |&pico| Comms, |bool|)
 	function RunThreaded (|[string]| R = [],  |SpdProcess|)
 		|| c_args = SpdProcess.CreateArgs("", r)
 		|| pico_fn = pico.new("SpdMainFn()")
 			rz = SpdProcess("SpdMainFn()", self, pico_fn, r)
-			if !rz.pico.startthread(self|picothreadfn|, 7|_voidptr|, c_args)
+			if !rz.pico.startthread(self|picothreadfn|, 7|&_void|, c_args)
 				rz = nil
 
 

@@ -1,6 +1,6 @@
 
 
-prototype PicoThreadFn (|&pico| Comms, |_voidptr| Obj, |&cstring| Args=nil, |bool|)
+prototype PicoThreadFn (|&pico| Comms, |&_void| Obj, |&cstring| Args=nil, |bool|)
 
 
 
@@ -43,7 +43,7 @@ struct Pico
 	helper StartFork (|bool| Exec=false, |PID_Int|)
 		cpp_wrapper PicoStartFork
 
-	function StartThread (|PicoThreadFn| fn, |_voidptr| Obj, |?&cstring| Args = nil, |bool|)
+	function StartThread (|PicoThreadFn| fn, |&_void| Obj, |?&cstring| Args = nil, |bool|)
 		cpp_wrapper PicoStartThread
 
 	function CompleteExec (|bool|)

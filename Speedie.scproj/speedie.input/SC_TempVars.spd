@@ -1,11 +1,4 @@
 
-
-//function message.EmbToString
-//	if (self == @emb) and !.name
-//		.func = @str
-//		scfunction.ObjectifyString(self)
-
-
 function Message.HasOwnBlock (|Message|)
 	opt norefcounts
 	|| arg = .parent
@@ -15,9 +8,7 @@ function Message.HasOwnBlock (|Message|)
 	arg = arg.parent
 	require (arg == @arg)
 	|| obj = arg.asarg
-	debug_require (obj isa scarg)
-
-	if (obj.TmpMovedOutFor == self)
+	if (obj and obj.TmpMovedOutFor == self)
 		return arg
 
 
@@ -26,14 +17,14 @@ function Message.CreateOwnBlock (|Message?|)
 
 	using (self)
 		
-	|| bra = «bra »
+	|| bra = @bra.msg
 	bra.obj = .obj
 	rz = bra.msg(@arg)
 	.ReplaceWith(bra)
 	
-	|| NewObj = rz.scarg(nil) #debug_require
-	NewObj.TmpMovedOutFor = self
-	bra.statementexpr = newobj
+	|| NewObj = rz.scarg(nil)
+		NewObj.TmpMovedOutFor = self
+		bra.statementexpr = newobj
 
 
 function message.StatementExpr (assigns:|scarg| arg)
@@ -42,7 +33,7 @@ function message.StatementExpr (assigns:|scarg| arg)
 
 
 function message.TheTmpVarOf (|string| tmpname, |message|)
-	rz = «Thg tmpname »
+	rz = @Thg + tmpname
 	|| ad = .AsDecl
 		|| d = ad.copydecl
 		d.Name = ""

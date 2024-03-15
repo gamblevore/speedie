@@ -18,7 +18,7 @@ function @SCClass.NewTask (CollectFunc)
 	name.next = bra
 	bra <~ (@thg, "task")
 	bra.obj = prms				// hehe
-	|| con = "constructor () {super.constructor((&run)|_voidptr|), ._Objects = –taskvars}"~digest
+	|| con = "constructor () {super.constructor(&run), ._Objects = –taskvars}"~digest
 	arg.BuildTask(con!, prms)
 
 	|| task = SCClass.NeuRole(node, name_space, ErrPlace)|scmodule|

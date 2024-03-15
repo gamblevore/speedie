@@ -318,8 +318,7 @@ extend Parser
 
 
 	function fAtNamedExp (ParseHandler)
-		debug_require parent
-		require  .needname(parent)
+		require  parent and .needname(parent)
 		parent.func = @name
 		parent <~ parser.ProcessThing(0, Parser.kExpect)
 		return parent

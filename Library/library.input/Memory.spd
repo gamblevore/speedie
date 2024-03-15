@@ -25,7 +25,7 @@ class DataObject
 	
 	destructor
 		if .deathaction == DataObject.kfree
-			Memory.free(.privvalue|_voidptr|)
+			Memory.free(.privvalue|&_void|)
 
 	
 	constructor (|int64| v)
@@ -40,7 +40,8 @@ class DataObject
 		.PrivValue = b|int|
 
 	
-	constructor (|_voidptr| p)
+	constructor (|&_void| p)
+		cpp_part ConstructorVoidPtr
 		.datatype = datatypecode.unusedtype
 		.PrivValue = p|int64|
 
@@ -75,7 +76,7 @@ class DataObject
 
 	module
 		function NewFloat (|f64| v, |Dataobject|)
-			rz = Dataobject(true) 
+			rz = DataObject(true) 
 			rz.datatype = datatypecode.f64
 			rz.PrivValue = v.AsInt
 
@@ -161,7 +162,7 @@ class Memory
 			if (!P2) // fail
 				return (&Memory.MDummy)|&...|
 			|| OldSize = .ByteCapacity
-			Memory.zero(p2 + OldSize, NewSize - OldSize) 
+			Memory.zero((p2 + OldSize), NewSize - OldSize) 
 			._ptr = p2
 	
 		.length = l + 1
@@ -186,7 +187,7 @@ class Memory
 			._ptr = mem
 			.Capacity = Value 
 			if New > Old
-				memory.Zero(mem+old, New-Old)
+				memory.Zero((mem+old), New-Old)
 			return true
 		error (self, "Can't allocate enough bytes: " + new.render)
 
@@ -272,18 +273,13 @@ class Memory
 				random.shared.temporal(rz)
 		
 		function FillInt (|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
-		function Unmap	 (|_voidptr| p, |int| n):						cpp_wrapper JB_munmap
+		function Unmap	 (|&_void| p, |int| n):							cpp_wrapper JB_munmap
 		function UsedString	 (|int64|):									cpp_wrapper JB_MemUsedString
 		function UsedOther	 (|int64|):									cpp_wrapper JB_MemUsedOther
 		function Zalloc  (|int| n, |?&byte|)
 			return byte.zalloc(n)
-		function Realloc (|_voidptr| b, |int| n, |?&byte|):				cpp_wrapper JB_realloc
-		function Free	 (|?_voidptr| b):								cpp_wrapper JB_free
-		function Zero	 (|_voidptr| addr, |int| n):					cpp_wrapper memzero
-		function Copy	 (|_voidptr| dest, |_voidptr|src, |int| N):		cpp_wrapper memcpy
-		function Copy	 (|object| dest, |object|src, |int| N)
-			.copy(dest|_voidptr|, src|_voidptr|, n)
-		
-		function CopyObject (|object|src, |object| dest, |int| N) 
-			disabled "Copying object contents seems like a very bad thing"
-		
+		function Realloc (|&_void| b, |int| n, |?&byte|):				cpp_wrapper JB_realloc
+		function Free	 (|?(&_void)| b):								cpp_wrapper JB_free
+		function Zero	 (|&_void| addr, |int| n):						cpp_wrapper memzero (||)
+		function Copy	 (|&_void| dest, |&_void| src, |int| N):		cpp_wrapper memcpy
+
