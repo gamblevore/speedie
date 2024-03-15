@@ -199,7 +199,7 @@ class SpdProcess (Process)
 			cpp_wrapper
 
 
-		function BackTrace (|&_voidptr| space, |&int| size, |&cstring|) 
+		function BackTrace (|&_void| space, |&int| size, |&cstring|) 
 			cpp_wrapper JB_App__BackTrace
 
 

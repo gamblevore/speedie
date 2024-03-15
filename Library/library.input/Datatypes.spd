@@ -350,17 +350,6 @@ datatype U24_8 (uint)
 		return (self & ~255) ||| (v & 255)
 
 
-
-datatype _voidptr:
-	// actualtype &byte
-
-helper adas
-	visible
-	target debug2
-//		|int[10]| haha
-		|(&_void)[10]| aha
-
-
 datatype _void
 	linkage
 		cpp_class void

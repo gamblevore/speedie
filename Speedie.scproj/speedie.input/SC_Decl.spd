@@ -313,6 +313,7 @@ class SCDecl (SCNamed) {
 	
 	function DeReferenceSub (|message| brel, |SCNode| name_space,  |bool| IsAccess, |scdecl|)
 		opt norefcounts
+		// "adas".DebugFunc
 		if .IsCArray
 			check (IsAccess) (brel, "Use [0] instead.")
 			|| i = .Internal$				
@@ -935,7 +936,7 @@ class SCDecl (SCNamed) {
 		|| cst = @type + ":)"
 		.prev = cst
 		cst <~ self
-		cst <~ @thg + "_voidptr"
+		cst.msg(@emb).obj = typevoidptr
 		
 		cst.obj = typevoidptr	 // hmmm.... why not do it anyhow?
 		return kCastedMatch
@@ -961,9 +962,9 @@ class SCDecl (SCNamed) {
 		|| cst = «type ":)" »
 		.prev = cst
 		cst <~ self
-		cst <~ «thg typeName »
-		
+		cst.msg(@thg, typeName).obj = Type.TypeNormal 
 		cst.obj = Type.TypeNormal	 // hmmm.... why not do it anyhow?
+		//.obj = Type.TypeNormal
 		Return loss	
 
 	

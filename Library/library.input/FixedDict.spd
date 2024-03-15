@@ -8,7 +8,7 @@ class FixedDict
 	|Byte|					Letter
 	|(&_void)?|				Value
 	|FixedDict--?|			Parent
-	|_voidptr[16]|			Items
+	|(&_void)[16]|			Items
 	
 	constants
 		TypeValue	= 0
@@ -28,7 +28,7 @@ class FixedDict
 		.value = old|&_void|
 		.valuetype = type
 		parent.typeof(part) = typedict
-		parent.items[part] = self|_voidptr|
+		parent.items[part] = self|&_void|
 		jb_incr(self)
 
 
@@ -81,7 +81,7 @@ class FixedDict
 				debugger // obj will never be nil here
 		  else
 			.typeof(b) = type
-			*place = val|_voidptr|
+			*place = val|&_void|
 			if bt
 				jb_decr( obj )				// cos we call this last, compiler can opt it.
 	
