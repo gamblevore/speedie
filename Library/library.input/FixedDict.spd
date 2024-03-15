@@ -6,7 +6,7 @@ class FixedDict
 	|uint|					ItemTypes
 	|Byte|					ValueType
 	|Byte|					Letter
-	|_voidptr?|				Value
+	|(&_void)?|				Value
 	|FixedDict--?|			Parent
 	|_voidptr[16]|			Items
 	
@@ -16,7 +16,7 @@ class FixedDict
 		TypeStem	= 2
 		TypeDict    = 3
 	
-	constructor (|_voidptr| Value = nil, |Byte| type = 0)
+	constructor (|&_void| Value = nil, |Byte| type = 0)
 		cpp_part ConstructorValue
 		.value = value
 		.valuetype = type
@@ -25,7 +25,7 @@ class FixedDict
 	
 	constructor (|FixedDict| Parent, |int| Part, || old, |byte| type)
 		cpp_part ConstructorReplace
-		.value = old|_voidptr|
+		.value = old|&_void|
 		.valuetype = type
 		parent.typeof(part) = typedict
 		parent.items[part] = self|_voidptr|
@@ -76,7 +76,7 @@ class FixedDict
 				if obj.valuetype
 					jb_decr( obj.value|object| )
 				obj.valuetype = type
-				obj.value = val|_voidptr|
+				obj.value = val|&_void|
 			  else
 				debugger // obj will never be nil here
 		  else
