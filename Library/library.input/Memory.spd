@@ -25,7 +25,7 @@ class DataObject
 	
 	destructor
 		if .deathaction == DataObject.kfree
-			Memory.free(.privvalue|&_void|)
+			Memory.free(.privvalue|&nil|)
 
 	
 	constructor (|int64| v)
@@ -40,7 +40,7 @@ class DataObject
 		.PrivValue = b|int|
 
 	
-	constructor (|&_void| p)
+	constructor (|&nil| p)
 		cpp_part ConstructorVoidPtr
 		.datatype = datatypecode.unusedtype
 		.PrivValue = p|int64|
@@ -273,13 +273,13 @@ class Memory
 				random.shared.temporal(rz)
 		
 		function FillInt (|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
-		function Unmap	 (|&_void| p, |int| n):							cpp_wrapper JB_munmap
+		function Unmap	 (|&nil| p, |int| n):							cpp_wrapper JB_munmap
 		function UsedString	 (|int64|):									cpp_wrapper JB_MemUsedString
 		function UsedOther	 (|int64|):									cpp_wrapper JB_MemUsedOther
 		function Zalloc  (|int| n, |?&byte|)
 			return byte.zalloc(n)
-		function Realloc (|&_void| b, |int| n, |?&byte|):				cpp_wrapper JB_realloc
-		function Free	 (|?(&_void)| b):								cpp_wrapper JB_free
-		function Zero	 (|&_void| addr, |int| n):						cpp_wrapper memzero (||)
-		function Copy	 (|&_void| dest, |&_void| src, |int| N):		cpp_wrapper memcpy
+		function Realloc (|&nil| b, |int| n, |?&byte|):				cpp_wrapper JB_realloc
+		function Free	 (|?(&nil)| b):								cpp_wrapper JB_free
+		function Zero	 (|&nil| addr, |int| n):						cpp_wrapper memzero (||)
+		function Copy	 (|&nil| dest, |&nil| src, |int| N):		cpp_wrapper memcpy
 

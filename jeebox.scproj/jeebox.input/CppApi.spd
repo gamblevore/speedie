@@ -26,9 +26,9 @@ class_api Message (msg)
 		return .position
 		description "The byte-position of the original syntax that created this node. Useful for error-reporting."
 	
-	api tag (|&_void|)
+	api tag (|&nil|)
 		.nil$
-		return .obj|&_void|
+		return .obj|&nil|
 		description "Attached user-defined value."
 		 
 	api nameset (|string| Result)
@@ -48,7 +48,7 @@ class_api Message (msg)
 		description "Sets the byte-position. Jeebox doesn't use this value other than to store it for you. You might want to set the position if you created some nodes yourself via jb_msg_create. Obviously those nodes wouldn't have a position."
 
 
-	api tagset (|&_void| Result)
+	api tagset (|&nil| Result)
 		.nil$
 		.obj = Result|object|
 		description "In case you want to attach a user-defined value to the node, to use for your own purposes."
@@ -261,18 +261,18 @@ api syntax (|string| name, |syntax|)
 	description `Looks up the syntax of that name from the syntax-table. The name must be in short-form, like "arg", not "argument". (The list of short-form names is in api.h, you will see $arg, $acc... its those minus the $.)`
 
 
-api str (|cstring| Str, |int| Length, |&_void| Release, |&_void| Tag, |string|)
+api str (|cstring| Str, |int| Length, |&nil| Release, |&nil| Tag, |string|)
 	if !str or length < 0
 		return "" // why not?
 	Length := str.length
-	return string.FromPtr(str|&_void|, Length, Release, Tag)
+	return string.FromPtr(str|&nil|, Length, Release, Tag)
 
 	description "Creates a JBString from a c-string. Expects the c-string to remain unchanged until the JBString is freed. Length is optional. Can optionally pass a call-back to release your c-string, during freeing the JBString."
 
 
 api cstr (|cstring| Str, |string|)
 	if (str)
-		return string.FromPtr(str|&_void|, str.length)
+		return string.FromPtr(str|&nil|, str.length)
 
 	description "Creates a JBString from a c-string. Expects the c-string to remain unchanged until the JBString is freed."
 

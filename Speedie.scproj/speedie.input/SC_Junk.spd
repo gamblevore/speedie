@@ -129,11 +129,11 @@ helper __junktest_11__
 	printline y
 
 
-helper voidtest  (|&_void| abc, |&_void|)
+helper voidtest  (|&nil| abc, |&nil|)
 	visible
 	return abc
 
-helper voidtest2 (|&_void| abc, |&_void|)
+helper voidtest2 (|&nil| abc, |&nil|)
 	|| abc2 = voidtest(abc)
 	visible
 

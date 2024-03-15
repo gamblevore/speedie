@@ -6,9 +6,9 @@ class FixedDict
 	|uint|					ItemTypes
 	|Byte|					ValueType
 	|Byte|					Letter
-	|(&_void)?|				Value
+	|(&nil)?|				Value
 	|FixedDict--?|			Parent
-	|(&_void)[16]|			Items
+	|(&nil)[16]|			Items
 	
 	constants
 		TypeValue	= 0
@@ -16,7 +16,7 @@ class FixedDict
 		TypeStem	= 2
 		TypeDict    = 3
 	
-	constructor (|&_void| Value = nil, |Byte| type = 0)
+	constructor (|&nil| Value = nil, |Byte| type = 0)
 		cpp_part ConstructorValue
 		.value = value
 		.valuetype = type
@@ -25,10 +25,10 @@ class FixedDict
 	
 	constructor (|FixedDict| Parent, |int| Part, || old, |byte| type)
 		cpp_part ConstructorReplace
-		.value = old|&_void|
+		.value = old|&nil|
 		.valuetype = type
 		parent.typeof(part) = typedict
-		parent.items[part] = self|&_void|
+		parent.items[part] = self|&nil|
 		jb_incr(self)
 
 
@@ -76,12 +76,12 @@ class FixedDict
 				if obj.valuetype
 					jb_decr( obj.value|object| )
 				obj.valuetype = type
-				obj.value = val|&_void|
+				obj.value = val|&nil|
 			  else
 				debugger // obj will never be nil here
 		  else
 			.typeof(b) = type
-			*place = val|&_void|
+			*place = val|&nil|
 			if bt
 				jb_decr( obj )				// cos we call this last, compiler can opt it.
 	

@@ -433,7 +433,9 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 			return typeofexpr(p.first, name_space)				
 			
 	if (f == @Thg)		// usual case
-		return Compiler.FindClassCurr( c )$.typenormal
+		if c == "nil" // nice
+			return typevoid
+		return Compiler.FindClassType( c )
 	
 	if (c == @Acc)		// |Byte[10]| TenBytes
 		|| Prms = c.second

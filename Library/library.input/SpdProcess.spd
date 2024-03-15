@@ -199,7 +199,7 @@ class SpdProcess (Process)
 			cpp_wrapper
 
 
-		function BackTrace (|&_void| space, |&int| size, |&cstring|) 
+		function BackTrace (|&nil| space, |&int| size, |&cstring|) 
 			cpp_wrapper JB_App__BackTrace
 
 
@@ -222,12 +222,12 @@ datatype ProcessMode (byte)
 		return self&M
 
 
-prototype SpdMainFn	(|&_void| Obj, |&cstring| args, |&pico| Comms, |bool|)
+prototype SpdMainFn	(|&nil| Obj, |&cstring| args, |&pico| Comms, |bool|)
 	function RunThreaded (|[string]| R = [],  |SpdProcess|)
 		|| c_args = SpdProcess.CreateArgs("", r)
 		|| pico_fn = pico.new("SpdMainFn()")
 			rz = SpdProcess("SpdMainFn()", self, pico_fn, r)
-			if !rz.pico.startthread(self|picothreadfn|, 7|&_void|, c_args)
+			if !rz.pico.startthread(self|picothreadfn|, 7|&nil|, c_args)
 				rz = nil
 
 

@@ -2,11 +2,11 @@
 
 
 class Task (ringtree)
-	|&_void|			_Func
+	|&nil|				_Func
 	|byte|				_Objects
 	|int64[9]| 			_Local
 	
-	constructor (|&_void| fn)
+	constructor (|&nil| fn)
 		._Func = fn
 	
 	destructor

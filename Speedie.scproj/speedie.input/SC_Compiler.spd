@@ -663,12 +663,13 @@ syntax access (|Message| name, |SCClass|)
 		return .FindClass( name.name, name, true )
 
 
-function FindClassCurr (|message| n, |scclass|)
+function FindClassType (|message| n, |scdecl|)
 	opt norefcounts
 	|| m = SCModule.curr
 	if !m
 		m = compiler.program
-	return m.findclass(n.name, n)
+	|| c = m.findclass(n.name, n)
+		return c.typenormal
 
 
 function FindClass (|string| name, |message| where, |bool| DoErrors=true, |scclass|)
