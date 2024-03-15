@@ -93,9 +93,6 @@ class File (String)
 	function Close
 		cpp_wrapper JB_File_Close
 	
-	function Write (|string| Data, |ind|)
-		cpp_wrapper JB_File_Write
-	
 	Syntax Append (|string| data)
 		.write(Data)
 	
@@ -121,7 +118,9 @@ class File (String)
 	
 	function Data (assigns:|String|Data, |bool|)
 		cpp_wrapper JB_File_DataSet
-	
+
+	function Write (|string| Data, |ind|)
+		cpp_wrapper JB_File_Write	
 	
 	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |messageroot|)
 		// normally allowmissing is good, but here it is bad.
