@@ -6,8 +6,9 @@ class Task (ringtree)
 	|byte|				_ObjectCount
 	|int64[9]| 			_Local
 	
-	constructor (|&nil| fn)
+	constructor (|&nil| fn, |int| Objs)
 		._Func = fn
+		._ObjectCount = Objs
 	
 	destructor
 		for (i in ._ObjectCount|int|)

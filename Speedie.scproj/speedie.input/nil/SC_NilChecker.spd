@@ -520,8 +520,6 @@ function Type (NilTrackerFn)
 	if !d.TypeSuffers
 		return nilstate.real
 	|| fd = f.FastDecl
-	"SC_LessThanTest_SyntaxCall".debugfunc
-//	debugat 22
 	if fd.TypeSuffers // return inner suffering
 		return ns
 	

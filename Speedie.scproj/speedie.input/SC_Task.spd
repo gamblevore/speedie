@@ -18,7 +18,7 @@ function @SCClass.NewTask (CollectFunc)
 	name.next = bra
 	bra <~ (@thg, "task")
 	bra.obj = prms				// hehe
-	|| con = "constructor () {super.constructor(&run), ._Objectcount = –taskvars}"~digest
+	|| con = "constructor () {super.constructor(&run, –taskvars)}"~digest
 	arg.BuildTask(con!, prms)
 
 	|| task = SCClass.NeuRole(node, name_space, ErrPlace)|scmodule|
@@ -73,32 +73,26 @@ function Message.BuildTask (|message| con, |message| prms)
 
 
 
-target debug2
-	task LessThanTest (|int| i, |bool|)
-		|string|	a
-		|int| 		b
-		|string|	c
-		run: visible, return i < .b
 
-	function testtest
-		visible
-		|LessThanTest| xxx
+task LessThanTest (|int| i, |bool|)
+	|string|	a
+	|int| 		b
+	|string|	c
+	run
+		return i < .b
 
 
+ignore
+	task LessThanTest2 (lessthantest)
+		|float|	f
+		run
+			return i|float| / 3.0 < .f
+		
+	task LessThanTest (|string| a, |int| b, |string| c)
+		run (|int| i, |bool|)
+			return i < .b
 
-ignore {
-role LessThanTest (task)
-	|int| Vs
-	syntax call (|int| i, |bool|)
-		return i < .Vs
-	constructor () {
-	
-	}
-	destructor {
-	
-	}
-
-function caller (|lessthantest| abc)
-	abc.Items[0] = 3
-}
+	task LessThanTest (|float| f)
+		run (LessThanTest2)
+			return i < .b
 

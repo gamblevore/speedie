@@ -2,6 +2,7 @@
 
 main // speedie main {
 	compiler.SetupEnv
+	compiler.MiniTests
 	compiler.Main
 	compiler.PrintResults
 
@@ -21,6 +22,13 @@ function Compiler.PrintResults
 	.PrintCompileErrors
 	if SpdProcess.parent != nil
 		printline "Exiting Speedie " + app.id.render
+
+
+function Compiler.MiniTests
+	debugger
+	|| xxx = LessThanTest("a", 5, "c")
+	|| yyy = (xxx)(0)
+	printline yyy
 
 
 function compiler.ClearEnvs
@@ -61,4 +69,5 @@ api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)
 	comms.config.name = "speedie"
 	if rz == 0
 		rz = app.sp_run(args, mode)
+
 
