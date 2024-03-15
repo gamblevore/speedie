@@ -289,6 +289,7 @@ class SCDecl (SCNamed) {
 		.CopyTypeInfoTo(rz)
 		rz.internal = self
 		rz.PointerCount++
+		rz.c_array = 0
 		|| ns = nilstate.realish
 		if purpose == declmode.globals
 			ns = nilstate.optional
@@ -297,18 +298,35 @@ class SCDecl (SCNamed) {
 		rz.NilDeclared = ns
 		check (rz.pointercount <= 4) (.source, "Too much abstraction")
 	
+	function GetCArray (|int| Amount, |SCDecl|)
+		rz = SCDecl(.type)
+		.CopyTypeInfoTo(rz)
+		rz.iscarray(amount, self)
+	
+	function IsCarray (|int| Size, |scdecl| Of)
+		.pointercount = 0
+		.C_Array = size
+		.NilDeclared = nilstate.real
+		.Internal = of
+		.nildeclared = nilstate.realish
 	
 	function DeReference (|message| brel, |SCNode|name_space,  |bool| IsAccess,  |scdecl|)
 		opt norefcounts
 		|| c = .DeReferenceSub(brel, name_space, isaccess)
 			return c
+		debugger
+		.DeReferenceSub(brel, name_space, isaccess)
 		error (brel.first, "Can't dereference this.")
 		
 	
 	function DeReferenceSub (|message| brel, |SCNode|name_space,  |bool| IsAccess, |scdecl|)
 		opt norefcounts
 		if .IsCArray
-			require IsAccess
+			check (IsAccess) ("Use [0] instead.")
+			|| i = .Internal					
+				if i.TypeSuffers
+					return i.MakeNewOptional
+				return i
 			|| c = .CopyDecl // should keep borrowedness...
 							 // what about the nildeclare? c-arrays exist, but do their items exist?
 			c.C_Array = 0
@@ -671,11 +689,10 @@ class SCDecl (SCNamed) {
 		if !c or (minimal and .AlreadyContains)
 			return simple
 		
-		return «rel
-			simple
-			«opp "of"»
-			«thg c.Type.Name »
-		»
+		rz = @rel.msg
+		rz <~ simple
+		rz <~ (@opp, "of")
+		rz <~ (@thg, c.Type.Name)
 		
 
 	function WriteSimpleType (|Message|)
@@ -722,18 +739,19 @@ class SCDecl (SCNamed) {
 		return (.IsCArray) or (.type.IsStruct) or (.isnumeric > 1) 
 
 
-	function CreateStructNil (|message| errs, |Message!|)
-		using (errs)
-		|| Arg = «arg »
-		Arg.obj = self
-		if .IsCArray
-			return Arg
-		
-		rz = «type ":)"
-			Arg
-			.WriteType
-		»
+	function CreateStructNil (|message| where, |Message!|)
+		using where
+		rz = .CreateStructNilsub()
 		rz.obj = self
+	
+		
+	function CreateStructNilSub (|Message!|)
+		if .IsCArray
+			return @arg.msg
+		
+		rz = @type + ":)"
+		rz <~ @Arg
+		rz <~ .WriteType
 	
 
 	function message.CreateNil (|message|)
@@ -1044,7 +1062,7 @@ class SCDecl (SCNamed) {
 			
 			if .IsCArray
 				fs <~ '['
-				fs <~ .c_Array|int|
+				fs <~ .c_Array
 				fs <~ ']'
 			
 			|| c = .Contains
