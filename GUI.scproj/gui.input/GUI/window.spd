@@ -197,10 +197,10 @@ class Window (GUIControl)
 		if !Item
 			item = (L.start, l.end)(fwd)
 		  else
-			item = l.HierStep(item, fwd)
-		L.select(item)
-		
-		return true
+			item = l.SearchStep(item, fwd)
+		if item
+			L.select(item)
+		return L.doreturn
 	
 	
 	function MainlistView (|listview|)

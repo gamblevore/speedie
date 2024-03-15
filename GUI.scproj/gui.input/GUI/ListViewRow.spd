@@ -233,6 +233,7 @@ datatype ListViewSelectMode (uint)
 		Fast
 		NoShow
 		NoEvent
+		SendEvent
 		Normal = 0
 	
 	syntax is (|ListViewSelectMode| s, |bool|)

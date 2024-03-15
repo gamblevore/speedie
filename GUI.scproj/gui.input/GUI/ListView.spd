@@ -1014,6 +1014,7 @@ class ListView (GUIControl) {
 	function SelectFast (|ListViewRow| s)
 		.select(s, ListViewSelectMode.Fast)
 		
+		
 	function Select (|ListViewRow| s, |ListViewSelectMode| Mode = ListViewSelectMode.Normal)
 		opt norefcounts
 		require s and s != .ListSource
@@ -1024,7 +1025,7 @@ class ListView (GUIControl) {
 		for r.all in self
 			modified += r.ChangeSel(r == s)
 		
-		if modified or .AlwaysSendChangeEvent
+		if modified or .AlwaysSendChangeEvent or mode is SendEvent
 			.SelChangeEvent(s, mode)
 		if mode isnt noshow
 			.show(s)
