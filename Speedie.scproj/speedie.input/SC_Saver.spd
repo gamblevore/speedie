@@ -44,7 +44,7 @@ module SC_Saver {
 			if (!type) {continue}
 			
 			fs <~ "\n\t"
-			|| Count = item.c_Array
+			|| Count = item.c_Array|int|
 			|| T = item.type.TypeInfo
 			|| AppendAsData = (T.ExistsButBadlyNamedOrDesigned and T.isfloat) 
 			if (!AppendAsData and Count)

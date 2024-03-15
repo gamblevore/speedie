@@ -356,11 +356,9 @@ datatype _voidptr:
 
 helper adas
 	visible
-
-//		|int[10]| haha
 	target debug2
+//		|int[10]| haha
 		|(&_void)[10]| aha
-//	|| x = aha[0]
 
 
 datatype _void

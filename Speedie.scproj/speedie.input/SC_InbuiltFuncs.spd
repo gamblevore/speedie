@@ -34,7 +34,7 @@ function Message.ReplaceInbuiltSub (|SCNode| name_space, |scdecl?| self_decl, |m
 
 	  elseif (self == "count")
 		expect (self_decl and self_decl.IsCArray) (self, "This is not a c-array")
-		return @num + self_decl.c_array
+		return «num self_decl.c_array »
 
 	  elseif (self == "digest")
 		|| f = self[@sstr]
