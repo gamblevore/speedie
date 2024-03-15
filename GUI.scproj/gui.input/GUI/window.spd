@@ -166,8 +166,9 @@ class Window (GUIControl)
 
 	syntax is (|guicontrolflags| F, assigns:|bool|)
 		require self
-		if (f == guicontrolflags.Modified) and ((self is modified) != value)
-			sdlapp.JB_SDL_SetModified(sdlapp.nativewindow, value)
+		|| n = sdlapp.nativewindow
+			if (f == guicontrolflags.Modified) and ((self is modified) != value)
+				sdlapp.JB_SDL_SetModified(n, value)
 		super.syntaxis(f) = value
 
 
@@ -504,7 +505,7 @@ struct SDL_Window
 struct SDL_SysWMinfo
 	|int|		A
 	|int|		B
-	|_voidptr|	window //actually a "datatype ObjCID:"
+	|&nil|		window //actually a "datatype ObjCID:"
 	|byte[56]|	Buffer
 
 
@@ -514,7 +515,7 @@ struct SDL_DisplayMode
 	|int| w 
 	|int| h
 	|int| refresh_rate
-	|_voidptr| driverdata
+	|&nil| driverdata
 
 
 struct SDL_Renderer
@@ -531,7 +532,7 @@ struct SDL_Texture
 	function UnlockThatCopiesEvenThoughItShouldnt
 		cpp_wrapper SDL_UnlockTexture
 	
-	function LockThatZerosEvenThoughItShouldnt (|?&ivec4| b, |&_voidptr| p, |&int| n)
+	function LockThatZerosEvenThoughItShouldnt (|?&ivec4| b, |&&nil| p, |&int| n)
 		cpp_wrapper SDL_LockTexture
 		
 	destructor

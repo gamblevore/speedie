@@ -81,9 +81,9 @@ module SDLApp
 	cpp_wrapper SDL_StartTextInput		()
 	cpp_wrapper SDL_StopTextInput		()
 	cpp_wrapper SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |?&SDL_Window| window)
-	cpp_Wrapper JB_SDL_RemoveWindowBorder (|_voidptr| window)
-	cpp_Wrapper JB_SDL_SetModified (|_voidptr| window, |bool| b)
-	cpp_wrapper JB_SDL_FullScreen (|_voidptr| w, |bool| On=true)
+	cpp_Wrapper JB_SDL_RemoveWindowBorder (|&nil| window)
+	cpp_Wrapper JB_SDL_SetModified (|&nil| window, |bool| b)
+	cpp_wrapper JB_SDL_FullScreen (|&nil| w, |bool| On=true)
 	cpp_Wrapper SDL_GetCurrentDisplayMode (|int| displayIndex, |&SDL_DisplayMode| mode, |errorint|)
 
 		
@@ -100,11 +100,11 @@ module SDLApp
 		return (.ScreenOrig.vec4 / .scale).ivec4 	
 
 
-	function NativeWindow (|_voidptr|)
+	function NativeWindow (|&nil|)
 		|SDL_SysWMinfo| data
 		|| s = .ScreenWindow
 			s.SDL_GetWindowWMInfo(data)
-			return data.window|_Voidptr|
+			return data.window|&nil|
 
 
 	function Alert (|string| msg, |string| title="")
@@ -170,7 +170,8 @@ module SDLApp
 	function ScreenOrig (assigns:|ivec4| result, |bool|)
 		require .ScreenWindow
 		if (result.x <= 0) and (result.y <= 0)
-			.JB_SDL_FullScreen(.nativewindow) // SDL2 had a bug in it... probably still exists
+			|| n = .nativewindow
+				.JB_SDL_FullScreen(n) // SDL2 had a bug in it... probably still exists
 			return true
 		|| Old = .SizeOrig
 		|| aligned = .scale * (1+.IsHighDPI)
@@ -290,7 +291,8 @@ module SDLApp
 
 		|| scr = .CurrDisplaySize
 		if (s.x >= scr.x) and (s.y >= scr.y)
-			.JB_SDL_FullScreen(.nativewindow)
+			|| n = .NativeWindow
+				.JB_SDL_FullScreen(n)
 
 
 	helper vsync (assigns:|bool|)
@@ -299,7 +301,8 @@ module SDLApp
 	
 	
 	helper RemoveBorder
-		JB_SDL_RemoveWindowBorder(.NativeWindow)
+		|| n = .NativeWindow
+			JB_SDL_RemoveWindowBorder(n)
 
 
 	function SavePrefs
@@ -337,9 +340,10 @@ module SDLApp
 		description "Fixes a MacOSX bug. Not my fault!" 
 		.FixScreenBug = 0
 		|| was = .IsFullScreen
-		.JB_SDL_FullScreen(.nativewindow, false)
+		|| n = sdlapp.nativewindow$
+		.JB_SDL_FullScreen(n, false)
 		if was
-			.JB_SDL_FullScreen(.nativewindow, true)
+			.JB_SDL_FullScreen(n, true)
 	
 	
 	function Scaling (assigns:|float| scale)
@@ -368,7 +372,7 @@ module SDLApp
 	
 	
 	function Init (|ivec2| s=(414,256)) // startup
-		pico.conf.suicideifparentdies = false
+		pico.conf.SuicideIfParentDies = false
 		pico.start
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
@@ -389,15 +393,16 @@ module SDLApp
 		.FastToolTipDate = 1
 
 		.InitWindow(s, .niceappname)
-		.scaling = 2 - (0.5*.ishighdpi)
+		.scaling = 2.0 - (0.5*.ishighdpi)
 		
 		.CheckQuarantine
 		¥.LoadDefaults
 
 		appmenu.GetAppMenu
 		.InitDelegates
-		if !PrevSize
-			.JB_SDL_FullScreen(.nativewindow)		
+		|| n = .nativewindow
+		if !PrevSize and n
+			.JB_SDL_FullScreen(n)
 		.StartedProperly = true
 		
 	
@@ -720,8 +725,8 @@ module SDLApp
 	function StartFrame (|&SDL_Texture| T)
 		opt norefcounts
 		|| stride = 0
-		|| bytes = &(.DrawSpace._ptr)
-		t.lockThatZerosEventhoughItShouldnt(nil, bytes|&_voidptr|, &stride)
+		|| bytes = (&(.DrawSpace._ptr))|&&nil|
+		t.lockThatZerosEventhoughItShouldnt(nil, bytes, &stride)
 		
 
 	
@@ -805,7 +810,8 @@ module SDLApp
 			if (key is minus)
 				return .Rescale(.scale-0.5)
 			if (key is f) and keys.option
-				.JB_SDL_FullScreen(.nativewindow, false)
+				|| n = .nativewindow
+					.JB_SDL_FullScreen(n, false)
 				return true
 			if (key is l) and keys.shift
 				JB_Mem_ClassLeakCounter()
