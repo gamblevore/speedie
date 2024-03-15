@@ -18,7 +18,7 @@ function Sleep (|float| Duration)
 
 function Sleep (|Date| Duration=1s)
 	cpp_wrapper JB_Date__Sleep
-
+	
 function TrySleep (|date| Duration=1s, |bool|)
 	cpp_wrapper JB_Date__TrySleep
 	
@@ -43,12 +43,12 @@ function Conf (|string| name, |string|)
 function Conf (|string| name, assigns:|string|)
 	disabled "Set conf values in the original app.configure..."
 
-function Prefs (|string| s, |string|)
+function Pref (|string| s, |string|)
 	cpp_part GetPref
 	return ._prefs[s].value
-
-function Prefs (|config|)
-	return ._prefs
+	
+function PrefMsg (|string| s, |message|)
+	return ._prefs[s]
 
 function Created (|date|)
 	return __now__|date|
@@ -56,17 +56,14 @@ function Created (|date|)
 function TimeID (|uint64|)
 	return __time_id__
 
-function Prefs (|string| s, assigns:|string|)
-	|| p = ._prefs
-		p[s] = Value
-	  else
-		debugger
-function Prefs (|string| s, assigns:|message|)
+function Pref (|string| s, assigns:|string|)
+	opt norefcounts
+	.PrefsInit()[s] = Value
+
+function Pref (|string| s, assigns:|message|)
+	opt norefcounts
 	cpp_part SetPrefMsg
-	|| p = ._prefs
-		p[s] = Value
-	  else
-		debugger
+	.prefsinit()[s] = Value
 
 function AllowInteruptCrash (assigns:|bool|)
 	cpp_wrapper JB_App__CrashOnInterupt
@@ -196,15 +193,17 @@ function PrefPath (|string|)
 	check (*rz == '/' or '~') ("App pref path should be 'default' or a full-path.")
 
 
-function PrefsInit (|date| when=date.now, |bool|)
+function PrefsInit (|date| when=0, |config!|)
 	if ._prefs
-		return true
+		return ._prefs!
 	|| pref_path = .prefpath
 		._prefs = pref_path.file.conf
-		if ._prefs
-			rz = true
-			if when
-				app.prefs("first") := when.renderint
+	if !._prefs
+		._prefs = Message(@arg, string.error)
+	if when
+		if when < 0: When = date.now
+		app.pref("first") := when.renderint
+	return ._prefs!
 
 
 function SavePrefs

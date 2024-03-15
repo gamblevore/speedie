@@ -354,6 +354,11 @@ datatype U24_8 (uint)
 datatype _voidptr:
 	// actualtype &byte
 
+helper adas
+	visible
+	target debug2
+//		|int[10]| haha
+		|(&_void)[10]| aha
 
 
 datatype _void

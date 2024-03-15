@@ -186,7 +186,7 @@ class OpenSaveDialog (Window)
 		|OpenSaveDialog|				Asker
 		
 		function StartPrefs (|message|)
-			rz = (app.prefs)("opensave")
+			rz = (app.prefsinit)("opensave")
 			rz.keep(20)
 			for f in rz
 				if f != @tmp

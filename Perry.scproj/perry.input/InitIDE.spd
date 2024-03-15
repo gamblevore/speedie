@@ -400,7 +400,7 @@ extend PerryIDE
 		.AddViewButton(.viewsearch,		"\16",	.searcharea)
 		.AddViewButton(.viewerrors,		"\17",	.errorlist)
 		.AddViewButton(.viewdebugger,	"\18",	.debugger)
-		if app.Prefs["dev"]
+		if app.Pref("dev")
 			.AddViewButton(.viewlog,		"\0D",	.CommsLogList)
 
 		.viewfiles.left = 5 ~ right
@@ -466,7 +466,7 @@ extend PerryIDE
 		|| g = .CommsLogList
 		g.istree = true
 		g.id = "log"
-		require !app.prefs["nolog"]
+		require !app.pref("nolog")
 		g.gnormal.seps = g.gnormal.bg
 		g.gnormal.seps.a *= 0.8
 		

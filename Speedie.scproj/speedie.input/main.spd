@@ -36,8 +36,7 @@ function compiler.SetupEnv
 
 	FlowControl.FlowMode = FlowControl.Off // can enable via "log"
 	.Clearenvs
-	if app.prefpath
-		app.PrefsInit
+	app.PrefsInit(-1)
 	
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"

@@ -303,8 +303,8 @@ module SDLApp
 
 
 	function SavePrefs
-		if app.prefs
-			app.prefs!["screen"] = sdlapp.ScreenOrig.List
+		if app._prefs
+			app.pref("screen") = sdlapp.ScreenOrig.List
 			app.SavePrefs
 
 
@@ -376,7 +376,7 @@ module SDLApp
 		.FrameLength = 180th.date
 		.openedfirst = date.now
 		app.PrefsInit(.openedfirst)
-		|| PrevSize = app.prefs["screen"].ivec4
+		|| PrevSize = app.prefmsg("screen").ivec4
 			s = PrevSize.size
 		  else
 			s = (800, 600)
@@ -600,7 +600,7 @@ module SDLApp
 	
 	function DrawFrame
 		opt norefcounts
-		|| CanBlur = !app.Prefs("noblur")
+		|| CanBlur = !app.Pref("noblur")
 		
 		if !.DialogIsOpen
 			.BlurBackgroundStart = 0

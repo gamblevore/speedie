@@ -402,7 +402,8 @@ function ExtractAmount (|Message| Prms, |SCNode| name_space, |SCDecl| R, |bool|)
 	if num == @unit
 		typeofunit(Num, nil, nil)
 	require num.expect(@num) and num.expectlast
-	R.CArraySize = Num.Name.ParseInt
+	if r.pointercount
+	R.CArraySize = Num.Int
 	R.Default = «arg »
 	return true
 
@@ -410,7 +411,6 @@ function ExtractAmount (|Message| Prms, |SCNode| name_space, |SCDecl| R, |bool|)
 function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |SCDecl?|)
 	// a bit recursive!
 	|| f = c.func
-	
 	if (f == @Decl)
 		Return ExtractDecl( c.first!, name_space, purpose )
 	

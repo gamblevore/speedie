@@ -27,8 +27,8 @@ extend ObjectLoader {
 
 	function Int (|int64|)
 		opt norefcounts
-		|| C = .Next #require
-		return C.name.parseint(c)
+		|| C = .Next
+			return C.int
 
 	function Bool (|bool|)
 		return .int|bool|

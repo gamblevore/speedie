@@ -324,9 +324,3 @@ datatype DeclMode (uint)
 	syntax is (|DeclMode|o, |bool|)
 		return self == o
 
-//	function Policy (|nilstate|)
-//		if self == FuncParam or functionbody
-//			return nilstate.either
-//		if self == typecast
-//			return nilstate.optional
-//		return nilstate.real

@@ -70,7 +70,7 @@ module Feedback
 			Options.SelfReplacement = kSelfReplace // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
-			Options.GenFlowControlCode = app.prefs["self_flow"].yes
+			Options.GenFlowControlCode = app.pref("self_flow").yes
 			SC_Targets["flow"] = options.GenFlowControlCode
 			SC_Targets["self"] = true
 		  elseif t2 == 2
@@ -430,12 +430,12 @@ module Feedback
 		+"codesign"
 			Explain(Purpose, "Gets/Sets the codesign certificate")$
 			if value == ""
-				printline app.prefs(codesign_native)
+				printline app.pref(codesign_native)
 				return true
 			
 			if value == "none" or "nil" or "-"
 				value = ""
-			app.prefs(codesign_native) = value
+			app.pref(codesign_native) = value
 			app.saveprefs
 			printline "Codesign set to " + value
 			return true
@@ -485,7 +485,7 @@ module Feedback
 		fs <~ " /path/to/project\n"
 		fs <~ "Installation: ${compiler.SpeedieProj.parent}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
-		fs <~ "  SelfFlow: ",  fs <~ app.prefs["self_flow"]
+		fs <~ "  SelfFlow: ",  fs <~ app.pref("self_flow")
 		fs <~ "  @max: ${@max|int|}"
 		for (v in AppOptions) (k) 
 			(*v)("", "", fs_tester)

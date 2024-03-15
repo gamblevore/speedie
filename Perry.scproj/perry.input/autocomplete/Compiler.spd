@@ -85,7 +85,8 @@ extend PerryIDE
 		newlist := Error()
 		.errorlist.listsource = newlist
 		.UpdateErrorCount
-		beep
+		if .ErrorList isnt Visible
+			beep
 		.ShowErrors
 
 

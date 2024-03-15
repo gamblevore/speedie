@@ -146,11 +146,11 @@ class PerryIDE (Window)
 	
 	behaviour Drawbackground
 		opt norefcounts
-		|| bg = app.Prefs["bg"]
+		|| bg = app.Prefmsg("bg")
 		if bg == "flat"
 			return super.drawbackground(where)
 		if !bg
-			app.prefs("bg") = "jeebox"
+			app.pref("bg") = "jeebox"
 		.Jeeboxeffects(where, bg)
 
 
@@ -304,7 +304,7 @@ class PerryIDE (Window)
 	function ShowIDE (|bool| FromClick=false)
 		debug_require self // what?
 		|| p = .Project
-		app.prefs("currproj") = p
+		app.pref("currproj") = p
 		if FromClick
 			if .islast
 				.ClickedTodo
@@ -848,7 +848,7 @@ So anything not 0 means "its OK"`
 	
 	
 	function UpdatePrefs
-		|| oldPrefs = app.prefs
+		|| oldPrefs = app._prefs
 		app._prefs = nil
 		if app.PrefsInit(0)
 			.notify("Reloaded Prefs.")
