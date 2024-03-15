@@ -221,7 +221,7 @@ function CheckNotBadName
 
 function FuncDecls 
 	scfunction.currfunc = self
-	|| P = .Source.second!
+	|| P = .Source.second				#require
 	if self is constructor
 		.AddConstructorReturn(p)
 	
@@ -231,7 +231,7 @@ function FuncDecls
 		.DeclsProtoTypeClass( fc )
 	
 	|| A = .SourceArg
-	|| space = a.scarg(self)
+	|| space = a.SCArg(self)
 	
 	if (P==@List or @Bra or @prm)
 		p.Func = @prm

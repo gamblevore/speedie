@@ -1071,7 +1071,7 @@ function IsPointerMath (|SCDecl|L, |SCDecl|R, |SCOperator| opp, |Message|exp, |S
 
 
 function scdecl.CheckMath (|message| exp, |scdecl|)
-	check (.type != TypeVoid_) (exp, "Can't do math on void pointers")
+	check (.type != TypeVoid_) (exp, "Can't do math on pointer-to-nil")
 	return self
 
 

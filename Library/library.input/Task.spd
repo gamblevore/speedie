@@ -3,14 +3,14 @@
 
 class Task (ringtree)
 	|&nil|				_Func
-	|byte|				_Objects
+	|byte|				_ObjectCount
 	|int64[9]| 			_Local
 	
 	constructor (|&nil| fn)
 		._Func = fn
 	
 	destructor
-		for (i in ._objects|int|)
+		for (i in ._ObjectCount|int|)
 			jb_decr(._Local[i]|object|) // noice
 
 
