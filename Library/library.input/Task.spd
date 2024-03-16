@@ -1,7 +1,6 @@
 
 
-
-class Task (ringtree)
+class Task (RingTree)
 	|&nil|				_Func
 	|byte|				_ObjectCount
 	|int64[9]| 			_Local
@@ -13,22 +12,4 @@ class Task (ringtree)
 	destructor
 		for (i in ._ObjectCount|int|)
 			jb_decr(._Local[i]|object|) // noice
-
-
-
-ignore {
-// should have a start and endtime, by default, and a state
-task DelayedShowError (|bool|)
-	|textview| self
-	|error|    err 
-	|ivec2|    P
-	run
-		(.OnShowExtraInfo)(self, P, nil, err, "error", true)?
-
-
-task LessThanTest (|int| i, |bool|)
-	|int| LessThan
-	run: return i < lessthan
-
-}
 
