@@ -406,13 +406,12 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
 // could be cleaned up so that exp is NEVER nil... "AddMain", "InitRootDecl", lookupvar etc would need altering...
 	
-	debugat 0 // ugh
-	|| name			= OrigName.Lowercase
+	debugat 41292 // ugh
 	|| ParamsArray	= SCParamArray.new(exp)
 	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
 	ParamsArray.PreReadTypes(Arg_Space, ParamsHere, side)
 	|| CanFunction	= (ParamsHere) and  (!ParamsArray.IsAddress)
-	|| ConstructorAsNew = (purpose == kPurposeDot) and (name == "new") and (self isa scmodule)
+	|| ConstructorAsNew = (purpose == kPurposeDot) and (origname ~= "new") and (self isa scmodule)
 	|SCFunction| Missing
 	|SCFunction| f
 	|scclass| owning_cls
@@ -420,7 +419,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 		owning_cls = scfunction.currfunc!.cls
 
 	for (b.ListLookup in Curr)
-		|| o = b[ name ]
+		|| o = b[ origname ]
 		if (!o)
 			continue
 		if (ParamsArray.IsDot)  and  (ParamsArray.IsModule)  and  (b == compiler.program)
@@ -441,8 +440,6 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 		
 		paramsarray.ConstructorAsNew = ConstructorAsNew
 		if (paramshere and paramshere.func == @prm) and (o isa scmodule)
-			if paramsarray.isdot
-				debugat
 			o = o.GetTheNewer|scmodule|
 			paramsarray.ConstructorAsNew = true
 		
