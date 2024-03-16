@@ -81,7 +81,7 @@ class SCBehaviour (SCNode)
 	
 	
 	function SCClass.CreateBehaviour
-		require .isobject
+		require .isobject and !.isrole
 		.Behaviour := SCBehaviour.new(self)
 		.Behaviour!.CreateFuncTable( .sourcearg )
 	
@@ -197,20 +197,20 @@ class SCBehaviour (SCNode)
 		expect !.FuncTable
 
 		|| name = .cls!.BehaviourName
-		|| Using = errplace.SyntaxUsing 
-		|| msg = «tmp "struct"
-			«Thg name »
-			«Arg »
-		»
+		using errplace 
+		|| msg = @tmp + "struct"
+		msg <~ (@Thg, name)
+		if name ~= "lessthan_behaviour"
+		msg <~ @Arg
 		
 		.project.use
-		|| F = SCClass.NewStruct(msg, compiler.program, ErrPlace)|SCModule| #require
-		F.cls!.IsBehaviour = kBehaviourTable
-		f.cls!.IsRole = .cls!.IsRole						// sigh
-		compiler.program.TryAddBase( ErrPlace, F )
-		Compiler.ModuleList <~ F							// Sigh... should not have to do this!
-		.FuncTable = F
-		scimport.noproj
+		|| F = SCClass.NewStruct(msg, compiler.program, ErrPlace)|SCModule|
+			F.cls!.IsBehaviour = kBehaviourTable
+			f.cls!.IsRole = .cls!.IsRole						// sigh
+			compiler.program.TryAddBase( ErrPlace, F )
+			Compiler.ModuleList <~ F							// Sigh... should not have to do this!
+			.FuncTable = F
+			scimport.noproj
 	
 	
 	function String.UnderScoreAtAnyEnd (|bool|)
