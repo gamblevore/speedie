@@ -252,7 +252,9 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 
 
 function LoadSuperClass
-	.Modul.parent = compiler.program 
+	|| OldMod = .modul.parent // in case it was already set, like in a task... which has a name_space
+	if !oldmod
+		.Modul.parent = compiler.program 
 	
 	|| p = .Source								#require
 	|| supc = p.Second
@@ -278,10 +280,10 @@ function LoadSuperClass
 		.Super = S
 		if Options.ListAllLib
 			s.Children <~ self
-		if .IsRole
-			.modul.parent = s.modul
-		  else
+		if !.IsRole
 			s.HasSubClass = true
+		  elseif !oldmod
+			.modul.parent = s.modul
 		.parent = S
 		|| b = .behaviour
 		|| SB = S.behaviour
@@ -854,7 +856,7 @@ module
 	function NeuClass (CollectFunc)
 		|| cls = .NeuClassSub(node, name_space, ErrPlace, "", SCNodetype.object)
 			cls.ClassCollect
-			return cls.modul
+			rz = cls.modul
 
 	
 	function SCClass.ClassCollect

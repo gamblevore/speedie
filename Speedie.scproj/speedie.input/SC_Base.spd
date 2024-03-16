@@ -406,7 +406,6 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
 // could be cleaned up so that exp is NEVER nil... "AddMain", "InitRootDecl", lookupvar etc would need altering...
 	
-	debugat 41292 // ugh
 	|| ParamsArray	= SCParamArray.new(exp)
 	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
 	ParamsArray.PreReadTypes(Arg_Space, ParamsHere, side)

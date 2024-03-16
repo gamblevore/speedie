@@ -2,8 +2,6 @@
 
 // new task system
 
-// 	task LessThan (|string| a, |int| b, |string| c)
-
 module SCTasks {
 
 function CollectAll
@@ -15,6 +13,7 @@ function CollectAll
 		if P == Compiler.program
 			P = T.Modul
 		|| found = newtaskActual(ch, P)
+			found.parent = p
 			P.tryadd(ch, found, found.name)
 
 
@@ -104,23 +103,20 @@ function Message.BuildTask (|message| con)
 
 
 
-// put these into task.lessthantest! niwgga!
-// get the typecasting working in C++!
-target debug2 {
+function Test
+	target debug2
+		|| xxx = task.LessThan("a", 5, "c")
+		|| yyy = (xxx)(0)
+}
+
+
 task LessThan (|string| a, |int| b, |string| c)
 	run (|int| i, |bool|)
 		return i < .b
-
+	
 	module
-		function abc (sctasks.lessthan.prototype) 
+		function abc (lessthan.prototype) 
 			|| x = 0
 		function def
-			|| xxx = sctasks.lessthan("a", 5, "c")
-			|| z = .abc(xxx,0)
-}
-
-function Test
-//	|| xxx = LessThan("a", 5, "c")
-//	|| yyy = (xxx)(0)
-}
-
+			|| xxx = lessthan("a", 5, "c")
+			|| z = .abc(xxx, 0)
