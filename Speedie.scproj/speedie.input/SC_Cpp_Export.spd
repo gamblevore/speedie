@@ -129,7 +129,6 @@ function SCClass.NeedsExport (|bool|)
 function Codify (|SCModule| scb, |string| fName)
 	// class and modules come through here.
 	|| cls = scb.Cls
-	if cls ~= "lessthan"
 	if !fName
 		if (cls)
 			fName = cls.ExportName
@@ -173,7 +172,6 @@ function SetupFlow (|SCFunction| f)
 function CodifyInlines
 	opt norefcounts
 	for (f in compiler.funclist)
-		if (f.cls ~= "lessthan") and (f is constructor)
 		if f.NeedsExport and .CanExportFunc(f) and f.IsInline
 			.cppfunc( .Inlines, f )
 	scfunction.CurrFunc = nil
@@ -182,7 +180,6 @@ function CodifyInlines
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
 	opt norefcounts
 	for (f in list)
-		if (f.cls ~= "lessthan") and (f is constructor)
 		if f.NeedsExport and !f.IsInline
 			.cppfunc( file, f )
 	scfunction.CurrFunc = nil
@@ -317,7 +314,6 @@ function Run
 		if c.IsFunc
 			WriteType( c, .AllTypes, false )
 	
-	debugger
 	for c in Compiler.ModuleList
 		.Codify( c, "" )
 	

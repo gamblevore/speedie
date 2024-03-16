@@ -208,7 +208,6 @@ class SCBehaviour (SCNode)
 			F.cls!.IsBehaviour = kBehaviourTable
 			f.cls!.IsRole = .cls!.IsRole						// sigh
 			compiler.program.TryAddBase( ErrPlace, F )
-			Compiler.ModuleList <~ F							// Sigh... should not have to do this!
 			.FuncTable = F
 			scimport.noproj
 	

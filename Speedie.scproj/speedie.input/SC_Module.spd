@@ -24,7 +24,8 @@ linkage
 
 constructor
 	.defaultrefs = cpprefs.new
-	if .IsVisible
+	if compiler.modulelist != nil
+		compiler.modulelist <~ self
 
 
 render

@@ -286,6 +286,7 @@ function InitBasicStuff (|int|) // compiler.init
 	
 	cpp_export[""] // str0
 	options.ListAllLib = linkage.interpreter
+	.ModuleList <~ .program
 	
 	.InitTypes
 	TypeNil   = .AddGlobalConst( "nil",   TypeObject!,   NilState.ActuallyNil )
@@ -407,16 +408,9 @@ function ImportAll
 		SCClass.ProcessExtend( l, false )
 
 	require .initbasicfuncs
-	
-	.ModuleList = ListModules( .program.access! )
-	.AddSubProjects(.ModuleList)
-	.ModuleList <~ .program
-	
-	
 	require .Stage( "Creating Class Hierarchy" )
-	for c in .classlist
-		c.AddInterfacesTo(.modulelist)
 		
+
 	for c in .ClassList
 		c.CreateBehaviour	// creates new classes, put before loadsuperclass
 	
