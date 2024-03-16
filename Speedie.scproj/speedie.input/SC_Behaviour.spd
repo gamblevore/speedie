@@ -81,7 +81,8 @@ class SCBehaviour (SCNode)
 	
 	
 	function SCClass.CreateBehaviour
-		require .isobject and !.isrole
+		require .isobject
+		
 		.Behaviour := SCBehaviour.new(self)
 		.Behaviour!.CreateFuncTable( .sourcearg )
 	
@@ -112,7 +113,8 @@ class SCBehaviour (SCNode)
 		|| Interface = .InterfaceForBehaviour(fn)					#require
 		|| prm = fn.source.find(@prm)								#expect (fn.source, "No parameters found")
 		
-		fn.DeclsProtoCleanup(interface, prm.first, true)
+		|| f = prm.first											#require
+		fn.DeclsProtoCleanup(interface, f, true)
 
 		require stderr.ok
 		|| prms = fn.source!.findnested(@sthg, "...")				#expect
@@ -200,14 +202,17 @@ class SCBehaviour (SCNode)
 		using errplace 
 		|| msg = @tmp + "struct"
 		msg <~ (@Thg, name)
-		if name ~= "lessthan_behaviour"
 		msg <~ @Arg
 		
 		.project.use
 		|| F = SCClass.NewStruct(msg, compiler.program, ErrPlace)|SCModule|
 			F.cls!.IsBehaviour = kBehaviourTable
-			f.cls!.IsRole = .cls!.IsRole						// sigh
+			f.cls!.IsRole = .cls!.IsRole
 			compiler.program.TryAddBase( ErrPlace, F )
+			
+//			debugger
+//			Compiler.ModuleList <~ F							// Sigh... should not have to do this!
+			
 			.FuncTable = F
 			scimport.noproj
 	

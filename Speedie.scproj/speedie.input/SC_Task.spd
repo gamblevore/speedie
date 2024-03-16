@@ -104,10 +104,8 @@ function Message.BuildTask (|message| con)
 
 
 function Test
-	target debug2
-		|| xxx = task.LessThan("a", 5, "c")
-		|| yyy = (xxx)(0)
-}
+	|| xxx = sctasks.LessThan("a", 5, "c")
+	|| yyy = (xxx)(0)
 
 
 task LessThan (|string| a, |int| b, |string| c)
@@ -120,3 +118,6 @@ task LessThan (|string| a, |int| b, |string| c)
 		function def
 			|| xxx = lessthan("a", 5, "c")
 			|| z = .abc(xxx, 0)
+
+
+}
