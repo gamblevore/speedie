@@ -226,9 +226,8 @@ function FuncDecls
 		.AddConstructorReturn(p)
 	
 	|| fc = p.first
-	
-	if (fc == @thg)
-		.DeclsProtoTypeClass( fc )
+		if (fc.func == @thg or @dot)
+			.DeclsProtoTypeClass( fc )
 	
 	|| A = .SourceArg
 	|| space = a.SCArg(self)
@@ -661,7 +660,7 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 function DeclsPrototypeClass (|Message| ch0)
 	opt norefcounts
 	|| p = .parent as scmodule #require
-	|| fpType = p.findclass(ch0)
+	|| fpType = p.FindClassMsg(ch0)
 		.DeclsProtoCleanup(fpType, ch0, false, false)
 		.DeclsProtoTypeAdd(fpType)
 

@@ -71,7 +71,7 @@ struct ArchonPurger
 	function BranchEnter (|message| where, |NilRecord|)
 		expect (.Neel < .RowEnd) (where, "Branch depth too deep (over 63)")
 		rz = *(.Neel++)
-		.SetAllNil(rz)
+		*.neel = rz // no realnesses
 	
 	
 	function BranchSwap (|NilRecord| A, |nilrecord|)
@@ -202,6 +202,7 @@ struct ArchonPurger
 		|LoopInfo| 				Loops
 		|ArchonPurger|			T
 		|byte|					OldPrint
+		|byte|					NilTrapper
 
 
 		function Value (|NilRecord|)

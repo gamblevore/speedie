@@ -73,6 +73,20 @@ function FindClass (|String| name, |Message| where, |bool| errs=true,  |SCClass|
 			error (where, "Expected a class but found module.")
 
 
+function FindModuleMsg (|Message| where, |bool| DoErrors=true, |SCModule|)
+	return .findmodule(where.name, where, doerrors)
+
+
+function scnode.FindClassMsg (|Message| where, |bool| errs=true,  |SCClass|)
+	// OK now what?
+	opt norefcounts
+	if where == @dot
+		self = .FindModuleMsg(where, errs)
+		if !self?
+			return nil
+	return .findclass(where.name, where, errs)
+
+
 function FindModule (|String| name, |Message| where, |bool| DoErrors=true, |SCModule|)
 	opt norefcounts
 	while self

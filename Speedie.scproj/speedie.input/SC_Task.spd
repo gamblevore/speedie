@@ -9,18 +9,16 @@ function @SCClass.NewTask (CollectFunc)
 	|| fields = name.Next(@nil)
 	require name and fields
 	if fields == @bra or @list
-		fields.func = @prm
+		fields.func = @bra
 	  else
-		fields = @prm.msg
+		fields = @bra.msg
 		name.next = fields
 	
 	|| arg = fields.next(@arg)		#require
 	while (|| ch = fields.last)
 		arg.first = ch
 	using node
-	|| bra = @bra.msg
-	name.next = bra
-	bra <~ (@thg, "task")
+	fields <~ (@thg, "task")
 	|| con = "constructor () {super.constructor(&run, –taskvars)}"~digest
 	arg.BuildTask(con!)
 
@@ -42,26 +40,35 @@ function Message.MakeTaskVar  (|message!| con, |message|)
 		arg <~ NewEqRel(@sdot + name, @thg + name)
 		prm <~ .copy // :)
 
+
+function Message.BuildRunTask (|message| con, |message|)
+	opt norefcounts
+	rz = self[@nil]
+	|| arg = rz.next(@arg)
+	require rz and arg.ExpectLast
+	|| f = rz.func
+	expect (f == @bra or @list) (rz)
 	
 	
+	.prev = con
+	.name = "function"
+	|| brah = @bra.msg
+	brah <~ (@thg, "task_prototype")
+	.first = brah
+	.first = @thg + "run"
+
+
 function Message.BuildTask (|message| con)
 	opt norefcounts
 	|message| prms = con
-	|| found = 0
+	|message| Run
 	for ch in self
 		if ch == @decl
 			ch.MakeTaskVar(con)
 		  elseif ch istmp "run"
-			if found
-				error (ch, "Duplicate run statements")
-			  elseif ch[@arg].ExpectLast
-				ch.prev = con
-				ch.name = "function"
-				|| brah = @bra.msg
-				brah <~ (@thg, "task_prototype")
-				ch.first = brah
-				ch.first = @thg + "run"
-			found++	
+			expect (!Run) (ch, "Duplicate run statements")
+			Run = ch
+			prms = ch.BuildRunTask(con)
 	
 	|| Caller = (macros.TaskCaller)(prms, @thg + "task_prototype")
 	|| CallPrms = Caller.FlatLast.parent
@@ -71,24 +78,32 @@ function Message.BuildTask (|message| con)
 	
 	|| proto = .msg(@tmp, "prototype")
 	proto <~ (@thg, "task_prototype")
-	proto <~ prms.copy
+	if prms
+		proto <~ prms.copy
 	
 	self <~ Caller
 
 
 
 function Compiler.MiniTests
-	target debug2
-		|| xxx = LessThanTest("a", 5, "c")
-		|| yyy = (xxx)(0)
+	|| xxx = LessThan("a", 5, "c")
+	|| yyy = (xxx)(0)
 
 
+// put these into task.lessthantest! niwgga!
+// get the typecasting working in C++!
+task LessThan (|string| a, |int| b, |string| c)
+	run (|int| i, |bool|)
+		return i < .b
 target debug2
-	task LessThanTest (|string| a, |int| b, |string| c)
-		run (|int| i, |bool|)
-			return i < .b
+	module adsa
+		function abc (lessthan.task_prototype) 
+			|| x = 0
+		function def
+			|| z = .abc(0)
 
-	task LessThanTest (|float| f)
-		run (LessThanTest2)
-			return i < .b
 
+target debug3
+	task LessThan2 (|float| f)
+		run (LessThan)
+			return i|float| / 2.0 < .f

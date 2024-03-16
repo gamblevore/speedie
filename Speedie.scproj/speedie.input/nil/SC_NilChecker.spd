@@ -306,6 +306,7 @@ function If (NilTrackerFn)
 	if always.isfalse
 		return .Argument(arg2)
 	
+	if NilTrapper
 	|| Orig = T.BranchEnter(msg)				#require
 	#!"First Branch"
 	.Jump(Cond, NilCheckMode.positive)

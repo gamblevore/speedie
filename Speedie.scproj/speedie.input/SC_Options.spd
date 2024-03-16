@@ -18,6 +18,7 @@ module Options
 	||		SingleCppOutput			= true
 	||		HideMultipleErrors		= true
 	|| 		NilTestAllocNeverFails	= true
+	|| 		Beep					= false
 	||		Cpp						= true
 	||		Compile					= true
 	||		MakeASM					= false
@@ -209,6 +210,10 @@ module Feedback
 		+"path"
 			Explain(Purpose, "")$
 			printline app.exepath
+			
+		+"beep"
+			Explain(Purpose, "Beeps after compile is complete")$
+			options.beep = value.optionbool
 		
 		+"keepallerrors"
 			explain(purpose, "Show more errors that were hidden.")$
@@ -219,8 +224,7 @@ module Feedback
 			for (s in app.env) (k)
 				printline k + ": " + s
 			return true
-			
-		+"externalcompile" (AppTransCompile) // deprecated. remove
+		
 		+"x" (AppTransCompile)
 		
 		+"arch"

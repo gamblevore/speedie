@@ -680,10 +680,7 @@ function FindModule (|string| name, |Message| where=nil, |bool| errs=true, |SCMo
 
 
 function FindModule (|Message| where, |bool| errs=true, |SCModule|)
-	return compiler.program.FindModule(where.name, where, errs)
-
-function scnode.FindClass (|Message| where, |bool| errs=true,  |SCClass|)
-	return .findclass(where.name, where, errs)
+	return compiler.program.FindModulemsg(where, errs)
 
 
 function CreateRoot

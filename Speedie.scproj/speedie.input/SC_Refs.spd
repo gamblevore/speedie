@@ -205,7 +205,7 @@ function RefIncr (|Message| msg, |Message| Place, |bool| IsJustAnArg=false)
 		if (Place == @decl)
 			msg = Place.last
 			if (msg == @rel)
-				msg = msg.last
+				msg = msg.last!
 				if msg.IsStatementExpr
 					return msg.AvoidSafeDecr
 		require !(msg.unbra isthing "nil")

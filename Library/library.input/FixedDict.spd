@@ -91,7 +91,7 @@ class FixedDict
 		|| rt = .typeof(part)
 		|| r  = self[Part]
 		if rt == TypeDict
-			return r
+			return r!
 		return fixeddict(self, part, r, rt)
 	
 
@@ -131,7 +131,7 @@ class FixedDict
 				curr	= curr[B&15]				#require
 				|| T	= curr.typeof(B>>4)
 				curr	= curr[B>>4]
-				if i >= n: return curr.valueobj(t)
+				if i >= n: debug_require curr, return curr.valueobj(t) // can curr be nil or not? perhaps just require is needed
 				require T == typedict
 
 
