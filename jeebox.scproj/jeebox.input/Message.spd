@@ -121,10 +121,11 @@ class Message (RingTree)
 		Opt NoRefCounts
 		|| Braces = (.parent and self isnt style2)  or  !.hasany  or .name or  (self in @arg)
 			fs <~ '{'
-		.FSListArg( fs, braces ) // the name is already rendered by this!!
+		.FSListArg( fs, true ) // the name is already rendered by this!!
 		if Braces
-			fs.IndentLine
+			fs.AppendIndent
 			fs <~ '}'
+			fs <~ '\n'
 		if !.parent
 			fs <~ "\n" // make sure it will reparse as an arg
 		

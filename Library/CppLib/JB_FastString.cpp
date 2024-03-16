@@ -225,10 +225,14 @@ void JB_FS_AppendMultiByte(FastString* self, int byte, int Count) { // - numbers
 
 
 void JB_FS_AppendIndent( FastString* self ) {
-	JB_FS_AppendByte( self, '\n' );
     if (self->IndentChar) {
         JB_FS_AppendMultiByte( self, self->IndentChar, self->Indent );
     }
+}
+
+void JB_FS_LineIndent( FastString* self ) {
+	JB_FS_AppendByte( self, '\n' );
+	JB_FS_AppendIndent(self);
 }
 
 

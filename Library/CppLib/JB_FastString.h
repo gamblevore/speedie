@@ -80,6 +80,7 @@ void JB_FS_AppendHexData(FastString* fs, uint8* Addr, int N, int Spaces);
 void JB_FS_AppendHex3(FastString* fs, int tVal);
 void JB_FS_AppendIntegerAsText(FastString* self, s64 LeftOver, int RoundTo);
 void JB_FS_AppendIndent( FastString* self );
+void JB_FS_LineIndent( FastString* self );
 int JB_int_Render(int Self, byte* Addr, int N);
 void JB_FS_AppendDurr(FastString* self, Date D);
 void JB_FS_AppendLocalTime(FastString* self, Date D);
