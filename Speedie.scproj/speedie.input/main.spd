@@ -25,10 +25,8 @@ function Compiler.PrintResults
 
 
 function Compiler.MiniTests
-	debugger
 	|| xxx = LessThanTest("a", 5, "c")
 	|| yyy = (xxx)(0)
-	printline yyy
 
 
 function compiler.ClearEnvs

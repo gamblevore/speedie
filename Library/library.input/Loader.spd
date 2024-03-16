@@ -161,7 +161,7 @@ struct ObjectLoader {
 	
 	
 	module
-		|dictionary of int64| ClassList = nil		// _voidptr is better
+		|dictionary of int64| ClassList
 		
 		function LoadOne (SaverLoadClass)
 			|| name = string.fromc(cls.name).lowercase

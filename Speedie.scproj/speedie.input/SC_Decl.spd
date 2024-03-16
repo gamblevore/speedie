@@ -326,7 +326,7 @@ class SCDecl (SCNamed) {
 		
 		if !isaccess and .isnormalobject
 			brel.become(@dot, "first")
-			brel.msg(@prm)
+			brel<~(@prm)
 			return typeofexpr(brel, name_space)
 		
 
@@ -636,6 +636,8 @@ class SCDecl (SCNamed) {
 			|| C = .copydecl
 			c.type = ctype
 			c.contains = contains.contains
+			//ifn c.pointercount == contains.pointercount
+			//ifn c.c_array == contains.c_array // why cant we just return contains? i tried but it doesnt work
 			(C is UpgradeableContained) = !sameType
 			
 			Return C
@@ -678,7 +680,7 @@ class SCDecl (SCNamed) {
 		rz = @rel.msg
 		rz <~ simple
 		rz <~ (@opp, "of")
-		rz <~ (@thg, c.Type.Name)
+		rz <~ c.writetype(minimal)
 		
 
 	function WriteSimpleType (|Message|)
