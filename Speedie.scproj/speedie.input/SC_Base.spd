@@ -99,11 +99,18 @@ function FindClass (|String| name, |Message| where, |bool| errs=true,  |SCClass|
 
 function FindModule (|String| name, |Message| where, |bool| DoErrors=true, |SCModule|)
 	opt norefcounts
-	while self
-		|| Obj = self[ name ]
+
+	if name ~= .name
+//		debugger // wowzers
+		return self as scmodule
+
+	|| Upon = self
+	while upon
+		|| Obj = upon[ name ]
 		if Obj isa SCModule
 			return Obj
-		self = .parent
+		upon = upon.parent
+		
 	if where and DoErrors
 		error (where, "Can’t find module: " + name)
 
@@ -399,6 +406,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
 // could be cleaned up so that exp is NEVER nil... "AddMain", "InitRootDecl", lookupvar etc would need altering...
 	
+	debugat 0 // ugh
 	|| name			= OrigName.Lowercase
 	|| ParamsArray	= SCParamArray.new(exp)
 	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
@@ -432,7 +440,9 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 
 		
 		paramsarray.ConstructorAsNew = ConstructorAsNew
-		if paramshere and !paramsarray.isdot and (o isa scmodule)
+		if (paramshere and paramshere.func == @prm) and (o isa scmodule)
+			if paramsarray.isdot
+				debugat
 			o = o.GetTheNewer|scmodule|
 			paramsarray.ConstructorAsNew = true
 		

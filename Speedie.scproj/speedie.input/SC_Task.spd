@@ -48,12 +48,6 @@ function NewTask (CollectFunc)
 	return compiler.program
 
 
-function Test
-//	|| xxx = LessThan("a", 5, "c")
-//	|| yyy = (xxx)(0)
-
-}
-
 function Message.MakeTaskVar  (|message!| con, |message|)
 	is editable // whatever
 	|| prm = con.first!
@@ -112,14 +106,21 @@ function Message.BuildTask (|message| con)
 
 // put these into task.lessthantest! niwgga!
 // get the typecasting working in C++!
+target debug2 {
 task LessThan (|string| a, |int| b, |string| c)
 	run (|int| i, |bool|)
 		return i < .b
 
 	module
-		function abc (task.lessthan.prototype) 
+		function abc (sctasks.lessthan.prototype) 
 			|| x = 0
 		function def
-			|| xxx = LessThan("a", 5, "c")
+			|| xxx = sctasks.lessthan("a", 5, "c")
 			|| z = .abc(xxx,0)
+}
+
+function Test
+//	|| xxx = LessThan("a", 5, "c")
+//	|| yyy = (xxx)(0)
+}
 
