@@ -72,6 +72,7 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 
 function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 	opt norefcounts
+	scmodule.curr = .parent|scmodule|
 	|| cls = .Cls
 	if !cls
 		cls = .parent|SCModule|!.Cls

@@ -262,8 +262,8 @@ function LoadSuperClass
 		if (.IsObject) and (self != TypeObject)
 			S = TypeObject
 	  else
-		|| SupName = supc[@Thg].Name				#require
-		S = Compiler[ SupName, supc ]				#require
+		|| thg = supc[@nil]							#require
+		S = Compiler[ thg ]							#require
 		
 		if (.FuncProto)
 			error						(supc, "Can't subclass this.")
@@ -497,7 +497,7 @@ function ContainedTypeLoad
 		.false := «thg "nil"»
 
 	|| ContainedMsg = .Sourcearg.find(@Tmp, "contains")[@thg]			#require
-	|| cls = compiler[ ContainedMsg.name, ContainedMsg ]				#require
+	|| cls = compiler[ ContainedMsg ]									#require
 	|| TN = Cls.TypeOptional
 	|| cont = TN.CopyDecl
 	(cont Is UpgradeableContained)
@@ -928,10 +928,12 @@ module
 	
 	function datatypecode.CreateSignedStuff (|scclass|)
 		opt norefcounts
-		|| s = .setsigned(!.issigned)
-		for (c in datatypecode.types) (key)
+		|| s = .SetSigned(!.IsSigned)
+		|| keymsg = Message(@thg)
+		for (c in datatypecode.Types) (key)
 			if (c == s)
-				Return compiler.findclass( key, nil, true )
+				keymsg.name = key
+				Return compiler[ keymsg ]
 		
 
 	function LoadSyntax (CollectFunc)

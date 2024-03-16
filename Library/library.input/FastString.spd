@@ -152,14 +152,24 @@ class FastString {
 			rz.Reserved = n
 
 
-	syntax Access (|int| off, |Byte|):				cpp_wrapper JB_FS_Byte
-	syntax Access (|int| off, assigns:|Byte|)		{ cpp_wrapper JB_FS_ByteSet }
+	syntax Access (|int| off, |Byte|)
+		cpp_wrapper JB_FS_Byte
+	
+	syntax Access (|int| off, assigns:|Byte|)
+		cpp_wrapper JB_FS_ByteSet
+	
+	function Last (|int| off=0, |int|)
+		cpp_wrapper JB_FS_Last
+	
 	syntax Append (|string?| data)
 		cpp_wrapper JB_FS_AppendString
+	
 	syntax Append (|FastString| fs)
 		cpp_part AppendFastString
 		.AppendMemory(fs.resultptr, fs.length)
-	syntax Append (|Byte| data)						{ cpp_wrapper JB_FS_AppendByte }
+		
+	syntax Append (|Byte| data)
+		cpp_wrapper JB_FS_AppendByte
 
 	function AppendIntegerAsText (|int64| data, |int|RoundTo=1)
 		cpp_wrapper JB_FS_AppendIntegerAsText
@@ -176,6 +186,7 @@ class FastString {
 	syntax Append (|int64| data)
 		cpp_part AppendInt64
 		.AppendIntegerAsText(data, 1)
+	
 	syntax Append (|uint| data)
 		cpp_part AppendUint
 		.AppendIntegerAsText(data, 1)

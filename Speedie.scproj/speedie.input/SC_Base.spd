@@ -64,6 +64,30 @@ syntax access (|string| s, |SCObject|)
 		return a.ValueLower(s)
 
 
+
+function FindModuleMsg (|Message| where, |bool| DoErrors=true, |SCModule?|)
+	opt norefcounts
+	real self
+	
+	|| fn = where.func
+	if fn == @dot
+		require where.last(@emb)
+		self = .FindModuleMsg(where.first!, doerrors) #require
+	  else
+		expect (fn == @thg or @name) (where)
+	return .findmodule(where.name, where, doerrors)
+
+
+function scnode.FindClassMsg (|Message| where, |bool| errs=true,  |SCClass|)
+	// OK now what?
+	opt norefcounts
+	|| mod = .FindModuleMsg(where, errs)
+		|| C = mod.cls
+			return C
+		if errs
+			error (where, "Expected a class but found module.")
+
+
 function FindClass (|String| name, |Message| where, |bool| errs=true,  |SCClass|)
 	opt norefcounts
 	|| Mod = .FindModule(name, where, errs)
@@ -71,20 +95,6 @@ function FindClass (|String| name, |Message| where, |bool| errs=true,  |SCClass|
 			return mod.cls
 		if errs
 			error (where, "Expected a class but found module.")
-
-
-function FindModuleMsg (|Message| where, |bool| DoErrors=true, |SCModule|)
-	return .findmodule(where.name, where, doerrors)
-
-
-function scnode.FindClassMsg (|Message| where, |bool| errs=true,  |SCClass|)
-	// OK now what?
-	opt norefcounts
-	if where == @dot
-		self = .FindModuleMsg(where, errs)
-		if !self?
-			return nil
-	return .findclass(where.name, where, errs)
 
 
 function FindModule (|String| name, |Message| where, |bool| DoErrors=true, |SCModule|)
@@ -893,7 +903,7 @@ dispatch RootCollectTable (CollectFunc)
 	static				{error (node, "static is called 'module' in speedie.")}
 	selector			SCSelector.neu
 	class				SCClass.neuClass
-	task				SCClass.NewTask
+	task				sctasks.NewTask
 	role				SCClass.neuRole
 	export_api			SC_API.NewExportAPI
 	model				SCGame3D.NeuModel

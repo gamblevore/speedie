@@ -121,7 +121,7 @@ class Message (RingTree)
 		Opt NoRefCounts
 		|| Braces = (.parent and self isnt style2)  or  !.hasany  or .name or  (self in @arg)
 			fs <~ '{'
-		.FSListArg( fs, true ) // the name is already rendered by this!!
+		.FSListArg( fs, braces ) // the name is already rendered by this!!
 		if Braces
 			fs.AppendIndent
 			fs <~ '}'
@@ -159,13 +159,11 @@ class Message (RingTree)
 	
 	syx Tmp (Statement)
 		Opt NoRefCounts
-//							return x
 		if .name.IsStatementName
 			fs <~ .name
 		  else
 			fs <~ '+'
-			fs.AppendQuotedEscape(.name) // should really be +'' so that $ escapes don't slow us down.
-			// also visualy lighter.
+			fs.AppendQuotedEscape(.name) // use +''  ???  it is visually lighter.
 
 		require .hasany
 
@@ -179,6 +177,7 @@ class Message (RingTree)
 			if ch == @arg
 				hasarg = true
 			ch++
+
 
 	syx Oat (Operator_As_Thing)
 		fs <~ '%'
@@ -671,7 +670,7 @@ class Message (RingTree)
 			AddLine = true
 
 		fs.indent -= hasp
-		if hasp
+		if hasp and fs.last != '\n'
 			fs <~ '\n'
 
 

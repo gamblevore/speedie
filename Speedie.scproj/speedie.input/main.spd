@@ -26,6 +26,11 @@ function Compiler.PrintResults
 		printline "\07"
 
 
+function Compiler.MiniTests
+	sctasks.test
+
+
+
 function compiler.ClearEnvs
 	// osx freaks out sometimes otherwise
 	// it's only specific flag that needs clearing tho... better to just find and remove it

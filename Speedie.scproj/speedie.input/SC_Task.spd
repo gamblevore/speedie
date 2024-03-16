@@ -4,7 +4,21 @@
 
 // 	task LessThan (|string| a, |int| b, |string| c)
 
-function @SCClass.NewTask (CollectFunc)
+module SCTasks {
+
+function CollectAll
+	opt norefcounts
+	|| T = typetask
+	require T
+	for ch in compiler.taskstodo
+		|| P = ch.obj|scnode|!
+		if P == Compiler.program
+			P = T.Modul
+		|| found = newtaskActual(ch, P)
+			P.tryadd(ch, found, found.name)
+
+
+function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 	|| name = node[@thg]
 	|| fields = name.Next(@nil)
 	require name and fields
@@ -21,12 +35,24 @@ function @SCClass.NewTask (CollectFunc)
 	fields <~ (@thg, "task")
 	|| con = "constructor () {super.constructor(&run, –taskvars)}"~digest
 	arg.BuildTask(con!)
+	node.name = "class" 
 
-	|| task = SCClass.NeuRole(node, name_space, ErrPlace)|scmodule|
+	|| task = SCClass.NeuRole(node, name_space, node)|scmodule|
 		task.cls!.IsRole = 2
 	return task
-		
 
+
+function NewTask (CollectFunc)
+	node.obj = name_space
+	compiler.taskstodo <~ node
+	return compiler.program
+
+
+function Test
+//	|| xxx = LessThan("a", 5, "c")
+//	|| yyy = (xxx)(0)
+
+}
 
 function Message.MakeTaskVar  (|message!| con, |message|)
 	is editable // whatever
@@ -49,11 +75,10 @@ function Message.BuildRunTask (|message| con, |message|)
 	|| f = rz.func
 	expect (f == @bra or @list) (rz)
 	
-	
 	.prev = con
 	.name = "function"
 	|| brah = @bra.msg
-	brah <~ (@thg, "task_prototype")
+	brah <~ (@thg, "prototype")
 	.first = brah
 	.first = @thg + "run"
 
@@ -70,14 +95,14 @@ function Message.BuildTask (|message| con)
 			Run = ch
 			prms = ch.BuildRunTask(con)
 	
-	|| Caller = (macros.TaskCaller)(prms, @thg + "task_prototype")
+	|| Caller = (macros.TaskCaller)(prms, @thg + "prototype")
 	|| CallPrms = Caller.FlatLast.parent
 	for p in prms
 		|| ty = p.second
 			callprms <~ ty.copy
 	
 	|| proto = .msg(@tmp, "prototype")
-	proto <~ (@thg, "task_prototype")
+	proto <~ (@thg, "prototype")
 	if prms
 		proto <~ prms.copy
 	
@@ -85,25 +110,16 @@ function Message.BuildTask (|message| con)
 
 
 
-function Compiler.MiniTests
-	|| xxx = LessThan("a", 5, "c")
-	|| yyy = (xxx)(0)
-
-
 // put these into task.lessthantest! niwgga!
 // get the typecasting working in C++!
 task LessThan (|string| a, |int| b, |string| c)
 	run (|int| i, |bool|)
 		return i < .b
-target debug2
-	module adsa
-		function abc (lessthan.task_prototype) 
+
+	module
+		function abc (task.lessthan.prototype) 
 			|| x = 0
 		function def
-			|| z = .abc(0)
+			|| xxx = LessThan("a", 5, "c")
+			|| z = .abc(xxx,0)
 
-
-target debug3
-	task LessThan2 (|float| f)
-		run (LessThan)
-			return i|float| / 2.0 < .f

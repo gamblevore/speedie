@@ -28,6 +28,7 @@
 |SCClass|	TypeDictionary
 |SCClass|	TypeFastString
 |SCClass|	TypeJBClass
+|scclass|	TypeTask
 |SCClass|	TypeVec4
 |SCClass|	TypeVec3
 |SCClass|	TypeVec2
@@ -110,6 +111,8 @@ linkage
 |[String]|					SyxArray
 |Message|					ExtendList = message()
 |Message|					ConstantsList = message()
+|Message|					TasksList = message()
+|Message|					TasksTodo = message()
 |[Message]|					ExtendModuleList
 |[Message]|					API_List
 |[SCFunction]|				API_Funcs
@@ -256,6 +259,7 @@ function InitTypes
 	Typeivec4			= compiler["ivec4"]
 	Typedate			= compiler["date"]
 	TypeJBClass			= Compiler["classdata"]
+	TypeTask			= Compiler["task"]
 	TypeObject			= Compiler["object"]
 	TypeSyntax			= Compiler["syntax"]
 	TypeVoid_           = Compiler["_void"]
@@ -391,6 +395,7 @@ function ImportAll
 	parser.using.Flags = MsgParseFlags.Inserted // noice
 	scimport.noproj
 	
+	sctasks.CollectAll
 	for c in .classlist
 		C.TryAddToProject
 	
@@ -653,14 +658,14 @@ function CreateDisambiguation
 	.DisamModules = SCModule.newContainer("__modules__")
 
 
-syntax access (|string| name, |Message| where=nil, |SCClass|)
+syntax access (|string| name, |SCClass|)
 	cpp_part FindClassName
-	return .FindClass( name, where, true )
+	return compiler.program.Findclass(name, nil, true)
 
 
 syntax access (|Message| name, |SCClass|)
 	if name
-		return .FindClass( name.name, name, true )
+		return compiler.program.FindClassmsg( name, true )
 
 
 function FindClassType (|message| n, |scdecl|)
@@ -668,12 +673,9 @@ function FindClassType (|message| n, |scdecl|)
 	|| m = SCModule.curr
 	if !m
 		m = compiler.program
-	|| c = m.findclass(n.name, n)
+	|| c = m.findclassmsg(n)
 		return c.typenormal
 
-
-function FindClass (|string| name, |message| where, |bool| DoErrors=true, |scclass|)
-	return compiler.program.Findclass(name, where, DoErrors)
 
 function FindModule (|string| name, |Message| where=nil, |bool| errs=true, |SCModule|)
 	return compiler.program.FindModule(name, where, errs)
