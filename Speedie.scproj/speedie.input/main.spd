@@ -24,11 +24,6 @@ function Compiler.PrintResults
 		printline "Exiting Speedie " + app.id.render
 
 
-function Compiler.MiniTests
-	|| xxx = LessThanTest("a", 5, "c")
-	|| yyy = (xxx)(0)
-
-
 function compiler.ClearEnvs
 	// osx freaks out sometimes otherwise
 	// it's only specific flag that needs clearing tho... better to just find and remove it

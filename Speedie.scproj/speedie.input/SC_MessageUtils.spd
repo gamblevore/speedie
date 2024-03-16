@@ -241,13 +241,6 @@ function Message.CastedParent (|Message|)
 ///////////// ///////////// ///////////// MOVING ///////////// ///////////// ///////////// 
 
 
-
-//function Message.ReplaceIntoFirst (|message| With, |message|)
-//	.prev = with
-//	with.first
-//	return with
-
-
 function Message.ReplaceWith (|message!| j, |Message!|)
 	.Prev = j
 	.Remove

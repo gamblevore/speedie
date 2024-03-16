@@ -87,6 +87,12 @@ class Error (Message)
 
 	function HasPosition (|bool|)
 		return .Position >= 0 
+		
+	function ShiftPosition (|int| i)
+		opt norefcounts
+		.position += i
+		|| node = .node
+			node.position += i
 	
 	function Fired (|bool|)
 		return .when.fired

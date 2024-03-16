@@ -2,24 +2,27 @@
 
 // new task system
 
+// 	task LessThan (|string| a, |int| b, |string| c)
+
 function @SCClass.NewTask (CollectFunc)
 	|| name = node[@thg]
-	|| prms = name.Next(@nil)
-	require name and prms
-	if prms == @bra or @list
-		prms.func = @prm
+	|| fields = name.Next(@nil)
+	require name and fields
+	if fields == @bra or @list
+		fields.func = @prm
 	  else
-		prms = @prm.msg
-		name.next = prms
+		fields = @prm.msg
+		name.next = fields
 	
-	|| arg = prms.next(@arg)		#require
+	|| arg = fields.next(@arg)		#require
+	while (|| ch = fields.last)
+		arg.first = ch
 	using node
 	|| bra = @bra.msg
 	name.next = bra
 	bra <~ (@thg, "task")
-	bra.obj = prms				// hehe
 	|| con = "constructor () {super.constructor(&run, –taskvars)}"~digest
-	arg.BuildTask(con!, prms)
+	arg.BuildTask(con!)
 
 	|| task = SCClass.NeuRole(node, name_space, ErrPlace)|scmodule|
 		task.cls!.IsRole = 2
@@ -41,8 +44,9 @@ function Message.MakeTaskVar  (|message!| con, |message|)
 
 	
 	
-function Message.BuildTask (|message| con, |message| prms)
+function Message.BuildTask (|message| con)
 	opt norefcounts
+	|message| prms = con
 	|| found = 0
 	for ch in self
 		if ch == @decl
@@ -73,21 +77,13 @@ function Message.BuildTask (|message| con, |message| prms)
 
 
 
-
-task LessThanTest (|int| i, |bool|)
-	|string|	a
-	|int| 		b
-	|string|	c
-	run
-		return i < .b
+function Compiler.MiniTests
+	target debug2
+		|| xxx = LessThanTest("a", 5, "c")
+		|| yyy = (xxx)(0)
 
 
-ignore
-	task LessThanTest2 (lessthantest)
-		|float|	f
-		run
-			return i|float| / 3.0 < .f
-		
+target debug2
 	task LessThanTest (|string| a, |int| b, |string| c)
 		run (|int| i, |bool|)
 			return i < .b
