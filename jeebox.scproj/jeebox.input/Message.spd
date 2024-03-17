@@ -24,7 +24,7 @@ class Message (RingTree)
 
 
 ////////////////////////////////		
-	|MsgParseFlags|			Flags				// useful bits for you to set.
+	|MsgParseFlags|			Flags				// Output only. Change freely or reuse.
 	|uint16|				Tag					// Jeebox does not use these itself.
 ////////////////////////////////		
 			
@@ -715,6 +715,11 @@ class Message (RingTree)
 		if self
 			return .Name
 
+
+	function Func (|Syntax|)
+		nil safe
+		if self
+			return .func
 
 	function Name_ (|string|) // for use within the message class!
 		description "For use within the message class, which can't use the 'name' function directly."

@@ -12,12 +12,15 @@ function CollectAll
 		|| P = ch.obj|scnode|!
 		if P == Compiler.program
 			P = T.Modul
+		  elseif p isa scclass
+			p = p.modul|scclass|
 		|| found = newtaskActual(ch, P)
 			found.parent = p
 			P.tryadd(ch, found, found.name)
 
 
 function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
+	debugger
 	|| name = node[@thg]
 	|| fields = name.Next(@nil)
 	require name and fields
@@ -28,8 +31,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 		name.next = fields
 	
 	|| arg = fields.next(@arg)		#require
-	while (|| ch = fields.last)
-		arg.first = ch
+	arg.takeallfrom(fields)
 	using node
 	fields <~ (@thg, "task")
 	|| con = "constructor () {super.constructor(&run, –taskvars)}"~digest
@@ -70,9 +72,11 @@ function Message.BuildRunTask (|message| con, |message|)
 	
 	.prev = con
 	.name = "function"
-	|| brah = @bra.msg
-	brah <~ (@thg, "prototype")
-	.first = brah
+	f = rz.first.func
+	ifn f == @thg or @dot
+		|| brah = @bra.msg
+		brah <~ (@thg, "prototype")
+		.first = brah
 	.first = @thg + "run"
 
 
@@ -88,6 +92,8 @@ function Message.BuildTask (|message| con)
 			Run = ch
 			prms = ch.BuildRunTask(con)
 	
+	expect (Run) (self, "Missing 'run' statement")
+	debugger
 	|| Caller = (macros.TaskCaller)(prms, @thg + "prototype")
 	|| CallPrms = Caller.FlatLast.parent
 	for p in prms
@@ -107,6 +113,16 @@ function Test
 	|| xxx = sctasks.LessThan("a", 5, "c")
 	|| yyy = (xxx)(0)
 
+
+task LessThan2 (|float| f)
+	target debug2 {
+		run (lessthan)
+			return i*2.1 < .f
+	} else {
+		
+		run (|int| i, |bool|)
+			return i*2.1 < .f
+	}
 
 task LessThan (|string| a, |int| b, |string| c)
 	run (|int| i, |bool|)
