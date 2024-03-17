@@ -1797,7 +1797,10 @@ function NewDestructor (CollectFunc)
 
 
 function message.MainFix (|message|)
-	|| prms = self[@nil]$
+	|| prms = self.first
+	if !prms
+		prms = .GiveArg
+		prms <~ "hello world"
 
 	.name = "function"
 	|| fn_src = "function app.Main (|ErrorInt|,) {cpp_name JB_Main, visible true}".ParseClean

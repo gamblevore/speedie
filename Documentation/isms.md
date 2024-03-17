@@ -254,8 +254,23 @@ Speedie has some handy constants!
 Obviously, these are in power of 2, so 1KB = 1024. Reporting sizes can be done nicely too!
 
     "${x.strsize} ${x2.strsize} ${x3.strsize}" // prints: "1024 2MB 1.5MB"
+    
+ <small>_(We reject the stupid ISO change that means 1KB = 1000. That is utterly retarded, and has nothing to do with programming, because programmers need powers of 2 numbers. kibble-bytes or whatever will never be added. We are proud believers of 1024 is a kilobyte and everyone else can go to hell.)_</small>
 
 ---
 ### Parsing
 Remembering to use Jeebox instead of making a custom file format, is a good way to reduce code-size, even for very simple file formats like a file separated by lines and commas.
 
+
+---
+### Config Files
+
+Quite often you have some kind of config file, and you want to access it as if it were like a "record". That is... you have rows and values in those rows. Here is an example:
+
+    main
+    	|| conf = ConfData.parse		#require
+    	"Theme: ${conf[`theme`]}"
+    	"Last Opened: ${conf[`date`].date}"
+    	"Curr File: ${conf[`curropen`]}"
+
+You should find this example in `/usr/local/speedie/examples/config_reader.spd`

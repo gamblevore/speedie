@@ -858,7 +858,7 @@ class Message (RingTree)
 
 
 	syntax append (|string| key)
-		self <~ @str.msg(key)
+		self <~ (@str, key)
 
 
 	function Arg (|message|)

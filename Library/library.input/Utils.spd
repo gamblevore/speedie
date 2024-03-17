@@ -147,6 +147,14 @@ function bool.Msg (|message|)
 	return @thg + .Render
 
 
+datatype HumanDate (date)
+	render
+		fs.AppendLocalTime(self)
+		
+function message.date (|humanDate|)
+	return .int
+
+
 insertion
 	digest (–digest _0).ParseJbin
 

@@ -65,7 +65,7 @@ datatype Date (int64)
 		fs.appendintegerastext(self)
 	
 	render  // hmmm... i guess this is just for data-formats.
-		disabled "Do you mean .RenderLocalTime or .RenderInt"
+		disabled "Do you mean .LocalTime or .RenderInt"
 
 		
 	function Fired (|bool|)
