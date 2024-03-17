@@ -400,11 +400,11 @@ function Message.GetMarker (|String| s, |Message|)
 
 function NewEqRel (|string| L, |String| R, |Message|)
 	opt norefcounts
-	rz = «Rel
-		«Thg L »
-		«Opp "=" »
-		«Thg R »
-	»
+	rz = @rel.msg
+	rz <~ (@Thg, L)
+	rz <~ (@Opp, "=")
+	rz <~ (@Thg, R)
+	
 	rz.TmpType = asmtmp.ksetvar
 
 
@@ -422,7 +422,7 @@ function NewDecl (|string| type, |string| name="", |message|)
 
 function NewDecl (|string| type, |message| RelOrName, |message|)
 	opt norefcounts
-	rz = «decl »
+	rz = @decl.msg
 	if type
 		rz <~ (@thg, type)
 	  else
@@ -433,25 +433,15 @@ function NewDecl (|string| type, |message| RelOrName, |message|)
 
 function NewRel (|Message| L, |Message| R, |string| op, |Message|)
 	opt norefcounts
-	return «rel
-		L
-		«Opp op »
-		R
-	»
+	rz = @rel.msg
+	rz <~ L
+	rz <~ (@Opp, op)
+	rz <~ R
 	
 function NewEqRel (|Message| L, |Message| R, |Message|)
 	opt norefcounts
 	rz = NewRel(l, r, "=")
-	rz.tmptype = ASMtmp.kSetVar
-
-
-//function NewSetter (|string| L, |Message| R, |Message|)
-//	opt norefcounts
-//	return «rel
-//		«thg L »
-//		«Opp "="»
-//		R
-//	»
+	rz.TmpType = ASMtmp.kSetVar
 
 
 function message.WrapWith (|syntax| f, |string| s="", |message|)
@@ -470,15 +460,9 @@ function Message.NeedBra (|Message|)
 
 function NewFnc (|string| name, |Message|)
 	opt norefcounts
-	return «func
-		«Thg name »
-		«prm »
-	»
-
-
-//function Message.Hash (|uint64| Pos, |Uint64|)
-//	Pos = (pos << 8) ||| .Func|uint64|
-//	return .Name.Hash(pos)
+	rz = @func.msg
+	rz <~ (@thg, name)
+	rz <~ @prm
 	
 	
 function message.ExpectEmpty

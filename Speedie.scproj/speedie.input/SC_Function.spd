@@ -645,7 +645,7 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 		cst.First!.ReplaceWith( exp )
 
 	  else
-		cst = «func, «thg .ExportName »»  // JB_Str_Exists(obj)
+		cst = (@thg + .ExportName).wrapwith(@func)  // JB_Str_Exists(obj)
 		exp.Next = cst
 		cst.msg(@prm) <~ exp
 		if MyType.IsNormalStruct
@@ -935,7 +935,7 @@ function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Typ
 		Type = "expect"
 	
 	if (!L)
-		On = «thg "nil"»
+		On = @thg + "nil"
 	  elseif (L == @list or @bra or @prm)
 		L.Func = @prm
 		on = L.first
@@ -945,11 +945,12 @@ function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Typ
 
 	|| l2 = L
 	if (L != @prm)
-		l2 = «prm, L »		
-	|| tmp = «dot ("syntax" + Type)
-		on
-		l2
-	»
+		l2 = @prm.msg
+		l2 <~ L
+	|| tmp = @dot + ("syntax" + Type)
+	tmp <~ on
+	tmp <~ l2
+	
 	L = tmp 
 	L.Position = P
 	return L
@@ -986,7 +987,7 @@ function FixCnjSub (|Message| exp) {
 		exp.ReplaceWith( ch )
 		
 		|| RightSide = ch.Last!
-		|| bra = «bra »
+		|| bra = @bra.msg
 		RightSide.ReplaceWith( bra )
 		bra <~ RightSide
 		bra.WrapWith( exp )
@@ -1018,7 +1019,7 @@ function FixCnjSub (|Message| exp) {
 	if (ch isbrel "++") and (ch in @arg) and (ch.first == @thg) {
 		// ++ch #require // just an opt.
 		// Actually I didn't implement the general case yet :) haha.
-		Thg = «thg ch.first!.name »
+		Thg = @thg + ch.first!.name
 		pp = ch
 		
 	} else {
@@ -1036,7 +1037,7 @@ function FixCnjSub (|Message| exp) {
 			|| IsDecl = (pp in @Decl)
 			if isdecl or (name != "loop")
 				Done = 1
-				Thg = «Thg pp.first!.name »
+				Thg = @Thg + pp.first!.name
 				if IsDecl
 					pp = pp.Parent!
 			
@@ -1047,7 +1048,7 @@ function FixCnjSub (|Message| exp) {
 			// func( tmp_318 )
 			
 			pp = SCFunction.TempMoveOut( ch )!
-			Thg = «thg pp.DeclName!.Name »
+			Thg = @thg + pp.DeclName!.Name
 	}
 	
 	// || tmp = func()
@@ -1059,7 +1060,7 @@ function FixCnjSub (|Message| exp) {
 	// || x = tmp
 	
 	
-	|| arg = «arg »
+	|| arg = @arg.msg
 	if (CreatesError)
 		|| L = exp.first.Next!
 		if (name != "expected")
@@ -1082,10 +1083,10 @@ function FixCnjSub (|Message| exp) {
 		arg.msg(@tmp, "return") <~ (@ques,"nil")
 	
 	thg = thg!.Negate	
-	|| if_ = «tmp "if"
-		thg
-		arg
-	»
+	|| if_ = @tmp + "if"
+	if_ <~ thg
+	if_ <~ arg
+	
 	if (UsePrev)
 		pp.Prev = if_
 	  else
@@ -1245,13 +1246,12 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |SCD
 
 	|message| R
 	if numc or type.hiderfunc
-		R = NewRel(exp, «num "1"», msg.name[0, 1])
+		R = NewRel(exp, @num + "1", msg.name[0, 1])
 	  else
 		|| name = ("next", "prev")(msg == "++")
-		R = «dot name
-			(exp)
-			«emb »
-		»
+		R = @dot + name
+		r <~ exp
+		r <~ @emb
 
 
 // X++ --> X = X.next,  ("arl" "++" ("thg" "x")) -> rel(thg("x")  opp("=")  dot("next" thg("x") lst() ))
@@ -1429,7 +1429,7 @@ function Tran_Once (TranFunc)
 	
 	using (node)
 		node.name = "if"
-		|| obj = compiler.program.lateAddTempory( "bool",  "once"+(++OnceCount).render, «thg "false"», node )
+		|| obj = compiler.program.lateAddTempory( "bool",  "once"+(++OnceCount).render, @thg + "false", node )
 
 		|| rel = @rel+""
 		rel <~ (@thg, obj)
@@ -1592,9 +1592,9 @@ function NewCppWrapper (CollectFunc)
 	expect (prm.islast) (prm)
 	
 	using name
-	|| thg = «thg name!.name »
+	|| thg = @thg + name!.name
 	if node == "cpp_inbuilt"
-		thg = «bra, thg »
+		thg = thg.WrapWith(@bra)
 	|| IsNothing = node == "cpp_nothing"
 	|| IsLib	 = node == "cpp_libwrapper"
 	node.name = "function"
@@ -1704,7 +1704,7 @@ function scfunction.Cleanupfunc (|message| s)
 	|| cls = .cls!.isnormalobject
 	if s ~= "constructor" or "destructor"
 		s.name = "function"
-		s.first = «thg n »
+		s.first = @thg + n
 	  elseif s ~= "render"
 		if Tran_Render(s, cls)
 			s.name = "behaviour"
@@ -1783,7 +1783,7 @@ function NewFunc (CollectFunc)
 function NewConstructor (CollectFunc)
 	node.name = "function"
 	using (node)
-	node.first = «Thg "Constructor"»
+	node.first = @Thg+ "Constructor"
 	return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 
@@ -1792,7 +1792,7 @@ function NewDestructor (CollectFunc)
 		expect !(name_space.IsRole) (node, "destructors aren't allowed on roles")
 		node.name = "function"
 		using node
-			node.first = «Thg "Destructor"»
+			node.first = @Thg+ "Destructor"
 		return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 

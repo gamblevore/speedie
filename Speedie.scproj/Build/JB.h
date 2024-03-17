@@ -133,6 +133,8 @@ typedef u16 ASMParam;
 
 typedef JSM ASM;
 
+typedef Date HumanDate;
+
 typedef ASM ASM_BFLD;
 
 typedef ASM ASM_Bra;
@@ -4443,6 +4445,9 @@ void SC_ASM__TestASM();
 
 void SC_ASM__TestASMSub(Message* tests);
 
+
+
+// HumanDate
 
 
 // ASM_BFLD
