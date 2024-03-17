@@ -134,16 +134,18 @@ Speedie uses custom operators a lot. For string appends obviously, but for all s
     if L == 4
         "The list $L has four items!"
         
-`Isa` works on ints too, it checks if something is a multiple of somerthing else. We can also set bits on ints even.
+`Isa` works on ints too, it checks if something is a multiple of something else. `(x isa 3)` is `true` for 0, 3, 6, 9, etc.
 
     || x = 0
     for i in 10
-        if i isa 2 // if 
+        if i isa 2
             "$i is even"
             x[i] = true
           else
             "$i is odd"
     "x is $x"
+    
+We can also set bits on ints even. Like above where I did `x[i] = true`, that is setting an individual bit on an int.
 
 We have ternary expressions too. Useful sometimes.
 
