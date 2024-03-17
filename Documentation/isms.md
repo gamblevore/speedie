@@ -274,3 +274,10 @@ Quite often you have some kind of config file, and you want to access it as if i
     	"Curr File: ${conf[`curropen`]}"
 
 You should find this example in `/usr/local/speedie/examples/config_reader.spd`
+
+Treating `message` class as a config, is done by accessing it with `msg[string]`. Config files probably need their own file to explain how they work, as there some details, but mostly its just there to enable short-simple code.
+
+
+
+
+
