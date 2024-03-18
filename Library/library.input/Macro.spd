@@ -35,6 +35,10 @@ class Macro
 
 function string.Macro (|macro!|)
 	return macro(self)
+
+
+macro string.Macro2 // doesnt work... sadly. not sure why
+	macro(–digest "_")
 	
 
 extend message
@@ -59,7 +63,7 @@ extend message
 			|| f = .first
 			if f == "_" and @thg
 				for p in prms
-					if p isnt Inserted:  dest <~ .MacroSame(p)
+					if p isnt Inserted:  dest <~ p.macroavoidcopy
 				return nil
 				// (first, secnd, A, B, C, D, E)
 			
@@ -86,12 +90,10 @@ extend message
 			.clear
 			.func = s.func
 			.name = s.name
-			.AppendMacro(m, prms)
-
-	syntax append  (|Macro| M,  |array of message| prms)
-		.AppendMacro(m, prms)
+			self <~ (m, prms)
+	
 		
-	function AppendMacro (|Macro| M,  |array of message| prms=nil)
+	syntax append (|Macro| M,  |array of message| prms=nil)
 		using self,  opt norefcounts
 		m.Source.MacroCopy(self, prms, self)
 		for r in prms
