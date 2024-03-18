@@ -32,6 +32,7 @@ class Macro
 	module
 		|array of message| TmpPrms
 
+
 function string.Macro (|macro!|)
 	return macro(self)
 	
@@ -47,13 +48,22 @@ extend message
 	helper MacroSame (|message| prm, |message|)
 		rz = .copy
 		(prm is inserted)
-		rz.name = prm.name
+		rz.name = prm.name // why?
 	
 	
-	helper MacroPrm (|message| root,  |array? of message| prms,  |Message|)
+	helper MacroPrm (|message| root,  |array? of message| prms,  |message| dest,  |Message|)
 		opt norefcounts
 		|| n = .name
-		if (n.first == '_')
+		|| c = n.First
+		if (c == '*') and (self == @brel)
+			|| f = .first
+			if f == "_" and @thg
+				for p in prms
+					if p isnt Inserted:  dest <~ .MacroSame(p)
+				return nil
+				// (first, secnd, A, B, C, D, E)
+			
+		if (c == '_')
 			if (n == 1) or n.IsInt(1) 
 				|| oop = prms[n.int|int|]		#expect (root, "Not enough params.")
 				|| f = .func
@@ -68,7 +78,7 @@ extend message
 	helper MacroCopy (|Message| root, |array? of message| prms,  |Message| dest)
 		opt norefcounts
 		for v in self
-			dest <~ v.MacroPrm(root, prms)
+			dest <~ v.MacroPrm(root, prms, dest)
 
 	function BecomeMacro (|Macro| M,  |array? of message| prms=nil)
 		opt norefcounts

@@ -1145,9 +1145,9 @@ function NewMissingFunc (CollectFunc)
 	if (f isa scfunction)
 		|| arg = f.sourcearg
 		|| C = arg.first
-		expect (C and !C.next) (F, "Missing functions must be one line!")
+		expect (C and !C.next) (F, "Macros must be one line!")
 		|| prm = arg.prev
-		expect (!prm.HasAny) ("Missing functions don't directly state arguments.")
+		expect (!prm.HasAny) ("Macros don't directly state arguments.")
 		f.isMacro = true
 		node.name = "function"
 	return f
