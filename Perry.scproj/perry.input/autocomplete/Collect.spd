@@ -107,14 +107,17 @@ function PerryIDE.ActualCompile (|string| operation)
 	if .compilr: return app.beep // wah?
 	
 	require .filelist.SaveAll(documentstate.saving)
-	.compilr = process.Stream(speedie, [.project, "--perry=bin", "--nocolor"])
-	require .compilr
+	|| args = [.project, "--perry=bin", "--nocolor"]
+	if .DebugIsWaitingForCompile
+		args <~ "--usescriptloc"
+
+	.compilr = process.Stream(speedie, args)		#require
 	.SpeedieText.text = ""
 	
-	(.buildbutton isnt enabled)
-	(.buildbutton isnt visible)
-	(.runbutton isnt enabled)
-	(.progress is visible)
+	(.BuildButton isnt enabled)
+	(.BuildButton isnt visible)
+	(.RunButton isnt enabled)
+	(.Progress is visible)
 
 	is active
 	.ShowCompileTab(.speedietext, .name ~= "Speedie.scproj")

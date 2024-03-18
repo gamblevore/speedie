@@ -95,7 +95,7 @@ function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiled
 	out <~ ("\n", 2)
 	|| r = Process.stream(f, args, out)
 	.RunCompiledApp = r
-	if r.PID
+	if r and r.PID
 		.RunButton.text = "\07"
 
 
