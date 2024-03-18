@@ -1306,7 +1306,6 @@ extern SCFunction* SC__Comp_ClassListInitFunc;
 extern Message* SC__Comp_ConfMsg;
 extern Message* SC__Comp_ConstantsList;
 extern int SC__Comp_CurrStage;
-extern Message* SC__Comp_DebugInsert;
 extern SCModule* SC__Comp_DisamClasses;
 extern SCModule* SC__Comp_DisamModules;
 extern Dictionary* SC__Comp_ExportNames;
@@ -1482,6 +1481,7 @@ extern bool SC__Options_SingleCppOutput;
 extern JB_String* SC__Options_SingleFileInput;
 extern bool SC__Options_TargetDebug;
 extern bool SC__Options_UseFuncCallCount;
+extern byte SC__Options_UseScriptLoc;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
 #define kJB__Pipe_StdErr_ (2)
@@ -2167,7 +2167,7 @@ extern CompressionStats JB__Flow_Stats;
 #define kSC__Instruction_kTypeFunc (1)
 extern Dictionary* SC__Instruction_TypeDict;
 extern Instruction* SC__Instruction_TypeList[128];
-extern Array* SC__Macro_TmpPrms;
+extern Array* JB__Macro_TmpPrms;
 extern uint64 JB__Mrap_MDummy[2];
 extern NilTest* SC__NilTest_n0;
 extern NilTest* SC__NilTest_n1;
@@ -2442,6 +2442,8 @@ int SC_Comp__Reachedfuncs();
 
 JB_String* SC_Comp__RenderErrors(JB_ErrorReceiver* stderr, ErrorSeverity MinSev);
 
+JB_File* SC_Comp__ScriptLoc(JB_String* f);
+
 bool SC_Comp__ScriptRecompile(JB_File* f, JB_File* script_build);
 
 void SC_Comp__SetupEnv();
@@ -2610,6 +2612,8 @@ bool SC_FB__AppOptions_stages(JB_String* Name, JB_String* Value, FastString* pur
 bool SC_FB__AppOptions_target(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppOptions_targetdebug(JB_String* Name, JB_String* Value, FastString* purpose);
+
+bool SC_FB__AppOptions_usescriptloc(JB_String* Name, JB_String* Value, FastString* purpose);
 
 bool SC_FB__AppOptions_variant(JB_String* Name, JB_String* Value, FastString* purpose);
 
@@ -5855,21 +5859,21 @@ void JB_Lk_Test2(LeakTester* self);
 // JB_Macro
 Macro* SC_Macro_clean(Macro* self);
 
-Macro* SC_Macro_ConstructorStr(Macro* self, JB_String* s);
+Macro* JB_Macro_ConstructorStr(Macro* self, JB_String* s);
 
-Macro* SC_Macro_ConstructorMsg(Macro* self, Message* s);
+Macro* JB_Macro_ConstructorMsg(Macro* self, Message* s);
 
 void JB_Macro_Destructor(Macro* self);
 
-Message* SC_Macro_Source(Macro* self);
+Message* JB_Macro_Run(Macro* self, Array* prms);
 
-Message* SC_Macro_SyntaxCall(Macro* self, Array* prms);
+Message* JB_Macro_CallFast(Macro* self, Message* prm1, Message* prm2);
 
-Message* SC_Macro_CallFast(Macro* self, Message* prm1, Message* prm2);
+Message* JB_Macro_Source(Macro* self);
 
-int SC_Macro__Init_();
+int JB_Macro__Init_();
 
-int SC_Macro__InitCode_();
+int JB_Macro__InitCode_();
 
 
 
@@ -6263,7 +6267,7 @@ byte JB_Str_Last(JB_String* self, int minus);
 
 int JB_Str_LineCount(JB_String* self);
 
-Macro* SC_Str_Macro(JB_String* self);
+Macro* JB_Str_Macro(JB_String* self);
 
 JB_File* SC_Str_MakeAndGoInto(JB_String* self);
 
@@ -6847,8 +6851,6 @@ JB_String* SC_Msg_APICppProject(Message* self);
 
 void SC_Msg_AppendAllInto(Message* self, Message* Dest);
 
-void SC_Msg_AppendMacro(Message* self, Macro* M, Array* prms);
-
 void JB_Msg_ARel__(Message* self, FastString* fs);
 
 Message* JB_Msg_Arg(Message* self);
@@ -6897,7 +6899,7 @@ void SC_Msg_Become(Message* self, SCOperator* op);
 
 void SC_Msg_BecomeAppend(Message* self, JB_String* s);
 
-void SC_Msg_BecomeMacro(Message* self, Macro* M, Array* prms);
+void JB_Msg_BecomeMacro(Message* self, Macro* M, Array* prms);
 
 void SC_Msg_BecomeNil(Message* self);
 
@@ -7281,15 +7283,15 @@ void SC_Msg_LoopExit(Message* self);
 
 void SC_Msg_LoopExitter(Message* self, int ASMType, SCBlockage ExitCode);
 
-Message* SC_Msg_MacroAvoidCopy(Message* self);
+Message* JB_Msg_MacroAvoidCopy(Message* self);
 
-void SC_Msg_MacroCopy(Message* self, Message* root, Array* prms, Message* dest);
+void JB_Msg_MacroCopy(Message* self, Message* root, Array* prms, Message* dest);
 
 int SC_Msg_MacroFixCount(Message* self);
 
-Message* SC_Msg_MacroPrm(Message* self, Message* root, Array* prms);
+Message* JB_Msg_MacroPrm(Message* self, Message* root, Array* prms, Message* dest);
 
-Message* SC_Msg_MacroSame(Message* self, Message* prm);
+Message* JB_Msg_MacroSame(Message* self, Message* prm);
 
 Message* SC_Msg_MainFix(Message* self);
 
@@ -7531,13 +7533,13 @@ void JB_Msg_SetMsg(Message* self, JB_String* key, Message* Value);
 
 Message* JB_Msg_GetConf(Message* self, JB_String* key, bool Err);
 
-void JB_Msg_SyntaxAppend(Message* self, JB_String* key);
+void JB_Msg_AppendString(Message* self, JB_String* key);
 
 void JB_Msg_AppendSyx(Message* self, Syntax Fn, JB_String* name);
 
 void JB_Msg_AppendNum(Message* self, int64 Num);
 
-void SC_Msg_SyntaxAppend(Message* self, Macro* M, Array* prms);
+void JB_Msg_SyntaxAppend(Message* self, Macro* M, Array* prms);
 
 void JB_Msg_SyntaxDeprecate(Message* self, JB_String* Error);
 
@@ -8672,6 +8674,8 @@ SCDecl* SC_Func_MacroFix(SCFunction* self, SCDecl* contains, SCNode* name_space,
 
 bool SC_Func_MacroGet(SCFunction* self, SCParamArray* paramsarray, SCFunction* prev);
 
+void SC_Func_MakeMacro(SCFunction* self, Message* arg);
+
 void SC_Func_MakeNilChecker(SCFunction* self, Message* msg);
 
 void SC_Func_MakeParamsReal(SCFunction* self);
@@ -8730,8 +8734,6 @@ bool SC_Func_SyntaxIs(SCFunction* self, FunctionType k);
 
 void SC_Func_SyntaxIsSet(SCFunction* self, FunctionType k, bool Value);
 
-void SC_Func_TranDebugInsert(SCFunction* self);
-
 void SC_Func_Transform(SCFunction* self);
 
 void SC_Func_TranStrings(SCFunction* self);
@@ -8765,8 +8767,6 @@ Message* SC_Func__ArgToFunc(JB_String* NewName, Message* Params, Message* arg);
 bool SC_Func__CanKeepAsSource(Message* list, Message* arg, SCDecl* d);
 
 bool SC_Func__CanKeepAsValue(SCIterator* iter, Message* arg, SCDecl* dcl, Message* value);
-
-SCNode* SC_Func__DebugInsert(Message* node, SCNode* name_space, Message* ErrPlace);
 
 void SC_Func__FastStringOpt(Message* s, SCNode* name_space);
 
@@ -8802,7 +8802,7 @@ SCNode* SC_Func__NewHelper(Message* node, SCNode* name_space, Message* ErrPlace)
 
 SCNode* SC_Func__NewHider(Message* node, SCNode* name_space, Message* ErrPlace);
 
-SCNode* SC_Func__NewMissingFunc(Message* node, SCNode* name_space, Message* ErrPlace);
+SCNode* SC_Func__NewMacro(Message* node, SCNode* name_space, Message* ErrPlace);
 
 SCNode* SC_Func__NewProtoType(Message* node, SCNode* name_space, Message* ErrPlace);
 
@@ -8980,6 +8980,8 @@ inline bool JB_File_SyntaxCast(JB_File* self);
 
 inline bool JB_Ind_SyntaxCast(Ind self);
 
+inline Syntax JB_Msg_Func(Message* self);
+
 inline JB_String* JB_Msg_Name(Message* self);
 
 inline JB_String* JB_Msg_Name_(Message* self);
@@ -9067,6 +9069,13 @@ inline bool JB_File_SyntaxCast(JB_File* self) {
 
 inline bool JB_Ind_SyntaxCast(Ind self) {
 	return self >= 0;
+}
+
+inline Syntax JB_Msg_Func(Message* self) {
+	if (self) {
+		return self->Func;
+	}
+	return nil;
 }
 
 inline JB_String* JB_Msg_Name(Message* self) {
