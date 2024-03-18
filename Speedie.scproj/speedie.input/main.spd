@@ -1,6 +1,9 @@
 
 
 main // speedie main {
+	target debug2
+		|| x = "Abc".macro2
+	
 	compiler.SetupEnv
 	compiler.MiniTests
 	compiler.Main
@@ -23,7 +26,7 @@ function Compiler.PrintResults
 	if SpdProcess.parent != nil
 		printline "Exiting Speedie " + app.id.render
 	if Options.Beep
-		printline "\07"
+		"\07"
 
 
 function Compiler.MiniTests

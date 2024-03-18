@@ -38,7 +38,7 @@ function string.Macro (|macro!|)
 
 
 macro string.Macro2 // doesnt work... sadly. not sure why
-	macro(–digest "_")
+	macro(–digest "_0")
 	
 
 extend message

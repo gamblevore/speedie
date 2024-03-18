@@ -1,6 +1,7 @@
 
 
 class Task (RingTree)
+//	contains int64 // we need multiple contains for this to work.
 	|&nil|				_Func
 	|byte|				_ObjectCount
 	|int64[9]| 			_Local
@@ -13,3 +14,24 @@ class Task (RingTree)
 		for (i in ._ObjectCount|int|)
 			jb_decr(._Local[i]|object|) // noice
 
+
+//class fnasDas
+//	contains int64
+//	|| abc
+//	constructor (|Fpfp| f)
+//		.abc = f|int64|
+//		
+//	macro call
+//		(.abc)(*_)
+//
+//	module
+//		prototype fpfp (|int| a, |int| b, |string| name,   |int|)
+//		helper def (fpfp)
+//			return a*100+b + name.hash
+//		
+//		function test
+//			|fnasdas of fpfp| f = fnasdas(def)
+//			|| x = (f.abc)(14, 2, "bbb")
+//			printline x
+//
+//

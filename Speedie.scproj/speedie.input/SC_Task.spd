@@ -114,6 +114,7 @@ function Test
 	|| yyy = (xxx)(0)
 
 
+target debug3 {
 task LessThan2 (|float| f)
 	target debug2 {
 		run (lessthan)
@@ -123,6 +124,8 @@ task LessThan2 (|float| f)
 		run (|int| i, |bool|)
 			return i*2.1 < .f
 	}
+}
+
 
 task LessThan (|string| a, |int| b, |string| c)
 	run (|int| i, |bool|)
