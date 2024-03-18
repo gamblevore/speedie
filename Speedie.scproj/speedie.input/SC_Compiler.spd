@@ -70,7 +70,6 @@ linkage
 |string|					ReportedName
 |scimport|					Project
 |scfunction|				MainFunc
-|message|					DebugInsert
 |message|					ConfMsg
 |dictionary|				InsecureWords
 |[message]| 				TodoList

@@ -251,23 +251,6 @@ function FuncDecls
 		r.AllocSource = .AllocCode
 
 
-//function AfterGotClasses
-//	|| S = .Source
-//	|| ClassName = (**S).Name					#expect S
-//	|| ClassObj = Compiler[ ClassName, S ]
-//		.FLookup = ClassObj
-//		ClassObj.TryAddBase( S, self )
-
-
-function TranDebugInsert
-	|| d = compiler.debuginsert			#require
-	|| m = .sourcearg				
-	using (d)
-		if (self is Constructor)
-			m.last = d.copy
-		  else
-			m.first = d.copy
-
 
 function Transform ()
 	opt norefcounts
@@ -283,7 +266,6 @@ function Transform ()
 	if (.IsWrapper)
 		space.ProcessLinkage( n, FuncLinkageTable )
 	  else
-		.TranDebugInsert
 		|| r_z = Tran_Result( self )
 		Tran_All( self, n, space )
 		if r_z
@@ -376,7 +358,7 @@ function Message.MacroFixCount (|int|)
 
 function scfunction.MacroGet (|scparamarray| paramsarray, |scfunction| prev, |bool|)
 	opt norefcounts
-	|| A = .SourceArg				#debug_require
+	|| A = .SourceArg!
 	|| M = A.MacroFixCount
 	if m != -111111	and  paramsarray.macrosize != M
 		return false
@@ -1140,17 +1122,8 @@ module {
 |int[12]|		FuncStats
 
 
-function NewMissingFunc (CollectFunc)
-	|| f = SCFunction.NewFunc( node, name_space, errplace )
-	if (f isa scfunction)
-		|| arg = f.sourcearg
-		|| C = arg.first
-		expect (C and !C.next) (F, "Macros must be one line!")
-		|| prm = arg.prev
-		expect (!prm.HasAny) ("Macros don't directly state arguments.")
-		f.isMacro = true
-		node.name = "function"
-	return f
+function NewMacro (CollectFunc)
+	return SCFunction.NewFunc( node, name_space, errplace )
 
 
 function scfunction.MakeProtoClassName (|string| start, |string|)
@@ -1764,7 +1737,19 @@ function scfunction.Init_Sub (|message| node,  |SCNode| name_space)
 	.PreRead(arg)
 	.SetBlindCasts(name_space)
 	
-	
+	if node == "macro"
+		.MakeMacro(arg)
+
+
+function scfunction.MakeMacro (|message| arg)
+	opt norefcounts
+	.isMacro = true
+	|| C = arg.first
+	|| prm = arg.prev
+	check (C and !C.next) (self, "Macros must be one line!")
+	check !(prm.HasAny)   ("Macros don't directly state arguments.")
+
+
 
 function NewFuncSub (|message| node, |SCNode| name_space, |scfunction|)
 	|| fn = SCFunction(node)
