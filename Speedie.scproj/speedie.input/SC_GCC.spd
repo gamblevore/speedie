@@ -309,7 +309,7 @@ function ExportAndInstall (|bool| CanInstall)
 		.ClearThis~quietly
 		if stderr.ok
 			compiler.Package
-	if stderr.ok
+	if stderr.ok and !options.scripting
 		 .PrintProduct("Product")
 
 

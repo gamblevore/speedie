@@ -36,9 +36,9 @@ function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |[messa
 function FillTypePrm (|string| fname, |int| pname)
 	|| prop = @thg + fname
 	if pname >= 4
-		.dt_prm <~ (macros.ASMcopier2)(prop)	
+		.dt_prm <~ macros.ASMcopier2.run(prop)	
 	  else
-		.dt_prm <~ (macros.ASMcopier)(prop, pname.msg)
+		.dt_prm <~ macros.ASMcopier.run(prop, pname.msg)
 
 
 function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
@@ -59,7 +59,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
 	
 	lname = .parent + lname
 	|| arr = .DefineGet(lname, 32-n, bit_pos, bit_pos+n==32)
-	|| fnc_src = (macros.ASMSetter)(arr)
+	|| fnc_src = macros.ASMSetter.run(arr)
 	SCFunction.newfunc(fnc_src, nil, line)
 	
 	.FillTypePrm(lname, pname)
@@ -98,7 +98,7 @@ function string.ASMNormalise (|string|)
 function DataTypeCreate (|message| form,  |int| fnum,  |message|)
 	opt norefcounts
 	|| name = "ASM_" + form.name
-	|| sigh = (Macros.ASM_Datatype)(
+	|| sigh = Macros.ASM_Datatype.run(
 		@thg + name
 		fnum.msg
 	)

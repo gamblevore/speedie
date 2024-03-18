@@ -18,10 +18,10 @@ class Macro
 			if rz
 				rz.wipepositions
 				._parsed = rz
-	syntax call (|[message]| prms=nil, |message|)
+	function Run (|[message]| prms=nil, |message|)
 		rz = message()
 		rz.BecomeMacro(self, prms)
-	syntax call (|message| prm1=nil, |message| prm2=nil, |message|)
+	function Run (|message| prm1=nil, |message| prm2=nil, |message|)
 		cpp_part CallFast
 		rz = message()
 		TmpPrms <~ prm1

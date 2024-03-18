@@ -94,7 +94,7 @@ function Message.BuildTask (|message| con)
 	
 	expect (Run) (self, "Missing 'run' statement")
 	debugger
-	|| Caller = (macros.TaskCaller)(prms, @thg + "prototype")
+	|| Caller = macros.TaskCaller.run(prms, @thg + "prototype")
 	|| CallPrms = Caller.FlatLast.parent
 	for p in prms
 		|| ty = p.second

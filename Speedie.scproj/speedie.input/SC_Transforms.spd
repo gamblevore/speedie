@@ -239,7 +239,7 @@ function Tran_While (TranFunc)
 			cond = Cond.msg(@Thg, "true")
 			arg.first = decl
 			|| dname = decl.declname
-				decl.next = (macros.WhileDecl)(dname.copy)
+				decl.next = macros.WhileDecl.run(dname.copy)
 		  else
 			cond = ExpandToBool( Cond, name_Space ) #require
 

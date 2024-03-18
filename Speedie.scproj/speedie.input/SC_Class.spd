@@ -363,7 +363,7 @@ function scfunction.AddConstructorReturn2
 	|| args = .source[@arg,2]
 	using .source
 	|| type = message(@thg, .cls!.name)
-	args.first = (macros.ConstructorNew)(type)
+	args.first = macros.ConstructorNew.run(type)
 	args.msg(@tmp, "return") <~ (@thg, "self")
 
 
