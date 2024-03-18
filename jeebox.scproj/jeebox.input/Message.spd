@@ -863,6 +863,7 @@ class Message (RingTree)
 
 
 	syntax append (|string| key)
+		cpp_part AppendString
 		self <~ (@str, key)
 
 
