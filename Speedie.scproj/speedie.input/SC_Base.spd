@@ -416,7 +416,8 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 	|scclass| owning_cls
 	if scfunction.currfunc
 		owning_cls = scfunction.currfunc!.cls
-
+	
+	// debugat 40602
 	for (b.ListLookup in Curr)
 		|| o = b[ origname ]
 		if (!o)
@@ -881,57 +882,47 @@ function DontRemove (CollectFunc)
 	return Compiler.Program // OK
 
 
-extend_module scfunction
-	function DebugInsert (CollectFunc)
-		debugger
-		node.remove
-		expect (!compiler.debuginsert) (node, "Already got one of these.")
-		compiler.debuginsert = node.first
-		return compiler.program
-
-
 
 dispatch RootCollectTable (CollectFunc)
-	love				SCGame3D.Love
-	function			SCFunction.NewFunc
-	extend_function		SCFunction.NewFunc // user shouldn't write these
-	api					SCFunction.NewFunc
-	cpp_libwrapper		SCFunction.NewCppWrapper
-	cpp_wrapper			SCFunction.NewCppWrapper
-	cpp_inbuilt			SCFunction.NewCppWrapper
-	cpp_nothing			SCFunction.NewCppWrapper
-	helper				SCFunction.NewHelper
-	macro				SCFunction.NewMissingFunc
-	insertion			SCThe.NewInsertion
-	conf				compiler.WrongConf
-	crash				{app.crash(node.firstname)}
-	module				SCModule.NeuModule
-	static				{error (node, "static is called 'module' in speedie.")}
-	selector			SCSelector.neu
-	class				SCClass.neuClass
-	task				sctasks.NewTask
-	role				SCClass.neuRole
-	export_api			SC_API.NewExportAPI
-	model				SCGame3D.NeuModel
-	prototype			SCFunction.NewProtoType
-	render				SCFunction.NewRender
-	import				(DontRemove)
-	compile_linking		Linkage.Collect
-	shell_args			InbuiltShellArgs.collect
-	syntax				SCClass.LoadSyntax
-	linkage				CppRefs.Linkage
-	struct				SCClass.newstruct
-	datatype			SCClass.DataType
-	extend				SCClass.StoreExtend
-	extend_module		SCClass.StoreExtendModule
-	extends				{ error (node, "I think you mean 'extend'"), return compiler.program }
-	main				SCFunction.NeuMain
-	library				SCFunction.NeuLibrary
-	ignore				(DontRemove)
-	cpp_part			(SCNode.LoadCppPart)
-	constants			(SCModule.ConstantCollector)
-	flags				(SCModule.ConstantCollector)
-	debuginsert			(scfunction.DebugInsert)
+	+"love"					SCGame3D.Love
+	+"function"				SCFunction.NewFunc
+	+"extend_function"		SCFunction.NewFunc // user shouldn't write these
+	+"api"					SCFunction.NewFunc
+	+"cpp_libwrapper"		SCFunction.NewCppWrapper
+	+"cpp_wrapper"			SCFunction.NewCppWrapper
+	+"cpp_inbuilt"			SCFunction.NewCppWrapper
+	+"cpp_nothing"			SCFunction.NewCppWrapper
+	+"helper"				SCFunction.NewHelper
+	+"macro"				SCFunction.NewMacro
+	+"insertion"			SCThe.NewInsertion
+	+"conf"					compiler.WrongConf
+	+"crash"				{app.crash(node.firstname)}
+	+"module"				SCModule.NeuModule
+	+"static"				{error (node, "static is called 'module' in speedie.")}
+	+"selector"				SCSelector.neu
+	+"class"				SCClass.neuClass
+	+"task"					sctasks.NewTask
+	+"role"					SCClass.neuRole
+	+"export_api"			SC_API.NewExportAPI
+	+"model"				SCGame3D.NeuModel
+	+"prototype"			SCFunction.NewProtoType
+	+"render"				SCFunction.NewRender
+	+"import"				(DontRemove)
+	+"compile_linking"		Linkage.Collect
+	+"shell_args"			InbuiltShellArgs.collect
+	+"syntax"				SCClass.LoadSyntax
+	+"linkage"				CppRefs.Linkage
+	+"struct"				SCClass.newstruct
+	+"datatype"				SCClass.DataType
+	+"extend"				SCClass.StoreExtend
+	+"extend_module"		SCClass.StoreExtendModule
+	+"extends"				{ error (node, "I think you mean 'extend'"), return compiler.program }
+	+"main"					SCFunction.NeuMain
+	+"library"				SCFunction.NeuLibrary
+	+"ignore"				(DontRemove)
+	+"cpp_part"				(SCNode.LoadCppPart)
+	+"constants"			(SCModule.ConstantCollector)
+	+"flags"				(SCModule.ConstantCollector)
 	
 
 
@@ -944,7 +935,7 @@ dispatch ClsCollectTable (CollectFunc)
 	+"extend_function"		SCFunction.NewFunc // user shouldn't write these
 	+"setter"				SCFunction.NewHider
 	+"api"					SCFunction.NewFunc
-	+"macro"				SCFunction.NewMissingFunc
+	+"macro"				SCFunction.NewMacro
 	+"helper"				SCFunction.NewHelper
 	+"behaviour"			SCBehaviour.NewActual
 	+"actual"				SCBehaviour.NewActual
