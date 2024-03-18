@@ -50,6 +50,7 @@ module Options
 	|byte|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0
+	|byte|	UseScriptLoc			= 0
 	
 	function Color (assigns:|bool|)
 		ErrorColors.enabled = Value
@@ -244,7 +245,11 @@ module Feedback
 			|| RealPerry = value~="bin"
 			options.perryoutput += RealPerry // argvalue not needed? jsut value, right?
 			compiler.insecurewords = file.PrefsFolder["klinkerhoppen.banned"]!.readall.dict
-		
+
+		+"usescriptloc"
+			Explain(Purpose, "")$
+			options.usescriptloc = true
+
 		+"check"
 			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$
 			Options.Compile = false
@@ -408,7 +413,7 @@ module Feedback
 		+"cpp"
 			explain(purpose, "Compiles to cpp. Default true")$
 			options.cpp = value.optionbool
-		
+				
 		+"output_path"
 			explain(purpose, "Specifies the build product path")$
 			options.output_path = value.pathfix

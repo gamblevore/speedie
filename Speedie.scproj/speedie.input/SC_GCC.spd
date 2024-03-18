@@ -51,9 +51,6 @@ function ProductPath (|bool| Direct=false, |String|)
 	if options.output_path
 		return options.output_path
 	
-	if options.scripting
-		return compiler.originalinputpath.scriptlocation
-		
 	|| prod = compiler.projectname
 	if !Direct
 		prod = .productname + .ProductSuffix

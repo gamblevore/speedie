@@ -51,6 +51,9 @@ function compiler.VariousSelfTests
 
 
 function compiler.CompileTime 
+	if !options.output_path and options.UseScriptLoc
+		.ScriptLoc(compiler.originalinputpath)		
+	
 	if options.SelfReplacement // avoid failing needlessly
 		.FileSanityTests // sometimes this fails due to lack of permissions in xcode...
 						 // xcode gives lower perms to it's builder scripts, strangely.

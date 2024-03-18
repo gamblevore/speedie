@@ -1,12 +1,19 @@
 
 
+function Compiler.ScriptLoc (|string| f, |file|)
+	rz = feedback.TryUseProject(f, true).ScriptLocation.file
+	options.output_path = rz
+
+
 function compiler.UsingScript (|file| f, |file|)
-	require options.compile
-	require !f.isdir
+	require options.compile and !f.isdir
 	require f.Read(16) starts "#!/"
-	rz = feedback.TryUseProject(f.path, true).scriptlocation.file
+	
+	rz = .ScriptLoc(f)
+	
 	if error.autoprint == errorflags.printandkeep
 		error.AutoPrint = 0
+	
 	options.scripting = true
 	options.silent = true
 	options.PrintCompileString = false
@@ -28,7 +35,7 @@ function compiler.TryVariousStartModes (|bool|)
 	require p and !p.argname
 			
 	|| f   = p.file
-	|| it  = compiler.usingScript(f)$
+	|| it  = compiler.UsingScript(f)$
 	|| cwd = app.cwd
 	if compiler.ScriptRecompile(f, it)
 		compiler.CompileTime
@@ -37,6 +44,7 @@ function compiler.TryVariousStartModes (|bool|)
 		app.ChildEnv("OrigScriptPath") = f
 		app.turninto(it.path, app.rawargs)
 	return true
+
 
 
 function string.ContainerName (|string|ext, |string|)
