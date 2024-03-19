@@ -3,6 +3,7 @@
 class Task (RingTree)
 	|&nil|				_Func
 	|byte|				_ObjectCount
+	|taskstate| 		State
 	|int64[9]| 			_Local
 	
 	constructor (|&nil| fn, |int| Objs)
@@ -14,3 +15,12 @@ class Task (RingTree)
 			jb_decr(._Local[i]|object|) // noice
 
 	
+datatype TaskState (byte)
+	flags
+		|TaskState| 
+		Started
+		Paused
+		Finished
+	syntax is (|TaskState| t, |bool|)
+		return self & t
+
