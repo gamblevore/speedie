@@ -62,69 +62,63 @@ function Message.MakeTaskVar  (|message!| con, |message|)
 		prm <~ .copy // :)
 
 
-function Message.BuildRunTask (|message| con, |message|)
+function Message.BuildRunTask (|message| con, |message| prms, |int|)
 	opt norefcounts
-	rz = self[@nil]
-	|| arg = rz.next(@arg)
-	require rz and arg.ExpectLast
-	|| f = rz.func
-	expect (f == @bra or @list) (rz)
+	|| arg = prms.next(@arg)
+	require arg.ExpectLast
+	|| f = prms.func
+	expect (f == @bra or @list) (prms)
 	
 	.prev = con
 	.name = "function"
-	f = rz.first.func
+	f = prms.first.func
+
+	rz = 2
 	ifn f == @thg or @dot
 		|| brah = @bra.msg
 		brah <~ (@thg, "prototype")
 		.first = brah
+		rz = 1
+	
 	.first = @thg + "run"
 
 
 function Message.BuildTask (|message| con)
 	opt norefcounts
 	|message| prms = con
-	|message| Run
+	|| State = 0
 	for ch in self
 		if ch == @decl
 			ch.MakeTaskVar(con)
 		  elseif ch istmp "run"
-			expect (!Run) (ch, "Duplicate run statements")
-			Run = ch
-			prms = ch.BuildRunTask(con)
+			expect (!State) (ch, "Duplicate run statements")
+			prms = ch[@nil]										#require
+			state = ch.BuildRunTask(con, prms)					#require
 	
-	expect (Run) (self, "Missing 'run' statement")
-//	debugger
+	expect (state) (self, "Missing 'run' statement")
+	
+	require state == 1
 	|| Caller = macros.TaskCaller.run(prms, @thg + "prototype")
 	|| CallPrms = Caller.FlatLast.parent
 	for p in prms
 		|| ty = p.second
 			callprms <~ ty.copy
-	
 	|| proto = .msg(@tmp, "prototype")
 	proto <~ (@thg, "prototype")
-	if prms
-		proto <~ prms.copy
-	
+	prms = prms.copy
+	prms.first = newdecl("task", "self")
+	proto <~ prms
 	self <~ Caller
 
 
 
-function Test
-	|| xxx = sctasks.LessThan("a", 5, "c")
-	|| yyy = (xxx)(0)
+function TestLizardBath
+	target debug3
+		|| xxx = lessthan("a", 5, "c")
+		|| z = LessThan.abc(xxx, 1)
+		|| yyy = task.lessthan2(1.2)
+		|| w = LessThan.abc(yyy, 1)
 
-
-target debug3 {
-task LessThan2 (|float| f)
-	target debug2 {
-		run (lessthan)
-			return i*2.1 < .f
-	} else {
-		
-		run (|int| i, |bool|)
-			return i*2.1 < .f
-	}
-}
 
 
 task LessThan (|string| a, |int| b, |string| c)
@@ -133,10 +127,36 @@ task LessThan (|string| a, |int| b, |string| c)
 	
 	module
 		function abc (lessthan.prototype) 
-			|| x = 0
-		function def
-			|| xxx = lessthan("a", 5, "c")
-			|| z = .abc(xxx, 0)
+			return (self|lessthan|)(i)
 
 
 }
+
+task LessThan2 (|float| f)
+	run (sctasks.lessthan)
+		return i*2.1 < .f
+
+
+
+
+
+
+
+
+
+/*
+	Could shrink this further? for example, we can check if a var is refered to directly, within the declared func... or in the creator-func.
+	This is for variable capture.
+	
+	task task2 (|float|)
+		run (|float| a, |float|)
+		
+	function abc (|task2|)
+		|| i = random[]
+		return |task2|{ return i*a } // 'i' is defined above, but within the calling func. So we create the property 'i' in an anonymous task.
+	
+	Its good enough for now!
+	
+	Probably no fucking need.
+*/
+

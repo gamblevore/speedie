@@ -27,7 +27,7 @@ function Compiler.PrintResults
 
 
 function Compiler.MiniTests
-	sctasks.test
+	sctasks.TestLizardBath
 
 
 

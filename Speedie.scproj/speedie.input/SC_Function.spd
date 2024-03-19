@@ -567,10 +567,16 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 
 function DeclsPrototypeClass (|Message| ch0)
 	opt norefcounts
-	|| p = .parent as scmodule #require
-	|| fpType = p.FindClassMsg(ch0)
-		.DeclsProtoCleanup(fpType, ch0, false, false)
-		.DeclsProtoTypeAdd(fpType)
+	|| p = .parent as scmodule						#require
+	|| fpType = p.FindClassMsg(ch0) 				#require
+	if !fptype.funcproto
+		|| task_proto = fptype.modul["prototype"]
+		if (task_Proto isa scmodule)
+			|| cls = task_proto.cls
+				fptype = cls
+		
+	.DeclsProtoCleanup(fpType, ch0, false, false)
+	.DeclsProtoTypeAdd(fpType)
 
 
 function scdecl.CouldUpgradeToReal (|bool|)
@@ -1578,10 +1584,12 @@ function message.NormaliseFunc (|scclass| AddSelf = nil, |message|)
 		expect (fn == @bra or @list or @prm) (prm)
 		prm.Func = @prm
 	if (addself)
-		|| d = @decl.msg
-		d <~ (@thg, addself.name)
-		d <~ (@thg, "self")
-		prm.first = d
+		|| d = prm.first
+		ifn (d == @decl) and (d.second isthing "self")
+			d = @decl.msg
+			d <~ (@thg, addself.name)
+			d <~ (@thg, "self")
+			prm.first = d
 	rz = prm.next
 	if rz
 		rz.expect(@arg)

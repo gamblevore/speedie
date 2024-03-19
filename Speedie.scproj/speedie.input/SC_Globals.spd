@@ -1068,11 +1068,6 @@ function TypeOfDot (ExprResolver)
 		if contains
 			if (DotVar isa scclass) and !exp.IsSettablePlace
 				decl = decl.ContainedReplace( Contains, true )
-				
-		  elseif DotVar isa SCModule
-			|| cls = DotVar.cls
-				if cls.IsRole
-					decl = decl.ClassActReplace(cls)		
 		if decl is task
 			return (dotvar as scclass).DotTaskProperty( exp, decl )
 	
