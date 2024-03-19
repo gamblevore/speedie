@@ -252,10 +252,10 @@ class Memory
 		(.ptr|&...|)[.length-1]
 		
 	macro SyntaxAccess
-		(.ptr|&...|)[_]
+		(.ptr|&...|)[_1]
 	
 	macro SyntaxAppend
-		(.appendplace|&...|)[0] = _
+		(.appendplace|&...|)[0] = _1
 
 	syntax cast (|&...|)
 		return .ptr

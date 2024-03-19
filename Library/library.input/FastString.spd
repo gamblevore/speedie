@@ -275,7 +275,7 @@ class FastString {
 		cpp_wrapper
 
 	macro SyntaxAppend
-		_.render(self)
+		_1.render(self)
 
 	syntax Compare (|int| n, |bool|Aware, |int|)
 		return .streamlength - n

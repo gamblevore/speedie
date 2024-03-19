@@ -154,3 +154,9 @@ class SCParamArray
 			.addsub(Value)
 			.IsAssigns = true
 
+	iterator
+		|int| n = .size
+		|int| i = 0
+		while i < n
+			yield .items[i]
+			i++

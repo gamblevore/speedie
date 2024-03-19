@@ -613,12 +613,14 @@ function scfunction.ParamUniquer (|string| s, |string|)
 
 function UniquifyExport (|String| s, |string|)
 	if (self isa scfunction)
-		s = .ParamUniquer(s)
-		ifn compiler.exportnames[s] : return s
+		|| s2 = .ParamUniquer(s)
+		if !compiler.exportnames[s2]
+			return s2
 	
 	|| u = SCGlobals.UniqueNum++
-	s += u.render
-	ifn compiler.exportnames[s] : return s
+	|| s3 = s + u.render
+	if !compiler.exportnames[s3]
+		return s3
 
 
 function RehomeExport (|bool|)
@@ -654,10 +656,9 @@ function SetExportName (|String| s, |bool| Explicit)
 	if self isa scfunction
 		require !.ismacro
 
-	s = s.unicodesafename
+	s = s.UnicodeSafeName
 	ifn (self isa SCModule) or (self isa SCClass)		// modules aren't really accessable like that.
 		s = .TestExportName(s, explicit)				#require
-		
 		Compiler.ExportNames[ s ] = self
 
 	(self is ExplicitExport) = Explicit
@@ -894,6 +895,7 @@ dispatch RootCollectTable (CollectFunc)
 	+"cpp_nothing"			SCFunction.NewCppWrapper
 	+"helper"				SCFunction.NewHelper
 	+"macro"				SCFunction.NewMacro
+	+"macro2"				SCFunction.NewMacro
 	+"insertion"			SCThe.NewInsertion
 	+"conf"					compiler.WrongConf
 	+"crash"				{app.crash(node.firstname)}

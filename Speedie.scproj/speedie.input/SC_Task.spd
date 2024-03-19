@@ -20,7 +20,7 @@ function CollectAll
 
 
 function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
-	debugger
+//	debugger
 	|| name = node[@thg]
 	|| fields = name.Next(@nil)
 	require name and fields
@@ -93,7 +93,7 @@ function Message.BuildTask (|message| con)
 			prms = ch.BuildRunTask(con)
 	
 	expect (Run) (self, "Missing 'run' statement")
-	debugger
+//	debugger
 	|| Caller = macros.TaskCaller.run(prms, @thg + "prototype")
 	|| CallPrms = Caller.FlatLast.parent
 	for p in prms

@@ -114,14 +114,14 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	require (prms == 3)
 	check !(found & 1) (arg, "Can't come after arrays")
 	if IsArray
-		arg <~ (macros.mainargArray.clean, prms)
+		arg.AppendMacro(macros.mainargArray.clean, prms)
 		return 1
 	if name != @rel
 		check !(found & 4) (arg, "Can't come after defaults")
 		if MaybeNil
-			arg <~ (macros.MainArgBasic.clean, prms)
+			arg.AppendMacro(macros.MainArgBasic.clean, prms)
 		  else
-			arg <~ (macros.MainArgbasicreq.clean, prms)
+			arg.AppendMacro(macros.MainArgbasicreq.clean, prms)
 		return 2
 	name = name[@thg]					#require
 	prms[0] = name
@@ -129,7 +129,7 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	|| l = opp.Next(@Nil)
 		prms <~ l
 	require prms == 4
-	arg <~ (macros.MainArgDefault.clean, prms)
+	arg.AppendMacro(macros.MainArgDefault.clean, prms)
 	return 4
 	
 	
@@ -176,7 +176,7 @@ if __ArgCount == 0
 `
 
 	using prms
-	self <~ (firstarg.macro, [Usage.msg])
+	.AppendMacro(firstarg.macro, [Usage.msg])
 	|| i = 0
 	|| Found = 0
 	for ch in prms
@@ -184,7 +184,7 @@ if __ArgCount == 0
 
 	ifn found&1
 		macros.mainargNone.clean
-		self <~ (macros.mainargNone, [i.msg])
+		.AppendMacro(macros.mainargNone, [i.msg])
 
 	self <~ "require stderr.ok"~digest
 

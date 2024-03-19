@@ -1,7 +1,7 @@
 
 
 main // speedie main {
-	target debug2
+	target debug3
 		|| x = "Abc".macro2
 	
 	compiler.SetupEnv
