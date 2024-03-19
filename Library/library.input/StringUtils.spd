@@ -8,7 +8,7 @@ function PrintLine (|string| data="")
 	strprintline(Data)							// to disambiguate vs macro
 
 
-macro2 PrintLine
+macro PrintLine
 	StrPrintline(_0.render) // not self-referential anymore.
 
 
@@ -25,7 +25,7 @@ function ZalgoLine (|string| data)
 	printline data.zalgo
 
 
-macro2 ZalgoLine
+macro ZalgoLine
 	Printline _0.render.zalgo
 
 

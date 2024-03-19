@@ -38,11 +38,7 @@ class Macro
 		|array of message| TmpPrms
 
 
-function string.Macro (|macro!|)
-	return macro(self)
-
-
-macro2 string.Macro2
+macro string.Macro
 	macro(–digest "_0")
 	
 

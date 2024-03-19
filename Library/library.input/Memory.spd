@@ -248,14 +248,11 @@ class Memory
 			Curr++
 
 		
-	Macro Last
-		(.ptr|&...|)[.length-1]
-		
 	macro SyntaxAccess
-		(.ptr|&...|)[_1]
+		(_0.ptr|&...|)[_1]
 	
 	macro SyntaxAppend
-		(.appendplace|&...|)[0] = _1
+		(_0.appendplace|&...|)[0] = _1
 
 	syntax cast (|&...|)
 		return .ptr

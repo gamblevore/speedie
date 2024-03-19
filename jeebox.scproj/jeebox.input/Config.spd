@@ -65,9 +65,9 @@ extend message
 
 // move these to utils?
 	function IsTypeOfDecl (|bool|)
-		return .istype(1)
+		return .WithinType(1)
 			
-	function IsType (|int| Allowed=3, |bool|)
+	function WithinType (|int| Allowed=3, |bool|)
 		opt norefcounts
 		|| p = .parent
 		|| msg = self

@@ -274,7 +274,7 @@ class FastString {
 	function Grew (|int| m, |bool|)
 		cpp_wrapper
 
-	macro2 SyntaxAppend
+	macro SyntaxAppend
 		_1.render(_0)
 		
 

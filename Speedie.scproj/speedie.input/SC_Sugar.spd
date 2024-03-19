@@ -173,10 +173,10 @@ if __ArgCount == 0
 	printline app.usage.replaceall("\$app", app.callpath.name)
 	return 0
 
-`
+`.macro
 
 	using prms
-	.AppendMacro(firstarg.macro, [Usage.msg])
+	.AppendMacro(firstarg, [Usage.msg])
 	|| i = 0
 	|| Found = 0
 	for ch in prms

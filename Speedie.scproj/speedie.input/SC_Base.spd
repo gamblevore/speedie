@@ -450,7 +450,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 			if !o
 				0
 			  elseif o.ismacro
-				if o.MacroGet(paramsarray, missing)
+				if o.ismacro
 					Missing = o
 				o = nil
 			  else
@@ -895,7 +895,6 @@ dispatch RootCollectTable (CollectFunc)
 	+"cpp_nothing"			SCFunction.NewCppWrapper
 	+"helper"				SCFunction.NewHelper
 	+"macro"				SCFunction.NewMacro
-	+"macro2"				SCFunction.NewMacro
 	+"insertion"			SCThe.NewInsertion
 	+"conf"					compiler.WrongConf
 	+"crash"				{app.crash(node.firstname)}
@@ -938,7 +937,6 @@ dispatch ClsCollectTable (CollectFunc)
 	+"setter"				SCFunction.NewHider
 	+"api"					SCFunction.NewFunc
 	+"macro"				SCFunction.NewMacro
-	+"macro2"				SCFunction.NewMacro
 	+"helper"				SCFunction.NewHelper
 	+"behaviour"			SCBehaviour.NewActual
 	+"actual"				SCBehaviour.NewActual

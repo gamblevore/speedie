@@ -116,7 +116,7 @@ struct Random
 		.shared.TimeSeed
 
 		macro SyntaxAccess
-			random.shared.float(...)
+			random.shared.float(*_)
 
 
 
