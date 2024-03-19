@@ -938,6 +938,7 @@ dispatch ClsCollectTable (CollectFunc)
 	+"setter"				SCFunction.NewHider
 	+"api"					SCFunction.NewFunc
 	+"macro"				SCFunction.NewMacro
+	+"macro2"				SCFunction.NewMacro
 	+"helper"				SCFunction.NewHelper
 	+"behaviour"			SCBehaviour.NewActual
 	+"actual"				SCBehaviour.NewActual

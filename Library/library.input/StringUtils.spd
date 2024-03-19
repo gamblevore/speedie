@@ -8,8 +8,8 @@ function PrintLine (|string| data="")
 	strprintline(Data)							// to disambiguate vs macro
 
 
-macro PrintLine
-	StrPrintline(_1.render) // not self-referential anymore.
+macro2 PrintLine
+	StrPrintline(_0.render) // not self-referential anymore.
 
 
 function StrPrintLine (|string?| data)
@@ -25,8 +25,8 @@ function ZalgoLine (|string| data)
 	printline data.zalgo
 
 
-macro ZalgoLine
-	Printline _1.render.zalgo
+macro2 ZalgoLine
+	Printline _0.render.zalgo
 
 
 function Print (|object| o)
@@ -318,13 +318,4 @@ function string.UnPrintable (|int|)
 
 function String.Spin (|int| f, |byte|)
 	return `|/-\`[f&3] // useful for printing "processing" things to stdout
-
-
-
-target debug2
-	helper PrintLine2Test
-		printline2("abc")
-
-	macro2 PrintLine2
-		StrPrintline(_0.render) // not self-referential anymore.
 

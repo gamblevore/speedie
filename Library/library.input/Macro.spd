@@ -42,7 +42,7 @@ function string.Macro (|macro!|)
 	return macro(self)
 
 
-macro string.Macro2 // doesnt work... sadly. not sure why
+macro2 string.Macro2
 	macro(–digest "_0")
 	
 
@@ -104,57 +104,6 @@ extend message
 	function AppendMacro (|Macro| M,  |array of message| prms=nil)
 		using self,  opt norefcounts
 		m.Source.MacroCopy(self, prms, self)
-		for r in prms
-			check (r is inserted)  (r, "Unused parameter to macro")
-
-
-
-////
-
-	helper MacroPrm2 (|message!| root,  |message?| prms,  |message!| dest,  |Message?|)
-		opt norefcounts
-		|| n = .name
-		|| c = n.First
-		if (c == '*') and (self == @brel)
-			|| f = .first
-			if f == "_" and @thg
-				for p in prms
-					if p isnt Inserted
-						dest <~ p.MacroAvoidCopy
-				return nil
-				// (first, secnd, A, B, C, D, E)
-			
-		if (c == '_')
-			if n == 1
-			if (n == 1) or n.IsInt(1) 
-				|| oop = prms[n.int|int|]		#expect (root, "Not enough params.")
-				|| f = .func
-				if f == @dot or @sdot or @str or @sstr or @char // anything except @thg?
-					return .MacroSame(oop)
-				return oop.MacroAvoidCopy
-			return message(self)
-		rz = Message(self)
-		.MacroCopy2(root, prms, rz)
-
-
-	helper MacroCopy2 (|Message| root,  |message?| prms,  |Message| dest)
-		opt norefcounts
-		for v in self
-			dest <~ v.MacroPrm2(root, prms, dest)
-
-
-	function BecomeMacro2 (|Macro| M,  |message?| prms=nil)
-		opt norefcounts
-		|| s = m.source
-			.clear
-			.func = s.func
-			.name = s.name
-			.appendmacro2(m, prms)
-	
-		
-	function AppendMacro2 (|Macro| M,  |message?| prms=nil)
-		using self,  opt norefcounts
-		m.Source.MacroCopy2(self, prms, self)
 		for r in prms
 			check (r is inserted)  (r, "Unused parameter to macro")
 

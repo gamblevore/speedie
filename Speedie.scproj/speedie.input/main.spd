@@ -1,9 +1,6 @@
 
 
 main // speedie main {
-	target debug3
-		|| x = "Abc".macro2
-	
 	compiler.SetupEnv
 	compiler.MiniTests
 	compiler.Main

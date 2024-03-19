@@ -271,11 +271,12 @@ class FastString {
 	function Mark (|int|)
 		cpp_wrapper
 	
-	function Grew (|int|m, |bool|)
+	function Grew (|int| m, |bool|)
 		cpp_wrapper
 
-	macro SyntaxAppend
-		_1.render(self)
+	macro2 SyntaxAppend
+		_1.render(_0)
+		
 
 	syntax Compare (|int| n, |bool|Aware, |int|)
 		return .streamlength - n

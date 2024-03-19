@@ -52,7 +52,11 @@ class SCParamArray
 			obj.render(fs)
 			|| ty = typeofexpr(obj, nil)
 				ty.render(fs)
-			
+	
+	function CopyArgs (|[message]|)
+		opt norefcounts
+		for s in self
+			rz <~ s
 	
 	function IsModule (|bool|)
 		return !.IsNotModule
