@@ -65,43 +65,41 @@ syntax access (|string| s, |SCObject|)
 
 
 
-function FindModuleMsg (|Message| where, |bool| DoErrors=true, |SCModule?|)
+function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule?|)
 	opt norefcounts
 	real self
 	
 	|| fn = where.func
 	if fn == @dot
 		require where.last(@emb)
-		self = .FindModuleMsg(where.first!, doerrors) #require
+		self = .FindModuleMsg(where.first!, Mode) #require
 	  else
 		expect (fn == @thg or @name) (where)
-	return .findmodule(where.name, where, doerrors)
+	return .findmodule(where.name, where, Mode)
 
 
-function scnode.FindClassMsg (|Message| where, |bool| errs=true,  |SCClass|)
-	// OK now what?
+function scnode.FindClassMsg (|Message| where, |SCNodeFindMode| Mode=0,  |SCClass|)
 	opt norefcounts
-	|| mod = .FindModuleMsg(where, errs)
+	|| mod = .FindModuleMsg(where, Mode)
 		|| C = mod.cls
 			return C
-		if errs
+		if mode isnt noerrors
 			error (where, "Expected a class but found module.")
 
 
-function FindClass (|String| name, |Message| where, |bool| errs=true,  |SCClass|)
+function FindClass (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0,  |SCClass|)
 	opt norefcounts
-	|| Mod = .FindModule(name, where, errs)
+	|| Mod = .FindModule(name, where, Mode)
 		if mod.cls
 			return mod.cls
-		if errs
+		if Mode isnt noerrors
 			error (where, "Expected a class but found module.")
 
 
-function FindModule (|String| name, |Message| where, |bool| DoErrors=true, |SCModule|)
+function FindModule (|String| name, |Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
 	opt norefcounts
 
 	if name ~= .name
-//		debugger // wowzers
 		return self as scmodule
 
 	|| Upon = self
@@ -109,9 +107,11 @@ function FindModule (|String| name, |Message| where, |bool| DoErrors=true, |SCMo
 		|| Obj = upon[ name ]
 		if Obj isa SCModule
 			return Obj
+		if mode is dontgoup
+			exit
 		upon = upon.parent
 		
-	if where and DoErrors
+	if where and (Mode isnt noerrors)
 		error (where, "Can’t find module: " + name)
 
 
@@ -139,10 +139,15 @@ function UpCheck (|string| name, |bool| LookUp=true, |SCObject|) {
 // so upcheck shouldn't work, if we are on a function, right?
 
 function TryAdd (|Message?| ErrPlace, |SCObject?| IncObj, |String| name)
-	if IncObj
-		expect (name.length inrange 64) ( ErrPlace, "Name should be 1-64 bytes long." )
-		.access := Dictionary.new
-		.tryaddsub(errplace, incobj, name.Lowercase)
+	real self
+	require IncObj
+	expect (name.length inrange 64) ( ErrPlace, "Name should be 1-64 bytes long." )
+	if (self isa scclass)
+		|| scls = incobj.class
+		if (scls == scclass or scmodule)
+			self = self.modul|scclass|
+	.access := Dictionary.new
+	.tryaddsub(errplace, incobj, name.Lowercase)
 
 	
 function TryAddSub (|Message| ErrPlace, |SCObject| IncObj, |String| name)
@@ -520,6 +525,11 @@ constants (
 	kPurposeHider=0x10000
 )
 
+flags (
+	NoErrors = 1
+	DontGoUp = 2
+)
+
 
 function LookUpDot (|String| name, |Message| exp, |SCNode| arg_space, |SCDecl| contains, |Message| side, |Object|)
 	opt norefcounts
@@ -827,36 +837,11 @@ function AutoCompleteKind (|string|)
 	return "unknown"
 
 
-//render DescribeStored
-//	for (B.ListLookup in self)
-//		fs <~ '\n'
-//		fs <~ B.ModuleType
-//		fs <~ ": "
-//		fs <~ B.name
-//
-//		for (b.access) (name)
-//			fs <~ '\n'
-//			fs <~ name
-//
-//		fs <~ '\n'
-
-
 iterator ListLookup
 	|| Curr = self
 	while (Curr)
 		yield Curr
 		Curr = Curr.parent
-
-
-//function SCModule.NonRoleModule (|SCNode|)
-//	opt norefcounts
-//	|| s = self
-//	while s
-//		|| cls = s.cls
-//		ifn cls and cls.isrole
-//			exit
-//		s = s.SuperMod
-//	return s
 
 
 
@@ -953,6 +938,9 @@ dispatch ClsCollectTable (CollectFunc)
 	+"linkage"				CppRefs.Linkage
 	+"pragma"				{ error (node) }
 
+//	+"class"				SCClass.NewInnerClass
+	+"role"					SCClass.NewInnerRole
+
 	+"initafter"			(SCModule.DoInitAfter)
 	+"ignore"				(DontRemove)
 	+"saveas"				(DontRemove)
@@ -974,3 +962,11 @@ datatype SCNodeInfo (int)
 		ExplicitExport
 		Visible
 
+
+datatype SCNodeFindMode (int)
+	flags
+		|SCNodeFindMode|
+		NoErrors = 1
+		DontGoUp = 2
+	syntax is (|SCNodeFindMode| m, |bool|)
+		return self & m

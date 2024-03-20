@@ -79,8 +79,8 @@ function scmodule.TryInit (|array of scmodule| req, |bool|)
 	opt norefcounts
 	for name in .initafter
 		name.expect(@thg)$
-		|| m = compiler.FindModule(name)$
-		require m.inited
+		|| m = compiler.findmodulemsg(name)
+		require m and m.inited
 
 	.inited = true
 	req <~ self

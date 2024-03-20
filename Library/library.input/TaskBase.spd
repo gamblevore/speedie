@@ -20,6 +20,8 @@ datatype TaskState (byte)
 		|TaskState| 
 		Started
 		Paused
+		HadErrors
+		Successful
 		Finished
 	syntax is (|TaskState| t, |bool|)
 		return self & t

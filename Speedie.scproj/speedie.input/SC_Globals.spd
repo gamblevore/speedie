@@ -52,7 +52,7 @@ function TypeOfSDot (ExprResolver)
 function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 	|| exp0 = exp.first!.unbra
 	|| Old = TypeOfExpr( exp0, name_space, side )									#require
-	|| New = ExtractDecl( exp.last!, name_space, declmode.TypeCast )					#require
+	|| New = ExtractDecl( exp.last!, name_space, declmode.TypeCast )				#require
 	// allow MOST typecasts, but NOT typecasts between struct instances...
 	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
 		error (exp, "Can’t cast between structs/carrays")

@@ -653,12 +653,12 @@ function CreateDisambiguation
 
 syntax access (|string| name, |SCClass|)
 	cpp_part FindClassName
-	return compiler.program.Findclass(name, nil, true)
+	return compiler.program.FindClass(name, nil)
 
 
 syntax access (|Message| name, |SCClass|)
 	if name
-		return compiler.program.FindClassmsg( name, true )
+		return compiler.program.FindClassMsg( name )
 
 
 function FindClassType (|message| n, |scdecl|)
@@ -670,12 +670,12 @@ function FindClassType (|message| n, |scdecl|)
 		return c.typenormal
 
 
-function FindModule (|string| name, |Message| where=nil, |bool| errs=true, |SCModule|)
-	return compiler.program.FindModule(name, where, errs)
+function FindModule (|string| name, |Message| where=nil, |SCNodeFindMode| Mode=0, |SCModule|)
+	return compiler.program.FindModule(name, where, Mode)
 
 
-function FindModule (|Message| where, |bool| errs=true, |SCModule|)
-	return compiler.program.FindModulemsg(where, errs)
+function FindModulemsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
+	return compiler.program.FindModulemsg(where, Mode)
 
 
 function CreateRoot

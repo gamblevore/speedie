@@ -264,10 +264,20 @@ function LoadSuperClass
 		if (.IsObject) and (self != TypeObject)
 			S = TypeObject
 	  else
-		|| thg = supc[@nil]							#require
-		S = Compiler[ thg ]							#require
+		|| thg = supc[@nil]								#require
+		if thg == @sdot
+			thg.func = @thg
+			S = .modul.findclassmsg( thg )
+		  elseif oldmod
+			debugger
+			S = oldmod.findclassmsg( thg )
+		  else
+			S = Compiler[ thg ]
 		
-		if (.FuncProto)
+		
+		if !S
+			0 //
+		  elseif (.FuncProto)
 			error						(supc, "Can't subclass this.")
 		  elseif (.isDataTypeonly)
 			check (S.isDataTypeonly)	(supc, "Datatypes can only subclass datatypes.")
@@ -792,13 +802,17 @@ function LoadClassType
 		
 
 
-function TryAddToProject
+function TryAddToProject 
+	opt norefcounts
 	require !.FuncProto
 	|| NameNode = .Source.first!
 	|| mod = Compiler.DisamClasses!
 	if NameNode == @dot		// load the modules first.
-		mod = compiler.FindModule(namenode.first!)	#require
+		mod = compiler.findmodulemsg(namenode.first!)	#require
+	  else
+		require .name != "task"
 
+	
 	mod.TryAdd( .SourceArg, .Modul, .Name )
 
 
@@ -947,7 +961,11 @@ module
 
 		Return SCFunction.NewFunc( node, name_space, ErrPlace )
 
-
+	
+	function NewInnerRole (CollectFunc)
+		if name_space isa scclass
+			return scclass.neuclass(node, name_Space.modul, errplace)
+	
 	function StoreExtend (CollectFunc)
 		Compiler.ExtendList <~ node
 		node.obj = SCImport.curr
@@ -983,7 +1001,7 @@ module
 		|| name = Dot[@nil]							#require
 		expect (name == @thg or @name) (name)
 
-		M := Compiler.FindModule(name)
+		M := Compiler.findmodulemsg(name)
 		require m
 		dot.clear
 		dot.func = @thg
@@ -1012,7 +1030,7 @@ module
 	function ProcessExtendOld (|Message| c, |bool| PreferClass)
 		|| name = c[@thg]
 			|| arg  = c.last(@arg)
-			|| M = Compiler.FindModule(name)
+			|| M = Compiler.findmodulemsg(name)
 			if m and arg
 				|SCNode| B = M
 				|| cls = m.cls

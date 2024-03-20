@@ -10,6 +10,7 @@ function CollectAll
 	require T
 	for ch in compiler.taskstodo
 		|| P = ch.obj|scnode|!
+		debugat 0
 		if P == Compiler.program
 			P = T.Modul
 		  elseif p isa scclass
@@ -20,7 +21,7 @@ function CollectAll
 
 
 function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
-//	debugger
+	opt norefcounts
 	|| name = node[@thg]
 	|| fields = name.Next(@nil)
 	require name and fields
@@ -33,10 +34,10 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 	|| arg = fields.next(@arg)		#require
 	arg.takeallfrom(fields)
 	using node
-	fields <~ (@thg, "task")
+	fields <~ (@sdot, "task")
 	|| con = "constructor () {super.constructor(&run, –taskvars)}"~digest
 	arg.BuildTask(con!)
-	node.name = "class" 
+	node.name = "role" 
 
 	|| task = SCClass.NeuRole(node, name_space, node)|scmodule|
 		task.cls!.IsRole = 2
@@ -76,7 +77,7 @@ function Message.BuildRunTask (|message| con, |message| prms, |int|)
 	rz = 2
 	ifn f == @thg or @dot
 		|| brah = @bra.msg
-		brah <~ (@thg, "prototype")
+		brah <~ (@thg, "task")
 		.first = brah
 		rz = 1
 	
@@ -85,7 +86,7 @@ function Message.BuildRunTask (|message| con, |message| prms, |int|)
 
 function Message.BuildTask (|message| con)
 	opt norefcounts
-	|message| prms = con
+	|| prms = con
 	|| State = 0
 	for ch in self
 		if ch == @decl
@@ -96,18 +97,23 @@ function Message.BuildTask (|message| con)
 			state = ch.BuildRunTask(con, prms)					#require
 	
 	expect (state) (self, "Missing 'run' statement")
-	
 	require state == 1
-	|| Caller = macros.TaskCaller.run(prms, @thg + "prototype")
-	|| CallPrms = Caller.FlatLast.parent
+
+	.appendmacro(sctasks.argh, [prms])
+	|| callprms = .flatlast
+	callprms <~ (@thg, "self")
 	for p in prms
 		|| ty = p.second
 			callprms <~ ty.copy
-	|| proto = .msg(@tmp, "prototype")
-	proto <~ (@thg, "prototype")
-	prms = prms.copy
-	prms.first = newdecl("task", "self")
-	proto <~ prms
-	self <~ Caller
+	
+	// printline .parent
+	// debugger
+	
+|| argh = `
+	role task (task)
+		prototype prototype (^"_0")
+		syntax call (^"_0")
+			return (._func|prototype|)()
+`.macro
 
 }

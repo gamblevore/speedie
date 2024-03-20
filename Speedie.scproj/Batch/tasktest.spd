@@ -1,0 +1,38 @@
+#!/usr/local/bin/spd
+
+
+//main
+//	|| xxx = task.lessthan("a", 5, "c")
+//	|| z = (xxx)(7)
+//	printline z
+//
+//
+//task LessThan (|string| a, |int| b, |string| c)
+//	run (|int| i, |bool|)
+//		return i < .b
+
+main
+	sctasks.run
+
+
+module SCTasks
+	function run
+		|| xxx = lessthan("a", 5, "c")
+		|| z = LessThan.abc(xxx, 1)
+		|| yyy = task.lessthan2(1.2)
+		|| w = LessThan.abc(yyy, 1)
+		
+	task LessThan (|string| a, |int| b, |string| c)
+		run (|int| i, |bool|)
+			return i < .b
+		
+		module
+			function abc (lessthan) 
+				return (self)(i)
+
+
+task LessThan2 (|float| f)
+	run (sctasks.lessthan)
+		return i*2.1 < .f
+
+

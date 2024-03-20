@@ -254,6 +254,7 @@ function FuncDecls
 
 function Transform ()
 	opt norefcounts
+	//if self is constructor
 	require !.isMacro
 	scfunction.CurrFunc = self
 	scmodule.curr = .parent as scmodule
@@ -567,13 +568,13 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 
 function DeclsPrototypeClass (|Message| ch0)
 	opt norefcounts
-	|| p = .parent as scmodule						#require
-	|| fpType = p.FindClassMsg(ch0) 				#require
+	|| p = .parent as scmodule								#require
+	|| fpType = p.FindClassMsg(ch0) 						#require
 	if !fptype.funcproto
-		|| task_proto = fptype.modul["prototype"]
-		if (task_Proto isa scmodule)
-			|| cls = task_proto.cls
-				fptype = cls
+		|| task = fptype.modul.FindClass("task", nil, scnode.DontGoUp)			// OK... so what do we do now?
+			fpType = task
+		|| task_proto = fptype.modul.findclass("prototype", nil, scnode.DontGoUp)
+			fptype = task_proto
 		
 	.DeclsProtoCleanup(fpType, ch0, false, false)
 	.DeclsProtoTypeAdd(fpType)

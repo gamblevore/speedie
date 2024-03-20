@@ -234,7 +234,7 @@ function compiler.FindModuleOrClass (|message| mod, |bool| retry, |SCNode|)
 	opt norefcounts
 	if mod == @name and "main"
 		return compiler.program
-	|| Module = .FindModule(mod, false)		#require
+	|| Module = .findmodulemsg(mod, SCNodeFindMode.noerrors)		#require
 	if (mod == @thg)
 		rz = module.cls
 		require rz or retry
