@@ -70,11 +70,12 @@ class SCBehaviour (SCNode)
 	
 	
 	function SCClass.InterfaceFor (|string| name, |message| errplace, |SCClass|)
+		opt norefcounts
 		|SCModule| Result
 		for (C.upwards in self)
-			|| B = C.behaviour								  #expect errplace
-			|| I = B.interfaces[name]
-				Result = Result.OneOrOther(I)
+			|| B = C.behaviour
+				|| I = B.interfaces[name]
+					Result = Result.OneOrOther(I)
 
 		expect result (ErrPlace, "No interface found for this behaviour")
 		return Result.cls

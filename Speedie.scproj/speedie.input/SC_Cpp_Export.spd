@@ -443,7 +443,7 @@ function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 	while (b)
 		for (M in b.interfaces)
 			|| s = m.name.InterfaceToBehaviour
-			|| fn = cls.BestBehaviourFor(s)					#expect (cls.source, "Cant find behaviour '$s' on class ${cls.name}")
+			|| fn = cls.BestBehaviourFor(s)					#expect (cls.source, cls.name + " doesn't have behaviour: " + s)
 			|| BaseClass = cls.InterfaceForBehaviour(fn)	#require
 			if (M.IsRequiredInterface and !cls.Behaviour![s])
 				|| msg = "Missing behaviour on class: " + cls.name
