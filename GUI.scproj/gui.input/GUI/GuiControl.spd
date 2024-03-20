@@ -471,6 +471,45 @@ class GUIControl (ringtree)
 			r2.refsanity
 		
 
+	
+	task GUITask (|GUIControl| Upon,  |date| StartTime,  |Date| EndTime)
+		|object?| 			Param
+		|ivec4| 			Rect	
+		
+		function RunTask (|bool|)
+			opt NoRefCounts
+			require .upon.parent
+			|| d = date()
+			if d >= .EndTime
+				require .state isnt finished
+				.State |= TaskState.Finished
+			rz = (.func)(.upon, self)
+			.State |= TaskState.Started
+			if .state is Finished
+				rz = false
+		
+		run (|bool|)
+			opt NoRefCounts
+			require .upon.parent
+			|| d = date()
+			if d >= .EndTime
+				require .state isnt finished
+				.State |= TaskState.Finished
+			rz = (.func)(.upon, self)
+			.State |= TaskState.Started
+			if .state is Finished
+				rz = false
+
+
+function Window.RunTasks (|date| now)
+	opt norefcounts
+	|| i = 0
+	while (|| p = .Tasks[i])
+		if (p.starttime < now) and !p.runtask
+			.Tasks.FastRemove(i)
+		  else
+			i++
+
 
 helper image.ControlClip (assigns:|GuiControl| G)
 	.controlclip = g.lastrect

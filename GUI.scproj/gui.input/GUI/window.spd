@@ -3,28 +3,28 @@
 class Window (GUIControl)
 	linkage
 		cpp_part Win
-	|bool|							FocusWasSet
-	|bool|							AlphaSubtle
-	|bool|							IsDialog
-	|bool|							FlashSelf
-	|bool|							BlockRecurseKeyDown
-	|bool| 							IsLiveAction
-	|GUIControl?|					Focus
-	|Guicontrol?|					InnerFocus
-	|GUIControl?|					CurrMouseDown
-	|GuiControl?|					SelBeforeMouseDown
-	|guicontrol?|					ToolTipControl // probably better to remove this
-	|guicontrol?|					DroppingInto
-	|guicontrol?|					MouseIsOver
-	|guicontrol?|					FocusAttempt
-	|InlineEditor|					InlineEditorPlace
-	|GUIPasteEvent?|				OnPaste
-	|GUICopyEvent?|					OnCopy
-	|GUIMouseMoveEvent?|			OnMouseMove
-	|array of guitask| 				Tasks
-	|object?|						ReturnValue
-	|date|							AlphaFader
-	|date|							CreatedDate
+	|bool|								FocusWasSet
+	|bool|								AlphaSubtle
+	|bool|								IsDialog
+	|bool|								FlashSelf
+	|bool|								BlockRecurseKeyDown
+	|bool| 								IsLiveAction
+	|GUIControl?|						Focus
+	|Guicontrol?|						InnerFocus
+	|GUIControl?|						CurrMouseDown
+	|GuiControl?|						SelBeforeMouseDown
+	|guicontrol?|						ToolTipControl // probably better to remove this
+	|guicontrol?|						DroppingInto
+	|guicontrol?|						MouseIsOver
+	|guicontrol?|						FocusAttempt
+	|InlineEditor|						InlineEditorPlace
+	|GUIPasteEvent?|					OnPaste
+	|GUICopyEvent?|						OnCopy
+	|GUIMouseMoveEvent?|				OnMouseMove
+	|array of task.GUITask|				Tasks
+	|object?|							ReturnValue
+	|date|								AlphaFader
+	|date|								CreatedDate
 	
 	
 	constructor

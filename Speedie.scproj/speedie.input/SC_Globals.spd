@@ -415,6 +415,11 @@ function scdecl.ExtractAmountSub (|Message| Prms, |SCNode| name_space, |scdecl|)
 function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |SCDecl?|)
 	// a bit recursive!
 	|| f = c.func
+	if (f == @Thg)		// usual case
+		if c == "nil" // nice
+			return typevoid
+		return Compiler.FindClassType( c )
+	
 	if (f == @Decl)
 		Return ExtractDecl( c.first!, name_space, purpose )
 	
@@ -427,16 +432,11 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 		
 	if (f == @sthg) and (c == "...")
 		return name_space.RequireContained( c )
-
+		
 	if (f == @list) and !c.hasany
 		|| p = c.UpToType    // abc|()--|
 			return typeofexpr(p.first, name_space)				
 			
-	if (f == @Thg)		// usual case
-		if c == "nil" // nice
-			return typevoid
-		return Compiler.FindClassType( c )
-	
 	if (c == @Acc)		// |Byte[10]| TenBytes
 		|| Prms = c.second
 		if prms.HasAny
@@ -457,8 +457,6 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 	
 	if (f == @Arel or @brel)
 		|| R = ExtractDecl( c.first!, name_space, purpose )				#require
-		if (C == "--")
-			return R.MakeBorrowed(c.uptotype != nil)
 		if C == "~"
 			return R.MakeDataObject(name_space, purpose)
 		if (C == "&")											// pointer
@@ -469,6 +467,8 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 			if R.StatedReal and c isnt inserted
 				deprecate (c, "Already assumed real. Only '?' needs to be specified.")
 			return R.MakeNewReal
+		if (C == "--")
+			return R.MakeBorrowed(c.uptotype != nil)
 		if (C.name)												// emptyname = compiler internal
 			error (c)
 		return r
@@ -483,6 +483,10 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 		|| d = ExtractDecl(c.first!, name_Space, purpose)$
 		(d is compilercreated)
 		return d
+
+	if (f == @dot)
+		return Compiler.FindClassType( c )
+		
 
 	rz = SCDecl(TypeVoid_!)
 	|| ErrCount = stderr.errorCount

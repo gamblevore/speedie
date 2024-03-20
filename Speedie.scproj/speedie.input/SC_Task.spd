@@ -6,18 +6,17 @@ module SCTasks {
 
 function CollectAll
 	opt norefcounts
-	|| T = typetask
+	|| T = typetask		// now what?
 	require T
-	for ch in compiler.taskstodo
-		|| P = ch.obj|scnode|!
-		debugat 0
+	for ch in compiler.TasksTodo
+		|| P = ch.obj|SCNode|!
 		if P == Compiler.program
 			P = T.Modul
-		  elseif p isa scclass
-			p = p.modul|scclass|
-		|| found = newtaskActual(ch, P)
+		  elseif p isa SCClass
+			p = p.modul|SCClass|
+		|| found = NewTaskActual(ch, P)
 			found.parent = p
-			P.tryadd(ch, found, found.name)
+			P.TryAdd(ch, found, found.name)
 
 
 function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
@@ -32,14 +31,14 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 		name.next = fields
 	
 	|| arg = fields.next(@arg)		#require
-	arg.takeallfrom(fields)
+	arg.TakeAllFrom(fields)
 	using node
 	fields <~ (@sdot, "task")
 	|| con = "constructor () {super.constructor(&run, –taskvars)}"~digest
 	arg.BuildTask(con!)
 	node.name = "role" 
 
-	|| task = SCClass.NeuRole(node, name_space, node)|scmodule|
+	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
 		task.cls!.IsRole = 2
 	return task
 
@@ -99,7 +98,7 @@ function Message.BuildTask (|message| con)
 	expect (state) (self, "Missing 'run' statement")
 	require state == 1
 
-	.appendmacro(sctasks.argh, [prms])
+	.AppendMacro(sctasks.argh, [prms])
 	|| callprms = .flatlast
 	callprms <~ (@thg, "self")
 	for p in prms
