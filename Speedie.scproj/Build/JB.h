@@ -113,6 +113,8 @@ typedef uint SCBlockage;
 
 typedef uint SCDeclInfo;
 
+typedef int SCNodeFindMode;
+
 typedef int SCNodeInfo;
 
 typedef byte SCNodeType;
@@ -120,6 +122,8 @@ typedef byte SCNodeType;
 typedef int SizeInt;
 
 typedef byte Syntax;
+
+typedef byte TaskState;
 
 typedef int TerminalColor;
 
@@ -231,8 +235,6 @@ struct ContainerStruct2;
 
 struct ContainerStruct;
 
-struct Object_Behaviour;
-
 struct ByteMap_Behaviour;
 
 struct Charset_Behaviour;
@@ -305,19 +307,13 @@ struct xC2xB5Func_Behaviour;
 
 struct Array_Behaviour;
 
-struct String_Behaviour;
-
 struct Dictionary_Behaviour;
 
 struct FastStringCpp_Behaviour;
 
 struct File_Behaviour;
 
-struct FastString_Behaviour;
-
 struct MaterialsLol_Behaviour;
-
-struct FastString_Behaviour;
 
 struct Process_Behaviour;
 
@@ -329,15 +325,9 @@ struct SavingTest_Behaviour;
 
 struct StringShared_Behaviour;
 
-struct String_Behaviour;
-
 struct StringZeroTerminated_Behaviour;
 
 struct xC2xB5Func1_Behaviour;
-
-struct File_Behaviour;
-
-struct File_Behaviour;
 
 struct MessageID_Behaviour;
 
@@ -361,12 +351,6 @@ struct Task_Behaviour;
 
 struct Error_Behaviour;
 
-struct Message_Behaviour;
-
-struct Task_Behaviour;
-
-struct Message_Behaviour;
-
 struct SCArg_Behaviour;
 
 struct SCBehaviour_Behaviour;
@@ -376,8 +360,6 @@ struct SCClass_Behaviour;
 struct SCFunction_Behaviour;
 
 struct SCModule_Behaviour;
-
-struct Message_Behaviour;
 
 struct JB_Object;
 
@@ -479,8 +461,6 @@ struct JB_Error;
 
 struct Message;
 
-struct Task;
-
 struct Message;
 
 struct SCArg;
@@ -550,8 +530,6 @@ typedef void (*FP_fpDestructor)(JB_Object* self);
 typedef void (*FP_fpMsgRender)(Message* self, FastString* fs);
 
 typedef void (*FP_fpMsgRenderCpp)(Message* self, FastStringCpp* fs);
-
-typedef bool (*LessThan_prototype)(Task* self, int i);
 
 //// HEADER Proj.h
 
@@ -1129,15 +1107,6 @@ JBClass ( SpdProcess , ShellStream ,
 	ProcessMode Mode;
 );
 
-struct Task_Behaviour: RingTree_Behaviour {
-};
-
-JBClass ( Task , RingTree , 
-	void* _Func;
-	byte _ObjectCount;
-	int64 _Local[9];
-);
-
 struct Error_Behaviour: Message_Behaviour {
 };
 
@@ -1370,13 +1339,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[1899])
+#define kJB__ErrorColors_bold (JB_LUB[1897])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1900])
-#define kJB__ErrorColors_good (JB_LUB[1901])
-#define kJB__ErrorColors_normal (JB_LUB[1902])
-#define kJB__ErrorColors_underline (JB_LUB[1901])
-#define kJB__ErrorColors_warn (JB_LUB[1903])
+#define kJB__ErrorColors_error (JB_LUB[1898])
+#define kJB__ErrorColors_good (JB_LUB[1899])
+#define kJB__ErrorColors_normal (JB_LUB[1900])
+#define kJB__ErrorColors_underline (JB_LUB[1899])
+#define kJB__ErrorColors_warn (JB_LUB[1901])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1435,7 +1404,6 @@ extern Macro* SC__Macros_MainArgBasicReq;
 extern Macro* SC__Macros_MainArgDefault;
 extern Macro* SC__Macros_MainArgNoNE;
 extern Macro* SC__Macros_MultiDecr;
-extern Macro* SC__Macros_TaskCaller;
 extern Macro* SC__Macros_WhileDecl;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
@@ -1504,6 +1472,7 @@ extern int SC__SC_UniqueNum;
 extern Message* SC__SCStrings_RenderFinish;
 extern Message* SC__SCStrings_RenderInsides;
 extern Message* SC__SCStrings_RenderNewParams;
+extern Macro* SC__SCTasks_argh;
 extern Dictionary* SC__Errors_IgnoredBranches;
 extern Dictionary* SC__SC_Targets_Items;
 #define kJB__Terminal_Black (30)
@@ -1548,7 +1517,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1904])
+#define kJB_codesign_native (JB_LUB[1902])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1562,7 +1531,7 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitOr (JB_LUB[1353])
+#define kJB_kBitOr (JB_LUB[1350])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1577,7 +1546,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[1905])
+#define kJB_kSaverStart1 (JB_LUB[1903])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -2020,6 +1989,9 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_TypeImprove (128)
 #define kSC__SCDeclInfo_UpgradeableContained (32)
 #define kSC__SCDeclInfo_UsedByCode (256)
+#define kSC__SCNodeFindMode_DontGoUp (2)
+#define kSC__SCNodeFindMode_LargestFlag (0)
+#define kSC__SCNodeFindMode_NoErrors (1)
 #define kSC__SCNodeInfo_ExplicitExport (0)
 #define kSC__SCNodeInfo_Visible (1)
 #define kSC__SCNodeType_DataType (2)
@@ -2030,6 +2002,12 @@ extern Array* SC__NilReason_values;
 #define kSC__SCNodeType_Struct (4)
 extern int JB__Syx_CurrFuncID;
 extern int JB__Syx_MaxFuncID;
+#define kJB__TaskState_Finished (16)
+#define kJB__TaskState_HadErrors (4)
+#define kJB__TaskState_LargestFlag (31)
+#define kJB__TaskState_Paused (2)
+#define kJB__TaskState_Started (1)
+#define kJB__TaskState_Successful (8)
 #define kSC__TM_BaseShrinkSpeed (0.0005f)
 #define kSC__TM_Halfmap (6148914691236517205)
 #define kSC__TM_MOUSEBUTTONDOWN (1025)
@@ -2203,12 +2181,15 @@ extern SCIterator* SC__Iter_carray;
 extern SCIterator* SC__Iter_pointer;
 extern bool SC__Base_ConstantsLoadingOverride;
 extern bool SC__Base_CurrVisibility;
+#define kSC__Base_DontGoUp (2)
 #define kSC__Base_kPurposeAddress (0)
 #define kSC__Base_kPurposeDot (2)
 #define kSC__Base_kPurposeFunc (1)
 #define kSC__Base_kPurposeHider (65536)
 #define kSC__Base_kPurposeVar (3)
 #define kSC__Base_kPurposeVarDecl (4)
+#define kSC__Base_LargestFlag (0)
+#define kSC__Base_NoErrors (1)
 extern SpdProcess* JB__Proc_Parent;
 extern byte JB__Err_AutoPrint;
 extern Array* JB__Err_CurrSource;
@@ -2358,7 +2339,7 @@ SCDecl* SC_Comp__FindClassType(Message* n);
 
 SCFunction* SC_Comp__FindFunction(JB_String* Name);
 
-SCModule* SC_Comp__FindModuleWithMsgBool(Message* where, bool errs);
+SCModule* SC_Comp__FindModulemsg(Message* where, SCNodeFindMode Mode);
 
 SCNode* SC_Comp__FindModuleOrClass(Message* mod, bool retry);
 
@@ -2964,11 +2945,13 @@ int SC_SCStrings__InitCode_();
 // SCTasks
 void SC_SCTasks__CollectAll();
 
+int SC_SCTasks__Init_();
+
+int SC_SCTasks__InitCode_();
+
 SCNode* SC_SCTasks__NewTask(Message* node, SCNode* name_space, Message* ErrPlace);
 
 SCNode* SC_SCTasks__NewTaskActual(Message* node, SCNode* name_space);
-
-void SC_SCTasks__Test();
 
 
 
@@ -4280,6 +4263,11 @@ SCDeclInfo SC_SCDeclInfo_Set(SCDeclInfo self, SCDeclInfo d, bool b);
 
 
 
+// SCNodeFindMode
+bool SC_SCNodeFindMode_SyntaxIs(SCNodeFindMode self, SCNodeFindMode m);
+
+
+
 // SCNodeInfo
 
 
@@ -4328,6 +4316,9 @@ int JB_Syx__InitCode_();
 
 Syntax JB_Syx__StdNew(FP_fpMsgRender msg, JB_String* name, JB_String* LongName);
 
+
+
+// TaskState
 
 
 // TerminalColor
@@ -4635,9 +4626,6 @@ void SC_fn_asm__InitTable();
 
 
 // fpMsgRenderCpp
-
-
-// prototype
 
 
 // JB_ASMFuncState
@@ -5157,9 +5145,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_ContainerStruct
 
 
-// JB_AppArgument_Behaviour
-
-
 // JB_ByteMap_Behaviour
 
 
@@ -5268,9 +5253,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_Array_Behaviour
 
 
-// JB_BigNum_Behaviour
-
-
 // JB_Dictionary_Behaviour
 
 
@@ -5280,13 +5262,7 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_File_Behaviour
 
 
-// JB_JBin_Behaviour
-
-
 // JB_MaterialsLol_Behaviour
-
-
-// JB_OutputFile_Behaviour
 
 
 // JB_Process_Behaviour
@@ -5304,19 +5280,10 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_StringShared_Behaviour
 
 
-// JB_StringThatWasReadSafely_Behaviour
-
-
 // JB_StringZeroTerminated_Behaviour
 
 
 // JB_µFunc1_Behaviour
-
-
-// JB_ExistingFile_Behaviour
-
-
-// JB_JeeboxFile_Behaviour
 
 
 // JB_MessageID_Behaviour
@@ -5352,15 +5319,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_Error_Behaviour
 
 
-// JB_FileArchive_Behaviour
-
-
-// JB_LessThan_Behaviour
-
-
-// JB_MessageRoot_Behaviour
-
-
 // JB_SCArg_Behaviour
 
 
@@ -5374,9 +5332,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_SCModule_Behaviour
-
-
-// JB_config_Behaviour
 
 
 // JB_Object
@@ -6923,7 +6878,7 @@ SCDecl* SC_Msg_BraDeclfind(Message* self);
 
 void JB_Msg_BRel__(Message* self, FastString* fs);
 
-Message* SC_Msg_BuildRunTask(Message* self, Message* con);
+int SC_Msg_BuildRunTask(Message* self, Message* con, Message* prms);
 
 void SC_Msg_BuildTask(Message* self, Message* con);
 
@@ -7693,8 +7648,6 @@ bool SC_Decl_CanWrap(SCDecl* self);
 
 SCDecl* SC_Decl_CheckMath(SCDecl* self, Message* exp);
 
-SCDecl* SC_Decl_ClassActReplace(SCDecl* self, SCClass* cls);
-
 bool SC_Decl_ConstCheck(SCDecl* self, Message* ln, Message* RN, SCDecl* rc);
 
 bool SC_Decl_ConstInRange(SCDecl* self, Message* RN, SCDecl* rt);
@@ -8028,15 +7981,15 @@ Message* SC_Base_DiissplayObj(SCNode* self, Message* rz);
 
 bool SC_Base_ExpectModule(SCNode* self, Message* errplace);
 
-SCClass* SC_Base_FindClass(SCNode* self, JB_String* name, Message* where, bool errs);
+SCClass* SC_Base_FindClass(SCNode* self, JB_String* name, Message* where, SCNodeFindMode Mode);
 
-SCClass* SC_Base_FindClassMsg(SCNode* self, Message* where, bool errs);
+SCClass* SC_Base_FindClassMsg(SCNode* self, Message* where, SCNodeFindMode Mode);
 
 Message* SC_Base_FindCppWrapper(SCNode* self, Message* place, bool isclass);
 
-SCModule* SC_Base_FindModule(SCNode* self, JB_String* name, Message* where, bool DoErrors);
+SCModule* SC_Base_FindModule(SCNode* self, JB_String* name, Message* where, SCNodeFindMode Mode);
 
-SCModule* SC_Base_FindModuleMsg(SCNode* self, Message* where, bool DoErrors);
+SCModule* SC_Base_FindModuleMsg(SCNode* self, Message* where, SCNodeFindMode Mode);
 
 bool SC_Base_FindVis(SCNode* self, Message* c);
 
@@ -8168,10 +8121,6 @@ void JB_Proc__InitOwner();
 
 
 // JB_Task
-Task* JB_Task_Constructor(Task* self, void* fn, int Objs);
-
-void JB_Task_Destructor(Task* self);
-
 
 
 // JB_Error
@@ -8238,15 +8187,6 @@ void JB_Err__SourceRemove();
 
 
 // JB_FileArchive
-
-
-// JB_LessThan
-Task* SC_LessThan_Constructor(Task* self, JB_String* a, int b, JB_String* c);
-
-bool SC_LessThan_run(Task* self, int i);
-
-bool SC_LessThan_SyntaxCall(Task* self, int i);
-
 
 
 // JB_MessageRoot
@@ -8506,6 +8446,8 @@ SCNode* SC_Class__NeuClass(Message* node, SCNode* name_space, Message* ErrPlace)
 SCClass* SC_Class__NeuClassSub(Message* node, SCNode* parent, Message* ErrPlace, JB_String* ForInterface, SCNodeType base);
 
 SCNode* SC_Class__NeuRole(Message* node, SCNode* name_space, Message* ErrPlace);
+
+SCNode* SC_Class__NewInnerRole(Message* node, SCNode* name_space, Message* ErrPlace);
 
 SCNode* SC_Class__NewStruct(Message* node, SCNode* name_space, Message* ErrPlace);
 
@@ -9210,7 +9152,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1869])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1867])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
