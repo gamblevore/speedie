@@ -1655,22 +1655,18 @@ function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
 		D.Default = rz
 
 
-function SCClass.DotTaskProperty (|Message| dot, |scdecl| decl, |scdecl|)
+function SCClass.DotTaskProperty (|Message| dot, |SCDecl| decl, |scdecl|)
 	opt norefcounts
-	expect  (decl.typesuffers or decl.type.size <= 8)  (dot, "Too big. Upgrade this compiler feature?")
+	expect  (decl.TypeSuffers or decl.type.size <= 8)  (dot, "Too big. Upgrade this compiler feature?")
 	
-	|| var = dot.first
-	|| arr = var.next
-		require arr.expect(@emb)
 	|| src = decl.source					#expect (dot, errorreceiver.nonfatal)
-	if !arr
-		arr = dot.msg(@emb)
+	|| var = dot.first
+	macro.TmpPrms <~ var
+	macro.TmpPrms <~ src.indent|int|.msg
+	macro.TmpPrms <~ decl.WriteVerySimpleType
+	dot.BecomeMacro(macros.TaskAccess, macro.TmpPrms)
+	macro.TmpPrms.clear
 	
-	dot.func = @acc
-	arr.become(@arr)
-	|| num = arr.msg(@num, src.indent|int|.render)
-	|| InnerDot = var!.wrapwith(@dot, "_Local")
-	innerdot <~ @emb
 	dot.obj = decl
 	// allow left-side casting!!! :D just C++ can hook it and rook it nicely
 	return decl

@@ -508,11 +508,6 @@ RingTree* JB_Ring_Constructor( RingTree* self, RingTree* Parent ) {
 
 void JB_Ring_Destructor( RingTree* self ) {
 	RingTree* Curr = self->Child;
-	
-	// if it's got a prev...
-		// it has either got a parent (so its dispose)
-		// it it doesnt               (so its a weaklist destructor, but check for the refcount)
-	
 	while (Curr) {
 		RingTree* Next = Curr->Next;
 		RingOwnForDeref_( Curr );
@@ -524,8 +519,6 @@ void JB_Ring_Destructor( RingTree* self ) {
 		RingOwnForDeref_( self );
 		JB_SafeDecr( self );
 	}
-	// weaklist can just decrement an existing node?/?
-	
 }
 
 }

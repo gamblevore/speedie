@@ -684,28 +684,27 @@ class SCDecl (SCNamed) {
 		
 
 	function WriteSimpleType (|Message|)
-		|| name = .type.Name
-		rz = @Thg + name
+		opt norefcounts
+		rz = .writeverysimpletype
+		if self is borrowed
+			rz = rz.wrapwith(@arel, "--")
+		if .TypeSuffers and .nilstated
+			if .StatedOptional
+				rz = rz.wrapwith(@brel, "?")  // «brel "?", rz »
+			  elseif .StatedReal and platform.isdebug
+				rz = rz.wrapwith(@brel, "!")  // «brel "!", rz »
+
+
+	function WriteVerySimpleType (|Message|)
+		rz = @Thg + .type.Name
 		for (.pointercount|int|)
-			rz = «Brel "&", rz »
+			rz = rz.wrapwith(@Brel, "&")
 
 		if (.IsCArray)
-			rz = «acc 
-				rz
-				«arr
-					«num .c_array »
-				»
-			»
-		if self is borrowed
-			rz = «arel "--", rz »
-		if .TypeSuffers and .nilstated
-			if .Statedoptional
-				rz = «brel "?", rz »
-			  elseif .StatedReal and platform.isdebug
-				rz = «brel "!", rz »
-				
-	
-	
+			rz = rz.wrapwith(@acc)
+			rz.msg(@arr) <~ .c_array
+
+
 	function CreateSimpleTypeCast (|Message!| exp, |Message|)
 		|| Curr = exp
 		While (curr == @bra)

@@ -76,7 +76,7 @@ extend message
 				if f == @dot or @sdot or @str or @sstr or @char // anything except @thg?
 					return .MacroSame(oop)
 				return oop.MacroAvoidCopy
-			return message(self)
+			// return message(self)
 		rz = Message(self)
 		.MacroCopy(root, prms, rz)
 

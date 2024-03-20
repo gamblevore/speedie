@@ -5,7 +5,7 @@ main
 	sctasks.run
 	|| xxx = task.lessthan3("a", 5, "c")
 	|| z = (xxx)(7)
-	printline z
+	"z is: ${z.render}"
 
 
 task LessThan3 (|string| a, |int| b, |string| c)
@@ -19,11 +19,12 @@ module SCTasks
 		|| z = LessThan.abc(xxx, 1)
 		|| yyy = task.lessthan2(1.2)
 		|| w = LessThan.abc(yyy, 1)
-		printline z
-		printline w
+		"w is: ${w.render}"
+
 		
 	task LessThan (|string| a, |int| b, |string| c)
 		run (|int| i, |bool|)
+			cpp_part TaskTest
 			return i < .b
 		
 		module
@@ -34,5 +35,4 @@ module SCTasks
 task LessThan2 (|float| f)
 	run (sctasks.lessthan)
 		return i*2.1 < .f
-
 

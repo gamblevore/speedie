@@ -19,6 +19,8 @@ module Macros {
 }".macro
 
 
+|| TaskAccess = `*((&_0._local[_1])|&_2|)`.macro
+
 || MultiDecr = "JB_DecrMulti(_0, _1)".macro
 || ConstructorNew = "if self == nil: self = JB_NewClass(_0)|_0|".macro
 || MainArgBasic      = `|| _0 =  _1.MainArg(_2, "_0"),           `.macro

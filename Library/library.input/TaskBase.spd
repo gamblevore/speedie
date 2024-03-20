@@ -1,18 +1,20 @@
 
 
 class Task (RingTree)
-	|&nil|				_Func
+	|&nil|				_func
+	|int64[9]| 			_local
 	|byte|				_ObjectCount
 	|taskstate| 		State
-	|int64[9]| 			_Local
 	
 	constructor (|&nil| fn, |int| Objs)
 		._Func = fn
 		._ObjectCount = Objs
+		for i in 9
+			._local[i] = 0
 	
 	destructor
 		for (i in ._ObjectCount|int|)
-			jb_decr(._Local[i]|object|) // noice
+			jb_decr(._local[i]|object|) // noice
 
 	
 datatype TaskState (byte)
@@ -23,6 +25,7 @@ datatype TaskState (byte)
 		HadErrors
 		Successful
 		Finished
+	
 	syntax is (|TaskState| t, |bool|)
 		return self & t
 

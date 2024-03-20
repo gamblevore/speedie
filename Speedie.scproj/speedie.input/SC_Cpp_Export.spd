@@ -1010,6 +1010,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 	
 	function C_RenderAcc (fpMsgRenderCpp) // name, params
+		opt norefcounts
 		.first!.Export(fs)
 		fs <~ '['
 		.second.first!.Export(fs)
@@ -1073,7 +1074,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		opt norefcounts
 		|| obj = .DotMustBeProperty						#require
 		|| ch = .first!
-
+		
 		if (ch.obj isa SCModule)
 			obj.exportName.safe(fs)
 
@@ -1129,6 +1130,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderDcl (fpMsgRenderCpp)
+		opt norefcounts
 		|| name = .GetDclName!
 		|| d = name.AsDecl				#expect
 		WriteDecl( d, fs, DeclsDefault(.last) )

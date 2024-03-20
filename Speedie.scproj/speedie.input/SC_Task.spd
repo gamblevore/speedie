@@ -105,9 +105,7 @@ function Message.BuildTask (|message| con)
 	for p in prms
 		|| ty = p.second
 			callprms <~ ty.copy
-	
-	// printline .parent
-	// debugger
+
 	
 || argh = `
 	role task (task)
@@ -117,3 +115,4 @@ function Message.BuildTask (|message| con)
 `.macro
 
 }
+
