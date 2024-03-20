@@ -54,7 +54,7 @@ function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 	|| Old = TypeOfExpr( exp0, name_space, side )									#require
 	|| New = ExtractDecl( exp.last!, name_space, declmode.TypeCast )				#require
 	// allow MOST typecasts, but NOT typecasts between struct instances...
-	if (Old.isntReallyCastable(exp0) or New.isntReallyCastable(exp0))
+	if Old.isntReallyCastable(exp0)  or  New.isntReallyCastable(exp0)
 		error (exp, "Can’t cast between structs/carrays")
 	  else
 		if exp0.isint and new.TypeSuffers
@@ -78,7 +78,7 @@ function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |SCNode| name_space)
 	opt norefcounts
 	|| fn = scfunction.CurrFunc 
-	if fn and (fn isnt Alloc) and fn.blindcasts
+	if fn and (fn isnt Allocornew) and fn.blindcasts
 		if old.IsNormalObject and .IsNormalObject
 			if !old.type.real_isa2( .type )
 				stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", fn.blindcasts)
