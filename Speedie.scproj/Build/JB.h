@@ -1404,6 +1404,7 @@ extern Macro* SC__Macros_MainArgBasicReq;
 extern Macro* SC__Macros_MainArgDefault;
 extern Macro* SC__Macros_MainArgNoNE;
 extern Macro* SC__Macros_MultiDecr;
+extern Macro* SC__Macros_TaskAccess;
 extern Macro* SC__Macros_WhileDecl;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
@@ -1531,7 +1532,7 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitOr (JB_LUB[1350])
+#define kJB_kBitOr (JB_LUB[1351])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -7897,6 +7898,8 @@ Message* SC_Decl_WriteSimpleType(SCDecl* self);
 Message* SC_Decl_WriteType(SCDecl* self, int minimal);
 
 Message* SC_Decl_WriteTypeCast(SCDecl* self, Message* msg);
+
+Message* SC_Decl_WriteVerySimpleType(SCDecl* self);
 
 
 
