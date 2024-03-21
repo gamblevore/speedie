@@ -28,6 +28,9 @@
 #endif
 
 
+extern "C" {
+JBClassPlace( ProcessOwner,   JB_PID_UnRegister,     JB_AsClass(JB_Object),      0 );
+}
 
 
 #ifndef AS_LIBRARY
@@ -37,7 +40,6 @@
 
 extern "C" {
 const int RD = 0; const int WR = 1;
-JBClassPlace( ProcessOwner,   JB_PID_UnRegister,     JB_AsClass(JB_Object),      0 );
 JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),   0 );
 
 

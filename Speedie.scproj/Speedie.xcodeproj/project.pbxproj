@@ -25,7 +25,7 @@
 		AC7D3CA629A27C7700148ADB /* JB_Child.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8429A27C1D00148ADB /* JB_Child.cpp */; };
 		AC7D3CA729A27C7700148ADB /* JB_Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8D29A27C1D00148ADB /* JB_Date.cpp */; };
 		AC7D3CA829A27C7700148ADB /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9529A27C1D00148ADB /* JB_FastString.cpp */; };
-		AC7D3CA929A27C7700148ADB /* JB_List.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8E29A27C1D00148ADB /* JB_List.cpp */; };
+		AC7D3CA929A27C7700148ADB /* JB_ListOld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8E29A27C1D00148ADB /* JB_ListOld.cpp */; };
 		AC7D3CAA29A27C7700148ADB /* JB_Math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8629A27C1D00148ADB /* JB_Math.cpp */; };
 		AC7D3CAB29A27C7700148ADB /* JB_Pipe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8529A27C1D00148ADB /* JB_Pipe.cpp */; };
 		AC7D3CAC29A27C7700148ADB /* JB_ObjArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8029A27C1D00148ADB /* JB_ObjArray.cpp */; };
@@ -45,7 +45,7 @@
 		AC7D3D8629A280A700148ADB /* JB_String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8B29A27C1D00148ADB /* JB_String.cpp */; };
 		AC7D3D8729A280A700148ADB /* JB_Tokeniser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8729A27C1D00148ADB /* JB_Tokeniser.cpp */; };
 		AC7D3D8829A280A700148ADB /* JB_BasicIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7D29A27C1D00148ADB /* JB_BasicIO.cpp */; };
-		AC7D3D8929A280A700148ADB /* JB_List.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8E29A27C1D00148ADB /* JB_List.cpp */; };
+		AC7D3D8929A280A700148ADB /* JB_ListOld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8E29A27C1D00148ADB /* JB_ListOld.cpp */; };
 		AC7D3D8A29A280A700148ADB /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7929A27C1D00148ADB /* JB_RingTree.cpp */; };
 		AC7D3D8B29A280A700148ADB /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9529A27C1D00148ADB /* JB_FastString.cpp */; };
 		AC7D3D8C29A280A700148ADB /* JB_Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8D29A27C1D00148ADB /* JB_Date.cpp */; };
@@ -75,7 +75,7 @@
 		AC7D3DB729A2816600148ADB /* JB_String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8B29A27C1D00148ADB /* JB_String.cpp */; };
 		AC7D3DB829A2816600148ADB /* JB_Tokeniser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8729A27C1D00148ADB /* JB_Tokeniser.cpp */; };
 		AC7D3DB929A2816600148ADB /* JB_BasicIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7D29A27C1D00148ADB /* JB_BasicIO.cpp */; };
-		AC7D3DBA29A2816600148ADB /* JB_List.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8E29A27C1D00148ADB /* JB_List.cpp */; };
+		AC7D3DBA29A2816600148ADB /* JB_ListOld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8E29A27C1D00148ADB /* JB_ListOld.cpp */; };
 		AC7D3DBB29A2816600148ADB /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7929A27C1D00148ADB /* JB_RingTree.cpp */; };
 		AC7D3DBC29A2816600148ADB /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9529A27C1D00148ADB /* JB_FastString.cpp */; };
 		AC7D3DBD29A2816600148ADB /* JB_Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8D29A27C1D00148ADB /* JB_Date.cpp */; };
@@ -103,7 +103,7 @@
 		AC7D3DE029A2816700148ADB /* JB_String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8B29A27C1D00148ADB /* JB_String.cpp */; };
 		AC7D3DE129A2816700148ADB /* JB_Tokeniser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8729A27C1D00148ADB /* JB_Tokeniser.cpp */; };
 		AC7D3DE229A2816700148ADB /* JB_BasicIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7D29A27C1D00148ADB /* JB_BasicIO.cpp */; };
-		AC7D3DE329A2816700148ADB /* JB_List.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8E29A27C1D00148ADB /* JB_List.cpp */; };
+		AC7D3DE329A2816700148ADB /* JB_ListOld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8E29A27C1D00148ADB /* JB_ListOld.cpp */; };
 		AC7D3DE429A2816700148ADB /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7929A27C1D00148ADB /* JB_RingTree.cpp */; };
 		AC7D3DE529A2816700148ADB /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9529A27C1D00148ADB /* JB_FastString.cpp */; };
 		AC7D3DE629A2816700148ADB /* JB_Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8D29A27C1D00148ADB /* JB_Date.cpp */; };
@@ -230,7 +230,7 @@
 		AC7D3C8B29A27C1D00148ADB /* JB_String.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_String.cpp; path = ../Library/CppLib/JB_String.cpp; sourceTree = "<group>"; };
 		AC7D3C8C29A27C1D00148ADB /* JB_Vectors.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Vectors.cpp; path = ../Library/CppLib/JB_Vectors.cpp; sourceTree = "<group>"; };
 		AC7D3C8D29A27C1D00148ADB /* JB_Date.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Date.cpp; path = ../Library/CppLib/JB_Date.cpp; sourceTree = "<group>"; };
-		AC7D3C8E29A27C1D00148ADB /* JB_List.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_List.cpp; path = ../Library/CppLib/JB_List.cpp; sourceTree = "<group>"; };
+		AC7D3C8E29A27C1D00148ADB /* JB_ListOld.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ListOld.cpp; path = ../Library/CppLib/JB_ListOld.cpp; sourceTree = "<group>"; };
 		AC7D3C8F29A27C1D00148ADB /* JB_Dictionary.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Dictionary.cpp; path = ../Library/CppLib/JB_Dictionary.cpp; sourceTree = "<group>"; };
 		AC7D3C9029A27C1D00148ADB /* JB_Errors.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Errors.cpp; path = ../Library/CppLib/JB_Errors.cpp; sourceTree = "<group>"; };
 		AC7D3C9129A27C1D00148ADB /* JB_Main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Main.cpp; path = ../Library/CppLib/JB_Main.cpp; sourceTree = "<group>"; };
@@ -382,7 +382,7 @@
 				AC7D3C9529A27C1D00148ADB /* JB_FastString.cpp */,
 				AC7D3C9329A27C1D00148ADB /* JB_File.cpp */,
 				AC7D3C8129A27C1D00148ADB /* JB_LibraryFile.cpp */,
-				AC7D3C8E29A27C1D00148ADB /* JB_List.cpp */,
+				AC7D3C8E29A27C1D00148ADB /* JB_ListOld.cpp */,
 				AC7D3C9129A27C1D00148ADB /* JB_Main.cpp */,
 				AC7D3C8629A27C1D00148ADB /* JB_Math.cpp */,
 				AC7D3C9629A27C1D00148ADB /* JB_MSR.cpp */,
@@ -648,7 +648,7 @@
 				AC7D3CA129A27C7700148ADB /* JB_String.cpp in Sources */,
 				AC7D3CA229A27C7700148ADB /* JB_Tokeniser.cpp in Sources */,
 				AC7D3CB629A27C7700148ADB /* JB_BasicIO.cpp in Sources */,
-				AC7D3CA929A27C7700148ADB /* JB_List.cpp in Sources */,
+				AC7D3CA929A27C7700148ADB /* JB_ListOld.cpp in Sources */,
 				AC7D3CB429A27C7700148ADB /* JB_RingTree.cpp in Sources */,
 				ACB3785D29A5026400795F00 /* JB_DivSufSort.cpp in Sources */,
 				AC7D3CA829A27C7700148ADB /* JB_FastString.cpp in Sources */,
@@ -688,7 +688,7 @@
 				AC7D3D8629A280A700148ADB /* JB_String.cpp in Sources */,
 				AC7D3D8729A280A700148ADB /* JB_Tokeniser.cpp in Sources */,
 				AC7D3D8829A280A700148ADB /* JB_BasicIO.cpp in Sources */,
-				AC7D3D8929A280A700148ADB /* JB_List.cpp in Sources */,
+				AC7D3D8929A280A700148ADB /* JB_ListOld.cpp in Sources */,
 				AC7D3D8A29A280A700148ADB /* JB_RingTree.cpp in Sources */,
 				ACB3785E29A5026400795F00 /* JB_DivSufSort.cpp in Sources */,
 				AC7D3D8B29A280A700148ADB /* JB_FastString.cpp in Sources */,
@@ -728,7 +728,7 @@
 				AC7D3DB729A2816600148ADB /* JB_String.cpp in Sources */,
 				AC7D3DB829A2816600148ADB /* JB_Tokeniser.cpp in Sources */,
 				AC7D3DB929A2816600148ADB /* JB_BasicIO.cpp in Sources */,
-				AC7D3DBA29A2816600148ADB /* JB_List.cpp in Sources */,
+				AC7D3DBA29A2816600148ADB /* JB_ListOld.cpp in Sources */,
 				AC7D3DBB29A2816600148ADB /* JB_RingTree.cpp in Sources */,
 				ACB3785F29A5026400795F00 /* JB_DivSufSort.cpp in Sources */,
 				AC7D3DBC29A2816600148ADB /* JB_FastString.cpp in Sources */,
@@ -768,7 +768,7 @@
 				AC7D3DE029A2816700148ADB /* JB_String.cpp in Sources */,
 				AC7D3DE129A2816700148ADB /* JB_Tokeniser.cpp in Sources */,
 				AC7D3DE229A2816700148ADB /* JB_BasicIO.cpp in Sources */,
-				AC7D3DE329A2816700148ADB /* JB_List.cpp in Sources */,
+				AC7D3DE329A2816700148ADB /* JB_ListOld.cpp in Sources */,
 				AC7D3DE429A2816700148ADB /* JB_RingTree.cpp in Sources */,
 				ACB3786029A5026400795F00 /* JB_DivSufSort.cpp in Sources */,
 				AC7D3DE529A2816700148ADB /* JB_FastString.cpp in Sources */,

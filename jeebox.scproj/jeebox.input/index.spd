@@ -1,8 +1,12 @@
-/*	Jeebox internals. By Theodore H. Smith...*/ 
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+ 
 linkage
 	cpp_part JB
 	type library
 // i guess my lib can now stream stuff...
-	bannedclasses (process, archive) //(file, process, shellstream, archive)
+	bannedclasses (process, archive, ProcessOwner, shellstream) //(file, process, shellstream, archive)
 
-ignore
+ignore

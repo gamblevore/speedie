@@ -54,11 +54,11 @@ struct jbstring : jbobject {};
 jbstring* jb_msg_name(jbmessage* self); /* The name of the node! */
 jbsyntax jb_msg_func(jbmessage* self); /* The node's syntactic-type. For example parsing "{}" would give a node of type 'arg', but parsing "()" would give a node of type 'list'. */
 int jb_msg_position(jbmessage* self); /* The byte-position of the original syntax that created this node. Useful for error-reporting. */
-_voidptr jb_msg_tag(jbmessage* self); /* Attached user-defined value. */
+void* jb_msg_tag(jbmessage* self); /* Attached user-defined value. */
 void jb_msg_nameset(jbmessage* self, jbstring* Result); /* Sets the name. */
 void jb_msg_funcset(jbmessage* self, jbsyntax Result); /* Sets the syntactic type */
 void jb_msg_positionset(jbmessage* self, int Result); /* Sets the byte-position. Jeebox doesn't use this value other than to store it for you. You might want to set the position if you created some nodes yourself via jb_msg_create. Obviously those nodes wouldn't have a position. */
-void jb_msg_tagset(jbmessage* self, _voidptr Result); /* In case you want to attach a user-defined value to the node, to use for your own purposes. */
+void jb_msg_tagset(jbmessage* self, void* Result); /* In case you want to attach a user-defined value to the node, to use for your own purposes. */
 void jb_msg_firstset(jbmessage* self, jbmessage* Result); /* Inserts 'Result' as the first child, and safely-removes it from it's old tree. You don't need to do anything to keep the next/prev/parent/etc values correct! They are updated for you. Same for all tree-node setters: jb_msg_lastset, jb_msg_prevset, jb_msg_nextset */
 void jb_msg_lastset(jbmessage* self, jbmessage* Result); /* Same as jb_msg_firstset. Inserts 'Result' as the last child. */
 void jb_msg_prevset(jbmessage* self, jbmessage* Result); /* Same as jb_msg_firstset. Inserts 'Result' as our prev-sibling. Does nothing if 'self' has no parent. */
@@ -116,7 +116,7 @@ double jb_string_float(jbstring* self, jbmessage* m); /* Parses this string into
 		// Global functions
 
 jbsyntax jb_syntax(jbstring* name); /* Looks up the syntax of that name from the syntax-table. The name must be in short-form, like "arg", not "argument". (The list of short-form names is in api.h, you will see $arg, $acc... its those minus the $.) */
-jbstring* jb_str(_cstring Str, int Length, _voidptr Release, _voidptr Tag); /* Creates a JBString from a c-string. Expects the c-string to remain unchanged until the JBString is freed. Length is optional. Can optionally pass a call-back to release your c-string, during freeing the JBString. */
+jbstring* jb_str(_cstring Str, int Length, void* Release, void* Tag); /* Creates a JBString from a c-string. Expects the c-string to remain unchanged until the JBString is freed. Length is optional. Can optionally pass a call-back to release your c-string, during freeing the JBString. */
 jbstring* jb_cstr(_cstring Str); /* Creates a JBString from a c-string. Expects the c-string to remain unchanged until the JBString is freed. */
 void jb_delete_(jbobject* obj); /* Deletes the object from memory. Don't call directly, use jb_incr jb_decr. */
 jbmessage* jb_errors(); /* Returns a list of errors as children of the returned node. Also clears the error-list. Each child's name is the error-description and each child's position is the error-position. */
