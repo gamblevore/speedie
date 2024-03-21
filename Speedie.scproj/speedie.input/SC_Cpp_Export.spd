@@ -143,7 +143,10 @@ function Codify (|SCModule| scb, |string| fName)
 		
 	cpp_Export.currclass = cls
 	|| File = .StreamChild( fname + ".cpp" )
-	.HeaderProj <~ ("\n\n// $fname\n")
+	.HeaderProj <~ "\n\n// "
+	.headerproj <~ fname
+	.headerproj <~ "\n"
+
 	.ExportModuleProperties( scb, .ModuleProperties )
 
 
@@ -440,7 +443,6 @@ function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 	
 	fs.AppendBehaviour("", cls.destructorfunc, nil)
 	
-	if cls ~= "playlist"
 	while (b)
 		for (M in b.interfaces)
 			|| s = m.name.InterfaceToBehaviour
@@ -685,8 +687,7 @@ extern "C" {
 		Cpp_Export.CreateClassListHeader(fs, ";\n")
 
 	cpp_export.GenStrings(.ModuleProperties)
-	|| glob_file = Cpp_Export.product("JB_Globals.cpp")
-	Cpp_Export.SmartWrite(.ModuleProperties, glob_file)
+	Cpp_Export.SmartWrite(.ModuleProperties, Cpp_Export.product("JB_Globals.cpp"))
 	.ModuleProperties.length = 0
 
 	for f in .Outputs_cpp

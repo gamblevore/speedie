@@ -1348,13 +1348,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[1894])
+#define kJB__ErrorColors_bold (JB_LUB[1893])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1895])
-#define kJB__ErrorColors_good (JB_LUB[1896])
-#define kJB__ErrorColors_normal (JB_LUB[1897])
-#define kJB__ErrorColors_underline (JB_LUB[1896])
-#define kJB__ErrorColors_warn (JB_LUB[1898])
+#define kJB__ErrorColors_error (JB_LUB[1894])
+#define kJB__ErrorColors_good (JB_LUB[1895])
+#define kJB__ErrorColors_normal (JB_LUB[1896])
+#define kJB__ErrorColors_underline (JB_LUB[1895])
+#define kJB__ErrorColors_warn (JB_LUB[1897])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1526,7 +1526,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1899])
+#define kJB_codesign_native (JB_LUB[1898])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1540,7 +1540,7 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitOr (JB_LUB[1350])
+#define kJB_kBitOr (JB_LUB[1349])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1555,7 +1555,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[1900])
+#define kJB_kSaverStart1 (JB_LUB[1899])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -2395,6 +2395,8 @@ JB_File* SC_Comp__Library();
 void SC_Comp__LoadInitsAndMore();
 
 SCFunction* SC_Comp__LoadRefFunc(JB_String* name);
+
+void SC_Comp__LoadSuperClasses();
 
 SCFunction* SC_Comp__LoadTypeTest(JB_String* s);
 
@@ -8374,6 +8376,8 @@ void SC_Class_LoadSaver(SCClass* self);
 
 JB_String* SC_Class_LoadSaverSub(SCClass* self);
 
+void SC_Class_LoadSuperBehaviours(SCClass* self);
+
 void SC_Class_LoadSuperClass(SCClass* self);
 
 SCDecl* SC_Class_MakeClassType(SCClass* self, SCDecl* d);
@@ -8421,8 +8425,6 @@ bool SC_Class_RenderSaveableSub(SCClass* self, FastString* fs);
 void SC_Class_StartupSaver(SCClass* self, JB_String* Name);
 
 JB_String* SC_Class_StructName(SCClass* self);
-
-bool SC_Class_EqualsName(SCClass* self, JB_String* name, bool aware);
 
 bool SC_Class_EqualsType(SCClass* self, SCNodeType d, bool aware);
 
@@ -9165,7 +9167,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1864])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1863])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -9187,7 +9189,9 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
-	SC_IR_Print(rz);
+	if (JB_IsDebug()) {
+		SC_IR_Print(rz);
+	}
 	return rz;
 }
 

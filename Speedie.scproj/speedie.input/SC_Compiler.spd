@@ -413,8 +413,7 @@ function ImportAll
 	for c in .ClassList
 		c.CreateBehaviour	// creates new classes, put before loadsuperclass
 	
-	for c in .ClassList
-		c.LoadSuperclass
+	.LoadSuperClasses
 	
 	for c in .ClassList
 		c.GetDepth
@@ -579,8 +578,16 @@ function ImportAll
 	scfunction.currfunc = nil
 		
 
+function LoadSuperClasses
+	opt norefcounts
+	for c in .ClassList
+		c.LoadSuperclass
+	for c in .classlist
+		c.LoadSuperBehaviours
+
 
 function LoadInitsAndMore
+	opt norefcounts
 	for m in .ModuleList
 		m.Use
 		m.LoadExportName

@@ -33,7 +33,7 @@ struct ASMFuncState // why not just be a subclass of memory?
 		rz.r[2] = c
 		rz.r[3] = d
 		rz.debug = dbg
-		target debug
+		if platform.isdebug
 			rz.print
 
 

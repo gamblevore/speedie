@@ -241,6 +241,8 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 
 
 function LoadSuperClass
+	opt norefcounts
+	
 	|| OldMod = .modul.parent // in case it was already set, like in a task... which has a name_space
 	if !oldmod
 		.Modul.parent = compiler.program 
@@ -263,7 +265,6 @@ function LoadSuperClass
 		  else
 			S = Compiler[ thg ]
 		
-		
 		if !S
 			0 //
 		  elseif (.FuncProto)
@@ -284,10 +285,16 @@ function LoadSuperClass
 		  elseif !oldmod
 			.modul.parent = s.modul
 		.parent = S
-		|| b = .behaviour
-		|| SB = S.behaviour
-		if (B and SB)
-			b.FuncTable!.cls!.super = SB.FuncTable!.cls
+
+
+function LoadSuperBehaviours
+	opt norefcounts
+	|| s = .super
+	|| b = .behaviour
+		while (s and !S.behaviour)
+			s = s.super
+		if s
+			b.FuncTable!.cls!.super = s.behaviour!.FuncTable!.cls
 
 
 module {
