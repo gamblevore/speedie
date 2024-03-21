@@ -938,8 +938,8 @@ dispatch ClsCollectTable (CollectFunc)
 	+"linkage"				CppRefs.Linkage
 	+"pragma"				{ error (node) }
 
-//	+"class"				SCClass.NewInnerClass
-	+"role"					SCClass.NewInnerRole
+	+"class"				SCClass.NewInnerClass
+	+"role"					SCClass.NewInnerClass
 	+"task"					sctasks.NewTask
 
 	+"initafter"			(SCModule.DoInitAfter)
@@ -951,7 +951,7 @@ dispatch ClsCollectTable (CollectFunc)
 	+"contains"				(DontRemove)
 	+"default"				(SCClass.GetDefault)
 	+"false"				(SCClass.GetFalse)
-	+"size"					(DontRemove)
+	+"size"					(SCClass.SetSize)
 	+"module"				(DontRemove)
 	+"constants"			(SCModule.ConstantCollector)
 	+"flags"				(SCModule.ConstantCollector)

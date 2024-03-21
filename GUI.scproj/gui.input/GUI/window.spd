@@ -21,7 +21,7 @@ class Window (GUIControl)
 	|GUIPasteEvent?|					OnPaste
 	|GUICopyEvent?|						OnCopy
 	|GUIMouseMoveEvent?|				OnMouseMove
-	|array of task.GUITask|				Tasks
+	|ringtree of guicontrol.GUITask|	Tasks
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
@@ -29,12 +29,14 @@ class Window (GUIControl)
 	
 	constructor
 		super.constructor(window.all)
+		.Tasks = RingTree()
 		.subconstructor(the~area)
 		
 
 	constructor (|ControlRect| Size)
 		cpp_part ConstructorSize
 		super.constructor(window.all)
+		.Tasks = RingTree()
 		.subconstructor(size)
 	
 	
@@ -170,6 +172,16 @@ class Window (GUIControl)
 			if (f == guicontrolflags.Modified) and ((self is modified) != value)
 				sdlapp.JB_SDL_SetModified(n, value)
 		super.syntaxis(f) = value
+
+
+	behaviour MouseWheel
+		opt norefcounts
+		|| it = .OpenedMenu()
+			return it.__MouseWheel__(P, direction)
+			
+		|| R = self[sdlapp.MouseXY]
+			R.__MouseWheel__(P, Direction)
+		return true
 
 
 	behaviour TypedString
@@ -446,16 +458,14 @@ class Window (GUIControl)
 
 	function ClearFocus
 		.SetFocus(nil)
-	
-	behaviour MouseWheel
+
+
+	function RunTasks (|date| now)
 		opt norefcounts
-		|| it = .OpenedMenu()
-			return it.__MouseWheel__(P, direction)
-			
-		|| R = self[sdlapp.MouseXY]
-			R.__MouseWheel__(P, Direction)
-		return true
-	
+		for p in .tasks
+			if !p.runtask(now)
+				p.Remove
+			 
 	
 	iterator
 		|| ctrl = .first|guicontrol|

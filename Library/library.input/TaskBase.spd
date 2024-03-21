@@ -1,22 +1,26 @@
 
 
 class Task (RingTree)
-	|&nil|				_func
-	|int64[9]| 			_local
-	|byte|				_ObjectCount
+	linkage
+		visible
+		cpp_class JB_Task
+
 	|taskstate| 		State
+	|byte|				_ObjectCount
+	|&nil|				_func
 	
 	constructor (|&nil| fn, |int| Objs)
 		._Func = fn
 		._ObjectCount = Objs
-		for i in 9
-			._local[i] = 0
 	
 	destructor
-		for (i in ._ObjectCount|int|)
-			jb_decr(._local[i]|object|) // noice
+		visible
+		|| curr = ((&._func)|&object|) + 1
+		for  i in ._ObjectCount|int|
+			jb_decr( curr[i] )          // noice
 
-	
+
+
 datatype TaskState (byte)
 	flags
 		|TaskState| 

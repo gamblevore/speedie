@@ -68,6 +68,8 @@ JBClassPlace( CharSet,          0,                     JB_AsClass(JB_Object),   
 JBClassPlace( RingTree,         JB_Ring_Destructor,    JB_AsClass(Saveable),       0 );
 JBClassPlace( TokHan,           0,                     JB_AsClass(JB_Object),      0 );
 
+extern JB_Class JB_TaskData;
+
 
 CharSet*            WhiteSpace_;
 JB_StringC*         EmptyString_;
@@ -177,6 +179,7 @@ void	JB_App__CrashInstall();
 
 int JB_LibInit (_cstring* R, bool IsThread) {
 	JB_ErrorNumber = 0;
+	JB_TaskData.Size = 128;
 	JB__Flow_Disabled = 0x7fffFFFF;
 
 	static_assert((sizeof(ivec3) == 16 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 16 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");

@@ -530,7 +530,8 @@ int JB_ObjRefCount(JB_Object* Obj) {
 
 uint8* JB_ObjClassBehaviours(JB_Object* Obj) {
     // assume exists.
-    return (uint8*)(ObjBlock_(Obj)->FuncTable);
+    auto Block = ObjBlock_(Obj);
+    return (uint8*)(Block->FuncTable);
 }
 
 

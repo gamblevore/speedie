@@ -111,13 +111,6 @@ render
 		fs <~ " model"
 
 
-//function message.AlreadySets (|string| name, |bool|)
-//	opt norefcounts
-//	for ch in self
-//		if SettingSelfProperty(ch) and (ch.first == name)
-//			return true
-
-
 
 function PassableCount (|int|)
 	opt norefcounts
@@ -149,19 +142,13 @@ function IsTask (|bool|)
 	return .isrole == 2
 
 
-
 function TaskProperties 
 	opt norefcounts
 	.properties.sort(&compiler.TaskPropertySorter)
-	check (.Properties <= 8) (.properties.last!.source, "Too many properties on task")
 
 	for (p in .Properties) (i)
-		|| src = p.source
-			src.indent = i
 		(p is task)
-		(p is PropertyWasConstructed)
 		.TaskObjectCount += p.IsObject
-		check (p.IsTaskable) (p, "Task properties can't have that")
 
 
 function CollectProperties 
@@ -209,13 +196,13 @@ function GetStructDepth
 	|| r = 0
 	for p in .properties
 		|| t = p.type
-		if (t.isstruct) and (p.pointercount == 0) 
+		if (t.IsStruct) and (p.pointercount == 0) 
 			t.GetStructDepth
 			r = r max t.StructContainerDepth+1
 	.StructContainerDepth = r
 
 
-function CalculateSize (|int| Depth=0, |int|)
+function CalculateSize (|int| Depth = 0, |int|)
 	.CalculateSizeRaw(Depth)
 	return .size
 
@@ -248,6 +235,8 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		Count += Curr * Mul 
 
 	.size = Count align 4
+	if .istask
+		check (.size <= 128) (.source, "Task size is over 128.")
 	return count	
 
 
@@ -302,6 +291,11 @@ function LoadSuperClass
 
 
 module {
+function SetSize (CollectFunc)
+	if name_space isa scclass
+		name_space.size = node.first.int
+	return compiler.program
+
 function LoadClassName (|message| node, |string|)
 	|| S = node.first
 	if (s == @thg or @dot)
@@ -622,6 +616,7 @@ function CreateEmptyFunc (|String| fname, |string| cpp_name="", |SCFunction|)
 
 
 function FindAllocFunc (|String| fname, |bool| DontCreate = true, |SCFunction|)
+	opt norefcounts
 	|| it = .FindSpecialFunc( fname, false )
 		Return it
 	
@@ -631,10 +626,15 @@ function FindAllocFunc (|String| fname, |bool| DontCreate = true, |SCFunction|)
 
 function CStructName (|String|)
 	opt norefcounts
-	if self
-		if !.IsRole
-			return .CppClass init .name.UnicodeSafeName
-		return .RealClass.CStructName
+	require self
+	if .IsRole == 1
+		return .RealClass.CStructNamesub
+	return .CStructNameSub
+
+
+function CStructNameSub (|String|)
+	opt norefcounts
+	return .CppClass init .name.UnicodeSafeName
 
 
 function HasStuffToHandleInDestructor (|bool|)
@@ -962,7 +962,7 @@ module
 		Return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 	
-	function NewInnerRole (CollectFunc)
+	function NewInnerClass (CollectFunc)
 		if name_space isa scclass
 			return scclass.neuclass(node, name_Space.modul, errplace)
 	

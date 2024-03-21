@@ -69,14 +69,12 @@ extend message
 				return nil
 				// (first, secnd, A, B, C, D, E)
 			
-		if (c == '_'  and  n > 1)
-			if n.IsInt(1) 
-				|| oop = prms[n.int|int|]		#expect (root, "Not enough params.")
-				|| f = .func
-				if f == @dot or @sdot or @str or @sstr or @char // anything except @thg?
-					return .MacroSame(oop)
-				return oop.MacroAvoidCopy
-			// return message(self)
+		if (c == '_'  and  n > 1) and n.IsInt(1) 
+			|| oop = prms[n.int|int|]		#expect (root, "Not enough params.")
+			|| f = .func
+			if f == @dot or @sdot or @str or @sstr or @char // anything except @thg?
+				return .MacroSame(oop)
+			return oop.MacroAvoidCopy
 		rz = Message(self)
 		.MacroCopy(root, prms, rz)
 
@@ -101,4 +99,5 @@ extend message
 		m.Source.MacroCopy(self, prms, self)
 		for r in prms
 			check (r is inserted)  (r, "Unused parameter to macro")
+
 

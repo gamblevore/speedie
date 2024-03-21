@@ -455,7 +455,7 @@ struct SimpleGraph;
 
 struct SpdProcess;
 
-struct Task;
+struct JB_Task;
 
 struct JB_Error;
 
@@ -1107,6 +1107,15 @@ JBClass ( SpdProcess , ShellStream ,
 	ProcessMode Mode;
 );
 
+struct Task_Behaviour: RingTree_Behaviour {
+};
+
+JBClass ( JB_Task , RingTree , 
+	TaskState State;
+	byte _ObjectCount;
+	void* _func;
+);
+
 struct Error_Behaviour: Message_Behaviour {
 };
 
@@ -1339,13 +1348,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[1897])
+#define kJB__ErrorColors_bold (JB_LUB[1894])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1898])
-#define kJB__ErrorColors_good (JB_LUB[1899])
-#define kJB__ErrorColors_normal (JB_LUB[1900])
-#define kJB__ErrorColors_underline (JB_LUB[1899])
-#define kJB__ErrorColors_warn (JB_LUB[1901])
+#define kJB__ErrorColors_error (JB_LUB[1895])
+#define kJB__ErrorColors_good (JB_LUB[1896])
+#define kJB__ErrorColors_normal (JB_LUB[1897])
+#define kJB__ErrorColors_underline (JB_LUB[1896])
+#define kJB__ErrorColors_warn (JB_LUB[1898])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1404,7 +1413,6 @@ extern Macro* SC__Macros_MainArgBasicReq;
 extern Macro* SC__Macros_MainArgDefault;
 extern Macro* SC__Macros_MainArgNoNE;
 extern Macro* SC__Macros_MultiDecr;
-extern Macro* SC__Macros_TaskAccess;
 extern Macro* SC__Macros_WhileDecl;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
@@ -1518,7 +1526,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1902])
+#define kJB_codesign_native (JB_LUB[1899])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1532,7 +1540,7 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitOr (JB_LUB[1351])
+#define kJB_kBitOr (JB_LUB[1350])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1547,7 +1555,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[1903])
+#define kJB_kSaverStart1 (JB_LUB[1900])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -6517,8 +6525,6 @@ void JB_Array_SaveWrite(Array* self, ObjectSaver* Saver);
 
 void JB_Array_SyntaxAppend(Array* self, JB_Object* item);
 
-int JB_Array_SyntaxCompare(Array* self, int n, bool Aware);
-
 bool JB_Array_SyntaxEquals(Array* self, int n, bool Aware);
 
 
@@ -7757,8 +7763,6 @@ bool SC_Decl_IsReg(SCDecl* self);
 
 JB_String* SC_Decl_IsSaveable(SCDecl* self);
 
-bool SC_Decl_IsTaskable(SCDecl* self);
-
 void SC_Decl_IsTypeImproveSet(SCDecl* self, bool Value);
 
 bool SC_Decl_IsUintLike(SCDecl* self);
@@ -8124,6 +8128,8 @@ void JB_Proc__InitOwner();
 
 
 // JB_Task
+void JB_Task_Destructor(JB_Task* self);
+
 
 
 // JB_Error
@@ -8280,6 +8286,8 @@ SCFunction* SC_Class_CreateEmptyFunc(SCClass* self, JB_String* fname, JB_String*
 
 JB_String* SC_Class_CStructName(SCClass* self);
 
+JB_String* SC_Class_CStructNameSub(SCClass* self);
+
 JB_String* SC_Class_CSuperStructName(SCClass* self);
 
 void SC_Class_DataTypePostLoad(SCClass* self);
@@ -8289,8 +8297,6 @@ void SC_Class_DeclModel(SCClass* self);
 void JB_Class_Destructor(SCClass* self);
 
 SCFunction* SC_Class_DoSaver(SCClass* self, JB_String* name, int stage);
-
-SCDecl* SC_Class_DotTaskProperty(SCClass* self, Message* dot, SCDecl* decl);
 
 Message* SC_Class_Falsify(SCClass* self, Message* ques);
 
@@ -8416,6 +8422,8 @@ void SC_Class_StartupSaver(SCClass* self, JB_String* Name);
 
 JB_String* SC_Class_StructName(SCClass* self);
 
+bool SC_Class_EqualsName(SCClass* self, JB_String* name, bool aware);
+
 bool SC_Class_EqualsType(SCClass* self, SCNodeType d, bool aware);
 
 void SC_Class_TaskProperties(SCClass* self);
@@ -8450,7 +8458,7 @@ SCClass* SC_Class__NeuClassSub(Message* node, SCNode* parent, Message* ErrPlace,
 
 SCNode* SC_Class__NeuRole(Message* node, SCNode* name_space, Message* ErrPlace);
 
-SCNode* SC_Class__NewInnerRole(Message* node, SCNode* name_space, Message* ErrPlace);
+SCNode* SC_Class__NewInnerClass(Message* node, SCNode* name_space, Message* ErrPlace);
 
 SCNode* SC_Class__NewStruct(Message* node, SCNode* name_space, Message* ErrPlace);
 
@@ -8459,6 +8467,8 @@ SCNode* SC_Class__ProcessAs(Message* node, SCNode* name_space, Message* ErrPlace
 SCFunction* SC_Class__ProcessExtend(Message* c, bool PreferClass, SCModule* m);
 
 void SC_Class__ProcessExtendOld(Message* c, bool PreferClass);
+
+SCNode* SC_Class__SetSize(Message* node, SCNode* name_space, Message* ErrPlace);
 
 SCNode* SC_Class__StoreExtend(Message* node, SCNode* name_space, Message* ErrPlace);
 
@@ -9155,7 +9165,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1867])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1864])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -9177,6 +9187,7 @@ inline IR* SC_flat_AddASM(ASMFuncState* self, Message* dbg, int SM, int a, int b
 	rz->r[2] = c;
 	rz->r[3] = d;
 	(SC_IR_DebugSet(rz, dbg));
+	SC_IR_Print(rz);
 	return rz;
 }
 

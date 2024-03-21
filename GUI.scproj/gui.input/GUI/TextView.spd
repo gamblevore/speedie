@@ -1637,11 +1637,11 @@ class TextView (GUIControl)
 			(.OnShowExtraInfo!)(self, P2, nil, err, "error", false)
 			return
 			
-		require ._ErrorExtraInfo != err
-		|| T = .StartTask(DelayedShowError, 0.33s)
-			t.param = err
-			T.Rect = (P2, P2)
-			._ErrorExtraInfo = err
+//		require ._ErrorExtraInfo != err
+//		|| T = .StartTask(DelayedShowError, 0.33s)
+//			t.param = err
+//			T.Rect = (P2, P2)
+//			._ErrorExtraInfo = err
 
 	
 	helper ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)
@@ -2033,12 +2033,12 @@ class TextView (GUIControl)
 		function MakeAnti (|charset|)
 			return jeebox.CSWordMiddle.Invert
 
-		helper DelayedShowError (GUITaskFunc)
-			opt NoRefCounts
-			if self isa textview
-				|| err = task.Param as error
-					|| P = task.Rect.xy
-					(.OnShowExtraInfo!)(self, P, nil, err, "error", true)
+//		helper DelayedShowError (GUITaskFunc)
+//			opt NoRefCounts
+//			if self isa textview
+//				|| err = task.Param as error
+//					|| P = task.Rect.xy
+//					(.OnShowExtraInfo!)(self, P, nil, err, "error", true)
 
 
 helper string.InsertTrim (|ivec2|)

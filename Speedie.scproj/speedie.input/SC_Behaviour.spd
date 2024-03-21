@@ -33,10 +33,12 @@ class SCBehaviour (SCNode)
 	
 	function Upwards (|SCBehaviour|)
 		opt norefcounts
-		|| c = .cls
-			|| s = c.Super
-				return s.behaviour
-	
+		|| curr = .cls
+		while curr
+			curr = curr.Super$
+			|| b = curr.behaviour
+				return b
+		
 	
 	function SCClass.AddBehaviourOrInterface (|SCNode| M, |Message| ErrPlace)
 		|| b = .behaviour

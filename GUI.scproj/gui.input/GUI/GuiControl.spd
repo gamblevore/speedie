@@ -476,39 +476,21 @@ class GUIControl (ringtree)
 		|object?| 			Param
 		|ivec4| 			Rect	
 		
-		function RunTask (|bool|)
+		function RunTask (|date| now, |bool|)
 			opt NoRefCounts
 			require .upon.parent
-			|| d = date()
-			if d >= .EndTime
+			if (.starttime < now)
+				return true
+			if now >= .EndTime
 				require .state isnt finished
 				.State |= TaskState.Finished
-			rz = (.func)(.upon, self)
+			rz = (self)(now)
 			.State |= TaskState.Started
 			if .state is Finished
 				rz = false
 		
-		run (|bool|)
-			opt NoRefCounts
-			require .upon.parent
-			|| d = date()
-			if d >= .EndTime
-				require .state isnt finished
-				.State |= TaskState.Finished
-			rz = (.func)(.upon, self)
-			.State |= TaskState.Started
-			if .state is Finished
-				rz = false
-
-
-function Window.RunTasks (|date| now)
-	opt norefcounts
-	|| i = 0
-	while (|| p = .Tasks[i])
-		if (p.starttime < now) and !p.runtask
-			.Tasks.FastRemove(i)
-		  else
-			i++
+		run (|date| now, |bool|)
+			0 // placeholder
 
 
 helper image.ControlClip (assigns:|GuiControl| G)

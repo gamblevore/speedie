@@ -440,16 +440,19 @@ function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 	
 	fs.AppendBehaviour("", cls.destructorfunc, nil)
 	
+	if cls ~= "playlist"
 	while (b)
 		for (M in b.interfaces)
 			|| s = m.name.InterfaceToBehaviour
-			|| fn = cls.BestBehaviourFor(s)					#expect (cls.source, cls.name + " doesn't have behaviour: " + s)
-			|| BaseClass = cls.InterfaceForBehaviour(fn)	#require
-			if (M.IsRequiredInterface and !cls.Behaviour![s])
-				|| msg = "Missing behaviour on class: " + cls.name
-				error (cls.source, msg)
-				error (baseclass.funcproto!.source, msg)
-			fs.AppendBehaviour(s, fn, Baseclass)
+			|| fn = cls.BestBehaviourFor(s)
+				|| BaseClass = cls.InterfaceForBehaviour(fn)
+					if (M.IsRequiredInterface and !cls.Behaviour![s])
+						|| msg = "Missing behaviour on class: " + cls.name
+						error (cls.source, msg)
+						error (baseclass.funcproto!.source, msg)
+					fs.AppendBehaviour(s, fn, Baseclass)
+			  else
+				error (cls.source, "Missing behaviour on class: " + s)
 		b = b.upwards
 	
 	fs <~ "\treturn Result;\n}\n\n"
@@ -460,42 +463,44 @@ function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 function ExportClass (|SCClass| cls, |FastStringCpp| CppFile)
 	require !cls.IsDataTypeOrFP
 	require !cls.isbehaviourTable
-	require !cls.IsRole
-	if cls.iswrapper
-		.ExportBehaviourHeader(cls)
-	require !cls.IsWrapper
-	
-	if cls.IsStruct
-		.ExportStruct( cls )
-		return
-	
+	require cls.IsRole != 1
+
+	if cls.isrole != 2
+		if cls.iswrapper
+			.ExportBehaviourHeader(cls)
+		require !cls.IsWrapper
+		if cls.IsStruct
+			.ExportStruct( cls )
+			return
 
 	|| HFile = .TypesProj
-	.ExportBehaviourHeader(cls)
+	
+	if !cls.isrole
+		.ExportBehaviourHeader(cls) // can we move this lower?
 	
 	HFile <~ "\nJBClass ( "
-	HFile <~ cls.CStructName
-	HFile <~ " , "
+	hfile <~ cls.CStructName
+	hfile <~ " , "
 	if (cls.super)
-		HFile <~ cls.super.CStructName
+		hfile <~ cls.super.CStructName
 	  else
-		HFile <~ "JB_Object"
-	HFile <~ " , "
+		hfile <~ "JB_Object"
+	hfile <~ " , "
 	
 	for (prop in cls.Properties)
-		HFile <~ "\n\t"
-		WriteDecl( prop, HFile )
-		HFile <~ ';'
+		hfile <~ "\n\t"
+		WriteDecl( prop, hfile )
+		hfile <~ ';'
 	
-	HFile <~ "\n);\n"
-	
+	hfile <~ "\n);\n"
 
-	|| HasTable = .ExportBehaviourInstance(cls, cppfile)
-	CppFile <~ "JBClassPlace4(${cls.CStructName}, ${cls.CSuperStructName}, "
-	if (!HasTable)
-		cls = TypeObject
-	cppfile <~ cls.CStructName
-	cppfile <~ "_FuncTable_);\n\n"
+	if !cls.isrole
+		|| HasTable = .ExportBehaviourInstance(cls, cppfile)
+		CppFile <~ "JBClassPlace4(${cls.CStructName}, ${cls.CSuperStructName}, "
+		if (!HasTable)
+			cls = TypeObject
+		cppfile <~ cls.CStructName
+		cppfile <~ "_FuncTable_);\n\n"
 
 
 function scfunction.CanLibLoad (|bool|)

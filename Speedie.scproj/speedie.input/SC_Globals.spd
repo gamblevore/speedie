@@ -1073,10 +1073,11 @@ function TypeOfDot (ExprResolver)
 			if (DotVar isa scclass) and !exp.IsSettablePlace
 				decl = decl.ContainedReplace( Contains, true )
 		if decl is task
-			return (dotvar as scclass).DotTaskProperty( exp, decl )
+			return decl
+	  else
+		decl = typevoid!
 	
 	|| fn = exp.last!.asfunc
-		decl := typevoid
 		exp.obj = decl
 		if exp != @func
 			fn.DotFuncToNormalFunc( exp )
@@ -1657,23 +1658,6 @@ function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
 	d.name = varname
 	if varname								// SetVarName later?
 		D.Default = rz
-
-
-function SCClass.DotTaskProperty (|Message| dot, |SCDecl| decl, |scdecl|)
-	opt norefcounts
-	expect  (decl.TypeSuffers or decl.type.size <= 8)  (dot, "Too big. Upgrade this compiler feature?")
-	
-	|| src = decl.source					#expect (dot, errorreceiver.nonfatal)
-	|| var = dot.first
-	macro.TmpPrms <~ var
-	macro.TmpPrms <~ src.indent|int|.msg
-	macro.TmpPrms <~ decl.WriteVerySimpleType
-	dot.BecomeMacro(macros.TaskAccess, macro.TmpPrms)
-	macro.TmpPrms.clear
-	
-	dot.obj = decl
-	// allow left-side casting!!! :D just C++ can hook it and rook it nicely
-	return decl
 	
 	
 
