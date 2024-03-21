@@ -3,7 +3,7 @@
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
 // todo
-// * Use ringtree for world/super/block! makes code simpler!
+// * Use list for world/super/block! makes code simpler!
 // * Can just do block = JB_RT_Next2(block); // goes up and down if hits end
 // 												easy way to list all blocks in the world!
 // * also... can put worlds together. Like sound/map/graphics/obj
@@ -1064,7 +1064,7 @@ void JB_DeleteSub_( FreeObject* Obj, AllocationBlock* Block ) {
 // number that stores all the stuff we need to delete an object. PerryIDE only has 61 objects
 // we can perhaps store the class-hierarchy within the 64-bit number or whatever.
 // no need to worry about jbobject/savable... PerryIDE is only 3 classes deep...
-// ringtree is a bit of an issue, but that can be separately optimised :)
+// list is a bit of an issue, but that can be separately optimised :)
 // could store the delete-info in the behaviour table or the allocationblock... either is ok.
 
 // we could specify a compile flag that warns if any classes unnecssarily have too many vars

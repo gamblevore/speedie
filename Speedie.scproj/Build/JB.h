@@ -317,8 +317,6 @@ struct MaterialsLol_Behaviour;
 
 struct Process_Behaviour;
 
-struct RingTree_Behaviour;
-
 struct SCNamed_Behaviour;
 
 struct SavingTest_Behaviour;
@@ -326,6 +324,8 @@ struct SavingTest_Behaviour;
 struct StringShared_Behaviour;
 
 struct StringZeroTerminated_Behaviour;
+
+struct list_Behaviour;
 
 struct xC2xB5Func1_Behaviour;
 
@@ -978,9 +978,6 @@ JBClass ( MaterialsLol , Selector ,
 struct Process_Behaviour: ProcessOwner_Behaviour {
 };
 
-struct RingTree_Behaviour: Saveable_Behaviour {
-};
-
 struct SCNamed_Behaviour: SCObject_Behaviour {
 };
 
@@ -1001,19 +998,22 @@ JBClass ( SavingTest , Saveable ,
 struct StringZeroTerminated_Behaviour: String_Behaviour {
 };
 
+struct list_Behaviour: Saveable_Behaviour {
+};
+
 struct xC2xB5Func1_Behaviour: Memory_Behaviour {
 };
 
 JBClass ( ASMFunc2 , MWrap , 
 );
 
-struct Message_Behaviour: RingTree_Behaviour {
+struct Message_Behaviour: list_Behaviour {
 	__Message_CopyID__ copyid;
 	__Message_Text__ text;
 	__Message_TextSet__ textset;
 };
 
-JBClass ( Message , RingTree , 
+JBClass ( Message , JB_List , 
 	JB_String* Name;
 	JB_Object* Obj;
 	Syntax Func;
@@ -1107,10 +1107,10 @@ JBClass ( SpdProcess , ShellStream ,
 	ProcessMode Mode;
 );
 
-struct Task_Behaviour: RingTree_Behaviour {
+struct Task_Behaviour: list_Behaviour {
 };
 
-JBClass ( JB_Task , RingTree , 
+JBClass ( JB_Task , JB_List , 
 	TaskState State;
 	byte _ObjectCount;
 	void* _func;
@@ -5279,9 +5279,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 // JB_Process_Behaviour
 
 
-// JB_RingTree_Behaviour
-
-
 // JB_SCNamed_Behaviour
 
 
@@ -5292,6 +5289,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_StringZeroTerminated_Behaviour
+
+
+// JB_list_Behaviour
 
 
 // JB_µFunc1_Behaviour
@@ -6685,59 +6685,6 @@ JB_String* JB_Sh_Render(ShellStream* self, FastString* fs_in);
 
 
 
-// JB_RingTree
-void JB_Tree_AppendAfter(RingTree* self, RingTree* item, RingTree* after);
-
-void JB_Tree_AppendBefore(RingTree* self, RingTree* item, RingTree* Before);
-
-int JB_Tree_BackDist(RingTree* self, RingTree* B);
-
-void JB_Tree_Clear(RingTree* self);
-
-int JB_Tree_Dist(RingTree* self, RingTree* r);
-
-RingTree* JB_Tree_FlatLast(RingTree* self);
-
-int JB_Tree_FwdDist(RingTree* self, RingTree* F);
-
-bool JB_Tree_HasOneChild(RingTree* self);
-
-bool JB_Tree_IsFirst(RingTree* self);
-
-bool JB_Tree_IsLast(RingTree* self);
-
-bool JB_Tree_IsOnlyChild(RingTree* self);
-
-void jdb2(RingTree* self);
-
-void jdb3(RingTree* self);
-
-bool JB_Tree_OperatorLessOrEqual(RingTree* self, int N);
-
-RingTree* JB_Tree_Pop(RingTree* self);
-
-void JB_Tree_Remove(RingTree* self);
-
-void JB_Tree_RemoveAfter(RingTree* self);
-
-JB_String* JB_Tree_Render(RingTree* self, FastString* fs_in);
-
-RingTree* JB_Tree_Second(RingTree* self);
-
-RingTree* JB_Tree_Get(RingTree* self, int n);
-
-void JB_Tree_SyntaxAppend(RingTree* self, RingTree* Last);
-
-bool JB_Tree_SyntaxEquals(RingTree* self, int n, bool Aware);
-
-void JB_Tree_TakeAllFrom(RingTree* self, RingTree* src);
-
-RingTree* JB_Tree_Upward(RingTree* self, int n);
-
-RingTree* JB_Tree_WrapWith(RingTree* self, RingTree* W);
-
-
-
 // JB_SCNamed
 SCNamed* JB_Named_Constructor(SCNamed* self);
 
@@ -6768,6 +6715,59 @@ bool SC_SavingTest__IsEqual(JB_Object* A, JB_Object* B);
 
 // JB_StringZeroTerminated
 _cstring JB_Str_CString(JB_StringC* self);
+
+
+
+// JB_list
+void JB_Tree_AppendAfter(JB_List* self, JB_List* item, JB_List* after);
+
+void JB_Tree_AppendBefore(JB_List* self, JB_List* item, JB_List* Before);
+
+int JB_Tree_BackDist(JB_List* self, JB_List* B);
+
+void JB_Tree_Clear(JB_List* self);
+
+int JB_Tree_Dist(JB_List* self, JB_List* r);
+
+JB_List* JB_Tree_FlatLast(JB_List* self);
+
+int JB_Tree_FwdDist(JB_List* self, JB_List* F);
+
+bool JB_Tree_HasOneChild(JB_List* self);
+
+bool JB_Tree_IsFirst(JB_List* self);
+
+bool JB_Tree_IsLast(JB_List* self);
+
+bool JB_Tree_IsOnlyChild(JB_List* self);
+
+void jdb2(JB_List* self);
+
+void jdb3(JB_List* self);
+
+bool JB_Tree_OperatorLessOrEqual(JB_List* self, int N);
+
+JB_List* JB_Tree_Pop(JB_List* self);
+
+void JB_Tree_Remove(JB_List* self);
+
+void JB_Tree_RemoveAfter(JB_List* self);
+
+JB_String* JB_Tree_Render(JB_List* self, FastString* fs_in);
+
+JB_List* JB_Tree_Second(JB_List* self);
+
+JB_List* JB_Tree_Get(JB_List* self, int n);
+
+void JB_Tree_SyntaxAppend(JB_List* self, JB_List* Last);
+
+bool JB_Tree_SyntaxEquals(JB_List* self, int n, bool Aware);
+
+void JB_Tree_TakeAllFrom(JB_List* self, JB_List* src);
+
+JB_List* JB_Tree_Upward(JB_List* self, int n);
+
+JB_List* JB_Tree_WrapWith(JB_List* self, JB_List* W);
 
 
 

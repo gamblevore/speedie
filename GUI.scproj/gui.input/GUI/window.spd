@@ -21,7 +21,7 @@ class Window (GUIControl)
 	|GUIPasteEvent?|					OnPaste
 	|GUICopyEvent?|						OnCopy
 	|GUIMouseMoveEvent?|				OnMouseMove
-	|ringtree of guicontrol.GUITask|	Tasks
+	|list of guicontrol.GUITask|	Tasks
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
@@ -29,14 +29,14 @@ class Window (GUIControl)
 	
 	constructor
 		super.constructor(window.all)
-		.Tasks = RingTree()
+		.Tasks = list()
 		.subconstructor(the~area)
 		
 
 	constructor (|ControlRect| Size)
 		cpp_part ConstructorSize
 		super.constructor(window.all)
-		.Tasks = RingTree()
+		.Tasks = list()
 		.subconstructor(size)
 	
 	

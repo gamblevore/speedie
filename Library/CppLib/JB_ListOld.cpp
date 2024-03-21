@@ -10,7 +10,6 @@
 
 
 /*
-	Another shit class.
 	USE RINGTREE!
 */
 

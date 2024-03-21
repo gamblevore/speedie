@@ -1,7 +1,7 @@
 
 module Notifications
 	linkage: cpp_part Note 
-	|ringtree of window|	Alerts = ringtree()
+	|list of window|	Alerts = list()
 	
 	constants
 		height = 60

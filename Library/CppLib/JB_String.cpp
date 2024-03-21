@@ -1928,7 +1928,7 @@ JB_String* JB_Obj_GenericRender(JB_Object* self, FastString* fs_in) {
     // ["abc"] // array of string
     // [1234]  // array of int-object
     // [(1,2,3)] // array of set
-    // [RingTree(741)] // seems to make sense?
+    // [JB_List(741)] // seems to make sense?
     FastString* fs = JB_FS__FastNew(fs_in);
 
     JB_Class* Cls = JB_ObjClass(self);

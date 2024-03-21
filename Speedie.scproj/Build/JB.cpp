@@ -2042,7 +2042,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112134348418011)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112134413999619)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -8592,13 +8592,13 @@ void SC___junktest_1__() {
 
 void SC___junktest_2__() {
 	//visible;
-	RingTree* r1 = JB_Incr(JB_Ring_Constructor0(nil));
+	JB_List* r1 = JB_Incr(JB_Ring_Constructor0(nil));
 	if (0.5f) {
 		JB_SetRef(r1, nil);
 	}
-	RingTree* r2 = JB_Incr(JB_Ring_Constructor0(nil));
+	JB_List* r2 = JB_Incr(JB_Ring_Constructor0(nil));
 	{
-		RingTree* _tmP0 = JB_Incr(JB_Ring_First(r1));
+		JB_List* _tmP0 = JB_Incr(JB_Ring_First(r1));
 		if (_tmP0) {
 			int i2 = 0;
 			i2 = JB_Tree_Dist(_tmP0, r2);
@@ -21372,7 +21372,8 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self) {
 }
 
 void JB_Rec_AppendErr(JB_ErrorReceiver* self, JB_Error* Err) {
-	bool CanPrint = (!JB_Rec_BadCount(self)) and ((bool)JB__Err_AutoPrint);
+	bool CanPrint = false;
+	//"Speedie" // useful marker for debugging...;
 	JB_Rec_Incr(self, Err, true);
 	if ((!(JB_Str_Exists(Err->Path)))) {
 		JB_SetRef(Err->Path, self->Source);
@@ -27082,247 +27083,6 @@ JB_String* JB_Sh_Render(ShellStream* self, FastString* fs_in) {
 }
 
 
-void JB_Tree_AppendAfter(RingTree* self, RingTree* item, RingTree* after) {
-	if (after) {
-		(JB_Ring_NextSibSet(after, item));
-	}
-	 else {
-		(JB_Ring_FirstSet(self, item));
-	}
-}
-
-void JB_Tree_AppendBefore(RingTree* self, RingTree* item, RingTree* Before) {
-	if (Before) {
-		(JB_Ring_PrevSibSet(Before, item));
-	}
-	 else {
-		(JB_Ring_LastSet(self, item));
-	}
-}
-
-int JB_Tree_BackDist(RingTree* self, RingTree* B) {
-	int c = 0;
-	while (B) {
-		if (self == B) {
-			return c;
-		}
-		B = JB_Ring_PrevSib(B);
-		c--;
-	};
-	return 0;
-}
-
-void JB_Tree_Clear(RingTree* self) {
-	while (true) {
-		RingTree* _tmPf0 = JB_Ring_First(self);
-		if ((!_tmPf0)) {
-			return;
-		}
-		JB_Tree_Remove(_tmPf0);
-	};
-}
-
-int JB_Tree_Dist(RingTree* self, RingTree* r) {
-	if ((!(((bool)self) and ((bool)r)))) {
-		return 0;
-	}
-	if (JB_Ring_Parent(r) != JB_Ring_Parent(self)) {
-		debugger;
-		return 0;
-	}
-	if (r != self) {
-		int _tmP0 = JB_Tree_FwdDist(self, r);
-		if ((!_tmP0)) {
-			_tmP0 = JB_Tree_BackDist(self, r);
-		}
-		return _tmP0;
-	}
-	return 0;
-}
-
-RingTree* JB_Tree_FlatLast(RingTree* self) {
-	RingTree* rz = nil;
-	rz = self;
-	while (true) {
-		RingTree* _tmPf0 = JB_Ring_Last(rz);
-		if ((!_tmPf0)) {
-			break;
-		}
-		rz = _tmPf0;
-	};
-	return rz;
-}
-
-int JB_Tree_FwdDist(RingTree* self, RingTree* F) {
-	int c = 0;
-	while (F) {
-		if (self == F) {
-			return c;
-		}
-		F = JB_Ring_NextSib(F);
-		c++;
-	};
-	return 0;
-}
-
-bool JB_Tree_HasOneChild(RingTree* self) {
-	return JB_Ring_HasChildCount(self, 1);
-}
-
-bool JB_Tree_IsFirst(RingTree* self) {
-	return JB_Ring_PrevSib(self) == nil;
-}
-
-bool JB_Tree_IsLast(RingTree* self) {
-	return JB_Ring_NextSib(self) == nil;
-}
-
-bool JB_Tree_IsOnlyChild(RingTree* self) {
-	if ((!JB_Ring_PrevSib(self))) {
-		return (!JB_Ring_NextSib(self));
-	}
-	return false;
-}
-
-__lib__ void jdb2(RingTree* self) {
-	//visible;
-	if (self) {
-		JB_String* _tmPf0 = JB_Incr(JB_Msg_JDB_(((Message*)self), nil, 1));
-		JB_PrintLine(_tmPf0);
-		JB_Decr(_tmPf0);
-	}
-	 else {
-		JB_PrintLine(JB_LUB[1427]);
-	}
-}
-
-__lib__ void jdb3(RingTree* self) {
-	//visible;
-	if (self) {
-		JB_String* _tmPf0 = JB_Incr(JB_Msg_JDB_(((Message*)self), nil, 3));
-		JB_PrintLine(_tmPf0);
-		JB_Decr(_tmPf0);
-	}
-	 else {
-		JB_PrintLine(JB_LUB[1427]);
-	}
-}
-
-bool JB_Tree_OperatorLessOrEqual(RingTree* self, int N) {
-	RingTree* c = JB_Ring_First(self);
-	while (c) {
-		if (N <= 0) {
-			return nil;
-		}
-		N--;
-		c = JB_Ring_NextSib(c);
-	};
-	return true;
-}
-
-RingTree* JB_Tree_Pop(RingTree* self) {
-	RingTree* rz = nil;
-	JB_SetRef(rz, JB_Ring_Last(self));
-	if (rz) {
-		JB_Tree_Remove(rz);
-	}
-	JB_SafeDecr(rz);
-	return rz;
-}
-
-void JB_Tree_Remove(RingTree* self) {
-	(JB_Ring_ParentSet(self, nil));
-}
-
-void JB_Tree_RemoveAfter(RingTree* self) {
-	while ((true)) {
-		RingTree* x = JB_Ring_NextSib(self);
-		if ((!x)) {
-			break;
-		}
-		JB_Tree_Remove(x);
-	};
-}
-
-JB_String* JB_Tree_Render(RingTree* self, FastString* fs_in) {
-	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
-	JB_FS_AppendByte(fs, '(');
-	{
-		RingTree* f = JB_Incr(JB_Ring_First(self));
-		while (f) {
-			RingTree* _Nf1 = JB_Incr((JB_Ring_NextSib(f)));
-			JB_FreeIfDead(JB_Object___Render__(f, fs));
-			JB_FS_AppendByte(fs, ',');
-			JB_FS_AppendByte(fs, ' ');
-			JB_SetRef(f, _Nf1);
-			JB_Decr(_Nf1);
-		};
-		JB_Decr(f);
-		;
-	}
-	;
-	JB_FS_AppendByte(fs, ')');
-	JB_String* _tmPf2 = JB_Incr(JB_FS_SmartResult(fs, fs_in));
-	JB_Decr(fs);
-	JB_SafeDecr(_tmPf2);
-	return _tmPf2;
-}
-
-RingTree* JB_Tree_Second(RingTree* self) {
-	RingTree* x = JB_Ring_First(self);
-	if (x) {
-		return JB_Ring_NextSib(x);
-	}
-	return nil;
-}
-
-RingTree* JB_Tree_Get(RingTree* self, int n) {
-	RingTree* rz = nil;
-	if (self) {
-		if (n >= 0) {
-			rz = JB_Ring_First(self);
-			while (((bool)rz) and ((--n) >= 0)) {
-				rz = JB_Ring_NextSib(rz);
-			};
-		}
-		 else {
-			rz = JB_Ring_Last(self);
-			while (((bool)rz) and ((++n) < 0)) {
-				rz = JB_Ring_PrevSib(rz);
-			};
-		}
-	}
-	return rz;
-}
-
-void JB_Tree_SyntaxAppend(RingTree* self, RingTree* Last) {
-	(JB_Ring_LastSet(self, Last));
-}
-
-bool JB_Tree_SyntaxEquals(RingTree* self, int n, bool Aware) {
-	return JB_Ring_HasChildCount(self, n);
-}
-
-void JB_Tree_TakeAllFrom(RingTree* self, RingTree* src) {
-	while (JB_Ring_HasChildren(src)) {
-		(JB_Ring_FirstSet(self, JB_Ring_Last(src)));
-	};
-}
-
-RingTree* JB_Tree_Upward(RingTree* self, int n) {
-	while (((bool)self) and (n-- >= 1)) {
-		self = JB_Ring_Parent(self);
-	};
-	return self;
-}
-
-RingTree* JB_Tree_WrapWith(RingTree* self, RingTree* W) {
-	(JB_Ring_PrevSibSet(self, W));
-	(JB_Ring_FirstSet(W, self));
-	return W;
-}
-
-
 SCNamed* JB_Named_Constructor(SCNamed* self) {
 	if (self == nil) {
 		self = ((SCNamed*)JB_NewClass(&SCNamedData));
@@ -27360,7 +27120,7 @@ SavingTest* SC_SavingTest_Constructor(SavingTest* self, int n) {
 	}
 	JB_Sav_Constructor(self);
 	JB_String* _tmPf0 = JB_Incr(JB_int_RenderFS(n, nil));
-	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1428], _tmPf0);
+	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1427], _tmPf0);
 	JB_Decr(_tmPf0);
 	self->Name = JB_Incr(_tmPf1);
 	self->Value = (1000 + n);
@@ -27412,6 +27172,247 @@ bool SC_SavingTest__IsEqual(JB_Object* A, JB_Object* B) {
 
 _cstring JB_Str_CString(JB_StringC* self) {
 	return ((_cstring)self->Addr);
+}
+
+
+void JB_Tree_AppendAfter(JB_List* self, JB_List* item, JB_List* after) {
+	if (after) {
+		(JB_Ring_NextSibSet(after, item));
+	}
+	 else {
+		(JB_Ring_FirstSet(self, item));
+	}
+}
+
+void JB_Tree_AppendBefore(JB_List* self, JB_List* item, JB_List* Before) {
+	if (Before) {
+		(JB_Ring_PrevSibSet(Before, item));
+	}
+	 else {
+		(JB_Ring_LastSet(self, item));
+	}
+}
+
+int JB_Tree_BackDist(JB_List* self, JB_List* B) {
+	int c = 0;
+	while (B) {
+		if (self == B) {
+			return c;
+		}
+		B = JB_Ring_PrevSib(B);
+		c--;
+	};
+	return 0;
+}
+
+void JB_Tree_Clear(JB_List* self) {
+	while (true) {
+		JB_List* _tmPf0 = JB_Ring_First(self);
+		if ((!_tmPf0)) {
+			return;
+		}
+		JB_Tree_Remove(_tmPf0);
+	};
+}
+
+int JB_Tree_Dist(JB_List* self, JB_List* r) {
+	if ((!(((bool)self) and ((bool)r)))) {
+		return 0;
+	}
+	if (JB_Ring_Parent(r) != JB_Ring_Parent(self)) {
+		debugger;
+		return 0;
+	}
+	if (r != self) {
+		int _tmP0 = JB_Tree_FwdDist(self, r);
+		if ((!_tmP0)) {
+			_tmP0 = JB_Tree_BackDist(self, r);
+		}
+		return _tmP0;
+	}
+	return 0;
+}
+
+JB_List* JB_Tree_FlatLast(JB_List* self) {
+	JB_List* rz = nil;
+	rz = self;
+	while (true) {
+		JB_List* _tmPf0 = JB_Ring_Last(rz);
+		if ((!_tmPf0)) {
+			break;
+		}
+		rz = _tmPf0;
+	};
+	return rz;
+}
+
+int JB_Tree_FwdDist(JB_List* self, JB_List* F) {
+	int c = 0;
+	while (F) {
+		if (self == F) {
+			return c;
+		}
+		F = JB_Ring_NextSib(F);
+		c++;
+	};
+	return 0;
+}
+
+bool JB_Tree_HasOneChild(JB_List* self) {
+	return JB_Ring_HasChildCount(self, 1);
+}
+
+bool JB_Tree_IsFirst(JB_List* self) {
+	return JB_Ring_PrevSib(self) == nil;
+}
+
+bool JB_Tree_IsLast(JB_List* self) {
+	return JB_Ring_NextSib(self) == nil;
+}
+
+bool JB_Tree_IsOnlyChild(JB_List* self) {
+	if ((!JB_Ring_PrevSib(self))) {
+		return (!JB_Ring_NextSib(self));
+	}
+	return false;
+}
+
+__lib__ void jdb2(JB_List* self) {
+	//visible;
+	if (self) {
+		JB_String* _tmPf0 = JB_Incr(JB_Msg_JDB_(((Message*)self), nil, 1));
+		JB_PrintLine(_tmPf0);
+		JB_Decr(_tmPf0);
+	}
+	 else {
+		JB_PrintLine(JB_LUB[1428]);
+	}
+}
+
+__lib__ void jdb3(JB_List* self) {
+	//visible;
+	if (self) {
+		JB_String* _tmPf0 = JB_Incr(JB_Msg_JDB_(((Message*)self), nil, 3));
+		JB_PrintLine(_tmPf0);
+		JB_Decr(_tmPf0);
+	}
+	 else {
+		JB_PrintLine(JB_LUB[1428]);
+	}
+}
+
+bool JB_Tree_OperatorLessOrEqual(JB_List* self, int N) {
+	JB_List* c = JB_Ring_First(self);
+	while (c) {
+		if (N <= 0) {
+			return nil;
+		}
+		N--;
+		c = JB_Ring_NextSib(c);
+	};
+	return true;
+}
+
+JB_List* JB_Tree_Pop(JB_List* self) {
+	JB_List* rz = nil;
+	JB_SetRef(rz, JB_Ring_Last(self));
+	if (rz) {
+		JB_Tree_Remove(rz);
+	}
+	JB_SafeDecr(rz);
+	return rz;
+}
+
+void JB_Tree_Remove(JB_List* self) {
+	(JB_Ring_ParentSet(self, nil));
+}
+
+void JB_Tree_RemoveAfter(JB_List* self) {
+	while ((true)) {
+		JB_List* x = JB_Ring_NextSib(self);
+		if ((!x)) {
+			break;
+		}
+		JB_Tree_Remove(x);
+	};
+}
+
+JB_String* JB_Tree_Render(JB_List* self, FastString* fs_in) {
+	FastString* fs = JB_Incr(JB_FS__FastNew(fs_in));
+	JB_FS_AppendByte(fs, '(');
+	{
+		JB_List* f = JB_Incr(JB_Ring_First(self));
+		while (f) {
+			JB_List* _Nf1 = JB_Incr((JB_Ring_NextSib(f)));
+			JB_FreeIfDead(JB_Object___Render__(f, fs));
+			JB_FS_AppendByte(fs, ',');
+			JB_FS_AppendByte(fs, ' ');
+			JB_SetRef(f, _Nf1);
+			JB_Decr(_Nf1);
+		};
+		JB_Decr(f);
+		;
+	}
+	;
+	JB_FS_AppendByte(fs, ')');
+	JB_String* _tmPf2 = JB_Incr(JB_FS_SmartResult(fs, fs_in));
+	JB_Decr(fs);
+	JB_SafeDecr(_tmPf2);
+	return _tmPf2;
+}
+
+JB_List* JB_Tree_Second(JB_List* self) {
+	JB_List* x = JB_Ring_First(self);
+	if (x) {
+		return JB_Ring_NextSib(x);
+	}
+	return nil;
+}
+
+JB_List* JB_Tree_Get(JB_List* self, int n) {
+	JB_List* rz = nil;
+	if (self) {
+		if (n >= 0) {
+			rz = JB_Ring_First(self);
+			while (((bool)rz) and ((--n) >= 0)) {
+				rz = JB_Ring_NextSib(rz);
+			};
+		}
+		 else {
+			rz = JB_Ring_Last(self);
+			while (((bool)rz) and ((++n) < 0)) {
+				rz = JB_Ring_PrevSib(rz);
+			};
+		}
+	}
+	return rz;
+}
+
+void JB_Tree_SyntaxAppend(JB_List* self, JB_List* Last) {
+	(JB_Ring_LastSet(self, Last));
+}
+
+bool JB_Tree_SyntaxEquals(JB_List* self, int n, bool Aware) {
+	return JB_Ring_HasChildCount(self, n);
+}
+
+void JB_Tree_TakeAllFrom(JB_List* self, JB_List* src) {
+	while (JB_Ring_HasChildren(src)) {
+		(JB_Ring_FirstSet(self, JB_Ring_Last(src)));
+	};
+}
+
+JB_List* JB_Tree_Upward(JB_List* self, int n) {
+	while (((bool)self) and (n-- >= 1)) {
+		self = JB_Ring_Parent(self);
+	};
+	return self;
+}
+
+JB_List* JB_Tree_WrapWith(JB_List* self, JB_List* W) {
+	(JB_Ring_PrevSibSet(self, W));
+	(JB_Ring_FirstSet(W, self));
+	return W;
 }
 
 
@@ -27781,9 +27782,6 @@ fn_asm SC_Msg_ASMFunc(Message* self) {
 		ASM = ((int)self->Func);
 	}
 	rz = JB_fn_asm_table[ASM];
-	if ((!(rz))) {
-		return rz;
-	}
 	return rz;
 }
 
@@ -31110,7 +31108,7 @@ bool JB_Msg_ListViewable(Message* self) {
 
 JB_String* JB_Msg_Locate(Message* self) {
 	if ((!self)) {
-		return JB_LUB[1427];
+		return JB_LUB[1428];
 	}
 	JB_String* s = JB_Incr(JB_Msg_Render(self, nil));
 	JB_String* fname = JB_Incr(JB_Syx_Name(self->Func));
@@ -47208,4 +47206,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 2128698466829806621 -3419531979525637712
+// 196267333444580300 -9005323781678822293

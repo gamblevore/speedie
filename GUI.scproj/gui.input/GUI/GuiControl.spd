@@ -1,6 +1,6 @@
 
 
-class GUIControl (ringtree)
+class GUIControl (list)
 	linkage: cpp_part ctrl
 	
 	contains GuiControl

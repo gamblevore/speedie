@@ -27,10 +27,10 @@ helper __junktest_3__ (|intrange| data, |bool|)
 
 helper __junktest_2__
 	visible
-	|| r1 = ringtree()
+	|| r1 = list()
 	if (0.5)
 		r1 = nil
-	|| r2 = ringtree()
+	|| r2 = list()
 	with r1.first
 		|| i2 = 0
 		i2 = .dist(r2)

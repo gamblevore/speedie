@@ -12,7 +12,7 @@ datatype TextLineFlags (uint16)
 		FakeMsg
 
 
-class TextViewLine (ringtree)
+class TextViewLine (list)
 	linkage
 		cpp_part Line
 	contains TextViewLine

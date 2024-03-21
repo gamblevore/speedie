@@ -33,7 +33,7 @@
 
 
 * Better expect syntax! explained in expect.txt
-* remove arrays/linkedlists. Use FixedDict+RingTree.
+* remove arrays/linkedlists. Use FixedDict+list.
 * Static vars?
 * struct/array unpacking too.
 	* var = {a,b,c}|nameandmsg| // a struct... or even a class? why not?
@@ -150,7 +150,7 @@ Do when it's fun...
 
 * Constructors/new are already good! Because constructors inline in C anyhow...
 
-*	msg[0] was finding a func in message[(default params)] instead of ringtree[(exact match)]
+*	msg[0] was finding a func in message[(default params)] instead of list[(exact match)]
 	I think this actually is good behaviour... I should just create an error about "Shadowing"... rather than make my compiler awkward.
 	
 * a = b:c

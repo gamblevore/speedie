@@ -136,7 +136,7 @@ struct JB_Object {
 };
 
 
-struct JB_RingList : JB_Object { // a list that does not own its items... unlike ringtree
+struct JB_RingList : JB_Object { // a list that does not own its items... unlike JB_List
 	uint					PID;
     JB_RingList*			Next;
     JB_RingList*			Prev;

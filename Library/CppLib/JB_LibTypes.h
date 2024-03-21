@@ -10,7 +10,7 @@ struct Tokeniser;
 struct Dictionary;
 struct DictionaryReader;
 struct TokHan;
-struct RingTree;
+struct JB_List;
 struct JB_StringShared;
 #ifndef __MM_SUCKS__ 
 constexpr int operator"" _K(unsigned long long x) { return (int)x * 1024; } 

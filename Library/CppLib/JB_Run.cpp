@@ -65,7 +65,7 @@ JBClassPlaceSaver( Saveable,     0,                     0,                      
 JBClassPlace( FastString,       JB_FS_Destructor,      JB_AsClass(JB_Object),      JB_FS_Render );
 JBClassPlace( ByteMap,          0,                     JB_AsClass(JB_Object),      0 );
 JBClassPlace( CharSet,          0,                     JB_AsClass(JB_Object),      JB_CS_Render );
-JBClassPlace( RingTree,         JB_Ring_Destructor,    JB_AsClass(Saveable),       0 );
+JBClassPlace( JB_List,         JB_Ring_Destructor,    JB_AsClass(Saveable),       0 );
 JBClassPlace( TokHan,           0,                     JB_AsClass(JB_Object),      0 );
 
 extern JB_Class JB_TaskData;

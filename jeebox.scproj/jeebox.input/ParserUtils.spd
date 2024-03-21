@@ -228,7 +228,7 @@ struct MessagePosition
 	function SyntaxUsingComplete 
 
 
-api ringtree.JDB2
+api list.JDB2
 	cpp_name jdb2
 	visible
 	if (Self)
@@ -237,7 +237,7 @@ api ringtree.JDB2
 	    "(nil)"
 
 
-api ringtree.JDB3
+api list.JDB3
 	cpp_name jdb3
 	visible
 	if (Self)

@@ -3,19 +3,21 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-class RingTree (Saveable)
+class list (Saveable)
 	size 40
 	|ind| 	Position
 	linkage
 		wrapper
 		cpp_part		Tree
+		cpp_class		JB_List
+
 	cpp_refs
 		disturbs nil
 		disowns  false
 
 	
 	saveas nil
-	contains		RingTree
+	contains		list
 
 	
 	constructor							{ cpp_wrapper JB_Ring_Constructor0 }
@@ -163,7 +165,7 @@ class RingTree (Saveable)
 		if (Metoo)
 			.dispose
 	
-	function Dist (|ringtree| r, |int|)
+	function Dist (|list| r, |int|)
 		opt norefcounts
 		require self and r
 		
@@ -172,7 +174,7 @@ class RingTree (Saveable)
 			return .fwddist(R) ?? .backdist(r)
 			
 
-	function FwdDist (|ringtree!| F, |int|)
+	function FwdDist (|list!| F, |int|)
 		opt norefcounts
 		|| c = 0
 		while F
@@ -182,7 +184,7 @@ class RingTree (Saveable)
 			c++
 			
 
-	function BackDist (|ringtree!| B, |int|)
+	function BackDist (|list!| B, |int|)
 		opt norefcounts
 		|| c = 0
 		while B
@@ -191,7 +193,7 @@ class RingTree (Saveable)
 			B--
 			c--
 		
-	operator gt (|ringtree| rt, |bool|)
+	operator gt (|list| rt, |bool|)
 		return .fwddist(rt)
 
 	operator min (|| rt, ||)
@@ -409,7 +411,7 @@ class RingTree (Saveable)
 			.Last = item
 
 
-	helper SortAfter (|SorterComparer| fnc, |ringtree|)
+	helper SortAfter (|SorterComparer| fnc, |list|)
 		opt norefcounts			// find the first obj that we are "more than"
 		|| p = .prev
 		while p
@@ -437,7 +439,7 @@ class RingTree (Saveable)
 			f.SortAfter2(self, fnc)
 
 
-	helper SortAfter2 (|ringtree| parent, |SorterComparer2| fnc)
+	helper SortAfter2 (|list| parent, |SorterComparer2| fnc)
 		opt norefcounts
 		|| p = .prev
 		// Find the first thing that we are larger than. end there.
@@ -452,7 +454,7 @@ class RingTree (Saveable)
 		parent.first = self // smallest
 
 
-	function Loop (|bool| dir=true, |ringtree| Owner=nil, |...!|)
+	function Loop (|bool| dir=true, |list| Owner=nil, |...!|)
 		description "Owner must be nil... or contain us. Otherwise this function will break."
 		opt norefcounts
 		real self
@@ -526,11 +528,3 @@ class RingTree (Saveable)
 			_curr = _curr.parent
 		(self)
 
-
-
-//struct RingTreePosition
-//	|int| RefCount
-//	|ind| Position // this is to hide the position property... so that no code edits it
-//				   // not without going out of it's way. This is to make Tasks more reliable.
-//				   // which use the position as refcount state.
-//	

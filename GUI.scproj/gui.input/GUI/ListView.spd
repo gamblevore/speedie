@@ -275,7 +275,7 @@ class ListView (GUIControl) {
 		|ListViewrow| willsel
 		if r is selected
 			willsel = r.prev ?? r.next
-		r|ringtree|.remove
+		r|list|.remove
 		
 		if willsel
 			willsel.ChangeSel(true)

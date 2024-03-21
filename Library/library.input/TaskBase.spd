@@ -1,6 +1,6 @@
 
 
-class Task (RingTree)
+class Task (list)
 	linkage
 		visible
 		cpp_class JB_Task

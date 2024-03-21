@@ -9,7 +9,7 @@
 
 
 
-class Message (RingTree)
+class Message (list)
 	linkage
 		cpp_part Msg
 		visible true

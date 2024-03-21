@@ -7,7 +7,7 @@
 // i wonder how do we describe the strength of the link, though?
 
 
-class Document (RingTree)
+class Document (list)
 	linkage
 		cpp_part Doc
 	contains DocumentState
@@ -376,7 +376,7 @@ extend TextView
 
 
 
-class DocumentState (RingTree)
+class DocumentState (list)
 	linkage
 		cpp_part dcs
 	contains DocumentState
