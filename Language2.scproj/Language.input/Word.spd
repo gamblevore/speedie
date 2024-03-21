@@ -1,7 +1,7 @@
 
 
 
-class Word (ringtree) {
+class Word (list) {
 	contains Word
 	|string|			Name
 	|message|			Source

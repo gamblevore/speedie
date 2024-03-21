@@ -19,15 +19,19 @@ Technically, a class contains these things:
 + Functions that work on the class.
 + A parent in the class-hierarchy.
 
-The class's parent might just be "`object`" or it could subclass from something else, like "`RingTree`" or one of your own classes.
+The class's parent might just be "`object`" or it could subclass from something else, like "`list`" or one of your own classes.
 
 
 ## Reference Cycles?
 You might find yourself wondering: _"Well how do I make a tree, or a double-linked-list in Speedie, without suffering from ref-count-cycles?"_
 
-Its a good question, but the answer is usually... use `RingTree`. Its not always true, but its a good place to start. `RingTree` uses linked-lists internally... and describes a tree, while taking care of all the ref-counting issues. It just makes your life simple. 
+Its a good question, but the answer is usually... use `list`. Its not always true, but its a good place to start.
 
-`RingTree` is useful for trees in general, but also for linked-lists. Otherwise, you'll have to clear the ref-cycles yourself, in order to free memory.
+`list` isnt just a normal list... its a tree-list! So it is very generally useful.
+
+`list` uses linked-lists internally... and describes a tree, while taking care of all the ref-counting issues. It just makes your life simple. 
+
+`list` is useful for trees in general, but also for linked-lists. Otherwise, you'll have to clear the ref-cycles yourself, in order to free memory.
 
 ## Working With Classes
 
@@ -61,19 +65,19 @@ Another way to typecast is using the `as` operator:
 
 If msg.obj is nil... this is OK but it will still return nil. If msg.obj is not nil and not a file, then `as` will create an error and return nil. The error will be stored in `stderr`, but the controlflow is not altered.
 
-This is MUCH better than blind-casting! Turning a RingTree into a file blindly... would cause all sorts of issues. And creating an exception would SUCK totally... because it destroys control flow. This approach is really nice.
+This is MUCH better than blind-casting! Turning a `list` into a file blindly... would cause all sorts of issues. And creating an exception would SUCK totally... because it destroys control flow. This approach is really nice.
 
 
 ## Subclassing
 
 Subclassing is done like this:
 
-    class MapArea (RingTree)
+    class MapArea (list)
         contains MapArea
         function Draw (|image| dest)
             ...
 
-`Contains` is needed when you subclass a container class (like `RingTree`, `array`, `dictionary`, etc). Otherwise it's not needed.
+`Contains` is needed when you subclass a container class (like `list`, `array`, `dictionary`, etc). Otherwise it's not needed.
 
     class A
         |string| Name

@@ -2042,7 +2042,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112134428997382)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112134524108800)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3377,7 +3377,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[241]);
-	JB_FS_AppendInt32(_fsf0, (2024032115));
+	JB_FS_AppendInt32(_fsf0, (2024032116));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7321,7 +7321,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[524]);
-	JB_FS_AppendInt32(_fsf0, (2024032115));
+	JB_FS_AppendInt32(_fsf0, (2024032116));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -34317,8 +34317,10 @@ bool SC_Decl_CanWrap(SCDecl* self) {
 }
 
 SCDecl* SC_Decl_CheckMath(SCDecl* self, Message* exp) {
-	if (self->Type == JB_TypeVoid_) {
-		JB_Msg_SyntaxExpect(exp, JB_LUB[1582]);
+	if (self->PointerCount == 1) {
+		if (self->Type == JB_TypeVoid_) {
+			JB_Msg_SyntaxExpect(exp, JB_LUB[1582]);
+		}
 	}
 	return self;
 }

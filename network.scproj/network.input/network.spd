@@ -1,5 +1,6 @@
 
-function string.download (|date| timeout=10s, |string|cookielist=nil, |string|)
+
+function string.download (|date| timeout=10s, |string|cookielist="", |string|)
 	rz = string.error
 	|| fs = faststring()
 	if fs.appendurl(self, cookielist)

@@ -1,7 +1,7 @@
 
 class Group {
 	|Concept|				Idea
-	|ringtree of Word|		Words
+	|list of Word|			Words
 	|ElementList|			Eles
 	|language|				Lang
 	|message|				Source

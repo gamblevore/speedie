@@ -8,11 +8,11 @@ class Class
 	|datatypecode|			DataType
 	|BaseType|				BaseType
 	|Message|				Src
-	|class|					Super
-	|&classdata|			RealClass
+	|?class|				Super
+	|?&classdata|			RealClass
 	
 	
-	constructor (|message| Cls)
+	constructor (|message!| Cls)
 		.name = cls.name
 		|| Type = cls[0]
 			if type == @char // datatype

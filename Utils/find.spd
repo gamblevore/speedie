@@ -1,0 +1,31 @@
+#!/usr/local/bin/speedie
+
+
+|dictionary?|			Types
+
+
+main (|existingfile| FindPath, |string| Search)
+	expect (Search) ("Requires a search string")
+	types = dictionary.new
+	types!["spd"] = "x"
+	types!["md"] = "x"
+	types!["txt"] = "x"
+	|| t = app["types"]
+		if t == "*"
+			types = nil
+		  else
+			types = t.Dict('/')
+	
+	app.Collect(FindPath, Search)
+
+
+function app.Collect (|file| f, |string| pattern)
+	require	f
+	if f.IsDir
+		for c.files in f
+			if c.visible
+				.collect(c, pattern)
+	  elseif !f.isdir and (!types or types[f.ext])
+		if f.ReadAll contains pattern
+			printline f
+

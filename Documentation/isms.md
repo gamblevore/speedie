@@ -122,7 +122,7 @@ As a bonus, I've also demonstrated auto-constructors, which are created for anyt
 
 ---
 ### Custom Operators
-Speedie uses custom operators a lot. For string appends obviously, but for all sorts of classes. For example, you can compare an array to an int. `Strings` too. And `RingTree`!
+Speedie uses custom operators a lot. For string appends obviously, but for all sorts of classes. For example, you can compare an array to an int. `Strings` too. And `list`!
 
     || x = ["a", "b", "c"]
     if x == 3
