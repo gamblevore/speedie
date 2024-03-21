@@ -155,6 +155,7 @@ function CollectProperties
 	opt norefcounts
 	require !.IsBehaviourTable
 
+	scmodule.curr = .modul
 	for item in .SourceArg
 		if item == @decl
 			.CollectProp(item)

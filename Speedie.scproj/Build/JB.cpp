@@ -915,7 +915,7 @@ SCDecl* SC_Comp__FindClassType(Message* n) {
 	if ((!m)) {
 		m = SC__Comp_program;
 	}
-	SCClass* c = SC_Base_FindClassMsg(m, n, 0);
+	SCClass* c = SC_Base_FindClassMsg(m, n, kSC__SCNodeFindMode_WantAType);
 	if (c) {
 		return c->TypeNormal;
 	}
@@ -2042,7 +2042,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112134524108800)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112134632842234)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -37055,7 +37055,7 @@ SCModule* SC_Base_FindModule(SCNode* self, JB_String* name, Message* where, SCNo
 		if (SC_SCNodeFindMode_SyntaxIs(Mode, kSC__SCNodeFindMode_DontGoUp)) {
 			break;
 		}
-		Upon = Upon->Parent;
+		Upon = SC_Base_FindModuleParent(Upon, Mode);
 	};
 	if (((bool)where) and ((!SC_SCNodeFindMode_SyntaxIs(Mode, kSC__SCNodeFindMode_NoErrors)))) {
 		if (true) {
@@ -37083,6 +37083,19 @@ SCModule* SC_Base_FindModuleMsg(SCNode* self, Message* where, SCNodeFindMode Mod
 		}
 	}
 	return SC_Base_FindModule(self, where->Name, where, Mode);
+}
+
+SCNode* SC_Base_FindModuleParent(SCNode* self, SCNodeFindMode Mode) {
+	if (SC_SCNodeFindMode_SyntaxIs(Mode, kSC__SCNodeFindMode_WantAType)) {
+		SCClass* cls = ((SCModule*)self)->Cls;
+		if (cls) {
+			SCClass* p = ((SCClass*)cls->Parent);
+			if (p) {
+				return p->Modul;
+			}
+		}
+	}
+	return self->Parent;
 }
 
 bool SC_Base_FindVis(SCNode* self, Message* c) {
@@ -39382,6 +39395,7 @@ void SC_Class_CollectProperties(SCClass* self) {
 	if (SC_Class_IsBehaviourTable(self)) {
 		return;
 	}
+	SC__Mod_Curr = self->Modul;
 	{
 		Message* _LoopSrcf2 = SC_Base_SourceArg(self);
 		Message* item = ((Message*)JB_Ring_First(_LoopSrcf2));
@@ -47208,4 +47222,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 196267333444580300 -9005323781678822293
+// 737131905503762923 -9005323781678822293

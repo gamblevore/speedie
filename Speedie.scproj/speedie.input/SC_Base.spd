@@ -96,6 +96,15 @@ function FindClass (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0,
 			error (where, "Expected a class but found module.")
 
 
+function FindModuleParent (|SCNodeFindMode| Mode, |SCnode|)
+	opt norefcounts
+	if mode is wantatype // allow going up superclasses instead.
+		|| cls = self|scmodule|.cls
+			|| p = cls.parent|scclass|
+				return p.modul
+	return .parent
+
+
 function FindModule (|String| name, |Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
 	opt norefcounts
 
@@ -109,7 +118,7 @@ function FindModule (|String| name, |Message| where, |SCNodeFindMode| Mode=0, |S
 			return Obj
 		if mode is dontgoup
 			exit
-		upon = upon.parent
+		upon = upon.FindModuleParent(mode)
 		
 	if where and (Mode isnt noerrors)
 		error (where, "Can’t find module: " + name)
@@ -969,5 +978,6 @@ datatype SCNodeFindMode (int)
 		|SCNodeFindMode|
 		NoErrors = 1
 		DontGoUp = 2
+		WantAType = 4
 	syntax is (|SCNodeFindMode| m, |bool|)
 		return self & m

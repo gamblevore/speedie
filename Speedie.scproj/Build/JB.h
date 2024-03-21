@@ -2001,6 +2001,7 @@ extern Array* SC__NilReason_values;
 #define kSC__SCNodeFindMode_DontGoUp (2)
 #define kSC__SCNodeFindMode_LargestFlag (0)
 #define kSC__SCNodeFindMode_NoErrors (1)
+#define kSC__SCNodeFindMode_WantAType (4)
 #define kSC__SCNodeInfo_ExplicitExport (0)
 #define kSC__SCNodeInfo_Visible (1)
 #define kSC__SCNodeType_DataType (2)
@@ -7999,6 +8000,8 @@ Message* SC_Base_FindCppWrapper(SCNode* self, Message* place, bool isclass);
 SCModule* SC_Base_FindModule(SCNode* self, JB_String* name, Message* where, SCNodeFindMode Mode);
 
 SCModule* SC_Base_FindModuleMsg(SCNode* self, Message* where, SCNodeFindMode Mode);
+
+SCNode* SC_Base_FindModuleParent(SCNode* self, SCNodeFindMode Mode);
 
 bool SC_Base_FindVis(SCNode* self, Message* c);
 

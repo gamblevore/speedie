@@ -673,7 +673,7 @@ function FindClassType (|message| n, |scdecl|)
 	|| m = SCModule.curr
 	if !m
 		m = compiler.program
-	|| c = m.findclassmsg(n)
+	|| c = m.findclassmsg(n, scnodefindmode.WantAType)
 		return c.typenormal
 
 
