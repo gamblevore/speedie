@@ -20,8 +20,7 @@ datatype FunctionType (uint)
 		New
 		Comparison
 		Reffer
-//		Layer
-		Alloc
+//		Alloc
 		NewStruct
 		TypeTest
 		InitFunc
@@ -34,7 +33,7 @@ datatype FunctionType (uint)
 		AlreadyExported
 		ConOrDes = Constructor + Destructor
 		ConOrNew = Constructor + New
-		AllocOrNew = Alloc + New
+//		AllocOrNew = Alloc + New
 	syntax is (|functiontype| t, |bool|)
 		return self & t
 
@@ -568,17 +567,45 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 
 function DeclsPrototypeClass (|Message| ch0)
 	opt norefcounts
-	|| p = .parent as scmodule								#require
-	|| fpType = p.FindClassMsg(ch0) 						#require
+	|| p = .parent as scmodule											#require
+	debugat 60
+	|| fpType = p.FindClassMsg(ch0)										#require
+
+	|message| Route
 	if !fptype.funcproto
-		|| task = fptype.modul.FindClass("task", nil, scnode.DontGoUp)			// OK... so what do we do now?
+		// this is finding the wrong thing. in fact fptype is already correct.
+		// we are going up somehow? even though it says DONT go up?
+		|| task = fptype.modul.FindClass("interface", nil, scnode.DontGoUp)
 			fpType = task
+			route = p.Route("interface")
+			
 		|| task_proto = fptype.modul.findclass("prototype", nil, scnode.DontGoUp)
 			fptype = task_proto
 		
-	.DeclsProtoCleanup(fpType, ch0, false, false)
+	.DeclsProtoCleanup(fpType, ch0, false, false, Route)
 	.DeclsProtoTypeAdd(fpType)
 
+
+function scmodule.Route (|string| name, |message|)
+	opt norefcounts
+	rz = @dot.msg(name)
+	|| curr = rz
+	while self
+		|| next = .parent|scmodule|
+		if !next or (next == compiler.program) or next.IsImport
+			curr <~ (@thg, .name)
+			exit
+		
+		curr = curr.msg(@dot, .name)
+		self = next
+	
+
+/*
+dot "d"
+	dot "c"
+		dot "b"
+			thg "a"
+*/
 
 function scdecl.CouldUpgradeToReal (|bool|)
 	return .typesuffers and !.nilstated
@@ -593,9 +620,11 @@ function MakeParamsReal // for cpp funcs...
 		if r.CouldUpgradeToReal
 			.returntype = r.DefaultToReal
 
+
 function CollectReturnAsReal (|bool|)
 	if .isallocornew and Options.NilTestAllocNeverFails
 		return true
+
 
 setter IsCppInBuilt (|int|)
 	if value and !.IsCppInBuilt
@@ -607,7 +636,7 @@ function DeclsPrototypeInterface (|Message| ch0, |SCClass| fpType, |bool| late)
 	opt norefcounts
 	.DeclsProtoCleanup(fpType, ch0, true, late)
 	if !late
-		.DeclsProtoTypeAdd(fpType)//.PointerCount = 1 // right??
+		.DeclsProtoTypeAdd(fpType)
 
 
 function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
@@ -623,26 +652,34 @@ function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 	return dcl
 
 
-function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool| late=false)
-	|| p = ch0.Parent!
+function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool| late, |message| Route=nil)
 	|| Proto = fpType.FuncProto										#expect (ch0, "This isn't a prototype!")
 	|| fProtoParams = Proto.Source[ @prm, 1 ]						#require
+	|| p = ch0.Parent!
+
+	p.Func = @prm
 
 	using (ch0)
 		fProtoParams.CopyAllInto( p )
-	p.Func = @prm
+	
+	debugat 91
+	if route
+		|| nxt = ch0.next
+		|| first = nxt.first
+		if first.next isthing "self"
+			first!.replacewith(route)
 	ch0.Remove
+	
+	|| c = .cls
+		if late
+			p.first.remove // ooof
 
-	|| c = .cls														#require
-	if late
-		p.first.remove // ooof
-	if (!AssumeSelf)
-		|| d = p[@decl]
-		|| ch = D[@nil]												#require
-		|| decl = ExtractDecl( ch, nil, declmode.ProtoParam )		#expect p
-		expect (decl matches c.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
-		d.Remove
-
+		if (!AssumeSelf)
+			|| d    = p[@decl]
+			|| ch   = D[@nil]
+				|| decl = ExtractDecl( ch, nil, declmode.ProtoParam )
+					check (decl matches c.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
+			d.Remove
 
 
 function IsSimpleCast (|Message|)
@@ -651,7 +688,6 @@ function IsSimpleCast (|Message|)
 	
 	|| found = .Source.last(@arg).first
 	require found and found.IsLast and (found IsTmp "return")
-
 
 	found = found.first
 	require (found.IsLast) and (found == @Type) and (found.first isThing "self")
@@ -718,7 +754,10 @@ function Message.SelfUsedForProperty (|int|)
 function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	opt norefcounts
 	require !.Badness
-	|| GotSuperConstructor = .cls!.super == typeobject
+	|| Supper = .cls!.super
+	|| GotSuperConstructor = false
+	if supper
+		GotSuperConstructor = Supper == typeobject  or  supper.parent == typetask
 	|| NoNesting = "This should be at the function root. (not nested)."
 	
 	
@@ -748,7 +787,7 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	
 
 function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
-	// fillindefaultconstructor, fillconstructordefaults, defaultconstructors
+	// fillindefaultconstructor, fillconstructordefaults, defaultconstructors, fillinconstructor
 	opt norefcounts
 	|| cls = .cls$
 	|| oof = .ConstructorLinePlace

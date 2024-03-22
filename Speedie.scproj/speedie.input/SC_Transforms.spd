@@ -638,7 +638,7 @@ function Tran_Syx (|Message| msg, |Message|)
 	|| Params	= msg.find(@bra).find(@thg)
 
 	using (msg)
-	ifn Params
+	if !Params
 		params = «thg »
 		name.Next = «bra, params »
 

@@ -11,6 +11,7 @@ main
 task LessThan3 (|string| a, |int| b, |string| c)
 	run (|int| i, |bool|)
 		return i < .b
+		a.b.c.d
 
 
 module SCTasks
@@ -23,13 +24,13 @@ module SCTasks
 
 		
 	task LessThan (|string| a, |int| b, |string| c)
-		run (|int| i, |bool|)
+		run (|int| LESSTHAN, |bool|)
 			cpp_part TaskTest
-			return i < .b
+			return LESSTHAN < .b
 		
 		module
 			function abc (lessthan) 
-				return (self)(i)
+				return (self)(LessThaN)
 
 
 task LessThan2 (|float| f)

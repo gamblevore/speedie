@@ -80,7 +80,7 @@ function LastInBlock (|SCBlockage| Reason)
 function @message.NilchCompare (|message|)
 	if ReturnSelfEqNil
 		return ReturnSelfEqNil
-	ReturnSelfEqNil = "return self!=nil"~digest
+	ReturnSelfEqNil = "return self!=nil"~parse
 	return ReturnSelfEqNil
 
 

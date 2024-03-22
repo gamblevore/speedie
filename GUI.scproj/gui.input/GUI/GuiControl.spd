@@ -469,27 +469,35 @@ class GUIControl (list)
 		for r in self
 			|| r2 = r
 			r2.refsanity
-		
-
 	
-	task GUITask (|GUIControl| Upon,  |date| StartTime,  |Date| EndTime)
-		|object?| 			Param
-		|ivec4| 			Rect	
+	
+	task GUITask ( |GUIControl|	Upon,  |date| StartTime,  |uint| duration )	
+		constructor
+			visible
+			// this can only be called if it is paramless...
+			// however... if this IS a task, and we RELY on this existing... we can actually
+			// rely on all the params existing.
+			
+			// to make a different constructor, just wrap shit.
+			|| w = Upon.Window
+				w.tasks <~ self
 		
-		function RunTask (|date| now, |bool|)
+		function RunTask (guitask)
 			opt NoRefCounts
 			require .upon.parent
-			if (.starttime < now)
-				return true
-			if now >= .EndTime
+			|| s = .starttime
+			|| e = s + .duration
+			if now > s
+				return 0
+			if now > e
 				require .state isnt finished
 				.State |= TaskState.Finished
 			rz = (self)(now)
 			.State |= TaskState.Started
 			if .state is Finished
-				rz = false
+				rz = -1
 		
-		run (|date| now, |bool|)
+		run (|date| now, |ErrorInt|)
 			0 // placeholder
 
 

@@ -765,7 +765,7 @@ struct Macro_Behaviour: Object_Behaviour {
 
 JBClass ( Macro , JB_Object , 
 	bool Cleaned;
-	JB_String* input;
+	JB_String* Input;
 	Message* _Parsed;
 );
 
@@ -1348,13 +1348,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[1893])
+#define kJB__ErrorColors_bold (JB_LUB[1895])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1894])
-#define kJB__ErrorColors_good (JB_LUB[1895])
-#define kJB__ErrorColors_normal (JB_LUB[1896])
-#define kJB__ErrorColors_underline (JB_LUB[1895])
-#define kJB__ErrorColors_warn (JB_LUB[1897])
+#define kJB__ErrorColors_error (JB_LUB[1896])
+#define kJB__ErrorColors_good (JB_LUB[1897])
+#define kJB__ErrorColors_normal (JB_LUB[1898])
+#define kJB__ErrorColors_underline (JB_LUB[1897])
+#define kJB__ErrorColors_warn (JB_LUB[1899])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1405,6 +1405,7 @@ extern Macro* SC__Macros_ASMCopier;
 extern Macro* SC__Macros_ASMCopier2;
 extern Macro* SC__Macros_ASMSetter;
 extern Macro* SC__Macros_ConstructorNew;
+extern Macro* SC__Macros_ConstructorNewTask;
 extern Macro* SC__Macros_FS;
 extern Macro* SC__Macros_InitExpand;
 extern Macro* SC__Macros_MainArgArray;
@@ -1481,7 +1482,7 @@ extern int SC__SC_UniqueNum;
 extern Message* SC__SCStrings_RenderFinish;
 extern Message* SC__SCStrings_RenderInsides;
 extern Message* SC__SCStrings_RenderNewParams;
-extern Macro* SC__SCTasks_argh;
+extern Macro* SC__SCTasks_TaskMacro;
 extern Dictionary* SC__Errors_IgnoredBranches;
 extern Dictionary* SC__SC_Targets_Items;
 #define kJB__Terminal_Black (30)
@@ -1526,7 +1527,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1898])
+#define kJB_codesign_native (JB_LUB[1900])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1540,7 +1541,7 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitOr (JB_LUB[1349])
+#define kJB_kBitOr (JB_LUB[1350])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1555,7 +1556,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[1899])
+#define kJB_kSaverStart1 (JB_LUB[1901])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -1854,26 +1855,24 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__FileMode_Owner (7 << 6)
 #define kJB__FileMode_Process (((7 << 6) + 5) << ((3 + 5) << 0))
 #define kJB__FileResolveMode_AllowMissing (true)
-#define kSC__FunctionType_Alloc (32)
-#define kSC__FunctionType_AllocOrNew (32 + 4)
-#define kSC__FunctionType_AlreadyExported (32768)
-#define kSC__FunctionType_Behaviour (4096)
+#define kSC__FunctionType_AlreadyExported (16384)
+#define kSC__FunctionType_Behaviour (2048)
 #define kSC__FunctionType_Comparison (8)
 #define kSC__FunctionType_ConOrDes (1 + 2)
 #define kSC__FunctionType_ConOrNew (1 + 4)
 #define kSC__FunctionType_Constructor (1)
 #define kSC__FunctionType_Destructor (2)
-#define kSC__FunctionType_EmptyConstructor (1024)
-#define kSC__FunctionType_ExpectsRealVars (16384)
-#define kSC__FunctionType_InitFunc (256)
-#define kSC__FunctionType_LargestFlag (65535)
+#define kSC__FunctionType_EmptyConstructor (512)
+#define kSC__FunctionType_ExpectsRealVars (8192)
+#define kSC__FunctionType_InitFunc (128)
+#define kSC__FunctionType_LargestFlag (32767)
 #define kSC__FunctionType_New (4)
-#define kSC__FunctionType_NewNew (8192)
-#define kSC__FunctionType_NewStruct (64)
-#define kSC__FunctionType_Recursive (512)
+#define kSC__FunctionType_NewNew (4096)
+#define kSC__FunctionType_NewStruct (32)
+#define kSC__FunctionType_Recursive (256)
 #define kSC__FunctionType_Reffer (16)
-#define kSC__FunctionType_TypeTest (128)
-#define kSC__FunctionType_VirtualCaller (2048)
+#define kSC__FunctionType_TypeTest (64)
+#define kSC__FunctionType_VirtualCaller (1024)
 #define kJB__MoveCode_All (63)
 #define kJB__MoveCode_Back (kJB__MoveCode_Backward)
 #define kJB__MoveCode_Backward (32)
@@ -2207,7 +2206,6 @@ extern bool JB__Err_KeepStackTrace;
 #define kSC__Beh_kBehaviourProto (2)
 #define kSC__Beh_kBehaviourProtoRequired (6)
 #define kSC__Beh_kBehaviourTable (1)
-extern Message* SC__Class_ConstrNew;
 extern SCFunction* SC__Func_CurrFunc;
 extern int SC__Func_DisabledPoints;
 extern int SC__Func_FuncStats[12];
@@ -6528,6 +6526,8 @@ void JB_Array_SaveWrite(Array* self, ObjectSaver* Saver);
 
 void JB_Array_SyntaxAppend(Array* self, JB_Object* item);
 
+int JB_Array_SyntaxCompare(Array* self, int n, bool Aware);
+
 bool JB_Array_SyntaxEquals(Array* self, int n, bool Aware);
 
 
@@ -6888,9 +6888,9 @@ SCDecl* SC_Msg_BraDeclfind(Message* self);
 
 void JB_Msg_BRel__(Message* self, FastString* fs);
 
-int SC_Msg_BuildRunTask(Message* self, Message* con, Message* prms);
+bool SC_Msg_BuildRunTask(Message* self);
 
-void SC_Msg_BuildTask(Message* self, Message* con);
+void SC_Msg_BuildTask(Message* self);
 
 void SC_Msg_BunchFix(Message* self);
 
@@ -7061,6 +7061,8 @@ Message* JB_Msg_FindSyx(Message* self, Syntax s);
 Message* JB_Msg_FindSyxName(Message* self, Syntax s, JB_String* name, bool Err);
 
 Message* JB_Msg_FindName(Message* self, JB_String* name);
+
+Array* JB_Msg_FindAll(Message* self, Syntax fn, JB_String* name);
 
 JB_String* SC_Msg_FindAndRemove(Message* self, JB_String* name, bool NothingOK, bool IsClass);
 
@@ -7260,7 +7262,7 @@ void SC_Msg_mainfix2(Message* self);
 
 int SC_Msg_MainOneArg(Message* self, Message* arg, int i, int found);
 
-Message* SC_Msg_MakeTaskVar(Message* self, Message* con);
+void SC_Msg_MakeTaskVar(Message* self, Message* con, Message* before);
 
 void JB_Msg_max__(Message* self, FastString* fs);
 
@@ -7515,6 +7517,8 @@ MessagePosition JB_Msg_SyntaxUsing(Message* self);
 void JB_Msg_SyntaxWarn(Message* self, JB_String* Error);
 
 bool SC_Msg_TargetTest(Message* self);
+
+Message* SC_Msg_TaskConBefore(Message* self);
 
 Message* SC_Msg_TempIntoBlock(Message* self, Message* ParentPlace);
 
@@ -8275,6 +8279,8 @@ bool SC_Class_CollectProp(SCClass* self, Message* msg);
 
 void SC_Class_CollectProperties(SCClass* self);
 
+SCFunction* SC_Class_ConOrDesForCall(SCClass* self, bool IsConstructor, int Task);
+
 SCClass* SC_Class_Constructor(SCClass* self, Message* node, SCNode* parent, bool HasPtrs, SCModule* m);
 
 void SC_Class_ContainedTypeLoad(SCClass* self);
@@ -8308,6 +8314,12 @@ Message* SC_Class_Falsify(SCClass* self, Message* ques);
 void SC_Class_FillInterFaceIn(SCClass* self, SCFunction* fn, bool Late);
 
 void SC_Class_FillInterFaceWrapper(SCClass* self, SCFunction* fn);
+
+void SC_Class_FillRoleConstructor(SCClass* self, SCFunction* con);
+
+void SC_Class_FillTaskConstructor(SCClass* self, SCFunction* con);
+
+void SC_Class_FillTaskConstructorSub(SCClass* self, Message* src, Message* before);
 
 SCFunction* SC_Class_FindAllocFunc(SCClass* self, JB_String* fname, bool DontCreate);
 
@@ -8371,7 +8383,7 @@ void SC_Class_LibExport(SCClass* self, FastString* j);
 
 void SC_Class_LoadClassType(SCClass* self);
 
-void SC_Class_LoadConstructorsAndAllocators(SCClass* self);
+void SC_Class_LoadConstructors(SCClass* self);
 
 void SC_Class_LoadLinkage(SCClass* self);
 
@@ -8448,10 +8460,6 @@ SCNode* SC_Class__ExtendOneFunc(Message* node, SCNode* name_space, Message* ErrP
 SCNode* SC_Class__GetDefault(Message* node, SCNode* name_space, Message* ErrPlace);
 
 SCNode* SC_Class__GetFalse(Message* node, SCNode* name_space, Message* ErrPlace);
-
-int SC_Class__Init_();
-
-int SC_Class__InitCode_();
 
 JB_String* SC_Class__LoadClassName(Message* node);
 
@@ -8548,7 +8556,7 @@ Message* SC_Func_CountCallsToParentAlloc(SCFunction* self, Message* root);
 
 int SC_Func_CreateTypeCast(SCFunction* self, SCDecl* MyType, Message* exp, int Loss);
 
-void SC_Func_DeclsProtoCleanup(SCFunction* self, SCClass* fpType, Message* ch0, bool AssumeSelf, bool late);
+void SC_Func_DeclsProtoCleanup(SCFunction* self, SCClass* fpType, Message* ch0, bool AssumeSelf, bool late, Message* Route);
 
 SCDecl* SC_Func_DeclsProtoTypeAdd(SCFunction* self, SCClass* fpType);
 
@@ -8897,6 +8905,8 @@ SCModule* SC_Mod_OneOrOther(SCModule* self, SCModule* B);
 
 JB_String* SC_Mod_Render(SCModule* self, FastString* fs_in);
 
+Message* SC_Mod_Route(SCModule* self, JB_String* name);
+
 JB_String* SC_Mod_SafeName(SCModule* self);
 
 SCModule* SC_Mod_SuperMod(SCModule* self);
@@ -9170,7 +9180,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1863])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1865])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}

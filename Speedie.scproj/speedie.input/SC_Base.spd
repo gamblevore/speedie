@@ -66,19 +66,21 @@ syntax access (|string| s, |SCObject|)
 
 
 function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule?|)
+	debugat 3402
 	opt norefcounts
 	real self
 	
 	|| fn = where.func
 	if fn == @dot
-		require where.last(@emb)
-		self = .FindModuleMsg(where.first!, Mode) #require
+		|| f = where.first!
+		f.next.expect(@emb)
+		self = .FindModuleMsg(f, Mode) #require
 	  else
 		expect (fn == @thg or @name) (where)
 	return .findmodule(where.name, where, Mode)
 
 
-function scnode.FindClassMsg (|Message| where, |SCNodeFindMode| Mode=0,  |SCClass|)
+function scnode.FindClassMsg (|Message| where, |SCNodeFindMode| Mode=scnodefindmode.WantAType,  |SCClass|)
 	opt norefcounts
 	|| mod = .FindModuleMsg(where, Mode)
 		|| C = mod.cls
@@ -108,11 +110,12 @@ function FindModuleParent (|SCNodeFindMode| Mode, |SCnode|)
 function FindModule (|String| name, |Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
 	opt norefcounts
 
-	if name ~= .name
-		return self as scmodule
-
 	|| Upon = self
 	while upon
+		if name ~= upon.name
+			if upon isa scmodule
+				return upon
+
 		|| Obj = upon[ name ]
 		if Obj isa SCModule
 			return Obj

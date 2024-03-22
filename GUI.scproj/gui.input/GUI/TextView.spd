@@ -1617,7 +1617,7 @@ class TextView (GUIControl)
 		if keys.cmd
 			.ShowExtraInfoAtPos(B, "", nil)
 		  elseif d and d.DrawError
-			.ShowErrorInfo(b, d.drawerror, mousemove)
+			.ShowErrorInfo(b, d.drawerror!, mousemove)
 		  else
 			._ErrorExtraInfo = nil
 			.ShowNoExtra
@@ -1637,11 +1637,9 @@ class TextView (GUIControl)
 			(.OnShowExtraInfo!)(self, P2, nil, err, "error", false)
 			return
 			
-//		require ._ErrorExtraInfo != err
-//		|| T = .StartTask(DelayedShowError, 0.33s)
-//			t.param = err
-//			T.Rect = (P2, P2)
-//			._ErrorExtraInfo = err
+		if ._ErrorExtraInfo != err
+			._ErrorExtraInfo = err
+			DelayedShowError(self, date.now, 0.33s, err, P2)
 
 	
 	helper ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)
@@ -2018,13 +2016,14 @@ class TextView (GUIControl)
 	
 	flags
 		NotRoot = 0x800
+	
 	constants
 		NotJeebox = 0
 		AllowJeebox
 		ProbablyJeebox
 		CurrentlyJeebox
 		AlwaysJeebox
-
+	
 	module
 		|| csAntiWords		= makeanti()
 		|| CounterParts		= <(`{[(`'"|`)>
@@ -2032,13 +2031,15 @@ class TextView (GUIControl)
 		
 		function MakeAnti (|charset|)
 			return jeebox.CSWordMiddle.Invert
-
-//		helper DelayedShowError (GUITaskFunc)
-//			opt NoRefCounts
-//			if self isa textview
-//				|| err = task.Param as error
-//					|| P = task.Rect.xy
-//					(.OnShowExtraInfo!)(self, P, nil, err, "error", true)
+		
+		task DelayedShowError (GUITask)
+			|error| err, |ivec2| Point
+//			constructor (|GUIControl|	Upon,  |date| StartTime,  |uint| duration, |error| err, |ivec2| Point)	
+//				super.constructor(upon, starttime, duration)
+			run (guitask)
+				|| u = .upon as textview
+					|| fp = u.OnShowExtraInfo
+						(fp)(u, .Point, nil, .err, "error", true)
 
 
 helper string.InsertTrim (|ivec2|)

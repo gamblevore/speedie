@@ -1,12 +1,2 @@
 
 
-
-//prototype GUITaskFunc         (|GUIControl| self,  |guicontrol.GUITask| Task,  |bool|)
-//function Guicontrol.StartTask (|GUITaskFunc|  fn,  |date|   Delay,  |date|  Durr=0,  |GUITask|)
-//	opt	norefcounts
-//	|| w = .Window$
-//	|| DS = date()
-//	|| D = DS + delay
-//	rz = GUITask(fn, self, D, D + Durr)
-//	w.Tasks <~ rz
-

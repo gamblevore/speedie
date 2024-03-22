@@ -382,7 +382,7 @@ extend PerryIDE
 			.size = the~area
 			.itemwidth = 75
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
-			.items = ("Speedie, Jeebox, '', Errors"~digest)|listviewrow|
+			.items = ("Speedie, Jeebox, '', Errors"~parse)|listviewrow|
 			|| C = .items.first!
 			(C is selected)
 			C.Obj = self.SpeedieText

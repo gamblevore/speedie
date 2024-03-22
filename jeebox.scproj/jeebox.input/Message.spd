@@ -286,11 +286,12 @@ class Message (list)
 
 
 	syx Dot (Dot)					// x.fn(a)
-		|| ch = .First					#require
-		fs <~ ch
+		|| ch = .First
+			fs <~ ch
 		fs <~ '.'
 		fs <~ .Name
-		fs <~ ch.Next
+		if ch
+			fs <~ ch.Next
 		
 
 	syx SDot (Self_Dot)
@@ -702,14 +703,6 @@ class Message (list)
 			b = b.flatnext
 
 		
-//	function Find (|message| match, |message|)
-//		cpp_part FindMatch
-//		opt norefcounts
-//		for old in self
-//			if old.DeepEquals(match)
-//				return old
-
-
 	function Name (|string|)
 		nil safe
 		if self
@@ -751,6 +744,13 @@ class Message (list)
 			if ch == s
 				return ch
 
+	function FindAll (|syntax| fn=@tmp, |string| name, |[message]|)
+		opt norefcounts
+		nil self // remove once we improve the nil-checker to "link" variables
+		for s in self
+			if s.func == fn and s.name == name
+				rz <~ s
+		
 	
 // merge these two! find and find flat... seem to do the same except the err-param
 	function Find (|Syntax| s, |string| name, |bool| Err = false, |Message|)

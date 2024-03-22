@@ -156,7 +156,7 @@ function message.date (|humanDate|)
 
 
 insertion
-	digest (–digest _0).ParseJbin
+	parse (–digest _0).ParseJbin!
 
 
 // seems not worth it

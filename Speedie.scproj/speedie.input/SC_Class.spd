@@ -139,7 +139,7 @@ function CreateAutoConstructor (|scfunction|)
 
 
 function IsTask (|bool|)
-	return .isrole == 2
+	return self and .isrole & 2
 
 
 function TaskProperties 
@@ -259,9 +259,8 @@ function LoadSuperClass
 		|| thg = supc[@nil]								#require
 		if thg == @sdot
 			thg.func = @thg
-			S = .modul.findclassmsg( thg )
+			S = .modul.findclassmsg( thg, 0 )
 		  elseif oldmod
-			debugger
 			S = oldmod.findclassmsg( thg )
 		  else
 			S = Compiler[ thg ]
@@ -310,14 +309,6 @@ function LoadClassName (|message| node, |string|)
 		return s.name 
 	if (node istmp "class")
 		error (node, "Can't find class name.")
-
-|Message| ConstrNew
-
-ConstrNew = `function New () {
-	flow off
-	return (nil|type|).Constructor()
-}`.ParseClean
-
 }
 
 function SCFunction.CopyParams (|message| list)
@@ -375,7 +366,10 @@ function scfunction.AddConstructorReturn2
 	|| args = .source[@arg,2]
 	using .source
 	|| type = message(@thg, .cls!.name)
-	args.first = macros.ConstructorNew.run(type)
+	if .cls.IsTask
+		args.first = macros.ConstructorNewTask.run(type)
+	  else
+		args.first = macros.ConstructorNew.run(type)
 	args.msg(@tmp, "return") <~ (@thg, "self")
 
 
@@ -406,16 +400,22 @@ function CreateConstructors
 		
 		if con
 			.modul.tryadd(con.source, con, "new") // maybe?
+			.FillRoleConstructor(con)
 			
-		for f in con
-			if f.cls == self // role messageroot doesnt need an allocator
-				(f is new)
-				//.NewClassNew( f, ConstrNew!.copy(f.source) )
 	
 	if !.IsRole
 		|| NeedsDestructor = .IsObject or (.IsStruct and .HasObjectProperties)
 		.DestructorFunc = .FindAllocFunc( "Destructor", !NeedsDestructor )
+	  elseif .isrole == 3
+		check (.super!.isrole == 2) (self, "Tasks can't nestedly subclass.")
 
+
+function scclass.FillRoleConstructor (|scfunction| con)
+	opt norefcounts
+	for f in con
+		(f is new)
+		if .istask
+			.FillTaskConstructor(f)
 
 function FindSpecialFunc (|string| keyword, |bool| CheckParents, |SCFunction|)
 	return .FindFunc(keyword.lowercase, CheckParents, true)
@@ -468,21 +468,6 @@ function NewClassNewSub (|SCFunction| con, |Message| src)
 		
 		TypeNode.ReplaceWith(.TypeNormal.writetype)
 		NewParams <~ .TypeNormal.WriteDeclFull
-
-
-function CreateAlloc (|string| ParseThing, |functiontype| Extra)
-	require .IsObject and !.IsRole
-	
-	|| src = ParseThing.ParseClean.first
-	|| fn = .modul.NewModuleFunc( src )
-		|| r = CppRefs.new
-		fn.refs = r
-		r.disturbs = nil
-		if extra
-			fn.IsVisible = false
-		debugger
-		//extra |= FunctionType.Alloc
-		fn.AllocCode |= extra
 
 
 function NeedsDefaultValue (|message| def, |&message| place, |string| name)
@@ -563,27 +548,16 @@ function HasObjectProperties (|bool|)
 			return true
 
 
-function LoadConstructorsAndAllocators
+function LoadConstructors
 	.Use									// parsed messages come from our source's file
 	SCNode.CurrVisibility = false			// for allocators that we generate
 	
 	.CreateConstructors
-	//if .IsObject and .constructorfunc
-	//	.CreateAlloc( .AllocStr, 0 )
-
+		
 	|| s = .super
 		.NoEarlyFree := s.NoEarlyFree
 
 	(Message).Restore // restore message parsing to general
-
-
-function AllocStr (|string|)
-	|| s0 = .name
-	|| s = (s0, .super!.name)(!.IsRole)
-	return "
-	helper Alloc (|$s0|)
-		return JB_NewClass(__classes__.$s)|$s0|
-	"
 
 
 function AfterFuncsDecled
@@ -818,7 +792,8 @@ function TryAddToProject
 	if NameNode == @dot		// load the modules first.
 		mod = compiler.findmodulemsg(namenode.first!)	#require
 	  else
-		require .name != "task"
+		if .name == "interface" and self isa scclass
+			require .isrole != 1
 
 	
 	mod.TryAdd( .SourceArg, .Modul, .Name )

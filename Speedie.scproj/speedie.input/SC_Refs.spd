@@ -684,6 +684,7 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 
 
 function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |message|)
+	// probably this should have been done earlier... but too late now!
 	opt norefcounts
 	if !fn
 		if self is Constructor
@@ -691,26 +692,34 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 		return nil	// can happen in this case!	//	class B (A) --> class A --> class object
 					// but none has a destructor.
 
-	|| slf = @thg + "self"
-	slf.obj = .self
-
-	|| PAF = NewFnc(fn.Name)
-	|| lst = paf.last!
-	lst <~ slf
+	using root
+	|| PCon = NewFnc(fn.Name)
+	|| lst = PCon.last!
 	lst.obj = fn
-	if fn is constructor
-		paf.obj = fn.ReturnType
-	  else
-		paf.obj = typevoid
+
+
+//	|| slf = @thg + "self"
+	if fn.args > 1 // oof
+	
+	for (a in fn.args) (i)
+		|| prm = lst.msg(@thg, a.name)
+		prm.obj = .args[i]
+//	slf.obj = .self
+//	lst <~ slf
+
+	if (fn is constructor) != (self is constructor) // remove
+
 
 	if (self is Constructor)
-		root.First!.next = PAF
+		PCon.obj = fn.ReturnType
+		root.First!.next = PCon
 	  else 
-		root <~ PAF
+		PCon.obj = typevoid
+		root <~ PCon
 	
 	.DoLinkTo( fn ) // sigh... shouldn't be necessary but it is...
 
-	return PAF
+	return PCon
 
 
 	
@@ -734,11 +743,21 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 
 	|| parent = .Cls!.super
 	if (parent and parent != TypeObject)
-		if IsConstructor
-			rz = .AddParentAllocFunc( root, parent.ConstructorFunc!.ParamlessConstructor )
-		  else
-			rz = .AddParentAllocFunc( root, parent.FirstDestructor )
+		|| t = .cls!.isrole
+		if t == 2
+			return nil
+		|| fn = parent.ConOrDesForCall(IsConstructor, t)
+		return .AddParentAllocFunc( root, fn )
 
+
+function scclass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|)
+	if !IsConstructor
+		return .FirstDestructor
+	if task <= 1
+		return .ConstructorFunc!.ParamlessConstructor
+	debugger 
+	return .ConstructorFunc
+			
 
 function SCFunction.BuildConstructorDestructor
 	opt norefcounts

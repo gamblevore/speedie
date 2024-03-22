@@ -2,7 +2,7 @@
 
 class Macro 
 	|bool|				Cleaned
-	|string|  			input
+	|string|  			Input
 	|message?| 			_Parsed
 	
 	constructor (|string| s)

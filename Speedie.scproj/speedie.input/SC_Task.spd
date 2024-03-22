@@ -31,15 +31,21 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 		name.next = fields
 	
 	|| arg = fields.next(@arg)		#require
+	|| Supper = fields.first
 	arg.TakeAllFrom(fields)
+	
+	|| level = 2
 	using node
-	fields <~ (@sdot, "task")
-	|| con = "constructor () {super.constructor(&run, –taskvars)}"~digest
-	arg.BuildTask(con!)
-	node.name = "role" 
+		if Supper == @thg or @dot
+			fields <~ Supper
+			level = 3
+		  else
+			fields <~ (@sdot, "task")
+		arg.BuildTask
+		node.name = "role" 
 
 	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
-		task.cls!.IsRole = 2
+		task.cls!.IsRole = level
 	return task
 
 
@@ -49,65 +55,85 @@ function NewTask (CollectFunc)
 	return compiler.program
 
 
-function Message.MakeTaskVar  (|message!| con, |message|)
-	is editable // whatever
-	|| prm = con.first!
+function Message.MakeTaskVar  (|message!| con, |message| before)
+	opt norefcounts
+	|| prm = con.second!
 	|| arg = prm.next!
-	|| name = .VarName										#require
-	|| type = .first
-	expect (type and type!=@emb) (type, "Missing type")
-
-	using self
-		arg <~ NewEqRel(@sdot + name, @thg + name)
+	|| name = .VarName
+		before.prev = NewEqRel(@sdot + name, @thg + name)
 		prm <~ .copy // :)
 
 
-function Message.BuildRunTask (|message| con, |message| prms, |int|)
+function scclass.FillTaskConstructor (|scfunction| con)
 	opt norefcounts
+	|| src = con.source!
+	using src
+	.FillTaskConstructorSub(src, src.last.TaskConBefore)
+	
+
+function message.TaskConBefore (|message!|)
+	opt norefcounts
+	|| marker = .find(@dot, "constructor")
+	if !marker
+		marker = .first
+	marker++
+	if marker
+		return marker
+	
+	return .msg(@sheb, "task")
+
+
+function scclass.FillTaskConstructorSub (|message| src, |message| before)
+	opt norefcounts
+	|| pr = .super
+	if pr.istask
+		pr.FillTaskConstructorSub(src, before)
+	for p in .properties
+		p.source!.MakeTaskVar(src, before)
+
+
+function Message.BuildRunTask (|bool|)
+	opt norefcounts
+	|| prms = self[@nil]
 	|| arg = prms.next(@arg)
 	require arg.ExpectLast
 	|| f = prms.func
 	expect (f == @bra or @list) (prms)
 	
-	.prev = con
 	.name = "function"
 	f = prms.first.func
 
-	rz = 2
 	ifn f == @thg or @dot
 		|| brah = @bra.msg
-		brah <~ (@thg, "task")
+		brah <~ (@thg, "interface")
 		.first = brah
-		rz = 1
+		|| pr = .parent!
+		pr.AppendMacro(sctasks.TaskMacro, [prms])
+		|| callprms = pr.flatlast
+		callprms <~ (@thg, "self")
+		for p in prms
+			|| ty = p.second
+				callprms <~ ty.copy
 	
 	.first = @thg + "run"
+	return true
 
 
-function Message.BuildTask (|message| con)
-	opt norefcounts
-	|| prms = con
-	|| State = 0
-	for ch in self
-		if ch == @decl
-			ch.MakeTaskVar(con)
-		  elseif ch istmp "run"
-			expect (!State) (ch, "Duplicate run statements")
-			prms = ch[@nil]										#require
-			state = ch.BuildRunTask(con, prms)					#require
-	
-	expect (state) (self, "Missing 'run' statement")
-	require state == 1
 
-	.AppendMacro(sctasks.argh, [prms])
-	|| callprms = .flatlast
-	callprms <~ (@thg, "self")
-	for p in prms
-		|| ty = p.second
-			callprms <~ ty.copy
+function Message.BuildTask 
+	|| Runs = .findall("run")
+	if runs == 0
+		runs <~ .msg(@tmp, "run")
+	  else
+		check (runs < 2) (runs[0], "Multiple run statements")
+	|| run = runs[0]!
+	if run.BuildRunTask and !.findall("constructor")
+		run.prev = "constructor () {}"~parse
+
 
 	
-|| argh = `
-	role task (task)
+|| TaskMacro = `
+	role interface (task)
 		prototype prototype (^"_0")
 		syntax call (^"_0")
 			return (._func|prototype|)()

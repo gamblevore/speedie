@@ -9,15 +9,16 @@ class Task (list)
 	|byte|				_ObjectCount
 	|&nil|				_func
 	
-	constructor (|&nil| fn, |int| Objs)
-		._Func = fn
-		._ObjectCount = Objs
-	
+	constructor
+		._Func = &(message.dummy)
+		._ObjectCount = 0
+		
 	destructor
 		visible
 		|| curr = ((&._func)|&object|) + 1
 		for  i in ._ObjectCount|int|
 			jb_decr( curr[i] )          // noice
+	
 
 
 

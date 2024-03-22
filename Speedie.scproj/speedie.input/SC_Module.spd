@@ -172,6 +172,9 @@ module
 		if node
 			MoveFutureStaticsIn(node) // fix this? Current this makes impossible to extend a static section...
 			.LoadModule( node )
+			if !.source
+		  else
+			.source = cls.source
 	
 	
 	function NeuModule (CollectFunc)

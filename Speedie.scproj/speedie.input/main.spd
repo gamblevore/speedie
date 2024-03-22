@@ -27,6 +27,7 @@ function Compiler.PrintResults
 
 
 function Compiler.MiniTests
+	.testdate
 
 
 

@@ -507,7 +507,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 	if self != @tmp // it's always a tmp?
 		return nil
 	if self == @tmp and self ~= "main"
-		return "@app.main"~digest
+		return "@app.main"~parse
 	|| f = .first
 	if (f == @dot) and autocomplete.isafunc(self)
 		// OK... so heres the problem... we don't know if we are module or not.
@@ -522,7 +522,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 	if self ~= "syntax" or "operator"
 		name = .name.lowercase + name
 	if self ~= "behaviour" or "virtual"
-		name = "__" + name + "__" // technically... only should be virtuals...
+		name = name.moat // technically... only should be virtuals...
 		// but I PREFER here too as we have so many behaviours
 	if f != @thg and self ~= "render"
 		name = "Render"

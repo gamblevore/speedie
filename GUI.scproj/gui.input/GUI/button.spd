@@ -223,7 +223,7 @@ class ButtonView (GUIControl)
 		|| WillDrawFocus = clicked and i and .ClickedItem
 		|| fader = 1.0
 		if i is Active
-			strength += (SDLApp.cycle(1.25s)*0.75)-0.15
+			strength += (SDLApp.cycle(1.25s)*0.95)-0.2
 			SDLApp.Touch
 		  else
 			fader = .declutterer.strength					#require

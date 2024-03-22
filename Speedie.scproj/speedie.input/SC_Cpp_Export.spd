@@ -108,7 +108,7 @@ function FuncHeader (|FastStringCpp| fs, |SCFunction| F, |string|)
 
 
 function CppFunc (|FastStringCpp| fs, |SCFunction| F)
-	opt norefcounts
+	opt norefcounts	
 	require .CanExportFunc(f)
 	scfunction.currfunc = f
 	(f is AlreadyExported)
@@ -175,16 +175,19 @@ function SetupFlow (|SCFunction| f)
 function CodifyInlines
 	opt norefcounts
 	for (f in compiler.funclist)
-		if f.NeedsExport and .CanExportFunc(f) and f.IsInline
-			.cppfunc( .Inlines, f )
+		if f.isinline
+			if f.NeedsExport and .CanExportFunc(f)
+				.cppfunc( .Inlines, f )
 	scfunction.CurrFunc = nil
 
 
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
 	opt norefcounts
 	for (f in list)
-		if f.NeedsExport and !f.IsInline
-			.cppfunc( file, f )
+		if !f.isinline
+			//if f.cls ~= "DelayedShowError"
+			if f.NeedsExport
+				.cppfunc( file, f )
 	scfunction.CurrFunc = nil
 
 
