@@ -21387,7 +21387,8 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self) {
 }
 
 void JB_Rec_AppendErr(JB_ErrorReceiver* self, JB_Error* Err) {
-	bool CanPrint = (!JB_Rec_BadCount(self)) and ((bool)JB__Err_AutoPrint);
+	bool CanPrint = false;
+	//"Speedie" // useful marker for debugging...;
 	JB_Rec_Incr(self, Err, true);
 	if ((!(JB_Str_Exists(Err->Path)))) {
 		JB_SetRef(Err->Path, self->Source);
@@ -27800,9 +27801,6 @@ fn_asm SC_Msg_ASMFunc(Message* self) {
 		ASM = ((int)self->Func);
 	}
 	rz = JB_fn_asm_table[ASM];
-	if ((!(rz))) {
-		return rz;
-	}
 	return rz;
 }
 
