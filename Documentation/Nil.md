@@ -13,7 +13,7 @@ But when you know that can't happen... things are a lot more fun.
 
 Unlike other languages, the nil-checker in speedie has zero-overhead. We dont have `"optional integers"`, cos they are always real!
 
-Speedie's nil-checker is extremely fast. Adds less than 0.003 seconds of compile time, for about 2MB of source code.
+Speedie's nil-checker is extremely fast. Adds less than 0.003 seconds of compile time, for about 1MB of source code.
 
 If you are wondering how its that fast, well to be honest, I think programmers are used to inefficient compilers. And they shouldn't be. Computers are super-fast these days, so I just took advantage of that.
 
