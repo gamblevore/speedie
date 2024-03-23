@@ -1,6 +1,6 @@
 ## The List Class
 
-Speedie has an incredible `list` class, that helps you do things with lists. Speedie's `list` class is a linked-list. So it is fast for insertion / removal / append, but slow for random access through large lists.
+Speedie has an incredible `list` class, that helps you do things with lists. Speedie's `list` is fast for insertion / removal / append, but slow for random access through large lists.
 
 Like most things in speedie, we tend to be a bit "extra". In this case our `list` is actually **a tree**. This gives it all sorts of useful abilities. The `Message` class is based on the list class, that is how powerful `list` is. `list` is used for lists of files in Perry's GUI, and all sorts of things.
 
