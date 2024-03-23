@@ -4,8 +4,6 @@ Speedie has an incredible `list` class, that helps you do things with lists. Spe
 
 Like most things in speedie, we tend to be a bit "extra". In this case our `list` is actually **a tree**. This gives it all sorts of useful abilities. The `Message` class is based on the list class, that is how powerful `list` is. `list` is used for lists of files in Perry's GUI, and all sorts of things.
 
-The list class is what is known as an "intrusive list". That is, you have to subclass it to use it as a list. This makes it super-fast and more RAM efficient, and just more natural... for operations where our nodes are already meant to be a list.
-
 _(We talk about a list containing "nodes", but you can think of it as a list containing "items" also. Same thing.)_
 
 ---
@@ -18,12 +16,44 @@ Basically this means, that for a `list of MyFunClass`, you can only add `MyFunCl
 
 The compiler knows about this and uses this info to make sure all the types are correct... and also saves you from having to check for the types of things.
 
+___
+
+### Internals
+
+The list class is what is an "intrusive list", you have to subclass it to use it as a list.
+
+This makes it super-fast and more RAM efficient, and just more natural... for operations where our nodes are already meant to be a list.
+
+Looking at some online C++ tests (Speedie is about as fast as C++), you can see that "intrusive lists" are 2-4x faster than non-intrusive lists. And simpler to use! Its just better.
+
+_(The `list` class used to be called "`RingTree`". Thats because internally it uses a ring, a half-ring really. So the first child's prev sibling is actually the last child. But you don't see that, its just internal. The only difference, is that finding/appending the last item is fast.)_
+
+
+___
+
+### Consistancy and Ownership
+
+The nice thing about the `list` class is that it keeps all your information consistant.
+
+For example, with a list `(a,b,c)`, if you did `b.next = d`, then you would get the list `(a,b,d,c)`. It would also change `d.prev` to `b`, and `d.next` to `c`. So all the properties are kept consistant for you. Without this, it would be impossible to use.
+
+Another very nice thing however, is that the `list` class frees us from having to worry about cyclical references. If you were to implement a tree class yourself in speedie, you would quickly run into *cyclical-reference* issues.
+
+Cyclical-references are where two objects refer to each other, causing memory-leaks.
+
+The `list` class doesn't suffer this.
+
+Basically, the root of the tree owns all the descendants. Of course, a node within the tree can be removed and become it own root, and as long as you still own a reference to it, you will now have two trees.
+
+Once the root is gone, all the nodes are gone (unless you have a reference to a node elsewhere, then it becomes it's own root).
+
+
 ---
 ### RAM Efficiency
 
-You might ask _"well doesn't making our list, a tree... bloat the list?"_ Well... no! We stay sharp.
+You might ask _"well doesn't making our list, a tree... bloat the list?"_ Well... no! We stay tight.
 
-To make any double-linked-list, you'll need the `prev`/`next` pointers (8 bytes per pointer), and then you'll need a "`Head`" pointer also. The head is to remove or change the first node in the list. So that's already 3 pointers just for a non-tree double-linked-list.
+To make any double-linked-list, you'll need the `prev`/`next` pointers (8 bytes per pointer), and then you'll need a "`Head`" pointer also. The head is to remove or change the first item in the list. So that's already 3 pointers just for a non-tree double-linked-list.
 
 Because of how memory alignment works, and the fact that the refcount takes 4 bytes, we also require a whole pointer's size (8 bytes) worth before even getting to the first pointer, so thats 4 pointers worth.
 
@@ -33,9 +63,11 @@ In fact about 95% of all list activities really want a tree anyhow. For example,
 
 Having a non-tree list and trying to implement a tree out of that... is much more awkward... when really you wanted a tree in the first place. This forces you down the right path. Which is a good thing.
 
+Besides... Speedie's allocator is pretty perfect, much tighter than the standard `new` / `malloc` allocator, so you save more than 8 bytes per object anyhow.
+
 ### Speed
 
-Another nice thing about my list class... is that you get almost instant access to the first and last nodes in the list. This makes appends fast. And we do this without wasting extra memory for a head/tail property! I just did some clever tricks to make things fast without taking memory.
+Another nice thing about my list class... is that you get almost instant access to the first and last items in the list. This makes appends fast. And we do this without wasting extra memory for a head/tail property! I just did some clever tricks to make things fast without taking memory.
 
 This means my list class, unlike many others, doesn't need 5 pointers to describe itself, but only 4.
 
@@ -66,7 +98,7 @@ The list class has many utility functions, including:
 
 * sorting
 * flattening
-* moving nodes from one place to another
+* moving items from one place to another
 * checking how many children there are... or if there are enough (HasAny, HasChildCount)
 * Checking the distance from one node to another within a parent
 * Popping and clearing
