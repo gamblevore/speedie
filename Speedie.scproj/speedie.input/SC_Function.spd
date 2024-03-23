@@ -568,25 +568,22 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 function DeclsPrototypeClass (|Message| ch0)
 	opt norefcounts
 	|| p = .parent as scmodule											#require
-	debugat 60
 	|| fpType = p.FindClassMsg(ch0)										#require
 
 	|message| Route
 	if !fptype.funcproto
-		// this is finding the wrong thing. in fact fptype is already correct.
-		// we are going up somehow? even though it says DONT go up?
 		|| task = fptype.modul.FindClass("interface", nil, scnode.DontGoUp)
 			fpType = task
-			route = p.Route("interface")
+			route = fptype.modul.parent.Route("interface")
 			
 		|| task_proto = fptype.modul.findclass("prototype", nil, scnode.DontGoUp)
 			fptype = task_proto
-		
+	
 	.DeclsProtoCleanup(fpType, ch0, false, false, Route)
 	.DeclsProtoTypeAdd(fpType)
 
 
-function scmodule.Route (|string| name, |message|)
+function scnode.Route (|string| name, |message|)
 	opt norefcounts
 	rz = @dot.msg(name)
 	|| curr = rz
@@ -662,24 +659,24 @@ function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, 
 	using (ch0)
 		fProtoParams.CopyAllInto( p )
 	
-	debugat 91
 	if route
 		|| nxt = ch0.next
 		|| first = nxt.first
 		if first.next isthing "self"
 			first!.replacewith(route)
+		
 	ch0.Remove
 	
-	|| c = .cls
-		if late
-			p.first.remove // ooof
-
-		if (!AssumeSelf)
-			|| d    = p[@decl]
-			|| ch   = D[@nil]
-				|| decl = ExtractDecl( ch, nil, declmode.ProtoParam )
-					check (decl matches c.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
-			d.Remove
+	|| c = .cls														#require
+	if late
+		p.first.remove // ooof
+	
+	if (!AssumeSelf)
+		|| d    = p[@decl]
+		|| ch   = D[@nil]											#require
+		|| decl = ExtractDecl( ch, nil, declmode.ProtoParam )		#expect p
+		expect (decl matches c.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
+		d.Remove
 
 
 function IsSimpleCast (|Message|)
@@ -747,7 +744,7 @@ function Message.SelfUsedForProperty (|int|)
 	require r and .func == @dot  and  r.func == @rel
 	if .first IsThing "self"
 		if .DotType
-			return 1 + (r.second.name_ != "=")
+			return 1 + (r.second.name != "=")
 
 
 

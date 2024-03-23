@@ -2,18 +2,18 @@
 
 
 main
-//	sctasks.run
+	sctasks.run
 //	|| xxx = task.lessthan3("a", 5, "c")
 //	|| z = (xxx)(7)
 //	"z is: ${z.render}"
-//
-//
+
+
 //task LessThan3 (|string| a, |int| b, |string| c)
 //	run (|int| i, |bool|)
 //		return i < .b
 //		a.b.c.d
-//
-//
+
+
 //module SCTasks
 //	function run
 //		|| xxx = lessthan("a", 5, "c")
@@ -34,7 +34,7 @@ main
 //
 //
 //task LessThan2 (|float| f)
-//	run (sctasks.lessthan)
-//		return i*2.1 < .f
+//	run 	(sctasks.lessthan)
+//		return lessthan*2.1 < .f
 //
 //

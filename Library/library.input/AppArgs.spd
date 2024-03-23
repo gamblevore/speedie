@@ -48,7 +48,7 @@ function Message.ArgName (|string|)
 function Message.ArgValue (|string|)
 	opt norefcounts
 	if (self == @item)
-		return .second.name_ ?? "true"
+		return .second.name ?? "true"
 	return .name
 
 

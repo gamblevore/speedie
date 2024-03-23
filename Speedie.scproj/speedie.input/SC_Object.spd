@@ -57,10 +57,16 @@ class SCObject
 class SCNamed (SCObject)	// move back into scobject? we can't remove it from scarg...
 							// not easily!
 	linkage
-		cpp_part		Named
+		cpp_part Named
 	|string|					Name
 	|String|					ExportName
 
+	function Name (|string|)
+		nil safe
+		if self
+			return .name
+		return "(nil)"
+		
 	render
 		|| cname = ((.class.name|uint64|)+2)|cstring|
 		fs <~ cname

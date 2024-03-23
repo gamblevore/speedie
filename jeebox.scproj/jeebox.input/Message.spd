@@ -715,6 +715,7 @@ class Message (list)
 			return .func
 
 	function Name_ (|string|) // for use within the message class!
+		// seems unnecessary?
 		description "For use within the message class, which can't use the 'name' function directly."
 		nil safe
 		if self

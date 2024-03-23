@@ -834,7 +834,7 @@ module
 		Compiler.ClassList <~ cls
 
 		|| Module = arg.find( @tmp, "module" )
-		cls.modul.loadModuleForCls( Module, cls )
+		cls.loadModuleForCls( Module, parent )
 
 		if (ForInterface and parent isa scmodule)
 			cls.CppClass = "__${parent.cls!.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"

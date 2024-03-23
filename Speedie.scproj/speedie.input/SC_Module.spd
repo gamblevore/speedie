@@ -162,19 +162,22 @@ module
 		error (errplace, "This should go into a module or class.")
 	
 		
-	function scmodule.LoadModuleForCls (|message| node, |scclass| cls)
-		.Project = SCImport.curr
+	function scclass.LoadModuleForCls (|message| node, |scnode| P)
+		|| M = .modul
+		m.Project = SCImport.curr
 		
-		.parent = nil	// So Array.Byte, File.Byte, XXX.Byte... won't be found.
-		.Cls = cls
-		.name = cls.Name
+//		|| x = array.byte
+//		if p != compiler.program
+//			"route: ${self.name} --> ${p.name} --> ${p.parent.name}"
+		m.parent = p
+		m.Cls = self
+		m.name = .Name
 		
 		if node
 			MoveFutureStaticsIn(node) // fix this? Current this makes impossible to extend a static section...
-			.LoadModule( node )
-			if !.source
+			m.LoadModule( node )
 		  else
-			.source = cls.source
+			m.source = .source
 	
 	
 	function NeuModule (CollectFunc)

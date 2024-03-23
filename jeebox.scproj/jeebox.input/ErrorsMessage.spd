@@ -60,10 +60,10 @@ function message.AsError (|error|)
 	rz = error(nil)
 	|| arg = .Last
 	if arg == @arg
-		rz.position		= arg..pos.int|int|
-		rz.path			= arg..file.value
-		rz.severity		= arg..severity.int|errorseverity|
-		rz.name	= arg[@str].name_
+		rz.position = arg..pos.int|int|
+		rz.path	= arg..file.value
+		rz.severity = arg..severity.int|errorseverity|
+		rz.name	= arg[@str].name
 	  else
 		rz.name = .name
 		rz.path = ""
