@@ -96,10 +96,10 @@ You can also loop backwards, upwards and downwards...
 
 The list class has many utility functions, including:
 
-* sorting
-* flattening
-* moving items from one place to another
-* checking how many children there are... or if there are enough (HasAny, HasChildCount)
+* Sorting
+* Flattening
+* Moving items from one place to another
+* Checking how many children there are... or if there are enough (HasAny, HasChildCount)
 * Checking the distance from one node to another within a parent
 * Popping and clearing
 * Checking if one node is within another node, or contains another...
