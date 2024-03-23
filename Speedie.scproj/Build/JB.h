@@ -8055,6 +8055,8 @@ bool SC_Base_RehomeExport(SCNode* self);
 
 SCDecl* SC_Base_RequireContained(SCNode* self, Message* exp);
 
+Message* SC_Base_Route(SCNode* self, JB_String* name);
+
 void SC_Base_SetExportName(SCNode* self, JB_String* s, bool Explicit);
 
 SCClass* SC_Base_ShouldBeClass(SCNode* self, Message* errplace);
@@ -8386,6 +8388,8 @@ void SC_Class_LoadClassType(SCClass* self);
 void SC_Class_LoadConstructors(SCClass* self);
 
 void SC_Class_LoadLinkage(SCClass* self);
+
+void SC_Class_LoadModuleForCls(SCClass* self, Message* node, SCNode* P);
 
 void SC_Class_LoadSaver(SCClass* self);
 
@@ -8895,8 +8899,6 @@ void SC_Mod_LoadInitFuncSub(SCModule* self, Message* init, JB_String* name);
 
 void SC_Mod_LoadModule(SCModule* self, Message* node);
 
-void SC_Mod_LoadModuleForCls(SCModule* self, Message* node, SCClass* cls);
-
 void SC_Mod_MoveToInitFunc(SCModule* self, Message* c);
 
 SCFunction* SC_Mod_NewModuleFunc(SCModule* self, Message* src);
@@ -8904,8 +8906,6 @@ SCFunction* SC_Mod_NewModuleFunc(SCModule* self, Message* src);
 SCModule* SC_Mod_OneOrOther(SCModule* self, SCModule* B);
 
 JB_String* SC_Mod_Render(SCModule* self, FastString* fs_in);
-
-Message* SC_Mod_Route(SCModule* self, JB_String* name);
 
 JB_String* SC_Mod_SafeName(SCModule* self);
 
@@ -8955,6 +8955,8 @@ inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f);
 inline bool JB_int64_OperatorInRange(int64 self, int64 d);
 
 inline bool JB_int_OperatorInRange(int self, int d);
+
+inline JB_String* SC_Named_Name(SCNamed* self);
 
 inline bool SC_PA_SyntaxCast(SCParamArray* self);
 
@@ -9074,6 +9076,13 @@ inline bool JB_int_OperatorInRange(int self, int d) {
 		return (((uint)self) < ((uint)d));
 	}
 	return false;
+}
+
+inline JB_String* SC_Named_Name(SCNamed* self) {
+	if (self) {
+		return self->Name;
+	}
+	return JB_LUB[1429];
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* self) {

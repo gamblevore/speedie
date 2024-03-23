@@ -2,7 +2,7 @@
 
 
 main
-	sctasks.run
+//	sctasks.run
 //	|| xxx = task.lessthan3("a", 5, "c")
 //	|| z = (xxx)(7)
 //	"z is: ${z.render}"
