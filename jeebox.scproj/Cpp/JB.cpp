@@ -6197,17 +6197,17 @@ void JB_Msg_Destructor(Message* self) {
 
 void JB_Msg_Dot__(Message* self, FastString* fs) {
 	Message* ch = JB_Incr(((Message*)JB_Ring_First(self)));
-	if ((!ch)) {
-		JB_Decr(ch);
-		return;
+	if (ch) {
+		JB_FS_SyntaxAppend(fs, ch);
 	}
-	JB_FS_SyntaxAppend(fs, ch);
 	JB_FS_AppendByte(fs, '.');
 	JB_FS_AppendString(fs, self->Name);
-	Message* _tmPf0 = JB_Incr(((Message*)JB_Ring_NextSib(ch)));
+	if (ch) {
+		Message* _tmPf0 = JB_Incr(((Message*)JB_Ring_NextSib(ch)));
+		JB_FS_SyntaxAppend(fs, _tmPf0);
+		JB_Decr(_tmPf0);
+	}
 	JB_Decr(ch);
-	JB_FS_SyntaxAppend(fs, _tmPf0);
-	JB_Decr(_tmPf0);
 }
 
 void JB_Msg_Dummy(Message* self, FastString* fs) {
@@ -8060,7 +8060,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024032115);
+	return (2024032313);
 }
 
 __lib__ JB_String* jb_readfile(_cstring path, bool AllowMissingFile) {
