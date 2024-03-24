@@ -1348,13 +1348,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[1895])
+#define kJB__ErrorColors_bold (JB_LUB[1897])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1896])
-#define kJB__ErrorColors_good (JB_LUB[1897])
-#define kJB__ErrorColors_normal (JB_LUB[1898])
-#define kJB__ErrorColors_underline (JB_LUB[1897])
-#define kJB__ErrorColors_warn (JB_LUB[1899])
+#define kJB__ErrorColors_error (JB_LUB[1898])
+#define kJB__ErrorColors_good (JB_LUB[1899])
+#define kJB__ErrorColors_normal (JB_LUB[1900])
+#define kJB__ErrorColors_underline (JB_LUB[1899])
+#define kJB__ErrorColors_warn (JB_LUB[1901])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1527,7 +1527,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1900])
+#define kJB_codesign_native (JB_LUB[1902])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1556,7 +1556,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[1901])
+#define kJB_kSaverStart1 (JB_LUB[1903])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -9082,7 +9082,7 @@ inline JB_String* SC_Named_Name(SCNamed* self) {
 	if (self) {
 		return self->Name;
 	}
-	return JB_LUB[1429];
+	return JB_LUB[1430];
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* self) {
@@ -9189,7 +9189,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1865])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1867])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}

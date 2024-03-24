@@ -100,7 +100,7 @@ function Message.BuildRunTask (|bool|)
 	|| f = prms.func
 	expect (f == @bra or @list) (prms)
 	
-	.name = "function"
+	.name = "syntax"
 	f = prms.first.func
 
 	ifn f == @thg or @dot
@@ -115,7 +115,7 @@ function Message.BuildRunTask (|bool|)
 			|| ty = p.second
 				callprms <~ ty.copy
 	
-	.first = @thg + "run"
+	.first = @thg + "call"
 	return true
 
 

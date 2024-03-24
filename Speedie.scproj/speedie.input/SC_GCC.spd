@@ -518,7 +518,7 @@ function file.TestBatch (|bool|)
 				print ", "
 			printed = true
 			print c.Name
-			.SilentExecute([c, "--nocompile"])
+			.SilentExecute([c, "--nocompile", "--perry"])
 	printline
 	
 	for c.files in batch
@@ -544,15 +544,10 @@ function File.TestSpeedie (|string| v, |bool|)
 	if Options.arch
 		cmd_args <~ "--arch="+options.arch
 	
-	|| result = faststring()
 	|| p = .path
-	p.execute(cmd_args, result)
+	p.execute(cmd_args)
 	|| TestProd = "/usr/local/speedie/Terminal/SpeedieTest" + v
-	if !testprod.file.mustexist("Compile Speedie")
-		debugger
-		p.execute(cmd_args, result)
-	
-	printline Result
+	testprod.file.mustexist("Compile Speedie")	
 	print TransCompiler.TmpOut(Variant).ReadFile
 	|| test_err = TransCompiler.TmpErr(Variant).ReadFile
 	if test_Err.length

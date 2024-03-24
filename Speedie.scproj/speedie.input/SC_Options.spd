@@ -342,6 +342,7 @@ module Feedback
 		
 		+"self" 
 			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$
+			options.perryoutput = 1
 			feedback.TryUseProject( Compiler.SpeedieProj )
 			return true // does something, counts towards operationCount
 		

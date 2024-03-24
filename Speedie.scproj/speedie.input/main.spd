@@ -1,10 +1,57 @@
 
 
 main // speedie main {
+//	"A"
+//	SCTasks2.run
+//	"B"
+//	|| xxx = task.LessThan3("a", "c", 5)
+//	"C"
+//	|| z = (xxx)(7)
+//	"D"
+//	"z is: ${z.render}"
 	compiler.SetupEnv
 	compiler.MiniTests
 	compiler.Main
 	compiler.PrintResults
+
+
+//task LessThan3 (|string| a, |int| b, |string| c)
+//	run (|int| i, |bool|)
+//		return i < .b
+//
+//
+//module SCTasks2
+//	function run
+//		"E"
+//		|| xxx = lessthan("a", "c", 5)
+//		"F"
+//		|| z = LessThan.abc(xxx, 1)
+//		"G"
+//		|| yyy = task.lessthan2(1.2)
+//		"H"
+//		|| w = LessThan.abc(yyy, 1)
+//		"I"
+//		"w is: ${w.render}"
+//		"J"
+//
+//		
+//	task LessThan (|string| a, |int| b, |string| c)
+//		run (|int| LESSTHAN, |bool|)
+//			cpp_part TaskTest
+//			"K"
+//			return LESSTHAN < .b
+//		
+//		module
+//			function abc (lessthan) 
+//				"L"
+//				return (self)(LessThaN)
+//
+//
+//task LessThan2 (|float| f)
+//	run 	(SCTasks2.lessthan)
+//		"M"
+//		return lessthan*2.1 < .f
+
 
 
 function Compiler.Main
@@ -57,10 +104,6 @@ function compiler.SetupEnv
 	if pico.parent
 		error.AutoPrint = 0
 		ErrorColors.enabled = false
-
-
-//function app.IgnoreBreakPoints
-//	cpp_wrapper JB_Pipe__IgnoreBreakPoints
 
 
 api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)

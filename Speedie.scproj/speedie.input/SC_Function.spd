@@ -754,9 +754,8 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	|| Supper = .cls!.super
 	|| GotSuperConstructor = false
 	if supper
-		GotSuperConstructor = Supper == typeobject  or  supper.parent == typetask
+		GotSuperConstructor  =  Supper == typeobject  or  (typetask == supper.parent or supper)
 	|| NoNesting = "This should be at the function root. (not nested)."
-	
 	
 	for dot.flat in root
 		if dot == @func
