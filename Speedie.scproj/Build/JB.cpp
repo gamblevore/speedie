@@ -2041,7 +2041,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112152102174720)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112152205918208)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -2466,12 +2466,6 @@ void SC_Comp__SyntaxAppend(Message* m) {
 	JB_Tree_SyntaxAppend(SC__Comp_InternalFile->LiveAST, m);
 }
 
-bool SC_Comp__TaskPropertySorter(JB_Object* a, JB_Object* b) {
-	SCDecl* aa = ((SCDecl*)a);
-	SCDecl* bb = ((SCDecl*)b);
-	return SC_Decl_IsObject(aa) >= SC_Decl_IsObject(bb);
-}
-
 void SC_Comp__TestDate() {
 	int64 day = 5662310400;
 	int64 hour = 235929600;
@@ -2492,7 +2486,7 @@ void SC_Comp__TestDate() {
 }
 
 void SC_Comp__TestTask() {
-	LessThan3* xxx = JB_Incr(SC_LessThan3_Constructor(nil, JB_LUB[176], JB_LUB[177], 5));
+	LessThan3* xxx = JB_Incr(SC_LessThan3_Constructor(nil, JB_LUB[176], 5, JB_LUB[177]));
 	bool z = SC_LessThan3_SyntaxCall((xxx), 8);
 	JB_Decr(xxx);
 }
@@ -3385,7 +3379,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[243]);
-	JB_FS_AppendInt32(_fsf0, (2024032418));
+	JB_FS_AppendInt32(_fsf0, (2024032419));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -6428,6 +6422,7 @@ SCNode* SC_SCTasks__NewTaskActual(Message* node, SCNode* name_space) {
 }
 
 
+
 SCNode* SC_SCThe__NewInsertion(Message* node, SCNode* name_space, Message* ErrPlace) {
 	Message* name = ((Message*)JB_Tree_Get(node, 0));
 	if (JB_Msg_EqualsSyx(name, JB_SyxArg, false)) {
@@ -7338,7 +7333,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[526]);
-	JB_FS_AppendInt32(_fsf0, (2024032418));
+	JB_FS_AppendInt32(_fsf0, (2024032419));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -14933,7 +14928,7 @@ bool JB_int_SyntaxAccess(int self, int bit) {
 
 int JB_int_SyntaxAccessSet(int self, int bit, bool Value) {
 	int mask = 1 << bit;
-	return (self & (~mask)) | (Value << ((bool)bit));
+	return (self & (~mask)) | (((int)Value) << bit);
 }
 
 int JB_int__Max() {
@@ -15051,6 +15046,10 @@ ivec4 SC_ivec4___junktest_4__Set(ivec4 self, int Value) {
 
 bool SC_uint_IsNormalMatch(uint self) {
 	return ((self == kJB_kSimpleMatch) or ((self == kJB_kNumericMatch) or (self == kJB_kSuperClassMatch)));
+}
+
+uint JB_uint_LowestBit(uint self) {
+	return self & (-self);
 }
 
 
@@ -16364,6 +16363,7 @@ void SC_fn_asm__InitTable() {
 		};
 	};
 }
+
 
 
 
@@ -38284,7 +38284,7 @@ JB_Task* JB_Task_Constructor(JB_Task* self, uint Obj, void* func) {
 	}
 	JB_Ring_Constructor0(self);
 	self->State = 0;
-	self->_ObjectCount = Obj;
+	self->_Object = Obj;
 	self->_func = func;
 	return self;
 }
@@ -38292,15 +38292,13 @@ JB_Task* JB_Task_Constructor(JB_Task* self, uint Obj, void* func) {
 void JB_Task_Destructor(JB_Task* self) {
 	//visible;
 	JB_Object** curr = ((JB_Object**)((&self->_func))) + 1;
-	{
-		int _LoopSrcf1 = ((int)self->_ObjectCount);
-		int i = 0;
-		while (i < _LoopSrcf1) {
-			JB_Decr(curr[i]);
-			i++;
-		};
-	}
-	;
+	uint o = self->_Object;
+	while (o) {
+		uint i = JB_uint_LowestBit(o);
+		o = (o & (~i));
+		i = JB_Int_Log2(((int)i));
+		JB_Decr(curr[i]);
+	};
 	JB_Ring_Destructor(self);
 }
 
@@ -38784,14 +38782,15 @@ void JB_Err__SourceRemove() {
 
 
 
-LessThan3* SC_LessThan3_Constructor(LessThan3* self, JB_String* a, JB_String* c, int b) {
+
+
+LessThan3* SC_LessThan3_Constructor(LessThan3* self, JB_String* a, int b, JB_String* c) {
 	if (self == nil) {
-		self = ((LessThan3*)JB_NewClass(&JB_TaskData));
-		JB_Task_Constructor(((JB_Task*)self), 2, ((void*)(&SC_LessThan3_SyntaxCall)));
+		self = ((LessThan3*)JB_Task_Constructor(nil, 384, ((void*)(&SC_LessThan3_SyntaxCall))));
 	}
 	self->a = JB_Incr(a);
-	self->c = JB_Incr(c);
 	self->b = b;
+	self->c = JB_Incr(c);
 	//task;
 	return self;
 }
@@ -39298,6 +39297,8 @@ int SC_Class_CalculateSizeRaw(SCClass* self, int Depth) {
 			return 0;
 		}
 	}
+	JB_Decr(s);
+	int bits = 0;
 	{
 		Array* _LoopSrcf2 = JB_Incr(self->Properties);
 		int _if0 = 0;
@@ -39316,6 +39317,9 @@ int SC_Class_CalculateSizeRaw(SCClass* self, int Depth) {
 					return 0;
 				}
 			}
+			if ((SC_Decl_SyntaxIs(p, kSC__SCDeclInfo_Task)) and SC_Decl_IsObject(p)) {
+				bits = JB_int_SyntaxAccessSet(bits, Count >> 3, true);
+			}
 			Count = JB_int_OperatorAlign(Count, curr);
 			int Mul = p->C_Array;
 			JB_Decr(p);
@@ -39326,11 +39330,11 @@ int SC_Class_CalculateSizeRaw(SCClass* self, int Depth) {
 			_if0++;
 		};
 		JB_Decr(_LoopSrcf2);
-		JB_Decr(s);
 	}
 	;
 	self->Size = JB_int_OperatorAlign(Count, 4);
 	if (SC_Class_IsTask(self)) {
+		self->TaskObjectCount = bits;
 		if (self->Size > 128) {
 			JB_Msg_SyntaxExpect(self->Source, JB_LUB[1705]);
 		}
@@ -39533,6 +39537,7 @@ SCClass* SC_Class_Constructor(SCClass* self, Message* node, SCNode* parent, bool
 	self->ProcessAs = nil;
 	self->DowngradeTo = nil;
 	self->DataObject = nil;
+	self->TaskObjectCount = 0;
 	self->Size = 0;
 	self->Depth = 0;
 	self->StructContainerDepth = 0;
@@ -39550,7 +39555,6 @@ SCClass* SC_Class_Constructor(SCClass* self, Message* node, SCNode* parent, bool
 	self->HasNilChecker = false;
 	self->DefaultsToReal = false;
 	self->IsRole = 0;
-	self->TaskObjectCount = 0;
 	self->IsBuiltin = false;
 	self->BaseType = 0;
 	self->IsASM = false;
@@ -41245,7 +41249,6 @@ bool SC_Class_EqualsType(SCClass* self, SCNodeType d, bool aware) {
 }
 
 void SC_Class_TaskProperties(SCClass* self) {
-	JB_Array_Sort(self->Properties, (&SC_Comp__TaskPropertySorter), false);
 	{
 		Array* _LoopSrcf2 = self->Properties;
 		int _if0 = 0;
@@ -41256,7 +41259,6 @@ void SC_Class_TaskProperties(SCClass* self) {
 			}
 			int i = _if0;
 			(SC_Decl_SyntaxIsSet(p, kSC__SCDeclInfo_Task, true));
-			self->TaskObjectCount = (self->TaskObjectCount + ((MaybeBool)SC_Decl_IsObject(p)));
 			_if0++;
 		};
 	};
@@ -47338,6 +47340,7 @@ bool JB_config_Save(Message* self) {
 }
 
 
+
 void JB_InitClassList(SaverLoadClass fn) {
 	fn(&SaveableData, (char*)"");
 	fn(&JB_StringData, (char*)"|int| Length_");
@@ -47351,4 +47354,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -7059645881692256447 -8937511009159496705
+// -2457771384230425055 -8937511009159496705

@@ -41,7 +41,7 @@ datatype int
 		return self&(1<<bit)
 	syntax access (|int| bit, assigns:|bool|, |int|)
 		|| mask = 1<<bit
-		return (self &~ mask) ||| (value << bit) 
+		return (self &~ mask) ||| (value|int| << bit) 
 	function Clz (|int|)
 		cpp_inbuilt __builtin_clz
 	

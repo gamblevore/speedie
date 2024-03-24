@@ -6,22 +6,26 @@ class Task (list)
 		cpp_class JB_Task
 
 	|taskstate| 		State
-	|uint|				_ObjectCount
+	|uint|				_Object
 	|&nil|				_func
 	
 	constructor
 		cpp_part Empty
 		._Func = &(message.dummy)
-		._ObjectCount = 0
+		._Object = 0
 	
 	constructor (|uint| Obj, |&nil| func)
-		._ObjectCount = Obj
+		._Object = Obj
 		._Func = func
 		
 	destructor
 		visible
 		|| curr = ((&._func)|&object|) + 1
-		for  i in ._ObjectCount|int|
+		|| o = ._object
+		while o
+			|| i = o.lowestbit
+			o &= ~i
+			i = i|int|.log2
 			jb_decr( curr[i] )          // noice
 
 

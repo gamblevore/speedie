@@ -461,6 +461,10 @@ struct JB_Error;
 
 struct Message;
 
+struct LessThan;
+
+struct LessThan2;
+
 struct LessThan3;
 
 struct Message;
@@ -476,6 +480,8 @@ struct SCFunction;
 struct SCModule;
 
 struct Message;
+
+struct JB_Task;
 
 struct JB_Task;
 
@@ -1118,7 +1124,7 @@ struct Task_Behaviour: list_Behaviour {
 
 JBClass ( JB_Task , JB_List , 
 	TaskState State;
-	uint _ObjectCount;
+	uint _Object;
 	void* _func;
 );
 
@@ -1138,8 +1144,8 @@ JBClass ( JB_Error , Message ,
 
 JBClass ( LessThan3 , JB_Task , 
 	JB_String* a;
-	JB_String* c;
 	int b;
+	JB_String* c;
 );
 
 struct SCArg_Behaviour: SCNode_Behaviour {
@@ -1191,6 +1197,7 @@ JBClass ( SCClass , SCNode ,
 	SCClass* ProcessAs;
 	SCClass* DowngradeTo;
 	SCDecl* DataObject;
+	uint TaskObjectCount;
 	u16 Size;
 	u16 Depth;
 	u16 StructContainerDepth;
@@ -1210,7 +1217,6 @@ JBClass ( SCClass , SCNode ,
 	bool HasNilChecker;
 	bool DefaultsToReal;
 	byte IsRole;
-	byte TaskObjectCount;
 	bool IsBuiltin;
 	SCNodeType BaseType;
 	bool IsASM;
@@ -2465,8 +2471,6 @@ SCClass* SC_Comp__SyntaxAccess(Message* name);
 
 void SC_Comp__SyntaxAppend(Message* m);
 
-bool SC_Comp__TaskPropertySorter(JB_Object* a, JB_Object* b);
-
 void SC_Comp__TestDate();
 
 void SC_Comp__TestTask();
@@ -2977,6 +2981,9 @@ SCNode* SC_SCTasks__NewTask(Message* node, SCNode* name_space, Message* ErrPlace
 
 SCNode* SC_SCTasks__NewTaskActual(Message* node, SCNode* name_space);
 
+
+
+// SCTasks2
 
 
 // SCThe
@@ -4000,6 +4007,8 @@ ivec4 SC_ivec4___junktest_4__Set(ivec4 self, int Value);
 // uint
 bool SC_uint_IsNormalMatch(uint self);
 
+uint JB_uint_LowestBit(uint self);
+
 
 
 // uint16
@@ -4650,6 +4659,9 @@ void SC_fn_asm__InitTable();
 
 
 // fpMsgRenderCpp
+
+
+// prototype
 
 
 // prototype
@@ -8228,8 +8240,14 @@ void JB_Err__SourceRemove();
 // JB_FileArchive
 
 
+// JB_LessThan
+
+
+// JB_LessThan2
+
+
 // JB_LessThan3
-LessThan3* SC_LessThan3_Constructor(LessThan3* self, JB_String* a, JB_String* c, int b);
+LessThan3* SC_LessThan3_Constructor(LessThan3* self, JB_String* a, int b, JB_String* c);
 
 bool SC_LessThan3_SyntaxCall(LessThan3* self, int i);
 
@@ -8958,6 +8976,9 @@ Message* JB_config_ConfFirst(Message* self);
 
 bool JB_config_Save(Message* self);
 
+
+
+// JB_interface
 
 
 // JB_interface

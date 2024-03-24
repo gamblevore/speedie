@@ -42,10 +42,8 @@ class SCObject
 		x[i] = value
 		.NodeInfo = x
 
-
 	function IsVisible (|bool|)
 		return self is visible
-	
 	
 	function IsVisible (assigns:|bool|)
 		(self is visible) = value

@@ -35,6 +35,7 @@ linkage
 |SCClass?|					ProcessAs
 |SCClass?|					DowngradeTo
 |SCDecl?|					DataObject
+|uint|						TaskObjectCount
 |uint16|					Size
 |uint16|					Depth
 |uint16|					StructContainerDepth
@@ -56,7 +57,6 @@ linkage
 |bool|						HasNilChecker
 |bool|						DefaultsToReal
 |byte|						IsRole
-|byte|						TaskObjectCount
 |bool|						IsBuiltin // SCNodeType
 |SCNodetype| 				BaseType
 |bool|						IsASM
@@ -142,13 +142,11 @@ function IsTask (|bool|)
 	return self and .isrole & 2
 
 
+// how can we get the size of each property?
 function TaskProperties 
 	opt norefcounts
-	.properties.sort(&compiler.TaskPropertySorter)
-
 	for (p in .Properties) (i)
 		(p is task)
-		.TaskObjectCount += p.IsObject
 
 
 function CollectProperties 
@@ -226,10 +224,14 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 	|| s = .super
 		Count = s.CalculateSizeRaw				#debug_require
 
+	|| bits = 0
+	// 	.TaskObjectCount = bits
 	for p in .properties
 		|| curr = platform.PointerBytes
 		ifn P.Type.IsObject or p.PointerCount
 			Curr = P.type.calculatesize(depth+1)	#require
+		if (p is task) and p.isobject
+			bits[count>>3] = true
 		Count = Count Align Curr
 
 		|| Mul = P.c_Array ?? 1
@@ -237,6 +239,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 
 	.size = Count align 4
 	if .istask
+		.taskobjectcount = bits
 		check (.size <= 128) (.source, "Task size is over 128.")
 	return count	
 

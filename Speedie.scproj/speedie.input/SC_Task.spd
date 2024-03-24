@@ -128,9 +128,7 @@ function Message.BuildTask
 		check (runs < 2) (runs[0], "Multiple run statements")
 	|| run = runs[0]!
 	if run.BuildRunTask and !.findall("constructor")
-		run.prev = "constructor () {
-//	super.constructor(–taskvars, &syntaxcall)
-}"~parse
+		run.prev = "constructor () {}"~parse
 
 
 	
@@ -146,11 +144,35 @@ function Message.BuildTask
 
 
 function compiler.TestTask
-	|| xxx = task.LessThan3("a", "c", 5)
+	|| xxx = task.LessThan3("a", 5, "c")
 	|| z = (xxx)(8)
 
 
 task LessThan3 (|string| a, |int| b, |string| c)
 	run (|int| i, |bool|)
 		return i < .b
+
+
+module SCTasks2
+	function run
+		|| xxx = lessthan("a", 5, "c")
+		|| z = LessThan.abc(xxx, 1)
+		|| yyy = task.lessthan2(1.2)
+		|| w = LessThan.abc(yyy, 1)
+		"w is: ${w.render}"
+
+		
+	task LessThan (|string| a, |int| b, |string| c)
+		run (|int| LESSTHAN, |bool|)
+			cpp_part TaskTest
+			return LESSTHAN < .b
+		
+		module
+			function abc (lessthan) 
+				return (self)(LessThaN)
+
+
+task LessThan2 (|float| f)
+	run 	(SCTasks2.lessthan)
+		return lessthan*2.1 < .f
 
