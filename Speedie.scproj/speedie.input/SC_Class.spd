@@ -225,13 +225,12 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		Count = s.CalculateSizeRaw				#debug_require
 
 	|| bits = 0
-	// 	.TaskObjectCount = bits
 	for p in .properties
 		|| curr = platform.PointerBytes
 		ifn P.Type.IsObject or p.PointerCount
 			Curr = P.type.calculatesize(depth+1)	#require
 		if (p is task) and p.isobject
-			bits[count>>3] = true
+			bits[(count+platform.PointerBytes)>>3] = true
 		Count = Count Align Curr
 
 		|| Mul = P.c_Array ?? 1

@@ -20,7 +20,7 @@ class Task (list)
 		
 	destructor
 		visible
-		|| curr = ((&._func)|&object|) + 1
+		|| curr = self|&object|
 		|| o = ._object
 		while o
 			|| i = o.lowestbit
