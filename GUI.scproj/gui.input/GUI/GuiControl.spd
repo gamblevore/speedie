@@ -470,35 +470,32 @@ class GUIControl (list)
 			|| r2 = r
 			r2.refsanity
 	
+
+	helper AddTask (|guitask| t)
+		opt norefcounts
+		|| w = .window
+			w.tasks <~ t
 	
 	task GUITask ( |GUIControl|	Upon,  |date| StartTime,  |uint| duration )	
 		constructor
-			visible
-			// this can only be called if it is paramless...
-			// however... if this IS a task, and we RELY on this existing... we can actually
-			// rely on all the params existing.
-			
-			// to make a different constructor, just wrap shit.
-			|| w = Upon.Window
-				w.tasks <~ self
+			// upon, starttime, duration are automatically set.  // maybe not very obvious tho?
+			upon.addtask(self)
 		
-		function RunTask (guitask)
+		function RunOne (|date| now, |bool|)
 			opt NoRefCounts
 			require .upon.parent
 			|| s = .starttime
 			|| e = s + .duration
-			if now > s
-				return 0
 			if now > e
 				require .state isnt finished
 				.State |= TaskState.Finished
 			rz = (self)(now)
 			.State |= TaskState.Started
 			if .state is Finished
-				rz = -1
+				rz = false
 		
 		run (|date| now, |ErrorInt|)
-			0 // placeholder
+			0
 
 
 helper image.ControlClip (assigns:|GuiControl| G)

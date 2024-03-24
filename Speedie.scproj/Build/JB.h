@@ -7291,7 +7291,7 @@ void SC_Msg_mainfix2(Message* self);
 
 int SC_Msg_MainOneArg(Message* self, Message* arg, int i, int found);
 
-void SC_Msg_MakeTaskVar(Message* self, Message* con, Message* before);
+void SC_Msg_MakeTaskVar(Message* self, Message* con, Message* before, bool First);
 
 void JB_Msg_max__(Message* self, FastString* fs);
 
@@ -8365,7 +8365,7 @@ void SC_Class_FillRoleConstructor(SCClass* self, SCFunction* con);
 
 void SC_Class_FillTaskConstructor(SCClass* self, SCFunction* con);
 
-void SC_Class_FillTaskConstructorSub(SCClass* self, Message* src, Message* before);
+void SC_Class_FillTaskConstructorSub(SCClass* self, Message* src, Message* before, int depth);
 
 SCFunction* SC_Class_FindAllocFunc(SCClass* self, JB_String* fname, bool DontCreate);
 

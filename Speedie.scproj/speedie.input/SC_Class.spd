@@ -238,8 +238,8 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 
 	.size = Count align 4
 	if .istask
-		.taskobjectcount = bits
-		check (.size <= 128) (.source, "Task size is over 128.")
+		.taskobjectcount = .super!.taskobjectcount ||| bits
+		check (.size <= 128) (.source, "Task size is over 128.") // could make it dynamic. Perhaps just allocate the largest task found? still limit to 256 bytes tho.
 	return count	
 
 

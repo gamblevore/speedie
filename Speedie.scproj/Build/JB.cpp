@@ -2041,7 +2041,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112152290983936)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112152960333546)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3379,7 +3379,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[243]);
-	JB_FS_AppendInt32(_fsf0, (2024032419));
+	JB_FS_AppendInt32(_fsf0, (2024032422));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7333,7 +7333,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[526]);
-	JB_FS_AppendInt32(_fsf0, (2024032419));
+	JB_FS_AppendInt32(_fsf0, (2024032422));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -31385,12 +31385,14 @@ int SC_Msg_MainOneArg(Message* self, Message* arg, int i, int found) {
 	return 4;
 }
 
-void SC_Msg_MakeTaskVar(Message* self, Message* con, Message* before) {
+void SC_Msg_MakeTaskVar(Message* self, Message* con, Message* before, bool First) {
 	Message* prm = ((Message*)JB_Tree_Second(con));
 	Message* arg = ((Message*)JB_Ring_NextSib(prm));
 	JB_String* name = SC_Msg_VarName(self);
 	if (JB_Str_Exists(name)) {
-		(JB_Ring_PrevSibSet(before, SC_NewEqRelWithMsgMsg(JB_Syx_OperatorPlus(JB_SyxSDot, name), JB_Syx_OperatorPlus(JB_SyxThg, name))));
+		if (First) {
+			(JB_Ring_PrevSibSet(before, SC_NewEqRelWithMsgMsg(JB_Syx_OperatorPlus(JB_SyxSDot, name), JB_Syx_OperatorPlus(JB_SyxThg, name))));
+		}
 		JB_Tree_SyntaxAppend(prm, JB_Msg_Copy(self, nil));
 	}
 }
@@ -39334,7 +39336,7 @@ int SC_Class_CalculateSizeRaw(SCClass* self, int Depth) {
 	;
 	self->Size = JB_int_OperatorAlign(Count, 4);
 	if (SC_Class_IsTask(self)) {
-		self->TaskObjectCount = bits;
+		self->TaskObjectCount = (self->Super->TaskObjectCount | bits);
 		if (self->Size > 128) {
 			JB_Msg_SyntaxExpect(self->Source, JB_LUB[1705]);
 		}
@@ -40095,15 +40097,18 @@ void SC_Class_FillTaskConstructor(SCClass* self, SCFunction* con) {
 	Message* src = con->Source;
 	//using;
 	MessagePosition _usingf0 = JB_Msg_SyntaxUsing(src);
-	SC_Class_FillTaskConstructorSub(self, src, SC_Msg_TaskConBefore(((Message*)JB_Ring_Last(src))));
+	SC_Class_FillTaskConstructorSub(self, src, SC_Msg_TaskConBefore(((Message*)JB_Ring_Last(src))), 0);
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 	JB_MsgPos_Destructor((&_usingf0));
 }
 
-void SC_Class_FillTaskConstructorSub(SCClass* self, Message* src, Message* before) {
+void SC_Class_FillTaskConstructorSub(SCClass* self, Message* src, Message* before, int depth) {
+	if (depth > 100) {
+		return;
+	}
 	SCClass* pr = self->Super;
 	if (SC_Class_IsTask(pr)) {
-		SC_Class_FillTaskConstructorSub(pr, src, before);
+		SC_Class_FillTaskConstructorSub(pr, src, before, depth + 1);
 	}
 	{
 		Array* _LoopSrcf2 = self->Properties;
@@ -40113,7 +40118,7 @@ void SC_Class_FillTaskConstructorSub(SCClass* self, Message* src, Message* befor
 			if (p == nil) {
 				break;
 			}
-			SC_Msg_MakeTaskVar(p->Source, src, before);
+			SC_Msg_MakeTaskVar(p->Source, src, before, depth == 0);
 			_if0++;
 		};
 	};
@@ -47354,4 +47359,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -2457771384230425055 -8937511009159496705
+// 1799890093541468427 -8937511009159496705

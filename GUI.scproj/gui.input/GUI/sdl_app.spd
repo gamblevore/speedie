@@ -643,7 +643,7 @@ module SDLApp
 		|| Now = date()
 		for w  in  window.all
 			w.FixFocus
-			w.RunTasks(now)
+			w.RunAllTasks(now)
 			if !dlg or w.IsLiveAction // stop needless updates
 				w.__FrameUpdate__(dlg or w.openedmenu or .IsBackground)
 		.StartResize
