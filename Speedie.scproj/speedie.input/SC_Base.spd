@@ -434,7 +434,6 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 	if scfunction.currfunc
 		owning_cls = scfunction.currfunc!.cls
 	
-	// debugat 40602
 	for (b.ListLookup in Curr)
 		|| o = b[ origname ]
 		if (!o)

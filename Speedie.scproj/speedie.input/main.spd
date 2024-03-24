@@ -28,8 +28,7 @@ function Compiler.PrintResults
 
 function Compiler.MiniTests
 	.testdate
-
-
+	.testTask
 
 
 function compiler.ClearEnvs

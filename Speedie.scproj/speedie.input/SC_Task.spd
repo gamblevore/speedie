@@ -121,14 +121,16 @@ function Message.BuildRunTask (|bool|)
 
 
 function Message.BuildTask 
-	|| Runs = .findall("run")
+	|| Runs = .FindAll("run")
 	if runs == 0
-		runs <~ .msg(@tmp, "run")
+		runs <~ .Msg(@tmp, "run")
 	  else
 		check (runs < 2) (runs[0], "Multiple run statements")
 	|| run = runs[0]!
 	if run.BuildRunTask and !.findall("constructor")
-		run.prev = "constructor () {}"~parse
+		run.prev = "constructor () {
+//	super.constructor(–taskvars, &syntaxcall)
+}"~parse
 
 
 	
@@ -140,4 +142,15 @@ function Message.BuildTask
 `.macro
 
 }
+
+
+
+function compiler.TestTask
+	|| xxx = task.LessThan3("a", "c", 5)
+	|| z = (xxx)(8)
+
+
+task LessThan3 (|string| a, |int| b, |string| c)
+	run (|int| i, |bool|)
+		return i < .b
 
