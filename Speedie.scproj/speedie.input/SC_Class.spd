@@ -230,7 +230,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		ifn P.Type.IsObject or p.PointerCount
 			Curr = P.type.calculatesize(depth+1)	#require
 		if (p is task) and p.isobject
-			bits[(count+platform.PointerBytes)>>3] = true
+			bits[(count+(platform.PointerBytes-1))>>3] = true
 		Count = Count Align Curr
 
 		|| Mul = P.c_Array ?? 1
