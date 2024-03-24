@@ -12,7 +12,7 @@
 
 # General Features #
 * Modern language, slightly more expressive than Python.
-* Compiled apps run faster than apps made in idiomatic C++.
+* Faster than idiomatic C++ (allocators / string / files / etc are faster than C++ std-lib)
 * Fast compilation.
 * Object-oriented programming model
 * Cross-platform. Create shell tools and GUI apps
