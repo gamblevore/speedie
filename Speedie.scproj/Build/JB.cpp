@@ -2041,7 +2041,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112152205918208)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[152], (112152290983936)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -38291,7 +38291,7 @@ JB_Task* JB_Task_Constructor(JB_Task* self, uint Obj, void* func) {
 
 void JB_Task_Destructor(JB_Task* self) {
 	//visible;
-	JB_Object** curr = ((JB_Object**)((&self->_func))) + 1;
+	JB_Object** curr = ((JB_Object**)self);
 	uint o = self->_Object;
 	while (o) {
 		uint i = JB_uint_LowestBit(o);
@@ -38786,7 +38786,7 @@ void JB_Err__SourceRemove() {
 
 LessThan3* SC_LessThan3_Constructor(LessThan3* self, JB_String* a, int b, JB_String* c) {
 	if (self == nil) {
-		self = ((LessThan3*)JB_Task_Constructor(nil, 384, ((void*)(&SC_LessThan3_SyntaxCall))));
+		self = ((LessThan3*)JB_Task_Constructor(nil, 640, ((void*)(&SC_LessThan3_SyntaxCall))));
 	}
 	self->a = JB_Incr(a);
 	self->b = b;
@@ -39318,7 +39318,7 @@ int SC_Class_CalculateSizeRaw(SCClass* self, int Depth) {
 				}
 			}
 			if ((SC_Decl_SyntaxIs(p, kSC__SCDeclInfo_Task)) and SC_Decl_IsObject(p)) {
-				bits = JB_int_SyntaxAccessSet(bits, Count >> 3, true);
+				bits = JB_int_SyntaxAccessSet(bits, (Count + (JB_Platform__PointerBytes() - 1)) >> 3, true);
 			}
 			Count = JB_int_OperatorAlign(Count, curr);
 			int Mul = p->C_Array;
