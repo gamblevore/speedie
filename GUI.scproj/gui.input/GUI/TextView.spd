@@ -2034,8 +2034,6 @@ class TextView (GUIControl)
 		
 		task DelayedShowError (GUITask)
 			|error| err, |ivec2| Point
-//			constructor (|GUIControl|	Upon,  |date| StartTime,  |uint| duration, |error| err, |ivec2| Point)	
-//				super.constructor(upon, starttime, duration)
 			run (guitask)
 				|| u = .upon as textview
 					|| fp = u.OnShowExtraInfo

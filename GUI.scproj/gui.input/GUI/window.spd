@@ -460,10 +460,10 @@ class Window (GUIControl)
 		.SetFocus(nil)
 
 
-	function RunTasks (|date| now)
+	function RunAllTasks (|date| now)
 		opt norefcounts
 		for p in .tasks
-			if !p.runtask(now)
+			if !p.runone(now)
 				p.Remove
 			 
 	
