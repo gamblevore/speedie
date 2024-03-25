@@ -251,16 +251,24 @@ function FuncDecls
 
 
 
+function @scfunction.TransformAll 
+	opt norefcounts
+	for f in compiler.FuncList
+		require !TooManyErrors()
+		f.Transform
+
+
 function Transform ()
 	opt norefcounts
-	//if self is constructor
+
+	.CheckNotBadName
 	require !.isMacro
 	scfunction.CurrFunc = self
 	scmodule.curr = .parent as scmodule
 	.Badness = 0
 	|| StillOK = StdErr.Mark
 
-	|| n = .SourceArg						#expect		(self, "Function can't be compiled")
+	|| n = .SourceArg						#require
 	|| Space = n.SCArg( self )				#require
 
 	if (.IsWrapper)
@@ -273,6 +281,9 @@ function Transform ()
 
 	if !StillOK
 		.Badness |= 1
+	  else
+		.CallSuperConstructor //hehe 🥰
+
 	CurrFunc = nil
 	scmodule.curr = nil
 
@@ -1675,7 +1686,6 @@ function scfunction.UpdateSourceSub (|message| src, |bool|)
 	rz = stderr.ok 
 	if rz
 		.FuncDecls
-		.CheckNotBadName
 		.Transform
 		stderr.clear			// lol
 

@@ -33,6 +33,12 @@ module LinkMap
 */
 
 
+	function CollectAll
+		opt norefcounts
+		for s in compiler.funclist
+			.collect(s)
+
+
 	function Collect (|scfunction| self)
 		opt norefcounts
 		scfunction.currfunc = self
@@ -74,6 +80,10 @@ function CollectLinks (|object!| obj)
 function FindReached (|SCNode| from, |bool|)
 	opt norefcounts
 	flow off // memory order dependant!
+	
+	if self is constructor
+		if .cls ~= "DelayedShowError"
+	if self ~= "ShowErrorInfo"
 	
 	if .borked
 		error (.source,    "Borked function reached!")

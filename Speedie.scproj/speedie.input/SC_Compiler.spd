@@ -127,7 +127,6 @@ linkage
 |int|						stFuncs
 |int|						stReachedFunc
 |int|						stReachedClass
-|int|						stFunctionProgress
 |int|						stParseTime
 |int|						stTotalSourceSize
 |int|						stTotalFileCount
@@ -564,16 +563,10 @@ function ImportAll
 
 	.Timer( "Transform" )
 	.Stage( "Transforming Functions" )
-
-	for f in .FuncList
-		if !TooManyErrors()
-			f.CheckNotBadName
-			f.Transform
-			.stFunctionProgress++	
+	scfunction.TransformAll
 
 	.Stage( "Building Function Link Map" )
-	for f in .FuncList
-		LinkMap.Collect(f)
+	LinkMap.CollectAll
 	scfunction.currfunc = nil
 		
 
@@ -759,13 +752,13 @@ function DoRefAnalysis
 	opt norefcounts
 	|[message]| list // avoid reading same thing that we alter.
 	for f in .FuncList
-		if f.CanDoRefs
+		if f.IsARealSpdFunc
 			list.clear
 			f.AnalyseRefs(list)
 	scfunction.currfunc = nil
 
 
-function scfunction.CanDoRefs (|bool|)
+function scfunction.IsARealSpdFunc (|bool|)
 	if .IsWrapper or .IsMacro
 		return false
 	scfunction.currfunc = self
@@ -773,7 +766,7 @@ function scfunction.CanDoRefs (|bool|)
 
 
 function scfunction.CanBuildConstructor (|bool|)
-	if (self is ConOrDes) and .CanDoRefs
+	if (self is ConOrDes) and .IsARealSpdFunc
 		return true
 
 
