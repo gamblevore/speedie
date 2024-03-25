@@ -1,7 +1,7 @@
 
 
 function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| name="", |string| reason="", |bool|)
-	#!sendmsg, msgsend
+	#!sendmsg, msgsend, sendcmd, cmdsend
 	|| fn = where.Func
 	if fn == @char or @num
 		.PopupHide
@@ -66,6 +66,8 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			c.Deactivate
 		if c.IsOpen
 			return c
+		if c.SubProcess
+			return c // can't deactivate it.
 		if c.ActivateChild
 			return c
 		return nil // ded?
@@ -126,4 +128,4 @@ function PerryIDE.ActualCompile (|string| operation)
 
 target debug
 	cpp_libwrapper Speedie_Main (SpdMainFn)
-|| SpdLibAlreadyInUse = true
+|| SpdLibAlreadyInUse = false

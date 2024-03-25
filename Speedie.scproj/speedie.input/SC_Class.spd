@@ -566,7 +566,6 @@ function AfterFuncsDecled
 	.OverrideSyntax
 		
 	|| f = .ConstructorFunc
-//		expect (!f.ReturnType)  ( f.Source, "Constructors can’t return things." )
 		.CheckAllocVsWrapper( f, true )
 	
 	f = .DestructorFunc
@@ -1028,25 +1027,6 @@ module
 					B.project.use
 		
 				B.Collect(arg, SCNode.CurrVisibility, m.SourceArg)
-
-	
-//	function DoOneNamedField (|message| c,  |string| name,  |string| datatype,  |int| n,  |message|)
-//		using c 
-//		|| src = "
-//		function ${c.name} (|$Datatype|)
-//			return .$name[$n]
-//		function ${c.name} (assigns:|$Datatype|)
-//			.$name[$n] = value
-//		".parse
-//		return src
-//	
-//	
-//	function SCClass.FindDecl (|string| name, |message|)
-//		opt norefcounts
-//		for l in .sourcearg
-//			if l == @decl
-//				if l.declname ~= name
-//					return l
 	
 	
 	function ProcessAs (CollectFunc) // node, parent, errplace

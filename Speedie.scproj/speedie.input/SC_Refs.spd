@@ -699,7 +699,7 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 
 
 //	|| slf = @thg + "self"
-	if fn.args > 1 // oof
+//	if fn.args > 1 // oof
 	
 	for (a in fn.args) (i)
 		|| prm = lst.msg(@thg, a.name)
@@ -755,7 +755,7 @@ function scclass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|
 		return .FirstDestructor
 	if task <= 1
 		return .ConstructorFunc!.ParamlessConstructor
-	debugger 
+//	debugger 
 	return .ConstructorFunc
 			
 
