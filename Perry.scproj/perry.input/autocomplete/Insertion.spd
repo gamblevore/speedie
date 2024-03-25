@@ -21,8 +21,12 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 
 	|| msg	= d.message.FindTightest(*s_End)
 	|| msg0 = msg
+	|| CanUsePrms = false
+	
 	while
 		require msg
+		if (msg == @prm) and !(keys.shift or keys.option)
+			canuseprms = true
 		loop msg != @tmp and @arg
 		msg = msg.parent
 	
@@ -37,11 +41,19 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 					return 4					// 4: function a.b (|*|)
 		if msg0 == @thg and msg0 in @decl and msg0.prev == @emb
 			return -2
+		if CanUsePrms  // myfunc(a,b,c ^)
+			*found = msg0
+			return 3
+			
 		return nil
 
 	require d.after >= msg.after
 
 	if !autocomplete.IsAFunc(msg)
+		if CanUsePrms  // myfunc(a,b,c ^)
+			*found = msg0
+			return 3
+		
 		*found = msg
 		return 10
 	|| ConstructorLike = msg ~= "constructor" or "render"
@@ -323,7 +335,8 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 	if  key is escape  and  ide.PopupDateOn.ago > 0.5
 		ide.PopupHide
 		return 1
-	require  .ExpectsParse >= probablyjeebox
+	require  .ExpectsParse >= ProbablyJeebox
+	
 	|| s = .SelRange
 	|| i2 = s.x2
 	if  !s.width
@@ -342,8 +355,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 				s.x2++
 			.Selrange = s
 			return 1
-			
-
+	
 	require key isnt escape
 	|| dd = .FindDrawInfo(s.x)
 	require  (dd contains i2)  and  !dd.drawerror
