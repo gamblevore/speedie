@@ -373,7 +373,6 @@ function LoadExportName
 
 
 	if self isa SCFunction
-		if .cls.istask and self is constructor
 		.IsCppInBuilt := (cw == @bra)|int|
 		|| CppWrapper = cw.cpp_Wrapper
 			.MakeParamsReal

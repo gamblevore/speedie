@@ -56,16 +56,6 @@ function NewTask (CollectFunc)
 	return compiler.program
 
 
-function Message.MakeTaskVar  (|message!| con, |message| before, |bool| First)
-	opt norefcounts
-	|| prm = con.second!
-	|| arg = prm.next!
-	|| name = .VarName
-		if first
-			before.prev = NewEqRel(@sdot + name, @thg + name)
-		prm <~ .copy // :)
-
-
 function scclass.FillTaskConstructor (|scfunction| con)
 	opt norefcounts
 	|| src = con.source!
@@ -85,15 +75,26 @@ function message.TaskConBefore (|message!|)
 	return .msg(@sheb, "task")
 
 
-function scclass.FillTaskConstructorSub (|message| src, |message| before, |int| depth)
+function scclass.FillTaskConstructorSub (|message| con, |message| before, |int| depth)
 	opt norefcounts
 	if depth > 100 // what?
 		return
 	|| pr = .super
 	if pr.istask
-		pr.FillTaskConstructorSub(src, before, depth+1)
+		pr.FillTaskConstructorSub(con, before, depth+1)
+	
 	for p in .properties
-		p.source!.MakeTaskVar(src, before, depth==0)
+		p.source!.MakeTaskVar(con, before, depth==0)
+
+
+function Message.MakeTaskVar  (|message!| con, |message| before, |bool| First)
+	opt norefcounts
+	|| prm = con.second!
+	|| arg = prm.next!
+	|| name = .VarName
+		if first
+			before.prev = NewEqRel(@sdot + name, @thg + name)
+		prm <~ .copy // :)
 
 
 function Message.BuildRunTask (|bool|)

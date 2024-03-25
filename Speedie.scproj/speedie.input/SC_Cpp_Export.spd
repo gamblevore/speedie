@@ -93,6 +93,8 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 
 
 function CanExportFunc (|SCFunction| F, |bool|)
+	if f ~= "GUI_GUITask_Constructor"
+	require f.NeedsExport
 	if !f.IsExternalLib
 		require !f.IsWrapper and !f.isMacro
 	return f isnt NewStruct and f isnt alreadyexported
@@ -109,7 +111,6 @@ function FuncHeader (|FastStringCpp| fs, |SCFunction| F, |string|)
 
 function CppFunc (|FastStringCpp| fs, |SCFunction| F)
 	opt norefcounts	
-	require .CanExportFunc(f)
 	scfunction.currfunc = f
 	(f is AlreadyExported)
 	|| funcheader = .FuncHeader(fs, f)$
@@ -175,19 +176,16 @@ function SetupFlow (|SCFunction| f)
 function CodifyInlines
 	opt norefcounts
 	for (f in compiler.funclist)
-		if f.isinline
-			if f.NeedsExport and .CanExportFunc(f)
-				.cppfunc( .Inlines, f )
+		if f.isinline and .CanExportFunc(f)
+			.cppfunc( .Inlines, f )
 	scfunction.CurrFunc = nil
 
 
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
 	opt norefcounts
 	for (f in list)
-		if !f.isinline
-			//if f.cls ~= "DelayedShowError"
-			if f.NeedsExport
-				.cppfunc( file, f )
+		if !f.isinline and .canexportfunc(f)
+			.cppfunc( file, f )
 	scfunction.CurrFunc = nil
 
 

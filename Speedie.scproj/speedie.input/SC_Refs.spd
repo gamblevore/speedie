@@ -686,29 +686,14 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |message|)
 	// probably this should have been done earlier... but too late now!
 	opt norefcounts
-	if !fn
-		if self is Constructor
-			expect (.cls == TypeObject) or (.cls!.super == TypeObject) (self, "Need call to superclass's constructor, but can't auto-create one.")
-		return nil	// can happen in this case!	//	class B (A) --> class A --> class object
-					// but none has a destructor.
-
 	using root
 	|| PCon = NewFnc(fn.Name)
 	|| lst = PCon.last!
 	lst.obj = fn
 
-
-//	|| slf = @thg + "self"
-//	if fn.args > 1 // oof
-	
 	for (a in fn.args) (i)
 		|| prm = lst.msg(@thg, a.name)
 		prm.obj = .args[i]
-//	slf.obj = .self
-//	lst <~ slf
-
-	if (fn is constructor) != (self is constructor) // remove
-
 
 	if (self is Constructor)
 		PCon.obj = fn.ReturnType
@@ -746,18 +731,45 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 		|| t = .cls!.isrole
 		if t == 2
 			return nil
-		|| fn = parent.ConOrDesForCall(IsConstructor, t)
-		return .AddParentAllocFunc( root, fn )
+		|| fn = .ConOrDesForCall(IsConstructor, t)
+			return .AddParentAllocFunc( root, fn )
 
 
-function scclass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|)
+function scfunction.CallSuperConstructor
+	opt norefcounts
+	require (self is constructor) and .IsARealSpdFunc
+	|| r = .SourceArg!
+	require !.CountCallsToParentAlloc( r )
+
+	|| parent = .Cls!.super							#require
+	require parent != TypeObject
+	|| t = .cls!.isrole
+	require t != 2
+	|| fn = .ConOrDesForCall(true, t)
+		|| added = .AddParentAllocFunc( r, fn )
+		added.obj = nil // remove later... and stop AddParentAllocFunc from adding .obj
+		debugger
+		typeofexpr(added, r.scarg(self))
+
+
+function scfunction.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|)
+	opt norefcounts
+	|| parent = .Cls!.super		#require
+	|| fn = parent.ConOrDesForCall(isconstructor, task)
+		return fn
+
+	if self is Constructor
+		expect (.cls == TypeObject) or (.cls!.super == TypeObject) (self, "Need call to superclass's constructor, but can't auto-create one.")
+
+
+function Scclass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|)
 	if !IsConstructor
 		return .FirstDestructor
 	if task <= 1
 		return .ConstructorFunc!.ParamlessConstructor
-//	debugger 
 	return .ConstructorFunc
-			
+
+
 
 function SCFunction.BuildConstructorDestructor
 	opt norefcounts
