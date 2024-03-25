@@ -415,7 +415,7 @@ function CreateConstructors
 function scclass.FillRoleConstructor (|scfunction| con)
 	opt norefcounts
 	for f in con
-		(f is new)
+		(f is constructor)
 		if .istask
 			.FillTaskConstructor(f)
 
@@ -452,7 +452,7 @@ function NewClassNewSub (|SCFunction| con, |Message| src)
 		c = []
 		con.CounterPart = c
 	c <~ result
-	(result is New)
+	(result is constructor)
 	(con.alloccode = functionType.Constructor)
 	
 	|| NewParams		= src[ @prm, 1 ]

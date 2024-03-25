@@ -17,7 +17,7 @@ datatype FunctionType (uint)
 		|FunctionType|
 		Constructor
 		Destructor
-		New
+//		New
 		Comparison
 		Reffer
 //		Alloc
@@ -32,7 +32,7 @@ datatype FunctionType (uint)
 		ExpectsRealVars
 		AlreadyExported
 		ConOrDes = Constructor + Destructor
-		ConOrNew = Constructor + New
+//		ConOrNew = Constructor + New
 //		AllocOrNew = Alloc + New
 	syntax is (|functiontype| t, |bool|)
 		return self & t
