@@ -45,6 +45,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 		node.name = "role" 
 
 	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
+		compiler.taskslist <~ task.cls
 		task.cls!.IsRole = level
 	return task
 

@@ -110,8 +110,8 @@ linkage
 |[String]|					SyxArray
 |Message|					ExtendList = message()
 |Message|					ConstantsList = message()
-|Message|					TasksList = message()
-|Message|					TasksTodo = message()
+|[scclass]|					TasksList
+|[Message]|					TasksTodo
 |[Message]|					ExtendModuleList
 |[Message]|					API_List
 |[SCFunction]|				API_Funcs

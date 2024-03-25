@@ -472,7 +472,8 @@ struct PicoComms {
 	void* Say (const char* A, const char* B="", int Iter=0) {
 		const char* S = IsParent?"Us":"Them";
 		const char* P = Conf.Name;
-		P = P?P:(IsParent ? "Parent" : "Child");
+		if (!P or !strlen(P))
+			P = IsParent ? "Parent" : "Child";
 		if (Iter)
 			printf("%s.%s: %s %s %i\n", S, P, A, B, Iter);
 		  else

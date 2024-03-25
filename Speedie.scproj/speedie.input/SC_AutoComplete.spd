@@ -221,7 +221,7 @@ function DoCmd (|Message| cmd, |message| arg, |message|)
 	if cmd ~= "unused_funcs":		return .UnusedFuncs(cmd)
 	if cmd ~= "check":				return .Check(cmd)
 	if cmd ~= "mem":				return .ReportMemory(cmd)
-	if cmd == 1:					return .Jump(cmd)
+	if cmd == 1 or "display":		return .Jump(cmd)
 
 	|| req = cmd[@str].name
 	|| my_file = compiler.files.valuelower(req)
@@ -350,7 +350,7 @@ function SCFunction.Disambiguate (|message| src, |scfunction|)
 
 function Jump (|message| cmd, |message|)
 	opt norefcounts
-	|| c = cmd.first
+	|| c = cmd.last
 	if c == @name
 		if cmd starts "autocomplete"
 			return .AutoComplete(c.first, c.name, cmd.name)  

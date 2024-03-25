@@ -1,6 +1,6 @@
 
 module AutoComplete
-	|| Owner			= "module/extend_module/class/struct/role/datatype/extend/linkage/selector".dict('/')
+	|| Owner			= "module/extend_module/class/struct/role/task/datatype/extend/linkage/selector".dict('/')
 	|| function_names	= "main/prototype/function/helper/api/syx/syntax/setter/operator/render/behaviour/virtual/constructor/destructor/cpp_wrapper/cpp_nothing/cpp_inbuilt"
 	|| Functions		= function_names.dict('/')
 	

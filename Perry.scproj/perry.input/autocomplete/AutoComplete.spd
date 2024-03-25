@@ -416,33 +416,36 @@ function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  
 	|| ppp = pp.parent
 	|| Jump = 0
 		
-	if spd_func
-		if cmd != "callfrom"
-			if where == @thg
-				if pp == @dot and ppp == spd_func
-					jump = 1
-			if !jump and pp == @bra and ppp == spd_func
-				jump = 2	// function bla (prototype)
+	if spd_func and  cmd != "callfrom"
+		if where == @thg
+			if pp == @dot and ppp == spd_func
+				jump = 1
+		if !jump and pp == @bra and ppp == spd_func
+			jump = 2	// function bla (prototype)
 			
 	if !jump
-		if (pp == @bra) and pp.OwningModClass			// class asdasd (super)
+		if (pp == @bra or @list) and pp.OwningModClass			// class asdasd (super)
 			jump = 1
-		  elseif pp == @tmp and where.OwningModClass	// extend message
+		  elseif pp == @tmp and where.OwningModClass			// extend message
 			jump = 1
 		
 	rz = @tmp + cmd
 	// pp is the @arg containing "f" right now?
 	if (where == 0 and @tmp) and (pp == @arg) and (ppp and ppp.OwningModClass)
 		ppp = nil
+		
 	if jump or (!jump and where.IsUsefulTypeOfDecl)
+		.describewhere(rz, where)
 		|| jj = (@name + where.name) 
 		rz <~ jj
 		if jump == 2
 			jj <~ (@ask, "prototype")
+			
+		// to search for the GUITask or other tasks... we need to send the position and file
+		// just like the stuff below does! then speedie can do its normal name-space lookup system.
+
 	  elseif ppp
-		rz <~ (@str, .editme.path) 
-		rz <~ where.position
-		rz <~ where.rangelength
+		.describewhere(rz, where)
 		|| str = rz.msg(@str, name)
 		str <~ (@thg, reason)
 		rz <~ .FuncText(spd_func)
@@ -452,6 +455,12 @@ function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  
 
 	if !rz.hasany or ((jump==1) and cmd[0, "autocomplete"])
 		rz = nil
+
+
+function perryide.DescribeWhere (|message| rz, |message| where)
+	rz <~ (@str, .editme.path) 
+	rz <~ where.position
+	rz <~ where.rangelength
 
 
 function message.IsUsefulTypeOfDecl (|bool|)

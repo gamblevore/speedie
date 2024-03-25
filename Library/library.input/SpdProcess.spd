@@ -147,7 +147,7 @@ class SpdProcess (Process)
 		nil checker // shouldn't be necessary
 		require .CommsOpen
 		if .WeAreParent
-			return .isrunning
+			return .subprocess or .isrunning
 		return app.ParentID > 1
 			
 	function Deactivate

@@ -257,7 +257,7 @@ class ButtonView (GUIControl)
 		if !i and .SubMenu
 			i = .SubMenu!.ListSource // allow these text to be added.
 		|| t = i.ButtonText(.text)
-		|| Pn = R.TextCorner(g,  t,  .align) + (-1, 1)
+		|| Pn = R.TextCorner(g,  t,  .align) + (0, 1)
 		|| DrawInvis = (.align & listviewstate.DrawWhiteSpace)!=0
 		|| TextCol = colors.white
 		textcol.alpha = fader
