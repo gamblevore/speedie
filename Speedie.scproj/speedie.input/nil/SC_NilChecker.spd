@@ -264,7 +264,6 @@ function Continue (NilTrackerFn)
 
 function WhileInner (|message| Cond)
 	opt norefcounts
-	//|nilrecord| OldCont // remove oldcont later, and lower loop count to 2
 
 	for i in 3
 		.jump(cond, NilCheckMode.whilepos)
