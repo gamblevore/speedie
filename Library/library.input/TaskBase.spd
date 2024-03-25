@@ -27,6 +27,15 @@ class Task (list)
 			o &= ~i
 			i = i|int|.log2
 			jb_decr( curr[i] )          // noice
+			
+	syntax is (|taskstate| s, |bool|) 
+		return .state & s
+			
+	syntax is (|taskstate| s, assigns:|bool|)
+		if value
+			.state |= s
+		  else
+			.state &= ~s
 
 
 datatype TaskState (byte)
@@ -34,6 +43,7 @@ datatype TaskState (byte)
 		|TaskState| 
 		Started
 		Paused
+		WaitsTillStart
 		HadErrors
 		Successful
 		Finished

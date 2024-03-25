@@ -58,15 +58,15 @@ JBClassPlace( Dictionary4,      JB_Dict_Destructor,    JB_AsClass(JB_Object),   
 JBClassPlace( DictionaryLeaf,   JB_Leaf_Destructor,    JB_AsClass(JB_Object),      0 );
 JBClassPlace( DictionaryReader, JB_Nav_Destructor,     JB_AsClass(JB_Object),      0 );
 
-JBClassPlaceSaver( Dictionary,   JB_Dict_Destructor,    JB_AsClass(Saveable),       JB_Dict_Render,  JB_Dict_LoadProperties,  JB_Dict_SaveCollect, JB_Dict_SaveWrite );
-JBClassPlaceSaver( Array,        JB_Array_Destructor,   JB_AsClass(Saveable),       JB_Array_Render, JB_Array_LoadProperties, JB_Array_SaveCollect, JB_Array_SaveWrite );
-JBClassPlaceSaver( Saveable,     0,                     0,                          0,               JB_Sav_LoadProperties,                       JB_Sav_SaveCollect, JB_Sav_SaveWrite );
+JBClassPlaceSaver( Dictionary,	JB_Dict_Destructor,    JB_AsClass(Saveable),       JB_Dict_Render,  JB_Dict_LoadProperties,		JB_Dict_SaveCollect, JB_Dict_SaveWrite );
+JBClassPlaceSaver( Array,       JB_Array_Destructor,   JB_AsClass(Saveable),       JB_Array_Render, JB_Array_LoadProperties,	JB_Array_SaveCollect, JB_Array_SaveWrite );
+JBClassPlaceSaver( Saveable,	0,                     0,                          0,               JB_Sav_LoadProperties,                       JB_Sav_SaveCollect, JB_Sav_SaveWrite );
 
 JBClassPlace( FastString,       JB_FS_Destructor,      JB_AsClass(JB_Object),      JB_FS_Render );
 JBClassPlace( ByteMap,          0,                     JB_AsClass(JB_Object),      0 );
-JBClassPlace( CharSet,          0,                     JB_AsClass(JB_Object),      JB_CS_Render );
-JBClassPlace( JB_List,         JB_Ring_Destructor,    JB_AsClass(Saveable),       0 );
-JBClassPlace( TokHan,           0,                     JB_AsClass(JB_Object),      0 );
+JBClassPlace( CharSet,			0,                     JB_AsClass(JB_Object),      JB_CS_Render );
+JBClassPlace( JB_List,			JB_Ring_Destructor,    JB_AsClass(Saveable),       JB_List_Render );
+JBClassPlace( TokHan,			0,                     JB_AsClass(JB_Object),      0 );
 
 extern JB_Class JB_TaskData;
 

@@ -32,12 +32,11 @@ class TextView (GUIControl)
 	|GUIKeyEvent?|				OnKeyDown
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
-//	|GUITextValidate|			OnValidate
 	|dictionary?|				ColoriseAsRoot // a callback would be better
 	|Document?|					_Viewing
 
 	|Error?|					MyError
-	|Error?| 					_ErrorExtraInfo
+	|DelayedShowError?| 		_ErrorDelayer
 	|GUITextShowEvent?|			OnShowExtraInfo
 	|GUITextErrorSelected?|		OnSelError
 
@@ -295,9 +294,16 @@ class TextView (GUIControl)
 		|| err = d.DrawError
 			(.OnSelError)(self, d)?
 			if .OnShowExtraInfo
+				.CancelDelayedError
 				.ShowErrorInfo(d.position, err, false)
-				._ErrorExtraInfo = nil
 	
+	
+	helper CancelDelayedError
+		opt norefcounts
+		|| dse = ._ErrorDelayer
+			dse.remove
+			._ErrorDelayer = nil
+		
 	
 	helper FindEnd (|ind| x,  |int| i,  |int|)
 		opt norefcounts
@@ -1156,9 +1162,6 @@ class TextView (GUIControl)
 	function SelText (|string|)
 		return self[.selrange]
 
-//	function SelLine (|string|)
-//		return self[.SelectCurrLine]
-
 	
 	behaviour TypedString
 		// shouldn't it be shift-space? option-space is a real char.
@@ -1611,36 +1614,32 @@ class TextView (GUIControl)
 		require .OnShowExtraInfo and .isjeeboxmode
 
 		|textviewline| d
-		// +(0,2) cos its too easy to slip down to lower line
-		|| B = .ByteAtXY(P+(0,2), d).x
+		P += (0,2)				// +(0,2) cos its too easy to slip down to lower line
+		|| B = .ByteAtXY(P, d).x
 
 		if keys.cmd
 			.ShowExtraInfoAtPos(B, "", nil)
 		  elseif d and d.DrawError
 			.ShowErrorInfo(b, d.drawerror!, mousemove)
 		  else
-			._ErrorExtraInfo = nil
+			.CancelDelayedError
 			.ShowNoExtra
 		
 
-	helper ShowErrorInfo (|int| b, |error| err, |bool| Later)
+	helper ShowErrorInfo (|int| B, |error| err, |bool| Later)
 		opt norefcounts
-		// Show this ... a few seconds later.
-		// Either we make all func pointers delayable... making a generic system via the compiler
-		// Or we squeeze this in somehow. I'd prefer a generic system. but thats like 2 full days work.
-		// not sure which is less painful :[
-		
-		// OK... So... somehow... something isnt firing. is that it? lets see.
 		|| P2 = .XYOfChar(B)
 		P2.x = -1
 		if !later
+			.CancelDelayedError
 			(.OnShowExtraInfo!)(self, P2, nil, err, "error", false)
 			return
-			
-		if ._ErrorExtraInfo != err
-			._ErrorExtraInfo = err
-			DelayedShowError(self, date.now, 0.33s, err, P2)
-
+		
+		|| dse = ._ErrorDelayer
+		if !dse or dse.err != err
+			.CancelDelayedError
+			._ErrorDelayer = DelayedShowError(self, date.now, 0.33s, err, P2)
+	
 	
 	helper ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)
 		opt NoRefCounts
@@ -2028,11 +2027,14 @@ class TextView (GUIControl)
 		|| csAntiWords		= makeanti()
 		|| CounterParts		= <(`{[(`'"|`)>
 		|| CounterParts2	= <(`}])`'"|`)>
-		
+
 		function MakeAnti (|charset|)
 			return jeebox.CSWordMiddle.Invert
-		
+
 		task DelayedShowError (GUITask, |error| err, |ivec2| Point)
+			constructor
+				is waitstillstart
+			
 			run (guitask)
 				|| u = .upon as textview
 					|| fp = u.OnShowExtraInfo
