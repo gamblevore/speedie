@@ -78,7 +78,7 @@ function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |SCNode| name_space)
 	opt norefcounts
 	|| fn = scfunction.CurrFunc 
-	if fn and (fn isnt new) and fn.blindcasts
+	if fn and (fn isnt constructor) and fn.blindcasts
 		if old.IsNormalObject and .IsNormalObject
 			if !old.type.real_isa2( .type )
 				stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", fn.blindcasts)

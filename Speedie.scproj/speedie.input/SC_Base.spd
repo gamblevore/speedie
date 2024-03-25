@@ -244,7 +244,7 @@ function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|
 function SCFunction.UseExportNameConstructor (|string| CppPart, |string| CppWrapper, |bool|)
 	// REMOVE THIS
 	// return true
-	require !CppWrapper and (self is new)  
+	require !CppWrapper and (self is constructor)  
 	|| fn = .CounterPart
 	if fn isa scfunction
 		if !fn.ExportName
@@ -373,6 +373,7 @@ function LoadExportName
 
 
 	if self isa SCFunction
+		if .cls.istask and self is constructor
 		.IsCppInBuilt := (cw == @bra)|int|
 		|| CppWrapper = cw.cpp_Wrapper
 			.MakeParamsReal

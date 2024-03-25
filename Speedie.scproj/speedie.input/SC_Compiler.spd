@@ -710,7 +710,7 @@ function FindFunction (|string| Name, |SCFunction|)
 
 
 function scfunction.IsAllocOrNew (|bool|)
-	return self is New
+	return self is Constructor
 
 
 /*function scfunction.HasFloatparams (|int|)

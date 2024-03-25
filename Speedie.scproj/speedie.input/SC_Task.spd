@@ -99,13 +99,20 @@ function scclass.FillTaskConstructorSub (|message| src, |message| before, |int| 
 function Message.BuildRunTask (|bool|)
 	opt norefcounts
 	|| prms = self[@nil]
-	|| arg = prms.next(@arg)
-	require arg.ExpectLast
-	|| f = prms.func
-	expect (f == @bra or @list) (prms)
+	if !prms
+		prms = .msg(@list)
+	  else
+		|| pf = prms.func
+		expect (pf == @bra or @list) (prms)
+	
+	|| arg = prms.next
+		arg.expect(@arg)
+		require arg.ExpectLast
+	  else
+		arg = .msg(@arg)
 	
 	.name = "syntax"
-	f = prms.first.func
+	|| f = prms.first.func
 
 	ifn f == @thg or @dot
 		|| brah = @bra.msg
