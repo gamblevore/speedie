@@ -484,18 +484,26 @@ class GUIControl (list)
 		function RunOne (|date| now, |bool|)
 			opt NoRefCounts
 			require .upon.parent
+				
 			|| s = .starttime
 			|| e = s + .duration
-			if now > e
-				require .state isnt finished
-				.State |= TaskState.Finished
-			rz = (self)(now)
-			.State |= TaskState.Started
-			if .state is Finished
-				rz = false
+			if now >= s
+				if now > e
+					require self isnt finished
+					is Finished
+				is started
+			  elseif self isnt waitstillstart
+				return true
+			|| err = .exec(now)
+			require self isnt Finished
+			return err
 		
-		run (|date| now, |ErrorInt|)
-			0
+		run (|date| now,  |ErrorInt|)
+			return -1
+		
+		function Exec (|date| now, |ErrorInt|)  // shouldn't be necessary
+																// or should be built in!
+			return (._func|interface.prototype|)(self, now)
 
 
 helper image.ControlClip (assigns:|GuiControl| G)

@@ -1353,8 +1353,8 @@ extern int SC__Comp_stReachedFunc;
 extern int SC__Comp_stTotalFileCount;
 extern int SC__Comp_stTotalSourceSize;
 extern Array* SC__Comp_SyxArray;
-extern Message* SC__Comp_TasksList;
-extern Message* SC__Comp_TasksTodo;
+extern Array* SC__Comp_TasksList;
+extern Array* SC__Comp_TasksTodo;
 extern JB_File* SC__Comp_TempFolder;
 extern SCFunction* SC__Comp_TernaryFunc;
 extern FastString* SC__Comp_TimerOutput;
@@ -2029,12 +2029,13 @@ extern Array* SC__NilReason_values;
 #define kSC__SCNodeType_Struct (4)
 extern int JB__Syx_CurrFuncID;
 extern int JB__Syx_MaxFuncID;
-#define kJB__TaskState_Finished (16)
-#define kJB__TaskState_HadErrors (4)
-#define kJB__TaskState_LargestFlag (31)
+#define kJB__TaskState_Finished (32)
+#define kJB__TaskState_HadErrors (8)
+#define kJB__TaskState_LargestFlag (63)
 #define kJB__TaskState_Paused (2)
 #define kJB__TaskState_Started (1)
-#define kJB__TaskState_Successful (8)
+#define kJB__TaskState_Successful (16)
+#define kJB__TaskState_WaitsTillStart (4)
 #define kSC__TM_BaseShrinkSpeed (0.0005f)
 #define kSC__TM_Halfmap (6148914691236517205)
 #define kSC__TM_MOUSEBUTTONDOWN (1025)
@@ -2674,6 +2675,8 @@ Message* SC_AC__AutoComplete(Message* ff, JB_String* name, JB_String* Purpose);
 
 bool SC_AC__AutoCompleteSorter(autoitem* a, autoitem* b);
 
+Message* SC_AC__AutoJump(Message* cmd);
+
 void SC_AC__AutoSub(SCNode* scope, JB_String* name, Array* found, int Types, Message* NeedTypeLimit);
 
 void SC_AC__AutoSub2(SCObject* value, JB_String* key, JB_String* src_name, Array* found, bool exact, int Types, SCDecl* TypeLimiter);
@@ -2727,8 +2730,6 @@ int SC_AC__Init_();
 int SC_AC__InitCode_();
 
 bool SC_AC__InitedOK();
-
-Message* SC_AC__Jump(Message* cmd);
 
 Message* SC_AC__JumpImport(Message* cmd);
 
@@ -6783,7 +6784,7 @@ void JB_Tree_Remove(JB_List* self);
 
 void JB_Tree_RemoveAfter(JB_List* self);
 
-JB_String* JB_Tree_Render(JB_List* self, FastString* fs_in);
+JB_String* JB_List_Render(JB_List* self, FastString* fs_in);
 
 JB_List* JB_Tree_Second(JB_List* self);
 

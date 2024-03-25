@@ -217,11 +217,11 @@ function ReportMemory (|Message| cmd, |message|)
 function DoCmd (|Message| cmd, |message| arg, |message|)
 	require cmd == @tmp
 	
-	if !.InitedOK:					return cmd.SendPerryErrors
-	if cmd ~= "unused_funcs":		return .UnusedFuncs(cmd)
-	if cmd ~= "check":				return .Check(cmd)
-	if cmd ~= "mem":				return .ReportMemory(cmd)
-	if cmd == 1 or "display":		return .Jump(cmd)
+	if !.InitedOK:						return cmd.SendPerryErrors
+	if cmd ~= "unused_funcs":			return .UnusedFuncs(cmd)
+	if cmd ~= "check":					return .Check(cmd)
+	if cmd ~= "mem":					return .ReportMemory(cmd)
+	if cmd == 1 or cmd.last == @name:	return .autoJump(cmd)
 
 	|| req = cmd[@str].name
 	|| my_file = compiler.files.valuelower(req)
@@ -348,7 +348,7 @@ function SCFunction.Disambiguate (|message| src, |scfunction|)
 	return self // better than nothing?
 
 
-function Jump (|message| cmd, |message|)
+function AutoJump (|message| cmd, |message|)
 	opt norefcounts
 	|| c = cmd.last
 	if c == @name

@@ -40,6 +40,7 @@ bool JB_Ring_IsRoot( JB_List* self );
 bool JB_Ring_HasChildCount( JB_List* self, int HasCount );
 int JB_Ring_Count( JB_List* self );
 bool JB_Ring_HasChildren( JB_List* self );
+JB_String* JB_List_Render(JB_List* self, FastString* fs_in);
 void JB_Ring_Destructor( JB_List* self );
 void JB_Ring_Dispose( JB_List* self );
 JB_List* JB_Ring_Constructor0( JB_List* self );

@@ -342,6 +342,8 @@ class list (Saveable)
 		return self[.slowcount()]
 
 	render
+		cpp_name JB_List_Render
+		visible
 		fs <~ "("
 		for f in self
 			f.__render__(Fs)
