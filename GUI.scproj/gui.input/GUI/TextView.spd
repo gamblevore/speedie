@@ -2036,6 +2036,8 @@ class TextView (GUIControl)
 				is waitstillstart
 			
 			run (guitask)
+				// would be better to make OnShowExtraInfo actually a task
+				// then we can just refire it... when necessary.
 				|| u = .upon as textview
 					|| fp = u.OnShowExtraInfo
 						(fp)(u, .Point, nil, .err, "error", true)

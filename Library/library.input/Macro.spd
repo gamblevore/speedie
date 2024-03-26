@@ -44,15 +44,15 @@ macro string.Macro
 
 extend message
 	helper MacroAvoidCopy (|message|)
-		if self isnt Inserted
-			is Inserted
+		if self isnt MacroMade
+			is MacroInserted
 			return self
 		return  .copy
 
 
 	helper MacroSame (|message| prm, |message|)
 		rz = .copy
-		(prm is inserted)
+		(prm is MacroInserted)
 		rz.name = prm.name // why?
 	
 	
@@ -64,7 +64,7 @@ extend message
 			|| f = .first
 			if f == "_" and @thg
 				for p in prms
-					if p isnt Inserted
+					if p isnt MacroMade
 						dest <~ p.MacroAvoidCopy
 				return nil
 				// (first, secnd, A, B, C, D, E)
@@ -98,6 +98,6 @@ extend message
 		using self,  opt norefcounts
 		m.Source.MacroCopy(self, prms, self)
 		for r in prms
-			check (r is inserted)  (r, "Unused parameter to macro")
+			check (r is MacroMade)  (r, "Unused parameter to macro")
 
 

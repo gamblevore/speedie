@@ -872,9 +872,11 @@ function scclass.RealClass (|scclass|)
 function CountCallsToParentAlloc (|Message| root, |message|)
 	opt norefcounts
 	|| FoundCount = 0
+	|| c = .cls!
 	for (curr in root)
 		|| f = curr.IsParentConCall
-			expect  (f.cls == .cls!.realsuper)   (curr, "Function should belong to parent class, but doesn't.")
+			|| fcls = f.cls
+			expect  (f.cls == c.realsuper or c.super)   (curr, "Function should belong to parent class, but doesn't.")
 			rz := curr
 			FoundCount++
 			expect  (FoundCount < 2)   (curr, "Multiple calls to parent constructor/destructor not allowed.")
