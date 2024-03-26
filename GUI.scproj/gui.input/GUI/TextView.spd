@@ -2032,15 +2032,15 @@ class TextView (GUIControl)
 			return jeebox.CSWordMiddle.Invert
 
 		task DelayedShowError (GUIControlTask, |error| err, |ivec2| Point)
+			contains textview
 			constructor
 				is waitstillstart
 			
 			run (GUIControlTask)
 				// would be better to make OnShowExtraInfo actually a task
 				// then we can just refire it... when necessary.
-				|| u = .upon as textview
-					|| fp = u.OnShowExtraInfo
-						(fp)(u, .Point, nil, .err, "error", true)
+				|| fp = .upon.OnShowExtraInfo
+					(fp)(.upon, .Point, nil, .err, "error", true)
 
 
 helper string.InsertTrim (|ivec2|)

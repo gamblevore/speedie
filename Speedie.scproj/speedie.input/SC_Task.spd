@@ -4,6 +4,7 @@
 
 module SCTasks {
 
+|| tmp = message()
 function CollectAll
 	opt norefcounts
 	|| T = typetask		// now what?
@@ -32,7 +33,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 	
 	|| arg = fields.next(@arg)		#require
 	|| Supper = fields.first
-	arg.TakeAllFrom(fields)
+	tmp.TakeAllFrom(fields)
 	
 	|| level = 2
 	using node
@@ -45,7 +46,8 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 	  else
 		fields <~ (@sdot, "interface")
 		arg.BuildTask(fields)
-
+	arg.takeallfrom(tmp)
+	
 	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
 		compiler.taskslist <~ task.cls
 		task.cls!.IsRole = level
@@ -147,7 +149,7 @@ function Message.BuildTask (|message| fields)
 		check (runs < 2) (runs[0], "Multiple run statements")
 	  else
 		run = @tmp + "run"
-		run.TakeAllFrom(self)
+		run.msg(@arg).TakeAllFrom(self)
 		self <~ run
 		
 	if run.BuildRunTask(fields) and !.findall("constructor")
