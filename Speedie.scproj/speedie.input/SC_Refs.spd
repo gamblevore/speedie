@@ -726,7 +726,7 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 	|| TheCall = .CountCallsToParentAlloc( root )
 		return Thecall
 
-	|| parent = .Cls!.super
+	|| parent = .Cls!.realsuper
 	if (parent and parent != TypeObject)
 		|| t = .cls!.isrole
 		if t == 2
@@ -735,21 +735,18 @@ function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|
 			return .AddParentAllocFunc( root, fn )
 
 
-function scfunction.CallSuperConstructor
+function scfunction.CallSuperConstructor 
 	opt norefcounts
 	require (self is constructor) and .IsARealSpdFunc
 	|| r = .SourceArg!
 	require !.CountCallsToParentAlloc( r )
 
-	|| parent = .Cls!.super							#require
+	|| parent = .Cls!.realsuper							#require
 	require parent != TypeObject
 	|| t = .cls!.isrole
 	require t != 2
 	|| fn = .ConOrDesForCall(true, t)
-		|| added = .AddParentAllocFunc( r, fn )
-		added.obj = nil // remove later... and stop AddParentAllocFunc from adding .obj
-		debugger
-		typeofexpr(added, r.scarg(self))
+		.AddParentAllocFunc( r, fn )
 
 
 function scfunction.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|)

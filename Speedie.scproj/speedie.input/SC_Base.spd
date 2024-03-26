@@ -293,15 +293,16 @@ function SCFunction.ExportNameBuilder (|string|CppPart="", |string| )
 	|| SubSection = ""
 	|| AfterSub = ""
 	|| c = .cls
-		SubSection = c.Modul.CppPart
+		SubSection = c.Modul.CppPath
 		AfterSub = "_"
 		if (self is constructor) and !(CppPart contains "Constructor")
 			cppPart = "Constructor" + CppPart
 	  else
 		|| L = .parent
-		if (L isa SCModule) and L|scmodule|.CppPart
-			SubSection = L.CppPart
-			AfterSub = "__"
+		if (L isa SCModule)
+			if L.CppPart
+				SubSection = L.CppPath
+				AfterSub = "__"
 
 	|| P = .project // never nil but whatever
 		|| wanted = p.mod.exportname
@@ -309,6 +310,21 @@ function SCFunction.ExportNameBuilder (|string|CppPart="", |string| )
 			rz = (wanted + "_")
 	rz += (Subsection + AfterSub + CppPart)
 
+
+function scmodule.CppPath (|string|)
+	|| f = .cpppart
+	while
+		|| p = .parent
+		if (p isa scmodule)
+			if !p.isimport
+				self = p
+				f = p.cpppart + "_" + f
+				continue
+		exit
+	return f
+	
+	// So... whats the path
+	
 
 function FindCppWrapper (|message| place, |bool|isclass, |message|)
 	if self isa SCFunction

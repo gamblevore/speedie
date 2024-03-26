@@ -81,10 +81,6 @@ function FindReached (|SCNode| from, |bool|)
 	opt norefcounts
 	flow off // memory order dependant!
 	
-	if self is constructor
-		if .cls ~= "DelayedShowError"
-	if self ~= "ShowErrorInfo"
-	
 	if .borked
 		error (.source,    "Borked function reached!")
 		error (from.source, from.ReachedName)

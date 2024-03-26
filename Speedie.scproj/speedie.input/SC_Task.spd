@@ -99,7 +99,7 @@ function Message.MakeTaskVar  (|message!| con, |message| before, |bool| First)
 
 function Message.BuildRunTask (|bool|)
 	opt norefcounts
-	|| prms = self[@nil]
+	|| prms = .first
 	if !prms
 		prms = .msg(@list)
 	  else
