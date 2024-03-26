@@ -461,11 +461,7 @@ struct JB_Error;
 
 struct Message;
 
-struct LessThan;
-
 struct LessThan2;
-
-struct LessThan3;
 
 struct Message;
 
@@ -484,6 +480,10 @@ struct Message;
 struct JB_Task;
 
 struct JB_Task;
+
+struct LessThan;
+
+struct LessThan3;
 
 typedef ASM (*ASM_Encoder2)(IR* self);
 
@@ -1142,12 +1142,6 @@ JBClass ( JB_Error , Message ,
 	ErrorFlags ErrorFlags;
 );
 
-JBClass ( LessThan3 , JB_Task , 
-	JB_String* a;
-	int b;
-	JB_String* c;
-);
-
 struct SCArg_Behaviour: SCNode_Behaviour {
 };
 
@@ -1279,6 +1273,12 @@ JBClass ( SCModule , SCNode ,
 	bool Inited;
 	bool IsRequiredInterface;
 );
+
+JBClass ( LessThan3 , JB_Task , 
+	JB_String* a;
+	int b;
+	JB_String* c;
+);
 extern Message* JB__App__Conf;
 extern JB_String* JB__App__Path;
 extern Message* JB__App__Prefs;
@@ -1345,7 +1345,6 @@ extern SCFunction* SC__Comp_RefSetRef;
 extern JB_String* SC__Comp_ReportedName;
 extern int SC__Comp_stClasses;
 extern int SC__Comp_stFuncs;
-extern int SC__Comp_stFunctionProgress;
 extern int SC__Comp_stParseTime;
 extern int SC__Comp_stParseTimeTotal;
 extern int SC__Comp_stReachedClass;
@@ -1366,13 +1365,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[1898])
+#define kJB__ErrorColors_bold (JB_LUB[1896])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1899])
-#define kJB__ErrorColors_good (JB_LUB[1900])
-#define kJB__ErrorColors_normal (JB_LUB[1901])
-#define kJB__ErrorColors_underline (JB_LUB[1900])
-#define kJB__ErrorColors_warn (JB_LUB[1902])
+#define kJB__ErrorColors_error (JB_LUB[1897])
+#define kJB__ErrorColors_good (JB_LUB[1898])
+#define kJB__ErrorColors_normal (JB_LUB[1899])
+#define kJB__ErrorColors_underline (JB_LUB[1898])
+#define kJB__ErrorColors_warn (JB_LUB[1900])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1545,7 +1544,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1903])
+#define kJB_codesign_native (JB_LUB[1901])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1559,7 +1558,7 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitOr (JB_LUB[1352])
+#define kJB_kBitOr (JB_LUB[1354])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1574,7 +1573,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[1904])
+#define kJB_kSaverStart1 (JB_LUB[1902])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -1873,24 +1872,22 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__FileMode_Owner (7 << 6)
 #define kJB__FileMode_Process (((7 << 6) + 5) << ((3 + 5) << 0))
 #define kJB__FileResolveMode_AllowMissing (true)
-#define kSC__FunctionType_AlreadyExported (16384)
-#define kSC__FunctionType_Behaviour (2048)
-#define kSC__FunctionType_Comparison (8)
+#define kSC__FunctionType_AlreadyExported (8192)
+#define kSC__FunctionType_Behaviour (1024)
+#define kSC__FunctionType_Comparison (4)
 #define kSC__FunctionType_ConOrDes (1 + 2)
-#define kSC__FunctionType_ConOrNew (1 + 4)
 #define kSC__FunctionType_Constructor (1)
 #define kSC__FunctionType_Destructor (2)
-#define kSC__FunctionType_EmptyConstructor (512)
-#define kSC__FunctionType_ExpectsRealVars (8192)
-#define kSC__FunctionType_InitFunc (128)
-#define kSC__FunctionType_LargestFlag (32767)
-#define kSC__FunctionType_New (4)
-#define kSC__FunctionType_NewNew (4096)
-#define kSC__FunctionType_NewStruct (32)
-#define kSC__FunctionType_Recursive (256)
-#define kSC__FunctionType_Reffer (16)
-#define kSC__FunctionType_TypeTest (64)
-#define kSC__FunctionType_VirtualCaller (1024)
+#define kSC__FunctionType_EmptyConstructor (256)
+#define kSC__FunctionType_ExpectsRealVars (4096)
+#define kSC__FunctionType_InitFunc (64)
+#define kSC__FunctionType_LargestFlag (16383)
+#define kSC__FunctionType_NewNew (2048)
+#define kSC__FunctionType_NewStruct (16)
+#define kSC__FunctionType_Recursive (128)
+#define kSC__FunctionType_Reffer (8)
+#define kSC__FunctionType_TypeTest (32)
+#define kSC__FunctionType_VirtualCaller (512)
 #define kJB__MoveCode_All (63)
 #define kJB__MoveCode_Back (kJB__MoveCode_Backward)
 #define kJB__MoveCode_Backward (32)
@@ -1909,10 +1906,12 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__MoveCode_Top (kJB__MoveCode_Up)
 #define kJB__MoveCode_Up (4)
 #define kJB__MsgParseFlags_BreakPoint (32768)
-#define kJB__MsgParseFlags_Editable (4096)
-#define kJB__MsgParseFlags_Inserted (8192)
+#define kJB__MsgParseFlags_Editable (2048)
+#define kJB__MsgParseFlags_Inserted (4096)
 #define kJB__MsgParseFlags_LargestFlag (0)
-#define kJB__MsgParseFlags_NicelyPositioned (2048)
+#define kJB__MsgParseFlags_MacroInserted (12288)
+#define kJB__MsgParseFlags_MacroMade (8192)
+#define kJB__MsgParseFlags_NicelyPositioned (1024)
 #define kJB__MsgParseFlags_Style2 (16384)
 #define kSC__khalai_Active (2 + 1)
 #define kSC__khalai_And (8)
@@ -2787,6 +2786,8 @@ bool JB_Constants__TestCasting();
 
 // LinkMap
 void SC_LinkMap__Collect(SCFunction* self);
+
+void SC_LinkMap__CollectAll();
 
 int SC_LinkMap__Init_();
 
@@ -6918,9 +6919,9 @@ SCDecl* SC_Msg_BraDeclfind(Message* self);
 
 void JB_Msg_BRel__(Message* self, FastString* fs);
 
-bool SC_Msg_BuildRunTask(Message* self);
+bool SC_Msg_BuildRunTask(Message* self, Message* fields);
 
-void SC_Msg_BuildTask(Message* self);
+void SC_Msg_BuildTask(Message* self, Message* fields);
 
 void SC_Msg_BunchFix(Message* self);
 
@@ -8241,17 +8242,7 @@ void JB_Err__SourceRemove();
 // JB_FileArchive
 
 
-// JB_LessThan
-
-
 // JB_LessThan2
-
-
-// JB_LessThan3
-LessThan3* SC_LessThan3_Constructor(LessThan3* self, JB_String* a, int b, JB_String* c);
-
-bool SC_LessThan3_SyntaxCall(LessThan3* self, int i);
-
 
 
 // JB_MessageRoot
@@ -8366,7 +8357,7 @@ void SC_Class_FillRoleConstructor(SCClass* self, SCFunction* con);
 
 void SC_Class_FillTaskConstructor(SCClass* self, SCFunction* con);
 
-void SC_Class_FillTaskConstructorSub(SCClass* self, Message* src, Message* before, int depth);
+void SC_Class_FillTaskConstructorSub(SCClass* self, Message* con, Message* before, int depth);
 
 SCFunction* SC_Class_FindAllocFunc(SCClass* self, JB_String* fname, bool DontCreate);
 
@@ -8569,11 +8560,11 @@ void SC_Func_BuildConstructorDestructor(SCFunction* self);
 
 Message* SC_Func_CallParents(SCFunction* self, Message* root, bool IsConstructor);
 
+void SC_Func_CallSuperConstructor(SCFunction* self);
+
 bool SC_Func_CanBuildConstructor(SCFunction* self);
 
 bool SC_Func_CanCompare(SCFunction* self, SCDecl* Against);
-
-bool SC_Func_CanDoRefs(SCFunction* self);
 
 bool SC_Func_CanLibLoad(SCFunction* self);
 
@@ -8594,6 +8585,8 @@ void SC_Func_CollectDeclsParams(SCFunction* self, Message* prms, SCNode* AddToSp
 void SC_Func_CollectLinks(SCFunction* self, JB_Object* obj);
 
 bool SC_Func_CollectReturnAsReal(SCFunction* self);
+
+SCFunction* SC_Func_ConOrDesForCall(SCFunction* self, bool IsConstructor, int Task);
 
 SCFunction* SC_Func_Constructor(SCFunction* self, Message* msg);
 
@@ -8666,6 +8659,8 @@ void SC_Func_Init_Sub(SCFunction* self, Message* node, SCNode* name_space);
 SCObject* SC_Func_InsertIn(SCFunction* self, SCNode* parent, JB_String* name);
 
 bool SC_Func_IsAllocOrNew(SCFunction* self);
+
+bool SC_Func_IsARealSpdFunc(SCFunction* self);
 
 bool SC_Func_IsBehaviour(SCFunction* self);
 
@@ -8909,6 +8904,8 @@ void SC_Func__Tran_Visible(SCFunction* fn, Message* node, SCNode* name_space);
 
 void SC_Func__Tran_While(SCFunction* fn, Message* node, SCNode* name_space);
 
+void SC_Func__TransformAll();
+
 
 
 // JB_SCModule
@@ -8923,6 +8920,8 @@ void SC_Mod_BaseDecls(SCModule* self);
 Message* SC_Mod_BuildInitArg(SCModule* self);
 
 SCModule* SC_Mod_Constructor(SCModule* self);
+
+JB_String* SC_Mod_CppPath(SCModule* self);
 
 void SC_Mod_DelayedInitFuncTransform(SCModule* self);
 
@@ -8980,9 +8979,21 @@ bool JB_config_Save(Message* self);
 
 
 // JB_interface
+bool SC_Task_LessThan3_interface_SyntaxCall(JB_Task* self, int i);
+
 
 
 // JB_interface
+
+
+// JB_LessThan
+
+
+// JB_LessThan3
+LessThan3* SC_Task_LessThan3_Constructor(LessThan3* self, JB_String* a, int b, JB_String* c);
+
+bool SC_Task_LessThan3_run(LessThan3* self, int i);
+
 inline bool JB_ErrorInt_SyntaxCast(ErrorInt self);
 
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self);
@@ -9133,7 +9144,7 @@ inline JB_String* SC_Named_Name(SCNamed* self) {
 	if (self) {
 		return self->Name;
 	}
-	return JB_LUB[1431];
+	return JB_LUB[1433];
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* self) {
@@ -9240,7 +9251,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1868])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1866])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
