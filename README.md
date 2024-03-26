@@ -11,10 +11,9 @@
 
 
 # General Features #
-* Modern language, slightly more expressive than Python.
-* Faster than idiomatic C++
+* Modern object-oriented language, slightly more expressive than Python.
+* Runs faster than idiomatic C++
 * Fast compilation.
-* Object-oriented programming model
 * Cross-platform. Create shell tools and GUI apps
 * Message-passing-interface lets your multiple-processes talk.
 * Has an awesome IDE, “Perry”.
@@ -57,7 +56,7 @@ Speedie is designed as a fast language. Ideally we want everything to be fast! T
 
 Especially if those speed optimisations were done in terms of removing code, rather than adding complexity. So while I often mention speed, behind that is a deeper thing. Which is efficiency. And behind that is a very spiritual goal, of not wasting the life energy of the planet, that humans are greedily destroying at this moment.
 
-Well I haven't been doing that. I've done the work of 1000 people (or more). And living a low-spending lifestyle... I'm saving the planet many times more than 1000. Its not that I'm trying to do this intentionally... it just happens as an unintentional side-effect of my values.
+Well I haven't been doing that. I've done the work of 1000 people (or more). And living a low-spending lifestyle... Its not that I'm trying to do this intentionally... it just happens as an unintentional side-effect of my values.
 
 Another nice thing about making code faster by making it smaller, is that debugging the raw ASM is nicer. It becomes "prettier on the inside". Speedie has a very attractive syntax. So it could be said that Speedie is only fast, because I make things of beauty.
 
