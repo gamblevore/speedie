@@ -160,7 +160,6 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 		.PopupDisplay.ExpectsParse = textview.probablyjeebox
 		(f is style2)
 		.popupreason = 1
-		// using guitask would be better... sigh.
 		.DisplayInPopup(f.render, display.name contains "forced")
 
 
@@ -172,7 +171,6 @@ function PerryIDE.DisplayStr (|message| f, |bool|)
 	if f.name != orig
 		.PopupDisplay.expectsparse = 0
 		.popupreason = 1
-		// using guitask would be better... sigh.
 		.DisplayInPopup(f.name, false)
 
 
@@ -334,7 +332,6 @@ function PerryIDE.InteractUpdate
 function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err, |string| reason, |bool| Instant)
 	opt norefcounts
 	if err
-		// using guitask would be better... sigh.
 		.lastextrainfo = nil
 		.PopupDisplay.ExpectsParse = 0
 		.PopupDisplayCorner = p

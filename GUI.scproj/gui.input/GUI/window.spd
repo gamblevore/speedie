@@ -21,7 +21,7 @@ class Window (GUIControl)
 	|GUIPasteEvent?|					OnPaste
 	|GUICopyEvent?|						OnCopy
 	|GUIMouseMoveEvent?|				OnMouseMove
-	|list of GUITask|					Tasks
+	|list of GUIControlTask|			Tasks
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate

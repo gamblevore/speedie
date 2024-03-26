@@ -471,12 +471,14 @@ class GUIControl (list)
 			r2.refsanity
 	
 
-	helper AddTask (|guitask| t)
+	helper AddTask (|GUIControlTask| t)
 		opt norefcounts
 		|| w = .window
 			w.tasks <~ t
-	
-	task GUITask ( |GUIControl|	Upon,  |date| StartTime,  |uint| duration )	
+
+
+	task GUIControlTask ( |...!|	Upon,  |date| StartTime,  |uint| duration )	
+		contains GUIControl
 		constructor
 			// upon, starttime, duration are automatically set.  // maybe not very obvious tho?
 			upon.addtask(self)
@@ -494,16 +496,20 @@ class GUIControl (list)
 				is started
 			  elseif self isnt waitstillstart
 				return true
-			|| err = .exec(now)
+			|| err = (self)(now)
 			require self isnt Finished
 			return err
 		
 		run (|date| now,  |ErrorInt|)
 			return -1
-		
-		function Exec (|date| now, |ErrorInt|)  // shouldn't be necessary
-																// or should be built in!
-			return (._func|interface.prototype|)(self, now)
+
+/*
+	task SlideMenuOpen (guitask, |listviewrow?| row=nil)
+		run
+			|| sub = (.upon as buttonview)!.openmenu(.row)
+				sub.IsSearchMenu = true
+				sub.typedstring("")
+*/
 
 
 helper image.ControlClip (assigns:|GuiControl| G)
@@ -515,3 +521,50 @@ function image.Window (assigns:|window| W)
 	.windowbase = s.xy
 	.ControlClip = s.Soothe
 
+
+
+ignore {
+
+task_interface GUIControlTask ( |GUIControl|	Upon,  |date| StartTime,  |uint| duration )		
+	run (|date| now,  |ErrorInt|)
+		return -1
+
+task_definition GUIControlTask ( |GUIControl|	Upon,  |date| StartTime,  |uint| duration )		
+	run (|date| now,  |ErrorInt|)
+		return -1
+
+
+task SlideMenuOpen (guitask, |listviewrow?| row=nil)
+	|| sub = (.upon as buttonview)!.openmenu(.row)
+		sub.IsSearchMenu = true
+		sub.typedstring("")
+			
+function SlideMenuOpen (guitask, |listviewrow?| row=nil)
+	|| sub = (.upon as buttonview)!.openmenu(.row)
+		sub.IsSearchMenu = true
+		sub.typedstring("")
+
+taskrun SlideMenuOpen (guitask, |listviewrow?| row=nil)
+	|| sub = (.upon as buttonview)!.openmenu(.row)
+		sub.IsSearchMenu = true
+		sub.typedstring("")
+
+taskdoer SlideMenuOpen (guitask, |listviewrow?| row=nil)
+	|| sub = (.upon as buttonview)!.openmenu(.row)
+		sub.IsSearchMenu = true
+		sub.typedstring("")
+
+
+...
+
+
+task GUIControlTask ( |GUIControl|	Upon,  |date| StartTime,  |uint| duration )		
+	run (|date| now,  |ErrorInt|)
+		return -1
+
+task SlideMenuOpen (guitask, |listviewrow?| row=nil)
+	run
+		|| sub = (.upon as buttonview)!.openmenu(.row)
+			sub.IsSearchMenu = true
+			sub.typedstring("")
+}

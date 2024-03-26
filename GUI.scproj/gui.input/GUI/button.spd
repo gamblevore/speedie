@@ -307,16 +307,16 @@ class ButtonView (GUIControl)
 		.sizer.g(2)	= (w) ~ long
 
 
-	task SlideMenuOpen (guitask, |listviewrow?| row=nil)
+	task SlideMenuOpen (GUIControlTask, |listviewrow?| row=nil)
+		contains buttonview
 		run
-			|| sub = (.upon as buttonview)!.openmenu(.row)
+			|| sub = .upon.openmenu(.row)
 				sub.IsSearchMenu = true
 				sub.typedstring("")
 	
 		
 	function SearchMenu (|listviewrow| row=nil, |bool|)
-		if 0
-			SlideMenuOpen(self, date.now, 0.5s, nil)
+//		SlideMenuOpen(self, date.now, 0.5s, nil)
 		|| sub = .openmenu(row)
 			sub.IsSearchMenu = true
 			return sub.typedstring("")
