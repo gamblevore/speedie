@@ -25,7 +25,7 @@ module Macros {
 || ConstructorNew = `if self == nil {
 	self = JB_NewClass(_0)|_0|}`.macro
 || ConstructorNewTask = `if self == nil {
-	self = task(–taskvars, &syntaxcall)|_0|
+	self = task(–taskvars, &run)|_0|
 }`.macro
 || MainArgBasic      = `|| _0 =  _1.MainArg(_2, "_0"),           `.macro
 || MainArgBasicReq   = `|| _0 =  _1.MainArg(_2, "_0") #require,  `.macro

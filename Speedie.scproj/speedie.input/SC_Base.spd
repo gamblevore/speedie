@@ -66,7 +66,6 @@ syntax access (|string| s, |SCObject|)
 
 
 function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule?|)
-	//debugat 3402
 	opt norefcounts
 	real self
 	
@@ -103,7 +102,10 @@ function FindModuleParent (|SCNodeFindMode| Mode, |SCnode|)
 	if mode is wantatype // allow going up superclasses instead.
 		|| cls = self|scmodule|.cls
 			|| p = cls.parent|scclass|
-				return p.modul
+				|| mod = p.modul
+				if mod.parent != self	// due to wierdness with how I did the interface thing
+					return mod			// the task module contains a module with the interface.
+										// yet we subclass off of that interface!
 	return .parent
 
 
@@ -199,6 +201,7 @@ function scfunction.IsConstructorOnModule (|scfunction| old, |bool|)
 		|| p = old.parent
 		return p == .cls!.modul
 
+
 constructor
 	cpp_part Constructor0
 	.Project = scimport.curr
@@ -256,10 +259,10 @@ function SCFunction.UseExportNameConstructor (|string| CppPart, |string| CppWrap
 
 
 function SCFunction.UseExportWrapper (|string| CppWrapper, |bool|)
-	require CppWrapper
-	.IsWrapper = 1
-	.SetExportName( CppWrapper, true )
-	return true
+	if CppWrapper
+		.IsWrapper = 1
+		.SetExportName( CppWrapper, true )
+		return true
 
 
 
@@ -618,10 +621,10 @@ function RequireContained (|Message| exp, |SCDecl|)
 
 function SourceArg (|Message|)
 	opt norefcounts
-	|| p = .Source #require
-	if p == @Arg
-		Return p
-	return p.find( @Arg )
+	|| p = .Source
+		if p == @Arg
+			Return p
+		return p.find( @Arg )
 
 
 function scfunction.SourceArg (|message|)

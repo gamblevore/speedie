@@ -36,14 +36,15 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 	
 	|| level = 2
 	using node
-		if Supper == @thg or @dot
-			fields <~ Supper
-			level = 3
-			arg.BuildTask(fields)
-		  else
-			fields <~ (@sdot, "task")
-			arg.BuildTask()
-		node.name = "role" 
+	node.name = "role"
+
+	if Supper == @thg or @dot
+		fields <~ Supper
+		level = 3
+		arg.BuildTask(fields)
+	  else
+		fields <~ (@sdot, "interface")
+		arg.BuildTask(fields)
 
 	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
 		compiler.taskslist <~ task.cls
@@ -78,9 +79,7 @@ function message.TaskConBefore (|message!|)
 
 function scclass.FillTaskConstructorSub (|message| con, |message| before, |int| depth)
 	opt norefcounts
-	debugger
-	if depth > 100 // what?
-		return
+	expect (depth <= 16) (con, "Recursion bug. Sheesh.") // what?
 	|| pr = .super
 	if pr.istask
 		pr.FillTaskConstructorSub(con, before, depth+1)
@@ -117,9 +116,13 @@ function Message.BuildRunTask (|message| fields, |bool|)
 	  else
 		arg = .msg(@arg)
 	
-	.name = "syntax"
-	|| f = prms.first.func
-
+	|| p1 = prms.first
+	|| ff = fields.first
+	if (p1 == @thg or @dot) and ff == @sdot
+		ff.name = "task"
+		ff.func = @thg
+			
+	|| f = p1.func
 	ifn f == @thg or @dot
 		|| brah = @bra.msg
 		brah <~ (@thg, "interface")
@@ -132,18 +135,21 @@ function Message.BuildRunTask (|message| fields, |bool|)
 			|| ty = p.second
 				callprms <~ ty.copy
 	
-	.first = @thg + "call"
+	.name = "function"
+	.first = @thg + "run"
 	return true
 
 
 
-function Message.BuildTask (|message?| fields=nil)
+function Message.BuildTask (|message| fields)
 	|| Runs = .FindAll("run")
-	if runs == 0
-		runs <~ .Msg(@tmp, "run")
-	  else
+	|| run = runs[0]
 		check (runs < 2) (runs[0], "Multiple run statements")
-	|| run = runs[0]!
+	  else
+		run = @tmp + "run"
+		run.TakeAllFrom(self)
+		self <~ run
+		
 	if run.BuildRunTask(fields) and !.findall("constructor")
 		run.prev = "constructor () {}"~parse
 
@@ -176,7 +182,6 @@ module SCTasks2
 		|| z = LessThan.abc(xxx, 1)
 		|| yyy = task.lessthan2(1.2)
 		|| w = LessThan.abc(yyy, 1)
-		"w is: ${w.render}"
 
 		
 	task LessThan (|string| a, |int| b, |string| c)

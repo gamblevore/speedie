@@ -10,7 +10,6 @@ extend_module ASM
 		|| fn = TreeAssembler[testname]
 			|| ff = fn.finish.run
 
-
 	function TestASM 
 		.enc1
 		require options.makeasm

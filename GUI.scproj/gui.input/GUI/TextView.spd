@@ -2031,11 +2031,11 @@ class TextView (GUIControl)
 		function MakeAnti (|charset|)
 			return jeebox.CSWordMiddle.Invert
 
-		task DelayedShowError (GUITask, |error| err, |ivec2| Point)
+		task DelayedShowError (GUIControlTask, |error| err, |ivec2| Point)
 			constructor
 				is waitstillstart
 			
-			run (guitask)
+			run (GUIControlTask)
 				// would be better to make OnShowExtraInfo actually a task
 				// then we can just refire it... when necessary.
 				|| u = .upon as textview
