@@ -40,6 +40,7 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 * [Error Handling](Documentation/Errors.md)
 * [Perry (IDE)](Documentation/Perry.md)
 * [Nil Checking](Documentation/Nil.md)
+* [Speedie Is Fast](Documentation/Speed.md)
 
 
 
