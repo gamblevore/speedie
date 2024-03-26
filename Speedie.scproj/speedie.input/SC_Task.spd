@@ -39,9 +39,10 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 		if Supper == @thg or @dot
 			fields <~ Supper
 			level = 3
+			arg.BuildTask(fields)
 		  else
 			fields <~ (@sdot, "task")
-		arg.BuildTask
+			arg.BuildTask()
 		node.name = "role" 
 
 	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
@@ -77,6 +78,7 @@ function message.TaskConBefore (|message!|)
 
 function scclass.FillTaskConstructorSub (|message| con, |message| before, |int| depth)
 	opt norefcounts
+	debugger
 	if depth > 100 // what?
 		return
 	|| pr = .super
@@ -97,11 +99,14 @@ function Message.MakeTaskVar  (|message!| con, |message| before, |bool| First)
 		prm <~ .copy // :)
 
 
-function Message.BuildRunTask (|bool|)
+function Message.BuildRunTask (|message| fields, |bool|)
 	opt norefcounts
 	|| prms = .first
-	if !prms
-		prms = .msg(@list)
+	if !prms or prms == @arg
+		prms = @list.msg
+		.first = prms
+		|| ss = fields.first
+			prms <~ ss.copy
 	  else
 		|| pf = prms.func
 		expect (pf == @bra or @list) (prms)
@@ -132,14 +137,14 @@ function Message.BuildRunTask (|bool|)
 
 
 
-function Message.BuildTask 
+function Message.BuildTask (|message?| fields=nil)
 	|| Runs = .FindAll("run")
 	if runs == 0
 		runs <~ .Msg(@tmp, "run")
 	  else
 		check (runs < 2) (runs[0], "Multiple run statements")
 	|| run = runs[0]!
-	if run.BuildRunTask and !.findall("constructor")
+	if run.BuildRunTask(fields) and !.findall("constructor")
 		run.prev = "constructor () {}"~parse
 
 

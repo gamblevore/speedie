@@ -10,8 +10,7 @@ bugs:
 	* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
 	* vector constants
 	* || s = "".Address.IsLower // won't compile...
-	* perryide_Behaviour 
-		* Make not available from speedie, c-export only.
+	* Make perryide_Behaviour available from speedie, c-export only.
 		* Perhaps a unicode start letter. or don't add to lookup table
 	* &uint... allows &int
 	* passing .hfloatvar to  func(float) causes reporting error
@@ -63,10 +62,8 @@ additions:
 	
 
 class-changes
-	* Make objectset from FixedDict?
 	* replace dictionary with fixeddict
-		* remove the datatype wrapper? it was only used for dicts+arrays anyhow...
-			* We could use a dict of ints or carray for pointers...
+		* doesnt need datatype wrapper! We could use a dict of ints / pointers...
 * Get galaxxies compiling
 	* Condtionally use glm in galaxxies.
 	* (|xyz| a)	// Should be @decl					// Replace fTypeCast2 with fdecl...

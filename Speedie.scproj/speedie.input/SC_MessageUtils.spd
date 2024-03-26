@@ -167,7 +167,15 @@ function Message.DeclName (|Message|)
 
 function Message.VarName (|string|)
 	opt norefcounts
-	return self[@thg, 1].name
+	|| ch = self[@nil, 1]
+		|| f = ch.func
+		if f == @rel
+			ch = ch.first!
+			f = ch.func
+		if f == @thg
+			return ch.name
+			
+		error (ch)
 
 
 

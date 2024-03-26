@@ -164,8 +164,9 @@ function CollectProperties
 		|| it = .properties.first
 			expect (!.IsRole) (it.source, "Roles can't have properties!")
 
-	for (p in .properties)
-		expect (!p.default) (p.source, "Class properties can’t have default values.")
+// i guess they can now
+//	for (p in .properties)
+//		expect (!p.default) (p.source, "Class properties can’t have default values.")
 
 	if .IsModel
 		.ModelDecls
