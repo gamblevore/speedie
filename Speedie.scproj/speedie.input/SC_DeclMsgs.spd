@@ -190,8 +190,8 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 	|| Names = types.Next
 
 	expect (FuncPrms or Names)  (self, "No name found.")
-	if (Mode & 2)
-		expect (names == @thg) (names, "Must be a proper name (a-z or unicode-letters)")
+	//if (Mode & 2)
+	//	expect (names == @thg) (names, "Must be a proper name (a-z or unicode-letters)")
 
 	|| Default = DeclsDefault( names )
 	|| Sdcl = ExtractDecl( Types, P, mode )
