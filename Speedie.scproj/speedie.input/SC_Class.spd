@@ -496,11 +496,14 @@ function ContainedTypeLoad
 		
 	
 	.defawlt := «thg "nil"»
-	if .NumericCount == 1 // what if its a vec4? (0,0,0,0)? sigh.
-		.false := «num "0"»
+	if .false
+		//
+	  elseif .NumericCount == 1 // what if its a vec4? (0,0,0,0)? sigh.
+		.false = «num "0"»
 	  else
-		.false := «thg "nil"»
+		.false = «thg "nil"»
 
+		
 	|| cls = .FindContainedClass			#require
 	|| TN = Cls.TypeOptional
 	|| cont = TN.CopyDecl
@@ -512,7 +515,13 @@ function ContainedTypeLoad
 
 function FindContainedClass (|scclass|)
 	opt norefcounts
-	|| C = .Sourcearg.find(@Tmp, "contains")[@nil]$
+	|| C = .Sourcearg.find(@Tmp, "contains")[@nil]
+	if !C
+		if .ContainsParentClass
+			|| P = .modul.parent
+			if p isa scmodule
+				return P.cls
+		return nil
 	|| m = .modul
 	if C == @ques
 		expect (C == "parentclass") (C)
