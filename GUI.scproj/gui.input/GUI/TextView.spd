@@ -1194,12 +1194,6 @@ class TextView (GUIControl)
 		return .InsertSub(s, .selrange, selnew)
 
 
-//	helper LoadOneError (|error| err)
-//		.LineErrorAdd(err, false)
-//		.MyError = err
-//		Notifications <~ err
-
-
 	helper ValidateNewText (|message|)
 		if .MyError is parse
 			.MyError = nil
@@ -1294,18 +1288,6 @@ class TextView (GUIControl)
 			beep
 		sdlapp.showcursor(false)
 		return true
-	
-		
-//	function SelectCurrLine (|intrange|)
-//		rz = .lineexpand(.selrange, true)
-//		if rz.x > 0
-//			rz.x--
-//		  else
-//			rz.x2++ // i guess?
-
-
-//	function DoSelectLine
-//		.selrange = .ProperSelectLine
 
 
 	function ExtendToLineEnd (|ind| i, |ind|)
@@ -1315,16 +1297,9 @@ class TextView (GUIControl)
 	function Length (|int|)
 		return .text.length
 
-
-//	helper InsertLoss (|string|s, |ivec2| loss, |int|)
-//		|| n = .length
-//		.insertsub(s, loss, false)
-//		return n - .length
-//		
 	
 	function FindLine (|int|start=0, |int|end=int.max, |ind|)
 		return .text.find(jeebox.CSLine, start, End )
-
 
 
 	helper ProperSelectLine (|intrange|)
@@ -1931,15 +1906,6 @@ class TextView (GUIControl)
 	function ScrollPos (|int|)
 		return ._Start.position
 
-	
-//	function ScrollPos (assigns:|int|)
-//		opt norefcounts
-//		for c in ._lines
-//			if c.after > value
-//				.StartWithoutScrollDraw(c)
-//				return
-//		.scrolltoend
-
 
 	helper UnloadDoc (|document| old)
 		old.ScrollPos = .scrollpos
@@ -2032,9 +1998,8 @@ class TextView (GUIControl)
 			return jeebox.CSWordMiddle.Invert
 
 		task DelayedShowError (GUIControlTask, |error| err, |ivec2| Point)
-			contains textview
 			constructor
-				is waitstillstart
+				is WaitStillStart
 			
 			run (GUIControlTask)
 				// would be better to make OnShowExtraInfo actually a task

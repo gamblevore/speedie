@@ -436,7 +436,10 @@ datatype float
 	syntax cast (|bool|)
 		cpp_part AsBool
 		return self|bool|
-		
+
+	syntax cast (|date|)
+		disabled "Call .date instead"
+
 	
 	function Floor (|float|)
 		cpp_wrapper (floorf)

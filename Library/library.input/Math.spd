@@ -170,7 +170,7 @@ function Mix (|float| X, |float| Y, |float| Mix, |float|)
 	cpp_Part FloatMix
 	return X + (Mix * (Y - X))
 
-function UnMix (|float| X, |float| Y, |float| R, |float|)
+function UnMix (|float| X, |float| Y, |float| R, |float|) // inbetweenness
 	return (R - x)/(Y - X)
 
 function Mix (|vec4| A, |vec4| B, |float| F, |vec4|)

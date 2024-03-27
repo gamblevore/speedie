@@ -22,6 +22,8 @@ function DebugArgsGotFocus (guiaction)
 		(self is visible) = v
 		if self isa textview
 			.UpdateDebugArgs(v)
+		if v
+			guicontrol.SlideHeight(self, date.now, 0.125s)
 
 
 function textview.UpdateDebugArgs (|bool| Visible=false)

@@ -45,9 +45,25 @@ struct ControlSize
 		.sizer.sett(2, value, ControlPoint.length)
 
 
-	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |ControlClipMode| ClipMode, |ivec4|)
-		if clipmode is debug
-			printline "---------------"
+	helper guicontrol.ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // resizecontrol, recalculatesize
+		opt norefcounts
+		rz = .sizer.Calculate(parent, prev, Hard, self)
+		.LastRect = rz
+		if !.hasany
+			return rz
+		|| mine = rz
+		if self isa window
+			mine = mine.soothe
+			hard = mine
+		.Reflow(mine, hard)
+
+
+	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |guicontrol| upon, |ivec4|)
+		|| dbg = upon.clipmode is debug
+			"---------------"
+		|| vis = upon is visible
+		if keys.shift and upon ~= "debugargs"
+			
 		|| pc = parent.size >> 1
 		for i in 4
 			|| m = .mode(i)
@@ -60,30 +76,31 @@ struct ControlSize
 				  elseif m == controlpoint.Centered
 					d = pc[i&1]
 				rz[i] = d + .Size(i)
-				if clipmode is debug
+				if upon.clipmode is debug
 					.PrintExplain(i, d, rz)
 			  elseif m == controlpoint.Percent
 				rz[i] = pc[i&1]|float| * (1.0/64K) * .size(i)
-				if clipmode is debug
+				if dbg
 					.PrintExplain(i, 0, rz)
 		
 		for i in 4
 			if .mode(i) == ControlPoint.Length
 				|| d = rz[i xor 2]
-				rz[i] = d + ((i>=2) sign .size(i))
-				if clipmode is debug
+				|| Sz = (.size(i) * upon._sizefraction[i&1]) >> 12
+				rz[i] = d + ((i>=2) sign sz)
+				if dbg
 					.PrintExplain(i, d, rz)
 		
-		if ClipMode & ControlClipMode.SlideBackInParent
+		if upon.ClipMode is SlideBackInParent
 			|| rz2 = rz.Bound(parent)
-			if clipmode is debug
+			if dbg
 				.ExplainBound(rz, rz2)
 			rz = rz2
 		
-		if ClipMode & ControlClipMode.SlideBackInWindow
+		if upon.ClipMode is SlideBackInWindow
 			|| rz2 = rz.Bound(window)
 			rz2 = rz2.boundclip(window) // in case parent goes outside window
-			if clipmode is debug
+			if dbg
 				.ExplainBound(rz, rz2)
 			rz = rz2
 	
