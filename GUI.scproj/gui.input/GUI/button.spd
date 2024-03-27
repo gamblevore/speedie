@@ -303,22 +303,14 @@ class ButtonView (GUIControl)
 
 	function TrimWidth
 		|| n = .items.slowcount max 1
-		|| w = n * (.itemwidth + .itemgap) - .itemgap
+		|| w = n * (.itemwidth + .itemgap) - .ItemGap
 		.sizer.g(2)	= (w) ~ long
 
-
-	task SlideMenuOpen (GUIControlTask, |listviewrow?| row=nil)
-		contains buttonview
-		run
-			|| sub = .upon.openmenu(.row)
-				sub.IsSearchMenu = true
-				sub.typedstring("")
-	
-		
+			
 	function SearchMenu (|listviewrow| row=nil, |bool|)
-//		SlideMenuOpen(self, date.now, 0.5s, nil)
 		|| sub = .openmenu(row)
 			sub.IsSearchMenu = true
+			//SlideMenuOpen(self, date.now, 0.5s)
 			return sub.typedstring("")
 
 

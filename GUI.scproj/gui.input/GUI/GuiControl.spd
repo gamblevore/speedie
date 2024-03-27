@@ -20,6 +20,7 @@ class GUIControl (list)
 	|ControlClipMode|			ClipMode
 	|GuiControlFlags|			State
 	|TakesFocusFlag|			TakesFocus
+	|uint16[2]| 				_SizeFraction
 	|byte|						TextAlteredForDraw
 	|byte|						ExpandOnMouseOver
 	|bool|						PostLoaded
@@ -35,6 +36,8 @@ class GUIControl (list)
 			.tabindex = parent.loadtabindex
 		.gnormal = drawstyle()
 
+		._SizeFraction[0] = 4K
+		._SizeFraction[1] = 4K
 		is visible
 		is Enabled
 		is Drawsfocus
@@ -130,19 +133,6 @@ class GUIControl (list)
 			w.tabindex = rz
 
 
-	helper ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // resizecontrol, recalculatesize
-		opt norefcounts
-		rz = .sizer.Calculate(parent, prev, Hard, .clipmode)
-		.LastRect = rz
-		if !.hasany
-			return rz
-		|| mine = rz
-		if self isa window
-			mine = mine.soothe
-			hard = mine
-		.Reflow(mine, hard)
-
-
 	helper NextFocus (|bool| dir, |bool| force, |guicontrol|)
 		opt NoRefCounts
 		real self
@@ -200,6 +190,7 @@ class GUIControl (list)
 		  else
 			.state &= ~F
 		if f & guicontrolflags.visible
+			#!VisibleChange
 			sdlapp.resized(self)
 
 	function Decluttering (|bool|)
@@ -222,7 +213,15 @@ class GUIControl (list)
 			._ScrollDrawTimer = value
 			sdlapp.touch(self)
 
-	
+	function SizeFraction (|int|which=2, assigns:|float|)
+		value = value.clamp * 4K
+		which++
+		if which&1
+			._Sizefraction[0] = value
+		if which&2
+			._Sizefraction[1] = value
+		sdlapp.resized(self)
+		
 	setter Visible (|bool|)
 		(self is visible) = value
 
@@ -250,7 +249,7 @@ class GUIControl (list)
 					r.drawchildren(where, Sublim, avoid)
 
 	
-	helper DoPaste (|Object| Data, |copypasteflags| Type = CopyPasteFlags.pastetext, |bool|)
+	helper DoPaste (|Object| Data, |copypasteflags| Type = CopyPasteFlags.PasteText, |bool|)
 		|| w = .window
 		if w and (data isa string)
 			|| c = self
@@ -471,16 +470,25 @@ class GUIControl (list)
 			r2.refsanity
 	
 
+	task SlideHeight (GUIControlTask)
+		constructor
+			.upon.sizefraction(1) = 0.0
+
+		run
+			|| Over = now - .starttime
+			.upon.sizefraction(1) = (Over)|float| / .duration|float|
+
+
 	helper AddTask (|GUIControlTask| t)
 		opt norefcounts
 		|| w = .window
 			w.tasks <~ t
 
 
-	task GUIControlTask ( |...!|	Upon,  |date| StartTime,  |uint| duration )	
-		contains GUIControl
+	task GUIControlTask ( |...!| Upon,  |date| StartTime,  |date| duration=0 )
+		contains –parentclass // super cool feature
 		constructor
-			// upon, starttime, duration are automatically set.  // maybe not very obvious tho?
+			// upon, starttime, duration are automatically set
 			upon.addtask(self)
 		
 		function RunOne (|date| now, |bool|)
@@ -496,20 +504,12 @@ class GUIControl (list)
 				is started
 			  elseif self isnt waitstillstart
 				return true
-			|| err = (self)(now)
-			require self isnt Finished
-			return err
+			|| ok = (self)(now)
+			if self isnt Finished
+				return ok
 		
 		run (|date| now,  |ErrorInt|)
 			return -1
-
-/*
-	task SlideMenuOpen (guitask, |listviewrow?| row=nil)
-		run
-			|| sub = (.upon as buttonview)!.openmenu(.row)
-				sub.IsSearchMenu = true
-				sub.typedstring("")
-*/
 
 
 helper image.ControlClip (assigns:|GuiControl| G)
@@ -520,51 +520,3 @@ function image.Window (assigns:|window| W)
 	|| s = w.LastRect
 	.windowbase = s.xy
 	.ControlClip = s.Soothe
-
-
-
-ignore {
-
-task_interface GUIControlTask ( |GUIControl|	Upon,  |date| StartTime,  |uint| duration )		
-	run (|date| now,  |ErrorInt|)
-		return -1
-
-task_definition GUIControlTask ( |GUIControl|	Upon,  |date| StartTime,  |uint| duration )		
-	run (|date| now,  |ErrorInt|)
-		return -1
-
-
-task SlideMenuOpen (guitask, |listviewrow?| row=nil)
-	|| sub = (.upon as buttonview)!.openmenu(.row)
-		sub.IsSearchMenu = true
-		sub.typedstring("")
-			
-function SlideMenuOpen (guitask, |listviewrow?| row=nil)
-	|| sub = (.upon as buttonview)!.openmenu(.row)
-		sub.IsSearchMenu = true
-		sub.typedstring("")
-
-taskrun SlideMenuOpen (guitask, |listviewrow?| row=nil)
-	|| sub = (.upon as buttonview)!.openmenu(.row)
-		sub.IsSearchMenu = true
-		sub.typedstring("")
-
-taskdoer SlideMenuOpen (guitask, |listviewrow?| row=nil)
-	|| sub = (.upon as buttonview)!.openmenu(.row)
-		sub.IsSearchMenu = true
-		sub.typedstring("")
-
-
-...
-
-
-task GUIControlTask ( |GUIControl|	Upon,  |date| StartTime,  |uint| duration )		
-	run (|date| now,  |ErrorInt|)
-		return -1
-
-task SlideMenuOpen (guitask, |listviewrow?| row=nil)
-	run
-		|| sub = (.upon as buttonview)!.openmenu(.row)
-			sub.IsSearchMenu = true
-			sub.typedstring("")
-}

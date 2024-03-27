@@ -108,7 +108,7 @@ datatype Date (int64)
 		|| StartDate = date.now()
 		|| EndDate = StartDate + self
 		|date| CurrTime
-		while date.now(CurrTime) < EndDate
+		while date.now2(CurrTime) < EndDate
 			yield (CurrTime - StartDate).seconds|float|
 
 	module
@@ -121,7 +121,7 @@ datatype Date (int64)
 		function Now (|Date|)
 			cpp_wrapper JB_Date__Now
 
-		function now (|&Date| out, |Date|)
+		helper Now2 (|&Date| out, |Date|)
 			cpp_part KindaNow
 			*out = .now()
 			return *out

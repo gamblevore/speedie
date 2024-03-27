@@ -332,7 +332,7 @@ helper String.DetectNoSpaces (|string| find, |int| start, |bool| Fwd=true,  |ind
 function textview.PerryInsertSyntax (|keys| Key, |int|)
 	opt norefcounts
 	|| ide = .ide!
-	if  key is escape  and  ide.PopupDateOn.ago > 0.5
+	if  key is escape  and  ide.PopupDateOn.ago > 0.5s
 		ide.PopupHide
 		return 1
 	require  .ExpectsParse >= ProbablyJeebox

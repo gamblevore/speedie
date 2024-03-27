@@ -289,7 +289,7 @@ function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| Bytes
 	require seconds
 	|float| scale = 1MB
 	|| unit = 'M'
-	|| rate = BytesIn / (scale*seconds)
+	|| rate = BytesIn|float| / (scale*seconds)
 	if rate >= 1K
 		rate /= 1K
 		unit = 'G'
