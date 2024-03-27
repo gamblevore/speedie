@@ -1080,11 +1080,12 @@ function Self (|scdecl|)
 
 
 function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
+	opt norefcounts
 	// .bla = X
-	require !d.IsCArray				// we actually need to clear it!
-	
-	|| def = d.CreateDefault(place)
-	return NeweqRel( d.DeclToDot(.self), def )
+	if !d.IsCArray				// carrays get cleared
+		|| def = d.Default
+		def := d.CreateDefault(place)
+		return NewEqRel( d.DeclToDot(.self), def )
 
 
 iterator
