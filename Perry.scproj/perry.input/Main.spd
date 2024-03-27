@@ -1,6 +1,10 @@
 
 
 main // main { 
+//	|int64| d
+//	|| range = 30.0
+//	if d <= range // this shouldn't involve cast to date.
+
 	if app["crash"]
 		app.crash
 	SDLApp.init

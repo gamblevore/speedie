@@ -37,7 +37,8 @@ function FastDecl (|SCDecl!|)
 		if l isa scdecl
 			return l
 		return obj
-	app.Crash 
+	error (self, "Compiler error. No decl found.")
+	return typevoid!
 
 
 function SCBlockage.BlockCombine (|SCBlockage| B, |int|)
