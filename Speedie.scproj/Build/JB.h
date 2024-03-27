@@ -1199,6 +1199,7 @@ JBClass ( SCClass , SCNode ,
 	byte MinOpt;
 	byte IsBehaviour;
 	byte IsWrapper;
+	bool ContainsParentClass;
 	bool IgnoreContainedSelf;
 	bool HasCompareFunc;
 	bool HasEqualsFunc;
@@ -1365,13 +1366,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[1896])
+#define kJB__ErrorColors_bold (JB_LUB[1899])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[1897])
-#define kJB__ErrorColors_good (JB_LUB[1898])
-#define kJB__ErrorColors_normal (JB_LUB[1899])
-#define kJB__ErrorColors_underline (JB_LUB[1898])
-#define kJB__ErrorColors_warn (JB_LUB[1900])
+#define kJB__ErrorColors_error (JB_LUB[1900])
+#define kJB__ErrorColors_good (JB_LUB[1901])
+#define kJB__ErrorColors_normal (JB_LUB[1902])
+#define kJB__ErrorColors_underline (JB_LUB[1901])
+#define kJB__ErrorColors_warn (JB_LUB[1903])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1500,6 +1501,7 @@ extern Message* SC__SCStrings_RenderFinish;
 extern Message* SC__SCStrings_RenderInsides;
 extern Message* SC__SCStrings_RenderNewParams;
 extern Macro* SC__SCTasks_TaskMacro;
+extern Message* SC__SCTasks_tmp;
 extern Dictionary* SC__Errors_IgnoredBranches;
 extern Dictionary* SC__SC_Targets_Items;
 #define kJB__Terminal_Black (30)
@@ -1544,7 +1546,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1901])
+#define kJB_codesign_native (JB_LUB[1904])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1573,7 +1575,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[1902])
+#define kJB_kSaverStart1 (JB_LUB[1905])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -8361,6 +8363,8 @@ void SC_Class_FillTaskConstructorSub(SCClass* self, Message* con, Message* befor
 
 SCFunction* SC_Class_FindAllocFunc(SCClass* self, JB_String* fname, bool DontCreate);
 
+SCClass* SC_Class_FindContainedClass(SCClass* self);
+
 SCFunction* SC_Class_FindFunc(SCClass* self, JB_String* keyword, bool CheckParents, bool DoError);
 
 SCFunction* SC_Class_FindSpecialFunc(SCClass* self, JB_String* keyword, bool CheckParents);
@@ -8534,7 +8538,7 @@ void SC_Func_AddConstructorReturn(SCFunction* self, Message* prms);
 
 void SC_Func_AddConstructorReturn2(SCFunction* self);
 
-Message* SC_Func_AddParentAllocFunc(SCFunction* self, Message* root, SCFunction* fn);
+void SC_Func_AddParentAllocFunc(SCFunction* self, Message* root, SCFunction* fn);
 
 void SC_Func_AddSelfPrm(SCFunction* self, SCClass* cls);
 
@@ -8558,9 +8562,7 @@ bool SC_Func_Borked(SCFunction* self);
 
 void SC_Func_BuildConstructorDestructor(SCFunction* self);
 
-Message* SC_Func_CallParents(SCFunction* self, Message* root, bool IsConstructor);
-
-void SC_Func_CallSuperConstructor(SCFunction* self);
+void SC_Func_CallParents(SCFunction* self);
 
 bool SC_Func_CanBuildConstructor(SCFunction* self);
 
@@ -8633,6 +8635,8 @@ void SC_Func_FillInDestructor(SCFunction* self);
 void SC_Func_FillInMissingConstructorDefaults(SCFunction* self, Message* root, Message* AfterHere);
 
 void SC_Func_FillInSaver(SCFunction* self, JB_String* name);
+
+Message* SC_Func_FindCallParents(SCFunction* self);
 
 Message* SC_Func_FindCppWrapperFunc(SCFunction* self, Message* place);
 
@@ -9251,7 +9255,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1866])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1869])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
