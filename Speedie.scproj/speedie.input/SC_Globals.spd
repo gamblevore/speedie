@@ -1053,9 +1053,6 @@ function TypeOfDot (ExprResolver)
 		contains = DotVar|scdecl|.Contains
 		|scclass--| ty = DotVar|scdecl|.Type
 		DotVar = ty
-		//if ty.ContainsParentClass
-			//printline Exp
-			//contains = ty.modul.parent|scmodule|!.cls!.typenormal
 		
 		contains := ty.Contained
 	  else

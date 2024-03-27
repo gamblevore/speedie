@@ -1084,7 +1084,6 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 		if (ch.obj isa SCModule)
 			obj.exportName.safe(fs)
-
 		  else
 			|| CloseStr = cpp_export.CDotType( self, obj, fs )
 	
@@ -1373,10 +1372,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 				if fn is Reffer
 					return ""
 		
-		fs <~ '('
+		fs <~ "(("
 		.WriteDeclNoName( Type, fs )
 		fs <~ ")("
-		return ")"
+		return "))"
 
 
 	function WriteDeclNoName (|SCDecl| D, |FastStringCpp| T)
