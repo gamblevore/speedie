@@ -1125,10 +1125,6 @@ class Message (list)
 		cpp_part ContainsStr
 		return .FindNested(@nil, s, false)
 
-//	operator Contains (|syntax| s, |bool|)
-//		opt norefcounts
-//		cpp_part ContainsSyx
-//		return .FindNested(s, nil, false)
 
 	function Contains (|ind| p, |bool| AllowJustAfter=false, |bool|)
 		cpp_part ContainsInd

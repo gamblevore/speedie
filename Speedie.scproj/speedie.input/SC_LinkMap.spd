@@ -26,12 +26,6 @@ module LinkMap
 			*darr = arr
 		arr <~ obj
 
-/*
-	main							// self
-		printline "abc"				// from
-		
-*/
-
 
 	function CollectAll
 		opt norefcounts

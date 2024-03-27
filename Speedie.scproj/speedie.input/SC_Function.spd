@@ -17,10 +17,8 @@ datatype FunctionType (uint)
 		|FunctionType|
 		Constructor
 		Destructor
-//		New
 		Comparison
 		Reffer
-//		Alloc
 		NewStruct
 		TypeTest
 		InitFunc
@@ -32,8 +30,6 @@ datatype FunctionType (uint)
 		ExpectsRealVars
 		AlreadyExported
 		ConOrDes = Constructor + Destructor
-//		ConOrNew = Constructor + New
-//		AllocOrNew = Alloc + New
 	syntax is (|functiontype| t, |bool|)
 		return self & t
 
@@ -243,11 +239,13 @@ function FuncDecls
 			L.AddModuleToFunc( space )
 
 	if .AllocCode
-		|| r = .ReturnType$
-		if r == r.Type.TypeNormal
-			r = r.copydecl
-			.ReturnType = r
-		r.AllocSource = .AllocCode
+		|| r = .ReturnType
+			if r == r.Type.TypeNormal
+				r = r.copydecl
+				.ReturnType = r
+			r.AllocSource = .AllocCode
+		 // else
+			//.returntype = typevoid 
 
 
 
@@ -282,7 +280,7 @@ function Transform ()
 	if !StillOK
 		.Badness |= 1
 	  else
-		.CallSuperConstructor //hehe 🥰
+		.CallParents //hehe 🥰
 
 	CurrFunc = nil
 	scmodule.curr = nil
@@ -397,7 +395,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		
 		if (Matched != kNoMatch) and !((matched == kUseDefaultParams) and ThisAlter)
 			if (Matched > result)
-				result = Matched				// don't replace worse matches with better ones.
+				result = Matched				// don't replace better matches with worse ones.
 			  elseif ((Matched ||| Result) & kNeedsAddressOfButAlsoNeedsSuperMatch)
 				result = kNeedsAddressOfButAlsoNeedsSuperMatch
 					// handled bugs from overloading functions belonging to structs.
@@ -1278,14 +1276,6 @@ function ArgToFunc (|string| NewName, |Message| Params, |Message| arg,  |Message
 
 	rz <~ arg
 	rz.position = arg.position
-
-
-//function Message.FindOwningLoop (|message| top, |Message|)
-//	opt norefcounts // using the new try syntax would be good here.
-//	for P.up in self
-//		require (P != top)
-//		if (P == @tmp) and (P == "while" or "for")
-//			return P
 
 
 function Tran_NotAllowed (TranFunc) // "continue"

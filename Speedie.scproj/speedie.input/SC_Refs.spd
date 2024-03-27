@@ -233,14 +233,6 @@ function RefDestructorMsg (|Message| msg, |SCFunction| fn, |Message|)
 	return RefMsg( msg, fn.exportname, fn )
 
 
-//function SCFunction.MaxVars (|int|)
-//	opt norefcounts
-//	for ch.flat in .source
-//		if ch == @arg
-//			|| a = ch.asarg
-//				(rz max= a.count)
-
-
 function RefCheckDisturbance (|Message| dcl, |int|)
 	require RefBasis( dcl, false ) == SCRefs.kbasisobj
 	
@@ -291,14 +283,6 @@ function Message.CausesUnReachable (|Message| arg, |Message?| Dcl=nil, |Message?
 			  elseif (s == "rejoin") and (self == arg)
 				Return Curr
 		Curr++
-
-
-//function Message.ReachableRejoin (|message| name, |bool|)
-//	opt norefcounts
-//	|| rej = .first
-//	if (rej isthing Name.name)
-//		return true
-//		// this was a bad idea
 
 
 function ExitHitsOrGoesPast (|Message!| curr, |Message!| arg, |bool|)
@@ -683,17 +667,15 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 
 
 
-function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |message|)
-	// probably this should have been done earlier... but too late now!
+function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn)
 	opt norefcounts
 	using root
-	|| PCon = NewFnc(fn.Name)
+	|| PCon = NewFnc(fn.exportName)
 	|| lst = PCon.last!
 	lst.obj = fn
 
 	for (a in fn.args) (i)
-		|| prm = lst.msg(@thg, a.name)
-		prm.obj = .args[i]
+		lst.msg(@thg, a.name).obj = .args[i]
 
 	if (self is Constructor)
 		PCon.obj = fn.ReturnType
@@ -701,10 +683,6 @@ function scfunction.AddParentAllocFunc (|Message| root, |SCFunction| fn, |messag
 	  else 
 		PCon.obj = typevoid
 		root <~ PCon
-	
-	.DoLinkTo( fn ) // sigh... shouldn't be necessary but it is...
-
-	return PCon
 
 
 	
@@ -721,37 +699,29 @@ function scfunction.FillInDestructor
 				.SourceArg.AddBefore( first, SCRefs.RefDestructorMsg( Addr, destr ) )
 
 
-function scfunction.CallParents (|Message| root, |bool| IsConstructor, |message|)
+function scfunction.FindCallParents (|message|)
+	return .CountCallsToParentAlloc( .SourceArg! )
+
+
+function scfunction.CallParents
 	opt norefcounts
-	|| TheCall = .CountCallsToParentAlloc( root )
-		return Thecall
+	|| r = .SourceArg!
+	require self is Constructor or Destructor
+	require .IsARealSpdFunc and !.CountCallsToParentAlloc( r )
 
 	|| parent = .Cls!.realsuper
-	if (parent and parent != TypeObject)
-		|| t = .cls!.isrole
-		if t == 2
-			return nil
-		|| fn = .ConOrDesForCall(IsConstructor, t)
-			return .AddParentAllocFunc( root, fn )
+	require (parent and parent != TypeObject)
 
-
-function scfunction.CallSuperConstructor 
-	opt norefcounts
-	require (self is constructor) and .IsARealSpdFunc
-	|| r = .SourceArg!
-	require !.CountCallsToParentAlloc( r )
-
-	|| parent = .Cls!.realsuper							#require
-	require parent != TypeObject
 	|| t = .cls!.isrole
 	require t != 2
-	|| fn = .ConOrDesForCall(true, t)
+
+	|| fn = .ConOrDesForCall(self is constructor, t)
 		.AddParentAllocFunc( r, fn )
 
 
-function scfunction.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|)
+function scfunction.ConOrDesForCall (|bool| IsConstructor, |int| Task,  |scfunction|)
 	opt norefcounts
-	|| parent = .Cls!.super		#require
+	|| parent = .Cls!.super		#require	
 	|| fn = parent.ConOrDesForCall(isconstructor, task)
 		return fn
 
@@ -759,7 +729,7 @@ function scfunction.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfuncti
 		expect (.cls == TypeObject) or (.cls!.super == TypeObject) (self, "Need call to superclass's constructor, but can't auto-create one.")
 
 
-function Scclass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|)
+function SCClass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|)
 	if !IsConstructor
 		return .FirstDestructor
 	if task <= 1
@@ -770,10 +740,9 @@ function Scclass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|
 
 function SCFunction.BuildConstructorDestructor
 	opt norefcounts
-	|| root = .SourceArg!
+	|| TheCall = .FindCallParents
 	|| IsConstructor = self is Constructor
-
-	|| TheCall = .CallParents( root, IsConstructor )
+	|| root = .SourceArg!
 	.CheckConstructorAndDestructor( root, IsConstructor )
 	if IsConstructor
 		if !thecall

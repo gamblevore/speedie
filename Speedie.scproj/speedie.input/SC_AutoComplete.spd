@@ -152,15 +152,6 @@ function CmdWrap (|Message| arg, |bool|)
 	return !.willexit
 
 
-//function Debug (|Message| cmd, |message|)
-//	error "Not implemented"
-
-
-//function Restart (|message| arg)
-//	app.RawArgs <~ arg.renderjbin
-//	app.restart
-
-
 function ErrorsToPerry (|message|)
 	if !.Cleaned
 		.errors!.PrePrintErrors
