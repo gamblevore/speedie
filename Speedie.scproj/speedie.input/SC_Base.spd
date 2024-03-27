@@ -846,12 +846,6 @@ function LoadVisibility (|Message| p)
 	SC_MakeComment( p )
 
 
-//function ModuleType (|string|)
-//	if self isa SCModule
-//		return "module"
-//	return "class"
-
-
 function AutoCompleteKind (|string|)
 	if self isa SCModule
 		return "module"
@@ -1002,3 +996,4 @@ datatype SCNodeFindMode (int)
 		WantAType = 4
 	syntax is (|SCNodeFindMode| m, |bool|)
 		return self & m
+

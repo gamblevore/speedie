@@ -261,17 +261,6 @@ function Tran_While (TranFunc)
 		»
 		exit.LoopExit
 		cond = ExitCond
-	
-
-
-//function MsgInsideDcl (|Message| msg, |bool|)
-//	opt norefcounts
-//	|| Count = 0				// |["":string]|
-//	
-//	for p.up in msg.parent
-//		if p == @Decl
-//			Return true
-//		require (p != @Tmp and @Rel) and (++Count < 3)
 
 	
 function Tran_Beep (TranFunc)

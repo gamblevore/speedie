@@ -52,16 +52,8 @@ class SCFile (file)
 	function GetMsg (|int| pos, |message|)
 		opt norefcounts
 		for f.flat in .orig
-			if f.name
-				if f.range contains pos
-					return f
-	
-	
-//	function SavedData (|string|)
-//		if !.fdata
-////	if .origdate < .modified
-//			.fData = .ReadAll.decompress // why not.
-//		return .fdata
+			if f.name and f.range contains pos
+				return f
 	
 	
 	function Orig (|message|)

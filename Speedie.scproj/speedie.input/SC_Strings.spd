@@ -423,29 +423,6 @@ function Message.BunchlessFix
 	multi_opp.BunchFixSub(subject!, self)
 
 
-//function Message.TernaryFix (|message| exp) {
-//	|| place = .IsSetIntoVar			#expect self	
-//	using (self)
-//	|| list = .first
-//	expect list.haschildcount(2) (self, "Expected two children")
-//
-//	.next = «tmp "if"
-//		exp
-//		«arg, neweqrel(place, list.first)»
-//		«tmp "else"
-//			«Arg, neweqrel( «Thg place.name », list.last)»
-//		»
-//	»
-//	
-//	.remove
-	
-	 
-//	|| x = ("true", "false")(exp2)
-// -->
-//  if (exp2) {x = "true"} else {x="false"}
-//}
-
-
 
 function Create_JeeboxTest (|Message| msg)
 	using (ErrorReceiver.new)

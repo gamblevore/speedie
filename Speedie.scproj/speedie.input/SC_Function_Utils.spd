@@ -118,16 +118,6 @@ function SettingMemory (|Message| Rel, |bool|)
 			return true
 
 
-//function IsSelfOfSetter (|Message| curr, |Message|)
-//	opt norefcounts
-//	// .bla = X
-//	|| dot = curr.Parent
-//	if dot.IsFirst
-//		|| P   = dot.Parent
-//		if P.IsSetRel
-//			Return P
-
-
 function scfunction.NilSelff (|message| where, |nilstate| v)
 	expect (!.nilself) (where, "Already stated")
 	.nilself = v

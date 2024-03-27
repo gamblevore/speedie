@@ -333,11 +333,6 @@ class SCDecl (SCNamed) {
 	render
 		if self
 			.WriteDeclFull("", 2).Render(fs)
-	
-	
-//	function SyntaxExpect
-//		printline "Decl failed"
-//		super.syntaxexpect("Decl failed")
 
 	
 	function AutoCompleteName (|string|)

@@ -45,6 +45,7 @@ linkage
 |byte|						IsWrapper
 
 // these could all just be an int?
+|bool|						ContainsParentClass
 |bool|						IgnoreContainedSelf
 |bool|						HasCompareFunc
 |bool|						HasEqualsFunc
@@ -481,7 +482,7 @@ function NeedsDefaultValue (|message| def, |&message| place, |string| name)
 	*place = def
 
 
-function ContainedTypeLoad
+function ContainedTypeLoad 
 	.use
 	|| sup = .super
 		.Contained = sup.Contained
@@ -491,6 +492,8 @@ function ContainedTypeLoad
 			.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
 			.NeedsDefaultValue(sup.false,   .false,   "false")
 		.IgnoreContainedSelf |= sup.IgnoreContainedSelf // bad assumption. we shouldn't swap objects and datatypes
+		.ContainsParentClass = sup.ContainsParentClass
+		
 	
 	.defawlt := «thg "nil"»
 	if .NumericCount == 1 // what if its a vec4? (0,0,0,0)? sigh.
@@ -498,16 +501,30 @@ function ContainedTypeLoad
 	  else
 		.false := «thg "nil"»
 
-	|| ContainedMsg = .Sourcearg.find(@Tmp, "contains")[@thg]			#require
-	|| cls = compiler[ ContainedMsg ]									#require
+	|| cls = .FindContainedClass			#require
 	|| TN = Cls.TypeOptional
 	|| cont = TN.CopyDecl
 	(cont Is UpgradeableContained)
 	.Contained = cont
 	.IgnoreContainedSelf |= cls.IsDataTypeOrFP
-	.SelfDecl.Contains = TN // shouldn't we be setting this to .contained? but when I do... my GUI lib doesn't compile
-							// which is strange cos speedie itself compiles OK. and all the errors generated seem garbage.
-							// so we need to fix this. sighs... more work.
+	.SelfDecl.Contains = TN
+
+
+function FindContainedClass (|scclass|)
+	opt norefcounts
+	|| C = .Sourcearg.find(@Tmp, "contains")[@nil]$
+	|| m = .modul
+	if C == @ques
+		expect (C == "parentclass") (C)
+		|| p = m.parent|SCModule| /// could go up a chain until we find one
+		expect (p and p.cls) (c, "No parent class found.")
+		.ContainsParentClass = true
+		return p.cls
+		
+	|| cls = m.FindClassMsg(C)
+		.ContainsParentClass = false
+		return cls
+		
 
 
 function scfunction.DontWantSameReturnType (|scfunction| f)
@@ -563,17 +580,17 @@ function LoadConstructors
 	(Message).Restore // restore message parsing to general
 
 
-function AfterFuncsDecled
+function AfterFuncsDecled 
 	.OverrideSyntax
 		
-	|| f = .ConstructorFunc
-		.CheckAllocVsWrapper( f, true )
+	|| c = .ConstructorFunc
+		.CheckAllocVsWrapper( c, true )
 	
-	f = .DestructorFunc
-	if (f)
-		expect (!f.NextFunc) ( f.Source, "Can’t have multiple destructors" )
-		expect (!f.ReturnType and (f.args.length == 1))   ( f.Source, "Destructor can’t have a return type or parameters." )
-		.CheckAllocVsWrapper( f, false )
+	|| d = .DestructorFunc
+		check (!d.NextFunc)						( d.Source, "Can’t have multiple destructors" )
+		check (d.args.length == 1)				( d.Source, "Destructor can’t have parameters" )
+		check (!d.ReturnType)					( d.Source, "Destructor can’t have a return type" )
+		.CheckAllocVsWrapper( d, false )
 	
 	|| cls = .ClassType
 		cls.Name = "&" + .CStructName + "Data" // sigh. Not pleasant.
@@ -888,16 +905,6 @@ module
 			it.basetype = SCNodeType.struct
 			it.classcollect
 			return it.modul
-
-
-//	function NewCast (CollectFunc)
-//		expect (name_space isa SCClass)  (node, "'cast' only goes inside classes." )
-//		
-//		|| f = node.first
-//			f.name = "function"
-//			f.Next = «Thg "operator_cast"»
-//		
-//		return SCFunction.NewFunc( node, name_space, ErrPlace )
 	
 
 	function SCClass.DataTypePostLoad
