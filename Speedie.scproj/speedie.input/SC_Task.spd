@@ -22,6 +22,7 @@ function CollectAll
 
 function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 	opt norefcounts
+	// OK so... now what?
 	|| name = node[@thg]
 	|| fields = name.Next(@nil)
 	require name and fields
@@ -37,16 +38,15 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 	
 	|| level = 2
 	using node
-	node.name = "role"
 
 	if Supper == @thg or @dot
 		fields <~ Supper
 		level = 3
-		arg.BuildTask(fields)
 	  else
 		fields <~ (@sdot, "interface")
-		arg.BuildTask(fields)
+	arg.BuildTask(fields, node)
 	arg.takeallfrom(tmp)
+	node.name = "role"
 	
 	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
 		compiler.taskslist <~ task.cls
@@ -143,11 +143,13 @@ function Message.BuildRunTask (|message| fields, |bool|)
 
 
 
-function Message.BuildTask (|message| fields)
+function Message.BuildTask (|message| fields, |message!| root)
 	|| Runs = .FindAll("run")
 	|| run = runs[0]
-		check (runs < 2) (runs[0], "Multiple run statements")
+		root.Expect(@tmp, "task")
+		check (runs == 1) (run, "Multiple run statements")
 	  else
+		root.Expect(@tmp, "task_run")
 		run = @tmp + "run"
 		run.msg(@arg).TakeAllFrom(self)
 		self <~ run
