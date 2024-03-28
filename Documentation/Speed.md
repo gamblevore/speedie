@@ -7,7 +7,7 @@ Ideally we want everything to be fast! Fast to compile, fast to run, fast to deb
 
 There is a certain beauty in optimising code to run fast. When you remove all bloat, what remains can be a thing of beauty. So while I often mention speed, behind that is a deeper thing. Which is beauty, and efficiency. And behind that is a very spiritual goal, of not wasting the life energy of the planet, that humans are greedily destroying at this moment.
 
-Well I haven't been doing that. I've done the work of 1000 people (or more). And living a low-spending lifestyle... Its not that I'm trying to do this intentionally... it just happens as an unintentional side-effect of my values.
+Well I've been living consistantly with that. I've done the work of 1000 people (or more). And living a low-spending lifestyle... Its not that I'm trying to do this intentionally... it just happens as an unintentional side-effect of my values.
 
 Another nice thing about making code faster by making it smaller, is that debugging the raw ASM is nicer. It becomes "prettier on the inside". Speedie has a very attractive syntax. So it could be said that Speedie is only fast, because I make things of beauty.
 
