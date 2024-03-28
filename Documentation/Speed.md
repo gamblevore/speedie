@@ -11,12 +11,23 @@ Well I've been living consistantly with that. I've done the work of 1000 people 
 
 Another nice thing about making code faster by making it smaller, is that debugging the raw ASM is nicer. It becomes "prettier on the inside". Speedie has a very attractive syntax. So it could be said that Speedie is only fast, because I make things of beauty.
 
-But about the language itself, why or how is speedie fast? "_How can a language be faster than C++_?" You might ask. Well... first, lets ask if we are talking about C++ or _"C--"_. _C--_ is when you take C++, treat it like C (no templates, no RTTI, exceptions, etc), and then avoid doing C-level functions like malloc/delete.
+#### How can a language be faster than C++?
 
-And so all you are left with is, is a small-subset of C, doing work on pointers and doing math-operations. In that case, Speedie is the same speed as _"C--"_.
+You might ask _"How can a language be faster than C++"_, as if it is impossible.
 
-In fact, if you look at Speedie's internals... its pretty much written in _C--_, so we are building on a very fast basis.
+Well... first, lets ask something: **Are we are talking about C++ or C-- ??**.
 
-However, if you use C++ like C++, that is, you use new/delete, use it's string functions and it's file-functions, you'll find that Speedie's equivalent functions are much faster.
+_C--_ is when you take `C++`, treat it like `C` (no templates, no RTTI, exceptions, etc), and then avoid doing `C`-level functions like malloc/free.
 
-Things get even better	for speedie when you compare it's memory management to C++'s shared_pointers, which are quite slow.
+And so all you are left with is, is a subset of `C`, doing work on pointers and doing math-operations. In that case, Speedie is the same speed as _"C--"_.
+
+Many popular libraries are written in "C--", especially sound/graphics/compression libs. But probably most popular libs are written in `C/C++`, for example XML libs, database libs, etc. And so Speedie won't be faster than `C++` for those sound/graphics libs... as they are already `C--`.
+
+In fact, if you look at Speedie's internals... its pretty much written in `C--`, so we are building on a very fast basis.
+
+However, if you use `C++` like `C++`, that is, you use new/delete, use it's string functions and it's file-functions, you'll find that Speedie's equivalent functions are much faster.
+
+Things get even better	for speedie when you compare it's memory management to `C++`'s shared_pointers, which are quite slow. Shared pointers are "new thing" in `C++` and help make it more reliable. Sadly, you lose even more speed.
+
+With speedie, you keep the reliability and gain speed.
+
