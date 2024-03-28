@@ -417,7 +417,7 @@ class File (String)
 		for name in self
 			if (invis) or (*name != '.')
 				rz <~ name
-		rz.sort(stringsorter)
+		rz.sort(&string.sorter)
 		if !flowcontrol.disabled
 			flowcontrol.input(rz, self)
 	

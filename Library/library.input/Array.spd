@@ -188,7 +188,7 @@ prototype SorterComparer2 (|object| a, |object| b, |int|) // we have two list so
 //function MySorter (SorterComparer) // should be: sortercomparer of message
 	// sortercomparer should be (|| a, || b, |bool|)... so a contained type, basically!
 	
-function StringSorter (SorterComparer)
+function @string.Sorter (SorterComparer)
 	return a|string|  <  b|string|
 	
 

@@ -441,7 +441,7 @@ function ReplaceOld (|file| input, |File| Backs)
 	|| score = 0
 	for f.files in Backs
 		|| name = f.name
-		if (name endswith "speedie") and ((*name).isletter)
+		if (name endswith "Speedie") and ((*name).isletter)
 			|| s = f.modified.ago.days
 			if s > score
 				score = s

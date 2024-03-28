@@ -35,6 +35,8 @@ constructor
 
 
 function PreRun
+	StringCorrector.Correct(Compiler.GeneratedCppsFolder[ "strings.txt" ]!)
+	
 	.AllTypes <~ "
 #ifndef ObjCID
 	#define ObjCID void*
@@ -728,10 +730,6 @@ extern "C" {
 
 
 module
-	|FastStringCpp|				StringBlob = FastStringCpp.new
-	|FastStringCpp|				StringLengths2 = FastStringCpp.new
-	|int|						StringCount
-
 	|bool|						WriteAPI 
 	|bool|						WroteAny
 								
@@ -763,19 +761,20 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function GenLub (|faststring| fs)
 		fs <~ "JB_StringC* JB_LUB["
-		fs <~ .StringCount + 1 // + 1 for the emptystring
+		fs <~ stringcorrector.Count + 1 // + 1 for the emptystring
 		fs <~ "];\n\n"
 
 
 	function GenStrings (|faststring| fs)
-		|| blob = .StringBlob.GetResult
-		|| lengths = .StringLengths2.GetResult
+		|| sl2 = FastString()
+		|| blob = .WriteStrings(sl2)
+		|| lengths = sl2.GetResult
 		.GenLub(fs)
 		
 		|| blob2 = FastString()
 		blob2.EncodeLength(lengths.length)
 		blob2.EncodeLength(blob.length)
-		blob2.EncodeLength(.StringCount)
+		blob2.EncodeLength(stringcorrector.Count)
 		blob2 <~ lengths
 		blob2 <~ blob
 		blob = blob2.GetResult
@@ -784,66 +783,35 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ "static const char* JB_LUBSrc2 = "
 		fs.AppendCppAll(blob)
 		fs <~ ";\n"
-		|| FlowStr = Options.GenFlowControlCode.render
+		|| FlowStr = Options.GenFlowControlCode.Render
 		fs <~ .FindGlobalsCpp.ReplaceAll("@flow", FlowStr)
-		
-		.StringLengths2.Dispose
-		.StringBlob.Dispose
-		StringCorrector.table.Dispose
 
 
-	Syntax Access (|string| name, |int|)
+
+	function WriteStrings (|faststring| Lengths, |string|)
 		opt norefcounts
-		// OK... so how can we do this?
-		// we could load the stringdict from disk
-		// however... we do need to remove values that are no longer used.
-		// lets say we load some strings with numbers from disk... OK
-		// then we have a dictionary of strings with numbers
-		// we just need to check each item to see if it was used.
-		// I guess on use, we can copy from one dict to another dict
-		// this isnt very fun.
-		// OK... lets use a simple example
-/*
-	old: a1, b2, c3, d4, e5
-	
-	new: b, e, z
-	
-	so what is the value of e? 5? it would need to be moved down.
-	b can re main at 2. but e and z need to be moved down.
-	what if we take two fully constructed dictionaries, and reshuffle their contents?
-	so its simply a dictionary content reshuffle.
-	
-	to do that, we need to delay the stringblob from being created.
-	
-	seems impossible? we'd need to go over it twice.
-	
-	perhaps during the nilchecker?
-*/
+		|| fs = FastString()
+		for s in StringCorrector.list
+			.WriteName(s, fs, lengths)
+		return fs
 
-		
-		
-		|| obj = StringCorrector.Table[name]
-			return *obj
-		rz = ++Cpp_Export.StringCount
-		StringCorrector.Table[name] = rz
 
-// add string
-		.StringBlob <~ name
-		.StringBlob <~ 0|byte|
-
-		StringLengths2.EncodeLength(name.length)
+	function WriteName (|string| name, |faststring| blob, |faststring| lengths)
+		blob <~ name
+		blob <~ 0|byte|
+		Lengths.EncodeLength(name.length)
 
 
 	function CppProduct (|File|)
-		return Compiler.GeneratedCppsFolder![ "JB.cpp" ]!
+		return Compiler.GeneratedCppsFolder[ "JB.cpp" ]!
 
 
 	function HProduct (|File|)
-		return Compiler.GeneratedCppsFolder![ "JB.h" ]!
+		return Compiler.GeneratedCppsFolder[ "JB.h" ]!
 
 
 	function Product (|string| name, |File|)
-		return Compiler.GeneratedCppsFolder![ name ]!
+		return Compiler.GeneratedCppsFolder[ name ]!
 
 
 	function APIHeader (|File|)
@@ -1466,11 +1434,14 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_RenderSStr (fpMsgRenderCpp)
 		// so... convert it to an obj
-		if !.name
+		opt norefcounts
+		|| n = .name
+		if !n
 			fs <~ "JB_LUB[0]"
 		  else
+			|int| ID = n|messageid|.ID
 			fs <~ "JB_LUB["
-			fs <~ Cpp_Export[.name]
+			fs <~ (ID+1)
 			fs <~ "]"
 
 
@@ -1577,77 +1548,3 @@ helper funcsorter_fn (sortercomparer)
 	return (a|scfunction|).exportname < (b|scfunction|).exportname
 
 
-
-module StringCorrector
-	linkage: cpp_Part Crkt
-	|dictionary of int|             Table  = dictionary()
-	|dictionary of MessageID| 		Table2 = dictionary()
-	|array of messageid|			List
-	|int| 							TotalSize
-
-	function Count (|int|)
-		return .list.Length
-	
-	function NewID (|string| name, |messageid|)
-		rz = MessageID(name, @str, .count+1)
-		.list <~ rz
-		.TotalSize += name.Length + 1 // nul terminated
-	
-	function Sort
-		.list.sort(&messageid.idsorter)
-
-	function UseID (|messageID| s, |message| old, |bool|)
-		opt norefcounts
-		|| OldID = old.Position
-		require oldid <= .Count
-		expect (old.name) (old, "Invalid string table")
-		s.ID = oldid
-		s.func = @num // mark as used
-		return true
-
-		
-	function MergeTable (|message| disk, |dictionary of message| D3)
-		opt norefcounts
-		visible
-		// the disk names will be ordered... 1,2,3,4,5,6
-		for s in .list
-			if !s.name // sigh
-			|| old = d3[s]
-				.UseID(s, old)
-				old.remove
-
-		// now like: 1,3,4,6
-		|| LastID = disk.last.Position?
-		for s in .list
-			if s.func != @num
-				|| d = disk.first
-					.useid(s, d)
-				  else
-					// we have more ids than they do!
-					s.id = ++LastID
-			
-		
-	function CollectString (|message| m)
-		opt norefcounts
-		|| p = Table2.MakePlace(m.name)
-		*p := .newID(m.name)
-
-	
-	function Correct (|file| where)
-		|| m = where.parse
-			debugger 
-			.MergeTable(m, m.Dict(true))
-		
-		.sort
-		
-		|| fs = where.Out
-			.WriteTable(fs)
-	
-	function WriteTable (|faststring| fs)
-		debugger 
-		for s in .list
-			fs.AppendQuotedEscape(s)
-			fs <~ '\n'
-		
-	// so the tables are now merged
-	// now what? we need to export! and in order too.	

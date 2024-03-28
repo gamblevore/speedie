@@ -647,8 +647,7 @@ function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 	|| Dcl = SCDecl(fpType)
 	dcl.IsLookupOnly = self
 	dcl.Name = .Name
-	(dcl is const)					// lets kill da hoe
-	(dcl is Global)					// kill! kill!
+	compiler.newconst(Dcl)					// lets kill da hoe		// kill! kill!
 	dcl.NilDeclared = nilstate.real
 	.ProtoDecl = dcl
 	if (.Cls)
