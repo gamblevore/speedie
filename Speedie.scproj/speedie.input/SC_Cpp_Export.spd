@@ -35,11 +35,6 @@ constructor
 
 
 function PreRun
-	Cpp_Export.StringBlob		= FastStringCpp.new
-	Cpp_Export.StringLengths2	= FastStringCpp.new
-	Cpp_Export.StringDict		= dictionary()
-
-	
 	.AllTypes <~ "
 #ifndef ObjCID
 	#define ObjCID void*
@@ -733,9 +728,8 @@ extern "C" {
 
 
 module
-	|FastStringCpp|				StringBlob
-	|FastStringCpp|				StringLengths2
-	|dictionary of int|			StringDict
+	|FastStringCpp|				StringBlob = FastStringCpp.new
+	|FastStringCpp|				StringLengths2 = FastStringCpp.new
 	|int|						StringCount
 
 	|bool|						WriteAPI 
@@ -781,7 +775,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| blob2 = FastString()
 		blob2.EncodeLength(lengths.length)
 		blob2.EncodeLength(blob.length)
-		blob2.EncodeLength(.stringcount)
+		blob2.EncodeLength(.StringCount)
 		blob2 <~ lengths
 		blob2 <~ blob
 		blob = blob2.GetResult
@@ -792,25 +786,52 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ ";\n"
 		|| FlowStr = Options.GenFlowControlCode.render
 		fs <~ .FindGlobalsCpp.ReplaceAll("@flow", FlowStr)
-			
 		
-		.StringLengths2 = nil
-		.StringBlob = nil
-		.StringDict = nil
+		.StringLengths2.Dispose
+		.StringBlob.Dispose
+		StringCorrector.table.Dispose
 
 
 	Syntax Access (|string| name, |int|)
-		require name // "" is 0
-		|| obj = Cpp_Export.StringDict[name]
+		opt norefcounts
+		// OK... so how can we do this?
+		// we could load the stringdict from disk
+		// however... we do need to remove values that are no longer used.
+		// lets say we load some strings with numbers from disk... OK
+		// then we have a dictionary of strings with numbers
+		// we just need to check each item to see if it was used.
+		// I guess on use, we can copy from one dict to another dict
+		// this isnt very fun.
+		// OK... lets use a simple example
+/*
+	old: a1, b2, c3, d4, e5
+	
+	new: b, e, z
+	
+	so what is the value of e? 5? it would need to be moved down.
+	b can re main at 2. but e and z need to be moved down.
+	what if we take two fully constructed dictionaries, and reshuffle their contents?
+	so its simply a dictionary content reshuffle.
+	
+	to do that, we need to delay the stringblob from being created.
+	
+	seems impossible? we'd need to go over it twice.
+	
+	perhaps during the nilchecker?
+*/
+
+		
+		
+		|| obj = StringCorrector.Table[name]
 			return *obj
 		rz = ++Cpp_Export.StringCount
-		Cpp_Export.StringDict![name] = rz
+		StringCorrector.Table[name] = rz
 
 // add string
-		.StringBlob! <~ name
-		.StringBlob! <~ 0|byte|
+		.StringBlob <~ name
+		.StringBlob <~ 0|byte|
 
-		StringLengths2!.EncodeLength(name.length)
+		StringLengths2.EncodeLength(name.length)
 
 
 	function CppProduct (|File|)
@@ -828,11 +849,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function APIHeader (|File|)
 		|| arg = compiler.api_place.last(@arg)
 		|| ForLib = arg.find(@tmp, "libraryname")[@str]
-		|| FolName = arg.find(@tmp, "exportplace")[@str]
-		if FolName and ForLib
-			|| Fol = Compiler.BaseProjectPath![ FolName.name ]
-				if fol.mustexist("Create API-Header for API: ${arg.filelocation}")
-					rz = Fol[compiler.ProjectName + "_api.h"]
+			|| FolName = arg.find(@tmp, "exportplace")[@str]
+				|| Fol = Compiler.BaseProjectPath![ FolName.name ]
+					if fol.mustexist("Create API-Header for API: ${arg.filelocation}")
+						rz = Fol[compiler.ProjectName + "_api.h"]
 	
 	
 	function WriteFuncSub (|SCFunction| F, |string| E, |FastStringCpp| T)
@@ -922,7 +942,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function CreateClassListFunc (|Faststring| dest)
-		|| fs = faststringcpp.new
+		|| fs = FastStringCpp.new
 		.CreateClassListHeader(fs, " {\n")
 
 		for ( c in compiler.ClassList )
@@ -1025,6 +1045,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 	
 	function C_RenderItem (fpMsgRenderCpp)
+		opt norefcounts
 		// func(a:b, c:d)
 		.second!.Export( fs )
 
@@ -1180,6 +1201,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 
 	function C_RenderOpp (fpMsgRenderCpp)
+		opt norefcounts
 		|| s = .name
 		if s == kBitOr
 			fs <~ "|"
@@ -1196,6 +1218,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderBrel (fpMsgRenderCpp)
+		opt norefcounts
 		fs <~ '('
 		|| s = .name
 		if (s == "~")
@@ -1207,6 +1230,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function WriteConst (|SCDecl| D, |FastStringCpp| T)
+		opt norefcounts
 		T <~ "#define "
 		D.exportName.safe(T)
 		t <~ " ("
@@ -1226,6 +1250,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderBak (fpMsgRenderCpp)
+		opt norefcounts
 		fs <~ .name // assume pre-rendered in C!
 
 
@@ -1242,6 +1267,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function C_RenderRel (fpMsgRenderCpp)
+		opt norefcounts
 		|| first	= .first!
 		|| ch		= first
 		RenderInBracketsIfRel( ch, fs )
@@ -1256,6 +1282,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function RenderInBracketsIfRel (fpMsgRenderCpp)
+		opt norefcounts
 		if self == @Rel
 			fs <~ '('
 		
@@ -1267,6 +1294,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function WriteFuncArgs (|SCFunction| F, |FastStringCpp| T, |bool| names_only=false)
 		// int example(int a, int b)
+		opt norefcounts
 		T <~ '('
 		|| N = false
 		for a in f.args
@@ -1438,13 +1466,16 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_RenderSStr (fpMsgRenderCpp)
 		// so... convert it to an obj
-		fs <~ "JB_LUB["
-		fs <~ Cpp_Export[.name]
-		fs <~ "]"
+		if !.name
+			fs <~ "JB_LUB[0]"
+		  else
+			fs <~ "JB_LUB["
+			fs <~ Cpp_Export[.name]
+			fs <~ "]"
 
 
 	function C_RenderStr (fpMsgRenderCpp)
-		fs.appendcpp(.name)
+		fs.AppendCpp(.name)
 
 	
 	function Faststring.AppendCppAll (|string| s)
@@ -1532,7 +1563,7 @@ function string.Safe (|faststring| fs)
 			fs.appendhex(s)
 
 
-prototype fpMsgRenderCpp (|Message|self, |FastStringCpp| fs)
+prototype fpMsgRenderCpp (|Message| self, |FastStringCpp| fs)
 class FastStringCpp (FastString)
 	|string|		Cpp_Name
 //	|scfunction|	CurrFunc
@@ -1544,3 +1575,58 @@ class FastStringCpp (FastString)
 
 helper funcsorter_fn (sortercomparer)
 	return (a|scfunction|).exportname < (b|scfunction|).exportname
+
+
+
+module StringCorrector
+	linkage: cpp_Part Crkt
+	|dictionary of int|             Table  = dictionary()
+	|dictionary of MessageID| 		Table2 = dictionary()
+	|messageidlist|					Ours
+
+	function UseID (|messageID| s, |message| old, |bool|)
+		opt norefcounts
+		|| OldID = old.Position
+		require oldid <= .ours.Count
+		s.ID = oldid
+		s.func = @num // mark as used
+		return true
+
+		
+	function MergeTable (|message| disk, |dictionary of message| D3)
+		opt norefcounts
+		visible
+		// the disk names will be ordered... 1,2,3,4,5,6
+		for s in .Ours
+			|| old = d3[s]
+				.UseID(s, old)
+				old.remove
+
+		// now like: 1,3,4,6
+		|| LastID = disk.last.Position?
+		for s in .ours
+			if s.func != @num
+				|| d = disk.first
+					.useid(s, d)
+				  else
+					// we have more ids than they do!
+					s.id = ++LastID
+			
+		
+	function CollectString (|message| m)
+		opt norefcounts
+		|| p = Table2.MakePlace(m.name)
+		*p := .ours.newID(m.name)
+
+	
+	function Correct (|file| where)
+		|| m = where.parse
+			.MergeTable(m, m.Dict(true))
+
+		
+		// so how to collect this string?
+		// we normally create it on the spot
+		// but we don't want to do that now...
+		// OK so that will unify the values... but how to actually correct them?
+	
+	

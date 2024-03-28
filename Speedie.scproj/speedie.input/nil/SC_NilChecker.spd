@@ -150,6 +150,7 @@ function Char (niltrackerfn)
 
 
 function String (niltrackerfn)
+	StringCorrector.CollectString(msg)
 	return .RealBool(!msg.length)
 
 

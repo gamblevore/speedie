@@ -11,7 +11,7 @@
 extend Message {
 
 function RedundantDeclare (|nilstate| D,  |nilstate|)
-	|| str = .origrender + " redundantly tested. Declared as real." 
+	|| str = .OrigRender + " redundantly tested. Declared as real." 
 	error (self, str)
 	return D
 

@@ -234,8 +234,8 @@ function FuncDecls
 	FuncStats[.args.length min 11]++ 
 
 	if space and !.cls
-		|| L = .parent|SCModule|
-		if  (L isa SCModule)  and  (L.IsProperModule)
+		|| L = .parent
+		if  (L isa SCModule)  and  (L|SCModule|.IsProperModule)
 			L.AddModuleToFunc( space )
 
 	if .AllocCode
@@ -244,9 +244,6 @@ function FuncDecls
 				r = r.copydecl
 				.ReturnType = r
 			r.AllocSource = .AllocCode
-		 // else
-			//.returntype = typevoid 
-
 
 
 function @scfunction.TransformAll 
@@ -870,7 +867,7 @@ function scclass.RealClass (|scclass|)
 function CountCallsToParentAlloc (|Message| root, |message|)
 	opt norefcounts
 	|| FoundCount = 0
-	|| c = .cls!
+	|| c = .cls$
 	for (curr in root)
 		|| f = curr.IsParentConCall
 			|| fcls = f.cls
@@ -1423,7 +1420,9 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 		  else // "else" branch
 			|| ElseArg = SubTest.first
 				check (ElseArg ~!= "if")    (ElseArg, "Use 'elseif' instead.")
-			SubTest[@arg]
+				elsearg.expect(@arg)
+			  else
+				SubTest.msg(@arg)
 	
 	name_space = arg.scarg(name_space) #require
 	using (node)	
