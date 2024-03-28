@@ -27,7 +27,7 @@ In fact, if you look at Speedie's internals... its pretty much written in `C--`,
 
 However, if you use `C++` like `C++`, that is, you use new/delete, use it's string functions and it's file-functions, you'll find that Speedie's equivalent functions are much faster.
 
-Things get even better	for speedie when you compare it's memory management to `C++`'s shared_pointers, which are quite slow. Shared pointers are "new thing" in `C++` and help make it more reliable. Sadly, you lose even more speed.
+Things get even better	for speedie when you compare it's memory management to `C++`'s shared_pointers, which are quite slow. Shared pointers are "the new thing" in `C++` and help make it more reliable. Sadly, you lose even more speed.
 
 With speedie, you keep the reliability and gain speed.
 
