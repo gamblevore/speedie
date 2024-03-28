@@ -13,7 +13,8 @@ function compiler.PrintCompileTime (|date| durr)
 	fs <~ " // (avg $avg)"
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
 	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
-	fs <~ errorcolors.normal
+	if options.color
+		fs <~ errorcolors.normal
 	printline fs
 
 
