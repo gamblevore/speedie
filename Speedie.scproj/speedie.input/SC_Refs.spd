@@ -701,7 +701,8 @@ function scfunction.FillInDestructor
 
 
 function scfunction.FindCallParents (|message|)
-	return .CountCallsToParentAlloc( .SourceArg! )
+	|| s = .SourceArg
+		rz = .CountCallsToParentAlloc( s )
 
 
 function scfunction.CallParents

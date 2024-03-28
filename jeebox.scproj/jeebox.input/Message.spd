@@ -17,15 +17,15 @@ class Message (list)
 ////////////////////////////////
 	contains Message
 	|string|				Name
-	|Object(tag)?|			Obj					// Allow users to attach interesting information.
+	|Object(tag)?|			Obj					// Obj:   Allow users to attach interesting information.
 	|Syntax|				Func
 	|Byte|					Indent
 	|uint16|				RangeLength
 
 
 ////////////////////////////////		
-	|MsgParseFlags|			Flags				// Output only. Change freely or reuse.
-	|uint16|				Tag					// Jeebox does not use these itself.
+	|MsgParseFlags|			Flags				// Flags: Output only. Change freely or reuse.
+	|uint16|				Tag					// Tag:   Jeebox does not use this.
 ////////////////////////////////		
 			
 	constructor (|Message!| other)

@@ -54,11 +54,14 @@ function ivec4.List (|message|)
 	for i in 4
 		rz <~ self[i]
 
-function message.Dict (|dictionary of message|)
+function message.Dict (|bool| DoCount=false, |dictionary of message|)
 	opt norefcounts
 	rz = Dictionary()
+	|| i = 0
 	for s in self
 		rz[s.name] = s
+		if DoCount
+			s.Position = ++i
 
 function @file.Dictionary (|file|)
 	disabled "Use .words"

@@ -16,7 +16,6 @@ class StringShared (string)
 	false			""
 
 
-
 class MessageID (stringshared)				// now is usefully used! :D
 	linkage
 		cpp_part ID
@@ -25,8 +24,9 @@ class MessageID (stringshared)				// now is usefully used! :D
 	false	NIL
 	contains object
 	||					Obj
-	|uint64| 			MTag
+	|uint64| 			ID
 	|Syntax|			Func
+	|MessageID?| 		Next
 	
 	render
 		fs <~ .func.name
@@ -35,29 +35,63 @@ class MessageID (stringshared)				// now is usefully used! :D
 			fs.AppendQuotedEscape(self)
 			
 	syntax cast (|bool|)
-		return self != nil
+		disabled "Do you mean .length > 0  or  self != nil"
 	
-	constructor (|string| Name, |Syntax| Fn, |uint64| Tag)
+	constructor (|string| Name, |Syntax| Fn, |uint64| ID=0)
 		super.constructor(name)
 		.Func = fn
 		.obj = nil               // c++ generator fails otherwise
-		.mtag = tag
+		.ID = ID
+
+	constructor
+		cpp_part Empty
+		super.constructor("")
+		.Func = @arg
+		.ID = 0
+		
 		
 	function Msg (|message| parent, |message|)
 		return Message(parent, .func, -1, .name, .name.length)
-
 
 	module
 		function IDSorter (SorterComparer)
 			opt norefcounts
 			|| aa = a|MessageID|,   || bb = b|MessageID| 
 			
-			|| diff = aa.mTag  -  bb.mTag
+			|| diff = aa.ID  -  bb.ID
 				return diff > 0							// more frequent should have lower lengths
 				
 			return aa|uint64| < bb|uint64|
 			// Now what?
 
+
+
+struct MessageIDList
+	|messageID?| First
+	|messageID?| Last
+	|int| 		 Count
+
+	iterator
+		|| curr = .first
+		while curr != nil
+			yield curr
+			curr++
+			if curr == .first
+				debugger
+				exit
+
+	function NewID (|string| name, |syntax| func=@str, |messageid|)
+		rz = MessageID(name, func, ++.count)
+		self <~ rz
+		
+		
+	syntax append (|messageid| i)
+		|| l = .last
+		if l != nil
+			l.next = i
+		  else
+			.first = i
+		.last = i
 
 
 /*function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)

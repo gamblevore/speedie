@@ -379,7 +379,8 @@ function scfunction.AddConstructorReturn2
 
 function scfunction.AddConstructorReturn (|message| prms)
 	opt norefcounts
-	require (.cls!.isobject)
+	|| c = .cls
+	require (c and c.isobject)
 	is newnew
 	using prms
 	|| dcl = prms.msg(@decl)

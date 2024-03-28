@@ -280,8 +280,6 @@ function InitBasicStuff (|int|) // compiler.init
 		stderr.LowerErrorsTo = ErrorSeverity.Warning
 		compiler.InitedOK = false
 	(Message).Restore
-	
-	cpp_export[""] // str0
 	options.ListAllLib = linkage.interpreter
 	.ModuleList <~ .program
 	
