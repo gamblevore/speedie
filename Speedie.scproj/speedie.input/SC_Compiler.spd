@@ -110,6 +110,7 @@ linkage
 |[String]|					SyxArray
 |Message|					ExtendList = message()
 |Message|					ConstantsList = message()
+|[scdecl]|					DeclConstants
 |[scclass]|					TasksList
 |[Message]|					TasksTodo
 |[Message]|					ExtendModuleList
@@ -178,6 +179,7 @@ function CompileAll (|bool|)
 
 	if Options.Cpp
 		.Timer( "Export Cpp" )
+		StringCorrector.CorrectConsts
 		if linkage.Interpreter
 			ExecTable.Run
 		Cpp_Export.ExportAllSource
@@ -597,7 +599,7 @@ function InitCompiler
 	
 	////////////////////////////////////////////////
 	.TimerOutput <~ "\n"
-
+	StringCorrector.CollectString(@str.msg)
 	.CurrStage = 1
 	SCGlobals.UniqueNum = 100
 	////////////////////////////////////////////////
@@ -622,7 +624,7 @@ function InitCompiler
 
 
 
-function GeneratedCppsFolder (|File|)
+function GeneratedCppsFolder (|File!|)
 	// * For most projects (Galaxies), we build jb.cpp in the temp folder, when built from terminal.
 	// * For xcode compiles, we use ExternalCompile, which creates a "Cpp" folder for the jb.cpp to be in
 	//   keeping it nice and separate from the builds that we want to use.
@@ -745,6 +747,11 @@ function CheckMaxVars
 	// what about the function count
 */
 
+
+function NewConst (|scdecl| d)
+	d <~ scdeclinfo.Const ||| scdeclinfo.Global
+	.DeclConstants <~ d
+	
 
 function DoRefAnalysis
 	opt norefcounts

@@ -387,7 +387,6 @@ function scfunction.AddConstructorReturn (|message| prms)
 		dcl.msg(@arel, "!") <~ (@thg, .cls!.name)
 
 
-
 function CreateConstructors 
 	if .IsObject
 		|| Con = .FindAllocFunc( "Constructor" )

@@ -92,14 +92,14 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			newitem.source = thg
 
 		newitem.nildeclared = nilstate.real // no point in having a nil constant.
-		NewItem <~ scdeclinfo.Const ||| scdeclinfo.Global
+		compiler.newconst(newitem)
 		NameList <~ NewItem.source! // crappy work around for now...
 		.TryAdd( line, NewItem, NewItem.Name )
 	
 	
 	if (ch == "flags")
 		|| NewItem = SCDecl(TypeInt!)
-		NewItem <~ scdeclinfo.Const ||| scdeclinfo.Global
+		Compiler.newconst(NewItem)
 		|| s = (FuncName.Name, "Flag")(FuncName)
 		NewDeclNum( NewItem, lastflag|int|.bits, "Largest" + s )
 		.TryAdd( ch, NewItem, NewItem.Name )

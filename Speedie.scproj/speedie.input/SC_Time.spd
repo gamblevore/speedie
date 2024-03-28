@@ -6,9 +6,14 @@ function compiler.PrintCompileTime (|date| durr)
 	fs.normal  "Stages",		fs <~ Compiler.CurrStage
 	fs.normal  "Classes",		fs <~ compiler.ReachedClassCount
 	fs.normal  "Funcs",			fs <~ "${compiler.reachedfuncs} / ${compiler.funclist.length}"
-	fs.normal  "Strings",		fs <~ "${stringcorrector.list.length} / ", stringcorrector.TotalSize.strsize(fs)
+	fs.normal  "Strings"
+	|| avg = stringcorrector.TotalSize|float| / stringcorrector.list.length|float|
+	fs <~ "${stringcorrector.list.length} / "	
+	stringcorrector.TotalSize.strsize(fs)
+	fs <~ " // (avg $avg)"
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
 	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
+	fs <~ errorcolors.normal
 	printline fs
 
 

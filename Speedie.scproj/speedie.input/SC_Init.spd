@@ -52,7 +52,7 @@ function Message.AllowedMoveToInit (|bool|)
 
 
 function SCModule.LoadInitFuncSub (|message| init, |string| name)
-	|| msg = "function $Name (|int|)".ParseClean
+	|| msg = "helper $Name (|int|)".ParseClean
 	msg <~ init
 	|| fn = .NewModuleFunc( msg )
 		(fn is InitFunc)

@@ -61,7 +61,7 @@ function message.Dict (|bool| DoCount=false, |dictionary of message|)
 	for s in self
 		rz[s.name] = s
 		if DoCount
-			s.Position = ++i
+			s.Position = i++
 
 function @file.Dictionary (|file|)
 	disabled "Use .words"
@@ -77,7 +77,7 @@ function string.Dict (|byte| sep='\n', |!dictionary|)
 
 function string.Sort (|byte| sep = '\n', |string|)
 	|| x = .split(sep)
-	x.Sort(StringSorter)
+	x.Sort(&String.Sorter)
 	return x.Join(string.byte(sep))
 
 

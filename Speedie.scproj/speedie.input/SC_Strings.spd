@@ -442,3 +442,99 @@ function Create_JeeboxTest (|Message| msg)
 
 
 
+
+module StringCorrector
+	linkage: cpp_Part Crkt
+	|dictionary of MessageID| 		Table2 = dictionary()
+	|array of messageid|			List
+	|int| 							TotalSize
+
+	function Count (|int|)
+		return .list.Length
+	
+	function NewID (|string| name, |messageid|)
+		rz = MessageID(name, @str, .count)
+		.list <~ rz
+		.TotalSize += name.Length + 1 // nul terminated
+	
+	function Sort (|bool| IDOrder)
+		opt norefcounts
+		if idorder
+			.list.sort(&messageid.idsorter)
+		  else
+			.list.sort(&string.sorter)
+			for (s in .list) (i)
+				s.id = i
+		
+
+	function UseID (|messageID| s, |message| old, |bool|)
+		opt norefcounts
+		require old
+		|int| OldID = old.Position
+		require oldid < .Count
+		expect (!old.length == !oldid) (old, "Invalid string table")
+		s.ID = oldid
+		s.func = @num // mark as used
+		old.remove
+		return true
+
+		
+	function MergeTable (|message| disk, |dictionary of message| D3)
+		opt norefcounts
+		visible
+		|| NextID = 0
+		|| dl = disk.last
+			NextID = dl.Position + 1
+
+		// the disk names will be ordered... 1,2,3,4,5,6
+		if disk.hasany
+			for s in .list
+				.UseID(s, d3[s])
+
+		// now like: 1,3,4,6
+
+		for s in .list
+			if (s.func != @num) and !.useid(s, disk.first)
+				// we have more ids than they do!
+				s.id = nextID++
+			
+		
+	function CollectString (|message| m)
+		opt norefcounts
+		|| p = Table2.MakePlace(m.name)
+		|| i = (*p)|messageid|
+		if i == nil
+			i = .newID(m.name)
+			*p = i
+		m.name = i
+
+
+	function CorrectConsts
+		opt norefcounts
+		for d in compiler.DeclConstants
+			|| def = d.default
+				.CollectString(def)
+			
+	function Correct (|file| where)
+		target !debug
+			return
+		
+		|| HasAnything = false 
+		|| m = where.parse(4MB, true)
+			HasAnything = m.hasany
+			.MergeTable(m, m.Dict(true))
+		
+		.sort(HasAnything)
+		
+		|| fs = where.Out
+			.WriteTable(fs)
+	
+	
+	function WriteTable (|faststring| fs)
+		opt norefcounts
+		for s in .list
+			fs.AppendQuotedEscape(s)
+			fs <~ '\n'
+		
+	// so the tables are now merged
+	// now what? we need to export! and in order too.	
