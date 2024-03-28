@@ -6605,8 +6605,6 @@ void JB_Array_SaveWrite(Array* self, ObjectSaver* Saver);
 
 void JB_Array_SyntaxAppend(Array* self, JB_Object* item);
 
-int JB_Array_SyntaxCompare(Array* self, int n, bool Aware);
-
 bool JB_Array_SyntaxEquals(Array* self, int n, bool Aware);
 
 
@@ -6969,7 +6967,7 @@ void JB_Msg_BRel__(Message* self, FastString* fs);
 
 bool SC_Msg_BuildRunTask(Message* self, Message* fields);
 
-void SC_Msg_BuildTask(Message* self, Message* fields);
+void SC_Msg_BuildTask(Message* self, Message* fields, Message* root);
 
 void SC_Msg_BunchFix(Message* self);
 

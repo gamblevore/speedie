@@ -265,12 +265,10 @@ function SCFunction.UseExportWrapper (|string| CppWrapper, |bool|)
 		return true
 
 
-
 function SCFunction.UseCppName (|string| CppName, |bool|)
 	require CppName
 	.SetExportName( CppName, true )
 	return true
-
 
 
 function LinkagePlace (|message|)
@@ -423,11 +421,6 @@ function TryAddBase (|Message| c, |SCNode| neu)
 
 function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scfunction|)
 	return .LookUpSub( name, exp, ParamsHere, self, nil, nil, kPurposeFunc )|scfunction|
-
-
-
-//function MyProj (|SCNode|)
-//	return Compiler.Program!.ProjectFix
 
 
 function ProjectFix (|SCNode|)
@@ -705,9 +698,6 @@ function SetExportName (|String| s, |bool| Explicit)
 	.ExportName = s
 
 
-
-
-
 function SCFunction.NeedsExport (|bool|)
 	Return  (.MyReacher) or .isapi
 
@@ -912,6 +902,7 @@ dispatch RootCollectTable (CollectFunc)
 	+"selector"				SCSelector.neu
 	+"class"				SCClass.neuClass
 	+"task"					sctasks.NewTask
+	+"task_run"				sctasks.NewTask
 	+"role"					SCClass.neuRole
 	+"export_api"			SC_API.NewExportAPI
 	+"model"				SCGame3D.NeuModel
@@ -934,7 +925,6 @@ dispatch RootCollectTable (CollectFunc)
 	+"constants"			(SCModule.ConstantCollector)
 	+"flags"				(SCModule.ConstantCollector)
 	
-
 
 
 dispatch ClsCollectTable (CollectFunc)
