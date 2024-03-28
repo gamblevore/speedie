@@ -29,6 +29,7 @@ datatype FunctionType (uint)
 		NewNew
 		ExpectsRealVars
 		AlreadyExported
+		Render
 		ConOrDes = Constructor + Destructor
 	syntax is (|functiontype| t, |bool|)
 		return self & t

@@ -290,18 +290,20 @@ module ErrorColors
 		underline	= "\1b[0;1;32m"
 	
 	
-	function string.PrintColor (|string| color)
-		if (errorcolors.enabled)
-			print color
-		print self
-		if (errorcolors.enabled)
-			print ErrorColors.normal
-	
-	
 	function string.PrintlineColor (|string| color)
 		if (errorcolors.enabled): print color
 		printline self
 		if (errorcolors.enabled): print ErrorColors.normal
+	
+		
+	function faststring.Normal (|string| s)
+		if (errorcolors.enabled):  self <~ ErrorColors.normal
+		self <~ "\n"
+		self <~ s
+		self <~ ":"
+		self <~ (' ', 18-s.length)
+		if (errorcolors.enabled):  self <~ ErrorColors.good
+		
 	
 	function DisableIfNoTerminal
 		.enabled = pipe.StdOutIsTerminal

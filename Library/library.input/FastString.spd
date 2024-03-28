@@ -214,9 +214,7 @@ class FastString {
 		cpp_part AppendInfo
 		if data
 			.fieldstart(name)
-			self <~ '"'
-			.appendescape(data)
-			self <~ '"'
+			.AppendQuotedEscape(data)
 	
 	function PadTo (|int|n, |byte| b=' ')
 		self <~ (b, n-.length)

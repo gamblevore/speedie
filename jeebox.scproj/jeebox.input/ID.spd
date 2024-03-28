@@ -26,7 +26,6 @@ class MessageID (stringshared)				// now is usefully used! :D
 	||					Obj
 	|uint64| 			ID
 	|Syntax|			Func
-	|MessageID?| 		Next
 	
 	render
 		fs <~ .func.name
@@ -57,42 +56,10 @@ class MessageID (stringshared)				// now is usefully used! :D
 		function IDSorter (SorterComparer)
 			opt norefcounts
 			|| aa = a|MessageID|,   || bb = b|MessageID| 
-			
 			|| diff = aa.ID  -  bb.ID
 				return diff > 0							// more frequent should have lower lengths
 				
 			return aa|uint64| < bb|uint64|
-			// Now what?
-
-
-
-struct MessageIDList
-	|messageID?| First
-	|messageID?| Last
-	|int| 		 Count
-
-	iterator
-		|| curr = .first
-		while curr != nil
-			yield curr
-			curr++
-			if curr == .first
-				debugger
-				exit
-
-	function NewID (|string| name, |syntax| func=@str, |messageid|)
-		rz = MessageID(name, func, ++.count)
-		self <~ rz
-		
-		
-	syntax append (|messageid| i)
-		|| l = .last
-		if l != nil
-			l.next = i
-		  else
-			.first = i
-		.last = i
-
 
 /*function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)
 	opt NoRefCounts

@@ -701,28 +701,30 @@ function scfunction.FillInDestructor
 
 
 function scfunction.FindCallParents (|message|)
+	opt norefcounts
 	|| s = .SourceArg
 		rz = .CountCallsToParentAlloc( s )
 
 
-function scfunction.CallParents
+function scfunction.CallParents 
 	opt norefcounts
 	require self is Constructor or Destructor
 	require .IsARealSpdFunc and !.FindCallParents
-
-	|| parent = .Cls!.realsuper
+	|| c = .cls $
+	
+	|| parent = c.realsuper
 	require (parent and parent != TypeObject)
 
-	|| t = .cls!.isrole
+	|| t = c.isrole
 	require t != 2
 
-	|| fn = .ConOrDesForCall(self is constructor, t)
+	|| fn = .ConOrDesForCall(c, self is constructor, t)
 		.CallSuperMem( fn )
 
 
-function scfunction.ConOrDesForCall (|bool| IsConstructor, |int| Task,  |scfunction|)
+function scfunction.ConOrDesForCall (|scclass| c, |bool| IsConstructor, |int| Task,  |scfunction|)
 	opt norefcounts
-	|| parent = .Cls!.super		#require	
+	|| parent = c.super		#require	
 	|| fn = parent.ConOrDesForCall(isconstructor, task)
 		return fn
 

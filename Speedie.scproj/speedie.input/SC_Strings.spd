@@ -56,8 +56,12 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 function NewRender (CollectFunc)
 	|| cls = name_space.isnormalobject 
 	if Tran_Render( node, cls )
-		return SCBehaviour.NewActual( node, name_space, ErrPlace )
-	return SCFunction.NewFunc( node, name_space, ErrPlace )
+		rz = SCBehaviour.NewActual( node, name_space, ErrPlace )
+	else
+		rz = SCFunction.NewFunc( node, name_space, ErrPlace )
+	if rz
+		(rz|scfunction| is render) // use this later to reliably turn:   fs <~ obj.somefunc   <--   obj.Somefunc(fs)
+		
 
 
 function ObjectifyString (|Message| msg)
