@@ -955,6 +955,7 @@ dispatch ClsCollectTable (CollectFunc)
 	+"class"				SCClass.NewInnerClass
 	+"role"					SCClass.NewInnerClass
 	+"task"					sctasks.NewTask
+	+"task_run"				sctasks.NewTask
 
 	+"initafter"			(SCModule.DoInitAfter)
 	+"ignore"				(DontRemove)
