@@ -45,7 +45,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 	  else
 		fields <~ (@sdot, "interface")
 	arg.BuildTask(fields, node)
-	arg.takeallfrom(tmp)
+	arg.TakeAllFrom(tmp)
 	node.name = "role"
 	
 	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
