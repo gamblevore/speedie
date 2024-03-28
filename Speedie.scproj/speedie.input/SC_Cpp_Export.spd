@@ -1582,12 +1582,25 @@ module StringCorrector
 	linkage: cpp_Part Crkt
 	|dictionary of int|             Table  = dictionary()
 	|dictionary of MessageID| 		Table2 = dictionary()
-	|messageidlist|					Ours
+	|array of messageid|			List
+	|int| 							TotalSize
+
+	function Count (|int|)
+		return .list.Length
+	
+	function NewID (|string| name, |messageid|)
+		rz = MessageID(name, @str, .count+1)
+		.list <~ rz
+		.TotalSize += name.Length + 1 // nul terminated
+	
+	function Sort
+		.list.sort(&messageid.idsorter)
 
 	function UseID (|messageID| s, |message| old, |bool|)
 		opt norefcounts
 		|| OldID = old.Position
-		require oldid <= .ours.Count
+		require oldid <= .Count
+		expect (old.name) (old, "Invalid string table")
 		s.ID = oldid
 		s.func = @num // mark as used
 		return true
@@ -1597,14 +1610,15 @@ module StringCorrector
 		opt norefcounts
 		visible
 		// the disk names will be ordered... 1,2,3,4,5,6
-		for s in .Ours
+		for s in .list
+			if !s.name // sigh
 			|| old = d3[s]
 				.UseID(s, old)
 				old.remove
 
 		// now like: 1,3,4,6
 		|| LastID = disk.last.Position?
-		for s in .ours
+		for s in .list
 			if s.func != @num
 				|| d = disk.first
 					.useid(s, d)
@@ -1616,17 +1630,24 @@ module StringCorrector
 	function CollectString (|message| m)
 		opt norefcounts
 		|| p = Table2.MakePlace(m.name)
-		*p := .ours.newID(m.name)
+		*p := .newID(m.name)
 
 	
 	function Correct (|file| where)
 		|| m = where.parse
+			debugger 
 			.MergeTable(m, m.Dict(true))
-
 		
-		// so how to collect this string?
-		// we normally create it on the spot
-		// but we don't want to do that now...
-		// OK so that will unify the values... but how to actually correct them?
+		.sort
+		
+		|| fs = where.Out
+			.WriteTable(fs)
 	
-	
+	function WriteTable (|faststring| fs)
+		debugger 
+		for s in .list
+			fs.AppendQuotedEscape(s)
+			fs <~ '\n'
+		
+	// so the tables are now merged
+	// now what? we need to export! and in order too.	

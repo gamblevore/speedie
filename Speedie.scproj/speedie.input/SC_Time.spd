@@ -1,19 +1,15 @@
 
 
 function compiler.PrintCompileTime (|date| durr) 	
-	if StdErr.OK and !options.silent
-		print "\nStages:            "
-		Compiler.CurrStage.Render.PrintlineColor(errorcolors.good)
-		print   "Classes:           "
-		compiler.ReachedClassCount.render.printlinecolor(errorcolors.good)
-		print   "Funcs:             "
-		"${compiler.reachedfuncs} / ${compiler.funclist.length}".printlinecolor(errorcolors.good)
-
-		print   "Total elapsed:	   "
-		(durr.renderdurr+"s").printlinecolor(errorcolors.good)
-
-		Print   "Input source code: "
-		"${Compiler.stTotalSourceSize/1024} KB\n".printcolor(errorcolors.good)
+	require StdErr.OK and !options.silent
+	|| fs = faststring()
+	fs.normal  "Stages",		fs <~ Compiler.CurrStage
+	fs.normal  "Classes",		fs <~ compiler.ReachedClassCount
+	fs.normal  "Funcs",			fs <~ "${compiler.reachedfuncs} / ${compiler.funclist.length}"
+	fs.normal  "Strings",		fs <~ "${stringcorrector.list.length} / ", stringcorrector.TotalSize.strsize(fs)
+	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
+	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
+	printline fs
 
 
 function compiler.PrintStats 

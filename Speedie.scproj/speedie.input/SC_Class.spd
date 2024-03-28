@@ -380,11 +380,11 @@ function scfunction.AddConstructorReturn2
 function scfunction.AddConstructorReturn (|message| prms)
 	opt norefcounts
 	|| c = .cls
-	require (c and c.isobject)
-	is newnew
-	using prms
-	|| dcl = prms.msg(@decl)
-	dcl.msg(@arel, "!") <~ (@thg, .cls!.name)
+		require c.isobject
+		is newnew
+		using prms
+		|| dcl = prms.msg(@decl)
+		dcl.msg(@arel, "!") <~ (@thg, .cls!.name)
 
 
 
