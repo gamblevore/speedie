@@ -202,7 +202,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 	|SCDecl--| DefaultDcl
 	if FuncPrms
 		0
-	  elseif (Default)
+	  elseif (Default and mode != declmode.Properties)
 		DefaultDcl = TypeOfExprNeeded( Default, P ) #require
 		DefaultDcl = DefaultDcl.Downgrade
 		if (sdcl)   // make sure it matches.
