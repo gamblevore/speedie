@@ -516,8 +516,8 @@ module StringCorrector
 				.CollectString(def)
 			
 	function Correct (|file| where)
-		target !debug
-			return
+		if options.PrintCompileString
+			printline where
 		
 		|| HasAnything = false 
 		|| m = where.parse(4MB, true)
