@@ -12,26 +12,11 @@ class SCArg (SCNode)
 	|Message?|		TmpMovedOutFor
 	|bool|			IsClassArg
 	|bool|			IsStatementExpr
-
-	function Cls (|SCClass|)
-		opt norefcounts
-		|| p = .ParentFunc
-			Return p.Cls
 	
 	constructor (|Message| node)
 	// shouldn't be necessary!
 		super.Constructor(node)
-	 
-	 
-//	function Count (|int|)
-//		opt norefcounts
-//		for (v in .access)
-//			RZ += (v isa scdecl)
-//
-//		|| l = .parent
-//		if l isa scarg
-//			RZ += l.count + 1		
-	
+
 	render
 		fs <~ "SCArg: (\n"
 		fs <~ .source

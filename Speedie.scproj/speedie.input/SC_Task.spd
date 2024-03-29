@@ -183,25 +183,3 @@ task LessThan3 (|string| a, |int| b, |string| c)
 		return i < .b
 
 
-module SCTasks2
-	function run
-		|| xxx = lessthan("a", 5, "c")
-		|| z = LessThan.abc(xxx, 1)
-		|| yyy = task.lessthan2(1.2)
-		|| w = LessThan.abc(yyy, 1)
-
-		
-	task LessThan (|string| a, |int| b, |string| c)
-		run (|int| LESSTHAN, |bool|)
-			cpp_part TaskTest
-			return LESSTHAN < .b
-		
-		module
-			function abc (lessthan) 
-				return (self)(LessThaN)
-
-
-task LessThan2 (|float| f)
-	run 	(SCTasks2.lessthan)
-		return lessthan*2.1 < .f
-

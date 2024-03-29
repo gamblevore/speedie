@@ -217,11 +217,6 @@ function compiler.ReachedClassCount (|int|)
 		RZ += ((C.MyReacher) and c.isobject)
 
 
-function AddSubProjects (|[SCModule]| Modules)
-	opt norefcounts
-	for Imp in .ImportedList
-		Modules <~ imp.Mod
-
 function FastString.AppendWidth (|string| s, |int| Width)
 	self <~ s
 	self <~ (' ', Width - s.length)
@@ -669,11 +664,7 @@ function FindClassType (|message| n, |scdecl|)
 		return c.typenormal
 
 
-function FindModule (|string| name, |Message| where=nil, |SCNodeFindMode| Mode=0, |SCModule|)
-	return compiler.program.FindModule(name, where, Mode)
-
-
-function FindModulemsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
+function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
 	return compiler.program.FindModulemsg(where, Mode)
 
 

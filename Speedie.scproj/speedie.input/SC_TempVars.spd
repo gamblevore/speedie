@@ -32,14 +32,6 @@ function message.StatementExpr (assigns:|scarg| arg)
 	arg.IsStatementExpr = true
 
 
-function message.TheTmpVarOf (|string| tmpname, |message|)
-	rz = @Thg + tmpname
-	|| ad = .AsDecl
-		|| d = ad.copydecl
-		d.Name = ""
-		rz.obj = d
-
-
 
 function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 // We wanna merge all the temp funcs into one...

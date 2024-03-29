@@ -136,13 +136,7 @@ class SCBehaviour (SCNode)
 				|| it = c.declname
 					WriteTo <~ (@thg, it.name)
 
-	
-	function SCClass.AddInterfacesTo (|[SCModule]| List)
-		|| B = .behaviour									   #require
-		for (mod in B.interfaces)	// add all?
-			List <~ mod
-	
-	
+		
 	function SCClass.IsBehaviourTable (|bool|)
 		require self
 		return .isbehaviour == scbehaviour.kBehaviourTable

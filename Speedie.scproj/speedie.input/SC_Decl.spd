@@ -607,12 +607,6 @@ class SCDecl (SCNamed) {
 	function MatchC (|SCDecl?| O, |bool|)
 		Return .TypeMatch( o, kTypeCastTrue, nil )
 
-
-	function ClassActReplace (|scclass| cls, |scdecl|)
-		if .MatchC(cls.typenormal)
-			return cls.typenormal
-		return self
-
 		
 	function ContainedReplace (|SCDecl| contains, |bool| NeedsName,  |SCDecl|)
 		opt NoRefCounts
