@@ -22,7 +22,7 @@ class SCParamArray
 	|bool|				IsSelf
 	|bool|				IsSuper
 	|bool|				Found
-	|bool|				ConstructorAsNew
+	|bool|				AllowSelfToConstructor
 	
 
 	constructor (|Message?| exp)
@@ -31,7 +31,6 @@ class SCParamArray
 		.IsDot = (exp == @dot)
 		.IsAddress = (exp and exp.niceparent Isbrel "&")
 		.ErrCount = stderr.errorcount
-//		.side = nil
 
 
 	function addsub (|| m)
@@ -63,7 +62,9 @@ class SCParamArray
 		
 	function MadeError (|bool|)
 		return StdErr.ErrorCount > .errcount
-		
+	
+	function IsSelfCon (|bool|)
+		return (.isself or .issuper) and (scfunction.currfunc is constructor)
 	
 	function IgnoreSelfContain (|int|)
 	// need to allow addressofcasting on self struct

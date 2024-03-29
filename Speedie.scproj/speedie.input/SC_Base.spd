@@ -433,19 +433,22 @@ function ProjectFix (|SCNode|)
 
 function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
-// could be cleaned up so that exp is NEVER nil... "AddMain", "InitRootDecl", lookupvar etc would need altering...
 	
 	|| ParamsArray	= SCParamArray.new(exp)
 	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
 	ParamsArray.PreReadTypes(Arg_Space, ParamsHere, side)
 	|| CanFunction	= (ParamsHere) and  (!ParamsArray.IsAddress)
-	|| ConstructorAsNew = (purpose == kPurposeDot) and (origname ~= "new") and (self isa scmodule)
 	|SCFunction| Missing
 	|SCFunction| f
-	|scclass| owning_cls
+	|scclass|    owning_cls
+	|| AllowSelfToConstructor = false
+
 	if scfunction.currfunc
 		owning_cls = scfunction.currfunc!.cls
-	
+		if owning_cls
+			AllowSelfToConstructor = ParamsArray.IsSelfCon
+			//if AllowSelfToConstructor
+		
 	for (b.ListLookup in Curr)
 		|| o = b[ origname ]
 		if (!o)
@@ -466,10 +469,10 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 					return o.ProcessAs(exp)
 
 		
-		paramsarray.ConstructorAsNew = ConstructorAsNew
+		paramsarray.AllowSelfToConstructor = AllowSelfToConstructor
 		if (paramshere and paramshere.func == @prm) and (o isa scmodule)
 			o = o.GetTheNewer|scmodule|
-			paramsarray.ConstructorAsNew = true
+			paramsarray.AllowSelfToConstructor = false
 		
 		
 		if CanFunction and (o isa SCFunction)
@@ -488,8 +491,8 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 
 				if Paramshere
 					ParamsHere.obj = o // multiple return :3
-				if paramsarray.ConstructorAsNew and o is constructor
-					ParamsHere.first = paramshere.CreateNil
+					if !paramsarray.AllowSelfToConstructor and o is constructor
+						ParamsHere.ConstructorAddNil(paramsarray.isdot and !(self isa scmodule))
 				Return o
 		
 		if o
@@ -537,6 +540,14 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 		ErrMsg = "Can’t find function “${OrigName}”."
 	error ( exp, ErrMsg )
 
+
+function message.ConstructorAddNil (|bool| isdot)
+	opt norefcounts
+	if isdot
+		|| p = .parent
+		.first = p.first
+		self = p
+	.first = .CreateNil
 
 
 constants (

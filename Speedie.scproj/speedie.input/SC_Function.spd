@@ -374,10 +374,10 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	|| Result = kSimpleMatch
 	|| SelfCast = Incoming.ignoreselfContain()
 	TypeCast |= kNoBoolTypeCast ||| kTypeCastWantSuperDistance
-	
+		
 	|| fin = .args.length
 	|| fi = 0
-	if  (self is constructor)  and  Incoming.ConstructorAsNew
+	if  (self is constructor)  and  !Incoming.AllowSelfToConstructor
 		fi = 1
 			
 	while fi < fin
