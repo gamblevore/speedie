@@ -20,12 +20,12 @@
 * Stick with one language, when your needs change:
     * Fast: When you are doing heavy-duty data-processing
     * Expressive: When making tools with few lines of code
-    * Type-safe and modern: Allows writing large complex programs
-    * The GUI and everything else is cross-platform.
+    * Type-safe & nil-safe: Allows writing large complex programs
+    * Cross platform GUI and libs.
 * Works natively with Jeebox... Learn how to use Jeebox!
 * Not controlled by big-tech.
 
-Speedie has been written as a passion project with a large amount of hacker-mentality, and it's source code reflects that ;D Dont expect "corporate behaviour". But do expect love for the project and the community.
+Speedie has been written as a passion project with a large amount of hacker-mentality.
 
 If you'd like to support the ongoing development of Speedie, consider [sponsoring through GitHub](https://github.com/sponsors/gamblevore).
 
