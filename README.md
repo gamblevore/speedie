@@ -25,7 +25,7 @@
 * Works natively with Jeebox... Learn how to use Jeebox!
 * Not controlled by big-tech.
 
-Speedie has been written as a passion project with a large amount of hacker-mentality.
+Speedie has been written as a passion project with a large amount of hacker-mentality.ack
 
 If you'd like to support the ongoing development of Speedie, consider [sponsoring through GitHub](https://github.com/sponsors/gamblevore).
 
@@ -46,8 +46,6 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 
 # Power Features #
 * Has an awesome nil-checker and type-safety system! Write safe code while having an easy time of doing it!
-* Generally runs faster than most other languages.
-* Basic things like allocating/deallocating objects is faster, and takes less memory, than C++'s `new` or `malloc` functions.
 * Doesn't infantilise you like Javascript or Java. Allows you to mess around with pointers if you need... (but try to avoid pointers anyhow).
 * Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
 
