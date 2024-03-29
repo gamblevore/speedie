@@ -5,8 +5,9 @@ app.usage = "Usage: cloc path [...]
 --types=cpp/c/h               Only report these types
 --quiet=true/false            Makes less output
 -k                            Keeps errors
+-j							  Keep track of jeebox size
 -s                            Report parse speed
--p                            Print parse Tree
+-p                            Print parse tree
 -m                            Report Memory Usage
 -h                            Histogram
 " // set this before getting into main
@@ -28,7 +29,8 @@ module Counts
 	|int64|		Parsed
 	|int64|		Files
 	|int64|		Dirs
-	|int64| 	KB
+	|int64| 	TotalSize
+	|int64| 	TotalJBin
 	|int64| 	ObjMem
 	|int64| 	StrMem
 	|int|		MaxNodeLength
@@ -38,6 +40,7 @@ module Counts
 	||			loud = !(app.yes("quiet") or app.yes("q"))
 	||			PrintTree = false
 	||			PrintedTree = false
+	|| 			JB = app.yes("j")
 	||			ParseSpeed = app.yes("s")
 	|string| 	DefaultExt = "spd/box/jbin/jb/xml"
 	
@@ -113,8 +116,10 @@ function file.CLOC
 		counts.Lines += msg.loc[0]
 	  else
 		Counts.Lines += data.loc
-	counts.kb += data.Length
+	counts.TotalSize += data.Length
 	require msg
+	if counts.jb
+		counts.TotalJBin += msg.RenderJbin.Length
 	counts.Count(msg) 
 	if counts.PrintTree
 		if counts.maxnodelength
@@ -164,14 +169,17 @@ function Counts.Report
 	|| l = .lines
 	|| p = .parsed
 	|| d = .nodes
-	|| kb = .KB.strsize
+	|| kb = .TotalSize.strsize
 	"$l lines"
 	|| n = .names
 		"$n names, in $d nodes"
 		.ReportHisto
-	if p > 1 or f > 1
+	if (p > 1) or (f > 1) or app.yes("t")
 		"Total files: $f,  total jeebox files: $p,  total filesize: $kb"
-	if compressionstats.All.Out
-		compressionstats.all.render(app.stdout.out)
+	if .JB
+		"Total jbin: ${.totaljbin.strsize}"
+	
+	if CompressionStats.All.Out
+		CompressionStats.all.render(app.stdout.out)
 		printline
 		
