@@ -5,7 +5,7 @@ app.usage = "Usage: cloc path [...]
 --types=cpp/c/h               Only report these types
 --quiet=true/false            Makes less output
 -k                            Keeps errors
--j							  Keep track of jeebox size
+-j							  The size if the data was converted to jbin (usually larger)
 -s                            Report parse speed
 -p                            Print parse tree
 -m                            Report Memory Usage
