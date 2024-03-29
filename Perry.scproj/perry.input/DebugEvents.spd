@@ -23,7 +23,7 @@ function DebugArgsGotFocus (guiaction)
 		if self isa textview
 			.UpdateDebugArgs(v)
 		if v
-			.SlideHeight(date.now, 0.125s)
+			.SlideHeight(0.125s)
 
 
 function textview.UpdateDebugArgs (|bool| Visible=false)

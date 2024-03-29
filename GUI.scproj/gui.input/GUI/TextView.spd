@@ -1613,7 +1613,7 @@ class TextView (GUIControl)
 		|| dse = ._ErrorDelayer
 		if !dse or dse.err != err
 			.CancelDelayedError
-			._ErrorDelayer = DelayedShowError(self, date.now, 0.33s, err, P2)
+			._ErrorDelayer = DelayedShowError(self, 0.33s, date.now, err, P2)
 	
 	
 	helper ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)

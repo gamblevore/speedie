@@ -485,7 +485,7 @@ class GUIControl (list)
 			w.tasks <~ t
 
 
-	task TaskGUI ( |...!| Upon,  |date| StartTime=date.now,  |date| duration=0 )
+	task TaskGUI ( |...!| Upon,  |date| duration=0,  |date| StartTime=date.now )
 		contains –parentclass // super cool feature
 		constructor
 			// upon, starttime, duration are automatically set
