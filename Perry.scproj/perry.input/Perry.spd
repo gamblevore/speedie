@@ -169,7 +169,7 @@ function IsSpeedieCode (|bool|)
 		return r.location.PathIsCode
 	
 
-function View (|ButtonView| btn)
+function View (|ButtonView| btn, |bool| CanChangeFocus=true)
 	opt norefcounts
 	require !.istextonly
 	|| g		= btn.tag as guicontrol #require

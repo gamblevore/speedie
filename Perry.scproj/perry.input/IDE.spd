@@ -143,7 +143,6 @@ class PerryIDE (Window)
 		  else
 			Effects.Restore
 	
-	
 	behaviour Drawbackground
 		opt norefcounts
 		|| bg = app.Prefmsg("bg")

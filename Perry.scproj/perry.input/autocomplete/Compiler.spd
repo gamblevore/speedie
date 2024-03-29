@@ -98,13 +98,15 @@ extend PerryIDE
 			  else
 				h.name = ""
 
+
 	function Compile (|string| operation)
-		if .isBuilding // they pressed it twice
-			if .ProductSep.div.Collapsed
-				return .ShowCompileTab(.SpeedieText, true)
-			require ClickedCancel(.BuildButton)
-		.ActualCompile(operation)
-			
+		if !.isBuilding // they pressed it twice
+			.ActualCompile(operation)
+		  elseif .ProductSep.div.Collapsed
+			.ShowCompileTab(.SpeedieText, true)
+		  else
+			ClickedCancel(.BuildButton)
+	
 	
 	function CheckMsg (|string| operation, |bool| SaveAll, |message|)
 		if SaveAll

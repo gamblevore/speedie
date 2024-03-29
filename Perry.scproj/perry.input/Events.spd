@@ -248,7 +248,7 @@ function PerryIDE.SaveAndShowErrors (|bool| FromKeys, |bool|)
 		return true
 	if .ShowErrors
 		return true
-	ClickedAView(.Viewfiles)
+	.UseThisView(.Viewfiles)
 	return true
 		
 
@@ -256,7 +256,7 @@ function PerryIDE.SaveAndShowErrors (|bool| FromKeys, |bool|)
 function PerryIDE.ShowErrors (|bool|)
 	opt norefcounts
 	if !.isviewing(.errorlist)
-		ClickedAView(.ViewErrors)
+		.UseThisView(.ViewErrors)
 		return true
 	if .errorlist.hasany
 		.errorlist.selectatleastfirst
@@ -266,11 +266,15 @@ function PerryIDE.ShowErrors (|bool|)
 function ClickedAView (GUIaction)
 	opt norefcounts
 	if self isa ButtonView
-		|| i = .ide!
-		|| el = i.errorlist
-		if (el is visible) and .tag == el
-			el.SelectAtleastFirst
-		i.view(self)
+		.ide!.UseThisView(self, true)
+
+
+function perryide.UseThisView (|buttonview| btn, |bool| chng=false)
+	opt norefcounts
+	|| el = .errorlist
+	if (el is visible) and btn.tag == el
+		el.SelectAtleastFirst
+	.view(btn, chng)
 
 
 function ClickedNoNeed (GUIaction)
