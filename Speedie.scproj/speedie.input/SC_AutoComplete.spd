@@ -181,6 +181,7 @@ function UnusedFuncs (|message| cmd, |message|)
 				str = "()'s callers are unused"
 			arg.msg(@tmp, fn.name + str) <~ src.position
 	
+	return cmd
 
 function Check (|message| cmd, |message|)
 	if .errors.HasProblems
