@@ -635,12 +635,17 @@ module SDLApp
 			return scale
 		sdlapp.Touch
 
+
 	function FrameUpdatesAndResize
 		opt norefcounts
 		notifications.CheckForDisappear
+
+		|| Now = date()
+		for w  in  window.all
+			w.RunAllTasks(now)
+		
 		.StartResize
 		|| Dlg = .DialogIsOpen
-		|| Now = date()
 		for w  in  window.all
 			w.FixFocus
 			w.RunAllTasks(now)

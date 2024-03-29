@@ -470,13 +470,9 @@ class GUIControl (list)
 			r2.refsanity
 	
 
-	task SlideHeight (TaskGUI)
-		constructor
-			.upon.sizefraction(1) = 0.0
-
-		run
-			|| Over = now - .StartTime
-			.upon.sizefraction(1) = (Over)|float| / .duration|float|
+	task_run SlideHeight (TaskGUI)
+		|| Over = now - .StartTime
+		.upon.sizefraction(1) = (Over)|float| / .duration|float|
 
 
 	helper AddTask (|TaskGUI| t)
