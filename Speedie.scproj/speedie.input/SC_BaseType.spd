@@ -19,13 +19,13 @@ datatype SCNodeType (byte)
 
 extend scclass
 	function IsStruct (|bool|)
-		return .BaseType == SCNodeType.struct
+		return .BaseType is struct
 	
 	function IsDataTypeOnly (|bool|)
-		return .BaseType == SCNodeType.datatype
+		return .BaseType is datatype
 	
 	function IsDataTypeOrFP (|bool|)
-		return .BaseType == SCNodeType.datatype or SCNodeType.funcproto
+		return .BaseType is datatype or funcproto
 	
 
 	syntax equals (|string| name, |bool| aware, |bool|)
