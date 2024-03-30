@@ -108,8 +108,8 @@ function PerryIDE.CompileTabSelect (|object| Desired, |bool| select=false)
 			|| vis = (Desired == i or obj)
 			(i is selected)  = vis
 			(obj is visible) = vis
-			if vis and select
-				obj.ScrollToEnd		
+//			if vis and select
+//				obj.ScrollToEnd		
 
 
 function ClickedToolbar (GUIAction)
