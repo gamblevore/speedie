@@ -21,7 +21,7 @@ static void AddLostChild_(int PID, int C) {
 			int Ex = 255; 	int Sig = 0;
 			if (WIFEXITED(C))   Ex = WEXITSTATUS(C);
 			if (WIFSIGNALED(C)) Sig = WTERMSIG(C);
-			if (!Ex) // in case unix is being dumb. Which happens a lot.
+			if (Sig and !Ex) // in case unix is being dumb. Which happens a lot.
 				Ex = -1;
 			F->_Exit = Ex;
 			F->_Status = Sig;
@@ -43,7 +43,7 @@ int JB_PID_Status (ProcessOwner* F) {
 }
 
 int JB_PID_Exit (ProcessOwner* F) {
-	while (SigChildOutStanding) {
+	while (SigChildOutStanding > 0) {
 		while (true) {
 			int ExitCode = 0;
 			int PID = waitpid(-1, &ExitCode, WNOHANG);
@@ -57,6 +57,8 @@ int JB_PID_Exit (ProcessOwner* F) {
 		}
 		SigChildOutStanding--;
 	}
+	if (SigChildOutStanding < 0) // ?what?
+		SigChildOutStanding = 0;
 	return F->_Exit;
 }
 
