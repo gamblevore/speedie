@@ -471,8 +471,7 @@ class GUIControl (list)
 	
 
 	task_run SlideHeight (TaskGUI)
-		|| Over = now - .StartTime
-		.upon.sizefraction(1) = (Over)|float| / .duration|float|
+		.upon.SizeFraction(1) = progress
 
 
 	helper AddTask (|TaskGUI| t)
@@ -482,10 +481,13 @@ class GUIControl (list)
 
 
 	task TaskGUI ( |...!| Upon,  |date| duration=0,  |date| StartTime=date.now )
-		contains –parentclass // super cool feature
-		constructor
-			// upon, starttime, duration are automatically set
+		contains –parentclass			// super cool feature
+		constructor						// upon,  StartTime,  duration are automatically set
 			upon.addtask(self)
+		
+		function Progress (|date| now, |float|)
+			|| Over = now - .StartTime
+			return (Over)|float| / .duration|float|
 		
 		function RunOne (|date| now, |bool|)
 			opt NoRefCounts
@@ -500,11 +502,11 @@ class GUIControl (list)
 				is started
 			  elseif self isnt waitstillstart
 				return true
-			|| ok = (self)(now)
+			|| ok = (self)(now, .progress(now))
 			if self isnt Finished
 				return ok
 		
-		run (|date| now,  |ErrorInt|)
+		run (|date| now, |float| progress, |ErrorInt|)
 			return -1
 
 
