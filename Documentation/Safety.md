@@ -1,6 +1,6 @@
 ## Safety In Speedie
 
-Making your code safe, as in not crashing unexpectly is a hugely important thing.
+Making your code safe, as in not crashing unexpectedly is a hugely important thing.
 
 Speedie has a lot of safety features built in, including:
 
@@ -8,14 +8,14 @@ Speedie has a lot of safety features built in, including:
 * Type-Safety
 * Numeric-Safety
 * Exceptionless Error Handling
-* Loop safety
-* Safe Library
-* Managed Memory
+* Loop-Safety
+* A Safe Library
+* Managed-Memory
 
 Speedie's memory-manager is a form of safety... its what you expect from most OOP systems, but its worth mentioning as C/C++ doesn't have it.
 
 
-### Safe Library
+### Speedie's Safe Library
 
 Speedie's library is safe too. It won't crash. _(If it crashes, then thats a bug that the speedie devs should fix. But I haven't seen that for a long time.)_ This isn't like C++ where `strlen(nil)` can crash your app.
 
@@ -28,7 +28,7 @@ For example this:
     || b = myarray.pop
     || c = myarray.pop // returns nil!
 
-That won't crash. It just returns `nil`. Which is totally valid. Same with accessing `myarray[-1]` just returns `nil`.
+That won't crash. It just returns `nil`. Which is totally valid. Same with accessing `myarray[-1]`. It just returns `nil`.
     
 
 ### Loop Safety
@@ -40,6 +40,7 @@ Speedie recognises a basic infinite loop. Not all but a basic one. It also recog
             "hello" // speedie does not allow this
     
     function B
+        "oh no!"
         B() // speedie doesn't allow this either
 
 Not a common bug, but nice that speedie saves you from it!
@@ -175,7 +176,9 @@ The nil-checker will complain when we set `msg.position`, because `msg` could be
 
 This works fine now! Because the nil-checker understands how loops work.
 
-You can override the nil-checker using the `!` symbol.
+The infererencer only works on local vars, not on object properties or global vars, sadly. But you can copy them to a local var and then let the inferencer do its work.
+
+You can also override the nil-checker using the `!` symbol.
 
     // parsing this particular string, should never return nil, but speedie doesnt know this.
     || msg = "abc, def".parse
